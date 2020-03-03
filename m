@@ -2,134 +2,77 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1769A176B6A
-	for <lists+kvm@lfdr.de>; Tue,  3 Mar 2020 03:50:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1A03E176D8B
+	for <lists+kvm@lfdr.de>; Tue,  3 Mar 2020 04:25:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729096AbgCCCuM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 Mar 2020 21:50:12 -0500
-Received: from mga17.intel.com ([192.55.52.151]:48417 "EHLO mga17.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729082AbgCCCuJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 2 Mar 2020 21:50:09 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 02 Mar 2020 18:50:08 -0800
-X-IronPort-AV: E=Sophos;i="5.70,509,1574150400"; 
-   d="scan'208";a="233439160"
-Received: from xiaoyaol-mobl.ccr.corp.intel.com (HELO [10.255.30.67]) ([10.255.30.67])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-SHA; 02 Mar 2020 18:50:05 -0800
-Subject: Re: [PATCH 1/6] KVM: x86: Fix tracing of CPUID.function when function
- is out-of-range
-To:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Jan Kiszka <jan.kiszka@siemens.com>
-References: <20200302195736.24777-1-sean.j.christopherson@intel.com>
- <20200302195736.24777-2-sean.j.christopherson@intel.com>
-From:   Xiaoyao Li <xiaoyao.li@intel.com>
-Message-ID: <6b41fc5c-f7f4-b20d-cfb5-95bf13cc7534@intel.com>
-Date:   Tue, 3 Mar 2020 10:50:03 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+        id S1727030AbgCCDZ5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 Mar 2020 22:25:57 -0500
+Received: from mail-il1-f193.google.com ([209.85.166.193]:36264 "EHLO
+        mail-il1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726859AbgCCDZ5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 2 Mar 2020 22:25:57 -0500
+Received: by mail-il1-f193.google.com with SMTP id b15so1501082iln.3
+        for <kvm@vger.kernel.org>; Mon, 02 Mar 2020 19:25:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=wzQcjQiljMZHk04fD58LGKeytnaqThE2ImCl62xxtGw=;
+        b=gvtKrk97dyg8vZFA/UyhjwGK7wwLRLzO4JaKCmDnLPB4uaVOIWceJk3AVrSWG+tqn+
+         i38ENLxtrVWCUEezxMcaWvK1ydOlXaZyDFBOHwQRYG34ddB9vCoOZHaW3FY4aBIgOIow
+         qMvVJF1R2Y+In3LSEoce8WHpTlsDOVkVWe5f8NgQQ+t0kCsPHNYPlZcO8m7PbJjIFdUQ
+         /RQ/Cs1N4e1qXZQRvabsrcNXQloJUPZbwatzhaZe1OxCbiUpGhBAy1I2WdBrWGIZnZaj
+         vjHYWQ/6nk03klg/mtoRuhHh8HfURPYXbwuVz+PzgRzk8ugRU4ZUDractKKJTIbJ/X6J
+         0FEg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=wzQcjQiljMZHk04fD58LGKeytnaqThE2ImCl62xxtGw=;
+        b=VoCz3By29cFIdtjbh6hinX93kXr7J5rN1xu+bU2oVptZ0KeFDR12cqgQmZzOYgNcua
+         XiR2qVFMkNIIyAo/KfBq4AS6LMrV4fPzQdmZU+Y4F3/F6AJU9rl0EypISDbSUwvAKG21
+         gmB5bPApd2vp2Kqg5ynsNIDmnzM73CwtNUb+aHhiX93oll/Zcxd7wf6iVD1YSsK7fDqS
+         ENGYLSB1B2TpzwELioR9BaGuLkC3i+UYqGpX52mOVfaLTBdp+IBaGzqPDcV7oT+qfWIL
+         Q/5ASIbZ5EIRo9QfPY81wr5g8zKRveSZEq69dxXiVdt4+jHLnFyZXtPdd3kU8cXTGW7t
+         rX9g==
+X-Gm-Message-State: ANhLgQ15mEKJrRRPHGa51Y8M2Jga3l/xUKKsa1sS4sL8G6A4cyOXjpWq
+        kPsMrJlNloY9AhsZxEoZy7ed/FwD/8XQ47cuio72FJ0e
+X-Google-Smtp-Source: ADFU+vsXeBNw6lE9vPufNiNNr1E9nPXO3ou8dsPEfPthJokT+oEqBw0I0OoQKRXOLzdC/aMa2lzH9rdkH3GNL5fM9Lw=
+X-Received: by 2002:a92:981b:: with SMTP id l27mr2882984ili.118.1583205954541;
+ Mon, 02 Mar 2020 19:25:54 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20200302195736.24777-2-sean.j.christopherson@intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20200302195736.24777-1-sean.j.christopherson@intel.com> <20200302195736.24777-3-sean.j.christopherson@intel.com>
+In-Reply-To: <20200302195736.24777-3-sean.j.christopherson@intel.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Mon, 2 Mar 2020 19:25:43 -0800
+Message-ID: <CALMp9eThBnN3ktAfwhNs7L-O031JDFqjb67OMPooGvmkcdhK4A@mail.gmail.com>
+Subject: Re: [PATCH 2/6] KVM: x86: Fix CPUID range check for Centaur and
+ Hypervisor ranges
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Jan Kiszka <jan.kiszka@siemens.com>,
+        Xiaoyao Li <xiaoyao.li@intel.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 3/3/2020 3:57 AM, Sean Christopherson wrote:
-> Rework kvm_cpuid() to query entry->function when adjusting the output
-> values so that the original function (in the aptly named "function") is
-> preserved for tracing.  This fixes a bug where trace_kvm_cpuid() will
-> trace the max function for a range instead of the requested function if
-> the requested function is out-of-range and an entry for the max function
-> exists.
-> 
-> Fixes: 43561123ab37 ("kvm: x86: Improve emulation of CPUID leaves 0BH and 1FH")
-> Reported-by: Jan Kiszka <jan.kiszka@siemens.com>
-> Cc: Jim Mattson <jmattson@google.com>
-> Cc: Xiaoyao Li <xiaoyao.li@intel.com>
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> ---
->   arch/x86/kvm/cpuid.c | 15 +++++++--------
->   1 file changed, 7 insertions(+), 8 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> index b1c469446b07..6be012937eba 100644
-> --- a/arch/x86/kvm/cpuid.c
-> +++ b/arch/x86/kvm/cpuid.c
-> @@ -997,12 +997,12 @@ static bool cpuid_function_in_range(struct kvm_vcpu *vcpu, u32 function)
->   	return max && function <= max->eax;
->   }
->   
-> +/* Returns true if the requested leaf/function exists in guest CPUID. */
->   bool kvm_cpuid(struct kvm_vcpu *vcpu, u32 *eax, u32 *ebx,
->   	       u32 *ecx, u32 *edx, bool check_limit)
->   {
-> -	u32 function = *eax, index = *ecx;
-> +	const u32 function = *eax, index = *ecx;
->   	struct kvm_cpuid_entry2 *entry;
-> -	struct kvm_cpuid_entry2 *max;
->   	bool found;
->   
->   	entry = kvm_find_cpuid_entry(vcpu, function, index);
-> @@ -1015,18 +1015,17 @@ bool kvm_cpuid(struct kvm_vcpu *vcpu, u32 *eax, u32 *ebx,
->   	 */
->   	if (!entry && check_limit && !guest_cpuid_is_amd(vcpu) &&
->   	    !cpuid_function_in_range(vcpu, function)) {
-> -		max = kvm_find_cpuid_entry(vcpu, 0, 0);
-> -		if (max) {
-> -			function = max->eax;
-> -			entry = kvm_find_cpuid_entry(vcpu, function, index);
-> -		}
-> +		entry = kvm_find_cpuid_entry(vcpu, 0, 0);
-> +		if (entry)
-> +			entry = kvm_find_cpuid_entry(vcpu, entry->eax, index);
+On Mon, Mar 2, 2020 at 11:57 AM Sean Christopherson
+<sean.j.christopherson@intel.com> wrote:
 
-There is a problem.
+> The bad behavior can be visually confirmed by dumping CPUID output in
+> the guest when running Qemu with a stable TSC, as Qemu extends the limit
+> of range 0x40000000 to 0x40000010 to advertise VMware's cpuid_freq,
+> without defining zeroed entries for 0x40000002 - 0x4000000f.
 
-when queried leaf is out of range on Intel CPU, it returns the maximum 
-basic leaf, and any dependence on input ECX (i.e., subleaf) value in the 
-basic leaf is honored. As disclaimed in SDM of CPUID instruction.
-
-The ECX should be honored if and only the leaf has a significant index.
-If the leaf doesn't has a significant index, it just ignores the EDX 
-input in bare metal.
-
-So it should be something like:
-
-if (!entry && check_limit && !guest_cpuid_is_amd(vcpu) &&
-	!cpuid_function_in_range(vcpu, function)) {
-	entry = kvm_find_cpuid_entry(vcpu, 0, 0);
-	if (entry) {
-		entry = kvm_find_cpuid_entry(vcpu, entry->eax, 0);
-		if (entry &&
-		    entry->flags & KVM_CPUID_FLAG_SIGNIFCANT_INDEX ) {
-			entry = kvm_find_cpuid_entry(vcpu, entry->eax,
-						     index);
-		}
-	}
-}
-
->   	}
->   	if (entry) {
->   		*eax = entry->eax;
->   		*ebx = entry->ebx;
->   		*ecx = entry->ecx;
->   		*edx = entry->edx;
-> -		if (function == 7 && index == 0) {
-> +
-> +		if (entry->function == 7 && index == 0) {
->   			u64 data;
->   		        if (!__kvm_get_msr(vcpu, MSR_IA32_TSX_CTRL, &data, true) &&
->   			    (data & TSX_CTRL_CPUID_CLEAR))
-> 
-
+I think it could be reasonably argued that this is a userspace bug.
+Clearly, when userspace explicitly supplies the results for a leaf,
+those results override the default CPUID values for that leaf. But I
+haven't seen it documented anywhere that leaves *not* explicitly
+supplied by userspace will override the default CPUID values, just
+because they happen to appear in some magic range.
