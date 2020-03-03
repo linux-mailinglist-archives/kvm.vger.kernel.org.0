@@ -2,125 +2,79 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7BC1417777C
-	for <lists+kvm@lfdr.de>; Tue,  3 Mar 2020 14:43:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D27C81777F5
+	for <lists+kvm@lfdr.de>; Tue,  3 Mar 2020 14:59:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727935AbgCCNif (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 Mar 2020 08:38:35 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:58593 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727585AbgCCNif (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 3 Mar 2020 08:38:35 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1583242714;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=ZIdK4y2508Xb+/mC7DM2rNqSWal4zqTlltB83tI+9ok=;
-        b=Yg7ia4RC2VS+U+6fidNIUeX4vAeARQYWF4cmv6bNBxb7d77/BsYjbLmSP5ffujqIxF9gVg
-        IiLHhUkAg6N7NrOYq9Vq8iR6WyW/PncRw2eTMItpPHvw/wwF+jwZgPSE4iltShDukZ9o+a
-        XNmhicTDaDXCMIO1hlq5EiC4OoobHXE=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-94-x1aP1UdgPxiZxXWjpAaLAQ-1; Tue, 03 Mar 2020 08:38:32 -0500
-X-MC-Unique: x1aP1UdgPxiZxXWjpAaLAQ-1
-Received: by mail-wr1-f69.google.com with SMTP id c6so1215461wrm.18
-        for <kvm@vger.kernel.org>; Tue, 03 Mar 2020 05:38:32 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=ZIdK4y2508Xb+/mC7DM2rNqSWal4zqTlltB83tI+9ok=;
-        b=FZ7hdnAVufUlX4XNluYHQuCD38+KraZzJx8Md9j/WrJ38OFT8wzpbhQQ83sQlNgyRm
-         9uUajTBS0RasaH/vBipAs1Dr9cLiNAR+MN1/aAV89yMjgG/zKOoS6nfgwumv0sPtzy91
-         I9qNE7hkZ7S3sjszT5u05pWAbMuZzrdgbWiEapw3EZx9ROD/hlGJUwNwyAn8H3WHObnY
-         ThnVUMzmrKDfmOaHxfJT4x19Ha5IoPIjhqIzGueuQBOsCWolCFQjhm0a2RQ0ET+nkQnR
-         1m5ucSoR8wF+J1Ma9HrHb524rTgKyjcbQl3Dw+B2V3b9x8RCAFd9h3WNdAI5RcW+Wu7h
-         VR3g==
-X-Gm-Message-State: ANhLgQ25nkaTgvmOOzD7/7W4yWlflBUMjF2078/Q+krr7YKIYqCWxS73
-        46Hzyt7uSUyoTfB+nSxGkVntLbTZBrX3T/L2y9xN9Lx6ok67FkVIrhZFLS66+LimdlCZQpXTwYO
-        4E7Wqcn4Bn1kp
-X-Received: by 2002:adf:e506:: with SMTP id j6mr5414696wrm.309.1583242710883;
-        Tue, 03 Mar 2020 05:38:30 -0800 (PST)
-X-Google-Smtp-Source: ADFU+vtH8R9P8o+Uo7AGDF83jLl43yugXJTyawCm8EZlL50uB6ig6MkWHi92L0GcizSfOo6phbXeew==
-X-Received: by 2002:adf:e506:: with SMTP id j6mr5414680wrm.309.1583242710689;
-        Tue, 03 Mar 2020 05:38:30 -0800 (PST)
-Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id c8sm24438550wru.7.2020.03.03.05.38.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Mar 2020 05:38:30 -0800 (PST)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Oliver Upton <oupton@google.com>
-Subject: Re: [GIT PULL] KVM changes for Linux 5.6-rc4
-In-Reply-To: <9bb75cdc-961e-0d83-0546-342298517496@redhat.com>
-References: <1582570669-45822-1-git-send-email-pbonzini@redhat.com> <87zhcyfvmk.fsf@vitty.brq.redhat.com> <8fbeb3c2-9627-bf41-d798-bafba22073e3@redhat.com> <87tv35fv5t.fsf@vitty.brq.redhat.com> <9bb75cdc-961e-0d83-0546-342298517496@redhat.com>
-Date:   Tue, 03 Mar 2020 14:38:29 +0100
-Message-ID: <87o8tdftii.fsf@vitty.brq.redhat.com>
+        id S1729337AbgCCN73 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 Mar 2020 08:59:29 -0500
+Received: from mail.kernel.org ([198.145.29.99]:45346 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728037AbgCCN73 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 3 Mar 2020 08:59:29 -0500
+Received: from mail.kernel.org (ip-109-40-2-133.web.vodafone.de [109.40.2.133])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id CA2692166E;
+        Tue,  3 Mar 2020 13:59:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1583243969;
+        bh=s0m7dutvhHUxy0GagWG09NA7+534PrANWICiABloyXk=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=VHd1+Rd8iKbiniMJBzd3ZSrKtuo3VTCThxt/tGg4YtrBn8kgYQimTjGz6/kyZKI04
+         AovqYF4jNVqQyJIz8L6QNA6lPBPbX2IB6xEhMwhBJeGyWGuGvCf90jQKG1cpWF+bOH
+         +1h5fL0iOcwtUR60JNM7RD+zJ4h7iN2bp0GF6LCI=
+Received: from mchehab by mail.kernel.org with local (Exim 4.92.3)
+        (envelope-from <mchehab@kernel.org>)
+        id 1j9850-001Ye9-MH; Tue, 03 Mar 2020 14:59:26 +0100
+From:   Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+Cc:     Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>, kvm@vger.kernel.org,
+        linux-doc@vger.kernel.org
+Subject: [PATCH v3 18/18] docs: kvm: get read of devices/README
+Date:   Tue,  3 Mar 2020 14:59:25 +0100
+Message-Id: <6e9c4aaf704cdc7b4e517122fb87cbe05f0ffd23.1583243827.git.mchehab+huawei@kernel.org>
+X-Mailer: git-send-email 2.24.1
+In-Reply-To: <cover.1583243826.git.mchehab+huawei@kernel.org>
+References: <cover.1583243826.git.mchehab+huawei@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
+To:     unlisted-recipients:; (no To-header on input)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
+Add the information there inside devices/index.rst
 
-> On 03/03/20 14:02, Vitaly Kuznetsov wrote:
->> Right you are,
->> 
->> a big hammer like
->> 
->> diff --git a/arch/x86/include/asm/kvm_emulate.h b/arch/x86/include/asm/kvm_emulate.h
->> index 2a8f2bd..52c9bce 100644
->> --- a/arch/x86/include/asm/kvm_emulate.h
->> +++ b/arch/x86/include/asm/kvm_emulate.h
->> @@ -324,14 +324,6 @@ struct x86_emulate_ctxt {
->>          */
->>  
->>         /* current opcode length in bytes */
->> -       u8 opcode_len;
->> -       u8 b;
->> -       u8 intercept;
->> -       u8 op_bytes;
->> -       u8 ad_bytes;
->> -       struct operand src;
->> -       struct operand src2;
->> -       struct operand dst;
->>         union {
->>                 int (*execute)(struct x86_emulate_ctxt *ctxt);
->>                 fastop_t fop;
->> @@ -343,6 +335,14 @@ struct x86_emulate_ctxt {
->>          * or elsewhere
->>          */
->>         bool rip_relative;
->> +       u8 opcode_len;
->> +       u8 b;
->> +       u8 intercept;
->> +       u8 op_bytes;
->> +       u8 ad_bytes;
->> +       struct operand src;
->> +       struct operand src2;
->> +       struct operand dst;
->>         u8 rex_prefix;
->>         u8 lock_prefix;
->>         u8 rep_prefix;
->> 
->> seems to make the issue go away. (For those wondering why fielf
->> shuffling makes a difference: init_decode_cache() clears
->> [rip_relative, modrm) range) How did this even work before...
->> (I'm still looking at the code, stay tuned...)
->
-> On AMD, probably because all these instructions were normally trapped by L1.
->
-> Of these, however, most need not be zeroed again. op_bytes, ad_bytes,
-> opcode_len and b are initialized by x86_decode_insn, and dst/src/src2
-> also by decode_operand.  So only intercept is affected, adding
-> "ctxt->intercept = x86_intercept_none" should be enough.
+Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+---
+ Documentation/virt/kvm/devices/README    | 1 -
+ Documentation/virt/kvm/devices/index.rst | 3 +++
+ 2 files changed, 3 insertions(+), 1 deletion(-)
+ delete mode 100644 Documentation/virt/kvm/devices/README
 
-This matches my findings, thank you! Patch[es] are coming.
-
+diff --git a/Documentation/virt/kvm/devices/README b/Documentation/virt/kvm/devices/README
+deleted file mode 100644
+index 34a69834124a..000000000000
+--- a/Documentation/virt/kvm/devices/README
++++ /dev/null
+@@ -1 +0,0 @@
+-This directory contains specific device bindings for KVM_CAP_DEVICE_CTRL.
+diff --git a/Documentation/virt/kvm/devices/index.rst b/Documentation/virt/kvm/devices/index.rst
+index 192cda7405c8..cbadafc0e36e 100644
+--- a/Documentation/virt/kvm/devices/index.rst
++++ b/Documentation/virt/kvm/devices/index.rst
+@@ -4,6 +4,9 @@
+ Devices
+ =======
+ 
++The following documentation contains specific device bindings
++for KVM_CAP_DEVICE_CTRL.
++
+ .. toctree::
+    :maxdepth: 2
+ 
 -- 
-Vitaly
+2.24.1
 
