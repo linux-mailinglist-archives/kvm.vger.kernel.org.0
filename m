@@ -2,84 +2,77 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C07A0176DF6
-	for <lists+kvm@lfdr.de>; Tue,  3 Mar 2020 05:25:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D29A6176E01
+	for <lists+kvm@lfdr.de>; Tue,  3 Mar 2020 05:30:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727052AbgCCEZn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 Mar 2020 23:25:43 -0500
-Received: from mail-il1-f196.google.com ([209.85.166.196]:33125 "EHLO
-        mail-il1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726859AbgCCEZn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 2 Mar 2020 23:25:43 -0500
-Received: by mail-il1-f196.google.com with SMTP id r4so1602192iln.0
-        for <kvm@vger.kernel.org>; Mon, 02 Mar 2020 20:25:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=aA3rcp37ynjDu323kR9lCxo/VdLX9hbo1ymg1oSY7S0=;
-        b=oTw2GfzGDJ0OMWgicWBB4xW5WXn76GCVh2YKU/tozHXB4mTl2yYRIchpoJtv1xTOil
-         jLA0hw4IBTGABDDTx+c3ivnH1+4pzygwbKXJiiJpG+QdB1seituXo8R0bxEynjj3Mp6j
-         OKMQgy+sFpv+/bIqAnqWHW1H7E092voDCvhx+fNXiD6tvWkOWNsH6oXuM9ArJvs6yidI
-         QoGvJZq/p3jhr8PU+mLBfPn2Uz59MQZ89WvErgYo9l/Xx1261x9mzRs450YGkcPrg1hJ
-         h3qW0dttkHW7Vm23Ek8h53hPVobnIiusnRQZfhwELxBb8+WDUG0lWKve27Azgb0aq+Sx
-         abdA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=aA3rcp37ynjDu323kR9lCxo/VdLX9hbo1ymg1oSY7S0=;
-        b=tLXqFTqWUgr2U2cOUvzQul5uCviMf7senPP932lpcdNLP/8XYCRX+b8SQnXh6T3Qid
-         fosJacw0Ew19U1j33TdmJiedKso1nvsvV8abhTmYg2l7uwE7CfmUX36MmfEMu7bdgIXT
-         jYX5220Kp8qQsbe4jRMLaA9uHjZwW366NV4foif37y/LFiOzqspA8693u0WRcpc+dzVp
-         QuPLSpu30MWDkkfnrxxrObve9+Jmev0vBtcC8xNatJWpzFwGAMQByak8qOSNdQs3pWyE
-         4JBwLmx7zfK7wWC4D3U7GrBbwnBkLzdcc7ElKGwGCVsizaqcvJfyossbErd6JCsv6DBA
-         EpTQ==
-X-Gm-Message-State: ANhLgQ0TPdsNDEX9fg0/DSTVaX1QiBY/36ua5SvwRvprGeM49I4LHuBW
-        zUP93RoPIO239JM6Wu67HgE3RqzxNAZPsDPcd7kJfA==
-X-Google-Smtp-Source: ADFU+vtiBNqH2OPw0N2pJtfK+G7U2UzZDbiRRJlnhpRPIPpeGlUsbvg6RWXrTljxxVNVtiVIvJ5UkLSPHJ/E4N50zrE=
-X-Received: by 2002:a92:8547:: with SMTP id f68mr3077508ilh.26.1583209542408;
- Mon, 02 Mar 2020 20:25:42 -0800 (PST)
+        id S1727067AbgCCEaK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 Mar 2020 23:30:10 -0500
+Received: from szxga01-in.huawei.com ([45.249.212.187]:2975 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726859AbgCCEaJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 2 Mar 2020 23:30:09 -0500
+Received: from DGGEMM406-HUB.china.huawei.com (unknown [172.30.72.53])
+        by Forcepoint Email with ESMTP id C3831BB387B08619B24D;
+        Tue,  3 Mar 2020 12:30:06 +0800 (CST)
+Received: from DGGEMM528-MBX.china.huawei.com ([169.254.8.90]) by
+ DGGEMM406-HUB.china.huawei.com ([10.3.20.214]) with mapi id 14.03.0439.000;
+ Tue, 3 Mar 2020 12:29:57 +0800
+From:   "Zhoujian (jay)" <jianjay.zhou@huawei.com>
+To:     Peter Feiner <pfeiner@google.com>
+CC:     Ben Gardon <bgardon@google.com>, Peter Xu <peterx@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "dgilbert@redhat.com" <dgilbert@redhat.com>,
+        "quintela@redhat.com" <quintela@redhat.com>,
+        "Liujinsong (Paul)" <liu.jinsong@huawei.com>,
+        "linfeng (M)" <linfeng23@huawei.com>,
+        "wangxin (U)" <wangxinxin.wang@huawei.com>,
+        "Huangweidong (C)" <weidong.huang@huawei.com>,
+        Junaid Shahid <junaids@google.com>
+Subject: RE: RFC: Split EPT huge pages in advance of dirty logging
+Thread-Topic: RFC: Split EPT huge pages in advance of dirty logging
+Thread-Index: AdXmU97BvyK5YKoyS5++my9GnvXVk///1+yA//428yCAA1S3gP/+abuggAMs8gCAAd62AIAAJJ4A//B2yiAD16MpAP/+sSEw
+Date:   Tue, 3 Mar 2020 04:29:57 +0000
+Message-ID: <B2D15215269B544CADD246097EACE7474BB4DD60@DGGEMM528-MBX.china.huawei.com>
+References: <B2D15215269B544CADD246097EACE7474BAF9AB6@DGGEMM528-MBX.china.huawei.com>
+ <20200218174311.GE1408806@xz-x1>
+ <B2D15215269B544CADD246097EACE7474BAFF835@DGGEMM528-MBX.china.huawei.com>
+ <20200219171919.GA34517@xz-x1>
+ <B2D15215269B544CADD246097EACE7474BB03772@DGGEMM528-MBX.china.huawei.com>
+ <CANgfPd-P_=GqcMiwLSSkUhZDt42aMLUsCJt+CPdUN5yR3RLHmQ@mail.gmail.com>
+ <cd4626a1-44b5-1a62-cf4b-716950a6db1b@google.com>
+ <CAM3pwhGF3ABoew5UOd9xUxtm14VN_o0gr+D=KfR3ZEQjmKgUdQ@mail.gmail.com>
+ <B2D15215269B544CADD246097EACE7474BB4A71D@DGGEMM528-MBX.china.huawei.com>
+ <CAM3pwhH8xyisEq_=LFTy=sZNA2kRTQTbBqW6GA-0M-AiJy0q1g@mail.gmail.com>
+In-Reply-To: <CAM3pwhH8xyisEq_=LFTy=sZNA2kRTQTbBqW6GA-0M-AiJy0q1g@mail.gmail.com>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.173.228.206]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-References: <20200302195736.24777-1-sean.j.christopherson@intel.com>
- <20200302195736.24777-3-sean.j.christopherson@intel.com> <CALMp9eThBnN3ktAfwhNs7L-O031JDFqjb67OMPooGvmkcdhK4A@mail.gmail.com>
-In-Reply-To: <CALMp9eThBnN3ktAfwhNs7L-O031JDFqjb67OMPooGvmkcdhK4A@mail.gmail.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Mon, 2 Mar 2020 20:25:31 -0800
-Message-ID: <CALMp9eR0Mw8iPv_Z43gfCEbErHQ6EXX8oghJJb5Xge+47ZU9yQ@mail.gmail.com>
-Subject: Re: [PATCH 2/6] KVM: x86: Fix CPUID range check for Centaur and
- Hypervisor ranges
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Jan Kiszka <jan.kiszka@siemens.com>,
-        Xiaoyao Li <xiaoyao.li@intel.com>
-Content-Type: text/plain; charset="UTF-8"
+X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Mar 2, 2020 at 7:25 PM Jim Mattson <jmattson@google.com> wrote:
->
-> On Mon, Mar 2, 2020 at 11:57 AM Sean Christopherson
-> <sean.j.christopherson@intel.com> wrote:
->
-> > The bad behavior can be visually confirmed by dumping CPUID output in
-> > the guest when running Qemu with a stable TSC, as Qemu extends the limit
-> > of range 0x40000000 to 0x40000010 to advertise VMware's cpuid_freq,
-> > without defining zeroed entries for 0x40000002 - 0x4000000f.
->
-> I think it could be reasonably argued that this is a userspace bug.
-> Clearly, when userspace explicitly supplies the results for a leaf,
-> those results override the default CPUID values for that leaf. But I
-> haven't seen it documented anywhere that leaves *not* explicitly
-> supplied by userspace will override the default CPUID values, just
-> because they happen to appear in some magic range.
-
-In fact, the more I think about it, the original change is correct, at
-least in this regard. Your "fix" introduces undocumented and
-unfathomable behavior.
+DQoNCkZyb206IFBldGVyIEZlaW5lciBbbWFpbHRvOnBmZWluZXJAZ29vZ2xlLmNvbV0gDQpTZW50
+OiBUdWVzZGF5LCBNYXJjaCAzLCAyMDIwIDEyOjI5IEFNDQpUbzogWmhvdWppYW4gKGpheSkgPGpp
+YW5qYXkuemhvdUBodWF3ZWkuY29tPg0KQ2M6IEJlbiBHYXJkb24gPGJnYXJkb25AZ29vZ2xlLmNv
+bT47IFBldGVyIFh1IDxwZXRlcnhAcmVkaGF0LmNvbT47IGt2bUB2Z2VyLmtlcm5lbC5vcmc7IHFl
+bXUtZGV2ZWxAbm9uZ251Lm9yZzsgcGJvbnppbmlAcmVkaGF0LmNvbTsgZGdpbGJlcnRAcmVkaGF0
+LmNvbTsgcXVpbnRlbGFAcmVkaGF0LmNvbTsgTGl1amluc29uZyAoUGF1bCkgPGxpdS5qaW5zb25n
+QGh1YXdlaS5jb20+OyBsaW5mZW5nIChNKSA8bGluZmVuZzIzQGh1YXdlaS5jb20+OyB3YW5neGlu
+IChVKSA8d2FuZ3hpbnhpbi53YW5nQGh1YXdlaS5jb20+OyBIdWFuZ3dlaWRvbmcgKEMpIDx3ZWlk
+b25nLmh1YW5nQGh1YXdlaS5jb20+OyBKdW5haWQgU2hhaGlkIDxqdW5haWRzQGdvb2dsZS5jb20+
+DQpTdWJqZWN0OiBSZTogUkZDOiBTcGxpdCBFUFQgaHVnZSBwYWdlcyBpbiBhZHZhbmNlIG9mIGRp
+cnR5IGxvZ2dpbmcNCg0KPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBQZXRl
+ciBGZWluZXIgW21haWx0bzpwZmVpbmVyQGdvb2dsZS5jb21dDQoNClsuLi5dDQoNCj5IaSBKYXks
+DQo+SSd2ZSBiZWVuIHNpY2sgc2luY2UgSSBzZW50IG15IGxhc3QgZW1haWwsIHNvIEkgaGF2ZW4n
+dCBnb3R0ZW4gdG8gdGhpcyBwYXRjaCBzZXQgeWV0LiBJJ2xsIHNlbmQgaXQgaW4gdGhlIG5leHQg
+d2VlayBvciB0d28uwqANCg0KT0ssIHBsZWFzZSB0YWtlIGNhcmUgb2YgeW91cnNlbGYuDQoNCg0K
+UmVnYXJkcywNCkpheSBaaG91DQo=
