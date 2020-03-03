@@ -2,69 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7A52017719B
-	for <lists+kvm@lfdr.de>; Tue,  3 Mar 2020 09:54:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 716F7177258
+	for <lists+kvm@lfdr.de>; Tue,  3 Mar 2020 10:28:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727879AbgCCIyS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 Mar 2020 03:54:18 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:20432 "EHLO
+        id S1728120AbgCCJ2H (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 Mar 2020 04:28:07 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:41837 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727659AbgCCIyS (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 3 Mar 2020 03:54:18 -0500
+        by vger.kernel.org with ESMTP id S1727870AbgCCJ2G (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 3 Mar 2020 04:28:06 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1583225656;
+        s=mimecast20190719; t=1583227686;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=OjsWUXqjUWqBSkSGCD4PbdKz2btlJQttY4xDooxfz/U=;
-        b=ADh48kCNYCMHEDMMIE7F2ggKcYH6TV9UqPz9VPM/pbLe1ikNBRhKVVhqlyIo/sOTGKBbev
-        hyS2IAI8pmIpKd/UxqCuA4Tb5YfM2us/WDmgaoL0MP37oYLCBeto878fzxXyY7voYv7A9p
-        ohgTOT7Ojf8DsE9yD+uLsgay3dMYFtg=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-111-vIlAfgy9OQmk3NN8C4EYQw-1; Tue, 03 Mar 2020 03:54:15 -0500
-X-MC-Unique: vIlAfgy9OQmk3NN8C4EYQw-1
-Received: by mail-wr1-f71.google.com with SMTP id w11so908168wrp.20
-        for <kvm@vger.kernel.org>; Tue, 03 Mar 2020 00:54:15 -0800 (PST)
+        bh=JawvsztqURHUMrivAZK9itm+6zuMO8VTLICNdnI7dxo=;
+        b=hMFIc0CLGIWvyEMhAvtDytMosd8AHGgA2I9YUdZtQsGEu6eqEDBQcUuXU5MRCBWiYHLxVX
+        GCB6HpBs78v99997mZSeKdDsW6RhbzMy7XFkNYfKR1A2GweLWMySM2KBHhafaNrpnTqWQm
+        0A5YG50M8EtIdAtyM4SmiTi52W1YxkU=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-198-zUrMuLcfMiawl1sTlG6lKg-1; Tue, 03 Mar 2020 04:28:04 -0500
+X-MC-Unique: zUrMuLcfMiawl1sTlG6lKg-1
+Received: by mail-wm1-f72.google.com with SMTP id m4so828203wmi.5
+        for <kvm@vger.kernel.org>; Tue, 03 Mar 2020 01:28:04 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=OjsWUXqjUWqBSkSGCD4PbdKz2btlJQttY4xDooxfz/U=;
-        b=GVGAuJyG0lDiZcb7J2rV4B2a7B7wsAn+/iQYBZivRpSfdtFhRC6b/gMwYfUxtr2Qwa
-         3hCgVfV1EwaOXrXw1ruGrEFuVJwlqsvr8+g8/Exw3aLKSH37tCPaXCDCI8GMZsF/7oJ6
-         dL72H6wu7794jbaz9w2sjSepzgqyd45YPBzKWzo1UFMTUu6XbAJSYSWq7t6cCJc7R4Q3
-         oQosPYwDk7GHfwE21nM5ue8E5IrEHppmhGh9toyTFCvzSu0eWPqMvrbh0Y9DgXneE9Kf
-         gwN9y8l8m8dPlXJ1UxtaIT+RDMsCKaRwznO4U/RQkHjZJjYMVB8D3rhvRVA/MGOAtYXq
-         PWXQ==
-X-Gm-Message-State: ANhLgQ211vHYpKdNQ1C13eimZxgbkxUoxVG1OhtizsEsrO5NoKadXpIy
-        1ks4tcquTIAkZE3MAJinIHNtUrNwZGTbA7vDUnP6YfMwv8IQUgg/9QqB4JZCBWznkGQG68UM863
-        qWJaXSkTWdLJ5
-X-Received: by 2002:adf:ce12:: with SMTP id p18mr4208154wrn.88.1583225653992;
-        Tue, 03 Mar 2020 00:54:13 -0800 (PST)
-X-Google-Smtp-Source: ADFU+vtxioLATY0Il+f/lYtoQmrW/DITC8fuFwFe+1VWyWHfMfdr9VUldKUP1b6K08oPMsyN/DiChQ==
-X-Received: by 2002:adf:ce12:: with SMTP id p18mr4208133wrn.88.1583225653782;
-        Tue, 03 Mar 2020 00:54:13 -0800 (PST)
+        bh=JawvsztqURHUMrivAZK9itm+6zuMO8VTLICNdnI7dxo=;
+        b=B0kmSetF08jGfUYpshcr0jiWuwod0jvrDe6Vfv7ECqDztUzmJOY4dI3YERseEOhAiX
+         RURxWMWpQohmto0PPAS+Npg8XiyFUfR6P0w6aWGl5il39/7n4zZ4oKhdM1SbxlWMuXbM
+         X5nVR+MSzkfLqqpV9a3Qwz00Swh6xqcAkRsPJMJex8lPYoqeqG0Go3sN9CvUoZnXqgrx
+         Ayy8tFP078+H5GWkqp33FcpIIqRuMyqj4R0aJqRmtwFcyeQyWlc2JW5c9cMAehWBJknQ
+         nzUuSy7HmcpYabzdH7b9eOQCpZFfeqd3jk8MXB5dfOIVMaGsTrIkI1lO7zPUXq+42Hgv
+         NiDg==
+X-Gm-Message-State: ANhLgQ0CKwtYgz4aIj+yylahY0gZVbZAvVf9jBOo+2T3RnVT9nDNGZ5b
+        fVHsc8sCe3fAotr5eaxqv3k/cZ3veUtxWJVMTQYGY2HTGFLOthpfYBYOpFDVS5o/9w/Hm/hl1MQ
+        kPm86i3+Du8bg
+X-Received: by 2002:a5d:68ce:: with SMTP id p14mr3888596wrw.315.1583227683197;
+        Tue, 03 Mar 2020 01:28:03 -0800 (PST)
+X-Google-Smtp-Source: ADFU+vsJpUVTnRWkgQAQclEelI+BOvdB7TqEFgh/PbQcMZ6SzEsdA+mGSHrg8PNex6myJcsME0a9aA==
+X-Received: by 2002:a5d:68ce:: with SMTP id p14mr3888556wrw.315.1583227682873;
+        Tue, 03 Mar 2020 01:28:02 -0800 (PST)
 Received: from ?IPv6:2001:b07:6468:f312:4c52:2f3b:d346:82de? ([2001:b07:6468:f312:4c52:2f3b:d346:82de])
-        by smtp.gmail.com with ESMTPSA id t124sm3204441wmg.13.2020.03.03.00.54.13
+        by smtp.gmail.com with ESMTPSA id a6sm3075433wmh.32.2020.03.03.01.28.02
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 03 Mar 2020 00:54:13 -0800 (PST)
-Subject: Re: [PATCH] kvm: selftests: Support dirty log initial-all-set test
-To:     Jay Zhou <jianjay.zhou@huawei.com>, kvm@vger.kernel.org
-Cc:     peterx@redhat.com, shuah@kernel.org,
-        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-        wangxinxin.wang@huawei.com, weidong.huang@huawei.com,
-        liu.jinsong@huawei.com
-References: <20200303080710.1672-1-jianjay.zhou@huawei.com>
+        Tue, 03 Mar 2020 01:28:02 -0800 (PST)
+Subject: Re: [PATCH v3 0/7] KVM: x86/mmu: nVMX: 5-level paging cleanup and
+ enabling
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20200303020240.28494-1-sean.j.christopherson@intel.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <f0c2dcb8-4415-eec9-d181-fb29d206c55c@redhat.com>
-Date:   Tue, 3 Mar 2020 09:54:13 +0100
+Message-ID: <748ad2db-f2da-d177-7ec8-54523465e64a@redhat.com>
+Date:   Tue, 3 Mar 2020 10:28:02 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200303080710.1672-1-jianjay.zhou@huawei.com>
+In-Reply-To: <20200303020240.28494-1-sean.j.christopherson@intel.com>
 Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -73,34 +75,46 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 03/03/20 09:07, Jay Zhou wrote:
->  #ifdef USE_CLEAR_DIRTY_LOG
-> -	if (!kvm_check_cap(KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2)) {
-> -		fprintf(stderr, "KVM_CLEAR_DIRTY_LOG not available, skipping tests\n");
-> +	dirty_log_manual_caps =
-> +		kvm_check_cap(KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2);
-> +	if (!dirty_log_manual_caps) {
-> +		fprintf(stderr, "KVM_CLEAR_DIRTY_LOG not available, "
-> +				"skipping tests\n");
-> +		exit(KSFT_SKIP);
-> +	}
-> +	if (dirty_log_manual_caps != KVM_DIRTY_LOG_MANUAL_CAPS &&
-> +		dirty_log_manual_caps != KVM_DIRTY_LOG_MANUAL_PROTECT_ENABLE) {
-> +		fprintf(stderr, "KVM_CLEAR_DIRTY_LOG not valid caps "
-> +				"%"PRIu64", skipping tests\n",
-> +				dirty_log_manual_caps);
->  		exit(KSFT_SKIP);
->  	}
->  #endif
+On 03/03/20 03:02, Sean Christopherson wrote:
+> Clean up MMU code related to 5 level paging, expose 5-level EPT to L1, and
+> additional clean up on top (mostly renames of functions/variables that
+> caused me no end of confusion when trying to figure out what was broken
+> at various times).
+> 
+> v3:
+>   - Dropped fixes for existing 5-level bugs (merged for 5.6).
+>   - Use get_guest_pgd() instead of get_guest_cr3_or_eptp(). [Paolo]
+>   - Add patches to fix MMU role calculation to play nice with 5-level
+>     paging without requiring additional CR4.LA_57 bit.
+> 
+> v2:
+>   - Increase the nested EPT array sizes to accomodate 5-level paging in
+>     the patch that adds support for 5-level nested EPT, not in the bug
+>     fix for 5-level shadow paging.
+> 
+> Sean Christopherson (7):
+>   KVM: x86/mmu: Don't drop level/direct from MMU role calculation
+>   KVM: x86/mmu: Drop kvm_mmu_extended_role.cr4_la57 hack
+>   KVM: nVMX: Allow L1 to use 5-level page walks for nested EPT
+>   KVM: nVMX: Rename nested_ept_get_cr3() to nested_ept_get_eptp()
+>   KVM: nVMX: Rename EPTP validity helper and associated variables
+>   KVM: x86/mmu: Rename kvm_mmu->get_cr3() to ->get_guest_pgd()
+>   KVM: nVMX: Drop unnecessary check on ept caps for execute-only
+> 
+>  arch/x86/include/asm/kvm_host.h |  3 +-
+>  arch/x86/include/asm/vmx.h      | 12 +++++++
+>  arch/x86/kvm/mmu/mmu.c          | 59 +++++++++++++++++----------------
+>  arch/x86/kvm/mmu/paging_tmpl.h  |  4 +--
+>  arch/x86/kvm/svm.c              |  2 +-
+>  arch/x86/kvm/vmx/nested.c       | 52 ++++++++++++++++++-----------
+>  arch/x86/kvm/vmx/nested.h       |  4 +--
+>  arch/x86/kvm/vmx/vmx.c          |  3 +-
+>  arch/x86/kvm/x86.c              |  2 +-
+>  9 files changed, 82 insertions(+), 59 deletions(-)
 > 
 
-Thanks, instead of this final "if" it should be enough to do
-
-	dirty_log_manual_caps &= (KVM_DIRTY_LOG_MANUAL_PROTECT_ENABLE |
-				  KVM_DIRTY_LOG_INITIALLY_SET);
-
-
-Otherwise looks good, I'll test it and eventually apply both patches.
+Queued, thanks.  I have a cleanup on top to unify set_cr3 and
+set_tdp_cr3, which I'll post after testing it.
 
 Paolo
 
