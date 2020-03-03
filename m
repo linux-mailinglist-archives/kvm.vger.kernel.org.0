@@ -2,91 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 300CE177BBA
-	for <lists+kvm@lfdr.de>; Tue,  3 Mar 2020 17:18:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1E954177BC5
+	for <lists+kvm@lfdr.de>; Tue,  3 Mar 2020 17:21:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730164AbgCCQSN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 Mar 2020 11:18:13 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:34834 "EHLO
+        id S1730263AbgCCQVO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 Mar 2020 11:21:14 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:42293 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1730229AbgCCQSN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 3 Mar 2020 11:18:13 -0500
+        with ESMTP id S1729382AbgCCQVN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 3 Mar 2020 11:21:13 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1583252292;
+        s=mimecast20190719; t=1583252473;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=ux1LbKEH1m8oXcQEuc/U7Ti4AulME3jbfobJPAiWr6U=;
-        b=Nbu2AaDLW1bbAk/SUyzTcpyfRzUgmnogY0ndlL0DopJonAnTWRcTnIwp4zyjJtUGKLYaBx
-        brcrLR9TW+raziIAy2l1K0noYhf0Rv6h2d06SRl8r7WrUfd6mj6EtyN+oJ3nEcjEZw7mp+
-        /6GoHZGPDv+nRgurw8Rq3+c52+qtVCo=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-274-wb-kGGUeNPujKSIsFXNwpw-1; Tue, 03 Mar 2020 11:18:10 -0500
-X-MC-Unique: wb-kGGUeNPujKSIsFXNwpw-1
-Received: by mail-wm1-f69.google.com with SMTP id p4so1102161wmp.0
-        for <kvm@vger.kernel.org>; Tue, 03 Mar 2020 08:18:10 -0800 (PST)
+        bh=DCeZj5j9NdL7UBpxH3v0lLKGG3Zlc6FhMXze5Z03xF8=;
+        b=WjBP76CYiACr3MaxrTuUIkC80U9QjOgItxhzGxFBbYSzqFGYvWrp+GIjKFIzDP3waYJJMq
+        RYAMlj4bTeoRRG993yXzpJWTwLocduN+ZMKErULdqW2TL1zr2nUq6ZxlLA3ceMYHdvUe1v
+        51GiGM8j49GytSd0foZ9R+LVBX9P3zg=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-206-xNRjjaiUPOOWkMQDHwl0iQ-1; Tue, 03 Mar 2020 11:21:11 -0500
+X-MC-Unique: xNRjjaiUPOOWkMQDHwl0iQ-1
+Received: by mail-wm1-f70.google.com with SMTP id r19so1315181wmh.1
+        for <kvm@vger.kernel.org>; Tue, 03 Mar 2020 08:21:11 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=ux1LbKEH1m8oXcQEuc/U7Ti4AulME3jbfobJPAiWr6U=;
-        b=UXxdIuTvr26QfTSQMZZT13GlklQefOObXt44Wa3IwJPVdyL7d0veCb2i1qg4NPrDEq
-         bliTd5xRw1Mn6ZJeVFl2T21G4VmauYsOr1b2J4uY3VWoBzwnpLBk7gkO77J1jS43Z5Pz
-         XyK0hVdXHdXzdEOzBbfhKUG4t2B6BGDnOHwHuZDMt5ZAKjbMp0EW51ExBqSaUlh29Yh7
-         BoOfVqiSYkagvN2HlH5/sNr6v16BUR0zqBw8eszYFECrXyG5YVdJMvW52T7mo29tpI6l
-         RhW2FT6lMoYENN16ReUXdyhJX9HhYfn5nFuB/0NiCyzyJ3j/l9V7MvIW53oJeg0wh6cA
-         KwNw==
-X-Gm-Message-State: ANhLgQ1C5IEKMKRNdtC9B4RgxndS8wful6zFm6RYYE/aLCellMq1QKAo
-        p542+E0vUeW0stJWOj2ksHu4uT8wIIaDCESKhD/nGtWbah0asKzuHBkYHyqbRL6wIDv+cwVOytA
-        dCuV8X92zxDo6
-X-Received: by 2002:adf:f491:: with SMTP id l17mr6715442wro.149.1583252289252;
-        Tue, 03 Mar 2020 08:18:09 -0800 (PST)
-X-Google-Smtp-Source: ADFU+vtwoSxwVgqZLc0Y9OACaZM95EIDRl4nCEMRKLI2B2zsM4WldStnyj0BJz2YJF13qOqzBE61vQ==
-X-Received: by 2002:adf:f491:: with SMTP id l17mr6715424wro.149.1583252289089;
-        Tue, 03 Mar 2020 08:18:09 -0800 (PST)
-Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id 16sm4551998wmi.0.2020.03.03.08.18.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Mar 2020 08:18:08 -0800 (PST)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=DCeZj5j9NdL7UBpxH3v0lLKGG3Zlc6FhMXze5Z03xF8=;
+        b=eyn9wX+HOKrZlbK10yLl36hNu9iEZzaIyfeBgBd+l9GGA7tnmrHkuoN1MznzbbDQEw
+         wJizSQC706aGEevSI4cyYNQY6PoG/+LCOW4Hke3FunmFxNebZ61fixy0y5kncSyOi+G1
+         oB8xUUtAfH19rg9Q+TrGwdq3dxMUlkUOFFh1UhRUq58Dsq0DZCKUpy3lO/nYJujYz++A
+         gZ/qTAAT9l6nC8BES85Un3letBHdeMbne0qhXjt/R6yqAh4L0X1X38P7IgejKtwJNeSo
+         EIkBwSCw3rpCqnaA/d5Px4ZvxMzQq6anKz8aszNGiArBfJnOsMaDAAw93xxi0XR7YGsa
+         NGBQ==
+X-Gm-Message-State: ANhLgQ0MKeVmUHToOV5+lijQF9b511R2pzBK+ytYt6d8QwpSj5pnWr17
+        /Hn3czkyW+jLVaxL4h3kVZFmCw/lAlK99VS2KFtGRCEsgAf7YcviTiO3DCSOYe6YmfczpYrfoGU
+        RYNoBBB4mmhQF
+X-Received: by 2002:a5d:4dc2:: with SMTP id f2mr6141668wru.293.1583252470206;
+        Tue, 03 Mar 2020 08:21:10 -0800 (PST)
+X-Google-Smtp-Source: ADFU+vvsutRpekH5hSIMUkCUQL3Af25B6EYt6WV4MX0oXaABfru5qSw5Hb/cPaoCQBFFCRN89HfuKw==
+X-Received: by 2002:a5d:4dc2:: with SMTP id f2mr6141655wru.293.1583252469994;
+        Tue, 03 Mar 2020 08:21:09 -0800 (PST)
+Received: from [192.168.178.40] ([151.20.254.94])
+        by smtp.gmail.com with ESMTPSA id z14sm31327373wrg.76.2020.03.03.08.21.08
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 03 Mar 2020 08:21:09 -0800 (PST)
+Subject: Re: [PATCH 1/2] KVM: x86: clear stale x86_emulate_ctxt->intercept
+ value
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org
+Cc:     Jim Mattson <jmattson@google.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Bandan Das <bsd@redhat.com>, Oliver Upton <oupton@google.com>,
         linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 08/13] KVM: x86: Dynamically allocate per-vCPU emulation context
-In-Reply-To: <20200303145746.GA1439@linux.intel.com>
-References: <20200218232953.5724-1-sean.j.christopherson@intel.com> <20200218232953.5724-9-sean.j.christopherson@intel.com> <87wo89i7e3.fsf@vitty.brq.redhat.com> <83bd7c0c-ac3c-8ab5-091f-598324156d27@redhat.com> <20200303145746.GA1439@linux.intel.com>
-Date:   Tue, 03 Mar 2020 17:18:07 +0100
-Message-ID: <8736apfm4g.fsf@vitty.brq.redhat.com>
+References: <20200303143316.834912-1-vkuznets@redhat.com>
+ <20200303143316.834912-2-vkuznets@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <4f933f77-6924-249a-77c5-3c904e7c052b@redhat.com>
+Date:   Tue, 3 Mar 2020 17:21:08 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <20200303143316.834912-2-vkuznets@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sean Christopherson <sean.j.christopherson@intel.com> writes:
+On 03/03/20 15:33, Vitaly Kuznetsov wrote:
+> Commit c44b4c6ab80e ("KVM: emulate: clean up initializations in
+> init_decode_cache") reduced the number of fields cleared by
+> init_decode_cache() claiming that they are being cleared elsewhere,
+> 'intercept', however, seems to be left uncleared in some cases.
+> 
+> The issue I'm observing manifests itself as following:
+> after commit 07721feee46b ("KVM: nVMX: Don't emulate instructions in guest
+> mode") Hyper-V guests on KVM stopped booting with:
+> 
+>  kvm_nested_vmexit:    rip fffff802987d6169 reason EPT_VIOLATION info1 181
+>     info2 0 int_info 0 int_info_err 0
+>  kvm_page_fault:       address febd0000 error_code 181
+>  kvm_emulate_insn:     0:fffff802987d6169: f3 a5
+>  kvm_emulate_insn:     0:fffff802987d6169: f3 a5 FAIL
+>  kvm_inj_exception:    #UD (0x0)
 
-> On Tue, Mar 03, 2020 at 11:26:21AM +0100, Paolo Bonzini wrote:
->> On 26/02/20 18:29, Vitaly Kuznetsov wrote:
->> >>  struct x86_emulate_ctxt {
->> >> +	void *vcpu;
->> > Why 'void *'? I changed this to 'struct kvm_vcpu *' and it seems to
->> > compile just fine...
->> > 
->> 
->> I guess because it's really just an opaque pointer; using void* ensures
->> that the emulator doesn't break the emulator ops abstraction.
->
-> Ya, it prevents the emulator from directly deferencing the vcpu.
->
+Slightly rephrased:
 
-Makes sense, a comment like /* Should never be dereferenced by the
-emulater */ would've helped)
+After commit 07721feee46b ("KVM: nVMX: Don't emulate instructions in guest
+mode") Hyper-V guests on KVM stopped booting with:
 
--- 
-Vitaly
+ kvm_nested_vmexit:    rip fffff802987d6169 reason EPT_VIOLATION info1 181
+    info2 0 int_info 0 int_info_err 0
+ kvm_page_fault:       address febd0000 error_code 181
+ kvm_emulate_insn:     0:fffff802987d6169: f3 a5
+ kvm_emulate_insn:     0:fffff802987d6169: f3 a5 FAIL
+ kvm_inj_exception:    #UD (0x0)
+
+"f3 a5" is a "rep movsw" instruction, which should not be intercepted
+at all.  Commit c44b4c6ab80e ("KVM: emulate: clean up initializations in
+init_decode_cache") reduced the number of fields cleared by
+init_decode_cache() claiming that they are being cleared elsewhere,
+'intercept', however, is left uncleared if the instruction does not have
+any of the "slow path" flags (NotImpl, Stack, Op3264, Sse, Mmx, CheckPerm,
+NearBranch, No16 and of course Intercept itself).
+
+Paolo
 
