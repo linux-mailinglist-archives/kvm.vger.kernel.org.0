@@ -2,140 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5887C177303
-	for <lists+kvm@lfdr.de>; Tue,  3 Mar 2020 10:49:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3F87D177351
+	for <lists+kvm@lfdr.de>; Tue,  3 Mar 2020 11:00:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727907AbgCCJtM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 Mar 2020 04:49:12 -0500
-Received: from goliath.siemens.de ([192.35.17.28]:55287 "EHLO
-        goliath.siemens.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727412AbgCCJtM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 3 Mar 2020 04:49:12 -0500
-Received: from mail2.sbs.de (mail2.sbs.de [192.129.41.66])
-        by goliath.siemens.de (8.15.2/8.15.2) with ESMTPS id 0239mh4H025629
-        (version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 3 Mar 2020 10:48:43 +0100
-Received: from [167.87.29.4] ([167.87.29.4])
-        by mail2.sbs.de (8.15.2/8.15.2) with ESMTP id 0239mg1F019125;
-        Tue, 3 Mar 2020 10:48:43 +0100
-Subject: Re: [PATCH 3/6] KVM: x86: Add dedicated emulator helper for grabbing
- CPUID.maxphyaddr
+        id S1727952AbgCCKAR convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Tue, 3 Mar 2020 05:00:17 -0500
+Received: from szxga08-in.huawei.com ([45.249.212.255]:40674 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726694AbgCCKAR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 3 Mar 2020 05:00:17 -0500
+Received: from DGGEMM401-HUB.china.huawei.com (unknown [172.30.72.53])
+        by Forcepoint Email with ESMTP id 25233E88490DF10B5032;
+        Tue,  3 Mar 2020 18:00:13 +0800 (CST)
+Received: from DGGEMM421-HUB.china.huawei.com (10.1.198.38) by
+ DGGEMM401-HUB.china.huawei.com (10.3.20.209) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Tue, 3 Mar 2020 18:00:12 +0800
+Received: from DGGEMM528-MBX.china.huawei.com ([169.254.8.90]) by
+ dggemm421-hub.china.huawei.com ([10.1.198.38]) with mapi id 14.03.0439.000;
+ Tue, 3 Mar 2020 18:00:06 +0800
+From:   "Zhoujian (jay)" <jianjay.zhou@huawei.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>
-References: <20200302195736.24777-1-sean.j.christopherson@intel.com>
- <20200302195736.24777-4-sean.j.christopherson@intel.com>
- <de2ed4e9-409a-6cb1-e295-ea946be11e82@redhat.com>
-From:   Jan Kiszka <jan.kiszka@siemens.com>
-Message-ID: <617748ab-0edd-2ccc-e86b-b86b0adf9d3b@siemens.com>
-Date:   Tue, 3 Mar 2020 10:48:42 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+CC:     "peterx@redhat.com" <peterx@redhat.com>,
+        "shuah@kernel.org" <shuah@kernel.org>,
+        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "wangxin (U)" <wangxinxin.wang@huawei.com>,
+        "Huangweidong (C)" <weidong.huang@huawei.com>,
+        "Liujinsong (Paul)" <liu.jinsong@huawei.com>
+Subject: RE: [PATCH] kvm: selftests: Support dirty log initial-all-set test
+Thread-Topic: [PATCH] kvm: selftests: Support dirty log initial-all-set test
+Thread-Index: AQHV8TLCY4Xj3pfMjkOXUb/5I4t9Iqg2Ch2AgACW2iA=
+Date:   Tue, 3 Mar 2020 10:00:05 +0000
+Message-ID: <B2D15215269B544CADD246097EACE7474BB4E091@DGGEMM528-MBX.china.huawei.com>
+References: <20200303080710.1672-1-jianjay.zhou@huawei.com>
+ <f0c2dcb8-4415-eec9-d181-fb29d206c55c@redhat.com>
+In-Reply-To: <f0c2dcb8-4415-eec9-d181-fb29d206c55c@redhat.com>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.173.228.206]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-In-Reply-To: <de2ed4e9-409a-6cb1-e295-ea946be11e82@redhat.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 03.03.20 09:48, Paolo Bonzini wrote:
-> On 02/03/20 20:57, Sean Christopherson wrote:
->> Add a helper to retrieve cpuid_maxphyaddr() instead of manually
->> calculating the value in the emulator via raw CPUID output.  In addition
->> to consolidating logic, this also paves the way toward simplifying
->> kvm_cpuid(), whose somewhat confusing return value exists purely to
->> support the emulator's maxphyaddr calculation.
->>
->> No functional change intended.
+
+
+> -----Original Message-----
+> From: Paolo Bonzini [mailto:pbonzini@redhat.com]
+> Sent: Tuesday, March 3, 2020 4:54 PM
+> To: Zhoujian (jay) <jianjay.zhou@huawei.com>; kvm@vger.kernel.org
+> Cc: peterx@redhat.com; shuah@kernel.org; linux-kselftest@vger.kernel.org;
+> linux-kernel@vger.kernel.org; wangxin (U) <wangxinxin.wang@huawei.com>;
+> Huangweidong (C) <weidong.huang@huawei.com>; Liujinsong (Paul)
+> <liu.jinsong@huawei.com>
+> Subject: Re: [PATCH] kvm: selftests: Support dirty log initial-all-set test
 > 
-> I don't think this is a particularly useful change.  Yes, it's not
-> intuitive but is it more than a matter of documentation (and possibly
-> moving the check_cr_write snippet into a separate function)?
+> On 03/03/20 09:07, Jay Zhou wrote:
+> >  #ifdef USE_CLEAR_DIRTY_LOG
+> > -	if (!kvm_check_cap(KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2)) {
+> > -		fprintf(stderr, "KVM_CLEAR_DIRTY_LOG not available, skipping
+> tests\n");
+> > +	dirty_log_manual_caps =
+> > +		kvm_check_cap(KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2);
+> > +	if (!dirty_log_manual_caps) {
+> > +		fprintf(stderr, "KVM_CLEAR_DIRTY_LOG not available, "
+> > +				"skipping tests\n");
+> > +		exit(KSFT_SKIP);
+> > +	}
+> > +	if (dirty_log_manual_caps != KVM_DIRTY_LOG_MANUAL_CAPS &&
+> > +		dirty_log_manual_caps !=
+> KVM_DIRTY_LOG_MANUAL_PROTECT_ENABLE) {
+> > +		fprintf(stderr, "KVM_CLEAR_DIRTY_LOG not valid caps "
+> > +				"%"PRIu64", skipping tests\n",
+> > +				dirty_log_manual_caps);
+> >  		exit(KSFT_SKIP);
+> >  	}
+> >  #endif
+> >
+> 
+> Thanks, instead of this final "if" it should be enough to do
+> 
+> 	dirty_log_manual_caps &= (KVM_DIRTY_LOG_MANUAL_PROTECT_ENABLE
+> |
+> 				  KVM_DIRTY_LOG_INITIALLY_SET);
+> 
+> 
+> Otherwise looks good, I'll test it and eventually apply both patches.
 
-Besides the non obvious return value of the current function, this 
-approach also avoids leaving cpuid traces for querying maxphyaddr, which 
-is also not very intuitive IMHO.
+Do I need to resubmit this patch with this modification?
 
-Jan
+Regards,
+Jay Zhou
 
 > 
 > Paolo
-> 
->> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
->> ---
->>   arch/x86/include/asm/kvm_emulate.h |  1 +
->>   arch/x86/kvm/emulate.c             | 10 +---------
->>   arch/x86/kvm/x86.c                 |  6 ++++++
->>   3 files changed, 8 insertions(+), 9 deletions(-)
->>
->> diff --git a/arch/x86/include/asm/kvm_emulate.h b/arch/x86/include/asm/kvm_emulate.h
->> index bf5f5e476f65..ded06515d30f 100644
->> --- a/arch/x86/include/asm/kvm_emulate.h
->> +++ b/arch/x86/include/asm/kvm_emulate.h
->> @@ -222,6 +222,7 @@ struct x86_emulate_ops {
->>   
->>   	bool (*get_cpuid)(struct x86_emulate_ctxt *ctxt, u32 *eax, u32 *ebx,
->>   			  u32 *ecx, u32 *edx, bool check_limit);
->> +	int (*get_cpuid_maxphyaddr)(struct x86_emulate_ctxt *ctxt);
->>   	bool (*guest_has_long_mode)(struct x86_emulate_ctxt *ctxt);
->>   	bool (*guest_has_movbe)(struct x86_emulate_ctxt *ctxt);
->>   	bool (*guest_has_fxsr)(struct x86_emulate_ctxt *ctxt);
->> diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
->> index dd19fb3539e0..bf02ed51e90f 100644
->> --- a/arch/x86/kvm/emulate.c
->> +++ b/arch/x86/kvm/emulate.c
->> @@ -4244,16 +4244,8 @@ static int check_cr_write(struct x86_emulate_ctxt *ctxt)
->>   
->>   		ctxt->ops->get_msr(ctxt, MSR_EFER, &efer);
->>   		if (efer & EFER_LMA) {
->> -			u64 maxphyaddr;
->> -			u32 eax, ebx, ecx, edx;
->> +			int maxphyaddr = ctxt->ops->get_cpuid_maxphyaddr(ctxt);
->>   
->> -			eax = 0x80000008;
->> -			ecx = 0;
->> -			if (ctxt->ops->get_cpuid(ctxt, &eax, &ebx, &ecx,
->> -						 &edx, false))
->> -				maxphyaddr = eax & 0xff;
->> -			else
->> -				maxphyaddr = 36;
->>   			rsvd = rsvd_bits(maxphyaddr, 63);
->>   			if (ctxt->ops->get_cr(ctxt, 4) & X86_CR4_PCIDE)
->>   				rsvd &= ~X86_CR3_PCID_NOFLUSH;
->> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
->> index ddd1d296bd20..5467ee71c25b 100644
->> --- a/arch/x86/kvm/x86.c
->> +++ b/arch/x86/kvm/x86.c
->> @@ -6209,6 +6209,11 @@ static bool emulator_get_cpuid(struct x86_emulate_ctxt *ctxt,
->>   	return kvm_cpuid(emul_to_vcpu(ctxt), eax, ebx, ecx, edx, check_limit);
->>   }
->>   
->> +static int emulator_get_cpuid_maxphyaddr(struct x86_emulate_ctxt *ctxt)
->> +{
->> +	return cpuid_maxphyaddr(emul_to_vcpu(ctxt));
->> +}
->> +
->>   static bool emulator_guest_has_long_mode(struct x86_emulate_ctxt *ctxt)
->>   {
->>   	return guest_cpuid_has(emul_to_vcpu(ctxt), X86_FEATURE_LM);
->> @@ -6301,6 +6306,7 @@ static const struct x86_emulate_ops emulate_ops = {
->>   	.fix_hypercall       = emulator_fix_hypercall,
->>   	.intercept           = emulator_intercept,
->>   	.get_cpuid           = emulator_get_cpuid,
->> +	.get_cpuid_maxphyaddr= emulator_get_cpuid_maxphyaddr,
->>   	.guest_has_long_mode = emulator_guest_has_long_mode,
->>   	.guest_has_movbe     = emulator_guest_has_movbe,
->>   	.guest_has_fxsr      = emulator_guest_has_fxsr,
->>
-> 
 
--- 
-Siemens AG, Corporate Technology, CT RDA IOT SES-DE
-Corporate Competence Center Embedded Linux
