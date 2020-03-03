@@ -2,80 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 79C79176E39
-	for <lists+kvm@lfdr.de>; Tue,  3 Mar 2020 05:58:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C4384176E4F
+	for <lists+kvm@lfdr.de>; Tue,  3 Mar 2020 06:04:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727407AbgCCE6k (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 Mar 2020 23:58:40 -0500
-Received: from mga03.intel.com ([134.134.136.65]:34653 "EHLO mga03.intel.com"
+        id S1725818AbgCCFEX convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Tue, 3 Mar 2020 00:04:23 -0500
+Received: from mail.kernel.org ([198.145.29.99]:36770 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726928AbgCCE6j (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 2 Mar 2020 23:58:39 -0500
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 02 Mar 2020 20:58:39 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,510,1574150400"; 
-   d="scan'208";a="232146450"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
-  by fmsmga007.fm.intel.com with ESMTP; 02 Mar 2020 20:58:38 -0800
-Date:   Mon, 2 Mar 2020 20:58:38 -0800
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Jim Mattson <jmattson@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Jan Kiszka <jan.kiszka@siemens.com>,
-        Xiaoyao Li <xiaoyao.li@intel.com>
-Subject: Re: [PATCH 2/6] KVM: x86: Fix CPUID range check for Centaur and
- Hypervisor ranges
-Message-ID: <20200303045838.GF27842@linux.intel.com>
-References: <20200302195736.24777-1-sean.j.christopherson@intel.com>
- <20200302195736.24777-3-sean.j.christopherson@intel.com>
- <CALMp9eThBnN3ktAfwhNs7L-O031JDFqjb67OMPooGvmkcdhK4A@mail.gmail.com>
- <CALMp9eR0Mw8iPv_Z43gfCEbErHQ6EXX8oghJJb5Xge+47ZU9yQ@mail.gmail.com>
+        id S1725763AbgCCFEX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 3 Mar 2020 00:04:23 -0500
+From:   bugzilla-daemon@bugzilla.kernel.org
+Authentication-Results: mail.kernel.org; dkim=permerror (bad message/signature format)
+To:     kvm@vger.kernel.org
+Subject: [Bug 206579] KVM with passthrough generates "BUG: kernel NULL
+ pointer dereference" and crashes
+Date:   Tue, 03 Mar 2020 05:04:22 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: rmuncrief@humanavance.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-206579-28872-0jsFHG7KPr@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-206579-28872@https.bugzilla.kernel.org/>
+References: <bug-206579-28872@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CALMp9eR0Mw8iPv_Z43gfCEbErHQ6EXX8oghJJb5Xge+47ZU9yQ@mail.gmail.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Mar 02, 2020 at 08:25:31PM -0800, Jim Mattson wrote:
-> On Mon, Mar 2, 2020 at 7:25 PM Jim Mattson <jmattson@google.com> wrote:
-> >
-> > On Mon, Mar 2, 2020 at 11:57 AM Sean Christopherson
-> > <sean.j.christopherson@intel.com> wrote:
-> >
-> > > The bad behavior can be visually confirmed by dumping CPUID output in
-> > > the guest when running Qemu with a stable TSC, as Qemu extends the limit
-> > > of range 0x40000000 to 0x40000010 to advertise VMware's cpuid_freq,
-> > > without defining zeroed entries for 0x40000002 - 0x4000000f.
-> >
-> > I think it could be reasonably argued that this is a userspace bug.
-> > Clearly, when userspace explicitly supplies the results for a leaf,
-> > those results override the default CPUID values for that leaf. But I
-> > haven't seen it documented anywhere that leaves *not* explicitly
-> > supplied by userspace will override the default CPUID values, just
-> > because they happen to appear in some magic range.
-> 
-> In fact, the more I think about it, the original change is correct, at
-> least in this regard. Your "fix" introduces undocumented and
-> unfathomable behavior.
+https://bugzilla.kernel.org/show_bug.cgi?id=206579
 
-Heh, the takeaway from this is that whatever we decide on needs to be
-documented somewhere :-)
+--- Comment #45 from muncrief (rmuncrief@humanavance.com) ---
+Well, I spent some time today trying to figure out why the
+AVIC_PHYSICAL_ID_ENTRY_IS_RUNNING_MASK is sometimes set when executing
+"avic_vcpu_load". I thought it might be a concurrency issue with
+"avic_physical_id_cache" so I put spinlocks around all access code but that
+didn't change anything, and tried some other things but I regret to say I
+failed.
 
-I wouldn't say it's unfathomable, conceptually it seems like the intent
-of the hypervisor range was to mimic the basic and extended ranges.  The
-whole thing is arbitrary behavior.  Of course if Intel CPUs would just
-return 0s on undefined leafs it would be a lot less arbitrary :-)
- 
-Anyways, I don't have a strong opinion on whether this patch stays or goes.
+First of all, I don't even know how "avic_vcpu_load" ends up being executed
+without being called by any of the functions in "svm_x86_ops"
+(svm_vcpu_blocking, svm_vcpu_unblocking, svm_vcpu_load). I did my best to
+figure out how swait worked, but I must really be missing something, and not
+understanding the call stack trace correctly.
+
+In any case, the basic issue is that occasionally "avic_vcpu_load" is executed
+when the AVIC_PHYSICAL_ID_ENTRY_IS_RUNNING_MASK bit is 1, and it always expects
+it to be 0. And this always seems to happen after a cpu is placed on the swait
+wait queue in the "kvm_vcpu_block" function. It seems like somehow when it
+resumes it's executing"avic_vcpu_load", and the
+AVIC_PHYSICAL_ID_ENTRY_IS_RUNNING_MASK bit is 1 instead of 0.
+
+I'm sure this is just mass misunderstanding on my part. And by the way I'm
+going through all of this because it's a good way for me to learn how real time
+concurrent kernel code operates. I know it seems like a backwards way to learn,
+but that's the only way I can.
+
+However, despite my ignorance, the header in "swait.h" is concerning, and makes
+me wonder if there's something wrong with swait itself. It even titles itself
+"BROKEN wait-queues." Here's an excerpt from the header:
+
+```
+/*
+ * BROKEN wait-queues.
+ *
+ * These "simple" wait-queues are broken garbage, and should never be
+ * used. The comments below claim that they are "similar" to regular
+ * wait-queues, but the semantics are actually completely different, and
+ * every single user we have ever had has been buggy (or pointless).
+ * ...
+```
+
+-- 
+You are receiving this mail because:
+You are watching the assignee of the bug.
