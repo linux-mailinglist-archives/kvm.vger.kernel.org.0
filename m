@@ -2,140 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5D7AF177696
-	for <lists+kvm@lfdr.de>; Tue,  3 Mar 2020 14:05:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 78A9E17769D
+	for <lists+kvm@lfdr.de>; Tue,  3 Mar 2020 14:05:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729208AbgCCNDC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 Mar 2020 08:03:02 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:47317 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728041AbgCCNDB (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 3 Mar 2020 08:03:01 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1583240580;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=fxyaJBCKdEug50sQ1sIk2q1FJ4yKhmLVJVdWUZZRTgs=;
-        b=jKQ8Y5PJBwMIdQJHSIWgQDhnKJwuehOKfqUcgFZvAdBIhPBMV5DeidOXqIftVWsDUhGaDf
-        nNLXjmWGNMIHoyS57UgUx7zVWFhJeqdKTF8uxQpgl0N2UQotHhIolTktpb1Xg4JhCNjKP/
-        JWUJNznoWLyR9UvJ0Uef1JCQhvKs8Lc=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-65-WJRaws0yOTqxbhjIQwdRkQ-1; Tue, 03 Mar 2020 08:02:57 -0500
-X-MC-Unique: WJRaws0yOTqxbhjIQwdRkQ-1
-Received: by mail-wr1-f69.google.com with SMTP id j14so1189858wru.8
-        for <kvm@vger.kernel.org>; Tue, 03 Mar 2020 05:02:56 -0800 (PST)
+        id S1728963AbgCCNEG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 Mar 2020 08:04:06 -0500
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:35649 "EHLO
+        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728602AbgCCNEG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 3 Mar 2020 08:04:06 -0500
+Received: by mail-wm1-f67.google.com with SMTP id m3so2774008wmi.0
+        for <kvm@vger.kernel.org>; Tue, 03 Mar 2020 05:04:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=vBC2YbhZkJ0v6nz38kCdb3gf7pmanp7d2q2V1CxXpg8=;
+        b=UwUGsP2peGrcDb+FuDOl36Uomb459AEZ0alK/qYf7ru06yn03UUn/cWusqOO4GCcdE
+         KFyRoWEy+kiGPgcFZk/6AVvEaVjvfyQf1pJRc6Bo4ypA3mLnoNRS6TZKizWJ2txKRFWy
+         iQjxA+2zl4NaZI6cdAELzHRg3sY0WEO9hW8BjiwA+kdMxJI2tkaiJMTQu/SzrSm2k0vv
+         WM+uNp85yE6gtWw2CWrUZZpJVsMW9P4iNhB0v01RU8vF5sJiJNYTIR0vKI9gsOU5UCwF
+         SfS3QEaC24GBmTBtNTIcNXYBbP/E6pA2nxGY75CdyvYUjIN1i72/Vc9Bts/FacI0gpEI
+         kwPA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=fxyaJBCKdEug50sQ1sIk2q1FJ4yKhmLVJVdWUZZRTgs=;
-        b=SXNGwOfBpd7IZWMUPAX4gq3lhExyw9fvHr8b24KGaiTcqdBW2Aj6raPaWEOs8ebqrY
-         dVGnJLoUtg2lA3pvQPjbiSXSKZxnYMUuC7r6o0anPMEx2wznjfTKPEoC3rsp984m4h4a
-         +bChLOCTxno5lzh7SCcUR8+i9LNhDvHMsacUNTik8rZQbfeeN8RElnHJ1DzswClrXtNW
-         0hvfK26NJiY7vIIC6Rp0dxqn100pENE0MIDs/6yNhgTLVvC1pzvui0XhO9nkoE6qtbof
-         SqJF2/h1h9DaXd8lQX/hvZEnCt94uXRJgA2NFhdNz9ynH6DwZ3UBsZw14gTu1UwYffJV
-         AqpQ==
-X-Gm-Message-State: ANhLgQ3ZuGLZxi7CiBcSOvEKJ4rTDqarD/CxTP8X1INcDuPrppEAfMr6
-        Bb4j0EgIeGQRgRCXWl+eMlfs15WXsg19rBMgviRS1g2CP8mtziMXo3Piz/ttSWrVGLtbw7R8BjP
-        Nec7WBZnk0St0
-X-Received: by 2002:adf:f84a:: with SMTP id d10mr5547885wrq.208.1583240576043;
-        Tue, 03 Mar 2020 05:02:56 -0800 (PST)
-X-Google-Smtp-Source: ADFU+vu05HQ3OHj9N3aJ8iNGgT/jLI2sDvyFRtk26XLwFnJjSUTHXBpAo4czkkiEuXW6nhpwE+4fTg==
-X-Received: by 2002:adf:f84a:: with SMTP id d10mr5547859wrq.208.1583240575803;
-        Tue, 03 Mar 2020 05:02:55 -0800 (PST)
-Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id a7sm34797870wrm.29.2020.03.03.05.02.54
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=vBC2YbhZkJ0v6nz38kCdb3gf7pmanp7d2q2V1CxXpg8=;
+        b=MN6WtCoY8EpqcobDSKWlKgWG7HvyBVmi37+jmfmqfDhw0uN5r7YPmOLbR1MBnwlHHw
+         c8tguPHNUrVPVI0OdNz+AVveRMPxq6o0gUZQxWFRI7bt/BFcpW32inEtI5bk5q9EBmVn
+         cE+JVlAhyHVod8QvjadHi1Zn6z+WD+Oi1+VQ8Y2m2amANo+YoRGEr/2Lr2Fs6WAghYwR
+         MWmLnycO8OuZiv9+TvRZzwUvQpX/LXCfI4N+m9PfO8Bc+FClRalwdu8dNzvqeAda5TAl
+         kQsgOVlc1fW3kAluu+CMmh6rZRnv1qjuizWPMfkmtjgbwkgDzfdOKaCHJBAGXIqIgVRk
+         Ov8A==
+X-Gm-Message-State: ANhLgQ1jWZNQ59UUrY01hVPRv6da/wL6HF/6YhaCiIj8Bn48ioCAUZXX
+        Twq0OtwgeAieh8GedIgSTw/y54V0
+X-Google-Smtp-Source: ADFU+vseVsSSieQJRa5AneHGAjY4U2GyG1vV+5VztkMR1npYFfitZgwAHoccfLlVnII9dg4y8imQgg==
+X-Received: by 2002:a7b:cb97:: with SMTP id m23mr4051638wmi.37.1583240644595;
+        Tue, 03 Mar 2020 05:04:04 -0800 (PST)
+Received: from linux.local ([199.203.162.213])
+        by smtp.gmail.com with ESMTPSA id w17sm2171951wrm.92.2020.03.03.05.04.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Mar 2020 05:02:55 -0800 (PST)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Oliver Upton <oupton@google.com>
-Subject: Re: [GIT PULL] KVM changes for Linux 5.6-rc4
-In-Reply-To: <8fbeb3c2-9627-bf41-d798-bafba22073e3@redhat.com>
-References: <1582570669-45822-1-git-send-email-pbonzini@redhat.com> <87zhcyfvmk.fsf@vitty.brq.redhat.com> <8fbeb3c2-9627-bf41-d798-bafba22073e3@redhat.com>
-Date:   Tue, 03 Mar 2020 14:02:54 +0100
-Message-ID: <87tv35fv5t.fsf@vitty.brq.redhat.com>
+        Tue, 03 Mar 2020 05:04:04 -0800 (PST)
+From:   Jon Doron <arilou@gmail.com>
+To:     kvm@vger.kernel.org
+Cc:     vkuznets@redhat.com, Jon Doron <arilou@gmail.com>
+Subject: [PATCH v1 0/3] x86/kvm/hyper-v: add support for synthetic debugger
+Date:   Tue,  3 Mar 2020 15:03:53 +0200
+Message-Id: <20200303130356.50405-1-arilou@gmail.com>
+X-Mailer: git-send-email 2.24.1
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
+Add support for the synthetic debugger interface of hyper-v, the
+synthetic debugger has 2 modes.
+1. Use a set of MSRs to send/recv information
+2. Use hypercalls
 
-> On 02/03/20 19:40, Vitaly Kuznetsov wrote:
->> 
->>  qemu-system-x86-23579 [005] 22018.775584: kvm_exit:             reason EPT_VIOLATION rip 0xfffff802987d6169 info 181 0
->>  qemu-system-x86-23579 [005] 22018.775584: kvm_nested_vmexit:    rip fffff802987d6169 reason EPT_VIOLATION info1 181 info2 0 int_info 0 int_info_err 0
->>  qemu-system-x86-23579 [005] 22018.775585: kvm_page_fault:       address febd0000 error_code 181
->>  qemu-system-x86-23579 [005] 22018.775592: kvm_emulate_insn:     0:fffff802987d6169: f3 a5
->>  qemu-system-x86-23579 [005] 22018.775593: kvm_emulate_insn:     0:fffff802987d6169: f3 a5 FAIL
->>  qemu-system-x86-23579 [005] 22018.775596: kvm_inj_exception:    #UD (0x0)
->> 
->> We probably need to re-enable instruction emulation for something...
->
-> This is a rep movsw instruction, it shouldn't be intercepted.  I think
-> we have a stale ctxt->intercept because the
->
->         /* Fields above regs are cleared together. */
->
-> comment is not true anymore since
->
->     commit c44b4c6ab80eef3a9c52c7b3f0c632942e6489aa
->     Author: Bandan Das <bsd@redhat.com>
->     Date:   Wed Apr 16 12:46:12 2014 -0400
->
->     KVM: emulate: clean up initializations in init_decode_cache
->
+The first mode is based the following MSRs:
+1. Control/Status MSRs which either asks for a send/recv .
+2. Send/Recv MSRs each holds GPA where the send/recv buffers are.
+3. Pending MSR, holds a GPA to a PAGE that simply has a boolean that
+   indicates if there is data pending to issue a recv VMEXIT.
 
-Right you are,
+In the first patch the first mode is being implemented in the sense that
+it simply exits to user-space when a control MSR is being written and
+when the pending MSR is being set, then it's up-to userspace to
+implement the rest of the logic of sending/recving.
 
-a big hammer like
+In the second mode instead of using MSRs KNet will simply issue
+Hypercalls with the information to send/recv, in this mode the data
+being transferred is UDP encapsulated, unlike in the previous mode in
+which you get just the data to send.
 
-diff --git a/arch/x86/include/asm/kvm_emulate.h b/arch/x86/include/asm/kvm_emulate.h
-index 2a8f2bd..52c9bce 100644
---- a/arch/x86/include/asm/kvm_emulate.h
-+++ b/arch/x86/include/asm/kvm_emulate.h
-@@ -324,14 +324,6 @@ struct x86_emulate_ctxt {
-         */
- 
-        /* current opcode length in bytes */
--       u8 opcode_len;
--       u8 b;
--       u8 intercept;
--       u8 op_bytes;
--       u8 ad_bytes;
--       struct operand src;
--       struct operand src2;
--       struct operand dst;
-        union {
-                int (*execute)(struct x86_emulate_ctxt *ctxt);
-                fastop_t fop;
-@@ -343,6 +335,14 @@ struct x86_emulate_ctxt {
-         * or elsewhere
-         */
-        bool rip_relative;
-+       u8 opcode_len;
-+       u8 b;
-+       u8 intercept;
-+       u8 op_bytes;
-+       u8 ad_bytes;
-+       struct operand src;
-+       struct operand src2;
-+       struct operand dst;
-        u8 rex_prefix;
-        u8 lock_prefix;
-        u8 rep_prefix;
+The new hypercalls will exit to userspace which will be incharge of
+re-encapsulating if needed the UDP packets to be sent.
 
-seems to make the issue go away. (For those wondering why fielf
-shuffling makes a difference: init_decode_cache() clears
-[rip_relative, modrm) range) How did this even work before...
-(I'm still looking at the code, stay tuned...)
+There is an issue though in which KDNet does not respect the hypercall
+page and simply issues vmcall/vmmcall instructions depending on the cpu
+type expecting them to be handled as it a real hypercall was issued.
+
+Jon Doron (3):
+  x86/kvm/hyper-v: Add support for synthetic debugger capability
+  x86/kvm/hyper-v: enable hypercalls regardless of hypercall page
+  x86/kvm/hyper-v: Add support for synthetic debugger via hypercalls
+
+ arch/x86/include/asm/hyperv-tlfs.h |  21 +++++
+ arch/x86/include/asm/kvm_host.h    |  11 +++
+ arch/x86/kvm/hyperv.c              | 122 ++++++++++++++++++++++++++++-
+ arch/x86/kvm/hyperv.h              |   5 ++
+ arch/x86/kvm/trace.h               |  22 ++++++
+ arch/x86/kvm/x86.c                 |   8 ++
+ include/uapi/linux/kvm.h           |   9 +++
+ 7 files changed, 197 insertions(+), 1 deletion(-)
 
 -- 
-Vitaly
+2.24.1
 
