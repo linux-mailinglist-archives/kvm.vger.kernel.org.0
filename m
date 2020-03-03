@@ -2,93 +2,87 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 91565177C07
-	for <lists+kvm@lfdr.de>; Tue,  3 Mar 2020 17:37:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DCCB9177C0D
+	for <lists+kvm@lfdr.de>; Tue,  3 Mar 2020 17:38:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730412AbgCCQhi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 Mar 2020 11:37:38 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:47307 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728497AbgCCQhi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 3 Mar 2020 11:37:38 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1583253457;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=m/ZeDpXicreEUdZsIrFx+xNBNktO+QHj/8L3lsHUiAY=;
-        b=Z5h+5q0g/HbQXVeSbaGY8AJiHpV2iGbt9Rt5zbtXZudAr7jIOAgK3gZOfwPA0xiSBa9AVs
-        d5r6rS/CEpoG1fI7Sm52uDGb8OBizk16eHMUpWAO+O+4CmBu3zlW6+b0p8/uns4D3w57ns
-        jR3g+/75JMSeHoPM53r+HKW8vNPs71E=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-13-96lt53XxPGGTg9Q7Hqm5nQ-1; Tue, 03 Mar 2020 11:37:36 -0500
-X-MC-Unique: 96lt53XxPGGTg9Q7Hqm5nQ-1
-Received: by mail-wm1-f70.google.com with SMTP id q20so888479wmg.1
-        for <kvm@vger.kernel.org>; Tue, 03 Mar 2020 08:37:35 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=m/ZeDpXicreEUdZsIrFx+xNBNktO+QHj/8L3lsHUiAY=;
-        b=UC6fi+EYi+bNDeNCSCnvCX15qYU1gIDXm4/nEsiw6DZXeWGW8rvDIu2+J4SwRKKPn3
-         uFtzu8HCSxysZ90MbXPIHgAK6TO0Yx9Qx6QWYQacUEvv2WTiGm2fNMUp1cDXVPfcR78+
-         qQJKhkrpBDCrS6PhHiJLU5eSBA9CdjP349XacYZTmlZJKxBbGuh5u3kO7fSY9TDoScng
-         iF5gFc9QdbuWRvjihN5uR2nUWkn0HY7zWNmBoKhq/itTXyi6SCFl+UzxjywbYA15Le0t
-         dH3zX6t5zaPD7TSyXN5BvSF3T+5FShWlaQ2M9d1XYps3rCh6PNHtfWh+WuEePnrkgp88
-         9O/w==
-X-Gm-Message-State: ANhLgQ1/Ztl3ty6j76zlr8LmmyBgdQq3gJlfv/5rNmEl2YZwpVr2ZNCD
-        7KGWuZIwXv20AhAJkSLhC2i7CTLIEbKjKAElwDbY69Xm9vkTIgHcqAmFv/QfT+Ho4CVXb+oPehD
-        tUn1KQ5tBF5aY
-X-Received: by 2002:a05:600c:280b:: with SMTP id m11mr2555444wmb.93.1583253455064;
-        Tue, 03 Mar 2020 08:37:35 -0800 (PST)
-X-Google-Smtp-Source: ADFU+vsPDqMEjkm6g4/BYmqiljcMv4+VVa/WPH9gF0EnpbOgCkqiHN1ZDAbIRGgQjqKgCsa1fXCfHA==
-X-Received: by 2002:a05:600c:280b:: with SMTP id m11mr2555430wmb.93.1583253454831;
-        Tue, 03 Mar 2020 08:37:34 -0800 (PST)
-Received: from [192.168.178.40] ([151.20.254.94])
-        by smtp.gmail.com with ESMTPSA id h10sm4892868wml.18.2020.03.03.08.37.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 03 Mar 2020 08:37:34 -0800 (PST)
-Subject: Re: [PATCH 1/2] KVM: x86: clear stale x86_emulate_ctxt->intercept
- value
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org
-Cc:     Jim Mattson <jmattson@google.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Bandan Das <bsd@redhat.com>, Oliver Upton <oupton@google.com>,
-        linux-kernel@vger.kernel.org
-References: <20200303143316.834912-1-vkuznets@redhat.com>
- <20200303143316.834912-2-vkuznets@redhat.com>
- <4f933f77-6924-249a-77c5-3c904e7c052b@redhat.com>
- <87zhcxe6qe.fsf@vitty.brq.redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <99fc27f9-bf89-7db1-d333-1433ebfa4e89@redhat.com>
-Date:   Tue, 3 Mar 2020 17:37:32 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+        id S1729366AbgCCQie (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 Mar 2020 11:38:34 -0500
+Received: from mga06.intel.com ([134.134.136.31]:35796 "EHLO mga06.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728311AbgCCQie (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 3 Mar 2020 11:38:34 -0500
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 03 Mar 2020 08:38:33 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,511,1574150400"; 
+   d="scan'208";a="274268961"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
+  by fmsmga002.fm.intel.com with ESMTP; 03 Mar 2020 08:38:33 -0800
+Date:   Tue, 3 Mar 2020 08:38:33 -0800
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Jan Kiszka <jan.kiszka@siemens.com>,
+        Xiaoyao Li <xiaoyao.li@intel.com>
+Subject: Re: [PATCH 0/6] KVM: x86: CPUID emulation and tracing fixes
+Message-ID: <20200303163833.GK1439@linux.intel.com>
+References: <20200302195736.24777-1-sean.j.christopherson@intel.com>
+ <f4a13ce0-1545-4ef7-d95c-2ce2db24a90d@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <87zhcxe6qe.fsf@vitty.brq.redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f4a13ce0-1545-4ef7-d95c-2ce2db24a90d@redhat.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 03/03/20 17:35, Vitaly Kuznetsov wrote:
->>
->> "f3 a5" is a "rep movsw" instruction, which should not be intercepted
->> at all.  Commit c44b4c6ab80e ("KVM: emulate: clean up initializations in
->> init_decode_cache") reduced the number of fields cleared by
->> init_decode_cache() claiming that they are being cleared elsewhere,
->> 'intercept', however, is left uncleared if the instruction does not have
->> any of the "slow path" flags (NotImpl, Stack, Op3264, Sse, Mmx, CheckPerm,
->> NearBranch, No16 and of course Intercept itself).
-> Much better, thanks) Please let me know if you want me to resubmit.
+On Tue, Mar 03, 2020 at 09:48:44AM +0100, Paolo Bonzini wrote:
+> On 02/03/20 20:57, Sean Christopherson wrote:
+> > Two fixes related to out-of-range CPUID emulation and related cleanup on
+> > top.
+> > 
+> > I have a unit test and also manually verified a few interesting cases.
+> > I'm not planning on posting the unit test at this time because I haven't
+> > figured out how to avoid false positives, e.g. if a random in-bounds
+> > leaf just happens to match the output of a max basic leaf.  It might be
+> > doable by hardcoding the cpu model?
+> 
+> It would be best suited for selftests rather than kvm-unit-tests.  But I 
+> don't really see the benefit of anything more than just
 
-No need, thanks.
+Gotta save those stack bytes?
 
-Paolo
-
+I got a bit confused by the "max" variable; I thought it would hold the
+max basic leaf, not CPUID.0x0.  Removing it seemed easier than trying to
+come up with a better name :-)
+ 
+> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> index b1c469446b07..c1abf5de4461 100644
+> --- a/arch/x86/kvm/cpuid.c
+> +++ b/arch/x86/kvm/cpuid.c
+> @@ -1001,6 +1001,7 @@ bool kvm_cpuid(struct kvm_vcpu *vcpu, u32 *eax, u32 *ebx,
+>  	       u32 *ecx, u32 *edx, bool check_limit)
+>  {
+>  	u32 function = *eax, index = *ecx;
+> +	u32 orig_function = function;
+>  	struct kvm_cpuid_entry2 *entry;
+>  	struct kvm_cpuid_entry2 *max;
+>  	bool found;
+> @@ -1049,7 +1050,7 @@ bool kvm_cpuid(struct kvm_vcpu *vcpu, u32 *eax, u32 *ebx,
+>  			}
+>  		}
+>  	}
+> -	trace_kvm_cpuid(function, *eax, *ebx, *ecx, *edx, found);
+> +	trace_kvm_cpuid(orig_function, *eax, *ebx, *ecx, *edx, found);
+>  	return found;
+>  }
+>  EXPORT_SYMBOL_GPL(kvm_cpuid);
+> 
