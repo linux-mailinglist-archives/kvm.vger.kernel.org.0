@@ -2,99 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 396D0177A8B
-	for <lists+kvm@lfdr.de>; Tue,  3 Mar 2020 16:36:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 836CF177A8E
+	for <lists+kvm@lfdr.de>; Tue,  3 Mar 2020 16:36:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729977AbgCCPfv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 Mar 2020 10:35:51 -0500
-Received: from mga14.intel.com ([192.55.52.115]:42732 "EHLO mga14.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729588AbgCCPfv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 3 Mar 2020 10:35:51 -0500
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 03 Mar 2020 07:35:51 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,511,1574150400"; 
-   d="scan'208";a="386820172"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
-  by orsmga004.jf.intel.com with ESMTP; 03 Mar 2020 07:35:50 -0800
-Date:   Tue, 3 Mar 2020 07:35:50 -0800
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
+        id S1729999AbgCCPgD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 Mar 2020 10:36:03 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:27049 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1729661AbgCCPgD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 3 Mar 2020 10:36:03 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1583249761;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=ujsLLzVuYTRYMxSwdOvoebiKOIVvxP1nddRp1hnsi8w=;
+        b=AG67bF89heOsL1VOxmx+RKzO58Y4PQc2BFbieZ4+s2hESivstalqS8H+dozQl9cpmSi3lE
+        uoGywm0ZLdWRDd4EleEUzZxVtmPtj2lppjKzMuzac1m5j6rfY1V02a2W0bnN8m9JyZb7cP
+        vk3tkJrBhpItIGdyl5Pbtg5pg8SLBc8=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-306-4N0iXehiPGK2--fx-OpviA-1; Tue, 03 Mar 2020 10:36:00 -0500
+X-MC-Unique: 4N0iXehiPGK2--fx-OpviA-1
+Received: by mail-wr1-f72.google.com with SMTP id m13so1391968wrw.3
+        for <kvm@vger.kernel.org>; Tue, 03 Mar 2020 07:35:59 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=ujsLLzVuYTRYMxSwdOvoebiKOIVvxP1nddRp1hnsi8w=;
+        b=KMNjwRMpk+nlfMW8kzyBQNJVYPTltgGUNDCY+aepGCaxK6rvlj+TKrLcy6bFAxE9Me
+         YmWeD0FpGvPqnfbZ7eRRzQxvlYd5fM3SfMTh6rcD9oOfl0MiNwe5hpDfTNMRAu4UlMD3
+         1dO5AItRNaEj7zbNpKMxecWXHPf/tVtLKhKxlQtWf0lk6aR6uiH/F0BLm4AQwwDJ8yZn
+         jrQuqP/2ZKrlNsU9FRFM7Cc8aFbUUo6R/qIlEq61IbdQlH57SqF72CA1OuCVRw1cGScO
+         UJ6aRukDKb1X3S7sPt3T3uXV+rbRVL6B9tMS0GG7UzkAIII75qC9Z60wPhAPYOxl1a0L
+         Mmrg==
+X-Gm-Message-State: ANhLgQ28IwrA064J0tHxsaGhToI9lLFPz5JEhofPrS8Zafo+jTGA9GVG
+        VebU6ocoOUoIkalfaORQtR2kctVFTozCL4rm24YUtPz3I38pnBEiUH38Nw+bGUgGIF1VsebJafQ
+        DfNH81Q/qnVv0
+X-Received: by 2002:adf:fa0f:: with SMTP id m15mr6386525wrr.392.1583249758943;
+        Tue, 03 Mar 2020 07:35:58 -0800 (PST)
+X-Google-Smtp-Source: ADFU+vtXOdsBuRFJDRHIa5TRjfWnThT4qNW6T0BPy5J15OWGLpEe3lKOi93Q21PvbTbxna5Yu0DsqQ==
+X-Received: by 2002:adf:fa0f:: with SMTP id m15mr6386514wrr.392.1583249758741;
+        Tue, 03 Mar 2020 07:35:58 -0800 (PST)
+Received: from [192.168.178.40] ([151.20.254.94])
+        by smtp.gmail.com with ESMTPSA id f3sm3777601wrs.26.2020.03.03.07.35.57
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 03 Mar 2020 07:35:58 -0800 (PST)
+Subject: Re: [PATCH v2 66/66] KVM: x86: Move nSVM CPUID 0x8000000A handing
+ into common x86 code
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
 Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>
-Subject: Re: [PATCH v2 36/66] KVM: x86: Handle GBPAGE CPUID adjustment for
- EPT in VMX code
-Message-ID: <20200303153550.GC1439@linux.intel.com>
 References: <20200302235709.27467-1-sean.j.christopherson@intel.com>
- <20200302235709.27467-37-sean.j.christopherson@intel.com>
- <90df7276-e586-9082-3d80-6b45e0fb4670@redhat.com>
+ <20200302235709.27467-67-sean.j.christopherson@intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <9d2b5256-5c00-54d2-8f73-c78d54b23552@redhat.com>
+Date:   Tue, 3 Mar 2020 16:35:57 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <90df7276-e586-9082-3d80-6b45e0fb4670@redhat.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <20200302235709.27467-67-sean.j.christopherson@intel.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 03, 2020 at 03:59:14PM +0100, Paolo Bonzini wrote:
-> On 03/03/20 00:56, Sean Christopherson wrote:
-> > Move the clearing of the GBPAGE CPUID bit into VMX to eliminate an
-> > instance of the undesirable "unsigned f_* = *_supported ? F(*) : 0"
-> > pattern in the common CPUID handling code, and to pave the way toward
-> > eliminating ->get_lpage_level().
-> > 
-> > No functional change intended.
-> 
-> And no functional change is done indeed but there is a preexisting bug 
-> that should be fixed.
-> 
-> cpu_has_vmx_ept_1g_page() has no relationship to whether 1GB pages should be
-> marked as supported in CPUID.  This has no ill effect because we're only
-> clearing the bit, but it results in 1GB pages not being available when
-> EPT is disabled (even though they are actually supported thanks to
-> shadowing).
+On 03/03/20 00:57, Sean Christopherson wrote:
+> +	case 0x8000000A:
+> +		if (!kvm_cpu_cap_has(X86_FEATURE_SVM)) {
+> +			entry->eax = entry->ebx = entry->ecx = entry->edx = 0;
+> +			break;
+> +		}
+> +		entry->eax = 1; /* SVM revision 1 */
+> +		entry->ebx = 8; /* Lets support 8 ASIDs in case we add proper
+> +				   ASID emulation to nested SVM */
+> +		entry->ecx = 0; /* Reserved */
+> +		/* Note, 0x8000000A.EDX is managed via kvm_cpu_caps. */;
 
-Oof, that took me a long time to process.  You're saying that KVM can
-allow the guest to use GBPAGES when shadow paging is enabled because KVM
-can effectively emulate GBPAGES.  And IIUC, you're also saying that
-cpuid.GBPAGES should never be influenced by EPT restrictions.
+... meaning this should do
 
-That all makes sense.
+                cpuid_entry_override(entry, CPUID_8000_000A_EDX);
 
-> The right fix should be this:
-> 
-> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> index 84b9a488a443..8bbba8eb4ce5 100644
-> --- a/arch/x86/kvm/cpuid.c
-> +++ b/arch/x86/kvm/cpuid.c
-> @@ -416,8 +416,7 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
->  	int r, i, max_idx;
->  	unsigned f_nx = is_efer_nx() ? F(NX) : 0;
->  #ifdef CONFIG_X86_64
-> -	unsigned f_gbpages = (kvm_x86_ops->get_lpage_level() == PT_PDPE_LEVEL)
-> -				? F(GBPAGES) : 0;
-> +	unsigned f_gbpages = F(GBPAGES);
->  	unsigned f_lm = F(LM);
->  #else
->  	unsigned f_gbpages = 0;
-> @@ -691,6 +690,8 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
->  	case 0x80000001:
->  		entry->edx &= kvm_cpuid_8000_0001_edx_x86_features;
->  		cpuid_entry_mask(entry, CPUID_8000_0001_EDX);
-> +		if (!tdp_enabled)
-> +			cpuid_entry_set(entry, X86_FEATURE_GBPAGES);
->  		entry->ecx &= kvm_cpuid_8000_0001_ecx_x86_features;
->  		cpuid_entry_mask(entry, CPUID_8000_0001_ECX);
->  		break;
-> 
-> Paolo
-> 
+shouldn't it?
+
+Paolo
+
+> +		break;
+
