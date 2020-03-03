@@ -2,72 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 716F7177258
-	for <lists+kvm@lfdr.de>; Tue,  3 Mar 2020 10:28:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5887C177303
+	for <lists+kvm@lfdr.de>; Tue,  3 Mar 2020 10:49:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728120AbgCCJ2H (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 Mar 2020 04:28:07 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:41837 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727870AbgCCJ2G (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 3 Mar 2020 04:28:06 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1583227686;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=JawvsztqURHUMrivAZK9itm+6zuMO8VTLICNdnI7dxo=;
-        b=hMFIc0CLGIWvyEMhAvtDytMosd8AHGgA2I9YUdZtQsGEu6eqEDBQcUuXU5MRCBWiYHLxVX
-        GCB6HpBs78v99997mZSeKdDsW6RhbzMy7XFkNYfKR1A2GweLWMySM2KBHhafaNrpnTqWQm
-        0A5YG50M8EtIdAtyM4SmiTi52W1YxkU=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-198-zUrMuLcfMiawl1sTlG6lKg-1; Tue, 03 Mar 2020 04:28:04 -0500
-X-MC-Unique: zUrMuLcfMiawl1sTlG6lKg-1
-Received: by mail-wm1-f72.google.com with SMTP id m4so828203wmi.5
-        for <kvm@vger.kernel.org>; Tue, 03 Mar 2020 01:28:04 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=JawvsztqURHUMrivAZK9itm+6zuMO8VTLICNdnI7dxo=;
-        b=B0kmSetF08jGfUYpshcr0jiWuwod0jvrDe6Vfv7ECqDztUzmJOY4dI3YERseEOhAiX
-         RURxWMWpQohmto0PPAS+Npg8XiyFUfR6P0w6aWGl5il39/7n4zZ4oKhdM1SbxlWMuXbM
-         X5nVR+MSzkfLqqpV9a3Qwz00Swh6xqcAkRsPJMJex8lPYoqeqG0Go3sN9CvUoZnXqgrx
-         Ayy8tFP078+H5GWkqp33FcpIIqRuMyqj4R0aJqRmtwFcyeQyWlc2JW5c9cMAehWBJknQ
-         nzUuSy7HmcpYabzdH7b9eOQCpZFfeqd3jk8MXB5dfOIVMaGsTrIkI1lO7zPUXq+42Hgv
-         NiDg==
-X-Gm-Message-State: ANhLgQ0CKwtYgz4aIj+yylahY0gZVbZAvVf9jBOo+2T3RnVT9nDNGZ5b
-        fVHsc8sCe3fAotr5eaxqv3k/cZ3veUtxWJVMTQYGY2HTGFLOthpfYBYOpFDVS5o/9w/Hm/hl1MQ
-        kPm86i3+Du8bg
-X-Received: by 2002:a5d:68ce:: with SMTP id p14mr3888596wrw.315.1583227683197;
-        Tue, 03 Mar 2020 01:28:03 -0800 (PST)
-X-Google-Smtp-Source: ADFU+vsJpUVTnRWkgQAQclEelI+BOvdB7TqEFgh/PbQcMZ6SzEsdA+mGSHrg8PNex6myJcsME0a9aA==
-X-Received: by 2002:a5d:68ce:: with SMTP id p14mr3888556wrw.315.1583227682873;
-        Tue, 03 Mar 2020 01:28:02 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:4c52:2f3b:d346:82de? ([2001:b07:6468:f312:4c52:2f3b:d346:82de])
-        by smtp.gmail.com with ESMTPSA id a6sm3075433wmh.32.2020.03.03.01.28.02
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 03 Mar 2020 01:28:02 -0800 (PST)
-Subject: Re: [PATCH v3 0/7] KVM: x86/mmu: nVMX: 5-level paging cleanup and
- enabling
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
+        id S1727907AbgCCJtM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 Mar 2020 04:49:12 -0500
+Received: from goliath.siemens.de ([192.35.17.28]:55287 "EHLO
+        goliath.siemens.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727412AbgCCJtM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 3 Mar 2020 04:49:12 -0500
+Received: from mail2.sbs.de (mail2.sbs.de [192.129.41.66])
+        by goliath.siemens.de (8.15.2/8.15.2) with ESMTPS id 0239mh4H025629
+        (version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 3 Mar 2020 10:48:43 +0100
+Received: from [167.87.29.4] ([167.87.29.4])
+        by mail2.sbs.de (8.15.2/8.15.2) with ESMTP id 0239mg1F019125;
+        Tue, 3 Mar 2020 10:48:43 +0100
+Subject: Re: [PATCH 3/6] KVM: x86: Add dedicated emulator helper for grabbing
+ CPUID.maxphyaddr
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
 Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20200303020240.28494-1-sean.j.christopherson@intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <748ad2db-f2da-d177-7ec8-54523465e64a@redhat.com>
-Date:   Tue, 3 Mar 2020 10:28:02 +0100
+        linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>
+References: <20200302195736.24777-1-sean.j.christopherson@intel.com>
+ <20200302195736.24777-4-sean.j.christopherson@intel.com>
+ <de2ed4e9-409a-6cb1-e295-ea946be11e82@redhat.com>
+From:   Jan Kiszka <jan.kiszka@siemens.com>
+Message-ID: <617748ab-0edd-2ccc-e86b-b86b0adf9d3b@siemens.com>
+Date:   Tue, 3 Mar 2020 10:48:42 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200303020240.28494-1-sean.j.christopherson@intel.com>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <de2ed4e9-409a-6cb1-e295-ea946be11e82@redhat.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
@@ -75,46 +45,97 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 03/03/20 03:02, Sean Christopherson wrote:
-> Clean up MMU code related to 5 level paging, expose 5-level EPT to L1, and
-> additional clean up on top (mostly renames of functions/variables that
-> caused me no end of confusion when trying to figure out what was broken
-> at various times).
+On 03.03.20 09:48, Paolo Bonzini wrote:
+> On 02/03/20 20:57, Sean Christopherson wrote:
+>> Add a helper to retrieve cpuid_maxphyaddr() instead of manually
+>> calculating the value in the emulator via raw CPUID output.  In addition
+>> to consolidating logic, this also paves the way toward simplifying
+>> kvm_cpuid(), whose somewhat confusing return value exists purely to
+>> support the emulator's maxphyaddr calculation.
+>>
+>> No functional change intended.
 > 
-> v3:
->   - Dropped fixes for existing 5-level bugs (merged for 5.6).
->   - Use get_guest_pgd() instead of get_guest_cr3_or_eptp(). [Paolo]
->   - Add patches to fix MMU role calculation to play nice with 5-level
->     paging without requiring additional CR4.LA_57 bit.
+> I don't think this is a particularly useful change.  Yes, it's not
+> intuitive but is it more than a matter of documentation (and possibly
+> moving the check_cr_write snippet into a separate function)?
+
+Besides the non obvious return value of the current function, this 
+approach also avoids leaving cpuid traces for querying maxphyaddr, which 
+is also not very intuitive IMHO.
+
+Jan
+
 > 
-> v2:
->   - Increase the nested EPT array sizes to accomodate 5-level paging in
->     the patch that adds support for 5-level nested EPT, not in the bug
->     fix for 5-level shadow paging.
+> Paolo
 > 
-> Sean Christopherson (7):
->   KVM: x86/mmu: Don't drop level/direct from MMU role calculation
->   KVM: x86/mmu: Drop kvm_mmu_extended_role.cr4_la57 hack
->   KVM: nVMX: Allow L1 to use 5-level page walks for nested EPT
->   KVM: nVMX: Rename nested_ept_get_cr3() to nested_ept_get_eptp()
->   KVM: nVMX: Rename EPTP validity helper and associated variables
->   KVM: x86/mmu: Rename kvm_mmu->get_cr3() to ->get_guest_pgd()
->   KVM: nVMX: Drop unnecessary check on ept caps for execute-only
-> 
->  arch/x86/include/asm/kvm_host.h |  3 +-
->  arch/x86/include/asm/vmx.h      | 12 +++++++
->  arch/x86/kvm/mmu/mmu.c          | 59 +++++++++++++++++----------------
->  arch/x86/kvm/mmu/paging_tmpl.h  |  4 +--
->  arch/x86/kvm/svm.c              |  2 +-
->  arch/x86/kvm/vmx/nested.c       | 52 ++++++++++++++++++-----------
->  arch/x86/kvm/vmx/nested.h       |  4 +--
->  arch/x86/kvm/vmx/vmx.c          |  3 +-
->  arch/x86/kvm/x86.c              |  2 +-
->  9 files changed, 82 insertions(+), 59 deletions(-)
+>> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+>> ---
+>>   arch/x86/include/asm/kvm_emulate.h |  1 +
+>>   arch/x86/kvm/emulate.c             | 10 +---------
+>>   arch/x86/kvm/x86.c                 |  6 ++++++
+>>   3 files changed, 8 insertions(+), 9 deletions(-)
+>>
+>> diff --git a/arch/x86/include/asm/kvm_emulate.h b/arch/x86/include/asm/kvm_emulate.h
+>> index bf5f5e476f65..ded06515d30f 100644
+>> --- a/arch/x86/include/asm/kvm_emulate.h
+>> +++ b/arch/x86/include/asm/kvm_emulate.h
+>> @@ -222,6 +222,7 @@ struct x86_emulate_ops {
+>>   
+>>   	bool (*get_cpuid)(struct x86_emulate_ctxt *ctxt, u32 *eax, u32 *ebx,
+>>   			  u32 *ecx, u32 *edx, bool check_limit);
+>> +	int (*get_cpuid_maxphyaddr)(struct x86_emulate_ctxt *ctxt);
+>>   	bool (*guest_has_long_mode)(struct x86_emulate_ctxt *ctxt);
+>>   	bool (*guest_has_movbe)(struct x86_emulate_ctxt *ctxt);
+>>   	bool (*guest_has_fxsr)(struct x86_emulate_ctxt *ctxt);
+>> diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
+>> index dd19fb3539e0..bf02ed51e90f 100644
+>> --- a/arch/x86/kvm/emulate.c
+>> +++ b/arch/x86/kvm/emulate.c
+>> @@ -4244,16 +4244,8 @@ static int check_cr_write(struct x86_emulate_ctxt *ctxt)
+>>   
+>>   		ctxt->ops->get_msr(ctxt, MSR_EFER, &efer);
+>>   		if (efer & EFER_LMA) {
+>> -			u64 maxphyaddr;
+>> -			u32 eax, ebx, ecx, edx;
+>> +			int maxphyaddr = ctxt->ops->get_cpuid_maxphyaddr(ctxt);
+>>   
+>> -			eax = 0x80000008;
+>> -			ecx = 0;
+>> -			if (ctxt->ops->get_cpuid(ctxt, &eax, &ebx, &ecx,
+>> -						 &edx, false))
+>> -				maxphyaddr = eax & 0xff;
+>> -			else
+>> -				maxphyaddr = 36;
+>>   			rsvd = rsvd_bits(maxphyaddr, 63);
+>>   			if (ctxt->ops->get_cr(ctxt, 4) & X86_CR4_PCIDE)
+>>   				rsvd &= ~X86_CR3_PCID_NOFLUSH;
+>> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+>> index ddd1d296bd20..5467ee71c25b 100644
+>> --- a/arch/x86/kvm/x86.c
+>> +++ b/arch/x86/kvm/x86.c
+>> @@ -6209,6 +6209,11 @@ static bool emulator_get_cpuid(struct x86_emulate_ctxt *ctxt,
+>>   	return kvm_cpuid(emul_to_vcpu(ctxt), eax, ebx, ecx, edx, check_limit);
+>>   }
+>>   
+>> +static int emulator_get_cpuid_maxphyaddr(struct x86_emulate_ctxt *ctxt)
+>> +{
+>> +	return cpuid_maxphyaddr(emul_to_vcpu(ctxt));
+>> +}
+>> +
+>>   static bool emulator_guest_has_long_mode(struct x86_emulate_ctxt *ctxt)
+>>   {
+>>   	return guest_cpuid_has(emul_to_vcpu(ctxt), X86_FEATURE_LM);
+>> @@ -6301,6 +6306,7 @@ static const struct x86_emulate_ops emulate_ops = {
+>>   	.fix_hypercall       = emulator_fix_hypercall,
+>>   	.intercept           = emulator_intercept,
+>>   	.get_cpuid           = emulator_get_cpuid,
+>> +	.get_cpuid_maxphyaddr= emulator_get_cpuid_maxphyaddr,
+>>   	.guest_has_long_mode = emulator_guest_has_long_mode,
+>>   	.guest_has_movbe     = emulator_guest_has_movbe,
+>>   	.guest_has_fxsr      = emulator_guest_has_fxsr,
+>>
 > 
 
-Queued, thanks.  I have a cleanup on top to unify set_cr3 and
-set_tdp_cr3, which I'll post after testing it.
-
-Paolo
-
+-- 
+Siemens AG, Corporate Technology, CT RDA IOT SES-DE
+Corporate Competence Center Embedded Linux
