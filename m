@@ -2,128 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id CF95F1782FB
-	for <lists+kvm@lfdr.de>; Tue,  3 Mar 2020 20:18:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BAA8F178312
+	for <lists+kvm@lfdr.de>; Tue,  3 Mar 2020 20:23:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729609AbgCCTSf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 Mar 2020 14:18:35 -0500
-Received: from mga12.intel.com ([192.55.52.136]:14351 "EHLO mga12.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729138AbgCCTSe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 3 Mar 2020 14:18:34 -0500
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 03 Mar 2020 11:18:34 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,511,1574150400"; 
-   d="scan'208";a="412858229"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
-  by orsmga005.jf.intel.com with ESMTP; 03 Mar 2020 11:18:33 -0800
-Date:   Tue, 3 Mar 2020 11:18:33 -0800
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Xiaoyao Li <xiaoyao.li@intel.com>
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        hpa@zytor.com, Paolo Bonzini <pbonzini@redhat.com>,
-        Andy Lutomirski <luto@kernel.org>, tony.luck@intel.com,
-        peterz@infradead.org, fenghua.yu@intel.com, x86@kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 3/8] x86/split_lock: Cache the value of MSR_TEST_CTRL
- in percpu data
-Message-ID: <20200303191833.GT1439@linux.intel.com>
-References: <20200206070412.17400-1-xiaoyao.li@intel.com>
- <20200206070412.17400-4-xiaoyao.li@intel.com>
+        id S1730815AbgCCTXc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 Mar 2020 14:23:32 -0500
+Received: from mail-io1-f68.google.com ([209.85.166.68]:37867 "EHLO
+        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725796AbgCCTXc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 3 Mar 2020 14:23:32 -0500
+Received: by mail-io1-f68.google.com with SMTP id c17so4941162ioc.4
+        for <kvm@vger.kernel.org>; Tue, 03 Mar 2020 11:23:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=LLgQsCek9Kb1m4nAwNnmEBwVioWI00Iv+0FWhumo+dE=;
+        b=uDa5LM3TNki7/Wt/1Evy+4ZqW3++lqzqUvHiCP0G35KGppB8eFCf5pVdqMAX3Iy1+m
+         XH/iBV3BYIVye8uH4kelWQbCvb4vejH65iHoK1IEwU39B71e9YsDwp4Cfb0H22FbqGvw
+         v3KJE1BjTz2Fml0kzHMObjV5yhGCli6713TjXpfY3bCzWpBdli55vD/fGrILXjvnRWIa
+         yxh1RyXO/HYzlrE38oQnfs+nlGviCMMCpgMXMs+sHSOomRk73GKZltkpUNmozcnXUAJI
+         8zyM20HCik3wUHLKu0mlbShT8+hvAZmZCuXxmioAStIXxRro4rDAcLLVD6+znTbeb6zA
+         mZ7A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=LLgQsCek9Kb1m4nAwNnmEBwVioWI00Iv+0FWhumo+dE=;
+        b=dIm91Mv2/Vxk+lXFpuzYgJqqfKoqf2oTKw67ceRECODcSww2n5YbKZIuHCzz29knOW
+         uId6N31FfZ8PNQVrlz3ApzfJxVu0mubZllQ00ZtTxDzipuQG+ou7/SlhSgOS4AHah7pn
+         CgO0j3WiBL1DAUY80oRospG5KvsURGq16dZvkePy6A7Zs8i0kzTcs6L+9UNA22+NTxcT
+         bw0jD4PyGKiHQZ/IVjOcgMHw9W0YxlkvL2zjXoS9IveMEz8G0VSBB8kFvaderB6hisAP
+         dOqkR7z3HnMhGV3hH8mOO9IcFZs8ETpxTmLzdwIO9X5E56mkMAJgkKhai9FjSiIkblz/
+         DcOg==
+X-Gm-Message-State: ANhLgQ3KvFm3FKXem+pZzzBXbXTauDT6iunza4su+5Rpp+MdRnqWVZc/
+        3ys0dWZntihqPS9kHKMNiOni4YoRL5kWUcEPdZsnoA==
+X-Google-Smtp-Source: ADFU+vvmFLfIa2HV/KNG6a6ZxH2awdyggqi1JUEECvxNbW+fPZiqZ/xZDxS36aAy14JiPgakxzIp85/ViOWnCFG7404=
+X-Received: by 2002:a6b:c986:: with SMTP id z128mr5313314iof.296.1583263409592;
+ Tue, 03 Mar 2020 11:23:29 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200206070412.17400-4-xiaoyao.li@intel.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+References: <20200302235709.27467-1-sean.j.christopherson@intel.com> <20200302235709.27467-49-sean.j.christopherson@intel.com>
+In-Reply-To: <20200302235709.27467-49-sean.j.christopherson@intel.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Tue, 3 Mar 2020 11:23:18 -0800
+Message-ID: <CALMp9eRoY6XkwaVd3NmB7xyVTgruRjRyo9ynixCf-szp7hBS+A@mail.gmail.com>
+Subject: Re: [PATCH v2 48/66] KVM: x86: Remove stateful CPUID handling
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Xiaoyao Li <xiaoyao.li@intel.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Feb 06, 2020 at 03:04:07PM +0800, Xiaoyao Li wrote:
-> Cache the value of MSR_TEST_CTRL in percpu data msr_test_ctrl_cache,
-> which will be used by KVM module.
-> 
-> It also avoids an expensive RDMSR instruction if SLD needs to be context
-> switched.
-> 
-> Suggested-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
-> ---
->  arch/x86/include/asm/cpu.h  |  2 ++
->  arch/x86/kernel/cpu/intel.c | 19 ++++++++++++-------
->  2 files changed, 14 insertions(+), 7 deletions(-)
-> 
-> diff --git a/arch/x86/include/asm/cpu.h b/arch/x86/include/asm/cpu.h
-> index ff567afa6ee1..2b20829db450 100644
-> --- a/arch/x86/include/asm/cpu.h
-> +++ b/arch/x86/include/asm/cpu.h
-> @@ -27,6 +27,8 @@ struct x86_cpu {
->  };
->  
->  #ifdef CONFIG_HOTPLUG_CPU
-> +DECLARE_PER_CPU(u64, msr_test_ctrl_cache);
-> +
->  extern int arch_register_cpu(int num);
->  extern void arch_unregister_cpu(int);
->  extern void start_cpu0(void);
-> diff --git a/arch/x86/kernel/cpu/intel.c b/arch/x86/kernel/cpu/intel.c
-> index 49535ed81c22..ff27d026cb4a 100644
-> --- a/arch/x86/kernel/cpu/intel.c
-> +++ b/arch/x86/kernel/cpu/intel.c
-> @@ -46,6 +46,9 @@ enum split_lock_detect_state {
->   */
->  static enum split_lock_detect_state sld_state = sld_off;
->  
-> +DEFINE_PER_CPU(u64, msr_test_ctrl_cache);
-> +EXPORT_PER_CPU_SYMBOL_GPL(msr_test_ctrl_cache);
-> +
->  /*
->   * Processors which have self-snooping capability can handle conflicting
->   * memory type across CPUs by snooping its own cache. However, there exists
-> @@ -1043,20 +1046,22 @@ static void __init split_lock_setup(void)
->   */
->  static void __sld_msr_set(bool on)
->  {
-> -	u64 test_ctrl_val;
-> -
-> -	rdmsrl(MSR_TEST_CTRL, test_ctrl_val);
-> -
->  	if (on)
-> -		test_ctrl_val |= MSR_TEST_CTRL_SPLIT_LOCK_DETECT;
-> +		this_cpu_or(msr_test_ctrl_cache, MSR_TEST_CTRL_SPLIT_LOCK_DETECT);
->  	else
-> -		test_ctrl_val &= ~MSR_TEST_CTRL_SPLIT_LOCK_DETECT;
-> +		this_cpu_and(msr_test_ctrl_cache, ~MSR_TEST_CTRL_SPLIT_LOCK_DETECT);
+On Mon, Mar 2, 2020 at 3:57 PM Sean Christopherson
+<sean.j.christopherson@intel.com> wrote:
 
-Updating the cache is at best unnecessary, and at worst dangerous, e.g. it
-incorrectly implies that the cached value of SPLIT_LOCK_DETECT is reliable.
+> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> index b5dce17c070f..49527dbcc90c 100644
+> --- a/arch/x86/kvm/cpuid.c
+> +++ b/arch/x86/kvm/cpuid.c
+> @@ -495,25 +495,16 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
+>                  * time, with the least-significant byte in EAX enumerating the
+>                  * number of times software should do CPUID(2, 0).
+>                  *
+> -                * Modern CPUs (quite likely every CPU KVM has *ever* run on)
+> -                * are less idiotic.  Intel's SDM states that EAX & 0xff "will
+> -                * always return 01H. Software should ignore this value and not
+> +                * Modern CPUs, i.e. every CPU KVM has *ever* run on are less
 
-Tony's patch[*] is more what I had in mind, the only question is whether the
-kernel should be paranoid about other bits in MSR_TEST_CTL.
+Nit: missing comma after "run on."
 
-[*] 20200206004944.GA11455@agluck-desk2.amr.corp.intel.com
-
-> -	wrmsrl(MSR_TEST_CTRL, test_ctrl_val);
-> +	wrmsrl(MSR_TEST_CTRL, this_cpu_read(msr_test_ctrl_cache));
->  }
->  
->  static void split_lock_init(void)
->  {
-> +	u64 test_ctrl_val;
-> +
-> +	/* Cache MSR TEST_CTRL */
-> +	rdmsrl(MSR_TEST_CTRL, test_ctrl_val);
-> +	this_cpu_write(msr_test_ctrl_cache, test_ctrl_val);
-> +
->  	if (sld_state == sld_off)
->  		return;
->  
-> -- 
-> 2.23.0
-> 
+Reviewed-by: Jim Mattson <jmattson@google.com>
