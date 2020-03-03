@@ -2,90 +2,84 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 777C1176DF4
-	for <lists+kvm@lfdr.de>; Tue,  3 Mar 2020 05:25:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C07A0176DF6
+	for <lists+kvm@lfdr.de>; Tue,  3 Mar 2020 05:25:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726974AbgCCEZQ convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Mon, 2 Mar 2020 23:25:16 -0500
-Received: from szxga01-in.huawei.com ([45.249.212.187]:2974 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726859AbgCCEZP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 2 Mar 2020 23:25:15 -0500
-Received: from DGGEMM401-HUB.china.huawei.com (unknown [172.30.72.57])
-        by Forcepoint Email with ESMTP id D29A1C59750FB9889CB7;
-        Tue,  3 Mar 2020 12:25:12 +0800 (CST)
-Received: from DGGEMM528-MBX.china.huawei.com ([169.254.8.90]) by
- DGGEMM401-HUB.china.huawei.com ([10.3.20.209]) with mapi id 14.03.0439.000;
- Tue, 3 Mar 2020 12:25:04 +0800
-From:   "Zhoujian (jay)" <jianjay.zhou@huawei.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-CC:     "peterx@redhat.com" <peterx@redhat.com>,
-        "sean.j.christopherson@intel.com" <sean.j.christopherson@intel.com>,
-        "wangxin (U)" <wangxinxin.wang@huawei.com>,
-        "Huangweidong (C)" <weidong.huang@huawei.com>,
-        "Liujinsong (Paul)" <liu.jinsong@huawei.com>
-Subject: RE: [PATCH v4] KVM: x86: enable dirty log gradually in small chunks
-Thread-Topic: [PATCH v4] KVM: x86: enable dirty log gradually in small chunks
-Thread-Index: AQHV7Q3Lxg5gWmOj/Eu4NPJgo7BMPag0/xkAgAFNMnA=
-Date:   Tue, 3 Mar 2020 04:25:04 +0000
-Message-ID: <B2D15215269B544CADD246097EACE7474BB4DD51@DGGEMM528-MBX.china.huawei.com>
-References: <20200227013227.1401-1-jianjay.zhou@huawei.com>
- <63c0990f-83bc-fa41-43b1-994d3bb6b4df@redhat.com>
-In-Reply-To: <63c0990f-83bc-fa41-43b1-994d3bb6b4df@redhat.com>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.173.228.206]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+        id S1727052AbgCCEZn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 Mar 2020 23:25:43 -0500
+Received: from mail-il1-f196.google.com ([209.85.166.196]:33125 "EHLO
+        mail-il1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726859AbgCCEZn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 2 Mar 2020 23:25:43 -0500
+Received: by mail-il1-f196.google.com with SMTP id r4so1602192iln.0
+        for <kvm@vger.kernel.org>; Mon, 02 Mar 2020 20:25:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=aA3rcp37ynjDu323kR9lCxo/VdLX9hbo1ymg1oSY7S0=;
+        b=oTw2GfzGDJ0OMWgicWBB4xW5WXn76GCVh2YKU/tozHXB4mTl2yYRIchpoJtv1xTOil
+         jLA0hw4IBTGABDDTx+c3ivnH1+4pzygwbKXJiiJpG+QdB1seituXo8R0bxEynjj3Mp6j
+         OKMQgy+sFpv+/bIqAnqWHW1H7E092voDCvhx+fNXiD6tvWkOWNsH6oXuM9ArJvs6yidI
+         QoGvJZq/p3jhr8PU+mLBfPn2Uz59MQZ89WvErgYo9l/Xx1261x9mzRs450YGkcPrg1hJ
+         h3qW0dttkHW7Vm23Ek8h53hPVobnIiusnRQZfhwELxBb8+WDUG0lWKve27Azgb0aq+Sx
+         abdA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=aA3rcp37ynjDu323kR9lCxo/VdLX9hbo1ymg1oSY7S0=;
+        b=tLXqFTqWUgr2U2cOUvzQul5uCviMf7senPP932lpcdNLP/8XYCRX+b8SQnXh6T3Qid
+         fosJacw0Ew19U1j33TdmJiedKso1nvsvV8abhTmYg2l7uwE7CfmUX36MmfEMu7bdgIXT
+         jYX5220Kp8qQsbe4jRMLaA9uHjZwW366NV4foif37y/LFiOzqspA8693u0WRcpc+dzVp
+         QuPLSpu30MWDkkfnrxxrObve9+Jmev0vBtcC8xNatJWpzFwGAMQByak8qOSNdQs3pWyE
+         4JBwLmx7zfK7wWC4D3U7GrBbwnBkLzdcc7ElKGwGCVsizaqcvJfyossbErd6JCsv6DBA
+         EpTQ==
+X-Gm-Message-State: ANhLgQ0TPdsNDEX9fg0/DSTVaX1QiBY/36ua5SvwRvprGeM49I4LHuBW
+        zUP93RoPIO239JM6Wu67HgE3RqzxNAZPsDPcd7kJfA==
+X-Google-Smtp-Source: ADFU+vtiBNqH2OPw0N2pJtfK+G7U2UzZDbiRRJlnhpRPIPpeGlUsbvg6RWXrTljxxVNVtiVIvJ5UkLSPHJ/E4N50zrE=
+X-Received: by 2002:a92:8547:: with SMTP id f68mr3077508ilh.26.1583209542408;
+ Mon, 02 Mar 2020 20:25:42 -0800 (PST)
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
+References: <20200302195736.24777-1-sean.j.christopherson@intel.com>
+ <20200302195736.24777-3-sean.j.christopherson@intel.com> <CALMp9eThBnN3ktAfwhNs7L-O031JDFqjb67OMPooGvmkcdhK4A@mail.gmail.com>
+In-Reply-To: <CALMp9eThBnN3ktAfwhNs7L-O031JDFqjb67OMPooGvmkcdhK4A@mail.gmail.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Mon, 2 Mar 2020 20:25:31 -0800
+Message-ID: <CALMp9eR0Mw8iPv_Z43gfCEbErHQ6EXX8oghJJb5Xge+47ZU9yQ@mail.gmail.com>
+Subject: Re: [PATCH 2/6] KVM: x86: Fix CPUID range check for Centaur and
+ Hypervisor ranges
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Jan Kiszka <jan.kiszka@siemens.com>,
+        Xiaoyao Li <xiaoyao.li@intel.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Mon, Mar 2, 2020 at 7:25 PM Jim Mattson <jmattson@google.com> wrote:
+>
+> On Mon, Mar 2, 2020 at 11:57 AM Sean Christopherson
+> <sean.j.christopherson@intel.com> wrote:
+>
+> > The bad behavior can be visually confirmed by dumping CPUID output in
+> > the guest when running Qemu with a stable TSC, as Qemu extends the limit
+> > of range 0x40000000 to 0x40000010 to advertise VMware's cpuid_freq,
+> > without defining zeroed entries for 0x40000002 - 0x4000000f.
+>
+> I think it could be reasonably argued that this is a userspace bug.
+> Clearly, when userspace explicitly supplies the results for a leaf,
+> those results override the default CPUID values for that leaf. But I
+> haven't seen it documented anywhere that leaves *not* explicitly
+> supplied by userspace will override the default CPUID values, just
+> because they happen to appear in some magic range.
 
-
-> -----Original Message-----
-> From: Paolo Bonzini [mailto:pbonzini@redhat.com]
-> Sent: Tuesday, March 3, 2020 12:29 AM
-> To: Zhoujian (jay) <jianjay.zhou@huawei.com>; kvm@vger.kernel.org
-> Cc: peterx@redhat.com; sean.j.christopherson@intel.com; wangxin (U)
-> <wangxinxin.wang@huawei.com>; Huangweidong (C)
-> <weidong.huang@huawei.com>; Liujinsong (Paul) <liu.jinsong@huawei.com>
-> Subject: Re: [PATCH v4] KVM: x86: enable dirty log gradually in small chunks
-> 
-> On 27/02/20 02:32, Jay Zhou wrote:
-> > It could take kvm->mmu_lock for an extended period of time when
-> > enabling dirty log for the first time. The main cost is to clear all
-> > the D-bits of last level SPTEs. This situation can benefit from manual
-> > dirty log protect as well, which can reduce the mmu_lock time taken.
-> > The sequence is like this:
-> >
-> > 1. Initialize all the bits of the dirty bitmap to 1 when enabling
-> >    dirty log for the first time
-> > 2. Only write protect the huge pages
-> > 3. KVM_GET_DIRTY_LOG returns the dirty bitmap info 4.
-> > KVM_CLEAR_DIRTY_LOG will clear D-bit for each of the leaf level
-> >    SPTEs gradually in small chunks
-> >
-> > Under the Intel(R) Xeon(R) Gold 6152 CPU @ 2.10GHz environment, I did
-> > some tests with a 128G windows VM and counted the time taken of
-> > memory_global_dirty_log_start, here is the numbers:
-> >
-> > VM Size        Before    After optimization
-> > 128G           460ms     10ms
-> >
-> > Signed-off-by: Jay Zhou <jianjay.zhou@huawei.com>
-> > ---
-> 
-> Looks good.  Can you write a change for QEMU and for
-> tools/testing/selftests/kvm/clear_dirty_log_test?
-
-Will do.
-
-Regards,
-Jay Zhou
+In fact, the more I think about it, the original change is correct, at
+least in this regard. Your "fix" introduces undocumented and
+unfathomable behavior.
