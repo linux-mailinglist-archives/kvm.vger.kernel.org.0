@@ -2,133 +2,164 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 39CB317829D
-	for <lists+kvm@lfdr.de>; Tue,  3 Mar 2020 20:03:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2886C17829F
+	for <lists+kvm@lfdr.de>; Tue,  3 Mar 2020 20:03:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729739AbgCCSxU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 Mar 2020 13:53:20 -0500
-Received: from mail-lf1-f68.google.com ([209.85.167.68]:43594 "EHLO
-        mail-lf1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729506AbgCCSxU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 3 Mar 2020 13:53:20 -0500
-Received: by mail-lf1-f68.google.com with SMTP id s23so3659192lfs.10
-        for <kvm@vger.kernel.org>; Tue, 03 Mar 2020 10:53:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=G1rFZaea9BK3b4wUfruQ7G0LK/25ghthW1G2sNgml7k=;
-        b=mkoPatuPS/SkcduMBsA0coljwYC4VYWcoF1Jde1trtw2sCAMZK5QhNPT06ViYxV2XM
-         yxGRRQ7C854GO3psHkEX3STRDXVU0S+qpus37MCvPspCzo2l0YQj/ZShOJGq9m6wRgI2
-         YXbYwsbMw3h3gkYRth/IWK40B4Y2GGZ6CYHPSsbd8pWhBmohoOWDglmJ9sMNWaUiZ07/
-         wyhrzfJi/FKI/PU4aRW0QSVYkvFwZoHYRLbM9B/kNBfM7ojTvnU6IQnNzaYV01fjwrbp
-         z2+o4WJTb9/2Nu5S9jjPhxDQlRhxHEivh5zgyZCilPUo5D9L98apYZxr1OEl4TeJwPZr
-         5ffg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=G1rFZaea9BK3b4wUfruQ7G0LK/25ghthW1G2sNgml7k=;
-        b=EPCrWFDWVHtLJLx4mEou78CkFOBpmLOtEoCysVEaJjqNXogPyZVbtlggWxFAXJAq+v
-         cFnOtWUW+RHu9DGVhF/WFAGkryU5scpexe9qhHLOF0cRMdD5A7HPG3ol+1Vfn5ZAWC7Y
-         +A9p/uaqmD21iaw0dTUKH3cYVx/kq+Y8IM41PvPZVOPlM/RqjTD2ZjIuacajEC2p/rxb
-         Cjbi/KPUZBihR6FZNLWTo7U8d6O9z/R3wsO0Z+KUB9yDZ9dv39EanObbbtScz4gGk1Q8
-         nulcEFGUndoS3bq2baOnjdvXm5ijC+APJusnFDnVAIC7ejcdSoPuxIBoAiQYLvqP8VBN
-         StuQ==
-X-Gm-Message-State: ANhLgQ3u9A9UQq7wVK2uhwZPXQ9DvJzbOcowYOke7fdeGIcC+6RuYqkG
-        iMT1Dmtfs7IuGheI75xixXv2cwFiHmC6PIksQ1Focg==
-X-Google-Smtp-Source: ADFU+vvW24LumfTp4zNrx9D5LaNU3ajtGV7X1StQtuE0E1EBjo0I+BBx+0o/fEH207sxIjwoiaWwq44Kt3d5uKAktvs=
-X-Received: by 2002:ac2:4d16:: with SMTP id r22mr3433400lfi.74.1583261597834;
- Tue, 03 Mar 2020 10:53:17 -0800 (PST)
+        id S1729799AbgCCSz1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 Mar 2020 13:55:27 -0500
+Received: from mga07.intel.com ([134.134.136.100]:29401 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725796AbgCCSz0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 3 Mar 2020 13:55:26 -0500
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 03 Mar 2020 10:55:25 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,511,1574150400"; 
+   d="scan'208";a="438840209"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
+  by fmsmga005.fm.intel.com with ESMTP; 03 Mar 2020 10:55:24 -0800
+Date:   Tue, 3 Mar 2020 10:55:24 -0800
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Xiaoyao Li <xiaoyao.li@intel.com>
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        hpa@zytor.com, Paolo Bonzini <pbonzini@redhat.com>,
+        Andy Lutomirski <luto@kernel.org>, tony.luck@intel.com,
+        peterz@infradead.org, fenghua.yu@intel.com, x86@kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 2/8] x86/split_lock: Ensure
+ X86_FEATURE_SPLIT_LOCK_DETECT means the existence of feature
+Message-ID: <20200303185524.GQ1439@linux.intel.com>
+References: <20200206070412.17400-1-xiaoyao.li@intel.com>
+ <20200206070412.17400-3-xiaoyao.li@intel.com>
 MIME-Version: 1.0
-References: <CA+G9fYvx=WzyJqS4fUFLq8qXT8nbFQoFfXZoeL9kP-hvv549EA@mail.gmail.com>
- <c82f4386-702f-a2e9-a4d7-d5ebb1f335d1@arm.com> <20200224133818.gtxtrmzo4y4guk4z@kamzik.brq.redhat.com>
- <adf05c0d-6a19-da06-5e41-da63b0d0d8d8@arm.com> <20200224145936.mzpwveaoijjmb5ql@kamzik.brq.redhat.com>
- <CA+G9fYvt2LyqU5G2j_EFKzgPXzt8sDYYm8NxP+zD6Do07REsYw@mail.gmail.com>
- <7b9209be-f880-a791-a2b9-c7e98bf05ecd@arm.com> <CA+G9fYvjoeLV5B951yFb8fc7r+WAejz+0kHcFYTNzW6+HfouXw@mail.gmail.com>
- <CA+G9fYuEfrhW_7vLCdK4nKBhDv6aQkK_knUY7mbgeDcuaETLyQ@mail.gmail.com> <a1f51266-d735-402a-6273-8ae84d415881@arm.com>
-In-Reply-To: <a1f51266-d735-402a-6273-8ae84d415881@arm.com>
-From:   Naresh Kamboju <naresh.kamboju@linaro.org>
-Date:   Wed, 4 Mar 2020 00:23:06 +0530
-Message-ID: <CA+G9fYt2UFv=i5Wg1cwM-hiHNRdkTUHjMZUfbWCY=CWVAoSwrQ@mail.gmail.com>
-Subject: Re: kvm-unit-tests : Kconfigs and extra kernel args for full coverage
-To:     Alexandru Elisei <alexandru.elisei@arm.com>
-Cc:     Andrew Jones <drjones@redhat.com>, kvm list <kvm@vger.kernel.org>,
-        lkft-triage@lists.linaro.org,
-        Krish Sadhukhan <krish.sadhukhan@oracle.com>, yzt356@gmail.com,
-        Jim Mattson <jmattson@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, namit@vmware.com,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Basil Eljuse <Basil.Eljuse@arm.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200206070412.17400-3-xiaoyao.li@intel.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 3 Mar 2020 at 21:32, Alexandru Elisei <alexandru.elisei@arm.com> wrote:
->
-> Hi,
->
-> On 2/25/20 8:20 AM, Naresh Kamboju wrote:
-> > Hi Alexandru,
-> >
-> > On Mon, 24 Feb 2020 at 23:14, Naresh Kamboju <naresh.kamboju@linaro.org> wrote:
-> >>> I think this is because you are running it on one physical CPU (it's exactly the
-> >>> same message I am getting when I use taskset to run the tests). Can you try and
-> >>> run it without taskset and see if it solves your issue?
-> > We have a new problem when running [1] without taskset on Juno-r2.
-> > None of the test got pass [2] when running without taskset on Juno-r2.
-> >
-> I think I have an explanation for why all the tests fail. qemu creates a vcpu to
-> match the host cpu in kvm_arm_create_scratch_host_vcpu and it sets the target to
-> whatever the result of the KVM_ARM_PREFERRED_TARGET ioctl is. If it's run on the
-> little core, the target will be KVM_ARM_TARGET_CORTEX_A53. If it's run on the big
-> core, the target will be KVM_ARM_TARGET_GENERIC_V8. I tried it a few times, and
-> for me it has always been the big core.
->
-> The vcpu is created from a different thread by doing a KVM_ARM_VCPU_INIT ioctl and
-> KVM makes sure that the vcpu target matches the target corresponding to the
-> physical CPU the thread is running on. What is happening is that the vcpu thread
-> is run on a little core, so the target as far as KVM is concerned should be
-> KVM_ARM_TARGET_CORTEX_A53, but qemu (correctly) set it to
-> KVM_ARM_TARGET_GENERIC_V8. The ioctl return -EINVAL (-22) and qemu dies.
->
-> To get around this, I ran the tests either only on the big cores or on the little
-> cores.
+On Thu, Feb 06, 2020 at 03:04:06PM +0800, Xiaoyao Li wrote:
+> When flag X86_FEATURE_SPLIT_LOCK_DETECT is set, it should ensure the
+> existence of MSR_TEST_CTRL and MSR_TEST_CTRL.SPLIT_LOCK_DETECT bit.
 
-Thanks for explaining in details.
-I have seen this scenario and defined my test to run only on CPU 0.
-The CPU 0 on my Juno-r2 devices found to be LITTLE CPU.
+The changelog confused me a bit.  "When flag X86_FEATURE_SPLIT_LOCK_DETECT
+is set" makes it sound like the logic is being applied after the feature
+bit is set.  Maybe something like:
 
->
-> I also managed to reliably trigger the PMU failures that you are seeing. They only
-> happen when kvm-unit-tests is run on the little cores (ran them 10 times in a
-> loop). When run on  the big cores, everything is fine (also ran them 10 times in a
-> loop). Log output when it fails:
+```
+Verify MSR_TEST_CTRL.SPLIT_LOCK_DETECT can be toggled via WRMSR prior to
+setting the SPLIT_LOCK_DETECT feature bit so that runtime consumers,
+e.g. KVM, don't need to worry about WRMSR failure.
+```
 
-Thanks for reproducing this PMU failure.
+> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+> ---
+>  arch/x86/kernel/cpu/intel.c | 41 +++++++++++++++++++++----------------
+>  1 file changed, 23 insertions(+), 18 deletions(-)
+> 
+> diff --git a/arch/x86/kernel/cpu/intel.c b/arch/x86/kernel/cpu/intel.c
+> index 2b3874a96bd4..49535ed81c22 100644
+> --- a/arch/x86/kernel/cpu/intel.c
+> +++ b/arch/x86/kernel/cpu/intel.c
+> @@ -702,7 +702,8 @@ static void init_intel(struct cpuinfo_x86 *c)
+>  	if (tsx_ctrl_state == TSX_CTRL_DISABLE)
+>  		tsx_disable();
+>  
+> -	split_lock_init();
+> +	if (boot_cpu_has(X86_FEATURE_SPLIT_LOCK_DETECT))
+> +		split_lock_init();
+>  }
+>  
+>  #ifdef CONFIG_X86_32
+> @@ -986,9 +987,26 @@ static inline bool match_option(const char *arg, int arglen, const char *opt)
+>  
+>  static void __init split_lock_setup(void)
+>  {
+> +	u64 test_ctrl_val;
+>  	char arg[20];
+>  	int i, ret;
+> +	/*
+> +	 * Use the "safe" versions of rdmsr/wrmsr here to ensure MSR_TEST_CTRL
+> +	 * and MSR_TEST_CTRL.SPLIT_LOCK_DETECT bit do exist. Because there may
+> +	 * be glitches in virtualization that leave a guest with an incorrect
+> +	 * view of real h/w capabilities.
+> +	 */
+> +	if (rdmsrl_safe(MSR_TEST_CTRL, &test_ctrl_val))
+> +		return;
+> +
+> +	if (wrmsrl_safe(MSR_TEST_CTRL,
+> +			test_ctrl_val | MSR_TEST_CTRL_SPLIT_LOCK_DETECT))
+> +		return;
+> +
+> +	if (wrmsrl_safe(MSR_TEST_CTRL, test_ctrl_val))
+> +		return;a
 
->
-> # taskset -c 0,3,4,5 arm/run arm/pmu.flat
+Probing the MSR should be skipped if SLD is disabled in sld_options, i.e.
+move this code (and setup_force_cpu_cap() etc...) down below the
+match_option() logic.  The above would temporarily enable SLD even if the
+admin has explicitly disabled it, e.g. makes the kernel param useless for
+turning off the feature due to bugs.
 
-CPU 0,3,4,5 are seem to be on little cores.
+And with that, IMO failing any of RDMSR/WRSMR here warrants a pr_err().
+The CPU says it supports split lock and the admin hasn't explicitly turned
+it off, so failure to enable should be logged.
 
-> /usr/bin/qemu-system-aarch64 -nodefaults -machine virt,gic-version=host,accel=kvm
-> -cpu host -device virtio-serial-device -device virtconsole,chardev=ctd -chardev
-> testdev,id=ctd -device pci-testdev -display none -serial stdio -kernel
-> arm/pmu.flat # -initrd /tmp/tmp.s4ld4DX4uK
-> INFO: PMU version: 3
-> INFO: pmu: PMU implementer/ID code/counters: 0x41("A")/0x3/6
-> PASS: pmu: Control register
-> Read 0 then 0.
-> FAIL: pmu: Monotonically increasing cycle count
-> instrs : cycles0 cycles1 ...
->    4:    0
-> cycles not incrementing!
-> FAIL: pmu: Cycle/instruction ratio
-> SUMMARY: 3 tests, 2 unexpected failures
->
-> I'm looking into it.
-
-- Naresh
+> +
+>  	setup_force_cpu_cap(X86_FEATURE_SPLIT_LOCK_DETECT);
+>  	sld_state = sld_warn;
+>  
+> @@ -1022,24 +1040,19 @@ static void __init split_lock_setup(void)
+>   * Locking is not required at the moment because only bit 29 of this
+>   * MSR is implemented and locking would not prevent that the operation
+>   * of one thread is immediately undone by the sibling thread.
+> - * Use the "safe" versions of rdmsr/wrmsr here because although code
+> - * checks CPUID and MSR bits to make sure the TEST_CTRL MSR should
+> - * exist, there may be glitches in virtualization that leave a guest
+> - * with an incorrect view of real h/w capabilities.
+>   */
+> -static bool __sld_msr_set(bool on)
+> +static void __sld_msr_set(bool on)
+>  {
+>  	u64 test_ctrl_val;
+>  
+> -	if (rdmsrl_safe(MSR_TEST_CTRL, &test_ctrl_val))
+> -		return false;
+> +	rdmsrl(MSR_TEST_CTRL, test_ctrl_val);
+>  
+>  	if (on)
+>  		test_ctrl_val |= MSR_TEST_CTRL_SPLIT_LOCK_DETECT;
+>  	else
+>  		test_ctrl_val &= ~MSR_TEST_CTRL_SPLIT_LOCK_DETECT;
+>  
+> -	return !wrmsrl_safe(MSR_TEST_CTRL, test_ctrl_val);
+> +	wrmsrl(MSR_TEST_CTRL, test_ctrl_val);
+>  }
+>  
+>  static void split_lock_init(void)
+> @@ -1047,15 +1060,7 @@ static void split_lock_init(void)
+>  	if (sld_state == sld_off)
+>  		return;
+>  
+> -	if (__sld_msr_set(true))
+> -		return;
+> -
+> -	/*
+> -	 * If this is anything other than the boot-cpu, you've done
+> -	 * funny things and you get to keep whatever pieces.
+> -	 */
+> -	pr_warn("MSR fail -- disabled\n");
+> -	sld_state = sld_off;
+> +	__sld_msr_set(true);
+>  }
+>  
+>  bool handle_user_split_lock(unsigned long ip)
+> -- 
+> 2.23.0
+> 
