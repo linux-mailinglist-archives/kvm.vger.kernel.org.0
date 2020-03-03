@@ -2,213 +2,187 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 342AE176F66
-	for <lists+kvm@lfdr.de>; Tue,  3 Mar 2020 07:27:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AD7861770BF
+	for <lists+kvm@lfdr.de>; Tue,  3 Mar 2020 09:06:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727487AbgCCG1i (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 Mar 2020 01:27:38 -0500
-Received: from mga03.intel.com ([134.134.136.65]:40059 "EHLO mga03.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725765AbgCCG1h (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 3 Mar 2020 01:27:37 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 02 Mar 2020 22:27:36 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,510,1574150400"; 
-   d="scan'208";a="274076019"
-Received: from sjchrist-coffee.jf.intel.com ([10.54.74.202])
-  by fmsmga002.fm.intel.com with ESMTP; 02 Mar 2020 22:27:36 -0800
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Liran Alon <liran.alon@oracle.com>
-Subject: [PATCH] KVM: nVMX: Properly handle userspace interrupt window request
-Date:   Mon,  2 Mar 2020 22:27:35 -0800
-Message-Id: <20200303062735.31868-1-sean.j.christopherson@intel.com>
-X-Mailer: git-send-email 2.24.1
+        id S1727743AbgCCIGw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 Mar 2020 03:06:52 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:28677 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727659AbgCCIGw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 3 Mar 2020 03:06:52 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1583222810;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+        bh=Nef5Bf9pKI8ANujlRyt5wOOUrBcWDZB8peR1Zkb7rzU=;
+        b=MBlqydmIpNha/7I3PDjYWmYgutycQPkeiM1dS+GSDlBQYdxkR6kP/CX4l9yp8xT51V0Ex7
+        nZCBZnYSUZt7peM2R91z8QQ+g2047yEQL6VNe8A1Z0U9E3VfKa4maXCXCxDPa+runigq+v
+        NZEUDFu8MH6zJ4RX1HCpvT78AbhbA7A=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-256-OWhx7svFM6yEKL-EWUbtag-1; Tue, 03 Mar 2020 03:06:44 -0500
+X-MC-Unique: OWhx7svFM6yEKL-EWUbtag-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 484B8106C0A8;
+        Tue,  3 Mar 2020 08:06:42 +0000 (UTC)
+Received: from [10.36.117.113] (ovpn-117-113.ams2.redhat.com [10.36.117.113])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 1EE0760C84;
+        Tue,  3 Mar 2020 08:06:29 +0000 (UTC)
+Subject: Re: [PATCH v1 02/11] virtio-mem: Paravirtualized memory hotplug
+To:     kbuild test robot <lkp@intel.com>
+Cc:     kbuild-all@lists.01.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, virtio-dev@lists.oasis-open.org,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        Michal Hocko <mhocko@kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Oscar Salvador <osalvador@suse.de>,
+        Igor Mammedov <imammedo@redhat.com>,
+        Dave Young <dyoung@redhat.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Pavel Tatashin <pasha.tatashin@soleen.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
+        Len Brown <lenb@kernel.org>, linux-acpi@vger.kernel.org
+References: <20200302134941.315212-3-david@redhat.com>
+ <202003031039.To18mcrC%lkp@intel.com>
+From:   David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat GmbH
+Message-ID: <3851c1eb-92ee-7c85-088f-2adeef3272e6@redhat.com>
+Date:   Tue, 3 Mar 2020 09:06:29 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <202003031039.To18mcrC%lkp@intel.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Return true for vmx_interrupt_allowed() if the vCPU is in L2 and L1 has
-external interrupt exiting enabled.  IRQs are never blocked in hardware
-if the CPU is in the guest (L2 from L1's perspective) when IRQs trigger
-VM-Exit.
+On 03.03.20 03:24, kbuild test robot wrote:
+> Hi David,
+>=20
+> I love your patch! Yet something to improve:
+>=20
+> [auto build test ERROR on pm/linux-next]
+> [also build test ERROR on linus/master v5.6-rc4 next-20200302]
+> [cannot apply to linux/master mmotm/master]
+> [if your patch is applied to the wrong git tree, please drop us a note =
+to help
+> improve the system. BTW, we also suggest to use '--base' option to spec=
+ify the
+> base tree in git format-patch, please see https://stackoverflow.com/a/3=
+7406982]
+>=20
+> url:    https://github.com/0day-ci/linux/commits/David-Hildenbrand/virt=
+io-mem-paravirtualized-memory/20200303-020852
+> base:   https://git.kernel.org/pub/scm/linux/kernel/git/rafael/linux-pm=
+.git linux-next
+> config: x86_64-randconfig-s1-20200303 (attached as .config)
+> compiler: gcc-5 (Ubuntu 5.5.0-12ubuntu1) 5.5.0 20171010
+> reproduce:
+>         # save the attached .config to linux build tree
+>         make ARCH=3Dx86_64=20
+>=20
+> If you fix the issue, kindly add following tag
+> Reported-by: kbuild test robot <lkp@intel.com>
+>=20
+> All errors (new ones prefixed by >>):
+>=20
+>    In file included from <command-line>:1:0:
+>>> ./usr/include/linux/virtio_mem.h:185:2: error: unknown type name 'uin=
+t32_t'
+>      uint32_t block_size;
+>      ^
+>>> ./usr/include/linux/virtio_mem.h:187:2: error: unknown type name 'uin=
+t16_t'
+>      uint16_t node_id;
+>      ^
+>    ./usr/include/linux/virtio_mem.h:188:2: error: unknown type name 'ui=
+nt16_t'
+>      uint16_t padding;
+>      ^
+>>> ./usr/include/linux/virtio_mem.h:190:2: error: unknown type name 'uin=
+t64_t'
+>      uint64_t addr;
+>      ^
+>    ./usr/include/linux/virtio_mem.h:192:2: error: unknown type name 'ui=
+nt64_t'
+>      uint64_t region_size;
+>      ^
+>    ./usr/include/linux/virtio_mem.h:198:2: error: unknown type name 'ui=
+nt64_t'
+>      uint64_t usable_region_size;
+>      ^
+>    ./usr/include/linux/virtio_mem.h:203:2: error: unknown type name 'ui=
+nt64_t'
+>      uint64_t plugged_size;
+>      ^
+>    ./usr/include/linux/virtio_mem.h:205:2: error: unknown type name 'ui=
+nt64_t'
+>      uint64_t requested_size;
+>      ^
 
-The new check percolates up to kvm_vcpu_ready_for_interrupt_injection()
-and thus vcpu_run(), and so KVM will exit to userspace if userspace has
-requested an interrupt window (to inject an IRQ into L1).
+Right, these have to be __u64 and friends. Should really enable
+CONFIG_UAPI_HEADER_TEST in my default config.
 
-Remove the @external_intr param from vmx_check_nested_events(), which is
-actually an indicator that userspace wants an interrupt window, e.g.
-it's named @req_int_win further up the stack.  Injecting a VM-Exit into
-L1 to try and bounce out to L0 userspace is all kinds of broken and is
-no longer necessary.
 
-Remove the hack in nested_vmx_vmexit() that attempted to workaround the
-breakage in vmx_check_nested_events() by only filling interrupt info if
-there's an actual interrupt pending.  The hack actually made things
-worse because it caused KVM to _never_ fill interrupt info when the
-LAPIC resides in userspace (kvm_cpu_has_interrupt() queries
-interrupt.injected, which is always cleared by prepare_vmcs12() before
-reaching the hack in nested_vmx_vmexit()).
+--=20
+Thanks,
 
-Fixes: 6550c4df7e50 ("KVM: nVMX: Fix interrupt window request with "Acknowledge interrupt on exit"")
-Cc: stable@vger.kernel.org
-Cc: Liran Alon <liran.alon@oracle.com>
-Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
----
-
-Odds are good that this doesn't solve all the problems with running nested
-VMX and a userspace LAPIC, but I'm at least able to boot a kernel and run
-unit tests, i.e. it's less broken than before.  Not that it matters, I'm
-guessing no one actually uses this configuration, e.g. running a SMP
-guest with the current KVM+kernel hangs during boot because Qemu
-advertises PV IPIs to the guest, which require an in-kernel LAPIC.  I
-stumbled on this disaster when disabling the in-kernel LAPIC for a
-completely unrelated test.  I'm happy even if it does nothing more than
-get rid of the awful logic vmx_check_nested_events().
-
- arch/x86/include/asm/kvm_host.h |  2 +-
- arch/x86/kvm/vmx/nested.c       | 18 ++++--------------
- arch/x86/kvm/vmx/vmx.c          |  9 +++++++--
- arch/x86/kvm/x86.c              | 10 +++++-----
- 4 files changed, 17 insertions(+), 22 deletions(-)
-
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 5edf6425c747..b3e936eeb07b 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1175,7 +1175,7 @@ struct kvm_x86_ops {
- 	bool (*pt_supported)(void);
- 	bool (*pku_supported)(void);
- 
--	int (*check_nested_events)(struct kvm_vcpu *vcpu, bool external_intr);
-+	int (*check_nested_events)(struct kvm_vcpu *vcpu);
- 	void (*request_immediate_exit)(struct kvm_vcpu *vcpu);
- 
- 	void (*sched_in)(struct kvm_vcpu *kvm, int cpu);
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 0946122a8d3b..745cdc382ea2 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -3603,7 +3603,7 @@ static void nested_vmx_update_pending_dbg(struct kvm_vcpu *vcpu)
- 			    vcpu->arch.exception.payload);
- }
- 
--static int vmx_check_nested_events(struct kvm_vcpu *vcpu, bool external_intr)
-+static int vmx_check_nested_events(struct kvm_vcpu *vcpu)
- {
- 	struct vcpu_vmx *vmx = to_vmx(vcpu);
- 	unsigned long exit_qual;
-@@ -3679,8 +3679,7 @@ static int vmx_check_nested_events(struct kvm_vcpu *vcpu, bool external_intr)
- 		return 0;
- 	}
- 
--	if ((kvm_cpu_has_interrupt(vcpu) || external_intr) &&
--	    nested_exit_on_intr(vcpu)) {
-+	if (kvm_cpu_has_interrupt(vcpu) && nested_exit_on_intr(vcpu)) {
- 		if (block_nested_events)
- 			return -EBUSY;
- 		nested_vmx_vmexit(vcpu, EXIT_REASON_EXTERNAL_INTERRUPT, 0, 0);
-@@ -4328,17 +4327,8 @@ void nested_vmx_vmexit(struct kvm_vcpu *vcpu, u32 exit_reason,
- 	vcpu->arch.mp_state = KVM_MP_STATE_RUNNABLE;
- 
- 	if (likely(!vmx->fail)) {
--		/*
--		 * TODO: SDM says that with acknowledge interrupt on
--		 * exit, bit 31 of the VM-exit interrupt information
--		 * (valid interrupt) is always set to 1 on
--		 * EXIT_REASON_EXTERNAL_INTERRUPT, so we shouldn't
--		 * need kvm_cpu_has_interrupt().  See the commit
--		 * message for details.
--		 */
--		if (nested_exit_intr_ack_set(vcpu) &&
--		    exit_reason == EXIT_REASON_EXTERNAL_INTERRUPT &&
--		    kvm_cpu_has_interrupt(vcpu)) {
-+		if (exit_reason == EXIT_REASON_EXTERNAL_INTERRUPT &&
-+		    nested_exit_intr_ack_set(vcpu)) {
- 			int irq = kvm_cpu_get_interrupt(vcpu);
- 			WARN_ON(irq < 0);
- 			vmcs12->vm_exit_intr_info = irq |
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index a04017bdae05..585e89f31340 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -4493,8 +4493,13 @@ static int vmx_nmi_allowed(struct kvm_vcpu *vcpu)
- 
- static int vmx_interrupt_allowed(struct kvm_vcpu *vcpu)
- {
--	return (!to_vmx(vcpu)->nested.nested_run_pending &&
--		vmcs_readl(GUEST_RFLAGS) & X86_EFLAGS_IF) &&
-+	if (to_vmx(vcpu)->nested.nested_run_pending)
-+		return false;
-+
-+	if (is_guest_mode(vcpu) && nested_exit_on_intr(vcpu))
-+		return true;
-+
-+	return (vmcs_readl(GUEST_RFLAGS) & X86_EFLAGS_IF) &&
- 		!(vmcs_read32(GUEST_INTERRUPTIBILITY_INFO) &
- 			(GUEST_INTR_STATE_STI | GUEST_INTR_STATE_MOV_SS));
- }
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index ddd1d296bd20..928c1ba08321 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -7578,7 +7578,7 @@ static void update_cr8_intercept(struct kvm_vcpu *vcpu)
- 	kvm_x86_ops->update_cr8_intercept(vcpu, tpr, max_irr);
- }
- 
--static int inject_pending_event(struct kvm_vcpu *vcpu, bool req_int_win)
-+static int inject_pending_event(struct kvm_vcpu *vcpu)
- {
- 	int r;
- 
-@@ -7614,7 +7614,7 @@ static int inject_pending_event(struct kvm_vcpu *vcpu, bool req_int_win)
- 	 * from L2 to L1.
- 	 */
- 	if (is_guest_mode(vcpu) && kvm_x86_ops->check_nested_events) {
--		r = kvm_x86_ops->check_nested_events(vcpu, req_int_win);
-+		r = kvm_x86_ops->check_nested_events(vcpu);
- 		if (r != 0)
- 			return r;
- 	}
-@@ -7676,7 +7676,7 @@ static int inject_pending_event(struct kvm_vcpu *vcpu, bool req_int_win)
- 		 * KVM_REQ_EVENT only on certain events and not unconditionally?
- 		 */
- 		if (is_guest_mode(vcpu) && kvm_x86_ops->check_nested_events) {
--			r = kvm_x86_ops->check_nested_events(vcpu, req_int_win);
-+			r = kvm_x86_ops->check_nested_events(vcpu);
- 			if (r != 0)
- 				return r;
- 		}
-@@ -8209,7 +8209,7 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
- 			goto out;
- 		}
- 
--		if (inject_pending_event(vcpu, req_int_win) != 0)
-+		if (inject_pending_event(vcpu) != 0)
- 			req_immediate_exit = true;
- 		else {
- 			/* Enable SMI/NMI/IRQ window open exits if needed.
-@@ -8437,7 +8437,7 @@ static inline int vcpu_block(struct kvm *kvm, struct kvm_vcpu *vcpu)
- static inline bool kvm_vcpu_running(struct kvm_vcpu *vcpu)
- {
- 	if (is_guest_mode(vcpu) && kvm_x86_ops->check_nested_events)
--		kvm_x86_ops->check_nested_events(vcpu, false);
-+		kvm_x86_ops->check_nested_events(vcpu);
- 
- 	return (vcpu->arch.mp_state == KVM_MP_STATE_RUNNABLE &&
- 		!vcpu->arch.apf.halted);
--- 
-2.24.1
+David / dhildenb
 
