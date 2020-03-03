@@ -2,102 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 67ECA177D8F
-	for <lists+kvm@lfdr.de>; Tue,  3 Mar 2020 18:33:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 05ABA177DA9
+	for <lists+kvm@lfdr.de>; Tue,  3 Mar 2020 18:43:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730437AbgCCRdo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 Mar 2020 12:33:44 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:36094 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1730411AbgCCRdo (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 3 Mar 2020 12:33:44 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1583256822;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=gxnMDm1mj8e+e8hgSCFPYUZNViu0FuRVXA/Vwdb0hRY=;
-        b=aQddCnVNTlmjNTbqd3RKlgw+4WofFZsYqbbNJ57z1G2IEcHye3APctRI+3RXlF6DtqydPN
-        bfv+MkPMU8eZjeslhDJTzgcMl3xYvOGnLCzyAQhYT88U5cgLVVaY8sBrqGqt/d36YQkHZp
-        3ma/t4luj1Ij+/badpkPeCfipV7e2c8=
-Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
- [209.85.160.199]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-132-4rN-72XvNjefgmbguNp6Qg-1; Tue, 03 Mar 2020 12:33:41 -0500
-X-MC-Unique: 4rN-72XvNjefgmbguNp6Qg-1
-Received: by mail-qt1-f199.google.com with SMTP id h90so2663108qtd.23
-        for <kvm@vger.kernel.org>; Tue, 03 Mar 2020 09:33:41 -0800 (PST)
+        id S1730517AbgCCRmz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 Mar 2020 12:42:55 -0500
+Received: from mail-il1-f193.google.com ([209.85.166.193]:42626 "EHLO
+        mail-il1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728953AbgCCRmy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 3 Mar 2020 12:42:54 -0500
+Received: by mail-il1-f193.google.com with SMTP id x2so3499564ila.9
+        for <kvm@vger.kernel.org>; Tue, 03 Mar 2020 09:42:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=Gtm53TC5rqrHg3h0I9s+1/H4clMch7YrubYWxhwSBQI=;
+        b=b1jcbLgwz/oSW/Syh5ZSg2zyIcmG8ytdYX3QgbkeaKBI3ELKUb//qk2+9DWlYPai3q
+         PguqBBpF9nF6tmxau6uB1enqyLCxYqPmyRELbaxd5EZW9OHb/KJxRjIeCI1oAEDFtKUi
+         hxbL8KD9Lgl5HhXPJSXTU7nt9PZufXI4SYW5PZQAmW+ZzE2DbPWkZKfxizkMdwAPfPbf
+         ir9Z7SxvDNkruM6RUd/5XoYEegF6JGygXWV21eyaZtALdiY9iDGKvKqoQ9ZSeCIYJcIK
+         Xa3O8k9/42GoiijumnPhmbD1S7HLDdic/NKH3pUTffa1xtFUCGHObxvdFD5WHaPsbTO/
+         lkWA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=gxnMDm1mj8e+e8hgSCFPYUZNViu0FuRVXA/Vwdb0hRY=;
-        b=NmR0UN8XSSywSnW4jc3QlbIPkKUaDjAQSv4N/JVu5h5eyLT/SbO81TK55HnwYMJ6oB
-         dUVACvcPetBs3jR4FGSnwN8Yfg8QewvjOEf5zH7sIfnVS+SZCuQrDnDlY+LERPsbcwpF
-         cjKTRDKe9+vzKxkmpBJQ4cR5fy+Nhlj4zCLaY7vWs4zL/1ia5aXkc6mbAo0p4TOqPdzt
-         ELvckqxN/1FrKVjHvCunNg+VlXKn1rF7NUSqHoiljeCOE2j1SnMZ6ms1mnTXTcCRfx4i
-         +s99xSGOxRz2FtHbra6uQp/EHsVtFXlWgsScBtqzuWqQ+tFbXIkhIq4eDHIFudFEs0L4
-         F74A==
-X-Gm-Message-State: ANhLgQ3QzFcXzAY53p+kr5sAEPlU1+rS+f98XydVb1mCQ7JY9hNapHYW
-        JVD0/+hYheL/rFx4T8NzyJH8PTWZcMxkTeyi0yNihanbiq2ST/Vz01OvAOwxG1ZumL/RIPjiblt
-        aPBzQ7bIVqe5D
-X-Received: by 2002:a0c:f707:: with SMTP id w7mr5015554qvn.46.1583256819815;
-        Tue, 03 Mar 2020 09:33:39 -0800 (PST)
-X-Google-Smtp-Source: ADFU+vuHtSJyfYDqXoUN1urEzaepBYjtUM0hwlk7Vp2mQmweuGkMQhYrGhiK0np00+bkmmUz680EJw==
-X-Received: by 2002:a0c:f707:: with SMTP id w7mr5015528qvn.46.1583256819589;
-        Tue, 03 Mar 2020 09:33:39 -0800 (PST)
-Received: from xz-x1 ([2607:9880:19c0:32::2])
-        by smtp.gmail.com with ESMTPSA id m1sm4095574qkk.103.2020.03.03.09.33.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Mar 2020 09:33:38 -0800 (PST)
-Date:   Tue, 3 Mar 2020 12:33:34 -0500
-From:   Peter Xu <peterx@redhat.com>
-To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     Christophe de Dinechin <dinechin@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Yan Zhao <yan.y.zhao@intel.com>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Kevin Tian <kevin.tian@intel.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>
-Subject: Re: [PATCH v4 00/14] KVM: Dirty ring interface
-Message-ID: <20200303173334.GE464129@xz-x1>
-References: <20200205025105.367213-1-peterx@redhat.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=Gtm53TC5rqrHg3h0I9s+1/H4clMch7YrubYWxhwSBQI=;
+        b=KMyL/RWpMbd2oKpibDO1JzbQcL5oXaB7Gvr6vjcC43j7IesMmWFdmG7Bi6Gb//8rQU
+         fxTosIGFaIxiffrD6OZGQ25Q8Fqhcqu/QadqG8rIRkP+jTv7qXnPqlP0CjazGOzuA81e
+         LFCNfBdhSkaVd8rfUjSj/SvXMGK9UvSymLzGsiejPRk3/QYfjbiEpUwXtrnOoisVRX4e
+         8t+8H9XQHBAWnB9MblDvggIhWiUGVdA1FYAYZSnI60tCcbmDcTY0oD0X4feXMEhVj9vj
+         gi9EaqxK/pZLlFjZ1c7tbzd7zsd0tz8h7CLH64gmmEL197ruUMCBrDHJpG4qD1nVC+/z
+         3+7A==
+X-Gm-Message-State: ANhLgQ3yKFkkpc6ocbWcbJXen/y5zcVDM1QoFOI1P3h3apsTd3S3Oq4q
+        8WbmpzvLXBeTrzEmZPXjDOu3l7GCSuTjj3BryND44g==
+X-Google-Smtp-Source: ADFU+vsOHpu+DbdIuAQmx62AW4AJRhs37uEQZV2A/j7KjzVW2A4KbAVxB1AkTRwzhrAHXDKGtYGMou87dlUCMVNTXBU=
+X-Received: by 2002:a92:8458:: with SMTP id l85mr6037720ild.296.1583257373851;
+ Tue, 03 Mar 2020 09:42:53 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20200205025105.367213-1-peterx@redhat.com>
+References: <20200302195736.24777-1-sean.j.christopherson@intel.com>
+ <20200302195736.24777-3-sean.j.christopherson@intel.com> <CALMp9eThBnN3ktAfwhNs7L-O031JDFqjb67OMPooGvmkcdhK4A@mail.gmail.com>
+ <CALMp9eR0Mw8iPv_Z43gfCEbErHQ6EXX8oghJJb5Xge+47ZU9yQ@mail.gmail.com> <20200303045838.GF27842@linux.intel.com>
+In-Reply-To: <20200303045838.GF27842@linux.intel.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Tue, 3 Mar 2020 09:42:42 -0800
+Message-ID: <CALMp9eSYZKUBko4ZViNbasRGJs2bAO2fREHX9maDbLrYj8yDhQ@mail.gmail.com>
+Subject: Re: [PATCH 2/6] KVM: x86: Fix CPUID range check for Centaur and
+ Hypervisor ranges
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Jan Kiszka <jan.kiszka@siemens.com>,
+        Xiaoyao Li <xiaoyao.li@intel.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Feb 04, 2020 at 09:50:51PM -0500, Peter Xu wrote:
-> KVM branch:
->   https://github.com/xzpeter/linux/tree/kvm-dirty-ring
-> 
-> QEMU branch for testing:
->   https://github.com/xzpeter/qemu/tree/kvm-dirty-ring
-> 
-> v4 changelog:
-> 
-> - refactor ring layout: remove indices, use bit 0/1 in the gfn.flags
->   field to encode GFN status (invalid, dirtied, collected) [Michael,
->   Paolo]
-> - patch memslot_valid_for_gpte() too to check against memslot flags
->   rather than dirty_bitmap pointer
-> - fix build on non-x86 arch [syzbot]
-> - fix comment for kvm_dirty_gfn [Michael]
-> - check against VM_EXEC, VM_SHARED for mmaps [Michael]
-> - fix "KVM: X86: Don't track dirty for
->   KVM_SET_[TSS_ADDR|IDENTITY_MAP_ADDR]" to unbreak
->   unrestricted_guest=N [Sean]
-> - some rework in the test code, e.g., more comments
+Unfathomable was the wrong word. I can see what you're trying to do. I
+just don't think it's defensible. I suspect that Intel CPU architects
+will be surprised and disappointed to find that the maximum effective
+value of CPUID.0H:EAX is now 255, and that they have to define
+CPUID.100H:EAX as the "maximum leaf between 100H and 1FFH" if they
+want to define any leaves between 100H and 1FFH.
 
-Any comments before I repost another version?  Thanks,
+Furthermore, AMD has only ceded 4000_0000h through 4000_00FFh to
+hypervisors, so kvm's use of 40000100H through 400001FFH appears to be
+a land grab, akin to VIA's unilateral grab of the C0000000H leaves.
+Admittedly, one could argue that the 40000000H leaves are not AMD's to
+apportion, since AMD and Intel appear to have reached a detente by
+splitting the available space down the middle. Intel, who seems to be
+the recognized authority for this range, declares the entire range
+from 40000000H through 4FFFFFFFH to be invalid. Make of that what you
+will.
 
--- 
-Peter Xu
+In any event, no one has ever documented what's supposed to happen if
+you leave gaps in the 4xxxxxxxH range when defining synthesized CPUID
+leaves under kvm.
 
+On Mon, Mar 2, 2020 at 8:58 PM Sean Christopherson
+<sean.j.christopherson@intel.com> wrote:
+>
+> On Mon, Mar 02, 2020 at 08:25:31PM -0800, Jim Mattson wrote:
+> > On Mon, Mar 2, 2020 at 7:25 PM Jim Mattson <jmattson@google.com> wrote:
+> > >
+> > > On Mon, Mar 2, 2020 at 11:57 AM Sean Christopherson
+> > > <sean.j.christopherson@intel.com> wrote:
+> > >
+> > > > The bad behavior can be visually confirmed by dumping CPUID output in
+> > > > the guest when running Qemu with a stable TSC, as Qemu extends the limit
+> > > > of range 0x40000000 to 0x40000010 to advertise VMware's cpuid_freq,
+> > > > without defining zeroed entries for 0x40000002 - 0x4000000f.
+> > >
+> > > I think it could be reasonably argued that this is a userspace bug.
+> > > Clearly, when userspace explicitly supplies the results for a leaf,
+> > > those results override the default CPUID values for that leaf. But I
+> > > haven't seen it documented anywhere that leaves *not* explicitly
+> > > supplied by userspace will override the default CPUID values, just
+> > > because they happen to appear in some magic range.
+> >
+> > In fact, the more I think about it, the original change is correct, at
+> > least in this regard. Your "fix" introduces undocumented and
+> > unfathomable behavior.
+>
+> Heh, the takeaway from this is that whatever we decide on needs to be
+> documented somewhere :-)
+>
+> I wouldn't say it's unfathomable, conceptually it seems like the intent
+> of the hypervisor range was to mimic the basic and extended ranges.  The
+> whole thing is arbitrary behavior.  Of course if Intel CPUs would just
+> return 0s on undefined leafs it would be a lot less arbitrary :-)
+>
+> Anyways, I don't have a strong opinion on whether this patch stays or goes.
