@@ -2,94 +2,177 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id CE36F17881C
-	for <lists+kvm@lfdr.de>; Wed,  4 Mar 2020 03:17:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D974F178823
+	for <lists+kvm@lfdr.de>; Wed,  4 Mar 2020 03:20:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387432AbgCDCRB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 Mar 2020 21:17:01 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:29910 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S2387397AbgCDCRA (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 3 Mar 2020 21:17:00 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1583288219;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=zwpmLVhYAg+RzC4wgoFG5yb2Ol28WwASDz+oEeK9Uow=;
-        b=RkMGg80ReMekloKrhUk7steiD/j0iRh1+Vg3U/b+El4vCyvrWwy7FAqUmhwkFEumaMavTB
-        yyo4gZhAS0aiTs+3CflFE1aYwSnfRmDEMhiMnSKZzylnMYVUWBF+GFNB9acgZlPZw8QwKi
-        zUM2QXWC7m24dzz5CaeSzNhmK7aZvFo=
-Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
- [209.85.219.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-88-f7HNbWEsPbCV5WQKnCRhXw-1; Tue, 03 Mar 2020 21:16:54 -0500
-X-MC-Unique: f7HNbWEsPbCV5WQKnCRhXw-1
-Received: by mail-qv1-f69.google.com with SMTP id l16so93519qvo.15
-        for <kvm@vger.kernel.org>; Tue, 03 Mar 2020 18:16:54 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=zwpmLVhYAg+RzC4wgoFG5yb2Ol28WwASDz+oEeK9Uow=;
-        b=ff+avXzZPEbV4bsd2xdAJdGcXvc7kr38TaxFaTyGElVcKvCJlrBMPPk80LZoCl2WjH
-         XOFkOgkmD0SekmIOOZK/RQ3Dmhz+APR0swsAMJDeYLTKLoVBlgS+ZzEGRtPwOa5R8HTe
-         ukwxH7Keeoz1VgPR5T5KohRV8yAnzSkCXY83vaX0aAt9O5WLJVYkoHKMlR0Xp2R/RStB
-         9hNaN6OEjy3unyqc2VfQXnfAVbYg0Hih4dAt5XSKY7BrxAIi/gkGYxHF1MKMtbdPz8D3
-         EPDj1FHwoecJbR3FQix40IADXC05++MfITVpFJ0dpnI0088brmRi5R24IU2fEEPZCtXD
-         IPOw==
-X-Gm-Message-State: ANhLgQ2y0WySlIBfHct3eXOYdNNUnGgTZvhndNFNeLwKqtxrkp2MT2+I
-        5orfGQ4x2y4xJJ0qXQd/qKh9X87jaD44YETHMlTColQXGoDzl+z6MkI2p+qr4Z7aSz6Fnq1h8Qp
-        0kl2n8yla/5Zm
-X-Received: by 2002:a05:620a:350:: with SMTP id t16mr936781qkm.238.1583288214462;
-        Tue, 03 Mar 2020 18:16:54 -0800 (PST)
-X-Google-Smtp-Source: ADFU+vu1ZMXcr1gqC/Zi87ZN+GHeSsAkSbjaQbQrEwLisqJpF+0jVmM6F3RpKZnuzgvqnsEWVWUn7Q==
-X-Received: by 2002:a05:620a:350:: with SMTP id t16mr936762qkm.238.1583288214196;
-        Tue, 03 Mar 2020 18:16:54 -0800 (PST)
-Received: from xz-x1.hitronhub.home ([2607:9880:19c0:32::2])
-        by smtp.gmail.com with ESMTPSA id n59sm4185363qtd.77.2020.03.03.18.16.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Mar 2020 18:16:53 -0800 (PST)
-From:   Peter Xu <peterx@redhat.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        peterx@redhat.com, Vitaly Kuznetsov <vkuznets@redhat.com>
-Subject: [PATCH] KVM: X86: Avoid explictly fetch instruction in x86_decode_insn()
-Date:   Tue,  3 Mar 2020 21:16:37 -0500
-Message-Id: <20200304021637.17856-1-peterx@redhat.com>
-X-Mailer: git-send-email 2.24.1
+        id S2387454AbgCDCU1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 Mar 2020 21:20:27 -0500
+Received: from mga03.intel.com ([134.134.136.65]:54022 "EHLO mga03.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2387397AbgCDCU0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 3 Mar 2020 21:20:26 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 03 Mar 2020 18:20:26 -0800
+X-IronPort-AV: E=Sophos;i="5.70,511,1574150400"; 
+   d="scan'208";a="233863143"
+Received: from xiaoyaol-mobl.ccr.corp.intel.com (HELO [10.255.31.22]) ([10.255.31.22])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-SHA; 03 Mar 2020 18:20:22 -0800
+Subject: Re: [PATCH v3 2/8] x86/split_lock: Ensure
+ X86_FEATURE_SPLIT_LOCK_DETECT means the existence of feature
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        hpa@zytor.com, Paolo Bonzini <pbonzini@redhat.com>,
+        Andy Lutomirski <luto@kernel.org>, tony.luck@intel.com,
+        peterz@infradead.org, fenghua.yu@intel.com, x86@kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20200206070412.17400-1-xiaoyao.li@intel.com>
+ <20200206070412.17400-3-xiaoyao.li@intel.com>
+ <20200303185524.GQ1439@linux.intel.com>
+From:   Xiaoyao Li <xiaoyao.li@intel.com>
+Message-ID: <439db928-6e92-8492-31d3-cdbe2bc6b9d4@intel.com>
+Date:   Wed, 4 Mar 2020 10:20:20 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200303185524.GQ1439@linux.intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-insn_fetch() will always implicitly refill instruction buffer properly
-when the buffer is empty, so we don't need to explicitly fetch it even
-if insn_len==0 for x86_decode_insn().
+On 3/4/2020 2:55 AM, Sean Christopherson wrote:
+> On Thu, Feb 06, 2020 at 03:04:06PM +0800, Xiaoyao Li wrote:
+>> When flag X86_FEATURE_SPLIT_LOCK_DETECT is set, it should ensure the
+>> existence of MSR_TEST_CTRL and MSR_TEST_CTRL.SPLIT_LOCK_DETECT bit.
+> 
+> The changelog confused me a bit.  "When flag X86_FEATURE_SPLIT_LOCK_DETECT
+> is set" makes it sound like the logic is being applied after the feature
+> bit is set.  Maybe something like:
+> 
+> ```
+> Verify MSR_TEST_CTRL.SPLIT_LOCK_DETECT can be toggled via WRMSR prior to
+> setting the SPLIT_LOCK_DETECT feature bit so that runtime consumers,
+> e.g. KVM, don't need to worry about WRMSR failure.
+> ```
+> 
+>> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+>> ---
+>>   arch/x86/kernel/cpu/intel.c | 41 +++++++++++++++++++++----------------
+>>   1 file changed, 23 insertions(+), 18 deletions(-)
+>>
+>> diff --git a/arch/x86/kernel/cpu/intel.c b/arch/x86/kernel/cpu/intel.c
+>> index 2b3874a96bd4..49535ed81c22 100644
+>> --- a/arch/x86/kernel/cpu/intel.c
+>> +++ b/arch/x86/kernel/cpu/intel.c
+>> @@ -702,7 +702,8 @@ static void init_intel(struct cpuinfo_x86 *c)
+>>   	if (tsx_ctrl_state == TSX_CTRL_DISABLE)
+>>   		tsx_disable();
+>>   
+>> -	split_lock_init();
+>> +	if (boot_cpu_has(X86_FEATURE_SPLIT_LOCK_DETECT))
+>> +		split_lock_init();
+>>   }
+>>   
+>>   #ifdef CONFIG_X86_32
+>> @@ -986,9 +987,26 @@ static inline bool match_option(const char *arg, int arglen, const char *opt)
+>>   
+>>   static void __init split_lock_setup(void)
+>>   {
+>> +	u64 test_ctrl_val;
+>>   	char arg[20];
+>>   	int i, ret;
+>> +	/*
+>> +	 * Use the "safe" versions of rdmsr/wrmsr here to ensure MSR_TEST_CTRL
+>> +	 * and MSR_TEST_CTRL.SPLIT_LOCK_DETECT bit do exist. Because there may
+>> +	 * be glitches in virtualization that leave a guest with an incorrect
+>> +	 * view of real h/w capabilities.
+>> +	 */
+>> +	if (rdmsrl_safe(MSR_TEST_CTRL, &test_ctrl_val))
+>> +		return;
+>> +
+>> +	if (wrmsrl_safe(MSR_TEST_CTRL,
+>> +			test_ctrl_val | MSR_TEST_CTRL_SPLIT_LOCK_DETECT))
+>> +		return;
+>> +
+>> +	if (wrmsrl_safe(MSR_TEST_CTRL, test_ctrl_val))
+>> +		return;a
+> 
+> Probing the MSR should be skipped if SLD is disabled in sld_options, i.e.
+> move this code (and setup_force_cpu_cap() etc...) down below the
+> match_option() logic.  The above would temporarily enable SLD even if the
+> admin has explicitly disabled it, e.g. makes the kernel param useless for
+> turning off the feature due to bugs.
+> 
+> And with that, IMO failing any of RDMSR/WRSMR here warrants a pr_err().
+> The CPU says it supports split lock and the admin hasn't explicitly turned
+> it off, so failure to enable should be logged.
 
-Signed-off-by: Peter Xu <peterx@redhat.com>
----
- arch/x86/kvm/emulate.c | 5 -----
- 1 file changed, 5 deletions(-)
+It is not about to enable split lock detection here, but to parse the 
+kernel booting parameter "split_lock_detect".
 
-diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
-index dd19fb3539e0..04f33c1ca926 100644
---- a/arch/x86/kvm/emulate.c
-+++ b/arch/x86/kvm/emulate.c
-@@ -5175,11 +5175,6 @@ int x86_decode_insn(struct x86_emulate_ctxt *ctxt, void *insn, int insn_len)
- 	ctxt->opcode_len = 1;
- 	if (insn_len > 0)
- 		memcpy(ctxt->fetch.data, insn, insn_len);
--	else {
--		rc = __do_insn_fetch_bytes(ctxt, 1);
--		if (rc != X86EMUL_CONTINUE)
--			goto done;
--	}
- 
- 	switch (mode) {
- 	case X86EMUL_MODE_REAL:
--- 
-2.24.1
+If probing MSR or MSR bit fails, it indicates the CPU doesn't has 
+feature X86_FEATURE_SPLIT_LOCK_DETECT. So don't set feature flag and 
+there is no need to parse "split_lock_detect", just return.
+
+Then, as the change at the beginning of this patch, we should call 
+split_lock_init() based on X86_FEATURE_SPLIT_LOCK_DETECT bit.
+
+>> +
+>>   	setup_force_cpu_cap(X86_FEATURE_SPLIT_LOCK_DETECT);
+>>   	sld_state = sld_warn;
+>>   
+>> @@ -1022,24 +1040,19 @@ static void __init split_lock_setup(void)
+>>    * Locking is not required at the moment because only bit 29 of this
+>>    * MSR is implemented and locking would not prevent that the operation
+>>    * of one thread is immediately undone by the sibling thread.
+>> - * Use the "safe" versions of rdmsr/wrmsr here because although code
+>> - * checks CPUID and MSR bits to make sure the TEST_CTRL MSR should
+>> - * exist, there may be glitches in virtualization that leave a guest
+>> - * with an incorrect view of real h/w capabilities.
+>>    */
+>> -static bool __sld_msr_set(bool on)
+>> +static void __sld_msr_set(bool on)
+>>   {
+>>   	u64 test_ctrl_val;
+>>   
+>> -	if (rdmsrl_safe(MSR_TEST_CTRL, &test_ctrl_val))
+>> -		return false;
+>> +	rdmsrl(MSR_TEST_CTRL, test_ctrl_val);
+>>   
+>>   	if (on)
+>>   		test_ctrl_val |= MSR_TEST_CTRL_SPLIT_LOCK_DETECT;
+>>   	else
+>>   		test_ctrl_val &= ~MSR_TEST_CTRL_SPLIT_LOCK_DETECT;
+>>   
+>> -	return !wrmsrl_safe(MSR_TEST_CTRL, test_ctrl_val);
+>> +	wrmsrl(MSR_TEST_CTRL, test_ctrl_val);
+>>   }
+>>   
+>>   static void split_lock_init(void)
+>> @@ -1047,15 +1060,7 @@ static void split_lock_init(void)
+>>   	if (sld_state == sld_off)
+>>   		return;
+>>   
+>> -	if (__sld_msr_set(true))
+>> -		return;
+>> -
+>> -	/*
+>> -	 * If this is anything other than the boot-cpu, you've done
+>> -	 * funny things and you get to keep whatever pieces.
+>> -	 */
+>> -	pr_warn("MSR fail -- disabled\n");
+>> -	sld_state = sld_off;
+>> +	__sld_msr_set(true);
+>>   }
+>>   
+>>   bool handle_user_split_lock(unsigned long ip)
+>> -- 
+>> 2.23.0
+>>
 
