@@ -2,79 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 672B7178E83
-	for <lists+kvm@lfdr.de>; Wed,  4 Mar 2020 11:40:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A9CD6178EB5
+	for <lists+kvm@lfdr.de>; Wed,  4 Mar 2020 11:43:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387488AbgCDKjz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 Mar 2020 05:39:55 -0500
-Received: from foss.arm.com ([217.140.110.172]:60620 "EHLO foss.arm.com"
+        id S2387860AbgCDKms (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 Mar 2020 05:42:48 -0500
+Received: from frisell.zx2c4.com ([192.95.5.64]:37919 "EHLO frisell.zx2c4.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728301AbgCDKjz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 4 Mar 2020 05:39:55 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9335530E;
-        Wed,  4 Mar 2020 02:39:54 -0800 (PST)
-Received: from donnerap.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 88AAE3F534;
-        Wed,  4 Mar 2020 02:39:53 -0800 (PST)
-Date:   Wed, 4 Mar 2020 10:39:50 +0000
-From:   Andre Przywara <andre.przywara@arm.com>
-To:     Eric Auger <eric.auger@redhat.com>
-Cc:     eric.auger.pro@gmail.com, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, alex.williamson@redhat.com,
-        stable@vger.kernel.org, cohuck@redhat.com
-Subject: Re: [PATCH] vfio: platform: Switch to platform_get_irq_optional()
-Message-ID: <20200304103950.4e98d0ff@donnerap.cambridge.arm.com>
-In-Reply-To: <20200302203715.13889-1-eric.auger@redhat.com>
-References: <20200302203715.13889-1-eric.auger@redhat.com>
-Organization: ARM
-X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; aarch64-unknown-linux-gnu)
+        id S2387396AbgCDKms (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 4 Mar 2020 05:42:48 -0500
+Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTP id 320b1e17;
+        Wed, 4 Mar 2020 10:38:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha1; c=relaxed; d=zx2c4.com; h=from:to:cc
+        :subject:date:message-id:mime-version:content-transfer-encoding;
+         s=mail; bh=woDMe5KTrxlQuzyXF8mQxtdX4Mo=; b=0xbXKYD5rqE3JWWxTtse
+        Bv4B/YLWwA7hDha5wuHTUmcnS3M9aBoyrna1pQQvJtebgO0bOaVldaJal1KYvxgD
+        WrpwNR5+MB/tBJQeY6tW1xwvrAH3nF4IiPg+pEoRBz/LG170DRwfB3+lrIPHieH9
+        aCJd7Ng9p+504S8yoHC1Fv7SFPbE7EslRkRB4KFI1wi2CYsO+njwCvXSiobO1/Vh
+        OxARR7tFSa/GHUPWkFKYcjiXiezSxjEZmC4jFlbkbG1UK5rfyD5t7UDEmTHuv7Yt
+        Ep1IawimLNuGwem1LjHk7xDKwAxOZEMQdgAjo1qY55zR3rFWOnw7E2wo7c5m/bJt
+        zw==
+Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 0033f560 (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384:256:NO);
+        Wed, 4 Mar 2020 10:38:13 +0000 (UTC)
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     pbonzini@redhat.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Subject: [PATCH] KVM: fix Kconfig menu text for -Werror
+Date:   Wed,  4 Mar 2020 18:42:21 +0800
+Message-Id: <20200304104221.2977-1-Jason@zx2c4.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon,  2 Mar 2020 21:37:15 +0100
-Eric Auger <eric.auger@redhat.com> wrote:
+This was evidently copy and pasted from the i915 driver, but the text
+wasn't updated.
 
-> Since commit 7723f4c5ecdb ("driver core: platform: Add an error
-> message to platform_get_irq*()"), platform_get_irq() calls dev_err()
-> on an error. As we enumerate all interrupts until platform_get_irq()
-> fails, we now systematically get a message such as:
-> "vfio-platform fff51000.ethernet: IRQ index 3 not found" which is
-> a false positive.
-> 
-> Let's use platform_get_irq_optional() instead.
+Fixes: 4f337faf1c55 ("KVM: allow disabling -Werror")
+Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+---
+ arch/x86/kvm/Kconfig | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Yes, that seems correct to me and avoids the false positive error message I saw before.
+diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
+index 1bb4927030af..29bd4dc3363e 100644
+--- a/arch/x86/kvm/Kconfig
++++ b/arch/x86/kvm/Kconfig
+@@ -68,7 +68,7 @@ config KVM_WERROR
+ 	depends on (X86_64 && !KASAN) || !COMPILE_TEST
+ 	depends on EXPERT
+ 	help
+-	  Add -Werror to the build flags for (and only for) i915.ko.
++	  Add -Werror to the build flags for kvm.ko.
  
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> Cc: stable@vger.kernel.org # v5.3+
-
-Reviewed-by: Andre Przywara <andre.przywara@arm.com>
-Tested-by: Andre Przywara <andre.przywara@arm.com>
-
-Thanks!
-Andre
-
-> ---
->  drivers/vfio/platform/vfio_platform.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/vfio/platform/vfio_platform.c b/drivers/vfio/platform/vfio_platform.c
-> index ae1a5eb98620..1e2769010089 100644
-> --- a/drivers/vfio/platform/vfio_platform.c
-> +++ b/drivers/vfio/platform/vfio_platform.c
-> @@ -44,7 +44,7 @@ static int get_platform_irq(struct vfio_platform_device *vdev, int i)
->  {
->  	struct platform_device *pdev = (struct platform_device *) vdev->opaque;
->  
-> -	return platform_get_irq(pdev, i);
-> +	return platform_get_irq_optional(pdev, i);
->  }
->  
->  static int vfio_platform_probe(struct platform_device *pdev)
+ 	  If in doubt, say "N".
+ 
+-- 
+2.25.1
 
