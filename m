@@ -2,101 +2,147 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id CE9A61797B3
-	for <lists+kvm@lfdr.de>; Wed,  4 Mar 2020 19:20:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4E5751797B7
+	for <lists+kvm@lfdr.de>; Wed,  4 Mar 2020 19:21:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388189AbgCDSUH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 Mar 2020 13:20:07 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:40104 "EHLO
+        id S1730021AbgCDSVh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 Mar 2020 13:21:37 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:21229 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S2388117AbgCDSUG (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 4 Mar 2020 13:20:06 -0500
+        by vger.kernel.org with ESMTP id S1729702AbgCDSVh (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 4 Mar 2020 13:21:37 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1583346006;
+        s=mimecast20190719; t=1583346095;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Sc0Xcmlskdb745JmJFxuE7AmsaR9eAsu+qMPQfvgRAA=;
-        b=eDkIqyvjUnm9dj3Lgoxc/HLfoyUR55xFutBY1nqTxiVrgkQ+3fKHlh5aKxJgtZzw3c45ub
-        FvTdmkHXd6kMbT5wgxUy8gBbUh2NL8WTpfPZKtnjb2NxL/YwMeolu3u51PVJDq+3uNCqEx
-        u4HzOeJe7c2o/XZlFChTY17v8rfxo54=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-204-RWTBqAa0Ojam-1IK3EB7Wg-1; Wed, 04 Mar 2020 13:20:02 -0500
-X-MC-Unique: RWTBqAa0Ojam-1IK3EB7Wg-1
-Received: by mail-wr1-f72.google.com with SMTP id q18so1190604wrw.5
-        for <kvm@vger.kernel.org>; Wed, 04 Mar 2020 10:20:02 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=Sc0Xcmlskdb745JmJFxuE7AmsaR9eAsu+qMPQfvgRAA=;
-        b=q+aOOYj85KmzvBDCX+IrgGPapS59GIOchIiBvZx3OqUhCOippxrBSyeYxnAhxajv+i
-         ueUkrfWLrAOhdWy6fwaV3ZKN4qegau9VJR929zGDIRjo29lRAfXTufHKGAIJT0NiI+oZ
-         htG6GwxvdqSMrGltKhhR0fAP07AzblM3LBg5xGP9wJ+EIKxM8vSQcVg8/gM0JCSgcqpL
-         3rr3lthK2NfouOKQ/6ewH3D9qWQPyvD0F0Y0KH8QkSDeFPRGpiGJtcPglxCkFfWCkYd5
-         kwGwfIk3f5W/KlQjfdfUjef0UvXY7220AdduD9dFW9a/hLH0VTkfrnJXXVN1Y9UbduRY
-         GWXA==
-X-Gm-Message-State: ANhLgQ2t+D2LmYsdZ+aocZdxvrut4EjvutfctDXDYwm6meQZRIaBP8+l
-        Ca+aAi8UOtc6C0FcMpgrYczGnoteipNULiTis7OIIf9iuxSUnQ6wfrjpvs6hPpkj4vshCEQjnJV
-        jpCF1fzds4xIl
-X-Received: by 2002:a5d:4043:: with SMTP id w3mr5385370wrp.139.1583346001107;
-        Wed, 04 Mar 2020 10:20:01 -0800 (PST)
-X-Google-Smtp-Source: ADFU+vvMvPx30AeZ0XZ0GMLVOfVyfATjiiWEyIm29aWaWBtqZT4tOSR60u07P5jBLCYTmV38Q30pcw==
-X-Received: by 2002:a5d:4043:: with SMTP id w3mr5385363wrp.139.1583346000909;
-        Wed, 04 Mar 2020 10:20:00 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:9def:34a0:b68d:9993? ([2001:b07:6468:f312:9def:34a0:b68d:9993])
-        by smtp.gmail.com with ESMTPSA id k66sm2769279wmf.0.2020.03.04.10.19.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 04 Mar 2020 10:20:00 -0800 (PST)
-Subject: Re: [PATCH] KVM: X86: Avoid explictly fetch instruction in
- x86_decode_insn()
-To:     Peter Xu <peterx@redhat.com>, linmiaohe <linmiaohe@huawei.com>
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-References: <05ca4e7e070844dd92e4f673a1bc15d9@huawei.com>
- <20200304153253.GB7146@xz-x1>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <ad023c34-9a08-7d61-22de-911c4e8760ba@redhat.com>
-Date:   Wed, 4 Mar 2020 19:19:58 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+        bh=nNKk6V4UafjEY7RM/4q9Bsej2pxdLWtMJlUp2kDxLcg=;
+        b=VldsUC96Zlns0GzM/rD++dy72oNlfU+O/J/PTSdGPtFM/UgJW5wnOK4EhqxLAu23LPpFyL
+        c2J+yC1GIE07Z0SLNE14m7FUG+Z1nUSNBAUJNfM3SGDzb3c8Vs+rYDAvRCOMAbb9T/GS0g
+        BHnbHHipaIkKpUlPysdniIBeJYmIdBI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-365-jSpBxr19NSqeuK5EvpGR7Q-1; Wed, 04 Mar 2020 13:21:32 -0500
+X-MC-Unique: jSpBxr19NSqeuK5EvpGR7Q-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2EF38100550E;
+        Wed,  4 Mar 2020 18:21:30 +0000 (UTC)
+Received: from [10.36.116.59] (ovpn-116-59.ams2.redhat.com [10.36.116.59])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id B3D158B777;
+        Wed,  4 Mar 2020 18:21:25 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH v2 3/9] arm: pmu: Add a pmu struct
+To:     Andre Przywara <andre.przywara@arm.com>
+Cc:     eric.auger.pro@gmail.com, maz@kernel.org,
+        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        qemu-devel@nongnu.org, qemu-arm@nongnu.org, drjones@redhat.com,
+        andrew.murray@arm.com, peter.maydell@linaro.org,
+        alexandru.elisei@arm.com
+References: <20200130112510.15154-1-eric.auger@redhat.com>
+ <20200130112510.15154-4-eric.auger@redhat.com>
+ <20200304180158.4d9e3b8c@donnerap.cambridge.arm.com>
+From:   Auger Eric <eric.auger@redhat.com>
+Message-ID: <c11424a4-22cc-3ca2-0949-f39c0c4c8b6b@redhat.com>
+Date:   Wed, 4 Mar 2020 19:21:23 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-In-Reply-To: <20200304153253.GB7146@xz-x1>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20200304180158.4d9e3b8c@donnerap.cambridge.arm.com>
+Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 04/03/20 16:32, Peter Xu wrote:
->> Looks good, thanks. But it seems we should also take care of the comment in __do_insn_fetch_bytes(), as we do not
->> load instruction at the beginning of x86_decode_insn() now, which may be misleading:
->> 		/*
->>          * One instruction can only straddle two pages,
->>          * and one has been loaded at the beginning of
->>          * x86_decode_insn.  So, if not enough bytes
->>          * still, we must have hit the 15-byte boundary.
->>          */
->>         if (unlikely(size < op_size))
->>                 return emulate_gp(ctxt, 0);
-> Right, thanks for spotting that (even if the patch to be dropped :).
+Hi Andre,
+
+On 3/4/20 7:02 PM, Andre Przywara wrote:
+> On Thu, 30 Jan 2020 12:25:04 +0100
+> Eric Auger <eric.auger@redhat.com> wrote:
 > 
-> I guess not only the comment, but the check might even fail if we
-> apply the patch. Because when the fetch is the 1st attempt and
-> unluckily that acrosses one page boundary (because we'll only fetch
-> until either 15 bytes or the page boundary), so that single fetch
-> could be smaller than op_size provided.
+>> This struct aims at storing information potentially used by
+>> all tests such as the pmu version, the read-only part of the
+>> PMCR, the number of implemented event counters, ...
+>>
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> 
+> As I stated already in v1:
+Hum that's an oversight. Please forgive for the 2 R-b's I have forgotten.
 
-Right, priming the decode cache with one byte from the current page
-cannot fail, and then we know that the next call must be at the
-beginning of the next page.
+Thanks
 
-Paolo
+Eric
+> 
+> Reviewed-by: Andre Przywara <andre.przywara@arm.com>
+
+
+> 
+> Cheers,
+> Andre
+> 
+>> ---
+>>  arm/pmu.c | 30 +++++++++++++++++++++++++-----
+>>  1 file changed, 25 insertions(+), 5 deletions(-)
+>>
+>> diff --git a/arm/pmu.c b/arm/pmu.c
+>> index e5e012d..d24857e 100644
+>> --- a/arm/pmu.c
+>> +++ b/arm/pmu.c
+>> @@ -33,7 +33,14 @@
+>>  
+>>  #define NR_SAMPLES 10
+>>  
+>> -static unsigned int pmu_version;
+>> +struct pmu {
+>> +	unsigned int version;
+>> +	unsigned int nb_implemented_counters;
+>> +	uint32_t pmcr_ro;
+>> +};
+>> +
+>> +static struct pmu pmu;
+>> +
+>>  #if defined(__arm__)
+>>  #define ID_DFR0_PERFMON_SHIFT 24
+>>  #define ID_DFR0_PERFMON_MASK  0xf
+>> @@ -265,7 +272,7 @@ static bool check_cpi(int cpi)
+>>  static void pmccntr64_test(void)
+>>  {
+>>  #ifdef __arm__
+>> -	if (pmu_version == 0x3) {
+>> +	if (pmu.version == 0x3) {
+>>  		if (ERRATA(9e3f7a296940)) {
+>>  			write_sysreg(0xdead, PMCCNTR64);
+>>  			report(read_sysreg(PMCCNTR64) == 0xdead, "pmccntr64");
+>> @@ -278,9 +285,22 @@ static void pmccntr64_test(void)
+>>  /* Return FALSE if no PMU found, otherwise return TRUE */
+>>  static bool pmu_probe(void)
+>>  {
+>> -	pmu_version = get_pmu_version();
+>> -	report_info("PMU version: %d", pmu_version);
+>> -	return pmu_version != 0 && pmu_version != 0xf;
+>> +	uint32_t pmcr;
+>> +
+>> +	pmu.version = get_pmu_version();
+>> +	report_info("PMU version: %d", pmu.version);
+>> +
+>> +	if (pmu.version == 0 || pmu.version == 0xF)
+>> +		return false;
+>> +
+>> +	pmcr = get_pmcr();
+>> +	pmu.pmcr_ro = pmcr & 0xFFFFFF80;
+>> +	pmu.nb_implemented_counters =
+>> +		(pmcr >> PMU_PMCR_N_SHIFT) & PMU_PMCR_N_MASK;
+>> +	report_info("Implements %d event counters",
+>> +		    pmu.nb_implemented_counters);
+>> +
+>> +	return true;
+>>  }
+>>  
+>>  int main(int argc, char *argv[])
+> 
 
