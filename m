@@ -2,64 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A9CD6178EB5
-	for <lists+kvm@lfdr.de>; Wed,  4 Mar 2020 11:43:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DBBF6178F73
+	for <lists+kvm@lfdr.de>; Wed,  4 Mar 2020 12:18:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387860AbgCDKms (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 Mar 2020 05:42:48 -0500
-Received: from frisell.zx2c4.com ([192.95.5.64]:37919 "EHLO frisell.zx2c4.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2387396AbgCDKms (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 4 Mar 2020 05:42:48 -0500
-Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTP id 320b1e17;
-        Wed, 4 Mar 2020 10:38:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha1; c=relaxed; d=zx2c4.com; h=from:to:cc
-        :subject:date:message-id:mime-version:content-transfer-encoding;
-         s=mail; bh=woDMe5KTrxlQuzyXF8mQxtdX4Mo=; b=0xbXKYD5rqE3JWWxTtse
-        Bv4B/YLWwA7hDha5wuHTUmcnS3M9aBoyrna1pQQvJtebgO0bOaVldaJal1KYvxgD
-        WrpwNR5+MB/tBJQeY6tW1xwvrAH3nF4IiPg+pEoRBz/LG170DRwfB3+lrIPHieH9
-        aCJd7Ng9p+504S8yoHC1Fv7SFPbE7EslRkRB4KFI1wi2CYsO+njwCvXSiobO1/Vh
-        OxARR7tFSa/GHUPWkFKYcjiXiezSxjEZmC4jFlbkbG1UK5rfyD5t7UDEmTHuv7Yt
-        Ep1IawimLNuGwem1LjHk7xDKwAxOZEMQdgAjo1qY55zR3rFWOnw7E2wo7c5m/bJt
-        zw==
-Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 0033f560 (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384:256:NO);
-        Wed, 4 Mar 2020 10:38:13 +0000 (UTC)
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     pbonzini@redhat.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: [PATCH] KVM: fix Kconfig menu text for -Werror
-Date:   Wed,  4 Mar 2020 18:42:21 +0800
-Message-Id: <20200304104221.2977-1-Jason@zx2c4.com>
+        id S2387851AbgCDLSU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 Mar 2020 06:18:20 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:51386 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S2387833AbgCDLSU (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 4 Mar 2020 06:18:20 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1583320698;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=tnbYBEfHFy2uHBhpK72x5hzqEk/RbkzKjku1Fg6oRoM=;
+        b=SOoAKofWTfS9JkRqHDKMMkmWhaT4vyESh80eMQh7Hkcucbl64gIWCz4jIFbRcJNQqzVm4B
+        E4W6qd+fLQumBPK6sOKufMgDpaWuq4YA6F3Sj8jCBOxwp5OSfppDZkz0aO22q3wf/zrPj6
+        +HkRK2Vtj99UePA5BklZM/bT2mbGMqQ=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-453-NdUVPeMlMuKbdfK8Vdlraw-1; Wed, 04 Mar 2020 06:18:17 -0500
+X-MC-Unique: NdUVPeMlMuKbdfK8Vdlraw-1
+Received: by mail-wr1-f72.google.com with SMTP id x14so126930wrv.23
+        for <kvm@vger.kernel.org>; Wed, 04 Mar 2020 03:18:16 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=tnbYBEfHFy2uHBhpK72x5hzqEk/RbkzKjku1Fg6oRoM=;
+        b=Ul0sKkotQxAVT5inuoFOAhyrlDIKSzMs/UaC+CFoWUm9A1rG7lWEmfEvdRuIf15XBc
+         9DY0UF8JYPBMDyzc+OKj/VtWVWrcXEGnWbglejpU7jeJVXH0AzrC9PRnCuKwKmH9OKDm
+         pZkEL2wdmmtbMRy45EbSKM9cYI7ptyomWr5dUD6geEGGTX5etj+ojjF5oyfUZwR/S9rU
+         suQ3D8FGage2F+0yuDsmrrGeTlC21fn9JuRgOeaQSaAC1Bg1wqXDU7NC3A3bsAqjKih4
+         to/eLEcMcb/feY3dOZZ7zOsxgPfaltg9Ec4/KktbFSRycIGJjy4toAHh4Unn4j7TNTl6
+         b9xw==
+X-Gm-Message-State: ANhLgQ1rjSD6PTBCxeI8N7zgFeQkh5jZt4K2TfcapYpUIYYhbw+FoKoS
+        FdxXWDsO7o7lgynn9yktHMXfnCMtLqUnDjPme1KIU+KQsT9qG/FosnJCr2TAES8WJWw0a2uXfbC
+        xFuX8QKPUY4GR
+X-Received: by 2002:a1c:f214:: with SMTP id s20mr3089669wmc.57.1583320695926;
+        Wed, 04 Mar 2020 03:18:15 -0800 (PST)
+X-Google-Smtp-Source: ADFU+vuzwSpBrWFCEylCbjzVGJupWHaIFw5613/wH2N8f6ImpbqVP4zei3xmBS7rl8UDQcyeH0dqWA==
+X-Received: by 2002:a1c:f214:: with SMTP id s20mr3089656wmc.57.1583320695676;
+        Wed, 04 Mar 2020 03:18:15 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:9def:34a0:b68d:9993? ([2001:b07:6468:f312:9def:34a0:b68d:9993])
+        by smtp.gmail.com with ESMTPSA id o26sm3527451wmc.33.2020.03.04.03.18.14
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 04 Mar 2020 03:18:14 -0800 (PST)
+Subject: Re: [PATCH 2/6] KVM: x86: Fix CPUID range check for Centaur and
+ Hypervisor ranges
+To:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Jim Mattson <jmattson@google.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Jan Kiszka <jan.kiszka@siemens.com>,
+        Xiaoyao Li <xiaoyao.li@intel.com>
+References: <20200302195736.24777-1-sean.j.christopherson@intel.com>
+ <20200302195736.24777-3-sean.j.christopherson@intel.com>
+ <CALMp9eThBnN3ktAfwhNs7L-O031JDFqjb67OMPooGvmkcdhK4A@mail.gmail.com>
+ <CALMp9eR0Mw8iPv_Z43gfCEbErHQ6EXX8oghJJb5Xge+47ZU9yQ@mail.gmail.com>
+ <20200303045838.GF27842@linux.intel.com>
+ <CALMp9eSYZKUBko4ZViNbasRGJs2bAO2fREHX9maDbLrYj8yDhQ@mail.gmail.com>
+ <20200303180122.GO1439@linux.intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <41235370-c095-6d8a-2546-be88b3974bfe@redhat.com>
+Date:   Wed, 4 Mar 2020 12:18:12 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200303180122.GO1439@linux.intel.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This was evidently copy and pasted from the i915 driver, but the text
-wasn't updated.
+On 03/03/20 19:01, Sean Christopherson wrote:
+> static bool cpuid_function_in_range(struct kvm_vcpu *vcpu, u32 function)
+> {
+> 	struct kvm_cpuid_entry2 *max;
+> 
+> 	if (function >= 0x40000000 && function <= 0x4fffffff)
+> 		max = kvm_find_cpuid_entry(vcpu, function & 0xffffff00, 0);
+> 	else
+> 		max = kvm_find_cpuid_entry(vcpu, function & 0x80000000, 0);
+> 	return max && function <= max->eax;
+> }
 
-Fixes: 4f337faf1c55 ("KVM: allow disabling -Werror")
-Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
----
- arch/x86/kvm/Kconfig | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Yes, this is a good idea (except it should be & 0xc0000000 to cover
+Centaur).
 
-diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
-index 1bb4927030af..29bd4dc3363e 100644
---- a/arch/x86/kvm/Kconfig
-+++ b/arch/x86/kvm/Kconfig
-@@ -68,7 +68,7 @@ config KVM_WERROR
- 	depends on (X86_64 && !KASAN) || !COMPILE_TEST
- 	depends on EXPERT
- 	help
--	  Add -Werror to the build flags for (and only for) i915.ko.
-+	  Add -Werror to the build flags for kvm.ko.
- 
- 	  If in doubt, say "N".
- 
--- 
-2.25.1
+Paolo
 
