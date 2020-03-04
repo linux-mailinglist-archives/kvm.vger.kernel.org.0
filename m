@@ -2,71 +2,76 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1FAF91785CA
-	for <lists+kvm@lfdr.de>; Tue,  3 Mar 2020 23:41:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 80C911786F6
+	for <lists+kvm@lfdr.de>; Wed,  4 Mar 2020 01:23:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727978AbgCCWlw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 Mar 2020 17:41:52 -0500
-Received: from mga02.intel.com ([134.134.136.20]:50140 "EHLO mga02.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726766AbgCCWlw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 3 Mar 2020 17:41:52 -0500
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 03 Mar 2020 14:41:51 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,511,1574150400"; 
-   d="scan'208";a="229102698"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
-  by orsmga007.jf.intel.com with ESMTP; 03 Mar 2020 14:41:51 -0800
-Date:   Tue, 3 Mar 2020 14:41:51 -0800
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 19/61] KVM: VMX: Add helpers to query Intel PT mode
-Message-ID: <20200303224150.GA17816@linux.intel.com>
-References: <20200201185218.24473-1-sean.j.christopherson@intel.com>
- <20200201185218.24473-20-sean.j.christopherson@intel.com>
- <87pne8q8c0.fsf@vitty.brq.redhat.com>
- <20200224221807.GM29865@linux.intel.com>
- <33a4d99d-98da-0bd8-0f9c-fc04bef54350@redhat.com>
+        id S1727864AbgCDAXK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 Mar 2020 19:23:10 -0500
+Received: from mail-vs1-f54.google.com ([209.85.217.54]:42183 "EHLO
+        mail-vs1-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727725AbgCDAXK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 3 Mar 2020 19:23:10 -0500
+Received: by mail-vs1-f54.google.com with SMTP id w142so25768vsw.9
+        for <kvm@vger.kernel.org>; Tue, 03 Mar 2020 16:23:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=vkq15fTmUQpExSNOgV9L6YbvOTkV5MiJlu4IVsNI6RM=;
+        b=o+7Fbz5EVb+o8P1f2VzexE3uIA2rk1zJZ/UhmUkcB9g4RHUUmuBWaW6PrrxojMxVZf
+         ugAT7VoZQrNDX4eqERDBZdNsWy9xDE2lGOYqaBD+ZqmWJ/DvDSO4Qbi7B9NsiJCWov66
+         j7argAtZicHqDGAxFU8tir/YBfrguYoR+Pz6t/QnRormg70uV7nt081xKl57NBIFF4tq
+         yOGMK/FltpsmGY4bQmtVops5+eiF1htKW3FHOpeSpyykEvfNsZCnwxRdPZpLKv2bMdB5
+         ux1oMVI5vis6NS4zqpq1cB79j6Z+DTU6ME2JEnq02iPD/2Fy9V/pNOujCWspbuESxLQQ
+         ZuKA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=vkq15fTmUQpExSNOgV9L6YbvOTkV5MiJlu4IVsNI6RM=;
+        b=XmnndemboTq0fTT7QvpEOYLmH1t01q63LhwLNf9H2rtupMGmGkQMisJujTSir2T6d4
+         juFxdkDtHKCBBU90NgGRMSzNDT8fpK2zM8Za6+3Dt44PCkselTB3nXMpViYMaB250XlX
+         BRDbnprn7hodRpreOrKjvkuTldj77apRYVaNUs3w1dXHnkXNDnycHAcqOTVuy7vkubjj
+         FyvF0id7+bj07PsKg4UTUTWwh2yLna6pZM3y+0FlCSLglr7f7n1voxHNwFgp3AUDOHIU
+         NlApgbp2vadpB1E+iSmVCgio4Ol6uNldC8oSJVU2RsqRPWNsbzLO0BscUTK1O8FLL0au
+         WoTw==
+X-Gm-Message-State: ANhLgQ1Kitdxdzehn85n//Qx6gsW0WLYDJky465iL8IS8SySKQPh7HCZ
+        MkM6L+X8dVh+f9aNvYDSjA1AFId+28/OGQ7qdb4LBTKTz6I=
+X-Google-Smtp-Source: ADFU+vvjkpISzsey288JlKFz9LB5YEzG5O1mdD8s+bhv7EyQ/LmeQcMYlUKLPV7COelTUeBE4zb4/bECvOD0hQ/Rh+Y=
+X-Received: by 2002:a05:6102:85:: with SMTP id t5mr370173vsp.134.1583281388599;
+ Tue, 03 Mar 2020 16:23:08 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <33a4d99d-98da-0bd8-0f9c-fc04bef54350@redhat.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+References: <CALMp9eQqAfehUnNmTU6QuiZPWQ-FtYhLXZ_SNHe=YRkGVJsKLw@mail.gmail.com>
+In-Reply-To: <CALMp9eQqAfehUnNmTU6QuiZPWQ-FtYhLXZ_SNHe=YRkGVJsKLw@mail.gmail.com>
+From:   Peter Feiner <pfeiner@google.com>
+Date:   Tue, 3 Mar 2020 16:22:57 -0800
+Message-ID: <CAM3pwhEXonbu-He1KD52ggEHHKVWok4Bac-4Woq7FvYL9pHykA@mail.gmail.com>
+Subject: Re: Nested virtualization and software page walks in the L1 hypervsior
+To:     Jim Mattson <jmattson@google.com>
+Cc:     kvm list <kvm@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Disclaimer: I'm going off a few lines in the SDM and the original patches,
-everything I say could be completely wrong :-)
+On Sat, Feb 29, 2020 at 2:31 PM Jim Mattson <jmattson@google.com> wrote:
+>
+> Peter Feiner asked me an intriguing question the other day. If you
+> have a hypervisor that walks  its guest's x86 page tables in software
+> during emulation, how can you make that software page walk behave
+> exactly like a hardware page walk? In particular, when the hypervisor
+> is running as an L1 guest, how is it possible to write the software
+> page walk so that accesses to L2's x86 page tables are treated as
+> reads if L0 isn't using EPT A/D bits, but they're treated as writes if
+> L0 is using EPT A/D bits? (Paravirtualization is not allowed.)
+>
+> It seems to me that this behavior isn't virtualizable. Am I wrong?
 
-On Tue, Feb 25, 2020 at 03:54:21PM +0100, Paolo Bonzini wrote:
-> On 24/02/20 23:18, Sean Christopherson wrote:
-> >>>  {
-> >>>  	u32 vmexit_ctrl = vmcs_config.vmexit_ctrl;
-> >>> -	if (pt_mode == PT_MODE_SYSTEM)
-> >>> +	if (vmx_pt_mode_is_system())
-> >> ... and here? I.e. to cover the currently unsupported 'host-only' mode.
-> > Hmm, good question.  I don't think so?  On VM-Enter, RTIT_CTL would need to
-> > be loaded to disable PT.  Clearing RTIT_CTL on VM-Exit would be redundant
-> > at that point[1].  And AIUI, the PIP for VM-Enter/VM-Exit isn't needed
-> > because there is no context switch from the decoder's perspective.
-> 
-> How does host-only mode differ from "host-guest but don't expose PT to
-> the guest"?  So I would say that host-only mode is a special case of
-> host-guest, not of system mode.
-
-AIUI, host-guest needs a special packet for VM-Enter/VM-Exit so that the
-trace analyzer understands there was a context switch.  With host-only, the
-packet isn't needed because tracing stops entirely.  So it's not that
-host-only is a special case of system mode, but rather it doesn't need the
-VM-Exit control enabled to generate the special packet.
+Jim, I thought about this some more after talking to you. I think it's
+entirely moot what L0 sees so long as L1 and L2 work correctly. So,
+the question becomes, is there anything that L0 could possibly rely on
+this behavior for? My first thought was dirty tracking, but that's not
+a problem because *writes* to the L2 x86 page tables' A/D bits will
+still be intercepted by L0. The missing D bit on a guest page that
+doesn't actually change doesn't matter :-)
