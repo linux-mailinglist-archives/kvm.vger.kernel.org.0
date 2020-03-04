@@ -2,101 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id DBBF6178F73
-	for <lists+kvm@lfdr.de>; Wed,  4 Mar 2020 12:18:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CDC3C178F96
+	for <lists+kvm@lfdr.de>; Wed,  4 Mar 2020 12:33:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387851AbgCDLSU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 Mar 2020 06:18:20 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:51386 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S2387833AbgCDLSU (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 4 Mar 2020 06:18:20 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1583320698;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=tnbYBEfHFy2uHBhpK72x5hzqEk/RbkzKjku1Fg6oRoM=;
-        b=SOoAKofWTfS9JkRqHDKMMkmWhaT4vyESh80eMQh7Hkcucbl64gIWCz4jIFbRcJNQqzVm4B
-        E4W6qd+fLQumBPK6sOKufMgDpaWuq4YA6F3Sj8jCBOxwp5OSfppDZkz0aO22q3wf/zrPj6
-        +HkRK2Vtj99UePA5BklZM/bT2mbGMqQ=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-453-NdUVPeMlMuKbdfK8Vdlraw-1; Wed, 04 Mar 2020 06:18:17 -0500
-X-MC-Unique: NdUVPeMlMuKbdfK8Vdlraw-1
-Received: by mail-wr1-f72.google.com with SMTP id x14so126930wrv.23
-        for <kvm@vger.kernel.org>; Wed, 04 Mar 2020 03:18:16 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=tnbYBEfHFy2uHBhpK72x5hzqEk/RbkzKjku1Fg6oRoM=;
-        b=Ul0sKkotQxAVT5inuoFOAhyrlDIKSzMs/UaC+CFoWUm9A1rG7lWEmfEvdRuIf15XBc
-         9DY0UF8JYPBMDyzc+OKj/VtWVWrcXEGnWbglejpU7jeJVXH0AzrC9PRnCuKwKmH9OKDm
-         pZkEL2wdmmtbMRy45EbSKM9cYI7ptyomWr5dUD6geEGGTX5etj+ojjF5oyfUZwR/S9rU
-         suQ3D8FGage2F+0yuDsmrrGeTlC21fn9JuRgOeaQSaAC1Bg1wqXDU7NC3A3bsAqjKih4
-         to/eLEcMcb/feY3dOZZ7zOsxgPfaltg9Ec4/KktbFSRycIGJjy4toAHh4Unn4j7TNTl6
-         b9xw==
-X-Gm-Message-State: ANhLgQ1rjSD6PTBCxeI8N7zgFeQkh5jZt4K2TfcapYpUIYYhbw+FoKoS
-        FdxXWDsO7o7lgynn9yktHMXfnCMtLqUnDjPme1KIU+KQsT9qG/FosnJCr2TAES8WJWw0a2uXfbC
-        xFuX8QKPUY4GR
-X-Received: by 2002:a1c:f214:: with SMTP id s20mr3089669wmc.57.1583320695926;
-        Wed, 04 Mar 2020 03:18:15 -0800 (PST)
-X-Google-Smtp-Source: ADFU+vuzwSpBrWFCEylCbjzVGJupWHaIFw5613/wH2N8f6ImpbqVP4zei3xmBS7rl8UDQcyeH0dqWA==
-X-Received: by 2002:a1c:f214:: with SMTP id s20mr3089656wmc.57.1583320695676;
-        Wed, 04 Mar 2020 03:18:15 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:9def:34a0:b68d:9993? ([2001:b07:6468:f312:9def:34a0:b68d:9993])
-        by smtp.gmail.com with ESMTPSA id o26sm3527451wmc.33.2020.03.04.03.18.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 04 Mar 2020 03:18:14 -0800 (PST)
-Subject: Re: [PATCH 2/6] KVM: x86: Fix CPUID range check for Centaur and
- Hypervisor ranges
-To:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Jim Mattson <jmattson@google.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Jan Kiszka <jan.kiszka@siemens.com>,
-        Xiaoyao Li <xiaoyao.li@intel.com>
-References: <20200302195736.24777-1-sean.j.christopherson@intel.com>
- <20200302195736.24777-3-sean.j.christopherson@intel.com>
- <CALMp9eThBnN3ktAfwhNs7L-O031JDFqjb67OMPooGvmkcdhK4A@mail.gmail.com>
- <CALMp9eR0Mw8iPv_Z43gfCEbErHQ6EXX8oghJJb5Xge+47ZU9yQ@mail.gmail.com>
- <20200303045838.GF27842@linux.intel.com>
- <CALMp9eSYZKUBko4ZViNbasRGJs2bAO2fREHX9maDbLrYj8yDhQ@mail.gmail.com>
- <20200303180122.GO1439@linux.intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <41235370-c095-6d8a-2546-be88b3974bfe@redhat.com>
-Date:   Wed, 4 Mar 2020 12:18:12 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+        id S2387772AbgCDLdB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 Mar 2020 06:33:01 -0500
+Received: from vps-vb.mhejs.net ([37.28.154.113]:57462 "EHLO vps-vb.mhejs.net"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729256AbgCDLdA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 4 Mar 2020 06:33:00 -0500
+Received: from MUA
+        by vps-vb.mhejs.net with esmtps (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384:256)
+        (Exim 4.92.3)
+        (envelope-from <mail@maciej.szmigiero.name>)
+        id 1j9SGj-0000pl-Un; Wed, 04 Mar 2020 12:32:53 +0100
+From:   "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
+To:     "Rafael J. Wysocki" <rjw@rjwysocki.net>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>
+Cc:     Joao Martins <joao.m.martins@oracle.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>, kvm@vger.kernel.org,
+        linux-pm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH v2] cpuidle-haltpoll: allow force loading on hosts without the REALTIME hint
+Date:   Wed,  4 Mar 2020 12:32:48 +0100
+Message-Id: <20200304113248.1143057-1-mail@maciej.szmigiero.name>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-In-Reply-To: <20200303180122.GO1439@linux.intel.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 03/03/20 19:01, Sean Christopherson wrote:
-> static bool cpuid_function_in_range(struct kvm_vcpu *vcpu, u32 function)
-> {
-> 	struct kvm_cpuid_entry2 *max;
-> 
-> 	if (function >= 0x40000000 && function <= 0x4fffffff)
-> 		max = kvm_find_cpuid_entry(vcpu, function & 0xffffff00, 0);
-> 	else
-> 		max = kvm_find_cpuid_entry(vcpu, function & 0x80000000, 0);
-> 	return max && function <= max->eax;
-> }
+From: "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
 
-Yes, this is a good idea (except it should be & 0xc0000000 to cover
-Centaur).
+Before commit 1328edca4a14 ("cpuidle-haltpoll: Enable kvm guest polling
+when dedicated physical CPUs are available") the cpuidle-haltpoll driver
+could also be used in scenarios when the host does not advertise the
+KVM_HINTS_REALTIME hint.
 
-Paolo
+While the behavior introduced by the aforementioned commit makes sense as
+the default there are cases where the old behavior is desired, for example,
+when other kernel changes triggered by presence by this hint are unwanted,
+for some workloads where the latency benefit from polling overweights the
+loss from idle CPU capacity that otherwise would be available, or just when
+running under older Qemu versions that lack this hint.
 
+Let's provide a typical "force" module parameter that allows restoring the
+old behavior.
+
+Signed-off-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
+---
+ drivers/cpuidle/cpuidle-haltpoll.c | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
+
+Changes from v1:
+Make the module parameter description more general, don't unnecessarily
+break a line in haltpoll_init().
+
+diff --git a/drivers/cpuidle/cpuidle-haltpoll.c b/drivers/cpuidle/cpuidle-haltpoll.c
+index b0ce9bc78113..db124bc1ca2c 100644
+--- a/drivers/cpuidle/cpuidle-haltpoll.c
++++ b/drivers/cpuidle/cpuidle-haltpoll.c
+@@ -18,6 +18,10 @@
+ #include <linux/kvm_para.h>
+ #include <linux/cpuidle_haltpoll.h>
+ 
++static bool force __read_mostly;
++module_param(force, bool, 0444);
++MODULE_PARM_DESC(force, "Load unconditionally");
++
+ static struct cpuidle_device __percpu *haltpoll_cpuidle_devices;
+ static enum cpuhp_state haltpoll_hp_state;
+ 
+@@ -90,6 +94,11 @@ static void haltpoll_uninit(void)
+ 	haltpoll_cpuidle_devices = NULL;
+ }
+ 
++static bool haltpool_want(void)
++{
++	return kvm_para_has_hint(KVM_HINTS_REALTIME) || force;
++}
++
+ static int __init haltpoll_init(void)
+ {
+ 	int ret;
+@@ -101,8 +110,7 @@ static int __init haltpoll_init(void)
+ 
+ 	cpuidle_poll_state_init(drv);
+ 
+-	if (!kvm_para_available() ||
+-		!kvm_para_has_hint(KVM_HINTS_REALTIME))
++	if (!kvm_para_available() || !haltpool_want())
+ 		return -ENODEV;
+ 
+ 	ret = cpuidle_register_driver(drv);
