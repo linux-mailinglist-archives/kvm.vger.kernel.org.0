@@ -2,108 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 45694179A2E
-	for <lists+kvm@lfdr.de>; Wed,  4 Mar 2020 21:37:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 93530179A62
+	for <lists+kvm@lfdr.de>; Wed,  4 Mar 2020 21:47:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388592AbgCDUgw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 Mar 2020 15:36:52 -0500
-Received: from mail.kernel.org ([198.145.29.99]:37210 "EHLO mail.kernel.org"
+        id S2388275AbgCDUrl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 Mar 2020 15:47:41 -0500
+Received: from mga12.intel.com ([192.55.52.136]:6749 "EHLO mga12.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2388554AbgCDUgw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 4 Mar 2020 15:36:52 -0500
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 95AED217F4;
-        Wed,  4 Mar 2020 20:36:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1583354211;
-        bh=OU3i052ZF//Wu4rkWcKgh+KLFM8jnoqZQPBXrJ+hcAM=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=0Jhvd8kxjNkju6TNqDSNuCKrKKciiz92bT23FNGEVTPadWV6dJBNR1kJ4hGWdVe1E
-         GzPOU0auVatnNwWa1XWLUSHiwyvne8c3zAXunFIQnAZbxdPWow/axR4k+996mYW0/U
-         BDNDJDg8kgli6w1zhhNwwKkwiyL0DFbRpZzyPN8Q=
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
-        by disco-boy.misterjones.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <maz@kernel.org>)
-        id 1j9ajJ-00A59R-6u; Wed, 04 Mar 2020 20:34:57 +0000
-From:   Marc Zyngier <maz@kernel.org>
-To:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
-        Jason Cooper <jason@lakedaemon.net>,
-        Robert Richter <rrichter@marvell.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [PATCH v5 23/23] KVM: arm64: GICv4.1: Expose HW-based SGIs in debugfs
-Date:   Wed,  4 Mar 2020 20:33:30 +0000
-Message-Id: <20200304203330.4967-24-maz@kernel.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200304203330.4967-1-maz@kernel.org>
-References: <20200304203330.4967-1-maz@kernel.org>
+        id S1728539AbgCDUrl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 4 Mar 2020 15:47:41 -0500
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 04 Mar 2020 12:47:40 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,515,1574150400"; 
+   d="scan'208";a="439262784"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
+  by fmsmga005.fm.intel.com with ESMTP; 04 Mar 2020 12:47:40 -0800
+Date:   Wed, 4 Mar 2020 12:47:40 -0800
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Jan Kiszka <jan.kiszka@siemens.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>
+Subject: Re: [PATCH 3/6] KVM: x86: Add dedicated emulator helper for grabbing
+ CPUID.maxphyaddr
+Message-ID: <20200304204740.GG21662@linux.intel.com>
+References: <20200302195736.24777-1-sean.j.christopherson@intel.com>
+ <20200302195736.24777-4-sean.j.christopherson@intel.com>
+ <de2ed4e9-409a-6cb1-e295-ea946be11e82@redhat.com>
+ <617748ab-0edd-2ccc-e86b-b86b0adf9d3b@siemens.com>
+ <4ddde497-9c71-d64c-df20-3b4439664336@redhat.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, lorenzo.pieralisi@arm.com, jason@lakedaemon.net, rrichter@marvell.com, tglx@linutronix.de, yuzenghui@huawei.com, eric.auger@redhat.com, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+In-Reply-To: <4ddde497-9c71-d64c-df20-3b4439664336@redhat.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The vgic-state debugfs file could do with showing the pending state
-of the HW-backed SGIs. Plug it into the low-level code.
+On Tue, Mar 03, 2020 at 11:14:22AM +0100, Paolo Bonzini wrote:
+> On 03/03/20 10:48, Jan Kiszka wrote:
+> >>
+> >> I don't think this is a particularly useful change.  Yes, it's not
+> >> intuitive but is it more than a matter of documentation (and possibly
+> >> moving the check_cr_write snippet into a separate function)?
+> > 
+> > Besides the non obvious return value of the current function, this
+> > approach also avoids leaving cpuid traces for querying maxphyaddr, which
+> > is also not very intuitive IMHO.
+> 
+> There are already other cases where we leave CPUID traces.  We can just
+> stop tracing if check_limit (which should be renamed to from_guest) is
+> true; there are other internal cases which call ctxt->ops->get_cpuid,
+> such as vendor_intel, and those should also use check_limit==true and
+> check the return value of ctxt->ops->get_cpuid.
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- virt/kvm/arm/vgic/vgic-debug.c | 14 +++++++++++++-
- 1 file changed, 13 insertions(+), 1 deletion(-)
+No, the vendor checks that use get_cpuid() shouldn't do check_limit=true,
+they're looking for an exact match on the vendor.
 
-diff --git a/virt/kvm/arm/vgic/vgic-debug.c b/virt/kvm/arm/vgic/vgic-debug.c
-index cc12fe9b2df3..b13a9e3f99dd 100644
---- a/virt/kvm/arm/vgic/vgic-debug.c
-+++ b/virt/kvm/arm/vgic/vgic-debug.c
-@@ -178,6 +178,8 @@ static void print_irq_state(struct seq_file *s, struct vgic_irq *irq,
- 			    struct kvm_vcpu *vcpu)
- {
- 	char *type;
-+	bool pending;
-+
- 	if (irq->intid < VGIC_NR_SGIS)
- 		type = "SGI";
- 	else if (irq->intid < VGIC_NR_PRIVATE_IRQS)
-@@ -190,6 +192,16 @@ static void print_irq_state(struct seq_file *s, struct vgic_irq *irq,
- 	if (irq->intid ==0 || irq->intid == VGIC_NR_PRIVATE_IRQS)
- 		print_header(s, irq, vcpu);
- 
-+	pending = irq->pending_latch;
-+	if (irq->hw && vgic_irq_is_sgi(irq->intid)) {
-+		int err;
-+
-+		err = irq_get_irqchip_state(irq->host_irq,
-+					    IRQCHIP_STATE_PENDING,
-+					    &pending);
-+		WARN_ON_ONCE(err);
-+	}
-+
- 	seq_printf(s, "       %s %4d "
- 		      "    %2d "
- 		      "%d%d%d%d%d%d%d "
-@@ -201,7 +213,7 @@ static void print_irq_state(struct seq_file *s, struct vgic_irq *irq,
- 		      "\n",
- 			type, irq->intid,
- 			(irq->target_vcpu) ? irq->target_vcpu->vcpu_id : -1,
--			irq->pending_latch,
-+			pending,
- 			irq->line_level,
- 			irq->active,
- 			irq->enabled,
--- 
-2.20.1
-
+Not that it matters.  @check_limit only comes into play on a vendor check
+if CPUID.0 doesn't exist, and @check_limit only effects the output if
+CPUID.0 _does_ exist.  I.e. the output for CPUID.0 is unaffected by
+@check_limit.
