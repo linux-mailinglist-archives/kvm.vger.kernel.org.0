@@ -2,86 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C49B217A831
-	for <lists+kvm@lfdr.de>; Thu,  5 Mar 2020 15:54:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0B1F017A88C
+	for <lists+kvm@lfdr.de>; Thu,  5 Mar 2020 16:10:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727002AbgCEOxz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 Mar 2020 09:53:55 -0500
-Received: from mail-ed1-f66.google.com ([209.85.208.66]:37884 "EHLO
-        mail-ed1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725938AbgCEOxz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 5 Mar 2020 09:53:55 -0500
-Received: by mail-ed1-f66.google.com with SMTP id m9so1485379edl.4;
-        Thu, 05 Mar 2020 06:53:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=W3PXlBNCG7FpHe1bsD2Om9lQtteQxPY470S45EoSOD4=;
-        b=do0F5XGyeCB9FzIA3lw3uklSKMKx1keztgNc9rrYiqbskDFSTO0PtYu1kGX41yqeDX
-         pXUXCFvFC2vpdoHyk1IGsPTkfDBM+dCR19uix9mBhSSTk3MadlesE3rAODH+4BKLhbfK
-         E8OYsj9k9SyTzOSB2ljfM6SomJyZrBvyIACRXI1nhbjEeub95AU2AhVZrkR5QR1m3d2c
-         R3Zm6GvpnBGQf92i/AcZeNcfdMd/v3uOR9/E7XOoaAdXEZbH1/ID0AvVicm5oXNOqwce
-         WgrFi1smCbdziqmMte22vHfYLnbxf9sTDsUZnlnGTWPU5h2mhdZnyW598XzBrg4BC165
-         IcaQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=W3PXlBNCG7FpHe1bsD2Om9lQtteQxPY470S45EoSOD4=;
-        b=NQJ+9DVOVJshhBiHkQvNHrpTE7Ik0qwQy2IFmbYTgP/DIzrgwPmK9Yul8ZL49WKqil
-         /UDjPThVdcQgEATm1RfDdP1BjghxdPQFN1a3tREDcMAumi8+FKtoGQ3HSqLjtdsATBK8
-         Bt6bmwxt9KtAzFzlfKW/OvJF3dooqE05sWFZb3rAaFONfHmhUMiG2HHpHdLCEqOaoE6q
-         0RID2IE5K8hcqkGRstzJxLeNClutVr5vEWUYFTvD2XJNR55WbZz0fwUVSdSU/05o7txU
-         91WZWpgF8nieu20Y62jE3M1+NgVvm4J7Y8Y5nYhbYyAtPG4CmEUXQCDWVL99BF8RNMEm
-         HGRA==
-X-Gm-Message-State: ANhLgQ1WLLFi1V1q0ykPgXO1VA5qXLpM7sS58a9+eo/dYXD/247Bne+d
-        EPtrMV8ZMG8ka0pQsYv3W2X8nxHngW1vJVegl2s=
-X-Google-Smtp-Source: ADFU+vsshS+ueiG0ttQN2fbWuz5hWypSE3ZNEEvSVg2/wXgCZ46pLFdOzL6PA6Te0DLh5DJtsWpTpNob1T99MdTYxUI=
-X-Received: by 2002:aa7:dd1a:: with SMTP id i26mr8638644edv.321.1583420033239;
- Thu, 05 Mar 2020 06:53:53 -0800 (PST)
+        id S1726891AbgCEPKM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 Mar 2020 10:10:12 -0500
+Received: from eu-smtp-delivery-151.mimecast.com ([146.101.78.151]:37175 "EHLO
+        eu-smtp-delivery-151.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726317AbgCEPKL (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 5 Mar 2020 10:10:11 -0500
+Received: from AcuMS.aculab.com (156.67.243.126 [156.67.243.126]) (Using
+ TLS) by relay.mimecast.com with ESMTP id
+ uk-mta-19-dq2hfeTOM-OFX6XMs-OnUQ-1; Thu, 05 Mar 2020 15:10:07 +0000
+X-MC-Unique: dq2hfeTOM-OFX6XMs-OnUQ-1
+Received: from AcuMS.Aculab.com (fd9f:af1c:a25b:0:43c:695e:880f:8750) by
+ AcuMS.aculab.com (fd9f:af1c:a25b:0:43c:695e:880f:8750) with Microsoft SMTP
+ Server (TLS) id 15.0.1347.2; Thu, 5 Mar 2020 15:10:06 +0000
+Received: from AcuMS.Aculab.com ([fe80::43c:695e:880f:8750]) by
+ AcuMS.aculab.com ([fe80::43c:695e:880f:8750%12]) with mapi id 15.00.1347.000;
+ Thu, 5 Mar 2020 15:10:06 +0000
+From:   David Laight <David.Laight@ACULAB.COM>
+To:     'Paolo Bonzini' <pbonzini@redhat.com>,
+        linmiaohe <linmiaohe@huawei.com>,
+        "rkrcmar@redhat.com" <rkrcmar@redhat.com>,
+        "sean.j.christopherson@intel.com" <sean.j.christopherson@intel.com>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        "jmattson@google.com" <jmattson@google.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "bp@alien8.de" <bp@alien8.de>, "hpa@zytor.com" <hpa@zytor.com>
+CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "x86@kernel.org" <x86@kernel.org>
+Subject: RE: [PATCH] KVM: x86: small optimization for is_mtrr_mask calculation
+Thread-Topic: [PATCH] KVM: x86: small optimization for is_mtrr_mask
+ calculation
+Thread-Index: AQHV8vtgGziz2VnmdUK2S7OlSyi4eKg6GbLw
+Date:   Thu, 5 Mar 2020 15:10:06 +0000
+Message-ID: <dc1870b0ea164015b1c1b6bc4d3248fe@AcuMS.aculab.com>
+References: <1583376535-27255-1-git-send-email-linmiaohe@huawei.com>
+ <2b678644-fcc0-e853-a53c-2651c1f6a327@redhat.com>
+In-Reply-To: <2b678644-fcc0-e853-a53c-2651c1f6a327@redhat.com>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.202.205.107]
 MIME-Version: 1.0
-References: <20200305140142.413220-1-arilou@gmail.com> <20200305140142.413220-2-arilou@gmail.com>
- <09762184-9913-d334-0a33-b76d153bc371@redhat.com>
-In-Reply-To: <09762184-9913-d334-0a33-b76d153bc371@redhat.com>
-From:   Jon Doron <arilou@gmail.com>
-Date:   Thu, 5 Mar 2020 16:53:42 +0200
-Message-ID: <CAP7QCoj9=mZCWdiOa92QP9Fjb=p3DfKTs0xHKZYQ+yRiMabmLA@mail.gmail.com>
-Subject: Re: [PATCH v2 1/4] x86/kvm/hyper-v: Align the hcall param for kvm_hyperv_exit
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-hyperv@vger.kernel.org,
-        Vitaly Kuznetsov <vkuznets@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: base64
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Vitaly recommended we will align the struct to 64bit...
+RnJvbTogUGFvbG8gQm9uemluaQ0KPiBTZW50OiAwNSBNYXJjaCAyMDIwIDE0OjM2DQo+IA0KPiBP
+biAwNS8wMy8yMCAwMzo0OCwgbGlubWlhb2hlIHdyb3RlOg0KPiA+IEZyb206IE1pYW9oZSBMaW4g
+PGxpbm1pYW9oZUBodWF3ZWkuY29tPg0KPiA+DQo+ID4gV2UgY2FuIGdldCBpc19tdHJyX21hc2sg
+YnkgY2FsY3VsYXRpbmcgKG1zciAtIDB4MjAwKSAlIDIgZGlyZWN0bHkuDQo+ID4NCj4gPiBTaWdu
+ZWQtb2ZmLWJ5OiBNaWFvaGUgTGluIDxsaW5taWFvaGVAaHVhd2VpLmNvbT4NCj4gPiAtLS0NCj4g
+PiAgYXJjaC94ODYva3ZtL210cnIuYyB8IDQgKystLQ0KPiA+ICAxIGZpbGUgY2hhbmdlZCwgMiBp
+bnNlcnRpb25zKCspLCAyIGRlbGV0aW9ucygtKQ0KPiA+DQo+ID4gZGlmZiAtLWdpdCBhL2FyY2gv
+eDg2L2t2bS9tdHJyLmMgYi9hcmNoL3g4Ni9rdm0vbXRyci5jDQo+ID4gaW5kZXggN2YwMDU5YWEz
+MGUxLi5hOTg3MDFkOWYyYmYgMTAwNjQ0DQo+ID4gLS0tIGEvYXJjaC94ODYva3ZtL210cnIuYw0K
+PiA+ICsrKyBiL2FyY2gveDg2L2t2bS9tdHJyLmMNCj4gPiBAQCAtMzQ4LDcgKzM0OCw3IEBAIHN0
+YXRpYyB2b2lkIHNldF92YXJfbXRycl9tc3Ioc3RydWN0IGt2bV92Y3B1ICp2Y3B1LCB1MzIgbXNy
+LCB1NjQgZGF0YSkNCj4gPiAgCWludCBpbmRleCwgaXNfbXRycl9tYXNrOw0KPiA+DQo+ID4gIAlp
+bmRleCA9IChtc3IgLSAweDIwMCkgLyAyOw0KPiA+IC0JaXNfbXRycl9tYXNrID0gbXNyIC0gMHgy
+MDAgLSAyICogaW5kZXg7DQo+ID4gKwlpc19tdHJyX21hc2sgPSAobXNyIC0gMHgyMDApICUgMjsN
+Cj4gPiAgCWN1ciA9ICZtdHJyX3N0YXRlLT52YXJfcmFuZ2VzW2luZGV4XTsNCj4gPg0KPiA+ICAJ
+LyogcmVtb3ZlIHRoZSBlbnRyeSBpZiBpdCdzIGluIHRoZSBsaXN0LiAqLw0KPiA+IEBAIC00MjQs
+NyArNDI0LDcgQEAgaW50IGt2bV9tdHJyX2dldF9tc3Ioc3RydWN0IGt2bV92Y3B1ICp2Y3B1LCB1
+MzIgbXNyLCB1NjQgKnBkYXRhKQ0KPiA+ICAJCWludCBpc19tdHJyX21hc2s7DQo+ID4NCj4gPiAg
+CQlpbmRleCA9IChtc3IgLSAweDIwMCkgLyAyOw0KPiA+IC0JCWlzX210cnJfbWFzayA9IG1zciAt
+IDB4MjAwIC0gMiAqIGluZGV4Ow0KPiA+ICsJCWlzX210cnJfbWFzayA9IChtc3IgLSAweDIwMCkg
+JSAyOw0KPiA+ICAJCWlmICghaXNfbXRycl9tYXNrKQ0KPiA+ICAJCQkqcGRhdGEgPSB2Y3B1LT5h
+cmNoLm10cnJfc3RhdGUudmFyX3Jhbmdlc1tpbmRleF0uYmFzZTsNCj4gPiAgCQllbHNlDQo+ID4N
+Cj4gDQo+IElmIHlvdSdyZSBnb2luZyB0byBkbyB0aGF0LCBtaWdodCBhcyB3ZWxsIHVzZSAiPj4g
+MSIgZm9yIGluZGV4IGluc3RlYWQNCj4gb2YgIi8gMiIsIGFuZCAibXNyICYgMSIgZm9yIGlzX210
+cnJfbWFzay4NCg0KUHJvdmlkZWQgdGhlIHZhcmlhYmxlcyBhcmUgdW5zaWduZWQgaXQgbWFrZXMg
+bGl0dGxlIGRpZmZlcmVuY2UNCndoZXRoZXIgeW91IHVzZSAvICUgb3IgPj4gJi4NCkF0IGxlYXN0
+IHdpdGggLyAlIHRoZSB0d28gdmFsdWVzIGFyZSB0aGUgc2FtZS4NCg0KCURhdmlkDQoNCi0NClJl
+Z2lzdGVyZWQgQWRkcmVzcyBMYWtlc2lkZSwgQnJhbWxleSBSb2FkLCBNb3VudCBGYXJtLCBNaWx0
+b24gS2V5bmVzLCBNSzEgMVBULCBVSw0KUmVnaXN0cmF0aW9uIE5vOiAxMzk3Mzg2IChXYWxlcykN
+Cg==
 
-On Thu, Mar 5, 2020 at 4:24 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 05/03/20 15:01, Jon Doron wrote:
-> > Signed-off-by: Jon Doron <arilou@gmail.com>
-> > ---
-> >  include/uapi/linux/kvm.h | 1 +
-> >  1 file changed, 1 insertion(+)
-> >
-> > diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> > index 4b95f9a31a2f..9b4d449f4d20 100644
-> > --- a/include/uapi/linux/kvm.h
-> > +++ b/include/uapi/linux/kvm.h
-> > @@ -200,6 +200,7 @@ struct kvm_hyperv_exit {
-> >                       __u64 input;
-> >                       __u64 result;
-> >                       __u64 params[2];
-> > +                     __u32 pad;
-> >               } hcall;
-> >       } u;
-> >  };
-> >
->
-> Can you explain the purpose of this patch?
->
-> Paolo
->
