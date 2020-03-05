@@ -2,69 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 63BED17A753
-	for <lists+kvm@lfdr.de>; Thu,  5 Mar 2020 15:24:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8CE8D17A766
+	for <lists+kvm@lfdr.de>; Thu,  5 Mar 2020 15:28:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725974AbgCEOYB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 Mar 2020 09:24:01 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:34610 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1725965AbgCEOYB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 5 Mar 2020 09:24:01 -0500
+        id S1726143AbgCEO20 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 Mar 2020 09:28:26 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:58254 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726007AbgCEO20 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 5 Mar 2020 09:28:26 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1583418239;
+        s=mimecast20190719; t=1583418504;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         to:to:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=7wS/wcb85DkcLBGKnRxV24Ml02OHwCI8OhAwRihp0FA=;
-        b=EixRMxFxaR9v60oqUjfN07paIyEu1l92RwDz2CmDxYJ8XOiX9Kyap0p+pmWtawBGPrxh9H
-        ynr9tBTDfa75j+CGLHKDsBB+QuLvDl1gglUJRF9YP2Dm4gV8sY4ezn6VDi9rIwzo0Xp5sa
-        t2tRftcKqW3+e+buBFDam1WTuOzRu2o=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-53-rKJMpKdsOKuE3RTr4aJeRw-1; Thu, 05 Mar 2020 09:23:57 -0500
-X-MC-Unique: rKJMpKdsOKuE3RTr4aJeRw-1
-Received: by mail-wr1-f72.google.com with SMTP id t14so2359518wrs.12
-        for <kvm@vger.kernel.org>; Thu, 05 Mar 2020 06:23:57 -0800 (PST)
+        bh=DwSWf5gcDIK8rHvZ3dTTXzEwGyOQdSLUTzEqTud8Y4Y=;
+        b=QLAkZEDCqZay/5A5WgJIs/PmyaV9ScV6B3PGVV4SSeljBC7GM9Kjfr2cnm9C5otdQScT0y
+        rOMG7kJYQCk2tHVUJlA97c5i0t9jJOJRbP0I9pCKcPIj22YCqoXjo6usxzxQIljgvfK59z
+        i3Fp+2nF4E1MsiQntD802X3ifFN0sWM=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-318--1BTFn_0OJafvKE1naJB_g-1; Thu, 05 Mar 2020 09:28:22 -0500
+X-MC-Unique: -1BTFn_0OJafvKE1naJB_g-1
+Received: by mail-wr1-f71.google.com with SMTP id 31so284690wrq.0
+        for <kvm@vger.kernel.org>; Thu, 05 Mar 2020 06:28:22 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+        h=x-gm-message-state:subject:to:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=7wS/wcb85DkcLBGKnRxV24Ml02OHwCI8OhAwRihp0FA=;
-        b=Qrt9C5sbusZ9m/i8DK4MULJDYtG8/f+1vd8e3CGvHSOu2ZxLh1xwnWlNNIO7Uc/Qqf
-         KFUxEbX3zwm1UOCHDxiSfyEX2BVaDv9Vyjlzb9uDvvY4HU4uSPi/84ZOmhlNQB+94Jt8
-         7lsOD2EXwaH3poGn5NRx1lwuRNBxyRvW/DMmvFI75W4XKVNuRXSIysFtbGmE/UMhwXHq
-         6nwV2biE3+YG4aCVld8lIVIEg8A7681Qn/CmI0Z/XaH+k5CV2/H9s2jWE2bZLMTkDttu
-         9jBpkfvnRk4ZT1hRpwIv8preGEmC3lJRmf/IgV/Miy54Mcbud7kzU+foIfzwPRXJ2ZKE
-         pmOA==
-X-Gm-Message-State: ANhLgQ18h7lFJvrKCfAUmtfrrRlv7JZCRBLnqvG4cpBP2esPPLqSDSdh
-        JTpsUAul2ofJQPqlk4Jf5IUay0q7i1b0zNhy6nnm74DB682o+jlye1/lTyF65UF6YXXKh0hXkPf
-        vc7A5/8n1qofw
-X-Received: by 2002:a05:6000:1186:: with SMTP id g6mr1840639wrx.331.1583418236633;
-        Thu, 05 Mar 2020 06:23:56 -0800 (PST)
-X-Google-Smtp-Source: ADFU+vsCAlsOC+yFneBefdJyj3+DCMaXPX18cRQKObXoQhxnoFrirb6aowWyILujBlj4CBuhZjFHmQ==
-X-Received: by 2002:a05:6000:1186:: with SMTP id g6mr1840623wrx.331.1583418236409;
-        Thu, 05 Mar 2020 06:23:56 -0800 (PST)
+        bh=DwSWf5gcDIK8rHvZ3dTTXzEwGyOQdSLUTzEqTud8Y4Y=;
+        b=Io14LT5MGZ2fTAsbli/zaKd19GHfpqjNBhjkQxvchaV6Q/nvQmxTuv6TQOuIKV0EBh
+         GPS/u7xrON5PLMFd0EIQ6equbkQMWY9XnTFI4LEks60K3nQHzMIYJv9zE7LW8b0nONjU
+         25Zrm8NVxtjXIbAqP2txR8U99jXKdqFqvm0YjSeSkeWVTghblEGaGU0/6PjRnnshyvbE
+         INVJ7qytyZQup1BW0Ne2BIwEDo8Z5YahsBAaoPinu/zRytbY0EfgwJepab+bJwe46Ev4
+         pIJkWBHw6omVrgkIX5oIUU/yAhRdxn++IMkzE7yJJh4evHtGvnYVAO333Xpg9bh+V1rQ
+         AayA==
+X-Gm-Message-State: ANhLgQ1TzsX9AohFtchaXSw6oep2Y8wD7wag3qs9MNt6JhMoeih2oGel
+        ctfm34lyRoksujtlNW7C4MJrwOQius7fM/Mj/uxOyfpb3JCjfvKoWN/+/PruFjOU4EgdysYlwoY
+        FZ7N2xp6xbx2s
+X-Received: by 2002:a1c:20c6:: with SMTP id g189mr10305396wmg.163.1583418501563;
+        Thu, 05 Mar 2020 06:28:21 -0800 (PST)
+X-Google-Smtp-Source: ADFU+vs/bJEaaJUnyfNbv5KieLHoHhabXSJtVqhoXbEBlrF2s+MLkXrwZ0CSseLMTlczfe9ACLb8mQ==
+X-Received: by 2002:a1c:20c6:: with SMTP id g189mr10305356wmg.163.1583418501078;
+        Thu, 05 Mar 2020 06:28:21 -0800 (PST)
 Received: from ?IPv6:2001:b07:6468:f312:9def:34a0:b68d:9993? ([2001:b07:6468:f312:9def:34a0:b68d:9993])
-        by smtp.gmail.com with ESMTPSA id z12sm17349361wrs.43.2020.03.05.06.23.55
+        by smtp.gmail.com with ESMTPSA id t131sm299663wmf.19.2020.03.05.06.28.20
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 05 Mar 2020 06:23:55 -0800 (PST)
-Subject: Re: [PATCH v2 1/4] x86/kvm/hyper-v: Align the hcall param for
- kvm_hyperv_exit
-To:     Jon Doron <arilou@gmail.com>, kvm@vger.kernel.org,
-        linux-hyperv@vger.kernel.org
-Cc:     vkuznets@redhat.com
-References: <20200305140142.413220-1-arilou@gmail.com>
- <20200305140142.413220-2-arilou@gmail.com>
+        Thu, 05 Mar 2020 06:28:20 -0800 (PST)
+Subject: Re: [PATCH v2] KVM: fix Kconfig menu text for -Werror
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, sean.j.christopherson@intel.com
+References: <20200304190750.GF21662@linux.intel.com>
+ <20200305060604.8076-1-Jason@zx2c4.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <09762184-9913-d334-0a33-b76d153bc371@redhat.com>
-Date:   Thu, 5 Mar 2020 15:23:54 +0100
+Message-ID: <e716d8e4-4cda-0c0c-ebf3-f32a2c2870ae@redhat.com>
+Date:   Thu, 5 Mar 2020 15:28:19 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200305140142.413220-2-arilou@gmail.com>
+In-Reply-To: <20200305060604.8076-1-Jason@zx2c4.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -73,27 +71,32 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 05/03/20 15:01, Jon Doron wrote:
-> Signed-off-by: Jon Doron <arilou@gmail.com>
-> ---
->  include/uapi/linux/kvm.h | 1 +
->  1 file changed, 1 insertion(+)
+On 05/03/20 07:06, Jason A. Donenfeld wrote:
+> This was evidently copy and pasted from the i915 driver, but the text
+> wasn't updated.
 > 
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index 4b95f9a31a2f..9b4d449f4d20 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -200,6 +200,7 @@ struct kvm_hyperv_exit {
->  			__u64 input;
->  			__u64 result;
->  			__u64 params[2];
-> +			__u32 pad;
->  		} hcall;
->  	} u;
->  };
+> Fixes: 4f337faf1c55 ("KVM: allow disabling -Werror")
+> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+> ---
+>  arch/x86/kvm/Kconfig | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
+> index 1bb4927030af..9fea0757db92 100644
+> --- a/arch/x86/kvm/Kconfig
+> +++ b/arch/x86/kvm/Kconfig
+> @@ -68,7 +68,7 @@ config KVM_WERROR
+>  	depends on (X86_64 && !KASAN) || !COMPILE_TEST
+>  	depends on EXPERT
+>  	help
+> -	  Add -Werror to the build flags for (and only for) i915.ko.
+> +	  Add -Werror to the build flags for KVM.
+>  
+>  	  If in doubt, say "N".
+>  
 > 
 
-Can you explain the purpose of this patch?
+Queued, thanks.
 
 Paolo
 
