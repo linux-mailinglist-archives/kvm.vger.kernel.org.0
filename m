@@ -2,124 +2,179 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A966A179E54
-	for <lists+kvm@lfdr.de>; Thu,  5 Mar 2020 04:40:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 66903179E69
+	for <lists+kvm@lfdr.de>; Thu,  5 Mar 2020 04:48:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725924AbgCEDkD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 Mar 2020 22:40:03 -0500
-Received: from szxga07-in.huawei.com ([45.249.212.35]:41596 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725810AbgCEDkC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 4 Mar 2020 22:40:02 -0500
-Received: from DGGEMS401-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id AD4361CEF13762CC0BFD;
-        Thu,  5 Mar 2020 11:40:00 +0800 (CST)
-Received: from [127.0.0.1] (10.173.222.27) by DGGEMS401-HUB.china.huawei.com
- (10.3.19.201) with Microsoft SMTP Server id 14.3.439.0; Thu, 5 Mar 2020
- 11:39:52 +0800
-Subject: Re: [PATCH v5 00/23] irqchip/gic-v4: GICv4.1 architecture support
-To:     Marc Zyngier <maz@kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-CC:     Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
-        Jason Cooper <jason@lakedaemon.net>,
-        Robert Richter <rrichter@marvell.com>,
-        "Thomas Gleixner" <tglx@linutronix.de>,
-        Eric Auger <eric.auger@redhat.com>,
-        "James Morse" <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>
-References: <20200304203330.4967-1-maz@kernel.org>
-From:   Zenghui Yu <yuzenghui@huawei.com>
-Message-ID: <5613bec0-a207-1e59-82d0-8d44fc65a0a4@huawei.com>
-Date:   Thu, 5 Mar 2020 11:39:50 +0800
+        id S1725948AbgCEDs1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 Mar 2020 22:48:27 -0500
+Received: from mga06.intel.com ([134.134.136.31]:54742 "EHLO mga06.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725877AbgCEDs0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 4 Mar 2020 22:48:26 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 04 Mar 2020 19:48:26 -0800
+X-IronPort-AV: E=Sophos;i="5.70,516,1574150400"; 
+   d="scan'208";a="234271358"
+Received: from xiaoyaol-mobl.ccr.corp.intel.com (HELO [10.249.168.47]) ([10.249.168.47])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-SHA; 04 Mar 2020 19:48:23 -0800
+Subject: Re: [PATCH v2 2/7] KVM: x86: Add helpers to perform CPUID-based guest
+ vendor check
+To:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Pu Wen <puwen@hygon.cn>
+References: <20200305013437.8578-1-sean.j.christopherson@intel.com>
+ <20200305013437.8578-3-sean.j.christopherson@intel.com>
+From:   Xiaoyao Li <xiaoyao.li@intel.com>
+Message-ID: <b752a4d4-b469-1a1f-c064-bf98a0467d49@intel.com>
+Date:   Thu, 5 Mar 2020 11:48:20 +0800
 User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200304203330.4967-1-maz@kernel.org>
-Content-Type: text/plain; charset="utf-8"; format=flowed
+In-Reply-To: <20200305013437.8578-3-sean.j.christopherson@intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.173.222.27]
-X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
+On 3/5/2020 9:34 AM, Sean Christopherson wrote:
+> Add helpers to provide CPUID-based guest vendor checks, i.e. to do the
+> ugly register comparisons.  Use the new helpers to check for an AMD
+> guest vendor in guest_cpuid_is_amd() as well as in the existing emulator
+> flows.
+> 
+> Using the new helpers fixes a _very_ theoretical bug where
+> guest_cpuid_is_amd() would get a false positive on a non-AMD virtual CPU
+> with a vendor string beginning with "Auth" due to the previous logic
+> only checking EBX.  It also fixes a marginally less theoretically bug
+> where guest_cpuid_is_amd() would incorrectly return false for a guest
+> CPU with "AMDisbetter!" as its vendor string.
+> 
+> Fixes: a0c0feb57992c ("KVM: x86: reserve bit 8 of non-leaf PDPEs and PML4Es in 64-bit mode on AMD")
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> ---
+>   arch/x86/include/asm/kvm_emulate.h | 24 ++++++++++++++++++++
+>   arch/x86/kvm/cpuid.h               |  2 +-
+>   arch/x86/kvm/emulate.c             | 36 +++++++-----------------------
+>   3 files changed, 33 insertions(+), 29 deletions(-)
+> 
+> diff --git a/arch/x86/include/asm/kvm_emulate.h b/arch/x86/include/asm/kvm_emulate.h
+> index bf5f5e476f65..2754972c36e6 100644
+> --- a/arch/x86/include/asm/kvm_emulate.h
+> +++ b/arch/x86/include/asm/kvm_emulate.h
+> @@ -393,6 +393,30 @@ struct x86_emulate_ctxt {
+>   #define X86EMUL_CPUID_VENDOR_GenuineIntel_ecx 0x6c65746e
+>   #define X86EMUL_CPUID_VENDOR_GenuineIntel_edx 0x49656e69
+>   
+> +static inline bool is_guest_vendor_intel(u32 ebx, u32 ecx, u32 edx)
+> +{
+> +	return ebx == X86EMUL_CPUID_VENDOR_GenuineIntel_ebx &&
+> +	       ecx == X86EMUL_CPUID_VENDOR_GenuineIntel_ecx &&
+> +	       edx == X86EMUL_CPUID_VENDOR_GenuineIntel_edx;
+> +}
+> +
+> +static inline bool is_guest_vendor_amd(u32 ebx, u32 ecx, u32 edx)
+> +{
+> +	return (ebx == X86EMUL_CPUID_VENDOR_AuthenticAMD_ebx &&
+> +		ecx == X86EMUL_CPUID_VENDOR_AuthenticAMD_ecx &&
+> +		edx == X86EMUL_CPUID_VENDOR_AuthenticAMD_edx) ||
+> +	       (ebx == X86EMUL_CPUID_VENDOR_AMDisbetterI_ebx &&
+> +		ecx == X86EMUL_CPUID_VENDOR_AMDisbetterI_ecx &&
+> +		edx == X86EMUL_CPUID_VENDOR_AMDisbetterI_edx);
+> +}
+> +
+> +static inline bool is_guest_vendor_hygon(u32 ebx, u32 ecx, u32 edx)
+> +{
+> +	return ebx == X86EMUL_CPUID_VENDOR_HygonGenuine_ebx &&
+> +	       ecx == X86EMUL_CPUID_VENDOR_HygonGenuine_ecx &&
+> +	       edx == X86EMUL_CPUID_VENDOR_HygonGenuine_edx;
+> +}
+> +
 
-On 2020/3/5 4:33, Marc Zyngier wrote:
-> This (now shorter) series expands the existing GICv4 support to deal
-> with the new GICv4.1 architecture, which comes with a set of major
-> improvements compared to v4.0:
-> 
-> - One architectural doorbell per vcpu, instead of one doorbell per VLPI
-> 
-> - Doorbell entirely managed by the HW, with an "at most once" delivery
->    guarantee per non-residency phase and only when requested by the
->    hypervisor
-> 
-> - A shared memory scheme between ITSs and redistributors, allowing for an
->    optimised residency sequence (the use of VMOVP becomes less frequent)
-> 
-> - Support for direct virtual SGI delivery (the injection path still involves
->    the hypervisor), at the cost of losing the active state on SGIs. It
->    shouldn't be a big deal, but some guest operating systems might notice
->    (Linux definitely won't care).
-> 
-> On the other hand, public documentation is not available yet, so that's a
-> bit annoying...
-> 
-> The series is roughly organised in 3 parts:
-> 
-> (0) Fixes
-> (1) v4.1 doorbell management
-> (2) Virtual SGI support
-> (3) Plumbing of virtual SGIs in KVM
-> 
-> Notes:
-> 
->    - The whole thing is tested on a FVP model, which can be obtained
->      free of charge on ARM's developer website. It requires you to
->      create an account, unfortunately... You'll need a fix for the
->      devicetree that is in the kernel tree (should be merged before
->      the 5.6 release).
-> 
->    - This series has uncovered a behaviour that looks like a HW bug on
->      the Cavium ThunderX (aka TX1) platform. I'd very much welcome some
->      clarification from the Marvell/Cavium folks on Cc, as well as an
->      official erratum number if this happens to be an actual bug.
-> 
->      [v3 update]
->      People have ignored for two months now, and it is fairly obvious
->      that support for this machine is slowly bit-rotting. Maybe I'll
->      drop the patch and instead start the process of removing all TX1
->      support from the kernel (we'd certainly be better off without it).
-> 
->      [v4 update]
->      TX1 is now broken in mainline, and nobody cares. Make of this what
->      you want.
-> 
->    - I'm extremely grateful for Zenghui Yu's huge effort in carefully
->      reviewing this rather difficult series (if we ever get to meet
->      face to face, drinks are definitely on me!).
+Why not define those in cpuid.h ?
+And also move X86EMUL_CPUID_VENDOR_* to cpuid.h and remove the "EMUL" 
+prefix.
 
-It's a pleasure to review this work and it's pretty useful for
-understanding how Linux works as a GICv4.1-capable hypervisor.
-Yay, cheers ;-)!
-
-I'll go through the v4.1 spec one more time before the final
-review of this series, as we still have plenty of time to do
-some reviews (and even some tests) before the 5.7 MW.
-
+>   enum x86_intercept_stage {
+>   	X86_ICTP_NONE = 0,   /* Allow zero-init to not match anything */
+>   	X86_ICPT_PRE_EXCEPT,
+> diff --git a/arch/x86/kvm/cpuid.h b/arch/x86/kvm/cpuid.h
+> index 7366c618aa04..13eb3e92c6a9 100644
+> --- a/arch/x86/kvm/cpuid.h
+> +++ b/arch/x86/kvm/cpuid.h
+> @@ -145,7 +145,7 @@ static inline bool guest_cpuid_is_amd(struct kvm_vcpu *vcpu)
+>   	struct kvm_cpuid_entry2 *best;
+>   
+>   	best = kvm_find_cpuid_entry(vcpu, 0, 0);
+> -	return best && best->ebx == X86EMUL_CPUID_VENDOR_AuthenticAMD_ebx;
+> +	return best && is_guest_vendor_amd(best->ebx, best->ecx, best->edx);
+>   }
+>   
+>   static inline int guest_cpuid_family(struct kvm_vcpu *vcpu)
+> diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
+> index dd19fb3539e0..9cf303984fe5 100644
+> --- a/arch/x86/kvm/emulate.c
+> +++ b/arch/x86/kvm/emulate.c
+> @@ -2712,9 +2712,7 @@ static bool vendor_intel(struct x86_emulate_ctxt *ctxt)
+>   
+>   	eax = ecx = 0;
+>   	ctxt->ops->get_cpuid(ctxt, &eax, &ebx, &ecx, &edx, false);
+> -	return ebx == X86EMUL_CPUID_VENDOR_GenuineIntel_ebx
+> -		&& ecx == X86EMUL_CPUID_VENDOR_GenuineIntel_ecx
+> -		&& edx == X86EMUL_CPUID_VENDOR_GenuineIntel_edx;
+> +	return is_guest_vendor_intel(ebx, ecx, edx);
+>   }
+>   
+>   static bool em_syscall_is_enabled(struct x86_emulate_ctxt *ctxt)
+> @@ -2733,34 +2731,16 @@ static bool em_syscall_is_enabled(struct x86_emulate_ctxt *ctxt)
+>   	ecx = 0x00000000;
+>   	ops->get_cpuid(ctxt, &eax, &ebx, &ecx, &edx, false);
+>   	/*
+> -	 * Intel ("GenuineIntel")
+> -	 * remark: Intel CPUs only support "syscall" in 64bit
+> -	 * longmode. Also an 64bit guest with a
+> -	 * 32bit compat-app running will #UD !! While this
+> -	 * behaviour can be fixed (by emulating) into AMD
+> -	 * response - CPUs of AMD can't behave like Intel.
+> +	 * remark: Intel CPUs only support "syscall" in 64bit longmode. Also a
+> +	 * 64bit guest with a 32bit compat-app running will #UD !! While this
+> +	 * behaviour can be fixed (by emulating) into AMD response - CPUs of
+> +	 * AMD can't behave like Intel.
+>   	 */
+> -	if (ebx == X86EMUL_CPUID_VENDOR_GenuineIntel_ebx &&
+> -	    ecx == X86EMUL_CPUID_VENDOR_GenuineIntel_ecx &&
+> -	    edx == X86EMUL_CPUID_VENDOR_GenuineIntel_edx)
+> +	if (is_guest_vendor_intel(ebx, ecx, edx))
+>   		return false;
+>   
+> -	/* AMD ("AuthenticAMD") */
+> -	if (ebx == X86EMUL_CPUID_VENDOR_AuthenticAMD_ebx &&
+> -	    ecx == X86EMUL_CPUID_VENDOR_AuthenticAMD_ecx &&
+> -	    edx == X86EMUL_CPUID_VENDOR_AuthenticAMD_edx)
+> -		return true;
+> -
+> -	/* AMD ("AMDisbetter!") */
+> -	if (ebx == X86EMUL_CPUID_VENDOR_AMDisbetterI_ebx &&
+> -	    ecx == X86EMUL_CPUID_VENDOR_AMDisbetterI_ecx &&
+> -	    edx == X86EMUL_CPUID_VENDOR_AMDisbetterI_edx)
+> -		return true;
+> -
+> -	/* Hygon ("HygonGenuine") */
+> -	if (ebx == X86EMUL_CPUID_VENDOR_HygonGenuine_ebx &&
+> -	    ecx == X86EMUL_CPUID_VENDOR_HygonGenuine_ecx &&
+> -	    edx == X86EMUL_CPUID_VENDOR_HygonGenuine_edx)
+> +	if (is_guest_vendor_amd(ebx, ecx, edx) ||
+> +	    is_guest_vendor_hygon(ebx, ecx, edx))
+>   		return true;
+>   
+>   	/*
 > 
->    - Unless someone cries wolf, I plan to take this into 5.7.
-
-Good news!
-
-
-Thanks,
-Zenghui
 
