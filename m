@@ -2,155 +2,78 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2399A17A2E0
-	for <lists+kvm@lfdr.de>; Thu,  5 Mar 2020 11:11:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E381F17A2F1
+	for <lists+kvm@lfdr.de>; Thu,  5 Mar 2020 11:15:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726846AbgCEKL2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 Mar 2020 05:11:28 -0500
-Received: from mail.kernel.org ([198.145.29.99]:43900 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726049AbgCEKL2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 5 Mar 2020 05:11:28 -0500
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 0A64120848;
-        Thu,  5 Mar 2020 10:11:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1583403087;
-        bh=VhcSG0+t6WlVkEBhrGpV+M/UFgLccIJ9/P7MZTSa6xk=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=CyIMrRa4c4dl44Pfg7aYaPPPtPbFne68bjNvIugCopp0cq0UPJbQF9m1jOFrRjm/v
-         bQ+VZeUn2KI8C8P1uu8lpJw5uiMK4zTISaDaRRh5EzYiFq0bNdHjT/Gk0nYNCO3MvR
-         W9Gfn7ZfFsUd+686TRtUOQ3G7BZp+J01cA1S/UJ8=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
-        by disco-boy.misterjones.org with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.92)
-        (envelope-from <maz@kernel.org>)
-        id 1j9nTR-00AFO9-8N; Thu, 05 Mar 2020 10:11:25 +0000
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date:   Thu, 05 Mar 2020 10:11:25 +0000
-From:   Marc Zyngier <maz@kernel.org>
-To:     Naresh Kamboju <naresh.kamboju@linaro.org>
-Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
-        Andrew Jones <drjones@redhat.com>,
-        kvm list <kvm@vger.kernel.org>, lkft-triage@lists.linaro.org,
-        Krish Sadhukhan <krish.sadhukhan@oracle.com>, yzt356@gmail.com,
-        Jim Mattson <jmattson@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, namit@vmware.com,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Basil Eljuse <Basil.Eljuse@arm.com>, kvm-owner@vger.kernel.org
-Subject: Re: kvm-unit-tests : Kconfigs and extra kernel args for full coverage
-In-Reply-To: <CA+G9fYt2UFv=i5Wg1cwM-hiHNRdkTUHjMZUfbWCY=CWVAoSwrQ@mail.gmail.com>
-References: <CA+G9fYvx=WzyJqS4fUFLq8qXT8nbFQoFfXZoeL9kP-hvv549EA@mail.gmail.com>
- <c82f4386-702f-a2e9-a4d7-d5ebb1f335d1@arm.com>
- <20200224133818.gtxtrmzo4y4guk4z@kamzik.brq.redhat.com>
- <adf05c0d-6a19-da06-5e41-da63b0d0d8d8@arm.com>
- <20200224145936.mzpwveaoijjmb5ql@kamzik.brq.redhat.com>
- <CA+G9fYvt2LyqU5G2j_EFKzgPXzt8sDYYm8NxP+zD6Do07REsYw@mail.gmail.com>
- <7b9209be-f880-a791-a2b9-c7e98bf05ecd@arm.com>
- <CA+G9fYvjoeLV5B951yFb8fc7r+WAejz+0kHcFYTNzW6+HfouXw@mail.gmail.com>
- <CA+G9fYuEfrhW_7vLCdK4nKBhDv6aQkK_knUY7mbgeDcuaETLyQ@mail.gmail.com>
- <a1f51266-d735-402a-6273-8ae84d415881@arm.com>
- <CA+G9fYt2UFv=i5Wg1cwM-hiHNRdkTUHjMZUfbWCY=CWVAoSwrQ@mail.gmail.com>
-Message-ID: <91cf9799db79b83fec4b3fc304969e16@misterjones.org>
-X-Sender: maz@kernel.org
-User-Agent: Roundcube Webmail/1.3.10
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: naresh.kamboju@linaro.org, alexandru.elisei@arm.com, drjones@redhat.com, kvm@vger.kernel.org, lkft-triage@lists.linaro.org, krish.sadhukhan@oracle.com, yzt356@gmail.com, jmattson@google.com, pbonzini@redhat.com, namit@vmware.com, sean.j.christopherson@intel.com, Basil.Eljuse@arm.com, kvm-owner@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+        id S1726992AbgCEKNx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 Mar 2020 05:13:53 -0500
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:50395 "EHLO
+        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725816AbgCEKNx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 5 Mar 2020 05:13:53 -0500
+Received: by mail-wm1-f68.google.com with SMTP id a5so5559396wmb.0;
+        Thu, 05 Mar 2020 02:13:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:from:to:cc:subject:date:message-id;
+        bh=cxk+MXcOeQV1WCXNQhxSl7i6QKVRGSx/9Z04A+Iz51g=;
+        b=USeffCvGW2kT/2nvw5Nshh15XS/mOrJtx1GAM/JerLUzySuvvCWxin5vWI23TGKR/m
+         tQFAFp1FGa71JP8HW4kq08UYGOqN4Dx2VlFi/QkN3/wMqIbGeFHvdJvmkpF3pm/6QP8n
+         Z/7NoxN40809fdsX7ZklFuQSj6xO8cMDpdngGTFdC34m6w2IRaxzzBYkY/tI9Uu0Wlhk
+         Pp4t+kSSO4TncVqzAVTZorMiglcTIIdDk5fkJZzu5CdK72Rw1NAjMcHJoGEoZOgaLNUl
+         ByHiM8ysMfiPyPBPBa5RHYJ2b4kInsKpr9dnQnLDzsTSDyL/qkOiutYD4QxaltWVZnS2
+         TFuw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id;
+        bh=cxk+MXcOeQV1WCXNQhxSl7i6QKVRGSx/9Z04A+Iz51g=;
+        b=e6ib+0NOjXix6dycrhxjXeIdWD9GlUtBDHEDkwvrxBUEo6uT0NoqvKlMtUwDv6WBE4
+         ZWfn0IzJVNV8fcw9RA3hXUf30bTFFJPR5/jAxoFyktCxuEqo28nOz5FeB+7DVbvSqubA
+         f9LHjQXtL/NaydH4CbJrQUPJnYl0XbaEEvzD8ZU9IUmNGqWjtsJvIzhesW4aEX64HUep
+         NrEBpgUANHcogtLb2xyHwlJmgmccOmvUp0o5O1WlBnch7G6qEKXHc//XHjDEzuXguBsn
+         UQgcO15ANfbyfr/wgnaaI19QjA3RiHQmHCQF2CEX8IYHsS3Ma7hJhO0kMfHXMXVdh4Iw
+         bVOQ==
+X-Gm-Message-State: ANhLgQ3b/p3kKPO9wyUIRjnPGueS6lQYrbLaerLQ3Smb51li+++y5FKc
+        Rm4TnL53Q/pROmw0OQ6C3jypRflc
+X-Google-Smtp-Source: ADFU+vtTOHJCj1WO3JX2pSwmBJ2rHiIGvOkj6V7BV0UQ+q4w1huemNS4QWTaP3HgDBcAIVBi2B7fTw==
+X-Received: by 2002:a1c:7719:: with SMTP id t25mr8314292wmi.7.1583403230448;
+        Thu, 05 Mar 2020 02:13:50 -0800 (PST)
+Received: from 640k.localdomain.com ([93.56.166.5])
+        by smtp.gmail.com with ESMTPSA id p15sm8331066wma.40.2020.03.05.02.13.49
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 05 Mar 2020 02:13:49 -0800 (PST)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     cavery@redhat.com, vkuznets@redhat.com, jan.kiszka@siemens.com,
+        wei.huang2@amd.com
+Subject: [PATCH 0/4] KVM: nSVM: first step towards fixing event injection
+Date:   Thu,  5 Mar 2020 11:13:43 +0100
+Message-Id: <1583403227-11432-1-git-send-email-pbonzini@redhat.com>
+X-Mailer: git-send-email 1.8.3.1
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2020-03-03 18:53, Naresh Kamboju wrote:
-> On Tue, 3 Mar 2020 at 21:32, Alexandru Elisei 
-> <alexandru.elisei@arm.com> wrote:
->> 
->> Hi,
->> 
->> On 2/25/20 8:20 AM, Naresh Kamboju wrote:
->> > Hi Alexandru,
->> >
->> > On Mon, 24 Feb 2020 at 23:14, Naresh Kamboju <naresh.kamboju@linaro.org> wrote:
->> >>> I think this is because you are running it on one physical CPU (it's exactly the
->> >>> same message I am getting when I use taskset to run the tests). Can you try and
->> >>> run it without taskset and see if it solves your issue?
->> > We have a new problem when running [1] without taskset on Juno-r2.
->> > None of the test got pass [2] when running without taskset on Juno-r2.
->> >
->> I think I have an explanation for why all the tests fail. qemu creates 
->> a vcpu to
->> match the host cpu in kvm_arm_create_scratch_host_vcpu and it sets the 
->> target to
->> whatever the result of the KVM_ARM_PREFERRED_TARGET ioctl is. If it's 
->> run on the
->> little core, the target will be KVM_ARM_TARGET_CORTEX_A53. If it's run 
->> on the big
->> core, the target will be KVM_ARM_TARGET_GENERIC_V8. I tried it a few 
->> times, and
->> for me it has always been the big core.
->> 
->> The vcpu is created from a different thread by doing a 
->> KVM_ARM_VCPU_INIT ioctl and
->> KVM makes sure that the vcpu target matches the target corresponding 
->> to the
->> physical CPU the thread is running on. What is happening is that the 
->> vcpu thread
->> is run on a little core, so the target as far as KVM is concerned 
->> should be
->> KVM_ARM_TARGET_CORTEX_A53, but qemu (correctly) set it to
->> KVM_ARM_TARGET_GENERIC_V8. The ioctl return -EINVAL (-22) and qemu 
->> dies.
->> 
->> To get around this, I ran the tests either only on the big cores or on 
->> the little
->> cores.
-> 
-> Thanks for explaining in details.
-> I have seen this scenario and defined my test to run only on CPU 0.
-> The CPU 0 on my Juno-r2 devices found to be LITTLE CPU.
+Event injection in nSVM does not use check_nested_events, which means it
+is basically broken.  As a first step, this fixes interrupt injection
+which is probably the most complicated case due to the interactions
+with V_INTR_MASKING and the host EFLAGS.IF.
 
-big-little? Just say no.
+This series fixes Cathy's test case that I have sent earlier.
 
-To be clear: this isn't a workaround. big-little is a fundamentally 
-broken
-paradigm when it comes to virtualization. If you let vcpus roam of 
-different
-u-archs, you will end-up with unpredictable results. So QEMU does the 
-right
-thing, and refuses to start a VM in these conditions.
+Paolo
 
-I suggest you drop your Juno at the nearest museum, department of Bad 
-Ideas,
-and get yourself a sensible machine. Even a RPi4 (cough!) is marginally 
-better.
+Paolo Bonzini (4):
+  KVM: nSVM: do not change host intercepts while nested VM is running
+  KVM: nSVM: ignore L1 interrupt window while running L2 with
+    V_INTR_MASKING=1
+  KVM: nSVM: implement check_nested_events for interrupts
+  KVM: nSVM: avoid loss of pending IRQ/NMI before entering L2
 
->> I also managed to reliably trigger the PMU failures that you are 
->> seeing. They only
->> happen when kvm-unit-tests is run on the little cores (ran them 10 
->> times in a
->> loop). When run on  the big cores, everything is fine (also ran them 
->> 10 times in a
->> loop). Log output when it fails:
-> 
-> Thanks for reproducing this PMU failure.
+ arch/x86/kvm/svm.c | 172 ++++++++++++++++++++++++++++++++---------------------
+ 1 file changed, 103 insertions(+), 69 deletions(-)
 
-This one is slightly more convoluted: Nothing in the KVM PMU code 
-expects *two*
-independent PMUs. What we need is a way to tie a physical PMU to the 
-virtual PMU
-that gets emulated with perf on the host. I'm working on something 
-similar for SPE,
-so maybe we can come up with a common approach.
-
-Thanks,
-
-         M.
 -- 
-Jazz is not dead. It just smells funny...
+1.8.3.1
+
