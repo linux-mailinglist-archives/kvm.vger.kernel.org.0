@@ -2,474 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5BECD17A247
-	for <lists+kvm@lfdr.de>; Thu,  5 Mar 2020 10:34:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F0F2E17A24A
+	for <lists+kvm@lfdr.de>; Thu,  5 Mar 2020 10:34:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726898AbgCEJeI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 Mar 2020 04:34:08 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:22292 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1725877AbgCEJeH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 5 Mar 2020 04:34:07 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1583400846;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=5m895NX6ueQpR/X4iF+h8HYQm1yvobiIzujOZ2vhHtU=;
-        b=YvUcjTSlwkUsif53Dd07v9+ne4gTXycH3rrOgO2jePAsTcriwJWO74/61BZtsXdSllxs2w
-        JnCVCbmtgyBBMTjCTje+jV0PKm6uL4Y0gHojWRGg4G32O61pe72O0OKofa8N6zBcqQ9lCp
-        4lcHcQ+zTonBp/XG95utnavJb6Lu128=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-258-rzp6eUlYMSqyDj58FlMZag-1; Thu, 05 Mar 2020 04:33:50 -0500
-X-MC-Unique: rzp6eUlYMSqyDj58FlMZag-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 82C7F100550E;
-        Thu,  5 Mar 2020 09:33:48 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (ovpn-204-110.brq.redhat.com [10.40.204.110])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 3F6A95C21B;
-        Thu,  5 Mar 2020 09:33:42 +0000 (UTC)
-Date:   Thu, 5 Mar 2020 10:33:39 +0100
-From:   Andrew Jones <drjones@redhat.com>
-To:     Eric Auger <eric.auger@redhat.com>
-Cc:     eric.auger.pro@gmail.com, maz@kernel.org,
-        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        qemu-devel@nongnu.org, qemu-arm@nongnu.org,
-        peter.maydell@linaro.org, andrew.murray@arm.com,
-        alexandru.elisei@arm.com, andre.przywara@arm.com
-Subject: Re: [kvm-unit-tests PATCH v2 5/9] arm: pmu: Basic event counter Tests
-Message-ID: <20200305093339.wavpi6xmqv5aedwx@kamzik.brq.redhat.com>
-References: <20200130112510.15154-1-eric.auger@redhat.com>
- <20200130112510.15154-6-eric.auger@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200130112510.15154-6-eric.auger@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+        id S1726968AbgCEJeh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 Mar 2020 04:34:37 -0500
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:39896 "EHLO
+        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725897AbgCEJeh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 5 Mar 2020 04:34:37 -0500
+Received: by mail-wm1-f66.google.com with SMTP id j1so4900663wmi.4
+        for <kvm@vger.kernel.org>; Thu, 05 Mar 2020 01:34:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:from:to:subject:date:message-id;
+        bh=inOOEeU8s4MrMsZvPiN0++tfetTMGOEO2+eeER8zsek=;
+        b=ALrNrWgkNd2p5pFR/ZIwZChNseSuz5G6+cTUdZEBl0e5qwYCns7kkQ4lA1WDRdTI8V
+         fkg0yvz8eaqn5tSBTg4sKjhcR7XA/fPGCW3cHM+4xCkNmYUL4HfsJYj/V5lpODqqNfce
+         r4eMCyhA2xKJDmoNY7vUuh9uqC5LOFqXkMA2dZkymhuQVfmvBkXEkISw6zGzp9DFzi5Q
+         s/JWjSH0U9dhTa5yPqjv6r+3Gl3H01ZLldsdLKB1oBjWVjx4hzDjq2pfCto+lVNV44Xe
+         Skz9XUh/QvKiGJWwjDUGp6J073XZjVLX4c4nDU9Qa6Gq2FFe4gxHp+4lojIxu4N6VbR4
+         l4iw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:from:to:subject:date:message-id;
+        bh=inOOEeU8s4MrMsZvPiN0++tfetTMGOEO2+eeER8zsek=;
+        b=QNh/mBujWalplkMO11nMrajgc823ZRgcPLpmmIn29cp/DlcN2o/XAlgkqietpuxLK5
+         nUfzNqw3R7zbo8id6imF3ZzHLpXI0fqs1iQL/hyjEQJZiDp0qQ0JKFZiIf5MdlRbmXH0
+         unIBP3M6+KN4YsJ8RgLf/Omu+cnpC2YdU06qtXFao+sueif5WIrX/2aJMzZhyaYfV1YH
+         whCjPPtvAogUhl+G1KCwO/Clo6hC4wXTdkad0hl/ZCUO4pl+IVF3esjjX+S4lte+KTgC
+         FL1GJr+DebWyGs7yA53YAcuXZyt4nTcltVl8Jpv0G9S1QRR8aM4FavMmKtQZiCRrGswB
+         wVEQ==
+X-Gm-Message-State: ANhLgQ3l3GnJ9y9xm31TW3IogYDanBN4VO7+ARmGmiZQFnds9sEpFa9N
+        7LwsP7Uqk8v2G5J0H+mPD9UsK6SC
+X-Google-Smtp-Source: ADFU+vvFrZaXLFGUv+geLRkR53ie855V/El8x2mh8raI6hNczTUG77r0M65sAnmuFtAWnwuN6En9PQ==
+X-Received: by 2002:a05:600c:2942:: with SMTP id n2mr8270323wmd.87.1583400874687;
+        Thu, 05 Mar 2020 01:34:34 -0800 (PST)
+Received: from 640k.localdomain.com ([93.56.166.5])
+        by smtp.gmail.com with ESMTPSA id i7sm28323587wro.87.2020.03.05.01.34.33
+        for <kvm@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 05 Mar 2020 01:34:34 -0800 (PST)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     kvm@vger.kernel.org
+Subject: [PATCH kvm-unit-tests] svm: allow specifying the tests to be run
+Date:   Thu,  5 Mar 2020 10:34:32 +0100
+Message-Id: <1583400872-56657-1-git-send-email-pbonzini@redhat.com>
+X-Mailer: git-send-email 1.8.3.1
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jan 30, 2020 at 12:25:06PM +0100, Eric Auger wrote:
-> Adds the following tests:
-> - event-counter-config: test event counter configuration
-> - basic-event-count:
->   - programs counters #0 and #1 to count 2 required events
->   (resp. CPU_CYCLES and INST_RETIRED). Counter #0 is preset
->   to a value close enough to the 32b
->   overflow limit so that we check the overflow bit is set
->   after the execution of the asm loop.
-> - mem-access: counts MEM_ACCESS event on counters #0 and #1
->   with and without 32-bit overflow.
-> 
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> 
-> ---
-> 
-> v1 -> v2:
-> - fix PMCNTENSET_EL0 and PMCNTENCLR_EL0 op0
-> - print PMEVTYPER SH
-> - properly clobber used regs and add "cc"
-> - simplify mem_access_loop
-> ---
->  arm/pmu.c         | 269 ++++++++++++++++++++++++++++++++++++++++++++++
->  arm/unittests.cfg |  18 ++++
->  2 files changed, 287 insertions(+)
-> 
-> diff --git a/arm/pmu.c b/arm/pmu.c
-> index 4a26a76..1b0101f 100644
-> --- a/arm/pmu.c
-> +++ b/arm/pmu.c
-> @@ -18,9 +18,15 @@
->  #include "asm/barrier.h"
->  #include "asm/sysreg.h"
->  #include "asm/processor.h"
-> +#include <bitops.h>
-> +#include <asm/gic.h>
->  
->  #define PMU_PMCR_E         (1 << 0)
-> +#define PMU_PMCR_P         (1 << 1)
->  #define PMU_PMCR_C         (1 << 2)
-> +#define PMU_PMCR_D         (1 << 3)
-> +#define PMU_PMCR_X         (1 << 4)
-> +#define PMU_PMCR_DP        (1 << 5)
->  #define PMU_PMCR_LC        (1 << 6)
->  #define PMU_PMCR_N_SHIFT   11
->  #define PMU_PMCR_N_MASK    0x1f
-> @@ -104,6 +110,9 @@ static inline void precise_instrs_loop(int loop, uint32_t pmcr)
->  
->  /* event counter tests only implemented for aarch64 */
->  static void test_event_introspection(void) {}
-> +static void test_event_counter_config(void) {}
-> +static void test_basic_event_count(void) {}
-> +static void test_mem_access(void) {}
->  
->  #elif defined(__aarch64__)
->  #define ID_AA64DFR0_PERFMON_SHIFT 8
-> @@ -145,6 +154,33 @@ static inline void precise_instrs_loop(int loop, uint32_t pmcr)
->  }
->  
->  #define PMCEID1_EL0 sys_reg(3, 3, 9, 12, 7)
-> +#define PMCNTENSET_EL0 sys_reg(3, 3, 9, 12, 1)
-> +#define PMCNTENCLR_EL0 sys_reg(3, 3, 9, 12, 2)
-> +
-> +#define PMEVTYPER_EXCLUDE_EL1 (1 << 31)
-> +#define PMEVTYPER_EXCLUDE_EL0 (1 << 30)
-> +
-> +#define regn_el0(__reg, __n) __reg ## __n  ## _el0
-> +#define write_regn(__reg, __n, __val) \
-> +	write_sysreg((__val), __reg ## __n ## _el0)
-> +
-> +#define read_regn(__reg, __n) \
-> +	read_sysreg(__reg ## __n ## _el0)
+Copy over the test_wanted machinery from vmx.c.
 
-You can delete regn_el0() since you don't use it anyway.
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ x86/svm.c | 46 +++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 45 insertions(+), 1 deletion(-)
 
-The el0 should probably be in the macro names,
-
-write_regn_el0()
-read_regn_el0()
-
-Also they could go in lib/arm64/asm/sysreg.h
-
-> +
-> +#define print_pmevtyper(__s, __n) do { \
-> +	uint32_t val; \
-> +	val = read_regn(pmevtyper, __n);\
-> +	report_info("%s pmevtyper%d=0x%x, eventcount=0x%x (p=%ld, u=%ld nsk=%ld, nsu=%ld, nsh=%ld m=%ld, mt=%ld, sh=%ld)", \
-> +			(__s), (__n), val, val & 0xFFFF,	\
-> +			(BIT_MASK(31) & val) >> 31,		\
-> +			(BIT_MASK(30) & val) >> 30,		\
-> +			(BIT_MASK(29) & val) >> 29,		\
-> +			(BIT_MASK(28) & val) >> 28,		\
-> +			(BIT_MASK(27) & val) >> 27,		\
-> +			(BIT_MASK(26) & val) >> 26,		\
-> +			(BIT_MASK(25) & val) >> 25);		\
-> +			(BIT_MASK(24) & val) >> 24);		\
-> +	} while (0)
->  
->  static bool is_event_supported(uint32_t n, bool warn)
->  {
-> @@ -198,6 +234,230 @@ static void test_event_introspection(void)
->  	report(required_events, "Check required events are implemented");
->  }
->  
-> +/*
-> + * Extra instructions inserted by the compiler would be difficult to compensate
-> + * for, so hand assemble everything between, and including, the PMCR accesses
-> + * to start and stop counting. isb instructions are inserted to make sure
-> + * pmccntr read after this function returns the exact instructions executed
-> + * in the controlled block. Loads @loop times the data at @address into x9.
-> + */
-> +static void mem_access_loop(void *addr, int loop, uint32_t pmcr)
-> +{
-> +asm volatile(
-> +	"       msr     pmcr_el0, %[pmcr]\n"
-> +	"       isb\n"
-> +	"       mov     x10, %[loop]\n"
-> +	"1:     sub     x10, x10, #1\n"
-> +	"       ldr x9, [%[addr]]\n"
-
-indent is wrong for line above
-
-> +	"       cmp     x10, #0x0\n"
-> +	"       b.gt    1b\n"
-> +	"       msr     pmcr_el0, xzr\n"
-> +	"       isb\n"
-> +	:
-> +	: [addr] "r" (addr), [pmcr] "r" (pmcr), [loop] "r" (loop)
-> +	: "x9", "x10", "cc");
-> +}
-> +
-> +static void pmu_reset(void)
-> +{
-> +	/* reset all counters, counting disabled at PMCR level*/
-> +	set_pmcr(pmu.pmcr_ro | PMU_PMCR_LC | PMU_PMCR_C | PMU_PMCR_P);
-> +	/* Disable all counters */
-> +	write_sysreg_s(0xFFFFFFFF, PMCNTENCLR_EL0);
-> +	/* clear overflow reg */
-> +	write_sysreg(0xFFFFFFFF, pmovsclr_el0);
-> +	/* disable overflow interrupts on all counters */
-> +	write_sysreg(0xFFFFFFFF, pmintenclr_el1);
-> +	isb();
-> +}
-> +
-> +static void test_event_counter_config(void)
-> +{
-> +	int i;
-> +
-> +	if (!pmu.nb_implemented_counters) {
-> +		report_skip("No event counter, skip ...");
-> +		return;
-> +	}
-> +
-> +	pmu_reset();
-> +
-> +	/*
-> +	 * Test setting through PMESELR/PMXEVTYPER and PMEVTYPERn read,
-> +	 * select counter 0
-> +	 */
-> +	write_sysreg(1, PMSELR_EL0);
-> +	/* program this counter to count unsupported event */
-> +	write_sysreg(0xEA, PMXEVTYPER_EL0);
-> +	write_sysreg(0xdeadbeef, PMXEVCNTR_EL0);
-> +	report((read_regn(pmevtyper, 1) & 0xFFF) == 0xEA,
-> +		"PMESELR/PMXEVTYPER/PMEVTYPERn");
-> +	report((read_regn(pmevcntr, 1) == 0xdeadbeef),
-> +		"PMESELR/PMXEVCNTR/PMEVCNTRn");
-> +
-> +	/* try to configure an unsupported event within the range [0x0, 0x3F] */
-> +	for (i = 0; i <= 0x3F; i++) {
-> +		if (!is_event_supported(i, false))
-> +			break;
-> +	}
-> +	if (i > 0x3F) {
-> +		report_skip("pmevtyper: all events within [0x0, 0x3F] are supported");
-> +		return;
-> +	}
-> +
-> +	/* select counter 0 */
-> +	write_sysreg(0, PMSELR_EL0);
-> +	/* program this counter to count unsupported event */
-> +	write_sysreg(i, PMXEVCNTR_EL0);
-> +	/* read the counter value */
-> +	read_sysreg(PMXEVCNTR_EL0);
-> +	report(read_sysreg(PMXEVCNTR_EL0) == i,
-> +		"read of a counter programmed with unsupported event");
-> +
-> +}
-> +
-> +static bool satisfy_prerequisites(uint32_t *events, unsigned int nb_events)
-> +{
-> +	int i;
-> +
-> +	if (pmu.nb_implemented_counters < nb_events) {
-> +		report_skip("Skip test as number of counters is too small (%d)",
-> +			    pmu.nb_implemented_counters);
-> +		return false;
-> +	}
-> +
-> +	for (i = 0; i < nb_events; i++) {
-> +		if (!is_event_supported(events[i], false)) {
-> +			report_skip("Skip test as event %d is not supported",
-> +				    events[i]);
-> +			return false;
-> +		}
-> +	}
-> +	return true;
-> +}
-> +
-> +static void test_basic_event_count(void)
-> +{
-> +	uint32_t implemented_counter_mask, non_implemented_counter_mask;
-> +	uint32_t counter_mask;
-> +	uint32_t events[] = {
-> +		0x11,	/* CPU_CYCLES */
-> +		0x8,	/* INST_RETIRED */
-> +	};
-
-#define CPU_CYCLES 0x11
-#define INST_RETIRED 0x8
-
-then no need for the comments and ...
-
-> +
-> +	if (!satisfy_prerequisites(events, ARRAY_SIZE(events)))
-> +		return;
-> +
-> +	implemented_counter_mask = BIT(pmu.nb_implemented_counters) - 1;
-> +	non_implemented_counter_mask = ~(BIT(31) | implemented_counter_mask);
-> +	counter_mask = implemented_counter_mask | non_implemented_counter_mask;
-> +
-> +	write_regn(pmevtyper, 0, events[0] | PMEVTYPER_EXCLUDE_EL0);
-> +	write_regn(pmevtyper, 1, events[1] | PMEVTYPER_EXCLUDE_EL0);
-
-... here we can see what we're doing more clearing using the defines
-instead of array members.
-
-> +
-> +	/* disable all counters */
-> +	write_sysreg_s(0xFFFFFFFF, PMCNTENCLR_EL0);
-> +	report(!read_sysreg_s(PMCNTENCLR_EL0) && !read_sysreg_s(PMCNTENSET_EL0),
-> +		"pmcntenclr: disable all counters");
-> +
-> +	/*
-> +	 * clear cycle and all event counters and allow counter enablement
-> +	 * through PMCNTENSET. LC is RES1.
-> +	 */
-> +	set_pmcr(pmu.pmcr_ro | PMU_PMCR_LC | PMU_PMCR_C | PMU_PMCR_P);
-> +	isb();
-> +	report(get_pmcr() == (pmu.pmcr_ro | PMU_PMCR_LC), "pmcr: reset counters");
-> +
-> +	/* Preset counter #0 to 0xFFFFFFF0 to trigger an overflow interrupt */
-> +	write_regn(pmevcntr, 0, 0xFFFFFFF0);
-> +	report(read_regn(pmevcntr, 0) == 0xFFFFFFF0,
-> +		"counter #0 preset to 0xFFFFFFF0");
-> +	report(!read_regn(pmevcntr, 1), "counter #1 is 0");
-> +
-> +	/*
-> +	 * Enable all implemented counters and also attempt to enable
-> +	 * not supported counters. Counting still is disabled by !PMCR.E
-> +	 */
-> +	write_sysreg_s(counter_mask, PMCNTENSET_EL0);
-> +
-> +	/* check only those implemented are enabled */
-> +	report((read_sysreg_s(PMCNTENSET_EL0) == read_sysreg_s(PMCNTENCLR_EL0)) &&
-> +		(read_sysreg_s(PMCNTENSET_EL0) == implemented_counter_mask),
-> +		"pmcntenset: enabled implemented_counters");
-> +
-> +	/* Disable all counters but counters #0 and #1 */
-> +	write_sysreg_s(~0x3, PMCNTENCLR_EL0);
-
-First time you've used ~ to define a mask. I prefer this to all the
-0xFFF..'s, but I prefer consistency and defines even more.
-
-> +	report((read_sysreg_s(PMCNTENSET_EL0) == read_sysreg_s(PMCNTENCLR_EL0)) &&
-> +		(read_sysreg_s(PMCNTENSET_EL0) == 0x3),
-> +		"pmcntenset: just enabled #0 and #1");
-> +
-> +	/* clear overflow register */
-> +	write_sysreg(0xFFFFFFFF, pmovsclr_el0);
-> +	report(!read_sysreg(pmovsclr_el0), "check overflow reg is 0");
-> +
-> +	/* disable overflow interrupts on all counters*/
-> +	write_sysreg(0xFFFFFFFF, pmintenclr_el1);
-> +	report(!read_sysreg(pmintenclr_el1),
-> +		"pmintenclr_el1=0, all interrupts disabled");
-> +
-> +	/* enable overflow interrupts on all event counters */
-> +	write_sysreg(implemented_counter_mask | non_implemented_counter_mask,
-> +		     pmintenset_el1);
-> +	report(read_sysreg(pmintenset_el1) == implemented_counter_mask,
-> +		"overflow interrupts enabled on all implemented counters");
-> +
-> +	/* Set PMCR.E, execute asm code and unset PMCR.E */
-> +	precise_instrs_loop(20, pmu.pmcr_ro | PMU_PMCR_E);
-> +
-> +	report_info("counter #0 is 0x%lx (CPU_CYCLES)",
-> +		    read_regn(pmevcntr, 0));
-> +	report_info("counter #1 is 0x%lx (INST_RETIRED)",
-> +		    read_regn(pmevcntr, 1));
-> +
-> +	report_info("overflow reg = 0x%lx", read_sysreg(pmovsclr_el0));
-> +	report(read_sysreg(pmovsclr_el0) & 0x1,
-> +		"check overflow happened on #0 only");
-> +}
-> +
-> +static void test_mem_access(void)
-> +{
-> +	void *addr = malloc(PAGE_SIZE);
-> +	uint32_t events[] = {
-> +		0x13,   /* MEM_ACCESS */
-> +		0x13,   /* MEM_ACCESS */
-> +	};
-
-#define MEM_ACCESS 0x13
-
-> +
-> +	if (!satisfy_prerequisites(events, ARRAY_SIZE(events)))
-
-No need to check the same event twice. Just call satisfy_prerequisites
-with ((uint32_t []){ MEM_ACCESS }, 1)
-
-> +		return;
-> +
-> +	pmu_reset();
-> +
-> +	write_regn(pmevtyper, 0, events[0] | PMEVTYPER_EXCLUDE_EL0);
-> +	write_regn(pmevtyper, 1, events[1] | PMEVTYPER_EXCLUDE_EL0);
-
-Same comment on using defines rather than array members.
-
-> +	write_sysreg_s(0x3, PMCNTENSET_EL0);
-> +	isb();
-> +	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
-> +	report_info("counter #0 is %ld (MEM_ACCESS)", read_regn(pmevcntr, 0));
-> +	report_info("counter #1 is %ld (MEM_ACCESS)", read_regn(pmevcntr, 1));
-> +	/* We may measure more than 20 mem access depending on the core */
-> +	report((read_regn(pmevcntr, 0) == read_regn(pmevcntr, 1)) &&
-> +	       (read_regn(pmevcntr, 0) >= 20) && !read_sysreg(pmovsclr_el0),
-> +	       "Ran 20 mem accesses");
-> +
-> +	pmu_reset();
-> +
-> +	write_regn(pmevcntr, 0, 0xFFFFFFFA);
-> +	write_regn(pmevcntr, 1, 0xFFFFFFF0);
-> +	write_sysreg_s(0x3, PMCNTENSET_EL0);
-> +	isb();
-> +	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
-> +	report(read_sysreg(pmovsclr_el0) == 0x3,
-> +	       "Ran 20 mem accesses with expected overflows on both counters");
-> +	report_info("cnt#0 = %ld cnt#1=%ld overflow=0x%lx",
-> +			read_regn(pmevcntr, 0), read_regn(pmevcntr, 1),
-> +			read_sysreg(pmovsclr_el0));
-> +}
-> +
->  #endif
->  
->  /*
-> @@ -388,6 +648,15 @@ int main(int argc, char *argv[])
->  	} else if (strcmp(argv[1], "event-introspection") == 0) {
->  		report_prefix_push(argv[1]);
->  		test_event_introspection();
-> +	} else if (strcmp(argv[1], "event-counter-config") == 0) {
-> +		report_prefix_push(argv[1]);
-> +		test_event_counter_config();
-> +	} else if (strcmp(argv[1], "basic-event-count") == 0) {
-> +		report_prefix_push(argv[1]);
-> +		test_basic_event_count();
-> +	} else if (strcmp(argv[1], "mem-access") == 0) {
-> +		report_prefix_push(argv[1]);
-> +		test_mem_access();
-
-missing the pops. I know they're not necessary since we finish the tests
-afterwards, but the universe must stay balanced. Where there's a yin, we
-should put a yang.
-
->  	} else {
->  		report_abort("Unknown sub-test '%s'", argv[1]);
->  	}
-> diff --git a/arm/unittests.cfg b/arm/unittests.cfg
-> index 4433ef3..7a59403 100644
-> --- a/arm/unittests.cfg
-> +++ b/arm/unittests.cfg
-> @@ -72,6 +72,24 @@ groups = pmu
->  arch = arm64
->  extra_params = -append 'event-introspection'
->  
-> +[pmu-event-counter-config]
-> +file = pmu.flat
-> +groups = pmu
-> +arch = arm64
-> +extra_params = -append 'event-counter-config'
-> +
-> +[pmu-basic-event-count]
-> +file = pmu.flat
-> +groups = pmu
-> +arch = arm64
-> +extra_params = -append 'basic-event-count'
-> +
-> +[pmu-mem-access]
-> +file = pmu.flat
-> +groups = pmu
-> +arch = arm64
-> +extra_params = -append 'mem-access'
-> +
->  # Test PMU support (TCG) with -icount IPC=1
->  #[pmu-tcg-icount-1]
->  #file = pmu.flat
-> -- 
-> 2.20.1
-> 
->
-
-I only skimmed this looking for style/framework issues. I'd prefer more
-defines in general to all the hex, but I won't insist on that.
-
-Thanks,
-drew
+diff --git a/x86/svm.c b/x86/svm.c
+index ae85194..70e5169 100644
+--- a/x86/svm.c
++++ b/x86/svm.c
+@@ -1577,11 +1577,52 @@ static struct test tests[] = {
+       pending_event_check_vmask },
+ };
+ 
++int matched;
++
++static bool
++test_wanted(const char *name, char *filters[], int filter_count)
++{
++        int i;
++        bool positive = false;
++        bool match = false;
++        char clean_name[strlen(name) + 1];
++        char *c;
++        const char *n;
++
++        /* Replace spaces with underscores. */
++        n = name;
++        c = &clean_name[0];
++        do *c++ = (*n == ' ') ? '_' : *n;
++        while (*n++);
++
++        for (i = 0; i < filter_count; i++) {
++                const char *filter = filters[i];
++
++                if (filter[0] == '-') {
++                        if (simple_glob(clean_name, filter + 1))
++                                return false;
++                } else {
++                        positive = true;
++                        match |= simple_glob(clean_name, filter);
++                }
++        }
++
++        if (!positive || match) {
++                matched++;
++                return true;
++        } else {
++                return false;
++        }
++}
++
+ int main(int ac, char **av)
+ {
+     int i, nr;
+     struct vmcb *vmcb;
+ 
++    ac--;
++    av++;
++
+     setup_vm();
+     smp_init();
+ 
+@@ -1596,10 +1637,13 @@ int main(int ac, char **av)
+ 
+     nr = ARRAY_SIZE(tests);
+     for (i = 0; i < nr; ++i) {
+-        if (!tests[i].supported())
++        if (!test_wanted(tests[i].name, av, ac) || !tests[i].supported())
+             continue;
+         test_run(&tests[i], vmcb);
+     }
+ 
++    if (!matched)
++        report(matched, "command line didn't match any tests!");
++
+     return report_summary();
+ }
+-- 
+1.8.3.1
 
