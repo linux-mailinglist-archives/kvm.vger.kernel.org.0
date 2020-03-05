@@ -2,129 +2,311 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5A1AB17A70D
-	for <lists+kvm@lfdr.de>; Thu,  5 Mar 2020 15:01:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9892817A735
+	for <lists+kvm@lfdr.de>; Thu,  5 Mar 2020 15:17:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727030AbgCEOBr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 Mar 2020 09:01:47 -0500
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:36164 "EHLO
-        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726173AbgCEOBq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 5 Mar 2020 09:01:46 -0500
-Received: by mail-wr1-f65.google.com with SMTP id j16so7181806wrt.3;
-        Thu, 05 Mar 2020 06:01:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=CdRrk1lQ1WyvzaaT5BfrZN2ALBnMZwS8yyu5uJl/AA4=;
-        b=Ox1T4ga0WB7Ku57bvtqm3KOlVlLSs3T3aHRhRwVuO4bkD50xpNKMmUemDWy/p0Velq
-         xWfL3TicfkNJCATedCX/ABl+lplqb+kIb/Au8twcIpBkMX6/3tdI2Ad0roZf50qBppsp
-         oM/bCOg+72O/3mIj7uhdq7HUe85jbr1bDuLqRJHWeF9IsQ2zuYO91POxkXtNxEgWV3iV
-         oecG3QoMgh9/tmHk49Iwmp2uZ5WP3aoiU5u1fic1ebGyZlw8IcmurnVlotnMw8HXf7+s
-         ia2facMUNUNJXcuWKGoUNwREzs1LbZcxaA9TsvArTYRawNV3t5v6LzxO+Fe63KtsXomO
-         hnHQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=CdRrk1lQ1WyvzaaT5BfrZN2ALBnMZwS8yyu5uJl/AA4=;
-        b=YMoiFtPa1gBldOdcC3UNh7PQjODGMLh9TBsfT4Eal4r+PKArJuGmB6k9/2idqxxCDR
-         AlaAR6TN21kd6dVhwzmeDZOduBujjlJZWfs4caYoghwAiLPrwDjBmoezWXhUnmszL+R7
-         STuGQuWhBvzfBTcE3P9QY/0WerO0pPF+mgyKNDHsKyxH2lvDHSCGvHAZuMnJDPGeebdx
-         9lqz1hsjzN6tOL3igTSECcJNo350EkWb1RBDla+WKRe0FAXTSQPXH1gdJ28H58ocxqTr
-         VF4h1nemtd1sLxYrzwE5ZN4D8Dp0oUtLUI5h1U52l2MAOWNNqJmglXTS5A6KhZM9Yv8a
-         M9Ew==
-X-Gm-Message-State: ANhLgQ0sNXgTbDvgc1ysa4m1yFKhyKkQQp9h3l6py2En8mahSe2bGsjH
-        4cmtKszfBOIu8B8qKzHupEuCiucX
-X-Google-Smtp-Source: ADFU+vsuO+xInr/d+F65KwhyjhJxy42YP2wDfLuF+upnK9tRl9EGK/Bi+kEgEax0+k2+jGXa9EhDdg==
-X-Received: by 2002:adf:fc81:: with SMTP id g1mr10887859wrr.410.1583416904077;
-        Thu, 05 Mar 2020 06:01:44 -0800 (PST)
-Received: from linux.local ([31.154.166.148])
-        by smtp.gmail.com with ESMTPSA id c72sm3379824wme.35.2020.03.05.06.01.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Mar 2020 06:01:43 -0800 (PST)
-From:   Jon Doron <arilou@gmail.com>
-To:     kvm@vger.kernel.org, linux-hyperv@vger.kernel.org
-Cc:     vkuznets@redhat.com, Jon Doron <arilou@gmail.com>
-Subject: [PATCH v2 4/4] x86/kvm/hyper-v: Add support for synthetic debugger via hypercalls
-Date:   Thu,  5 Mar 2020 16:01:42 +0200
-Message-Id: <20200305140142.413220-5-arilou@gmail.com>
-X-Mailer: git-send-email 2.24.1
-In-Reply-To: <20200305140142.413220-1-arilou@gmail.com>
-References: <20200305140142.413220-1-arilou@gmail.com>
+        id S1726087AbgCEOQ4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 Mar 2020 09:16:56 -0500
+Received: from mga18.intel.com ([134.134.136.126]:29587 "EHLO mga18.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725963AbgCEOQ4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 5 Mar 2020 09:16:56 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 05 Mar 2020 06:16:55 -0800
+X-IronPort-AV: E=Sophos;i="5.70,518,1574150400"; 
+   d="scan'208";a="234423636"
+Received: from xiaoyaol-mobl.ccr.corp.intel.com (HELO [10.249.168.47]) ([10.249.168.47])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-SHA; 05 Mar 2020 06:16:43 -0800
+Subject: Re: [PATCH v3 8/8] x86: vmx: virtualize split lock detection
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        hpa@zytor.com, Paolo Bonzini <pbonzini@redhat.com>,
+        Andy Lutomirski <luto@kernel.org>, tony.luck@intel.com,
+        peterz@infradead.org, fenghua.yu@intel.com, x86@kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20200206070412.17400-1-xiaoyao.li@intel.com>
+ <20200206070412.17400-9-xiaoyao.li@intel.com>
+ <20200303193012.GV1439@linux.intel.com>
+From:   Xiaoyao Li <xiaoyao.li@intel.com>
+Message-ID: <fb22d13d-60f5-5050-ccc7-4422f5b25739@intel.com>
+Date:   Thu, 5 Mar 2020 22:16:40 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200303193012.GV1439@linux.intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-There is another mode for the synthetic debugger which uses hypercalls
-to send/recv network data instead of the MSR interface.
+On 3/4/2020 3:30 AM, Sean Christopherson wrote:
+> On Thu, Feb 06, 2020 at 03:04:12PM +0800, Xiaoyao Li wrote:
+>> Due to the fact that MSR_TEST_CTRL is per-core scope, i.e., the sibling
+>> threads in the same physical CPU core share the same MSR, only
+>> advertising feature split lock detection to guest when SMT is disabled
+>> or unsupported for simplicitly.
+>>
+>> Below summarizing how guest behaves of different host configuration:
+>>
+>>    sld_fatal - MSR_TEST_CTL.SDL is forced on and is sticky from the guest's
+>>                perspective (so the guest can detect a forced fatal mode).
+>>
+>>    sld_warn - SLD is exposed to the guest.  MSR_TEST_CTRL.SLD is left on
+>>               until an #AC is intercepted with MSR_TEST_CTRL.SLD=0 in the
+>>               guest, at which point normal sld_warn rules apply.  If a vCPU
+>>               associated with the task does VM-Enter with
+>> 	     MSR_TEST_CTRL.SLD=1, TIF_SLD is reset and the cycle begins
+>> 	     anew.
+>>
+>>    sld_off - When set by the guest, MSR_TEST_CTL.SLD is set on VM-Entry
+>>              and cleared on VM-Exit if guest enables SLD.
+>>
+>> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+>> ---
+>>   arch/x86/include/asm/cpu.h  |  2 ++
+>>   arch/x86/kernel/cpu/intel.c |  7 +++++
+>>   arch/x86/kvm/vmx/vmx.c      | 59 +++++++++++++++++++++++++++++++++++--
+>>   arch/x86/kvm/vmx/vmx.h      |  1 +
+>>   arch/x86/kvm/x86.c          | 14 +++++++--
+>>   5 files changed, 79 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/arch/x86/include/asm/cpu.h b/arch/x86/include/asm/cpu.h
+>> index f5172dbd3f01..2920de10e72c 100644
+>> --- a/arch/x86/include/asm/cpu.h
+>> +++ b/arch/x86/include/asm/cpu.h
+>> @@ -46,6 +46,7 @@ unsigned int x86_stepping(unsigned int sig);
+>>   extern void __init cpu_set_core_cap_bits(struct cpuinfo_x86 *c);
+>>   extern void switch_to_sld(unsigned long tifn);
+>>   extern bool handle_user_split_lock(unsigned long ip);
+>> +extern void sld_turn_back_on(void);
+>>   extern bool split_lock_detect_enabled(void);
+>>   extern bool split_lock_detect_fatal(void);
+>>   #else
+>> @@ -55,6 +56,7 @@ static inline bool handle_user_split_lock(unsigned long ip)
+>>   {
+>>   	return false;
+>>   }
+>> +static inline void sld_turn_back_on(void) {}
+>>   static inline bool split_lock_detect_enabled(void) { return false; }
+>>   static inline bool split_lock_detect_fatal(void) { return false; }
+>>   #endif
+>> diff --git a/arch/x86/kernel/cpu/intel.c b/arch/x86/kernel/cpu/intel.c
+>> index b67b46ea66df..28dc1141152b 100644
+>> --- a/arch/x86/kernel/cpu/intel.c
+>> +++ b/arch/x86/kernel/cpu/intel.c
+>> @@ -1087,6 +1087,13 @@ bool handle_user_split_lock(unsigned long ip)
+>>   }
+>>   EXPORT_SYMBOL_GPL(handle_user_split_lock);
+>>   
+>> +void sld_turn_back_on(void)
+>> +{
+>> +	__sld_msr_set(true);
+>> +	clear_tsk_thread_flag(current, TIF_SLD);
+>> +}
+>> +EXPORT_SYMBOL_GPL(sld_turn_back_on);
+>> +
+>>   /*
+>>    * This function is called only when switching between tasks with
+>>    * different split-lock detection modes. It sets the MSR for the
+>> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+>> index 822211975e6c..8735bf0f3dfd 100644
+>> --- a/arch/x86/kvm/vmx/vmx.c
+>> +++ b/arch/x86/kvm/vmx/vmx.c
+>> @@ -1781,6 +1781,25 @@ static int vmx_get_msr_feature(struct kvm_msr_entry *msr)
+>>   	}
+>>   }
+>>   
+>> +/*
+>> + * Note: for guest, feature split lock detection can only be enumerated through
+>> + * MSR_IA32_CORE_CAPS_SPLIT_LOCK_DETECT bit. The FMS enumeration is invalid.
+>> + */
+>> +static inline bool guest_has_feature_split_lock_detect(struct kvm_vcpu *vcpu)
+>> +{
+>> +	return vcpu->arch.core_capabilities & MSR_IA32_CORE_CAPS_SPLIT_LOCK_DETECT;
+>> +}
+>> +
+>> +static inline u64 vmx_msr_test_ctrl_valid_bits(struct kvm_vcpu *vcpu)
+>> +{
+>> +	u64 valid_bits = 0;
+>> +
+>> +	if (guest_has_feature_split_lock_detect(vcpu))
+>> +		valid_bits |= MSR_TEST_CTRL_SPLIT_LOCK_DETECT;
+>> +
+>> +	return valid_bits;
+>> +}
+>> +
+>>   /*
+>>    * Reads an msr value (of 'msr_index') into 'pdata'.
+>>    * Returns 0 on success, non-0 otherwise.
+>> @@ -1793,6 +1812,12 @@ static int vmx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>>   	u32 index;
+>>   
+>>   	switch (msr_info->index) {
+>> +	case MSR_TEST_CTRL:
+>> +		if (!msr_info->host_initiated &&
+>> +		    !guest_has_feature_split_lock_detect(vcpu))
+>> +			return 1;
+>> +		msr_info->data = vmx->msr_test_ctrl;
+>> +		break;
+>>   #ifdef CONFIG_X86_64
+>>   	case MSR_FS_BASE:
+>>   		msr_info->data = vmcs_readl(GUEST_FS_BASE);
+>> @@ -1934,6 +1959,13 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>>   	u32 index;
+>>   
+>>   	switch (msr_index) {
+>> +	case MSR_TEST_CTRL:
+>> +		if (!msr_info->host_initiated &&
+> 
+> Host initiated writes need to be validated against
+> kvm_get_core_capabilities(), otherwise userspace can enable SLD when it's
+> supported in hardware and the kernel, but can't be safely exposed to the
+> guest due to SMT being on.
 
-This interface is much slower and less recommended since you might get
-a lot of VMExits while KDVM polling for new packets to recv, rather
-than simply checking the pending page to see if there is data avialble
-and then request.
+How about making the whole check like this:
 
-Signed-off-by: Jon Doron <arilou@gmail.com>
----
- arch/x86/include/asm/hyperv-tlfs.h |  5 +++++
- arch/x86/kvm/hyperv.c              | 17 +++++++++++++++++
- 2 files changed, 22 insertions(+)
+	if (!msr_info->host_initiated &&
+	    (!guest_has_feature_split_lock_detect(vcpu))
+		return 1;
 
-diff --git a/arch/x86/include/asm/hyperv-tlfs.h b/arch/x86/include/asm/hyperv-tlfs.h
-index 8efdf974c23f..4fa6bf3732a6 100644
---- a/arch/x86/include/asm/hyperv-tlfs.h
-+++ b/arch/x86/include/asm/hyperv-tlfs.h
-@@ -283,6 +283,8 @@
- #define HV_X64_MSR_SYNDBG_PENDING_BUFFER	0x400000F5
- #define HV_X64_MSR_SYNDBG_OPTIONS		0x400000FF
- 
-+#define HV_X64_SYNDBG_OPTION_USE_HCALLS		BIT(2)
-+
- /* Hyper-V guest crash notification MSR's */
- #define HV_X64_MSR_CRASH_P0			0x40000100
- #define HV_X64_MSR_CRASH_P1			0x40000101
-@@ -392,6 +394,9 @@ struct hv_tsc_emulation_status {
- #define HVCALL_SEND_IPI_EX			0x0015
- #define HVCALL_POST_MESSAGE			0x005c
- #define HVCALL_SIGNAL_EVENT			0x005d
-+#define HVCALL_POST_DEBUG_DATA			0x0069
-+#define HVCALL_RETRIEVE_DEBUG_DATA		0x006a
-+#define HVCALL_RESET_DEBUG_SESSION		0x006b
- #define HVCALL_FLUSH_GUEST_PHYSICAL_ADDRESS_SPACE 0x00af
- #define HVCALL_FLUSH_GUEST_PHYSICAL_ADDRESS_LIST 0x00b0
- 
-diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
-index d657a312004a..52517e11e643 100644
---- a/arch/x86/kvm/hyperv.c
-+++ b/arch/x86/kvm/hyperv.c
-@@ -1800,6 +1800,23 @@ int kvm_hv_hypercall(struct kvm_vcpu *vcpu)
- 		}
- 		ret = kvm_hv_send_ipi(vcpu, ingpa, outgpa, true, false);
- 		break;
-+	case HVCALL_POST_DEBUG_DATA:
-+	case HVCALL_RETRIEVE_DEBUG_DATA:
-+	case HVCALL_RESET_DEBUG_SESSION: {
-+		struct kvm_hv_syndbg *syndbg = vcpu_to_hv_syndbg(vcpu);
-+		if (!(syndbg->options & HV_X64_SYNDBG_OPTION_USE_HCALLS)) {
-+			ret = HV_STATUS_INVALID_HYPERCALL_INPUT;
-+			break;
-+		}
-+		vcpu->run->exit_reason = KVM_EXIT_HYPERV;
-+		vcpu->run->hyperv.type = KVM_EXIT_HYPERV_HCALL;
-+		vcpu->run->hyperv.u.hcall.input = param;
-+		vcpu->run->hyperv.u.hcall.params[0] = ingpa;
-+		vcpu->run->hyperv.u.hcall.params[1] = outgpa;
-+		vcpu->arch.complete_userspace_io =
-+				kvm_hv_hypercall_complete_userspace;
-+		return 0;
-+	}
- 	default:
- 		ret = HV_STATUS_INVALID_HYPERCALL_CODE;
- 		break;
--- 
-2.24.1
+	if (data & ~vmx_msr_test_ctrl_valid_bits(vcpu))
+		return 1;
+
+>> +		    (!guest_has_feature_split_lock_detect(vcpu) ||
+>> +		     data & ~vmx_msr_test_ctrl_valid_bits(vcpu)))
+>> +			return 1;
+>> +		vmx->msr_test_ctrl = data;
+>> +		break;
+>>   	case MSR_EFER:
+>>   		ret = kvm_set_msr_common(vcpu, msr_info);
+>>   		break;
+>> @@ -4230,6 +4262,7 @@ static void vmx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+>>   
+>>   	vmx->rmode.vm86_active = 0;
+>>   	vmx->spec_ctrl = 0;
+>> +	vmx->msr_test_ctrl = 0;
+>>   
+>>   	vmx->msr_ia32_umwait_control = 0;
+>>   
+>> @@ -4563,6 +4596,11 @@ static inline bool guest_cpu_alignment_check_enabled(struct kvm_vcpu *vcpu)
+>>   	       (kvm_get_rflags(vcpu) & X86_EFLAGS_AC);
+>>   }
+>>   
+>> +static inline bool guest_cpu_split_lock_detect_enabled(struct vcpu_vmx *vmx)
+>> +{
+>> +	return vmx->msr_test_ctrl & MSR_TEST_CTRL_SPLIT_LOCK_DETECT;
+>> +}
+>> +
+>>   static int handle_exception_nmi(struct kvm_vcpu *vcpu)
+>>   {
+>>   	struct vcpu_vmx *vmx = to_vmx(vcpu);
+>> @@ -4658,8 +4696,9 @@ static int handle_exception_nmi(struct kvm_vcpu *vcpu)
+>>   		break;
+>>   	case AC_VECTOR:
+>>   		/*
+>> -		 * Inject #AC back to guest only when guest enables legacy
+>> -		 * alignment check.
+>> +		 * Inject #AC back to guest only when guest is expecting it,
+>> +		 * i.e., guest enables legacy alignment check or split lock
+>> +		 * detection.
+>>   		 * Otherwise, it must be an unexpected split lock #AC of guest
+>>   		 * since hardware SPLIT_LOCK_DETECT bit keeps unchanged set
+>>   		 * when vcpu is running. In this case, treat guest the same as
+>> @@ -4670,6 +4709,7 @@ static int handle_exception_nmi(struct kvm_vcpu *vcpu)
+>>   		 *    similar as sending SIGBUS.
+>>   		 */
+>>   		if (!split_lock_detect_enabled() ||
+>> +		    guest_cpu_split_lock_detect_enabled(vmx) ||
+>>   		    guest_cpu_alignment_check_enabled(vcpu)) {
+>>   			kvm_queue_exception_e(vcpu, AC_VECTOR, error_code);
+>>   			return 1;
+>> @@ -6555,6 +6595,16 @@ static void vmx_vcpu_run(struct kvm_vcpu *vcpu)
+>>   	 */
+>>   	x86_spec_ctrl_set_guest(vmx->spec_ctrl, 0);
+>>   
+>> +	if (static_cpu_has(X86_FEATURE_SPLIT_LOCK_DETECT) &&
+>> +	    guest_cpu_split_lock_detect_enabled(vmx)) {
+>> +		if (test_thread_flag(TIF_SLD))
+>> +			sld_turn_back_on();
+>> +		else if (!split_lock_detect_enabled())
+>> +			wrmsrl(MSR_TEST_CTRL,
+>> +			       this_cpu_read(msr_test_ctrl_cache) |
+>> +			       MSR_TEST_CTRL_SPLIT_LOCK_DETECT);
+>> +	}
+>> +
+>>   	/* L1D Flush includes CPU buffer clear to mitigate MDS */
+>>   	if (static_branch_unlikely(&vmx_l1d_should_flush))
+>>   		vmx_l1d_flush(vcpu);
+>> @@ -6589,6 +6639,11 @@ static void vmx_vcpu_run(struct kvm_vcpu *vcpu)
+>>   
+>>   	x86_spec_ctrl_restore_host(vmx->spec_ctrl, 0);
+>>   
+>> +	if (static_cpu_has(X86_FEATURE_SPLIT_LOCK_DETECT) &&
+>> +	    guest_cpu_split_lock_detect_enabled(vmx) &&
+>> +	    !split_lock_detect_enabled())
+>> +		wrmsrl(MSR_TEST_CTRL, this_cpu_read(msr_test_ctrl_cache));
+>> +
+>>   	/* All fields are clean at this point */
+>>   	if (static_branch_unlikely(&enable_evmcs))
+>>   		current_evmcs->hv_clean_fields |=
+>> diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
+>> index 7f42cf3dcd70..4cb8075e0b2a 100644
+>> --- a/arch/x86/kvm/vmx/vmx.h
+>> +++ b/arch/x86/kvm/vmx/vmx.h
+>> @@ -222,6 +222,7 @@ struct vcpu_vmx {
+>>   #endif
+>>   
+>>   	u64		      spec_ctrl;
+>> +	u64		      msr_test_ctrl;
+>>   	u32		      msr_ia32_umwait_control;
+>>   
+>>   	u32 secondary_exec_control;
+>> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+>> index ed16644289a3..a3bb09319526 100644
+>> --- a/arch/x86/kvm/x86.c
+>> +++ b/arch/x86/kvm/x86.c
+>> @@ -1163,7 +1163,7 @@ static const u32 msrs_to_save_all[] = {
+>>   #endif
+>>   	MSR_IA32_TSC, MSR_IA32_CR_PAT, MSR_VM_HSAVE_PA,
+>>   	MSR_IA32_FEAT_CTL, MSR_IA32_BNDCFGS, MSR_TSC_AUX,
+>> -	MSR_IA32_SPEC_CTRL,
+>> +	MSR_IA32_SPEC_CTRL, MSR_TEST_CTRL,
+>>   	MSR_IA32_RTIT_CTL, MSR_IA32_RTIT_STATUS, MSR_IA32_RTIT_CR3_MATCH,
+>>   	MSR_IA32_RTIT_OUTPUT_BASE, MSR_IA32_RTIT_OUTPUT_MASK,
+>>   	MSR_IA32_RTIT_ADDR0_A, MSR_IA32_RTIT_ADDR0_B,
+>> @@ -1345,7 +1345,12 @@ static u64 kvm_get_arch_capabilities(void)
+>>   
+>>   static u64 kvm_get_core_capabilities(void)
+>>   {
+>> -	return 0;
+>> +	u64 data = 0;
+>> +
+>> +	if (boot_cpu_has(X86_FEATURE_SPLIT_LOCK_DETECT) && !cpu_smt_possible())
+>> +		data |= MSR_IA32_CORE_CAPS_SPLIT_LOCK_DETECT;
+>> +
+>> +	return data;
+>>   }
+>>   
+>>   static int kvm_get_msr_feature(struct kvm_msr_entry *msr)
+>> @@ -5259,6 +5264,11 @@ static void kvm_init_msr_list(void)
+>>   		 * to the guests in some cases.
+>>   		 */
+>>   		switch (msrs_to_save_all[i]) {
+>> +		case MSR_TEST_CTRL:
+>> +			if (!(kvm_get_core_capabilities() &
+>> +			      MSR_IA32_CORE_CAPS_SPLIT_LOCK_DETECT))
+>> +				continue;
+>> +			break;
+>>   		case MSR_IA32_BNDCFGS:
+>>   			if (!kvm_mpx_supported())
+>>   				continue;
+>> -- 
+>> 2.23.0
+>>
 
