@@ -2,103 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id AA96217A943
-	for <lists+kvm@lfdr.de>; Thu,  5 Mar 2020 16:53:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A3D7D17A967
+	for <lists+kvm@lfdr.de>; Thu,  5 Mar 2020 16:57:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726897AbgCEPxF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 Mar 2020 10:53:05 -0500
-Received: from mail-ed1-f66.google.com ([209.85.208.66]:36174 "EHLO
-        mail-ed1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726129AbgCEPxF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 5 Mar 2020 10:53:05 -0500
-Received: by mail-ed1-f66.google.com with SMTP id a13so7381594edh.3;
-        Thu, 05 Mar 2020 07:53:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=3zIiGhH+NqmE7D/rwhoTLyBEtxi9COUeHYXpd/hp1CE=;
-        b=aZJzvWCWgRJfr0UAAAp8ALdatMHZYNcUf24/7AvkBxIpMmg/Vt3zZ+hIslR95vw7yE
-         4DH/awMqykAuZjTN4y/xadcR7pqPZ+1Pt15ZZcmYe3Mnb0M5LXkTGvrbHNjDpRjw6xnj
-         Ar1tYwMM/DIprR+8IBTEY9vaxcM0SIuuLTLedma5trmntQEOvqcDGKwG0FTFM6MwzRi8
-         SXkSwony4IkaPpQFan1z79Eu+ljWL0oW8OJOjTaKO8Aj4rfmy3EoHAJTCaaY6oUDpH1G
-         T0y9YnAG1K1YeeDdXzEnrCNvtkX7gihcGmwIE9/1Ip1Vq+tyUCI9rxAKYivs2hwfK99Y
-         CUcQ==
+        id S1726191AbgCEP5Q (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 Mar 2020 10:57:16 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:52730 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726184AbgCEP5O (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 5 Mar 2020 10:57:14 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1583423833;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=IxoeEnt35O7QTmRZWyr2gwugnfgn2HRJVIdogRILp7k=;
+        b=dQtCxkPub7SE1lGVzRmyEOJVXWbvZq/fj+FaEgtuHOc1UIPfOUcI3TJKJ5b7A6bvQTUAC+
+        WYxzAMSSR46DhjqGNtRHQLuEFud0jr/pSwTioQHRSAtVk4vufNBD1yhVsk4fFsUk4+7vz5
+        4JWEdOTlBIqJEsEcz8dFYdCz9ZNmlXY=
+Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
+ [209.85.219.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-167-FnlzzZx7M2CEOesy1lHj7g-1; Thu, 05 Mar 2020 10:57:12 -0500
+X-MC-Unique: FnlzzZx7M2CEOesy1lHj7g-1
+Received: by mail-qv1-f71.google.com with SMTP id g11so3294437qvl.3
+        for <kvm@vger.kernel.org>; Thu, 05 Mar 2020 07:57:12 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=3zIiGhH+NqmE7D/rwhoTLyBEtxi9COUeHYXpd/hp1CE=;
-        b=UejN4mYdbzdl+W3Uk6uxRIExv0k9Clg1aBwATTepz4T+PdQjy1DJAfgIWvkBnV2hsQ
-         V1gqD543UZP5qeKZCZSDv9Jpw0aTCle8GTcFxY/ueN3GlaSDfaFfSezjqZHKFXRDe5pT
-         dfdkJM7eUJ44dZZerUtjChrxeu8Kz/I4sOw+Nf9tQ+mZsp9Gp9YzrQcbiq5J7DWN19fE
-         a1bUagSzq3i2OAK8eYzTO8DYkew+/Xdlis6NcN43WpsSYsNFVv8jqYINlap1RrLrTJGN
-         Vd84crdLKsBBVw6rsIpJgxGtqBb2yVUP/0yQVztrw3gibG2WsKzt0dNTowyTsZ0saVTP
-         iuvQ==
-X-Gm-Message-State: ANhLgQ0Yx6W/mGCuL3KqvI7oH92WoMMtrUDGzwlANmFiOVs3UyXh76vu
-        WQBfx4B+pnDuBVQlp7KWfc7U7rGUEd8n5KKe3SE=
-X-Google-Smtp-Source: ADFU+vsJmunqbD1mxkWHF1rP8ZNtmvdVnSbe313PRCmTXVVPaS9SFpCUWqScEvEO8aK2BqSBQQ1jocR7n38FuAiwqtw=
-X-Received: by 2002:a50:a419:: with SMTP id u25mr7304324edb.289.1583423584002;
- Thu, 05 Mar 2020 07:53:04 -0800 (PST)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=IxoeEnt35O7QTmRZWyr2gwugnfgn2HRJVIdogRILp7k=;
+        b=Lu/Jj7l5MWzse23Zep9LEni5M2PueLdIHVva1BlNYpU7GvADPEFqPoDrWWZTqRADYt
+         JdPIEIaaR3nmTVzIysWQpf0gndI53L0ILq+q7G4+9M4uFxD277/2Awh7ItXGdEZT85l3
+         oqLV9gDXK59FtB5agO7miCveOWltnwkwcAf1uUHkzY15sNVGcC1ecdivDNC6sX34l8uw
+         RZerbdltSq6Xlt8zSj22ZJ6Cnoo9vPSXVhlml6Ms39Sxn4oDuIUv/q2DmOybwfMSYJR7
+         cFJL5xzh7PBdf7/DTcjCIT8Tu5XJxGiGHQOXw92AJg4eokwI7UB8CJQsJMiSoIdsyZCn
+         qn/A==
+X-Gm-Message-State: ANhLgQ1MNiTJzYMcvuBFY7STnaReFYJ0bthVlKpworVk1aUmdERtrV/u
+        IYjS7HsfPjy3AyQAAYGLi2C1kwqfKos8mB8Wuec+EUks90HRBH2L/BKttZlgvG6+xFzrvOHi0of
+        Gn2igK7cQITo5
+X-Received: by 2002:a37:6258:: with SMTP id w85mr9019903qkb.206.1583423831397;
+        Thu, 05 Mar 2020 07:57:11 -0800 (PST)
+X-Google-Smtp-Source: ADFU+vsWJ9ChA7AqjC8mi6Y+3B8RoMTG+j/4BpcKmFtJ6GioCGLGAqBL5bV82PTSSCUwsx+KztqSCw==
+X-Received: by 2002:a37:6258:: with SMTP id w85mr9019888qkb.206.1583423831166;
+        Thu, 05 Mar 2020 07:57:11 -0800 (PST)
+Received: from xz-x1.redhat.com ([2607:9880:19c0:32::2])
+        by smtp.gmail.com with ESMTPSA id a18sm14815053qkg.48.2020.03.05.07.57.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 05 Mar 2020 07:57:10 -0800 (PST)
+From:   Peter Xu <peterx@redhat.com>
+To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     linmiaohe@huawei.com, Paolo Bonzini <pbonzini@redhat.com>,
+        peterx@redhat.com
+Subject: [PATCH v2 0/2] KVM: Drop gfn_to_pfn_atomic()
+Date:   Thu,  5 Mar 2020 10:57:07 -0500
+Message-Id: <20200305155709.118503-1-peterx@redhat.com>
+X-Mailer: git-send-email 2.24.1
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-References: <20200305140142.413220-1-arilou@gmail.com> <20200305140142.413220-2-arilou@gmail.com>
- <09762184-9913-d334-0a33-b76d153bc371@redhat.com> <CAP7QCoj9=mZCWdiOa92QP9Fjb=p3DfKTs0xHKZYQ+yRiMabmLA@mail.gmail.com>
- <0edfee0e-01ee-bb62-5fc5-67d7d45ec192@redhat.com>
-In-Reply-To: <0edfee0e-01ee-bb62-5fc5-67d7d45ec192@redhat.com>
-From:   Jon Doron <arilou@gmail.com>
-Date:   Thu, 5 Mar 2020 17:52:52 +0200
-Message-ID: <CAP7QCogGkC_wOPuuz2cZDb0aRv0GzMGDR2Y0voU8w4hdtO39BQ@mail.gmail.com>
-Subject: Re: [PATCH v2 1/4] x86/kvm/hyper-v: Align the hcall param for kvm_hyperv_exit
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-hyperv@vger.kernel.org,
-        Vitaly Kuznetsov <vkuznets@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-bah you are right sorry :( but if ill do that ill break userspace no?
--- Jon..
+v2:=0D
+- add a document update for indirect sp fast path which referenced=0D
+  gfn_to_pfn_atomic(). [linmiaohe]=0D
+=0D
+Please review, thanks.=0D
+=0D
+Peter Xu (2):=0D
+  KVM: Documentation: Update fast page fault for indirect sp=0D
+  KVM: Drop gfn_to_pfn_atomic()=0D
+=0D
+ Documentation/virt/kvm/locking.rst | 9 ++++-----=0D
+ include/linux/kvm_host.h           | 1 -=0D
+ virt/kvm/kvm_main.c                | 6 ------=0D
+ 3 files changed, 4 insertions(+), 12 deletions(-)=0D
+=0D
+-- =0D
+2.24.1=0D
+=0D
 
-On Thu, Mar 5, 2020 at 5:30 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 05/03/20 15:53, Jon Doron wrote:
-> > Vitaly recommended we will align the struct to 64bit...
->
-> Oh, then I think you actually should add a padding after "__u32 type;"
-> and "__u32 msr;" if you want to make it explicit.  The patch, as is, is
-> not aligning anything, hence my confusion.
->
-> Thanks,
->
-> Paolo
->
-> > On Thu, Mar 5, 2020 at 4:24 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
-> >>
-> >> On 05/03/20 15:01, Jon Doron wrote:
-> >>> Signed-off-by: Jon Doron <arilou@gmail.com>
-> >>> ---
-> >>>  include/uapi/linux/kvm.h | 1 +
-> >>>  1 file changed, 1 insertion(+)
-> >>>
-> >>> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> >>> index 4b95f9a31a2f..9b4d449f4d20 100644
-> >>> --- a/include/uapi/linux/kvm.h
-> >>> +++ b/include/uapi/linux/kvm.h
-> >>> @@ -200,6 +200,7 @@ struct kvm_hyperv_exit {
-> >>>                       __u64 input;
-> >>>                       __u64 result;
-> >>>                       __u64 params[2];
-> >>> +                     __u32 pad;
-> >>>               } hcall;
-> >>>       } u;
-> >>>  };
-> >>>
-> >>
-> >> Can you explain the purpose of this patch?
-> >>
-> >> Paolo
-> >>
-> >
->
