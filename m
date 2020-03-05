@@ -2,77 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 77B8D17AB3E
-	for <lists+kvm@lfdr.de>; Thu,  5 Mar 2020 18:12:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2427C17ACE1
+	for <lists+kvm@lfdr.de>; Thu,  5 Mar 2020 18:23:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725993AbgCERMF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 Mar 2020 12:12:05 -0500
-Received: from mga05.intel.com ([192.55.52.43]:19713 "EHLO mga05.intel.com"
+        id S1728081AbgCERW5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 Mar 2020 12:22:57 -0500
+Received: from mail.kernel.org ([198.145.29.99]:39638 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725938AbgCERME (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 5 Mar 2020 12:12:04 -0500
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 05 Mar 2020 09:12:04 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,518,1574150400"; 
-   d="scan'208";a="264040974"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
-  by fmsmga004.fm.intel.com with ESMTP; 05 Mar 2020 09:12:04 -0800
-Date:   Thu, 5 Mar 2020 09:12:04 -0800
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Pu Wen <puwen@hygon.cn>
-Subject: Re: [PATCH v2 0/7] KVM: x86: CPUID emulation and tracing fixes
-Message-ID: <20200305171204.GI11500@linux.intel.com>
-References: <20200305013437.8578-1-sean.j.christopherson@intel.com>
- <6071310f-dd4b-6a6d-5578-7b6f72a9b1be@redhat.com>
+        id S1727409AbgCERNw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 5 Mar 2020 12:13:52 -0500
+Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 34B7420870;
+        Thu,  5 Mar 2020 17:13:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1583428431;
+        bh=T/N6searkn/741FSLMAo4Cm8Zx59t2ps/5DqLkc5Mmg=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=owooDXD1iHi5kw05LhRYxDHMjOSsOsdOBTSfdgb4B68iUzZRaxuLbfj0TMXmCEMpZ
+         ftSKSdCdypJtPY7lGFlvLHplb4U7gGmVUPqiwN+7akXhcHD4/Y76swOauzmIgOLS8E
+         Fu9p3Od6Jn938EWwPxlwSE3XDfJmXmkzW2lz0cas=
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     =?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
+        syzbot+f2a62d07a5198c819c7b@syzkaller.appspotmail.com,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.5 30/67] vhost: Check docket sk_family instead of call getname
+Date:   Thu,  5 Mar 2020 12:12:31 -0500
+Message-Id: <20200305171309.29118-30-sashal@kernel.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200305171309.29118-1-sashal@kernel.org>
+References: <20200305171309.29118-1-sashal@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <6071310f-dd4b-6a6d-5578-7b6f72a9b1be@redhat.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+Content-Type: text/plain; charset=UTF-8
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 05, 2020 at 05:42:59PM +0100, Paolo Bonzini wrote:
-> On 05/03/20 02:34, Sean Christopherson wrote:
-> > 
-> > In theory, everything up to the refactoring is non-controversial, i.e. we
-> > can bikeshed the refactoring without delaying the bug fixes.
-> 
-> Even the refactoring itself is much less controversial.  I queued
-> everything, there's always time to unqueue.
+From: Eugenio Pérez <eperezma@redhat.com>
 
-Looks like the build-time assertions don't play nice with older versions of
-gcc :-(
+[ Upstream commit 42d84c8490f9f0931786f1623191fcab397c3d64 ]
 
-config: x86_64-randconfig-s2-20200305 (attached as .config)
-compiler: gcc-4.9 (Debian 4.9.2-10+deb8u1) 4.9.2
-reproduce:
-        # save the attached .config to linux build tree
-        make ARCH=x86_64 
+Doing so, we save one call to get data we already have in the struct.
 
-If you fix the issue, kindly add following tag
-Reported-by: kbuild test robot <lkp@intel.com>
+Also, since there is no guarantee that getname use sockaddr_ll
+parameter beyond its size, we add a little bit of security here.
+It should do not do beyond MAX_ADDR_LEN, but syzbot found that
+ax25_getname writes more (72 bytes, the size of full_sockaddr_ax25,
+versus 20 + 32 bytes of sockaddr_ll + MAX_ADDR_LEN in syzbot repro).
 
-All error/warnings (new ones prefixed by >>):
+Fixes: 3a4d5c94e9593 ("vhost_net: a kernel-level virtio server")
+Reported-by: syzbot+f2a62d07a5198c819c7b@syzkaller.appspotmail.com
+Signed-off-by: Eugenio Pérez <eperezma@redhat.com>
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: David S. Miller <davem@davemloft.net>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/vhost/net.c | 10 +---------
+ 1 file changed, 1 insertion(+), 9 deletions(-)
 
-   In file included from include/linux/export.h:43:0,
-                    from include/linux/linkage.h:7,
-                    from include/linux/preempt.h:10,
-                    from include/linux/hardirq.h:5,
-                    from include/linux/kvm_host.h:7,
-                    from arch/x86/kvm/emulate.c:21:
-   arch/x86/kvm/emulate.c: In function 'em_cpuid':
->> include/linux/compiler.h:350:38: error: call to '__compiletime_assert_3957' declared with attribute error: BUILD_BUG_ON failed: X86EMUL_CPUID_VENDOR_AuthenticAMD_ebx != *(u32 *)"Auth" || X86EMUL_CPUID_VENDOR_AuthenticAMD_edx != *(u32 *)"enti" || X86EMUL_CPUID_VENDOR_AuthenticAMD_ecx != *(u32 *)"cAMD"
-     _compiletime_assert(condition, msg, __compiletime_assert_, __LINE__)
+diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
+index e158159671fa2..18e205eeb9af7 100644
+--- a/drivers/vhost/net.c
++++ b/drivers/vhost/net.c
+@@ -1414,10 +1414,6 @@ static int vhost_net_release(struct inode *inode, struct file *f)
+ 
+ static struct socket *get_raw_socket(int fd)
+ {
+-	struct {
+-		struct sockaddr_ll sa;
+-		char  buf[MAX_ADDR_LEN];
+-	} uaddr;
+ 	int r;
+ 	struct socket *sock = sockfd_lookup(fd, &r);
+ 
+@@ -1430,11 +1426,7 @@ static struct socket *get_raw_socket(int fd)
+ 		goto err;
+ 	}
+ 
+-	r = sock->ops->getname(sock, (struct sockaddr *)&uaddr.sa, 0);
+-	if (r < 0)
+-		goto err;
+-
+-	if (uaddr.sa.sll_family != AF_PACKET) {
++	if (sock->sk->sk_family != AF_PACKET) {
+ 		r = -EPFNOSUPPORT;
+ 		goto err;
+ 	}
+-- 
+2.20.1
 
