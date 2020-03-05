@@ -2,73 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0B7AD17AABF
-	for <lists+kvm@lfdr.de>; Thu,  5 Mar 2020 17:43:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D186A17AAC6
+	for <lists+kvm@lfdr.de>; Thu,  5 Mar 2020 17:45:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726145AbgCEQnv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 Mar 2020 11:43:51 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:49415 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726142AbgCEQnv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 5 Mar 2020 11:43:51 -0500
+        id S1726090AbgCEQpY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 Mar 2020 11:45:24 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:56670 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725991AbgCEQpY (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 5 Mar 2020 11:45:24 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1583426629;
+        s=mimecast20190719; t=1583426723;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=BhhISddobKRvxCyVQfFxQKYUaxrCs/nqVOLHMdfl6w4=;
-        b=gCp9ZlI1pRK6Srcadn0YBN30dOFAjXdKTHLLXNTbyJWnD7fY7jzqmMy33ijfvqOx+PWHKc
-        mlPdDpy2a+B9a+P5eNISyvjkMa4fPZEG6VOlvoC1SMH1lez0wQqDHx1Uy8tvZILaWwBVaU
-        TKwmF7ev6P6bB6su8eiNzSbAneCmzM4=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-17-HyWYf0v4MbOAw7t5cr1opg-1; Thu, 05 Mar 2020 11:43:48 -0500
-X-MC-Unique: HyWYf0v4MbOAw7t5cr1opg-1
-Received: by mail-wr1-f71.google.com with SMTP id u18so2506632wrn.11
-        for <kvm@vger.kernel.org>; Thu, 05 Mar 2020 08:43:48 -0800 (PST)
+        bh=ctNq4CCoaNBHGFzM1KPycpQ4JYOcWX3tmGXm2KQziW8=;
+        b=UiHt5ubDfTB64BUeKjSuLAcFzFukoQ456hxae4mvjUrZnTvBNZlfC3GoZpvekdEZO5+FJ9
+        cEOr7IkeOXGHQN4xtQjJrjfjSjxyPw/vNfnWQpydnRGKcEd4g8ApC1QXOXRhh0r+cda9rR
+        Wu4ADHeR1icn4MfmNhfQEqGiFUNzRVM=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-143-i-d1q3nrP5mBNSNX6kKqgg-1; Thu, 05 Mar 2020 11:45:21 -0500
+X-MC-Unique: i-d1q3nrP5mBNSNX6kKqgg-1
+Received: by mail-wm1-f69.google.com with SMTP id f207so2301313wme.6
+        for <kvm@vger.kernel.org>; Thu, 05 Mar 2020 08:45:21 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=BhhISddobKRvxCyVQfFxQKYUaxrCs/nqVOLHMdfl6w4=;
-        b=G1davdUxjd4RbQI4EArtbO6qp2FNNk3YmE+BQEKmrelmBIeT7jmwHgRk4hlctlvDqO
-         6eiodt6GwXhIt1PvQwbO45352eEjsPFAKgeu9eSjDMeR2fxW/qGRRrv2TRRpFhZ1vKvr
-         Jj1Ya+zfAnWkTduXfv5ZBiNu2wdE/kLTOKU0GAkNgxngvlbGBrpNPLqyT858F/H7+oY0
-         LK3TVlBf7M0jJ86gXOGtxJD8M1CDoOOoE7wA39wBQt4PsRUqWMlVUzlPitJxBI9n+gDV
-         QvU/gpeEcY3FPObVjS20wIZ3WT8qShM4ZuZ7RUaNFela+meKlUU6EXAsWseu3cPY2SaO
-         eJZA==
-X-Gm-Message-State: ANhLgQ344hyab5vwAJorsuOssX/LrtOaOg5WZcZd917DUuiCDLFEqlUz
-        E5WdBelTaZQy6V3i/zV5DTWWHi6G6uAaHSaj/znICBSefCynDUh/TDL1fQvwE5Zo0DDy7e2m0U2
-        4lfGcY7BU/c4j
-X-Received: by 2002:adf:d4c7:: with SMTP id w7mr1907319wrk.20.1583426627093;
-        Thu, 05 Mar 2020 08:43:47 -0800 (PST)
-X-Google-Smtp-Source: ADFU+vudytWymUEkci84I/WZSseDXaNi0Bm39I2yP2Zha9wZsreA/1rCNGnBV4PyCOqqQHgKHjKo+Q==
-X-Received: by 2002:adf:d4c7:: with SMTP id w7mr1907297wrk.20.1583426626866;
-        Thu, 05 Mar 2020 08:43:46 -0800 (PST)
+        bh=ctNq4CCoaNBHGFzM1KPycpQ4JYOcWX3tmGXm2KQziW8=;
+        b=GOZcE68Hyf3QzyioND3PFYYfF+CuBaV0MsO0e0ppnO849Qyn7HF64lLKkajsfv6E9g
+         EjeS0nYkNNqW1pvKL8FLjFtmKKGVxk9+DlmK4eOWQUaHT+KtCUNso+K0AT8Id+m8bCGM
+         ffxxOmKHK2ZuxUw1+tpy2jTTd9ImOOkOcTHwnkky5ez6W9Ad0AfZUeeqzFSm8uYB0Xfc
+         D5vYo85jI9yRa3BiEzI6UjyhB9sdnZpv/F5jWgR0T5pEpR4+YR2NIyKcCO3cTqffGwUZ
+         /kM3zO01JA77ShuOLhfenXVkKInqPtha0MsMca9GEEG+yC+zIyIsr4zShqSlQEl7d+Kw
+         i2nw==
+X-Gm-Message-State: ANhLgQ3TEjbGCF2XJmfq5//NmgWAhypsyRs1CeLygFEt5bkt7+h0uGp2
+        14Y89zgjAFCq8mXHtC9bLBQVUjh4XbrbG7UCiUPBCesdNZMECWJKqwcao3UC3k+2xCnrOvLz5lP
+        wAbwbxRKz/myO
+X-Received: by 2002:a05:600c:4108:: with SMTP id j8mr10410541wmi.188.1583426720209;
+        Thu, 05 Mar 2020 08:45:20 -0800 (PST)
+X-Google-Smtp-Source: ADFU+vtqIAyf6ANiV/6hH7zyPHEAgMKe6UD6gdYRfrFD40jdUM+Pii4EnaD7zdAuV588Uc8uu6P6iQ==
+X-Received: by 2002:a05:600c:4108:: with SMTP id j8mr10410494wmi.188.1583426719539;
+        Thu, 05 Mar 2020 08:45:19 -0800 (PST)
 Received: from ?IPv6:2001:b07:6468:f312:9def:34a0:b68d:9993? ([2001:b07:6468:f312:9def:34a0:b68d:9993])
-        by smtp.gmail.com with ESMTPSA id g129sm11491735wmg.12.2020.03.05.08.43.45
+        by smtp.gmail.com with ESMTPSA id m19sm9856625wmc.34.2020.03.05.08.45.18
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 05 Mar 2020 08:43:46 -0800 (PST)
-Subject: Re: [PATCH 2/2] KVM: x86: VMX: untangle VMXON revision_id setting
- when using eVMCS
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20200305100123.1013667-1-vkuznets@redhat.com>
- <20200305100123.1013667-3-vkuznets@redhat.com>
- <20200305154130.GB11500@linux.intel.com>
- <8736amg3q5.fsf@vitty.brq.redhat.com>
+        Thu, 05 Mar 2020 08:45:18 -0800 (PST)
+Subject: Re: [PATCH v2 1/4] x86/kvm/hyper-v: Align the hcall param for
+ kvm_hyperv_exit
+To:     Jon Doron <arilou@gmail.com>
+Cc:     kvm@vger.kernel.org, linux-hyperv@vger.kernel.org,
+        Vitaly Kuznetsov <vkuznets@redhat.com>
+References: <20200305140142.413220-1-arilou@gmail.com>
+ <20200305140142.413220-2-arilou@gmail.com>
+ <09762184-9913-d334-0a33-b76d153bc371@redhat.com>
+ <CAP7QCoj9=mZCWdiOa92QP9Fjb=p3DfKTs0xHKZYQ+yRiMabmLA@mail.gmail.com>
+ <0edfee0e-01ee-bb62-5fc5-67d7d45ec192@redhat.com>
+ <CAP7QCogGkC_wOPuuz2cZDb0aRv0GzMGDR2Y0voU8w4hdtO39BQ@mail.gmail.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <4e4218fe-2409-558f-8d0f-aae18e8d4651@redhat.com>
-Date:   Thu, 5 Mar 2020 17:43:44 +0100
+Message-ID: <bb520125-71e5-51b2-5477-164205656fb7@redhat.com>
+Date:   Thu, 5 Mar 2020 17:45:18 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <8736amg3q5.fsf@vitty.brq.redhat.com>
+In-Reply-To: <CAP7QCogGkC_wOPuuz2cZDb0aRv0GzMGDR2Y0voU8w4hdtO39BQ@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -77,18 +77,18 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 05/03/20 17:34, Vitaly Kuznetsov wrote:
->> I'd strongly prefer to keep the alloc_vmcs_cpu() name and call the new enum
->> "vmcs_type".  The discrepancy could be resolved by a comment above the
->> VMXON_REGION usage, e.g.
->>
->> 		/* The VMXON region is really just a special type of VMCS. */
->> 		vmcs = alloc_vmcs_cpu(VMXON_REGION, cpu, GFP_KERNEL);
-> I have no strong opinion (but honestly I don't really know what VMXON
-> region is being used for), Paolo already said 'queued' but I think I'll
-> send v2 with the suggested changes (including patch prefixes :-)
+On 05/03/20 16:52, Jon Doron wrote:
+> bah you are right sorry :( but if ill do that ill break userspace no?
 
-Yes, please do.
+No, you'd just be making the padding explicit.
 
 Paolo
+
+> 
+> On Thu, Mar 5, 2020 at 5:30 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>> On 05/03/20 15:53, Jon Doron wrote:
+>>> Vitaly recommended we will align the struct to 64bit...
+>> Oh, then I think you actually should add a padding after "__u32 type;"
+>> and "__u32 msr;" if you want to make it explicit.  The patch, as is, is
+>> not aligning anything, hence my confusion.
 
