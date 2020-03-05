@@ -2,207 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D590717A298
-	for <lists+kvm@lfdr.de>; Thu,  5 Mar 2020 10:59:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 03D6817A2BE
+	for <lists+kvm@lfdr.de>; Thu,  5 Mar 2020 11:02:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727041AbgCEJ64 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 Mar 2020 04:58:56 -0500
-Received: from mga01.intel.com ([192.55.52.88]:50986 "EHLO mga01.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725912AbgCEJ64 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 5 Mar 2020 04:58:56 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 05 Mar 2020 01:58:55 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,517,1574150400"; 
-   d="scan'208";a="234366402"
-Received: from snr.bj.intel.com ([10.240.193.90])
-  by orsmga008.jf.intel.com with ESMTP; 05 Mar 2020 01:58:49 -0800
-From:   Luwei Kang <luwei.kang@intel.com>
-To:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     peterz@infradead.org, mingo@redhat.com, acme@kernel.org,
-        mark.rutland@arm.com, alexander.shishkin@linux.intel.com,
-        jolsa@redhat.com, namhyung@kernel.org, tglx@linutronix.de,
-        bp@alien8.de, hpa@zytor.com, pbonzini@redhat.com,
-        sean.j.christopherson@intel.com, vkuznets@redhat.com,
-        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
-        pawan.kumar.gupta@linux.intel.com, ak@linux.intel.com,
-        thomas.lendacky@amd.com, fenghua.yu@intel.com,
-        kan.liang@linux.intel.com, like.xu@linux.intel.com
-Subject: [PATCH v1 01/11] perf/x86/core: Support KVM to assign a dedicated counter for guest PEBS
-Date:   Fri,  6 Mar 2020 01:56:55 +0800
-Message-Id: <1583431025-19802-2-git-send-email-luwei.kang@intel.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1583431025-19802-1-git-send-email-luwei.kang@intel.com>
-References: <1583431025-19802-1-git-send-email-luwei.kang@intel.com>
+        id S1727484AbgCEKAc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 Mar 2020 05:00:32 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:60144 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727067AbgCEKA1 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 5 Mar 2020 05:00:27 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1583402425;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=h9c3Oo/RuEHs22bhUV7ITfbICrFSfIEa7L4Ikjb6rqs=;
+        b=FOyvF56peCZPKLIZurAoxd1oXeyGhIjxp6O5LD9D5BpBd/b3Kym/S0qaokQEWpazfHpAT+
+        aQWRVsMuKCkadBfcnnH0ai96w4kzsbq7pk0QuMHHhMNQ0AxCSOjrCj+BANmJEQKA7AB4qX
+        DBcpTt3TAbBxpQtN6xtqUJBHb2v1BtU=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-316-lI3352K2M5y22SxX9KI6Ag-1; Thu, 05 Mar 2020 05:00:24 -0500
+X-MC-Unique: lI3352K2M5y22SxX9KI6Ag-1
+Received: by mail-wm1-f72.google.com with SMTP id y7so1879518wmd.4
+        for <kvm@vger.kernel.org>; Thu, 05 Mar 2020 02:00:24 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=h9c3Oo/RuEHs22bhUV7ITfbICrFSfIEa7L4Ikjb6rqs=;
+        b=XZG2Pn00oEWbbKc0HpSrA6Bwu+fhudRmr8jKVVtet/ykxjGgtAbrUSN4HIn56dfMTC
+         RtZ+J4+0osGTK1nTRh64B9SKmU6HT1US9F055DJa61hLASzrm4j5QqAnTr9gQGUTB8UF
+         yp0BBoMs4PHHJBUQpilHN2/7QrAhIxwX4FcCkftNjgN+aWz3/2YAUNSIrZ5fHq47I7m8
+         LKEhtn70yTbqcgiw0tW2x574QwOLV8eV/SNjxuZzxORaeaDur/CpgDePM2fGHUdRud25
+         QNj2NIs7V99J6pQxsav5y703Fa8Kql49sr7RtWnhaoEKwpHiRYiviW+rkv/Kaq6iR1+a
+         CAHA==
+X-Gm-Message-State: ANhLgQ0Nr+h3JjPtutMLgEi7V/5ixnQ6C2KjUKCeTVpEtghgJAN4IkXB
+        rbncldYuMOoObJRmO6gGFd1qha7wWIlh84i3KVDgFRBTdx10deWQUyY7R5//1wvTVIpjK7m09+V
+        kO5QBTz2MC+wB
+X-Received: by 2002:adf:ed4c:: with SMTP id u12mr10026074wro.204.1583402422953;
+        Thu, 05 Mar 2020 02:00:22 -0800 (PST)
+X-Google-Smtp-Source: ADFU+vs1BoO4KZ5s7zmZKx1MVnI40qzqSNNmxzRndp8CmpnaWitVLFzRckZCZjjtUM9MSCoyPkYzyQ==
+X-Received: by 2002:adf:ed4c:: with SMTP id u12mr10026049wro.204.1583402422768;
+        Thu, 05 Mar 2020 02:00:22 -0800 (PST)
+Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
+        by smtp.gmail.com with ESMTPSA id e11sm42114205wrm.80.2020.03.05.02.00.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 05 Mar 2020 02:00:21 -0800 (PST)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] KVM: x86: Fix warning due to implicit truncation on 32-bit KVM
+In-Reply-To: <20200305002422.20968-1-sean.j.christopherson@intel.com>
+References: <20200305002422.20968-1-sean.j.christopherson@intel.com>
+Date:   Thu, 05 Mar 2020 11:00:20 +0100
+Message-ID: <87wo7zcea3.fsf@vitty.brq.redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Kan Liang <kan.liang@linux.intel.com>
+Sean Christopherson <sean.j.christopherson@intel.com> writes:
 
-The PEBS event created by host needs to be assigned specific counters
-requested by the guest, which means the guest and host counter indexes
-have to be the same or fail to create. This is needed because PEBS leaks
-counter indexes into the guest. Otherwise, the guest driver will be
-confused by the counter indexes in the status field of the PEBS record.
+> Explicitly cast the integer literal to an unsigned long when stuffing a
+> non-canonical value into the host virtual address during private memslot
+> deletion.  The explicit cast fixes a warning that gets promoted to an
+> error when running with KVM's newfangled -Werror setting.
+>
+>   arch/x86/kvm/x86.c:9739:9: error: large integer implicitly truncated
+>   to unsigned type [-Werror=overflow]
+>
+> Fixes: a3e967c0b87d3 ("KVM: Terminate memslot walks via used_slots"
 
-A guest_dedicated_idx field is added to indicate the counter index
-specifically requested by KVM. The dedicated event constraints would
-constrain the counter in the host to the same numbered counter in guest.
+Missing ')'
 
-A intel_ctrl_guest_dedicated_mask field is added to indicate the enabled
-counters for guest PEBS events. The IA32_PEBS_ENABLE MSR will be switched
-during the VMX transitions if intel_ctrl_guest_owned is set.
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> ---
+>  arch/x86/kvm/x86.c | 8 ++++++--
+>  1 file changed, 6 insertions(+), 2 deletions(-)
+>
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index ba4d476b79ad..fa03f31ab33c 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -9735,8 +9735,12 @@ int __x86_set_memory_region(struct kvm *kvm, int id, gpa_t gpa, u32 size)
+>  		if (!slot || !slot->npages)
+>  			return 0;
+>  
+> -		/* Stuff a non-canonical value to catch use-after-delete. */
+> -		hva = 0xdeadull << 48;
+> +		/*
+> +		 * Stuff a non-canonical value to catch use-after-delete.  This
+> +		 * ends up being 0 on 32-bit KVM, but there's no better
+> +		 * alternative.
+> +		 */
+> +		hva = (unsigned long)(0xdeadull << 48);
+>  		old_npages = slot->npages;
+>  	}
 
-Originally-by: Andi Kleen <ak@linux.intel.com>
-Signed-off-by: Kan Liang <kan.liang@linux.intel.com>
----
- arch/x86/events/intel/core.c | 60 +++++++++++++++++++++++++++++++++++++++++++-
- arch/x86/events/perf_event.h |  1 +
- include/linux/perf_event.h   |  2 ++
- kernel/events/core.c         |  1 +
- 4 files changed, 63 insertions(+), 1 deletion(-)
+Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 
-diff --git a/arch/x86/events/intel/core.c b/arch/x86/events/intel/core.c
-index dff6623..ef95076 100644
---- a/arch/x86/events/intel/core.c
-+++ b/arch/x86/events/intel/core.c
-@@ -368,6 +368,29 @@
- 	EVENT_CONSTRAINT_END
- };
- 
-+#define GUEST_DEDICATED_CONSTRAINT(idx) {          \
-+	{ .idxmsk64 = (1ULL << (idx)) },        \
-+	.weight = 1,                            \
-+}
-+
-+static struct event_constraint dedicated_gp_c[MAX_PEBS_EVENTS] = {
-+	GUEST_DEDICATED_CONSTRAINT(0),
-+	GUEST_DEDICATED_CONSTRAINT(1),
-+	GUEST_DEDICATED_CONSTRAINT(2),
-+	GUEST_DEDICATED_CONSTRAINT(3),
-+	GUEST_DEDICATED_CONSTRAINT(4),
-+	GUEST_DEDICATED_CONSTRAINT(5),
-+	GUEST_DEDICATED_CONSTRAINT(6),
-+	GUEST_DEDICATED_CONSTRAINT(7),
-+};
-+
-+static struct event_constraint dedicated_fixed_c[MAX_FIXED_PEBS_EVENTS] = {
-+	GUEST_DEDICATED_CONSTRAINT(INTEL_PMC_IDX_FIXED),
-+	GUEST_DEDICATED_CONSTRAINT(INTEL_PMC_IDX_FIXED + 1),
-+	GUEST_DEDICATED_CONSTRAINT(INTEL_PMC_IDX_FIXED + 2),
-+	GUEST_DEDICATED_CONSTRAINT(INTEL_PMC_IDX_FIXED + 3),
-+};
-+
- static u64 intel_pmu_event_map(int hw_event)
- {
- 	return intel_perfmon_event_map[hw_event];
-@@ -2158,6 +2181,7 @@ static void intel_pmu_disable_event(struct perf_event *event)
- 	}
- 
- 	cpuc->intel_ctrl_guest_mask &= ~(1ull << hwc->idx);
-+	cpuc->intel_ctrl_guest_dedicated_mask &= ~(1ull << hwc->idx);
- 	cpuc->intel_ctrl_host_mask &= ~(1ull << hwc->idx);
- 	cpuc->intel_cp_status &= ~(1ull << hwc->idx);
- 
-@@ -2246,6 +2270,10 @@ static void intel_pmu_enable_event(struct perf_event *event)
- 	if (event->attr.exclude_guest)
- 		cpuc->intel_ctrl_host_mask |= (1ull << hwc->idx);
- 
-+	if (unlikely(event->guest_dedicated_idx >= 0)) {
-+		WARN_ON(hwc->idx != event->guest_dedicated_idx);
-+		cpuc->intel_ctrl_guest_dedicated_mask |= (1ull << hwc->idx);
-+	}
- 	if (unlikely(event_is_checkpointed(event)))
- 		cpuc->intel_cp_status |= (1ull << hwc->idx);
- 
-@@ -3036,7 +3064,21 @@ static void intel_commit_scheduling(struct cpu_hw_events *cpuc, int idx, int cnt
- 	if (cpuc->excl_cntrs)
- 		return intel_get_excl_constraints(cpuc, event, idx, c2);
- 
--	return c2;
-+	if (event->guest_dedicated_idx < 0)
-+		return c2;
-+
-+	BUILD_BUG_ON(ARRAY_SIZE(dedicated_fixed_c) != MAX_FIXED_PEBS_EVENTS);
-+	if (c2->idxmsk64 & (1ULL << event->guest_dedicated_idx)) {
-+		if (event->guest_dedicated_idx < MAX_PEBS_EVENTS)
-+			return &dedicated_gp_c[event->guest_dedicated_idx];
-+		else if ((event->guest_dedicated_idx >= INTEL_PMC_IDX_FIXED) &&
-+			 (event->guest_dedicated_idx < INTEL_PMC_IDX_FIXED +
-+							MAX_FIXED_PEBS_EVENTS))
-+			return &dedicated_fixed_c[event->guest_dedicated_idx -
-+							INTEL_PMC_IDX_FIXED];
-+	}
-+
-+	return &emptyconstraint;
- }
- 
- static void intel_put_excl_constraints(struct cpu_hw_events *cpuc,
-@@ -3373,6 +3415,22 @@ static struct perf_guest_switch_msr *intel_guest_get_msrs(int *nr)
- 		*nr = 2;
- 	}
- 
-+	if (cpuc->intel_ctrl_guest_dedicated_mask) {
-+		arr[0].guest |= cpuc->intel_ctrl_guest_dedicated_mask;
-+		arr[1].msr = MSR_IA32_PEBS_ENABLE;
-+		arr[1].host = cpuc->pebs_enabled &
-+				~cpuc->intel_ctrl_guest_dedicated_mask;
-+		arr[1].guest = cpuc->intel_ctrl_guest_dedicated_mask;
-+		*nr = 2;
-+	} else {
-+		/* Remove MSR_IA32_PEBS_ENABLE from MSR switch list in KVM */
-+		if (*nr == 1) {
-+			arr[1].msr = MSR_IA32_PEBS_ENABLE;
-+			arr[1].host = arr[1].guest = 0;
-+			*nr = 2;
-+		}
-+	}
-+
- 	return arr;
- }
- 
-diff --git a/arch/x86/events/perf_event.h b/arch/x86/events/perf_event.h
-index f1cd1ca..621529c 100644
---- a/arch/x86/events/perf_event.h
-+++ b/arch/x86/events/perf_event.h
-@@ -242,6 +242,7 @@ struct cpu_hw_events {
- 	 * Intel host/guest exclude bits
- 	 */
- 	u64				intel_ctrl_guest_mask;
-+	u64				intel_ctrl_guest_dedicated_mask;
- 	u64				intel_ctrl_host_mask;
- 	struct perf_guest_switch_msr	guest_switch_msrs[X86_PMC_IDX_MAX];
- 
-diff --git a/include/linux/perf_event.h b/include/linux/perf_event.h
-index 547773f..3bccb88 100644
---- a/include/linux/perf_event.h
-+++ b/include/linux/perf_event.h
-@@ -750,6 +750,8 @@ struct perf_event {
- 	void *security;
- #endif
- 	struct list_head		sb_list;
-+	/* the guest specified counter index of KVM owned event, e.g PEBS */
-+	int				guest_dedicated_idx;
- #endif /* CONFIG_PERF_EVENTS */
- };
- 
-diff --git a/kernel/events/core.c b/kernel/events/core.c
-index e453589..7a7b56c 100644
---- a/kernel/events/core.c
-+++ b/kernel/events/core.c
-@@ -10731,6 +10731,7 @@ static void account_event(struct perf_event *event)
- 	event->id		= atomic64_inc_return(&perf_event_id);
- 
- 	event->state		= PERF_EVENT_STATE_INACTIVE;
-+	event->guest_dedicated_idx = -1;
- 
- 	if (task) {
- 		event->attach_state = PERF_ATTACH_TASK;
 -- 
-1.8.3.1
+Vitaly
 
