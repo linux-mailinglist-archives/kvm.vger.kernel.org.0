@@ -2,24 +2,24 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 60F6217A2A3
-	for <lists+kvm@lfdr.de>; Thu,  5 Mar 2020 11:01:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4F2C417A2A6
+	for <lists+kvm@lfdr.de>; Thu,  5 Mar 2020 11:01:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727023AbgCEJ7E (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 Mar 2020 04:59:04 -0500
-Received: from mga09.intel.com ([134.134.136.24]:64850 "EHLO mga09.intel.com"
+        id S1727126AbgCEJ7L (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 Mar 2020 04:59:11 -0500
+Received: from mga03.intel.com ([134.134.136.65]:7415 "EHLO mga03.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725880AbgCEJ7D (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 5 Mar 2020 04:59:03 -0500
+        id S1727071AbgCEJ7L (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 5 Mar 2020 04:59:11 -0500
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 05 Mar 2020 01:59:02 -0800
+  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 05 Mar 2020 01:59:10 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.70,517,1574150400"; 
-   d="scan'208";a="234366434"
+   d="scan'208";a="234366468"
 Received: from snr.bj.intel.com ([10.240.193.90])
-  by orsmga008.jf.intel.com with ESMTP; 05 Mar 2020 01:58:56 -0800
+  by orsmga008.jf.intel.com with ESMTP; 05 Mar 2020 01:59:03 -0800
 From:   Luwei Kang <luwei.kang@intel.com>
 To:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     peterz@infradead.org, mingo@redhat.com, acme@kernel.org,
@@ -31,9 +31,9 @@ Cc:     peterz@infradead.org, mingo@redhat.com, acme@kernel.org,
         pawan.kumar.gupta@linux.intel.com, ak@linux.intel.com,
         thomas.lendacky@amd.com, fenghua.yu@intel.com,
         kan.liang@linux.intel.com, like.xu@linux.intel.com
-Subject: [PATCH v1 02/11] perf/x86/ds: Handle guest PEBS events overflow and inject fake PMI
-Date:   Fri,  6 Mar 2020 01:56:56 +0800
-Message-Id: <1583431025-19802-3-git-send-email-luwei.kang@intel.com>
+Subject: [PATCH v1 03/11] perf/x86: Expose a function to disable auto-reload
+Date:   Fri,  6 Mar 2020 01:56:57 +0800
+Message-Id: <1583431025-19802-4-git-send-email-luwei.kang@intel.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1583431025-19802-1-git-send-email-luwei.kang@intel.com>
 References: <1583431025-19802-1-git-send-email-luwei.kang@intel.com>
@@ -44,102 +44,64 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Kan Liang <kan.liang@linux.intel.com>
 
-With PEBS virtualization, the PEBS record gets delivered to the guest,
-but host still sees the PMI. This would normally result in a spurious
-PEBS PMI that is ignored. But we need to inject the PMI into the guest,
-so that the guest PMI handler can handle the PEBS record.
+KVM needs to disable PEBS auto-reload for guest owned event to avoid
+unnecessory drain_pebs() in host.
 
-Check for this case in the perf PEBS handler. If a guest PEBS counter
-overflowed, a fake event will be triggered. The fake event results in
-calling the KVM PMI callback, which injects the PMI into the guest.
+Expose a function to disable auto-reload mechanism by unset the related
+flag. The function has to be invoked before event enabling, otherwise
+there is no effect.
 
-No matter how many PEBS counters are overflowed, only triggering one
-fake event is enough. Then the guest handler would retrieve the correct
-information from its own PEBS records including the guest state.
-
-Originally-by: Andi Kleen <ak@linux.intel.com>
 Signed-off-by: Kan Liang <kan.liang@linux.intel.com>
 ---
- arch/x86/events/intel/ds.c | 59 ++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 59 insertions(+)
+ arch/x86/events/intel/core.c      | 14 ++++++++++++++
+ arch/x86/include/asm/perf_event.h |  2 ++
+ 2 files changed, 16 insertions(+)
 
-diff --git a/arch/x86/events/intel/ds.c b/arch/x86/events/intel/ds.c
-index dc43cc1..6722f39 100644
---- a/arch/x86/events/intel/ds.c
-+++ b/arch/x86/events/intel/ds.c
-@@ -1721,6 +1721,62 @@ void intel_pmu_auto_reload_read(struct perf_event *event)
- 	return 0;
+diff --git a/arch/x86/events/intel/core.c b/arch/x86/events/intel/core.c
+index ef95076..cd17601 100644
+--- a/arch/x86/events/intel/core.c
++++ b/arch/x86/events/intel/core.c
+@@ -3299,6 +3299,20 @@ static int core_pmu_hw_config(struct perf_event *event)
+ 	return intel_pmu_bts_config(event);
  }
  
 +/*
-+ * We may be running with virtualized PEBS, so the PEBS record
-+ * was logged into the guest's DS and is invisible to host.
++ * Disable PEBS auto-reload mechanism by unset the flag.
++ * The function has to be invoked before event enabling,
++ * otherwise there is no effect.
 + *
-+ * For guest-dedicated counters we always have to check if the
-+ * counters are overflowed, because PEBS thresholds
-+ * are not reported in the PERF_GLOBAL_STATUS.
-+ *
-+ * In this case we just trigger a fake event for KVM to forward
-+ * to the guest as PMI. The guest will then see the real PEBS
-+ * record and read the counter values.
-+ *
-+ * The contents of the event do not matter.
++ * Currently, it's used by KVM to disable PEBS auto-reload
++ * for guest owned event.
 + */
-+static int intel_pmu_handle_guest_pebs(struct cpu_hw_events *cpuc,
-+				       struct pt_regs *iregs,
-+				       struct debug_store *ds)
++void perf_x86_pmu_unset_auto_reload(struct perf_event *event)
 +{
-+	struct perf_sample_data data;
-+	struct perf_event *event;
-+	int bit;
-+
-+	/*
-+	 * Ideally, we should check guest DS to understand if the
-+	 * guest-dedicated PEBS counters are overflowed.
-+	 *
-+	 * However, it brings high overhead to retrieve guest DS in host.
-+	 * The host and guest cannot have pending PEBS events simultaneously.
-+	 * So we check host DS instead.
-+	 *
-+	 * If PEBS interrupt threshold on host is not exceeded in a NMI,
-+	 * the guest-dedicated counter must be overflowed.
-+	 */
-+	if (!cpuc->intel_ctrl_guest_dedicated_mask || !in_nmi() ||
-+	    (ds->pebs_interrupt_threshold <= ds->pebs_index))
-+		return 0;
-+
-+	for_each_set_bit(bit,
-+		(unsigned long *)&cpuc->intel_ctrl_guest_dedicated_mask,
-+			INTEL_PMC_IDX_FIXED + x86_pmu.num_counters_fixed) {
-+
-+		event = cpuc->events[bit];
-+		if (!event->attr.precise_ip)
-+			continue;
-+
-+		perf_sample_data_init(&data, 0, event->hw.last_period);
-+		if (perf_event_overflow(event, &data, iregs))
-+			x86_pmu_stop(event, 0);
-+
-+		/* Inject one fake event is enough. */
-+		return 1;
-+	}
-+
-+	return 0;
++	event->hw.flags &= ~PERF_X86_EVENT_AUTO_RELOAD;
 +}
++EXPORT_SYMBOL_GPL(perf_x86_pmu_unset_auto_reload);
 +
- static void __intel_pmu_pebs_event(struct perf_event *event,
- 				   struct pt_regs *iregs,
- 				   void *base, void *top,
-@@ -1954,6 +2010,9 @@ static void intel_pmu_drain_pebs_icl(struct pt_regs *iregs)
- 	if (!x86_pmu.pebs_active)
- 		return;
+ static int intel_pmu_hw_config(struct perf_event *event)
+ {
+ 	int ret = x86_pmu_hw_config(event);
+diff --git a/arch/x86/include/asm/perf_event.h b/arch/x86/include/asm/perf_event.h
+index 29964b0..6179234 100644
+--- a/arch/x86/include/asm/perf_event.h
++++ b/arch/x86/include/asm/perf_event.h
+@@ -325,6 +325,7 @@ struct perf_guest_switch_msr {
+ extern void perf_get_x86_pmu_capability(struct x86_pmu_capability *cap);
+ extern void perf_check_microcode(void);
+ extern int x86_perf_rdpmc_index(struct perf_event *event);
++extern void perf_x86_pmu_unset_auto_reload(struct perf_event *event);
+ #else
+ static inline void perf_get_x86_pmu_capability(struct x86_pmu_capability *cap)
+ {
+@@ -333,6 +334,7 @@ static inline void perf_get_x86_pmu_capability(struct x86_pmu_capability *cap)
  
-+	if (intel_pmu_handle_guest_pebs(cpuc, iregs, ds))
-+		return;
-+
- 	base = (struct pebs_basic *)(unsigned long)ds->pebs_buffer_base;
- 	top = (struct pebs_basic *)(unsigned long)ds->pebs_index;
+ static inline void perf_events_lapic_init(void)	{ }
+ static inline void perf_check_microcode(void) { }
++static inline void perf_x86_pmu_unset_auto_reload(struct perf_event *event) { }
+ #endif
  
+ #if defined(CONFIG_PERF_EVENTS) && defined(CONFIG_CPU_SUP_INTEL)
 -- 
 1.8.3.1
 
