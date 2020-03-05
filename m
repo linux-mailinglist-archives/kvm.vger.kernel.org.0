@@ -2,109 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 56DFE17B0ED
-	for <lists+kvm@lfdr.de>; Thu,  5 Mar 2020 22:52:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 24DEA17B1E4
+	for <lists+kvm@lfdr.de>; Thu,  5 Mar 2020 23:49:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726351AbgCEVvv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 Mar 2020 16:51:51 -0500
-Received: from mga02.intel.com ([134.134.136.20]:5375 "EHLO mga02.intel.com"
+        id S1726498AbgCEWsx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 Mar 2020 17:48:53 -0500
+Received: from mga11.intel.com ([192.55.52.93]:5209 "EHLO mga11.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726141AbgCEVvv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 5 Mar 2020 16:51:51 -0500
+        id S1726300AbgCEWsx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 5 Mar 2020 17:48:53 -0500
 X-Amp-Result: UNKNOWN
 X-Amp-Original-Verdict: FILE UNKNOWN
 X-Amp-File-Uploaded: False
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 05 Mar 2020 13:51:50 -0800
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 05 Mar 2020 14:48:53 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.70,519,1574150400"; 
-   d="scan'208";a="234564919"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
-  by orsmga008.jf.intel.com with ESMTP; 05 Mar 2020 13:51:50 -0800
-Date:   Thu, 5 Mar 2020 13:51:50 -0800
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Jim Mattson <jmattson@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>, Pu Wen <puwen@hygon.cn>
-Subject: Re: [PATCH v2 4/7] KVM: x86: Fix CPUID range checks for Hypervisor
- and Centaur classes
-Message-ID: <20200305215149.GS11500@linux.intel.com>
-References: <20200305013437.8578-1-sean.j.christopherson@intel.com>
- <20200305013437.8578-5-sean.j.christopherson@intel.com>
- <CALMp9eRRWZ54kzMXdTqRCy2KmaUAq+HVVVzbxJNVdgktg65XCA@mail.gmail.com>
- <20200305192532.GN11500@linux.intel.com>
- <CALMp9eRxdGj0DL0_g-an0YC+gTMcWcSk7=md=k4-8S0Zcankbg@mail.gmail.com>
+   d="scan'208";a="387645389"
+Received: from tassilo.jf.intel.com (HELO tassilo.localdomain) ([10.7.201.21])
+  by orsmga004.jf.intel.com with ESMTP; 05 Mar 2020 14:48:52 -0800
+Received: by tassilo.localdomain (Postfix, from userid 1000)
+        id C0679301BC6; Thu,  5 Mar 2020 14:48:52 -0800 (PST)
+Date:   Thu, 5 Mar 2020 14:48:52 -0800
+From:   Andi Kleen <ak@linux.intel.com>
+To:     Luwei Kang <luwei.kang@intel.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        peterz@infradead.org, mingo@redhat.com, acme@kernel.org,
+        mark.rutland@arm.com, alexander.shishkin@linux.intel.com,
+        jolsa@redhat.com, namhyung@kernel.org, tglx@linutronix.de,
+        bp@alien8.de, hpa@zytor.com, pbonzini@redhat.com,
+        sean.j.christopherson@intel.com, vkuznets@redhat.com,
+        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
+        pawan.kumar.gupta@linux.intel.com, thomas.lendacky@amd.com,
+        fenghua.yu@intel.com, kan.liang@linux.intel.com,
+        like.xu@linux.intel.com
+Subject: Re: [PATCH v1 00/11] PEBS virtualization enabling via DS
+Message-ID: <20200305224852.GE1454533@tassilo.jf.intel.com>
+References: <1583431025-19802-1-git-send-email-luwei.kang@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CALMp9eRxdGj0DL0_g-an0YC+gTMcWcSk7=md=k4-8S0Zcankbg@mail.gmail.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <1583431025-19802-1-git-send-email-luwei.kang@intel.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 05, 2020 at 01:10:57PM -0800, Jim Mattson wrote:
-> On Thu, Mar 5, 2020 at 11:25 AM Sean Christopherson
-> <sean.j.christopherson@intel.com> wrote:
-> >
-> > On Thu, Mar 05, 2020 at 10:43:51AM -0800, Jim Mattson wrote:
-> > > On Wed, Mar 4, 2020 at 5:34 PM Sean Christopherson
-> > > <sean.j.christopherson@intel.com> wrote:
-> > > >
-> > > > Rework the masking in the out-of-range CPUID logic to handle the
-> > > > Hypervisor sub-classes, as well as the Centaur class if the guest
-> > > > virtual CPU vendor is Centaur.
-> > > >
-> > > > Masking against 0x80000000 only handles basic and extended leafs, which
-> > > > results in Hypervisor range checks being performed against the basic
-> > > > CPUID class, and Centuar range checks being performed against the
-> > > > Extended class.  E.g. if CPUID.0x40000000.EAX returns 0x4000000A and
-> > > > there is no entry for CPUID.0x40000006, then function 0x40000006 would
-> > > > be incorrectly reported as out of bounds.
-> > > >
-> > > > While there is no official definition of what constitutes a class, the
-> > > > convention established for Hypervisor classes effectively uses bits 31:8
-> > > > as the mask by virtue of checking for different bases in increments of
-> > > > 0x100, e.g. KVM advertises its CPUID functions starting at 0x40000100
-> > > > when HyperV features are advertised at the default base of 0x40000000.
-> > > >
-> > > > The bad range check doesn't cause functional problems for any known VMM
-> > > > because out-of-range semantics only come into play if the exact entry
-> > > > isn't found, and VMMs either support a very limited Hypervisor range,
-> > > > e.g. the official KVM range is 0x40000000-0x40000001 (effectively no
-> > > > room for undefined leafs) or explicitly defines gaps to be zero, e.g.
-> > > > Qemu explicitly creates zeroed entries up to the Cenatur and Hypervisor
-> > > > limits (the latter comes into play when providing HyperV features).
-> > > >
-> > > > The bad behavior can be visually confirmed by dumping CPUID output in
-> > > > the guest when running Qemu with a stable TSC, as Qemu extends the limit
-> > > > of range 0x40000000 to 0x40000010 to advertise VMware's cpuid_freq,
-> > > > without defining zeroed entries for 0x40000002 - 0x4000000f.
-> > > >
-> > > > Note, documentation of Centaur/VIA CPUs is hard to come by.  Designating
-> > > > 0xc0000000 - 0xcfffffff as the Centaur class is a best guess as to the
-> > > > behavior of a real Centaur/VIA CPU.
-> > >
-> > > Don't forget Transmeta's CPUID range at 0x80860000 through 0x8086FFFF!
-> >
-> > Hmm, is it actually needed here?  KVM doesn't advertise support for that
-> > range in KVM_GET_SUPPORTED_CPUID.
+> Testing:
+> The guest can use PEBS feature like native. e.g.
 
-> > That's also why I limited the Centaur
-> > range to vendor==CENTAUR, as KVM_GET_SUPPORTED_CPUID enumerates the
-> > Centaur range if and only if the host CPU is Centaur.
+Could you please add example qemu command lines too? That will make it much easier
+for someone to reproduce.
 
-Actually, I take this part of that comment back.  I limited this to
-vendor==CENTAUR so that it wouldn't conflict with an actual Intel CPU if
-Intel adds a CPUID leaf in the 0xc0000000 range.
-
-> Ah. So cross-vendor CPUID specifications are not supported?
-
-Cross-vendor CPUID is sort of allowed?  E.g. this plays nice with creating
-a Centaur CPU on an Intel platform.  My interpretation of GET_SUPPORTED...
-is that KVM won't prevent enumerating what you want in CPUID, but it only
-promises to correctly support select leafs.
+-Andi
+> 
+> # perf record -e instructions:ppp ./br_instr a
+> 
+> perf report on guest:
+> # Samples: 2K of event 'instructions:ppp', # Event count (approx.): 1473377250
+> # Overhead  Command   Shared Object      Symbol
+>   57.74%  br_instr  br_instr           [.] lfsr_cond
+>   41.40%  br_instr  br_instr           [.] cmp_end
+>    0.21%  br_instr  [kernel.kallsyms]  [k] __lock_acquire
+> 
+> perf report on host:
+> # Samples: 2K of event 'instructions:ppp', # Event count (approx.): 1462721386
+> # Overhead  Command   Shared Object     Symbol
+>   57.90%  br_instr  br_instr          [.] lfsr_cond
+>   41.95%  br_instr  br_instr          [.] cmp_end
+>    0.05%  br_instr  [kernel.vmlinux]  [k] lock_acquire
