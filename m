@@ -2,110 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D356117A498
-	for <lists+kvm@lfdr.de>; Thu,  5 Mar 2020 12:49:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A761417A53A
+	for <lists+kvm@lfdr.de>; Thu,  5 Mar 2020 13:28:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727255AbgCELta (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 Mar 2020 06:49:30 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:38918 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726990AbgCELta (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 5 Mar 2020 06:49:30 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1583408969;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=jjEqvtB2T3AtCQceC0s+9bXMXtVod456eAE+2om8cIk=;
-        b=WElYReDp0mSyv2i33b08pu5v1TggpJGwjlg/5gbRQIS/vNpptYSDiEE/OykTEr+fF8gPQv
-        y++ohRJ7DFTrnapS3yi2NEk+lR1LXEpL+w7erqXnmTQZGw/EOnixDyJpgnpx3XAj3XSO6N
-        Nsd+RqdYs62veDqw4UUI0R100oXrujk=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-63-XaM7QyrmNdC6KHxwXNbwhQ-1; Thu, 05 Mar 2020 06:49:27 -0500
-X-MC-Unique: XaM7QyrmNdC6KHxwXNbwhQ-1
-Received: by mail-wr1-f72.google.com with SMTP id f10so2206102wrv.1
-        for <kvm@vger.kernel.org>; Thu, 05 Mar 2020 03:49:27 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=jjEqvtB2T3AtCQceC0s+9bXMXtVod456eAE+2om8cIk=;
-        b=f5Ab21y5cD4rEN2qBLI27vcrPbIhD/PZNrSLEX6TSRJ/bcBWjSpfpq/cAmAcirCi6l
-         P1yf18Bv6ByU2rjuG3s9tCyPlyDdfZylRY/m/quLuzoEJ9G54NiVqJBfosXcRAt1L0nP
-         Rj5TzS3CS64gbKqNSRgyx6smVpsaLPiCzVHQxhaakWYdo0+7hK8JX/uwCgFPobCwE0VC
-         qeE5L0q8WK0oiejDvQh01naBPwDi682nqDFWKqrsyaHG+q9MFa5K4WW6iYGdgom9Wtso
-         DjEh3Tfvgeivrl0tD+OM8BlwQQo/dyCA6AHuIY7ix6Lz6JYGlo3VaI4PjcLs3Mmlj8YD
-         GNUg==
-X-Gm-Message-State: ANhLgQ2RP+oGP51Nr85XL0z0Z/q/KhskzAUhVzivAkIFVOvJgfsz/MW0
-        EtEge1LQ7AcSGUuiNaSAi5gX3fzre/qdXmWMPxSgMAWAKc1kVl8tVR4rfXb2vpsqVaoD8yHJT3A
-        LuznX2dcoXS1T
-X-Received: by 2002:a5d:4f03:: with SMTP id c3mr9700623wru.336.1583408966553;
-        Thu, 05 Mar 2020 03:49:26 -0800 (PST)
-X-Google-Smtp-Source: ADFU+vvWp4hDVBVG1qtAYBSlwG0TuP+swcJOdAhM8+FTa0BbErmeYy/trLgrnVFpjM/xmz56FptGfA==
-X-Received: by 2002:a5d:4f03:: with SMTP id c3mr9700595wru.336.1583408966345;
-        Thu, 05 Mar 2020 03:49:26 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:9def:34a0:b68d:9993? ([2001:b07:6468:f312:9def:34a0:b68d:9993])
-        by smtp.gmail.com with ESMTPSA id n3sm9523174wmc.27.2020.03.05.03.49.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 05 Mar 2020 03:49:25 -0800 (PST)
-Subject: Re: [PATCH] KVM: VMX: Use wrapper macro
- ~RMODE_GUEST_OWNED_EFLAGS_BITS directly
-To:     linmiaohe <linmiaohe@huawei.com>, rkrcmar@redhat.com,
-        sean.j.christopherson@intel.com, vkuznets@redhat.com,
-        jmattson@google.com, joro@8bytes.org, tglx@linutronix.de,
-        mingo@redhat.com, bp@alien8.de, hpa@zytor.com
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org
-References: <1583375731-18219-1-git-send-email-linmiaohe@huawei.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <f5aaab6f-8111-8d12-754f-027989fd4b06@redhat.com>
-Date:   Thu, 5 Mar 2020 12:49:23 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+        id S1725989AbgCEM2G (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 Mar 2020 07:28:06 -0500
+Received: from mga06.intel.com ([134.134.136.31]:28113 "EHLO mga06.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725880AbgCEM2G (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 5 Mar 2020 07:28:06 -0500
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 05 Mar 2020 04:28:04 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,518,1574150400"; 
+   d="scan'208";a="352352187"
+Received: from local-michael-cet-test.sh.intel.com (HELO localhost) ([10.239.159.128])
+  by fmsmga001.fm.intel.com with ESMTP; 05 Mar 2020 04:28:02 -0800
+Date:   Thu, 5 Mar 2020 20:31:31 +0800
+From:   Yang Weijiang <weijiang.yang@intel.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Yang Weijiang <weijiang.yang@intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, pbonzini@redhat.com,
+        jmattson@google.com, yu.c.zhang@linux.intel.com
+Subject: Re: [PATCH v9 7/7] KVM: X86: Add user-space access interface for CET
+ MSRs
+Message-ID: <20200305123130.GA17242@local-michael-cet-test.sh.intel.com>
+References: <20191227021133.11993-1-weijiang.yang@intel.com>
+ <20191227021133.11993-8-weijiang.yang@intel.com>
+ <20200303222827.GC1439@linux.intel.com>
+ <20200304151815.GD5831@local-michael-cet-test.sh.intel.com>
+ <20200304154538.GB21662@linux.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <1583375731-18219-1-git-send-email-linmiaohe@huawei.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200304154538.GB21662@linux.intel.com>
+User-Agent: Mutt/1.11.3 (2019-02-01)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 05/03/20 03:35, linmiaohe wrote:
-> (X86_EFLAGS_IOPL | X86_EFLAGS_VM) indicates the eflag bits that can not be
-> owned by realmode guest, i.e. ~RMODE_GUEST_OWNED_EFLAGS_BITS.
-
-... but ~RMODE_GUEST_OWNED_EFLAGS_BITS is the bits that are owned by the
-host; they could be 0 or 1 and that's why the code was using
-X86_EFLAGS_IOPL | X86_EFLAGS_VM.
-
-I understand where ~RMODE_GUEST_OWNED_EFLAGS_BITS is better than
-X86_EFLAGS_IOPL | X86_EFLAGS_VM, but I cannot think of a way to express
-it that is the best of both worlds.
-
-Paolo
-
- Use wrapper
-> macro directly to make it clear and also improve readability.
+On Wed, Mar 04, 2020 at 07:45:38AM -0800, Sean Christopherson wrote:
+> On Wed, Mar 04, 2020 at 11:18:15PM +0800, Yang Weijiang wrote:
+> > On Tue, Mar 03, 2020 at 02:28:27PM -0800, Sean Christopherson wrote:
+> > > > @@ -1886,6 +1976,26 @@ static int vmx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+> > > >  		else
+> > > >  			msr_info->data = vmx->pt_desc.guest.addr_a[index / 2];
+> > > >  		break;
+> > > > +	case MSR_IA32_S_CET:
+> > > > +		if (!cet_ctl_access_allowed(vcpu, msr_info))
+> > > > +			return 1;
+> > > > +		msr_info->data = vmcs_readl(GUEST_S_CET);
+> > > > +		break;
+> > > > +	case MSR_IA32_INT_SSP_TAB:
+> > > > +		if (!cet_ssp_access_allowed(vcpu, msr_info))
+> > > > +			return 1;
+> > > > +		msr_info->data = vmcs_readl(GUEST_INTR_SSP_TABLE);
+> > > > +		break;
+> > > > +	case MSR_IA32_U_CET:
+> > > > +		if (!cet_ctl_access_allowed(vcpu, msr_info))
+> > > > +			return 1;
+> > > > +		rdmsrl(MSR_IA32_U_CET, msr_info->data);
+> > > > +		break;
+> > > > +	case MSR_IA32_PL0_SSP ... MSR_IA32_PL3_SSP:
+> > > > +		if (!cet_ssp_access_allowed(vcpu, msr_info))
+> > > > +			return 1;
+> > > > +		rdmsrl(msr_info->index, msr_info->data);
+> > > 
+> > > Ugh, thought of another problem.  If a SoftIRQ runs after an IRQ it can
+> > > load the kernel FPU state.  So for all the XSAVES MSRs we'll need a helper
+> > > similar to vmx_write_guest_kernel_gs_base(), except XSAVES has to be even
+> > > more restrictive and disable IRQs entirely.  E.g.
+> > > 
+> > > static void vmx_get_xsave_msr(struct msr_data *msr_info)
+> > > {
+> > > 	local_irq_disable();
+> > > 	if (test_thread_flag(TIF_NEED_FPU_LOAD))
+> > > 		switch_fpu_return();
+> > > 	rdmsrl(msr_info->index, msr_info->data);
+> > > 	local_irq_enable();
+> > In this case, would SoftIRQ destroy vcpu->arch.guest.fpu states which
+> > had been restored to XSAVES MSRs that we were accessing?
 > 
-> Signed-off-by: Miaohe Lin <linmiaohe@huawei.com>
-> ---
->  arch/x86/kvm/vmx/vmx.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+> Doing kernel_fpu_begin() from a softirq would swap guest.fpu out of the
+> CPUs registers.  It sets TIF_NEED_FPU_LOAD to mark the tasks has needing to
+> reload its FPU state prior to returning to userspace.  So it doesn't
+> destroy it per se.  The result is that KVM would read/write the CET MSRs
+> after they're loaded from the kernel's FPU state instead of reading the
+> MSRs loaded from the guest's FPU state.
+>
+OK, will wrap the access code with a helper, thank you!
+> > So should we restore
+> > guest.fpu or? In previous patch, we have restored guest.fpu before
+> > access the XSAVES MSRs.
 > 
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 743b81642ce2..9571f8dea016 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -1466,7 +1466,7 @@ void vmx_set_rflags(struct kvm_vcpu *vcpu, unsigned long rflags)
->  	vmx->rflags = rflags;
->  	if (vmx->rmode.vm86_active) {
->  		vmx->rmode.save_rflags = rflags;
-> -		rflags |= X86_EFLAGS_IOPL | X86_EFLAGS_VM;
-> +		rflags |= ~RMODE_GUEST_OWNED_EFLAGS_BITS;
->  	}
->  	vmcs_writel(GUEST_RFLAGS, rflags);
+> There are three different FPU states:
+> 
+>   - kernel
+>   - userspace
+>   - guest
+> 
+> RDMSR/WRMSR for CET MSRs need to run while the guest.fpu state is loaded
+> into the CPU registers[1].  At the beginning of the syscall from userspace,
+> i.e. the vCPU ioctl(), the task's FPU state[2] holds userspace FPU state.
+> Patch 6/7 swaps out the userspace state and loads the guest state.
+> 
+> But, if a softirq runs between kvm_load_guest_fpu() and now, and executes
+> kernel_fpu_begin(), it will swap the guest state (out of CPU registers)
+> and load the kernel state (into PCU registers).  The actual RDMSR/WRMSR
+> needs to ensure the guest state is still loaded by checking and handling
+> TIF_NEED_FPU_LOAD.
+> 
+> [1] An alternative to doing switch_fpu_return() on TIF_NEED_FPU_LOAD would
+>     be to calculate the offset into the xsave and read/write directly
+>     to/from memory.  But IMO that's unnecessary complexity as the guest's
+>     fpu state still needs to be reloaded before re-entering the guest, e.g.
+>     if vmx_{g,s}et_msr() is invoked on {RD,WR}MSR intercept, while loading
+>     or saving MSR state from userspace isn't a hot path.
+> 
+> [2] I worded this to say "task's FPU state" because it's also possible the
+>     CPU registers hold kernel state at the beginning of the vCPU ioctl(),
+>     e.g. because of softirq.
 
+It's clear to me, thanks for the explanation.
