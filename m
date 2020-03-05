@@ -2,144 +2,155 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9D4B517A2D8
-	for <lists+kvm@lfdr.de>; Thu,  5 Mar 2020 11:08:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2399A17A2E0
+	for <lists+kvm@lfdr.de>; Thu,  5 Mar 2020 11:11:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726263AbgCEKIr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 Mar 2020 05:08:47 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:32514 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726048AbgCEKIq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 5 Mar 2020 05:08:46 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1583402924;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=a++OnOLHx7X8yF6qTfZsk/CBiAFakXwwpWB/hlFxqQk=;
-        b=SHxUw6UnW4w3sBeRYx1g8BfAzhflcOHnhnON7ZcGta1R4qEw1FXzKtQFhLo+E9mvKVeEza
-        x0YEU1jiuDD7m5x6D+x1R1iwD2nO5WEZDAMwkxPxxZZO9oO93LDtwnRL0m4i1Jc+H6bcEJ
-        o50EFZg1TWllUSaR566wJOb3YLogi1Q=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-81-O_gN0nsjP-S084ZcD2mxow-1; Thu, 05 Mar 2020 05:08:43 -0500
-X-MC-Unique: O_gN0nsjP-S084ZcD2mxow-1
-Received: by mail-wr1-f70.google.com with SMTP id w8so2092082wrn.7
-        for <kvm@vger.kernel.org>; Thu, 05 Mar 2020 02:08:42 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=a++OnOLHx7X8yF6qTfZsk/CBiAFakXwwpWB/hlFxqQk=;
-        b=s5SeAdO8O+VWVZPJz0IMA20Qs01l34A5xMDo2aVeyVGEgZr21Tproucgjy0kNRqi7o
-         gwAkfwEcdg1/X56b1T1u/rqkJzmdLNLyaFVcfzl9obYYLz/yEGo2hOG0U4PRqnwqSvzt
-         OwnngDyzppKVyTIfBIhAn1w5C82Eb/PRxgEEy+cGn+jskRwj8a1T662T4QSP2KyVk+dA
-         gi2HZS0cuQJP35kIDwpDQdxHOBjjIBy1E+m3fQfyixh53RmirnkfGURbivIQJeCE4Ckq
-         rnXRLCL8Jt8mVsemzY7dSli1DJWuYxwGmaLKnor0n6k+t2kqrE18+FRlwurIDdo8rDs6
-         wuhw==
-X-Gm-Message-State: ANhLgQ1K5IJtLa4eaRGIgn+TRMXtrMrUjvLSY3Dic4hIXsNktmCNULNb
-        A4gH80hPQC2gPx/Qo6euRM48QGvJmr6oRruXitvBI+weWIq5J7zW0Vtz7JWPXM3wCxGSYYzX8w8
-        gfyIvqPM3b584
-X-Received: by 2002:a1c:f008:: with SMTP id a8mr8497017wmb.81.1583402921632;
-        Thu, 05 Mar 2020 02:08:41 -0800 (PST)
-X-Google-Smtp-Source: ADFU+vsbhjFKaAeSfPW48bnxoeEB0ks/A9uEmzLV2bTa/Ugj9be5kTg7qhyLsAMwgyzYk+RO9VUxug==
-X-Received: by 2002:a1c:f008:: with SMTP id a8mr8497006wmb.81.1583402921444;
-        Thu, 05 Mar 2020 02:08:41 -0800 (PST)
-Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id i6sm10535928wra.42.2020.03.05.02.08.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Mar 2020 02:08:40 -0800 (PST)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     linmiaohe <linmiaohe@huawei.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org,
-        pbonzini@redhat.com, rkrcmar@redhat.com,
-        sean.j.christopherson@intel.com, jmattson@google.com,
-        joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, hpa@zytor.com
-Subject: Re: [PATCH] KVM: VMX: Use wrapper macro ~RMODE_GUEST_OWNED_EFLAGS_BITS directly
-In-Reply-To: <1583375731-18219-1-git-send-email-linmiaohe@huawei.com>
-References: <1583375731-18219-1-git-send-email-linmiaohe@huawei.com>
-Date:   Thu, 05 Mar 2020 11:08:39 +0100
-Message-ID: <87tv33cdw8.fsf@vitty.brq.redhat.com>
+        id S1726846AbgCEKL2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 Mar 2020 05:11:28 -0500
+Received: from mail.kernel.org ([198.145.29.99]:43900 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726049AbgCEKL2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 5 Mar 2020 05:11:28 -0500
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 0A64120848;
+        Thu,  5 Mar 2020 10:11:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1583403087;
+        bh=VhcSG0+t6WlVkEBhrGpV+M/UFgLccIJ9/P7MZTSa6xk=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=CyIMrRa4c4dl44Pfg7aYaPPPtPbFne68bjNvIugCopp0cq0UPJbQF9m1jOFrRjm/v
+         bQ+VZeUn2KI8C8P1uu8lpJw5uiMK4zTISaDaRRh5EzYiFq0bNdHjT/Gk0nYNCO3MvR
+         W9Gfn7ZfFsUd+686TRtUOQ3G7BZp+J01cA1S/UJ8=
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+        by disco-boy.misterjones.org with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        (Exim 4.92)
+        (envelope-from <maz@kernel.org>)
+        id 1j9nTR-00AFO9-8N; Thu, 05 Mar 2020 10:11:25 +0000
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date:   Thu, 05 Mar 2020 10:11:25 +0000
+From:   Marc Zyngier <maz@kernel.org>
+To:     Naresh Kamboju <naresh.kamboju@linaro.org>
+Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
+        Andrew Jones <drjones@redhat.com>,
+        kvm list <kvm@vger.kernel.org>, lkft-triage@lists.linaro.org,
+        Krish Sadhukhan <krish.sadhukhan@oracle.com>, yzt356@gmail.com,
+        Jim Mattson <jmattson@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, namit@vmware.com,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Basil Eljuse <Basil.Eljuse@arm.com>, kvm-owner@vger.kernel.org
+Subject: Re: kvm-unit-tests : Kconfigs and extra kernel args for full coverage
+In-Reply-To: <CA+G9fYt2UFv=i5Wg1cwM-hiHNRdkTUHjMZUfbWCY=CWVAoSwrQ@mail.gmail.com>
+References: <CA+G9fYvx=WzyJqS4fUFLq8qXT8nbFQoFfXZoeL9kP-hvv549EA@mail.gmail.com>
+ <c82f4386-702f-a2e9-a4d7-d5ebb1f335d1@arm.com>
+ <20200224133818.gtxtrmzo4y4guk4z@kamzik.brq.redhat.com>
+ <adf05c0d-6a19-da06-5e41-da63b0d0d8d8@arm.com>
+ <20200224145936.mzpwveaoijjmb5ql@kamzik.brq.redhat.com>
+ <CA+G9fYvt2LyqU5G2j_EFKzgPXzt8sDYYm8NxP+zD6Do07REsYw@mail.gmail.com>
+ <7b9209be-f880-a791-a2b9-c7e98bf05ecd@arm.com>
+ <CA+G9fYvjoeLV5B951yFb8fc7r+WAejz+0kHcFYTNzW6+HfouXw@mail.gmail.com>
+ <CA+G9fYuEfrhW_7vLCdK4nKBhDv6aQkK_knUY7mbgeDcuaETLyQ@mail.gmail.com>
+ <a1f51266-d735-402a-6273-8ae84d415881@arm.com>
+ <CA+G9fYt2UFv=i5Wg1cwM-hiHNRdkTUHjMZUfbWCY=CWVAoSwrQ@mail.gmail.com>
+Message-ID: <91cf9799db79b83fec4b3fc304969e16@misterjones.org>
+X-Sender: maz@kernel.org
+User-Agent: Roundcube Webmail/1.3.10
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: naresh.kamboju@linaro.org, alexandru.elisei@arm.com, drjones@redhat.com, kvm@vger.kernel.org, lkft-triage@lists.linaro.org, krish.sadhukhan@oracle.com, yzt356@gmail.com, jmattson@google.com, pbonzini@redhat.com, namit@vmware.com, sean.j.christopherson@intel.com, Basil.Eljuse@arm.com, kvm-owner@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-linmiaohe <linmiaohe@huawei.com> writes:
+On 2020-03-03 18:53, Naresh Kamboju wrote:
+> On Tue, 3 Mar 2020 at 21:32, Alexandru Elisei 
+> <alexandru.elisei@arm.com> wrote:
+>> 
+>> Hi,
+>> 
+>> On 2/25/20 8:20 AM, Naresh Kamboju wrote:
+>> > Hi Alexandru,
+>> >
+>> > On Mon, 24 Feb 2020 at 23:14, Naresh Kamboju <naresh.kamboju@linaro.org> wrote:
+>> >>> I think this is because you are running it on one physical CPU (it's exactly the
+>> >>> same message I am getting when I use taskset to run the tests). Can you try and
+>> >>> run it without taskset and see if it solves your issue?
+>> > We have a new problem when running [1] without taskset on Juno-r2.
+>> > None of the test got pass [2] when running without taskset on Juno-r2.
+>> >
+>> I think I have an explanation for why all the tests fail. qemu creates 
+>> a vcpu to
+>> match the host cpu in kvm_arm_create_scratch_host_vcpu and it sets the 
+>> target to
+>> whatever the result of the KVM_ARM_PREFERRED_TARGET ioctl is. If it's 
+>> run on the
+>> little core, the target will be KVM_ARM_TARGET_CORTEX_A53. If it's run 
+>> on the big
+>> core, the target will be KVM_ARM_TARGET_GENERIC_V8. I tried it a few 
+>> times, and
+>> for me it has always been the big core.
+>> 
+>> The vcpu is created from a different thread by doing a 
+>> KVM_ARM_VCPU_INIT ioctl and
+>> KVM makes sure that the vcpu target matches the target corresponding 
+>> to the
+>> physical CPU the thread is running on. What is happening is that the 
+>> vcpu thread
+>> is run on a little core, so the target as far as KVM is concerned 
+>> should be
+>> KVM_ARM_TARGET_CORTEX_A53, but qemu (correctly) set it to
+>> KVM_ARM_TARGET_GENERIC_V8. The ioctl return -EINVAL (-22) and qemu 
+>> dies.
+>> 
+>> To get around this, I ran the tests either only on the big cores or on 
+>> the little
+>> cores.
+> 
+> Thanks for explaining in details.
+> I have seen this scenario and defined my test to run only on CPU 0.
+> The CPU 0 on my Juno-r2 devices found to be LITTLE CPU.
 
-> From: Miaohe Lin <linmiaohe@huawei.com>
->
-> (X86_EFLAGS_IOPL | X86_EFLAGS_VM) indicates the eflag bits that can not be
-> owned by realmode guest, i.e. ~RMODE_GUEST_OWNED_EFLAGS_BITS. Use wrapper
-> macro directly to make it clear and also improve readability.
->
-> Signed-off-by: Miaohe Lin <linmiaohe@huawei.com>
-> ---
->  arch/x86/kvm/vmx/vmx.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 743b81642ce2..9571f8dea016 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -1466,7 +1466,7 @@ void vmx_set_rflags(struct kvm_vcpu *vcpu, unsigned long rflags)
->  	vmx->rflags = rflags;
->  	if (vmx->rmode.vm86_active) {
->  		vmx->rmode.save_rflags = rflags;
-> -		rflags |= X86_EFLAGS_IOPL | X86_EFLAGS_VM;
-> +		rflags |= ~RMODE_GUEST_OWNED_EFLAGS_BITS;
->  	}
->  	vmcs_writel(GUEST_RFLAGS, rflags);
->  
-> @@ -2797,7 +2797,7 @@ static void enter_rmode(struct kvm_vcpu *vcpu)
->  	flags = vmcs_readl(GUEST_RFLAGS);
->  	vmx->rmode.save_rflags = flags;
->  
-> -	flags |= X86_EFLAGS_IOPL | X86_EFLAGS_VM;
-> +	flags |= ~RMODE_GUEST_OWNED_EFLAGS_BITS;
->  
->  	vmcs_writel(GUEST_RFLAGS, flags);
->  	vmcs_writel(GUEST_CR4, vmcs_readl(GUEST_CR4) | X86_CR4_VME);
+big-little? Just say no.
 
-Double negations are evil, let's define a macro for 'X86_EFLAGS_IOPL |
-X86_EFLAGS_VM' instead (completely untested):
+To be clear: this isn't a workaround. big-little is a fundamentally 
+broken
+paradigm when it comes to virtualization. If you let vcpus roam of 
+different
+u-archs, you will end-up with unpredictable results. So QEMU does the 
+right
+thing, and refuses to start a VM in these conditions.
 
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 4ee19fb35cde..d838f93bd6d2 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -139,7 +139,8 @@ module_param_named(preemption_timer, enable_preemption_timer, bool, S_IRUGO);
- #define KVM_PMODE_VM_CR4_ALWAYS_ON (X86_CR4_PAE | X86_CR4_VMXE)
- #define KVM_RMODE_VM_CR4_ALWAYS_ON (X86_CR4_VME | X86_CR4_PAE | X86_CR4_VMXE)
- 
--#define RMODE_GUEST_OWNED_EFLAGS_BITS (~(X86_EFLAGS_IOPL | X86_EFLAGS_VM))
-+#define RMODE_HOST_OWNED_EFLAGS_BITS (X86_EFLAGS_IOPL | X86_EFLAGS_VM)
-+#define RMODE_GUEST_OWNED_EFLAGS_BITS (~RMODE_HOST_OWNED_EFLAGS_BITS)
- 
- #define MSR_IA32_RTIT_STATUS_MASK (~(RTIT_STATUS_FILTEREN | \
-        RTIT_STATUS_CONTEXTEN | RTIT_STATUS_TRIGGEREN | \
-@@ -1468,7 +1469,7 @@ void vmx_set_rflags(struct kvm_vcpu *vcpu, unsigned long rflags)
-        vmx->rflags = rflags;
-        if (vmx->rmode.vm86_active) {
-                vmx->rmode.save_rflags = rflags;
--               rflags |= X86_EFLAGS_IOPL | X86_EFLAGS_VM;
-+               rflags |= RMODE_HOST_OWNED_EFLAGS_BITS;
-        }
-        vmcs_writel(GUEST_RFLAGS, rflags);
- 
-@@ -2794,7 +2795,7 @@ static void enter_rmode(struct kvm_vcpu *vcpu)
-        flags = vmcs_readl(GUEST_RFLAGS);
-        vmx->rmode.save_rflags = flags;
- 
--       flags |= X86_EFLAGS_IOPL | X86_EFLAGS_VM;
-+       flags |= RMODE_HOST_OWNED_EFLAGS_BITS;
- 
-        vmcs_writel(GUEST_RFLAGS, flags);
-        vmcs_writel(GUEST_CR4, vmcs_readl(GUEST_CR4) | X86_CR4_VME);
+I suggest you drop your Juno at the nearest museum, department of Bad 
+Ideas,
+and get yourself a sensible machine. Even a RPi4 (cough!) is marginally 
+better.
 
+>> I also managed to reliably trigger the PMU failures that you are 
+>> seeing. They only
+>> happen when kvm-unit-tests is run on the little cores (ran them 10 
+>> times in a
+>> loop). When run on  the big cores, everything is fine (also ran them 
+>> 10 times in a
+>> loop). Log output when it fails:
+> 
+> Thanks for reproducing this PMU failure.
+
+This one is slightly more convoluted: Nothing in the KVM PMU code 
+expects *two*
+independent PMUs. What we need is a way to tie a physical PMU to the 
+virtual PMU
+that gets emulated with perf on the host. I'm working on something 
+similar for SPE,
+so maybe we can come up with a common approach.
+
+Thanks,
+
+         M.
 -- 
-Vitaly
-
+Jazz is not dead. It just smells funny...
