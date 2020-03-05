@@ -2,93 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3137C17AA93
-	for <lists+kvm@lfdr.de>; Thu,  5 Mar 2020 17:34:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 62EEE17AABC
+	for <lists+kvm@lfdr.de>; Thu,  5 Mar 2020 17:43:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726048AbgCEQes (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 Mar 2020 11:34:48 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:28964 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1725974AbgCEQes (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 5 Mar 2020 11:34:48 -0500
+        id S1726079AbgCEQnJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 Mar 2020 11:43:09 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:20657 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725938AbgCEQnJ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 5 Mar 2020 11:43:09 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1583426086;
+        s=mimecast20190719; t=1583426587;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=WNagLYm3IRt75F9jKpC8khl3GYIIHmvh5jxy9sQJTtk=;
-        b=AV/TTAel/CjmDXkodHQcMgSfCIqxr9HoiZzOi7COhVx37z08K3b//p7f1jGNb0Sxsx8zOk
-        100cLyZ+tXWSR2/TCauTmZOVLH3vJ4pBCu5eFCb5d+SxjgFF/4vK/kBF+WEdtxojD4rFab
-        fCoL4umbc9ggutmkVLSOuOKl5vlKTjM=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-288-nAMOcFHfOQWL4SAeWfQmcg-1; Thu, 05 Mar 2020 11:34:45 -0500
-X-MC-Unique: nAMOcFHfOQWL4SAeWfQmcg-1
-Received: by mail-wm1-f69.google.com with SMTP id 7so2288065wmo.7
-        for <kvm@vger.kernel.org>; Thu, 05 Mar 2020 08:34:44 -0800 (PST)
+        bh=I9DAtl+FSyCFHYDQsK2Du0TBkiXUFV5Bx439VCb735M=;
+        b=aRoSg00ucfvzVmgREdk8RzkyjamRl4oidgaNGtZWn14eQYy6B3aUn24wVgQR3gU/4Em8gk
+        Kx+FRa0zsFYbrZX6secQxrgKc9b15uGrU8ieuKkLMvh8skJlt0v7xIwz4BFVro8G51ujiW
+        vgIPmwsNipPlv7itW8KBTV9tislXtOU=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-271-yZSvHHpkN826uOk0PF9ckg-1; Thu, 05 Mar 2020 11:43:02 -0500
+X-MC-Unique: yZSvHHpkN826uOk0PF9ckg-1
+Received: by mail-wr1-f71.google.com with SMTP id f10so2528611wrv.1
+        for <kvm@vger.kernel.org>; Thu, 05 Mar 2020 08:43:02 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=WNagLYm3IRt75F9jKpC8khl3GYIIHmvh5jxy9sQJTtk=;
-        b=HzQY/6/ZVsMiYz4MYxdXpI67Ur3Fb4MSHIgv2geLR9R1vhftndXEK0HjvVvcWx3Rcg
-         t1c+d8tX+eJ8d9pd2rq++qMEdXx60hp9stFQ4EbbaYYHWcC3uAKE3tNhuJ2lX8bLPQH7
-         6FWLPAKZ6dQXQZQEEg4gNQAnY3ShCbuPoxH0KXWy4O8Yrt/wkDdqVA2RnYEQtStYzx17
-         tqS9yg9PDZscmhATFNEW2YZb4ZrL8yWuYZZgY1TDDAzKjhf8HUa0r+MSGVILQwaFYviT
-         N+ZME2wxKhefBYcIczzix6b9qLiRxJEEc1rU/bQoBDrwPD4KZGzu7/LuFGhn+EFJykes
-         xBDA==
-X-Gm-Message-State: ANhLgQ3mJ13HTY0Hcp8KQxErbhLpMGYNwb3rxV8aUXDFCrlNthuGqnuF
-        gH20K2sHLcSM4EDCXrWIfK8EcjbS9zeOK7j9V7474dLAYJpIA6Ivsp1kEL184TaJu4BhqChwxMl
-        tDQ/AkD5XL0rO
-X-Received: by 2002:a05:600c:54f:: with SMTP id k15mr8396967wmc.96.1583426083675;
-        Thu, 05 Mar 2020 08:34:43 -0800 (PST)
-X-Google-Smtp-Source: ADFU+vtaAEVKge+gDK1MAbN9me2WDKnBCDFWySO/3/nv/fwsMFC5vi1XMuvCNCAb2I/aae/wvcGrRg==
-X-Received: by 2002:a05:600c:54f:: with SMTP id k15mr8396941wmc.96.1583426083431;
-        Thu, 05 Mar 2020 08:34:43 -0800 (PST)
-Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id 2sm8825636wrf.79.2020.03.05.08.34.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Mar 2020 08:34:42 -0800 (PST)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=I9DAtl+FSyCFHYDQsK2Du0TBkiXUFV5Bx439VCb735M=;
+        b=boPWPIiamxqUe+Vapu86JvCRbXbcnDQbHA7zQg4PZffbfKhSQy9EmnHC7wnpbc6ctZ
+         x1HmZd/xPOMLgUXQIHjyxyyU6wqTKaps/yvZ/KDrt4I3DJddISBWd3xuLDZUXHa+wxQj
+         RR4VG5WuF+aHt92KtfvIUrpvgybcuP2QaMW9yqMCf5HFWVoevhBGkfY6w5oUCiRB5sHG
+         /owdUI+5oBcBaNgEOdh+zytVpz4zpAHyNuFM+39r61GG/cEaNaOt/LAzVzzQQNXDiECG
+         3jCYlYF6o39V0YjTszC+zuomvzzXi2iG8zRiTAIhLBOg85KWC6ZENDMMjqYdyEoit/ak
+         tE1w==
+X-Gm-Message-State: ANhLgQ3Y1vi/+/y+fbi07W6ZIL2KkXFYxxKwI2K0o6smhguq6/Hd/a70
+        xdiSZOeYFuPCSbQs8JsZstGOQsUpa+PqRmwHg84GXklc5sWdGsxKpgVuWMv3Zd1jNoRZibMh+gw
+        r8Em423YSKGoc
+X-Received: by 2002:a5d:4004:: with SMTP id n4mr9624731wrp.48.1583426581723;
+        Thu, 05 Mar 2020 08:43:01 -0800 (PST)
+X-Google-Smtp-Source: ADFU+vuczSqaBpycmHn4lDUE/pzvhjBs8yMsn8vI4F0+nvjWjdCvFBpk6DqMYK0U/zOcUaFc2Q1epA==
+X-Received: by 2002:a5d:4004:: with SMTP id n4mr9624713wrp.48.1583426581431;
+        Thu, 05 Mar 2020 08:43:01 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:9def:34a0:b68d:9993? ([2001:b07:6468:f312:9def:34a0:b68d:9993])
+        by smtp.gmail.com with ESMTPSA id t1sm49390231wrs.41.2020.03.05.08.42.59
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 05 Mar 2020 08:43:00 -0800 (PST)
+Subject: Re: [PATCH v2 0/7] KVM: x86: CPUID emulation and tracing fixes
 To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/2] KVM: x86: VMX: untangle VMXON revision_id setting when using eVMCS
-In-Reply-To: <20200305154130.GB11500@linux.intel.com>
-References: <20200305100123.1013667-1-vkuznets@redhat.com> <20200305100123.1013667-3-vkuznets@redhat.com> <20200305154130.GB11500@linux.intel.com>
-Date:   Thu, 05 Mar 2020 17:34:42 +0100
-Message-ID: <8736amg3q5.fsf@vitty.brq.redhat.com>
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Pu Wen <puwen@hygon.cn>
+References: <20200305013437.8578-1-sean.j.christopherson@intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <6071310f-dd4b-6a6d-5578-7b6f72a9b1be@redhat.com>
+Date:   Thu, 5 Mar 2020 17:42:59 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <20200305013437.8578-1-sean.j.christopherson@intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sean Christopherson <sean.j.christopherson@intel.com> writes:
+On 05/03/20 02:34, Sean Christopherson wrote:
+> 
+> In theory, everything up to the refactoring is non-controversial, i.e. we
+> can bikeshed the refactoring without delaying the bug fixes.
 
-> On Thu, Mar 05, 2020 at 11:01:23AM +0100, Vitaly Kuznetsov wrote:
->> As stated in alloc_vmxon_regions(), VMXON region needs to be tagged with
->> revision id from MSR_IA32_VMX_BASIC even in case of eVMCS. The logic to
->> do so is not very straightforward: first, we set
->> hdr.revision_id = KVM_EVMCS_VERSION in alloc_vmcs_cpu() just to reset it
->> back to vmcs_config.revision_id in alloc_vmxon_regions(). Simplify this by
->> introducing 'enum vmx_area_type' parameter to what is now known as
->> alloc_vmx_area_cpu().
->
-> I'd strongly prefer to keep the alloc_vmcs_cpu() name and call the new enum
-> "vmcs_type".  The discrepancy could be resolved by a comment above the
-> VMXON_REGION usage, e.g.
->
-> 		/* The VMXON region is really just a special type of VMCS. */
-> 		vmcs = alloc_vmcs_cpu(VMXON_REGION, cpu, GFP_KERNEL);
+Even the refactoring itself is much less controversial.  I queued
+everything, there's always time to unqueue.
 
-I have no strong opinion (but honestly I don't really know what VMXON
-region is being used for), Paolo already said 'queued' but I think I'll
-send v2 with the suggested changes (including patch prefixes :-)
+Paolo
 
--- 
-Vitaly
+> v2:
+>   - Use Jan's patch to fix the trace bug. [Everyone]
+>   - Rework Hypervisor/Centaur handling so that only the Hypervisor
+>     sub-ranges get the restrictive 0xffffff00 mask, and so that Centaur's
+>     range only gets recognized when the guest vendor is Centaur. [Jim]
+>   - Add the aforementioned bug fixes.
+>   - Add a patch to do build time assertions on the vendor string, which
+>     are hand coded u32s in the emulator (for direct comparison against
+>     CPUID register output).
+>   - Drop the patch to add CPUID.maxphyaddr emulator helper. [Paolo]
+>   - Redo refactoring patches to land them after all the bug fixes
+>     and to do the refactoring without any semantic changes in the
+>     emulator.
 
