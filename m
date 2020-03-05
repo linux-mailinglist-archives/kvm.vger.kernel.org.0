@@ -2,27 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0B1F017A88C
-	for <lists+kvm@lfdr.de>; Thu,  5 Mar 2020 16:10:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 87FA717A8CD
+	for <lists+kvm@lfdr.de>; Thu,  5 Mar 2020 16:25:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726891AbgCEPKM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 Mar 2020 10:10:12 -0500
-Received: from eu-smtp-delivery-151.mimecast.com ([146.101.78.151]:37175 "EHLO
-        eu-smtp-delivery-151.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726317AbgCEPKL (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 5 Mar 2020 10:10:11 -0500
-Received: from AcuMS.aculab.com (156.67.243.126 [156.67.243.126]) (Using
- TLS) by relay.mimecast.com with ESMTP id
- uk-mta-19-dq2hfeTOM-OFX6XMs-OnUQ-1; Thu, 05 Mar 2020 15:10:07 +0000
-X-MC-Unique: dq2hfeTOM-OFX6XMs-OnUQ-1
-Received: from AcuMS.Aculab.com (fd9f:af1c:a25b:0:43c:695e:880f:8750) by
- AcuMS.aculab.com (fd9f:af1c:a25b:0:43c:695e:880f:8750) with Microsoft SMTP
- Server (TLS) id 15.0.1347.2; Thu, 5 Mar 2020 15:10:06 +0000
-Received: from AcuMS.Aculab.com ([fe80::43c:695e:880f:8750]) by
- AcuMS.aculab.com ([fe80::43c:695e:880f:8750%12]) with mapi id 15.00.1347.000;
- Thu, 5 Mar 2020 15:10:06 +0000
-From:   David Laight <David.Laight@ACULAB.COM>
-To:     'Paolo Bonzini' <pbonzini@redhat.com>,
+        id S1726740AbgCEPZg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 Mar 2020 10:25:36 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:27515 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726390AbgCEPZg (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 5 Mar 2020 10:25:36 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1583421935;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=vy5/EiEAp0wCHefyZwq4zlhiKyPciLoRoXRp/gwmNyU=;
+        b=IbuNu3uLB97iMmC6KF4ifFqQq13NatV+OQjJYrlroJ5nvad9WPkOCS6+rPfGk3HXUALP7X
+        L6xrqme3uBaOEbiHjrv/BHq8fUC80t+7QHVxUw0X5ujsu1KpbiikLU1WNghxT7YkStXDTI
+        z0R6rv8e2z4FPiwCi/uJlqZrrAwfPTU=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-397-mtyEnOm3NF-jnugvLieUsw-1; Thu, 05 Mar 2020 10:25:34 -0500
+X-MC-Unique: mtyEnOm3NF-jnugvLieUsw-1
+Received: by mail-wr1-f70.google.com with SMTP id w18so2456736wro.2
+        for <kvm@vger.kernel.org>; Thu, 05 Mar 2020 07:25:34 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=vy5/EiEAp0wCHefyZwq4zlhiKyPciLoRoXRp/gwmNyU=;
+        b=phBhlQ8UVd3lTAYLxyGaLhOKgG4+Nqiz6y9OQN3bnsLF+Rntbe/Ak/5iwBLHgPWUOD
+         7rVSiuq8THYjPGDw7iKhSpzIFTdQ22TAAAHLkQOc2a3PbTUWnBFivxSyKgJBmS5nDPTD
+         0qJVbgIczSnRhaObV3KricLOvdtlApBNIhiLzqKj+qXxedliQr2k2CR5aA4MkhIELOGL
+         HovdfNB9E5qnT1qMsxL8kolqBZe6H2H0cjjTuDV8OslsOM2TqUn6Axoe08/+RAd/CM7Q
+         MT39hHQx1A0zPh13lzKAPAIEIL7mTTBSGjpJST8cg9+s0yWe3I/ZhTGCujmyCw+7j3Zt
+         Tw3A==
+X-Gm-Message-State: ANhLgQ1Dmiszm8ewfKo5v62wqqmQ5N8uZ0Jh4fybadMDtodGDGE+31k2
+        3WZBk87CBlALWHvYbGUc4KsGD+2Y8E46kPyHlhOe9TGUdU7lXW/6z8dpwupw9Se3AwVkCouitWx
+        GuWulS/5WWwRQ
+X-Received: by 2002:a7b:cb46:: with SMTP id v6mr10012831wmj.0.1583421931388;
+        Thu, 05 Mar 2020 07:25:31 -0800 (PST)
+X-Google-Smtp-Source: ADFU+vtQWnJAQ64di79lN3HKkN0FhLCIQPUPAt48JNuzax0K/0I7UfpL5czy4vwD/j2Yo0yF954fWw==
+X-Received: by 2002:a7b:cb46:: with SMTP id v6mr10012811wmj.0.1583421931138;
+        Thu, 05 Mar 2020 07:25:31 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:9def:34a0:b68d:9993? ([2001:b07:6468:f312:9def:34a0:b68d:9993])
+        by smtp.gmail.com with ESMTPSA id b24sm9503524wmj.13.2020.03.05.07.25.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 05 Mar 2020 07:25:30 -0800 (PST)
+Subject: Re: [PATCH] KVM: x86: small optimization for is_mtrr_mask calculation
+To:     David Laight <David.Laight@ACULAB.COM>,
         linmiaohe <linmiaohe@huawei.com>,
         "rkrcmar@redhat.com" <rkrcmar@redhat.com>,
         "sean.j.christopherson@intel.com" <sean.j.christopherson@intel.com>,
@@ -32,62 +62,57 @@ To:     'Paolo Bonzini' <pbonzini@redhat.com>,
         "tglx@linutronix.de" <tglx@linutronix.de>,
         "mingo@redhat.com" <mingo@redhat.com>,
         "bp@alien8.de" <bp@alien8.de>, "hpa@zytor.com" <hpa@zytor.com>
-CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         "x86@kernel.org" <x86@kernel.org>
-Subject: RE: [PATCH] KVM: x86: small optimization for is_mtrr_mask calculation
-Thread-Topic: [PATCH] KVM: x86: small optimization for is_mtrr_mask
- calculation
-Thread-Index: AQHV8vtgGziz2VnmdUK2S7OlSyi4eKg6GbLw
-Date:   Thu, 5 Mar 2020 15:10:06 +0000
-Message-ID: <dc1870b0ea164015b1c1b6bc4d3248fe@AcuMS.aculab.com>
 References: <1583376535-27255-1-git-send-email-linmiaohe@huawei.com>
  <2b678644-fcc0-e853-a53c-2651c1f6a327@redhat.com>
-In-Reply-To: <2b678644-fcc0-e853-a53c-2651c1f6a327@redhat.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.202.205.107]
+ <dc1870b0ea164015b1c1b6bc4d3248fe@AcuMS.aculab.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <2129995e-3441-f362-aed1-7c247189c136@redhat.com>
+Date:   Thu, 5 Mar 2020 16:25:20 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: base64
+In-Reply-To: <dc1870b0ea164015b1c1b6bc4d3248fe@AcuMS.aculab.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-RnJvbTogUGFvbG8gQm9uemluaQ0KPiBTZW50OiAwNSBNYXJjaCAyMDIwIDE0OjM2DQo+IA0KPiBP
-biAwNS8wMy8yMCAwMzo0OCwgbGlubWlhb2hlIHdyb3RlOg0KPiA+IEZyb206IE1pYW9oZSBMaW4g
-PGxpbm1pYW9oZUBodWF3ZWkuY29tPg0KPiA+DQo+ID4gV2UgY2FuIGdldCBpc19tdHJyX21hc2sg
-YnkgY2FsY3VsYXRpbmcgKG1zciAtIDB4MjAwKSAlIDIgZGlyZWN0bHkuDQo+ID4NCj4gPiBTaWdu
-ZWQtb2ZmLWJ5OiBNaWFvaGUgTGluIDxsaW5taWFvaGVAaHVhd2VpLmNvbT4NCj4gPiAtLS0NCj4g
-PiAgYXJjaC94ODYva3ZtL210cnIuYyB8IDQgKystLQ0KPiA+ICAxIGZpbGUgY2hhbmdlZCwgMiBp
-bnNlcnRpb25zKCspLCAyIGRlbGV0aW9ucygtKQ0KPiA+DQo+ID4gZGlmZiAtLWdpdCBhL2FyY2gv
-eDg2L2t2bS9tdHJyLmMgYi9hcmNoL3g4Ni9rdm0vbXRyci5jDQo+ID4gaW5kZXggN2YwMDU5YWEz
-MGUxLi5hOTg3MDFkOWYyYmYgMTAwNjQ0DQo+ID4gLS0tIGEvYXJjaC94ODYva3ZtL210cnIuYw0K
-PiA+ICsrKyBiL2FyY2gveDg2L2t2bS9tdHJyLmMNCj4gPiBAQCAtMzQ4LDcgKzM0OCw3IEBAIHN0
-YXRpYyB2b2lkIHNldF92YXJfbXRycl9tc3Ioc3RydWN0IGt2bV92Y3B1ICp2Y3B1LCB1MzIgbXNy
-LCB1NjQgZGF0YSkNCj4gPiAgCWludCBpbmRleCwgaXNfbXRycl9tYXNrOw0KPiA+DQo+ID4gIAlp
-bmRleCA9IChtc3IgLSAweDIwMCkgLyAyOw0KPiA+IC0JaXNfbXRycl9tYXNrID0gbXNyIC0gMHgy
-MDAgLSAyICogaW5kZXg7DQo+ID4gKwlpc19tdHJyX21hc2sgPSAobXNyIC0gMHgyMDApICUgMjsN
-Cj4gPiAgCWN1ciA9ICZtdHJyX3N0YXRlLT52YXJfcmFuZ2VzW2luZGV4XTsNCj4gPg0KPiA+ICAJ
-LyogcmVtb3ZlIHRoZSBlbnRyeSBpZiBpdCdzIGluIHRoZSBsaXN0LiAqLw0KPiA+IEBAIC00MjQs
-NyArNDI0LDcgQEAgaW50IGt2bV9tdHJyX2dldF9tc3Ioc3RydWN0IGt2bV92Y3B1ICp2Y3B1LCB1
-MzIgbXNyLCB1NjQgKnBkYXRhKQ0KPiA+ICAJCWludCBpc19tdHJyX21hc2s7DQo+ID4NCj4gPiAg
-CQlpbmRleCA9IChtc3IgLSAweDIwMCkgLyAyOw0KPiA+IC0JCWlzX210cnJfbWFzayA9IG1zciAt
-IDB4MjAwIC0gMiAqIGluZGV4Ow0KPiA+ICsJCWlzX210cnJfbWFzayA9IChtc3IgLSAweDIwMCkg
-JSAyOw0KPiA+ICAJCWlmICghaXNfbXRycl9tYXNrKQ0KPiA+ICAJCQkqcGRhdGEgPSB2Y3B1LT5h
-cmNoLm10cnJfc3RhdGUudmFyX3Jhbmdlc1tpbmRleF0uYmFzZTsNCj4gPiAgCQllbHNlDQo+ID4N
-Cj4gDQo+IElmIHlvdSdyZSBnb2luZyB0byBkbyB0aGF0LCBtaWdodCBhcyB3ZWxsIHVzZSAiPj4g
-MSIgZm9yIGluZGV4IGluc3RlYWQNCj4gb2YgIi8gMiIsIGFuZCAibXNyICYgMSIgZm9yIGlzX210
-cnJfbWFzay4NCg0KUHJvdmlkZWQgdGhlIHZhcmlhYmxlcyBhcmUgdW5zaWduZWQgaXQgbWFrZXMg
-bGl0dGxlIGRpZmZlcmVuY2UNCndoZXRoZXIgeW91IHVzZSAvICUgb3IgPj4gJi4NCkF0IGxlYXN0
-IHdpdGggLyAlIHRoZSB0d28gdmFsdWVzIGFyZSB0aGUgc2FtZS4NCg0KCURhdmlkDQoNCi0NClJl
-Z2lzdGVyZWQgQWRkcmVzcyBMYWtlc2lkZSwgQnJhbWxleSBSb2FkLCBNb3VudCBGYXJtLCBNaWx0
-b24gS2V5bmVzLCBNSzEgMVBULCBVSw0KUmVnaXN0cmF0aW9uIE5vOiAxMzk3Mzg2IChXYWxlcykN
-Cg==
+On 05/03/20 16:10, David Laight wrote:
+>>>  	index = (msr - 0x200) / 2;
+>>> -	is_mtrr_mask = msr - 0x200 - 2 * index;
+>>> +	is_mtrr_mask = (msr - 0x200) % 2;
+>>>  	cur = &mtrr_state->var_ranges[index];
+>>>
+>>>  	/* remove the entry if it's in the list. */
+>>> @@ -424,7 +424,7 @@ int kvm_mtrr_get_msr(struct kvm_vcpu *vcpu, u32 msr, u64 *pdata)
+>>>  		int is_mtrr_mask;
+>>>
+>>>  		index = (msr - 0x200) / 2;
+>>> -		is_mtrr_mask = msr - 0x200 - 2 * index;
+>>> +		is_mtrr_mask = (msr - 0x200) % 2;
+>>>  		if (!is_mtrr_mask)
+>>>  			*pdata = vcpu->arch.mtrr_state.var_ranges[index].base;
+>>>  		else
+>>>
+>> If you're going to do that, might as well use ">> 1" for index instead
+>> of "/ 2", and "msr & 1" for is_mtrr_mask.
+> Provided the variables are unsigned it makes little difference
+> whether you use / % or >> &.
+> At least with / % the two values are the same.
+
+Yes, I'm old-fashioned, but also I prefer ">>" and "&" for both signed
+and unsigned, because if ever I need to switch from unsigned to signed I
+will get floor-division instead of round-to-zero division (most likely
+the code doesn't expect negative remainders if it was using unsigned).
+
+(That perhaps also reflects on me working a lot with Smalltalk long
+before switching to the kernel...).
+
+Paolo
 
