@@ -2,156 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 610C417AADC
-	for <lists+kvm@lfdr.de>; Thu,  5 Mar 2020 17:49:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D5D5917AAEA
+	for <lists+kvm@lfdr.de>; Thu,  5 Mar 2020 17:51:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726170AbgCEQt2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 Mar 2020 11:49:28 -0500
-Received: from mga12.intel.com ([192.55.52.136]:42731 "EHLO mga12.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725989AbgCEQt2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 5 Mar 2020 11:49:28 -0500
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 05 Mar 2020 08:49:27 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,518,1574150400"; 
-   d="scan'208";a="320257512"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
-  by orsmga001.jf.intel.com with ESMTP; 05 Mar 2020 08:49:26 -0800
-Date:   Thu, 5 Mar 2020 08:49:26 -0800
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Xiaoyao Li <xiaoyao.li@intel.com>
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        hpa@zytor.com, Paolo Bonzini <pbonzini@redhat.com>,
-        Andy Lutomirski <luto@kernel.org>, tony.luck@intel.com,
-        peterz@infradead.org, fenghua.yu@intel.com, x86@kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 8/8] x86: vmx: virtualize split lock detection
-Message-ID: <20200305164926.GH11500@linux.intel.com>
-References: <20200206070412.17400-1-xiaoyao.li@intel.com>
- <20200206070412.17400-9-xiaoyao.li@intel.com>
- <20200303193012.GV1439@linux.intel.com>
- <fb22d13d-60f5-5050-ccc7-4422f5b25739@intel.com>
+        id S1726048AbgCEQvi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 Mar 2020 11:51:38 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:28523 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725944AbgCEQvi (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 5 Mar 2020 11:51:38 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1583427097;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=SqVNCIytxdHmAm4l+2tk3rB1xbxHOZa0mRnp6D7J+Ck=;
+        b=XLoJqbnxBCuJWDevZV/i5gn8osNlyTHyVJNfdQQ2MryiU9bETxDNM6oYBKrMNPHzyTY5bp
+        4OOs0cJWV7IBMUhPUXigsHpqXTfPy39xmNfuFB3w+sdzFtq3x0kadxI2K/FmsjWqa0+2RL
+        O52huwxiRsE6Pp1IbMxOH04MSCcEW9o=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-392-5iL60ZXyO2eV5bvF4SDGxQ-1; Thu, 05 Mar 2020 11:51:32 -0500
+X-MC-Unique: 5iL60ZXyO2eV5bvF4SDGxQ-1
+Received: by mail-wm1-f70.google.com with SMTP id p17so971116wmc.9
+        for <kvm@vger.kernel.org>; Thu, 05 Mar 2020 08:51:32 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=SqVNCIytxdHmAm4l+2tk3rB1xbxHOZa0mRnp6D7J+Ck=;
+        b=RJ5jZIAV9aByv9RDx8NPH70xnf4G394S1kjm112L58XugZQN+RKqOsV8kw9SMIR//X
+         jKYEM4BqZxHmZq0QzTjljyfV6IgpMYuqB44oyZ3FlXhU68M5yLhB3XLayNll4AhYzEWM
+         tLRrbnfCv3xfL5r8cYrQObE7VjzIFSxgQFid8HxAQYRvwIeD6/FWKALVULcf6M7RQFre
+         hnrFeGAXGiHa5e3BJ1iJB+2VAYwWSiALhVZb+bOTzfmUxrnP+z3jCEXLKLUffi3mpWzP
+         pt53LkeMlnU9G8R7e+sXjfQMNRxKNdOi5eYoSDwVIK7c3v78D0afKWOhmnaEkppgLBp+
+         0eMg==
+X-Gm-Message-State: ANhLgQ3I1bsrgYFdYnrLcyFlFEMGe9gLGS2C7ZuHhiYWYEYS+W+Gj4VZ
+        r24leK7hqa7qscWm1L+a3JRm9wXCr0zPgLl41avj11ejG4S/qztE69TMr0nnX+JN0CLL4i2fg02
+        QLA7p88l70rbH
+X-Received: by 2002:a7b:c446:: with SMTP id l6mr10060473wmi.3.1583427091590;
+        Thu, 05 Mar 2020 08:51:31 -0800 (PST)
+X-Google-Smtp-Source: ADFU+vty5v9FoOa0gGl9gu7HAojv2CNgZGjeX+xuelU6nsEMG9+BrIhKp6yHt4D+lPtraLEsiIFV/w==
+X-Received: by 2002:a7b:c446:: with SMTP id l6mr10060406wmi.3.1583427090476;
+        Thu, 05 Mar 2020 08:51:30 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:9def:34a0:b68d:9993? ([2001:b07:6468:f312:9def:34a0:b68d:9993])
+        by smtp.gmail.com with ESMTPSA id e1sm32448187wrx.90.2020.03.05.08.51.29
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 05 Mar 2020 08:51:29 -0800 (PST)
+Subject: Re: [PATCH v1 00/11] PEBS virtualization enabling via DS
+To:     Luwei Kang <luwei.kang@intel.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     peterz@infradead.org, mingo@redhat.com, acme@kernel.org,
+        mark.rutland@arm.com, alexander.shishkin@linux.intel.com,
+        jolsa@redhat.com, namhyung@kernel.org, tglx@linutronix.de,
+        bp@alien8.de, hpa@zytor.com, sean.j.christopherson@intel.com,
+        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+        joro@8bytes.org, pawan.kumar.gupta@linux.intel.com,
+        ak@linux.intel.com, thomas.lendacky@amd.com, fenghua.yu@intel.com,
+        kan.liang@linux.intel.com, like.xu@linux.intel.com
+References: <1583431025-19802-1-git-send-email-luwei.kang@intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <da7e4734-a184-7f4f-6456-e57ac6d8063d@redhat.com>
+Date:   Thu, 5 Mar 2020 17:51:28 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <fb22d13d-60f5-5050-ccc7-4422f5b25739@intel.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <1583431025-19802-1-git-send-email-luwei.kang@intel.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 05, 2020 at 10:16:40PM +0800, Xiaoyao Li wrote:
-> On 3/4/2020 3:30 AM, Sean Christopherson wrote:
-> >On Thu, Feb 06, 2020 at 03:04:12PM +0800, Xiaoyao Li wrote:
-> >>--- a/arch/x86/kvm/vmx/vmx.c
-> >>+++ b/arch/x86/kvm/vmx/vmx.c
-> >>@@ -1781,6 +1781,25 @@ static int vmx_get_msr_feature(struct kvm_msr_entry *msr)
-> >>  	}
-> >>  }
-> >>+/*
-> >>+ * Note: for guest, feature split lock detection can only be enumerated through
-> >>+ * MSR_IA32_CORE_CAPS_SPLIT_LOCK_DETECT bit. The FMS enumeration is invalid.
-> >>+ */
-> >>+static inline bool guest_has_feature_split_lock_detect(struct kvm_vcpu *vcpu)
-> >>+{
-> >>+	return vcpu->arch.core_capabilities & MSR_IA32_CORE_CAPS_SPLIT_LOCK_DETECT;
-> >>+}
-> >>+
-> >>+static inline u64 vmx_msr_test_ctrl_valid_bits(struct kvm_vcpu *vcpu)
-> >>+{
-> >>+	u64 valid_bits = 0;
-> >>+
-> >>+	if (guest_has_feature_split_lock_detect(vcpu))
-> >>+		valid_bits |= MSR_TEST_CTRL_SPLIT_LOCK_DETECT;
-> >>+
-> >>+	return valid_bits;
-> >>+}
-> >>+
-> >>  /*
-> >>   * Reads an msr value (of 'msr_index') into 'pdata'.
-> >>   * Returns 0 on success, non-0 otherwise.
-> >>@@ -1793,6 +1812,12 @@ static int vmx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
-> >>  	u32 index;
-> >>  	switch (msr_info->index) {
-> >>+	case MSR_TEST_CTRL:
-> >>+		if (!msr_info->host_initiated &&
-> >>+		    !guest_has_feature_split_lock_detect(vcpu))
-> >>+			return 1;
-> >>+		msr_info->data = vmx->msr_test_ctrl;
-> >>+		break;
-> >>  #ifdef CONFIG_X86_64
-> >>  	case MSR_FS_BASE:
-> >>  		msr_info->data = vmcs_readl(GUEST_FS_BASE);
-> >>@@ -1934,6 +1959,13 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
-> >>  	u32 index;
-> >>  	switch (msr_index) {
-> >>+	case MSR_TEST_CTRL:
-> >>+		if (!msr_info->host_initiated &&
-> >
-> >Host initiated writes need to be validated against
-> >kvm_get_core_capabilities(), otherwise userspace can enable SLD when it's
-> >supported in hardware and the kernel, but can't be safely exposed to the
-> >guest due to SMT being on.
-> 
-> How about making the whole check like this:
-> 
-> 	if (!msr_info->host_initiated &&
-> 	    (!guest_has_feature_split_lock_detect(vcpu))
-> 		return 1;
-> 
-> 	if (data & ~vmx_msr_test_ctrl_valid_bits(vcpu))
+On 05/03/20 18:56, Luwei Kang wrote:
+> BTW:
+> The PEBS virtualization via Intel PT patchset V1 has been posted out and the
+> later version will base on this patchset.
+> https://lkml.kernel.org/r/1572217877-26484-1-git-send-email-luwei.kang@intel.com/
 
-Whoops, the check on kvm_get_core_capabilities() should be done in
-"case MSR_IA32_CORE_CAPS:", i.e. KVM shouldn't let host userspace advertise
-split-lock support unless it's allowed by KVM.
+Thanks, I'll review both.
 
-Then this code doesn't need to do a check on host_initiated=true.
+Paolo
 
-Back to the original code, I don't think we need to make the existence of
-MSR_TEST_CTRL dependent on guest_has_feature_split_lock_detect(), i.e. this
-check can simply be:
-
-	if (!msr_info->host_initiated &&
-	    (data & ~vmx_msr_test_ctrl_valid_bits(vcpu)))
-		return 1;
-
-and vmx_get_msr() doesn't need to check anything, i.e. RDMSR always
-succeeds.  This is actually aligned with real silicon behavior because
-MSR_TEST_CTRL exists on older processors, it's just wasn't documented until
-we decided to throw in SPLIT_LOCK_AC, e.g. the LOCK# suppression bit is
-marked for deprecation in the SDM, which wouldn't be necessary if it didn't
-exist :-)
-
-  Intel ISA/Feature                          Year of Removal
-  TEST_CTRL MSR, bit 31 (MSR address 33H)    2019 onwards
-
-  31 Disable LOCK# assertion for split locked access
-
-On my Haswell box:
-
-  $ rdmsr 0x33
-  0
-  $ wrmsr 0x33 0x20000000
-  wrmsr: CPU 0 cannot set MSR 0x00000033 to 0x0000000020000000
-  $ wrmsr 0x33 0x80000000
-  $ rdmsr 0x33
-  80000000
-  $ wrmsr 0x33 0x00000000
-  $ rdmsr 0x33
-  0
-
-That way the guest_has_feature_split_lock_detect() helper isn't needed
-since its only user is vmx_msr_test_ctrl_valid_bits(), i.e. it can be
-open coded there.
-
-> >>+		    (!guest_has_feature_split_lock_detect(vcpu) ||
-> >>+		     data & ~vmx_msr_test_ctrl_valid_bits(vcpu)))
-> >>+			return 1;
-> >>+		vmx->msr_test_ctrl = data;
-> m>+		break;
