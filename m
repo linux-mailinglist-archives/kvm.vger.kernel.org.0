@@ -2,27 +2,27 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2427C17ACE1
-	for <lists+kvm@lfdr.de>; Thu,  5 Mar 2020 18:23:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E424C17AC6E
+	for <lists+kvm@lfdr.de>; Thu,  5 Mar 2020 18:21:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728081AbgCERW5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 Mar 2020 12:22:57 -0500
-Received: from mail.kernel.org ([198.145.29.99]:39638 "EHLO mail.kernel.org"
+        id S1727185AbgCERUd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 Mar 2020 12:20:33 -0500
+Received: from mail.kernel.org ([198.145.29.99]:41358 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727409AbgCERNw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 5 Mar 2020 12:13:52 -0500
+        id S1726917AbgCEROy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 5 Mar 2020 12:14:54 -0500
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 34B7420870;
-        Thu,  5 Mar 2020 17:13:50 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 9B60420848;
+        Thu,  5 Mar 2020 17:14:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1583428431;
-        bh=T/N6searkn/741FSLMAo4Cm8Zx59t2ps/5DqLkc5Mmg=;
+        s=default; t=1583428493;
+        bh=ub1e6VQTs9jE/F1xf+C+Yz3QqzEx23k/ksrr7W9aNuQ=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=owooDXD1iHi5kw05LhRYxDHMjOSsOsdOBTSfdgb4B68iUzZRaxuLbfj0TMXmCEMpZ
-         ftSKSdCdypJtPY7lGFlvLHplb4U7gGmVUPqiwN+7akXhcHD4/Y76swOauzmIgOLS8E
-         Fu9p3Od6Jn938EWwPxlwSE3XDfJmXmkzW2lz0cas=
+        b=gcGScbG+cs39hMiE21fcVMyebUobM4weW/AtIbdAc2WEOCCmwepdKKX0vB9wA4syF
+         k+uc/9zAbI5xEUWQ4hMbkMFQb1De2+b2xt0hNZpE9QnY9P3mF8h2e/Tg4GeyiwCwCd
+         Z653CfuaHCEHxhvoEd6kGvWjGXfDzpmmM69t0Btg=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     =?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
@@ -31,12 +31,12 @@ Cc:     =?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
         "David S . Miller" <davem@davemloft.net>,
         Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org,
         virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.5 30/67] vhost: Check docket sk_family instead of call getname
-Date:   Thu,  5 Mar 2020 12:12:31 -0500
-Message-Id: <20200305171309.29118-30-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.4 26/58] vhost: Check docket sk_family instead of call getname
+Date:   Thu,  5 Mar 2020 12:13:47 -0500
+Message-Id: <20200305171420.29595-26-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200305171309.29118-1-sashal@kernel.org>
-References: <20200305171309.29118-1-sashal@kernel.org>
+In-Reply-To: <20200305171420.29595-1-sashal@kernel.org>
+References: <20200305171420.29595-1-sashal@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 X-stable: review
@@ -70,7 +70,7 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 1 insertion(+), 9 deletions(-)
 
 diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-index e158159671fa2..18e205eeb9af7 100644
+index 1a2dd53caadea..b53b6528d6ce2 100644
 --- a/drivers/vhost/net.c
 +++ b/drivers/vhost/net.c
 @@ -1414,10 +1414,6 @@ static int vhost_net_release(struct inode *inode, struct file *f)
