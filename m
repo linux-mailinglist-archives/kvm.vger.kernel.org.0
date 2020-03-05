@@ -2,74 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D5D5917AAEA
-	for <lists+kvm@lfdr.de>; Thu,  5 Mar 2020 17:51:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C654617AB20
+	for <lists+kvm@lfdr.de>; Thu,  5 Mar 2020 18:03:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726048AbgCEQvi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 Mar 2020 11:51:38 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:28523 "EHLO
+        id S1726049AbgCERD4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 Mar 2020 12:03:56 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:35080 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725944AbgCEQvi (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 5 Mar 2020 11:51:38 -0500
+        by vger.kernel.org with ESMTP id S1725944AbgCERD4 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 5 Mar 2020 12:03:56 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1583427097;
+        s=mimecast20190719; t=1583427834;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=SqVNCIytxdHmAm4l+2tk3rB1xbxHOZa0mRnp6D7J+Ck=;
-        b=XLoJqbnxBCuJWDevZV/i5gn8osNlyTHyVJNfdQQ2MryiU9bETxDNM6oYBKrMNPHzyTY5bp
-        4OOs0cJWV7IBMUhPUXigsHpqXTfPy39xmNfuFB3w+sdzFtq3x0kadxI2K/FmsjWqa0+2RL
-        O52huwxiRsE6Pp1IbMxOH04MSCcEW9o=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-392-5iL60ZXyO2eV5bvF4SDGxQ-1; Thu, 05 Mar 2020 11:51:32 -0500
-X-MC-Unique: 5iL60ZXyO2eV5bvF4SDGxQ-1
-Received: by mail-wm1-f70.google.com with SMTP id p17so971116wmc.9
-        for <kvm@vger.kernel.org>; Thu, 05 Mar 2020 08:51:32 -0800 (PST)
+        bh=+gBea8Ut08GlhDI9hHgDu2CcQmB1gpx84oWYQvMgPMQ=;
+        b=b1+NSMYQFkYHcZjSXg970nD7DkOgwDS9opLYhHay+XJiNCaZdRdmMl7/jBtBdYGRnShUbJ
+        Q8yIWdKxSY5u55aWMPgFO01rNCP8ayzaHHK/g2aTDdVGTGzNxBwZwCiR53T7K/AZ4P+L1X
+        6IdCFAguPrhmGpVE97fCcJZzg/BQGGA=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-237-uv-1zJ3QPMudXjTTkpif0Q-1; Thu, 05 Mar 2020 12:03:53 -0500
+X-MC-Unique: uv-1zJ3QPMudXjTTkpif0Q-1
+Received: by mail-wr1-f71.google.com with SMTP id q18so2546100wrw.5
+        for <kvm@vger.kernel.org>; Thu, 05 Mar 2020 09:03:52 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=SqVNCIytxdHmAm4l+2tk3rB1xbxHOZa0mRnp6D7J+Ck=;
-        b=RJ5jZIAV9aByv9RDx8NPH70xnf4G394S1kjm112L58XugZQN+RKqOsV8kw9SMIR//X
-         jKYEM4BqZxHmZq0QzTjljyfV6IgpMYuqB44oyZ3FlXhU68M5yLhB3XLayNll4AhYzEWM
-         tLRrbnfCv3xfL5r8cYrQObE7VjzIFSxgQFid8HxAQYRvwIeD6/FWKALVULcf6M7RQFre
-         hnrFeGAXGiHa5e3BJ1iJB+2VAYwWSiALhVZb+bOTzfmUxrnP+z3jCEXLKLUffi3mpWzP
-         pt53LkeMlnU9G8R7e+sXjfQMNRxKNdOi5eYoSDwVIK7c3v78D0afKWOhmnaEkppgLBp+
-         0eMg==
-X-Gm-Message-State: ANhLgQ3I1bsrgYFdYnrLcyFlFEMGe9gLGS2C7ZuHhiYWYEYS+W+Gj4VZ
-        r24leK7hqa7qscWm1L+a3JRm9wXCr0zPgLl41avj11ejG4S/qztE69TMr0nnX+JN0CLL4i2fg02
-        QLA7p88l70rbH
-X-Received: by 2002:a7b:c446:: with SMTP id l6mr10060473wmi.3.1583427091590;
-        Thu, 05 Mar 2020 08:51:31 -0800 (PST)
-X-Google-Smtp-Source: ADFU+vty5v9FoOa0gGl9gu7HAojv2CNgZGjeX+xuelU6nsEMG9+BrIhKp6yHt4D+lPtraLEsiIFV/w==
-X-Received: by 2002:a7b:c446:: with SMTP id l6mr10060406wmi.3.1583427090476;
-        Thu, 05 Mar 2020 08:51:30 -0800 (PST)
+        bh=+gBea8Ut08GlhDI9hHgDu2CcQmB1gpx84oWYQvMgPMQ=;
+        b=Z7xrU37852/6n/P+9DLCrGLh5ayv867hJe1qXCIBCBHGxwBwqmZUhEHczZm0TVecbE
+         26t5/V8UZkG/6KVt+PbtN0JG6pb9kDb4Bta4pETINwNCOXBgJMDJyx8LJ54//2/2HyUz
+         W47JaiZCFCZ6nIKabuZNXdDpBNpjhUTfYiE7ExFQ+Stv0DhYC/RfQXgImHllUTD9cri8
+         lgI2YQ0VKn1O48YTqlM5GDjpnB4Gtu+fvi8WBoBbg4B6MBg/6H/FhnlGAZjeI+9gigxX
+         6m4LIhQU0ROc/F3oGSMybA1YNHH8nKLNYIycFo+ipFowILuzSLfIzlwlSi1yqKzuGLiM
+         20Gw==
+X-Gm-Message-State: ANhLgQ1GVBRnYLBjDJZ7FTvW2GWAVyXRGLqCVH/m47QVPR+ojQquLxob
+        mCui1ZLMC/fS3kY0AlxshLRWppRsIW6DAacn1OMgfuwhTdBGnzS6eYGx8zsyGePyhVzGO278oz1
+        WH6Ya9JJL4Ajl
+X-Received: by 2002:a1c:e087:: with SMTP id x129mr10558800wmg.18.1583427831524;
+        Thu, 05 Mar 2020 09:03:51 -0800 (PST)
+X-Google-Smtp-Source: ADFU+vsdHGDwU1gMubIJZjsDgm2LvNu9TaryVqAyIVNzhRd1nEfTk0rLwmch7tF0Njrf/WO2RWDI6Q==
+X-Received: by 2002:a1c:e087:: with SMTP id x129mr10558775wmg.18.1583427831226;
+        Thu, 05 Mar 2020 09:03:51 -0800 (PST)
 Received: from ?IPv6:2001:b07:6468:f312:9def:34a0:b68d:9993? ([2001:b07:6468:f312:9def:34a0:b68d:9993])
-        by smtp.gmail.com with ESMTPSA id e1sm32448187wrx.90.2020.03.05.08.51.29
+        by smtp.gmail.com with ESMTPSA id x8sm34059043wro.55.2020.03.05.09.03.50
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 05 Mar 2020 08:51:29 -0800 (PST)
-Subject: Re: [PATCH v1 00/11] PEBS virtualization enabling via DS
-To:     Luwei Kang <luwei.kang@intel.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     peterz@infradead.org, mingo@redhat.com, acme@kernel.org,
-        mark.rutland@arm.com, alexander.shishkin@linux.intel.com,
-        jolsa@redhat.com, namhyung@kernel.org, tglx@linutronix.de,
-        bp@alien8.de, hpa@zytor.com, sean.j.christopherson@intel.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        joro@8bytes.org, pawan.kumar.gupta@linux.intel.com,
-        ak@linux.intel.com, thomas.lendacky@amd.com, fenghua.yu@intel.com,
-        kan.liang@linux.intel.com, like.xu@linux.intel.com
-References: <1583431025-19802-1-git-send-email-luwei.kang@intel.com>
+        Thu, 05 Mar 2020 09:03:50 -0800 (PST)
+Subject: Re: [kvm-unit-tests PATCH] x86: Move definition of some exception
+ vectors into processor.h
+To:     Xiaoyao Li <xiaoyao.li@intel.com>
+Cc:     kvm@vger.kernel.org
+References: <20200304074932.77095-1-xiaoyao.li@intel.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <da7e4734-a184-7f4f-6456-e57ac6d8063d@redhat.com>
-Date:   Thu, 5 Mar 2020 17:51:28 +0100
+Message-ID: <3ad11480-94cc-af2d-e852-1ac556f02e32@redhat.com>
+Date:   Thu, 5 Mar 2020 18:03:49 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <1583431025-19802-1-git-send-email-luwei.kang@intel.com>
+In-Reply-To: <20200304074932.77095-1-xiaoyao.li@intel.com>
 Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -78,13 +71,73 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 05/03/20 18:56, Luwei Kang wrote:
-> BTW:
-> The PEBS virtualization via Intel PT patchset V1 has been posted out and the
-> later version will base on this patchset.
-> https://lkml.kernel.org/r/1572217877-26484-1-git-send-email-luwei.kang@intel.com/
+On 04/03/20 08:49, Xiaoyao Li wrote:
+> Both processor.h and desc.h hold some definitions of exception vector.
+> put them together in processor.h
+> 
+> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+> ---
+>  lib/x86/desc.h      | 5 -----
+>  lib/x86/processor.h | 3 +++
+>  x86/debug.c         | 1 +
+>  x86/idt_test.c      | 1 +
+>  4 files changed, 5 insertions(+), 5 deletions(-)
+> 
+> diff --git a/lib/x86/desc.h b/lib/x86/desc.h
+> index 00b93285f5c6..0fe5cbf35577 100644
+> --- a/lib/x86/desc.h
+> +++ b/lib/x86/desc.h
+> @@ -91,11 +91,6 @@ typedef struct  __attribute__((packed)) {
+>      "1111:"
+>  #endif
+>  
+> -#define DB_VECTOR   1
+> -#define BP_VECTOR   3
+> -#define UD_VECTOR   6
+> -#define GP_VECTOR   13
+> -
+>  /*
+>   * selector     32-bit                        64-bit
+>   * 0x00         NULL descriptor               NULL descriptor
+> diff --git a/lib/x86/processor.h b/lib/x86/processor.h
+> index 103e52b19d82..67ba416b73ff 100644
+> --- a/lib/x86/processor.h
+> +++ b/lib/x86/processor.h
+> @@ -15,6 +15,9 @@
+>  #  define S "4"
+>  #endif
+>  
+> +#define DB_VECTOR 1
+> +#define BP_VECTOR 3
+> +#define UD_VECTOR 6
+>  #define DF_VECTOR 8
+>  #define TS_VECTOR 10
+>  #define NP_VECTOR 11
+> diff --git a/x86/debug.c b/x86/debug.c
+> index c5db4c6ecf5a..972762a72ce8 100644
+> --- a/x86/debug.c
+> +++ b/x86/debug.c
+> @@ -10,6 +10,7 @@
+>   */
+>  
+>  #include "libcflat.h"
+> +#include "processor.h"
+>  #include "desc.h"
+>  
+>  static volatile unsigned long bp_addr;
+> diff --git a/x86/idt_test.c b/x86/idt_test.c
+> index aa2973301ee0..964f119060ee 100644
+> --- a/x86/idt_test.c
+> +++ b/x86/idt_test.c
+> @@ -1,4 +1,5 @@
+>  #include "libcflat.h"
+> +#include "processor.h"
+>  #include "desc.h"
+>  
+>  static int test_ud2(bool *rflags_rf)
+> 
 
-Thanks, I'll review both.
+Queued, thanks.
 
 Paolo
 
