@@ -2,184 +2,144 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D5CBF17A2C2
-	for <lists+kvm@lfdr.de>; Thu,  5 Mar 2020 11:02:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9D4B517A2D8
+	for <lists+kvm@lfdr.de>; Thu,  5 Mar 2020 11:08:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727123AbgCEKBc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 Mar 2020 05:01:32 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:51432 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727176AbgCEKBb (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 5 Mar 2020 05:01:31 -0500
+        id S1726263AbgCEKIr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 Mar 2020 05:08:47 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:32514 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726048AbgCEKIq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 5 Mar 2020 05:08:46 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1583402491;
+        s=mimecast20190719; t=1583402924;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=qdo7x8MpejMs3Bq5JO4MC2hL+YdmdvCezwWgTT9glAE=;
-        b=O3cdxU2AafE2P7O+Ld9eMDbqe/oH7LltgfqY9isOaT3OSZafstELDhhyDzOmAg9L9bGreD
-        GU+6j9D3g5zhqPUc+GBBN+a69/RqpZ96rVwNmLVBADsb9h17aTw3CDPzaOLaGK94DUXcBT
-        fKBRcuXxTai73eyKMeUWPl+TMph6Ios=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-221-6ATMs-9EP7G5RN9cgAtsHw-1; Thu, 05 Mar 2020 05:01:29 -0500
-X-MC-Unique: 6ATMs-9EP7G5RN9cgAtsHw-1
-Received: by mail-wr1-f72.google.com with SMTP id m13so2102058wrw.3
-        for <kvm@vger.kernel.org>; Thu, 05 Mar 2020 02:01:29 -0800 (PST)
+        bh=a++OnOLHx7X8yF6qTfZsk/CBiAFakXwwpWB/hlFxqQk=;
+        b=SHxUw6UnW4w3sBeRYx1g8BfAzhflcOHnhnON7ZcGta1R4qEw1FXzKtQFhLo+E9mvKVeEza
+        x0YEU1jiuDD7m5x6D+x1R1iwD2nO5WEZDAMwkxPxxZZO9oO93LDtwnRL0m4i1Jc+H6bcEJ
+        o50EFZg1TWllUSaR566wJOb3YLogi1Q=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-81-O_gN0nsjP-S084ZcD2mxow-1; Thu, 05 Mar 2020 05:08:43 -0500
+X-MC-Unique: O_gN0nsjP-S084ZcD2mxow-1
+Received: by mail-wr1-f70.google.com with SMTP id w8so2092082wrn.7
+        for <kvm@vger.kernel.org>; Thu, 05 Mar 2020 02:08:42 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=qdo7x8MpejMs3Bq5JO4MC2hL+YdmdvCezwWgTT9glAE=;
-        b=uTlB1KiFseErLHIWoYBmJE92aB+uNooToVGri52cUyO+hHYPeV0Iyi++ZNFpAU7s/1
-         +8Ayzkz2TnyBitB9pGH4VYRckwYc/7+MeIQMPFNJ+6aLH1mVXPBxO6PUN1SY41kkzP61
-         gO35epsu89uYNMj7vizQfMEOyHPHQ3i/RZ7h84z76skZGyb4KszY3SPqCWjiYA/VQLGT
-         f0FYTSenmr08Qssgf/bhaWbGi24UE+mxcMo/wJGCJS+wjJt45XXpyYQLRQ53aRwG9BMR
-         ejzNTPze7Cwt+nzIwTLTLXPLnzmfvpxpzy/4r3JjNudIiMHcUXXBLTGwUf2SzpsaGawI
-         umiw==
-X-Gm-Message-State: ANhLgQ1Q9tBWaGqShhNaoly1Kjg2CM4QInz3rvMZ94mbIWN/2EMP7qV/
-        ndb6Ld7fJLRbOduyqE5J2mgLaja70/U56uMRSedBt34dtK4K62Mwe8uWFm7cNQYVxtdFXHAwFU3
-        pa5IrQXkFywBS
-X-Received: by 2002:a1c:7719:: with SMTP id t25mr8256323wmi.7.1583402488286;
-        Thu, 05 Mar 2020 02:01:28 -0800 (PST)
-X-Google-Smtp-Source: ADFU+vuR36k+H5I0bH9ygje4jHPz2Ku/Ml99/fjX64Va9n4SX7D7Hg8q7BBs/EMdEjurRVCvPvehUw==
-X-Received: by 2002:a1c:7719:: with SMTP id t25mr8256297wmi.7.1583402488063;
-        Thu, 05 Mar 2020 02:01:28 -0800 (PST)
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=a++OnOLHx7X8yF6qTfZsk/CBiAFakXwwpWB/hlFxqQk=;
+        b=s5SeAdO8O+VWVZPJz0IMA20Qs01l34A5xMDo2aVeyVGEgZr21Tproucgjy0kNRqi7o
+         gwAkfwEcdg1/X56b1T1u/rqkJzmdLNLyaFVcfzl9obYYLz/yEGo2hOG0U4PRqnwqSvzt
+         OwnngDyzppKVyTIfBIhAn1w5C82Eb/PRxgEEy+cGn+jskRwj8a1T662T4QSP2KyVk+dA
+         gi2HZS0cuQJP35kIDwpDQdxHOBjjIBy1E+m3fQfyixh53RmirnkfGURbivIQJeCE4Ckq
+         rnXRLCL8Jt8mVsemzY7dSli1DJWuYxwGmaLKnor0n6k+t2kqrE18+FRlwurIDdo8rDs6
+         wuhw==
+X-Gm-Message-State: ANhLgQ1K5IJtLa4eaRGIgn+TRMXtrMrUjvLSY3Dic4hIXsNktmCNULNb
+        A4gH80hPQC2gPx/Qo6euRM48QGvJmr6oRruXitvBI+weWIq5J7zW0Vtz7JWPXM3wCxGSYYzX8w8
+        gfyIvqPM3b584
+X-Received: by 2002:a1c:f008:: with SMTP id a8mr8497017wmb.81.1583402921632;
+        Thu, 05 Mar 2020 02:08:41 -0800 (PST)
+X-Google-Smtp-Source: ADFU+vsbhjFKaAeSfPW48bnxoeEB0ks/A9uEmzLV2bTa/Ugj9be5kTg7qhyLsAMwgyzYk+RO9VUxug==
+X-Received: by 2002:a1c:f008:: with SMTP id a8mr8497006wmb.81.1583402921444;
+        Thu, 05 Mar 2020 02:08:41 -0800 (PST)
 Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id f207sm10440025wme.9.2020.03.05.02.01.26
+        by smtp.gmail.com with ESMTPSA id i6sm10535928wra.42.2020.03.05.02.08.39
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Mar 2020 02:01:27 -0800 (PST)
+        Thu, 05 Mar 2020 02:08:40 -0800 (PST)
 From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH 2/2] KVM: x86: VMX: untangle VMXON revision_id setting when using eVMCS
-Date:   Thu,  5 Mar 2020 11:01:23 +0100
-Message-Id: <20200305100123.1013667-3-vkuznets@redhat.com>
-X-Mailer: git-send-email 2.24.1
-In-Reply-To: <20200305100123.1013667-1-vkuznets@redhat.com>
-References: <20200305100123.1013667-1-vkuznets@redhat.com>
+To:     linmiaohe <linmiaohe@huawei.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org,
+        pbonzini@redhat.com, rkrcmar@redhat.com,
+        sean.j.christopherson@intel.com, jmattson@google.com,
+        joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, hpa@zytor.com
+Subject: Re: [PATCH] KVM: VMX: Use wrapper macro ~RMODE_GUEST_OWNED_EFLAGS_BITS directly
+In-Reply-To: <1583375731-18219-1-git-send-email-linmiaohe@huawei.com>
+References: <1583375731-18219-1-git-send-email-linmiaohe@huawei.com>
+Date:   Thu, 05 Mar 2020 11:08:39 +0100
+Message-ID: <87tv33cdw8.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-As stated in alloc_vmxon_regions(), VMXON region needs to be tagged with
-revision id from MSR_IA32_VMX_BASIC even in case of eVMCS. The logic to
-do so is not very straightforward: first, we set
-hdr.revision_id = KVM_EVMCS_VERSION in alloc_vmcs_cpu() just to reset it
-back to vmcs_config.revision_id in alloc_vmxon_regions(). Simplify this by
-introducing 'enum vmx_area_type' parameter to what is now known as
-alloc_vmx_area_cpu().
+linmiaohe <linmiaohe@huawei.com> writes:
 
-No functional change intended.
+> From: Miaohe Lin <linmiaohe@huawei.com>
+>
+> (X86_EFLAGS_IOPL | X86_EFLAGS_VM) indicates the eflag bits that can not be
+> owned by realmode guest, i.e. ~RMODE_GUEST_OWNED_EFLAGS_BITS. Use wrapper
+> macro directly to make it clear and also improve readability.
+>
+> Signed-off-by: Miaohe Lin <linmiaohe@huawei.com>
+> ---
+>  arch/x86/kvm/vmx/vmx.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 743b81642ce2..9571f8dea016 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -1466,7 +1466,7 @@ void vmx_set_rflags(struct kvm_vcpu *vcpu, unsigned long rflags)
+>  	vmx->rflags = rflags;
+>  	if (vmx->rmode.vm86_active) {
+>  		vmx->rmode.save_rflags = rflags;
+> -		rflags |= X86_EFLAGS_IOPL | X86_EFLAGS_VM;
+> +		rflags |= ~RMODE_GUEST_OWNED_EFLAGS_BITS;
+>  	}
+>  	vmcs_writel(GUEST_RFLAGS, rflags);
+>  
+> @@ -2797,7 +2797,7 @@ static void enter_rmode(struct kvm_vcpu *vcpu)
+>  	flags = vmcs_readl(GUEST_RFLAGS);
+>  	vmx->rmode.save_rflags = flags;
+>  
+> -	flags |= X86_EFLAGS_IOPL | X86_EFLAGS_VM;
+> +	flags |= ~RMODE_GUEST_OWNED_EFLAGS_BITS;
+>  
+>  	vmcs_writel(GUEST_RFLAGS, flags);
+>  	vmcs_writel(GUEST_CR4, vmcs_readl(GUEST_CR4) | X86_CR4_VME);
 
-Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
----
- arch/x86/kvm/vmx/vmx.c | 31 +++++++++++++------------------
- arch/x86/kvm/vmx/vmx.h | 12 +++++++++---
- 2 files changed, 22 insertions(+), 21 deletions(-)
+Double negations are evil, let's define a macro for 'X86_EFLAGS_IOPL |
+X86_EFLAGS_VM' instead (completely untested):
 
 diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index dab19e4e5f2b..4ee19fb35cde 100644
+index 4ee19fb35cde..d838f93bd6d2 100644
 --- a/arch/x86/kvm/vmx/vmx.c
 +++ b/arch/x86/kvm/vmx/vmx.c
-@@ -2554,7 +2554,7 @@ static __init int setup_vmcs_config(struct vmcs_config *vmcs_conf,
- 	return 0;
- }
+@@ -139,7 +139,8 @@ module_param_named(preemption_timer, enable_preemption_timer, bool, S_IRUGO);
+ #define KVM_PMODE_VM_CR4_ALWAYS_ON (X86_CR4_PAE | X86_CR4_VMXE)
+ #define KVM_RMODE_VM_CR4_ALWAYS_ON (X86_CR4_VME | X86_CR4_PAE | X86_CR4_VMXE)
  
--struct vmcs *alloc_vmcs_cpu(bool shadow, int cpu, gfp_t flags)
-+struct vmcs *alloc_vmx_area_cpu(enum vmx_area_type type, int cpu, gfp_t flags)
- {
- 	int node = cpu_to_node(cpu);
- 	struct page *pages;
-@@ -2566,13 +2566,21 @@ struct vmcs *alloc_vmcs_cpu(bool shadow, int cpu, gfp_t flags)
- 	vmcs = page_address(pages);
- 	memset(vmcs, 0, vmcs_config.size);
+-#define RMODE_GUEST_OWNED_EFLAGS_BITS (~(X86_EFLAGS_IOPL | X86_EFLAGS_VM))
++#define RMODE_HOST_OWNED_EFLAGS_BITS (X86_EFLAGS_IOPL | X86_EFLAGS_VM)
++#define RMODE_GUEST_OWNED_EFLAGS_BITS (~RMODE_HOST_OWNED_EFLAGS_BITS)
  
--	/* KVM supports Enlightened VMCS v1 only */
--	if (static_branch_unlikely(&enable_evmcs))
-+	/*
-+	 * When eVMCS is enabled, vmcs->revision_id needs to be set to the
-+	 * supported eVMCS version (KVM_EVMCS_VERSION) instead of revision_id
-+	 * reported by MSR_IA32_VMX_BASIC.
-+	 *
-+	 * However, even though not explicitly documented by TLFS, VMXArea
-+	 * passed as VMXON argument should still be marked with revision_id
-+	 * reported by physical CPU.
-+	 */
-+	if (type != VMXON_REGION && static_branch_unlikely(&enable_evmcs))
- 		vmcs->hdr.revision_id = KVM_EVMCS_VERSION;
- 	else
- 		vmcs->hdr.revision_id = vmcs_config.revision_id;
+ #define MSR_IA32_RTIT_STATUS_MASK (~(RTIT_STATUS_FILTEREN | \
+        RTIT_STATUS_CONTEXTEN | RTIT_STATUS_TRIGGEREN | \
+@@ -1468,7 +1469,7 @@ void vmx_set_rflags(struct kvm_vcpu *vcpu, unsigned long rflags)
+        vmx->rflags = rflags;
+        if (vmx->rmode.vm86_active) {
+                vmx->rmode.save_rflags = rflags;
+-               rflags |= X86_EFLAGS_IOPL | X86_EFLAGS_VM;
++               rflags |= RMODE_HOST_OWNED_EFLAGS_BITS;
+        }
+        vmcs_writel(GUEST_RFLAGS, rflags);
  
--	if (shadow)
-+	if (type == SHADOW_VMCS_REGION)
- 		vmcs->hdr.shadow_vmcs = 1;
- 	return vmcs;
- }
-@@ -2652,25 +2660,12 @@ static __init int alloc_vmxon_regions(void)
- 	for_each_possible_cpu(cpu) {
- 		struct vmcs *vmcs;
+@@ -2794,7 +2795,7 @@ static void enter_rmode(struct kvm_vcpu *vcpu)
+        flags = vmcs_readl(GUEST_RFLAGS);
+        vmx->rmode.save_rflags = flags;
  
--		vmcs = alloc_vmcs_cpu(false, cpu, GFP_KERNEL);
-+		vmcs = alloc_vmx_area_cpu(VMXON_REGION, cpu, GFP_KERNEL);
- 		if (!vmcs) {
- 			free_vmxon_regions();
- 			return -ENOMEM;
- 		}
+-       flags |= X86_EFLAGS_IOPL | X86_EFLAGS_VM;
++       flags |= RMODE_HOST_OWNED_EFLAGS_BITS;
  
--		/*
--		 * When eVMCS is enabled, alloc_vmcs_cpu() sets
--		 * vmcs->revision_id to KVM_EVMCS_VERSION instead of
--		 * revision_id reported by MSR_IA32_VMX_BASIC.
--		 *
--		 * However, even though not explicitly documented by
--		 * TLFS, VMXArea passed as VMXON argument should
--		 * still be marked with revision_id reported by
--		 * physical CPU.
--		 */
--		if (static_branch_unlikely(&enable_evmcs))
--			vmcs->hdr.revision_id = vmcs_config.revision_id;
--
- 		per_cpu(vmxarea, cpu) = vmcs;
- 	}
- 	return 0;
-diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-index e64da06c7009..7bdac5a50432 100644
---- a/arch/x86/kvm/vmx/vmx.h
-+++ b/arch/x86/kvm/vmx/vmx.h
-@@ -489,7 +489,13 @@ static inline struct pi_desc *vcpu_to_pi_desc(struct kvm_vcpu *vcpu)
- 	return &(to_vmx(vcpu)->pi_desc);
- }
- 
--struct vmcs *alloc_vmcs_cpu(bool shadow, int cpu, gfp_t flags);
-+enum vmx_area_type {
-+	VMXON_REGION,
-+	VMCS_REGION,
-+	SHADOW_VMCS_REGION,
-+};
-+
-+struct vmcs *alloc_vmx_area_cpu(enum vmx_area_type type, int cpu, gfp_t flags);
- void free_vmcs(struct vmcs *vmcs);
- int alloc_loaded_vmcs(struct loaded_vmcs *loaded_vmcs);
- void free_loaded_vmcs(struct loaded_vmcs *loaded_vmcs);
-@@ -498,8 +504,8 @@ void loaded_vmcs_clear(struct loaded_vmcs *loaded_vmcs);
- 
- static inline struct vmcs *alloc_vmcs(bool shadow)
- {
--	return alloc_vmcs_cpu(shadow, raw_smp_processor_id(),
--			      GFP_KERNEL_ACCOUNT);
-+	return alloc_vmx_area_cpu(shadow ? SHADOW_VMCS_REGION : VMCS_REGION,
-+				  raw_smp_processor_id(), GFP_KERNEL_ACCOUNT);
- }
- 
- u64 construct_eptp(struct kvm_vcpu *vcpu, unsigned long root_hpa);
+        vmcs_writel(GUEST_RFLAGS, flags);
+        vmcs_writel(GUEST_CR4, vmcs_readl(GUEST_CR4) | X86_CR4_VME);
+
 -- 
-2.24.1
+Vitaly
 
