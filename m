@@ -2,83 +2,86 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id EB29117A81E
-	for <lists+kvm@lfdr.de>; Thu,  5 Mar 2020 15:51:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C49B217A831
+	for <lists+kvm@lfdr.de>; Thu,  5 Mar 2020 15:54:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726178AbgCEOva (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 Mar 2020 09:51:30 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:54965 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725963AbgCEOv3 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 5 Mar 2020 09:51:29 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1583419888;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Q2h6nPEsw2WQpXjdndQPq3IqLV2vLVlw94U+XC3vi3k=;
-        b=CzvnUBWGVZnjd3B/8yl+bSatwjxd3Ig6WG0SdGntbNRgLv1Elta76g9VHBvx9BuOQpqGbF
-        cbYBGkHfLl7SUd8lrv7ZpHnqfrrj1yE5TYfDh7LL+3nf7uPp/LiwZHWwNzrIWAat7SS9Kc
-        cvEDJY2CkwZ07cCWAyYW27IMIORx0ws=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-107-1dX8urIDMxKeFy2AMAKKeg-1; Thu, 05 Mar 2020 09:51:25 -0500
-X-MC-Unique: 1dX8urIDMxKeFy2AMAKKeg-1
-Received: by mail-wm1-f71.google.com with SMTP id k65so1665337wmf.7
-        for <kvm@vger.kernel.org>; Thu, 05 Mar 2020 06:51:25 -0800 (PST)
+        id S1727002AbgCEOxz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 Mar 2020 09:53:55 -0500
+Received: from mail-ed1-f66.google.com ([209.85.208.66]:37884 "EHLO
+        mail-ed1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725938AbgCEOxz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 5 Mar 2020 09:53:55 -0500
+Received: by mail-ed1-f66.google.com with SMTP id m9so1485379edl.4;
+        Thu, 05 Mar 2020 06:53:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=W3PXlBNCG7FpHe1bsD2Om9lQtteQxPY470S45EoSOD4=;
+        b=do0F5XGyeCB9FzIA3lw3uklSKMKx1keztgNc9rrYiqbskDFSTO0PtYu1kGX41yqeDX
+         pXUXCFvFC2vpdoHyk1IGsPTkfDBM+dCR19uix9mBhSSTk3MadlesE3rAODH+4BKLhbfK
+         E8OYsj9k9SyTzOSB2ljfM6SomJyZrBvyIACRXI1nhbjEeub95AU2AhVZrkR5QR1m3d2c
+         R3Zm6GvpnBGQf92i/AcZeNcfdMd/v3uOR9/E7XOoaAdXEZbH1/ID0AvVicm5oXNOqwce
+         WgrFi1smCbdziqmMte22vHfYLnbxf9sTDsUZnlnGTWPU5h2mhdZnyW598XzBrg4BC165
+         IcaQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=Q2h6nPEsw2WQpXjdndQPq3IqLV2vLVlw94U+XC3vi3k=;
-        b=F77BoAZPdYarOvjh1ekkv6Kso7VQ7sZNuDmpalo32c8lU24oEnYitCnlhwWX5B0zBa
-         9ki01CDS44Gu0y0EatdeRDvZmr9efw8Tztr2Ofdq6q8vYyoyNt5SYHfpHnSeOXwfKWJG
-         5U/filrLEp1nWk1Z1iMkjcybMyawGA4uLb4EYUf9WVODH3phkhlA/2mXBO/g7UciccXg
-         e1gQ9GCT/ntAVjuilmDDlG9s8X1Yr5O+onpHWyaFOR+JCcGaJ3DlYe0HS7RQYPFUB/t+
-         u/wIohFu3d8VrhtIacVcZtPynf4hF+oRJpuvWljcQMGZMXCtsh89swGNhOUK09izQqC7
-         FFeA==
-X-Gm-Message-State: ANhLgQ3yhyXqeaFAcqiXd9Vft+BmzGI6HXTVYUOn9JLDgwJZMfLxnGrW
-        ATomdJCC281K5650CwMEOel1FIV5I2zsjxQhhEZVWe+PmC/Ed2rVGitc8a/jqHEpPxSVPNHYETs
-        K4orQqmlYczcK
-X-Received: by 2002:adf:db84:: with SMTP id u4mr10772015wri.317.1583419884802;
-        Thu, 05 Mar 2020 06:51:24 -0800 (PST)
-X-Google-Smtp-Source: ADFU+vtTRxo3t5rJ55MDnIHanJNHGJWt5oHjPPR6NBeyxl0zG2Vh2C3V07dfWyE02Tr41RF7mTuCEA==
-X-Received: by 2002:adf:db84:: with SMTP id u4mr10771941wri.317.1583419883699;
-        Thu, 05 Mar 2020 06:51:23 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:9def:34a0:b68d:9993? ([2001:b07:6468:f312:9def:34a0:b68d:9993])
-        by smtp.gmail.com with ESMTPSA id 12sm9559704wmo.30.2020.03.05.06.51.20
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 05 Mar 2020 06:51:23 -0800 (PST)
-Subject: Re: [PATCH v9 1/7] KVM: CPUID: Fix IA32_XSS support in CPUID(0xd,i)
- enumeration
-To:     Yang Weijiang <weijiang.yang@intel.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, jmattson@google.com,
-        sean.j.christopherson@intel.com
-Cc:     yu.c.zhang@linux.intel.com
-References: <20191227021133.11993-1-weijiang.yang@intel.com>
- <20191227021133.11993-2-weijiang.yang@intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <bd75450f-a929-f60b-e973-205e4f5a9743@redhat.com>
-Date:   Thu, 5 Mar 2020 15:51:17 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=W3PXlBNCG7FpHe1bsD2Om9lQtteQxPY470S45EoSOD4=;
+        b=NQJ+9DVOVJshhBiHkQvNHrpTE7Ik0qwQy2IFmbYTgP/DIzrgwPmK9Yul8ZL49WKqil
+         /UDjPThVdcQgEATm1RfDdP1BjghxdPQFN1a3tREDcMAumi8+FKtoGQ3HSqLjtdsATBK8
+         Bt6bmwxt9KtAzFzlfKW/OvJF3dooqE05sWFZb3rAaFONfHmhUMiG2HHpHdLCEqOaoE6q
+         0RID2IE5K8hcqkGRstzJxLeNClutVr5vEWUYFTvD2XJNR55WbZz0fwUVSdSU/05o7txU
+         91WZWpgF8nieu20Y62jE3M1+NgVvm4J7Y8Y5nYhbYyAtPG4CmEUXQCDWVL99BF8RNMEm
+         HGRA==
+X-Gm-Message-State: ANhLgQ1WLLFi1V1q0ykPgXO1VA5qXLpM7sS58a9+eo/dYXD/247Bne+d
+        EPtrMV8ZMG8ka0pQsYv3W2X8nxHngW1vJVegl2s=
+X-Google-Smtp-Source: ADFU+vsshS+ueiG0ttQN2fbWuz5hWypSE3ZNEEvSVg2/wXgCZ46pLFdOzL6PA6Te0DLh5DJtsWpTpNob1T99MdTYxUI=
+X-Received: by 2002:aa7:dd1a:: with SMTP id i26mr8638644edv.321.1583420033239;
+ Thu, 05 Mar 2020 06:53:53 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20191227021133.11993-2-weijiang.yang@intel.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20200305140142.413220-1-arilou@gmail.com> <20200305140142.413220-2-arilou@gmail.com>
+ <09762184-9913-d334-0a33-b76d153bc371@redhat.com>
+In-Reply-To: <09762184-9913-d334-0a33-b76d153bc371@redhat.com>
+From:   Jon Doron <arilou@gmail.com>
+Date:   Thu, 5 Mar 2020 16:53:42 +0200
+Message-ID: <CAP7QCoj9=mZCWdiOa92QP9Fjb=p3DfKTs0xHKZYQ+yRiMabmLA@mail.gmail.com>
+Subject: Re: [PATCH v2 1/4] x86/kvm/hyper-v: Align the hcall param for kvm_hyperv_exit
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-hyperv@vger.kernel.org,
+        Vitaly Kuznetsov <vkuznets@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 27/12/19 03:11, Yang Weijiang wrote:
-> +	u64 (*supported_xss)(void);
+Vitaly recommended we will align the struct to 64bit...
 
-I don't think the new callback is needed.  Anyway I'm rewriting this
-patch on top of the new CPUID feature and will post it shortly.
-
-Paolo
-
+On Thu, Mar 5, 2020 at 4:24 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 05/03/20 15:01, Jon Doron wrote:
+> > Signed-off-by: Jon Doron <arilou@gmail.com>
+> > ---
+> >  include/uapi/linux/kvm.h | 1 +
+> >  1 file changed, 1 insertion(+)
+> >
+> > diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> > index 4b95f9a31a2f..9b4d449f4d20 100644
+> > --- a/include/uapi/linux/kvm.h
+> > +++ b/include/uapi/linux/kvm.h
+> > @@ -200,6 +200,7 @@ struct kvm_hyperv_exit {
+> >                       __u64 input;
+> >                       __u64 result;
+> >                       __u64 params[2];
+> > +                     __u32 pad;
+> >               } hcall;
+> >       } u;
+> >  };
+> >
+>
+> Can you explain the purpose of this patch?
+>
+> Paolo
+>
