@@ -2,95 +2,144 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7B2D017C099
-	for <lists+kvm@lfdr.de>; Fri,  6 Mar 2020 15:43:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7048B17C09B
+	for <lists+kvm@lfdr.de>; Fri,  6 Mar 2020 15:43:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727506AbgCFOnF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 6 Mar 2020 09:43:05 -0500
-Received: from mga01.intel.com ([192.55.52.88]:49905 "EHLO mga01.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726650AbgCFOnE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 6 Mar 2020 09:43:04 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 06 Mar 2020 06:42:52 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,522,1574150400"; 
-   d="scan'208";a="234870124"
-Received: from linux.intel.com ([10.54.29.200])
-  by fmsmga008.fm.intel.com with ESMTP; 06 Mar 2020 06:42:51 -0800
-Received: from [10.251.20.182] (kliang2-mobl.ccr.corp.intel.com [10.251.20.182])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by linux.intel.com (Postfix) with ESMTPS id E5D7A580298;
-        Fri,  6 Mar 2020 06:42:48 -0800 (PST)
-Subject: Re: [PATCH v1 01/11] perf/x86/core: Support KVM to assign a dedicated
- counter for guest PEBS
-To:     Peter Zijlstra <peterz@infradead.org>,
-        Luwei Kang <luwei.kang@intel.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        mingo@redhat.com, acme@kernel.org, mark.rutland@arm.com,
-        alexander.shishkin@linux.intel.com, jolsa@redhat.com,
-        namhyung@kernel.org, tglx@linutronix.de, bp@alien8.de,
-        hpa@zytor.com, pbonzini@redhat.com,
-        sean.j.christopherson@intel.com, vkuznets@redhat.com,
-        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
-        pawan.kumar.gupta@linux.intel.com, ak@linux.intel.com,
-        thomas.lendacky@amd.com, fenghua.yu@intel.com,
-        like.xu@linux.intel.com
-References: <1583431025-19802-1-git-send-email-luwei.kang@intel.com>
- <1583431025-19802-2-git-send-email-luwei.kang@intel.com>
- <20200306135317.GD12561@hirez.programming.kicks-ass.net>
-From:   "Liang, Kan" <kan.liang@linux.intel.com>
-Message-ID: <b72cb68e-1a0a-eeff-21b4-ce412e939cfd@linux.intel.com>
-Date:   Fri, 6 Mar 2020 09:42:47 -0500
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+        id S1727522AbgCFOnK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 6 Mar 2020 09:43:10 -0500
+Received: from mail-lf1-f68.google.com ([209.85.167.68]:40215 "EHLO
+        mail-lf1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727516AbgCFOnJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 6 Mar 2020 09:43:09 -0500
+Received: by mail-lf1-f68.google.com with SMTP id p5so2106783lfc.7;
+        Fri, 06 Mar 2020 06:43:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=o3DVrX7dUQC3QbATMcETpnI+Z1HuqofnTymVGHpuzYY=;
+        b=EzhkDARjUonOmJKZoBakTmmlGVDqNwzGwuuQy1BwfgVX1ZPNyRN5CkIAkTQ+F7vec9
+         MkLjHlk+N1stZU4cVrxU/yj/oMih/909riqXGFFYvoGSWTlUY5Yb8eNM+Sr9i3xNwSJV
+         paRrBnSAYwW1P80pEsG1bz+cmroutc329rCzWAKM/BNL9Eo47fQmBwk1i9hiSI7/AJdq
+         7cikL7nijfYad/JHCVfJGue/VCN+t28u0MdKp22DRF5Hz6ckdTa2IXm0rIiUQm7Fb0rj
+         /Qe9b6vhn+XrGqrE+od5CYKWBekJMAMO+OSFa3wQ24ycxxUh25Fe10dA+aQ201YZXCTX
+         iPnQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=o3DVrX7dUQC3QbATMcETpnI+Z1HuqofnTymVGHpuzYY=;
+        b=Gdey5uVXO6lyOBET/CiCmeSeEntcRdkNvkeZ3ILGhq8Cg72Y2zFpbRwBnh2XAlVoQO
+         GzhgWZROA7jlu372eIjyod+nTr8UKxkjw17RB7UbtV+AiqVTJLWyDN+lFfbmlbXAJDHi
+         Ta9J73OpQgjT8QxbiScIpsg4tZTyXsA1VMFq8QAzNagFYo5qYMAmNAbVE9NpJgiaUSt8
+         +xi1XZbZBlm8j2n4YgtSgyzqH19CNAUGuMllMFIIPujS3fayE7cBf4sWhlrJxn2PcA+L
+         hX1oThehlSnHvSGDh+ybpLg7po4NAgcK1tUPfIxEe9r7hlI06a6XK7lK1fZv+OM+Hnam
+         ZUrg==
+X-Gm-Message-State: ANhLgQ0p6XYtaKo6kRkX5HaTouKbOPpuMT2vBj6JUKYUe36AMuSh+aMo
+        kDAbxkMRfdelBglmfOwluQcOR8PCGTLdWfxxTgs=
+X-Google-Smtp-Source: ADFU+vtgJtFcdoBBGOREy3c0wSP0h7mwVRGzOddZ4+/os0YZq+NZJqsqxRhrORPMro+0YFi++XxBHND5tERQDnkkBRY=
+X-Received: by 2002:a19:f507:: with SMTP id j7mr2186508lfb.161.1583505787299;
+ Fri, 06 Mar 2020 06:43:07 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20200306135317.GD12561@hirez.programming.kicks-ass.net>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20200305140142.413220-1-arilou@gmail.com> <20200305140142.413220-2-arilou@gmail.com>
+ <09762184-9913-d334-0a33-b76d153bc371@redhat.com> <CAP7QCoj9=mZCWdiOa92QP9Fjb=p3DfKTs0xHKZYQ+yRiMabmLA@mail.gmail.com>
+ <0edfee0e-01ee-bb62-5fc5-67d7d45ec192@redhat.com> <87ftelepwz.fsf@vitty.brq.redhat.com>
+In-Reply-To: <87ftelepwz.fsf@vitty.brq.redhat.com>
+From:   Jon Doron <arilou@gmail.com>
+Date:   Fri, 6 Mar 2020 16:42:55 +0200
+Message-ID: <CAP7QCoiqjtpmMwo_P17pzNg5wP=6MaCRw7_TLu6GPQHH1XVT0g@mail.gmail.com>
+Subject: Re: [PATCH v2 1/4] x86/kvm/hyper-v: Align the hcall param for kvm_hyperv_exit
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-hyperv@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 3/6/2020 8:53 AM, Peter Zijlstra wrote:
-> On Fri, Mar 06, 2020 at 01:56:55AM +0800, Luwei Kang wrote:
->> From: Kan Liang <kan.liang@linux.intel.com>
->>
->> The PEBS event created by host needs to be assigned specific counters
->> requested by the guest, which means the guest and host counter indexes
->> have to be the same or fail to create. This is needed because PEBS leaks
->> counter indexes into the guest. Otherwise, the guest driver will be
->> confused by the counter indexes in the status field of the PEBS record.
->>
->> A guest_dedicated_idx field is added to indicate the counter index
->> specifically requested by KVM. The dedicated event constraints would
->> constrain the counter in the host to the same numbered counter in guest.
->>
->> A intel_ctrl_guest_dedicated_mask field is added to indicate the enabled
->> counters for guest PEBS events. The IA32_PEBS_ENABLE MSR will be switched
->> during the VMX transitions if intel_ctrl_guest_owned is set.
->>
-> 
->> +	/* the guest specified counter index of KVM owned event, e.g PEBS */
->> +	int				guest_dedicated_idx;
-> 
-> We've always objected to guest 'owned' counters, they destroy scheduling
-> freedom. Why are you expecting that to be any different this time?
->
-
-The new proposal tries to 'own' a counter by setting the event 
-constraint. It doesn't stop other events using the counter.
-If there is high priority event which requires the same counter, 
-scheduler can still reject the request from KVM.
-I don't think it destroys the scheduling freedom this time.
+Thanks Vitaly and Paoloo I'll fix the 1st patch and wait for the final
+review on the other 3 and submit v3, I'll also look into adding
+the proper test for the Hypercall patch to
+https://git.kernel.org/pub/scm/virt/kvm/kvm-unit-tests.git, and submit
+a separate patch
+to that repository.
 
 Thanks,
-Kan
+-- Jon.
 
+On Fri, Mar 6, 2020 at 12:30 PM Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
+>
+> Paolo Bonzini <pbonzini@redhat.com> writes:
+>
+> > On 05/03/20 15:53, Jon Doron wrote:
+> >> Vitaly recommended we will align the struct to 64bit...
+> >
+> > Oh, then I think you actually should add a padding after "__u32 type;"
+> > and "__u32 msr;" if you want to make it explicit.  The patch, as is, is
+> > not aligning anything, hence my confusion.
+> >
+>
+> Right,
+>
+> the problem I tried to highlight is that without propper padding ABI may
+> change, e.g.
+>
+> #include <stdio.h>
+> #include <stdint.h>
+> #include <stddef.h>
+>
+> #define __u32 uint32_t
+> #define __u64 uint64_t
+>
+> struct kvm_hyperv_exit {
+>         __u32 type;
+>         union {
+>                 struct {
+>                         __u32 msr;
+>                         __u64 control;
+>                         __u64 evt_page;
+>                         __u64 msg_page;
+>                 } synic;
+>                 struct {
+>                         __u64 input;
+>                         __u64 result;
+>                         __u64 params[2];
+>                 } hcall;
+>         } u;
+> };
+>
+> int main() {
+>         printf("%d\n", offsetof(struct kvm_hyperv_exit, u.synic.control));
+>         printf("%d\n", offsetof(struct kvm_hyperv_exit, u.hcall.input));
+>
+>         return 0;
+> }
+>
+> $ gcc -m32 1.c -o 1
+> $ ./1
+> 8
+> 4
+>
+> $ gcc 1.c -o 1
+> $ ./1
+> 16
+> 8
+>
+> if we add a padding after 'type' and 'msr' we'll get
+> $ gcc -m32 1.c -o 1
+> $ ./1
+> 16
+> 8
+>
+> $ gcc 1.c -o 1
+> $ ./1
+> 16
+> 8
+>
+> which is much better. Technically, this is an ABI change on 32 bit but
+> I'm pretty sure noone cares (famous last words!).
+>
+> --
+> Vitaly
+>
