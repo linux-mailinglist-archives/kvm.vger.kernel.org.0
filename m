@@ -2,30 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B56A317B424
-	for <lists+kvm@lfdr.de>; Fri,  6 Mar 2020 03:05:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E6DE417B42A
+	for <lists+kvm@lfdr.de>; Fri,  6 Mar 2020 03:10:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726413AbgCFCFo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 Mar 2020 21:05:44 -0500
-Received: from szxga03-in.huawei.com ([45.249.212.189]:2598 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726300AbgCFCFn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 5 Mar 2020 21:05:43 -0500
-Received: from DGGEMM402-HUB.china.huawei.com (unknown [172.30.72.53])
-        by Forcepoint Email with ESMTP id 1D553813662A715DAA7F;
-        Fri,  6 Mar 2020 10:05:41 +0800 (CST)
-Received: from dggeme702-chm.china.huawei.com (10.1.199.98) by
- DGGEMM402-HUB.china.huawei.com (10.3.20.210) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Fri, 6 Mar 2020 10:05:40 +0800
-Received: from dggeme753-chm.china.huawei.com (10.3.19.99) by
- dggeme702-chm.china.huawei.com (10.1.199.98) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.1713.5; Fri, 6 Mar 2020 10:05:40 +0800
-Received: from dggeme753-chm.china.huawei.com ([10.7.64.70]) by
- dggeme753-chm.china.huawei.com ([10.7.64.70]) with mapi id 15.01.1713.004;
- Fri, 6 Mar 2020 10:05:40 +0800
-From:   linmiaohe <linmiaohe@huawei.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
+        id S1726524AbgCFCJ7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 Mar 2020 21:09:59 -0500
+Received: from terminus.zytor.com ([198.137.202.136]:47713 "EHLO
+        mail.zytor.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726251AbgCFCJ6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 5 Mar 2020 21:09:58 -0500
+Received: from [IPv6:2601:646:8600:3281:d841:929b:f37:3a31] ([IPv6:2601:646:8600:3281:d841:929b:f37:3a31])
+        (authenticated bits=0)
+        by mail.zytor.com (8.15.2/8.15.2) with ESMTPSA id 02629Jmv816866
+        (version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
+        Thu, 5 Mar 2020 18:09:20 -0800
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 02629Jmv816866
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
+        s=2020022001; t=1583460561;
+        bh=u42XpQkEklwk2jgju0E0ou84vbvPEJiWthnbO8cPS3A=;
+        h=Date:In-Reply-To:References:Subject:To:CC:From:From;
+        b=dVhLHqkoS7wQ5iiiNvkSuJ7TeTy9eTtrM72qtwVXXmBWXvq6x/puyEvZ3QWgVOXJi
+         H7CLZxQ0/bxM+BNhQqi+KAFnYuny7P7VlRi41ATfnDjvRgF/OSOMGT1wckQ4LKFs0O
+         eQkPF/mSRKwk2d6aFiJt9FzzB28orhc0XG9UhxQy7okGS1hjo8G9LzeDq1uCWzhHEu
+         Xa80YmRLKkhpa5d0myzE/8LYZ9ujCJ4E3uKB3JJhf98eqX9Qj7mUGy8DLFmPHwfxVH
+         w1XDQIKVqD6XsghK7mkdIyrR9arhNGky2KqnQbarq1yEJHzrv7BZrUw12L1NRwZRdg
+         KmSX8YiSAzz4A==
+Date:   Thu, 05 Mar 2020 18:09:10 -0800
+User-Agent: K-9 Mail for Android
+In-Reply-To: <82b7d2d8c75e4c80a7704ae43940392a@huawei.com>
+References: <82b7d2d8c75e4c80a7704ae43940392a@huawei.com>
+MIME-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH] KVM: x86: small optimization for is_mtrr_mask calculation
+To:     linmiaohe <linmiaohe@huawei.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
 CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         "x86@kernel.org" <x86@kernel.org>,
@@ -36,37 +48,44 @@ CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
         "joro@8bytes.org" <joro@8bytes.org>,
         "tglx@linutronix.de" <tglx@linutronix.de>,
         "mingo@redhat.com" <mingo@redhat.com>,
-        "bp@alien8.de" <bp@alien8.de>, "hpa@zytor.com" <hpa@zytor.com>
-Subject: Re: [PATCH] KVM: x86: small optimization for is_mtrr_mask calculation
-Thread-Topic: [PATCH] KVM: x86: small optimization for is_mtrr_mask
- calculation
-Thread-Index: AdXzWwIZgYDieYaoSGWM6QNNY//RGA==
-Date:   Fri, 6 Mar 2020 02:05:40 +0000
-Message-ID: <82b7d2d8c75e4c80a7704ae43940392a@huawei.com>
-Accept-Language: en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.173.221.158]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-X-CFilter-Loop: Reflected
+        "bp@alien8.de" <bp@alien8.de>
+From:   hpa@zytor.com
+Message-ID: <9209A69A-899B-47A9-8483-E3E5F545D2C4@zytor.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-SGksDQpQYW9sbyBCb256aW5pIDxwYm9uemluaUByZWRoYXQuY29tPiB3cm90ZToNCj5PbiAwNS8w
-My8yMCAwMzo0OCwgbGlubWlhb2hlIHdyb3RlOg0KPj4gRnJvbTogTWlhb2hlIExpbiA8bGlubWlh
-b2hlQGh1YXdlaS5jb20+DQo+PiANCj4+IFdlIGNhbiBnZXQgaXNfbXRycl9tYXNrIGJ5IGNhbGN1
-bGF0aW5nIChtc3IgLSAweDIwMCkgJSAyIGRpcmVjdGx5Lg0KPj4gIAkJaW5kZXggPSAobXNyIC0g
-MHgyMDApIC8gMjsNCj4+IC0JCWlzX210cnJfbWFzayA9IG1zciAtIDB4MjAwIC0gMiAqIGluZGV4
-Ow0KPj4gKwkJaXNfbXRycl9tYXNrID0gKG1zciAtIDB4MjAwKSAlIDI7DQo+PiAgCQlpZiAoIWlz
-X210cnJfbWFzaykNCj4+ICAJCQkqcGRhdGEgPSB2Y3B1LT5hcmNoLm10cnJfc3RhdGUudmFyX3Jh
-bmdlc1tpbmRleF0uYmFzZTsNCj4+ICAJCWVsc2UNCj4+IA0KPg0KPklmIHlvdSdyZSBnb2luZyB0
-byBkbyB0aGF0LCBtaWdodCBhcyB3ZWxsIHVzZSAiPj4gMSIgZm9yIGluZGV4IGluc3RlYWQgb2Yg
-Ii8gMiIsIGFuZCAibXNyICYgMSIgZm9yIGlzX210cnJfbWFzay4NCj4NCg0KTWFueSB0aGFua3Mg
-Zm9yIHN1Z2dlc3Rpb24uIFdoYXQgZG8geW91IG1lYW4gaXMgbGlrZSB0aGlzID8NCg0KCWluZGV4
-ID0gKG1zciAtIDB4MjAwKSA+PiAxOw0KCWlzX210cnJfbWFzayA9IG1zciAmIDE7DQoNClRoYW5r
-cyBhZ2Fpbi4NCg==
+On March 5, 2020 6:05:40 PM PST, linmiaohe <linmiaohe@huawei=2Ecom> wrote:
+>Hi,
+>Paolo Bonzini <pbonzini@redhat=2Ecom> wrote:
+>>On 05/03/20 03:48, linmiaohe wrote:
+>>> From: Miaohe Lin <linmiaohe@huawei=2Ecom>
+>>>=20
+>>> We can get is_mtrr_mask by calculating (msr - 0x200) % 2 directly=2E
+>>>  		index =3D (msr - 0x200) / 2;
+>>> -		is_mtrr_mask =3D msr - 0x200 - 2 * index;
+>>> +		is_mtrr_mask =3D (msr - 0x200) % 2;
+>>>  		if (!is_mtrr_mask)
+>>>  			*pdata =3D vcpu->arch=2Emtrr_state=2Evar_ranges[index]=2Ebase;
+>>>  		else
+>>>=20
+>>
+>>If you're going to do that, might as well use ">> 1" for index instead
+>of "/ 2", and "msr & 1" for is_mtrr_mask=2E
+>>
+>
+>Many thanks for suggestion=2E What do you mean is like this ?
+>
+>	index =3D (msr - 0x200) >> 1;
+>	is_mtrr_mask =3D msr & 1;
+>
+>Thanks again=2E
+
+You realize that the compiler will probably produce exactly the same code,=
+ right? As such, it is about making the code easy for the human reader=2E
+
+Even if it didn't, this code is as far from performance critical as one ca=
+n possibly get=2E
+--=20
+Sent from my Android device with K-9 Mail=2E Please excuse my brevity=2E
