@@ -2,189 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3159C17B4F6
-	for <lists+kvm@lfdr.de>; Fri,  6 Mar 2020 04:35:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 258BA17B663
+	for <lists+kvm@lfdr.de>; Fri,  6 Mar 2020 06:33:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726947AbgCFDfj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 Mar 2020 22:35:39 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:44326 "EHLO
+        id S1726070AbgCFFc6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 6 Mar 2020 00:32:58 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:58240 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726533AbgCFDfj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 5 Mar 2020 22:35:39 -0500
+        with ESMTP id S1725873AbgCFFc5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 6 Mar 2020 00:32:57 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1583465738;
+        s=mimecast20190719; t=1583472777;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=6EZalpkWJawotNixfanTTs27PQUK9gnQWERCmK6d7yk=;
-        b=Fw5W1HzN2o8gDhy2Y0Ihh79B9toV7AsMHty/jRkqr3U31YmhR5be/PE0hx7L5bPM3A8G0H
-        7qeRtocpbhPlxpkrjWfkvv1fuw8i8iTSvpxLkYxAdPgqJAYU1mu0YenmAOV8REQmCz3p1V
-        Sm3tCkEOxLQayYUgK+BMljPvCjMNvMk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-224-v5JIgj87P1ekz7L5n2ZW2A-1; Thu, 05 Mar 2020 22:35:33 -0500
-X-MC-Unique: v5JIgj87P1ekz7L5n2ZW2A-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7AD15800D53;
-        Fri,  6 Mar 2020 03:35:31 +0000 (UTC)
-Received: from [10.72.13.242] (ovpn-13-242.pek2.redhat.com [10.72.13.242])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 8576360BE0;
-        Fri,  6 Mar 2020 03:35:23 +0000 (UTC)
-Subject: Re: [PATCH v2 0/7] vfio/pci: SR-IOV support
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
+        bh=2Dg5l40fFklgiXW3Pi2JeGrXIz1t8W6lNvDgLqT7nN8=;
+        b=O0OFStgO1b52R7gzeun8YK17I52hVzQPLYKaAbNCmWo2Q2/hdtvlNq2cXVkn/sHkMQB6M7
+        9ut7HLULUbpqczqj6XLqMyAlQKOrewAwOx9OxYyqmalnaNfUoM3cg86W2wbGpsgiVNFhP8
+        Aax6u1LA74DHKzpTpAtp9XosrpG8lko=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-365-FuoJly7tMnq_OZWWO_BWhg-1; Fri, 06 Mar 2020 00:32:53 -0500
+X-MC-Unique: FuoJly7tMnq_OZWWO_BWhg-1
+Received: by mail-wr1-f72.google.com with SMTP id m13so542008wrw.3
+        for <kvm@vger.kernel.org>; Thu, 05 Mar 2020 21:32:53 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=2Dg5l40fFklgiXW3Pi2JeGrXIz1t8W6lNvDgLqT7nN8=;
+        b=YxGr3oqICb/1KROvb9zjoWxBVytlzcfA/T/CFMjPG3VaAs32aEzIJS5eg8dvMPa9Rg
+         ZyBsyb4QxKMi1vupRPxDmM/Uil4SnDomMNh9ER4m7ofy3ehwQJ36zAvhvx7gi0BoYu1k
+         npieicGwXT3yyKyoNaKBAWFnwnKCPp+ZjeYAg+TRu1OaYhdGkje69ChwEXkuUTW1458T
+         ZqD6hsOwMyuu8EwcR0KmmbrMmbxNknJWlXNn4dM1NitQoAj6v/YyngcR9HBNO+PjoOzD
+         V7rUWgQjwNtE9JWX5kHoPWXNL6wq8E7IywQe2ouXOAkHugfrztTiOSvtiXqHgqx3eD7Y
+         QSIA==
+X-Gm-Message-State: ANhLgQ0HibzuCTjk8SpXZ7rUcs7v9k1tpc0Oy5cMnu06RWCjk5VWxwwj
+        lE133AJAHfINxO/YU5oe1VgdFcwhu/spVZIv58dZoX564RjtPy315EhavQ+5TmQFoRQTgJ7EwJv
+        ImKw+ApKi9GW6
+X-Received: by 2002:a5d:4902:: with SMTP id x2mr2045480wrq.301.1583472772190;
+        Thu, 05 Mar 2020 21:32:52 -0800 (PST)
+X-Google-Smtp-Source: ADFU+vsk/wfYFESgN2vEQJ3IVYE/ThGeS0U1JqD+oUUhMbb4iHplVb00stFd0EPUaYUZcTYTgaTK1Q==
+X-Received: by 2002:a5d:4902:: with SMTP id x2mr2045463wrq.301.1583472771981;
+        Thu, 05 Mar 2020 21:32:51 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:9def:34a0:b68d:9993? ([2001:b07:6468:f312:9def:34a0:b68d:9993])
+        by smtp.gmail.com with ESMTPSA id b13sm12635205wme.2.2020.03.05.21.32.49
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 05 Mar 2020 21:32:51 -0800 (PST)
+Subject: Re: [PATCH] KVM: VMX: Use wrapper macro
+ ~RMODE_GUEST_OWNED_EFLAGS_BITS directly
+To:     linmiaohe <linmiaohe@huawei.com>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>
+Cc:     "rkrcmar@redhat.com" <rkrcmar@redhat.com>,
+        "sean.j.christopherson@intel.com" <sean.j.christopherson@intel.com>,
+        "jmattson@google.com" <jmattson@google.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "bp@alien8.de" <bp@alien8.de>, "hpa@zytor.com" <hpa@zytor.com>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "dev@dpdk.org" <dev@dpdk.org>,
-        "mtosatti@redhat.com" <mtosatti@redhat.com>,
-        "thomas@monjalon.net" <thomas@monjalon.net>,
-        "bluca@debian.org" <bluca@debian.org>,
-        "jerinjacobk@gmail.com" <jerinjacobk@gmail.com>,
-        "Richardson, Bruce" <bruce.richardson@intel.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>
-References: <158213716959.17090.8399427017403507114.stgit@gimli.home>
- <AADFC41AFE54684AB9EE6CBC0274A5D19D79A8A7@SHSMSX104.ccr.corp.intel.com>
- <a6c04bac-0a37-f4c0-876e-e5cf2a8a6c3f@redhat.com>
- <20200305101406.02703e2a@w520.home>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <3e8db1d0-8afc-f1e9-e857-aead4717fa11@redhat.com>
-Date:   Fri, 6 Mar 2020 11:35:21 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        "x86@kernel.org" <x86@kernel.org>
+References: <f1b01b4903564f2c8c267a3996e1ac29@huawei.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <1e3f7ff0-0159-98e8-ba21-8806c3a14820@redhat.com>
+Date:   Fri, 6 Mar 2020 06:32:49 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200305101406.02703e2a@w520.home>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <f1b01b4903564f2c8c267a3996e1ac29@huawei.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 06/03/20 03:17, linmiaohe wrote:
+> Define a macro RMODE_HOST_OWNED_EFLAGS_BITS for (X86_EFLAGS_IOPL |
+> X86_EFLAGS_VM) as suggested by Vitaly seems a good way to fix this ?
+> Thanks.
 
-On 2020/3/6 =E4=B8=8A=E5=8D=881:14, Alex Williamson wrote:
-> On Tue, 25 Feb 2020 14:09:07 +0800
-> Jason Wang <jasowang@redhat.com> wrote:
->
->> On 2020/2/25 =E4=B8=8A=E5=8D=8810:33, Tian, Kevin wrote:
->>>> From: Alex Williamson
->>>> Sent: Thursday, February 20, 2020 2:54 AM
->>>>
->>>> Changes since v1 are primarily to patch 3/7 where the commit log is
->>>> rewritten, along with option parsing and failure logging based on
->>>> upstream discussions.  The primary user visible difference is that
->>>> option parsing is now much more strict.  If a vf_token option is
->>>> provided that cannot be used, we generate an error.  As a result of
->>>> this, opening a PF with a vf_token option will serve as a mechanism =
-of
->>>> setting the vf_token.  This seems like a more user friendly API than
->>>> the alternative of sometimes requiring the option (VFs in use) and
->>>> sometimes rejecting it, and upholds our desire that the option is
->>>> always either used or rejected.
->>>>
->>>> This also means that the VFIO_DEVICE_FEATURE ioctl is not the only
->>>> means of setting the VF token, which might call into question whethe=
-r
->>>> we absolutely need this new ioctl.  Currently I'm keeping it because=
- I
->>>> can imagine use cases, for example if a hypervisor were to support
->>>> SR-IOV, the PF device might be opened without consideration for a VF
->>>> token and we'd require the hypservisor to close and re-open the PF i=
-n
->>>> order to set a known VF token, which is impractical.
->>>>
->>>> Series overview (same as provided with v1):
->>> Thanks for doing this!
->>>  =20
->>>> The synopsis of this series is that we have an ongoing desire to dri=
-ve
->>>> PCIe SR-IOV PFs from userspace with VFIO.  There's an immediate need
->>>> for this with DPDK drivers and potentially interesting future use
->>> Can you provide a link to the DPDK discussion?
->>>  =20
->>>> cases in virtualization.  We've been reluctant to add this support
->>>> previously due to the dependency and trust relationship between the
->>>> VF device and PF driver.  Minimally the PF driver can induce a denia=
-l
->>>> of service to the VF, but depending on the specific implementation,
->>>> the PF driver might also be responsible for moving data between VFs
->>>> or have direct access to the state of the VF, including data or stat=
-e
->>>> otherwise private to the VF or VF driver.
->>> Just a loud thinking. While the motivation of VF token sounds reasona=
-ble
->>> to me, I'm curious why the same concern is not raised in other usages=
-.
->>> For example, there is no such design in virtio framework, where the
->>> virtio device could also be restarted, putting in separate process (v=
-host-user),
->>> and even in separate VM (virtio-vhost-user), etc.
->>
->> AFAIK, the restart could only be triggered by either VM or qemu. But
->> yes, the datapath could be offloaded.
->>
->> But I'm not sure introducing another dedicated mechanism is better tha=
-n
->> using the exist generic POSIX mechanism to make sure the connection
->> (AF_UINX) is secure.
->>
->>
->>>    Of course the para-
->>> virtualized attribute of virtio implies some degree of trust, but as =
-you
->>> mentioned many SR-IOV implementations support VF->PF communication
->>> which also implies some level of trust. It's perfectly fine if VFIO j=
-ust tries
->>> to do better than other sub-systems, but knowing how other people
->>> tackle the similar problem may make the whole picture clearer. =F0=9F=
-=98=8A
->>>
->>> +Jason.
->>
->> I'm not quite sure e.g allowing userspace PF driver with kernel VF
->> driver would not break the assumption of kernel security model. At lea=
-st
->> we should forbid a unprivileged PF driver running in userspace.
-> It might be useful to have your opinion on this series, because that's
-> exactly what we're trying to do here.  Various environments, DPDK
-> specifically, want a userspace PF driver.  This series takes steps to
-> mitigate the risk of having such a driver, such as requiring this VF
-> token interface to extend the VFIO interface and validate participation
-> around a PF that is not considered trusted by the kernel.
+No, what if a host-owned flag was zero?  I'd just leave it as is.
 
-
-I may miss something. But what happens if:
-
-- PF driver is running by unprivileged user
-- PF is programmed to send translated DMA request
-- Then unprivileged user can mangle the kernel data
-
-
-> We also set
-> a driver_override to try to make sure no host kernel driver can
-> automatically bind to a VF of a user owned PF, only vfio-pci, but we
-> don't prevent the admin from creating configurations where the VFs are
-> used by other host kernel drivers.
->
-> I think the question Kevin is inquiring about is whether virtio devices
-> are susceptible to the type of collaborative, shared key environment
-> we're creating here.  For example, can a VM or qemu have access to
-> reset a virtio device in a way that could affect other devices, ex. FLR
-> on a PF that could interfere with VF operation.  Thanks,
-
-
-Right, but I'm not sure it can be done only via virtio or need support=20
-from transport (e.g PCI).
-
-Thanks
-
-
->
-> Alex
->
+Paolo
 
