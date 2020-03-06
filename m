@@ -2,207 +2,280 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5E1ED17BD76
-	for <lists+kvm@lfdr.de>; Fri,  6 Mar 2020 14:02:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 21F5017BDA4
+	for <lists+kvm@lfdr.de>; Fri,  6 Mar 2020 14:06:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726982AbgCFNCZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 6 Mar 2020 08:02:25 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:30694 "EHLO
+        id S1726932AbgCFNGW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 6 Mar 2020 08:06:22 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:57475 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726646AbgCFNCZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 6 Mar 2020 08:02:25 -0500
+        with ESMTP id S1727247AbgCFNGS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 6 Mar 2020 08:06:18 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1583499744;
+        s=mimecast20190719; t=1583499977;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=DEYmwO34ejd5Fehx/7gH5NvWBz/ItGWjm6SWsG9bpRU=;
-        b=bJk33B0Tex+iaUwj9UzsUTme93xfSZSYb1Ui602YZIW+Gj3ENUMPmQ88JKZl6+CeL7Lz7Z
-        QcwJdfWMGYCrT33rGOj31cNL9dUlbs+Hn0QYNg7tQDQh2b/ubgqUau8e/Z82cu/WOTKUM1
-        0MRyT/mC1G5BPxuOGcIXz0fYAUJ6XKs=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-474-7as33T5EPfCjUPYM76-Hew-1; Fri, 06 Mar 2020 08:02:22 -0500
-X-MC-Unique: 7as33T5EPfCjUPYM76-Hew-1
-Received: by mail-wr1-f72.google.com with SMTP id n12so954782wrp.19
-        for <kvm@vger.kernel.org>; Fri, 06 Mar 2020 05:02:22 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=DEYmwO34ejd5Fehx/7gH5NvWBz/ItGWjm6SWsG9bpRU=;
-        b=SXx2cy2odorSePBuNn01CV4CnftPDocFUvVujo7P5GFsoirSGNfo/KvCLAGrTitv3y
-         GowhKatt72PtaMrJZOOUkyvnrDWaBYtrzsbqOKbdcaBo1/v6/JdaHJKc7GEQbOvBu9/g
-         AyXMDiPY0Iu4sZTPqvKpswn7Yu7ClgChwmoVvnFsDAJC1b1R13F3qxwHdm4BdbZHnlo8
-         gy5bGWsHy0tOoah+5tnLJAYbdb/13s9IdklWqPDpp4S+j7cPh8JXIuJDobMUKwyTqo/o
-         uA2jVHF9Jhmo0MlW8q7yrdTXZaAaQXfwFWpBS6VBT16ifdMtMhInr/AzVYLr4z7eOi9z
-         D1rg==
-X-Gm-Message-State: ANhLgQ2CHTzi8rIRGuC8b1R7NuYot9uZHWjMt4tOFl8LCS0FzqhTkSZX
-        LpVBMrAGA+8pznVonDEs2BUiBQm7g9oWhJex8AA8t6rrw0Ll3xlejqn/C3Se96/vSsJ3Ce/hIGV
-        R0eouvL6RPejM
-X-Received: by 2002:a5d:4cc6:: with SMTP id c6mr3928183wrt.30.1583499741191;
-        Fri, 06 Mar 2020 05:02:21 -0800 (PST)
-X-Google-Smtp-Source: ADFU+vvzKd18Q9ZyAetOJWJu+50Kd94+STONaewuv+fP1bA7GRouCbY0I5lzU1pvtQCmm1vExEeYRg==
-X-Received: by 2002:a5d:4cc6:: with SMTP id c6mr3928150wrt.30.1583499740818;
-        Fri, 06 Mar 2020 05:02:20 -0800 (PST)
-Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id i67sm26613243wri.50.2020.03.06.05.02.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 06 Mar 2020 05:02:20 -0800 (PST)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Jim Mattson <jmattson@google.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH v3 2/2] KVM: VMX: untangle VMXON revision_id setting when using eVMCS
-Date:   Fri,  6 Mar 2020 14:02:15 +0100
-Message-Id: <20200306130215.150686-3-vkuznets@redhat.com>
-X-Mailer: git-send-email 2.24.1
-In-Reply-To: <20200306130215.150686-1-vkuznets@redhat.com>
-References: <20200306130215.150686-1-vkuznets@redhat.com>
+        bh=T5LShtWZWpYWyqheSZzbznDplp/cdC8Q/qoN9VsXBss=;
+        b=Qb6vlsaed2Y0kS6mVEfNGgMi7OuLbs7QXECgUf8Ag7pEng8zZUB5zDpbTrb1M/mNwhDqIR
+        l+RnynlIQ9yUXCyJXFqf5KMCzhF07BoIYJ/q1D6dPvWy+wP+WtyxdsXqSfXDEEvlio47mp
+        fyshe6BSUOae6vXsd87vL/rd0fHzQdo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-302-5nYdyAr6P2-pLpzRykT7LQ-1; Fri, 06 Mar 2020 08:06:15 -0500
+X-MC-Unique: 5nYdyAr6P2-pLpzRykT7LQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 32DDC18A6EC0;
+        Fri,  6 Mar 2020 13:06:13 +0000 (UTC)
+Received: from [10.36.116.59] (ovpn-116-59.ams2.redhat.com [10.36.116.59])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id BBBE85D9CD;
+        Fri,  6 Mar 2020 13:06:09 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH v3 13/14] arm/arm64: ITS: migration tests
+To:     Andrew Jones <drjones@redhat.com>
+Cc:     eric.auger.pro@gmail.com, maz@kernel.org,
+        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        qemu-devel@nongnu.org, qemu-arm@nongnu.org, andre.przywara@arm.com,
+        peter.maydell@linaro.org, yuzenghui@huawei.com,
+        alexandru.elisei@arm.com, thuth@redhat.com
+References: <20200128103459.19413-1-eric.auger@redhat.com>
+ <20200128103459.19413-14-eric.auger@redhat.com>
+ <20200207134923.4gh5cz2qokuzei2m@kamzik.brq.redhat.com>
+From:   Auger Eric <eric.auger@redhat.com>
+Message-ID: <eeb138b4-4b4d-78d5-e5b1-6e9ad33f5a3a@redhat.com>
+Date:   Fri, 6 Mar 2020 14:06:08 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200207134923.4gh5cz2qokuzei2m@kamzik.brq.redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-As stated in alloc_vmxon_regions(), VMXON region needs to be tagged with
-revision id from MSR_IA32_VMX_BASIC even in case of eVMCS. The logic to
-do so is not very straightforward: first, we set
-hdr.revision_id = KVM_EVMCS_VERSION in alloc_vmcs_cpu() just to reset it
-back to vmcs_config.revision_id in alloc_vmxon_regions(). Simplify this by
-introducing 'enum vmcs_type' parameter to alloc_vmcs_cpu()/alloc_vmcs().
+Hi Drew,
 
-No functional change intended.
+On 2/7/20 2:49 PM, Andrew Jones wrote:
+> On Tue, Jan 28, 2020 at 11:34:58AM +0100, Eric Auger wrote:
+>> This test maps LPIs (populates the device table, the collection table,
+>> interrupt translation tables, configuration table), migrates and make
+>> sure the translation is correct on the destination.
+>>
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>> ---
+>>  arm/gic.c                | 59 ++++++++++++++++++++++++++++++++++++----
+>>  arm/unittests.cfg        |  8 ++++++
+>>  lib/arm/asm/gic-v3-its.h |  2 ++
+>>  lib/arm/gic-v3-its.c     | 22 +++++++++++++++
+>>  4 files changed, 85 insertions(+), 6 deletions(-)
+>>
+>> diff --git a/arm/gic.c b/arm/gic.c
+>> index 50104b1..fa8626a 100644
+>> --- a/arm/gic.c
+>> +++ b/arm/gic.c
+>> @@ -593,6 +593,7 @@ static void gic_test_mmio(void)
+>>  
+>>  static void test_its_introspection(void) {}
+>>  static void test_its_trigger(void) {}
+>> +static void test_its_migration(void) {}
+>>  
+>>  #else /* __arch64__ */
+>>  
+>> @@ -665,13 +666,19 @@ static bool its_prerequisites(int nb_cpus)
+>>  	return false;
+>>  }
+>>  
+>> -static void test_its_trigger(void)
+>> +/*
+>> + * Setup the configuration for those mappings:
+>> + * dev_id=2 event=20 -> vcpu 3, intid=8195
+>> + * dev_id=7 event=255 -> vcpu 2, intid=8196
+>> + * LPIs ready to hit
+>> + */
+>> +static int its_setup1(void)
+>>  {
+>>  	struct its_collection *col3, *col2;
+>>  	struct its_device *dev2, *dev7;
+>>  
+>>  	if (its_prerequisites(4))
+>> -		return;
+>> +		return -1;
+> 
+> Why not make its_setup1 a bool? Where true means success and false mean
+> failure?
+I tend to prefer the std error return value convention that the bool
+return value. I aligned its_prerequisites accordingly.
+> 
+>>  
+>>  	dev2 = its_create_device(2 /* dev id */, 8 /* nb_ites */);
+>>  	dev7 = its_create_device(7 /* dev id */, 8 /* nb_ites */);
+>> @@ -685,14 +692,10 @@ static void test_its_trigger(void)
+>>  	its_send_invall(col2);
+>>  	its_send_invall(col3);
+>>  
+>> -	report_prefix_push("int");
+>>  	/*
+>>  	 * dev=2, eventid=20  -> lpi= 8195, col=3
+>>  	 * dev=7, eventid=255 -> lpi= 8196, col=2
+>> -	 * Trigger dev2, eventid=20 and dev7, eventid=255
+>> -	 * Check both LPIs hit
+>>  	 */
+>> -
+>>  	its_send_mapd(dev2, true);
+>>  	its_send_mapd(dev7, true);
+>>  
+>> @@ -703,6 +706,23 @@ static void test_its_trigger(void)
+>>  		       20 /* event id */, col3);
+>>  	its_send_mapti(dev7, 8196 /* lpi id */,
+>>  		       255 /* event id */, col2);
+>> +	return 0;
+>> +}
+>> +
+>> +static void test_its_trigger(void)
+>> +{
+>> +	struct its_collection *col3, *col2;
+>> +	struct its_device *dev2, *dev7;
+>> +
+>> +	if (its_setup1())
+>> +		return;
+>> +
+>> +	col3 = its_get_collection(3);
+>> +	col2 = its_get_collection(2);
+>> +	dev2 = its_get_device(2);
+>> +	dev7 = its_get_device(7);
+>> +
+>> +	report_prefix_push("int");
+>>  
+>>  	lpi_stats_expect(3, 8195);
+>>  	its_send_int(dev2, 20);
+>> @@ -763,6 +783,29 @@ static void test_its_trigger(void)
+>>  	check_lpi_stats();
+>>  	report_prefix_pop();
+>>  }
+>> +
+>> +static void test_its_migration(void)
+>> +{
+>> +	struct its_device *dev2, *dev7;
+>> +
+>> +	if (its_setup1())
+>> +		return;
+>> +
+>> +	dev2 = its_get_device(2);
+>> +	dev7 = its_get_device(7);
+>> +
+>> +	puts("Now migrate the VM, then press a key to continue...\n");
+>> +	(void)getchar();
+>> +	report(true, "Migration complete");
+> 
+> This seems more like a report_info place. If migration fails and
+> we don't complete we'll never get the report FAIL anyway.
+OK
+> 
+>> +
+>> +	lpi_stats_expect(3, 8195);
+>> +	its_send_int(dev2, 20);
+>> +	check_lpi_stats();
+>> +
+>> +	lpi_stats_expect(2, 8196);
+>> +	its_send_int(dev7, 255);
+>> +	check_lpi_stats();
+>> +}
+>>  #endif
+>>  
+>>  int main(int argc, char **argv)
+>> @@ -800,6 +843,10 @@ int main(int argc, char **argv)
+>>  		report_prefix_push(argv[1]);
+>>  		test_its_trigger();
+>>  		report_prefix_pop();
+>> +	} else if (!strcmp(argv[1], "its-migration")) {
+>> +		report_prefix_push(argv[1]);
+>> +		test_its_migration();
+>> +		report_prefix_pop();
+>>  	} else if (strcmp(argv[1], "its-introspection") == 0) {
+>>  		report_prefix_push(argv[1]);
+>>  		test_its_introspection();
+>> diff --git a/arm/unittests.cfg b/arm/unittests.cfg
+>> index bfafec5..8b8ec79 100644
+>> --- a/arm/unittests.cfg
+>> +++ b/arm/unittests.cfg
+>> @@ -136,6 +136,14 @@ extra_params = -machine gic-version=3 -append 'its-trigger'
+>>  groups = its
+>>  arch = arm64
+>>  
+>> +[its-migration]
+>> +file = gic.flat
+>> +smp = $MAX_SMP
+>> +accel = kvm
+>> +extra_params = -machine gic-version=3 -append 'its-migration'
+>> +groups = its migration
+>> +arch = arm64
+>> +
+>>  # Test PSCI emulation
+>>  [psci]
+>>  file = psci.flat
+>> diff --git a/lib/arm/asm/gic-v3-its.h b/lib/arm/asm/gic-v3-its.h
+>> index 0e5c5b6..febc2b2 100644
+>> --- a/lib/arm/asm/gic-v3-its.h
+>> +++ b/lib/arm/asm/gic-v3-its.h
+>> @@ -151,6 +151,8 @@ extern void its_send_invall(struct its_collection *col);
+>>  extern void its_send_movi(struct its_device *dev,
+>>  			  struct its_collection *col, u32 id);
+>>  extern void its_send_sync(struct its_collection *col);
+>> +extern struct its_device *its_get_device(u32 id);
+>> +extern struct its_collection *its_get_collection(u32 id);
+>>  
+>>  #define ITS_FLAGS_CMDQ_NEEDS_FLUSHING           (1ULL << 0)
+>>  #define ITS_FLAGS_WORKAROUND_CAVIUM_22375       (1ULL << 1)
+>> diff --git a/lib/arm/gic-v3-its.c b/lib/arm/gic-v3-its.c
+>> index c2dcd01..099940e 100644
+>> --- a/lib/arm/gic-v3-its.c
+>> +++ b/lib/arm/gic-v3-its.c
+>> @@ -219,3 +219,25 @@ struct its_collection *its_create_collection(u32 col_id, u32 pe)
+>>  	its_data.nr_collections++;
+>>  	return new;
+>>  }
+>> +
+>> +struct its_device *its_get_device(u32 id)
+>> +{
+>> +	int i;
+>> +
+>> +	for (i = 0; i < GITS_MAX_DEVICES; i++) {
+>> +		if (its_data.devices[i].device_id == id)
+>> +			return &its_data.devices[i];
+>> +	}
+>> +	return NULL;
+>> +}
+>> +
+>> +struct its_collection *its_get_collection(u32 id)
+>> +{
+>> +	int i;
+>> +
+>> +	for (i = 0; i < GITS_MAX_COLLECTIONS; i++) {
+>> +		if (its_data.collections[i].col_id == id)
+>> +			return &its_data.collections[i];
+>> +	}
+>> +	return NULL;
+>> +}
+> 
+> The callers aren't checking for NULL. Should we assert here
+> or in the caller?
+Added the assert here.
 
-Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
----
- arch/x86/kvm/vmx/nested.c |  2 +-
- arch/x86/kvm/vmx/vmx.c    | 34 +++++++++++++++-------------------
- arch/x86/kvm/vmx/vmx.h    | 12 +++++++++---
- 3 files changed, 25 insertions(+), 23 deletions(-)
+Thanks
 
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index e920d7834d73..8c0ed62b29be 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -4566,7 +4566,7 @@ static struct vmcs *alloc_shadow_vmcs(struct kvm_vcpu *vcpu)
- 	WARN_ON(loaded_vmcs == &vmx->vmcs01 && loaded_vmcs->shadow_vmcs);
- 
- 	if (!loaded_vmcs->shadow_vmcs) {
--		loaded_vmcs->shadow_vmcs = alloc_vmcs(true);
-+		loaded_vmcs->shadow_vmcs = alloc_vmcs(SHADOW_VMCS_REGION);
- 		if (loaded_vmcs->shadow_vmcs)
- 			vmcs_clear(loaded_vmcs->shadow_vmcs);
- 	}
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index dab19e4e5f2b..a45d3721e7d7 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -2554,7 +2554,7 @@ static __init int setup_vmcs_config(struct vmcs_config *vmcs_conf,
- 	return 0;
- }
- 
--struct vmcs *alloc_vmcs_cpu(bool shadow, int cpu, gfp_t flags)
-+struct vmcs *alloc_vmcs_cpu(enum vmcs_type type, int cpu, gfp_t flags)
- {
- 	int node = cpu_to_node(cpu);
- 	struct page *pages;
-@@ -2566,13 +2566,21 @@ struct vmcs *alloc_vmcs_cpu(bool shadow, int cpu, gfp_t flags)
- 	vmcs = page_address(pages);
- 	memset(vmcs, 0, vmcs_config.size);
- 
--	/* KVM supports Enlightened VMCS v1 only */
--	if (static_branch_unlikely(&enable_evmcs))
-+	/*
-+	 * When eVMCS is enabled, vmcs->revision_id needs to be set to the
-+	 * supported eVMCS version (KVM_EVMCS_VERSION) instead of revision_id
-+	 * reported by MSR_IA32_VMX_BASIC.
-+	 *
-+	 * However, even though not explicitly documented by TLFS, VMXArea
-+	 * passed as VMXON argument should still be marked with revision_id
-+	 * reported by physical CPU.
-+	 */
-+	if (type != VMXON_REGION && static_branch_unlikely(&enable_evmcs))
- 		vmcs->hdr.revision_id = KVM_EVMCS_VERSION;
- 	else
- 		vmcs->hdr.revision_id = vmcs_config.revision_id;
- 
--	if (shadow)
-+	if (type == SHADOW_VMCS_REGION)
- 		vmcs->hdr.shadow_vmcs = 1;
- 	return vmcs;
- }
-@@ -2599,7 +2607,7 @@ void free_loaded_vmcs(struct loaded_vmcs *loaded_vmcs)
- 
- int alloc_loaded_vmcs(struct loaded_vmcs *loaded_vmcs)
- {
--	loaded_vmcs->vmcs = alloc_vmcs(false);
-+	loaded_vmcs->vmcs = alloc_vmcs(VMCS_REGION);
- 	if (!loaded_vmcs->vmcs)
- 		return -ENOMEM;
- 
-@@ -2652,25 +2660,13 @@ static __init int alloc_vmxon_regions(void)
- 	for_each_possible_cpu(cpu) {
- 		struct vmcs *vmcs;
- 
--		vmcs = alloc_vmcs_cpu(false, cpu, GFP_KERNEL);
-+		/* The VMXON region is really just a special type of VMCS. */
-+		vmcs = alloc_vmcs_cpu(VMXON_REGION, cpu, GFP_KERNEL);
- 		if (!vmcs) {
- 			free_vmxon_regions();
- 			return -ENOMEM;
- 		}
- 
--		/*
--		 * When eVMCS is enabled, alloc_vmcs_cpu() sets
--		 * vmcs->revision_id to KVM_EVMCS_VERSION instead of
--		 * revision_id reported by MSR_IA32_VMX_BASIC.
--		 *
--		 * However, even though not explicitly documented by
--		 * TLFS, VMXArea passed as VMXON argument should
--		 * still be marked with revision_id reported by
--		 * physical CPU.
--		 */
--		if (static_branch_unlikely(&enable_evmcs))
--			vmcs->hdr.revision_id = vmcs_config.revision_id;
--
- 		per_cpu(vmxarea, cpu) = vmcs;
- 	}
- 	return 0;
-diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-index e64da06c7009..a5eb92638ac2 100644
---- a/arch/x86/kvm/vmx/vmx.h
-+++ b/arch/x86/kvm/vmx/vmx.h
-@@ -489,16 +489,22 @@ static inline struct pi_desc *vcpu_to_pi_desc(struct kvm_vcpu *vcpu)
- 	return &(to_vmx(vcpu)->pi_desc);
- }
- 
--struct vmcs *alloc_vmcs_cpu(bool shadow, int cpu, gfp_t flags);
-+enum vmcs_type {
-+	VMXON_REGION,
-+	VMCS_REGION,
-+	SHADOW_VMCS_REGION,
-+};
-+
-+struct vmcs *alloc_vmcs_cpu(enum vmcs_type type, int cpu, gfp_t flags);
- void free_vmcs(struct vmcs *vmcs);
- int alloc_loaded_vmcs(struct loaded_vmcs *loaded_vmcs);
- void free_loaded_vmcs(struct loaded_vmcs *loaded_vmcs);
- void loaded_vmcs_init(struct loaded_vmcs *loaded_vmcs);
- void loaded_vmcs_clear(struct loaded_vmcs *loaded_vmcs);
- 
--static inline struct vmcs *alloc_vmcs(bool shadow)
-+static inline struct vmcs *alloc_vmcs(enum vmcs_type type)
- {
--	return alloc_vmcs_cpu(shadow, raw_smp_processor_id(),
-+	return alloc_vmcs_cpu(type, raw_smp_processor_id(),
- 			      GFP_KERNEL_ACCOUNT);
- }
- 
--- 
-2.24.1
+Eric
+> 
+> Thanks,
+> drew
+> 
+> 
+>> -- 
+>> 2.20.1
+>>
 
