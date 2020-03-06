@@ -2,110 +2,145 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6521217C322
-	for <lists+kvm@lfdr.de>; Fri,  6 Mar 2020 17:39:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0932017C687
+	for <lists+kvm@lfdr.de>; Fri,  6 Mar 2020 20:52:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726968AbgCFQjR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 6 Mar 2020 11:39:17 -0500
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:44417 "EHLO
-        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725873AbgCFQjQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 6 Mar 2020 11:39:16 -0500
-Received: by mail-wr1-f68.google.com with SMTP id n7so3099345wrt.11;
-        Fri, 06 Mar 2020 08:39:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=Po8ghn9sRSyYfmDTi+lZZbS3gjK6dyrUhJNG+tTwLV8=;
-        b=jBql44M21TnlUvBslRFIzmOeZwCiUQlau6sMsVF3bB0ewubmwCHU+D0qWV9uHVUlgW
-         TM+CHOF1gQqbmBFhdOaYQtdwO0k/muGaGtwNwj3IC1g0XW6WYycdSdchIUPPKNLnQTXi
-         gk3paS5PAe2gCLbVsC2FVUQLC980D2fIR6JHU3ZkY6UqSrwSskrhpsB86Waa8wf4GrpI
-         HHx0+jgiFwHoEDLu0r320UKhAR6qSVLeDmhrafx4vFMcEqgavxTFsm6vbChehZL316P/
-         YwtT13Eqp2cf6UExoHAd7nk0qutsZhtHDIiA7MeYJ0Rcqp2lxxnwLaWW/bU5fv3sMPCo
-         pG8A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=Po8ghn9sRSyYfmDTi+lZZbS3gjK6dyrUhJNG+tTwLV8=;
-        b=hAzOMr/mLQh6VqL9uApqN01jXw87CvEi34dQsYdIsWVdojHo8S3pzmkckHgzHAh1td
-         U6CuCMCpBuBgI2EIIoF0LsfUcEFYe6gzcjmO1L3kmjtTl0YS61V/eluWhA54VBnpnFOQ
-         dxUndGhuzcxdfQ3vLDC8J2B5y+Pg1j1ANvkRjcWxRXfVhTYgpyw7EqajjQCPm5UKOGo/
-         Xuo6+joPrSpScvgoFVDNu3fMxGD73WoNGyF11z4QD7uv4cYs4n/xUpSAiThaGFO82V67
-         xD8CEVAkV1lRHGLH5tP+a+3Z7bJB+ArJN9+6W7QM1d1wmjw0mOW5nD6mUXIAxZ8UgCKy
-         BpQg==
-X-Gm-Message-State: ANhLgQ39fcbs3zqGZd/8y2pAcgooziuwm0lYtMC6bAIB+oSEEUPh4ty9
-        9Rpdq8tIBCwR06TCguKayp47AuKm
-X-Google-Smtp-Source: ADFU+vuCh1BLncWUkoQnSEtINCW5/ohoFUEgcWFy0HYC7rbc98C4PtmT6iHJT+Ky7GL/46s7ZJmhPA==
-X-Received: by 2002:adf:e808:: with SMTP id o8mr4735660wrm.8.1583512754719;
-        Fri, 06 Mar 2020 08:39:14 -0800 (PST)
-Received: from linux.local ([199.203.162.213])
-        by smtp.gmail.com with ESMTPSA id n24sm8812760wra.61.2020.03.06.08.39.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 06 Mar 2020 08:39:14 -0800 (PST)
-From:   Jon Doron <arilou@gmail.com>
-To:     kvm@vger.kernel.org, linux-hyperv@vger.kernel.org
-Cc:     vkuznets@redhat.com, Jon Doron <arilou@gmail.com>
-Subject: [PATCH v3 5/5] x86/kvm/hyper-v: Add support for synthetic debugger via hypercalls
-Date:   Fri,  6 Mar 2020 18:39:09 +0200
-Message-Id: <20200306163909.1020369-6-arilou@gmail.com>
-X-Mailer: git-send-email 2.24.1
-In-Reply-To: <20200306163909.1020369-1-arilou@gmail.com>
-References: <20200306163909.1020369-1-arilou@gmail.com>
+        id S1726307AbgCFTwR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 6 Mar 2020 14:52:17 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:53444 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726083AbgCFTwQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 6 Mar 2020 14:52:16 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1583524335;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=7wshUEfGJ0oCbRrCm+psHycgVdvMv8N6eiO1mp9WFHQ=;
+        b=K0J4Fj875O1K8xDURpjSaDB+NNNWgB35W5dA+RRKec/DZjhiJAeLRvMbc8hHcCqGaXJqrn
+        fvgYKGbNUeGMecJmbGzQQVYAeLg3tN5Mw2QJUnnpvYVOVczo8Kn/lZEqurR8pCNUoCfOg6
+        GnmQwijqUGUa9CvKaPL9l7MddGY/UD0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-235-ZbozAVvCPia2fE25-rWBtQ-1; Fri, 06 Mar 2020 14:52:13 -0500
+X-MC-Unique: ZbozAVvCPia2fE25-rWBtQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F2F7F800053;
+        Fri,  6 Mar 2020 19:52:11 +0000 (UTC)
+Received: from fuller.cnet (ovpn-116-16.gru2.redhat.com [10.97.116.16])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 6295B10027AB;
+        Fri,  6 Mar 2020 19:52:11 +0000 (UTC)
+Received: by fuller.cnet (Postfix, from userid 1000)
+        id 2562842FE410; Fri,  6 Mar 2020 06:56:17 -0300 (-03)
+Date:   Fri, 6 Mar 2020 06:56:17 -0300
+From:   Marcelo Tosatti <mtosatti@redhat.com>
+To:     "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     "Rafael J. Wysocki" <rjw@rjwysocki.net>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        Joao Martins <joao.m.martins@oracle.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        linux-pm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Subject: Re: [PATCH] cpuidle-haltpoll: allow force loading on hosts without
+ the REALTIME hint
+Message-ID: <20200306095617.GD32190@fuller.cnet>
+References: <20200221174331.1480468-1-mail@maciej.szmigiero.name>
+ <114f7b8d-6f88-222a-d1fa-abcfc0e6a1f2@maciej.szmigiero.name>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <114f7b8d-6f88-222a-d1fa-abcfc0e6a1f2@maciej.szmigiero.name>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-There is another mode for the synthetic debugger which uses hypercalls
-to send/recv network data instead of the MSR interface.
+On Mon, Feb 24, 2020 at 09:10:18PM +0100, Maciej S. Szmigiero wrote:
+> (CC'ing also Marcelo as the cpuidle-haltpoll driver author and the KVM ML).
 
-This interface is much slower and less recommended since you might get
-a lot of VMExits while KDVM polling for new packets to recv, rather
-than simply checking the pending page to see if there is data avialble
-and then request.
+Hi Maciej,
 
-Signed-off-by: Jon Doron <arilou@gmail.com>
----
- arch/x86/kvm/hyperv.c | 22 ++++++++++++++++++++++
- 1 file changed, 22 insertions(+)
+> On 21.02.2020 18:43, Maciej S. Szmigiero wrote:
+> > From: "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
+> > 
+> > Before commit 1328edca4a14 ("cpuidle-haltpoll: Enable kvm guest polling
+> > when dedicated physical CPUs are available") the cpuidle-haltpoll driver
+> > could also be used in scenarios when the host does not advertise the
+> > KVM_HINTS_REALTIME hint.
+> > 
+> > While the behavior introduced by the aforementioned commit makes sense as
+> > the default 
 
-diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
-index 67628796f514..ba3b1e3406ef 100644
---- a/arch/x86/kvm/hyperv.c
-+++ b/arch/x86/kvm/hyperv.c
-@@ -1820,6 +1820,28 @@ int kvm_hv_hypercall(struct kvm_vcpu *vcpu)
- 		}
- 		ret = kvm_hv_send_ipi(vcpu, ingpa, outgpa, true, false);
- 		break;
-+	case HVCALL_POST_DEBUG_DATA:
-+	case HVCALL_RETRIEVE_DEBUG_DATA:
-+		if (unlikely(fast)) {
-+			ret = HV_STATUS_INVALID_PARAMETER;
-+			break;
-+		}
-+		/* fallthrough */
-+	case HVCALL_RESET_DEBUG_SESSION: {
-+		struct kvm_hv_syndbg *syndbg = vcpu_to_hv_syndbg(vcpu);
-+		if (!(syndbg->options & HV_X64_SYNDBG_OPTION_USE_HCALLS)) {
-+			ret = HV_STATUS_OPERATION_DENIED;
-+			break;
-+		}
-+		vcpu->run->exit_reason = KVM_EXIT_HYPERV;
-+		vcpu->run->hyperv.type = KVM_EXIT_HYPERV_HCALL;
-+		vcpu->run->hyperv.u.hcall.input = param;
-+		vcpu->run->hyperv.u.hcall.params[0] = ingpa;
-+		vcpu->run->hyperv.u.hcall.params[1] = outgpa;
-+		vcpu->arch.complete_userspace_io =
-+				kvm_hv_hypercall_complete_userspace;
-+		return 0;
-+	}
- 	default:
- 		ret = HV_STATUS_INVALID_HYPERCALL_CODE;
- 		break;
--- 
-2.24.1
+It makes sense for the pCPU overcommitted case only.
+
+> > there are cases where the old behavior is desired, for example,
+> > when other kernel changes triggered by presence by this hint are unwanted,
+> > for some workloads where the latency benefit from polling overweights the
+> > loss from idle CPU capacity that otherwise would be available, or just when
+> > running under older Qemu versions that lack this hint.
+> > 
+> > Let's provide a typical "force" module parameter that allows restoring the
+> > old behavior.
+> > 
+> > Signed-off-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
+
+I would rather: 
+
+1) Switch back to the default non-overcommitted case.
+
+or even better (but requires more investment)
+
+2) Make on the flight dynamic configuration (after all pCPU
+overcommitment=true/false is a property that changes during
+the day, depending on system load).
+
+But its up to Paolo to decide, really.
+
+> > ---
+> >  drivers/cpuidle/cpuidle-haltpoll.c | 12 +++++++++++-
+> >  1 file changed, 11 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/drivers/cpuidle/cpuidle-haltpoll.c b/drivers/cpuidle/cpuidle-haltpoll.c
+> > index b0ce9bc78113..07e5b36076bb 100644
+> > --- a/drivers/cpuidle/cpuidle-haltpoll.c
+> > +++ b/drivers/cpuidle/cpuidle-haltpoll.c
+> > @@ -18,6 +18,11 @@
+> >  #include <linux/kvm_para.h>
+> >  #include <linux/cpuidle_haltpoll.h>
+> >  
+> > +static bool force __read_mostly;
+> > +module_param(force, bool, 0444);
+> > +MODULE_PARM_DESC(force,
+> > +		 "Load even if the host does not provide the REALTIME hint");
+> > +
+> >  static struct cpuidle_device __percpu *haltpoll_cpuidle_devices;
+> >  static enum cpuhp_state haltpoll_hp_state;
+> >  
+> > @@ -90,6 +95,11 @@ static void haltpoll_uninit(void)
+> >  	haltpoll_cpuidle_devices = NULL;
+> >  }
+> >  
+> > +static bool haltpool_want(void)
+> > +{
+> > +	return kvm_para_has_hint(KVM_HINTS_REALTIME) || force;
+> > +}
+> > +
+> >  static int __init haltpoll_init(void)
+> >  {
+> >  	int ret;
+> > @@ -102,7 +112,7 @@ static int __init haltpoll_init(void)
+> >  	cpuidle_poll_state_init(drv);
+> >  
+> >  	if (!kvm_para_available() ||
+> > -		!kvm_para_has_hint(KVM_HINTS_REALTIME))
+> > +	    !haltpool_want())
+> >  		return -ENODEV;
+> >  
+> >  	ret = cpuidle_register_driver(drv);
+> > 
 
