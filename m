@@ -2,154 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9F01B17B455
-	for <lists+kvm@lfdr.de>; Fri,  6 Mar 2020 03:15:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6670B17B459
+	for <lists+kvm@lfdr.de>; Fri,  6 Mar 2020 03:17:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726485AbgCFCPc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 Mar 2020 21:15:32 -0500
-Received: from mga14.intel.com ([192.55.52.115]:62264 "EHLO mga14.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726317AbgCFCPc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 5 Mar 2020 21:15:32 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 05 Mar 2020 18:15:31 -0800
-X-IronPort-AV: E=Sophos;i="5.70,520,1574150400"; 
-   d="scan'208";a="234638821"
-Received: from xiaoyaol-mobl.ccr.corp.intel.com (HELO [10.249.168.47]) ([10.249.168.47])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-SHA; 05 Mar 2020 18:15:26 -0800
-Subject: Re: [PATCH v3 2/8] x86/split_lock: Ensure
- X86_FEATURE_SPLIT_LOCK_DETECT means the existence of feature
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        hpa@zytor.com, Paolo Bonzini <pbonzini@redhat.com>,
-        Andy Lutomirski <luto@kernel.org>, tony.luck@intel.com,
-        peterz@infradead.org, fenghua.yu@intel.com, x86@kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20200206070412.17400-1-xiaoyao.li@intel.com>
- <20200206070412.17400-3-xiaoyao.li@intel.com>
- <20200303185524.GQ1439@linux.intel.com>
- <20200303194134.GW1439@linux.intel.com>
- <ab2a83e1-8ae4-b471-1968-7f6baaac602e@intel.com>
- <20200305162311.GG11500@linux.intel.com>
-From:   Xiaoyao Li <xiaoyao.li@intel.com>
-Message-ID: <20bc0919-72ac-0445-29f2-2b445230faad@intel.com>
-Date:   Fri, 6 Mar 2020 10:15:23 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+        id S1726702AbgCFCRN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 Mar 2020 21:17:13 -0500
+Received: from szxga01-in.huawei.com ([45.249.212.187]:3412 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726317AbgCFCRN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 5 Mar 2020 21:17:13 -0500
+Received: from DGGEMM402-HUB.china.huawei.com (unknown [172.30.72.55])
+        by Forcepoint Email with ESMTP id 067305A2E4406AC0004C;
+        Fri,  6 Mar 2020 10:17:09 +0800 (CST)
+Received: from dggeme702-chm.china.huawei.com (10.1.199.98) by
+ DGGEMM402-HUB.china.huawei.com (10.3.20.210) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Fri, 6 Mar 2020 10:17:08 +0800
+Received: from dggeme753-chm.china.huawei.com (10.3.19.99) by
+ dggeme702-chm.china.huawei.com (10.1.199.98) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.1713.5; Fri, 6 Mar 2020 10:17:08 +0800
+Received: from dggeme753-chm.china.huawei.com ([10.7.64.70]) by
+ dggeme753-chm.china.huawei.com ([10.7.64.70]) with mapi id 15.01.1713.004;
+ Fri, 6 Mar 2020 10:17:08 +0800
+From:   linmiaohe <linmiaohe@huawei.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>
+CC:     "rkrcmar@redhat.com" <rkrcmar@redhat.com>,
+        "sean.j.christopherson@intel.com" <sean.j.christopherson@intel.com>,
+        "jmattson@google.com" <jmattson@google.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "bp@alien8.de" <bp@alien8.de>, "hpa@zytor.com" <hpa@zytor.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "x86@kernel.org" <x86@kernel.org>
+Subject: Re: [PATCH] KVM: VMX: Use wrapper macro
+ ~RMODE_GUEST_OWNED_EFLAGS_BITS directly
+Thread-Topic: [PATCH] KVM: VMX: Use wrapper macro
+ ~RMODE_GUEST_OWNED_EFLAGS_BITS directly
+Thread-Index: AdXzXJ/0DM6VN2+tTIaJSCGff/rcKw==
+Date:   Fri, 6 Mar 2020 02:17:08 +0000
+Message-ID: <f1b01b4903564f2c8c267a3996e1ac29@huawei.com>
+Accept-Language: en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.173.221.158]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <20200305162311.GG11500@linux.intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 3/6/2020 12:23 AM, Sean Christopherson wrote:
-> On Wed, Mar 04, 2020 at 09:49:14AM +0800, Xiaoyao Li wrote:
->> On 3/4/2020 3:41 AM, Sean Christopherson wrote:
->>> On Tue, Mar 03, 2020 at 10:55:24AM -0800, Sean Christopherson wrote:
->>>> On Thu, Feb 06, 2020 at 03:04:06PM +0800, Xiaoyao Li wrote:
->>>>> When flag X86_FEATURE_SPLIT_LOCK_DETECT is set, it should ensure the
->>>>> existence of MSR_TEST_CTRL and MSR_TEST_CTRL.SPLIT_LOCK_DETECT bit.
->>>>
->>>> The changelog confused me a bit.  "When flag X86_FEATURE_SPLIT_LOCK_DETECT
->>>> is set" makes it sound like the logic is being applied after the feature
->>>> bit is set.  Maybe something like:
->>>>
->>>> ```
->>>> Verify MSR_TEST_CTRL.SPLIT_LOCK_DETECT can be toggled via WRMSR prior to
->>>> setting the SPLIT_LOCK_DETECT feature bit so that runtime consumers,
->>>> e.g. KVM, don't need to worry about WRMSR failure.
->>>> ```
->>>>
->>>>> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
->>>>> ---
->>>>>   arch/x86/kernel/cpu/intel.c | 41 +++++++++++++++++++++----------------
->>>>>   1 file changed, 23 insertions(+), 18 deletions(-)
->>>>>
->>>>> diff --git a/arch/x86/kernel/cpu/intel.c b/arch/x86/kernel/cpu/intel.c
->>>>> index 2b3874a96bd4..49535ed81c22 100644
->>>>> --- a/arch/x86/kernel/cpu/intel.c
->>>>> +++ b/arch/x86/kernel/cpu/intel.c
->>>>> @@ -702,7 +702,8 @@ static void init_intel(struct cpuinfo_x86 *c)
->>>>>   	if (tsx_ctrl_state == TSX_CTRL_DISABLE)
->>>>>   		tsx_disable();
->>>>> -	split_lock_init();
->>>>> +	if (boot_cpu_has(X86_FEATURE_SPLIT_LOCK_DETECT))
->>>>> +		split_lock_init();
->>>>>   }
->>>>>   #ifdef CONFIG_X86_32
->>>>> @@ -986,9 +987,26 @@ static inline bool match_option(const char *arg, int arglen, const char *opt)
->>>>>   static void __init split_lock_setup(void)
->>>>>   {
->>>>> +	u64 test_ctrl_val;
->>>>>   	char arg[20];
->>>>>   	int i, ret;
->>>>> +	/*
->>>>> +	 * Use the "safe" versions of rdmsr/wrmsr here to ensure MSR_TEST_CTRL
->>>>> +	 * and MSR_TEST_CTRL.SPLIT_LOCK_DETECT bit do exist. Because there may
->>>>> +	 * be glitches in virtualization that leave a guest with an incorrect
->>>>> +	 * view of real h/w capabilities.
->>>>> +	 */
->>>>> +	if (rdmsrl_safe(MSR_TEST_CTRL, &test_ctrl_val))
->>>>> +		return;
->>>>> +
->>>>> +	if (wrmsrl_safe(MSR_TEST_CTRL,
->>>>> +			test_ctrl_val | MSR_TEST_CTRL_SPLIT_LOCK_DETECT))
->>>>> +		return;
->>>>> +
->>>>> +	if (wrmsrl_safe(MSR_TEST_CTRL, test_ctrl_val))
->>>>> +		return;a
->>>>
->>>> Probing the MSR should be skipped if SLD is disabled in sld_options, i.e.
->>>> move this code (and setup_force_cpu_cap() etc...) down below the
->>>> match_option() logic.  The above would temporarily enable SLD even if the
->>>> admin has explicitly disabled it, e.g. makes the kernel param useless for
->>>> turning off the feature due to bugs.
->>>
->>> Hmm, but this prevents KVM from exposing SLD to a guest when it's off in
->>> the kernel, which would be a useful debug/testing scenario.
->>>
->>> Maybe add another SLD state to forcefully disable SLD?  That way the admin
->>> can turn of SLD in the host kernel but still allow KVM to expose it to its
->>> guests.  E.g.
->>
->> I don't think we need do this.
->>
->> IMO, this a the bug of split_lock_init(), which assume the initial value of
->> MSR_TEST_CTRL is zero, at least bit SPLIT_LOCK of which is zero.
->> This is problem, it's possible that BIOS has set this bit.
-> 
-> Hmm, yeah, that's a bug.  But it's a separate bug.
->   
->> split_lock_setup() here, is to check if the feature really exists. So
->> probing MSR_TEST_CTRL and bit MSR_TEST_CTRL_SPLIT_LOCK_DETECT here. If there
->> all exist, setup_force_cpu_cap(X86_FEATURE_SPLIT_LOCK_DETECT) to indicate
->> feature does exist.
->> Only when feature exists, there is a need to parse the command line config
->> of split_lock_detect.
-> 
-> Toggling SPLIT_LOCK before checking the kernel param is bad behavior, e.g.
-> if someone has broken silicon that causes explosions if SPLIT_LOCK=1.  The
-> behavior is especially bad because cpu_set_core_cap_bits() enumerates split
-> lock detection using FMS, i.e. clearcpuid to kill CORE_CAPABILITIES
-> wouldn't work either.
-> 
-
-It makes things complicated when we take all into account.
-
-We check kernel param first in BSP, if it's sld_off, we don't set flag 
-X86_FEATURE_SPLIT_LOCK_DETECT. Of course during APs booting, there is no 
-X86_FEATURE_SPLIT_LOCK_DETECT, it won't do split_lock_init().
-
-However, due to X86_FEATURE_SPLIT_LOCK_DETECT flag not being set, 
-clearing SLD bit in each AP when sld_off in case BIOS has set it, won't 
-work. So in split_lock_setup() here, if sld_off, we don't set flag 
-X86_FEATURE_SPLIT_LOCK_DETECT, and we also need to send IPI to each AP 
-to clear SLD bit ?
-
+UGFvbG8gQm9uemluaSA8cGJvbnppbmlAcmVkaGF0LmNvbT4gd3JvdGU6DQo+T24gMDUvMDMvMjAg
+MDM6MzUsIGxpbm1pYW9oZSB3cm90ZToNCj4+IChYODZfRUZMQUdTX0lPUEwgfCBYODZfRUZMQUdT
+X1ZNKSBpbmRpY2F0ZXMgdGhlIGVmbGFnIGJpdHMgdGhhdCBjYW4gDQo+PiBub3QgYmUgb3duZWQg
+YnkgcmVhbG1vZGUgZ3Vlc3QsIGkuZS4gflJNT0RFX0dVRVNUX09XTkVEX0VGTEFHU19CSVRTLg0K
+Pg0KPi4uLiBidXQgflJNT0RFX0dVRVNUX09XTkVEX0VGTEFHU19CSVRTIGlzIHRoZSBiaXRzIHRo
+YXQgYXJlIG93bmVkIGJ5IHRoZSBob3N0OyB0aGV5IGNvdWxkIGJlIDAgb3IgMSBhbmQgdGhhdCdz
+IHdoeSB0aGUgY29kZSB3YXMgdXNpbmcgWDg2X0VGTEFHU19JT1BMIHwgWDg2X0VGTEFHU19WTS4N
+Cj4NCj5JIHVuZGVyc3RhbmQgd2hlcmUgflJNT0RFX0dVRVNUX09XTkVEX0VGTEFHU19CSVRTIGlz
+IGJldHRlciB0aGFuIFg4Nl9FRkxBR1NfSU9QTCB8IFg4Nl9FRkxBR1NfVk0sIGJ1dCBJIGNhbm5v
+dCB0aGluayBvZiBhIHdheSB0byBleHByZXNzIGl0IHRoYXQgaXMgdGhlIGJlc3Qgb2YgYm90aCB3
+b3JsZHMuDQo+DQoNCkRlZmluZSBhIG1hY3JvIFJNT0RFX0hPU1RfT1dORURfRUZMQUdTX0JJVFMg
+Zm9yIChYODZfRUZMQUdTX0lPUEwgfCBYODZfRUZMQUdTX1ZNKSBhcyBzdWdnZXN0ZWQgYnkgVml0
+YWx5IHNlZW1zIGEgZ29vZCB3YXkgdG8gZml4IHRoaXMgPyBUaGFua3MuDQoNCg==
