@@ -2,679 +2,221 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B009A17B90E
-	for <lists+kvm@lfdr.de>; Fri,  6 Mar 2020 10:14:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2C17517B922
+	for <lists+kvm@lfdr.de>; Fri,  6 Mar 2020 10:21:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726047AbgCFJOK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 6 Mar 2020 04:14:10 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:26305 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726010AbgCFJOK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 6 Mar 2020 04:14:10 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1583486047;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=//eiJpmPkBJykwZGCYPlxZ7B4SOK/gX5ZfgScuSVslw=;
-        b=UQzZBktMsTH2q2D+j7kIJLR836UDtgX91ArqJfncDAL9fEVMyDSfHeb/C46jutlExo3Zi3
-        InnS/d0aJErEuQCk0Zf8uzp+ZuwVSq8wz/kI9KHSZ6dBZLdo9yZWXSu0qWfRt0eS6nuxpR
-        2w6iwrc4tMAr7uQvApDND/F+ln4OJAk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-60-JK7L4NkIMZmAWTkY4zO4ig-1; Fri, 06 Mar 2020 04:14:05 -0500
-X-MC-Unique: JK7L4NkIMZmAWTkY4zO4ig-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BF006802CB0;
-        Fri,  6 Mar 2020 09:14:03 +0000 (UTC)
-Received: from [10.36.116.59] (ovpn-116-59.ams2.redhat.com [10.36.116.59])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id DCB8673885;
-        Fri,  6 Mar 2020 09:13:56 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH v3 10/14] arm/arm64: ITS: commands
-To:     Andrew Jones <drjones@redhat.com>
-Cc:     eric.auger.pro@gmail.com, maz@kernel.org,
-        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        qemu-devel@nongnu.org, qemu-arm@nongnu.org,
-        peter.maydell@linaro.org, andre.przywara@arm.com, thuth@redhat.com,
-        yuzenghui@huawei.com, alexandru.elisei@arm.com
-References: <20200128103459.19413-1-eric.auger@redhat.com>
- <20200128103459.19413-11-eric.auger@redhat.com>
- <20200207133752.3dsmty3y37wirsda@kamzik.brq.redhat.com>
-From:   Auger Eric <eric.auger@redhat.com>
-Message-ID: <4b121af7-6f9a-1164-55fd-fad1f42f1a3c@redhat.com>
-Date:   Fri, 6 Mar 2020 10:13:55 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
-MIME-Version: 1.0
-In-Reply-To: <20200207133752.3dsmty3y37wirsda@kamzik.brq.redhat.com>
-Content-Type: text/plain; charset=utf-8
+        id S1726047AbgCFJVp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 6 Mar 2020 04:21:45 -0500
+Received: from mga09.intel.com ([134.134.136.24]:19800 "EHLO mga09.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725855AbgCFJVp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 6 Mar 2020 04:21:45 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 06 Mar 2020 01:21:44 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,521,1574150400"; 
+   d="scan'208";a="233203274"
+Received: from fmsmsx107.amr.corp.intel.com ([10.18.124.205])
+  by fmsmga007.fm.intel.com with ESMTP; 06 Mar 2020 01:21:43 -0800
+Received: from fmsmsx122.amr.corp.intel.com (10.18.125.37) by
+ fmsmsx107.amr.corp.intel.com (10.18.124.205) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Fri, 6 Mar 2020 01:21:43 -0800
+Received: from shsmsx101.ccr.corp.intel.com (10.239.4.153) by
+ fmsmsx122.amr.corp.intel.com (10.18.125.37) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Fri, 6 Mar 2020 01:21:43 -0800
+Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.206]) by
+ SHSMSX101.ccr.corp.intel.com ([169.254.1.43]) with mapi id 14.03.0439.000;
+ Fri, 6 Mar 2020 17:21:40 +0800
+From:   "Tian, Kevin" <kevin.tian@intel.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "dev@dpdk.org" <dev@dpdk.org>,
+        "mtosatti@redhat.com" <mtosatti@redhat.com>,
+        "thomas@monjalon.net" <thomas@monjalon.net>,
+        "bluca@debian.org" <bluca@debian.org>,
+        "jerinjacobk@gmail.com" <jerinjacobk@gmail.com>,
+        "Richardson, Bruce" <bruce.richardson@intel.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "Jason Wang" <jasowang@redhat.com>
+Subject: RE: [PATCH v2 0/7] vfio/pci: SR-IOV support
+Thread-Topic: [PATCH v2 0/7] vfio/pci: SR-IOV support
+Thread-Index: AQHV51X+m51PiOSLOUuJWfsX8scipqgrMXbggA6iQ4CAAY51QA==
+Date:   Fri, 6 Mar 2020 09:21:39 +0000
+Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D19D7C0973@SHSMSX104.ccr.corp.intel.com>
+References: <158213716959.17090.8399427017403507114.stgit@gimli.home>
+        <AADFC41AFE54684AB9EE6CBC0274A5D19D79A8A7@SHSMSX104.ccr.corp.intel.com>
+ <20200305103359.4467f97f@w520.home>
+In-Reply-To: <20200305103359.4467f97f@w520.home>
+Accept-Language: en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ctpclassification: CTP_NT
+x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiMDkyYWI5NDctNzQyZC00ZjY5LWIxYTYtNmE0NWYxNTdhZTA3IiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiQ09mUWxlRHJcL0tUUmpnenZPNG1XajYxRUthYlZ3bk9weXJQaDVaWEYxbFZQMHpsNjR2OHpmbUtXZ3N3eFJ0Qk0ifQ==
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Drew,
-
-On 2/7/20 2:37 PM, Andrew Jones wrote:
-> On Tue, Jan 28, 2020 at 11:34:55AM +0100, Eric Auger wrote:
->> Implement main ITS commands. The code is largely inherited from
->> the ITS driver.
->>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->>
->> ---
->>
->> v2 -> v3:
->> - do not use report() anymore
->> - assert if cmd_write exceeds the queue capacity
->>
->> v1 -> v2:
->> - removed its_print_cmd_state
->> ---
->>  arm/Makefile.arm64       |   2 +-
->>  lib/arm/asm/gic-v3-its.h |  38 +++-
->>  lib/arm/gic-v3-its-cmd.c | 454 +++++++++++++++++++++++++++++++++++++++
->>  3 files changed, 492 insertions(+), 2 deletions(-)
->>  create mode 100644 lib/arm/gic-v3-its-cmd.c
->>
->> diff --git a/arm/Makefile.arm64 b/arm/Makefile.arm64
->> index 2571ffb..d12aea5 100644
->> --- a/arm/Makefile.arm64
->> +++ b/arm/Makefile.arm64
->> @@ -19,7 +19,7 @@ endef
->>  cstart.o = $(TEST_DIR)/cstart64.o
->>  cflatobjs += lib/arm64/processor.o
->>  cflatobjs += lib/arm64/spinlock.o
->> -cflatobjs += lib/arm/gic-v3-its.o
->> +cflatobjs += lib/arm/gic-v3-its.o lib/arm/gic-v3-its-cmd.o
->>  
->>  OBJDIRS += lib/arm64
->>  
->> diff --git a/lib/arm/asm/gic-v3-its.h b/lib/arm/asm/gic-v3-its.h
->> index acd97a9..0e5c5b6 100644
->> --- a/lib/arm/asm/gic-v3-its.h
->> +++ b/lib/arm/asm/gic-v3-its.h
->> @@ -45,6 +45,8 @@ struct its_collection {
->>  	u16 col_id;
->>  };
->>  
->> +struct its_cmd_block;
->> +
-> 
-> This isn't necessary. If it was, then it should have been added in a
-> previous patch.
-removed
-> 
->>  struct its_data {
->>  	void *base;
->>  	struct its_typer typer;
->> @@ -107,6 +109,24 @@ extern struct its_data its_data;
->>  #define GITS_BASER_TYPE_DEVICE		1
->>  #define GITS_BASER_TYPE_COLLECTION	4
->>  
->> +/*
->> + * ITS commands
->> + */
->> +#define GITS_CMD_MAPD                   0x08
->> +#define GITS_CMD_MAPC                   0x09
->> +#define GITS_CMD_MAPTI                  0x0a
->> +/* older GIC documentation used MAPVI for this command */
->> +#define GITS_CMD_MAPVI                  GITS_CMD_MAPTI
->> +#define GITS_CMD_MAPI                   0x0b
->> +#define GITS_CMD_MOVI                   0x01
->> +#define GITS_CMD_DISCARD                0x0f
->> +#define GITS_CMD_INV                    0x0c
->> +#define GITS_CMD_MOVALL                 0x0e
->> +#define GITS_CMD_INVALL                 0x0d
->> +#define GITS_CMD_INT                    0x03
->> +#define GITS_CMD_CLEAR                  0x04
->> +#define GITS_CMD_SYNC                   0x05
-> 
-> Please use tabs.
-done
-> 
->> +
->>  struct its_cmd_block {
->>  	u64 raw_cmd[4];
->>  };
->> @@ -119,11 +139,27 @@ extern void its_enable_defaults(void);
->>  extern struct its_device *its_create_device(u32 dev_id, int nr_ites);
->>  extern struct its_collection *its_create_collection(u32 col_id, u32 target_pe);
->>  
->> +extern void its_send_mapd(struct its_device *dev, int valid);
->> +extern void its_send_mapc(struct its_collection *col, int valid);
->> +extern void its_send_mapti(struct its_device *dev, u32 irq_id,
->> +			   u32 event_id, struct its_collection *col);
->> +extern void its_send_int(struct its_device *dev, u32 event_id);
->> +extern void its_send_inv(struct its_device *dev, u32 event_id);
->> +extern void its_send_discard(struct its_device *dev, u32 event_id);
->> +extern void its_send_clear(struct its_device *dev, u32 event_id);
->> +extern void its_send_invall(struct its_collection *col);
->> +extern void its_send_movi(struct its_device *dev,
->> +			  struct its_collection *col, u32 id);
->> +extern void its_send_sync(struct its_collection *col);
->> +
->> +#define ITS_FLAGS_CMDQ_NEEDS_FLUSHING           (1ULL << 0)
->> +#define ITS_FLAGS_WORKAROUND_CAVIUM_22375       (1ULL << 1)
->> +#define ITS_FLAGS_WORKAROUND_CAVIUM_23144       (1ULL << 2)
-> 
-> What are these flags for?
-removed
-> 
->> +
->>  #else /* __arm__ */
->>  
->>  static inline void its_init(void) {}
->>  
->>  #endif
->> -
->>  #endif /* !__ASSEMBLY__ */
->>  #endif /* _ASMARM_GIC_V3_ITS_H_ */
->> diff --git a/lib/arm/gic-v3-its-cmd.c b/lib/arm/gic-v3-its-cmd.c
->> new file mode 100644
->> index 0000000..fb4364c
->> --- /dev/null
->> +++ b/lib/arm/gic-v3-its-cmd.c
->> @@ -0,0 +1,454 @@
->> +/*
->> + * Copyright (C) 2020, Red Hat Inc, Eric Auger <eric.auger@redhat.com>
->> + *
->> + * Most of the code is copy-pasted from:
->> + * drivers/irqchip/irq-gic-v3-its.c
->> + * This work is licensed under the terms of the GNU LGPL, version 2.
->> + */
->> +#include <asm/io.h>
->> +#include <asm/gic.h>
->> +#include <asm/gic-v3-its.h>
->> +
->> +#define ITS_ITT_ALIGN           SZ_256
-> 
-> tabs
-done
-> 
->> +
->> +static const char * const its_cmd_string[] = {
->> +	[GITS_CMD_MAPD]		= "MAPD",
->> +	[GITS_CMD_MAPC]		= "MAPC",
->> +	[GITS_CMD_MAPTI]	= "MAPTI",
->> +	[GITS_CMD_MAPI]		= "MAPI",
->> +	[GITS_CMD_MOVI]		= "MOVI",
->> +	[GITS_CMD_DISCARD]	= "DISCARD",
->> +	[GITS_CMD_INV]		= "INV",
->> +	[GITS_CMD_MOVALL]	= "MOVALL",
->> +	[GITS_CMD_INVALL]	= "INVALL",
->> +	[GITS_CMD_INT]		= "INT",
->> +	[GITS_CMD_CLEAR]	= "CLEAR",
->> +	[GITS_CMD_SYNC]		= "SYNC",
->> +};
->> +
->> +struct its_cmd_desc {
->> +	union {
->> +		struct {
->> +			struct its_device *dev;
->> +			u32 event_id;
->> +		} its_inv_cmd;
->> +
->> +		struct {
->> +			struct its_device *dev;
->> +			u32 event_id;
->> +		} its_int_cmd;
->> +
->> +		struct {
->> +			struct its_device *dev;
->> +			bool valid;
->> +		} its_mapd_cmd;
->> +
->> +		struct {
->> +			struct its_collection *col;
->> +			bool valid;
->> +		} its_mapc_cmd;
->> +
->> +		struct {
->> +			struct its_device *dev;
->> +			u32 phys_id;
->> +			u32 event_id;
->> +			u32 col_id;
->> +		} its_mapti_cmd;
->> +
->> +		struct {
->> +			struct its_device *dev;
->> +			struct its_collection *col;
->> +			u32 event_id;
->> +		} its_movi_cmd;
->> +
->> +		struct {
->> +			struct its_device *dev;
->> +			u32 event_id;
->> +		} its_discard_cmd;
->> +
->> +		struct {
->> +			struct its_device *dev;
->> +			u32 event_id;
->> +		} its_clear_cmd;
->> +
->> +		struct {
->> +			struct its_collection *col;
->> +		} its_invall_cmd;
->> +
->> +		struct {
->> +			struct its_collection *col;
->> +		} its_sync_cmd;
->> +	};
->> +};
->> +
->> +typedef void (*its_cmd_builder_t)(struct its_cmd_block *,
->> +				  struct its_cmd_desc *);
->> +
->> +/* ITS COMMANDS */
->> +
->> +static void its_encode_cmd(struct its_cmd_block *cmd, u8 cmd_nr)
->> +{
->> +	cmd->raw_cmd[0] &= ~0xffUL;
->> +	cmd->raw_cmd[0] |= cmd_nr;
->> +}
->> +
->> +static void its_encode_devid(struct its_cmd_block *cmd, u32 devid)
->> +{
->> +	cmd->raw_cmd[0] &= BIT_ULL(32) - 1;
->> +	cmd->raw_cmd[0] |= ((u64)devid) << 32;
->> +}
->> +
->> +static void its_encode_event_id(struct its_cmd_block *cmd, u32 id)
->> +{
->> +	cmd->raw_cmd[1] &= ~0xffffffffUL;
->> +	cmd->raw_cmd[1] |= id;
->> +}
->> +
->> +static void its_encode_phys_id(struct its_cmd_block *cmd, u32 phys_id)
->> +{
->> +	cmd->raw_cmd[1] &= 0xffffffffUL;
->> +	cmd->raw_cmd[1] |= ((u64)phys_id) << 32;
->> +}
->> +
->> +static void its_encode_size(struct its_cmd_block *cmd, u8 size)
->> +{
->> +	cmd->raw_cmd[1] &= ~0x1fUL;
->> +	cmd->raw_cmd[1] |= size & 0x1f;
->> +}
->> +
->> +static void its_encode_itt(struct its_cmd_block *cmd, u64 itt_addr)
->> +{
->> +	cmd->raw_cmd[2] &= ~0xffffffffffffUL;
->> +	cmd->raw_cmd[2] |= itt_addr & 0xffffffffff00UL;
->> +}
->> +
->> +static void its_encode_valid(struct its_cmd_block *cmd, int valid)
->> +{
->> +	cmd->raw_cmd[2] &= ~(1UL << 63);
->> +	cmd->raw_cmd[2] |= ((u64)!!valid) << 63;
->> +}
->> +
->> +static void its_encode_target(struct its_cmd_block *cmd, u64 target_addr)
->> +{
->> +	cmd->raw_cmd[2] &= ~(0xfffffffffUL << 16);
->> +	cmd->raw_cmd[2] |= (target_addr & (0xffffffffUL << 16));
->> +}
->> +
->> +static void its_encode_collection(struct its_cmd_block *cmd, u16 col)
->> +{
->> +	cmd->raw_cmd[2] &= ~0xffffUL;
->> +	cmd->raw_cmd[2] |= col;
->> +}
->> +
->> +static inline void its_fixup_cmd(struct its_cmd_block *cmd)
->> +{
->> +	/* Let's fixup BE commands */
->> +	cmd->raw_cmd[0] = cpu_to_le64(cmd->raw_cmd[0]);
->> +	cmd->raw_cmd[1] = cpu_to_le64(cmd->raw_cmd[1]);
->> +	cmd->raw_cmd[2] = cpu_to_le64(cmd->raw_cmd[2]);
->> +	cmd->raw_cmd[3] = cpu_to_le64(cmd->raw_cmd[3]);
->> +}
->> +
->> +static u64 its_cmd_ptr_to_offset(struct its_cmd_block *ptr)
->> +{
->> +	return (ptr - its_data.cmd_base) * sizeof(*ptr);
->> +}
->> +
->> +static struct its_cmd_block *its_post_commands(void)
->> +{
->> +	u64 wr = its_cmd_ptr_to_offset(its_data.cmd_write);
->> +
->> +	writeq(wr, its_data.base + GITS_CWRITER);
->> +	return its_data.cmd_write;
->> +}
->> +
->> +
-> 
-> extra blank line
-removed
-> 
->> +static struct its_cmd_block *its_allocate_entry(void)
->> +{
->> +	struct its_cmd_block *cmd;
->> +
->> +	assert((u64)its_data.cmd_write < (u64)its_data.cmd_base + SZ_64K);
->> +	cmd = its_data.cmd_write++;
->> +	return cmd;
->> +}
->> +
->> +static void its_wait_for_range_completion(struct its_cmd_block *from,
->> +					  struct its_cmd_block *to)
->> +{
->> +	u64 rd_idx, from_idx, to_idx;
->> +	u32 count = 1000000;    /* 1s! */
->> +
->> +	from_idx = its_cmd_ptr_to_offset(from);
->> +	to_idx = its_cmd_ptr_to_offset(to);
->> +	while (1) {
->> +		rd_idx = readq(its_data.base + GITS_CREADR);
->> +		if (rd_idx >= to_idx || rd_idx < from_idx)
->> +			break;
->> +
->> +		count--;
->> +		if (!count) {
->> +			unsigned int cmd_id = from->raw_cmd[0] & 0xFF;
->> +
->> +			assert_msg(false, "%s timeout!",
->> +			       cmd_id <= 0xF ? its_cmd_string[cmd_id] :
->> +			       "Unexpected");
->> +			return;
-> 
-> No need for 'return' after assert.
-removed
-> 
->> +		}
->> +		cpu_relax();
-> 
-> no need for cpu_relax right before udelay which calls cpu_relax
-removed
-> 
->> +		udelay(1);
->> +	}
->> +}
->> +
->> +static void its_send_single_command(its_cmd_builder_t builder,
->> +				    struct its_cmd_desc *desc)
->> +{
->> +	struct its_cmd_block *cmd, *next_cmd;
->> +
->> +	cmd = its_allocate_entry();
->> +	builder(cmd, desc);
->> +	next_cmd = its_post_commands();
->> +
->> +	its_wait_for_range_completion(cmd, next_cmd);
->> +}
->> +
->> +
->> +static void its_build_mapd_cmd(struct its_cmd_block *cmd,
->> +			       struct its_cmd_desc *desc)
->> +{
->> +	unsigned long itt_addr;
->> +	u8 size = 12; /* 4096 eventids */
->> +
->> +	itt_addr = (unsigned long)desc->its_mapd_cmd.dev->itt;
->> +	itt_addr = ALIGN(itt_addr, ITS_ITT_ALIGN);
->> +
->> +	its_encode_cmd(cmd, GITS_CMD_MAPD);
->> +	its_encode_devid(cmd, desc->its_mapd_cmd.dev->device_id);
->> +	its_encode_size(cmd, size - 1);
->> +	its_encode_itt(cmd, itt_addr);
->> +	its_encode_valid(cmd, desc->its_mapd_cmd.valid);
->> +
->> +	its_fixup_cmd(cmd);
->> +	printf("ITS: MAPD devid=%d size = 0x%x itt=0x%lx valid=%d\n",
->> +		desc->its_mapd_cmd.dev->device_id,
->> +		size, itt_addr, desc->its_mapd_cmd.valid);
->> +
->> +}
->> +
->> +static void its_build_mapc_cmd(struct its_cmd_block *cmd,
->> +			       struct its_cmd_desc *desc)
->> +{
->> +	its_encode_cmd(cmd, GITS_CMD_MAPC);
->> +	its_encode_collection(cmd, desc->its_mapc_cmd.col->col_id);
->> +	its_encode_target(cmd, desc->its_mapc_cmd.col->target_address);
->> +	its_encode_valid(cmd, desc->its_mapc_cmd.valid);
->> +
->> +	its_fixup_cmd(cmd);
->> +	report_info("MAPC col_id=%d target_addr = 0x%lx valid=%d",
->> +		    desc->its_mapc_cmd.col->col_id,
->> +		    desc->its_mapc_cmd.col->target_address,
->> +		    desc->its_mapc_cmd.valid);
-> 
-> printf, but better yet, leave the printing to the callers. We're in
-> library code here, so if a unit test doesn't want this verbosity
-> then they shouldn't have to have it. Same comment for the above printf
-> and all the below report_infos.
-I switched to printf. I added a verbose field to desc so that send*
-function can pass a verbose argument. It is easier to trace at low
-levels as all the fields are resolved there.
-> 
->> +}
->> +
->> +static void its_build_mapti_cmd(struct its_cmd_block *cmd,
->> +				struct its_cmd_desc *desc)
->> +{
->> +	its_encode_cmd(cmd, GITS_CMD_MAPTI);
->> +	its_encode_devid(cmd, desc->its_mapti_cmd.dev->device_id);
->> +	its_encode_event_id(cmd, desc->its_mapti_cmd.event_id);
->> +	its_encode_phys_id(cmd, desc->its_mapti_cmd.phys_id);
->> +	its_encode_collection(cmd, desc->its_mapti_cmd.col_id);
->> +
->> +	its_fixup_cmd(cmd);
->> +	report_info("MAPTI dev_id=%d event_id=%d -> phys_id=%d, col_id=%d",
->> +		    desc->its_mapti_cmd.dev->device_id,
->> +		    desc->its_mapti_cmd.event_id,
->> +		    desc->its_mapti_cmd.phys_id,
->> +		    desc->its_mapti_cmd.col_id);
->> +}
->> +
->> +static void its_build_invall_cmd(struct its_cmd_block *cmd,
->> +			      struct its_cmd_desc *desc)
->> +{
->> +	its_encode_cmd(cmd, GITS_CMD_INVALL);
->> +	its_encode_collection(cmd, desc->its_invall_cmd.col->col_id);
->> +
->> +	its_fixup_cmd(cmd);
->> +	report_info("INVALL col_id=%d", desc->its_invall_cmd.col->col_id);
->> +}
->> +
->> +static void its_build_clear_cmd(struct its_cmd_block *cmd,
->> +				struct its_cmd_desc *desc)
->> +{
->> +	its_encode_cmd(cmd, GITS_CMD_CLEAR);
->> +	its_encode_devid(cmd, desc->its_clear_cmd.dev->device_id);
->> +	its_encode_event_id(cmd, desc->its_clear_cmd.event_id);
->> +
->> +	its_fixup_cmd(cmd);
->> +	report_info("CLEAR col_id=%d", desc->its_invall_cmd.col->col_id);
->> +}
->> +
->> +static void its_build_discard_cmd(struct its_cmd_block *cmd,
->> +				  struct its_cmd_desc *desc)
->> +{
->> +	its_encode_cmd(cmd, GITS_CMD_DISCARD);
->> +	its_encode_devid(cmd, desc->its_discard_cmd.dev->device_id);
->> +	its_encode_event_id(cmd, desc->its_discard_cmd.event_id);
->> +
->> +	its_fixup_cmd(cmd);
->> +	report_info("DISCARD col_id=%d", desc->its_invall_cmd.col->col_id);
->> +}
->> +
->> +static void its_build_inv_cmd(struct its_cmd_block *cmd,
->> +			      struct its_cmd_desc *desc)
->> +{
->> +	its_encode_cmd(cmd, GITS_CMD_INV);
->> +	its_encode_devid(cmd, desc->its_inv_cmd.dev->device_id);
->> +	its_encode_event_id(cmd, desc->its_inv_cmd.event_id);
->> +
->> +	its_fixup_cmd(cmd);
->> +	report_info("INV dev_id=%d event_id=%d",
->> +		    desc->its_inv_cmd.dev->device_id,
->> +		    desc->its_inv_cmd.event_id);
->> +}
->> +
->> +static void its_build_int_cmd(struct its_cmd_block *cmd,
->> +			      struct its_cmd_desc *desc)
->> +{
->> +	its_encode_cmd(cmd, GITS_CMD_INT);
->> +	its_encode_devid(cmd, desc->its_int_cmd.dev->device_id);
->> +	its_encode_event_id(cmd, desc->its_int_cmd.event_id);
->> +
->> +	its_fixup_cmd(cmd);
->> +	report_info("INT dev_id=%d event_id=%d",
->> +		    desc->its_int_cmd.dev->device_id,
->> +		    desc->its_int_cmd.event_id);
->> +}
->> +
->> +static void its_build_sync_cmd(struct its_cmd_block *cmd,
->> +			       struct its_cmd_desc *desc)
->> +{
->> +	its_encode_cmd(cmd, GITS_CMD_SYNC);
->> +	its_encode_target(cmd, desc->its_sync_cmd.col->target_address);
->> +	its_fixup_cmd(cmd);
-> 
-> All the rest of the blocks have a blank line before its_fixup_cmd,
-> but I actually like this one better. The blanks are unnecessary.
-removed
-> 
->> +	report_info("SYNC target_addr = 0x%lx",
->> +		    desc->its_sync_cmd.col->target_address);
->> +}
->> +
->> +static void its_build_movi_cmd(struct its_cmd_block *cmd,
->> +			       struct its_cmd_desc *desc)
->> +{
->> +	its_encode_cmd(cmd, GITS_CMD_MOVI);
->> +	its_encode_devid(cmd, desc->its_movi_cmd.dev->device_id);
->> +	its_encode_event_id(cmd, desc->its_movi_cmd.event_id);
->> +	its_encode_collection(cmd, desc->its_movi_cmd.col->col_id);
->> +
->> +	its_fixup_cmd(cmd);
->> +	report_info("MOVI dev_id=%d event_id = %d col_id=%d",
->> +		    desc->its_movi_cmd.dev->device_id,
->> +		    desc->its_movi_cmd.event_id,
->> +		    desc->its_movi_cmd.col->col_id);
->> +}
->> +
->> +void its_send_mapd(struct its_device *dev, int valid)
->> +{
->> +	struct its_cmd_desc desc;
->> +
->> +	desc.its_mapd_cmd.dev = dev;
->> +	desc.its_mapd_cmd.valid = !!valid;
->> +
->> +	its_send_single_command(its_build_mapd_cmd, &desc);
->> +}
->> +
->> +void its_send_mapc(struct its_collection *col, int valid)
->> +{
->> +	struct its_cmd_desc desc;
->> +
->> +	desc.its_mapc_cmd.col = col;
->> +	desc.its_mapc_cmd.valid = !!valid;
->> +
->> +	its_send_single_command(its_build_mapc_cmd, &desc);
->> +}
->> +
->> +void its_send_mapti(struct its_device *dev, u32 irq_id,
->> +		    u32 event_id, struct its_collection *col)
->> +{
->> +	struct its_cmd_desc desc;
->> +
->> +	desc.its_mapti_cmd.dev = dev;
->> +	desc.its_mapti_cmd.phys_id = irq_id;
->> +	desc.its_mapti_cmd.event_id = event_id;
->> +	desc.its_mapti_cmd.col_id = col->col_id;
->> +
->> +	its_send_single_command(its_build_mapti_cmd, &desc);
->> +}
->> +
->> +void its_send_int(struct its_device *dev, u32 event_id)
->> +{
->> +	struct its_cmd_desc desc;
->> +
->> +	desc.its_int_cmd.dev = dev;
->> +	desc.its_int_cmd.event_id = event_id;
->> +
->> +	its_send_single_command(its_build_int_cmd, &desc);
->> +}
->> +
->> +void its_send_movi(struct its_device *dev,
->> +		   struct its_collection *col, u32 id)
->> +{
->> +	struct its_cmd_desc desc;
->> +
->> +	desc.its_movi_cmd.dev = dev;
->> +	desc.its_movi_cmd.col = col;
->> +	desc.its_movi_cmd.event_id = id;
->> +
->> +	its_send_single_command(its_build_movi_cmd, &desc);
->> +}
->> +
->> +void its_send_invall(struct its_collection *col)
->> +{
->> +	struct its_cmd_desc desc;
->> +
->> +	desc.its_invall_cmd.col = col;
->> +
->> +	its_send_single_command(its_build_invall_cmd, &desc);
->> +}
->> +
->> +void its_send_inv(struct its_device *dev, u32 event_id)
->> +{
->> +	struct its_cmd_desc desc;
->> +
->> +	desc.its_inv_cmd.dev = dev;
->> +	desc.its_inv_cmd.event_id = event_id;
->> +
->> +	its_send_single_command(its_build_inv_cmd, &desc);
->> +}
->> +
->> +void its_send_discard(struct its_device *dev, u32 event_id)
->> +{
->> +	struct its_cmd_desc desc;
->> +
->> +	desc.its_discard_cmd.dev = dev;
->> +	desc.its_discard_cmd.event_id = event_id;
->> +
->> +	its_send_single_command(its_build_discard_cmd, &desc);
->> +}
->> +
->> +void its_send_clear(struct its_device *dev, u32 event_id)
->> +{
->> +	struct its_cmd_desc desc;
->> +
->> +	desc.its_clear_cmd.dev = dev;
->> +	desc.its_clear_cmd.event_id = event_id;
->> +
->> +	its_send_single_command(its_build_clear_cmd, &desc);
->> +}
->> +
->> +void its_send_sync(struct its_collection *col)
->> +{
->> +	struct its_cmd_desc desc;
->> +
->> +	desc.its_sync_cmd.col = col;
->> +
->> +	its_send_single_command(its_build_sync_cmd, &desc);
->> +}
->> +
->> -- 
->> 2.20.1
->>
->>
-> 
-> Thanks,
-> drew 
-> 
-Thanks
-
-Eric
-
+PiBGcm9tOiBBbGV4IFdpbGxpYW1zb24NCj4gU2VudDogRnJpZGF5LCBNYXJjaCA2LCAyMDIwIDE6
+MzQgQU0NCj4gDQo+IEhpIEtldmluLA0KPiANCj4gU29ycnkgZm9yIHRoZSBkZWxheSwgSSd2ZSBi
+ZWVuIG91dCBvbiBQVE8uLi4NCj4gDQo+IE9uIFR1ZSwgMjUgRmViIDIwMjAgMDI6MzM6MjcgKzAw
+MDANCj4gIlRpYW4sIEtldmluIiA8a2V2aW4udGlhbkBpbnRlbC5jb20+IHdyb3RlOg0KPiANCj4g
+PiA+IEZyb206IEFsZXggV2lsbGlhbXNvbg0KPiA+ID4gU2VudDogVGh1cnNkYXksIEZlYnJ1YXJ5
+IDIwLCAyMDIwIDI6NTQgQU0NCj4gPiA+DQo+ID4gPiBDaGFuZ2VzIHNpbmNlIHYxIGFyZSBwcmlt
+YXJpbHkgdG8gcGF0Y2ggMy83IHdoZXJlIHRoZSBjb21taXQgbG9nIGlzDQo+ID4gPiByZXdyaXR0
+ZW4sIGFsb25nIHdpdGggb3B0aW9uIHBhcnNpbmcgYW5kIGZhaWx1cmUgbG9nZ2luZyBiYXNlZCBv
+bg0KPiA+ID4gdXBzdHJlYW0gZGlzY3Vzc2lvbnMuICBUaGUgcHJpbWFyeSB1c2VyIHZpc2libGUg
+ZGlmZmVyZW5jZSBpcyB0aGF0DQo+ID4gPiBvcHRpb24gcGFyc2luZyBpcyBub3cgbXVjaCBtb3Jl
+IHN0cmljdC4gIElmIGEgdmZfdG9rZW4gb3B0aW9uIGlzDQo+ID4gPiBwcm92aWRlZCB0aGF0IGNh
+bm5vdCBiZSB1c2VkLCB3ZSBnZW5lcmF0ZSBhbiBlcnJvci4gIEFzIGEgcmVzdWx0IG9mDQo+ID4g
+PiB0aGlzLCBvcGVuaW5nIGEgUEYgd2l0aCBhIHZmX3Rva2VuIG9wdGlvbiB3aWxsIHNlcnZlIGFz
+IGEgbWVjaGFuaXNtIG9mDQo+ID4gPiBzZXR0aW5nIHRoZSB2Zl90b2tlbi4gIFRoaXMgc2VlbXMg
+bGlrZSBhIG1vcmUgdXNlciBmcmllbmRseSBBUEkgdGhhbg0KPiA+ID4gdGhlIGFsdGVybmF0aXZl
+IG9mIHNvbWV0aW1lcyByZXF1aXJpbmcgdGhlIG9wdGlvbiAoVkZzIGluIHVzZSkgYW5kDQo+ID4g
+PiBzb21ldGltZXMgcmVqZWN0aW5nIGl0LCBhbmQgdXBob2xkcyBvdXIgZGVzaXJlIHRoYXQgdGhl
+IG9wdGlvbiBpcw0KPiA+ID4gYWx3YXlzIGVpdGhlciB1c2VkIG9yIHJlamVjdGVkLg0KPiA+ID4N
+Cj4gPiA+IFRoaXMgYWxzbyBtZWFucyB0aGF0IHRoZSBWRklPX0RFVklDRV9GRUFUVVJFIGlvY3Rs
+IGlzIG5vdCB0aGUgb25seQ0KPiA+ID4gbWVhbnMgb2Ygc2V0dGluZyB0aGUgVkYgdG9rZW4sIHdo
+aWNoIG1pZ2h0IGNhbGwgaW50byBxdWVzdGlvbiB3aGV0aGVyDQo+ID4gPiB3ZSBhYnNvbHV0ZWx5
+IG5lZWQgdGhpcyBuZXcgaW9jdGwuICBDdXJyZW50bHkgSSdtIGtlZXBpbmcgaXQgYmVjYXVzZSBJ
+DQo+ID4gPiBjYW4gaW1hZ2luZSB1c2UgY2FzZXMsIGZvciBleGFtcGxlIGlmIGEgaHlwZXJ2aXNv
+ciB3ZXJlIHRvIHN1cHBvcnQNCj4gPiA+IFNSLUlPViwgdGhlIFBGIGRldmljZSBtaWdodCBiZSBv
+cGVuZWQgd2l0aG91dCBjb25zaWRlcmF0aW9uIGZvciBhIFZGDQo+ID4gPiB0b2tlbiBhbmQgd2Un
+ZCByZXF1aXJlIHRoZSBoeXBzZXJ2aXNvciB0byBjbG9zZSBhbmQgcmUtb3BlbiB0aGUgUEYgaW4N
+Cj4gPiA+IG9yZGVyIHRvIHNldCBhIGtub3duIFZGIHRva2VuLCB3aGljaCBpcyBpbXByYWN0aWNh
+bC4NCj4gPiA+DQo+ID4gPiBTZXJpZXMgb3ZlcnZpZXcgKHNhbWUgYXMgcHJvdmlkZWQgd2l0aCB2
+MSk6DQo+ID4NCj4gPiBUaGFua3MgZm9yIGRvaW5nIHRoaXMhDQo+ID4NCj4gPiA+DQo+ID4gPiBU
+aGUgc3lub3BzaXMgb2YgdGhpcyBzZXJpZXMgaXMgdGhhdCB3ZSBoYXZlIGFuIG9uZ29pbmcgZGVz
+aXJlIHRvIGRyaXZlDQo+ID4gPiBQQ0llIFNSLUlPViBQRnMgZnJvbSB1c2Vyc3BhY2Ugd2l0aCBW
+RklPLiAgVGhlcmUncyBhbiBpbW1lZGlhdGUgbmVlZA0KPiA+ID4gZm9yIHRoaXMgd2l0aCBEUERL
+IGRyaXZlcnMgYW5kIHBvdGVudGlhbGx5IGludGVyZXN0aW5nIGZ1dHVyZSB1c2UNCj4gPg0KPiA+
+IENhbiB5b3UgcHJvdmlkZSBhIGxpbmsgdG8gdGhlIERQREsgZGlzY3Vzc2lvbj8NCj4gDQo+IFRo
+ZXJlJ3MgYSB0aHJlYWQgaGVyZSB3aGljaCBwcm9wb3NlZCBhbiBvdXQtb2YtdHJlZSBkcml2ZXIg
+dGhhdCBlbmFibGVzDQo+IGEgcGFyYWxsZWwgc3ItaW92IGVuYWJsaW5nIGludGVyZmFjZSBmb3Ig
+YSB2ZmlvLXBjaSBvd24gZGV2aWNlLg0KPiBDbGVhcmx5IEkgZmVsdCBzdHJvbmdseSBhYm91dCBp
+dCA7KQ0KPiANCj4gaHR0cHM6Ly9wYXRjaGVzLmRwZGsub3JnL3BhdGNoLzU4ODEwLw0KPiANCj4g
+QWxzbywgZG9jdW1lbnRhdGlvbiBmb3IgbWFraW5nIHVzZSBvZiBhbiBJbnRlbCBGUEdBIGRldmlj
+ZSB3aXRoIERQREsNCj4gcmVxdWlyZXMgdGhlIFBGIGJvdW5kIHRvIGlnYl91aW8gdG8gc3VwcG9y
+dCBlbmFibGluZyBTUi1JT1Y6DQo+IA0KPiBodHRwczovL2RvYy5kcGRrLm9yZy9ndWlkZXMvYmJk
+ZXZzL2ZwZ2FfbHRlX2ZlYy5odG1sDQoNCnRoYW5rcy4gaXQgaXMgdXNlZnVsLg0KDQo+IA0KPiA+
+ID4gY2FzZXMgaW4gdmlydHVhbGl6YXRpb24uICBXZSd2ZSBiZWVuIHJlbHVjdGFudCB0byBhZGQg
+dGhpcyBzdXBwb3J0DQo+ID4gPiBwcmV2aW91c2x5IGR1ZSB0byB0aGUgZGVwZW5kZW5jeSBhbmQg
+dHJ1c3QgcmVsYXRpb25zaGlwIGJldHdlZW4gdGhlDQo+ID4gPiBWRiBkZXZpY2UgYW5kIFBGIGRy
+aXZlci4gIE1pbmltYWxseSB0aGUgUEYgZHJpdmVyIGNhbiBpbmR1Y2UgYSBkZW5pYWwNCj4gPiA+
+IG9mIHNlcnZpY2UgdG8gdGhlIFZGLCBidXQgZGVwZW5kaW5nIG9uIHRoZSBzcGVjaWZpYyBpbXBs
+ZW1lbnRhdGlvbiwNCj4gPiA+IHRoZSBQRiBkcml2ZXIgbWlnaHQgYWxzbyBiZSByZXNwb25zaWJs
+ZSBmb3IgbW92aW5nIGRhdGEgYmV0d2VlbiBWRnMNCj4gPiA+IG9yIGhhdmUgZGlyZWN0IGFjY2Vz
+cyB0byB0aGUgc3RhdGUgb2YgdGhlIFZGLCBpbmNsdWRpbmcgZGF0YSBvciBzdGF0ZQ0KPiA+ID4g
+b3RoZXJ3aXNlIHByaXZhdGUgdG8gdGhlIFZGIG9yIFZGIGRyaXZlci4NCj4gPg0KPiA+IEp1c3Qg
+YSBsb3VkIHRoaW5raW5nLiBXaGlsZSB0aGUgbW90aXZhdGlvbiBvZiBWRiB0b2tlbiBzb3VuZHMg
+cmVhc29uYWJsZQ0KPiA+IHRvIG1lLCBJJ20gY3VyaW91cyB3aHkgdGhlIHNhbWUgY29uY2VybiBp
+cyBub3QgcmFpc2VkIGluIG90aGVyIHVzYWdlcy4NCj4gPiBGb3IgZXhhbXBsZSwgdGhlcmUgaXMg
+bm8gc3VjaCBkZXNpZ24gaW4gdmlydGlvIGZyYW1ld29yaywgd2hlcmUgdGhlDQo+ID4gdmlydGlv
+IGRldmljZSBjb3VsZCBhbHNvIGJlIHJlc3RhcnRlZCwgcHV0dGluZyBpbiBzZXBhcmF0ZSBwcm9j
+ZXNzICh2aG9zdC0NCj4gdXNlciksDQo+ID4gYW5kIGV2ZW4gaW4gc2VwYXJhdGUgVk0gKHZpcnRp
+by12aG9zdC11c2VyKSwgZXRjLiBPZiBjb3Vyc2UgdGhlIHBhcmEtDQo+ID4gdmlydHVhbGl6ZWQg
+YXR0cmlidXRlIG9mIHZpcnRpbyBpbXBsaWVzIHNvbWUgZGVncmVlIG9mIHRydXN0LCBidXQgYXMg
+eW91DQo+ID4gbWVudGlvbmVkIG1hbnkgU1ItSU9WIGltcGxlbWVudGF0aW9ucyBzdXBwb3J0IFZG
+LT5QRiBjb21tdW5pY2F0aW9uDQo+ID4gd2hpY2ggYWxzbyBpbXBsaWVzIHNvbWUgbGV2ZWwgb2Yg
+dHJ1c3QuIEl0J3MgcGVyZmVjdGx5IGZpbmUgaWYgVkZJTyBqdXN0IHRyaWVzDQo+ID4gdG8gZG8g
+YmV0dGVyIHRoYW4gb3RoZXIgc3ViLXN5c3RlbXMsIGJ1dCBrbm93aW5nIGhvdyBvdGhlciBwZW9w
+bGUNCj4gPiB0YWNrbGUgdGhlIHNpbWlsYXIgcHJvYmxlbSBtYXkgbWFrZSB0aGUgd2hvbGUgcGlj
+dHVyZSBjbGVhcmVyLiDwn5iKDQo+ID4NCj4gPiArSmFzb24uDQo+IA0KPiBXZSBjYW4gZm9sbG93
+IHRoZSB0aHJlYWQgd2l0aCBKYXNvbiwgYnV0IEkgY2FuJ3QgcmVhbGx5IHNwZWFrIHRvDQo+IHdo
+ZXRoZXIgdmlydGlvIG5lZWRzIHNvbWV0aGluZyBzaW1pbGFyIG9yIGRvZXNuJ3QgcHJvdmlkZSBl
+bm91Z2ggUEYNCj4gYWNjZXNzIHRvIGJlIGNvbmNlcm5lZC4gIElmIHRoZXkgbmVlZCBhIHNpbWls
+YXIgc29sdXRpb24sIHdlIGNhbg0KPiBjb2xsYWJvcmF0ZSwgYnV0IHRoZSBleHRlbnNpb24gd2Un
+cmUgZGVmaW5pbmcgaGVyZSBpcyBzcGVjaWZpY2FsbHkgcGFydA0KPiBvZiB0aGUgdmZpby1wY2kg
+QUJJLCBzbyBpdCBtaWdodCBub3QgYmUgZWFzaWx5IHBvcnRhYmxlIHRvIHZpcnRpby4NCj4gDQo+
+ID4gPiBUbyBoZWxwIHJlc29sdmUgdGhlc2UgY29uY2VybnMsIHdlIGludHJvZHVjZSBhIFZGIHRv
+a2VuIGludG8gdGhlIFZGSU8NCj4gPiA+IFBDSSBBQkksIHdoaWNoIGFjdHMgYXMgYSBzaGFyZWQg
+c2VjcmV0IGtleSBiZXR3ZWVuIGRyaXZlcnMuICBUaGUNCj4gPiA+IHVzZXJzcGFjZSBQRiBkcml2
+ZXIgaXMgcmVxdWlyZWQgdG8gc2V0IHRoZSBWRiB0b2tlbiB0byBhIGtub3duIHZhbHVlDQo+ID4g
+PiBhbmQgdXNlcnNwYWNlIFZGIGRyaXZlcnMgYXJlIHJlcXVpcmVkIHRvIHByb3ZpZGUgdGhlIHRv
+a2VuIHRvIGFjY2Vzcw0KPiA+ID4gdGhlIFZGIGRldmljZS4gIElmIGEgUEYgZHJpdmVyIGlzIHJl
+c3RhcnRlZCB3aXRoIFZGIGRyaXZlcnMgaW4gdXNlLCBpdA0KPiA+ID4gbXVzdCBhbHNvIHByb3Zp
+ZGUgdGhlIGN1cnJlbnQgdG9rZW4gaW4gb3JkZXIgdG8gcHJldmVudCBhIHJvZ3VlDQo+ID4gPiB1
+bnRydXN0ZWQgUEYgZHJpdmVyIGZyb20gcmVwbGFjaW5nIGEga25vd24gZHJpdmVyLiAgVGhlIGRl
+Z3JlZSB0bw0KPiA+ID4gd2hpY2ggdGhpcyBuZXcgdG9rZW4gaXMgY29uc2lkZXJlZCBzZWNyZXQg
+aXMgbGVmdCB0byB0aGUgdXNlcnNwYWNlDQo+ID4gPiBkcml2ZXJzLCB0aGUga2VybmVsIGludGVu
+dGlvbmFsbHkgcHJvdmlkZXMgbm8gbWVhbnMgdG8gcmV0cmlldmUgdGhlDQo+ID4gPiBjdXJyZW50
+IHRva2VuLg0KPiA+DQo+ID4gSSdtIHdvbmRlcmluZyB3aGV0aGVyIHRoZSB0b2tlbiBpZGVhIGNh
+biBiZSB1c2VkIGJleW9uZCBTUi1JT1YsIGUuZy4NCj4gPiAoMSkgd2UgbWF5IGFsbG93IHZmaW8g
+dXNlciBzcGFjZSB0byBtYW5hZ2UgU2NhbGFibGUgSU9WIGluIHRoZSBmdXR1cmUsDQo+ID4gd2hp
+Y2ggZmFjZXMgdGhlIHNpbWlsYXIgY2hhbGxlbmdlIGJldHdlZW4gdGhlIFBGIGFuZCBtZGV2OyAo
+MikgdGhlDQo+ID4gdG9rZW4gbWlnaHQgYmUgdXNlZCBhcyBhIGNhbm9uaWNhbCB3YXkgdG8gcmVw
+bGFjZSBvZmYtdHJlZSBhY3Mtb3ZlcnJpZGUNCj4gPiB3b3JrYXJvdW5kLCBzYXksIGFsbG93aW5n
+IHRoZSBhZG1pbiB0byBhc3NpZ24gZGV2aWNlcyB3aXRoaW4gdGhlDQo+ID4gc2FtZSBpb21tdSBn
+cm91cCB0byBkaWZmZXJlbnQgVk1zIHdoaWNoIHRydXN0IGVhY2ggb3RoZXIuIEknbSBub3QNCj4g
+PiBzdXJlIGhvdyBtdWNoIGNvbXBsZXhpdHkgd2lsbCBiZSBmdXJ0aGVyIGludHJvZHVjZWQsIGJ1
+dCBpdCdzIGdyZWF0bHkNCj4gPiBhcHByZWNpYXRlZCBpZiB5b3UgY2FuIGhlbHAgdGhpbmsgYSBi
+aXQgYW5kIGlmIGZlYXNpYmxlIGFic3RyYWN0IHNvbWUNCj4gPiBsb2dpYyBpbiB2ZmlvIGNvcmUg
+bGF5ZXIgZm9yIHN1Y2ggcG90ZW50aWFsIHVzYWdlcy4uLg0KPiANCj4gSSBkb24ndCBzZWUgaG93
+IHRoaXMgY2FuIGJlIHVzZWQgZm9yIEFDUyBvdmVycmlkZS4gIExhY2tpbmcgQUNTLCB3ZQ0KPiBt
+dXN0IGFzc3VtZSBsYWNrIG9mIERNQSBpc29sYXRpb24sIHdoaWNoIHJlc3VsdHMgaW4gb3VyIElP
+TU1VIGdyb3VwaW5nLg0KPiBJZiB3ZSBzcGxpdCBJT01NVSBncm91cHMsIHRoYXQgaW1wbGllcyBz
+b21ldGhpbmcgdGhhdCBkb2Vzbid0IGV4aXN0LiAgQQ0KPiB1c2VyIGNhbiBhbHJlYWR5IGNyZWF0
+ZSBhIHByb2Nlc3MgdGhhdCBjYW4gb3duIHRoZSB2ZmlvIGdyb3VwIGFuZCBwYXNzDQo+IHZmaW8g
+ZGV2aWNlcyB0byBvdGhlciB0YXNrcywgd2l0aCB0aGUgcmVzdHJpY3Rpb24gb2YgaGF2aW5nIGEg
+c2luZ2xlDQo+IERNQSBhZGRyZXNzIHNwYWNlLiAgSWYgdGhlcmUgaXMgRE1BIGlzb2xhdGlvbiwg
+dGhlbiBhbiBtZGV2IHNvbHV0aW9uDQo+IG1pZ2h0IGJlIGJldHRlciwgYnV0IGdpdmVuIHRoZSBJ
+T01NVSBpbnRlZ3JhdGlvbiBvZiBTSU9WLCBJJ20gbm90IHN1cmUNCj4gd2h5IHRoZSBkZXZpY2Vz
+IHdvdWxkbid0IHNpbXBseSBiZSBwbGFjZWQgaW4gc2VwYXJhdGUgZ3JvdXBzIGJ5IHRoZQ0KPiBJ
+T01NVSBkcml2ZXIuICBUaGFua3MsDQoNCllvdSBhcmUgcmlnaHQuIEkgb3Zlcmxvb2tlZCB0aGUg
+c2luZ2xlIERNQSBhZGRyZXNzIHNwYWNlIGxpbWl0YXRpb24uDQoNCj4gDQo+IEFsZXgNCj4gDQo+
+ID4gPiBOb3RlIHRoYXQgdGhlIGFib3ZlIHRva2VuIGlzIG9ubHkgcmVxdWlyZWQgZm9yIHRoaXMg
+bmV3IG1vZGVsIHdoZXJlDQo+ID4gPiBib3RoIHRoZSBQRiBhbmQgVkYgZGV2aWNlcyBhcmUgdXNh
+YmxlIHRocm91Z2ggdmZpby1wY2kuICBFeGlzdGluZw0KPiA+ID4gbW9kZWxzIG9mIFZGSU8gZHJp
+dmVycyB3aGVyZSB0aGUgUEYgaXMgdXNlZCB3aXRob3V0IFNSLUlPViBlbmFibGVkDQo+ID4gPiBv
+ciB0aGUgVkYgaXMgYm91bmQgdG8gYSB1c2Vyc3BhY2UgZHJpdmVyIHdpdGggYW4gaW4ta2VybmVs
+LCBob3N0IFBGDQo+ID4gPiBkcml2ZXIgYXJlIHVuYWZmZWN0ZWQuDQo+ID4gPg0KPiA+ID4gVGhl
+IGxhdHRlciBjb25maWd1cmF0aW9uIGFib3ZlIGFsc28gaGlnaGxpZ2h0cyBhIG5ldyBpbnZlcnRl
+ZCBzY2VuYXJpbw0KPiA+ID4gdGhhdCBpcyBub3cgcG9zc2libGUsIGEgdXNlcnNwYWNlIFBGIGRy
+aXZlciB3aXRoIGluLWtlcm5lbCBWRiBkcml2ZXJzLg0KPiA+ID4gSSBiZWxpZXZlIHRoaXMgaXMg
+YSBzY2VuYXJpbyB0aGF0IHNob3VsZCBiZSBhbGxvd2VkLCBidXQgc2hvdWxkIG5vdCBiZQ0KPiA+
+ID4gZW5hYmxlZCBieSBkZWZhdWx0LiAgVGhpcyBzZXJpZXMgaW5jbHVkZXMgY29kZSB0byBzZXQg
+YSBkZWZhdWx0DQo+ID4gPiBkcml2ZXJfb3ZlcnJpZGUgZm9yIFZGcyBzb3VyY2VkIGZyb20gYSB2
+ZmlvLXBjaSB1c2VyIG93bmVkIFBGLCBzdWNoDQo+ID4gPiB0aGF0IHRoZSBWRnMgYXJlIGFsc28g
+Ym91bmQgdG8gdmZpby1wY2kuICBUaGlzIG1vZGVsIGlzIGNvbXBhdGlibGUNCj4gPiA+IHdpdGgg
+dG9vbHMgbGlrZSBkcml2ZXJjdGwgYW5kIGFsbG93cyB0aGUgc3lzdGVtIGFkbWluaXN0cmF0b3Ig
+dG8NCj4gPiA+IGRlY2lkZSBpZiBvdGhlciBiaW5kaW5ncyBzaG91bGQgYmUgZW5hYmxlZC4gIFRo
+ZSBWRiB0b2tlbiBpbnRlcmZhY2UNCj4gPiA+IGFib3ZlIGV4aXN0cyBvbmx5IGJldHdlZW4gdmZp
+by1wY2kgUEYgYW5kIFZGIGRyaXZlcnMsIG9uY2UgYSBWRiBpcw0KPiA+ID4gYm91bmQgdG8gYW5v
+dGhlciBkcml2ZXIsIHRoZSBhZG1pbmlzdHJhdG9yIGhhcyBlZmZlY3RpdmVseSBwcm9ub3VuY2Vk
+DQo+ID4gPiB0aGUgZGV2aWNlIGFzIHRydXN0ZWQuICBUaGUgdmZpby1wY2kgZHJpdmVyIHdpbGwg
+bm90ZSBhbHRlcm5hdGUNCj4gPiA+IGJpbmRpbmcgaW4gZG1lc2cgZm9yIGxvZ2dpbmcgYW5kIGRl
+YnVnZ2luZyBwdXJwb3Nlcy4NCj4gPiA+DQo+ID4gPiBQbGVhc2UgcmV2aWV3LCBjb21tZW50LCBh
+bmQgdGVzdC4gIFRoZSBleGFtcGxlIFFFTVUgaW1wbGVtZW50YXRpb24NCj4gPiA+IHByb3ZpZGVk
+IHdpdGggdGhlIFJGQyBpcyBzdGlsbCBjdXJyZW50IGZvciB0aGlzIHZlcnNpb24uICBUaGFua3Ms
+DQo+ID4gPg0KPiA+ID4gQWxleA0KPiA+ID4NCj4gPiA+IFJGQzoNCj4gPiA+DQo+IGh0dHBzOi8v
+bG9yZS5rZXJuZWwub3JnL2xrbWwvMTU4MDg1MzM3NTgyLjk0NDUuMTc2ODIyNjY0Mzc1ODM1MDU1
+MDIuc3RnDQo+ID4gPiBpdEBnaW1saS5ob21lLw0KPiA+ID4gdjE6DQo+ID4gPg0KPiBodHRwczov
+L2xvcmUua2VybmVsLm9yZy9sa21sLzE1ODE0NTQ3MjYwNC4xNjgyNy4xNTc1MTM3NTU0MDEwMjI5
+ODEzMC5zdA0KPiA+ID4gZ2l0QGdpbWxpLmhvbWUvDQo+ID4gPg0KPiA+ID4gLS0tDQo+ID4gPg0K
+PiA+ID4gQWxleCBXaWxsaWFtc29uICg3KToNCj4gPiA+ICAgICAgIHZmaW86IEluY2x1ZGUgb3B0
+aW9uYWwgZGV2aWNlIG1hdGNoIGluIHZmaW9fZGV2aWNlX29wcyBjYWxsYmFja3MNCj4gPiA+ICAg
+ICAgIHZmaW8vcGNpOiBJbXBsZW1lbnQgbWF0Y2ggb3BzDQo+ID4gPiAgICAgICB2ZmlvL3BjaTog
+SW50cm9kdWNlIFZGIHRva2VuDQo+ID4gPiAgICAgICB2ZmlvOiBJbnRyb2R1Y2UgVkZJT19ERVZJ
+Q0VfRkVBVFVSRSBpb2N0bCBhbmQgZmlyc3QgdXNlcg0KPiA+ID4gICAgICAgdmZpby9wY2k6IEFk
+ZCBzcmlvdl9jb25maWd1cmUgc3VwcG9ydA0KPiA+ID4gICAgICAgdmZpby9wY2k6IFJlbW92ZSBk
+ZXZfZm10IGRlZmluaXRpb24NCj4gPiA+ICAgICAgIHZmaW8vcGNpOiBDbGVhbnVwIC5wcm9iZSgp
+IGV4aXQgcGF0aHMNCj4gPiA+DQo+ID4gPg0KPiA+ID4gIGRyaXZlcnMvdmZpby9wY2kvdmZpb19w
+Y2kuYyAgICAgICAgIHwgIDM4Mw0KPiA+ID4gKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
+KysrLS0NCj4gPiA+ICBkcml2ZXJzL3ZmaW8vcGNpL3ZmaW9fcGNpX3ByaXZhdGUuaCB8ICAgMTAg
+Kw0KPiA+ID4gIGRyaXZlcnMvdmZpby92ZmlvLmMgICAgICAgICAgICAgICAgIHwgICAyMCArLQ0K
+PiA+ID4gIGluY2x1ZGUvbGludXgvdmZpby5oICAgICAgICAgICAgICAgIHwgICAgNA0KPiA+ID4g
+IGluY2x1ZGUvdWFwaS9saW51eC92ZmlvLmggICAgICAgICAgIHwgICAzNyArKysNCj4gPiA+ICA1
+IGZpbGVzIGNoYW5nZWQsIDQyNiBpbnNlcnRpb25zKCspLCAyOCBkZWxldGlvbnMoLSkNCj4gPg0K
+DQo=
