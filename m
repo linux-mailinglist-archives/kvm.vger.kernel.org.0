@@ -2,145 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id DC35317BC9C
-	for <lists+kvm@lfdr.de>; Fri,  6 Mar 2020 13:18:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 70D1617BCCB
+	for <lists+kvm@lfdr.de>; Fri,  6 Mar 2020 13:33:42 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726740AbgCFMSj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 6 Mar 2020 07:18:39 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:49390 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726378AbgCFMSj (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 6 Mar 2020 07:18:39 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1583497118;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=qIMARDUOOQfh2lKCYwKJuDnA0s4/uv7t6503H9imxuM=;
-        b=EdbYx3qO3C5q0LfTRcV1L78baZe4xMQ4uFuh0ifyQT6RhomHqx8PVtA5rUNxFE7bHE88SF
-        BHJShz5mu1jwybiyUdcpKcBfTDGKjcRW//NJjwDWOUXCe3Ns8u/8oH+i1ItTdS+Vs0XN8K
-        wEsDD9k2wigj0brzsVaxTgS9ReSA2RA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-266--QVk4-Y1OZCmUhXRhPogPQ-1; Fri, 06 Mar 2020 07:18:36 -0500
-X-MC-Unique: -QVk4-Y1OZCmUhXRhPogPQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B7DF8100550E;
-        Fri,  6 Mar 2020 12:18:35 +0000 (UTC)
-Received: from [10.36.117.101] (ovpn-117-101.ams2.redhat.com [10.36.117.101])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E3CAE5C545;
-        Fri,  6 Mar 2020 12:18:28 +0000 (UTC)
-Subject: Re: [PATCH RFC 4/4] kvm: Implement atomic memory region resizes via
- region_resize()
-To:     Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc:     Richard Henderson <rth@twiddle.net>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        Igor Mammedov <imammedo@redhat.com>,
-        Peter Xu <peterx@redhat.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        kvm@vger.kernel.org
-References: <20200303141939.352319-1-david@redhat.com>
- <20200303141939.352319-5-david@redhat.com>
- <102af47e-7ec0-7cf9-8ddd-0b67791b5126@redhat.com>
- <3b67a5ba-dc21-ad42-4363-95bb685240b9@redhat.com>
- <2a8d8b63-d54f-c1e7-9668-5d065e36aa1d@redhat.com>
-From:   David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat GmbH
-Message-ID: <fb629fb1-0180-d011-6659-55fa4c8dada8@redhat.com>
-Date:   Fri, 6 Mar 2020 13:18:28 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+        id S1726185AbgCFMdl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 6 Mar 2020 07:33:41 -0500
+Received: from foss.arm.com ([217.140.110.172]:60632 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726090AbgCFMdl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 6 Mar 2020 07:33:41 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 61D4B31B;
+        Fri,  6 Mar 2020 04:33:40 -0800 (PST)
+Received: from [10.1.196.63] (e123195-lin.cambridge.arm.com [10.1.196.63])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 729783F6C4;
+        Fri,  6 Mar 2020 04:33:39 -0800 (PST)
+Subject: Re: [PATCH v2 kvmtool 17/30] hw/vesa: Don't ignore fatal errors
+To:     Andre Przywara <andre.przywara@arm.com>
+Cc:     kvm@vger.kernel.org, will@kernel.org,
+        julien.thierry.kdev@gmail.com, sami.mujawar@arm.com,
+        lorenzo.pieralisi@arm.com, maz@kernel.org
+References: <20200123134805.1993-1-alexandru.elisei@arm.com>
+ <20200123134805.1993-18-alexandru.elisei@arm.com>
+ <20200130145220.52d61500@donnerap.cambridge.arm.com>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <18c8399e-927b-e382-5ac4-f36722c5a073@arm.com>
+Date:   Fri, 6 Mar 2020 12:33:38 +0000
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <2a8d8b63-d54f-c1e7-9668-5d065e36aa1d@redhat.com>
+In-Reply-To: <20200130145220.52d61500@donnerap.cambridge.arm.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Language: en-US
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 06.03.20 12:38, Paolo Bonzini wrote:
-> On 06/03/20 11:20, David Hildenbrand wrote:
->> Yeah, rwlocks are not optimal and I am still looking for better
->> alternatives (suggestions welcome :) ). Using RCU might not work,
->> because the rcu_read region might be too big (esp. while in KVM_RUN).
+Hi,
+
+On 1/30/20 2:52 PM, Andre Przywara wrote:
+> On Thu, 23 Jan 2020 13:47:52 +0000
+> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+>
+>> Failling an mmap call or creating a memslot means that device emulation
+>> will not work, don't ignore it.
 >>
->> I had a prototype which used a bunch of atomics + qemu_cond_wait. But it
->> was quite elaborate and buggy.
+>> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+>> ---
+>>  hw/vesa.c | 6 ++++--
+>>  1 file changed, 4 insertions(+), 2 deletions(-)
 >>
->> (I assume only going into KVM_RUN is really affected, and I do wonder if
->> it will be noticeable at all. Doing an ioctl is always already an
->> expensive operation.)
->>
->> I can look into per-cpu locks instead of the rwlock.
-> 
-> Assuming we're only talking about CPU ioctls (seems like a good
+>> diff --git a/hw/vesa.c b/hw/vesa.c
+>> index b92cc990b730..a665736a76d7 100644
+>> --- a/hw/vesa.c
+>> +++ b/hw/vesa.c
+>> @@ -76,9 +76,11 @@ struct framebuffer *vesa__init(struct kvm *kvm)
+>>  
+>>  	mem = mmap(NULL, VESA_MEM_SIZE, PROT_RW, MAP_ANON_NORESERVE, -1, 0);
+>>  	if (mem == MAP_FAILED)
+>> -		ERR_PTR(-errno);
+>> +		return ERR_PTR(-errno);
+>>  
+>> -	kvm__register_dev_mem(kvm, VESA_MEM_ADDR, VESA_MEM_SIZE, mem);
+>> +	r = kvm__register_dev_mem(kvm, VESA_MEM_ADDR, VESA_MEM_SIZE, mem);
+>> +	if (r < 0)
+>> +		return ERR_PTR(r);
+> For the sake of correctness, we should munmap here, I think.
+> With that fixed:
+>
+> Reviewed-by: Andre Przywara <andre.przywara@arm.com>
 
-Yeah, I guess most !CPU ioctls are done under the BQL.
+Actually, I think the correct cleanup order should be munmap(mem) ->
+device__unregister(vesa_device) -> ioport__unregister(vesa_base_addr). I'll drop
+your R-b.
 
-> approximation) maybe you could use start_exclusive/end_exclusive?  The
-> current_cpu->in_exclusive_context assignments can be made conditional on
-> "if (current_cpu)".
-> 
-> However that means you have to drop the BQL, see
-> process_queued_cpu_work.  It may be a problem.
-
-Thanks, I'll look into that. I currently have a simple cpu->ioctl_mutex.
-
-Cheers!
-
-
--- 
 Thanks,
-
-David / dhildenb
-
+Alex
+>
+> Cheers,
+> Andre.
+>
+>>  
+>>  	vesafb = (struct framebuffer) {
+>>  		.width			= VESA_WIDTH,
