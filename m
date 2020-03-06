@@ -2,377 +2,540 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5FD0C17BF07
-	for <lists+kvm@lfdr.de>; Fri,  6 Mar 2020 14:36:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8840017BF42
+	for <lists+kvm@lfdr.de>; Fri,  6 Mar 2020 14:40:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726240AbgCFNg3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 6 Mar 2020 08:36:29 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:30842 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726171AbgCFNg2 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 6 Mar 2020 08:36:28 -0500
+        id S1726646AbgCFNkV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 6 Mar 2020 08:40:21 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:55364 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726090AbgCFNkU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 6 Mar 2020 08:40:20 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1583501787;
+        s=mimecast20190719; t=1583502018;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=93QMUec0Md5U37TbVtP0qnLf/Lf51HVAtIB5qCx9+iw=;
-        b=cmWOCwgQFC/yzcsReh2yE2IYNb7Sgk6xcjQMWqrenevzsx/z5+fM52WdmpZn/TaYhbnjdd
-        hWGbsqXExrSEvsVqZu+rOeqAZZx18/+DXI0wWckWU7cW6Ar8zcfuT+spShNeovUEDudXtC
-        V9KFlSyi3RZtP9gW0heySGKhbWNChDM=
+        bh=MTN85EDGHhLSRrRisKA51huPDatllgHXkn8nG5dIrk8=;
+        b=fxY5si8/vhUyRWgppwzv6RNckRpc5BnTm8NXyjAZKnCNCUuLmRf2lc48ecP7Jkyfbp1mLD
+        qfp73Y8DiP8ZdHl7SSzCdS7btNUFXYZRNUxcMhfPOpWAUSAYuL0LYbiZuAnk7cum+tcCNW
+        Ng1nVutsJrqhSeTjhENxsIaPsuxaVHA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-311-BYdikcd5NFqVY393qbJCcQ-1; Fri, 06 Mar 2020 08:36:26 -0500
-X-MC-Unique: BYdikcd5NFqVY393qbJCcQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+ us-mta-481-fdIQDuJVMWCtoADx9jmuyA-1; Fri, 06 Mar 2020 08:40:15 -0500
+X-MC-Unique: fdIQDuJVMWCtoADx9jmuyA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4F728107ACC7;
-        Fri,  6 Mar 2020 13:36:24 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id B247091D9B;
-        Fri,  6 Mar 2020 13:36:18 +0000 (UTC)
-Date:   Fri, 6 Mar 2020 14:36:16 +0100
-From:   Andrew Jones <drjones@redhat.com>
-To:     Auger Eric <eric.auger@redhat.com>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 21CB4107ACC7;
+        Fri,  6 Mar 2020 13:40:13 +0000 (UTC)
+Received: from [10.36.116.59] (ovpn-116-59.ams2.redhat.com [10.36.116.59])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 6D7635C545;
+        Fri,  6 Mar 2020 13:40:08 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH v3 11/14] arm/arm64: ITS: INT functional
+ tests
+To:     Andrew Jones <drjones@redhat.com>
 Cc:     peter.maydell@linaro.org, thuth@redhat.com, kvm@vger.kernel.org,
         maz@kernel.org, qemu-devel@nongnu.org, qemu-arm@nongnu.org,
         andre.przywara@arm.com, yuzenghui@huawei.com,
         alexandru.elisei@arm.com, kvmarm@lists.cs.columbia.edu,
         eric.auger.pro@gmail.com
-Subject: Re: [kvm-unit-tests PATCH v3 14/14] arm/arm64: ITS: pending table
- migration test
-Message-ID: <20200306133616.pp5vf2xramt5afvr@kamzik.brq.redhat.com>
 References: <20200128103459.19413-1-eric.auger@redhat.com>
- <20200128103459.19413-15-eric.auger@redhat.com>
- <20200207140627.rikkw5coe7naxssb@kamzik.brq.redhat.com>
- <24940769-6e50-2585-4572-44422ca21613@redhat.com>
+ <20200128103459.19413-12-eric.auger@redhat.com>
+ <20200207131547.rlj44nwu32xa4tyd@kamzik.brq.redhat.com>
+ <5f5b7136-61e5-6464-f359-5925ceaa49a2@redhat.com>
+ <20200306132957.ztjlr2g2ngqigfwq@kamzik.brq.redhat.com>
+From:   Auger Eric <eric.auger@redhat.com>
+Message-ID: <9ba9979c-3d0e-c416-f616-ab0a154ab236@redhat.com>
+Date:   Fri, 6 Mar 2020 14:40:06 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <24940769-6e50-2585-4572-44422ca21613@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <20200306132957.ztjlr2g2ngqigfwq@kamzik.brq.redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Mar 06, 2020 at 02:21:37PM +0100, Auger Eric wrote:
-> Hi Drew,
-> 
-> On 2/7/20 3:06 PM, Andrew Jones wrote:
-> > On Tue, Jan 28, 2020 at 11:34:59AM +0100, Eric Auger wrote:
-> >> Add two new migration tests. One testing the migration of
-> >> a topology where collection were unmapped. The second test
-> >> checks the migration of the pending table.
-> >>
-> >> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> >>
-> >> ---
-> >>
-> >> v2 -> v3:
-> >> - tests belong to both its and migration groups
-> >> ---
-> >>  arm/gic.c         | 150 ++++++++++++++++++++++++++++++++++++++++++++++
-> >>  arm/unittests.cfg |  16 +++++
-> >>  2 files changed, 166 insertions(+)
-> >>
-> >> diff --git a/arm/gic.c b/arm/gic.c
-> >> index fa8626a..ec3dd3a 100644
-> >> --- a/arm/gic.c
-> >> +++ b/arm/gic.c
-> >> @@ -195,6 +195,7 @@ static void lpi_handler(struct pt_regs *regs __unused)
-> >>  	smp_rmb(); /* pairs with wmb in lpi_stats_expect */
-> >>  	lpi_stats.observed.cpu_id = smp_processor_id();
-> >>  	lpi_stats.observed.lpi_id = irqnr;
-> >> +	acked[lpi_stats.observed.cpu_id]++;
-> >>  	smp_wmb(); /* pairs with rmb in check_lpi_stats */
-> >>  }
-> >>  
-> >> @@ -239,6 +240,18 @@ static void secondary_lpi_test(void)
-> >>  	while (1)
-> >>  		wfi();
-> >>  }
-> >> +
-> >> +static void check_lpi_hits(int *expected)
-> >> +{
-> >> +	int i;
-> >> +
-> >> +	for (i = 0; i < nr_cpus; i++) {
-> >> +		if (acked[i] != expected[i])
-> >> +			report(false, "expected %d LPIs on PE #%d, %d observed",
-> >> +			       expected[i], i, acked[i]);
-> > 
-> > report_info
-> > pass = false
-> > 
-> >> +		}
-> >> +	report(true, "check LPI on all vcpus");
-> > 
-> > report(pass, ...);
-> I still don't get the issue.
+Hi Drew,
 
-Your messages aren't consistent and have dynamic info. You need
+On 3/6/20 2:29 PM, Andrew Jones wrote:
+> On Fri, Mar 06, 2020 at 01:55:09PM +0100, Auger Eric wrote:
+>> Hi Drew,
+>>
+>> On 2/7/20 2:15 PM, Andrew Jones wrote:
+>>> On Tue, Jan 28, 2020 at 11:34:56AM +0100, Eric Auger wrote:
+>>>> Triggers LPIs through the INT command.
+>>>>
+>>>> the test checks the LPI hits the right CPU and triggers
+>>>> the right LPI intid, ie. the translation is correct.
+>>>>
+>>>> Updates to the config table also are tested, along with inv
+>>>> and invall commands.
+>>>>
+>>>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>>>>
+>>>> ---
+>>>>
+>>>> v2 -> v3:
+>>>> - add comments
+>>>> - keep the report_skip in case there aren't 4 vcpus to be able to
+>>>>   run other tests in the its category.
+>>>> - fix the prefix pop
+>>>> - move its_event and its_stats to arm/gic.c
+>>>> ---
+>>>>  arm/gic.c         | 228 +++++++++++++++++++++++++++++++++++++++++++---
+>>>>  arm/unittests.cfg |   7 ++
+>>>>  2 files changed, 224 insertions(+), 11 deletions(-)
+>>>>
+>>>> diff --git a/arm/gic.c b/arm/gic.c
+>>>> index 4d7dd03..50104b1 100644
+>>>> --- a/arm/gic.c
+>>>> +++ b/arm/gic.c
+>>>> @@ -160,6 +160,87 @@ static void ipi_handler(struct pt_regs *regs __unused)
+>>>>  	}
+>>>>  }
+>>>>  
+>>>> +static void setup_irq(handler_t handler)
+>>>> +{
+>>>> +	gic_enable_defaults();
+>>>> +#ifdef __arm__
+>>>> +	install_exception_handler(EXCPTN_IRQ, handler);
+>>>> +#else
+>>>> +	install_irq_handler(EL1H_IRQ, handler);
+>>>> +#endif
+>>>> +	local_irq_enable();
+>>>> +}
+>>>> +
+>>>> +#if defined(__aarch64__)
+>>>> +struct its_event {
+>>>> +	int cpu_id;
+>>>> +	int lpi_id;
+>>>> +};
+>>>> +
+>>>> +struct its_stats {
+>>>> +	struct its_event expected;
+>>>> +	struct its_event observed;
+>>>> +};
+>>>> +
+>>>> +static struct its_stats lpi_stats;
+>>>> +
+>>>> +static void lpi_handler(struct pt_regs *regs __unused)
+>>>> +{
+>>>> +	u32 irqstat = gic_read_iar();
+>>>> +	int irqnr = gic_iar_irqnr(irqstat);
+>>>> +
+>>>> +	gic_write_eoir(irqstat);
+>>>> +	if (irqnr < 8192)
+>>>> +		report(false, "Unexpected non LPI interrupt received");
+>>>
+>>> report_info
+>> why? This is an error case. We do not expect other interrupts than LPIs
+> 
+> If there's almost no chance this will happen and it means something quite
+> unexpected has occurred, then it should probably be an assert. If this is
+> a real test case, then it should be
+> 
+>  report(irqnr >= 8192, "Got LPI");
+> 
+> or something like that. If it's something that shouldn't ever happen, so
+> it doesn't really deserve its own PASS/FAIL test output each execution
+> of the unit test, but you don't want to assert for some reason, then it
+> should be a report_info, but it should probably also contain a "WARNING"
+> prefix in that case.
+OK so the assert should be OK.
+> 
+>>>
+>>>> +	smp_rmb(); /* pairs with wmb in lpi_stats_expect */
+>>>> +	lpi_stats.observed.cpu_id = smp_processor_id();
+>>>> +	lpi_stats.observed.lpi_id = irqnr;
+>>>> +	smp_wmb(); /* pairs with rmb in check_lpi_stats */
+>>>> +}
+>>>> +
+>>>> +static void lpi_stats_expect(int exp_cpu_id, int exp_lpi_id)
+>>>> +{
+>>>> +	lpi_stats.expected.cpu_id = exp_cpu_id;
+>>>> +	lpi_stats.expected.lpi_id = exp_lpi_id;
+>>>> +	lpi_stats.observed.cpu_id = -1;
+>>>> +	lpi_stats.observed.lpi_id = -1;
+>>>> +	smp_wmb(); /* pairs with rmb in handler */
+>>>> +}
+>>>> +
+>>>> +static void check_lpi_stats(void)
+>>>
+>>> static void check_lpi_stats(const char *testname)
+>>> {
+>>>    bool pass = false;
+>>>
+>>>> +{
+>>>> +	mdelay(100);
+>>>> +	smp_rmb(); /* pairs with wmb in lpi_handler */
+>>>> +	if ((lpi_stats.observed.cpu_id != lpi_stats.expected.cpu_id) ||
+>>>> +	    (lpi_stats.observed.lpi_id != lpi_stats.expected.lpi_id)) {
+>>>
+>>> nit: extra ()
+>>>
+>>>> +		if (lpi_stats.observed.cpu_id == -1 &&
+>>>> +		    lpi_stats.observed.lpi_id == -1) {
+>>>> +			report(false,
+>>>> +			       "No LPI received whereas (cpuid=%d, intid=%d) "
+>>>> +			       "was expected", lpi_stats.expected.cpu_id,
+>>>> +			       lpi_stats.expected.lpi_id);
+>>>
+>>> report_info
+>> What's the problem keeping those. Those are error reports. The message
+>> is something like that:
+>> FAIL: gicv3: its-trigger: mapc valid=false: No LPI received whereas
+>> (cpuid=1, intid=8192) was expected.
+>>
+>> So the testname is already part of the message.
+> 
+> This one has two problems with being report() vs. report_info. The same
+> comment as above, where the condition for a report() should be the test,
+> rather than if (cond) report(false, ...), which implies it's not expected
+> to report at all. A pattern like that needs to be extended at least to
+> something like this
+> 
+> if (cond)
+>   report(true, ...)
+> else
+>   report(false, ...)
+OK understood. I should have use the test as the 1st param.
+> 
+> so we get the PASS/FAIL each execution. The other problem with this
+> particular report() is the dynamic info in it (cpuid and maybe intid).
+> A report() should only have consistent info so test output parsers
+> can count on finding the PASS/FAIL for a given report line. If you
+> need a test like this, then it can be structured like
+> 
+> report_info(...); // dynamic info
+> if (cond) {
+>    report(true, MSG1); // no dynamic info
+>    report(true, MSG2); // no dynamic info
+> } else {
+>    report(false, MSG1); // no dynamic info
+>    report(false, MSG2); // no dynamic info
+> }
+> 
+> Notice how the MSG's match on both paths of the condition.
+> 
+> Or just 
+> 
+> report_info(...);
+> report(cond, ...);
+OK I see what you mean now. I will rewrite it accordingly.
 
-report_info(...); // dynamic info
-if (failure_condition) {
-   pass_boolean = false;
-}
-report(pass_boolean, single_message_for_both_pass_and_failure);
+Thank you for the extra explanation
 
-> > 
-> >> +}
-> >>  #endif
-> >>  
-> >>  static void gicv2_ipi_send_self(void)
-> >> @@ -594,6 +607,8 @@ static void gic_test_mmio(void)
-> >>  static void test_its_introspection(void) {}
-> >>  static void test_its_trigger(void) {}
-> >>  static void test_its_migration(void) {}
-> >> +static void test_migrate_unmapped_collection(void) {}
-> >> +static void test_its_pending_migration(void) {}
-> > 
-> > I'm not sure what's worse. This pile of stubs or one #ifdef in main()
-> > wrapping all the calls.
-> Those stubs now are in the arm header.
-> > 
-> >>  
-> >>  #else /* __arch64__ */
-> >>  
-> >> @@ -666,6 +681,18 @@ static bool its_prerequisites(int nb_cpus)
-> >>  	return false;
-> >>  }
-> >>  
-> >> +static void set_lpi(struct its_device *dev, u32 eventid, u32 physid,
-> >> +		    struct its_collection *col)
-> >> +{
-> >> +	if (!dev || !col)
-> > 
-> > I don't think col can be null, and this doesn't look like the right place
-> > to check if dev is null.  If we're bothiner to call set_lpi, then I
-> > think we should already expect dev to be good to go.
-> put an assert() instead
-> > 
-> >> +		report_abort("wrong device or collection");
-> >> +
-> >> +	its_send_mapti(dev, physid, eventid, col);
-> >> +
-> >> +	gicv3_lpi_set_config(physid, LPI_PROP_DEFAULT);
-> >> +	its_send_invall(col);
-> >> +}
-> >> +
-> >>  /*
-> >>   * Setup the configuration for those mappings:
-> >>   * dev_id=2 event=20 -> vcpu 3, intid=8195
-> >> @@ -806,6 +833,121 @@ static void test_its_migration(void)
-> >>  	its_send_int(dev7, 255);
-> >>  	check_lpi_stats();
-> >>  }
-> >> +
-> >> +static void test_migrate_unmapped_collection(void)
-> >> +{
-> >> +	struct its_collection *col;
-> >> +	struct its_device *dev2, *dev7;
-> >> +	u8 config;
-> >> +
-> >> +	if (its_setup1())
-> >> +		return;
-> >> +
-> >> +	col = its_create_collection(nr_cpus - 1, nr_cpus - 1);
-> >> +	dev2 = its_get_device(2);
-> >> +	dev7 = its_get_device(7);
-> >> +
-> >> +	/* MAPTI with the collection unmapped */
-> >> +	set_lpi(dev2, 0, 8192, col);
-> >> +
-> >> +	puts("Now migrate the VM, then press a key to continue...\n");
-> >> +	(void)getchar();
-> >> +	report(true, "Migration complete");
-> > 
-> > report_info
-> yep
-> > 
-> >> +
-> >> +	/* on the destination, map the collection */
-> >> +	its_send_mapc(col, true);
-> >> +
-> >> +	lpi_stats_expect(2, 8196);
-> >> +	its_send_int(dev7, 255);
-> >> +	check_lpi_stats();
-> >> +
-> >> +	config = gicv3_lpi_get_config(8192);
-> >> +	report(config == LPI_PROP_DEFAULT,
-> >> +	       "Config of LPI 8192 was properly migrated");
-> >> +
-> >> +	lpi_stats_expect(nr_cpus - 1, 8192);
-> >> +	its_send_int(dev2, 0);
-> >> +	check_lpi_stats();
-> >> +
-> >> +	/* unmap the collection */
-> >> +	its_send_mapc(col, false);
-> >> +
-> >> +	lpi_stats_expect(-1, -1);
-> >> +	its_send_int(dev2, 0);
-> >> +	check_lpi_stats();
-> >> +
-> >> +	/* remap event 0 onto lpiid 8193 */
-> >> +	set_lpi(dev2, 0, 8193, col);
-> >> +	lpi_stats_expect(-1, -1);
-> >> +	its_send_int(dev2, 0);
-> >> +	check_lpi_stats();
-> >> +
-> >> +	/* remap the collection */
-> >> +	its_send_mapc(col, true);
-> >> +	lpi_stats_expect(nr_cpus - 1, 8193);
-> >> +}
-> >> +
-> >> +static void test_its_pending_migration(void)
-> >> +{
-> >> +	struct its_device *dev;
-> >> +	struct its_collection *collection[2];
-> >> +	int expected[NR_CPUS];
-> > 
-> > expected = malloc(nr_cpus * sizeof(int));
-> > 
-> > I know there are other places using NR_CPUS right now that don't have to,
-> > but we shouldn't add more. Eventually I'll change the other places too.
-> OK
-> > 
-> >> +	u64 pendbaser;
-> >> +	void *ptr;
-> >> +	int i;
-> >> +
-> >> +	if (its_prerequisites(4))
-> >> +		return;
-> >> +
-> >> +	dev = its_create_device(2 /* dev id */, 8 /* nb_ites */);
-> >> +	its_send_mapd(dev, true);
-> >> +
-> >> +	collection[0] = its_create_collection(nr_cpus - 1, nr_cpus - 1);
-> >> +	collection[1] = its_create_collection(nr_cpus - 2, nr_cpus - 2);
-> >> +	its_send_mapc(collection[0], true);
-> >> +	its_send_mapc(collection[1], true);
-> >> +
-> >> +	/* disable lpi at redist level */
-> >> +	gicv3_lpi_rdist_ctrl(nr_cpus - 1, false);
-> >> +	gicv3_lpi_rdist_ctrl(nr_cpus - 2, false);
-> >> +
-> >> +	/* even lpis are assigned to even cpu */
-> >> +	for (i = 0; i < 256; i++) {
-> >> +		struct its_collection *col = i % 2 ? collection[0] :
-> >> +						     collection[1];
-> >> +		int vcpu = col->target_address >> 16;
-> > 
-> > I'm lost with the even/odd (nr_cpus - 1)/(nr_cpus - 2) stuff, and won't
-> > it swap if nr_cpus is odd vs. even?
-> > 
-> > Shouldn't we just have something like
-> > 
-> >   pe1 = nr_cpus - 1;
-> >   pe2 = nr_cpus - 2;
-> >   col1 = its_create_collection(pe1, pe1);
-> >   col2 = its_create_collection(pe2, pe2);
-> > 
-> > without mentioning even and odd?
-> OK
-> > 
-> >> +
-> >> +		its_send_mapti(dev, 8192 + i, i, col);
-> >> +		gicv3_lpi_set_config(8192 + i, LPI_PROP_DEFAULT);
-> >> +		gicv3_lpi_set_pending_table_bit(vcpu, 8192 + i, true);
-> >> +	}
-> >> +	its_send_invall(collection[0]);
-> >> +	its_send_invall(collection[1]);
-> >> +
-> >> +	/* Set the PTZ bit on each pendbaser */
-> >> +
-> >> +	expected[nr_cpus - 1] = 128;
-> >> +	expected[nr_cpus - 2] = 128;
-> >> +
-> >> +	ptr = gicv3_data.redist_base[nr_cpus - 1] + GICR_PENDBASER;
-> >> +	pendbaser = readq(ptr);
-> >> +	writeq(pendbaser & ~GICR_PENDBASER_PTZ, ptr);
-> >> +
-> >> +	ptr = gicv3_data.redist_base[nr_cpus - 2] + GICR_PENDBASER;
-> >> +	pendbaser = readq(ptr);
-> >> +	writeq(pendbaser & ~GICR_PENDBASER_PTZ, ptr);
-> >> +
-> >> +	gicv3_lpi_rdist_ctrl(nr_cpus - 1, true);
-> >> +	gicv3_lpi_rdist_ctrl(nr_cpus - 2, true);
-> >> +
-> >> +	puts("Now migrate the VM, then press a key to continue...\n");
-> >> +	(void)getchar();
-> >> +	report(true, "Migration complete");
-> > 
-> > report_info
-> OK
-> > 
-> >> +
-> >> +	mdelay(1000);
-> > 
-> > This delay needs a comment explaining why it's here.
-> OK
+Eric
 > 
-> Thanks
+>>>
+>>>> +		} else {
+>>>> +			report(false, "Unexpected LPI (cpuid=%d, intid=%d)",
+>>>> +			       lpi_stats.observed.cpu_id,
+>>>> +			       lpi_stats.observed.lpi_id);
+>>>
+>>> report_info
+>>>
+>>>> +		}
+>>>
+>>> pass = false;
+>>>
+>>>> +	} else if (lpi_stats.expected.lpi_id != -1) {
+>>>> +		report(true, "LPI %d on CPU %d", lpi_stats.observed.lpi_id,
+>>>> +		       lpi_stats.observed.cpu_id);
+>>>
+>>> report_info
+>>>
+>>>> +	} else {
+>>>> +		report(true, "no LPI received, as expected");
+>>>
+>>> report_info
 > 
-> Eric
-> > 
-> >> +
-> >> +	check_lpi_hits(expected);
-> >> +}
-> >>  #endif
-> >>  
-> >>  int main(int argc, char **argv)
-> >> @@ -847,6 +989,14 @@ int main(int argc, char **argv)
-> >>  		report_prefix_push(argv[1]);
-> >>  		test_its_migration();
-> >>  		report_prefix_pop();
-> >> +	} else if (!strcmp(argv[1], "its-pending-migration")) {
-> >> +		report_prefix_push(argv[1]);
-> >> +		test_its_pending_migration();
-> >> +		report_prefix_pop();
-> >> +	} else if (!strcmp(argv[1], "its-migrate-unmapped-collection")) {
-> >> +		report_prefix_push(argv[1]);
-> >> +		test_migrate_unmapped_collection();
-> >> +		report_prefix_pop();
-> >>  	} else if (strcmp(argv[1], "its-introspection") == 0) {
-> >>  		report_prefix_push(argv[1]);
-> >>  		test_its_introspection();
-> >> diff --git a/arm/unittests.cfg b/arm/unittests.cfg
-> >> index 8b8ec79..d917157 100644
-> >> --- a/arm/unittests.cfg
-> >> +++ b/arm/unittests.cfg
-> >> @@ -144,6 +144,22 @@ extra_params = -machine gic-version=3 -append 'its-migration'
-> >>  groups = its migration
-> >>  arch = arm64
-> >>  
-> >> +[its-pending-migration]
-> >> +file = gic.flat
-> >> +smp = $MAX_SMP
-> >> +accel = kvm
-> >> +extra_params = -machine gic-version=3 -append 'its-pending-migration'
-> >> +groups = its migration
-> >> +arch = arm64
-> >> +
-> >> +[its-migrate-unmapped-collection]
-> >> +file = gic.flat
-> >> +smp = $MAX_SMP
-> >> +accel = kvm
-> >> +extra_params = -machine gic-version=3 -append 'its-migrate-unmapped-collection'
-> >> +groups = its migration
-> >> +arch = arm64
-> >> +
-> >>  # Test PSCI emulation
-> >>  [psci]
-> >>  file = psci.flat
-> >> -- 
-> >> 2.20.1
-> >>
-> >>
-> > 
-> > Thanks,
-> > drew 
-> > 
+> This if, else if, ..., else with report() would be fine if the messages
+> would all match, resulting in a single 'PASS: MSG' line. report_info can
+> be used to get the dynamic info output too.
 > 
+>>>
+>>>
+>>>> +	}
+>>>
+>>> report(pass, "%s", testname);
+>>>
+>>>> +}
+>>>> +
+>>>> +static void secondary_lpi_test(void)
+>>>> +{
+>>>> +	setup_irq(lpi_handler);
+>>>> +	cpumask_set_cpu(smp_processor_id(), &ready);
+>>>> +	while (1)
+>>>> +		wfi();
+>>>> +}
+>>>> +#endif
+>>>> +
+>>>>  static void gicv2_ipi_send_self(void)
+>>>>  {
+>>>>  	writel(2 << 24 | IPI_IRQ, gicv2_dist_base() + GICD_SGIR);
+>>>> @@ -217,17 +298,6 @@ static void ipi_test_smp(void)
+>>>>  	report_prefix_pop();
+>>>>  }
+>>>>  
+>>>> -static void setup_irq(handler_t handler)
+>>>> -{
+>>>> -	gic_enable_defaults();
+>>>> -#ifdef __arm__
+>>>> -	install_exception_handler(EXCPTN_IRQ, handler);
+>>>> -#else
+>>>> -	install_irq_handler(EL1H_IRQ, handler);
+>>>> -#endif
+>>>> -	local_irq_enable();
+>>>> -}
+>>>> -
+>>>>  static void ipi_send(void)
+>>>>  {
+>>>>  	setup_irq(ipi_handler);
+>>>> @@ -522,6 +592,7 @@ static void gic_test_mmio(void)
+>>>>  #if defined(__arm__)
+>>>>  
+>>>>  static void test_its_introspection(void) {}
+>>>> +static void test_its_trigger(void) {}
+>>>>  
+>>>>  #else /* __arch64__ */
+>>>>  
+>>>> @@ -561,6 +632,137 @@ static void test_its_introspection(void)
+>>>>  	report_info("collection baser entry_size = 0x%x", coll_baser->esz);
+>>>>  }
+>>>>  
+>>>> +static bool its_prerequisites(int nb_cpus)
+>>>> +{
+>>>> +	int cpu;
+>>>> +
+>>>> +	if (!gicv3_its_base()) {
+>>>> +		report_skip("No ITS, skip ...");
+>>>> +		return true;
+>>>> +	}
+>>>> +
+>>>> +	if (nr_cpus < 4) {
+>>>
+>>> nr_cpus < nb_cpus, or just drop the nb_cpus parameter and hard code 4
+>>> here.
+>> sure
+>>>
+>>>> +		report_skip("Test requires at least %d vcpus", nb_cpus);
+>>>> +		return true;
+>>>> +	}
+>>>> +
+>>>> +	stats_reset();
+>>>> +
+>>>> +	setup_irq(lpi_handler);
+>>>> +
+>>>> +	for_each_present_cpu(cpu) {
+>>>> +		if (cpu == 0)
+>>>> +			continue;
+>>>> +		smp_boot_secondary(cpu, secondary_lpi_test);
+>>>> +	}
+>>>> +	wait_on_ready();
+>>>> +
+>>>> +	its_enable_defaults();
+>>>> +
+>>>> +	lpi_stats_expect(-1, -1);
+>>>> +	check_lpi_stats();
+>>>> +
+>>>> +	return false;
+>>>
+>>> Reverse logic. I'd expect 'return true' for success.
+>> I am going to return an int. In case of error a std negative error will
+>> be returned.
+>>>
+>>>> +}
+>>>> +
+>>>> +static void test_its_trigger(void)
+>>>> +{
+>>>> +	struct its_collection *col3, *col2;
+>>>> +	struct its_device *dev2, *dev7;
+>>>> +
+>>>> +	if (its_prerequisites(4))
+>>>
+>>> if (!its_prerequisites(...))
+>>>
+>>>> +		return;
+>>>> +
+>>>> +	dev2 = its_create_device(2 /* dev id */, 8 /* nb_ites */);
+>>>> +	dev7 = its_create_device(7 /* dev id */, 8 /* nb_ites */);
+>>>> +
+>>>> +	col3 = its_create_collection(3 /* col id */, 3/* target PE */);
+>>>> +	col2 = its_create_collection(2 /* col id */, 2/* target PE */);
+>>>> +
+>>>> +	gicv3_lpi_set_config(8195, LPI_PROP_DEFAULT);
+>>>> +	gicv3_lpi_set_config(8196, LPI_PROP_DEFAULT);
+>>>> +
+>>>> +	its_send_invall(col2);
+>>>> +	its_send_invall(col3);
+>>>> +
+>>>> +	report_prefix_push("int");
+>>>> +	/*
+>>>> +	 * dev=2, eventid=20  -> lpi= 8195, col=3
+>>>> +	 * dev=7, eventid=255 -> lpi= 8196, col=2
+>>>> +	 * Trigger dev2, eventid=20 and dev7, eventid=255
+>>>> +	 * Check both LPIs hit
+>>>> +	 */
+>>>> +
+>>>> +	its_send_mapd(dev2, true);
+>>>> +	its_send_mapd(dev7, true);
+>>>> +
+>>>> +	its_send_mapc(col3, true);
+>>>> +	its_send_mapc(col2, true);
+>>>> +
+>>>> +	its_send_mapti(dev2, 8195 /* lpi id */,
+>>>> +		       20 /* event id */, col3);
+>>>> +	its_send_mapti(dev7, 8196 /* lpi id */,
+>>>> +		       255 /* event id */, col2);
+>>>
+>>> No need for line breaks, with the embedded comments it's hard to read
+>> OK
+>>>
+>>>> +
+>>>> +	lpi_stats_expect(3, 8195);
+>>>> +	its_send_int(dev2, 20);
+>>>> +	check_lpi_stats();
+>>>> +
+>>>> +	lpi_stats_expect(2, 8196);
+>>>> +	its_send_int(dev7, 255);
+>>>> +	check_lpi_stats();
+>>>> +
+>>>> +	report_prefix_pop();
+>>>
+>>> I think a table of parameters and loop would be nicer than all the
+>>> repeated function calls.
+>> Frankly speaking I am not sure this would really help. We are just
+>> enabling 2 translation paths. I think I prefer to manipulate the low
+>> level objects and helpers rather than playing with a loop and potential
+>> new structs of params.
+> 
+> OK, but you could probably at least wrap the common sequence into one
+> function
+> 
+> void master_function(a1, a2, a3, a4)
+> {
+>   lpi_stats_expect(a1, a2);
+>   its_send_int(a3, a4);
+>   check_lpi_stats();
+> }
+> 
+> but whatever, it's not so important.
+> 
+>>>
+>>>> +
+>>>> +	report_prefix_push("inv/invall");
+>>>> +
+>>>> +	/*
+>>>> +	 * disable 8195, check dev2/eventid=20 does not trigger the
+>>>> +	 * corresponding LPI
+>>>> +	 */
+>>>> +	gicv3_lpi_set_config(8195, LPI_PROP_DEFAULT & ~0x1);
+>>>
+>>> LPI_PROP_DEFAULT & ~LPI_PROP_ENABLED
+>> ok
+>>>
+>>>> +	its_send_inv(dev2, 20);
+>>>> +
+>>>> +	lpi_stats_expect(-1, -1);
+>>>> +	its_send_int(dev2, 20);
+>>>> +	check_lpi_stats();
+>>>> +
+>>>> +	/*
+>>>> +	 * re-enable the LPI but willingly do not call invall
+>>>> +	 * so the change in config is not taken into account.
+>>>> +	 * The LPI should not hit
+>>>> +	 */
+>>>> +	gicv3_lpi_set_config(8195, LPI_PROP_DEFAULT);
+>>>> +	lpi_stats_expect(-1, -1);
+>>>> +	its_send_int(dev2, 20);
+>>>> +	check_lpi_stats();
+>>>> +
+>>>> +	/* Now call the invall and check the LPI hits */
+>>>> +	its_send_invall(col3);
+>>>> +	lpi_stats_expect(3, 8195);
+>>>> +	its_send_int(dev2, 20);
+>>>> +	check_lpi_stats();
+>>>> +
+>>>> +	report_prefix_pop();
+>>>
+>>> Need blank line here.
+>> OK
+>>>
+>>>> +	/*
+>>>> +	 * Unmap device 2 and check the eventid 20 formerly
+>>>> +	 * attached to it does not hit anymore
+>>>> +	 */
+>>>> +	report_prefix_push("mapd valid=false");
+>>>
+>>> Above you have the prefix-push before the comment explaining the test.
+>>> After is probably better, but whatever, as long as it's consistent.
+>> moved after
+>>>
+>>>> +	its_send_mapd(dev2, false);
+>>>> +	lpi_stats_expect(-1, -1);
+>>>> +	its_send_int(dev2, 20);
+>>>> +	check_lpi_stats();
+>>>> +	report_prefix_pop();
+>>>> +
+>>>> +	/* Unmap the collection this time and check no LPI does hit */
+>>>> +	report_prefix_push("mapc valid=false");
+>>>> +	its_send_mapc(col2, false);
+>>>> +	lpi_stats_expect(-1, -1);
+>>>> +	its_send_int(dev7, 255);
+>>>> +	check_lpi_stats();
+>>>> +	report_prefix_pop();
+>>>> +}
+>>>>  #endif
+>>>>  
+>>>>  int main(int argc, char **argv)
+>>>> @@ -594,6 +796,10 @@ int main(int argc, char **argv)
+>>>>  		report_prefix_push(argv[1]);
+>>>>  		gic_test_mmio();
+>>>>  		report_prefix_pop();
+>>>> +	} else if (!strcmp(argv[1], "its-trigger")) {
+>>>> +		report_prefix_push(argv[1]);
+>>>> +		test_its_trigger();
+>>>> +		report_prefix_pop();
+>>>>  	} else if (strcmp(argv[1], "its-introspection") == 0) {
+>>>>  		report_prefix_push(argv[1]);
+>>>>  		test_its_introspection();
+>>>> diff --git a/arm/unittests.cfg b/arm/unittests.cfg
+>>>> index ba2b31b..bfafec5 100644
+>>>> --- a/arm/unittests.cfg
+>>>> +++ b/arm/unittests.cfg
+>>>> @@ -129,6 +129,13 @@ extra_params = -machine gic-version=3 -append 'its-introspection'
+>>>>  groups = its
+>>>>  arch = arm64
+>>>>  
+>>>> +[its-trigger]
+>>>> +file = gic.flat
+>>>> +smp = $MAX_SMP
+>>>> +extra_params = -machine gic-version=3 -append 'its-trigger'
+>>>> +groups = its
+>>>> +arch = arm64
+>>>> +
+>>>>  # Test PSCI emulation
+>>>>  [psci]
+>>>>  file = psci.flat
+>>>> -- 
+>>>> 2.20.1
+>>>>
+>>>
+>>> Thanks,
+>>> drew 
+>>>
+>> Thanks
+>>
+>> Eric
+>>
+>>
 > 
 
