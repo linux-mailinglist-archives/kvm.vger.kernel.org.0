@@ -2,63 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 586A517BD71
-	for <lists+kvm@lfdr.de>; Fri,  6 Mar 2020 14:02:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7F8AA17BD74
+	for <lists+kvm@lfdr.de>; Fri,  6 Mar 2020 14:02:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726533AbgCFNCX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 6 Mar 2020 08:02:23 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:23670 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726368AbgCFNCW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 6 Mar 2020 08:02:22 -0500
+        id S1727146AbgCFNC0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 6 Mar 2020 08:02:26 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:34939 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726733AbgCFNCZ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 6 Mar 2020 08:02:25 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1583499741;
+        s=mimecast20190719; t=1583499744;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=9kyJgQMNNTtILNB3efmK9JnspOevwrPmN1Q1JAEBpAU=;
-        b=ZVZZH3KEegGKb7gGBcYxrD1JWwJZgUR40LY0l6V6CZ5GWKbBxGkXF5me4MNdvtLFxXyOnO
-        uMLTlnP+WY7BUdW2olEkgFjRycF1yCfg6huR0F/cefB3UdPvV4S9P2ovGW/BaP43ynsYCB
-        Vsyr6rnbDotfErU0C2CQJH6lp48NO5M=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-430-jUFJfcEZPgC7HIE4ySuW5A-1; Fri, 06 Mar 2020 08:02:19 -0500
-X-MC-Unique: jUFJfcEZPgC7HIE4ySuW5A-1
-Received: by mail-wm1-f71.google.com with SMTP id c18so865283wml.0
-        for <kvm@vger.kernel.org>; Fri, 06 Mar 2020 05:02:19 -0800 (PST)
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=y2yWNaYqjJ/RvKkVVduCbhM3C1I4Zkz6logIvpDXjRI=;
+        b=Q6oy0vfpoUSWpizjCenTyIP2H4xFppaP/aL07Tm8nzTBA6pdF1XE+jmnddi2ZcTyWuBlAa
+        w3wCs136ssTu+Svp7AkJQeLFFeBLaCNSFlm9uStyelesBKIk/WmWKtDkm8F4UYOkp2ctCO
+        /ce8cmJ3WZQZZHlewRo8GFYP/uo7N9s=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-39-wG0-d9-HNH2lQX5CDpht-g-1; Fri, 06 Mar 2020 08:02:20 -0500
+X-MC-Unique: wG0-d9-HNH2lQX5CDpht-g-1
+Received: by mail-wm1-f69.google.com with SMTP id y7so859576wmd.4
+        for <kvm@vger.kernel.org>; Fri, 06 Mar 2020 05:02:20 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=9kyJgQMNNTtILNB3efmK9JnspOevwrPmN1Q1JAEBpAU=;
-        b=M+Y+jLIQtQdDLsPfLofe97wJshvjW+QIzZmsbIWt9b6sPjB7SKca8/GmCAbG6pO9Qp
-         1/1CuFvX0RYrR3mtvtpILGcOImzAfINqnat82zUWYPmxgu9Td/jlNCYTsUcf0nUtwj+9
-         Kelg8cWq5bhxlANUcX9LU1L/R4H3qDPT64/2nE7yFLS58B++ZMaDB4j6EWme4LznfDZ7
-         FruGAtQPBiI4mX1RBRHrIiL2o7EP7cal9VGQ8tex16qBmHQAPjOtz2CIumnDWonoDXqF
-         b695BS1f6vqqjoPYlFKyKwURAkA1mRWcA9jaNOxgdjGElbfmX92U+bp7Rbe5K9akT5ZC
-         7HkQ==
-X-Gm-Message-State: ANhLgQ2YRBTdG5Q4xuUEpEeQlPU1l3O9BOO3ecTG7WJt5QetQP55j+cm
-        c+XCCfm9H7w21mrENX8RUrjnCeP9erMVty273HES+pyrOA22aLBzB9JCbEcxGu2OcC6mdUTL2dO
-        RI02nqF2E2MBt
-X-Received: by 2002:adf:de0d:: with SMTP id b13mr3989698wrm.297.1583499738505;
-        Fri, 06 Mar 2020 05:02:18 -0800 (PST)
-X-Google-Smtp-Source: ADFU+vsKYoaK09agc4K6ttjmJfCHwezyd4P5yvpgDy7QZx84bx8Hc+dQIFutDBEvtnkB7At6SeYHAQ==
-X-Received: by 2002:adf:de0d:: with SMTP id b13mr3989672wrm.297.1583499738253;
-        Fri, 06 Mar 2020 05:02:18 -0800 (PST)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=y2yWNaYqjJ/RvKkVVduCbhM3C1I4Zkz6logIvpDXjRI=;
+        b=gjBXfGAR4kLou//3lyaAI8T0E4rmodS85S0CpWR+wcKxcweqQXZmTjks6+1CPtjAsW
+         T6tBFLIqqoWKLLdKeysTV3f8UHdPQzq+m+8r/UraopYsyUm0b/zWnbTnMVzA6iZrFFzO
+         gMLaqvrj7KM3VcN8RqbmR1Pf7RjHCmV1O+b2GkxdFdFpw7XsOu6j1UmJDgjmCAfCYy6Q
+         sYjBdbsk/76qY9MgJ4Lu65lJmFU8PLWhKvFuE3iFwxBY/WqOzI8qV6i0T/g366jofJml
+         RuO5y9kYZIs4leEEVb8hT3mTCZTG6cBL9vMwu05hnKXQx95mz3lcCcb6QdtjVxu4yUPe
+         lgfA==
+X-Gm-Message-State: ANhLgQ3wwSqwi3cmsT1IqZC87bPc8lxZVrO8cLE21rjUBwdSnALTD358
+        rSzBxD33rO+47z/Y2Hvybs/G/pWLC2fPgD3899N89tNPi+AuVE3BjdiSGcvAG5BeNuZfIFuAohU
+        2BvXrbgZ4Qy4u
+X-Received: by 2002:a5d:6690:: with SMTP id l16mr4193877wru.251.1583499739787;
+        Fri, 06 Mar 2020 05:02:19 -0800 (PST)
+X-Google-Smtp-Source: ADFU+vt1OXPzlEbyvBAvceW/RbmClBEpZeiagwVFOODbocvqNKeEiZjWeqYhWm0qnk58uiEN6mYnZw==
+X-Received: by 2002:a5d:6690:: with SMTP id l16mr4193848wru.251.1583499739540;
+        Fri, 06 Mar 2020 05:02:19 -0800 (PST)
 Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id i67sm26613243wri.50.2020.03.06.05.02.16
+        by smtp.gmail.com with ESMTPSA id i67sm26613243wri.50.2020.03.06.05.02.18
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 06 Mar 2020 05:02:17 -0800 (PST)
+        Fri, 06 Mar 2020 05:02:18 -0800 (PST)
 From:   Vitaly Kuznetsov <vkuznets@redhat.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Jim Mattson <jmattson@google.com>,
         Sean Christopherson <sean.j.christopherson@intel.com>,
         Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v3 0/2] KVM: VMX: cleanup VMXON region allocation
-Date:   Fri,  6 Mar 2020 14:02:13 +0100
-Message-Id: <20200306130215.150686-1-vkuznets@redhat.com>
+Subject: [PATCH v3 1/2] KVM: VMX: rename 'kvm_area' to 'vmxon_region'
+Date:   Fri,  6 Mar 2020 14:02:14 +0100
+Message-Id: <20200306130215.150686-2-vkuznets@redhat.com>
 X-Mailer: git-send-email 2.24.1
+In-Reply-To: <20200306130215.150686-1-vkuznets@redhat.com>
+References: <20200306130215.150686-1-vkuznets@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
@@ -66,22 +69,67 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Minor cleanup with no functional change (intended):
-- Rename 'kvm_area' to 'vmxon_region'
-- Simplify setting revision_id for VMXON region when eVMCS is in use
+The name 'kvm_area' is misleading (as we have way too many areas which are
+KVM related), what alloc_kvm_area()/free_kvm_area() functions really do is
+allocate/free VMXON region for all CPUs. Rename accordingly.
 
-Changes since v1:
-- Pass 'enum vmcs_type' parameter to alloc_vmcs() too [Sean Christopherson <sean.j.christopherson@intel.com>]
+No functional change intended.
 
-Vitaly Kuznetsov (2):
-  KVM: VMX: rename 'kvm_area' to 'vmxon_region'
-  KVM: VMX: untangle VMXON revision_id setting when using eVMCS
+Reviewed-by: Sean Christopherson <sean.j.christopherson@intel.com>
+Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+---
+ arch/x86/kvm/vmx/vmx.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
- arch/x86/kvm/vmx/nested.c |  2 +-
- arch/x86/kvm/vmx/vmx.c    | 44 ++++++++++++++++++---------------------
- arch/x86/kvm/vmx/vmx.h    | 12 ++++++++---
- 3 files changed, 30 insertions(+), 28 deletions(-)
-
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 40b1e6138cd5..dab19e4e5f2b 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -2635,7 +2635,7 @@ int alloc_loaded_vmcs(struct loaded_vmcs *loaded_vmcs)
+ 	return -ENOMEM;
+ }
+ 
+-static void free_kvm_area(void)
++static void free_vmxon_regions(void)
+ {
+ 	int cpu;
+ 
+@@ -2645,7 +2645,7 @@ static void free_kvm_area(void)
+ 	}
+ }
+ 
+-static __init int alloc_kvm_area(void)
++static __init int alloc_vmxon_regions(void)
+ {
+ 	int cpu;
+ 
+@@ -2654,7 +2654,7 @@ static __init int alloc_kvm_area(void)
+ 
+ 		vmcs = alloc_vmcs_cpu(false, cpu, GFP_KERNEL);
+ 		if (!vmcs) {
+-			free_kvm_area();
++			free_vmxon_regions();
+ 			return -ENOMEM;
+ 		}
+ 
+@@ -7815,7 +7815,7 @@ static __init int hardware_setup(void)
+ 			return r;
+ 	}
+ 
+-	r = alloc_kvm_area();
++	r = alloc_vmxon_regions();
+ 	if (r)
+ 		nested_vmx_hardware_unsetup();
+ 	return r;
+@@ -7826,7 +7826,7 @@ static __exit void hardware_unsetup(void)
+ 	if (nested)
+ 		nested_vmx_hardware_unsetup();
+ 
+-	free_kvm_area();
++	free_vmxon_regions();
+ }
+ 
+ static bool vmx_check_apicv_inhibit_reasons(ulong bit)
 -- 
 2.24.1
 
