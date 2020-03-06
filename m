@@ -2,93 +2,141 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7A43C17B984
-	for <lists+kvm@lfdr.de>; Fri,  6 Mar 2020 10:45:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BEA2C17B986
+	for <lists+kvm@lfdr.de>; Fri,  6 Mar 2020 10:45:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726069AbgCFJo7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 6 Mar 2020 04:44:59 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:25553 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726010AbgCFJo7 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 6 Mar 2020 04:44:59 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1583487898;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=WbxIdYhTTjgVlUuu7acZggNhYjFYj5XT7w4bg+bKCpo=;
-        b=Onj9kiOE+6sRUX8Pyw9bTJxHkGmbprAHh7OgMhFJLqpmEujvUAz1J4NJPP+9nXH/DU0XrI
-        otuPBdFd2RhVlRsKe1B9xqBIx+6FvjE5CMbhrpn0QFLa2IU4bQvtSK7p3j7cTUFT2k3AXg
-        hzdc1CySqRFEqpu3r/o7QQ7VZhl7Z3U=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-36-pywpoBYVNSCrqm11C3pF_Q-1; Fri, 06 Mar 2020 04:44:57 -0500
-X-MC-Unique: pywpoBYVNSCrqm11C3pF_Q-1
-Received: by mail-wr1-f72.google.com with SMTP id n7so767813wro.9
-        for <kvm@vger.kernel.org>; Fri, 06 Mar 2020 01:44:56 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=WbxIdYhTTjgVlUuu7acZggNhYjFYj5XT7w4bg+bKCpo=;
-        b=d45rDXFbNxJcAP7ncLoxwjs5Rr0RYuZkCMchaWiYLyae+YyfI7Mi4716dYKu/fbhf5
-         uaGZGh/cT22cKBtYL3X5NkuNN0gPWNOiromdrY/l/mkO77Y1dfyDVYm5GwCsnrIwhVOB
-         MQiluzDSriLPC+HiFEW0YiO01vAJQouETAxb5DFY93k2oTP3EwSiNurWd84+5KwVwJrc
-         pq0+D8nT28EgQrqH5VMEx8emDTf26ft/kjs1regxifaaC4DAMYjHlTAfvpIh9MErsna6
-         XFbawWpNanrjcZnlOZJWh2bccF0FDH6xVLlqW8hrGjVxBurTZpt1nhe2VKkbE6GdBRxz
-         rWuw==
-X-Gm-Message-State: ANhLgQ09sFLpJGq69Wt/N4RUh9M+fdJEp2pm+jEDg0+TQNBAD1QXFzqx
-        //R9yE62zT09yVZk/d4BqQ4b2KUgRhMKTvZyLlI+vDxnhhtr1uYTPBpwNlAXSFRtmKYEz7QawiP
-        fuLVJ9lS2Kz67
-X-Received: by 2002:a1c:7919:: with SMTP id l25mr3019498wme.135.1583487895751;
-        Fri, 06 Mar 2020 01:44:55 -0800 (PST)
-X-Google-Smtp-Source: ADFU+vvxjBVBTvy10EKYcXioKSADNfuDaKvIrnd4UdrjOTMe11WoR4rkgftir/YuAN37Jpblb9nk5g==
-X-Received: by 2002:a1c:7919:: with SMTP id l25mr3019483wme.135.1583487895545;
-        Fri, 06 Mar 2020 01:44:55 -0800 (PST)
-Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id p15sm12572147wma.40.2020.03.06.01.44.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 06 Mar 2020 01:44:54 -0800 (PST)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        linmiaohe <linmiaohe@huawei.com>
-Cc:     "rkrcmar\@redhat.com" <rkrcmar@redhat.com>,
-        "sean.j.christopherson\@intel.com" <sean.j.christopherson@intel.com>,
-        "jmattson\@google.com" <jmattson@google.com>,
-        "joro\@8bytes.org" <joro@8bytes.org>,
-        "tglx\@linutronix.de" <tglx@linutronix.de>,
-        "mingo\@redhat.com" <mingo@redhat.com>,
-        "bp\@alien8.de" <bp@alien8.de>, "hpa\@zytor.com" <hpa@zytor.com>,
-        "kvm\@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel\@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "x86\@kernel.org" <x86@kernel.org>
-Subject: Re: [PATCH] KVM: VMX: Use wrapper macro ~RMODE_GUEST_OWNED_EFLAGS_BITS directly
-In-Reply-To: <1e3f7ff0-0159-98e8-ba21-8806c3a14820@redhat.com>
-References: <f1b01b4903564f2c8c267a3996e1ac29@huawei.com> <1e3f7ff0-0159-98e8-ba21-8806c3a14820@redhat.com>
-Date:   Fri, 06 Mar 2020 10:44:53 +0100
-Message-ID: <87sgiles16.fsf@vitty.brq.redhat.com>
+        id S1726261AbgCFJpx convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Fri, 6 Mar 2020 04:45:53 -0500
+Received: from mga14.intel.com ([192.55.52.115]:26681 "EHLO mga14.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726034AbgCFJpx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 6 Mar 2020 04:45:53 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 06 Mar 2020 01:45:53 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,521,1574150400"; 
+   d="scan'208";a="234748382"
+Received: from fmsmsx103.amr.corp.intel.com ([10.18.124.201])
+  by orsmga008.jf.intel.com with ESMTP; 06 Mar 2020 01:45:52 -0800
+Received: from fmsmsx153.amr.corp.intel.com (10.18.125.6) by
+ FMSMSX103.amr.corp.intel.com (10.18.124.201) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Fri, 6 Mar 2020 01:45:43 -0800
+Received: from shsmsx151.ccr.corp.intel.com (10.239.6.50) by
+ FMSMSX153.amr.corp.intel.com (10.18.125.6) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Fri, 6 Mar 2020 01:45:43 -0800
+Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.206]) by
+ SHSMSX151.ccr.corp.intel.com ([169.254.3.201]) with mapi id 14.03.0439.000;
+ Fri, 6 Mar 2020 17:45:40 +0800
+From:   "Tian, Kevin" <kevin.tian@intel.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "dev@dpdk.org" <dev@dpdk.org>,
+        "mtosatti@redhat.com" <mtosatti@redhat.com>,
+        "thomas@monjalon.net" <thomas@monjalon.net>,
+        "bluca@debian.org" <bluca@debian.org>,
+        "jerinjacobk@gmail.com" <jerinjacobk@gmail.com>,
+        "Richardson, Bruce" <bruce.richardson@intel.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>
+Subject: RE: [PATCH v2 5/7] vfio/pci: Add sriov_configure support
+Thread-Topic: [PATCH v2 5/7] vfio/pci: Add sriov_configure support
+Thread-Index: AQHV51YaoTnickP570etlLGInd5eAKgrQJIwgA6gtQCAAWITYIAAIt7A
+Date:   Fri, 6 Mar 2020 09:45:40 +0000
+Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D19D7C0A43@SHSMSX104.ccr.corp.intel.com>
+References: <158213716959.17090.8399427017403507114.stgit@gimli.home>
+        <158213846731.17090.37693075723046377.stgit@gimli.home>
+        <AADFC41AFE54684AB9EE6CBC0274A5D19D79A943@SHSMSX104.ccr.corp.intel.com>
+ <20200305112230.0dd77712@w520.home> 
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ctpclassification: CTP_NT
+x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiMjY4MTQ2OWItZDU1Ny00ZGViLTk5ODEtODAzYjcxMDY3OWNhIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiWEFkM0paSjhCUXhKS0JQdHFpWUw0NGhCOElseFk2c1daa3dnYjdwdUVJMzJJSHlIc3Y4MGxveFhmVDFVR0VVZCJ9
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
+> From: Tian, Kevin
+> Sent: Friday, March 6, 2020 3:57 PM
+> 
+> > From: Alex Williamson <alex.williamson@redhat.com>
+> > Sent: Friday, March 6, 2020 2:23 AM
+> >
+> > On Tue, 25 Feb 2020 03:08:00 +0000
+> > "Tian, Kevin" <kevin.tian@intel.com> wrote:
+> >
+> > > > From: Alex Williamson
+> > > > Sent: Thursday, February 20, 2020 2:54 AM
+> > > >
+> > > > With the VF Token interface we can now expect that a vfio userspace
+> > > > driver must be in collaboration with the PF driver, an unwitting
+> > > > userspace driver will not be able to get past the GET_DEVICE_FD step
+> > > > in accessing the device.  We can now move on to actually allowing
+> > > > SR-IOV to be enabled by vfio-pci on the PF.  Support for this is not
+> > > > enabled by default in this commit, but it does provide a module option
+> > > > for this to be enabled (enable_sriov=1).  Enabling VFs is rather
+> > > > straightforward, except we don't want to risk that a VF might get
+> > > > autoprobed and bound to other drivers, so a bus notifier is used to
+> > > > "capture" VFs to vfio-pci using the driver_override support.  We
+> > > > assume any later action to bind the device to other drivers is
+> > > > condoned by the system admin and allow it with a log warning.
+> > > >
+> > > > vfio-pci will disable SR-IOV on a PF before releasing the device,
+> > > > allowing a VF driver to be assured other drivers cannot take over the
+> > > > PF and that any other userspace driver must know the shared VF token.
+> > > > This support also does not provide a mechanism for the PF userspace
+> > > > driver itself to manipulate SR-IOV through the vfio API.  With this
+> > > > patch SR-IOV can only be enabled via the host sysfs interface and the
+> > > > PF driver user cannot create or remove VFs.
+> > >
+> > > I'm not sure how many devices can be properly configured simply
+> > > with pci_enable_sriov. It is not unusual to require PF driver prepare
+> > > something before turning PCI SR-IOV capability. If you look kernel
+> > > PF drivers, there are only two using generic pci_sriov_configure_
+> > > simple (simple wrapper like pci_enable_sriov), while most others
+> > > implementing their own callback. However vfio itself has no idea
+> > > thus I'm not sure how an user knows whether using this option can
+> > > actually meet his purpose. I may miss something here, possibly
+> > > using DPDK as an example will make it clearer.
+> >
+> > There is still the entire vfio userspace driver interface.  Imagine for
+> > example that QEMU emulates the SR-IOV capability and makes a call out
+> > to libvirt (or maybe runs with privs for the PF SR-IOV sysfs attribs)
+> > when the guest enables SR-IOV.  Can't we assume that any PF specific
+> > support can still be performed in the userspace/guest driver, leaving
+> > us with a very simple and generic sriov_configure callback in vfio-pci?
+> 
+> Makes sense. One concern, though, is how an user could be warned
+> if he inadvertently uses sysfs to enable SR-IOV on a vfio device whose
+> userspace driver is incapable of handling it. Note any VFIO device,
+> if SR-IOV capable, will allow user to do so once the module option is
+> turned on and the callback is registered. I felt such uncertainty can be
+> contained by toggling SR-IOV through a vfio api, but from your description
+> obviously it is what you want to avoid. Is it due to the sequence reason,
+> e.g. that SR-IOV must be enabled before userspace PF driver sets the
+> token?
+> 
 
-> On 06/03/20 03:17, linmiaohe wrote:
->> Define a macro RMODE_HOST_OWNED_EFLAGS_BITS for (X86_EFLAGS_IOPL |
->> X86_EFLAGS_VM) as suggested by Vitaly seems a good way to fix this ?
->> Thanks.
->
-> No, what if a host-owned flag was zero?  I'd just leave it as is.
->
+reading again I found that you specifically mentioned "the PF driver user 
+cannot create or remove VFs.". However I failed to get the rationale 
+behind. If the VF drivers have built the trust with the PF driver through
+the token, what is the problem of allowing the PF driver to further manage 
+SR-IOV itself? suppose any VF removal will be done in a cooperate way
+to avoid surprise impact to related VF drivers. then possibly a new vfio
+ioctl for setting the VF numbers plus a token from the userspace driver
+could also serve the purpose of this patch series (GET_DEVICE_FD + sysfs)?
 
-I'm not saying my suggestion was a good idea but honestly I'm failing to
-wrap my head around this. The suggested 'RMODE_HOST_OWNED_EFLAGS_BITS'
-would just be a define for (X86_EFLAGS_IOPL | X86_EFLAGS_VM) so
-technically the patch would just be nop, no?
-
--- 
-Vitaly
-
+Thanks
+Kevin
