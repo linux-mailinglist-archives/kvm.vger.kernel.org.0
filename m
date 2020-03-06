@@ -2,106 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2467817BBD0
-	for <lists+kvm@lfdr.de>; Fri,  6 Mar 2020 12:38:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 32E5117BBE0
+	for <lists+kvm@lfdr.de>; Fri,  6 Mar 2020 12:42:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726300AbgCFLis (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 6 Mar 2020 06:38:48 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:36707 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726231AbgCFLis (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 6 Mar 2020 06:38:48 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1583494727;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Spzl07gt6AiHxSswf4FMxeagCVtGBrYL0CA43/3EHAA=;
-        b=SI7h45YlI5aXOuXPVuos+GLlbQlME1gHzeW5ZnBmkYKTh/UCtEeEp5/tOpoXoo0cVt4zqb
-        V1WhXsj3KsUg34AFLMbttDbsrcy0KZfwaYvQRI+5Q/NhqMY45ksj/B0BoRZ409VJ2RRfkS
-        uw1ZbfKB/0fN078Un5qVVOBJUA5IfU8=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-293-NavDlw8MPyi9oISVxdF5wA-1; Fri, 06 Mar 2020 06:38:45 -0500
-X-MC-Unique: NavDlw8MPyi9oISVxdF5wA-1
-Received: by mail-wm1-f69.google.com with SMTP id r19so786725wmh.1
-        for <kvm@vger.kernel.org>; Fri, 06 Mar 2020 03:38:44 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=Spzl07gt6AiHxSswf4FMxeagCVtGBrYL0CA43/3EHAA=;
-        b=feQ2NvW2cO2oSodJGozTO3mGr0oa0cHvxKuPH5bVF0BMbfX9U8GN5uouV7uOVtShoJ
-         ls3U36OoenS70pGQMxdw1MgNiwAuyNmraFM5Y2x4ai8ig1XT3t4hNyFRmeuXFOqtDucd
-         q2/3VJRbPwKpL6xOlW11nCb5gVoftLvLExFVis/+CAS2uPQ+vfn7pLA2JEwgIz8RU6zo
-         VcjWLSUCjgQUiVQaFUqDx+0RyYcLUI0rEQDG4dMxaK3TGzFjBOI+jd9eB1s0bn4YgN09
-         bLo8lhYXkdMTV9rW3HLLlZwdQqw4mhKGo+pOgTpEWVbl3Ah5YE2U3aGw6qzvmoNjrNg/
-         TwDg==
-X-Gm-Message-State: ANhLgQ0qzdhyKy/dORZzG0cjs8PKByUSX0GRvkfYDwteZmFE+cMMY2xa
-        1hvh5/Q0uqzhNcrKqTPCd8f2blzarXvab6BIVc0GMFptWGtyiQOVdIU9uLWIg+ZpOLh4AvXzrws
-        Up7xvWPVgEEUb
-X-Received: by 2002:a1c:e442:: with SMTP id b63mr570773wmh.174.1583494723590;
-        Fri, 06 Mar 2020 03:38:43 -0800 (PST)
-X-Google-Smtp-Source: ADFU+vuLdMqaEBrFkhWpgZz11Wwa03MCR7/8PlHXB9UcY9iaRG8MEtnrqJPJIvECyJFWVOJbykuMyw==
-X-Received: by 2002:a1c:e442:: with SMTP id b63mr570759wmh.174.1583494723368;
-        Fri, 06 Mar 2020 03:38:43 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:8cd7:8509:4683:f03a? ([2001:b07:6468:f312:8cd7:8509:4683:f03a])
-        by smtp.gmail.com with ESMTPSA id 19sm14946335wma.3.2020.03.06.03.38.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 06 Mar 2020 03:38:42 -0800 (PST)
-Subject: Re: [PATCH RFC 4/4] kvm: Implement atomic memory region resizes via
- region_resize()
-To:     David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-Cc:     Richard Henderson <rth@twiddle.net>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        Igor Mammedov <imammedo@redhat.com>,
-        Peter Xu <peterx@redhat.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        kvm@vger.kernel.org
-References: <20200303141939.352319-1-david@redhat.com>
- <20200303141939.352319-5-david@redhat.com>
- <102af47e-7ec0-7cf9-8ddd-0b67791b5126@redhat.com>
- <3b67a5ba-dc21-ad42-4363-95bb685240b9@redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <2a8d8b63-d54f-c1e7-9668-5d065e36aa1d@redhat.com>
-Date:   Fri, 6 Mar 2020 12:38:42 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
-MIME-Version: 1.0
-In-Reply-To: <3b67a5ba-dc21-ad42-4363-95bb685240b9@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        id S1726565AbgCFLm6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 6 Mar 2020 06:42:58 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:1270 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725827AbgCFLm6 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 6 Mar 2020 06:42:58 -0500
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 026BdqUB123878
+        for <kvm@vger.kernel.org>; Fri, 6 Mar 2020 06:42:57 -0500
+Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2yk4jpyrc1-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Fri, 06 Mar 2020 06:42:57 -0500
+Received: from localhost
+        by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <raspl@linux.ibm.com>;
+        Fri, 6 Mar 2020 11:42:54 -0000
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
+        by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Fri, 6 Mar 2020 11:42:53 -0000
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 026BgqHp59310254
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 6 Mar 2020 11:42:52 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 4240D42041;
+        Fri,  6 Mar 2020 11:42:52 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 195C242047;
+        Fri,  6 Mar 2020 11:42:52 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri,  6 Mar 2020 11:42:52 +0000 (GMT)
+From:   Stefan Raspl <raspl@linux.ibm.com>
+To:     kvm@vger.kernel.org
+Cc:     rkrcmar@redhat.com, pbonzini@redhat.com
+Subject: [PATCH 0/7] tools/kvm_stat: add logfile support
+Date:   Fri,  6 Mar 2020 12:42:43 +0100
+X-Mailer: git-send-email 2.17.1
+X-TM-AS-GCONF: 00
+x-cbid: 20030611-4275-0000-0000-000003A8F1EF
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20030611-4276-0000-0000-000038BE045B
+Message-Id: <20200306114250.57585-1-raspl@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
+ definitions=2020-03-06_03:2020-03-06,2020-03-06 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 mlxlogscore=906
+ priorityscore=1501 lowpriorityscore=0 malwarescore=0 mlxscore=0
+ impostorscore=0 clxscore=1011 spamscore=0 suspectscore=1 bulkscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2001150001 definitions=main-2003060084
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 06/03/20 11:20, David Hildenbrand wrote:
-> Yeah, rwlocks are not optimal and I am still looking for better
-> alternatives (suggestions welcome :) ). Using RCU might not work,
-> because the rcu_read region might be too big (esp. while in KVM_RUN).
-> 
-> I had a prototype which used a bunch of atomics + qemu_cond_wait. But it
-> was quite elaborate and buggy.
-> 
-> (I assume only going into KVM_RUN is really affected, and I do wonder if
-> it will be noticeable at all. Doing an ioctl is always already an
-> expensive operation.)
-> 
-> I can look into per-cpu locks instead of the rwlock.
-
-Assuming we're only talking about CPU ioctls (seems like a good
-approximation) maybe you could use start_exclusive/end_exclusive?  The
-current_cpu->in_exclusive_context assignments can be made conditional on
-"if (current_cpu)".
-
-However that means you have to drop the BQL, see
-process_queued_cpu_work.  It may be a problem.
+This patch series provides a couple of new options to make logging to
+files feasible.
+Specifically, we add command line switches to specify an arbitrary time
+interval for logging, and to toggle between a .csv and the previous
+file format. Furthermore, we allow logging to files, where we utilize a
+rotating set of 6 logfiles, each with its own header for easy post-
+processing, especially when using .csv format.
+Since specifying logfile size limits might be a non-trivial exercise,
+we're throwing in yet another command line option that allows to
+specify the minimum timeframe that should be covered by logs.
+Finally, there's a minimal systemd unit file to deploy kvm_stat-based
+logging in Linux distributions.
+Note that the decision to write our own logfiles rather than to log to
+e.g. systemd journal is a conscious one: It is effectively impossible to
+write csv records into the systemd journal, the header will either
+disappear after a while or has to be repeated from time to time, which
+defeats the purpose of having a .csv format that can be easily post-
+processed, etc.
+See individual patch description for further details.
 
 
-Paolo
+Stefan Raspl (7):
+  tools/kvm_stat: rework command line sequence and message texts
+  tools/kvm_stat: switch to argparse
+  tools/kvm_stat: add command line switch '-s' to set update interval
+  tools/kvm_stat: add command line switch '-c' to log in csv format
+  tools/kvm_stat: add rotating log support
+  tools/kvm_stat: add command line switch '-T'
+  tools/kvm_stat: add sample systemd unit file
+
+ tools/kvm/kvm_stat/kvm_stat         | 434 +++++++++++++++++++++-------
+ tools/kvm/kvm_stat/kvm_stat.service |  15 +
+ tools/kvm/kvm_stat/kvm_stat.txt     |  59 ++--
+ 3 files changed, 384 insertions(+), 124 deletions(-)
+ create mode 100644 tools/kvm/kvm_stat/kvm_stat.service
+
+-- 
+2.17.1
 
