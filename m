@@ -2,55 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id F2FD417C319
-	for <lists+kvm@lfdr.de>; Fri,  6 Mar 2020 17:39:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 02C0717C31A
+	for <lists+kvm@lfdr.de>; Fri,  6 Mar 2020 17:39:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726873AbgCFQjL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        id S1726879AbgCFQjM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 6 Mar 2020 11:39:12 -0500
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:33705 "EHLO
+        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725873AbgCFQjL (ORCPT <rfc822;kvm@vger.kernel.org>);
         Fri, 6 Mar 2020 11:39:11 -0500
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:54823 "EHLO
-        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726751AbgCFQjL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 6 Mar 2020 11:39:11 -0500
-Received: by mail-wm1-f67.google.com with SMTP id i9so3171262wml.4;
-        Fri, 06 Mar 2020 08:39:09 -0800 (PST)
+Received: by mail-wr1-f66.google.com with SMTP id x7so3139610wrr.0;
+        Fri, 06 Mar 2020 08:39:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=rbE3tgX9IDkq6AOPA7A4EoyYR/J2nofK1ZsBKFjymL0=;
-        b=LkGXvpX06maPjCBjn0DVOiVmp7mTGiFcWZPIO6OiAKfscrub3qXMJq8hha8ExqwbR7
-         APRVJxtve78UPfSEpC6vIh36dmZUJfp9KmLK08FoIVhKSyTo1JT8ehVgq3Qy0G0sJY4p
-         t0qiiMvn7nEqD0XM3s6lxy6o7QOGxGL83gVMCvpNFxTnd2Yv/pqQL5W/qaqb92Fu427R
-         cMVzGBSLnnEKDgLa8eyAFcEOiPTcgXM0SnMd2d337cV4XvYrLc2T2E2AmNH7eKr2UHgM
-         R8vl8IbZOTtI6ZzmT6dg9FQ6gXyyogqYWY0f7Pmrep721xWyFE+r4sJ5OhUm+qVo5sOF
-         owRA==
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=cqBaz7Pqcjvqd8BzE+nwXVxffgaDXzbn0ymPrZ8bx5I=;
+        b=ZNWeuQFwBIvTe8w5V1YJ7K5Z6Uu46S0ZxGEZAY4hVwRfR305Iu/gbeKfetnAfBNPgI
+         8DzwxVoXrZUQ2NFGEq7plXlQHolqW+qSNR4ehqjlUNm3bdhyFOSeuMVVHh+U/PduMNlT
+         n75b04c8DeJbXpcl18LinJ07xHBbS0Rhx1cuOSvwnxYK7r6Op4Aub+IAkwSQRC8oqs5/
+         tx6OeVom0IetxxCro0quRNTy+T3ypiGa26ogoaJsPjnKm9ZWc67GqVPf1IDz777fSQwm
+         85TPnF34t+l25w63hgf6ek3xBpPXp08T7mHZiqz/wD8c+1ca5TASle1ytUTGZV7afNIq
+         9Gzw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=rbE3tgX9IDkq6AOPA7A4EoyYR/J2nofK1ZsBKFjymL0=;
-        b=bN22h3friZ+PDZCa5J8l6brD3VDvrl0UIa8pReI6LS7Pa1knxoPbaFcZRnlhUxfJk2
-         Q3TkZPiTa3k8dOMv+l67qrqSRMzjF0g6sVqmJ/Kmf2GnPgztn9ETlwiGOyHVF8OHQKfI
-         1mEWfjx4ARt1KUED3a/y8sa3CPitzjna7gtzTbti7h+KDUrimBK4O7CVhci1BilLhRc6
-         Qi0p2m32DrwE8vsE36odZMt3fpRgyJMA31pguZi/Gi+vNHPz1KA6Kq1JZsurATdfS24/
-         VoK5sXwSBaoh46hlsEhAqZt4ABvbJmsJG6Pg4Ld6sj3h55IQHeoF0qn1EOkltugLrXX6
-         DiGg==
-X-Gm-Message-State: ANhLgQ2aOA+zwIBPlClW4lcvohpT4NUVUmMMKigE/IEuJs5Xn0XsAGEH
-        MvJNXf3sMPVVvaFaPkuHyHU5QtTL
-X-Google-Smtp-Source: ADFU+vsjnUAaIK6l49ok4fI+XxVUgl1BAY7j37FFk3An892kplijaY+tUbx05ukFUzcibVLoqRnJ9g==
-X-Received: by 2002:a7b:cc04:: with SMTP id f4mr4718806wmh.134.1583512748761;
-        Fri, 06 Mar 2020 08:39:08 -0800 (PST)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=cqBaz7Pqcjvqd8BzE+nwXVxffgaDXzbn0ymPrZ8bx5I=;
+        b=N24onkn78bekmvRkr+j0aTAkL6M85MIJhjeg2aRK6zbm60/++gNR1S9iof2EloA40L
+         Zo6Lk1h2d4SloiHLZrJvnplg8oUg3NWDbqwKvAhFbAeyRmQvWKb95h1wIrQcASKGIcGP
+         yKuU43Jlt4q1uohruKrbI5wi17l4iDhSZ0u77R+VmbXqbd0AHv3AMwv3qQ0NIls0swUi
+         6EyuLEoJ69UtUp0kkThoFfzHvanN6tx3ZXU9kIFAxqqMm9orwg/5cRL7Re0qMVEw/E8W
+         1hL8M7zo9TEozU+bnB+Qe/HwN7JwQs2XHv0fJ6IoQvrB1QC9LPjMyZjpIrdeFV4Tax/S
+         xEQw==
+X-Gm-Message-State: ANhLgQ0klXP/Q6RZHoUeSRDM7r8uFsX3Xn5USXyV0yypCPoz/G9ukaFl
+        HAykQCDQ6OzMnPjS1bb8OdOYG5s9
+X-Google-Smtp-Source: ADFU+vu8PM8BfB/3tnpmAnl4QkKt8nOdKP/pQ6jqE9wlHwfOK4XvbbLSVru+j194LDNaN8YJVuc/lQ==
+X-Received: by 2002:a5d:410a:: with SMTP id l10mr4491955wrp.380.1583512750017;
+        Fri, 06 Mar 2020 08:39:10 -0800 (PST)
 Received: from linux.local ([199.203.162.213])
-        by smtp.gmail.com with ESMTPSA id n24sm8812760wra.61.2020.03.06.08.39.07
+        by smtp.gmail.com with ESMTPSA id n24sm8812760wra.61.2020.03.06.08.39.08
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 06 Mar 2020 08:39:08 -0800 (PST)
+        Fri, 06 Mar 2020 08:39:09 -0800 (PST)
 From:   Jon Doron <arilou@gmail.com>
 To:     kvm@vger.kernel.org, linux-hyperv@vger.kernel.org
 Cc:     vkuznets@redhat.com, Jon Doron <arilou@gmail.com>
-Subject: [PATCH v3 0/5] x86/kvm/hyper-v: add support for synthetic debugger
-Date:   Fri,  6 Mar 2020 18:39:04 +0200
-Message-Id: <20200306163909.1020369-1-arilou@gmail.com>
+Subject: [PATCH v3 1/5] x86/kvm/hyper-v: Explicitly align hcall param for kvm_hyperv_exit
+Date:   Fri,  6 Mar 2020 18:39:05 +0200
+Message-Id: <20200306163909.1020369-2-arilou@gmail.com>
 X-Mailer: git-send-email 2.24.1
+In-Reply-To: <20200306163909.1020369-1-arilou@gmail.com>
+References: <20200306163909.1020369-1-arilou@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
@@ -58,50 +60,23 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add support for the synthetic debugger interface of hyper-v, the
-synthetic debugger has 2 modes.
-1. Use a set of MSRs to send/recv information
-2. Use hypercalls
+Signed-off-by: Jon Doron <arilou@gmail.com>
+---
+ include/uapi/linux/kvm.h | 1 +
+ 1 file changed, 1 insertion(+)
 
-The first mode is based the following MSRs:
-1. Control/Status MSRs which either asks for a send/recv .
-2. Send/Recv MSRs each holds GPA where the send/recv buffers are.
-3. Pending MSR, holds a GPA to a PAGE that simply has a boolean that
-   indicates if there is data pending to issue a recv VMEXIT.
-
-In the first patch the first mode is being implemented in the sense that
-it simply exits to user-space when a control MSR is being written and
-when the pending MSR is being set, then it's up-to userspace to
-implement the rest of the logic of sending/recving.
-
-In the second mode instead of using MSRs KNet will simply issue
-Hypercalls with the information to send/recv, in this mode the data
-being transferred is UDP encapsulated, unlike in the previous mode in
-which you get just the data to send.
-
-The new hypercalls will exit to userspace which will be incharge of
-re-encapsulating if needed the UDP packets to be sent.
-
-There is an issue though in which KDNet does not respect the hypercall
-page and simply issues vmcall/vmmcall instructions depending on the cpu
-type expecting them to be handled as it a real hypercall was issued.
-
-Jon Doron (5):
-  x86/kvm/hyper-v: Explicitly align hcall param for kvm_hyperv_exit
-  x86/hyper-v: Add synthetic debugger definitions
-  x86/kvm/hyper-v: Add support for synthetic debugger capability
-  x86/kvm/hyper-v: enable hypercalls regardless of hypercall page
-  x86/kvm/hyper-v: Add support for synthetic debugger via hypercalls
-
- arch/x86/include/asm/hyperv-tlfs.h |  26 +++++
- arch/x86/include/asm/kvm_host.h    |  13 +++
- arch/x86/kvm/hyperv.c              | 161 ++++++++++++++++++++++++++++-
- arch/x86/kvm/hyperv.h              |   5 +
- arch/x86/kvm/trace.h               |  48 +++++++++
- arch/x86/kvm/x86.c                 |   9 ++
- include/uapi/linux/kvm.h           |  11 ++
- 7 files changed, 271 insertions(+), 2 deletions(-)
-
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index 4b95f9a31a2f..24b7c48ccc6f 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -197,6 +197,7 @@ struct kvm_hyperv_exit {
+ 			__u64 msg_page;
+ 		} synic;
+ 		struct {
++			__u32 pad;
+ 			__u64 input;
+ 			__u64 result;
+ 			__u64 params[2];
 -- 
 2.24.1
 
