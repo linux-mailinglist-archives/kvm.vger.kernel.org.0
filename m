@@ -2,120 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4149C17CF2C
-	for <lists+kvm@lfdr.de>; Sat,  7 Mar 2020 16:52:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1419717CF35
+	for <lists+kvm@lfdr.de>; Sat,  7 Mar 2020 16:59:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726292AbgCGPwW convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Sat, 7 Mar 2020 10:52:22 -0500
-Received: from Galois.linutronix.de ([193.142.43.55]:55636 "EHLO
-        Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726138AbgCGPwV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 7 Mar 2020 10:52:21 -0500
-Received: from p5de0bf0b.dip0.t-ipconnect.de ([93.224.191.11] helo=nanos.tec.linutronix.de)
-        by Galois.linutronix.de with esmtpsa (TLS1.2:DHE_RSA_AES_256_CBC_SHA256:256)
-        (Exim 4.80)
-        (envelope-from <tglx@linutronix.de>)
-        id 1jAbkP-0006ge-Qx; Sat, 07 Mar 2020 16:52:17 +0100
-Received: by nanos.tec.linutronix.de (Postfix, from userid 1000)
-        id 37D92104088; Sat,  7 Mar 2020 16:52:17 +0100 (CET)
-From:   Thomas Gleixner <tglx@linutronix.de>
-To:     Andy Lutomirski <luto@kernel.org>
+        id S1726199AbgCGP7h (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 7 Mar 2020 10:59:37 -0500
+Received: from mail.kernel.org ([198.145.29.99]:36850 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726065AbgCGP7h (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 7 Mar 2020 10:59:37 -0500
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 85AC02077B
+        for <kvm@vger.kernel.org>; Sat,  7 Mar 2020 15:59:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1583596776;
+        bh=zMkJH6cK603hkiloMil4J7KbZG+wEMJbLxkolozJ8y4=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=wl6DWydhYNyJg+uXDV7caWUBz1t5DhX+qqoTIdiOgeLjAPAFFlLTyvGdS2MGNhdsD
+         BbZNFXXAt8+rfk8lQgEp59HhLFhhQ54p1j1ZLE2N/Pz133vyTUsNnc1URmioveU0nF
+         ob12zJh5RHBqImzhx6w4EdEknItkP2Is8eUfe71I=
+Received: by mail-wm1-f49.google.com with SMTP id g134so5601185wme.3
+        for <kvm@vger.kernel.org>; Sat, 07 Mar 2020 07:59:36 -0800 (PST)
+X-Gm-Message-State: ANhLgQ1Hh6A3Mzo73XTaphzy9RxLDcLGllx4d0vdFDbU/mi8guwO8zlL
+        /1s7BB7qRmahk3TJz7yD92eTHRDGMNh6Gt99loaFNw==
+X-Google-Smtp-Source: ADFU+vvxDbLv30/SJ1GdrACcZi2erMHbijB2e7fHbV/Q2v+aZ/w3oszY1ocnI9nhuP4cv/N2cbSsd3T6zolnXE6tflg=
+X-Received: by 2002:a7b:cd83:: with SMTP id y3mr10159179wmj.176.1583596774941;
+ Sat, 07 Mar 2020 07:59:34 -0800 (PST)
+MIME-Version: 1.0
+References: <ed71d0967113a35f670a9625a058b8e6e0b2f104.1583547991.git.luto@kernel.org>
+ <CALCETrVmsF9JSMLSd44-3GGWEz6siJQxudeaYiVnvv__YDT1BQ@mail.gmail.com> <87ftek9ngq.fsf@nanos.tec.linutronix.de>
+In-Reply-To: <87ftek9ngq.fsf@nanos.tec.linutronix.de>
+From:   Andy Lutomirski <luto@kernel.org>
+Date:   Sat, 7 Mar 2020 07:59:22 -0800
+X-Gmail-Original-Message-ID: <CALCETrVsc-t=tDRPbCg5dWHDY0NFv2zjz12ahD-vnGPn8T+RXA@mail.gmail.com>
+Message-ID: <CALCETrVsc-t=tDRPbCg5dWHDY0NFv2zjz12ahD-vnGPn8T+RXA@mail.gmail.com>
+Subject: Re: [PATCH v2] x86/kvm: Disable KVM_ASYNC_PF_SEND_ALWAYS
+To:     Thomas Gleixner <tglx@linutronix.de>
 Cc:     Andy Lutomirski <luto@kernel.org>,
         LKML <linux-kernel@vger.kernel.org>, X86 ML <x86@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>, KVM <kvm@vger.kernel.org>,
-        "Paul E. McKenney" <paulmck@kernel.org>
-Subject: Re: [patch 2/2] x86/kvm: Sanitize kvm_async_pf_task_wait()
-In-Reply-To: <CALCETrWc0wM1x-mAcKCPRUiGtzONtXiNVMFgWZwkRD3v3K3jsA@mail.gmail.com>
-References: <20200306234204.847674001@linutronix.de> <20200307000259.448059232@linutronix.de> <CALCETrV74siTTHHWRPv+Gz=YS3SAUA6eqB6FX1XaHKvZDCbaNg@mail.gmail.com> <87r1y4a3gw.fsf@nanos.tec.linutronix.de> <CALCETrWc0wM1x-mAcKCPRUiGtzONtXiNVMFgWZwkRD3v3K3jsA@mail.gmail.com>
-Date:   Sat, 07 Mar 2020 16:52:17 +0100
-Message-ID: <87d09o9n7y.fsf@nanos.tec.linutronix.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8BIT
-X-Linutronix-Spam-Score: -1.0
-X-Linutronix-Spam-Level: -
-X-Linutronix-Spam-Status: No , -1.0 points, 5.0 required,  ALL_TRUSTED=-1,SHORTCIRCUIT=-0.0001
+        kvm list <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        stable <stable@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Andy Lutomirski <luto@kernel.org> writes:
-> On Sat, Mar 7, 2020 at 2:01 AM Thomas Gleixner <tglx@linutronix.de> wrote:
->> > What’s the local_irq_disable() here for? I would believe a
->> > lockdep_assert_irqs_disabled() somewhere in here would make sense.
->> > (Yes, I see you copied this from the old code. It’s still nonsense.)
->>
->> native_safe_halt() does:
->>
->>          STI
->>          HLT
->>
->> So the irq disable is required as the loop should exit with interrupts
->> disabled.
+On Sat, Mar 7, 2020 at 7:47 AM Thomas Gleixner <tglx@linutronix.de> wrote:
 >
-> Oops, should have looked at what native_safe_halt() does.
+> Andy Lutomirski <luto@kernel.org> writes:
+> > On Fri, Mar 6, 2020 at 6:26 PM Andy Lutomirski <luto@kernel.org> wrote:
+> >> +               /*
+> >> +                * We do not set KVM_ASYNC_PF_SEND_ALWAYS.  With the current
+> >> +                * KVM paravirt ABI, the following scenario is possible:
+> >> +                *
+> >> +                * #PF: async page fault (KVM_PV_REASON_PAGE_NOT_PRESENT)
+> >> +                *  NMI before CR2 or KVM_PF_REASON_PAGE_NOT_PRESENT
+> >> +                *   NMI accesses user memory, e.g. due to perf
+> >> +                *    #PF: normal page fault
+> >> +                *     #PF reads CR2 and apf_reason -- apf_reason should be 0
+> >> +                *
+> >> +                *  outer #PF reads CR2 and apf_reason -- apf_reason should be
+> >> +                *  KVM_PV_REASON_PAGE_NOT_PRESENT
+> >> +                *
+> >> +                * There is no possible way that both reads of CR2 and
+> >> +                * apf_reason get the correct values.  Fixing this would
+> >> +                * require paravirt ABI changes.
+> >> +                */
+> >> +
+> >
+> > Upon re-reading my own comment, I think the problem is real, but I
+> > don't think my patch fixes it.  The outer #PF could just as easily
+> > have come from user mode.  We may actually need the NMI code (and
+> > perhaps MCE and maybe #DB too) to save, clear, and restore apf_reason.
+> > If we do this, then maybe CPL0 async PFs are actually okay, but the
+> > semantics are so poorly defined that I'm not very confident about
+> > that.
 >
->>
->> > I also find it truly bizarre that hlt actually works in this context.
->> > Does KVM in fact wake a HLTed guest that HLTed with IRQs off when a
->> > pending async pf is satisfied?  This would make sense if the wake
->> > event were an interrupt, but it’s not according to Paolo.
->>
->> See above. safe halt enables interrupts, which means IF == 1 and the
->> host sanity check for IF == 1 is satisfied.
->>
->> In fact, if e.g. some regular interrupt arrives before the page becomes
->> available and the guest entered the halt loop because the fault happened
->> inside a RCU read side critical section with preemption enabled, then
->> the interrupt might wake up another task, set need resched and this
->> other task can run.
+> I think even with the current mode this is fixable on the host side when
+> it keeps track of the state.
 >
-> Now I'm confused again.  Your patch is very careful not to schedule if
-> we're in an RCU read-side critical section, but the regular preemption
-> code (preempt_schedule_irq, etc) seems to be willing to schedule
-> inside an RCU read-side critical section.  Why is the latter okay but
-> not the async pf case?
-
-Preemption is fine, but voluntary schedule not. voluntary schedule might
-end up in idle if this is the last runnable task.
-
-> Ignoring that, this still seems racy:
+> The host knows exactly when it injects a async PF and it can store CR2
+> and reason of that async PF in flight.
 >
-> STI
-> nested #PF telling us to wake up
-> #PF returns
-> HLT
-
-You will say Ooops, should have looked .... when I tell you that the
-above cannot happen. From the SDM:
-
-  If IF = 0, maskable hardware interrupts remain inhibited on the
-  instruction boundary following an execution of STI.
-
-Otherwise safe_halt would not work at all :)
-
-> doesn't this result in putting the CPU asleep for no good reason until
-> the next interrupt hits?
-
-No :)
-
+> On the next VMEXIT it checks whether apf_reason is 0. If apf_reason is 0
+> then it knows that the guest has read CR2 and apf_reason. All good
+> nothing to worry about.
 >
->> > All this being said, the only remotely sane case is when regs->flags
->> > has IF==1. Perhaps this code should actually do:
->> >
->> > WARN_ON(!(regs->flags & X86_EFLAGS_IF));
->>
->> Yes, that want's to be somewhere early and also cover the async wake
->> case. Neither wake nor wait can be injected when IF == 0.
+> If not it needs to be careful.
 >
-> Sadly, wrmsr to turn off async pf will inject wakeups even if IF == 0.
+> As long as the apf_reason of the last async #PF is not cleared by the
+> guest no new async #PF can be injected. That's already correct because
+> in that case IF==0 which prevents a nested async #PF.
+>
+> If MCE, NMI trigger a real pagefault then the #PF injection needs to
+> clear apf_reason and set the correct CR2. When that #PF returns then the
+> old CR2 and apf_reason need to be restored.
 
-WHAT? That's fundamentally broken. Can you point me to the code in
-question?
-
-Thanks,
-
-        tglx
-
-
+How is the host supposed to know when the #PF returns?  Intercepting
+IRET sounds like a bad idea and, in any case, is not actually a
+reliable indication that #PF returned.
