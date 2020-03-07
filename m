@@ -2,34 +2,33 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 347D317CFBB
-	for <lists+kvm@lfdr.de>; Sat,  7 Mar 2020 20:01:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0643017CFD2
+	for <lists+kvm@lfdr.de>; Sat,  7 Mar 2020 20:18:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726296AbgCGTBK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 7 Mar 2020 14:01:10 -0500
-Received: from Galois.linutronix.de ([193.142.43.55]:55794 "EHLO
+        id S1726283AbgCGTSf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 7 Mar 2020 14:18:35 -0500
+Received: from Galois.linutronix.de ([193.142.43.55]:55808 "EHLO
         Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726114AbgCGTBJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 7 Mar 2020 14:01:09 -0500
+        with ESMTP id S1726139AbgCGTSf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 7 Mar 2020 14:18:35 -0500
 Received: from p5de0bf0b.dip0.t-ipconnect.de ([93.224.191.11] helo=nanos.tec.linutronix.de)
         by Galois.linutronix.de with esmtpsa (TLS1.2:DHE_RSA_AES_256_CBC_SHA256:256)
         (Exim 4.80)
         (envelope-from <tglx@linutronix.de>)
-        id 1jAeh7-0007da-F2; Sat, 07 Mar 2020 20:01:05 +0100
+        id 1jAexz-0007je-8N; Sat, 07 Mar 2020 20:18:31 +0100
 Received: by nanos.tec.linutronix.de (Postfix, from userid 1000)
-        id 81EDA104088; Sat,  7 Mar 2020 20:01:04 +0100 (CET)
+        id A78DF104088; Sat,  7 Mar 2020 20:18:30 +0100 (CET)
 From:   Thomas Gleixner <tglx@linutronix.de>
-To:     Andy Lutomirski <luto@kernel.org>
-Cc:     Andy Lutomirski <luto@kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>, X86 ML <x86@kernel.org>,
-        kvm list <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        stable <stable@vger.kernel.org>
-Subject: Re: [PATCH v2] x86/kvm: Disable KVM_ASYNC_PF_SEND_ALWAYS
-In-Reply-To: <CALCETrVsc-t=tDRPbCg5dWHDY0NFv2zjz12ahD-vnGPn8T+RXA@mail.gmail.com>
-References: <ed71d0967113a35f670a9625a058b8e6e0b2f104.1583547991.git.luto@kernel.org> <CALCETrVmsF9JSMLSd44-3GGWEz6siJQxudeaYiVnvv__YDT1BQ@mail.gmail.com> <87ftek9ngq.fsf@nanos.tec.linutronix.de> <CALCETrVsc-t=tDRPbCg5dWHDY0NFv2zjz12ahD-vnGPn8T+RXA@mail.gmail.com>
-Date:   Sat, 07 Mar 2020 20:01:04 +0100
-Message-ID: <87a74s9ehb.fsf@nanos.tec.linutronix.de>
+To:     Andy Lutomirski <luto@kernel.org>,
+        Andy Lutomirski <luto@kernel.org>
+Cc:     LKML <linux-kernel@vger.kernel.org>, X86 ML <x86@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>, KVM <kvm@vger.kernel.org>,
+        "Paul E. McKenney" <paulmck@kernel.org>
+Subject: Re: [patch 2/2] x86/kvm: Sanitize kvm_async_pf_task_wait()
+In-Reply-To: <CALCETrX4p+++nS6N_yW2CnvMGUxngQBua65x9A9T-PB740LY0A@mail.gmail.com>
+References: <20200306234204.847674001@linutronix.de> <20200307000259.448059232@linutronix.de> <CALCETrV74siTTHHWRPv+Gz=YS3SAUA6eqB6FX1XaHKvZDCbaNg@mail.gmail.com> <87r1y4a3gw.fsf@nanos.tec.linutronix.de> <CALCETrWc0wM1x-mAcKCPRUiGtzONtXiNVMFgWZwkRD3v3K3jsA@mail.gmail.com> <CALCETrX4p+++nS6N_yW2CnvMGUxngQBua65x9A9T-PB740LY0A@mail.gmail.com>
+Date:   Sat, 07 Mar 2020 20:18:30 +0100
+Message-ID: <875zfg9do9.fsf@nanos.tec.linutronix.de>
 MIME-Version: 1.0
 Content-Type: text/plain
 X-Linutronix-Spam-Score: -1.0
@@ -41,31 +40,66 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 Andy Lutomirski <luto@kernel.org> writes:
-> On Sat, Mar 7, 2020 at 7:47 AM Thomas Gleixner <tglx@linutronix.de> wrote:
->> The host knows exactly when it injects a async PF and it can store CR2
->> and reason of that async PF in flight.
->>
->> On the next VMEXIT it checks whether apf_reason is 0. If apf_reason is 0
->> then it knows that the guest has read CR2 and apf_reason. All good
->> nothing to worry about.
->>
->> If not it needs to be careful.
->>
->> As long as the apf_reason of the last async #PF is not cleared by the
->> guest no new async #PF can be injected. That's already correct because
->> in that case IF==0 which prevents a nested async #PF.
->>
->> If MCE, NMI trigger a real pagefault then the #PF injection needs to
->> clear apf_reason and set the correct CR2. When that #PF returns then the
->> old CR2 and apf_reason need to be restored.
+> On Sat, Mar 7, 2020 at 7:10 AM Andy Lutomirski <luto@kernel.org> wrote:
+>> On Sat, Mar 7, 2020 at 2:01 AM Thomas Gleixner <tglx@linutronix.de> wrote:
+>> >
+>> > Andy Lutomirski <luto@kernel.org> writes:
 >
-> How is the host supposed to know when the #PF returns?  Intercepting
-> IRET sounds like a bad idea and, in any case, is not actually a
-> reliable indication that #PF returned.
+>> Now I'm confused again.  Your patch is very careful not to schedule if
+>> we're in an RCU read-side critical section, but the regular preemption
+>> code (preempt_schedule_irq, etc) seems to be willing to schedule
+>> inside an RCU read-side critical section.  Why is the latter okay but
+>> not the async pf case?
+>
+> I read more docs.  I guess the relevant situation is
+> CONFIG_PREEMPT_CPU, in which case it is legal to preempt an RCU
+> read-side critical section and obviously legal to put the whole CPU to
+> sleep, but it's illegal to explicitly block in an RCU read-side
+> critical section.  So I have a question for Paul: is it, in fact,
+> entirely illegal to block or merely illegal to block for an
+> excessively long time, e.g. waiting for user space or network traffic?
 
-The host does not care about the IRET. It solely has to check whether
-apf_reason is 0 or not. That way it knows that the guest has read CR2
-and apf_reason.
+Two issues here:
+
+    - excessive blocking time
+
+    - entering idle with an RCU read side critical section blocking
+
+>  In this situation, we cannot make progress until the host says we
+> can, so we are, in effect, blocking until the host tells us to stop
+> blocking.  Regardless, I agree that turning IRQs on is reasonable, and
+> allowing those IRQs to preempt us is reasonable.
+>
+> As it stands in your patch, the situation is rather odd: we'll run
+> another task if that task *preempts* us (e.g. we block long enough to
+> run out of our time slice), but we won't run another task if we aren't
+> preempted.  This seems bizarre.
+
+Yes, it looks odd. We could do:
+
+	preempt_disable();
+	while (!page_arrived()) {
+		if (preempt_count() == 1 && this_cpu_runnable_tasks() > 1) {
+        		set_need_resched();
+                	schedule_preempt_disabled();
+		} else {
+                	native_safe_halt();
+                        local_irq_disable();
+		}
+	}
+        preempt_enable();
+
+Don't know if it's worth the trouble. But that's not the problem :)
+
+> I think this issue still stands and is actually a fairly easy race to hit.
+>
+> STI
+> IRQ happens and we get preempted
+> another task runs and gets the #PF "async pf wakeup" event
+> reschedule, back to original task
+> HLT
+
+See the other mail about STI :)
 
 Thanks,
 
