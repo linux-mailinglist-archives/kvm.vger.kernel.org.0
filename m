@@ -2,201 +2,208 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id BF3D617CA7D
-	for <lists+kvm@lfdr.de>; Sat,  7 Mar 2020 02:35:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8E7B617CA81
+	for <lists+kvm@lfdr.de>; Sat,  7 Mar 2020 02:35:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726300AbgCGBfO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 6 Mar 2020 20:35:14 -0500
-Received: from aserp2120.oracle.com ([141.146.126.78]:58278 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726231AbgCGBfO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 6 Mar 2020 20:35:14 -0500
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0271YEK5174321;
-        Sat, 7 Mar 2020 01:34:14 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2020-01-29;
- bh=PbQUxrRcvnBhgB9zACPzqhbzr3oDdrTvmkqMm9T8DrI=;
- b=BFWHfNZMOYZoyDbucUc0ikaOBFRq+Plc5QWsIgyXSrTsVM/Siqw7AYWnuMrz9i5KeBt5
- +PUPpnMwHOQjVKbpN5PxurB1F/WwWSFlBlZV/Ht1YrSqqoV2WTqmILDZSsR8Hvvzc9O5
- WqZrBsA0UpUzPme9PNVOWUI8kie0we3Px1KndpjdR0dRsL2WD6YAcKKF+7iPYlifCYZ4
- gd1f1T/Z6vkOb82SbSw/EbpSKdhooQqv+Fy5G+w7E51UX+dC92vsvGXd/BA/Ppw25fVI
- ZtqMCiMKn8/C8O1Nf5gjLdZsmQu/k0V7G1hn84WAwTQeLUOhnDhqM2nhz/4bR5jVDd22 Iw== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by aserp2120.oracle.com with ESMTP id 2yffwre7v9-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Sat, 07 Mar 2020 01:34:14 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0271Y1HV096404;
-        Sat, 7 Mar 2020 01:34:14 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by aserp3030.oracle.com with ESMTP id 2ym1ndgk5x-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Sat, 07 Mar 2020 01:34:13 +0000
-Received: from abhmp0004.oracle.com (abhmp0004.oracle.com [141.146.116.10])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 0271YC1c022890;
-        Sat, 7 Mar 2020 01:34:12 GMT
-Received: from localhost.localdomain (/10.159.228.115)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Fri, 06 Mar 2020 17:34:11 -0800
-Subject: Re: [PATCH v3 2/2] KVM: VMX: untangle VMXON revision_id setting when
- using eVMCS
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20200306130215.150686-1-vkuznets@redhat.com>
- <20200306130215.150686-3-vkuznets@redhat.com>
- <908345f1-9bfd-004f-3ba6-0d6dce67d11e@oracle.com>
- <20200306230747.GA27868@linux.intel.com>
- <ceb19682-4374-313a-cf05-8af6cd8d6c3b@oracle.com>
- <20200307002852.GA28225@linux.intel.com>
-From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Message-ID: <6ce77a63-0505-36f8-3a92-f0f6b275fed1@oracle.com>
-Date:   Fri, 6 Mar 2020 17:34:10 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
-MIME-Version: 1.0
-In-Reply-To: <20200307002852.GA28225@linux.intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+        id S1726682AbgCGBf2 convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Fri, 6 Mar 2020 20:35:28 -0500
+Received: from mga04.intel.com ([192.55.52.120]:54277 "EHLO mga04.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726231AbgCGBf1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 6 Mar 2020 20:35:27 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 06 Mar 2020 17:35:27 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,524,1574150400"; 
+   d="scan'208";a="235015794"
+Received: from fmsmsx107.amr.corp.intel.com ([10.18.124.205])
+  by fmsmga008.fm.intel.com with ESMTP; 06 Mar 2020 17:35:27 -0800
+Received: from fmsmsx123.amr.corp.intel.com (10.18.125.38) by
+ fmsmsx107.amr.corp.intel.com (10.18.124.205) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Fri, 6 Mar 2020 17:35:27 -0800
+Received: from shsmsx101.ccr.corp.intel.com (10.239.4.153) by
+ fmsmsx123.amr.corp.intel.com (10.18.125.38) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Fri, 6 Mar 2020 17:35:26 -0800
+Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.206]) by
+ SHSMSX101.ccr.corp.intel.com ([169.254.1.43]) with mapi id 14.03.0439.000;
+ Sat, 7 Mar 2020 09:35:23 +0800
+From:   "Tian, Kevin" <kevin.tian@intel.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "dev@dpdk.org" <dev@dpdk.org>,
+        "mtosatti@redhat.com" <mtosatti@redhat.com>,
+        "thomas@monjalon.net" <thomas@monjalon.net>,
+        "bluca@debian.org" <bluca@debian.org>,
+        "jerinjacobk@gmail.com" <jerinjacobk@gmail.com>,
+        "Richardson, Bruce" <bruce.richardson@intel.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>
+Subject: RE: [PATCH v2 5/7] vfio/pci: Add sriov_configure support
+Thread-Topic: [PATCH v2 5/7] vfio/pci: Add sriov_configure support
+Thread-Index: AQHV51YaoTnickP570etlLGInd5eAKgrQJIwgA6gtQCAAWITYIAAce8AgAC1CGA=
+Date:   Sat, 7 Mar 2020 01:35:23 +0000
+Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D19D7C208E@SHSMSX104.ccr.corp.intel.com>
+References: <158213716959.17090.8399427017403507114.stgit@gimli.home>
+        <158213846731.17090.37693075723046377.stgit@gimli.home>
+        <AADFC41AFE54684AB9EE6CBC0274A5D19D79A943@SHSMSX104.ccr.corp.intel.com>
+        <20200305112230.0dd77712@w520.home>
+        <AADFC41AFE54684AB9EE6CBC0274A5D19D7C07A0@SHSMSX104.ccr.corp.intel.com>
+ <20200306151734.741d1d58@x1.home>
+In-Reply-To: <20200306151734.741d1d58@x1.home>
+Accept-Language: en-US
 Content-Language: en-US
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9552 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 phishscore=0
- suspectscore=2 bulkscore=0 adultscore=0 mlxscore=0 spamscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2001150001 definitions=main-2003070008
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9552 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 lowpriorityscore=0 spamscore=0
- impostorscore=0 malwarescore=0 mlxlogscore=999 mlxscore=0 suspectscore=2
- phishscore=0 clxscore=1015 bulkscore=0 adultscore=0 priorityscore=1501
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
- definitions=main-2003070008
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ctpclassification: CTP_NT
+x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiMDNkNTZkOGYtZjBiNS00YzUyLTk2MmQtYjc5YmQ5M2NmMTMwIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoidnhvM2hDeFcrcGQ1bG5Pb3VQOEJXbjJHaEdqWU81QThYaUFndWp1dkZZZ3F3TDFJenpOMXFGOVZuK3RsYUMzVSJ9
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
+MIME-Version: 1.0
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+> From: Alex Williamson
+> Sent: Saturday, March 7, 2020 6:18 AM
+> 
+> On Fri, 6 Mar 2020 07:57:19 +0000
+> "Tian, Kevin" <kevin.tian@intel.com> wrote:
+> 
+> > > From: Alex Williamson <alex.williamson@redhat.com>
+> > > Sent: Friday, March 6, 2020 2:23 AM
+> > >
+> > > On Tue, 25 Feb 2020 03:08:00 +0000
+> > > "Tian, Kevin" <kevin.tian@intel.com> wrote:
+> > >
+> > > > > From: Alex Williamson
+> > > > > Sent: Thursday, February 20, 2020 2:54 AM
+> > > > >
+> > > > > With the VF Token interface we can now expect that a vfio userspace
+> > > > > driver must be in collaboration with the PF driver, an unwitting
+> > > > > userspace driver will not be able to get past the GET_DEVICE_FD step
+> > > > > in accessing the device.  We can now move on to actually allowing
+> > > > > SR-IOV to be enabled by vfio-pci on the PF.  Support for this is not
+> > > > > enabled by default in this commit, but it does provide a module
+> option
+> > > > > for this to be enabled (enable_sriov=1).  Enabling VFs is rather
+> > > > > straightforward, except we don't want to risk that a VF might get
+> > > > > autoprobed and bound to other drivers, so a bus notifier is used to
+> > > > > "capture" VFs to vfio-pci using the driver_override support.  We
+> > > > > assume any later action to bind the device to other drivers is
+> > > > > condoned by the system admin and allow it with a log warning.
+> > > > >
+> > > > > vfio-pci will disable SR-IOV on a PF before releasing the device,
+> > > > > allowing a VF driver to be assured other drivers cannot take over the
+> > > > > PF and that any other userspace driver must know the shared VF
+> token.
+> > > > > This support also does not provide a mechanism for the PF userspace
+> > > > > driver itself to manipulate SR-IOV through the vfio API.  With this
+> > > > > patch SR-IOV can only be enabled via the host sysfs interface and the
+> > > > > PF driver user cannot create or remove VFs.
+> > > >
+> > > > I'm not sure how many devices can be properly configured simply
+> > > > with pci_enable_sriov. It is not unusual to require PF driver prepare
+> > > > something before turning PCI SR-IOV capability. If you look kernel
+> > > > PF drivers, there are only two using generic pci_sriov_configure_
+> > > > simple (simple wrapper like pci_enable_sriov), while most others
+> > > > implementing their own callback. However vfio itself has no idea
+> > > > thus I'm not sure how an user knows whether using this option can
+> > > > actually meet his purpose. I may miss something here, possibly
+> > > > using DPDK as an example will make it clearer.
+> > >
+> > > There is still the entire vfio userspace driver interface.  Imagine for
+> > > example that QEMU emulates the SR-IOV capability and makes a call out
+> > > to libvirt (or maybe runs with privs for the PF SR-IOV sysfs attribs)
+> > > when the guest enables SR-IOV.  Can't we assume that any PF specific
+> > > support can still be performed in the userspace/guest driver, leaving
+> > > us with a very simple and generic sriov_configure callback in vfio-pci?
+> >
+> > Makes sense. One concern, though, is how an user could be warned
+> > if he inadvertently uses sysfs to enable SR-IOV on a vfio device whose
+> > userspace driver is incapable of handling it. Note any VFIO device,
+> > if SR-IOV capable, will allow user to do so once the module option is
+> > turned on and the callback is registered. I felt such uncertainty can be
+> > contained by toggling SR-IOV through a vfio api, but from your description
+> > obviously it is what you want to avoid. Is it due to the sequence reason,
+> > e.g. that SR-IOV must be enabled before userspace PF driver sets the
+> > token?
+> 
+> As in my other reply, enabling SR-IOV via a vfio API suggests that
+> we're not only granting the user owning the PF device access to the
+> device itself, but also the ability to create and remove subordinate
+> devices on the host.  That implies an extended degree of trust in the
+> user beyond the PF device itself and raises questions about whether a
+> user who is allowed to create VF devices should automatically be
+> granted access to those VF devices, what the mechanism would be for
+> that, and how we might re-assign those devices to other users,
+> potentially including host kernel usage.  What I'm proposing here
+> doesn't preclude some future extension in that direction, but instead
+> tries to simplify a first step towards enabling SR-IOV by leaving the
+> SR-IOV enablement and VF assignment in the realm of a privileged system
+> entity.
 
-On 3/6/20 4:28 PM, Sean Christopherson wrote:
-> On Fri, Mar 06, 2020 at 03:57:25PM -0800, Krish Sadhukhan wrote:
->> On 3/6/20 3:07 PM, Sean Christopherson wrote:
->>> On Fri, Mar 06, 2020 at 02:20:13PM -0800, Krish Sadhukhan wrote:
->>>>> @@ -2599,7 +2607,7 @@ void free_loaded_vmcs(struct loaded_vmcs *loaded_vmcs)
->>>>>   int alloc_loaded_vmcs(struct loaded_vmcs *loaded_vmcs)
->>>>>   {
->>>>> -	loaded_vmcs->vmcs = alloc_vmcs(false);
->>>>> +	loaded_vmcs->vmcs = alloc_vmcs(VMCS_REGION);
->>>>>   	if (!loaded_vmcs->vmcs)
->>>>>   		return -ENOMEM;
->>>>> @@ -2652,25 +2660,13 @@ static __init int alloc_vmxon_regions(void)
->>>>>   	for_each_possible_cpu(cpu) {
->>>>>   		struct vmcs *vmcs;
->>>>> -		vmcs = alloc_vmcs_cpu(false, cpu, GFP_KERNEL);
->>>>> +		/* The VMXON region is really just a special type of VMCS. */
->>>> Not sure if this is the right way to correlate the two.
->>>>
->>>> AFAIU, the SDM calls VMXON region as a memory area that holds the VMCS data
->>>> structure and it calls VMCS the data structure that is used by software to
->>>> switch between VMX root-mode and not-root-mode. So VMXON is a memory area
->>>> whereas VMCS is the structure of the data that resides in that memory area.
->>>>
->>>> So if we follow this interpretation, your enum should rather look like,
->>>>
->>>> enum vmcs_type {
->>>> +    VMCS,
->>>> +    EVMCS,
->>>> +    SHADOW_VMCS
->>> No (to the EVMCS suggestion), because this allocation needs to happen for
->>> !eVMCS.  The SDM never explictly calls the VMXON region a VMCS, but it's
->>> just being coy.  E.g. VMCLEAR doesn't fail if you point it at random
->>> memory, but point it at the VMXON region and it yells.
->>>
->>> We could call it VMXON_VMCS if that helps.
->> Are you saying,
->>
->> + enum vmcs_type {
->> +     VMXON_REGION,
->> +     VMXON_VMCS,
->> +     SHADOW_VMCS_REGION,
->> +};
->>
->> ?
->>
->> In that case, "VMXON_REGION" and "VMXON_VMCS" are no different according to
->> your explanation.
->    enum vmcs_type {
-> 	VMXON_VMCS,
-> 	VMCS,
-> 	SHADOW_VMCS,
->    };
+the intention is clear to me now.
 
+> 
+> So, what I think you're suggesting here is that we should restrict
+> vfio_pci_sriov_configure() to reject enabling SR-IOV until a user
+> driver has configured a VF token.  That requires both that the
+> userspace driver has initialized to this point before SR-IOV can be
+> enabled and that we would be forced to define a termination point for
+> the user set VF token.  Logically, this would need to be when the
+> userspace driver exits or closes the PF device, which implies that we
+> need to disable SR-IOV on the PF at this point, or we're left in an
+> inconsistent state where VFs are enabled but cannot be disabled because
+> we don't have a valid VF token.  Now we're back to nearly a state where
+> the user has control of not creating devices on the host, but removing
+> them by closing the device, which will necessarily require that any VF
+> driver release the device, whether userspace or kernel.
+> 
+> I'm not sure what we're gaining by doing this though.  I agree that
+> there will be users that enable SR-IOV on a PF and then try to, for
+> example, assign the PF and all the VFs to a VM.  The VFs will fail due
+> to lacking VF token support, unless they've patch QEMU with my test
+> code, but depending on the PF driver in the guest, it may, or more
+> likely won't work.  But don't you think the VFs and probably PF not
+> working is a sufficient clue that the configuration is invalid?  OTOH,
+> from what I've heard of the device in the ID table of the pci-pf-stub
+> driver, they might very well be able to work with both PF and VFs in
+> QEMU using only my test code to set the VF token.
+> 
+> Therefore, I'm afraid what you're asking for here is to impose a usage
+> restriction as a sanity test, when we don't really know what might be
+> sane for this particular piece of hardware or use case.  There are
+> infinite ways that a vfio based userspace driver can fail to configure
+> their hardware and make it work correctly, many of them are device
+> specific.  Isn't this just one of those cases?  Thanks,
+> 
 
-It looks reasonable.
+what you said all makes sense. so I withdraw the idea of manipulating
+SR-IOV through vfio ioctl. However I still feel that simply registering 
+sriov_configuration callback by vfio-pci somehow violates the typical
+expectation of the sysfs interface. Before this patch, the success return
+of writing non-zero value to numvfs implies VFs are in sane state and
+functionally ready for immediate use. However now the behavior of
+success return becomes undefined for vfio devices, since even vfio-pci 
+itself doesn't know whether VFs are functional for a random device 
+(may know some if carrying the same device IDs from pci-pf-stub). It
+simply relies on the privileged entity who knows exactly the implication
+of such write, while there is no way to warn inadvertent users which
+to me is not a good design from kernel API p.o.v. Of course we may 
+document such restriction and the driver_override may also be an 
+indirect way to warn such user if he wants to use VFs for other purpose.
+But it is still less elegant than reporting it in the first place. Maybe
+what we really require is a new sysfs attribute purely for enabling
+PCI SR-IOV capability, which doesn't imply making VFs actually 
+functional as did through the existing numvfs?
 
-
->
-> alloc_vmcs_cpu() does more than just allocate the memory, it also
-> initializes the data structure, e.g. "allocate and initalize a VMXON VMCS",
->
->>>   The SDM does call the memory
->>> allocation for regular VMCSes a "VMCS region":
->>>
->>>    A logical processor associates a region in memory with each VMCS. This
->>>    region is called the VMCS region.
->>>
->>> I don't think I've ever heard anyone differentiate that two though, i.e.
->>> VMCS is used colloquially to mean both the data structure itself and the
->>> memory region containing the data structure.
->>>
->>>>> +		vmcs = alloc_vmcs_cpu(VMXON_REGION, cpu, GFP_KERNEL);
->>>>>   		if (!vmcs) {
->>>>>   			free_vmxon_regions();
->>>>>   			return -ENOMEM;
->>>>>   		}
->>>>> -		/*
->>>>> -		 * When eVMCS is enabled, alloc_vmcs_cpu() sets
->>>>> -		 * vmcs->revision_id to KVM_EVMCS_VERSION instead of
->>>>> -		 * revision_id reported by MSR_IA32_VMX_BASIC.
->>>>> -		 *
->>>>> -		 * However, even though not explicitly documented by
->>>>> -		 * TLFS, VMXArea passed as VMXON argument should
->>>>> -		 * still be marked with revision_id reported by
->>>>> -		 * physical CPU.
->>>>> -		 */
->>>>> -		if (static_branch_unlikely(&enable_evmcs))
->>>>> -			vmcs->hdr.revision_id = vmcs_config.revision_id;
->>>>> -
->>>>>   		per_cpu(vmxarea, cpu) = vmcs;
->>>>>   	}
->>>>>   	return 0;
->>>>> diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
->>>>> index e64da06c7009..a5eb92638ac2 100644
->>>>> --- a/arch/x86/kvm/vmx/vmx.h
->>>>> +++ b/arch/x86/kvm/vmx/vmx.h
->>>>> @@ -489,16 +489,22 @@ static inline struct pi_desc *vcpu_to_pi_desc(struct kvm_vcpu *vcpu)
->>>>>   	return &(to_vmx(vcpu)->pi_desc);
->>>>>   }
->>>>> -struct vmcs *alloc_vmcs_cpu(bool shadow, int cpu, gfp_t flags);
->>>>> +enum vmcs_type {
->>>>> +	VMXON_REGION,
->>>>> +	VMCS_REGION,
->>>>> +	SHADOW_VMCS_REGION,
->>>>> +};
->>>>> +
->>>>> +struct vmcs *alloc_vmcs_cpu(enum vmcs_type type, int cpu, gfp_t flags);
->>>>>   void free_vmcs(struct vmcs *vmcs);
->>>>>   int alloc_loaded_vmcs(struct loaded_vmcs *loaded_vmcs);
->>>>>   void free_loaded_vmcs(struct loaded_vmcs *loaded_vmcs);
->>>>>   void loaded_vmcs_init(struct loaded_vmcs *loaded_vmcs);
->>>>>   void loaded_vmcs_clear(struct loaded_vmcs *loaded_vmcs);
->>>>> -static inline struct vmcs *alloc_vmcs(bool shadow)
->>>>> +static inline struct vmcs *alloc_vmcs(enum vmcs_type type)
->>>>>   {
->>>>> -	return alloc_vmcs_cpu(shadow, raw_smp_processor_id(),
->>>>> +	return alloc_vmcs_cpu(type, raw_smp_processor_id(),
->>>>>   			      GFP_KERNEL_ACCOUNT);
->>>>>   }
+Thanks
+Kevin
