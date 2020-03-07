@@ -2,141 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C5D5917CF40
-	for <lists+kvm@lfdr.de>; Sat,  7 Mar 2020 17:07:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 347D317CFBB
+	for <lists+kvm@lfdr.de>; Sat,  7 Mar 2020 20:01:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726318AbgCGQHH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 7 Mar 2020 11:07:07 -0500
-Received: from mail.kernel.org ([198.145.29.99]:39582 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726109AbgCGQHH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 7 Mar 2020 11:07:07 -0500
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 81B362077C
-        for <kvm@vger.kernel.org>; Sat,  7 Mar 2020 16:07:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1583597225;
-        bh=yyqK+Ql2p4NXPr4RjWF269NGUHTHvvPj0zJ+ILRkEOg=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=NL2x4LxRYKBgtzACYWlJ2pMI2FhHtawWlR1dNr+OEMGq4wtXfu+jDuErJZ621Eo9V
-         pyNKtA+g6i2pQVjrJqM9HU/+OwGee39y9b3TUnEwraXGxgVPqCl+sqLsOWw67e1GHv
-         3GSoav2poMwmYQz7PAv09M81nqNVqekxvY/ZkefY=
-Received: by mail-wm1-f46.google.com with SMTP id p9so5618627wmc.2
-        for <kvm@vger.kernel.org>; Sat, 07 Mar 2020 08:07:05 -0800 (PST)
-X-Gm-Message-State: ANhLgQ0x/rKOaIOEeBCl22ZltwE4DyxtiWzdXWrwqwZiOkA+D1qtOK5I
-        Y9Og3H4/GhPVwbca9xIwb6RZdxhbZ1K0Czv4VYHLSQ==
-X-Google-Smtp-Source: ADFU+vudN2xwPRYRNB2o4MM2vanAeeTTHZ6j/KCg28MIjew9C/SRRYIi+AzD8kBMAgCC+UznEhbzhnyozZYz03npvFQ=
-X-Received: by 2002:a7b:ce09:: with SMTP id m9mr10869694wmc.49.1583597223816;
- Sat, 07 Mar 2020 08:07:03 -0800 (PST)
-MIME-Version: 1.0
-References: <20200306234204.847674001@linutronix.de> <20200307000259.448059232@linutronix.de>
- <CALCETrV74siTTHHWRPv+Gz=YS3SAUA6eqB6FX1XaHKvZDCbaNg@mail.gmail.com>
- <87r1y4a3gw.fsf@nanos.tec.linutronix.de> <CALCETrWc0wM1x-mAcKCPRUiGtzONtXiNVMFgWZwkRD3v3K3jsA@mail.gmail.com>
- <87d09o9n7y.fsf@nanos.tec.linutronix.de>
-In-Reply-To: <87d09o9n7y.fsf@nanos.tec.linutronix.de>
-From:   Andy Lutomirski <luto@kernel.org>
-Date:   Sat, 7 Mar 2020 08:06:52 -0800
-X-Gmail-Original-Message-ID: <CALCETrXpW5TYRNu2hMXt=fGC8EOh7WVqffCzS5GrwApC1inTzw@mail.gmail.com>
-Message-ID: <CALCETrXpW5TYRNu2hMXt=fGC8EOh7WVqffCzS5GrwApC1inTzw@mail.gmail.com>
-Subject: Re: [patch 2/2] x86/kvm: Sanitize kvm_async_pf_task_wait()
-To:     Thomas Gleixner <tglx@linutronix.de>
+        id S1726296AbgCGTBK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 7 Mar 2020 14:01:10 -0500
+Received: from Galois.linutronix.de ([193.142.43.55]:55794 "EHLO
+        Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726114AbgCGTBJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 7 Mar 2020 14:01:09 -0500
+Received: from p5de0bf0b.dip0.t-ipconnect.de ([93.224.191.11] helo=nanos.tec.linutronix.de)
+        by Galois.linutronix.de with esmtpsa (TLS1.2:DHE_RSA_AES_256_CBC_SHA256:256)
+        (Exim 4.80)
+        (envelope-from <tglx@linutronix.de>)
+        id 1jAeh7-0007da-F2; Sat, 07 Mar 2020 20:01:05 +0100
+Received: by nanos.tec.linutronix.de (Postfix, from userid 1000)
+        id 81EDA104088; Sat,  7 Mar 2020 20:01:04 +0100 (CET)
+From:   Thomas Gleixner <tglx@linutronix.de>
+To:     Andy Lutomirski <luto@kernel.org>
 Cc:     Andy Lutomirski <luto@kernel.org>,
         LKML <linux-kernel@vger.kernel.org>, X86 ML <x86@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>, KVM <kvm@vger.kernel.org>,
-        "Paul E. McKenney" <paulmck@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+        kvm list <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        stable <stable@vger.kernel.org>
+Subject: Re: [PATCH v2] x86/kvm: Disable KVM_ASYNC_PF_SEND_ALWAYS
+In-Reply-To: <CALCETrVsc-t=tDRPbCg5dWHDY0NFv2zjz12ahD-vnGPn8T+RXA@mail.gmail.com>
+References: <ed71d0967113a35f670a9625a058b8e6e0b2f104.1583547991.git.luto@kernel.org> <CALCETrVmsF9JSMLSd44-3GGWEz6siJQxudeaYiVnvv__YDT1BQ@mail.gmail.com> <87ftek9ngq.fsf@nanos.tec.linutronix.de> <CALCETrVsc-t=tDRPbCg5dWHDY0NFv2zjz12ahD-vnGPn8T+RXA@mail.gmail.com>
+Date:   Sat, 07 Mar 2020 20:01:04 +0100
+Message-ID: <87a74s9ehb.fsf@nanos.tec.linutronix.de>
+MIME-Version: 1.0
+Content-Type: text/plain
+X-Linutronix-Spam-Score: -1.0
+X-Linutronix-Spam-Level: -
+X-Linutronix-Spam-Status: No , -1.0 points, 5.0 required,  ALL_TRUSTED=-1,SHORTCIRCUIT=-0.0001
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Mar 7, 2020 at 7:52 AM Thomas Gleixner <tglx@linutronix.de> wrote:
+Andy Lutomirski <luto@kernel.org> writes:
+> On Sat, Mar 7, 2020 at 7:47 AM Thomas Gleixner <tglx@linutronix.de> wrote:
+>> The host knows exactly when it injects a async PF and it can store CR2
+>> and reason of that async PF in flight.
+>>
+>> On the next VMEXIT it checks whether apf_reason is 0. If apf_reason is 0
+>> then it knows that the guest has read CR2 and apf_reason. All good
+>> nothing to worry about.
+>>
+>> If not it needs to be careful.
+>>
+>> As long as the apf_reason of the last async #PF is not cleared by the
+>> guest no new async #PF can be injected. That's already correct because
+>> in that case IF==0 which prevents a nested async #PF.
+>>
+>> If MCE, NMI trigger a real pagefault then the #PF injection needs to
+>> clear apf_reason and set the correct CR2. When that #PF returns then the
+>> old CR2 and apf_reason need to be restored.
 >
-> Andy Lutomirski <luto@kernel.org> writes:
-> > On Sat, Mar 7, 2020 at 2:01 AM Thomas Gleixner <tglx@linutronix.de> wro=
-te:
-> >> > What=E2=80=99s the local_irq_disable() here for? I would believe a
-> >> > lockdep_assert_irqs_disabled() somewhere in here would make sense.
-> >> > (Yes, I see you copied this from the old code. It=E2=80=99s still no=
-nsense.)
-> >>
-> >> native_safe_halt() does:
-> >>
-> >>          STI
-> >>          HLT
-> >>
-> >> So the irq disable is required as the loop should exit with interrupts
-> >> disabled.
-> >
-> > Oops, should have looked at what native_safe_halt() does.
-> >
-> >>
-> >> > I also find it truly bizarre that hlt actually works in this context=
-.
-> >> > Does KVM in fact wake a HLTed guest that HLTed with IRQs off when a
-> >> > pending async pf is satisfied?  This would make sense if the wake
-> >> > event were an interrupt, but it=E2=80=99s not according to Paolo.
-> >>
-> >> See above. safe halt enables interrupts, which means IF =3D=3D 1 and t=
-he
-> >> host sanity check for IF =3D=3D 1 is satisfied.
-> >>
-> >> In fact, if e.g. some regular interrupt arrives before the page become=
-s
-> >> available and the guest entered the halt loop because the fault happen=
-ed
-> >> inside a RCU read side critical section with preemption enabled, then
-> >> the interrupt might wake up another task, set need resched and this
-> >> other task can run.
-> >
-> > Now I'm confused again.  Your patch is very careful not to schedule if
-> > we're in an RCU read-side critical section, but the regular preemption
-> > code (preempt_schedule_irq, etc) seems to be willing to schedule
-> > inside an RCU read-side critical section.  Why is the latter okay but
-> > not the async pf case?
->
-> Preemption is fine, but voluntary schedule not. voluntary schedule might
-> end up in idle if this is the last runnable task.
+> How is the host supposed to know when the #PF returns?  Intercepting
+> IRET sounds like a bad idea and, in any case, is not actually a
+> reliable indication that #PF returned.
 
-I guess something horrible happens if we try to go idle while in an
-RCU read-side critical section.  Like perhaps it's considered a grace
-period.  Hmm.
+The host does not care about the IRET. It solely has to check whether
+apf_reason is 0 or not. That way it knows that the guest has read CR2
+and apf_reason.
 
->
-> > Ignoring that, this still seems racy:
-> >
-> > STI
-> > nested #PF telling us to wake up
-> > #PF returns
-> > HLT
->
-> You will say Ooops, should have looked .... when I tell you that the
-> above cannot happen. From the SDM:
->
->   If IF =3D 0, maskable hardware interrupts remain inhibited on the
->   instruction boundary following an execution of STI.
->
-> Otherwise safe_halt would not work at all :)
+Thanks,
 
-Ooops, should have looked. :)
-
-> > Sadly, wrmsr to turn off async pf will inject wakeups even if IF =3D=3D=
- 0.
->
-> WHAT? That's fundamentally broken. Can you point me to the code in
-> question?
-
-I think Paolo said so in a different thread, but I can't Let me see if
-I can find it:
-
-kvm_pv_enable_async_pf()
-  kvm_clear_async_pf_completion_queue()
-
-but that doesn't actually seem to send #PF.  So maybe I'm wrong.
-
-I will admit that, even after reading the host code a few times, I'm
-also not convinced that wakeups don't get swallowed on occasion if
-they would have been delivered at times when it's illegal.
+        tglx
