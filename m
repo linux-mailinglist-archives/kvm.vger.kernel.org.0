@@ -2,151 +2,189 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 55F0F17CD57
-	for <lists+kvm@lfdr.de>; Sat,  7 Mar 2020 10:49:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F41C017CD65
+	for <lists+kvm@lfdr.de>; Sat,  7 Mar 2020 11:01:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726293AbgCGJs7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 7 Mar 2020 04:48:59 -0500
-Received: from mout.web.de ([212.227.15.3]:45965 "EHLO mout.web.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726065AbgCGJs6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 7 Mar 2020 04:48:58 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
-        s=dbaedf251592; t=1583574507;
-        bh=NfYTLzzJkZUdCjUySaSerm1xfcOdkle+o2cN/pwHHvI=;
-        h=X-UI-Sender-Class:Subject:To:Cc:References:From:Date:In-Reply-To;
-        b=FoT6pFGPuFPu/Ab0sk/+Q8WlnXmAVnZh0PBMbIQLtTLz2gFPmlpRdewGU69GMZZeG
-         1RDW2n/JAek1ORfQToPEDI4624K7T4kBdXPoSw502OG4r5ALU8sQNcDROGand65+wb
-         qYDMT66X0hnDX8QSOUrZd4FdGIy5KM65iOE9oU/k=
-X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
-Received: from [192.168.1.10] ([95.157.55.156]) by smtp.web.de (mrweb003
- [213.165.67.108]) with ESMTPSA (Nemesis) id 0MCqmp-1j0rHc0RZz-009jrJ; Sat, 07
- Mar 2020 10:48:27 +0100
-Subject: Re: [PATCH 6/6] KVM: x86: Add requested index to the CPUID tracepoint
-To:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>
-References: <20200302195736.24777-1-sean.j.christopherson@intel.com>
- <20200302195736.24777-7-sean.j.christopherson@intel.com>
-From:   Jan Kiszka <jan.kiszka@web.de>
-Message-ID: <00827dc7-3338-ce1a-923a-784284cb26db@web.de>
-Date:   Sat, 7 Mar 2020 10:48:25 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+        id S1726139AbgCGKBb convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Sat, 7 Mar 2020 05:01:31 -0500
+Received: from Galois.linutronix.de ([193.142.43.55]:55339 "EHLO
+        Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725878AbgCGKBa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 7 Mar 2020 05:01:30 -0500
+Received: from p5de0bf0b.dip0.t-ipconnect.de ([93.224.191.11] helo=nanos.tec.linutronix.de)
+        by Galois.linutronix.de with esmtpsa (TLS1.2:DHE_RSA_AES_256_CBC_SHA256:256)
+        (Exim 4.80)
+        (envelope-from <tglx@linutronix.de>)
+        id 1jAWGr-0004yV-HQ; Sat, 07 Mar 2020 11:01:25 +0100
+Received: by nanos.tec.linutronix.de (Postfix, from userid 1000)
+        id 2BA96104088; Sat,  7 Mar 2020 11:01:19 +0100 (CET)
+From:   Thomas Gleixner <tglx@linutronix.de>
+To:     Andy Lutomirski <luto@kernel.org>
+Cc:     LKML <linux-kernel@vger.kernel.org>, X86 ML <x86@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>, KVM <kvm@vger.kernel.org>,
+        "Paul E. McKenney" <paulmck@kernel.org>
+Subject: Re: [patch 2/2] x86/kvm: Sanitize kvm_async_pf_task_wait()
+In-Reply-To: <CALCETrV74siTTHHWRPv+Gz=YS3SAUA6eqB6FX1XaHKvZDCbaNg@mail.gmail.com>
+References: <20200306234204.847674001@linutronix.de> <20200307000259.448059232@linutronix.de> <CALCETrV74siTTHHWRPv+Gz=YS3SAUA6eqB6FX1XaHKvZDCbaNg@mail.gmail.com>
+Date:   Sat, 07 Mar 2020 11:01:19 +0100
+Message-ID: <87r1y4a3gw.fsf@nanos.tec.linutronix.de>
 MIME-Version: 1.0
-In-Reply-To: <20200302195736.24777-7-sean.j.christopherson@intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:l1aUPNuFvYp9CoUQMSZJV7f6WzEVM9scmarRJ+A48HNxbxkcGoW
- b33bxhIDH7cGv+BPRBUj0bkevbMX622nbNj79UZpUOZKAg6kb+YE7+/BoTChoh8pKlXfKWS
- noh+Y+JaL7fRHvLv9Vq4ToClCGX3IJbN1+AzuSqjg/54G1h9xM//qE4BOVBEYHhX/B5mI0q
- yCZ3yqzsTKx4YzGdTHwlg==
-X-Spam-Flag: NO
-X-UI-Out-Filterresults: notjunk:1;V03:K0:wxVnwk6qj7E=:vxZjq4j7XV57YYVd4YaPlQ
- WO1mR12AXAlyxAfonBYpuPnieU8mMSggPKPLCIC5u4WRMG+/K/i+ocK3J8vklu58888xuESNd
- FnMpt6kh8xELgdtRoQeABwat7u30oYc5YYExLBsQkTiUFFiIrXyzIMTfy20P+F36T1hB/bSW0
- S+wtanM5OXtxthsqV10Ae3L5uSvrvrdJXf+93RkLKYGCYz/ysykv9vci1LkNpfLhrT3eKd7T3
- n6g62rYDlSWOCN3woJBGV/mE0gfOR5icq+zGVu+Baxa2HYI2+OPWqcDEofoxBDkCSt7LkCi1w
- jkYlUuu4ddlf1SbhsCIdWYwWWevEawhVD1k+CEXTk1isfYLKMoDiuBuqP8xMjusrsvACZLUwR
- /xAENSrZRiwcDuBJ2bhyyKgI+sR2gN2ZudPlYtYi6dBxvZMvuxoyEfwsQZUeLiUeDkcTwTMez
- CZBaOR1Lc1NL+2HgLw6bcqGdYo7LMUWqhn1ia85VFIoL6iqQI8NUuS+c8ssbUufzqdNB5cHWO
- yBbCRUW62wOTWMcHfeLtfKKwFSrJxXrCkhL9WPp9m3smoG84ojtFNZohi03y1agiBEhXldzpZ
- eLonSxVlM8mAM9lRgMUkFt5ALABuKxO/+Ud4cHNS41ZN18ciFP9r9DN8Yyknl5ooDNmACK3aU
- L7p3xSB2eTxrnLIaT4RFNBlMCnJkg5WiPfNWWwnlRMNVs+r0qtfTWB3Hvwi97LNjXhjHYDAsh
- oW8K2CpuvxBy+ttWDM/T4qQjJ6XsfMRfo9ES2nfji6nDCq/sMppKai2xVgU79VN8DxUu+tgpz
- poqHdS9jd6syqPU3s2vWS9EDSTVm6obk3cDm8BZwhH3bfF3gewK1aggBHl+rLPyFzCFvP43X7
- XY07a1P+EUqSAZm7lWODPnd4lkqqBExuVKuZoFaGnED6/aK8JCkNwp3U1ESjzgVq9odiTVSIg
- ZvNZiCQ33zRvZtpcIMPiLEi99a6YKSM+N33M7M8ycGQUg5ihVeL5vW9Z2hsaRudA9gejjQRAf
- 7zCvvOqGar1pu+nEMd/2BAN2b1SbcFPXyeQywpPv5Nghu6doLeiRRRExS5J7KRFvtSTNgmrVM
- V+es3X4XMRFlN7TSQd/+ZpQu9tkX4MhHwxWFsj5WK0n3hvZe7Yx7nF1yLhH3lQydQyuY0MNUq
- WZymSnrNgdw/yNmbkdd3eohpX+aBAUTc4zrVw7f2VEDuO8dTzDZOirNN+R/PSHbryaVwgczYc
- diJVkPoBlDlzD9YCe
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8BIT
+X-Linutronix-Spam-Score: -1.0
+X-Linutronix-Spam-Level: -
+X-Linutronix-Spam-Status: No , -1.0 points, 5.0 required,  ALL_TRUSTED=-1,SHORTCIRCUIT=-0.0001
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 02.03.20 20:57, Sean Christopherson wrote:
-> Output the requested index when tracing CPUID emulation; it's basically
-> mandatory for leafs where the index is meaningful, and is helpful for
-> verifying KVM correctness even when the index isn't meaningful, e.g. the
-> trace for a Linux guest's hypervisor_cpuid_base() probing appears to
-> be broken (returns all zeroes) at first glance, but is correct because
-> the index is non-zero, i.e. the output values correspond to random index
-> in the maximum basic leaf.
+Andy Lutomirski <luto@kernel.org> writes:
+>> On Mar 6, 2020, at 4:12 PM, Thomas Gleixner <tglx@linutronix.de> wrote:
+>> Aside of that the actual code is a convoluted one fits it all swiss army
+>> knife. It is invoked from different places with different RCU constraints:
+>>
+>> 1) Host side:
+>>
+>>   vcpu_enter_guest()
+>>     kvm_x86_ops->handle_exit()
+>>       kvm_handle_page_fault()
+>>         kvm_async_pf_task_wait()
+>>
+>>   The invocation happens from fully preemptible context.
 >
-> Suggested-by: Xiaoyao Li <xiaoyao.li@intel.com>
-> Cc: Jan Kiszka <jan.kiszka@siemens.com>
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> ---
->   arch/x86/kvm/cpuid.c |  3 ++-
->   arch/x86/kvm/trace.h | 13 ++++++++-----
->   2 files changed, 10 insertions(+), 6 deletions(-)
->
-> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> index b0a4f3c17932..a3c9f6bf43f3 100644
-> --- a/arch/x86/kvm/cpuid.c
-> +++ b/arch/x86/kvm/cpuid.c
-> @@ -1047,7 +1047,8 @@ void kvm_cpuid(struct kvm_vcpu *vcpu, u32 *eax, u3=
-2 *ebx,
->   			}
->   		}
->   	}
-> -	trace_kvm_cpuid(function, *eax, *ebx, *ecx, *edx, exact_entry_exists);
-> +	trace_kvm_cpuid(function, index, *eax, *ebx, *ecx, *edx,
-> +			exact_entry_exists);
->   }
->   EXPORT_SYMBOL_GPL(kvm_cpuid);
->
-> diff --git a/arch/x86/kvm/trace.h b/arch/x86/kvm/trace.h
-> index f194dd058470..aa372d0119f0 100644
-> --- a/arch/x86/kvm/trace.h
-> +++ b/arch/x86/kvm/trace.h
-> @@ -151,12 +151,14 @@ TRACE_EVENT(kvm_fast_mmio,
->    * Tracepoint for cpuid.
->    */
->   TRACE_EVENT(kvm_cpuid,
-> -	TP_PROTO(unsigned int function, unsigned long rax, unsigned long rbx,
-> -		 unsigned long rcx, unsigned long rdx, bool found),
-> -	TP_ARGS(function, rax, rbx, rcx, rdx, found),
-> +	TP_PROTO(unsigned int function, unsigned int index, unsigned long rax,
-> +		 unsigned long rbx, unsigned long rcx, unsigned long rdx,
-> +		 bool found),
-> +	TP_ARGS(function, index, rax, rbx, rcx, rdx, found),
->
->   	TP_STRUCT__entry(
->   		__field(	unsigned int,	function	)
-> +		__field(	unsigned int,	index		)
->   		__field(	unsigned long,	rax		)
->   		__field(	unsigned long,	rbx		)
->   		__field(	unsigned long,	rcx		)
-> @@ -166,6 +168,7 @@ TRACE_EVENT(kvm_cpuid,
->
->   	TP_fast_assign(
->   		__entry->function	=3D function;
-> +		__entry->index		=3D index;
->   		__entry->rax		=3D rax;
->   		__entry->rbx		=3D rbx;
->   		__entry->rcx		=3D rcx;
-> @@ -173,8 +176,8 @@ TRACE_EVENT(kvm_cpuid,
->   		__entry->found		=3D found;
->   	),
->
-> -	TP_printk("func %x rax %lx rbx %lx rcx %lx rdx %lx, cpuid entry %s",
-> -		  __entry->function, __entry->rax,
-> +	TP_printk("func %x idx %x rax %lx rbx %lx rcx %lx rdx %lx, cpuid entry=
- %s",
-> +		  __entry->function, __entry->index, __entry->rax,
->   		  __entry->rbx, __entry->rcx, __entry->rdx,
->   		  __entry->found ? "found" : "not found")
->   );
->
+> I’m a bit baffled as to why the host uses this code at all instead of
+> just sleeping the old fashioned way when the guest takes a (host) page
+> fault.  Oh well.
 
-What happened to this patch in your v2 round?
+If I can trust the crystal ball which I used to decode this maze then it
+actually makes sense.
 
-Jan
+Aysnc faults are faults which cannot be handled by the guest, i.e. the
+host either pulled a page away under the guest or did not populate it in
+the first place.
+
+So the reasoning is that if this happens the guest might be in a
+situation where it can schedule other tasks instead of being stopped
+completely by the host until the page arrives.
+
+Now you could argue that this mostly makes sense for CPL 0 faults, but
+there is definitely code in the kernel where it makes sense as well,
+e.g. exec. But of course as this is designed without a proper handshake
+there is no way for the hypervisor to figure out whether it makes sense
+or not.
+
+If the async fault cannot be delivered to the guest (async PF disabled,
+async PF only enabled for CPL 0, IF == 0) then the host utilizes the
+same data structure and wait mechanism. That really makes sense.
+
+The part which does not make sense in the current implementation is the
+kvm_async_pf_task_wait() trainwreck. A clear upfront separation of
+schedulable and non schedulable wait mechanisms would have avoided all
+the RCU duct tape nonsense and also spared me the brain damage caused by
+reverse engineering this completely undocumented mess.
+
+>> +static void kvm_async_pf_task_wait_halt(u32 token)
+>> +{
+>> +    struct kvm_task_sleep_node n;
+>> +
+>> +    if (!kvm_async_pf_queue_task(token, true, &n))
+>> +        return;
+>>
+>>  for (;;) {
+>> -        if (!n.halted)
+>> -            prepare_to_swait_exclusive(&n.wq, &wait, TASK_UNINTERRUPTIBLE);
+>>      if (hlist_unhashed(&n.link))
+>>          break;
+>> +        /*
+>> +         * No point in doing anything about RCU here. Any RCU read
+>> +         * side critical section or RCU watching section can be
+>> +         * interrupted by VMEXITs and the host is free to keep the
+>> +         * vCPU scheduled out as long as it sees fit. This is not
+>> +         * any different just because of the halt induced voluntary
+>> +         * VMEXIT.
+>> +         *
+>> +         * Also the async page fault could have interrupted any RCU
+>> +         * watching context, so invoking rcu_irq_exit()/enter()
+>> +         * around this is not gaining anything.
+>> +         */
+>> +        native_safe_halt();
+>> +        local_irq_disable();
+>
+> What’s the local_irq_disable() here for? I would believe a
+> lockdep_assert_irqs_disabled() somewhere in here would make sense.
+> (Yes, I see you copied this from the old code. It’s still nonsense.)
+
+native_safe_halt() does:
+
+         STI
+         HLT
+
+So the irq disable is required as the loop should exit with interrupts
+disabled.
+
+> I also find it truly bizarre that hlt actually works in this context.
+> Does KVM in fact wake a HLTed guest that HLTed with IRQs off when a
+> pending async pf is satisfied?  This would make sense if the wake
+> event were an interrupt, but it’s not according to Paolo.
+
+See above. safe halt enables interrupts, which means IF == 1 and the
+host sanity check for IF == 1 is satisfied.
+
+In fact, if e.g. some regular interrupt arrives before the page becomes
+available and the guest entered the halt loop because the fault happened
+inside a RCU read side critical section with preemption enabled, then
+the interrupt might wake up another task, set need resched and this
+other task can run. At some point the halt waiting task gets back into
+the loop and either finds the page ready or goes back into halt.
+
+If the fault hit a preempt disabled region then still the interrupt and
+eventual resulting soft interrupts can be handled.
+
+Both scenarios are correct when you actually manage to mentaly
+disconnect regular #PF and async #PF completely.
+
+Of course the overloading of regular #PF, the utter lack of
+documentation and the crappy and duct taped implementation makes this
+really a mind boggling exercise.
+
+> All this being said, the only remotely sane case is when regs->flags
+> has IF==1. Perhaps this code should actually do:
+>
+> WARN_ON(!(regs->flags & X86_EFLAGS_IF));
+
+Yes, that want's to be somewhere early and also cover the async wake
+case. Neither wake nor wait can be injected when IF == 0.
+
+> while (the page isn’t ready) {
+>  local_irq_enable();
+>  native_safe_halt();
+>  local_irq_disable();
+> }
+>
+> with some provision to survive the case where the warning fires so we
+> at least get logs.
+
+I don't think that any attempt to survive a async #PF injection into a
+interrupt disabled region makes sense aside of looking smart and being
+uncomprehensible voodoo.
+
+If this ever happens then the host side is completely buggered and all
+we can do is warn and pray or warn and die hard.
+
+My personal preference is to warn and die hard.
+
+> In any event, I just sent a patch to disable async page faults that
+> happen in kernel mode.
+
+I don't think it's justified. The host side really makes sure that the
+guest does have IF == 1 before injecting anything which is not a NMI. If
+the guest enables interrupts at the wrong place then this is really not
+the hosts problem.
+
+Having a warning in that async pf entry for the IF == 0 injection case
+is good enough IMO.
+
+Thanks,
+
+        tglx
