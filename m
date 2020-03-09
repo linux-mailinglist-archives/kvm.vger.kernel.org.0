@@ -2,192 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3540417E309
-	for <lists+kvm@lfdr.de>; Mon,  9 Mar 2020 16:04:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8DAE517E315
+	for <lists+kvm@lfdr.de>; Mon,  9 Mar 2020 16:06:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726875AbgCIPEC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Mar 2020 11:04:02 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:19224 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726739AbgCIPEB (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 9 Mar 2020 11:04:01 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 029Ex6iL137322;
-        Mon, 9 Mar 2020 11:04:00 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2ym8c9cd7y-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 09 Mar 2020 11:03:50 -0400
-Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 029ExI2J138718;
-        Mon, 9 Mar 2020 11:02:42 -0400
-Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2ym8c9caf8-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 09 Mar 2020 11:02:42 -0400
-Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
-        by ppma01dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 029F0PLA004788;
-        Mon, 9 Mar 2020 15:00:36 GMT
-Received: from b01cxnp23034.gho.pok.ibm.com (b01cxnp23034.gho.pok.ibm.com [9.57.198.29])
-        by ppma01dal.us.ibm.com with ESMTP id 2ym386fvvk-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 09 Mar 2020 15:00:35 +0000
-Received: from b01ledav001.gho.pok.ibm.com (b01ledav001.gho.pok.ibm.com [9.57.199.106])
-        by b01cxnp23034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 029F0ZNW49742322
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 9 Mar 2020 15:00:35 GMT
-Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E069A28065;
-        Mon,  9 Mar 2020 15:00:34 +0000 (GMT)
-Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id DABD72805C;
-        Mon,  9 Mar 2020 15:00:34 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.114.17.106])
-        by b01ledav001.gho.pok.ibm.com (Postfix) with ESMTP;
-        Mon,  9 Mar 2020 15:00:34 +0000 (GMT)
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
-To:     Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.vnet.ibm.com>
-Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
-        David Hildenbrand <david@redhat.com>,
-        Thomas Huth <thuth@redhat.com>,
-        linux-s390 <linux-s390@vger.kernel.org>
-Subject: [PATCH 4/4] selftests: KVM: s390: check for registers to NOT change on reset
-Date:   Mon,  9 Mar 2020 11:00:26 -0400
-Message-Id: <20200309150026.4329-5-borntraeger@de.ibm.com>
-X-Mailer: git-send-email 2.25.0
-In-Reply-To: <20200309150026.4329-1-borntraeger@de.ibm.com>
-References: <20200309150026.4329-1-borntraeger@de.ibm.com>
+        id S1726992AbgCIPGC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Mar 2020 11:06:02 -0400
+Received: from merlin.infradead.org ([205.233.59.134]:38886 "EHLO
+        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726804AbgCIPGC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 Mar 2020 11:06:02 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=merlin.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=r2s3gIPBweXfuFOjhh7nUBoOiFWLhoiQfZtS6vOmD/A=; b=c3HOGujTpXWo2lQjkzMSyzqsLX
+        Ejq9uuXrAcpnK7/Jr3R3P3LlOR3Mp7JfLouaPortD2AFz8/kt1wys/i01pTg0ltHTdT8HlrD3IB63
+        k2AUnHDbabmyptmuhxK/yOY37iilBGoYguHSxUWMiSt0aUNi2gxldIiX8/u4//h6RImZnMvwwN4Ng
+        zhbheTvFKLSKeHJRuG3pojWQXU5FrBKqBIkGh2UeG9S2TSTavcZyQmtHzP3hrDInD7UtYRJnlMwnl
+        aQLe+odfbh3LVrJSQeOmQ6Z2DSl8MXYh/jtL3fls0AYJx8wlCnLwBd1yUL1nVUGG6bFAWi2CCemQD
+        jWiYPTzg==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
+        by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1jBJyD-00074L-Ms; Mon, 09 Mar 2020 15:05:29 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 22B303058B4;
+        Mon,  9 Mar 2020 16:05:26 +0100 (CET)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id 0A12D284A2808; Mon,  9 Mar 2020 16:05:26 +0100 (CET)
+Date:   Mon, 9 Mar 2020 16:05:26 +0100
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     "Liang, Kan" <kan.liang@linux.intel.com>
+Cc:     Luwei Kang <luwei.kang@intel.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        mingo@redhat.com, acme@kernel.org, mark.rutland@arm.com,
+        alexander.shishkin@linux.intel.com, jolsa@redhat.com,
+        namhyung@kernel.org, tglx@linutronix.de, bp@alien8.de,
+        hpa@zytor.com, pbonzini@redhat.com,
+        sean.j.christopherson@intel.com, vkuznets@redhat.com,
+        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
+        pawan.kumar.gupta@linux.intel.com, ak@linux.intel.com,
+        thomas.lendacky@amd.com, fenghua.yu@intel.com,
+        like.xu@linux.intel.com
+Subject: Re: [PATCH v1 01/11] perf/x86/core: Support KVM to assign a
+ dedicated counter for guest PEBS
+Message-ID: <20200309150526.GI12561@hirez.programming.kicks-ass.net>
+References: <1583431025-19802-1-git-send-email-luwei.kang@intel.com>
+ <1583431025-19802-2-git-send-email-luwei.kang@intel.com>
+ <20200306135317.GD12561@hirez.programming.kicks-ass.net>
+ <b72cb68e-1a0a-eeff-21b4-ce412e939cfd@linux.intel.com>
+ <20200309100443.GG12561@hirez.programming.kicks-ass.net>
+ <97ce1ba4-d75a-8db2-ea2f-7d334942b4e6@linux.intel.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
- definitions=2020-03-09_06:2020-03-09,2020-03-09 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 bulkscore=0
- lowpriorityscore=0 priorityscore=1501 phishscore=0 suspectscore=2
- impostorscore=0 spamscore=0 adultscore=0 mlxlogscore=999 malwarescore=0
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2001150001 definitions=main-2003090104
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <97ce1ba4-d75a-8db2-ea2f-7d334942b4e6@linux.intel.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Normal reset and initial CPU reset do not clear all registers. Add a
-test that those registers are NOT changed.
+On Mon, Mar 09, 2020 at 09:12:42AM -0400, Liang, Kan wrote:
 
-Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
----
- tools/testing/selftests/kvm/s390x/resets.c | 55 +++++++++++++++++++++-
- 1 file changed, 53 insertions(+), 2 deletions(-)
+> > Suppose your KVM thing claims counter 0/2 (ICL/SKL) for some random PEBS
+> > event, and then the host wants to use PREC_DIST.. Then one of them will
+> > be screwed for no reason what so ever.
+> > 
+> 
+> The multiplexing should be triggered.
+> 
+> For host, if both user A and user B requires PREC_DIST, the multiplexing
+> should be triggered for them.
+> Now, the user B is KVM. I don't think there is difference. The multiplexing
+> should still be triggered. Why it is screwed?
 
-diff --git a/tools/testing/selftests/kvm/s390x/resets.c b/tools/testing/selftests/kvm/s390x/resets.c
-index c385842792b7..b567705f0d41 100644
---- a/tools/testing/selftests/kvm/s390x/resets.c
-+++ b/tools/testing/selftests/kvm/s390x/resets.c
-@@ -40,8 +40,22 @@ static void guest_code_initial(void)
- 		"	lctlg	8,8,%1\n"
- 		"	lctlg	10,10,%2\n"
- 		"	lctlg	11,11,%3\n"
--		: : "m" (cr2_59), "m" (cr8_63), "m" (cr10), "m" (cr11) : "2");
--	GUEST_SYNC(0);
-+		/* now clobber some general purpose regs */
-+		"	llihh	0,0xffff\n"
-+		"	llihl	1,0x5555\n"
-+		"	llilh	2,0xaaaa\n"
-+		"	llill	3,0x0000\n"
-+		/* now clobber a floating point reg */
-+		"	lghi	4,0x1\n"
-+		"	cdgbr	0,4\n"
-+		/* now clobber an access reg */
-+		"	sar	9,4\n"
-+		/* We embed diag 501 here to control register content */
-+		"	diag 0,0,0x501\n"
-+		:
-+		: "m" (cr2_59), "m" (cr8_63), "m" (cr10), "m" (cr11)
-+		/* no clobber list as this should not return */
-+		);
- }
- 
- static void test_one_reg(uint64_t id, uint64_t value)
-@@ -98,6 +112,21 @@ static void assert_clear(void)
- 		    "vrs0-15 == 0 (sync_regs)");
- }
- 
-+static void assert_initial_noclear(void)
-+{
-+	TEST_ASSERT(sync_regs->gprs[0] == 0xffff000000000000UL,
-+		    "gpr0 == 0xffff000000000000 (sync_regs)");
-+	TEST_ASSERT(sync_regs->gprs[1] == 0x0000555500000000UL,
-+		    "gpr1 == 0x0000555500000000 (sync_regs)");
-+	TEST_ASSERT(sync_regs->gprs[2] == 0x00000000aaaa0000UL,
-+		    "gpr2 == 0x00000000aaaa0000 (sync_regs)");
-+	TEST_ASSERT(sync_regs->gprs[3] == 0x0000000000000000UL,
-+		    "gpr3 == 0x0000000000000000 (sync_regs)");
-+	TEST_ASSERT(sync_regs->fprs[0] == 0x3ff0000000000000UL,
-+		    "fpr0 == 0f1 (sync_regs)");
-+	TEST_ASSERT(sync_regs->acrs[9] == 1, "ar9 == 1 (sync_regs)");
-+}
-+
- static void assert_initial(void)
- {
- 	struct kvm_sregs sregs;
-@@ -140,6 +169,14 @@ static void assert_initial(void)
- 	test_one_reg(KVM_REG_S390_CLOCK_COMP, 0);
- }
- 
-+static void assert_normal_noclear(void)
-+{
-+	TEST_ASSERT(sync_regs->crs[2] == 0x10, "cr2 == 10 (sync_regs)");
-+	TEST_ASSERT(sync_regs->crs[8] == 1, "cr10 == 1 (sync_regs)");
-+	TEST_ASSERT(sync_regs->crs[10] == 1, "cr10 == 1 (sync_regs)");
-+	TEST_ASSERT(sync_regs->crs[11] == -1, "cr11 == -1 (sync_regs)");
-+}
-+
- static void assert_normal(void)
- {
- 	test_one_reg(KVM_REG_S390_PFTOKEN, KVM_S390_PFAULT_TOKEN_INVALID);
-@@ -176,7 +213,13 @@ static void test_normal(void)
- 	inject_irq(VCPU_ID);
- 
- 	vcpu_ioctl(vm, VCPU_ID, KVM_S390_NORMAL_RESET, 0);
-+
-+	/* must clears */
- 	assert_normal();
-+	/* must not clears */
-+	assert_normal_noclear();
-+	assert_initial_noclear();
-+
- 	kvm_vm_free(vm);
- }
- 
-@@ -192,8 +235,13 @@ static void test_initial(void)
- 	inject_irq(VCPU_ID);
- 
- 	vcpu_ioctl(vm, VCPU_ID, KVM_S390_INITIAL_RESET, 0);
-+
-+	/* must clears */
- 	assert_normal();
- 	assert_initial();
-+	/* must not clears */
-+	assert_initial_noclear();
-+
- 	kvm_vm_free(vm);
- }
- 
-@@ -209,9 +257,12 @@ static void test_clear(void)
- 	inject_irq(VCPU_ID);
- 
- 	vcpu_ioctl(vm, VCPU_ID, KVM_S390_CLEAR_RESET, 0);
-+
-+	/* must clears */
- 	assert_normal();
- 	assert_initial();
- 	assert_clear();
-+
- 	kvm_vm_free(vm);
- }
- 
--- 
-2.25.0
+Becuase if KVM isn't PREC_DIST we should be able to reschedule it to a
+different counter.
 
+> > How is that not destroying scheduling freedom? Any other situation we'd
+> > have moved the !PREC_DIST PEBS event to another counter.
+> > 
+> 
+> All counters are equivalent for them. It doesn't matter if we move it to
+> another counter. There is no impact for the user.
+
+But we cannot move it to another counter, because you're pinning it.
+
+> In the new proposal, KVM user is treated the same as other host events with
+> event constraint. The scheduler is free to choose whether or not to assign a
+> counter for it.
+
+That's what it does, I understand that. I'm saying that that is creating
+artificial contention.
+
+
+Why is this needed anyway? Can't we force the guest to flush and then
+move it over to a new counter?
