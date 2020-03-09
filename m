@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1EDD217DE96
-	for <lists+kvm@lfdr.de>; Mon,  9 Mar 2020 12:19:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2E80717DEB5
+	for <lists+kvm@lfdr.de>; Mon,  9 Mar 2020 12:28:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726379AbgCILTo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Mar 2020 07:19:44 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:26324 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725796AbgCILTo (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 9 Mar 2020 07:19:44 -0400
+        id S1726478AbgCIL2B (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Mar 2020 07:28:01 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:26577 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726469AbgCIL2B (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 Mar 2020 07:28:01 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1583752781;
+        s=mimecast20190719; t=1583753280;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=WPKjGxI/CtV5UF01rT9bf4zv9EkxXcn090JrU41bD2w=;
-        b=N77NGiYEuCNi4BBXUAxvsPOjUUOK+yAUdZ/wucVjaDfcnhGgQtLVx5i7aW5LcZy13gwLR/
-        JzcbSpuv3wSD+yLRCpHE2hTnUMCcHiI1SVwb1Nfl9wQDeMwtkjDfW80ee5vcnCjcohEg2U
-        968FwEaAtSvAhc70JgNPTHoAnhHnAiM=
+        bh=ZXvdMJEgW8utCn7FonEpgPrYzs7ym8h0kN9CF9LzEks=;
+        b=JTokeT7KtOy+cVUGRP1YI4a10OKWBua8eWkMi4iCiE2x6rAZnTj73d6rQfDYvVjVH9AzLi
+        nZHQbnN7MwLcEShY2xNkcEGmzcJJwXHHkEklHykFf+ZHN+Cda5oHpZzRjqzakceyUOTJnC
+        JC+sFQa3fwqFGCBNSliQ7DSBISDwJHc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-488-m-BswTOyPOKtbJ01kwn-bQ-1; Mon, 09 Mar 2020 07:19:40 -0400
-X-MC-Unique: m-BswTOyPOKtbJ01kwn-bQ-1
+ us-mta-102-QqAxODeTNq2CiixcGg8blg-1; Mon, 09 Mar 2020 07:27:58 -0400
+X-MC-Unique: QqAxODeTNq2CiixcGg8blg-1
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 45F30801E5C;
-        Mon,  9 Mar 2020 11:19:38 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BD7408017CC;
+        Mon,  9 Mar 2020 11:27:56 +0000 (UTC)
 Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id DDC1C1001925;
-        Mon,  9 Mar 2020 11:19:32 +0000 (UTC)
-Date:   Mon, 9 Mar 2020 12:19:30 +0100
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 31C031001DC2;
+        Mon,  9 Mar 2020 11:27:51 +0000 (UTC)
+Date:   Mon, 9 Mar 2020 12:27:49 +0100
 From:   Andrew Jones <drjones@redhat.com>
 To:     Eric Auger <eric.auger@redhat.com>
 Cc:     eric.auger.pro@gmail.com, maz@kernel.org,
@@ -40,501 +40,266 @@ Cc:     eric.auger.pro@gmail.com, maz@kernel.org,
         qemu-devel@nongnu.org, qemu-arm@nongnu.org, andre.przywara@arm.com,
         peter.maydell@linaro.org, yuzenghui@huawei.com,
         alexandru.elisei@arm.com, thuth@redhat.com
-Subject: Re: [kvm-unit-tests PATCH v4 06/13] arm/arm64: ITS: Introspection
- tests
-Message-ID: <20200309111930.zj6e4yzpzehcdr7e@kamzik.brq.redhat.com>
+Subject: Re: [kvm-unit-tests PATCH v4 07/13] arm/arm64: ITS:
+ its_enable_defaults
+Message-ID: <20200309112749.jeatdhajxqght7so@kamzik.brq.redhat.com>
 References: <20200309102420.24498-1-eric.auger@redhat.com>
- <20200309102420.24498-7-eric.auger@redhat.com>
+ <20200309102420.24498-8-eric.auger@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200309102420.24498-7-eric.auger@redhat.com>
+In-Reply-To: <20200309102420.24498-8-eric.auger@redhat.com>
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Mar 09, 2020 at 11:24:13AM +0100, Eric Auger wrote:
-> Detect the presence of an ITS as part of the GICv3 init
-> routine, initialize its base address and read few registers
-> the IIDR, the TYPER to store its dimensioning parameters.
-> Parse the BASER registers. As part of the init sequence we
-> also init all the requested tables.
+On Mon, Mar 09, 2020 at 11:24:14AM +0100, Eric Auger wrote:
+> its_enable_defaults() enable LPIs at distributor level
+> and ITS level.
 > 
-> This is our first ITS test, belonging to a new "its" group.
+> gicv3_enable_defaults must be called before.
 > 
 > Signed-off-by: Eric Auger <eric.auger@redhat.com>
 > 
 > ---
-> 
 > v3 -> v4:
-> - fixed some typos, refine trace msgs
-> - move its files to lib/arm64 instead of lib/arm
-> - create lib/arm/asm/gic-v3-its.h containing stubs
-> - rework gic_get_dt_bases
-> - rework baser parsing
-> - move table allocation to init routine
-> - use get_order()
+> - use GITS_BASER_INDIRECT & GITS_BASER_VALID in its_setup_baser()
+> - don't parse BASERs again in its_enable_defaults
+> - rename its_setup_baser into its_baser_alloc_table
+> - All allocations moved to the init function
+> - squashed "arm/arm64: gicv3: Enable/Disable LPIs at re-distributor level"
+>   into this patch
+> - introduce gicv3_lpi_rdist_enable and gicv3_lpi_rdist_disable
+> - pend and prop table bases stored as virt addresses
+> - move some init functions from enable() to its_init
+> - removed GICR_PROPBASER_IDBITS_MASK
+> - introduced LPI_OFFSET
+> - lpi_prop becomes u8 *
+> - gicv3_lpi_set_config/get_config became macro
+> - renamed gicv3_lpi_set_pending_table_bit into gicv3_lpi_set_clr_pending
 > 
 > v2 -> v3:
-> - updated dates and changed author
-> - squash "arm/arm64: ITS: Test BASER" into this patch but
->   removes setup_baser which will be introduced later.
-> - only compile on aarch64
-> - restrict the new test to aarch64
-> 
-> v1 -> v2:
-> - clean GITS_TYPER macros and unused fields in typer struct
-> - remove memory attribute related macros
-> - remove everything related to memory attributes
-> - s/dev_baser/coll_baser/ in report_info
-> - add extra line
-> - removed index filed in its_baser
+> - introduce its_setup_baser in this patch
+> - squash "arm/arm64: ITS: Init the command queue" in this patch.
 > ---
->  arm/Makefile.arm64         |   1 +
->  arm/gic.c                  |  44 ++++++++++++++++
->  arm/unittests.cfg          |   7 +++
->  lib/arm/asm/gic-v3-its.h   |  23 +++++++++
->  lib/arm/gic.c              |  34 +++++++++++--
->  lib/arm64/asm/gic-v3-its.h |  92 +++++++++++++++++++++++++++++++++
->  lib/arm64/gic-v3-its.c     | 102 +++++++++++++++++++++++++++++++++++++
->  7 files changed, 298 insertions(+), 5 deletions(-)
->  create mode 100644 lib/arm/asm/gic-v3-its.h
->  create mode 100644 lib/arm64/asm/gic-v3-its.h
->  create mode 100644 lib/arm64/gic-v3-its.c
+>  lib/arm/asm/gic-v3.h       | 28 +++++++++++------
+>  lib/arm/gic-v3.c           | 64 ++++++++++++++++++++++----------------
+>  lib/arm64/asm/gic-v3-its.h |  1 +
+>  lib/arm64/gic-v3-its.c     | 16 ++++++++--
+>  4 files changed, 71 insertions(+), 38 deletions(-)
 > 
-> diff --git a/arm/Makefile.arm64 b/arm/Makefile.arm64
-> index 6d3dc2c..60182ae 100644
-> --- a/arm/Makefile.arm64
-> +++ b/arm/Makefile.arm64
-> @@ -19,6 +19,7 @@ endef
->  cstart.o = $(TEST_DIR)/cstart64.o
->  cflatobjs += lib/arm64/processor.o
->  cflatobjs += lib/arm64/spinlock.o
-> +cflatobjs += lib/arm64/gic-v3-its.o
+> diff --git a/lib/arm/asm/gic-v3.h b/lib/arm/asm/gic-v3.h
+> index 12134ef..ea9ae8e 100644
+> --- a/lib/arm/asm/gic-v3.h
+> +++ b/lib/arm/asm/gic-v3.h
+> @@ -50,15 +50,16 @@
+>  #define MPIDR_TO_SGI_AFFINITY(cluster_id, level) \
+>  	(MPIDR_AFFINITY_LEVEL(cluster_id, level) << ICC_SGI1R_AFFINITY_## level ## _SHIFT)
 >  
->  OBJDIRS += lib/arm64
+> -#define GICR_PROPBASER_IDBITS_MASK                      (0x1f)
+> +#define GICR_PENDBASER_PTZ		BIT_ULL(62)
 >  
-> diff --git a/arm/gic.c b/arm/gic.c
-> index abf08c7..67989f6 100644
-> --- a/arm/gic.c
-> +++ b/arm/gic.c
-> @@ -16,6 +16,7 @@
->  #include <asm/processor.h>
->  #include <asm/delay.h>
->  #include <asm/gic.h>
-> +#include <asm/gic-v3-its.h>
->  #include <asm/smp.h>
->  #include <asm/barrier.h>
->  #include <asm/io.h>
-> @@ -518,6 +519,45 @@ static void gic_test_mmio(void)
->  		test_targets(nr_irqs);
->  }
+> -#define GICR_PENDBASER_PTZ                              BIT_ULL(62)
+> +#define LPI_PROP_GROUP1			(1 << 1)
+> +#define LPI_PROP_ENABLED		(1 << 0)
+> +#define LPI_PROP_DEFAULT_PRIO		0xa0
+> +#define LPI_PROP_DEFAULT		(LPI_PROP_DEFAULT_PRIO | LPI_PROP_GROUP1 | LPI_PROP_ENABLED)
 >  
-> +#if defined(__aarch64__)
-> +
-> +static void test_its_introspection(void)
-> +{
-> +	struct its_baser *dev_baser = &its_data.device_baser;
-> +	struct its_baser *coll_baser = &its_data.coll_baser;
-> +	struct its_typer *typer = &its_data.typer;
-> +
-> +	if (!gicv3_its_base()) {
-> +		report_skip("No ITS, skip ...");
-> +		return;
-> +	}
-> +
-> +	/* IIDR */
-> +	report(test_readonly_32(gicv3_its_base() + GITS_IIDR, false),
-> +	       "GITS_IIDR is read-only"),
-> +
-> +	/* TYPER */
-> +	report(test_readonly_32(gicv3_its_base() + GITS_TYPER, false),
-> +	       "GITS_TYPER is read-only");
-> +
-> +	report(typer->phys_lpi, "ITS supports physical LPIs");
-> +	report_info("vLPI support: %s", typer->virt_lpi ? "yes" : "no");
-> +	report_info("ITT entry size = 0x%x", typer->ite_size);
-> +	report_info("Bit Count: EventID=%d DeviceId=%d CollId=%d",
-> +		    typer->eventid_bits, typer->deviceid_bits,
-> +		    typer->collid_bits);
-> +	report(typer->eventid_bits && typer->deviceid_bits &&
-> +	       typer->collid_bits, "ID spaces");
-> +	report_info("Target address format %s",
-> +			typer->pta ? "Redist base address" : "PE #");
-> +
-> +	report(dev_baser && coll_baser, "detect device and collection BASER");
-> +	report_info("device table entry_size = 0x%x", dev_baser->esz);
-> +	report_info("collection table entry_size = 0x%x", coll_baser->esz);
-> +}
-> +
-> +#endif
-> +
->  int main(int argc, char **argv)
->  {
->  	if (!gic_init()) {
-> @@ -549,6 +589,10 @@ int main(int argc, char **argv)
->  		report_prefix_push(argv[1]);
->  		gic_test_mmio();
->  		report_prefix_pop();
-> +	} else if (strcmp(argv[1], "its-introspection") == 0) {
-> +		report_prefix_push(argv[1]);
-> +		test_its_introspection();
-> +		report_prefix_pop();
->  	} else {
->  		report_abort("Unknown subtest '%s'", argv[1]);
->  	}
-> diff --git a/arm/unittests.cfg b/arm/unittests.cfg
-> index 017958d..23d378e 100644
-> --- a/arm/unittests.cfg
-> +++ b/arm/unittests.cfg
-> @@ -122,6 +122,13 @@ smp = $MAX_SMP
->  extra_params = -machine gic-version=3 -append 'active'
->  groups = gic
->  
-> +[its-introspection]
-> +file = gic.flat
-> +smp = $MAX_SMP
-> +extra_params = -machine gic-version=3 -append 'its-introspection'
-> +groups = its
-> +arch = arm64
-> +
->  # Test PSCI emulation
->  [psci]
->  file = psci.flat
-> diff --git a/lib/arm/asm/gic-v3-its.h b/lib/arm/asm/gic-v3-its.h
-> new file mode 100644
-> index 0000000..0096de6
-> --- /dev/null
-> +++ b/lib/arm/asm/gic-v3-its.h
-> @@ -0,0 +1,23 @@
-> +/*
-> + * ITS 32-bit stubs
-> + *
-> + * Copyright (C) 2020, Red Hat Inc, Eric Auger <eric.auger@redhat.com>
-> + *
-> + * This work is licensed under the terms of the GNU LGPL, version 2.
-> + */
-> +
-> +#ifndef _ASMARM_GICv3_ITS
-> +#define _ASMARM_GICv3_ITS
-> +
-> +/* dummy its_data struct to allow gic_get_dt_bases() call */
-> +struct its_data {
-> +	void *base;
-> +};
-> +
-> +static inline void its_init(void) {}
-> +static inline void test_its_introspection(void)
-> +{
-> +	report_abort("not supported on 32-bit");
+> -#define LPI_PROP_GROUP1		(1 << 1)
+> -#define LPI_PROP_ENABLED	(1 << 0)
+> -#define LPI_PROP_DEFAULT_PRIO   0xa0
+> -#define LPI_PROP_DEFAULT	(LPI_PROP_DEFAULT_PRIO | LPI_PROP_GROUP1 | \
+> -				 LPI_PROP_ENABLED)
 
-I suggested report_abort() in this function when it was in arm/gic.c,
-but we don't want report_* functions in the library code, nor do we
-want functions named test_*. This test_* stub should go back to
-arm/gic.c, where it can be empty, because the 32-bit its_init() stub
-here could get an assert_msg("not supported on 32-bit") instead.
+This reformatting should be squashed into 5/13.
 
-> +}
-> +
-> +#endif /* _ASMARM_GICv3_ITS */
-> diff --git a/lib/arm/gic.c b/lib/arm/gic.c
-> index c3c5f6b..4f6f15b 100644
-> --- a/lib/arm/gic.c
-> +++ b/lib/arm/gic.c
-> @@ -6,9 +6,11 @@
->  #include <devicetree.h>
->  #include <asm/gic.h>
->  #include <asm/io.h>
-> +#include <asm/gic-v3-its.h>
+> +#define LPI_ID_BASE			8192
+> +#define LPI(lpi)			((lpi) + LPI_ID_BASE)
+> +#define LPI_OFFSET(intid)		((intid) - LPI_ID_BASE)
 >  
->  struct gicv2_data gicv2_data;
->  struct gicv3_data gicv3_data;
-> +struct its_data its_data;
+>  #include <asm/arch_gicv3.h>
 >  
->  struct gic_common_ops {
->  	void (*enable_defaults)(void);
-> @@ -44,12 +46,13 @@ static const struct gic_common_ops gicv3_common_ops = {
->   * Documentation/devicetree/bindings/interrupt-controller/arm,gic-v3.txt
->   */
->  static bool
-> -gic_get_dt_bases(const char *compatible, void **base1, void **base2)
-> +gic_get_dt_bases(const char *compatible, void **base1, void **base2, void **base3)
+> @@ -76,7 +77,7 @@ struct gicv3_data {
+>  	void *dist_base;
+>  	void *redist_bases[GICV3_NR_REDISTS];
+>  	void *redist_base[NR_CPUS];
+> -	void *lpi_prop;
+> +	u8 *lpi_prop;
+>  	void *lpi_pend[NR_CPUS];
+>  	unsigned int irq_nr;
+>  };
+> @@ -96,8 +97,10 @@ extern void gicv3_ipi_send_mask(int irq, const cpumask_t *dest);
+>  extern void gicv3_set_redist_base(size_t stride);
+>  extern void gicv3_lpi_set_config(int n, u8 val);
+>  extern u8 gicv3_lpi_get_config(int n);
+> -extern void gicv3_lpi_set_pending_table_bit(int rdist, int n, bool set);
+> +extern void gicv3_lpi_set_clr_pending(int rdist, int n, bool set);
+>  extern void gicv3_lpi_alloc_tables(void);
+> +extern void gicv3_lpi_rdist_enable(int redist);
+> +extern void gicv3_lpi_rdist_disable(int redist);
+>  
+>  static inline void gicv3_do_wait_for_rwp(void *base)
 >  {
->  	struct dt_pbus_reg reg;
-> -	struct dt_device gic;
-> +	struct dt_device gic, its;
->  	struct dt_bus bus;
-> -	int node, ret, i;
-> +	int node, subnode, ret, i, len;
-> +	const void *fdt = dt_fdt();
->  
->  	dt_bus_init_defaults(&bus);
->  	dt_device_init(&gic, &bus, NULL);
-> @@ -74,19 +77,39 @@ gic_get_dt_bases(const char *compatible, void **base1, void **base2)
->  		base2[i] = ioremap(reg.addr, reg.size);
->  	}
->  
-> +	if (!base3) {
-> +		assert(!strcmp(compatible, "arm,cortex-a15-gic"));
-> +		return true;
-> +	}
-> +
-> +	assert(!strcmp(compatible, "arm,gic-v3"));
-> +
-> +	dt_for_each_subnode(node, subnode) {
-> +		const struct fdt_property *prop;
-> +
-> +		prop = fdt_get_property(fdt, subnode, "compatible", &len);
-> +		if (!strcmp((char *)prop->data, "arm,gic-v3-its")) {
-> +			dt_device_bind_node(&its, subnode);
-> +			ret = dt_pbus_translate(&its, 0, &reg);
-> +			assert(ret == 0);
-> +			*base3 = ioremap(reg.addr, reg.size);
-> +			break;
-> +		}
-> +	}
-> +
->  	return true;
+> @@ -143,5 +146,12 @@ static inline u64 mpidr_uncompress(u32 compressed)
+>  	return mpidr;
 >  }
 >  
->  int gicv2_init(void)
->  {
->  	return gic_get_dt_bases("arm,cortex-a15-gic",
-> -			&gicv2_data.dist_base, &gicv2_data.cpu_base);
-> +			&gicv2_data.dist_base, &gicv2_data.cpu_base, NULL);
+> +#define gicv3_lpi_set_config(intid, value) ({		\
+> +	gicv3_data.lpi_prop[LPI_OFFSET(intid)] = value; \
+> +})
+> +
+> +#define gicv3_lpi_get_config(intid) (gicv3_data.lpi_prop[LPI_OFFSET(intid)])
+> +
+> +
+>  #endif /* !__ASSEMBLY__ */
+>  #endif /* _ASMARM_GIC_V3_H_ */
+> diff --git a/lib/arm/gic-v3.c b/lib/arm/gic-v3.c
+> index 949a986..a3b55b2 100644
+> --- a/lib/arm/gic-v3.c
+> +++ b/lib/arm/gic-v3.c
+> @@ -150,7 +150,14 @@ void gicv3_ipi_send_single(int irq, int cpu)
 >  }
 >  
->  int gicv3_init(void)
->  {
->  	return gic_get_dt_bases("arm,gic-v3", &gicv3_data.dist_base,
-> -			&gicv3_data.redist_bases[0]);
-> +			&gicv3_data.redist_bases[0], &its_data.base);
->  }
->  
->  int gic_version(void)
-> @@ -104,6 +127,7 @@ int gic_init(void)
->  		gic_common_ops = &gicv2_common_ops;
->  	else if (gicv3_init())
->  		gic_common_ops = &gicv3_common_ops;
-> +	its_init();
->  	return gic_version();
->  }
->  
-> diff --git a/lib/arm64/asm/gic-v3-its.h b/lib/arm64/asm/gic-v3-its.h
-> new file mode 100644
-> index 0000000..331ba0e
-> --- /dev/null
-> +++ b/lib/arm64/asm/gic-v3-its.h
-> @@ -0,0 +1,92 @@
-> +/*
-> + * All ITS* defines are lifted from include/linux/irqchip/arm-gic-v3.h
-> + *
-> + * Copyright (C) 2020, Red Hat Inc, Eric Auger <eric.auger@redhat.com>
-> + *
-> + * This work is licensed under the terms of the GNU LGPL, version 2.
-> + */
-> +#ifndef _ASMARM64_GIC_V3_ITS_H_
-> +#define _ASMARM64_GIC_V3_ITS_H_
-> +
-> +struct its_typer {
-> +	unsigned int ite_size;
-> +	unsigned int eventid_bits;
-> +	unsigned int deviceid_bits;
-> +	unsigned int collid_bits;
-> +	bool pta;
-> +	bool phys_lpi;
-> +	bool virt_lpi;
-> +};
-> +
-> +struct its_baser {
-> +	int index;
-> +	size_t psz;
-> +	int esz;
-> +	bool indirect;
-> +	phys_addr_t table_addr;
-> +};
-> +
-> +#define GITS_BASER_NR_REGS              8
-> +
-> +struct its_data {
-> +	void *base;
-> +	struct its_typer typer;
-> +	struct its_baser device_baser;
-> +	struct its_baser coll_baser;
-> +	struct its_cmd_block *cmd_base;
-> +	struct its_cmd_block *cmd_write;
-> +};
-> +
-> +extern struct its_data its_data;
-> +
-> +#define gicv3_its_base()		(its_data.base)
-> +
-> +#define GITS_CTLR			0x0000
-> +#define GITS_IIDR			0x0004
-> +#define GITS_TYPER			0x0008
-> +#define GITS_CBASER			0x0080
-> +#define GITS_CWRITER			0x0088
-> +#define GITS_CREADR			0x0090
-> +#define GITS_BASER			0x0100
-> +
-> +#define GITS_TYPER_PLPIS                BIT(0)
-> +#define GITS_TYPER_VLPIS		BIT(1)
-> +#define GITS_TYPER_ITT_ENTRY_SIZE	GENMASK_ULL(7, 4)
-> +#define GITS_TYPER_ITT_ENTRY_SIZE_SHIFT	4
-> +#define GITS_TYPER_IDBITS		GENMASK_ULL(8, 12)
-> +#define GITS_TYPER_IDBITS_SHIFT         8
-> +#define GITS_TYPER_DEVBITS		GENMASK_ULL(13, 17)
-> +#define GITS_TYPER_DEVBITS_SHIFT        13
-> +#define GITS_TYPER_PTA                  BIT(19)
-> +#define GITS_TYPER_CIDBITS		GENMASK_ULL(32, 35)
-> +#define GITS_TYPER_CIDBITS_SHIFT	32
-> +#define GITS_TYPER_CIL			BIT(36)
-> +
-> +#define GITS_CTLR_ENABLE		(1U << 0)
-> +
-> +#define GITS_CBASER_VALID		(1UL << 63)
-> +
-> +#define GITS_BASER_VALID		BIT(63)
-> +#define GITS_BASER_INDIRECT		BIT(62)
-> +#define GITS_BASER_TYPE_SHIFT		(56)
-> +#define GITS_BASER_TYPE(r)		(((r) >> GITS_BASER_TYPE_SHIFT) & 7)
-> +#define GITS_BASER_ENTRY_SIZE_SHIFT	(48)
-> +#define GITS_BASER_ENTRY_SIZE(r)	((((r) >> GITS_BASER_ENTRY_SIZE_SHIFT) & 0x1f) + 1)
-> +#define GITS_BASER_PAGE_SIZE_SHIFT	(8)
-> +#define GITS_BASER_PAGE_SIZE_4K		(0UL << GITS_BASER_PAGE_SIZE_SHIFT)
-> +#define GITS_BASER_PAGE_SIZE_16K	(1UL << GITS_BASER_PAGE_SIZE_SHIFT)
-> +#define GITS_BASER_PAGE_SIZE_64K	(2UL << GITS_BASER_PAGE_SIZE_SHIFT)
-> +#define GITS_BASER_PAGE_SIZE_MASK	(3UL << GITS_BASER_PAGE_SIZE_SHIFT)
-> +#define GITS_BASER_PAGES_MAX		256
-> +#define GITS_BASER_PAGES_SHIFT		(0)
-> +#define GITS_BASER_NR_PAGES(r)		(((r) & 0xff) + 1)
-> +#define GITS_BASER_PHYS_ADDR_MASK	0xFFFFFFFFF000
-> +#define GITS_BASER_TYPE_NONE		0
-> +#define GITS_BASER_TYPE_DEVICE		1
-> +#define GITS_BASER_TYPE_COLLECTION	4
-> +
-> +extern void its_parse_typer(void);
-> +extern void its_init(void);
-> +extern int its_baser_lookup(int i, struct its_baser *baser);
-> +
-> +#endif /* _ASMARM64_GIC_V3_ITS_H_ */
-> diff --git a/lib/arm64/gic-v3-its.c b/lib/arm64/gic-v3-its.c
-> new file mode 100644
-> index 0000000..23b0d06
-> --- /dev/null
-> +++ b/lib/arm64/gic-v3-its.c
-> @@ -0,0 +1,102 @@
-> +/*
-> + * Copyright (C) 2020, Red Hat Inc, Eric Auger <eric.auger@redhat.com>
-> + *
-> + * This work is licensed under the terms of the GNU LGPL, version 2.
-> + */
-> +#include <asm/gic.h>
-> +#include <alloc_page.h>
-> +#include <asm/gic-v3-its.h>
-> +
-> +void its_parse_typer(void)
-> +{
-> +	u64 typer = readq(gicv3_its_base() + GITS_TYPER);
-> +	struct its_typer *t = &its_data.typer;
-> +
-> +	t->ite_size = ((typer & GITS_TYPER_ITT_ENTRY_SIZE) >> GITS_TYPER_ITT_ENTRY_SIZE_SHIFT) + 1;
-> +	t->pta = typer & GITS_TYPER_PTA;
-> +	t->eventid_bits = ((typer & GITS_TYPER_IDBITS) >> GITS_TYPER_IDBITS_SHIFT) + 1;
-> +	t->deviceid_bits = ((typer & GITS_TYPER_DEVBITS) >> GITS_TYPER_DEVBITS_SHIFT) + 1;
-> +
-> +	if (typer & GITS_TYPER_CIL)
-> +		t->collid_bits = ((typer & GITS_TYPER_CIDBITS) >> GITS_TYPER_CIDBITS_SHIFT) + 1;
-> +	else
-> +		t->collid_bits = 16;
-> +
-> +	t->virt_lpi = typer & GITS_TYPER_VLPIS;
-> +	t->phys_lpi = typer & GITS_TYPER_PLPIS;
-> +}
-> +
-> +int its_baser_lookup(int type, struct its_baser *baser)
-> +{
-> +	int i;
-> +
-> +	for (i = 0; i < GITS_BASER_NR_REGS; i++) {
-> +		void *reg_addr = gicv3_its_base() + GITS_BASER + i * 8;
-> +		u64 val = readq(reg_addr);
-> +
-> +		if (GITS_BASER_TYPE(val) == type) {
-> +			assert((val & GITS_BASER_PAGE_SIZE_MASK) == GITS_BASER_PAGE_SIZE_64K);
-> +			baser->esz = GITS_BASER_ENTRY_SIZE(val);
-> +			baser->indirect = val & GITS_BASER_INDIRECT;
-> +			baser->index = i;
-> +			return 0;
-> +		}
-> +	}
-> +	return -1;
-> +}
-> +
-> +/*
-> + * Allocate the BASER table (a single page of size @baser->psz)
-> + * and set the BASER valid
-> + */
-> +static void its_baser_alloc_table(struct its_baser *baser, size_t size)
-> +{
-> +	unsigned long order = get_order(size >> PAGE_SHIFT);
-> +	void *reg_addr = gicv3_its_base() + GITS_BASER + baser->index * 8;
-> +	u64 val = readq(reg_addr);
-> +
-> +	baser->table_addr = (u64)virt_to_phys(alloc_pages(order));
-> +
-> +	val |= (u64)baser->table_addr | GITS_BASER_VALID;
-> +
-> +	writeq(val, reg_addr);
-> +}
+>  #if defined(__aarch64__)
+> -/* alloc_lpi_tables: Allocate LPI config and pending tables */
 > +
 > +/**
 
-nit: this isn't a kernel-doc comment, one * is enough
+*
 
-> + * init_cmd_queue - Allocate the command queue and initialize
-> + * CBASER, CWRITER
+> + * alloc_lpi_tables - Allocate LPI config and pending tables
+> + * and set PROPBASER (shared by all rdistributors) and per
+> + * redistributor PENDBASER.
+> + *
+> + * gicv3_set_redist_base() must be called before
+
+How about asserting gicv3_redist_base() isn't NULL?
+
 > + */
-> +static void its_cmd_queue_init(void)
+>  void gicv3_lpi_alloc_tables(void)
+>  {
+>  	unsigned long n = SZ_64K >> PAGE_SHIFT;
+> @@ -161,13 +168,9 @@ void gicv3_lpi_alloc_tables(void)
+>  	gicv3_data.lpi_prop = alloc_pages(order);
+>  
+>  	/* ID bits = 13, ie. up to 14b LPI INTID */
+> -	prop_val = (u64)virt_to_phys(gicv3_data.lpi_prop) | 13;
+> +	prop_val = (u64)(virt_to_phys(gicv3_data.lpi_prop)) | 13;
+>  
+> -	/*
+> -	 * Allocate pending tables for each redistributor
+> -	 * and set PROPBASER and PENDBASER
+> -	 */
+> -	for_each_present_cpu(cpu) {
+> +	for (cpu = 0; cpu < nr_cpus; cpu++) {
+>  		u64 pend_val;
+>  		void *ptr;
+>  
+> @@ -176,30 +179,14 @@ void gicv3_lpi_alloc_tables(void)
+>  		writeq(prop_val, ptr + GICR_PROPBASER);
+>  
+>  		gicv3_data.lpi_pend[cpu] = alloc_pages(order);
+> -
+> -		pend_val = (u64)virt_to_phys(gicv3_data.lpi_pend[cpu]);
+> -
+> +		pend_val = (u64)(virt_to_phys(gicv3_data.lpi_pend[cpu]));
+>  		writeq(pend_val, ptr + GICR_PENDBASER);
+>  	}
+>  }
+>  
+> -void gicv3_lpi_set_config(int n, u8 value)
+> +void gicv3_lpi_set_clr_pending(int rdist, int n, bool set)
+>  {
+> -	u8 *entry = (u8 *)(gicv3_data.lpi_prop + (n - 8192));
+> -
+> -	*entry = value;
+> -}
+> -
+> -u8 gicv3_lpi_get_config(int n)
+> -{
+> -	u8 *entry = (u8 *)(gicv3_data.lpi_prop + (n - 8192));
+> -
+> -	return *entry;
+> -}
+> -
+> -void gicv3_lpi_set_pending_table_bit(int rdist, int n, bool set)
+> -{
+> -	u8 *ptr = phys_to_virt((phys_addr_t)gicv3_data.lpi_pend[rdist]);
+> +	u8 *ptr = gicv3_data.lpi_pend[rdist];
+>  	u8 mask = 1 << (n % 8), byte;
+>  
+>  	ptr += (n / 8);
+> @@ -210,4 +197,29 @@ void gicv3_lpi_set_pending_table_bit(int rdist, int n, bool set)
+>  		byte &= ~mask;
+>  	*ptr = byte;
+>  }
+> +
+> +static void gicv3_lpi_rdist_ctrl(u32 redist, bool set)
 > +{
-> +	unsigned long order = get_order(SZ_64K >> PAGE_SHIFT);
-> +	u64 cbaser;
+> +	void *ptr;
+> +	u64 val;
 > +
-> +	its_data.cmd_base = (void *)virt_to_phys(alloc_pages(order));
+> +	assert(redist < nr_cpus);
 > +
-> +	cbaser = ((u64)its_data.cmd_base | (SZ_64K / SZ_4K - 1)	| GITS_CBASER_VALID);
-> +
-> +	writeq(cbaser, its_data.base + GITS_CBASER);
-> +
-> +	its_data.cmd_write = its_data.cmd_base;
-> +	writeq(0, its_data.base + GITS_CWRITER);
+> +	ptr = gicv3_data.redist_base[redist];
+> +	val = readl(ptr + GICR_CTLR);
+> +	if (set)
+> +		val |= GICR_CTLR_ENABLE_LPIS;
+> +	else
+> +		val &= ~GICR_CTLR_ENABLE_LPIS;
+> +	writel(val,  ptr + GICR_CTLR);
 > +}
 > +
-> +void its_init(void)
+> +void gicv3_lpi_rdist_enable(int redist)
 > +{
-> +	if (!its_data.base)
-> +		return;
-> +
-> +	its_parse_typer();
-> +
-> +	assert(!its_baser_lookup(GITS_BASER_TYPE_DEVICE, &its_data.device_baser));
-> +	assert(!its_baser_lookup(GITS_BASER_TYPE_COLLECTION, &its_data.coll_baser));
-> +
-> +	its_baser_alloc_table(&its_data.device_baser, SZ_64K);
-> +	its_baser_alloc_table(&its_data.coll_baser, SZ_64K);
+> +	gicv3_lpi_rdist_ctrl(redist, true);
+> +}
+> +void gicv3_lpi_rdist_disable(int redist)
+> +{
+> +	gicv3_lpi_rdist_ctrl(redist, false);
+> +}
+>  #endif /* __aarch64__ */
+> diff --git a/lib/arm64/asm/gic-v3-its.h b/lib/arm64/asm/gic-v3-its.h
+> index 331ba0e..1e95977 100644
+> --- a/lib/arm64/asm/gic-v3-its.h
+> +++ b/lib/arm64/asm/gic-v3-its.h
+> @@ -88,5 +88,6 @@ extern struct its_data its_data;
+>  extern void its_parse_typer(void);
+>  extern void its_init(void);
+>  extern int its_baser_lookup(int i, struct its_baser *baser);
+> +extern void its_enable_defaults(void);
+>  
+>  #endif /* _ASMARM64_GIC_V3_ITS_H_ */
+> diff --git a/lib/arm64/gic-v3-its.c b/lib/arm64/gic-v3-its.c
+> index 23b0d06..2f480ae 100644
+> --- a/lib/arm64/gic-v3-its.c
+> +++ b/lib/arm64/gic-v3-its.c
+> @@ -94,9 +94,19 @@ void its_init(void)
+>  	its_baser_alloc_table(&its_data.device_baser, SZ_64K);
+>  	its_baser_alloc_table(&its_data.coll_baser, SZ_64K);
+>  
+> -	/* Allocate LPI config and pending tables */
+> -	gicv3_lpi_alloc_tables();
+> -
+>  	its_cmd_queue_init();
+>  }
+>  
+> +/* must be called after gicv3_enable_defaults */
+> +void its_enable_defaults(void)
+> +{
+> +	int i;
 > +
 > +	/* Allocate LPI config and pending tables */
 > +	gicv3_lpi_alloc_tables();
 > +
-> +	its_cmd_queue_init();
-> +}
+> +	for (i = 0; i < nr_cpus; i++)
+> +		gicv3_lpi_rdist_enable(i);
 > +
+> +	writel(GITS_CTLR_ENABLE, its_data.base + GITS_CTLR);
+> +}
 > -- 
 > 2.20.1
->
-
-Thanks,
-drew 
+> 
 
