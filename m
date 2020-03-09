@@ -2,54 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D0D9C17E6D4
-	for <lists+kvm@lfdr.de>; Mon,  9 Mar 2020 19:20:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9263417E6D8
+	for <lists+kvm@lfdr.de>; Mon,  9 Mar 2020 19:20:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727761AbgCISUe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        id S1727771AbgCISUh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Mar 2020 14:20:37 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:45142 "EHLO
+        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727500AbgCISUe (ORCPT <rfc822;kvm@vger.kernel.org>);
         Mon, 9 Mar 2020 14:20:34 -0400
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:38661 "EHLO
-        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727752AbgCISUd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 Mar 2020 14:20:33 -0400
-Received: by mail-wm1-f68.google.com with SMTP id n2so524034wmc.3;
-        Mon, 09 Mar 2020 11:20:32 -0700 (PDT)
+Received: by mail-wr1-f66.google.com with SMTP id m9so3483809wro.12;
+        Mon, 09 Mar 2020 11:20:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=uHjQnX3gyUEuVprG/+YZpKO/PfRLqvF0oJQ7HCGTFS0=;
-        b=TbiGWwAhKVkXZDdUIAruKPooWBEa7jPJ0vXBZAvYvskkH4V6YNt34tLngLeXiGCuFK
-         5fvWMDUZF9dE7dg+tmaS03lY7BJWTC0E2qPILTG95KsuBP3Y+7p4xONMGIOPDQOBFgeq
-         a9q8xoBVua2Zs8C1YIXcIbmJXtcLWSn4Mx3t1E4tY9k8fVhk6BnHmU+UxWLyg7Rk4VWD
-         ZZB8NftRsfxkZPoZRW1vcXlbmhzncXTg3AUkhbYzOEb2ZSCqvq5yPelKlHJkJgDLBs/B
-         g2x9+K2QSSM6rrAofRKLukyEiVLoZJWaCdIR2CsF4E5jqxBGGe1kC+cSDslNgjK8KkPw
-         Ts8A==
+        bh=ZuvV9ToDUH9Z7nRm33O7cyqYk/jzexuummxj9jXv5cY=;
+        b=m8Jok7sCQNWnwYNHKCfaVNpFBSYjbnw+4AXeXL6HRDg5w50lIMUOQXmdyRjOlCBjva
+         bWeEaeYa9bVR+z49/0syHHQdJAI6npbwKpKtmWoBEfaCVn+MIprqyVwzMFRzdHTcj2v4
+         4ekXOKViqSd79b55C1w76nxRsTalCb+Bz3E+/8OI7XtV3Y+vUNYAONlSTDpZzfCNgp5X
+         7e5H7Y5M8OmJRO/GmQ1Hi408DvYGOrm90uWNn15R7eeNdpCrTSPkSyZkrIJt75r/sIP2
+         e4YpxVix1tApIlm62wyxcSFJ5SPN+PE74o5SMcd/DI3scNj2c9V3l+ParZc2H69ffVNr
+         F4LA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=uHjQnX3gyUEuVprG/+YZpKO/PfRLqvF0oJQ7HCGTFS0=;
-        b=G4WviDSynFpsEQXCF9Y5TOZseaa8gEXx1/bwb+Su9703ehw6NCot88hVqRew1ioLwM
-         nNCWJ9xnT1uINtdK6A4E0lbcog7KObeIuJb4bOBwuTTrZ/KslIjeNHrKw7AF3Gw7x6Ay
-         z8i06XFhje2OtQbnzPsRSyZZnm8d4UXd2VMPTw1G327QSDY42uBnUhfTfc3VJZ8mjHXU
-         i1VitLAovPvP4vStVMJqUNgcpRKuBTtz5/O/0tR1Ofi2Row9Hh3wH3g0DYLJKVI/Hrnw
-         7LLNNQy6RETFWBazYr5qYwWYBqK3Rh1K+UnyFdqMjAfuqEchycM9n/n5FrvM9s3/Q7gn
-         xszQ==
-X-Gm-Message-State: ANhLgQ3KD9ygalF7YWCRMXwKc7fQbI2PhiEOHdVm5XzlXZDFfdECm5DN
-        H2xnnKJ+z70Eg4eD98hxwxyoHztJew8=
-X-Google-Smtp-Source: ADFU+vv3/Rc5ZrG5moXweUn8xofLMZw614O4eZMqaKc6z/1MnyT6qObBiGZityNbI/Rm2B4TBUYbXQ==
-X-Received: by 2002:a1c:4642:: with SMTP id t63mr494064wma.164.1583778031408;
-        Mon, 09 Mar 2020 11:20:31 -0700 (PDT)
+        bh=ZuvV9ToDUH9Z7nRm33O7cyqYk/jzexuummxj9jXv5cY=;
+        b=dqQj50w6VAB8m/zMxutcit+bgCOBejPHFzZOjqA3MOyjq/Lzc64tUhWH0ijM+pSwpA
+         uMkzuMnqaXpdl+8R4fzJ9CzaxOlS1pnLt9nLTnT+ph1LbpGVZsiLD88MxAtHqoFgS9X4
+         A9bGis3SBlh6hd89/RvX6C0QZJ806qG+RqsF8KijBxGO5zLZpaL4egCuO5ZkaH26CLym
+         CPwswCwdKU+jZxovxfyyvf4wptaPFwA2TCzihqK4sB8VKauXqaboiyDfYJHPmCoqY/5Z
+         /0SuaaO4amUT1YeisbMsZ9+e9LMNVEJCzwMcfTaap3wyn4iWVL8fUmNWaj62m7xIBXRL
+         d7Jg==
+X-Gm-Message-State: ANhLgQ1tkT/WLSMYGDI51LgiBPULeTOECGHQFpANwAmGuki+M2QbRxBA
+        iZNiwevo0g0IXe12cAorD+lzgDuauNM=
+X-Google-Smtp-Source: ADFU+vugc8hnbGwfCv/PXiYp5Te6OiGBnMt3bbfftT/dAvQvdpTuMo1Bd4/ssIARyE1aJ7OlbNNWhw==
+X-Received: by 2002:adf:ed91:: with SMTP id c17mr20494288wro.388.1583778032488;
+        Mon, 09 Mar 2020 11:20:32 -0700 (PDT)
 Received: from linux.local ([31.154.166.148])
-        by smtp.gmail.com with ESMTPSA id t6sm8371828wrr.49.2020.03.09.11.20.30
+        by smtp.gmail.com with ESMTPSA id t6sm8371828wrr.49.2020.03.09.11.20.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Mar 2020 11:20:30 -0700 (PDT)
+        Mon, 09 Mar 2020 11:20:32 -0700 (PDT)
 From:   Jon Doron <arilou@gmail.com>
 To:     kvm@vger.kernel.org, linux-hyperv@vger.kernel.org
 Cc:     vkuznets@redhat.com, Jon Doron <arilou@gmail.com>
-Subject: [PATCH v4 4/5] x86/kvm/hyper-v: enable hypercalls regardless of hypercall page
-Date:   Mon,  9 Mar 2020 20:20:16 +0200
-Message-Id: <20200309182017.3559534-5-arilou@gmail.com>
+Subject: [PATCH v4 5/5] x86/kvm/hyper-v: Add support for synthetic debugger via hypercalls
+Date:   Mon,  9 Mar 2020 20:20:17 +0200
+Message-Id: <20200309182017.3559534-6-arilou@gmail.com>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200309182017.3559534-1-arilou@gmail.com>
 References: <20200309182017.3559534-1-arilou@gmail.com>
@@ -60,49 +60,52 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Microsoft's kdvm.dll dbgtransport module does not respect the hypercall
-page and simply identifies the CPU being used (AMD/Intel) and according
-to it simply makes hypercalls with the relevant instruction
-(vmmcall/vmcall respectively).
+There is another mode for the synthetic debugger which uses hypercalls
+to send/recv network data instead of the MSR interface.
 
-The relevant function in kdvm is KdHvConnectHypervisor which first checks
-if the hypercall page has been enabled via HV_X64_MSR_HYPERCALL_ENABLE,
-and in case it was not it simply sets the HV_X64_MSR_GUEST_OS_ID to
-0x1000101010001 which means:
-build_number = 0x0001
-service_version = 0x01
-minor_version = 0x01
-major_version = 0x01
-os_id = 0x00 (Undefined)
-vendor_id = 1 (Microsoft)
-os_type = 0 (A value of 0 indicates a proprietary, closed source OS)
-
-and starts issuing the hypercall without setting the hypercall page.
-
-To resolve this issue simply enable hypercalls also if the guest_os_id
-is not 0.
+This interface is much slower and less recommended since you might get
+a lot of VMExits while KDVM polling for new packets to recv, rather
+than simply checking the pending page to see if there is data avialble
+and then request.
 
 Signed-off-by: Jon Doron <arilou@gmail.com>
 ---
- arch/x86/kvm/hyperv.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ arch/x86/kvm/hyperv.c | 22 ++++++++++++++++++++++
+ 1 file changed, 22 insertions(+)
 
 diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
-index b6a97abe2bc9..917b10a637fc 100644
+index 917b10a637fc..4a77ff61658b 100644
 --- a/arch/x86/kvm/hyperv.c
 +++ b/arch/x86/kvm/hyperv.c
-@@ -1639,7 +1639,10 @@ static u64 kvm_hv_send_ipi(struct kvm_vcpu *current_vcpu, u64 ingpa, u64 outgpa,
- 
- bool kvm_hv_hypercall_enabled(struct kvm *kvm)
- {
--	return READ_ONCE(kvm->arch.hyperv.hv_hypercall) & HV_X64_MSR_HYPERCALL_ENABLE;
-+	struct kvm_hv *hv = &kvm->arch.hyperv;
-+
-+	return READ_ONCE(hv->hv_hypercall) & HV_X64_MSR_HYPERCALL_ENABLE ||
-+	       READ_ONCE(hv->hv_guest_os_id) != 0;
- }
- 
- static void kvm_hv_hypercall_set_result(struct kvm_vcpu *vcpu, u64 result)
+@@ -1821,6 +1821,28 @@ int kvm_hv_hypercall(struct kvm_vcpu *vcpu)
+ 		}
+ 		ret = kvm_hv_send_ipi(vcpu, ingpa, outgpa, true, false);
+ 		break;
++	case HVCALL_POST_DEBUG_DATA:
++	case HVCALL_RETRIEVE_DEBUG_DATA:
++		if (unlikely(fast)) {
++			ret = HV_STATUS_INVALID_PARAMETER;
++			break;
++		}
++		/* fallthrough */
++	case HVCALL_RESET_DEBUG_SESSION: {
++		struct kvm_hv_syndbg *syndbg = vcpu_to_hv_syndbg(vcpu);
++		if (!(syndbg->options & HV_X64_SYNDBG_OPTION_USE_HCALLS)) {
++			ret = HV_STATUS_OPERATION_DENIED;
++			break;
++		}
++		vcpu->run->exit_reason = KVM_EXIT_HYPERV;
++		vcpu->run->hyperv.type = KVM_EXIT_HYPERV_HCALL;
++		vcpu->run->hyperv.u.hcall.input = param;
++		vcpu->run->hyperv.u.hcall.params[0] = ingpa;
++		vcpu->run->hyperv.u.hcall.params[1] = outgpa;
++		vcpu->arch.complete_userspace_io =
++				kvm_hv_hypercall_complete_userspace;
++		return 0;
++	}
+ 	default:
+ 		ret = HV_STATUS_INVALID_HYPERCALL_CODE;
+ 		break;
 -- 
 2.24.1
 
