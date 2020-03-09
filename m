@@ -2,100 +2,136 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D237217E68B
-	for <lists+kvm@lfdr.de>; Mon,  9 Mar 2020 19:14:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F182D17E69E
+	for <lists+kvm@lfdr.de>; Mon,  9 Mar 2020 19:17:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727421AbgCISOS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Mar 2020 14:14:18 -0400
-Received: from mail.kernel.org ([198.145.29.99]:58842 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726467AbgCISOS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 Mar 2020 14:14:18 -0400
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        id S1727381AbgCISRT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Mar 2020 14:17:19 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:56973 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726467AbgCISRT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 Mar 2020 14:17:19 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1583777838;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=AcKeyBIFIAYs+7QT/qIbpPBFwomeSgcpZFyE84PAy9U=;
+        b=Ek0WW09CCUDtl7Mfo18FLQ6Mg5Dprt6Itl60PoOIjso6A+hldyJPlW8TGjhYeEuSWtd4lR
+        0zkkuor94m7/lGAUGX1uNchZ6R9tIl9mF5NCoxW0GomFQ6U1OnQ0T+xMpArNuab2w/SFdt
+        WsCBshS852DspRlu7d2G+zXWNxsieJQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-348-v-Lmv5crPmyT1kNrDWhytg-1; Mon, 09 Mar 2020 14:17:14 -0400
+X-MC-Unique: v-Lmv5crPmyT1kNrDWhytg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 99C72222C3
-        for <kvm@vger.kernel.org>; Mon,  9 Mar 2020 18:14:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1583777657;
-        bh=GPOsnxPOWkitvcYLr873iWAuXAjAvRcZgDNyk1lxnSw=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=JpN6DgItReJj4bVteGdpRQHuRkryGz+QlPvJ+ob7GuABPmfHGSjjCZy1cIYhq+Ai5
-         v0XG8mBjVPqu3Hjl6uo0ho+Uy4cMuAjCdBYTAxLZjybdEMyNgzptrJ7CTEvDqQkCSp
-         Z3fv5bx2ECjIIOnCVyJCI6m5hBP+bSrROSa6TK7Q=
-Received: by mail-wm1-f50.google.com with SMTP id m3so202851wmi.0
-        for <kvm@vger.kernel.org>; Mon, 09 Mar 2020 11:14:17 -0700 (PDT)
-X-Gm-Message-State: ANhLgQ1mKdCXkABqSKobyslMhxY4f88NQStv2tSlFXaaHDPVn3zwmA6p
-        3IaXhp+gK7JuUp/pTeKgdq5/p5oSYJAupolMD+f5UQ==
-X-Google-Smtp-Source: ADFU+vu+3khw0mvyiOjN3S2PCh5Gg+ouhuqQbOo+d62XxOfUqKh9yBjB8oCXz6OL/+7A908PJLeZq8ErBSIsPMnDAQo=
-X-Received: by 2002:a7b:cd83:: with SMTP id y3mr480519wmj.176.1583777656050;
- Mon, 09 Mar 2020 11:14:16 -0700 (PDT)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C2AA1107ACC9;
+        Mon,  9 Mar 2020 18:17:12 +0000 (UTC)
+Received: from [10.36.116.59] (ovpn-116-59.ams2.redhat.com [10.36.116.59])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id B58D460C05;
+        Mon,  9 Mar 2020 18:17:10 +0000 (UTC)
+Subject: Re: [PATCH v2 2/2] KVM: arm64: Document PMU filtering API
+To:     Marc Zyngier <maz@kernel.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org
+Cc:     James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Mark Rutland <mark.rutland@arm.com>
+References: <20200309124837.19908-1-maz@kernel.org>
+ <20200309124837.19908-3-maz@kernel.org>
+From:   Auger Eric <eric.auger@redhat.com>
+Message-ID: <7943c896-013b-d9cb-ba89-2040b46437fe@redhat.com>
+Date:   Mon, 9 Mar 2020 19:17:09 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-References: <ed71d0967113a35f670a9625a058b8e6e0b2f104.1583547991.git.luto@kernel.org>
- <CALCETrVmsF9JSMLSd44-3GGWEz6siJQxudeaYiVnvv__YDT1BQ@mail.gmail.com>
- <87ftek9ngq.fsf@nanos.tec.linutronix.de> <CALCETrVsc-t=tDRPbCg5dWHDY0NFv2zjz12ahD-vnGPn8T+RXA@mail.gmail.com>
- <87a74s9ehb.fsf@nanos.tec.linutronix.de> <87wo7v8g4j.fsf@nanos.tec.linutronix.de>
- <877dzu8178.fsf@nanos.tec.linutronix.de> <37440ade-1657-648b-bf72-2b8ca4ac21ce@redhat.com>
- <871rq199oz.fsf@nanos.tec.linutronix.de>
-In-Reply-To: <871rq199oz.fsf@nanos.tec.linutronix.de>
-From:   Andy Lutomirski <luto@kernel.org>
-Date:   Mon, 9 Mar 2020 11:14:04 -0700
-X-Gmail-Original-Message-ID: <CALCETrUHwd8pNr_ZdFqY8vMjJeMdNyw2C+FL6uOUM98SEE9rNQ@mail.gmail.com>
-Message-ID: <CALCETrUHwd8pNr_ZdFqY8vMjJeMdNyw2C+FL6uOUM98SEE9rNQ@mail.gmail.com>
-Subject: Re: [PATCH v2] x86/kvm: Disable KVM_ASYNC_PF_SEND_ALWAYS
-To:     Thomas Gleixner <tglx@linutronix.de>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>, X86 ML <x86@kernel.org>,
-        kvm list <kvm@vger.kernel.org>, stable <stable@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20200309124837.19908-3-maz@kernel.org>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Mar 9, 2020 at 2:09 AM Thomas Gleixner <tglx@linutronix.de> wrote:
->
-> Paolo Bonzini <pbonzini@redhat.com> writes:
-> > On 09/03/20 07:57, Thomas Gleixner wrote:
-> >> Thomas Gleixner <tglx@linutronix.de> writes:
-> >>
-> >> guest side:
-> >>
-> >>    nmi()/mce() ...
-> >>
-> >>         stash_crs();
-> >>
-> >> +       stash_and_clear_apf_reason();
-> >>
-> >>         ....
-> >>
-> >> +       restore_apf_reason();
-> >>
-> >>      restore_cr2();
-> >>
-> >> Too obvious, isn't it?
-> >
-> > Yes, this works but Andy was not happy about adding more
-> > save-and-restore to NMIs.  If you do not want to do that, I'm okay with
-> > disabling async page fault support for now.
->
-> I'm fine with doing that save/restore dance, but I have no strong
-> opinion either.
->
-> > Storing the page fault reason in memory was not a good idea.  Better
-> > options would be to co-opt the page fault error code (e.g. store the
-> > reason in bits 31:16, mark bits 15:0 with the invalid error code
-> > RSVD=1/P=0), or to use the virtualization exception area.
->
-> Memory store is not the problem. The real problem is hijacking #PF.
->
-> If you'd have just used a separate VECTOR_ASYNC_PF then none of these
-> problems would exist at all.
->
+Hi Marc,
 
-I'm okay with the save/restore dance, I guess.  It's just yet more
-entry crud to deal with architecture nastiness, except that this
-nastiness is 100% software and isn't Intel/AMD's fault.
+On 3/9/20 1:48 PM, Marc Zyngier wrote:
+> Add a small blurb describing how the event filtering API gets used.
+> 
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  Documentation/virt/kvm/devices/vcpu.rst | 40 +++++++++++++++++++++++++
+>  1 file changed, 40 insertions(+)
+> 
+> diff --git a/Documentation/virt/kvm/devices/vcpu.rst b/Documentation/virt/kvm/devices/vcpu.rst
+> index 9963e680770a..7262c0469856 100644
+> --- a/Documentation/virt/kvm/devices/vcpu.rst
+> +++ b/Documentation/virt/kvm/devices/vcpu.rst
+> @@ -55,6 +55,46 @@ Request the initialization of the PMUv3.  If using the PMUv3 with an in-kernel
+>  virtual GIC implementation, this must be done after initializing the in-kernel
+>  irqchip.
+>  
+> +1.3 ATTRIBUTE: KVM_ARM_VCPU_PMU_V3_FILTER
+> +---------------------------------------
+> +
+> +:Parameters: in kvm_device_attr.addr the address for a PMU event filter is a
+> +             pointer to a struct kvm_pmu_event_filter
+> +
+> +:Returns:
+> +
+> +	 =======  ======================================================
+> +	 -ENODEV: PMUv3 not supported or GIC not initialized
+> +	 -ENXIO:  PMUv3 not properly configured or in-kernel irqchip not
+> +	 	  configured as required prior to calling this attribute
+> +	 -EBUSY:  PMUv3 already initialized
+maybe document -EINVAL?
+> +	 =======  ======================================================
+> +
+> +Request the installation of a PMU event filter describe as follows:
+s/describe/described
+> +
+> +struct kvm_pmu_event_filter {
+> +	__u16	base_event;
+> +	__u16	nevents;
+> +
+> +#define KVM_PMU_EVENT_ALLOW	0
+> +#define KVM_PMU_EVENT_DENY	1
+> +
+> +	__u8	action;
+> +	__u8	pad[3];
+> +};
+> +
+> +A filter range is defined as the range [@base_event, @base_event + @nevents[,
+> +together with an @action (KVM_PMU_EVENT_ALLOW or KVM_PMU_EVENT_DENY). The
+> +first registered range defines the global policy (global ALLOW if the first
+> +@action is DENY, global DENY if the first @action is ALLOW). Multiple ranges
+> +can be programmed, and must fit within the 16bit space defined by the ARMv8.1
+> +PMU architecture.
+what about before 8.1 where the range was 10 bits? Should it be tested
+in the code?
 
-At least until we get an async page fault due to apf_reason being paged out...
+nitpicking: It is not totally obvious what does happen if the user space
+sets a deny filter on a range and then an allow filter on the same
+range. it is supported but may be worth telling so? Also explain the the
+default filtering remains "allow" by default?
+> +
+> +Restrictions: Event 0 (SW_INCR) is never filtered, as it doesn't count a
+> +hardware event. Filtering event 0x1E (CHAIN) has no effect either, as it
+> +isn't strictly speaking an event. Filtering the cycle counter is possible
+> +using event 0x11 (CPU_CYCLES).
+Thanks
+
+Eric
+> +
+>  
+>  2. GROUP: KVM_ARM_VCPU_TIMER_CTRL
+>  =================================
+> 
+
