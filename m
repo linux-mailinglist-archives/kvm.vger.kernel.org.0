@@ -2,267 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id F32D717DA01
-	for <lists+kvm@lfdr.de>; Mon,  9 Mar 2020 08:47:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B068C17DA47
+	for <lists+kvm@lfdr.de>; Mon,  9 Mar 2020 09:08:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726248AbgCIHrh convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Mon, 9 Mar 2020 03:47:37 -0400
-Received: from szxga01-in.huawei.com ([45.249.212.187]:3416 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726027AbgCIHrh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 Mar 2020 03:47:37 -0400
-Received: from DGGEMM401-HUB.china.huawei.com (unknown [172.30.72.55])
-        by Forcepoint Email with ESMTP id 53883F98019EDB6AB92C;
-        Mon,  9 Mar 2020 15:46:49 +0800 (CST)
-Received: from DGGEMM526-MBX.china.huawei.com ([169.254.8.227]) by
- DGGEMM401-HUB.china.huawei.com ([10.3.20.209]) with mapi id 14.03.0439.000;
- Mon, 9 Mar 2020 15:46:48 +0800
-From:   "Zengtao (B)" <prime.zeng@hisilicon.com>
-To:     Kirti Wankhede <kwankhede@nvidia.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "cjia@nvidia.com" <cjia@nvidia.com>
-CC:     "kevin.tian@intel.com" <kevin.tian@intel.com>,
-        "ziye.yang@intel.com" <ziye.yang@intel.com>,
-        "changpeng.liu@intel.com" <changpeng.liu@intel.com>,
-        "yi.l.liu@intel.com" <yi.l.liu@intel.com>,
-        "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
-        "eskultet@redhat.com" <eskultet@redhat.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "dgilbert@redhat.com" <dgilbert@redhat.com>,
-        "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>,
-        "eauger@redhat.com" <eauger@redhat.com>,
-        "aik@ozlabs.ru" <aik@ozlabs.ru>,
-        "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
-        "felipe@nutanix.com" <felipe@nutanix.com>,
-        "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@Alibaba-inc.com>,
-        "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
-        "Ken.Xue@amd.com" <Ken.Xue@amd.com>,
-        "zhi.a.wang@intel.com" <zhi.a.wang@intel.com>,
-        "yan.y.zhao@intel.com" <yan.y.zhao@intel.com>,
-        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: RE: [PATCH v12 Kernel 0/7] KABIs to support migration for VFIO
- devices
-Thread-Topic: [PATCH v12 Kernel 0/7] KABIs to support migration for VFIO
- devices
-Thread-Index: AQHV3fN6EE9vp3iTJEm7N/h8s2q+yahAEQaA
-Date:   Mon, 9 Mar 2020 07:46:48 +0000
-Message-ID: <678F3D1BB717D949B966B68EAEB446ED3421FAFF@dggemm526-mbx.china.huawei.com>
-References: <1581104554-10704-1-git-send-email-kwankhede@nvidia.com>
-In-Reply-To: <1581104554-10704-1-git-send-email-kwankhede@nvidia.com>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.74.221.187]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+        id S1726498AbgCIIIh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Mar 2020 04:08:37 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:43549 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726217AbgCIIIg (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 9 Mar 2020 04:08:36 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1583741316;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+        bh=T8KT/+n14Cn5HelmWM4TG6Zo6L21o7FLn2E43AQONUI=;
+        b=djy4DDw0GWO/FlipTcCuReTRQdxU7CCeyznNX6plnt1Fnk2hzBgVjY0Gg7u9QOHKd/V6op
+        qCM0yiU97aSGDOJCMWfyvInwVJaWxcCD1HH9MymtbUWe59vQc4VQ0uOFroV8eDrs6LCZ6f
+        UaCVAZ64wWh/fxmffJE0CZtx4OiW2A8=
+Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
+ [209.85.222.200]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-107-0xLf21sZPNe_ca2UoHEFjw-1; Mon, 09 Mar 2020 04:08:33 -0400
+X-MC-Unique: 0xLf21sZPNe_ca2UoHEFjw-1
+Received: by mail-qk1-f200.google.com with SMTP id t186so6703189qkh.22
+        for <kvm@vger.kernel.org>; Mon, 09 Mar 2020 01:08:33 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
+         :content-disposition;
+        bh=T8KT/+n14Cn5HelmWM4TG6Zo6L21o7FLn2E43AQONUI=;
+        b=r5Cfunm7j3CalAFyuIuLU8G9p3diuRqMPqWKdTOC43+6hUomxQrQK5vY9MevQrt/M1
+         JYNPGubKw8GzIDWr6m0AeIY7votWKimRyuD0tvvMWvAx7ttRMBlkwhQXtqa0ATIR8aPR
+         1r1a2AVgZ1p0f+Eelvq3EVjewy58L7UYiqovctKq4GpPSZ3ZrcEM899b+x2RbZ26cJaF
+         lamlXI0Ker4bCLMoXSyVsMyaniT67LudeFNNcsvTAYrHptmUaTAyUYSh1jvoJO0SMbt7
+         MZB9dwIYFkc2bnGzDjx8TqyAuZ5a0jfOFlp1GHy5nU3ke3PuvvjmbYTgIlsNeqgzn+9C
+         07bA==
+X-Gm-Message-State: ANhLgQ2NJd8H1hAephK0x1oCo57DKyd7lwHVmUGyykVz/II1E4ceDdfJ
+        oiP25JTwNoIcXKFBM6HyY2YHNeKeyoLNJFlEqXzkbBS0nDLDgE+ixY09lO0/IVIclUuZKm8aWH9
+        CEoQaBTZDnToy
+X-Received: by 2002:a0c:c244:: with SMTP id w4mr13815581qvh.104.1583741311604;
+        Mon, 09 Mar 2020 01:08:31 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vsDCYFx3tgEt/18zqy2Hj0onYaUrEMtYoBKu3yJ+l1tw+IzBr80xlV0fKvKv/QcwEaRhnxGPw==
+X-Received: by 2002:a0c:c244:: with SMTP id w4mr13815565qvh.104.1583741311386;
+        Mon, 09 Mar 2020 01:08:31 -0700 (PDT)
+Received: from redhat.com (bzq-79-178-2-19.red.bezeqint.net. [79.178.2.19])
+        by smtp.gmail.com with ESMTPSA id k11sm21885175qti.68.2020.03.09.01.08.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 09 Mar 2020 01:08:30 -0700 (PDT)
+Date:   Mon, 9 Mar 2020 04:08:25 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        axboe@kernel.dk, jasowang@redhat.com, mst@redhat.com,
+        natechancellor@gmail.com, pasic@linux.ibm.com, s-anna@ti.com
+Subject: [GIT PULL] virtio: fixes
+Message-ID: <20200309040825-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Mutt-Fcc: =sent
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Kirti:
+The following changes since commit 98d54f81e36ba3bf92172791eba5ca5bd813989b:
 
-What kind of platform/IO are you using now to do the basic code
-verification?
+  Linux 5.6-rc4 (2020-03-01 16:38:46 -0600)
 
-I just want to check if I can verify it on my platform, and if any open
-IO cards available? 
+are available in the Git repository at:
 
-Thanks.
+  https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
 
-Regards
-Zengtao 
+for you to fetch changes up to 6ae4edab2fbf86ec92fbf0a8f0c60b857d90d50f:
 
-> -----Original Message-----
-> From: kvm-owner@vger.kernel.org [mailto:kvm-owner@vger.kernel.org]
-> On Behalf Of Kirti Wankhede
-> Sent: Saturday, February 08, 2020 3:42 AM
-> To: alex.williamson@redhat.com; cjia@nvidia.com
-> Cc: kevin.tian@intel.com; ziye.yang@intel.com;
-> changpeng.liu@intel.com; yi.l.liu@intel.com; mlevitsk@redhat.com;
-> eskultet@redhat.com; cohuck@redhat.com; dgilbert@redhat.com;
-> jonathan.davies@nutanix.com; eauger@redhat.com; aik@ozlabs.ru;
-> pasic@linux.ibm.com; felipe@nutanix.com;
-> Zhengxiao.zx@Alibaba-inc.com; shuangtai.tst@alibaba-inc.com;
-> Ken.Xue@amd.com; zhi.a.wang@intel.com; yan.y.zhao@intel.com;
-> qemu-devel@nongnu.org; kvm@vger.kernel.org; Kirti Wankhede
-> Subject: [PATCH v12 Kernel 0/7] KABIs to support migration for VFIO
-> devices
-> 
-> Hi,
-> 
-> This patch set adds:
-> * New IOCTL VFIO_IOMMU_DIRTY_PAGES to get dirty pages bitmap with
->   respect to IOMMU container rather than per device. All pages pinned
-> by
->   vendor driver through vfio_pin_pages external API has to be marked
-> as
->   dirty during  migration. When IOMMU capable device is present in
-> the
->   container and all pages are pinned and mapped, then all pages are
-> marked
->   dirty.
->   When there are CPU writes, CPU dirty page tracking can identify
-> dirtied
->   pages, but any page pinned by vendor driver can also be written by
->   device. As of now there is no device which has hardware support for
->   dirty page tracking. So all pages which are pinned should be
-> considered
->   as dirty.
->   This ioctl is also used to start/stop dirty pages tracking for pinned and
->   unpinned pages while migration is active.
-> 
-> * Updated IOCTL VFIO_IOMMU_UNMAP_DMA to get dirty pages bitmap
-> before
->   unmapping IO virtual address range.
->   With vIOMMU, during pre-copy phase of migration, while CPUs are
-> still
->   running, IO virtual address unmap can happen while device still
-> keeping
->   reference of guest pfns. Those pages should be reported as dirty
-> before
->   unmap, so that VFIO user space application can copy content of those
->   pages from source to destination.
-> 
-> * Patch 7 is proposed change to detect if IOMMU capable device driver is
->   smart to report pages to be marked dirty by pinning pages using
->   vfio_pin_pages() API.
-> 
-> 
-> Yet TODO:
-> Since there is no device which has hardware support for system
-> memmory
-> dirty bitmap tracking, right now there is no other API from vendor driver
-> to VFIO IOMMU module to report dirty pages. In future, when such
-> hardware
-> support will be implemented, an API will be required such that vendor
-> driver could report dirty pages to VFIO module during migration phases.
-> 
-> Adding revision history from previous QEMU patch set to understand
-> KABI
-> changes done till now
-> 
-> v11 -> v12
-> - Changed bitmap allocation in vfio_iommu_type1.
-> - Remove atomicity of ref_count.
-> - Updated comments for migration device state structure about error
->   reporting.
-> - Nit picks from v11 reviews
-> 
-> v10 -> v11
-> - Fix pin pages API to free vpfn if it is marked as unpinned tracking page.
-> - Added proposal to detect if IOMMU capable device calls external pin
-> pages
->   API to mark pages dirty.
-> - Nit picks from v10 reviews
-> 
-> v9 -> v10:
-> - Updated existing VFIO_IOMMU_UNMAP_DMA ioctl to get dirty pages
-> bitmap
->   during unmap while migration is active
-> - Added flag in VFIO_IOMMU_GET_INFO to indicate driver support dirty
-> page
->   tracking.
-> - If iommu_mapped, mark all pages dirty.
-> - Added unpinned pages tracking while migration is active.
-> - Updated comments for migration device state structure with bit
->   combination table and state transition details.
-> 
-> v8 -> v9:
-> - Split patch set in 2 sets, Kernel and QEMU.
-> - Dirty pages bitmap is queried from IOMMU container rather than from
->   vendor driver for per device. Added 2 ioctls to achieve this.
-> 
-> v7 -> v8:
-> - Updated comments for KABI
-> - Added BAR address validation check during PCI device's config space
-> load
->   as suggested by Dr. David Alan Gilbert.
-> - Changed vfio_migration_set_state() to set or clear device state flags.
-> - Some nit fixes.
-> 
-> v6 -> v7:
-> - Fix build failures.
-> 
-> v5 -> v6:
-> - Fix build failure.
-> 
-> v4 -> v5:
-> - Added decriptive comment about the sequence of access of members
-> of
->   structure vfio_device_migration_info to be followed based on Alex's
->   suggestion
-> - Updated get dirty pages sequence.
-> - As per Cornelia Huck's suggestion, added callbacks to VFIODeviceOps to
->   get_object, save_config and load_config.
-> - Fixed multiple nit picks.
-> - Tested live migration with multiple vfio device assigned to a VM.
-> 
-> v3 -> v4:
-> - Added one more bit for _RESUMING flag to be set explicitly.
-> - data_offset field is read-only for user space application.
-> - data_size is read for every iteration before reading data from
-> migration,
->   that is removed assumption that data will be till end of migration
->   region.
-> - If vendor driver supports mappable sparsed region, map those region
->   during setup state of save/load, similarly unmap those from cleanup
->   routines.
-> - Handles race condition that causes data corruption in migration region
->   during save device state by adding mutex and serialiaing save_buffer
-> and
->   get_dirty_pages routines.
-> - Skip called get_dirty_pages routine for mapped MMIO region of device.
-> - Added trace events.
-> - Split into multiple functional patches.
-> 
-> v2 -> v3:
-> - Removed enum of VFIO device states. Defined VFIO device state with 2
->   bits.
-> - Re-structured vfio_device_migration_info to keep it minimal and
-> defined
->   action on read and write access on its members.
-> 
-> v1 -> v2:
-> - Defined MIGRATION region type and sub-type which should be used
-> with
->   region type capability.
-> - Re-structured vfio_device_migration_info. This structure will be placed
->   at 0th offset of migration region.
-> - Replaced ioctl with read/write for trapped part of migration region.
-> - Added both type of access support, trapped or mmapped, for data
-> section
->   of the region.
-> - Moved PCI device functions to pci file.
-> - Added iteration to get dirty page bitmap until bitmap for all requested
->   pages are copied.
-> 
-> Thanks,
-> Kirti
-> 
-> 
-> Kirti Wankhede (7):
->   vfio: KABI for migration interface for device state
->   vfio iommu: Remove atomicity of ref_count of pinned pages
->   vfio iommu: Add ioctl definition for dirty pages tracking.
->   vfio iommu: Implementation of ioctl to for dirty pages tracking.
->   vfio iommu: Update UNMAP_DMA ioctl to get dirty bitmap before
-> unmap
->   vfio iommu: Adds flag to indicate dirty pages tracking capability
->     support
->   vfio: Selective dirty page tracking if IOMMU backed device pins pages
-> 
->  drivers/vfio/vfio.c             |  13 +-
->  drivers/vfio/vfio_iommu_type1.c | 435
-> +++++++++++++++++++++++++++++++++++++---
->  include/linux/vfio.h            |   4 +-
->  include/uapi/linux/vfio.h       | 267 +++++++++++++++++++++++-
->  4 files changed, 692 insertions(+), 27 deletions(-)
-> 
-> --
-> 2.7.0
+  virtio_balloon: Adjust label in virtballoon_probe (2020-03-08 05:35:24 -0400)
+
+----------------------------------------------------------------
+virtio: fixes
+
+Some bug fixes all over the place.
+
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+
+----------------------------------------------------------------
+Halil Pasic (2):
+      virtio-blk: fix hw_queue stopped on arbitrary error
+      virtio-blk: improve virtqueue error to BLK_STS
+
+Nathan Chancellor (1):
+      virtio_balloon: Adjust label in virtballoon_probe
+
+Suman Anna (1):
+      virtio_ring: Fix mem leak with vring_new_virtqueue()
+
+ drivers/block/virtio_blk.c      | 17 ++++++++++++-----
+ drivers/virtio/virtio_balloon.c |  2 +-
+ drivers/virtio/virtio_ring.c    |  4 ++--
+ 3 files changed, 15 insertions(+), 8 deletions(-)
 
