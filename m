@@ -2,71 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C8A5B17E802
-	for <lists+kvm@lfdr.de>; Mon,  9 Mar 2020 20:07:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6895B17E865
+	for <lists+kvm@lfdr.de>; Mon,  9 Mar 2020 20:28:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727845AbgCITFY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Mar 2020 15:05:24 -0400
-Received: from Galois.linutronix.de ([193.142.43.55]:60013 "EHLO
-        Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727613AbgCITFX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 Mar 2020 15:05:23 -0400
-Received: from p5de0bf0b.dip0.t-ipconnect.de ([93.224.191.11] helo=nanos.tec.linutronix.de)
-        by Galois.linutronix.de with esmtpsa (TLS1.2:DHE_RSA_AES_256_CBC_SHA256:256)
-        (Exim 4.80)
-        (envelope-from <tglx@linutronix.de>)
-        id 1jBNiJ-0005bg-Ev; Mon, 09 Mar 2020 20:05:19 +0100
-Received: by nanos.tec.linutronix.de (Postfix, from userid 1000)
-        id 4BE8010408A; Mon,  9 Mar 2020 20:05:18 +0100 (CET)
-From:   Thomas Gleixner <tglx@linutronix.de>
-To:     Andy Lutomirski <luto@kernel.org>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>, X86 ML <x86@kernel.org>,
-        kvm list <kvm@vger.kernel.org>, stable <stable@vger.kernel.org>
-Subject: Re: [PATCH v2] x86/kvm: Disable KVM_ASYNC_PF_SEND_ALWAYS
-In-Reply-To: <CALCETrUHwd8pNr_ZdFqY8vMjJeMdNyw2C+FL6uOUM98SEE9rNQ@mail.gmail.com>
-References: <ed71d0967113a35f670a9625a058b8e6e0b2f104.1583547991.git.luto@kernel.org> <CALCETrVmsF9JSMLSd44-3GGWEz6siJQxudeaYiVnvv__YDT1BQ@mail.gmail.com> <87ftek9ngq.fsf@nanos.tec.linutronix.de> <CALCETrVsc-t=tDRPbCg5dWHDY0NFv2zjz12ahD-vnGPn8T+RXA@mail.gmail.com> <87a74s9ehb.fsf@nanos.tec.linutronix.de> <87wo7v8g4j.fsf@nanos.tec.linutronix.de> <877dzu8178.fsf@nanos.tec.linutronix.de> <37440ade-1657-648b-bf72-2b8ca4ac21ce@redhat.com> <871rq199oz.fsf@nanos.tec.linutronix.de> <CALCETrUHwd8pNr_ZdFqY8vMjJeMdNyw2C+FL6uOUM98SEE9rNQ@mail.gmail.com>
-Date:   Mon, 09 Mar 2020 20:05:18 +0100
-Message-ID: <87d09l73ip.fsf@nanos.tec.linutronix.de>
+        id S1726156AbgCIT2i (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Mar 2020 15:28:38 -0400
+Received: from mga02.intel.com ([134.134.136.20]:1482 "EHLO mga02.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725956AbgCIT2i (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 Mar 2020 15:28:38 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 09 Mar 2020 12:28:37 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,534,1574150400"; 
+   d="scan'208";a="235693532"
+Received: from linux.intel.com ([10.54.29.200])
+  by fmsmga008.fm.intel.com with ESMTP; 09 Mar 2020 12:28:37 -0700
+Received: from [10.251.21.146] (kliang2-mobl.ccr.corp.intel.com [10.251.21.146])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by linux.intel.com (Postfix) with ESMTPS id 964265802A3;
+        Mon,  9 Mar 2020 12:28:33 -0700 (PDT)
+Subject: Re: [PATCH v1 01/11] perf/x86/core: Support KVM to assign a dedicated
+ counter for guest PEBS
+To:     Peter Zijlstra <peterz@infradead.org>
+Cc:     Luwei Kang <luwei.kang@intel.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        mingo@redhat.com, acme@kernel.org, mark.rutland@arm.com,
+        alexander.shishkin@linux.intel.com, jolsa@redhat.com,
+        namhyung@kernel.org, tglx@linutronix.de, bp@alien8.de,
+        hpa@zytor.com, pbonzini@redhat.com,
+        sean.j.christopherson@intel.com, vkuznets@redhat.com,
+        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
+        pawan.kumar.gupta@linux.intel.com, ak@linux.intel.com,
+        thomas.lendacky@amd.com, fenghua.yu@intel.com,
+        like.xu@linux.intel.com
+References: <1583431025-19802-1-git-send-email-luwei.kang@intel.com>
+ <1583431025-19802-2-git-send-email-luwei.kang@intel.com>
+ <20200306135317.GD12561@hirez.programming.kicks-ass.net>
+ <b72cb68e-1a0a-eeff-21b4-ce412e939cfd@linux.intel.com>
+ <20200309100443.GG12561@hirez.programming.kicks-ass.net>
+ <97ce1ba4-d75a-8db2-ea2f-7d334942b4e6@linux.intel.com>
+ <20200309150526.GI12561@hirez.programming.kicks-ass.net>
+From:   "Liang, Kan" <kan.liang@linux.intel.com>
+Message-ID: <45a1a575-9363-f778-b5f5-bcdf28d3e34b@linux.intel.com>
+Date:   Mon, 9 Mar 2020 15:28:31 -0400
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Linutronix-Spam-Score: -1.0
-X-Linutronix-Spam-Level: -
-X-Linutronix-Spam-Status: No , -1.0 points, 5.0 required,  ALL_TRUSTED=-1,SHORTCIRCUIT=-0.0001
+In-Reply-To: <20200309150526.GI12561@hirez.programming.kicks-ass.net>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Andy Lutomirski <luto@kernel.org> writes:
-> On Mon, Mar 9, 2020 at 2:09 AM Thomas Gleixner <tglx@linutronix.de> wrote:
->> Paolo Bonzini <pbonzini@redhat.com> writes:
->> > Yes, this works but Andy was not happy about adding more
->> > save-and-restore to NMIs.  If you do not want to do that, I'm okay with
->> > disabling async page fault support for now.
->>
->> I'm fine with doing that save/restore dance, but I have no strong
->> opinion either.
->>
->> > Storing the page fault reason in memory was not a good idea.  Better
->> > options would be to co-opt the page fault error code (e.g. store the
->> > reason in bits 31:16, mark bits 15:0 with the invalid error code
->> > RSVD=1/P=0), or to use the virtualization exception area.
->>
->> Memory store is not the problem. The real problem is hijacking #PF.
->>
->> If you'd have just used a separate VECTOR_ASYNC_PF then none of these
->> problems would exist at all.
->>
->
-> I'm okay with the save/restore dance, I guess.  It's just yet more
-> entry crud to deal with architecture nastiness, except that this
-> nastiness is 100% software and isn't Intel/AMD's fault.
 
-And we can do it in C and don't have to fiddle with it in the ASM
-maze.
+
+On 3/9/2020 11:05 AM, Peter Zijlstra wrote:
+>> In the new proposal, KVM user is treated the same as other host events with
+>> event constraint. The scheduler is free to choose whether or not to assign a
+>> counter for it.
+> That's what it does, I understand that. I'm saying that that is creating
+> artificial contention.
+> 
+> 
+> Why is this needed anyway? Can't we force the guest to flush and then
+> move it over to a new counter?
+
+KVM only traps the MSR access. There is no MSR access during the 
+scheduling in guest.
+KVM/host only knows the request counter, when guest tries to enable the 
+counter. It's too late for guest to start over.
+
+Regarding to the artificial contention, as my understanding, it should 
+rarely happen in practical.
+Cloud vendors have to explicitly set pebs option in qemu to enable PEBS 
+support for guest. They knows the environment well. They can avoid the 
+contention. (We may implement some patches for qemu/KVM later to 
+temporarily disable PEBS in runtime if they require.)
+
+For now, I think we may print a warning when both host and guest require 
+the same counter. Host can get a clue from the warning.
 
 Thanks,
-
-        tglx
+Kan
