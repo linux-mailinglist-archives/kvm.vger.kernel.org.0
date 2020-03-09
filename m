@@ -2,116 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2496617E682
-	for <lists+kvm@lfdr.de>; Mon,  9 Mar 2020 19:11:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D237217E68B
+	for <lists+kvm@lfdr.de>; Mon,  9 Mar 2020 19:14:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726676AbgCISL3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Mar 2020 14:11:29 -0400
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:35619 "EHLO
-        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726169AbgCISL3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 Mar 2020 14:11:29 -0400
-Received: by mail-wr1-f66.google.com with SMTP id r7so12481194wro.2;
-        Mon, 09 Mar 2020 11:11:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=zNpV6O5ivA3Si8ar1S1KuJt1ygXwnM2oG0rkigXm7x4=;
-        b=JBRI00/uh/ses/SeUVzY3vSX8ROznzWZP4qPKV7MZj4CQI49MPIFIdWxymhBZNf25G
-         U5ABL2tqMu5q6D4+VRuzsw3xJ3Zk78Hz32N4PO4mq8QicxYRnKldVHd4Bv2EWtuHElIm
-         D4zJLQfi6Z0pr1ZUm3ATRftoOKcTGy05fA4GjXtkGq86+VLjW195R8zrexLTKdDm2LzU
-         V0hb40PTXmizWfvwIbPlfbQyR9t1g83B8fSATcvUJ1Pw4A5ipW77owKqGYQqnBb+BX8r
-         pnv8tqwqMU3Enn71hitKJBfh/4W/pRuQlJCyiqNKMURDn7HSQk2JIIhjA9sPkW2cwt7o
-         nlMA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=zNpV6O5ivA3Si8ar1S1KuJt1ygXwnM2oG0rkigXm7x4=;
-        b=K4MHLUQOyFj/mVN/SszBwnY34SLs2lDn1pbfyBS4fmJwFPV4URtXePsQJO6SY66gX9
-         QIykdbhRygv554fOM6EX+6Xql9HTMwP7Qpw5rXs3WyKIwLE+9+MKHGX9/M6K0ehhBUAx
-         J/vIXpSszhHjZhUxvu0s7V+bil9qo3Yd9Vt5DZqFkySudLGhxaw5kIgpC1L1YkOkWo20
-         zbyGPH0DPLR6v8WYU73IFz3DE2yzDEFC7C7Ebu0mpNgLn7sfv60ZYjWiD7RU1jeAuWx+
-         inUX2sxVX4nNm+tYFa0YtuUdUtJ4bXWaTNm/hxF361iJqgpbUpE4MtRGoHsPMW0XaJF0
-         qVxQ==
-X-Gm-Message-State: ANhLgQ0OFBv7Jfl04VNmOQQwk42xRzIgWzvwxnYEpOww6LkIiPpC5Hsb
-        UnSeXwoY5YWsmeUDWLvHbT0=
-X-Google-Smtp-Source: ADFU+vscDulKO189yzGeCSJUrEBXThXgggVympv7I+OCNkEg2OD5wmtVBdAaUuoyClA2Y7GV3auAZA==
-X-Received: by 2002:adf:c40e:: with SMTP id v14mr4488963wrf.408.1583777487640;
-        Mon, 09 Mar 2020 11:11:27 -0700 (PDT)
-Received: from jondnuc (IGLD-84-229-155-229.inter.net.il. [84.229.155.229])
-        by smtp.gmail.com with ESMTPSA id k2sm31501062wrn.57.2020.03.09.11.11.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Mar 2020 11:11:26 -0700 (PDT)
-Date:   Mon, 9 Mar 2020 20:11:25 +0200
-From:   Jon Doron <arilou@gmail.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-hyperv@vger.kernel.org
-Subject: Re: [PATCH v3 1/5] x86/kvm/hyper-v: Explicitly align hcall param for
- kvm_hyperv_exit
-Message-ID: <20200309181125.GA3755153@jondnuc>
-References: <20200306163909.1020369-1-arilou@gmail.com>
- <20200306163909.1020369-2-arilou@gmail.com>
- <87k13tcxrm.fsf@vitty.brq.redhat.com>
+        id S1727421AbgCISOS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Mar 2020 14:14:18 -0400
+Received: from mail.kernel.org ([198.145.29.99]:58842 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726467AbgCISOS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 Mar 2020 14:14:18 -0400
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 99C72222C3
+        for <kvm@vger.kernel.org>; Mon,  9 Mar 2020 18:14:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1583777657;
+        bh=GPOsnxPOWkitvcYLr873iWAuXAjAvRcZgDNyk1lxnSw=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=JpN6DgItReJj4bVteGdpRQHuRkryGz+QlPvJ+ob7GuABPmfHGSjjCZy1cIYhq+Ai5
+         v0XG8mBjVPqu3Hjl6uo0ho+Uy4cMuAjCdBYTAxLZjybdEMyNgzptrJ7CTEvDqQkCSp
+         Z3fv5bx2ECjIIOnCVyJCI6m5hBP+bSrROSa6TK7Q=
+Received: by mail-wm1-f50.google.com with SMTP id m3so202851wmi.0
+        for <kvm@vger.kernel.org>; Mon, 09 Mar 2020 11:14:17 -0700 (PDT)
+X-Gm-Message-State: ANhLgQ1mKdCXkABqSKobyslMhxY4f88NQStv2tSlFXaaHDPVn3zwmA6p
+        3IaXhp+gK7JuUp/pTeKgdq5/p5oSYJAupolMD+f5UQ==
+X-Google-Smtp-Source: ADFU+vu+3khw0mvyiOjN3S2PCh5Gg+ouhuqQbOo+d62XxOfUqKh9yBjB8oCXz6OL/+7A908PJLeZq8ErBSIsPMnDAQo=
+X-Received: by 2002:a7b:cd83:: with SMTP id y3mr480519wmj.176.1583777656050;
+ Mon, 09 Mar 2020 11:14:16 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <87k13tcxrm.fsf@vitty.brq.redhat.com>
+References: <ed71d0967113a35f670a9625a058b8e6e0b2f104.1583547991.git.luto@kernel.org>
+ <CALCETrVmsF9JSMLSd44-3GGWEz6siJQxudeaYiVnvv__YDT1BQ@mail.gmail.com>
+ <87ftek9ngq.fsf@nanos.tec.linutronix.de> <CALCETrVsc-t=tDRPbCg5dWHDY0NFv2zjz12ahD-vnGPn8T+RXA@mail.gmail.com>
+ <87a74s9ehb.fsf@nanos.tec.linutronix.de> <87wo7v8g4j.fsf@nanos.tec.linutronix.de>
+ <877dzu8178.fsf@nanos.tec.linutronix.de> <37440ade-1657-648b-bf72-2b8ca4ac21ce@redhat.com>
+ <871rq199oz.fsf@nanos.tec.linutronix.de>
+In-Reply-To: <871rq199oz.fsf@nanos.tec.linutronix.de>
+From:   Andy Lutomirski <luto@kernel.org>
+Date:   Mon, 9 Mar 2020 11:14:04 -0700
+X-Gmail-Original-Message-ID: <CALCETrUHwd8pNr_ZdFqY8vMjJeMdNyw2C+FL6uOUM98SEE9rNQ@mail.gmail.com>
+Message-ID: <CALCETrUHwd8pNr_ZdFqY8vMjJeMdNyw2C+FL6uOUM98SEE9rNQ@mail.gmail.com>
+Subject: Re: [PATCH v2] x86/kvm: Disable KVM_ASYNC_PF_SEND_ALWAYS
+To:     Thomas Gleixner <tglx@linutronix.de>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>, X86 ML <x86@kernel.org>,
+        kvm list <kvm@vger.kernel.org>, stable <stable@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 09/03/2020, Vitaly Kuznetsov wrote:
->Jon Doron <arilou@gmail.com> writes:
+On Mon, Mar 9, 2020 at 2:09 AM Thomas Gleixner <tglx@linutronix.de> wrote:
 >
->> Signed-off-by: Jon Doron <arilou@gmail.com>
->> ---
->>  include/uapi/linux/kvm.h | 1 +
->>  1 file changed, 1 insertion(+)
->>
->> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
->> index 4b95f9a31a2f..24b7c48ccc6f 100644
->> --- a/include/uapi/linux/kvm.h
->> +++ b/include/uapi/linux/kvm.h
->> @@ -197,6 +197,7 @@ struct kvm_hyperv_exit {
->>  			__u64 msg_page;
->>  		} synic;
->>  		struct {
->> +			__u32 pad;
->>  			__u64 input;
->>  			__u64 result;
->>  			__u64 params[2];
+> Paolo Bonzini <pbonzini@redhat.com> writes:
+> > On 09/03/20 07:57, Thomas Gleixner wrote:
+> >> Thomas Gleixner <tglx@linutronix.de> writes:
+> >>
+> >> guest side:
+> >>
+> >>    nmi()/mce() ...
+> >>
+> >>         stash_crs();
+> >>
+> >> +       stash_and_clear_apf_reason();
+> >>
+> >>         ....
+> >>
+> >> +       restore_apf_reason();
+> >>
+> >>      restore_cr2();
+> >>
+> >> Too obvious, isn't it?
+> >
+> > Yes, this works but Andy was not happy about adding more
+> > save-and-restore to NMIs.  If you do not want to do that, I'm okay with
+> > disabling async page fault support for now.
 >
->This doesn't seem to be correct, __u64 get aligned at 8 byte boundary so
->implicitly you now (pre-patch) have the following:
+> I'm fine with doing that save/restore dance, but I have no strong
+> opinion either.
 >
->struct kvm_hyperv_exit {
->	__u32 type;
->        __u32 pad1;
->	union {
->		struct {
->			__u32 msr;
->                        __u32 pad2;
->			__u64 control;
->			__u64 evt_page;
->			__u64 msg_page;
->		} synic;
->		struct {
->			__u64 input;
->			__u64 result;
->			__u64 params[2];
->		} hcall;
->	} u;
->};
+> > Storing the page fault reason in memory was not a good idea.  Better
+> > options would be to co-opt the page fault error code (e.g. store the
+> > reason in bits 31:16, mark bits 15:0 with the invalid error code
+> > RSVD=1/P=0), or to use the virtualization exception area.
 >
->and the suggestion is only to make it explicit. Adding something before
->'input' will actually break ABI.
+> Memory store is not the problem. The real problem is hijacking #PF.
 >
->-- 
->Vitaly
+> If you'd have just used a separate VECTOR_ASYNC_PF then none of these
+> problems would exist at all.
 >
 
-Bah sorry guys :( not sure why this too so many iterations... will fix 
-it right in next version.
+I'm okay with the save/restore dance, I guess.  It's just yet more
+entry crud to deal with architecture nastiness, except that this
+nastiness is 100% software and isn't Intel/AMD's fault.
+
+At least until we get an async page fault due to apf_reason being paged out...
