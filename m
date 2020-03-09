@@ -2,102 +2,61 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B068C17DA47
-	for <lists+kvm@lfdr.de>; Mon,  9 Mar 2020 09:08:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7CD3F17DA82
+	for <lists+kvm@lfdr.de>; Mon,  9 Mar 2020 09:18:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726498AbgCIIIh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Mar 2020 04:08:37 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:43549 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726217AbgCIIIg (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 9 Mar 2020 04:08:36 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1583741316;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-        bh=T8KT/+n14Cn5HelmWM4TG6Zo6L21o7FLn2E43AQONUI=;
-        b=djy4DDw0GWO/FlipTcCuReTRQdxU7CCeyznNX6plnt1Fnk2hzBgVjY0Gg7u9QOHKd/V6op
-        qCM0yiU97aSGDOJCMWfyvInwVJaWxcCD1HH9MymtbUWe59vQc4VQ0uOFroV8eDrs6LCZ6f
-        UaCVAZ64wWh/fxmffJE0CZtx4OiW2A8=
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
- [209.85.222.200]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-107-0xLf21sZPNe_ca2UoHEFjw-1; Mon, 09 Mar 2020 04:08:33 -0400
-X-MC-Unique: 0xLf21sZPNe_ca2UoHEFjw-1
-Received: by mail-qk1-f200.google.com with SMTP id t186so6703189qkh.22
-        for <kvm@vger.kernel.org>; Mon, 09 Mar 2020 01:08:33 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
-         :content-disposition;
-        bh=T8KT/+n14Cn5HelmWM4TG6Zo6L21o7FLn2E43AQONUI=;
-        b=r5Cfunm7j3CalAFyuIuLU8G9p3diuRqMPqWKdTOC43+6hUomxQrQK5vY9MevQrt/M1
-         JYNPGubKw8GzIDWr6m0AeIY7votWKimRyuD0tvvMWvAx7ttRMBlkwhQXtqa0ATIR8aPR
-         1r1a2AVgZ1p0f+Eelvq3EVjewy58L7UYiqovctKq4GpPSZ3ZrcEM899b+x2RbZ26cJaF
-         lamlXI0Ker4bCLMoXSyVsMyaniT67LudeFNNcsvTAYrHptmUaTAyUYSh1jvoJO0SMbt7
-         MZB9dwIYFkc2bnGzDjx8TqyAuZ5a0jfOFlp1GHy5nU3ke3PuvvjmbYTgIlsNeqgzn+9C
-         07bA==
-X-Gm-Message-State: ANhLgQ2NJd8H1hAephK0x1oCo57DKyd7lwHVmUGyykVz/II1E4ceDdfJ
-        oiP25JTwNoIcXKFBM6HyY2YHNeKeyoLNJFlEqXzkbBS0nDLDgE+ixY09lO0/IVIclUuZKm8aWH9
-        CEoQaBTZDnToy
-X-Received: by 2002:a0c:c244:: with SMTP id w4mr13815581qvh.104.1583741311604;
-        Mon, 09 Mar 2020 01:08:31 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vsDCYFx3tgEt/18zqy2Hj0onYaUrEMtYoBKu3yJ+l1tw+IzBr80xlV0fKvKv/QcwEaRhnxGPw==
-X-Received: by 2002:a0c:c244:: with SMTP id w4mr13815565qvh.104.1583741311386;
-        Mon, 09 Mar 2020 01:08:31 -0700 (PDT)
-Received: from redhat.com (bzq-79-178-2-19.red.bezeqint.net. [79.178.2.19])
-        by smtp.gmail.com with ESMTPSA id k11sm21885175qti.68.2020.03.09.01.08.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Mar 2020 01:08:30 -0700 (PDT)
-Date:   Mon, 9 Mar 2020 04:08:25 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        axboe@kernel.dk, jasowang@redhat.com, mst@redhat.com,
-        natechancellor@gmail.com, pasic@linux.ibm.com, s-anna@ti.com
-Subject: [GIT PULL] virtio: fixes
-Message-ID: <20200309040825-mutt-send-email-mst@kernel.org>
+        id S1726445AbgCIIRp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Mar 2020 04:17:45 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:52612 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725796AbgCIIRo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 Mar 2020 04:17:44 -0400
+Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.59])
+        by Forcepoint Email with ESMTP id 79827FD2151E12FE420E;
+        Mon,  9 Mar 2020 16:17:40 +0800 (CST)
+Received: from [127.0.0.1] (10.173.222.27) by DGGEMS406-HUB.china.huawei.com
+ (10.3.19.206) with Microsoft SMTP Server id 14.3.487.0; Mon, 9 Mar 2020
+ 16:17:32 +0800
+Subject: Re: [PATCH v5 00/23] irqchip/gic-v4: GICv4.1 architecture support
+To:     Marc Zyngier <maz@kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+CC:     Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
+        Jason Cooper <jason@lakedaemon.net>,
+        Robert Richter <rrichter@marvell.com>,
+        "Thomas Gleixner" <tglx@linutronix.de>,
+        Eric Auger <eric.auger@redhat.com>,
+        "James Morse" <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>
+References: <20200304203330.4967-1-maz@kernel.org>
+From:   Zenghui Yu <yuzenghui@huawei.com>
+Message-ID: <a2994971-0997-f723-4745-c6404a68e65a@huawei.com>
+Date:   Mon, 9 Mar 2020 16:17:30 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Mutt-Fcc: =sent
+In-Reply-To: <20200304203330.4967-1-maz@kernel.org>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.173.222.27]
+X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The following changes since commit 98d54f81e36ba3bf92172791eba5ca5bd813989b:
+On 2020/3/5 4:33, Marc Zyngier wrote:
+> On the other hand, public documentation is not available yet, so that's a
+> bit annoying...
 
-  Linux 5.6-rc4 (2020-03-01 16:38:46 -0600)
+The IHI0069F is now available. People can have a look at:
 
-are available in the Git repository at:
+https://developer.arm.com/docs/ihi0069/latest
 
-  https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
 
-for you to fetch changes up to 6ae4edab2fbf86ec92fbf0a8f0c60b857d90d50f:
-
-  virtio_balloon: Adjust label in virtballoon_probe (2020-03-08 05:35:24 -0400)
-
-----------------------------------------------------------------
-virtio: fixes
-
-Some bug fixes all over the place.
-
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-
-----------------------------------------------------------------
-Halil Pasic (2):
-      virtio-blk: fix hw_queue stopped on arbitrary error
-      virtio-blk: improve virtqueue error to BLK_STS
-
-Nathan Chancellor (1):
-      virtio_balloon: Adjust label in virtballoon_probe
-
-Suman Anna (1):
-      virtio_ring: Fix mem leak with vring_new_virtqueue()
-
- drivers/block/virtio_blk.c      | 17 ++++++++++++-----
- drivers/virtio/virtio_balloon.c |  2 +-
- drivers/virtio/virtio_ring.c    |  4 ++--
- 3 files changed, 15 insertions(+), 8 deletions(-)
+Thanks,
+Zenghui
 
