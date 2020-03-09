@@ -2,474 +2,314 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A9FC017E48C
-	for <lists+kvm@lfdr.de>; Mon,  9 Mar 2020 17:18:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 390A917E65D
+	for <lists+kvm@lfdr.de>; Mon,  9 Mar 2020 19:05:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727434AbgCIQS3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Mar 2020 12:18:29 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:36694 "EHLO
+        id S1727335AbgCISFi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Mar 2020 14:05:38 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:21404 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727421AbgCIQSZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 Mar 2020 12:18:25 -0400
+        with ESMTP id S1726269AbgCISFi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 Mar 2020 14:05:38 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1583770704;
+        s=mimecast20190719; t=1583777137;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=EZXRmsIY6zy5lcwKEjGL+Mve8eK4dIX3HbT9ljSN3RI=;
-        b=dNm/QBUxx/dmflgeNhU+i+rx0FDeWQGa2QN8SrHedmOW1NRsbH+04m5kImuCF9NI/s1GgA
-        LNdTP1MIOvbDAVd8iT1TtNcvFFIrkapzs3pLy8rXSoFsw7bI6l4LP+PaaDZyjj+TtU7LKH
-        5FgXWrUgO+AOBwJYMpbcRg4gy2sccJU=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-251-IQTiLceJPo-7R3gmhPQepw-1; Mon, 09 Mar 2020 12:18:20 -0400
-X-MC-Unique: IQTiLceJPo-7R3gmhPQepw-1
-Received: by mail-wm1-f71.google.com with SMTP id 20so42346wmk.1
-        for <kvm@vger.kernel.org>; Mon, 09 Mar 2020 09:18:20 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=EZXRmsIY6zy5lcwKEjGL+Mve8eK4dIX3HbT9ljSN3RI=;
-        b=T+MDkgoYd0ONTgwdVBC/aA6kC1yAE0ZJANmYF21q2fznSqrhRW+A5GHsTCGrCP+yNM
-         8AuHmHSz2KWQKo5DFSwhkWVamWI77714To5YMnRG15IAP7wau8TZDGEI/uNxpMd4aVFg
-         5BO/34rKOTfK2f1c2MQAKpGCkSJrXEIiwsn5aTC8MDYRHPo7sRMF6W1mFQl4a/7+gWYX
-         SGV4rsRXAWKm9HMybewYMqyLy5uM+9om4rqAav+JRdWQtkk/n15U3MMxgegGK8cu06C0
-         VQh0N+RkgLYejbQ/bErazabrnDd1QLgGgCEOvR7NGZqgvoicGMAlhqAFM5O/3ZTsx8UN
-         s8mA==
-X-Gm-Message-State: ANhLgQ3JCMeu8zdykC1eFzm/2z9p3FTI++lVXRKH7hCcEou6JKgrZq+O
-        c4zjRfE2YmRBb8hb1yu/Ey1L4GT6vrQhmO0DSmxJeMRCbus+zpVo24/4YTXBkp17fKRUSuK83sZ
-        3DOToEUIdzflk
-X-Received: by 2002:adf:82ee:: with SMTP id 101mr21513311wrc.7.1583770699311;
-        Mon, 09 Mar 2020 09:18:19 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vusbRqs5D8eRBPXnPHiktvp0ON5M+BqnhvSi3T4SDVDwzdIoRSwyStTGaRG1JXsCiyDdfKQPw==
-X-Received: by 2002:adf:82ee:: with SMTP id 101mr21513284wrc.7.1583770698927;
-        Mon, 09 Mar 2020 09:18:18 -0700 (PDT)
-Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id f8sm70097wmf.20.2020.03.09.09.18.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Mar 2020 09:18:18 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Jon Doron <arilou@gmail.com>, kvm@vger.kernel.org,
-        linux-hyperv@vger.kernel.org
-Cc:     Jon Doron <arilou@gmail.com>
-Subject: Re: [PATCH v3 3/5] x86/kvm/hyper-v: Add support for synthetic debugger capability
-In-Reply-To: <20200306163909.1020369-4-arilou@gmail.com>
-References: <20200306163909.1020369-1-arilou@gmail.com> <20200306163909.1020369-4-arilou@gmail.com>
-Date:   Mon, 09 Mar 2020 17:18:17 +0100
-Message-ID: <87h7yxcxiu.fsf@vitty.brq.redhat.com>
+        bh=kP7sVkwOS3ofanVWmMfztmyQ1DBwa2+YN9KmONlqah4=;
+        b=RIQ+Ht3lC3Vf+2cRwuNnAGott19d0ZTIYELDziRV2BYU3G4jKCKqWs2rJ6Bv3wZsvNe4cW
+        xpOhK5/ESM7HgTRcCk/MifUOReGz8JwxLVOL7uynjK0QHr2n+yaaugi4HgmyBt40sqAVr1
+        MvRzSn1VJChd0G50V80F9mAV1prK1Dg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-345-knvtoQyNOd2zsv6aQW4REw-1; Mon, 09 Mar 2020 14:05:30 -0400
+X-MC-Unique: knvtoQyNOd2zsv6aQW4REw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D783E477;
+        Mon,  9 Mar 2020 18:05:28 +0000 (UTC)
+Received: from [10.36.116.59] (ovpn-116-59.ams2.redhat.com [10.36.116.59])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 86EC55D9C5;
+        Mon,  9 Mar 2020 18:05:26 +0000 (UTC)
+Subject: Re: [PATCH v2 1/2] KVM: arm64: Add PMU event filtering infrastructure
+To:     Marc Zyngier <maz@kernel.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org
+Cc:     James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Mark Rutland <mark.rutland@arm.com>
+References: <20200309124837.19908-1-maz@kernel.org>
+ <20200309124837.19908-2-maz@kernel.org>
+From:   Auger Eric <eric.auger@redhat.com>
+Message-ID: <70e712fc-6789-2384-c21c-d932b5e1a32f@redhat.com>
+Date:   Mon, 9 Mar 2020 19:05:24 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <20200309124837.19908-2-maz@kernel.org>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Jon Doron <arilou@gmail.com> writes:
+Hi Marc,
 
-> Add support for Hyper-V synthetic debugger (syndbg) interface.
-> The syndbg interface is using MSRs to emulate a way to send/recv packets
-> data.
->
-> The debug transport dll (kdvm/kdnet) will identify if Hyper-V is enabled
-> and if it supports the synthetic debugger interface it will attempt to
-> use it, instead of trying to initialize a network adapter.
->
-> Signed-off-by: Jon Doron <arilou@gmail.com>
+On 3/9/20 1:48 PM, Marc Zyngier wrote:
+> It can be desirable to expose a PMU to a guest, and yet not want the
+> guest to be able to count some of the implemented events (because this
+> would give information on shared resources, for example.
+> 
+> For this, let's extend the PMUv3 device API, and offer a way to setup a
+> bitmap of the allowed events (the default being no bitmap, and thus no
+> filtering).
+> 
+> Userspace can thus allow/deny ranges of event. The default policy
+> depends on the "polarity" of the first filter setup (default deny if the
+> filter allows events, and default allow if the filter denies events).
+> This allows to setup exactly what is allowed for a given guest.
+> 
+> Note that although the ioctl is per-vcpu, the map of allowed events is
+> global to the VM (it can be setup from any vcpu until the vcpu PMU is
+> initialized).
+> 
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
 > ---
->  arch/x86/include/asm/kvm_host.h |  13 ++++
->  arch/x86/kvm/hyperv.c           | 134 +++++++++++++++++++++++++++++++-
->  arch/x86/kvm/hyperv.h           |   5 ++
->  arch/x86/kvm/trace.h            |  48 ++++++++++++
->  arch/x86/kvm/x86.c              |   9 +++
->  include/uapi/linux/kvm.h        |  10 +++
->  6 files changed, 218 insertions(+), 1 deletion(-)
->
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 98959e8cd448..f8e58e8866bb 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -854,6 +854,18 @@ struct kvm_apic_map {
->  	struct kvm_lapic *phys_map[];
+>  arch/arm64/include/asm/kvm_host.h |  6 +++
+>  arch/arm64/include/uapi/asm/kvm.h | 16 ++++++
+>  virt/kvm/arm/arm.c                |  2 +
+>  virt/kvm/arm/pmu.c                | 84 +++++++++++++++++++++++++------
+>  4 files changed, 92 insertions(+), 16 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 57fd46acd058..8e63c618688d 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -91,6 +91,12 @@ struct kvm_arch {
+>  	 * supported.
+>  	 */
+>  	bool return_nisv_io_abort_to_user;
+> +
+> +	/*
+> +	 * VM-wide PMU filter, implemented as a bitmap and big enough
+> +	 * for up to 65536 events
+> +	 */
+> +	unsigned long *pmu_filter;
 >  };
 >  
-> +/* Hyper-V synthetic debugger (SynDbg)*/
-> +struct kvm_hv_syndbg {
-> +	struct {
-> +		u64 control;
-> +		u64 status;
-> +		u64 send_page;
-> +		u64 recv_page;
-> +		u64 pending_page;
-> +	} control;
-> +	u64 options;
+>  #define KVM_NR_MEM_OBJS     40
+> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+> index ba85bb23f060..7b1511d6ce44 100644
+> --- a/arch/arm64/include/uapi/asm/kvm.h
+> +++ b/arch/arm64/include/uapi/asm/kvm.h
+> @@ -159,6 +159,21 @@ struct kvm_sync_regs {
+>  struct kvm_arch_memory_slot {
+>  };
+>  
+> +/*
+> + * PMU filter structure. Describe a range of events with a particular
+> + * action. To be used with KVM_ARM_VCPU_PMU_V3_FILTER.
+> + */
+> +struct kvm_pmu_event_filter {
+> +	__u16	base_event;
+> +	__u16	nevents;
+> +
+> +#define KVM_PMU_EVENT_ALLOW	0
+> +#define KVM_PMU_EVENT_DENY	1
+> +
+> +	__u8	action;
+> +	__u8	pad[3];
 > +};
 > +
->  /* Hyper-V emulation context */
->  struct kvm_hv {
->  	struct mutex hv_lock;
-> @@ -877,6 +889,7 @@ struct kvm_hv {
->  	atomic_t num_mismatched_vp_indexes;
+>  /* for KVM_GET/SET_VCPU_EVENTS */
+>  struct kvm_vcpu_events {
+>  	struct {
+> @@ -329,6 +344,7 @@ struct kvm_vcpu_events {
+>  #define KVM_ARM_VCPU_PMU_V3_CTRL	0
+>  #define   KVM_ARM_VCPU_PMU_V3_IRQ	0
+>  #define   KVM_ARM_VCPU_PMU_V3_INIT	1
+> +#define   KVM_ARM_VCPU_PMU_V3_FILTER	2
+>  #define KVM_ARM_VCPU_TIMER_CTRL		1
+>  #define   KVM_ARM_VCPU_TIMER_IRQ_VTIMER		0
+>  #define   KVM_ARM_VCPU_TIMER_IRQ_PTIMER		1
+> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+> index eda7b624eab8..8d849ac88a44 100644
+> --- a/virt/kvm/arm/arm.c
+> +++ b/virt/kvm/arm/arm.c
+> @@ -164,6 +164,8 @@ void kvm_arch_destroy_vm(struct kvm *kvm)
+>  	free_percpu(kvm->arch.last_vcpu_ran);
+>  	kvm->arch.last_vcpu_ran = NULL;
 >  
->  	struct hv_partition_assist_pg *hv_pa_pg;
-> +	struct kvm_hv_syndbg hv_syndbg;
->  };
+> +	bitmap_free(kvm->arch.pmu_filter);
+> +
+>  	for (i = 0; i < KVM_MAX_VCPUS; ++i) {
+>  		if (kvm->vcpus[i]) {
+>  			kvm_vcpu_destroy(kvm->vcpus[i]);
+> diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
+> index f0d0312c0a55..9f0fd0224d5b 100644
+> --- a/virt/kvm/arm/pmu.c
+> +++ b/virt/kvm/arm/pmu.c
+> @@ -579,10 +579,19 @@ static void kvm_pmu_create_perf_event(struct kvm_vcpu *vcpu, u64 select_idx)
 >  
->  enum kvm_irqchip_mode {
-> diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
-> index a86fda7a1d03..554e78f961bc 100644
-> --- a/arch/x86/kvm/hyperv.c
-> +++ b/arch/x86/kvm/hyperv.c
-> @@ -266,6 +266,106 @@ static int synic_set_msr(struct kvm_vcpu_hv_synic *synic,
->  	return ret;
->  }
+>  	kvm_pmu_stop_counter(vcpu, pmc);
+>  	eventsel = data & ARMV8_PMU_EVTYPE_EVENT;
+> +	if (pmc->idx == ARMV8_PMU_CYCLE_IDX)
+> +		eventsel = ARMV8_PMUV3_PERFCTR_CPU_CYCLES;
+nit:
+	if (pmc->idx == ARMV8_PMU_CYCLE_IDX)
+		eventsel = ARMV8_PMUV3_PERFCTR_CPU_CYCLES;
+	else
+		eventsel = data & ARMV8_PMU_EVTYPE_EVENT;
+
 >  
-> +static int kvm_hv_syndbg_complete_userspace(struct kvm_vcpu *vcpu)
-> +{
-> +	struct kvm *kvm = vcpu->kvm;
-> +	struct kvm_hv *hv = &kvm->arch.hyperv;
+>  	/* Software increment event does't need to be backed by a perf event */
+nit: while wer are at it fix the does't typo
+> -	if (eventsel == ARMV8_PMUV3_PERFCTR_SW_INCR &&
+> -	    pmc->idx != ARMV8_PMU_CYCLE_IDX)
+> +	if (eventsel == ARMV8_PMUV3_PERFCTR_SW_INCR)
+> +		return;
 > +
-> +	if (vcpu->run->hyperv.u.syndbg.msr == HV_X64_MSR_SYNDBG_CONTROL)
-> +		hv->hv_syndbg.control.status =
-> +			vcpu->run->hyperv.u.syndbg.status;
-> +	return 1;
-> +}
-> +
-> +static void syndbg_exit(struct kvm_vcpu *vcpu, u32 msr)
-> +{
-> +	struct kvm_hv_syndbg *syndbg = vcpu_to_hv_syndbg(vcpu);
-> +	struct kvm_vcpu_hv *hv_vcpu = &vcpu->arch.hyperv;
-> +
-> +	hv_vcpu->exit.type = KVM_EXIT_HYPERV_SYNDBG;
-> +	hv_vcpu->exit.u.syndbg.msr = msr;
-> +	hv_vcpu->exit.u.syndbg.control = syndbg->control.control;
-> +	hv_vcpu->exit.u.syndbg.send_page = syndbg->control.send_page;
-> +	hv_vcpu->exit.u.syndbg.recv_page = syndbg->control.recv_page;
-> +	hv_vcpu->exit.u.syndbg.pending_page = syndbg->control.pending_page;
-> +	vcpu->arch.complete_userspace_io =
-> +			kvm_hv_syndbg_complete_userspace;
-> +
-> +	kvm_make_request(KVM_REQ_HV_EXIT, vcpu);
-> +}
-> +
-> +static int syndbg_set_msr(struct kvm_vcpu *vcpu, u32 msr, u64 data)
-> +{
-> +	struct kvm_hv_syndbg *syndbg = vcpu_to_hv_syndbg(vcpu);
-> +	int ret;
-> +
-> +	trace_kvm_hv_syndbg_set_msr(vcpu->vcpu_id,
-> +				    vcpu_to_hv_vcpu(vcpu)->vp_index, msr, data);
-> +	ret = 0;
-> +	switch (msr) {
-> +	case HV_X64_MSR_SYNDBG_CONTROL:
-> +		syndbg->control.control = data;
-> +		syndbg_exit(vcpu, msr);
-> +		break;
-> +	case HV_X64_MSR_SYNDBG_STATUS:
-> +		syndbg->control.status = data;
-> +		break;
-> +	case HV_X64_MSR_SYNDBG_SEND_BUFFER:
-> +		syndbg->control.send_page = data;
-> +		break;
-> +	case HV_X64_MSR_SYNDBG_RECV_BUFFER:
-> +		syndbg->control.recv_page = data;
-> +		break;
-> +	case HV_X64_MSR_SYNDBG_PENDING_BUFFER:
-> +		syndbg->control.pending_page = data;
-> +		syndbg_exit(vcpu, msr);
-> +		break;
-> +	case HV_X64_MSR_SYNDBG_OPTIONS:
-> +		syndbg->options = data;
-> +		break;
-> +	default:
-> +		ret = 1;
-> +		break;
-> +	}
-> +
-> +	return ret;
-> +}
-> +
-> +static int syndbg_get_msr(struct kvm_vcpu *vcpu, u32 msr, u64 *pdata)
-> +{
-> +	struct kvm_hv_syndbg *syndbg = vcpu_to_hv_syndbg(vcpu);
-> +	int ret;
-> +
-> +	trace_kvm_hv_syndbg_get_msr(vcpu->vcpu_id,
-> +				    vcpu_to_hv_vcpu(vcpu)->vp_index, msr);
-> +	ret = 0;
-> +	switch (msr) {
-> +	case HV_X64_MSR_SYNDBG_CONTROL:
-> +		*pdata = syndbg->control.control;
-> +		break;
-> +	case HV_X64_MSR_SYNDBG_STATUS:
-> +		*pdata = syndbg->control.status;
-> +		break;
-> +	case HV_X64_MSR_SYNDBG_SEND_BUFFER:
-> +		*pdata = syndbg->control.send_page;
-> +		break;
-> +	case HV_X64_MSR_SYNDBG_RECV_BUFFER:
-> +		*pdata = syndbg->control.recv_page;
-> +		break;
-> +	case HV_X64_MSR_SYNDBG_PENDING_BUFFER:
-> +		*pdata = syndbg->control.pending_page;
-> +		break;
-> +	case HV_X64_MSR_SYNDBG_OPTIONS:
-> +		*pdata = syndbg->options;
-> +		break;
-> +	default:
-> +		ret = 1;
-> +		break;
-> +	}
-> +
-
-Nitpick: I would've moved trace_kvm_hv_syndbg_get_msr() here so we can
-actually see the value (*pdata) which was read. kvm_hv_syndbg_get_msr()
-tracepoint will now look exactly as kvm_hv_syndbg_set_msr().
-
-
-> +	return ret;
-> +}
-> +
->  static int synic_get_msr(struct kvm_vcpu_hv_synic *synic, u32 msr, u64 *pdata,
->  			 bool host)
+> +	/*
+> +	 * If we have a filter in place and that the event isn't allowed, do
+> +	 * not install a perf event either.
+> +	 */
+> +	if (vcpu->kvm->arch.pmu_filter &&
+> +	    !test_bit(eventsel, vcpu->kvm->arch.pmu_filter))
+>  		return;
+>  
+>  	memset(&attr, 0, sizeof(struct perf_event_attr));
+> @@ -594,8 +603,7 @@ static void kvm_pmu_create_perf_event(struct kvm_vcpu *vcpu, u64 select_idx)
+>  	attr.exclude_kernel = data & ARMV8_PMU_EXCLUDE_EL1 ? 1 : 0;
+>  	attr.exclude_hv = 1; /* Don't count EL2 events */
+>  	attr.exclude_host = 1; /* Don't count host events */
+> -	attr.config = (pmc->idx == ARMV8_PMU_CYCLE_IDX) ?
+> -		ARMV8_PMUV3_PERFCTR_CPU_CYCLES : eventsel;
+> +	attr.config = eventsel;
+So in that case the guest counter will not increment but the guest does
+not know the counter is not implemented. Can't this lead to bad user
+experience. Shouldn't this disablement be reflected in PMCEID0/1 regs?
+>  
+>  	counter = kvm_pmu_get_pair_counter_value(vcpu, pmc);
+>  
+> @@ -735,15 +743,6 @@ int kvm_arm_pmu_v3_enable(struct kvm_vcpu *vcpu)
+>  
+>  static int kvm_arm_pmu_v3_init(struct kvm_vcpu *vcpu)
 >  {
-> @@ -800,6 +900,8 @@ static bool kvm_hv_msr_partition_wide(u32 msr)
->  	case HV_X64_MSR_REENLIGHTENMENT_CONTROL:
->  	case HV_X64_MSR_TSC_EMULATION_CONTROL:
->  	case HV_X64_MSR_TSC_EMULATION_STATUS:
-> +	case HV_X64_MSR_SYNDBG_OPTIONS:
-> +	case HV_X64_MSR_SYNDBG_CONTROL ... HV_X64_MSR_SYNDBG_PENDING_BUFFER:
->  		r = true;
->  		break;
->  	}
-> @@ -1061,6 +1163,9 @@ static int kvm_hv_set_msr_pw(struct kvm_vcpu *vcpu, u32 msr, u64 data,
->  		if (!host)
->  			return 1;
->  		break;
-> +	case HV_X64_MSR_SYNDBG_OPTIONS:
-> +	case HV_X64_MSR_SYNDBG_CONTROL ... HV_X64_MSR_SYNDBG_PENDING_BUFFER:
-> +		return syndbg_set_msr(vcpu, msr, data);
->  	default:
->  		vcpu_unimpl(vcpu, "Hyper-V unhandled wrmsr: 0x%x data 0x%llx\n",
->  			    msr, data);
-> @@ -1227,6 +1332,9 @@ static int kvm_hv_get_msr_pw(struct kvm_vcpu *vcpu, u32 msr, u64 *pdata)
->  	case HV_X64_MSR_TSC_EMULATION_STATUS:
->  		data = hv->hv_tsc_emulation_status;
->  		break;
-> +	case HV_X64_MSR_SYNDBG_OPTIONS:
-> +	case HV_X64_MSR_SYNDBG_CONTROL ... HV_X64_MSR_SYNDBG_PENDING_BUFFER:
-> +		return syndbg_get_msr(vcpu, msr, pdata);
->  	default:
->  		vcpu_unimpl(vcpu, "Hyper-V unhandled rdmsr: 0x%x\n", msr);
->  		return 1;
-> @@ -1797,6 +1905,9 @@ int kvm_vcpu_ioctl_get_hv_cpuid(struct kvm_vcpu *vcpu, struct kvm_cpuid2 *cpuid,
->  		{ .function = HYPERV_CPUID_ENLIGHTMENT_INFO },
->  		{ .function = HYPERV_CPUID_IMPLEMENT_LIMITS },
->  		{ .function = HYPERV_CPUID_NESTED_FEATURES },
-> +		{ .function = HYPERV_CPUID_SYNDBG_VENDOR_AND_MAX_FUNCTIONS },
-> +		{ .function = HYPERV_CPUID_SYNDBG_INTERFACE },
-> +		{ .function = HYPERV_CPUID_SYNDBG_PLATFORM_CAPABILITIES	},
->  	};
->  	int i, nent = ARRAY_SIZE(cpuid_entries);
+> -	if (!kvm_arm_support_pmu_v3())
+> -		return -ENODEV;
+> -
+> -	if (!test_bit(KVM_ARM_VCPU_PMU_V3, vcpu->arch.features))
+> -		return -ENXIO;
+> -
+> -	if (vcpu->arch.pmu.created)
+> -		return -EBUSY;
+> -
+>  	if (irqchip_in_kernel(vcpu->kvm)) {
+>  		int ret;
 >  
-> @@ -1821,7 +1932,7 @@ int kvm_vcpu_ioctl_get_hv_cpuid(struct kvm_vcpu *vcpu, struct kvm_cpuid2 *cpuid,
->  		case HYPERV_CPUID_VENDOR_AND_MAX_FUNCTIONS:
->  			memcpy(signature, "Linux KVM Hv", 12);
->  
-> -			ent->eax = HYPERV_CPUID_NESTED_FEATURES;
-> +			ent->eax = HYPERV_CPUID_SYNDBG_PLATFORM_CAPABILITIES;
->  			ent->ebx = signature[0];
->  			ent->ecx = signature[1];
->  			ent->edx = signature[2];
-> @@ -1856,9 +1967,12 @@ int kvm_vcpu_ioctl_get_hv_cpuid(struct kvm_vcpu *vcpu, struct kvm_cpuid2 *cpuid,
->  
->  			ent->ebx |= HV_X64_POST_MESSAGES;
->  			ent->ebx |= HV_X64_SIGNAL_EVENTS;
-> +			ent->ebx |= HV_X64_DEBUGGING;
->  
->  			ent->edx |= HV_FEATURE_FREQUENCY_MSRS_AVAILABLE;
->  			ent->edx |= HV_FEATURE_GUEST_CRASH_MSR_AVAILABLE;
-> +			ent->edx |= HV_X64_GUEST_DEBUGGING_AVAILABLE;
-> +			ent->edx |= HV_FEATURE_DEBUG_MSRS_AVAILABLE;
->  
->  			/*
->  			 * Direct Synthetic timers only make sense with in-kernel
-> @@ -1903,6 +2017,24 @@ int kvm_vcpu_ioctl_get_hv_cpuid(struct kvm_vcpu *vcpu, struct kvm_cpuid2 *cpuid,
->  
->  			break;
->  
-> +		case HYPERV_CPUID_SYNDBG_VENDOR_AND_MAX_FUNCTIONS:
-> +			memcpy(signature, "Linux KVM Hv", 12);
-> +
-> +			ent->eax = 0;
-> +			ent->ebx = signature[0];
-> +			ent->ecx = signature[1];
-> +			ent->edx = signature[2];
-> +			break;
-> +
-> +		case HYPERV_CPUID_SYNDBG_INTERFACE:
-> +			memcpy(signature, "VS#1\0\0\0\0\0\0\0\0", 12);
-> +			ent->eax = signature[0];
-> +			break;
-> +
-> +		case HYPERV_CPUID_SYNDBG_PLATFORM_CAPABILITIES:
-> +			ent->eax |= HV_X64_SYNDBG_CAP_ALLOW_KERNEL_DEBUGGING;
-> +			break;
-> +
->  		default:
->  			break;
->  		}
-> diff --git a/arch/x86/kvm/hyperv.h b/arch/x86/kvm/hyperv.h
-> index 757cb578101c..6a86151fac53 100644
-> --- a/arch/x86/kvm/hyperv.h
-> +++ b/arch/x86/kvm/hyperv.h
-> @@ -46,6 +46,11 @@ static inline struct kvm_vcpu *synic_to_vcpu(struct kvm_vcpu_hv_synic *synic)
->  	return hv_vcpu_to_vcpu(container_of(synic, struct kvm_vcpu_hv, synic));
+> @@ -794,8 +793,19 @@ static bool pmu_irq_is_valid(struct kvm *kvm, int irq)
+>  	return true;
 >  }
 >  
-> +static inline struct kvm_hv_syndbg *vcpu_to_hv_syndbg(struct kvm_vcpu *vcpu)
-> +{
-> +	return &vcpu->kvm->arch.hyperv.hv_syndbg;
-> +}
+> +#define NR_EVENTS	(ARMV8_PMU_EVTYPE_EVENT + 1)
 > +
->  int kvm_hv_set_msr_common(struct kvm_vcpu *vcpu, u32 msr, u64 data, bool host);
->  int kvm_hv_get_msr_common(struct kvm_vcpu *vcpu, u32 msr, u64 *pdata, bool host);
+>  int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+>  {
+> +	if (!kvm_arm_support_pmu_v3())
+> +		return -ENODEV;
+> +
+> +	if (!test_bit(KVM_ARM_VCPU_PMU_V3, vcpu->arch.features))
+> +		return -ENODEV;
+I see you changed -ENXIO into -ENODEV. wanted?
+> +
+> +	if (vcpu->arch.pmu.created)
+> +		return -EBUSY;
+> +
+>  	switch (attr->attr) {
+>  	case KVM_ARM_VCPU_PMU_V3_IRQ: {
+>  		int __user *uaddr = (int __user *)(long)attr->addr;
+> @@ -804,9 +814,6 @@ int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+>  		if (!irqchip_in_kernel(vcpu->kvm))
+>  			return -EINVAL;
 >  
-> diff --git a/arch/x86/kvm/trace.h b/arch/x86/kvm/trace.h
-> index f194dd058470..97f4edea0e71 100644
-> --- a/arch/x86/kvm/trace.h
-> +++ b/arch/x86/kvm/trace.h
-> @@ -1515,6 +1515,54 @@ TRACE_EVENT(kvm_nested_vmenter_failed,
->  		__print_symbolic(__entry->err, VMX_VMENTER_INSTRUCTION_ERRORS))
->  );
+> -		if (!test_bit(KVM_ARM_VCPU_PMU_V3, vcpu->arch.features))
+> -			return -ENODEV;
+> -
+>  		if (get_user(irq, uaddr))
+>  			return -EFAULT;
 >  
-> +/*
-> + * Tracepoint for syndbg_set_msr.
-> + */
-> +TRACE_EVENT(kvm_hv_syndbg_set_msr,
-> +	TP_PROTO(int vcpu_id, u32 vp_index, u32 msr, u64 data),
-> +	TP_ARGS(vcpu_id, vp_index, msr, data),
+> @@ -824,6 +831,50 @@ int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+>  		vcpu->arch.pmu.irq_num = irq;
+>  		return 0;
+>  	}
+> +	case KVM_ARM_VCPU_PMU_V3_FILTER: {
+> +		struct kvm_pmu_event_filter __user *uaddr;
+> +		struct kvm_pmu_event_filter filter;
 > +
-> +	TP_STRUCT__entry(
-> +		__field(int, vcpu_id)
-> +		__field(u32, vp_index)
-> +		__field(u32, msr)
-> +		__field(u64, data)
-> +	),
+> +		uaddr = (struct kvm_pmu_event_filter __user *)(long)attr->addr;
 > +
-> +	TP_fast_assign(
-> +		__entry->vcpu_id = vcpu_id;
-> +		__entry->vp_index = vp_index;
-> +		__entry->msr = msr;
-> +		__entry->data = data;
-> +	),
+> +		if (copy_from_user(&filter, uaddr, sizeof(filter)))
+> +			return -EFAULT;
 > +
-> +	TP_printk("vcpu_id %d vp_index %u msr 0x%x data 0x%llx",
-> +		  __entry->vcpu_id, __entry->vp_index, __entry->msr,
-> +		  __entry->data)
-> +);
+> +		if (((u32)filter.base_event + filter.nevents) > NR_EVENTS ||
+isnt't it >= ?
+> +		    (filter.action != KVM_PMU_EVENT_ALLOW &&
+> +		     filter.action != KVM_PMU_EVENT_DENY))
+> +			return -EINVAL;
+-EINVAL is not documented in the API doc.
 > +
-> +/*
-> + * Tracepoint for syndbg_get_msr.
-> + */
-> +TRACE_EVENT(kvm_hv_syndbg_get_msr,
-> +	TP_PROTO(int vcpu_id, u32 vp_index, u32 msr),
-> +	TP_ARGS(vcpu_id, vp_index, msr),
+> +		mutex_lock(&vcpu->kvm->lock);
 > +
-> +	TP_STRUCT__entry(
-> +		__field(int, vcpu_id)
-> +		__field(u32, vp_index)
-> +		__field(u32, msr)
-> +	),
+> +		if (!vcpu->kvm->arch.pmu_filter) {
+> +			vcpu->kvm->arch.pmu_filter = bitmap_alloc(NR_EVENTS, GFP_KERNEL);
+> +			if (!vcpu->kvm->arch.pmu_filter) {
+> +				mutex_unlock(&vcpu->kvm->lock);
+> +				return -ENOMEM;
+> +			}
 > +
-> +	TP_fast_assign(
-> +		__entry->vcpu_id = vcpu_id;
-> +		__entry->vp_index = vp_index;
-> +		__entry->msr = msr;
-> +	),
+> +			/*
+> +			 * The default depends on the first applied filter.
+> +			 * If it allows events, the default is to deny.
+> +			 * Conversely, if the first filter denies a set of
+> +			 * events, the default is to allow.
+> +			 */
+> +			if (filter.action == KVM_PMU_EVENT_ALLOW)
+> +				bitmap_zero(vcpu->kvm->arch.pmu_filter, NR_EVENTS);
+> +			else
+> +				bitmap_fill(vcpu->kvm->arch.pmu_filter, NR_EVENTS);
+> +		}
 > +
-> +	TP_printk("vcpu_id %d vp_index %u msr 0x%x",
-> +		  __entry->vcpu_id, __entry->vp_index, __entry->msr)
-> +);
->  #endif /* _TRACE_KVM_H */
->  
->  #undef TRACE_INCLUDE_PATH
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 5de200663f51..619c24bac79e 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -1214,6 +1214,10 @@ static const u32 emulated_msrs_all[] = {
->  	HV_X64_MSR_VP_ASSIST_PAGE,
->  	HV_X64_MSR_REENLIGHTENMENT_CONTROL, HV_X64_MSR_TSC_EMULATION_CONTROL,
->  	HV_X64_MSR_TSC_EMULATION_STATUS,
-> +	HV_X64_MSR_SYNDBG_OPTIONS,
-> +	HV_X64_MSR_SYNDBG_CONTROL, HV_X64_MSR_SYNDBG_STATUS,
-> +	HV_X64_MSR_SYNDBG_SEND_BUFFER, HV_X64_MSR_SYNDBG_RECV_BUFFER,
-> +	HV_X64_MSR_SYNDBG_PENDING_BUFFER,
->  
->  	MSR_KVM_ASYNC_PF_EN, MSR_KVM_STEAL_TIME,
->  	MSR_KVM_PV_EOI_EN,
-> @@ -2906,6 +2910,8 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->  		 */
->  		break;
->  	case HV_X64_MSR_GUEST_OS_ID ... HV_X64_MSR_SINT15:
-> +	case HV_X64_MSR_SYNDBG_CONTROL ... HV_X64_MSR_SYNDBG_PENDING_BUFFER:
-> +	case HV_X64_MSR_SYNDBG_OPTIONS:
->  	case HV_X64_MSR_CRASH_P0 ... HV_X64_MSR_CRASH_P4:
->  	case HV_X64_MSR_CRASH_CTL:
->  	case HV_X64_MSR_STIMER0_CONFIG ... HV_X64_MSR_STIMER3_COUNT:
-> @@ -3151,6 +3157,8 @@ int kvm_get_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->  		msr_info->data = 0x20000000;
->  		break;
->  	case HV_X64_MSR_GUEST_OS_ID ... HV_X64_MSR_SINT15:
-> +	case HV_X64_MSR_SYNDBG_CONTROL ... HV_X64_MSR_SYNDBG_PENDING_BUFFER:
-> +	case HV_X64_MSR_SYNDBG_OPTIONS:
->  	case HV_X64_MSR_CRASH_P0 ... HV_X64_MSR_CRASH_P4:
->  	case HV_X64_MSR_CRASH_CTL:
->  	case HV_X64_MSR_STIMER0_CONFIG ... HV_X64_MSR_STIMER3_COUNT:
-> @@ -3323,6 +3331,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->  	case KVM_CAP_HYPERV_TLBFLUSH:
->  	case KVM_CAP_HYPERV_SEND_IPI:
->  	case KVM_CAP_HYPERV_CPUID:
-> +	case KVM_CAP_HYPERV_DEBUGGING:
->  	case KVM_CAP_PCI_SEGMENT:
->  	case KVM_CAP_DEBUGREGS:
->  	case KVM_CAP_X86_ROBUST_SINGLESTEP:
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index 24b7c48ccc6f..97a208728b3d 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -188,6 +188,7 @@ struct kvm_s390_cmma_log {
->  struct kvm_hyperv_exit {
->  #define KVM_EXIT_HYPERV_SYNIC          1
->  #define KVM_EXIT_HYPERV_HCALL          2
-> +#define KVM_EXIT_HYPERV_SYNDBG         3
->  	__u32 type;
->  	union {
->  		struct {
-> @@ -202,6 +203,14 @@ struct kvm_hyperv_exit {
->  			__u64 result;
->  			__u64 params[2];
->  		} hcall;
-> +		struct {
-> +			__u32 msr;
-> +			__u64 control;
-> +			__u64 status;
-> +			__u64 send_page;
-> +			__u64 recv_page;
-> +			__u64 pending_page;
-> +		} syndbg;
->  	} u;
->  };
->  
-> @@ -1011,6 +1020,7 @@ struct kvm_ppc_resize_hpt {
->  #define KVM_CAP_ARM_NISV_TO_USER 177
->  #define KVM_CAP_ARM_INJECT_EXT_DABT 178
->  #define KVM_CAP_S390_VCPU_RESETS 179
-> +#define KVM_CAP_HYPERV_DEBUGGING 180
->  
->  #ifdef KVM_CAP_IRQ_ROUTING
+> +		if (filter.action == KVM_PMU_EVENT_ALLOW)
+> +			bitmap_set(vcpu->kvm->arch.pmu_filter, filter.base_event, filter.nevents);
+> +		else
+> +			bitmap_clear(vcpu->kvm->arch.pmu_filter, filter.base_event, filter.nevents);
+> +
+> +		mutex_unlock(&vcpu->kvm->lock);
+> +
+> +		return 0;
+> +	}
+>  	case KVM_ARM_VCPU_PMU_V3_INIT:
+>  		return kvm_arm_pmu_v3_init(vcpu);
+>  	}
+> @@ -860,6 +911,7 @@ int kvm_arm_pmu_v3_has_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+>  	switch (attr->attr) {
+>  	case KVM_ARM_VCPU_PMU_V3_IRQ:
+not related to this patch but shouldn't we advertise this only with
+in-kernel irqchip?
+>  	case KVM_ARM_VCPU_PMU_V3_INIT:
+> +	case KVM_ARM_VCPU_PMU_V3_FILTER:
+>  		if (kvm_arm_support_pmu_v3() &&
+>  		    test_bit(KVM_ARM_VCPU_PMU_V3, vcpu->arch.features))
+>  			return 0;
+> 
+Thanks
 
--- 
-Vitaly
+Eric
 
