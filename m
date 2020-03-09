@@ -2,215 +2,347 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B5BA717EAAF
-	for <lists+kvm@lfdr.de>; Mon,  9 Mar 2020 22:02:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id ADEEC17EB2A
+	for <lists+kvm@lfdr.de>; Mon,  9 Mar 2020 22:29:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726617AbgCIVCB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Mar 2020 17:02:01 -0400
-Received: from mail-bn8nam12on2096.outbound.protection.outlook.com ([40.107.237.96]:42529
-        "EHLO NAM12-BN8-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726118AbgCIVCB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 Mar 2020 17:02:01 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=MPph1fw4D5RPjKP11Q/lC4invJoP69FjFn3fgHN3NCb4NRzpE+bOWOHeJiuhgzRM2fgaHJ9aLlzbm9XD7cDDStOKm0PRCrRAvn4CC8upIS9iv6BNVYeq+0c6XONt9wVSrtBNuS3bJFMMiWfkXjI7+BR82OWGKPihsDTYelS9kjGm17e/tGrwsCtOOVaLKtx1ib5gBpTBIZ7b7liQJwSL3yxhYR6p19hbX2JesHP1G24StohQtoGO3D/i4cPOpsr5W/XSygpnyFySRAhW0cpjLQplpZzkMkisgsyNyHX5/OO2+G/L1dSC4fQsjTiyO6Jm80WyH82rI/3kAh7gmETv9w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=q1+XGjzU/yWbgsvIut3YoxCNyKQAISz6+V7AlxRfpJQ=;
- b=h1FoZ4ab72ZEsXu6He9gt6wIhXZhNeSMYypBETKyNTAiVuTGWlbUmuFOYO6uHsPKuIj9fhHwW451063gav2rTlUtr63S6FK7snJc/Fws6sjPGNT5VyU1ZIwIO6fjB9VpQUKoXXdh62Ei9/MjGLaLw/I7JrtHd7nEN2KBWI6Ld4OZIbwoKmZ5ZvSLK7e/8DenkxFzmMXFaLUhSa2GaTNdsdHNMNwVfEi1KQFwFfyCDW0tr4B90SGLvGnVYkGof6FyztxLe1jbI86F+8nNYrD9SGPI1LvPLVxLykwFt3VoX7/SMCB0vmaQC/bW31vLsaRSWZ5NsFxHmeKur3nRRh0xwQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microsoft.com; dmarc=pass action=none
- header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=q1+XGjzU/yWbgsvIut3YoxCNyKQAISz6+V7AlxRfpJQ=;
- b=IDZ4wb0HINIj0SZ3GHAyXiul8aRDSkvIm4sQSUdD0KgJhU7qAn381kujsBvMbBX+MtL2/gETr4RWFR0gjL2PM8k6lIWC37P/J+cBkg1QKhwxcGtHOUPpQIjMgRl62F/UjtntmYWIww9hPPkx7nrTZOQqWPj8eaqPh2nZv9XHgoI=
-Received: from DM5PR2101MB1047.namprd21.prod.outlook.com (2603:10b6:4:9e::16)
- by DM5PR2101MB1095.namprd21.prod.outlook.com (2603:10b6:4:a2::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2814.0; Mon, 9 Mar
- 2020 21:00:22 +0000
-Received: from DM5PR2101MB1047.namprd21.prod.outlook.com
- ([fe80::1cf9:aae4:18cc:8b3d]) by DM5PR2101MB1047.namprd21.prod.outlook.com
- ([fe80::1cf9:aae4:18cc:8b3d%7]) with mapi id 15.20.2835.003; Mon, 9 Mar 2020
- 21:00:22 +0000
-From:   Michael Kelley <mikelley@microsoft.com>
-To:     Jon Doron <arilou@gmail.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>
-CC:     vkuznets <vkuznets@redhat.com>
-Subject: RE: [PATCH v4 2/5] x86/hyper-v: Add synthetic debugger definitions
-Thread-Topic: [PATCH v4 2/5] x86/hyper-v: Add synthetic debugger definitions
-Thread-Index: AQHV9j9ukyAJ0hjklE6HBDoXElbMoqhAvCqQ
-Date:   Mon, 9 Mar 2020 21:00:22 +0000
-Message-ID: <DM5PR2101MB104761F98A44ACB77DA5B414D7FE0@DM5PR2101MB1047.namprd21.prod.outlook.com>
-References: <20200309182017.3559534-1-arilou@gmail.com>
- <20200309182017.3559534-3-arilou@gmail.com>
-In-Reply-To: <20200309182017.3559534-3-arilou@gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-msip_labels: MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=True;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Owner=mikelley@ntdev.microsoft.com;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2020-03-09T21:00:20.4152392Z;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=General;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Application=Microsoft Azure
- Information Protection;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=72330bda-0cd5-47b6-8fad-70f216e647e2;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Extended_MSFT_Method=Automatic
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=mikelley@microsoft.com; 
-x-originating-ip: [24.22.167.197]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: e06f9d59-d973-4485-ccc2-08d7c46ce20c
-x-ms-traffictypediagnostic: DM5PR2101MB1095:|DM5PR2101MB1095:
-x-ld-processed: 72f988bf-86f1-41af-91ab-2d7cd011db47,ExtAddr
-x-microsoft-antispam-prvs: <DM5PR2101MB109502685F0ABFB9FF441DC1D7FE0@DM5PR2101MB1095.namprd21.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:7219;
-x-forefront-prvs: 0337AFFE9A
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(4636009)(39860400002)(396003)(366004)(376002)(136003)(346002)(189003)(199004)(10290500003)(26005)(5660300002)(4326008)(66556008)(64756008)(66476007)(66946007)(66446008)(86362001)(55016002)(9686003)(81166006)(81156014)(71200400001)(8676002)(186003)(8936002)(52536014)(76116006)(6506007)(2906002)(110136005)(316002)(478600001)(33656002)(7696005)(8990500004);DIR:OUT;SFP:1102;SCL:1;SRVR:DM5PR2101MB1095;H:DM5PR2101MB1047.namprd21.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-received-spf: None (protection.outlook.com: microsoft.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: LlHdf/w/7TJ+qnqVK17q5ZJx+M0AQ9jQtrsCoxSYGwa3UZMFareiGjqwmsUiLD9JZ5wzhMnZFkfKvW/fpJ1mbKMrWxzF2DxIbfl5FJlGh066NcPNaqh70v0ddl0d843Bxn/ERIzYkI6NncjuA1XszPicDRr1xYrcXaUe/LCLtxPrjAr/TKkuUqD0L8R3BLYVhor52yUUGuO71taB63Edrsrl8RKiOxd/20lK7dC+VX2mg+jOY/QdGCXN7FQbGRWzwDTMn6lL2etqfX4QVQdL0Ce3HBgdVoL1vulKLVuMQSHsaFWY9KG209ztZ7zbpkVD9qAGBvrVAj64fCOtm5C4ArqoutmrUwAWJ4J4d5Wxw9Sjd7ef9eATN9I0UjrIizcKsmfhKUexv8wEXPflKY/fjIBlCtk/cCNC76HZTkLN2L0BZXpsCZiT1WF61BqDXpwC
-x-ms-exchange-antispam-messagedata: AmDlBFrX0xfpUPNTOk4wHnLSn4hiBf3Jm0IM/mAKna3Owye/Ou4T4D/OatjJHjr/E3s4buFkwiHxcaQzD1wE6HWqrWmvSmOEhzZSYF7GtkCu8H22Ro15FQ1Op0HZD8cMX07e4X7FGBmyWsq0ijoRGw==
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        id S1726838AbgCIV3Y (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Mar 2020 17:29:24 -0400
+Received: from mail-lj1-f193.google.com ([209.85.208.193]:37518 "EHLO
+        mail-lj1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726266AbgCIV3X (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 Mar 2020 17:29:23 -0400
+Received: by mail-lj1-f193.google.com with SMTP id d12so11684476lji.4
+        for <kvm@vger.kernel.org>; Mon, 09 Mar 2020 14:29:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=T8M3/jbbXEQHhkWJ8fWBj3BkKaZr3EQT9pwrSQhYf0g=;
+        b=YtYemB+ouTty70S4QpIHG+myx29twDxqxnTZUJFvkofojfymPemyjqUNscIbOjQ1ud
+         HvA43i9pcGvF1SoXF6dG8+52fciUDqwcqhHZ0qyU1455qudRKPwBvrIjXeHEmQgWXJwI
+         7KYUGP18a1zI2UBYyYo4a0/DdMbiCgCZZurjom266NMXI8BreHiZZxpuF8L05uM/FEH1
+         c0oS18K3GvSpG6eOcAuyOrMpQXiYeqBx6vkCYIPHvR8MJKiHLzLOvCN4b9yXfH+0/aVo
+         dIMhU0Sjy+kgjVCHXDkr9AMC4WNtyaRzJtqDO1MLKD6zF3kzPTRCuhSqo8JbHm5KPuyk
+         Ty3g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=T8M3/jbbXEQHhkWJ8fWBj3BkKaZr3EQT9pwrSQhYf0g=;
+        b=NdiMkd1V3Ddu8ezhtOB8HsOn4pST0RrxKh2YVxyw2zYKNg70OIb/uI0DrdrQerZLRN
+         xNVkFRog0O9RdCTvO0oqjZknMfnoDMlCAlv0VbYYJuKey/Z9xKnu1ERYeWIjrwAkQeCk
+         7K4xC2r1yxMNuDIeem+/eqHiIrenqTAHbWnQCZjwXICVDx2AAdufVKkbBfYFjJYnapHh
+         jii+dJHrGiX+VlrdeW4X7KT0LAyUdRqPU+UCt+wU8C/1931NjQPPby+nBy0pjPCCSan0
+         rohcdpNuhs8pY530gFZQTqpwbDGCwfjc6QQyU0QvSlZQwOfX/o78w6mUt6NgoOwpC5A/
+         A7VA==
+X-Gm-Message-State: ANhLgQ0+1IwU0nG4r2t4rBab+3WR/L5tx/yRUnjnMJj2rT/CY79sNu0o
+        BfgSFAb4Nnjv/xitbFnIJVibWwjSSanQJiSzHf50rQ==
+X-Google-Smtp-Source: ADFU+vtug0RGpWjSmMn7rkWSctbfENbtHS5jZ40tTWcWx3iW7hWtZ7iTTQvrB3BM+Yy3IMEIEKH5EU5T8wlDC+4kcwM=
+X-Received: by 2002:a2e:b008:: with SMTP id y8mr10897462ljk.35.1583789358675;
+ Mon, 09 Mar 2020 14:29:18 -0700 (PDT)
 MIME-Version: 1.0
-X-OriginatorOrg: microsoft.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e06f9d59-d973-4485-ccc2-08d7c46ce20c
-X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Mar 2020 21:00:22.2966
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: kXnZcMe7PsXIRFvsLU85Fbr6BfqHFlx+f52awP52IFZsw0JXWI2j65dFhhuZ1sqRnsRJtgqR6sTWgmF0WwttvoGKhNTgnpZWoELNDfuvoLs=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR2101MB1095
+References: <cover.1581555616.git.ashish.kalra@amd.com> <59ca3ae4ac03c43751ce4af5119ede548bb9e8e4.1581555616.git.ashish.kalra@amd.com>
+In-Reply-To: <59ca3ae4ac03c43751ce4af5119ede548bb9e8e4.1581555616.git.ashish.kalra@amd.com>
+From:   Steve Rutherford <srutherford@google.com>
+Date:   Mon, 9 Mar 2020 14:28:42 -0700
+Message-ID: <CABayD+f1Vk1YfpkZ7XXBpw5Z_kxzg1xb3zxtQGYaF4MbEQCT3w@mail.gmail.com>
+Subject: Re: [PATCH 01/12] KVM: SVM: Add KVM_SEV SEND_START command
+To:     Ashish Kalra <Ashish.Kalra@amd.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Joerg Roedel <joro@8bytes.org>, Borislav Petkov <bp@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        David Rientjes <rientjes@google.com>, X86 ML <x86@kernel.org>,
+        KVM list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Jon Doron <arilou@gmail.com> Sent: Monday, March 9, 2020 11:20 AM
->=20
-> Hyper-V synthetic debugger has two modes, one that uses MSRs and
-> the other that use Hypercalls.
->=20
-> Add all the required definitions to both types of synthetic debugger
-> interface.
->=20
-> Signed-off-by: Jon Doron <arilou@gmail.com>
-
-I got some additional details from the Hyper-V team about the Hyper-V
-synthetic debugger functionality.  Starting with Windows 10 and Windows
-Server 2016, KDNET is built-in to the Windows OS.  So when these and later
-Windows versions are running as a guest on KVM, the synthetic debugger
-support should not be needed.  It would only be needed for older Windows
-versions (Windows 8.1, Windows Server 2012 R2, and earlier) that lack a
-built-in KDNET.  Given the age of these Windows versions, I'm wondering
-whether having KVM try to emulate Hyper-V's synthetic debugging support
-is worthwhile.  While the synthetic debugger support is still present in
-current Windows releases along with the built-in KDNET, it is a legacy feat=
-ure
-that is subject to being removed at any time in a future release.  Also, th=
-e
-debug hypercalls are only offered to the parent partition, so they are
-undocumented in the TLFS and the interfaces are subject to change at any
-time.
-
-Given the situation, I would rather not have the MSR and CPUID leaf definit=
-ions
-added to hyperv-tlfs.h.  But maybe I'm misunderstanding what you are trying
-to accomplish.  Is there a bigger picture of what the goals are for adding =
-the
-synthetic debugger support?
-
-Michael
-
+On Wed, Feb 12, 2020 at 5:15 PM Ashish Kalra <Ashish.Kalra@amd.com> wrote:
+>
+> From: Brijesh Singh <brijesh.singh@amd.com>
+>
+> The command is used to create an outgoing SEV guest encryption context.
+>
+> Cc: Thomas Gleixner <tglx@linutronix.de>
+> Cc: Ingo Molnar <mingo@redhat.com>
+> Cc: "H. Peter Anvin" <hpa@zytor.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: "Radim Kr=C4=8Dm=C3=A1=C5=99" <rkrcmar@redhat.com>
+> Cc: Joerg Roedel <joro@8bytes.org>
+> Cc: Borislav Petkov <bp@suse.de>
+> Cc: Tom Lendacky <thomas.lendacky@amd.com>
+> Cc: x86@kernel.org
+> Cc: kvm@vger.kernel.org
+> Cc: linux-kernel@vger.kernel.org
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
 > ---
->  arch/x86/include/asm/hyperv-tlfs.h | 26 ++++++++++++++++++++++++++
->  1 file changed, 26 insertions(+)
->=20
-> diff --git a/arch/x86/include/asm/hyperv-tlfs.h b/arch/x86/include/asm/hy=
-perv-tlfs.h
-> index 92abc1e42bfc..12596da95a53 100644
-> --- a/arch/x86/include/asm/hyperv-tlfs.h
-> +++ b/arch/x86/include/asm/hyperv-tlfs.h
-> @@ -33,6 +33,9 @@
->  #define HYPERV_CPUID_ENLIGHTMENT_INFO		0x40000004
->  #define HYPERV_CPUID_IMPLEMENT_LIMITS		0x40000005
->  #define HYPERV_CPUID_NESTED_FEATURES		0x4000000A
-> +#define HYPERV_CPUID_SYNDBG_VENDOR_AND_MAX_FUNCTIONS	0x40000080
-> +#define HYPERV_CPUID_SYNDBG_INTERFACE			0x40000081
-> +#define HYPERV_CPUID_SYNDBG_PLATFORM_CAPABILITIES	0x40000082
->=20
->  #define HYPERV_HYPERVISOR_PRESENT_BIT		0x80000000
->  #define HYPERV_CPUID_MIN			0x40000005
-> @@ -131,6 +134,8 @@
->  #define HV_FEATURE_FREQUENCY_MSRS_AVAILABLE		BIT(8)
->  /* Crash MSR available */
->  #define HV_FEATURE_GUEST_CRASH_MSR_AVAILABLE		BIT(10)
-> +/* Support for debug MSRs available */
-> +#define HV_FEATURE_DEBUG_MSRS_AVAILABLE			BIT(11)
->  /* stimer Direct Mode is available */
->  #define HV_STIMER_DIRECT_MODE_AVAILABLE			BIT(19)
->=20
-> @@ -194,6 +199,12 @@
->  #define HV_X64_NESTED_GUEST_MAPPING_FLUSH		BIT(18)
->  #define HV_X64_NESTED_MSR_BITMAP			BIT(19)
->=20
-> +/*
-> + * Hyper-V synthetic debugger platform capabilities
-> + * These are HYPERV_CPUID_SYNDBG_PLATFORM_CAPABILITIES.EAX bits.
-> + */
-> +#define HV_X64_SYNDBG_CAP_ALLOW_KERNEL_DEBUGGING	BIT(1)
+>  .../virt/kvm/amd-memory-encryption.rst        |  27 ++++
+>  arch/x86/kvm/svm.c                            | 125 ++++++++++++++++++
+>  include/linux/psp-sev.h                       |   8 +-
+>  include/uapi/linux/kvm.h                      |  12 ++
+>  4 files changed, 168 insertions(+), 4 deletions(-)
+>
+> diff --git a/Documentation/virt/kvm/amd-memory-encryption.rst b/Documenta=
+tion/virt/kvm/amd-memory-encryption.rst
+> index d18c97b4e140..826911f41f3b 100644
+> --- a/Documentation/virt/kvm/amd-memory-encryption.rst
+> +++ b/Documentation/virt/kvm/amd-memory-encryption.rst
+> @@ -238,6 +238,33 @@ Returns: 0 on success, -negative on error
+>                  __u32 trans_len;
+>          };
+>
+> +10. KVM_SEV_SEND_START
+> +----------------------
 > +
->  /* Hyper-V specific model specific registers (MSRs) */
->=20
->  /* MSR used to identify the guest OS. */
-> @@ -267,6 +278,17 @@
->  /* Hyper-V guest idle MSR */
->  #define HV_X64_MSR_GUEST_IDLE			0x400000F0
->=20
-> +/* Hyper-V Synthetic debug options MSR */
-> +#define HV_X64_MSR_SYNDBG_CONTROL		0x400000F1
-> +#define HV_X64_MSR_SYNDBG_STATUS		0x400000F2
-> +#define HV_X64_MSR_SYNDBG_SEND_BUFFER		0x400000F3
-> +#define HV_X64_MSR_SYNDBG_RECV_BUFFER		0x400000F4
-> +#define HV_X64_MSR_SYNDBG_PENDING_BUFFER	0x400000F5
-> +#define HV_X64_MSR_SYNDBG_OPTIONS		0x400000FF
+> +The KVM_SEV_SEND_START command can be used by the hypervisor to create a=
+n
+> +outgoing guest encryption context.
 > +
-> +/* Hyper-V HV_X64_MSR_SYNDBG_OPTIONS bits */
-> +#define HV_X64_SYNDBG_OPTION_USE_HCALLS		BIT(2)
+> +Parameters (in): struct kvm_sev_send_start
 > +
->  /* Hyper-V guest crash notification MSR's */
->  #define HV_X64_MSR_CRASH_P0			0x40000100
->  #define HV_X64_MSR_CRASH_P1			0x40000101
-> @@ -376,6 +398,9 @@ struct hv_tsc_emulation_status {
->  #define HVCALL_SEND_IPI_EX			0x0015
->  #define HVCALL_POST_MESSAGE			0x005c
->  #define HVCALL_SIGNAL_EVENT			0x005d
-> +#define HVCALL_POST_DEBUG_DATA			0x0069
-> +#define HVCALL_RETRIEVE_DEBUG_DATA		0x006a
-> +#define HVCALL_RESET_DEBUG_SESSION		0x006b
->  #define HVCALL_FLUSH_GUEST_PHYSICAL_ADDRESS_SPACE 0x00af
->  #define HVCALL_FLUSH_GUEST_PHYSICAL_ADDRESS_LIST 0x00b0
->=20
-> @@ -419,6 +444,7 @@ enum HV_GENERIC_SET_FORMAT {
->  #define HV_STATUS_INVALID_HYPERCALL_INPUT	3
->  #define HV_STATUS_INVALID_ALIGNMENT		4
->  #define HV_STATUS_INVALID_PARAMETER		5
-> +#define HV_STATUS_OPERATION_DENIED		8
->  #define HV_STATUS_INSUFFICIENT_MEMORY		11
->  #define HV_STATUS_INVALID_PORT_ID		17
->  #define HV_STATUS_INVALID_CONNECTION_ID		18
-> --
-> 2.24.1
+> +Returns: 0 on success, -negative on error
+> +
+> +::
+> +        struct kvm_sev_send_start {
+> +                __u32 policy;                 /* guest policy */
+> +
+> +                __u64 pdh_cert_uaddr;         /* platform Diffie-Hellman=
+ certificate */
+> +                __u32 pdh_cert_len;
+> +
+> +                __u64 plat_certs_uadr;        /* platform certificate ch=
+ain */
+> +                __u32 plat_certs_len;
+> +
+> +                __u64 amd_certs_uaddr;        /* AMD certificate */
+> +                __u32 amd_cert_len;
+> +
+> +                __u64 session_uaddr;          /* Guest session informati=
+on */
+> +                __u32 session_len;
+> +        };
+> +
+>  References
+>  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>
+> diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
+> index a3e32d61d60c..3a7e2cac51de 100644
+> --- a/arch/x86/kvm/svm.c
+> +++ b/arch/x86/kvm/svm.c
+> @@ -7140,6 +7140,128 @@ static int sev_launch_secret(struct kvm *kvm, str=
+uct kvm_sev_cmd *argp)
+>         return ret;
+>  }
+>
+> +/* Userspace wants to query session length. */
+> +static int
+> +__sev_send_start_query_session_length(struct kvm *kvm, struct kvm_sev_cm=
+d *argp,
+> +                                     struct kvm_sev_send_start *params)
+> +{
+> +       struct kvm_sev_info *sev =3D &to_kvm_svm(kvm)->sev_info;
+> +       struct sev_data_send_start *data;
+> +       int ret;
+> +
+> +       data =3D kzalloc(sizeof(*data), GFP_KERNEL_ACCOUNT);
+> +       if (data =3D=3D NULL)
+> +               return -ENOMEM;
+> +
+> +       data->handle =3D sev->handle;
+> +       ret =3D sev_issue_cmd(kvm, SEV_CMD_SEND_START, data, &argp->error=
+);
+> +
+> +       params->session_len =3D data->session_len;
+> +       if (copy_to_user((void __user *)(uintptr_t)argp->data, params,
+> +                               sizeof(struct kvm_sev_send_start)))
+> +               ret =3D -EFAULT;
+> +
+> +       kfree(data);
+> +       return ret;
+> +}
+> +
+> +static int sev_send_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
+> +{
+> +       struct kvm_sev_info *sev =3D &to_kvm_svm(kvm)->sev_info;
+> +       struct sev_data_send_start *data;
+> +       struct kvm_sev_send_start params;
+> +       void *amd_certs, *session_data;
+> +       void *pdh_cert, *plat_certs;
+> +       int ret;
+> +
+> +       if (!sev_guest(kvm))
+> +               return -ENOTTY;
+> +
+> +       if (copy_from_user(&params, (void __user *)(uintptr_t)argp->data,
+> +                               sizeof(struct kvm_sev_send_start)))
+> +               return -EFAULT;
+> +
+> +       /* if session_len is zero, userspace wants t query the session le=
+ngth */
 
+/t/to/
+>
+> +       if (!params.session_len)
+> +               return __sev_send_start_query_session_length(kvm, argp,
+> +                               &params);
+Document this behavior with the command.
+
+> +
+> +       /* some sanity checks */
+> +       if (!params.pdh_cert_uaddr || !params.pdh_cert_len ||
+> +           !params.session_uaddr || params.session_len > SEV_FW_BLOB_MAX=
+_SIZE)
+> +               return -EINVAL;
+> +
+> +       /* allocate the memory to hold the session data blob */
+> +       session_data =3D kmalloc(params.session_len, GFP_KERNEL_ACCOUNT);
+> +       if (!session_data)
+> +               return -ENOMEM;
+> +
+> +       /* copy the certificate blobs from userspace */
+> +       pdh_cert =3D psp_copy_user_blob(params.pdh_cert_uaddr,
+> +                               params.pdh_cert_len);
+> +       if (IS_ERR(pdh_cert)) {
+> +               ret =3D PTR_ERR(pdh_cert);
+> +               goto e_free_session;
+> +       }
+> +
+> +       plat_certs =3D psp_copy_user_blob(params.plat_certs_uaddr,
+> +                               params.plat_certs_len);
+> +       if (IS_ERR(plat_certs)) {
+> +               ret =3D PTR_ERR(plat_certs);
+> +               goto e_free_pdh;
+> +       }
+> +
+> +       amd_certs =3D psp_copy_user_blob(params.amd_certs_uaddr,
+> +                               params.amd_certs_len);
+> +       if (IS_ERR(amd_certs)) {
+> +               ret =3D PTR_ERR(amd_certs);
+> +               goto e_free_plat_cert;
+> +       }
+> +
+> +       data =3D kzalloc(sizeof(*data), GFP_KERNEL_ACCOUNT);
+> +       if (data =3D=3D NULL) {
+> +               ret =3D -ENOMEM;
+> +               goto e_free_amd_cert;
+> +       }
+> +
+> +       /* populate the FW SEND_START field with system physical address =
+*/
+> +       data->pdh_cert_address =3D __psp_pa(pdh_cert);
+> +       data->pdh_cert_len =3D params.pdh_cert_len;
+> +       data->plat_certs_address =3D __psp_pa(plat_certs);
+> +       data->plat_certs_len =3D params.plat_certs_len;
+> +       data->amd_certs_address =3D __psp_pa(amd_certs);
+> +       data->amd_certs_len =3D params.amd_certs_len;
+> +       data->session_address =3D __psp_pa(session_data);
+> +       data->session_len =3D params.session_len;
+> +       data->handle =3D sev->handle;
+> +
+> +       ret =3D sev_issue_cmd(kvm, SEV_CMD_SEND_START, data, &argp->error=
+);
+sev_issue_cmd can fail. I think you want to handle those errors here
+(e.g. it can return -ebadf or a number of others). Right now they
+could get clobbered by a later copy_to_user error.
+
+It's also worth documenting what the error argp->error is filled in
+with. I didn't see anything in the docs mentioning the status codes
+(may have missed it).
+
+> +
+> +       if (copy_to_user((void __user *)(uintptr_t) params.session_uaddr,
+> +                       session_data, params.session_len)) {
+> +               ret =3D -EFAULT;
+> +               goto e_free;
+> +       }
+> +
+> +       params.policy =3D data->policy;
+> +       params.session_len =3D data->session_len;
+> +       if (copy_to_user((void __user *)(uintptr_t)argp->data, &params,
+> +                               sizeof(struct kvm_sev_send_start)))
+> +               ret =3D -EFAULT;
+> +
+> +e_free:
+> +       kfree(data);
+> +e_free_amd_cert:
+> +       kfree(amd_certs);
+> +e_free_plat_cert:
+> +       kfree(plat_certs);
+> +e_free_pdh:
+> +       kfree(pdh_cert);
+> +e_free_session:
+> +       kfree(session_data);
+> +       return ret;
+> +}
+> +
+>  static int svm_mem_enc_op(struct kvm *kvm, void __user *argp)
+>  {
+>         struct kvm_sev_cmd sev_cmd;
+> @@ -7181,6 +7303,9 @@ static int svm_mem_enc_op(struct kvm *kvm, void __u=
+ser *argp)
+>         case KVM_SEV_LAUNCH_SECRET:
+>                 r =3D sev_launch_secret(kvm, &sev_cmd);
+>                 break;
+> +       case KVM_SEV_SEND_START:
+> +               r =3D sev_send_start(kvm, &sev_cmd);
+> +               break;
+>         default:
+>                 r =3D -EINVAL;
+>                 goto out;
+> diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
+> index 5167bf2bfc75..9f63b9d48b63 100644
+> --- a/include/linux/psp-sev.h
+> +++ b/include/linux/psp-sev.h
+> @@ -323,11 +323,11 @@ struct sev_data_send_start {
+>         u64 pdh_cert_address;                   /* In */
+>         u32 pdh_cert_len;                       /* In */
+>         u32 reserved1;
+> -       u64 plat_cert_address;                  /* In */
+> -       u32 plat_cert_len;                      /* In */
+> +       u64 plat_certs_address;                 /* In */
+> +       u32 plat_certs_len;                     /* In */
+>         u32 reserved2;
+> -       u64 amd_cert_address;                   /* In */
+> -       u32 amd_cert_len;                       /* In */
+> +       u64 amd_certs_address;                  /* In */
+> +       u32 amd_certs_len;                      /* In */
+>         u32 reserved3;
+>         u64 session_address;                    /* In */
+>         u32 session_len;                        /* In/Out */
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index 4b95f9a31a2f..17bef4c245e1 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -1558,6 +1558,18 @@ struct kvm_sev_dbg {
+>         __u32 len;
+>  };
+>
+> +struct kvm_sev_send_start {
+> +       __u32 policy;
+> +       __u64 pdh_cert_uaddr;
+> +       __u32 pdh_cert_len;
+> +       __u64 plat_certs_uaddr;
+> +       __u32 plat_certs_len;
+> +       __u64 amd_certs_uaddr;
+> +       __u32 amd_certs_len;
+> +       __u64 session_uaddr;
+> +       __u32 session_len;
+> +};
+> +
+>  #define KVM_DEV_ASSIGN_ENABLE_IOMMU    (1 << 0)
+>  #define KVM_DEV_ASSIGN_PCI_2_3         (1 << 1)
+>  #define KVM_DEV_ASSIGN_MASK_INTX       (1 << 2)
+> --
+> 2.17.1
+>
+
+Looks pretty reasonable overall.
