@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2E80717DEB5
-	for <lists+kvm@lfdr.de>; Mon,  9 Mar 2020 12:28:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C4B3617DED1
+	for <lists+kvm@lfdr.de>; Mon,  9 Mar 2020 12:39:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726478AbgCIL2B (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Mar 2020 07:28:01 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:26577 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726469AbgCIL2B (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 Mar 2020 07:28:01 -0400
+        id S1726379AbgCILj3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Mar 2020 07:39:29 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:47150 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725796AbgCILj3 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 9 Mar 2020 07:39:29 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1583753280;
+        s=mimecast20190719; t=1583753967;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=ZXvdMJEgW8utCn7FonEpgPrYzs7ym8h0kN9CF9LzEks=;
-        b=JTokeT7KtOy+cVUGRP1YI4a10OKWBua8eWkMi4iCiE2x6rAZnTj73d6rQfDYvVjVH9AzLi
-        nZHQbnN7MwLcEShY2xNkcEGmzcJJwXHHkEklHykFf+ZHN+Cda5oHpZzRjqzakceyUOTJnC
-        JC+sFQa3fwqFGCBNSliQ7DSBISDwJHc=
+        bh=vzdnHWsQf6HWX3tws9aR3pcgbPwXvsackPOxGGljIdY=;
+        b=a68089T0IGKUxraNUAZM9r/1BIG69D3qgxnQYm2c6VXpPHTUVUNLU9FcMSP/cfuufwg4Bc
+        0QgFJ1rk403A0tnDDWEHyqQRV59yGTM1DbQcHfL0bBgfXlF1Hx4WpRCQkx09ap9HIUKde7
+        WydVTkuqa+x32ExBcbCEJv0xvfiEWnE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-102-QqAxODeTNq2CiixcGg8blg-1; Mon, 09 Mar 2020 07:27:58 -0400
-X-MC-Unique: QqAxODeTNq2CiixcGg8blg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+ us-mta-235-7SuXIaPwOC6bzdu1ewkhPw-1; Mon, 09 Mar 2020 07:39:24 -0400
+X-MC-Unique: 7SuXIaPwOC6bzdu1ewkhPw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BD7408017CC;
-        Mon,  9 Mar 2020 11:27:56 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 51A2A107ACC4;
+        Mon,  9 Mar 2020 11:39:22 +0000 (UTC)
 Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 31C031001DC2;
-        Mon,  9 Mar 2020 11:27:51 +0000 (UTC)
-Date:   Mon, 9 Mar 2020 12:27:49 +0100
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id A5AC560BE2;
+        Mon,  9 Mar 2020 11:39:16 +0000 (UTC)
+Date:   Mon, 9 Mar 2020 12:39:14 +0100
 From:   Andrew Jones <drjones@redhat.com>
 To:     Eric Auger <eric.auger@redhat.com>
 Cc:     eric.auger.pro@gmail.com, maz@kernel.org,
@@ -42,14 +42,14 @@ Cc:     eric.auger.pro@gmail.com, maz@kernel.org,
         alexandru.elisei@arm.com, thuth@redhat.com
 Subject: Re: [kvm-unit-tests PATCH v4 07/13] arm/arm64: ITS:
  its_enable_defaults
-Message-ID: <20200309112749.jeatdhajxqght7so@kamzik.brq.redhat.com>
+Message-ID: <20200309113914.pg5522tvwazgrfec@kamzik.brq.redhat.com>
 References: <20200309102420.24498-1-eric.auger@redhat.com>
  <20200309102420.24498-8-eric.auger@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <20200309102420.24498-8-eric.auger@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
@@ -112,9 +112,6 @@ On Mon, Mar 09, 2020 at 11:24:14AM +0100, Eric Auger wrote:
 > -#define LPI_PROP_DEFAULT_PRIO   0xa0
 > -#define LPI_PROP_DEFAULT	(LPI_PROP_DEFAULT_PRIO | LPI_PROP_GROUP1 | \
 > -				 LPI_PROP_ENABLED)
-
-This reformatting should be squashed into 5/13.
-
 > +#define LPI_ID_BASE			8192
 > +#define LPI(lpi)			((lpi) + LPI_ID_BASE)
 > +#define LPI_OFFSET(intid)		((intid) - LPI_ID_BASE)
@@ -166,17 +163,11 @@ This reformatting should be squashed into 5/13.
 > -/* alloc_lpi_tables: Allocate LPI config and pending tables */
 > +
 > +/**
-
-*
-
 > + * alloc_lpi_tables - Allocate LPI config and pending tables
 > + * and set PROPBASER (shared by all rdistributors) and per
 > + * redistributor PENDBASER.
 > + *
 > + * gicv3_set_redist_base() must be called before
-
-How about asserting gicv3_redist_base() isn't NULL?
-
 > + */
 >  void gicv3_lpi_alloc_tables(void)
 >  {
@@ -194,6 +185,10 @@ How about asserting gicv3_redist_base() isn't NULL?
 > -	 */
 > -	for_each_present_cpu(cpu) {
 > +	for (cpu = 0; cpu < nr_cpus; cpu++) {
+
+You don't mention this change in the changelog. What's wrong with
+using for_each_present_cpu() here?
+
 >  		u64 pend_val;
 >  		void *ptr;
 >  
@@ -228,6 +223,11 @@ How about asserting gicv3_redist_base() isn't NULL?
 > -{
 > -	u8 *ptr = phys_to_virt((phys_addr_t)gicv3_data.lpi_pend[rdist]);
 > +	u8 *ptr = gicv3_data.lpi_pend[rdist];
+
+Alot of the changes above and in this patch in general look like cleanups
+that should have been squashed into the patches that introduced the lines
+in the first place.
+
 >  	u8 mask = 1 << (n % 8), byte;
 >  
 >  	ptr += (n / 8);
@@ -301,5 +301,8 @@ How about asserting gicv3_redist_base() isn't NULL?
 > +}
 > -- 
 > 2.20.1
-> 
+>
+
+Thanks,
+drew 
 
