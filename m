@@ -2,45 +2,45 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 012B117E2F7
-	for <lists+kvm@lfdr.de>; Mon,  9 Mar 2020 16:01:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3540417E309
+	for <lists+kvm@lfdr.de>; Mon,  9 Mar 2020 16:04:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726859AbgCIPBP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Mar 2020 11:01:15 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:25218 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726772AbgCIPBP (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 9 Mar 2020 11:01:15 -0400
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 029EwqPo013602;
-        Mon, 9 Mar 2020 11:01:14 -0400
+        id S1726875AbgCIPEC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Mar 2020 11:04:02 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:19224 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726739AbgCIPEB (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 9 Mar 2020 11:04:01 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 029Ex6iL137322;
+        Mon, 9 Mar 2020 11:04:00 -0400
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2ym8n7c3eq-1
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2ym8c9cd7y-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 09 Mar 2020 11:01:11 -0400
-Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 029F0JxR024513;
-        Mon, 9 Mar 2020 11:00:51 -0400
-Received: from ppma03wdc.us.ibm.com (ba.79.3fa9.ip4.static.sl-reverse.com [169.63.121.186])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2ym8n7c2yu-1
+        Mon, 09 Mar 2020 11:03:50 -0400
+Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 029ExI2J138718;
+        Mon, 9 Mar 2020 11:02:42 -0400
+Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2ym8c9caf8-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 09 Mar 2020 11:00:51 -0400
-Received: from pps.filterd (ppma03wdc.us.ibm.com [127.0.0.1])
-        by ppma03wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 029F0WRH024797;
-        Mon, 9 Mar 2020 15:00:35 GMT
-Received: from b01cxnp23033.gho.pok.ibm.com (b01cxnp23033.gho.pok.ibm.com [9.57.198.28])
-        by ppma03wdc.us.ibm.com with ESMTP id 2ym38635ds-1
+        Mon, 09 Mar 2020 11:02:42 -0400
+Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
+        by ppma01dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 029F0PLA004788;
+        Mon, 9 Mar 2020 15:00:36 GMT
+Received: from b01cxnp23034.gho.pok.ibm.com (b01cxnp23034.gho.pok.ibm.com [9.57.198.29])
+        by ppma01dal.us.ibm.com with ESMTP id 2ym386fvvk-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Mon, 09 Mar 2020 15:00:35 +0000
 Received: from b01ledav001.gho.pok.ibm.com (b01ledav001.gho.pok.ibm.com [9.57.199.106])
-        by b01cxnp23033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 029F0ZgN53346704
+        by b01cxnp23034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 029F0ZNW49742322
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
         Mon, 9 Mar 2020 15:00:35 GMT
 Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id CFA8928077;
+        by IMSVA (Postfix) with ESMTP id E069A28065;
         Mon,  9 Mar 2020 15:00:34 +0000 (GMT)
 Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C86EE2805A;
+        by IMSVA (Postfix) with ESMTP id DABD72805C;
         Mon,  9 Mar 2020 15:00:34 +0000 (GMT)
 Received: from localhost.localdomain (unknown [9.114.17.106])
         by b01ledav001.gho.pok.ibm.com (Postfix) with ESMTP;
@@ -51,10 +51,10 @@ To:     Christian Borntraeger <borntraeger@de.ibm.com>,
 Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
         David Hildenbrand <david@redhat.com>,
         Thomas Huth <thuth@redhat.com>,
-        linux-s390 <linux-s390@vger.kernel.org>, stable@vger.kernel.org
-Subject: [PATCH 3/4] KVM: s390: Also reset registers in sync regs for initial cpu reset
-Date:   Mon,  9 Mar 2020 11:00:25 -0400
-Message-Id: <20200309150026.4329-4-borntraeger@de.ibm.com>
+        linux-s390 <linux-s390@vger.kernel.org>
+Subject: [PATCH 4/4] selftests: KVM: s390: check for registers to NOT change on reset
+Date:   Mon,  9 Mar 2020 11:00:26 -0400
+Message-Id: <20200309150026.4329-5-borntraeger@de.ibm.com>
 X-Mailer: git-send-email 2.25.0
 In-Reply-To: <20200309150026.4329-1-borntraeger@de.ibm.com>
 References: <20200309150026.4329-1-borntraeger@de.ibm.com>
@@ -63,63 +63,131 @@ Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
  definitions=2020-03-09_06:2020-03-09,2020-03-09 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- adultscore=0 mlxlogscore=999 mlxscore=0 suspectscore=0 spamscore=0
- phishscore=0 bulkscore=0 malwarescore=0 clxscore=1011 impostorscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 bulkscore=0
+ lowpriorityscore=0 priorityscore=1501 phishscore=0 suspectscore=2
+ impostorscore=0 spamscore=0 adultscore=0 mlxlogscore=999 malwarescore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2001150001 definitions=main-2003090104
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When we do the initial CPU reset we must not only clear the registers
-in the internal data structures but also in kvm_run sync_regs. For
-modern userspace sync_regs is the only place that it looks at.
+Normal reset and initial CPU reset do not clear all registers. Add a
+test that those registers are NOT changed.
 
-Cc: stable@vger.kernel.org
-Fixes: 7de3f1423ff943 ("KVM: s390: Add new reset vcpu API")
 Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
 ---
- arch/s390/kvm/kvm-s390.c | 18 +++++++++++++++++-
- 1 file changed, 17 insertions(+), 1 deletion(-)
+ tools/testing/selftests/kvm/s390x/resets.c | 55 +++++++++++++++++++++-
+ 1 file changed, 53 insertions(+), 2 deletions(-)
 
-diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-index 6b1842a9feed..81f54ddedb3d 100644
---- a/arch/s390/kvm/kvm-s390.c
-+++ b/arch/s390/kvm/kvm-s390.c
-@@ -3529,7 +3529,10 @@ static void kvm_arch_vcpu_ioctl_initial_reset(struct kvm_vcpu *vcpu)
- 	/* Initial reset is a superset of the normal reset */
- 	kvm_arch_vcpu_ioctl_normal_reset(vcpu);
+diff --git a/tools/testing/selftests/kvm/s390x/resets.c b/tools/testing/selftests/kvm/s390x/resets.c
+index c385842792b7..b567705f0d41 100644
+--- a/tools/testing/selftests/kvm/s390x/resets.c
++++ b/tools/testing/selftests/kvm/s390x/resets.c
+@@ -40,8 +40,22 @@ static void guest_code_initial(void)
+ 		"	lctlg	8,8,%1\n"
+ 		"	lctlg	10,10,%2\n"
+ 		"	lctlg	11,11,%3\n"
+-		: : "m" (cr2_59), "m" (cr8_63), "m" (cr10), "m" (cr11) : "2");
+-	GUEST_SYNC(0);
++		/* now clobber some general purpose regs */
++		"	llihh	0,0xffff\n"
++		"	llihl	1,0x5555\n"
++		"	llilh	2,0xaaaa\n"
++		"	llill	3,0x0000\n"
++		/* now clobber a floating point reg */
++		"	lghi	4,0x1\n"
++		"	cdgbr	0,4\n"
++		/* now clobber an access reg */
++		"	sar	9,4\n"
++		/* We embed diag 501 here to control register content */
++		"	diag 0,0,0x501\n"
++		:
++		: "m" (cr2_59), "m" (cr8_63), "m" (cr10), "m" (cr11)
++		/* no clobber list as this should not return */
++		);
+ }
  
--	/* this equals initial cpu reset in pop, but we don't switch to ESA */
-+	/*
-+	 * This equals initial cpu reset in pop, but we don't switch to ESA.
-+	 * We do not even reset the internal data, but also ...
-+	 */
- 	vcpu->arch.sie_block->gpsw.mask = 0;
- 	vcpu->arch.sie_block->gpsw.addr = 0;
- 	kvm_s390_set_prefix(vcpu, 0);
-@@ -3538,6 +3541,19 @@ static void kvm_arch_vcpu_ioctl_initial_reset(struct kvm_vcpu *vcpu)
- 	memset(vcpu->arch.sie_block->gcr, 0, sizeof(vcpu->arch.sie_block->gcr));
- 	vcpu->arch.sie_block->gcr[0] = CR0_INITIAL_MASK;
- 	vcpu->arch.sie_block->gcr[14] = CR14_INITIAL_MASK;
+ static void test_one_reg(uint64_t id, uint64_t value)
+@@ -98,6 +112,21 @@ static void assert_clear(void)
+ 		    "vrs0-15 == 0 (sync_regs)");
+ }
+ 
++static void assert_initial_noclear(void)
++{
++	TEST_ASSERT(sync_regs->gprs[0] == 0xffff000000000000UL,
++		    "gpr0 == 0xffff000000000000 (sync_regs)");
++	TEST_ASSERT(sync_regs->gprs[1] == 0x0000555500000000UL,
++		    "gpr1 == 0x0000555500000000 (sync_regs)");
++	TEST_ASSERT(sync_regs->gprs[2] == 0x00000000aaaa0000UL,
++		    "gpr2 == 0x00000000aaaa0000 (sync_regs)");
++	TEST_ASSERT(sync_regs->gprs[3] == 0x0000000000000000UL,
++		    "gpr3 == 0x0000000000000000 (sync_regs)");
++	TEST_ASSERT(sync_regs->fprs[0] == 0x3ff0000000000000UL,
++		    "fpr0 == 0f1 (sync_regs)");
++	TEST_ASSERT(sync_regs->acrs[9] == 1, "ar9 == 1 (sync_regs)");
++}
 +
-+	/* ... the data in sync regs */
-+	memset(vcpu->run->s.regs.crs, 0, sizeof(vcpu->run->s.regs.crs));
-+	vcpu->run->s.regs.ckc = 0;
-+	vcpu->run->s.regs.crs[0] = CR0_INITIAL_MASK;
-+	vcpu->run->s.regs.crs[14] = CR14_INITIAL_MASK;
-+	vcpu->run->psw_addr = 0;
-+	vcpu->run->psw_mask = 0;
-+	vcpu->run->s.regs.todpr = 0;
-+	vcpu->run->s.regs.cputm = 0;
-+	vcpu->run->s.regs.ckc = 0;
-+	vcpu->run->s.regs.pp = 0;
-+	vcpu->run->s.regs.gbea = 1;
- 	vcpu->run->s.regs.fpc = 0;
- 	/*
- 	 * Do not reset these registers in the protected case, as some of
+ static void assert_initial(void)
+ {
+ 	struct kvm_sregs sregs;
+@@ -140,6 +169,14 @@ static void assert_initial(void)
+ 	test_one_reg(KVM_REG_S390_CLOCK_COMP, 0);
+ }
+ 
++static void assert_normal_noclear(void)
++{
++	TEST_ASSERT(sync_regs->crs[2] == 0x10, "cr2 == 10 (sync_regs)");
++	TEST_ASSERT(sync_regs->crs[8] == 1, "cr10 == 1 (sync_regs)");
++	TEST_ASSERT(sync_regs->crs[10] == 1, "cr10 == 1 (sync_regs)");
++	TEST_ASSERT(sync_regs->crs[11] == -1, "cr11 == -1 (sync_regs)");
++}
++
+ static void assert_normal(void)
+ {
+ 	test_one_reg(KVM_REG_S390_PFTOKEN, KVM_S390_PFAULT_TOKEN_INVALID);
+@@ -176,7 +213,13 @@ static void test_normal(void)
+ 	inject_irq(VCPU_ID);
+ 
+ 	vcpu_ioctl(vm, VCPU_ID, KVM_S390_NORMAL_RESET, 0);
++
++	/* must clears */
+ 	assert_normal();
++	/* must not clears */
++	assert_normal_noclear();
++	assert_initial_noclear();
++
+ 	kvm_vm_free(vm);
+ }
+ 
+@@ -192,8 +235,13 @@ static void test_initial(void)
+ 	inject_irq(VCPU_ID);
+ 
+ 	vcpu_ioctl(vm, VCPU_ID, KVM_S390_INITIAL_RESET, 0);
++
++	/* must clears */
+ 	assert_normal();
+ 	assert_initial();
++	/* must not clears */
++	assert_initial_noclear();
++
+ 	kvm_vm_free(vm);
+ }
+ 
+@@ -209,9 +257,12 @@ static void test_clear(void)
+ 	inject_irq(VCPU_ID);
+ 
+ 	vcpu_ioctl(vm, VCPU_ID, KVM_S390_CLEAR_RESET, 0);
++
++	/* must clears */
+ 	assert_normal();
+ 	assert_initial();
+ 	assert_clear();
++
+ 	kvm_vm_free(vm);
+ }
+ 
 -- 
 2.25.0
 
