@@ -2,36 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id AC10817D7EF
-	for <lists+kvm@lfdr.de>; Mon,  9 Mar 2020 02:49:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B01CB17D851
+	for <lists+kvm@lfdr.de>; Mon,  9 Mar 2020 04:37:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726508AbgCIBsR convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Sun, 8 Mar 2020 21:48:17 -0400
-Received: from mga02.intel.com ([134.134.136.20]:40716 "EHLO mga02.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726346AbgCIBsQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 8 Mar 2020 21:48:16 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 08 Mar 2020 18:48:14 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,530,1574150400"; 
-   d="scan'208";a="235519784"
-Received: from fmsmsx103.amr.corp.intel.com ([10.18.124.201])
-  by orsmga008.jf.intel.com with ESMTP; 08 Mar 2020 18:48:15 -0700
-Received: from fmsmsx116.amr.corp.intel.com (10.18.116.20) by
- FMSMSX103.amr.corp.intel.com (10.18.124.201) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Sun, 8 Mar 2020 18:48:14 -0700
-Received: from shsmsx106.ccr.corp.intel.com (10.239.4.159) by
- fmsmsx116.amr.corp.intel.com (10.18.116.20) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Sun, 8 Mar 2020 18:48:14 -0700
-Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.206]) by
- SHSMSX106.ccr.corp.intel.com ([169.254.10.86]) with mapi id 14.03.0439.000;
- Mon, 9 Mar 2020 09:48:12 +0800
-From:   "Tian, Kevin" <kevin.tian@intel.com>
+        id S1726859AbgCIDhG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 8 Mar 2020 23:37:06 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:22460 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726781AbgCIDhE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 8 Mar 2020 23:37:04 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1583725022;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=S0qLVKfYZK8pYenESepAxVRIXfABKBnhJdpq7W8RSUA=;
+        b=fCsYG5F2c/j7p+LxsK7SJu3WHPEpdfleoVZ0Ttuk23Jkx1bpNEI/w/d01Js2QSlVwDYgbS
+        DfbAGbbvEfZ+OoQoHQGKI/JR5Xp0Gw0Zczc6ysuklktadqltg26n5U/eZJ6DsXADkymgEF
+        Is7CG+RJWN8J0jr7mGTVEfh99AMYM4U=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-47-VoLRSUGNOjaqQVz4KT5Ihg-1; Sun, 08 Mar 2020 23:36:59 -0400
+X-MC-Unique: VoLRSUGNOjaqQVz4KT5Ihg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 65DFC477;
+        Mon,  9 Mar 2020 03:36:57 +0000 (UTC)
+Received: from [10.72.13.185] (ovpn-13-185.pek2.redhat.com [10.72.13.185])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 2A06D9008F;
+        Mon,  9 Mar 2020 03:36:47 +0000 (UTC)
+Subject: Re: [PATCH v2 0/7] vfio/pci: SR-IOV support
 To:     Alex Williamson <alex.williamson@redhat.com>
-CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
         "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         "dev@dpdk.org" <dev@dpdk.org>,
@@ -41,210 +46,171 @@ CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
         "jerinjacobk@gmail.com" <jerinjacobk@gmail.com>,
         "Richardson, Bruce" <bruce.richardson@intel.com>,
         "cohuck@redhat.com" <cohuck@redhat.com>
-Subject: RE: [PATCH v2 5/7] vfio/pci: Add sriov_configure support
-Thread-Topic: [PATCH v2 5/7] vfio/pci: Add sriov_configure support
-Thread-Index: AQHV51YaoTnickP570etlLGInd5eAKgrQJIwgA6gtQCAAWITYIAAce8AgAC1CGCAApkmAIAAk+rQ
-Date:   Mon, 9 Mar 2020 01:48:11 +0000
-Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D19D7C36CC@SHSMSX104.ccr.corp.intel.com>
 References: <158213716959.17090.8399427017403507114.stgit@gimli.home>
-        <158213846731.17090.37693075723046377.stgit@gimli.home>
-        <AADFC41AFE54684AB9EE6CBC0274A5D19D79A943@SHSMSX104.ccr.corp.intel.com>
-        <20200305112230.0dd77712@w520.home>
-        <AADFC41AFE54684AB9EE6CBC0274A5D19D7C07A0@SHSMSX104.ccr.corp.intel.com>
-        <20200306151734.741d1d58@x1.home>
-        <AADFC41AFE54684AB9EE6CBC0274A5D19D7C208E@SHSMSX104.ccr.corp.intel.com>
- <20200308184610.647b70f4@x1.home>
-In-Reply-To: <20200308184610.647b70f4@x1.home>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ctpclassification: CTP_NT
-x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiZGYxODZjNmYtZTFhMS00ZjA5LThlYzAtYTY0YTJhODQyMDhmIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiNE9Ga2VCUUh3NWt4NjllSVZpb1FYczg0VVBBZ3Nnc291SngwWVVXV2Rad0F2Z3ZXU0pZTzVRTDA3WGdSbmk4SCJ9
-dlp-product: dlpe-windows
-dlp-version: 11.2.0.6
-dlp-reaction: no-action
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+ <AADFC41AFE54684AB9EE6CBC0274A5D19D79A8A7@SHSMSX104.ccr.corp.intel.com>
+ <a6c04bac-0a37-f4c0-876e-e5cf2a8a6c3f@redhat.com>
+ <20200305101406.02703e2a@w520.home>
+ <3e8db1d0-8afc-f1e9-e857-aead4717fa11@redhat.com>
+ <20200306092445.1bd4611c@x1.home>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <d9ac428f-c764-014c-db5b-3f94d8f3e626@redhat.com>
+Date:   Mon, 9 Mar 2020 11:36:46 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
+In-Reply-To: <20200306092445.1bd4611c@x1.home>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> From: Alex Williamson
-> Sent: Monday, March 9, 2020 8:46 AM
-> 
-> On Sat, 7 Mar 2020 01:35:23 +0000
-> "Tian, Kevin" <kevin.tian@intel.com> wrote:
-> 
-> > > From: Alex Williamson
-> > > Sent: Saturday, March 7, 2020 6:18 AM
-> > >
-> > > On Fri, 6 Mar 2020 07:57:19 +0000
-> > > "Tian, Kevin" <kevin.tian@intel.com> wrote:
-> > >
-> > > > > From: Alex Williamson <alex.williamson@redhat.com>
-> > > > > Sent: Friday, March 6, 2020 2:23 AM
-> > > > >
-> > > > > On Tue, 25 Feb 2020 03:08:00 +0000
-> > > > > "Tian, Kevin" <kevin.tian@intel.com> wrote:
-> > > > >
-> > > > > > > From: Alex Williamson
-> > > > > > > Sent: Thursday, February 20, 2020 2:54 AM
-> > > > > > >
-> > > > > > > With the VF Token interface we can now expect that a vfio
-> userspace
-> > > > > > > driver must be in collaboration with the PF driver, an unwitting
-> > > > > > > userspace driver will not be able to get past the GET_DEVICE_FD
-> step
-> > > > > > > in accessing the device.  We can now move on to actually allowing
-> > > > > > > SR-IOV to be enabled by vfio-pci on the PF.  Support for this is not
-> > > > > > > enabled by default in this commit, but it does provide a module
-> > > option
-> > > > > > > for this to be enabled (enable_sriov=1).  Enabling VFs is rather
-> > > > > > > straightforward, except we don't want to risk that a VF might get
-> > > > > > > autoprobed and bound to other drivers, so a bus notifier is used
-> to
-> > > > > > > "capture" VFs to vfio-pci using the driver_override support.  We
-> > > > > > > assume any later action to bind the device to other drivers is
-> > > > > > > condoned by the system admin and allow it with a log warning.
-> > > > > > >
-> > > > > > > vfio-pci will disable SR-IOV on a PF before releasing the device,
-> > > > > > > allowing a VF driver to be assured other drivers cannot take over
-> the
-> > > > > > > PF and that any other userspace driver must know the shared VF
-> > > token.
-> > > > > > > This support also does not provide a mechanism for the PF
-> userspace
-> > > > > > > driver itself to manipulate SR-IOV through the vfio API.  With this
-> > > > > > > patch SR-IOV can only be enabled via the host sysfs interface and
-> the
-> > > > > > > PF driver user cannot create or remove VFs.
-> > > > > >
-> > > > > > I'm not sure how many devices can be properly configured simply
-> > > > > > with pci_enable_sriov. It is not unusual to require PF driver prepare
-> > > > > > something before turning PCI SR-IOV capability. If you look kernel
-> > > > > > PF drivers, there are only two using generic pci_sriov_configure_
-> > > > > > simple (simple wrapper like pci_enable_sriov), while most others
-> > > > > > implementing their own callback. However vfio itself has no idea
-> > > > > > thus I'm not sure how an user knows whether using this option can
-> > > > > > actually meet his purpose. I may miss something here, possibly
-> > > > > > using DPDK as an example will make it clearer.
-> > > > >
-> > > > > There is still the entire vfio userspace driver interface.  Imagine for
-> > > > > example that QEMU emulates the SR-IOV capability and makes a call
-> out
-> > > > > to libvirt (or maybe runs with privs for the PF SR-IOV sysfs attribs)
-> > > > > when the guest enables SR-IOV.  Can't we assume that any PF specific
-> > > > > support can still be performed in the userspace/guest driver, leaving
-> > > > > us with a very simple and generic sriov_configure callback in vfio-pci?
-> > > >
-> > > > Makes sense. One concern, though, is how an user could be warned
-> > > > if he inadvertently uses sysfs to enable SR-IOV on a vfio device whose
-> > > > userspace driver is incapable of handling it. Note any VFIO device,
-> > > > if SR-IOV capable, will allow user to do so once the module option is
-> > > > turned on and the callback is registered. I felt such uncertainty can be
-> > > > contained by toggling SR-IOV through a vfio api, but from your
-> description
-> > > > obviously it is what you want to avoid. Is it due to the sequence reason,
-> > > > e.g. that SR-IOV must be enabled before userspace PF driver sets the
-> > > > token?
-> > >
-> > > As in my other reply, enabling SR-IOV via a vfio API suggests that
-> > > we're not only granting the user owning the PF device access to the
-> > > device itself, but also the ability to create and remove subordinate
-> > > devices on the host.  That implies an extended degree of trust in the
-> > > user beyond the PF device itself and raises questions about whether a
-> > > user who is allowed to create VF devices should automatically be
-> > > granted access to those VF devices, what the mechanism would be for
-> > > that, and how we might re-assign those devices to other users,
-> > > potentially including host kernel usage.  What I'm proposing here
-> > > doesn't preclude some future extension in that direction, but instead
-> > > tries to simplify a first step towards enabling SR-IOV by leaving the
-> > > SR-IOV enablement and VF assignment in the realm of a privileged system
-> > > entity.
-> >
-> > the intention is clear to me now.
-> >
-> > >
-> > > So, what I think you're suggesting here is that we should restrict
-> > > vfio_pci_sriov_configure() to reject enabling SR-IOV until a user
-> > > driver has configured a VF token.  That requires both that the
-> > > userspace driver has initialized to this point before SR-IOV can be
-> > > enabled and that we would be forced to define a termination point for
-> > > the user set VF token.  Logically, this would need to be when the
-> > > userspace driver exits or closes the PF device, which implies that we
-> > > need to disable SR-IOV on the PF at this point, or we're left in an
-> > > inconsistent state where VFs are enabled but cannot be disabled because
-> > > we don't have a valid VF token.  Now we're back to nearly a state where
-> > > the user has control of not creating devices on the host, but removing
-> > > them by closing the device, which will necessarily require that any VF
-> > > driver release the device, whether userspace or kernel.
-> > >
-> > > I'm not sure what we're gaining by doing this though.  I agree that
-> > > there will be users that enable SR-IOV on a PF and then try to, for
-> > > example, assign the PF and all the VFs to a VM.  The VFs will fail due
-> > > to lacking VF token support, unless they've patch QEMU with my test
-> > > code, but depending on the PF driver in the guest, it may, or more
-> > > likely won't work.  But don't you think the VFs and probably PF not
-> > > working is a sufficient clue that the configuration is invalid?  OTOH,
-> > > from what I've heard of the device in the ID table of the pci-pf-stub
-> > > driver, they might very well be able to work with both PF and VFs in
-> > > QEMU using only my test code to set the VF token.
-> > >
-> > > Therefore, I'm afraid what you're asking for here is to impose a usage
-> > > restriction as a sanity test, when we don't really know what might be
-> > > sane for this particular piece of hardware or use case.  There are
-> > > infinite ways that a vfio based userspace driver can fail to configure
-> > > their hardware and make it work correctly, many of them are device
-> > > specific.  Isn't this just one of those cases?  Thanks,
-> > >
-> >
-> > what you said all makes sense. so I withdraw the idea of manipulating
-> > SR-IOV through vfio ioctl. However I still feel that simply registering
-> > sriov_configuration callback by vfio-pci somehow violates the typical
-> > expectation of the sysfs interface. Before this patch, the success return
-> > of writing non-zero value to numvfs implies VFs are in sane state and
-> > functionally ready for immediate use. However now the behavior of
-> > success return becomes undefined for vfio devices, since even vfio-pci
-> > itself doesn't know whether VFs are functional for a random device
-> > (may know some if carrying the same device IDs from pci-pf-stub). It
-> > simply relies on the privileged entity who knows exactly the implication
-> > of such write, while there is no way to warn inadvertent users which
-> > to me is not a good design from kernel API p.o.v. Of course we may
-> > document such restriction and the driver_override may also be an
-> > indirect way to warn such user if he wants to use VFs for other purpose.
-> > But it is still less elegant than reporting it in the first place. Maybe
-> > what we really require is a new sysfs attribute purely for enabling
-> > PCI SR-IOV capability, which doesn't imply making VFs actually
-> > functional as did through the existing numvfs?
-> 
-> I don't read the same guarantee into the sysfs SR-IOV interface.  If
-> such a guarantee exists, it's already broken by pci-pf-stub, which like
-> vfio-pci allows dynamic IDs and driver_override to bind to any PF device
-> allowing the ability to create (potentially) non-functional VFs.  I
 
-I don't know whether others raised the similar concern and how 
-it was addressed for pci-pf-stub before. Many places describe 
-numvfs as the preferred interface to enable/disable VFs while 
-'enable' just reads functional to me.
-
-> think it would be a really bad decision to fork a new sysfs interface
-> for this.  I've already made SR-IOV support in vfio-pci an opt-in via a
-> module option, would it ease your concerns if I elaborate in the text
-> for the option that enabling SR-IOV may depend on support provided by a
-> vfio-pci userspace driver?
-
-Sure.
-
-> 
-> I think that without absolutely knowing that an operation is incorrect,
-> we're just generating noise and confusion by triggering warnings or
-> developing alternate interfaces.  Unfortunately, we have no generic
-> means of knowing that an operation is incorrect, so I assume the best.
+On 2020/3/7 =E4=B8=8A=E5=8D=8812:24, Alex Williamson wrote:
+> On Fri, 6 Mar 2020 11:35:21 +0800
+> Jason Wang <jasowang@redhat.com> wrote:
+>
+>> On 2020/3/6 =E4=B8=8A=E5=8D=881:14, Alex Williamson wrote:
+>>> On Tue, 25 Feb 2020 14:09:07 +0800
+>>> Jason Wang <jasowang@redhat.com> wrote:
+>>>  =20
+>>>> On 2020/2/25 =E4=B8=8A=E5=8D=8810:33, Tian, Kevin wrote:
+>>>>>> From: Alex Williamson
+>>>>>> Sent: Thursday, February 20, 2020 2:54 AM
+>>>>>>
+>>>>>> Changes since v1 are primarily to patch 3/7 where the commit log i=
+s
+>>>>>> rewritten, along with option parsing and failure logging based on
+>>>>>> upstream discussions.  The primary user visible difference is that
+>>>>>> option parsing is now much more strict.  If a vf_token option is
+>>>>>> provided that cannot be used, we generate an error.  As a result o=
+f
+>>>>>> this, opening a PF with a vf_token option will serve as a mechanis=
+m of
+>>>>>> setting the vf_token.  This seems like a more user friendly API th=
+an
+>>>>>> the alternative of sometimes requiring the option (VFs in use) and
+>>>>>> sometimes rejecting it, and upholds our desire that the option is
+>>>>>> always either used or rejected.
+>>>>>>
+>>>>>> This also means that the VFIO_DEVICE_FEATURE ioctl is not the only
+>>>>>> means of setting the VF token, which might call into question whet=
+her
+>>>>>> we absolutely need this new ioctl.  Currently I'm keeping it becau=
+se I
+>>>>>> can imagine use cases, for example if a hypervisor were to support
+>>>>>> SR-IOV, the PF device might be opened without consideration for a =
+VF
+>>>>>> token and we'd require the hypservisor to close and re-open the PF=
+ in
+>>>>>> order to set a known VF token, which is impractical.
+>>>>>>
+>>>>>> Series overview (same as provided with v1):
+>>>>> Thanks for doing this!
+>>>>>     =20
+>>>>>> The synopsis of this series is that we have an ongoing desire to d=
+rive
+>>>>>> PCIe SR-IOV PFs from userspace with VFIO.  There's an immediate ne=
+ed
+>>>>>> for this with DPDK drivers and potentially interesting future use
+>>>>> Can you provide a link to the DPDK discussion?
+>>>>>     =20
+>>>>>> cases in virtualization.  We've been reluctant to add this support
+>>>>>> previously due to the dependency and trust relationship between th=
+e
+>>>>>> VF device and PF driver.  Minimally the PF driver can induce a den=
+ial
+>>>>>> of service to the VF, but depending on the specific implementation=
+,
+>>>>>> the PF driver might also be responsible for moving data between VF=
+s
+>>>>>> or have direct access to the state of the VF, including data or st=
+ate
+>>>>>> otherwise private to the VF or VF driver.
+>>>>> Just a loud thinking. While the motivation of VF token sounds reaso=
+nable
+>>>>> to me, I'm curious why the same concern is not raised in other usag=
+es.
+>>>>> For example, there is no such design in virtio framework, where the
+>>>>> virtio device could also be restarted, putting in separate process =
+(vhost-user),
+>>>>> and even in separate VM (virtio-vhost-user), etc.
+>>>> AFAIK, the restart could only be triggered by either VM or qemu. But
+>>>> yes, the datapath could be offloaded.
+>>>>
+>>>> But I'm not sure introducing another dedicated mechanism is better t=
+han
+>>>> using the exist generic POSIX mechanism to make sure the connection
+>>>> (AF_UINX) is secure.
+>>>>
+>>>>  =20
+>>>>>     Of course the para-
+>>>>> virtualized attribute of virtio implies some degree of trust, but a=
+s you
+>>>>> mentioned many SR-IOV implementations support VF->PF communication
+>>>>> which also implies some level of trust. It's perfectly fine if VFIO=
+ just tries
+>>>>> to do better than other sub-systems, but knowing how other people
+>>>>> tackle the similar problem may make the whole picture clearer. =F0=9F=
+=98=8A
+>>>>>
+>>>>> +Jason.
+>>>> I'm not quite sure e.g allowing userspace PF driver with kernel VF
+>>>> driver would not break the assumption of kernel security model. At l=
+east
+>>>> we should forbid a unprivileged PF driver running in userspace.
+>>> It might be useful to have your opinion on this series, because that'=
+s
+>>> exactly what we're trying to do here.  Various environments, DPDK
+>>> specifically, want a userspace PF driver.  This series takes steps to
+>>> mitigate the risk of having such a driver, such as requiring this VF
+>>> token interface to extend the VFIO interface and validate participati=
+on
+>>> around a PF that is not considered trusted by the kernel.
+>>
+>> I may miss something. But what happens if:
+>>
+>> - PF driver is running by unprivileged user
+>> - PF is programmed to send translated DMA request
+>> - Then unprivileged user can mangle the kernel data
+> ATS is a security risk regardless of SR-IOV, how does this change it?
 > Thanks,
-> 
+
+
+My understanding is the ATS only happen for some bugous devices. Some=20
+hardware has on-chip IOMMU, this probably means unprivileged userspace=20
+PF driver can control the on-chip IOMMU in this case.
+
+Thanks
+
+
+>
 > Alex
+>
+>>> We also set
+>>> a driver_override to try to make sure no host kernel driver can
+>>> automatically bind to a VF of a user owned PF, only vfio-pci, but we
+>>> don't prevent the admin from creating configurations where the VFs ar=
+e
+>>> used by other host kernel drivers.
+>>>
+>>> I think the question Kevin is inquiring about is whether virtio devic=
+es
+>>> are susceptible to the type of collaborative, shared key environment
+>>> we're creating here.  For example, can a VM or qemu have access to
+>>> reset a virtio device in a way that could affect other devices, ex. F=
+LR
+>>> on a PF that could interfere with VF operation.  Thanks,
+>>
+>> Right, but I'm not sure it can be done only via virtio or need support
+>> from transport (e.g PCI).
+>>
+>> Thanks
+>>
+>>
+>>> Alex
+>>>  =20
 
