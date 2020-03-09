@@ -2,54 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 58AEC17E401
-	for <lists+kvm@lfdr.de>; Mon,  9 Mar 2020 16:52:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D3B6E17E404
+	for <lists+kvm@lfdr.de>; Mon,  9 Mar 2020 16:52:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727216AbgCIPwh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Mar 2020 11:52:37 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:46697 "EHLO
+        id S1726990AbgCIPwo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Mar 2020 11:52:44 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:41066 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727171AbgCIPwg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 Mar 2020 11:52:36 -0400
+        with ESMTP id S1727202AbgCIPwk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 Mar 2020 11:52:40 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1583769155;
+        s=mimecast20190719; t=1583769159;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=kEZnDQ3EPN69hzxp+XwMgJi39q3+ALjlYK44BICSftw=;
-        b=GvZT5/J4pkkznu2EBQOZY/Bs6XiUBrRRBJuKY6WWCwST1YFVv5nIvcDGyXseJjyT+8UGp/
-        GLtsLA0E/9kC9L6m+/TGtjUD3IkUF+IdeuRmEpX8Hts3e0AvZsS+ZEKiISpxFwGKDPK+XV
-        1HhTHICsmQRfUN7ojIraYEGb97ZdYYM=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-105-8hg-rbRHP_ON8fBtS4JqUA-1; Mon, 09 Mar 2020 11:52:34 -0400
-X-MC-Unique: 8hg-rbRHP_ON8fBtS4JqUA-1
-Received: by mail-wr1-f69.google.com with SMTP id j5so433883wrt.1
-        for <kvm@vger.kernel.org>; Mon, 09 Mar 2020 08:52:33 -0700 (PDT)
+        bh=gpdJ6Cg1tIsPQIU8l639Qlh3t2/IFpSBkTvWUWG8TI0=;
+        b=dkb0iEEkKkIDWuo2ZvLGLm1Co03rJZFT6xlJJv0O1UqvUdCRQWwbGF5bq5RfE6wZtO3KbP
+        VAROzTBx4DjCUMVfXnm3wWtgsN415OCf609jsHnqpq/I/Tbkt5QNAiATsXeLZwOxdEJr8Z
+        Hb+F8m8dQxvTjAtreNvPafZ2lD6SQWY=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-280-5tpYYNb_PbqstWxIyZKFfQ-1; Mon, 09 Mar 2020 11:52:35 -0400
+X-MC-Unique: 5tpYYNb_PbqstWxIyZKFfQ-1
+Received: by mail-wr1-f70.google.com with SMTP id p11so5383638wrn.10
+        for <kvm@vger.kernel.org>; Mon, 09 Mar 2020 08:52:35 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=kEZnDQ3EPN69hzxp+XwMgJi39q3+ALjlYK44BICSftw=;
-        b=JsvJaMl+RB5oW4S8nV71gTQpM7A5T4ubA8Fb8TDZeZgdntTUHm959hHt+Fkvd2b4uq
-         9/LLkG5pxOEvnBI+jS6L749HJ/OgOMEsosyijRGYtsy8J/Nq17KYnwd8fRxHGM14aKMo
-         XG9w353YVuHOY3wT4p26hkvqmdAJVX6xYsrtzJ9dbnK5Nign1cWisl3xoKreh+WEOG3H
-         WJ0gCVRhKux2n6mMxK7EShKCya12erl2FR2nar6xptJMgvWm/GZ+OXHYMZ41uIO6iUp4
-         6WFaEVnqLtZQfUih62+BVC1kzw677onykvxqYkjFKX1VcXHk3arAxlVkjbJ8oCiKyOgT
-         jU9A==
-X-Gm-Message-State: ANhLgQ30KAjofYzesvjMs8lElZnK2jfVLKwLbA/VuR2xoT7/a/GsCg/f
-        cHu8a6aD1kGwn2ZfkZBHGp8nos4FXL5hU4MF42lFwLoqsutooRv4SJghYzPkhbzo+LVcNnI0w6y
-        FJ+goWYtvwKlB
-X-Received: by 2002:a1c:a345:: with SMTP id m66mr21683093wme.114.1583769152544;
-        Mon, 09 Mar 2020 08:52:32 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vuBsFwL/38WqBZvYsDczlUIj4JLSMvzr77wkabrGWT0xBQqHgpF8sih91f14RuhC/Y3HCPJng==
-X-Received: by 2002:a1c:a345:: with SMTP id m66mr21683080wme.114.1583769152339;
-        Mon, 09 Mar 2020 08:52:32 -0700 (PDT)
+        bh=gpdJ6Cg1tIsPQIU8l639Qlh3t2/IFpSBkTvWUWG8TI0=;
+        b=Sw3wcV0wMZ+tuKUb8RjSmOB/nTwF8DTfwoRnPLoYUqcM9XS0vyTt8sFm5+pBI8J25Z
+         mCSfBRvr0Cwn1q9IDE/j/5ugM8z8Qqs6qd7Y7XWNWt3rlZ94pNtH70WkO4WgquZTlKDN
+         Rd04cG8pN6HBVRodTsCyU0rhJiTwxVpcxSs/FBJagIXGWlSxf79YnZMZC2PTFpmQIEos
+         SDDnLUgf6BGVU1+hhRw7Bof5VVQayYjUK1p0vCMKx/LdEz17Xs3tDf+gPxVVBb0PkGo7
+         uyp1uRISLaMGq2SOj+sHA7vcZHNiQKgMc9+O0M9OpQ9oUCxM2QWCmjjy2esXI661FJvt
+         971Q==
+X-Gm-Message-State: ANhLgQ1d6IQThBZ+P7Zhdlfs2CLroto5oJtSr7Lti2AQyJ6Ax04OStbz
+        k/tYYH1Ef52k1phTjS85LCGCK1/t+gCu+0ha+9utSpyq2fr+x71RRfCfCEsaFVJ38PQ8DACzMzG
+        Re3ugH7Li1Qwo
+X-Received: by 2002:a1c:9d41:: with SMTP id g62mr19391296wme.131.1583769154409;
+        Mon, 09 Mar 2020 08:52:34 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vucLw7YOCnn8HRRRJAIb3+rjAedSA1dvQR96Or6tajfe9jl5CymLzC/u8rLXBoNjwCxXzD9vw==
+X-Received: by 2002:a1c:9d41:: with SMTP id g62mr19391282wme.131.1583769154229;
+        Mon, 09 Mar 2020 08:52:34 -0700 (PDT)
 Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id q4sm17294521wro.56.2020.03.09.08.52.29
+        by smtp.gmail.com with ESMTPSA id q4sm17294521wro.56.2020.03.09.08.52.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Mar 2020 08:52:30 -0700 (PDT)
+        Mon, 09 Mar 2020 08:52:32 -0700 (PDT)
 From:   Vitaly Kuznetsov <vkuznets@redhat.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Jim Mattson <jmattson@google.com>,
@@ -57,9 +57,9 @@ Cc:     Jim Mattson <jmattson@google.com>,
         kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         Liran Alon <liran.alon@oracle.com>,
         Miaohe Lin <linmiaohe@huawei.com>
-Subject: [PATCH 5/6] KVM: selftests: test enlightened vmenter with wrong eVMCS version
-Date:   Mon,  9 Mar 2020 16:52:15 +0100
-Message-Id: <20200309155216.204752-6-vkuznets@redhat.com>
+Subject: [PATCH 6/6] KVM: selftests: enlightened VMPTRLD with an incorrect GPA
+Date:   Mon,  9 Mar 2020 16:52:16 +0100
+Message-Id: <20200309155216.204752-7-vkuznets@redhat.com>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200309155216.204752-1-vkuznets@redhat.com>
 References: <20200309155216.204752-1-vkuznets@redhat.com>
@@ -70,50 +70,51 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Check that VMfailInvalid happens when eVMCS revision is is invalid.
+Check that guest doesn't hang when an invalid eVMCS GPA is specified.
+Testing that #UD is injected would probably be better but selftests lack
+the infrastructure currently.
 
 Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 ---
- tools/testing/selftests/kvm/x86_64/evmcs_test.c | 13 +++++++++----
- 1 file changed, 9 insertions(+), 4 deletions(-)
+ tools/testing/selftests/kvm/x86_64/evmcs_test.c | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
 
 diff --git a/tools/testing/selftests/kvm/x86_64/evmcs_test.c b/tools/testing/selftests/kvm/x86_64/evmcs_test.c
-index 92915e6408e7..10e9c158dc96 100644
+index 10e9c158dc96..fed8f933748b 100644
 --- a/tools/testing/selftests/kvm/x86_64/evmcs_test.c
 +++ b/tools/testing/selftests/kvm/x86_64/evmcs_test.c
-@@ -21,10 +21,10 @@
+@@ -72,6 +72,10 @@ void guest_code(struct vmx_pages *vmx_pages)
+ 		l1_guest_code(vmx_pages);
  
- void l2_guest_code(void)
- {
--	GUEST_SYNC(6);
--
- 	GUEST_SYNC(7);
- 
-+	GUEST_SYNC(8);
+ 	GUEST_DONE();
 +
- 	/* Done, exit to L1 and never come back.  */
- 	vmcall();
- }
-@@ -50,12 +50,17 @@ void l1_guest_code(struct vmx_pages *vmx_pages)
- 
- 	GUEST_SYNC(5);
- 	GUEST_ASSERT(vmptrstz() == vmx_pages->enlightened_vmcs_gpa);
-+	current_evmcs->revision_id = -1u;
++	/* Try enlightened vmptrld with an incorrect GPA */
++	evmcs_vmptrld(0xdeadbeef, vmx_pages->enlightened_vmcs);
 +	GUEST_ASSERT(vmlaunch());
-+	current_evmcs->revision_id = EVMCS_VERSION;
-+	GUEST_SYNC(6);
-+
- 	GUEST_ASSERT(!vmlaunch());
- 	GUEST_ASSERT(vmptrstz() == vmx_pages->enlightened_vmcs_gpa);
--	GUEST_SYNC(8);
-+	GUEST_SYNC(9);
- 	GUEST_ASSERT(!vmresume());
- 	GUEST_ASSERT(vmreadz(VM_EXIT_REASON) == EXIT_REASON_VMCALL);
--	GUEST_SYNC(9);
-+	GUEST_SYNC(10);
  }
  
- void guest_code(struct vmx_pages *vmx_pages)
+ int main(int argc, char *argv[])
+@@ -120,7 +124,7 @@ int main(int argc, char *argv[])
+ 		case UCALL_SYNC:
+ 			break;
+ 		case UCALL_DONE:
+-			goto done;
++			goto part1_done;
+ 		default:
+ 			TEST_ASSERT(false, "Unknown ucall 0x%x.", uc.cmd);
+ 		}
+@@ -152,6 +156,10 @@ int main(int argc, char *argv[])
+ 			    (ulong) regs2.rdi, (ulong) regs2.rsi);
+ 	}
+ 
+-done:
++part1_done:
++	_vcpu_run(vm, VCPU_ID);
++	TEST_ASSERT(run->exit_reason == KVM_EXIT_SHUTDOWN,
++		    "Unexpected successful VMEnter with invalid eVMCS pointer!");
++
+ 	kvm_vm_free(vm);
+ }
 -- 
 2.24.1
 
