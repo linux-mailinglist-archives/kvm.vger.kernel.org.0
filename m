@@ -2,53 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B6F6E17E3FA
-	for <lists+kvm@lfdr.de>; Mon,  9 Mar 2020 16:52:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 19F0E17E407
+	for <lists+kvm@lfdr.de>; Mon,  9 Mar 2020 16:52:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727032AbgCIPwY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Mar 2020 11:52:24 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:38255 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726436AbgCIPwY (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 9 Mar 2020 11:52:24 -0400
+        id S1727125AbgCIPwt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Mar 2020 11:52:49 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:56595 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727124AbgCIPwc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 Mar 2020 11:52:32 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1583769142;
+        s=mimecast20190719; t=1583769150;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=UB/IvUr/ugaH4om1futJLL45EG+xV5yXpIjZW59btTM=;
-        b=SEVkeIrD563stOtwq2BQdj/MaInoiZYe30Ejzu2lgLBs4tglMTerTIBMiAxpML+li+dKER
-        Da5hgkQDxIXC5ZcIz147M18Bu3kmBPxDr9w03tx6CL2on+hf67eDuIW+S2/bIpPLNOyr8W
-        22R111slN3iyHDBsiTLAgxw5TCD1qfY=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-148-GX1KOuizPSSfuup2z0bFpQ-1; Mon, 09 Mar 2020 11:52:21 -0400
-X-MC-Unique: GX1KOuizPSSfuup2z0bFpQ-1
-Received: by mail-wr1-f69.google.com with SMTP id v6so2981876wrg.22
-        for <kvm@vger.kernel.org>; Mon, 09 Mar 2020 08:52:20 -0700 (PDT)
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=3E4LIBi/eaTA+USlOTfstaQ+9ylrR99sJyL6v/S7Fzk=;
+        b=RgnK5S4OCgxqO6Kh/A4QZ4z7op1FUFfSat1Ittg5vuPUPn9WUaANF97ml6bdntVLf5UsWH
+        LchrrAkz48sR/zjiUOMfe7RT/RbCZrzwEHMYImHg4HZHlWx58XVekxaC2kezF2hcNVT0y/
+        wmIGBBaSpnSldytrQmWCuRhlqRwHGQ0=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-304-7uG4iJMsNrSZhcnKuntN5Q-1; Mon, 09 Mar 2020 11:52:23 -0400
+X-MC-Unique: 7uG4iJMsNrSZhcnKuntN5Q-1
+Received: by mail-wr1-f72.google.com with SMTP id p11so5383391wrn.10
+        for <kvm@vger.kernel.org>; Mon, 09 Mar 2020 08:52:23 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=UB/IvUr/ugaH4om1futJLL45EG+xV5yXpIjZW59btTM=;
-        b=nAat5G46tZIblIUrtDZolmxrdIxlkxd19LqB++lqg2n92icB51iZG+1wUclCPYntV2
-         JuW27rKdOKmeyAQs3IPnVU5LJavFMfbOeMBEse7F1NrsyfluwfuHnsAXJ2TB1esCgi0v
-         ioMf+BKYkBing7ufMVYj7PJ19ck5++/iYVHLbo8VSt/yBY30aSAKhRP/DQk+d9SN6Y7/
-         sY93ZUIOsKT0A5aNndFSB5tCTNVVi1kaB9bJeSxv9van7KpOo9zMNYrgyym7v4KkVOli
-         qB9SxCLQzQ4irkv+T2hhZR+mSikDnD7/rHCd+fK9KEo3Prbk3dSJD3kbAjQ2LKAZnt4A
-         CF7w==
-X-Gm-Message-State: ANhLgQ3h3CqQD+rEpl8wcDzs8n34m6qXnJdaaqlSJGDcJQWtcrIx2AN7
-        tot4CUAHi1+0nhKkK4mFmCqDyGxOHNyJKAQfLrRZ+ypNTfmls6uYtsW8Ua9gaBKHEfyX+mWi6Dz
-        xbQ+WT04A9BOh
-X-Received: by 2002:a05:6000:10f:: with SMTP id o15mr6853054wrx.351.1583769139971;
-        Mon, 09 Mar 2020 08:52:19 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vtw/xasyVnTCQ/tSOo6zLe/OXjzuXj8HRel7v1396vtd+EE+E43smyhMCZMQ8azfB0ke2vLQw==
-X-Received: by 2002:a05:6000:10f:: with SMTP id o15mr6853031wrx.351.1583769139725;
-        Mon, 09 Mar 2020 08:52:19 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=3E4LIBi/eaTA+USlOTfstaQ+9ylrR99sJyL6v/S7Fzk=;
+        b=NWO2AWnUdmZvo1FflMDyWlNQBi7XbO8WyVQc2pkPK59ZknwHQiOT2/sjB62sksSMVP
+         R3Ggy3RufWIN/bVYJ5FZmoWaqNl+PvrMcl9tnOcB30wHkayjsyeuwE4a9X+TjY4BrygW
+         Vm4EIhFdjK+rxfHhIq7i4HMS9eG6oqDz6/1Oa36dWXrn78NcXO0TG/13Y9Ut5uP59Rpk
+         ZZI1LSh1iNfDXmQ6079jIO1o7XTCZqBWMbfnO0ZcIskLsvdQ69ihM4icxQx9deMf9kpf
+         CIR+CEPjwotuqOqSJzVnQXG9ASf2U0Orgm3t4jRuAmOtyKNCG42MMxPQ9mjzptoHR6/o
+         HzAA==
+X-Gm-Message-State: ANhLgQ3Wc7UKGviPXnhg7O9dJpPjp1r72lsTNd1sid+szZBHs0BaIJO9
+        p8ThfScJMWg81WXGm+KsHs1DV01yJOTk9Vg4sdcpsjPDndxJ+PodQbwpHkE2uhi842wVrWZs8i3
+        OusSexISJOHcf
+X-Received: by 2002:a5d:5411:: with SMTP id g17mr20557077wrv.4.1583769142618;
+        Mon, 09 Mar 2020 08:52:22 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vs9pNoq6eROQLSMnQjOi+/bC2QHYG7NKgj7y/VTWqWWzCnhRUMXrJkC1KQDPqK4jhMpsxv/EA==
+X-Received: by 2002:a5d:5411:: with SMTP id g17mr20557054wrv.4.1583769142367;
+        Mon, 09 Mar 2020 08:52:22 -0700 (PDT)
 Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id q4sm17294521wro.56.2020.03.09.08.52.18
+        by smtp.gmail.com with ESMTPSA id q4sm17294521wro.56.2020.03.09.08.52.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Mar 2020 08:52:18 -0700 (PDT)
+        Mon, 09 Mar 2020 08:52:20 -0700 (PDT)
 From:   Vitaly Kuznetsov <vkuznets@redhat.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Jim Mattson <jmattson@google.com>,
@@ -56,10 +57,12 @@ Cc:     Jim Mattson <jmattson@google.com>,
         kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         Liran Alon <liran.alon@oracle.com>,
         Miaohe Lin <linmiaohe@huawei.com>
-Subject: [PATCH 0/6] KVM: nVMX: propperly handle enlightened vmptrld failure conditions
-Date:   Mon,  9 Mar 2020 16:52:10 +0100
-Message-Id: <20200309155216.204752-1-vkuznets@redhat.com>
+Subject: [PATCH 1/6] KVM: nVMX: avoid NULL pointer dereference with incorrect EVMCS GPAs
+Date:   Mon,  9 Mar 2020 16:52:11 +0100
+Message-Id: <20200309155216.204752-2-vkuznets@redhat.com>
 X-Mailer: git-send-email 2.24.1
+In-Reply-To: <20200309155216.204752-1-vkuznets@redhat.com>
+References: <20200309155216.204752-1-vkuznets@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
@@ -67,34 +70,58 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Miaohe Lin noticed that we incorrectly handle enlightened vmptrld failures
-in nested_vmx_run(). Trying to handle errors correctly, I fixed
-a few things:
-- NULL pointer dereference with invalid eVMCS GPAs [PATCH1]
-- moved eVMCS mapping after migration to nested_get_vmcs12_pages() from
-  nested_sync_vmcs12_to_shadow() [PATCH2]
-- added propper nested_vmx_handle_enlightened_vmptrld() error handling
-  [PATCH3]
-- added selftests for incorrect eVMCS revision id and GPA [PATCHes4-6]
+When an EVMCS enabled L1 guest on KVM will tries doing enlightened VMEnter
+with EVMCS GPA = 0 the host crashes because the
 
-PATCH1 fixes a DoS and thus marked for stable@.
+evmcs_gpa != vmx->nested.hv_evmcs_vmptr
 
-Vitaly Kuznetsov (6):
-  KVM: nVMX: avoid NULL pointer dereference with incorrect EVMCS GPAs
-  KVM: nVMX: stop abusing need_vmcs12_to_shadow_sync for eVMCS mapping
-  KVM: nVMX: properly handle errors in
-    nested_vmx_handle_enlightened_vmptrld()
-  KVM: selftests: define and use EVMCS_VERSION
-  KVM: selftests: test enlightened vmenter with wrong eVMCS version
-  KVM: selftests: enlightened VMPTRLD with an incorrect GPA
+condition in nested_vmx_handle_enlightened_vmptrld() will evaluate to
+false (as nested.hv_evmcs_vmptr is zeroed after init). The crash will
+happen on vmx->nested.hv_evmcs pointer dereference.
 
- arch/x86/kvm/vmx/evmcs.h                      |  7 ++
- arch/x86/kvm/vmx/nested.c                     | 64 +++++++++++++------
- tools/testing/selftests/kvm/include/evmcs.h   |  2 +
- tools/testing/selftests/kvm/lib/x86_64/vmx.c  |  2 +-
- .../testing/selftests/kvm/x86_64/evmcs_test.c | 25 ++++++--
- 5 files changed, 72 insertions(+), 28 deletions(-)
+Another problematic EVMCS ptr value is '-1' but it only causes host crash
+after nested_release_evmcs() invocation. The problem is exactly the same as
+with '0', we mistakenly think that the EVMCS pointer hasn't changed and
+thus nested.hv_evmcs_vmptr is valid.
 
+Resolve the issue by adding an additional !vmx->nested.hv_evmcs
+check to nested_vmx_handle_enlightened_vmptrld(), this way we will
+always be trying kvm_vcpu_map() when nested.hv_evmcs is NULL
+and this is supposed to catch all invalid EVMCS GPAs.
+
+Also, initialize hv_evmcs_vmptr to '0' in nested_release_evmcs()
+to be consistent with initialization where we don't currently
+set hv_evmcs_vmptr to '-1'.
+
+Cc: stable@vger.kernel.org
+Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+---
+ arch/x86/kvm/vmx/nested.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index e920d7834d73..9750e590c89d 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -224,7 +224,7 @@ static inline void nested_release_evmcs(struct kvm_vcpu *vcpu)
+ 		return;
+ 
+ 	kvm_vcpu_unmap(vcpu, &vmx->nested.hv_evmcs_map, true);
+-	vmx->nested.hv_evmcs_vmptr = -1ull;
++	vmx->nested.hv_evmcs_vmptr = 0;
+ 	vmx->nested.hv_evmcs = NULL;
+ }
+ 
+@@ -1923,7 +1923,8 @@ static int nested_vmx_handle_enlightened_vmptrld(struct kvm_vcpu *vcpu,
+ 	if (!nested_enlightened_vmentry(vcpu, &evmcs_gpa))
+ 		return 1;
+ 
+-	if (unlikely(evmcs_gpa != vmx->nested.hv_evmcs_vmptr)) {
++	if (unlikely(!vmx->nested.hv_evmcs ||
++		     evmcs_gpa != vmx->nested.hv_evmcs_vmptr)) {
+ 		if (!vmx->nested.hv_evmcs)
+ 			vmx->nested.current_vmptr = -1ull;
+ 
 -- 
 2.24.1
 
