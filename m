@@ -2,100 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8DAE517E315
-	for <lists+kvm@lfdr.de>; Mon,  9 Mar 2020 16:06:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 602BC17E36E
+	for <lists+kvm@lfdr.de>; Mon,  9 Mar 2020 16:21:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726992AbgCIPGC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Mar 2020 11:06:02 -0400
-Received: from merlin.infradead.org ([205.233.59.134]:38886 "EHLO
-        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726804AbgCIPGC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 Mar 2020 11:06:02 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=merlin.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=r2s3gIPBweXfuFOjhh7nUBoOiFWLhoiQfZtS6vOmD/A=; b=c3HOGujTpXWo2lQjkzMSyzqsLX
-        Ejq9uuXrAcpnK7/Jr3R3P3LlOR3Mp7JfLouaPortD2AFz8/kt1wys/i01pTg0ltHTdT8HlrD3IB63
-        k2AUnHDbabmyptmuhxK/yOY37iilBGoYguHSxUWMiSt0aUNi2gxldIiX8/u4//h6RImZnMvwwN4Ng
-        zhbheTvFKLSKeHJRuG3pojWQXU5FrBKqBIkGh2UeG9S2TSTavcZyQmtHzP3hrDInD7UtYRJnlMwnl
-        aQLe+odfbh3LVrJSQeOmQ6Z2DSl8MXYh/jtL3fls0AYJx8wlCnLwBd1yUL1nVUGG6bFAWi2CCemQD
-        jWiYPTzg==;
-Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
-        by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jBJyD-00074L-Ms; Mon, 09 Mar 2020 15:05:29 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 22B303058B4;
-        Mon,  9 Mar 2020 16:05:26 +0100 (CET)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id 0A12D284A2808; Mon,  9 Mar 2020 16:05:26 +0100 (CET)
-Date:   Mon, 9 Mar 2020 16:05:26 +0100
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     "Liang, Kan" <kan.liang@linux.intel.com>
-Cc:     Luwei Kang <luwei.kang@intel.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        mingo@redhat.com, acme@kernel.org, mark.rutland@arm.com,
-        alexander.shishkin@linux.intel.com, jolsa@redhat.com,
-        namhyung@kernel.org, tglx@linutronix.de, bp@alien8.de,
-        hpa@zytor.com, pbonzini@redhat.com,
-        sean.j.christopherson@intel.com, vkuznets@redhat.com,
-        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
-        pawan.kumar.gupta@linux.intel.com, ak@linux.intel.com,
-        thomas.lendacky@amd.com, fenghua.yu@intel.com,
-        like.xu@linux.intel.com
-Subject: Re: [PATCH v1 01/11] perf/x86/core: Support KVM to assign a
- dedicated counter for guest PEBS
-Message-ID: <20200309150526.GI12561@hirez.programming.kicks-ass.net>
-References: <1583431025-19802-1-git-send-email-luwei.kang@intel.com>
- <1583431025-19802-2-git-send-email-luwei.kang@intel.com>
- <20200306135317.GD12561@hirez.programming.kicks-ass.net>
- <b72cb68e-1a0a-eeff-21b4-ce412e939cfd@linux.intel.com>
- <20200309100443.GG12561@hirez.programming.kicks-ass.net>
- <97ce1ba4-d75a-8db2-ea2f-7d334942b4e6@linux.intel.com>
+        id S1726871AbgCIPVV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Mar 2020 11:21:21 -0400
+Received: from foss.arm.com ([217.140.110.172]:53712 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726729AbgCIPVU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 Mar 2020 11:21:20 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6089430E;
+        Mon,  9 Mar 2020 08:21:20 -0700 (PDT)
+Received: from [10.1.196.63] (e123195-lin.cambridge.arm.com [10.1.196.63])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6AF983F534;
+        Mon,  9 Mar 2020 08:21:19 -0700 (PDT)
+Subject: Re: [PATCH v2 kvmtool 24/30] vfio/pci: Don't write configuration
+ value twice
+To:     Andre Przywara <andre.przywara@arm.com>
+Cc:     kvm@vger.kernel.org, will@kernel.org,
+        julien.thierry.kdev@gmail.com, sami.mujawar@arm.com,
+        lorenzo.pieralisi@arm.com, maz@kernel.org
+References: <20200123134805.1993-1-alexandru.elisei@arm.com>
+ <20200123134805.1993-25-alexandru.elisei@arm.com>
+ <20200205183525.0ed83c94@donnerap.cambridge.arm.com>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <b2ddb3f6-7d92-921d-d66c-fd8987f632e9@arm.com>
+Date:   Mon, 9 Mar 2020 15:21:18 +0000
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <97ce1ba4-d75a-8db2-ea2f-7d334942b4e6@linux.intel.com>
+In-Reply-To: <20200205183525.0ed83c94@donnerap.cambridge.arm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Mar 09, 2020 at 09:12:42AM -0400, Liang, Kan wrote:
+Hi,
 
-> > Suppose your KVM thing claims counter 0/2 (ICL/SKL) for some random PEBS
-> > event, and then the host wants to use PREC_DIST.. Then one of them will
-> > be screwed for no reason what so ever.
-> > 
-> 
-> The multiplexing should be triggered.
-> 
-> For host, if both user A and user B requires PREC_DIST, the multiplexing
-> should be triggered for them.
-> Now, the user B is KVM. I don't think there is difference. The multiplexing
-> should still be triggered. Why it is screwed?
+On 2/5/20 6:35 PM, Andre Przywara wrote:
+> On Thu, 23 Jan 2020 13:47:59 +0000
+> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+>
+> Hi,
+>
+>> After writing to the device fd as part of the PCI configuration space
+>> emulation, we read back from the device to make sure that the write
+>> finished. The value is read back into the PCI configuration space and
+>> afterwards, the same value is copied by the PCI emulation code. Let's
+>> read from the device fd into a temporary variable, to prevent this
+>> double write.
+>>
+>> The double write is harmless in itself. But when we implement
+>> reassignable BARs, we need to keep track of the old BAR value, and the
+>> VFIO code is overwritting it.
+>>
+>> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+>> ---
+>>  vfio/pci.c | 4 ++--
+>>  1 file changed, 2 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/vfio/pci.c b/vfio/pci.c
+>> index abde16dc8693..8a775a4a4a54 100644
+>> --- a/vfio/pci.c
+>> +++ b/vfio/pci.c
+>> @@ -470,7 +470,7 @@ static void vfio_pci_cfg_write(struct kvm *kvm, struct pci_device_header *pci_hd
+>>  	struct vfio_region_info *info;
+>>  	struct vfio_pci_device *pdev;
+>>  	struct vfio_device *vdev;
+>> -	void *base = pci_hdr;
+>> +	u32 tmp;
+> Can we make this a u64, please? I am not sure if 64-bit MMIO is allowed for PCI config space accesses, but a guest could do it anyway, and it looks like it would overwrite the vdev pointer on the stack here in this case.
 
-Becuase if KVM isn't PREC_DIST we should be able to reschedule it to a
-different counter.
+See my replies to the next patch in the series.
 
-> > How is that not destroying scheduling freedom? Any other situation we'd
-> > have moved the !PREC_DIST PEBS event to another counter.
-> > 
-> 
-> All counters are equivalent for them. It doesn't matter if we move it to
-> another counter. There is no impact for the user.
-
-But we cannot move it to another counter, because you're pinning it.
-
-> In the new proposal, KVM user is treated the same as other host events with
-> event constraint. The scheduler is free to choose whether or not to assign a
-> counter for it.
-
-That's what it does, I understand that. I'm saying that that is creating
-artificial contention.
-
-
-Why is this needed anyway? Can't we force the guest to flush and then
-move it over to a new counter?
+Thanks,
+Alex
+>
+> Cheers,
+> Andre.
+>
+>>  
+>>  	if (offset == PCI_ROM_ADDRESS)
+>>  		return;
+>> @@ -490,7 +490,7 @@ static void vfio_pci_cfg_write(struct kvm *kvm, struct pci_device_header *pci_hd
+>>  	if (pdev->irq_modes & VFIO_PCI_IRQ_MODE_MSI)
+>>  		vfio_pci_msi_cap_write(kvm, vdev, offset, data, sz);
+>>  
+>> -	if (pread(vdev->fd, base + offset, sz, info->offset + offset) != sz)
+>> +	if (pread(vdev->fd, &tmp, sz, info->offset + offset) != sz)
+>>  		vfio_dev_warn(vdev, "Failed to read %d bytes from Configuration Space at 0x%x",
+>>  			      sz, offset);
+>>  }
