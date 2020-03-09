@@ -2,222 +2,267 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4D30B17D78D
-	for <lists+kvm@lfdr.de>; Mon,  9 Mar 2020 01:46:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E43AD17D7A2
+	for <lists+kvm@lfdr.de>; Mon,  9 Mar 2020 01:58:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726549AbgCIAqX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 8 Mar 2020 20:46:23 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:29195 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726354AbgCIAqW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 8 Mar 2020 20:46:22 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1583714782;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=KwnA7fgLV0NwQqHrFEb1u2uDqGAmsiA8LFxP4exvvsQ=;
-        b=Yy84Cfp2VR4v+x/GFry6zJU0iOq/k1MB8v2jzxvnIeZQMya405QZLSxdP31J7AwNloDWs4
-        9vIztREzUGPJImISZAwKGnD28KyA6E7HJimr1Qm3ITM+63/B7e/G+zrfAiugkCPpCObkpF
-        gZZlwaLROuGHnnEtRtmGEb+Lsbhl0hA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-311-_mOm6MMYMTqQp6MBZR-xaA-1; Sun, 08 Mar 2020 20:46:20 -0400
-X-MC-Unique: _mOm6MMYMTqQp6MBZR-xaA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AEA9E18A72AE;
-        Mon,  9 Mar 2020 00:46:18 +0000 (UTC)
-Received: from x1.home (ovpn-116-28.phx2.redhat.com [10.3.116.28])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id CE92360BE2;
-        Mon,  9 Mar 2020 00:46:17 +0000 (UTC)
-Date:   Sun, 8 Mar 2020 18:46:10 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     "Tian, Kevin" <kevin.tian@intel.com>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
+        id S1726622AbgCIA6x convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Sun, 8 Mar 2020 20:58:53 -0400
+Received: from mga01.intel.com ([192.55.52.88]:16346 "EHLO mga01.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726346AbgCIA6w (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 8 Mar 2020 20:58:52 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 08 Mar 2020 17:58:51 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,518,1574150400"; 
+   d="scan'208";a="260255816"
+Received: from fmsmsx106.amr.corp.intel.com ([10.18.124.204])
+  by orsmga002.jf.intel.com with ESMTP; 08 Mar 2020 17:58:50 -0700
+Received: from shsmsx105.ccr.corp.intel.com (10.239.4.158) by
+ FMSMSX106.amr.corp.intel.com (10.18.124.204) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Sun, 8 Mar 2020 17:58:50 -0700
+Received: from shsmsx102.ccr.corp.intel.com ([169.254.2.50]) by
+ SHSMSX105.ccr.corp.intel.com ([169.254.11.144]) with mapi id 14.03.0439.000;
+ Mon, 9 Mar 2020 08:58:47 +0800
+From:   "Xu, Like" <like.xu@intel.com>
+To:     lkp <lkp@intel.com>, "Kang, Luwei" <luwei.kang@intel.com>
+CC:     "kbuild-all@lists.01.org" <kbuild-all@lists.01.org>,
+        "x86@kernel.org" <x86@kernel.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "dev@dpdk.org" <dev@dpdk.org>,
-        "mtosatti@redhat.com" <mtosatti@redhat.com>,
-        "thomas@monjalon.net" <thomas@monjalon.net>,
-        "bluca@debian.org" <bluca@debian.org>,
-        "jerinjacobk@gmail.com" <jerinjacobk@gmail.com>,
-        "Richardson, Bruce" <bruce.richardson@intel.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>
-Subject: Re: [PATCH v2 5/7] vfio/pci: Add sriov_configure support
-Message-ID: <20200308184610.647b70f4@x1.home>
-In-Reply-To: <AADFC41AFE54684AB9EE6CBC0274A5D19D7C208E@SHSMSX104.ccr.corp.intel.com>
-References: <158213716959.17090.8399427017403507114.stgit@gimli.home>
-        <158213846731.17090.37693075723046377.stgit@gimli.home>
-        <AADFC41AFE54684AB9EE6CBC0274A5D19D79A943@SHSMSX104.ccr.corp.intel.com>
-        <20200305112230.0dd77712@w520.home>
-        <AADFC41AFE54684AB9EE6CBC0274A5D19D7C07A0@SHSMSX104.ccr.corp.intel.com>
-        <20200306151734.741d1d58@x1.home>
-        <AADFC41AFE54684AB9EE6CBC0274A5D19D7C208E@SHSMSX104.ccr.corp.intel.com>
-Organization: Red Hat
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "peterz@infradead.org" <peterz@infradead.org>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "acme@kernel.org" <acme@kernel.org>,
+        "mark.rutland@arm.com" <mark.rutland@arm.com>,
+        "alexander.shishkin@linux.intel.com" 
+        <alexander.shishkin@linux.intel.com>,
+        "jolsa@redhat.com" <jolsa@redhat.com>,
+        "namhyung@kernel.org" <namhyung@kernel.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "bp@alien8.de" <bp@alien8.de>, "hpa@zytor.com" <hpa@zytor.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "Christopherson, Sean J" <sean.j.christopherson@intel.com>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        "wanpengli@tencent.com" <wanpengli@tencent.com>,
+        "jmattson@google.com" <jmattson@google.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "pawan.kumar.gupta@linux.intel.com" 
+        <pawan.kumar.gupta@linux.intel.com>,
+        "ak@linux.intel.com" <ak@linux.intel.com>,
+        "thomas.lendacky@amd.com" <thomas.lendacky@amd.com>,
+        "Yu, Fenghua" <fenghua.yu@intel.com>,
+        "kan.liang@linux.intel.com" <kan.liang@linux.intel.com>,
+        "like.xu@linux.intel.com" <like.xu@linux.intel.com>
+Subject: RE: [PATCH v1 05/11] KVM: x86/pmu: Add support to reprogram PEBS
+ event for guest counters
+Thread-Topic: [PATCH v1 05/11] KVM: x86/pmu: Add support to reprogram PEBS
+ event for guest counters
+Thread-Index: AQJvPzxww5HXayZ7yL4sj1CxXq+eMQM8p73NpvL3z6A=
+Date:   Mon, 9 Mar 2020 00:58:47 +0000
+Message-ID: <F7FC466FA1E455449AD0F9063BBE758E0C868500@shsmsx102.ccr.corp.intel.com>
+References: <1583431025-19802-6-git-send-email-luwei.kang@intel.com>
+ <202003070038.amFy5Etu%lkp@intel.com>
+In-Reply-To: <202003070038.amFy5Etu%lkp@intel.com>
+Accept-Language: en-US, zh-CN
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, 7 Mar 2020 01:35:23 +0000
-"Tian, Kevin" <kevin.tian@intel.com> wrote:
-
-> > From: Alex Williamson
-> > Sent: Saturday, March 7, 2020 6:18 AM
-> > 
-> > On Fri, 6 Mar 2020 07:57:19 +0000
-> > "Tian, Kevin" <kevin.tian@intel.com> wrote:
-> >   
-> > > > From: Alex Williamson <alex.williamson@redhat.com>
-> > > > Sent: Friday, March 6, 2020 2:23 AM
-> > > >
-> > > > On Tue, 25 Feb 2020 03:08:00 +0000
-> > > > "Tian, Kevin" <kevin.tian@intel.com> wrote:
-> > > >  
-> > > > > > From: Alex Williamson
-> > > > > > Sent: Thursday, February 20, 2020 2:54 AM
-> > > > > >
-> > > > > > With the VF Token interface we can now expect that a vfio userspace
-> > > > > > driver must be in collaboration with the PF driver, an unwitting
-> > > > > > userspace driver will not be able to get past the GET_DEVICE_FD step
-> > > > > > in accessing the device.  We can now move on to actually allowing
-> > > > > > SR-IOV to be enabled by vfio-pci on the PF.  Support for this is not
-> > > > > > enabled by default in this commit, but it does provide a module  
-> > option  
-> > > > > > for this to be enabled (enable_sriov=1).  Enabling VFs is rather
-> > > > > > straightforward, except we don't want to risk that a VF might get
-> > > > > > autoprobed and bound to other drivers, so a bus notifier is used to
-> > > > > > "capture" VFs to vfio-pci using the driver_override support.  We
-> > > > > > assume any later action to bind the device to other drivers is
-> > > > > > condoned by the system admin and allow it with a log warning.
-> > > > > >
-> > > > > > vfio-pci will disable SR-IOV on a PF before releasing the device,
-> > > > > > allowing a VF driver to be assured other drivers cannot take over the
-> > > > > > PF and that any other userspace driver must know the shared VF  
-> > token.  
-> > > > > > This support also does not provide a mechanism for the PF userspace
-> > > > > > driver itself to manipulate SR-IOV through the vfio API.  With this
-> > > > > > patch SR-IOV can only be enabled via the host sysfs interface and the
-> > > > > > PF driver user cannot create or remove VFs.  
-> > > > >
-> > > > > I'm not sure how many devices can be properly configured simply
-> > > > > with pci_enable_sriov. It is not unusual to require PF driver prepare
-> > > > > something before turning PCI SR-IOV capability. If you look kernel
-> > > > > PF drivers, there are only two using generic pci_sriov_configure_
-> > > > > simple (simple wrapper like pci_enable_sriov), while most others
-> > > > > implementing their own callback. However vfio itself has no idea
-> > > > > thus I'm not sure how an user knows whether using this option can
-> > > > > actually meet his purpose. I may miss something here, possibly
-> > > > > using DPDK as an example will make it clearer.  
-> > > >
-> > > > There is still the entire vfio userspace driver interface.  Imagine for
-> > > > example that QEMU emulates the SR-IOV capability and makes a call out
-> > > > to libvirt (or maybe runs with privs for the PF SR-IOV sysfs attribs)
-> > > > when the guest enables SR-IOV.  Can't we assume that any PF specific
-> > > > support can still be performed in the userspace/guest driver, leaving
-> > > > us with a very simple and generic sriov_configure callback in vfio-pci?  
-> > >
-> > > Makes sense. One concern, though, is how an user could be warned
-> > > if he inadvertently uses sysfs to enable SR-IOV on a vfio device whose
-> > > userspace driver is incapable of handling it. Note any VFIO device,
-> > > if SR-IOV capable, will allow user to do so once the module option is
-> > > turned on and the callback is registered. I felt such uncertainty can be
-> > > contained by toggling SR-IOV through a vfio api, but from your description
-> > > obviously it is what you want to avoid. Is it due to the sequence reason,
-> > > e.g. that SR-IOV must be enabled before userspace PF driver sets the
-> > > token?  
-> > 
-> > As in my other reply, enabling SR-IOV via a vfio API suggests that
-> > we're not only granting the user owning the PF device access to the
-> > device itself, but also the ability to create and remove subordinate
-> > devices on the host.  That implies an extended degree of trust in the
-> > user beyond the PF device itself and raises questions about whether a
-> > user who is allowed to create VF devices should automatically be
-> > granted access to those VF devices, what the mechanism would be for
-> > that, and how we might re-assign those devices to other users,
-> > potentially including host kernel usage.  What I'm proposing here
-> > doesn't preclude some future extension in that direction, but instead
-> > tries to simplify a first step towards enabling SR-IOV by leaving the
-> > SR-IOV enablement and VF assignment in the realm of a privileged system
-> > entity.  
+> -----Original Message-----
+> From: kbuild test robot <lkp@intel.com>
+> Sent: Saturday, March 7, 2020 12:28 AM
+> To: Luwei Kang <luwei.kang@intel.com>
+> Cc: kbuild-all@lists.01.org; x86@kernel.org; linux-kernel@vger.kernel.org;
+> kvm@vger.kernel.org; peterz@infradead.org; mingo@redhat.com;
+> acme@kernel.org; mark.rutland@arm.com;
+> alexander.shishkin@linux.intel.com; jolsa@redhat.com;
+> namhyung@kernel.org; tglx@linutronix.de; bp@alien8.de; hpa@zytor.com;
+> pbonzini@redhat.com; sean.j.christopherson@intel.com;
+> vkuznets@redhat.com; wanpengli@tencent.com; jmattson@google.com;
+> joro@8bytes.org; pawan.kumar.gupta@linux.intel.com; ak@linux.intel.com;
+> thomas.lendacky@amd.com; fenghua.yu@intel.com;
+> kan.liang@linux.intel.com; like.xu@linux.intel.com
+> Subject: Re: [PATCH v1 05/11] KVM: x86/pmu: Add support to reprogram PEBS
+> event for guest counters
 > 
-> the intention is clear to me now.
+> Hi Luwei,
 > 
-> > 
-> > So, what I think you're suggesting here is that we should restrict
-> > vfio_pci_sriov_configure() to reject enabling SR-IOV until a user
-> > driver has configured a VF token.  That requires both that the
-> > userspace driver has initialized to this point before SR-IOV can be
-> > enabled and that we would be forced to define a termination point for
-> > the user set VF token.  Logically, this would need to be when the
-> > userspace driver exits or closes the PF device, which implies that we
-> > need to disable SR-IOV on the PF at this point, or we're left in an
-> > inconsistent state where VFs are enabled but cannot be disabled because
-> > we don't have a valid VF token.  Now we're back to nearly a state where
-> > the user has control of not creating devices on the host, but removing
-> > them by closing the device, which will necessarily require that any VF
-> > driver release the device, whether userspace or kernel.
-> > 
-> > I'm not sure what we're gaining by doing this though.  I agree that
-> > there will be users that enable SR-IOV on a PF and then try to, for
-> > example, assign the PF and all the VFs to a VM.  The VFs will fail due
-> > to lacking VF token support, unless they've patch QEMU with my test
-> > code, but depending on the PF driver in the guest, it may, or more
-> > likely won't work.  But don't you think the VFs and probably PF not
-> > working is a sufficient clue that the configuration is invalid?  OTOH,
-> > from what I've heard of the device in the ID table of the pci-pf-stub
-> > driver, they might very well be able to work with both PF and VFs in
-> > QEMU using only my test code to set the VF token.
-> > 
-> > Therefore, I'm afraid what you're asking for here is to impose a usage
-> > restriction as a sanity test, when we don't really know what might be
-> > sane for this particular piece of hardware or use case.  There are
-> > infinite ways that a vfio based userspace driver can fail to configure
-> > their hardware and make it work correctly, many of them are device
-> > specific.  Isn't this just one of those cases?  Thanks,
-> >   
+> Thank you for the patch! Yet something to improve:
 > 
-> what you said all makes sense. so I withdraw the idea of manipulating
-> SR-IOV through vfio ioctl. However I still feel that simply registering 
-> sriov_configuration callback by vfio-pci somehow violates the typical
-> expectation of the sysfs interface. Before this patch, the success return
-> of writing non-zero value to numvfs implies VFs are in sane state and
-> functionally ready for immediate use. However now the behavior of
-> success return becomes undefined for vfio devices, since even vfio-pci 
-> itself doesn't know whether VFs are functional for a random device 
-> (may know some if carrying the same device IDs from pci-pf-stub). It
-> simply relies on the privileged entity who knows exactly the implication
-> of such write, while there is no way to warn inadvertent users which
-> to me is not a good design from kernel API p.o.v. Of course we may 
-> document such restriction and the driver_override may also be an 
-> indirect way to warn such user if he wants to use VFs for other purpose.
-> But it is still less elegant than reporting it in the first place. Maybe
-> what we really require is a new sysfs attribute purely for enabling
-> PCI SR-IOV capability, which doesn't imply making VFs actually 
-> functional as did through the existing numvfs?
+> [auto build test ERROR on kvm/linux-next] [also build test ERROR on
+> tip/perf/core tip/auto-latest v5.6-rc4 next-20200306] [if your patch is applied to
+> the wrong git tree, please drop us a note to help improve the system. BTW, we
+> also suggest to use '--base' option to specify the base tree in git format-patch,
+> please see https://stackoverflow.com/a/37406982]
+> 
+> url:
+> https://github.com/0day-ci/linux/commits/Luwei-Kang/PEBS-virtualization-ena
+> bling-via-DS/20200306-013049
+> base:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git linux-next
+> config: x86_64-randconfig-h003-20200305 (attached as .config)
+> compiler: gcc-7 (Debian 7.5.0-5) 7.5.0
+> reproduce:
+>         # save the attached .config to linux build tree
+>         make ARCH=x86_64
+> 
+> If you fix the issue, kindly add following tag
+> Reported-by: kbuild test robot <lkp@intel.com>
+> 
+> All errors (new ones prefixed by >>):
+> 
+>    ld: arch/x86/kvm/pmu.o: in function `pmc_reprogram_counter':
+> >> arch/x86/kvm/pmu.c:199: undefined reference to
+> `perf_x86_pmu_unset_auto_reload'
 
-I don't read the same guarantee into the sysfs SR-IOV interface.  If
-such a guarantee exists, it's already broken by pci-pf-stub, which like
-vfio-pci allows dynamic IDs and driver_override to bind to any PF device
-allowing the ability to create (potentially) non-functional VFs.  I
-think it would be a really bad decision to fork a new sysfs interface
-for this.  I've already made SR-IOV support in vfio-pci an opt-in via a
-module option, would it ease your concerns if I elaborate in the text
-for the option that enabling SR-IOV may depend on support provided by a
-vfio-pci userspace driver?
+Since we may not lose PEBS functionality for other x86 vendors on KVM
+and we already have defined PERF_X86_EVENT_AUTO_RELOAD in the general
+arch/x86/events/perf_event.h,
 
-I think that without absolutely knowing that an operation is incorrect,
-we're just generating noise and confusion by triggering warnings or
-developing alternate interfaces.  Unfortunately, we have no generic
-means of knowing that an operation is incorrect, so I assume the best.
+one of the ways to fix this issue is to
+move the definition of perf_x86_pmu_unset_auto_reload()
+to the end of arch/x86/events/core.c
+instead of making it Intel specific
+in previous patch "perf/x86: Expose a function to disable auto-reload."
+
 Thanks,
+Like Xu
 
-Alex
-
+> 
+> vim +199 arch/x86/kvm/pmu.c
+> 
+>    101
+>    102	static void pmc_reprogram_counter(struct kvm_pmc *pmc, u32 type,
+>    103					  unsigned config, bool exclude_user,
+>    104					  bool exclude_kernel, bool intr,
+>    105					  bool in_tx, bool in_tx_cp)
+>    106	{
+>    107		struct kvm_pmu *pmu = vcpu_to_pmu(pmc->vcpu);
+>    108		struct perf_event *event;
+>    109		struct perf_event_attr attr = {
+>    110			.type = type,
+>    111			.size = sizeof(attr),
+>    112			.pinned = true,
+>    113			.exclude_idle = true,
+>    114			.exclude_host = 1,
+>    115			.exclude_user = exclude_user,
+>    116			.exclude_kernel = exclude_kernel,
+>    117			.config = config,
+>    118			.disabled = 1,
+>    119		};
+>    120		bool pebs = test_bit(pmc->idx, (unsigned long
+> *)&pmu->pebs_enable);
+>    121
+>    122		attr.sample_period = (-pmc->counter) & pmc_bitmask(pmc);
+>    123
+>    124		if (in_tx)
+>    125			attr.config |= HSW_IN_TX;
+>    126		if (in_tx_cp) {
+>    127			/*
+>    128			 * HSW_IN_TX_CHECKPOINTED is not supported with
+> nonzero
+>    129			 * period. Just clear the sample period so at least
+>    130			 * allocating the counter doesn't fail.
+>    131			 */
+>    132			attr.sample_period = 0;
+>    133			attr.config |= HSW_IN_TX_CHECKPOINTED;
+>    134		}
+>    135
+>    136		if (pebs) {
+>    137			/*
+>    138			 * Host never knows the precision level set by guest.
+>    139			 * Force Host's PEBS event to precision level 1, which will
+>    140			 * not impact the accuracy of the results for guest PEBS
+> events.
+>    141			 * Because,
+>    142			 * - For most cases, there is no difference among precision
+>    143			 *   level 1 to 3 for PEBS events.
+>    144			 * - The functions as below checks the precision level in
+> host.
+>    145			 *   But the results from these functions in host are
+> replaced
+>    146			 *   by guest when sampling the guest.
+>    147			 *   The accuracy for guest PEBS events will not be
+> impacted.
+>    148			 *    -- event_constraints() impacts the index of counter.
+>    149			 *	The index for host event is exactly the same as guest.
+>    150			 *	It's decided by guest.
+>    151			 *    -- pebs_update_adaptive_cfg() impacts the value of
+>    152			 *	MSR_PEBS_DATA_CFG. When guest is switched in,
+>    153			 *	the MSR value will be replaced by the value from
+> guest.
+>    154			 *    -- setup_sample () impacts the output of a PEBS
+> record.
+>    155			 *	Guest handles the PEBS records.
+>    156			 */
+>    157			attr.precise_ip = 1;
+>    158			/*
+>    159			 * When the host's PMI handler completes, it's going to
+>    160			 * enter the guest and trigger the guest's PMI handler.
+>    161			 *
+>    162			 * At this moment, this function may be called by
+>    163			 * kvm_pmu_handle_event(). However the next
+> sample_period
+>    164			 * hasn't been determined by guest yet and the left period,
+>    165			 * which probably be 0, is used for current sample_period.
+>    166			 *
+>    167			 * In this case, perf will mistakenly treat it as non
+>    168			 * sampling events. The PEBS event will error out.
+>    169			 *
+>    170			 * Fill it with maximum period to prevent the error out.
+>    171			 * The guest PMI handler will soon reprogram the counter.
+>    172			 */
+>    173			if (!attr.sample_period)
+>    174				attr.sample_period = (-1ULL) & pmc_bitmask(pmc);
+>    175		}
+>    176
+>    177		event = perf_event_create_kernel_counter(&attr, -1, current,
+>    178							 (intr || pebs) ?
+>    179							 kvm_perf_overflow_intr :
+>    180							 kvm_perf_overflow, pmc);
+>    181		if (IS_ERR(event)) {
+>    182			pr_debug_ratelimited("kvm_pmu: event creation failed %ld
+> for pmc->idx = %d\n",
+>    183				    PTR_ERR(event), pmc->idx);
+>    184			return;
+>    185		}
+>    186
+>    187		if (pebs) {
+>    188			event->guest_dedicated_idx = pmc->idx;
+>    189			/*
+>    190			 * For guest PEBS events, guest takes the responsibility to
+>    191			 * drain PEBS buffers, and load proper values to reset
+> counters.
+>    192			 *
+>    193			 * Host will unconditionally set auto-reload flag for PEBS
+>    194			 * events with fixed period which is not necessary. Host
+> should
+>    195			 * do nothing in drain_pebs() but inject the PMI into the
+> guest.
+>    196			 *
+>    197			 * Unset the auto-reload flag for guest PEBS events.
+>    198			 */
+>  > 199			perf_x86_pmu_unset_auto_reload(event);
+>    200		}
+>    201		pmc->perf_event = event;
+>    202		pmc_to_pmu(pmc)->event_count++;
+>    203		perf_event_enable(event);
+>    204		clear_bit(pmc->idx, pmc_to_pmu(pmc)->reprogram_pmi);
+>    205	}
+>    206
+> 
+> ---
+> 0-DAY CI Kernel Test Service, Intel Corporation
+> https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
