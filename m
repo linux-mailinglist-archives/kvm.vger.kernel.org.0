@@ -2,71 +2,78 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B6DC217EEB9
-	for <lists+kvm@lfdr.de>; Tue, 10 Mar 2020 03:38:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4DA2317EED3
+	for <lists+kvm@lfdr.de>; Tue, 10 Mar 2020 03:51:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726833AbgCJCiV convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Mon, 9 Mar 2020 22:38:21 -0400
-Received: from szxga08-in.huawei.com ([45.249.212.255]:46238 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725845AbgCJCiU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 Mar 2020 22:38:20 -0400
-Received: from DGGEMM405-HUB.china.huawei.com (unknown [172.30.72.55])
-        by Forcepoint Email with ESMTP id 481785740B42A67CB5F8;
-        Tue, 10 Mar 2020 10:38:18 +0800 (CST)
-Received: from dggeme703-chm.china.huawei.com (10.1.199.99) by
- DGGEMM405-HUB.china.huawei.com (10.3.20.213) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Tue, 10 Mar 2020 10:38:16 +0800
-Received: from dggeme753-chm.china.huawei.com (10.3.19.99) by
- dggeme703-chm.china.huawei.com (10.1.199.99) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.1713.5; Tue, 10 Mar 2020 10:38:16 +0800
-Received: from dggeme753-chm.china.huawei.com ([10.7.64.70]) by
- dggeme753-chm.china.huawei.com ([10.7.64.70]) with mapi id 15.01.1713.004;
- Tue, 10 Mar 2020 10:38:16 +0800
-From:   linmiaohe <linmiaohe@huawei.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-CC:     Paolo Bonzini <pbonzini@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Liran Alon <liran.alon@oracle.com>
-Subject: Re[PATCH 3/6] KVM: nVMX: properly handle errors in
- nested_vmx_handle_enlightened_vmptrld()
-Thread-Topic: Re[PATCH 3/6] KVM: nVMX: properly handle errors in
- nested_vmx_handle_enlightened_vmptrld()
-Thread-Index: AdX2g+kg61+qMhM5ThKDU/fibqij4w==
-Date:   Tue, 10 Mar 2020 02:38:16 +0000
-Message-ID: <a65dcb60347c4300a0a1f53c9f25792c@huawei.com>
-Accept-Language: en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.173.221.158]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
-MIME-Version: 1.0
-X-CFilter-Loop: Reflected
+        id S1726558AbgCJCvN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Mar 2020 22:51:13 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:29583 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726446AbgCJCvM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 Mar 2020 22:51:12 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1583808671;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc; bh=R6peiWc+YqZetn/lw3+wRj0vYCDROkZKsrBmpaORfr4=;
+        b=I10mjx8DOQjXevohny2+BbnqasunkNN3m3vb3LXsaS9ujbKPj+B6PVmwglCF5hKOF8HGeh
+        tVw0SFz41ZQ+zjSpzntxp5LosUAmxBXDp2FyB+Un5PnAy5BYQGK6HSAe583WGyMW5s35DR
+        cfn8YwIs2WyLHWkf+/et2DNvBKNE3GU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-184-DaKKvYlVNG2EElH1V4v2nw-1; Mon, 09 Mar 2020 22:51:08 -0400
+X-MC-Unique: DaKKvYlVNG2EElH1V4v2nw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D0FC0800D48;
+        Tue, 10 Mar 2020 02:51:06 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-116-124.gru2.redhat.com [10.97.116.124])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E31235C1C3;
+        Tue, 10 Mar 2020 02:51:02 +0000 (UTC)
+From:   Wainer dos Santos Moschetta <wainersm@redhat.com>
+To:     kvm@vger.kernel.org, pbonzini@redhat.com
+Cc:     linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        sean.j.christopherson@intel.com, shuah@kernel.org,
+        tglx@linutronix.de, thuth@redhat.com
+Subject: [PATCH v2 0/2] kvm: selftests: Introduce TEST_FAIL and convert
+Date:   Mon,  9 Mar 2020 23:50:57 -0300
+Message-Id: <20200310025059.9301-1-wainersm@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi:
-Vitaly Kuznetsov <vkuznets@redhat.com> writes:
->nested_vmx_handle_enlightened_vmptrld() fails in two cases:
->- when we fail to kvm_vcpu_map() the supplied GPA
->- when revision_id is incorrect.
->Genuine Hyper-V raises #UD in the former case (at least with *some* incorrect GPAs) and does VMfailInvalid() in the later. KVM doesn't do anything so L1 just gets stuck retrying the same faulty VMLAUNCH.
->
->nested_vmx_handle_enlightened_vmptrld() has two call sites:
->nested_vmx_run() and nested_get_vmcs12_pages(). The former needs to queue do much: the failure there happens after migration when L2 was running (and
->L1 did something weird like wrote to VP assist page from a different vCPU), just kill L1 with KVM_EXIT_INTERNAL_ERROR.
->
->Reported-by: Miaohe Lin <linmiaohe@huawei.com>
->Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+Introduce the TEST_FAIL macro and change the tests/utilities
+to use it.
 
-Thanks for fixing this issue!:) The code looks fine for and it should works as far as I can say.
-Reviewed-by: Miaohe Lin <linmiaohe@huawei.com>
+v1 -> v2:
+- Completed the conversion to TEST_FAIL.
+
+v1:
+- [RFC PATCH 0/1] kvm: selftests: Add TEST_FAIL macro
+  https://lore.kernel.org/kvm/20200305172532.9360-1-wainersm@redhat.com/
+
+Wainer dos Santos Moschetta (2):
+  selftests: kvm: Introduce the TEST_FAIL macro
+  selftests: kvm: Uses TEST_FAIL in tests/utilities
+
+ tools/testing/selftests/kvm/dirty_log_test.c  |  7 +++----
+ .../testing/selftests/kvm/include/test_util.h |  3 +++
+ .../selftests/kvm/lib/aarch64/processor.c     | 17 +++++++--------
+ .../testing/selftests/kvm/lib/aarch64/ucall.c |  2 +-
+ tools/testing/selftests/kvm/lib/io.c          | 12 +++++------
+ tools/testing/selftests/kvm/lib/kvm_util.c    | 21 ++++++++-----------
+ .../selftests/kvm/lib/x86_64/processor.c      |  5 ++---
+ .../kvm/x86_64/cr4_cpuid_sync_test.c          |  4 ++--
+ .../testing/selftests/kvm/x86_64/evmcs_test.c |  6 +++---
+ .../testing/selftests/kvm/x86_64/state_test.c |  6 +++---
+ .../selftests/kvm/x86_64/svm_vmcall_test.c    |  6 ++----
+ .../kvm/x86_64/vmx_close_while_nested_test.c  |  4 ++--
+ .../selftests/kvm/x86_64/vmx_dirty_log_test.c |  6 +++---
+ .../kvm/x86_64/vmx_tsc_adjust_test.c          |  4 ++--
+ 14 files changed, 49 insertions(+), 54 deletions(-)
+
+-- 
+2.17.2
 
