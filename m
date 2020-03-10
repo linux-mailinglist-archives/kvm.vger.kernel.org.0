@@ -2,94 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3D97317F081
-	for <lists+kvm@lfdr.de>; Tue, 10 Mar 2020 07:32:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4F58617F0CD
+	for <lists+kvm@lfdr.de>; Tue, 10 Mar 2020 08:01:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726205AbgCJGcH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Mar 2020 02:32:07 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:60073 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725919AbgCJGcG (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 10 Mar 2020 02:32:06 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1583821926;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=1yU8oUTA8/wnaOz9hoJioLzE4hVFWMjV/4+YfFPe8NY=;
-        b=aZ3LCU7SduD5XEMiwKFoEifIBfoOmMeOA4uqX7fAg2KkJZXV8XyWGzAwrZ5k9uJaKI36c0
-        hWqzo3WgyALMCjFq/cG6Q7IRGo1jrKqRnLy1UHX/NkE47sKK6VTl0RlHsTEoPUX/+Yu0g1
-        58U5bzzgraNTLZs9a853e/kIAdbSzFk=
-Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
- [209.85.160.199]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-69-u4dUJXd8PVamha83rFUwwA-1; Tue, 10 Mar 2020 02:32:03 -0400
-X-MC-Unique: u4dUJXd8PVamha83rFUwwA-1
-Received: by mail-qt1-f199.google.com with SMTP id z5so4156163qtd.4
-        for <kvm@vger.kernel.org>; Mon, 09 Mar 2020 23:32:03 -0700 (PDT)
+        id S1726258AbgCJHB0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Mar 2020 03:01:26 -0400
+Received: from mail-pl1-f196.google.com ([209.85.214.196]:44678 "EHLO
+        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726195AbgCJHB0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Mar 2020 03:01:26 -0400
+Received: by mail-pl1-f196.google.com with SMTP id d9so5059926plo.11;
+        Tue, 10 Mar 2020 00:01:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id;
+        bh=YVCc+DwPWWPXpUGQIKeRYvwB/hOaYmc0ZXRCQL5h/QI=;
+        b=Ch9tuHA5mP7aZFRWp0dUFohQRYj+RTodiPvpCIpy4uvOXMytCkwdiMZ8Fwni/PV1Nj
+         gUjFzAIGWPoFoGnUY4THtMnyY/X+jN3DJJ/BxpHSt3HVYYq22nZ59dxdQqW/co+r7VYN
+         Q0ZQvxNXcEsmMocQ6TZGyvzuK7zrhPG75zitXlYJzcwYg0B/QADaBME/215jJcAe6t3e
+         0ZBrSTlKoZRb6o4kiw3ItxxWf44Bea+Mz142XjKc/nR0uuGB5RGH6nheTo2d5g+va3Vw
+         2yweAWeEhHJ2kF1UhpbB2jCnYSF2UsHsaxTqwXnK/dIzivkulWBYkDHbrA0Tq3TRASph
+         CuWA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=1yU8oUTA8/wnaOz9hoJioLzE4hVFWMjV/4+YfFPe8NY=;
-        b=thxJINYJSV/X3S7Z7QGmDpXM+DZ6MWz0n99WOSLGm8hjy15ckyQ9IoPkU6Jha8M4Gx
-         zZqJ4LysU9dZgr4CW6/56W6Z0Idh/DjwVI9vu8Z9uSG6miB7KSMiDYmcLNWf+P4XmuTB
-         axD9lLtp5LT723FWYu6PSkAq3Zqr9Oe4wpo/cTVnqqTFR9We1UJUswRsaovQnM/50EQp
-         fJt3WAYSUHLrPK5yTdmLiYXlACGsAnTzb5zAoqYTGSa8ab5UtQ7eulKcn+9dgNycTh9o
-         W0y02Ij6Lzek3DaIsKrv2VWV9rGDjgckW43E3XvDl2uYCZ8a9Q9873kh+sqU9DmkOoVi
-         aRug==
-X-Gm-Message-State: ANhLgQ0Il0o9x1+TdP+fYs0/SOhErTmIN2jD36sj7cl/tR7PRARh2wzQ
-        p7gOXus/apfhIBiNx03AU5xnJpHkRfOA1O+GT4jyY/c8vtvTDix28V8Ui6A3Hof6XnUmYDTxItz
-        iu/4OT2++Dsk+
-X-Received: by 2002:ad4:510f:: with SMTP id g15mr17843673qvp.105.1583821923117;
-        Mon, 09 Mar 2020 23:32:03 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vuxiDdLJVlLKqFBw/p9Wp9h+eHv1I2YQjlDbjEPANoQ+DnOSPJfUC4oUjNeZIuVmyLRb0N5hg==
-X-Received: by 2002:ad4:510f:: with SMTP id g15mr17843652qvp.105.1583821922918;
-        Mon, 09 Mar 2020 23:32:02 -0700 (PDT)
-Received: from redhat.com (bzq-79-178-2-19.red.bezeqint.net. [79.178.2.19])
-        by smtp.gmail.com with ESMTPSA id e7sm14687548qtp.0.2020.03.09.23.31.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Mar 2020 23:32:01 -0700 (PDT)
-Date:   Tue, 10 Mar 2020 02:31:55 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Peter Xu <peterx@redhat.com>
-Cc:     kbuild test robot <lkp@intel.com>, kbuild-all@lists.01.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Yan Zhao <yan.y.zhao@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=YVCc+DwPWWPXpUGQIKeRYvwB/hOaYmc0ZXRCQL5h/QI=;
+        b=twlSLYhPvXzTu9HmseqhisVOvU8lSxXW9Xnc3fktx6cMBgXrVZcG11SoCvhuxePCIA
+         SHw/OYjp3z+sSirf164pj3kzAlDzFHV4CWBpzJ5ZjMxXopN2J40cZJB+RU0x+rxorrcr
+         PD2ave4wm7J+3HwR1fuQ+xEZeavAsQjl7njhbx3j9OgfulFxGvdb76iTOZr5xBFovaDD
+         8S5uKfZ02yYj6oea2eQVX8FdxU9/2sDOB0qJH1n5HhCTEDv3jQX9Z3oUT53DOvjOUnnh
+         079PwwcnPwI2oce2/VDzYSDkQ78NmxRCfNp8TsIE8QTtQ/QxFVlOjYOum4qzusMzYAVg
+         fCng==
+X-Gm-Message-State: ANhLgQ1Um/tRwTfz9tjiWBqRxC6Xelc9cpJT4hh4EqA8VEN8Hk+aFjtb
+        AE5obU77nr/66it+KBhdBtP2lww9
+X-Google-Smtp-Source: ADFU+vtWyb9wxDCHh+eWg5cFe/KSNXdnPSQSZLGp23dJF5fr7mZVeuzE2lhp5gRqVxgsx9KRANH4EA==
+X-Received: by 2002:a17:90a:a409:: with SMTP id y9mr261468pjp.103.1583823685319;
+        Tue, 10 Mar 2020 00:01:25 -0700 (PDT)
+Received: from localhost.localdomain ([103.7.29.6])
+        by smtp.googlemail.com with ESMTPSA id k14sm1645934pje.3.2020.03.10.00.01.22
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
+        Tue, 10 Mar 2020 00:01:24 -0700 (PDT)
+From:   Wanpeng Li <kernellwp@gmail.com>
+X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <sean.j.christopherson@intel.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Kevin Tian <kevin.tian@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Christophe de Dinechin <dinechin@redhat.com>,
-        Lei Cao <lei.cao@stratus.com>
-Subject: Re: [PATCH v5 05/14] KVM: X86: Implement ring-based dirty memory
- tracking
-Message-ID: <20200310022931-mutt-send-email-mst@kernel.org>
-References: <20200304174947.69595-6-peterx@redhat.com>
- <202003061911.MfG74mgX%lkp@intel.com>
- <20200309213554.GF4206@xz-x1>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200309213554.GF4206@xz-x1>
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>
+Subject: [PATCH] KVM: X86: Don't load/put guest FPU context for sleeping AP
+Date:   Tue, 10 Mar 2020 15:01:19 +0800
+Message-Id: <1583823679-17648-1-git-send-email-wanpengli@tencent.com>
+X-Mailer: git-send-email 2.7.4
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Mar 09, 2020 at 05:35:54PM -0400, Peter Xu wrote:
-> I'll probably also
-> move KVM_DIRTY_LOG_PAGE_OFFSET==0 definition to uapi/linux/kvm.h.
+From: Wanpeng Li <wanpengli@tencent.com>
 
+kvm_load_guest_fpu() and kvm_put_guest_fpu() each consume more than 14us 
+observed by ftrace, the qemu userspace FPU is swapped out for the guest 
+FPU context for the duration of the KVM_RUN ioctl even if sleeping AP, 
+we shouldn't load/put guest FPU context for this case especially for 
+serverless scenario which sensitives to boot time.
 
-IMHO KVM_DIRTY_LOG_PAGE_OFFSET is kind of pointless anyway - 
-we won't be able to move data around just by changing the
-uapi value since userspace isn't
-recompiled when kernel changes ...
+Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+---
+ arch/x86/kvm/x86.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
-
-> -- 
-> Peter Xu
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 5de2006..080ffa4 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -8680,7 +8680,6 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *kvm_run)
+ 
+ 	vcpu_load(vcpu);
+ 	kvm_sigset_activate(vcpu);
+-	kvm_load_guest_fpu(vcpu);
+ 
+ 	if (unlikely(vcpu->arch.mp_state == KVM_MP_STATE_UNINITIALIZED)) {
+ 		if (kvm_run->immediate_exit) {
+@@ -8718,12 +8717,14 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *kvm_run)
+ 		}
+ 	}
+ 
++	kvm_load_guest_fpu(vcpu);
++
+ 	if (unlikely(vcpu->arch.complete_userspace_io)) {
+ 		int (*cui)(struct kvm_vcpu *) = vcpu->arch.complete_userspace_io;
+ 		vcpu->arch.complete_userspace_io = NULL;
+ 		r = cui(vcpu);
+ 		if (r <= 0)
+-			goto out;
++			goto out_fpu;
+ 	} else
+ 		WARN_ON(vcpu->arch.pio.count || vcpu->mmio_needed);
+ 
+@@ -8732,8 +8733,9 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *kvm_run)
+ 	else
+ 		r = vcpu_run(vcpu);
+ 
+-out:
++out_fpu:
+ 	kvm_put_guest_fpu(vcpu);
++out:
+ 	if (vcpu->run->kvm_valid_regs)
+ 		store_regs(vcpu);
+ 	post_kvm_run_save(vcpu);
+-- 
+2.7.4
 
