@@ -2,87 +2,84 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id F1402180B14
-	for <lists+kvm@lfdr.de>; Tue, 10 Mar 2020 23:01:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1E60A180C61
+	for <lists+kvm@lfdr.de>; Wed, 11 Mar 2020 00:29:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727728AbgCJWB2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Mar 2020 18:01:28 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:34347 "EHLO ozlabs.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727688AbgCJWB1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Mar 2020 18:01:27 -0400
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 48cTZF1NB6z9s3x;
-        Wed, 11 Mar 2020 09:01:25 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=canb.auug.org.au;
-        s=201702; t=1583877685;
-        bh=wzZzebi45AhIS8HGeVFhdyHkTlG8O3pVyWnqNN9rlqQ=;
-        h=Date:From:To:Cc:Subject:From;
-        b=jVjC6Nju7T0T9y+wjzfdyl/mtjA8IR7sw+h4jd/f7Ti0Pd40VyYazZf2eRRWGU2mJ
-         PMqLMtTwnNkj3c/CHqenS59dGXobbwChG76kOW9xmamf5QnIyr5FK1eRI1sIZ2FaB0
-         Bwjj+3QYsrECTk7K6BrA2eptDTkI3Hb+C8mSO6rAoAAkGKAcS54fhRGdya0LcP2sfd
-         wpJVBUW/zwHo0xZaI0kF0wMR5/8TnYhOkOsZOuYz/Le8XteAsq7frdw8bLNcGq6mLf
-         RwgMpX1YvHtGgNcFe5CG/0TlaZv7FMXzY3cKdh2nbwpGk2WgXWjeR8sJ/knchFE/9w
-         1tv7+owRHiwVw==
-Date:   Wed, 11 Mar 2020 09:01:15 +1100
-From:   Stephen Rothwell <sfr@canb.auug.org.au>
-To:     Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        KVM <kvm@vger.kernel.org>, S390 <linux-s390@vger.kernel.org>
-Cc:     Linux Next Mailing List <linux-next@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Subject: linux-next: Fixes tag needs some work in the kvms390-fixes tree
-Message-ID: <20200311090115.3967bbc6@canb.auug.org.au>
+        id S1727648AbgCJX3b (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Mar 2020 19:29:31 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:49786 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726463AbgCJX3b (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Mar 2020 19:29:31 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02ANScAr188171;
+        Tue, 10 Mar 2020 23:29:27 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding;
+ s=corp-2020-01-29; bh=oA5hD/B94mzTT7EGD/Z+5fNdvb48AJjrLpTzm01JLHc=;
+ b=UVhcl4/fYzH93Suhv8evdoeg+cnyVMPue5iko8//9yXmlkjYpjD8bMBLI4fXyx+rr9T0
+ a0FBAfDWTATrxOAhuMZVBKwIqdZvVomhcpKo8DcIRO4zZXSlDZ+JkqwDrozH7PUE5fiH
+ k3bRKjaAV0fsYpNRqwjDL71/usIVaLqF6kYCA6x0B+4stgEAJxlatjuZbEt4jbFX1gbR
+ GvN4bE5LMDPuTHJONQQhK2pDeozpfZgZ7jebxLbDkNOW0eNEURXa20ZRY0VT8pnZzgnw
+ 8jsnEWncUs7w9wGJUlK73RudDOFbBz3Pk1m1bx8UNO1nAJXMMJKms7Daf6TJfjP9RUUI gA== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by userp2130.oracle.com with ESMTP id 2ym31ughcv-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 10 Mar 2020 23:29:27 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02ANT0NH071921;
+        Tue, 10 Mar 2020 23:29:26 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by aserp3020.oracle.com with ESMTP id 2yp8nwk188-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 10 Mar 2020 23:29:26 +0000
+Received: from abhmp0006.oracle.com (abhmp0006.oracle.com [141.146.116.12])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 02ANTP78004785;
+        Tue, 10 Mar 2020 23:29:25 GMT
+Received: from ban25x6uut29.us.oracle.com (/10.153.73.29)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Tue, 10 Mar 2020 16:29:25 -0700
+From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
+To:     kvm@vger.kernel.org
+Cc:     pbonzini@redhat.com, jmattson@google.com,
+        sean.j.christopherson@intel.com
+Subject: [PATCH] kvm-unit-test: nVMX: Test Selector and Base Address fields of Guest Segment registers
+Date:   Tue, 10 Mar 2020 18:51:48 -0400
+Message-Id: <20200310225149.31254-1-krish.sadhukhan@oracle.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/kv.9uJJpUfaryogAyL3K1zT";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9556 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 mlxscore=0 phishscore=0
+ spamscore=0 malwarescore=0 adultscore=0 suspectscore=13 mlxlogscore=846
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
+ definitions=main-2003100140
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9556 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 lowpriorityscore=0
+ spamscore=0 priorityscore=1501 impostorscore=0 bulkscore=0 suspectscore=13
+ phishscore=0 mlxlogscore=916 mlxscore=0 malwarescore=0 clxscore=1015
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
+ definitions=main-2003100140
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
---Sig_/kv.9uJJpUfaryogAyL3K1zT
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Even thought today's x86 hardware uses paging and not segmentation for memory
+management, it is still good to have some tests that can verify the sanity of
+the segment register fields on vmentry of nested guests.
 
-Hi all,
+The test on SS Selector field is failing because the hardware (I am using
+Intel Xeon Platinum 8167M 2.00GHz) doesn't raise any error even if the
+prescribed bit pattern is not set and as a result vmentry succeeds.
 
-In commit
 
-  b5de9eede579 ("KVM: s390: Also reset registers in sync regs for initial c=
-pu reset")
+[PATCH] kvm-unit-test: nVMX: Test Selector and Base Address fields of Guest Segment
 
-Fixes tag
+ lib/x86/processor.h |   1 +
+ x86/vmx_tests.c     | 109 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 110 insertions(+)
 
-  Fixes: 7de3f1423ff ("KVM: s390: Add new reset vcpu API")
+Krish Sadhukhan (1):
+      nVMX: Test Selector and Base Address fields of Guest Segment Registers on
 
-has these problem(s):
-
-  - SHA1 should be at least 12 digits long
-    Can be fixed by setting core.abbrev to 12 (or more) or (for git v2.11
-    or later) just making sure it is not set (or set to "auto").
-
---=20
-Cheers,
-Stephen Rothwell
-
---Sig_/kv.9uJJpUfaryogAyL3K1zT
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAl5oDisACgkQAVBC80lX
-0GzYaAf9FXBdN/sPL0m1wS/M8NvQrp0wWqykM2mze0kNV+wY77eqasWuk3dSkCZQ
-YOWpjCN/T6FTBwJpiNLZMtgoKYOKFwkPToNXjCNkl+3sXrp/8xhKREmnobTSpqyP
-XWhIzMfqyXRn5/5gWg44M/pVIE5KIDeDxZzeU4tbcDCCsoHOeqkdne1n7KOkRk+L
-yTw1hgzfqPeT6uegHLvSwgO1K1XwLDZagZJrPzdMgr5wGvMMEe6J4gk7msoXBpia
-3n+gZjDjDeYb8erVrRxqR7niqGb7vIPeeKkP4PNVKxnVoIg2N0/kLrQHHvnZGEaU
-prhFRX7EBNh0WELfnGmQDRa/L3c75Q==
-=IiMa
------END PGP SIGNATURE-----
-
---Sig_/kv.9uJJpUfaryogAyL3K1zT--
