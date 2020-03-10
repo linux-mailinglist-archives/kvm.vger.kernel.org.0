@@ -2,120 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 545C117FB4B
-	for <lists+kvm@lfdr.de>; Tue, 10 Mar 2020 14:12:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6D3E617FBDB
+	for <lists+kvm@lfdr.de>; Tue, 10 Mar 2020 14:17:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731573AbgCJNMc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Mar 2020 09:12:32 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:30834 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1731558AbgCJNMa (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 10 Mar 2020 09:12:30 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 02ADC3v3016421;
-        Tue, 10 Mar 2020 09:12:29 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2ynraxnm8c-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 10 Mar 2020 09:12:29 -0400
-Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 02ADCDuN017656;
-        Tue, 10 Mar 2020 09:12:28 -0400
-Received: from ppma05wdc.us.ibm.com (1b.90.2fa9.ip4.static.sl-reverse.com [169.47.144.27])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2ynraxnm7e-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 10 Mar 2020 09:12:28 -0400
-Received: from pps.filterd (ppma05wdc.us.ibm.com [127.0.0.1])
-        by ppma05wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 02ADC0Nn030386;
-        Tue, 10 Mar 2020 13:12:27 GMT
-Received: from b03cxnp08026.gho.boulder.ibm.com (b03cxnp08026.gho.boulder.ibm.com [9.17.130.18])
-        by ppma05wdc.us.ibm.com with ESMTP id 2ym386junm-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 10 Mar 2020 13:12:27 +0000
-Received: from b03ledav006.gho.boulder.ibm.com (b03ledav006.gho.boulder.ibm.com [9.17.130.237])
-        by b03cxnp08026.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 02ADCQr554788370
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 10 Mar 2020 13:12:26 GMT
-Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B0EBBC6057;
-        Tue, 10 Mar 2020 13:12:26 +0000 (GMT)
-Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 328A4C6059;
-        Tue, 10 Mar 2020 13:12:26 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.114.17.106])
-        by b03ledav006.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Tue, 10 Mar 2020 13:12:26 +0000 (GMT)
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
-To:     Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.vnet.ibm.com>,
-        David Hildenbrand <david@redhat.com>
-Cc:     KVM <kvm@vger.kernel.org>, linux-s390 <linux-s390@vger.kernel.org>,
-        Cornelia Huck <cohuck@redhat.com>, stable@vger.kernel.org
-Subject: [PATCH v2] KVM: s390: Also reset registers in sync regs for initial cpu reset
-Date:   Tue, 10 Mar 2020 09:12:23 -0400
-Message-Id: <20200310131223.10287-1-borntraeger@de.ibm.com>
-X-Mailer: git-send-email 2.25.0
+        id S1730277AbgCJNQ5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Mar 2020 09:16:57 -0400
+Received: from mail.kernel.org ([198.145.29.99]:42066 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728337AbgCJNQ4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Mar 2020 09:16:56 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 9503E24693;
+        Tue, 10 Mar 2020 13:16:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1583846215;
+        bh=CiF2e4Gu3MUdh7Lg3zur4QzwVBU4lRXnHY3VzJVyY/4=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=Dyd17xpVF0JxkmyH3agz6PA0jQ9JY+cKzy37NP2xJREQyR1k4eYVBwOMm3QBwZafZ
+         78doEykwC9a3jiy++aeUHd2sjMmBr52uxv6lUDfQzWrsO5rzavgL7Be86zUEPOKaZw
+         rwwyMfDKk9vYKGWvUHcwjyAXo+h3EcV1GpDqMlbg=
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+        by disco-boy.misterjones.org with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        (Exim 4.92)
+        (envelope-from <maz@kernel.org>)
+        id 1jBekf-00Bb9d-VK; Tue, 10 Mar 2020 13:16:54 +0000
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
- definitions=2020-03-10_06:2020-03-10,2020-03-10 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 spamscore=0
- malwarescore=0 mlxlogscore=999 lowpriorityscore=0 bulkscore=0 mlxscore=0
- phishscore=0 impostorscore=0 suspectscore=0 clxscore=1015
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2001150001 definitions=main-2003100088
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date:   Tue, 10 Mar 2020 13:16:53 +0000
+From:   Marc Zyngier <maz@kernel.org>
+To:     zhukeqian <zhukeqian1@huawei.com>
+Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        Jay Zhou <jianjay.zhou@huawei.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>
+Subject: Re: [RFC] KVM: arm64: support enabling dirty log graually in small
+ chunks
+In-Reply-To: <64925c8b-af3d-beb5-bc9b-66ef1e47f92d@huawei.com>
+References: <20200309085727.1106-1-zhukeqian1@huawei.com>
+ <4b85699ec1d354cc73f5302560231f86@misterjones.org>
+ <64925c8b-af3d-beb5-bc9b-66ef1e47f92d@huawei.com>
+Message-ID: <a642a79ea9190542a9098e4c9dc5a9f2@kernel.org>
+X-Sender: maz@kernel.org
+User-Agent: Roundcube Webmail/1.3.10
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: zhukeqian1@huawei.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, jianjay.zhou@huawei.com, sean.j.christopherson@intel.com, pbonzini@redhat.com, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When we do the initial CPU reset we must not only clear the registers
-in the internal data structures but also in kvm_run sync_regs. For
-modern userspace sync_regs is the only place that it looks at.
+On 2020-03-10 08:26, zhukeqian wrote:
+> Hi Marc,
+> 
+> On 2020/3/9 19:45, Marc Zyngier wrote:
+>> Kegian,
 
-Cc: stable@vger.kernel.org
-Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
----
- arch/s390/kvm/kvm-s390.c | 18 +++++++++++++++++-
- 1 file changed, 17 insertions(+), 1 deletion(-)
+[...]
 
-diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-index d7ff30e45589..c2e6d4ba4e23 100644
---- a/arch/s390/kvm/kvm-s390.c
-+++ b/arch/s390/kvm/kvm-s390.c
-@@ -3268,7 +3268,10 @@ static void kvm_arch_vcpu_ioctl_initial_reset(struct kvm_vcpu *vcpu)
- 	/* Initial reset is a superset of the normal reset */
- 	kvm_arch_vcpu_ioctl_normal_reset(vcpu);
- 
--	/* this equals initial cpu reset in pop, but we don't switch to ESA */
-+	/*
-+	 * This equals initial cpu reset in pop, but we don't switch to ESA.
-+	 * We do not only reset the internal data, but also ...
-+	 */
- 	vcpu->arch.sie_block->gpsw.mask = 0;
- 	vcpu->arch.sie_block->gpsw.addr = 0;
- 	kvm_s390_set_prefix(vcpu, 0);
-@@ -3278,6 +3281,19 @@ static void kvm_arch_vcpu_ioctl_initial_reset(struct kvm_vcpu *vcpu)
- 	memset(vcpu->arch.sie_block->gcr, 0, sizeof(vcpu->arch.sie_block->gcr));
- 	vcpu->arch.sie_block->gcr[0] = CR0_INITIAL_MASK;
- 	vcpu->arch.sie_block->gcr[14] = CR14_INITIAL_MASK;
-+
-+	/* ... the data in sync regs */
-+	memset(vcpu->run->s.regs.crs, 0, sizeof(vcpu->run->s.regs.crs));
-+	vcpu->run->s.regs.ckc = 0;
-+	vcpu->run->s.regs.crs[0] = CR0_INITIAL_MASK;
-+	vcpu->run->s.regs.crs[14] = CR14_INITIAL_MASK;
-+	vcpu->run->psw_addr = 0;
-+	vcpu->run->psw_mask = 0;
-+	vcpu->run->s.regs.todpr = 0;
-+	vcpu->run->s.regs.cputm = 0;
-+	vcpu->run->s.regs.ckc = 0;
-+	vcpu->run->s.regs.pp = 0;
-+	vcpu->run->s.regs.gbea = 1;
- 	vcpu->run->s.regs.fpc = 0;
- 	vcpu->arch.sie_block->gbea = 1;
- 	vcpu->arch.sie_block->pp = 0;
+>> Is there a userspace counterpart to it?
+>> 
+> As this KVM/x86 related changes have not been merged to mainline
+> kernel, some little modification is needed on mainline Qemu.
+
+Could you please point me to these changes?
+
+> As I tested this patch on a 128GB RAM Linux VM with no huge pages, the
+> time of enabling dirty log will decrease obviously.
+
+I'm not sure how realistic that is. Not having huge pages tends to lead
+to pretty bad performance in general...
+
+Thanks,
+
+         M.
 -- 
-2.25.0
-
+Jazz is not dead. It just smells funny...
