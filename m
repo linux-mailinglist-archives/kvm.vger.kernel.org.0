@@ -2,28 +2,28 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1D3EA17EE6D
-	for <lists+kvm@lfdr.de>; Tue, 10 Mar 2020 03:15:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B6DC217EEB9
+	for <lists+kvm@lfdr.de>; Tue, 10 Mar 2020 03:38:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726837AbgCJCPa convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Mon, 9 Mar 2020 22:15:30 -0400
-Received: from szxga02-in.huawei.com ([45.249.212.188]:3474 "EHLO huawei.com"
+        id S1726833AbgCJCiV convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Mon, 9 Mar 2020 22:38:21 -0400
+Received: from szxga08-in.huawei.com ([45.249.212.255]:46238 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726749AbgCJCP0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 Mar 2020 22:15:26 -0400
-Received: from DGGEMM403-HUB.china.huawei.com (unknown [172.30.72.55])
-        by Forcepoint Email with ESMTP id CFE5675DCFD32CF15548;
-        Tue, 10 Mar 2020 10:15:22 +0800 (CST)
-Received: from dggeme751-chm.china.huawei.com (10.3.19.97) by
- DGGEMM403-HUB.china.huawei.com (10.3.20.211) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Tue, 10 Mar 2020 10:15:22 +0800
+        id S1725845AbgCJCiU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 Mar 2020 22:38:20 -0400
+Received: from DGGEMM405-HUB.china.huawei.com (unknown [172.30.72.55])
+        by Forcepoint Email with ESMTP id 481785740B42A67CB5F8;
+        Tue, 10 Mar 2020 10:38:18 +0800 (CST)
+Received: from dggeme703-chm.china.huawei.com (10.1.199.99) by
+ DGGEMM405-HUB.china.huawei.com (10.3.20.213) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Tue, 10 Mar 2020 10:38:16 +0800
 Received: from dggeme753-chm.china.huawei.com (10.3.19.99) by
- dggeme751-chm.china.huawei.com (10.3.19.97) with Microsoft SMTP Server
+ dggeme703-chm.china.huawei.com (10.1.199.99) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.1713.5; Tue, 10 Mar 2020 10:15:22 +0800
+ 15.1.1713.5; Tue, 10 Mar 2020 10:38:16 +0800
 Received: from dggeme753-chm.china.huawei.com ([10.7.64.70]) by
  dggeme753-chm.china.huawei.com ([10.7.64.70]) with mapi id 15.01.1713.004;
- Tue, 10 Mar 2020 10:15:22 +0800
+ Tue, 10 Mar 2020 10:38:16 +0800
 From:   linmiaohe <linmiaohe@huawei.com>
 To:     Vitaly Kuznetsov <vkuznets@redhat.com>
 CC:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -32,13 +32,13 @@ CC:     Paolo Bonzini <pbonzini@redhat.com>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         Liran Alon <liran.alon@oracle.com>
-Subject: Re: [PATCH 1/6] KVM: nVMX: avoid NULL pointer dereference with
- incorrect EVMCS GPAs
-Thread-Topic: [PATCH 1/6] KVM: nVMX: avoid NULL pointer dereference with
- incorrect EVMCS GPAs
-Thread-Index: AdX2gYnHrRJm24gdykq2IZCf5t2hfg==
-Date:   Tue, 10 Mar 2020 02:15:22 +0000
-Message-ID: <35a2dd64f2024f4693737af24637a3d6@huawei.com>
+Subject: Re[PATCH 3/6] KVM: nVMX: properly handle errors in
+ nested_vmx_handle_enlightened_vmptrld()
+Thread-Topic: Re[PATCH 3/6] KVM: nVMX: properly handle errors in
+ nested_vmx_handle_enlightened_vmptrld()
+Thread-Index: AdX2g+kg61+qMhM5ThKDU/fibqij4w==
+Date:   Tue, 10 Mar 2020 02:38:16 +0000
+Message-ID: <a65dcb60347c4300a0a1f53c9f25792c@huawei.com>
 Accept-Language: en-US
 Content-Language: zh-CN
 X-MS-Has-Attach: 
@@ -55,24 +55,18 @@ X-Mailing-List: kvm@vger.kernel.org
 
 Hi:
 Vitaly Kuznetsov <vkuznets@redhat.com> writes:
->When an EVMCS enabled L1 guest on KVM will tries doing enlightened VMEnter with EVMCS GPA = 0 the host crashes because the
+>nested_vmx_handle_enlightened_vmptrld() fails in two cases:
+>- when we fail to kvm_vcpu_map() the supplied GPA
+>- when revision_id is incorrect.
+>Genuine Hyper-V raises #UD in the former case (at least with *some* incorrect GPAs) and does VMfailInvalid() in the later. KVM doesn't do anything so L1 just gets stuck retrying the same faulty VMLAUNCH.
 >
->evmcs_gpa != vmx->nested.hv_evmcs_vmptr
+>nested_vmx_handle_enlightened_vmptrld() has two call sites:
+>nested_vmx_run() and nested_get_vmcs12_pages(). The former needs to queue do much: the failure there happens after migration when L2 was running (and
+>L1 did something weird like wrote to VP assist page from a different vCPU), just kill L1 with KVM_EXIT_INTERNAL_ERROR.
 >
->condition in nested_vmx_handle_enlightened_vmptrld() will evaluate to false (as nested.hv_evmcs_vmptr is zeroed after init). The crash will happen on vmx->nested.hv_evmcs pointer dereference.
->
->Another problematic EVMCS ptr value is '-1' but it only causes host crash after nested_release_evmcs() invocation. The problem is exactly the same as with '0', we mistakenly think that the EVMCS pointer hasn't changed and thus nested.hv_evmcs_vmptr is valid.
->
->Resolve the issue by adding an additional !vmx->nested.hv_evmcs check to nested_vmx_handle_enlightened_vmptrld(), this way we will always be trying kvm_vcpu_map() when nested.hv_evmcs is NULL and this is supposed to catch all invalid EVMCS GPAs.
->
->Also, initialize hv_evmcs_vmptr to '0' in nested_release_evmcs() to be consistent with initialization where we don't currently set hv_evmcs_vmptr to '-1'.
->
->Cc: stable@vger.kernel.org
+>Reported-by: Miaohe Lin <linmiaohe@huawei.com>
 >Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
->---
-> arch/x86/kvm/vmx/nested.c | 5 +++--
-> 1 file changed, 3 insertions(+), 2 deletions(-)
 
-Good catch! Patch looks good for me. Thanks!
+Thanks for fixing this issue!:) The code looks fine for and it should works as far as I can say.
 Reviewed-by: Miaohe Lin <linmiaohe@huawei.com>
 
