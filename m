@@ -2,41 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5073217F76D
-	for <lists+kvm@lfdr.de>; Tue, 10 Mar 2020 13:29:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A6BEE17F783
+	for <lists+kvm@lfdr.de>; Tue, 10 Mar 2020 13:35:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726316AbgCJM3a (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Mar 2020 08:29:30 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:18026 "EHLO
+        id S1726403AbgCJMfD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Mar 2020 08:35:03 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:51832 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726273AbgCJM33 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 10 Mar 2020 08:29:29 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 02ACKSQ2041764
-        for <kvm@vger.kernel.org>; Tue, 10 Mar 2020 08:29:28 -0400
-Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2ym8g4gy4x-1
+        by vger.kernel.org with ESMTP id S1726269AbgCJMfD (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 10 Mar 2020 08:35:03 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 02ACJfGt141490
+        for <kvm@vger.kernel.org>; Tue, 10 Mar 2020 08:35:01 -0400
+Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2ynra44svb-1
         (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Tue, 10 Mar 2020 08:29:27 -0400
+        for <kvm@vger.kernel.org>; Tue, 10 Mar 2020 08:35:01 -0400
 Received: from localhost
-        by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
         for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
-        Tue, 10 Mar 2020 12:29:26 -0000
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
-        by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        Tue, 10 Mar 2020 12:34:59 -0000
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
+        by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
         (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Tue, 10 Mar 2020 12:29:24 -0000
+        Tue, 10 Mar 2020 12:34:55 -0000
 Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 02ACTN0g60948632
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 02ACYs7w459200
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 10 Mar 2020 12:29:23 GMT
+        Tue, 10 Mar 2020 12:34:54 GMT
 Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 18C195204F;
-        Tue, 10 Mar 2020 12:29:23 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 83AC85204F;
+        Tue, 10 Mar 2020 12:34:54 +0000 (GMT)
 Received: from oc7455500831.ibm.com (unknown [9.152.224.141])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 961A252050;
-        Tue, 10 Mar 2020 12:29:22 +0000 (GMT)
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 42A6F52054;
+        Tue, 10 Mar 2020 12:34:54 +0000 (GMT)
 Subject: Re: [PATCH 0/4] KVM: selftests: Various cleanups and fixes
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
 To:     Andrew Jones <drjones@redhat.com>
 Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, frankja@linux.ibm.com,
         david@redhat.com, cohuck@redhat.com, peterx@redhat.com,
@@ -44,7 +45,7 @@ Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, frankja@linux.ibm.com,
 References: <20200310091556.4701-1-drjones@redhat.com>
  <1b6d5b6a-f323-14d5-f423-d59547637819@de.ibm.com>
  <20200310115814.fxgbfrxn62zge2jp@kamzik.brq.redhat.com>
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
+ <a801a41c-5b7e-9c01-fc24-02d7f57079ca@de.ibm.com>
 Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
  xsFNBE6cPPgBEAC2VpALY0UJjGmgAmavkL/iAdqul2/F9ONz42K6NrwmT+SI9CylKHIX+fdf
  J34pLNJDmDVEdeb+brtpwC9JEZOLVE0nb+SR83CsAINJYKG3V1b3Kfs0hydseYKsBYqJTN2j
@@ -88,194 +89,201 @@ Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
  jaqYefx7yQ7FJXXETd2uVURiDeNEFhVZWb5CiBJM5c6qQMhmkS4VyT7/+raaEGgkEKEgHOWf
  ZDP8BHfXtszHqI3Fo1F4IKFo/AP8GOFFxMRgbvlAs8z/+rEEaQYjxYJqj08raw6P4LFBqozr
  nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Date:   Tue, 10 Mar 2020 13:29:22 +0100
+Date:   Tue, 10 Mar 2020 13:34:54 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200310115814.fxgbfrxn62zge2jp@kamzik.brq.redhat.com>
+In-Reply-To: <a801a41c-5b7e-9c01-fc24-02d7f57079ca@de.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-x-cbid: 20031012-4275-0000-0000-000003AA33BE
+x-cbid: 20031012-0012-0000-0000-0000038EFC4E
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20031012-4276-0000-0000-000038BF4CDC
-Message-Id: <a801a41c-5b7e-9c01-fc24-02d7f57079ca@de.ibm.com>
+x-cbparentid: 20031012-0013-0000-0000-000021CBC758
+Message-Id: <9d33b783-8911-d638-af34-d69eab3520ef@de.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
  definitions=2020-03-10_06:2020-03-10,2020-03-10 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 mlxscore=0
- suspectscore=0 priorityscore=1501 lowpriorityscore=0 clxscore=1015
- impostorscore=0 mlxlogscore=837 spamscore=0 malwarescore=0 bulkscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2001150001 definitions=main-2003100083
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 mlxlogscore=850
+ mlxscore=0 bulkscore=0 priorityscore=1501 suspectscore=0 malwarescore=0
+ adultscore=0 lowpriorityscore=0 clxscore=1015 impostorscore=0 spamscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
+ definitions=main-2003100083
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-I get the following with your patches.
+On 10.03.20 13:29, Christian Borntraeger wrote:
+> I get the following with your patches.
+
+And those errors have been there before. 
+I will provide fixups for sync_regs_test.c and reset.c. So you patch set really has value.
 
 
-In file included from s390x/sync_regs_test.c:21:
-s390x/sync_regs_test.c: In function ‘compare_sregs’:
-s390x/sync_regs_test.c:41:7: warning: format ‘%llx’ expects argument of type ‘long long unsigned int’, but argument 6 has type ‘__u32’ {aka ‘unsigned int’} [-Wformat=]
-   41 |       "Register " #reg \
-      |       ^~~~~~~~~~~
-   42 |       " values did not match: 0x%llx, 0x%llx\n", \
-   43 |       left->reg, right->reg)
-      |       ~~~~~~~~~~~~~~~~~~~~~~
-   44 | 
-      |        
-   45 | static void compare_regs(struct kvm_regs *left, struct kvm_sync_regs *right)
-      | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   46 | {
-      | ~      
-   47 |  int i;
-      |  ~~~~~~
-   48 | 
-      |        
-   49 |  for (i = 0; i < 16; i++)
-      |  ~~~~~~~~~~~~~~~~~~~~~~~~
-   50 |   REG_COMPARE(gprs[i]);
-      |   ~~~~~~~~~~~~~~~~~~~~~
-   51 | }
-      | ~      
-   52 | 
-      |        
-   53 | static void compare_sregs(struct kvm_sregs *left, struct kvm_sync_regs *right)
-      | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   54 | {
-      | ~      
-   55 |  int i;
-      |  ~~~~~~
-   56 | 
-      |        
-   57 |  for (i = 0; i < 16; i++)
-      |  ~~~~~~~~~~~~~~~~~~~~~~~~
-   58 |   REG_COMPARE(acrs[i]);
-      |   ~~~~~~~~~~~~~~~~~~~
-      |                   |
-      |                   __u32 {aka unsigned int}
-include/test_util.h:46:43: note: in definition of macro ‘TEST_ASSERT’
-   46 |  test_assert((e), #e, __FILE__, __LINE__, fmt, ##__VA_ARGS__)
-      |                                           ^~~
-s390x/sync_regs_test.c:58:3: note: in expansion of macro ‘REG_COMPARE’
-   58 |   REG_COMPARE(acrs[i]);
-      |   ^~~~~~~~~~~
-s390x/sync_regs_test.c:41:7: warning: format ‘%llx’ expects argument of type ‘long long unsigned int’, but argument 7 has type ‘__u32’ {aka ‘unsigned int’} [-Wformat=]
-   41 |       "Register " #reg \
-      |       ^~~~~~~~~~~
-   42 |       " values did not match: 0x%llx, 0x%llx\n", \
-   43 |       left->reg, right->reg)
-      |                  ~~~~~~~~~~~
-   44 | 
-      |        
-   45 | static void compare_regs(struct kvm_regs *left, struct kvm_sync_regs *right)
-      | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   46 | {
-      | ~      
-   47 |  int i;
-      |  ~~~~~~
-   48 | 
-      |        
-   49 |  for (i = 0; i < 16; i++)
-      |  ~~~~~~~~~~~~~~~~~~~~~~~~
-   50 |   REG_COMPARE(gprs[i]);
-      |   ~~~~~~~~~~~~~~~~~~~~~
-   51 | }
-      | ~      
-   52 | 
-      |        
-   53 | static void compare_sregs(struct kvm_sregs *left, struct kvm_sync_regs *right)
-      | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   54 | {
-      | ~      
-   55 |  int i;
-      |  ~~~~~~
-   56 | 
-      |        
-   57 |  for (i = 0; i < 16; i++)
-      |  ~~~~~~~~~~~~~~~~~~~~~~~~
-   58 |   REG_COMPARE(acrs[i]);
-      |   ~~~~~~~~~~~~~~~~~~~
-      |                   |
-      |                   __u32 {aka unsigned int}
-include/test_util.h:46:43: note: in definition of macro ‘TEST_ASSERT’
-   46 |  test_assert((e), #e, __FILE__, __LINE__, fmt, ##__VA_ARGS__)
-      |                                           ^~~
-s390x/sync_regs_test.c:58:3: note: in expansion of macro ‘REG_COMPARE’
-   58 |   REG_COMPARE(acrs[i]);
-      |   ^~~~~~~~~~~
-s390x/sync_regs_test.c: In function ‘main’:
-s390x/sync_regs_test.c:158:7: warning: format ‘%llx’ expects argument of type ‘long long unsigned int’, but argument 6 has type ‘__u32’ {aka ‘unsigned int’} [-Wformat=]
-  158 |       "acr0 sync regs value incorrect 0x%llx.",
-      |       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  159 |       run->s.regs.acrs[0]);
-      |       ~~~~~~~~~~~~~~~~~~~
-      |                       |
-      |                       __u32 {aka unsigned int}
-include/test_util.h:46:43: note: in definition of macro ‘TEST_ASSERT’
-   46 |  test_assert((e), #e, __FILE__, __LINE__, fmt, ##__VA_ARGS__)
-      |                                           ^~~
-s390x/sync_regs_test.c:158:44: note: format string is defined here
-  158 |       "acr0 sync regs value incorrect 0x%llx.",
-      |                                         ~~~^
-      |                                            |
-      |                                            long long unsigned int
-      |      
-
-
-
-On 10.03.20 12:58, Andrew Jones wrote:
-> On Tue, Mar 10, 2020 at 10:45:43AM +0100, Christian Borntraeger wrote:
->> On 10.03.20 10:15, Andrew Jones wrote:
+> 
+> 
+> In file included from s390x/sync_regs_test.c:21:
+> s390x/sync_regs_test.c: In function ‘compare_sregs’:
+> s390x/sync_regs_test.c:41:7: warning: format ‘%llx’ expects argument of type ‘long long unsigned int’, but argument 6 has type ‘__u32’ {aka ‘unsigned int’} [-Wformat=]
+>    41 |       "Register " #reg \
+>       |       ^~~~~~~~~~~
+>    42 |       " values did not match: 0x%llx, 0x%llx\n", \
+>    43 |       left->reg, right->reg)
+>       |       ~~~~~~~~~~~~~~~~~~~~~~
+>    44 | 
+>       |        
+>    45 | static void compare_regs(struct kvm_regs *left, struct kvm_sync_regs *right)
+>       | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>    46 | {
+>       | ~      
+>    47 |  int i;
+>       |  ~~~~~~
+>    48 | 
+>       |        
+>    49 |  for (i = 0; i < 16; i++)
+>       |  ~~~~~~~~~~~~~~~~~~~~~~~~
+>    50 |   REG_COMPARE(gprs[i]);
+>       |   ~~~~~~~~~~~~~~~~~~~~~
+>    51 | }
+>       | ~      
+>    52 | 
+>       |        
+>    53 | static void compare_sregs(struct kvm_sregs *left, struct kvm_sync_regs *right)
+>       | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>    54 | {
+>       | ~      
+>    55 |  int i;
+>       |  ~~~~~~
+>    56 | 
+>       |        
+>    57 |  for (i = 0; i < 16; i++)
+>       |  ~~~~~~~~~~~~~~~~~~~~~~~~
+>    58 |   REG_COMPARE(acrs[i]);
+>       |   ~~~~~~~~~~~~~~~~~~~
+>       |                   |
+>       |                   __u32 {aka unsigned int}
+> include/test_util.h:46:43: note: in definition of macro ‘TEST_ASSERT’
+>    46 |  test_assert((e), #e, __FILE__, __LINE__, fmt, ##__VA_ARGS__)
+>       |                                           ^~~
+> s390x/sync_regs_test.c:58:3: note: in expansion of macro ‘REG_COMPARE’
+>    58 |   REG_COMPARE(acrs[i]);
+>       |   ^~~~~~~~~~~
+> s390x/sync_regs_test.c:41:7: warning: format ‘%llx’ expects argument of type ‘long long unsigned int’, but argument 7 has type ‘__u32’ {aka ‘unsigned int’} [-Wformat=]
+>    41 |       "Register " #reg \
+>       |       ^~~~~~~~~~~
+>    42 |       " values did not match: 0x%llx, 0x%llx\n", \
+>    43 |       left->reg, right->reg)
+>       |                  ~~~~~~~~~~~
+>    44 | 
+>       |        
+>    45 | static void compare_regs(struct kvm_regs *left, struct kvm_sync_regs *right)
+>       | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>    46 | {
+>       | ~      
+>    47 |  int i;
+>       |  ~~~~~~
+>    48 | 
+>       |        
+>    49 |  for (i = 0; i < 16; i++)
+>       |  ~~~~~~~~~~~~~~~~~~~~~~~~
+>    50 |   REG_COMPARE(gprs[i]);
+>       |   ~~~~~~~~~~~~~~~~~~~~~
+>    51 | }
+>       | ~      
+>    52 | 
+>       |        
+>    53 | static void compare_sregs(struct kvm_sregs *left, struct kvm_sync_regs *right)
+>       | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>    54 | {
+>       | ~      
+>    55 |  int i;
+>       |  ~~~~~~
+>    56 | 
+>       |        
+>    57 |  for (i = 0; i < 16; i++)
+>       |  ~~~~~~~~~~~~~~~~~~~~~~~~
+>    58 |   REG_COMPARE(acrs[i]);
+>       |   ~~~~~~~~~~~~~~~~~~~
+>       |                   |
+>       |                   __u32 {aka unsigned int}
+> include/test_util.h:46:43: note: in definition of macro ‘TEST_ASSERT’
+>    46 |  test_assert((e), #e, __FILE__, __LINE__, fmt, ##__VA_ARGS__)
+>       |                                           ^~~
+> s390x/sync_regs_test.c:58:3: note: in expansion of macro ‘REG_COMPARE’
+>    58 |   REG_COMPARE(acrs[i]);
+>       |   ^~~~~~~~~~~
+> s390x/sync_regs_test.c: In function ‘main’:
+> s390x/sync_regs_test.c:158:7: warning: format ‘%llx’ expects argument of type ‘long long unsigned int’, but argument 6 has type ‘__u32’ {aka ‘unsigned int’} [-Wformat=]
+>   158 |       "acr0 sync regs value incorrect 0x%llx.",
+>       |       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>   159 |       run->s.regs.acrs[0]);
+>       |       ~~~~~~~~~~~~~~~~~~~
+>       |                       |
+>       |                       __u32 {aka unsigned int}
+> include/test_util.h:46:43: note: in definition of macro ‘TEST_ASSERT’
+>    46 |  test_assert((e), #e, __FILE__, __LINE__, fmt, ##__VA_ARGS__)
+>       |                                           ^~~
+> s390x/sync_regs_test.c:158:44: note: format string is defined here
+>   158 |       "acr0 sync regs value incorrect 0x%llx.",
+>       |                                         ~~~^
+>       |                                            |
+>       |                                            long long unsigned int
+>       |      
+> 
+> 
+> 
+> On 10.03.20 12:58, Andrew Jones wrote:
+>> On Tue, Mar 10, 2020 at 10:45:43AM +0100, Christian Borntraeger wrote:
+>>> On 10.03.20 10:15, Andrew Jones wrote:
+>>>>
+>>>> Andrew Jones (4):
+>>>>   fixup! selftests: KVM: SVM: Add vmcall test
+>>>>   KVM: selftests: Share common API documentation
+>>>>   KVM: selftests: Enable printf format warnings for TEST_ASSERT
+>>>>   KVM: selftests: Use consistent message for test skipping
 >>>
->>> Andrew Jones (4):
->>>   fixup! selftests: KVM: SVM: Add vmcall test
->>>   KVM: selftests: Share common API documentation
->>>   KVM: selftests: Enable printf format warnings for TEST_ASSERT
->>>   KVM: selftests: Use consistent message for test skipping
+>>> This looks like a nice cleanup but this does not seem to apply
+>>> cleanly on kvm/master or linus/master. Which tree is this based on?
 >>
->> This looks like a nice cleanup but this does not seem to apply
->> cleanly on kvm/master or linus/master. Which tree is this based on?
-> 
-> This is based on kvm/queue. Sorry, I should have mentioned that in
-> the cover letter.
-> 
-> Thanks,
-> drew
-> 
+>> This is based on kvm/queue. Sorry, I should have mentioned that in
+>> the cover letter.
+>>
+>> Thanks,
+>> drew
 >>
 >>>
->>>  tools/testing/selftests/kvm/.gitignore        |   5 +-
->>>  .../selftests/kvm/demand_paging_test.c        |   6 +-
->>>  tools/testing/selftests/kvm/dirty_log_test.c  |   3 +-
->>>  .../testing/selftests/kvm/include/kvm_util.h  | 100 ++++++++-
->>>  .../testing/selftests/kvm/include/test_util.h |   5 +-
->>>  .../selftests/kvm/lib/aarch64/processor.c     |  17 --
->>>  tools/testing/selftests/kvm/lib/assert.c      |   6 +-
->>>  tools/testing/selftests/kvm/lib/kvm_util.c    |  10 +-
->>>  .../selftests/kvm/lib/kvm_util_internal.h     |  48 +++++
->>>  .../selftests/kvm/lib/s390x/processor.c       |  74 -------
->>>  tools/testing/selftests/kvm/lib/test_util.c   |  12 ++
->>>  .../selftests/kvm/lib/x86_64/processor.c      | 196 ++++--------------
->>>  tools/testing/selftests/kvm/lib/x86_64/svm.c  |   2 +-
->>>  tools/testing/selftests/kvm/lib/x86_64/vmx.c  |   2 +-
->>>  tools/testing/selftests/kvm/s390x/memop.c     |   2 +-
->>>  .../selftests/kvm/s390x/sync_regs_test.c      |   2 +-
->>>  .../kvm/x86_64/cr4_cpuid_sync_test.c          |   2 +-
->>>  .../testing/selftests/kvm/x86_64/evmcs_test.c |   6 +-
->>>  .../selftests/kvm/x86_64/hyperv_cpuid.c       |   8 +-
->>>  .../selftests/kvm/x86_64/mmio_warning_test.c  |   4 +-
->>>  .../selftests/kvm/x86_64/platform_info_test.c |   3 +-
->>>  .../kvm/x86_64/set_memory_region_test.c       |   3 +-
->>>  .../testing/selftests/kvm/x86_64/state_test.c |   4 +-
->>>  .../selftests/kvm/x86_64/svm_vmcall_test.c    |   3 +-
->>>  .../selftests/kvm/x86_64/sync_regs_test.c     |   4 +-
->>>  .../selftests/kvm/x86_64/vmx_dirty_log_test.c |   2 +-
->>>  .../kvm/x86_64/vmx_set_nested_state_test.c    |   4 +-
->>>  .../selftests/kvm/x86_64/xss_msr_test.c       |   2 +-
->>>  28 files changed, 243 insertions(+), 292 deletions(-)
+>>>>
+>>>>  tools/testing/selftests/kvm/.gitignore        |   5 +-
+>>>>  .../selftests/kvm/demand_paging_test.c        |   6 +-
+>>>>  tools/testing/selftests/kvm/dirty_log_test.c  |   3 +-
+>>>>  .../testing/selftests/kvm/include/kvm_util.h  | 100 ++++++++-
+>>>>  .../testing/selftests/kvm/include/test_util.h |   5 +-
+>>>>  .../selftests/kvm/lib/aarch64/processor.c     |  17 --
+>>>>  tools/testing/selftests/kvm/lib/assert.c      |   6 +-
+>>>>  tools/testing/selftests/kvm/lib/kvm_util.c    |  10 +-
+>>>>  .../selftests/kvm/lib/kvm_util_internal.h     |  48 +++++
+>>>>  .../selftests/kvm/lib/s390x/processor.c       |  74 -------
+>>>>  tools/testing/selftests/kvm/lib/test_util.c   |  12 ++
+>>>>  .../selftests/kvm/lib/x86_64/processor.c      | 196 ++++--------------
+>>>>  tools/testing/selftests/kvm/lib/x86_64/svm.c  |   2 +-
+>>>>  tools/testing/selftests/kvm/lib/x86_64/vmx.c  |   2 +-
+>>>>  tools/testing/selftests/kvm/s390x/memop.c     |   2 +-
+>>>>  .../selftests/kvm/s390x/sync_regs_test.c      |   2 +-
+>>>>  .../kvm/x86_64/cr4_cpuid_sync_test.c          |   2 +-
+>>>>  .../testing/selftests/kvm/x86_64/evmcs_test.c |   6 +-
+>>>>  .../selftests/kvm/x86_64/hyperv_cpuid.c       |   8 +-
+>>>>  .../selftests/kvm/x86_64/mmio_warning_test.c  |   4 +-
+>>>>  .../selftests/kvm/x86_64/platform_info_test.c |   3 +-
+>>>>  .../kvm/x86_64/set_memory_region_test.c       |   3 +-
+>>>>  .../testing/selftests/kvm/x86_64/state_test.c |   4 +-
+>>>>  .../selftests/kvm/x86_64/svm_vmcall_test.c    |   3 +-
+>>>>  .../selftests/kvm/x86_64/sync_regs_test.c     |   4 +-
+>>>>  .../selftests/kvm/x86_64/vmx_dirty_log_test.c |   2 +-
+>>>>  .../kvm/x86_64/vmx_set_nested_state_test.c    |   4 +-
+>>>>  .../selftests/kvm/x86_64/xss_msr_test.c       |   2 +-
+>>>>  28 files changed, 243 insertions(+), 292 deletions(-)
+>>>>
 >>>
 >>
 > 
