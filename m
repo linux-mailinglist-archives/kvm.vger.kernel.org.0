@@ -2,179 +2,150 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6CF3917F6AB
-	for <lists+kvm@lfdr.de>; Tue, 10 Mar 2020 12:49:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6240F17F6C9
+	for <lists+kvm@lfdr.de>; Tue, 10 Mar 2020 12:54:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726331AbgCJLtF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Mar 2020 07:49:05 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:45989 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726269AbgCJLtE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Mar 2020 07:49:04 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1583840943;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=sF/HiyfVz9l7cuc8IOJvk3CIfxW9vUTq5vPXc97ZE9g=;
-        b=E1nMPSzveMSRsASWPhtLBtbmAsI3AfKuc3cnx9RJ0BwaapPRQg9L19GcIr+zxppmooEcsV
-        K8JSrrZZTDrtol7eS/q9X8MQ8QflgfmxOfEXSlhhaFkCJc2ISi02vRvd3YtCT09fZWqxHL
-        YAEpEDN49g3TMf6lb8lS/9GNODMey+I=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-90-lUeXhEzNMEqEAJ3jRWD8Mg-1; Tue, 10 Mar 2020 07:48:59 -0400
-X-MC-Unique: lUeXhEzNMEqEAJ3jRWD8Mg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S1726265AbgCJLyx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Mar 2020 07:54:53 -0400
+Received: from mail.kernel.org ([198.145.29.99]:44178 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726211AbgCJLyw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Mar 2020 07:54:52 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 60502189F760;
-        Tue, 10 Mar 2020 11:48:56 +0000 (UTC)
-Received: from [10.36.118.8] (unknown [10.36.118.8])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 3AD815D9CA;
-        Tue, 10 Mar 2020 11:48:49 +0000 (UTC)
-Subject: Re: [PATCH v1 06/11] mm: Allow to offline unmovable PageOffline()
- pages via MEM_GOING_OFFLINE
-To:     Michal Hocko <mhocko@kernel.org>
-Cc:     linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        virtio-dev@lists.oasis-open.org,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        Andrew Morton <akpm@linux-foundation.org>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Juergen Gross <jgross@suse.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Pavel Tatashin <pavel.tatashin@microsoft.com>,
-        Alexander Duyck <alexander.h.duyck@linux.intel.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Anthony Yznaga <anthony.yznaga@oracle.com>,
-        Oscar Salvador <osalvador@suse.de>,
-        Mel Gorman <mgorman@techsingularity.net>,
-        Mike Rapoport <rppt@linux.ibm.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Anshuman Khandual <anshuman.khandual@arm.com>,
-        Qian Cai <cai@lca.pw>, Pingfan Liu <kernelfans@gmail.com>
-References: <20200302134941.315212-1-david@redhat.com>
- <20200302134941.315212-7-david@redhat.com>
- <20200310114745.GH8447@dhcp22.suse.cz>
-From:   David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat GmbH
-Message-ID: <5bc2a2ff-1ae0-6746-b32a-c27962804cef@redhat.com>
-Date:   Tue, 10 Mar 2020 12:48:48 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+        by mail.kernel.org (Postfix) with ESMTPSA id 49D5B2464B;
+        Tue, 10 Mar 2020 11:54:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1583841291;
+        bh=oHt26cI0evbqGQu3N7YOlcKoUwgoa88DrVqzHJqkdEw=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=j3UGAoUogik5p9i5EPRsvGFc8i4r+/KdQnG9teAjKg3+Ld3RyOoDWINtKMATN8Z9k
+         kZ1UniPntVhawKyyaOl0XqSyHRs1u016YYBMkpBKfVXVZ82CFWwQRJlWU3vPvA6akY
+         00fJiFeTZYd2IGtSz1+9hLWDFvkvESMmIdfjsvl0=
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+        by disco-boy.misterjones.org with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        (Exim 4.92)
+        (envelope-from <maz@kernel.org>)
+        id 1jBdTF-00BYBZ-DK; Tue, 10 Mar 2020 11:54:49 +0000
 MIME-Version: 1.0
-In-Reply-To: <20200310114745.GH8447@dhcp22.suse.cz>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Date:   Tue, 10 Mar 2020 11:54:49 +0000
+From:   Marc Zyngier <maz@kernel.org>
+To:     Auger Eric <eric.auger@redhat.com>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Mark Rutland <mark.rutland@arm.com>
+Subject: Re: [PATCH v2 2/2] KVM: arm64: Document PMU filtering API
+In-Reply-To: <7943c896-013b-d9cb-ba89-2040b46437fe@redhat.com>
+References: <20200309124837.19908-1-maz@kernel.org>
+ <20200309124837.19908-3-maz@kernel.org>
+ <7943c896-013b-d9cb-ba89-2040b46437fe@redhat.com>
+Message-ID: <07f4ef9b5ff6c6c5086c9723c64c035f@kernel.org>
+X-Sender: maz@kernel.org
+User-Agent: Roundcube Webmail/1.3.10
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: eric.auger@redhat.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, robin.murphy@arm.com, mark.rutland@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10.03.20 12:47, Michal Hocko wrote:
-> On Mon 02-03-20 14:49:36, David Hildenbrand wrote:
->> virtio-mem wants to allow to offline memory blocks of which some parts
->> were unplugged (allocated via alloc_contig_range()), especially, to later
->> offline and remove completely unplugged memory blocks. The important part
->> is that PageOffline() has to remain set until the section is offline, so
->> these pages will never get accessed (e.g., when dumping). The pages should
->> not be handed back to the buddy (which would require clearing PageOffline()
->> and result in issues if offlining fails and the pages are suddenly in the
->> buddy).
->>
->> Let's allow to do that by allowing to isolate any PageOffline() page
->> when offlining. This way, we can reach the memory hotplug notifier
->> MEM_GOING_OFFLINE, where the driver can signal that he is fine with
->> offlining this page by dropping its reference count. PageOffline() pages
->> with a reference count of 0 can then be skipped when offlining the
->> pages (like if they were free, however they are not in the buddy).
->>
->> Anybody who uses PageOffline() pages and does not agree to offline them
->> (e.g., Hyper-V balloon, XEN balloon, VMWare balloon for 2MB pages) will not
->> decrement the reference count and make offlining fail when trying to
->> migrate such an unmovable page. So there should be no observable change.
->> Same applies to balloon compaction users (movable PageOffline() pages), the
->> pages will simply be migrated.
->>
->> Note 1: If offlining fails, a driver has to increment the reference
->> 	count again in MEM_CANCEL_OFFLINE.
->>
->> Note 2: A driver that makes use of this has to be aware that re-onlining
->> 	the memory block has to be handled by hooking into onlining code
->> 	(online_page_callback_t), resetting the page PageOffline() and
->> 	not giving them to the buddy.
->>
->> Cc: Andrew Morton <akpm@linux-foundation.org>
->> Cc: Juergen Gross <jgross@suse.com>
->> Cc: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
->> Cc: Pavel Tatashin <pavel.tatashin@microsoft.com>
->> Cc: Alexander Duyck <alexander.h.duyck@linux.intel.com>
->> Cc: Vlastimil Babka <vbabka@suse.cz>
->> Cc: Johannes Weiner <hannes@cmpxchg.org>
->> Cc: Anthony Yznaga <anthony.yznaga@oracle.com>
->> Cc: Michal Hocko <mhocko@suse.com>
->> Cc: Oscar Salvador <osalvador@suse.de>
->> Cc: Mel Gorman <mgorman@techsingularity.net>
->> Cc: Mike Rapoport <rppt@linux.ibm.com>
->> Cc: Dan Williams <dan.j.williams@intel.com>
->> Cc: Anshuman Khandual <anshuman.khandual@arm.com>
->> Cc: Qian Cai <cai@lca.pw>
->> Cc: Pingfan Liu <kernelfans@gmail.com>
->> Signed-off-by: David Hildenbrand <david@redhat.com>
+On 2020-03-09 18:17, Auger Eric wrote:
+> Hi Marc,
 > 
-> Looks good to me. Thanks for dropping __put_page hooks!
-> Acked-by: Michal Hocko <mhocko@suse.com>
+> On 3/9/20 1:48 PM, Marc Zyngier wrote:
+>> Add a small blurb describing how the event filtering API gets used.
+>> 
+>> Signed-off-by: Marc Zyngier <maz@kernel.org>
+>> ---
+>>  Documentation/virt/kvm/devices/vcpu.rst | 40 
+>> +++++++++++++++++++++++++
+>>  1 file changed, 40 insertions(+)
+>> 
+>> diff --git a/Documentation/virt/kvm/devices/vcpu.rst 
+>> b/Documentation/virt/kvm/devices/vcpu.rst
+>> index 9963e680770a..7262c0469856 100644
+>> --- a/Documentation/virt/kvm/devices/vcpu.rst
+>> +++ b/Documentation/virt/kvm/devices/vcpu.rst
+>> @@ -55,6 +55,46 @@ Request the initialization of the PMUv3.  If using 
+>> the PMUv3 with an in-kernel
+>>  virtual GIC implementation, this must be done after initializing the 
+>> in-kernel
+>>  irqchip.
+>> 
+>> +1.3 ATTRIBUTE: KVM_ARM_VCPU_PMU_V3_FILTER
+>> +---------------------------------------
+>> +
+>> +:Parameters: in kvm_device_attr.addr the address for a PMU event 
+>> filter is a
+>> +             pointer to a struct kvm_pmu_event_filter
+>> +
+>> +:Returns:
+>> +
+>> +	 =======  ======================================================
+>> +	 -ENODEV: PMUv3 not supported or GIC not initialized
+>> +	 -ENXIO:  PMUv3 not properly configured or in-kernel irqchip not
+>> +	 	  configured as required prior to calling this attribute
+>> +	 -EBUSY:  PMUv3 already initialized
+> maybe document -EINVAL?
 
-Thanks a lot Michal - looks much cleaner this way.
+Yup, definitely.
 
--- 
+>> +	 =======  ======================================================
+>> +
+>> +Request the installation of a PMU event filter describe as follows:
+> s/describe/described
+>> +
+>> +struct kvm_pmu_event_filter {
+>> +	__u16	base_event;
+>> +	__u16	nevents;
+>> +
+>> +#define KVM_PMU_EVENT_ALLOW	0
+>> +#define KVM_PMU_EVENT_DENY	1
+>> +
+>> +	__u8	action;
+>> +	__u8	pad[3];
+>> +};
+>> +
+>> +A filter range is defined as the range [@base_event, @base_event + 
+>> @nevents[,
+>> +together with an @action (KVM_PMU_EVENT_ALLOW or KVM_PMU_EVENT_DENY). 
+>> The
+>> +first registered range defines the global policy (global ALLOW if the 
+>> first
+>> +@action is DENY, global DENY if the first @action is ALLOW). Multiple 
+>> ranges
+>> +can be programmed, and must fit within the 16bit space defined by the 
+>> ARMv8.1
+>> +PMU architecture.
+> what about before 8.1 where the range was 10 bits? Should it be tested
+> in the code?
+
+It's a good point. We could test that upon installing the filter and 
+limit
+the bitmap allocation to the minimum.
+
+> nitpicking: It is not totally obvious what does happen if the user 
+> space
+> sets a deny filter on a range and then an allow filter on the same
+> range. it is supported but may be worth telling so? Also explain the 
+> the
+> default filtering remains "allow" by default?
+
+Overlapping filters are easy: the last one wins. And yes, no filter 
+means
+just that: no filter.
+
 Thanks,
 
-David / dhildenb
-
+         M.
+-- 
+Jazz is not dead. It just smells funny...
