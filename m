@@ -2,152 +2,87 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7DB10180AD7
-	for <lists+kvm@lfdr.de>; Tue, 10 Mar 2020 22:51:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F1402180B14
+	for <lists+kvm@lfdr.de>; Tue, 10 Mar 2020 23:01:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726307AbgCJVvG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Mar 2020 17:51:06 -0400
-Received: from mail-ot1-f68.google.com ([209.85.210.68]:40301 "EHLO
-        mail-ot1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726271AbgCJVvF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Mar 2020 17:51:05 -0400
-Received: by mail-ot1-f68.google.com with SMTP id h17so2330420otn.7
-        for <kvm@vger.kernel.org>; Tue, 10 Mar 2020 14:51:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Vb0GLcs/8L01cTZ3HReaJOKCCqFsvClKHIQrRrGWG3I=;
-        b=ML2h3mATLzke2m39a1Y6P/zDeHMxWqmWXR8CmeCANV0lcaQJmDMP4U3tgRYj3VwNVk
-         gcrsdaOTXdOK+JjqpLxko+kEbnGIn7QupEmi+2Q0b4vwqC6coa38rR0r7QcCru31DAfk
-         sP5TSdEzlau5ApuVktDVZXO2kqn+tioqibI+YdajtqBI/IN2FQIVXJjbMrmTR6N8aagK
-         4bYw66E+LCk5utYxoMeGj/mgh0bXybW9Hy21qFbJP8VzcWirKwIuqM4fg53vOIcf2M5G
-         457LG5EtugTnBxKo2TqABdeUV2BIWYtxrAYSp56R1HBngCTQ7tFbkZP+oMTR4otrECVK
-         bGtg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Vb0GLcs/8L01cTZ3HReaJOKCCqFsvClKHIQrRrGWG3I=;
-        b=nWZwjcPVIZYJ0Zio/LTH9qpAvc3RuIJduDudHZ7evJKv7rBmMYGHYdJyKYQs/Qj5LW
-         SEv/uJsCsG4n1ksdoJ2lzF97opnNgTMYlLKaR4qS2Zk47+z7F2VC65wMJVxfiziAQIN+
-         nZYhXDQasE4Q7+HsykGEi0DiU2ofUox850HJIB30idryN6JngrigJJKxt/Q6GKLV1QDp
-         Cqsryj7uEqnmfVzVodmlgCVuZ2Kyx+9iXzQn3bqg5af6jc9w608JhYUS7msbkdhwDoe1
-         d6XN/twAQ2wkxib7cXkjMUnvSnBEKNy3Eu7Jrz0XWiDpv8VbWosiQmvT3cjCaL7/7ZvL
-         piKQ==
-X-Gm-Message-State: ANhLgQ1UDqG/FU2nX/MUna37QbvM7fYtzLaC1jQlcrKXhiuUAQowYPdH
-        tJ19Qg8NQ/Gotcj+xE/38PaoDFE8Bxuy4YdN+GEODw==
-X-Google-Smtp-Source: ADFU+vv6rIwq0naQzaPUTbSTkQPR9MrTSMoZs8D8+Kw1FxXqF+vvTQ6t7/pUXhQZwCfMKjxzfvYNNNcfLsXZgyFIH1w=
-X-Received: by 2002:a9d:2028:: with SMTP id n37mr19373893ota.127.1583877064482;
- Tue, 10 Mar 2020 14:51:04 -0700 (PDT)
+        id S1727728AbgCJWB2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Mar 2020 18:01:28 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:34347 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727688AbgCJWB1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Mar 2020 18:01:27 -0400
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 48cTZF1NB6z9s3x;
+        Wed, 11 Mar 2020 09:01:25 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=canb.auug.org.au;
+        s=201702; t=1583877685;
+        bh=wzZzebi45AhIS8HGeVFhdyHkTlG8O3pVyWnqNN9rlqQ=;
+        h=Date:From:To:Cc:Subject:From;
+        b=jVjC6Nju7T0T9y+wjzfdyl/mtjA8IR7sw+h4jd/f7Ti0Pd40VyYazZf2eRRWGU2mJ
+         PMqLMtTwnNkj3c/CHqenS59dGXobbwChG76kOW9xmamf5QnIyr5FK1eRI1sIZ2FaB0
+         Bwjj+3QYsrECTk7K6BrA2eptDTkI3Hb+C8mSO6rAoAAkGKAcS54fhRGdya0LcP2sfd
+         wpJVBUW/zwHo0xZaI0kF0wMR5/8TnYhOkOsZOuYz/Le8XteAsq7frdw8bLNcGq6mLf
+         RwgMpX1YvHtGgNcFe5CG/0TlaZv7FMXzY3cKdh2nbwpGk2WgXWjeR8sJ/knchFE/9w
+         1tv7+owRHiwVw==
+Date:   Wed, 11 Mar 2020 09:01:15 +1100
+From:   Stephen Rothwell <sfr@canb.auug.org.au>
+To:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        KVM <kvm@vger.kernel.org>, S390 <linux-s390@vger.kernel.org>
+Cc:     Linux Next Mailing List <linux-next@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Subject: linux-next: Fixes tag needs some work in the kvms390-fixes tree
+Message-ID: <20200311090115.3967bbc6@canb.auug.org.au>
 MIME-Version: 1.0
-References: <20200213194157.5877-1-sds@tycho.nsa.gov> <CAHC9VhSsjrgu2Jn+yiV5Bz_wt2x5bgEXdhjqLA+duWYNo4gOtw@mail.gmail.com>
- <eb2dbe22-91af-17c6-3dfb-d9ec619a4d7a@schaufler-ca.com> <CAKOZueuus6fVqrKsfNgSYGo-kXJ3f6Mv_NJZStY1Uo934=SjDw@mail.gmail.com>
- <CAKOZuetUvu=maOmHXjCqkHaYEN5Sf+pKBc3BZ+qpy1tE1NJ9xQ@mail.gmail.com> <CAEjxPJ4+NM6-tfOeZ6UQfas6=KxtBTAk6f23GEyLomFn3K3qew@mail.gmail.com>
-In-Reply-To: <CAEjxPJ4+NM6-tfOeZ6UQfas6=KxtBTAk6f23GEyLomFn3K3qew@mail.gmail.com>
-From:   Daniel Colascione <dancol@google.com>
-Date:   Tue, 10 Mar 2020 14:50:27 -0700
-Message-ID: <CAKOZuevcz+fvfhRXPx2iZGtkk6+FjVj3ZSaGGT8DfwsOJR0k3A@mail.gmail.com>
-Subject: Re: [RFC PATCH] security,anon_inodes,kvm: enable security support for
- anon inodes
-To:     Stephen Smalley <stephen.smalley.work@gmail.com>
-Cc:     Casey Schaufler <casey@schaufler-ca.com>,
-        Sandeep Patil <sspatil@google.com>,
-        Paul Moore <paul@paul-moore.com>,
-        LSM List <linux-security-module@vger.kernel.org>,
-        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        SElinux list <selinux@vger.kernel.org>, kvm@vger.kernel.org,
-        Nick Kralevich <nnk@google.com>,
-        Stephen Smalley <sds@tycho.nsa.gov>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; boundary="Sig_/kv.9uJJpUfaryogAyL3K1zT";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 10, 2020 at 11:25 AM Stephen Smalley
-<stephen.smalley.work@gmail.com> wrote:
->
-> On Tue, Mar 10, 2020 at 2:11 PM Daniel Colascione <dancol@google.com> wrote:
-> >
-> > On Thu, Feb 20, 2020 at 10:50 AM Daniel Colascione <dancol@google.com> wrote:
-> > >
-> > > On Thu, Feb 20, 2020 at 10:11 AM Casey Schaufler <casey@schaufler-ca.com> wrote:
-> > > >
-> > > > On 2/17/2020 4:14 PM, Paul Moore wrote:
-> > > > > On Thu, Feb 13, 2020 at 2:41 PM Stephen Smalley <sds@tycho.nsa.gov> wrote:
-> > > > >> Add support for labeling and controlling access to files attached to anon
-> > > > >> inodes. Introduce extended interfaces for creating such files to permit
-> > > > >> passing a related file as an input to decide how to label the anon
-> > > > >> inode. Define a security hook for initializing the anon inode security
-> > > > >> attributes. Security attributes are either inherited from a related file
-> > > > >> or determined based on some combination of the creating task and policy
-> > > > >> (in the case of SELinux, using type_transition rules).  As an
-> > > > >> example user of the inheritance support, convert kvm to use the new
-> > > > >> interface for passing the related file so that the anon inode can inherit
-> > > > >> the security attributes of /dev/kvm and provide consistent access control
-> > > > >> for subsequent ioctl operations.  Other users of anon inodes, including
-> > > > >> userfaultfd, will default to the transition-based mechanism instead.
-> > > > >>
-> > > > >> Compared to the series in
-> > > > >> https://lore.kernel.org/selinux/20200211225547.235083-1-dancol@google.com/,
-> > > > >> this approach differs in that it does not require creation of a separate
-> > > > >> anonymous inode for each file (instead storing the per-instance security
-> > > > >> information in the file security blob), it applies labeling and control
-> > > > >> to all users of anonymous inodes rather than requiring opt-in via a new
-> > > > >> flag, it supports labeling based on a related inode if provided,
-> > > > >> it relies on type transitions to compute the label of the anon inode
-> > > > >> when there is no related inode, and it does not require introducing a new
-> > > > >> security class for each user of anonymous inodes.
-> > > > >>
-> > > > >> On the other hand, the approach in this patch does expose the name passed
-> > > > >> by the creator of the anon inode to the policy (an indirect mapping could
-> > > > >> be provided within SELinux if these names aren't considered to be stable),
-> > > > >> requires the definition of type_transition rules to distinguish userfaultfd
-> > > > >> inodes from proc inodes based on type since they share the same class,
-> > > > >> doesn't support denying the creation of anonymous inodes (making the hook
-> > > > >> added by this patch return something other than void is problematic due to
-> > > > >> it being called after the file is already allocated and error handling in
-> > > > >> the callers can't presently account for this scenario and end up calling
-> > > > >> release methods multiple times), and may be more expensive
-> > > > >> (security_transition_sid overhead on each anon inode allocation).
-> > > > >>
-> > > > >> We are primarily posting this RFC patch now so that the two different
-> > > > >> approaches can be concretely compared.  We anticipate a hybrid of the
-> > > > >> two approaches being the likely outcome in the end.  In particular
-> > > > >> if support for allocating a separate inode for each of these files
-> > > > >> is acceptable, then we would favor storing the security information
-> > > > >> in the inode security blob and using it instead of the file security
-> > > > >> blob.
-> > > > > Bringing this back up in hopes of attracting some attention from the
-> > > > > fs-devel crowd and Al.  As Stephen already mentioned, from a SELinux
-> > > > > perspective we would prefer to attach the security blob to the inode
-> > > > > as opposed to the file struct; does anyone have any objections to
-> > > > > that?
-> > > >
-> > > > Sorry for the delay - been sick the past few days.
-> > > >
-> > > > I agree that the inode is a better place than the file for information
-> > > > about the inode. This is especially true for Smack, which uses
-> > > > multiple extended attributes in some cases. I don't believe that any
-> > > > except the access label will be relevant to anonymous inodes, but
-> > > > I can imagine security modules with policies that would.
-> > > >
-> > > > I am always an advocate of full xattr support. It goes a long
-> > > > way in reducing the number and complexity of special case interfaces.
-> > >
-> > > It sounds like we have broad consensus on using the inode to hold
-> > > security information, implying that anon_inodes should create new
-> > > inodes. Do any of the VFS people want to object?
-> >
-> > Ping?
->
-> I'd recommend refreshing your patch series to incorporate feedback on
-> the previous version and re-post,
-> including viro and linux-fsdevel on the cc, and see if they have any
-> comments on it.
+--Sig_/kv.9uJJpUfaryogAyL3K1zT
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-I don't think there's anything in the patch series that needs to
-change right now. AFAICT, we're still just waiting on comment from the
-VFS people, who should be on this thread. Did I miss something?
+Hi all,
+
+In commit
+
+  b5de9eede579 ("KVM: s390: Also reset registers in sync regs for initial c=
+pu reset")
+
+Fixes tag
+
+  Fixes: 7de3f1423ff ("KVM: s390: Add new reset vcpu API")
+
+has these problem(s):
+
+  - SHA1 should be at least 12 digits long
+    Can be fixed by setting core.abbrev to 12 (or more) or (for git v2.11
+    or later) just making sure it is not set (or set to "auto").
+
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/kv.9uJJpUfaryogAyL3K1zT
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAl5oDisACgkQAVBC80lX
+0GzYaAf9FXBdN/sPL0m1wS/M8NvQrp0wWqykM2mze0kNV+wY77eqasWuk3dSkCZQ
+YOWpjCN/T6FTBwJpiNLZMtgoKYOKFwkPToNXjCNkl+3sXrp/8xhKREmnobTSpqyP
+XWhIzMfqyXRn5/5gWg44M/pVIE5KIDeDxZzeU4tbcDCCsoHOeqkdne1n7KOkRk+L
+yTw1hgzfqPeT6uegHLvSwgO1K1XwLDZagZJrPzdMgr5wGvMMEe6J4gk7msoXBpia
+3n+gZjDjDeYb8erVrRxqR7niqGb7vIPeeKkP4PNVKxnVoIg2N0/kLrQHHvnZGEaU
+prhFRX7EBNh0WELfnGmQDRa/L3c75Q==
+=IiMa
+-----END PGP SIGNATURE-----
+
+--Sig_/kv.9uJJpUfaryogAyL3K1zT--
