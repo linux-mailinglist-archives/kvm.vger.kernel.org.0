@@ -2,88 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id F3E831804AD
-	for <lists+kvm@lfdr.de>; Tue, 10 Mar 2020 18:23:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DFE221804BF
+	for <lists+kvm@lfdr.de>; Tue, 10 Mar 2020 18:27:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726442AbgCJRX4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Mar 2020 13:23:56 -0400
-Received: from mail-il1-f193.google.com ([209.85.166.193]:41316 "EHLO
-        mail-il1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726295AbgCJRX4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Mar 2020 13:23:56 -0400
-Received: by mail-il1-f193.google.com with SMTP id l14so6877723ilj.8
-        for <kvm@vger.kernel.org>; Tue, 10 Mar 2020 10:23:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=bpKs3XJUi+EzrxrD69z2rWEMUDijI2aX+JxbzZCOheM=;
-        b=jC2v5tmmuEnmUgDs+1o340Pp6muc2ypEpD8eaP6r2cPOyHT0UQ2PlIn/QtNGxkE4+8
-         cASs91MnMeo8ZYxW2c5PAIkJ0SDlxhG3iJTSsvPlU5s080/QYJohXagrGCH/GzpvvT98
-         WHcXWwupWcsc+f8H82YAAoIrwBgVLBphe07lLJBYJ8HdcmX9XBOxeechO/XaWNXYi8YE
-         Aa0OUiQKyYWYwEQds8gPprxAGBjI+WvtYntOAB9plQyYyp/YDkhYYJzjDXUGcvMxQWsD
-         cxjeiHchLTmwjy7F8sJse27h8pR8rUkqcBaVeAUD8fgXZC+ckz7ZSMd/nZ5nPvp6jypt
-         Kg3w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=bpKs3XJUi+EzrxrD69z2rWEMUDijI2aX+JxbzZCOheM=;
-        b=E7pUQDKec87/oInMY4JSiE0Dw/UvCvzmLvXDdDCH5T6t9b6Po6GM708MVLpNg+3I0/
-         Cf23Upmdp/aBed/oecpfXIXEfKasQ7nMKdE7KD5suYQY7nisWfIDB7yAmHNu1uz8qr/6
-         1vdfMwTmVrNXp6pgzN5BPotXXxYnekcbsVPcpAB0qZd7KYmIX7AWUxUQ7SVlMhEa8AcW
-         J1FsKGQ+gxP/D74Ez9avqcFd4hiqnZaM+nHdvQoMEf7rw7hkGTcvIWia4ZlpI7qCaEix
-         2ckCUwHRC0PHIencK4/UzrDIoJtrWRy32x9yEC2x6JgAoWqDuoPrtnbPHTLzHrbc6Ubh
-         2EDg==
-X-Gm-Message-State: ANhLgQ3z6gSlxIHD/ujv1vT/PsPdgzpgM7xhoOqC/352lb0vLB00x33p
-        2XbGVVrdh190OPAs+tLprkciSTcoEM//V/x/hcIEtA==
-X-Google-Smtp-Source: ADFU+vsdimCS3ju3X6q4TFVr0q8tJXbwYngqSmKvAnDqE7FFDwCj2Y7m2zWw0oFBeuLMLbJXXOmYlKV7766rSe/gNpI=
-X-Received: by 2002:a92:3c04:: with SMTP id j4mr12290505ila.108.1583861035356;
- Tue, 10 Mar 2020 10:23:55 -0700 (PDT)
+        id S1726520AbgCJR1z (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Mar 2020 13:27:55 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:24225 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726271AbgCJR1y (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 10 Mar 2020 13:27:54 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1583861273;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=ghBSnBwFc/MfOO87KoM+ks7WKUvlCd5SZkqJx+HigQY=;
+        b=YlcHPuNUqG1tCLAZRCBMbVUUArZhHrV6Yc8Bun8UicTZ8b3oUWeI/im2NY02GgPytuJV85
+        IKNg7o21jjYO9otCwexoZ0Pe8zvKR8eDUkt3qZUGj4qO3W6of2DXuWnwHKAhChHbbNQipe
+        edrkF+srTigY/uZkLSzVcZDal4NH+mU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-167-XobozGP5PfiE95iuBLBNyw-1; Tue, 10 Mar 2020 13:27:51 -0400
+X-MC-Unique: XobozGP5PfiE95iuBLBNyw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7B39E8017CC;
+        Tue, 10 Mar 2020 17:27:50 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 63EFB10013A1;
+        Tue, 10 Mar 2020 17:27:46 +0000 (UTC)
+Date:   Tue, 10 Mar 2020 18:27:44 +0100
+From:   Andrew Jones <drjones@redhat.com>
+To:     Christian Borntraeger <borntraeger@de.ibm.com>
+Cc:     Ben Gardon <bgardon@google.com>, kvm list <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>
+Subject: Re: kvm/queue demand paging test and s390
+Message-ID: <20200310172744.36lawcszzjbebz6d@kamzik.brq.redhat.com>
+References: <c845637e-d662-993e-2184-fa34bae79495@de.ibm.com>
 MIME-Version: 1.0
-References: <20200305013437.8578-1-sean.j.christopherson@intel.com>
- <20200305013437.8578-5-sean.j.christopherson@intel.com> <CALMp9eRRWZ54kzMXdTqRCy2KmaUAq+HVVVzbxJNVdgktg65XCA@mail.gmail.com>
- <20200305192532.GN11500@linux.intel.com> <CALMp9eRxdGj0DL0_g-an0YC+gTMcWcSk7=md=k4-8S0Zcankbg@mail.gmail.com>
- <20200305215149.GS11500@linux.intel.com> <5567edf6-a04c-5810-8ed5-78a0db14b202@redhat.com>
- <20200310171017.GC9305@linux.intel.com>
-In-Reply-To: <20200310171017.GC9305@linux.intel.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Tue, 10 Mar 2020 10:23:44 -0700
-Message-ID: <CALMp9eRjOd3=+koxGus=V0CLvz3wg-A1soa9Z4rvXhedQzCHcA@mail.gmail.com>
-Subject: Re: [PATCH v2 4/7] KVM: x86: Fix CPUID range checks for Hypervisor
- and Centaur classes
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>, Pu Wen <puwen@hygon.cn>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c845637e-d662-993e-2184-fa34bae79495@de.ibm.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 10, 2020 at 10:10 AM Sean Christopherson
-<sean.j.christopherson@intel.com> wrote:
+On Tue, Mar 10, 2020 at 05:54:59PM +0100, Christian Borntraeger wrote:
+> For s390 the guest memory size must be 1M aligned. I need something like the following to make this work:
+> 
+> diff --git a/tools/testing/selftests/kvm/demand_paging_test.c b/tools/testing/selftests/kvm/demand_paging_test.c
+> index c1e326d3ed7f..f85ec3f01a35 100644
+> --- a/tools/testing/selftests/kvm/demand_paging_test.c
+> +++ b/tools/testing/selftests/kvm/demand_paging_test.c
+> @@ -164,6 +164,10 @@ static struct kvm_vm *create_vm(enum vm_guest_mode mode, int vcpus,
+>         pages += ((2 * vcpus * vcpu_memory_bytes) >> PAGE_SHIFT_4K) /
+>                  PTES_PER_4K_PT;
+>         pages = vm_adjust_num_guest_pages(mode, pages);
+> +#ifdef __s390x__
+> +       /* s390 requires 1M aligned guest sizes */
+> +       pages = (pages + 255) & ~0xff;
+> +#endif
+>  
+>         pr_info("Testing guest mode: %s\n", vm_guest_mode_string(mode));
+>  
+> 
+> any better idea how to do that?
 >
-> On Fri, Mar 06, 2020 at 10:03:37AM +0100, Paolo Bonzini wrote:
-> > On 05/03/20 22:51, Sean Christopherson wrote:
-> > >> Ah. So cross-vendor CPUID specifications are not supported?
-> > > Cross-vendor CPUID is sort of allowed?  E.g. this plays nice with creating
-> > > a Centaur CPU on an Intel platform.  My interpretation of GET_SUPPORTED...
-> > > is that KVM won't prevent enumerating what you want in CPUID, but it only
-> > > promises to correctly support select leafs.
-> >
-> > But in practice does this change anything?  If the vendor is not Centaur
-> > it's unlikely that there is a 0xc0000000 leaf.  The 0x80000000 bound is
-> > certainly not going to be at 0xc0000000 or beyond, and likewise to 0xc0000000
-> > bound is not going to be at 0xd0000000 or beyond.  So I'm not sure if
-> > anything is lost from this simplification:
->
-> Probably not?  But in the unlikely scenario that Intel wants to add a CPUID
-> leaf above 0xc0000000, I don't want to have to explain that it might cause
-> problems for KVM guests because I added code to emulate (alleged) Centaur
-> behavior for virtual Intel CPUs.
 
-And there is some precedent for that, with the 0x20000000 leaves.
+For this one we could patch[*] vm_adjust_num_guest_pages(). That would
+also allow the one on line 382, and another one at dirty_log_test.c:300
+to be hidden.
+
+I'd also like to add a
+
+ unsigned int vm_calc_num_guest_pages(enum vm_guest_mode mode, size_t size)
+ {
+      unsigned int n;
+      n = DIV_ROUND_UP(size, vm_guest_mode_params[mode].page_size);
+      return vm_adjust_num_guest_pages(mode, n);
+ }
+
+to the num-pages API we've recently put in kvm/queue. If we do, then we
+could add a #ifdef-390x to that as well.
+
+Thanks,
+drew
+
+
+[*]
+
+diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
+index fc84da4b72d4..9569b21eed26 100644
+--- a/tools/testing/selftests/kvm/include/kvm_util.h
++++ b/tools/testing/selftests/kvm/include/kvm_util.h
+@@ -261,7 +261,13 @@ unsigned int vm_num_guest_pages(enum vm_guest_mode mode, unsigned int num_host_p
+ static inline unsigned int
+ vm_adjust_num_guest_pages(enum vm_guest_mode mode, unsigned int num_guest_pages)
+ {
+-       return vm_num_guest_pages(mode, vm_num_host_pages(mode, num_guest_pages));
++       unsigned int n;
++       n = vm_num_guest_pages(mode, vm_num_host_pages(mode, num_guest_pages));
++#ifdef __s390x__
++       /* s390 requires 1M aligned guest sizes */
++       n = (n + 255) & ~0xff;
++#endif
++       return n;
+ }
+ 
+ struct kvm_userspace_memory_region *
+
