@@ -2,84 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6F9BE17F61D
-	for <lists+kvm@lfdr.de>; Tue, 10 Mar 2020 12:20:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5014E17F68C
+	for <lists+kvm@lfdr.de>; Tue, 10 Mar 2020 12:43:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726283AbgCJLUp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Mar 2020 07:20:45 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:21184 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725937AbgCJLUn (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 10 Mar 2020 07:20:43 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1583839242;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:mime-version:mime-version:
-         content-type:content-type; bh=arw5L5YsoJ87khZVMFIrLcsKvVPIlQcfxYIOv80kSBg=;
-        b=d66rXwRpXBzA5RPScNFObQshSHgIyJljAfwA02V352ZH8eGxpBQ/f5BNCfGgSAY3vyhhOX
-        SVRvX01U2g7b37JZiJBYuyXhN919LyzLwqbtdeaIXKyElFKHAoDnGAO5oRlPCANpe7AImr
-        aIQquNKQ9YLGWUuQp6YlJQ7yvE3uaII=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-221-jfRFySz4PDiWwTidYnC3Bg-1; Tue, 10 Mar 2020 07:20:40 -0400
-X-MC-Unique: jfRFySz4PDiWwTidYnC3Bg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A2EAA18FF686;
-        Tue, 10 Mar 2020 11:20:39 +0000 (UTC)
-Received: from redhat.com (ovpn-116-72.ams2.redhat.com [10.36.116.72])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 4652360BF3;
-        Tue, 10 Mar 2020 11:20:39 +0000 (UTC)
-From:   Juan Quintela <quintela@redhat.com>
-To:     kvm-devel <kvm@vger.kernel.org>, qemu-devel@nongnu.org
-Subject: KVM call today 2020-03-10
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
-Reply-To: quintela@redhat.com
-Date:   Tue, 10 Mar 2020 12:20:33 +0100
-Message-ID: <87a74ozcam.fsf@secure.laptop>
+        id S1726307AbgCJLnQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Mar 2020 07:43:16 -0400
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:53644 "EHLO
+        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726205AbgCJLnP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Mar 2020 07:43:15 -0400
+Received: by mail-wm1-f68.google.com with SMTP id 25so1017477wmk.3;
+        Tue, 10 Mar 2020 04:43:14 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=hMBSAZ2w6rHBlgdOMKsoKxalij10II+RdrF1ljWYIAk=;
+        b=CT1UgkL2egBTV0YLLHJ2dx8KHYyOY16G/v3ksJ6HEA5NbJVa6m/UTmeymOj/Lnjj8t
+         pAkXpX1tET5SMewsjbv6udog3l3INkBt1maraDXk4gU5OWh7n/lBBiaFzxpT3lsfGhJp
+         Spyxvvndau0hT6sS/pK16SGs9UF4hyXx6m0KQ1uiBahBj8IniJ405lpfTJ4nu46HWu0h
+         /KMOwg1LUY6bd2OJUOEGSw2EVMg6eoJKxjGAcj2kWcgIZigr3fbUQcRiq4v0o6Du2LR1
+         oJO7PDLHqHdzTmSI5Jro8DniS9Cxg5dDpbLQtgOB0hvHik7cpQbpsUXVoHwE3xU9hnZB
+         wtQA==
+X-Gm-Message-State: ANhLgQ3mlNcVLKnSAiKnVmPWRbLn0t4EgRpTIXJjSXRuccXvwHI4FTb/
+        zSrK9bGK7pyqOE2Vc4//pKM=
+X-Google-Smtp-Source: ADFU+vuKZ/41TrYfhsXloC/F2fawinzqxCwHUoA7MsTg/Xb+5sVoVBhrkM90t/0amNfG09qJHc1Ixg==
+X-Received: by 2002:a05:600c:d8:: with SMTP id u24mr1820247wmm.165.1583840594393;
+        Tue, 10 Mar 2020 04:43:14 -0700 (PDT)
+Received: from localhost (prg-ext-pat.suse.com. [213.151.95.130])
+        by smtp.gmail.com with ESMTPSA id e20sm4703596wrc.97.2020.03.10.04.43.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 10 Mar 2020 04:43:13 -0700 (PDT)
+Date:   Tue, 10 Mar 2020 12:43:12 +0100
+From:   Michal Hocko <mhocko@kernel.org>
+To:     David Hildenbrand <david@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        virtio-dev@lists.oasis-open.org,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        Andrew Morton <akpm@linux-foundation.org>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Oscar Salvador <osalvador@suse.de>,
+        Igor Mammedov <imammedo@redhat.com>,
+        Dave Young <dyoung@redhat.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Pavel Tatashin <pasha.tatashin@soleen.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Vlastimil Babka <vbabka@suse.cz>
+Subject: Re: [PATCH v1 07/11] virtio-mem: Allow to offline partially
+ unplugged memory blocks
+Message-ID: <20200310114312.GG8447@dhcp22.suse.cz>
+References: <20200302134941.315212-1-david@redhat.com>
+ <20200302134941.315212-8-david@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200302134941.315212-8-david@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Mon 02-03-20 14:49:37, David Hildenbrand wrote:
+[...]
+> +static void virtio_mem_notify_going_offline(struct virtio_mem *vm,
+> +					    unsigned long mb_id)
+> +{
+> +	const unsigned long nr_pages = PFN_DOWN(vm->subblock_size);
+> +	unsigned long pfn;
+> +	int sb_id, i;
+> +
+> +	for (sb_id = 0; sb_id < vm->nb_sb_per_mb; sb_id++) {
+> +		if (virtio_mem_mb_test_sb_plugged(vm, mb_id, sb_id, 1))
+> +			continue;
+> +		/*
+> +		 * Drop our reference to the pages so the memory can get
+> +		 * offlined and add the unplugged pages to the managed
+> +		 * page counters (so offlining code can correctly subtract
+> +		 * them again).
+> +		 */
+> +		pfn = PFN_DOWN(virtio_mem_mb_id_to_phys(mb_id) +
+> +			       sb_id * vm->subblock_size);
+> +		adjust_managed_page_count(pfn_to_page(pfn), nr_pages);
+> +		for (i = 0; i < nr_pages; i++)
+> +			page_ref_dec(pfn_to_page(pfn + i));
 
-
-Hi
-
-Today is a call becasue there are topics, in case you missed.
-Notice that this call is in USA time, so if you are not there, it is
-inside possiblity that it is one hour sooner that you are used to. See
-the calendar.
-
- * Clarify the feedback on the latest revision of multi-process QEMU
-   patches concerning:
-   - Command-line: It's not clear what's the preferred approach to pass
-     command-line parameters for the remote process. We are wondering if
-     it's OK to accept the command-line parameters for the remote as a
-     single string, or if it should be on multiple lines?
-   - Refactoring migration related code: We realize that some of the
-     modules we have built into the remote process (such as block and
-     migration) compile more code than is required by the remote process.
-     Ideally, we could refactor them to utilize just the pieces of code
-     needed. However, this problem of refactoring has a larger scope.
-     Could this be addressed in later projects?
-
-
-
- Call details:
-
-By popular demand, a google calendar public entry with it
-
-  https://www.google.com/calendar/embed?src=dG9iMXRqcXAzN3Y4ZXZwNzRoMHE4a3BqcXNAZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvbQ
-
-(Let me know if you have any problems with the calendar entry.  I just
-gave up about getting right at the same time CEST, CET, EDT and DST).
-
-If you need phone number details,  contact me privately
-
-Thanks, Juan.
-
+Is there ever situation this might be a different than 1->0 transition?
+-- 
+Michal Hocko
+SUSE Labs
