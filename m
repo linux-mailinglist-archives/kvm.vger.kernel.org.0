@@ -2,102 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C8089180493
-	for <lists+kvm@lfdr.de>; Tue, 10 Mar 2020 18:14:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F3E831804AD
+	for <lists+kvm@lfdr.de>; Tue, 10 Mar 2020 18:23:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727032AbgCJROR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Mar 2020 13:14:17 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:36604 "EHLO
-        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726520AbgCJROR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Mar 2020 13:14:17 -0400
-Received: by mail-wr1-f67.google.com with SMTP id s5so12989936wrg.3;
-        Tue, 10 Mar 2020 10:14:14 -0700 (PDT)
+        id S1726442AbgCJRX4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Mar 2020 13:23:56 -0400
+Received: from mail-il1-f193.google.com ([209.85.166.193]:41316 "EHLO
+        mail-il1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726295AbgCJRX4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Mar 2020 13:23:56 -0400
+Received: by mail-il1-f193.google.com with SMTP id l14so6877723ilj.8
+        for <kvm@vger.kernel.org>; Tue, 10 Mar 2020 10:23:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=YxvAecFulSD8TnYu6Bdw3yluyHTPsAWlb/0EQPhybgQ=;
-        b=SPr60n6OSWbLna/pRLxYdMcGAsdyqT7XCIi+09nutJD29iRPlx6m8oVdZcK4iApRtG
-         32KAdMaO2Jg1mWSXym/DmureZCJ/qe0xzsc43FZIHpa3fjwf4IKfNfuEo7MIJoLhe29o
-         CfHEnQy1CRQbOSggcj1urjjYJ7QWJB4bgmCGbxziFgvBV5h1hJwHbts5FhOIicctDb9T
-         7rmZBDpsMH9msitNbBC6bKKlf6Hwxn6t9cNjKdhoupY6J1SPg/eYRg5P1xk3rmEciOiq
-         IZOLzaqiwYk9+rNcR2ZDHJu1zhwJm5eUwoY4ltmH1FbCM31wO8R/HZyyvLeq7j7UIz+E
-         O74Q==
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=bpKs3XJUi+EzrxrD69z2rWEMUDijI2aX+JxbzZCOheM=;
+        b=jC2v5tmmuEnmUgDs+1o340Pp6muc2ypEpD8eaP6r2cPOyHT0UQ2PlIn/QtNGxkE4+8
+         cASs91MnMeo8ZYxW2c5PAIkJ0SDlxhG3iJTSsvPlU5s080/QYJohXagrGCH/GzpvvT98
+         WHcXWwupWcsc+f8H82YAAoIrwBgVLBphe07lLJBYJ8HdcmX9XBOxeechO/XaWNXYi8YE
+         Aa0OUiQKyYWYwEQds8gPprxAGBjI+WvtYntOAB9plQyYyp/YDkhYYJzjDXUGcvMxQWsD
+         cxjeiHchLTmwjy7F8sJse27h8pR8rUkqcBaVeAUD8fgXZC+ckz7ZSMd/nZ5nPvp6jypt
+         Kg3w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=YxvAecFulSD8TnYu6Bdw3yluyHTPsAWlb/0EQPhybgQ=;
-        b=oYDUz98Gvdit9NvWuifZisrVaoNk5WLjKgWYrWzWGEwBf9MgL5X6C1oiJjPBk6SRHz
-         H7ORrxY60MxfYTXtPJkyyJ+OiknFNXKIsCpjvSP6IqPoPeoNKvS80DEqYLXC3nzVHS7y
-         9C3I6pUJdZDwIwcatpRVG+zTdEZnyRmLqZ6QZyLV6M6GmjesABpkFXtjlyd8VaiUxrZ1
-         KA6LscbDPcTsB8FvxkLj2Cn2R23qsWjN1GrIfVRD7jl1CE81/P94LEyVJKGqpPxwaZlN
-         0AuVhoMxJ36GK/4/xSNsG2T6JB9/P7qfjF4Z2tHdkAi2eLOPFI7QfR7eRBiCpFMgdzFf
-         UhFQ==
-X-Gm-Message-State: ANhLgQ2bV4HWh/W/KmaeUFEXbJQAjo4/wwwd3KHcJLFgcvB34DqSvH4z
-        n5cK8uwiDh38FEupSVX5jKmzpIAKQBU=
-X-Google-Smtp-Source: ADFU+vthAIE2MZTZEesfjfcou/8n96q9par0YA5nRJM1HOgesSd20O6u7XfzN09curTSNmGTLof0zw==
-X-Received: by 2002:adf:9d8f:: with SMTP id p15mr25885968wre.160.1583860453844;
-        Tue, 10 Mar 2020 10:14:13 -0700 (PDT)
-Received: from jondnuc (IGLD-84-229-155-229.inter.net.il. [84.229.155.229])
-        by smtp.gmail.com with ESMTPSA id i6sm1963972wru.40.2020.03.10.10.14.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Mar 2020 10:14:13 -0700 (PDT)
-Date:   Tue, 10 Mar 2020 19:14:12 +0200
-From:   Jon Doron <arilou@gmail.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-hyperv@vger.kernel.org
-Subject: Re: [PATCH v4 1/5] x86/kvm/hyper-v: Explicitly align hcall param for
- kvm_hyperv_exit
-Message-ID: <20200310171412.GC13767@jondnuc>
-References: <20200309182017.3559534-1-arilou@gmail.com>
- <20200309182017.3559534-2-arilou@gmail.com>
- <87k13sb14a.fsf@vitty.brq.redhat.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=bpKs3XJUi+EzrxrD69z2rWEMUDijI2aX+JxbzZCOheM=;
+        b=E7pUQDKec87/oInMY4JSiE0Dw/UvCvzmLvXDdDCH5T6t9b6Po6GM708MVLpNg+3I0/
+         Cf23Upmdp/aBed/oecpfXIXEfKasQ7nMKdE7KD5suYQY7nisWfIDB7yAmHNu1uz8qr/6
+         1vdfMwTmVrNXp6pgzN5BPotXXxYnekcbsVPcpAB0qZd7KYmIX7AWUxUQ7SVlMhEa8AcW
+         J1FsKGQ+gxP/D74Ez9avqcFd4hiqnZaM+nHdvQoMEf7rw7hkGTcvIWia4ZlpI7qCaEix
+         2ckCUwHRC0PHIencK4/UzrDIoJtrWRy32x9yEC2x6JgAoWqDuoPrtnbPHTLzHrbc6Ubh
+         2EDg==
+X-Gm-Message-State: ANhLgQ3z6gSlxIHD/ujv1vT/PsPdgzpgM7xhoOqC/352lb0vLB00x33p
+        2XbGVVrdh190OPAs+tLprkciSTcoEM//V/x/hcIEtA==
+X-Google-Smtp-Source: ADFU+vsdimCS3ju3X6q4TFVr0q8tJXbwYngqSmKvAnDqE7FFDwCj2Y7m2zWw0oFBeuLMLbJXXOmYlKV7766rSe/gNpI=
+X-Received: by 2002:a92:3c04:: with SMTP id j4mr12290505ila.108.1583861035356;
+ Tue, 10 Mar 2020 10:23:55 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <87k13sb14a.fsf@vitty.brq.redhat.com>
+References: <20200305013437.8578-1-sean.j.christopherson@intel.com>
+ <20200305013437.8578-5-sean.j.christopherson@intel.com> <CALMp9eRRWZ54kzMXdTqRCy2KmaUAq+HVVVzbxJNVdgktg65XCA@mail.gmail.com>
+ <20200305192532.GN11500@linux.intel.com> <CALMp9eRxdGj0DL0_g-an0YC+gTMcWcSk7=md=k4-8S0Zcankbg@mail.gmail.com>
+ <20200305215149.GS11500@linux.intel.com> <5567edf6-a04c-5810-8ed5-78a0db14b202@redhat.com>
+ <20200310171017.GC9305@linux.intel.com>
+In-Reply-To: <20200310171017.GC9305@linux.intel.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Tue, 10 Mar 2020 10:23:44 -0700
+Message-ID: <CALMp9eRjOd3=+koxGus=V0CLvz3wg-A1soa9Z4rvXhedQzCHcA@mail.gmail.com>
+Subject: Re: [PATCH v2 4/7] KVM: x86: Fix CPUID range checks for Hypervisor
+ and Centaur classes
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>, Pu Wen <puwen@hygon.cn>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/03/2020, Vitaly Kuznetsov wrote:
->Jon Doron <arilou@gmail.com> writes:
+On Tue, Mar 10, 2020 at 10:10 AM Sean Christopherson
+<sean.j.christopherson@intel.com> wrote:
 >
->> Signed-off-by: Jon Doron <arilou@gmail.com>
->> ---
->>  include/uapi/linux/kvm.h | 1 +
->>  1 file changed, 1 insertion(+)
->>
->> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
->> index 4b95f9a31a2f..7acfd6a2569a 100644
->> --- a/include/uapi/linux/kvm.h
->> +++ b/include/uapi/linux/kvm.h
->> @@ -189,6 +189,7 @@ struct kvm_hyperv_exit {
->>  #define KVM_EXIT_HYPERV_SYNIC          1
->>  #define KVM_EXIT_HYPERV_HCALL          2
->>  	__u32 type;
->> +	__u32 pad;
->>  	union {
->>  		struct {
->>  			__u32 msr;
+> On Fri, Mar 06, 2020 at 10:03:37AM +0100, Paolo Bonzini wrote:
+> > On 05/03/20 22:51, Sean Christopherson wrote:
+> > >> Ah. So cross-vendor CPUID specifications are not supported?
+> > > Cross-vendor CPUID is sort of allowed?  E.g. this plays nice with creating
+> > > a Centaur CPU on an Intel platform.  My interpretation of GET_SUPPORTED...
+> > > is that KVM won't prevent enumerating what you want in CPUID, but it only
+> > > promises to correctly support select leafs.
+> >
+> > But in practice does this change anything?  If the vendor is not Centaur
+> > it's unlikely that there is a 0xc0000000 leaf.  The 0x80000000 bound is
+> > certainly not going to be at 0xc0000000 or beyond, and likewise to 0xc0000000
+> > bound is not going to be at 0xd0000000 or beyond.  So I'm not sure if
+> > anything is lost from this simplification:
 >
->Sorry if I missed something but I think the suggestion was to pad this
->'msr' too (in case we're aiming at making padding explicit for the whole
->structure). Or is there any reason to not do that?
->
->Also, I just noticed that we have a copy of this definition in
->Documentation/virt/kvm/api.rst - it will need to be updated (and sorry
->for not noticing it earlier).
->
->-- 
->Vitaly
->
+> Probably not?  But in the unlikely scenario that Intel wants to add a CPUID
+> leaf above 0xc0000000, I don't want to have to explain that it might cause
+> problems for KVM guests because I added code to emulate (alleged) Centaur
+> behavior for virtual Intel CPUs.
 
-Heh sure no problem will fix in v5, but going to wait for a verdict on 
-the location for the new CPUID leafs and MSRs for the synthetic 
-debugger.
-
--- Jon.
+And there is some precedent for that, with the 0x20000000 leaves.
