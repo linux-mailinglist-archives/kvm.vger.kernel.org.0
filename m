@@ -2,109 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 18E121802B0
-	for <lists+kvm@lfdr.de>; Tue, 10 Mar 2020 17:01:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E82471802BD
+	for <lists+kvm@lfdr.de>; Tue, 10 Mar 2020 17:04:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726863AbgCJQBb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Mar 2020 12:01:31 -0400
-Received: from mga14.intel.com ([192.55.52.115]:31254 "EHLO mga14.intel.com"
+        id S1726599AbgCJQEy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Mar 2020 12:04:54 -0400
+Received: from foss.arm.com ([217.140.110.172]:39018 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726445AbgCJQBb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Mar 2020 12:01:31 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 10 Mar 2020 09:01:30 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,537,1574150400"; 
-   d="scan'208";a="353652216"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
-  by fmsmga001.fm.intel.com with ESMTP; 10 Mar 2020 09:01:30 -0700
-Date:   Tue, 10 Mar 2020 09:01:29 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Wanpeng Li <kernellwp@gmail.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Subject: Re: [PATCH] KVM: X86: Don't load/put guest FPU context for sleeping
- AP
-Message-ID: <20200310160129.GA9305@linux.intel.com>
-References: <1583823679-17648-1-git-send-email-wanpengli@tencent.com>
+        id S1726557AbgCJQEx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Mar 2020 12:04:53 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 064631FB;
+        Tue, 10 Mar 2020 09:04:53 -0700 (PDT)
+Received: from [10.1.196.63] (e123195-lin.cambridge.arm.com [10.1.196.63])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id F316A3F67D;
+        Tue, 10 Mar 2020 09:04:51 -0700 (PDT)
+Subject: Re: [PATCH v2 kvmtool 28/30] arm/fdt: Remove 'linux,pci-probe-only'
+ property
+To:     Andre Przywara <andre.przywara@arm.com>
+Cc:     kvm@vger.kernel.org, will@kernel.org,
+        julien.thierry.kdev@gmail.com, sami.mujawar@arm.com,
+        lorenzo.pieralisi@arm.com, maz@kernel.org,
+        Julien Thierry <julien.thierry@arm.com>
+References: <20200123134805.1993-1-alexandru.elisei@arm.com>
+ <20200123134805.1993-29-alexandru.elisei@arm.com>
+ <20200207173829.1ac1884e@donnerap.cambridge.arm.com>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <bbdea8bf-4776-5a60-31d7-6cf5437d8577@arm.com>
+Date:   Tue, 10 Mar 2020 16:04:50 +0000
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1583823679-17648-1-git-send-email-wanpengli@tencent.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <20200207173829.1ac1884e@donnerap.cambridge.arm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 10, 2020 at 03:01:19PM +0800, Wanpeng Li wrote:
-> From: Wanpeng Li <wanpengli@tencent.com>
-> 
-> kvm_load_guest_fpu() and kvm_put_guest_fpu() each consume more than 14us 
-> observed by ftrace, the qemu userspace FPU is swapped out for the guest 
-> FPU context for the duration of the KVM_RUN ioctl even if sleeping AP, 
-> we shouldn't load/put guest FPU context for this case especially for 
-> serverless scenario which sensitives to boot time.
-> 
-> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
-> ---
->  arch/x86/kvm/x86.c | 8 +++++---
->  1 file changed, 5 insertions(+), 3 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 5de2006..080ffa4 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -8680,7 +8680,6 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *kvm_run)
->  
->  	vcpu_load(vcpu);
->  	kvm_sigset_activate(vcpu);
-> -	kvm_load_guest_fpu(vcpu);
->  
->  	if (unlikely(vcpu->arch.mp_state == KVM_MP_STATE_UNINITIALIZED)) {
->  		if (kvm_run->immediate_exit) {
-> @@ -8718,12 +8717,14 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *kvm_run)
->  		}
->  	}
->  
-> +	kvm_load_guest_fpu(vcpu);
+Hi,
 
-Ugh, so this isn't safe on MPX capable CPUs, kvm_apic_accept_events() can
-trigger kvm_vcpu_reset() with @init_event=true and try to unload guest_fpu.
+On 2/7/20 5:38 PM, Andre Przywara wrote:
+> On Thu, 23 Jan 2020 13:48:03 +0000
+> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+>
+> Hi,
+>
+>> From: Julien Thierry <julien.thierry@arm.com>
+>>
+>> PCI now supports configurable BARs. Get rid of the no longer needed,
+>> Linux-only, fdt property.
+> I was just wondering: what is the x86 story here?
+> Does the x86 kernel never reassign BARs? Or is this dependent on something else?
+> I see tons of pci kernel command line parameters for pci=, maybe one of them would explicitly allow reassigning?
 
-We could hack around that issue, but it'd be ugly, and I'm also concerned
-that calling vmx_vcpu_reset() without guest_fpu loaded will be problematic
-in the future with all the things that are getting managed by XSAVE.
+I only see pci=conf1, can you post your kernel command line? Here's mine:
 
-> +
->  	if (unlikely(vcpu->arch.complete_userspace_io)) {
->  		int (*cui)(struct kvm_vcpu *) = vcpu->arch.complete_userspace_io;
->  		vcpu->arch.complete_userspace_io = NULL;
->  		r = cui(vcpu);
->  		if (r <= 0)
-> -			goto out;
-> +			goto out_fpu;
->  	} else
->  		WARN_ON(vcpu->arch.pio.count || vcpu->mmio_needed);
->  
-> @@ -8732,8 +8733,9 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *kvm_run)
->  	else
->  		r = vcpu_run(vcpu);
->  
-> -out:
-> +out_fpu:
->  	kvm_put_guest_fpu(vcpu);
-> +out:
->  	if (vcpu->run->kvm_valid_regs)
->  		store_regs(vcpu);
->  	post_kvm_run_save(vcpu);
-> -- 
-> 2.7.4
-> 
+[    0.000000] Command line: noapic noacpi pci=conf1 reboot=k panic=1
+i8042.direct=1 i8042.dumbkbd=1 i8042.nopnp=1 earlyprintk=serial i8042.noaux=1
+console=ttyS0 earlycon root=/dev/vda1
+
+Just for pci=conf1, from Documentation/admin-guide/kernel-parameters.txt:
+
+"conf1        [X86] Force use of PCI Configuration Access
+                Mechanism 1 (config address in IO port 0xCF8,
+                data in IO port 0xCFC, both 32-bit)."
+
+But you have a point, I haven't seen an x86 guest reassign BARs, I assumed it's
+because it trusts the BIOS allocation. I'll try to figure out why this happens
+(maybe I need a special kernel parameter).
+
+Thanks,
+Alex
+>
+> Cheers,
+> Andre
+>
+>> Signed-off-by: Julien Thierry <julien.thierry@arm.com>
+>> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+>> ---
+>>  arm/fdt.c | 1 -
+>>  1 file changed, 1 deletion(-)
+>>
+>> diff --git a/arm/fdt.c b/arm/fdt.c
+>> index c80e6da323b6..02091e9e0bee 100644
+>> --- a/arm/fdt.c
+>> +++ b/arm/fdt.c
+>> @@ -130,7 +130,6 @@ static int setup_fdt(struct kvm *kvm)
+>>  
+>>  	/* /chosen */
+>>  	_FDT(fdt_begin_node(fdt, "chosen"));
+>> -	_FDT(fdt_property_cell(fdt, "linux,pci-probe-only", 1));
+>>  
+>>  	/* Pass on our amended command line to a Linux kernel only. */
+>>  	if (kvm->cfg.firmware_filename) {
