@@ -2,155 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id AE93718043B
-	for <lists+kvm@lfdr.de>; Tue, 10 Mar 2020 18:02:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D75BF18046E
+	for <lists+kvm@lfdr.de>; Tue, 10 Mar 2020 18:10:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727171AbgCJRCH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Mar 2020 13:02:07 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:41293 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726633AbgCJRCG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Mar 2020 13:02:06 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1583859725;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=UkWPqE2JkjD0+rSe1RwEqI2R5lR5OgljToSA2P+0lDk=;
-        b=XGPLqVgd8zgCiYS8WSuo+eh+/+Pmoe2JlJF063d4lj+xKqLc9ew+WdlhNh3I5NlgFZHmdp
-        8SAJ0CTUShJgfDtz35zYVXX9GJQjLeRUtl4VmE+HCmacg/e5oenNM31z7V/W8NqoToQPzl
-        RCEWdDCkxufyiGzcaqlQggQg085FMxo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-109-9hJWdklTNdCll66Ph94jlQ-1; Tue, 10 Mar 2020 13:02:03 -0400
-X-MC-Unique: 9hJWdklTNdCll66Ph94jlQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B660A1005512
-        for <kvm@vger.kernel.org>; Tue, 10 Mar 2020 17:02:02 +0000 (UTC)
-Received: from fuller.cnet (ovpn-116-43.gru2.redhat.com [10.97.116.43])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id E11239051C;
-        Tue, 10 Mar 2020 17:01:59 +0000 (UTC)
-Received: by fuller.cnet (Postfix, from userid 1000)
-        id 08EB4418CC02; Tue, 10 Mar 2020 11:03:24 -0300 (-03)
-Date:   Tue, 10 Mar 2020 11:03:23 -0300
-From:   Marcelo Tosatti <mtosatti@redhat.com>
-To:     Nitesh Narayan Lal <nitesh@redhat.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, thuth@redhat.com,
-        nilal@redhat.com
-Subject: Re: [Patch v1] x86: Fix the logical destination mode test
-Message-ID: <20200310140323.GA7132@fuller.cnet>
-References: <1583795750-33197-1-git-send-email-nitesh@redhat.com>
+        id S1726616AbgCJRKS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Mar 2020 13:10:18 -0400
+Received: from mga14.intel.com ([192.55.52.115]:37450 "EHLO mga14.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726295AbgCJRKS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Mar 2020 13:10:18 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 10 Mar 2020 10:10:17 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,537,1574150400"; 
+   d="scan'208";a="443241331"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
+  by fmsmga006.fm.intel.com with ESMTP; 10 Mar 2020 10:10:17 -0700
+Date:   Tue, 10 Mar 2020 10:10:17 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Jim Mattson <jmattson@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>, Pu Wen <puwen@hygon.cn>
+Subject: Re: [PATCH v2 4/7] KVM: x86: Fix CPUID range checks for Hypervisor
+ and Centaur classes
+Message-ID: <20200310171017.GC9305@linux.intel.com>
+References: <20200305013437.8578-1-sean.j.christopherson@intel.com>
+ <20200305013437.8578-5-sean.j.christopherson@intel.com>
+ <CALMp9eRRWZ54kzMXdTqRCy2KmaUAq+HVVVzbxJNVdgktg65XCA@mail.gmail.com>
+ <20200305192532.GN11500@linux.intel.com>
+ <CALMp9eRxdGj0DL0_g-an0YC+gTMcWcSk7=md=k4-8S0Zcankbg@mail.gmail.com>
+ <20200305215149.GS11500@linux.intel.com>
+ <5567edf6-a04c-5810-8ed5-78a0db14b202@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1583795750-33197-1-git-send-email-nitesh@redhat.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <5567edf6-a04c-5810-8ed5-78a0db14b202@redhat.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Mar 09, 2020 at 07:15:50PM -0400, Nitesh Narayan Lal wrote:
-> There are following issues with the ioapic logical destination mode tes=
-t:
->=20
-> - A race condition that is triggered when the interrupt handler
-> =C2=A0 ioapic_isr_86() is called at the same time by multiple vCPUs. Du=
-e to this
->   the g_isr_86 is not correctly incremented. To prevent this a spinlock=
- is
->   added around =E2=80=98g_isr_86++=E2=80=99.
->=20
-> - On older QEMU versions initial x2APIC ID is not set, that is why
-> =C2=A0 the local APIC IDs of each vCPUs are not configured. Hence the l=
-ogical
-> =C2=A0 destination mode test fails/hangs. Adding =E2=80=98+x2apic=E2=80=
-=99 to the qemu -cpu params
-> =C2=A0 ensures that the local APICs are configured every time, irrespec=
-tive of the
-> =C2=A0 QEMU version.
->=20
-> - With =E2=80=98-machine kernel_irqchip=3Dsplit=E2=80=99 included in th=
-e ioapic test
-> =C2=A0 test_ioapic_self_reconfigure() always fails and somehow leads to=
- a state where
-> =C2=A0 after submitting IOAPIC fixed delivery - logical destination mod=
-e request we
-> =C2=A0 never receive an interrupt back. For now, the physical and logic=
-al destination
-> =C2=A0 mode tests are moved above test_ioapic_self_reconfigure().
->=20
-> Fixes: b2a1ee7e ("kvm-unit-test: x86: ioapic: Test physical and logical=
- destination mode")
-> Signed-off-by: Nitesh Narayan Lal <nitesh@redhat.com>
+On Fri, Mar 06, 2020 at 10:03:37AM +0100, Paolo Bonzini wrote:
+> On 05/03/20 22:51, Sean Christopherson wrote:
+> >> Ah. So cross-vendor CPUID specifications are not supported?
+> > Cross-vendor CPUID is sort of allowed?  E.g. this plays nice with creating
+> > a Centaur CPU on an Intel platform.  My interpretation of GET_SUPPORTED...
+> > is that KVM won't prevent enumerating what you want in CPUID, but it only
+> > promises to correctly support select leafs.
+> 
+> But in practice does this change anything?  If the vendor is not Centaur 
+> it's unlikely that there is a 0xc0000000 leaf.  The 0x80000000 bound is
+> certainly not going to be at 0xc0000000 or beyond, and likewise to 0xc0000000
+> bound is not going to be at 0xd0000000 or beyond.  So I'm not sure if
+> anything is lost from this simplification:
 
-Looks good to me.
+Probably not?  But in the unlikely scenario that Intel wants to add a CPUID
+leaf above 0xc0000000, I don't want to have to explain that it might cause
+problems for KVM guests because I added code to emulate (alleged) Centaur
+behavior for virtual Intel CPUs.
 
-> ---
->  x86/ioapic.c      | 11 +++++++----
->  x86/unittests.cfg |  2 +-
->  2 files changed, 8 insertions(+), 5 deletions(-)
->=20
-> diff --git a/x86/ioapic.c b/x86/ioapic.c
-> index 742c711..3106531 100644
-> --- a/x86/ioapic.c
-> +++ b/x86/ioapic.c
-> @@ -432,10 +432,13 @@ static void test_ioapic_physical_destination_mode=
-(void)
+> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> index ed5e0bda672c..f43a8875c126 100644
+> --- a/arch/x86/kvm/cpuid.c
+> +++ b/arch/x86/kvm/cpuid.c
+> @@ -963,8 +963,7 @@ static bool cpuid_function_in_range(struct kvm_vcpu *vcpu, u32 function)
+>  
+>  	if (function >= 0x40000000 && function <= 0x4fffffff)
+>  		class = kvm_find_cpuid_entry(vcpu, function & 0xffffff00, 0);
+> -	else if (function >= 0xc0000000 && function <= 0xcfffffff &&
+> -		 is_guest_vendor_centaur(basic->ebx, basic->ecx, basic->edx))
+> +	else if (function >= 0xc0000000)
+>  		class = kvm_find_cpuid_entry(vcpu, 0xc0000000, 0);
+>  	else
+>  		class = kvm_find_cpuid_entry(vcpu, function & 0x80000000, 0);
+> diff --git a/arch/x86/kvm/kvm_emulate.h b/arch/x86/kvm/kvm_emulate.h
+> index 12ddfa493bae..3cb50eda606d 100644
+> --- a/arch/x86/kvm/kvm_emulate.h
+> +++ b/arch/x86/kvm/kvm_emulate.h
+> @@ -424,13 +424,6 @@ static inline bool is_guest_vendor_hygon(u32 ebx, u32 ecx, u32 edx)
+>  	       edx == X86EMUL_CPUID_VENDOR_HygonGenuine_edx;
 >  }
-> =20
->  static volatile int g_isr_86;
-> +struct spinlock ioapic_lock;
-> =20
->  static void ioapic_isr_86(isr_regs_t *regs)
->  {
-> +	spin_lock(&ioapic_lock);
->  	++g_isr_86;
-> +	spin_unlock(&ioapic_lock);
->  	set_irq_line(0x0e, 0);
->  	eoi();
->  }
-> @@ -501,6 +504,10 @@ int main(void)
->  	test_ioapic_level_tmr(true);
->  	test_ioapic_edge_tmr(true);
-> =20
-> +	test_ioapic_physical_destination_mode();
-> +	if (cpu_count() > 3)
-> +		test_ioapic_logical_destination_mode();
-> +
->  	if (cpu_count() > 1) {
->  		test_ioapic_edge_tmr_smp(false);
->  		test_ioapic_level_tmr_smp(false);
-> @@ -508,11 +515,7 @@ int main(void)
->  		test_ioapic_edge_tmr_smp(true);
-> =20
->  		test_ioapic_self_reconfigure();
-> -		test_ioapic_physical_destination_mode();
->  	}
-> =20
-> -	if (cpu_count() > 3)
-> -		test_ioapic_logical_destination_mode();
+>  
+> -static inline bool is_guest_vendor_centaur(u32 ebx, u32 ecx, u32 edx)
+> -{
+> -	return ebx == X86EMUL_CPUID_VENDOR_CentaurHauls_ebx &&
+> -	       ecx == X86EMUL_CPUID_VENDOR_CentaurHauls_ecx &&
+> -	       edx == X86EMUL_CPUID_VENDOR_CentaurHauls_edx;
+> -}
 > -
->  	return report_summary();
->  }
-> diff --git a/x86/unittests.cfg b/x86/unittests.cfg
-> index f2401eb..d658bc8 100644
-> --- a/x86/unittests.cfg
-> +++ b/x86/unittests.cfg
-> @@ -46,7 +46,7 @@ timeout =3D 30
->  [ioapic]
->  file =3D ioapic.flat
->  smp =3D 4
-> -extra_params =3D -cpu qemu64
-> +extra_params =3D -cpu qemu64,+x2apic
->  arch =3D x86_64
-> =20
->  [cmpxchg8b]
-> --=20
-> 1.8.3.1
-
+>  enum x86_intercept_stage {
+>  	X86_ICTP_NONE = 0,   /* Allow zero-init to not match anything */
+>  	X86_ICPT_PRE_EXCEPT,
+> 
