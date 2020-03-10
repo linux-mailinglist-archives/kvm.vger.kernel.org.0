@@ -2,173 +2,136 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A7E561805CB
-	for <lists+kvm@lfdr.de>; Tue, 10 Mar 2020 19:07:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0762F1805E5
+	for <lists+kvm@lfdr.de>; Tue, 10 Mar 2020 19:10:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726426AbgCJSHL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Mar 2020 14:07:11 -0400
-Received: from mail.kernel.org ([198.145.29.99]:52126 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726269AbgCJSHL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Mar 2020 14:07:11 -0400
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 110802146E;
-        Tue, 10 Mar 2020 18:07:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1583863630;
-        bh=rHYS2dfliP5kBBFI8WXzNz2+NnXttJ2pOTUrYGHzrPs=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=NvQi3eK//4yMrQUAifYnYu1PWXL+qiDJEyW/u+fxmWzYSscjcFAkzncBvknsJMDgu
-         yJVMiSJom2dyM3axRabWI01RADaSXS3ohbIc7WSgmuyu7pFmH/xcwQop4RRQTv5EiD
-         wIkQwTkihaIqbjVQ6J4yoIjMS4YMwZfM+Ge2tS48=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
-        by disco-boy.misterjones.org with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.92)
-        (envelope-from <maz@kernel.org>)
-        id 1jBjHY-00Bh7w-9n; Tue, 10 Mar 2020 18:07:08 +0000
+        id S1726851AbgCJSKN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Mar 2020 14:10:13 -0400
+Received: from mail-lj1-f196.google.com ([209.85.208.196]:40322 "EHLO
+        mail-lj1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726729AbgCJSKN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Mar 2020 14:10:13 -0400
+Received: by mail-lj1-f196.google.com with SMTP id 19so12430917ljj.7
+        for <kvm@vger.kernel.org>; Tue, 10 Mar 2020 11:10:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=GAmrLSm94M3atxor6m3MBGNU1T3aJwAms1a60E3OcKQ=;
+        b=E4Gh5FebxbswQObtHkMKLa0I1vxP38Xyu9we0WSALKU9brqcmL7dmgK5DPgBi0vtGt
+         OCLEcIv+wlGiaPr/aZzGWrh3C2GCorpWLWvzGmTExo1WIkd5cOXbmEz/PNc1Nce2bWNb
+         MO1ty0KtN9jj98dselZJN/RU3YxMNgohQiTzVr0ujRZdljdUfPEMa86uPKlKMgmqEjd7
+         7puKGvXBmhiuGcL0ITpKvmrRv1gCP6RcvRMvm2Rp5JZUvGM5UjUAdTpQUbo2QI6Pnsj+
+         7i7kQRLJXarHpzmGH7INlZlEHEfpWE1zujmaiianXg7IXVsEvq/5l8bcP+9wdmtziTPi
+         NK7A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=GAmrLSm94M3atxor6m3MBGNU1T3aJwAms1a60E3OcKQ=;
+        b=Wz8ljkRIIVeWPbKf/tg27bNAoyCYoHwazfaCzo1Xe0dtfeqGlB5IUASl6Y9jUhxWEt
+         kn30iP6G10b9WIn2flV3fLG5yN2m9FPqm7z7s/BV5YSXE9/NN2RbbJADLGzGI03Ou1TG
+         M6aWIuE2cFDUUvEKpU2kHhSnlmR5EzpViCVJFicOcqvgQWwP6hoJGGcW04YlkC7Nu+2W
+         7RfCIdQ7RkDImVHPO0oXP3nYUE5U9Ny3XjTSEa9dRU94iiubmReu0jIn719snrcxgaJ+
+         x2Ox4Osch6lnDgOazn5JE5rvFM4TU+k+dwKXHiQ7SeUd32APH1fir/wSJh42wOtPf6UN
+         Z7HQ==
+X-Gm-Message-State: ANhLgQ2zIfTwbnpAE6A8ww6Jvuo7bV9ISRZIjyuMBT1np7hsupD0d/A1
+        draSB+neWkES9AJVFuycdebbdcbneqGWseUixR7qqg==
+X-Google-Smtp-Source: ADFU+vv0bRCpZ9upS082ADo1baaiIcsgHRiEr/NQ/XsGlkb1/DnYR7EmtbYbw4Q/00elQBj/MZtk5RGryisNcNPLl5A=
+X-Received: by 2002:a2e:800a:: with SMTP id j10mr10367065ljg.23.1583863810659;
+ Tue, 10 Mar 2020 11:10:10 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
-Content-Transfer-Encoding: 8bit
-Date:   Tue, 10 Mar 2020 18:07:08 +0000
-From:   Marc Zyngier <maz@kernel.org>
-To:     Auger Eric <eric.auger@redhat.com>
-Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Mark Rutland <mark.rutland@arm.com>
-Subject: Re: [PATCH v2 2/2] KVM: arm64: Document PMU filtering API
-In-Reply-To: <867c7926-df43-7ab0-d20a-211a59d7612d@redhat.com>
-References: <20200309124837.19908-1-maz@kernel.org>
- <20200309124837.19908-3-maz@kernel.org>
- <7943c896-013b-d9cb-ba89-2040b46437fe@redhat.com>
- <07f4ef9b5ff6c6c5086c9723c64c035f@kernel.org>
- <867c7926-df43-7ab0-d20a-211a59d7612d@redhat.com>
-Message-ID: <79f80ab568138e1287d0a515e0caa98c@kernel.org>
-X-Sender: maz@kernel.org
-User-Agent: Roundcube Webmail/1.3.10
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: eric.auger@redhat.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, robin.murphy@arm.com, mark.rutland@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+References: <20200213194157.5877-1-sds@tycho.nsa.gov> <CAHC9VhSsjrgu2Jn+yiV5Bz_wt2x5bgEXdhjqLA+duWYNo4gOtw@mail.gmail.com>
+ <eb2dbe22-91af-17c6-3dfb-d9ec619a4d7a@schaufler-ca.com> <CAKOZueuus6fVqrKsfNgSYGo-kXJ3f6Mv_NJZStY1Uo934=SjDw@mail.gmail.com>
+In-Reply-To: <CAKOZueuus6fVqrKsfNgSYGo-kXJ3f6Mv_NJZStY1Uo934=SjDw@mail.gmail.com>
+From:   Daniel Colascione <dancol@google.com>
+Date:   Tue, 10 Mar 2020 11:09:34 -0700
+Message-ID: <CAKOZuetUvu=maOmHXjCqkHaYEN5Sf+pKBc3BZ+qpy1tE1NJ9xQ@mail.gmail.com>
+Subject: Re: [RFC PATCH] security,anon_inodes,kvm: enable security support for
+ anon inodes
+To:     Casey Schaufler <casey@schaufler-ca.com>,
+        Sandeep Patil <sspatil@google.com>
+Cc:     Paul Moore <paul@paul-moore.com>,
+        LSM List <linux-security-module@vger.kernel.org>,
+        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        SElinux list <selinux@vger.kernel.org>, kvm@vger.kernel.org,
+        Nick Kralevich <nnk@google.com>,
+        Stephen Smalley <sds@tycho.nsa.gov>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2020-03-10 17:30, Auger Eric wrote:
-> Hi Marc,
-> 
-> On 3/10/20 12:54 PM, Marc Zyngier wrote:
->> On 2020-03-09 18:17, Auger Eric wrote:
->>> Hi Marc,
->>> 
->>> On 3/9/20 1:48 PM, Marc Zyngier wrote:
->>>> Add a small blurb describing how the event filtering API gets used.
->>>> 
->>>> Signed-off-by: Marc Zyngier <maz@kernel.org>
->>>> ---
->>>>  Documentation/virt/kvm/devices/vcpu.rst | 40 
->>>> +++++++++++++++++++++++++
->>>>  1 file changed, 40 insertions(+)
->>>> 
->>>> diff --git a/Documentation/virt/kvm/devices/vcpu.rst
->>>> b/Documentation/virt/kvm/devices/vcpu.rst
->>>> index 9963e680770a..7262c0469856 100644
->>>> --- a/Documentation/virt/kvm/devices/vcpu.rst
->>>> +++ b/Documentation/virt/kvm/devices/vcpu.rst
->>>> @@ -55,6 +55,46 @@ Request the initialization of the PMUv3.  If 
->>>> using
->>>> the PMUv3 with an in-kernel
->>>>  virtual GIC implementation, this must be done after initializing 
->>>> the
->>>> in-kernel
->>>>  irqchip.
->>>> 
->>>> +1.3 ATTRIBUTE: KVM_ARM_VCPU_PMU_V3_FILTER
->>>> +---------------------------------------
->>>> +
->>>> +:Parameters: in kvm_device_attr.addr the address for a PMU event
->>>> filter is a
->>>> +             pointer to a struct kvm_pmu_event_filter
->>>> +
->>>> +:Returns:
->>>> +
->>>> +     =======  
->>>> ======================================================
->>>> +     -ENODEV: PMUv3 not supported or GIC not initialized
->>>> +     -ENXIO:  PMUv3 not properly configured or in-kernel irqchip 
->>>> not
->>>> +           configured as required prior to calling this attribute
->>>> +     -EBUSY:  PMUv3 already initialized
->>> maybe document -EINVAL?
->> 
->> Yup, definitely.
->> 
->>>> +     =======  
->>>> ======================================================
->>>> +
->>>> +Request the installation of a PMU event filter describe as follows:
->>> s/describe/described
->>>> +
->>>> +struct kvm_pmu_event_filter {
->>>> +    __u16    base_event;
->>>> +    __u16    nevents;
->>>> +
->>>> +#define KVM_PMU_EVENT_ALLOW    0
->>>> +#define KVM_PMU_EVENT_DENY    1
->>>> +
->>>> +    __u8    action;
->>>> +    __u8    pad[3];
->>>> +};
->>>> +
->>>> +A filter range is defined as the range [@base_event, @base_event +
->>>> @nevents[,
->>>> +together with an @action (KVM_PMU_EVENT_ALLOW or
->>>> KVM_PMU_EVENT_DENY). The
->>>> +first registered range defines the global policy (global ALLOW if
->>>> the first
->>>> +@action is DENY, global DENY if the first @action is ALLOW).
->>>> Multiple ranges
->>>> +can be programmed, and must fit within the 16bit space defined by
->>>> the ARMv8.1
->>>> +PMU architecture.
->>> what about before 8.1 where the range was 10 bits? Should it be 
->>> tested
->>> in the code?
->> 
->> It's a good point. We could test that upon installing the filter and 
->> limit
->> the bitmap allocation to the minimum.
->> 
->>> nitpicking: It is not totally obvious what does happen if the user 
->>> space
->>> sets a deny filter on a range and then an allow filter on the same
->>> range. it is supported but may be worth telling so? Also explain the 
->>> the
->>> default filtering remains "allow" by default?
->> 
->> Overlapping filters are easy: the last one wins. And yes, no filter 
->> means
->> just that: no filter.
-> Actually the point I wanted to put forward is
-> 1) set allow filter on range [0-a] -> default setting is deny and allow
-> [0-a] only
-> 2) deny deny filter on rang [0-a] -> there is no "real" active 
-> filtering
-> anymore but default behavior still is deny. ie. you do not destroy the
-> bitmap on the last filter removal but on the VM removal.
+On Thu, Feb 20, 2020 at 10:50 AM Daniel Colascione <dancol@google.com> wrote:
+>
+> On Thu, Feb 20, 2020 at 10:11 AM Casey Schaufler <casey@schaufler-ca.com> wrote:
+> >
+> > On 2/17/2020 4:14 PM, Paul Moore wrote:
+> > > On Thu, Feb 13, 2020 at 2:41 PM Stephen Smalley <sds@tycho.nsa.gov> wrote:
+> > >> Add support for labeling and controlling access to files attached to anon
+> > >> inodes. Introduce extended interfaces for creating such files to permit
+> > >> passing a related file as an input to decide how to label the anon
+> > >> inode. Define a security hook for initializing the anon inode security
+> > >> attributes. Security attributes are either inherited from a related file
+> > >> or determined based on some combination of the creating task and policy
+> > >> (in the case of SELinux, using type_transition rules).  As an
+> > >> example user of the inheritance support, convert kvm to use the new
+> > >> interface for passing the related file so that the anon inode can inherit
+> > >> the security attributes of /dev/kvm and provide consistent access control
+> > >> for subsequent ioctl operations.  Other users of anon inodes, including
+> > >> userfaultfd, will default to the transition-based mechanism instead.
+> > >>
+> > >> Compared to the series in
+> > >> https://lore.kernel.org/selinux/20200211225547.235083-1-dancol@google.com/,
+> > >> this approach differs in that it does not require creation of a separate
+> > >> anonymous inode for each file (instead storing the per-instance security
+> > >> information in the file security blob), it applies labeling and control
+> > >> to all users of anonymous inodes rather than requiring opt-in via a new
+> > >> flag, it supports labeling based on a related inode if provided,
+> > >> it relies on type transitions to compute the label of the anon inode
+> > >> when there is no related inode, and it does not require introducing a new
+> > >> security class for each user of anonymous inodes.
+> > >>
+> > >> On the other hand, the approach in this patch does expose the name passed
+> > >> by the creator of the anon inode to the policy (an indirect mapping could
+> > >> be provided within SELinux if these names aren't considered to be stable),
+> > >> requires the definition of type_transition rules to distinguish userfaultfd
+> > >> inodes from proc inodes based on type since they share the same class,
+> > >> doesn't support denying the creation of anonymous inodes (making the hook
+> > >> added by this patch return something other than void is problematic due to
+> > >> it being called after the file is already allocated and error handling in
+> > >> the callers can't presently account for this scenario and end up calling
+> > >> release methods multiple times), and may be more expensive
+> > >> (security_transition_sid overhead on each anon inode allocation).
+> > >>
+> > >> We are primarily posting this RFC patch now so that the two different
+> > >> approaches can be concretely compared.  We anticipate a hybrid of the
+> > >> two approaches being the likely outcome in the end.  In particular
+> > >> if support for allocating a separate inode for each of these files
+> > >> is acceptable, then we would favor storing the security information
+> > >> in the inode security blob and using it instead of the file security
+> > >> blob.
+> > > Bringing this back up in hopes of attracting some attention from the
+> > > fs-devel crowd and Al.  As Stephen already mentioned, from a SELinux
+> > > perspective we would prefer to attach the security blob to the inode
+> > > as opposed to the file struct; does anyone have any objections to
+> > > that?
+> >
+> > Sorry for the delay - been sick the past few days.
+> >
+> > I agree that the inode is a better place than the file for information
+> > about the inode. This is especially true for Smack, which uses
+> > multiple extended attributes in some cases. I don't believe that any
+> > except the access label will be relevant to anonymous inodes, but
+> > I can imagine security modules with policies that would.
+> >
+> > I am always an advocate of full xattr support. It goes a long
+> > way in reducing the number and complexity of special case interfaces.
+>
+> It sounds like we have broad consensus on using the inode to hold
+> security information, implying that anon_inodes should create new
+> inodes. Do any of the VFS people want to object?
 
-Ah, gotcha. Yes, this is odd. The solution to this is to re-apply a 
-default
-behaviour. But this needs documenting...
-
-Thanks,
-
-        M.
--- 
-Jazz is not dead. It just smells funny...
+Ping?
