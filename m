@@ -2,59 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7547A1804CF
-	for <lists+kvm@lfdr.de>; Tue, 10 Mar 2020 18:30:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0288318050A
+	for <lists+kvm@lfdr.de>; Tue, 10 Mar 2020 18:40:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726545AbgCJRal (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Mar 2020 13:30:41 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:47520 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726380AbgCJRak (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 10 Mar 2020 13:30:40 -0400
+        id S1726504AbgCJRko (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Mar 2020 13:40:44 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:30101 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726283AbgCJRko (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Mar 2020 13:40:44 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1583861439;
+        s=mimecast20190719; t=1583862041;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=r6RWW66Auc2Rk/GNuUgSAGvLduNQwWlqc2HkVeIS1zc=;
-        b=VSFUNLqW/O9LJUofrtIlTkuYYbhqffy23fquzBQjQK9Yr1xQ6EyLq8rXHCvcqU/4bCaAB/
-        Tug8NcmqVTtgXiZKd7WTcVpWkwPHeeafRVOoVlhiM/oR8dmeAp++vZdUsZUKW0hLn5H1v2
-        kyJHUePkVR6u4h22Gs0waMGTvb0P6LU=
+        bh=dljaERloHEuGp3V5iww3HRh7a2eZNpuprqvzP0XXYRk=;
+        b=KFfmaujxR0yUhjVpAPXR9KAI+K8etsYaVOKMzLHP4+94ZJu+OUK2M2ZXUOBF4GegzCDVdt
+        OgvGE4jSzMQxXTqoEw3OYtRmZd/0CwA0zsTuglU3Cp+V9hffjcLIlu8D1IJBh32n8suTJB
+        T58MvhWvZ/fjtjixwxiwx3SnCYGMFG8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-27-4H-srkrCPfWDrBsXlrJ0_w-1; Tue, 10 Mar 2020 13:30:35 -0400
-X-MC-Unique: 4H-srkrCPfWDrBsXlrJ0_w-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+ us-mta-168-bQ7AsOBXPbuIYarbLukT2w-1; Tue, 10 Mar 2020 13:40:37 -0400
+X-MC-Unique: bQ7AsOBXPbuIYarbLukT2w-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 45FEE107ACC4;
-        Tue, 10 Mar 2020 17:30:33 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5723E107ACC4;
+        Tue, 10 Mar 2020 17:40:36 +0000 (UTC)
 Received: from [10.36.117.85] (ovpn-117-85.ams2.redhat.com [10.36.117.85])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 14EF110013A1;
-        Tue, 10 Mar 2020 17:30:30 +0000 (UTC)
-Subject: Re: [PATCH v2 2/2] KVM: arm64: Document PMU filtering API
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 98DF55D9C5;
+        Tue, 10 Mar 2020 17:40:33 +0000 (UTC)
+Subject: Re: [PATCH v2 1/2] KVM: arm64: Add PMU event filtering infrastructure
 To:     Marc Zyngier <maz@kernel.org>
-Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
+Cc:     Mark Rutland <mark.rutland@arm.com>, kvm@vger.kernel.org,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
+        James Morse <james.morse@arm.com>,
+        linux-arm-kernel@lists.infradead.org,
         Robin Murphy <robin.murphy@arm.com>,
-        Mark Rutland <mark.rutland@arm.com>
+        kvmarm@lists.cs.columbia.edu,
+        Julien Thierry <julien.thierry.kdev@gmail.com>
 References: <20200309124837.19908-1-maz@kernel.org>
- <20200309124837.19908-3-maz@kernel.org>
- <7943c896-013b-d9cb-ba89-2040b46437fe@redhat.com>
- <07f4ef9b5ff6c6c5086c9723c64c035f@kernel.org>
+ <20200309124837.19908-2-maz@kernel.org>
+ <70e712fc-6789-2384-c21c-d932b5e1a32f@redhat.com>
+ <0027398587e8746a6a7459682330855f@kernel.org>
 From:   Auger Eric <eric.auger@redhat.com>
-Message-ID: <867c7926-df43-7ab0-d20a-211a59d7612d@redhat.com>
-Date:   Tue, 10 Mar 2020 18:30:29 +0100
+Message-ID: <7c9e2e55-95c8-a212-e566-c48f5d3bc417@redhat.com>
+Date:   Tue, 10 Mar 2020 18:40:31 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.4.0
 MIME-Version: 1.0
-In-Reply-To: <07f4ef9b5ff6c6c5086c9723c64c035f@kernel.org>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <0027398587e8746a6a7459682330855f@kernel.org>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
@@ -63,114 +64,398 @@ X-Mailing-List: kvm@vger.kernel.org
 
 Hi Marc,
 
-On 3/10/20 12:54 PM, Marc Zyngier wrote:
-> On 2020-03-09 18:17, Auger Eric wrote:
+On 3/10/20 12:03 PM, Marc Zyngier wrote:
+> Hi Eric,
+>=20
+> On 2020-03-09 18:05, Auger Eric wrote:
 >> Hi Marc,
 >>
 >> On 3/9/20 1:48 PM, Marc Zyngier wrote:
->>> Add a small blurb describing how the event filtering API gets used.
+>>> It can be desirable to expose a PMU to a guest, and yet not want the
+>>> guest to be able to count some of the implemented events (because thi=
+s
+>>> would give information on shared resources, for example.
+>>>
+>>> For this, let's extend the PMUv3 device API, and offer a way to setup=
+ a
+>>> bitmap of the allowed events (the default being no bitmap, and thus n=
+o
+>>> filtering).
+>>>
+>>> Userspace can thus allow/deny ranges of event. The default policy
+>>> depends on the "polarity" of the first filter setup (default deny if =
+the
+>>> filter allows events, and default allow if the filter denies events).
+>>> This allows to setup exactly what is allowed for a given guest.
+>>>
+>>> Note that although the ioctl is per-vcpu, the map of allowed events i=
+s
+>>> global to the VM (it can be setup from any vcpu until the vcpu PMU is
+>>> initialized).
 >>>
 >>> Signed-off-by: Marc Zyngier <maz@kernel.org>
 >>> ---
->>> =A0Documentation/virt/kvm/devices/vcpu.rst | 40 +++++++++++++++++++++=
-++++
->>> =A01 file changed, 40 insertions(+)
+>>> =C2=A0arch/arm64/include/asm/kvm_host.h |=C2=A0 6 +++
+>>> =C2=A0arch/arm64/include/uapi/asm/kvm.h | 16 ++++++
+>>> =C2=A0virt/kvm/arm/arm.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 2 +
+>>> =C2=A0virt/kvm/arm/pmu.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 84 ++++++++++++++++++++++=
++++------
+>>> =C2=A04 files changed, 92 insertions(+), 16 deletions(-)
 >>>
->>> diff --git a/Documentation/virt/kvm/devices/vcpu.rst
->>> b/Documentation/virt/kvm/devices/vcpu.rst
->>> index 9963e680770a..7262c0469856 100644
->>> --- a/Documentation/virt/kvm/devices/vcpu.rst
->>> +++ b/Documentation/virt/kvm/devices/vcpu.rst
->>> @@ -55,6 +55,46 @@ Request the initialization of the PMUv3.=A0 If usi=
-ng
->>> the PMUv3 with an in-kernel
->>> =A0virtual GIC implementation, this must be done after initializing t=
-he
->>> in-kernel
->>> =A0irqchip.
+>>> diff --git a/arch/arm64/include/asm/kvm_host.h
+>>> b/arch/arm64/include/asm/kvm_host.h
+>>> index 57fd46acd058..8e63c618688d 100644
+>>> --- a/arch/arm64/include/asm/kvm_host.h
+>>> +++ b/arch/arm64/include/asm/kvm_host.h
+>>> @@ -91,6 +91,12 @@ struct kvm_arch {
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * supported.
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 */
+>>> =C2=A0=C2=A0=C2=A0=C2=A0 bool return_nisv_io_abort_to_user;
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 /*
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0 * VM-wide PMU filter, implemented as a bitm=
+ap and big enough
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0 * for up to 65536 events
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0 */
+>>> +=C2=A0=C2=A0=C2=A0 unsigned long *pmu_filter;
+>>> =C2=A0};
 >>>
->>> +1.3 ATTRIBUTE: KVM_ARM_VCPU_PMU_V3_FILTER
->>> +---------------------------------------
->>> +
->>> +:Parameters: in kvm_device_attr.addr the address for a PMU event
->>> filter is a
->>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 pointer to a struct kvm_pmu_eve=
-nt_filter
->>> +
->>> +:Returns:
->>> +
->>> +=A0=A0=A0=A0 =3D=3D=3D=3D=3D=3D=3D=A0 =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->>> +=A0=A0=A0=A0 -ENODEV: PMUv3 not supported or GIC not initialized
->>> +=A0=A0=A0=A0 -ENXIO:=A0 PMUv3 not properly configured or in-kernel i=
-rqchip not
->>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 configured as required prior to calli=
-ng this attribute
->>> +=A0=A0=A0=A0 -EBUSY:=A0 PMUv3 already initialized
->> maybe document -EINVAL?
->=20
-> Yup, definitely.
->=20
->>> +=A0=A0=A0=A0 =3D=3D=3D=3D=3D=3D=3D=A0 =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->>> +
->>> +Request the installation of a PMU event filter describe as follows:
->> s/describe/described
->>> +
+>>> =C2=A0#define KVM_NR_MEM_OBJS=C2=A0=C2=A0=C2=A0=C2=A0 40
+>>> diff --git a/arch/arm64/include/uapi/asm/kvm.h
+>>> b/arch/arm64/include/uapi/asm/kvm.h
+>>> index ba85bb23f060..7b1511d6ce44 100644
+>>> --- a/arch/arm64/include/uapi/asm/kvm.h
+>>> +++ b/arch/arm64/include/uapi/asm/kvm.h
+>>> @@ -159,6 +159,21 @@ struct kvm_sync_regs {
+>>> =C2=A0struct kvm_arch_memory_slot {
+>>> =C2=A0};
+>>>
+>>> +/*
+>>> + * PMU filter structure. Describe a range of events with a particula=
+r
+>>> + * action. To be used with KVM_ARM_VCPU_PMU_V3_FILTER.
+>>> + */
 >>> +struct kvm_pmu_event_filter {
->>> +=A0=A0=A0 __u16=A0=A0=A0 base_event;
->>> +=A0=A0=A0 __u16=A0=A0=A0 nevents;
+>>> +=C2=A0=C2=A0=C2=A0 __u16=C2=A0=C2=A0=C2=A0 base_event;
+>>> +=C2=A0=C2=A0=C2=A0 __u16=C2=A0=C2=A0=C2=A0 nevents;
 >>> +
->>> +#define KVM_PMU_EVENT_ALLOW=A0=A0=A0 0
->>> +#define KVM_PMU_EVENT_DENY=A0=A0=A0 1
+>>> +#define KVM_PMU_EVENT_ALLOW=C2=A0=C2=A0=C2=A0 0
+>>> +#define KVM_PMU_EVENT_DENY=C2=A0=C2=A0=C2=A0 1
 >>> +
->>> +=A0=A0=A0 __u8=A0=A0=A0 action;
->>> +=A0=A0=A0 __u8=A0=A0=A0 pad[3];
+>>> +=C2=A0=C2=A0=C2=A0 __u8=C2=A0=C2=A0=C2=A0 action;
+>>> +=C2=A0=C2=A0=C2=A0 __u8=C2=A0=C2=A0=C2=A0 pad[3];
 >>> +};
 >>> +
->>> +A filter range is defined as the range [@base_event, @base_event +
->>> @nevents[,
->>> +together with an @action (KVM_PMU_EVENT_ALLOW or
->>> KVM_PMU_EVENT_DENY). The
->>> +first registered range defines the global policy (global ALLOW if
->>> the first
->>> +@action is DENY, global DENY if the first @action is ALLOW).
->>> Multiple ranges
->>> +can be programmed, and must fit within the 16bit space defined by
->>> the ARMv8.1
->>> +PMU architecture.
->> what about before 8.1 where the range was 10 bits? Should it be tested
->> in the code?
+>>> =C2=A0/* for KVM_GET/SET_VCPU_EVENTS */
+>>> =C2=A0struct kvm_vcpu_events {
+>>> =C2=A0=C2=A0=C2=A0=C2=A0 struct {
+>>> @@ -329,6 +344,7 @@ struct kvm_vcpu_events {
+>>> =C2=A0#define KVM_ARM_VCPU_PMU_V3_CTRL=C2=A0=C2=A0=C2=A0 0
+>>> =C2=A0#define=C2=A0=C2=A0 KVM_ARM_VCPU_PMU_V3_IRQ=C2=A0=C2=A0=C2=A0 0
+>>> =C2=A0#define=C2=A0=C2=A0 KVM_ARM_VCPU_PMU_V3_INIT=C2=A0=C2=A0=C2=A0 =
+1
+>>> +#define=C2=A0=C2=A0 KVM_ARM_VCPU_PMU_V3_FILTER=C2=A0=C2=A0=C2=A0 2
+>>> =C2=A0#define KVM_ARM_VCPU_TIMER_CTRL=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0 1
+>>> =C2=A0#define=C2=A0=C2=A0 KVM_ARM_VCPU_TIMER_IRQ_VTIMER=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 0
+>>> =C2=A0#define=C2=A0=C2=A0 KVM_ARM_VCPU_TIMER_IRQ_PTIMER=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 1
+>>> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+>>> index eda7b624eab8..8d849ac88a44 100644
+>>> --- a/virt/kvm/arm/arm.c
+>>> +++ b/virt/kvm/arm/arm.c
+>>> @@ -164,6 +164,8 @@ void kvm_arch_destroy_vm(struct kvm *kvm)
+>>> =C2=A0=C2=A0=C2=A0=C2=A0 free_percpu(kvm->arch.last_vcpu_ran);
+>>> =C2=A0=C2=A0=C2=A0=C2=A0 kvm->arch.last_vcpu_ran =3D NULL;
+>>>
+>>> +=C2=A0=C2=A0=C2=A0 bitmap_free(kvm->arch.pmu_filter);
+>>> +
+>>> =C2=A0=C2=A0=C2=A0=C2=A0 for (i =3D 0; i < KVM_MAX_VCPUS; ++i) {
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (kvm->vcpus[i]) {
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 kvm_vcpu_destroy(kvm->vcpus[i]);
+>>> diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
+>>> index f0d0312c0a55..9f0fd0224d5b 100644
+>>> --- a/virt/kvm/arm/pmu.c
+>>> +++ b/virt/kvm/arm/pmu.c
+>>> @@ -579,10 +579,19 @@ static void kvm_pmu_create_perf_event(struct
+>>> kvm_vcpu *vcpu, u64 select_idx)
+>>>
+>>> =C2=A0=C2=A0=C2=A0=C2=A0 kvm_pmu_stop_counter(vcpu, pmc);
+>>> =C2=A0=C2=A0=C2=A0=C2=A0 eventsel =3D data & ARMV8_PMU_EVTYPE_EVENT;
+>>> +=C2=A0=C2=A0=C2=A0 if (pmc->idx =3D=3D ARMV8_PMU_CYCLE_IDX)
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 eventsel =3D ARMV8_PMUV3_=
+PERFCTR_CPU_CYCLES;
+>> nit:
+>> =C2=A0=C2=A0=C2=A0=C2=A0if (pmc->idx =3D=3D ARMV8_PMU_CYCLE_IDX)
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 eventsel =3D ARMV8_PMUV3_PE=
+RFCTR_CPU_CYCLES;
+>> =C2=A0=C2=A0=C2=A0=C2=A0else
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 eventsel =3D data & ARMV8_P=
+MU_EVTYPE_EVENT;
 >=20
-> It's a good point. We could test that upon installing the filter and li=
-mit
-> the bitmap allocation to the minimum.
+> You don't like it? ;-)
+? eventset set only once instead of 2 times
 >=20
->> nitpicking: It is not totally obvious what does happen if the user spa=
-ce
->> sets a deny filter on a range and then an allow filter on the same
->> range. it is supported but may be worth telling so? Also explain the t=
-he
->> default filtering remains "allow" by default?
+>>>
+>>> =C2=A0=C2=A0=C2=A0=C2=A0 /* Software increment event does't need to b=
+e backed by a perf
+>>> event */
+>> nit: while wer are at it fix the does't typo
+>>> -=C2=A0=C2=A0=C2=A0 if (eventsel =3D=3D ARMV8_PMUV3_PERFCTR_SW_INCR &=
+&
+>>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 pmc->idx !=3D ARMV8_PMU_C=
+YCLE_IDX)
+>>> +=C2=A0=C2=A0=C2=A0 if (eventsel =3D=3D ARMV8_PMUV3_PERFCTR_SW_INCR)
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return;
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 /*
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0 * If we have a filter in place and that the=
+ event isn't
+>>> allowed, do
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0 * not install a perf event either.
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0 */
+>>> +=C2=A0=C2=A0=C2=A0 if (vcpu->kvm->arch.pmu_filter &&
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 !test_bit(eventsel, vcpu-=
+>kvm->arch.pmu_filter))
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return;
+>>>
+>>> =C2=A0=C2=A0=C2=A0=C2=A0 memset(&attr, 0, sizeof(struct perf_event_at=
+tr));
+>>> @@ -594,8 +603,7 @@ static void kvm_pmu_create_perf_event(struct
+>>> kvm_vcpu *vcpu, u64 select_idx)
+>>> =C2=A0=C2=A0=C2=A0=C2=A0 attr.exclude_kernel =3D data & ARMV8_PMU_EXC=
+LUDE_EL1 ? 1 : 0;
+>>> =C2=A0=C2=A0=C2=A0=C2=A0 attr.exclude_hv =3D 1; /* Don't count EL2 ev=
+ents */
+>>> =C2=A0=C2=A0=C2=A0=C2=A0 attr.exclude_host =3D 1; /* Don't count host=
+ events */
+>>> -=C2=A0=C2=A0=C2=A0 attr.config =3D (pmc->idx =3D=3D ARMV8_PMU_CYCLE_=
+IDX) ?
+>>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ARMV8_PMUV3_PERFCTR_CPU_C=
+YCLES : eventsel;
+>>> +=C2=A0=C2=A0=C2=A0 attr.config =3D eventsel;
+>> So in that case the guest counter will not increment but the guest doe=
+s
+>> not know the counter is not implemented. Can't this lead to bad user
+>> experience. Shouldn't this disablement be reflected in PMCEID0/1 regs?
 >=20
-> Overlapping filters are easy: the last one wins. And yes, no filter mea=
-ns
-> just that: no filter.
-Actually the point I wanted to put forward is
-1) set allow filter on range [0-a] -> default setting is deny and allow
-[0-a] only
-2) deny deny filter on rang [0-a] -> there is no "real" active filtering
-anymore but default behavior still is deny. ie. you do not destroy the
-bitmap on the last filter removal but on the VM removal.
+> The whole point is that we want to keep things hidden from the guest.
+> Also, PMCEID{0,1} only describe a small set of events (the architected
+> common events), and not the whole range of microarchitectural events
+> that the CPU implements.
+
+I am still not totally convinced. Things are not totally hidden to the
+guest as the counter does not increment, right? So a guest may try to
+use as it is advertised in PMCEID0/1 but not get the expected results
+leading to potential support request. I agree not all the events are
+described there but your API also allows to filter out some of the ones
+that are advertised.
+>=20
+>>>
+>>> =C2=A0=C2=A0=C2=A0=C2=A0 counter =3D kvm_pmu_get_pair_counter_value(v=
+cpu, pmc);
+>>>
+>>> @@ -735,15 +743,6 @@ int kvm_arm_pmu_v3_enable(struct kvm_vcpu *vcpu)
+>>>
+>>> =C2=A0static int kvm_arm_pmu_v3_init(struct kvm_vcpu *vcpu)
+>>> =C2=A0{
+>>> -=C2=A0=C2=A0=C2=A0 if (!kvm_arm_support_pmu_v3())
+>>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return -ENODEV;
+>>> -
+>>> -=C2=A0=C2=A0=C2=A0 if (!test_bit(KVM_ARM_VCPU_PMU_V3, vcpu->arch.fea=
+tures))
+>>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return -ENXIO;
+>>> -
+>>> -=C2=A0=C2=A0=C2=A0 if (vcpu->arch.pmu.created)
+>>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return -EBUSY;
+>>> -
+>>> =C2=A0=C2=A0=C2=A0=C2=A0 if (irqchip_in_kernel(vcpu->kvm)) {
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 int ret;
+>>>
+>>> @@ -794,8 +793,19 @@ static bool pmu_irq_is_valid(struct kvm *kvm,
+>>> int irq)
+>>> =C2=A0=C2=A0=C2=A0=C2=A0 return true;
+>>> =C2=A0}
+>>>
+>>> +#define NR_EVENTS=C2=A0=C2=A0=C2=A0 (ARMV8_PMU_EVTYPE_EVENT + 1)
+>>> +
+>>> =C2=A0int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu, struct
+>>> kvm_device_attr *attr)
+>>> =C2=A0{
+>>> +=C2=A0=C2=A0=C2=A0 if (!kvm_arm_support_pmu_v3())
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return -ENODEV;
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 if (!test_bit(KVM_ARM_VCPU_PMU_V3, vcpu->arch.fea=
+tures))
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return -ENODEV;
+>> I see you changed -ENXIO into -ENODEV. wanted?
+>=20
+> Probably not... but see below.
+>=20
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 if (vcpu->arch.pmu.created)
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return -EBUSY;
+>>> +
+>>> =C2=A0=C2=A0=C2=A0=C2=A0 switch (attr->attr) {
+>>> =C2=A0=C2=A0=C2=A0=C2=A0 case KVM_ARM_VCPU_PMU_V3_IRQ: {
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 int __user *uaddr =3D=
+ (int __user *)(long)attr->addr;
+>>> @@ -804,9 +814,6 @@ int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu
+>>> *vcpu, struct kvm_device_attr *attr)
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (!irqchip_in_kern=
+el(vcpu->kvm))
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 return -EINVAL;
+>>>
+>>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (!test_bit(KVM_ARM_VCP=
+U_PMU_V3, vcpu->arch.features))
+>>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 r=
+eturn -ENODEV;
+>>> -
+>=20
+> Here's why. I wonder if we already have a problem with the consistency
+> of the
+> error codes returned to userspace.
+OK. Then you may document it in the commit message?
+>=20
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (get_user(irq, ua=
+ddr))
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 return -EFAULT;
+>>>
+>>> @@ -824,6 +831,50 @@ int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu
+>>> *vcpu, struct kvm_device_attr *attr)
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 vcpu->arch.pmu.irq_n=
+um =3D irq;
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return 0;
+>>> =C2=A0=C2=A0=C2=A0=C2=A0 }
+>>> +=C2=A0=C2=A0=C2=A0 case KVM_ARM_VCPU_PMU_V3_FILTER: {
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 struct kvm_pmu_event_filt=
+er __user *uaddr;
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 struct kvm_pmu_event_filt=
+er filter;
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 uaddr =3D (struct kvm_pmu=
+_event_filter __user *)(long)attr->addr;
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (copy_from_user(&filte=
+r, uaddr, sizeof(filter)))
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 r=
+eturn -EFAULT;
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (((u32)filter.base_eve=
+nt + filter.nevents) > NR_EVENTS ||
+>> isnt't it >=3D ?
+>=20
+> No, I think this is correct. I want to be able to filter event 0xFFFF,
+> for example,
+> so I have base_event=3D0xFFFF and nevents=3D1.
+hum my mistake. Sorry
+>=20
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 (=
+filter.action !=3D KVM_PMU_EVENT_ALLOW &&
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 filter.action !=3D KVM_PMU_EVENT_DENY))
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 r=
+eturn -EINVAL;
+>> -EINVAL is not documented in the API doc.
+>=20
+> Good point.
+>=20
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 mutex_lock(&vcpu->kvm->lo=
+ck);
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (!vcpu->kvm->arch.pmu_=
+filter) {
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 v=
+cpu->kvm->arch.pmu_filter =3D bitmap_alloc(NR_EVENTS,
+>>> GFP_KERNEL);
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 i=
+f (!vcpu->kvm->arch.pmu_filter) {
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 mutex_unlock(&vcpu->kvm->lock);
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 return -ENOMEM;
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /=
+*
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 * The default depends on the first applied filter.
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 * If it allows events, the default is to deny.
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 * Conversely, if the first filter denies a set of
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 * events, the default is to allow.
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 */
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 i=
+f (filter.action =3D=3D KVM_PMU_EVENT_ALLOW)
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 bitmap_zero(vcpu->kvm->arch.pmu_filter, NR_EVENTS);
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 e=
+lse
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 bitmap_fill(vcpu->kvm->arch.pmu_filter, NR_EVENTS);
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (filter.action =3D=3D =
+KVM_PMU_EVENT_ALLOW)
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 b=
+itmap_set(vcpu->kvm->arch.pmu_filter,
+>>> filter.base_event, filter.nevents);
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 else
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 b=
+itmap_clear(vcpu->kvm->arch.pmu_filter,
+>>> filter.base_event, filter.nevents);
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 mutex_unlock(&vcpu->kvm->=
+lock);
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return 0;
+>>> +=C2=A0=C2=A0=C2=A0 }
+>>> =C2=A0=C2=A0=C2=A0=C2=A0 case KVM_ARM_VCPU_PMU_V3_INIT:
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return kvm_arm_pmu_v=
+3_init(vcpu);
+>>> =C2=A0=C2=A0=C2=A0=C2=A0 }
+>>> @@ -860,6 +911,7 @@ int kvm_arm_pmu_v3_has_attr(struct kvm_vcpu
+>>> *vcpu, struct kvm_device_attr *attr)
+>>> =C2=A0=C2=A0=C2=A0=C2=A0 switch (attr->attr) {
+>>> =C2=A0=C2=A0=C2=A0=C2=A0 case KVM_ARM_VCPU_PMU_V3_IRQ:
+>> not related to this patch but shouldn't we advertise this only with
+>> in-kernel irqchip?
+>=20
+> We do support the PMU without the in-kernel chip, unfortunately... Yes,
+> supporting this feature was a big mistake.
+But I see in kvm_arm_pmu_v3_set_attr:
+case KVM_ARM_VCPU_PMU_V3_IRQ:
+../..
+                if (!irqchip_in_kernel(vcpu->kvm))
+                        return -EINVAL;
 
 Thanks
 
 Eric
 
+
+
 >=20
-> Thanks,
+>>> =C2=A0=C2=A0=C2=A0=C2=A0 case KVM_ARM_VCPU_PMU_V3_INIT:
+>>> +=C2=A0=C2=A0=C2=A0 case KVM_ARM_VCPU_PMU_V3_FILTER:
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (kvm_arm_support_=
+pmu_v3() &&
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 test_bit(KVM_ARM_VCPU_PMU_V3, vcpu->arch.features))
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 return 0;
 >=20
-> =A0=A0=A0=A0=A0=A0=A0 M.
+> Thanks for the review,
+>=20
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 M.
 
