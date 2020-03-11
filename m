@@ -2,137 +2,399 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 03E19181F16
-	for <lists+kvm@lfdr.de>; Wed, 11 Mar 2020 18:19:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 69FAF181FC1
+	for <lists+kvm@lfdr.de>; Wed, 11 Mar 2020 18:43:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730258AbgCKRTS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Mar 2020 13:19:18 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:40261 "EHLO
+        id S1730493AbgCKRnc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Mar 2020 13:43:32 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:56750 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1730059AbgCKRTS (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 11 Mar 2020 13:19:18 -0400
+        by vger.kernel.org with ESMTP id S1729852AbgCKRnc (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 11 Mar 2020 13:43:32 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1583947157;
+        s=mimecast20190719; t=1583948610;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=uczb4pAojxIRA+B5sUM2PIPzhEPKXzDEFRXyZ39v1l0=;
-        b=SXfsFzte7R69J0Xow0yZI8ctj3Xo7OTQC4yqKyVGYzjdh4kXQxXpa6w99JVOzP1yBoEE8J
-        bXzXxZVoyhqqwKfXYNMuKG1UbHuuyJZW2VtWLeoQcD/FkNJaWBYAliZrdMZncxG+snpiES
-        TPjtl682LydKj4ykn3svtBX0h7VoINc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-376-W3UxZeFqOBGYdsw1XpdjQQ-1; Wed, 11 Mar 2020 13:19:10 -0400
-X-MC-Unique: W3UxZeFqOBGYdsw1XpdjQQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5901118B9FC2;
-        Wed, 11 Mar 2020 17:19:08 +0000 (UTC)
-Received: from [10.36.116.132] (ovpn-116-132.ams2.redhat.com [10.36.116.132])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 91A9760BEE;
-        Wed, 11 Mar 2020 17:19:05 +0000 (UTC)
-Subject: Re: [PATCH v2 07/10] mm/memory_hotplug: Introduce
- offline_and_remove_memory()
-To:     linux-kernel@vger.kernel.org
-Cc:     linux-mm@kvack.org, virtio-dev@lists.oasis-open.org,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        Michal Hocko <mhocko@kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
+         in-reply-to:in-reply-to:references:references;
+        bh=CCUUy2vgM8I5wGiA0yY8hUokKO4zUxePsoBKPrcG2nM=;
+        b=TrDfif+dsUrzMIrQk/uEUMltkeUGIBQFi0X6t2vMVf4pkxUmm99GNJwEB41XUIb0z2Ey7F
+        wJ3BVvWYv2lu/qvnJDZXwgIMAxjuPt8a2s58/CC1N0fkV5z9KxQIyTE0aKuRLd5lyC0T8l
+        FSgIokiaiqYh5yMwKEY14ALemEnszoY=
+Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
+ [209.85.160.197]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-295-lKQCeYyGNUiJo3EmePYVjg-1; Wed, 11 Mar 2020 13:43:29 -0400
+X-MC-Unique: lKQCeYyGNUiJo3EmePYVjg-1
+Received: by mail-qt1-f197.google.com with SMTP id i25so1690350qtm.17
+        for <kvm@vger.kernel.org>; Wed, 11 Mar 2020 10:43:29 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=CCUUy2vgM8I5wGiA0yY8hUokKO4zUxePsoBKPrcG2nM=;
+        b=HA49b6kGUT6dvQ4PRcBUT9C2l7vX24bQArVUbtmZKjLjQjUSDrIFAyBz5xH6UeZGNH
+         oDGzX/MnJNz6feQIQXvhG7YRJKya+4nFHzZexB4FLFdD+U7VCQqLIglQWa1Z/z84bfZM
+         uJ9qqRjXte4SAX9qB+ectD+sQr5IXuQayLNgFzD8DKy6eq4DtFj/zqCLR2jV3AnaxhgX
+         HkG/qboeUdoWCK9G9p7G4VEd759aOOr1K5iei2klnlnCObUg8aTBxBPliaDqceWSu1dM
+         c3sfHJeo7rn0kAQyjRL3rxu3AexIvy/Gw7CzSBGeB3d68xuw+VY/n8ihfo6xcbz+pra6
+         1/wg==
+X-Gm-Message-State: ANhLgQ32r+8UKPV2NYS+jWNeziWO1zBsM6yRspCL3syKrqhdtC8n8Pq3
+        c+a2ig1rCLA0DYqov81NoVKE35NRV4lmD2+/XEIv0LdW5+j37QYOg8mrxSF9Fj3cMFc1K/TR9zA
+        r0bUsMibB6ruf
+X-Received: by 2002:a37:5943:: with SMTP id n64mr3695322qkb.411.1583948606719;
+        Wed, 11 Mar 2020 10:43:26 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vtvfBwFqzHkHeo22g/I9H4RKiuHy/xFt5VNtWuFfZznD36SG8Ns6bcBrkPnqGIs+K4WJQaGlA==
+X-Received: by 2002:a37:5943:: with SMTP id n64mr3695294qkb.411.1583948606308;
+        Wed, 11 Mar 2020 10:43:26 -0700 (PDT)
+Received: from xz-x1 ([2607:9880:19c0:32::2])
+        by smtp.gmail.com with ESMTPSA id 82sm9584972qkd.62.2020.03.11.10.43.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 11 Mar 2020 10:43:25 -0700 (PDT)
+Date:   Wed, 11 Mar 2020 13:43:24 -0400
+From:   Peter Xu <peterx@redhat.com>
+To:     Andrew Jones <drjones@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Yan Zhao <yan.y.zhao@intel.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        Christophe de Dinechin <dinechin@redhat.com>,
         "Michael S . Tsirkin" <mst@redhat.com>,
-        Oscar Salvador <osalvador@suse.com>,
-        Michal Hocko <mhocko@suse.com>,
-        Pavel Tatashin <pasha.tatashin@soleen.com>,
-        Wei Yang <richard.weiyang@gmail.com>,
-        Dan Williams <dan.j.williams@intel.com>, Qian Cai <cai@lca.pw>
-References: <20200311171422.10484-1-david@redhat.com>
- <20200311171422.10484-8-david@redhat.com>
-From:   David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat GmbH
-Message-ID: <156601a9-e919-b88f-2278-97ecee554d21@redhat.com>
-Date:   Wed, 11 Mar 2020 18:19:04 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+        Kevin Tian <kevin.tian@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Subject: Re: [PATCH v6 10/14] KVM: selftests: Use a single binary for
+ dirty/clear log test
+Message-ID: <20200311174324.GH479302@xz-x1>
+References: <20200309214424.330363-1-peterx@redhat.com>
+ <20200309222519.345601-1-peterx@redhat.com>
+ <20200310081002.unxq6kwlevmr6m3b@kamzik.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200311171422.10484-8-david@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Content-Disposition: inline
+In-Reply-To: <20200310081002.unxq6kwlevmr6m3b@kamzik.brq.redhat.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11.03.20 18:14, David Hildenbrand wrote:
-> virtio-mem wants to offline and remove a memory block once it unplugged
-> all subblocks (e.g., using alloc_contig_range()). Let's provide
-> an interface to do that from a driver. virtio-mem already supports to
-> offline partially unplugged memory blocks. Offlining a fully unplugged
-> memory block will not require to migrate any pages. All unplugged
-> subblocks are PageOffline() and have a reference count of 0 - so
-> offlining code will simply skip them.
+On Tue, Mar 10, 2020 at 09:10:02AM +0100, Andrew Jones wrote:
+> On Mon, Mar 09, 2020 at 06:25:19PM -0400, Peter Xu wrote:
+> > Remove the clear_dirty_log test, instead merge it into the existing
+> > dirty_log_test.  It should be cleaner to use this single binary to do
+> > both tests, also it's a preparation for the upcoming dirty ring test.
+> > 
+> > The default behavior will run all the modes in sequence.
+> > 
+> > Signed-off-by: Peter Xu <peterx@redhat.com>
+> > ---
+> >  tools/testing/selftests/kvm/Makefile          |   2 -
+> >  .../selftests/kvm/clear_dirty_log_test.c      |   2 -
+> >  tools/testing/selftests/kvm/dirty_log_test.c  | 169 +++++++++++++++---
+> >  3 files changed, 146 insertions(+), 27 deletions(-)
+> >  delete mode 100644 tools/testing/selftests/kvm/clear_dirty_log_test.c
+> > 
+> > diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+> > index d91c53b726e6..941bfcd48eaa 100644
+> > --- a/tools/testing/selftests/kvm/Makefile
+> > +++ b/tools/testing/selftests/kvm/Makefile
+> > @@ -27,11 +27,9 @@ TEST_GEN_PROGS_x86_64 += x86_64/vmx_set_nested_state_test
+> >  TEST_GEN_PROGS_x86_64 += x86_64/vmx_tsc_adjust_test
+> >  TEST_GEN_PROGS_x86_64 += x86_64/xss_msr_test
+> >  TEST_GEN_PROGS_x86_64 += x86_64/svm_vmcall_test
+> > -TEST_GEN_PROGS_x86_64 += clear_dirty_log_test
+> >  TEST_GEN_PROGS_x86_64 += dirty_log_test
+> >  TEST_GEN_PROGS_x86_64 += kvm_create_max_vcpus
+> >  
+> > -TEST_GEN_PROGS_aarch64 += clear_dirty_log_test
+> >  TEST_GEN_PROGS_aarch64 += dirty_log_test
+> >  TEST_GEN_PROGS_aarch64 += kvm_create_max_vcpus
+> >  
+> > diff --git a/tools/testing/selftests/kvm/clear_dirty_log_test.c b/tools/testing/selftests/kvm/clear_dirty_log_test.c
+> > deleted file mode 100644
+> > index 749336937d37..000000000000
+> > --- a/tools/testing/selftests/kvm/clear_dirty_log_test.c
+> > +++ /dev/null
+> > @@ -1,2 +0,0 @@
+> > -#define USE_CLEAR_DIRTY_LOG
+> > -#include "dirty_log_test.c"
+> > diff --git a/tools/testing/selftests/kvm/dirty_log_test.c b/tools/testing/selftests/kvm/dirty_log_test.c
+> > index 3c0ffd34b3b0..642886394e34 100644
+> > --- a/tools/testing/selftests/kvm/dirty_log_test.c
+> > +++ b/tools/testing/selftests/kvm/dirty_log_test.c
+> > @@ -128,6 +128,73 @@ static uint64_t host_dirty_count;
+> >  static uint64_t host_clear_count;
+> >  static uint64_t host_track_next_count;
+> >  
+> > +enum log_mode_t {
+> > +	/* Only use KVM_GET_DIRTY_LOG for logging */
+> > +	LOG_MODE_DIRTY_LOG = 0,
+> > +
+> > +	/* Use both KVM_[GET|CLEAR]_DIRTY_LOG for logging */
+> > +	LOG_MODE_CLEAR_LOG = 1,
+> > +
+> > +	LOG_MODE_NUM,
+> > +
+> > +	/* Run all supported modes */
+> > +	LOG_MODE_ALL = LOG_MODE_NUM,
+> > +};
+> > +
+> > +/* Mode of logging to test.  Default is to run all supported modes */
+> > +static enum log_mode_t host_log_mode_option = LOG_MODE_ALL;
+> > +/* Logging mode for current run */
+> > +static enum log_mode_t host_log_mode;
+> > +
+> > +static bool clear_log_supported(void)
+> > +{
+> > +	return kvm_check_cap(KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2);
+> > +}
+> > +
+> > +static void clear_log_create_vm_done(struct kvm_vm *vm)
+> > +{
+> > +	struct kvm_enable_cap cap = {};
+> > +
+> > +	cap.cap = KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2;
+> > +	cap.args[0] = 1;
+> > +	vm_enable_cap(vm, &cap);
+> > +}
+> > +
+> > +static void dirty_log_collect_dirty_pages(struct kvm_vm *vm, int slot,
+> > +					  void *bitmap, uint32_t num_pages)
+> > +{
+> > +	kvm_vm_get_dirty_log(vm, slot, bitmap);
+> > +}
+> > +
+> > +static void clear_log_collect_dirty_pages(struct kvm_vm *vm, int slot,
+> > +					  void *bitmap, uint32_t num_pages)
+> > +{
+> > +	kvm_vm_get_dirty_log(vm, slot, bitmap);
+> > +	kvm_vm_clear_dirty_log(vm, slot, bitmap, 0, num_pages);
+> > +}
+> > +
+> > +struct log_mode {
+> > +	const char *name;
+> > +	/* Return true if this mode is supported, otherwise false */
+> > +	bool (*supported)(void);
+> > +	/* Hook when the vm creation is done (before vcpu creation) */
+> > +	void (*create_vm_done)(struct kvm_vm *vm);
+> > +	/* Hook to collect the dirty pages into the bitmap provided */
+> > +	void (*collect_dirty_pages) (struct kvm_vm *vm, int slot,
+> > +				     void *bitmap, uint32_t num_pages);
+> > +} log_modes[LOG_MODE_NUM] = {
+> > +	{
+> > +		.name = "dirty-log",
+> > +		.collect_dirty_pages = dirty_log_collect_dirty_pages,
+> > +	},
+> > +	{
+> > +		.name = "clear-log",
+> > +		.supported = clear_log_supported,
+> > +		.create_vm_done = clear_log_create_vm_done,
+> > +		.collect_dirty_pages = clear_log_collect_dirty_pages,
+> > +	},
+> > +};
+> > +
+> >  /*
+> >   * We use this bitmap to track some pages that should have its dirty
+> >   * bit set in the _next_ iteration.  For example, if we detected the
+> > @@ -137,6 +204,43 @@ static uint64_t host_track_next_count;
+> >   */
+> >  static unsigned long *host_bmap_track;
+> >  
+> > +static void log_modes_dump(void)
+> > +{
+> > +	int i;
+> > +
+> > +	for (i = 0; i < LOG_MODE_NUM; i++)
+> > +		printf("%s, ", log_modes[i].name);
+> > +	puts("\b\b  \b\b");
 > 
-> All we need is an interface to offline and remove the memory from kernel
-> module context, where we don't have access to the memory block devices
-> (esp. find_memory_block() and device_offline()) and the device hotplug
-> lock.
+> This will be ugly when the output is redirected to a file.
+> How about just
 > 
-> To keep things simple, allow to only work on a single memory block.
+> printf("%s", log_modes[0].name);
+> for (i = 1; i < LOG_MODE_NUM; i++)
+>   printf(", %s", log_modes[i].name);
+> printf("\n");
+
+Will do.
+
 > 
+> > +}
+> > +
+> > +static bool log_mode_supported(void)
+> > +{
+> > +	struct log_mode *mode = &log_modes[host_log_mode];
+> > +
+> > +	if (mode->supported)
+> > +		return mode->supported();
+> > +
+> > +	return true;
+> > +}
+> > +
+> > +static void log_mode_create_vm_done(struct kvm_vm *vm)
+> > +{
+> > +	struct log_mode *mode = &log_modes[host_log_mode];
+> > +
+> > +	if (mode->create_vm_done)
+> > +		mode->create_vm_done(vm);
+> > +}
+> > +
+> > +static void log_mode_collect_dirty_pages(struct kvm_vm *vm, int slot,
+> > +					 void *bitmap, uint32_t num_pages)
+> > +{
+> > +	struct log_mode *mode = &log_modes[host_log_mode];
+> > +
+> > +	TEST_ASSERT(mode->collect_dirty_pages != NULL,
+> > +		    "collect_dirty_pages() is required for any log mode!");
+> > +	mode->collect_dirty_pages(vm, slot, bitmap, num_pages);
+> > +}
+> > +
+> >  static void generate_random_array(uint64_t *guest_array, uint64_t size)
+> >  {
+> >  	uint64_t i;
+> > @@ -257,6 +361,7 @@ static struct kvm_vm *create_vm(enum vm_guest_mode mode, uint32_t vcpuid,
+> >  #ifdef __x86_64__
+> >  	vm_create_irqchip(vm);
+> >  #endif
+> > +	log_mode_create_vm_done(vm);
+> >  	vm_vcpu_add_default(vm, vcpuid, guest_code);
+> >  	return vm;
+> >  }
+> > @@ -271,6 +376,12 @@ static void run_test(enum vm_guest_mode mode, unsigned long iterations,
+> >  	struct kvm_vm *vm;
+> >  	unsigned long *bmap;
+> >  
+> > +	if (!log_mode_supported()) {
+> > +		fprintf(stderr, "Log mode '%s' not supported, skip\n",
+> > +			log_modes[host_log_mode].name);
+> 
+> I think kvm selftests needs a skip_test() function that outputs a more
+> consistent test skip message. It seems we mostly do
 
-Lost the ACK from Michael
+Yep, I can introduce one.
 
-Acked-by: Michal Hocko <mhocko@suse.com> [1]
+> 
+> fprintf(stderr, "%s, skipping test\n", custom_message);
+> 
+> but here we have ', skip'. Also, I see a few places were we output
+> skipping to stderr and others to stdout. I think I like stdout better.
 
-[1] https://lkml.kernel.org/r/20200302142737.GP4380@dhcp22.suse.cz
+Sure.
+
+> 
+> > +		return;
+> > +	}
+> > +
+> >  	/*
+> >  	 * We reserve page table for 2 times of extra dirty mem which
+> >  	 * will definitely cover the original (1G+) test range.  Here
+> > @@ -316,14 +427,6 @@ static void run_test(enum vm_guest_mode mode, unsigned long iterations,
+> >  	bmap = bitmap_alloc(host_num_pages);
+> >  	host_bmap_track = bitmap_alloc(host_num_pages);
+> >  
+> > -#ifdef USE_CLEAR_DIRTY_LOG
+> > -	struct kvm_enable_cap cap = {};
+> > -
+> > -	cap.cap = KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2;
+> > -	cap.args[0] = 1;
+> > -	vm_enable_cap(vm, &cap);
+> > -#endif
+> > -
+> >  	/* Add an extra memory slot for testing dirty logging */
+> >  	vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS,
+> >  				    guest_test_phys_mem,
+> > @@ -364,11 +467,8 @@ static void run_test(enum vm_guest_mode mode, unsigned long iterations,
+> >  	while (iteration < iterations) {
+> >  		/* Give the vcpu thread some time to dirty some pages */
+> >  		usleep(interval * 1000);
+> > -		kvm_vm_get_dirty_log(vm, TEST_MEM_SLOT_INDEX, bmap);
+> > -#ifdef USE_CLEAR_DIRTY_LOG
+> > -		kvm_vm_clear_dirty_log(vm, TEST_MEM_SLOT_INDEX, bmap, 0,
+> > -				       host_num_pages);
+> > -#endif
+> > +		log_mode_collect_dirty_pages(vm, TEST_MEM_SLOT_INDEX,
+> > +					     bmap, host_num_pages);
+> >  		vm_dirty_log_verify(bmap);
+> >  		iteration++;
+> >  		sync_global_to_guest(vm, iteration);
+> > @@ -413,6 +513,9 @@ static void help(char *name)
+> >  	       TEST_HOST_LOOP_INTERVAL);
+> >  	printf(" -p: specify guest physical test memory offset\n"
+> >  	       "     Warning: a low offset can conflict with the loaded test code.\n");
+> > +	printf(" -M: specify the host logging mode "
+> > +	       "(default: run all log modes).  Supported modes: \n\t");
+> > +	log_modes_dump();
+> >  	printf(" -m: specify the guest mode ID to test "
+> >  	       "(default: test all supported modes)\n"
+> >  	       "     This option may be used multiple times.\n"
+> > @@ -432,18 +535,11 @@ int main(int argc, char *argv[])
+> >  	bool mode_selected = false;
+> >  	uint64_t phys_offset = 0;
+> >  	unsigned int mode;
+> > -	int opt, i;
+> > +	int opt, i, j;
+> >  #ifdef __aarch64__
+> >  	unsigned int host_ipa_limit;
+> >  #endif
+> >  
+> > -#ifdef USE_CLEAR_DIRTY_LOG
+> > -	if (!kvm_check_cap(KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2)) {
+> > -		fprintf(stderr, "KVM_CLEAR_DIRTY_LOG not available, skipping tests\n");
+> > -		exit(KSFT_SKIP);
+> > -	}
+> > -#endif
+> > -
+> >  #ifdef __x86_64__
+> >  	vm_guest_mode_params_init(VM_MODE_PXXV48_4K, true, true);
+> >  #endif
+> > @@ -463,7 +559,7 @@ int main(int argc, char *argv[])
+> >  	vm_guest_mode_params_init(VM_MODE_P40V48_4K, true, true);
+> >  #endif
+> >  
+> > -	while ((opt = getopt(argc, argv, "hi:I:p:m:")) != -1) {
+> > +	while ((opt = getopt(argc, argv, "hi:I:p:m:M:")) != -1) {
+> >  		switch (opt) {
+> >  		case 'i':
+> >  			iterations = strtol(optarg, NULL, 10);
+> > @@ -485,6 +581,22 @@ int main(int argc, char *argv[])
+> >  				    "Guest mode ID %d too big", mode);
+> >  			vm_guest_mode_params[mode].enabled = true;
+> >  			break;
+> > +		case 'M':
+> 
+> Can also add
+> 
+> if (!strcmp(optarg, "all"))
+>   host_log_mode_option = LOG_MODE_ALL;
+
+Sure.
+
+> 
+> > +			for (i = 0; i < LOG_MODE_NUM; i++) {
+> > +				if (!strcmp(optarg, log_modes[i].name)) {
+> > +					DEBUG("Setting log mode to: '%s'\n",
+> > +					      optarg);
+> 
+> Basing this on kvm/queue won't work as DEBUG() no longer exists. This
+> looks like a pr_info().
+
+I'll rebase to kvm/queue and see...
+
+> 
+> > +					host_log_mode_option = i;
+> > +					break;
+> > +				}
+> > +			}
+> > +			if (i == LOG_MODE_NUM) {
+> > +				printf("Log mode '%s' is invalid.  "
+> > +				       "Please choose from: ", optarg);
+> > +				log_modes_dump();
+> > +				exit(-1);
+> 
+> Exit code of 255? Probably just want exit(1);
+
+Sure.  Thanks!
 
 -- 
-Thanks,
-
-David / dhildenb
+Peter Xu
 
