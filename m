@@ -2,135 +2,203 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5D5DA1810A8
-	for <lists+kvm@lfdr.de>; Wed, 11 Mar 2020 07:27:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 690411810F1
+	for <lists+kvm@lfdr.de>; Wed, 11 Mar 2020 07:43:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726472AbgCKG1I (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Mar 2020 02:27:08 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:54607 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725976AbgCKG1I (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 11 Mar 2020 02:27:08 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1583908026;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=lmEKgXks/zEjgN+sn5kNszdNlcPSZgDCHuaFZ0ie3as=;
-        b=g2tlwZ4Bc9I/63k0RpuWejLRGmQyHsxSucOvWyaBlDWm8nngmeU5UttMhAAZBWWqdD5TDo
-        +1p0eU/MA3o6yOS1oX1Yfml7B+dtkN/lmfpDXNkGkiFTodqrAUU69x0PXODIsBY2INQINM
-        UH38dS4dck8AWmQLPFMlSJ8lOnSJbV4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-314-eRwKvcR4OeOKCCnwcrueow-1; Wed, 11 Mar 2020 02:27:02 -0400
-X-MC-Unique: eRwKvcR4OeOKCCnwcrueow-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9C6A6477;
-        Wed, 11 Mar 2020 06:27:01 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (ovpn-204-108.brq.redhat.com [10.40.204.108])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 7781E5C290;
-        Wed, 11 Mar 2020 06:26:56 +0000 (UTC)
-Date:   Wed, 11 Mar 2020 07:26:53 +0100
-From:   Andrew Jones <drjones@redhat.com>
-To:     Christian Borntraeger <borntraeger@de.ibm.com>
-Cc:     Ben Gardon <bgardon@google.com>, kvm list <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>
-Subject: Re: kvm/queue demand paging test and s390
-Message-ID: <20200311062653.yczihmgrnfqyrwa3@kamzik.brq.redhat.com>
-References: <c845637e-d662-993e-2184-fa34bae79495@de.ibm.com>
- <20200310172744.36lawcszzjbebz6d@kamzik.brq.redhat.com>
- <2d1fbe47-75fe-f57c-ab7a-65702e1ea23d@de.ibm.com>
+        id S1728223AbgCKGm5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Mar 2020 02:42:57 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:11223 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726160AbgCKGm5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 Mar 2020 02:42:57 -0400
+Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.59])
+        by Forcepoint Email with ESMTP id EC7167B4F0923BCCC96B;
+        Wed, 11 Mar 2020 14:42:45 +0800 (CST)
+Received: from [127.0.0.1] (10.173.222.27) by DGGEMS403-HUB.china.huawei.com
+ (10.3.19.203) with Microsoft SMTP Server id 14.3.487.0; Wed, 11 Mar 2020
+ 14:42:39 +0800
+Subject: Re: [kvm-unit-tests PATCH v5 05/13] arm/arm64: gicv3: Set the LPI
+ config and pending tables
+To:     Eric Auger <eric.auger@redhat.com>, <eric.auger.pro@gmail.com>,
+        <maz@kernel.org>, <kvmarm@lists.cs.columbia.edu>,
+        <kvm@vger.kernel.org>, <qemu-devel@nongnu.org>,
+        <qemu-arm@nongnu.org>
+CC:     <drjones@redhat.com>, <andre.przywara@arm.com>,
+        <peter.maydell@linaro.org>, <alexandru.elisei@arm.com>,
+        <thuth@redhat.com>
+References: <20200310145410.26308-1-eric.auger@redhat.com>
+ <20200310145410.26308-6-eric.auger@redhat.com>
+From:   Zenghui Yu <yuzenghui@huawei.com>
+Message-ID: <cd3bab7d-a585-b091-621c-0ae712b82b3c@huawei.com>
+Date:   Wed, 11 Mar 2020 14:42:36 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2d1fbe47-75fe-f57c-ab7a-65702e1ea23d@de.ibm.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+In-Reply-To: <20200310145410.26308-6-eric.auger@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.173.222.27]
+X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 10, 2020 at 09:18:16PM +0100, Christian Borntraeger wrote:
+Hi Eric,
+
+On 2020/3/10 22:54, Eric Auger wrote:
+> Allocate the LPI configuration and per re-distributor pending table.
+> Set redistributor's PROPBASER and PENDBASER. The LPIs are enabled
+> by default in the config table.
 > 
+> Also introduce a helper routine that allows to set the pending table
+> bit for a given LPI.
 > 
-> On 10.03.20 18:27, Andrew Jones wrote:
-> > On Tue, Mar 10, 2020 at 05:54:59PM +0100, Christian Borntraeger wrote:
-> >> For s390 the guest memory size must be 1M aligned. I need something like the following to make this work:
-> >>
-> >> diff --git a/tools/testing/selftests/kvm/demand_paging_test.c b/tools/testing/selftests/kvm/demand_paging_test.c
-> >> index c1e326d3ed7f..f85ec3f01a35 100644
-> >> --- a/tools/testing/selftests/kvm/demand_paging_test.c
-> >> +++ b/tools/testing/selftests/kvm/demand_paging_test.c
-> >> @@ -164,6 +164,10 @@ static struct kvm_vm *create_vm(enum vm_guest_mode mode, int vcpus,
-> >>         pages += ((2 * vcpus * vcpu_memory_bytes) >> PAGE_SHIFT_4K) /
-> >>                  PTES_PER_4K_PT;
-> >>         pages = vm_adjust_num_guest_pages(mode, pages);
-> >> +#ifdef __s390x__
-> >> +       /* s390 requires 1M aligned guest sizes */
-> >> +       pages = (pages + 255) & ~0xff;
-> >> +#endif
-> >>  
-> >>         pr_info("Testing guest mode: %s\n", vm_guest_mode_string(mode));
-> >>  
-> >>
-> >> any better idea how to do that?
-> >>
-> > 
-> > For this one we could patch[*] vm_adjust_num_guest_pages(). That would
-> > also allow the one on line 382, and another one at dirty_log_test.c:300
-> > to be hidden.
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
 > 
-> I tried that first but then I ran into several other asserts that checked for
-> num_pages = vm_adjust_num_guest_pages(num_pages)
+> ---
 > 
-> See kvm_util.c:     TEST_ASSERT(vm_adjust_num_guest_pages(vm->mode, npages) == npages
+> v4 -> v5:
+> - Moved some reformattings previously done in
+>    "arm/arm64: ITS: its_enable_defaults", in this patch
+> - added assert(!gicv3_redist_base()) in gicv3_lpi_alloc_tables()
+> - revert for_each_present_cpu() change
 > 
-> So it seems like a bigger rework is necessary to avoid this little hack :-/
+> v2 -> v3:
+> - Move the helpers in lib/arm/gic-v3.c and prefix them with "gicv3_"
+>    and add _lpi prefix too
+> 
+> v1 -> v2:
+> - remove memory attributes
+> ---
+>   lib/arm/asm/gic-v3.h | 15 +++++++++++++
+>   lib/arm/gic-v3.c     | 53 ++++++++++++++++++++++++++++++++++++++++++++
+>   2 files changed, 68 insertions(+)
+> 
+> diff --git a/lib/arm/asm/gic-v3.h b/lib/arm/asm/gic-v3.h
+> index 47df051..064cc68 100644
+> --- a/lib/arm/asm/gic-v3.h
+> +++ b/lib/arm/asm/gic-v3.h
+> @@ -50,6 +50,15 @@
+>   #define MPIDR_TO_SGI_AFFINITY(cluster_id, level) \
+>   	(MPIDR_AFFINITY_LEVEL(cluster_id, level) << ICC_SGI1R_AFFINITY_## level ## _SHIFT)
+>   
+> +#define GICR_PROPBASER_IDBITS_MASK	(0x1f)
 
-There's just this one other assert, and it'll only fire if the number of
-guest pages aren't selectect correctly. One must just be sure they
-always select the number correctly or do
+Again this can be dropped, but not a problem.
 
- adjusted_num_pages = vm_adjust_num_guest_pages(mode, guessed_num_pages);
- vm_userspace_mem_region_add(..., adjusted_num_pages, ...);
+> +
+> +#define GICR_PENDBASER_PTZ		BIT_ULL(62)
+> +
+> +#define LPI_PROP_GROUP1			(1 << 1)
+> +#define LPI_PROP_ENABLED		(1 << 0)
+> +#define LPI_PROP_DEFAULT_PRIO		0xa0
+> +#define LPI_PROP_DEFAULT		(LPI_PROP_DEFAULT_PRIO | LPI_PROP_GROUP1 | LPI_PROP_ENABLED)
+> +
+>   #include <asm/arch_gicv3.h>
+>   
+>   #ifndef __ASSEMBLY__
+> @@ -66,6 +75,8 @@ struct gicv3_data {
+>   	void *dist_base;
+>   	void *redist_bases[GICV3_NR_REDISTS];
+>   	void *redist_base[NR_CPUS];
+> +	u8 *lpi_prop;
+> +	void *lpi_pend[NR_CPUS];
+>   	unsigned int irq_nr;
+>   };
+>   extern struct gicv3_data gicv3_data;
+> @@ -82,6 +93,10 @@ extern void gicv3_write_eoir(u32 irqstat);
+>   extern void gicv3_ipi_send_single(int irq, int cpu);
+>   extern void gicv3_ipi_send_mask(int irq, const cpumask_t *dest);
+>   extern void gicv3_set_redist_base(size_t stride);
+> +extern void gicv3_lpi_set_config(int n, u8 val);
+> +extern u8 gicv3_lpi_get_config(int n);
 
-to ensure it. If we patch vm_adjust_num_guest_pages() as suggested below
-then the assert should never fire when the number is already correct,
-because vm_adjust_num_guest_pages() doesn't change an already correct
-number, i.e.
+These two declarations can be dropped, and I think it's better to
+move their macro implementations here (they're now in patch #7).
+But also not a problem.
 
- adjusted_num_pages == vm_adjust_num_guest_pages(mode, adjusted_num_pages)
+> +extern void gicv3_lpi_set_clr_pending(int rdist, int n, bool set);
+> +extern void gicv3_lpi_alloc_tables(void);
+>   
+>   static inline void gicv3_do_wait_for_rwp(void *base)
+>   {
+> diff --git a/lib/arm/gic-v3.c b/lib/arm/gic-v3.c
+> index feecb5e..d752bd4 100644
+> --- a/lib/arm/gic-v3.c
+> +++ b/lib/arm/gic-v3.c
+> @@ -5,6 +5,7 @@
+>    */
+>   #include <asm/gic.h>
+>   #include <asm/io.h>
+> +#include <alloc_page.h>
+>   
+>   void gicv3_set_redist_base(size_t stride)
+>   {
+> @@ -147,3 +148,55 @@ void gicv3_ipi_send_single(int irq, int cpu)
+>   	cpumask_set_cpu(cpu, &dest);
+>   	gicv3_ipi_send_mask(irq, &dest);
+>   }
+> +
+> +#if defined(__aarch64__)
+> +
+> +/*
+> + * alloc_lpi_tables - Allocate LPI config and pending tables
+> + * and set PROPBASER (shared by all rdistributors) and per
+> + * redistributor PENDBASER.
+> + *
+> + * gicv3_set_redist_base() must be called before
+> + */
+> +void gicv3_lpi_alloc_tables(void)
+> +{
+> +	unsigned long n = SZ_64K >> PAGE_SHIFT;
+> +	unsigned long order = fls(n);
+> +	u64 prop_val;
+> +	int cpu;
+> +
+> +	assert(!gicv3_redist_base());
 
-If an assert is firing after making that change, then I wonder if not
-all s390 memregions are 1M aligned?
+I guess you wanted assert(gicv3_redist_base())? With this confirmed,
 
-Thanks,
-drew
+Reviewed-by: Zenghui Yu <yuzenghui@huawei.com>
 
-> > diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
-> > index fc84da4b72d4..9569b21eed26 100644
-> > --- a/tools/testing/selftests/kvm/include/kvm_util.h
-> > +++ b/tools/testing/selftests/kvm/include/kvm_util.h
-> > @@ -261,7 +261,13 @@ unsigned int vm_num_guest_pages(enum vm_guest_mode mode, unsigned int num_host_p
-> >  static inline unsigned int
-> >  vm_adjust_num_guest_pages(enum vm_guest_mode mode, unsigned int num_guest_pages)
-> >  {
-> > -       return vm_num_guest_pages(mode, vm_num_host_pages(mode, num_guest_pages));
-> > +       unsigned int n;
-> > +       n = vm_num_guest_pages(mode, vm_num_host_pages(mode, num_guest_pages));
-> > +#ifdef __s390x__
-> > +       /* s390 requires 1M aligned guest sizes */
-> > +       n = (n + 255) & ~0xff;
-> > +#endif
-> > +       return n;
-> >  }
-> >  
-> >  struct kvm_userspace_memory_region *
-> > 
+
+Thanks
+
+> +
+> +	gicv3_data.lpi_prop = alloc_pages(order);
+> +
+> +	/* ID bits = 13, ie. up to 14b LPI INTID */
+> +	prop_val = (u64)(virt_to_phys(gicv3_data.lpi_prop)) | 13;
+> +
+> +	for_each_present_cpu(cpu) {
+> +		u64 pend_val;
+> +		void *ptr;
+> +
+> +		ptr = gicv3_data.redist_base[cpu];
+> +
+> +		writeq(prop_val, ptr + GICR_PROPBASER);
+> +
+> +		gicv3_data.lpi_pend[cpu] = alloc_pages(order);
+> +		pend_val = (u64)(virt_to_phys(gicv3_data.lpi_pend[cpu]));
+> +		writeq(pend_val, ptr + GICR_PENDBASER);
+> +	}
+> +}
+> +
+> +void gicv3_lpi_set_clr_pending(int rdist, int n, bool set)
+> +{
+> +	u8 *ptr = gicv3_data.lpi_pend[rdist];
+> +	u8 mask = 1 << (n % 8), byte;
+> +
+> +	ptr += (n / 8);
+> +	byte = *ptr;
+> +	if (set)
+> +		byte |=  mask;
+> +	else
+> +		byte &= ~mask;
+> +	*ptr = byte;
+> +}
+> +#endif /* __aarch64__ */
 > 
 
