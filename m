@@ -2,82 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 52000182122
-	for <lists+kvm@lfdr.de>; Wed, 11 Mar 2020 19:47:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D25BA182130
+	for <lists+kvm@lfdr.de>; Wed, 11 Mar 2020 19:49:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730920AbgCKSr2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Mar 2020 14:47:28 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:35216 "EHLO
+        id S1730912AbgCKStn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Mar 2020 14:49:43 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:41359 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1730893AbgCKSr2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 11 Mar 2020 14:47:28 -0400
+        with ESMTP id S1730788AbgCKStn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 Mar 2020 14:49:43 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1583952446;
+        s=mimecast20190719; t=1583952582;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         to:to:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Irye0rFaDzdP42Inlr4cQrTj7L1YCDCLX9nYEZrBcr8=;
-        b=Z6srpiWz1hNEhd/IZy29bOTbnmqI3yUQW/sm4feQZbNLVtE6msKlbscRSsCy/keM98mpGd
-        AexHA/Ku2OjT4Iv+dBKNU8J1hsjLvLetluu+5TiB+ls5J/edt5R3mDALwy6widq71kgT6O
-        rwF2Go94E1xLis8KiWkdJE72IO9s4g8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-68-5e2e3V1UMgaulAWdT5wBzA-1; Wed, 11 Mar 2020 14:47:22 -0400
-X-MC-Unique: 5e2e3V1UMgaulAWdT5wBzA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 55719107ACC4;
-        Wed, 11 Mar 2020 18:47:21 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (ovpn-206-80.brq.redhat.com [10.40.206.80])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id D3E5E92D34;
-        Wed, 11 Mar 2020 18:47:07 +0000 (UTC)
-Date:   Wed, 11 Mar 2020 19:47:03 +0100
-From:   Andrew Jones <drjones@redhat.com>
-To:     Peter Xu <peterx@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Yan Zhao <yan.y.zhao@intel.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        Christophe de Dinechin <dinechin@redhat.com>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Kevin Tian <kevin.tian@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-Subject: Re: [PATCH v6 10/14] KVM: selftests: Use a single binary for
- dirty/clear log test
-Message-ID: <20200311184703.gbjncvlusef44tqk@kamzik.brq.redhat.com>
-References: <20200309214424.330363-1-peterx@redhat.com>
- <20200309222519.345601-1-peterx@redhat.com>
- <20200310081002.unxq6kwlevmr6m3b@kamzik.brq.redhat.com>
- <20200311174324.GH479302@xz-x1>
+        bh=YfBxpaAILUlLDcONCdOQOUUPmTwmQsDDi+kgpOYOtpc=;
+        b=SYdqwvGM2qP1rlucV54JQ09PfOj2S+zAHe1VJ5DKv0NrmLJArrC0qSK6rdp/EADbRNm5ER
+        Izo8y0sZqUO2Q5tJo541110vwwT2REIx+Cis5RfTtadLDywUKX/+bctZ88qKeTWM01+ecy
+        z7FiCciXLF8SggrKEmTfY1jflU/mwhs=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-188-iC_xG8qSNYq6UFnS11oLXQ-1; Wed, 11 Mar 2020 14:49:41 -0400
+X-MC-Unique: iC_xG8qSNYq6UFnS11oLXQ-1
+Received: by mail-wr1-f70.google.com with SMTP id q18so1354084wrw.5
+        for <kvm@vger.kernel.org>; Wed, 11 Mar 2020 11:49:40 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=YfBxpaAILUlLDcONCdOQOUUPmTwmQsDDi+kgpOYOtpc=;
+        b=XSgb97BjLfbOykGOCYbPi8ArAdLGFJL/yCSEYFxJRrBoPsfuzOTiiI2hxkyn52icLz
+         bxKn1vGnsOKMY190TlnGUtJrjxs21MkICFLV8tH4vYNd/v3fME+k0n0Ub8/9GxiSxfVD
+         1r2QX50KkOL3CZF8mxXJCNQwTkSK9yAsZkHdz5nzXCUfMuGN4uO7CIjbHjVeijfQj9Lu
+         oSlsvn1UnINFjgs5b2atN/SbW51d/+WhUNXBgkhMOiKkyVKuy9NK15XCFv4j2zcIkS3D
+         rl++IgAdi2l5UAVy3JP6tEjX9y3O2M0Ef2MWguVWmbu/V6FxeIhMvArwg4Q4lLU4hvOb
+         cTXg==
+X-Gm-Message-State: ANhLgQ22NXxz0QvwWC5PeICoaRu0j+mRG/7IFmGdf0DcDKQxY5PbqzF7
+        b9qrn1b3684Oqib0sLDmGkK8WCNhIgvRg3Y88qEEOUWWEC6ZxFIMiDGWN4Vn+E7Oe4xs34Vv8nA
+        w+zwKCurvY0NB
+X-Received: by 2002:adf:b19d:: with SMTP id q29mr5774418wra.211.1583952579763;
+        Wed, 11 Mar 2020 11:49:39 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vvW8ZkWjSBV9LLgOlM23YlqBML0RJ6dwxVjP61v6JJHWW3ZRtss5/e2WmLmXCZ0v/RMNvtaQg==
+X-Received: by 2002:adf:b19d:: with SMTP id q29mr5774388wra.211.1583952579533;
+        Wed, 11 Mar 2020 11:49:39 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:4887:2313:c0bc:e3a8? ([2001:b07:6468:f312:4887:2313:c0bc:e3a8])
+        by smtp.gmail.com with ESMTPSA id z11sm9131811wmd.47.2020.03.11.11.49.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 11 Mar 2020 11:49:38 -0700 (PDT)
+Subject: Re: [Patch v1] KVM: x86: Initializing all kvm_lapic_irq fields
+To:     Nitesh Narayan Lal <nitesh@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, mtosatti@redhat.com,
+        vkuznets@redhat.com, sean.j.christopherson@intel.com,
+        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org
+References: <1583951685-202743-1-git-send-email-nitesh@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <c4370fce-1bc7-3a82-91a7-37fcd013bd77@redhat.com>
+Date:   Wed, 11 Mar 2020 19:49:38 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200311174324.GH479302@xz-x1>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <1583951685-202743-1-git-send-email-nitesh@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 11, 2020 at 01:43:24PM -0400, Peter Xu wrote:
-> > >  
-> > > +	if (!log_mode_supported()) {
-> > > +		fprintf(stderr, "Log mode '%s' not supported, skip\n",
-> > > +			log_modes[host_log_mode].name);
-> > 
-> > I think kvm selftests needs a skip_test() function that outputs a more
-> > consistent test skip message. It seems we mostly do
-> 
-> Yep, I can introduce one.
+On 11/03/20 19:34, Nitesh Narayan Lal wrote:
+> Previously all fields of structure kvm_lapic_irq were not initialized
+> before it was passed to kvm_bitmap_or_dest_vcpus(). Which will cause
+> an issue when any of those fields are used for processing a request.
+> This patch initializes all the fields of kvm_lapic_irq based on the
+> values which are passed through the ioapic redirect_entry object.
 
-I already did. Right after suggesting it.
-
-https://www.spinics.net/lists/kvm/msg209545.html
+Can you explain better how the bug manifests itself?
 
 Thanks,
-drew
+
+Paolo
+
+> Fixes: 7ee30bc132c6("KVM: x86: deliver KVM IOAPIC scan request to target vCPUs")
+> Signed-off-by: Nitesh Narayan Lal <nitesh@redhat.com>
+> ---
+>  arch/x86/kvm/ioapic.c | 7 +++++--
+>  1 file changed, 5 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/ioapic.c b/arch/x86/kvm/ioapic.c
+> index 7668fed..3a8467d 100644
+> --- a/arch/x86/kvm/ioapic.c
+> +++ b/arch/x86/kvm/ioapic.c
+> @@ -378,12 +378,15 @@ static void ioapic_write_indirect(struct kvm_ioapic *ioapic, u32 val)
+>  		if (e->fields.delivery_mode == APIC_DM_FIXED) {
+>  			struct kvm_lapic_irq irq;
+>  
+> -			irq.shorthand = APIC_DEST_NOSHORT;
+>  			irq.vector = e->fields.vector;
+>  			irq.delivery_mode = e->fields.delivery_mode << 8;
+> -			irq.dest_id = e->fields.dest_id;
+>  			irq.dest_mode =
+>  			    kvm_lapic_irq_dest_mode(!!e->fields.dest_mode);
+> +			irq.level = 1;
+> +			irq.trig_mode = e->fields.trig_mode;
+> +			irq.shorthand = APIC_DEST_NOSHORT;
+> +			irq.dest_id = e->fields.dest_id;
+> +			irq.msi_redir_hint = false;
+>  			bitmap_zero(&vcpu_bitmap, 16);
+>  			kvm_bitmap_or_dest_vcpus(ioapic->kvm, &irq,
+>  						 &vcpu_bitmap);
+> 
 
