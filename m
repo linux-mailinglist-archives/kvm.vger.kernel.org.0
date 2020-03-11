@@ -2,39 +2,39 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0F561181A18
-	for <lists+kvm@lfdr.de>; Wed, 11 Mar 2020 14:48:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 92907181A1F
+	for <lists+kvm@lfdr.de>; Wed, 11 Mar 2020 14:49:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729541AbgCKNsZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Mar 2020 09:48:25 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:30123 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1729428AbgCKNsZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 11 Mar 2020 09:48:25 -0400
+        id S1729646AbgCKNth (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Mar 2020 09:49:37 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:32268 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1729512AbgCKNth (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 11 Mar 2020 09:49:37 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1583934504;
+        s=mimecast20190719; t=1583934575;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=ojxoxR+MHQtWUQ/abjg7bLaa0SyuDx1Bi9ausr3HrUw=;
-        b=P7JAe8/6IEVJ+I+0ew1AVvuGMow+dFyBmWJyAXtlP/4CNdBcTZ5tEXxxu43fD2cczMYH3g
-        5UQQKtRvDd4kXV2R3BEDxHjqDOjL8MU/0iKi1NkI838Gxlr8KmdJqriM2iz8rzJlR1bwLn
-        PLgVrRvBojQX6dR2oauLoUqPg21I8BI=
+        bh=JsvML7TjAQJWusNVkCpKgOQx6lENNDL9bm3AiV1RPfc=;
+        b=FtHMMYqcx71j1Q1XV3hxocOLcKCMQ+nSS+rhYs8VvhVa1276naiKcUZbSFAO23tX53vXne
+        xNlbvS/7XB3/yaVx8qPdfjuydHQUNy+8LrUwIgGe4YvwQZSL7OJOuuT+4e/v+4O9fUbxRy
+        Fni/+nMxgNyigv5pU06xUKCcqdZ1Gh0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-189-TwTOY6s4MGWF3JJ6-DH5-w-1; Wed, 11 Mar 2020 09:48:20 -0400
-X-MC-Unique: TwTOY6s4MGWF3JJ6-DH5-w-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+ us-mta-254-49vmNWx9MBC47vDTZl3Pig-1; Wed, 11 Mar 2020 09:49:31 -0400
+X-MC-Unique: 49vmNWx9MBC47vDTZl3Pig-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 687EE1005509;
-        Wed, 11 Mar 2020 13:48:18 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3A9C01137841;
+        Wed, 11 Mar 2020 13:49:29 +0000 (UTC)
 Received: from [10.36.118.12] (unknown [10.36.118.12])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 114CA60CC0;
-        Wed, 11 Mar 2020 13:48:13 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH v5 10/13] arm/arm64: ITS: INT functional
- tests
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 397A692D2C;
+        Wed, 11 Mar 2020 13:49:25 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH v5 13/13] arm/arm64: ITS: pending table
+ migration test
 To:     Zenghui Yu <yuzenghui@huawei.com>, eric.auger.pro@gmail.com,
         maz@kernel.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
         qemu-devel@nongnu.org, qemu-arm@nongnu.org
@@ -42,197 +42,276 @@ Cc:     drjones@redhat.com, andre.przywara@arm.com,
         peter.maydell@linaro.org, alexandru.elisei@arm.com,
         thuth@redhat.com
 References: <20200310145410.26308-1-eric.auger@redhat.com>
- <20200310145410.26308-11-eric.auger@redhat.com>
- <d3f651a0-2344-4d6e-111b-be133db7e068@huawei.com>
+ <20200310145410.26308-14-eric.auger@redhat.com>
+ <54139b63-3a1d-7276-4d0b-4d38f9901536@huawei.com>
 From:   Auger Eric <eric.auger@redhat.com>
-Message-ID: <46f0ed1d-3bda-f91b-e2b0-addf1c61c373@redhat.com>
-Date:   Wed, 11 Mar 2020 14:48:11 +0100
+Message-ID: <96f01985-6515-8501-2b14-c8f91dcdfa81@redhat.com>
+Date:   Wed, 11 Mar 2020 14:49:23 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.4.0
 MIME-Version: 1.0
-In-Reply-To: <d3f651a0-2344-4d6e-111b-be133db7e068@huawei.com>
+In-Reply-To: <54139b63-3a1d-7276-4d0b-4d38f9901536@huawei.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Zenghui,
 
-On 3/11/20 12:59 PM, Zenghui Yu wrote:
+
+On 3/11/20 1:07 PM, Zenghui Yu wrote:
 > Hi Eric,
 >=20
 > On 2020/3/10 22:54, Eric Auger wrote:
->> Triggers LPIs through the INT command.
->>
->> the test checks the LPI hits the right CPU and triggers
->> the right LPI intid, ie. the translation is correct.
->>
->> Updates to the config table also are tested, along with inv
->> and invall commands.
+>> Add two new migration tests. One testing the migration of
+>> a topology where collection were unmapped. The second test
+>> checks the migration of the pending table.
 >>
 >> Signed-off-by: Eric Auger <eric.auger@redhat.com>
 >>
 >> ---
->=20
-> [...]
->=20
->> +static void test_its_trigger(void)
+>>
+>> v4 -> v5:
+>> - move stub from header to arm/gic.c
+>>
+>> v3 -> v4:
+>> - do not talk about odd/even CPUs, use pe0 and pe1
+>> - comment the delay
+>>
+>> v2 -> v3:
+>> - tests belong to both its and migration groups
+>> - use LPI(i)
+>> - gicv3_lpi_set_pending_table_bit renamed into gicv3_lpi_set_clr_pendi=
+ng
+>> ---
+>> =C2=A0 arm/gic.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 146=
+ ++++++++++++++++++++++++++++++++++++++++++++++
+>> =C2=A0 arm/unittests.cfg |=C2=A0 16 +++++
+>> =C2=A0 2 files changed, 162 insertions(+)
+>>
+>> diff --git a/arm/gic.c b/arm/gic.c
+>> index b8fbc13..e6ffbc3 100644
+>> --- a/arm/gic.c
+>> +++ b/arm/gic.c
+>> @@ -193,6 +193,7 @@ static void lpi_handler(struct pt_regs *regs
+>> __unused)
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 smp_rmb(); /* pairs with wmb in lpi_sta=
+ts_expect */
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 lpi_stats.observed.cpu_id =3D smp_proce=
+ssor_id();
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 lpi_stats.observed.lpi_id =3D irqnr;
+>> +=C2=A0=C2=A0=C2=A0 acked[lpi_stats.observed.cpu_id]++;
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 smp_wmb(); /* pairs with rmb in check_l=
+pi_stats */
+>> =C2=A0 }
+>> =C2=A0 @@ -236,6 +237,22 @@ static void secondary_lpi_test(void)
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 while (1)
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 wfi();
+>> =C2=A0 }
+>> +
+>> +static void check_lpi_hits(int *expected, const char *msg)
 >> +{
->> +=C2=A0=C2=A0=C2=A0 struct its_collection *col3, *col2;
+>> +=C2=A0=C2=A0=C2=A0 bool pass =3D true;
+>> +=C2=A0=C2=A0=C2=A0 int i;
+>> +
+>> +=C2=A0=C2=A0=C2=A0 for (i =3D 0; i < nr_cpus; i++) {
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (acked[i] !=3D expected=
+[i]) {
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 re=
+port_info("expected %d LPIs on PE #%d, %d observed",
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 expected[i], i, acked[i]);
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 pa=
+ss =3D false;
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 br=
+eak;
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>> +=C2=A0=C2=A0=C2=A0 }
+>> +=C2=A0=C2=A0=C2=A0 report(pass, "%s", msg);
+>> +}
+>> =C2=A0 #endif
+>> =C2=A0 =C2=A0 static void gicv2_ipi_send_self(void)
+>> @@ -591,6 +608,8 @@ static void gic_test_mmio(void)
+>> =C2=A0 static void test_its_introspection(void) {}
+>> =C2=A0 static void test_its_trigger(void) {}
+>> =C2=A0 static void test_its_migration(void) {}
+>> +static void test_its_pending_migration(void) {}
+>> +static void test_migrate_unmapped_collection(void) {}
+>> =C2=A0 =C2=A0 #else /* __aarch64__ */
+>> =C2=A0 @@ -659,6 +678,17 @@ static int its_prerequisites(int nb_cpus)
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return 0;
+>> =C2=A0 }
+>> =C2=A0 +static void set_lpi(struct its_device *dev, u32 eventid, u32 p=
+hysid,
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 st=
+ruct its_collection *col)
+>> +{
+>> +=C2=A0=C2=A0=C2=A0 assert(dev && col);
+>> +
+>> +=C2=A0=C2=A0=C2=A0 its_send_mapti(dev, physid, eventid, col);
+>> +
+>> +=C2=A0=C2=A0=C2=A0 gicv3_lpi_set_config(physid, LPI_PROP_DEFAULT);
+>> +=C2=A0=C2=A0=C2=A0 its_send_invall(col);
+>=20
+> Again, the col hasn't been mapped currently.
+right. Moving it outside of the helper then
+>=20
+>> +}
+>> +
+>> =C2=A0 /*
+>> =C2=A0=C2=A0 * Setup the configuration for those mappings:
+>> =C2=A0=C2=A0 * dev_id=3D2 event=3D20 -> vcpu 3, intid=3D8195
+>> @@ -799,6 +829,114 @@ static void test_its_migration(void)
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 its_send_int(dev7, 255);
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 check_lpi_stats("dev7/eventid=3D255 tri=
+ggers LPI 8196 on PE #2
+>> after migration");
+>> =C2=A0 }
+>> +
+>> +static void test_migrate_unmapped_collection(void)
+>> +{
+>> +=C2=A0=C2=A0=C2=A0 struct its_collection *col;
 >> +=C2=A0=C2=A0=C2=A0 struct its_device *dev2, *dev7;
+>> +=C2=A0=C2=A0=C2=A0 int pe0 =3D nr_cpus - 1;
+>> +=C2=A0=C2=A0=C2=A0 u8 config;
+>> +
+>> +=C2=A0=C2=A0=C2=A0 if (its_setup1())
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return;
+>> +
+>> +=C2=A0=C2=A0=C2=A0 col =3D its_create_collection(pe0, pe0);
+>> +=C2=A0=C2=A0=C2=A0 dev2 =3D its_get_device(2);
+>> +=C2=A0=C2=A0=C2=A0 dev7 =3D its_get_device(7);
+>> +
+>> +=C2=A0=C2=A0=C2=A0 /* MAPTI with the collection unmapped */
+>> +=C2=A0=C2=A0=C2=A0 set_lpi(dev2, 0, 8192, col);
+>> +
+>> +=C2=A0=C2=A0=C2=A0 puts("Now migrate the VM, then press a key to cont=
+inue...\n");
+>> +=C2=A0=C2=A0=C2=A0 (void)getchar();
+>> +=C2=A0=C2=A0=C2=A0 report_info("Migration complete");
+>> +
+>> +=C2=A0=C2=A0=C2=A0 /* on the destination, map the collection */
+>> +=C2=A0=C2=A0=C2=A0 its_send_mapc(col, true);
+>> +
+>> +=C2=A0=C2=A0=C2=A0 lpi_stats_expect(2, 8196);
+>> +=C2=A0=C2=A0=C2=A0 its_send_int(dev7, 255);
+>> +=C2=A0=C2=A0=C2=A0 check_lpi_stats("dev7/eventid=3D 255 triggered LPI=
+ 8196 on PE #2");
+>> +
+>> +=C2=A0=C2=A0=C2=A0 config =3D gicv3_lpi_get_config(8192);
+>> +=C2=A0=C2=A0=C2=A0 report(config =3D=3D LPI_PROP_DEFAULT,
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "Config =
+of LPI 8192 was properly migrated");
+>> +
+>> +=C2=A0=C2=A0=C2=A0 lpi_stats_expect(pe0, 8192);
+>> +=C2=A0=C2=A0=C2=A0 its_send_int(dev2, 0);
+>> +=C2=A0=C2=A0=C2=A0 check_lpi_stats("dev2/eventid =3D 0 triggered LPI =
+8192 on PE0");
+>> +
+>> +=C2=A0=C2=A0=C2=A0 /* unmap the collection */
+>> +=C2=A0=C2=A0=C2=A0 its_send_mapc(col, false);
+>=20
+> Again, behavior is unpredictable.
+yep removing that test.
+>=20
+>> +
+>> +=C2=A0=C2=A0=C2=A0 lpi_stats_expect(-1, -1);
+>> +=C2=A0=C2=A0=C2=A0 its_send_int(dev2, 0);
+>> +=C2=A0=C2=A0=C2=A0 check_lpi_stats("no LPI triggered after collection=
+ unmapping");
+>> +}
+>> +
+>> +static void test_its_pending_migration(void)
+>> +{
+>> +=C2=A0=C2=A0=C2=A0 struct its_device *dev;
+>> +=C2=A0=C2=A0=C2=A0 struct its_collection *collection[2];
+>> +=C2=A0=C2=A0=C2=A0 int *expected =3D malloc(nr_cpus * sizeof(int));
+>> +=C2=A0=C2=A0=C2=A0 int pe0 =3D nr_cpus - 1, pe1 =3D nr_cpus - 2;
+>> +=C2=A0=C2=A0=C2=A0 u64 pendbaser;
+>> +=C2=A0=C2=A0=C2=A0 void *ptr;
+>> +=C2=A0=C2=A0=C2=A0 int i;
 >> +
 >> +=C2=A0=C2=A0=C2=A0 if (its_prerequisites(4))
 >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return;
 >> +
->> +=C2=A0=C2=A0=C2=A0 dev2 =3D its_create_device(2 /* dev id */, 8 /* nb=
-_ites */);
->> +=C2=A0=C2=A0=C2=A0 dev7 =3D its_create_device(7 /* dev id */, 8 /* nb=
-_ites */);
+>> +=C2=A0=C2=A0=C2=A0 dev =3D its_create_device(2 /* dev id */, 8 /* nb_=
+ites */);
+>> +=C2=A0=C2=A0=C2=A0 its_send_mapd(dev, true);
 >> +
->> +=C2=A0=C2=A0=C2=A0 col3 =3D its_create_collection(3 /* col id */, 3/*=
- target PE */);
->> +=C2=A0=C2=A0=C2=A0 col2 =3D its_create_collection(2 /* col id */, 2/*=
- target PE */);
+>> +=C2=A0=C2=A0=C2=A0 collection[0] =3D its_create_collection(pe0, pe0);
+>> +=C2=A0=C2=A0=C2=A0 collection[1] =3D its_create_collection(pe1, pe1);
+>> +=C2=A0=C2=A0=C2=A0 its_send_mapc(collection[0], true);
+>> +=C2=A0=C2=A0=C2=A0 its_send_mapc(collection[1], true);
 >> +
->> +=C2=A0=C2=A0=C2=A0 gicv3_lpi_set_config(8195, LPI_PROP_DEFAULT);
->> +=C2=A0=C2=A0=C2=A0 gicv3_lpi_set_config(8196, LPI_PROP_DEFAULT);
+>> +=C2=A0=C2=A0=C2=A0 /* disable lpi at redist level */
+>> +=C2=A0=C2=A0=C2=A0 gicv3_lpi_rdist_disable(pe0);
+>> +=C2=A0=C2=A0=C2=A0 gicv3_lpi_rdist_disable(pe1);
 >> +
->> +=C2=A0=C2=A0=C2=A0 its_send_invall(col2);
->> +=C2=A0=C2=A0=C2=A0 its_send_invall(col3);
+>> +=C2=A0=C2=A0=C2=A0 /* lpis are interleaved inbetween the 2 PEs */
+>> +=C2=A0=C2=A0=C2=A0 for (i =3D 0; i < 256; i++) {
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 struct its_collection *col=
+ =3D i % 2 ? collection[0] :
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0 collection[1];
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 int vcpu =3D col->target_a=
+ddress >> 16;
+>> +
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 its_send_mapti(dev, LPI(i)=
+, i, col);
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 gicv3_lpi_set_config(LPI(i=
+), LPI_PROP_DEFAULT);
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 gicv3_lpi_set_clr_pending(=
+vcpu, LPI(i), true);
+>> +=C2=A0=C2=A0=C2=A0 }
+>> +=C2=A0=C2=A0=C2=A0 its_send_invall(collection[0]);
+>> +=C2=A0=C2=A0=C2=A0 its_send_invall(collection[1]);
+>> +
+>> +=C2=A0=C2=A0=C2=A0 /* Set the PTZ bit on each pendbaser */
 >=20
-> These two INVALLs should be issued after col2 and col3 are mapped,
-> otherwise this will cause the INVALL command error as per the spec
-> (though KVM doesn't complain it at all).
-Yes you're right. reading the spec again:
+> 'Clear' the PTZ.
+yep
+>=20
+> Otherwise looks good!
 
-A command error occurs if any of the following apply:
-../..
-The collection specified by ICID has not been mapped to an RDbase using
-MAPC.
+Thank you for your careful review!
 
-But as mentionned in the cover letter, no real means to retrieve the
-error at the moment.
-
->=20
->> +
->> +=C2=A0=C2=A0=C2=A0 report_prefix_push("int");
->> +=C2=A0=C2=A0=C2=A0 /*
->> +=C2=A0=C2=A0=C2=A0=C2=A0 * dev=3D2, eventid=3D20=C2=A0 -> lpi=3D 8195=
-, col=3D3
->> +=C2=A0=C2=A0=C2=A0=C2=A0 * dev=3D7, eventid=3D255 -> lpi=3D 8196, col=
-=3D2
->> +=C2=A0=C2=A0=C2=A0=C2=A0 * Trigger dev2, eventid=3D20 and dev7, event=
-id=3D255
->> +=C2=A0=C2=A0=C2=A0=C2=A0 * Check both LPIs hit
->> +=C2=A0=C2=A0=C2=A0=C2=A0 */
->> +
->> +=C2=A0=C2=A0=C2=A0 its_send_mapd(dev2, true);
->> +=C2=A0=C2=A0=C2=A0 its_send_mapd(dev7, true);
->> +
->> +=C2=A0=C2=A0=C2=A0 its_send_mapc(col3, true);
->> +=C2=A0=C2=A0=C2=A0 its_send_mapc(col2, true);
->> +
->> +=C2=A0=C2=A0=C2=A0 its_send_mapti(dev2, 8195 /* lpi id */, 20 /* even=
-t id */, col3);
->> +=C2=A0=C2=A0=C2=A0 its_send_mapti(dev7, 8196 /* lpi id */, 255 /* eve=
-nt id */, col2);
->> +
->> +=C2=A0=C2=A0=C2=A0 lpi_stats_expect(3, 8195);
->> +=C2=A0=C2=A0=C2=A0 its_send_int(dev2, 20);
->> +=C2=A0=C2=A0=C2=A0 check_lpi_stats("dev=3D2, eventid=3D20=C2=A0 -> lp=
-i=3D 8195, col=3D3");
->> +
->> +=C2=A0=C2=A0=C2=A0 lpi_stats_expect(2, 8196);
->> +=C2=A0=C2=A0=C2=A0 its_send_int(dev7, 255);
->> +=C2=A0=C2=A0=C2=A0 check_lpi_stats("dev=3D7, eventid=3D255 -> lpi=3D =
-8196, col=3D2");
->> +
->> +=C2=A0=C2=A0=C2=A0 report_prefix_pop();
->> +
->> +=C2=A0=C2=A0=C2=A0 report_prefix_push("inv/invall");
->> +
->> +=C2=A0=C2=A0=C2=A0 /*
->> +=C2=A0=C2=A0=C2=A0=C2=A0 * disable 8195, check dev2/eventid=3D20 does=
- not trigger the
->> +=C2=A0=C2=A0=C2=A0=C2=A0 * corresponding LPI
->> +=C2=A0=C2=A0=C2=A0=C2=A0 */
->> +=C2=A0=C2=A0=C2=A0 gicv3_lpi_set_config(8195, LPI_PROP_DEFAULT & ~LPI=
-_PROP_ENABLED);
->> +=C2=A0=C2=A0=C2=A0 its_send_inv(dev2, 20);
->> +
->> +=C2=A0=C2=A0=C2=A0 lpi_stats_expect(-1, -1);
->> +=C2=A0=C2=A0=C2=A0 its_send_int(dev2, 20);
->> +=C2=A0=C2=A0=C2=A0 check_lpi_stats("dev2/eventid=3D20 does not trigge=
-r any LPI");
->> +
->> +=C2=A0=C2=A0=C2=A0 /*
->> +=C2=A0=C2=A0=C2=A0=C2=A0 * re-enable the LPI but willingly do not cal=
-l invall
->> +=C2=A0=C2=A0=C2=A0=C2=A0 * so the change in config is not taken into =
-account.
->> +=C2=A0=C2=A0=C2=A0=C2=A0 * The LPI should not hit
->> +=C2=A0=C2=A0=C2=A0=C2=A0 */
->> +=C2=A0=C2=A0=C2=A0 gicv3_lpi_set_config(8195, LPI_PROP_DEFAULT);
->> +=C2=A0=C2=A0=C2=A0 lpi_stats_expect(-1, -1);
->> +=C2=A0=C2=A0=C2=A0 its_send_int(dev2, 20);
->> +=C2=A0=C2=A0=C2=A0 check_lpi_stats("dev2/eventid=3D20 still does not =
-trigger any LPI");
->> +
->> +=C2=A0=C2=A0=C2=A0 /* Now call the invall and check the LPI hits */
->> +=C2=A0=C2=A0=C2=A0 its_send_invall(col3);
->> +=C2=A0=C2=A0=C2=A0 lpi_stats_expect(3, 8195);
->> +=C2=A0=C2=A0=C2=A0 its_send_int(dev2, 20);
->> +=C2=A0=C2=A0=C2=A0 check_lpi_stats("dev2/eventid=3D20 now triggers an=
- LPI");
->> +
->> +=C2=A0=C2=A0=C2=A0 report_prefix_pop();
->> +
->> +=C2=A0=C2=A0=C2=A0 report_prefix_push("mapd valid=3Dfalse");
->> +=C2=A0=C2=A0=C2=A0 /*
->> +=C2=A0=C2=A0=C2=A0=C2=A0 * Unmap device 2 and check the eventid 20 fo=
-rmerly
->> +=C2=A0=C2=A0=C2=A0=C2=A0 * attached to it does not hit anymore
->> +=C2=A0=C2=A0=C2=A0=C2=A0 */
->> +
->> +=C2=A0=C2=A0=C2=A0 its_send_mapd(dev2, false);
->> +=C2=A0=C2=A0=C2=A0 lpi_stats_expect(-1, -1);
->> +=C2=A0=C2=A0=C2=A0 its_send_int(dev2, 20);
->> +=C2=A0=C2=A0=C2=A0 check_lpi_stats("no LPI after device unmap");
->> +=C2=A0=C2=A0=C2=A0 report_prefix_pop();
->> +
->> +=C2=A0=C2=A0=C2=A0 /* Unmap the collection this time and check no LPI=
- does hit */
->> +=C2=A0=C2=A0=C2=A0 report_prefix_push("mapc valid=3Dfalse");
->> +=C2=A0=C2=A0=C2=A0 its_send_mapc(col2, false);
->=20
-> And as for the MAPC, the spec says:
->=20
-> " When V is 0:
-> Behavior is unpredictable if there are interrupts that are mapped to th=
-e
-> specified collection, with the restriction that further translation
-> requests from that device are ignored. "
->=20
-> So this collection-unmap test may not make sense?
-makes sense. Removing it.
->=20
->> +=C2=A0=C2=A0=C2=A0 lpi_stats_expect(-1, -1);
->> +=C2=A0=C2=A0=C2=A0 its_send_int(dev7, 255);
->> +=C2=A0=C2=A0=C2=A0 check_lpi_stats("no LPI after collection unmap");
->> +=C2=A0=C2=A0=C2=A0 report_prefix_pop();
->> +}
->=20
-> [...]
->=20
-> Otherwise looks good.
-Thanks!
+Best Regards
 
 Eric
 >=20
+>> +
+>> +=C2=A0=C2=A0=C2=A0 expected[pe0] =3D 128;
+>> +=C2=A0=C2=A0=C2=A0 expected[pe1] =3D 128;
+>> +
+>> +=C2=A0=C2=A0=C2=A0 ptr =3D gicv3_data.redist_base[pe0] + GICR_PENDBAS=
+ER;
+>> +=C2=A0=C2=A0=C2=A0 pendbaser =3D readq(ptr);
+>> +=C2=A0=C2=A0=C2=A0 writeq(pendbaser & ~GICR_PENDBASER_PTZ, ptr);
+>> +
+>> +=C2=A0=C2=A0=C2=A0 ptr =3D gicv3_data.redist_base[pe1] + GICR_PENDBAS=
+ER;
+>> +=C2=A0=C2=A0=C2=A0 pendbaser =3D readq(ptr);
+>> +=C2=A0=C2=A0=C2=A0 writeq(pendbaser & ~GICR_PENDBASER_PTZ, ptr);
+>> +
+>> +=C2=A0=C2=A0=C2=A0 gicv3_lpi_rdist_enable(pe0);
+>> +=C2=A0=C2=A0=C2=A0 gicv3_lpi_rdist_enable(pe1);
+>> +
+>> +=C2=A0=C2=A0=C2=A0 puts("Now migrate the VM, then press a key to cont=
+inue...\n");
+>> +=C2=A0=C2=A0=C2=A0 (void)getchar();
+>> +=C2=A0=C2=A0=C2=A0 report_info("Migration complete");
+>> +
+>> +=C2=A0=C2=A0=C2=A0 /* let's wait for the 256 LPIs to be handled */
+>> +=C2=A0=C2=A0=C2=A0 mdelay(1000);
+>> +
+>> +=C2=A0=C2=A0=C2=A0 check_lpi_hits(expected, "128 LPIs on both PE0 and=
+ PE1 after
+>> migration");
+>> +}
 >=20
 > Thanks,
 > Zenghui
