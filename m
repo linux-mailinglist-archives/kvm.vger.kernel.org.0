@@ -2,45 +2,45 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C537F181AAE
-	for <lists+kvm@lfdr.de>; Wed, 11 Mar 2020 15:03:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 34B5C181AB6
+	for <lists+kvm@lfdr.de>; Wed, 11 Mar 2020 15:04:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729792AbgCKODB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Mar 2020 10:03:01 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:30778 "EHLO
+        id S1729704AbgCKOEZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Mar 2020 10:04:25 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:62450 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729718AbgCKODA (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 11 Mar 2020 10:03:00 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 02BE11IQ014596
-        for <kvm@vger.kernel.org>; Wed, 11 Mar 2020 10:02:59 -0400
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2yq04rjwf4-1
+        by vger.kernel.org with ESMTP id S1729552AbgCKOEZ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 11 Mar 2020 10:04:25 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 02BE16ck003708
+        for <kvm@vger.kernel.org>; Wed, 11 Mar 2020 10:04:25 -0400
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2yq0hbjvpy-1
         (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Wed, 11 Mar 2020 10:02:58 -0400
+        for <kvm@vger.kernel.org>; Wed, 11 Mar 2020 10:04:22 -0400
 Received: from localhost
-        by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
         for <kvm@vger.kernel.org> from <frankja@linux.ibm.com>;
-        Wed, 11 Mar 2020 14:02:09 -0000
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
-        by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        Wed, 11 Mar 2020 14:03:53 -0000
+Received: from b06avi18626390.portsmouth.uk.ibm.com (9.149.26.192)
+        by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
         (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Wed, 11 Mar 2020 14:02:06 -0000
+        Wed, 11 Mar 2020 14:03:49 -0000
 Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 02BE259061604052
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 02BE2nN350135410
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 11 Mar 2020 14:02:05 GMT
+        Wed, 11 Mar 2020 14:02:49 GMT
 Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0210BA4057;
-        Wed, 11 Mar 2020 14:02:05 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 9DFB7A4059;
+        Wed, 11 Mar 2020 14:03:48 +0000 (GMT)
 Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 92DA1A4055;
-        Wed, 11 Mar 2020 14:02:04 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 413B5A405F;
+        Wed, 11 Mar 2020 14:03:48 +0000 (GMT)
 Received: from localhost.localdomain (unknown [9.145.36.208])
         by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 11 Mar 2020 14:02:04 +0000 (GMT)
-Subject: Re: [PATCH 1/2] selftests: KVM: s390: fixup fprintf format error in
- reset.c
+        Wed, 11 Mar 2020 14:03:48 +0000 (GMT)
+Subject: Re: [PATCH 2/2] selftests: KVM: s390: fix format strings for access
+ reg test
 To:     Christian Borntraeger <borntraeger@de.ibm.com>,
         Janosch Frank <frankja@linux.vnet.ibm.com>
 Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
@@ -49,7 +49,7 @@ Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
         Thomas Huth <thuth@redhat.com>,
         Andrew Jones <drjones@redhat.com>
 References: <20200311131056.140016-1-borntraeger@de.ibm.com>
- <20200311131056.140016-2-borntraeger@de.ibm.com>
+ <20200311131056.140016-3-borntraeger@de.ibm.com>
 From:   Janosch Frank <frankja@linux.ibm.com>
 Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
  mQINBFubpD4BEADX0uhkRhkj2AVn7kI4IuPY3A8xKat0ihuPDXbynUC77mNox7yvK3X5QBO6
@@ -93,25 +93,25 @@ Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
  DchCqFm5adiSP5+OT4NjkKUeGpBe/aRyQSle/RropTgCi85pje/juYEn2P9UAgkfBJrOHvQ9
  Z+2Sva8FRd61NJLkCJ4LFumRn9wQlX2icFbi8UDV3do0hXJRRYTWCxrHscMhkrFWLhYiPF4i
  phX7UNdOWBQ90qpHyAxHmDazdo27gEjfvsgYMdveKknEOTEb5phwxWgg7BcIDoJf9UMC
-Date:   Wed, 11 Mar 2020 15:02:04 +0100
+Date:   Wed, 11 Mar 2020 15:03:47 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <20200311131056.140016-2-borntraeger@de.ibm.com>
+In-Reply-To: <20200311131056.140016-3-borntraeger@de.ibm.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="Fo0t0DfbeVpeC9zpuJqATRHCpXN3qBNak"
+ boundary="FtYHVWxGF4i4fyYmn6XNr160bU2gKJN5p"
 X-TM-AS-GCONF: 00
-x-cbid: 20031114-0016-0000-0000-000002EF6FE7
+x-cbid: 20031114-0028-0000-0000-000003E3241D
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20031114-0017-0000-0000-00003352D95D
-Message-Id: <3e093eca-9786-8aff-707f-f8529e3affd8@linux.ibm.com>
+x-cbparentid: 20031114-0029-0000-0000-000024A868A9
+Message-Id: <6c8ac2c1-a4c3-41be-6e9c-0c82f2d7a59d@linux.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
  definitions=2020-03-11_05:2020-03-11,2020-03-11 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 clxscore=1015
- impostorscore=0 suspectscore=0 mlxlogscore=999 priorityscore=1501
- mlxscore=0 bulkscore=0 lowpriorityscore=0 phishscore=0 adultscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 malwarescore=0
+ impostorscore=0 phishscore=0 lowpriorityscore=0 adultscore=0 bulkscore=0
+ priorityscore=1501 clxscore=1015 suspectscore=0 spamscore=0
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2001150001 definitions=main-2003110089
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
@@ -119,68 +119,95 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Fo0t0DfbeVpeC9zpuJqATRHCpXN3qBNak
-Content-Type: multipart/mixed; boundary="XgEqa889JImCvEvEcpyk7Ea08grLiJ5dc"
+--FtYHVWxGF4i4fyYmn6XNr160bU2gKJN5p
+Content-Type: multipart/mixed; boundary="V2XtRiHB3P40G2YCxf6I3QqKiP9h6KvwE"
 
---XgEqa889JImCvEvEcpyk7Ea08grLiJ5dc
+--V2XtRiHB3P40G2YCxf6I3QqKiP9h6KvwE
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
 On 3/11/20 2:10 PM, Christian Borntraeger wrote:
-> value is u64 and not string.
+> acrs are 32 bit and not 64 bit.
 >=20
 > Reported-by: Andrew Jones <drjones@redhat.com>
 > Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
 
-Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
+Acked-by: Janosch Frank <frankja@linux.ibm.com>
 
 > ---
->  tools/testing/selftests/kvm/s390x/resets.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  tools/testing/selftests/kvm/s390x/sync_regs_test.c | 11 +++++++++--
+>  1 file changed, 9 insertions(+), 2 deletions(-)
 >=20
-> diff --git a/tools/testing/selftests/kvm/s390x/resets.c b/tools/testing=
-/selftests/kvm/s390x/resets.c
-> index b567705f0d41..221e9c9a8bd2 100644
-> --- a/tools/testing/selftests/kvm/s390x/resets.c
-> +++ b/tools/testing/selftests/kvm/s390x/resets.c
-> @@ -66,7 +66,7 @@ static void test_one_reg(uint64_t id, uint64_t value)=
-
->  	reg.addr =3D (uintptr_t)&eval_reg;
->  	reg.id =3D id;
->  	vcpu_get_reg(vm, VCPU_ID, &reg);
-> -	TEST_ASSERT(eval_reg =3D=3D value, "value =3D=3D %s", value);
-> +	TEST_ASSERT(eval_reg =3D=3D value, "value =3D=3D 0x%lx", value);
->  }
+> diff --git a/tools/testing/selftests/kvm/s390x/sync_regs_test.c b/tools=
+/testing/selftests/kvm/s390x/sync_regs_test.c
+> index b705637ca14b..70a56580042b 100644
+> --- a/tools/testing/selftests/kvm/s390x/sync_regs_test.c
+> +++ b/tools/testing/selftests/kvm/s390x/sync_regs_test.c
+> @@ -42,6 +42,13 @@ static void guest_code(void)
+>  		    " values did not match: 0x%llx, 0x%llx\n", \
+>  		    left->reg, right->reg)
 > =20
->  static void assert_noirq(void)
+> +#define REG_COMPARE32(reg) \
+> +	TEST_ASSERT(left->reg =3D=3D right->reg, \
+> +		    "Register " #reg \
+> +		    " values did not match: 0x%x, 0x%x\n", \
+> +		    left->reg, right->reg)
+> +
+> +
+
+One \n too much?
+
+>  static void compare_regs(struct kvm_regs *left, struct kvm_sync_regs *=
+right)
+>  {
+>  	int i;
+> @@ -55,7 +62,7 @@ static void compare_sregs(struct kvm_sregs *left, str=
+uct kvm_sync_regs *right)
+>  	int i;
+> =20
+>  	for (i =3D 0; i < 16; i++)
+> -		REG_COMPARE(acrs[i]);
+> +		REG_COMPARE32(acrs[i]);
+> =20
+>  	for (i =3D 0; i < 16; i++)
+>  		REG_COMPARE(crs[i]);
+> @@ -155,7 +162,7 @@ int main(int argc, char *argv[])
+>  		    "r11 sync regs value incorrect 0x%llx.",
+>  		    run->s.regs.gprs[11]);
+>  	TEST_ASSERT(run->s.regs.acrs[0]  =3D=3D 1 << 11,
+> -		    "acr0 sync regs value incorrect 0x%llx.",
+> +		    "acr0 sync regs value incorrect 0x%x.",
+>  		    run->s.regs.acrs[0]);
+> =20
+>  	vcpu_regs_get(vm, VCPU_ID, &regs);
 >=20
 
 
 
---XgEqa889JImCvEvEcpyk7Ea08grLiJ5dc--
+--V2XtRiHB3P40G2YCxf6I3QqKiP9h6KvwE--
 
---Fo0t0DfbeVpeC9zpuJqATRHCpXN3qBNak
+--FtYHVWxGF4i4fyYmn6XNr160bU2gKJN5p
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl5o71wACgkQ41TmuOI4
-ufhqkg/8Cu8BbFntC8dZBW4kNgUa6LFnWghB7gYIq4Jo06uXBltyLlu+YcLPNTjD
-K6vw/D7M5sYw0PvUEIfLsvib8qb7tBSGj9yw6lYvthgaYzJKUCrL0hsoeO5u+F/t
-937TWVWXw3ajFPBPmkYa7pxs+3cLkTuH/MiugXMkpNERD64b8BQ6pNAFnFPm8TAQ
-5VF4kOpH0sVcUM3lKoU1fqFtatr0XIOydVGFOFZ4C0fbtyex03Xb+q7P0ewHXNLr
-1JS2lirJrs2NSgZd5DSA6gID2HDDfDPlkJNie2MUnP4Kk3I3mLoaAISkuuZwpZhL
-StiJ29tb+kd9avZ6UD/73Q8H6mxEWAAmiEWOgsuLNr4OOSrC85J+1/zeabi/vMtk
-/frCX6f2s+nQZAZ0Oet8othW4J9OX4Gnzfo6NnEQLrnE+zoBpXIwWLwifq1tWbMX
-Lq+IR3mwbnUHGHsHRlAi4cKEOwuiijIhd00Wjg5YuyP7GoN5fIZPWoStTsN4rxxt
-F0yVF8DsAa977+UFtuWkKe7lWDPJvFN4Z4g3/7eOG/r8fxLS4bjcCT/k4Xvk3bMb
-XR5FW9xdZa3INcuOlaxyKgTGkxZdv0Tizn8uhqG8tmPVs52GwhfpCwu1olEHAagn
-R8c+kiSIu/e43/uSqiiS7UppPs7jYtW2XLmpIpGSL76sXPzmlL8=
-=sJJ1
+iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl5o78MACgkQ41TmuOI4
+ufjM/xAAlbSaU5GzAW+zZ7CczqdTv7dgcP8W8d/A7RTuuJeHfTxiEgTYyUGkvgMw
+bKtakOaZVUJNKSCHuEiLz15C7qfWcLz1rNj30dORybc0VykNDbgqyG+HlYCjorrt
+KYJBezhe7JXbI2kkL6xPbwpb4qOR308v67EiCrilv1drltuQpYqHNgnLMuDaeHeZ
+jAtRUsLs13Yx9If0pkVC/4EuY6eaL/VKeyNKYH41Yw9tzn9T6e8Wcd+Y2wywlMV3
+xIHSvHoiw3HJBc9J1895iPHI3qenUE2Be1jbe55xpvvFZL0Wx7lsnCxMxpaKmtSH
+u+qfzvVmItgxd82nnjmCBMO6j3ZGwDWsAQnthW20Rlf8yC1lEpj/xLjXexnhk8Df
+sV/zDPujAofk4uyph1UeyeSCTi1wLWIzkE2hlXf07EaJ/KtPsCm8zUHcpu+fD92m
+iR+kHDpOIx+BFkYQhySDvJcRypa2gxZ+U53X0Vv4p33xYAPHoytttKSmRUqsbabd
+KEzHdc91ymxX2UNrJqPqLKpMnW21tO4yAq56Bhqj+IdSJ13H4K1ebxJAzPq7PbTK
+Rih3ewfFansILy7KKAFqBk5VMMb/0ptEAKOsclCt3lMsxelEoJfP1WxqG7l2Vs+9
+YlD+1ufw1Jh319kDi/vSrk1Sxe9qK3Hfxiw12noG6DAc/FwFoUQ=
+=GQCE
 -----END PGP SIGNATURE-----
 
---Fo0t0DfbeVpeC9zpuJqATRHCpXN3qBNak--
+--FtYHVWxGF4i4fyYmn6XNr160bU2gKJN5p--
 
