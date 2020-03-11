@@ -2,196 +2,313 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0395E181D8F
-	for <lists+kvm@lfdr.de>; Wed, 11 Mar 2020 17:16:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4A6B2181DB0
+	for <lists+kvm@lfdr.de>; Wed, 11 Mar 2020 17:25:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730202AbgCKQQU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Mar 2020 12:16:20 -0400
-Received: from foss.arm.com ([217.140.110.172]:51442 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730099AbgCKQQU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 11 Mar 2020 12:16:20 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BEA0F31B;
-        Wed, 11 Mar 2020 09:16:19 -0700 (PDT)
-Received: from [192.168.0.106] (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D2EE23F6CF;
-        Wed, 11 Mar 2020 09:16:18 -0700 (PDT)
-Subject: Re: [PATCH v2 kvmtool 25/30] pci: Implement callbacks for toggling
- BAR emulation
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-To:     Andre Przywara <andre.przywara@arm.com>
-Cc:     kvm@vger.kernel.org, will@kernel.org,
-        julien.thierry.kdev@gmail.com, sami.mujawar@arm.com,
-        lorenzo.pieralisi@arm.com, maz@kernel.org
-References: <20200123134805.1993-1-alexandru.elisei@arm.com>
- <20200123134805.1993-26-alexandru.elisei@arm.com>
- <20200206182128.536565a6@donnerap.cambridge.arm.com>
- <47624fb3-dbab-734a-0126-caa30e9f7ab0@arm.com>
-Message-ID: <07e65719-20ee-6f63-e0c2-f98d482b6355@arm.com>
-Date:   Wed, 11 Mar 2020 16:16:38 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+        id S1730101AbgCKQZA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Mar 2020 12:25:00 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:36284 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726314AbgCKQY7 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 11 Mar 2020 12:24:59 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1583943897;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=DVeoZZJMMZCCIarL9YyHSuTSAyd4nyhK1RYWiCBuaY4=;
+        b=BAZQOUatm2J80CrF99MDtRG73DPnskbYcb70Db3KG4mbOVHt80FMFrcXujGCS9u9OpMxZ3
+        zsZFCHiZcNwiNtSA3eYrDxx4rEDB5/z6Pf686h1EuWJX3Lr3WzJJxF2qYtPx4qfNnmwb5r
+        dtBO/mnFu7YwBXaXoEuRqt4g3EZffs4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-148-E-cCTqctOkmBYw0OSiI2mQ-1; Wed, 11 Mar 2020 12:24:53 -0400
+X-MC-Unique: E-cCTqctOkmBYw0OSiI2mQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 174C61005510;
+        Wed, 11 Mar 2020 16:24:52 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (ovpn-206-80.brq.redhat.com [10.40.206.80])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 407F726E6D;
+        Wed, 11 Mar 2020 16:24:45 +0000 (UTC)
+Date:   Wed, 11 Mar 2020 17:24:42 +0100
+From:   Andrew Jones <drjones@redhat.com>
+To:     Eric Auger <eric.auger@redhat.com>
+Cc:     eric.auger.pro@gmail.com, maz@kernel.org,
+        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        qemu-devel@nongnu.org, qemu-arm@nongnu.org,
+        peter.maydell@linaro.org, andre.przywara@arm.com, thuth@redhat.com,
+        yuzenghui@huawei.com, alexandru.elisei@arm.com
+Subject: Re: [kvm-unit-tests PATCH v6 00/13] arm/arm64: Add ITS tests
+Message-ID: <20200311162442.th564amlnxsvzjqc@kamzik.brq.redhat.com>
+References: <20200311135117.9366-1-eric.auger@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <47624fb3-dbab-734a-0126-caa30e9f7ab0@arm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200311135117.9366-1-eric.auger@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
-
-On 2/7/20 10:12 AM, Alexandru Elisei wrote:
-> Hi,
+On Wed, Mar 11, 2020 at 02:51:04PM +0100, Eric Auger wrote:
+> This series is a revival of an RFC series sent in Dec 2016 [1].
+> Given the amount of code and the lack of traction at that time,
+> I haven't respinned until now. However a recent bug found related
+> to the ITS migration convinced me that this work may deserve to be
+> respinned and enhanced.
+> 
+> Tests exercise main ITS commands and also test migration.
+> With the migration framework, we are able to trigger the
+> migration from guest and that is very practical actually.
+> 
+> What is particular with the ITS programming is that most of
+> the commands are passed through queues and there is real error
+> handling. Invalid commands are just ignored and that is not
+> really tester friendly.
+> 
+> The series can be fount at:
+> https://github.com/eauger/kut/tree/its-v6
+> 
+> Applies on top of arm/queue.
+> 
+> Best Regards
+> 
+> Eric
+> 
+> History:
+> v5 -> v6:
+> - Took into account Zenghui's comments, mostly functional: see invidual
+>   history logs
+> - fix wrong assert!
+> 
+> v4 -> v5:
+> - 32b stubs moved back to arm/gic.c
+> - some changes reordering
+> - minor style issues
+> 
+> v3 -> v4:
+> - addressed comments from Drew and Zenghui
+> - added "page_alloc: Introduce get_order()"
+> - removed "arm: gic: Provide per-IRQ helper functions"
+> - ITS files moved to lib64
+> - and many more, see individual logs
+> 
+> v2 -> v3:
+> - fix 32b compilation
+> - take into account Drew's comments (see individual diff logs)
+> 
+> v1 -> v2:
+> - took into account Zenghui's comments
+> - collect R-b's from Thomas
+> 
+> References:
+> [1] [kvm-unit-tests RFC 00/15] arm/arm64: add ITS framework
+>     https://lists.gnu.org/archive/html/qemu-devel/2016-12/msg00575.html
+> 
+> Execution:
+> x For other ITS tests:
+>   ./run_tests.sh -g its
+> 
+> x non migration tests can be launched invidually. For instance:
+>   ./arm-run arm/gic.flat -smp 8 -append 'its-trigger'
+> 
+> Eric Auger (13):
+>   libcflat: Add other size defines
+>   page_alloc: Introduce get_order()
+>   arm/arm64: gic: Introduce setup_irq() helper
+>   arm/arm64: gicv3: Add some re-distributor defines
+>   arm/arm64: gicv3: Set the LPI config and pending tables
+>   arm/arm64: ITS: Introspection tests
+>   arm/arm64: ITS: its_enable_defaults
+>   arm/arm64: ITS: Device and collection Initialization
+>   arm/arm64: ITS: Commands
+>   arm/arm64: ITS: INT functional tests
+>   arm/run: Allow Migration tests
+>   arm/arm64: ITS: migration tests
+>   arm/arm64: ITS: pending table migration test
+> 
+>  arm/Makefile.arm64         |   1 +
+>  arm/Makefile.common        |   2 +-
+>  arm/gic.c                  | 460 ++++++++++++++++++++++++++++++++++--
+>  arm/run                    |   2 +-
+>  arm/unittests.cfg          |  38 +++
+>  lib/alloc_page.c           |   7 +-
+>  lib/alloc_page.h           |   1 +
+>  lib/arm/asm/gic-v3-its.h   |  22 ++
+>  lib/arm/asm/gic-v3.h       |  29 +++
+>  lib/arm/asm/processor.h    |   2 +
+>  lib/arm/gic-v3.c           |  78 +++++++
+>  lib/arm/gic.c              |  34 ++-
+>  lib/arm/io.c               |  28 +++
+>  lib/arm64/asm/gic-v3-its.h | 170 ++++++++++++++
+>  lib/arm64/gic-v3-its-cmd.c | 464 +++++++++++++++++++++++++++++++++++++
+>  lib/arm64/gic-v3-its.c     | 172 ++++++++++++++
+>  lib/libcflat.h             |   3 +
+>  17 files changed, 1484 insertions(+), 29 deletions(-)
+>  create mode 100644 lib/arm/asm/gic-v3-its.h
+>  create mode 100644 lib/arm64/asm/gic-v3-its.h
+>  create mode 100644 lib/arm64/gic-v3-its-cmd.c
+>  create mode 100644 lib/arm64/gic-v3-its.c
+> 
+> -- 
+> 2.20.1
+> 
 >
-> On 2/6/20 6:21 PM, Andre Przywara wrote:
->> On Thu, 23 Jan 2020 13:48:00 +0000
->> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
->>
->> Hi,
->>
->>> Implement callbacks for activating and deactivating emulation for a BAR
->>> region. This is in preparation for allowing a guest operating system to
->>> enable and disable access to I/O or memory space, or to reassign the
->>> BARs.
->>>
->>> The emulated vesa device has been refactored in the process and the static
->>> variables were removed in order to make using the callbacks less painful.
->>> The framebuffer isn't designed to allow stopping and restarting at
->>> arbitrary points in the guest execution. Furthermore, on x86, the kernel
->>> will not change the BAR addresses, which on bare metal are programmed by
->>> the firmware, so take the easy way out and refuse to deactivate emulation
->>> for the BAR regions.
->>>
->>> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
->>> ---
->>>  hw/vesa.c         | 120 ++++++++++++++++++++++++++++++++--------------
->>>  include/kvm/pci.h |  19 +++++++-
->>>  pci.c             |  44 +++++++++++++++++
->>>  vfio/pci.c        | 100 +++++++++++++++++++++++++++++++-------
->>>  virtio/pci.c      |  90 ++++++++++++++++++++++++----------
->>>  5 files changed, 294 insertions(+), 79 deletions(-)
->>>
->>> diff --git a/hw/vesa.c b/hw/vesa.c
->>> index e988c0425946..74ebebbefa6b 100644
->>> --- a/hw/vesa.c
->>> +++ b/hw/vesa.c
->>> @@ -18,6 +18,12 @@
->>>  #include <inttypes.h>
->>>  #include <unistd.h>
->>>  
->>> +struct vesa_dev {
->>> +	struct pci_device_header	pci_hdr;
->>> +	struct device_header		dev_hdr;
->>> +	struct framebuffer		fb;
->>> +};
->>> +
->>>  static bool vesa_pci_io_in(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size)
->>>  {
->>>  	return true;
->>> @@ -33,29 +39,52 @@ static struct ioport_operations vesa_io_ops = {
->>>  	.io_out			= vesa_pci_io_out,
->>>  };
->>>  
->>> -static struct pci_device_header vesa_pci_device = {
->>> -	.vendor_id		= cpu_to_le16(PCI_VENDOR_ID_REDHAT_QUMRANET),
->>> -	.device_id		= cpu_to_le16(PCI_DEVICE_ID_VESA),
->>> -	.header_type		= PCI_HEADER_TYPE_NORMAL,
->>> -	.revision_id		= 0,
->>> -	.class[2]		= 0x03,
->>> -	.subsys_vendor_id	= cpu_to_le16(PCI_SUBSYSTEM_VENDOR_ID_REDHAT_QUMRANET),
->>> -	.subsys_id		= cpu_to_le16(PCI_SUBSYSTEM_ID_VESA),
->>> -	.bar[1]			= cpu_to_le32(VESA_MEM_ADDR | PCI_BASE_ADDRESS_SPACE_MEMORY),
->>> -	.bar_size[1]		= VESA_MEM_SIZE,
->>> -};
->>> +static int vesa__bar_activate(struct kvm *kvm,
->>> +			      struct pci_device_header *pci_hdr,
->>> +			      int bar_num, void *data)
->>> +{
->>> +	struct vesa_dev *vdev = data;
->>> +	u32 bar_addr, bar_size;
->>> +	char *mem;
->>> +	int r;
->>>  
->>> -static struct device_header vesa_device = {
->>> -	.bus_type	= DEVICE_BUS_PCI,
->>> -	.data		= &vesa_pci_device,
->>> -};
->>> +	bar_addr = pci__bar_address(pci_hdr, bar_num);
->>> +	bar_size = pci_hdr->bar_size[bar_num];
->>>  
->>> -static struct framebuffer vesafb;
->>> +	switch (bar_num) {
->>> +	case 0:
->>> +		r = ioport__register(kvm, bar_addr, &vesa_io_ops, bar_size,
->>> +				     NULL);
->>> +		break;
->>> +	case 1:
->>> +		mem = mmap(NULL, bar_size, PROT_RW, MAP_ANON_NORESERVE, -1, 0);
->>> +		if (mem == MAP_FAILED) {
->>> +			r = -errno;
->>> +			break;
->>> +		}
->>> +		r = kvm__register_dev_mem(kvm, bar_addr, bar_size, mem);
->>> +		if (r < 0)
->>> +			break;
->>> +		vdev->fb.mem = mem;
->>> +		break;
->>> +	default:
->>> +		r = -EINVAL;
->>> +	}
->>> +
->>> +	return r;
->>> +}
->>> +
->>> +static int vesa__bar_deactivate(struct kvm *kvm,
->>> +				struct pci_device_header *pci_hdr,
->>> +				int bar_num, void *data)
->>> +{
->>> +	return -EINVAL;
->>> +}
->>>  
->>>  struct framebuffer *vesa__init(struct kvm *kvm)
->>>  {
->>> -	u16 vesa_base_addr;
->>> -	char *mem;
->>> +	struct vesa_dev *vdev;
->>> +	u16 port_addr;
->>>  	int r;
->>>  
->>>  	BUILD_BUG_ON(!is_power_of_two(VESA_MEM_SIZE));
->>> @@ -63,34 +92,51 @@ struct framebuffer *vesa__init(struct kvm *kvm)
->>>  
->>>  	if (!kvm->cfg.vnc && !kvm->cfg.sdl && !kvm->cfg.gtk)
->>>  		return NULL;
->>> -	r = pci_get_io_port_block(PCI_IO_SIZE);
->>> -	r = ioport__register(kvm, r, &vesa_io_ops, PCI_IO_SIZE, NULL);
->>> -	if (r < 0)
->>> -		return ERR_PTR(r);
->>>  
->>> -	vesa_base_addr			= (u16)r;
->>> -	vesa_pci_device.bar[0]		= cpu_to_le32(vesa_base_addr | PCI_BASE_ADDRESS_SPACE_IO);
->>> -	vesa_pci_device.bar_size[0]	= PCI_IO_SIZE;
->>> -	r = device__register(&vesa_device);
->>> -	if (r < 0)
->>> -		return ERR_PTR(r);
->>> +	vdev = calloc(1, sizeof(*vdev));
->>> +	if (vdev == NULL)
->>> +		return ERR_PTR(-ENOMEM);
->> Is it really necessary to allocate this here? You never free this, and I don't see how you could actually do this. AFAICS conceptually there can be only one VESA device? So maybe have a static variable above and use that instead of passing the pointer around? Or use &vdev if you need a pointer argument for the callbacks.
-> As far as I can tell, there can be only one VESA device, yes. I was following the
-> same pattern from virtio/{net,blk,rng,scsi,9p}.c, which I prefer because it's
-> explicit what function can access the device. What's wrong with passing the
-> pointer around? The entire PCI emulation code works like that.
->
-I took a closer look at this patch and it turns out that vesa__bar_activate is
-called exactly once, at initialization, because vesa__bar_deactivate doesn't
-actually deactivate emulation (and returns an error to let the PCI emulation code
-know that). I will drop the changes to hw/vesa.c and keep the vesa device static
-and framebuffer creation in vesa__init.
 
-Thanks,
-Alex
+Hi Eric,
+
+You don't need to respin for me, but let's see if Zenghui has time for
+another review and possibly more r-b's for me to collect.
+
+While applying I made a few changes that you can integrate if you do
+respin (I can also make the for_each_present_cpu changes myself, if
+you don't respin.)
+
+The changes are for the following reasons and are almost all in
+"arm/arm64: ITS: Introspection tests"
+
+ * Only calling its_init for arm64-gicv3, and removing the report call
+ * Not including gic-v3-its.h anywhere directly
+ * One spaces to tab
+
+diff of the changes below
+
+diff --git a/arm/gic.c b/arm/gic.c
+index 763ed1bc5106..2c56eb212425 100644
+--- a/arm/gic.c
++++ b/arm/gic.c
+@@ -16,7 +16,6 @@
+ #include <asm/processor.h>
+ #include <asm/delay.h>
+ #include <asm/gic.h>
+-#include <asm/gic-v3-its.h>
+ #include <asm/smp.h>
+ #include <asm/barrier.h>
+ #include <asm/io.h>
+diff --git a/lib/arm/asm/gic-v3-its.h b/lib/arm/asm/gic-v3-its.h
+index 2167099eb5d1..1af085ef53be 100644
+--- a/lib/arm/asm/gic-v3-its.h
++++ b/lib/arm/asm/gic-v3-its.h
+@@ -5,10 +5,15 @@
+  *
+  * This work is licensed under the terms of the GNU LGPL, version 2.
+  */
+-
+ #ifndef _ASMARM_GIC_V3_ITS_H_
+ #define _ASMARM_GIC_V3_ITS_H_
+ 
++#ifndef _ASMARM_GIC_H_
++#error Do not directly include <asm/gic-v3-its.h>. Include <asm/gic.h>
++#endif
++
++#include <libcflat.h>
++
+ /* dummy its_data struct to allow gic_get_dt_bases() call */
+ struct its_data {
+ 	void *base;
+@@ -16,7 +21,7 @@ struct its_data {
+ 
+ static inline void its_init(void)
+ {
+-	report_abort("not supported on 32-bit");
++	assert_msg(false, "ITS not supported on 32-bit");
+ }
+ 
+-#endif /* _ASMARM_GICv3_ITS_H_ */
++#endif /* _ASMARM_GIC_V3_ITS_H_ */
+diff --git a/lib/arm/asm/gic.h b/lib/arm/asm/gic.h
+index 922cbe95750c..9564d4f80b93 100644
+--- a/lib/arm/asm/gic.h
++++ b/lib/arm/asm/gic.h
+@@ -40,6 +40,7 @@
+ 
+ #include <asm/gic-v2.h>
+ #include <asm/gic-v3.h>
++#include <asm/gic-v3-its.h>
+ 
+ #define PPI(irq)			((irq) + 16)
+ #define SPI(irq)			((irq) + GIC_FIRST_SPI)
+diff --git a/lib/arm/gic.c b/lib/arm/gic.c
+index 4f6f15b1eb8a..a807d5f86ee9 100644
+--- a/lib/arm/gic.c
++++ b/lib/arm/gic.c
+@@ -6,7 +6,6 @@
+ #include <devicetree.h>
+ #include <asm/gic.h>
+ #include <asm/io.h>
+-#include <asm/gic-v3-its.h>
+ 
+ struct gicv2_data gicv2_data;
+ struct gicv3_data gicv3_data;
+@@ -123,11 +122,14 @@ int gic_version(void)
+ 
+ int gic_init(void)
+ {
+-	if (gicv2_init())
++	if (gicv2_init()) {
+ 		gic_common_ops = &gicv2_common_ops;
+-	else if (gicv3_init())
++	} else if (gicv3_init()) {
+ 		gic_common_ops = &gicv3_common_ops;
+-	its_init();
++#ifdef __aarch64__
++		its_init();
++#endif
++	}
+ 	return gic_version();
+ }
+ 
+diff --git a/lib/arm64/asm/gic-v3-its.h b/lib/arm64/asm/gic-v3-its.h
+index 872953c005d2..412f43849bac 100644
+--- a/lib/arm64/asm/gic-v3-its.h
++++ b/lib/arm64/asm/gic-v3-its.h
+@@ -8,6 +8,10 @@
+ #ifndef _ASMARM64_GIC_V3_ITS_H_
+ #define _ASMARM64_GIC_V3_ITS_H_
+ 
++#ifndef _ASMARM_GIC_H_
++#error Do not directly include <asm/gic-v3-its.h>. Include <asm/gic.h>
++#endif
++
+ struct its_typer {
+ 	unsigned int ite_size;
+ 	unsigned int eventid_bits;
+@@ -26,7 +30,7 @@ struct its_baser {
+ 	phys_addr_t table_addr;
+ };
+ 
+-#define GITS_BASER_NR_REGS              8
++#define GITS_BASER_NR_REGS		8
+ #define GITS_MAX_DEVICES		8
+ #define GITS_MAX_COLLECTIONS		8
+ 
+diff --git a/lib/arm64/gic-v3-its-cmd.c b/lib/arm64/gic-v3-its-cmd.c
+index 34b090459ef4..65f1c8c8752f 100644
+--- a/lib/arm64/gic-v3-its-cmd.c
++++ b/lib/arm64/gic-v3-its-cmd.c
+@@ -7,7 +7,6 @@
+  */
+ #include <asm/io.h>
+ #include <asm/gic.h>
+-#include <asm/gic-v3-its.h>
+ 
+ #define ITS_ITT_ALIGN		SZ_256
+ 
+diff --git a/lib/arm64/gic-v3-its.c b/lib/arm64/gic-v3-its.c
+index 9c9fa60400f3..6a3642182bf7 100644
+--- a/lib/arm64/gic-v3-its.c
++++ b/lib/arm64/gic-v3-its.c
+@@ -5,7 +5,6 @@
+  */
+ #include <asm/gic.h>
+ #include <alloc_page.h>
+-#include <asm/gic-v3-its.h>
+ 
+ void its_parse_typer(void)
+ {
+
+ 
+
