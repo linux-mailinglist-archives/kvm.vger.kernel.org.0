@@ -2,52 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9626D1815F9
-	for <lists+kvm@lfdr.de>; Wed, 11 Mar 2020 11:38:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EEE321816E4
+	for <lists+kvm@lfdr.de>; Wed, 11 Mar 2020 12:33:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726672AbgCKKiF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Mar 2020 06:38:05 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:35250 "EHLO
+        id S1729103AbgCKLdd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Mar 2020 07:33:33 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:14554 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726310AbgCKKiF (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 11 Mar 2020 06:38:05 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 02BAW284117913
-        for <kvm@vger.kernel.org>; Wed, 11 Mar 2020 06:38:03 -0400
-Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2ypvxp4wbg-1
+        by vger.kernel.org with ESMTP id S1726000AbgCKLdc (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 11 Mar 2020 07:33:32 -0400
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 02BBTBXf096559
+        for <kvm@vger.kernel.org>; Wed, 11 Mar 2020 07:33:31 -0400
+Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2ypxc2ac5a-1
         (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Wed, 11 Mar 2020 06:38:03 -0400
+        for <kvm@vger.kernel.org>; Wed, 11 Mar 2020 07:33:28 -0400
 Received: from localhost
-        by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
         for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
-        Wed, 11 Mar 2020 10:38:01 -0000
-Received: from b06avi18626390.portsmouth.uk.ibm.com (9.149.26.192)
-        by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        Wed, 11 Mar 2020 11:33:26 -0000
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
+        by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
         (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Wed, 11 Mar 2020 10:37:58 -0000
+        Wed, 11 Mar 2020 11:33:22 -0000
 Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 02BAawh248496994
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 02BBXLpu34930838
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 11 Mar 2020 10:36:58 GMT
+        Wed, 11 Mar 2020 11:33:21 GMT
 Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id EDECEAE053;
-        Wed, 11 Mar 2020 10:37:57 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 63821AE045;
+        Wed, 11 Mar 2020 11:33:21 +0000 (GMT)
 Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 869D5AE045;
-        Wed, 11 Mar 2020 10:37:57 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id E111BAE053;
+        Wed, 11 Mar 2020 11:33:20 +0000 (GMT)
 Received: from oc7455500831.ibm.com (unknown [9.145.53.58])
         by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 11 Mar 2020 10:37:57 +0000 (GMT)
-Subject: Re: [PATCH] KVM: s390: mark sie block as 512 byte aligned
-To:     David Hildenbrand <david@redhat.com>,
-        Janosch Frank <frankja@linux.vnet.ibm.com>
-Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        Thomas Huth <thuth@redhat.com>
-References: <20200311083304.3725276-1-borntraeger@de.ibm.com>
- <9e15182c-f7ef-23b1-91e9-4b21b6bd5d99@redhat.com>
+        Wed, 11 Mar 2020 11:33:20 +0000 (GMT)
 From:   Christian Borntraeger <borntraeger@de.ibm.com>
+Subject: Re: [PATCH -next 018/491] KERNEL VIRTUAL MACHINE for s390 (KVM/s390):
+ Use fallthrough;
+To:     Joe Perches <joe@perches.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>
+Cc:     Heiko Carstens <heiko.carstens@de.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <cover.1583896344.git.joe@perches.com>
+ <d63c86429f3e5aa806aa3e185c97d213904924a5.1583896348.git.joe@perches.com>
 Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
  xsFNBE6cPPgBEAC2VpALY0UJjGmgAmavkL/iAdqul2/F9ONz42K6NrwmT+SI9CylKHIX+fdf
  J34pLNJDmDVEdeb+brtpwC9JEZOLVE0nb+SR83CsAINJYKG3V1b3Kfs0hydseYKsBYqJTN2j
@@ -91,26 +94,26 @@ Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
  jaqYefx7yQ7FJXXETd2uVURiDeNEFhVZWb5CiBJM5c6qQMhmkS4VyT7/+raaEGgkEKEgHOWf
  ZDP8BHfXtszHqI3Fo1F4IKFo/AP8GOFFxMRgbvlAs8z/+rEEaQYjxYJqj08raw6P4LFBqozr
  nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Date:   Wed, 11 Mar 2020 11:37:57 +0100
+Date:   Wed, 11 Mar 2020 12:33:20 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <9e15182c-f7ef-23b1-91e9-4b21b6bd5d99@redhat.com>
+In-Reply-To: <d63c86429f3e5aa806aa3e185c97d213904924a5.1583896348.git.joe@perches.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-x-cbid: 20031110-4275-0000-0000-000003AA9194
+x-cbid: 20031111-0016-0000-0000-000002EF5F5F
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20031110-4276-0000-0000-000038BFAD30
-Message-Id: <69dd3390-0155-2538-ed25-1924e40a5b8c@de.ibm.com>
+x-cbparentid: 20031111-0017-0000-0000-00003352C82E
+Message-Id: <26a7b1c0-df95-e706-b8a0-3532f38c7b77@de.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
- definitions=2020-03-11_02:2020-03-11,2020-03-11 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 lowpriorityscore=0
- mlxlogscore=964 suspectscore=0 phishscore=0 clxscore=1015 adultscore=0
- impostorscore=0 spamscore=0 priorityscore=1501 bulkscore=0 malwarescore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
- definitions=main-2003110067
+ definitions=2020-03-11_05:2020-03-11,2020-03-11 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 phishscore=0
+ adultscore=0 mlxscore=0 spamscore=0 lowpriorityscore=0 malwarescore=0
+ bulkscore=0 clxscore=1015 suspectscore=0 priorityscore=1501
+ mlxlogscore=951 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2001150001 definitions=main-2003110075
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
@@ -118,36 +121,14 @@ X-Mailing-List: kvm@vger.kernel.org
 
 
 
-On 11.03.20 09:41, David Hildenbrand wrote:
-> On 11.03.20 09:33, Christian Borntraeger wrote:
->> The sie block must be aligned to 512 bytes. Mark it as such.
->>
->> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
->> ---
->>  arch/s390/include/asm/kvm_host.h | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
->> index 0ea82152d2f7..2d50f6c432e2 100644
->> --- a/arch/s390/include/asm/kvm_host.h
->> +++ b/arch/s390/include/asm/kvm_host.h
->> @@ -344,7 +344,7 @@ struct kvm_s390_sie_block {
->>  	__u64	itdba;			/* 0x01e8 */
->>  	__u64   riccbd;			/* 0x01f0 */
->>  	__u64	gvrd;			/* 0x01f8 */
->> -} __attribute__((packed));
->> +} __packed __aligned(512);
->>  
+On 11.03.20 05:51, Joe Perches wrote:
+> Convert the various uses of fallthrough comments to fallthrough;
 > 
-> I guess there is no change in the code/behavior, because we always place
-> into well defined spots within a page.
+> Done via script
+> Link: https://lore.kernel.org/lkml/b56602fcf79f849e733e7b521bb0e17895d390fa.1582230379.git.joe.com/
 
-In theory gcc can  generate code that relies on that alignment. For example
-load relative long requires double word alignment. Or some atomic instructions.
-This could - in theory - generate better code.
+That link does not work. lore asks if this is the right one
+https://lore.kernel.org/lkml/b56602fcf79f849e733e7b521bb0e17895d390fa.1582230379.git.joe@perches.com/
 
-> 
-> Reviewed-by: David Hildenbrand <david@redhat.com>
-> 
-> 
+Shall I fix that up when applying?
 
