@@ -2,149 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6B38C181206
-	for <lists+kvm@lfdr.de>; Wed, 11 Mar 2020 08:35:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 215A9181304
+	for <lists+kvm@lfdr.de>; Wed, 11 Mar 2020 09:33:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728269AbgCKHfJ convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Wed, 11 Mar 2020 03:35:09 -0400
-Received: from szxga08-in.huawei.com ([45.249.212.255]:37010 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726160AbgCKHfJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 11 Mar 2020 03:35:09 -0400
-Received: from DGGEMM402-HUB.china.huawei.com (unknown [172.30.72.53])
-        by Forcepoint Email with ESMTP id 8A9A3905D61B99ACD7FD;
-        Wed, 11 Mar 2020 15:35:03 +0800 (CST)
-Received: from DGGEMM421-HUB.china.huawei.com (10.1.198.38) by
- DGGEMM402-HUB.china.huawei.com (10.3.20.210) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Wed, 11 Mar 2020 15:35:02 +0800
-Received: from DGGEMM528-MBX.china.huawei.com ([169.254.8.90]) by
- dggemm421-hub.china.huawei.com ([10.1.198.38]) with mapi id 14.03.0439.000;
- Wed, 11 Mar 2020 15:34:56 +0800
-From:   "Zhoujian (jay)" <jianjay.zhou@huawei.com>
-To:     zhukeqian <zhukeqian1@huawei.com>, Marc Zyngier <maz@kernel.org>
-CC:     "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-arm-kernel@lists.infradead.org" 
-        <linux-arm-kernel@lists.infradead.org>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        "Huangweidong (C)" <weidong.huang@huawei.com>,
-        "wangxin (U)" <wangxinxin.wang@huawei.com>
-Subject: RE: [RFC] KVM: arm64: support enabling dirty log graually in small
- chunks
-Thread-Topic: [RFC] KVM: arm64: support enabling dirty log graually in small
- chunks
-Thread-Index: AQHV9fES7bnu3RiLvUOZvoLEbVPgkKg/noOAgAFalYCAAFE+gIABLpcAgACIxzA=
-Date:   Wed, 11 Mar 2020 07:34:55 +0000
-Message-ID: <B2D15215269B544CADD246097EACE7474BB64495@DGGEMM528-MBX.china.huawei.com>
-References: <20200309085727.1106-1-zhukeqian1@huawei.com>
- <4b85699ec1d354cc73f5302560231f86@misterjones.org>
- <64925c8b-af3d-beb5-bc9b-66ef1e47f92d@huawei.com>
- <a642a79ea9190542a9098e4c9dc5a9f2@kernel.org>
- <9ddefc54-dd5b-0555-0aaa-00a3a23febcf@huawei.com>
-In-Reply-To: <9ddefc54-dd5b-0555-0aaa-00a3a23febcf@huawei.com>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.173.228.206]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+        id S1728571AbgCKIdO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Mar 2020 04:33:14 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:28158 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728562AbgCKIdN (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 11 Mar 2020 04:33:13 -0400
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 02B8RGvZ161249
+        for <kvm@vger.kernel.org>; Wed, 11 Mar 2020 04:33:13 -0400
+Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2ypv8b8xyu-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Wed, 11 Mar 2020 04:33:12 -0400
+Received: from localhost
+        by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
+        Wed, 11 Mar 2020 08:33:09 -0000
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
+        by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Wed, 11 Mar 2020 08:33:06 -0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 02B8X5sM51511348
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 11 Mar 2020 08:33:05 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 755B2AE055;
+        Wed, 11 Mar 2020 08:33:05 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 64043AE04D;
+        Wed, 11 Mar 2020 08:33:05 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Wed, 11 Mar 2020 08:33:05 +0000 (GMT)
+Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 25651)
+        id E4DFCE0251; Wed, 11 Mar 2020 09:33:04 +0100 (CET)
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+To:     Janosch Frank <frankja@linux.vnet.ibm.com>
+Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Thomas Huth <thuth@redhat.com>
+Subject: [PATCH] KVM: s390: mark sie block as 512 byte aligned
+Date:   Wed, 11 Mar 2020 09:33:04 +0100
+X-Mailer: git-send-email 2.24.1
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 20031108-4275-0000-0000-000003AA84B3
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20031108-4276-0000-0000-000038BF9FFF
+Message-Id: <20200311083304.3725276-1-borntraeger@de.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
+ definitions=2020-03-11_02:2020-03-10,2020-03-11 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 mlxscore=0
+ lowpriorityscore=0 clxscore=1015 mlxlogscore=668 malwarescore=0
+ bulkscore=0 impostorscore=0 phishscore=0 priorityscore=1501 adultscore=0
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2001150001 definitions=main-2003110055
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+The sie block must be aligned to 512 bytes. Mark it as such.
 
+Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+---
+ arch/s390/include/asm/kvm_host.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> -----Original Message-----
-> From: zhukeqian
-> Sent: Wednesday, March 11, 2020 3:20 PM
-> To: Marc Zyngier <maz@kernel.org>
-> Cc: kvmarm@lists.cs.columbia.edu; kvm@vger.kernel.org;
-> linux-kernel@vger.kernel.org; linux-arm-kernel@lists.infradead.org; Zhoujian (jay)
-> <jianjay.zhou@huawei.com>; Sean Christopherson
-> <sean.j.christopherson@intel.com>; Paolo Bonzini <pbonzini@redhat.com>;
-> James Morse <james.morse@arm.com>; Julien Thierry
-> <julien.thierry.kdev@gmail.com>; Suzuki K Poulose <suzuki.poulose@arm.com>
-> Subject: Re: [RFC] KVM: arm64: support enabling dirty log graually in small chunks
-> 
-> Hi Marc,
-> 
-> On 2020/3/10 21:16, Marc Zyngier wrote:
-> > On 2020-03-10 08:26, zhukeqian wrote:
-> >> Hi Marc,
-> >>
-> >> On 2020/3/9 19:45, Marc Zyngier wrote:
-> >>> Kegian,
-> >
-> > [...]
-> >
-> >>> Is there a userspace counterpart to it?
-> >>>
-> >> As this KVM/x86 related changes have not been merged to mainline
-> >> kernel, some little modification is needed on mainline Qemu.
-> >
-> > Could you please point me to these changes?
-> I made some changes locally listed below.
-> 
-> However, Qemu can choose to enable KVM_DIRTY_LOG_INITIALLY_SET or not.
-> Here I made no judgement on dirty_log_manual_caps because I just want to
-> verify the optimization of this patch.
-> 
-> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c index
-> 439a4efe52..1611f644a4 100644
-> --- a/accel/kvm/kvm-all.c
-> +++ b/accel/kvm/kvm-all.c
-> @@ -2007,14 +2007,16 @@ static int kvm_init(MachineState *ms)
->      s->coalesced_pio = s->coalesced_mmio &&
->                         kvm_check_extension(s,
-> KVM_CAP_COALESCED_PIO);
-> 
-> -    s->manual_dirty_log_protect =
-> +    uint64_t dirty_log_manual_caps =
->          kvm_check_extension(s,
-> KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2);
-> -    if (s->manual_dirty_log_protect) {
-> -        ret = kvm_vm_enable_cap(s,
-> KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2, 0, 1);
-> +    if (dirty_log_manual_caps) {
-> +        ret = kvm_vm_enable_cap(s,
-> KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2, 0,
-> +                                dirty_log_manual_caps);
->          if (ret) {
->              warn_report("Trying to enable
-> KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2 "
->                          "but failed.  Falling back to the legacy mode. ");
-> -            s->manual_dirty_log_protect = false;
-> +        } else {
-> +            s->manual_dirty_log_protect = true;
->          }
->      }
+diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
+index 0ea82152d2f7..2d50f6c432e2 100644
+--- a/arch/s390/include/asm/kvm_host.h
++++ b/arch/s390/include/asm/kvm_host.h
+@@ -344,7 +344,7 @@ struct kvm_s390_sie_block {
+ 	__u64	itdba;			/* 0x01e8 */
+ 	__u64   riccbd;			/* 0x01f0 */
+ 	__u64	gvrd;			/* 0x01f8 */
+-} __attribute__((packed));
++} __packed __aligned(512);
+ 
+ struct kvm_s390_itdb {
+ 	__u8	data[256];
+-- 
+2.24.1
 
-FYI: I had submitted a patch to the Qemu community some days ago:
-https://patchwork.kernel.org/patch/11419191/
-
-> >
-> >> As I tested this patch on a 128GB RAM Linux VM with no huge pages,
-> >> the time of enabling dirty log will decrease obviously.
-> >
-> > I'm not sure how realistic that is. Not having huge pages tends to
-> > lead to pretty bad performance in general...
-> Sure, this has no effect on guests which are all of huge pages.
-> 
-> For my understanding, once a guest has normal pages (maybe are initialized at
-> beginning or dissloved from huge pages), it can benefit from this patch.
-
-Yes, I agree.
-
-
-
-Regards,
-Jay Zhou
