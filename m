@@ -2,241 +2,214 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 08AA0181410
-	for <lists+kvm@lfdr.de>; Wed, 11 Mar 2020 10:08:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 35B46181427
+	for <lists+kvm@lfdr.de>; Wed, 11 Mar 2020 10:10:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728606AbgCKJHs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Mar 2020 05:07:48 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:34877 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726934AbgCKJHs (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 11 Mar 2020 05:07:48 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1583917666;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=90odkQRcEuNdf2jJohXDHYVWT8ef6QX7pd7255D7wy8=;
-        b=TnGP2ZXfjzr1nlUoJqDjjnJLvT01j6ascktvdZEemzBTP/TY46HCS9WMUYLGYTo+IBIWLc
-        uOxzLsKZvXwXzdehxSXdnCwUb/+oIzYsWq8j2iTbCkmqORydCLvgzsQ038TICegwWDk5TH
-        XSxzojUzJwEZBscCJ1U5kik7H8vbf9c=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-279-isU5ogb3Pq-TV_LPOEpLBQ-1; Wed, 11 Mar 2020 05:07:42 -0400
-X-MC-Unique: isU5ogb3Pq-TV_LPOEpLBQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E9F86107ACC4;
-        Wed, 11 Mar 2020 09:07:40 +0000 (UTC)
-Received: from [10.36.118.12] (unknown [10.36.118.12])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 695545D9C9;
-        Wed, 11 Mar 2020 09:07:35 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH v5 05/13] arm/arm64: gicv3: Set the LPI
- config and pending tables
-To:     Zenghui Yu <yuzenghui@huawei.com>, eric.auger.pro@gmail.com,
-        maz@kernel.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        qemu-devel@nongnu.org, qemu-arm@nongnu.org
-Cc:     andre.przywara@arm.com, drjones@redhat.com,
-        alexandru.elisei@arm.com, thuth@redhat.com,
-        peter.maydell@linaro.org
+        id S1728653AbgCKJJU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Mar 2020 05:09:20 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:11661 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726934AbgCKJJU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 Mar 2020 05:09:20 -0400
+Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.59])
+        by Forcepoint Email with ESMTP id D9CCC96868EE027D56DF;
+        Wed, 11 Mar 2020 17:09:13 +0800 (CST)
+Received: from [127.0.0.1] (10.173.222.27) by DGGEMS414-HUB.china.huawei.com
+ (10.3.19.214) with Microsoft SMTP Server id 14.3.487.0; Wed, 11 Mar 2020
+ 17:09:04 +0800
+Subject: Re: [kvm-unit-tests PATCH v5 09/13] arm/arm64: ITS: Commands
+To:     Eric Auger <eric.auger@redhat.com>, <eric.auger.pro@gmail.com>,
+        <maz@kernel.org>, <kvmarm@lists.cs.columbia.edu>,
+        <kvm@vger.kernel.org>, <qemu-devel@nongnu.org>,
+        <qemu-arm@nongnu.org>
+CC:     <drjones@redhat.com>, <andre.przywara@arm.com>,
+        <peter.maydell@linaro.org>, <alexandru.elisei@arm.com>,
+        <thuth@redhat.com>
 References: <20200310145410.26308-1-eric.auger@redhat.com>
- <20200310145410.26308-6-eric.auger@redhat.com>
- <cd3bab7d-a585-b091-621c-0ae712b82b3c@huawei.com>
-From:   Auger Eric <eric.auger@redhat.com>
-Message-ID: <97357581-9712-b467-764c-d32f354b6f3c@redhat.com>
-Date:   Wed, 11 Mar 2020 10:07:32 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+ <20200310145410.26308-10-eric.auger@redhat.com>
+From:   Zenghui Yu <yuzenghui@huawei.com>
+Message-ID: <ad7d4011-0b8e-978d-54e7-d44cd4e34ed7@huawei.com>
+Date:   Wed, 11 Mar 2020 17:09:02 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-In-Reply-To: <cd3bab7d-a585-b091-621c-0ae712b82b3c@huawei.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20200310145410.26308-10-eric.auger@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.173.222.27]
+X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Zenghui,
+Hi Eric,
 
-On 3/11/20 7:42 AM, Zenghui Yu wrote:
-> Hi Eric,
->=20
-> On 2020/3/10 22:54, Eric Auger wrote:
->> Allocate the LPI configuration and per re-distributor pending table.
->> Set redistributor's PROPBASER and PENDBASER. The LPIs are enabled
->> by default in the config table.
->>
->> Also introduce a helper routine that allows to set the pending table
->> bit for a given LPI.
->>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->>
->> ---
->>
->> v4 -> v5:
->> - Moved some reformattings previously done in
->> =C2=A0=C2=A0 "arm/arm64: ITS: its_enable_defaults", in this patch
->> - added assert(!gicv3_redist_base()) in gicv3_lpi_alloc_tables()
->> - revert for_each_present_cpu() change
->>
->> v2 -> v3:
->> - Move the helpers in lib/arm/gic-v3.c and prefix them with "gicv3_"
->> =C2=A0=C2=A0 and add _lpi prefix too
->>
->> v1 -> v2:
->> - remove memory attributes
->> ---
->> =C2=A0 lib/arm/asm/gic-v3.h | 15 +++++++++++++
->> =C2=A0 lib/arm/gic-v3.c=C2=A0=C2=A0=C2=A0=C2=A0 | 53 +++++++++++++++++=
-+++++++++++++++++++++++++++
->> =C2=A0 2 files changed, 68 insertions(+)
->>
->> diff --git a/lib/arm/asm/gic-v3.h b/lib/arm/asm/gic-v3.h
->> index 47df051..064cc68 100644
->> --- a/lib/arm/asm/gic-v3.h
->> +++ b/lib/arm/asm/gic-v3.h
->> @@ -50,6 +50,15 @@
->> =C2=A0 #define MPIDR_TO_SGI_AFFINITY(cluster_id, level) \
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 (MPIDR_AFFINITY_LEVEL(cluster_id, level=
-) <<
->> ICC_SGI1R_AFFINITY_## level ## _SHIFT)
->> =C2=A0 +#define GICR_PROPBASER_IDBITS_MASK=C2=A0=C2=A0=C2=A0 (0x1f)
->=20
-> Again this can be dropped, but not a problem.
-OK
->=20
->> +
->> +#define GICR_PENDBASER_PTZ=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
-BIT_ULL(62)
->> +
->> +#define LPI_PROP_GROUP1=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 (1 << 1)
->> +#define LPI_PROP_ENABLED=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 (1=
- << 0)
->> +#define LPI_PROP_DEFAULT_PRIO=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- 0xa0
->> +#define LPI_PROP_DEFAULT=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 (L=
-PI_PROP_DEFAULT_PRIO |
->> LPI_PROP_GROUP1 | LPI_PROP_ENABLED)
->> +
->> =C2=A0 #include <asm/arch_gicv3.h>
->> =C2=A0 =C2=A0 #ifndef __ASSEMBLY__
->> @@ -66,6 +75,8 @@ struct gicv3_data {
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 void *dist_base;
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 void *redist_bases[GICV3_NR_REDISTS];
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 void *redist_base[NR_CPUS];
->> +=C2=A0=C2=A0=C2=A0 u8 *lpi_prop;
->> +=C2=A0=C2=A0=C2=A0 void *lpi_pend[NR_CPUS];
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 unsigned int irq_nr;
->> =C2=A0 };
->> =C2=A0 extern struct gicv3_data gicv3_data;
->> @@ -82,6 +93,10 @@ extern void gicv3_write_eoir(u32 irqstat);
->> =C2=A0 extern void gicv3_ipi_send_single(int irq, int cpu);
->> =C2=A0 extern void gicv3_ipi_send_mask(int irq, const cpumask_t *dest)=
-;
->> =C2=A0 extern void gicv3_set_redist_base(size_t stride);
->> +extern void gicv3_lpi_set_config(int n, u8 val);
->> +extern u8 gicv3_lpi_get_config(int n);
->=20
-> These two declarations can be dropped, and I think it's better to
-> move their macro implementations here (they're now in patch #7).
-> But also not a problem.
-OK
->=20
->> +extern void gicv3_lpi_set_clr_pending(int rdist, int n, bool set);
->> +extern void gicv3_lpi_alloc_tables(void);
->> =C2=A0 =C2=A0 static inline void gicv3_do_wait_for_rwp(void *base)
->> =C2=A0 {
->> diff --git a/lib/arm/gic-v3.c b/lib/arm/gic-v3.c
->> index feecb5e..d752bd4 100644
->> --- a/lib/arm/gic-v3.c
->> +++ b/lib/arm/gic-v3.c
->> @@ -5,6 +5,7 @@
->> =C2=A0=C2=A0 */
->> =C2=A0 #include <asm/gic.h>
->> =C2=A0 #include <asm/io.h>
->> +#include <alloc_page.h>
->> =C2=A0 =C2=A0 void gicv3_set_redist_base(size_t stride)
->> =C2=A0 {
->> @@ -147,3 +148,55 @@ void gicv3_ipi_send_single(int irq, int cpu)
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 cpumask_set_cpu(cpu, &dest);
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 gicv3_ipi_send_mask(irq, &dest);
->> =C2=A0 }
->> +
->> +#if defined(__aarch64__)
->> +
->> +/*
->> + * alloc_lpi_tables - Allocate LPI config and pending tables
->> + * and set PROPBASER (shared by all rdistributors) and per
->> + * redistributor PENDBASER.
->> + *
->> + * gicv3_set_redist_base() must be called before
->> + */
->> +void gicv3_lpi_alloc_tables(void)
->> +{
->> +=C2=A0=C2=A0=C2=A0 unsigned long n =3D SZ_64K >> PAGE_SHIFT;
->> +=C2=A0=C2=A0=C2=A0 unsigned long order =3D fls(n);
->> +=C2=A0=C2=A0=C2=A0 u64 prop_val;
->> +=C2=A0=C2=A0=C2=A0 int cpu;
->> +
->> +=C2=A0=C2=A0=C2=A0 assert(!gicv3_redist_base());
->=20
-> I guess you wanted assert(gicv3_redist_base())? With this confirmed,
-damn, a last minute change I must have failed to test?! Indeed you're rig=
-ht.
->=20
-> Reviewed-by: Zenghui Yu <yuzenghui@huawei.com>
-Thanks!
+On 2020/3/10 22:54, Eric Auger wrote:
+> Implement main ITS commands. The code is largely inherited from
+> the ITS driver.
+> 
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> 
+> ---
+> 
+> v3 -> v4:
+> - device's itt now is a VGA
+> - pass verbose to choose whether we shall print the cmd
+> - use printf instead of report_info
+> 
+> v2 -> v3:
+> - do not use report() anymore
+> - assert if cmd_write exceeds the queue capacity
+> 
+> v1 -> v2:
+> - removed its_print_cmd_state
+> ---
+>   arm/Makefile.arm64         |   2 +-
+>   lib/arm64/asm/gic-v3-its.h |  57 +++++
+>   lib/arm64/gic-v3-its-cmd.c | 463 +++++++++++++++++++++++++++++++++++++
+>   3 files changed, 521 insertions(+), 1 deletion(-)
+>   create mode 100644 lib/arm64/gic-v3-its-cmd.c
+> 
+> diff --git a/arm/Makefile.arm64 b/arm/Makefile.arm64
+> index 60182ae..dfd0c56 100644
+> --- a/arm/Makefile.arm64
+> +++ b/arm/Makefile.arm64
+> @@ -19,7 +19,7 @@ endef
+>   cstart.o = $(TEST_DIR)/cstart64.o
+>   cflatobjs += lib/arm64/processor.o
+>   cflatobjs += lib/arm64/spinlock.o
+> -cflatobjs += lib/arm64/gic-v3-its.o
+> +cflatobjs += lib/arm64/gic-v3-its.o lib/arm64/gic-v3-its-cmd.o
+>   
+>   OBJDIRS += lib/arm64
+>   
+> diff --git a/lib/arm64/asm/gic-v3-its.h b/lib/arm64/asm/gic-v3-its.h
+> index 3da548b..889d6ce 100644
+> --- a/lib/arm64/asm/gic-v3-its.h
+> +++ b/lib/arm64/asm/gic-v3-its.h
+> @@ -102,6 +102,28 @@ extern struct its_data its_data;
+>   #define GITS_BASER_TYPE_DEVICE		1
+>   #define GITS_BASER_TYPE_COLLECTION	4
+>   
+> +/*
+> + * ITS commands
+> + */
+> +#define GITS_CMD_MAPD			0x08
+> +#define GITS_CMD_MAPC			0x09
+> +#define GITS_CMD_MAPTI			0x0a
+> +/* older GIC documentation used MAPVI for this command */
+> +#define GITS_CMD_MAPVI			GITS_CMD_MAPTI
 
->=20
->=20
-> Thanks
->=20
->> +
->> +=C2=A0=C2=A0=C2=A0 gicv3_data.lpi_prop =3D alloc_pages(order);
->> +
->> +=C2=A0=C2=A0=C2=A0 /* ID bits =3D 13, ie. up to 14b LPI INTID */
->> +=C2=A0=C2=A0=C2=A0 prop_val =3D (u64)(virt_to_phys(gicv3_data.lpi_pro=
-p)) | 13;
->> +
->> +=C2=A0=C2=A0=C2=A0 for_each_present_cpu(cpu) {
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 u64 pend_val;
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 void *ptr;
->> +
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ptr =3D gicv3_data.redist_=
-base[cpu];
->> +
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 writeq(prop_val, ptr + GIC=
-R_PROPBASER);
->> +
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 gicv3_data.lpi_pend[cpu] =3D=
- alloc_pages(order);
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 pend_val =3D (u64)(virt_to=
-_phys(gicv3_data.lpi_pend[cpu]));
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 writeq(pend_val, ptr + GIC=
-R_PENDBASER);
->> +=C2=A0=C2=A0=C2=A0 }
->> +}
->> +
->> +void gicv3_lpi_set_clr_pending(int rdist, int n, bool set)
->> +{
->> +=C2=A0=C2=A0=C2=A0 u8 *ptr =3D gicv3_data.lpi_pend[rdist];
->> +=C2=A0=C2=A0=C2=A0 u8 mask =3D 1 << (n % 8), byte;
->> +
->> +=C2=A0=C2=A0=C2=A0 ptr +=3D (n / 8);
->> +=C2=A0=C2=A0=C2=A0 byte =3D *ptr;
->> +=C2=A0=C2=A0=C2=A0 if (set)
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 byte |=3D=C2=A0 mask;
->> +=C2=A0=C2=A0=C2=A0 else
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 byte &=3D ~mask;
->> +=C2=A0=C2=A0=C2=A0 *ptr =3D byte;
->> +}
->> +#endif /* __aarch64__ */
->>
->=20
->=20
+You can drop it.
+
+> +#define GITS_CMD_MAPI			0x0b
+> +#define GITS_CMD_MOVI			0x01
+> +#define GITS_CMD_DISCARD		0x0f
+> +#define GITS_CMD_INV			0x0c
+> +#define GITS_CMD_MOVALL			0x0e
+> +#define GITS_CMD_INVALL			0x0d
+> +#define GITS_CMD_INT			0x03
+> +#define GITS_CMD_CLEAR			0x04
+> +#define GITS_CMD_SYNC			0x05
+> +
+> +struct its_cmd_block {
+> +	u64 raw_cmd[4];
+> +};
+> +
+>   extern void its_parse_typer(void);
+>   extern void its_init(void);
+>   extern int its_baser_lookup(int i, struct its_baser *baser);
+> @@ -109,4 +131,39 @@ extern void its_enable_defaults(void);
+>   extern struct its_device *its_create_device(u32 dev_id, int nr_ites);
+>   extern struct its_collection *its_create_collection(u32 col_id, u32 target_pe);
+>   
+> +extern void __its_send_mapd(struct its_device *dev, int valid, bool verbose);
+> +extern void __its_send_mapc(struct its_collection *col, int valid, bool verbose);
+> +extern void __its_send_mapti(struct its_device *dev, u32 irq_id, u32 event_id,
+> +			     struct its_collection *col, bool verbose);
+> +extern void __its_send_int(struct its_device *dev, u32 event_id, bool verbose);
+> +extern void __its_send_inv(struct its_device *dev, u32 event_id, bool verbose);
+> +extern void __its_send_discard(struct its_device *dev, u32 event_id, bool verbose);
+> +extern void __its_send_clear(struct its_device *dev, u32 event_id, bool verbose);
+> +extern void __its_send_invall(struct its_collection *col, bool verbose);
+> +extern void __its_send_movi(struct its_device *dev, struct its_collection *col,
+> +			    u32 id, bool verbose);
+> +extern void __its_send_sync(struct its_collection *col, bool verbose);
+> +
+> +#define its_send_mapd(dev, valid)			__its_send_mapd(dev, valid, true)
+> +#define its_send_mapc(col, valid)			__its_send_mapc(col, valid, true)
+> +#define its_send_mapti(dev, irqid, eventid, col)	__its_send_mapti(dev, irqid, eventid, col, true)
+> +#define its_send_int(dev, eventid)			__its_send_int(dev, eventid, true)
+> +#define its_send_inv(dev, eventid)			__its_send_inv(dev, eventid, true)
+> +#define its_send_discard(dev, eventid)			__its_send_discard(dev, eventid, true)
+> +#define its_send_clear(dev, eventid)			__its_send_clear(dev, eventid, true)
+> +#define its_send_invall(col)				__its_send_invall(col, true)
+> +#define its_send_movi(dev, col, id)			__its_send_movi(dev, col, id, true)
+> +#define its_send_sync(col)				__its_send_sync(col, true)
+> +
+> +#define its_send_mapd_nv(dev, valid)			__its_send_mapd(dev, valid, false)
+> +#define its_send_mapc_nv(col, valid)			__its_send_mapc(col, valid, false)
+> +#define its_send_mapti_nv(dev, irqid, eventid, col)	__its_send_mapti(dev, irqid, eventid, col, false)
+> +#define its_send_int_nv(dev, eventid)			__its_send_int(dev, eventid, false)
+> +#define its_send_inv_nv(dev, eventid)			__its_send_inv(dev, eventid, false)
+> +#define its_send_discard_nv(dev, eventid)		__its_send_discard(dev, eventid, false)
+> +#define its_send_clear_nv(dev, eventid)			__its_send_clear(dev, eventidn false)
+> +#define its_send_invall_nv(col)				__its_send_invall(col, false)
+> +#define its_send_movi_nv(dev, col, id)			__its_send_movi(dev, col, id, false)
+> +#define its_send_sync_nv(col)				__its_send_sync(col, false)
+
+(not verbose? Naming is always difficult ;-).)
+
+[...]
+
+> +
+> +static void its_build_invall_cmd(struct its_cmd_block *cmd,
+> +			      struct its_cmd_desc *desc)
+> +{
+> +	its_encode_cmd(cmd, GITS_CMD_INVALL);
+> +	its_encode_collection(cmd, desc->its_invall_cmd.col->col_id);
+> +	its_fixup_cmd(cmd);
+> +	if (desc->verbose)
+> +		printf("INVALL col_id=%d\n", desc->its_invall_cmd.col->col_id);
+> +}
+> +
+> +static void its_build_clear_cmd(struct its_cmd_block *cmd,
+> +				struct its_cmd_desc *desc)
+> +{
+> +	its_encode_cmd(cmd, GITS_CMD_CLEAR);
+> +	its_encode_devid(cmd, desc->its_clear_cmd.dev->device_id);
+> +	its_encode_event_id(cmd, desc->its_clear_cmd.event_id);
+> +	its_fixup_cmd(cmd);
+> +	if (desc->verbose)
+> +		printf("CLEAR col_id=%d\n", desc->its_invall_cmd.col->col_id);
+
+its_invall_cmd.col->col_id?
+
+Don't you want to print the arguments (DeviceID and EventID) as you've
+done for other commands?
+
+> +}
+> +
+> +static void its_build_discard_cmd(struct its_cmd_block *cmd,
+> +				  struct its_cmd_desc *desc)
+> +{
+> +	its_encode_cmd(cmd, GITS_CMD_DISCARD);
+> +	its_encode_devid(cmd, desc->its_discard_cmd.dev->device_id);
+> +	its_encode_event_id(cmd, desc->its_discard_cmd.event_id);
+> +	its_fixup_cmd(cmd);
+> +	if (desc->verbose)
+> +		printf("DISCARD col_id=%d\n", desc->its_invall_cmd.col->col_id);
+
+The same question here.
+
+[...]
+
+And afaict, there's some fixes for the Linux ITS driver since the RFC
+version of this series. Please have a check if you can.
+
+
+Thanks,
+Zenghui
 
