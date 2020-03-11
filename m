@@ -2,62 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 996CE1825BC
-	for <lists+kvm@lfdr.de>; Thu, 12 Mar 2020 00:21:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 06A551825C0
+	for <lists+kvm@lfdr.de>; Thu, 12 Mar 2020 00:22:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731374AbgCKXVO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Mar 2020 19:21:14 -0400
-Received: from mail-pg1-f193.google.com ([209.85.215.193]:33627 "EHLO
-        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726194AbgCKXVO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 11 Mar 2020 19:21:14 -0400
-Received: by mail-pg1-f193.google.com with SMTP id m5so2045850pgg.0
-        for <kvm@vger.kernel.org>; Wed, 11 Mar 2020 16:21:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=5eiBg99YYHrlAxjCNvjNGTI4q/+L4CRApPkS5MR51wI=;
-        b=BRXJifeOewSDVsRbWPQODDRYNGXQ79IE0qOAgkq+MsrP37AFi6JpNrR327wiBo9gAU
-         p5LcGyQ4uvDxfE6Sy1m10puAe+S6BSLMTZvV6Iqk5lm/CfBOY17TURTw5tLUUFMYCHjf
-         K1BpmisQ6gVjkFisJSWP/MG0vb4f4QBDg9g246AYEN37uOH7oX8R3FQVS3Zgm8R1rXmW
-         7IYBtVhkP1bkzip47NSacM1T2gQw5FYLIzbLKwmMI54hFJ8FJ50bY2CYNJ9EjUUetm2j
-         iQe9exDSUPb/u7WsxAseD+6qqAfzuDAsbTqjCdxYaBFT56cZrvH3OxP+KmpHnNlNSV/b
-         eOfw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=5eiBg99YYHrlAxjCNvjNGTI4q/+L4CRApPkS5MR51wI=;
-        b=YiSl1Ax2w7wtOiBt3eVkt8TJlJwYK8yUvvSz/CR8is51sMvZAzPdNTl/EiOAZwegs6
-         SOAekuHCVkLSd/76zI6A5WLomScIh+LA10+w3MfW0DxVInfuBNMKNL4j/0cpxJAW9bKg
-         pDXyIk3o64IkwoFrBtKM3siobInaJJ76r4nK4inJ3imf99gscn2p1u4vdMxo2fMEGA5L
-         wBnlyW2VCbohSQxPBeEa3EOSlHbjj7cvP9bwOJEgOPXwMoTUX7ItWp/k31xHFFsLV4tW
-         V3+tYMOLZpLPs1FQpKOdOmdS5d+RSudC0L/7Y121nbnhH3nSpM0ZvzsGIMXuJTXZpnHS
-         Qr/Q==
-X-Gm-Message-State: ANhLgQ0G2lihi6QvhEd+b2MrDg58PaFrSyir8qZbBKyo804+jtGVQDPq
-        ivsFJe2ZcnKQWWy8ecRvxcocMDg5MCI=
-X-Google-Smtp-Source: ADFU+vvEwa9h/8DSeKM6MbgU5hOKXd1JFBGDBHT5eD7T5CRxGuoNdBaZHITimjElvIm81Cr7wz1n6w==
-X-Received: by 2002:a63:1547:: with SMTP id 7mr4804452pgv.353.1583968870994;
-        Wed, 11 Mar 2020 16:21:10 -0700 (PDT)
-Received: from [10.235.171.60] ([73.93.152.208])
-        by smtp.gmail.com with ESMTPSA id y18sm50902854pfe.19.2020.03.11.16.21.09
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 11 Mar 2020 16:21:10 -0700 (PDT)
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3608.60.0.2.5\))
+        id S2387404AbgCKXWp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Mar 2020 19:22:45 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:42286 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726194AbgCKXWp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 Mar 2020 19:22:45 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02BNJMi7002706;
+        Wed, 11 Mar 2020 23:22:39 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=mime-version :
+ message-id : date : from : to : cc : subject : references : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2020-01-29;
+ bh=XH5izjhAjE3b/k6+22PeagK1e6WFNeDzjPmPOyeLkyo=;
+ b=IBLsF9Hcz+r4gSrMjMwlipxxnLfMS4KacNF9wGmUM0OsQRLMhZkzGC9MQSH11xV8rdPx
+ 7rAyitgMlbH5KvUAt/9jtFUfZ6CUdObiBE8wR/r3BVKlQCPLm8qD1t14Y+S4h/Rv81y9
+ 4c5DWCZM+y2GlbmK3/DgffRdXy8Ji7F3ppENV972pmY1vs0+ZJCtTOewjhWFGrWJgWiV
+ Vj963edqaQIXIFXgQyL8DYkcXCVhfMWzVhd4k1Nk2tRCrQQDB8kyaZueBepDq2OPYHEj
+ AfGSMXGnoiV6mKwbgQlEEGy/SzFcFOSB8JlnOUpJrFH1uxgwa+SBwzQV2vb81C2jQxqm Dw== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by userp2120.oracle.com with ESMTP id 2yp7hmay14-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 11 Mar 2020 23:22:39 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02BNKEY0157785;
+        Wed, 11 Mar 2020 23:22:39 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by userp3020.oracle.com with ESMTP id 2ypv9wf5pp-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 11 Mar 2020 23:22:38 +0000
+Received: from abhmp0021.oracle.com (abhmp0021.oracle.com [141.146.116.27])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 02BNMbYC019399;
+        Wed, 11 Mar 2020 23:22:37 GMT
+Received: from [192.168.14.112] (/109.66.218.218) by default (Oracle Beehive
+ Gateway v4.0) with ESMTP ; Wed, 11 Mar 2020 16:22:17 -0700
+USER-AGENT: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.13; rv:68.0)
+ Gecko/20100101 Thunderbird/68.5.0
+Content-Language: en-US
+MIME-Version: 1.0
+Message-ID: <e87a88de-f1cd-0bde-48a8-c66b915435de@oracle.com>
+Date:   Wed, 11 Mar 2020 23:22:13 +0000 (UTC)
+From:   Liran Alon <liran.alon@oracle.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Nadav Amit <nadav.amit@gmail.com>,
+        Krish Sadhukhan <krish.sadhukhan@oracle.com>,
+        kvm list <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>, jmattson@google.com
 Subject: Re: [PATCH] kvm-unit-test: nVMX: Test Selector and Base Address
  fields of Guest Segment Registers on vmentry of nested guests
-From:   Nadav Amit <nadav.amit@gmail.com>
-In-Reply-To: <20200311231206.GL21852@linux.intel.com>
-Date:   Wed, 11 Mar 2020 16:21:08 -0700
-Cc:     Krish Sadhukhan <krish.sadhukhan@oracle.com>,
-        kvm list <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jim Mattson <jmattson@google.com>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <E0581325-7501-438D-B547-4FEC4F2C2D28@gmail.com>
 References: <20200310225149.31254-1-krish.sadhukhan@oracle.com>
  <20200310225149.31254-2-krish.sadhukhan@oracle.com>
  <20200311150516.GB21852@linux.intel.com>
@@ -66,34 +61,40 @@ References: <20200310225149.31254-1-krish.sadhukhan@oracle.com>
  <E53A1909-C614-401C-A22E-8A22B3E36225@gmail.com>
  <d5f0ba6a-8c7f-60b6-871b-615d11b08a1b@oracle.com>
  <20200311231206.GL21852@linux.intel.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Liran Alon <liran.alon@oracle.com>
-X-Mailer: Apple Mail (2.3608.60.0.2.5)
+In-Reply-To: <20200311231206.GL21852@linux.intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9557 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 mlxlogscore=999
+ spamscore=0 malwarescore=0 mlxscore=0 adultscore=0 phishscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2001150001 definitions=main-2003110131
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9557 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 spamscore=0
+ priorityscore=1501 clxscore=1015 mlxscore=0 impostorscore=0
+ mlxlogscore=999 suspectscore=0 phishscore=0 malwarescore=0 adultscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2001150001 definitions=main-2003110131
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> On Mar 11, 2020, at 4:12 PM, Sean Christopherson =
-<sean.j.christopherson@intel.com> wrote:
->=20
+
+On 12/03/2020 1:12, Sean Christopherson wrote:
 > On Thu, Mar 12, 2020 at 12:54:05AM +0200, Liran Alon wrote:
->> Of course it was best if Intel would have shared their unit-tests for =
-CPU
->> functionality (Sean? I'm looking at you :P), but I am not aware that =
-they
+>> Of course it was best if Intel would have shared their unit-tests for CPU
+>> functionality (Sean? I'm looking at you :P), but I am not aware that they
 >> did.
->=20
 > Only in my dreams :-)  I would love to open source some of Intel's
-> validation tools so that they could be adapted to hammer KVM, but =
-it'll
+> validation tools so that they could be adapted to hammer KVM, but it'll
 > never happen for a variety of reasons.
 
-FYI: In 2014 I ran Intel=E2=80=99s fuzzing-tool (Cafe) to test KVM and =
-found (and
-fixed) ~100 bugs. And I did not even test nested virtualization=E2=80=A6
+I hope then you at least built a setup internally at Intel that runs 
+these test suites on top of KVM to find bugs. :)
+It would also be nice of Intel to even setup this internally on top of 
+other common hypervisors (e.g. Hyper-V, VMware) and report bugs to vendors.
 
-=
-http://www.cs.technion.ac.il/people/namit/online-publications/161-amit.pdf=
+-Liran
 
 
