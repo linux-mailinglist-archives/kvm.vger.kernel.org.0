@@ -2,102 +2,185 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id CE74F18170A
-	for <lists+kvm@lfdr.de>; Wed, 11 Mar 2020 12:49:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B342F18174C
+	for <lists+kvm@lfdr.de>; Wed, 11 Mar 2020 12:59:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729067AbgCKLtU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Mar 2020 07:49:20 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:36929 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1725834AbgCKLtU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 11 Mar 2020 07:49:20 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1583927359;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=F5OgNaYAikVgpZYOSNk5y2jqMOtP53edDDqZVD/pDRE=;
-        b=RYu1tv+QbJaZlAuU5XuoKwZiYxM/hJbhRqklnpmWshRELnoL5dHaF041C+xE7mXqqrx+Lc
-        8wnWdA/54zISNbi+yfl6huFpSwX9wPJ19K9ACS66VWr0yxcmGkKAJq4125SeAYNDnJpQQK
-        85qAMaV7QvGRvjzvCyZBT6C15ApwCBY=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-74-EzhzE16mOACWoHK2hrEDwg-1; Wed, 11 Mar 2020 07:49:17 -0400
-X-MC-Unique: EzhzE16mOACWoHK2hrEDwg-1
-Received: by mail-wm1-f72.google.com with SMTP id t2so564812wmj.2
-        for <kvm@vger.kernel.org>; Wed, 11 Mar 2020 04:49:17 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=F5OgNaYAikVgpZYOSNk5y2jqMOtP53edDDqZVD/pDRE=;
-        b=VSnUgnu9b+ceVJfaGUgHiWTTOv61umi0fTXCA+t+MAqoUigd194eaHFR2fnMne0f7D
-         tPPaX3qgmS2kL77iHjocyml2Oe1JGZ8rkn0u4qUUykvq6mEwDLV+QG3xOzUgvbwJr0ex
-         r6ldQcTT88WomNlrzRSd7ML2/85T+l5QEAQlIvTIy5dNoQjqWQy9uYL18pRdqGNpIQV1
-         AORZg5KHIAH0bNewGDtVqwRmMmRjPu6AOmtd6o36sidCOYTk0hKmoqHWVJd1clTAL1dT
-         tEYu8ZNZkGRKeiFwsHqCdIP0O+7f58OPRoUp3Sm+Jkv5NMpOaC1CMRAPigqHG2PEzNqK
-         q5/A==
-X-Gm-Message-State: ANhLgQ0tRGiloWuZd68a1y1sqe9tLigYuWSgCdNHQXCCfjEujORINQdJ
-        I7gT73R4TowcoKJlUeMpCfC/WHE9LlTbPAEMVu42El4vd2UkS1Y94e8YCFibOmS5JEuR0/2hSft
-        PsX3xImk85LyO
-X-Received: by 2002:a5d:6a4d:: with SMTP id t13mr4127281wrw.344.1583927356341;
-        Wed, 11 Mar 2020 04:49:16 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vsLTPh5QjDF4BVIWhl7Hz6t3aq6gMtSaIcj8l84Z5nkZqsVtENlcA0VXwUD8mRF8pmkrPvYTA==
-X-Received: by 2002:a5d:6a4d:: with SMTP id t13mr4127247wrw.344.1583927356118;
-        Wed, 11 Mar 2020 04:49:16 -0700 (PDT)
-Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id c4sm8261810wml.7.2020.03.11.04.49.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Mar 2020 04:49:14 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     kbuild test robot <lkp@intel.com>
-Cc:     kbuild-all@lists.01.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Liran Alon <liran.alon@oracle.com>,
-        Miaohe Lin <linmiaohe@huawei.com>
-Subject: Re: [RFC PATCH] KVM: nVMX: nested_vmx_handle_enlightened_vmptrld() can be static
-In-Reply-To: <20200310200830.GA84412@69fab159caf3>
-References: <20200309155216.204752-4-vkuznets@redhat.com> <20200310200830.GA84412@69fab159caf3>
-Date:   Wed, 11 Mar 2020 12:49:13 +0100
-Message-ID: <87d09jaz7q.fsf@vitty.brq.redhat.com>
+        id S1729237AbgCKL7T (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Mar 2020 07:59:19 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:11662 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1729057AbgCKL7T (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 Mar 2020 07:59:19 -0400
+Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.58])
+        by Forcepoint Email with ESMTP id 84AEF31DAF8532D5D5B4;
+        Wed, 11 Mar 2020 19:59:14 +0800 (CST)
+Received: from [127.0.0.1] (10.173.222.27) by DGGEMS406-HUB.china.huawei.com
+ (10.3.19.206) with Microsoft SMTP Server id 14.3.487.0; Wed, 11 Mar 2020
+ 19:59:07 +0800
+Subject: Re: [kvm-unit-tests PATCH v5 10/13] arm/arm64: ITS: INT functional
+ tests
+To:     Eric Auger <eric.auger@redhat.com>, <eric.auger.pro@gmail.com>,
+        <maz@kernel.org>, <kvmarm@lists.cs.columbia.edu>,
+        <kvm@vger.kernel.org>, <qemu-devel@nongnu.org>,
+        <qemu-arm@nongnu.org>
+CC:     <drjones@redhat.com>, <andre.przywara@arm.com>,
+        <peter.maydell@linaro.org>, <alexandru.elisei@arm.com>,
+        <thuth@redhat.com>
+References: <20200310145410.26308-1-eric.auger@redhat.com>
+ <20200310145410.26308-11-eric.auger@redhat.com>
+From:   Zenghui Yu <yuzenghui@huawei.com>
+Message-ID: <d3f651a0-2344-4d6e-111b-be133db7e068@huawei.com>
+Date:   Wed, 11 Mar 2020 19:59:05 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <20200310145410.26308-11-eric.auger@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.173.222.27]
+X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-kbuild test robot <lkp@intel.com> writes:
+Hi Eric,
 
-> Fixes: e3fd8bda412e ("KVM: nVMX: properly handle errors in nested_vmx_handle_enlightened_vmptrld()")
-> Signed-off-by: kbuild test robot <lkp@intel.com>
+On 2020/3/10 22:54, Eric Auger wrote:
+> Triggers LPIs through the INT command.
+> 
+> the test checks the LPI hits the right CPU and triggers
+> the right LPI intid, ie. the translation is correct.
+> 
+> Updates to the config table also are tested, along with inv
+> and invall commands.
+> 
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> 
 > ---
->  nested.c |    2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> index 65df8bcbb9c86..1d9ab1e9933fb 100644
-> --- a/arch/x86/kvm/vmx/nested.c
-> +++ b/arch/x86/kvm/vmx/nested.c
-> @@ -1910,7 +1910,7 @@ static int copy_vmcs12_to_enlightened(struct vcpu_vmx *vmx)
->   * This is an equivalent of the nested hypervisor executing the vmptrld
->   * instruction.
->   */
-> -enum nested_evmptrld_status nested_vmx_handle_enlightened_vmptrld(
-> +static enum nested_evmptrld_status nested_vmx_handle_enlightened_vmptrld(
->  	struct kvm_vcpu *vcpu, bool from_launch)
->  {
->  	struct vcpu_vmx *vmx = to_vmx(vcpu);
->
 
-Yea,
+[...]
 
-I accidentially dropped 'static' in PATCH3, will restore it in v2.
+> +static void test_its_trigger(void)
+> +{
+> +	struct its_collection *col3, *col2;
+> +	struct its_device *dev2, *dev7;
+> +
+> +	if (its_prerequisites(4))
+> +		return;
+> +
+> +	dev2 = its_create_device(2 /* dev id */, 8 /* nb_ites */);
+> +	dev7 = its_create_device(7 /* dev id */, 8 /* nb_ites */);
+> +
+> +	col3 = its_create_collection(3 /* col id */, 3/* target PE */);
+> +	col2 = its_create_collection(2 /* col id */, 2/* target PE */);
+> +
+> +	gicv3_lpi_set_config(8195, LPI_PROP_DEFAULT);
+> +	gicv3_lpi_set_config(8196, LPI_PROP_DEFAULT);
+> +
+> +	its_send_invall(col2);
+> +	its_send_invall(col3);
 
-Thanks!
+These two INVALLs should be issued after col2 and col3 are mapped,
+otherwise this will cause the INVALL command error as per the spec
+(though KVM doesn't complain it at all).
 
--- 
-Vitaly
+> +
+> +	report_prefix_push("int");
+> +	/*
+> +	 * dev=2, eventid=20  -> lpi= 8195, col=3
+> +	 * dev=7, eventid=255 -> lpi= 8196, col=2
+> +	 * Trigger dev2, eventid=20 and dev7, eventid=255
+> +	 * Check both LPIs hit
+> +	 */
+> +
+> +	its_send_mapd(dev2, true);
+> +	its_send_mapd(dev7, true);
+> +
+> +	its_send_mapc(col3, true);
+> +	its_send_mapc(col2, true);
+> +
+> +	its_send_mapti(dev2, 8195 /* lpi id */, 20 /* event id */, col3);
+> +	its_send_mapti(dev7, 8196 /* lpi id */, 255 /* event id */, col2);
+> +
+> +	lpi_stats_expect(3, 8195);
+> +	its_send_int(dev2, 20);
+> +	check_lpi_stats("dev=2, eventid=20  -> lpi= 8195, col=3");
+> +
+> +	lpi_stats_expect(2, 8196);
+> +	its_send_int(dev7, 255);
+> +	check_lpi_stats("dev=7, eventid=255 -> lpi= 8196, col=2");
+> +
+> +	report_prefix_pop();
+> +
+> +	report_prefix_push("inv/invall");
+> +
+> +	/*
+> +	 * disable 8195, check dev2/eventid=20 does not trigger the
+> +	 * corresponding LPI
+> +	 */
+> +	gicv3_lpi_set_config(8195, LPI_PROP_DEFAULT & ~LPI_PROP_ENABLED);
+> +	its_send_inv(dev2, 20);
+> +
+> +	lpi_stats_expect(-1, -1);
+> +	its_send_int(dev2, 20);
+> +	check_lpi_stats("dev2/eventid=20 does not trigger any LPI");
+> +
+> +	/*
+> +	 * re-enable the LPI but willingly do not call invall
+> +	 * so the change in config is not taken into account.
+> +	 * The LPI should not hit
+> +	 */
+> +	gicv3_lpi_set_config(8195, LPI_PROP_DEFAULT);
+> +	lpi_stats_expect(-1, -1);
+> +	its_send_int(dev2, 20);
+> +	check_lpi_stats("dev2/eventid=20 still does not trigger any LPI");
+> +
+> +	/* Now call the invall and check the LPI hits */
+> +	its_send_invall(col3);
+> +	lpi_stats_expect(3, 8195);
+> +	its_send_int(dev2, 20);
+> +	check_lpi_stats("dev2/eventid=20 now triggers an LPI");
+> +
+> +	report_prefix_pop();
+> +
+> +	report_prefix_push("mapd valid=false");
+> +	/*
+> +	 * Unmap device 2 and check the eventid 20 formerly
+> +	 * attached to it does not hit anymore
+> +	 */
+> +
+> +	its_send_mapd(dev2, false);
+> +	lpi_stats_expect(-1, -1);
+> +	its_send_int(dev2, 20);
+> +	check_lpi_stats("no LPI after device unmap");
+> +	report_prefix_pop();
+> +
+> +	/* Unmap the collection this time and check no LPI does hit */
+> +	report_prefix_push("mapc valid=false");
+> +	its_send_mapc(col2, false);
+
+And as for the MAPC, the spec says:
+
+" When V is 0:
+Behavior is unpredictable if there are interrupts that are mapped to the
+specified collection, with the restriction that further translation
+requests from that device are ignored. "
+
+So this collection-unmap test may not make sense?
+
+> +	lpi_stats_expect(-1, -1);
+> +	its_send_int(dev7, 255);
+> +	check_lpi_stats("no LPI after collection unmap");
+> +	report_prefix_pop();
+> +}
+
+[...]
+
+Otherwise looks good.
+
+
+Thanks,
+Zenghui
 
