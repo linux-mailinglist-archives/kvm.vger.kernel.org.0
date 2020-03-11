@@ -2,121 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6E4D1181965
-	for <lists+kvm@lfdr.de>; Wed, 11 Mar 2020 14:16:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 56DED1819C1
+	for <lists+kvm@lfdr.de>; Wed, 11 Mar 2020 14:30:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729461AbgCKNQe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Mar 2020 09:16:34 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:46148 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729103AbgCKNQd (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 11 Mar 2020 09:16:33 -0400
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 02BDFgbB030116
-        for <kvm@vger.kernel.org>; Wed, 11 Mar 2020 09:16:32 -0400
-Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2yq04ghny2-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Wed, 11 Mar 2020 09:16:32 -0400
-Received: from localhost
-        by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
-        Wed, 11 Mar 2020 13:11:02 -0000
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
-        by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Wed, 11 Mar 2020 13:10:59 -0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 02BDAwc535848430
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 11 Mar 2020 13:10:58 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 31123A405D;
-        Wed, 11 Mar 2020 13:10:58 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 295F3A4057;
-        Wed, 11 Mar 2020 13:10:58 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
-        Wed, 11 Mar 2020 13:10:58 +0000 (GMT)
-Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 25651)
-        id E0C45E024B; Wed, 11 Mar 2020 14:10:57 +0100 (CET)
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
-To:     Janosch Frank <frankja@linux.vnet.ibm.com>
-Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        Thomas Huth <thuth@redhat.com>,
-        Andrew Jones <drjones@redhat.com>
-Subject: [PATCH 2/2] selftests: KVM: s390: fix format strings for access reg test
-Date:   Wed, 11 Mar 2020 14:10:56 +0100
-X-Mailer: git-send-email 2.24.1
-In-Reply-To: <20200311131056.140016-1-borntraeger@de.ibm.com>
-References: <20200311131056.140016-1-borntraeger@de.ibm.com>
+        id S1729532AbgCKNag (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Mar 2020 09:30:36 -0400
+Received: from mail-oi1-f194.google.com ([209.85.167.194]:32790 "EHLO
+        mail-oi1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729103AbgCKNaf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 Mar 2020 09:30:35 -0400
+Received: by mail-oi1-f194.google.com with SMTP id r7so1886512oij.0;
+        Wed, 11 Mar 2020 06:30:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=ZsSuSLKEfu3I1SAJl6xAjr3wjSOLPeFy3yPY3Iv28F8=;
+        b=O63n39UljFStteXPWaHbRbdpOd2uAMy0s5j2fnaLfILxlCicixRYjHxQw6QvFk++1b
+         VaGfDRjDs1bbaWSa4F64rl+av5D5RoudRzzzYBvbXP8ZHU6oiBIUnnud29vhj85vpwHu
+         LHpSKss9nDNTi3xXzDulVL99eHFHJgf9/eYIQk2qA9+HwTifaclc4a9B7vluubeFe+eM
+         LWsG3GcAZOYFOp8996mmBZ177nTLZzQNxrbEXCCH7Aj4mGIMNkT5rKcUwm/kBge5Epa/
+         hbTvvnIXyorhpxoO9xjdlF8PkkXrEpHn7RUAN89qb4Dh+48hY9BfwZkHd3NPSydmQUGl
+         jVLA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=ZsSuSLKEfu3I1SAJl6xAjr3wjSOLPeFy3yPY3Iv28F8=;
+        b=sJhqy5qCwY0coQYSHPGsdHIv1pvXGIA2RrPP7XlRXdlUBOLlbEhFnkI0eOF/mXArN/
+         ZPDJTzZkqO0rKX2yKZMumj1GDmKcbaKxbHMGyfICT031H8XWlaVFUiF2wbRI+6etejim
+         2YHQqKjdNBUZ8/2c5ijy53w4BQS0RzdaAqqxYK2tCldp+T6/jXswvjmMxmMMka+PLoP5
+         +1AUhwbWvcE0Y5V+0ipx8+Bl0bDWBNANq7luye9lYPkKwwCXkvNN5ocVjcRul5KQXHSH
+         GuIHVKHLGtZ5uq3gsEAqvryKiqEqnGj0l+WW2jJNN4l+RxM769GbYe4VgalV57I5Uwyh
+         i3FA==
+X-Gm-Message-State: ANhLgQ2XuStqeHLMwv6499PxPg8aaFarLDeb1BvQWVRyHz1F8ewfZjqB
+        7CKWCzyuj5YE0YZRmWiGBAUn1O3eyuTstF4uv1A=
+X-Google-Smtp-Source: ADFU+vtFqcIvIEMwdHZH1rUNUjfICLAyZmD0fE5Ggd/lDRNjab4mHbySl80mFwEwNzKaMPjOQGEMFq6AFbJCgSHIM9c=
+X-Received: by 2002:aca:3544:: with SMTP id c65mr1865799oia.160.1583933434832;
+ Wed, 11 Mar 2020 06:30:34 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-x-cbid: 20031113-0028-0000-0000-000003E31DA7
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20031113-0029-0000-0000-000024A86214
-Message-Id: <20200311131056.140016-3-borntraeger@de.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
- definitions=2020-03-11_05:2020-03-11,2020-03-11 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 adultscore=0
- impostorscore=0 mlxscore=0 mlxlogscore=816 spamscore=0 lowpriorityscore=0
- bulkscore=0 suspectscore=0 phishscore=0 priorityscore=1501 clxscore=1015
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
- definitions=main-2003110084
+References: <20200213194157.5877-1-sds@tycho.nsa.gov> <CAHC9VhSsjrgu2Jn+yiV5Bz_wt2x5bgEXdhjqLA+duWYNo4gOtw@mail.gmail.com>
+ <eb2dbe22-91af-17c6-3dfb-d9ec619a4d7a@schaufler-ca.com> <CAKOZueuus6fVqrKsfNgSYGo-kXJ3f6Mv_NJZStY1Uo934=SjDw@mail.gmail.com>
+ <CAKOZuetUvu=maOmHXjCqkHaYEN5Sf+pKBc3BZ+qpy1tE1NJ9xQ@mail.gmail.com>
+ <CAEjxPJ4+NM6-tfOeZ6UQfas6=KxtBTAk6f23GEyLomFn3K3qew@mail.gmail.com> <CAKOZuevcz+fvfhRXPx2iZGtkk6+FjVj3ZSaGGT8DfwsOJR0k3A@mail.gmail.com>
+In-Reply-To: <CAKOZuevcz+fvfhRXPx2iZGtkk6+FjVj3ZSaGGT8DfwsOJR0k3A@mail.gmail.com>
+From:   Stephen Smalley <stephen.smalley.work@gmail.com>
+Date:   Wed, 11 Mar 2020 09:31:34 -0400
+Message-ID: <CAEjxPJ7DykRX7Q1NLhtRh123rjAvW4t6symJ5ochth+iCyg3kg@mail.gmail.com>
+Subject: Re: [RFC PATCH] security,anon_inodes,kvm: enable security support for
+ anon inodes
+To:     Daniel Colascione <dancol@google.com>
+Cc:     Casey Schaufler <casey@schaufler-ca.com>,
+        Sandeep Patil <sspatil@google.com>,
+        Paul Moore <paul@paul-moore.com>,
+        LSM List <linux-security-module@vger.kernel.org>,
+        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        SElinux list <selinux@vger.kernel.org>, kvm@vger.kernel.org,
+        Nick Kralevich <nnk@google.com>,
+        Stephen Smalley <sds@tycho.nsa.gov>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-acrs are 32 bit and not 64 bit.
+On Tue, Mar 10, 2020 at 5:51 PM Daniel Colascione <dancol@google.com> wrote:
+>
+> On Tue, Mar 10, 2020 at 11:25 AM Stephen Smalley
+> <stephen.smalley.work@gmail.com> wrote:
+> >
+> > On Tue, Mar 10, 2020 at 2:11 PM Daniel Colascione <dancol@google.com> wrote:
+> > >
+> > > On Thu, Feb 20, 2020 at 10:50 AM Daniel Colascione <dancol@google.com> wrote:
+> > > >
+> > > > On Thu, Feb 20, 2020 at 10:11 AM Casey Schaufler <casey@schaufler-ca.com> wrote:
+> > > > >
+> > > > > On 2/17/2020 4:14 PM, Paul Moore wrote:
+> > > > > > On Thu, Feb 13, 2020 at 2:41 PM Stephen Smalley <sds@tycho.nsa.gov> wrote:
+> > > > > >> We are primarily posting this RFC patch now so that the two different
+> > > > > >> approaches can be concretely compared.  We anticipate a hybrid of the
+> > > > > >> two approaches being the likely outcome in the end.  In particular
+> > > > > >> if support for allocating a separate inode for each of these files
+> > > > > >> is acceptable, then we would favor storing the security information
+> > > > > >> in the inode security blob and using it instead of the file security
+> > > > > >> blob.
+> > > > > > Bringing this back up in hopes of attracting some attention from the
+> > > > > > fs-devel crowd and Al.  As Stephen already mentioned, from a SELinux
+> > > > > > perspective we would prefer to attach the security blob to the inode
+> > > > > > as opposed to the file struct; does anyone have any objections to
+> > > > > > that?
+> > > > >
+> > > > > Sorry for the delay - been sick the past few days.
+> > > > >
+> > > > > I agree that the inode is a better place than the file for information
+> > > > > about the inode. This is especially true for Smack, which uses
+> > > > > multiple extended attributes in some cases. I don't believe that any
+> > > > > except the access label will be relevant to anonymous inodes, but
+> > > > > I can imagine security modules with policies that would.
+> > > > >
+> > > > > I am always an advocate of full xattr support. It goes a long
+> > > > > way in reducing the number and complexity of special case interfaces.
+> > > >
+> > > > It sounds like we have broad consensus on using the inode to hold
+> > > > security information, implying that anon_inodes should create new
+> > > > inodes. Do any of the VFS people want to object?
+> > >
+> > > Ping?
+> >
+> > I'd recommend refreshing your patch series to incorporate feedback on
+> > the previous version and re-post,
+> > including viro and linux-fsdevel on the cc, and see if they have any
+> > comments on it.
+>
+> I don't think there's anything in the patch series that needs to
+> change right now. AFAICT, we're still just waiting on comment from the
+> VFS people, who should be on this thread. Did I miss something?
 
-Reported-by: Andrew Jones <drjones@redhat.com>
-Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
----
- tools/testing/selftests/kvm/s390x/sync_regs_test.c | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
-
-diff --git a/tools/testing/selftests/kvm/s390x/sync_regs_test.c b/tools/testing/selftests/kvm/s390x/sync_regs_test.c
-index b705637ca14b..70a56580042b 100644
---- a/tools/testing/selftests/kvm/s390x/sync_regs_test.c
-+++ b/tools/testing/selftests/kvm/s390x/sync_regs_test.c
-@@ -42,6 +42,13 @@ static void guest_code(void)
- 		    " values did not match: 0x%llx, 0x%llx\n", \
- 		    left->reg, right->reg)
- 
-+#define REG_COMPARE32(reg) \
-+	TEST_ASSERT(left->reg == right->reg, \
-+		    "Register " #reg \
-+		    " values did not match: 0x%x, 0x%x\n", \
-+		    left->reg, right->reg)
-+
-+
- static void compare_regs(struct kvm_regs *left, struct kvm_sync_regs *right)
- {
- 	int i;
-@@ -55,7 +62,7 @@ static void compare_sregs(struct kvm_sregs *left, struct kvm_sync_regs *right)
- 	int i;
- 
- 	for (i = 0; i < 16; i++)
--		REG_COMPARE(acrs[i]);
-+		REG_COMPARE32(acrs[i]);
- 
- 	for (i = 0; i < 16; i++)
- 		REG_COMPARE(crs[i]);
-@@ -155,7 +162,7 @@ int main(int argc, char *argv[])
- 		    "r11 sync regs value incorrect 0x%llx.",
- 		    run->s.regs.gprs[11]);
- 	TEST_ASSERT(run->s.regs.acrs[0]  == 1 << 11,
--		    "acr0 sync regs value incorrect 0x%llx.",
-+		    "acr0 sync regs value incorrect 0x%x.",
- 		    run->s.regs.acrs[0]);
- 
- 	vcpu_regs_get(vm, VCPU_ID, &regs);
--- 
-2.24.1
-
+There was some discussion on the SELinux bits in patch 2/3.  I would
+take the silence on
+the vfs bits as implicit acceptance until you hear otherwise and just
+submit a v2 that addresses
+the SELinux bits.
