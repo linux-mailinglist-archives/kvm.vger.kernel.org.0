@@ -2,131 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 91AD7180D53
-	for <lists+kvm@lfdr.de>; Wed, 11 Mar 2020 02:12:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BB84D180F40
+	for <lists+kvm@lfdr.de>; Wed, 11 Mar 2020 06:07:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727926AbgCKBMQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Mar 2020 21:12:16 -0400
-Received: from mail-oi1-f193.google.com ([209.85.167.193]:38807 "EHLO
-        mail-oi1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727528AbgCKBMP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Mar 2020 21:12:15 -0400
-Received: by mail-oi1-f193.google.com with SMTP id k21so235897oij.5;
-        Tue, 10 Mar 2020 18:12:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=7e9kdJF3mluOhD1f6/Nwb28lEg4dYM2hjsaSfswwkMc=;
-        b=NiQEiqxOO8bCCcjt2dn/i+Qn6TwC8hrPuXzL48/sfX1J5PAT0Bd5JTi4w/pz+vjMC3
-         rUhxUiloArwMIKuntpFtdZjbTTakVANaquCU02lPV+gn8lMO8BSbZvpQ3SZuLWFFVv0B
-         AEv1cSoafHTaceX505JZVMvQRLMkhcxYobRttgnYEBHZJdlWnd5c34y/Hg108JcaFY9Y
-         DN0u+T3gmrvijuVODZSke1apmMbuXafdR2pxh6KDh/CUoH84e7Yon6ijTcYKbU7ycSR2
-         ZRoWrenj/urlzpsXPql0pouwZzFmLvDbPyeWgZBWPVvXSg2aAcmYNv5SWxOSaY2OBtbQ
-         UJsg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=7e9kdJF3mluOhD1f6/Nwb28lEg4dYM2hjsaSfswwkMc=;
-        b=BQqnhQjclQ0nTGRgcZgBjco38ZgGKtOF818rF67ioN9d3NAlOPDOOfijmWST/gfkwX
-         YgXe+NWqKp4XYEHOxCISRXlyovO71oHBvTJFSYNStvDMrn3zm7/yICzm+7V1NIajWLt5
-         KiHLLp2XfyB8rSaINxU98j//j0aFeeWYuL0seFrR4vfgIzxlZQXAdwvLkzbim3dfuS9J
-         6zzCrVx54ef31UVyWeI/K4UVzMJWfejx/5UqxPVpy+54ryDdQnt720QfSXpxC0TFGrxh
-         45Dj1teGvvgHGRVslu8acLOFBhgZYCr2RQ7RDrtfpBMwkU9/d1l+BBWk0ZRvZZxfiwyv
-         X2Vw==
-X-Gm-Message-State: ANhLgQ1SGRuZxqp1YXlFknWbmeadXKy1OvmyK2tAnl55p993fyQOsUv5
-        nrDNk4TWeaNB0UDLBRKLXWc81GC6cMqXMFdCvNY=
-X-Google-Smtp-Source: ADFU+vsZ+NXvpZuO6uraRuKkYFspwGjGqaznVWT289WY9llq5Vwwotot8JNDzFXSvIGNknEPl0kDhOAoqCIPNxnB5i0=
-X-Received: by 2002:aca:5f09:: with SMTP id t9mr327851oib.5.1583889133582;
- Tue, 10 Mar 2020 18:12:13 -0700 (PDT)
+        id S1728226AbgCKFHR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Mar 2020 01:07:17 -0400
+Received: from smtprelay0162.hostedemail.com ([216.40.44.162]:51800 "EHLO
+        smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728130AbgCKFHO (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 11 Mar 2020 01:07:14 -0400
+Received: from filter.hostedemail.com (clb03-v110.bra.tucows.net [216.40.38.60])
+        by smtprelay01.hostedemail.com (Postfix) with ESMTP id 4B629101684F2;
+        Wed, 11 Mar 2020 05:07:13 +0000 (UTC)
+X-Session-Marker: 6A6F6540706572636865732E636F6D
+X-Spam-Summary: 50,0,0,,d41d8cd98f00b204,joe@perches.com,,RULES_HIT:41:355:379:541:800:960:967:973:982:988:989:1260:1311:1314:1345:1359:1437:1515:1534:1541:1711:1730:1747:1777:1792:2393:2525:2560:2563:2682:2685:2859:2902:2933:2937:2939:2942:2945:2947:2951:2954:3022:3138:3139:3140:3141:3142:3352:3865:3866:3867:3868:3870:3934:3936:3938:3941:3944:3947:3950:3953:3956:3959:4321:5007:6261:9025:9036:10004:11026:11658:11914:12043:12296:12297:12438:12555:12679:12895:12986:13069:13255:13311:13357:13894:14181:14384:14394:14721:21080:21433:21627:21811:21939:30054,0,RBL:none,CacheIP:none,Bayesian:0.5,0.5,0.5,Netcheck:none,DomainCache:0,MSF:not bulk,SPF:,MSBL:0,DNSBL:none,Custom_rules:0:0:0,LFtime:1,LUA_SUMMARY:none
+X-HE-Tag: queen12_21d50d9d4a639
+X-Filterd-Recvd-Size: 2278
+Received: from joe-laptop.perches.com (unknown [47.151.143.254])
+        (Authenticated sender: joe@perches.com)
+        by omf16.hostedemail.com (Postfix) with ESMTPA;
+        Wed, 11 Mar 2020 05:07:12 +0000 (UTC)
+From:   Joe Perches <joe@perches.com>
+To:     linux-kernel@vger.kernel.org
+Cc:     Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        linux-mips@vger.kernel.org, kvm@vger.kernel.org
+Subject: [PATCH -next 015/491] KERNEL VIRTUAL MACHINE FOR MIPS (KVM/mips): Use fallthrough;
+Date:   Tue, 10 Mar 2020 21:51:29 -0700
+Message-Id: <5a1ee76be0f502af626f50313456730d75fe424b.1583896348.git.joe@perches.com>
+X-Mailer: git-send-email 2.24.0
+In-Reply-To: <cover.1583896344.git.joe@perches.com>
+References: <cover.1583896344.git.joe@perches.com>
 MIME-Version: 1.0
-References: <1583823679-17648-1-git-send-email-wanpengli@tencent.com> <20200310160129.GA9305@linux.intel.com>
-In-Reply-To: <20200310160129.GA9305@linux.intel.com>
-From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Wed, 11 Mar 2020 09:12:02 +0800
-Message-ID: <CANRm+CxFUiv=ss51Yg73L+HTWe4-Zrixk4mM6=XAaVwKRqeUYA@mail.gmail.com>
-Subject: Re: [PATCH] KVM: X86: Don't load/put guest FPU context for sleeping AP
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 11 Mar 2020 at 00:01, Sean Christopherson
-<sean.j.christopherson@intel.com> wrote:
->
-> On Tue, Mar 10, 2020 at 03:01:19PM +0800, Wanpeng Li wrote:
-> > From: Wanpeng Li <wanpengli@tencent.com>
-> >
-> > kvm_load_guest_fpu() and kvm_put_guest_fpu() each consume more than 14us
-> > observed by ftrace, the qemu userspace FPU is swapped out for the guest
-> > FPU context for the duration of the KVM_RUN ioctl even if sleeping AP,
-> > we shouldn't load/put guest FPU context for this case especially for
-> > serverless scenario which sensitives to boot time.
-> >
-> > Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
-> > ---
-> >  arch/x86/kvm/x86.c | 8 +++++---
-> >  1 file changed, 5 insertions(+), 3 deletions(-)
-> >
-> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > index 5de2006..080ffa4 100644
-> > --- a/arch/x86/kvm/x86.c
-> > +++ b/arch/x86/kvm/x86.c
-> > @@ -8680,7 +8680,6 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *kvm_run)
-> >
-> >       vcpu_load(vcpu);
-> >       kvm_sigset_activate(vcpu);
-> > -     kvm_load_guest_fpu(vcpu);
-> >
-> >       if (unlikely(vcpu->arch.mp_state == KVM_MP_STATE_UNINITIALIZED)) {
-> >               if (kvm_run->immediate_exit) {
-> > @@ -8718,12 +8717,14 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *kvm_run)
-> >               }
-> >       }
-> >
-> > +     kvm_load_guest_fpu(vcpu);
->
-> Ugh, so this isn't safe on MPX capable CPUs, kvm_apic_accept_events() can
-> trigger kvm_vcpu_reset() with @init_event=true and try to unload guest_fpu.
+Convert the various uses of fallthrough comments to fallthrough;
 
-Right.
+Done via script
+Link: https://lore.kernel.org/lkml/b56602fcf79f849e733e7b521bb0e17895d390fa.1582230379.git.joe.com/
 
->
-> We could hack around that issue, but it'd be ugly, and I'm also concerned
-> that calling vmx_vcpu_reset() without guest_fpu loaded will be problematic
-> in the future with all the things that are getting managed by XSAVE.
->
-> > +
-> >       if (unlikely(vcpu->arch.complete_userspace_io)) {
-> >               int (*cui)(struct kvm_vcpu *) = vcpu->arch.complete_userspace_io;
-> >               vcpu->arch.complete_userspace_io = NULL;
-> >               r = cui(vcpu);
-> >               if (r <= 0)
-> > -                     goto out;
-> > +                     goto out_fpu;
-> >       } else
-> >               WARN_ON(vcpu->arch.pio.count || vcpu->mmio_needed);
-> >
-> > @@ -8732,8 +8733,9 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *kvm_run)
-> >       else
-> >               r = vcpu_run(vcpu);
-> >
-> > -out:
-> > +out_fpu:
-> >       kvm_put_guest_fpu(vcpu);
-> > +out:
-> >       if (vcpu->run->kvm_valid_regs)
-> >               store_regs(vcpu);
-> >       post_kvm_run_save(vcpu);
-> > --
-> > 2.7.4
-> >
+Signed-off-by: Joe Perches <joe@perches.com>
+---
+ arch/mips/kvm/emulate.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/arch/mips/kvm/emulate.c b/arch/mips/kvm/emulate.c
+index 754094..8c80333 100644
+--- a/arch/mips/kvm/emulate.c
++++ b/arch/mips/kvm/emulate.c
+@@ -64,7 +64,7 @@ static int kvm_compute_return_epc(struct kvm_vcpu *vcpu, unsigned long instpc,
+ 		switch (insn.r_format.func) {
+ 		case jalr_op:
+ 			arch->gprs[insn.r_format.rd] = epc + 8;
+-			/* Fall through */
++			fallthrough;
+ 		case jr_op:
+ 			nextpc = arch->gprs[insn.r_format.rs];
+ 			break;
+@@ -140,7 +140,7 @@ static int kvm_compute_return_epc(struct kvm_vcpu *vcpu, unsigned long instpc,
+ 		/* These are unconditional and in j_format. */
+ 	case jal_op:
+ 		arch->gprs[31] = instpc + 8;
+-		/* fall through */
++		fallthrough;
+ 	case j_op:
+ 		epc += 4;
+ 		epc >>= 28;
+@@ -1724,14 +1724,14 @@ enum emulation_result kvm_mips_emulate_load(union mips_instruction inst,
+ 
+ 	case lhu_op:
+ 		vcpu->mmio_needed = 1;	/* unsigned */
+-		/* fall through */
++		fallthrough;
+ 	case lh_op:
+ 		run->mmio.len = 2;
+ 		break;
+ 
+ 	case lbu_op:
+ 		vcpu->mmio_needed = 1;	/* unsigned */
+-		/* fall through */
++		fallthrough;
+ 	case lb_op:
+ 		run->mmio.len = 1;
+ 		break;
+-- 
+2.24.0
+
