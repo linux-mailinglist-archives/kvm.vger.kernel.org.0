@@ -2,126 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 02B19181FCE
-	for <lists+kvm@lfdr.de>; Wed, 11 Mar 2020 18:44:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3B1B0181FD5
+	for <lists+kvm@lfdr.de>; Wed, 11 Mar 2020 18:45:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730648AbgCKRo2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Mar 2020 13:44:28 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:56969 "EHLO
+        id S1730667AbgCKRpG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Mar 2020 13:45:06 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:46526 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1730258AbgCKRo2 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 11 Mar 2020 13:44:28 -0400
+        by vger.kernel.org with ESMTP id S1730666AbgCKRpG (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 11 Mar 2020 13:45:06 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1583948667;
+        s=mimecast20190719; t=1583948705;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Egr0Wvsijd8a/sAsIii/kuR4HDSloQdA1QBM06VTEsc=;
-        b=OIeUlHsj5qzDAcuJIWpGxRv5AcMqbdE1+6ui2DcXYMSOXb52CEt8bBH1lSq4g98HClYttN
-        6HMmwV7vlu0LT3dfAfvdgRg4btdV9K4UxcpcWhR6ds1RsJp2orRWj0+EI0g9G0/Y6t9ltB
-        okLlXCHyFSYyXAZ+M//1t/5p76LmIAE=
-Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
- [209.85.160.197]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-264-44bOFiuVMQm974JqGGfxlQ-1; Wed, 11 Mar 2020 13:44:25 -0400
-X-MC-Unique: 44bOFiuVMQm974JqGGfxlQ-1
-Received: by mail-qt1-f197.google.com with SMTP id y3so1694501qti.15
-        for <kvm@vger.kernel.org>; Wed, 11 Mar 2020 10:44:25 -0700 (PDT)
+        bh=rW7pu79lKkKAPsdVQOo/aJ4urBOrtpq5oK5W7qCpQMY=;
+        b=E4nYMCIrGWKW+1xY69Ew/e8DzYWPVuIWgdFcuGBUGoNJUQh29C6XydCIHbk0QdBaCtLFM7
+        zvAStnMXBC3LyamxuZr5oJNO+2yb9Nd538P3Gs7c2IQk/c0D0TIFMcToNtlzsIXhM1O2VX
+        HYaIcrtPEIw5NwF6SJ/nyp06bbaiI4M=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-303-9cjQnBF7NIWlWlV43KyHAw-1; Wed, 11 Mar 2020 13:45:03 -0400
+X-MC-Unique: 9cjQnBF7NIWlWlV43KyHAw-1
+Received: by mail-wm1-f72.google.com with SMTP id w12so902720wmc.3
+        for <kvm@vger.kernel.org>; Wed, 11 Mar 2020 10:45:03 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=Egr0Wvsijd8a/sAsIii/kuR4HDSloQdA1QBM06VTEsc=;
-        b=rsn1rWFjp3IhiTRbKyf3aZsneTm9L+kes1h7nNfBMORk1DIOIIk+l784+yKNcacUPW
-         bZmof6MON3HKuP97SrrYreCRkuSf8kyVPDWICfn4PmIsCNs2L3Z2jFUE0JecJs9Em2dZ
-         ri8v43d5mS22Cn8QmHMZF+F8OBy/EgjPsmvMoYVkpYXPuHW3BVBF31erkPFXeTt/Q3y0
-         fuG1dw/da0vmoTeynRw89ypGD9POLyEekiiFvSmwdarFRcwoXpkhNYeFDdHKLT6R3yzn
-         WHhfPh13W58l4kB8xj4h6Ch4RrMaBmhV6taNMbLgXr6O0SAdTnLKVRHSEzMKJ6h6odUC
-         WEJA==
-X-Gm-Message-State: ANhLgQ3IXn3KflXuGeu5gB1DvuiK7uLo//7zM4HzAWfnSYVZKmFFAUKQ
-        pO5hmHhlJrJT8yacc9gRmeI665DmEAZMreazNrBJBbo8QHTGrxVyc8wXVbfpZ84l7+sLkrsEJBo
-        d1tBUUIsSeYQc
-X-Received: by 2002:ac8:45d6:: with SMTP id e22mr3754086qto.34.1583948665098;
-        Wed, 11 Mar 2020 10:44:25 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vvGjzKVXYRhk/h7ikNvjVRLCg8NW9Tm42+Z//BzMUUJ3eGevXv4paQogeanWo2CnV941bKdsg==
-X-Received: by 2002:ac8:45d6:: with SMTP id e22mr3754054qto.34.1583948664740;
-        Wed, 11 Mar 2020 10:44:24 -0700 (PDT)
-Received: from xz-x1 ([2607:9880:19c0:32::2])
-        by smtp.gmail.com with ESMTPSA id d201sm5220436qke.59.2020.03.11.10.44.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Mar 2020 10:44:24 -0700 (PDT)
-Date:   Wed, 11 Mar 2020 13:44:22 -0400
-From:   Peter Xu <peterx@redhat.com>
-To:     Andrew Jones <drjones@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Yan Zhao <yan.y.zhao@intel.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        Christophe de Dinechin <dinechin@redhat.com>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Kevin Tian <kevin.tian@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-Subject: Re: [PATCH v6 12/14] KVM: selftests: Add dirty ring buffer test
-Message-ID: <20200311174422.GI479302@xz-x1>
-References: <20200309214424.330363-1-peterx@redhat.com>
- <20200309222529.345699-1-peterx@redhat.com>
- <20200310081847.42sx5oc3q6m3wsdj@kamzik.brq.redhat.com>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=rW7pu79lKkKAPsdVQOo/aJ4urBOrtpq5oK5W7qCpQMY=;
+        b=EH56rPZw+w+AI4ULfPhEa0FPoYuY7gNX5bSX6xQOE2Zs2UnLuqloSHkk9Bf+M9knNH
+         NR3p7ZFEFnPHFIaiykj78fp8WLAF837OTVwB3pZOAKO2JqIUjzrtROtycNYXKR3ZvzTD
+         NM9IyHgjA6qJSGA0TGY1fvWnAbpAUPNhBRVj4bMVINpwXvqO//l/b/YVc/zrUZ6JMmla
+         JD0cTCIaH0VqmkqERAXj+jp2nlQO7K3ywwBwfyQSscKX3Sq5WSKILzhhaKd0l9Dy/VTe
+         u+XCd+oianLDORaW7xdM46L6+M0ecoLJ11IYp2J7Rxy4FVBTAEJ5SpiOe3yRppR2quR8
+         pxvQ==
+X-Gm-Message-State: ANhLgQ1QY/6CapF1O+Dki0KrvQUdSo0bEyEl/KFqOVBxW15qE8xWXCLz
+        st9DfnCLdWRpD9ZLoWmT7Xi6LF7pTA4jo5RMZetZsnY1xf96Dqwo7Da1AnbcxGeCEJ6SbuvjAC5
+        0cSS8d5DKetbn
+X-Received: by 2002:a1c:4805:: with SMTP id v5mr770348wma.98.1583948702488;
+        Wed, 11 Mar 2020 10:45:02 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vvb2cSXhwPBa8avHtfP3up4fDySjC14dqD45ZcSdTFyPdocWJAOkwI8QHYiJr+lnsYF+iTknA==
+X-Received: by 2002:a1c:4805:: with SMTP id v5mr770331wma.98.1583948702237;
+        Wed, 11 Mar 2020 10:45:02 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:4887:2313:c0bc:e3a8? ([2001:b07:6468:f312:4887:2313:c0bc:e3a8])
+        by smtp.gmail.com with ESMTPSA id a13sm340949wrh.80.2020.03.11.10.45.01
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 11 Mar 2020 10:45:01 -0700 (PDT)
+Subject: Re: [RFC PATCH] KVM: nVMX: nested_vmx_handle_enlightened_vmptrld()
+ can be static
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        kbuild test robot <lkp@intel.com>
+Cc:     kbuild-all@lists.01.org, Jim Mattson <jmattson@google.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Liran Alon <liran.alon@oracle.com>,
+        Miaohe Lin <linmiaohe@huawei.com>
+References: <20200309155216.204752-4-vkuznets@redhat.com>
+ <20200310200830.GA84412@69fab159caf3> <87d09jaz7q.fsf@vitty.brq.redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <6fbd3df7-2fb6-337c-a9ce-e663f3742009@redhat.com>
+Date:   Wed, 11 Mar 2020 18:45:01 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
+In-Reply-To: <87d09jaz7q.fsf@vitty.brq.redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20200310081847.42sx5oc3q6m3wsdj@kamzik.brq.redhat.com>
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 10, 2020 at 09:18:47AM +0100, Andrew Jones wrote:
-> On Mon, Mar 09, 2020 at 06:25:29PM -0400, Peter Xu wrote:
-> > +void *vcpu_map_dirty_ring(struct kvm_vm *vm, uint32_t vcpuid)
-> > +{
-> > +	struct vcpu *vcpu;
-> > +	uint32_t size = vm->dirty_ring_size;
-> > +
-> > +	TEST_ASSERT(size > 0, "Should enable dirty ring first");
-> > +
-> > +	vcpu = vcpu_find(vm, vcpuid);
-> > +
-> > +	TEST_ASSERT(vcpu, "Cannot find vcpu %u", vcpuid);
-> > +
-> > +	if (!vcpu->dirty_gfns) {
-> > +		void *addr;
-> > +
-> > +		addr = mmap(NULL, size, PROT_READ,
-> > +			    MAP_PRIVATE, vcpu->fd,
-> > +			    vm->page_size * KVM_DIRTY_LOG_PAGE_OFFSET);
-> > +		TEST_ASSERT(addr == MAP_FAILED, "Dirty ring mapped private");
-> > +
-> > +		addr = mmap(NULL, size, PROT_READ | PROT_EXEC,
-> > +			    MAP_PRIVATE, vcpu->fd,
-> > +			    vm->page_size * KVM_DIRTY_LOG_PAGE_OFFSET);
-> > +		TEST_ASSERT(addr == MAP_FAILED, "Dirty ring mapped exec");
-> > +
-> > +		addr = mmap(NULL, size, PROT_READ | PROT_WRITE,
-> > +			    MAP_SHARED, vcpu->fd,
-> > +			    vm->page_size * KVM_DIRTY_LOG_PAGE_OFFSET);
+On 11/03/20 12:49, Vitaly Kuznetsov wrote:
+> kbuild test robot <lkp@intel.com> writes:
 > 
-> No TEST_ASSERT for this mmap?
-
-It'll be used (verified) later. :) Though never harm to add one!
-
-Thanks,
+>> Fixes: e3fd8bda412e ("KVM: nVMX: properly handle errors in nested_vmx_handle_enlightened_vmptrld()")
+>> Signed-off-by: kbuild test robot <lkp@intel.com>
+>> ---
+>>  nested.c |    2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+>> index 65df8bcbb9c86..1d9ab1e9933fb 100644
+>> --- a/arch/x86/kvm/vmx/nested.c
+>> +++ b/arch/x86/kvm/vmx/nested.c
+>> @@ -1910,7 +1910,7 @@ static int copy_vmcs12_to_enlightened(struct vcpu_vmx *vmx)
+>>   * This is an equivalent of the nested hypervisor executing the vmptrld
+>>   * instruction.
+>>   */
+>> -enum nested_evmptrld_status nested_vmx_handle_enlightened_vmptrld(
+>> +static enum nested_evmptrld_status nested_vmx_handle_enlightened_vmptrld(
+>>  	struct kvm_vcpu *vcpu, bool from_launch)
+>>  {
+>>  	struct vcpu_vmx *vmx = to_vmx(vcpu);
+>>
 > 
-> > +
-> > +		vcpu->dirty_gfns = addr;
-> > +		vcpu->dirty_gfns_count = size / sizeof(struct kvm_dirty_gfn);
-> > +	}
-> > +
-> > +	return vcpu->dirty_gfns;
-> > +}
+> Yea,
 > 
+> I accidentially dropped 'static' in PATCH3, will restore it in v2.
 
--- 
-Peter Xu
+No problem, I will squash.
+
+Paolo
 
