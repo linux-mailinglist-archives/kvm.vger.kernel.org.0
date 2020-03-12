@@ -2,303 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 686D6183D4E
-	for <lists+kvm@lfdr.de>; Fri, 13 Mar 2020 00:27:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 85651183D72
+	for <lists+kvm@lfdr.de>; Fri, 13 Mar 2020 00:38:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726913AbgCLX1t (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Mar 2020 19:27:49 -0400
-Received: from mga14.intel.com ([192.55.52.115]:14954 "EHLO mga14.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726882AbgCLX1t (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 Mar 2020 19:27:49 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 12 Mar 2020 16:27:47 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,546,1574150400"; 
-   d="scan'208";a="261705947"
-Received: from sjchrist-coffee.jf.intel.com ([10.54.74.202])
-  by orsmga002.jf.intel.com with ESMTP; 12 Mar 2020 16:27:46 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org
-Subject: [kvm-unit-tests PATCH 8/8] nVMX: Pass exit reason enum to print_vmexit_info()
-Date:   Thu, 12 Mar 2020 16:27:45 -0700
-Message-Id: <20200312232745.884-9-sean.j.christopherson@intel.com>
-X-Mailer: git-send-email 2.24.1
-In-Reply-To: <20200312232745.884-1-sean.j.christopherson@intel.com>
-References: <20200312232745.884-1-sean.j.christopherson@intel.com>
+        id S1726838AbgCLXiE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Mar 2020 19:38:04 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:48086 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726802AbgCLXiD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 Mar 2020 19:38:03 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02CNIbjc050226;
+        Thu, 12 Mar 2020 23:37:59 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2020-01-29;
+ bh=4+fjIpyF2vTr8vy41OpFV0LuUn5jW0g5BXbM6Vxcf6w=;
+ b=V0+L792qTKt3WVLSrqgMH61ueBn/4vS10Ef3aJ9C+a1lV57jFwhCr7t80PfkiO3eMlBZ
+ dCqy5A/SOvbxw10KFXsVaQxjXbXWeJVYLlhR/2qeJ+r/GE7F5gS/Sov2iLbG+D05cvfL
+ 3bZMJUcRbsR91VLaZWAlaGb+FnAjvtUI6GAGtgrXVSrgBqnWJ6ngOmbzCErpukaoFMn4
+ JL0aUo7MXHtBtpJi5uJjvkxBiMSK6HCbZKtM34X4rJKuyNqhhJe+NRwIc9P3jDlAdP1U
+ y3IIV6kLCTt8yTPavWISIFTVZ2N/SpKa6lu0t2WPxxQfT27RcVB5jKzWEfyp5grsLbSv mQ== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by aserp2120.oracle.com with ESMTP id 2yqtaes49u-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 12 Mar 2020 23:37:58 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02CNJH0Y097419;
+        Thu, 12 Mar 2020 23:37:58 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+        by aserp3020.oracle.com with ESMTP id 2yqtatx4ng-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 12 Mar 2020 23:37:58 +0000
+Received: from abhmp0002.oracle.com (abhmp0002.oracle.com [141.146.116.8])
+        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 02CNbvWF006814;
+        Thu, 12 Mar 2020 23:37:57 GMT
+Received: from localhost.localdomain (/10.159.129.95)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Thu, 12 Mar 2020 16:37:56 -0700
+Subject: Re: [PATCH] kvm-unit-test: nVMX: Test Selector and Base Address
+ fields of Guest Segment registers
+To:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Jim Mattson <jmattson@google.com>
+Cc:     kvm list <kvm@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>
+References: <20200310225149.31254-1-krish.sadhukhan@oracle.com>
+ <CALMp9eR9hL9OQPBfekDbRAFHx5j-wgBcijjAV0T22NGoSpxpdA@mail.gmail.com>
+ <20200311152459.GD21852@linux.intel.com>
+From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Message-ID: <59359699-430e-9d83-4926-3fde6d0f4122@oracle.com>
+Date:   Thu, 12 Mar 2020 16:37:50 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200311152459.GD21852@linux.intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9558 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 bulkscore=0 phishscore=0
+ suspectscore=0 mlxscore=0 spamscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
+ definitions=main-2003120116
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9558 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 impostorscore=0
+ lowpriorityscore=0 bulkscore=0 priorityscore=1501 suspectscore=0
+ mlxlogscore=999 mlxscore=0 adultscore=0 malwarescore=0 spamscore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2003120116
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Take the exit reason as a parameter when printing VM-Exit info instead
-of rereading it from the VMCS.  Opportunistically clean up the related
-printing.
 
-Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
----
- x86/vmx.c       |  9 ++++-----
- x86/vmx.h       |  2 +-
- x86/vmx_tests.c | 46 +++++++++++++++++++++++-----------------------
- 3 files changed, 28 insertions(+), 29 deletions(-)
+On 3/11/20 8:24 AM, Sean Christopherson wrote:
+> On Tue, Mar 10, 2020 at 04:51:40PM -0700, Jim Mattson wrote:
+>> On Tue, Mar 10, 2020 at 4:29 PM Krish Sadhukhan
+>> <krish.sadhukhan@oracle.com> wrote:
+>>> Even thought today's x86 hardware uses paging and not segmentation for memory
+>>> management, it is still good to have some tests that can verify the sanity of
+>>> the segment register fields on vmentry of nested guests.
+>>>
+>>> The test on SS Selector field is failing because the hardware (I am using
+>>> Intel Xeon Platinum 8167M 2.00GHz) doesn't raise any error even if the
+>>> prescribed bit pattern is not set and as a result vmentry succeeds.
+>> Are you sure this isn't just an L0 bug? For instance, does your L0 set
+>> "unrestricted guest" in vmcs02, even when L1 doesn't set it in vmcs12?
+>
+> I assume this is the check being discussed?  The code is flawed, if CS=3
+> and SS=3, "sel = sel_saved | (~cs_rpl_bits & 0x3)" will yield SS=3 and pass.
+>
+> I think you wanted something like:
+>
+>    sel = (sel_saved & ~0x3) | (~cs_rpl_bits & 0x3);
 
-diff --git a/x86/vmx.c b/x86/vmx.c
-index f7f9665..4c47eec 100644
---- a/x86/vmx.c
-+++ b/x86/vmx.c
-@@ -585,17 +585,16 @@ const char *exit_reason_description(u64 reason)
- 	return exit_reason_descriptions[reason] ? : "(unused)";
- }
- 
--void print_vmexit_info()
-+void print_vmexit_info(union exit_reason exit_reason)
- {
- 	u64 guest_rip, guest_rsp;
--	ulong reason = vmcs_read(EXI_REASON) & 0xff;
- 	ulong exit_qual = vmcs_read(EXI_QUALIFICATION);
- 	guest_rip = vmcs_read(GUEST_RIP);
- 	guest_rsp = vmcs_read(GUEST_RSP);
- 	printf("VMEXIT info:\n");
--	printf("\tvmexit reason = %ld\n", reason);
-+	printf("\tvmexit reason = %u\n", exit_reason.basic);
-+	printf("\tfailed vmentry = %u\n", !!exit_reason.failed_vmentry);
- 	printf("\texit qualification = %#lx\n", exit_qual);
--	printf("\tBit 31 of reason = %lx\n", (vmcs_read(EXI_REASON) >> 31) & 1);
- 	printf("\tguest_rip = %#lx\n", guest_rip);
- 	printf("\tRAX=%#lx    RBX=%#lx    RCX=%#lx    RDX=%#lx\n",
- 		regs.rax, regs.rbx, regs.rcx, regs.rdx);
-@@ -1708,7 +1707,7 @@ static int vmx_run(void)
- 		}
- 
- 		if (result.entered)
--			print_vmexit_info();
-+			print_vmexit_info(result.exit_reason);
- 		else
- 			print_vmentry_failure_info(&result);
- 		abort();
-diff --git a/x86/vmx.h b/x86/vmx.h
-index b79cbc1..e6ee776 100644
---- a/x86/vmx.h
-+++ b/x86/vmx.h
-@@ -826,7 +826,7 @@ void enable_vmx(void);
- void init_vmx(u64 *vmxon_region);
- 
- const char *exit_reason_description(u64 reason);
--void print_vmexit_info(void);
-+void print_vmexit_info(union exit_reason exit_reason);
- void print_vmentry_failure_info(struct vmentry_result *result);
- void ept_sync(int type, u64 eptp);
- void vpid_sync(int type, u16 vpid);
-diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
-index f46a0b9..2b8ce03 100644
---- a/x86/vmx_tests.c
-+++ b/x86/vmx_tests.c
-@@ -61,7 +61,7 @@ static void basic_guest_main(void)
- static int basic_exit_handler(union exit_reason exit_reason)
- {
- 	report(0, "Basic VMX test");
--	print_vmexit_info();
-+	print_vmexit_info(exit_reason);
- 	return VMX_TEST_EXIT;
- }
- 
-@@ -98,7 +98,7 @@ static int vmenter_exit_handler(union exit_reason exit_reason)
- 		return VMX_TEST_RESUME;
- 	default:
- 		report(0, "test vmresume");
--		print_vmexit_info();
-+		print_vmexit_info(exit_reason);
- 	}
- 	return VMX_TEST_VMEXIT;
- }
-@@ -187,7 +187,7 @@ static int preemption_timer_exit_handler(union exit_reason exit_reason)
- 			break;
- 		default:
- 			report(false, "Invalid stage.");
--			print_vmexit_info();
-+			print_vmexit_info(exit_reason);
- 			break;
- 		}
- 		break;
-@@ -230,13 +230,13 @@ static int preemption_timer_exit_handler(union exit_reason exit_reason)
- 			// Should not reach here
- 			report(false, "unexpected stage, %d",
- 			       vmx_get_test_stage());
--			print_vmexit_info();
-+			print_vmexit_info(exit_reason);
- 			return VMX_TEST_VMEXIT;
- 		}
- 		break;
- 	default:
- 		report(false, "Unknown exit reason, 0x%x", exit_reason.full);
--		print_vmexit_info();
-+		print_vmexit_info(exit_reason);
- 	}
- 	vmcs_write(PIN_CONTROLS, vmcs_read(PIN_CONTROLS) & ~PIN_PREEMPT);
- 	return VMX_TEST_VMEXIT;
-@@ -568,7 +568,7 @@ static int cr_shadowing_exit_handler(union exit_reason exit_reason)
- 			// Should not reach here
- 			report(false, "unexpected stage, %d",
- 			       vmx_get_test_stage());
--			print_vmexit_info();
-+			print_vmexit_info(exit_reason);
- 			return VMX_TEST_VMEXIT;
- 		}
- 		vmcs_write(GUEST_RIP, guest_rip + insn_len);
-@@ -607,14 +607,14 @@ static int cr_shadowing_exit_handler(union exit_reason exit_reason)
- 			// Should not reach here
- 			report(false, "unexpected stage, %d",
- 			       vmx_get_test_stage());
--			print_vmexit_info();
-+			print_vmexit_info(exit_reason);
- 			return VMX_TEST_VMEXIT;
- 		}
- 		vmcs_write(GUEST_RIP, guest_rip + insn_len);
- 		return VMX_TEST_RESUME;
- 	default:
- 		report(false, "Unknown exit reason, 0x%x", exit_reason.full);
--		print_vmexit_info();
-+		print_vmexit_info(exit_reason);
- 	}
- 	return VMX_TEST_VMEXIT;
- }
-@@ -744,7 +744,7 @@ static int iobmp_exit_handler(union exit_reason exit_reason)
- 			// Should not reach here
- 			report(false, "unexpected stage, %d",
- 			       vmx_get_test_stage());
--			print_vmexit_info();
-+			print_vmexit_info(exit_reason);
- 			return VMX_TEST_VMEXIT;
- 		}
- 		vmcs_write(GUEST_RIP, guest_rip + insn_len);
-@@ -765,7 +765,7 @@ static int iobmp_exit_handler(union exit_reason exit_reason)
- 			// Should not reach here
- 			report(false, "unexpected stage, %d",
- 			       vmx_get_test_stage());
--			print_vmexit_info();
-+			print_vmexit_info(exit_reason);
- 			return VMX_TEST_VMEXIT;
- 		}
- 		vmcs_write(GUEST_RIP, guest_rip + insn_len);
-@@ -1290,7 +1290,7 @@ static int pml_exit_handler(union exit_reason exit_reason)
- 		default:
- 			report(false, "unexpected stage, %d.",
- 			       vmx_get_test_stage());
--			print_vmexit_info();
-+			print_vmexit_info(exit_reason);
- 			return VMX_TEST_VMEXIT;
- 		}
- 		vmcs_write(GUEST_RIP, guest_rip + insn_len);
-@@ -1301,7 +1301,7 @@ static int pml_exit_handler(union exit_reason exit_reason)
- 		return VMX_TEST_RESUME;
- 	default:
- 		report(false, "Unknown exit reason, 0x%x", exit_reason.full);
--		print_vmexit_info();
-+		print_vmexit_info(exit_reason);
- 	}
- 	return VMX_TEST_VMEXIT;
- }
-@@ -1386,7 +1386,7 @@ static int ept_exit_handler_common(union exit_reason exit_reason, bool have_ad)
- 		default:
- 			report(false, "ERROR - unexpected stage, %d.",
- 			       vmx_get_test_stage());
--			print_vmexit_info();
-+			print_vmexit_info(exit_reason);
- 			return VMX_TEST_VMEXIT;
- 		}
- 		vmcs_write(GUEST_RIP, guest_rip + insn_len);
-@@ -1405,7 +1405,7 @@ static int ept_exit_handler_common(union exit_reason exit_reason, bool have_ad)
- 		default:
- 			report(false, "ERROR - unexpected stage, %d.",
- 			       vmx_get_test_stage());
--			print_vmexit_info();
-+			print_vmexit_info(exit_reason);
- 			return VMX_TEST_VMEXIT;
- 		}
- 		return VMX_TEST_RESUME;
-@@ -1461,13 +1461,13 @@ static int ept_exit_handler_common(union exit_reason exit_reason, bool have_ad)
- 			// Should not reach here
- 			report(false, "ERROR : unexpected stage, %d",
- 			       vmx_get_test_stage());
--			print_vmexit_info();
-+			print_vmexit_info(exit_reason);
- 			return VMX_TEST_VMEXIT;
- 		}
- 		return VMX_TEST_RESUME;
- 	default:
- 		report(false, "Unknown exit reason, 0x%x", exit_reason.full);
--		print_vmexit_info();
-+		print_vmexit_info(exit_reason);
- 	}
- 	return VMX_TEST_VMEXIT;
- }
-@@ -1618,14 +1618,14 @@ static int vpid_exit_handler(union exit_reason exit_reason)
- 		default:
- 			report(false, "ERROR: unexpected stage, %d",
- 					vmx_get_test_stage());
--			print_vmexit_info();
-+			print_vmexit_info(exit_reason);
- 			return VMX_TEST_VMEXIT;
- 		}
- 		vmcs_write(GUEST_RIP, guest_rip + insn_len);
- 		return VMX_TEST_RESUME;
- 	default:
- 		report(false, "Unknown exit reason, 0x%x", exit_reason.full);
--		print_vmexit_info();
-+		print_vmexit_info(exit_reason);
- 	}
- 	return VMX_TEST_VMEXIT;
- }
-@@ -1796,7 +1796,7 @@ static int interrupt_exit_handler(union exit_reason exit_reason)
- 		return VMX_TEST_RESUME;
- 	default:
- 		report(false, "Unknown exit reason, 0x%x", exit_reason.full);
--		print_vmexit_info();
-+		print_vmexit_info(exit_reason);
- 	}
- 
- 	return VMX_TEST_VMEXIT;
-@@ -1909,7 +1909,7 @@ static int dbgctls_exit_handler(union exit_reason exit_reason)
- 		return VMX_TEST_RESUME;
- 	default:
- 		report(false, "Unknown exit reason, %d", exit_reason.full);
--		print_vmexit_info();
-+		print_vmexit_info(exit_reason);
- 	}
- 	return VMX_TEST_VMEXIT;
- }
-@@ -2020,7 +2020,7 @@ static int vmmcall_exit_handler(union exit_reason exit_reason)
- 		break;
- 	default:
- 		report(false, "Unknown exit reason, 0x%x", exit_reason.full);
--		print_vmexit_info();
-+		print_vmexit_info(exit_reason);
- 	}
- 
- 	return VMX_TEST_VMEXIT;
-@@ -2092,7 +2092,7 @@ static int disable_rdtscp_exit_handler(union exit_reason exit_reason)
- 
- 	default:
- 		report(false, "Unknown exit reason, 0x%x", exit_reason.full);
--		print_vmexit_info();
-+		print_vmexit_info(exit_reason);
- 	}
- 	return VMX_TEST_VMEXIT;
- }
-@@ -9349,7 +9349,7 @@ static void invalid_msr_main(void)
- static int invalid_msr_exit_handler(union exit_reason exit_reason)
- {
- 	report(0, "Invalid MSR load");
--	print_vmexit_info();
-+	print_vmexit_info(exit_reason);
- 	return VMX_TEST_EXIT;
- }
- 
--- 
-2.24.1
+Yes, my bit-setting was wrong and I have fixed it. But that's not the 
+cause of the failure.
 
+It appears that Jim's suspicion is correct. L0 is not checking in 
+prepare_vmcs02_early(), whether vmcs12 has "unrestricted guest" turned 
+off. After I put the relevant setting in that function, the test now 
+passes (meaning vmentry fails).
+
+I will add this fix in v2.
+
+
+>
+>
+>> +	if (!(vmcs_read(GUEST_RFLAGS) & X86_EFLAGS_VM) &&
+>> +	    !(vmcs_read(CPU_SECONDARY) & CPU_URG)) {
+>> +		u16 cs_rpl_bits = vmcs_read(GUEST_SEL_CS) & 0x3;
+>> +		sel_saved = vmcs_read(GUEST_SEL_SS);
+>> +		sel = sel_saved | (~cs_rpl_bits & 0x3);
+>> +		TEST_SEGMENT_SEL(GUEST_SEL_SS, "GUEST_SEL_SS", sel, sel_saved);
+>> +	}
+>> +}
