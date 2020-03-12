@@ -2,119 +2,142 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 576BF182D9C
-	for <lists+kvm@lfdr.de>; Thu, 12 Mar 2020 11:28:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 348E0182DE6
+	for <lists+kvm@lfdr.de>; Thu, 12 Mar 2020 11:36:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726946AbgCLK2w (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Mar 2020 06:28:52 -0400
-Received: from mga06.intel.com ([134.134.136.31]:28498 "EHLO mga06.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725978AbgCLK2w (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 Mar 2020 06:28:52 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 12 Mar 2020 03:28:51 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,544,1574150400"; 
-   d="scan'208";a="354099036"
-Received: from fmsmsx103.amr.corp.intel.com ([10.18.124.201])
-  by fmsmga001.fm.intel.com with ESMTP; 12 Mar 2020 03:28:51 -0700
-Received: from FMSMSX110.amr.corp.intel.com (10.18.116.10) by
- FMSMSX103.amr.corp.intel.com (10.18.124.201) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Thu, 12 Mar 2020 03:28:50 -0700
-Received: from shsmsx151.ccr.corp.intel.com (10.239.6.50) by
- fmsmsx110.amr.corp.intel.com (10.18.116.10) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Thu, 12 Mar 2020 03:28:50 -0700
-Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.206]) by
- SHSMSX151.ccr.corp.intel.com ([169.254.3.201]) with mapi id 14.03.0439.000;
- Thu, 12 Mar 2020 18:28:47 +0800
-From:   "Kang, Luwei" <luwei.kang@intel.com>
-To:     "Liang, Kan" <kan.liang@linux.intel.com>,
-        Peter Zijlstra <peterz@infradead.org>
-CC:     "x86@kernel.org" <x86@kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "acme@kernel.org" <acme@kernel.org>,
-        "mark.rutland@arm.com" <mark.rutland@arm.com>,
-        "alexander.shishkin@linux.intel.com" 
-        <alexander.shishkin@linux.intel.com>,
-        "jolsa@redhat.com" <jolsa@redhat.com>,
-        "namhyung@kernel.org" <namhyung@kernel.org>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "bp@alien8.de" <bp@alien8.de>, "hpa@zytor.com" <hpa@zytor.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "Christopherson, Sean J" <sean.j.christopherson@intel.com>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,
-        "wanpengli@tencent.com" <wanpengli@tencent.com>,
-        "jmattson@google.com" <jmattson@google.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "pawan.kumar.gupta@linux.intel.com" 
-        <pawan.kumar.gupta@linux.intel.com>,
-        "ak@linux.intel.com" <ak@linux.intel.com>,
-        "thomas.lendacky@amd.com" <thomas.lendacky@amd.com>,
-        "Yu, Fenghua" <fenghua.yu@intel.com>,
-        "like.xu@linux.intel.com" <like.xu@linux.intel.com>,
-        "Wang, Wei W" <wei.w.wang@intel.com>
-Subject: RE: [PATCH v1 01/11] perf/x86/core: Support KVM to assign a
- dedicated counter for guest PEBS
-Thread-Topic: [PATCH v1 01/11] perf/x86/core: Support KVM to assign a
- dedicated counter for guest PEBS
-Thread-Index: AQHV8tS2uZDJ2Dgk6EqR/a2HW+9LbKg7EWeAgAAN1ICABGlOgIAANIUAgAAfgACAAEmBgIAEoPfg
-Date:   Thu, 12 Mar 2020 10:28:47 +0000
-Message-ID: <82D7661F83C1A047AF7DC287873BF1E1738A1898@SHSMSX104.ccr.corp.intel.com>
-References: <1583431025-19802-1-git-send-email-luwei.kang@intel.com>
- <1583431025-19802-2-git-send-email-luwei.kang@intel.com>
- <20200306135317.GD12561@hirez.programming.kicks-ass.net>
- <b72cb68e-1a0a-eeff-21b4-ce412e939cfd@linux.intel.com>
- <20200309100443.GG12561@hirez.programming.kicks-ass.net>
- <97ce1ba4-d75a-8db2-ea2f-7d334942b4e6@linux.intel.com>
- <20200309150526.GI12561@hirez.programming.kicks-ass.net>
- <45a1a575-9363-f778-b5f5-bcdf28d3e34b@linux.intel.com>
-In-Reply-To: <45a1a575-9363-f778-b5f5-bcdf28d3e34b@linux.intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-version: 11.2.0.6
-dlp-reaction: no-action
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        id S1726725AbgCLKgZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Mar 2020 06:36:25 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:43086 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726028AbgCLKgZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 Mar 2020 06:36:25 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1584009384;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=GH7fU1TWEWw40X0bZzMnWywwid5YSvqvgDDmRobv45Y=;
+        b=iXtPj5wgcCMHSPMzUsWRxwATQWYS/jAqATCs65UX95fNsBSU8NojmKBiZ0siIQNqoCgXSm
+        bjdMrPSTDAzVtdUbL1L/5EPCPAaPVkeYNMJnR/m0riWF5afhlS0BRIlPbI/di/7mI0sHVq
+        wkrvCNSM/fhh2LY7SCxCQzZUM0LJJE4=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-55-WyqlkljOPneoXxL6SYTMWA-1; Thu, 12 Mar 2020 06:36:21 -0400
+X-MC-Unique: WyqlkljOPneoXxL6SYTMWA-1
+Received: by mail-wr1-f72.google.com with SMTP id o9so2400914wrw.14
+        for <kvm@vger.kernel.org>; Thu, 12 Mar 2020 03:36:21 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=GH7fU1TWEWw40X0bZzMnWywwid5YSvqvgDDmRobv45Y=;
+        b=ThNxD8F7ay1pSawVZrUbhtSWdMdoWG9Jz7oYUvvcBOJFczpeCTtTq68V8kzU1Vo+Jp
+         3vo/ytEw04tV3XArvz5IKs4nWKr6yoCnJeVuHNTy4uz3QCZH96EG9PHtd5Znr4A3zgW2
+         XPa1uAZe6L3JszMcOQSD+PYQWV/bdcWTXcG5LqGuGG5rHQT4NP+kHY9XLGdInxbUi50w
+         0ZlBoChnSUaQ2AZYiodQZxn/zVYn+W5Ils6U1cxltE5IP1sTN4wFWdv0A8SN7bd2lsOs
+         zvMW6Li+oslnsMf20aAQLM9OwfYSzxyUPh6xPwpuwfqXLT8OXbJDXR5KAecz14nWL0kz
+         jLZA==
+X-Gm-Message-State: ANhLgQ3vlsB0ezPNdcG9Np1AFtgyXVdQOzLBT+RkWqjxjOuaHRGPN/E6
+        ZbSBWog9H9y6fEfeG0KxGf5rn+nCGm9AYjemYs4MOGqNjHQtI+y5CVub/6HLg5q3EsSjqscXQab
+        6Fece0dies66v
+X-Received: by 2002:a1c:2e4d:: with SMTP id u74mr4107936wmu.96.1584009380311;
+        Thu, 12 Mar 2020 03:36:20 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vs7zWG7tWo2aK3FgLZH9xdm8Y5FGguMSvAZpJaTh4TPxo4IM8BRiVjLFQaYc3w9c3HX8ctjrA==
+X-Received: by 2002:a1c:2e4d:: with SMTP id u74mr4107908wmu.96.1584009380046;
+        Thu, 12 Mar 2020 03:36:20 -0700 (PDT)
+Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
+        by smtp.gmail.com with ESMTPSA id l7sm2679012wrw.33.2020.03.12.03.36.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 12 Mar 2020 03:36:19 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Wanpeng Li <kernellwp@gmail.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>
+Subject: Re: [PATCH] KVM: VMX: Micro-optimize vmexit time when not exposing PMU
+In-Reply-To: <1584007547-4802-1-git-send-email-wanpengli@tencent.com>
+References: <1584007547-4802-1-git-send-email-wanpengli@tencent.com>
+Date:   Thu, 12 Mar 2020 11:36:19 +0100
+Message-ID: <87r1xxrhb0.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
+Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-PiA+PiBJbiB0aGUgbmV3IHByb3Bvc2FsLCBLVk0gdXNlciBpcyB0cmVhdGVkIHRoZSBzYW1lIGFz
-IG90aGVyIGhvc3QNCj4gPj4gZXZlbnRzIHdpdGggZXZlbnQgY29uc3RyYWludC4gVGhlIHNjaGVk
-dWxlciBpcyBmcmVlIHRvIGNob29zZSB3aGV0aGVyDQo+ID4+IG9yIG5vdCB0byBhc3NpZ24gYSBj
-b3VudGVyIGZvciBpdC4NCj4gPiBUaGF0J3Mgd2hhdCBpdCBkb2VzLCBJIHVuZGVyc3RhbmQgdGhh
-dC4gSSdtIHNheWluZyB0aGF0IHRoYXQgaXMNCj4gPiBjcmVhdGluZyBhcnRpZmljaWFsIGNvbnRl
-bnRpb24uDQo+ID4NCj4gPg0KPiA+IFdoeSBpcyB0aGlzIG5lZWRlZCBhbnl3YXk/IENhbid0IHdl
-IGZvcmNlIHRoZSBndWVzdCB0byBmbHVzaCBhbmQgdGhlbg0KPiA+IG1vdmUgaXQgb3ZlciB0byBh
-IG5ldyBjb3VudGVyPw0KPiANCj4gS1ZNIG9ubHkgdHJhcHMgdGhlIE1TUiBhY2Nlc3MuIFRoZXJl
-IGlzIG5vIE1TUiBhY2Nlc3MgZHVyaW5nIHRoZSBzY2hlZHVsaW5nDQo+IGluIGd1ZXN0Lg0KPiBL
-Vk0vaG9zdCBvbmx5IGtub3dzIHRoZSByZXF1ZXN0IGNvdW50ZXIsIHdoZW4gZ3Vlc3QgdHJpZXMg
-dG8gZW5hYmxlIHRoZQ0KPiBjb3VudGVyLiBJdCdzIHRvbyBsYXRlIGZvciBndWVzdCB0byBzdGFy
-dCBvdmVyLg0KPiANCj4gUmVnYXJkaW5nIHRvIHRoZSBhcnRpZmljaWFsIGNvbnRlbnRpb24sIGFz
-IG15IHVuZGVyc3RhbmRpbmcsIGl0IHNob3VsZCByYXJlbHkNCj4gaGFwcGVuIGluIHByYWN0aWNh
-bC4NCj4gQ2xvdWQgdmVuZG9ycyBoYXZlIHRvIGV4cGxpY2l0bHkgc2V0IHBlYnMgb3B0aW9uIGlu
-IHFlbXUgdG8gZW5hYmxlIFBFQlMNCj4gc3VwcG9ydCBmb3IgZ3Vlc3QuIFRoZXkga25vd3MgdGhl
-IGVudmlyb25tZW50IHdlbGwuIFRoZXkgY2FuIGF2b2lkIHRoZQ0KPiBjb250ZW50aW9uLiAoV2Ug
-bWF5IGltcGxlbWVudCBzb21lIHBhdGNoZXMgZm9yIHFlbXUvS1ZNIGxhdGVyIHRvDQo+IHRlbXBv
-cmFyaWx5IGRpc2FibGUgUEVCUyBpbiBydW50aW1lIGlmIHRoZXkgcmVxdWlyZS4pDQo+IA0KPiBG
-b3Igbm93LCBJIHRoaW5rIHdlIG1heSBwcmludCBhIHdhcm5pbmcgd2hlbiBib3RoIGhvc3QgYW5k
-IGd1ZXN0IHJlcXVpcmUgdGhlDQo+IHNhbWUgY291bnRlci4gSG9zdCBjYW4gZ2V0IGEgY2x1ZSBm
-cm9tIHRoZSB3YXJuaW5nLg0KDQpIaSBQZXRlciwNCiAgICBXaGF0IGlzIHlvdXIgb3Bpbmlvbj8g
-V2UgY2FuIHRyZWF0IHRoZSBndWVzdCBQRUJTIGV2ZW50IGFzIGFuIGV2ZW50IGZyb20gdGhlIHVz
-ZXIuIEEgbGl0dGxlIGRpZmZlcmVudCBmcm9tIG90aGVyIGV2ZW50cyBpcyB0aGUgbmVlZCBvZiBw
-aW4gdG8gdGhlIHNwZWNpZmljIGNvdW50ZXIgYmVjYXVzZSB0aGUgY291bnRlciBpbmRleCB3aWxs
-IGJlIGluY2x1ZGVkIGluIHRoZSBHdWVzdCBQRUJTIHJlY29yZC4gVGhlIGd1ZXN0IGNvdW50ZXIg
-Y2FuJ3QgYmUgZm9yY2VkIGRpc2FibGVkL3JlbGVhc2VkIGFzIHdlbGwsIG90aGVyd2lzZSwgdGhl
-IGVuZC11c2VyIHdpbGwgY29tcGxhaW4uIENhbiB3ZSBhZGQgYSB3YXJuaW5nIHdoZW4gdGhlIGNv
-bnRlbnRpb24gaXMgZGV0ZWN0ZWQgb3IgYWRkIHNvbWUgZGVzY3JpcHRpb24gaW4gdGhlIGRvY3Vt
-ZW50IG9yLi4uPw0KDQpUaGFua3MsDQpMdXdlaSBLYW5nDQo=
+Wanpeng Li <kernellwp@gmail.com> writes:
+
+> From: Wanpeng Li <wanpengli@tencent.com>
+>
+> PMU is not exposed to guest by most of cloud providers since the bad performance 
+> of PMU emulation and security concern. However, it calls perf_guest_switch_get_msrs()
+> and clear_atomic_switch_msr() unconditionally even if PMU is not exposed to the 
+> guest before each vmentry. 
+>
+> ~1.28% vmexit time reduced can be observed by kvm-unit-tests/vmexit.flat on my 
+> SKX server.
+>
+> Before patch:
+> vmcall 1559
+>
+> After patch:
+> vmcall 1539
+>
+> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+> ---
+>  arch/x86/kvm/vmx/vmx.c | 3 +++
+>  1 file changed, 3 insertions(+)
+>
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 40b1e61..fd526c8 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -6441,6 +6441,9 @@ static void atomic_switch_perf_msrs(struct vcpu_vmx *vmx)
+>  	int i, nr_msrs;
+>  	struct perf_guest_switch_msr *msrs;
+>  
+> +	if (!vcpu_to_pmu(&vmx->vcpu)->version)
+> +		return;
+> +
+>  	msrs = perf_guest_get_msrs(&nr_msrs);
+>  
+>  	if (!msrs)
+
+Personally, I'd prefer this to be expressed as
+
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 40b1e6138cd5..ace92076c90f 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -6567,7 +6567,9 @@ static void vmx_vcpu_run(struct kvm_vcpu *vcpu)
+ 
+        pt_guest_enter(vmx);
+ 
+-       atomic_switch_perf_msrs(vmx);
++       if (vcpu_to_pmu(&vmx->vcpu)->version)
++               atomic_switch_perf_msrs(vmx);
++
+        atomic_switch_umwait_control_msr(vmx);
+ 
+        if (enable_preemption_timer)
+
+(which will likely produce the same code as atomic_switch_perf_msrs() is
+likely inlined).
+
+Also, (not knowing much about PMU), is
+"vcpu_to_pmu(&vmx->vcpu)->version" check correct?
+
+E.g. in intel_is_valid_msr() correct for Intel PMU or is it stated
+somewhere that it is generic rule?
+
+Also, speaking about cloud providers and the 'micro' nature of this
+optimization, would it rather make sense to introduce a static branch
+(the policy to disable vPMU is likely to be host wide, right)?
+
+-- 
+Vitaly
+
