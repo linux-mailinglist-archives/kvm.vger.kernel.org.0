@@ -2,139 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id BC438183858
-	for <lists+kvm@lfdr.de>; Thu, 12 Mar 2020 19:15:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 993F8183873
+	for <lists+kvm@lfdr.de>; Thu, 12 Mar 2020 19:20:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726579AbgCLSPi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Mar 2020 14:15:38 -0400
-Received: from mga17.intel.com ([192.55.52.151]:29400 "EHLO mga17.intel.com"
+        id S1726512AbgCLST6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Mar 2020 14:19:58 -0400
+Received: from foss.arm.com ([217.140.110.172]:39520 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726520AbgCLSPi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 Mar 2020 14:15:38 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 12 Mar 2020 11:15:38 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,545,1574150400"; 
-   d="scan'208";a="442148589"
-Received: from sjchrist-coffee.jf.intel.com ([10.54.74.202])
-  by fmsmga005.fm.intel.com with ESMTP; 12 Mar 2020 11:15:37 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH] KVM: x86: Print symbolic names of VMX VM-Exit flags in traces
-Date:   Thu, 12 Mar 2020 11:15:35 -0700
-Message-Id: <20200312181535.23797-1-sean.j.christopherson@intel.com>
-X-Mailer: git-send-email 2.24.1
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        id S1726328AbgCLST6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 Mar 2020 14:19:58 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 184A130E;
+        Thu, 12 Mar 2020 11:19:58 -0700 (PDT)
+Received: from donnerap.arm.com (donnerap.cambridge.arm.com [10.1.197.25])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BC9F43F67D;
+        Thu, 12 Mar 2020 11:19:56 -0700 (PDT)
+From:   Andre Przywara <andre.przywara@arm.com>
+To:     Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Will Deacon <will@kernel.org>,
+        Robin Murphy <robin.murphy@arm.com>
+Cc:     Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        iommu@lists.linux-foundation.org,
+        Eric Auger <eric.auger@redhat.com>
+Subject: [RFC PATCH] vfio: Ignore -ENODEV when getting MSI cookie
+Date:   Thu, 12 Mar 2020 18:19:50 +0000
+Message-Id: <20200312181950.60664-1-andre.przywara@arm.com>
+X-Mailer: git-send-email 2.17.1
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Use __print_flags() to display the names of VMX flags in VM-Exit traces
-and strip the flags when printing the basic exit reason, e.g. so that a
-failed VM-Entry due to invalid guest state gets recorded as
-"INVALID_STATE FAILED_VMENTRY" instead of "0x80000021".
+When we try to get an MSI cookie for a VFIO device, that can fail if
+CONFIG_IOMMU_DMA is not set. In this case iommu_get_msi_cookie() returns
+-ENODEV, and that should not be fatal.
 
-Opportunstically fix misaligned variables in the kvm_exit and
-kvm_nested_vmexit_inject tracepoints.
+Ignore that case and proceed with the initialisation.
 
-Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+This fixes VFIO with a platform device on the Calxeda Midway (no MSIs).
+
+Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 ---
- arch/x86/include/uapi/asm/vmx.h |  3 +++
- arch/x86/kvm/trace.h            | 32 +++++++++++++++++---------------
- 2 files changed, 20 insertions(+), 15 deletions(-)
+Hi,
 
-diff --git a/arch/x86/include/uapi/asm/vmx.h b/arch/x86/include/uapi/asm/vmx.h
-index e95b72ec19bc..b8ff9e8ac0d5 100644
---- a/arch/x86/include/uapi/asm/vmx.h
-+++ b/arch/x86/include/uapi/asm/vmx.h
-@@ -150,6 +150,9 @@
- 	{ EXIT_REASON_UMWAIT,                "UMWAIT" }, \
- 	{ EXIT_REASON_TPAUSE,                "TPAUSE" }
+not sure this is the right fix, or we should rather check if the
+platform doesn't support MSIs at all (which doesn't seem to be easy
+to do).
+Or is this because arm-smmu.c always reserves an IOMMU_RESV_SW_MSI
+region?
+
+Also this seems to be long broken, actually since Eric introduced MSI
+support in 4.10-rc3, but at least since the initialisation order was
+fixed with f6810c15cf9.
+
+Grateful for any insight.
+
+Cheers,
+Andre
+
+ drivers/vfio/vfio_iommu_type1.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+index a177bf2c6683..467e217ef09a 100644
+--- a/drivers/vfio/vfio_iommu_type1.c
++++ b/drivers/vfio/vfio_iommu_type1.c
+@@ -1786,7 +1786,7 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
  
-+#define VMX_EXIT_REASON_FLAGS \
-+	{ VMX_EXIT_REASONS_FAILED_VMENTRY,	"FAILED_VMENTRY" }
-+
- #define VMX_ABORT_SAVE_GUEST_MSR_FAIL        1
- #define VMX_ABORT_LOAD_HOST_PDPTE_FAIL       2
- #define VMX_ABORT_LOAD_HOST_MSR_FAIL         4
-diff --git a/arch/x86/kvm/trace.h b/arch/x86/kvm/trace.h
-index f5b8814d9f83..3cfc8d97b158 100644
---- a/arch/x86/kvm/trace.h
-+++ b/arch/x86/kvm/trace.h
-@@ -219,6 +219,14 @@ TRACE_EVENT(kvm_apic,
- #define KVM_ISA_VMX   1
- #define KVM_ISA_SVM   2
+ 	if (resv_msi) {
+ 		ret = iommu_get_msi_cookie(domain->domain, resv_msi_base);
+-		if (ret)
++		if (ret && ret != -ENODEV)
+ 			goto out_detach;
+ 	}
  
-+#define kvm_print_exit_reason(exit_reason, isa)				\
-+	(isa == KVM_ISA_VMX) ?						\
-+	__print_symbolic(exit_reason & 0xffff, VMX_EXIT_REASONS) :	\
-+	__print_symbolic(exit_reason, SVM_EXIT_REASONS),		\
-+	(isa == KVM_ISA_VMX && exit_reason & ~0xffff) ? " " : "",	\
-+	(isa == KVM_ISA_VMX) ?						\
-+	__print_flags(exit_reason & ~0xffff, " ", VMX_EXIT_REASON_FLAGS) : ""
-+
- /*
-  * Tracepoint for kvm guest exit:
-  */
-@@ -244,12 +252,10 @@ TRACE_EVENT(kvm_exit,
- 					   &__entry->info2);
- 	),
- 
--	TP_printk("vcpu %u reason %s rip 0x%lx info %llx %llx",
-+	TP_printk("vcpu %u reason %s%s%s rip 0x%lx info %llx %llx",
- 		  __entry->vcpu_id,
--		 (__entry->isa == KVM_ISA_VMX) ?
--		 __print_symbolic(__entry->exit_reason, VMX_EXIT_REASONS) :
--		 __print_symbolic(__entry->exit_reason, SVM_EXIT_REASONS),
--		 __entry->guest_rip, __entry->info1, __entry->info2)
-+		  kvm_print_exit_reason(__entry->exit_reason, __entry->isa),
-+		  __entry->guest_rip, __entry->info1, __entry->info2)
- );
- 
- /*
-@@ -582,12 +588,10 @@ TRACE_EVENT(kvm_nested_vmexit,
- 		__entry->exit_int_info_err	= exit_int_info_err;
- 		__entry->isa			= isa;
- 	),
--	TP_printk("rip: 0x%016llx reason: %s ext_inf1: 0x%016llx "
-+	TP_printk("rip: 0x%016llx reason: %s%s%s ext_inf1: 0x%016llx "
- 		  "ext_inf2: 0x%016llx ext_int: 0x%08x ext_int_err: 0x%08x",
- 		  __entry->rip,
--		 (__entry->isa == KVM_ISA_VMX) ?
--		 __print_symbolic(__entry->exit_code, VMX_EXIT_REASONS) :
--		 __print_symbolic(__entry->exit_code, SVM_EXIT_REASONS),
-+		  kvm_print_exit_reason(__entry->exit_code, __entry->isa),
- 		  __entry->exit_info1, __entry->exit_info2,
- 		  __entry->exit_int_info, __entry->exit_int_info_err)
- );
-@@ -620,13 +624,11 @@ TRACE_EVENT(kvm_nested_vmexit_inject,
- 		__entry->isa			= isa;
- 	),
- 
--	TP_printk("reason: %s ext_inf1: 0x%016llx "
-+	TP_printk("reason: %s%s%s ext_inf1: 0x%016llx "
- 		  "ext_inf2: 0x%016llx ext_int: 0x%08x ext_int_err: 0x%08x",
--		 (__entry->isa == KVM_ISA_VMX) ?
--		 __print_symbolic(__entry->exit_code, VMX_EXIT_REASONS) :
--		 __print_symbolic(__entry->exit_code, SVM_EXIT_REASONS),
--		__entry->exit_info1, __entry->exit_info2,
--		__entry->exit_int_info, __entry->exit_int_info_err)
-+		  kvm_print_exit_reason(__entry->exit_code, __entry->isa),
-+		  __entry->exit_info1, __entry->exit_info2,
-+		  __entry->exit_int_info, __entry->exit_int_info_err)
- );
- 
- /*
 -- 
-2.24.1
+2.17.1
 
