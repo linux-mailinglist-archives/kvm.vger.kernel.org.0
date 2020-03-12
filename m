@@ -2,177 +2,154 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id EEB7318264B
-	for <lists+kvm@lfdr.de>; Thu, 12 Mar 2020 01:39:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3794E1826C4
+	for <lists+kvm@lfdr.de>; Thu, 12 Mar 2020 02:45:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387518AbgCLAjk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Mar 2020 20:39:40 -0400
-Received: from mail-dm6nam11on2048.outbound.protection.outlook.com ([40.107.223.48]:32833
-        "EHLO NAM11-DM6-obe.outbound.protection.outlook.com"
+        id S2387628AbgCLBpm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Mar 2020 21:45:42 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:49984 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S2387486AbgCLAjk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 11 Mar 2020 20:39:40 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=fgeMUgBYqk7R2GtLiMxiMe2SKcffVYei2Rk4+Q/kquwqT3luf/hYoxliNpbd8+qTDBBS1Zdnu2UgNtQiKB9qVQ07ULLUnyigJUz+EtkXUwb2RoeFuSY16ly+bB8hhmlc4zViZdiR6UyGSOA37gSwMtOCgVp8Y1e8r7VqDyrfoV6sqj8jafbxIwi3QFumkxubA8uELYMorK7HTh+riad/m2ptkas3NVlgeFO+NQjPGRkZAG9aUBi5nm267O2Y1eosqYctC4CG4PIJkCNAnRRy0LjhCI3OXlFgBR2YmuPrZ8yrHVMxPhE9PVHDzrZdh85v2MUSlpgVXsSJJ0/XElq6GQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Mtblxdy2aDMSi+orff0eKuWX1MniM94QBDKkbCP98W8=;
- b=RJ5Zui7SiyTWn0o7SfP2wTCClL6HSxt+bQ2VWys6386hlfnNHNoogFcz5ca86LW7Pu90rI1L1Yi1//b72WZjfTJ6aQhJGFhn1XEfrjRBEIz4jn0QQnMiVaaeAE0Bb7PCMS7RhGYLOcy+eiHygs2/0YfsD0wrTYWwqzx/nx6hICtVypZfR5CajFskicKZwWwZgvjaEcBYMgAe/aktlccL45s2MnOk5LQ2Dgrj8hY951TINDqdDKTyvT9AsTo1Z1YWLY+rgg5eaTdIq3NMi0FzG00OrAm/kLfPHbwtqR+FuZiVexKlA6M3pzxFXa1blRRYz3FtqzZFOQ1yzgVR/CLq1w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Mtblxdy2aDMSi+orff0eKuWX1MniM94QBDKkbCP98W8=;
- b=oBo3+263j2XoUjnC4u9E1qkLzWCc6qf/KwiDUoAwYLmE7bVGbKiQPqA48C6+F93A7AuOA49iP3GhIPQZc7M86C/Mzy38zIHDvdTUUEBOPFnvTCnfQRZJF6Mp+rrVFBzhEd2nASGrPbq6cidvq6hC84OLYwyq2kHQ2nvjQzLlxuE=
-Authentication-Results: spf=none (sender IP is )
- smtp.mailfrom=Ashish.Kalra@amd.com; 
-Received: from DM5PR12MB1386.namprd12.prod.outlook.com (2603:10b6:3:77::9) by
- DM5PR12MB1148.namprd12.prod.outlook.com (2603:10b6:3:74::17) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2793.17; Thu, 12 Mar 2020 00:39:01 +0000
-Received: from DM5PR12MB1386.namprd12.prod.outlook.com
- ([fe80::969:3d4e:6f37:c33c]) by DM5PR12MB1386.namprd12.prod.outlook.com
- ([fe80::969:3d4e:6f37:c33c%12]) with mapi id 15.20.2793.018; Thu, 12 Mar 2020
- 00:39:01 +0000
-Date:   Thu, 12 Mar 2020 00:38:55 +0000
-From:   Ashish Kalra <ashish.kalra@amd.com>
-To:     Steve Rutherford <srutherford@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Joerg Roedel <joro@8bytes.org>, Borislav Petkov <bp@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        David Rientjes <rientjes@google.com>, X86 ML <x86@kernel.org>,
-        KVM list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>, brijesh.singh@amd.com
-Subject: Re: [PATCH 04/12] KVM: SVM: Add support for KVM_SEV_RECEIVE_START
- command
-Message-ID: <20200312003855.GA26448@ashkalra_ubuntu_server>
-References: <cover.1581555616.git.ashish.kalra@amd.com>
- <0a0b3815e03dcee47ca0fbf4813821877b4c2ea0.1581555616.git.ashish.kalra@amd.com>
- <CABayD+ciJiF8gf+s6d57vENcnSQPQGzTTwdo0TLBsNLdoy0tWw@mail.gmail.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CABayD+ciJiF8gf+s6d57vENcnSQPQGzTTwdo0TLBsNLdoy0tWw@mail.gmail.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-ClientProxiedBy: DM6PR13CA0048.namprd13.prod.outlook.com
- (2603:10b6:5:134::25) To DM5PR12MB1386.namprd12.prod.outlook.com
- (2603:10b6:3:77::9)
+        id S2387571AbgCLBpm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 Mar 2020 21:45:42 -0400
+Received: from DGGEMS405-HUB.china.huawei.com (unknown [172.30.72.59])
+        by Forcepoint Email with ESMTP id 9DD712E01B64EC9C1957;
+        Thu, 12 Mar 2020 09:45:36 +0800 (CST)
+Received: from [127.0.0.1] (10.173.221.230) by DGGEMS405-HUB.china.huawei.com
+ (10.3.19.205) with Microsoft SMTP Server id 14.3.487.0; Thu, 12 Mar 2020
+ 09:45:26 +0800
+Subject: Re: [RFC] KVM: arm64: support enabling dirty log graually in small
+ chunks
+To:     "Zhoujian (jay)" <jianjay.zhou@huawei.com>,
+        Marc Zyngier <maz@kernel.org>
+References: <20200309085727.1106-1-zhukeqian1@huawei.com>
+ <4b85699ec1d354cc73f5302560231f86@misterjones.org>
+ <64925c8b-af3d-beb5-bc9b-66ef1e47f92d@huawei.com>
+ <a642a79ea9190542a9098e4c9dc5a9f2@kernel.org>
+ <9ddefc54-dd5b-0555-0aaa-00a3a23febcf@huawei.com>
+ <B2D15215269B544CADD246097EACE7474BB64495@DGGEMM528-MBX.china.huawei.com>
+CC:     "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "James Morse" <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        "Huangweidong (C)" <weidong.huang@huawei.com>,
+        "wangxin (U)" <wangxinxin.wang@huawei.com>
+From:   zhukeqian <zhukeqian1@huawei.com>
+Message-ID: <3238d495-8c13-4fbb-8e3d-c34e560ec9af@huawei.com>
+Date:   Thu, 12 Mar 2020 09:45:25 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.7.1
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from ashkalra_ubuntu_server (165.204.77.1) by DM6PR13CA0048.namprd13.prod.outlook.com (2603:10b6:5:134::25) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2814.8 via Frontend Transport; Thu, 12 Mar 2020 00:38:59 +0000
-X-Originating-IP: [165.204.77.1]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 398d0955-4e9e-4b0c-4a92-08d7c61dc1dd
-X-MS-TrafficTypeDiagnostic: DM5PR12MB1148:|DM5PR12MB1148:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <DM5PR12MB1148941169809A6F8D153B638EFD0@DM5PR12MB1148.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:5236;
-X-Forefront-PRVS: 0340850FCD
-X-Forefront-Antispam-Report: SFV:NSPM;SFS:(10009020)(4636009)(136003)(39860400002)(366004)(396003)(376002)(346002)(199004)(7416002)(86362001)(6496006)(52116002)(6916009)(33656002)(2906002)(33716001)(6666004)(8676002)(5660300002)(66476007)(9686003)(55016002)(8936002)(81166006)(81156014)(1076003)(44832011)(478600001)(186003)(316002)(16526019)(26005)(66556008)(54906003)(956004)(66946007)(4326008);DIR:OUT;SFP:1101;SCL:1;SRVR:DM5PR12MB1148;H:DM5PR12MB1386.namprd12.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;
-Received-SPF: None (protection.outlook.com: amd.com does not designate
- permitted sender hosts)
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: Rt633aPsVroUTIoxhbpI4sU2MkDN8EN5/K7OdHCuxBQ19Q7Z2Fi/r75dYav2C+t/cuFnk5WXQgHrlqqQqkk098MsNTXPg4e+R+rPDeiYhh83cSKeGsdI3jAiy6SX+wSf/cJjbMLbaVq7XDm8pnRd1f3fhpD8FLPrQk8hpzDdOukZXpL5+qjOl8+K7m75pL4gZ1zzsWtTE1lafzGkMWKq2rXBw2kDssWaHr+Yi4uFDnF4kVvKLOBmbNVWZeXxTeSRADguFd7v/ZM9g2b4xUKkDR3uzguMJjZk+qSxxH3WlFC6k+rA6aSSBiMQy8wjUbiOubL/P6HQFSW0QKNmHFfn5nsKA8Y3ZtN3ZXhn2ejTNKGg1/ynz2rwLXEPLQS8L5vfLSFOyNXhwlN4NtpIht72qzpQLI5XiHS+YhcEckACs3pGJ0+VAB9bKfLpc4rvuE8v
-X-MS-Exchange-AntiSpam-MessageData: ZNZHbomLObZQ8S+9w7+sfDJaArOBAbVQKArVKAmWV51BdtJpTvfcmh759HEhzQprpUnz36LU2jOOXwhTRgy7O/SPCKTatvBUi25VfmlrfqBoJrKt0cZCcUVSK6F4kLs9VD5cnPefxtwodFrWiCiC6w==
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 398d0955-4e9e-4b0c-4a92-08d7c61dc1dd
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Mar 2020 00:39:01.0208
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: AdhwcqbM2WjTm5aISMvFh/wBX1osy8MEUNVSUcILx0lkjbrv8OvR2eGrA4HS/A+t8pXHcLSerTY/tXtuSg44eA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR12MB1148
+In-Reply-To: <B2D15215269B544CADD246097EACE7474BB64495@DGGEMM528-MBX.china.huawei.com>
+Content-Type: text/plain; charset="windows-1252"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.173.221.230]
+X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Mar 09, 2020 at 06:41:02PM -0700, Steve Rutherford wrote:
-> > +static int sev_receive_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
-> > +{
-> > +       struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
-> > +       struct sev_data_receive_start *start;
-> > +       struct kvm_sev_receive_start params;
-> > +       int *error = &argp->error;
-> > +       void *session_data;
-> > +       void *pdh_data;
-> > +       int ret;
-> > +
-> > +       if (!sev_guest(kvm))
-> > +               return -ENOTTY;
-> > +
-> > +       /* Get parameter from the userspace */
-> > +       if (copy_from_user(&params, (void __user *)(uintptr_t)argp->data,
-> > +                       sizeof(struct kvm_sev_receive_start)))
-> > +               return -EFAULT;
-> > +
-> > +       /* some sanity checks */
-> > +       if (!params.pdh_uaddr || !params.pdh_len ||
-> > +           !params.session_uaddr || !params.session_len)
-> > +               return -EINVAL;
-> > +
-> > +       pdh_data = psp_copy_user_blob(params.pdh_uaddr, params.pdh_len);
-> > +       if (IS_ERR(pdh_data))
-> > +               return PTR_ERR(pdh_data);
-> > +
-> > +       session_data = psp_copy_user_blob(params.session_uaddr,
-> > +                       params.session_len);
-> > +       if (IS_ERR(session_data)) {
-> > +               ret = PTR_ERR(session_data);
-> > +               goto e_free_pdh;
-> > +       }
-> > +
-> > +       ret = -ENOMEM;
-> > +       start = kzalloc(sizeof(*start), GFP_KERNEL);
-> > +       if (!start)
-> > +               goto e_free_session;
-> > +
-> > +       start->handle = params.handle;
-> > +       start->policy = params.policy;
-> > +       start->pdh_cert_address = __psp_pa(pdh_data);
-> > +       start->pdh_cert_len = params.pdh_len;
-> > +       start->session_address = __psp_pa(session_data);
-> > +       start->session_len = params.session_len;
-> > +
-> > +       /* create memory encryption context */
+Hi Jay,
+
+On 2020/3/11 15:34, Zhoujian (jay) wrote:
 > 
-> Set ret to a different value here, since otherwise this will look like -ENOMEM.
-
-But, ret will be the value returned by __sev_issue_cmd(), so why will it
-look like -ENOMEM ?
-
 > 
-> > +       ret = __sev_issue_cmd(argp->sev_fd, SEV_CMD_RECEIVE_START, start,
-> > +                               error);
-> > +       if (ret)
-> > +               goto e_free;
-> > +
-> > +       /* Bind ASID to this guest */
+>> -----Original Message-----
+>> From: zhukeqian
+>> Sent: Wednesday, March 11, 2020 3:20 PM
+>> To: Marc Zyngier <maz@kernel.org>
+>> Cc: kvmarm@lists.cs.columbia.edu; kvm@vger.kernel.org;
+>> linux-kernel@vger.kernel.org; linux-arm-kernel@lists.infradead.org; Zhoujian (jay)
+>> <jianjay.zhou@huawei.com>; Sean Christopherson
+>> <sean.j.christopherson@intel.com>; Paolo Bonzini <pbonzini@redhat.com>;
+>> James Morse <james.morse@arm.com>; Julien Thierry
+>> <julien.thierry.kdev@gmail.com>; Suzuki K Poulose <suzuki.poulose@arm.com>
+>> Subject: Re: [RFC] KVM: arm64: support enabling dirty log graually in small chunks
+>>
+>> Hi Marc,
+>>
+>> On 2020/3/10 21:16, Marc Zyngier wrote:
+>>> On 2020-03-10 08:26, zhukeqian wrote:
+>>>> Hi Marc,
+>>>>
+>>>> On 2020/3/9 19:45, Marc Zyngier wrote:
+>>>>> Kegian,
+>>>
+>>> [...]
+>>>
+>>>>> Is there a userspace counterpart to it?
+>>>>>
+>>>> As this KVM/x86 related changes have not been merged to mainline
+>>>> kernel, some little modification is needed on mainline Qemu.
+>>>
+>>> Could you please point me to these changes?
+>> I made some changes locally listed below.
+>>
+>> However, Qemu can choose to enable KVM_DIRTY_LOG_INITIALLY_SET or not.
+>> Here I made no judgement on dirty_log_manual_caps because I just want to
+>> verify the optimization of this patch.
+>>
+>> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c index
+>> 439a4efe52..1611f644a4 100644
+>> --- a/accel/kvm/kvm-all.c
+>> +++ b/accel/kvm/kvm-all.c
+>> @@ -2007,14 +2007,16 @@ static int kvm_init(MachineState *ms)
+>>      s->coalesced_pio = s->coalesced_mmio &&
+>>                         kvm_check_extension(s,
+>> KVM_CAP_COALESCED_PIO);
+>>
+>> -    s->manual_dirty_log_protect =
+>> +    uint64_t dirty_log_manual_caps =
+>>          kvm_check_extension(s,
+>> KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2);
+>> -    if (s->manual_dirty_log_protect) {
+>> -        ret = kvm_vm_enable_cap(s,
+>> KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2, 0, 1);
+>> +    if (dirty_log_manual_caps) {
+>> +        ret = kvm_vm_enable_cap(s,
+>> KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2, 0,
+>> +                                dirty_log_manual_caps);
+>>          if (ret) {
+>>              warn_report("Trying to enable
+>> KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2 "
+>>                          "but failed.  Falling back to the legacy mode. ");
+>> -            s->manual_dirty_log_protect = false;
+>> +        } else {
+>> +            s->manual_dirty_log_protect = true;
+>>          }
+>>      }
 > 
-> Ideally, set ret to another distinct value, since the error spaces for
-> these commands overlap, so you won't be sure which had the problem.
-> You also wouldn't be sure if one succeeded and the other failed vs
-> both failing.
-
-Both commands "may" return the same error code as set by sev_do_cmd(), but
-then we need that very specific error code, sev_do_cmd() can't return
-different error codes for each command it is issuing ?
-
+> FYI: I had submitted a patch to the Qemu community some days ago:
+> https://patchwork.kernel.org/patch/11419191/
+This is very helpful, thanks.
 > 
-> > +       ret = sev_bind_asid(kvm, start->handle, error);
-> > +       if (ret)
-> > +               goto e_free;
-> > +
-
+>>>
+>>>> As I tested this patch on a 128GB RAM Linux VM with no huge pages,
+>>>> the time of enabling dirty log will decrease obviously.
+>>>
+>>> I'm not sure how realistic that is. Not having huge pages tends to
+>>> lead to pretty bad performance in general...
+>> Sure, this has no effect on guests which are all of huge pages.
+>>
+>> For my understanding, once a guest has normal pages (maybe are initialized at
+>> beginning or dissloved from huge pages), it can benefit from this patch.
+> 
+> Yes, I agree.
+> 
+I will send PATCH v1 soon.
+> 
+> 
+> Regards,
+> Jay Zhou
+> 
+> .
+>
 Thanks,
-Ashish
+Keqian
 
