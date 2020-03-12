@@ -2,104 +2,177 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D029C1825EC
-	for <lists+kvm@lfdr.de>; Thu, 12 Mar 2020 00:35:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EEB7318264B
+	for <lists+kvm@lfdr.de>; Thu, 12 Mar 2020 01:39:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731418AbgCKXfl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Mar 2020 19:35:41 -0400
-Received: from mail-pj1-f65.google.com ([209.85.216.65]:55436 "EHLO
-        mail-pj1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726194AbgCKXfl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 11 Mar 2020 19:35:41 -0400
-Received: by mail-pj1-f65.google.com with SMTP id mj6so1585639pjb.5
-        for <kvm@vger.kernel.org>; Wed, 11 Mar 2020 16:35:40 -0700 (PDT)
+        id S2387518AbgCLAjk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Mar 2020 20:39:40 -0400
+Received: from mail-dm6nam11on2048.outbound.protection.outlook.com ([40.107.223.48]:32833
+        "EHLO NAM11-DM6-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S2387486AbgCLAjk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 Mar 2020 20:39:40 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=fgeMUgBYqk7R2GtLiMxiMe2SKcffVYei2Rk4+Q/kquwqT3luf/hYoxliNpbd8+qTDBBS1Zdnu2UgNtQiKB9qVQ07ULLUnyigJUz+EtkXUwb2RoeFuSY16ly+bB8hhmlc4zViZdiR6UyGSOA37gSwMtOCgVp8Y1e8r7VqDyrfoV6sqj8jafbxIwi3QFumkxubA8uELYMorK7HTh+riad/m2ptkas3NVlgeFO+NQjPGRkZAG9aUBi5nm267O2Y1eosqYctC4CG4PIJkCNAnRRy0LjhCI3OXlFgBR2YmuPrZ8yrHVMxPhE9PVHDzrZdh85v2MUSlpgVXsSJJ0/XElq6GQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Mtblxdy2aDMSi+orff0eKuWX1MniM94QBDKkbCP98W8=;
+ b=RJ5Zui7SiyTWn0o7SfP2wTCClL6HSxt+bQ2VWys6386hlfnNHNoogFcz5ca86LW7Pu90rI1L1Yi1//b72WZjfTJ6aQhJGFhn1XEfrjRBEIz4jn0QQnMiVaaeAE0Bb7PCMS7RhGYLOcy+eiHygs2/0YfsD0wrTYWwqzx/nx6hICtVypZfR5CajFskicKZwWwZgvjaEcBYMgAe/aktlccL45s2MnOk5LQ2Dgrj8hY951TINDqdDKTyvT9AsTo1Z1YWLY+rgg5eaTdIq3NMi0FzG00OrAm/kLfPHbwtqR+FuZiVexKlA6M3pzxFXa1blRRYz3FtqzZFOQ1yzgVR/CLq1w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=4zuCrPDHBtAX21eY9BKIbx4zaoZTw3vfx8hnGFwyk5I=;
-        b=cI3xnRPtZ0gJ6SxtNkOLCMVb+rU2wbQIr1qQT3zyzkm25a4PHdXkTJmLgF8NNdcL4j
-         t7TcMqn0aNyS+tfXA/dLMXUhSHppqsSrtI0k9oJhd+WCIalNioe2yRt3K/4Oyqxedf9o
-         adS3FrGxExEwBUIu2JMe/qIwyuQGhwLMl8eeb4NnblFWpuQ/Tit/kCr2GDoGKHfKLx2g
-         97YT0ualChmYVu2KPLQxj0eVcSVyWeYlADsulBWvThUAVVSoNy9GFdIKPTHlIZEq/IP1
-         Nk0ydgwatI8aBEFK6+Y6+OtjAns06B7ymZBeTWYy5SJXlN4+EpXGpu3AF/938YH9dG77
-         MkPQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=4zuCrPDHBtAX21eY9BKIbx4zaoZTw3vfx8hnGFwyk5I=;
-        b=OmnTa8Q0VMQRArnIAaEwfQVeFDhk9kb8aQkI3KFc8UygNmsv+3tRUmqepOsl3fR0Qk
-         wCIrJgy6U+hi1tWDTxfCRFF4iyre8tFCdwlgD2ZAuEk3PBD1FmpQqrKlyzDecP+WP3G6
-         vehwS2qfSfh4wRLg8I2aBZlfMOfqIR6maEn1CU3DCPQYwEp3zIFvYz/vXZs1Q1KXlkqU
-         uonHa12o6yjqiBpoBbLMvKDyjJFompry7+Zvie6nezVUrOKmabWy+ngi9suYUC1SGRsi
-         rjmSgH5FXzYMGlXXFW8EgVC4Rd8UweJe9eeqjPFVDV3oNPh3tgWm2w7xsCy+Y4NM7m8n
-         wO+w==
-X-Gm-Message-State: ANhLgQ2bIEc9hezSHNSpz8J2VOixA4poGBZhbDjAcTCsSgPAnInjxQW7
-        uC/leX13UpXXy0ppsP1O0xw=
-X-Google-Smtp-Source: ADFU+vv4EOxlxZA6nMxiSbmoDoebcBF87Zm8UZ5X5KHtpVI9Xq1EYO9Papi6EJJfd7Z5peb034cbfQ==
-X-Received: by 2002:a17:902:467:: with SMTP id 94mr5163432ple.302.1583969739717;
-        Wed, 11 Mar 2020 16:35:39 -0700 (PDT)
-Received: from [10.235.171.60] ([73.93.152.208])
-        by smtp.gmail.com with ESMTPSA id my6sm7406942pjb.10.2020.03.11.16.35.38
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 11 Mar 2020 16:35:39 -0700 (PDT)
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3608.60.0.2.5\))
-Subject: Re: [PATCH] kvm-unit-test: nVMX: Test Selector and Base Address
- fields of Guest Segment Registers on vmentry of nested guests
-From:   Nadav Amit <nadav.amit@gmail.com>
-In-Reply-To: <20200311232550.GM21852@linux.intel.com>
-Date:   Wed, 11 Mar 2020 16:35:37 -0700
-Cc:     Liran Alon <liran.alon@oracle.com>,
-        Krish Sadhukhan <krish.sadhukhan@oracle.com>,
-        kvm list <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jim Mattson <jmattson@google.com>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <E6A6C555-8750-41E4-AD34-68EB0769C4BE@gmail.com>
-References: <20200310225149.31254-1-krish.sadhukhan@oracle.com>
- <20200310225149.31254-2-krish.sadhukhan@oracle.com>
- <20200311150516.GB21852@linux.intel.com>
- <0fb906f6-574f-2e2e-4113-e9d883cb713e@oracle.com>
- <20200311214657.GJ21852@linux.intel.com>
- <E53A1909-C614-401C-A22E-8A22B3E36225@gmail.com>
- <d5f0ba6a-8c7f-60b6-871b-615d11b08a1b@oracle.com>
- <20200311231206.GL21852@linux.intel.com>
- <E0581325-7501-438D-B547-4FEC4F2C2D28@gmail.com>
- <20200311232550.GM21852@linux.intel.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-X-Mailer: Apple Mail (2.3608.60.0.2.5)
+ d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Mtblxdy2aDMSi+orff0eKuWX1MniM94QBDKkbCP98W8=;
+ b=oBo3+263j2XoUjnC4u9E1qkLzWCc6qf/KwiDUoAwYLmE7bVGbKiQPqA48C6+F93A7AuOA49iP3GhIPQZc7M86C/Mzy38zIHDvdTUUEBOPFnvTCnfQRZJF6Mp+rrVFBzhEd2nASGrPbq6cidvq6hC84OLYwyq2kHQ2nvjQzLlxuE=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=Ashish.Kalra@amd.com; 
+Received: from DM5PR12MB1386.namprd12.prod.outlook.com (2603:10b6:3:77::9) by
+ DM5PR12MB1148.namprd12.prod.outlook.com (2603:10b6:3:74::17) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2793.17; Thu, 12 Mar 2020 00:39:01 +0000
+Received: from DM5PR12MB1386.namprd12.prod.outlook.com
+ ([fe80::969:3d4e:6f37:c33c]) by DM5PR12MB1386.namprd12.prod.outlook.com
+ ([fe80::969:3d4e:6f37:c33c%12]) with mapi id 15.20.2793.018; Thu, 12 Mar 2020
+ 00:39:01 +0000
+Date:   Thu, 12 Mar 2020 00:38:55 +0000
+From:   Ashish Kalra <ashish.kalra@amd.com>
+To:     Steve Rutherford <srutherford@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Joerg Roedel <joro@8bytes.org>, Borislav Petkov <bp@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        David Rientjes <rientjes@google.com>, X86 ML <x86@kernel.org>,
+        KVM list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>, brijesh.singh@amd.com
+Subject: Re: [PATCH 04/12] KVM: SVM: Add support for KVM_SEV_RECEIVE_START
+ command
+Message-ID: <20200312003855.GA26448@ashkalra_ubuntu_server>
+References: <cover.1581555616.git.ashish.kalra@amd.com>
+ <0a0b3815e03dcee47ca0fbf4813821877b4c2ea0.1581555616.git.ashish.kalra@amd.com>
+ <CABayD+ciJiF8gf+s6d57vENcnSQPQGzTTwdo0TLBsNLdoy0tWw@mail.gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CABayD+ciJiF8gf+s6d57vENcnSQPQGzTTwdo0TLBsNLdoy0tWw@mail.gmail.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-ClientProxiedBy: DM6PR13CA0048.namprd13.prod.outlook.com
+ (2603:10b6:5:134::25) To DM5PR12MB1386.namprd12.prod.outlook.com
+ (2603:10b6:3:77::9)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from ashkalra_ubuntu_server (165.204.77.1) by DM6PR13CA0048.namprd13.prod.outlook.com (2603:10b6:5:134::25) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2814.8 via Frontend Transport; Thu, 12 Mar 2020 00:38:59 +0000
+X-Originating-IP: [165.204.77.1]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: 398d0955-4e9e-4b0c-4a92-08d7c61dc1dd
+X-MS-TrafficTypeDiagnostic: DM5PR12MB1148:|DM5PR12MB1148:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <DM5PR12MB1148941169809A6F8D153B638EFD0@DM5PR12MB1148.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:5236;
+X-Forefront-PRVS: 0340850FCD
+X-Forefront-Antispam-Report: SFV:NSPM;SFS:(10009020)(4636009)(136003)(39860400002)(366004)(396003)(376002)(346002)(199004)(7416002)(86362001)(6496006)(52116002)(6916009)(33656002)(2906002)(33716001)(6666004)(8676002)(5660300002)(66476007)(9686003)(55016002)(8936002)(81166006)(81156014)(1076003)(44832011)(478600001)(186003)(316002)(16526019)(26005)(66556008)(54906003)(956004)(66946007)(4326008);DIR:OUT;SFP:1101;SCL:1;SRVR:DM5PR12MB1148;H:DM5PR12MB1386.namprd12.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;
+Received-SPF: None (protection.outlook.com: amd.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: Rt633aPsVroUTIoxhbpI4sU2MkDN8EN5/K7OdHCuxBQ19Q7Z2Fi/r75dYav2C+t/cuFnk5WXQgHrlqqQqkk098MsNTXPg4e+R+rPDeiYhh83cSKeGsdI3jAiy6SX+wSf/cJjbMLbaVq7XDm8pnRd1f3fhpD8FLPrQk8hpzDdOukZXpL5+qjOl8+K7m75pL4gZ1zzsWtTE1lafzGkMWKq2rXBw2kDssWaHr+Yi4uFDnF4kVvKLOBmbNVWZeXxTeSRADguFd7v/ZM9g2b4xUKkDR3uzguMJjZk+qSxxH3WlFC6k+rA6aSSBiMQy8wjUbiOubL/P6HQFSW0QKNmHFfn5nsKA8Y3ZtN3ZXhn2ejTNKGg1/ynz2rwLXEPLQS8L5vfLSFOyNXhwlN4NtpIht72qzpQLI5XiHS+YhcEckACs3pGJ0+VAB9bKfLpc4rvuE8v
+X-MS-Exchange-AntiSpam-MessageData: ZNZHbomLObZQ8S+9w7+sfDJaArOBAbVQKArVKAmWV51BdtJpTvfcmh759HEhzQprpUnz36LU2jOOXwhTRgy7O/SPCKTatvBUi25VfmlrfqBoJrKt0cZCcUVSK6F4kLs9VD5cnPefxtwodFrWiCiC6w==
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 398d0955-4e9e-4b0c-4a92-08d7c61dc1dd
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Mar 2020 00:39:01.0208
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: AdhwcqbM2WjTm5aISMvFh/wBX1osy8MEUNVSUcILx0lkjbrv8OvR2eGrA4HS/A+t8pXHcLSerTY/tXtuSg44eA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR12MB1148
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> On Mar 11, 2020, at 4:25 PM, Sean Christopherson =
-<sean.j.christopherson@intel.com> wrote:
->=20
-> On Wed, Mar 11, 2020 at 04:21:08PM -0700, Nadav Amit wrote:
->>> On Mar 11, 2020, at 4:12 PM, Sean Christopherson =
-<sean.j.christopherson@intel.com> wrote:
->>>=20
->>> On Thu, Mar 12, 2020 at 12:54:05AM +0200, Liran Alon wrote:
->>>> Of course it was best if Intel would have shared their unit-tests =
-for CPU
->>>> functionality (Sean? I'm looking at you :P), but I am not aware =
-that they
->>>> did.
->>>=20
->>> Only in my dreams :-)  I would love to open source some of Intel's
->>> validation tools so that they could be adapted to hammer KVM, but =
-it'll
->>> never happen for a variety of reasons.
->>=20
->> FYI: In 2014 I ran Intel=E2=80=99s fuzzing-tool (Cafe) to test KVM =
-and found (and
->> fixed) ~100 bugs. And I did not even test nested virtualization=E2=80=A6=
+On Mon, Mar 09, 2020 at 06:41:02PM -0700, Steve Rutherford wrote:
+> > +static int sev_receive_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
+> > +{
+> > +       struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+> > +       struct sev_data_receive_start *start;
+> > +       struct kvm_sev_receive_start params;
+> > +       int *error = &argp->error;
+> > +       void *session_data;
+> > +       void *pdh_data;
+> > +       int ret;
+> > +
+> > +       if (!sev_guest(kvm))
+> > +               return -ENOTTY;
+> > +
+> > +       /* Get parameter from the userspace */
+> > +       if (copy_from_user(&params, (void __user *)(uintptr_t)argp->data,
+> > +                       sizeof(struct kvm_sev_receive_start)))
+> > +               return -EFAULT;
+> > +
+> > +       /* some sanity checks */
+> > +       if (!params.pdh_uaddr || !params.pdh_len ||
+> > +           !params.session_uaddr || !params.session_len)
+> > +               return -EINVAL;
+> > +
+> > +       pdh_data = psp_copy_user_blob(params.pdh_uaddr, params.pdh_len);
+> > +       if (IS_ERR(pdh_data))
+> > +               return PTR_ERR(pdh_data);
+> > +
+> > +       session_data = psp_copy_user_blob(params.session_uaddr,
+> > +                       params.session_len);
+> > +       if (IS_ERR(session_data)) {
+> > +               ret = PTR_ERR(session_data);
+> > +               goto e_free_pdh;
+> > +       }
+> > +
+> > +       ret = -ENOMEM;
+> > +       start = kzalloc(sizeof(*start), GFP_KERNEL);
+> > +       if (!start)
+> > +               goto e_free_session;
+> > +
+> > +       start->handle = params.handle;
+> > +       start->policy = params.policy;
+> > +       start->pdh_cert_address = __psp_pa(pdh_data);
+> > +       start->pdh_cert_len = params.pdh_len;
+> > +       start->session_address = __psp_pa(session_data);
+> > +       start->session_len = params.session_len;
+> > +
+> > +       /* create memory encryption context */
+> 
+> Set ret to a different value here, since otherwise this will look like -ENOMEM.
 
->=20
-> Heh, I worked on Cafe for 6+ years :-)
+But, ret will be the value returned by __sev_issue_cmd(), so why will it
+look like -ENOMEM ?
 
-Well, I was working on its predecessor, Janus, for 5 years=E2=80=A6=20=
+> 
+> > +       ret = __sev_issue_cmd(argp->sev_fd, SEV_CMD_RECEIVE_START, start,
+> > +                               error);
+> > +       if (ret)
+> > +               goto e_free;
+> > +
+> > +       /* Bind ASID to this guest */
+> 
+> Ideally, set ret to another distinct value, since the error spaces for
+> these commands overlap, so you won't be sure which had the problem.
+> You also wouldn't be sure if one succeeded and the other failed vs
+> both failing.
+
+Both commands "may" return the same error code as set by sev_do_cmd(), but
+then we need that very specific error code, sev_do_cmd() can't return
+different error codes for each command it is issuing ?
+
+> 
+> > +       ret = sev_bind_asid(kvm, start->handle, error);
+> > +       if (ret)
+> > +               goto e_free;
+> > +
+
+Thanks,
+Ashish
+
