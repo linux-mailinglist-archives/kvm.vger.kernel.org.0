@@ -2,110 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E04DC182FD2
-	for <lists+kvm@lfdr.de>; Thu, 12 Mar 2020 13:05:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 531311830C8
+	for <lists+kvm@lfdr.de>; Thu, 12 Mar 2020 14:02:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726952AbgCLMFI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Mar 2020 08:05:08 -0400
-Received: from mail.kernel.org ([198.145.29.99]:40600 "EHLO mail.kernel.org"
+        id S1726571AbgCLNCy convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Thu, 12 Mar 2020 09:02:54 -0400
+Received: from mail.kernel.org ([198.145.29.99]:49482 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726044AbgCLMFI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 Mar 2020 08:05:08 -0400
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 967DB206E7;
-        Thu, 12 Mar 2020 12:05:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1584014707;
-        bh=kF1jN8Wxs2QJYXtiW/6/YPILqARijKLxcTLHrblKp4U=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=xMSz8X+0VXtjyVOmUmgY3wXSKQTgBmi1+2IsmfOShGZSY/RDKa1wL6/UIClcZYUK2
-         mjK9DrRrxe8P8dn0eVzIOEyjY9i1E7TE0OqZwj/KTjVT/ulAIWr0rvFFpu/FJJiL5P
-         M3Xdaxx4zwUu4eC4bcu9xVh8m113xDUJpkMkZiQw=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
-        by disco-boy.misterjones.org with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.92)
-        (envelope-from <maz@kernel.org>)
-        id 1jCMaH-00CCnj-Tk; Thu, 12 Mar 2020 12:05:06 +0000
+        id S1726044AbgCLNCx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 Mar 2020 09:02:53 -0400
+From:   bugzilla-daemon@bugzilla.kernel.org
+Authentication-Results: mail.kernel.org; dkim=permerror (bad message/signature format)
+To:     kvm@vger.kernel.org
+Subject: [Bug 206831] New: Intel AC 9260 wifi doesn't load in vm(sys-net
+ under qubes os)
+Date:   Thu, 12 Mar 2020 13:02:52 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: new
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: high
+X-Bugzilla-Who: lipan.ovidiu@gmail.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_id short_desc product version
+ cf_kernel_version rep_platform op_sys cf_tree bug_status bug_severity
+ priority component assigned_to reporter cf_regression
+Message-ID: <bug-206831-28872@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date:   Thu, 12 Mar 2020 12:05:05 +0000
-From:   Marc Zyngier <maz@kernel.org>
-To:     Zenghui Yu <yuzenghui@huawei.com>
-Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
-        Jason Cooper <jason@lakedaemon.net>,
-        Robert Richter <rrichter@marvell.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Eric Auger <eric.auger@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: Re: [PATCH v5 01/23] irqchip/gic-v3: Use SGIs without active state if
- offered
-In-Reply-To: <51b2c74fdbcca049cc01be6d78c7c693@kernel.org>
-References: <20200304203330.4967-1-maz@kernel.org>
- <20200304203330.4967-2-maz@kernel.org>
- <63f6530a-9369-31e6-88d0-5337173495b9@huawei.com>
- <51b2c74fdbcca049cc01be6d78c7c693@kernel.org>
-Message-ID: <1bff1835ba7d6e22edb836d38cf16a14@kernel.org>
-X-Sender: maz@kernel.org
-User-Agent: Roundcube Webmail/1.3.10
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, lorenzo.pieralisi@arm.com, jason@lakedaemon.net, rrichter@marvell.com, tglx@linutronix.de, eric.auger@redhat.com, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2020-03-12 09:28, Marc Zyngier wrote:
-> Hi Zenghui,
-> 
-> On 2020-03-12 06:30, Zenghui Yu wrote:
->> Hi Marc,
->> 
->> On 2020/3/5 4:33, Marc Zyngier wrote:
->>> To allow the direct injection of SGIs into a guest, the GICv4.1
->>> architecture has to sacrifice the Active state so that SGIs look
->>> a lot like LPIs (they are injected by the same mechanism).
->>> 
->>> In order not to break existing software, the architecture gives
->>> offers guests OSs the choice: SGIs with or without an active
->>> state. It is the hypervisors duty to honor the guest's choice.
->>> 
->>> For this, the architecture offers a discovery bit indicating whether
->>> the GIC supports GICv4.1 SGIs (GICD_TYPER2.nASSGIcap), and another
->>> bit indicating whether the guest wants Active-less SGIs or not
->>> (controlled by GICD_CTLR.nASSGIreq).
->> 
->> I still can't find the description of these two bits in IHI0069F.
->> Are they actually architected and will be available in the future
->> version of the spec?  I want to confirm it again since this has a
->> great impact on the KVM code, any pointers?
-> 
-> Damn. The bits *are* in the engineering spec version 19 (unfortunately
-> not a public document, but I believe you should have access to it).
-> 
-> If the bits have effectively been removed from the spec, I'll drop the
-> GICv4.1 code from the 5.7 queue until we find a way to achieve the same
-> level of support.
-> 
-> I've emailed people inside ARM to find out.
+https://bugzilla.kernel.org/show_bug.cgi?id=206831
 
-I've now had written confirmation that the bits are still there.
+            Bug ID: 206831
+           Summary: Intel AC 9260 wifi doesn't load in vm(sys-net under
+                    qubes os)
+           Product: Virtualization
+           Version: unspecified
+    Kernel Version: 5.6-rc4
+          Hardware: Intel
+                OS: Linux
+              Tree: Mainline
+            Status: NEW
+          Severity: high
+          Priority: P1
+         Component: kvm
+          Assignee: virtualization_kvm@kernel-bugs.osdl.org
+          Reporter: lipan.ovidiu@gmail.com
+        Regression: No
 
-It is just that the current revision of the documentation was cut 
-*before*
-they made it into the architecture (there seem to be a 6 month delay 
-between
-the architecture being sampled and the documentation being released).
+I recently updated my qubes r4.1 fc31 to kernel 5.6-rc4(due lack of Nvidia rtx
+2080 support under the old kernel). Now the NV card works properly but I've
+lost the wifi connection under sys-net vm. I must mention it used to works
+perfectly on the older kernel version(actually any version up to 5.6, including
+5.5.9 freshly compiled). I also updated the sys-net vm kernel verision to
+5.6-rc4 but I still have the issue. Here is the output of dmseg of sys-net:
 
-         M.
+[    7.332438] iwlwifi 0000:00:06.0: Failed to load firmware chunk!
+[    7.332458] iwlwifi 0000:00:06.0: iwlwifi transaction failed, dumping
+registers
+[    7.332476] iwlwifi 0000:00:06.0: iwlwifi device config registers:
+[    7.338624] iwlwifi 0000:00:06.0: 00000000: 25268086 00180406 02800029
+00000000 f2010004 00000000 00000000 00000000
+[    7.338651] iwlwifi 0000:00:06.0: 00000020: 00000000 00000000 00000000
+15501a56 00000000 000000c8 00000000 0000010b
+[    7.338677] iwlwifi 0000:00:06.0: 00000040: 00020010 00008ec0 00102810
+0045e812 10120000 00000000 00000000 00000000
+[    7.338701] iwlwifi 0000:00:06.0: 00000060: 00000000 00080812 00000000
+00000000 00000002 00000000 00000000 00000000
+[    7.338725] iwlwifi 0000:00:06.0: 00000080: 000f0011 00002000 00003000
+00000000 00000000 00000000 00000000 00000000
+[    7.338749] iwlwifi 0000:00:06.0: 000000a0: 00000000 00000000 00000000
+00000000 00000000 00000000 00000000 00000000
+[    7.338773] iwlwifi 0000:00:06.0: 000000c0: 00000000 00000000 0023d001
+0d000008 00804005 fee97000 00000000 00004300
+[    7.338797] iwlwifi 0000:00:06.0: 000000e0: 00000000 00000000 00000000
+00000000 00000000 00000000 00000000 00000000
+[    7.338822] iwlwifi 0000:00:06.0: Read failed at 0x100
+[    7.338836] iwlwifi 0000:00:06.0: Could not load the [0] uCode section
+[    7.338860] iwlwifi 0000:00:06.0: Failed to start INIT ucode: -110
+[    7.338877] iwlwifi 0000:00:06.0: Collecting data: trigger 16 fired.
+[    7.588505] iwlwifi 0000:00:06.0: Not valid error log pointer 0x00000000 for
+Init uCode
+[    7.588537] iwlwifi 0000:00:06.0: Fseq Registers:
+[    7.588557] iwlwifi 0000:00:06.0: 0x66C2C9EE | FSEQ_ERROR_CODE
+[    7.588579] iwlwifi 0000:00:06.0: 0x00000000 | FSEQ_TOP_INIT_VERSION
+[    7.588602] iwlwifi 0000:00:06.0: 0x815790C8 | FSEQ_CNVIO_INIT_VERSION
+[    7.588624] iwlwifi 0000:00:06.0: 0x0000A371 | FSEQ_OTP_VERSION
+[    7.588645] iwlwifi 0000:00:06.0: 0xF133AC29 | FSEQ_TOP_CONTENT_VERSION
+[    7.588668] iwlwifi 0000:00:06.0: 0xAFFDD78E | FSEQ_ALIVE_TOKEN
+[    7.588689] iwlwifi 0000:00:06.0: 0xB1F3B688 | FSEQ_CNVI_ID
+[    7.588709] iwlwifi 0000:00:06.0: 0x6F9FEAC3 | FSEQ_CNVR_ID
+[    7.588729] iwlwifi 0000:00:06.0: 0x01000200 | CNVI_AUX_MISC_CHIP
+[    7.588753] iwlwifi 0000:00:06.0: 0x01300202 | CNVR_AUX_MISC_CHIP
+[    7.588778] iwlwifi 0000:00:06.0: 0x0000485B |
+CNVR_SCU_SD_REGS_SD_REG_DIG_DCDC_VTRIM
+[    7.588856] iwlwifi 0000:00:06.0: 0x0BADCAFE |
+CNVR_SCU_SD_REGS_SD_REG_ACTIVE_VDIG_MIRROR
+[    7.588929] iwlwifi 0000:00:06.0: Firmware not running - cannot dump error
+[    7.601717] iwlwifi 0000:00:06.0: Failed to run INIT ucode: -110
+
+
+Any help will be highly appreciated.
+
+Thank you
+
 -- 
-Jazz is not dead. It just smells funny...
+You are receiving this mail because:
+You are watching the assignee of the bug.
