@@ -2,215 +2,177 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A63CC1829E4
-	for <lists+kvm@lfdr.de>; Thu, 12 Mar 2020 08:42:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0B1DB182A6E
+	for <lists+kvm@lfdr.de>; Thu, 12 Mar 2020 09:05:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388146AbgCLHmD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Mar 2020 03:42:03 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:11669 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S2388086AbgCLHmD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 Mar 2020 03:42:03 -0400
-Received: from DGGEMS401-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id 832CF39499E54775AFE3;
-        Thu, 12 Mar 2020 15:41:58 +0800 (CST)
-Received: from [127.0.0.1] (10.173.222.27) by DGGEMS401-HUB.china.huawei.com
- (10.3.19.201) with Microsoft SMTP Server id 14.3.487.0; Thu, 12 Mar 2020
- 15:41:52 +0800
-Subject: Re: [PATCH v5 11/23] irqchip/gic-v4.1: Plumb get/set_irqchip_state
- SGI callbacks
-To:     Marc Zyngier <maz@kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-CC:     Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
-        Jason Cooper <jason@lakedaemon.net>,
-        Robert Richter <rrichter@marvell.com>,
-        "Thomas Gleixner" <tglx@linutronix.de>,
-        Eric Auger <eric.auger@redhat.com>,
-        "James Morse" <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>
-References: <20200304203330.4967-1-maz@kernel.org>
- <20200304203330.4967-12-maz@kernel.org>
-From:   Zenghui Yu <yuzenghui@huawei.com>
-Message-ID: <da2fd5bc-0fe3-df3a-090f-0b5ce378a34a@huawei.com>
-Date:   Thu, 12 Mar 2020 15:41:50 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+        id S2388232AbgCLIEx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Mar 2020 04:04:53 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:15058 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S2388194AbgCLIEx (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 12 Mar 2020 04:04:53 -0400
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 02C80P7i081635
+        for <kvm@vger.kernel.org>; Thu, 12 Mar 2020 04:04:51 -0400
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2yqg0qu093-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Thu, 12 Mar 2020 04:04:50 -0400
+Received: from localhost
+        by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
+        Thu, 12 Mar 2020 08:00:32 -0000
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
+        by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Thu, 12 Mar 2020 08:00:30 -0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 02C80Tb948758890
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 12 Mar 2020 08:00:29 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 1952152079;
+        Thu, 12 Mar 2020 08:00:29 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.152.224.141])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id D35A15206B;
+        Thu, 12 Mar 2020 08:00:28 +0000 (GMT)
+Subject: Re: kvm/queue demand paging test and s390
+To:     Andrew Jones <drjones@redhat.com>
+Cc:     Ben Gardon <bgardon@google.com>, kvm list <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>
+References: <c845637e-d662-993e-2184-fa34bae79495@de.ibm.com>
+ <20200310172744.36lawcszzjbebz6d@kamzik.brq.redhat.com>
+ <2d1fbe47-75fe-f57c-ab7a-65702e1ea23d@de.ibm.com>
+ <20200311062653.yczihmgrnfqyrwa3@kamzik.brq.redhat.com>
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+ nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
+Date:   Thu, 12 Mar 2020 09:00:28 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200304203330.4967-12-maz@kernel.org>
-Content-Type: text/plain; charset="utf-8"; format=flowed
+In-Reply-To: <20200311062653.yczihmgrnfqyrwa3@kamzik.brq.redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.173.222.27]
-X-CFilter-Loop: Reflected
+X-TM-AS-GCONF: 00
+x-cbid: 20031208-0008-0000-0000-0000035BF632
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20031208-0009-0000-0000-00004A7D3F06
+Message-Id: <8733ba0b-7722-3ab2-39e5-3a6a01efb571@de.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
+ definitions=2020-03-11_15:2020-03-11,2020-03-11 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 suspectscore=0
+ impostorscore=0 priorityscore=1501 lowpriorityscore=0 clxscore=1015
+ mlxlogscore=871 malwarescore=0 spamscore=0 phishscore=0 bulkscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2001150001 definitions=main-2003120042
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
 
-Some checkpatch errors below:
 
-On 2020/3/5 4:33, Marc Zyngier wrote:
-> To implement the get/set_irqchip_state callbacks (limited to the
-> PENDING state), we have to use a particular set of hacks:
+On 11.03.20 07:26, Andrew Jones wrote:
+> On Tue, Mar 10, 2020 at 09:18:16PM +0100, Christian Borntraeger wrote:
+>>
+>>
+>> On 10.03.20 18:27, Andrew Jones wrote:
+>>> On Tue, Mar 10, 2020 at 05:54:59PM +0100, Christian Borntraeger wrote:
+>>>> For s390 the guest memory size must be 1M aligned. I need something like the following to make this work:
+>>>>
+>>>> diff --git a/tools/testing/selftests/kvm/demand_paging_test.c b/tools/testing/selftests/kvm/demand_paging_test.c
+>>>> index c1e326d3ed7f..f85ec3f01a35 100644
+>>>> --- a/tools/testing/selftests/kvm/demand_paging_test.c
+>>>> +++ b/tools/testing/selftests/kvm/demand_paging_test.c
+>>>> @@ -164,6 +164,10 @@ static struct kvm_vm *create_vm(enum vm_guest_mode mode, int vcpus,
+>>>>         pages += ((2 * vcpus * vcpu_memory_bytes) >> PAGE_SHIFT_4K) /
+>>>>                  PTES_PER_4K_PT;
+>>>>         pages = vm_adjust_num_guest_pages(mode, pages);
+>>>> +#ifdef __s390x__
+>>>> +       /* s390 requires 1M aligned guest sizes */
+>>>> +       pages = (pages + 255) & ~0xff;
+>>>> +#endif
+>>>>  
+>>>>         pr_info("Testing guest mode: %s\n", vm_guest_mode_string(mode));
+>>>>  
+>>>>
+>>>> any better idea how to do that?
+>>>>
+>>>
+>>> For this one we could patch[*] vm_adjust_num_guest_pages(). That would
+>>> also allow the one on line 382, and another one at dirty_log_test.c:300
+>>> to be hidden.
+>>
+>> I tried that first but then I ran into several other asserts that checked for
+>> num_pages = vm_adjust_num_guest_pages(num_pages)
+>>
+>> See kvm_util.c:     TEST_ASSERT(vm_adjust_num_guest_pages(vm->mode, npages) == npages
+>>
+>> So it seems like a bigger rework is necessary to avoid this little hack :-/
 > 
-> - Reading the pending state is done by using a pair of new redistributor
->    registers (GICR_VSGIR, GICR_VSGIPENDR), which allow the 16 interrupts
->    state to be retrieved.
-> - Setting the pending state is done by generating it as we'd otherwise do
->    for a guest (writing to GITS_SGIR).
-> - Clearing the pending state is done by emiting a VSGI command with the
->    "clear" bit set.
+> There's just this one other assert, and it'll only fire if the number of
+> guest pages aren't selectect correctly. One must just be sure they
+> always select the number correctly or do
 > 
-> This requires some interesting locking though:
-> - When talking to the redistributor, we must make sure that the VPE
->    affinity doesn't change, hence taking the VPE lock.
-> - At the same time, we must ensure that nobody accesses the same
->    redistributor's GICR_VSGI*R registers for a different VPE, which
->    would corrupt the reading of the pending bits. We thus take the
->    per-RD spinlock. Much fun.
+>  adjusted_num_pages = vm_adjust_num_guest_pages(mode, guessed_num_pages);
+>  vm_userspace_mem_region_add(..., adjusted_num_pages, ...);
 > 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->   drivers/irqchip/irq-gic-v3-its.c   | 73 ++++++++++++++++++++++++++++++
->   include/linux/irqchip/arm-gic-v3.h | 14 ++++++
->   2 files changed, 87 insertions(+)
+> to ensure it. If we patch vm_adjust_num_guest_pages() as suggested below
+> then the assert should never fire when the number is already correct,
+> because vm_adjust_num_guest_pages() doesn't change an already correct
+> number, i.e.
 > 
-> diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
-> index c93f178914ee..fb2b836c31ff 100644
-> --- a/drivers/irqchip/irq-gic-v3-its.c
-> +++ b/drivers/irqchip/irq-gic-v3-its.c
-> @@ -3962,11 +3962,84 @@ static int its_sgi_set_affinity(struct irq_data *d,
->   	return -EINVAL;
->   }
->   
-> +static int its_sgi_set_irqchip_state(struct irq_data *d,
-> +				     enum irqchip_irq_state which,
-> +				     bool state)
-> +{
-> +	if (which != IRQCHIP_STATE_PENDING)
-> +		return -EINVAL;
-> +
-> +	if (state) {
-> +		struct its_vpe *vpe = irq_data_get_irq_chip_data(d);
-> +		struct its_node *its = find_4_1_its();
-> +		u64 val;
-> +
-> +		val  = FIELD_PREP(GITS_SGIR_VPEID, vpe->vpe_id);
-> +		val |= FIELD_PREP(GITS_SGIR_VINTID, d->hwirq);
-> +		writeq_relaxed(val, its->sgir_base + GITS_SGIR - SZ_128K);
-> +	} else {
-> +		its_configure_sgi(d, true);
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +static int its_sgi_get_irqchip_state(struct irq_data *d,
-> +				     enum irqchip_irq_state which, bool *val)
-> +{
-> +	struct its_vpe *vpe = irq_data_get_irq_chip_data(d);
-> +	void __iomem *base;
-> +	unsigned long flags;
-> +	u32 count = 1000000;	/* 1s! */
-> +	u32 status;
-> +	int cpu;
-> +
-> +	if (which != IRQCHIP_STATE_PENDING)
-> +		return -EINVAL;
-> +
-> +	/*
-> +	 * Locking galore! We can race against two different events:
-> +	 *
-> +	 * - Concurent vPE affinity change: we must make sure it cannot
-> +         *   happen, or we'll talk to the wrong redistributor. This is
-> +         *   identical to what happens with vLPIs.
+>  adjusted_num_pages == vm_adjust_num_guest_pages(mode, adjusted_num_pages)
+> 
+> If an assert is firing after making that change, then I wonder if not
+> all s390 memregions are 1M aligned?
 
-code indent should use tabs where possible
-
-> +	 *
-> +	 * - Concurrent VSGIPENDR access: As it involves accessing two
-> +         *   MMIO registers, this must be made atomic one way or another.
-
-The same here.
-
-> +	 */
-> +	cpu = vpe_to_cpuid_lock(vpe, &flags);
-> +	raw_spin_lock(&gic_data_rdist_cpu(cpu)->rd_lock);
-> +	base = gic_data_rdist_cpu(cpu)->rd_base + SZ_128K;
-> +	writel_relaxed(vpe->vpe_id, base + GICR_VSGIR);
-> +	do {
-> +		status = readl_relaxed(base + GICR_VSGIPENDR);
-> +		if (!(status & GICR_VSGIPENDR_BUSY))
-> +			goto out;
-> +
-> +		count--;
-> +		if (!count) {
-> +			pr_err_ratelimited("Unable to get SGI status\n");
-> +			goto out;
-> +		}
-> +		cpu_relax();
-> +		udelay(1);
-> +	} while(count);
-
-space required before the open parenthesis '('
-
-> +
-> +out:
-> +	raw_spin_unlock(&gic_data_rdist_cpu(cpu)->rd_lock);
-> +	vpe_to_cpuid_unlock(vpe, flags);
-> +	*val = !!(status & (1 << d->hwirq));
-> +
-> +	return 0;
-> +}
-> +
->   static struct irq_chip its_sgi_irq_chip = {
->   	.name			= "GICv4.1-sgi",
->   	.irq_mask		= its_sgi_mask_irq,
->   	.irq_unmask		= its_sgi_unmask_irq,
->   	.irq_set_affinity	= its_sgi_set_affinity,
-> +	.irq_set_irqchip_state	= its_sgi_set_irqchip_state,
-> +	.irq_get_irqchip_state	= its_sgi_get_irqchip_state,
->   };
->   
->   static int its_sgi_irq_domain_alloc(struct irq_domain *domain,
-> diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
-> index fd3be49ac9a5..830d2abf14b3 100644
-> --- a/include/linux/irqchip/arm-gic-v3.h
-> +++ b/include/linux/irqchip/arm-gic-v3.h
-> @@ -345,6 +345,15 @@
->   #define GICR_VPENDBASER_4_1_VGRP1EN	(1ULL << 58)
->   #define GICR_VPENDBASER_4_1_VPEID	GENMASK_ULL(15, 0)
->   
-> +#define GICR_VSGIR			0x0080
-> +
-> +#define GICR_VSGIR_VPEID		GENMASK(15, 0)
-> +
-> +#define GICR_VSGIPENDR			0x0088
-> +
-> +#define GICR_VSGIPENDR_BUSY		(1U << 31)
-> +#define GICR_VSGIPENDR_PENDING		GENMASK(15, 0)
-> +
->   /*
->    * ITS registers, offsets from ITS_base
->    */
-> @@ -368,6 +377,11 @@
->   
->   #define GITS_TRANSLATER			0x10040
->   
-> +#define GITS_SGIR			0x20020
-> +
-> +#define GITS_SGIR_VPEID			GENMASK_ULL(47, 32)
-> +#define GITS_SGIR_VINTID		GENMASK_ULL(7, 0)
-
-GENMASK_ULL(3, 0), though not a problem.  Besides,
-
-Reviewed-by: Zenghui Yu <yuzenghui@huawei.com>
-
-
-Thanks
+I just checked your patch and it seems to work fine. No idea what I did wrong
+in my test. Can you respin this as a proper patch against kvm/queue?
 
