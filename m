@@ -2,124 +2,86 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 531311830C8
-	for <lists+kvm@lfdr.de>; Thu, 12 Mar 2020 14:02:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A24E8183206
+	for <lists+kvm@lfdr.de>; Thu, 12 Mar 2020 14:51:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726571AbgCLNCy convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Thu, 12 Mar 2020 09:02:54 -0400
-Received: from mail.kernel.org ([198.145.29.99]:49482 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726044AbgCLNCx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 Mar 2020 09:02:53 -0400
-From:   bugzilla-daemon@bugzilla.kernel.org
-Authentication-Results: mail.kernel.org; dkim=permerror (bad message/signature format)
-To:     kvm@vger.kernel.org
-Subject: [Bug 206831] New: Intel AC 9260 wifi doesn't load in vm(sys-net
- under qubes os)
-Date:   Thu, 12 Mar 2020 13:02:52 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: new
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: high
-X-Bugzilla-Who: lipan.ovidiu@gmail.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_id short_desc product version
- cf_kernel_version rep_platform op_sys cf_tree bug_status bug_severity
- priority component assigned_to reporter cf_regression
-Message-ID: <bug-206831-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        id S1727381AbgCLNva (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Mar 2020 09:51:30 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:41229 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727270AbgCLNva (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 Mar 2020 09:51:30 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1584021088;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=2nAfdnCM9aEuiGPmfbZ3pIUNPPugXK/vVGLzpCG2PUc=;
+        b=bWxJQFGxTiw/hB3QWCW8EgpPz/4ojr71DKfZ6cdzK0taoW0mVVv3nobUCZ9TGhvp3mdEnx
+        Vr86dk3nmrFc9PEnINSs0pSG7232zPXCSNh3lR/rPJoe9uSeKqn6MIN86vwC+qQm5JnSHv
+        fs8uAaRIdYItKqlFOUCABIyxnJTN9To=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-175-FSYLvuUPNXuRIxI3D1YKBA-1; Thu, 12 Mar 2020 09:51:26 -0400
+X-MC-Unique: FSYLvuUPNXuRIxI3D1YKBA-1
+Received: by mail-wm1-f71.google.com with SMTP id f9so316405wme.7
+        for <kvm@vger.kernel.org>; Thu, 12 Mar 2020 06:51:25 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=2nAfdnCM9aEuiGPmfbZ3pIUNPPugXK/vVGLzpCG2PUc=;
+        b=nCYMzm7zzhskEXFpSL+OmVWjV2Lvj/xmxFPTRu1R7m4KneRgNXtKbNzatHquG5JODb
+         L8hxy/dywxYgU6FdjurZV7aJeCo5mzlpffWTsPETEk0vGxfzEZsMT0qdQy1U8H6T/Y8D
+         /D64z5VZeXqOwtefw7Oi3tf1xYs080ZKfTS232EBzvTehrJCu4ICk5qZ5yeipkKR+12r
+         fpQDv6ngOwneld2JaIsTjMZCn69D+VYCUBbKvRP3Mp6AKW0itktwFYNVPNxz1VgnvSI8
+         JmL6g2FO23pJumWJDQ8ZDWa0B1EMI7VtCVoJMQfDzy/SdxkZaDAihTXFGntCMBMDNLIu
+         mKXA==
+X-Gm-Message-State: ANhLgQ0sA7BJq/plTZQdZ+uIe17ZxkDMkNZz1kvtRz01bX4Mg1ipaRjj
+        n/C/qLvV6hUFCOqTsPipZxPEeYOCr01WeggKsPyqwtLPFXuhfd9i4U5A8yxLzA2IArka1OQ8V+J
+        ZkR0ZhJspx6wt
+X-Received: by 2002:adf:ea42:: with SMTP id j2mr385413wrn.3.1584021084875;
+        Thu, 12 Mar 2020 06:51:24 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vtGpDPgE7pICtrNjLgGDlOHy9QvQAE7dJiUg+NXqqUyEmgbX2S2plfpUcE27zOfBojnrAgRow==
+X-Received: by 2002:adf:ea42:: with SMTP id j2mr385401wrn.3.1584021084647;
+        Thu, 12 Mar 2020 06:51:24 -0700 (PDT)
+Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
+        by smtp.gmail.com with ESMTPSA id e1sm64177153wrx.90.2020.03.12.06.51.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 12 Mar 2020 06:51:24 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Michael Kelley <mikelley@microsoft.com>,
+        Jon Doron <arilou@gmail.com>, Wei Liu <wei.liu@kernel.org>
+Cc:     "kvm\@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-hyperv\@vger.kernel.org" <linux-hyperv@vger.kernel.org>
+Subject: RE: [PATCH v4 2/5] x86/hyper-v: Add synthetic debugger definitions
+In-Reply-To: <MW2PR2101MB10522800EB048383C227F556D7FF0@MW2PR2101MB1052.namprd21.prod.outlook.com>
+References: <20200309182017.3559534-1-arilou@gmail.com> <20200309182017.3559534-3-arilou@gmail.com> <DM5PR2101MB104761F98A44ACB77DA5B414D7FE0@DM5PR2101MB1047.namprd21.prod.outlook.com> <20200310032453.GC3755153@jondnuc> <MW2PR2101MB10522800EB048383C227F556D7FF0@MW2PR2101MB1052.namprd21.prod.outlook.com>
+Date:   Thu, 12 Mar 2020 14:51:23 +0100
+Message-ID: <87d09hr89w.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
+Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=206831
+Michael Kelley <mikelley@microsoft.com> writes:
 
-            Bug ID: 206831
-           Summary: Intel AC 9260 wifi doesn't load in vm(sys-net under
-                    qubes os)
-           Product: Virtualization
-           Version: unspecified
-    Kernel Version: 5.6-rc4
-          Hardware: Intel
-                OS: Linux
-              Tree: Mainline
-            Status: NEW
-          Severity: high
-          Priority: P1
-         Component: kvm
-          Assignee: virtualization_kvm@kernel-bugs.osdl.org
-          Reporter: lipan.ovidiu@gmail.com
-        Regression: No
+> I'm flexible, and trying to not be a pain-in-the-neck. :-)  What would
+> the KVM guys think about putting the definitions in a KVM specific
+> #include file, and clearly marking them as deprecated, mostly
+> undocumented, and used only to support debugging old Windows
+> versions?
 
-I recently updated my qubes r4.1 fc31 to kernel 5.6-rc4(due lack of Nvidia rtx
-2080 support under the old kernel). Now the NV card works properly but I've
-lost the wifi connection under sys-net vm. I must mention it used to works
-perfectly on the older kernel version(actually any version up to 5.6, including
-5.5.9 freshly compiled). I also updated the sys-net vm kernel verision to
-5.6-rc4 but I still have the issue. Here is the output of dmseg of sys-net:
+I *think* we should do the following: defines which *are* present in
+TLFS doc (e.g. HV_FEATURE_DEBUG_MSRS_AVAILABLE,
+HV_STATUS_OPERATION_DENIED, ...) go to asm/hyperv-tlfs.h, the rest
+(syndbg) stuff goes to kvm-specific include (I'd suggest we just use
+hyperv.h we already have).
 
-[    7.332438] iwlwifi 0000:00:06.0: Failed to load firmware chunk!
-[    7.332458] iwlwifi 0000:00:06.0: iwlwifi transaction failed, dumping
-registers
-[    7.332476] iwlwifi 0000:00:06.0: iwlwifi device config registers:
-[    7.338624] iwlwifi 0000:00:06.0: 00000000: 25268086 00180406 02800029
-00000000 f2010004 00000000 00000000 00000000
-[    7.338651] iwlwifi 0000:00:06.0: 00000020: 00000000 00000000 00000000
-15501a56 00000000 000000c8 00000000 0000010b
-[    7.338677] iwlwifi 0000:00:06.0: 00000040: 00020010 00008ec0 00102810
-0045e812 10120000 00000000 00000000 00000000
-[    7.338701] iwlwifi 0000:00:06.0: 00000060: 00000000 00080812 00000000
-00000000 00000002 00000000 00000000 00000000
-[    7.338725] iwlwifi 0000:00:06.0: 00000080: 000f0011 00002000 00003000
-00000000 00000000 00000000 00000000 00000000
-[    7.338749] iwlwifi 0000:00:06.0: 000000a0: 00000000 00000000 00000000
-00000000 00000000 00000000 00000000 00000000
-[    7.338773] iwlwifi 0000:00:06.0: 000000c0: 00000000 00000000 0023d001
-0d000008 00804005 fee97000 00000000 00004300
-[    7.338797] iwlwifi 0000:00:06.0: 000000e0: 00000000 00000000 00000000
-00000000 00000000 00000000 00000000 00000000
-[    7.338822] iwlwifi 0000:00:06.0: Read failed at 0x100
-[    7.338836] iwlwifi 0000:00:06.0: Could not load the [0] uCode section
-[    7.338860] iwlwifi 0000:00:06.0: Failed to start INIT ucode: -110
-[    7.338877] iwlwifi 0000:00:06.0: Collecting data: trigger 16 fired.
-[    7.588505] iwlwifi 0000:00:06.0: Not valid error log pointer 0x00000000 for
-Init uCode
-[    7.588537] iwlwifi 0000:00:06.0: Fseq Registers:
-[    7.588557] iwlwifi 0000:00:06.0: 0x66C2C9EE | FSEQ_ERROR_CODE
-[    7.588579] iwlwifi 0000:00:06.0: 0x00000000 | FSEQ_TOP_INIT_VERSION
-[    7.588602] iwlwifi 0000:00:06.0: 0x815790C8 | FSEQ_CNVIO_INIT_VERSION
-[    7.588624] iwlwifi 0000:00:06.0: 0x0000A371 | FSEQ_OTP_VERSION
-[    7.588645] iwlwifi 0000:00:06.0: 0xF133AC29 | FSEQ_TOP_CONTENT_VERSION
-[    7.588668] iwlwifi 0000:00:06.0: 0xAFFDD78E | FSEQ_ALIVE_TOKEN
-[    7.588689] iwlwifi 0000:00:06.0: 0xB1F3B688 | FSEQ_CNVI_ID
-[    7.588709] iwlwifi 0000:00:06.0: 0x6F9FEAC3 | FSEQ_CNVR_ID
-[    7.588729] iwlwifi 0000:00:06.0: 0x01000200 | CNVI_AUX_MISC_CHIP
-[    7.588753] iwlwifi 0000:00:06.0: 0x01300202 | CNVR_AUX_MISC_CHIP
-[    7.588778] iwlwifi 0000:00:06.0: 0x0000485B |
-CNVR_SCU_SD_REGS_SD_REG_DIG_DCDC_VTRIM
-[    7.588856] iwlwifi 0000:00:06.0: 0x0BADCAFE |
-CNVR_SCU_SD_REGS_SD_REG_ACTIVE_VDIG_MIRROR
-[    7.588929] iwlwifi 0000:00:06.0: Firmware not running - cannot dump error
-[    7.601717] iwlwifi 0000:00:06.0: Failed to run INIT ucode: -110
-
-
-Any help will be highly appreciated.
-
-Thank you
+What do you think?
 
 -- 
-You are receiving this mail because:
-You are watching the assignee of the bug.
+Vitaly
+
