@@ -2,123 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 550671826D2
-	for <lists+kvm@lfdr.de>; Thu, 12 Mar 2020 02:49:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E9EF8182725
+	for <lists+kvm@lfdr.de>; Thu, 12 Mar 2020 03:56:42 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387641AbgCLBtQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Mar 2020 21:49:16 -0400
-Received: from mail-eopbgr750054.outbound.protection.outlook.com ([40.107.75.54]:19523
-        "EHLO NAM02-BL2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S2387575AbgCLBtP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 11 Mar 2020 21:49:15 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=kX4gJ2WkuXbhUE+33C7yIRq3+ywqQucwSh1qFYphMuauhMH2YlbKMEuv77gEFgmoSP+hfLgUhjlwQjzejbPlFDsyEy5lQVVfutIgr4mINv3HXlYuSRhE4aQnEKibeWduZQv2vLi52P8c7HL1EURZbBL+NyXgi/yHitYrSZxvIWLqJp3t5YreT56dWQ3ZbsxiCV8pYzzaHLilCyh++t4JWRyHP6fg+rCJUHyDsSqSuuWcHKxvqAqde0PrsE6w/Mf3ZWMRD767Jf+aE1GjchJzyq6sPx/OCECjpZ6rW+Z4kCQOcs+Vq6PO6LzXcv0Z6QTkW5xrGVW3N0WAIBEiLmMZOQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Ut0xvl+DgtXikvkQR4a6jNnmcKDxrSiiLdm74ZjIoTM=;
- b=QM3F74ELWEbYxcpqK/+55dRQDGj7vgmvDX4lAcB6CSiciGXRSz+BbKVfNb9hepPksRw+cPkN2EzhJCuwTZVpnAg7d5TfUueA7LIIME7AvIaKT9/SnRxXkZCt3SShDoWXvkAUiIEaf5nG6lRfYDwv0mUNK64NcfEB5QcSuWixTdN6CJS7XKySm/zNELORoOBghHuUurFbWGU7lpXXt3aOdr1lEZZb98QAZj+IXOO3DU+ikZHN9EvEtu7rWu3w4HeKg7dE4AMoQ1Kll20z+zaLyyh4XObuYpf8VRQl3FbWrCuLRwafG/8AW9pfQ2JJfkh6IIpyNBf8LbgeC1FxUfTN8g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
+        id S2387676AbgCLC4A (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Mar 2020 22:56:00 -0400
+Received: from mail-lj1-f194.google.com ([209.85.208.194]:38165 "EHLO
+        mail-lj1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2387411AbgCLCz7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 Mar 2020 22:55:59 -0400
+Received: by mail-lj1-f194.google.com with SMTP id w1so4673193ljh.5
+        for <kvm@vger.kernel.org>; Wed, 11 Mar 2020 19:55:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Ut0xvl+DgtXikvkQR4a6jNnmcKDxrSiiLdm74ZjIoTM=;
- b=tm6Kx6JU+x1giCNICg8tQg5lmmYXg/uHXMy9TdcVU5e/K3JcQuBTVpS8T+70EXOkgbkSsIVS92VYbB7aRgR9HabOHInTBYNXZUtugSsqdpGV/Pcf7T2Zouct7Vut2aG3PdrqQ5KTjWyqeBsHd2RWfpJP9le8LkoaJNEplzCT3Yw=
-Authentication-Results: spf=none (sender IP is )
- smtp.mailfrom=Ashish.Kalra@amd.com; 
-Received: from DM5PR12MB1386.namprd12.prod.outlook.com (2603:10b6:3:77::9) by
- DM5PR12MB1691.namprd12.prod.outlook.com (2603:10b6:4:8::11) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2793.17; Thu, 12 Mar 2020 01:49:13 +0000
-Received: from DM5PR12MB1386.namprd12.prod.outlook.com
- ([fe80::969:3d4e:6f37:c33c]) by DM5PR12MB1386.namprd12.prod.outlook.com
- ([fe80::969:3d4e:6f37:c33c%12]) with mapi id 15.20.2793.018; Thu, 12 Mar 2020
- 01:49:13 +0000
-Date:   Thu, 12 Mar 2020 01:49:10 +0000
-From:   Ashish Kalra <ashish.kalra@amd.com>
-To:     Steve Rutherford <srutherford@google.com>
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=hsS48m6LR9cXGJBBVG+DToxPnhsfOEVUJkGScSiXLHM=;
+        b=kPPSFOlxkkXWcCwIrF9BMn05RqMqZKPh03FB7wzqY43xpwJJysDK9Ex3U5laEo7J9W
+         LUwgS9CHkcBwMUr5HokC8u1L0hzjerat3N5ohJPmMptcvg18d7hyuyrOQ1KeIlPi8+5P
+         4zuy8hGUikahVSMZLvJ6gWE1sMJD5BWW994bec7F2cmcVDpUbldHFVow8BtQRlvhik0i
+         mZ/CuPIhzlZXTgfVCfG3c5AS3/YkrZiS6XLOggmkMdukGm82vdsSBtmIz4E4koZAIneT
+         YqZEmUT8eoFi5YTHuLtOMpxrj+eydMq5t4mhojAXiEqgxxIJ5d5Rq7rg5XiBNCQOFNao
+         Om9w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=hsS48m6LR9cXGJBBVG+DToxPnhsfOEVUJkGScSiXLHM=;
+        b=aB11hTDXF0VM7g+wlCJAvw7qyELyqok+IYoWjBN0oisPAToYAQ09Ql7BsSb1WEFnUC
+         2iHQbBfIhyk7vXV0JEKCTqwC7hxNG6zE4Sd8PyhMarUwrAXuzZLFB974KksZVtb3l92x
+         a/ObgD11ZdnfJ80snRGsVix2pgU1mBD3tevEhLgRFOFX9tDknWEMzZ3WCLpZPwOcCKj8
+         TAVwEnVPdguSQPYTC4/LtqrEWW7KAxTH4amqxexl7PFwhrgvRh/f4JFEaXa57mQ7ecBS
+         NphvFyhT6WbN5KZ2GGg/hNmSSYwE2OOjBnZRhXl5f7zCQX8TxncQdYhsYkEhHi2LaXE8
+         y9Og==
+X-Gm-Message-State: ANhLgQ3DIwuHi5BMQsuM14IBimHBJZhcIikYTMR8pidEq6e2xyEG0JgX
+        TYSRBSYvtvkvbuvMVY/i8CTCkRCBJutA17Z9tYvckQ==
+X-Google-Smtp-Source: ADFU+vsahOnnT4SwaIal4nExbTEVNWe0RvajxIg8XZpCwZLxZ6k2OSf3JTEeBKwgILLBGggLDoHn8pImTsLeAL/8438=
+X-Received: by 2002:a05:651c:1114:: with SMTP id d20mr3646951ljo.103.1583981757540;
+ Wed, 11 Mar 2020 19:55:57 -0700 (PDT)
+MIME-Version: 1.0
+References: <cover.1581555616.git.ashish.kalra@amd.com> <0a0b3815e03dcee47ca0fbf4813821877b4c2ea0.1581555616.git.ashish.kalra@amd.com>
+ <CABayD+ciJiF8gf+s6d57vENcnSQPQGzTTwdo0TLBsNLdoy0tWw@mail.gmail.com> <20200312003855.GA26448@ashkalra_ubuntu_server>
+In-Reply-To: <20200312003855.GA26448@ashkalra_ubuntu_server>
+From:   Steve Rutherford <srutherford@google.com>
+Date:   Wed, 11 Mar 2020 19:55:21 -0700
+Message-ID: <CABayD+ejsAt3QZGHGhkKh7GDd89R5QzMAbwJV6FW1t88Ne=MNg@mail.gmail.com>
+Subject: Re: [PATCH 04/12] KVM: SVM: Add support for KVM_SEV_RECEIVE_START command
+To:     Ashish Kalra <ashish.kalra@amd.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Joerg Roedel <joro@8bytes.org>,
-        Borislav Petkov <bp@suse.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Joerg Roedel <joro@8bytes.org>, Borislav Petkov <bp@suse.de>,
         Tom Lendacky <thomas.lendacky@amd.com>,
         David Rientjes <rientjes@google.com>, X86 ML <x86@kernel.org>,
         KVM list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>, brijesh.singh@amd.com
-Subject: Re: [PATCH 02/12] KVM: SVM: Add KVM_SEND_UPDATE_DATA command
-Message-ID: <20200312014910.GC26448@ashkalra_ubuntu_server>
-References: <cover.1581555616.git.ashish.kalra@amd.com>
- <b1b4675537fc592a6a78c0ca1888feba0d515557.1581555616.git.ashish.kalra@amd.com>
- <CABayD+cZhCUkEAdCv+qTgvBOzsfDX5Vo8kYATHZDa4PwX_PYiQ@mail.gmail.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CABayD+cZhCUkEAdCv+qTgvBOzsfDX5Vo8kYATHZDa4PwX_PYiQ@mail.gmail.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-ClientProxiedBy: DM5PR11CA0010.namprd11.prod.outlook.com
- (2603:10b6:3:115::20) To DM5PR12MB1386.namprd12.prod.outlook.com
- (2603:10b6:3:77::9)
-MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from ashkalra_ubuntu_server (165.204.77.1) by DM5PR11CA0010.namprd11.prod.outlook.com (2603:10b6:3:115::20) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2793.15 via Frontend Transport; Thu, 12 Mar 2020 01:49:12 +0000
-X-Originating-IP: [165.204.77.1]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: c7fd4c6b-ac54-4b85-899d-08d7c62790a8
-X-MS-TrafficTypeDiagnostic: DM5PR12MB1691:|DM5PR12MB1691:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <DM5PR12MB169101951C74060AB52108918EFD0@DM5PR12MB1691.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
-X-Forefront-PRVS: 0340850FCD
-X-Forefront-Antispam-Report: SFV:NSPM;SFS:(10009020)(4636009)(346002)(376002)(396003)(39860400002)(366004)(136003)(199004)(1076003)(9686003)(4744005)(8936002)(66946007)(4326008)(66476007)(54906003)(55016002)(33716001)(8676002)(86362001)(81166006)(33656002)(66556008)(81156014)(5660300002)(16526019)(478600001)(7416002)(316002)(2906002)(186003)(956004)(6916009)(44832011)(6496006)(26005)(52116002);DIR:OUT;SFP:1101;SCL:1;SRVR:DM5PR12MB1691;H:DM5PR12MB1386.namprd12.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;
-Received-SPF: None (protection.outlook.com: amd.com does not designate
- permitted sender hosts)
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: m1ad7vQNSFeK+pIRWOXmd3AftGLuLi1y/BOMHyI6vZKtpSY85xeD4/IxWTpfQCmur1oLusu24IM2tWAjz6+h8k3z0RqE31lIrguWqYStEfp7L8CuOzbLUm/uQVgFSEv3MLsItpqCNI/aZpfYihk5GRiGlXtoZz4pc0AGfrPif6kZTQvZDRu0WcUFjN48/6iTmaZMN7+NqJj0aKDE1WqjvcPGhCAHetVm6v8KmB9VYkJz6IKRBV/1G9rqv/6xTsv7P6QpfxGtSYXjxF5TrKj0DmlH9ry1Hfa+XeTR95ZQ4k2sGvHZpYQxosThrt63yon1AGvBJVZF9t6X4J4n9h0lcfD4JUVxTicD0Kw/B0CCdIIGkdsiGwD4QbqG2O5/Xl13gLhv2D5lfMKgBg1JHOVIdvP3kIAUQyxXoG7PBZp/rA33OF6XvM3A2X1yvyDxk3kw
-X-MS-Exchange-AntiSpam-MessageData: 9H1Bd3vq/YWU13WIDd2OfPnCa0yU9SbnBROzsDzRqjHUd9y2Y1DexVWhE8Tr2D8M7PPeeQHOUDi1tTFscdXI+c8BPTKcm3CbjTv3NwX0UZx86eQtdbjhQaFJ2vA9IFoUuOwZpIn/z1MxcSsfJsPXAw==
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c7fd4c6b-ac54-4b85-899d-08d7c62790a8
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Mar 2020 01:49:13.2791
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: w6BkB7CdP/yA0zUsch7TKZq05lhzF2B+3N1MwQaNJm/Dd5AuQ/oV+ESN/9/LfmHGFjNM5K1Flf3uAKq/2ZM+3A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR12MB1691
+        LKML <linux-kernel@vger.kernel.org>,
+        Brijesh Singh <brijesh.singh@amd.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Mar 09, 2020 at 06:04:56PM -0700, Steve Rutherford wrote:
-> > diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> > index 17bef4c245e1..d9dc81bb9c55 100644
-> > --- a/include/uapi/linux/kvm.h
-> > +++ b/include/uapi/linux/kvm.h
-> > @@ -1570,6 +1570,15 @@ struct kvm_sev_send_start {
-> >         __u32 session_len;
-> >  };
+On Wed, Mar 11, 2020 at 5:39 PM Ashish Kalra <ashish.kalra@amd.com> wrote:
+>
+> But, ret will be the value returned by __sev_issue_cmd(), so why will it
+> look like -ENOMEM ?
+My bad, this is fine.
+>
 > >
-> > +struct kvm_sev_send_update_data {
-> > +       __u64 hdr_uaddr;
-> > +       __u32 hdr_len;
-> > +       __u64 guest_uaddr;
-> > +       __u32 guest_len;
-> > +       __u64 trans_uaddr;
-> > +       __u32 trans_len;
-> > +};
-> Input from others is welcome here, but I'd put the padding in
-> intentionally (explicitly fill in the reserved u8s between *_len and
-> *_uaddr). I had to double check that this pattern was intentional and
-> matched the SEV spec.
+> > > +       ret = __sev_issue_cmd(argp->sev_fd, SEV_CMD_RECEIVE_START, start,
+> > > +                               error);
+> > > +       if (ret)
+> > > +               goto e_free;
+> > > +
+> > > +       /* Bind ASID to this guest */
+> >
+> > Ideally, set ret to another distinct value, since the error spaces for
+> > these commands overlap, so you won't be sure which had the problem.
+> > You also wouldn't be sure if one succeeded and the other failed vs
+> > both failing.
+>
+> Both commands "may" return the same error code as set by sev_do_cmd(), but
+> then we need that very specific error code, sev_do_cmd() can't return
+> different error codes for each command it is issuing ?
 
-struct kvm_sev_send_update_data{} is used to get/send the information 
-from/to userspace, while struct sev_data_send_update_data{} has the
-paddings and is packed as required by the SEV spec.
+I'll try to separate my comment into two levels: High level response,
+and pragmatic response.
 
-Thanks,
-Ashish
+--- High level ---
+At the end of the day, I want to be able to handle these errors in a
+reasonable way. As often as possible, I'd like userspace to be able to
+see a set of errors and know what to do in response. I find this
+particularly important for migration, where you are mucking around
+with a live VM with customer data you don't want to lose.
+
+One red flag for me is when one pair of {errno, SEV error code}
+corresponds to two distinct situations. For example, when, in another
+patch in this series, {EFAULT, SUCCESS} could have corresponded to
+either the command succeeding or the command never having run. Seems
+like a pretty wide range of possibilities for a single error value.
+
+I want to try to give the return codes scrutiny now, since we are
+probably going to be stuck with maintaining them indefinitely, even if
+there are mistakes.
+
+--- Pragmatic ---
+There's probably a strong argument that most situations like this
+don't matter, since there's nothing you can do about an error except
+kill the VM (or not continue migrating) anyway. I'm pretty open to
+this argument. In particular, looking at SEV RECEIVE START, I think
+you could throw away this attempt at creating a migration target, and
+just make a new one (pretty much without consequence), so I think my
+comment on this particular patch is moot. You can't cancel the SEND
+START so you will be stuck working with this particular destination
+host, but you can mint a new target VM via SEV RECEIVE START.
+
+Looking at the earlier patches, older commands seem to have the same
+ambiguity. The command SEV LAUNCH START also has identical errors that
+could be sourced from either of two commands. Seems like we're already
+committed to ambiguity being ok.
+
+Given that I have no further comments on this particular patch:
+Reviewed-by: Steve Rutherford <srutherford@google.com>
+
+>
+> >
+> > > +       ret = sev_bind_asid(kvm, start->handle, error);
+> > > +       if (ret)
+> > > +               goto e_free;
+> > > +
+>
+> Thanks,
+> Ashish
+>
