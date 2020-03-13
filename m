@@ -2,139 +2,157 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A15FD18466F
-	for <lists+kvm@lfdr.de>; Fri, 13 Mar 2020 13:04:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2B629184695
+	for <lists+kvm@lfdr.de>; Fri, 13 Mar 2020 13:12:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726814AbgCMMEp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 13 Mar 2020 08:04:45 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:13342 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726216AbgCMMEo (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 13 Mar 2020 08:04:44 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 02DC3QF6114762
-        for <kvm@vger.kernel.org>; Fri, 13 Mar 2020 08:04:44 -0400
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2yr125d6t2-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Fri, 13 Mar 2020 08:04:43 -0400
-Received: from localhost
-        by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
-        Fri, 13 Mar 2020 12:04:40 -0000
-Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
-        by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Fri, 13 Mar 2020 12:04:37 -0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 02DC4ZVV43581806
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 13 Mar 2020 12:04:35 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C3CAE4C04A;
-        Fri, 13 Mar 2020 12:04:35 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7D3744C040;
-        Fri, 13 Mar 2020 12:04:35 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.152.224.119])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri, 13 Mar 2020 12:04:35 +0000 (GMT)
-Subject: Re: [PATCH -next 018/491] KERNEL VIRTUAL MACHINE for s390 (KVM/s390):
- Use fallthrough;
-To:     Joe Perches <joe@perches.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>
-Cc:     Heiko Carstens <heiko.carstens@de.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <cover.1583896344.git.joe@perches.com>
- <d63c86429f3e5aa806aa3e185c97d213904924a5.1583896348.git.joe@perches.com>
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
-Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
- 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
- nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Date:   Fri, 13 Mar 2020 13:04:35 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+        id S1726761AbgCMMMj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 13 Mar 2020 08:12:39 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:35956 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726620AbgCMMMj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 13 Mar 2020 08:12:39 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1584101558;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=L3JO80ASy2k51/5bJXWTlXPpMuSoyvyJ+Z2PLLcwmQM=;
+        b=UM0hOxZ3K5lUYcT16Y8jefGUMv9sugSH+ihhqlTkxJIoTHTcQKocRjHW/mVbe4rJmsafmu
+        WqIlQT5j/RWifMiYARpnGujNLULM7+qiao9ue1Nhc11/ElurH6zAigpid4V6v3ZTWG13V2
+        iZWF6sLCWNYi5Cel+6MnRs2zAJfQYaA=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-305-flhDx-AqNKWD_NzfSf-OHA-1; Fri, 13 Mar 2020 08:12:36 -0400
+X-MC-Unique: flhDx-AqNKWD_NzfSf-OHA-1
+Received: by mail-wr1-f70.google.com with SMTP id j17so4186687wru.19
+        for <kvm@vger.kernel.org>; Fri, 13 Mar 2020 05:12:36 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=L3JO80ASy2k51/5bJXWTlXPpMuSoyvyJ+Z2PLLcwmQM=;
+        b=i0Lzg/khLSvTGqtT4VfIz2dROvzXqCrQTaSSLvSHCa0qtnj3lYnAEuk+MCxJXlMCmY
+         oIPKGvMtt7QpX0Vr+2RS+twJp51+opz9xKjxjA1QogqUQpqh0uSWrEZGI1QchPA5opDa
+         lAez74kjc/++BUejYQL1u0xEGyNc75t+1dM0qlPOmH+MHJGf6Eh/lcuCzT/0uCzLRhx2
+         VphbOL5vpWv+eyV7s8VJGaqwPCGBVX6+BvyAue88Jbz0o3MdnoUbW1djay9dMpCxsQjm
+         GBIEj/tuvXRn9nUnhIcZLNFpdLkkQXcwpLIHnLlOFzV4+5tm1A+klD/n4jcU9A6DRB0T
+         gM8A==
+X-Gm-Message-State: ANhLgQ0kuMLV7Yal7tGkoqNm9PNOCy6zya5Sa2MxngbC8BTIeBbL+1VT
+        DjDjlzklIMscLdNmhEuL+A0QCPNbKPgZMLkL1O2qH7gSxt6L5SExHN+v/UDjqd5mYpX2+GuXKzs
+        YBqNY0nvvk29a
+X-Received: by 2002:a1c:1fc9:: with SMTP id f192mr10936168wmf.4.1584101555243;
+        Fri, 13 Mar 2020 05:12:35 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vsUiG/bhRPhm9IKk8OaIP0Fi57Hoxb0VuHeMLXJFendIRAXnb5eBMnP10GuN8TrXXy+Su5iaQ==
+X-Received: by 2002:a1c:1fc9:: with SMTP id f192mr10936142wmf.4.1584101554957;
+        Fri, 13 Mar 2020 05:12:34 -0700 (PDT)
+Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
+        by smtp.gmail.com with ESMTPSA id q16sm65582545wrj.73.2020.03.13.05.12.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 13 Mar 2020 05:12:34 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>
+Subject: Re: [PATCH 01/10] KVM: nVMX: Move reflection check into nested_vmx_reflect_vmexit()
+In-Reply-To: <20200312184521.24579-2-sean.j.christopherson@intel.com>
+References: <20200312184521.24579-1-sean.j.christopherson@intel.com> <20200312184521.24579-2-sean.j.christopherson@intel.com>
+Date:   Fri, 13 Mar 2020 13:12:33 +0100
+Message-ID: <87k13opi6m.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <d63c86429f3e5aa806aa3e185c97d213904924a5.1583896348.git.joe@perches.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 20031312-0016-0000-0000-000002F07375
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20031312-0017-0000-0000-00003353E6F2
-Message-Id: <354d7bd6-025a-6012-523a-e82d4a99cf77@de.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
- definitions=2020-03-13_04:2020-03-12,2020-03-13 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- priorityscore=1501 malwarescore=0 bulkscore=0 phishscore=0 mlxlogscore=699
- spamscore=0 suspectscore=0 lowpriorityscore=0 mlxscore=0 clxscore=1015
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2003130066
+Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Sean Christopherson <sean.j.christopherson@intel.com> writes:
 
-On 11.03.20 05:51, Joe Perches wrote:
-> Convert the various uses of fallthrough comments to fallthrough;
-> 
-> Done via script
-> Link: https://lore.kernel.org/lkml/b56602fcf79f849e733e7b521bb0e17895d390fa.1582230379.git.joe.com/
-
-I have applied this with a fixed link.
-
-> 
-> Signed-off-by: Joe Perches <joe@perches.com>
+> Move the call to nested_vmx_exit_reflected() from vmx_handle_exit() into
+> nested_vmx_reflect_vmexit() and change the semantics of the return value
+> for nested_vmx_reflect_vmexit() to indicate whether or not the exit was
+> reflected into L1.  nested_vmx_exit_reflected() and
+> nested_vmx_reflect_vmexit() are intrinsically tied together, calling one
+> without simultaneously calling the other makes little sense.
+>
+> No functional change intended.
+>
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 > ---
->  arch/s390/kvm/gaccess.c   | 23 +++++++++++++----------
->  arch/s390/kvm/interrupt.c |  2 +-
->  arch/s390/kvm/kvm-s390.c  |  4 ++--
->  arch/s390/mm/gmap.c       |  6 +++---
->  4 files changed, 19 insertions(+), 16 deletions(-)
-[...]
+>  arch/x86/kvm/vmx/nested.h | 16 +++++++++++-----
+>  arch/x86/kvm/vmx/vmx.c    |  4 ++--
+>  2 files changed, 13 insertions(+), 7 deletions(-)
+>
+> diff --git a/arch/x86/kvm/vmx/nested.h b/arch/x86/kvm/vmx/nested.h
+> index 21d36652f213..6bc379cf4755 100644
+> --- a/arch/x86/kvm/vmx/nested.h
+> +++ b/arch/x86/kvm/vmx/nested.h
+> @@ -72,12 +72,16 @@ static inline bool nested_ept_ad_enabled(struct kvm_vcpu *vcpu)
+>  }
+>  
+>  /*
+> - * Reflect a VM Exit into L1.
+> + * Conditionally reflect a VM-Exit into L1.  Returns %true if the VM-Exit was
+> + * reflected into L1.
+>   */
+> -static inline int nested_vmx_reflect_vmexit(struct kvm_vcpu *vcpu,
+> -					    u32 exit_reason)
+> +static inline bool nested_vmx_reflect_vmexit(struct kvm_vcpu *vcpu,
+> +					     u32 exit_reason)
+>  {
+> -	u32 exit_intr_info = vmcs_read32(VM_EXIT_INTR_INFO);
+> +	u32 exit_intr_info;
+> +
+> +	if (!nested_vmx_exit_reflected(vcpu, exit_reason))
+> +		return false;
+
+(unrelated to your patch)
+
+It's probably just me but 'nested_vmx_exit_reflected()' name always
+makes me thinkg 'the vmexit WAS [already] reflected' and not 'the vmexit
+NEEDS to be reflected'. 'nested_vmx_exit_needs_reflecting()' maybe?
+
+>  
+>  	/*
+>  	 * At this point, the exit interruption info in exit_intr_info
+> @@ -85,6 +89,8 @@ static inline int nested_vmx_reflect_vmexit(struct kvm_vcpu *vcpu,
+>  	 * we need to query the in-kernel LAPIC.
+>  	 */
+>  	WARN_ON(exit_reason == EXIT_REASON_EXTERNAL_INTERRUPT);
+> +
+> +	exit_intr_info = vmcs_read32(VM_EXIT_INTR_INFO);
+>  	if ((exit_intr_info &
+>  	     (INTR_INFO_VALID_MASK | INTR_INFO_DELIVER_CODE_MASK)) ==
+>  	    (INTR_INFO_VALID_MASK | INTR_INFO_DELIVER_CODE_MASK)) {
+> @@ -96,7 +102,7 @@ static inline int nested_vmx_reflect_vmexit(struct kvm_vcpu *vcpu,
+>  
+>  	nested_vmx_vmexit(vcpu, exit_reason, exit_intr_info,
+>  			  vmcs_readl(EXIT_QUALIFICATION));
+> -	return 1;
+> +	return true;
+>  }
+>  
+>  /*
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 57742ddfd854..c1caac7e8f57 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -5863,8 +5863,8 @@ static int vmx_handle_exit(struct kvm_vcpu *vcpu,
+>  	if (vmx->emulation_required)
+>  		return handle_invalid_guest_state(vcpu);
+>  
+> -	if (is_guest_mode(vcpu) && nested_vmx_exit_reflected(vcpu, exit_reason))
+> -		return nested_vmx_reflect_vmexit(vcpu, exit_reason);
+> +	if (is_guest_mode(vcpu) && nested_vmx_reflect_vmexit(vcpu, exit_reason))
+> +		return 1;
+>  
+>  	if (exit_reason & VMX_EXIT_REASONS_FAILED_VMENTRY) {
+>  		dump_vmcs();
+
+Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+
+-- 
+Vitaly
 
