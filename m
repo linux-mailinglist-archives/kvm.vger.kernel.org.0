@@ -2,131 +2,153 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7186218472A
-	for <lists+kvm@lfdr.de>; Fri, 13 Mar 2020 13:47:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8345A184733
+	for <lists+kvm@lfdr.de>; Fri, 13 Mar 2020 13:48:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726621AbgCMMrG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 13 Mar 2020 08:47:06 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:50765 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726216AbgCMMrG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 13 Mar 2020 08:47:06 -0400
+        id S1726591AbgCMMso (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 13 Mar 2020 08:48:44 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:28343 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726216AbgCMMso (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 13 Mar 2020 08:48:44 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1584103625;
+        s=mimecast20190719; t=1584103723;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=cVGvYp8s4tIYmQbZbCv3pyCVPMIadQ3rGV3wCFwPiPQ=;
-        b=P0wQf7g95cE1OYv4e0N0SL9yEmMHyf9bB0s8rMxvri45V8Q7+h3O5AMtKNBx43F1A6XaO5
-        az2PpdTasrhJiPjI9ec6XvCaO+SQy8F+DJk4Um3SAam1v8CScTlsontBFOSJcOQM6iKp8Z
-        EGcbWHxSEGmH/hEegYC5cYTtkBzvOys=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-3-8ZVEkCPUMAyxS-QthqqELg-1; Fri, 13 Mar 2020 08:47:04 -0400
-X-MC-Unique: 8ZVEkCPUMAyxS-QthqqELg-1
-Received: by mail-wr1-f72.google.com with SMTP id i7so4241606wru.3
-        for <kvm@vger.kernel.org>; Fri, 13 Mar 2020 05:47:04 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=cVGvYp8s4tIYmQbZbCv3pyCVPMIadQ3rGV3wCFwPiPQ=;
-        b=JUqt9UycxN2bkJBXFLwTHnYcDXsuOHqQNQDPIQYRPU78f4gemAg1bkPqwWIYbT++NX
-         Wc1+KKzH1/lyud7z61rP3CNXlL40Sz/J3RF9ZvA2SpkaRZ3QnSlBGO7a7Yi+dzI1nnTe
-         ZY3Fu0vmdJorV/LjX07ovTVveYZT0Ivsuftpreztgj+O9pRKDM5C6XrskyPMHuv/cJHY
-         OZXi0Ol/Wptv4Yhoi/ESaTEGbYeNtqv0IDGPkP6c6cNl6NxP8yA+4F3fzqy//fp2/lZ2
-         uFa2y/snVgOd83Nmy4EFo0RpgyXNpFrmKURq91fmxeuE5sTqF2gvp8dqvVE7l548dohg
-         i+ng==
-X-Gm-Message-State: ANhLgQ0+JPVzzmCW5Me+x7O7htB8zxD9dYukyf8y1urUsShMwCb0pud5
-        tm0H9tLQb7N3JqJjmtBaH1/NqMzps+bUnBVn0/0A1CAO/8C50rZ7+1pxggydmDGvEJAOleWtT6v
-        JDodIwGoYW/b9
-X-Received: by 2002:a1c:f21a:: with SMTP id s26mr10738922wmc.39.1584103623171;
-        Fri, 13 Mar 2020 05:47:03 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vuB2U9pYEH4d9F0BJmVdxxrIWk5xI3GpDU0d8J7LIDQTOvO+P2YVyz1UPOYDpy7EcUGXaBvAQ==
-X-Received: by 2002:a1c:f21a:: with SMTP id s26mr10738899wmc.39.1584103622905;
-        Fri, 13 Mar 2020 05:47:02 -0700 (PDT)
-Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id l18sm9773424wrr.17.2020.03.13.05.47.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 13 Mar 2020 05:47:01 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>
-Subject: Re: [PATCH 04/10] KVM: VMX: Convert local exit_reason to u16 in nested_vmx_exit_reflected()
-In-Reply-To: <20200312184521.24579-5-sean.j.christopherson@intel.com>
-References: <20200312184521.24579-1-sean.j.christopherson@intel.com> <20200312184521.24579-5-sean.j.christopherson@intel.com>
-Date:   Fri, 13 Mar 2020 13:47:01 +0100
-Message-ID: <87a74kpgl6.fsf@vitty.brq.redhat.com>
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+        bh=Zd4XKBIBF6sPbUMPRJkChmpB8KoTvZPkXFEOvFsjYug=;
+        b=Qx4S4da6ULEZxOhc1UtubyxctyaWYLE23U67MITmyrIjfV/6wBb+liKV/uB3QhwD5D0Rok
+        afmindpyhC+yM+sgvGwNzsMupPx7+YV1Q2XZAN4ZjbQKcN/0EZFveuKTsJgeTwtvgvG26H
+        Edb6mAOoN42WAwTSesADN3E9Vobbw3M=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-431-1OY6ougWOIGLAR3XC3-tqw-1; Fri, 13 Mar 2020 08:48:41 -0400
+X-MC-Unique: 1OY6ougWOIGLAR3XC3-tqw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E72E71005F9C;
+        Fri, 13 Mar 2020 12:48:39 +0000 (UTC)
+Received: from [10.36.116.93] (ovpn-116-93.ams2.redhat.com [10.36.116.93])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 3F87C1036B3D;
+        Fri, 13 Mar 2020 12:48:38 +0000 (UTC)
+Subject: Re: [PATCH] KVM: s390: pending interrupts are unlikely
+To:     Michael Mueller <mimu@linux.ibm.com>, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     borntraeger@de.ibm.com, frankja@linux.ibm.com, cohuck@redhat.com,
+        heiko.carstens@de.ibm.com, gor@linux.ibm.com
+References: <20200313124030.99834-1-mimu@linux.ibm.com>
+From:   David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat GmbH
+Message-ID: <b31aef6d-7cf7-c870-5250-02cfd4e29542@redhat.com>
+Date:   Fri, 13 Mar 2020 13:48:37 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <20200313124030.99834-1-mimu@linux.ibm.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sean Christopherson <sean.j.christopherson@intel.com> writes:
-
-> Store only the basic exit reason in the local "exit_reason" variable in
-> nested_vmx_exit_reflected().  Except for tracing, all references to
-> exit_reason are expecting to encounter only the basic exit reason.
->
-> Opportunistically align the params to nested_vmx_exit_handled_msr().
->
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+On 13.03.20 13:40, Michael Mueller wrote:
+> A statistical analysis shows that in most cases when deliverable_irqs()
+> is called, no interrupts are pending. (see: early exit ratio)
+> 
+> The data was sampled during an iperf3 run over virtio_net
+> between one guest and the host.
+> 
+> deliverable_irqs()
+>         called = 3145123
+>            by kvm_s390_vcpu_has_irq() = 3005581 (95.56%)
+>               by kvm_arch_vcpu_runnable() = 3005578 (95.56%)
+>                  by kvm_s390_handle_wait() = 1219331 (38.76%)
+>                  by kvm_vcpu_check_block() = 2943565 (93.59%)
+>                     by kvm_cpu_block(1) = 2826431 (89.86%)
+>                     by kvm_cpu_block(2) = 117136 (3.72%)
+>                  by kvm_arch_dy_runnable() = 0 (0%)
+>               by kvm_arch_setup_async_pf() = 0 (0%)
+>               by handle_stop() = 0 (0%)
+>            by kvm_s390_deliver_pending_interrupt() = 139542 (4.43%)
+>               irqs_delivered = (0:15917 1:61810 2:1 3:0 4:0 x:0)
+>               irqs_pending = (0:15917 1:61722 2:86 3:1 4:0 x:0)
+>     early exit = 3021787 (96.07%)
+>   pending irqs = 123237 (3.91%)
+> 
+> Signed-off-by: Michael Mueller <mimu@linux.ibm.com>
 > ---
->  arch/x86/kvm/vmx/nested.c | 8 +++++---
->  1 file changed, 5 insertions(+), 3 deletions(-)
->
-> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> index cb05bcbbfc4e..1848ca0116c0 100644
-> --- a/arch/x86/kvm/vmx/nested.c
-> +++ b/arch/x86/kvm/vmx/nested.c
-> @@ -5374,7 +5374,7 @@ static bool nested_vmx_exit_handled_io(struct kvm_vcpu *vcpu,
->   * MSR bitmap. This may be the case even when L0 doesn't use MSR bitmaps.
->   */
->  static bool nested_vmx_exit_handled_msr(struct kvm_vcpu *vcpu,
-> -	struct vmcs12 *vmcs12, u32 exit_reason)
-> +					struct vmcs12 *vmcs12, u16 exit_reason)
->  {
->  	u32 msr_index = kvm_rcx_read(vcpu);
->  	gpa_t bitmap;
-> @@ -5523,7 +5523,7 @@ bool nested_vmx_exit_reflected(struct kvm_vcpu *vcpu)
->  	u32 intr_info = vmcs_read32(VM_EXIT_INTR_INFO);
->  	struct vcpu_vmx *vmx = to_vmx(vcpu);
->  	struct vmcs12 *vmcs12 = get_vmcs12(vcpu);
-> -	u32 exit_reason = vmx->exit_reason;
-> +	u16 exit_reason;
+>  arch/s390/kvm/interrupt.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/arch/s390/kvm/interrupt.c b/arch/s390/kvm/interrupt.c
+> index 028167d6eacd..c34d62b4209e 100644
+> --- a/arch/s390/kvm/interrupt.c
+> +++ b/arch/s390/kvm/interrupt.c
+> @@ -369,7 +369,7 @@ static unsigned long deliverable_irqs(struct kvm_vcpu *vcpu)
+>  	unsigned long active_mask;
 >  
->  	if (vmx->nested.nested_run_pending)
->  		return false;
-> @@ -5548,13 +5548,15 @@ bool nested_vmx_exit_reflected(struct kvm_vcpu *vcpu)
->  	 */
->  	nested_mark_vmcs12_pages_dirty(vcpu);
+>  	active_mask = pending_irqs(vcpu);
+> -	if (!active_mask)
+> +	if (likely(!active_mask))
+>  		return 0;
 >  
-> -	trace_kvm_nested_vmexit(kvm_rip_read(vcpu), exit_reason,
-> +	trace_kvm_nested_vmexit(kvm_rip_read(vcpu), vmx->exit_reason,
->  				vmcs_readl(EXIT_QUALIFICATION),
->  				vmx->idt_vectoring_info,
->  				intr_info,
->  				vmcs_read32(VM_EXIT_INTR_ERROR_CODE),
->  				KVM_ISA_VMX);
->  
-> +	exit_reason = vmx->exit_reason;
-> +
->  	switch (exit_reason) {
->  	case EXIT_REASON_EXCEPTION_NMI:
->  		if (is_nmi(intr_info))
+>  	if (psw_extint_disabled(vcpu))
+> 
 
-If the patch is looked at by itself (and not as part of the series) one
-may ask to add a comment explaining that we do the trunctation
-deliberately but with all patches of the series it is superfluous.
-
-Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+Is this change even observable in practice? Usually, we do have some
+performance numbers backing such micro optimizations. But I guess it
+will be fairly hard to get some meaning full numbers backing this ...
 
 -- 
-Vitaly
+Thanks,
+
+David / dhildenb
 
