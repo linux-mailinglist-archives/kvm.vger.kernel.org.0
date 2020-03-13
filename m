@@ -2,89 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E72E0184347
-	for <lists+kvm@lfdr.de>; Fri, 13 Mar 2020 10:08:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 431E4184367
+	for <lists+kvm@lfdr.de>; Fri, 13 Mar 2020 10:12:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726622AbgCMJIH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 13 Mar 2020 05:08:07 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:24520 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726365AbgCMJIG (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 13 Mar 2020 05:08:06 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1584090485;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=wl+yNGtuWXWkfGSGtM8HBlvrUGjPCbpwXBezEmRx7rc=;
-        b=D/qUCTzwxIcQbTdsaIsPvXZqRr6HZ30Jndwh1cBRVq0D/TDTO7PNiJDsdf00UqUJN6KDT5
-        8y59SPxAUCSVy3hByTkzMD59g369z4NdgoeMt30G+R0qKHYys8Ka1Eto3onbDRRrII4E4S
-        Yfxbvn4kfwQKhNKUIpz5XHBscYoyQ+8=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-473-rOp1qUxUP6GKTnmd1eCBtA-1; Fri, 13 Mar 2020 05:08:04 -0400
-X-MC-Unique: rOp1qUxUP6GKTnmd1eCBtA-1
-Received: by mail-wm1-f70.google.com with SMTP id s15so1086194wmc.0
-        for <kvm@vger.kernel.org>; Fri, 13 Mar 2020 02:08:04 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=wl+yNGtuWXWkfGSGtM8HBlvrUGjPCbpwXBezEmRx7rc=;
-        b=mpnNQPE87nQ9AOCI6OEvNhN5xFFKf6O5NDBki8LVxixaOCgTaIggL6W0es+a+4EeL1
-         eKMfO7dswbrNvwYCbjG+29qMHvpdbdO8j6LCdFo6vF9bVSx6U+atd7NQ4hRqimkmYQKu
-         PuS/pPPjtbr4ZHfvBRWESwGp5crO8nyuLPf98jhsFQD2TXitqmSZYDpIh6ezQc1gVr6h
-         z6P7+CEYaTtUQm87JWK1krRECPU7/0DJBoN7XIOiK5aN60o9Q1aiXf3BOwzPAdmPsYC4
-         4RKP/JW0mBjVKsnDuG+xgjBZnlk6PRPjnHLHWNQv1kNvC5rBv4a/sYyd94vanmj0Ok5Z
-         zSCQ==
-X-Gm-Message-State: ANhLgQ0eqKqiShJXy9ZsbePpWf15T0Yrmgjv09zdzFM0oHL0+Yzw8MWL
-        0EL6U7brqd8eFMOSzDaWx8d5l0SjJ5l+boteSdtzgfAbEKgbDZ89aBnijrn8FR5yiMSuc3MyPUW
-        +I5N4hZPNrq/B
-X-Received: by 2002:a7b:c4d6:: with SMTP id g22mr4716939wmk.79.1584090483181;
-        Fri, 13 Mar 2020 02:08:03 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vuuGYVrX3d9NDPj6bLJOiHXmXO+iiPtI2qoFJ6vPVqe8f2YiQ7CXhiXwjGV1CBmokIarAb43A==
-X-Received: by 2002:a7b:c4d6:: with SMTP id g22mr4716906wmk.79.1584090482942;
-        Fri, 13 Mar 2020 02:08:02 -0700 (PDT)
-Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id a1sm39008132wru.75.2020.03.13.02.08.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 13 Mar 2020 02:08:02 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Jim Mattson <jmattson@google.com>, Wanpeng Li <kernellwp@gmail.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>,
+        id S1726481AbgCMJMZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 13 Mar 2020 05:12:25 -0400
+Received: from mx2.suse.de ([195.135.220.15]:45946 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726310AbgCMJMZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 13 Mar 2020 05:12:25 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx2.suse.de (Postfix) with ESMTP id 63F64AD39;
+        Fri, 13 Mar 2020 09:12:23 +0000 (UTC)
+Date:   Fri, 13 Mar 2020 10:12:21 +0100
+From:   Joerg Roedel <jroedel@suse.de>
+To:     Andy Lutomirski <luto@kernel.org>
+Cc:     Joerg Roedel <joro@8bytes.org>, X86 ML <x86@kernel.org>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Thomas Hellstrom <thellstrom@vmware.com>,
+        Jiri Slaby <jslaby@suse.cz>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Juergen Gross <jgross@suse.com>,
+        Kees Cook <keescook@chromium.org>,
+        LKML <linux-kernel@vger.kernel.org>,
         kvm list <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>
-Subject: Re: [PATCH] KVM: VMX: Micro-optimize vmexit time when not exposing PMU
-In-Reply-To: <CALMp9eTSBpaPYKE6toPCbSfCQGhM9M4=1Z1FFBGQ9Bm_pKSpuQ@mail.gmail.com>
-References: <1584007547-4802-1-git-send-email-wanpengli@tencent.com> <87r1xxrhb0.fsf@vitty.brq.redhat.com> <CALMp9eTSBpaPYKE6toPCbSfCQGhM9M4=1Z1FFBGQ9Bm_pKSpuQ@mail.gmail.com>
-Date:   Fri, 13 Mar 2020 10:08:01 +0100
-Message-ID: <877dzor5am.fsf@vitty.brq.redhat.com>
+        Linux Virtualization <virtualization@lists.linux-foundation.org>
+Subject: Re: [PATCH 38/62] x86/sev-es: Handle instruction fetches from
+ user-space
+Message-ID: <20200313091221.GA16378@suse.de>
+References: <20200211135256.24617-1-joro@8bytes.org>
+ <20200211135256.24617-39-joro@8bytes.org>
+ <CALCETrVRmg88xY0s4a2CONXQ3fgvCKXpW2eYJRJGhqQLneoGqQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CALCETrVRmg88xY0s4a2CONXQ3fgvCKXpW2eYJRJGhqQLneoGqQ@mail.gmail.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Jim Mattson <jmattson@google.com> writes:
+On Wed, Feb 12, 2020 at 01:42:48PM -0800, Andy Lutomirski wrote:
+> I realize that this is a somewhat arbitrary point in the series to
+> complain about this, but: the kernel already has infrastructure to
+> decode and fix up an instruction-based exception.  See
+> fixup_umip_exception().  Please refactor code so that you can share
+> the same infrastructure rather than creating an entirely new thing.
 
-> On Thu, Mar 12, 2020 at 3:36 AM Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
->
->> Also, speaking about cloud providers and the 'micro' nature of this
->> optimization, would it rather make sense to introduce a static branch
->> (the policy to disable vPMU is likely to be host wide, right)?
->
-> Speaking for a cloud provider, no, the policy is not likely to be host-wide.
+Okay, but 'infrastructure' is a bold word for the call path down
+fixup_umip_exception(). It uses the in-kernel instruction decoder, which
+I already use in my patch-set. But I agree that some code in this
+patch-set is duplicated and already present in the instruction decoder,
+and that fixup_umip_exception() has more robust instruction decoding.
 
-Ah, then it's just my flawed picture of the world where hosts only run
-instances of the same type/family because it's mych easier to partition
-them this way.
+I factor the instruction decoding part out and make is usable for the
+#VC handler too and remove the code that is already present in the
+instruction decoder.
 
-Scratch the static branch idea then.
+Regards,
 
--- 
-Vitaly
+	Joerg
 
