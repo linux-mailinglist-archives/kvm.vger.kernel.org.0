@@ -2,164 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 17422183F65
-	for <lists+kvm@lfdr.de>; Fri, 13 Mar 2020 04:16:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B19F4183F69
+	for <lists+kvm@lfdr.de>; Fri, 13 Mar 2020 04:17:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726443AbgCMDQN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Mar 2020 23:16:13 -0400
-Received: from mga11.intel.com ([192.55.52.93]:7288 "EHLO mga11.intel.com"
+        id S1726426AbgCMDRb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Mar 2020 23:17:31 -0400
+Received: from mga09.intel.com ([134.134.136.24]:6435 "EHLO mga09.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726246AbgCMDQN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 Mar 2020 23:16:13 -0400
+        id S1726246AbgCMDRb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 Mar 2020 23:17:31 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 12 Mar 2020 20:16:12 -0700
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 12 Mar 2020 20:17:30 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.70,546,1574150400"; 
-   d="scan'208";a="232279013"
+   d="scan'208";a="278064811"
 Received: from joy-optiplex-7040.sh.intel.com ([10.239.13.16])
-  by orsmga007.jf.intel.com with ESMTP; 12 Mar 2020 20:16:10 -0700
+  by fmsmga002.fm.intel.com with ESMTP; 12 Mar 2020 20:17:27 -0700
 From:   Yan Zhao <yan.y.zhao@intel.com>
 To:     intel-gvt-dev@lists.freedesktop.org, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
 Cc:     alex.williamson@redhat.com, zhenyuw@linux.intel.com,
         pbonzini@redhat.com, kevin.tian@intel.com, peterx@redhat.com,
         Yan Zhao <yan.y.zhao@intel.com>
-Subject: [PATCH v4 0/7] use vfio_dma_rw to read/write IOVAs from CPU side
-Date:   Thu, 12 Mar 2020 23:05:48 -0400
-Message-Id: <20200313030548.7705-1-yan.y.zhao@intel.com>
+Subject: [PATCH v4 1/7] vfio: allow external user to get vfio group from device
+Date:   Thu, 12 Mar 2020 23:07:55 -0400
+Message-Id: <20200313030755.7767-1-yan.y.zhao@intel.com>
 X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20200313030548.7705-1-yan.y.zhao@intel.com>
+References: <20200313030548.7705-1-yan.y.zhao@intel.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-It is better for a device model to use IOVAs to read/write memory to
-perform some sort of virtual DMA on behalf of the device.
+external user calls vfio_group_get_external_user_from_dev() with a device
+pointer to get the VFIO group associated with this device.
+The VFIO group is checked to be vialbe and have IOMMU set. Then
+container user counter is increased and VFIO group reference is hold
+to prevent the VFIO group from disposal before external user exits.
 
-patch 1 exports VFIO group to external user so that it can hold the group
-reference until finishing using of it. It saves ~500 cycles that are spent
-on VFIO group looking up, referencing and dereferencing. (this data is
-measured with 1 VFIO user).
+when the external user finishes using of the VFIO group, it calls
+vfio_group_put_external_user() to dereference the VFIO group and the
+container user counter.
 
-patch 2 introduces interface vfio_dma_rw().
+Suggested-by: Alex Williamson <alex.williamson@redhat.com>
+Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
+---
+ drivers/vfio/vfio.c  | 38 ++++++++++++++++++++++++++++++++++++++
+ include/linux/vfio.h |  2 ++
+ 2 files changed, 40 insertions(+)
 
-patch 3 introduces interfaces vfio_group_pin_pages() and
-vfio_group_unpin_pages() to get rid of VFIO group looking-up in
-vfio_pin_pages() and vfio_unpin_pages().
-
-patch 4-5 let kvmgt switch from calling kvm_read/write_guest() to calling
-vfio_dma_rw to rw IOVAs.
-
-patch 6 let kvmgt switch to use lighter version of vfio_pin/unpin_pages(),
-i.e. vfio_group_pin/unpin_pages()
-
-patch 7 enables kvmgt to read/write IOVAs of size larger than PAGE_SIZE.
-
-
-Performance:
-
-Comparison between vfio_dma_rw() and kvm_read/write_guest():
-
-1. avergage CPU cycles of each interface measured with 1 running VM:
- --------------------------------------------------
-|  rw       |          avg cycles of               |
-|  size     | (vfio_dma_rw - kvm_read/write_guest) |
-|---------- ---------------------------------------|
-| <= 1 page |            +155 ~ +195               |        
-|--------------------------------------------------|
-| 5 pages   |                -530                  |
-|--------------------------------------------------|
-| 20 pages  |           -2005 ~ -2533              |
- --------------------------------------------------
-
-2. average scores
-
-base: base code before applying code in this series. use
-kvm_read/write_pages() to rw IOVAs
-
-base + this series: use vfio_dma_rw() to read IOVAs and use
-vfio_group_pin/unpin_pages(), and kvmgt is able to rw several pages
-at a time.
-
-Scores of benchmarks running in 1 VM each:
- -----------------------------------------------------------------
-|                    | glmark2 | lightsmark | openarena | heavens |
-|-----------------------------------------------------------------|
-|       base         |  1248   |  219.70    |  114.9    |   560   |
-|-----------------------------------------------------------------|
-|base + this series  |  1248   |  225.8     |   115     |   559   |
- -----------------------------------------------------------------
-
-Sum of scores of two benchmark instances running in 2 VMs each:
- -------------------------------------------------------
-|                    | glmark2 | lightsmark | openarena |
-|-------------------------------------------------------|
-|       base         |  812    |  211.46    |  115.3    |
-|-------------------------------------------------------|
-|base + this series  |  814    |  214.69    |  115.9    |
- -------------------------------------------------------
-
-
-Changelogs:
-v3 --> v4:
-- rebased to 5.6.0-rc4+
-- adjust wrap position for vfio_group_get_external_user_from_dev() in
-  header file.(Alex)
-- updated function description of vfio_group_get_external_user_from_dev()
-  (Alex)
-- fixed Error path group reference leaking in
-  vfio_group_get_external_user_from_dev()  (Alex)
-- reurn 0 for success or errno in vfio_dma_rw_chunk(). (Alex)
-- renamed iova to user_iova in interface vfio_dam_rw().
-- renamed vfio_pin_pages_from_group() and vfio_unpin_pages_from_group() to
-  vfio_group_pin_pages() and vfio_group_unpin_pages()
-- renamed user_pfn to user_iova_pfn in vfio_group_pin_pages() and
-  vfio_group_unpin_pages()
-
-v2 --> v3:
-- add vfio_group_get_external_user_from_dev() to improve performance (Alex)
-- add vfio_pin/unpin_pages_from_group() to avoid repeated looking up of
-  VFIO group in vfio_pin/unpin_pages() (Alex)
-- add a check for IOMMU_READ permission. (Alex)
-- rename vfio_iommu_type1_rw_dma_nopin() to
-  vfio_iommu_type1_dma_rw_chunk(). (Alex)
-- in kvmgt, change "write ? vfio_dma_rw(...,true) :
-  vfio_dma_rw(...,false)" to vfio_dma_rw(dev, gpa, buf, len, write)
-  (Alex and Paolo)
-- in kvmgt, instead of read/write context pages 1:1, combining the
-  reads/writes of continuous IOVAs to take advantage of vfio_dma_rw() for
-  faster crossing page boundary accesses.
-
-v1 --> v2:
-- rename vfio_iova_rw to vfio_dma_rw, vfio iommu driver ops .iova_rw
-to .dma_rw. (Alex).
-- change iova and len from unsigned long to dma_addr_t and size_t,
-respectively. (Alex)
-- fix possible overflow in dma->vaddr + iova - dma->iova + offset (Alex)
-- split DMAs from on page boundary to on max available size to eliminate
-  redundant searching of vfio_dma and switching mm. (Alex)
-- add a check for IOMMU_WRITE permission.
-
-
-Yan Zhao (7):
-  vfio: allow external user to get vfio group from device
-  vfio: introduce vfio_dma_rw to read/write a range of IOVAs
-  vfio: avoid inefficient operations on VFIO group in
-    vfio_pin/unpin_pages
-  drm/i915/gvt: hold reference of VFIO group during opening of vgpu
-  drm/i915/gvt: subsitute kvm_read/write_guest with vfio_dma_rw
-  drm/i915/gvt: switch to user vfio_group_pin/upin_pages
-  drm/i915/gvt: rw more pages a time for shadow context
-
- drivers/gpu/drm/i915/gvt/kvmgt.c     |  46 ++++---
- drivers/gpu/drm/i915/gvt/scheduler.c |  97 ++++++++++-----
- drivers/vfio/vfio.c                  | 180 +++++++++++++++++++++++++++
- drivers/vfio/vfio_iommu_type1.c      |  76 +++++++++++
- include/linux/vfio.h                 |  13 ++
- 5 files changed, 360 insertions(+), 52 deletions(-)
-
+diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
+index c8482624ca34..97b972bfb735 100644
+--- a/drivers/vfio/vfio.c
++++ b/drivers/vfio/vfio.c
+@@ -1720,6 +1720,44 @@ struct vfio_group *vfio_group_get_external_user(struct file *filep)
+ }
+ EXPORT_SYMBOL_GPL(vfio_group_get_external_user);
+ 
++/**
++ * External user API, exported by symbols to be linked dynamically.
++ * The external user passes in a device pointer
++ * to verify that:
++ *	- A VFIO group is assiciated with the device;
++ *	- IOMMU is set for the group.
++ * If both checks passed, vfio_group_get_external_user_from_dev()
++ * increments the container user counter to prevent the VFIO group
++ * from disposal before external user exits and returns the pointer
++ * to the VFIO group.
++ *
++ * When the external user finishes using the VFIO group, it calls
++ * vfio_group_put_external_user() to release the VFIO group and
++ * decrement the container user counter.
++ *
++ * @dev [in]	: device
++ * Return error PTR or pointer to VFIO group.
++ */
++
++struct vfio_group *vfio_group_get_external_user_from_dev(struct device *dev)
++{
++	struct vfio_group *group;
++	int ret;
++
++	group = vfio_group_get_from_dev(dev);
++	if (!group)
++		return ERR_PTR(-ENODEV);
++
++	ret = vfio_group_add_container_user(group);
++	if (ret) {
++		vfio_group_put(group);
++		return ERR_PTR(ret);
++	}
++
++	return group;
++}
++EXPORT_SYMBOL_GPL(vfio_group_get_external_user_from_dev);
++
+ void vfio_group_put_external_user(struct vfio_group *group)
+ {
+ 	vfio_group_try_dissolve_container(group);
+diff --git a/include/linux/vfio.h b/include/linux/vfio.h
+index e42a711a2800..fb71e0ac0e76 100644
+--- a/include/linux/vfio.h
++++ b/include/linux/vfio.h
+@@ -94,6 +94,8 @@ extern void vfio_unregister_iommu_driver(
+  */
+ extern struct vfio_group *vfio_group_get_external_user(struct file *filep);
+ extern void vfio_group_put_external_user(struct vfio_group *group);
++extern struct vfio_group *vfio_group_get_external_user_from_dev(struct device
++								*dev);
+ extern bool vfio_external_group_match_file(struct vfio_group *group,
+ 					   struct file *filep);
+ extern int vfio_external_user_iommu_id(struct vfio_group *group);
 -- 
 2.17.1
 
