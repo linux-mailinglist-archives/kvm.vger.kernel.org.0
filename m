@@ -2,118 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 85651183D72
-	for <lists+kvm@lfdr.de>; Fri, 13 Mar 2020 00:38:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 943E1183EB7
+	for <lists+kvm@lfdr.de>; Fri, 13 Mar 2020 02:39:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726838AbgCLXiE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Mar 2020 19:38:04 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:48086 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726802AbgCLXiD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 Mar 2020 19:38:03 -0400
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02CNIbjc050226;
-        Thu, 12 Mar 2020 23:37:59 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2020-01-29;
- bh=4+fjIpyF2vTr8vy41OpFV0LuUn5jW0g5BXbM6Vxcf6w=;
- b=V0+L792qTKt3WVLSrqgMH61ueBn/4vS10Ef3aJ9C+a1lV57jFwhCr7t80PfkiO3eMlBZ
- dCqy5A/SOvbxw10KFXsVaQxjXbXWeJVYLlhR/2qeJ+r/GE7F5gS/Sov2iLbG+D05cvfL
- 3bZMJUcRbsR91VLaZWAlaGb+FnAjvtUI6GAGtgrXVSrgBqnWJ6ngOmbzCErpukaoFMn4
- JL0aUo7MXHtBtpJi5uJjvkxBiMSK6HCbZKtM34X4rJKuyNqhhJe+NRwIc9P3jDlAdP1U
- y3IIV6kLCTt8yTPavWISIFTVZ2N/SpKa6lu0t2WPxxQfT27RcVB5jKzWEfyp5grsLbSv mQ== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by aserp2120.oracle.com with ESMTP id 2yqtaes49u-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 12 Mar 2020 23:37:58 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02CNJH0Y097419;
-        Thu, 12 Mar 2020 23:37:58 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by aserp3020.oracle.com with ESMTP id 2yqtatx4ng-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 12 Mar 2020 23:37:58 +0000
-Received: from abhmp0002.oracle.com (abhmp0002.oracle.com [141.146.116.8])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 02CNbvWF006814;
-        Thu, 12 Mar 2020 23:37:57 GMT
-Received: from localhost.localdomain (/10.159.129.95)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Thu, 12 Mar 2020 16:37:56 -0700
-Subject: Re: [PATCH] kvm-unit-test: nVMX: Test Selector and Base Address
- fields of Guest Segment registers
-To:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Jim Mattson <jmattson@google.com>
-Cc:     kvm list <kvm@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>
-References: <20200310225149.31254-1-krish.sadhukhan@oracle.com>
- <CALMp9eR9hL9OQPBfekDbRAFHx5j-wgBcijjAV0T22NGoSpxpdA@mail.gmail.com>
- <20200311152459.GD21852@linux.intel.com>
-From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Message-ID: <59359699-430e-9d83-4926-3fde6d0f4122@oracle.com>
-Date:   Thu, 12 Mar 2020 16:37:50 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+        id S1726636AbgCMBjV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Mar 2020 21:39:21 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:11640 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726546AbgCMBjV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 Mar 2020 21:39:21 -0400
+Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.59])
+        by Forcepoint Email with ESMTP id F35E4EF00CE69FBB0358;
+        Fri, 13 Mar 2020 09:39:17 +0800 (CST)
+Received: from [127.0.0.1] (10.173.222.27) by DGGEMS403-HUB.china.huawei.com
+ (10.3.19.203) with Microsoft SMTP Server id 14.3.487.0; Fri, 13 Mar 2020
+ 09:39:10 +0800
+Subject: Re: [PATCH v5 01/23] irqchip/gic-v3: Use SGIs without active state if
+ offered
+To:     Marc Zyngier <maz@kernel.org>
+CC:     <linux-arm-kernel@lists.infradead.org>,
+        <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>,
+        Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
+        Jason Cooper <jason@lakedaemon.net>,
+        "Robert Richter" <rrichter@marvell.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        "Eric Auger" <eric.auger@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        "Julien Thierry" <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>
+References: <20200304203330.4967-1-maz@kernel.org>
+ <20200304203330.4967-2-maz@kernel.org>
+ <63f6530a-9369-31e6-88d0-5337173495b9@huawei.com>
+ <51b2c74fdbcca049cc01be6d78c7c693@kernel.org>
+ <1bff1835ba7d6e22edb836d38cf16a14@kernel.org>
+From:   Zenghui Yu <yuzenghui@huawei.com>
+Message-ID: <3e20f3c3-0312-bd29-dcfc-2afee764ef19@huawei.com>
+Date:   Fri, 13 Mar 2020 09:39:08 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-In-Reply-To: <20200311152459.GD21852@linux.intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <1bff1835ba7d6e22edb836d38cf16a14@kernel.org>
+Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Language: en-US
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9558 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 bulkscore=0 phishscore=0
- suspectscore=0 mlxscore=0 spamscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
- definitions=main-2003120116
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9558 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 impostorscore=0
- lowpriorityscore=0 bulkscore=0 priorityscore=1501 suspectscore=0
- mlxlogscore=999 mlxscore=0 adultscore=0 malwarescore=0 spamscore=0
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2003120116
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.173.222.27]
+X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi Marc,
 
-On 3/11/20 8:24 AM, Sean Christopherson wrote:
-> On Tue, Mar 10, 2020 at 04:51:40PM -0700, Jim Mattson wrote:
->> On Tue, Mar 10, 2020 at 4:29 PM Krish Sadhukhan
->> <krish.sadhukhan@oracle.com> wrote:
->>> Even thought today's x86 hardware uses paging and not segmentation for memory
->>> management, it is still good to have some tests that can verify the sanity of
->>> the segment register fields on vmentry of nested guests.
+On 2020/3/12 20:05, Marc Zyngier wrote:
+> On 2020-03-12 09:28, Marc Zyngier wrote:
+>> Hi Zenghui,
+>>
+>> On 2020-03-12 06:30, Zenghui Yu wrote:
+>>> Hi Marc,
 >>>
->>> The test on SS Selector field is failing because the hardware (I am using
->>> Intel Xeon Platinum 8167M 2.00GHz) doesn't raise any error even if the
->>> prescribed bit pattern is not set and as a result vmentry succeeds.
->> Are you sure this isn't just an L0 bug? For instance, does your L0 set
->> "unrestricted guest" in vmcs02, even when L1 doesn't set it in vmcs12?
->
-> I assume this is the check being discussed?  The code is flawed, if CS=3
-> and SS=3, "sel = sel_saved | (~cs_rpl_bits & 0x3)" will yield SS=3 and pass.
->
-> I think you wanted something like:
->
->    sel = (sel_saved & ~0x3) | (~cs_rpl_bits & 0x3);
+>>> On 2020/3/5 4:33, Marc Zyngier wrote:
+>>>> To allow the direct injection of SGIs into a guest, the GICv4.1
+>>>> architecture has to sacrifice the Active state so that SGIs look
+>>>> a lot like LPIs (they are injected by the same mechanism).
+>>>>
+>>>> In order not to break existing software, the architecture gives
+>>>> offers guests OSs the choice: SGIs with or without an active
+>>>> state. It is the hypervisors duty to honor the guest's choice.
+>>>>
+>>>> For this, the architecture offers a discovery bit indicating whether
+>>>> the GIC supports GICv4.1 SGIs (GICD_TYPER2.nASSGIcap), and another
+>>>> bit indicating whether the guest wants Active-less SGIs or not
+>>>> (controlled by GICD_CTLR.nASSGIreq).
+>>>
+>>> I still can't find the description of these two bits in IHI0069F.
+>>> Are they actually architected and will be available in the future
+>>> version of the spec?  I want to confirm it again since this has a
+>>> great impact on the KVM code, any pointers?
+>>
+>> Damn. The bits *are* in the engineering spec version 19 (unfortunately
+>> not a public document, but I believe you should have access to it).
+>>
+>> If the bits have effectively been removed from the spec, I'll drop the
+>> GICv4.1 code from the 5.7 queue until we find a way to achieve the same
+>> level of support.
+>>
+>> I've emailed people inside ARM to find out.
+> 
+> I've now had written confirmation that the bits are still there.
+> 
+> It is just that the current revision of the documentation was cut *before*
+> they made it into the architecture (there seem to be a 6 month delay 
+> between
+> the architecture being sampled and the documentation being released).
 
-Yes, my bit-setting was wrong and I have fixed it. But that's not the 
-cause of the failure.
-
-It appears that Jim's suspicion is correct. L0 is not checking in 
-prepare_vmcs02_early(), whether vmcs12 has "unrestricted guest" turned 
-off. After I put the relevant setting in that function, the test now 
-passes (meaning vmentry fails).
-
-I will add this fix in v2.
+I see. Thanks for the confirmation!
 
 
->
->
->> +	if (!(vmcs_read(GUEST_RFLAGS) & X86_EFLAGS_VM) &&
->> +	    !(vmcs_read(CPU_SECONDARY) & CPU_URG)) {
->> +		u16 cs_rpl_bits = vmcs_read(GUEST_SEL_CS) & 0x3;
->> +		sel_saved = vmcs_read(GUEST_SEL_SS);
->> +		sel = sel_saved | (~cs_rpl_bits & 0x3);
->> +		TEST_SEGMENT_SEL(GUEST_SEL_SS, "GUEST_SEL_SS", sel, sel_saved);
->> +	}
->> +}
+Zenghui
+
