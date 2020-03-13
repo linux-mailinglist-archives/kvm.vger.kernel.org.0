@@ -2,50 +2,47 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 943E1183EB7
-	for <lists+kvm@lfdr.de>; Fri, 13 Mar 2020 02:39:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9F3D5183EE2
+	for <lists+kvm@lfdr.de>; Fri, 13 Mar 2020 02:55:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726636AbgCMBjV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Mar 2020 21:39:21 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:11640 "EHLO huawei.com"
+        id S1726390AbgCMBzm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Mar 2020 21:55:42 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:60566 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726546AbgCMBjV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 Mar 2020 21:39:21 -0400
-Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id F35E4EF00CE69FBB0358;
-        Fri, 13 Mar 2020 09:39:17 +0800 (CST)
-Received: from [127.0.0.1] (10.173.222.27) by DGGEMS403-HUB.china.huawei.com
- (10.3.19.203) with Microsoft SMTP Server id 14.3.487.0; Fri, 13 Mar 2020
- 09:39:10 +0800
-Subject: Re: [PATCH v5 01/23] irqchip/gic-v3: Use SGIs without active state if
- offered
-To:     Marc Zyngier <maz@kernel.org>
-CC:     <linux-arm-kernel@lists.infradead.org>,
+        id S1726194AbgCMBzm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 Mar 2020 21:55:42 -0400
+Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.60])
+        by Forcepoint Email with ESMTP id 3CC268047441D80DBB2B;
+        Fri, 13 Mar 2020 09:55:38 +0800 (CST)
+Received: from [127.0.0.1] (10.173.222.27) by DGGEMS409-HUB.china.huawei.com
+ (10.3.19.209) with Microsoft SMTP Server id 14.3.487.0; Fri, 13 Mar 2020
+ 09:55:31 +0800
+Subject: Re: [kvm-unit-tests PATCH v5 10/13] arm/arm64: ITS: INT functional
+ tests
+To:     Auger Eric <eric.auger@redhat.com>
+CC:     Marc Zyngier <maz@kernel.org>, <eric.auger.pro@gmail.com>,
         <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>,
-        Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
-        Jason Cooper <jason@lakedaemon.net>,
-        "Robert Richter" <rrichter@marvell.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        "Eric Auger" <eric.auger@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        "Julien Thierry" <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>
-References: <20200304203330.4967-1-maz@kernel.org>
- <20200304203330.4967-2-maz@kernel.org>
- <63f6530a-9369-31e6-88d0-5337173495b9@huawei.com>
- <51b2c74fdbcca049cc01be6d78c7c693@kernel.org>
- <1bff1835ba7d6e22edb836d38cf16a14@kernel.org>
+        <qemu-devel@nongnu.org>, <qemu-arm@nongnu.org>,
+        <drjones@redhat.com>, <andre.przywara@arm.com>,
+        <peter.maydell@linaro.org>, <alexandru.elisei@arm.com>,
+        <thuth@redhat.com>
+References: <20200310145410.26308-1-eric.auger@redhat.com>
+ <20200310145410.26308-11-eric.auger@redhat.com>
+ <d3f651a0-2344-4d6e-111b-be133db7e068@huawei.com>
+ <46f0ed1d-3bda-f91b-e2b0-addf1c61c373@redhat.com>
+ <301a8b402ff7e480e927b0f8f8b093f2@kernel.org>
+ <7fb9f81f-6520-526d-7031-d3d08cb1dd6a@huawei.com>
+ <acc652b7-f331-1e48-160c-f07e0e5283b3@redhat.com>
 From:   Zenghui Yu <yuzenghui@huawei.com>
-Message-ID: <3e20f3c3-0312-bd29-dcfc-2afee764ef19@huawei.com>
-Date:   Fri, 13 Mar 2020 09:39:08 +0800
+Message-ID: <160015aa-f5d7-2fdc-8d06-1322af241896@huawei.com>
+Date:   Fri, 13 Mar 2020 09:55:29 +0800
 User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.0
 MIME-Version: 1.0
-In-Reply-To: <1bff1835ba7d6e22edb836d38cf16a14@kernel.org>
+In-Reply-To: <acc652b7-f331-1e48-160c-f07e0e5283b3@redhat.com>
 Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 X-Originating-IP: [10.173.222.27]
 X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
@@ -53,52 +50,49 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
+Hi Eric,
 
-On 2020/3/12 20:05, Marc Zyngier wrote:
-> On 2020-03-12 09:28, Marc Zyngier wrote:
->> Hi Zenghui,
->>
->> On 2020-03-12 06:30, Zenghui Yu wrote:
->>> Hi Marc,
->>>
->>> On 2020/3/5 4:33, Marc Zyngier wrote:
->>>> To allow the direct injection of SGIs into a guest, the GICv4.1
->>>> architecture has to sacrifice the Active state so that SGIs look
->>>> a lot like LPIs (they are injected by the same mechanism).
->>>>
->>>> In order not to break existing software, the architecture gives
->>>> offers guests OSs the choice: SGIs with or without an active
->>>> state. It is the hypervisors duty to honor the guest's choice.
->>>>
->>>> For this, the architecture offers a discovery bit indicating whether
->>>> the GIC supports GICv4.1 SGIs (GICD_TYPER2.nASSGIcap), and another
->>>> bit indicating whether the guest wants Active-less SGIs or not
->>>> (controlled by GICD_CTLR.nASSGIreq).
->>>
->>> I still can't find the description of these two bits in IHI0069F.
->>> Are they actually architected and will be available in the future
->>> version of the spec?  I want to confirm it again since this has a
->>> great impact on the KVM code, any pointers?
->>
->> Damn. The bits *are* in the engineering spec version 19 (unfortunately
->> not a public document, but I believe you should have access to it).
->>
->> If the bits have effectively been removed from the spec, I'll drop the
->> GICv4.1 code from the 5.7 queue until we find a way to achieve the same
->> level of support.
->>
->> I've emailed people inside ARM to find out.
+On 2020/3/12 17:59, Auger Eric wrote:
+> Hi Zenghui,
 > 
-> I've now had written confirmation that the bits are still there.
+> On 3/12/20 10:19 AM, Zenghui Yu wrote:
+>> On 2020/3/11 22:00, Marc Zyngier wrote:
+>>> That is still a problem with the ITS. There is no architectural way
+>>> to report an error, even if the error numbers are architected...
+>>>
+>>> One thing we could do though is to implement the stall model (as
+>>> described
+>>> in 5.3.2). It still doesn't give us the error, but at least the command
+>>> queue would stop on detecting an error.
+>>
+>> It would be interesting to see the buggy guest's behavior under the
+>> stall mode. I've used the following diff (absolutely *not* a formal
+>> patch, don't handle CREADR.Stalled and CWRITER.Retry at all) to have
+>> a try, and caught another command error in the 'its-trigger' test.
+>>
+>> logs/its-trigger.log:
+>> " INT dev_id=2 event_id=20
+>> lib/arm64/gic-v3-its-cmd.c:194: assert failed: false: INT timeout! "
+>>
+>> dmesg:
+>> [13297.711958] ------------[ cut here ]------------
+>> [13297.711964] ITS command error encoding 0x10307
+>>
+>> It's the last INT test in test_its_trigger() who has triggered this
+>> error, Eric?
 > 
-> It is just that the current revision of the documentation was cut *before*
-> they made it into the architecture (there seem to be a 6 month delay 
-> between
-> the architecture being sampled and the documentation being released).
+> Yes it may be the culprit. Anyway I removed the collection unmap in v6.
 
-I see. Thanks for the confirmation!
+I forgot to mention that this is based on your v6. I'll reply to it.
+
+> 
+> By the way are you OK now with v6? I think Drew plans to send a pull
+> request by the end of this week.
+
+Sorry I haven't looked at it yet (v5 already looks good except for
+some minor issues).
 
 
+Thanks,
 Zenghui
 
