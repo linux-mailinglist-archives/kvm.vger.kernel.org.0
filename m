@@ -2,63 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id BC27C1841DA
-	for <lists+kvm@lfdr.de>; Fri, 13 Mar 2020 08:56:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2D8B31841E7
+	for <lists+kvm@lfdr.de>; Fri, 13 Mar 2020 08:57:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726651AbgCMHz7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 13 Mar 2020 03:55:59 -0400
-Received: from esa6.hgst.iphmx.com ([216.71.154.45]:13917 "EHLO
-        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726437AbgCMHz7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 13 Mar 2020 03:55:59 -0400
+        id S1726461AbgCMH5m (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 13 Mar 2020 03:57:42 -0400
+Received: from esa1.hgst.iphmx.com ([68.232.141.245]:61189 "EHLO
+        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726230AbgCMH5m (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 13 Mar 2020 03:57:42 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1584086158; x=1615622158;
+  t=1584086262; x=1615622262;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version;
-  bh=PoZ4C0DQCgArH0HRPuHiVnF3odpjp0F6YtqVSYQoomY=;
-  b=r33KGuKXRdTmC3xtAI08GH0FSE3KogdhBMcpwEexDWPg3bODDuU2+JlD
-   BvDd7g+qSu7m0lIzP3XWpB/lYnRmJKHh0/p69q+Mrfo6g4CxmxRjiz9YT
-   ARelfQEKKF3eD3hUu6LWErfFsWvCD60Q+/gcw+czQPBjWxukFpEQstxUe
-   ECUNZQj9OQ61AUbKdaXkSlsuln9vmWBnpM02xBEXNtw8y46p3GfbKWErb
-   4d4MZax8SHe3yIOouoembQ2lh9BW0403FVDqBhD5fmggtIam5GQuj88mw
-   1B9UIl29OdcNETXHkDhpIw8Q+9isXDqNFiS7HnrO1A/mr/S9Uew2El8T6
-   A==;
-IronPort-SDR: 4BXD5ZnAFMJj+9qHD1iAxohuxzLKjupEwrPeXft3yqBZ/zIzz6uqwzmBI64GtB3Mr4mp5hPju0
- z3BMMrz+fmYCPYvv0PaW5QqukiMFZJDYvY2HLNJJX/drVExfdAQvVF4yMrKkbVh23Z0sorcZiH
- vFdOcnvCOw391d1Uf2kQwPxFRxifC/een6XAP+1zRXhvEJTSBakfbpVZ/YMLmk3UdjKLw94/+q
- J5PkqQOhXFJGB7s2niBUyOpHw7tMABzasoLFmskwnOa2xt0piFa8Qpd+jyzTdhoU9MNBCPdlGO
- O/I=
+  bh=TuE0WWlQMDc84XCF3FID2HNyE/MlgKkPTVowXNeF/AI=;
+  b=TLXyV2D0K1OliYilsvH1zMNBi69Ej7cXEpT5Y9Wiy1MdHBHelGY3Ucj5
+   gyUMMucUq4noPEzhpQ+P5iWbQyorvu7awGfoc+OJMSpGSZi0otOCXKT5D
+   YTZJ+hNS68ufNv9fZjvOFkB/8cEP9nOx26EnlsmlDjp4a9LeonT4Ta/i4
+   WeaONRZ76Rrc0eDsVgexzfPvBIbQI86jvKU6dABbLFStiE6NFvhVwiW8/
+   Bs9ltE5itm1S7jscPvXeGufV42XPZtj+2zLBXOcAnJP2H2HB5DWP7arLR
+   vj1ZBx0JcS59XaiaXaao26Fv/Gcc5rvDscIVQunO5+Be/0ZWfU4SUZZGG
+   g==;
+IronPort-SDR: trJAbPeZHTYYWJPhTDBGS8ASpL7b+NqOjGnwhhiqhFxg6LnFKLjZarRUL3ooJPjJbTW+9hFA1q
+ Cm1pPVr1xWje0W2GBcfttH8KtSHq5xZ0OTzxeQeuOv19BnHuKd+xwstjCqkSME88lXz1VRCkKF
+ 9PrzZi5dc6FfLg29W9iFzPgI5BXa8VpDZHbjhXqoEjiCLLzGk/ppqMamXLm4BmdItwjdtS639S
+ 2HxFWZVWQTOtkv7OwLjcxQcQDMpgBrqxWnKCXreweJxPOUSQgqM38BX8L1GIwuOlN96f19zxXu
+ hwE=
 X-IronPort-AV: E=Sophos;i="5.70,547,1574092800"; 
-   d="scan'208";a="133834776"
-Received: from mail-sn1nam04lp2052.outbound.protection.outlook.com (HELO NAM04-SN1-obe.outbound.protection.outlook.com) ([104.47.44.52])
-  by ob1.hgst.iphmx.com with ESMTP; 13 Mar 2020 15:55:57 +0800
+   d="scan'208";a="240664365"
+Received: from mail-bn7nam10lp2104.outbound.protection.outlook.com (HELO NAM10-BN7-obe.outbound.protection.outlook.com) ([104.47.70.104])
+  by ob1.hgst.iphmx.com with ESMTP; 13 Mar 2020 15:57:40 +0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Nk8bnj8qoWs5kL0/5RUpe3uJi8rIwnHJgxfpGRIsZ3vStSVw0UOJpSpVHi74Gbyl9yPcDuN/otuvIfY6YouDyPcm31HdnjSz/uBmvuGZWqDGS0yazVXPI2ObvE4Oz32kmKc/ZlQ7Ol5ds5+79qKj2wPt5dNQEJGA7rmC5vd8MPEtLPoLHKFluctNBSDqTkQ1oLdSa+PiAYIBZG3sAXJ3egWYO68GQX8wvk59Fpbrq5ACASF8o+vLT1IQ8BYMpNo4ci5yrU8lMF14AHLCkcNRnVmJk7XtSZX7o4nedOOeK0/JEttuCajPHcZ4/iFybHXaZ1kVl1TRuhq/f+FTbAORKQ==
+ b=N0RWS/YchiQtXg0DP77wqSSAG8Ja1U7BDuQCanwi7MrP311fplSa9EBiapHsrLN6eaZrNZBaHesk/S3uiBUs9B+eTRuxknJNL1p9FRlBikh9qHlzYrbAf3MkNaqpQcFs804vkDdGhC1DIlegDaY29PG0zEjM4hRwniEYXZ9uOqn6Kqi8ZYvZctdwFfkz43LDT7I7vOaRDtlpUSxt4MOlQZ2o8K33H0kkce6nudOrxLWHfyQYJ+Q4ssCWyYmgKPwxw0Ck6FazbdLMPlnYhzDher55Wixg1dIbBMlT9uje9Wwhgd+0wr6Ert08RzVK09rv3Tp+oS/VVryxtdeSMTRgHg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=JaWtiMB/gu8T/MRwP+gVMajyzdJklY1EdYNxNIiTt2U=;
- b=P5x2eflGKfnAanUsRVqMAr4PZ0b+WugR/zYkhRCz56HvQ2qU9kPDKi5EYXWgUhZ2WfKjKbthdvn5/l7gy5YaMH+dqWbfvpFtRHQ0xcBUHdZr1KfbmyVNqhNuxFB6uis8XDmPbsIveQ/RtwB1v52XPLYF15AXg690AKp0l+EskzuSficYD2I91t1XgByRymt12UcjvdUAZb6zPw7BOBrl/8T2Ci0RApsvbrQVSO+GhjFay/Qisx4KupadyYRK0HpDBm1PNF8FQ0B7M4GYLRHEbMZv+Z/pF5uTkUlDsjpQzkhiZ1+jrxFi86WExtC4/hpjY8TlHC4rJ9SF0EWqd0zDFw==
+ bh=WK7z6cvnL8d03JPUkB1ScL66qjC35+YJBmF1Gfd69Oo=;
+ b=UALi/X2XZb8hQjEaoRGG8MBJFKIp8k3PvDd9GwXaSivy2flg2htE540xqok5tAEWdhv64Py0fT1hRAafI6tZCfJldZTWQRzME64leWswtKuBVIL3ygEWAiSEJYZFPRi+MpwxmJ9QFJSDPA+hNY/2L2i1RcngOix6tBCnVYPllwZKhZApUbajVzOICcM4SUV17viCP1LQq/CRSlBZiolwLXmPcs8ZWC7O3vWVKVD1arpBm2mwbeQyodNUBNtcjS6y2pOHSE1laB/6fCR8ghPNNCHOhTwW9r/3Aby8+NtVjo5VjxAAQXcjwROxLXepsLwHFON10LBj0RT8N8EKxDCQfQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
  header.d=wdc.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=JaWtiMB/gu8T/MRwP+gVMajyzdJklY1EdYNxNIiTt2U=;
- b=RxlwXiE0KicIR3k1DrlcMGgv8QhbdmiMUUICaiRbxCp9b80WTv+3hyPaDXgOhrYZhjF9Nm5wgEASvFKaQvybk203KpkikYMfAnCH18MP3Sxxd2jv5Qa4JS4cgSvcAo8KTWnLCjn5Fpn0EA9cpHUqRhXXHCmLnDo4xObzXodbRpI=
+ bh=WK7z6cvnL8d03JPUkB1ScL66qjC35+YJBmF1Gfd69Oo=;
+ b=lZ37sv4E8/85LO6eN4SKPdlAiToRpv570M70JjMEQTm4SP67LbSm+XXI+mhyWXF+5uwUpmFEk2GKCNDtzYku9Y+BbiDYhyyDCRkAIjU1i1rYmXVfxhPaNzE+cOepAGJkaererqdo01yrED+A/ciJqFntnuYIOJjEdjuMBiUliH8=
 Authentication-Results: spf=none (sender IP is )
  smtp.mailfrom=Anup.Patel@wdc.com; 
 Received: from MN2PR04MB6061.namprd04.prod.outlook.com (2603:10b6:208:d8::15)
  by MN2PR04MB6319.namprd04.prod.outlook.com (2603:10b6:208:1aa::21) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2793.16; Fri, 13 Mar
- 2020 07:55:56 +0000
+ 2020 07:57:38 +0000
 Received: from MN2PR04MB6061.namprd04.prod.outlook.com
  ([fe80::159d:10c9:f6df:64c8]) by MN2PR04MB6061.namprd04.prod.outlook.com
  ([fe80::159d:10c9:f6df:64c8%6]) with mapi id 15.20.2814.018; Fri, 13 Mar 2020
- 07:55:56 +0000
+ 07:57:38 +0000
 From:   Anup Patel <anup.patel@wdc.com>
 To:     Palmer Dabbelt <palmer@dabbelt.com>,
         Paul Walmsley <paul.walmsley@sifive.com>,
@@ -73,9 +73,9 @@ Cc:     Alexander Graf <graf@amazon.com>,
         Anup Patel <anup@brainfault.org>, kvm@vger.kernel.org,
         kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
         linux-kernel@vger.kernel.org, Anup Patel <anup.patel@wdc.com>
-Subject: [PATCH v11 08/20] RISC-V: KVM: Implement KVM_GET_ONE_REG/KVM_SET_ONE_REG ioctls
-Date:   Fri, 13 Mar 2020 13:21:19 +0530
-Message-Id: <20200313075131.69837-9-anup.patel@wdc.com>
+Subject: [PATCH v11 09/20] RISC-V: KVM: Implement VCPU world-switch
+Date:   Fri, 13 Mar 2020 13:21:20 +0530
+Message-Id: <20200313075131.69837-10-anup.patel@wdc.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200313075131.69837-1-anup.patel@wdc.com>
 References: <20200313075131.69837-1-anup.patel@wdc.com>
@@ -85,405 +85,439 @@ X-ClientProxiedBy: MA1PR0101CA0057.INDPRD01.PROD.OUTLOOK.COM
  (2603:10b6:208:d8::15)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from wdc.com (1.39.129.91) by MA1PR0101CA0057.INDPRD01.PROD.OUTLOOK.COM (2603:1096:a00:20::19) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2814.14 via Frontend Transport; Fri, 13 Mar 2020 07:55:45 +0000
+Received: from wdc.com (1.39.129.91) by MA1PR0101CA0057.INDPRD01.PROD.OUTLOOK.COM (2603:1096:a00:20::19) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2814.14 via Frontend Transport; Fri, 13 Mar 2020 07:56:18 +0000
 X-Mailer: git-send-email 2.17.1
 X-Originating-IP: [1.39.129.91]
 X-MS-PublicTrafficType: Email
 X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 4e3e4878-33f7-4fe5-44a6-08d7c723f43e
+X-MS-Office365-Filtering-Correlation-Id: b3b118c3-13b3-458d-f574-08d7c72431cc
 X-MS-TrafficTypeDiagnostic: MN2PR04MB6319:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <MN2PR04MB6319F56FA7F6CF691A66889C8DFA0@MN2PR04MB6319.namprd04.prod.outlook.com>
+X-Microsoft-Antispam-PRVS: <MN2PR04MB63190D9851F5D4C74087C9148DFA0@MN2PR04MB6319.namprd04.prod.outlook.com>
 WDCIPOUTBOUND: EOP-TRUE
 X-MS-Oob-TLC-OOBClassifiers: OLM:7219;
 X-Forefront-PRVS: 034119E4F6
-X-Forefront-Antispam-Report: SFV:NSPM;SFS:(10019020)(4636009)(346002)(366004)(376002)(136003)(396003)(39860400002)(199004)(26005)(44832011)(7696005)(86362001)(52116002)(16526019)(81156014)(55016002)(186003)(81166006)(1076003)(66946007)(2906002)(66476007)(110136005)(4326008)(66556008)(8676002)(54906003)(5660300002)(316002)(6666004)(30864003)(2616005)(8886007)(956004)(1006002)(478600001)(36756003)(8936002)(7416002)(36456003)(42976004);DIR:OUT;SFP:1102;SCL:1;SRVR:MN2PR04MB6319;H:MN2PR04MB6061.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;
+X-Forefront-Antispam-Report: SFV:NSPM;SFS:(10019020)(4636009)(39860400002)(396003)(136003)(346002)(366004)(376002)(199004)(1006002)(478600001)(2616005)(956004)(8886007)(8936002)(7416002)(36756003)(81156014)(16526019)(81166006)(1076003)(55016002)(186003)(52116002)(86362001)(26005)(44832011)(7696005)(8676002)(54906003)(5660300002)(4326008)(66556008)(30864003)(316002)(6666004)(66476007)(110136005)(66946007)(2906002)(36456003)(42976004);DIR:OUT;SFP:1102;SCL:1;SRVR:MN2PR04MB6319;H:MN2PR04MB6061.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 5PeNIn48+W4Jn3uIOmmrX4mTj/oe84HrJsS4T+NaZmvmhvzieEUT9Gw4A6ZKafztNM0N8ajeDSxQUFsI/XEpZEcgiRBqQFLbWw5KJr82YgwOTKG4VWcgr7KmDfOx+o3TGnVmgS6z2M3xLpUdTxrDwjoXLKh+uxNrBOXNLg8//EZfYWsVQhACSN7FVoNFAkTUxnsJbbyPQUQj7pkREDS7+adwa1Pr1OutC+KRmpOxst+iszsnEfvDyM61YWYXigHQXo6Ak+0kbdY61FCQkEn5lOZaW5MwhHq+7JvER55WVEbJH0iUim8XxWDmA9+O5xfrIpbH/R1HK4PPds2QTz1CP5Jee95CL+LAarFzizH0JnBQW7DmMBTLuxti2FZVJwykr2pjlHRWpZSop/4inZAqX972QE7xyRzq0UerrEdVqz+qchGQQ5k1RcEEh53VSZ5O2pgefU4be2T2o3K6Sn7cRheLO6amENfLZS0QU9OcvWoXMKA9FCeetL3h0PCkKdr1
-X-MS-Exchange-AntiSpam-MessageData: +Kpj7MSyzwSu9ksfANn06tZAWO4Xxr7HyC1xylZgCAWqiKgM/FVLPDjCBzhqqO+9rN4+cOGp9w3JJNBQqjVfYF4Th/e4mAyATAHYraIvcdEUP8bPs8IxELESDSb56wUgVsotTGa4CzVsVe/s6xBNew==
+X-Microsoft-Antispam-Message-Info: BRICOGZo1Nt0NihnKYYW1i4DD/yQhj5aAj37hwgnF/SDN24E7cVYpmUZDQm7HXLtGy/pGOqm7yhoxcdLETaFItKZNvGvL7sbNNGBaHI4LoYQ/jjBS76cNj5LEUJAcqgUgB3xxizzo0wbYOV6pO107sWyfExpRtCnX1HGZwyBXnN9bJznFHS4vLD1oQMAYcWyUqpnI74vwmRU7b0eBYowUb91S5x9Lbra4s7rzSwiy3/W39PtlW+qiP7hBAlztnYZqJOZWjK+8sm6M4Hy7LARNEFGdOCgSrfkPUL/Ga0PkAxXr1GggS1ZJF3B68WMDryR2icSzyOFVMaCyftsjjIUxTRSd3OJ10ntd36U5f7q4rInhkobOnJK6vVk+HA88Ye9GGqXjtgr0T5rtkydzmF5pnJh0njRj4bvRi/I/M/Y4bFc2rQ5+a8JAKXZWksnb0G8G5squN7EA1B8nb97VSxreEO5LW24I75rZ7LIIOwD/q1xBGitsZ0hoKjb6gyF/Y8cQupJysxU2DaB2Yd1DA7EdQ==
+X-MS-Exchange-AntiSpam-MessageData: UN4uUxRBjZ+CJ8GsETuU9o2eT0Pjov5yEGM3G7AicBRiTdgxCL7ikIi9Z6fjBtvW4VrJK2s+xHxtByG8lrvFihXDlf1qUAEyp8tqZtKaOKPm68IPlH2qGMIaX9DTjxIFLzvYH7xCmUrw+T89L5RC0Q==
 X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4e3e4878-33f7-4fe5-44a6-08d7c723f43e
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Mar 2020 07:55:56.3280
+X-MS-Exchange-CrossTenant-Network-Message-Id: b3b118c3-13b3-458d-f574-08d7c72431cc
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Mar 2020 07:57:38.6978
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: b61c8803-16f3-4c35-9b17-6f65f441df86
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: jJkH95e9uGFvDIBt51Tf36rU6soGrPOGdlVPOFj3dqzKrpnTCPG2uoe/pDeZY4ktEPHTt3v3OZRozMtQkR/qlA==
+X-MS-Exchange-CrossTenant-UserPrincipalName: 4Yw3WuzQBaYfOKoVXfr4RJmxGEeCn1jWe4QuQl/DF9GmhgosWdukV/BBoGCs2t3pihunL6WctHdThEbvieO3ew==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR04MB6319
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-For KVM RISC-V, we use KVM_GET_ONE_REG/KVM_SET_ONE_REG ioctls to access
-VCPU config and registers from user-space.
+This patch implements the VCPU world-switch for KVM RISC-V.
 
-We have three types of VCPU registers:
-1. CONFIG - these are VCPU config and capabilities
-2. CORE   - these are VCPU general purpose registers
-3. CSR    - these are VCPU control and status registers
-
-The CONFIG register available to user-space is ISA. The ISA register is
-a read and write register where user-space can only write the desired
-VCPU ISA capabilities before running the VCPU.
-
-The CORE registers available to user-space are PC, RA, SP, GP, TP, A0-A7,
-T0-T6, S0-S11 and MODE. Most of these are RISC-V general registers except
-PC and MODE. The PC register represents program counter whereas the MODE
-register represent VCPU privilege mode (i.e. S/U-mode).
-
-The CSRs available to user-space are SSTATUS, SIE, STVEC, SSCRATCH, SEPC,
-SCAUSE, STVAL, SIP, and SATP. All of these are read/write registers.
-
-In future, more VCPU register types will be added (such as FP) for the
-KVM_GET_ONE_REG/KVM_SET_ONE_REG ioctls.
+The KVM RISC-V world-switch (i.e. __kvm_riscv_switch_to()) mostly
+switches general purpose registers, SSTATUS, STVEC, SSCRATCH and
+HSTATUS CSRs. Other CSRs are switched via vcpu_load() and vcpu_put()
+interface in kvm_arch_vcpu_load() and kvm_arch_vcpu_put() functions
+respectively.
 
 Signed-off-by: Anup Patel <anup.patel@wdc.com>
 Acked-by: Paolo Bonzini <pbonzini@redhat.com>
 Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+Reviewed-by: Alexander Graf <graf@amazon.com>
 ---
- arch/riscv/include/uapi/asm/kvm.h |  52 ++++++-
- arch/riscv/kvm/vcpu.c             | 246 +++++++++++++++++++++++++++++-
- 2 files changed, 294 insertions(+), 4 deletions(-)
+ arch/riscv/include/asm/kvm_host.h |   9 +-
+ arch/riscv/kernel/asm-offsets.c   |  76 ++++++++++++
+ arch/riscv/kvm/Makefile           |   2 +-
+ arch/riscv/kvm/vcpu.c             |  30 ++++-
+ arch/riscv/kvm/vcpu_switch.S      | 194 ++++++++++++++++++++++++++++++
+ 5 files changed, 307 insertions(+), 4 deletions(-)
+ create mode 100644 arch/riscv/kvm/vcpu_switch.S
 
-diff --git a/arch/riscv/include/uapi/asm/kvm.h b/arch/riscv/include/uapi/asm/kvm.h
-index 6dbc056d58ba..3a20327242f1 100644
---- a/arch/riscv/include/uapi/asm/kvm.h
-+++ b/arch/riscv/include/uapi/asm/kvm.h
-@@ -41,10 +41,60 @@ struct kvm_guest_debug_arch {
- struct kvm_sync_regs {
- };
+diff --git a/arch/riscv/include/asm/kvm_host.h b/arch/riscv/include/asm/kvm_host.h
+index 94ae81220ac6..70413ebcf4db 100644
+--- a/arch/riscv/include/asm/kvm_host.h
++++ b/arch/riscv/include/asm/kvm_host.h
+@@ -110,6 +110,13 @@ struct kvm_vcpu_arch {
+ 	/* ISA feature bits (similar to MISA) */
+ 	unsigned long isa;
  
--/* dummy definition */
-+/* for KVM_GET_SREGS and KVM_SET_SREGS */
- struct kvm_sregs {
- };
++	/* SSCRATCH and STVEC of Host */
++	unsigned long host_sscratch;
++	unsigned long host_stvec;
++
++	/* CPU context of Host */
++	struct kvm_cpu_context host_context;
++
+ 	/* CPU context of Guest VCPU */
+ 	struct kvm_cpu_context guest_context;
  
-+/* CONFIG registers for KVM_GET_ONE_REG and KVM_SET_ONE_REG */
-+struct kvm_riscv_config {
-+	unsigned long isa;
-+};
-+
-+/* CORE registers for KVM_GET_ONE_REG and KVM_SET_ONE_REG */
-+struct kvm_riscv_core {
-+	struct user_regs_struct regs;
-+	unsigned long mode;
-+};
-+
-+/* Possible privilege modes for kvm_riscv_core */
-+#define KVM_RISCV_MODE_S	1
-+#define KVM_RISCV_MODE_U	0
-+
-+/* CSR registers for KVM_GET_ONE_REG and KVM_SET_ONE_REG */
-+struct kvm_riscv_csr {
-+	unsigned long sstatus;
-+	unsigned long sie;
-+	unsigned long stvec;
-+	unsigned long sscratch;
-+	unsigned long sepc;
-+	unsigned long scause;
-+	unsigned long stval;
-+	unsigned long sip;
-+	unsigned long satp;
-+};
-+
-+#define KVM_REG_SIZE(id)		\
-+	(1U << (((id) & KVM_REG_SIZE_MASK) >> KVM_REG_SIZE_SHIFT))
-+
-+/* If you need to interpret the index values, here is the key: */
-+#define KVM_REG_RISCV_TYPE_MASK		0x00000000FF000000
-+#define KVM_REG_RISCV_TYPE_SHIFT	24
-+
-+/* Config registers are mapped as type 1 */
-+#define KVM_REG_RISCV_CONFIG		(0x01 << KVM_REG_RISCV_TYPE_SHIFT)
-+#define KVM_REG_RISCV_CONFIG_REG(name)	\
-+	(offsetof(struct kvm_riscv_config, name) / sizeof(unsigned long))
-+
-+/* Core registers are mapped as type 2 */
-+#define KVM_REG_RISCV_CORE		(0x02 << KVM_REG_RISCV_TYPE_SHIFT)
-+#define KVM_REG_RISCV_CORE_REG(name)	\
-+		(offsetof(struct kvm_riscv_core, name) / sizeof(unsigned long))
-+
-+/* Control and status registers are mapped as type 3 */
-+#define KVM_REG_RISCV_CSR		(0x03 << KVM_REG_RISCV_TYPE_SHIFT)
-+#define KVM_REG_RISCV_CSR_REG(name)	\
-+		(offsetof(struct kvm_riscv_csr, name) / sizeof(unsigned long))
-+
- #endif
+@@ -160,7 +167,7 @@ int kvm_riscv_vcpu_exit(struct kvm_vcpu *vcpu, struct kvm_run *run,
+ 			unsigned long scause, unsigned long stval,
+ 			unsigned long htval, unsigned long htinst);
  
- #endif /* __LINUX_KVM_RISCV_H */
+-static inline void __kvm_riscv_switch_to(struct kvm_vcpu_arch *vcpu_arch) {}
++void __kvm_riscv_switch_to(struct kvm_vcpu_arch *vcpu_arch);
+ 
+ int kvm_riscv_vcpu_set_interrupt(struct kvm_vcpu *vcpu, unsigned int irq);
+ int kvm_riscv_vcpu_unset_interrupt(struct kvm_vcpu *vcpu, unsigned int irq);
+diff --git a/arch/riscv/kernel/asm-offsets.c b/arch/riscv/kernel/asm-offsets.c
+index 07cb9c10de4e..3a230882b91e 100644
+--- a/arch/riscv/kernel/asm-offsets.c
++++ b/arch/riscv/kernel/asm-offsets.c
+@@ -7,7 +7,9 @@
+ #define GENERATING_ASM_OFFSETS
+ 
+ #include <linux/kbuild.h>
++#include <linux/mm.h>
+ #include <linux/sched.h>
++#include <asm/kvm_host.h>
+ #include <asm/thread_info.h>
+ #include <asm/ptrace.h>
+ 
+@@ -109,6 +111,80 @@ void asm_offsets(void)
+ 	OFFSET(PT_BADADDR, pt_regs, badaddr);
+ 	OFFSET(PT_CAUSE, pt_regs, cause);
+ 
++	OFFSET(KVM_ARCH_GUEST_ZERO, kvm_vcpu_arch, guest_context.zero);
++	OFFSET(KVM_ARCH_GUEST_RA, kvm_vcpu_arch, guest_context.ra);
++	OFFSET(KVM_ARCH_GUEST_SP, kvm_vcpu_arch, guest_context.sp);
++	OFFSET(KVM_ARCH_GUEST_GP, kvm_vcpu_arch, guest_context.gp);
++	OFFSET(KVM_ARCH_GUEST_TP, kvm_vcpu_arch, guest_context.tp);
++	OFFSET(KVM_ARCH_GUEST_T0, kvm_vcpu_arch, guest_context.t0);
++	OFFSET(KVM_ARCH_GUEST_T1, kvm_vcpu_arch, guest_context.t1);
++	OFFSET(KVM_ARCH_GUEST_T2, kvm_vcpu_arch, guest_context.t2);
++	OFFSET(KVM_ARCH_GUEST_S0, kvm_vcpu_arch, guest_context.s0);
++	OFFSET(KVM_ARCH_GUEST_S1, kvm_vcpu_arch, guest_context.s1);
++	OFFSET(KVM_ARCH_GUEST_A0, kvm_vcpu_arch, guest_context.a0);
++	OFFSET(KVM_ARCH_GUEST_A1, kvm_vcpu_arch, guest_context.a1);
++	OFFSET(KVM_ARCH_GUEST_A2, kvm_vcpu_arch, guest_context.a2);
++	OFFSET(KVM_ARCH_GUEST_A3, kvm_vcpu_arch, guest_context.a3);
++	OFFSET(KVM_ARCH_GUEST_A4, kvm_vcpu_arch, guest_context.a4);
++	OFFSET(KVM_ARCH_GUEST_A5, kvm_vcpu_arch, guest_context.a5);
++	OFFSET(KVM_ARCH_GUEST_A6, kvm_vcpu_arch, guest_context.a6);
++	OFFSET(KVM_ARCH_GUEST_A7, kvm_vcpu_arch, guest_context.a7);
++	OFFSET(KVM_ARCH_GUEST_S2, kvm_vcpu_arch, guest_context.s2);
++	OFFSET(KVM_ARCH_GUEST_S3, kvm_vcpu_arch, guest_context.s3);
++	OFFSET(KVM_ARCH_GUEST_S4, kvm_vcpu_arch, guest_context.s4);
++	OFFSET(KVM_ARCH_GUEST_S5, kvm_vcpu_arch, guest_context.s5);
++	OFFSET(KVM_ARCH_GUEST_S6, kvm_vcpu_arch, guest_context.s6);
++	OFFSET(KVM_ARCH_GUEST_S7, kvm_vcpu_arch, guest_context.s7);
++	OFFSET(KVM_ARCH_GUEST_S8, kvm_vcpu_arch, guest_context.s8);
++	OFFSET(KVM_ARCH_GUEST_S9, kvm_vcpu_arch, guest_context.s9);
++	OFFSET(KVM_ARCH_GUEST_S10, kvm_vcpu_arch, guest_context.s10);
++	OFFSET(KVM_ARCH_GUEST_S11, kvm_vcpu_arch, guest_context.s11);
++	OFFSET(KVM_ARCH_GUEST_T3, kvm_vcpu_arch, guest_context.t3);
++	OFFSET(KVM_ARCH_GUEST_T4, kvm_vcpu_arch, guest_context.t4);
++	OFFSET(KVM_ARCH_GUEST_T5, kvm_vcpu_arch, guest_context.t5);
++	OFFSET(KVM_ARCH_GUEST_T6, kvm_vcpu_arch, guest_context.t6);
++	OFFSET(KVM_ARCH_GUEST_SEPC, kvm_vcpu_arch, guest_context.sepc);
++	OFFSET(KVM_ARCH_GUEST_SSTATUS, kvm_vcpu_arch, guest_context.sstatus);
++	OFFSET(KVM_ARCH_GUEST_HSTATUS, kvm_vcpu_arch, guest_context.hstatus);
++
++	OFFSET(KVM_ARCH_HOST_ZERO, kvm_vcpu_arch, host_context.zero);
++	OFFSET(KVM_ARCH_HOST_RA, kvm_vcpu_arch, host_context.ra);
++	OFFSET(KVM_ARCH_HOST_SP, kvm_vcpu_arch, host_context.sp);
++	OFFSET(KVM_ARCH_HOST_GP, kvm_vcpu_arch, host_context.gp);
++	OFFSET(KVM_ARCH_HOST_TP, kvm_vcpu_arch, host_context.tp);
++	OFFSET(KVM_ARCH_HOST_T0, kvm_vcpu_arch, host_context.t0);
++	OFFSET(KVM_ARCH_HOST_T1, kvm_vcpu_arch, host_context.t1);
++	OFFSET(KVM_ARCH_HOST_T2, kvm_vcpu_arch, host_context.t2);
++	OFFSET(KVM_ARCH_HOST_S0, kvm_vcpu_arch, host_context.s0);
++	OFFSET(KVM_ARCH_HOST_S1, kvm_vcpu_arch, host_context.s1);
++	OFFSET(KVM_ARCH_HOST_A0, kvm_vcpu_arch, host_context.a0);
++	OFFSET(KVM_ARCH_HOST_A1, kvm_vcpu_arch, host_context.a1);
++	OFFSET(KVM_ARCH_HOST_A2, kvm_vcpu_arch, host_context.a2);
++	OFFSET(KVM_ARCH_HOST_A3, kvm_vcpu_arch, host_context.a3);
++	OFFSET(KVM_ARCH_HOST_A4, kvm_vcpu_arch, host_context.a4);
++	OFFSET(KVM_ARCH_HOST_A5, kvm_vcpu_arch, host_context.a5);
++	OFFSET(KVM_ARCH_HOST_A6, kvm_vcpu_arch, host_context.a6);
++	OFFSET(KVM_ARCH_HOST_A7, kvm_vcpu_arch, host_context.a7);
++	OFFSET(KVM_ARCH_HOST_S2, kvm_vcpu_arch, host_context.s2);
++	OFFSET(KVM_ARCH_HOST_S3, kvm_vcpu_arch, host_context.s3);
++	OFFSET(KVM_ARCH_HOST_S4, kvm_vcpu_arch, host_context.s4);
++	OFFSET(KVM_ARCH_HOST_S5, kvm_vcpu_arch, host_context.s5);
++	OFFSET(KVM_ARCH_HOST_S6, kvm_vcpu_arch, host_context.s6);
++	OFFSET(KVM_ARCH_HOST_S7, kvm_vcpu_arch, host_context.s7);
++	OFFSET(KVM_ARCH_HOST_S8, kvm_vcpu_arch, host_context.s8);
++	OFFSET(KVM_ARCH_HOST_S9, kvm_vcpu_arch, host_context.s9);
++	OFFSET(KVM_ARCH_HOST_S10, kvm_vcpu_arch, host_context.s10);
++	OFFSET(KVM_ARCH_HOST_S11, kvm_vcpu_arch, host_context.s11);
++	OFFSET(KVM_ARCH_HOST_T3, kvm_vcpu_arch, host_context.t3);
++	OFFSET(KVM_ARCH_HOST_T4, kvm_vcpu_arch, host_context.t4);
++	OFFSET(KVM_ARCH_HOST_T5, kvm_vcpu_arch, host_context.t5);
++	OFFSET(KVM_ARCH_HOST_T6, kvm_vcpu_arch, host_context.t6);
++	OFFSET(KVM_ARCH_HOST_SEPC, kvm_vcpu_arch, host_context.sepc);
++	OFFSET(KVM_ARCH_HOST_SSTATUS, kvm_vcpu_arch, host_context.sstatus);
++	OFFSET(KVM_ARCH_HOST_HSTATUS, kvm_vcpu_arch, host_context.hstatus);
++	OFFSET(KVM_ARCH_HOST_SSCRATCH, kvm_vcpu_arch, host_sscratch);
++	OFFSET(KVM_ARCH_HOST_STVEC, kvm_vcpu_arch, host_stvec);
++
+ 	/*
+ 	 * THREAD_{F,X}* might be larger than a S-type offset can handle, but
+ 	 * these are used in performance-sensitive assembly so we can't resort
+diff --git a/arch/riscv/kvm/Makefile b/arch/riscv/kvm/Makefile
+index 37b5a59d4f4f..845579273727 100644
+--- a/arch/riscv/kvm/Makefile
++++ b/arch/riscv/kvm/Makefile
+@@ -8,6 +8,6 @@ ccflags-y := -Ivirt/kvm -Iarch/riscv/kvm
+ 
+ kvm-objs := $(common-objs-y)
+ 
+-kvm-objs += main.o vm.o mmu.o vcpu.o vcpu_exit.o
++kvm-objs += main.o vm.o mmu.o vcpu.o vcpu_exit.o vcpu_switch.o
+ 
+ obj-$(CONFIG_KVM)	+= kvm.o
 diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
-index 2e14f8b8bdea..4ccb895fffa2 100644
+index 4ccb895fffa2..99acd836ba06 100644
 --- a/arch/riscv/kvm/vcpu.c
 +++ b/arch/riscv/kvm/vcpu.c
-@@ -18,7 +18,6 @@
- #include <linux/fs.h>
- #include <linux/kvm_host.h>
- #include <asm/csr.h>
--#include <asm/delay.h>
- #include <asm/hwcap.h>
+@@ -576,14 +576,40 @@ int kvm_arch_vcpu_ioctl_set_guest_debug(struct kvm_vcpu *vcpu,
  
- #define VCPU_STAT(x) { #x, offsetof(struct kvm_vcpu, stat.x), KVM_STAT_VCPU }
-@@ -144,6 +143,225 @@ vm_fault_t kvm_arch_vcpu_fault(struct kvm_vcpu *vcpu, struct vm_fault *vmf)
- 	return VM_FAULT_SIGBUS;
- }
- 
-+static int kvm_riscv_vcpu_get_reg_config(struct kvm_vcpu *vcpu,
-+					 const struct kvm_one_reg *reg)
-+{
-+	unsigned long __user *uaddr =
-+			(unsigned long __user *)(unsigned long)reg->addr;
-+	unsigned long reg_num = reg->id & ~(KVM_REG_ARCH_MASK |
-+					    KVM_REG_SIZE_MASK |
-+					    KVM_REG_RISCV_CONFIG);
-+	unsigned long reg_val;
-+
-+	if (KVM_REG_SIZE(reg->id) != sizeof(unsigned long))
-+		return -EINVAL;
-+
-+	switch (reg_num) {
-+	case KVM_REG_RISCV_CONFIG_REG(isa):
-+		reg_val = vcpu->arch.isa;
-+		break;
-+	default:
-+		return -EINVAL;
-+	};
-+
-+	if (copy_to_user(uaddr, &reg_val, KVM_REG_SIZE(reg->id)))
-+		return -EFAULT;
-+
-+	return 0;
-+}
-+
-+static int kvm_riscv_vcpu_set_reg_config(struct kvm_vcpu *vcpu,
-+					 const struct kvm_one_reg *reg)
-+{
-+	unsigned long __user *uaddr =
-+			(unsigned long __user *)(unsigned long)reg->addr;
-+	unsigned long reg_num = reg->id & ~(KVM_REG_ARCH_MASK |
-+					    KVM_REG_SIZE_MASK |
-+					    KVM_REG_RISCV_CONFIG);
-+	unsigned long reg_val;
-+
-+	if (KVM_REG_SIZE(reg->id) != sizeof(unsigned long))
-+		return -EINVAL;
-+
-+	if (copy_from_user(&reg_val, uaddr, KVM_REG_SIZE(reg->id)))
-+		return -EFAULT;
-+
-+	switch (reg_num) {
-+	case KVM_REG_RISCV_CONFIG_REG(isa):
-+		if (!vcpu->arch.ran_atleast_once) {
-+			vcpu->arch.isa = reg_val;
-+			vcpu->arch.isa &= riscv_isa_extension_base(NULL);
-+			vcpu->arch.isa &= KVM_RISCV_ISA_ALLOWED;
-+		} else {
-+			return -ENOTSUPP;
-+		}
-+		break;
-+	default:
-+		return -EINVAL;
-+	};
-+
-+	return 0;
-+}
-+
-+static int kvm_riscv_vcpu_get_reg_core(struct kvm_vcpu *vcpu,
-+				       const struct kvm_one_reg *reg)
-+{
-+	struct kvm_cpu_context *cntx = &vcpu->arch.guest_context;
-+	unsigned long __user *uaddr =
-+			(unsigned long __user *)(unsigned long)reg->addr;
-+	unsigned long reg_num = reg->id & ~(KVM_REG_ARCH_MASK |
-+					    KVM_REG_SIZE_MASK |
-+					    KVM_REG_RISCV_CORE);
-+	unsigned long reg_val;
-+
-+	if (KVM_REG_SIZE(reg->id) != sizeof(unsigned long))
-+		return -EINVAL;
-+	if (reg_num >= sizeof(struct kvm_riscv_core) / sizeof(unsigned long))
-+		return -EINVAL;
-+
-+	if (reg_num == KVM_REG_RISCV_CORE_REG(regs.pc))
-+		reg_val = cntx->sepc;
-+	else if (KVM_REG_RISCV_CORE_REG(regs.pc) < reg_num &&
-+		 reg_num <= KVM_REG_RISCV_CORE_REG(regs.t6))
-+		reg_val = ((unsigned long *)cntx)[reg_num];
-+	else if (reg_num == KVM_REG_RISCV_CORE_REG(mode))
-+		reg_val = (cntx->sstatus & SR_SPP) ?
-+				KVM_RISCV_MODE_S : KVM_RISCV_MODE_U;
-+	else
-+		return -EINVAL;
-+
-+	if (copy_to_user(uaddr, &reg_val, KVM_REG_SIZE(reg->id)))
-+		return -EFAULT;
-+
-+	return 0;
-+}
-+
-+static int kvm_riscv_vcpu_set_reg_core(struct kvm_vcpu *vcpu,
-+				       const struct kvm_one_reg *reg)
-+{
-+	struct kvm_cpu_context *cntx = &vcpu->arch.guest_context;
-+	unsigned long __user *uaddr =
-+			(unsigned long __user *)(unsigned long)reg->addr;
-+	unsigned long reg_num = reg->id & ~(KVM_REG_ARCH_MASK |
-+					    KVM_REG_SIZE_MASK |
-+					    KVM_REG_RISCV_CORE);
-+	unsigned long reg_val;
-+
-+	if (KVM_REG_SIZE(reg->id) != sizeof(unsigned long))
-+		return -EINVAL;
-+	if (reg_num >= sizeof(struct kvm_riscv_core) / sizeof(unsigned long))
-+		return -EINVAL;
-+
-+	if (copy_from_user(&reg_val, uaddr, KVM_REG_SIZE(reg->id)))
-+		return -EFAULT;
-+
-+	if (reg_num == KVM_REG_RISCV_CORE_REG(regs.pc))
-+		cntx->sepc = reg_val;
-+	else if (KVM_REG_RISCV_CORE_REG(regs.pc) < reg_num &&
-+		 reg_num <= KVM_REG_RISCV_CORE_REG(regs.t6))
-+		((unsigned long *)cntx)[reg_num] = reg_val;
-+	else if (reg_num == KVM_REG_RISCV_CORE_REG(mode)) {
-+		if (reg_val == KVM_RISCV_MODE_S)
-+			cntx->sstatus |= SR_SPP;
-+		else
-+			cntx->sstatus &= ~SR_SPP;
-+	} else
-+		return -EINVAL;
-+
-+	return 0;
-+}
-+
-+static int kvm_riscv_vcpu_get_reg_csr(struct kvm_vcpu *vcpu,
-+				      const struct kvm_one_reg *reg)
-+{
-+	struct kvm_vcpu_csr *csr = &vcpu->arch.guest_csr;
-+	unsigned long __user *uaddr =
-+			(unsigned long __user *)(unsigned long)reg->addr;
-+	unsigned long reg_num = reg->id & ~(KVM_REG_ARCH_MASK |
-+					    KVM_REG_SIZE_MASK |
-+					    KVM_REG_RISCV_CSR);
-+	unsigned long reg_val;
-+
-+	if (KVM_REG_SIZE(reg->id) != sizeof(unsigned long))
-+		return -EINVAL;
-+	if (reg_num >= sizeof(struct kvm_riscv_csr) / sizeof(unsigned long))
-+		return -EINVAL;
-+
-+	if (reg_num == KVM_REG_RISCV_CSR_REG(sip)) {
-+		kvm_riscv_vcpu_flush_interrupts(vcpu);
-+		reg_val = csr->hip >> VSIP_TO_HIP_SHIFT;
-+		reg_val = reg_val & VSIP_VALID_MASK;
-+	} else if (reg_num == KVM_REG_RISCV_CSR_REG(sie)) {
-+		reg_val = csr->hie >> VSIP_TO_HIP_SHIFT;
-+		reg_val = reg_val & VSIP_VALID_MASK;
-+	} else
-+		reg_val = ((unsigned long *)csr)[reg_num];
-+
-+	if (copy_to_user(uaddr, &reg_val, KVM_REG_SIZE(reg->id)))
-+		return -EFAULT;
-+
-+	return 0;
-+}
-+
-+static int kvm_riscv_vcpu_set_reg_csr(struct kvm_vcpu *vcpu,
-+				      const struct kvm_one_reg *reg)
-+{
-+	struct kvm_vcpu_csr *csr = &vcpu->arch.guest_csr;
-+	unsigned long __user *uaddr =
-+			(unsigned long __user *)(unsigned long)reg->addr;
-+	unsigned long reg_num = reg->id & ~(KVM_REG_ARCH_MASK |
-+					    KVM_REG_SIZE_MASK |
-+					    KVM_REG_RISCV_CSR);
-+	unsigned long reg_val;
-+
-+	if (KVM_REG_SIZE(reg->id) != sizeof(unsigned long))
-+		return -EINVAL;
-+	if (reg_num >= sizeof(struct kvm_riscv_csr) / sizeof(unsigned long))
-+		return -EINVAL;
-+
-+	if (copy_from_user(&reg_val, uaddr, KVM_REG_SIZE(reg->id)))
-+		return -EFAULT;
-+
-+	if (reg_num == KVM_REG_RISCV_CSR_REG(sip) ||
-+	    reg_num == KVM_REG_RISCV_CSR_REG(sie)) {
-+		reg_val = reg_val << VSIP_TO_HIP_SHIFT;
-+		reg_val = reg_val & VSIP_VALID_MASK;
-+	}
-+
-+	((unsigned long *)csr)[reg_num] = reg_val;
-+
-+	if (reg_num == KVM_REG_RISCV_CSR_REG(sip))
-+		WRITE_ONCE(vcpu->arch.irqs_pending_mask, 0);
-+
-+	return 0;
-+}
-+
-+static int kvm_riscv_vcpu_set_reg(struct kvm_vcpu *vcpu,
-+				  const struct kvm_one_reg *reg)
-+{
-+	if ((reg->id & KVM_REG_RISCV_TYPE_MASK) == KVM_REG_RISCV_CONFIG)
-+		return kvm_riscv_vcpu_set_reg_config(vcpu, reg);
-+	else if ((reg->id & KVM_REG_RISCV_TYPE_MASK) == KVM_REG_RISCV_CORE)
-+		return kvm_riscv_vcpu_set_reg_core(vcpu, reg);
-+	else if ((reg->id & KVM_REG_RISCV_TYPE_MASK) == KVM_REG_RISCV_CSR)
-+		return kvm_riscv_vcpu_set_reg_csr(vcpu, reg);
-+
-+	return -EINVAL;
-+}
-+
-+static int kvm_riscv_vcpu_get_reg(struct kvm_vcpu *vcpu,
-+				  const struct kvm_one_reg *reg)
-+{
-+	if ((reg->id & KVM_REG_RISCV_TYPE_MASK) == KVM_REG_RISCV_CONFIG)
-+		return kvm_riscv_vcpu_get_reg_config(vcpu, reg);
-+	else if ((reg->id & KVM_REG_RISCV_TYPE_MASK) == KVM_REG_RISCV_CORE)
-+		return kvm_riscv_vcpu_get_reg_core(vcpu, reg);
-+	else if ((reg->id & KVM_REG_RISCV_TYPE_MASK) == KVM_REG_RISCV_CSR)
-+		return kvm_riscv_vcpu_get_reg_csr(vcpu, reg);
-+
-+	return -EINVAL;
-+}
-+
- long kvm_arch_vcpu_async_ioctl(struct file *filp,
- 			       unsigned int ioctl, unsigned long arg)
- {
-@@ -168,8 +386,30 @@ long kvm_arch_vcpu_async_ioctl(struct file *filp,
- long kvm_arch_vcpu_ioctl(struct file *filp,
- 			 unsigned int ioctl, unsigned long arg)
+ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
  {
 -	/* TODO: */
--	return -EINVAL;
-+	struct kvm_vcpu *vcpu = filp->private_data;
-+	void __user *argp = (void __user *)arg;
-+	long r = -EINVAL;
++	struct kvm_vcpu_csr *csr = &vcpu->arch.guest_csr;
 +
-+	switch (ioctl) {
-+	case KVM_SET_ONE_REG:
-+	case KVM_GET_ONE_REG: {
-+		struct kvm_one_reg reg;
++	csr_write(CSR_VSSTATUS, csr->vsstatus);
++	csr_write(CSR_HIE, csr->hie);
++	csr_write(CSR_VSTVEC, csr->vstvec);
++	csr_write(CSR_VSSCRATCH, csr->vsscratch);
++	csr_write(CSR_VSEPC, csr->vsepc);
++	csr_write(CSR_VSCAUSE, csr->vscause);
++	csr_write(CSR_VSTVAL, csr->vstval);
++	csr_write(CSR_HIP, csr->hip);
++	csr_write(CSR_VSATP, csr->vsatp);
+ 
+ 	kvm_riscv_stage2_update_hgatp(vcpu);
 +
-+		r = -EFAULT;
-+		if (copy_from_user(&reg, argp, sizeof(reg)))
-+			break;
-+
-+		if (ioctl == KVM_SET_ONE_REG)
-+			r = kvm_riscv_vcpu_set_reg(vcpu, &reg);
-+		else
-+			r = kvm_riscv_vcpu_get_reg(vcpu, &reg);
-+		break;
-+	}
-+	default:
-+		break;
-+	}
-+
-+	return r;
++	vcpu->cpu = cpu;
  }
  
- int kvm_arch_vcpu_ioctl_get_sregs(struct kvm_vcpu *vcpu,
+ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
+ {
+-	/* TODO: */
++	struct kvm_vcpu_csr *csr = &vcpu->arch.guest_csr;
++
++	vcpu->cpu = -1;
++
++	csr_write(CSR_HGATP, 0);
++
++	csr->vsstatus = csr_read(CSR_VSSTATUS);
++	csr->hie = csr_read(CSR_HIE);
++	csr->vstvec = csr_read(CSR_VSTVEC);
++	csr->vsscratch = csr_read(CSR_VSSCRATCH);
++	csr->vsepc = csr_read(CSR_VSEPC);
++	csr->vscause = csr_read(CSR_VSCAUSE);
++	csr->vstval = csr_read(CSR_VSTVAL);
++	csr->hip = csr_read(CSR_HIP);
++	csr->vsatp = csr_read(CSR_VSATP);
+ }
+ 
+ static void kvm_riscv_check_vcpu_requests(struct kvm_vcpu *vcpu)
+diff --git a/arch/riscv/kvm/vcpu_switch.S b/arch/riscv/kvm/vcpu_switch.S
+new file mode 100644
+index 000000000000..e1a17df1b379
+--- /dev/null
++++ b/arch/riscv/kvm/vcpu_switch.S
+@@ -0,0 +1,194 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/*
++ * Copyright (C) 2019 Western Digital Corporation or its affiliates.
++ *
++ * Authors:
++ *     Anup Patel <anup.patel@wdc.com>
++ */
++
++#include <linux/linkage.h>
++#include <asm/asm.h>
++#include <asm/asm-offsets.h>
++#include <asm/csr.h>
++
++	.text
++	.altmacro
++	.option norelax
++
++ENTRY(__kvm_riscv_switch_to)
++	/* Save Host GPRs (except A0 and T0-T6) */
++	REG_S	ra, (KVM_ARCH_HOST_RA)(a0)
++	REG_S	sp, (KVM_ARCH_HOST_SP)(a0)
++	REG_S	gp, (KVM_ARCH_HOST_GP)(a0)
++	REG_S	tp, (KVM_ARCH_HOST_TP)(a0)
++	REG_S	s0, (KVM_ARCH_HOST_S0)(a0)
++	REG_S	s1, (KVM_ARCH_HOST_S1)(a0)
++	REG_S	a1, (KVM_ARCH_HOST_A1)(a0)
++	REG_S	a2, (KVM_ARCH_HOST_A2)(a0)
++	REG_S	a3, (KVM_ARCH_HOST_A3)(a0)
++	REG_S	a4, (KVM_ARCH_HOST_A4)(a0)
++	REG_S	a5, (KVM_ARCH_HOST_A5)(a0)
++	REG_S	a6, (KVM_ARCH_HOST_A6)(a0)
++	REG_S	a7, (KVM_ARCH_HOST_A7)(a0)
++	REG_S	s2, (KVM_ARCH_HOST_S2)(a0)
++	REG_S	s3, (KVM_ARCH_HOST_S3)(a0)
++	REG_S	s4, (KVM_ARCH_HOST_S4)(a0)
++	REG_S	s5, (KVM_ARCH_HOST_S5)(a0)
++	REG_S	s6, (KVM_ARCH_HOST_S6)(a0)
++	REG_S	s7, (KVM_ARCH_HOST_S7)(a0)
++	REG_S	s8, (KVM_ARCH_HOST_S8)(a0)
++	REG_S	s9, (KVM_ARCH_HOST_S9)(a0)
++	REG_S	s10, (KVM_ARCH_HOST_S10)(a0)
++	REG_S	s11, (KVM_ARCH_HOST_S11)(a0)
++
++	/* Save Host SSTATUS, HSTATUS, SCRATCH and STVEC */
++	csrr	t0, CSR_SSTATUS
++	REG_S	t0, (KVM_ARCH_HOST_SSTATUS)(a0)
++	csrr	t1, CSR_HSTATUS
++	REG_S	t1, (KVM_ARCH_HOST_HSTATUS)(a0)
++	csrr	t2, CSR_SSCRATCH
++	REG_S	t2, (KVM_ARCH_HOST_SSCRATCH)(a0)
++	csrr	t3, CSR_STVEC
++	REG_S	t3, (KVM_ARCH_HOST_STVEC)(a0)
++
++	/* Change Host exception vector to return path */
++	la	t4, __kvm_switch_return
++	csrw	CSR_STVEC, t4
++
++	/* Restore Guest HSTATUS, SSTATUS and SEPC */
++	REG_L	t4, (KVM_ARCH_GUEST_SEPC)(a0)
++	csrw	CSR_SEPC, t4
++	REG_L	t5, (KVM_ARCH_GUEST_SSTATUS)(a0)
++	csrw	CSR_SSTATUS, t5
++	REG_L	t6, (KVM_ARCH_GUEST_HSTATUS)(a0)
++	csrw	CSR_HSTATUS, t6
++
++	/* Restore Guest GPRs (except A0) */
++	REG_L	ra, (KVM_ARCH_GUEST_RA)(a0)
++	REG_L	sp, (KVM_ARCH_GUEST_SP)(a0)
++	REG_L	gp, (KVM_ARCH_GUEST_GP)(a0)
++	REG_L	tp, (KVM_ARCH_GUEST_TP)(a0)
++	REG_L	t0, (KVM_ARCH_GUEST_T0)(a0)
++	REG_L	t1, (KVM_ARCH_GUEST_T1)(a0)
++	REG_L	t2, (KVM_ARCH_GUEST_T2)(a0)
++	REG_L	s0, (KVM_ARCH_GUEST_S0)(a0)
++	REG_L	s1, (KVM_ARCH_GUEST_S1)(a0)
++	REG_L	a1, (KVM_ARCH_GUEST_A1)(a0)
++	REG_L	a2, (KVM_ARCH_GUEST_A2)(a0)
++	REG_L	a3, (KVM_ARCH_GUEST_A3)(a0)
++	REG_L	a4, (KVM_ARCH_GUEST_A4)(a0)
++	REG_L	a5, (KVM_ARCH_GUEST_A5)(a0)
++	REG_L	a6, (KVM_ARCH_GUEST_A6)(a0)
++	REG_L	a7, (KVM_ARCH_GUEST_A7)(a0)
++	REG_L	s2, (KVM_ARCH_GUEST_S2)(a0)
++	REG_L	s3, (KVM_ARCH_GUEST_S3)(a0)
++	REG_L	s4, (KVM_ARCH_GUEST_S4)(a0)
++	REG_L	s5, (KVM_ARCH_GUEST_S5)(a0)
++	REG_L	s6, (KVM_ARCH_GUEST_S6)(a0)
++	REG_L	s7, (KVM_ARCH_GUEST_S7)(a0)
++	REG_L	s8, (KVM_ARCH_GUEST_S8)(a0)
++	REG_L	s9, (KVM_ARCH_GUEST_S9)(a0)
++	REG_L	s10, (KVM_ARCH_GUEST_S10)(a0)
++	REG_L	s11, (KVM_ARCH_GUEST_S11)(a0)
++	REG_L	t3, (KVM_ARCH_GUEST_T3)(a0)
++	REG_L	t4, (KVM_ARCH_GUEST_T4)(a0)
++	REG_L	t5, (KVM_ARCH_GUEST_T5)(a0)
++	REG_L	t6, (KVM_ARCH_GUEST_T6)(a0)
++
++	/* Save Host A0 in SSCRATCH */
++	csrw	CSR_SSCRATCH, a0
++
++	/* Restore Guest A0 */
++	REG_L	a0, (KVM_ARCH_GUEST_A0)(a0)
++
++	/* Resume Guest */
++	sret
++
++	/* Back to Host */
++	.align 2
++__kvm_switch_return:
++	/* Swap Guest A0 with SSCRATCH */
++	csrrw	a0, CSR_SSCRATCH, a0
++
++	/* Save Guest GPRs (except A0) */
++	REG_S	ra, (KVM_ARCH_GUEST_RA)(a0)
++	REG_S	sp, (KVM_ARCH_GUEST_SP)(a0)
++	REG_S	gp, (KVM_ARCH_GUEST_GP)(a0)
++	REG_S	tp, (KVM_ARCH_GUEST_TP)(a0)
++	REG_S	t0, (KVM_ARCH_GUEST_T0)(a0)
++	REG_S	t1, (KVM_ARCH_GUEST_T1)(a0)
++	REG_S	t2, (KVM_ARCH_GUEST_T2)(a0)
++	REG_S	s0, (KVM_ARCH_GUEST_S0)(a0)
++	REG_S	s1, (KVM_ARCH_GUEST_S1)(a0)
++	REG_S	a1, (KVM_ARCH_GUEST_A1)(a0)
++	REG_S	a2, (KVM_ARCH_GUEST_A2)(a0)
++	REG_S	a3, (KVM_ARCH_GUEST_A3)(a0)
++	REG_S	a4, (KVM_ARCH_GUEST_A4)(a0)
++	REG_S	a5, (KVM_ARCH_GUEST_A5)(a0)
++	REG_S	a6, (KVM_ARCH_GUEST_A6)(a0)
++	REG_S	a7, (KVM_ARCH_GUEST_A7)(a0)
++	REG_S	s2, (KVM_ARCH_GUEST_S2)(a0)
++	REG_S	s3, (KVM_ARCH_GUEST_S3)(a0)
++	REG_S	s4, (KVM_ARCH_GUEST_S4)(a0)
++	REG_S	s5, (KVM_ARCH_GUEST_S5)(a0)
++	REG_S	s6, (KVM_ARCH_GUEST_S6)(a0)
++	REG_S	s7, (KVM_ARCH_GUEST_S7)(a0)
++	REG_S	s8, (KVM_ARCH_GUEST_S8)(a0)
++	REG_S	s9, (KVM_ARCH_GUEST_S9)(a0)
++	REG_S	s10, (KVM_ARCH_GUEST_S10)(a0)
++	REG_S	s11, (KVM_ARCH_GUEST_S11)(a0)
++	REG_S	t3, (KVM_ARCH_GUEST_T3)(a0)
++	REG_S	t4, (KVM_ARCH_GUEST_T4)(a0)
++	REG_S	t5, (KVM_ARCH_GUEST_T5)(a0)
++	REG_S	t6, (KVM_ARCH_GUEST_T6)(a0)
++
++	/* Save Guest A0 */
++	csrr	t0, CSR_SSCRATCH
++	REG_S	t0, (KVM_ARCH_GUEST_A0)(a0)
++
++	/* Save Guest HSTATUS, SSTATUS, and SEPC */
++	csrr	t0, CSR_SEPC
++	REG_S	t0, (KVM_ARCH_GUEST_SEPC)(a0)
++	csrr	t1, CSR_SSTATUS
++	REG_S	t1, (KVM_ARCH_GUEST_SSTATUS)(a0)
++	csrr	t2, CSR_HSTATUS
++	REG_S	t2, (KVM_ARCH_GUEST_HSTATUS)(a0)
++
++	/* Restore Host SSTATUS, HSTATUS, SCRATCH and STVEC */
++	REG_L	t3, (KVM_ARCH_HOST_SSTATUS)(a0)
++	csrw	CSR_SSTATUS, t3
++	REG_L	t4, (KVM_ARCH_HOST_HSTATUS)(a0)
++	csrw	CSR_HSTATUS, t4
++	REG_L	t5, (KVM_ARCH_HOST_SSCRATCH)(a0)
++	csrw	CSR_SSCRATCH, t5
++	REG_L	t6, (KVM_ARCH_HOST_STVEC)(a0)
++	csrw	CSR_STVEC, t6
++
++	/* Restore Host GPRs (except A0 and T0-T6) */
++	REG_L	ra, (KVM_ARCH_HOST_RA)(a0)
++	REG_L	sp, (KVM_ARCH_HOST_SP)(a0)
++	REG_L	gp, (KVM_ARCH_HOST_GP)(a0)
++	REG_L	tp, (KVM_ARCH_HOST_TP)(a0)
++	REG_L	s0, (KVM_ARCH_HOST_S0)(a0)
++	REG_L	s1, (KVM_ARCH_HOST_S1)(a0)
++	REG_L	a1, (KVM_ARCH_HOST_A1)(a0)
++	REG_L	a2, (KVM_ARCH_HOST_A2)(a0)
++	REG_L	a3, (KVM_ARCH_HOST_A3)(a0)
++	REG_L	a4, (KVM_ARCH_HOST_A4)(a0)
++	REG_L	a5, (KVM_ARCH_HOST_A5)(a0)
++	REG_L	a6, (KVM_ARCH_HOST_A6)(a0)
++	REG_L	a7, (KVM_ARCH_HOST_A7)(a0)
++	REG_L	s2, (KVM_ARCH_HOST_S2)(a0)
++	REG_L	s3, (KVM_ARCH_HOST_S3)(a0)
++	REG_L	s4, (KVM_ARCH_HOST_S4)(a0)
++	REG_L	s5, (KVM_ARCH_HOST_S5)(a0)
++	REG_L	s6, (KVM_ARCH_HOST_S6)(a0)
++	REG_L	s7, (KVM_ARCH_HOST_S7)(a0)
++	REG_L	s8, (KVM_ARCH_HOST_S8)(a0)
++	REG_L	s9, (KVM_ARCH_HOST_S9)(a0)
++	REG_L	s10, (KVM_ARCH_HOST_S10)(a0)
++	REG_L	s11, (KVM_ARCH_HOST_S11)(a0)
++
++	/* Return to C code */
++	ret
++ENDPROC(__kvm_riscv_switch_to)
 -- 
 2.17.1
 
