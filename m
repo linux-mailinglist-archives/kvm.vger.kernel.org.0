@@ -2,44 +2,39 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9F3D5183EE2
-	for <lists+kvm@lfdr.de>; Fri, 13 Mar 2020 02:55:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2C81C183EF5
+	for <lists+kvm@lfdr.de>; Fri, 13 Mar 2020 03:06:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726390AbgCMBzm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Mar 2020 21:55:42 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:60566 "EHLO huawei.com"
+        id S1726477AbgCMCGj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Mar 2020 22:06:39 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:49276 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726194AbgCMBzm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 Mar 2020 21:55:42 -0400
-Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.60])
-        by Forcepoint Email with ESMTP id 3CC268047441D80DBB2B;
-        Fri, 13 Mar 2020 09:55:38 +0800 (CST)
-Received: from [127.0.0.1] (10.173.222.27) by DGGEMS409-HUB.china.huawei.com
- (10.3.19.209) with Microsoft SMTP Server id 14.3.487.0; Fri, 13 Mar 2020
- 09:55:31 +0800
-Subject: Re: [kvm-unit-tests PATCH v5 10/13] arm/arm64: ITS: INT functional
+        id S1726194AbgCMCGj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 Mar 2020 22:06:39 -0400
+Received: from DGGEMS405-HUB.china.huawei.com (unknown [172.30.72.60])
+        by Forcepoint Email with ESMTP id 379E3E7D2780482DFE51;
+        Fri, 13 Mar 2020 10:06:33 +0800 (CST)
+Received: from [127.0.0.1] (10.173.222.27) by DGGEMS405-HUB.china.huawei.com
+ (10.3.19.205) with Microsoft SMTP Server id 14.3.487.0; Fri, 13 Mar 2020
+ 10:06:22 +0800
+Subject: Re: [kvm-unit-tests PATCH v6 10/13] arm/arm64: ITS: INT functional
  tests
-To:     Auger Eric <eric.auger@redhat.com>
-CC:     Marc Zyngier <maz@kernel.org>, <eric.auger.pro@gmail.com>,
-        <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>,
-        <qemu-devel@nongnu.org>, <qemu-arm@nongnu.org>,
-        <drjones@redhat.com>, <andre.przywara@arm.com>,
+To:     Eric Auger <eric.auger@redhat.com>, <eric.auger.pro@gmail.com>,
+        <maz@kernel.org>, <kvmarm@lists.cs.columbia.edu>,
+        <kvm@vger.kernel.org>, <qemu-devel@nongnu.org>,
+        <qemu-arm@nongnu.org>
+CC:     <drjones@redhat.com>, <andre.przywara@arm.com>,
         <peter.maydell@linaro.org>, <alexandru.elisei@arm.com>,
         <thuth@redhat.com>
-References: <20200310145410.26308-1-eric.auger@redhat.com>
- <20200310145410.26308-11-eric.auger@redhat.com>
- <d3f651a0-2344-4d6e-111b-be133db7e068@huawei.com>
- <46f0ed1d-3bda-f91b-e2b0-addf1c61c373@redhat.com>
- <301a8b402ff7e480e927b0f8f8b093f2@kernel.org>
- <7fb9f81f-6520-526d-7031-d3d08cb1dd6a@huawei.com>
- <acc652b7-f331-1e48-160c-f07e0e5283b3@redhat.com>
+References: <20200311135117.9366-1-eric.auger@redhat.com>
+ <20200311135117.9366-11-eric.auger@redhat.com>
 From:   Zenghui Yu <yuzenghui@huawei.com>
-Message-ID: <160015aa-f5d7-2fdc-8d06-1322af241896@huawei.com>
-Date:   Fri, 13 Mar 2020 09:55:29 +0800
+Message-ID: <7d79cc12-acdb-ff56-594d-3fa830f7d053@huawei.com>
+Date:   Fri, 13 Mar 2020 10:06:20 +0800
 User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.0
 MIME-Version: 1.0
-In-Reply-To: <acc652b7-f331-1e48-160c-f07e0e5283b3@redhat.com>
+In-Reply-To: <20200311135117.9366-11-eric.auger@redhat.com>
 Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -50,49 +45,104 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Eric,
+On 2020/3/11 21:51, Eric Auger wrote:
+> +static void test_its_trigger(void)
+> +{
+> +	struct its_collection *col3, *col2;
+> +	struct its_device *dev2, *dev7;
+> +
+> +	if (its_prerequisites(4))
+> +		return;
+> +
+> +	dev2 = its_create_device(2 /* dev id */, 8 /* nb_ites */);
+> +	dev7 = its_create_device(7 /* dev id */, 8 /* nb_ites */);
+> +
+> +	col3 = its_create_collection(3 /* col id */, 3/* target PE */);
+> +	col2 = its_create_collection(2 /* col id */, 2/* target PE */);
+> +
+> +	gicv3_lpi_set_config(8195, LPI_PROP_DEFAULT);
+> +	gicv3_lpi_set_config(8196, LPI_PROP_DEFAULT);
+> +
+> +	report_prefix_push("int");
+> +	/*
+> +	 * dev=2, eventid=20  -> lpi= 8195, col=3
+> +	 * dev=7, eventid=255 -> lpi= 8196, col=2
+> +	 * Trigger dev2, eventid=20 and dev7, eventid=255
+> +	 * Check both LPIs hit
+> +	 */
+> +
+> +	its_send_mapd(dev2, true);
+> +	its_send_mapd(dev7, true);
+> +
+> +	its_send_mapc(col3, true);
+> +	its_send_mapc(col2, true);
+> +
+> +	its_send_invall(col2);
+> +	its_send_invall(col3);
+> +
+> +	its_send_mapti(dev2, 8195 /* lpi id */, 20 /* event id */, col3);
+> +	its_send_mapti(dev7, 8196 /* lpi id */, 255 /* event id */, col2);
+> +
+> +	lpi_stats_expect(3, 8195);
+> +	its_send_int(dev2, 20);
+> +	check_lpi_stats("dev=2, eventid=20  -> lpi= 8195, col=3");
+> +
+> +	lpi_stats_expect(2, 8196);
+> +	its_send_int(dev7, 255);
+> +	check_lpi_stats("dev=7, eventid=255 -> lpi= 8196, col=2");
+> +
+> +	report_prefix_pop();
+> +
+> +	report_prefix_push("inv/invall");
+> +
+> +	/*
+> +	 * disable 8195, check dev2/eventid=20 does not trigger the
+> +	 * corresponding LPI
+> +	 */
+> +	gicv3_lpi_set_config(8195, LPI_PROP_DEFAULT & ~LPI_PROP_ENABLED);
+> +	its_send_inv(dev2, 20);
+> +
+> +	lpi_stats_expect(-1, -1);
+> +	its_send_int(dev2, 20);
+> +	check_lpi_stats("dev2/eventid=20 does not trigger any LPI");
+> +
+> +	/*
+> +	 * re-enable the LPI but willingly do not call invall
+> +	 * so the change in config is not taken into account.
+> +	 * The LPI should not hit
+> +	 */
+> +	gicv3_lpi_set_config(8195, LPI_PROP_DEFAULT);
+> +	lpi_stats_expect(-1, -1);
+> +	its_send_int(dev2, 20);
+> +	check_lpi_stats("dev2/eventid=20 still does not trigger any LPI");
+> +
+> +	/* Now call the invall and check the LPI hits */
+> +	its_send_invall(col3);
+> +	lpi_stats_expect(3, 8195);
+> +	its_send_int(dev2, 20);
+> +	check_lpi_stats("dev2/eventid=20 now triggers an LPI");
+> +
+> +	report_prefix_pop();
+> +
+> +	report_prefix_push("mapd valid=false");
+> +	/*
+> +	 * Unmap device 2 and check the eventid 20 formerly
+> +	 * attached to it does not hit anymore
+> +	 */
+> +
+> +	its_send_mapd(dev2, false);
+> +	lpi_stats_expect(-1, -1);
+> +	its_send_int(dev2, 20);
 
-On 2020/3/12 17:59, Auger Eric wrote:
-> Hi Zenghui,
-> 
-> On 3/12/20 10:19 AM, Zenghui Yu wrote:
->> On 2020/3/11 22:00, Marc Zyngier wrote:
->>> That is still a problem with the ITS. There is no architectural way
->>> to report an error, even if the error numbers are architected...
->>>
->>> One thing we could do though is to implement the stall model (as
->>> described
->>> in 5.3.2). It still doesn't give us the error, but at least the command
->>> queue would stop on detecting an error.
->>
->> It would be interesting to see the buggy guest's behavior under the
->> stall mode. I've used the following diff (absolutely *not* a formal
->> patch, don't handle CREADR.Stalled and CWRITER.Retry at all) to have
->> a try, and caught another command error in the 'its-trigger' test.
->>
->> logs/its-trigger.log:
->> " INT dev_id=2 event_id=20
->> lib/arm64/gic-v3-its-cmd.c:194: assert failed: false: INT timeout! "
->>
->> dmesg:
->> [13297.711958] ------------[ cut here ]------------
->> [13297.711964] ITS command error encoding 0x10307
->>
->> It's the last INT test in test_its_trigger() who has triggered this
->> error, Eric?
-> 
-> Yes it may be the culprit. Anyway I removed the collection unmap in v6.
-
-I forgot to mention that this is based on your v6. I'll reply to it.
-
-> 
-> By the way are you OK now with v6? I think Drew plans to send a pull
-> request by the end of this week.
-
-Sorry I haven't looked at it yet (v5 already looks good except for
-some minor issues).
+Here. You issued an INT command while the dev2 has just been unmapped,
+this will be detected by ITS as a command error. We may end-up failed
+to see the completion of this command (under the ITS stall mode).
 
 
 Thanks,
 Zenghui
+
+> +	check_lpi_stats("no LPI after device unmap");
+> +	report_prefix_pop();
+> +}
 
