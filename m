@@ -2,179 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id CC3431844B8
-	for <lists+kvm@lfdr.de>; Fri, 13 Mar 2020 11:20:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A15FD18466F
+	for <lists+kvm@lfdr.de>; Fri, 13 Mar 2020 13:04:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726492AbgCMKUu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 13 Mar 2020 06:20:50 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:39098 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726414AbgCMKUu (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 13 Mar 2020 06:20:50 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1584094848;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=p8p0yU+2dtK6r1zkXXvBWL0DAYf00F48i3c6W+/DfDA=;
-        b=f93lXXCxqMcVWXcM8uFA/fOGcluwnRfcoNQcq0LwGZwB6pThb2Kr4wU04Bjk0v6dXNH2q8
-        Z4IjSptHn9P9vajpKHFXjc2wuVnQVbJDGmg5p7BVh02aIXEafNjFNHgJSgkCBy794caPjz
-        K45khI23G5ZsfT44HLR+3HMiXpnL37k=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-54-Jek3W0FXNv-BboceZ2BhtQ-1; Fri, 13 Mar 2020 06:20:47 -0400
-X-MC-Unique: Jek3W0FXNv-BboceZ2BhtQ-1
-Received: by mail-wr1-f69.google.com with SMTP id 31so4087404wrq.0
-        for <kvm@vger.kernel.org>; Fri, 13 Mar 2020 03:20:46 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=p8p0yU+2dtK6r1zkXXvBWL0DAYf00F48i3c6W+/DfDA=;
-        b=evJLxogrq1yObnrU4mEEXq8e6lyZcSJsYzzrGsRiaw3ttP9d9vL8me5tNBm7U8yYAy
-         JvPILtfcJlrLh+z4MvwIobxmQyXU8pJyyEJmRarMmGS8rcNX672EKU7UBQMcwRFTwoyZ
-         ZIFBBnQYbkCZFWvbSmvztV06UIjOi/CyyIQVWnRRt2iiVqxCc/oW6rsShIBsYm3sgVEW
-         082Tc9xZ9A4gm0OTYbPmJkIHzwKxXJsJFK05r/o+y3iIgnJWoepXLUu42kw/Vccdxq5f
-         G/Mqd7Avx+P3hN7eWAn6eaJ8hcM3mnvGiH5pa3awV725//+4/c8LnHoUDtlru2awlSei
-         1TDw==
-X-Gm-Message-State: ANhLgQ3078ptIxhd9s22SXSKcQ14IF1NC8dvaDc9MLknv/Lk1IKp8PFU
-        KVS5/Uf1JU3904L9YUHATzkaZ9oq3Ye/eMQ/vsQmKJgxc/SjX8rQVcZQJ2OyGcpzEXYyVXyLwZ9
-        OEW6AUGLDO1ek
-X-Received: by 2002:a7b:c458:: with SMTP id l24mr9972981wmi.120.1584094845565;
-        Fri, 13 Mar 2020 03:20:45 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vu4okEOyFmr9Ae+lSmbX/xV4gnPgkDtiLRpMgrFE8NAiB8lzXzPaNtVJsV1W672x5xOLNPu8w==
-X-Received: by 2002:a7b:c458:: with SMTP id l24mr9972964wmi.120.1584094845318;
-        Fri, 13 Mar 2020 03:20:45 -0700 (PDT)
-Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id b187sm233348wmc.14.2020.03.13.03.20.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 13 Mar 2020 03:20:44 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: x86: Print symbolic names of VMX VM-Exit flags in traces
-In-Reply-To: <20200312181535.23797-1-sean.j.christopherson@intel.com>
-References: <20200312181535.23797-1-sean.j.christopherson@intel.com>
-Date:   Fri, 13 Mar 2020 11:20:43 +0100
-Message-ID: <87sgicpnd0.fsf@vitty.brq.redhat.com>
+        id S1726814AbgCMMEp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 13 Mar 2020 08:04:45 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:13342 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726216AbgCMMEo (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 13 Mar 2020 08:04:44 -0400
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 02DC3QF6114762
+        for <kvm@vger.kernel.org>; Fri, 13 Mar 2020 08:04:44 -0400
+Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2yr125d6t2-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Fri, 13 Mar 2020 08:04:43 -0400
+Received: from localhost
+        by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
+        Fri, 13 Mar 2020 12:04:40 -0000
+Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
+        by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Fri, 13 Mar 2020 12:04:37 -0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 02DC4ZVV43581806
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 13 Mar 2020 12:04:35 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C3CAE4C04A;
+        Fri, 13 Mar 2020 12:04:35 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 7D3744C040;
+        Fri, 13 Mar 2020 12:04:35 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.152.224.119])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri, 13 Mar 2020 12:04:35 +0000 (GMT)
+Subject: Re: [PATCH -next 018/491] KERNEL VIRTUAL MACHINE for s390 (KVM/s390):
+ Use fallthrough;
+To:     Joe Perches <joe@perches.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>
+Cc:     Heiko Carstens <heiko.carstens@de.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <cover.1583896344.git.joe@perches.com>
+ <d63c86429f3e5aa806aa3e185c97d213904924a5.1583896348.git.joe@perches.com>
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+ nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
+Date:   Fri, 13 Mar 2020 13:04:35 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <d63c86429f3e5aa806aa3e185c97d213904924a5.1583896348.git.joe@perches.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 20031312-0016-0000-0000-000002F07375
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20031312-0017-0000-0000-00003353E6F2
+Message-Id: <354d7bd6-025a-6012-523a-e82d4a99cf77@de.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
+ definitions=2020-03-13_04:2020-03-12,2020-03-13 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ priorityscore=1501 malwarescore=0 bulkscore=0 phishscore=0 mlxlogscore=699
+ spamscore=0 suspectscore=0 lowpriorityscore=0 mlxscore=0 clxscore=1015
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2003130066
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sean Christopherson <sean.j.christopherson@intel.com> writes:
 
-> Use __print_flags() to display the names of VMX flags in VM-Exit traces
-> and strip the flags when printing the basic exit reason, e.g. so that a
-> failed VM-Entry due to invalid guest state gets recorded as
-> "INVALID_STATE FAILED_VMENTRY" instead of "0x80000021".
->
-> Opportunstically fix misaligned variables in the kvm_exit and
-> kvm_nested_vmexit_inject tracepoints.
->
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+On 11.03.20 05:51, Joe Perches wrote:
+> Convert the various uses of fallthrough comments to fallthrough;
+> 
+> Done via script
+> Link: https://lore.kernel.org/lkml/b56602fcf79f849e733e7b521bb0e17895d390fa.1582230379.git.joe.com/
+
+I have applied this with a fixed link.
+
+> 
+> Signed-off-by: Joe Perches <joe@perches.com>
 > ---
->  arch/x86/include/uapi/asm/vmx.h |  3 +++
->  arch/x86/kvm/trace.h            | 32 +++++++++++++++++---------------
->  2 files changed, 20 insertions(+), 15 deletions(-)
->
-> diff --git a/arch/x86/include/uapi/asm/vmx.h b/arch/x86/include/uapi/asm/vmx.h
-> index e95b72ec19bc..b8ff9e8ac0d5 100644
-> --- a/arch/x86/include/uapi/asm/vmx.h
-> +++ b/arch/x86/include/uapi/asm/vmx.h
-> @@ -150,6 +150,9 @@
->  	{ EXIT_REASON_UMWAIT,                "UMWAIT" }, \
->  	{ EXIT_REASON_TPAUSE,                "TPAUSE" }
->  
-> +#define VMX_EXIT_REASON_FLAGS \
-> +	{ VMX_EXIT_REASONS_FAILED_VMENTRY,	"FAILED_VMENTRY" }
-> +
->  #define VMX_ABORT_SAVE_GUEST_MSR_FAIL        1
->  #define VMX_ABORT_LOAD_HOST_PDPTE_FAIL       2
->  #define VMX_ABORT_LOAD_HOST_MSR_FAIL         4
-> diff --git a/arch/x86/kvm/trace.h b/arch/x86/kvm/trace.h
-> index f5b8814d9f83..3cfc8d97b158 100644
-> --- a/arch/x86/kvm/trace.h
-> +++ b/arch/x86/kvm/trace.h
-> @@ -219,6 +219,14 @@ TRACE_EVENT(kvm_apic,
->  #define KVM_ISA_VMX   1
->  #define KVM_ISA_SVM   2
->  
-> +#define kvm_print_exit_reason(exit_reason, isa)				\
-> +	(isa == KVM_ISA_VMX) ?						\
-> +	__print_symbolic(exit_reason & 0xffff, VMX_EXIT_REASONS) :	\
-> +	__print_symbolic(exit_reason, SVM_EXIT_REASONS),		\
-> +	(isa == KVM_ISA_VMX && exit_reason & ~0xffff) ? " " : "",	\
-> +	(isa == KVM_ISA_VMX) ?						\
-> +	__print_flags(exit_reason & ~0xffff, " ", VMX_EXIT_REASON_FLAGS) : ""
-> +
->  /*
->   * Tracepoint for kvm guest exit:
->   */
-> @@ -244,12 +252,10 @@ TRACE_EVENT(kvm_exit,
->  					   &__entry->info2);
->  	),
->  
-> -	TP_printk("vcpu %u reason %s rip 0x%lx info %llx %llx",
-> +	TP_printk("vcpu %u reason %s%s%s rip 0x%lx info %llx %llx",
->  		  __entry->vcpu_id,
-> -		 (__entry->isa == KVM_ISA_VMX) ?
-> -		 __print_symbolic(__entry->exit_reason, VMX_EXIT_REASONS) :
-> -		 __print_symbolic(__entry->exit_reason, SVM_EXIT_REASONS),
-> -		 __entry->guest_rip, __entry->info1, __entry->info2)
-> +		  kvm_print_exit_reason(__entry->exit_reason, __entry->isa),
-> +		  __entry->guest_rip, __entry->info1, __entry->info2)
->  );
->  
->  /*
-> @@ -582,12 +588,10 @@ TRACE_EVENT(kvm_nested_vmexit,
->  		__entry->exit_int_info_err	= exit_int_info_err;
->  		__entry->isa			= isa;
-
-Unrelated to your patch, just a random thought: I *think* it would be
-possible to avoid passing 'isa' to these tracepoints and figure out
-which module is embedding them instead (THIS_MODULE/KBUILD_MODNAME/...
-magic or something like that) but it may not worth the effort.
-
->  	),
-> -	TP_printk("rip: 0x%016llx reason: %s ext_inf1: 0x%016llx "
-> +	TP_printk("rip: 0x%016llx reason: %s%s%s ext_inf1: 0x%016llx "
->  		  "ext_inf2: 0x%016llx ext_int: 0x%08x ext_int_err: 0x%08x",
->  		  __entry->rip,
-> -		 (__entry->isa == KVM_ISA_VMX) ?
-> -		 __print_symbolic(__entry->exit_code, VMX_EXIT_REASONS) :
-> -		 __print_symbolic(__entry->exit_code, SVM_EXIT_REASONS),
-> +		  kvm_print_exit_reason(__entry->exit_code, __entry->isa),
->  		  __entry->exit_info1, __entry->exit_info2,
->  		  __entry->exit_int_info, __entry->exit_int_info_err)
->  );
-> @@ -620,13 +624,11 @@ TRACE_EVENT(kvm_nested_vmexit_inject,
->  		__entry->isa			= isa;
->  	),
->  
-> -	TP_printk("reason: %s ext_inf1: 0x%016llx "
-> +	TP_printk("reason: %s%s%s ext_inf1: 0x%016llx "
->  		  "ext_inf2: 0x%016llx ext_int: 0x%08x ext_int_err: 0x%08x",
-> -		 (__entry->isa == KVM_ISA_VMX) ?
-> -		 __print_symbolic(__entry->exit_code, VMX_EXIT_REASONS) :
-> -		 __print_symbolic(__entry->exit_code, SVM_EXIT_REASONS),
-> -		__entry->exit_info1, __entry->exit_info2,
-> -		__entry->exit_int_info, __entry->exit_int_info_err)
-> +		  kvm_print_exit_reason(__entry->exit_code, __entry->isa),
-> +		  __entry->exit_info1, __entry->exit_info2,
-> +		  __entry->exit_int_info, __entry->exit_int_info_err)
->  );
->  
->  /*
-
-Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-
--- 
-Vitaly
+>  arch/s390/kvm/gaccess.c   | 23 +++++++++++++----------
+>  arch/s390/kvm/interrupt.c |  2 +-
+>  arch/s390/kvm/kvm-s390.c  |  4 ++--
+>  arch/s390/mm/gmap.c       |  6 +++---
+>  4 files changed, 19 insertions(+), 16 deletions(-)
+[...]
 
