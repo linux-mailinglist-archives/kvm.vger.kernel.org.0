@@ -2,333 +2,196 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1BF0318508D
-	for <lists+kvm@lfdr.de>; Fri, 13 Mar 2020 21:49:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1BF7B1851A8
+	for <lists+kvm@lfdr.de>; Fri, 13 Mar 2020 23:30:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727352AbgCMUtX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 13 Mar 2020 16:49:23 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:44890 "EHLO
+        id S1727565AbgCMWaJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 13 Mar 2020 18:30:09 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:27161 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726926AbgCMUtX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 13 Mar 2020 16:49:23 -0400
+        with ESMTP id S1726534AbgCMWaJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 13 Mar 2020 18:30:09 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1584132561;
+        s=mimecast20190719; t=1584138607;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Z4dvF73kaZ111+E9J06RzSJ+7R3u780xXum6KII9mcI=;
-        b=NRCdzAAo0Kg7JZr6mEpVZ+UszvM/p2/ivwaiBgOGydpt8cEB45mfz3+vpsO8wiWKmJ2CEd
-        UCMxXGgIq2CNsLoyqSYPlwB6M7MOVntKr3+e/F3yLqUgTMwAnbeBMhuRJ2QXabbfLE/Jyu
-        pGACgS51+LkKFviDCnV/yoNKaF8+F90=
+        bh=bJRqmbszSA1oTVb3wgjwQJD7tdcXqWuFXrwdcjYeYK0=;
+        b=TxRKfk2BChSDvXQx89glPN8S9Wf/OnZ6y+gBCVeMYjNRIGsYKuvbYch3OA1zXW68OQfNVL
+        /R5zNofG9Df3BtJ/r+p0yZi6fP4B0mY1E6ggWJFQQ80SiDC8Q9RQbShb57CYh8JC3OOfS+
+        cJcZmaST1J/+JcyOtywfAFkh6s9XQIA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-34--_UQoJQ1NUGD1xKYPVT83A-1; Fri, 13 Mar 2020 16:49:17 -0400
-X-MC-Unique: -_UQoJQ1NUGD1xKYPVT83A-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+ us-mta-164-teosRALzMJGa4azdSSx5Aw-1; Fri, 13 Mar 2020 18:30:04 -0400
+X-MC-Unique: teosRALzMJGa4azdSSx5Aw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6846FA0CC0;
-        Fri, 13 Mar 2020 20:49:14 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 83B7D1060DB1;
+        Fri, 13 Mar 2020 22:30:02 +0000 (UTC)
 Received: from x1.home (ovpn-116-28.phx2.redhat.com [10.3.116.28])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 76C8719757;
-        Fri, 13 Mar 2020 20:49:12 +0000 (UTC)
-Date:   Fri, 13 Mar 2020 14:49:11 -0600
+        by smtp.corp.redhat.com (Postfix) with ESMTP id CCB5094940;
+        Fri, 13 Mar 2020 22:29:58 +0000 (UTC)
+Date:   Fri, 13 Mar 2020 16:29:58 -0600
 From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Kirti Wankhede <kwankhede@nvidia.com>
-Cc:     <cjia@nvidia.com>, <kevin.tian@intel.com>, <ziye.yang@intel.com>,
-        <changpeng.liu@intel.com>, <yi.l.liu@intel.com>,
-        <mlevitsk@redhat.com>, <eskultet@redhat.com>, <cohuck@redhat.com>,
-        <dgilbert@redhat.com>, <jonathan.davies@nutanix.com>,
-        <eauger@redhat.com>, <aik@ozlabs.ru>, <pasic@linux.ibm.com>,
-        <felipe@nutanix.com>, <Zhengxiao.zx@Alibaba-inc.com>,
-        <shuangtai.tst@alibaba-inc.com>, <Ken.Xue@amd.com>,
-        <zhi.a.wang@intel.com>, <yan.y.zhao@intel.com>,
-        <qemu-devel@nongnu.org>, <kvm@vger.kernel.org>
-Subject: Re: [PATCH v13 Kernel 7/7] vfio: Selective dirty page tracking if
- IOMMU backed device pins pages
-Message-ID: <20200313144911.72e727d4@x1.home>
-In-Reply-To: <1584035607-23166-8-git-send-email-kwankhede@nvidia.com>
-References: <1584035607-23166-1-git-send-email-kwankhede@nvidia.com>
-        <1584035607-23166-8-git-send-email-kwankhede@nvidia.com>
+To:     Yan Zhao <yan.y.zhao@intel.com>
+Cc:     intel-gvt-dev@lists.freedesktop.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, zhenyuw@linux.intel.com,
+        pbonzini@redhat.com, kevin.tian@intel.com, peterx@redhat.com,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        "Neo Jia (cjia@nvidia.com)" <cjia@nvidia.com>
+Subject: Re: [PATCH v4 0/7] use vfio_dma_rw to read/write IOVAs from CPU
+ side
+Message-ID: <20200313162958.5bfb5b82@x1.home>
+In-Reply-To: <20200313030548.7705-1-yan.y.zhao@intel.com>
+References: <20200313030548.7705-1-yan.y.zhao@intel.com>
 Organization: Red Hat
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 12 Mar 2020 23:23:27 +0530
-Kirti Wankhede <kwankhede@nvidia.com> wrote:
+[Cc +NVIDIA]
 
-> Added a check such that only singleton IOMMU groups can pin pages.
-> From the point when vendor driver pins any pages, consider IOMMU group
-> dirty page scope to be limited to pinned pages.
+On Thu, 12 Mar 2020 23:05:48 -0400
+Yan Zhao <yan.y.zhao@intel.com> wrote:
+
+> It is better for a device model to use IOVAs to read/write memory to
+> perform some sort of virtual DMA on behalf of the device.
 > 
-> To optimize to avoid walking list often, added flag
-> pinned_page_dirty_scope to indicate if all of the vfio_groups for each
-> vfio_domain in the domain_list dirty page scope is limited to pinned
-> pages. This flag is updated on first pinned pages request for that IOMMU
-> group and on attaching/detaching group.
+> patch 1 exports VFIO group to external user so that it can hold the group
+> reference until finishing using of it. It saves ~500 cycles that are spent
+> on VFIO group looking up, referencing and dereferencing. (this data is
+> measured with 1 VFIO user).
 > 
-> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-> Reviewed-by: Neo Jia <cjia@nvidia.com>
-> ---
->  drivers/vfio/vfio.c             |  9 +++++-
->  drivers/vfio/vfio_iommu_type1.c | 72 +++++++++++++++++++++++++++++++++++++++--
->  include/linux/vfio.h            |  4 ++-
->  3 files changed, 80 insertions(+), 5 deletions(-)
+> patch 2 introduces interface vfio_dma_rw().
 > 
-> diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
-> index c8482624ca34..79108c1245a5 100644
-> --- a/drivers/vfio/vfio.c
-> +++ b/drivers/vfio/vfio.c
-> @@ -85,6 +85,7 @@ struct vfio_group {
->  	atomic_t			opened;
->  	wait_queue_head_t		container_q;
->  	bool				noiommu;
-> +	unsigned int			dev_counter;
->  	struct kvm			*kvm;
->  	struct blocking_notifier_head	notifier;
->  };
-> @@ -555,6 +556,7 @@ struct vfio_device *vfio_group_create_device(struct vfio_group *group,
->  
->  	mutex_lock(&group->device_lock);
->  	list_add(&device->group_next, &group->device_list);
-> +	group->dev_counter++;
->  	mutex_unlock(&group->device_lock);
->  
->  	return device;
-> @@ -567,6 +569,7 @@ static void vfio_device_release(struct kref *kref)
->  	struct vfio_group *group = device->group;
->  
->  	list_del(&device->group_next);
-> +	group->dev_counter--;
->  	mutex_unlock(&group->device_lock);
->  
->  	dev_set_drvdata(device->dev, NULL);
-> @@ -1895,6 +1898,9 @@ int vfio_pin_pages(struct device *dev, unsigned long *user_pfn, int npage,
->  	if (!group)
->  		return -ENODEV;
->  
-> +	if (group->dev_counter > 1)
-> +		return -EINVAL;
-> +
->  	ret = vfio_group_add_container_user(group);
->  	if (ret)
->  		goto err_pin_pages;
-> @@ -1902,7 +1908,8 @@ int vfio_pin_pages(struct device *dev, unsigned long *user_pfn, int npage,
->  	container = group->container;
->  	driver = container->iommu_driver;
->  	if (likely(driver && driver->ops->pin_pages))
-> -		ret = driver->ops->pin_pages(container->iommu_data, user_pfn,
-> +		ret = driver->ops->pin_pages(container->iommu_data,
-> +					     group->iommu_group, user_pfn,
->  					     npage, prot, phys_pfn);
->  	else
->  		ret = -ENOTTY;
-> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> index 4f1f116feabc..18a284b230c0 100644
-> --- a/drivers/vfio/vfio_iommu_type1.c
-> +++ b/drivers/vfio/vfio_iommu_type1.c
-> @@ -71,6 +71,7 @@ struct vfio_iommu {
->  	bool			v2;
->  	bool			nesting;
->  	bool			dirty_page_tracking;
-> +	bool			pinned_page_dirty_scope;
->  };
->  
->  struct vfio_domain {
-> @@ -98,6 +99,7 @@ struct vfio_group {
->  	struct iommu_group	*iommu_group;
->  	struct list_head	next;
->  	bool			mdev_group;	/* An mdev group */
-> +	bool			has_pinned_pages;
+> patch 3 introduces interfaces vfio_group_pin_pages() and
+> vfio_group_unpin_pages() to get rid of VFIO group looking-up in
+> vfio_pin_pages() and vfio_unpin_pages().
+> 
+> patch 4-5 let kvmgt switch from calling kvm_read/write_guest() to calling
+> vfio_dma_rw to rw IOVAs.
+> 
+> patch 6 let kvmgt switch to use lighter version of vfio_pin/unpin_pages(),
+> i.e. vfio_group_pin/unpin_pages()
+> 
+> patch 7 enables kvmgt to read/write IOVAs of size larger than PAGE_SIZE.
 
-I'm afraid over time this name will be confusing, should we simply
-call it pinned_page_dirty_scope per vfio_group as well?   We might have
-to adapt this over time as we get new ways to dirty pages, but each
-group voting towards the same value being set on the vfio_iommu object
-seems like a good starting point.
+This looks pretty good to me, hopefully Kirti and Neo can find some
+advantage with this series as well.  Given that we're also trying to
+get the migration interface and dirty page tracking integrated for
+v5.7, would it make sense to merge the first 3 patches via my next
+branch?  This is probably the easiest way to update the dirty tracking.
+Thanks,
 
->  };
->  
->  struct vfio_iova {
-> @@ -129,6 +131,10 @@ struct vfio_regions {
->  static int put_pfn(unsigned long pfn, int prot);
->  static unsigned long vfio_pgsize_bitmap(struct vfio_iommu *iommu);
->  
-> +static struct vfio_group *vfio_iommu_find_iommu_group(struct vfio_iommu *iommu,
-> +					       struct iommu_group *iommu_group);
-> +
-> +static void update_pinned_page_dirty_scope(struct vfio_iommu *iommu);
->  /*
->   * This code handles mapping and unmapping of user data buffers
->   * into DMA'ble space using the IOMMU
-> @@ -579,11 +585,13 @@ static int vfio_unpin_page_external(struct vfio_dma *dma, dma_addr_t iova,
->  }
->  
->  static int vfio_iommu_type1_pin_pages(void *iommu_data,
-> +				      struct iommu_group *iommu_group,
->  				      unsigned long *user_pfn,
->  				      int npage, int prot,
->  				      unsigned long *phys_pfn)
->  {
->  	struct vfio_iommu *iommu = iommu_data;
-> +	struct vfio_group *group;
->  	int i, j, ret;
->  	unsigned long remote_vaddr;
->  	struct vfio_dma *dma;
-> @@ -662,8 +670,14 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
->  				   (vpfn->iova - dma->iova) >> pgshift, 1);
->  		}
->  	}
-> -
->  	ret = i;
-> +
-> +	group = vfio_iommu_find_iommu_group(iommu, iommu_group);
-> +	if (!group->has_pinned_pages) {
-> +		group->has_pinned_pages = true;
-> +		update_pinned_page_dirty_scope(iommu);
-> +	}
-> +
->  	goto pin_done;
->  
->  pin_unwind:
-> @@ -946,8 +960,11 @@ static int vfio_iova_dirty_bitmap(struct vfio_iommu *iommu, dma_addr_t iova,
->  	npages = dma->size >> pgshift;
->  	bitmap_size = dirty_bitmap_bytes(npages);
->  
-> -	/* mark all pages dirty if all pages are pinned and mapped. */
-> -	if (dma->iommu_mapped)
-> +	/*
-> +	 * mark all pages dirty if any IOMMU capable device is not able
-> +	 * to report dirty pages and all pages are pinned and mapped.
-> +	 */
-> +	if (!iommu->pinned_page_dirty_scope && dma->iommu_mapped)
->  		bitmap_set(dma->bitmap, 0, npages);
->  
->  	if (dma->bitmap) {
-> @@ -1430,6 +1447,51 @@ static struct vfio_group *find_iommu_group(struct vfio_domain *domain,
->  	return NULL;
->  }
->  
-> +static struct vfio_group *vfio_iommu_find_iommu_group(struct vfio_iommu *iommu,
-> +					       struct iommu_group *iommu_group)
-> +{
-> +	struct vfio_domain *domain;
-> +	struct vfio_group *group = NULL;
-> +
-> +	list_for_each_entry(domain, &iommu->domain_list, next) {
-> +		group = find_iommu_group(domain, iommu_group);
-> +		if (group)
-> +			return group;
-> +	}
-> +
-> +	if (iommu->external_domain)
-> +		group = find_iommu_group(iommu->external_domain, iommu_group);
-> +
-> +	return group;
-> +}
-> +
-> +static void update_pinned_page_dirty_scope(struct vfio_iommu *iommu)
-> +{
-> +	struct vfio_domain *domain;
-> +	struct vfio_group *group;
-> +
-> +	list_for_each_entry(domain, &iommu->domain_list, next) {
-> +		list_for_each_entry(group, &domain->group_list, next) {
-> +			if (!group->has_pinned_pages) {
-> +				iommu->pinned_page_dirty_scope = false;
-> +				return;
-> +			}
-> +		}
-> +	}
-> +
-> +	if (iommu->external_domain) {
-> +		domain = iommu->external_domain;
-> +		list_for_each_entry(group, &domain->group_list, next) {
-> +			if (!group->has_pinned_pages) {
-> +				iommu->pinned_page_dirty_scope = false;
-> +				return;
-> +			}
-> +		}
-> +	}
-> +
-> +	iommu->pinned_page_dirty_scope = true;
-> +}
-> +
->  static bool vfio_iommu_has_sw_msi(struct list_head *group_resv_regions,
->  				  phys_addr_t *base)
->  {
-> @@ -1836,6 +1898,7 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
->  
->  			list_add(&group->next,
->  				 &iommu->external_domain->group_list);
-> +			update_pinned_page_dirty_scope(iommu);
->  			mutex_unlock(&iommu->lock);
->  
->  			return 0;
-> @@ -1958,6 +2021,7 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
->  done:
->  	/* Delete the old one and insert new iova list */
->  	vfio_iommu_iova_insert_copy(iommu, &iova_copy);
-> +	update_pinned_page_dirty_scope(iommu);
->  	mutex_unlock(&iommu->lock);
->  	vfio_iommu_resv_free(&group_resv_regions);
->  
+Alex
 
-At this point we've added an iommu backed group that can't possibly
-have pages pinned on behalf of this group yet, can't we just set
-iommu->pinned_page_dirty_scope = false?
-
-In the previous case, aren't we adding a non-iommu backed group, so
-should we presume the scope is pinned pages even before we have any?
-We could almost forego the iommu scope update, but it could be the
-first group added if we're going to preemptively assume the scope of
-the group.
-
-> @@ -1972,6 +2036,7 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
->  out_free:
->  	kfree(domain);
->  	kfree(group);
-> +	update_pinned_page_dirty_scope(iommu);
-
-This one looks like paranoia given how late we update when the group is
-added.
-
->  	mutex_unlock(&iommu->lock);
->  	return ret;
->  }
-> @@ -2176,6 +2241,7 @@ static void vfio_iommu_type1_detach_group(void *iommu_data,
->  		vfio_iommu_iova_free(&iova_copy);
->  
->  detach_group_done:
-> +	update_pinned_page_dirty_scope(iommu);
-
-We only need to do this if the group we're removing does not have
-pinned page dirty scope, right?  I think we have all the info here to
-make that optimization.
-
->  	mutex_unlock(&iommu->lock);
->  }
->  
-> diff --git a/include/linux/vfio.h b/include/linux/vfio.h
-> index e42a711a2800..da29802d6276 100644
-> --- a/include/linux/vfio.h
-> +++ b/include/linux/vfio.h
-> @@ -72,7 +72,9 @@ struct vfio_iommu_driver_ops {
->  					struct iommu_group *group);
->  	void		(*detach_group)(void *iommu_data,
->  					struct iommu_group *group);
-> -	int		(*pin_pages)(void *iommu_data, unsigned long *user_pfn,
-> +	int		(*pin_pages)(void *iommu_data,
-> +				     struct iommu_group *group,
-> +				     unsigned long *user_pfn,
->  				     int npage, int prot,
->  				     unsigned long *phys_pfn);
->  	int		(*unpin_pages)(void *iommu_data,
+> Performance:
+> 
+> Comparison between vfio_dma_rw() and kvm_read/write_guest():
+> 
+> 1. avergage CPU cycles of each interface measured with 1 running VM:
+>  --------------------------------------------------
+> |  rw       |          avg cycles of               |
+> |  size     | (vfio_dma_rw - kvm_read/write_guest) |
+> |---------- ---------------------------------------|
+> | <= 1 page |            +155 ~ +195               |        
+> |--------------------------------------------------|
+> | 5 pages   |                -530                  |
+> |--------------------------------------------------|
+> | 20 pages  |           -2005 ~ -2533              |
+>  --------------------------------------------------
+> 
+> 2. average scores
+> 
+> base: base code before applying code in this series. use
+> kvm_read/write_pages() to rw IOVAs
+> 
+> base + this series: use vfio_dma_rw() to read IOVAs and use
+> vfio_group_pin/unpin_pages(), and kvmgt is able to rw several pages
+> at a time.
+> 
+> Scores of benchmarks running in 1 VM each:
+>  -----------------------------------------------------------------
+> |                    | glmark2 | lightsmark | openarena | heavens |
+> |-----------------------------------------------------------------|
+> |       base         |  1248   |  219.70    |  114.9    |   560   |
+> |-----------------------------------------------------------------|
+> |base + this series  |  1248   |  225.8     |   115     |   559   |
+>  -----------------------------------------------------------------
+> 
+> Sum of scores of two benchmark instances running in 2 VMs each:
+>  -------------------------------------------------------
+> |                    | glmark2 | lightsmark | openarena |
+> |-------------------------------------------------------|
+> |       base         |  812    |  211.46    |  115.3    |
+> |-------------------------------------------------------|
+> |base + this series  |  814    |  214.69    |  115.9    |
+>  -------------------------------------------------------
+> 
+> 
+> Changelogs:
+> v3 --> v4:
+> - rebased to 5.6.0-rc4+
+> - adjust wrap position for vfio_group_get_external_user_from_dev() in
+>   header file.(Alex)
+> - updated function description of vfio_group_get_external_user_from_dev()
+>   (Alex)
+> - fixed Error path group reference leaking in
+>   vfio_group_get_external_user_from_dev()  (Alex)
+> - reurn 0 for success or errno in vfio_dma_rw_chunk(). (Alex)
+> - renamed iova to user_iova in interface vfio_dam_rw().
+> - renamed vfio_pin_pages_from_group() and vfio_unpin_pages_from_group() to
+>   vfio_group_pin_pages() and vfio_group_unpin_pages()
+> - renamed user_pfn to user_iova_pfn in vfio_group_pin_pages() and
+>   vfio_group_unpin_pages()
+> 
+> v2 --> v3:
+> - add vfio_group_get_external_user_from_dev() to improve performance (Alex)
+> - add vfio_pin/unpin_pages_from_group() to avoid repeated looking up of
+>   VFIO group in vfio_pin/unpin_pages() (Alex)
+> - add a check for IOMMU_READ permission. (Alex)
+> - rename vfio_iommu_type1_rw_dma_nopin() to
+>   vfio_iommu_type1_dma_rw_chunk(). (Alex)
+> - in kvmgt, change "write ? vfio_dma_rw(...,true) :
+>   vfio_dma_rw(...,false)" to vfio_dma_rw(dev, gpa, buf, len, write)
+>   (Alex and Paolo)
+> - in kvmgt, instead of read/write context pages 1:1, combining the
+>   reads/writes of continuous IOVAs to take advantage of vfio_dma_rw() for
+>   faster crossing page boundary accesses.
+> 
+> v1 --> v2:
+> - rename vfio_iova_rw to vfio_dma_rw, vfio iommu driver ops .iova_rw
+> to .dma_rw. (Alex).
+> - change iova and len from unsigned long to dma_addr_t and size_t,
+> respectively. (Alex)
+> - fix possible overflow in dma->vaddr + iova - dma->iova + offset (Alex)
+> - split DMAs from on page boundary to on max available size to eliminate
+>   redundant searching of vfio_dma and switching mm. (Alex)
+> - add a check for IOMMU_WRITE permission.
+> 
+> 
+> Yan Zhao (7):
+>   vfio: allow external user to get vfio group from device
+>   vfio: introduce vfio_dma_rw to read/write a range of IOVAs
+>   vfio: avoid inefficient operations on VFIO group in
+>     vfio_pin/unpin_pages
+>   drm/i915/gvt: hold reference of VFIO group during opening of vgpu
+>   drm/i915/gvt: subsitute kvm_read/write_guest with vfio_dma_rw
+>   drm/i915/gvt: switch to user vfio_group_pin/upin_pages
+>   drm/i915/gvt: rw more pages a time for shadow context
+> 
+>  drivers/gpu/drm/i915/gvt/kvmgt.c     |  46 ++++---
+>  drivers/gpu/drm/i915/gvt/scheduler.c |  97 ++++++++++-----
+>  drivers/vfio/vfio.c                  | 180 +++++++++++++++++++++++++++
+>  drivers/vfio/vfio_iommu_type1.c      |  76 +++++++++++
+>  include/linux/vfio.h                 |  13 ++
+>  5 files changed, 360 insertions(+), 52 deletions(-)
+> 
 
