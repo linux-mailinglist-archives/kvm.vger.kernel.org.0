@@ -2,81 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E033A183F5D
-	for <lists+kvm@lfdr.de>; Fri, 13 Mar 2020 04:14:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7317A183F60
+	for <lists+kvm@lfdr.de>; Fri, 13 Mar 2020 04:14:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726578AbgCMDOc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Mar 2020 23:14:32 -0400
-Received: from mail.loongson.cn ([114.242.206.163]:55508 "EHLO loongson.cn"
+        id S1726483AbgCMDO2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Mar 2020 23:14:28 -0400
+Received: from mail.loongson.cn ([114.242.206.163]:55504 "EHLO loongson.cn"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726310AbgCMDO3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 Mar 2020 23:14:29 -0400
+        id S1726377AbgCMDO2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 Mar 2020 23:14:28 -0400
 Received: from localhost.localdomain.localdomain (unknown [125.69.47.232])
-        by mail.loongson.cn (Coremail) with SMTP id AQAAf9Dxn9uK+mpe1gcaAA--.45S3;
+        by mail.loongson.cn (Coremail) with SMTP id AQAAf9Dxn9uK+mpe1gcaAA--.45S4;
         Fri, 13 Mar 2020 11:14:20 +0800 (CST)
 From:   Xing Li <lixing@loongson.cn>
 To:     Thomas Bogendoerfer <tsbogend@alpha.franken.de>
 Cc:     linux-mips@vger.kernel.org, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org, maobibo@loongson.cn,
         chenhc@lemote.com, jiaxun.yang@flygoat.com
-Subject: [PATCH v2 Resend 2/3] KVM: MIPS: Fixup VPN2_MASK definition over 32bits virtual address
-Date:   Fri, 13 Mar 2020 11:14:16 +0800
-Message-Id: <1584069257-30896-2-git-send-email-lixing@loongson.cn>
+Subject: [PATCH v2 Resend 3/3] KVM: MIPS: Support kvm modules autoprobed when startup system
+Date:   Fri, 13 Mar 2020 11:14:17 +0800
+Message-Id: <1584069257-30896-3-git-send-email-lixing@loongson.cn>
 X-Mailer: git-send-email 2.1.0
 In-Reply-To: <1584069257-30896-1-git-send-email-lixing@loongson.cn>
 References: <1584069257-30896-1-git-send-email-lixing@loongson.cn>
-X-CM-TRANSID: AQAAf9Dxn9uK+mpe1gcaAA--.45S3
-X-Coremail-Antispam: 1UD129KBjvdXoWrKr47GrWxWw4DXr1xKrW3ZFb_yoWDKwbEva
-        4xZws7Zr1kGFZFyrWxZan5WFy5W34UWF9Igr98WryDC34Syrs8Wa93ury7Jw45uw4jyFsY
-        va4vv34rZrnF9jkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-        9fnUUIcSsGvfJTRUUUbhxFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
-        6rWj6s0DM7CIcVAFz4kK6r1j6r18M28IrcIa0xkI8VA2jI8067AKxVWUGwA2048vs2IY02
-        0Ec7CjxVAFwI0_JFI_Gr1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xv
-        wVC0I7IYx2IY67AKxVW8JVW5JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVWxJVW8Jr1l84
-        ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AKxVWxJr0_GcWl
-        e2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI
-        8IcVAFwI0_JrI_JrylYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwAC
-        jcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc2xSY4AK67AK6r48MxAIw2
-        8IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4l
-        x2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUAVWUtwCIc40Y0x0EwIxGrw
-        CI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI
-        42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z2
-        80aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUjLSdPUUUUU==
+X-CM-TRANSID: AQAAf9Dxn9uK+mpe1gcaAA--.45S4
+X-Coremail-Antispam: 1UD129KBjvJXoW7Cr1xCFy7uF1UKFWkuw4rKrg_yoW8Zr1rpF
+        4DAa93Cr45uryDJFWfZFnFgrW3Ja1DG3yj9ayjgryjv3ZYqFs8Jws2kwnxKr1DXFsIq3WF
+        gas3Xr1jka92vw7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUBv14x267AKxVW5JVWrJwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2048vs2IY020E87I2jVAFwI0_Jryl82xGYIkIc2
+        x26xkF7I0E14v26r4j6ryUM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2z4x0
+        Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Cr0_Gr1UM2
+        8EF7xvwVC2z280aVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Cr1j6rxd
+        M2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjx
+        v20xvE14v26r106r15McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1l
+        F7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7MxkIecxEwVAFwVW8GwCF04
+        k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18
+        MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_JF0_Jw1lIxkGc2Ij64vIr4
+        1lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1l
+        IxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4
+        A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JU5pnQUUUUU=
 X-CM-SenderInfo: pol0x03j6o00pqjv00gofq/
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-If the cpu support more than 32bits vmbits, VPN2_MASK set to fixed
-0xffffe000 will lead to wrong entryhi for _kvm_mips_host_tlb_inv
+Currently, the module_init of kvm_mips_init cannot force the kvm
+modules insmod when startup system.
 
-The cpu_vmbits definition of 32bit in cpu-features.h is 31,
-so still use the old style for 32bits.
+Add new feature CPU_MIPS_VZ in elf_hwcap to support KVM auto probe
+when hardware virtualization supported.
 
 Signed-off-by: Xing Li <lixing@loongson.cn>
 ---
-v2:
-Change VPN2_MASK definition according to Jiaxun Yang's comment
- arch/mips/include/asm/kvm_host.h | 4 ++++
- 1 file changed, 4 insertions(+)
+ arch/mips/include/uapi/asm/hwcap.h | 1 +
+ arch/mips/kernel/cpu-probe.c       | 4 +++-
+ arch/mips/kvm/mips.c               | 3 ++-
+ 3 files changed, 6 insertions(+), 2 deletions(-)
 
-diff --git a/arch/mips/include/asm/kvm_host.h b/arch/mips/include/asm/kvm_host.h
-index 6be70d5..ef8e606 100644
---- a/arch/mips/include/asm/kvm_host.h
-+++ b/arch/mips/include/asm/kvm_host.h
-@@ -274,7 +274,11 @@ enum emulation_result {
- #define MIPS3_PG_SHIFT		6
- #define MIPS3_PG_FRAME		0x3fffffc0
+diff --git a/arch/mips/include/uapi/asm/hwcap.h b/arch/mips/include/uapi/asm/hwcap.h
+index 1ade1da..9e66509 100644
+--- a/arch/mips/include/uapi/asm/hwcap.h
++++ b/arch/mips/include/uapi/asm/hwcap.h
+@@ -17,5 +17,6 @@
+ #define HWCAP_LOONGSON_MMI  (1 << 11)
+ #define HWCAP_LOONGSON_EXT  (1 << 12)
+ #define HWCAP_LOONGSON_EXT2 (1 << 13)
++#define HWCAP_MIPS_VZ       (1 << 14)
  
-+#if defined(CONFIG_64BIT)
-+#define VPN2_MASK		GENMASK(cpu_vmbits - 1, 13)
-+#else
- #define VPN2_MASK		0xffffe000
-+#endif
- #define KVM_ENTRYHI_ASID	cpu_asid_mask(&current_cpu_data)
- #define TLB_IS_GLOBAL(x)	((x).tlb_lo[0] & (x).tlb_lo[1] & ENTRYLO_G)
- #define TLB_VPN2(x)		((x).tlb_hi & VPN2_MASK)
+ #endif /* _UAPI_ASM_HWCAP_H */
+diff --git a/arch/mips/kernel/cpu-probe.c b/arch/mips/kernel/cpu-probe.c
+index c543326..b305269 100644
+--- a/arch/mips/kernel/cpu-probe.c
++++ b/arch/mips/kernel/cpu-probe.c
+@@ -2242,8 +2242,10 @@ void cpu_probe(void)
+ 	if (cpu_has_loongson_ext2)
+ 		elf_hwcap |= HWCAP_LOONGSON_EXT2;
+ 
+-	if (cpu_has_vz)
++	if (cpu_has_vz) {
+ 		cpu_probe_vz(c);
++		elf_hwcap |= HWCAP_MIPS_VZ;
++	}
+ 
+ 	cpu_probe_vmbits(c);
+ 
+diff --git a/arch/mips/kvm/mips.c b/arch/mips/kvm/mips.c
+index 1109924..1da5df3 100644
+--- a/arch/mips/kvm/mips.c
++++ b/arch/mips/kvm/mips.c
+@@ -19,6 +19,7 @@
+ #include <linux/sched/signal.h>
+ #include <linux/fs.h>
+ #include <linux/memblock.h>
++#include <linux/cpufeature.h>
+ 
+ #include <asm/fpu.h>
+ #include <asm/page.h>
+@@ -1742,7 +1743,7 @@ static void __exit kvm_mips_exit(void)
+ 	unregister_die_notifier(&kvm_mips_csr_die_notifier);
+ }
+ 
+-module_init(kvm_mips_init);
++module_cpu_feature_match(MIPS_VZ, kvm_mips_init);
+ module_exit(kvm_mips_exit);
+ 
+ EXPORT_TRACEPOINT_SYMBOL(kvm_exit);
 -- 
 2.1.0
 
