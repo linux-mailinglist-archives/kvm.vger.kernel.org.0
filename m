@@ -2,107 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 058431848D5
-	for <lists+kvm@lfdr.de>; Fri, 13 Mar 2020 15:08:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D492A1848DB
+	for <lists+kvm@lfdr.de>; Fri, 13 Mar 2020 15:10:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726754AbgCMOI5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 13 Mar 2020 10:08:57 -0400
-Received: from foss.arm.com ([217.140.110.172]:55890 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726647AbgCMOI4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 13 Mar 2020 10:08:56 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1DD3030E;
-        Fri, 13 Mar 2020 07:08:56 -0700 (PDT)
-Received: from [192.168.1.123] (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 15E5C3F67D;
-        Fri, 13 Mar 2020 07:08:54 -0700 (PDT)
-Subject: Re: [RFC PATCH] vfio: Ignore -ENODEV when getting MSI cookie
-To:     Andre Przywara <andre.przywara@arm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Will Deacon <will@kernel.org>
-Cc:     iommu@lists.linux-foundation.org,
-        linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
-References: <20200312181950.60664-1-andre.przywara@arm.com>
-From:   Robin Murphy <robin.murphy@arm.com>
-Message-ID: <c9e00735-9673-2016-b274-d5290b648a06@arm.com>
-Date:   Fri, 13 Mar 2020 14:08:47 +0000
-User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+        id S1726761AbgCMOKC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 13 Mar 2020 10:10:02 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:24554 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726741AbgCMOKC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 13 Mar 2020 10:10:02 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1584108601;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=F1V8F7R+emEsH2Puu+xTU6xnzq5JbKAu2uhy1Jl9ZpQ=;
+        b=RgY8wSeA+NigxyzLgzHCdB+fj82cIJ6Xjt1kNFPaqnuxt04yuiZzwwI97Qmdau5fZFZhZU
+        uKeUbUi1ONQqwl4EG12ubOE4Uu/sIwJ3U6RfJjkWrHKF4Wl5AuxvNs2B7lXdNXsx+bp7AR
+        IJc9r3qjnArrMINcfhh6DOdAGNBHCXQ=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-240-AobhcPTcOnul26uc_4aINg-1; Fri, 13 Mar 2020 10:09:59 -0400
+X-MC-Unique: AobhcPTcOnul26uc_4aINg-1
+Received: by mail-wr1-f69.google.com with SMTP id u12so1872487wrw.10
+        for <kvm@vger.kernel.org>; Fri, 13 Mar 2020 07:09:58 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=F1V8F7R+emEsH2Puu+xTU6xnzq5JbKAu2uhy1Jl9ZpQ=;
+        b=aeHYUhnUimvRKlKEopLadp2QF/KbD83e2Dh6mOj/Pib04aKM1UEDNY1bxDJnAIP46q
+         nPN5SuxyAYAtVo7hHDtyMt28EFc5AROo/c8FpAKIBFMLZ8JTxX3FtKxEA4fyuej6NfzX
+         /wi91h2QAcalai9LOGfoWpJB/0FbhbW9bZkLYIDdOlgr3O1MC8aLuqoHVa0oa93Wb0kQ
+         qUTWjtKhQTGCAXEMyViWU+xGG50PvExwqIL/q60CI46kfMqKtKoZsuwbShmG7lAK+E4E
+         7ii+O9VDLhol6u/0uv7KPPGZi91Ws80VoV51wGrov+xWdVytWKni4Rz0pZz7FTKV+4AP
+         XgyQ==
+X-Gm-Message-State: ANhLgQ3C3xbE8uQMmKqa52AAzSUUECsCZkZeGWqu6DqYMKqXMmwFJqq1
+        XVw6A0kVHFw6p26txtyn1JzXX3vGUYGF2qJfGMiSbPTnYxaMvjl/op7nxaFqfGv3w5BXTWgjZPZ
+        nnYgaU0cJRxXQ
+X-Received: by 2002:adf:9071:: with SMTP id h104mr18213508wrh.359.1584108597987;
+        Fri, 13 Mar 2020 07:09:57 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vvhEwV3TeTg8xQbLJb4GROPa8wOf4t+geLxrOrIV4oik7bg0a3LBUdPL/nDNQ3nNvTxJhw7oQ==
+X-Received: by 2002:adf:9071:: with SMTP id h104mr18213482wrh.359.1584108597771;
+        Fri, 13 Mar 2020 07:09:57 -0700 (PDT)
+Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
+        by smtp.gmail.com with ESMTPSA id k126sm17084484wme.4.2020.03.13.07.09.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 13 Mar 2020 07:09:54 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>
+Subject: Re: [PATCH 09/10] KVM: VMX: Cache vmx->exit_reason in local u16 in vmx_handle_exit_irqoff()
+In-Reply-To: <20200312184521.24579-10-sean.j.christopherson@intel.com>
+References: <20200312184521.24579-1-sean.j.christopherson@intel.com> <20200312184521.24579-10-sean.j.christopherson@intel.com>
+Date:   Fri, 13 Mar 2020 15:09:47 +0100
+Message-ID: <87h7ysny6s.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200312181950.60664-1-andre.przywara@arm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2020-03-12 6:19 pm, Andre Przywara wrote:
-> When we try to get an MSI cookie for a VFIO device, that can fail if
-> CONFIG_IOMMU_DMA is not set. In this case iommu_get_msi_cookie() returns
-> -ENODEV, and that should not be fatal.
-> 
-> Ignore that case and proceed with the initialisation.
-> 
-> This fixes VFIO with a platform device on the Calxeda Midway (no MSIs).
-> 
-> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+Sean Christopherson <sean.j.christopherson@intel.com> writes:
+
+> Use a u16 to hold the exit reason in vmx_handle_exit_irqoff(), as the
+> checks for INTR/NMI/WRMSR expect to encounter only the basic exit reason
+> in vmx->exit_reason.
+>
+
+True Sean would also add:
+
+"No functional change intended."
+
+"Opportunistically align the params to handle_external_interrupt_irqoff()."
+
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 > ---
-> Hi,
-> 
-> not sure this is the right fix, or we should rather check if the
-> platform doesn't support MSIs at all (which doesn't seem to be easy
-> to do).
-> Or is this because arm-smmu.c always reserves an IOMMU_RESV_SW_MSI
-> region?
+>  arch/x86/kvm/vmx/vmx.c | 10 +++++-----
+>  1 file changed, 5 insertions(+), 5 deletions(-)
+>
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index d43e1d28bb58..910a7cadeaf7 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -6287,16 +6287,16 @@ static void handle_external_interrupt_irqoff(struct kvm_vcpu *vcpu)
+>  STACK_FRAME_NON_STANDARD(handle_external_interrupt_irqoff);
+>  
+>  static void vmx_handle_exit_irqoff(struct kvm_vcpu *vcpu,
+> -	enum exit_fastpath_completion *exit_fastpath)
+> +				   enum exit_fastpath_completion *exit_fastpath)
+>  {
+>  	struct vcpu_vmx *vmx = to_vmx(vcpu);
+> +	u16 exit_reason = vmx->exit_reason;
+>  
+> -	if (vmx->exit_reason == EXIT_REASON_EXTERNAL_INTERRUPT)
+> +	if (exit_reason == EXIT_REASON_EXTERNAL_INTERRUPT)
+>  		handle_external_interrupt_irqoff(vcpu);
+> -	else if (vmx->exit_reason == EXIT_REASON_EXCEPTION_NMI)
+> +	else if (exit_reason == EXIT_REASON_EXCEPTION_NMI)
+>  		handle_exception_nmi_irqoff(vmx);
+> -	else if (!is_guest_mode(vcpu) &&
+> -		vmx->exit_reason == EXIT_REASON_MSR_WRITE)
+> +	else if (!is_guest_mode(vcpu) && exit_reason == EXIT_REASON_MSR_WRITE)
+>  		*exit_fastpath = handle_fastpath_set_msr_irqoff(vcpu);
+>  }
 
-Both, really - ideally VFIO should be able to skip all MSI_related setup 
-if the system doesn't support MSIs, but equally the SMMU drivers would 
-also ideally not expose a pointless SW_MSI region in the same situation.
+Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 
-In lieu of a 'nice' way of acheiving that, I think this patch seems 
-reasonable - ENODEV doesn't clash with any real error that can occur 
-when iommu-dma is present, and carrying on without a cookie should be 
-fine since the MSI hooks that would otherwise dereference it will also 
-be no-ops.
+-- 
+Vitaly
 
-Perhaps it might be worth a comment to clarify that this is specifically 
-to allow vfio-platform to work with iommu-dma disabled, but either way,
-
-Acked-by: Robin Murphy <robin.murphy@arm.com>
-
-> Also this seems to be long broken, actually since Eric introduced MSI
-> support in 4.10-rc3, but at least since the initialisation order was
-> fixed with f6810c15cf9.
-
-I'm sure the entire Midway userbase have been up-in-arms the whole 
-time... :P
-
-Robin.
-
-> 
-> Grateful for any insight.
-> 
-> Cheers,
-> Andre
-> 
->   drivers/vfio/vfio_iommu_type1.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> index a177bf2c6683..467e217ef09a 100644
-> --- a/drivers/vfio/vfio_iommu_type1.c
-> +++ b/drivers/vfio/vfio_iommu_type1.c
-> @@ -1786,7 +1786,7 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
->   
->   	if (resv_msi) {
->   		ret = iommu_get_msi_cookie(domain->domain, resv_msi_base);
-> -		if (ret)
-> +		if (ret && ret != -ENODEV)
->   			goto out_detach;
->   	}
->   
-> 
