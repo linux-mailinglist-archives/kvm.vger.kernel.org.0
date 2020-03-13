@@ -2,92 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D46501847CD
-	for <lists+kvm@lfdr.de>; Fri, 13 Mar 2020 14:16:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DC6D21847E5
+	for <lists+kvm@lfdr.de>; Fri, 13 Mar 2020 14:20:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726659AbgCMNQd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 13 Mar 2020 09:16:33 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:41566 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726495AbgCMNQd (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 13 Mar 2020 09:16:33 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1584105392;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc; bh=7LrEVfZqSzW5l9b4ZSlHX3dnPgc63h+ofdKggf3vssA=;
-        b=OdP/QA25McLc9wy1q4vKWQpLn4vKENsFxeNKWYTqkS01/Wx7/lfVlVSxI8Z/JK28OsuYDC
-        Ep0/7L72u2ZOQLDI8MSlx86KNLRIOAOi5aFeaPSqglOd3JHa3h2nvdZfOZc/8EPngS5bla
-        VlYzOLmAGliLlJ2yAYJfaPn+q478Pes=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-464-T1yMoNLHMxSWIvn3GkXIxw-1; Fri, 13 Mar 2020 09:16:30 -0400
-X-MC-Unique: T1yMoNLHMxSWIvn3GkXIxw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 37BFD8017CC;
-        Fri, 13 Mar 2020 13:16:29 +0000 (UTC)
-Received: from virtlab512.virt.lab.eng.bos.redhat.com (virtlab512.virt.lab.eng.bos.redhat.com [10.19.152.206])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id C96B492D47;
-        Fri, 13 Mar 2020 13:16:24 +0000 (UTC)
-From:   Nitesh Narayan Lal <nitesh@redhat.com>
-To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        mtosatti@redhat.com, vkuznets@redhat.com,
-        sean.j.christopherson@intel.com, wanpengli@tencent.com,
-        jmattson@google.com, joro@8bytes.org, pbonzini@redhat.com,
-        peterx@redhat.com
-Subject: [Patch v2] KVM: x86: Initializing all kvm_lapic_irq fields in ioapic_write_indirect
-Date:   Fri, 13 Mar 2020 09:16:24 -0400
-Message-Id: <1584105384-4864-1-git-send-email-nitesh@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+        id S1726591AbgCMNU5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 13 Mar 2020 09:20:57 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:40813 "EHLO
+        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726479AbgCMNU4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 13 Mar 2020 09:20:56 -0400
+Received: by mail-wr1-f65.google.com with SMTP id f3so5073864wrw.7;
+        Fri, 13 Mar 2020 06:20:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=uwCiu2+wFwTgNtqnIu7f8w30xax2anlVmGhqQ2d23uI=;
+        b=JJqctYwYpYLlkRXcaX+NqzFqPyV5AhCG9giq/MX7SCx0v1V1Lg/VU6idMdl32TRG24
+         MPoS6r5ckEgPARi0LgtLgm6vP25doAlEKk+N3lSb6tr4oG3vug6UsjwRBN/AjY2tkPxW
+         XRR7NpX5/jVtArwaOA0n8/LhiqG8IYJKOmBzEKm0uFIK82lflmDZOMa3K0voiGWgrR9g
+         lBqw3jepyfxr4ijjCEZ8gGcJAS2Jv97v259M2rISiOM8viWyK/BPodyLqydsVsPHBDRD
+         M0cVsoY6od7Ls8j09JPXytlmeVGliW7uqQQmdtZk0GoLg0PoOsUxCT7UQqSOC6pzMTCX
+         P7sw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=uwCiu2+wFwTgNtqnIu7f8w30xax2anlVmGhqQ2d23uI=;
+        b=janNMJMNhpJNvaubtmi8xdALxkN8yW89p7xm7p6Z/O7FDyuepbxw6LcEvsWpie4JEH
+         eI9gUZZy0y1OBRzQXCJkdU1mqDsjNRPMQWcE3Q1PpkzHyga0cYP5d7Xy66KJkJ7inhuf
+         zlcqt7CiGXe4+qNLeL6M2sk+x7fV2XEclTpRaHot6PvQm1jtZ67+1aBtFrbmfLekBgSS
+         UUoL6ObbXYH7DncPCCRR2chmVUxr8N7X/xbKBOQb9nX/oy9ydk0pHksO9kZJNlims9As
+         OQN3G6B1qFjg3CvO6MhhTeWQHwx6Iyzy/y5Z6nm9cnr7J8RzHs1y2e5ZzakiGIvsQstt
+         Qjyg==
+X-Gm-Message-State: ANhLgQ0CzwL3YTPyYmCFSoqeB8dDbxmk2UcSVs037dDTjTP5FA01Z7DS
+        JZ3PSbiFrm8P0Xb3yhiwJ6fM40BrpBU=
+X-Google-Smtp-Source: ADFU+vsveTEgaA9u+6b5flsmtaadZk8zvbxpPt83ExWqQmGeOxLfmJtW0NfRc5e2j7uJwXPZIB713Q==
+X-Received: by 2002:a05:6000:12c6:: with SMTP id l6mr18691775wrx.217.1584105654145;
+        Fri, 13 Mar 2020 06:20:54 -0700 (PDT)
+Received: from jondnuc.lan (IGLD-84-229-155-229.inter.net.il. [84.229.155.229])
+        by smtp.gmail.com with ESMTPSA id v8sm77112121wrw.2.2020.03.13.06.20.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 13 Mar 2020 06:20:53 -0700 (PDT)
+From:   Jon Doron <arilou@gmail.com>
+To:     kvm@vger.kernel.org, linux-hyperv@vger.kernel.org
+Cc:     vkuznets@redhat.com, Jon Doron <arilou@gmail.com>
+Subject: [PATCH v5 0/5] x86/kvm/hyper-v: add support for synthetic debugger
+Date:   Fri, 13 Mar 2020 15:20:29 +0200
+Message-Id: <20200313132034.132315-1-arilou@gmail.com>
+X-Mailer: git-send-email 2.24.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Previously all fields of structure kvm_lapic_irq were not initialized
-before it was passed to kvm_bitmap_or_dest_vcpus(). Which will cause
-an issue when any of those fields are used for processing a request.
-For example not initializing the msi_redir_hint field before passing
-to the kvm_bitmap_or_dest_vcpus(), may lead to a misbehavior of
-kvm_apic_map_get_dest_lapic(). This will specifically happen when the
-kvm_lowest_prio_delivery() returns TRUE due to a non-zero garbage
-value of msi_redir_hint, which should not happen as the request belongs
-to APIC fixed delivery mode and we do not want to deliver the
-interrupt only to the lowest priority candidate.
+Add support for the synthetic debugger interface of hyper-v, the
+synthetic debugger has 2 modes.
+1. Use a set of MSRs to send/recv information (undocumented so it's not
+   going to the hyperv-tlfs.h)
+2. Use hypercalls
 
-This patch initializes all the fields of kvm_lapic_irq based on the
-values of ioapic redirect_entry object before passing it on to
-kvm_bitmap_or_dest_vcpus().
+The first mode is based the following MSRs:
+1. Control/Status MSRs which either asks for a send/recv .
+2. Send/Recv MSRs each holds GPA where the send/recv buffers are.
+3. Pending MSR, holds a GPA to a PAGE that simply has a boolean that
+   indicates if there is data pending to issue a recv VMEXIT.
 
-Fixes: 7ee30bc132c6("KVM: x86: deliver KVM IOAPIC scan request to target vCPUs")
-Signed-off-by: Nitesh Narayan Lal <nitesh@redhat.com>
----
- arch/x86/kvm/ioapic.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+The first mode implementation is to simply exit to user-space when
+either the control MSR or the pending MSR are being set.
+Then it's up-to userspace to implement the rest of the logic of sending/recving.
 
-diff --git a/arch/x86/kvm/ioapic.c b/arch/x86/kvm/ioapic.c
-index 7668fed..3a8467d 100644
---- a/arch/x86/kvm/ioapic.c
-+++ b/arch/x86/kvm/ioapic.c
-@@ -378,12 +378,15 @@ static void ioapic_write_indirect(struct kvm_ioapic *ioapic, u32 val)
- 		if (e->fields.delivery_mode == APIC_DM_FIXED) {
- 			struct kvm_lapic_irq irq;
- 
--			irq.shorthand = APIC_DEST_NOSHORT;
- 			irq.vector = e->fields.vector;
- 			irq.delivery_mode = e->fields.delivery_mode << 8;
--			irq.dest_id = e->fields.dest_id;
- 			irq.dest_mode =
- 			    kvm_lapic_irq_dest_mode(!!e->fields.dest_mode);
-+			irq.level = 1;
-+			irq.trig_mode = e->fields.trig_mode;
-+			irq.shorthand = APIC_DEST_NOSHORT;
-+			irq.dest_id = e->fields.dest_id;
-+			irq.msi_redir_hint = false;
- 			bitmap_zero(&vcpu_bitmap, 16);
- 			kvm_bitmap_or_dest_vcpus(ioapic->kvm, &irq,
- 						 &vcpu_bitmap);
+In the second mode instead of using MSRs KNet will simply issue
+Hypercalls with the information to send/recv, in this mode the data
+being transferred is UDP encapsulated, unlike in the previous mode in
+which you get just the data to send.
+
+The new hypercalls will exit to userspace which will be incharge of
+re-encapsulating if needed the UDP packets to be sent.
+
+There is an issue though in which KDNet does not respect the hypercall
+page and simply issues vmcall/vmmcall instructions depending on the cpu
+type expecting them to be handled as it a real hypercall was issued.
+
+Jon Doron (5):
+  x86/kvm/hyper-v: Explicitly align hcall param for kvm_hyperv_exit
+  x86/hyper-v: Add synthetic debugger definitions
+  x86/kvm/hyper-v: Add support for synthetic debugger capability
+  x86/kvm/hyper-v: enable hypercalls regardless of hypercall page
+  x86/kvm/hyper-v: Add support for synthetic debugger via hypercalls
+
+ Documentation/virt/kvm/api.rst     |  18 ++++
+ arch/x86/include/asm/hyperv-tlfs.h |   6 ++
+ arch/x86/include/asm/kvm_host.h    |  13 +++
+ arch/x86/kvm/hyperv.c              | 162 ++++++++++++++++++++++++++++-
+ arch/x86/kvm/hyperv.h              |  27 +++++
+ arch/x86/kvm/trace.h               |  51 +++++++++
+ arch/x86/kvm/x86.c                 |   9 ++
+ include/uapi/linux/kvm.h           |  13 +++
+ 8 files changed, 297 insertions(+), 2 deletions(-)
+
 -- 
-1.8.3.1
+2.24.1
 
