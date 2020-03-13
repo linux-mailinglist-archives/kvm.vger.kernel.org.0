@@ -2,174 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id DE94018401F
-	for <lists+kvm@lfdr.de>; Fri, 13 Mar 2020 05:58:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 728431840DB
+	for <lists+kvm@lfdr.de>; Fri, 13 Mar 2020 07:31:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726371AbgCME6G (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 13 Mar 2020 00:58:06 -0400
-Received: from mga18.intel.com ([134.134.136.126]:42565 "EHLO mga18.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726194AbgCME6F (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 13 Mar 2020 00:58:05 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 12 Mar 2020 21:58:03 -0700
-X-IronPort-AV: E=Sophos;i="5.70,547,1574150400"; 
-   d="scan'208";a="246595174"
-Received: from likexu-mobl1.ccr.corp.intel.com (HELO [10.238.4.82]) ([10.238.4.82])
-  by orsmga006-auth.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-SHA; 12 Mar 2020 21:57:51 -0700
-Subject: Re: [PATCH] KVM: VMX: Micro-optimize vmexit time when not exposing
- PMU
-To:     Wanpeng Li <kernellwp@gmail.com>, like.xu@intel.com
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-References: <1584007547-4802-1-git-send-email-wanpengli@tencent.com>
- <87r1xxrhb0.fsf@vitty.brq.redhat.com>
- <CANRm+Cwawew=Xygxmzr2jmgPAKqDxvkqxxzjvoxnRRjC_Jx9Xw@mail.gmail.com>
- <79141339-3506-1fe4-2e69-8430f4c202bd@intel.com>
- <CANRm+Cw-t2GXnHjOTPEV6BjwZPDZpwvK4QrUNz+AU21UL4rEww@mail.gmail.com>
-From:   Like Xu <like.xu@linux.intel.com>
-Organization: Intel OTC
-Message-ID: <cf873f0b-8f80-29d4-fce6-9b0380934356@linux.intel.com>
-Date:   Fri, 13 Mar 2020 12:57:49 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+        id S1726395AbgCMGby (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 13 Mar 2020 02:31:54 -0400
+Received: from mail-io1-f67.google.com ([209.85.166.67]:36323 "EHLO
+        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726364AbgCMGby (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 13 Mar 2020 02:31:54 -0400
+Received: by mail-io1-f67.google.com with SMTP id d15so8261697iog.3;
+        Thu, 12 Mar 2020 23:31:53 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=gwo18I+qhDyK0f9CRK6fxLCdLThMsDTks/uef8gm4kY=;
+        b=arC548UFw58zPiZMTGpKSTA6C6cShe4/2dw/ERpegDkNqAfCg04TZN4DNuXAGiPlWr
+         wpIlPtGJ8GPVxD37ww0/w34k112uvnTr9PsHbgyAiKqDeKaTewKk4XNcZL3L1tLv/2Ty
+         zhQaCGOfFI4vhmKGlFgoFBweHPRg9V4g50Cg4rmKpBG1oULr/u58nB5rowQucqVdBFDC
+         taW9/oROrxRrnjSpEKQiok8fJOJ9zvNbuhGz9A+i/aAJOr4VSfxZSZb2aS4P5uMEe/F6
+         9Q/rIiQfE5+nL17Egz0+euMGpKMeuYP5t2KK/XV6aDHDZVyI+pT+jdTTsK+Bl2C+vh78
+         JTHA==
+X-Gm-Message-State: ANhLgQ0vLxbb7Qf1CtK3POF+QhCCMG9wEy8KvB0KkXthXDXKSdlgNBJf
+        kmxekXZfdla1cQouxOd53WTgJoMlPyH+Z8GESaAVT+cW
+X-Google-Smtp-Source: ADFU+vsYn7olWjR5ZdnVzmHpadFtCBryj55XjQULGF5Jf4ExDfr1NLEO1VzBnFywsf13xgwymPRjhRkizQCmf4VjPIo=
+X-Received: by 2002:a6b:8ec2:: with SMTP id q185mr10907291iod.180.1584081112766;
+ Thu, 12 Mar 2020 23:31:52 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CANRm+Cw-t2GXnHjOTPEV6BjwZPDZpwvK4QrUNz+AU21UL4rEww@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <1584069257-30896-1-git-send-email-lixing@loongson.cn> <1584069257-30896-3-git-send-email-lixing@loongson.cn>
+In-Reply-To: <1584069257-30896-3-git-send-email-lixing@loongson.cn>
+From:   Huacai Chen <chenhc@lemote.com>
+Date:   Fri, 13 Mar 2020 14:38:20 +0800
+Message-ID: <CAAhV-H6_eouq_i9RRntTVk2kwEDf62zSoy1Xz9rD30cVjKcRyg@mail.gmail.com>
+Subject: Re: [PATCH v2 Resend 3/3] KVM: MIPS: Support kvm modules autoprobed
+ when startup system
+To:     Xing Li <lixing@loongson.cn>
+Cc:     Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        "open list:MIPS" <linux-mips@vger.kernel.org>, kvm@vger.kernel.org,
+        LKML <linux-kernel@vger.kernel.org>, maobibo@loongson.cn,
+        Jiaxun Yang <jiaxun.yang@flygoat.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2020/3/13 11:39, Wanpeng Li wrote:
-> On Fri, 13 Mar 2020 at 11:23, Xu, Like <like.xu@intel.com> wrote:
->>
->> Hi Wanpeng,
->>
->> On 2020/3/12 19:05, Wanpeng Li wrote:
->>> On Thu, 12 Mar 2020 at 18:36, Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
->>>> Wanpeng Li <kernellwp@gmail.com> writes:
->>>>
->>>>> From: Wanpeng Li <wanpengli@tencent.com>
->>>>>
->>>>> PMU is not exposed to guest by most of cloud providers since the bad performance
->>>>> of PMU emulation and security concern. However, it calls perf_guest_switch_get_msrs()
->>>>> and clear_atomic_switch_msr() unconditionally even if PMU is not exposed to the
->>>>> guest before each vmentry.
->>>>>
->>>>> ~1.28% vmexit time reduced can be observed by kvm-unit-tests/vmexit.flat on my
->>>>> SKX server.
->>>>>
->>>>> Before patch:
->>>>> vmcall 1559
->>>>>
->>>>> After patch:
->>>>> vmcall 1539
->>>>>
->>>>> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
->>>>> ---
->>>>>    arch/x86/kvm/vmx/vmx.c | 3 +++
->>>>>    1 file changed, 3 insertions(+)
->>>>>
->>>>> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
->>>>> index 40b1e61..fd526c8 100644
->>>>> --- a/arch/x86/kvm/vmx/vmx.c
->>>>> +++ b/arch/x86/kvm/vmx/vmx.c
->>>>> @@ -6441,6 +6441,9 @@ static void atomic_switch_perf_msrs(struct vcpu_vmx *vmx)
->>>>>         int i, nr_msrs;
->>>>>         struct perf_guest_switch_msr *msrs;
->>>>>
->>>>> +     if (!vcpu_to_pmu(&vmx->vcpu)->version)
->>>>> +             return;
->>>>> +
->>>>>         msrs = perf_guest_get_msrs(&nr_msrs);
->>>>>
->>>>>         if (!msrs)
->>>> Personally, I'd prefer this to be expressed as
->>>>
->>>> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
->>>> index 40b1e6138cd5..ace92076c90f 100644
->>>> --- a/arch/x86/kvm/vmx/vmx.c
->>>> +++ b/arch/x86/kvm/vmx/vmx.c
->>>> @@ -6567,7 +6567,9 @@ static void vmx_vcpu_run(struct kvm_vcpu *vcpu)
->>>>
->>>>           pt_guest_enter(vmx);
->>>>
->>>> -       atomic_switch_perf_msrs(vmx);
->>>> +       if (vcpu_to_pmu(&vmx->vcpu)->version)
->> We may use 'vmx->vcpu.arch.pmu.version'.
-> 
-> Thanks for confirm this. Maybe this is better:
-> 
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 40b1e61..b20423c 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -6567,7 +6567,8 @@ static void vmx_vcpu_run(struct kvm_vcpu *vcpu)
-> 
->          pt_guest_enter(vmx);
-> 
-> -       atomic_switch_perf_msrs(vmx);
-> +       if (vcpu_to_pmu(vcpu)->version)
-> +               atomic_switch_perf_msrs(vmx);
+Hi, Lixing,
 
->          atomic_switch_umwait_control_msr(vmx);
-> 
->          if (enable_preemption_timer)
-> 
->>
->> I would vote in favor of adding the "unlikely (vmx->vcpu.arch.pmu.version)"
->> check to the atomic_switch_perf_msrs(), which follows pt_guest_enter(vmx).
-> 
-> This is hotpath, let's save the cost of function call.
+On Fri, Mar 13, 2020 at 11:14 AM Xing Li <lixing@loongson.cn> wrote:
+>
+> Currently, the module_init of kvm_mips_init cannot force the kvm
+> modules insmod when startup system.
+>
+> Add new feature CPU_MIPS_VZ in elf_hwcap to support KVM auto probe
+> when hardware virtualization supported.
+I think this patch is not suitable, because:
+1, KVM has VZ mode and TE mode, you only consider VZ mode?
+2, As X86 does, you can use udev or modprobe.conf to autoprobe kvm module.
 
-You're right, I measured both.
-We may fix pt_guest_enter() with static_branch_unlikely
-for a little bit more micro-optimize as well.
-
-Thanks,
-Like Xu
-
-> 
->      Wanpeng
-> 
->>
->>>> +               atomic_switch_perf_msrs(vmx);
->>>> +
->>> I just hope the beautiful codes before, I testing this version before
->>> sending out the patch, ~30 cycles can be saved which means that ~2%
->>> vmexit time, will update in next version. Let's wait Paolo for other
->>> opinions below.
->>
->> You may factor the cost of the "pmu-> version check' itself (~10 cycles)
->> into your overall 'micro-optimize' revenue.
->>
->> Thanks,
->> Like Xu
->>>
->>>       Wanpeng
->>>
->>>> Also, (not knowing much about PMU), is
->>>> "vcpu_to_pmu(&vmx->vcpu)->version" check correct?
->>>>
->>>> E.g. in intel_is_valid_msr() correct for Intel PMU or is it stated
->>>> somewhere that it is generic rule?
->>>>
->>>> Also, speaking about cloud providers and the 'micro' nature of this
->>>> optimization, would it rather make sense to introduce a static branch
->>>> (the policy to disable vPMU is likely to be host wide, right)?
->>>>
->>>> --
->>>> Vitaly
->>>>
->>
-
+Regards,
+Huacai
+>
+> Signed-off-by: Xing Li <lixing@loongson.cn>
+> ---
+>  arch/mips/include/uapi/asm/hwcap.h | 1 +
+>  arch/mips/kernel/cpu-probe.c       | 4 +++-
+>  arch/mips/kvm/mips.c               | 3 ++-
+>  3 files changed, 6 insertions(+), 2 deletions(-)
+>
+> diff --git a/arch/mips/include/uapi/asm/hwcap.h b/arch/mips/include/uapi/asm/hwcap.h
+> index 1ade1da..9e66509 100644
+> --- a/arch/mips/include/uapi/asm/hwcap.h
+> +++ b/arch/mips/include/uapi/asm/hwcap.h
+> @@ -17,5 +17,6 @@
+>  #define HWCAP_LOONGSON_MMI  (1 << 11)
+>  #define HWCAP_LOONGSON_EXT  (1 << 12)
+>  #define HWCAP_LOONGSON_EXT2 (1 << 13)
+> +#define HWCAP_MIPS_VZ       (1 << 14)
+>
+>  #endif /* _UAPI_ASM_HWCAP_H */
+> diff --git a/arch/mips/kernel/cpu-probe.c b/arch/mips/kernel/cpu-probe.c
+> index c543326..b305269 100644
+> --- a/arch/mips/kernel/cpu-probe.c
+> +++ b/arch/mips/kernel/cpu-probe.c
+> @@ -2242,8 +2242,10 @@ void cpu_probe(void)
+>         if (cpu_has_loongson_ext2)
+>                 elf_hwcap |= HWCAP_LOONGSON_EXT2;
+>
+> -       if (cpu_has_vz)
+> +       if (cpu_has_vz) {
+>                 cpu_probe_vz(c);
+> +               elf_hwcap |= HWCAP_MIPS_VZ;
+> +       }
+>
+>         cpu_probe_vmbits(c);
+>
+> diff --git a/arch/mips/kvm/mips.c b/arch/mips/kvm/mips.c
+> index 1109924..1da5df3 100644
+> --- a/arch/mips/kvm/mips.c
+> +++ b/arch/mips/kvm/mips.c
+> @@ -19,6 +19,7 @@
+>  #include <linux/sched/signal.h>
+>  #include <linux/fs.h>
+>  #include <linux/memblock.h>
+> +#include <linux/cpufeature.h>
+>
+>  #include <asm/fpu.h>
+>  #include <asm/page.h>
+> @@ -1742,7 +1743,7 @@ static void __exit kvm_mips_exit(void)
+>         unregister_die_notifier(&kvm_mips_csr_die_notifier);
+>  }
+>
+> -module_init(kvm_mips_init);
+> +module_cpu_feature_match(MIPS_VZ, kvm_mips_init);
+>  module_exit(kvm_mips_exit);
+>
+>  EXPORT_TRACEPOINT_SYMBOL(kvm_exit);
+> --
+> 2.1.0
+>
