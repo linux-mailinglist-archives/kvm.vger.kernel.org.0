@@ -2,173 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 627871859B1
-	for <lists+kvm@lfdr.de>; Sun, 15 Mar 2020 04:32:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 442A11859C7
+	for <lists+kvm@lfdr.de>; Sun, 15 Mar 2020 04:41:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727156AbgCODcj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 14 Mar 2020 23:32:39 -0400
-Received: from mail-ed1-f65.google.com ([209.85.208.65]:37761 "EHLO
-        mail-ed1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726643AbgCODci (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 14 Mar 2020 23:32:38 -0400
-Received: by mail-ed1-f65.google.com with SMTP id b23so17490661edx.4;
-        Sat, 14 Mar 2020 20:32:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=2k/FWhwnxSmRyvkYX/addpqZAvvD/zc/fmTTZk2KfTg=;
-        b=IiTYEo9sQU3SJruOebAutscq7dbKBvfhkn3R5mw7EDPR2Sqlrn3wTQMSALZ+Uaam7K
-         5iMgr7cPHPXworFSjRk69JMzFZUiutV7QVAY8bWp1ZY2yC/vtOBwqaLQ5X9Uul6fjp78
-         GEZuSjgAaLuc+99oNf8ZoBNN3u4VNy4mMl8I8ZVfFrksDtDuMpQ/9dlGvpbH1oCcgR58
-         WujcnofzwgXwyh/D1tS/W5Wd2nXCOUZ0Jsg9R6cUsmQ3guLGWQixhrvGRDg8XrwG37PW
-         QiBQUOVHYVRKYCABPxNJCkIeTLow2koe9AM2rXzHxCH9mTYHDXsRtFbiNYB0JmBUuIUU
-         SODg==
+        id S1727493AbgCODkv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 14 Mar 2020 23:40:51 -0400
+Received: from mail-qk1-f193.google.com ([209.85.222.193]:37486 "EHLO
+        mail-qk1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726653AbgCODkv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 14 Mar 2020 23:40:51 -0400
+Received: by mail-qk1-f193.google.com with SMTP id z25so15299879qkj.4;
+        Sat, 14 Mar 2020 20:40:50 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=2k/FWhwnxSmRyvkYX/addpqZAvvD/zc/fmTTZk2KfTg=;
-        b=h3G9EzAxBkFEtwNavT0fblr3hU4MLNaaxHlceJjmcJOLPXrSszOdP1DN5y7hKB64nJ
-         sfs9FVRpZAuf1OBdc3DOCybumDhG4C3eCWD/AwdiNJ9S1AfUzoYQbQFDGAIDfLIe0LPj
-         yfBJ0XyNuTBR4UYW2R5TPRpp64j1csTheGvTsBaYyV2wddNTy9f9CZAmnUTF2IOgq1BN
-         snvjkINk+vfiVGRGjOLvODf2ioyGQ2MCujb9+UT638dt8JZG8IxUQqPZdhQqOhtrob7Y
-         j2Fz1T1p0wx+JAoUbwDbS8Xmlho99YtwXaOH8t2l3gcfwwfoMY2w2DjIMI1wGAZex1Vq
-         J+Zw==
-X-Gm-Message-State: ANhLgQ0ot7WC4Nx8Xcmycfz+caCsFIQ8GSfqCrieB9GpRYSt0qOpI8d/
-        qr5UOD5jalFDwj9KRDxqC9sOk20a03U=
-X-Google-Smtp-Source: ADFU+vuKsq+WEtB5MHCLDZ2FmbzoJHHzISseL9CuIYL9j3TSemupcSx5bJsmtyAJiaBJkowVKDtXLQ==
-X-Received: by 2002:a5d:49d2:: with SMTP id t18mr20783550wrs.279.1584161094000;
-        Fri, 13 Mar 2020 21:44:54 -0700 (PDT)
-Received: from jondnuc (IGLD-84-229-155-229.inter.net.il. [84.229.155.229])
-        by smtp.gmail.com with ESMTPSA id q3sm18455477wmj.38.2020.03.13.21.44.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 13 Mar 2020 21:44:53 -0700 (PDT)
-Date:   Sat, 14 Mar 2020 06:44:51 +0200
-From:   Jon Doron <arilou@gmail.com>
-To:     Michael Kelley <mikelley@microsoft.com>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
-        vkuznets <vkuznets@redhat.com>
-Subject: Re: [PATCH v5 2/5] x86/hyper-v: Add synthetic debugger definitions
-Message-ID: <20200314044451.GA15879@jondnuc>
-References: <20200313132034.132315-1-arilou@gmail.com>
- <20200313132034.132315-3-arilou@gmail.com>
- <MW2PR2101MB10521050158699C7C96613F5D7FA0@MW2PR2101MB1052.namprd21.prod.outlook.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=xWfNlXspNXP/Z3scX2GkjvDWCTPuiHmONTso2D85LQ0=;
+        b=sGtaPxoOYlnTE5+b5zUoJ5Qn4z0EdmGqcfdkyzpvc+A+oNj2ctggTsHy7R5k5KZaSS
+         bJmMY5PSsrpz4laFSZ4Cvu1/UjYJvYiDHDndj8EmjUyw16JFuCWraRfLM2fLieGE1rw/
+         t4GXZD+7QD+JKa0naTB5pkynZPCLuLQGIggS7Itm3YqeYqhRene0PWAK7SwTR5eN9yQl
+         +vJlMoXeZ6j0Q6fHxZXu9BH5N9pQBpt0VboKIs4enjv3glrDqAwo24UUnZ50iNeQXMLS
+         LYpw3WcitaT3FUhFNW5aVWy/LP1RCkHJmHHxiXiFyS60KPOk0PPhc36PkRXhY7LOVeLY
+         VzFA==
+X-Gm-Message-State: ANhLgQ3XMB+dMlygbKdQ6riMKlTY/fWvpG4+Pa5qXNxz0mSZPa0BgrSc
+        UYxcEye81dVp7IqW0xfZETMUf2fnx688Aje0f6bitg==
+X-Google-Smtp-Source: ADFU+vt9NbYnSnppxGI7xOTmGfRR3RSs/QZOhkMGUVuMhiPSyyT3vdhguRYt/HjQ0hyrQs/pQ8sEHfBxb3po2QAZY0w=
+X-Received: by 2002:a9d:1d07:: with SMTP id m7mr6029839otm.167.1584182450168;
+ Sat, 14 Mar 2020 03:40:50 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <MW2PR2101MB10521050158699C7C96613F5D7FA0@MW2PR2101MB1052.namprd21.prod.outlook.com>
+References: <20200304113248.1143057-1-mail@maciej.szmigiero.name>
+ <20200312161751.GA5245@fuller.cnet> <CAJZ5v0jLOKj5LN5Kmredixomer4BKdBPNwP7gOf7A0tS_WMbDQ@mail.gmail.com>
+In-Reply-To: <CAJZ5v0jLOKj5LN5Kmredixomer4BKdBPNwP7gOf7A0tS_WMbDQ@mail.gmail.com>
+From:   "Rafael J. Wysocki" <rafael@kernel.org>
+Date:   Sat, 14 Mar 2020 11:40:38 +0100
+Message-ID: <CAJZ5v0gSLR+K2698rwbv0j9-sbSNX98HUFDQfTHoom+gYtHrdw@mail.gmail.com>
+Subject: Re: [PATCH v2] cpuidle-haltpoll: allow force loading on hosts without
+ the REALTIME hint
+To:     "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>,
+        Marcelo Tosatti <mtosatti@redhat.com>
+Cc:     "Rafael J. Wysocki" <rjw@rjwysocki.net>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        Joao Martins <joao.m.martins@oracle.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        kvm-devel <kvm@vger.kernel.org>,
+        Linux PM <linux-pm@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 13/03/2020, Michael Kelley wrote:
->From: Jon Doron <arilou@gmail.com> Sent: Friday, March 13, 2020 6:21 AM
->>
->> Hyper-V synthetic debugger has two modes, one that uses MSRs and
->> the other that use Hypercalls.
->>
->> Add all the required definitions to both types of synthetic debugger
->> interface.
->>
->> Some of the required new CPUIDs and MSRs are not documented in the TLFS
->> so they are in hyperv.h instead.
->>
->> Signed-off-by: Jon Doron <arilou@gmail.com>
->> ---
->>  arch/x86/include/asm/hyperv-tlfs.h |  6 ++++++
->>  arch/x86/kvm/hyperv.h              | 22 ++++++++++++++++++++++
->>  2 files changed, 28 insertions(+)
->>
->> diff --git a/arch/x86/include/asm/hyperv-tlfs.h b/arch/x86/include/asm/hyperv-tlfs.h
->> index 92abc1e42bfc..671ce2a39d4b 100644
->> --- a/arch/x86/include/asm/hyperv-tlfs.h
->> +++ b/arch/x86/include/asm/hyperv-tlfs.h
->> @@ -131,6 +131,8 @@
->>  #define HV_FEATURE_FREQUENCY_MSRS_AVAILABLE		BIT(8)
->>  /* Crash MSR available */
->>  #define HV_FEATURE_GUEST_CRASH_MSR_AVAILABLE		BIT(10)
->> +/* Support for debug MSRs available */
->> +#define HV_FEATURE_DEBUG_MSRS_AVAILABLE			BIT(11)
->>  /* stimer Direct Mode is available */
->>  #define HV_STIMER_DIRECT_MODE_AVAILABLE			BIT(19)
->>
->> @@ -376,6 +378,9 @@ struct hv_tsc_emulation_status {
->>  #define HVCALL_SEND_IPI_EX			0x0015
->>  #define HVCALL_POST_MESSAGE			0x005c
->>  #define HVCALL_SIGNAL_EVENT			0x005d
->> +#define HVCALL_POST_DEBUG_DATA			0x0069
->> +#define HVCALL_RETRIEVE_DEBUG_DATA		0x006a
->> +#define HVCALL_RESET_DEBUG_SESSION		0x006b
->>  #define HVCALL_FLUSH_GUEST_PHYSICAL_ADDRESS_SPACE 0x00af
->>  #define HVCALL_FLUSH_GUEST_PHYSICAL_ADDRESS_LIST 0x00b0
->>
->> @@ -419,6 +424,7 @@ enum HV_GENERIC_SET_FORMAT {
->>  #define HV_STATUS_INVALID_HYPERCALL_INPUT	3
->>  #define HV_STATUS_INVALID_ALIGNMENT		4
->>  #define HV_STATUS_INVALID_PARAMETER		5
->> +#define HV_STATUS_OPERATION_DENIED		8
->>  #define HV_STATUS_INSUFFICIENT_MEMORY		11
->>  #define HV_STATUS_INVALID_PORT_ID		17
->>  #define HV_STATUS_INVALID_CONNECTION_ID		18
->> diff --git a/arch/x86/kvm/hyperv.h b/arch/x86/kvm/hyperv.h
->> index 757cb578101c..56bc3416b62f 100644
->> --- a/arch/x86/kvm/hyperv.h
->> +++ b/arch/x86/kvm/hyperv.h
->> @@ -23,6 +23,28 @@
->>
->>  #include <linux/kvm_host.h>
->>
->> +/* These defines are required by KDNet and they are not part of Hyper-V TLFS */
+On Fri, Mar 13, 2020 at 6:49 PM Rafael J. Wysocki <rafael@kernel.org> wrote:
 >
->I'm looking for a bit more info in the comment so that it's clear that the
->synthetic debugger functionality is not committed to be available going
->forward. Perhaps something along the lines of:
+> On Thu, Mar 12, 2020 at 5:36 PM Marcelo Tosatti <mtosatti@redhat.com> wrote:
+> >
+> > On Wed, Mar 04, 2020 at 12:32:48PM +0100, Maciej S. Szmigiero wrote:
+> > > From: "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
+> > >
+> > > Before commit 1328edca4a14 ("cpuidle-haltpoll: Enable kvm guest polling
+> > > when dedicated physical CPUs are available") the cpuidle-haltpoll driver
+> > > could also be used in scenarios when the host does not advertise the
+> > > KVM_HINTS_REALTIME hint.
+> > >
+> > > While the behavior introduced by the aforementioned commit makes sense as
+> > > the default there are cases where the old behavior is desired, for example,
+> > > when other kernel changes triggered by presence by this hint are unwanted,
+> > > for some workloads where the latency benefit from polling overweights the
+> > > loss from idle CPU capacity that otherwise would be available, or just when
+> > > running under older Qemu versions that lack this hint.
+> > >
+> > > Let's provide a typical "force" module parameter that allows restoring the
+> > > old behavior.
+> > >
+> > > Signed-off-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
+> > > ---
+> > >  drivers/cpuidle/cpuidle-haltpoll.c | 12 ++++++++++--
+> > >  1 file changed, 10 insertions(+), 2 deletions(-)
+> > >
+> > > Changes from v1:
+> > > Make the module parameter description more general, don't unnecessarily
+> > > break a line in haltpoll_init().
+> > >
+> > > diff --git a/drivers/cpuidle/cpuidle-haltpoll.c b/drivers/cpuidle/cpuidle-haltpoll.c
+> > > index b0ce9bc78113..db124bc1ca2c 100644
+> > > --- a/drivers/cpuidle/cpuidle-haltpoll.c
+> > > +++ b/drivers/cpuidle/cpuidle-haltpoll.c
+> > > @@ -18,6 +18,10 @@
+> > >  #include <linux/kvm_para.h>
+> > >  #include <linux/cpuidle_haltpoll.h>
+> > >
+> > > +static bool force __read_mostly;
+> > > +module_param(force, bool, 0444);
+> > > +MODULE_PARM_DESC(force, "Load unconditionally");
+> > > +
+> > >  static struct cpuidle_device __percpu *haltpoll_cpuidle_devices;
+> > >  static enum cpuhp_state haltpoll_hp_state;
+> > >
+> > > @@ -90,6 +94,11 @@ static void haltpoll_uninit(void)
+> > >       haltpoll_cpuidle_devices = NULL;
+> > >  }
+> > >
+> > > +static bool haltpool_want(void)
+> > > +{
+> > > +     return kvm_para_has_hint(KVM_HINTS_REALTIME) || force;
+> > > +}
+> > > +
+> > >  static int __init haltpoll_init(void)
+> > >  {
+> > >       int ret;
+> > > @@ -101,8 +110,7 @@ static int __init haltpoll_init(void)
+> > >
+> > >       cpuidle_poll_state_init(drv);
+> > >
+> > > -     if (!kvm_para_available() ||
+> > > -             !kvm_para_has_hint(KVM_HINTS_REALTIME))
+> > > +     if (!kvm_para_available() || !haltpool_want())
+> > >               return -ENODEV;
+> > >
+> > >       ret = cpuidle_register_driver(drv);
+> >
+> > Signed-off-by: Marcelo Tosatti <mtosatti@redhat.com>
 >
->/* The #defines related to the synthetic debugger are required by KDNet, but
-> * they are not documented in the Hyper-V TLFS because the synthetic debugger
-> * functionality has been deprecated and is subject to removal in future versions
-> * of Windows.
-> */
->
->But with that additional comment text,
->
->Reviewed-by: Michael Kelley <mikelley@microsoft.com>
->
+> I'm taking this as a Reviewed-by, thanks!
 
-Sure thing, but one quick question I have noticed that in the 6.0 TLFS 
-the bit indicating the DEBUG_MSRS are available is still documented is 
-that intentional or a juss a miss?
-
-Cheers,
--- Jon.
-
->> +#define HYPERV_CPUID_SYNDBG_VENDOR_AND_MAX_FUNCTIONS	0x40000080
->> +#define HYPERV_CPUID_SYNDBG_INTERFACE			0x40000081
->> +#define HYPERV_CPUID_SYNDBG_PLATFORM_CAPABILITIES	0x40000082
->> +
->> +/*
->> + * Hyper-V synthetic debugger platform capabilities
->> + * These are HYPERV_CPUID_SYNDBG_PLATFORM_CAPABILITIES.EAX bits.
->> + */
->> +#define HV_X64_SYNDBG_CAP_ALLOW_KERNEL_DEBUGGING	BIT(1)
->> +
->> +/* Hyper-V Synthetic debug options MSR */
->> +#define HV_X64_MSR_SYNDBG_CONTROL		0x400000F1
->> +#define HV_X64_MSR_SYNDBG_STATUS		0x400000F2
->> +#define HV_X64_MSR_SYNDBG_SEND_BUFFER		0x400000F3
->> +#define HV_X64_MSR_SYNDBG_RECV_BUFFER		0x400000F4
->> +#define HV_X64_MSR_SYNDBG_PENDING_BUFFER	0x400000F5
->> +#define HV_X64_MSR_SYNDBG_OPTIONS		0x400000FF
->> +
->> +/* Hyper-V HV_X64_MSR_SYNDBG_OPTIONS bits */
->> +#define HV_X64_SYNDBG_OPTION_USE_HCALLS		BIT(2)
->> +
->>  static inline struct kvm_vcpu_hv *vcpu_to_hv_vcpu(struct kvm_vcpu *vcpu)
->>  {
->>  	return &vcpu->arch.hyperv;
->> --
->> 2.24.1
->
+Patch applied as 5.7 material, thanks!
