@@ -2,102 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 67CC5185935
-	for <lists+kvm@lfdr.de>; Sun, 15 Mar 2020 03:38:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DA719185952
+	for <lists+kvm@lfdr.de>; Sun, 15 Mar 2020 03:45:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727299AbgCOCiO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 14 Mar 2020 22:38:14 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:33701 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726873AbgCOCiO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 14 Mar 2020 22:38:14 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1584239893;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=8fXoDgGhJ92EE8IqO5VxMhR5fjvfyZ3SQGsS261Nmz8=;
-        b=TJF3VrH8W5O9wXWmzcrAotAZGozGj3tqSwhFnoW3opJpLcYsnzVKLkllWvpykrfCrF+bHi
-        V1FMO9wfOyX/ibAN4j+jKf7jHS4VxrL3SMpIVsvTGX0z5/h0qQYr7jhYHTt2DpsvytNNAw
-        A8BTVUiQKrBva1IymTVNZikSZ7gPwcE=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-378-byNpg8uKNhKCpsSw14MaJw-1; Sat, 14 Mar 2020 06:35:18 -0400
-X-MC-Unique: byNpg8uKNhKCpsSw14MaJw-1
-Received: by mail-wr1-f70.google.com with SMTP id z16so5734629wrm.15
-        for <kvm@vger.kernel.org>; Sat, 14 Mar 2020 03:35:18 -0700 (PDT)
+        id S1727417AbgCOCpc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 14 Mar 2020 22:45:32 -0400
+Received: from mail-io1-f68.google.com ([209.85.166.68]:42479 "EHLO
+        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726811AbgCOCpb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 14 Mar 2020 22:45:31 -0400
+Received: by mail-io1-f68.google.com with SMTP id q128so13690759iof.9
+        for <kvm@vger.kernel.org>; Sat, 14 Mar 2020 19:45:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:sender:from:date:message-id:subject:to;
+        bh=rySLrb6e8pdxDloLytBEUWmIP8HvBNLPxIuJLcg1j9c=;
+        b=h9YhYCfhuvcoOK9JuTSnuiXg2cILoy3ExIWXtsaJYq8huKBTSezqcgybwNUJnF31OD
+         8M4XkdAA+wF3Kc0hz30O/kK9eMooTs7yoqdIBJNfvWQnNRWRGMPcYzXrJl2zdeF1j7va
+         J8XdxMT0KmL8llAYJuvJtfAv+moo5flCUCJCh/tlglJ+fFmIUPVbZ1fac7bCjKhbkCn+
+         rZJerUAJLBThHl7kvNkOSCFj/J2Gim7L2OHs8nEEBbbGF0yG+oMEoxI1m7Q6XmwEaoXK
+         TKHu+SSgJteucaBn++J1ylejcFocesa/O0LZlk7VxDKA6TPZDYhdjLA4ADjt7vhRjRdb
+         KZMA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=8fXoDgGhJ92EE8IqO5VxMhR5fjvfyZ3SQGsS261Nmz8=;
-        b=lWrKbLwwKaZbrKQM5Wtw+YcPvJhXLkbTIBc3o+kaGNLw1jFy2y9uDp4UElLzSnsWcv
-         fav0bhetGOewkFQoV9ovzB+L2xGDi0dVp0eM/Z3d46B7d9EShw9pPFSQIUlUAosfZOw2
-         eIe693MXW85L/qd37cjJxYjCCSHW1oSFjmmp6fLUT64pV6zAO/1YbYvlRJWfenp+pzcX
-         FqXXTpAAi7+C5YN6qREm1xCcF5m43rEToHcJpkuLONP4QnT19bcfQmOCx0z7e+YaHuyO
-         XPtpvpLXdmbTMHVcLy4d7d/2+PeNz2MSQ9nDi4TjS+Gbaf8cnjjorglG408A/xQHJMJC
-         VNkw==
-X-Gm-Message-State: ANhLgQ2awDt32GDafQu/EG5VIzU4skge2EZciq9HoiyJqQkJI0DVsrYP
-        XOPhebyUxJX4iPKjSbc/O67w5Nb49S05/35Ns5kSwgWwTG9ZSB1wcU6PIGLu8Xy01oI1vF70bTT
-        I4R0nq8c4s48R
-X-Received: by 2002:adf:a419:: with SMTP id d25mr24724882wra.210.1584182117421;
-        Sat, 14 Mar 2020 03:35:17 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vuF30RHC7/9R+Xx3Ukae0RxoBE5Cf0TCe9XBmZJBY3UTJye/SvS0S3JlUOQEKxKlFFYDE9SNA==
-X-Received: by 2002:adf:a419:: with SMTP id d25mr24724861wra.210.1584182117170;
-        Sat, 14 Mar 2020 03:35:17 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:7de8:5d90:2370:d1ac? ([2001:b07:6468:f312:7de8:5d90:2370:d1ac])
-        by smtp.gmail.com with ESMTPSA id v8sm81163776wrw.2.2020.03.14.03.35.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 14 Mar 2020 03:35:16 -0700 (PDT)
-Subject: Re: [kvm-unit-tests PATCH 0/8] nVMX: Clean up __enter_guest() and co.
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     kvm@vger.kernel.org
-References: <20200312232745.884-1-sean.j.christopherson@intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <6d53a962-667e-2d8a-bdf7-32ca5ea42ad6@redhat.com>
-Date:   Sat, 14 Mar 2020 11:35:16 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+        h=x-gm-message-state:mime-version:sender:from:date:message-id:subject
+         :to;
+        bh=rySLrb6e8pdxDloLytBEUWmIP8HvBNLPxIuJLcg1j9c=;
+        b=rHuvJoFIeyAv3alxnC47nqZgc61s6Ut96H92F0JzjIhXfrwHepg6cx7U/81iCMxmd4
+         iMN0qSD/eq3W+C85Kk40297nrS4wxLk+YIdzJnzU16BvPU9jDRoR1HDZRfPoAESqjZw/
+         D1E/0jY5Jq6si5PZnPSNcFRgIdSL3bgn8csINRDB+P3ZYL37R+ihbyXqyT0eMm8M7tTK
+         /C17YQvJeldB1Ghq7jj8kDaDlW5/C0UUaXnyqe1hNRw18jI3DlxnHmTHMSqJKH6yzjJc
+         Qie5wljWMRrMViq6Fz+qQ8gcJwWUvLhbJYEl4UVsXcgcW5fqTcLMfUEaEgJ/mKImDlna
+         dx5g==
+X-Gm-Message-State: ANhLgQ3hZltsuby53NH4pD3BInvYzpu93vRGlZRNE0tti619BfFqesdB
+        9jSgsaIvoE4Va/zyE/jE4EtH6/nNBOr+ZbPAKEA64xuN
+X-Google-Smtp-Source: ADFU+vsJ8OZ/Dhr0DwwgkL8CDPySYZHLYuNtMBF50V178xoCgQ3+Wbsy6eqrOFGI1hDMkk7GA6AGM8FMlDHfqPtuVxs=
+X-Received: by 2002:a02:3f4c:: with SMTP id c12mr12249418jaf.115.1584206617074;
+ Sat, 14 Mar 2020 10:23:37 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200312232745.884-1-sean.j.christopherson@intel.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Received: by 2002:a02:63c1:0:0:0:0:0 with HTTP; Sat, 14 Mar 2020 10:23:36
+ -0700 (PDT)
+From:   Omar Ousman <omarousman25@gmail.com>
+Date:   Sat, 14 Mar 2020 18:23:36 +0100
+X-Google-Sender-Auth: e3Esaw6NMf2t59gU8aF8hbfxq5E
+Message-ID: <CAOdk3H=BWVFSbBHnPp89pkv5eyhE_YLWx_uztwjom2+untGdDQ@mail.gmail.com>
+Subject: You received my last mail,,,,
+To:     undisclosed-recipients:;
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 13/03/20 00:27, Sean Christopherson wrote:
-> Start chipping away at the crustiness in the nVMX tests by refactoring
-> "struct vmentry_failure" into "struct vmentry_result", with the full
-> VM-Exit stored in vmentry_result.  Capturing the exit reason allows for a
-> variety of cleanups and consolidations.
-> 
-> This series really only dives into the v1 tests.  I'd like to also clean
-> up the v2 tests, e.g. take the expected exit reason in enter_guest() so
-> that the expected behavior is more obvious, but that's a more invasive
-> cleanup for another day.
-> 
-> Sean Christopherson (8):
->   nVMX: Eliminate superfluous entry_failure_handler() wrapper
->   nVMX: Refactor VM-Entry "failure" struct into "result"
->   nVMX: Consolidate non-canonical code in test_canonical()
->   nVMX: Drop redundant check for guest termination
->   nVMX: Expose __enter_guest() and consolidate guest state test code
->   nVMX: Pass exit reason union to v1 exit handlers
->   nVMX: Pass exit reason union to is_hypercall()
->   nVMX: Pass exit reason enum to print_vmexit_info()
-> 
->  x86/vmx.c       | 191 +++++++++++--------------
->  x86/vmx.h       |  50 +++++--
->  x86/vmx_tests.c | 366 +++++++++++++++++++-----------------------------
->  3 files changed, 263 insertions(+), 344 deletions(-)
-> 
+I am Mr.Omar Ousman, a regional managing director (CORIS BANK
+INTERNATIONAL) Ouagadougou Burkina Faso, in my department we have
+US$9,500.0000 million united state dollars, to transfer into your
+account as a dormant fund.If you are interested to use this fund to
+help the orphans around the world contact and send me your personal
+information for more details to my email omarousman25@gmail.com
 
-Queued, thanks.
+Your full names..........
+Your country of origin..........
+Your occupation..........
+Your Age..........
+Your Mobile Number..........
 
-Paolo
-
+Best Regards,
