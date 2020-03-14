@@ -2,229 +2,272 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id ABB341856E3
-	for <lists+kvm@lfdr.de>; Sun, 15 Mar 2020 02:30:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7C2AA1857E5
+	for <lists+kvm@lfdr.de>; Sun, 15 Mar 2020 02:47:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727226AbgCOBa3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 14 Mar 2020 21:30:29 -0400
-Received: from mail-eopbgr700109.outbound.protection.outlook.com ([40.107.70.109]:3776
-        "EHLO NAM04-SN1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727206AbgCOBa2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 14 Mar 2020 21:30:28 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Eyh/rK7PqGfs1GTT04/xd7CFSGR+ZJ/BkoVZEd4feozNJzglKT6uzzFmfJRj2olemprZoOKIUOo/1t92WKvGsd0uKaUf/VuRQd5jVZ8sb4mCZtnM9xAFGhQz1Y3LB/2FKKpgX3KjK/SKOEDKOusAAxG/BT6xWPU3aUAMJNiSKvrYe0dFLwJZvQ9IkRzUxJxuRzJ4lg2OAL6gRtm5+cXEfq4H+V8D0KhRivTin277Vtiei2Zh1e1YfNoqr9mOjNPFNKUCax32T2zAE3xJyjJQol6lvMDMXBnyBQwR6UUE1qzoFNmWBU6hTr48FcB4GuE6fhqoiTR0G/LcZCVJM753GQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=kDNDhKNMMl/elMotPjXPxRshnKot+EpSDmiev/+jHog=;
- b=HOJZbX3907AqC9R1b62n49kZHJUwE87PEr/K+rHiumiC7WJafbhn8hqLx2RrbeS+FTxMDsYdO3a+Gt0G+bcPM87EldvJvYHbLgVUJ7CHooBnWOjgIyIpqdhW9x6X+moZvgybP9izOOf5eS8ZGS4cUR/McGKf0IzScNCNuefqIQU6CvAZ2paMe2crgtRu4NuKkALvJDfkA7Gy8yT91hdL6y2mL8NFhl105ozIpPVOvF7BfvNUXOFYKBZkuN0XcYX1ud9/4AsLQVnmhxNNAlO0vRn37/9rhfKEF3xK+x/JcozKuIVgvcGZjQda+lyf8HIYQ8tQoGUHcp2+ValmLpR1Bg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microsoft.com; dmarc=pass action=none
- header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=kDNDhKNMMl/elMotPjXPxRshnKot+EpSDmiev/+jHog=;
- b=J8ENPY1Rs+j+ZWIW99eJY9tydJ6GUYiq4o3TpgTOzrerv2Xuagpk9Kw8nMM/jHUEKRoKgP4QuM4N2U0qkRWM3D0qarNGh4DaPyQGfEcncQDT9LkIoe6Wg8PvOCfnUKvsvpLKH2bQqlAUSlumYm464oKqs48ymCaiFveQE+Blhko=
-Received: from MW2PR2101MB1052.namprd21.prod.outlook.com (2603:10b6:302:a::16)
- by MW2PR2101MB0987.namprd21.prod.outlook.com (2603:10b6:302:4::24) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2835.2; Sat, 14 Mar
- 2020 14:14:41 +0000
-Received: from MW2PR2101MB1052.namprd21.prod.outlook.com
- ([fe80::71ee:121:71bd:6156]) by MW2PR2101MB1052.namprd21.prod.outlook.com
- ([fe80::71ee:121:71bd:6156%9]) with mapi id 15.20.2835.003; Sat, 14 Mar 2020
- 14:14:41 +0000
-From:   Michael Kelley <mikelley@microsoft.com>
-To:     Jon Doron <arilou@gmail.com>
-CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
-        vkuznets <vkuznets@redhat.com>
-Subject: RE: [PATCH v5 2/5] x86/hyper-v: Add synthetic debugger definitions
-Thread-Topic: [PATCH v5 2/5] x86/hyper-v: Add synthetic debugger definitions
-Thread-Index: AQHV+To/OcoVcvMEKUyFhrb80x2BNahG+0vAgACI2ICAAJ2b0A==
-Date:   Sat, 14 Mar 2020 14:14:41 +0000
-Message-ID: <MW2PR2101MB105281002BEE02E23A43D517D7FB0@MW2PR2101MB1052.namprd21.prod.outlook.com>
-References: <20200313132034.132315-1-arilou@gmail.com>
- <20200313132034.132315-3-arilou@gmail.com>
- <MW2PR2101MB10521050158699C7C96613F5D7FA0@MW2PR2101MB1052.namprd21.prod.outlook.com>
- <20200314044451.GA15879@jondnuc>
-In-Reply-To: <20200314044451.GA15879@jondnuc>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-msip_labels: MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=True;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Owner=mikelley@ntdev.microsoft.com;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2020-03-14T14:14:39.3506328Z;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=General;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Application=Microsoft Azure
- Information Protection;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=cbf0e3a3-3ab2-42b4-b7d6-f4742b40c351;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Extended_MSFT_Method=Automatic
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=mikelley@microsoft.com; 
-x-originating-ip: [24.22.167.197]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: 99c06d0e-9967-43e0-fee2-08d7c82209b0
-x-ms-traffictypediagnostic: MW2PR2101MB0987:|MW2PR2101MB0987:
-x-ld-processed: 72f988bf-86f1-41af-91ab-2d7cd011db47,ExtAddr
-x-microsoft-antispam-prvs: <MW2PR2101MB098715E975D133394FE87B8CD7FB0@MW2PR2101MB0987.namprd21.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:7219;
-x-forefront-prvs: 034215E98F
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(4636009)(39860400002)(346002)(136003)(376002)(396003)(366004)(199004)(478600001)(10290500003)(66946007)(81166006)(55016002)(7696005)(76116006)(71200400001)(8990500004)(5660300002)(66556008)(66446008)(9686003)(8676002)(64756008)(33656002)(6916009)(8936002)(186003)(66476007)(81156014)(6506007)(4326008)(316002)(26005)(54906003)(52536014)(86362001)(2906002);DIR:OUT;SFP:1102;SCL:1;SRVR:MW2PR2101MB0987;H:MW2PR2101MB1052.namprd21.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;
-received-spf: None (protection.outlook.com: microsoft.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: ViMIIhg3MWmj2P8Lk4fxq0LoUlDOtJ5ce/X/pVJY9TfuCltUTGGTk3HZ15BPsCLtKSTp2+UiuAmqcMLGVR+51eqOkg/fiv//JJHrf86sfChpSI3+VLCGzmz8uc1OXpezGIuU8Q2/aJGiXK/AGP1osFiZAXcp4JPF5JIFIhZx9QYqjnZq7YXEryvvLkuTHs2BfoyuC2fkT3N674v92w0O53kYBy4yk/GdXQerLpkEWBVyjNpHTsk44BRdXBC1Nc3xR7kSvVTw4r5FB1r3KLgqmJxtfVEEzuV1d5p70rW+kkk5+WlradmUMDuJ7Si56cmxuMTbwcirz9t59m+XbOM8KFNklJCwWcsRLATLgJ1dCCAAv6g5baaRQUh3ihOcBB8Kqeh/A7P/vrKCY36hBzBPiu2R1a9l12qmBmXo8YnMy57w6GM9pB/ckGHqJg4aMDEb
-x-ms-exchange-antispam-messagedata: MMQiIax0Xd1Z5KelQB/BmUSvX3xhoEULSJbsaHy5ELODGh6V9HfeUBRLy+YfahzJ/5tYpf51g3SIl5WfP/aWVD9cmiXbBuRwYggz7IgLAYaUoYWGhe+hoOjSiiGjZchDpk+zWUJFnbCeM8WRvWUxOQ==
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        id S1727111AbgCOBrH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 14 Mar 2020 21:47:07 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:45498 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726643AbgCOBrG (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sat, 14 Mar 2020 21:47:06 -0400
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 02EFpNR0105089
+        for <kvm@vger.kernel.org>; Sat, 14 Mar 2020 11:58:29 -0400
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2yrude1sat-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Sat, 14 Mar 2020 11:58:29 -0400
+Received: from localhost
+        by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
+        Sat, 14 Mar 2020 15:58:27 -0000
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
+        by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Sat, 14 Mar 2020 15:58:23 -0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 02EFwMWn52559960
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Sat, 14 Mar 2020 15:58:22 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 142D7AE04D;
+        Sat, 14 Mar 2020 15:58:22 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 7B68FAE045;
+        Sat, 14 Mar 2020 15:58:21 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.145.6.32])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Sat, 14 Mar 2020 15:58:21 +0000 (GMT)
+Subject: Re: [GIT PULL 00/36] KVM: s390: Features and Enhancements for 5.7
+ part1
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     KVM <kvm@vger.kernel.org>,
+        Janosch Frank <frankja@linux.vnet.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Michael Mueller <mimu@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Ulrich Weigand <uweigand@de.ibm.com>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Heiko Carstens <heiko.carstens@de.ibm.com>
+References: <20200309085126.3334302-1-borntraeger@de.ibm.com>
+Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+ nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
+Date:   Sat, 14 Mar 2020 16:58:21 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-X-OriginatorOrg: microsoft.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 99c06d0e-9967-43e0-fee2-08d7c82209b0
-X-MS-Exchange-CrossTenant-originalarrivaltime: 14 Mar 2020 14:14:41.1693
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: uqJvnW02fUI2zqKVdLRd4F56aWd0jEkPJf1UybtscZtITmu3KM5zK4bP3GuY5Nod4/PMLl7sCEyyE2ZvZ5EtleDzTSZTkgnOfuJ1MMcDuCs=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW2PR2101MB0987
+In-Reply-To: <20200309085126.3334302-1-borntraeger@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 20031415-0008-0000-0000-0000035D2BA3
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20031415-0009-0000-0000-00004A7E7ABD
+Message-Id: <323ef53d-1aab-5971-72cf-0d385f844ea8@de.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
+ definitions=2020-03-14_05:2020-03-12,2020-03-14 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 mlxscore=0
+ clxscore=1015 impostorscore=0 spamscore=0 lowpriorityscore=0
+ suspectscore=0 malwarescore=0 bulkscore=0 phishscore=0 mlxlogscore=999
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2003140084
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Jon Doron <arilou@gmail.com>  Sent: Friday, March 13, 2020 9:45 PM
->=20
-> On 13/03/2020, Michael Kelley wrote:
-> >From: Jon Doron <arilou@gmail.com> Sent: Friday, March 13, 2020 6:21 AM
-> >>
-> >> Hyper-V synthetic debugger has two modes, one that uses MSRs and
-> >> the other that use Hypercalls.
-> >>
-> >> Add all the required definitions to both types of synthetic debugger
-> >> interface.
-> >>
-> >> Some of the required new CPUIDs and MSRs are not documented in the TLF=
-S
-> >> so they are in hyperv.h instead.
-> >>
-> >> Signed-off-by: Jon Doron <arilou@gmail.com>
-> >> ---
-> >>  arch/x86/include/asm/hyperv-tlfs.h |  6 ++++++
-> >>  arch/x86/kvm/hyperv.h              | 22 ++++++++++++++++++++++
-> >>  2 files changed, 28 insertions(+)
-> >>
-> >> diff --git a/arch/x86/include/asm/hyperv-tlfs.h b/arch/x86/include/asm=
-/hyperv-tlfs.h
-> >> index 92abc1e42bfc..671ce2a39d4b 100644
-> >> --- a/arch/x86/include/asm/hyperv-tlfs.h
-> >> +++ b/arch/x86/include/asm/hyperv-tlfs.h
-> >> @@ -131,6 +131,8 @@
-> >>  #define HV_FEATURE_FREQUENCY_MSRS_AVAILABLE		BIT(8)
-> >>  /* Crash MSR available */
-> >>  #define HV_FEATURE_GUEST_CRASH_MSR_AVAILABLE		BIT(10)
-> >> +/* Support for debug MSRs available */
-> >> +#define HV_FEATURE_DEBUG_MSRS_AVAILABLE			BIT(11)
-> >>  /* stimer Direct Mode is available */
-> >>  #define HV_STIMER_DIRECT_MODE_AVAILABLE			BIT(19)
-> >>
-> >> @@ -376,6 +378,9 @@ struct hv_tsc_emulation_status {
-> >>  #define HVCALL_SEND_IPI_EX			0x0015
-> >>  #define HVCALL_POST_MESSAGE			0x005c
-> >>  #define HVCALL_SIGNAL_EVENT			0x005d
-> >> +#define HVCALL_POST_DEBUG_DATA			0x0069
-> >> +#define HVCALL_RETRIEVE_DEBUG_DATA		0x006a
-> >> +#define HVCALL_RESET_DEBUG_SESSION		0x006b
-> >>  #define HVCALL_FLUSH_GUEST_PHYSICAL_ADDRESS_SPACE 0x00af
-> >>  #define HVCALL_FLUSH_GUEST_PHYSICAL_ADDRESS_LIST 0x00b0
-> >>
-> >> @@ -419,6 +424,7 @@ enum HV_GENERIC_SET_FORMAT {
-> >>  #define HV_STATUS_INVALID_HYPERCALL_INPUT	3
-> >>  #define HV_STATUS_INVALID_ALIGNMENT		4
-> >>  #define HV_STATUS_INVALID_PARAMETER		5
-> >> +#define HV_STATUS_OPERATION_DENIED		8
-> >>  #define HV_STATUS_INSUFFICIENT_MEMORY		11
-> >>  #define HV_STATUS_INVALID_PORT_ID		17
-> >>  #define HV_STATUS_INVALID_CONNECTION_ID		18
-> >> diff --git a/arch/x86/kvm/hyperv.h b/arch/x86/kvm/hyperv.h
-> >> index 757cb578101c..56bc3416b62f 100644
-> >> --- a/arch/x86/kvm/hyperv.h
-> >> +++ b/arch/x86/kvm/hyperv.h
-> >> @@ -23,6 +23,28 @@
-> >>
-> >>  #include <linux/kvm_host.h>
-> >>
-> >> +/* These defines are required by KDNet and they are not part of Hyper=
--V TLFS */
-> >
-> >I'm looking for a bit more info in the comment so that it's clear that t=
-he
-> >synthetic debugger functionality is not committed to be available going
-> >forward. Perhaps something along the lines of:
-> >
-> >/* The #defines related to the synthetic debugger are required by KDNet,=
- but
-> > * they are not documented in the Hyper-V TLFS because the synthetic deb=
-ugger
-> > * functionality has been deprecated and is subject to removal in future=
- versions
-> > * of Windows.
-> > */
-> >
-> >But with that additional comment text,
-> >
-> >Reviewed-by: Michael Kelley <mikelley@microsoft.com>
-> >
->=20
-> Sure thing, but one quick question I have noticed that in the 6.0 TLFS
-> the bit indicating the DEBUG_MSRS are available is still documented is
-> that intentional or a juss a miss?
+ping.
 
-From the side conversation I had with the Hyper-V people, I think
-this is just a miss.  They took out the MSR definitions, but forgot to
-take out the flag indicating the presence of the MSRs.  As I think I
-mentioned in an earlier email, there will be future updates to the
-TLFS, and I've put this topic on my list of things to make sure get
-cleaned up.
+On 09.03.20 09:50, Christian Borntraeger wrote:
+> Paolo,
+> 
+> an early pull request containing mostly the protected virtualization guest
+> support. Some remarks:
+> 
+> 1.To avoid conflicts I would rather add this early. We do have in KVM
+> common code:
+> - a new capability KVM_CAP_S390_PROTECTED = 180
+> - a new ioctl  KVM_S390_PV_COMMAND =  _IOWR(KVMIO, 0xc5, struct kvm_pv_cmd)
+> - data structures for KVM_S390_PV_COMMAND
+> - new MEMOP ioctl subfunctions
+> - new files under Documentation
+> - additions to api.rst 4.125 KVM_S390_PV_COMMAND
+> 
+> 2. There is an mm patch in Andrews mm tree which is needed for full
+> functionality. The patch is not necessary to build KVM or to run non
+> protected KVM though. So this can go independently.
+> 
+> 3. I created a topic branch for the non-kvm s390x parts that I merged
+> in. Vasily, Heiko or myself will pull that into the s390 tree if there
+> will be a conflict.
+> 
+> 
+> The following changes since commit 11a48a5a18c63fd7621bb050228cebf13566e4d8:
+> 
+>   Linux 5.6-rc2 (2020-02-16 13:16:59 -0800)
+> 
+> are available in the Git repository at:
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux.git  tags/kvm-s390-next-5.7-1
+> 
+> for you to fetch changes up to cc674ef252f4750bdcea1560ff491081bb960954:
+> 
+>   KVM: s390: introduce module parameter kvm.use_gisa (2020-02-27 19:47:13 +0100)
+> 
+> ----------------------------------------------------------------
+> KVM: s390: Features and Enhancements for 5.7 part1
+> 
+> 1. Allow to disable gisa
+> 2. protected virtual machines
+>   Protected VMs (PVM) are KVM VMs, where KVM can't access the VM's
+>   state like guest memory and guest registers anymore. Instead the
+>   PVMs are mostly managed by a new entity called Ultravisor (UV),
+>   which provides an API, so KVM and the PV can request management
+>   actions.
+> 
+>   PVMs are encrypted at rest and protected from hypervisor access
+>   while running.  They switch from a normal operation into protected
+>   mode, so we can still use the standard boot process to load a
+>   encrypted blob and then move it into protected mode.
+> 
+>   Rebooting is only possible by passing through the unprotected/normal
+>   mode and switching to protected again.
+> 
+>   One mm related patch will go via Andrews mm tree ( mm/gup/writeback:
+>   add callbacks for inaccessible pages)
+> 
+> ----------------------------------------------------------------
+> Christian Borntraeger (5):
+>       Merge branch 'pvbase' of git://git.kernel.org/.../kvms390/linux into HEAD
+>       KVM: s390/mm: Make pages accessible before destroying the guest
+>       KVM: s390: protvirt: Add SCLP interrupt handling
+>       KVM: s390: protvirt: do not inject interrupts after start
+>       KVM: s390: protvirt: introduce and enable KVM_CAP_S390_PROTECTED
+> 
+> Claudio Imbrenda (2):
+>       s390/mm: provide memory management functions for protected KVM guests
+>       KVM: s390/mm: handle guest unpin events
+> 
+> Janosch Frank (24):
+>       s390/protvirt: Add sysfs firmware interface for Ultravisor information
+>       KVM: s390: protvirt: Add UV debug trace
+>       KVM: s390: add new variants of UV CALL
+>       KVM: s390: protvirt: Add initial vm and cpu lifecycle handling
+>       KVM: s390: protvirt: Secure memory is not mergeable
+>       KVM: s390: protvirt: Handle SE notification interceptions
+>       KVM: s390: protvirt: Instruction emulation
+>       KVM: s390: protvirt: Handle spec exception loops
+>       KVM: s390: protvirt: Add new gprs location handling
+>       KVM: S390: protvirt: Introduce instruction data area bounce buffer
+>       KVM: s390: protvirt: handle secure guest prefix pages
+>       KVM: s390: protvirt: Write sthyi data to instruction data area
+>       KVM: s390: protvirt: STSI handling
+>       KVM: s390: protvirt: disallow one_reg
+>       KVM: s390: protvirt: Do only reset registers that are accessible
+>       KVM: s390: protvirt: Only sync fmt4 registers
+>       KVM: s390: protvirt: Add program exception injection
+>       KVM: s390: protvirt: UV calls in support of diag308 0, 1
+>       KVM: s390: protvirt: Report CPU state to Ultravisor
+>       KVM: s390: protvirt: Support cmd 5 operation state
+>       KVM: s390: protvirt: Mask PSW interrupt bits for interception 104 and 112
+>       KVM: s390: protvirt: Add UV cpu reset calls
+>       DOCUMENTATION: Protected virtual machine introduction and IPL
+>       KVM: s390: protvirt: Add KVM api documentation
+> 
+> Michael Mueller (2):
+>       KVM: s390: protvirt: Implement interrupt injection
+>       KVM: s390: introduce module parameter kvm.use_gisa
+> 
+> Ulrich Weigand (1):
+>       KVM: s390/interrupt: do not pin adapter interrupt pages
+> 
+> Vasily Gorbik (3):
+>       s390/protvirt: introduce host side setup
+>       s390/protvirt: add ultravisor initialization
+>       s390/mm: add (non)secure page access exceptions handlers
+> 
+>  Documentation/admin-guide/kernel-parameters.txt |   5 +
+>  Documentation/virt/kvm/api.rst                  |  65 ++-
+>  Documentation/virt/kvm/devices/s390_flic.rst    |  11 +-
+>  Documentation/virt/kvm/index.rst                |   2 +
+>  Documentation/virt/kvm/s390-pv-boot.rst         |  84 ++++
+>  Documentation/virt/kvm/s390-pv.rst              | 116 +++++
+>  MAINTAINERS                                     |   1 +
+>  arch/s390/boot/Makefile                         |   2 +-
+>  arch/s390/boot/uv.c                             |  20 +
+>  arch/s390/include/asm/gmap.h                    |   6 +
+>  arch/s390/include/asm/kvm_host.h                | 113 ++++-
+>  arch/s390/include/asm/mmu.h                     |   2 +
+>  arch/s390/include/asm/mmu_context.h             |   1 +
+>  arch/s390/include/asm/page.h                    |   5 +
+>  arch/s390/include/asm/pgtable.h                 |  35 +-
+>  arch/s390/include/asm/uv.h                      | 251 ++++++++++-
+>  arch/s390/kernel/Makefile                       |   1 +
+>  arch/s390/kernel/entry.h                        |   2 +
+>  arch/s390/kernel/pgm_check.S                    |   4 +-
+>  arch/s390/kernel/setup.c                        |   9 +-
+>  arch/s390/kernel/uv.c                           | 414 +++++++++++++++++
+>  arch/s390/kvm/Makefile                          |   2 +-
+>  arch/s390/kvm/diag.c                            |   6 +-
+>  arch/s390/kvm/intercept.c                       | 122 ++++-
+>  arch/s390/kvm/interrupt.c                       | 399 ++++++++++-------
+>  arch/s390/kvm/kvm-s390.c                        | 567 +++++++++++++++++++++---
+>  arch/s390/kvm/kvm-s390.h                        |  51 ++-
+>  arch/s390/kvm/priv.c                            |  13 +-
+>  arch/s390/kvm/pv.c                              | 303 +++++++++++++
+>  arch/s390/mm/fault.c                            |  78 ++++
+>  arch/s390/mm/gmap.c                             |  65 ++-
+>  include/uapi/linux/kvm.h                        |  43 +-
+>  32 files changed, 2488 insertions(+), 310 deletions(-)
+>  create mode 100644 Documentation/virt/kvm/s390-pv-boot.rst
+>  create mode 100644 Documentation/virt/kvm/s390-pv.rst
+>  create mode 100644 arch/s390/kernel/uv.c
+>  create mode 100644 arch/s390/kvm/pv.c
+> 
 
-Michael
-
->=20
-> Cheers,
-> -- Jon.
->=20
-> >> +#define HYPERV_CPUID_SYNDBG_VENDOR_AND_MAX_FUNCTIONS	0x40000080
-> >> +#define HYPERV_CPUID_SYNDBG_INTERFACE			0x40000081
-> >> +#define HYPERV_CPUID_SYNDBG_PLATFORM_CAPABILITIES	0x40000082
-> >> +
-> >> +/*
-> >> + * Hyper-V synthetic debugger platform capabilities
-> >> + * These are HYPERV_CPUID_SYNDBG_PLATFORM_CAPABILITIES.EAX bits.
-> >> + */
-> >> +#define HV_X64_SYNDBG_CAP_ALLOW_KERNEL_DEBUGGING	BIT(1)
-> >> +
-> >> +/* Hyper-V Synthetic debug options MSR */
-> >> +#define HV_X64_MSR_SYNDBG_CONTROL		0x400000F1
-> >> +#define HV_X64_MSR_SYNDBG_STATUS		0x400000F2
-> >> +#define HV_X64_MSR_SYNDBG_SEND_BUFFER		0x400000F3
-> >> +#define HV_X64_MSR_SYNDBG_RECV_BUFFER		0x400000F4
-> >> +#define HV_X64_MSR_SYNDBG_PENDING_BUFFER	0x400000F5
-> >> +#define HV_X64_MSR_SYNDBG_OPTIONS		0x400000FF
-> >> +
-> >> +/* Hyper-V HV_X64_MSR_SYNDBG_OPTIONS bits */
-> >> +#define HV_X64_SYNDBG_OPTION_USE_HCALLS		BIT(2)
-> >> +
-> >>  static inline struct kvm_vcpu_hv *vcpu_to_hv_vcpu(struct kvm_vcpu *vc=
-pu)
-> >>  {
-> >>  	return &vcpu->arch.hyperv;
-> >> --
-> >> 2.24.1
-> >
