@@ -2,28 +2,28 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3DAEE18589B
-	for <lists+kvm@lfdr.de>; Sun, 15 Mar 2020 03:14:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B45C3185898
+	for <lists+kvm@lfdr.de>; Sun, 15 Mar 2020 03:14:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727709AbgCOCNh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 14 Mar 2020 22:13:37 -0400
+        id S1727742AbgCOCNi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 14 Mar 2020 22:13:38 -0400
 Received: from mga14.intel.com ([192.55.52.115]:41895 "EHLO mga14.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726917AbgCOCNh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 14 Mar 2020 22:13:37 -0400
-IronPort-SDR: iY7P3VHkW2PCbv4CGRrqvwkdCRcE9GTewldOMgKhU4SbbAplqeIVPFovZ+KfF8SK74GYn4mKa6
- I6/UTHFubeUA==
+        id S1727574AbgCOCNi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 14 Mar 2020 22:13:38 -0400
+IronPort-SDR: O/d525jcUaqxMiDOAY5ir7Zg2qZJBWPKz2sXqbkhieS17Y5e+Y455nnbMBFvQDK8nzXrEV+/Th
+ w9yh+JhL0bVA==
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Mar 2020 00:51:47 -0700
-IronPort-SDR: lJkLpeeG5viF6B/T6Z8Q6WmK6S3b2+tI0KaCMSrNzN1isbFcG1cRGrE1eUdv9H4M+dsy3E0R+B
- 534vbjtJgJ3Q==
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Mar 2020 00:51:51 -0700
+IronPort-SDR: gsLoapCDm/VkIs7QUR8QRXIruDq/iLRJeTJMWr7AV+UhI/AJ8c4tU46gimiHbGp5eAkTEqYfPm
+ v5Vfsz8hconA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.70,551,1574150400"; 
-   d="scan'208";a="416537519"
+   d="scan'208";a="416537529"
 Received: from lxy-clx-4s.sh.intel.com ([10.239.43.160])
-  by orsmga005.jf.intel.com with ESMTP; 14 Mar 2020 00:51:43 -0700
+  by orsmga005.jf.intel.com with ESMTP; 14 Mar 2020 00:51:47 -0700
 From:   Xiaoyao Li <xiaoyao.li@intel.com>
 To:     Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
@@ -36,10 +36,12 @@ Cc:     peterz@infradead.org, fenghua.yu@intel.com,
         Jim Mattson <jmattson@google.com>, x86@kernel.org,
         kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         Xiaoyao Li <xiaoyao.li@intel.com>
-Subject: [PATCH v4 00/10] x86/split_lock: Add feature split lock detection support in kvm
-Date:   Sat, 14 Mar 2020 15:34:04 +0800
-Message-Id: <20200314073414.184213-1-xiaoyao.li@intel.com>
+Subject: [PATCH v4 01/10] x86/split_lock: Rework the initialization flow of split lock detection
+Date:   Sat, 14 Mar 2020 15:34:05 +0800
+Message-Id: <20200314073414.184213-2-xiaoyao.li@intel.com>
 X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200314073414.184213-1-xiaoyao.li@intel.com>
+References: <20200314073414.184213-1-xiaoyao.li@intel.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
@@ -47,63 +49,171 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This series aims to add the virtualization of split lock detection for
-guest, while containing some fixes of native kernel split lock handling. 
+Current initialization flow of split lock detection has following issues:
+1. It assumes the initial value of MSR_TEST_CTRL.SPLIT_LOCK_DETECT to be
+   zero. However, it's possible that BIOS/firmware has set it.
 
-Note, this series is based on the kernel patch[1].
+2. X86_FEATURE_SPLIT_LOCK_DETECT flag is unconditionally set even if
+   there is a virtualization flaw that FMS indicates the existence while
+   it's actually not supported.
 
-Patch 1 is new added one in this series, that is the enhancement and fix
-for kernel split lock detction. It ensure X86_FEATURE_SPLIT_LOCK_DETECT
-flag is set after verifying the feature is really supported.
-And it explicitly turn off split lock when sld_off instead of assuming
-BIOS/firmware leaves it cleared.
+Introducing a new sld_state, "sld_not_exist", which is set as the
+default value. Only when sld_state != sld_not_exist, it goes to
+initialization flow.
 
-Patch 2 optimizes the runtime MSR accessing.
+In initialization flow, it explicitly accesses MSR_TEST_CTRL and
+SPLIT_LOCK_DETECT bit to ensure there is no virtualization flaw.
+In detail,
+ 1. sld_off,   verify SPLIT_LOCK_DETECT bit can be cleared, and clear it;
+ 2. sld_warn,  verify SPLIT_LOCK_DETECT bit can be cleared and set,
+               and set it;
+ 3. sld_fatal, verify SPLIT_LOCK_DETECT bit can be set, and set it;
 
-Patch 3-5 are the preparation for enabling split lock detection
-virtualization in KVM.
+Only when no MSR aceessing failure, can X86_FEATURE_SPLIT_LOCK_DETECT be
+set. Also, this can avoid using safe version RDMSR/WRMSR at runtime.
 
-Patch 6-7 fixes the issue in kvm emulator and guest when host truns
-split lock detect on.
+Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+---
+ arch/x86/kernel/cpu/intel.c | 64 +++++++++++++++++++++++++------------
+ 1 file changed, 44 insertions(+), 20 deletions(-)
 
-Patch 8-10 implement the virtualization of split lock detection in kvm.
-
-[1]: https://lore.kernel.org/lkml/158031147976.396.8941798847364718785.tip-bot2@tip-bot2/ 
-
-v4:
- - Add patch 1 to rework the initialization flow of split lock
-   detection.
- - Drop percpu MSR_TEST_CTRL cache, just use a static variable to cache
-   the reserved/unused bit of MSR_TEST_CTRL. [Sean]
- - Add new option for split_lock_detect kernel param.
- - Changlog refinement. [Sean]
- - Add a new patch to enable MSR_TEST_CTRL for intel guest. [Sean]
-
-Xiaoyao Li (10):
-  x86/split_lock: Rework the initialization flow of split lock detection
-  x86/split_lock: Avoid runtime reads of the TEST_CTRL MSR
-  x86/split_lock: Re-define the kernel param option for
-    split_lock_detect
-  x86/split_lock: Export handle_user_split_lock()
-  x86/split_lock: Add and export several functions for KVM
-  kvm: x86: Emulate split-lock access as a write
-  kvm: vmx: Extend VMX's #AC interceptor to handle split lock #AC
-    happens in guest
-  kvm: x86: Emulate MSR IA32_CORE_CAPABILITIES
-  kvm: vmx: Enable MSR_TEST_CTRL for intel guest
-  x86: vmx: virtualize split lock detection
-
- .../admin-guide/kernel-parameters.txt         |   5 +-
- arch/x86/include/asm/cpu.h                    |  29 ++++-
- arch/x86/include/asm/kvm_host.h               |   1 +
- arch/x86/kernel/cpu/intel.c                   | 119 +++++++++++++-----
- arch/x86/kernel/traps.c                       |   2 +-
- arch/x86/kvm/cpuid.c                          |   7 +-
- arch/x86/kvm/vmx/vmx.c                        |  75 ++++++++++-
- arch/x86/kvm/vmx/vmx.h                        |   1 +
- arch/x86/kvm/x86.c                            |  42 ++++++-
- 9 files changed, 235 insertions(+), 46 deletions(-)
-
+diff --git a/arch/x86/kernel/cpu/intel.c b/arch/x86/kernel/cpu/intel.c
+index db3e745e5d47..064ba12defc8 100644
+--- a/arch/x86/kernel/cpu/intel.c
++++ b/arch/x86/kernel/cpu/intel.c
+@@ -34,17 +34,17 @@
+ #endif
+ 
+ enum split_lock_detect_state {
+-	sld_off = 0,
++	sld_not_exist = 0,
++	sld_off,
+ 	sld_warn,
+ 	sld_fatal,
+ };
+ 
+ /*
+- * Default to sld_off because most systems do not support split lock detection
+  * split_lock_setup() will switch this to sld_warn on systems that support
+  * split lock detect, unless there is a command line override.
+  */
+-static enum split_lock_detect_state sld_state = sld_off;
++static enum split_lock_detect_state sld_state = sld_not_exist;
+ 
+ /*
+  * Processors which have self-snooping capability can handle conflicting
+@@ -585,7 +585,7 @@ static void init_intel_misc_features(struct cpuinfo_x86 *c)
+ 	wrmsrl(MSR_MISC_FEATURES_ENABLES, msr);
+ }
+ 
+-static void split_lock_init(void);
++static void split_lock_init(struct cpuinfo_x86 *c);
+ 
+ static void init_intel(struct cpuinfo_x86 *c)
+ {
+@@ -702,7 +702,8 @@ static void init_intel(struct cpuinfo_x86 *c)
+ 	if (tsx_ctrl_state == TSX_CTRL_DISABLE)
+ 		tsx_disable();
+ 
+-	split_lock_init();
++	if (sld_state != sld_not_exist)
++		split_lock_init(c);
+ }
+ 
+ #ifdef CONFIG_X86_32
+@@ -989,7 +990,6 @@ static void __init split_lock_setup(void)
+ 	char arg[20];
+ 	int i, ret;
+ 
+-	setup_force_cpu_cap(X86_FEATURE_SPLIT_LOCK_DETECT);
+ 	sld_state = sld_warn;
+ 
+ 	ret = cmdline_find_option(boot_command_line, "split_lock_detect",
+@@ -1015,6 +1015,8 @@ static void __init split_lock_setup(void)
+ 	case sld_fatal:
+ 		pr_info("sending SIGBUS on user-space split_locks\n");
+ 		break;
++	default:
++		break;
+ 	}
+ }
+ 
+@@ -1022,39 +1024,61 @@ static void __init split_lock_setup(void)
+  * Locking is not required at the moment because only bit 29 of this
+  * MSR is implemented and locking would not prevent that the operation
+  * of one thread is immediately undone by the sibling thread.
+- * Use the "safe" versions of rdmsr/wrmsr here because although code
+- * checks CPUID and MSR bits to make sure the TEST_CTRL MSR should
+- * exist, there may be glitches in virtualization that leave a guest
+- * with an incorrect view of real h/w capabilities.
+  */
+-static bool __sld_msr_set(bool on)
++static void __sld_msr_set(bool on)
+ {
+ 	u64 test_ctrl_val;
+ 
+-	if (rdmsrl_safe(MSR_TEST_CTRL, &test_ctrl_val))
+-		return false;
++	rdmsrl(MSR_TEST_CTRL, test_ctrl_val);
+ 
+ 	if (on)
+ 		test_ctrl_val |= MSR_TEST_CTRL_SPLIT_LOCK_DETECT;
+ 	else
+ 		test_ctrl_val &= ~MSR_TEST_CTRL_SPLIT_LOCK_DETECT;
+ 
+-	return !wrmsrl_safe(MSR_TEST_CTRL, test_ctrl_val);
++	wrmsrl(MSR_TEST_CTRL, test_ctrl_val);
+ }
+ 
+-static void split_lock_init(void)
++/*
++ * Use the "safe" versions of rdmsr/wrmsr here because although code
++ * checks CPUID and MSR bits to make sure the TEST_CTRL MSR should
++ * exist, there may be glitches in virtualization that leave a guest
++ * with an incorrect view of real h/w capabilities.
++ * If not msr_broken, then it needn't use "safe" version at runtime.
++ */
++static void split_lock_init(struct cpuinfo_x86 *c)
+ {
+-	if (sld_state == sld_off)
+-		return;
++	u64 test_ctrl_val;
+ 
+-	if (__sld_msr_set(true))
+-		return;
++	if (rdmsrl_safe(MSR_TEST_CTRL, &test_ctrl_val))
++		goto msr_broken;
++
++	switch (sld_state) {
++	case sld_off:
++		if (wrmsrl_safe(MSR_TEST_CTRL, test_ctrl_val & ~MSR_TEST_CTRL_SPLIT_LOCK_DETECT))
++			goto msr_broken;
++		break;
++	case sld_warn:
++		if (wrmsrl_safe(MSR_TEST_CTRL, test_ctrl_val & ~MSR_TEST_CTRL_SPLIT_LOCK_DETECT))
++			goto msr_broken;
++		fallthrough;
++	case sld_fatal:
++		if (wrmsrl_safe(MSR_TEST_CTRL, test_ctrl_val | MSR_TEST_CTRL_SPLIT_LOCK_DETECT))
++			goto msr_broken;
++		break;
++	default:
++		break;
++	}
++
++	set_cpu_cap(c, X86_FEATURE_SPLIT_LOCK_DETECT);
++	return;
+ 
++msr_broken:
+ 	/*
+ 	 * If this is anything other than the boot-cpu, you've done
+ 	 * funny things and you get to keep whatever pieces.
+ 	 */
+-	pr_warn("MSR fail -- disabled\n");
++	pr_warn_once("MSR fail -- disabled\n");
+ 	sld_state = sld_off;
+ }
+ 
 -- 
 2.20.1
 
