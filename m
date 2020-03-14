@@ -2,128 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 442A11859C7
-	for <lists+kvm@lfdr.de>; Sun, 15 Mar 2020 04:41:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DD71E1859B4
+	for <lists+kvm@lfdr.de>; Sun, 15 Mar 2020 04:35:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727493AbgCODkv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 14 Mar 2020 23:40:51 -0400
-Received: from mail-qk1-f193.google.com ([209.85.222.193]:37486 "EHLO
-        mail-qk1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726653AbgCODkv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 14 Mar 2020 23:40:51 -0400
-Received: by mail-qk1-f193.google.com with SMTP id z25so15299879qkj.4;
-        Sat, 14 Mar 2020 20:40:50 -0700 (PDT)
+        id S1727317AbgCODfX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 14 Mar 2020 23:35:23 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:41058 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726643AbgCODfV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 14 Mar 2020 23:35:21 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1584243320;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=0LyD0PJgIGGLoQzoojfk9tWf5U8ULkM9R+XCQsoyJqs=;
+        b=RqqPZTQVjg390cDJb3QMUqUizuBobFPD2UFO9LMrPVFF+O9XBo5/DzKF5sP5hHK5uXZrPP
+        KX/ErysS+fmSAIFCCQG1Xn9NmKwdtk7kMJEQMyunWPlU6d7C7IHg2hUzTSdfmIjjEPmHTp
+        QhvUx45rgloTX9Z/IDH2BZCJwAjwTWk=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-145-pqxPpuewOM6HOKSrcMzCHw-1; Sat, 14 Mar 2020 07:31:31 -0400
+X-MC-Unique: pqxPpuewOM6HOKSrcMzCHw-1
+Received: by mail-wm1-f70.google.com with SMTP id p4so3944335wmp.0
+        for <kvm@vger.kernel.org>; Sat, 14 Mar 2020 04:31:30 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=xWfNlXspNXP/Z3scX2GkjvDWCTPuiHmONTso2D85LQ0=;
-        b=sGtaPxoOYlnTE5+b5zUoJ5Qn4z0EdmGqcfdkyzpvc+A+oNj2ctggTsHy7R5k5KZaSS
-         bJmMY5PSsrpz4laFSZ4Cvu1/UjYJvYiDHDndj8EmjUyw16JFuCWraRfLM2fLieGE1rw/
-         t4GXZD+7QD+JKa0naTB5pkynZPCLuLQGIggS7Itm3YqeYqhRene0PWAK7SwTR5eN9yQl
-         +vJlMoXeZ6j0Q6fHxZXu9BH5N9pQBpt0VboKIs4enjv3glrDqAwo24UUnZ50iNeQXMLS
-         LYpw3WcitaT3FUhFNW5aVWy/LP1RCkHJmHHxiXiFyS60KPOk0PPhc36PkRXhY7LOVeLY
-         VzFA==
-X-Gm-Message-State: ANhLgQ3XMB+dMlygbKdQ6riMKlTY/fWvpG4+Pa5qXNxz0mSZPa0BgrSc
-        UYxcEye81dVp7IqW0xfZETMUf2fnx688Aje0f6bitg==
-X-Google-Smtp-Source: ADFU+vt9NbYnSnppxGI7xOTmGfRR3RSs/QZOhkMGUVuMhiPSyyT3vdhguRYt/HjQ0hyrQs/pQ8sEHfBxb3po2QAZY0w=
-X-Received: by 2002:a9d:1d07:: with SMTP id m7mr6029839otm.167.1584182450168;
- Sat, 14 Mar 2020 03:40:50 -0700 (PDT)
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=0LyD0PJgIGGLoQzoojfk9tWf5U8ULkM9R+XCQsoyJqs=;
+        b=SD7/80wleqZIOByZzyX/Q/P+LQVVUOdbrMAfCGQzuDBaT40AyGHm81j6kKouvUG9t7
+         FAlw/PG+QzpTO+RWHMdk1zRZYi83bmA930+PQDFWgbUQFEAneXIaV+57IW6AmiaH7OUU
+         t4TOjeACm6Ru6qG37d2Hk7cOJCKi3fRcr4iI9rPLaPlsi1/s014eKIIqiEQjcWfFqtRT
+         bn1ZD+HMSzAl2A26kpwEu7u4Olo8Ep7P1OgLKzq/CNcaQuWWoLZx+TtVXHRJbg/af49d
+         5kC3O5rzdx4Euzl3ZJY+70l94SdVrXX0WxtnTh/nSleFZoBFX2jJU7vxFuWn7d6paLkB
+         DqiA==
+X-Gm-Message-State: ANhLgQ0/sy9GqD1FrtQ3ytS26cSWiVPtCULOlOeYr0b5R5GcB8bHq8UM
+        GzSTBwH5qYA/aH+LE89i68FogpfRHJg4G3TM6imCqDH0276CyTFh9BxcQYq1FB2FcjZOmeCVnpa
+        Mmm0lzKG2/y6d
+X-Received: by 2002:a1c:23d5:: with SMTP id j204mr16789902wmj.59.1584185490041;
+        Sat, 14 Mar 2020 04:31:30 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vs7P00MYsmC+SvAzqAncBQeg6TZFVmmUDSznYiD+XlMbi+A+TDwdXXwziZQe0yzu+wo3xeiRA==
+X-Received: by 2002:a1c:23d5:: with SMTP id j204mr16789874wmj.59.1584185489799;
+        Sat, 14 Mar 2020 04:31:29 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:7de8:5d90:2370:d1ac? ([2001:b07:6468:f312:7de8:5d90:2370:d1ac])
+        by smtp.gmail.com with ESMTPSA id y3sm47966512wrm.46.2020.03.14.04.31.28
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 14 Mar 2020 04:31:29 -0700 (PDT)
+Subject: Re: [PATCH] KVM: X86: avoid meaningless kvm_apicv_activated() check
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        linmiaohe <linmiaohe@huawei.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org,
+        rkrcmar@redhat.com, sean.j.christopherson@intel.com,
+        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com
+References: <1582597279-32297-1-git-send-email-linmiaohe@huawei.com>
+ <87d0a2n8g9.fsf@vitty.brq.redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <7c0aedea-36dc-bd84-b7ba-1aa6d1cceb11@redhat.com>
+Date:   Sat, 14 Mar 2020 12:31:28 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-References: <20200304113248.1143057-1-mail@maciej.szmigiero.name>
- <20200312161751.GA5245@fuller.cnet> <CAJZ5v0jLOKj5LN5Kmredixomer4BKdBPNwP7gOf7A0tS_WMbDQ@mail.gmail.com>
-In-Reply-To: <CAJZ5v0jLOKj5LN5Kmredixomer4BKdBPNwP7gOf7A0tS_WMbDQ@mail.gmail.com>
-From:   "Rafael J. Wysocki" <rafael@kernel.org>
-Date:   Sat, 14 Mar 2020 11:40:38 +0100
-Message-ID: <CAJZ5v0gSLR+K2698rwbv0j9-sbSNX98HUFDQfTHoom+gYtHrdw@mail.gmail.com>
-Subject: Re: [PATCH v2] cpuidle-haltpoll: allow force loading on hosts without
- the REALTIME hint
-To:     "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>,
-        Marcelo Tosatti <mtosatti@redhat.com>
-Cc:     "Rafael J. Wysocki" <rjw@rjwysocki.net>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
-        Joao Martins <joao.m.martins@oracle.com>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        kvm-devel <kvm@vger.kernel.org>,
-        Linux PM <linux-pm@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <87d0a2n8g9.fsf@vitty.brq.redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Mar 13, 2020 at 6:49 PM Rafael J. Wysocki <rafael@kernel.org> wrote:
->
-> On Thu, Mar 12, 2020 at 5:36 PM Marcelo Tosatti <mtosatti@redhat.com> wrote:
-> >
-> > On Wed, Mar 04, 2020 at 12:32:48PM +0100, Maciej S. Szmigiero wrote:
-> > > From: "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
-> > >
-> > > Before commit 1328edca4a14 ("cpuidle-haltpoll: Enable kvm guest polling
-> > > when dedicated physical CPUs are available") the cpuidle-haltpoll driver
-> > > could also be used in scenarios when the host does not advertise the
-> > > KVM_HINTS_REALTIME hint.
-> > >
-> > > While the behavior introduced by the aforementioned commit makes sense as
-> > > the default there are cases where the old behavior is desired, for example,
-> > > when other kernel changes triggered by presence by this hint are unwanted,
-> > > for some workloads where the latency benefit from polling overweights the
-> > > loss from idle CPU capacity that otherwise would be available, or just when
-> > > running under older Qemu versions that lack this hint.
-> > >
-> > > Let's provide a typical "force" module parameter that allows restoring the
-> > > old behavior.
-> > >
-> > > Signed-off-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
-> > > ---
-> > >  drivers/cpuidle/cpuidle-haltpoll.c | 12 ++++++++++--
-> > >  1 file changed, 10 insertions(+), 2 deletions(-)
-> > >
-> > > Changes from v1:
-> > > Make the module parameter description more general, don't unnecessarily
-> > > break a line in haltpoll_init().
-> > >
-> > > diff --git a/drivers/cpuidle/cpuidle-haltpoll.c b/drivers/cpuidle/cpuidle-haltpoll.c
-> > > index b0ce9bc78113..db124bc1ca2c 100644
-> > > --- a/drivers/cpuidle/cpuidle-haltpoll.c
-> > > +++ b/drivers/cpuidle/cpuidle-haltpoll.c
-> > > @@ -18,6 +18,10 @@
-> > >  #include <linux/kvm_para.h>
-> > >  #include <linux/cpuidle_haltpoll.h>
-> > >
-> > > +static bool force __read_mostly;
-> > > +module_param(force, bool, 0444);
-> > > +MODULE_PARM_DESC(force, "Load unconditionally");
-> > > +
-> > >  static struct cpuidle_device __percpu *haltpoll_cpuidle_devices;
-> > >  static enum cpuhp_state haltpoll_hp_state;
-> > >
-> > > @@ -90,6 +94,11 @@ static void haltpoll_uninit(void)
-> > >       haltpoll_cpuidle_devices = NULL;
-> > >  }
-> > >
-> > > +static bool haltpool_want(void)
-> > > +{
-> > > +     return kvm_para_has_hint(KVM_HINTS_REALTIME) || force;
-> > > +}
-> > > +
-> > >  static int __init haltpoll_init(void)
-> > >  {
-> > >       int ret;
-> > > @@ -101,8 +110,7 @@ static int __init haltpoll_init(void)
-> > >
-> > >       cpuidle_poll_state_init(drv);
-> > >
-> > > -     if (!kvm_para_available() ||
-> > > -             !kvm_para_has_hint(KVM_HINTS_REALTIME))
-> > > +     if (!kvm_para_available() || !haltpool_want())
-> > >               return -ENODEV;
-> > >
-> > >       ret = cpuidle_register_driver(drv);
-> >
-> > Signed-off-by: Marcelo Tosatti <mtosatti@redhat.com>
->
-> I'm taking this as a Reviewed-by, thanks!
+On 25/02/20 13:43, Vitaly Kuznetsov wrote:
+> If I'm not mistaken, the logic this function was supposed to implement
+> is: change the requested bit to the requested state and, if
+> kvm_apicv_activated() changed (we set the first bit or cleared the
+> last), proceed with KVM_REQ_APICV_UPDATE. What if we re-write it like
+> 
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 2103101eca78..b97b8ff4a789 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -8027,19 +8027,19 @@ EXPORT_SYMBOL_GPL(kvm_vcpu_update_apicv);
+>   */
+>  void kvm_request_apicv_update(struct kvm *kvm, bool activate, ulong bit)
+>  {
+> +       bool apicv_was_activated = kvm_apicv_activated(kvm);
+> +
+>         if (!kvm_x86_ops->check_apicv_inhibit_reasons ||
+>             !kvm_x86_ops->check_apicv_inhibit_reasons(bit))
+>                 return;
+>  
+> -       if (activate) {
+> -               if (!test_and_clear_bit(bit, &kvm->arch.apicv_inhibit_reasons) ||
+> -                   !kvm_apicv_activated(kvm))
+> -                       return;
+> -       } else {
+> -               if (test_and_set_bit(bit, &kvm->arch.apicv_inhibit_reasons) ||
+> -                   kvm_apicv_activated(kvm))
+> -                       return;
+> -       }
+> +       if (activate)
+> +               clear_bit(bit, &kvm->arch.apicv_inhibit_reasons);
+> +       else
+> +               set_bit(bit, &kvm->arch.apicv_inhibit_reasons);
+> +
+> +       if (kvm_apicv_activated(kvm) == apicv_was_activated)
+> +               return;
 
-Patch applied as 5.7 material, thanks!
+Yes, I got to the same conclusion before seeing you message.  Another
+possibility is to use cmpxchg, which I slightly prefer because if there
+are multiple concurrent updates it has some possibilities of avoiding
+the atomic operation and consequent cacheline bouncing.  I've sent a patch.
+
+Paolo
+
