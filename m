@@ -2,196 +2,151 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1BF7B1851A8
-	for <lists+kvm@lfdr.de>; Fri, 13 Mar 2020 23:30:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6BC81185753
+	for <lists+kvm@lfdr.de>; Sun, 15 Mar 2020 02:36:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727565AbgCMWaJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 13 Mar 2020 18:30:09 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:27161 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726534AbgCMWaJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 13 Mar 2020 18:30:09 -0400
+        id S1727273AbgCOBgY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 14 Mar 2020 21:36:24 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:24556 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727237AbgCOBgX (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sat, 14 Mar 2020 21:36:23 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1584138607;
+        s=mimecast20190719; t=1584236182;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=bJRqmbszSA1oTVb3wgjwQJD7tdcXqWuFXrwdcjYeYK0=;
-        b=TxRKfk2BChSDvXQx89glPN8S9Wf/OnZ6y+gBCVeMYjNRIGsYKuvbYch3OA1zXW68OQfNVL
-        /R5zNofG9Df3BtJ/r+p0yZi6fP4B0mY1E6ggWJFQQ80SiDC8Q9RQbShb57CYh8JC3OOfS+
-        cJcZmaST1J/+JcyOtywfAFkh6s9XQIA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-164-teosRALzMJGa4azdSSx5Aw-1; Fri, 13 Mar 2020 18:30:04 -0400
-X-MC-Unique: teosRALzMJGa4azdSSx5Aw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 83B7D1060DB1;
-        Fri, 13 Mar 2020 22:30:02 +0000 (UTC)
-Received: from x1.home (ovpn-116-28.phx2.redhat.com [10.3.116.28])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id CCB5094940;
-        Fri, 13 Mar 2020 22:29:58 +0000 (UTC)
-Date:   Fri, 13 Mar 2020 16:29:58 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Yan Zhao <yan.y.zhao@intel.com>
-Cc:     intel-gvt-dev@lists.freedesktop.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, zhenyuw@linux.intel.com,
-        pbonzini@redhat.com, kevin.tian@intel.com, peterx@redhat.com,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        "Neo Jia (cjia@nvidia.com)" <cjia@nvidia.com>
-Subject: Re: [PATCH v4 0/7] use vfio_dma_rw to read/write IOVAs from CPU
- side
-Message-ID: <20200313162958.5bfb5b82@x1.home>
-In-Reply-To: <20200313030548.7705-1-yan.y.zhao@intel.com>
-References: <20200313030548.7705-1-yan.y.zhao@intel.com>
-Organization: Red Hat
+        bh=6C3WExn7s+xj+iSv2VKzXJvMQvMfExOgXpF/HdM+nvg=;
+        b=UnBFkpLruBDqtzOk9yN5HLWGvOe2LJLLV+/bEnO+Af5yZQPRdV714EoOK3Auz+4knNykZb
+        S0RAnXlaPrRNQtxt0SI2roEWo+H+hUtNEfA+QbIWJIUVFXHU4ud86qHJz6GBoGO4mniVSK
+        EUWEpStFYNheQjC2R0/PL3a9Bs7iKTk=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-201-QsPolEt5Mc68xqaoi-Wx4A-1; Sat, 14 Mar 2020 05:32:31 -0400
+X-MC-Unique: QsPolEt5Mc68xqaoi-Wx4A-1
+Received: by mail-wr1-f69.google.com with SMTP id t4so2738996wrv.9
+        for <kvm@vger.kernel.org>; Sat, 14 Mar 2020 02:32:30 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=6C3WExn7s+xj+iSv2VKzXJvMQvMfExOgXpF/HdM+nvg=;
+        b=cP4givvV8CEc2vTu1ZgPwDh/cJdwz27aytmFRi4qooPTUxhXjVAkzruQOen0xjhMP9
+         hi9dSKmx95TTYwFcw1SxhwWDLA6yMPbyBkLJk4FnYnPvvIwXGq0AXQ1eQzYbN9Oy0agK
+         U8uK8xeLrzpUDEn/AF0pqmb7LVlOIvgAa0H2+J0J1E6g/LEg+DKInjy13jdzxWoG0Lcu
+         cyHbz9n01QTDgLjYHnGuqqtbF5b9A6bFY6yu7VrWtwfxh7Hm3eu6H1ORqhEghuwagvsW
+         yBftPe1+bPpgOLSJUAizYL5yUtxjaVSO7kcOjrajKVV3aFea8C+pbH9BYbmYfvPnDFqo
+         MWQw==
+X-Gm-Message-State: ANhLgQ3cw8uJwYEatD7z9NnOqpq4OAnpB/JeLnrjNg/p+78yeV5TeZxO
+        TCERqfHHWrfYn27pKTq86Ihia2f7YXAVXqXosiPX/3D8g7fGSyYBNuMLQ809YGC3ZWiGP6OfWJ4
+        gGguJYx3zXVCk
+X-Received: by 2002:adf:d4d1:: with SMTP id w17mr23696441wrk.206.1584178349763;
+        Sat, 14 Mar 2020 02:32:29 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vsPmKZzpKZ83gTWVwn+FLz5ACaVlHI/Tl1KtX0Nw1x+AfeobYV5T7TZwv62Nyh+1yh2nTWf5A==
+X-Received: by 2002:adf:d4d1:: with SMTP id w17mr23696423wrk.206.1584178349535;
+        Sat, 14 Mar 2020 02:32:29 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:7de8:5d90:2370:d1ac? ([2001:b07:6468:f312:7de8:5d90:2370:d1ac])
+        by smtp.gmail.com with ESMTPSA id a199sm11539997wme.29.2020.03.14.02.32.28
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 14 Mar 2020 02:32:29 -0700 (PDT)
+Subject: Re: [PATCH] KVM: VMX: Condition ENCLS-exiting enabling on CPU support
+ for SGX1
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Toni Spets <toni.spets@iki.fi>
+References: <20200312180416.6679-1-sean.j.christopherson@intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <62c80927-b174-398b-b340-c66560811172@redhat.com>
+Date:   Sat, 14 Mar 2020 10:32:28 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20200312180416.6679-1-sean.j.christopherson@intel.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-[Cc +NVIDIA]
+On 12/03/20 19:04, Sean Christopherson wrote:
+> Enable ENCLS-exiting (and thus set vmcs.ENCLS_EXITING_BITMAP) only if
+> the CPU supports SGX1.  Per Intel's SDM, all ENCLS leafs #UD if SGX1
+> is not supported[*], i.e. intercepting ENCLS to inject a #UD is
+> unnecessary.
+> 
+> Avoiding ENCLS-exiting even when it is reported as supported by the CPU
+> works around a reported issue where SGX is "hard" disabled after an S3
+> suspend/resume cycle, i.e. CPUID.0x7.SGX=0 and the VMCS field/control
+> are enumerated as unsupported.  While the root cause of the S3 issue is
+> unknown, it's definitely _not_ a KVM (or kernel) bug, i.e. this is a
+> workaround for what is most likely a hardware or firmware issue.  As a
+> bonus side effect, KVM saves a VMWRITE when first preparing vmcs01 and
+> vmcs02.
+> 
+> Query CPUID directly instead of going through cpu_data() or cpu_has() to
+> ensure KVM is trapping ENCLS when it's supported in hardware, e.g. even
+> if X86_FEATURE_SGX1 (which doesn't yet exist in upstream) were disabled
+> by the kernel/user.
+> 
+> Note, SGX must be disabled in BIOS to take advantage of this workaround
+> 
+> [*] The additional ENCLS CPUID check on SGX1 exists so that SGX can be
+>     globally "soft" disabled post-reset, e.g. if #MC bits in MCi_CTL are
+>     cleared.  Soft disabled meaning disabling SGX without clearing the
+>     primary CPUID bit (in leaf 0x7) and without poking into non-SGX
+>     CPU paths, e.g. for the VMCS controls.
+> 
+> Fixes: 0b665d304028 ("KVM: vmx: Inject #UD for SGX ENCLS instruction in guest")
+> Reported-by: Toni Spets <toni.spets@iki.fi>
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> ---
+> 
+> This seems somewhat premature given that we don't yet know if the observed
+> behavior is a logic bug, a one off manufacturing defect, firmware specific,
+> etc...  On the other hand, the change is arguably an optimization
+> irrespective of using it as a workaround.
+> 
+>  arch/x86/kvm/vmx/vmx.c | 10 ++++++++--
+>  1 file changed, 8 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 40b1e6138cd5..50cab98382e7 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -2338,6 +2338,11 @@ static void hardware_disable(void)
+>  	kvm_cpu_vmxoff();
+>  }
+>  
+> +static bool cpu_has_sgx(void)
+> +{
+> +	return cpuid_eax(0) >= 0x12 && (cpuid_eax(0x12) & BIT(0));
+> +}
+> +
+>  static __init int adjust_vmx_controls(u32 ctl_min, u32 ctl_opt,
+>  				      u32 msr, u32 *result)
+>  {
+> @@ -2418,8 +2423,9 @@ static __init int setup_vmcs_config(struct vmcs_config *vmcs_conf,
+>  			SECONDARY_EXEC_ENABLE_USR_WAIT_PAUSE |
+>  			SECONDARY_EXEC_PT_USE_GPA |
+>  			SECONDARY_EXEC_PT_CONCEAL_VMX |
+> -			SECONDARY_EXEC_ENABLE_VMFUNC |
+> -			SECONDARY_EXEC_ENCLS_EXITING;
+> +			SECONDARY_EXEC_ENABLE_VMFUNC;
+> +		if (cpu_has_sgx())
+> +			opt2 |= SECONDARY_EXEC_ENCLS_EXITING;
+>  		if (adjust_vmx_controls(min2, opt2,
+>  					MSR_IA32_VMX_PROCBASED_CTLS2,
+>  					&_cpu_based_2nd_exec_control) < 0)
+> 
 
-On Thu, 12 Mar 2020 23:05:48 -0400
-Yan Zhao <yan.y.zhao@intel.com> wrote:
+Queued, thanks.
 
-> It is better for a device model to use IOVAs to read/write memory to
-> perform some sort of virtual DMA on behalf of the device.
-> 
-> patch 1 exports VFIO group to external user so that it can hold the group
-> reference until finishing using of it. It saves ~500 cycles that are spent
-> on VFIO group looking up, referencing and dereferencing. (this data is
-> measured with 1 VFIO user).
-> 
-> patch 2 introduces interface vfio_dma_rw().
-> 
-> patch 3 introduces interfaces vfio_group_pin_pages() and
-> vfio_group_unpin_pages() to get rid of VFIO group looking-up in
-> vfio_pin_pages() and vfio_unpin_pages().
-> 
-> patch 4-5 let kvmgt switch from calling kvm_read/write_guest() to calling
-> vfio_dma_rw to rw IOVAs.
-> 
-> patch 6 let kvmgt switch to use lighter version of vfio_pin/unpin_pages(),
-> i.e. vfio_group_pin/unpin_pages()
-> 
-> patch 7 enables kvmgt to read/write IOVAs of size larger than PAGE_SIZE.
-
-This looks pretty good to me, hopefully Kirti and Neo can find some
-advantage with this series as well.  Given that we're also trying to
-get the migration interface and dirty page tracking integrated for
-v5.7, would it make sense to merge the first 3 patches via my next
-branch?  This is probably the easiest way to update the dirty tracking.
-Thanks,
-
-Alex
-
-> Performance:
-> 
-> Comparison between vfio_dma_rw() and kvm_read/write_guest():
-> 
-> 1. avergage CPU cycles of each interface measured with 1 running VM:
->  --------------------------------------------------
-> |  rw       |          avg cycles of               |
-> |  size     | (vfio_dma_rw - kvm_read/write_guest) |
-> |---------- ---------------------------------------|
-> | <= 1 page |            +155 ~ +195               |        
-> |--------------------------------------------------|
-> | 5 pages   |                -530                  |
-> |--------------------------------------------------|
-> | 20 pages  |           -2005 ~ -2533              |
->  --------------------------------------------------
-> 
-> 2. average scores
-> 
-> base: base code before applying code in this series. use
-> kvm_read/write_pages() to rw IOVAs
-> 
-> base + this series: use vfio_dma_rw() to read IOVAs and use
-> vfio_group_pin/unpin_pages(), and kvmgt is able to rw several pages
-> at a time.
-> 
-> Scores of benchmarks running in 1 VM each:
->  -----------------------------------------------------------------
-> |                    | glmark2 | lightsmark | openarena | heavens |
-> |-----------------------------------------------------------------|
-> |       base         |  1248   |  219.70    |  114.9    |   560   |
-> |-----------------------------------------------------------------|
-> |base + this series  |  1248   |  225.8     |   115     |   559   |
->  -----------------------------------------------------------------
-> 
-> Sum of scores of two benchmark instances running in 2 VMs each:
->  -------------------------------------------------------
-> |                    | glmark2 | lightsmark | openarena |
-> |-------------------------------------------------------|
-> |       base         |  812    |  211.46    |  115.3    |
-> |-------------------------------------------------------|
-> |base + this series  |  814    |  214.69    |  115.9    |
->  -------------------------------------------------------
-> 
-> 
-> Changelogs:
-> v3 --> v4:
-> - rebased to 5.6.0-rc4+
-> - adjust wrap position for vfio_group_get_external_user_from_dev() in
->   header file.(Alex)
-> - updated function description of vfio_group_get_external_user_from_dev()
->   (Alex)
-> - fixed Error path group reference leaking in
->   vfio_group_get_external_user_from_dev()  (Alex)
-> - reurn 0 for success or errno in vfio_dma_rw_chunk(). (Alex)
-> - renamed iova to user_iova in interface vfio_dam_rw().
-> - renamed vfio_pin_pages_from_group() and vfio_unpin_pages_from_group() to
->   vfio_group_pin_pages() and vfio_group_unpin_pages()
-> - renamed user_pfn to user_iova_pfn in vfio_group_pin_pages() and
->   vfio_group_unpin_pages()
-> 
-> v2 --> v3:
-> - add vfio_group_get_external_user_from_dev() to improve performance (Alex)
-> - add vfio_pin/unpin_pages_from_group() to avoid repeated looking up of
->   VFIO group in vfio_pin/unpin_pages() (Alex)
-> - add a check for IOMMU_READ permission. (Alex)
-> - rename vfio_iommu_type1_rw_dma_nopin() to
->   vfio_iommu_type1_dma_rw_chunk(). (Alex)
-> - in kvmgt, change "write ? vfio_dma_rw(...,true) :
->   vfio_dma_rw(...,false)" to vfio_dma_rw(dev, gpa, buf, len, write)
->   (Alex and Paolo)
-> - in kvmgt, instead of read/write context pages 1:1, combining the
->   reads/writes of continuous IOVAs to take advantage of vfio_dma_rw() for
->   faster crossing page boundary accesses.
-> 
-> v1 --> v2:
-> - rename vfio_iova_rw to vfio_dma_rw, vfio iommu driver ops .iova_rw
-> to .dma_rw. (Alex).
-> - change iova and len from unsigned long to dma_addr_t and size_t,
-> respectively. (Alex)
-> - fix possible overflow in dma->vaddr + iova - dma->iova + offset (Alex)
-> - split DMAs from on page boundary to on max available size to eliminate
->   redundant searching of vfio_dma and switching mm. (Alex)
-> - add a check for IOMMU_WRITE permission.
-> 
-> 
-> Yan Zhao (7):
->   vfio: allow external user to get vfio group from device
->   vfio: introduce vfio_dma_rw to read/write a range of IOVAs
->   vfio: avoid inefficient operations on VFIO group in
->     vfio_pin/unpin_pages
->   drm/i915/gvt: hold reference of VFIO group during opening of vgpu
->   drm/i915/gvt: subsitute kvm_read/write_guest with vfio_dma_rw
->   drm/i915/gvt: switch to user vfio_group_pin/upin_pages
->   drm/i915/gvt: rw more pages a time for shadow context
-> 
->  drivers/gpu/drm/i915/gvt/kvmgt.c     |  46 ++++---
->  drivers/gpu/drm/i915/gvt/scheduler.c |  97 ++++++++++-----
->  drivers/vfio/vfio.c                  | 180 +++++++++++++++++++++++++++
->  drivers/vfio/vfio_iommu_type1.c      |  76 +++++++++++
->  include/linux/vfio.h                 |  13 ++
->  5 files changed, 360 insertions(+), 52 deletions(-)
-> 
+Paolo
 
