@@ -2,241 +2,197 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 028A2185ED7
-	for <lists+kvm@lfdr.de>; Sun, 15 Mar 2020 19:15:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3CCC71860AD
+	for <lists+kvm@lfdr.de>; Mon, 16 Mar 2020 01:06:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729049AbgCOSPi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 15 Mar 2020 14:15:38 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:48570 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1729001AbgCOSPi (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sun, 15 Mar 2020 14:15:38 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1584296136;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Vq2kWuZasR+WQA2BBEH7AqgF0yh9m5uiRfdUPcimgXE=;
-        b=HOIybUCwDrAjMtS7PnjlNQ3KT/jMngdX/5+9IPDWAPqaPBxF0p56PHs4QKcMyC3XlOXn9s
-        VkL6GRe8nmepI5v3UDajYyozFbQU7zC1swJFsxIb/F7fXNxjt6ZhlVTy1asppcM73qa6MX
-        t/MBGL/6srONAnrlv/nSYI1o+/ysgJM=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-317-ScdWgNMSM1uRVcEin-Yhnw-1; Sun, 15 Mar 2020 14:15:32 -0400
-X-MC-Unique: ScdWgNMSM1uRVcEin-Yhnw-1
-Received: by mail-wr1-f69.google.com with SMTP id p5so7645092wrj.17
-        for <kvm@vger.kernel.org>; Sun, 15 Mar 2020 11:15:32 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=Vq2kWuZasR+WQA2BBEH7AqgF0yh9m5uiRfdUPcimgXE=;
-        b=PlHu5w5L5c3qlZyVGSPCaLfBeD4OcD77sZmur06oUh38SNO9Q+G+tHtVvYxEBTw45B
-         mr6rRoRGeZltnDuJfjSy8hbuvsTG8P/sbUeDUs3BBKemeGAnTSUsMC1KUOcVoGcH5zvv
-         a5T0Nz3tOMexv9jn2IATyny+85jFDOQLBb2OcdMMwjKzHfWXPAvtZdfaRvSPkSNCF22S
-         0H5gZ3iPGqCh1Kf392l+KM5CpU8rzr98tqisFUK+nl4OWE1PBHhG+cCSrdXJajOunw+p
-         Yw1FwV3nyxIqxcKzSoRUKUwui5Tdb832lVTvyD3dPQAwXGRy/zm0hBvxANmS1aGCgIFw
-         Jhmw==
-X-Gm-Message-State: ANhLgQ2nuFUTpAKwCqRZnoJ4EhQVpW3veWWzl/s7U3OyqTlGjJdyS95k
-        PLIPB0IMo9mhHeio0KkkxE42xYKDA+CHoshSTaALQmfgcqmhrfJcc6wrGIcaX92E8Ff9ZKxikvI
-        A9dYZMcNCYweV
-X-Received: by 2002:a1c:de41:: with SMTP id v62mr10738137wmg.60.1584296131565;
-        Sun, 15 Mar 2020 11:15:31 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vvT06PDxKWaXMSuE3KdMdBv7/zkifq93xHvHk+dUXmFvcoVAfWXWq4N8G0L67fPwXRWOoftig==
-X-Received: by 2002:a1c:de41:: with SMTP id v62mr10738115wmg.60.1584296131210;
-        Sun, 15 Mar 2020 11:15:31 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:40d4:87da:1ffc:e462? ([2001:b07:6468:f312:40d4:87da:1ffc:e462])
-        by smtp.gmail.com with ESMTPSA id w19sm25568848wmc.22.2020.03.15.11.15.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 15 Mar 2020 11:15:30 -0700 (PDT)
-Subject: Re: [GIT PULL 00/36] KVM: s390: Features and Enhancements for 5.7
- part1
-To:     Christian Borntraeger <borntraeger@de.ibm.com>
-Cc:     KVM <kvm@vger.kernel.org>,
-        Janosch Frank <frankja@linux.vnet.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Michael Mueller <mimu@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Ulrich Weigand <uweigand@de.ibm.com>,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        Heiko Carstens <heiko.carstens@de.ibm.com>
-References: <20200309085126.3334302-1-borntraeger@de.ibm.com>
- <323ef53d-1aab-5971-72cf-0d385f844ea8@de.ibm.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <d05efc66-603b-39dd-97e5-65aa91722c47@redhat.com>
-Date:   Sun, 15 Mar 2020 19:15:31 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+        id S1729204AbgCPAGG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 15 Mar 2020 20:06:06 -0400
+Received: from mga09.intel.com ([134.134.136.24]:49834 "EHLO mga09.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729065AbgCPAGG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 15 Mar 2020 20:06:06 -0400
+IronPort-SDR: bItU5+bpVuQLYsEPRLswc7/pJvuCimljUVFMsVs3ahCzsFi58JEbJaSfCxCPdQLKUwW5ZpK2pS
+ +vps9hVRAx3Q==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Mar 2020 17:06:05 -0700
+IronPort-SDR: K011tSRQz9rFpJchs1l25EtCl6RLu7klBLFQCrFnLlMtL32vbRkwWon/pUs4Jmh8bxMm1ykU7h
+ MqPyTcJd/2/Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,558,1574150400"; 
+   d="scan'208";a="443119513"
+Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040) ([10.239.13.16])
+  by fmsmga005.fm.intel.com with ESMTP; 15 Mar 2020 17:06:02 -0700
+Date:   Sun, 15 Mar 2020 19:56:33 -0400
+From:   Yan Zhao <yan.y.zhao@intel.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        "Neo Jia (cjia@nvidia.com)" <cjia@nvidia.com>
+Subject: Re: [PATCH v4 0/7] use vfio_dma_rw to read/write IOVAs from CPU side
+Message-ID: <20200315235633.GB4641@joy-OptiPlex-7040>
+Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+References: <20200313030548.7705-1-yan.y.zhao@intel.com>
+ <20200313162958.5bfb5b82@x1.home>
 MIME-Version: 1.0
-In-Reply-To: <323ef53d-1aab-5971-72cf-0d385f844ea8@de.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200313162958.5bfb5b82@x1.home>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 14/03/20 16:58, Christian Borntraeger wrote:
-> ping.
-
-Sorry, I wanted to get kvm/queue sorted out first.  I have now run my
-battery of x86 tests and will pull it tomorrow (QEMU soft freeze is also
-incoming but I should make it).
-
-Thanks,
-
-Paolo
-
-> On 09.03.20 09:50, Christian Borntraeger wrote:
->> Paolo,
->>
->> an early pull request containing mostly the protected virtualization guest
->> support. Some remarks:
->>
->> 1.To avoid conflicts I would rather add this early. We do have in KVM
->> common code:
->> - a new capability KVM_CAP_S390_PROTECTED = 180
->> - a new ioctl  KVM_S390_PV_COMMAND =  _IOWR(KVMIO, 0xc5, struct kvm_pv_cmd)
->> - data structures for KVM_S390_PV_COMMAND
->> - new MEMOP ioctl subfunctions
->> - new files under Documentation
->> - additions to api.rst 4.125 KVM_S390_PV_COMMAND
->>
->> 2. There is an mm patch in Andrews mm tree which is needed for full
->> functionality. The patch is not necessary to build KVM or to run non
->> protected KVM though. So this can go independently.
->>
->> 3. I created a topic branch for the non-kvm s390x parts that I merged
->> in. Vasily, Heiko or myself will pull that into the s390 tree if there
->> will be a conflict.
->>
->>
->> The following changes since commit 11a48a5a18c63fd7621bb050228cebf13566e4d8:
->>
->>   Linux 5.6-rc2 (2020-02-16 13:16:59 -0800)
->>
->> are available in the Git repository at:
->>
->>   git://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux.git  tags/kvm-s390-next-5.7-1
->>
->> for you to fetch changes up to cc674ef252f4750bdcea1560ff491081bb960954:
->>
->>   KVM: s390: introduce module parameter kvm.use_gisa (2020-02-27 19:47:13 +0100)
->>
->> ----------------------------------------------------------------
->> KVM: s390: Features and Enhancements for 5.7 part1
->>
->> 1. Allow to disable gisa
->> 2. protected virtual machines
->>   Protected VMs (PVM) are KVM VMs, where KVM can't access the VM's
->>   state like guest memory and guest registers anymore. Instead the
->>   PVMs are mostly managed by a new entity called Ultravisor (UV),
->>   which provides an API, so KVM and the PV can request management
->>   actions.
->>
->>   PVMs are encrypted at rest and protected from hypervisor access
->>   while running.  They switch from a normal operation into protected
->>   mode, so we can still use the standard boot process to load a
->>   encrypted blob and then move it into protected mode.
->>
->>   Rebooting is only possible by passing through the unprotected/normal
->>   mode and switching to protected again.
->>
->>   One mm related patch will go via Andrews mm tree ( mm/gup/writeback:
->>   add callbacks for inaccessible pages)
->>
->> ----------------------------------------------------------------
->> Christian Borntraeger (5):
->>       Merge branch 'pvbase' of git://git.kernel.org/.../kvms390/linux into HEAD
->>       KVM: s390/mm: Make pages accessible before destroying the guest
->>       KVM: s390: protvirt: Add SCLP interrupt handling
->>       KVM: s390: protvirt: do not inject interrupts after start
->>       KVM: s390: protvirt: introduce and enable KVM_CAP_S390_PROTECTED
->>
->> Claudio Imbrenda (2):
->>       s390/mm: provide memory management functions for protected KVM guests
->>       KVM: s390/mm: handle guest unpin events
->>
->> Janosch Frank (24):
->>       s390/protvirt: Add sysfs firmware interface for Ultravisor information
->>       KVM: s390: protvirt: Add UV debug trace
->>       KVM: s390: add new variants of UV CALL
->>       KVM: s390: protvirt: Add initial vm and cpu lifecycle handling
->>       KVM: s390: protvirt: Secure memory is not mergeable
->>       KVM: s390: protvirt: Handle SE notification interceptions
->>       KVM: s390: protvirt: Instruction emulation
->>       KVM: s390: protvirt: Handle spec exception loops
->>       KVM: s390: protvirt: Add new gprs location handling
->>       KVM: S390: protvirt: Introduce instruction data area bounce buffer
->>       KVM: s390: protvirt: handle secure guest prefix pages
->>       KVM: s390: protvirt: Write sthyi data to instruction data area
->>       KVM: s390: protvirt: STSI handling
->>       KVM: s390: protvirt: disallow one_reg
->>       KVM: s390: protvirt: Do only reset registers that are accessible
->>       KVM: s390: protvirt: Only sync fmt4 registers
->>       KVM: s390: protvirt: Add program exception injection
->>       KVM: s390: protvirt: UV calls in support of diag308 0, 1
->>       KVM: s390: protvirt: Report CPU state to Ultravisor
->>       KVM: s390: protvirt: Support cmd 5 operation state
->>       KVM: s390: protvirt: Mask PSW interrupt bits for interception 104 and 112
->>       KVM: s390: protvirt: Add UV cpu reset calls
->>       DOCUMENTATION: Protected virtual machine introduction and IPL
->>       KVM: s390: protvirt: Add KVM api documentation
->>
->> Michael Mueller (2):
->>       KVM: s390: protvirt: Implement interrupt injection
->>       KVM: s390: introduce module parameter kvm.use_gisa
->>
->> Ulrich Weigand (1):
->>       KVM: s390/interrupt: do not pin adapter interrupt pages
->>
->> Vasily Gorbik (3):
->>       s390/protvirt: introduce host side setup
->>       s390/protvirt: add ultravisor initialization
->>       s390/mm: add (non)secure page access exceptions handlers
->>
->>  Documentation/admin-guide/kernel-parameters.txt |   5 +
->>  Documentation/virt/kvm/api.rst                  |  65 ++-
->>  Documentation/virt/kvm/devices/s390_flic.rst    |  11 +-
->>  Documentation/virt/kvm/index.rst                |   2 +
->>  Documentation/virt/kvm/s390-pv-boot.rst         |  84 ++++
->>  Documentation/virt/kvm/s390-pv.rst              | 116 +++++
->>  MAINTAINERS                                     |   1 +
->>  arch/s390/boot/Makefile                         |   2 +-
->>  arch/s390/boot/uv.c                             |  20 +
->>  arch/s390/include/asm/gmap.h                    |   6 +
->>  arch/s390/include/asm/kvm_host.h                | 113 ++++-
->>  arch/s390/include/asm/mmu.h                     |   2 +
->>  arch/s390/include/asm/mmu_context.h             |   1 +
->>  arch/s390/include/asm/page.h                    |   5 +
->>  arch/s390/include/asm/pgtable.h                 |  35 +-
->>  arch/s390/include/asm/uv.h                      | 251 ++++++++++-
->>  arch/s390/kernel/Makefile                       |   1 +
->>  arch/s390/kernel/entry.h                        |   2 +
->>  arch/s390/kernel/pgm_check.S                    |   4 +-
->>  arch/s390/kernel/setup.c                        |   9 +-
->>  arch/s390/kernel/uv.c                           | 414 +++++++++++++++++
->>  arch/s390/kvm/Makefile                          |   2 +-
->>  arch/s390/kvm/diag.c                            |   6 +-
->>  arch/s390/kvm/intercept.c                       | 122 ++++-
->>  arch/s390/kvm/interrupt.c                       | 399 ++++++++++-------
->>  arch/s390/kvm/kvm-s390.c                        | 567 +++++++++++++++++++++---
->>  arch/s390/kvm/kvm-s390.h                        |  51 ++-
->>  arch/s390/kvm/priv.c                            |  13 +-
->>  arch/s390/kvm/pv.c                              | 303 +++++++++++++
->>  arch/s390/mm/fault.c                            |  78 ++++
->>  arch/s390/mm/gmap.c                             |  65 ++-
->>  include/uapi/linux/kvm.h                        |  43 +-
->>  32 files changed, 2488 insertions(+), 310 deletions(-)
->>  create mode 100644 Documentation/virt/kvm/s390-pv-boot.rst
->>  create mode 100644 Documentation/virt/kvm/s390-pv.rst
->>  create mode 100644 arch/s390/kernel/uv.c
->>  create mode 100644 arch/s390/kvm/pv.c
->>
+On Sat, Mar 14, 2020 at 06:29:58AM +0800, Alex Williamson wrote:
+> [Cc +NVIDIA]
 > 
+> On Thu, 12 Mar 2020 23:05:48 -0400
+> Yan Zhao <yan.y.zhao@intel.com> wrote:
+> 
+> > It is better for a device model to use IOVAs to read/write memory to
+> > perform some sort of virtual DMA on behalf of the device.
+> > 
+> > patch 1 exports VFIO group to external user so that it can hold the group
+> > reference until finishing using of it. It saves ~500 cycles that are spent
+> > on VFIO group looking up, referencing and dereferencing. (this data is
+> > measured with 1 VFIO user).
+> > 
+> > patch 2 introduces interface vfio_dma_rw().
+> > 
+> > patch 3 introduces interfaces vfio_group_pin_pages() and
+> > vfio_group_unpin_pages() to get rid of VFIO group looking-up in
+> > vfio_pin_pages() and vfio_unpin_pages().
+> > 
+> > patch 4-5 let kvmgt switch from calling kvm_read/write_guest() to calling
+> > vfio_dma_rw to rw IOVAs.
+> > 
+> > patch 6 let kvmgt switch to use lighter version of vfio_pin/unpin_pages(),
+> > i.e. vfio_group_pin/unpin_pages()
+> > 
+> > patch 7 enables kvmgt to read/write IOVAs of size larger than PAGE_SIZE.
+> 
+> This looks pretty good to me, hopefully Kirti and Neo can find some
+> advantage with this series as well.  Given that we're also trying to
+> get the migration interface and dirty page tracking integrated for
+> v5.7, would it make sense to merge the first 3 patches via my next
+> branch?  This is probably the easiest way to update the dirty tracking.
+> Thanks,
+> 
+sure. glad to hear that :)
 
+Thanks
+Yan
+
+> 
+> > Performance:
+> > 
+> > Comparison between vfio_dma_rw() and kvm_read/write_guest():
+> > 
+> > 1. avergage CPU cycles of each interface measured with 1 running VM:
+> >  --------------------------------------------------
+> > |  rw       |          avg cycles of               |
+> > |  size     | (vfio_dma_rw - kvm_read/write_guest) |
+> > |---------- ---------------------------------------|
+> > | <= 1 page |            +155 ~ +195               |        
+> > |--------------------------------------------------|
+> > | 5 pages   |                -530                  |
+> > |--------------------------------------------------|
+> > | 20 pages  |           -2005 ~ -2533              |
+> >  --------------------------------------------------
+> > 
+> > 2. average scores
+> > 
+> > base: base code before applying code in this series. use
+> > kvm_read/write_pages() to rw IOVAs
+> > 
+> > base + this series: use vfio_dma_rw() to read IOVAs and use
+> > vfio_group_pin/unpin_pages(), and kvmgt is able to rw several pages
+> > at a time.
+> > 
+> > Scores of benchmarks running in 1 VM each:
+> >  -----------------------------------------------------------------
+> > |                    | glmark2 | lightsmark | openarena | heavens |
+> > |-----------------------------------------------------------------|
+> > |       base         |  1248   |  219.70    |  114.9    |   560   |
+> > |-----------------------------------------------------------------|
+> > |base + this series  |  1248   |  225.8     |   115     |   559   |
+> >  -----------------------------------------------------------------
+> > 
+> > Sum of scores of two benchmark instances running in 2 VMs each:
+> >  -------------------------------------------------------
+> > |                    | glmark2 | lightsmark | openarena |
+> > |-------------------------------------------------------|
+> > |       base         |  812    |  211.46    |  115.3    |
+> > |-------------------------------------------------------|
+> > |base + this series  |  814    |  214.69    |  115.9    |
+> >  -------------------------------------------------------
+> > 
+> > 
+> > Changelogs:
+> > v3 --> v4:
+> > - rebased to 5.6.0-rc4+
+> > - adjust wrap position for vfio_group_get_external_user_from_dev() in
+> >   header file.(Alex)
+> > - updated function description of vfio_group_get_external_user_from_dev()
+> >   (Alex)
+> > - fixed Error path group reference leaking in
+> >   vfio_group_get_external_user_from_dev()  (Alex)
+> > - reurn 0 for success or errno in vfio_dma_rw_chunk(). (Alex)
+> > - renamed iova to user_iova in interface vfio_dam_rw().
+> > - renamed vfio_pin_pages_from_group() and vfio_unpin_pages_from_group() to
+> >   vfio_group_pin_pages() and vfio_group_unpin_pages()
+> > - renamed user_pfn to user_iova_pfn in vfio_group_pin_pages() and
+> >   vfio_group_unpin_pages()
+> > 
+> > v2 --> v3:
+> > - add vfio_group_get_external_user_from_dev() to improve performance (Alex)
+> > - add vfio_pin/unpin_pages_from_group() to avoid repeated looking up of
+> >   VFIO group in vfio_pin/unpin_pages() (Alex)
+> > - add a check for IOMMU_READ permission. (Alex)
+> > - rename vfio_iommu_type1_rw_dma_nopin() to
+> >   vfio_iommu_type1_dma_rw_chunk(). (Alex)
+> > - in kvmgt, change "write ? vfio_dma_rw(...,true) :
+> >   vfio_dma_rw(...,false)" to vfio_dma_rw(dev, gpa, buf, len, write)
+> >   (Alex and Paolo)
+> > - in kvmgt, instead of read/write context pages 1:1, combining the
+> >   reads/writes of continuous IOVAs to take advantage of vfio_dma_rw() for
+> >   faster crossing page boundary accesses.
+> > 
+> > v1 --> v2:
+> > - rename vfio_iova_rw to vfio_dma_rw, vfio iommu driver ops .iova_rw
+> > to .dma_rw. (Alex).
+> > - change iova and len from unsigned long to dma_addr_t and size_t,
+> > respectively. (Alex)
+> > - fix possible overflow in dma->vaddr + iova - dma->iova + offset (Alex)
+> > - split DMAs from on page boundary to on max available size to eliminate
+> >   redundant searching of vfio_dma and switching mm. (Alex)
+> > - add a check for IOMMU_WRITE permission.
+> > 
+> > 
+> > Yan Zhao (7):
+> >   vfio: allow external user to get vfio group from device
+> >   vfio: introduce vfio_dma_rw to read/write a range of IOVAs
+> >   vfio: avoid inefficient operations on VFIO group in
+> >     vfio_pin/unpin_pages
+> >   drm/i915/gvt: hold reference of VFIO group during opening of vgpu
+> >   drm/i915/gvt: subsitute kvm_read/write_guest with vfio_dma_rw
+> >   drm/i915/gvt: switch to user vfio_group_pin/upin_pages
+> >   drm/i915/gvt: rw more pages a time for shadow context
+> > 
+> >  drivers/gpu/drm/i915/gvt/kvmgt.c     |  46 ++++---
+> >  drivers/gpu/drm/i915/gvt/scheduler.c |  97 ++++++++++-----
+> >  drivers/vfio/vfio.c                  | 180 +++++++++++++++++++++++++++
+> >  drivers/vfio/vfio_iommu_type1.c      |  76 +++++++++++
+> >  include/linux/vfio.h                 |  13 ++
+> >  5 files changed, 360 insertions(+), 52 deletions(-)
+> > 
+> 
