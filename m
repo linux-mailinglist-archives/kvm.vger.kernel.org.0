@@ -2,82 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A8E1B186A53
-	for <lists+kvm@lfdr.de>; Mon, 16 Mar 2020 12:45:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CAD4C186A9D
+	for <lists+kvm@lfdr.de>; Mon, 16 Mar 2020 13:10:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730890AbgCPLpi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Mar 2020 07:45:38 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:45749 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1729043AbgCPLpi (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 16 Mar 2020 07:45:38 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1584359137;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=fjC5eyqiVh4MSP5+mfLOvVmb5WFAsqeD54Xi4bPf+uc=;
-        b=DTTxaJw92GOeLyWOTNB88G1hvgoSua5zr6FUk8yRQ+S7SZa/kixQvAhdeBKODGgN2snOC1
-        H0sZGTkCQuDQjzltmk+iCYZBxERqfa/4qFHW+POzNMeOXPhOj9o/SLrtesmvPbuCuLFh+0
-        GhT39mbpQXEGeOiKnX3mqpt91ZTcC6I=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-286-qBH6rYb2OOC7Rsz_bGiHjg-1; Mon, 16 Mar 2020 07:45:33 -0400
-X-MC-Unique: qBH6rYb2OOC7Rsz_bGiHjg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ABFFF18A8CBE;
-        Mon, 16 Mar 2020 11:45:32 +0000 (UTC)
-Received: from gondolin (ovpn-117-70.ams2.redhat.com [10.36.117.70])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 4CD497388E;
-        Mon, 16 Mar 2020 11:45:27 +0000 (UTC)
-Date:   Mon, 16 Mar 2020 12:45:25 +0100
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     David Hildenbrand <david@redhat.com>
-Cc:     Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.vnet.ibm.com>,
-        KVM <kvm@vger.kernel.org>,
-        linux-s390 <linux-s390@vger.kernel.org>, stable@vger.kernel.org
-Subject: Re: [PATCH v2] KVM: s390: Also reset registers in sync regs for
- initial cpu reset
-Message-ID: <20200316124525.3bc099f9.cohuck@redhat.com>
-In-Reply-To: <8bdef3aa-01b5-93a1-c54a-46768d47dfa4@redhat.com>
-References: <20200310131223.10287-1-borntraeger@de.ibm.com>
-        <8bdef3aa-01b5-93a1-c54a-46768d47dfa4@redhat.com>
-Organization: Red Hat GmbH
+        id S1730907AbgCPMKT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Mar 2020 08:10:19 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:11696 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1730844AbgCPMKT (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 16 Mar 2020 08:10:19 -0400
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 02GC3Y4v004835
+        for <kvm@vger.kernel.org>; Mon, 16 Mar 2020 08:10:17 -0400
+Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2yrt33vemh-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Mon, 16 Mar 2020 08:10:17 -0400
+Received: from localhost
+        by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <imbrenda@linux.ibm.com>;
+        Mon, 16 Mar 2020 12:10:15 -0000
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
+        by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Mon, 16 Mar 2020 12:10:13 -0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 02GCACqK50725066
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 16 Mar 2020 12:10:12 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 62AA64C05C;
+        Mon, 16 Mar 2020 12:10:12 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 0A1304C046;
+        Mon, 16 Mar 2020 12:10:12 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.145.15.61])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon, 16 Mar 2020 12:10:11 +0000 (GMT)
+Date:   Mon, 16 Mar 2020 13:10:09 +0100
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Christian Borntraeger <borntraeger@de.ibm.com>
+Cc:     Janosch Frank <frankja@linux.vnet.ibm.com>,
+        KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
+        David Hildenbrand <david@redhat.com>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Thomas Huth <thuth@redhat.com>
+Subject: Re: [PATCH] KVM: s390: mark sie block as 512 byte aligned
+In-Reply-To: <20200311083304.3725276-1-borntraeger@de.ibm.com>
+References: <20200311083304.3725276-1-borntraeger@de.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-TM-AS-GCONF: 00
+x-cbid: 20031612-0020-0000-0000-000003B5412B
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20031612-0021-0000-0000-0000220DA072
+Message-Id: <20200316131009.381a8692@p-imbrenda>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
+ definitions=2020-03-16_03:2020-03-12,2020-03-16 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ mlxlogscore=744 mlxscore=0 spamscore=0 bulkscore=0 phishscore=0
+ lowpriorityscore=0 suspectscore=0 clxscore=1015 impostorscore=0
+ malwarescore=0 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2003020000 definitions=main-2003160058
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 10 Mar 2020 14:21:23 +0100
-David Hildenbrand <david@redhat.com> wrote:
+On Wed, 11 Mar 2020 09:33:04 +0100
+Christian Borntraeger <borntraeger@de.ibm.com> wrote:
 
-> On 10.03.20 14:12, Christian Borntraeger wrote:
-> > When we do the initial CPU reset we must not only clear the registers
-> > in the internal data structures but also in kvm_run sync_regs. For
-> > modern userspace sync_regs is the only place that it looks at.
-> > 
-> > Cc: stable@vger.kernel.org  
+> The sie block must be aligned to 512 bytes. Mark it as such.
 > 
-> # v?
+> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> ---
+>  arch/s390/include/asm/kvm_host.h | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> > Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> > ---
-> >  arch/s390/kvm/kvm-s390.c | 18 +++++++++++++++++-
-> >  1 file changed, 17 insertions(+), 1 deletion(-)
+> diff --git a/arch/s390/include/asm/kvm_host.h
+> b/arch/s390/include/asm/kvm_host.h index 0ea82152d2f7..2d50f6c432e2
+> 100644 --- a/arch/s390/include/asm/kvm_host.h
+> +++ b/arch/s390/include/asm/kvm_host.h
+> @@ -344,7 +344,7 @@ struct kvm_s390_sie_block {
+>  	__u64	itdba;			/* 0x01e8 */
+>  	__u64   riccbd;			/* 0x01f0 */
+>  	__u64	gvrd;			/* 0x01f8 */
+> -} __attribute__((packed));
+> +} __packed __aligned(512);
+>  
+>  struct kvm_s390_itdb {
+>  	__u8	data[256];
 
-> However, I do wonder if that ioctl *originally* was designed for that -
-> IOW if this is rally a stable patch or just some change that makes
-> sense. IIRC, userspace/QEMU always did the right thing, no? There was no
-> documentation about the guarantees AFAIK.
+I agree with the addition of aligned, but did you really have to remove
+packed? it makes me a little uncomfortable.
 
-The documentation only refers to the PoP for what is actually reset...
-should it also mention the sync regs?
+do we have any compile-time assertions that the size of the block will
+be the one we expect?
 
