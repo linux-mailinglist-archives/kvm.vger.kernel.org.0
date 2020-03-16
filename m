@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6D3341873CD
-	for <lists+kvm@lfdr.de>; Mon, 16 Mar 2020 21:06:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 787D11873D2
+	for <lists+kvm@lfdr.de>; Mon, 16 Mar 2020 21:09:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732470AbgCPUG3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Mar 2020 16:06:29 -0400
-Received: from mail-pg1-f193.google.com ([209.85.215.193]:37975 "EHLO
-        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732436AbgCPUG2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 Mar 2020 16:06:28 -0400
-Received: by mail-pg1-f193.google.com with SMTP id x7so10347313pgh.5
-        for <kvm@vger.kernel.org>; Mon, 16 Mar 2020 13:06:28 -0700 (PDT)
+        id S1732543AbgCPUJR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Mar 2020 16:09:17 -0400
+Received: from mail-pg1-f194.google.com ([209.85.215.194]:39594 "EHLO
+        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732448AbgCPUJR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 Mar 2020 16:09:17 -0400
+Received: by mail-pg1-f194.google.com with SMTP id b22so4352650pgb.6
+        for <kvm@vger.kernel.org>; Mon, 16 Mar 2020 13:09:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=oMoLpNdfwPj3BjJ9X6DM9wITDjEHBSTuqrQmlwfNSjU=;
-        b=mfW4NgO9PmedbXOTkBJ2p4fnyqH+PaQYFFXkpEl0+hkas2oi5vm/Ucr8lrSCnzFctx
-         6wBrvoaeMeZBG2bQRqO6mw68s4MtCafwnw1Acq3IC/kOQ/oZvCX1QOkyT1nv8l5yR9f7
-         nL8bzh5vOlxijwjQmhJX60n3loAmx6odX8iqdxxUKlOyqsvAUvJZGVcUty0Jq2YYVuHW
-         ciMsmsWm/7We+5mY6F/srwuqqKqIvZJ3LWnx4LWa6xvmfGDrBi1V+BdAJm3E8Mi8khy7
-         N49rccakpTBvzDNoqeIEZhtiDJQhZr1MR+mYhDE+Yea4FztXp6MFREA8EZUCaWd+HufS
-         NvHA==
+        bh=iHWNGHwZg0b9gZmRRuZF0ElUxFU5qu0I08unHCAlUTo=;
+        b=CmE9Y6GIRrEIFvCBFwc3pmjmYPqQ/MY52zfMZfNZMTcbUXhyZGGYlCZi0eVCmBVCIP
+         UjA7lYlBipTKZTVo2Gs75p76wj/pRrheSrHYLUmItGJcc+gqetzboJpaJBUaGIrMSgAN
+         0FTeLyZVjdPXRhJxsu6aNeWE1kO09Ftpzk+QceM+nx+SJOTKhUlrVD1tm8IBRwwNjTPn
+         h49QreqTPOmHVcyCcpZqMeAgcqRGf1qVvtY4LK0JhEN3VxFuXWoCY9XltQgKBGVzsLhg
+         yvm6EGvbW3L0mo22l2kWROnd/oYRhTsA4zusQ+fQfoCFE5QZys27szf2nvMqOxshtxjM
+         BWMQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=oMoLpNdfwPj3BjJ9X6DM9wITDjEHBSTuqrQmlwfNSjU=;
-        b=b11hYcCWOh4PPih7Tw5CdOlZ3wb3NP6N5Kl6uVDAtusgEkzP+koAbf10y1zuDlCZAL
-         CLImsji2P/LZq7uydGtZXTcbIy0hGE7EsVw7BneC+TydQ5cOcNamvOyTBbUELvPc6ZlH
-         MdlDW7tEKyyK1GK4msKE7/oVAL551mP7IUokxaBtNJ7bgwXMP00AR/0eFiPoqaW6WnU7
-         Zrn4nA6MQeeRwa64Bub/Z0w93EC8Zq3Az1mQzK6xLhj1V66t22dVv1Q//103zPTSrvdc
-         O56IkuMoVSOAECFd3G1aFLaZ3TS7gTLvajtzeAzqD49Kp4hu+2w8u24JnOW2x3atoXlY
-         /Msw==
-X-Gm-Message-State: ANhLgQ3kwgQxNZtiSYib8tdG5H/0urE/HUhIRcRekq6GzCNlzinCYeqT
-        zk61iqhAvMGmPamAY6EaA8M6xg==
-X-Google-Smtp-Source: ADFU+vvSFbuSg/ZfRlESkgsCOFoCSgmG5iPCyQlDq0W9IFjOrCmIyWHQSdbKHKIkdWBjoEo1wl9mPA==
-X-Received: by 2002:a63:790e:: with SMTP id u14mr1340697pgc.361.1584389187593;
-        Mon, 16 Mar 2020 13:06:27 -0700 (PDT)
+        bh=iHWNGHwZg0b9gZmRRuZF0ElUxFU5qu0I08unHCAlUTo=;
+        b=MLS3sJ0ogFlLBRmYTU0+OaAQ31Tupg76XqNVXgB/3UBwrRI4v8PRvoNSdsfTSsAFTg
+         YwACtIx/swYSzJf8H7lzF4741zez1Z2Cmg/wBjeLfwbixUnvnIZ0MGXMBXkxPtE4a25s
+         GhCBisbV1j32btg/3kfY7yrrm3/e2zSCmmT2UzGmIUkajdLcd9WlPkWi+PoFQkKm1JhF
+         4QSROkEVuB3HHtDlVxZFGUyxuhBx7U8GbexepbGCflS+gWQleK+0PVEJ8rr1XdTi7Pdn
+         gyjPQ5x2MwikwohK4RTD/7uA+WM53qYatR1WArlFxAKasjtPCVxQRRQx97YaOKa1rngH
+         liLw==
+X-Gm-Message-State: ANhLgQ3BumVz09JvxCuFvGlgxwXTkkK2Ke2KdAHrDz4O1jz3BSJbPDio
+        fu1XZIGr1S5Ge+9kW38CUuZ/FQ==
+X-Google-Smtp-Source: ADFU+vvwIq9UpPBuFyug8mpIP8LNVAnbLWqF2AkU3+pV85O/b7C5pVFS7sPIzV+bLSU23jKDsIvnSg==
+X-Received: by 2002:a62:4ec4:: with SMTP id c187mr1376639pfb.223.1584389356184;
+        Mon, 16 Mar 2020 13:09:16 -0700 (PDT)
 Received: from [192.168.1.11] (97-126-123-70.tukw.qwest.net. [97.126.123.70])
-        by smtp.gmail.com with ESMTPSA id a71sm687824pfa.162.2020.03.16.13.06.26
+        by smtp.gmail.com with ESMTPSA id r186sm685696pfc.181.2020.03.16.13.09.14
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 16 Mar 2020 13:06:26 -0700 (PDT)
-Subject: Re: [PATCH v3 17/19] hw/arm: Automatically select the 'virt' machine
- on KVM
+        Mon, 16 Mar 2020 13:09:15 -0700 (PDT)
+Subject: Re: [PATCH v3 09/19] target/arm: Move ARM_V7M Kconfig from hw/ to
+ target/
 To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
         qemu-devel@nongnu.org
 Cc:     =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
@@ -55,14 +55,14 @@ Cc:     =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Peter Maydell <peter.maydell@linaro.org>
 References: <20200316160634.3386-1-philmd@redhat.com>
- <20200316160634.3386-18-philmd@redhat.com>
+ <20200316160634.3386-10-philmd@redhat.com>
 From:   Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <d0842e82-8640-5903-e59b-99963584b89a@linaro.org>
-Date:   Mon, 16 Mar 2020 13:06:25 -0700
+Message-ID: <d09210dd-2837-1fb3-2dc5-c17c2f86d908@linaro.org>
+Date:   Mon, 16 Mar 2020 13:09:13 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200316160634.3386-18-philmd@redhat.com>
+In-Reply-To: <20200316160634.3386-10-philmd@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -72,29 +72,19 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 3/16/20 9:06 AM, Philippe Mathieu-Daudé wrote:
-> When building a KVM-only QEMU, the 'virt' machine is a good
-> default :)
+> ARM_V7M is a concept tied to the architecture. Move it to the
+> target/arm/ directory to keep the hardware/architecture separation
+> clearer.
 > 
 > Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 > ---
->  hw/arm/Kconfig | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
-> index d0903d8544..8e801cd15f 100644
-> --- a/hw/arm/Kconfig
-> +++ b/hw/arm/Kconfig
-> @@ -1,5 +1,6 @@
->  config ARM_VIRT
->      bool
-> +    default y if KVM
->      imply PCI_DEVICES
->      imply TEST_DEVICES
->      imply VFIO_AMD_XGBE
-> 
+>  hw/arm/Kconfig     | 3 ---
+>  target/Kconfig     | 2 +-
+>  target/arm/Kconfig | 2 ++
+>  3 files changed, 3 insertions(+), 4 deletions(-)
+>  create mode 100644 target/arm/Kconfig
 
-Likewise SBSA_REF?  Otherwise, what is this for?
-Did you remove ARM_VIRT from default-config/*?
+Acked-by: Richard Henderson <richard.henderson@linaro.org>
 
 
 r~
