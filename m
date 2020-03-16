@@ -2,105 +2,86 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4BDD11873D8
-	for <lists+kvm@lfdr.de>; Mon, 16 Mar 2020 21:11:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BBC5A1873DF
+	for <lists+kvm@lfdr.de>; Mon, 16 Mar 2020 21:16:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732494AbgCPULs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Mar 2020 16:11:48 -0400
-Received: from mail-oi1-f196.google.com ([209.85.167.196]:44059 "EHLO
-        mail-oi1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732436AbgCPULs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 Mar 2020 16:11:48 -0400
-Received: by mail-oi1-f196.google.com with SMTP id d62so19179399oia.11
-        for <kvm@vger.kernel.org>; Mon, 16 Mar 2020 13:11:46 -0700 (PDT)
+        id S1732504AbgCPUQg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Mar 2020 16:16:36 -0400
+Received: from mail-pj1-f67.google.com ([209.85.216.67]:38436 "EHLO
+        mail-pj1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732448AbgCPUQg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 Mar 2020 16:16:36 -0400
+Received: by mail-pj1-f67.google.com with SMTP id m15so8580642pje.3
+        for <kvm@vger.kernel.org>; Mon, 16 Mar 2020 13:16:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Ijs2BAIZQngYJr60lDXDIztUajpq/leFmXIdziG2LkM=;
-        b=sv5GzYNwiSh3FeS0FRD8JM9TyIwu42PNDUBqb2XRpr7JWlyBhsNwNdpjQBWBU+l1bR
-         WN6v2XTv991YfA+F1LJE3nqARuovbsoRT3n4bJouPNyhgwsi6Fl2xAIdDG+rNfRWzw9N
-         BeyPq/wVWSA56Wg5t/+hJhUDQuLoL92VYEEyb76M2cFYJjW/MPndakK64X7XPFlhMDcc
-         MnKhzJo21aBHp9XNHOLp4MHAGgi6uP28iPP2tAmsbd4osuHZ1UQKD6YU81yz+a8mt1wv
-         KExbnv7HV333vv/xrvNbN6VMES9N3EELGs5ODy6fE7X+/Obh6Cw/X+6S1RJdf6t6o3H8
-         OnSQ==
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=FhITnVcXOIhnDs6uomlU7NICQahFSW5Nno5Xh6Sq2S4=;
+        b=FoJB4AMPXLMvqJ/PwEVqdjzE4axxigJIAJXVIgptDfwHvaprZTEE5YOdc/y1goBOvu
+         4ZZaQY5MzFzgkwfBhc4G6K7luBCzEvSeoGcAaYETYA7PnJtCwMVh8x/6uMPN5r/rJgGe
+         YvRU50ybHtZ0mOlJF+eVXe7HpEaZrykr6uypERcyCu8bFl/CtCsdL0lE+IqAYOw0mHse
+         AftV/lzKuiYcwTV9dV9xl96SMyhsFYDe2VXitZfHl2W6PrAaSmtQp92OiscOzfWMIIXG
+         1Ek0faM4ssdTahTxkQcazBtwMjZurKMef+/NGaY6EsxiQaKqFpYLIQQbwlUIk/7+peV1
+         mfuA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Ijs2BAIZQngYJr60lDXDIztUajpq/leFmXIdziG2LkM=;
-        b=ZkNmb4i4qQDoR3HuTmlWSEJVgOkWtx6W3GUqobof3zUsWF9hJNx+wzqTXN7aE2oVCZ
-         EjxHPz0GOQEPG6qrC9rLHsLEJXwpyyKY/Jk3NL6yYiPrHqZNZthoBZSObg+oE55cFOwJ
-         Gi7vvCyDB3D486jDjyioFj4VsmPNUZDq3RV4H7zx61PGzUVqi0YiqjPj/ndGTht/Gdvh
-         HFs+pVsOonah7kvdlbxXx/WNItIJGrqg8/0ZLxIgdg3DNOK2aPHnIwg3/J2L5NqaF+Pm
-         JlwAS5sdguc1dJg4TKi/RroM6kH71SmjFNCAxzESUjquejNvxW0v8Bc0+ms+9bX+zdQM
-         AMzg==
-X-Gm-Message-State: ANhLgQ2Nv/IAh4DeAPhQx80oQeHtn0Hj/rRI14IjAQxArnVVMzohAj/7
-        jUZqM7umbwVmhzadQAgD8pyfA7qLI4W0vPQgPNUrMQ==
-X-Google-Smtp-Source: ADFU+vuNAGWfTNfTG7BCG62IAVcWTMGcJnSdFo65qjGsPUVKe0hQPlhhs0R7X5BcJqT9yHK67QFaPQIXmPb88pVygO4=
-X-Received: by 2002:aca:190f:: with SMTP id l15mr937814oii.48.1584389505745;
- Mon, 16 Mar 2020 13:11:45 -0700 (PDT)
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=FhITnVcXOIhnDs6uomlU7NICQahFSW5Nno5Xh6Sq2S4=;
+        b=CHWKUs30Z+rEV2zbyKxBwUH1nh/jqOQsPicX77G9Vapb5KbzWLwqIAhKDGizQjhc3b
+         GhcCNDMvlgSqnviu8G9iyS+5aZH+Lvon9sO4qTrJa1OHtWOojNj3EopOXMYbfKM/xmeB
+         fqw7vSKuS0AoNb91v5UyzUY28pUDzbYj6kUEGe65rO7NSV/TasIPC5zzPukoPwFsouvv
+         xD6kXfkLQ5XmZP6noaIyh84/tt1eZRT04Sl2K1ZDxk9DahcOFi0JReotcNPXYHYjLUfg
+         9cwMqDgbRpXyRmuDqfmAv2l1gGlqnkHarapuL3g9ZJPeRZQGsUGvs2R9lcHn7hhcIy3I
+         +4Qw==
+X-Gm-Message-State: ANhLgQ3uPgNN0UyqM3xhYt20Zd7q42O0d4CrcjHpXpIIB9xGovXhO5nr
+        y/dgW1Fr0kEN3KH5E8CkWAp2hu7DGxM=
+X-Google-Smtp-Source: ADFU+vvXz6vFHeF1yKbPbpgcnf+53vX8VlT/JrnRIIROKRDHpkh55asOanh1rtAanRMRpWVarvC1uw==
+X-Received: by 2002:a17:90b:d8d:: with SMTP id bg13mr1312350pjb.29.1584389794888;
+        Mon, 16 Mar 2020 13:16:34 -0700 (PDT)
+Received: from [192.168.1.11] (97-126-123-70.tukw.qwest.net. [97.126.123.70])
+        by smtp.gmail.com with ESMTPSA id 67sm677082pfe.168.2020.03.16.13.16.33
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 16 Mar 2020 13:16:34 -0700 (PDT)
+Subject: Re: [PATCH v3 01/19] target/arm: Rename KVM set_feature() as
+ kvm_set_feature()
+To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+        qemu-devel@nongnu.org
+Cc:     =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+        kvm@vger.kernel.org, Thomas Huth <thuth@redhat.com>,
+        qemu-arm@nongnu.org, Fam Zheng <fam@euphon.net>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Peter Maydell <peter.maydell@linaro.org>
+References: <20200316160634.3386-1-philmd@redhat.com>
+ <20200316160634.3386-2-philmd@redhat.com>
+From:   Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <cb3178f1-5a0c-b11c-a012-c41beeb66cd2@linaro.org>
+Date:   Mon, 16 Mar 2020 13:16:32 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-References: <20200316160634.3386-1-philmd@redhat.com> <20200316160634.3386-4-philmd@redhat.com>
- <f570579b-da9c-e89a-3430-08e82d9052c1@linaro.org>
-In-Reply-To: <f570579b-da9c-e89a-3430-08e82d9052c1@linaro.org>
-From:   Peter Maydell <peter.maydell@linaro.org>
-Date:   Mon, 16 Mar 2020 20:11:34 +0000
-Message-ID: <CAFEAcA8K-njh=TyjS_4deD4wTjhqnc=t6SQB1DbKgWWS5rixSQ@mail.gmail.com>
-Subject: Re: [PATCH v3 03/19] target/arm: Restrict DC-CVAP instruction to TCG accel
-To:     Richard Henderson <richard.henderson@linaro.org>
-Cc:     =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
-        QEMU Developers <qemu-devel@nongnu.org>,
-        =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
-        kvm-devel <kvm@vger.kernel.org>, Thomas Huth <thuth@redhat.com>,
-        qemu-arm <qemu-arm@nongnu.org>, Fam Zheng <fam@euphon.net>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20200316160634.3386-2-philmd@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 16 Mar 2020 at 19:36, Richard Henderson
-<richard.henderson@linaro.org> wrote:
-> I'm not 100% sure how the system regs function under kvm.
->
-> If they are not used at all, then we should avoid them all en masse an not
-> piecemeal like this.
->
-> If they are used for something, then we should keep them registered and change
-> the writefn like so:
->
-> #ifdef CONFIG_TCG
->     /* existing stuff */
-> #else
->     /* Handled by hardware accelerator. */
->     g_assert_not_reached();
-> #endif
+On 3/16/20 9:06 AM, Philippe Mathieu-Daudé wrote:
+> +++ b/target/arm/kvm32.c
+> @@ -22,7 +22,7 @@
+>  #include "internals.h"
+>  #include "qemu/log.h"
+>  
+> -static inline void set_feature(uint64_t *features, int feature)
+> +static inline void kvm_set_feature(uint64_t *features, int feature)
 
-(1) for those registers where we need to know the value within
-QEMU code (notably anything involved in VA-to-PA translation,
-as this is used by gdbstub accesses, etc, but sometimes we
-want other register values too): the sysreg struct is
-what lets us map from the KVM register to the field in the
-CPU struct when we do a sync of data to/from the kernel.
+Why, what's wrong with the existing name?
+Plus, with patch 2, you can just remove these.
 
-(2) for other registers, the sync lets us make the register
-visible as an r/o register in the gdbstub. (this is not
-very important, but it's nice)
 
-(3) Either way, the sync works via the raw_read/raw_write
-accessors (this is a big part of what they're for), which are
-supposed to just stuff the data into/out of the underlying
-CPU struct field. (But watch out because we fall back to
-using the non-raw read/writefn if there's no raw version
-provided for a particular register.) If a regdef is marked
-as NO_RAW then it means there is no raw access and we don't
-sync the value.
-
-(4) I think that in KVM mode we won't deliberately do
-non-raw accesses, and a quick grep through of the places
-that do 'readfn' accesses supports that.
-
-thanks
--- PMM
+r~
