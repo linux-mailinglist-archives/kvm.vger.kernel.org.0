@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 47C7418737C
-	for <lists+kvm@lfdr.de>; Mon, 16 Mar 2020 20:36:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1FD08187380
+	for <lists+kvm@lfdr.de>; Mon, 16 Mar 2020 20:37:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732437AbgCPTgb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Mar 2020 15:36:31 -0400
-Received: from mail-pj1-f66.google.com ([209.85.216.66]:37122 "EHLO
-        mail-pj1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732413AbgCPTga (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 Mar 2020 15:36:30 -0400
-Received: by mail-pj1-f66.google.com with SMTP id ca13so9232371pjb.2
-        for <kvm@vger.kernel.org>; Mon, 16 Mar 2020 12:36:29 -0700 (PDT)
+        id S1732460AbgCPThM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Mar 2020 15:37:12 -0400
+Received: from mail-pf1-f194.google.com ([209.85.210.194]:39234 "EHLO
+        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732436AbgCPThM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 Mar 2020 15:37:12 -0400
+Received: by mail-pf1-f194.google.com with SMTP id d25so2511971pfn.6
+        for <kvm@vger.kernel.org>; Mon, 16 Mar 2020 12:37:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=4LmArg3GTu54ll1HNRtasTPkMr+nwPGShFSLJ6YeUnI=;
-        b=UCMqjmpftx/SVaAcJC2uV0Mh8wWzRMNLzGmKyg2r9FKUh1a+nm610urYYMC0euiben
-         wdwoaeK8aZNWW1uvuVCokCyF6UkNhWiNY5jCrf+HgruIXY/G5m50tQXxoxFlkiIom4MS
-         IiF2qaNcF93JRGICwiVHlhDp2cCEJEo+x8QqVw0gURa/ImowPkDSrmW6x+KoYXKea6Yr
-         29tCDsvaYT2r+dK4EyvqXlxis3TyjerqTa1H40pQIx9hKRogNjk6VIWWbLUz0Gf/FSAt
-         UyppgclCH3Qu/wwEdAhfir7lWmTSo1YcnN8uXe+rUAextBb53XOLcYO3Opcq0rNjWnn7
-         1oYA==
+        bh=L89ZWrRD+o41kxNk0fnpcdzdsDuN76+Y+I0X9Rp+gms=;
+        b=JOykOFt2/Pic/Ya/IJ1Yuxkfir9truF3YSQWCcT0DMz/IOBBBgUasm4tSdf1lbYH+C
+         KQFeRRmYukwQXIfxV7PiTbjLDRkheJGHGkIcbWD8ukyAGXKnbe7CmubS9P0iR96MXISV
+         QPcDoCC3TJnR7ADHr0FEeX9DuMN4Jpww5d8KoHi8f7iEMCzGYL/zGtMYSWxxXnwWW545
+         t4t9ttJSJzT78RaBCd6izDyZnmN8Va//drpARvGb3gsINYt2DZjytGl3i0EjGhogROOl
+         nECne9eMCiClmtmHmwomneU1aXuC9lfHDIEMrYLeb6r6lJHz+KR5IlDrMQrtGUlkCovL
+         JCDw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=4LmArg3GTu54ll1HNRtasTPkMr+nwPGShFSLJ6YeUnI=;
-        b=l81UO0LpDV9QK+9QDtRxeGooUQPHoUGgylxPB2hhyfisdBfJwLDqX7ojEsOg8BDZ+E
-         HStbF1MUSjPJtbPZd4m6RH9IN8A+C7W2+/AjUNddHEltzF6KjyFxet0nBCxP6Y2cNB5O
-         oX5Xi8O8Q5vRV/89kUdoxLAn2QtyW6cD0gCvuayD2T5D5jgXPGuJj/Gy6NQ5jed+PXcO
-         E/uF7ebaEEszjyyCjbUYVwfkU6XTJOA4uAuqCEjXUeBSvz9EpuIJqz/0earclqNZ/kHy
-         CcZcPIWaU28oA4IGr/EZfMzPmXFJK8ZaSkUGOrnjE8R8RP3CuQ+t/AocrHWZfQ11kxID
-         Eu7A==
-X-Gm-Message-State: ANhLgQ2sXKuOPzL4Vl9VAJFwQS9fmpyLiacLGl6g4qwQQkg/zsnDs8Nq
-        r13miWqJzU0ZJZe0HobaUE/WBQ==
-X-Google-Smtp-Source: ADFU+vtZgb/dz6XW3yb1GA5ZDRSuPFgkv5SJph2TK2P9VA40H7gjfL+36QxLD2o/1YkyWhcuBFX92A==
-X-Received: by 2002:a17:90a:faa:: with SMTP id 39mr1196481pjz.190.1584387387544;
-        Mon, 16 Mar 2020 12:36:27 -0700 (PDT)
+        bh=L89ZWrRD+o41kxNk0fnpcdzdsDuN76+Y+I0X9Rp+gms=;
+        b=ZyZWv28xHEc9THKMS64bHLxhctI69jKNcR+CrOLEyG7Fp9HlTnnxl3Ieat5Lt8xsc/
+         Xd85di7sIKVh/S6/EpFA6D48D5wNf5mBEnjtdn6eBHOzDYclaIuksO23ZzNxDRJJODZw
+         xMGHvzfq+2bKtl9K1c7TQH2KX9zJsl8jKU1uR+M3Dd2Ee7nKt4chH09cmavJRT5nWq2V
+         n1jFEQeMnzK2+Ytm/62QzGLt2aGixvNpbu1WajYFqncBwI2quUuhpd0vmCTDdTwY6XaZ
+         A/tvOCQDryn8g00se1B+LB2HPh6t2/0mgD0+QR18a+aVTamdDx5jqz8nkxnNWo+T2pvH
+         WUeg==
+X-Gm-Message-State: ANhLgQ1h4J9+EVTLHXjkYZVDuZsO/SyJquLLdzLpCMlkE/kHBC/lOo4e
+        vnFXcvOTxMw6HgJJjG2myKxKBA==
+X-Google-Smtp-Source: ADFU+vvhNufPP7bu7Lbr300PVxk4IJgWKvd7lJvPzyrN4DkPlsGgJZsWycA0QGAqYFPlScuXekBqTA==
+X-Received: by 2002:aa7:8711:: with SMTP id b17mr1118088pfo.315.1584387430595;
+        Mon, 16 Mar 2020 12:37:10 -0700 (PDT)
 Received: from [192.168.1.11] (97-126-123-70.tukw.qwest.net. [97.126.123.70])
-        by smtp.gmail.com with ESMTPSA id i197sm655801pfe.137.2020.03.16.12.36.25
+        by smtp.gmail.com with ESMTPSA id g13sm673135pfi.183.2020.03.16.12.37.09
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 16 Mar 2020 12:36:26 -0700 (PDT)
-Subject: Re: [PATCH v3 03/19] target/arm: Restrict DC-CVAP instruction to TCG
- accel
+        Mon, 16 Mar 2020 12:37:09 -0700 (PDT)
+Subject: Re: [PATCH v3 04/19] target/arm: Restric the Address Translate
+ operations to TCG accel
 To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
         qemu-devel@nongnu.org
 Cc:     =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
@@ -55,14 +55,14 @@ Cc:     =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Peter Maydell <peter.maydell@linaro.org>
 References: <20200316160634.3386-1-philmd@redhat.com>
- <20200316160634.3386-4-philmd@redhat.com>
+ <20200316160634.3386-5-philmd@redhat.com>
 From:   Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <f570579b-da9c-e89a-3430-08e82d9052c1@linaro.org>
-Date:   Mon, 16 Mar 2020 12:36:24 -0700
+Message-ID: <c257230b-277c-d568-756b-39acb93ac308@linaro.org>
+Date:   Mon, 16 Mar 2020 12:37:07 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200316160634.3386-4-philmd@redhat.com>
+In-Reply-To: <20200316160634.3386-5-philmd@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -72,78 +72,105 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 3/16/20 9:06 AM, Philippe Mathieu-Daudé wrote:
-> Under KVM the 'Data or unified Cache line Clean by VA to PoP'
-> instruction will trap.
-> 
-> Fixes: 0d57b4999 ("Add support for DC CVAP & DC CVADP ins")
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> ---
->  target/arm/helper.c | 12 ++++++------
->  1 file changed, 6 insertions(+), 6 deletions(-)
-> 
-> diff --git a/target/arm/helper.c b/target/arm/helper.c
-> index b61ee73d18..924deffd65 100644
-> --- a/target/arm/helper.c
-> +++ b/target/arm/helper.c
-> @@ -6777,7 +6777,7 @@ static const ARMCPRegInfo rndr_reginfo[] = {
->      REGINFO_SENTINEL
->  };
->  
-> -#ifndef CONFIG_USER_ONLY
-> +#if !defined(CONFIG_USER_ONLY) && defined(CONFIG_TCG)
->  static void dccvap_writefn(CPUARMState *env, const ARMCPRegInfo *opaque,
->                            uint64_t value)
->  {
-> @@ -6820,9 +6820,9 @@ static const ARMCPRegInfo dcpodp_reg[] = {
->        .accessfn = aa64_cacheop_poc_access, .writefn = dccvap_writefn },
->      REGINFO_SENTINEL
->  };
-> -#endif /*CONFIG_USER_ONLY*/
-> +#endif /* !CONFIG_USER_ONLY && CONFIG_TCG */
+> Under KVM the ATS instruction will trap.
 
-I'm not 100% sure how the system regs function under kvm.
-
-If they are not used at all, then we should avoid them all en masse an not
-piecemeal like this.
-
-If they are used for something, then we should keep them registered and change
-the writefn like so:
-
-#ifdef CONFIG_TCG
-    /* existing stuff */
-#else
-    /* Handled by hardware accelerator. */
-    g_assert_not_reached();
-#endif
+Not trap, they'll just work.
+Otherwise similar comment as for dcpop.
 
 
 r~
 
+> 
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> ---
+>  target/arm/helper.c | 20 +++++++++++---------
+>  1 file changed, 11 insertions(+), 9 deletions(-)
+> 
+> diff --git a/target/arm/helper.c b/target/arm/helper.c
+> index 924deffd65..a5280c091b 100644
+> --- a/target/arm/helper.c
+> +++ b/target/arm/helper.c
+> @@ -3322,7 +3322,7 @@ static void par_write(CPUARMState *env, const ARMCPRegInfo *ri, uint64_t value)
+>      }
+>  }
 >  
+> -#ifndef CONFIG_USER_ONLY
+> +#if !defined(CONFIG_USER_ONLY) && defined(CONFIG_TCG)
+>  /* get_phys_addr() isn't present for user-mode-only targets */
+>  
+>  static CPAccessResult ats_access(CPUARMState *env, const ARMCPRegInfo *ri,
+> @@ -3631,7 +3631,7 @@ static void ats_write64(CPUARMState *env, const ARMCPRegInfo *ri,
+>  
+>      env->cp15.par_el[1] = do_ats_write(env, value, access_type, mmu_idx);
+>  }
 > -#endif
-> +#endif /* TARGET_AARCH64 */
+> +#endif /* !CONFIG_USER_ONLY && CONFIG_TCG */
 >  
->  static CPAccessResult access_predinv(CPUARMState *env, const ARMCPRegInfo *ri,
->                                       bool isread)
-> @@ -7929,7 +7929,7 @@ void register_cp_regs_for_features(ARMCPU *cpu)
->      if (cpu_isar_feature(aa64_rndr, cpu)) {
->          define_arm_cp_regs(cpu, rndr_reginfo);
+>  static const ARMCPRegInfo vapa_cp_reginfo[] = {
+>      { .name = "PAR", .cp = 15, .crn = 7, .crm = 4, .opc1 = 0, .opc2 = 0,
+> @@ -3639,7 +3639,7 @@ static const ARMCPRegInfo vapa_cp_reginfo[] = {
+>        .bank_fieldoffsets = { offsetoflow32(CPUARMState, cp15.par_s),
+>                               offsetoflow32(CPUARMState, cp15.par_ns) },
+>        .writefn = par_write },
+> -#ifndef CONFIG_USER_ONLY
+> +#if !defined(CONFIG_USER_ONLY) && defined(CONFIG_TCG)
+>      /* This underdecoding is safe because the reginfo is NO_RAW. */
+>      { .name = "ATS", .cp = 15, .crn = 7, .crm = 8, .opc1 = 0, .opc2 = CP_ANY,
+>        .access = PL1_W, .accessfn = ats_access,
+> @@ -4880,7 +4880,8 @@ static const ARMCPRegInfo v8_cp_reginfo[] = {
+>        .opc0 = 1, .opc1 = 4, .crn = 8, .crm = 7, .opc2 = 6,
+>        .access = PL2_W, .type = ARM_CP_NO_RAW,
+>        .writefn = tlbi_aa64_alle1is_write },
+> -#ifndef CONFIG_USER_ONLY
+> +
+> +#if !defined(CONFIG_USER_ONLY) && defined(CONFIG_TCG)
+>      /* 64 bit address translation operations */
+>      { .name = "AT_S1E1R", .state = ARM_CP_STATE_AA64,
+>        .opc0 = 1, .opc1 = 0, .crn = 7, .crm = 8, .opc2 = 0,
+> @@ -4929,7 +4930,8 @@ static const ARMCPRegInfo v8_cp_reginfo[] = {
+>        .access = PL1_RW, .resetvalue = 0,
+>        .fieldoffset = offsetof(CPUARMState, cp15.par_el[1]),
+>        .writefn = par_write },
+> -#endif
+> +#endif /* !CONFIG_USER_ONLY && CONFIG_TCG */
+> +
+>      /* TLB invalidate last level of translation table walk */
+>      { .name = "TLBIMVALIS", .cp = 15, .opc1 = 0, .crn = 8, .crm = 3, .opc2 = 5,
+>        .type = ARM_CP_NO_RAW, .access = PL1_W, .accessfn = access_ttlb,
+> @@ -5536,7 +5538,7 @@ static const ARMCPRegInfo el2_cp_reginfo[] = {
+>        .opc0 = 1, .opc1 = 4, .crn = 8, .crm = 3, .opc2 = 5,
+>        .access = PL2_W, .type = ARM_CP_NO_RAW,
+>        .writefn = tlbi_aa64_vae2is_write },
+> -#ifndef CONFIG_USER_ONLY
+> +#if !defined(CONFIG_USER_ONLY) && defined(CONFIG_TCG)
+>      /* Unlike the other EL2-related AT operations, these must
+>       * UNDEF from EL3 if EL2 is not implemented, which is why we
+>       * define them here rather than with the rest of the AT ops.
+> @@ -6992,7 +6994,7 @@ static const ARMCPRegInfo vhe_reginfo[] = {
+>      REGINFO_SENTINEL
+>  };
+>  
+> -#ifndef CONFIG_USER_ONLY
+> +#if !defined(CONFIG_USER_ONLY) && defined(CONFIG_TCG)
+>  static const ARMCPRegInfo ats1e1_reginfo[] = {
+>      { .name = "AT_S1E1R", .state = ARM_CP_STATE_AA64,
+>        .opc0 = 1, .opc1 = 0, .crn = 7, .crm = 9, .opc2 = 0,
+> @@ -7894,14 +7896,14 @@ void register_cp_regs_for_features(ARMCPU *cpu)
+>      if (cpu_isar_feature(aa64_pan, cpu)) {
+>          define_one_arm_cp_reg(cpu, &pan_reginfo);
 >      }
 > -#ifndef CONFIG_USER_ONLY
 > +#if !defined(CONFIG_USER_ONLY) && defined(CONFIG_TCG)
->      /* Data Cache clean instructions up to PoP */
->      if (cpu_isar_feature(aa64_dcpop, cpu)) {
->          define_one_arm_cp_reg(cpu, dcpop_reg);
-> @@ -7938,8 +7938,8 @@ void register_cp_regs_for_features(ARMCPU *cpu)
->              define_one_arm_cp_reg(cpu, dcpodp_reg);
->          }
+>      if (cpu_isar_feature(aa64_ats1e1, cpu)) {
+>          define_arm_cp_regs(cpu, ats1e1_reginfo);
 >      }
-> -#endif /*CONFIG_USER_ONLY*/
+>      if (cpu_isar_feature(aa32_ats1e1, cpu)) {
+>          define_arm_cp_regs(cpu, ats1cp_reginfo);
+>      }
 > -#endif
 > +#endif /* !CONFIG_USER_ONLY && CONFIG_TCG */
-> +#endif /* TARGET_AARCH64 */
->  
->      if (cpu_isar_feature(any_predinv, cpu)) {
->          define_arm_cp_regs(cpu, predinv_reginfo);
+>      if (cpu_isar_feature(aa64_uao, cpu)) {
+>          define_one_arm_cp_reg(cpu, &uao_reginfo);
+>      }
 > 
 
