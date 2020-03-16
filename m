@@ -2,54 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 382B9186FBB
-	for <lists+kvm@lfdr.de>; Mon, 16 Mar 2020 17:13:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0A36E186FCF
+	for <lists+kvm@lfdr.de>; Mon, 16 Mar 2020 17:16:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731994AbgCPQNX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Mar 2020 12:13:23 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:59149 "EHLO
+        id S1732072AbgCPQQD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Mar 2020 12:16:03 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:55988 "EHLO
         us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1731991AbgCPQNX (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 16 Mar 2020 12:13:23 -0400
+        by vger.kernel.org with ESMTP id S1731924AbgCPQQD (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 16 Mar 2020 12:16:03 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1584375201;
+        s=mimecast20190719; t=1584375362;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:  content-type:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=yxNTHu0Y9BXexKmUFsNlCCh8LSzlOCW9yO82fm58I4s=;
-        b=cnyidcUk9ksnMIUa+VWHBwfrkx32BSgWA/5DtgzW3JgfGOo50FwW6y1RlCeg/fxMTZKjTC
-        hSRWLU3ksO749F/Tc6R1pt0rlvnBzYthEL1MnZuEgM2XIw8HgwvcJ/m8AeVkCuN/R0nD49
-        LVkHDmiOHkHzCOmrdXecIHSehU8Y18E=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-403-6rI3XHHhMHKLi5nWOkpE2g-1; Mon, 16 Mar 2020 12:07:11 -0400
-X-MC-Unique: 6rI3XHHhMHKLi5nWOkpE2g-1
-Received: by mail-wr1-f69.google.com with SMTP id 94so4576704wrr.3
-        for <kvm@vger.kernel.org>; Mon, 16 Mar 2020 09:07:11 -0700 (PDT)
+        bh=r1sJ64QkUjojSCH6EGfhYUMESaCKLhSIpdoia+8OdJA=;
+        b=Y8pcIBYPiaPQvfm82U6HsC+KWv9Gn+86vVgo1gU/djhRobrRxjSVluTXkj9baINRW+A1Z6
+        mT4BLFHBeKIGwXr4SoI1knS/m+tY85Q9BvZG1mRZ7WfTkvyAhkQh3WpjMIfSg3wbxHFfWg
+        MTslW17MH0rDk7cIkt4YKbswzmxWhrc=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-366-ltVIQjEtMFyN7mIPM5wqgw-1; Mon, 16 Mar 2020 12:07:39 -0400
+X-MC-Unique: ltVIQjEtMFyN7mIPM5wqgw-1
+Received: by mail-wr1-f70.google.com with SMTP id b11so9233295wru.21
+        for <kvm@vger.kernel.org>; Mon, 16 Mar 2020 09:07:38 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=yxNTHu0Y9BXexKmUFsNlCCh8LSzlOCW9yO82fm58I4s=;
-        b=mMjkJT/DPXw+hSOQgSHd27S7Bh3fPpJ+HRccfMozEUhndfP2DiTas4xFlFrBZqSTu1
-         CkGy06OE1SYWuzIsUtOvcizU5iG/IIcvSB9EQTmOzraCdhXYRyE4oTDd3fgrmQu5UgpR
-         Oy1COjyszQaNwP+13TpowTUzTkQhoG7VgvhbWZqdm8UPYarhlofX0PCpIaa0EHLuyyWC
-         ZFjML5+5Z5n2+Fz8YyLcKe1crMdHE/PpWooY7zk4B0T0ToqYHurjUZZBui/pwL+qnAJt
-         hFN3I4EIQ9J8W3Nh+IpYTLbFFQRnTo2qbgPpqwdx79uiTWN5k5v0AZbjQRQtCfcc9c42
-         vs4w==
-X-Gm-Message-State: ANhLgQ1AZsADC/+M25HN7hndO0yEK+JpeJMrwN8YhbVLA6/88+Y+9BeA
-        9C/542MSY93YyzL1ipsBAPcblUNbh5xkL1PqMX28d3gHRznL/b/V65zGbIP1/PZ4yP95GSg9gRD
-        G9/WOhocB1RvI
-X-Received: by 2002:a7b:c5cd:: with SMTP id n13mr28456586wmk.172.1584374830944;
-        Mon, 16 Mar 2020 09:07:10 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vs7IJfPb/lnQB6VsT1fXs4khiy3iYFUFjrhDCacWI//Wr03P/OMBnlYg0XoQf+8TAXToOGQKQ==
-X-Received: by 2002:a7b:c5cd:: with SMTP id n13mr28456569wmk.172.1584374830787;
-        Mon, 16 Mar 2020 09:07:10 -0700 (PDT)
+        bh=r1sJ64QkUjojSCH6EGfhYUMESaCKLhSIpdoia+8OdJA=;
+        b=rcXqeXjG+shZqgxwTvS4vFOTINBr2EBdYNXALZzHEcbV5NJEMVY9gOyQSyl5rAbpvx
+         JRfZXvc7WBFDpniNiTx7wtzFap2RMbZSyt+ifZ7OjkQygJ7D78cannnjQSRfpYa/X5wp
+         UsM8opOmwlSh8IVPIy1NAdQA7CfzBcrKPWP+6MAQduzqyEFrj3jSudYqfeF5/4yNl9Yi
+         LNQATr+6egu2dMLF1XiCI1LLCqNR3P2k/QrWyW7nxf+uTyj1gQvlQX/hKOnOTjKDgeoc
+         jDS0Dnts1uflaXFtSsCpnKaC9B/V9bTwmGvJiEijrqgvp1Wd3px3bIpdCcQxaDkLYxjS
+         4LWA==
+X-Gm-Message-State: ANhLgQ0BRtdXeI7nKt06qw7Xp6fVPlYzXokuDHd+iy3dkQBfI2sE9qdI
+        NCylOVcKbyX6+hZGPjpmlGZq3pvsUEsae1UhewqOAMiACkVQjSbWBw5bqIz7WXHVVn6qjh2AGLv
+        Mg1KM+aqIDIKM
+X-Received: by 2002:a05:6000:d0:: with SMTP id q16mr77275wrx.71.1584374836479;
+        Mon, 16 Mar 2020 09:07:16 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vuudPESzx7lkwiv+yf4OA/xliD4IQtL8C5kEgXeePSGNU/JOytk/Z7I5CpK3n1RCITbf/5TOg==
+X-Received: by 2002:a05:6000:d0:: with SMTP id q16mr77257wrx.71.1584374836307;
+        Mon, 16 Mar 2020 09:07:16 -0700 (PDT)
 Received: from localhost.localdomain (96.red-83-59-163.dynamicip.rima-tde.net. [83.59.163.96])
-        by smtp.gmail.com with ESMTPSA id p8sm552349wrw.19.2020.03.16.09.07.09
+        by smtp.gmail.com with ESMTPSA id y7sm22973551wmd.1.2020.03.16.09.07.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 Mar 2020 09:07:10 -0700 (PDT)
+        Mon, 16 Mar 2020 09:07:15 -0700 (PDT)
 From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To:     qemu-devel@nongnu.org
 Cc:     =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
@@ -58,10 +58,11 @@ Cc:     =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
         =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Peter Maydell <peter.maydell@linaro.org>,
-        Richard Henderson <richard.henderson@linaro.org>
-Subject: [PATCH v3 06/19] target/arm: Move Makefile variable restricted to CONFIG_TCG
-Date:   Mon, 16 Mar 2020 17:06:21 +0100
-Message-Id: <20200316160634.3386-7-philmd@redhat.com>
+        Richard Henderson <richard.henderson@linaro.org>,
+        Eric Auger <eric.auger@redhat.com>
+Subject: [PATCH v3 07/19] target/arm: Make cpu_register() available for other files
+Date:   Mon, 16 Mar 2020 17:06:22 +0100
+Message-Id: <20200316160634.3386-8-philmd@redhat.com>
 X-Mailer: git-send-email 2.21.1
 In-Reply-To: <20200316160634.3386-1-philmd@redhat.com>
 References: <20200316160634.3386-1-philmd@redhat.com>
@@ -74,35 +75,105 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Simple code movement which simplifies next commits.
+From: Thomas Huth <thuth@redhat.com>
 
+Make cpu_register() (renamed to arm_cpu_register()) available
+from internals.h so we can register CPUs also from other files
+in the future.
+
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Message-ID: <20190921150420.30743-2-thuth@redhat.com>
+[PMD: Split Thomas's patch in two: set_feature (earlier), cpu_register]
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- target/arm/Makefile.objs | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ target/arm/cpu-qom.h |  9 ++++++++-
+ target/arm/cpu.c     | 10 ++--------
+ target/arm/cpu64.c   |  8 +-------
+ 3 files changed, 11 insertions(+), 16 deletions(-)
 
-diff --git a/target/arm/Makefile.objs b/target/arm/Makefile.objs
-index cf26c16f5f..0c6f8c248d 100644
---- a/target/arm/Makefile.objs
-+++ b/target/arm/Makefile.objs
-@@ -1,4 +1,3 @@
--obj-$(CONFIG_TCG) += arm-semi.o
- obj-y += helper.o vfp_helper.o
- obj-y += cpu.o gdbstub.o
- obj-$(TARGET_AARCH64) += cpu64.o gdbstub64.o
-@@ -56,6 +55,12 @@ target/arm/translate.o: target/arm/decode-a32-uncond.inc.c
- target/arm/translate.o: target/arm/decode-t32.inc.c
- target/arm/translate.o: target/arm/decode-t16.inc.c
+diff --git a/target/arm/cpu-qom.h b/target/arm/cpu-qom.h
+index 3a9d31ea9d..29c5e2f2c9 100644
+--- a/target/arm/cpu-qom.h
++++ b/target/arm/cpu-qom.h
+@@ -35,7 +35,14 @@ struct arm_boot_info;
  
-+ifeq ($(CONFIG_TCG),y)
+ #define TYPE_ARM_MAX_CPU "max-" TYPE_ARM_CPU
+ 
+-typedef struct ARMCPUInfo ARMCPUInfo;
++typedef struct ARMCPUInfo {
++    const char *name;
++    void (*initfn)(Object *obj);
++    void (*class_init)(ObjectClass *oc, void *data);
++} ARMCPUInfo;
 +
-+obj-y += arm-semi.o
-+
-+endif # CONFIG_TCG
-+
- obj-y += tlb_helper.o debug_helper.o
- obj-y += translate.o op_helper.o
- obj-y += crypto_helper.o
++void arm_cpu_register(const ARMCPUInfo *info);
++void aarch64_cpu_register(const ARMCPUInfo *info);
+ 
+ /**
+  * ARMCPUClass:
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index c074364542..d2813eb81a 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -2698,12 +2698,6 @@ static void arm_max_initfn(Object *obj)
+ 
+ #endif /* !defined(CONFIG_USER_ONLY) || !defined(TARGET_AARCH64) */
+ 
+-struct ARMCPUInfo {
+-    const char *name;
+-    void (*initfn)(Object *obj);
+-    void (*class_init)(ObjectClass *oc, void *data);
+-};
+-
+ static const ARMCPUInfo arm_cpus[] = {
+ #if !defined(CONFIG_USER_ONLY) || !defined(TARGET_AARCH64)
+     { .name = "arm926",      .initfn = arm926_initfn },
+@@ -2869,7 +2863,7 @@ static void cpu_register_class_init(ObjectClass *oc, void *data)
+     acc->info = data;
+ }
+ 
+-static void cpu_register(const ARMCPUInfo *info)
++void arm_cpu_register(const ARMCPUInfo *info)
+ {
+     TypeInfo type_info = {
+         .parent = TYPE_ARM_CPU,
+@@ -2910,7 +2904,7 @@ static void arm_cpu_register_types(void)
+     type_register_static(&idau_interface_type_info);
+ 
+     while (info->name) {
+-        cpu_register(info);
++        arm_cpu_register(info);
+         info++;
+     }
+ 
+diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
+index 622082eae2..e89388378b 100644
+--- a/target/arm/cpu64.c
++++ b/target/arm/cpu64.c
+@@ -728,12 +728,6 @@ static void aarch64_max_initfn(Object *obj)
+                         cpu_max_set_sve_max_vq, NULL, NULL, &error_fatal);
+ }
+ 
+-struct ARMCPUInfo {
+-    const char *name;
+-    void (*initfn)(Object *obj);
+-    void (*class_init)(ObjectClass *oc, void *data);
+-};
+-
+ static const ARMCPUInfo aarch64_cpus[] = {
+     { .name = "cortex-a57",         .initfn = aarch64_a57_initfn },
+     { .name = "cortex-a53",         .initfn = aarch64_a53_initfn },
+@@ -816,7 +810,7 @@ static void cpu_register_class_init(ObjectClass *oc, void *data)
+     acc->info = data;
+ }
+ 
+-static void aarch64_cpu_register(const ARMCPUInfo *info)
++void aarch64_cpu_register(const ARMCPUInfo *info)
+ {
+     TypeInfo type_info = {
+         .parent = TYPE_AARCH64_CPU,
 -- 
 2.21.1
 
