@@ -2,26 +2,26 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4272E1878B1
-	for <lists+kvm@lfdr.de>; Tue, 17 Mar 2020 05:54:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CC0CF1878AE
+	for <lists+kvm@lfdr.de>; Tue, 17 Mar 2020 05:53:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727132AbgCQExz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Mar 2020 00:53:55 -0400
+        id S1727134AbgCQExs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Mar 2020 00:53:48 -0400
 Received: from mga04.intel.com ([192.55.52.120]:34131 "EHLO mga04.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727026AbgCQExX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 Mar 2020 00:53:23 -0400
-IronPort-SDR: MHYBoN4vHnsEx22GNkr7Erp4NU/68NEpzKMsatHEQS53hO9PUi9i1UN0BLbL6E22E4WXVU0eOu
- 4VHII5TA0Rfw==
+        id S1726921AbgCQExY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 Mar 2020 00:53:24 -0400
+IronPort-SDR: +JSWsUICKsl6/AKPBDGKLnIgH1Ulcrl2HKGkKC8w7Bv7xsU405n+uDcWQDETxDniNbEGJr4iaz
+ aZGrCjTOtXkw==
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Mar 2020 21:53:23 -0700
-IronPort-SDR: i5ieWGSyHvcJNxu4jL7DiJMsGZTgrxQJKH3AWff+68oxaCuYkRNAY/XqiWtbhm9vYLp8V2xjxi
- K8ImlLWTptsA==
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Mar 2020 21:53:24 -0700
+IronPort-SDR: NIrdoSL3jMIyoyOLcZJa5qTTYZLECPl7SKdmnTrl3iEV/anxYGEINOYA/oeVIyucvLNW9wxflW
+ yuD7UiFLzOmA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.70,563,1574150400"; 
-   d="scan'208";a="355252831"
+   d="scan'208";a="355252835"
 Received: from sjchrist-coffee.jf.intel.com ([10.54.74.202])
   by fmsmga001.fm.intel.com with ESMTP; 16 Mar 2020 21:53:23 -0700
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
@@ -38,9 +38,9 @@ Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
         John Haxby <john.haxby@oracle.com>,
         Miaohe Lin <linmiaohe@huawei.com>,
         Tom Lendacky <thomas.lendacky@amd.com>
-Subject: [PATCH v2 29/32] KVM: VMX: Don't reload APIC access page if its control is disabled
-Date:   Mon, 16 Mar 2020 21:52:35 -0700
-Message-Id: <20200317045238.30434-30-sean.j.christopherson@intel.com>
+Subject: [PATCH v2 30/32] KVM: x86/mmu: Add module param to force TLB flush on root reuse
+Date:   Mon, 16 Mar 2020 21:52:36 -0700
+Message-Id: <20200317045238.30434-31-sean.j.christopherson@intel.com>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200317045238.30434-1-sean.j.christopherson@intel.com>
 References: <20200317045238.30434-1-sean.j.christopherson@intel.com>
@@ -51,51 +51,44 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Don't reload the APIC access page if its control is disabled, e.g. if
-the guest is running with x2APIC (likely) or with the local APIC
-disabled (unlikely), to avoid unnecessary TLB flushes and VMWRITEs.
-Unconditionally reload the APIC access page and flush the TLB when
-the guest's virtual APIC transitions to "xAPIC enabled", as any
-changes to the APIC access page's mapping will not be recorded while
-the guest's virtual APIC is disabled.
+Add a module param, flush_on_reuse, to override skip_tlb_flush when
+performing a so called "fast cr3 switch", i.e. when reusing a cached
+root.  The primary motiviation for the control is to provide a fallback
+mechanism in the event that TLB flushing bugs are exposed/introduced by
+upcoming changes to stop unconditionally flushing on nested VMX
+transitions.
 
+Suggested-by: Jim Mattson <jmattson@google.com>
+Suggested-by: Junaid Shahid <junaids@google.com>
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 ---
- arch/x86/kvm/vmx/vmx.c | 14 +++++++++++++-
- 1 file changed, 13 insertions(+), 1 deletion(-)
+ arch/x86/kvm/mmu/mmu.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index e8d409b50afd..d49d2a1ddf03 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -6122,7 +6122,15 @@ void vmx_set_virtual_apic_mode(struct kvm_vcpu *vcpu)
- 		if (flexpriority_enabled) {
- 			sec_exec_control |=
- 				SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES;
--			vmx_flush_tlb_current(vcpu);
-+			kvm_make_request(KVM_REQ_APIC_PAGE_RELOAD, vcpu);
-+
-+			/*
-+			 * Flush the TLB, reloading the APIC access page will
-+			 * only do so if its physical address has changed, but
-+			 * the guest may have inserted a non-APIC mapping into
-+			 * the TLB while the APIC access page was disabled.
-+			 */
-+			kvm_make_request(KVM_REQ_TLB_FLUSH_CURRENT, vcpu);
- 		}
- 		break;
- 	case LAPIC_MODE_X2APIC:
-@@ -6146,6 +6154,10 @@ static void vmx_set_apic_access_page_addr(struct kvm_vcpu *vcpu)
- 		return;
- 	}
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 97d906a42e81..b98482b60748 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -78,6 +78,9 @@ module_param_cb(nx_huge_pages_recovery_ratio, &nx_huge_pages_recovery_ratio_ops,
+ 		&nx_huge_pages_recovery_ratio, 0644);
+ __MODULE_PARM_TYPE(nx_huge_pages_recovery_ratio, "uint");
  
-+	if (!(secondary_exec_controls_get(to_vmx(vcpu)) &
-+	    SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES))
-+		return;
++static bool __read_mostly force_tlb_flush_on_reuse;
++module_param_named(flush_on_reuse, force_tlb_flush_on_reuse, bool, 0644);
 +
- 	page = gfn_to_page(vcpu->kvm, APIC_DEFAULT_PHYS_BASE >> PAGE_SHIFT);
- 	if (is_error_page(page))
- 		return;
+ /*
+  * When setting this variable to true it enables Two-Dimensional-Paging
+  * where the hardware walks 2 page tables:
+@@ -4340,6 +4343,9 @@ static void __kvm_mmu_new_cr3(struct kvm_vcpu *vcpu, gpa_t new_cr3,
+ 			      union kvm_mmu_page_role new_role,
+ 			      bool skip_tlb_flush)
+ {
++	if (force_tlb_flush_on_reuse)
++		skip_tlb_flush = false;
++
+ 	if (!fast_cr3_switch(vcpu, new_cr3, new_role, skip_tlb_flush))
+ 		kvm_mmu_free_roots(vcpu, vcpu->arch.mmu,
+ 				   KVM_MMU_ROOT_CURRENT);
 -- 
 2.24.1
 
