@@ -2,36 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B5B591879F1
-	for <lists+kvm@lfdr.de>; Tue, 17 Mar 2020 07:55:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6C360187AB4
+	for <lists+kvm@lfdr.de>; Tue, 17 Mar 2020 08:55:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726272AbgCQGzG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Mar 2020 02:55:06 -0400
-Received: from mga14.intel.com ([192.55.52.115]:25817 "EHLO mga14.intel.com"
+        id S1726077AbgCQHzr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Mar 2020 03:55:47 -0400
+Received: from mga04.intel.com ([192.55.52.120]:45769 "EHLO mga04.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726207AbgCQGzF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 Mar 2020 02:55:05 -0400
-IronPort-SDR: 9URtp7CndDTfHErMEtxwd6mIexQMGiaZub9bvI7xpo62rRn3SrBAeLdJgXZaJvkNmOSFlIMzlV
- r8RsRuZ7xuyg==
+        id S1725872AbgCQHzr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 Mar 2020 03:55:47 -0400
+IronPort-SDR: /Hm/qcicNixH3kqTxbs+O+3dJLb4Jt6PP3Cqu3/GtmgKSjRYdUGXW/qy7Le92p0+wMapf+6AW1
+ VtgoPra1XLBw==
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Mar 2020 23:55:05 -0700
-IronPort-SDR: Ks2lyFR4oQi+/qPyHNM8E+gog2qCtpLm5wZsCX9HHOT8ta1lsCwXUxodY71dHg89zhK5itHWIN
- FBE4ui/9eucg==
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Mar 2020 00:55:47 -0700
+IronPort-SDR: eOFSdfZVZQknN6RXM/9BeO2Nd2xpz2d7sQp4msxwVTTZseODz8LEN/z76AcPAdzF9Scm4iCM4c
+ 1r3hOkOnq9mg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.70,563,1574150400"; 
-   d="scan'208";a="233412448"
-Received: from debian-skl.sh.intel.com ([10.239.160.44])
-  by orsmga007.jf.intel.com with ESMTP; 16 Mar 2020 23:55:03 -0700
-From:   Zhenyu Wang <zhenyuw@linux.intel.com>
-To:     pbonzini@redhat.com
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        "Zhong, Yang" <yang.zhong@intel.com>
-Subject: [PATCH] KVM: x86: Expose AVX512 VP2INTERSECT in cpuid for TGL
-Date:   Tue, 17 Mar 2020 14:55:53 +0800
-Message-Id: <20200317065553.64790-1-zhenyuw@linux.intel.com>
-X-Mailer: git-send-email 2.25.0.rc2
+   d="scan'208";a="279314858"
+Received: from sqa-gate.sh.intel.com (HELO clx-ap-likexu.tsp.org) ([10.239.48.212])
+  by fmsmga002.fm.intel.com with ESMTP; 17 Mar 2020 00:55:44 -0700
+From:   Like Xu <like.xu@linux.intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Eric Hankland <ehankland@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Like Xu <like.xu@linux.intel.com>
+Subject: [PATCH] kvm/x86: Reduce counter period change overhead and delay the effective time
+Date:   Tue, 17 Mar 2020 15:53:15 +0800
+Message-Id: <20200317075315.70933-1-like.xu@linux.intel.com>
+X-Mailer: git-send-email 2.21.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
@@ -39,28 +44,92 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tigerlake new AVX512 VP2INTERSECT feature is available.
-This would expose it for KVM supported cpuid.
+The cost of perf_event_period() is unstable, and when the guest samples
+multiple events, the overhead increases dramatically (5378 ns on E5-2699).
 
-Cc: "Zhong, Yang" <yang.zhong@intel.com>
-Signed-off-by: Zhenyu Wang <zhenyuw@linux.intel.com>
+For a non-running counter, the effective time of the new period is when
+its corresponding enable bit is enabled. Calling perf_event_period()
+in advance is superfluous. For a running counter, it's safe to delay the
+effective time until the KVM_REQ_PMU event is handled. If there are
+multiple perf_event_period() calls before handling KVM_REQ_PMU,
+it helps to reduce the total cost.
+
+Signed-off-by: Like Xu <like.xu@linux.intel.com>
+
 ---
- arch/x86/kvm/cpuid.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ arch/x86/kvm/pmu.c           | 11 -----------
+ arch/x86/kvm/pmu.h           | 11 +++++++++++
+ arch/x86/kvm/vmx/pmu_intel.c | 10 ++++------
+ 3 files changed, 15 insertions(+), 17 deletions(-)
 
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index b1c469446b07..b4e25ff6ab0a 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -374,7 +374,7 @@ static inline void do_cpuid_7_mask(struct kvm_cpuid_entry2 *entry, int index)
- 	const u32 kvm_cpuid_7_0_edx_x86_features =
- 		F(AVX512_4VNNIW) | F(AVX512_4FMAPS) | F(SPEC_CTRL) |
- 		F(SPEC_CTRL_SSBD) | F(ARCH_CAPABILITIES) | F(INTEL_STIBP) |
--		F(MD_CLEAR);
-+		F(MD_CLEAR) | F(AVX512_VP2INTERSECT);
+diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
+index d1f8ca57d354..527a8bb85080 100644
+--- a/arch/x86/kvm/pmu.c
++++ b/arch/x86/kvm/pmu.c
+@@ -437,17 +437,6 @@ void kvm_pmu_init(struct kvm_vcpu *vcpu)
+ 	kvm_pmu_refresh(vcpu);
+ }
  
- 	/* cpuid 7.1.eax */
- 	const u32 kvm_cpuid_7_1_eax_x86_features =
+-static inline bool pmc_speculative_in_use(struct kvm_pmc *pmc)
+-{
+-	struct kvm_pmu *pmu = pmc_to_pmu(pmc);
+-
+-	if (pmc_is_fixed(pmc))
+-		return fixed_ctrl_field(pmu->fixed_ctr_ctrl,
+-			pmc->idx - INTEL_PMC_IDX_FIXED) & 0x3;
+-
+-	return pmc->eventsel & ARCH_PERFMON_EVENTSEL_ENABLE;
+-}
+-
+ /* Release perf_events for vPMCs that have been unused for a full time slice.  */
+ void kvm_pmu_cleanup(struct kvm_vcpu *vcpu)
+ {
+diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
+index d7da2b9e0755..cd112e825d2c 100644
+--- a/arch/x86/kvm/pmu.h
++++ b/arch/x86/kvm/pmu.h
+@@ -138,6 +138,17 @@ static inline u64 get_sample_period(struct kvm_pmc *pmc, u64 counter_value)
+ 	return sample_period;
+ }
+ 
++static inline bool pmc_speculative_in_use(struct kvm_pmc *pmc)
++{
++	struct kvm_pmu *pmu = pmc_to_pmu(pmc);
++
++	if (pmc_is_fixed(pmc))
++		return fixed_ctrl_field(pmu->fixed_ctr_ctrl,
++			pmc->idx - INTEL_PMC_IDX_FIXED) & 0x3;
++
++	return pmc->eventsel & ARCH_PERFMON_EVENTSEL_ENABLE;
++}
++
+ void reprogram_gp_counter(struct kvm_pmc *pmc, u64 eventsel);
+ void reprogram_fixed_counter(struct kvm_pmc *pmc, u8 ctrl, int fixed_idx);
+ void reprogram_counter(struct kvm_pmu *pmu, int pmc_idx);
+diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
+index 7c857737b438..4e689273eb05 100644
+--- a/arch/x86/kvm/vmx/pmu_intel.c
++++ b/arch/x86/kvm/vmx/pmu_intel.c
+@@ -263,15 +263,13 @@ static int intel_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 			if (!msr_info->host_initiated)
+ 				data = (s64)(s32)data;
+ 			pmc->counter += data - pmc_read_counter(pmc);
+-			if (pmc->perf_event)
+-				perf_event_period(pmc->perf_event,
+-						  get_sample_period(pmc, data));
++			if (pmc_speculative_in_use(pmc)) {
++				kvm_make_request(KVM_REQ_PMU, pmc->vcpu);
+ 			return 0;
+ 		} else if ((pmc = get_fixed_pmc(pmu, msr))) {
+ 			pmc->counter += data - pmc_read_counter(pmc);
+-			if (pmc->perf_event)
+-				perf_event_period(pmc->perf_event,
+-						  get_sample_period(pmc, data));
++			if (pmc_speculative_in_use(pmc)) {
++				kvm_make_request(KVM_REQ_PMU, pmc->vcpu);
+ 			return 0;
+ 		} else if ((pmc = get_gp_pmc(pmu, msr, MSR_P6_EVNTSEL0))) {
+ 			if (data == pmc->eventsel)
 -- 
-2.25.0.rc2
+2.21.1
 
