@@ -2,28 +2,28 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4BCE51878DC
-	for <lists+kvm@lfdr.de>; Tue, 17 Mar 2020 05:56:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 61C411878DD
+	for <lists+kvm@lfdr.de>; Tue, 17 Mar 2020 05:56:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726787AbgCQExK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Mar 2020 00:53:10 -0400
+        id S1726801AbgCQExL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Mar 2020 00:53:11 -0400
 Received: from mga04.intel.com ([192.55.52.120]:34097 "EHLO mga04.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726769AbgCQExJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 Mar 2020 00:53:09 -0400
-IronPort-SDR: 9srsuqLzq/C/FrDOlIBzBrwPWhMNNsZXK19aReCgmeIMPXAJKUwoB6sYh9rQ8dpnpGk5rTUgnI
- 1V++kReEsPoA==
+        id S1726760AbgCQExK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 Mar 2020 00:53:10 -0400
+IronPort-SDR: TCtRZB72X1IDjSPrhNXJZJkg/ux8pkpsb+crq7RVgSwksg4fhbp2uovycvXEPjvic+xOpS5iu5
+ eI5asXDuG9wQ==
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga001.fm.intel.com ([10.253.24.23])
   by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Mar 2020 21:53:09 -0700
-IronPort-SDR: 4DUYEdUSKfeA49dlutWOLnwfCIrqTNcO7T5ZFwMo8tK8/cVfRpXpvUAsx/OElJZh50RppwXuoc
- JC1AA4fnkyiw==
+IronPort-SDR: mtrT54hH5lEWRi46NEIhK6lytmJiP5A47NNxRISpQL6ut1L9KH4JBB9ANk+aE+J8iChIb44THU
+ bye3m1R2AacQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.70,563,1574150400"; 
-   d="scan'208";a="355252727"
+   d="scan'208";a="355252734"
 Received: from sjchrist-coffee.jf.intel.com ([10.54.74.202])
-  by fmsmga001.fm.intel.com with ESMTP; 16 Mar 2020 21:53:08 -0700
+  by fmsmga001.fm.intel.com with ESMTP; 16 Mar 2020 21:53:09 -0700
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
@@ -38,9 +38,9 @@ Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
         John Haxby <john.haxby@oracle.com>,
         Miaohe Lin <linmiaohe@huawei.com>,
         Tom Lendacky <thomas.lendacky@amd.com>
-Subject: [PATCH v2 01/32] KVM: VMX: Flush all EPTP/VPID contexts on remote TLB flush
-Date:   Mon, 16 Mar 2020 21:52:07 -0700
-Message-Id: <20200317045238.30434-2-sean.j.christopherson@intel.com>
+Subject: [PATCH v2 02/32] KVM: nVMX: Validate the EPTP when emulating INVEPT(EXTENT_CONTEXT)
+Date:   Mon, 16 Mar 2020 21:52:08 -0700
+Message-Id: <20200317045238.30434-3-sean.j.christopherson@intel.com>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200317045238.30434-1-sean.j.christopherson@intel.com>
 References: <20200317045238.30434-1-sean.j.christopherson@intel.com>
@@ -51,116 +51,37 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Flush all EPTP/VPID contexts if a TLB flush _may_ have been triggered by
-a remote or deferred TLB flush, i.e. by KVM_REQ_TLB_FLUSH.  Remote TLB
-flushes require all contexts to be invalidated, not just the active
-contexts, e.g. all mappings in all contexts for a given HVA need to be
-invalidated on a mmu_notifier invalidation.  Similarly, the instigator
-of the deferred TLB flush may be expecting all contexts to be flushed,
-e.g. vmx_vcpu_load_vmcs().
+Signal VM-Fail for the single-context variant of INVEPT if the specified
+EPTP is invalid.  Per the INEVPT pseudocode in Intel's SDM, it's subject
+to the standard EPT checks:
 
-Without nested VMX, flushing only the current EPTP/VPID context isn't
-problematic because KVM uses a constant VPID for each vCPU, and
-mmu_alloc_direct_roots() all but guarantees KVM will use a single EPTP
-for L1.  In the rare case where a different EPTP is created or reused,
-KVM (currently) unconditionally flushes the new EPTP context prior to
-entering the guest.
+  If VM entry with the "enable EPT" VM execution control set to 1 would
+  fail due to the EPTP value then VMfail(Invalid operand to INVEPT/INVVPID);
 
-With nested VMX, KVM conditionally uses a different VPID for L2, and
-unconditionally uses a different EPTP for L2.  Because KVM doesn't
-_intentionally_ guarantee L2's EPTP/VPID context is flushed on nested
-VM-Enter, it'd be possible for a malicious L1 to attack the host and/or
-different VMs by exploiting the lack of flushing for L2.
-
-  1) Launch nested guest from malicious L1.
-
-  2) Nested VM-Enter to L2.
-
-  3) Access target GPA 'g'.  CPU inserts TLB entry tagged with L2's ASID
-     mapping 'g' to host PFN 'x'.
-
-  2) Nested VM-Exit to L1.
-
-  3) L1 triggers kernel same-page merging (ksm) by duplicating/zeroing
-     the page for PFN 'x'.
-
-  4) Host kernel merges PFN 'x' with PFN 'y', i.e. unmaps PFN 'x' and
-     remaps the page to PFN 'y'.  mmu_notifier sends invalidate command,
-     KVM flushes TLB only for L1's ASID.
-
-  4) Host kernel reallocates PFN 'x' to some other task/guest.
-
-  5) Nested VM-Enter to L2.  KVM does not invalidate L2's EPTP or VPID.
-
-  6) L2 accesses GPA 'g' and gains read/write access to PFN 'x' via its
-     stale TLB entry.
-
-However, current KVM unconditionally flushes L1's EPTP/VPID context on
-nested VM-Exit.  But, that behavior is mostly unintentional, KVM doesn't
-go out of its way to flush EPTP/VPID on nested VM-Enter/VM-Exit, rather
-a TLB flush is guaranteed to occur prior to re-entering L1 due to
-__kvm_mmu_new_cr3() always being called with skip_tlb_flush=false.  On
-nested VM-Enter, this happens via kvm_init_shadow_ept_mmu() (nested EPT
-enabled) or in nested_vmx_load_cr3() (nested EPT disabled).  On nested
-VM-Exit it occurs via nested_vmx_load_cr3().
-
-This also fixes a bug where a deferred TLB flush in the context of L2,
-with EPT disabled, would flush L1's VPID instead of L2's VPID, as
-vmx_flush_tlb() flushes L1's VPID regardless of is_guest_mode().
-
-Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc: Ben Gardon <bgardon@google.com>
-Cc: Jim Mattson <jmattson@google.com>
-Cc: Junaid Shahid <junaids@google.com>
-Cc: Liran Alon <liran.alon@oracle.com>
-Cc: Boris Ostrovsky <boris.ostrovsky@oracle.com>
-Cc: John Haxby <john.haxby@oracle.com>
-Reviewed-by: Liran Alon <liran.alon@oracle.com>
-Fixes: efebf0aaec3d ("KVM: nVMX: Do not flush TLB on L1<->L2 transitions if L1 uses VPID and EPT")
+Fixes: bfd0a56b90005 ("nEPT: Nested INVEPT")
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 ---
- arch/x86/kvm/vmx/vmx.h | 28 +++++++++++++++++++++++++++-
- 1 file changed, 27 insertions(+), 1 deletion(-)
+ arch/x86/kvm/vmx/nested.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-index be93d597306c..d6d67b816ebe 100644
---- a/arch/x86/kvm/vmx/vmx.h
-+++ b/arch/x86/kvm/vmx/vmx.h
-@@ -518,7 +518,33 @@ static inline void __vmx_flush_tlb(struct kvm_vcpu *vcpu, int vpid,
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index 8578513907d7..f3774cef4fd4 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -5156,8 +5156,12 @@ static int handle_invept(struct kvm_vcpu *vcpu)
+ 	}
  
- static inline void vmx_flush_tlb(struct kvm_vcpu *vcpu, bool invalidate_gpa)
- {
--	__vmx_flush_tlb(vcpu, to_vmx(vcpu)->vpid, invalidate_gpa);
-+	struct vcpu_vmx *vmx = to_vmx(vcpu);
-+
-+	/*
-+	 * Flush all EPTP/VPID contexts if the TLB flush _may_ have been
-+	 * invoked via kvm_flush_remote_tlbs(), which always passes %true for
-+	 * @invalidate_gpa.  Flushing remote TLBs requires all contexts to be
-+	 * flushed, not just the active context.
-+	 *
-+	 * Note, this also ensures a deferred TLB flush with VPID enabled and
-+	 * EPT disabled invalidates the "correct" VPID, by nuking both L1 and
-+	 * L2's VPIDs.
-+	 */
-+	if (invalidate_gpa) {
-+		if (enable_ept) {
-+			ept_sync_global();
-+		} else if (enable_vpid) {
-+			if (cpu_has_vmx_invvpid_global()) {
-+				vpid_sync_vcpu_global();
-+			} else {
-+				WARN_ON_ONCE(!cpu_has_vmx_invvpid_single());
-+				vpid_sync_vcpu_single(vmx->vpid);
-+				vpid_sync_vcpu_single(vmx->nested.vpid02);
-+			}
-+		}
-+	} else {
-+		__vmx_flush_tlb(vcpu, vmx->vpid, false);
-+	}
- }
- 
- static inline void decache_tsc_multiplier(struct vcpu_vmx *vmx)
+ 	switch (type) {
+-	case VMX_EPT_EXTENT_GLOBAL:
+ 	case VMX_EPT_EXTENT_CONTEXT:
++		if (!nested_vmx_check_eptp(vcpu, operand.eptp))
++			return nested_vmx_failValid(vcpu,
++				VMXERR_INVALID_OPERAND_TO_INVEPT_INVVPID);
++		fallthrough;
++	case VMX_EPT_EXTENT_GLOBAL:
+ 	/*
+ 	 * TODO: Sync the necessary shadow EPT roots here, rather than
+ 	 * at the next emulated VM-entry.
 -- 
 2.24.1
 
