@@ -2,28 +2,28 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B39911878B2
-	for <lists+kvm@lfdr.de>; Tue, 17 Mar 2020 05:54:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6CAC91878AB
+	for <lists+kvm@lfdr.de>; Tue, 17 Mar 2020 05:53:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727021AbgCQExX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Mar 2020 00:53:23 -0400
-Received: from mga04.intel.com ([192.55.52.120]:34127 "EHLO mga04.intel.com"
+        id S1727034AbgCQExY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Mar 2020 00:53:24 -0400
+Received: from mga04.intel.com ([192.55.52.120]:34126 "EHLO mga04.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727001AbgCQExX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S1727002AbgCQExX (ORCPT <rfc822;kvm@vger.kernel.org>);
         Tue, 17 Mar 2020 00:53:23 -0400
-IronPort-SDR: 4S1QgyQNoxvgkEDWKXgbpL0Cu/BF81ynclIdunEt3rjIOsl3v71nAQIZI7MqYjSqs8/3TPxyhx
- Yp9kLhPaJrqA==
+IronPort-SDR: C3MPFO1vQYfiEdJ3GD/EbwDKZ6IJcdVjxboZSjQvA8mi2gXcAJTderY+CuRX8Fphhe6OJcsmxm
+ 7rnQq8vzU5kA==
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga001.fm.intel.com ([10.253.24.23])
   by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Mar 2020 21:53:22 -0700
-IronPort-SDR: OoVw0F+1w+mMxqupFNoOWLQqbXu94VN7KU50wOWphTxPS4LAAtBdk4CYjI8i4zSMXeG06LeG+P
- wKlF9YSFojsg==
+IronPort-SDR: rDH3iAmDJc0zU3ociC8voHWM+TnzrY7x0lPDZE2EuYkKqhS2maCO2Y2VIv/OyascB6Z0nmPJGb
+ FDUf69ptlkYw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.70,563,1574150400"; 
-   d="scan'208";a="355252820"
+   d="scan'208";a="355252824"
 Received: from sjchrist-coffee.jf.intel.com ([10.54.74.202])
-  by fmsmga001.fm.intel.com with ESMTP; 16 Mar 2020 21:53:21 -0700
+  by fmsmga001.fm.intel.com with ESMTP; 16 Mar 2020 21:53:22 -0700
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
@@ -38,9 +38,9 @@ Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
         John Haxby <john.haxby@oracle.com>,
         Miaohe Lin <linmiaohe@huawei.com>,
         Tom Lendacky <thomas.lendacky@amd.com>
-Subject: [PATCH v2 26/32] KVM: nVMX: Selectively use TLB_FLUSH_CURRENT for nested VM-Enter/VM-Exit
-Date:   Mon, 16 Mar 2020 21:52:32 -0700
-Message-Id: <20200317045238.30434-27-sean.j.christopherson@intel.com>
+Subject: [PATCH v2 27/32] KVM: nVMX: Reload APIC access page on nested VM-Exit only if necessary
+Date:   Mon, 16 Mar 2020 21:52:33 -0700
+Message-Id: <20200317045238.30434-28-sean.j.christopherson@intel.com>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200317045238.30434-1-sean.j.christopherson@intel.com>
 References: <20200317045238.30434-1-sean.j.christopherson@intel.com>
@@ -51,47 +51,72 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Flush only the current context, as opposed to all contexts, when
-requesting a TLB flush to handle the scenario where a L1 does not expect
-a TLB flush, but one is required because L1 and L2 shared an ASID.  This
-occurs if EPT is disabled (no per-EPTP tag), VPID is enabled (hardware
-doesn't flush unconditionally) and vmcs02 does not have its own VPID due
-to exhaustion of available VPIDs.
+Defer reloading L1's APIC page by logging the need for a reload and
+processing it during nested VM-Exit instead of unconditionally reloading
+the APIC page on nested VM-Exit.  This eliminates a TLB flush on the
+majority of VM-Exits as the APIC page rarely needs to be reloaded.
 
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 ---
- arch/x86/kvm/vmx/nested.c | 13 ++++++++-----
- 1 file changed, 8 insertions(+), 5 deletions(-)
+ arch/x86/kvm/vmx/nested.c |  9 ++++-----
+ arch/x86/kvm/vmx/vmx.c    | 10 +++++++---
+ arch/x86/kvm/vmx/vmx.h    |  1 +
+ 3 files changed, 12 insertions(+), 8 deletions(-)
 
 diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 19600d4b3344..04cdf7ded1d3 100644
+index 04cdf7ded1d3..d816f1366943 100644
 --- a/arch/x86/kvm/vmx/nested.c
 +++ b/arch/x86/kvm/vmx/nested.c
-@@ -1167,16 +1167,19 @@ static void nested_vmx_transition_tlb_flush(struct kvm_vcpu *vcpu,
- 	 *
- 	 * If VPID is enabled and used by vmc12, but L2 does not have a unique
- 	 * TLB tag (ASID), i.e. EPT is disabled and KVM was unable to allocate
--	 * a VPID for L2, flush the TLB as the effective ASID is common to both
--	 * L1 and L2.
-+	 * a VPID for L2, flush the current context as the effective ASID is
-+	 * common to both L1 and L2.
- 	 *
- 	 * Defer the flush so that it runs after vmcs02.EPTP has been set by
- 	 * KVM_REQ_LOAD_MMU_PGD (if nested EPT is enabled) and to avoid
- 	 * redundant flushes further down the nested pipeline.
- 	 */
--	if (enable_vpid &&
--	    (!nested_cpu_has_vpid(vmcs12) || !nested_has_guest_tlb_tag(vcpu)))
--		kvm_make_request(KVM_REQ_TLB_FLUSH, vcpu);
-+	if (enable_vpid) {
-+		if (!nested_cpu_has_vpid(vmcs12))
-+			kvm_make_request(KVM_REQ_TLB_FLUSH, vcpu);
-+		else if (!nested_has_guest_tlb_tag(vcpu))
-+			kvm_make_request(KVM_REQ_TLB_FLUSH_CURRENT, vcpu);
+@@ -4365,11 +4365,10 @@ void nested_vmx_vmexit(struct kvm_vcpu *vcpu, u32 exit_reason,
+ 	kvm_vcpu_unmap(vcpu, &vmx->nested.pi_desc_map, true);
+ 	vmx->nested.pi_desc = NULL;
+ 
+-	/*
+-	 * We are now running in L2, mmu_notifier will force to reload the
+-	 * page's hpa for L2 vmcs. Need to reload it for L1 before entering L1.
+-	 */
+-	kvm_make_request(KVM_REQ_APIC_PAGE_RELOAD, vcpu);
++	if (vmx->nested.reload_vmcs01_apic_access_page) {
++		vmx->nested.reload_vmcs01_apic_access_page = false;
++		kvm_make_request(KVM_REQ_APIC_PAGE_RELOAD, vcpu);
 +	}
+ 
+ 	if ((exit_reason != -1) && (enable_shadow_vmcs || vmx->nested.hv_evmcs))
+ 		vmx->nested.need_vmcs12_to_shadow_sync = true;
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index ae7279802652..3155329bf844 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -6138,10 +6138,14 @@ void vmx_set_virtual_apic_mode(struct kvm_vcpu *vcpu)
+ 
+ static void vmx_set_apic_access_page_addr(struct kvm_vcpu *vcpu, hpa_t hpa)
+ {
+-	if (!is_guest_mode(vcpu)) {
+-		vmcs_write64(APIC_ACCESS_ADDR, hpa);
+-		vmx_flush_tlb_current(vcpu);
++	/* Defer reload until vmcs01 is the current VMCS. */
++	if (is_guest_mode(vcpu)) {
++		to_vmx(vcpu)->nested.reload_vmcs01_apic_access_page = true;
++		return;
+ 	}
++
++	vmcs_write64(APIC_ACCESS_ADDR, hpa);
++	vmx_flush_tlb_current(vcpu);
  }
  
- static bool is_bitwise_subset(u64 superset, u64 subset, u64 mask)
+ static void vmx_hwapic_isr_update(struct kvm_vcpu *vcpu, int max_isr)
+diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
+index 571249e18bb6..66cc9f639e4b 100644
+--- a/arch/x86/kvm/vmx/vmx.h
++++ b/arch/x86/kvm/vmx/vmx.h
+@@ -138,6 +138,7 @@ struct nested_vmx {
+ 	bool vmcs02_initialized;
+ 
+ 	bool change_vmcs01_virtual_apic_mode;
++	bool reload_vmcs01_apic_access_page;
+ 
+ 	/*
+ 	 * Enlightened VMCS has been enabled. It does not mean that L1 has to
 -- 
 2.24.1
 
