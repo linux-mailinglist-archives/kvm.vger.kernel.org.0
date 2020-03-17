@@ -2,26 +2,26 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D1EAE1878C0
-	for <lists+kvm@lfdr.de>; Tue, 17 Mar 2020 05:54:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D3E6F1878C1
+	for <lists+kvm@lfdr.de>; Tue, 17 Mar 2020 05:54:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726930AbgCQExT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Mar 2020 00:53:19 -0400
+        id S1726664AbgCQEyj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Mar 2020 00:54:39 -0400
 Received: from mga04.intel.com ([192.55.52.120]:34117 "EHLO mga04.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726917AbgCQExS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 Mar 2020 00:53:18 -0400
-IronPort-SDR: nJ4QpDBULnp6uLtxC8C7Vo98eS280W3SToRByBcGQpFWrX3ZpXnw2nm0YwzSA8xzeOVva+l6xH
- t9QP98c79vBw==
+        id S1726895AbgCQExT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 Mar 2020 00:53:19 -0400
+IronPort-SDR: zW+9ovCLtEUyrMCC/JK8cHXIV5Cjx7cO04pK2EueWlBrKlfCGDSWPku36Xggwm+NxDDuDDpxct
+ 1N5/8duWK8Ng==
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Mar 2020 21:53:18 -0700
-IronPort-SDR: UQ2vuzzuPnlQAi2xN9myxKIDVFNL+Shl7f/QwvtTiPFbhZtUug6Yfae+bs167+PjHr75dMUfq5
- ON/DLrbtqHVA==
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Mar 2020 21:53:19 -0700
+IronPort-SDR: WmH91DVc/zlUYV1NKw4Q6EJE1mrYqlCva4oU/73mN2zOhkTYM64vshUbLO+3M7/iddWJYNEnjG
+ Sg/U/wmNVqjA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.70,563,1574150400"; 
-   d="scan'208";a="355252795"
+   d="scan'208";a="355252798"
 Received: from sjchrist-coffee.jf.intel.com ([10.54.74.202])
   by fmsmga001.fm.intel.com with ESMTP; 16 Mar 2020 21:53:18 -0700
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
@@ -38,9 +38,9 @@ Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
         John Haxby <john.haxby@oracle.com>,
         Miaohe Lin <linmiaohe@huawei.com>,
         Tom Lendacky <thomas.lendacky@amd.com>
-Subject: [PATCH v2 19/32] KVM: nVMX: Move nested_get_vpid02() to vmx/nested.h
-Date:   Mon, 16 Mar 2020 21:52:25 -0700
-Message-Id: <20200317045238.30434-20-sean.j.christopherson@intel.com>
+Subject: [PATCH v2 20/32] KVM: VMX: Introduce vmx_flush_tlb_current()
+Date:   Mon, 16 Mar 2020 21:52:26 -0700
+Message-Id: <20200317045238.30434-21-sean.j.christopherson@intel.com>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200317045238.30434-1-sean.j.christopherson@intel.com>
 References: <20200317045238.30434-1-sean.j.christopherson@intel.com>
@@ -51,53 +51,64 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Move nested_get_vpid02() to vmx/nested.h so that a future patch can
-reference it from vmx.c to implement context-specific TLB flushing.
+Add a helper to flush TLB entries only for the current EPTP/VPID context
+and use it for the existing direct invocations of vmx_flush_tlb().  TLB
+flushes that are specific to the current vCPU state do not need to flush
+other contexts.
 
-No functional change intended.
+Note, both converted call sites happen to be related to the APIC access
+page, this is purely coincidental.
 
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 ---
- arch/x86/kvm/vmx/nested.c | 7 -------
- arch/x86/kvm/vmx/nested.h | 7 +++++++
- 2 files changed, 7 insertions(+), 7 deletions(-)
+ arch/x86/kvm/vmx/vmx.c | 20 ++++++++++++++++++--
+ 1 file changed, 18 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 20c6e363f760..960ecbab5ebe 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -1154,13 +1154,6 @@ static bool nested_has_guest_tlb_tag(struct kvm_vcpu *vcpu)
- 	       (nested_cpu_has_vpid(vmcs12) && to_vmx(vcpu)->nested.vpid02);
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index c6affaaef138..2d0a8c7654d7 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -2874,6 +2874,22 @@ static void vmx_flush_tlb(struct kvm_vcpu *vcpu)
+ 	}
  }
  
--static u16 nested_get_vpid02(struct kvm_vcpu *vcpu)
--{
--	struct vcpu_vmx *vmx = to_vmx(vcpu);
--
--	return vmx->nested.vpid02 ? vmx->nested.vpid02 : vmx->vpid;
--}
--
- static bool is_bitwise_subset(u64 superset, u64 subset, u64 mask)
- {
- 	superset &= mask;
-diff --git a/arch/x86/kvm/vmx/nested.h b/arch/x86/kvm/vmx/nested.h
-index 21d36652f213..debc5eeb5757 100644
---- a/arch/x86/kvm/vmx/nested.h
-+++ b/arch/x86/kvm/vmx/nested.h
-@@ -60,6 +60,13 @@ static inline int vmx_has_valid_vmcs12(struct kvm_vcpu *vcpu)
- 		vmx->nested.hv_evmcs;
- }
- 
-+static inline u16 nested_get_vpid02(struct kvm_vcpu *vcpu)
++static void vmx_flush_tlb_current(struct kvm_vcpu *vcpu)
 +{
-+	struct vcpu_vmx *vmx = to_vmx(vcpu);
++	u64 root_hpa = vcpu->arch.mmu->root_hpa;
 +
-+	return vmx->nested.vpid02 ? vmx->nested.vpid02 : vmx->vpid;
++	/* No flush required if the current context is invalid. */
++	if (!VALID_PAGE(root_hpa))
++		return;
++
++	if (enable_ept)
++		ept_sync_context(construct_eptp(vcpu, root_hpa));
++	else if (!is_guest_mode(vcpu))
++		vpid_sync_context(to_vmx(vcpu)->vpid);
++	else
++		vpid_sync_context(nested_get_vpid02(vcpu));
 +}
 +
- static inline unsigned long nested_ept_get_eptp(struct kvm_vcpu *vcpu)
+ static void vmx_flush_tlb_gva(struct kvm_vcpu *vcpu, gva_t addr)
  {
- 	/* return the page table to be shadowed - in our case, EPT12 */
+ 	/*
+@@ -6104,7 +6120,7 @@ void vmx_set_virtual_apic_mode(struct kvm_vcpu *vcpu)
+ 		if (flexpriority_enabled) {
+ 			sec_exec_control |=
+ 				SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES;
+-			vmx_flush_tlb(vcpu);
++			vmx_flush_tlb_current(vcpu);
+ 		}
+ 		break;
+ 	case LAPIC_MODE_X2APIC:
+@@ -6122,7 +6138,7 @@ static void vmx_set_apic_access_page_addr(struct kvm_vcpu *vcpu, hpa_t hpa)
+ {
+ 	if (!is_guest_mode(vcpu)) {
+ 		vmcs_write64(APIC_ACCESS_ADDR, hpa);
+-		vmx_flush_tlb(vcpu);
++		vmx_flush_tlb_current(vcpu);
+ 	}
+ }
+ 
 -- 
 2.24.1
 
