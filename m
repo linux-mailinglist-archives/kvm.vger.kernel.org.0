@@ -2,61 +2,50 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 910DC188354
-	for <lists+kvm@lfdr.de>; Tue, 17 Mar 2020 13:11:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 59875188336
+	for <lists+kvm@lfdr.de>; Tue, 17 Mar 2020 13:11:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726970AbgCQML6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Mar 2020 08:11:58 -0400
-Received: from sonic308-2.consmr.mail.ne1.yahoo.com ([66.163.187.121]:39078
-        "EHLO sonic308-2.consmr.mail.ne1.yahoo.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726949AbgCQML4 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 17 Mar 2020 08:11:56 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1584447115; bh=kcevCRoll2+Bsa3FDERpIV72LVcB1A4YV1b5N2AWYBk=; h=Date:From:Reply-To:Subject:References:From:Subject; b=iUlGnRLQG6F3FaEVNIp3zcBgcxIJSYrz1n2caipTs0506aGX82j4iJh/jdfSgvf/ydicy2n4aU/zcMuD6FT0MPShSa5Y9D0k1iZPPFL8PIFVehJi7MVWrDXqoMlkPLuvXo9aP+WQB/EErjPvAayMOmUP+gTL/NWxITqPGPZK2XtE9pgcVrWyc3xc/+YTyebWNK+rtmAyWlGP/eliRO3yEsGmz8o9JBSgOoQqhEmw5DHDZJheBrRRyvm+a84qVIzOFpXH9siCaC50IUM0wmFhzZuSMna+3k035X/W95iGIQBCFRdjIOLpT0JSULvvxk0W9DSm14SNXbMEEWQazrStyw==
-X-YMail-OSG: 1HTxhrwVM1kZE2_6l5ymOn55wL.OWIsR9auq.uEqq_ZHTQie.PaPJpxl5rp9igB
- FCikKZTBgfOj8BtWp.7dvKTeASz9ejKdjMoqxE0hg4RSPq.Xd74XcI5VEnMkqJkyztk67cbM7Or9
- unzm5W7a3GjGw1sOHs_4l.tEhyFRVj01f6pdEhXinjs1ji5NymU2z43mkQDygHNj16YBZa9wTB07
- moCD3msk0w8_kdkp22fpPwTX4fLTEmNYBk21vXz6HtPk0.6b3kVjtTGK6_ZZh_OYbaLCc5TFSvT.
- AENtXRny18CK0gOejXVDH8ptfkWZF5lg6LdBoZiGU43ZYWbhjIXMSDsrYPX.SYJZG3m6aL96RlDc
- 4vm72HzxkuZRIQhMed8kwuXYxZl_jqoyOlhI.nyfIvgsga1AYHOmHv.U_XZRhERMqBF.P5FA.Wnv
- 6kMqdwrgGgGIaBeQs75cdTwEmgv5ykzgM2LfpevJOpR_MdTOpjHP08RQMgGirEnMzLLu4uGsG6Jp
- KxzISBhVgXQ4x9lZvKT1RFpVYF.wX6_RTCbllK1_nHOjYKRfnp8EfjyYm_VsnMOFRAnulZztZzAB
- juSj9TeppZ71SsI8u6thVsJU0PtFY_.RdSdkfF0PQaXmIwubwv0BR2gR0gt5yXxJV0kAW.bpPwB4
- 8v7fMU_tvJzbYunZIf9a6A3doFdxSkSIuEfQctkuJZxwf955s2qBys5JamCgpQA5LprKLq3.iR.G
- BIyc.9HtBGd7_XlYAWyIBlRYB4dhsVF8_yma6nxIJdOXkg7QBy0U0Mba7DucPundHOuIxwEb5Rov
- KpuYyiiYmAOOobaSJaM8GYdWZLDqdKdCwa.RlA0BHZIK3lDCKK9a76.qpc6gs.WiFFwndlk9SpVe
- CFz52MUKaSLxUp3Y.jhTJdHuxZgtpswiFP2J_BbRrk3nvH_6qaOcGnaxXjwty5qD_ElDn2rmpKl4
- a06XHTzdmDucbtqSf1I5rTyiFcVFiIzSREWbA7Kc8Kh_utzmUu7QXM6J87zt9PxzcFHlBHvtZV3d
- Jt2ydetpORiYIDflivuU8c5bAF93F6tbvCTO1bi7racv42jfg48zkh61iQck2C7pew6.5E.HLDNs
- CDqJWL0wv05joC45oVjMt6mHEACw8YXaKFnoUMjnlrbHwDktN8ty70H7rYDNrKIM_SRj1rjtWOE2
- wpRrOZm8gM..Xxb1sh2OeXwtcuiT16WAIZ8HTAtstL3u_TVZOyW_eMVZbtrQE7M7dhwEAxNYa.uz
- Rdql3UbrnbUdAEu4bpqZDBxt5XwCviqOtp.6WkyD5frAPEgwbHYnAZsPjZPglQsouJX2ttD_S.Kj
- HBXFqHTAuu1pSYJNaUNcIey6u_eM-
-Received: from sonic.gate.mail.ne1.yahoo.com by sonic308.consmr.mail.ne1.yahoo.com with HTTP; Tue, 17 Mar 2020 12:11:55 +0000
-Date:   Tue, 17 Mar 2020 12:09:54 +0000 (UTC)
-From:   Stephen Li <stenn6@gabg.net>
-Reply-To: stephli947701@gmail.com
-Message-ID: <2059527141.1811494.1584446994240@mail.yahoo.com>
-Subject: REF
+        id S1726802AbgCQMKg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Mar 2020 08:10:36 -0400
+Received: from foss.arm.com ([217.140.110.172]:36322 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726490AbgCQMKg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 Mar 2020 08:10:36 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 227D030E;
+        Tue, 17 Mar 2020 05:10:36 -0700 (PDT)
+Received: from [192.168.0.106] (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A2BB03F534;
+        Tue, 17 Mar 2020 05:10:35 -0700 (PDT)
+Subject: Re: [PULL kvm-unit-tests 00/10] arm/arm64: Various fixes
+To:     Andrew Jones <drjones@redhat.com>, kvm@vger.kernel.org
+Cc:     pbonzini@redhat.com
+References: <20200206162434.14624-1-drjones@redhat.com>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <f14ba398-b838-151d-0c27-1cb9992fb27a@arm.com>
+Date:   Tue, 17 Mar 2020 12:10:56 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <20200206162434.14624-1-drjones@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-References: <2059527141.1811494.1584446994240.ref@mail.yahoo.com>
-X-Mailer: WebService/1.1.15342 YMailNodin Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36
-To:     unlisted-recipients:; (no To-header on input)
+Content-Language: en-US
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi,
 
+On 2/6/20 4:24 PM, Andrew Jones wrote:
+> Hi Paolo,
+>
+> This pull request contains one general Makefile fix, but the rest
+> are a nice collection of fixes for arm/arm64 from Alexandru.
 
-Greetings,
-I was searching through a local business directory when I found your
-profile. I am Soliciting On-Behalf of my private client who is
-interested in having a serious business investment in your country. If
-you have a valid business, investment or project he can invest
-back to me for more details. Your swift response is highly needed.
-Sincerely
-Stephen Li
-Please response back to me with is my private email below for more details
-stephli947701@gmail.com
+Gentle ping about this pull request, in case it has slipped through the cracks.
+
+Thanks,
+Alex
+
