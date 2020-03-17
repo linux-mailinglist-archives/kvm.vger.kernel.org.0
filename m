@@ -2,137 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 66272188E5F
-	for <lists+kvm@lfdr.de>; Tue, 17 Mar 2020 20:54:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 61D0F188F39
+	for <lists+kvm@lfdr.de>; Tue, 17 Mar 2020 21:44:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726789AbgCQTx6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Mar 2020 15:53:58 -0400
-Received: from mga07.intel.com ([134.134.136.100]:43598 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726294AbgCQTx5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 Mar 2020 15:53:57 -0400
-IronPort-SDR: NiXrL8DwljF97pNa85UmhnH34T2gA/S8mUt1s/zz57SQRqnL8XaRpUUUXpAXWGNSdBcjN5NjxN
- zJ96kevVUDfA==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Mar 2020 12:53:55 -0700
-IronPort-SDR: Ycsnj1AQXL2CoIr8PVFPOfKU/5vlVSg0xS409rOMErNjN36rTjp9vnKrdM3OalM48kYhMliZmt
- kr2E4TTQzT9g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,565,1574150400"; 
-   d="scan'208";a="233604303"
-Received: from sjchrist-coffee.jf.intel.com ([10.54.74.202])
-  by orsmga007.jf.intel.com with ESMTP; 17 Mar 2020 12:53:55 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>,
-        Jan Kiszka <jan.kiszka@siemens.com>
-Subject: [PATCH 2/2] KVM: x86: Add blurb to CPUID tracepoint when using max basic leaf values
-Date:   Tue, 17 Mar 2020 12:53:54 -0700
-Message-Id: <20200317195354.28384-3-sean.j.christopherson@intel.com>
-X-Mailer: git-send-email 2.24.1
-In-Reply-To: <20200317195354.28384-1-sean.j.christopherson@intel.com>
-References: <20200317195354.28384-1-sean.j.christopherson@intel.com>
+        id S1726823AbgCQUoe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Mar 2020 16:44:34 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:39276 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726730AbgCQUod (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 Mar 2020 16:44:33 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02HKiFu4046053;
+        Tue, 17 Mar 2020 20:44:30 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=mime-version :
+ message-id : date : from : to : cc : subject : content-type :
+ content-transfer-encoding; s=corp-2020-01-29;
+ bh=OdpgIhTvhAdO6ABMJZtItawg7Zcv3wS0co5iLt+/01w=;
+ b=fSFwxW66DGK4ri9vd1VEfWy+7g58xiiLJ+eryuxqM9FpPyB+HUtgUYfuoGQgJN18IGp3
+ Kh5RD6ATw9zKIg8yqsCon1kubZko1nkP0ey3c1+m5Q0dbjOeiNMmTUcGMkwJYs2mMKYF
+ voViQdShBMhsPhFI4qAzzpXjDFVG8FrUzqkp4mvTIio8t8ymY7A7vWqXIOANipkVf4XD
+ rAVtm+CQoI3CLgUxYx84aDzZUu8pcySFr0+hfUzvEr2ZqgdW1kj0GYOIfd9U5Ei9aL3q
+ SbX21abxM3QvgWnHJFbD+Ebp91Ra0He3mTf3U0V2wy9potp1g1cR60Mbh3Ij1CkwkiTx 0Q== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by userp2130.oracle.com with ESMTP id 2yrppr79n3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 17 Mar 2020 20:44:30 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02HKcVjR149082;
+        Tue, 17 Mar 2020 20:44:30 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by userp3020.oracle.com with ESMTP id 2ys8yyx3b0-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 17 Mar 2020 20:44:30 +0000
+Received: from abhmp0010.oracle.com (abhmp0010.oracle.com [141.146.116.16])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 02HKiTdD023933;
+        Tue, 17 Mar 2020 20:44:29 GMT
+Received: from ban25x6uut29.us.oracle.com (/10.153.73.29) by default (Oracle
+ Beehive Gateway v4.0) with ESMTP ; Tue, 17 Mar 2020 13:43:16 -0700
 MIME-Version: 1.0
+Message-ID: <20200317200537.21593-1-krish.sadhukhan@oracle.com>
+Date:   Tue, 17 Mar 2020 13:05:34 -0700 (PDT)
+From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
+To:     kvm@vger.kernel.org
+Cc:     pbonzini@redhat.com
+Subject: [PATCH 0/3] kvm-unit-test: nSVM: Add alternative (v2) test framework
+ and add test for SVME.EFER vmcb field
+X-Mailer: git-send-email 2.20.1
+Content-Type: text/plain; charset=ascii
 Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9563 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 mlxlogscore=417 mlxscore=0
+ adultscore=0 bulkscore=0 malwarescore=0 spamscore=0 suspectscore=13
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
+ definitions=main-2003170077
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9563 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 bulkscore=0
+ suspectscore=13 lowpriorityscore=0 phishscore=0 adultscore=0 clxscore=1015
+ impostorscore=0 priorityscore=1501 spamscore=0 mlxlogscore=472 mlxscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
+ definitions=main-2003170077
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Tack on "used max basic" at the end of the CPUID tracepoint when the
-output values correspond to the max basic leaf, i.e. when emulating
-Intel's out-of-range CPUID behavior.  Observing "cpuid entry not found"
-in the tracepoint with non-zero output values is confusing for users
-that aren't familiar with the out-of-range semantics, and qualifying the
-"not found" case hopefully makes it clear that "found" means "found the
-exact entry".
+This patchset builds on top of my previous patch titled:
 
-Suggested-by: Jan Kiszka <jan.kiszka@siemens.com>
-Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
----
- arch/x86/kvm/cpuid.c |  9 ++++++---
- arch/x86/kvm/trace.h | 11 +++++++----
- 2 files changed, 13 insertions(+), 7 deletions(-)
+	"[PATCH] kvm-unit-test: nSVM: Restructure nSVM test code"
 
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index bccaae0df668..a515a83c6f29 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -990,13 +990,15 @@ bool kvm_cpuid(struct kvm_vcpu *vcpu, u32 *eax, u32 *ebx,
- {
- 	u32 orig_function = *eax, function = *eax, index = *ecx;
- 	struct kvm_cpuid_entry2 *entry;
--	bool exact;
-+	bool exact, used_max_basic = false;
- 
- 	entry = kvm_find_cpuid_entry(vcpu, function, index);
- 	exact = !!entry;
- 
--	if (!entry && !exact_only)
-+	if (!entry && !exact_only) {
- 		entry = get_out_of_range_cpuid_entry(vcpu, &function, index);
-+		used_max_basic = !!entry;
-+	}
- 
- 	if (entry) {
- 		*eax = entry->eax;
-@@ -1026,7 +1028,8 @@ bool kvm_cpuid(struct kvm_vcpu *vcpu, u32 *eax, u32 *ebx,
- 			}
- 		}
- 	}
--	trace_kvm_cpuid(orig_function, index, *eax, *ebx, *ecx, *edx, exact);
-+	trace_kvm_cpuid(orig_function, index, *eax, *ebx, *ecx, *edx, exact,
-+			used_max_basic);
- 	return exact;
- }
- EXPORT_SYMBOL_GPL(kvm_cpuid);
-diff --git a/arch/x86/kvm/trace.h b/arch/x86/kvm/trace.h
-index 27270ba0f05f..c3d1e9f4a2c0 100644
---- a/arch/x86/kvm/trace.h
-+++ b/arch/x86/kvm/trace.h
-@@ -153,8 +153,8 @@ TRACE_EVENT(kvm_fast_mmio,
- TRACE_EVENT(kvm_cpuid,
- 	TP_PROTO(unsigned int function, unsigned int index, unsigned long rax,
- 		 unsigned long rbx, unsigned long rcx, unsigned long rdx,
--		 bool found),
--	TP_ARGS(function, index, rax, rbx, rcx, rdx, found),
-+		 bool found, bool used_max_basic),
-+	TP_ARGS(function, index, rax, rbx, rcx, rdx, found, used_max_basic),
- 
- 	TP_STRUCT__entry(
- 		__field(	unsigned int,	function	)
-@@ -164,6 +164,7 @@ TRACE_EVENT(kvm_cpuid,
- 		__field(	unsigned long,	rcx		)
- 		__field(	unsigned long,	rdx		)
- 		__field(	bool,		found		)
-+		__field(	bool,		used_max_basic	)
- 	),
- 
- 	TP_fast_assign(
-@@ -174,12 +175,14 @@ TRACE_EVENT(kvm_cpuid,
- 		__entry->rcx		= rcx;
- 		__entry->rdx		= rdx;
- 		__entry->found		= found;
-+		__entry->used_max_basic	= used_max_basic;
- 	),
- 
--	TP_printk("func %x idx %x rax %lx rbx %lx rcx %lx rdx %lx, cpuid entry %s",
-+	TP_printk("func %x idx %x rax %lx rbx %lx rcx %lx rdx %lx, cpuid entry %s%s",
- 		  __entry->function, __entry->index, __entry->rax,
- 		  __entry->rbx, __entry->rcx, __entry->rdx,
--		  __entry->found ? "found" : "not found")
-+		  __entry->found ? "found" : "not found",
-+		  __entry->used_max_basic ? ", used max basic" : "")
- );
- 
- #define AREG(x) { APIC_##x, "APIC_" #x }
--- 
-2.24.1
+The idea here is to create an alternative (v2) test framework that nVMX has
+so that tests that don't need the functions that the current framework
+requires, can be added.
+Patch# 1: Adds the alternative (v2) framework.
+Patch# 2: Adds helper functions for reading and writing vmcb fields by the
+	  tests.
+Patch# 3: Adds a test for SVME.EFER field.
+
+[PATCH 1/3] kvm-unit-test: nSVM: Add alternative (v2) test format for nested guests
+[PATCH 2/3] kvm-unit-test: nSVM: Add helper functions to write and read vmcb fields
+[PATCH 3/3] kvm-unit-test: nSVM: Test SVME.EFER on VMRUN of nested guests
+
+ x86/svm.c       | 91 ++++++++++++++++++++++++++++++++++++++++++++-------------
+ x86/svm.h       |  8 +++++
+ x86/svm_tests.c | 25 ++++++++++++++++
+ 3 files changed, 104 insertions(+), 20 deletions(-)
+
+Krish Sadhukhan (3):
+      nSVM: Add alternative (v2) test format for nested guests
+      nSVM: Add helper functions to write and read vmcb fields
+      nSVM: Test SVME.EFER on VMRUN of nested guests
 
