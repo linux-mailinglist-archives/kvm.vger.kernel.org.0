@@ -2,184 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0DFAE1877E9
-	for <lists+kvm@lfdr.de>; Tue, 17 Mar 2020 03:49:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DE878187842
+	for <lists+kvm@lfdr.de>; Tue, 17 Mar 2020 04:48:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726744AbgCQCte (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Mar 2020 22:49:34 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:52714 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726343AbgCQCte (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 Mar 2020 22:49:34 -0400
-Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id AC9D0E0409BF2661E9C8;
-        Tue, 17 Mar 2020 10:49:28 +0800 (CST)
-Received: from [127.0.0.1] (10.173.222.27) by DGGEMS406-HUB.china.huawei.com
- (10.3.19.206) with Microsoft SMTP Server id 14.3.487.0; Tue, 17 Mar 2020
- 10:49:20 +0800
-Subject: Re: [PATCH v5 16/23] irqchip/gic-v4.1: Eagerly vmap vPEs
-To:     Marc Zyngier <maz@kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-CC:     Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
-        Jason Cooper <jason@lakedaemon.net>,
-        Robert Richter <rrichter@marvell.com>,
-        "Thomas Gleixner" <tglx@linutronix.de>,
-        Eric Auger <eric.auger@redhat.com>,
-        "James Morse" <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>
-References: <20200304203330.4967-1-maz@kernel.org>
- <20200304203330.4967-17-maz@kernel.org>
-From:   Zenghui Yu <yuzenghui@huawei.com>
-Message-ID: <2817cb89-4cc2-549f-6e40-91d941aa8a5f@huawei.com>
-Date:   Tue, 17 Mar 2020 10:49:18 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+        id S1726416AbgCQDs0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Mar 2020 23:48:26 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:37171 "EHLO
+        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726082AbgCQDs0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 Mar 2020 23:48:26 -0400
+Received: by mail-wr1-f67.google.com with SMTP id 6so23825290wre.4;
+        Mon, 16 Mar 2020 20:48:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=FrKlI3sd00+t1N/OzNDhMxZ6Gkz1BB4AwGkkgntEVIU=;
+        b=D0YlpZUxZXl0ocStqqZ8JRBOU64KdAWnHdiKFg9shQ/OR4Op9SINZCdUQmm4gXN+Ul
+         wLtpt98z6sc9LqYUwfcTqIcxjf3mgkKpY0Gw/rXk6FS90olTq44DQpHF94l1cHRW0Tz/
+         gI818jSLzO1dx1NwwR/+d3ushN/uEMktaw+/XJzt2MMOol6SBKTQmFb5T5uc9XUycgCY
+         Z6lJ4BSdd+MFvCr96qOue2seEd9LckycNO3Qdk5XYjENSaqlBxlvy3//7X8Xf7Jq9nbi
+         Eq0GwhXGIW5JAaFU1yftfTGpdi6G2+wItF1gnwsil8eWRcBmf5JZKWrf0dqUPI+9/Vx+
+         KaZA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=FrKlI3sd00+t1N/OzNDhMxZ6Gkz1BB4AwGkkgntEVIU=;
+        b=GT8mOkhpQofmY0ky+blyx3FjWyFYFYLlhnxIuys7EMkY/UHXKmmQ34RoZv1Om83FGz
+         8omHLbI82Bc+u3C91beKnv4lMlwV8uuNrqVa5MG6pcI8GZqmx4G9pSkaXh3Qsn/KGV/V
+         wyrzQRAYMbP9tln6QjDJ0xP+7oxXe+5t1pga8ijnMmf4sp1qU4MKd0jnS5AV+nmccHwI
+         NcEkKTP/O94+dfWrJo4ptLIBUdBZHupSuGiPwrALybIyTUmvRQbKfgoEi100+i6r6Fh0
+         EvcjBthhm7n2Do4wbfuLaCR2GYkMD4BvFcmYYHKOWfNStyj4HssbVxe2hLSeBywooVV5
+         gKWg==
+X-Gm-Message-State: ANhLgQ1fwPGvX6h+FPwZE/hR2gS8rw7/HEccdI5P/KxHGacne1C0QSeX
+        zEkD9GncDktgSE7PJ3craTnc8ZyoCK4=
+X-Google-Smtp-Source: ADFU+vsOLrCitUkZGjpfFFU6lT84rq+gBAhbdnqEN6gYJq5Z/Rs0bY3AKGXGLxi6NHK129Hkljb6jg==
+X-Received: by 2002:a5d:69c1:: with SMTP id s1mr3239639wrw.351.1584416904565;
+        Mon, 16 Mar 2020 20:48:24 -0700 (PDT)
+Received: from jondnuc.lan (IGLD-84-229-155-229.inter.net.il. [84.229.155.229])
+        by smtp.gmail.com with ESMTPSA id c23sm1457757wrb.79.2020.03.16.20.48.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 16 Mar 2020 20:48:23 -0700 (PDT)
+From:   Jon Doron <arilou@gmail.com>
+To:     kvm@vger.kernel.org, linux-hyperv@vger.kernel.org
+Cc:     vkuznets@redhat.com, Jon Doron <arilou@gmail.com>
+Subject: [PATCH v6 0/5] x86/kvm/hyper-v: add support for synthetic debugger
+Date:   Tue, 17 Mar 2020 05:47:59 +0200
+Message-Id: <20200317034804.112538-1-arilou@gmail.com>
+X-Mailer: git-send-email 2.24.1
 MIME-Version: 1.0
-In-Reply-To: <20200304203330.4967-17-maz@kernel.org>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.173.222.27]
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
+Add support for the synthetic debugger interface of hyper-v, the
+synthetic debugger has 2 modes.
+1. Use a set of MSRs to send/recv information (undocumented so it's not
+   going to the hyperv-tlfs.h)
+2. Use hypercalls
 
-On 2020/3/5 4:33, Marc Zyngier wrote:
-> Now that we have HW-accelerated SGIs being delivered to VPEs, it
-> becomes required to map the VPEs on all ITSs instead of relying
-> on the lazy approach that we would use when using the ITS-list
-> mechanism.
-> 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
+The first mode is based the following MSRs:
+1. Control/Status MSRs which either asks for a send/recv .
+2. Send/Recv MSRs each holds GPA where the send/recv buffers are.
+3. Pending MSR, holds a GPA to a PAGE that simply has a boolean that
+   indicates if there is data pending to issue a recv VMEXIT.
 
-Before GICv4.1, we use vlpi_count to evaluate whether the vPE has been
-mapped on the specified ITS, and use this refcount to only issue VMOVP
-to those involved ITSes. It's broken after this patch.
+The first mode implementation is to simply exit to user-space when
+either the control MSR or the pending MSR are being set.
+Then it's up-to userspace to implement the rest of the logic of sending/recving.
 
-We may need to re-evaluate "whether the vPE is mapped" now that we're at
-GICv4.1, otherwise *no* VMOVP will be issued on the v4.1 capable machine
-(I mean those without single VMOVP support).
+In the second mode instead of using MSRs KNet will simply issue
+Hypercalls with the information to send/recv, in this mode the data
+being transferred is UDP encapsulated, unlike in the previous mode in
+which you get just the data to send.
 
-What I'm saying is something like below (only an idea, it even can't
-compile), any thoughts?
+The new hypercalls will exit to userspace which will be incharge of
+re-encapsulating if needed the UDP packets to be sent.
 
+There is an issue though in which KDNet does not respect the hypercall
+page and simply issues vmcall/vmmcall instructions depending on the cpu
+type expecting them to be handled as it a real hypercall was issued.
 
-diff --git a/drivers/irqchip/irq-gic-v3-its.c 
-b/drivers/irqchip/irq-gic-v3-its.c
-index 2e12bc52e3a2..3450b5e847ca 100644
---- a/drivers/irqchip/irq-gic-v3-its.c
-+++ b/drivers/irqchip/irq-gic-v3-its.c
-@@ -198,7 +198,8 @@ static u16 get_its_list(struct its_vm *vm)
-  		if (!is_v4(its))
-  			continue;
+It's important to note that part of this feature has been subject to be
+removed in future versions of Windows, which is why some of the
+defintions will not be present the the TLFS but in the kvm hyperv header
+instead.
 
--		if (vm->vlpi_count[its->list_nr])
-+		if (vm->vlpi_count[its->list_nr] ||
-+		    gic_requires_eager_mapping())
-  			__set_bit(its->list_nr, &its_list);
-  	}
+Jon Doron (5):
+  x86/kvm/hyper-v: Explicitly align hcall param for kvm_hyperv_exit
+  x86/hyper-v: Add synthetic debugger definitions
+  x86/kvm/hyper-v: Add support for synthetic debugger capability
+  x86/kvm/hyper-v: enable hypercalls regardless of hypercall page
+  x86/kvm/hyper-v: Add support for synthetic debugger via hypercalls
 
-@@ -1295,7 +1296,8 @@ static void its_send_vmovp(struct its_vpe *vpe)
-  		if (!is_v4(its))
-  			continue;
+ Documentation/virt/kvm/api.rst     |  18 ++++
+ arch/x86/include/asm/hyperv-tlfs.h |   6 ++
+ arch/x86/include/asm/kvm_host.h    |  13 +++
+ arch/x86/kvm/hyperv.c              | 162 ++++++++++++++++++++++++++++-
+ arch/x86/kvm/hyperv.h              |  32 ++++++
+ arch/x86/kvm/trace.h               |  51 +++++++++
+ arch/x86/kvm/x86.c                 |   9 ++
+ include/uapi/linux/kvm.h           |  13 +++
+ 8 files changed, 302 insertions(+), 2 deletions(-)
 
--		if (!vpe->its_vm->vlpi_count[its->list_nr])
-+		if (!vpe->its_vm->vlpi_count[its->list_nr] &&
-+		    !gic_requires_eager_mapping())
-  			continue;
-
-  		desc.its_vmovp_cmd.col = &its->collections[col_id];
-
-
-Thanks,
-Zenghui
-
-> ---
->   drivers/irqchip/irq-gic-v3-its.c | 39 +++++++++++++++++++++++++-------
->   1 file changed, 31 insertions(+), 8 deletions(-)
-> 
-> diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
-> index b65fba67bd85..6277b3e3731f 100644
-> --- a/drivers/irqchip/irq-gic-v3-its.c
-> +++ b/drivers/irqchip/irq-gic-v3-its.c
-> @@ -1586,12 +1586,31 @@ static int its_irq_set_irqchip_state(struct irq_data *d,
->   	return 0;
->   }
->   
-> +/*
-> + * Two favourable cases:
-> + *
-> + * (a) Either we have a GICv4.1, and all vPEs have to be mapped at all times
-> + *     for vSGI delivery
-> + *
-> + * (b) Or the ITSs do not use a list map, meaning that VMOVP is cheap enough
-> + *     and we're better off mapping all VPEs always
-> + *
-> + * If neither (a) nor (b) is true, then we map vPEs on demand.
-> + *
-> + */
-> +static bool gic_requires_eager_mapping(void)
-> +{
-> +	if (!its_list_map || gic_rdists->has_rvpeid)
-> +		return true;
-> +
-> +	return false;
-> +}
-> +
->   static void its_map_vm(struct its_node *its, struct its_vm *vm)
->   {
->   	unsigned long flags;
->   
-> -	/* Not using the ITS list? Everything is always mapped. */
-> -	if (!its_list_map)
-> +	if (gic_requires_eager_mapping())
->   		return;
->   
->   	raw_spin_lock_irqsave(&vmovp_lock, flags);
-> @@ -1625,7 +1644,7 @@ static void its_unmap_vm(struct its_node *its, struct its_vm *vm)
->   	unsigned long flags;
->   
->   	/* Not using the ITS list? Everything is always mapped. */
-> -	if (!its_list_map)
-> +	if (gic_requires_eager_mapping())
->   		return;
->   
->   	raw_spin_lock_irqsave(&vmovp_lock, flags);
-> @@ -4260,8 +4279,12 @@ static int its_vpe_irq_domain_activate(struct irq_domain *domain,
->   	struct its_vpe *vpe = irq_data_get_irq_chip_data(d);
->   	struct its_node *its;
->   
-> -	/* If we use the list map, we issue VMAPP on demand... */
-> -	if (its_list_map)
-> +	/*
-> +	 * If we use the list map, we issue VMAPP on demand... Unless
-> +	 * we're on a GICv4.1 and we eagerly map the VPE on all ITSs
-> +	 * so that VSGIs can work.
-> +	 */
-> +	if (!gic_requires_eager_mapping())
->   		return 0;
->   
->   	/* Map the VPE to the first possible CPU */
-> @@ -4287,10 +4310,10 @@ static void its_vpe_irq_domain_deactivate(struct irq_domain *domain,
->   	struct its_node *its;
->   
->   	/*
-> -	 * If we use the list map, we unmap the VPE once no VLPIs are
-> -	 * associated with the VM.
-> +	 * If we use the list map on GICv4.0, we unmap the VPE once no
-> +	 * VLPIs are associated with the VM.
->   	 */
-> -	if (its_list_map)
-> +	if (!gic_requires_eager_mapping())
->   		return;
->   
->   	list_for_each_entry(its, &its_nodes, entry) {
-> 
+-- 
+2.24.1
 
