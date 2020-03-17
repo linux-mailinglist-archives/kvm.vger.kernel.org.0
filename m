@@ -2,26 +2,26 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5245E1878A9
-	for <lists+kvm@lfdr.de>; Tue, 17 Mar 2020 05:53:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5AC6D1878AD
+	for <lists+kvm@lfdr.de>; Tue, 17 Mar 2020 05:53:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727050AbgCQExZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Mar 2020 00:53:25 -0400
-Received: from mga04.intel.com ([192.55.52.120]:34139 "EHLO mga04.intel.com"
+        id S1727036AbgCQExn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Mar 2020 00:53:43 -0400
+Received: from mga04.intel.com ([192.55.52.120]:34131 "EHLO mga04.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727036AbgCQExZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S1726399AbgCQExZ (ORCPT <rfc822;kvm@vger.kernel.org>);
         Tue, 17 Mar 2020 00:53:25 -0400
-IronPort-SDR: u1KrTjENEGeuZ4xqPPpVfjPBzbf8howVSfC+ThJZ5euKvlcP+DUAxLATQpOOBra9wogqz2ui4C
- W7VNAPfSnrPQ==
+IronPort-SDR: 2QU8lfrISksUDFNU9T6ow0/JVRaCfeTGhde1ZO4CJ4PJCGy8s9jFKT7mJxy6+R7+hzyq0DS/N8
+ Tv3BJWIK2cww==
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Mar 2020 21:53:24 -0700
-IronPort-SDR: e1paSdrLwyX5WHmjwUrsciracoyoch8vl+lX1dyRrpgEJd2U5xeZOT4Nzqv760TfTlnHWQCBMx
- qXpc57MawNgg==
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Mar 2020 21:53:25 -0700
+IronPort-SDR: ADldV2o6gjw4NvcMKGZo8jkFQBBhzBVX8AGFAOjlQoh48SfIW1KsP/J8bmZTu7bO2bnSkbmR7g
+ NOO3ZVgQg/fg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.70,563,1574150400"; 
-   d="scan'208";a="355252839"
+   d="scan'208";a="355252842"
 Received: from sjchrist-coffee.jf.intel.com ([10.54.74.202])
   by fmsmga001.fm.intel.com with ESMTP; 16 Mar 2020 21:53:24 -0700
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
@@ -38,9 +38,9 @@ Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
         John Haxby <john.haxby@oracle.com>,
         Miaohe Lin <linmiaohe@huawei.com>,
         Tom Lendacky <thomas.lendacky@amd.com>
-Subject: [PATCH v2 31/32] KVM: nVMX: Don't flush TLB on nested VM transition with EPT enabled
-Date:   Mon, 16 Mar 2020 21:52:37 -0700
-Message-Id: <20200317045238.30434-32-sean.j.christopherson@intel.com>
+Subject: [PATCH v2 32/32] KVM: nVMX: Free only the affected contexts when emulating INVEPT
+Date:   Mon, 16 Mar 2020 21:52:38 -0700
+Message-Id: <20200317045238.30434-33-sean.j.christopherson@intel.com>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200317045238.30434-1-sean.j.christopherson@intel.com>
 References: <20200317045238.30434-1-sean.j.christopherson@intel.com>
@@ -51,44 +51,76 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Don't flush the TLB if a cached EPTP root can be reused for nested
-VM-Enter/VM-Exit.  Each unique EPTP constitutes a different ASID,
-cached roots are invalidated on eviction, and KVM invalidates all EPTP
-contexts on global events, e.g. mmu_notifier invalidate or memslot
-updates.
+Add logic to handle_invept() to free only those roots that match the
+target EPT context when emulating a single-context INVEPT.
 
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 ---
- arch/x86/kvm/mmu/mmu.c    | 2 +-
- arch/x86/kvm/vmx/nested.c | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ arch/x86/kvm/vmx/nested.c | 26 +++++++++++++++++++++-----
+ 1 file changed, 21 insertions(+), 5 deletions(-)
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index b98482b60748..de2bd07bad7f 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -5047,7 +5047,7 @@ void kvm_init_shadow_ept_mmu(struct kvm_vcpu *vcpu, bool execonly,
- 		kvm_calc_shadow_ept_root_page_role(vcpu, accessed_dirty,
- 						   execonly, level);
- 
--	__kvm_mmu_new_cr3(vcpu, new_eptp, new_role.base, false);
-+	__kvm_mmu_new_cr3(vcpu, new_eptp, new_role.base, true);
- 
- 	if (new_role.as_u64 == context->mmu_role.as_u64)
- 		return;
 diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index d816f1366943..a77eab5b0e8a 100644
+index a77eab5b0e8a..3652ac2ffa19 100644
 --- a/arch/x86/kvm/vmx/nested.c
 +++ b/arch/x86/kvm/vmx/nested.c
-@@ -1123,7 +1123,7 @@ static int nested_vmx_load_cr3(struct kvm_vcpu *vcpu, unsigned long cr3, bool ne
+@@ -5139,12 +5139,14 @@ static int handle_invept(struct kvm_vcpu *vcpu)
+ {
+ 	struct vcpu_vmx *vmx = to_vmx(vcpu);
+ 	u32 vmx_instruction_info, types;
+-	unsigned long type;
++	unsigned long type, roots_to_free;
++	struct kvm_mmu *mmu;
+ 	gva_t gva;
+ 	struct x86_exception e;
+ 	struct {
+ 		u64 eptp, gpa;
+ 	} operand;
++	int i;
+ 
+ 	if (!(vmx->nested.msrs.secondary_ctls_high &
+ 	      SECONDARY_EXEC_ENABLE_EPT) ||
+@@ -5176,23 +5178,37 @@ static int handle_invept(struct kvm_vcpu *vcpu)
+ 		return 1;
  	}
  
- 	if (!nested_ept)
--		kvm_mmu_new_cr3(vcpu, cr3, false);
-+		kvm_mmu_new_cr3(vcpu, cr3, enable_ept);
++	mmu = &vcpu->arch.guest_mmu;
++
+ 	switch (type) {
+ 	case VMX_EPT_EXTENT_CONTEXT:
+ 		if (!nested_vmx_check_eptp(vcpu, operand.eptp))
+ 			return nested_vmx_failValid(vcpu,
+ 				VMXERR_INVALID_OPERAND_TO_INVEPT_INVVPID);
  
- 	vcpu->arch.cr3 = cr3;
- 	kvm_register_mark_available(vcpu, VCPU_EXREG_CR3);
+-		/* TODO: sync only the target EPTP context. */
+-		fallthrough;
++		roots_to_free = 0;
++		if (nested_ept_root_matches(mmu->root_hpa, mmu->root_cr3,
++					    operand.eptp))
++			roots_to_free |= KVM_MMU_ROOT_CURRENT;
++
++		for (i = 0; i < KVM_MMU_NUM_PREV_ROOTS; i++) {
++			if (nested_ept_root_matches(mmu->prev_roots[i].hpa,
++						    mmu->prev_roots[i].cr3,
++						    operand.eptp))
++				roots_to_free |= KVM_MMU_ROOT_PREVIOUS(i);
++		}
++		break;
+ 	case VMX_EPT_EXTENT_GLOBAL:
+-		kvm_mmu_free_roots(vcpu, &vcpu->arch.guest_mmu,
+-				   KVM_MMU_ROOTS_ALL);
++		roots_to_free = KVM_MMU_ROOTS_ALL;
+ 		break;
+ 	default:
+ 		BUG_ON(1);
+ 		break;
+ 	}
+ 
++	if (roots_to_free)
++		kvm_mmu_free_roots(vcpu, mmu, roots_to_free);
++
+ 	return nested_vmx_succeed(vcpu);
+ }
+ 
 -- 
 2.24.1
 
