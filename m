@@ -2,26 +2,26 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3F6AB1878B9
-	for <lists+kvm@lfdr.de>; Tue, 17 Mar 2020 05:54:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 546A51878BD
+	for <lists+kvm@lfdr.de>; Tue, 17 Mar 2020 05:54:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726964AbgCQEyU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Mar 2020 00:54:20 -0400
-Received: from mga04.intel.com ([192.55.52.120]:34117 "EHLO mga04.intel.com"
+        id S1726655AbgCQEyT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Mar 2020 00:54:19 -0400
+Received: from mga04.intel.com ([192.55.52.120]:34126 "EHLO mga04.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726968AbgCQExU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 Mar 2020 00:53:20 -0400
-IronPort-SDR: Y4/aPNuHRPM5qiAtvkwZI4EqkhrK7HbN7ebDARHPnnXjDjVxqVAs1TvLxymTS7LA1OcUn0N6gX
- AmMJa7z8AeJQ==
+        id S1726982AbgCQExV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 Mar 2020 00:53:21 -0400
+IronPort-SDR: dM9+NZDxZ4DOD3SY5WAp1SFF4p/HihO8B68bm9pF1n2cpMgmq4KIgIyQTUmAcZQSg/3WvAFMpW
+ 5Lz/dSTIuBjA==
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Mar 2020 21:53:20 -0700
-IronPort-SDR: bQk3yQSuq6WzRbvEkRRY6WsZsnX4XkVv1x7xaiXeRuWZxO5TkhMjIFLH/N2F9+0v/GSNu5oP2E
- DonKKXtpShyg==
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Mar 2020 21:53:21 -0700
+IronPort-SDR: 6YAmKSmJ2ktdCsILkws1OP+UkhDVetT6qCTKuML113M+gxQng5SvYYVzdDNvy8+6dopTyzloMq
+ bKhKC8LWhA+g==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.70,563,1574150400"; 
-   d="scan'208";a="355252809"
+   d="scan'208";a="355252814"
 Received: from sjchrist-coffee.jf.intel.com ([10.54.74.202])
   by fmsmga001.fm.intel.com with ESMTP; 16 Mar 2020 21:53:20 -0700
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
@@ -38,9 +38,9 @@ Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
         John Haxby <john.haxby@oracle.com>,
         Miaohe Lin <linmiaohe@huawei.com>,
         Tom Lendacky <thomas.lendacky@amd.com>
-Subject: [PATCH v2 23/32] KVM: nVMX: Add helper to handle TLB flushes on nested VM-Enter/VM-Exit
-Date:   Mon, 16 Mar 2020 21:52:29 -0700
-Message-Id: <20200317045238.30434-24-sean.j.christopherson@intel.com>
+Subject: [PATCH v2 24/32] KVM: x86: Introduce KVM_REQ_TLB_FLUSH_CURRENT to flush current ASID
+Date:   Mon, 16 Mar 2020 21:52:30 -0700
+Message-Id: <20200317045238.30434-25-sean.j.christopherson@intel.com>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200317045238.30434-1-sean.j.christopherson@intel.com>
 References: <20200317045238.30434-1-sean.j.christopherson@intel.com>
@@ -51,133 +51,175 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add a helper to determine whether or not a full TLB flush needs to be
-performed on nested VM-Enter/VM-Exit, as the logic is identical for both
-flows and needs a fairly beefy comment to boot.  This also provides a
-common point to make future adjustments to the logic.
+Add KVM_REQ_TLB_FLUSH_CURRENT to allow optimized TLB flushing of VMX's
+EPTP/VPID contexts[*] from the KVM MMU and/or in a deferred manner, e.g.
+to flush L2's context during nested VM-Enter.
 
-Skip the INVVPID if a TLB flush is pending, which mostly preserves the
-existing logic, but also skips INVVPID in the unlikely event that a TLB
-flush was requested for some other reason.
+Convert KVM_REQ_TLB_FLUSH to KVM_REQ_TLB_FLUSH_CURRENT in flows where
+the flush is directly associated with vCPU-scoped instruction emulation,
+i.e. MOV CR3 and INVPCID.
 
-Remove the explicit enable_vpid from prepare_vmcs02() as its implied by
-nested_cpu_has_vpid(), which can return true if and only if VPID is
-enabled in KVM (L0).
+Add a comment in vmx_vcpu_load_vmcs() above its KVM_REQ_TLB_FLUSH to
+make it clear that it deliberately requests a flush of all contexts.
 
-Cc: Liran Alon <liran.alon@oracle.com>
+Service any pending flush request on nested VM-Exit as it's possible a
+nested VM-Exit could occur after requesting a flush for L2.  Add the
+same logic for nested VM-Enter even though it's _extremely_ unlikely
+for flush to be pending on nested VM-Enter, but theoretically possible
+(in the future) due to RSM (SMM) emulation.
+
+[*] Intel also has an Address Space Identifier (ASID) concept, e.g.
+    EPTP+VPID+PCID == ASID, it's just not documented in the SDM because
+    the rules of invalidation are different based on which piece of the
+    ASID is being changed, i.e. whether the EPTP, VPID, or PCID context
+    must be invalidated.
+
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 ---
- arch/x86/kvm/vmx/nested.c | 83 +++++++++++++++++++--------------------
- 1 file changed, 40 insertions(+), 43 deletions(-)
+ arch/x86/include/asm/kvm_host.h |  2 ++
+ arch/x86/kvm/svm.c              |  1 +
+ arch/x86/kvm/vmx/nested.c       |  7 +++++++
+ arch/x86/kvm/vmx/vmx.c          |  7 ++++++-
+ arch/x86/kvm/x86.c              | 11 +++++++++--
+ arch/x86/kvm/x86.h              |  6 ++++++
+ 6 files changed, 31 insertions(+), 3 deletions(-)
 
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 0392a9db110d..26fa52450569 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -83,6 +83,7 @@
+ #define KVM_REQ_GET_VMCS12_PAGES	KVM_ARCH_REQ(24)
+ #define KVM_REQ_APICV_UPDATE \
+ 	KVM_ARCH_REQ_FLAGS(25, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
++#define KVM_REQ_TLB_FLUSH_CURRENT	KVM_ARCH_REQ(26)
+ 
+ #define CR0_RESERVED_BITS                                               \
+ 	(~(unsigned long)(X86_CR0_PE | X86_CR0_MP | X86_CR0_EM | X86_CR0_TS \
+@@ -1106,6 +1107,7 @@ struct kvm_x86_ops {
+ 	void (*set_rflags)(struct kvm_vcpu *vcpu, unsigned long rflags);
+ 
+ 	void (*tlb_flush_all)(struct kvm_vcpu *vcpu);
++	void (*tlb_flush_current)(struct kvm_vcpu *vcpu);
+ 	int  (*tlb_remote_flush)(struct kvm *kvm);
+ 	int  (*tlb_remote_flush_with_range)(struct kvm *kvm,
+ 			struct kvm_tlb_range *range);
+diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
+index 10e5b8c4b515..0bf7ad5f62ad 100644
+--- a/arch/x86/kvm/svm.c
++++ b/arch/x86/kvm/svm.c
+@@ -7406,6 +7406,7 @@ static struct kvm_x86_ops svm_x86_ops __ro_after_init = {
+ 	.set_rflags = svm_set_rflags,
+ 
+ 	.tlb_flush_all = svm_flush_tlb,
++	.tlb_flush_current = svm_flush_tlb,
+ 	.tlb_flush_gva = svm_flush_tlb_gva,
+ 	.tlb_flush_guest = svm_flush_tlb,
+ 
 diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 960ecbab5ebe..a7cc41e69948 100644
+index a7cc41e69948..19600d4b3344 100644
 --- a/arch/x86/kvm/vmx/nested.c
 +++ b/arch/x86/kvm/vmx/nested.c
-@@ -1154,6 +1154,31 @@ static bool nested_has_guest_tlb_tag(struct kvm_vcpu *vcpu)
- 	       (nested_cpu_has_vpid(vmcs12) && to_vmx(vcpu)->nested.vpid02);
+@@ -3227,6 +3227,9 @@ enum nvmx_vmentry_status nested_vmx_enter_non_root_mode(struct kvm_vcpu *vcpu,
+ 	u32 exit_reason = EXIT_REASON_INVALID_STATE;
+ 	u32 exit_qual;
+ 
++	if (kvm_check_request(KVM_REQ_TLB_FLUSH_CURRENT, vcpu))
++		kvm_vcpu_flush_tlb_current(vcpu);
++
+ 	evaluate_pending_interrupts = exec_controls_get(vmx) &
+ 		(CPU_BASED_INTR_WINDOW_EXITING | CPU_BASED_NMI_WINDOW_EXITING);
+ 	if (likely(!evaluate_pending_interrupts) && kvm_vcpu_apicv_active(vcpu))
+@@ -4292,6 +4295,10 @@ void nested_vmx_vmexit(struct kvm_vcpu *vcpu, u32 exit_reason,
+ 	/* trying to cancel vmlaunch/vmresume is a bug */
+ 	WARN_ON_ONCE(vmx->nested.nested_run_pending);
+ 
++	/* Service the TLB flush request for L2 before switching to L1. */
++	if (kvm_check_request(KVM_REQ_TLB_FLUSH_CURRENT, vcpu))
++		kvm_vcpu_flush_tlb_current(vcpu);
++
+ 	leave_guest_mode(vcpu);
+ 
+ 	if (nested_cpu_has_preemption_timer(vmcs12))
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index d6cf625b4011..ae7279802652 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -1367,6 +1367,10 @@ void vmx_vcpu_load_vmcs(struct kvm_vcpu *vcpu, int cpu)
+ 		void *gdt = get_current_gdt_ro();
+ 		unsigned long sysenter_esp;
+ 
++		/*
++		 * Flush all EPTP/VPID contexts, the new pCPU may have stale
++		 * TLB entries from its previous association with the vCPU.
++		 */
+ 		kvm_make_request(KVM_REQ_TLB_FLUSH, vcpu);
+ 
+ 		/*
+@@ -5479,7 +5483,7 @@ static int handle_invpcid(struct kvm_vcpu *vcpu)
+ 
+ 		if (kvm_get_active_pcid(vcpu) == operand.pcid) {
+ 			kvm_mmu_sync_roots(vcpu);
+-			kvm_make_request(KVM_REQ_TLB_FLUSH, vcpu);
++			kvm_make_request(KVM_REQ_TLB_FLUSH_CURRENT, vcpu);
+ 		}
+ 
+ 		for (i = 0; i < KVM_MMU_NUM_PREV_ROOTS; i++)
+@@ -7921,6 +7925,7 @@ static struct kvm_x86_ops vmx_x86_ops __ro_after_init = {
+ 	.set_rflags = vmx_set_rflags,
+ 
+ 	.tlb_flush_all = vmx_flush_tlb_all,
++	.tlb_flush_current = vmx_flush_tlb_current,
+ 	.tlb_flush_gva = vmx_flush_tlb_gva,
+ 	.tlb_flush_guest = vmx_flush_tlb_guest,
+ 
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 333968e5ef3c..cccfcf612008 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -1033,7 +1033,7 @@ int kvm_set_cr3(struct kvm_vcpu *vcpu, unsigned long cr3)
+ 	if (cr3 == kvm_read_cr3(vcpu) && !pdptrs_changed(vcpu)) {
+ 		if (!skip_tlb_flush) {
+ 			kvm_mmu_sync_roots(vcpu);
+-			kvm_make_request(KVM_REQ_TLB_FLUSH, vcpu);
++			kvm_make_request(KVM_REQ_TLB_FLUSH_CURRENT, vcpu);
+ 		}
+ 		return 0;
+ 	}
+@@ -8222,8 +8222,15 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+ 			kvm_mmu_sync_roots(vcpu);
+ 		if (kvm_check_request(KVM_REQ_LOAD_MMU_PGD, vcpu))
+ 			kvm_mmu_load_pgd(vcpu);
+-		if (kvm_check_request(KVM_REQ_TLB_FLUSH, vcpu))
++		if (kvm_check_request(KVM_REQ_TLB_FLUSH, vcpu)) {
+ 			kvm_vcpu_flush_tlb_all(vcpu);
++
++			/* Flushing all ASIDs flushes the current ASID... */
++			kvm_clear_request(KVM_REQ_TLB_FLUSH_CURRENT, vcpu);
++		}
++		if (kvm_check_request(KVM_REQ_TLB_FLUSH_CURRENT, vcpu))
++			kvm_vcpu_flush_tlb_current(vcpu);
++
+ 		if (kvm_check_request(KVM_REQ_REPORT_TPR_ACCESS, vcpu)) {
+ 			vcpu->run->exit_reason = KVM_EXIT_TPR_ACCESS;
+ 			r = 0;
+diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
+index c1954e216b41..e0816850ce5e 100644
+--- a/arch/x86/kvm/x86.h
++++ b/arch/x86/kvm/x86.h
+@@ -125,6 +125,12 @@ static inline bool mmu_is_nested(struct kvm_vcpu *vcpu)
+ 	return vcpu->arch.walk_mmu == &vcpu->arch.nested_mmu;
  }
  
-+static void nested_vmx_transition_tlb_flush(struct kvm_vcpu *vcpu,
-+					    struct vmcs12 *vmcs12)
++static inline void kvm_vcpu_flush_tlb_current(struct kvm_vcpu *vcpu)
 +{
-+	/*
-+	 * If VPID is disabled, linear and combined mappings are flushed on
-+	 * VM-Enter/VM-Exit, and guest-physical mappings are valid only for
-+	 * their associated EPTP.
-+	 *
-+	 * If vmcs12 doesn't use VPID, L1 expects linear and combined mappings
-+	 * for *all* contexts to be flushed on VM-Enter/VM-Exit.
-+	 *
-+	 * If VPID is enabled and used by vmc12, but L2 does not have a unique
-+	 * TLB tag (ASID), i.e. EPT is disabled and KVM was unable to allocate
-+	 * a VPID for L2, flush the TLB as the effective ASID is common to both
-+	 * L1 and L2.
-+	 *
-+	 * Defer the flush so that it runs after vmcs02.EPTP has been set by
-+	 * KVM_REQ_LOAD_MMU_PGD (if nested EPT is enabled) and to avoid
-+	 * redundant flushes further down the nested pipeline.
-+	 */
-+	if (enable_vpid &&
-+	    (!nested_cpu_has_vpid(vmcs12) || !nested_has_guest_tlb_tag(vcpu)))
-+		kvm_make_request(KVM_REQ_TLB_FLUSH, vcpu);
++	++vcpu->stat.tlb_flush;
++	kvm_x86_ops->tlb_flush_current(vcpu);
 +}
 +
- static bool is_bitwise_subset(u64 superset, u64 subset, u64 mask)
+ static inline int is_pae(struct kvm_vcpu *vcpu)
  {
- 	superset &= mask;
-@@ -2462,31 +2487,20 @@ static int prepare_vmcs02(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12,
- 	if (kvm_has_tsc_control)
- 		decache_tsc_multiplier(vmx);
- 
--	if (enable_vpid) {
--		/*
--		 * There is no direct mapping between vpid02 and vpid12, the
--		 * vpid02 is per-vCPU for L0 and reused while the value of
--		 * vpid12 is changed w/ one invvpid during nested vmentry.
--		 * The vpid12 is allocated by L1 for L2, so it will not
--		 * influence global bitmap(for vpid01 and vpid02 allocation)
--		 * even if spawn a lot of nested vCPUs.
--		 */
--		if (nested_cpu_has_vpid(vmcs12) && nested_has_guest_tlb_tag(vcpu)) {
--			if (vmcs12->virtual_processor_id != vmx->nested.last_vpid) {
--				vmx->nested.last_vpid = vmcs12->virtual_processor_id;
--				vpid_sync_context(nested_get_vpid02(vcpu));
--			}
--		} else {
--			/*
--			 * If L1 use EPT, then L0 needs to execute INVEPT on
--			 * EPTP02 instead of EPTP01. Therefore, delay TLB
--			 * flush until vmcs02->eptp is fully updated by
--			 * KVM_REQ_LOAD_MMU_PGD. Note that this assumes
--			 * KVM_REQ_TLB_FLUSH is evaluated after
--			 * KVM_REQ_LOAD_MMU_PGD in vcpu_enter_guest().
--			 */
--			kvm_make_request(KVM_REQ_TLB_FLUSH, vcpu);
--		}
-+	nested_vmx_transition_tlb_flush(vcpu, vmcs12);
-+
-+	/*
-+	 * There is no direct mapping between vpid02 and vpid12, vpid02 is
-+	 * per-vCPU and reused for all nested vCPUs.  If vpid12 is changing
-+	 * then the new "virtual" VPID will reuse the same "real" VPID,
-+	 * vpid02, and so needs to be sync'd.  Skip the sync if a TLB flush
-+	 * has already been requested, but always update the last used VPID.
-+	 */
-+	if (nested_cpu_has_vpid(vmcs12) && nested_has_guest_tlb_tag(vcpu) &&
-+	    vmcs12->virtual_processor_id != vmx->nested.last_vpid) {
-+		vmx->nested.last_vpid = vmcs12->virtual_processor_id;
-+		if (!kvm_test_request(KVM_REQ_TLB_FLUSH, vcpu))
-+			vpid_sync_context(nested_get_vpid02(vcpu));
- 	}
- 
- 	if (nested_cpu_has_ept(vmcs12))
-@@ -4054,24 +4068,7 @@ static void load_vmcs12_host_state(struct kvm_vcpu *vcpu,
- 	if (!enable_ept)
- 		vcpu->arch.walk_mmu->inject_page_fault = kvm_inject_page_fault;
- 
--	/*
--	 * If vmcs01 doesn't use VPID, CPU flushes TLB on every
--	 * VMEntry/VMExit. Thus, no need to flush TLB.
--	 *
--	 * If vmcs12 doesn't use VPID, L1 expects TLB to be
--	 * flushed on every VMEntry/VMExit.
--	 *
--	 * Otherwise, we can preserve TLB entries as long as we are
--	 * able to tag L1 TLB entries differently than L2 TLB entries.
--	 *
--	 * If vmcs12 uses EPT, we need to execute this flush on EPTP01
--	 * and therefore we request the TLB flush to happen only after VMCS EPTP
--	 * has been set by KVM_REQ_LOAD_MMU_PGD.
--	 */
--	if (enable_vpid &&
--	    (!nested_cpu_has_vpid(vmcs12) || !nested_has_guest_tlb_tag(vcpu))) {
--		kvm_make_request(KVM_REQ_TLB_FLUSH, vcpu);
--	}
-+	nested_vmx_transition_tlb_flush(vcpu, vmcs12);
- 
- 	vmcs_write32(GUEST_SYSENTER_CS, vmcs12->host_ia32_sysenter_cs);
- 	vmcs_writel(GUEST_SYSENTER_ESP, vmcs12->host_ia32_sysenter_esp);
+ 	return kvm_read_cr4_bits(vcpu, X86_CR4_PAE);
 -- 
 2.24.1
 
