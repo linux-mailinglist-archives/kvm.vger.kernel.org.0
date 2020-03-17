@@ -2,100 +2,145 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B44F8187BBE
-	for <lists+kvm@lfdr.de>; Tue, 17 Mar 2020 10:10:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AE2B3187E4E
+	for <lists+kvm@lfdr.de>; Tue, 17 Mar 2020 11:30:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726077AbgCQJKB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Mar 2020 05:10:01 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:32326 "EHLO
+        id S1725928AbgCQKaa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Mar 2020 06:30:30 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:41557 "EHLO
         us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725862AbgCQJKB (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 17 Mar 2020 05:10:01 -0400
+        by vger.kernel.org with ESMTP id S1725794AbgCQKa3 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 17 Mar 2020 06:30:29 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1584436200;
+        s=mimecast20190719; t=1584441028;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=33HOQxyjSNkaXfQU6fJkB48HoXWoJZs0ADNmqK4BWjc=;
-        b=ijko8ir+vnw5ED1ytkTtyqsq2nbCs3mhBNarZxDGsQn8jbPKfhK93MlHIL2yViYFr2SU1q
-        5wkSO40Q+LgETTNOx1Aox6LIz3wg9ouM7XHmXpJws652zLGkA7JXwmqAz2Akri0wcvSHHb
-        doXPgvutT9u2nV8YvLWqeXmOeJ5fS6g=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-472-YzM6GGyBMum4pz0QxLztsg-1; Tue, 17 Mar 2020 05:09:58 -0400
-X-MC-Unique: YzM6GGyBMum4pz0QxLztsg-1
-Received: by mail-wr1-f69.google.com with SMTP id v7so924289wrp.0
-        for <kvm@vger.kernel.org>; Tue, 17 Mar 2020 02:09:58 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=33HOQxyjSNkaXfQU6fJkB48HoXWoJZs0ADNmqK4BWjc=;
-        b=R27kNZkUTOW1QDUdTn31/i1o3FPfoRndru9secaWGjoENYgjA5/WzjLpKfbh1UNa7h
-         HW58Dv5n/HCD3ksPIfaC602gz0UsABQoQV0H34AnSOCpWqGAmro/hRrXwfqWdDFc8xsi
-         DavzT8jtK/0psTyxVRE9RGWTTTEfkVkEFpDLh4FrbXzRHT9gisuW8qL8/sigWElItjcV
-         ekNBxqBwtqh4XkPEosl3zjBp4+W4pfog/86kEOwGTmaartuLrvkGaKwd/QlmSZsxWRl/
-         qCM0HeKC8NyE60sk37eywQ27pXuGCVGQgDLT9d0pJrbH5aqjecZXdMoNZ7aE9YkI0AKS
-         FjZg==
-X-Gm-Message-State: ANhLgQ2TetHuAjOv89mRaRP3BCGwWejgXuN7t8aTNavfKFx6/tXxyj+/
-        b2WKQbwcMd8hmPPer6xuvsRuoBNkPhVI7dwDW+RVYxFcGvWLlF6W28y1baZrfRZLiv4bAG96RzN
-        iY1tFntIPI0Zy
-X-Received: by 2002:a7b:c552:: with SMTP id j18mr4165513wmk.42.1584436197474;
-        Tue, 17 Mar 2020 02:09:57 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vsVhMPn0HH0yjUz3wkQv8Y+81cQSZkbZuYdWOMMNo1uHPo3ZbzVny9ih/PRaMnKHtKR3ZdflA==
-X-Received: by 2002:a7b:c552:: with SMTP id j18mr4165486wmk.42.1584436197243;
-        Tue, 17 Mar 2020 02:09:57 -0700 (PDT)
-Received: from [192.168.1.34] (96.red-83-59-163.dynamicip.rima-tde.net. [83.59.163.96])
-        by smtp.gmail.com with ESMTPSA id s1sm3673452wrp.41.2020.03.17.02.09.56
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 17 Mar 2020 02:09:56 -0700 (PDT)
-Subject: Re: [PATCH v3 01/19] target/arm: Rename KVM set_feature() as
- kvm_set_feature()
-To:     Richard Henderson <richard.henderson@linaro.org>,
-        qemu-devel@nongnu.org
-Cc:     =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
-        kvm@vger.kernel.org, Thomas Huth <thuth@redhat.com>,
-        qemu-arm@nongnu.org, Fam Zheng <fam@euphon.net>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Peter Maydell <peter.maydell@linaro.org>
-References: <20200316160634.3386-1-philmd@redhat.com>
- <20200316160634.3386-2-philmd@redhat.com>
- <cb3178f1-5a0c-b11c-a012-c41beeb66cd2@linaro.org>
-From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <3dc0e645-05a5-938c-4277-38014e4a68a3@redhat.com>
-Date:   Tue, 17 Mar 2020 10:09:55 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+        bh=E3boV3yl7QUZP/2283Qn125pIkCavFJHZDCmoHG9RZ4=;
+        b=QiHG9Qim1HeSBEtKzNWwOjlY0YQDv8LrWgObz/BMg5oMAdSRxT/vp8qIUeWbSl6Cm2xMRC
+        NX8p/8Zb+X2IwNDXHaf71dqIiMtgQScPhRGKHhRaK007fpv7f5D8MqFby8WR/zW1C5z758
+        df5ymeeXZWzSO0lUMaU6fwmaO+LXTdg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-404-q__xEIZcPW-S9ONrSCl3rA-1; Tue, 17 Mar 2020 06:30:27 -0400
+X-MC-Unique: q__xEIZcPW-S9ONrSCl3rA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EE6F68018A4;
+        Tue, 17 Mar 2020 10:30:24 +0000 (UTC)
+Received: from [10.36.113.142] (ovpn-113-142.ams2.redhat.com [10.36.113.142])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 4C12419C58;
+        Tue, 17 Mar 2020 10:30:21 +0000 (UTC)
+Subject: Re: [PATCH v5 15/23] irqchip/gic-v4.1: Add VSGI property setup
+To:     Marc Zyngier <maz@kernel.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
+        Jason Cooper <jason@lakedaemon.net>,
+        Robert Richter <rrichter@marvell.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>
+References: <20200304203330.4967-1-maz@kernel.org>
+ <20200304203330.4967-16-maz@kernel.org>
+From:   Auger Eric <eric.auger@redhat.com>
+Message-ID: <edfc4aa0-3e96-4fb2-731e-76a284c8ce17@redhat.com>
+Date:   Tue, 17 Mar 2020 11:30:19 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-In-Reply-To: <cb3178f1-5a0c-b11c-a012-c41beeb66cd2@linaro.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20200304203330.4967-16-maz@kernel.org>
+Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 3/16/20 9:16 PM, Richard Henderson wrote:
-> On 3/16/20 9:06 AM, Philippe Mathieu-Daudé wrote:
->> +++ b/target/arm/kvm32.c
->> @@ -22,7 +22,7 @@
->>   #include "internals.h"
->>   #include "qemu/log.h"
->>   
->> -static inline void set_feature(uint64_t *features, int feature)
->> +static inline void kvm_set_feature(uint64_t *features, int feature)
+Hi Marc,
+
+On 3/4/20 9:33 PM, Marc Zyngier wrote:
+> Add the SGI configuration entry point for KVM to use.
 > 
-> Why, what's wrong with the existing name?
-> Plus, with patch 2, you can just remove these.
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  drivers/irqchip/irq-gic-v3-its.c   |  2 +-
+>  drivers/irqchip/irq-gic-v4.c       | 13 +++++++++++++
+>  include/linux/irqchip/arm-gic-v4.h |  3 ++-
+>  3 files changed, 16 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
+> index effb0e0b0c9d..b65fba67bd85 100644
+> --- a/drivers/irqchip/irq-gic-v3-its.c
+> +++ b/drivers/irqchip/irq-gic-v3-its.c
+> @@ -4039,7 +4039,7 @@ static int its_sgi_set_vcpu_affinity(struct irq_data *d, void *vcpu_info)
+>  	struct its_cmd_info *info = vcpu_info;
+>  
+>  	switch (info->cmd_type) {
+> -	case PROP_UPDATE_SGI:
+> +	case PROP_UPDATE_VSGI:
+This change rather belongs to
+[PATCH v5 12/23] irqchip/gic-v4.1: Plumb set_vcpu_affinity SGI callbacks
+>  		vpe->sgi_config[d->hwirq].priority = info->priority;
+>  		vpe->sgi_config[d->hwirq].group = info->group;
+>  		its_configure_sgi(d, false);
+> diff --git a/drivers/irqchip/irq-gic-v4.c b/drivers/irqchip/irq-gic-v4.c
+> index 99b33f60ac63..0c18714ae13e 100644
+> --- a/drivers/irqchip/irq-gic-v4.c
+> +++ b/drivers/irqchip/irq-gic-v4.c
+> @@ -320,6 +320,19 @@ int its_prop_update_vlpi(int irq, u8 config, bool inv)
+>  	return irq_set_vcpu_affinity(irq, &info);
+>  }
+>  
+> +int its_prop_update_vsgi(int irq, u8 priority, bool group)
+> +{
+> +	struct its_cmd_info info = {
+> +		.cmd_type = PROP_UPDATE_VSGI,
+> +		{
+> +			.priority	= priority,
+> +			.group		= group,
+> +		},
+> +	};
+> +
+> +	return irq_set_vcpu_affinity(irq, &info);
+> +}
+> +
+>  int its_init_v4(struct irq_domain *domain,
+>  		const struct irq_domain_ops *vpe_ops,
+>  		const struct irq_domain_ops *sgi_ops)
+> diff --git a/include/linux/irqchip/arm-gic-v4.h b/include/linux/irqchip/arm-gic-v4.h
+> index 0bb111b4a504..6976b8331b60 100644
+> --- a/include/linux/irqchip/arm-gic-v4.h
+> +++ b/include/linux/irqchip/arm-gic-v4.h
+> @@ -105,7 +105,7 @@ enum its_vcpu_info_cmd_type {
+>  	SCHEDULE_VPE,
+>  	DESCHEDULE_VPE,
+>  	INVALL_VPE,
+> -	PROP_UPDATE_SGI,
+> +	PROP_UPDATE_VSGI,
+same
+>  };
+>  
+>  struct its_cmd_info {
+> @@ -134,6 +134,7 @@ int its_map_vlpi(int irq, struct its_vlpi_map *map);
+>  int its_get_vlpi(int irq, struct its_vlpi_map *map);
+>  int its_unmap_vlpi(int irq);
+>  int its_prop_update_vlpi(int irq, u8 config, bool inv);
+> +int its_prop_update_vsgi(int irq, u8 priority, bool group);
+>  
+>  struct irq_domain_ops;
+>  int its_init_v4(struct irq_domain *domain,
+> 
+Besides
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
-The prototypes are different:
+Thanks
 
-   void set_feature(uint64_t *features, int feature)
-
-   void set_feature(CPUARMState *env, int feature)
-
-Anyway you are right, I'll use the later prototype instead, thanks.
+Eric
 
