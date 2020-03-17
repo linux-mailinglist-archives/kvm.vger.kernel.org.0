@@ -2,26 +2,26 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B03821878CD
-	for <lists+kvm@lfdr.de>; Tue, 17 Mar 2020 05:55:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 24E911878D4
+	for <lists+kvm@lfdr.de>; Tue, 17 Mar 2020 05:55:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726877AbgCQExP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Mar 2020 00:53:15 -0400
+        id S1727239AbgCQEz0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Mar 2020 00:55:26 -0400
 Received: from mga04.intel.com ([192.55.52.120]:34106 "EHLO mga04.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726856AbgCQExO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 Mar 2020 00:53:14 -0400
-IronPort-SDR: 7kT2j3fSeA0uCaSuJmHlsCfs6s47wYX7ukqZBUCs0llRMK0nt5CRU+VrAeYIsUy+85bYq+MkE/
- DByCtnFgp3qw==
+        id S1726859AbgCQExP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 Mar 2020 00:53:15 -0400
+IronPort-SDR: iSqhsLFKSBewFCH4yOWqZNRnwd5/S9aJp3XxU05p2T6BLzw5IskpgLL0XPkyKKpjYHmF1jgtgE
+ 3OegPX1S49jA==
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Mar 2020 21:53:14 -0700
-IronPort-SDR: 6qx7BgOUOq4x9v1/UJe2e7NCxP0ngV0YUL6ratHo5Pz5wlxffVDmwSRYSg2sUBbx114w8sKDnu
- CxpuIUrN9TYg==
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Mar 2020 21:53:15 -0700
+IronPort-SDR: X7RcKHBgDV7adjmDxpRKw+wRGXUiGZuxUNzpxDDoqJ0q7K8gKE1eukIbcpi1qlkhGcIN6EWMpN
+ Qfrm7DjfzExA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.70,563,1574150400"; 
-   d="scan'208";a="355252768"
+   d="scan'208";a="355252771"
 Received: from sjchrist-coffee.jf.intel.com ([10.54.74.202])
   by fmsmga001.fm.intel.com with ESMTP; 16 Mar 2020 21:53:14 -0700
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
@@ -38,9 +38,9 @@ Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
         John Haxby <john.haxby@oracle.com>,
         Miaohe Lin <linmiaohe@huawei.com>,
         Tom Lendacky <thomas.lendacky@amd.com>
-Subject: [PATCH v2 11/32] KVM: VMX: Handle INVVPID fallback logic in vpid_sync_vcpu_addr()
-Date:   Mon, 16 Mar 2020 21:52:17 -0700
-Message-Id: <20200317045238.30434-12-sean.j.christopherson@intel.com>
+Subject: [PATCH v2 12/32] KVM: VMX: Drop redundant capability checks in low level INVVPID helpers
+Date:   Mon, 16 Mar 2020 21:52:18 -0700
+Message-Id: <20200317045238.30434-13-sean.j.christopherson@intel.com>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200317045238.30434-1-sean.j.christopherson@intel.com>
 References: <20200317045238.30434-1-sean.j.christopherson@intel.com>
@@ -51,64 +51,55 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Directly invoke vpid_sync_context() to do a global INVVPID when the
-individual address variant is not supported instead of deferring such
-behavior to the caller.  This allows for additional consolidation of
-code as the logic is basically identical to the emulation of the
-individual address variant in handle_invvpid().
+Remove the INVVPID capabilities checks from vpid_sync_vcpu_single() and
+vpid_sync_vcpu_global() now that all callers ensure the INVVPID variant
+is supported.  Note, in some cases the guarantee is provided in concert
+with hardware_setup(), which enables VPID if and only if at least of
+invvpid_single() or invvpid_global() is supported.
 
-No functional change intended.
+Drop the WARN_ON_ONCE() from vmx_flush_tlb() as vpid_sync_vcpu_single()
+will trigger a WARN() on INVVPID failure, i.e. if SINGLE_CONTEXT isn't
+supported.
 
-Reviewed-by: Miaohe Lin <linmiaohe@huawei.com>
-Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 ---
- arch/x86/kvm/vmx/ops.h | 12 +++++-------
- arch/x86/kvm/vmx/vmx.c |  3 +--
- 2 files changed, 6 insertions(+), 9 deletions(-)
+ arch/x86/kvm/vmx/ops.h | 6 ++----
+ arch/x86/kvm/vmx/vmx.h | 1 -
+ 2 files changed, 2 insertions(+), 5 deletions(-)
 
 diff --git a/arch/x86/kvm/vmx/ops.h b/arch/x86/kvm/vmx/ops.h
-index dd7ab61bfcc1..39122699cfeb 100644
+index 39122699cfeb..aa1aab52971a 100644
 --- a/arch/x86/kvm/vmx/ops.h
 +++ b/arch/x86/kvm/vmx/ops.h
-@@ -276,17 +276,15 @@ static inline void vpid_sync_context(int vpid)
- 		vpid_sync_vcpu_global();
- }
- 
--static inline bool vpid_sync_vcpu_addr(int vpid, gva_t addr)
-+static inline void vpid_sync_vcpu_addr(int vpid, gva_t addr)
- {
+@@ -258,14 +258,12 @@ static inline void vpid_sync_vcpu_single(int vpid)
  	if (vpid == 0)
--		return true;
-+		return;
+ 		return;
  
--	if (cpu_has_vmx_invvpid_individual_addr()) {
-+	if (cpu_has_vmx_invvpid_individual_addr())
- 		__invvpid(VMX_VPID_EXTENT_INDIVIDUAL_ADDR, vpid, addr);
--		return true;
--	}
--
--	return false;
-+	else
-+		vpid_sync_context(vpid);
+-	if (cpu_has_vmx_invvpid_single())
+-		__invvpid(VMX_VPID_EXTENT_SINGLE_CONTEXT, vpid, 0);
++	__invvpid(VMX_VPID_EXTENT_SINGLE_CONTEXT, vpid, 0);
  }
  
- static inline void ept_sync_global(void)
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index ba49323a89d8..ba24bbda2c12 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -2853,8 +2853,7 @@ static void vmx_flush_tlb_gva(struct kvm_vcpu *vcpu, gva_t addr)
+ static inline void vpid_sync_vcpu_global(void)
  {
- 	int vpid = to_vmx(vcpu)->vpid;
+-	if (cpu_has_vmx_invvpid_global())
+-		__invvpid(VMX_VPID_EXTENT_ALL_CONTEXT, 0, 0);
++	__invvpid(VMX_VPID_EXTENT_ALL_CONTEXT, 0, 0);
+ }
  
--	if (!vpid_sync_vcpu_addr(vpid, addr))
--		vpid_sync_context(vpid);
-+	vpid_sync_vcpu_addr(vpid, addr);
- 
- 	/*
- 	 * If VPIDs are not supported or enabled, then the above is a no-op.
+ static inline void vpid_sync_context(int vpid)
+diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
+index d6d67b816ebe..3770ae111e6a 100644
+--- a/arch/x86/kvm/vmx/vmx.h
++++ b/arch/x86/kvm/vmx/vmx.h
+@@ -537,7 +537,6 @@ static inline void vmx_flush_tlb(struct kvm_vcpu *vcpu, bool invalidate_gpa)
+ 			if (cpu_has_vmx_invvpid_global()) {
+ 				vpid_sync_vcpu_global();
+ 			} else {
+-				WARN_ON_ONCE(!cpu_has_vmx_invvpid_single());
+ 				vpid_sync_vcpu_single(vmx->vpid);
+ 				vpid_sync_vcpu_single(vmx->nested.vpid02);
+ 			}
 -- 
 2.24.1
 
