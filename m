@@ -2,26 +2,26 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8C1B91878B8
-	for <lists+kvm@lfdr.de>; Tue, 17 Mar 2020 05:54:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B39911878B2
+	for <lists+kvm@lfdr.de>; Tue, 17 Mar 2020 05:54:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727100AbgCQEyH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Mar 2020 00:54:07 -0400
+        id S1727021AbgCQExX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Mar 2020 00:53:23 -0400
 Received: from mga04.intel.com ([192.55.52.120]:34127 "EHLO mga04.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726990AbgCQExW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 Mar 2020 00:53:22 -0400
-IronPort-SDR: PDGOoR4vZsnlTjI1x4EdFthoptEGiyGqaHix6GSOMRInPc89b42X9+vtzW0dZ4k24ZTlOTNFto
- qEsRUharJGCA==
+        id S1727001AbgCQExX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 Mar 2020 00:53:23 -0400
+IronPort-SDR: 4S1QgyQNoxvgkEDWKXgbpL0Cu/BF81ynclIdunEt3rjIOsl3v71nAQIZI7MqYjSqs8/3TPxyhx
+ Yp9kLhPaJrqA==
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Mar 2020 21:53:21 -0700
-IronPort-SDR: 0AmwAqGv0AxARjRI60JTGna/30e80qVsjdNnL/U3juIi99RcZDQ5uQih4Ibm9w74aIdpv1KXrY
- BfBXkPgyOJqw==
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Mar 2020 21:53:22 -0700
+IronPort-SDR: OoVw0F+1w+mMxqupFNoOWLQqbXu94VN7KU50wOWphTxPS4LAAtBdk4CYjI8i4zSMXeG06LeG+P
+ wKlF9YSFojsg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.70,563,1574150400"; 
-   d="scan'208";a="355252817"
+   d="scan'208";a="355252820"
 Received: from sjchrist-coffee.jf.intel.com ([10.54.74.202])
   by fmsmga001.fm.intel.com with ESMTP; 16 Mar 2020 21:53:21 -0700
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
@@ -38,9 +38,9 @@ Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
         John Haxby <john.haxby@oracle.com>,
         Miaohe Lin <linmiaohe@huawei.com>,
         Tom Lendacky <thomas.lendacky@amd.com>
-Subject: [PATCH v2 25/32] KVM: x86/mmu: Use KVM_REQ_TLB_FLUSH_CURRENT for MMU specific flushes
-Date:   Mon, 16 Mar 2020 21:52:31 -0700
-Message-Id: <20200317045238.30434-26-sean.j.christopherson@intel.com>
+Subject: [PATCH v2 26/32] KVM: nVMX: Selectively use TLB_FLUSH_CURRENT for nested VM-Enter/VM-Exit
+Date:   Mon, 16 Mar 2020 21:52:32 -0700
+Message-Id: <20200317045238.30434-27-sean.j.christopherson@intel.com>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200317045238.30434-1-sean.j.christopherson@intel.com>
 References: <20200317045238.30434-1-sean.j.christopherson@intel.com>
@@ -51,70 +51,47 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Flush only the current ASID/context when requesting a TLB flush due to a
-change in the current vCPU's MMU to avoid blasting away TLB entries
-associated with other ASIDs/contexts, e.g. entries cached for L1 when
-a change in L2's MMU requires a flush.
+Flush only the current context, as opposed to all contexts, when
+requesting a TLB flush to handle the scenario where a L1 does not expect
+a TLB flush, but one is required because L1 and L2 shared an ASID.  This
+occurs if EPT is disabled (no per-EPTP tag), VPID is enabled (hardware
+doesn't flush unconditionally) and vmcs02 does not have its own VPID due
+to exhaustion of available VPIDs.
 
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 ---
- arch/x86/kvm/mmu/mmu.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ arch/x86/kvm/vmx/nested.c | 13 ++++++++-----
+ 1 file changed, 8 insertions(+), 5 deletions(-)
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index c357cc79f0f3..97d906a42e81 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -2313,7 +2313,7 @@ static void kvm_mmu_flush_or_zap(struct kvm_vcpu *vcpu,
- 		return;
- 
- 	if (local_flush)
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index 19600d4b3344..04cdf7ded1d3 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -1167,16 +1167,19 @@ static void nested_vmx_transition_tlb_flush(struct kvm_vcpu *vcpu,
+ 	 *
+ 	 * If VPID is enabled and used by vmc12, but L2 does not have a unique
+ 	 * TLB tag (ASID), i.e. EPT is disabled and KVM was unable to allocate
+-	 * a VPID for L2, flush the TLB as the effective ASID is common to both
+-	 * L1 and L2.
++	 * a VPID for L2, flush the current context as the effective ASID is
++	 * common to both L1 and L2.
+ 	 *
+ 	 * Defer the flush so that it runs after vmcs02.EPTP has been set by
+ 	 * KVM_REQ_LOAD_MMU_PGD (if nested EPT is enabled) and to avoid
+ 	 * redundant flushes further down the nested pipeline.
+ 	 */
+-	if (enable_vpid &&
+-	    (!nested_cpu_has_vpid(vmcs12) || !nested_has_guest_tlb_tag(vcpu)))
 -		kvm_make_request(KVM_REQ_TLB_FLUSH, vcpu);
-+		kvm_make_request(KVM_REQ_TLB_FLUSH_CURRENT, vcpu);
++	if (enable_vpid) {
++		if (!nested_cpu_has_vpid(vmcs12))
++			kvm_make_request(KVM_REQ_TLB_FLUSH, vcpu);
++		else if (!nested_has_guest_tlb_tag(vcpu))
++			kvm_make_request(KVM_REQ_TLB_FLUSH_CURRENT, vcpu);
++	}
  }
  
- #ifdef CONFIG_KVM_MMU_AUDIT
-@@ -2520,11 +2520,11 @@ static struct kvm_mmu_page *kvm_mmu_get_page(struct kvm_vcpu *vcpu,
- 				break;
- 
- 			WARN_ON(!list_empty(&invalid_list));
--			kvm_make_request(KVM_REQ_TLB_FLUSH, vcpu);
-+			kvm_make_request(KVM_REQ_TLB_FLUSH_CURRENT, vcpu);
- 		}
- 
- 		if (sp->unsync_children)
--			kvm_make_request(KVM_REQ_MMU_SYNC, vcpu);
-+			kvm_make_request(KVM_REQ_TLB_FLUSH_CURRENT, vcpu);
- 
- 		__clear_sp_write_flooding_count(sp);
- 		trace_kvm_mmu_get_page(sp, false);
-@@ -3125,7 +3125,7 @@ static int mmu_set_spte(struct kvm_vcpu *vcpu, u64 *sptep,
- 	if (set_spte_ret & SET_SPTE_WRITE_PROTECTED_PT) {
- 		if (write_fault)
- 			ret = RET_PF_EMULATE;
--		kvm_make_request(KVM_REQ_TLB_FLUSH, vcpu);
-+		kvm_make_request(KVM_REQ_TLB_FLUSH_CURRENT, vcpu);
- 	}
- 
- 	if (set_spte_ret & SET_SPTE_NEED_REMOTE_TLB_FLUSH || flush)
-@@ -4314,7 +4314,7 @@ static bool fast_cr3_switch(struct kvm_vcpu *vcpu, gpa_t new_cr3,
- 			kvm_make_request(KVM_REQ_LOAD_MMU_PGD, vcpu);
- 			if (!skip_tlb_flush) {
- 				kvm_make_request(KVM_REQ_MMU_SYNC, vcpu);
--				kvm_make_request(KVM_REQ_TLB_FLUSH, vcpu);
-+				kvm_make_request(KVM_REQ_TLB_FLUSH_CURRENT, vcpu);
- 			}
- 
- 			/*
-@@ -5177,7 +5177,7 @@ int kvm_mmu_load(struct kvm_vcpu *vcpu)
- 	if (r)
- 		goto out;
- 	kvm_mmu_load_pgd(vcpu);
--	kvm_x86_ops->tlb_flush_all(vcpu);
-+	kvm_x86_ops->tlb_flush_current(vcpu);
- out:
- 	return r;
- }
+ static bool is_bitwise_subset(u64 superset, u64 subset, u64 mask)
 -- 
 2.24.1
 
