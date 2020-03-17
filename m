@@ -2,74 +2,78 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4F1A1187688
-	for <lists+kvm@lfdr.de>; Tue, 17 Mar 2020 01:10:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4B872187765
+	for <lists+kvm@lfdr.de>; Tue, 17 Mar 2020 02:21:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1733045AbgCQAKs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Mar 2020 20:10:48 -0400
-Received: from mail.uic.edu.hk ([61.143.62.86]:46687 "EHLO umgp.uic.edu.hk"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1733019AbgCQAKr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 Mar 2020 20:10:47 -0400
-X-IronPort-AV: E=Sophos;i="5.43,368,1503331200"; 
-   d="scan'208";a="17242154"
-Received: from unknown (HELO zpmail.uic.edu.hk) ([192.168.111.249])
-  by umgp.uic.edu.hk with ESMTP; 17 Mar 2020 08:10:45 +0800
-Received: from zpmail.uic.edu.hk (localhost [127.0.0.1])
-        by zpmail.uic.edu.hk (Postfix) with ESMTPS id 9AFDA41C0567;
-        Tue, 17 Mar 2020 08:10:44 +0800 (CST)
-Received: from localhost (localhost [127.0.0.1])
-        by zpmail.uic.edu.hk (Postfix) with ESMTP id E747F41C0957;
-        Tue, 17 Mar 2020 08:10:43 +0800 (CST)
-DKIM-Filter: OpenDKIM Filter v2.10.3 zpmail.uic.edu.hk E747F41C0957
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uic.edu.hk;
-        s=6465647E-9D7B-11E8-B17B-42130C7FA3B9; t=1584403844;
-        bh=Wn2BcVyAdGxyDvB/5AnVfCr/iJTzisyuX4dwKssec6E=;
-        h=Date:From:Message-ID:MIME-Version;
-        b=Wr01idGFpLptPiBLm5PFfVX+aTNYjqHm6anPKDeIy4U0pwLGSZ5uiLZkPZmZuPsvE
-         jIu82SMDkFnAZ1picooyQQzcS174MCBnmmeGrA1HLL5HwCUVqWLRQJ6F7n/dEbCp1Z
-         h9G8egrEhGipDOUop8Au92LWrVihibpFReiYYUCP2PUw5zMVj9M9BrZbBsW/WKUk0E
-         5xaw0OuaQzNV+/d+a+rYfJePf2PWtl4HlduEkoLxh0y8c/gB/AmOqWKoMFrZ4Zwy7h
-         u6NOmHqjs3lhNcO0gKsbiwDlPLcTS8GI72U1QZ1Lebg1UCG1++p2wbe7wlg+Y9PjzM
-         2uyRUVz9sM5Dw==
-Received: from zpmail.uic.edu.hk ([127.0.0.1])
-        by localhost (zpmail.uic.edu.hk [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id S2WBlP-nuasS; Tue, 17 Mar 2020 08:10:43 +0800 (CST)
-Received: from zpmail.uic.edu.hk (zpmail.uic.edu.hk [192.168.111.249])
-        by zpmail.uic.edu.hk (Postfix) with ESMTP id 5169C41C0567;
-        Tue, 17 Mar 2020 08:10:38 +0800 (CST)
-Date:   Tue, 17 Mar 2020 08:10:38 +0800 (CST)
-From:   David Ibe <ylawrence@uic.edu.hk>
-Reply-To: David Ibe <davidibe718@gmail.com>
-Message-ID: <823530439.63694938.1584403838226.JavaMail.zimbra@uic.edu.hk>
-Subject: 
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [192.168.111.160]
-X-Mailer: Zimbra 8.8.15_GA_3829 (ZimbraWebClient - GC80 (Win)/8.8.15_GA_3829)
-Thread-Index: MdVyMl4Wyg6wtPZiBXOue762XG1upg==
-Thread-Topic: 
-To:     unlisted-recipients:; (no To-header on input)
+        id S1733124AbgCQBVy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Mar 2020 21:21:54 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:57972 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1733104AbgCQBVx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 Mar 2020 21:21:53 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02H1I2Ro179228;
+        Tue, 17 Mar 2020 01:21:48 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id; s=corp-2020-01-29;
+ bh=f7CQW5yD+bNNHJvpMDW69FmUb46A0zpHFlOpybxLz4I=;
+ b=pffBb7sbyQ1fMdVTzVH1FiPXnXiB/r8kPc1eebgAfs/CyyYFCYJjioDF2guA3u4vPhuv
+ S+ypMiiCqGJtv4LaBewRM106NbJaZEPFqTemuEcq2RmHNO+Nhf+j5AyRQtYAAyVcSyOo
+ u+84wa2dYer4+5rDbUv8flrL08ytMK8SlDeOwxBR5zveEwsxl1tvZ1QYoTwGlLZrZrhN
+ A/DEDlJ46swaGar9epQ5X9vdeKPSSex+ntUaUOoLPgW9cVAUhkxkeJgR4SocG50MQYyF
+ aDFAl60lwb4fawYi4d6N2/l9ilLx001XzdG3S1P6uRpXsD3kMl1VJpFlWOnkuDSorfCa zQ== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by userp2120.oracle.com with ESMTP id 2yrqwn1w3u-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 17 Mar 2020 01:21:48 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02H1KgWS064787;
+        Tue, 17 Mar 2020 01:21:47 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by aserp3030.oracle.com with ESMTP id 2ys8tqs4t6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 17 Mar 2020 01:21:47 +0000
+Received: from abhmp0006.oracle.com (abhmp0006.oracle.com [141.146.116.12])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 02H1LknT008917;
+        Tue, 17 Mar 2020 01:21:46 GMT
+Received: from sadhukhan-nvmx.osdevelopmeniad.oraclevcn.com (/100.100.231.182)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Mon, 16 Mar 2020 18:21:45 -0700
+From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
+To:     kvm@vger.kernel.org
+Cc:     pbonzini@redhat.com, jmattson@google.com,
+        sean.j.christopherson@intel.com
+Subject: [PATCH 0/2] kvm-unit-test: nVMX: Test GUEST_BNDCFGS VM-Entry control on vmentry of nested guests
+Date:   Tue, 17 Mar 2020 01:21:33 +0000
+Message-Id: <1584408095-16591-1-git-send-email-krish.sadhukhan@oracle.com>
+X-Mailer: git-send-email 1.8.3.1
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9562 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 phishscore=0 mlxscore=0
+ malwarescore=0 suspectscore=13 mlxlogscore=626 spamscore=0 bulkscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
+ definitions=main-2003170003
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9562 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 lowpriorityscore=0 mlxlogscore=703
+ mlxscore=0 bulkscore=0 phishscore=0 spamscore=0 suspectscore=13
+ malwarescore=0 priorityscore=1501 clxscore=1015 adultscore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2003170003
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Patch# 1: Adds the required enum values to the header file
+Patch# 2: Adds the test code
 
 
-Good Day,                
+[PATCH 1/2] kvm-unit-test: VMX: Add enum for GUEST_BNDCFGS field and LOAD_BNDCFGS
+[PATCH 2/2] kvm-unit-test: nVMX: Test GUEST_BNDCFGS VM-Entry control on vmentry of
 
-I am Mr. David Ibe, I work with the International Standards on Auditing, I have seen on records, that several times people has divert your funds into their own personal accounts.
+ x86/vmx.h       |  2 ++
+ x86/vmx_tests.c | 53 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 55 insertions(+)
 
-Now I am writing to you in respect of the amount which I have been able to send to you through our International United Nations accredited and approved Diplomat, who has arrived Africa, I want you to know that the diplomat would deliver the funds which I have packaged as a diplomatic compensation to you and the amount in the consignment is  $10,000,000.00 United State Dollars.
-
-I did not disclose the contents to the diplomat, but I told him that it is your compensation from the Auditing Corporate Governance and Stewardship, Auditing and Assurance Standards Board. I want you to know that these funds would help with your financial status as I have seen in records that you have spent a lot trying to receive these funds and I am not demanding so much from you but only 30% for my stress and logistics.
-
-I would like you to get back to me with your personal contact details, so that I can give you the contact information's of the diplomat who has arrived Africa and has been waiting to get your details so that he can proceed with the delivery to you.
-
-Yours Sincerely,
-Kindly forward your details to: mrdavidibe966@gmail.com
-Mr. David Ibe
-International Auditor,
-Corporate Governance and Stewardship
+Krish Sadhukhan (2):
+      VMX: Add enum for GUEST_BNDCFGS field and LOAD_BNDCFGS vmentry control fie
+      nVMX: Test GUEST_BNDCFGS VM-Entry control on vmentry of nested guests
