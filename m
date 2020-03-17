@@ -2,38 +2,39 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id AE2B3187E4E
-	for <lists+kvm@lfdr.de>; Tue, 17 Mar 2020 11:30:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 29EF3187E6C
+	for <lists+kvm@lfdr.de>; Tue, 17 Mar 2020 11:35:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725928AbgCQKaa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Mar 2020 06:30:30 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:41557 "EHLO
+        id S1725933AbgCQKfV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Mar 2020 06:35:21 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:49471 "EHLO
         us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725794AbgCQKa3 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 17 Mar 2020 06:30:29 -0400
+        by vger.kernel.org with ESMTP id S1725730AbgCQKfV (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 17 Mar 2020 06:35:21 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1584441028;
+        s=mimecast20190719; t=1584441320;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=E3boV3yl7QUZP/2283Qn125pIkCavFJHZDCmoHG9RZ4=;
-        b=QiHG9Qim1HeSBEtKzNWwOjlY0YQDv8LrWgObz/BMg5oMAdSRxT/vp8qIUeWbSl6Cm2xMRC
-        NX8p/8Zb+X2IwNDXHaf71dqIiMtgQScPhRGKHhRaK007fpv7f5D8MqFby8WR/zW1C5z758
-        df5ymeeXZWzSO0lUMaU6fwmaO+LXTdg=
+        bh=PDF9KX2gWP/KQxi7FPC/r6zYWiKxTIB+y9Tt6qr75x0=;
+        b=LTy4UdqpBNBBc3aSHY0F8dFlzuqCWbH/8UU2MItDnqXEsmYJ36iHxIp0Q+0I81Hg5hj165
+        ofK9ebV7x/h/3HkxaZlKElW9TtLwxm41dW+a9wgsI8FDia/A7Rv5IUU7o084FwucRDQEaT
+        8y4YXk5yv584g79LZeKIOFLp4VXEOak=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-404-q__xEIZcPW-S9ONrSCl3rA-1; Tue, 17 Mar 2020 06:30:27 -0400
-X-MC-Unique: q__xEIZcPW-S9ONrSCl3rA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+ us-mta-362-MHeVK9nTPLqv1JiyvpOjEw-1; Tue, 17 Mar 2020 06:35:18 -0400
+X-MC-Unique: MHeVK9nTPLqv1JiyvpOjEw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EE6F68018A4;
-        Tue, 17 Mar 2020 10:30:24 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0656118A551B;
+        Tue, 17 Mar 2020 10:35:16 +0000 (UTC)
 Received: from [10.36.113.142] (ovpn-113-142.ams2.redhat.com [10.36.113.142])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 4C12419C58;
-        Tue, 17 Mar 2020 10:30:21 +0000 (UTC)
-Subject: Re: [PATCH v5 15/23] irqchip/gic-v4.1: Add VSGI property setup
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id F33D75C1C3;
+        Tue, 17 Mar 2020 10:35:12 +0000 (UTC)
+Subject: Re: [PATCH v5 12/23] irqchip/gic-v4.1: Plumb set_vcpu_affinity SGI
+ callbacks
 To:     Marc Zyngier <maz@kernel.org>,
         linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         kvm@vger.kernel.org, linux-kernel@vger.kernel.org
@@ -46,18 +47,18 @@ Cc:     Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
         Julien Thierry <julien.thierry.kdev@gmail.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>
 References: <20200304203330.4967-1-maz@kernel.org>
- <20200304203330.4967-16-maz@kernel.org>
+ <20200304203330.4967-13-maz@kernel.org>
 From:   Auger Eric <eric.auger@redhat.com>
-Message-ID: <edfc4aa0-3e96-4fb2-731e-76a284c8ce17@redhat.com>
-Date:   Tue, 17 Mar 2020 11:30:19 +0100
+Message-ID: <2f981328-92e8-7554-ccf7-962c79add0c3@redhat.com>
+Date:   Tue, 17 Mar 2020 11:35:11 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.4.0
 MIME-Version: 1.0
-In-Reply-To: <20200304203330.4967-16-maz@kernel.org>
+In-Reply-To: <20200304203330.4967-13-maz@kernel.org>
 Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
@@ -66,81 +67,83 @@ X-Mailing-List: kvm@vger.kernel.org
 Hi Marc,
 
 On 3/4/20 9:33 PM, Marc Zyngier wrote:
-> Add the SGI configuration entry point for KVM to use.
+> Just like for vLPIs, there is some configuration information that cannot
+> be directly communicated through the normal irqchip API, and we have to
+> use our good old friend set_vcpu_affinity as a side-band communication
+> mechanism.
+> 
+> This is used to configure group and priority for a given vSGI.
 > 
 > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> Reviewed-by: Zenghui Yu <yuzenghui@huawei.com>
 > ---
->  drivers/irqchip/irq-gic-v3-its.c   |  2 +-
->  drivers/irqchip/irq-gic-v4.c       | 13 +++++++++++++
->  include/linux/irqchip/arm-gic-v4.h |  3 ++-
->  3 files changed, 16 insertions(+), 2 deletions(-)
+>  drivers/irqchip/irq-gic-v3-its.c   | 18 ++++++++++++++++++
+>  include/linux/irqchip/arm-gic-v4.h |  5 +++++
+>  2 files changed, 23 insertions(+)
 > 
 > diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
-> index effb0e0b0c9d..b65fba67bd85 100644
+> index fb2b836c31ff..effb0e0b0c9d 100644
 > --- a/drivers/irqchip/irq-gic-v3-its.c
 > +++ b/drivers/irqchip/irq-gic-v3-its.c
-> @@ -4039,7 +4039,7 @@ static int its_sgi_set_vcpu_affinity(struct irq_data *d, void *vcpu_info)
->  	struct its_cmd_info *info = vcpu_info;
->  
->  	switch (info->cmd_type) {
-> -	case PROP_UPDATE_SGI:
-> +	case PROP_UPDATE_VSGI:
-This change rather belongs to
-[PATCH v5 12/23] irqchip/gic-v4.1: Plumb set_vcpu_affinity SGI callbacks
->  		vpe->sgi_config[d->hwirq].priority = info->priority;
->  		vpe->sgi_config[d->hwirq].group = info->group;
->  		its_configure_sgi(d, false);
-> diff --git a/drivers/irqchip/irq-gic-v4.c b/drivers/irqchip/irq-gic-v4.c
-> index 99b33f60ac63..0c18714ae13e 100644
-> --- a/drivers/irqchip/irq-gic-v4.c
-> +++ b/drivers/irqchip/irq-gic-v4.c
-> @@ -320,6 +320,19 @@ int its_prop_update_vlpi(int irq, u8 config, bool inv)
->  	return irq_set_vcpu_affinity(irq, &info);
+> @@ -4033,6 +4033,23 @@ static int its_sgi_get_irqchip_state(struct irq_data *d,
+>  	return 0;
 >  }
 >  
-> +int its_prop_update_vsgi(int irq, u8 priority, bool group)
+> +static int its_sgi_set_vcpu_affinity(struct irq_data *d, void *vcpu_info)
 > +{
-> +	struct its_cmd_info info = {
-> +		.cmd_type = PROP_UPDATE_VSGI,
-> +		{
-> +			.priority	= priority,
-> +			.group		= group,
-> +		},
-> +	};
+> +	struct its_vpe *vpe = irq_data_get_irq_chip_data(d);
+> +	struct its_cmd_info *info = vcpu_info;
 > +
-> +	return irq_set_vcpu_affinity(irq, &info);
+> +	switch (info->cmd_type) {
+> +	case PROP_UPDATE_SGI:
+PROP_UPDATE_VSGI directly?
+> +		vpe->sgi_config[d->hwirq].priority = info->priority;
+> +		vpe->sgi_config[d->hwirq].group = info->group;
+> +		its_configure_sgi(d, false);
+> +		return 0;
+> +
+extra line
+> +	default:
+> +		return -EINVAL;
+> +	}
 > +}
 > +
->  int its_init_v4(struct irq_domain *domain,
->  		const struct irq_domain_ops *vpe_ops,
->  		const struct irq_domain_ops *sgi_ops)
+>  static struct irq_chip its_sgi_irq_chip = {
+>  	.name			= "GICv4.1-sgi",
+>  	.irq_mask		= its_sgi_mask_irq,
+> @@ -4040,6 +4057,7 @@ static struct irq_chip its_sgi_irq_chip = {
+>  	.irq_set_affinity	= its_sgi_set_affinity,
+>  	.irq_set_irqchip_state	= its_sgi_set_irqchip_state,
+>  	.irq_get_irqchip_state	= its_sgi_get_irqchip_state,
+> +	.irq_set_vcpu_affinity	= its_sgi_set_vcpu_affinity,
+>  };
+>  
+>  static int its_sgi_irq_domain_alloc(struct irq_domain *domain,
 > diff --git a/include/linux/irqchip/arm-gic-v4.h b/include/linux/irqchip/arm-gic-v4.h
-> index 0bb111b4a504..6976b8331b60 100644
+> index 44e8c19e3d56..b4dbf899460b 100644
 > --- a/include/linux/irqchip/arm-gic-v4.h
 > +++ b/include/linux/irqchip/arm-gic-v4.h
-> @@ -105,7 +105,7 @@ enum its_vcpu_info_cmd_type {
+> @@ -103,6 +103,7 @@ enum its_vcpu_info_cmd_type {
 >  	SCHEDULE_VPE,
 >  	DESCHEDULE_VPE,
 >  	INVALL_VPE,
-> -	PROP_UPDATE_SGI,
-> +	PROP_UPDATE_VSGI,
-same
+> +	PROP_UPDATE_SGI,
 >  };
 >  
 >  struct its_cmd_info {
-> @@ -134,6 +134,7 @@ int its_map_vlpi(int irq, struct its_vlpi_map *map);
->  int its_get_vlpi(int irq, struct its_vlpi_map *map);
->  int its_unmap_vlpi(int irq);
->  int its_prop_update_vlpi(int irq, u8 config, bool inv);
-> +int its_prop_update_vsgi(int irq, u8 priority, bool group);
+> @@ -115,6 +116,10 @@ struct its_cmd_info {
+>  			bool		g0en;
+>  			bool		g1en;
+>  		};
+> +		struct {
+> +			u8		priority;
+> +			bool		group;
+> +		};
+>  	};
+>  };
 >  
->  struct irq_domain_ops;
->  int its_init_v4(struct irq_domain *domain,
 > 
-Besides
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
-
-Thanks
 
 Eric
 
