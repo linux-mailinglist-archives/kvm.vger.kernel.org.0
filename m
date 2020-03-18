@@ -2,89 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id CAAE6189931
-	for <lists+kvm@lfdr.de>; Wed, 18 Mar 2020 11:22:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6E26018998E
+	for <lists+kvm@lfdr.de>; Wed, 18 Mar 2020 11:36:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727324AbgCRKWa convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Wed, 18 Mar 2020 06:22:30 -0400
-Received: from mail.kernel.org ([198.145.29.99]:57766 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726733AbgCRKW3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 Mar 2020 06:22:29 -0400
-From:   bugzilla-daemon@bugzilla.kernel.org
-Authentication-Results: mail.kernel.org; dkim=permerror (bad message/signature format)
-To:     kvm@vger.kernel.org
-Subject: [Bug 206877] New: Nested virt on AMD (and probably older Intel)
- doesn't work with ignore_msrs=Y on L0 (fails with UMWAIT error)
-Date:   Wed, 18 Mar 2020 10:22:28 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: new
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: s.reiter@proxmox.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_id short_desc product version
- cf_kernel_version rep_platform op_sys cf_tree bug_status bug_severity
- priority component assigned_to reporter cf_regression
-Message-ID: <bug-206877-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        id S1727673AbgCRKgN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Mar 2020 06:36:13 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:54376 "EHLO
+        us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726486AbgCRKgN (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 18 Mar 2020 06:36:13 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1584527771;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=9kOGaEvY0uUWWp0UDmf+47Tlqah6zLj19Jn9s94Xy88=;
+        b=LqWBO8JcdTin1v6vhABcYzNtv/OyOl4zfcXmXQFXlnU6voszzDTi88PR4ggJfhU1+OnimA
+        lGEf6WAQnLoPRpeVrLIoKjHv2Wzyj5lmnInSSnyX4+4DEsxjof5jp0EV3Y08ulDqbVet9p
+        Sjb2TmrR6Pq60ElDMCBep/y4rGsbnDY=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-315-USXhNlDePo23UamBHyLdlA-1; Wed, 18 Mar 2020 06:36:08 -0400
+X-MC-Unique: USXhNlDePo23UamBHyLdlA-1
+Received: by mail-wr1-f71.google.com with SMTP id d17so328955wrw.19
+        for <kvm@vger.kernel.org>; Wed, 18 Mar 2020 03:36:08 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=9kOGaEvY0uUWWp0UDmf+47Tlqah6zLj19Jn9s94Xy88=;
+        b=UuXLn999trkCWcFZOmEqv2fOxuPq4t2OaFoncIGX0Y9mW7tjJbEkofSu+5StycrB84
+         JbZikS1Gg5rRhNlLIFJjZdJfD+7fqQUDRgLtnipXp4wicE7H5O0e5TRAmf2VvxNb4eo8
+         0tyl69hIL3pwOXHDBkofDxFQYqLE39s+8SsqSLCA8qOCOvFzns2QCVCqvvKEEsT2nCYA
+         +nVVjL4TjjS0LbyX6TYJcZFRhCqAgCWss8rzx4FctnMXUN2rhhmNWf7dh2k0yci+vdd1
+         cfHMXyN9BKeAFisHlUoBPopV2RKiY+uvjW2WNwPsxMsmdWexaQNkQU6rWZRdbwylHXoz
+         wtEQ==
+X-Gm-Message-State: ANhLgQ347Fhl4bRXFdqypAd9rlE1U2LEtthnUPSNgC7hkEyqgG2C2FVq
+        EZ41isOVF4Ga0Ph6/zWw1TRVdl/pRQ/0Tsg9mDCzGgar8Mzj+ZANmLFkYIAWR4RQ9s5dSgN75Zi
+        jgdWonr2QAs7g
+X-Received: by 2002:a5d:6ca7:: with SMTP id a7mr5262334wra.157.1584527767069;
+        Wed, 18 Mar 2020 03:36:07 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vuuOOj7mHIPHFJZLgSdpePaCmID9395Fcz/+5L89ZGcwdLxZ3fvs1hiO/Pb1h9lf/7IQevihg==
+X-Received: by 2002:a5d:6ca7:: with SMTP id a7mr5262303wra.157.1584527766824;
+        Wed, 18 Mar 2020 03:36:06 -0700 (PDT)
+Received: from [192.168.178.58] ([151.21.15.43])
+        by smtp.gmail.com with ESMTPSA id a184sm3141380wmf.29.2020.03.18.03.36.05
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 18 Mar 2020 03:36:06 -0700 (PDT)
+Subject: Re: [PATCH v2 31/32] KVM: nVMX: Don't flush TLB on nested VM
+ transition with EPT enabled
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Ben Gardon <bgardon@google.com>,
+        Junaid Shahid <junaids@google.com>,
+        Liran Alon <liran.alon@oracle.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        John Haxby <john.haxby@oracle.com>,
+        Miaohe Lin <linmiaohe@huawei.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>
+References: <20200317045238.30434-1-sean.j.christopherson@intel.com>
+ <20200317045238.30434-32-sean.j.christopherson@intel.com>
+ <97f91b27-65ac-9187-6b60-184e1562d228@redhat.com>
+ <20200317182251.GD12959@linux.intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <218d4dbd-20f1-5bf8-ca44-c53dd9345dab@redhat.com>
+Date:   Wed, 18 Mar 2020 11:36:04 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
+In-Reply-To: <20200317182251.GD12959@linux.intel.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=206877
+On 17/03/20 19:22, Sean Christopherson wrote:
+> On Tue, Mar 17, 2020 at 06:18:37PM +0100, Paolo Bonzini wrote:
+>> On 17/03/20 05:52, Sean Christopherson wrote:
+>>> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+>>> index d816f1366943..a77eab5b0e8a 100644
+>>> --- a/arch/x86/kvm/vmx/nested.c
+>>> +++ b/arch/x86/kvm/vmx/nested.c
+>>> @@ -1123,7 +1123,7 @@ static int nested_vmx_load_cr3(struct kvm_vcpu *vcpu, unsigned long cr3, bool ne
+>>>  	}
+>>>  
+>>>  	if (!nested_ept)
+>>> -		kvm_mmu_new_cr3(vcpu, cr3, false);
+>>> +		kvm_mmu_new_cr3(vcpu, cr3, enable_ept);
+>>
+>> Even if enable_ept == false, we could have already scheduled or flushed
+>> the TLB soon due to one of 1) nested_vmx_transition_tlb_flush 2)
+>> vpid_sync_context in prepare_vmcs02 3) the processor doing it for
+>> !enable_vpid.
+>>
+>> So for !enable_ept only KVM_REQ_MMU_SYNC is needed, not
+>> KVM_REQ_TLB_FLUSH_CURRENT I think.  Worth adding a TODO?
+> 
+> Now that you point it out, I think it makes sense to unconditionally pass
+> %true here, i.e. rely 100% on nested_vmx_transition_tlb_flush() to do the
+> right thing.
 
-            Bug ID: 206877
-           Summary: Nested virt on AMD (and probably older Intel) doesn't
-                    work with ignore_msrs=Y on L0 (fails with UMWAIT
-                    error)
-           Product: Virtualization
-           Version: unspecified
-    Kernel Version: 5.6.0-rc6
-          Hardware: i386
-                OS: Linux
-              Tree: Mainline
-            Status: NEW
-          Severity: normal
-          Priority: P1
-         Component: kvm
-          Assignee: virtualization_kvm@kernel-bugs.osdl.org
-          Reporter: s.reiter@proxmox.com
-        Regression: No
+Why doesn't it need KVM_REQ_MMU_SYNC either?  All this should be in a
+comment as well, of course.
 
-I'm not sure if this is a supported configuration, but since the commit
-mentioned below nested virtualization on AMD when the host has 'ignore_msrs=Y'
-is broken. QEMU fails with:
+(All patches I didn't comment on look good).
 
-kvm: error: failed to set MSR 0xe1 to 0x0
-kvm: /qemu/target/i386/kvm.c:2947: kvm_put_msrs: Assertion `ret ==
-cpu->kvm_msr_buf->nmsrs' failed.
+Paolo
 
-If this is supposed to work, it's a regression from 6e3ba4abcea5 ("KVM: vmx:
-Emulate MSR IA32_UMWAIT_CONTROL"), I can confirm that reverting this commit for
-the guest kernel makes everything work again. Ignoring UMWAIT in QEMU
-(kvm_get_supported_msrs) does the trick too.
-
-I *think* this happens since MSR_IA32_UMWAIT_CONTROL (in msrs_to_save_all) is
-added to the guest CPUID with the only condition being that 'rdmsr_safe' in
-'kvm_init_msr_list' succeeds - which it does, since the host ignores it.
-However, since the CPU doesn't actually support UMWAIT (in my case since it's
-an AMD chip, but I suppose the same happens on older Intel ones) the MSR set
-for the L2 guest fails.
-
--- 
-You are receiving this mail because:
-You are watching the assignee of the bug.
