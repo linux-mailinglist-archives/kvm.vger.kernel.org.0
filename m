@@ -2,96 +2,271 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C6F63189E4E
-	for <lists+kvm@lfdr.de>; Wed, 18 Mar 2020 15:53:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 676C9189E67
+	for <lists+kvm@lfdr.de>; Wed, 18 Mar 2020 15:59:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726769AbgCROxZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Mar 2020 10:53:25 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:28563 "EHLO
+        id S1726671AbgCRO7A (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Mar 2020 10:59:00 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:34432 "EHLO
         us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726308AbgCROxZ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 18 Mar 2020 10:53:25 -0400
+        by vger.kernel.org with ESMTP id S1726308AbgCRO67 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 18 Mar 2020 10:58:59 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1584543204;
+        s=mimecast20190719; t=1584543537;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=8WKtJ0NoeW5X7Z6TZZcRE25TjkVLqGWMqe9mT+XKLH4=;
-        b=jInc0BllTbgebH2Aky6WemvNc+NNAh3bL18w929C91V3DNliei3t3pzUztd1BpO9b6J3FQ
-        vEo4HloaFzl8oDC1Cj3gmX25f4+MejbkTptu/rWPQ+3Ho61Nrs4FA8ZW50EYP/hTsfkqd4
-        CvG2m6rK3vHJKCeibYb4RISaTuZQaUA=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-253-pvmeZAx-Nq2Za3MDJPyCyg-1; Wed, 18 Mar 2020 10:53:22 -0400
-X-MC-Unique: pvmeZAx-Nq2Za3MDJPyCyg-1
-Received: by mail-wr1-f71.google.com with SMTP id v6so12362229wrg.22
-        for <kvm@vger.kernel.org>; Wed, 18 Mar 2020 07:53:22 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=8WKtJ0NoeW5X7Z6TZZcRE25TjkVLqGWMqe9mT+XKLH4=;
-        b=El4/3K2Rl81Uf58dMX53LMZYymNWZFq1kIrOQuSms1UG/VoPG9NZpWAThOod0TTH9k
-         9yUqzsYX34I3EEfR1Ve6d3lH7qPMMetFNRIEaWY8p6lnJUugt2E6uvEjR/fDMvLcdmz/
-         1/CFR4lHS1xFdSl/W9i9eqBhXYglhjta/57zqlDTkf3xGdaTvQRPeN06QpTsWxqy+5wN
-         FFcOqPLnXASXQtirXFEQNSYe54F5fcdcJsYVfduCRKetdJKfXTtF3Zjec7h20m/RaFWU
-         dIPcpWtcoUfKFuqhRVF2ABZkARMyFRdeVt2HvFQ8NsYyjJkV/duidNV47ANCsEuQyHCD
-         9wkA==
-X-Gm-Message-State: ANhLgQ1b/F2E/1dqBk9tjN8jPAmRd6nchyWfTmoVU2cmlCjnI3+mZCol
-        ZlA8hyeNoj1Qr7mrMOZZZieTZ+nmcVXMRfiKtRRhMV8/zu1XrdcZalXm5+M9OpLaTrg1ZFhNUOk
-        bf5adjjz8/cyd
-X-Received: by 2002:a1c:2701:: with SMTP id n1mr5686046wmn.180.1584543201138;
-        Wed, 18 Mar 2020 07:53:21 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vsEFavcmZ92zPR5GFapmD2k6UNbKOWgwr1iImA3etdVN9BHmNhPJHNXPkEEJZIZmcDqYJmUaA==
-X-Received: by 2002:a1c:2701:: with SMTP id n1mr5686021wmn.180.1584543200952;
-        Wed, 18 Mar 2020 07:53:20 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id q10sm9326043wrx.12.2020.03.18.07.53.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Mar 2020 07:53:20 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+        bh=Ve4s7FPYGZF9JKgjT+WaVYn3b5S2BdECnB07tfNEl+k=;
+        b=Ho5F4NywqsNGJjIA1oxuEd9c1P1soUfV5SZuvrp5LZNJ/q6x16pOyU1T+t+vUIGfJ8yF5N
+        HeH1BVla7Iyw2mzinUAPG618SMx56gD6FQBme86qS+cGCCVXbzrSwVEPpCDkpuNdWeqyVb
+        xyUDqj+o7zI9NvJ8HPhUNoD+SGr2BmM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-17-sJ37-AYtM4S_xPvlAzeq9g-1; Wed, 18 Mar 2020 10:58:55 -0400
+X-MC-Unique: sJ37-AYtM4S_xPvlAzeq9g-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E5F198010F8
+        for <kvm@vger.kernel.org>; Wed, 18 Mar 2020 14:58:54 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.40.193.227])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 04B355C21B;
+        Wed, 18 Mar 2020 14:58:53 +0000 (UTC)
+Date:   Wed, 18 Mar 2020 15:58:51 +0100
+From:   Andrew Jones <drjones@redhat.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH] KVM: nSVM: check for EFER.SVME=1 before entering guest
-In-Reply-To: <1584535300-6571-1-git-send-email-pbonzini@redhat.com>
-References: <1584535300-6571-1-git-send-email-pbonzini@redhat.com>
-Date:   Wed, 18 Mar 2020 15:53:19 +0100
-Message-ID: <877dzh3eao.fsf@vitty.brq.redhat.com>
+Cc:     kvm@vger.kernel.org
+Subject: Re: [PATCH v2 2/2] KVM: selftests: Rework timespec functions and
+ usage
+Message-ID: <20200318145851.bb3mb7qvga35ambg@kamzik.brq.redhat.com>
+References: <20200316173703.12785-1-drjones@redhat.com>
+ <20200316173703.12785-3-drjones@redhat.com>
+ <4e2efaa3-f2cb-8210-d486-b1250e3be27a@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4e2efaa3-f2cb-8210-d486-b1250e3be27a@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
+On Wed, Mar 18, 2020 at 02:10:25PM +0100, Paolo Bonzini wrote:
+> On 16/03/20 18:37, Andrew Jones wrote:
+> > The steal_time test's timespec stop condition was wrong and should have
+> > used the timespec functions instead to avoid being wrong, but
+> > timespec_diff had a strange interface. Rework all the timespec API and
+> > its use.
+> > 
+> > Signed-off-by: Andrew Jones <drjones@redhat.com>
+> 
+> Queued this one,
 
-> EFER is set for L2 using svm_set_efer, which hardcodes EFER_SVME to 1 and hides
-> an incorrect value for EFER.SVME in the L1 VMCB.  Perform the check manually
-> to detect invalid guest state.
->
-> Reported-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  arch/x86/kvm/svm.c | 3 +++
->  1 file changed, 3 insertions(+)
->
-> diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
-> index 08568ae9f7a1..2125c6ae5951 100644
-> --- a/arch/x86/kvm/svm.c
-> +++ b/arch/x86/kvm/svm.c
-> @@ -3558,6 +3558,9 @@ static bool nested_svm_vmrun_msrpm(struct vcpu_svm *svm)
->  
->  static bool nested_vmcb_checks(struct vmcb *vmcb)
->  {
-> +	if ((vmcb->save.efer & EFER_SVME) == 0)
-> +		return false;
-> +
->  	if ((vmcb->control.intercept & (1ULL << INTERCEPT_VMRUN)) == 0)
->  		return false;
+I don't see this in queue or next.
 
-Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> I have already pushed the test to kvm/next so the
+> "fixup!" commit cannot be squashed.  But I don't really mind the code as
+> it looks in kvm/next.
 
--- 
-Vitaly
+The previous patch isn't a huge deal, but it's more than a cleanup,
+because if somebody wants to use QUIET when compiling, but then --verbose
+when executing, they won't get any verbose output. And the removed,
+useless assert is truly useless.
+
+Thanks,
+drew
+
+> 
+> Paolo
+> 
+> > ---
+> >  .../selftests/kvm/demand_paging_test.c        | 37 ++++++++-----------
+> >  .../testing/selftests/kvm/include/test_util.h |  3 +-
+> >  tools/testing/selftests/kvm/lib/test_util.c   | 37 ++++++++-----------
+> >  tools/testing/selftests/kvm/steal_time.c      |  2 +-
+> >  4 files changed, 35 insertions(+), 44 deletions(-)
+> > 
+> > diff --git a/tools/testing/selftests/kvm/demand_paging_test.c b/tools/testing/selftests/kvm/demand_paging_test.c
+> > index d82f7bc060c3..360cd3ea4cd6 100644
+> > --- a/tools/testing/selftests/kvm/demand_paging_test.c
+> > +++ b/tools/testing/selftests/kvm/demand_paging_test.c
+> > @@ -117,8 +117,7 @@ static void *vcpu_worker(void *data)
+> >  	struct kvm_vm *vm = args->vm;
+> >  	int vcpu_id = args->vcpu_id;
+> >  	struct kvm_run *run;
+> > -	struct timespec start;
+> > -	struct timespec end;
+> > +	struct timespec start, end, ts_diff;
+> >  
+> >  	vcpu_args_set(vm, vcpu_id, 1, vcpu_id);
+> >  	run = vcpu_state(vm, vcpu_id);
+> > @@ -135,9 +134,9 @@ static void *vcpu_worker(void *data)
+> >  	}
+> >  
+> >  	clock_gettime(CLOCK_MONOTONIC, &end);
+> > -	PER_VCPU_DEBUG("vCPU %d execution time: %lld.%.9lds\n", vcpu_id,
+> > -		       (long long)(timespec_diff(start, end).tv_sec),
+> > -		       timespec_diff(start, end).tv_nsec);
+> > +	ts_diff = timespec_sub(end, start);
+> > +	PER_VCPU_DEBUG("vCPU %d execution time: %ld.%.9lds\n", vcpu_id,
+> > +		       ts_diff.tv_sec, ts_diff.tv_nsec);
+> >  
+> >  	return NULL;
+> >  }
+> > @@ -201,8 +200,8 @@ static int handle_uffd_page_request(int uffd, uint64_t addr)
+> >  
+> >  	clock_gettime(CLOCK_MONOTONIC, &end);
+> >  
+> > -	PER_PAGE_DEBUG("UFFDIO_COPY %d \t%lld ns\n", tid,
+> > -		       (long long)timespec_to_ns(timespec_diff(start, end)));
+> > +	PER_PAGE_DEBUG("UFFDIO_COPY %d \t%ld ns\n", tid,
+> > +		       timespec_to_ns(timespec_sub(end, start)));
+> >  	PER_PAGE_DEBUG("Paged in %ld bytes at 0x%lx from thread %d\n",
+> >  		       host_page_size, addr, tid);
+> >  
+> > @@ -224,8 +223,7 @@ static void *uffd_handler_thread_fn(void *arg)
+> >  	int pipefd = uffd_args->pipefd;
+> >  	useconds_t delay = uffd_args->delay;
+> >  	int64_t pages = 0;
+> > -	struct timespec start;
+> > -	struct timespec end;
+> > +	struct timespec start, end, ts_diff;
+> >  
+> >  	clock_gettime(CLOCK_MONOTONIC, &start);
+> >  	while (!quit_uffd_thread) {
+> > @@ -295,11 +293,10 @@ static void *uffd_handler_thread_fn(void *arg)
+> >  	}
+> >  
+> >  	clock_gettime(CLOCK_MONOTONIC, &end);
+> > -	PER_VCPU_DEBUG("userfaulted %ld pages over %lld.%.9lds. (%f/sec)\n",
+> > -		       pages, (long long)(timespec_diff(start, end).tv_sec),
+> > -		       timespec_diff(start, end).tv_nsec, pages /
+> > -		       ((double)timespec_diff(start, end).tv_sec +
+> > -			(double)timespec_diff(start, end).tv_nsec / 100000000.0));
+> > +	ts_diff = timespec_sub(end, start);
+> > +	PER_VCPU_DEBUG("userfaulted %ld pages over %ld.%.9lds. (%f/sec)\n",
+> > +		       pages, ts_diff.tv_sec, ts_diff.tv_nsec,
+> > +		       pages / ((double)ts_diff.tv_sec + (double)ts_diff.tv_nsec / 100000000.0));
+> >  
+> >  	return NULL;
+> >  }
+> > @@ -360,13 +357,12 @@ static void run_test(enum vm_guest_mode mode, bool use_uffd,
+> >  	pthread_t *vcpu_threads;
+> >  	pthread_t *uffd_handler_threads = NULL;
+> >  	struct uffd_handler_args *uffd_args = NULL;
+> > +	struct timespec start, end, ts_diff;
+> >  	int *pipefds = NULL;
+> >  	struct kvm_vm *vm;
+> >  	uint64_t guest_num_pages;
+> >  	int vcpu_id;
+> >  	int r;
+> > -	struct timespec start;
+> > -	struct timespec end;
+> >  
+> >  	vm = create_vm(mode, vcpus, vcpu_memory_bytes);
+> >  
+> > @@ -514,12 +510,11 @@ static void run_test(enum vm_guest_mode mode, bool use_uffd,
+> >  		}
+> >  	}
+> >  
+> > -	pr_info("Total guest execution time: %lld.%.9lds\n",
+> > -		(long long)(timespec_diff(start, end).tv_sec),
+> > -		timespec_diff(start, end).tv_nsec);
+> > +	ts_diff = timespec_sub(end, start);
+> > +	pr_info("Total guest execution time: %ld.%.9lds\n",
+> > +		ts_diff.tv_sec, ts_diff.tv_nsec);
+> >  	pr_info("Overall demand paging rate: %f pgs/sec\n",
+> > -		guest_num_pages / ((double)timespec_diff(start, end).tv_sec +
+> > -		(double)timespec_diff(start, end).tv_nsec / 100000000.0));
+> > +		guest_num_pages / ((double)ts_diff.tv_sec + (double)ts_diff.tv_nsec / 100000000.0));
+> >  
+> >  	ucall_uninit(vm);
+> >  	kvm_vm_free(vm);
+> > diff --git a/tools/testing/selftests/kvm/include/test_util.h b/tools/testing/selftests/kvm/include/test_util.h
+> > index f588ad1403f1..5eb01bf51b86 100644
+> > --- a/tools/testing/selftests/kvm/include/test_util.h
+> > +++ b/tools/testing/selftests/kvm/include/test_util.h
+> > @@ -61,7 +61,8 @@ void test_assert(bool exp, const char *exp_str,
+> >  size_t parse_size(const char *size);
+> >  
+> >  int64_t timespec_to_ns(struct timespec ts);
+> > -struct timespec timespec_diff(struct timespec start, struct timespec end);
+> >  struct timespec timespec_add_ns(struct timespec ts, int64_t ns);
+> > +struct timespec timespec_add(struct timespec ts1, struct timespec ts2);
+> > +struct timespec timespec_sub(struct timespec ts1, struct timespec ts2);
+> >  
+> >  #endif /* SELFTEST_KVM_TEST_UTIL_H */
+> > diff --git a/tools/testing/selftests/kvm/lib/test_util.c b/tools/testing/selftests/kvm/lib/test_util.c
+> > index ee12c4b9ae05..689e97c27ee2 100644
+> > --- a/tools/testing/selftests/kvm/lib/test_util.c
+> > +++ b/tools/testing/selftests/kvm/lib/test_util.c
+> > @@ -56,36 +56,31 @@ int64_t timespec_to_ns(struct timespec ts)
+> >  	return (int64_t)ts.tv_nsec + 1000000000LL * (int64_t)ts.tv_sec;
+> >  }
+> >  
+> > -struct timespec timespec_diff(struct timespec start, struct timespec end)
+> > -{
+> > -	struct timespec temp;
+> > -
+> > -	if ((end.tv_nsec - start.tv_nsec) < 0) {
+> > -		temp.tv_sec = end.tv_sec - start.tv_sec - 1;
+> > -		temp.tv_nsec = 1000000000LL + end.tv_nsec - start.tv_nsec;
+> > -	} else {
+> > -		temp.tv_sec = end.tv_sec - start.tv_sec;
+> > -		temp.tv_nsec = end.tv_nsec - start.tv_nsec;
+> > -	}
+> > -
+> > -	return temp;
+> > -}
+> > -
+> >  struct timespec timespec_add_ns(struct timespec ts, int64_t ns)
+> >  {
+> >  	struct timespec res;
+> >  
+> > -	res.tv_sec = ts.tv_sec;
+> >  	res.tv_nsec = ts.tv_nsec + ns;
+> > -
+> > -	if (res.tv_nsec > 1000000000UL) {
+> > -		res.tv_sec += 1;
+> > -		res.tv_nsec -= 1000000000UL;
+> > -	}
+> > +	res.tv_sec = ts.tv_sec + res.tv_nsec / 1000000000LL;
+> > +	res.tv_nsec %= 1000000000LL;
+> >  
+> >  	return res;
+> >  }
+> >  
+> > +struct timespec timespec_add(struct timespec ts1, struct timespec ts2)
+> > +{
+> > +	int64_t ns1 = timespec_to_ns(ts1);
+> > +	int64_t ns2 = timespec_to_ns(ts2);
+> > +	return timespec_add_ns((struct timespec){0}, ns1 + ns2);
+> > +}
+> > +
+> > +struct timespec timespec_sub(struct timespec ts1, struct timespec ts2)
+> > +{
+> > +	int64_t ns1 = timespec_to_ns(ts1);
+> > +	int64_t ns2 = timespec_to_ns(ts2);
+> > +	return timespec_add_ns((struct timespec){0}, ns1 - ns2);
+> > +}
+> > +
+> >  void print_skip(const char *fmt, ...)
+> >  {
+> >  	va_list ap;
+> > diff --git a/tools/testing/selftests/kvm/steal_time.c b/tools/testing/selftests/kvm/steal_time.c
+> > index 21990d653099..86f30eda0ae7 100644
+> > --- a/tools/testing/selftests/kvm/steal_time.c
+> > +++ b/tools/testing/selftests/kvm/steal_time.c
+> > @@ -242,7 +242,7 @@ static void *do_steal_time(void *arg)
+> >  
+> >  	while (1) {
+> >  		clock_gettime(CLOCK_MONOTONIC, &ts);
+> > -		if (ts.tv_sec > stop.tv_sec || ts.tv_nsec >= stop.tv_nsec)
+> > +		if (timespec_to_ns(timespec_sub(ts, stop)) >= 0)
+> >  			break;
+> >  	}
+> >  
+> > 
+> 
 
