@@ -2,271 +2,441 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 676C9189E67
-	for <lists+kvm@lfdr.de>; Wed, 18 Mar 2020 15:59:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BD9FA189E6D
+	for <lists+kvm@lfdr.de>; Wed, 18 Mar 2020 16:00:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726671AbgCRO7A (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Mar 2020 10:59:00 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:34432 "EHLO
-        us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726308AbgCRO67 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 18 Mar 2020 10:58:59 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1584543537;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Ve4s7FPYGZF9JKgjT+WaVYn3b5S2BdECnB07tfNEl+k=;
-        b=Ho5F4NywqsNGJjIA1oxuEd9c1P1soUfV5SZuvrp5LZNJ/q6x16pOyU1T+t+vUIGfJ8yF5N
-        HeH1BVla7Iyw2mzinUAPG618SMx56gD6FQBme86qS+cGCCVXbzrSwVEPpCDkpuNdWeqyVb
-        xyUDqj+o7zI9NvJ8HPhUNoD+SGr2BmM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-17-sJ37-AYtM4S_xPvlAzeq9g-1; Wed, 18 Mar 2020 10:58:55 -0400
-X-MC-Unique: sJ37-AYtM4S_xPvlAzeq9g-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E5F198010F8
-        for <kvm@vger.kernel.org>; Wed, 18 Mar 2020 14:58:54 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.40.193.227])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 04B355C21B;
-        Wed, 18 Mar 2020 14:58:53 +0000 (UTC)
-Date:   Wed, 18 Mar 2020 15:58:51 +0100
-From:   Andrew Jones <drjones@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org
-Subject: Re: [PATCH v2 2/2] KVM: selftests: Rework timespec functions and
- usage
-Message-ID: <20200318145851.bb3mb7qvga35ambg@kamzik.brq.redhat.com>
-References: <20200316173703.12785-1-drjones@redhat.com>
- <20200316173703.12785-3-drjones@redhat.com>
- <4e2efaa3-f2cb-8210-d486-b1250e3be27a@redhat.com>
+        id S1726832AbgCRPAg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Mar 2020 11:00:36 -0400
+Received: from hqnvemgate24.nvidia.com ([216.228.121.143]:13257 "EHLO
+        hqnvemgate24.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726726AbgCRPAg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 Mar 2020 11:00:36 -0400
+Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate24.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+        id <B5e7237300001>; Wed, 18 Mar 2020 07:58:56 -0700
+Received: from hqmail.nvidia.com ([172.20.161.6])
+  by hqpgpgate101.nvidia.com (PGP Universal service);
+  Wed, 18 Mar 2020 08:00:33 -0700
+X-PGP-Universal: processed;
+        by hqpgpgate101.nvidia.com on Wed, 18 Mar 2020 08:00:33 -0700
+Received: from [10.40.102.54] (10.124.1.5) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Wed, 18 Mar
+ 2020 15:00:24 +0000
+Subject: Re: [PATCH v13 Kernel 7/7] vfio: Selective dirty page tracking if
+ IOMMU backed device pins pages
+To:     Alex Williamson <alex.williamson@redhat.com>
+CC:     <cjia@nvidia.com>, <kevin.tian@intel.com>, <ziye.yang@intel.com>,
+        <changpeng.liu@intel.com>, <yi.l.liu@intel.com>,
+        <mlevitsk@redhat.com>, <eskultet@redhat.com>, <cohuck@redhat.com>,
+        <dgilbert@redhat.com>, <jonathan.davies@nutanix.com>,
+        <eauger@redhat.com>, <aik@ozlabs.ru>, <pasic@linux.ibm.com>,
+        <felipe@nutanix.com>, <Zhengxiao.zx@Alibaba-inc.com>,
+        <shuangtai.tst@alibaba-inc.com>, <Ken.Xue@amd.com>,
+        <zhi.a.wang@intel.com>, <yan.y.zhao@intel.com>,
+        <qemu-devel@nongnu.org>, <kvm@vger.kernel.org>
+References: <1584035607-23166-1-git-send-email-kwankhede@nvidia.com>
+ <1584035607-23166-8-git-send-email-kwankhede@nvidia.com>
+ <20200313144911.72e727d4@x1.home>
+ <48f3b2b2-c066-f366-e5ff-2f39763a9463@nvidia.com>
+ <20200317130036.6f20003c@w520.home>
+X-Nvconfidentiality: public
+From:   Kirti Wankhede <kwankhede@nvidia.com>
+Message-ID: <71c8ddff-42e7-ec1b-9761-00c4a6add16c@nvidia.com>
+Date:   Wed, 18 Mar 2020 20:30:19 +0530
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4e2efaa3-f2cb-8210-d486-b1250e3be27a@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+In-Reply-To: <20200317130036.6f20003c@w520.home>
+X-Originating-IP: [10.124.1.5]
+X-ClientProxiedBy: HQMAIL101.nvidia.com (172.20.187.10) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1584543536; bh=ULetPZhc4orU6Scshm3LQRT5Ld5fXI2UfoEwLbz9UaY=;
+        h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
+         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
+         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
+         Content-Transfer-Encoding;
+        b=T3zuNSbEElL18JqEXfk/QCC1ef770V99Ju9Vs2MVQui8poRpcLy+kSVbzENdMYQk7
+         Nu0pOou6XbB93mwkmrhNGNmYY7RhIBcdf+CwiMqasgXOV21bGyh29M4eFxAoZ3a9rn
+         +dBI2wc0pHOKM8xBHajyQ7SOYcEjqZA7Hzxqc5T0YslIMghqJKVnIJEzH042mndfBR
+         viGLnHafEKENvVQ3vhzcqvs8E8+y5wuhI5aH9zaJBNJc66pKQeQrJ3OXwXRYjO15Gb
+         BHpXJitHYOEbOOavND3/3OfbHKe1Zg5jqePJ2IIGglepQEFzwJiVmULHoLHUNBqqla
+         bon4lSbRhsmEQ==
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 18, 2020 at 02:10:25PM +0100, Paolo Bonzini wrote:
-> On 16/03/20 18:37, Andrew Jones wrote:
-> > The steal_time test's timespec stop condition was wrong and should have
-> > used the timespec functions instead to avoid being wrong, but
-> > timespec_diff had a strange interface. Rework all the timespec API and
-> > its use.
-> > 
-> > Signed-off-by: Andrew Jones <drjones@redhat.com>
+
+
+On 3/18/2020 12:30 AM, Alex Williamson wrote:
+> On Tue, 17 Mar 2020 23:58:38 +0530
+> Kirti Wankhede <kwankhede@nvidia.com> wrote:
 > 
-> Queued this one,
+>> On 3/14/2020 2:19 AM, Alex Williamson wrote:
+>>> On Thu, 12 Mar 2020 23:23:27 +0530
+>>> Kirti Wankhede <kwankhede@nvidia.com> wrote:
+>>>    
+>>>> Added a check such that only singleton IOMMU groups can pin pages.
+>>>>   From the point when vendor driver pins any pages, consider IOMMU group
+>>>> dirty page scope to be limited to pinned pages.
+>>>>
+>>>> To optimize to avoid walking list often, added flag
+>>>> pinned_page_dirty_scope to indicate if all of the vfio_groups for each
+>>>> vfio_domain in the domain_list dirty page scope is limited to pinned
+>>>> pages. This flag is updated on first pinned pages request for that IOMMU
+>>>> group and on attaching/detaching group.
+>>>>
+>>>> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+>>>> Reviewed-by: Neo Jia <cjia@nvidia.com>
+>>>> ---
+>>>>    drivers/vfio/vfio.c             |  9 +++++-
+>>>>    drivers/vfio/vfio_iommu_type1.c | 72 +++++++++++++++++++++++++++++++++++++++--
+>>>>    include/linux/vfio.h            |  4 ++-
+>>>>    3 files changed, 80 insertions(+), 5 deletions(-)
+>>>>
+>>>> diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
+>>>> index c8482624ca34..79108c1245a5 100644
+>>>> --- a/drivers/vfio/vfio.c
+>>>> +++ b/drivers/vfio/vfio.c
+>>>> @@ -85,6 +85,7 @@ struct vfio_group {
+>>>>    	atomic_t			opened;
+>>>>    	wait_queue_head_t		container_q;
+>>>>    	bool				noiommu;
+>>>> +	unsigned int			dev_counter;
+>>>>    	struct kvm			*kvm;
+>>>>    	struct blocking_notifier_head	notifier;
+>>>>    };
+>>>> @@ -555,6 +556,7 @@ struct vfio_device *vfio_group_create_device(struct vfio_group *group,
+>>>>    
+>>>>    	mutex_lock(&group->device_lock);
+>>>>    	list_add(&device->group_next, &group->device_list);
+>>>> +	group->dev_counter++;
+>>>>    	mutex_unlock(&group->device_lock);
+>>>>    
+>>>>    	return device;
+>>>> @@ -567,6 +569,7 @@ static void vfio_device_release(struct kref *kref)
+>>>>    	struct vfio_group *group = device->group;
+>>>>    
+>>>>    	list_del(&device->group_next);
+>>>> +	group->dev_counter--;
+>>>>    	mutex_unlock(&group->device_lock);
+>>>>    
+>>>>    	dev_set_drvdata(device->dev, NULL);
+>>>> @@ -1895,6 +1898,9 @@ int vfio_pin_pages(struct device *dev, unsigned long *user_pfn, int npage,
+>>>>    	if (!group)
+>>>>    		return -ENODEV;
+>>>>    
+>>>> +	if (group->dev_counter > 1)
+>>>> +		return -EINVAL;
+>>>> +
+>>>>    	ret = vfio_group_add_container_user(group);
+>>>>    	if (ret)
+>>>>    		goto err_pin_pages;
+>>>> @@ -1902,7 +1908,8 @@ int vfio_pin_pages(struct device *dev, unsigned long *user_pfn, int npage,
+>>>>    	container = group->container;
+>>>>    	driver = container->iommu_driver;
+>>>>    	if (likely(driver && driver->ops->pin_pages))
+>>>> -		ret = driver->ops->pin_pages(container->iommu_data, user_pfn,
+>>>> +		ret = driver->ops->pin_pages(container->iommu_data,
+>>>> +					     group->iommu_group, user_pfn,
+>>>>    					     npage, prot, phys_pfn);
+>>>>    	else
+>>>>    		ret = -ENOTTY;
+>>>> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+>>>> index 4f1f116feabc..18a284b230c0 100644
+>>>> --- a/drivers/vfio/vfio_iommu_type1.c
+>>>> +++ b/drivers/vfio/vfio_iommu_type1.c
+>>>> @@ -71,6 +71,7 @@ struct vfio_iommu {
+>>>>    	bool			v2;
+>>>>    	bool			nesting;
+>>>>    	bool			dirty_page_tracking;
+>>>> +	bool			pinned_page_dirty_scope;
+>>>>    };
+>>>>    
+>>>>    struct vfio_domain {
+>>>> @@ -98,6 +99,7 @@ struct vfio_group {
+>>>>    	struct iommu_group	*iommu_group;
+>>>>    	struct list_head	next;
+>>>>    	bool			mdev_group;	/* An mdev group */
+>>>> +	bool			has_pinned_pages;
+>>>
+>>> I'm afraid over time this name will be confusing, should we simply
+>>> call it pinned_page_dirty_scope per vfio_group as well?
+>>
+>> Updating as you suggested, but I hope it doesn't look confusing.
+>>
+>>>   We might have
+>>> to adapt this over time as we get new ways to dirty pages, but each
+>>> group voting towards the same value being set on the vfio_iommu object
+>>> seems like a good starting point.
+>>>    
+>>>>    };
+>>>>    
+>>>>    struct vfio_iova {
+>>>> @@ -129,6 +131,10 @@ struct vfio_regions {
+>>>>    static int put_pfn(unsigned long pfn, int prot);
+>>>>    static unsigned long vfio_pgsize_bitmap(struct vfio_iommu *iommu);
+>>>>    
+>>>> +static struct vfio_group *vfio_iommu_find_iommu_group(struct vfio_iommu *iommu,
+>>>> +					       struct iommu_group *iommu_group);
+>>>> +
+>>>> +static void update_pinned_page_dirty_scope(struct vfio_iommu *iommu);
+>>>>    /*
+>>>>     * This code handles mapping and unmapping of user data buffers
+>>>>     * into DMA'ble space using the IOMMU
+>>>> @@ -579,11 +585,13 @@ static int vfio_unpin_page_external(struct vfio_dma *dma, dma_addr_t iova,
+>>>>    }
+>>>>    
+>>>>    static int vfio_iommu_type1_pin_pages(void *iommu_data,
+>>>> +				      struct iommu_group *iommu_group,
+>>>>    				      unsigned long *user_pfn,
+>>>>    				      int npage, int prot,
+>>>>    				      unsigned long *phys_pfn)
+>>>>    {
+>>>>    	struct vfio_iommu *iommu = iommu_data;
+>>>> +	struct vfio_group *group;
+>>>>    	int i, j, ret;
+>>>>    	unsigned long remote_vaddr;
+>>>>    	struct vfio_dma *dma;
+>>>> @@ -662,8 +670,14 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
+>>>>    				   (vpfn->iova - dma->iova) >> pgshift, 1);
+>>>>    		}
+>>>>    	}
+>>>> -
+>>>>    	ret = i;
+>>>> +
+>>>> +	group = vfio_iommu_find_iommu_group(iommu, iommu_group);
+>>>> +	if (!group->has_pinned_pages) {
+>>>> +		group->has_pinned_pages = true;
+>>>> +		update_pinned_page_dirty_scope(iommu);
+>>>> +	}
+>>>> +
+>>>>    	goto pin_done;
+>>>>    
+>>>>    pin_unwind:
+>>>> @@ -946,8 +960,11 @@ static int vfio_iova_dirty_bitmap(struct vfio_iommu *iommu, dma_addr_t iova,
+>>>>    	npages = dma->size >> pgshift;
+>>>>    	bitmap_size = dirty_bitmap_bytes(npages);
+>>>>    
+>>>> -	/* mark all pages dirty if all pages are pinned and mapped. */
+>>>> -	if (dma->iommu_mapped)
+>>>> +	/*
+>>>> +	 * mark all pages dirty if any IOMMU capable device is not able
+>>>> +	 * to report dirty pages and all pages are pinned and mapped.
+>>>> +	 */
+>>>> +	if (!iommu->pinned_page_dirty_scope && dma->iommu_mapped)
+>>>>    		bitmap_set(dma->bitmap, 0, npages);
+>>>>    
+>>>>    	if (dma->bitmap) {
+>>>> @@ -1430,6 +1447,51 @@ static struct vfio_group *find_iommu_group(struct vfio_domain *domain,
+>>>>    	return NULL;
+>>>>    }
+>>>>    
+>>>> +static struct vfio_group *vfio_iommu_find_iommu_group(struct vfio_iommu *iommu,
+>>>> +					       struct iommu_group *iommu_group)
+>>>> +{
+>>>> +	struct vfio_domain *domain;
+>>>> +	struct vfio_group *group = NULL;
+>>>> +
+>>>> +	list_for_each_entry(domain, &iommu->domain_list, next) {
+>>>> +		group = find_iommu_group(domain, iommu_group);
+>>>> +		if (group)
+>>>> +			return group;
+>>>> +	}
+>>>> +
+>>>> +	if (iommu->external_domain)
+>>>> +		group = find_iommu_group(iommu->external_domain, iommu_group);
+>>>> +
+>>>> +	return group;
+>>>> +}
+>>>> +
+>>>> +static void update_pinned_page_dirty_scope(struct vfio_iommu *iommu)
+>>>> +{
+>>>> +	struct vfio_domain *domain;
+>>>> +	struct vfio_group *group;
+>>>> +
+>>>> +	list_for_each_entry(domain, &iommu->domain_list, next) {
+>>>> +		list_for_each_entry(group, &domain->group_list, next) {
+>>>> +			if (!group->has_pinned_pages) {
+>>>> +				iommu->pinned_page_dirty_scope = false;
+>>>> +				return;
+>>>> +			}
+>>>> +		}
+>>>> +	}
+>>>> +
+>>>> +	if (iommu->external_domain) {
+>>>> +		domain = iommu->external_domain;
+>>>> +		list_for_each_entry(group, &domain->group_list, next) {
+>>>> +			if (!group->has_pinned_pages) {
+>>>> +				iommu->pinned_page_dirty_scope = false;
+>>>> +				return;
+>>>> +			}
+>>>> +		}
+>>>> +	}
+>>>> +
+>>>> +	iommu->pinned_page_dirty_scope = true;
+>>>> +}
+>>>> +
+>>>>    static bool vfio_iommu_has_sw_msi(struct list_head *group_resv_regions,
+>>>>    				  phys_addr_t *base)
+>>>>    {
+>>>> @@ -1836,6 +1898,7 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
+>>>>    
+>>>>    			list_add(&group->next,
+>>>>    				 &iommu->external_domain->group_list);
+>>>> +			update_pinned_page_dirty_scope(iommu);
+>>>>    			mutex_unlock(&iommu->lock);
+>>>>    
+>>>>    			return 0;
+>>>> @@ -1958,6 +2021,7 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
+>>>>    done:
+>>>>    	/* Delete the old one and insert new iova list */
+>>>>    	vfio_iommu_iova_insert_copy(iommu, &iova_copy);
+>>>> +	update_pinned_page_dirty_scope(iommu);
+>>>>    	mutex_unlock(&iommu->lock);
+>>>>    	vfio_iommu_resv_free(&group_resv_regions);
+>>>>      
+>>>
+>>> At this point we've added an iommu backed group that can't possibly
+>>> have pages pinned on behalf of this group yet, can't we just set
+>>> iommu->pinned_page_dirty_scope = false?
+>>>    
+>>
+>> Right, changing.
+>>
+>>> In the previous case, aren't we adding a non-iommu backed group, so
+>>> should we presume the scope is pinned pages even before we have any?
+>>
+>> Anyways we are updating it when pages are pinned, I think better not to
+>> presume.
+> 
+> If there's no iommu backing then the device doesn't have access to
+> dirty the pages itself, how else will they get dirty?  Perhaps I was a
+> little use in using the word "presume", I think there's a proof that
+> the pages must have limited dirty-scope.
+> 
 
-I don't see this in queue or next.
+We need to handle below cases with non-iommu backed device:
+1. Only non-iommu mdev device
+group->pinned_page_dirty_scope = true;
+update_pinned_page_dirty_scope()=>iommu->pinned_page_dirty_scope=true
 
-> I have already pushed the test to kvm/next so the
-> "fixup!" commit cannot be squashed.  But I don't really mind the code as
-> it looks in kvm/next.
+2. First non-iommu mdev is attached then iommu backed device attached.
+1st non-iommu mdev device attached
+group->pinned_page_dirty_scope = true;
+update_pinned_page_dirty_scope()=>iommu->pinned_page_dirty_scope=true
 
-The previous patch isn't a huge deal, but it's more than a cleanup,
-because if somebody wants to use QUIET when compiling, but then --verbose
-when executing, they won't get any verbose output. And the removed,
-useless assert is truly useless.
+2nd iommu backed device attached:
+iommu->pinned_page_dirty_scope = false
+
+3. First iommu backed devices are attached then non-iommu backed devices 
+attached
+For iommu backed device attached
+iommu->pinned_page_dirty_scope = false
+
+Last non-iommu mdev device attached
+group->pinned_page_dirty_scope = true;
+update_pinned_page_dirty_scope()=>iommu->pinned_page_dirty_scope=false
+
+I think we can set group->pinned_page_dirty_scope = true, but not the 
+iommu->pinned_page_dirty_scope.
+
+Then if iommu backed device's driver pins pages through vfio_pin_pages(): 	
+group->pinned_page_dirty_scope = true;
+update_pinned_page_dirty_scope() will change 
+iommu->pinned_page_dirty_scope based on current group list - if any 
+group in the list doesn't support dirty scope - set false
+
+>>> We could almost forego the iommu scope update, but it could be the
+>>> first group added if we're going to preemptively assume the scope of
+>>> the group.
+>>>    
+>>>> @@ -1972,6 +2036,7 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
+>>>>    out_free:
+>>>>    	kfree(domain);
+>>>>    	kfree(group);
+>>>> +	update_pinned_page_dirty_scope(iommu);
+>>>
+>>> This one looks like paranoia given how late we update when the group is
+>>> added.
+>>>    
+>>>>    	mutex_unlock(&iommu->lock);
+>>>>    	return ret;
+>>>>    }
+>>>> @@ -2176,6 +2241,7 @@ static void vfio_iommu_type1_detach_group(void *iommu_data,
+>>>>    		vfio_iommu_iova_free(&iova_copy);
+>>>>    
+>>>>    detach_group_done:
+>>>> +	update_pinned_page_dirty_scope(iommu);
+>>>
+>>> We only need to do this if the group we're removing does not have
+>>> pinned page dirty scope, right?  I think we have all the info here to
+>>> make that optimization.
+>>>    
+>>
+>> There could be more than one group that doesn't have pinned page dirty
+>> scope, better to run through update_pinned_page_dirty_scope() function.
+> 
+> Maybe I stated it wrong above, but I think we have this table:
+> 
+> 
+> iommu|group
+> -----+--------+---------+
+> XXXXX|   0    |    1    |
+> -----+--------+---------+
+>    0  |   A    |    B    |
+> -----+--------+---------+
+>    1  |   C    |    D    |
+> -----+--------+---------+
+> 
+> A: If we are NOT dirty-page-scope at the iommu and we remove a group
+> that is NOT dirty-page-scope, we need to check because that might have
+> been the group preventing the iommu from being dirty-page-scope.
+> 
+> B: If we are NOT dirty-page-scope at the iommu and we remove a group
+> that IS dirty-page-scope, we know that group wasn't limiting the scope
+> at the iommu.
+> 
+> C: If the iommu IS dirty-page-scope, we can't remove a group that is
+> NOT dirty page scope, this case is impossible.
+> 
+> D: If the iommu IS dirty-page-scope and we remove a group that IS dirty-
+> page-scope, nothing changes.
+> 
+> So I think we only need to update on A, or A+C since C cannot happen.
+> In B and D removing a group with dirt-page-scope cannot change the
+> iommu scope.  Thanks,
+> 
+
+Ok. Updating iommu->pinned_page_dirty_scope only when removing a group 
+that is NOT dirty-page-scope.
 
 Thanks,
-drew
+Kirti
 
+> Alex
 > 
-> Paolo
+>>>>    	mutex_unlock(&iommu->lock);
+>>>>    }
+>>>>    
+>>>> diff --git a/include/linux/vfio.h b/include/linux/vfio.h
+>>>> index e42a711a2800..da29802d6276 100644
+>>>> --- a/include/linux/vfio.h
+>>>> +++ b/include/linux/vfio.h
+>>>> @@ -72,7 +72,9 @@ struct vfio_iommu_driver_ops {
+>>>>    					struct iommu_group *group);
+>>>>    	void		(*detach_group)(void *iommu_data,
+>>>>    					struct iommu_group *group);
+>>>> -	int		(*pin_pages)(void *iommu_data, unsigned long *user_pfn,
+>>>> +	int		(*pin_pages)(void *iommu_data,
+>>>> +				     struct iommu_group *group,
+>>>> +				     unsigned long *user_pfn,
+>>>>    				     int npage, int prot,
+>>>>    				     unsigned long *phys_pfn);
+>>>>    	int		(*unpin_pages)(void *iommu_data,
+>>>    
+>>
 > 
-> > ---
-> >  .../selftests/kvm/demand_paging_test.c        | 37 ++++++++-----------
-> >  .../testing/selftests/kvm/include/test_util.h |  3 +-
-> >  tools/testing/selftests/kvm/lib/test_util.c   | 37 ++++++++-----------
-> >  tools/testing/selftests/kvm/steal_time.c      |  2 +-
-> >  4 files changed, 35 insertions(+), 44 deletions(-)
-> > 
-> > diff --git a/tools/testing/selftests/kvm/demand_paging_test.c b/tools/testing/selftests/kvm/demand_paging_test.c
-> > index d82f7bc060c3..360cd3ea4cd6 100644
-> > --- a/tools/testing/selftests/kvm/demand_paging_test.c
-> > +++ b/tools/testing/selftests/kvm/demand_paging_test.c
-> > @@ -117,8 +117,7 @@ static void *vcpu_worker(void *data)
-> >  	struct kvm_vm *vm = args->vm;
-> >  	int vcpu_id = args->vcpu_id;
-> >  	struct kvm_run *run;
-> > -	struct timespec start;
-> > -	struct timespec end;
-> > +	struct timespec start, end, ts_diff;
-> >  
-> >  	vcpu_args_set(vm, vcpu_id, 1, vcpu_id);
-> >  	run = vcpu_state(vm, vcpu_id);
-> > @@ -135,9 +134,9 @@ static void *vcpu_worker(void *data)
-> >  	}
-> >  
-> >  	clock_gettime(CLOCK_MONOTONIC, &end);
-> > -	PER_VCPU_DEBUG("vCPU %d execution time: %lld.%.9lds\n", vcpu_id,
-> > -		       (long long)(timespec_diff(start, end).tv_sec),
-> > -		       timespec_diff(start, end).tv_nsec);
-> > +	ts_diff = timespec_sub(end, start);
-> > +	PER_VCPU_DEBUG("vCPU %d execution time: %ld.%.9lds\n", vcpu_id,
-> > +		       ts_diff.tv_sec, ts_diff.tv_nsec);
-> >  
-> >  	return NULL;
-> >  }
-> > @@ -201,8 +200,8 @@ static int handle_uffd_page_request(int uffd, uint64_t addr)
-> >  
-> >  	clock_gettime(CLOCK_MONOTONIC, &end);
-> >  
-> > -	PER_PAGE_DEBUG("UFFDIO_COPY %d \t%lld ns\n", tid,
-> > -		       (long long)timespec_to_ns(timespec_diff(start, end)));
-> > +	PER_PAGE_DEBUG("UFFDIO_COPY %d \t%ld ns\n", tid,
-> > +		       timespec_to_ns(timespec_sub(end, start)));
-> >  	PER_PAGE_DEBUG("Paged in %ld bytes at 0x%lx from thread %d\n",
-> >  		       host_page_size, addr, tid);
-> >  
-> > @@ -224,8 +223,7 @@ static void *uffd_handler_thread_fn(void *arg)
-> >  	int pipefd = uffd_args->pipefd;
-> >  	useconds_t delay = uffd_args->delay;
-> >  	int64_t pages = 0;
-> > -	struct timespec start;
-> > -	struct timespec end;
-> > +	struct timespec start, end, ts_diff;
-> >  
-> >  	clock_gettime(CLOCK_MONOTONIC, &start);
-> >  	while (!quit_uffd_thread) {
-> > @@ -295,11 +293,10 @@ static void *uffd_handler_thread_fn(void *arg)
-> >  	}
-> >  
-> >  	clock_gettime(CLOCK_MONOTONIC, &end);
-> > -	PER_VCPU_DEBUG("userfaulted %ld pages over %lld.%.9lds. (%f/sec)\n",
-> > -		       pages, (long long)(timespec_diff(start, end).tv_sec),
-> > -		       timespec_diff(start, end).tv_nsec, pages /
-> > -		       ((double)timespec_diff(start, end).tv_sec +
-> > -			(double)timespec_diff(start, end).tv_nsec / 100000000.0));
-> > +	ts_diff = timespec_sub(end, start);
-> > +	PER_VCPU_DEBUG("userfaulted %ld pages over %ld.%.9lds. (%f/sec)\n",
-> > +		       pages, ts_diff.tv_sec, ts_diff.tv_nsec,
-> > +		       pages / ((double)ts_diff.tv_sec + (double)ts_diff.tv_nsec / 100000000.0));
-> >  
-> >  	return NULL;
-> >  }
-> > @@ -360,13 +357,12 @@ static void run_test(enum vm_guest_mode mode, bool use_uffd,
-> >  	pthread_t *vcpu_threads;
-> >  	pthread_t *uffd_handler_threads = NULL;
-> >  	struct uffd_handler_args *uffd_args = NULL;
-> > +	struct timespec start, end, ts_diff;
-> >  	int *pipefds = NULL;
-> >  	struct kvm_vm *vm;
-> >  	uint64_t guest_num_pages;
-> >  	int vcpu_id;
-> >  	int r;
-> > -	struct timespec start;
-> > -	struct timespec end;
-> >  
-> >  	vm = create_vm(mode, vcpus, vcpu_memory_bytes);
-> >  
-> > @@ -514,12 +510,11 @@ static void run_test(enum vm_guest_mode mode, bool use_uffd,
-> >  		}
-> >  	}
-> >  
-> > -	pr_info("Total guest execution time: %lld.%.9lds\n",
-> > -		(long long)(timespec_diff(start, end).tv_sec),
-> > -		timespec_diff(start, end).tv_nsec);
-> > +	ts_diff = timespec_sub(end, start);
-> > +	pr_info("Total guest execution time: %ld.%.9lds\n",
-> > +		ts_diff.tv_sec, ts_diff.tv_nsec);
-> >  	pr_info("Overall demand paging rate: %f pgs/sec\n",
-> > -		guest_num_pages / ((double)timespec_diff(start, end).tv_sec +
-> > -		(double)timespec_diff(start, end).tv_nsec / 100000000.0));
-> > +		guest_num_pages / ((double)ts_diff.tv_sec + (double)ts_diff.tv_nsec / 100000000.0));
-> >  
-> >  	ucall_uninit(vm);
-> >  	kvm_vm_free(vm);
-> > diff --git a/tools/testing/selftests/kvm/include/test_util.h b/tools/testing/selftests/kvm/include/test_util.h
-> > index f588ad1403f1..5eb01bf51b86 100644
-> > --- a/tools/testing/selftests/kvm/include/test_util.h
-> > +++ b/tools/testing/selftests/kvm/include/test_util.h
-> > @@ -61,7 +61,8 @@ void test_assert(bool exp, const char *exp_str,
-> >  size_t parse_size(const char *size);
-> >  
-> >  int64_t timespec_to_ns(struct timespec ts);
-> > -struct timespec timespec_diff(struct timespec start, struct timespec end);
-> >  struct timespec timespec_add_ns(struct timespec ts, int64_t ns);
-> > +struct timespec timespec_add(struct timespec ts1, struct timespec ts2);
-> > +struct timespec timespec_sub(struct timespec ts1, struct timespec ts2);
-> >  
-> >  #endif /* SELFTEST_KVM_TEST_UTIL_H */
-> > diff --git a/tools/testing/selftests/kvm/lib/test_util.c b/tools/testing/selftests/kvm/lib/test_util.c
-> > index ee12c4b9ae05..689e97c27ee2 100644
-> > --- a/tools/testing/selftests/kvm/lib/test_util.c
-> > +++ b/tools/testing/selftests/kvm/lib/test_util.c
-> > @@ -56,36 +56,31 @@ int64_t timespec_to_ns(struct timespec ts)
-> >  	return (int64_t)ts.tv_nsec + 1000000000LL * (int64_t)ts.tv_sec;
-> >  }
-> >  
-> > -struct timespec timespec_diff(struct timespec start, struct timespec end)
-> > -{
-> > -	struct timespec temp;
-> > -
-> > -	if ((end.tv_nsec - start.tv_nsec) < 0) {
-> > -		temp.tv_sec = end.tv_sec - start.tv_sec - 1;
-> > -		temp.tv_nsec = 1000000000LL + end.tv_nsec - start.tv_nsec;
-> > -	} else {
-> > -		temp.tv_sec = end.tv_sec - start.tv_sec;
-> > -		temp.tv_nsec = end.tv_nsec - start.tv_nsec;
-> > -	}
-> > -
-> > -	return temp;
-> > -}
-> > -
-> >  struct timespec timespec_add_ns(struct timespec ts, int64_t ns)
-> >  {
-> >  	struct timespec res;
-> >  
-> > -	res.tv_sec = ts.tv_sec;
-> >  	res.tv_nsec = ts.tv_nsec + ns;
-> > -
-> > -	if (res.tv_nsec > 1000000000UL) {
-> > -		res.tv_sec += 1;
-> > -		res.tv_nsec -= 1000000000UL;
-> > -	}
-> > +	res.tv_sec = ts.tv_sec + res.tv_nsec / 1000000000LL;
-> > +	res.tv_nsec %= 1000000000LL;
-> >  
-> >  	return res;
-> >  }
-> >  
-> > +struct timespec timespec_add(struct timespec ts1, struct timespec ts2)
-> > +{
-> > +	int64_t ns1 = timespec_to_ns(ts1);
-> > +	int64_t ns2 = timespec_to_ns(ts2);
-> > +	return timespec_add_ns((struct timespec){0}, ns1 + ns2);
-> > +}
-> > +
-> > +struct timespec timespec_sub(struct timespec ts1, struct timespec ts2)
-> > +{
-> > +	int64_t ns1 = timespec_to_ns(ts1);
-> > +	int64_t ns2 = timespec_to_ns(ts2);
-> > +	return timespec_add_ns((struct timespec){0}, ns1 - ns2);
-> > +}
-> > +
-> >  void print_skip(const char *fmt, ...)
-> >  {
-> >  	va_list ap;
-> > diff --git a/tools/testing/selftests/kvm/steal_time.c b/tools/testing/selftests/kvm/steal_time.c
-> > index 21990d653099..86f30eda0ae7 100644
-> > --- a/tools/testing/selftests/kvm/steal_time.c
-> > +++ b/tools/testing/selftests/kvm/steal_time.c
-> > @@ -242,7 +242,7 @@ static void *do_steal_time(void *arg)
-> >  
-> >  	while (1) {
-> >  		clock_gettime(CLOCK_MONOTONIC, &ts);
-> > -		if (ts.tv_sec > stop.tv_sec || ts.tv_nsec >= stop.tv_nsec)
-> > +		if (timespec_to_ns(timespec_sub(ts, stop)) >= 0)
-> >  			break;
-> >  	}
-> >  
-> > 
-> 
-
