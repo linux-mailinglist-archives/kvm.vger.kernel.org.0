@@ -2,89 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D9BA618A15D
-	for <lists+kvm@lfdr.de>; Wed, 18 Mar 2020 18:17:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A160A18A160
+	for <lists+kvm@lfdr.de>; Wed, 18 Mar 2020 18:18:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727047AbgCRRRo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Mar 2020 13:17:44 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:59988 "EHLO
+        id S1727065AbgCRRR7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Mar 2020 13:17:59 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:30361 "EHLO
         us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726638AbgCRRRl (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 18 Mar 2020 13:17:41 -0400
+        by vger.kernel.org with ESMTP id S1726765AbgCRRR6 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 18 Mar 2020 13:17:58 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1584551860;
+        s=mimecast20190719; t=1584551878;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=ElhWjdRMCoGK2Lc8uZXX8uK2whTvzsICGIGF/xooqpM=;
-        b=i2tzr4YGZHmecaPbGaSSa3zpFUS87DD/pBQe3d40Cg2fgFGnxiD7FzxiaodDdyDLDTQKMx
-        xe+hcNqzgBMVINJccE8nqcp3BSx2baiY2Qfx9op+f484rPNev1U8w+Nwobj5KLd0R5qj/E
-        ErVaG5ZUfH5cW95A4ChmFv99EbmTwTY=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-346-8QdJ3G-5Pv6V22wlwBWbeQ-1; Wed, 18 Mar 2020 13:17:38 -0400
-X-MC-Unique: 8QdJ3G-5Pv6V22wlwBWbeQ-1
-Received: by mail-wm1-f72.google.com with SMTP id z16so1337678wmi.2
-        for <kvm@vger.kernel.org>; Wed, 18 Mar 2020 10:17:38 -0700 (PDT)
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=1tmYrjNBPlfS8Oz+KPrbLzllyHIAIh5B4HPxuEUJj2k=;
+        b=KAEdYPmHElhrsGgEW1Nfnc1wgjL/RifeSa+HORDnsU05M/yShr74lm25w1+mPOiJxVnR5R
+        KzgAmsLd4jGiBs4N0B4Kcv0Tj3UH0rwY6xSGkuwWMyhHy9nNUFutXkNA2qyVRNUHhU0rwy
+        zRQLkyKzzsLxnM5w2z/QiuaPKL6Oh/g=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-105-CXuIpPxuPS6QkbNjE9NrDg-1; Wed, 18 Mar 2020 13:17:56 -0400
+X-MC-Unique: CXuIpPxuPS6QkbNjE9NrDg-1
+Received: by mail-wr1-f70.google.com with SMTP id t4so8385329wrr.1
+        for <kvm@vger.kernel.org>; Wed, 18 Mar 2020 10:17:56 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=ElhWjdRMCoGK2Lc8uZXX8uK2whTvzsICGIGF/xooqpM=;
-        b=B7cVR+OjLHGJhR+BsKsSxjiS6AFFT/RugT1zzs9uRh9Mm0N17D6QeLZqqcKbs/kytQ
-         d/czBiflc4m0GOCmLs7tjrugv8uXWxM9ZOlWuAW5wWTZXzXXarPfI0AfcJx0YnhJaryD
-         ZGMpMA5npqMG6rl7EfOzusLbTbZGRd/Wbr2g3+DClDkmC7VSUPMXMH8rWecdcomPr3Qn
-         SgCMjQeIOcgjY/sNTIvw4jIoyUdEQ41XffG4VPT/yjwDcZs8CyBZ0WhXLPkKETdkWq73
-         H48ldYZwOkow2c5ar4jlr1t8JL4/Lg2vpOQp6OX26tFfGkng9hwSo9UGx3+m7s78/cD4
-         w0gA==
-X-Gm-Message-State: ANhLgQ2wlevyP3OEyqmkT4/o3cIr67D/6QJxrnlpM17G6BTBR6iOFPEX
-        nXGnMpAQyRFWA4XGzoi7pXsfM26T6pU13hXfffraWvyNp5+yckILip/zI/5tM1U544v/pYeOS0H
-        HiuhFTVuwW0H9
-X-Received: by 2002:adf:f9cd:: with SMTP id w13mr6556011wrr.406.1584551857189;
-        Wed, 18 Mar 2020 10:17:37 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vuLNTKjD3r3M43CNF3bs8kW9P2xtl0cL/v67E32HQFeJpZLIMHlaNw6rmfihVJhQipQ+Kn6vw==
-X-Received: by 2002:adf:f9cd:: with SMTP id w13mr6555987wrr.406.1584551856929;
-        Wed, 18 Mar 2020 10:17:36 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=1tmYrjNBPlfS8Oz+KPrbLzllyHIAIh5B4HPxuEUJj2k=;
+        b=M09a/QFPxAiQQ/0xTRYfuvsEmGZCIoynqZGqOQ9svDlaTOhnUSYLzBoTYDQe0+CL4O
+         FJPdzpKPXTg6QaV/TooG6mAnzcqR7PWSfabz6WHd9VXLrHXUT9bdPzmte84eJyYa7xQS
+         gnij679N7Pj18UgaMngKba3K1vZQi3z3FpZMaZf4JpULlpQI5NBemmR7NZ9IalZTB23c
+         juexapzLhJZMhO1palB6Mm0qLY5pFtjdCrRCp3CndFh2k1dw/GQ8GZlg1Ng7U2qa1Na7
+         0aBqNSaC9EojZNGAy+bCXVFJ8sc8t1/AaQdxAgyvtFHqufebxR5TCU2eTz0bwPOeYkcZ
+         A66A==
+X-Gm-Message-State: ANhLgQ3KcoPmxVOjwQ/H7ZSw2cZPzzrfDfG23BXPKyLjLp//bMz7gZup
+        Dz+rzenYkc8kjTm2zhnG/fwGX2V+eEURyOZcsJubO+MSRMaP1jwe0qrVzZt4K7IWdBJKhZsv+8j
+        VRc837cJnlUKb
+X-Received: by 2002:a5d:680d:: with SMTP id w13mr6619018wru.227.1584551875099;
+        Wed, 18 Mar 2020 10:17:55 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vuV4gL9NnrUrL3uhgtDnC8jCR+eQZlEHteghQ1cIvY0SDIXvFJgPy1bqpym7Ng4rNGsdr2PWA==
+X-Received: by 2002:a5d:680d:: with SMTP id w13mr6618996wru.227.1584551874821;
+        Wed, 18 Mar 2020 10:17:54 -0700 (PDT)
 Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id u144sm3129625wmu.39.2020.03.18.10.17.35
+        by smtp.gmail.com with ESMTPSA id r3sm10531597wrw.76.2020.03.18.10.17.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Mar 2020 10:17:36 -0700 (PDT)
+        Wed, 18 Mar 2020 10:17:54 -0700 (PDT)
 From:   Vitaly Kuznetsov <vkuznets@redhat.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Krish Sadhukhan <krish.sadhukhan@oracle.com>,
-        Jim Mattson <jmattson@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-Subject: Re: [PATCH v3 2/2] KVM: VMX: untangle VMXON revision_id setting when using eVMCS
-In-Reply-To: <87mu8pdgci.fsf@vitty.brq.redhat.com>
-References: <20200306130215.150686-1-vkuznets@redhat.com> <20200306130215.150686-3-vkuznets@redhat.com> <908345f1-9bfd-004f-3ba6-0d6dce67d11e@oracle.com> <20200306230747.GA27868@linux.intel.com> <ceb19682-4374-313a-cf05-8af6cd8d6c3b@oracle.com> <20200307002852.GA28225@linux.intel.com> <87mu8pdgci.fsf@vitty.brq.redhat.com>
-Date:   Wed, 18 Mar 2020 18:17:34 +0100
-Message-ID: <87r1xp1t1t.fsf@vitty.brq.redhat.com>
+Cc:     Jim Mattson <jmattson@google.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Krish Sadhukhan <krish.sadhukhan@oracle.com>,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH v4 0/2] KVM: VMX: cleanup VMXON region allocation
+Date:   Wed, 18 Mar 2020 18:17:50 +0100
+Message-Id: <20200318171752.173073-1-vkuznets@redhat.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Vitaly Kuznetsov <vkuznets@redhat.com> writes:
+Minor cleanup with no functional change (intended):
+- Rename 'kvm_area' to 'vmxon_region'
+- Simplify setting revision_id for VMXON region when eVMCS is in use
 
-> Sean Christopherson <sean.j.christopherson@intel.com> writes:
->
->>   enum vmcs_type {
->> 	VMXON_VMCS,
->> 	VMCS,
->> 	SHADOW_VMCS,
->>   };
->>
->
-> No objections from my side. v4 or would it be possible to tweak it upon
-> commit?
+Changes since v3:
+- Rebase to kvm/queue
+- Added Krish's Reviewed-by: tag to PATCH1
+- Re-name 'enum vmcs_type' members [Sean Christopherson]
 
-It seems this slipped through the cracks, rebased v4 is comming to
-rescue!
+Vitaly Kuznetsov (2):
+  KVM: VMX: rename 'kvm_area' to 'vmxon_region'
+  KVM: VMX: untangle VMXON revision_id setting when using eVMCS
+
+ arch/x86/kvm/vmx/nested.c |  2 +-
+ arch/x86/kvm/vmx/vmx.c    | 44 ++++++++++++++++++---------------------
+ arch/x86/kvm/vmx/vmx.h    | 12 ++++++++---
+ 3 files changed, 30 insertions(+), 28 deletions(-)
 
 -- 
-Vitaly
+2.25.1
 
