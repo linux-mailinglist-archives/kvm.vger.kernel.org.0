@@ -2,69 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A57E9189A92
-	for <lists+kvm@lfdr.de>; Wed, 18 Mar 2020 12:26:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 52ABD189A9F
+	for <lists+kvm@lfdr.de>; Wed, 18 Mar 2020 12:30:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727781AbgCRL0o (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Mar 2020 07:26:44 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:48852 "EHLO
+        id S1726964AbgCRLaB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Mar 2020 07:30:01 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:41553 "EHLO
         us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727722AbgCRL0o (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 18 Mar 2020 07:26:44 -0400
+        by vger.kernel.org with ESMTP id S1726905AbgCRLaA (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 18 Mar 2020 07:30:00 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1584530802;
+        s=mimecast20190719; t=1584530999;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=5igz5ifXUjPW3HOZrUuMXCx1D9YbVzwpu9tICwFVMz4=;
-        b=Z4U2q1yqXf1zch0EcDOVh3U1K+OMXJHFv7NTspfYcSFz8HI5JHMsF9zCPoaXvjPp423ArG
-        cyPa+MdL0f1+HAhdeqiqzn2HPCVyjwO7X3UJrxueIPJndBeTANhEk6IcyJu9c21YfHQCLU
-        AtQCkWk/Pq4RS+K+ckR+lzP+kx/Swhc=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-438-9MClN17aPiCqeFWywkGOlA-1; Wed, 18 Mar 2020 07:26:40 -0400
-X-MC-Unique: 9MClN17aPiCqeFWywkGOlA-1
-Received: by mail-wr1-f72.google.com with SMTP id t10so5872271wrp.15
-        for <kvm@vger.kernel.org>; Wed, 18 Mar 2020 04:26:40 -0700 (PDT)
+        bh=E2raNO3LZvQFYBCoVG2cHroRijIinSH+Abh4Yah3yxE=;
+        b=MgKZ33n2tR7WAjvjYMWe+gHMuYwnmwnxBVnEyOH9CwUJKYCDTr6hFh5zdqooJpUWpkBY6m
+        x+CMOgJrAC4cyPq8EluqjRKOmzIkBh/lcWSHs++pARnapAh3CScN82y1pHn3kIyO4cJ504
+        6YMfDEF4mxN/AnnrXa0+XR4HUTXK8Ms=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-63-OHOBnt1HM_WrqDqap-8y6w-1; Wed, 18 Mar 2020 07:29:57 -0400
+X-MC-Unique: OHOBnt1HM_WrqDqap-8y6w-1
+Received: by mail-wm1-f69.google.com with SMTP id n188so929924wmf.0
+        for <kvm@vger.kernel.org>; Wed, 18 Mar 2020 04:29:57 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=5igz5ifXUjPW3HOZrUuMXCx1D9YbVzwpu9tICwFVMz4=;
-        b=RPOJRd1jgh7xShw1BbSOndnaPGm1vcCZ+MBsSqnP/iJBkctUQ22OiGqqn6RFCxIwaD
-         H3VgQpAck+S1j07MPYAt6JtTM+bWZcZ12Vevc6yQFX7uBOJCoigLzo8ib3yJ3XvwGL1u
-         GbemFBX3VwgZ1Z6EZ7KwbOAzrTwCbEK4Y1y5/CZDy6xxhnJ8j4KrbOg9qEf6e6IQbVAZ
-         twD0eRKf+Wo/4M63ANS/uWH58WkvvL4gVlxDCY9jnDFtjT/WJosb1lWo2TGJYOiSCiph
-         cgPR7QwP2Zih8KqFLEnnsmoLhhmmg8BTECjDMzJiV6wyVBc8Fi5xVyLwrzmqXfhx9eOP
-         BgSQ==
-X-Gm-Message-State: ANhLgQ1ksojKpAxZVf0bc4BX0+N5EFtQHaCUroPLvcNljFwjvPY5of/o
-        cHpouYnpPBggLOGMKVvtuXwsV0U9VXh/w6jlYE7eR2KvWLJgb8AuxeLt8gBmBw086Oet7KABUWs
-        EDBJP5lWMCfNa
-X-Received: by 2002:adf:f807:: with SMTP id s7mr5040091wrp.49.1584530799361;
-        Wed, 18 Mar 2020 04:26:39 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vsNZ3RbBs/kRWmkrVpq+7LDajnIvwaWGyakEzMuR33iRe/bnqCAX/H4bBeFbfpC3O8OTc31ZQ==
-X-Received: by 2002:adf:f807:: with SMTP id s7mr5040067wrp.49.1584530799133;
-        Wed, 18 Mar 2020 04:26:39 -0700 (PDT)
+        bh=E2raNO3LZvQFYBCoVG2cHroRijIinSH+Abh4Yah3yxE=;
+        b=IB59twG2PUGjvlSszWXfR7H8cx9ZLSfjkxobWppjqawwo3qBF79YMf3m++j1Cdtfu9
+         9pZv3KBxj9s3YLBTyo4z6pawiiKRy3ZUKwhQHuRQghJ3WHJV7dbf9dV+my7zSIOHzl2h
+         lAAlg6zyRBjd61KDC/Sif/AG98lmehTiLHUyE49DOaHWJ5fWoqSsGJpfZLjvX6ZqVgyA
+         cMyvsJHJk9qbvHIaPSVuax4QFvgpH5texoy+9ksuOpZ+2n0lwTKg7LsQJgKe0KzyEL0v
+         ZF88CbZNriSuzXrfznSlV3cPdD8xtPVZQYwvH/a+3On0bKxdKuTvqJcui3RBUv6BA0R9
+         vgNw==
+X-Gm-Message-State: ANhLgQ38R6+6xb5PQLXK6K4LNxtoYobVSoewFxV6g/azaldd/P/qU2gp
+        kP30/XcFP98gAMOXrtuQoy9lMl5flSafsqEmYJFayCw8CsbXGfFJPwjcz+zaOeKu6NFaH1CJaTD
+        DPKsGdMUzHrCq
+X-Received: by 2002:a05:600c:d8:: with SMTP id u24mr4879758wmm.42.1584530996277;
+        Wed, 18 Mar 2020 04:29:56 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vsr1aX6ZaLbIrm8qc+ZOSLlogf/y+e/yKqFJim1bY3qrXkv+Gvhpe2QqGWc8QZUfYw60gbh7w==
+X-Received: by 2002:a05:600c:d8:: with SMTP id u24mr4879737wmm.42.1584530996060;
+        Wed, 18 Mar 2020 04:29:56 -0700 (PDT)
 Received: from [192.168.178.58] ([151.21.15.43])
-        by smtp.gmail.com with ESMTPSA id z12sm1721100wrt.27.2020.03.18.04.26.38
+        by smtp.gmail.com with ESMTPSA id u204sm3484735wmg.40.2020.03.18.04.29.55
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 18 Mar 2020 04:26:38 -0700 (PDT)
-Subject: Re: [PATCH rebase] KVM: x86: Expose AVX512 VP2INTERSECT in cpuid for
- TGL
-To:     Zhenyu Wang <zhenyuw@linux.intel.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        "Zhong, Yang" <yang.zhong@intel.com>
-References: <dcc9899c-f5af-9a4f-3ac2-f37fd8b930f7@redhat.com>
- <20200318032739.3745-1-zhenyuw@linux.intel.com>
+        Wed, 18 Mar 2020 04:29:55 -0700 (PDT)
+Subject: Re: [PATCH kvm-unit-tests] x86: vmx: Expect multiple error codes on
+ HOST_EFER corruption
+To:     Nadav Amit <namit@vmware.com>
+Cc:     kvm@vger.kernel.org, Krish Sadhukhan <krish.sadhukhan@oracle.com>
+References: <20200212195736.39540-1-namit@vmware.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <65e997c3-9ef9-d9f3-143e-0bc0823aad4f@redhat.com>
-Date:   Wed, 18 Mar 2020 12:26:37 +0100
+Message-ID: <620bcfed-a0a1-73a6-d24f-421dce4591c9@redhat.com>
+Date:   Wed, 18 Mar 2020 12:29:54 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200318032739.3745-1-zhenyuw@linux.intel.com>
+In-Reply-To: <20200212195736.39540-1-namit@vmware.com>
 Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -73,29 +71,65 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 18/03/20 04:27, Zhenyu Wang wrote:
-> On Tigerlake new AVX512 VP2INTERSECT feature is available.
-> This trys to expose it for KVM supported cpuid.
+On 12/02/20 20:57, Nadav Amit wrote:
+> Extended HOST_EFER tests can fail with a different error code than the
+> expected one, since the host address size bit is checked against
+> EFER.LMA. This causes kvm-unit-tests to fail on bare metal. According
+> to the SDM the errors are not ordered.
 > 
-> Cc: "Zhong, Yang" <yang.zhong@intel.com>
-> Signed-off-by: Zhenyu Wang <zhenyuw@linux.intel.com>
+> Expect either "invalid control" or "invalid host state" error-codes to
+> allow the tests to pass. The fix somewhat relaxes the tests, as there
+> are cases when only "invalid host state" is a valid instruction error,
+> but doing the fix in this manner prevents intrusive changes.
+> 
+> Fixes: a22d7b5534c2 ("x86: vmx_tests: extend HOST_EFER tests")
+> Signed-off-by: Nadav Amit <namit@vmware.com>
 > ---
->  arch/x86/kvm/cpuid.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  x86/vmx_tests.c | 24 +++++++++++++++++++++++-
+>  1 file changed, 23 insertions(+), 1 deletion(-)
 > 
-> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> index 08280d8a2ac9..435a7da07d5f 100644
-> --- a/arch/x86/kvm/cpuid.c
-> +++ b/arch/x86/kvm/cpuid.c
-> @@ -338,7 +338,7 @@ void kvm_set_cpu_caps(void)
->  	kvm_cpu_cap_mask(CPUID_7_EDX,
->  		F(AVX512_4VNNIW) | F(AVX512_4FMAPS) | F(SPEC_CTRL) |
->  		F(SPEC_CTRL_SSBD) | F(ARCH_CAPABILITIES) | F(INTEL_STIBP) |
-> -		F(MD_CLEAR)
-> +		F(MD_CLEAR) | F(AVX512_VP2INTERSECT)
->  	);
+> diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
+> index 69429e5..e69c361 100644
+> --- a/x86/vmx_tests.c
+> +++ b/x86/vmx_tests.c
+> @@ -3407,6 +3407,27 @@ static void test_vmx_vmlaunch(u32 xerror)
+>  	}
+>  }
 >  
->  	/* TSC_ADJUST and ARCH_CAPABILITIES are emulated in software. */
+> +/*
+> + * Try to launch the current VMCS, and expect one of two possible
+> + * errors (or success) codes.
+> + */
+> +static void test_vmx_vmlaunch2(u32 xerror1, u32 xerror2)
+> +{
+> +	bool success = vmlaunch_succeeds();
+> +	u32 vmx_inst_err;
+> +
+> +	if (!xerror1 == !xerror2)
+> +		report(success == !xerror1, "vmlaunch %s",
+> +		       !xerror1 ? "succeeds" : "fails");
+> +
+> +	if (!success && (xerror1 || xerror2)) {
+> +		vmx_inst_err = vmcs_read(VMX_INST_ERROR);
+> +		report(vmx_inst_err == xerror1 || vmx_inst_err == xerror2,
+> +		       "VMX inst error is %d or %d (actual %d)", xerror1,
+> +		       xerror2, vmx_inst_err);
+> +	}
+> +}
+> +
+>  static void test_vmx_invalid_controls(void)
+>  {
+>  	test_vmx_vmlaunch(VMXERR_ENTRY_INVALID_CONTROL_FIELD);
+> @@ -6764,7 +6785,8 @@ static void test_efer_vmlaunch(u32 fld, bool ok)
+>  		if (ok)
+>  			test_vmx_vmlaunch(0);
+>  		else
+> -			test_vmx_vmlaunch(VMXERR_ENTRY_INVALID_HOST_STATE_FIELD);
+> +			test_vmx_vmlaunch2(VMXERR_ENTRY_INVALID_CONTROL_FIELD,
+> +					VMXERR_ENTRY_INVALID_HOST_STATE_FIELD);
+>  	} else {
+>  		if (ok) {
+>  			enter_guest();
 > 
 
 Queued, thanks.
