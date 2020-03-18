@@ -2,119 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8BDB1189C9E
-	for <lists+kvm@lfdr.de>; Wed, 18 Mar 2020 14:11:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E992D189CA9
+	for <lists+kvm@lfdr.de>; Wed, 18 Mar 2020 14:13:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727033AbgCRNLc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Mar 2020 09:11:32 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:35032 "EHLO
+        id S1726820AbgCRNNm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Mar 2020 09:13:42 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:31584 "EHLO
         us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726671AbgCRNLb (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 18 Mar 2020 09:11:31 -0400
+        by vger.kernel.org with ESMTP id S1726671AbgCRNNm (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 18 Mar 2020 09:13:42 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1584537090;
+        s=mimecast20190719; t=1584537221;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         to:to:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=WxzuXD7SjpbHJ+BCX206OkrEuY7wjaScd2kiTVbloRM=;
-        b=YUsPw2NTFHHM31hkAQK4BSMLgT1Zk430yKIs4faddPJjq6qTyncqdoSWRrw8M/cTy7HUXQ
-        RevvDZsff362fD1e/5jIHjXaVByvmehOHLwrs1UkR4q8meCrZRP7N/PcR4BBHW84lWfhRj
-        pSmhMw1qnlmRmChLoLGVwcG4GarY8Zw=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-307-pLpi2ETHPX607qnB_bDCdg-1; Wed, 18 Mar 2020 09:11:29 -0400
-X-MC-Unique: pLpi2ETHPX607qnB_bDCdg-1
-Received: by mail-wr1-f70.google.com with SMTP id i18so1258528wrx.17
-        for <kvm@vger.kernel.org>; Wed, 18 Mar 2020 06:11:28 -0700 (PDT)
+        bh=PxBoqIBbe7s8BPyTsCZ02RzESp7E1oZC6kxy/vfpBRo=;
+        b=ODsBolDURrG3BqnfW4yy0khAwv1hqx65glxBLG8PfjzWpxnDOJMfs7pVJs7+odzQNsZout
+        R5n1WvlUbwoJ5oQX6+dmWH8xbthAkWI8RBRINx8RIQW46zNL+GsueyeIIanTDnSqkE/4B0
+        Zm8YymEbVZkIgDYg0oiMDtN4xcH9hZA=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-151-UNsA-ru4MzKJIG33knkRUQ-1; Wed, 18 Mar 2020 09:13:40 -0400
+X-MC-Unique: UNsA-ru4MzKJIG33knkRUQ-1
+Received: by mail-wr1-f72.google.com with SMTP id l16so11639897wrr.6
+        for <kvm@vger.kernel.org>; Wed, 18 Mar 2020 06:13:40 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=WxzuXD7SjpbHJ+BCX206OkrEuY7wjaScd2kiTVbloRM=;
-        b=JQ22MD33mHR+du0lhFGkDzk9jYUXwJYoEityq9WetGzDzsF4Pxqq3S7MpRgCz69+WZ
-         1trhk2O5PI+c+3Fdw1z8K+T9I4S/wD/ZvocMsfhfkfmkgkzv7DVyUk/nnEsvBaV9dr/0
-         dYI85dCYJYkBPPpR4xZcD8CcqZB3kT9rmkzWfHb9KminERviTxHeBSVsXct53IaRyqN/
-         nYODtuS8sOyldygi1f0co2RZLTXvpHdAq9qjdvNOwlKm1MGgjVWowwv0ZoTF9Z4HWbFm
-         dBkF/o3aL3nTXFbqRjSCb7JcwAad5HxMi7fMEc40XlR5BiVg1Z18bwcEBPSgXeu8cHqt
-         TnZQ==
-X-Gm-Message-State: ANhLgQ0g19iKRskKbNo1lyJvOhXQ3CUsNTU9ubEXSmwhH9LjWEH4cNxa
-        7suSLHQKJoyDi4EWAUlaw+y1ljau/boYna9AvCUW8Kbkoh3x+HlnoxyNb5Hman4Du9v/Ui3AeWq
-        eXba+BLNlTj80
-X-Received: by 2002:a1c:9690:: with SMTP id y138mr5464340wmd.65.1584537087803;
-        Wed, 18 Mar 2020 06:11:27 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vsc4KGaDOV8F9iCPnHjAeVdXJABfYWwbPLHE9INjSPFgjrAsjNxefnbmnFrSCri7znl4EaNzg==
-X-Received: by 2002:a1c:9690:: with SMTP id y138mr5464322wmd.65.1584537087534;
-        Wed, 18 Mar 2020 06:11:27 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id o16sm6615253wrs.44.2020.03.18.06.11.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Mar 2020 06:11:26 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Jon Doron <arilou@gmail.com>
-Cc:     Jon Doron <arilou@gmail.com>, kvm@vger.kernel.org,
-        linux-hyperv@vger.kernel.org
-Subject: Re: [PATCH v6 4/5] x86/kvm/hyper-v: enable hypercalls regardless of hypercall page
-In-Reply-To: <20200317034804.112538-5-arilou@gmail.com>
-References: <20200317034804.112538-1-arilou@gmail.com> <20200317034804.112538-5-arilou@gmail.com>
-Date:   Wed, 18 Mar 2020 14:11:25 +0100
-Message-ID: <87lfnx3j0i.fsf@vitty.brq.redhat.com>
+        h=x-gm-message-state:subject:to:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=PxBoqIBbe7s8BPyTsCZ02RzESp7E1oZC6kxy/vfpBRo=;
+        b=qRo0pwQ9QjBIiG7CRnzg6NupQWA0mQksAN/zuRrVxrGUEy3EP0ugQE+1iN5zIyXBS+
+         oxW7xczy6KgNwpmZ1ZkeaTLtek+SsFdMBO7v7kNxrbzHex/Eo8ZqFO0bagQjYNzt5IYy
+         myXuBZzCi7VlZnV8bCC9XCoiPRO3AOVUYm4oA7ya1/eL8pUKvcXZQa8xVi+8WKIzQIRy
+         favEaeCZ4fTfcgSdJSJmuWbqvZH+/Gp5onTaCXawvaMPutZQXIgrCcTQlCzKzbWqLTDs
+         wDhglzJANegzr2KuQ+y69F6IWPPQcqtnHTkBaCn+nFoVB3Sk8YdybOqJTOdcSN4raXea
+         zpPQ==
+X-Gm-Message-State: ANhLgQ3VUBWrXgZdALAsYvouUF0/C4MtnbMMNiVzZXalE+lz8DikrmcU
+        xHxrdfcEkEPt6DNppWXm8+aQ1cZVHVwMXHLXGWgyZdSsJaKkDFsNnH50JEOOwCD7b0uDda0T4aV
+        9pJC0fp6QLlu8
+X-Received: by 2002:a7b:c4c3:: with SMTP id g3mr5126515wmk.131.1584537218884;
+        Wed, 18 Mar 2020 06:13:38 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vs+9a05PJ9MjSVvgvmjIy/7AfVl4jvUgyfkQTDqBDQ0QhqKsWXVBZhmLJxegqv36zeZ+Qbawg==
+X-Received: by 2002:a7b:c4c3:: with SMTP id g3mr5126491wmk.131.1584537218610;
+        Wed, 18 Mar 2020 06:13:38 -0700 (PDT)
+Received: from [192.168.178.58] ([151.21.15.43])
+        by smtp.gmail.com with ESMTPSA id n186sm3807573wme.25.2020.03.18.06.13.37
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 18 Mar 2020 06:13:38 -0700 (PDT)
+Subject: Re: [PATCH 0/2] Fix errors when try to build kvm selftests on
+To:     Xiaoyao Li <xiaoyao.li@intel.com>, Shuah Khan <shuah@kernel.org>,
+        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+References: <20200315093425.33600-1-xiaoyao.li@intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <7f7a2945-300d-d62c-e5f5-de55c2e3fd2f@redhat.com>
+Date:   Wed, 18 Mar 2020 14:13:37 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <20200315093425.33600-1-xiaoyao.li@intel.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Jon Doron <arilou@gmail.com> writes:
+On 15/03/20 10:34, Xiaoyao Li wrote:
+> I attempted to build KVM selftests on a specified dir, unfortunately
+> neither	"make O=~/mydir TARGETS=kvm" in tools/testing/selftests, nor
+> "make OUTPUT=~/mydir" in tools/testing/selftests/kvm work.
+> 
+> This series aims to make both work.
+> 
+> Xiaoyao Li (2):
+>   kvm: selftests: Fix no directory error when OUTPUT specified
+>   selftests: export INSTALL_HDR_PATH if using "O" to specify output dir
+> 
+>  tools/testing/selftests/Makefile     | 6 +++++-
+>  tools/testing/selftests/kvm/Makefile | 3 ++-
+>  2 files changed, 7 insertions(+), 2 deletions(-)
+> 
 
-> Microsoft's kdvm.dll dbgtransport module does not respect the hypercall
-> page and simply identifies the CPU being used (AMD/Intel) and according
-> to it simply makes hypercalls with the relevant instruction
-> (vmmcall/vmcall respectively).
->
-> The relevant function in kdvm is KdHvConnectHypervisor which first checks
-> if the hypercall page has been enabled via HV_X64_MSR_HYPERCALL_ENABLE,
-> and in case it was not it simply sets the HV_X64_MSR_GUEST_OS_ID to
-> 0x1000101010001 which means:
-> build_number = 0x0001
-> service_version = 0x01
-> minor_version = 0x01
-> major_version = 0x01
-> os_id = 0x00 (Undefined)
-> vendor_id = 1 (Microsoft)
-> os_type = 0 (A value of 0 indicates a proprietary, closed source OS)
->
-> and starts issuing the hypercall without setting the hypercall page.
->
-> To resolve this issue simply enable hypercalls also if the guest_os_id
-> is not 0.
->
-> Signed-off-by: Jon Doron <arilou@gmail.com>
-> ---
->  arch/x86/kvm/hyperv.c | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
->
-> diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
-> index b6a97abe2bc9..917b10a637fc 100644
-> --- a/arch/x86/kvm/hyperv.c
-> +++ b/arch/x86/kvm/hyperv.c
-> @@ -1639,7 +1639,10 @@ static u64 kvm_hv_send_ipi(struct kvm_vcpu *current_vcpu, u64 ingpa, u64 outgpa,
->  
->  bool kvm_hv_hypercall_enabled(struct kvm *kvm)
->  {
-> -	return READ_ONCE(kvm->arch.hyperv.hv_hypercall) & HV_X64_MSR_HYPERCALL_ENABLE;
-> +	struct kvm_hv *hv = &kvm->arch.hyperv;
-> +
-> +	return READ_ONCE(hv->hv_hypercall) & HV_X64_MSR_HYPERCALL_ENABLE ||
-> +	       READ_ONCE(hv->hv_guest_os_id) != 0;
->  }
->  
->  static void kvm_hv_hypercall_set_result(struct kvm_vcpu *vcpu, u64 result)
+Queued, thanks.
 
-Also, as we're introducing KVM_CAP_HYPERV_DEBUGGING please include it in
-the check: no need to enable hypercalls without a hypercall page if we
-haven't enabled KVM_CAP_HYPERV_DEBUGGING (preserve the status quo).
-
--- 
-Vitaly
+Paolo
 
