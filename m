@@ -2,31 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id EBDBA18A10F
-	for <lists+kvm@lfdr.de>; Wed, 18 Mar 2020 18:02:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 89D1718A13C
+	for <lists+kvm@lfdr.de>; Wed, 18 Mar 2020 18:11:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726859AbgCRRCs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Mar 2020 13:02:48 -0400
-Received: from mga03.intel.com ([134.134.136.65]:13839 "EHLO mga03.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726638AbgCRRCs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 Mar 2020 13:02:48 -0400
-IronPort-SDR: GW29u5MqL4Q8TtV2DWHAvHtSWbFdDCJfe1XKgdYVSbJN22Yc/+XM7KNr8Dm4aXAINDi256qQpf
- Dxz2kSePep/Q==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Mar 2020 10:02:41 -0700
-IronPort-SDR: lvUm8X+7IdYPGh9PtUcxWuWLT07MuzXrRMbkxoFh+siGmQn+69FHUjG/Eogg9Axe8F5cIsxP9w
- y4hOLekTV9tA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,568,1574150400"; 
-   d="scan'208";a="244885698"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
-  by orsmga003.jf.intel.com with ESMTP; 18 Mar 2020 10:02:41 -0700
-Date:   Wed, 18 Mar 2020 10:02:41 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
+        id S1726845AbgCRRLh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Mar 2020 13:11:37 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:49390 "EHLO
+        us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726623AbgCRRLh (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 18 Mar 2020 13:11:37 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1584551494;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=vzqv9I5Sh/5ugsjV1X2H8uxVVaA/U2JrzTHi1Jlr7RM=;
+        b=XvXbUDKc51v2LavXQLKC5ekDS5+QKhwvgzY6vxxUrZLKXhY5y1pcG8+VHwGqfON02S3WBn
+        LDhaO7GE7l0iEn4UDFDD5ga8XrkJr1vATvIlOAbSU0sY/JuDOW+rm1d4h9PCeLDaKr0SDT
+        Z+Fjp2LORzd++JUuUVMgQ+SxfztiYn0=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-131-mJnrfWI-OBuYXs8dwZYBXA-1; Wed, 18 Mar 2020 13:11:33 -0400
+X-MC-Unique: mJnrfWI-OBuYXs8dwZYBXA-1
+Received: by mail-wm1-f71.google.com with SMTP id i24so1387506wml.1
+        for <kvm@vger.kernel.org>; Wed, 18 Mar 2020 10:11:33 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=vzqv9I5Sh/5ugsjV1X2H8uxVVaA/U2JrzTHi1Jlr7RM=;
+        b=rYAG+6hjZc61bVCL5Rm6mQ//clQn5/5zz4nlzxHKUgZOI+iSOzvDFOqPrOd4DyMXvb
+         5DiqEQA6wazkNcE9SmesXYHZF8hls3nNM/ssaYHRHgTlaWYQvDZ3DO/gjAwKZFXrJ3gT
+         QViRN19rF38kim7uRrF/0vDoUp4l/JNUOb5xcELbxJsY7mn6NKj2BX1atzdoS4c/Ch0D
+         WfT4juHA1NkNixDBwJzRose9WO7OAybUAoC66e2w3OC/WpoOkVQRo3wCa19FHG8HcaLM
+         4QL+PTnxTxRoUJczCReCJG8x39AuIuRxYfabuZCvfZaqq/4zWrXWLcBsq98N0HYjjq0J
+         zLGg==
+X-Gm-Message-State: ANhLgQ0na1F+PiwuxyjZbEdMsrrSBPtROkAIDy8J00N8eCcG7KUnhUZr
+        KZXIlyhwurrgErHxNz0XFJZ9ilVezbSX2HROFlroAVX9HBVfmYC7uUqdGOq5WEUMBPeOIRXRX7Q
+        vw0nw5T9lmQ0d
+X-Received: by 2002:adf:a54a:: with SMTP id j10mr6885891wrb.188.1584551492179;
+        Wed, 18 Mar 2020 10:11:32 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vt9u608gYRp7tO/knBR6K2ZgiFKLlyGeKIepNlMrVma8HthryXIRHihp1d398V+IzLI8vt48w==
+X-Received: by 2002:adf:a54a:: with SMTP id j10mr6885860wrb.188.1584551491921;
+        Wed, 18 Mar 2020 10:11:31 -0700 (PDT)
+Received: from [192.168.178.58] ([151.21.15.43])
+        by smtp.gmail.com with ESMTPSA id l18sm10187921wrr.17.2020.03.18.10.11.30
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 18 Mar 2020 10:11:31 -0700 (PDT)
+Subject: Re: [PATCH v2 31/32] KVM: nVMX: Don't flush TLB on nested VM
+ transition with EPT enabled
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
 Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
@@ -38,83 +65,39 @@ Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
         John Haxby <john.haxby@oracle.com>,
         Miaohe Lin <linmiaohe@huawei.com>,
         Tom Lendacky <thomas.lendacky@amd.com>
-Subject: Re: [PATCH v2 31/32] KVM: nVMX: Don't flush TLB on nested VM
- transition with EPT enabled
-Message-ID: <20200318170241.GJ24357@linux.intel.com>
 References: <20200317045238.30434-1-sean.j.christopherson@intel.com>
  <20200317045238.30434-32-sean.j.christopherson@intel.com>
  <97f91b27-65ac-9187-6b60-184e1562d228@redhat.com>
  <20200317182251.GD12959@linux.intel.com>
  <218d4dbd-20f1-5bf8-ca44-c53dd9345dab@redhat.com>
+ <20200318170241.GJ24357@linux.intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <3c3a4d9b-b213-dfc0-2857-a975e9c20770@redhat.com>
+Date:   Wed, 18 Mar 2020 18:11:28 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <218d4dbd-20f1-5bf8-ca44-c53dd9345dab@redhat.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <20200318170241.GJ24357@linux.intel.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 18, 2020 at 11:36:04AM +0100, Paolo Bonzini wrote:
-> On 17/03/20 19:22, Sean Christopherson wrote:
-> > On Tue, Mar 17, 2020 at 06:18:37PM +0100, Paolo Bonzini wrote:
-> >> On 17/03/20 05:52, Sean Christopherson wrote:
-> >>> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> >>> index d816f1366943..a77eab5b0e8a 100644
-> >>> --- a/arch/x86/kvm/vmx/nested.c
-> >>> +++ b/arch/x86/kvm/vmx/nested.c
-> >>> @@ -1123,7 +1123,7 @@ static int nested_vmx_load_cr3(struct kvm_vcpu *vcpu, unsigned long cr3, bool ne
-> >>>  	}
-> >>>  
-> >>>  	if (!nested_ept)
-> >>> -		kvm_mmu_new_cr3(vcpu, cr3, false);
-> >>> +		kvm_mmu_new_cr3(vcpu, cr3, enable_ept);
-> >>
-> >> Even if enable_ept == false, we could have already scheduled or flushed
-> >> the TLB soon due to one of 1) nested_vmx_transition_tlb_flush 2)
-> >> vpid_sync_context in prepare_vmcs02 3) the processor doing it for
-> >> !enable_vpid.
-> >>
-> >> So for !enable_ept only KVM_REQ_MMU_SYNC is needed, not
-> >> KVM_REQ_TLB_FLUSH_CURRENT I think.  Worth adding a TODO?
-> > 
-> > Now that you point it out, I think it makes sense to unconditionally pass
-> > %true here, i.e. rely 100% on nested_vmx_transition_tlb_flush() to do the
-> > right thing.
+On 18/03/20 18:02, Sean Christopherson wrote:
+> So something like this?
 > 
-> Why doesn't it need KVM_REQ_MMU_SYNC either?
+> 	if (!nested_ept)
+> 		kvm_mmu_new_cr3(vcpu, cr3, enable_ept ||
+> 					   nested_cpu_has_vpid(vmcs12));
 
-Hmm, so if L1 is using VPID, we're ok without a sync.  Junaid's INVVPID
-patch earlier in this series ensures cached roots won't retain unsync'd
-SPTEs when L1 does INVVPID.  If L1 doesn't flush L2's TLB on VM-Entry, it
-can't expect L2 to recognize changes in the PTEs since the last INVVPID.
+... which is exactly nested_has_guest_tlb_tag(vcpu).  Well, not exactly
+but it's a bug in your code above. :)
 
-Per Intel's SDM, INVLPG (and INVPCID) are only required to invalidate
-entries for the current VPID, i.e. virtual VPID=0 when executed by L1.
+It completely makes sense to use that as the third argument, and while a
+comment is still needed it will be much smaller.
 
-  Operations that architecturally invalidate entries in the TLBs or
-  paging-structure caches independent of VMX operation (e.g., the INVLPG and
-  INVPCID instructions) invalidate linear mappings and combined mappings.
-  They are required to do so only for the current VPID.
-                             ^^^^^^^^^^^^^^^^^^^^^^^^^
+Paolo
 
-If L1 isn't using VPID and L0 isn't using EPT, then a sync is required as
-L1 would expect PTE changes to be recognized without an explicit INVLPG
-prior to VM-Ennter.
-
-So something like this?
-
-	if (!nested_ept)
-		kvm_mmu_new_cr3(vcpu, cr3, enable_ept ||
-					   nested_cpu_has_vpid(vmcs12));
-
-The KVM_REQ_TLB_FLUSH_CURRENT request would be redundant with
-nested_vmx_transition_tlb_flush() when VPID is enabled, and is a (big) nop
-when VPID is disabled.  In either case the overhead is negligible.  Ideally
-this logic would tie into nested_vmx_transition_tlb_flush() in some way,
-but making that happen may be wishful thinking.
-
-> All this should be in a comment as well, of course.
-
-Heh, in hindsight that's painfully obvious.
