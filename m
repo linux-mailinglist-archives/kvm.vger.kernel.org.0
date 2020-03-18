@@ -2,1187 +2,355 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E9CB21896A0
-	for <lists+kvm@lfdr.de>; Wed, 18 Mar 2020 09:05:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6DF8C189898
+	for <lists+kvm@lfdr.de>; Wed, 18 Mar 2020 10:54:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727581AbgCRIFq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Mar 2020 04:05:46 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:22122 "EHLO
+        id S1727520AbgCRJyf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Mar 2020 05:54:35 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:36382 "EHLO
         us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727451AbgCRIFn (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 18 Mar 2020 04:05:43 -0400
+        by vger.kernel.org with ESMTP id S1726786AbgCRJye (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 18 Mar 2020 05:54:34 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1584518740;
+        s=mimecast20190719; t=1584525272;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=OTXf5iBampB9YU0zZlznbWRA23iVCHBixEY6j6n4mh8=;
-        b=B1kWKU8J7jcHtN5dDxpdUB09Ac4aRnfEQDBVYTaJoswfAS8PLa8FOVAdbhRKLQ4iKPYdTc
-        4hFI5KFaCKOu5CRoth5hzeCOH9dxvOkPilgL/uvGdx9f9BllD9v3qDBtmw52N+RATSQYb1
-        O6dSm9zuWFS8GBjAXEH5dWiFhk+rdl4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-170-1uTyUCh9Nrqjt98qQZrKlg-1; Wed, 18 Mar 2020 04:05:36 -0400
-X-MC-Unique: 1uTyUCh9Nrqjt98qQZrKlg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3C210DB60;
-        Wed, 18 Mar 2020 08:05:33 +0000 (UTC)
-Received: from jason-ThinkPad-X1-Carbon-6th.redhat.com (ovpn-13-166.pek2.redhat.com [10.72.13.166])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id C9A8519C58;
-        Wed, 18 Mar 2020 08:05:19 +0000 (UTC)
-From:   Jason Wang <jasowang@redhat.com>
-To:     mst@redhat.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
-Cc:     jgg@mellanox.com, maxime.coquelin@redhat.com,
-        cunming.liang@intel.com, zhihong.wang@intel.com,
-        rob.miller@broadcom.com, xiao.w.wang@intel.com,
-        lingshan.zhu@intel.com, eperezma@redhat.com, lulu@redhat.com,
-        parav@mellanox.com, kevin.tian@intel.com, stefanha@redhat.com,
-        rdunlap@infradead.org, hch@infradead.org, aadam@redhat.com,
-        jiri@mellanox.com, shahafs@mellanox.com, hanand@xilinx.com,
-        mhabets@solarflare.com, gdawar@xilinx.com, saugatm@xilinx.com,
-        vmireyno@marvell.com, Bie Tiwei <tiwei.bie@intel.com>,
-        Jason Wang <jasowang@redhat.com>
-Subject: [PATCH V6 8/8] virtio: Intel IFC VF driver for VDPA
-Date:   Wed, 18 Mar 2020 16:03:27 +0800
-Message-Id: <20200318080327.21958-9-jasowang@redhat.com>
-In-Reply-To: <20200318080327.21958-1-jasowang@redhat.com>
-References: <20200318080327.21958-1-jasowang@redhat.com>
+        bh=e+OVnLZB9CZEo0kN/BxEi4WmYFBdzymxgXvQb9Jkus0=;
+        b=JDafxs9IG2RSZvLPFaslq8K2L2YmqrqM5J+vlyLzM1QU0IY8gXUdIekcuPLk7x0xlrAbO+
+        dBXNgxyWlXrnZQAOYZ4HltIbxbzl+HHqFlgjnKiDomSX8YY/qqiOZIXhQL4crsVEQ56Q+U
+        /hJGeUMtpRJYj7CtaaxouK7rQCNiVWw=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-449-TgQ47GP5NL-8lGfTMzs4uw-1; Wed, 18 Mar 2020 05:54:28 -0400
+X-MC-Unique: TgQ47GP5NL-8lGfTMzs4uw-1
+Received: by mail-wm1-f71.google.com with SMTP id f9so776579wme.7
+        for <kvm@vger.kernel.org>; Wed, 18 Mar 2020 02:54:28 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version:content-transfer-encoding;
+        bh=e+OVnLZB9CZEo0kN/BxEi4WmYFBdzymxgXvQb9Jkus0=;
+        b=Xjwx7Xlct8ThkyZV1tW1ZznheNZ8LH9CjK4d0IJjsfOUmLQqnHdi/awcBxmoeSPLZ/
+         5wu1rn+YPsz4DYLw5oKgzdxT6TKklIZjyYcaCubmnKIVJ1WB7K+5nN+dpdjR7FHKuQ73
+         Egjy/XmpMaasvKpSU4hYY1NzbggbBqHem7q5ylxXXgpG1D+Vr2yU7WFVnOjfVooCD2Td
+         gfIcbe5f0uyLW3AH7rSdqFPEsWpBXRtnmqG0275oRXjTYe1o2CXlRmjnpzcamnJVCwY7
+         qL8xYp3sby0x1DOtMQYijKJgukXz0V06Nsu+h4IZfPGzYilxdKlV1LH8CWAuYu8BPb/d
+         Eb1A==
+X-Gm-Message-State: ANhLgQ2USKueMj4kdikIhIRJVUZAOqKmZhZQD5DfJJ+DIp4oVNY2tmTZ
+        oiD6iURK9cM7irr091lH9n785bML3fOTrWtulwJKDudZG4e8XOP+bH1PSuRLXsYzhMyagUiWI5M
+        UlLnu/uwocw/d
+X-Received: by 2002:a7b:c4c3:: with SMTP id g3mr4276579wmk.131.1584525267403;
+        Wed, 18 Mar 2020 02:54:27 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vslyvmYTC6dTS37Zw83n62n+vM2WpoHW17ZwsQMNw2mOFECFY515F06H8/ZK+kJ+Y0SNaR3Lw==
+X-Received: by 2002:a7b:c4c3:: with SMTP id g3mr4276554wmk.131.1584525267069;
+        Wed, 18 Mar 2020 02:54:27 -0700 (PDT)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id n186sm3106160wme.25.2020.03.18.02.54.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 18 Mar 2020 02:54:26 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Haiwei Li <lihaiwei.kernel@gmail.com>
+Cc:     wanpengli@tencent.com, x86@kernel.org, kvm@vger.kernel.org,
+        pbonzini@redhat.com
+Subject: Re: Some warnings occur in hyperv.c.
+In-Reply-To: <a46510c9-b629-805b-41e8-dbbbf626bd78@gmail.com>
+References: <CAB5KdOaiqS_nXq8_HfMH1PmjThFzmYNBcBrMnC3Utkw6-OPUfQ@mail.gmail.com> <87o8t1rgt7.fsf@vitty.brq.redhat.com> <a46510c9-b629-805b-41e8-dbbbf626bd78@gmail.com>
+Date:   Wed, 18 Mar 2020 10:54:25 +0100
+Message-ID: <87wo7i2dke.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Zhu Lingshan <lingshan.zhu@intel.com>
+Haiwei Li <lihaiwei.kernel@gmail.com> writes:
 
-This commit introduced two layers to drive IFC VF:
+> On 2020/3/12 18:47, Vitaly Kuznetsov wrote:
+>> Haiwei Li <lihaiwei.kernel@gmail.com> writes:
+>> 
+>>> Hi, When i build kvm, some warnings occur. Just like:
+>>>
+>>> /home/kernel/data/linux/arch/x86/kvm//hyperv.c: In function ‘kvm_hv_flush_tlb’:
+>>> /home/kernel/data/linux/arch/x86/kvm//hyperv.c:1436:1: warning: the
+>>> frame size of 1064 bytes is larger than 1024 bytes
+>>> [-Wframe-larger-than=]
+>>>   }
+>>>   ^
+>>> /home/kernel/data/linux/arch/x86/kvm//hyperv.c: In function ‘kvm_hv_send_ipi’:
+>>> /home/kernel/data/linux/arch/x86/kvm//hyperv.c:1529:1: warning: the
+>>> frame size of 1112 bytes is larger than 1024 bytes
+>>> [-Wframe-larger-than=]
+>>>   }
+>>>   ^
+>>>
+>>> Then i get the two functions in hyperv.c. Like:
+>>>
+>>> static u64 kvm_hv_send_ipi(struct kvm_vcpu *current_vcpu, u64 ingpa, u64 outgpa,
+>>>                             bool ex, bool fast)
+>>> {
+>>>          struct kvm *kvm = current_vcpu->kvm;
+>>>          struct hv_send_ipi_ex send_ipi_ex;
+>>>          struct hv_send_ipi send_ipi;
+>>>          u64 vp_bitmap[KVM_HV_MAX_SPARSE_VCPU_SET_BITS];
+>>>          DECLARE_BITMAP(vcpu_bitmap, KVM_MAX_VCPUS);
+>>>          unsigned long *vcpu_mask;
+>>>          unsigned long valid_bank_mask;
+>>>          u64 sparse_banks[64];
+>>>          int sparse_banks_len;
+>>>          u32 vector;
+>>>          bool all_cpus;
+>>>
+>>> static u64 kvm_hv_flush_tlb(struct kvm_vcpu *current_vcpu, u64 ingpa,
+>>>                              u16 rep_cnt, bool ex)
+>>> {
+>>>          struct kvm *kvm = current_vcpu->kvm;
+>>>          struct kvm_vcpu_hv *hv_vcpu = &current_vcpu->arch.hyperv;
+>>>          struct hv_tlb_flush_ex flush_ex;
+>>>          struct hv_tlb_flush flush;
+>>>          u64 vp_bitmap[KVM_HV_MAX_SPARSE_VCPU_SET_BITS];
+>>>          DECLARE_BITMAP(vcpu_bitmap, KVM_MAX_VCPUS);
+>>>          unsigned long *vcpu_mask;
+>>>          u64 valid_bank_mask;
+>>>          u64 sparse_banks[64];
+>>>          int sparse_banks_len;
+>>>          bool all_cpus;
+>>>
+>>> The definition of sparse_banks for X86_64 is 512 B.  So i tried to
+>>> refactor it by
+>>> defining it for both tlb and ipi. But no preempt disable in the flow.
+>>> How can i do?
+>> 
+>> I don't think preemption is a problem here if you define a per-vCPU
+>> buffer: we can never switch to serving some new request for the same
+>> vCPU before finishing the previous one so this is naturally serialized.
+>> 
+>> To not waste memory I'd suggest you allocate this buffer dinamically
+>> upon first usage. We can also have a union for struct
+>> hv_tlb_flush*/struct hv_send_ipi* as these also can't be used
+>> simultaneously.
+>> 
+>
+> Hi, Vitaly, thanks for your suggestions. I made some modification and 
+> basic tests. It works well. I'm not sure the correctness. Will you 
+> please do a review? thanks!
+>
+> From: Haiwei Li <lihaiwei@tencent.com>
+>
+> When building kvm:
+> /home/kernel/data/linux/arch/x86/kvm//hyperv.c: In function 
+> ‘kvm_hv_flush_tlb’:
+> /home/kernel/data/linux/arch/x86/kvm//hyperv.c:1436:1: warning: the
+> frame size of 1064 bytes is larger than 1024 bytes
+> [-Wframe-larger-than=]
+>   }
+>   ^
+> /home/kernel/data/linux/arch/x86/kvm//hyperv.c: In function 
+> ‘kvm_hv_send_ipi’:
+> /home/kernel/data/linux/arch/x86/kvm//hyperv.c:1529:1: warning: the
+> frame size of 1112 bytes is larger than 1024 bytes
+> [-Wframe-larger-than=]
+>   }
+>   ^
+>
+> Pre-allocate 1 variable per cpu for both hv_flush_tlb and hv_send_ipi. 
+> Union for struct hv_tlb_flush*/struct hv_send_ipi*.
+>
+> Signed-off-by: Haiwei Li <lihaiwei@tencent.com>
+> ---
+>   arch/x86/include/asm/hyperv-tlfs.h | 10 ++++++
+>   arch/x86/kvm/hyperv.c              | 67 
+> ++++++++++++++++++++------------------
+>   2 files changed, 45 insertions(+), 32 deletions(-)
+>
+> diff --git a/arch/x86/include/asm/hyperv-tlfs.h 
+> b/arch/x86/include/asm/hyperv-tlfs.h
+> index 92abc1e..f2d53e9 100644
+> --- a/arch/x86/include/asm/hyperv-tlfs.h
+> +++ b/arch/x86/include/asm/hyperv-tlfs.h
+> @@ -854,6 +854,11 @@ struct hv_send_ipi_ex {
+>   	struct hv_vpset vp_set;
+>   } __packed;
+>
+> +union hv_send_ipi_type {
+> +	struct hv_send_ipi send_ipi;
+> +	struct hv_send_ipi_ex send_ipi_ex;
+> +};
+> +
 
-(1) ifcvf_base layer, which handles IFC VF NIC hardware operations and
-    configurations.
+Please split the patch into two: first to unionize these and
+hv_tlb_flush_* structures and second to deal with sparse CPU banks.
 
-(2) ifcvf_main layer, which complies to VDPA bus framework,
-    implemented device operations for VDPA bus, handles device probe,
-    bus attaching, vring operations, etc.
 
-Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
-Signed-off-by: Bie Tiwei <tiwei.bie@intel.com>
-Signed-off-by: Wang Xiao <xiao.w.wang@intel.com>
-Signed-off-by: Jason Wang <jasowang@redhat.com>
----
- drivers/virtio/vdpa/Kconfig            |  10 +
- drivers/virtio/vdpa/Makefile           |   1 +
- drivers/virtio/vdpa/ifcvf/Makefile     |   3 +
- drivers/virtio/vdpa/ifcvf/ifcvf_base.c | 386 +++++++++++++++++++
- drivers/virtio/vdpa/ifcvf/ifcvf_base.h | 133 +++++++
- drivers/virtio/vdpa/ifcvf/ifcvf_main.c | 494 +++++++++++++++++++++++++
- drivers/virtio/virtio_vdpa.c           |   1 +
- 7 files changed, 1028 insertions(+)
- create mode 100644 drivers/virtio/vdpa/ifcvf/Makefile
- create mode 100644 drivers/virtio/vdpa/ifcvf/ifcvf_base.c
- create mode 100644 drivers/virtio/vdpa/ifcvf/ifcvf_base.h
- create mode 100644 drivers/virtio/vdpa/ifcvf/ifcvf_main.c
+>   /* HvFlushGuestPhysicalAddressSpace hypercalls */
+>   struct hv_guest_mapping_flush {
+>   	u64 address_space;
+> @@ -906,6 +911,11 @@ struct hv_tlb_flush_ex {
+>   	u64 gva_list[];
+>   } __packed;
+>
+> +union hv_tlb_flush_type {
+> +	struct hv_tlb_flush flush;
+> +	struct hv_tlb_flush_ex flush_ex;
+> +};
+> +
+>   struct hv_partition_assist_pg {
+>   	u32 tlb_lock_count;
+>   };
+> diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
+> index a86fda7..34cd57b 100644
+> --- a/arch/x86/kvm/hyperv.c
+> +++ b/arch/x86/kvm/hyperv.c
+> @@ -1351,30 +1351,33 @@ static __always_inline unsigned long 
+> *sparse_set_to_vcpu_mask(
+>   	return vcpu_bitmap;
+>   }
+>
+> +static DEFINE_PER_CPU(u64 [64], __hv_sparse_banks);
+> +
 
-diff --git a/drivers/virtio/vdpa/Kconfig b/drivers/virtio/vdpa/Kconfig
-index 9baa1d8da002..9f0b0fc72514 100644
---- a/drivers/virtio/vdpa/Kconfig
-+++ b/drivers/virtio/vdpa/Kconfig
-@@ -22,4 +22,14 @@ config VDPA_SIM
- 	  to RX. This device is used for testing, prototyping and
- 	  development of vDPA.
-=20
-+config IFCVF
-+	tristate "Intel IFC VF VDPA driver"
-+	depends on VDPA
-+	default n
-+	help
-+	  This kernel module can drive Intel IFC VF NIC to offload
-+	  virtio dataplane traffic to hardware.
-+	  To compile this driver as a module, choose M here: the module will
-+	  be called ifcvf.
-+
- endif # VDPA_MENU
-diff --git a/drivers/virtio/vdpa/Makefile b/drivers/virtio/vdpa/Makefile
-index 3814af8e097b..8bbb686ca7a2 100644
---- a/drivers/virtio/vdpa/Makefile
-+++ b/drivers/virtio/vdpa/Makefile
-@@ -1,3 +1,4 @@
- # SPDX-License-Identifier: GPL-2.0
- obj-$(CONFIG_VDPA) +=3D vdpa.o
- obj-$(CONFIG_VDPA_SIM) +=3D vdpa_sim/
-+obj-$(CONFIG_IFCVF)    +=3D ifcvf/
-diff --git a/drivers/virtio/vdpa/ifcvf/Makefile b/drivers/virtio/vdpa/ifc=
-vf/Makefile
-new file mode 100644
-index 000000000000..d709915995ab
---- /dev/null
-+++ b/drivers/virtio/vdpa/ifcvf/Makefile
-@@ -0,0 +1,3 @@
-+# SPDX-License-Identifier: GPL-2.0
-+obj-$(CONFIG_IFCVF) +=3D ifcvf.o
-+ifcvf-$(CONFIG_IFCVF) +=3D ifcvf_main.o ifcvf_base.o
-diff --git a/drivers/virtio/vdpa/ifcvf/ifcvf_base.c b/drivers/virtio/vdpa=
-/ifcvf/ifcvf_base.c
-new file mode 100644
-index 000000000000..ebfc0453f21a
---- /dev/null
-+++ b/drivers/virtio/vdpa/ifcvf/ifcvf_base.c
-@@ -0,0 +1,386 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Intel IFC VF NIC driver for virtio dataplane offloading
-+ *
-+ * Copyright (C) 2020 Intel Corporation.
-+ *
-+ * Author: Zhu Lingshan <lingshan.zhu@intel.com>
-+ *
-+ */
-+
-+#include "ifcvf_base.h"
-+
-+static inline u8 ifc_ioread8(u8 __iomem *addr)
-+{
-+	return ioread8(addr);
-+}
-+static inline u16 ifc_ioread16 (__le16 __iomem *addr)
-+{
-+	return ioread16(addr);
-+}
-+
-+static inline u32 ifc_ioread32(__le32 __iomem *addr)
-+{
-+	return ioread32(addr);
-+}
-+
-+static inline void ifc_iowrite8(u8 value, u8 __iomem *addr)
-+{
-+	iowrite8(value, addr);
-+}
-+
-+static inline void ifc_iowrite16(u16 value, __le16 __iomem *addr)
-+{
-+	iowrite16(value, addr);
-+}
-+
-+static inline void ifc_iowrite32(u32 value, __le32 __iomem *addr)
-+{
-+	iowrite32(value, addr);
-+}
-+
-+static void ifc_iowrite64_twopart(u64 val,
-+				  __le32 __iomem *lo, __le32 __iomem *hi)
-+{
-+	ifc_iowrite32((u32)val, lo);
-+	ifc_iowrite32(val >> 32, hi);
-+}
-+
-+struct ifcvf_adapter *vf_to_adapter(struct ifcvf_hw *hw)
-+{
-+	return container_of(hw, struct ifcvf_adapter, vf);
-+}
-+
-+static void __iomem *get_cap_addr(struct ifcvf_hw *hw,
-+				  struct virtio_pci_cap *cap)
-+{
-+	struct ifcvf_adapter *ifcvf;
-+	u32 length, offset;
-+	u8 bar;
-+
-+	length =3D le32_to_cpu(cap->length);
-+	offset =3D le32_to_cpu(cap->offset);
-+	bar =3D cap->bar;
-+
-+	ifcvf =3D vf_to_adapter(hw);
-+	if (bar >=3D IFCVF_PCI_MAX_RESOURCE) {
-+		IFCVF_DBG(ifcvf->dev,
-+			  "Invalid bar number %u to get capabilities\n", bar);
-+		return NULL;
-+	}
-+
-+	if (offset + length > hw->mem_resource[bar].len) {
-+		IFCVF_DBG(ifcvf->dev,
-+			  "offset(%u) + len(%u) overflows bar%u to get capabilities\n",
-+			  offset, length, bar);
-+		return NULL;
-+	}
-+
-+	return hw->mem_resource[bar].addr + offset;
-+}
-+
-+static int ifcvf_read_config_range(struct pci_dev *dev,
-+				   uint32_t *val, int size, int where)
-+{
-+	int ret, i;
-+
-+	for (i =3D 0; i < size; i +=3D 4) {
-+		ret =3D pci_read_config_dword(dev, where + i, val + i / 4);
-+		if (ret < 0)
-+			return ret;
-+	}
-+
-+	return 0;
-+}
-+
-+int ifcvf_init_hw(struct ifcvf_hw *hw, struct pci_dev *dev)
-+{
-+	struct virtio_pci_cap cap;
-+	u16 notify_off;
-+	int ret;
-+	u8 pos;
-+	u32 i;
-+
-+	ret =3D pci_read_config_byte(dev, PCI_CAPABILITY_LIST, &pos);
-+	if (ret < 0) {
-+		IFCVF_ERR(&dev->dev, "Failed to read PCI capability list\n");
-+		return -EIO;
-+	}
-+
-+	while (pos) {
-+		ret =3D ifcvf_read_config_range(dev, (u32 *)&cap,
-+					      sizeof(cap), pos);
-+		if (ret < 0) {
-+			IFCVF_ERR(&dev->dev,
-+				  "Failed to get PCI capability at %x\n", pos);
-+			break;
-+		}
-+
-+		if (cap.cap_vndr !=3D PCI_CAP_ID_VNDR)
-+			goto next;
-+
-+		switch (cap.cfg_type) {
-+		case VIRTIO_PCI_CAP_COMMON_CFG:
-+			hw->common_cfg =3D get_cap_addr(hw, &cap);
-+			IFCVF_DBG(&dev->dev, "hw->common_cfg =3D %p\n",
-+				  hw->common_cfg);
-+			break;
-+		case VIRTIO_PCI_CAP_NOTIFY_CFG:
-+			pci_read_config_dword(dev, pos + sizeof(cap),
-+					      &hw->notify_off_multiplier);
-+			hw->notify_bar =3D cap.bar;
-+			hw->notify_base =3D get_cap_addr(hw, &cap);
-+			IFCVF_DBG(&dev->dev, "hw->notify_base =3D %p\n",
-+				  hw->notify_base);
-+			break;
-+		case VIRTIO_PCI_CAP_ISR_CFG:
-+			hw->isr =3D get_cap_addr(hw, &cap);
-+			IFCVF_DBG(&dev->dev, "hw->isr =3D %p\n", hw->isr);
-+			break;
-+		case VIRTIO_PCI_CAP_DEVICE_CFG:
-+			hw->net_cfg =3D get_cap_addr(hw, &cap);
-+			IFCVF_DBG(&dev->dev, "hw->net_cfg =3D %p\n", hw->net_cfg);
-+			break;
-+		}
-+
-+next:
-+		pos =3D cap.cap_next;
-+	}
-+
-+	if (hw->common_cfg =3D=3D NULL || hw->notify_base =3D=3D NULL ||
-+	    hw->isr =3D=3D NULL || hw->net_cfg =3D=3D NULL) {
-+		IFCVF_ERR(&dev->dev, "Incomplete PCI capabilities\n");
-+		return -EIO;
-+	}
-+
-+	for (i =3D 0; i < IFCVF_MAX_QUEUE_PAIRS * 2; i++) {
-+		ifc_iowrite16(i, &hw->common_cfg->queue_select);
-+		notify_off =3D ifc_ioread16(&hw->common_cfg->queue_notify_off);
-+		hw->vring[i].notify_addr =3D hw->notify_base +
-+			notify_off * hw->notify_off_multiplier;
-+	}
-+
-+	hw->lm_cfg =3D hw->mem_resource[IFCVF_LM_BAR].addr;
-+
-+	IFCVF_DBG(&dev->dev,
-+		  "PCI capability mapping: common cfg: %p, notify base: %p\n, isr cfg:=
- %p, device cfg: %p, multiplier: %u\n",
-+		  hw->common_cfg, hw->notify_base, hw->isr,
-+		  hw->net_cfg, hw->notify_off_multiplier);
-+
-+	return 0;
-+}
-+
-+u8 ifcvf_get_status(struct ifcvf_hw *hw)
-+{
-+	return ifc_ioread8(&hw->common_cfg->device_status);
-+}
-+
-+void ifcvf_set_status(struct ifcvf_hw *hw, u8 status)
-+{
-+	ifc_iowrite8(status, &hw->common_cfg->device_status);
-+}
-+
-+void ifcvf_reset(struct ifcvf_hw *hw)
-+{
-+	ifcvf_set_status(hw, 0);
-+	/* flush set_status, make sure VF is stopped, reset */
-+	ifcvf_get_status(hw);
-+}
-+
-+static void ifcvf_add_status(struct ifcvf_hw *hw, u8 status)
-+{
-+	if (status !=3D 0)
-+		status |=3D ifcvf_get_status(hw);
-+
-+	ifcvf_set_status(hw, status);
-+	ifcvf_get_status(hw);
-+}
-+
-+u64 ifcvf_get_features(struct ifcvf_hw *hw)
-+{
-+	struct virtio_pci_common_cfg __iomem *cfg =3D hw->common_cfg;
-+	u32 features_lo, features_hi;
-+
-+	ifc_iowrite32(0, &cfg->device_feature_select);
-+	features_lo =3D ifc_ioread32(&cfg->device_feature);
-+
-+	ifc_iowrite32(1, &cfg->device_feature_select);
-+	features_hi =3D ifc_ioread32(&cfg->device_feature);
-+
-+	return ((u64)features_hi << 32) | features_lo;
-+}
-+
-+void ifcvf_read_net_config(struct ifcvf_hw *hw, u64 offset,
-+			   void *dst, int length)
-+{
-+	u8 old_gen, new_gen, *p;
-+	int i;
-+
-+	WARN_ON(offset + length > sizeof(struct virtio_net_config));
-+	do {
-+		old_gen =3D ifc_ioread8(&hw->common_cfg->config_generation);
-+		p =3D dst;
-+		for (i =3D 0; i < length; i++)
-+			*p++ =3D ifc_ioread8(hw->net_cfg + offset + i);
-+
-+		new_gen =3D ifc_ioread8(&hw->common_cfg->config_generation);
-+	} while (old_gen !=3D new_gen);
-+}
-+
-+void ifcvf_write_net_config(struct ifcvf_hw *hw, u64 offset,
-+			    const void *src, int length)
-+{
-+	const u8 *p;
-+	int i;
-+
-+	p =3D src;
-+	WARN_ON(offset + length > sizeof(struct virtio_net_config));
-+	for (i =3D 0; i < length; i++)
-+		ifc_iowrite8(*p++, hw->net_cfg + offset + i);
-+}
-+
-+static void ifcvf_set_features(struct ifcvf_hw *hw, u64 features)
-+{
-+	struct virtio_pci_common_cfg __iomem *cfg =3D hw->common_cfg;
-+
-+	ifc_iowrite32(0, &cfg->guest_feature_select);
-+	ifc_iowrite32((u32)features, &cfg->guest_feature);
-+
-+	ifc_iowrite32(1, &cfg->guest_feature_select);
-+	ifc_iowrite32(features >> 32, &cfg->guest_feature);
-+}
-+
-+static int ifcvf_config_features(struct ifcvf_hw *hw)
-+{
-+	struct ifcvf_adapter *ifcvf;
-+
-+	ifcvf =3D vf_to_adapter(hw);
-+	ifcvf_set_features(hw, hw->req_features);
-+	ifcvf_add_status(hw, VIRTIO_CONFIG_S_FEATURES_OK);
-+
-+	if (!(ifcvf_get_status(hw) & VIRTIO_CONFIG_S_FEATURES_OK)) {
-+		IFCVF_ERR(ifcvf->dev, "Failed to set FEATURES_OK status\n");
-+		return -EIO;
-+	}
-+
-+	return 0;
-+}
-+
-+u64 ifcvf_get_vq_state(struct ifcvf_hw *hw, u16 qid)
-+{
-+	struct ifcvf_lm_cfg __iomem *ifcvf_lm;
-+	u32 __iomem *avail_idx_addr;
-+	u16 last_avail_idx;
-+	u32 q_pair_id;
-+
-+	ifcvf_lm =3D (struct ifcvf_lm_cfg __iomem *)hw->lm_cfg;
-+	q_pair_id =3D qid / (IFCVF_MAX_QUEUE_PAIRS * 2);
-+	avail_idx_addr =3D &ifcvf_lm->vring_lm_cfg[q_pair_id].idx_addr[qid % 2]=
-;
-+	last_avail_idx =3D ioread16(avail_idx_addr);
-+
-+	return last_avail_idx;
-+}
-+
-+int ifcvf_set_vq_state(struct ifcvf_hw *hw, u16 qid, u64 num)
-+{
-+	struct ifcvf_lm_cfg __iomem *ifcvf_lm;
-+	u32 __iomem *avail_idx_addr;
-+	u32 q_pair_id;
-+
-+	ifcvf_lm =3D (struct ifcvf_lm_cfg __iomem *)hw->lm_cfg;
-+	q_pair_id =3D qid / (IFCVF_MAX_QUEUE_PAIRS * 2);
-+	avail_idx_addr =3D &ifcvf_lm->vring_lm_cfg[q_pair_id].idx_addr[qid % 2]=
-;
-+	hw->vring[qid].last_avail_idx =3D num;
-+	iowrite16(num, avail_idx_addr);
-+
-+	return 0;
-+}
-+
-+static int ifcvf_hw_enable(struct ifcvf_hw *hw)
-+{
-+	struct ifcvf_lm_cfg __iomem *ifcvf_lm;
-+	struct virtio_pci_common_cfg __iomem *cfg;
-+	struct ifcvf_adapter *ifcvf;
-+	u32 i;
-+
-+	ifcvf_lm =3D (struct ifcvf_lm_cfg __iomem *)hw->lm_cfg;
-+	ifcvf =3D vf_to_adapter(hw);
-+	cfg =3D hw->common_cfg;
-+	ifc_iowrite16(IFCVF_MSI_CONFIG_OFF, &cfg->msix_config);
-+
-+	if (ifc_ioread16(&cfg->msix_config) =3D=3D VIRTIO_MSI_NO_VECTOR) {
-+		IFCVF_ERR(ifcvf->dev, "No msix vector for device config\n");
-+		return -EINVAL;
-+	}
-+
-+	for (i =3D 0; i < hw->nr_vring; i++) {
-+		if (!hw->vring[i].ready)
-+			break;
-+
-+		ifc_iowrite16(i, &cfg->queue_select);
-+		ifc_iowrite64_twopart(hw->vring[i].desc, &cfg->queue_desc_lo,
-+				     &cfg->queue_desc_hi);
-+		ifc_iowrite64_twopart(hw->vring[i].avail, &cfg->queue_avail_lo,
-+				      &cfg->queue_avail_hi);
-+		ifc_iowrite64_twopart(hw->vring[i].used, &cfg->queue_used_lo,
-+				     &cfg->queue_used_hi);
-+		ifc_iowrite16(hw->vring[i].size, &cfg->queue_size);
-+		ifc_iowrite16(i + IFCVF_MSI_QUEUE_OFF, &cfg->queue_msix_vector);
-+
-+		if (ifc_ioread16(&cfg->queue_msix_vector) =3D=3D
-+		    VIRTIO_MSI_NO_VECTOR) {
-+			IFCVF_ERR(ifcvf->dev,
-+				  "No msix vector for queue %u\n", i);
-+			return -EINVAL;
-+		}
-+
-+		ifcvf_set_vq_state(hw, i, hw->vring[i].last_avail_idx);
-+		ifc_iowrite16(1, &cfg->queue_enable);
-+	}
-+
-+	return 0;
-+}
-+
-+static void ifcvf_hw_disable(struct ifcvf_hw *hw)
-+{
-+	struct virtio_pci_common_cfg __iomem *cfg;
-+	u32 i;
-+
-+	cfg =3D hw->common_cfg;
-+	ifc_iowrite16(VIRTIO_MSI_NO_VECTOR, &cfg->msix_config);
-+
-+	for (i =3D 0; i < hw->nr_vring; i++) {
-+		ifc_iowrite16(i, &cfg->queue_select);
-+		ifc_iowrite16(VIRTIO_MSI_NO_VECTOR, &cfg->queue_msix_vector);
-+	}
-+
-+	ifc_ioread16(&cfg->queue_msix_vector);
-+}
-+
-+int ifcvf_start_hw(struct ifcvf_hw *hw)
-+{
-+	ifcvf_reset(hw);
-+	ifcvf_add_status(hw, VIRTIO_CONFIG_S_ACKNOWLEDGE);
-+	ifcvf_add_status(hw, VIRTIO_CONFIG_S_DRIVER);
-+
-+	if (ifcvf_config_features(hw) < 0)
-+		return -EINVAL;
-+
-+	if (ifcvf_hw_enable(hw) < 0)
-+		return -EINVAL;
-+
-+	ifcvf_add_status(hw, VIRTIO_CONFIG_S_DRIVER_OK);
-+
-+	return 0;
-+}
-+
-+void ifcvf_stop_hw(struct ifcvf_hw *hw)
-+{
-+	ifcvf_hw_disable(hw);
-+	ifcvf_reset(hw);
-+}
-+
-+void ifcvf_notify_queue(struct ifcvf_hw *hw, u16 qid)
-+{
-+	ifc_iowrite16(qid, hw->vring[qid].notify_addr);
-+}
-diff --git a/drivers/virtio/vdpa/ifcvf/ifcvf_base.h b/drivers/virtio/vdpa=
-/ifcvf/ifcvf_base.h
-new file mode 100644
-index 000000000000..efc61b931aaf
---- /dev/null
-+++ b/drivers/virtio/vdpa/ifcvf/ifcvf_base.h
-@@ -0,0 +1,133 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/*
-+ * Intel IFC VF NIC driver for virtio dataplane offloading
-+ *
-+ * Copyright (C) 2020 Intel Corporation.
-+ *
-+ * Author: Zhu Lingshan <lingshan.zhu@intel.com>
-+ *
-+ */
-+
-+#ifndef _IFCVF_H_
-+#define _IFCVF_H_
-+
-+#include <linux/pci.h>
-+#include <linux/pci_regs.h>
-+#include <linux/vdpa.h>
-+#include <uapi/linux/virtio_net.h>
-+#include <uapi/linux/virtio_config.h>
-+#include <uapi/linux/virtio_pci.h>
-+
-+#define IFCVF_VENDOR_ID		0x1AF4
-+#define IFCVF_DEVICE_ID		0x1041
-+#define IFCVF_SUBSYS_VENDOR_ID	0x8086
-+#define IFCVF_SUBSYS_DEVICE_ID	0x001A
-+
-+#define IFCVF_SUPPORTED_FEATURES \
-+		((1ULL << VIRTIO_NET_F_MAC)			| \
-+		 (1ULL << VIRTIO_F_ANY_LAYOUT)			| \
-+		 (1ULL << VIRTIO_F_VERSION_1)			| \
-+		 (1ULL << VIRTIO_F_ORDER_PLATFORM)		| \
-+		 (1ULL << VIRTIO_F_IOMMU_PLATFORM)		| \
-+		 (1ULL << VIRTIO_NET_F_MRG_RXBUF))
-+
-+/* Only one queue pair for now. */
-+#define IFCVF_MAX_QUEUE_PAIRS	1
-+
-+#define IFCVF_QUEUE_ALIGNMENT	PAGE_SIZE
-+#define IFCVF_QUEUE_MAX		32768
-+#define IFCVF_MSI_CONFIG_OFF	0
-+#define IFCVF_MSI_QUEUE_OFF	1
-+#define IFCVF_PCI_MAX_RESOURCE	6
-+
-+#define IFCVF_LM_CFG_SIZE		0x40
-+#define IFCVF_LM_RING_STATE_OFFSET	0x20
-+#define IFCVF_LM_BAR			4
-+
-+#define IFCVF_ERR(dev, fmt, ...)	dev_err(dev, fmt, ##__VA_ARGS__)
-+#define IFCVF_DBG(dev, fmt, ...)	dev_dbg(dev, fmt, ##__VA_ARGS__)
-+#define IFCVF_INFO(dev, fmt, ...)	dev_info(dev, fmt, ##__VA_ARGS__)
-+
-+#define ifcvf_private_to_vf(adapter) \
-+	(&((struct ifcvf_adapter *)adapter)->vf)
-+
-+#define IFCVF_MAX_INTR (IFCVF_MAX_QUEUE_PAIRS * 2 + 1)
-+
-+struct ifcvf_pci_mem_resource {
-+	u64      phys_addr;
-+	u64      len;
-+	/* Virtual address, NULL when not mapped. */
-+	void     __iomem *addr;
-+};
-+
-+struct vring_info {
-+	u64 desc;
-+	u64 avail;
-+	u64 used;
-+	u16 size;
-+	u16 last_avail_idx;
-+	bool ready;
-+	void __iomem *notify_addr;
-+	u32 irq;
-+	struct vdpa_callback cb;
-+	char msix_name[256];
-+};
-+
-+struct ifcvf_hw {
-+	u8	__iomem *isr;
-+	/* Live migration */
-+	u8	__iomem	*lm_cfg;
-+	u16	nr_vring;
-+	/* Notification bar number */
-+	u8	notify_bar;
-+	/* Notificaiton bar address */
-+	void	__iomem *notify_base;
-+	u32	notify_off_multiplier;
-+	u64	req_features;
-+	struct	virtio_pci_common_cfg __iomem	*common_cfg;
-+	void  __iomem	*net_cfg;
-+	struct	vring_info vring[IFCVF_MAX_QUEUE_PAIRS * 2];
-+	struct	ifcvf_pci_mem_resource mem_resource[IFCVF_PCI_MAX_RESOURCE];
-+};
-+
-+struct ifcvf_adapter {
-+	struct	device *dev;
-+	int	vectors;
-+	struct	ifcvf_hw vf;
-+	struct	vdpa_device *vdpa_dev;
-+};
-+
-+struct ifcvf_vring_lm_cfg {
-+	u32 idx_addr[2];
-+	u8 reserved[IFCVF_LM_CFG_SIZE - 8];
-+};
-+
-+struct ifcvf_lm_cfg {
-+	u8 reserved[IFCVF_LM_RING_STATE_OFFSET];
-+	struct ifcvf_vring_lm_cfg vring_lm_cfg[IFCVF_MAX_QUEUE_PAIRS];
-+};
-+
-+struct vdpa_ifcvf_dev {
-+	struct class	*vd_class;
-+	struct idr	vd_idr;
-+	struct device	dev;
-+	struct kobject  *devices_kobj;
-+};
-+
-+int ifcvf_init_hw(struct ifcvf_hw *hw, struct pci_dev *dev);
-+int ifcvf_start_hw(struct ifcvf_hw *hw);
-+void ifcvf_stop_hw(struct ifcvf_hw *hw);
-+void ifcvf_notify_queue(struct ifcvf_hw *hw, u16 qid);
-+void ifcvf_read_net_config(struct ifcvf_hw *hw, u64 offset,
-+			   void *dst, int length);
-+void ifcvf_write_net_config(struct ifcvf_hw *hw, u64 offset,
-+			    const void *src, int length);
-+u8 ifcvf_get_status(struct ifcvf_hw *hw);
-+void ifcvf_set_status(struct ifcvf_hw *hw, u8 status);
-+void io_write64_twopart(u64 val, u32 *lo, u32 *hi);
-+void ifcvf_reset(struct ifcvf_hw *hw);
-+u64 ifcvf_get_features(struct ifcvf_hw *hw);
-+u64 ifcvf_get_vq_state(struct ifcvf_hw *hw, u16 qid);
-+int ifcvf_set_vq_state(struct ifcvf_hw *hw, u16 qid, u64 num);
-+struct ifcvf_adapter *vf_to_adapter(struct ifcvf_hw *hw);
-+#endif /* _IFCVF_H_ */
-diff --git a/drivers/virtio/vdpa/ifcvf/ifcvf_main.c b/drivers/virtio/vdpa=
-/ifcvf/ifcvf_main.c
-new file mode 100644
-index 000000000000..52f72d1cbfb8
---- /dev/null
-+++ b/drivers/virtio/vdpa/ifcvf/ifcvf_main.c
-@@ -0,0 +1,494 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Intel IFC VF NIC driver for virtio dataplane offloading
-+ *
-+ * Copyright (C) 2020 Intel Corporation.
-+ *
-+ * Author: Zhu Lingshan <lingshan.zhu@intel.com>
-+ *
-+ */
-+
-+#include <linux/interrupt.h>
-+#include <linux/module.h>
-+#include <linux/pci.h>
-+#include <linux/sysfs.h>
-+#include "ifcvf_base.h"
-+
-+#define VERSION_STRING  "0.1"
-+#define DRIVER_AUTHOR   "Intel Corporation"
-+#define IFCVF_DRIVER_NAME       "ifcvf"
-+
-+static irqreturn_t ifcvf_intr_handler(int irq, void *arg)
-+{
-+	struct vring_info *vring =3D arg;
-+
-+	if (vring->cb.callback)
-+		return vring->cb.callback(vring->cb.private);
-+
-+	return IRQ_HANDLED;
-+}
-+
-+static int ifcvf_start_datapath(void *private)
-+{
-+	struct ifcvf_hw *vf =3D ifcvf_private_to_vf(private);
-+	struct ifcvf_adapter *ifcvf;
-+	u8 status;
-+	int ret;
-+
-+	ifcvf =3D vf_to_adapter(vf);
-+	vf->nr_vring =3D IFCVF_MAX_QUEUE_PAIRS * 2;
-+	ret =3D ifcvf_start_hw(vf);
-+	if (ret < 0) {
-+		status =3D ifcvf_get_status(vf);
-+		status |=3D VIRTIO_CONFIG_S_FAILED;
-+		ifcvf_set_status(vf, status);
-+	}
-+
-+	return ret;
-+}
-+
-+static int ifcvf_stop_datapath(void *private)
-+{
-+	struct ifcvf_hw *vf =3D ifcvf_private_to_vf(private);
-+	int i;
-+
-+	for (i =3D 0; i < IFCVF_MAX_QUEUE_PAIRS * 2; i++)
-+		vf->vring[i].cb.callback =3D NULL;
-+
-+	ifcvf_stop_hw(vf);
-+
-+	return 0;
-+}
-+
-+static void ifcvf_reset_vring(struct ifcvf_adapter *adapter)
-+{
-+	struct ifcvf_hw *vf =3D ifcvf_private_to_vf(adapter);
-+	int i;
-+
-+	for (i =3D 0; i < IFCVF_MAX_QUEUE_PAIRS * 2; i++) {
-+		vf->vring[i].last_avail_idx =3D 0;
-+		vf->vring[i].desc =3D 0;
-+		vf->vring[i].avail =3D 0;
-+		vf->vring[i].used =3D 0;
-+		vf->vring[i].ready =3D 0;
-+		vf->vring[i].cb.callback =3D NULL;
-+		vf->vring[i].cb.private =3D NULL;
-+	}
-+
-+	ifcvf_reset(vf);
-+}
-+
-+static struct ifcvf_hw *vdpa_to_vf(struct vdpa_device *vdpa_dev)
-+{
-+	struct ifcvf_adapter *adapter;
-+	struct ifcvf_hw *vf;
-+
-+	adapter =3D dev_get_drvdata(vdpa_dev->dev.parent);
-+	vf =3D ifcvf_private_to_vf(adapter);
-+
-+	return vf;
-+}
-+
-+static u64 ifcvf_vdpa_get_features(struct vdpa_device *vdpa_dev)
-+{
-+	struct ifcvf_hw *vf =3D vdpa_to_vf(vdpa_dev);
-+	u64 features;
-+
-+	features =3D ifcvf_get_features(vf) & IFCVF_SUPPORTED_FEATURES;
-+
-+	return features;
-+}
-+
-+static int ifcvf_vdpa_set_features(struct vdpa_device *vdpa_dev, u64 fea=
-tures)
-+{
-+	struct ifcvf_hw *vf =3D vdpa_to_vf(vdpa_dev);
-+
-+	vf->req_features =3D features;
-+
-+	return 0;
-+}
-+
-+static u8 ifcvf_vdpa_get_status(struct vdpa_device *vdpa_dev)
-+{
-+	struct ifcvf_hw *vf =3D vdpa_to_vf(vdpa_dev);
-+
-+	return ifcvf_get_status(vf);
-+}
-+
-+static void ifcvf_vdpa_set_status(struct vdpa_device *vdpa_dev, u8 statu=
-s)
-+{
-+	struct ifcvf_adapter *adapter;
-+	struct ifcvf_hw *vf;
-+
-+	vf  =3D vdpa_to_vf(vdpa_dev);
-+	adapter =3D dev_get_drvdata(vdpa_dev->dev.parent);
-+
-+	if (status =3D=3D 0) {
-+		ifcvf_stop_datapath(adapter);
-+		ifcvf_reset_vring(adapter);
-+		return;
-+	}
-+
-+	if (status & VIRTIO_CONFIG_S_DRIVER_OK) {
-+		if (ifcvf_start_datapath(adapter) < 0)
-+			IFCVF_ERR(adapter->dev,
-+				  "Failed to set ifcvf vdpa  status %u\n",
-+				  status);
-+	}
-+
-+	ifcvf_set_status(vf, status);
-+}
-+
-+static u16 ifcvf_vdpa_get_vq_num_max(struct vdpa_device *vdpa_dev)
-+{
-+	return IFCVF_QUEUE_MAX;
-+}
-+
-+static u64 ifcvf_vdpa_get_vq_state(struct vdpa_device *vdpa_dev, u16 qid=
-)
-+{
-+	struct ifcvf_hw *vf =3D vdpa_to_vf(vdpa_dev);
-+
-+	return ifcvf_get_vq_state(vf, qid);
-+}
-+
-+static int ifcvf_vdpa_set_vq_state(struct vdpa_device *vdpa_dev, u16 qid=
-,
-+				   u64 num)
-+{
-+	struct ifcvf_hw *vf =3D vdpa_to_vf(vdpa_dev);
-+
-+	return ifcvf_set_vq_state(vf, qid, num);
-+}
-+
-+static void ifcvf_vdpa_set_vq_cb(struct vdpa_device *vdpa_dev, u16 qid,
-+				 struct vdpa_callback *cb)
-+{
-+	struct ifcvf_hw *vf =3D vdpa_to_vf(vdpa_dev);
-+
-+	vf->vring[qid].cb =3D *cb;
-+}
-+
-+static void ifcvf_vdpa_set_vq_ready(struct vdpa_device *vdpa_dev,
-+				    u16 qid, bool ready)
-+{
-+	struct ifcvf_hw *vf =3D vdpa_to_vf(vdpa_dev);
-+
-+	vf->vring[qid].ready =3D ready;
-+}
-+
-+static bool ifcvf_vdpa_get_vq_ready(struct vdpa_device *vdpa_dev, u16 qi=
-d)
-+{
-+	struct ifcvf_hw *vf =3D vdpa_to_vf(vdpa_dev);
-+
-+	return vf->vring[qid].ready;
-+}
-+
-+static void ifcvf_vdpa_set_vq_num(struct vdpa_device *vdpa_dev, u16 qid,
-+				  u32 num)
-+{
-+	struct ifcvf_hw *vf =3D vdpa_to_vf(vdpa_dev);
-+
-+	vf->vring[qid].size =3D num;
-+}
-+
-+static int ifcvf_vdpa_set_vq_address(struct vdpa_device *vdpa_dev, u16 q=
-id,
-+				     u64 desc_area, u64 driver_area,
-+				     u64 device_area)
-+{
-+	struct ifcvf_hw *vf =3D vdpa_to_vf(vdpa_dev);
-+
-+	vf->vring[qid].desc =3D desc_area;
-+	vf->vring[qid].avail =3D driver_area;
-+	vf->vring[qid].used =3D device_area;
-+
-+	return 0;
-+}
-+
-+static void ifcvf_vdpa_kick_vq(struct vdpa_device *vdpa_dev, u16 qid)
-+{
-+	struct ifcvf_hw *vf =3D vdpa_to_vf(vdpa_dev);
-+
-+	ifcvf_notify_queue(vf, qid);
-+}
-+
-+static u32 ifcvf_vdpa_get_generation(struct vdpa_device *vdpa_dev)
-+{
-+	struct ifcvf_hw *vf =3D vdpa_to_vf(vdpa_dev);
-+
-+	return ioread8(&vf->common_cfg->config_generation);
-+}
-+
-+static u32 ifcvf_vdpa_get_device_id(struct vdpa_device *vdpa_dev)
-+{
-+	return VIRTIO_ID_NET;
-+}
-+
-+static u32 ifcvf_vdpa_get_vendor_id(struct vdpa_device *vdpa_dev)
-+{
-+	return IFCVF_SUBSYS_VENDOR_ID;
-+}
-+
-+static u16 ifcvf_vdpa_get_vq_align(struct vdpa_device *vdpa_dev)
-+{
-+	return IFCVF_QUEUE_ALIGNMENT;
-+}
-+
-+static void ifcvf_vdpa_get_config(struct vdpa_device *vdpa_dev,
-+				  unsigned int offset,
-+				  void *buf, unsigned int len)
-+{
-+	struct ifcvf_hw *vf =3D vdpa_to_vf(vdpa_dev);
-+
-+	WARN_ON(offset + len > sizeof(struct virtio_net_config));
-+	ifcvf_read_net_config(vf, offset, buf, len);
-+}
-+
-+static void ifcvf_vdpa_set_config(struct vdpa_device *vdpa_dev,
-+				  unsigned int offset, const void *buf,
-+				  unsigned int len)
-+{
-+	struct ifcvf_hw *vf =3D vdpa_to_vf(vdpa_dev);
-+
-+	WARN_ON(offset + len > sizeof(struct virtio_net_config));
-+	ifcvf_write_net_config(vf, offset, buf, len);
-+}
-+
-+static void ifcvf_vdpa_set_config_cb(struct vdpa_device *vdpa_dev,
-+				     struct vdpa_callback *cb)
-+{
-+	/* We don't support config interrupt */
-+}
-+
-+/*
-+ * IFCVF currently does't have on-chip IOMMU, so not
-+ * implemented set_map()/dma_map()/dma_unmap()
-+ */
-+static const struct vdpa_config_ops ifc_vdpa_ops =3D {
-+	.get_features	=3D ifcvf_vdpa_get_features,
-+	.set_features	=3D ifcvf_vdpa_set_features,
-+	.get_status	=3D ifcvf_vdpa_get_status,
-+	.set_status	=3D ifcvf_vdpa_set_status,
-+	.get_vq_num_max	=3D ifcvf_vdpa_get_vq_num_max,
-+	.get_vq_state	=3D ifcvf_vdpa_get_vq_state,
-+	.set_vq_state	=3D ifcvf_vdpa_set_vq_state,
-+	.set_vq_cb	=3D ifcvf_vdpa_set_vq_cb,
-+	.set_vq_ready	=3D ifcvf_vdpa_set_vq_ready,
-+	.get_vq_ready	=3D ifcvf_vdpa_get_vq_ready,
-+	.set_vq_num	=3D ifcvf_vdpa_set_vq_num,
-+	.set_vq_address	=3D ifcvf_vdpa_set_vq_address,
-+	.kick_vq	=3D ifcvf_vdpa_kick_vq,
-+	.get_generation	=3D ifcvf_vdpa_get_generation,
-+	.get_device_id	=3D ifcvf_vdpa_get_device_id,
-+	.get_vendor_id	=3D ifcvf_vdpa_get_vendor_id,
-+	.get_vq_align	=3D ifcvf_vdpa_get_vq_align,
-+	.get_config	=3D ifcvf_vdpa_get_config,
-+	.set_config	=3D ifcvf_vdpa_set_config,
-+	.set_config_cb  =3D ifcvf_vdpa_set_config_cb,
-+};
-+
-+static int ifcvf_init_msix(struct ifcvf_adapter *adapter)
-+{
-+	struct pci_dev *pdev =3D to_pci_dev(adapter->dev);
-+	struct ifcvf_hw *vf =3D &adapter->vf;
-+	int vector, i, ret, irq;
-+
-+	ret =3D pci_alloc_irq_vectors(pdev, IFCVF_MAX_INTR,
-+				    IFCVF_MAX_INTR, PCI_IRQ_MSIX);
-+	if (ret < 0) {
-+		IFCVF_ERR(adapter->dev, "Failed to alloc irq vectors\n");
-+		return ret;
-+	}
-+
-+	for (i =3D 0; i < IFCVF_MAX_QUEUE_PAIRS * 2; i++) {
-+		snprintf(vf->vring[i].msix_name, 256, "ifcvf[%s]-%d\n",
-+			 pci_name(pdev), i);
-+		vector =3D i + IFCVF_MSI_QUEUE_OFF;
-+		irq =3D pci_irq_vector(pdev, vector);
-+		vf->vring[i].irq =3D irq;
-+		ret =3D request_irq(irq, ifcvf_intr_handler, 0,
-+				  vf->vring[i].msix_name, &vf->vring[i]);
-+		if (ret) {
-+			IFCVF_ERR(adapter->dev,
-+				  "Failed to request irq for vq %d\n", i);
-+			goto irq_fail;
-+		}
-+	}
-+
-+	return 0;
-+
-+irq_fail:
-+	while (--i >=3D 0) {
-+		free_irq(vf->vring[i].irq, &vf->vring[i]);
-+		vf->vring[i].irq =3D 0;
-+	}
-+
-+	return ret;
-+
-+}
-+
-+static void ifcvf_destroy_adapter(struct ifcvf_adapter *adapter)
-+{
-+	struct ifcvf_hw *vf =3D ifcvf_private_to_vf(adapter);
-+	struct pci_dev *pdev =3D to_pci_dev(adapter->dev);
-+	int i, vector, irq;
-+
-+	for (i =3D 0; i < IFCVF_MAX_QUEUE_PAIRS * 2; i++) {
-+		vector =3D i + IFCVF_MSI_QUEUE_OFF;
-+		irq =3D pci_irq_vector(pdev, vector);
-+		free_irq(irq, &vf->vring[i]);
-+	}
-+}
-+
-+static int ifcvf_vdpa_attach(struct ifcvf_adapter *adapter)
-+{
-+	int ret;
-+
-+	adapter->vdpa_dev  =3D vdpa_alloc_device(adapter->dev, adapter->dev,
-+					       &ifc_vdpa_ops);
-+	if (IS_ERR(adapter->vdpa_dev)) {
-+		IFCVF_ERR(adapter->dev, "Failed to init ifcvf on vdpa bus");
-+		put_device(&adapter->vdpa_dev->dev);
-+		return -ENODEV;
-+	}
-+
-+	ret =3D vdpa_register_device(adapter->vdpa_dev);
-+	if (ret) {
-+		IFCVF_ERR(adapter->dev, "Failed to register ifcvf to vdpa bus");
-+		return ret;
-+	}
-+
-+	return 0;
-+}
-+static void ifcvf_vdpa_detach(struct ifcvf_adapter *adapter)
-+{
-+	vdpa_unregister_device(adapter->vdpa_dev);
-+}
-+
-+static int ifcvf_probe(struct pci_dev *pdev, const struct pci_device_id =
-*id)
-+{
-+	struct device *dev =3D &pdev->dev;
-+	struct ifcvf_adapter *adapter;
-+	struct ifcvf_hw *vf;
-+	int ret, i;
-+
-+	adapter =3D kzalloc(sizeof(struct ifcvf_adapter), GFP_KERNEL);
-+	if (adapter =3D=3D NULL) {
-+		ret =3D -ENOMEM;
-+		goto fail;
-+	}
-+
-+	adapter->dev =3D dev;
-+	pci_set_drvdata(pdev, adapter);
-+	ret =3D pci_enable_device(pdev);
-+	if (ret) {
-+		IFCVF_ERR(adapter->dev, "Failed to enable device\n");
-+		goto free_adapter;
-+	}
-+
-+	ret =3D pci_request_regions(pdev, IFCVF_DRIVER_NAME);
-+	if (ret) {
-+		IFCVF_ERR(adapter->dev, "Failed to request MMIO region\n");
-+		goto disable_device;
-+	}
-+
-+	pci_set_master(pdev);
-+	ret =3D ifcvf_init_msix(adapter);
-+	if (ret) {
-+		IFCVF_ERR(adapter->dev, "Failed to initialize MSI-X\n");
-+		goto free_msix;
-+	}
-+
-+	vf =3D &adapter->vf;
-+	for (i =3D 0; i < IFCVF_PCI_MAX_RESOURCE; i++) {
-+		vf->mem_resource[i].phys_addr =3D pci_resource_start(pdev, i);
-+		vf->mem_resource[i].len =3D pci_resource_len(pdev, i);
-+		if (!vf->mem_resource[i].len) {
-+			vf->mem_resource[i].addr =3D NULL;
-+			continue;
-+		}
-+
-+		vf->mem_resource[i].addr =3D pci_iomap_range(pdev, i, 0,
-+				vf->mem_resource[i].len);
-+		if (!vf->mem_resource[i].addr) {
-+			IFCVF_ERR(adapter->dev,
-+				  "Failed to map IO resource %d\n", i);
-+			ret =3D -EINVAL;
-+			goto free_msix;
-+		}
-+	}
-+
-+	if (ifcvf_init_hw(vf, pdev) < 0) {
-+		ret =3D -EINVAL;
-+		goto destroy_adapter;
-+	}
-+
-+	ret =3D dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(64));
-+	if (ret)
-+		ret =3D dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(32));
-+
-+	if (ret) {
-+		IFCVF_ERR(adapter->dev, "No usable DMA confiugration\n");
-+		ret =3D -EINVAL;
-+		goto destroy_adapter;
-+	}
-+
-+	ret =3D ifcvf_vdpa_attach(adapter);
-+	if (ret)
-+		goto destroy_adapter;
-+
-+	return 0;
-+
-+destroy_adapter:
-+	ifcvf_destroy_adapter(adapter);
-+free_msix:
-+	pci_free_irq_vectors(pdev);
-+	pci_release_regions(pdev);
-+disable_device:
-+	pci_disable_device(pdev);
-+free_adapter:
-+	kfree(adapter);
-+fail:
-+	return ret;
-+}
-+
-+static void ifcvf_remove(struct pci_dev *pdev)
-+{
-+	struct ifcvf_adapter *adapter =3D pci_get_drvdata(pdev);
-+	struct ifcvf_hw *vf;
-+	int i;
-+
-+	ifcvf_vdpa_detach(adapter);
-+	vf =3D &adapter->vf;
-+	for (i =3D 0; i < IFCVF_PCI_MAX_RESOURCE; i++) {
-+		if (vf->mem_resource[i].addr) {
-+			pci_iounmap(pdev, vf->mem_resource[i].addr);
-+			vf->mem_resource[i].addr =3D NULL;
-+		}
-+	}
-+
-+	ifcvf_destroy_adapter(adapter);
-+	pci_free_irq_vectors(pdev);
-+	pci_release_regions(pdev);
-+	pci_disable_device(pdev);
-+	kfree(adapter);
-+}
-+
-+static struct pci_device_id ifcvf_pci_ids[] =3D {
-+	{ PCI_DEVICE_SUB(IFCVF_VENDOR_ID,
-+		IFCVF_DEVICE_ID,
-+		IFCVF_SUBSYS_VENDOR_ID,
-+		IFCVF_SUBSYS_DEVICE_ID) },
-+	{ 0 },
-+};
-+MODULE_DEVICE_TABLE(pci, ifcvf_pci_ids);
-+
-+static struct pci_driver ifcvf_driver =3D {
-+	.name     =3D IFCVF_DRIVER_NAME,
-+	.id_table =3D ifcvf_pci_ids,
-+	.probe    =3D ifcvf_probe,
-+	.remove   =3D ifcvf_remove,
-+};
-+
-+module_pci_driver(ifcvf_driver);
-+
-+MODULE_LICENSE("GPL v2");
-+MODULE_VERSION(VERSION_STRING);
-diff --git a/drivers/virtio/virtio_vdpa.c b/drivers/virtio/virtio_vdpa.c
-index c30eb55030be..de64b88ee7e4 100644
---- a/drivers/virtio/virtio_vdpa.c
-+++ b/drivers/virtio/virtio_vdpa.c
-@@ -362,6 +362,7 @@ static int virtio_vdpa_probe(struct vdpa_device *vdpa=
-)
- 		goto err;
-=20
- 	vdpa_set_drvdata(vdpa, vd_dev);
-+	dev_info(vd_dev->vdev.dev.parent, "device attached to VDPA bus\n");
-=20
- 	return 0;
-=20
---=20
-2.20.1
+I don't think it's going to work well: if you make this per-CPU (not
+per-vCPU!) you'll have to deal with preemption which can actually
+happen (and then requests for different vCPUs and/or even VMs can
+collide).
+
+I think it would be better to *dynamically* (lazily?) allocate the
+buffer in 'struct kvm_vcpu_hv'.
+
+>   static u64 kvm_hv_flush_tlb(struct kvm_vcpu *current_vcpu, u64 ingpa,
+>   			    u16 rep_cnt, bool ex)
+>   {
+>   	struct kvm *kvm = current_vcpu->kvm;
+>   	struct kvm_vcpu_hv *hv_vcpu = &current_vcpu->arch.hyperv;
+> -	struct hv_tlb_flush_ex flush_ex;
+> -	struct hv_tlb_flush flush;
+> +	union hv_tlb_flush_type tlb_flush;
+>   	u64 vp_bitmap[KVM_HV_MAX_SPARSE_VCPU_SET_BITS];
+>   	DECLARE_BITMAP(vcpu_bitmap, KVM_MAX_VCPUS);
+>   	unsigned long *vcpu_mask;
+>   	u64 valid_bank_mask;
+> -	u64 sparse_banks[64];
+> +	u64 *sparse_banks = this_cpu_ptr(__hv_sparse_banks);
+>   	int sparse_banks_len;
+>   	bool all_cpus;
+>
+>   	if (!ex) {
+> -		if (unlikely(kvm_read_guest(kvm, ingpa, &flush, sizeof(flush))))
+> +		if (unlikely(kvm_read_guest(kvm, ingpa, &tlb_flush.flush,
+> +					    sizeof(tlb_flush.flush))))
+>   			return HV_STATUS_INVALID_HYPERCALL_INPUT;
+>
+> -		trace_kvm_hv_flush_tlb(flush.processor_mask,
+> -				       flush.address_space, flush.flags);
+> +		trace_kvm_hv_flush_tlb(tlb_flush.flush.processor_mask,
+> +				       tlb_flush.flush.address_space,
+> +				       tlb_flush.flush.flags);
+>
+>   		valid_bank_mask = BIT_ULL(0);
+> -		sparse_banks[0] = flush.processor_mask;
+> +		sparse_banks[0] = tlb_flush.flush.processor_mask;
+>
+>   		/*
+>   		 * Work around possible WS2012 bug: it sends hypercalls
+> @@ -1383,20 +1386,20 @@ static u64 kvm_hv_flush_tlb(struct kvm_vcpu 
+> *current_vcpu, u64 ingpa,
+>   		 * we don't. Let's treat processor_mask == 0 same as
+>   		 * HV_FLUSH_ALL_PROCESSORS.
+>   		 */
+> -		all_cpus = (flush.flags & HV_FLUSH_ALL_PROCESSORS) ||
+> -			flush.processor_mask == 0;
+> +		all_cpus = (tlb_flush.flush.flags & HV_FLUSH_ALL_PROCESSORS) ||
+> +			tlb_flush.flush.processor_mask == 0;
+>   	} else {
+> -		if (unlikely(kvm_read_guest(kvm, ingpa, &flush_ex,
+> -					    sizeof(flush_ex))))
+> +		if (unlikely(kvm_read_guest(kvm, ingpa, &tlb_flush.flush_ex,
+> +					    sizeof(tlb_flush.flush_ex))))
+>   			return HV_STATUS_INVALID_HYPERCALL_INPUT;
+>
+> -		trace_kvm_hv_flush_tlb_ex(flush_ex.hv_vp_set.valid_bank_mask,
+> -					  flush_ex.hv_vp_set.format,
+> -					  flush_ex.address_space,
+> -					  flush_ex.flags);
+> +		trace_kvm_hv_flush_tlb_ex(tlb_flush.flush_ex.hv_vp_set.valid_bank_mask,
+> +					  tlb_flush.flush_ex.hv_vp_set.format,
+> +					  tlb_flush.flush_ex.address_space,
+> +					  tlb_flush.flush_ex.flags);
+>
+> -		valid_bank_mask = flush_ex.hv_vp_set.valid_bank_mask;
+> -		all_cpus = flush_ex.hv_vp_set.format !=
+> +		valid_bank_mask = tlb_flush.flush_ex.hv_vp_set.valid_bank_mask;
+> +		all_cpus = tlb_flush.flush_ex.hv_vp_set.format !=
+>   			HV_GENERIC_SET_SPARSE_4K;
+>
+>   		sparse_banks_len =
+> @@ -1458,24 +1461,24 @@ static u64 kvm_hv_send_ipi(struct kvm_vcpu 
+> *current_vcpu, u64 ingpa, u64 outgpa,
+>   			   bool ex, bool fast)
+>   {
+>   	struct kvm *kvm = current_vcpu->kvm;
+> -	struct hv_send_ipi_ex send_ipi_ex;
+> -	struct hv_send_ipi send_ipi;
+> +	union hv_send_ipi_type hv_ipi;
+>   	u64 vp_bitmap[KVM_HV_MAX_SPARSE_VCPU_SET_BITS];
+>   	DECLARE_BITMAP(vcpu_bitmap, KVM_MAX_VCPUS);
+>   	unsigned long *vcpu_mask;
+>   	unsigned long valid_bank_mask;
+> -	u64 sparse_banks[64];
+> +	u64 *sparse_banks = this_cpu_ptr(__hv_sparse_banks);
+>   	int sparse_banks_len;
+>   	u32 vector;
+>   	bool all_cpus;
+>
+>   	if (!ex) {
+>   		if (!fast) {
+> -			if (unlikely(kvm_read_guest(kvm, ingpa, &send_ipi,
+> -						    sizeof(send_ipi))))
+> +			if (unlikely(kvm_read_guest(kvm, ingpa,
+> +						    &hv_ipi.send_ipi,
+> +						    sizeof(hv_ipi.send_ipi))))
+>   				return HV_STATUS_INVALID_HYPERCALL_INPUT;
+> -			sparse_banks[0] = send_ipi.cpu_mask;
+> -			vector = send_ipi.vector;
+> +			sparse_banks[0] = hv_ipi.send_ipi.cpu_mask;
+> +			vector = hv_ipi.send_ipi.vector;
+>   		} else {
+>   			/* 'reserved' part of hv_send_ipi should be 0 */
+>   			if (unlikely(ingpa >> 32 != 0))
+> @@ -1488,20 +1491,20 @@ static u64 kvm_hv_send_ipi(struct kvm_vcpu 
+> *current_vcpu, u64 ingpa, u64 outgpa,
+>
+>   		trace_kvm_hv_send_ipi(vector, sparse_banks[0]);
+>   	} else {
+> -		if (unlikely(kvm_read_guest(kvm, ingpa, &send_ipi_ex,
+> -					    sizeof(send_ipi_ex))))
+> +		if (unlikely(kvm_read_guest(kvm, ingpa, &hv_ipi.send_ipi_ex,
+> +					    sizeof(hv_ipi.send_ipi_ex))))
+>   			return HV_STATUS_INVALID_HYPERCALL_INPUT;
+>
+> -		trace_kvm_hv_send_ipi_ex(send_ipi_ex.vector,
+> -					 send_ipi_ex.vp_set.format,
+> -					 send_ipi_ex.vp_set.valid_bank_mask);
+> +		trace_kvm_hv_send_ipi_ex(hv_ipi.send_ipi_ex.vector,
+> +				hv_ipi.send_ipi_ex.vp_set.format,
+> +				hv_ipi.send_ipi_ex.vp_set.valid_bank_mask);
+>
+> -		vector = send_ipi_ex.vector;
+> -		valid_bank_mask = send_ipi_ex.vp_set.valid_bank_mask;
+> +		vector = hv_ipi.send_ipi_ex.vector;
+> +		valid_bank_mask = hv_ipi.send_ipi_ex.vp_set.valid_bank_mask;
+>   		sparse_banks_len = bitmap_weight(&valid_bank_mask, 64) *
+>   			sizeof(sparse_banks[0]);
+>
+> -		all_cpus = send_ipi_ex.vp_set.format == HV_GENERIC_SET_ALL;
+> +		all_cpus = hv_ipi.send_ipi_ex.vp_set.format == HV_GENERIC_SET_ALL;
+>
+>   		if (!sparse_banks_len)
+>   			goto ret_success;
+
+-- 
+Vitaly
 
