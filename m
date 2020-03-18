@@ -2,135 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4D40718A1AA
-	for <lists+kvm@lfdr.de>; Wed, 18 Mar 2020 18:39:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 328D818A285
+	for <lists+kvm@lfdr.de>; Wed, 18 Mar 2020 19:40:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726776AbgCRRjG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Mar 2020 13:39:06 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:21186 "EHLO
-        us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726506AbgCRRjE (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 18 Mar 2020 13:39:04 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1584553143;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=8ltahyOOW3gyw5hu5HKZgwII4enLzMRUQpOYTS+Rs5s=;
-        b=FklvOzYNTibxE2f3qRFgl6lzhNdmIMG1/6tXEXjOVfcImOTElNrwxi/xaPxeoCqcg9AmWW
-        i65SramMglYPHbUetvxm5SqE7NCNBglgd7xR5l4uBJGH2cfT22Ip3WuGBeXVzheqXZPdwk
-        4TyoKobv8qZyAk+UNpbEmr76pwEKhwg=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-50-Z3tSmAQgONm1YBlQomcxlg-1; Wed, 18 Mar 2020 13:39:01 -0400
-X-MC-Unique: Z3tSmAQgONm1YBlQomcxlg-1
-Received: by mail-wm1-f72.google.com with SMTP id f9so1351032wme.7
-        for <kvm@vger.kernel.org>; Wed, 18 Mar 2020 10:39:01 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=8ltahyOOW3gyw5hu5HKZgwII4enLzMRUQpOYTS+Rs5s=;
-        b=juMhehYotV5ByAIZwmXlkIM5oib6Jjish8Wf3iJrVpXr8nb/TQe4t3j6ktQKsCBtb5
-         dp+/75WWu0fHxJxBfBkL8evg+hb1IJQA9IofVdNANs2O6qX4g5hRtBg381sLrSFX5S3p
-         QvDBBmqEvt2ygyfA/Cp3M8hO9oTTHZ64GB0uwAZSQ8aLz/O7gqeKUrt7zl8zxuxjKBNt
-         jHt2RnURGnQHwIQRYzgXxza2f+7hzfoCw71Mydsry230caHSLNVvW9154pWrHBxWXti8
-         BVwO7donrHVCPs93Wn+/m8x7pceXZpFYg2c/l9a7JN0vtPJDcbH00MBCHMOExm0PUpoE
-         TD1Q==
-X-Gm-Message-State: ANhLgQ38XfLg+03X6EFd57khWWDN+ZTVDWtl06ahgPEYCdAG9Zo7QPMZ
-        FFTs6l/+Jbgo6GugJvITYCw9zXARd6MKd1MTZ9XfEFiH0K2LZRgdkVNFDi1H0bH/a8x8qmaUKTC
-        V1BTEW63fRUNH
-X-Received: by 2002:a05:600c:24c:: with SMTP id 12mr6260269wmj.119.1584553140455;
-        Wed, 18 Mar 2020 10:39:00 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vuYkHCYYMA4Xp4XlBoTwsVoafCfvFQAPbXylg2R+kbEgu+F7kEaGahXtLtVFBCfm2S5tlQlBQ==
-X-Received: by 2002:a05:600c:24c:: with SMTP id 12mr6260237wmj.119.1584553140189;
-        Wed, 18 Mar 2020 10:39:00 -0700 (PDT)
-Received: from [192.168.178.58] ([151.21.15.43])
-        by smtp.gmail.com with ESMTPSA id r3sm3775498wrm.35.2020.03.18.10.38.58
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 18 Mar 2020 10:38:59 -0700 (PDT)
-Subject: Re: [PATCH v2 31/32] KVM: nVMX: Don't flush TLB on nested VM
- transition with EPT enabled
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Ben Gardon <bgardon@google.com>,
-        Junaid Shahid <junaids@google.com>,
-        Liran Alon <liran.alon@oracle.com>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        John Haxby <john.haxby@oracle.com>,
-        Miaohe Lin <linmiaohe@huawei.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>
-References: <20200317045238.30434-1-sean.j.christopherson@intel.com>
- <20200317045238.30434-32-sean.j.christopherson@intel.com>
- <97f91b27-65ac-9187-6b60-184e1562d228@redhat.com>
- <20200317182251.GD12959@linux.intel.com>
- <218d4dbd-20f1-5bf8-ca44-c53dd9345dab@redhat.com>
- <20200318170241.GJ24357@linux.intel.com>
- <3c3a4d9b-b213-dfc0-2857-a975e9c20770@redhat.com>
- <20200318172614.GK24357@linux.intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <7661081d-6276-6176-dbbb-700aeec656b8@redhat.com>
-Date:   Wed, 18 Mar 2020 18:38:56 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+        id S1726733AbgCRSkV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Mar 2020 14:40:21 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:46722 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726506AbgCRSkV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 Mar 2020 14:40:21 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02IIcn3A042181;
+        Wed, 18 Mar 2020 18:40:17 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2020-01-29;
+ bh=sLjVWZvpMwWx2eXCxBSd4lEA29TaEzJvkHaAr3aH71E=;
+ b=OlTrfFpzt3wNpk/1TwUZrjzjw/A6/Py5RD/7zvESyQEJsQPI/2sVmo0WrxFhINidH4DS
+ p3ghzipq54NeyAjgm7G3LgstyyHx5nNqdCQUOdFY7KHI6rzZxOCJ961l0vS8WS+omfvy
+ DaOZw4Ui1QLXfD+xDsa/3KMuCDKdWixwIQD8YEb7y2dlI+aiV5qrdl+ThYKyTAc59zl3
+ +BdT8shtqFTshogdL5lRw47YfoY2prAD5WhviY8Ugx5BVjpSU0cPVfHJuLgLYBBB+56N
+ UW5ap7rhG/8UGmb1H90TlY5orXhfUDykYtvBcn8uYRa4d/27ok8A0p+EY4kK0VHHgeb4 oA== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by aserp2120.oracle.com with ESMTP id 2yrq7m49pf-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 18 Mar 2020 18:40:17 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02IIbe4b053965;
+        Wed, 18 Mar 2020 18:40:16 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+        by aserp3020.oracle.com with ESMTP id 2ys92has9y-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 18 Mar 2020 18:40:16 +0000
+Received: from abhmp0007.oracle.com (abhmp0007.oracle.com [141.146.116.13])
+        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 02IIeFAQ020988;
+        Wed, 18 Mar 2020 18:40:15 GMT
+Received: from localhost.localdomain (/10.159.130.178)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Wed, 18 Mar 2020 11:40:15 -0700
+Subject: Re: [PATCH] KVM: nSVM: check for EFER.SVME=1 before entering guest
+To:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+References: <1584535300-6571-1-git-send-email-pbonzini@redhat.com>
+From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Message-ID: <b5cb03b1-9840-f8f5-843a-1eab680d5e8e@oracle.com>
+Date:   Wed, 18 Mar 2020 11:40:07 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <20200318172614.GK24357@linux.intel.com>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <1584535300-6571-1-git-send-email-pbonzini@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9564 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 mlxlogscore=999
+ mlxscore=0 spamscore=0 bulkscore=0 adultscore=0 suspectscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2003180083
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9564 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 lowpriorityscore=0 suspectscore=0
+ adultscore=0 bulkscore=0 mlxlogscore=999 priorityscore=1501 clxscore=1015
+ malwarescore=0 mlxscore=0 phishscore=0 impostorscore=0 spamscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
+ definitions=main-2003180083
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 18/03/20 18:26, Sean Christopherson wrote:
->>>
->>> 	if (!nested_ept)
->>> 		kvm_mmu_new_cr3(vcpu, cr3, enable_ept ||
->>> 					   nested_cpu_has_vpid(vmcs12));
->>
->> ... which is exactly nested_has_guest_tlb_tag(vcpu).  Well, not exactly
->> but it's a bug in your code above. :)
+
+On 3/18/20 5:41 AM, Paolo Bonzini wrote:
+> EFER is set for L2 using svm_set_efer, which hardcodes EFER_SVME to 1 and hides
+> an incorrect value for EFER.SVME in the L1 VMCB.  Perform the check manually
+> to detect invalid guest state.
 >
-> I don't think it's a bug, it's intentionally different.  When enable_ept=0,
-> nested_has_guest_tlb_tag() returns true if and only if L1 has enabled VPID
-> for L2 *and* L2 has been assigned a unique VPID by L0.
-> 
-> For sync purposes, whether or not L2 has been assigned a unique VPID is
-> irrelevant.  L0 needs to invalidate TLB entries to prevent resuing L1's
-> entries (assuming L1 has been assigned a VPID), but L0 doesn't need to sync
-> SPTEs because L2 doesn't expect them to be refreshed.
-                ^^
-                L1
+> Reported-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>   arch/x86/kvm/svm.c | 3 +++
+>   1 file changed, 3 insertions(+)
+>
+> diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
+> index 08568ae9f7a1..2125c6ae5951 100644
+> --- a/arch/x86/kvm/svm.c
+> +++ b/arch/x86/kvm/svm.c
+> @@ -3558,6 +3558,9 @@ static bool nested_svm_vmrun_msrpm(struct vcpu_svm *svm)
+>   
+>   static bool nested_vmcb_checks(struct vmcb *vmcb)
+>   {
+> +	if ((vmcb->save.efer & EFER_SVME) == 0)
+> +		return false;
+> +
+>   	if ((vmcb->control.intercept & (1ULL << INTERCEPT_VMRUN)) == 0)
+>   		return false;
+>   
 
-Yes you're right.  So I would say keep your code, but we can simplify
-the comment.  Something like:
+Ah! This now tells me that I forgot the KVM fix that was supposed to 
+accompany my patchset.
 
-/*
- * We can skip the TLB flush if we have EPT enabled (because...)  and
- * also if L1 is using VPID, because then it doesn't expect SPTEs for L2
- * to be refreshed.
- *
- * This is almost the same as nested_has_guest_tlb_tag(vcpu), but here
- * we don't care if L2 has been assigned a unique VPID; L1 doesn't know,
- * and will nevertheless do INVVPID to avoid reuse of stale page
- * table entries.
- */
+Do we need this check in software ? I wasn't checking the bit in KVM and 
+instead I was just making sure that L0 sets that bit based on the 
+setting in nested vmcb:
 
-Nevertheless it's scary in that this is a potential attack vector for
-reusing stale L0 SPTEs, so we should make sure it's all properly commented.
 
-Thanks,
-
-Paolo
-
->> It completely makes sense to use that as the third argument, and while a
->> comment is still needed it will be much smaller.
-> Ya, agreed.
-> 
++static void nested_svm_set_efer(struct kvm_vcpu *vcpu, u64 
+nested_vmcb_efer)
++{
++       svm_set_efer(vcpu, nested_vmcb_efer);
++
++       if (!(nested_vmcb_efer & EFER_SVME))
++               to_svm(vcpu)->vmcb->save.efer &= ~EFER_SVME;
++}
++
+  static int is_external_interrupt(u32 info)
+  {
+         info &= SVM_EVTINJ_TYPE_MASK | SVM_EVTINJ_VALID;
+@@ -3554,7 +3562,7 @@ static void enter_svm_guest_mode(struct vcpu_svm 
+*svm, u64
+         svm->vmcb->save.gdtr = nested_vmcb->save.gdtr;
+         svm->vmcb->save.idtr = nested_vmcb->save.idtr;
+         kvm_set_rflags(&svm->vcpu, nested_vmcb->save.rflags);
+-       svm_set_efer(&svm->vcpu, nested_vmcb->save.efer);
++       nested_svm_set_efer(&svm->vcpu, nested_vmcb->save.efer);
+         svm_set_cr0(&svm->vcpu, nested_vmcb->save.cr0);
+         svm_set_cr4(&svm->vcpu, nested_vmcb->save.cr4);
+         if (npt_enabled) {
 
