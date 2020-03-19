@@ -2,77 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B55DA18ADB5
-	for <lists+kvm@lfdr.de>; Thu, 19 Mar 2020 08:55:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B4C0218ADF7
+	for <lists+kvm@lfdr.de>; Thu, 19 Mar 2020 09:08:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726998AbgCSHzR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Mar 2020 03:55:17 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:30604 "EHLO
+        id S1726592AbgCSIIr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Mar 2020 04:08:47 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:56252 "EHLO
         us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726151AbgCSHzP (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 19 Mar 2020 03:55:15 -0400
+        by vger.kernel.org with ESMTP id S1725895AbgCSIIr (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 19 Mar 2020 04:08:47 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1584604515;
+        s=mimecast20190719; t=1584605326;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=WrcEkZJ92O5FyyfklQyM4XRQPnUfp7MvJerL4+K+rPc=;
-        b=RGsb4yZyHRN5kkp62KbMJ9h/R1eWp6ypgOUPt9kWGcPKp8NxHHvwQqE7SOFmr/G/fpq4EF
-        ZDv5SurjcP8vzkpk75u+dLppHbXskauE4V1F84bEnYpyh2knk24UrzweFp9Xhy+CWXsIm5
-        9821Rxilq8qSghekceu3sFvLgAjMY4Q=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-492--rNErUqmN2iRoD2kcJJvaw-1; Thu, 19 Mar 2020 03:55:11 -0400
-X-MC-Unique: -rNErUqmN2iRoD2kcJJvaw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 31071801E70;
-        Thu, 19 Mar 2020 07:55:10 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.40.192.208])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 2238C60BF1;
-        Thu, 19 Mar 2020 07:54:55 +0000 (UTC)
-Date:   Thu, 19 Mar 2020 08:54:52 +0100
-From:   Andrew Jones <drjones@redhat.com>
-To:     Peter Xu <peterx@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Yan Zhao <yan.y.zhao@intel.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        Christophe de Dinechin <dinechin@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Kevin Tian <kevin.tian@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v7 14/14] KVM: selftests: Add "-c" parameter to dirty log
- test
-Message-ID: <20200319075452.eyykmtqt6e2etlc6@kamzik.brq.redhat.com>
-References: <20200318163720.93929-1-peterx@redhat.com>
- <20200318163720.93929-15-peterx@redhat.com>
+        bh=SlJrsOiPEFfP8xQL+2MTzWgFawZiNaS1jJXa4jmFhqA=;
+        b=iYlLg5hIVV2TyvX3y0YaBXJF//DSwwn78FJCDwDUvvV5v0JADbapACF6kEaI3Ysa+IO60M
+        jDGb8m3ODXoYLfvO+qXVuRu6Tm+3mmEZFCt+pXxq+jz4rEN9AoX4lt3Gc+qrEwWJ1bDJXg
+        qsGsRpcO+/uu61Lm7XNtbbZ5rZSidRU=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-100-lJgZ2d6BPTiKkytqLO5VmQ-1; Thu, 19 Mar 2020 04:08:44 -0400
+X-MC-Unique: lJgZ2d6BPTiKkytqLO5VmQ-1
+Received: by mail-wm1-f72.google.com with SMTP id m4so389599wmi.5
+        for <kvm@vger.kernel.org>; Thu, 19 Mar 2020 01:08:44 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=SlJrsOiPEFfP8xQL+2MTzWgFawZiNaS1jJXa4jmFhqA=;
+        b=AYBwOzEI+o4gdoPehWJhEOBXCzUmSIotha0QCrh5HK/CqRIWrKYvh8lc7JmKONa24M
+         JOAhdvrn7heMoXR41eH0fQiuV5JQTYG8kKHcUCSqLbs7/UpausVb2dO5N1xad1LIoCdR
+         ayQkhTI2zONmyR0BAUO6i010zgvFQYEZxkMkCMcs/yNr/QS8yVKpDDtE8VwWXM1s3yP1
+         3XrLBgctU7J1quaLmwvCxcnLP8xUX1nqqyYKRjAQm/CWEW71ehTTEA1mwsviuejOc0u2
+         jjdcGYSGvts2V2zmwpaZ8kt4nDR+y/LgYrOx5oCfDsDJewGN2nbAQCp20jIPRoaLoB8A
+         NlAA==
+X-Gm-Message-State: ANhLgQ1hl316dGbvCPKW27KGzWceqAgNzKsinwrGQS0HbJI8jwdtu1yZ
+        QG2gMPBto5TWfJ948ZNh6HcPQGHiLvs4QPMrtfI7M8fVLnn8bHjaTrF6a9+N97ZS74UpkHGacSU
+        zPuMm5IaADyO6
+X-Received: by 2002:a7b:c4cd:: with SMTP id g13mr2246557wmk.151.1584605322951;
+        Thu, 19 Mar 2020 01:08:42 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vuHul2WwD85TA8ajS4E+DeyZ8lqBhFZsQV3ofqPUzIbkGIIMM6eJzdwpfnX3UGfRPKInTOCMw==
+X-Received: by 2002:a7b:c4cd:: with SMTP id g13mr2246536wmk.151.1584605322742;
+        Thu, 19 Mar 2020 01:08:42 -0700 (PDT)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id r18sm2275564wro.13.2020.03.19.01.08.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 19 Mar 2020 01:08:42 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Jon Doron <arilou@gmail.com>
+Cc:     kvm@vger.kernel.org, linux-hyperv@vger.kernel.org
+Subject: Re: [PATCH v8 1/5] x86/kvm/hyper-v: Explicitly align hcall param for kvm_hyperv_exit
+In-Reply-To: <20200319063836.678562-2-arilou@gmail.com>
+References: <20200319063836.678562-1-arilou@gmail.com> <20200319063836.678562-2-arilou@gmail.com>
+Date:   Thu, 19 Mar 2020 09:08:41 +0100
+Message-ID: <87k13g22d2.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200318163720.93929-15-peterx@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 18, 2020 at 12:37:20PM -0400, Peter Xu wrote:
-> It's only used to override the existing dirty ring size/count.  If
-> with a bigger ring count, we test async of dirty ring.  If with a
-> smaller ring count, we test ring full code path.  Async is default.
-> 
-> It has no use for non-dirty-ring tests.
-> 
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-> ---
->  tools/testing/selftests/kvm/dirty_log_test.c | 13 ++++++++++---
->  1 file changed, 10 insertions(+), 3 deletions(-)
->
+Jon Doron <arilou@gmail.com> writes:
 
-Reviewed-by: Andrew Jones <drjones@redhat.com>
+> The problem the patch is trying to address is the fact that 'struct
+> kvm_hyperv_exit' has different layout on when compiling in 32 and 64 bit
+> modes.
+>
+> In 64-bit mode the default alignment boundary is 64 bits thus
+> forcing extra gaps after 'type' and 'msr' but in 32-bit mode the
+> boundary is at 32 bits thus no extra gaps.
+>
+> This is an issue as even when the kernel is 64 bit, the userspace using
+> the interface can be both 32 and 64 bit but the same 32 bit userspace has
+> to work with 32 bit kernel.
+>
+> The issue is fixed by forcing the 64 bit layout, this leads to ABI
+> change for 32 bit builds and while we are obviously breaking '32 bit
+> userspace with 32 bit kernel' case, we're fixing the '32 bit userspace
+> with 64 bit kernel' one.
+>
+> As the interface has no (known) users and 32 bit KVM is rather baroque
+> nowadays, this seems like a reasonable decision.
+>
+> Signed-off-by: Jon Doron <arilou@gmail.com>
+> ---
+>  Documentation/virt/kvm/api.rst | 2 ++
+>  include/uapi/linux/kvm.h       | 2 ++
+>  2 files changed, 4 insertions(+)
+>
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index ebd383fba939..4872c47bbcff 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -5025,9 +5025,11 @@ EOI was received.
+>    #define KVM_EXIT_HYPERV_SYNIC          1
+>    #define KVM_EXIT_HYPERV_HCALL          2
+>  			__u32 type;
+> +			__u32 pad1;
+>  			union {
+>  				struct {
+>  					__u32 msr;
+> +					__u32 pad2;
+>  					__u64 control;
+>  					__u64 evt_page;
+>  					__u64 msg_page;
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index 4b95f9a31a2f..7ee0ddc4c457 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -189,9 +189,11 @@ struct kvm_hyperv_exit {
+>  #define KVM_EXIT_HYPERV_SYNIC          1
+>  #define KVM_EXIT_HYPERV_HCALL          2
+>  	__u32 type;
+> +	__u32 pad1;
+>  	union {
+>  		struct {
+>  			__u32 msr;
+> +			__u32 pad2;
+>  			__u64 control;
+>  			__u64 evt_page;
+>  			__u64 msg_page;
+
+Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+
+-- 
+Vitaly
 
