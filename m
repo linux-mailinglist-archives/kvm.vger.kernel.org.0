@@ -2,110 +2,170 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 35B0D18B195
-	for <lists+kvm@lfdr.de>; Thu, 19 Mar 2020 11:35:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 999D918B1D6
+	for <lists+kvm@lfdr.de>; Thu, 19 Mar 2020 11:56:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727129AbgCSKfR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Mar 2020 06:35:17 -0400
-Received: from mail-io1-f71.google.com ([209.85.166.71]:51734 "EHLO
-        mail-io1-f71.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727064AbgCSKfR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 Mar 2020 06:35:17 -0400
-Received: by mail-io1-f71.google.com with SMTP id d1so1308957iod.18
-        for <kvm@vger.kernel.org>; Thu, 19 Mar 2020 03:35:16 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
-         :from:to;
-        bh=75IFSF+U0YhTbbRGzRYltGi5QkhePC6VgWPG6wybEig=;
-        b=ZWBfBaxV4D0dApl6tCjeRc7O/PWYL2QOpwz6SV3tQ24ZxjtFUt35+mYXzxVNqOx4dE
-         qTwVKBZfEr+dJktFWqF8446BNKbMfE/Mico7f0sb6/FzFdE12WsuCLpIq8jm4gYupmwu
-         R/4B88S3osUaa9+Q1m0OEiuoylMhtUFzwxdPFUBUDWY2qQjR3sJnHl628FJF18CV0caK
-         0/lizBgAgQt2/b4QwltkD4I6yoDqIvKYEqZLhKLJZuIgpJug+pWlbBykhiGcyCda6LCR
-         vyUlJRFOLDUibg+wzppHnIcxO5/Y4y+B2fEZnHYGIz2yx1jv5Gr3SQCyse163rrVDpwT
-         Caeg==
-X-Gm-Message-State: ANhLgQ3yp9rXVv2Mwi584IP1P9/CoBUztpfaOu6TyGwvXR4in9UG1vDA
-        G3x8x+klRtCSIxgTPHqhWAS5RsFXZ3jxOvMwt1M+4wsPgPdl
-X-Google-Smtp-Source: ADFU+vsdroRqSLGN56Cc3Nn2W+BmUiajwugkafWJeacGc4vIpO1oUXD2MhjHgSjlm5KXkDc//S5OUmRIgWgxDpDverVTVgn3ZG4F
+        id S1727102AbgCSK4C (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Mar 2020 06:56:02 -0400
+Received: from mail.kernel.org ([198.145.29.99]:37262 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726785AbgCSK4C (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 Mar 2020 06:56:02 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 37C3A20752;
+        Thu, 19 Mar 2020 10:56:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1584615361;
+        bh=FgL+vAAVjsz7UBPASMA+6v+M3lCJAwKJ3E3l89+r2xk=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=xEgMD21+sF/isioXATJ90/m2wi0y1eRKeruTMs8rk9CD1Q9iumXQAdXmWUS4B/RRd
+         2Pg+TkmzhNP7c2ra6Akbn061od5ZXeDR2Wk54YMhNqPJefcJMb2XGDcsB2JHpKbS6w
+         qxW/nfnI4iwDHFmUPTI+FYcBjJkfVWLyVAQM+xHQ=
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+        by disco-boy.misterjones.org with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        (Exim 4.92)
+        (envelope-from <maz@kernel.org>)
+        id 1jEsqF-00Duty-9Q; Thu, 19 Mar 2020 10:55:59 +0000
 MIME-Version: 1.0
-X-Received: by 2002:a92:dad0:: with SMTP id o16mr2312812ilq.27.1584614116260;
- Thu, 19 Mar 2020 03:35:16 -0700 (PDT)
-Date:   Thu, 19 Mar 2020 03:35:16 -0700
-In-Reply-To: <000000000000f965b8059877e5e6@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000081861f05a132b9cd@google.com>
-Subject: Re: WARNING in vcpu_enter_guest
-From:   syzbot <syzbot+00be5da1d75f1cc95f6b@syzkaller.appspotmail.com>
-To:     bp@alien8.de, hpa@zytor.com, jmattson@google.com, joro@8bytes.org,
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date:   Thu, 19 Mar 2020 10:55:59 +0000
+From:   Marc Zyngier <maz@kernel.org>
+To:     Zenghui Yu <yuzenghui@huawei.com>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        mingo@redhat.com, pbonzini@redhat.com, rkrcmar@redhat.com,
-        sean.j.christopherson@intel.com, syzkaller-bugs@googlegroups.com,
-        tglx@linutronix.de, vkuznets@redhat.com, wanpengli@tencent.com,
-        x86@kernel.org
-Content-Type: text/plain; charset="UTF-8"
+        Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
+        Jason Cooper <jason@lakedaemon.net>,
+        Robert Richter <rrichter@marvell.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Eric Auger <eric.auger@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>
+Subject: Re: [PATCH v5 16/23] irqchip/gic-v4.1: Eagerly vmap vPEs
+In-Reply-To: <2817cb89-4cc2-549f-6e40-91d941aa8a5f@huawei.com>
+References: <20200304203330.4967-1-maz@kernel.org>
+ <20200304203330.4967-17-maz@kernel.org>
+ <2817cb89-4cc2-549f-6e40-91d941aa8a5f@huawei.com>
+Message-ID: <d45e7ddfd51d4d8229e02efc42c8da04@kernel.org>
+X-Sender: maz@kernel.org
+User-Agent: Roundcube Webmail/1.3.10
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, lorenzo.pieralisi@arm.com, jason@lakedaemon.net, rrichter@marvell.com, tglx@linutronix.de, eric.auger@redhat.com, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-syzbot has found a reproducer for the following crash on:
+On 2020-03-17 02:49, Zenghui Yu wrote:
+> Hi Marc,
+> 
+> On 2020/3/5 4:33, Marc Zyngier wrote:
+>> Now that we have HW-accelerated SGIs being delivered to VPEs, it
+>> becomes required to map the VPEs on all ITSs instead of relying
+>> on the lazy approach that we would use when using the ITS-list
+>> mechanism.
+>> 
+>> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> 
+> Before GICv4.1, we use vlpi_count to evaluate whether the vPE has been
+> mapped on the specified ITS, and use this refcount to only issue VMOVP
+> to those involved ITSes. It's broken after this patch.
+> 
+> We may need to re-evaluate "whether the vPE is mapped" now that we're 
+> at
+> GICv4.1, otherwise *no* VMOVP will be issued on the v4.1 capable 
+> machine
+> (I mean those without single VMOVP support).
+> 
+> What I'm saying is something like below (only an idea, it even can't
+> compile), any thoughts?
+> 
+> 
+> diff --git a/drivers/irqchip/irq-gic-v3-its.c 
+> b/drivers/irqchip/irq-gic-v3-its.c
+> index 2e12bc52e3a2..3450b5e847ca 100644
+> --- a/drivers/irqchip/irq-gic-v3-its.c
+> +++ b/drivers/irqchip/irq-gic-v3-its.c
+> @@ -198,7 +198,8 @@ static u16 get_its_list(struct its_vm *vm)
+>  		if (!is_v4(its))
+>  			continue;
+> 
+> -		if (vm->vlpi_count[its->list_nr])
+> +		if (vm->vlpi_count[its->list_nr] ||
+> +		    gic_requires_eager_mapping())
+>  			__set_bit(its->list_nr, &its_list);
+>  	}
+> 
+> @@ -1295,7 +1296,8 @@ static void its_send_vmovp(struct its_vpe *vpe)
+>  		if (!is_v4(its))
+>  			continue;
+> 
+> -		if (!vpe->its_vm->vlpi_count[its->list_nr])
+> +		if (!vpe->its_vm->vlpi_count[its->list_nr] &&
+> +		    !gic_requires_eager_mapping())
+>  			continue;
+> 
+>  		desc.its_vmovp_cmd.col = &its->collections[col_id];
 
-HEAD commit:    5076190d mm: slub: be more careful about the double cmpxch..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=143ca61de00000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=9f894bd92023de02
-dashboard link: https://syzkaller.appspot.com/bug?extid=00be5da1d75f1cc95f6b
-compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=10bb4023e00000
+It took me a while to wrap my head around that one, but you're as usual 
+spot on.
 
-IMPORTANT: if you fix the bug, please add the following tag to the commit:
-Reported-by: syzbot+00be5da1d75f1cc95f6b@syzkaller.appspotmail.com
+The use of gic_requires_eager_mapping() is a bit confusing here, as it 
+isn't
+so much that the VPE is eagerly mapped, but the predicate on which we 
+evaluate
+the need for a VMOVP. How about this:
 
-------------[ cut here ]------------
-WARNING: CPU: 0 PID: 9833 at arch/x86/kvm/x86.c:2447 kvm_guest_time_update arch/x86/kvm/x86.c:2447 [inline]
-WARNING: CPU: 0 PID: 9833 at arch/x86/kvm/x86.c:2447 vcpu_enter_guest+0x3cf3/0x6120 arch/x86/kvm/x86.c:8175
-Kernel panic - not syncing: panic_on_warn set ...
-CPU: 0 PID: 9833 Comm: syz-executor.0 Not tainted 5.6.0-rc6-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-Call Trace:
- __dump_stack lib/dump_stack.c:77 [inline]
- dump_stack+0x188/0x20d lib/dump_stack.c:118
- panic+0x2e3/0x75c kernel/panic.c:221
- __warn.cold+0x2f/0x35 kernel/panic.c:582
- report_bug+0x27b/0x2f0 lib/bug.c:195
- fixup_bug arch/x86/kernel/traps.c:174 [inline]
- fixup_bug arch/x86/kernel/traps.c:169 [inline]
- do_error_trap+0x12b/0x220 arch/x86/kernel/traps.c:267
- do_invalid_op+0x32/0x40 arch/x86/kernel/traps.c:286
- invalid_op+0x23/0x30 arch/x86/entry/entry_64.S:1027
-RIP: 0010:kvm_guest_time_update arch/x86/kvm/x86.c:2447 [inline]
-RIP: 0010:vcpu_enter_guest+0x3cf3/0x6120 arch/x86/kvm/x86.c:8175
-Code: f3 7e 0f 94 c3 31 ff 89 de e8 d9 03 64 00 84 db 0f 84 62 ea ff ff e8 9c 02 64 00 e8 fb 43 f2 ff e9 53 ea ff ff e8 8d 02 64 00 <0f> 0b e9 e7 dc ff ff e8 81 02 64 00 bf 00 94 35 77 45 31 e4 4c 69
-RSP: 0018:ffffc900024afb50 EFLAGS: 00010293
-RAX: ffff888097b88040 RBX: fffffffffffff8d2 RCX: ffffffff810dff78
-RDX: 0000000000000000 RSI: ffffffff810e2293 RDI: 0000000000000007
-RBP: ffffc900024afcc0 R08: ffff888097b88040 R09: fffffbfff180e58f
-R10: fffffbfff180e58e R11: ffffffff8c072c77 R12: 0000000000000000
-R13: ffffc90002521000 R14: ffff88808e620378 R15: ffff88808e620340
- vcpu_run arch/x86/kvm/x86.c:8513 [inline]
- kvm_arch_vcpu_ioctl_run+0x41c/0x1790 arch/x86/kvm/x86.c:8735
- kvm_vcpu_ioctl+0x493/0xe60 arch/x86/kvm/../../../virt/kvm/kvm_main.c:2932
- vfs_ioctl fs/ioctl.c:47 [inline]
- ksys_ioctl+0x11a/0x180 fs/ioctl.c:763
- __do_sys_ioctl fs/ioctl.c:772 [inline]
- __se_sys_ioctl fs/ioctl.c:770 [inline]
- __x64_sys_ioctl+0x6f/0xb0 fs/ioctl.c:770
- do_syscall_64+0xf6/0x7d0 arch/x86/entry/common.c:294
- entry_SYSCALL_64_after_hwframe+0x49/0xbe
-RIP: 0033:0x45c849
-Code: ad b6 fb ff c3 66 2e 0f 1f 84 00 00 00 00 00 66 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 0f 83 7b b6 fb ff c3 66 2e 0f 1f 84 00 00 00 00
-RSP: 002b:00007f5029f2ec78 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 00007f5029f2f6d4 RCX: 000000000045c849
-RDX: 0000000000000000 RSI: 000000000000ae80 RDI: 0000000000000005
-RBP: 000000000076bf00 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 00000000ffffffff
-R13: 00000000000003be R14: 00000000004c647e R15: 000000000076bf0c
-Kernel Offset: disabled
-Rebooting in 86400 seconds..
+diff --git a/drivers/irqchip/irq-gic-v3-its.c 
+b/drivers/irqchip/irq-gic-v3-its.c
+index cd6451e190c9..348f7a909a69 100644
+--- a/drivers/irqchip/irq-gic-v3-its.c
++++ b/drivers/irqchip/irq-gic-v3-its.c
+@@ -189,6 +189,15 @@ static DEFINE_IDA(its_vpeid_ida);
+  #define gic_data_rdist_rd_base()	(gic_data_rdist()->rd_base)
+  #define gic_data_rdist_vlpi_base()	(gic_data_rdist_rd_base() + SZ_128K)
 
++/*
++ * Skip ITSs that have no vLPIs mapped, unless we're on GICv4.1, as we
++ * always have vSGIs mapped.
++ */
++static bool require_its_list_vmovp(struct its_vm *vm, struct its_node 
+*its)
++{
++	return (gic_rdists->has_rvpeid || vm->vlpi_count[its->list_nr]);
++}
++
+  static u16 get_its_list(struct its_vm *vm)
+  {
+  	struct its_node *its;
+@@ -198,7 +207,7 @@ static u16 get_its_list(struct its_vm *vm)
+  		if (!is_v4(its))
+  			continue;
+
+-		if (vm->vlpi_count[its->list_nr])
++		if (require_its_list_vmovp(vm, its))
+  			__set_bit(its->list_nr, &its_list);
+  	}
+
+@@ -1295,7 +1304,7 @@ static void its_send_vmovp(struct its_vpe *vpe)
+  		if (!is_v4(its))
+  			continue;
+
+-		if (!vpe->its_vm->vlpi_count[its->list_nr])
++		if (!require_its_list_vmovp(vpe->its_vm, its))
+  			continue;
+
+  		desc.its_vmovp_cmd.col = &its->collections[col_id];
+
+
+Thanks,
+
+         M.
+-- 
+Jazz is not dead. It just smells funny...
