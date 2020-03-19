@@ -2,144 +2,176 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 97F1C18C0D3
-	for <lists+kvm@lfdr.de>; Thu, 19 Mar 2020 20:52:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C3BB418C10A
+	for <lists+kvm@lfdr.de>; Thu, 19 Mar 2020 21:11:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727471AbgCSTwp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Mar 2020 15:52:45 -0400
-Received: from mail.kernel.org ([198.145.29.99]:34816 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725787AbgCSTwp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 Mar 2020 15:52:45 -0400
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 19B8A206D7;
-        Thu, 19 Mar 2020 19:52:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1584647564;
-        bh=UMFRuMeWN29pb4882uOYxANHVABCplgj+koAb1z+2dE=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=qkSTKb4utIarMQd8CDJcC0r66jjv4E6Grgajl0GaZ2NsWZFpgnSsxvNw5d1trhyVf
-         m/hfAowH8zpNjr3UjCBAXtljDdoHJ8gci0Db/rlJFpoF62Ej37wABUnI3eg2J6bWh9
-         n0uwur1NEU7m4GqQdTUpOURPTJro6MWBSuqnHrzk=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
-        by disco-boy.misterjones.org with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.92)
-        (envelope-from <maz@kernel.org>)
-        id 1jF1Dd-00E46F-Ts; Thu, 19 Mar 2020 19:52:42 +0000
+        id S1727108AbgCSULX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Mar 2020 16:11:23 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:36560 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725747AbgCSULX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 Mar 2020 16:11:23 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02JK9AFZ113610;
+        Thu, 19 Mar 2020 20:11:19 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2020-01-29;
+ bh=crgG96nAJeU59nO4ZUu6PGmEfdz+veKrExSouQv8J/o=;
+ b=pQN4U8dmY9qDkwm7viNZ/u4sXdeTrxTM/+lka8bINYOsmhcQqHwod0D7vYOjwOOW+1I/
+ 3xzaEpUmOngCW6KXLyLRaOJKgXl+aHRSZlhMlAGrsLcnlWWUgWsSUreRhuhJd9QCb9IX
+ NrRjkjPSzqu8wKceJOi6VoSRm79JCTnCLkOqerYTwBRWAOv3FrkBFpD+phQdVgsEBsye
+ ne9+0KTsSm9R4YX+YxOrijlR2zSzBwSZNGilhxN2COAYNuicVF09yrXh74YRUdYPs2qt
+ TaqFKd7HC6OD47gm4uxyRwr0ZSOcYRgwWiPxI66BokGgqSR+A8gYkS5wBwa544sRiITz Yw== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by userp2130.oracle.com with ESMTP id 2yrpprjhbb-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 19 Mar 2020 20:11:18 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02JJwZOY094548;
+        Thu, 19 Mar 2020 20:11:18 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by userp3020.oracle.com with ESMTP id 2ys904vuu1-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 19 Mar 2020 20:11:18 +0000
+Received: from abhmp0019.oracle.com (abhmp0019.oracle.com [141.146.116.25])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 02JKBHu2024184;
+        Thu, 19 Mar 2020 20:11:17 GMT
+Received: from localhost.localdomain (/10.65.178.104)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Thu, 19 Mar 2020 13:11:17 -0700
+Subject: Re: [PATCH] KVM: nVMX: remove side effects from
+ nested_vmx_exit_reflected
+To:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     vkuznets@redhat.com, sean.j.christopherson@intel.com
+References: <1584468059-3585-1-git-send-email-pbonzini@redhat.com>
+From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Message-ID: <4aa41614-51f0-7e4f-57b6-0e15329036a5@oracle.com>
+Date:   Thu, 19 Mar 2020 13:11:14 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
+In-Reply-To: <1584468059-3585-1-git-send-email-pbonzini@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Date:   Thu, 19 Mar 2020 19:52:41 +0000
-From:   Marc Zyngier <maz@kernel.org>
-To:     Auger Eric <eric.auger@redhat.com>
-Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
-        Jason Cooper <jason@lakedaemon.net>,
-        Robert Richter <rrichter@marvell.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: Re: [PATCH v5 19/23] KVM: arm64: GICv4.1: Allow SGIs to switch
- between HW and SW interrupts
-In-Reply-To: <8a6cf87a-7eee-5502-3b54-093ea0ab5e2d@redhat.com>
-References: <20200304203330.4967-1-maz@kernel.org>
- <20200304203330.4967-20-maz@kernel.org>
- <8a6cf87a-7eee-5502-3b54-093ea0ab5e2d@redhat.com>
-Message-ID: <877ba4711c6b9456314ea580b9c4718c@kernel.org>
-X-Sender: maz@kernel.org
-User-Agent: Roundcube Webmail/1.3.10
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: eric.auger@redhat.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, lorenzo.pieralisi@arm.com, jason@lakedaemon.net, rrichter@marvell.com, tglx@linutronix.de, yuzenghui@huawei.com, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Language: en-US
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9565 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 mlxlogscore=999 mlxscore=0
+ adultscore=0 bulkscore=0 malwarescore=0 spamscore=0 suspectscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
+ definitions=main-2003190083
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9565 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 bulkscore=0
+ suspectscore=0 lowpriorityscore=0 phishscore=0 adultscore=0 clxscore=1015
+ impostorscore=0 priorityscore=1501 spamscore=0 mlxlogscore=999 mlxscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
+ definitions=main-2003190083
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Eric,
 
-On 2020-03-19 16:16, Auger Eric wrote:
-> Hi Marc,
-> 
-> On 3/4/20 9:33 PM, Marc Zyngier wrote:
->> In order to let a guest buy in the new, active-less SGIs, we
->> need to be able to switch between the two modes.
->> 
->> Handle this by stopping all guest activity, transfer the state
->> from one mode to the other, and resume the guest. Nothing calls
->> this code so far, but a later patch will plug it into the MMIO
->> emulation.
->> 
->> Signed-off-by: Marc Zyngier <maz@kernel.org>
->> ---
->>  include/kvm/arm_vgic.h      |  3 ++
->>  virt/kvm/arm/vgic/vgic-v4.c | 94 
->> +++++++++++++++++++++++++++++++++++++
->>  virt/kvm/arm/vgic/vgic.h    |  1 +
->>  3 files changed, 98 insertions(+)
->> 
->> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
->> index 63457908c9c4..69f4164d6477 100644
->> --- a/include/kvm/arm_vgic.h
->> +++ b/include/kvm/arm_vgic.h
->> @@ -231,6 +231,9 @@ struct vgic_dist {
->>  	/* distributor enabled */
->>  	bool			enabled;
->> 
->> +	/* Wants SGIs without active state */
->> +	bool			nassgireq;
->> +
->>  	struct vgic_irq		*spis;
->> 
->>  	struct vgic_io_device	dist_iodev;
->> diff --git a/virt/kvm/arm/vgic/vgic-v4.c b/virt/kvm/arm/vgic/vgic-v4.c
->> index c2fcde104ea2..a65dc1c85363 100644
->> --- a/virt/kvm/arm/vgic/vgic-v4.c
->> +++ b/virt/kvm/arm/vgic/vgic-v4.c
->> @@ -97,6 +97,100 @@ static irqreturn_t vgic_v4_doorbell_handler(int 
->> irq, void *info)
->>  	return IRQ_HANDLED;
->>  }
->> 
->> +static void vgic_v4_sync_sgi_config(struct its_vpe *vpe, struct 
->> vgic_irq *irq)
->> +{
->> +	vpe->sgi_config[irq->intid].enabled	= irq->enabled;
->> +	vpe->sgi_config[irq->intid].group 	= irq->group;
->> +	vpe->sgi_config[irq->intid].priority	= irq->priority;
->> +}
->> +
->> +static void vgic_v4_enable_vsgis(struct kvm_vcpu *vcpu)
->> +{
->> +	struct its_vpe *vpe = &vcpu->arch.vgic_cpu.vgic_v3.its_vpe;
->> +	int i;
->> +
->> +	/*
->> +	 * With GICv4.1, every virtual SGI can be directly injected. So
->> +	 * let's pretend that they are HW interrupts, tied to a host
->> +	 * IRQ. The SGI code will do its magic.
->> +	 */
->> +	for (i = 0; i < VGIC_NR_SGIS; i++) {
->> +		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, i);
->> +		struct irq_desc *desc;
->> +		int ret;
-> Is is safe without holding the irq->irq_lock?
-
-The assumption here is that we're coming vgic_v4_configure_vsgis(), 
-which starts
-by stopping the whole guest. My guess is that it should be safe enough, 
-but
-maybe you are thinking of something else?
-
-Thanks,
-
-          M.
--- 
-Jazz is not dead. It just smells funny...
+On 3/17/20 11:00 AM, Paolo Bonzini wrote:
+> The name of nested_vmx_exit_reflected suggests that it's purely
+> a test, but it actually marks VMCS12 pages as dirty.  Move this to
+> vmx_handle_exit, observing that the initial nested_run_pending check in
+> nested_vmx_exit_reflected is pointless---nested_run_pending has just
+> been cleared in vmx_vcpu_run and won't be set until handle_vmlaunch
+> or handle_vmresume.
+>
+> Suggested-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>   arch/x86/kvm/vmx/nested.c | 18 ++----------------
+>   arch/x86/kvm/vmx/nested.h |  1 +
+>   arch/x86/kvm/vmx/vmx.c    | 19 +++++++++++++++++--
+>   3 files changed, 20 insertions(+), 18 deletions(-)
+>
+> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> index 8578513907d7..4ff859c99946 100644
+> --- a/arch/x86/kvm/vmx/nested.c
+> +++ b/arch/x86/kvm/vmx/nested.c
+> @@ -3527,7 +3527,7 @@ static void vmcs12_save_pending_event(struct kvm_vcpu *vcpu,
+>   }
+>   
+>   
+> -static void nested_mark_vmcs12_pages_dirty(struct kvm_vcpu *vcpu)
+> +void nested_mark_vmcs12_pages_dirty(struct kvm_vcpu *vcpu)
+>   {
+>   	struct vmcs12 *vmcs12 = get_vmcs12(vcpu);
+>   	gfn_t gfn;
+> @@ -5543,8 +5543,7 @@ bool nested_vmx_exit_reflected(struct kvm_vcpu *vcpu, u32 exit_reason)
+>   	struct vcpu_vmx *vmx = to_vmx(vcpu);
+>   	struct vmcs12 *vmcs12 = get_vmcs12(vcpu);
+>   
+> -	if (vmx->nested.nested_run_pending)
+> -		return false;
+> +	WARN_ON_ONCE(vmx->nested.nested_run_pending);
+>   
+>   	if (unlikely(vmx->fail)) {
+>   		trace_kvm_nested_vmenter_failed(
+> @@ -5553,19 +5552,6 @@ bool nested_vmx_exit_reflected(struct kvm_vcpu *vcpu, u32 exit_reason)
+>   		return true;
+>   	}
+>   
+> -	/*
+> -	 * The host physical addresses of some pages of guest memory
+> -	 * are loaded into the vmcs02 (e.g. vmcs12's Virtual APIC
+> -	 * Page). The CPU may write to these pages via their host
+> -	 * physical address while L2 is running, bypassing any
+> -	 * address-translation-based dirty tracking (e.g. EPT write
+> -	 * protection).
+> -	 *
+> -	 * Mark them dirty on every exit from L2 to prevent them from
+> -	 * getting out of sync with dirty tracking.
+> -	 */
+> -	nested_mark_vmcs12_pages_dirty(vcpu);
+> -
+>   	trace_kvm_nested_vmexit(kvm_rip_read(vcpu), exit_reason,
+>   				vmcs_readl(EXIT_QUALIFICATION),
+>   				vmx->idt_vectoring_info,
+> diff --git a/arch/x86/kvm/vmx/nested.h b/arch/x86/kvm/vmx/nested.h
+> index 21d36652f213..f70968b76d33 100644
+> --- a/arch/x86/kvm/vmx/nested.h
+> +++ b/arch/x86/kvm/vmx/nested.h
+> @@ -33,6 +33,7 @@ void nested_vmx_vmexit(struct kvm_vcpu *vcpu, u32 exit_reason,
+>   int get_vmx_mem_address(struct kvm_vcpu *vcpu, unsigned long exit_qualification,
+>   			u32 vmx_instruction_info, bool wr, int len, gva_t *ret);
+>   void nested_vmx_pmu_entry_exit_ctls_update(struct kvm_vcpu *vcpu);
+> +void nested_mark_vmcs12_pages_dirty(struct kvm_vcpu *vcpu);
+>   bool nested_vmx_check_io_bitmaps(struct kvm_vcpu *vcpu, unsigned int port,
+>   				 int size);
+>   
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index b447d66f44e6..07299a957d4a 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -5851,8 +5851,23 @@ static int vmx_handle_exit(struct kvm_vcpu *vcpu,
+>   	if (vmx->emulation_required)
+>   		return handle_invalid_guest_state(vcpu);
+>   
+> -	if (is_guest_mode(vcpu) && nested_vmx_exit_reflected(vcpu, exit_reason))
+> -		return nested_vmx_reflect_vmexit(vcpu, exit_reason);
+> +	if (is_guest_mode(vcpu)) {
+> +		/*
+> +		 * The host physical addresses of some pages of guest memory
+> +		 * are loaded into the vmcs02 (e.g. vmcs12's Virtual APIC
+> +		 * Page). The CPU may write to these pages via their host
+> +		 * physical address while L2 is running, bypassing any
+> +		 * address-translation-based dirty tracking (e.g. EPT write
+> +		 * protection).
+> +		 *
+> +		 * Mark them dirty on every exit from L2 to prevent them from
+> +		 * getting out of sync with dirty tracking.
+> +		 */
+> +		nested_mark_vmcs12_pages_dirty(vcpu);
+> +
+> +		if (nested_vmx_exit_reflected(vcpu, exit_reason))
+> +			return nested_vmx_reflect_vmexit(vcpu, exit_reason);
+> +	}
+>   
+>   	if (exit_reason & VMX_EXIT_REASONS_FAILED_VMENTRY) {
+>   		dump_vmcs();
+Reviewed-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
