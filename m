@@ -2,28 +2,28 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 80F2418ACD0
-	for <lists+kvm@lfdr.de>; Thu, 19 Mar 2020 07:35:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 29E1F18ACD2
+	for <lists+kvm@lfdr.de>; Thu, 19 Mar 2020 07:35:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727011AbgCSGfb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Mar 2020 02:35:31 -0400
-Received: from mga01.intel.com ([192.55.52.88]:51299 "EHLO mga01.intel.com"
+        id S1727154AbgCSGfk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Mar 2020 02:35:40 -0400
+Received: from mga18.intel.com ([134.134.136.126]:53786 "EHLO mga18.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725812AbgCSGfa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 Mar 2020 02:35:30 -0400
-IronPort-SDR: jAqTvka35ViE+GAudoZ/cQaT25DXIoZPuRaNUSHWRYZTDSlA31jziqYiK0+UCW/ux9Vw/SzvCI
- P7O59klnAFsQ==
+        id S1727083AbgCSGfk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 Mar 2020 02:35:40 -0400
+IronPort-SDR: uN70BF67evq3fYIOzWXYrvPcgwYfO6elXpxF4mw3jyNrYXI6j3GParuuDhjplExTyO8VcCgoBh
+ ICM546pLLQcA==
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Mar 2020 23:35:30 -0700
-IronPort-SDR: JjJIFAbFGye2coKeGQkBdUKDRzZ8ruE0DyVb+H5EoqBg/iQ1rysMNE1vEQvWG+R1YVs0y+Ffo6
- MZGgRTdhYMnA==
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Mar 2020 23:35:39 -0700
+IronPort-SDR: mO6BQX3Nubr+1jnwsgXjApcFxUDYoktBvcVK/l5I75yXI3q9hhvDsIoE62AI6hXhjSQ8r+nluz
+ bZOVt17vDFQA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.70,570,1574150400"; 
-   d="scan'208";a="248439070"
+   d="scan'208";a="248439100"
 Received: from snr.bj.intel.com ([10.240.193.90])
-  by orsmga006.jf.intel.com with ESMTP; 18 Mar 2020 23:35:24 -0700
+  by orsmga006.jf.intel.com with ESMTP; 18 Mar 2020 23:35:33 -0700
 From:   Luwei Kang <luwei.kang@intel.com>
 To:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     peterz@infradead.org, mingo@redhat.com, acme@kernel.org,
@@ -35,54 +35,110 @@ Cc:     peterz@infradead.org, mingo@redhat.com, acme@kernel.org,
         pawan.kumar.gupta@linux.intel.com, ak@linux.intel.com,
         thomas.lendacky@amd.com, fenghua.yu@intel.com,
         kan.liang@linux.intel.com, Luwei Kang <luwei.kang@intel.com>
-Subject: [PATCH v2 0/5] PEBS virtualization enabling via Intel PT
-Date:   Thu, 19 Mar 2020 22:33:45 +0800
-Message-Id: <1584628430-23220-1-git-send-email-luwei.kang@intel.com>
+Subject: [PATCH v2 1/5] KVM: x86/pmu: Add base address parameter for get_fixed_pmc function
+Date:   Thu, 19 Mar 2020 22:33:46 +0800
+Message-Id: <1584628430-23220-2-git-send-email-luwei.kang@intel.com>
 X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1584628430-23220-1-git-send-email-luwei.kang@intel.com>
+References: <1584628430-23220-1-git-send-email-luwei.kang@intel.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Intel new hardware(Atom processors based on the Tremont
-microarchitecture) introduces some Processor Event-Based Sampling(PEBS)
-extensions that output the PEBS record to Intel PT stream instead of DS
-area. The PEBS record will be packaged in a specific format when
-outputting to Intel PT.
+PEBS output to Inte PT feature introduces some new
+MSRs(MSR_RELOAD_FIXED_CTRx) for fixed function counters that using for
+autoload the present value after writing out a PEBS event.
 
-This patch set will enable PEBS functionality in KVM Guest by PEBS output
-to Intel PT, base on PEBS virtualization enabling via DS patch set[1].
+Introduce a base MSRs address parameter to make this function can get
+kvm performance monitor counter structure by MSR_RELOAD_FIXED_CTRx
+registers.
 
-Compared to the v1, the common code of PEBS virtualization enabling(PEBS
-via DS and PEBS via Intel PT) has been moved to PEBS via DS patch set.
-This patch set only includes the PEBS via PT specific changes.
+Signed-off-by: Luwei Kang <luwei.kang@intel.com>
+---
+ arch/x86/kvm/pmu.h           |  5 ++---
+ arch/x86/kvm/vmx/pmu_intel.c | 16 ++++++++++------
+ 2 files changed, 12 insertions(+), 9 deletions(-)
 
-Patch 1 is an extension to get fixed function counter by reload MSRs;
-Patch 2,3 implement the CPUID and MSRs emulation;
-Patch 4 will add the counter reload MSRs to MSR list during VM-entry/exit;
-Patch 5 will swith the PEBS records to Intel PT buffer if PEBS via PT is
-        enabled in KVM guest.
-
-[1]: https://lore.kernel.org/kvm/1583431025-19802-1-git-send-email-luwei.kang@intel.com/
-
-Luwei Kang (5):
-  KVM: x86/pmu: Add base address parameter for get_fixed_pmc function
-  KVM: x86/pmu: Expose PDCM feature when PEBS output to PT
-  KVM: x86/pmu: PEBS output Intel PT MSRs emulation
-  KVM: x86/pmu: Add counter reload register to MSR list
-  KVM: VMX: Switch PEBS records output to Intel PT buffer
-
- arch/x86/events/perf_event.h     |   5 --
- arch/x86/include/asm/kvm_host.h  |   2 +
- arch/x86/include/asm/msr-index.h |   6 +++
- arch/x86/kvm/pmu.h               |   6 +--
- arch/x86/kvm/vmx/capabilities.h  |   9 +++-
- arch/x86/kvm/vmx/pmu_intel.c     | 112 ++++++++++++++++++++++++++++++++++-----
- arch/x86/kvm/vmx/vmx.c           |   3 ++
- arch/x86/kvm/vmx/vmx.h           |   2 +-
- arch/x86/kvm/x86.c               |  32 +++++++++++
- 9 files changed, 154 insertions(+), 23 deletions(-)
-
+diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
+index 9de6ef1..d640628 100644
+--- a/arch/x86/kvm/pmu.h
++++ b/arch/x86/kvm/pmu.h
+@@ -117,10 +117,9 @@ static inline struct kvm_pmc *get_gp_pmc(struct kvm_pmu *pmu, u32 msr,
+ }
+ 
+ /* returns fixed PMC with the specified MSR */
+-static inline struct kvm_pmc *get_fixed_pmc(struct kvm_pmu *pmu, u32 msr)
++static inline struct kvm_pmc *get_fixed_pmc(struct kvm_pmu *pmu,
++						u32 msr, u32 base)
+ {
+-	int base = MSR_CORE_PERF_FIXED_CTR0;
+-
+ 	if (msr >= base && msr < base + pmu->nr_arch_fixed_counters) {
+ 		u32 index = array_index_nospec(msr - base,
+ 					       pmu->nr_arch_fixed_counters);
+diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
+index 6a0eef3..2db9b9e 100644
+--- a/arch/x86/kvm/vmx/pmu_intel.c
++++ b/arch/x86/kvm/vmx/pmu_intel.c
+@@ -43,7 +43,8 @@ static void reprogram_fixed_counters(struct kvm_pmu *pmu, u64 data)
+ 		u8 old_ctrl = fixed_ctrl_field(pmu->fixed_ctr_ctrl, i);
+ 		struct kvm_pmc *pmc;
+ 
+-		pmc = get_fixed_pmc(pmu, MSR_CORE_PERF_FIXED_CTR0 + i);
++		pmc = get_fixed_pmc(pmu, MSR_CORE_PERF_FIXED_CTR0 + i,
++					MSR_CORE_PERF_FIXED_CTR0);
+ 
+ 		if (old_ctrl == new_ctrl)
+ 			continue;
+@@ -135,7 +136,8 @@ static struct kvm_pmc *intel_pmc_idx_to_pmc(struct kvm_pmu *pmu, int pmc_idx)
+ 	else {
+ 		u32 idx = pmc_idx - INTEL_PMC_IDX_FIXED;
+ 
+-		return get_fixed_pmc(pmu, idx + MSR_CORE_PERF_FIXED_CTR0);
++		return get_fixed_pmc(pmu, idx + MSR_CORE_PERF_FIXED_CTR0,
++						MSR_CORE_PERF_FIXED_CTR0);
+ 	}
+ }
+ 
+@@ -196,7 +198,7 @@ static bool intel_is_valid_msr(struct kvm_vcpu *vcpu, u32 msr)
+ 	default:
+ 		ret = get_gp_pmc(pmu, msr, MSR_IA32_PERFCTR0) ||
+ 			get_gp_pmc(pmu, msr, MSR_P6_EVNTSEL0) ||
+-			get_fixed_pmc(pmu, msr);
++			get_fixed_pmc(pmu, msr, MSR_CORE_PERF_FIXED_CTR0);
+ 		break;
+ 	}
+ 
+@@ -236,7 +238,7 @@ static struct kvm_pmc *intel_msr_idx_to_pmc(struct kvm_vcpu *vcpu, u32 msr)
+ 	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
+ 	struct kvm_pmc *pmc;
+ 
+-	pmc = get_fixed_pmc(pmu, msr);
++	pmc = get_fixed_pmc(pmu, msr, MSR_CORE_PERF_FIXED_CTR0);
+ 	pmc = pmc ? pmc : get_gp_pmc(pmu, msr, MSR_P6_EVNTSEL0);
+ 	pmc = pmc ? pmc : get_gp_pmc(pmu, msr, MSR_IA32_PERFCTR0);
+ 
+@@ -278,7 +280,8 @@ static int intel_pmu_get_msr(struct kvm_vcpu *vcpu, u32 msr, u64 *data)
+ 			u64 val = pmc_read_counter(pmc);
+ 			*data = val & pmu->counter_bitmask[KVM_PMC_GP];
+ 			return 0;
+-		} else if ((pmc = get_fixed_pmc(pmu, msr))) {
++		} else if ((pmc = get_fixed_pmc(pmu, msr,
++				MSR_CORE_PERF_FIXED_CTR0))) {
+ 			u64 val = pmc_read_counter(pmc);
+ 			*data = val & pmu->counter_bitmask[KVM_PMC_FIXED];
+ 			return 0;
+@@ -354,7 +357,8 @@ static int intel_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 				data = (s64)(s32)data;
+ 			pmc->counter += data - pmc_read_counter(pmc);
+ 			return 0;
+-		} else if ((pmc = get_fixed_pmc(pmu, msr))) {
++		} else if ((pmc = get_fixed_pmc(pmu, msr,
++				MSR_CORE_PERF_FIXED_CTR0))) {
+ 			pmc->counter += data - pmc_read_counter(pmc);
+ 			return 0;
+ 		} else if ((pmc = get_gp_pmc(pmu, msr, MSR_P6_EVNTSEL0))) {
 -- 
 1.8.3.1
 
