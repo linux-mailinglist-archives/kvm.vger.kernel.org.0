@@ -2,352 +2,203 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 266EE18C1D2
-	for <lists+kvm@lfdr.de>; Thu, 19 Mar 2020 21:51:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AC54D18C188
+	for <lists+kvm@lfdr.de>; Thu, 19 Mar 2020 21:38:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727213AbgCSUvF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Mar 2020 16:51:05 -0400
-Received: from hqnvemgate24.nvidia.com ([216.228.121.143]:7968 "EHLO
-        hqnvemgate24.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727523AbgCSUvD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 Mar 2020 16:51:03 -0400
-Received: from hqpgpgate102.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate24.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
-        id <B5e73dad30000>; Thu, 19 Mar 2020 13:49:23 -0700
-Received: from hqmail.nvidia.com ([172.20.161.6])
-  by hqpgpgate102.nvidia.com (PGP Universal service);
-  Thu, 19 Mar 2020 13:51:01 -0700
-X-PGP-Universal: processed;
-        by hqpgpgate102.nvidia.com on Thu, 19 Mar 2020 13:51:01 -0700
-Received: from HQMAIL105.nvidia.com (172.20.187.12) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Thu, 19 Mar
- 2020 20:51:01 +0000
-Received: from kwankhede-dev.nvidia.com (10.124.1.5) by HQMAIL105.nvidia.com
- (172.20.187.12) with Microsoft SMTP Server (TLS) id 15.0.1473.3 via Frontend
- Transport; Thu, 19 Mar 2020 20:50:54 +0000
-From:   Kirti Wankhede <kwankhede@nvidia.com>
-To:     <alex.williamson@redhat.com>, <cjia@nvidia.com>
-CC:     <kevin.tian@intel.com>, <ziye.yang@intel.com>,
-        <changpeng.liu@intel.com>, <yi.l.liu@intel.com>,
-        <mlevitsk@redhat.com>, <eskultet@redhat.com>, <cohuck@redhat.com>,
-        <dgilbert@redhat.com>, <jonathan.davies@nutanix.com>,
-        <eauger@redhat.com>, <aik@ozlabs.ru>, <pasic@linux.ibm.com>,
-        <felipe@nutanix.com>, <Zhengxiao.zx@Alibaba-inc.com>,
-        <shuangtai.tst@alibaba-inc.com>, <Ken.Xue@amd.com>,
-        <zhi.a.wang@intel.com>, <yan.y.zhao@intel.com>,
-        <qemu-devel@nongnu.org>, <kvm@vger.kernel.org>,
-        "Kirti Wankhede" <kwankhede@nvidia.com>
-Subject: [PATCH v15 Kernel 7/7] vfio: Selective dirty page tracking if IOMMU backed device pins pages
-Date:   Fri, 20 Mar 2020 01:46:44 +0530
-Message-ID: <1584649004-8285-8-git-send-email-kwankhede@nvidia.com>
-X-Mailer: git-send-email 2.7.0
-In-Reply-To: <1584649004-8285-1-git-send-email-kwankhede@nvidia.com>
-References: <1584649004-8285-1-git-send-email-kwankhede@nvidia.com>
-X-NVConfidentiality: public
+        id S1726975AbgCSUiy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Mar 2020 16:38:54 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:43141 "EHLO
+        us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726785AbgCSUix (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 19 Mar 2020 16:38:53 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1584650332;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=uShTuto7PeNwwk0OxuI8oVZpBKc3YZzPGr0sD1pMJCE=;
+        b=iW61pHPQn3h7nHdPuUMAxdh1a5yX61ZdteDSuREauUxUgSfEvD1RNZJoKmPGOsuXYtftNY
+        mW3EiCtXA5FGGdJxS1pjUMaM5sSd+5gfgJfGd85fLLfLJBkrN6aiKVDauAlCxkGvbJB4Lg
+        OVbmqe1Z461syra4mJqmWSY4d7xOfxE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-54-iwln2pr0NWmBbDRRtDVBdA-1; Thu, 19 Mar 2020 16:38:48 -0400
+X-MC-Unique: iwln2pr0NWmBbDRRtDVBdA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3D355189F781;
+        Thu, 19 Mar 2020 20:38:46 +0000 (UTC)
+Received: from [10.36.113.142] (ovpn-113-142.ams2.redhat.com [10.36.113.142])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id CD8B11036B46;
+        Thu, 19 Mar 2020 20:38:42 +0000 (UTC)
+Subject: Re: [PATCH v5 20/23] KVM: arm64: GICv4.1: Plumb SGI implementation
+ selection in the distributor
+To:     Marc Zyngier <maz@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
+        Jason Cooper <jason@lakedaemon.net>,
+        Robert Richter <rrichter@marvell.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>
+References: <20200304203330.4967-1-maz@kernel.org>
+ <20200304203330.4967-21-maz@kernel.org>
+ <72832f51-bbde-8502-3e03-189ac20a0143@huawei.com>
+ <4a06fae9c93e10351276d173747d17f4@kernel.org>
+From:   Auger Eric <eric.auger@redhat.com>
+Message-ID: <49995ec9-3970-1f62-5dfc-118563ca00fc@redhat.com>
+Date:   Thu, 19 Mar 2020 21:38:40 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-Content-Type: text/plain
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1584650963; bh=pS4D/kXQIdaJtEkqQTbg6mrFTsymPJiay4SoCkmaedI=;
-        h=X-PGP-Universal:From:To:CC:Subject:Date:Message-ID:X-Mailer:
-         In-Reply-To:References:X-NVConfidentiality:MIME-Version:
-         Content-Type;
-        b=e8E5u3pvOJWd3g9xPr86qgp7K3iNgqg826MWObRSTz+R3Mbt1HzdLG2JTR+JjVPMs
-         Q+F3HiEyRefPBOpKiC/00go7swOnmM/wEty2D8cuqSQywmQTPjXYLMN0AT6wyqOIMz
-         oBp48r0nro/fw0fr0/84j5ejrNQkWgEfocF2vibpU0G4Kwetho9aNgLeTn6qsK1MVT
-         AuUALQP21AKAxx61Dk+jDJYDjEWLqsJPiAoUFDT3n5SPpYda/7mgik55RFBzUzJ0oU
-         83GT5UhlG1+fRGKu8C+8GZI2JVw4Z3OwZ9qxe+7M8Kicfxy94MPbBbouuFnc+CmLIK
-         A9ipI7bVbaXUw==
+In-Reply-To: <4a06fae9c93e10351276d173747d17f4@kernel.org>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Added a check such that only singleton IOMMU groups can pin pages.
-From the point when vendor driver pins any pages, consider IOMMU group
-dirty page scope to be limited to pinned pages.
+Hi Marc,
+On 3/19/20 1:10 PM, Marc Zyngier wrote:
+> Hi Zenghui,
+>=20
+> On 2020-03-18 06:34, Zenghui Yu wrote:
+>> Hi Marc,
+>>
+>> On 2020/3/5 4:33, Marc Zyngier wrote:
+>>> The GICv4.1 architecture gives the hypervisor the option to let
+>>> the guest choose whether it wants the good old SGIs with an
+>>> active state, or the new, HW-based ones that do not have one.
+>>>
+>>> For this, plumb the configuration of SGIs into the GICv3 MMIO
+>>> handling, present the GICD_TYPER2.nASSGIcap to the guest,
+>>> and handle the GICD_CTLR.nASSGIreq setting.
+>>>
+>>> In order to be able to deal with the restore of a guest, also
+>>> apply the GICD_CTLR.nASSGIreq setting at first run so that we
+>>> can move the restored SGIs to the HW if that's what the guest
+>>> had selected in a previous life.
+>>
+>> I'm okay with the restore path.=A0 But it seems that we still fail to
+>> save the pending state of vSGI - software pending_latch of HW-based
+>> vSGIs will not be updated (and always be false) because we directly
+>> inject them through ITS, so vgic_v3_uaccess_read_pending() can't
+>> tell the correct pending state to user-space (the correct one should
+>> be latched in HW).
+>>
+>> It would be good if we can sync the hardware state into pending_latch
+>> at an appropriate time (just before save), but not sure if we can...
+>=20
+> The problem is to find the "appropriate time". It would require to defi=
+ne
+> a point in the save sequence where we transition the state from HW to
+> SW. I'm not keen on adding more state than we already have.
 
-To optimize to avoid walking list often, added flag
-pinned_page_dirty_scope to indicate if all of the vfio_groups for each
-vfio_domain in the domain_list dirty page scope is limited to pinned
-pages. This flag is updated on first pinned pages request for that IOMMU
-group and on attaching/detaching group.
+may be we could use a dedicated device group/attr as we have for the ITS
+save tables? the user space would choose.
 
-Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-Reviewed-by: Neo Jia <cjia@nvidia.com>
----
- drivers/vfio/vfio.c             | 13 ++++--
- drivers/vfio/vfio_iommu_type1.c | 94 +++++++++++++++++++++++++++++++++++++++--
- include/linux/vfio.h            |  4 +-
- 3 files changed, 104 insertions(+), 7 deletions(-)
+Thanks
 
-diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
-index 210fcf426643..311b5e4e111e 100644
---- a/drivers/vfio/vfio.c
-+++ b/drivers/vfio/vfio.c
-@@ -85,6 +85,7 @@ struct vfio_group {
- 	atomic_t			opened;
- 	wait_queue_head_t		container_q;
- 	bool				noiommu;
-+	unsigned int			dev_counter;
- 	struct kvm			*kvm;
- 	struct blocking_notifier_head	notifier;
- };
-@@ -555,6 +556,7 @@ struct vfio_device *vfio_group_create_device(struct vfio_group *group,
- 
- 	mutex_lock(&group->device_lock);
- 	list_add(&device->group_next, &group->device_list);
-+	group->dev_counter++;
- 	mutex_unlock(&group->device_lock);
- 
- 	return device;
-@@ -567,6 +569,7 @@ static void vfio_device_release(struct kref *kref)
- 	struct vfio_group *group = device->group;
- 
- 	list_del(&device->group_next);
-+	group->dev_counter--;
- 	mutex_unlock(&group->device_lock);
- 
- 	dev_set_drvdata(device->dev, NULL);
-@@ -1933,6 +1936,9 @@ int vfio_pin_pages(struct device *dev, unsigned long *user_pfn, int npage,
- 	if (!group)
- 		return -ENODEV;
- 
-+	if (group->dev_counter > 1)
-+		return -EINVAL;
-+
- 	ret = vfio_group_add_container_user(group);
- 	if (ret)
- 		goto err_pin_pages;
-@@ -1940,7 +1946,8 @@ int vfio_pin_pages(struct device *dev, unsigned long *user_pfn, int npage,
- 	container = group->container;
- 	driver = container->iommu_driver;
- 	if (likely(driver && driver->ops->pin_pages))
--		ret = driver->ops->pin_pages(container->iommu_data, user_pfn,
-+		ret = driver->ops->pin_pages(container->iommu_data,
-+					     group->iommu_group, user_pfn,
- 					     npage, prot, phys_pfn);
- 	else
- 		ret = -ENOTTY;
-@@ -2038,8 +2045,8 @@ int vfio_group_pin_pages(struct vfio_group *group,
- 	driver = container->iommu_driver;
- 	if (likely(driver && driver->ops->pin_pages))
- 		ret = driver->ops->pin_pages(container->iommu_data,
--					     user_iova_pfn, npage,
--					     prot, phys_pfn);
-+					     group->iommu_group, user_iova_pfn,
-+					     npage, prot, phys_pfn);
- 	else
- 		ret = -ENOTTY;
- 
-diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-index dce0a3e1e8b7..881abfc04f0a 100644
---- a/drivers/vfio/vfio_iommu_type1.c
-+++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -72,6 +72,7 @@ struct vfio_iommu {
- 	bool			v2;
- 	bool			nesting;
- 	bool			dirty_page_tracking;
-+	bool			pinned_page_dirty_scope;
- };
- 
- struct vfio_domain {
-@@ -99,6 +100,7 @@ struct vfio_group {
- 	struct iommu_group	*iommu_group;
- 	struct list_head	next;
- 	bool			mdev_group;	/* An mdev group */
-+	bool			pinned_page_dirty_scope;
- };
- 
- struct vfio_iova {
-@@ -143,6 +145,10 @@ struct vfio_regions {
- static int put_pfn(unsigned long pfn, int prot);
- static unsigned long vfio_pgsize_bitmap(struct vfio_iommu *iommu);
- 
-+static struct vfio_group *vfio_iommu_find_iommu_group(struct vfio_iommu *iommu,
-+					       struct iommu_group *iommu_group);
-+
-+static void update_pinned_page_dirty_scope(struct vfio_iommu *iommu);
- /*
-  * This code handles mapping and unmapping of user data buffers
-  * into DMA'ble space using the IOMMU
-@@ -579,11 +585,13 @@ static int vfio_unpin_page_external(struct vfio_dma *dma, dma_addr_t iova,
- }
- 
- static int vfio_iommu_type1_pin_pages(void *iommu_data,
-+				      struct iommu_group *iommu_group,
- 				      unsigned long *user_pfn,
- 				      int npage, int prot,
- 				      unsigned long *phys_pfn)
- {
- 	struct vfio_iommu *iommu = iommu_data;
-+	struct vfio_group *group;
- 	int i, j, ret;
- 	unsigned long remote_vaddr;
- 	struct vfio_dma *dma;
-@@ -653,8 +661,14 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
- 				   (vpfn->iova - dma->iova) >> pgshift, 1);
- 		}
- 	}
--
- 	ret = i;
-+
-+	group = vfio_iommu_find_iommu_group(iommu, iommu_group);
-+	if (!group->pinned_page_dirty_scope) {
-+		group->pinned_page_dirty_scope = true;
-+		update_pinned_page_dirty_scope(iommu);
-+	}
-+
- 	goto pin_done;
- 
- pin_unwind:
-@@ -936,8 +950,11 @@ static int vfio_iova_dirty_bitmap(struct vfio_iommu *iommu, dma_addr_t iova,
- 	npages = dma->size >> pgshift;
- 	bitmap_size = DIRTY_BITMAP_BYTES(npages);
- 
--	/* mark all pages dirty if all pages are pinned and mapped. */
--	if (dma->iommu_mapped)
-+	/*
-+	 * mark all pages dirty if any IOMMU capable device is not able
-+	 * to report dirty pages and all pages are pinned and mapped.
-+	 */
-+	if (!iommu->pinned_page_dirty_scope && dma->iommu_mapped)
- 		bitmap_set(dma->bitmap, 0, npages);
- 
- 	if (copy_to_user((void __user *)bitmap, dma->bitmap, bitmap_size))
-@@ -1421,6 +1438,51 @@ static struct vfio_group *find_iommu_group(struct vfio_domain *domain,
- 	return NULL;
- }
- 
-+static struct vfio_group *vfio_iommu_find_iommu_group(struct vfio_iommu *iommu,
-+					       struct iommu_group *iommu_group)
-+{
-+	struct vfio_domain *domain;
-+	struct vfio_group *group = NULL;
-+
-+	list_for_each_entry(domain, &iommu->domain_list, next) {
-+		group = find_iommu_group(domain, iommu_group);
-+		if (group)
-+			return group;
-+	}
-+
-+	if (iommu->external_domain)
-+		group = find_iommu_group(iommu->external_domain, iommu_group);
-+
-+	return group;
-+}
-+
-+static void update_pinned_page_dirty_scope(struct vfio_iommu *iommu)
-+{
-+	struct vfio_domain *domain;
-+	struct vfio_group *group;
-+
-+	list_for_each_entry(domain, &iommu->domain_list, next) {
-+		list_for_each_entry(group, &domain->group_list, next) {
-+			if (!group->pinned_page_dirty_scope) {
-+				iommu->pinned_page_dirty_scope = false;
-+				return;
-+			}
-+		}
-+	}
-+
-+	if (iommu->external_domain) {
-+		domain = iommu->external_domain;
-+		list_for_each_entry(group, &domain->group_list, next) {
-+			if (!group->pinned_page_dirty_scope) {
-+				iommu->pinned_page_dirty_scope = false;
-+				return;
-+			}
-+		}
-+	}
-+
-+	iommu->pinned_page_dirty_scope = true;
-+}
-+
- static bool vfio_iommu_has_sw_msi(struct list_head *group_resv_regions,
- 				  phys_addr_t *base)
- {
-@@ -1827,6 +1889,16 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
- 
- 			list_add(&group->next,
- 				 &iommu->external_domain->group_list);
-+			/*
-+			 * Non-iommu backed group cannot dirty memory directly,
-+			 * it can only use interfaces that provide dirty
-+			 * tracking.
-+			 * The iommu scope can only be promoted with the
-+			 * addition of a dirty tracking group.
-+			 */
-+			group->pinned_page_dirty_scope = true;
-+			if (!iommu->pinned_page_dirty_scope)
-+				update_pinned_page_dirty_scope(iommu);
- 			mutex_unlock(&iommu->lock);
- 
- 			return 0;
-@@ -1949,6 +2021,13 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
- done:
- 	/* Delete the old one and insert new iova list */
- 	vfio_iommu_iova_insert_copy(iommu, &iova_copy);
-+
-+	/*
-+	 * An iommu backed group can dirty memory directly and therefore
-+	 * demotes the iommu scope until it declares itself dirty tracking
-+	 * capable via the page pinning interface.
-+	 */
-+	iommu->pinned_page_dirty_scope = false;
- 	mutex_unlock(&iommu->lock);
- 	vfio_iommu_resv_free(&group_resv_regions);
- 
-@@ -2101,6 +2180,7 @@ static void vfio_iommu_type1_detach_group(void *iommu_data,
- 	struct vfio_iommu *iommu = iommu_data;
- 	struct vfio_domain *domain;
- 	struct vfio_group *group;
-+	bool update_dirty_scope = false;
- 	LIST_HEAD(iova_copy);
- 
- 	mutex_lock(&iommu->lock);
-@@ -2108,6 +2188,7 @@ static void vfio_iommu_type1_detach_group(void *iommu_data,
- 	if (iommu->external_domain) {
- 		group = find_iommu_group(iommu->external_domain, iommu_group);
- 		if (group) {
-+			update_dirty_scope = !group->pinned_page_dirty_scope;
- 			list_del(&group->next);
- 			kfree(group);
- 
-@@ -2137,6 +2218,7 @@ static void vfio_iommu_type1_detach_group(void *iommu_data,
- 			continue;
- 
- 		vfio_iommu_detach_group(domain, group);
-+		update_dirty_scope = !group->pinned_page_dirty_scope;
- 		list_del(&group->next);
- 		kfree(group);
- 		/*
-@@ -2167,6 +2249,12 @@ static void vfio_iommu_type1_detach_group(void *iommu_data,
- 		vfio_iommu_iova_free(&iova_copy);
- 
- detach_group_done:
-+	/*
-+	 * Removal of a group without dirty tracking may allow the iommu scope
-+	 * to be promoted.
-+	 */
-+	if (update_dirty_scope)
-+		update_pinned_page_dirty_scope(iommu);
- 	mutex_unlock(&iommu->lock);
- }
- 
-diff --git a/include/linux/vfio.h b/include/linux/vfio.h
-index be2bd358b952..702e1d7b6e8b 100644
---- a/include/linux/vfio.h
-+++ b/include/linux/vfio.h
-@@ -72,7 +72,9 @@ struct vfio_iommu_driver_ops {
- 					struct iommu_group *group);
- 	void		(*detach_group)(void *iommu_data,
- 					struct iommu_group *group);
--	int		(*pin_pages)(void *iommu_data, unsigned long *user_pfn,
-+	int		(*pin_pages)(void *iommu_data,
-+				     struct iommu_group *group,
-+				     unsigned long *user_pfn,
- 				     int npage, int prot,
- 				     unsigned long *phys_pfn);
- 	int		(*unpin_pages)(void *iommu_data,
--- 
-2.7.0
+Eric
+>=20
+> But what we can do is to just ask the HW to give us the right state
+> on userspace access, at all times. How about this:
+>=20
+> diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c
+> b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+> index 48fd9fc229a2..281fe7216c59 100644
+> --- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
+> +++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+> @@ -305,8 +305,18 @@ static unsigned long
+> vgic_v3_uaccess_read_pending(struct kvm_vcpu *vcpu,
+> =A0=A0=A0=A0=A0 */
+> =A0=A0=A0=A0 for (i =3D 0; i < len * 8; i++) {
+> =A0=A0=A0=A0=A0=A0=A0=A0 struct vgic_irq *irq =3D vgic_get_irq(vcpu->kv=
+m, vcpu, intid + i);
+> +=A0=A0=A0=A0=A0=A0=A0 bool state =3D irq->pending_latch;
+>=20
+> -=A0=A0=A0=A0=A0=A0=A0 if (irq->pending_latch)
+> +=A0=A0=A0=A0=A0=A0=A0 if (irq->hw && vgic_irq_is_sgi(irq->intid)) {
+> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 int err;
+> +
+> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 err =3D irq_get_irqchip_state(irq->h=
+ost_irq,
+> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0 IRQCHIP_STATE_PENDING,
+> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0 &state);
+> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 WARN_ON(err);
+> +=A0=A0=A0=A0=A0=A0=A0 }
+> +
+> +=A0=A0=A0=A0=A0=A0=A0 if (state)
+> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 value |=3D (1U << i);
+>=20
+> =A0=A0=A0=A0=A0=A0=A0=A0 vgic_put_irq(vcpu->kvm, irq);
+>=20
+> I can add this to "KVM: arm64: GICv4.1: Add direct injection capability
+> to SGI registers".
+>=20
+>>
+>>>
+>>> Signed-off-by: Marc Zyngier <maz@kernel.org>
+>>> ---
+>>> =A0 virt/kvm/arm/vgic/vgic-mmio-v3.c | 48 +++++++++++++++++++++++++++=
++++--
+>>> =A0 virt/kvm/arm/vgic/vgic-v3.c=A0=A0=A0=A0=A0 |=A0 2 ++
+>>> =A0 2 files changed, 48 insertions(+), 2 deletions(-)
+>>>
+>>> diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c
+>>> b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+>>> index de89da76a379..442f3b8c2559 100644
+>>> --- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
+>>> +++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+>>> @@ -3,6 +3,7 @@
+>>> =A0=A0 * VGICv3 MMIO handling functions
+>>> =A0=A0 */
+>>> =A0 +#include <linux/bitfield.h>
+>>> =A0 #include <linux/irqchip/arm-gic-v3.h>
+>>> =A0 #include <linux/kvm.h>
+>>> =A0 #include <linux/kvm_host.h>
+>>> @@ -70,6 +71,8 @@ static unsigned long vgic_mmio_read_v3_misc(struct
+>>> kvm_vcpu *vcpu,
+>>> =A0=A0=A0=A0=A0=A0=A0=A0=A0 if (vgic->enabled)
+>>> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 value |=3D GICD_CTLR_ENABLE_S=
+S_G1;
+>>> =A0=A0=A0=A0=A0=A0=A0=A0=A0 value |=3D GICD_CTLR_ARE_NS | GICD_CTLR_D=
+S;
+>>> +=A0=A0=A0=A0=A0=A0=A0 if (kvm_vgic_global_state.has_gicv4_1 && vgic-=
+>nassgireq)
+>>
+>> Looking at how we handle the GICD_CTLR.nASSGIreq setting, I think
+>> "nassgireq=3D=3Dtrue" already indicates "has_gicv4_1=3D=3Dtrue".=A0 So=
+ this
+>> can be simplified.
+>=20
+> Indeed. I've now dropped the has_gicv4.1 check.
+>=20
+>> But I wonder that should we use nassgireq to *only* keep track what
+>> the guest had written into the GICD_CTLR.nASSGIreq.=A0 If not, we may
+>> lose the guest-request bit after migration among hosts with different
+>> has_gicv4_1 settings.
+>=20
+> I'm unsure of what you're suggesting here. If userspace tries to set
+> GICD_CTLR.nASSGIreq on a non-4.1 host, this bit will not latch.
+> Userspace can check that at restore time. Or we could fail the
+> userspace write, which is a bit odd (the bit is otherwise RES0).
+>=20
+> Could you clarify your proposal?
+>=20
+>> The remaining patches all look good to me :-). I will wait for you to
+>> confirm these two concerns.
+>=20
+> Thanks,
+>=20
+> =A0=A0=A0=A0=A0=A0=A0 M.
 
