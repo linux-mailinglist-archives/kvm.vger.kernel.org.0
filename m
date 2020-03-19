@@ -2,157 +2,226 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D302518BFBF
-	for <lists+kvm@lfdr.de>; Thu, 19 Mar 2020 19:57:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 60A9F18C01B
+	for <lists+kvm@lfdr.de>; Thu, 19 Mar 2020 20:09:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726943AbgCSS5m (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Mar 2020 14:57:42 -0400
-Received: from hqnvemgate24.nvidia.com ([216.228.121.143]:13955 "EHLO
-        hqnvemgate24.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726589AbgCSS5m (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 Mar 2020 14:57:42 -0400
-Received: from hqpgpgate102.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate24.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
-        id <B5e73c0430000>; Thu, 19 Mar 2020 11:56:03 -0700
-Received: from hqmail.nvidia.com ([172.20.161.6])
-  by hqpgpgate102.nvidia.com (PGP Universal service);
-  Thu, 19 Mar 2020 11:57:41 -0700
-X-PGP-Universal: processed;
-        by hqpgpgate102.nvidia.com on Thu, 19 Mar 2020 11:57:41 -0700
-Received: from [10.40.102.54] (10.124.1.5) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Thu, 19 Mar
- 2020 18:57:32 +0000
-Subject: Re: [PATCH v14 Kernel 4/7] vfio iommu: Implementation of ioctl for
- dirty pages tracking.
-To:     Alex Williamson <alex.williamson@redhat.com>
-CC:     <cjia@nvidia.com>, <kevin.tian@intel.com>, <ziye.yang@intel.com>,
-        <changpeng.liu@intel.com>, <yi.l.liu@intel.com>,
-        <mlevitsk@redhat.com>, <eskultet@redhat.com>, <cohuck@redhat.com>,
-        <dgilbert@redhat.com>, <jonathan.davies@nutanix.com>,
-        <eauger@redhat.com>, <aik@ozlabs.ru>, <pasic@linux.ibm.com>,
-        <felipe@nutanix.com>, <Zhengxiao.zx@Alibaba-inc.com>,
-        <shuangtai.tst@alibaba-inc.com>, <Ken.Xue@amd.com>,
-        <zhi.a.wang@intel.com>, <yan.y.zhao@intel.com>,
-        <qemu-devel@nongnu.org>, <kvm@vger.kernel.org>
-References: <1584560474-19946-1-git-send-email-kwankhede@nvidia.com>
- <1584560474-19946-5-git-send-email-kwankhede@nvidia.com>
- <20200318214500.1a0cb985@w520.home>
-X-Nvconfidentiality: public
-From:   Kirti Wankhede <kwankhede@nvidia.com>
-Message-ID: <be22d111-123c-e1bb-a376-e66b10ebe55f@nvidia.com>
-Date:   Fri, 20 Mar 2020 00:27:28 +0530
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+        id S1727504AbgCSTJ2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Mar 2020 15:09:28 -0400
+Received: from 11.mo7.mail-out.ovh.net ([87.98.173.157]:35915 "EHLO
+        11.mo7.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726589AbgCSTJ2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 Mar 2020 15:09:28 -0400
+X-Greylist: delayed 4199 seconds by postgrey-1.27 at vger.kernel.org; Thu, 19 Mar 2020 15:09:26 EDT
+Received: from player788.ha.ovh.net (unknown [10.108.42.170])
+        by mo7.mail-out.ovh.net (Postfix) with ESMTP id 0D8C9159CF2
+        for <kvm@vger.kernel.org>; Thu, 19 Mar 2020 18:52:07 +0100 (CET)
+Received: from kaod.org (82-64-250-170.subs.proxad.net [82.64.250.170])
+        (Authenticated sender: clg@kaod.org)
+        by player788.ha.ovh.net (Postfix) with ESMTPSA id 991E810A33A06;
+        Thu, 19 Mar 2020 17:52:02 +0000 (UTC)
+Subject: Re: [PATCH] KVM: PPC: Book3S HV: Add a capability for enabling secure
+ guests
+To:     Paul Mackerras <paulus@ozlabs.org>, kvm@vger.kernel.org
+Cc:     kvm-ppc@vger.kernel.org,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Ram Pai <linuxram@us.ibm.com>
+References: <20200319043301.GA13052@blackberry>
+From:   =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <cacecfae-a440-5f87-13f3-4174fa1bf320@kaod.org>
+Date:   Thu, 19 Mar 2020 18:52:01 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200318214500.1a0cb985@w520.home>
-X-Originating-IP: [10.124.1.5]
-X-ClientProxiedBy: HQMAIL101.nvidia.com (172.20.187.10) To
- HQMAIL107.nvidia.com (172.20.187.13)
-Content-Type: text/plain; charset="utf-8"; format=flowed
+In-Reply-To: <20200319043301.GA13052@blackberry>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1584644163; bh=vfV88Ij06FqO4WLmvlV/YCflIZKfz0v6Hvy6pULwZuo=;
-        h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
-         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
-         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
-         Content-Transfer-Encoding;
-        b=js7IJV3SHXnODSgCqg8UiUybsPrToVSihTWkqALlgfltkrfbUtz38Z/Luc+B2LOtl
-         nhj2unhILoPL8ylxCKt4T7/cx5xxsJ0TnqUJqulGfYgDHTVYXL/mfyYgBSaH53Bk9I
-         Cf7KlYbENjlJ9u2xHnGlSxeNPEsjdykAAU3nX3gb7AeSQquxZnX05kRpuveFq5wNwo
-         F09yhhuJ8Ld3bbCUe2qcdWdU7vN+D4FB8yVzKSHcv299nOZ9pbLcrHdYnMNg8joYWj
-         AkS0OtxrQovgYRdbl9GrKOn9VyrfzoNEccn6WJAAFclQiKnffwv6rohXXxGCwoLcxt
-         lO9MCHV7w473g==
+Content-Transfer-Encoding: 8bit
+X-Ovh-Tracer-Id: 12774178872098917323
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedugedrudefledguddtiecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefuvfhfhffkffgfgggjtgfgsehtkeertddtfeejnecuhfhrohhmpeevrogurhhitggpnfgvpgfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdekvddrieegrddvhedtrddujedtnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjeekkedrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpegtlhhgsehkrghougdrohhrghdprhgtphhtthhopehkvhhmsehvghgvrhdrkhgvrhhnvghlrdhorhhg
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 3/19/20 5:33 AM, Paul Mackerras wrote:
+> At present, on Power systems with Protected Execution Facility
+> hardware and an ultravisor, a KVM guest can transition to being a
+> secure guest at will.  Userspace (QEMU) has no way of knowing
+> whether a host system is capable of running secure guests.  This
+> will present a problem in future when the ultravisor is capable of
+> migrating secure guests from one host to another, because
+> virtualization management software will have no way to ensure that
+> secure guests only run in domains where all of the hosts can
+> support secure guests.
+> 
+> This adds a VM capability which has two functions: (a) userspace
+> can query it to find out whether the host can support secure guests,
+> and (b) userspace can enable it for a guest, which allows that
+> guest to become a secure guest.  If userspace does not enable it,
+> KVM will return an error when the ultravisor does the hypercall
+> that indicates that the guest is starting to transition to a
+> secure guest.  The ultravisor will then abort the transition and
+> the guest will terminate.
+> 
+> Signed-off-by: Paul Mackerras <paulus@ozlabs.org>
 
 
-On 3/19/2020 9:15 AM, Alex Williamson wrote:
-> On Thu, 19 Mar 2020 01:11:11 +0530
-> Kirti Wankhede <kwankhede@nvidia.com> wrote:
->=20
->> VFIO_IOMMU_DIRTY_PAGES ioctl performs three operations:
->> - Start dirty pages tracking while migration is active
->> - Stop dirty pages tracking.
->> - Get dirty pages bitmap. Its user space application's responsibility to
->>    copy content of dirty pages from source to destination during migrati=
-on.
->>
->> To prevent DoS attack, memory for bitmap is allocated per vfio_dma
->> structure. Bitmap size is calculated considering smallest supported page
->> size. Bitmap is allocated for all vfio_dmas when dirty logging is enable=
-d
->>
->> Bitmap is populated for already pinned pages when bitmap is allocated fo=
-r
->> a vfio_dma with the smallest supported page size. Update bitmap from
->> pinning functions when tracking is enabled. When user application querie=
-s
->> bitmap, check if requested page size is same as page size used to
->> populated bitmap. If it is equal, copy bitmap, but if not equal, return
->> error.
->>
->> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
->> Reviewed-by: Neo Jia <cjia@nvidia.com>
->> ---
->>   drivers/vfio/vfio_iommu_type1.c | 205 ++++++++++++++++++++++++++++++++=
-+++++++-
->>   1 file changed, 203 insertions(+), 2 deletions(-)
->>
->> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_t=
-ype1.c
->> index 70aeab921d0f..d6417fb02174 100644
->> --- a/drivers/vfio/vfio_iommu_type1.c
->> +++ b/drivers/vfio/vfio_iommu_type1.c
->> @@ -71,6 +71,7 @@ struct vfio_iommu {
->>   	unsigned int		dma_avail;
->>   	bool			v2;
->>   	bool			nesting;
->> +	bool			dirty_page_tracking;
->>   };
->>  =20
->>   struct vfio_domain {
->> @@ -91,6 +92,7 @@ struct vfio_dma {
->>   	bool			lock_cap;	/* capable(CAP_IPC_LOCK) */
->>   	struct task_struct	*task;
->>   	struct rb_root		pfn_list;	/* Ex-user pinned pfn list */
->> +	unsigned long		*bitmap;
->=20
-> We've made the bitmap a width invariant u64 else, should be here as
-> well.
->=20
+Reviewed-by: Cédric Le Goater <clg@kaod.org>
 
-Changing to u64 causes compile time warnings as below. Keeping 'unsigned=20
-long *'
+> ---
+> Note, only compile-tested.  Ram, please test.
+> 
+>  Documentation/virt/kvm/api.rst      | 17 +++++++++++++++++
+>  arch/powerpc/include/asm/kvm_host.h |  1 +
+>  arch/powerpc/include/asm/kvm_ppc.h  |  1 +
+>  arch/powerpc/kvm/book3s_hv.c        | 13 +++++++++++++
+>  arch/powerpc/kvm/book3s_hv_uvmem.c  |  4 ++++
+>  arch/powerpc/kvm/powerpc.c          | 13 +++++++++++++
+>  include/uapi/linux/kvm.h            |  1 +
+>  7 files changed, 50 insertions(+)
+> 
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index 158d118..a925500 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -5779,6 +5779,23 @@ it hard or impossible to use it correctly.  The availability of
+>  KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2 signals that those bugs are fixed.
+>  Userspace should not try to use KVM_CAP_MANUAL_DIRTY_LOG_PROTECT.
+>  
+> +7.19 KVM_CAP_PPC_SECURE_GUEST
+> +------------------------------
+> +
+> +:Architectures: ppc
+> +
+> +This capability indicates that KVM is running on a host that has
+> +ultravisor firmware and thus can support a secure guest.  On such a
+> +system, a guest can ask the ultravisor to make it a secure guest,
+> +one whose memory is inaccessible to the host except for pages which
+> +are explicitly requested to be shared with the host.  The ultravisor
+> +notifies KVM when a guest requests to become a secure guest, and KVM
+> +has the opportunity to veto the transition.
+> +
+> +If present, this capability can be enabled for a VM, meaning that KVM
+> +will allow the transition to secure guest mode.  Otherwise KVM will
+> +veto the transition.
+> +
+>  8. Other capabilities.
+>  ======================
+>  
+> diff --git a/arch/powerpc/include/asm/kvm_host.h b/arch/powerpc/include/asm/kvm_host.h
+> index 6e8b8ff..f99b433 100644
+> --- a/arch/powerpc/include/asm/kvm_host.h
+> +++ b/arch/powerpc/include/asm/kvm_host.h
+> @@ -303,6 +303,7 @@ struct kvm_arch {
+>  	u8 radix;
+>  	u8 fwnmi_enabled;
+>  	u8 secure_guest;
+> +	u8 svm_enabled;
+>  	bool threads_indep;
+>  	bool nested_enable;
+>  	pgd_t *pgtable;
+> diff --git a/arch/powerpc/include/asm/kvm_ppc.h b/arch/powerpc/include/asm/kvm_ppc.h
+> index 406ec46..0733618 100644
+> --- a/arch/powerpc/include/asm/kvm_ppc.h
+> +++ b/arch/powerpc/include/asm/kvm_ppc.h
+> @@ -316,6 +316,7 @@ struct kvmppc_ops {
+>  			       int size);
+>  	int (*store_to_eaddr)(struct kvm_vcpu *vcpu, ulong *eaddr, void *ptr,
+>  			      int size);
+> +	int (*enable_svm)(struct kvm *kvm);
+>  	int (*svm_off)(struct kvm *kvm);
+>  };
+>  
+> diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
+> index fbc55a1..36da720 100644
+> --- a/arch/powerpc/kvm/book3s_hv.c
+> +++ b/arch/powerpc/kvm/book3s_hv.c
+> @@ -5423,6 +5423,18 @@ static void unpin_vpa_reset(struct kvm *kvm, struct kvmppc_vpa *vpa)
+>  }
+>  
+>  /*
+> + * Enable a guest to become a secure VM.
+> + * Called when the KVM_CAP_PPC_SECURE_GUEST capability is enabled.
+> + */
+> +static int kvmhv_enable_svm(struct kvm *kvm)
+> +{
+> +	if (!firmware_has_feature(FW_FEATURE_ULTRAVISOR))
+> +		return -EINVAL;
+> +	kvm->arch.svm_enabled = 1;
+> +	return 0;
+> +}
+> +
+> +/*
+>   *  IOCTL handler to turn off secure mode of guest
+>   *
+>   * - Release all device pages
+> @@ -5543,6 +5555,7 @@ static struct kvmppc_ops kvm_ops_hv = {
+>  	.enable_nested = kvmhv_enable_nested,
+>  	.load_from_eaddr = kvmhv_load_from_eaddr,
+>  	.store_to_eaddr = kvmhv_store_to_eaddr,
+> +	.enable_svm = kvmhv_enable_svm,
+>  	.svm_off = kvmhv_svm_off,
+>  };
+>  
+> diff --git a/arch/powerpc/kvm/book3s_hv_uvmem.c b/arch/powerpc/kvm/book3s_hv_uvmem.c
+> index 79b1202..2ad999f 100644
+> --- a/arch/powerpc/kvm/book3s_hv_uvmem.c
+> +++ b/arch/powerpc/kvm/book3s_hv_uvmem.c
+> @@ -216,6 +216,10 @@ unsigned long kvmppc_h_svm_init_start(struct kvm *kvm)
+>  	if (!kvm_is_radix(kvm))
+>  		return H_UNSUPPORTED;
+>  
+> +	/* NAK the transition to secure if not enabled */
+> +	if (!kvm->arch.svm_enabled)
+> +		return H_AUTHORITY;
+> +
+>  	srcu_idx = srcu_read_lock(&kvm->srcu);
+>  	slots = kvm_memslots(kvm);
+>  	kvm_for_each_memslot(memslot, slots) {
+> diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
+> index 62ee66d..c32e6cc2 100644
+> --- a/arch/powerpc/kvm/powerpc.c
+> +++ b/arch/powerpc/kvm/powerpc.c
+> @@ -670,6 +670,11 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>  		     (hv_enabled && cpu_has_feature(CPU_FTR_P9_TM_HV_ASSIST));
+>  		break;
+>  #endif
+> +#if defined(CONFIG_KVM_BOOK3S_HV_POSSIBLE) && defined(CONFIG_PPC_UV)
+> +	case KVM_CAP_PPC_SECURE_GUEST:
+> +		r = hv_enabled && !!firmware_has_feature(FW_FEATURE_ULTRAVISOR);
+> +		break;
+> +#endif
+>  	default:
+>  		r = 0;
+>  		break;
+> @@ -2170,6 +2175,14 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+>  		r = kvm->arch.kvm_ops->enable_nested(kvm);
+>  		break;
+>  #endif
+> +#if defined(CONFIG_KVM_BOOK3S_HV_POSSIBLE) && defined(CONFIG_PPC_UV)
+> +	case KVM_CAP_PPC_SECURE_GUEST:
+> +		r = -EINVAL;
+> +		if (!is_kvmppc_hv_enabled(kvm) || !kvm->arch.kvm_ops->enable_svm)
+> +			break;
+> +		r = kvm->arch.kvm_ops->enable_svm(kvm);
+> +		break;
+> +#endif
+>  	default:
+>  		r = -EINVAL;
+>  		break;
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index 5e6234c..428c7dd 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -1016,6 +1016,7 @@ struct kvm_ppc_resize_hpt {
+>  #define KVM_CAP_ARM_INJECT_EXT_DABT 178
+>  #define KVM_CAP_S390_VCPU_RESETS 179
+>  #define KVM_CAP_S390_PROTECTED 180
+> +#define KVM_CAP_PPC_SECURE_GUEST 181
+>  
+>  #ifdef KVM_CAP_IRQ_ROUTING
+>  
+> 
 
-drivers/vfio/vfio_iommu_type1.c: In function =E2=80=98vfio_dma_bitmap_alloc=
-_all=E2=80=99:
-drivers/vfio/vfio_iommu_type1.c:232:8: warning: passing argument 1 of=20
-=E2=80=98bitmap_set=E2=80=99 from incompatible pointer type [enabled by def=
-ault]
-         (vpfn->iova - dma->iova) / pgsize, 1);
-         ^
-In file included from ./include/linux/cpumask.h:12:0,
-                  from ./arch/x86/include/asm/cpumask.h:5,
-                  from ./arch/x86/include/asm/msr.h:11,
-                  from ./arch/x86/include/asm/processor.h:22,
-                  from ./arch/x86/include/asm/cpufeature.h:5,
-                  from ./arch/x86/include/asm/thread_info.h:53,
-                  from ./include/linux/thread_info.h:38,
-                  from ./arch/x86/include/asm/preempt.h:7,
-                  from ./include/linux/preempt.h:78,
-                  from ./include/linux/spinlock.h:51,
-                  from ./include/linux/seqlock.h:36,
-                  from ./include/linux/time.h:6,
-                  from ./include/linux/compat.h:10,
-                  from drivers/vfio/vfio_iommu_type1.c:24:
-./include/linux/bitmap.h:405:29: note: expected =E2=80=98long unsigned int =
-*=E2=80=99=20
-but argument is of type =E2=80=98u64 *=E2=80=99
-  static __always_inline void bitmap_set(unsigned long *map, unsigned=20
-int start,
-
-Thanks,
-Kirti
