@@ -2,198 +2,158 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3C7FD18C1A6
-	for <lists+kvm@lfdr.de>; Thu, 19 Mar 2020 21:49:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 59ED818C1F2
+	for <lists+kvm@lfdr.de>; Thu, 19 Mar 2020 21:54:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726975AbgCSUtH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Mar 2020 16:49:07 -0400
-Received: from mail-mw2nam12on2121.outbound.protection.outlook.com ([40.107.244.121]:61248
-        "EHLO NAM12-MW2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725787AbgCSUtH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 Mar 2020 16:49:07 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=WvoOcu/wafDKG6MhBhKNS6F16xzRHySL3d+lMhuogq+d0mvkuCkE8Xc7/oTux/D4PTk7A+fQxmFE5+1euqEeInOy1Ou1Y77SzAlFajGMe1J+YC7K1NR4vPydoZvposKJXPiY9ay1x5sdlNczRrh8Z66Ii2qW/gF8nqgoIuP5OsT0BtoY25Re/8ilXqjN1DLH1dDjAVf1XZAO1nh7yFjnsgi+HzmuBIF4pAf1oaEOwjbdxcEVZ+3Qfee1tqxQjDnpBGube1ATlYrJxOcv+uvLhsAml7BYxawqQQinlpMqbDSCcULp6TqF13jvsKW2dbA0rbgjaYwXM2Mm5PIIA/efWg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=F61YRBI6iznorIltp5qZLGSCwUgJUJPBJmsjVcsv+M0=;
- b=bodeVZ5KvXD08TyJCTrPGFNFqhtb+pL0HlFyQsh5XYDw9wAcH0/1CgqP915ojph0KlbWUfAHnXa/xeEwe1CMi6/T3ZjoOr/nMv9vzzT9eV/bDC1Npnn0Z834Neg9lGA/S9HyX6OoWlINcspP0yRVI/GxMqVYeCTOaiTMwWH/JlbrvJ3DmMxozmCYBOEZPeVtt53Syd2SAvxW0CNOzzHOeDviqTADVsubSv6XdY792jc36OtmCG8ErIRiJTFN8z41QZBtgPdMvzjC2YZy0kpU0AO1GOF3DuSdbm6hTKZ8GrRQEQXib0rDWQOqlW6Do8JFhn4t8hz1r3g131kpXr0dog==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microsoft.com; dmarc=pass action=none
- header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=F61YRBI6iznorIltp5qZLGSCwUgJUJPBJmsjVcsv+M0=;
- b=N5JRqq3ayWJHv2O8ywdN1703ix/rr0EnXExiS4OeRyD27iau4aaf9UF8bsdTZmXHbrt+rPyvsZfdhNeteabeneq3g+SSO7g5KEjYeItOYb3gR1EUK+tZvmkIE9f6G/MHBh7/boNiyVkSCzDp5Ddm1xp0U9977jLJJuwv8jPIZD4=
-Received: from MW2PR2101MB1052.namprd21.prod.outlook.com (2603:10b6:302:a::16)
- by MW2PR2101MB1114.namprd21.prod.outlook.com (2603:10b6:302:a::31) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2856.1; Thu, 19 Mar
- 2020 20:49:01 +0000
-Received: from MW2PR2101MB1052.namprd21.prod.outlook.com
- ([fe80::71ee:121:71bd:6156]) by MW2PR2101MB1052.namprd21.prod.outlook.com
- ([fe80::71ee:121:71bd:6156%10]) with mapi id 15.20.2856.003; Thu, 19 Mar 2020
- 20:49:01 +0000
-From:   Michael Kelley <mikelley@microsoft.com>
-To:     Jon Doron <arilou@gmail.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>
-CC:     vkuznets <vkuznets@redhat.com>
-Subject: RE: [PATCH v8 2/5] x86/hyper-v: Add synthetic debugger definitions
-Thread-Topic: [PATCH v8 2/5] x86/hyper-v: Add synthetic debugger definitions
-Thread-Index: AQHV/bkRMMUyPxTkAEeuFf0GP1+Y4ahQY+qw
-Date:   Thu, 19 Mar 2020 20:49:01 +0000
-Message-ID: <MW2PR2101MB10524691B2FC06269E67E8FCD7F40@MW2PR2101MB1052.namprd21.prod.outlook.com>
-References: <20200319063836.678562-1-arilou@gmail.com>
- <20200319063836.678562-3-arilou@gmail.com>
-In-Reply-To: <20200319063836.678562-3-arilou@gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-msip_labels: MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=True;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Owner=mikelley@ntdev.microsoft.com;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2020-03-19T20:48:59.1055636Z;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=General;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Application=Microsoft Azure
- Information Protection;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=f47dd57c-1b5e-485c-96da-8c6d1d26f1ae;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Extended_MSFT_Method=Automatic
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=mikelley@microsoft.com; 
-x-originating-ip: [24.22.167.197]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: 8df82f72-df39-42f7-2475-08d7cc46f45d
-x-ms-traffictypediagnostic: MW2PR2101MB1114:|MW2PR2101MB1114:
-x-ld-processed: 72f988bf-86f1-41af-91ab-2d7cd011db47,ExtAddr
-x-microsoft-antispam-prvs: <MW2PR2101MB1114D0013DD1365A834BB877D7F40@MW2PR2101MB1114.namprd21.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:10000;
-x-forefront-prvs: 0347410860
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(4636009)(39860400002)(396003)(366004)(346002)(136003)(376002)(199004)(76116006)(52536014)(10290500003)(110136005)(86362001)(66946007)(316002)(478600001)(81156014)(81166006)(8676002)(8936002)(26005)(71200400001)(55016002)(7696005)(8990500004)(186003)(4326008)(33656002)(2906002)(6506007)(5660300002)(9686003)(66556008)(66476007)(64756008)(66446008);DIR:OUT;SFP:1102;SCL:1;SRVR:MW2PR2101MB1114;H:MW2PR2101MB1052.namprd21.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;
-received-spf: None (protection.outlook.com: microsoft.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: /QPsjQR9yzIEfmv6jL66BO/Nd3fTyRpLYOPs0iTgHKa9d4K9DmH+6hawzhHK8NjCdBXcf6+ollEjeQqtpjfJ2YNE6q41NY7Ow37YnEBtK+Vh0MEdIEeEaAgvuiePB5X0hUPF1Et7CPn3cxkZG+bs9TnzQBatHmknLWNaIUy/ZMLte4wVePofGLXBv95truEeoxYx9obVIWvDiFo9MWhGVpp6MBHXLfkJESTXC79WirbtZAR35BDKirtTmpPYrxGgL4NNT9WuMRKg7dGXhN8rhdrFS8CbSsbNnxHj/0ung4FCh5kGQJF/9AN9xoXrLcbjZ1IjUW1IJUvtE1n/LoURn//CZqnDLoilIqQZ+5vGbtqya63e1hgLyWFNmKiq9uIvvNF/duwaMurO1wWs/gws1Fb2/ZorakIplixJkVP8qEixUy1LmXidYQl8Cp1gnQKg
-x-ms-exchange-antispam-messagedata: zxU13xnl8zc4DdTLbzwwIVMpMPzsfVSrH+aJc5nw11ZN+sbE1jrIL6i6KXXWf/GodMTtNIjSUaeyGpiKKDTXOqSuqsL8uVqR6ifhJQZwYcydVeM70lS8sk86nrDpFP+ld3vGehDO8KXz4VybnO+wIA==
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        id S1727001AbgCSUyc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Mar 2020 16:54:32 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:52289 "EHLO
+        us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725787AbgCSUyb (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 19 Mar 2020 16:54:31 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1584651270;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=hjYV+wyQpR7B3d18pGkcaBgDOBTqUbQeqCdfhG5P9bo=;
+        b=bxRQax2KOIvVQ8vCVGS2SgaQuwAMYHMkknuSolDAvevK95u+NMjCd71TmUS1CZ0VhdSu35
+        pV0APy0kNcEmVqVdCGErKwq8qGi6Xfr+LIUiGaHeOwCbDTgB+COeVzGB6Y4y+A3hjk36C0
+        O1MwnUiS9czP95Sgz7CCNe8sGTY1NJE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-237-p0LYqKLYNvCQK8jTVjAaFQ-1; Thu, 19 Mar 2020 16:54:26 -0400
+X-MC-Unique: p0LYqKLYNvCQK8jTVjAaFQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BCD30800D4E;
+        Thu, 19 Mar 2020 20:54:23 +0000 (UTC)
+Received: from w520.home (ovpn-112-162.phx2.redhat.com [10.3.112.162])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 09B57BBBFD;
+        Thu, 19 Mar 2020 20:54:21 +0000 (UTC)
+Date:   Thu, 19 Mar 2020 14:54:21 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Kirti Wankhede <kwankhede@nvidia.com>
+Cc:     <cjia@nvidia.com>, <kevin.tian@intel.com>, <ziye.yang@intel.com>,
+        <changpeng.liu@intel.com>, <yi.l.liu@intel.com>,
+        <mlevitsk@redhat.com>, <eskultet@redhat.com>, <cohuck@redhat.com>,
+        <dgilbert@redhat.com>, <jonathan.davies@nutanix.com>,
+        <eauger@redhat.com>, <aik@ozlabs.ru>, <pasic@linux.ibm.com>,
+        <felipe@nutanix.com>, <Zhengxiao.zx@Alibaba-inc.com>,
+        <shuangtai.tst@alibaba-inc.com>, <Ken.Xue@amd.com>,
+        <zhi.a.wang@intel.com>, <yan.y.zhao@intel.com>,
+        <qemu-devel@nongnu.org>, <kvm@vger.kernel.org>
+Subject: Re: [PATCH v14 Kernel 4/7] vfio iommu: Implementation of ioctl for
+ dirty pages tracking.
+Message-ID: <20200319145421.4b8bd4eb@w520.home>
+In-Reply-To: <8e537411-b60e-cc45-498c-5e516382206e@nvidia.com>
+References: <1584560474-19946-1-git-send-email-kwankhede@nvidia.com>
+        <1584560474-19946-5-git-send-email-kwankhede@nvidia.com>
+        <20200318214500.1a0cb985@w520.home>
+        <e0070cf4-af58-2906-b427-0888ecb89538@nvidia.com>
+        <20200319102238.77686a08@w520.home>
+        <8e537411-b60e-cc45-498c-5e516382206e@nvidia.com>
 MIME-Version: 1.0
-X-OriginatorOrg: microsoft.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8df82f72-df39-42f7-2475-08d7cc46f45d
-X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Mar 2020 20:49:01.3767
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: KhiI4eu140F/QBPhbu3fU+nvHQBrbiNL0JO0uEFR+oi+bMBKAo2iRb8Q5E/D2X+//OD6DUSFnBsWPi+N7ZDFTZYILcgHf0okwTm7v2WNzEA=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW2PR2101MB1114
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Jon Doron <arilou@gmail.com> Sent: Wednesday, March 18, 2020 11:39 PM
->=20
-> Hyper-V synthetic debugger has two modes, one that uses MSRs and
-> the other that use Hypercalls.
->=20
-> Add all the required definitions to both types of synthetic debugger
-> interface.
->=20
-> Some of the required new CPUIDs and MSRs are not documented in the TLFS
-> so they are in hyperv.h instead.
->=20
-> The reason they are not documented is because they are subjected to be
-> removed in future versions of Windows.
->=20
-> Signed-off-by: Jon Doron <arilou@gmail.com>
+On Fri, 20 Mar 2020 01:55:10 +0530
+Kirti Wankhede <kwankhede@nvidia.com> wrote:
 
-Reviewed-by: Michael Kelley <mikelley@microsoft.com>
+> On 3/19/2020 9:52 PM, Alex Williamson wrote:
+> > On Thu, 19 Mar 2020 20:22:41 +0530
+> > Kirti Wankhede <kwankhede@nvidia.com> wrote:
+> >   
+> >> On 3/19/2020 9:15 AM, Alex Williamson wrote:  
+> >>> On Thu, 19 Mar 2020 01:11:11 +0530
+> >>> Kirti Wankhede <kwankhede@nvidia.com> wrote:
+> >>>      
+> 
+> <snip>
+> 
+> >>>> +
+> >>>> +static int verify_bitmap_size(uint64_t npages, uint64_t bitmap_size)
+> >>>> +{
+> >>>> +	uint64_t bsize;
+> >>>> +
+> >>>> +	if (!npages || !bitmap_size || bitmap_size > UINT_MAX)  
+> >>>
+> >>> As commented previously, how do we derive this UINT_MAX limitation?
+> >>>      
+> >>
+> >> Sorry, I missed that earlier
+> >>  
+> >>   > UINT_MAX seems arbitrary, is this specified in our API?  The size of a
+> >>   > vfio_dma is limited to what the user is able to pin, and therefore
+> >>   > their locked memory limit, but do we have an explicit limit elsewhere
+> >>   > that results in this limit here.  I think a 4GB bitmap would track
+> >>   > something like 2^47 bytes of memory, that's pretty excessive, but still
+> >>   > an arbitrary limit.  
+> >>
+> >> There has to be some upper limit check. In core KVM, in
+> >> virt/kvm/kvm_main.c there is max number of pages check:
+> >>
+> >> if (new.npages > KVM_MEM_MAX_NR_PAGES)
+> >>
+> >> Where
+> >> /*
+> >>    * Some of the bitops functions do not support too long bitmaps.
+> >>    * This number must be determined not to exceed such limits.
+> >>    */
+> >> #define KVM_MEM_MAX_NR_PAGES ((1UL << 31) - 1)
+> >>
+> >> Though I don't know which bitops functions do not support long bitmaps.
+> >>
+> >> Something similar as above can be done or same as you also mentioned of
+> >> 4GB bitmap limit? that is U32_MAX instead of UINT_MAX?  
+> > 
+> > Let's see, we use bitmap_set():
+> > 
+> > void bitmap_set(unsigned long *map, unsigned int start, unsigned int nbits)
+> > 
+> > So we're limited to an unsigned int number of bits, but for an
+> > unaligned, multi-bit operation this will call __bitmap_set():
+> > 
+> > void __bitmap_set(unsigned long *map, unsigned int start, int len)
+> > 
+> > So we're down to a signed int number of bits (seems like an API bug in
+> > bitops there), so it makes sense that KVM is testing against MAX_INT
+> > number of pages, ie. number of bits.  But that still suggests a bitmap
+> > size of MAX_UINT is off by a factor of 16.  So we can have 2^31 bits
+> > divided by 2^3 bits/byte yields a maximum bitmap size of 2^28 (ie.
+> > 256MB), which maps 2^31 * 2^12 = 2^43 (8TB) on a 4K system.
+> > 
+> > Let's fix the limit check and put a nice comment explaining it.  Thanks,
+> >   
+> 
+> Agreed. Adding DIRTY_BITMAP_SIZE_MAX macro and comment as below.
+> 
+> /*
+>   * Input argument of number of bits to bitmap_set() is unsigned 
+> integer, which
+>   * further casts to signed integer for unaligned multi-bit operation,
+>   * __bitmap_set().
+>   * Then maximum bitmap size supported is 2^31 bits divided by 2^3 
+> bits/byte,
+>   * that is 2^28 (256 MB) which maps to 2^31 * 2^12 = 2^43 (8TB) on 4K page
+>   * system.
+>   */
+> #define DIRTY_BITMAP_PAGES_MAX  ((1UL << 31) - 1)
 
-> ---
->  arch/x86/include/asm/hyperv-tlfs.h |  6 ++++++
->  arch/x86/kvm/hyperv.h              | 27 +++++++++++++++++++++++++++
->  2 files changed, 33 insertions(+)
->=20
-> diff --git a/arch/x86/include/asm/hyperv-tlfs.h b/arch/x86/include/asm/hy=
-perv-tlfs.h
-> index 92abc1e42bfc..671ce2a39d4b 100644
-> --- a/arch/x86/include/asm/hyperv-tlfs.h
-> +++ b/arch/x86/include/asm/hyperv-tlfs.h
-> @@ -131,6 +131,8 @@
->  #define HV_FEATURE_FREQUENCY_MSRS_AVAILABLE		BIT(8)
->  /* Crash MSR available */
->  #define HV_FEATURE_GUEST_CRASH_MSR_AVAILABLE		BIT(10)
-> +/* Support for debug MSRs available */
-> +#define HV_FEATURE_DEBUG_MSRS_AVAILABLE			BIT(11)
->  /* stimer Direct Mode is available */
->  #define HV_STIMER_DIRECT_MODE_AVAILABLE			BIT(19)
->=20
-> @@ -376,6 +378,9 @@ struct hv_tsc_emulation_status {
->  #define HVCALL_SEND_IPI_EX			0x0015
->  #define HVCALL_POST_MESSAGE			0x005c
->  #define HVCALL_SIGNAL_EVENT			0x005d
-> +#define HVCALL_POST_DEBUG_DATA			0x0069
-> +#define HVCALL_RETRIEVE_DEBUG_DATA		0x006a
-> +#define HVCALL_RESET_DEBUG_SESSION		0x006b
->  #define HVCALL_FLUSH_GUEST_PHYSICAL_ADDRESS_SPACE 0x00af
->  #define HVCALL_FLUSH_GUEST_PHYSICAL_ADDRESS_LIST 0x00b0
->=20
-> @@ -419,6 +424,7 @@ enum HV_GENERIC_SET_FORMAT {
->  #define HV_STATUS_INVALID_HYPERCALL_INPUT	3
->  #define HV_STATUS_INVALID_ALIGNMENT		4
->  #define HV_STATUS_INVALID_PARAMETER		5
-> +#define HV_STATUS_OPERATION_DENIED		8
->  #define HV_STATUS_INSUFFICIENT_MEMORY		11
->  #define HV_STATUS_INVALID_PORT_ID		17
->  #define HV_STATUS_INVALID_CONNECTION_ID		18
-> diff --git a/arch/x86/kvm/hyperv.h b/arch/x86/kvm/hyperv.h
-> index 757cb578101c..5e4780bf6dd7 100644
-> --- a/arch/x86/kvm/hyperv.h
-> +++ b/arch/x86/kvm/hyperv.h
-> @@ -23,6 +23,33 @@
->=20
->  #include <linux/kvm_host.h>
->=20
-> +/*
-> + * The #defines related to the synthetic debugger are required by KDNet,=
- but
-> + * they are not documented in the Hyper-V TLFS because the synthetic deb=
-ugger
-> + * functionality has been deprecated and is subject to removal in future=
- versions
-> + * of Windows.
-> + */
-> +#define HYPERV_CPUID_SYNDBG_VENDOR_AND_MAX_FUNCTIONS	0x40000080
-> +#define HYPERV_CPUID_SYNDBG_INTERFACE			0x40000081
-> +#define HYPERV_CPUID_SYNDBG_PLATFORM_CAPABILITIES	0x40000082
-> +
-> +/*
-> + * Hyper-V synthetic debugger platform capabilities
-> + * These are HYPERV_CPUID_SYNDBG_PLATFORM_CAPABILITIES.EAX bits.
-> + */
-> +#define HV_X64_SYNDBG_CAP_ALLOW_KERNEL_DEBUGGING	BIT(1)
-> +
-> +/* Hyper-V Synthetic debug options MSR */
-> +#define HV_X64_MSR_SYNDBG_CONTROL		0x400000F1
-> +#define HV_X64_MSR_SYNDBG_STATUS		0x400000F2
-> +#define HV_X64_MSR_SYNDBG_SEND_BUFFER		0x400000F3
-> +#define HV_X64_MSR_SYNDBG_RECV_BUFFER		0x400000F4
-> +#define HV_X64_MSR_SYNDBG_PENDING_BUFFER	0x400000F5
-> +#define HV_X64_MSR_SYNDBG_OPTIONS		0x400000FF
-> +
-> +/* Hyper-V HV_X64_MSR_SYNDBG_OPTIONS bits */
-> +#define HV_X64_SYNDBG_OPTION_USE_HCALLS		BIT(2)
-> +
->  static inline struct kvm_vcpu_hv *vcpu_to_hv_vcpu(struct kvm_vcpu *vcpu)
->  {
->  	return &vcpu->arch.hyperv;
-> --
-> 2.24.1
+nit, can we just use INT_MAX here?
+
+> #define DIRTY_BITMAP_SIZE_MAX 	\
+> 			DIRTY_BITMAP_BYTES(DIRTY_BITMAP_PAGES_MAX)
+> 
+> 
+> Thanks,
+> Kirti
+> 
 
