@@ -2,101 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1A62818B1DD
-	for <lists+kvm@lfdr.de>; Thu, 19 Mar 2020 11:57:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4DFF218B241
+	for <lists+kvm@lfdr.de>; Thu, 19 Mar 2020 12:21:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727162AbgCSK5e (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Mar 2020 06:57:34 -0400
-Received: from mail.kernel.org ([198.145.29.99]:37640 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727009AbgCSK5d (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 Mar 2020 06:57:33 -0400
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 223D020752;
-        Thu, 19 Mar 2020 10:57:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1584615453;
-        bh=uHx+Br1aMgWnaInx45PzVj4K7vit7la5TgFfqUwGJvA=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=LOf17CNugvPH2Y2uD9Tv74rrJWdl7xOpeMe/roOkwkNQdPLN1/2JREqsMj8iVjP2+
-         5pSBYtrmJMarW0a6lyyXniuNlZcLfCB11qjEGpG2KA0NVKkCZaNPMw86Eo7Q+AacOT
-         9+QuW7mDJe+HZ14RMb2B07KSMZX6oXoQVEOpnHh0=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
-        by disco-boy.misterjones.org with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.92)
-        (envelope-from <maz@kernel.org>)
-        id 1jEsrj-00Duvj-FZ; Thu, 19 Mar 2020 10:57:31 +0000
+        id S1726892AbgCSLVu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Mar 2020 07:21:50 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:37010 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725787AbgCSLVt (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 19 Mar 2020 07:21:49 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 02JBAWfB135771
+        for <kvm@vger.kernel.org>; Thu, 19 Mar 2020 07:21:48 -0400
+Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2yu7ad7vu7-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Thu, 19 Mar 2020 07:21:48 -0400
+Received: from localhost
+        by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <raspl@linux.ibm.com>;
+        Thu, 19 Mar 2020 11:21:46 -0000
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
+        by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Thu, 19 Mar 2020 11:21:43 -0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 02JBLgQ444630230
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 19 Mar 2020 11:21:42 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D3CB2AE053;
+        Thu, 19 Mar 2020 11:21:42 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B1709AE04D;
+        Thu, 19 Mar 2020 11:21:42 +0000 (GMT)
+Received: from [9.145.6.140] (unknown [9.145.6.140])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu, 19 Mar 2020 11:21:42 +0000 (GMT)
+Subject: Re: [PATCH 0/7] tools/kvm_stat: add logfile support
+From:   Stefan Raspl <raspl@linux.ibm.com>
+To:     kvm@vger.kernel.org
+Cc:     pbonzini@redhat.com
+References: <20200306114250.57585-1-raspl@linux.ibm.com>
+Date:   Thu, 19 Mar 2020 12:21:42 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
+In-Reply-To: <20200306114250.57585-1-raspl@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Date:   Thu, 19 Mar 2020 10:57:31 +0000
-From:   Marc Zyngier <maz@kernel.org>
-To:     Auger Eric <eric.auger@redhat.com>
-Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
-        Jason Cooper <jason@lakedaemon.net>,
-        Robert Richter <rrichter@marvell.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: Re: [PATCH v5 15/23] irqchip/gic-v4.1: Add VSGI property setup
-In-Reply-To: <edfc4aa0-3e96-4fb2-731e-76a284c8ce17@redhat.com>
-References: <20200304203330.4967-1-maz@kernel.org>
- <20200304203330.4967-16-maz@kernel.org>
- <edfc4aa0-3e96-4fb2-731e-76a284c8ce17@redhat.com>
-Message-ID: <fc6ae25a16ec8ad27e8853f137cc82a1@kernel.org>
-X-Sender: maz@kernel.org
-User-Agent: Roundcube Webmail/1.3.10
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: eric.auger@redhat.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, lorenzo.pieralisi@arm.com, jason@lakedaemon.net, rrichter@marvell.com, tglx@linutronix.de, yuzenghui@huawei.com, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-TM-AS-GCONF: 00
+x-cbid: 20031911-0016-0000-0000-000002F3CE29
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20031911-0017-0000-0000-00003357578E
+Message-Id: <d1c5e601-f7e3-4fa1-3418-4bc2679f3204@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.645
+ definitions=2020-03-19_02:2020-03-19,2020-03-19 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0
+ priorityscore=1501 mlxscore=0 lowpriorityscore=0 bulkscore=0
+ suspectscore=1 clxscore=1015 adultscore=0 spamscore=0 impostorscore=0
+ malwarescore=0 mlxlogscore=999 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2003020000 definitions=main-2003190048
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Eric,
-
-On 2020-03-17 10:30, Auger Eric wrote:
-> Hi Marc,
+On 2020-03-06 12:42, Stefan Raspl wrote:
+> This patch series provides a couple of new options to make logging to
+> files feasible.
+> Specifically, we add command line switches to specify an arbitrary time
+> interval for logging, and to toggle between a .csv and the previous
+> file format. Furthermore, we allow logging to files, where we utilize a
+> rotating set of 6 logfiles, each with its own header for easy post-
+> processing, especially when using .csv format.
+> Since specifying logfile size limits might be a non-trivial exercise,
+> we're throwing in yet another command line option that allows to
+> specify the minimum timeframe that should be covered by logs.
+> Finally, there's a minimal systemd unit file to deploy kvm_stat-based
+> logging in Linux distributions.
+> Note that the decision to write our own logfiles rather than to log to
+> e.g. systemd journal is a conscious one: It is effectively impossible to
+> write csv records into the systemd journal, the header will either
+> disappear after a while or has to be repeated from time to time, which
+> defeats the purpose of having a .csv format that can be easily post-
+> processed, etc.
+> See individual patch description for further details.
 > 
-> On 3/4/20 9:33 PM, Marc Zyngier wrote:
->> Add the SGI configuration entry point for KVM to use.
->> 
->> Signed-off-by: Marc Zyngier <maz@kernel.org>
->> ---
->>  drivers/irqchip/irq-gic-v3-its.c   |  2 +-
->>  drivers/irqchip/irq-gic-v4.c       | 13 +++++++++++++
->>  include/linux/irqchip/arm-gic-v4.h |  3 ++-
->>  3 files changed, 16 insertions(+), 2 deletions(-)
->> 
->> diff --git a/drivers/irqchip/irq-gic-v3-its.c 
->> b/drivers/irqchip/irq-gic-v3-its.c
->> index effb0e0b0c9d..b65fba67bd85 100644
->> --- a/drivers/irqchip/irq-gic-v3-its.c
->> +++ b/drivers/irqchip/irq-gic-v3-its.c
->> @@ -4039,7 +4039,7 @@ static int its_sgi_set_vcpu_affinity(struct 
->> irq_data *d, void *vcpu_info)
->>  	struct its_cmd_info *info = vcpu_info;
->> 
->>  	switch (info->cmd_type) {
->> -	case PROP_UPDATE_SGI:
->> +	case PROP_UPDATE_VSGI:
-> This change rather belongs to
-> [PATCH v5 12/23] irqchip/gic-v4.1: Plumb set_vcpu_affinity SGI 
-> callbacks
+> 
+> Stefan Raspl (7):
+>   tools/kvm_stat: rework command line sequence and message texts
+>   tools/kvm_stat: switch to argparse
+>   tools/kvm_stat: add command line switch '-s' to set update interval
+>   tools/kvm_stat: add command line switch '-c' to log in csv format
+>   tools/kvm_stat: add rotating log support
+>   tools/kvm_stat: add command line switch '-T'
+>   tools/kvm_stat: add sample systemd unit file
+> 
+>  tools/kvm/kvm_stat/kvm_stat         | 434 +++++++++++++++++++++-------
+>  tools/kvm/kvm_stat/kvm_stat.service |  15 +
+>  tools/kvm/kvm_stat/kvm_stat.txt     |  59 ++--
+>  3 files changed, 384 insertions(+), 124 deletions(-)
+>  create mode 100644 tools/kvm/kvm_stat/kvm_stat.service
+> 
 
-Absolutely. I messed up a rebase, obviously.
+Any consideration yet...?
 
-Thanks,
+Ciao,
+Stefan
 
-         M.
--- 
-Jazz is not dead. It just smells funny...
