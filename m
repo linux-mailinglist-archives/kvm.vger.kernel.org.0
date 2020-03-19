@@ -2,285 +2,144 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9634A18B0CE
-	for <lists+kvm@lfdr.de>; Thu, 19 Mar 2020 11:03:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 292C018B0E3
+	for <lists+kvm@lfdr.de>; Thu, 19 Mar 2020 11:05:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727001AbgCSKDZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Mar 2020 06:03:25 -0400
-Received: from mail.kernel.org ([198.145.29.99]:36328 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725767AbgCSKDZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 Mar 2020 06:03:25 -0400
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 8EAA820732;
-        Thu, 19 Mar 2020 10:03:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1584612203;
-        bh=NDSw/JHoFN2BsN1UPsDHqsSP+Epv+7qlVjTIxm9k30w=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=2CgxD8XmSED4dEoiCYiJoMLzjCtDg7MWOmknGZZE0JMWtDRHoN7jrUC2jeLJF6wjs
-         PqE48a7Co9nnn72MO7/KpdrPqldvZdEE/n4ouuywXgdFrUILCOBcCUlbE/0Q2Qiemr
-         K8cp4g++UHHw3tsaSBk8mSHzuxUBjsDDiEpIj8FU=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
-        by disco-boy.misterjones.org with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.92)
-        (envelope-from <maz@kernel.org>)
-        id 1jEs1J-00DuEW-Rn; Thu, 19 Mar 2020 10:03:21 +0000
+        id S1727188AbgCSKFW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Mar 2020 06:05:22 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:25691 "EHLO
+        us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726802AbgCSKFV (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 19 Mar 2020 06:05:21 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1584612320;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=biS3cShpXl2Aq0UEQn21ymKBE/YmvTY+/p2BtT5ta1k=;
+        b=DaICgVaiolpt7aK7OUJmCWpBw3hPXvtHqKOOiCaau+8ifb0SftcxPfT52aDmk+xVgQayI5
+        on5gxiVfrBrYISHGgRMeUTDMDzMGD5ZREagHeCaf6AXMuP7Tc/BID0X1MtisXs+HExp7nd
+        9s6V4wIl4es47lRP7Yvd4USX+vXqqf8=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-317-P3KqnMCtNouSE2-XTbvpaQ-1; Thu, 19 Mar 2020 06:05:18 -0400
+X-MC-Unique: P3KqnMCtNouSE2-XTbvpaQ-1
+Received: by mail-wm1-f70.google.com with SMTP id a11so777031wmm.9
+        for <kvm@vger.kernel.org>; Thu, 19 Mar 2020 03:05:18 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=biS3cShpXl2Aq0UEQn21ymKBE/YmvTY+/p2BtT5ta1k=;
+        b=o59CtHXB7DrdExMychZbFZiU+AkdSBQxZzZz4pGjfFJsZ0h9KG3TRaqrknpWg+ppJV
+         BOGdE64rtnVhJXH/aTVhfcn5hpUFqR7Qoz0GBGUgw71RMCSUGaaMwY1cOPWuTLqypWRm
+         TyqTpT/URaDgBM6JiIZMAJjrOzDhRc/tta+uRCrDiD0x6FbwmwcSr7eh3Ukh5HyTw39g
+         WG+VeVgJMVmM223e7S0BLtHOyup+nSMqy/fGnid5tCzfvtn3t4zaHyOBY8TJUSQrN/cK
+         yrqsLVdnARijvxANjlSbc3sQToqRBcwiI0+F5qV666lJKN2G6u5Qvgarbe3Z4cxnotnf
+         McZg==
+X-Gm-Message-State: ANhLgQ3fPhdcqLfn2pSFIx6ICkZ6FUcpmLncS/ji3rRJFBzg2CCkOsYo
+        qSHGsL4dZq4vpXQr88yp/NMkgcWbUi4ifO+cUWWb7QecSDUDrGbkZriBa2kHrVTJbGWr1YLHotz
+        TMVABtnnuvZz6
+X-Received: by 2002:a05:600c:2c0f:: with SMTP id q15mr2657230wmg.64.1584612317514;
+        Thu, 19 Mar 2020 03:05:17 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vteptDrM0Sa4MuQRsMwkR4OkaNbZvD0oN0fqzKGp8th+KLIwNuYkrMPUb6mOK28WU/CULOflA==
+X-Received: by 2002:a05:600c:2c0f:: with SMTP id q15mr2657206wmg.64.1584612317270;
+        Thu, 19 Mar 2020 03:05:17 -0700 (PDT)
+Received: from [192.168.178.58] ([151.21.15.43])
+        by smtp.gmail.com with ESMTPSA id t126sm2628652wmb.27.2020.03.19.03.05.16
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 19 Mar 2020 03:05:16 -0700 (PDT)
+Subject: Re: [PATCH] KVM: nSVM: check for EFER.SVME=1 before entering guest
+To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+References: <1584535300-6571-1-git-send-email-pbonzini@redhat.com>
+ <b5cb03b1-9840-f8f5-843a-1eab680d5e8e@oracle.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <6426c98d-d206-aeb7-93fa-da62b77df21a@redhat.com>
+Date:   Thu, 19 Mar 2020 11:05:15 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date:   Thu, 19 Mar 2020 10:03:21 +0000
-From:   Marc Zyngier <maz@kernel.org>
-To:     Auger Eric <eric.auger@redhat.com>
-Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
-        Jason Cooper <jason@lakedaemon.net>,
-        Robert Richter <rrichter@marvell.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: Re: [PATCH v5 08/23] irqchip/gic-v4.1: Plumb skeletal VSGI irqchip
-In-Reply-To: <67a863c1-1d68-458a-39b1-6c43b8730d60@redhat.com>
-References: <20200304203330.4967-1-maz@kernel.org>
- <20200304203330.4967-9-maz@kernel.org>
- <67a863c1-1d68-458a-39b1-6c43b8730d60@redhat.com>
-Message-ID: <c0f06359b2c5f15282a87201b1ff60ce@kernel.org>
-X-Sender: maz@kernel.org
-User-Agent: Roundcube Webmail/1.3.10
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: eric.auger@redhat.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, lorenzo.pieralisi@arm.com, jason@lakedaemon.net, rrichter@marvell.com, tglx@linutronix.de, yuzenghui@huawei.com, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+In-Reply-To: <b5cb03b1-9840-f8f5-843a-1eab680d5e8e@oracle.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Eric,
-
-On 2020-03-16 17:10, Auger Eric wrote:
-> Hi Marc,
+On 18/03/20 19:40, Krish Sadhukhan wrote:
 > 
-> On 3/4/20 9:33 PM, Marc Zyngier wrote:
->> Since GICv4.1 has the capability to inject 16 SGIs into each VPE,
->> and that I'm keen not to invent too many specific interfaces to
->> manipulate these interrupts, let's pretend that each of these SGIs
->> is an actual Linux interrupt.
->> 
->> For that matter, let's introduce a minimal irqchip and irqdomain
->> setup that will get fleshed up in the following patches.
->> 
->> Signed-off-by: Marc Zyngier <maz@kernel.org>
->> Reviewed-by: Zenghui Yu <yuzenghui@huawei.com>
+> On 3/18/20 5:41 AM, Paolo Bonzini wrote:
+>> EFER is set for L2 using svm_set_efer, which hardcodes EFER_SVME to 1
+>> and hides
+>> an incorrect value for EFER.SVME in the L1 VMCB.  Perform the check
+>> manually
+>> to detect invalid guest state.
+>>
+>> Reported-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
+>> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 >> ---
->>  drivers/irqchip/irq-gic-v3-its.c   | 68 
->> +++++++++++++++++++++++++++++-
->>  drivers/irqchip/irq-gic-v4.c       |  8 +++-
->>  include/linux/irqchip/arm-gic-v4.h |  9 +++-
->>  3 files changed, 81 insertions(+), 4 deletions(-)
->> 
->> diff --git a/drivers/irqchip/irq-gic-v3-its.c 
->> b/drivers/irqchip/irq-gic-v3-its.c
->> index 54d6fdf7a28e..112b452fcb40 100644
->> --- a/drivers/irqchip/irq-gic-v3-its.c
->> +++ b/drivers/irqchip/irq-gic-v3-its.c
->> @@ -3870,6 +3870,67 @@ static struct irq_chip its_vpe_4_1_irq_chip = {
->>  	.irq_set_vcpu_affinity	= its_vpe_4_1_set_vcpu_affinity,
->>  };
->> 
->> +static int its_sgi_set_affinity(struct irq_data *d,
->> +				const struct cpumask *mask_val,
->> +				bool force)
->> +{
->> +	return -EINVAL;
->> +}
+>>   arch/x86/kvm/svm.c | 3 +++
+>>   1 file changed, 3 insertions(+)
+>>
+>> diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
+>> index 08568ae9f7a1..2125c6ae5951 100644
+>> --- a/arch/x86/kvm/svm.c
+>> +++ b/arch/x86/kvm/svm.c
+>> @@ -3558,6 +3558,9 @@ static bool nested_svm_vmrun_msrpm(struct
+>> vcpu_svm *svm)
+>>     static bool nested_vmcb_checks(struct vmcb *vmcb)
+>>   {
+>> +    if ((vmcb->save.efer & EFER_SVME) == 0)
+>> +        return false;
 >> +
->> +static struct irq_chip its_sgi_irq_chip = {
->> +	.name			= "GICv4.1-sgi",
->> +	.irq_set_affinity	= its_sgi_set_affinity,
->> +};
-> nit: const?
+>>       if ((vmcb->control.intercept & (1ULL << INTERCEPT_VMRUN)) == 0)
+>>           return false;
+>>   
+> 
+> Ah! This now tells me that I forgot the KVM fix that was supposed to
+> accompany my patchset.
 
-That would create a warning with irq_domain_set_hwirq_and_chip(), which
-doesn't take a const argument. I think this is fixable in the long run,
-but only as a sweeping tree-wide change.
+Heh, indeed.  I was puzzled for a second after applying it, then decided
+I would just fix it myself. :)
 
->> +
->> +static int its_sgi_irq_domain_alloc(struct irq_domain *domain,
->> +				    unsigned int virq, unsigned int nr_irqs,
->> +				    void *args)
->> +{
->> +	struct its_vpe *vpe = args;
->> +	int i;
->> +
->> +	/* Yes, we do want 16 SGIs */
->> +	WARN_ON(nr_irqs != 16);
->> +
->> +	for (i = 0; i < 16; i++) {
->> +		vpe->sgi_config[i].priority = 0;
->> +		vpe->sgi_config[i].enabled = false;
->> +		vpe->sgi_config[i].group = false;
->> +
->> +		irq_domain_set_hwirq_and_chip(domain, virq + i, i,
->> +					      &its_sgi_irq_chip, vpe);
->> +		irq_set_status_flags(virq + i, IRQ_DISABLE_UNLAZY);
->> +	}
->> +
->> +	return 0;
->> +}
->> +
->> +static void its_sgi_irq_domain_free(struct irq_domain *domain,
->> +				    unsigned int virq,
->> +				    unsigned int nr_irqs)
->> +{
->> +	/* Nothing to do */
->> +}
->> +
->> +static int its_sgi_irq_domain_activate(struct irq_domain *domain,
->> +				       struct irq_data *d, bool reserve)
->> +{
->> +	return 0;
->> +}
->> +
->> +static void its_sgi_irq_domain_deactivate(struct irq_domain *domain,
->> +					  struct irq_data *d)
->> +{
->> +	/* Nothing to do */
->> +}
->> +
->> +static struct irq_domain_ops its_sgi_domain_ops = {
->> +	.alloc		= its_sgi_irq_domain_alloc,
->> +	.free		= its_sgi_irq_domain_free,
->> +	.activate	= its_sgi_irq_domain_activate,
->> +	.deactivate	= its_sgi_irq_domain_deactivate,
->> +};
-> nit: const?
+> Do we need this check in software ? I wasn't checking the bit in KVM and
+> instead I was just making sure that L0 sets that bit based on the
+> setting in nested vmcb:
 
-This one can work with a bit of surgery below:
+The only effect of the function below over svm_set_efer is to guarantee
+a vmrun error to happen.  Doing the test in nested_vmcb_checks is more
+consistent with other must-be-one bits such as the VMRUN intercept, and
+it's also a smaller patch.
 
-diff --git a/drivers/irqchip/irq-gic-v3-its.c 
-b/drivers/irqchip/irq-gic-v3-its.c
-index 2e12bc52e3a2..321f73015d6c 100644
---- a/drivers/irqchip/irq-gic-v3-its.c
-+++ b/drivers/irqchip/irq-gic-v3-its.c
-@@ -4129,7 +4129,7 @@ static void its_sgi_irq_domain_deactivate(struct 
-irq_domain *domain,
-  	its_configure_sgi(d, true);
-  }
+Paolo
 
--static struct irq_domain_ops its_sgi_domain_ops = {
-+static const struct irq_domain_ops its_sgi_domain_ops = {
-  	.alloc		= its_sgi_irq_domain_alloc,
-  	.free		= its_sgi_irq_domain_free,
-  	.activate	= its_sgi_irq_domain_activate,
-@@ -5182,10 +5182,12 @@ int __init its_init(struct fwnode_handle 
-*handle, struct rdists *rdists,
-  		rdists->has_rvpeid = false;
+> 
+> +static void nested_svm_set_efer(struct kvm_vcpu *vcpu, u64
+> nested_vmcb_efer)
+> +{
+> +       svm_set_efer(vcpu, nested_vmcb_efer);
+> +
+> +       if (!(nested_vmcb_efer & EFER_SVME))
+> +               to_svm(vcpu)->vmcb->save.efer &= ~EFER_SVME;
+> +}
+> +
+>  static int is_external_interrupt(u32 info)
+>  {
+>         info &= SVM_EVTINJ_TYPE_MASK | SVM_EVTINJ_VALID;
+> @@ -3554,7 +3562,7 @@ static void enter_svm_guest_mode(struct vcpu_svm
+> *svm, u64
+>         svm->vmcb->save.gdtr = nested_vmcb->save.gdtr;
+>         svm->vmcb->save.idtr = nested_vmcb->save.idtr;
+>         kvm_set_rflags(&svm->vcpu, nested_vmcb->save.rflags);
+> -       svm_set_efer(&svm->vcpu, nested_vmcb->save.efer);
+> +       nested_svm_set_efer(&svm->vcpu, nested_vmcb->save.efer);
+>         svm_set_cr0(&svm->vcpu, nested_vmcb->save.cr0);
+>         svm_set_cr4(&svm->vcpu, nested_vmcb->save.cr4);
+>         if (npt_enabled) {
+> 
 
-  	if (has_v4 & rdists->has_vlpis) {
--		struct irq_domain_ops *sgi_ops = NULL;
-+		const struct irq_domain_ops *sgi_ops;
-
-  		if (has_v4_1)
-  			sgi_ops = &its_sgi_domain_ops;
-+		else
-+			sgi_ops = NULL;
-
-  		if (its_init_vpe_domain() ||
-  		    its_init_v4(parent_domain, &its_vpe_domain_ops, sgi_ops)) {
-
->> +
->>  static int its_vpe_id_alloc(void)
->>  {
->>  	return ida_simple_get(&its_vpeid_ida, 0, ITS_MAX_VPEID, GFP_KERNEL);
->> @@ -4912,8 +4973,13 @@ int __init its_init(struct fwnode_handle 
->> *handle, struct rdists *rdists,
->>  		rdists->has_rvpeid = false;
->> 
->>  	if (has_v4 & rdists->has_vlpis) {
->> +		struct irq_domain_ops *sgi_ops = NULL;
->> +
->> +		if (has_v4_1)
->> +			sgi_ops = &its_sgi_domain_ops;
->> +
->>  		if (its_init_vpe_domain() ||
->> -		    its_init_v4(parent_domain, &its_vpe_domain_ops)) {
->> +		    its_init_v4(parent_domain, &its_vpe_domain_ops, sgi_ops)) {
->>  			rdists->has_vlpis = false;
->>  			pr_err("ITS: Disabling GICv4 support\n");
->>  		}
->> diff --git a/drivers/irqchip/irq-gic-v4.c 
->> b/drivers/irqchip/irq-gic-v4.c
->> index 45969927cc81..c01910d53f9e 100644
->> --- a/drivers/irqchip/irq-gic-v4.c
->> +++ b/drivers/irqchip/irq-gic-v4.c
->> @@ -85,6 +85,7 @@
->> 
->>  static struct irq_domain *gic_domain;
->>  static const struct irq_domain_ops *vpe_domain_ops;
->> +static const struct irq_domain_ops *sgi_domain_ops;
->> 
->>  int its_alloc_vcpu_irqs(struct its_vm *vm)
->>  {
->> @@ -216,12 +217,15 @@ int its_prop_update_vlpi(int irq, u8 config, 
->> bool inv)
->>  	return irq_set_vcpu_affinity(irq, &info);
->>  }
->> 
->> -int its_init_v4(struct irq_domain *domain, const struct 
->> irq_domain_ops *ops)
->> +int its_init_v4(struct irq_domain *domain,
->> +		const struct irq_domain_ops *vpe_ops,
->> +		const struct irq_domain_ops *sgi_ops)
->>  {
->>  	if (domain) {
->>  		pr_info("ITS: Enabling GICv4 support\n");
->>  		gic_domain = domain;
->> -		vpe_domain_ops = ops;
->> +		vpe_domain_ops = vpe_ops;
->> +		sgi_domain_ops = sgi_ops;
->>  		return 0;
->>  	}
->> 
->> diff --git a/include/linux/irqchip/arm-gic-v4.h 
->> b/include/linux/irqchip/arm-gic-v4.h
->> index 439963f4c66a..44e8c19e3d56 100644
->> --- a/include/linux/irqchip/arm-gic-v4.h
->> +++ b/include/linux/irqchip/arm-gic-v4.h
->> @@ -49,6 +49,11 @@ struct its_vpe {
->>  		};
->>  		/* GICv4.1 implementations */
->>  		struct {
->> +			struct {
->> +				u8	priority;
->> +				bool	enabled;
->> +				bool	group;
->> +			}			sgi_config[16];
->>  			atomic_t vmapp_count;
->>  		};
->>  	};
->> @@ -123,6 +128,8 @@ int its_unmap_vlpi(int irq);
->>  int its_prop_update_vlpi(int irq, u8 config, bool inv);
->> 
->>  struct irq_domain_ops;
->> -int its_init_v4(struct irq_domain *domain, const struct 
->> irq_domain_ops *ops);
->> +int its_init_v4(struct irq_domain *domain,
->> +		const struct irq_domain_ops *vpe_ops,
->> +		const struct irq_domain_ops *sgi_ops);
->> 
->>  #endif
->> 
-> Reviewed-by: Eric Auger <eric.auger@redhat.com>
-
-Thanks,
-
-         M.
--- 
-Jazz is not dead. It just smells funny...
