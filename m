@@ -2,17 +2,17 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E644018AF90
-	for <lists+kvm@lfdr.de>; Thu, 19 Mar 2020 10:19:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DD9FF18AF7D
+	for <lists+kvm@lfdr.de>; Thu, 19 Mar 2020 10:17:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727649AbgCSJRd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Mar 2020 05:17:33 -0400
-Received: from 8bytes.org ([81.169.241.247]:52214 "EHLO theia.8bytes.org"
+        id S1727806AbgCSJRN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Mar 2020 05:17:13 -0400
+Received: from 8bytes.org ([81.169.241.247]:52420 "EHLO theia.8bytes.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727249AbgCSJOi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 Mar 2020 05:14:38 -0400
+        id S1727398AbgCSJOj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 Mar 2020 05:14:39 -0400
 Received: by theia.8bytes.org (Postfix, from userid 1000)
-        id 08C9080A; Thu, 19 Mar 2020 10:14:23 +0100 (CET)
+        id 351FD982; Thu, 19 Mar 2020 10:14:24 +0100 (CET)
 From:   Joerg Roedel <joro@8bytes.org>
 To:     x86@kernel.org
 Cc:     hpa@zytor.com, Andy Lutomirski <luto@kernel.org>,
@@ -27,9 +27,9 @@ Cc:     hpa@zytor.com, Andy Lutomirski <luto@kernel.org>,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         virtualization@lists.linux-foundation.org,
         Joerg Roedel <joro@8bytes.org>, Joerg Roedel <jroedel@suse.de>
-Subject: [PATCH 41/70] x86/sev-es: Add Runtime #VC Exception Handler
-Date:   Thu, 19 Mar 2020 10:13:38 +0100
-Message-Id: <20200319091407.1481-42-joro@8bytes.org>
+Subject: [PATCH 42/70] x86/sev-es: Support nested #VC exceptions
+Date:   Thu, 19 Mar 2020 10:13:39 +0100
+Message-Id: <20200319091407.1481-43-joro@8bytes.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200319091407.1481-1-joro@8bytes.org>
 References: <20200319091407.1481-1-joro@8bytes.org>
@@ -38,170 +38,114 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Tom Lendacky <thomas.lendacky@amd.com>
+From: Joerg Roedel <jroedel@suse.de>
 
-Add the handler for #VC exceptions invoked at runtime.
+Handle #VC exceptions that happen while the GHCB is in use. This can
+happen when an NMI happens in the #VC exception handler and the NMI
+handler causes a #VC exception itself. Save the contents of the GHCB
+when nesting is detected and restore it when the GHCB is no longer
+used.
 
-Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
 Signed-off-by: Joerg Roedel <jroedel@suse.de>
 ---
- arch/x86/entry/entry_64.S    |  4 ++
- arch/x86/include/asm/traps.h |  7 ++++
- arch/x86/kernel/idt.c        |  4 +-
- arch/x86/kernel/sev-es.c     | 77 +++++++++++++++++++++++++++++++++++-
- 4 files changed, 90 insertions(+), 2 deletions(-)
+ arch/x86/kernel/sev-es.c | 63 +++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 59 insertions(+), 4 deletions(-)
 
-diff --git a/arch/x86/entry/entry_64.S b/arch/x86/entry/entry_64.S
-index f2bb91e87877..729876d368c5 100644
---- a/arch/x86/entry/entry_64.S
-+++ b/arch/x86/entry/entry_64.S
-@@ -1210,6 +1210,10 @@ idtentry async_page_fault	do_async_page_fault	has_error_code=1	read_cr2=1
- idtentry machine_check		do_mce			has_error_code=0	paranoid=1
- #endif
- 
-+#ifdef CONFIG_AMD_MEM_ENCRYPT
-+idtentry vmm_communication     do_vmm_communication    has_error_code=1
-+#endif
-+
- /*
-  * Save all registers in pt_regs, and switch gs if needed.
-  * Use slow, but surefire "are we in kernel?" check.
-diff --git a/arch/x86/include/asm/traps.h b/arch/x86/include/asm/traps.h
-index 2aa786484bb1..1be25c065698 100644
---- a/arch/x86/include/asm/traps.h
-+++ b/arch/x86/include/asm/traps.h
-@@ -35,6 +35,9 @@ asmlinkage void alignment_check(void);
- #ifdef CONFIG_X86_MCE
- asmlinkage void machine_check(void);
- #endif /* CONFIG_X86_MCE */
-+#ifdef CONFIG_AMD_MEM_ENCRYPT
-+asmlinkage void vmm_communication(void);
-+#endif
- asmlinkage void simd_coprocessor_error(void);
- 
- #if defined(CONFIG_X86_64) && defined(CONFIG_XEN_PV)
-@@ -93,6 +96,10 @@ dotraplinkage void do_alignment_check(struct pt_regs *regs, long error_code);
- dotraplinkage void do_machine_check(struct pt_regs *regs, long error_code);
- #endif
- dotraplinkage void do_simd_coprocessor_error(struct pt_regs *regs, long error_code);
-+#ifdef CONFIG_AMD_MEM_ENCRYPT
-+dotraplinkage void do_vmm_communication_error(struct pt_regs *regs,
-+					      long error_code);
-+#endif
- #ifdef CONFIG_X86_32
- dotraplinkage void do_iret_error(struct pt_regs *regs, long error_code);
- #endif
-diff --git a/arch/x86/kernel/idt.c b/arch/x86/kernel/idt.c
-index 135d208a2d38..25fa8ba70993 100644
---- a/arch/x86/kernel/idt.c
-+++ b/arch/x86/kernel/idt.c
-@@ -88,8 +88,10 @@ static const __initconst struct idt_data def_idts[] = {
- #ifdef CONFIG_X86_MCE
- 	INTG(X86_TRAP_MC,		&machine_check),
- #endif
--
- 	SYSG(X86_TRAP_OF,		overflow),
-+#ifdef CONFIG_AMD_MEM_ENCRYPT
-+	INTG(X86_TRAP_VC,               vmm_communication),
-+#endif
- #if defined(CONFIG_IA32_EMULATION)
- 	SYSG(IA32_SYSCALL_VECTOR,	entry_INT80_compat),
- #elif defined(CONFIG_X86_32)
 diff --git a/arch/x86/kernel/sev-es.c b/arch/x86/kernel/sev-es.c
-index 4bf5286310a0..97241d2f0f70 100644
+index 97241d2f0f70..3b7bbc8d841e 100644
 --- a/arch/x86/kernel/sev-es.c
 +++ b/arch/x86/kernel/sev-es.c
-@@ -20,7 +20,7 @@
- #include <asm/insn-eval.h>
- #include <asm/fpu/internal.h>
- #include <asm/processor.h>
--#include <asm/trap_defs.h>
-+#include <asm/traps.h>
- #include <asm/svm.h>
+@@ -32,9 +32,57 @@ struct ghcb boot_ghcb_page __bss_decrypted __aligned(PAGE_SIZE);
+  */
+ struct ghcb __initdata *boot_ghcb;
  
- /* For early boot hypervisor communication in SEV-ES enabled guests */
-@@ -251,6 +251,81 @@ static enum es_result vc_handle_exitcode(struct es_em_ctxt *ctxt,
- 	return result;
- }
- 
-+static void vc_forward_exception(struct es_em_ctxt *ctxt)
-+{
-+	long error_code = ctxt->fi.error_code;
-+	int trapnr = ctxt->fi.vector;
-+
-+	ctxt->regs->orig_ax = ctxt->fi.error_code;
-+
-+	switch (trapnr) {
-+	case X86_TRAP_GP:
-+		do_general_protection(ctxt->regs, error_code);
-+		break;
-+	case X86_TRAP_UD:
-+		do_invalid_op(ctxt->regs, 0);
-+		break;
-+	default:
-+		BUG();
-+	}
-+}
-+
-+dotraplinkage void do_vmm_communication(struct pt_regs *regs, unsigned long exit_code)
-+{
-+	struct es_em_ctxt ctxt;
-+	enum es_result result;
++struct ghcb_state {
 +	struct ghcb *ghcb;
++};
 +
-+	/*
-+	 * This is invoked through an interrupt gate, so IRQs are disabled. The
-+	 * code below might walk page-tables for user or kernel addresses, so
-+	 * keep the IRQs disabled to protect us against concurrent TLB flushes.
-+	 */
+ /* Runtime GHCB pointers */
+ static struct ghcb __percpu *ghcb_page;
+ 
++/*
++ * Mark the per-cpu GHCB as in-use to detect nested #VC exceptions.
++ * There is no need for it to be atomic, because nothing is written to the GHCB
++ * between the read and the write of ghcb_active. So it is safe to use it when a
++ * nested #VC exception happens before the write.
++ */
++static DEFINE_PER_CPU(bool, ghcb_active);
 +
-+	ghcb = (struct ghcb *)this_cpu_ptr(ghcb_page);
++static struct ghcb *sev_es_get_ghcb(struct ghcb_state *state)
++{
++	struct ghcb *ghcb = (struct ghcb *)this_cpu_ptr(ghcb_page);
++	bool *active = this_cpu_ptr(&ghcb_active);
 +
-+	vc_ghcb_invalidate(ghcb);
-+	result = vc_init_em_ctxt(&ctxt, regs, exit_code);
++	if (unlikely(*active)) {
++		/* GHCB is already in use - save its contents */
 +
-+	if (result == ES_OK)
-+		result = vc_handle_exitcode(&ctxt, ghcb, exit_code);
++		state->ghcb = kzalloc(sizeof(struct ghcb), GFP_ATOMIC);
++		if (!state->ghcb)
++			return NULL;
 +
-+	/* Done - now check the result */
-+	switch (result) {
-+	case ES_OK:
-+		vc_finish_insn(&ctxt);
-+		break;
-+	case ES_UNSUPPORTED:
-+		pr_emerg("Unsupported exit-code 0x%02lx in early #VC exception (IP: 0x%lx)\n",
-+			 exit_code, regs->ip);
-+		goto fail;
-+	case ES_VMM_ERROR:
-+		pr_emerg("PANIC: Failure in communication with VMM (exit-code 0x%02lx IP: 0x%lx)\n",
-+			 exit_code, regs->ip);
-+		goto fail;
-+	case ES_DECODE_FAILED:
-+		pr_emerg("PANIC: Failed to decode instruction (exit-code 0x%02lx IP: 0x%lx)\n",
-+			 exit_code, regs->ip);
-+		goto fail;
-+	case ES_EXCEPTION:
-+		vc_forward_exception(&ctxt);
-+		break;
-+	case ES_RETRY:
-+		/* Nothing to do */
-+		break;
-+	default:
-+		BUG();
++		*state->ghcb = *ghcb;
++	} else {
++		state->ghcb = NULL;
++		*active = true;
 +	}
 +
-+	return;
-+
-+fail:
-+	show_regs(regs);
-+
-+	while (true)
-+		halt();
++	return ghcb;
 +}
 +
- bool __init boot_vc_exception(struct pt_regs *regs)
++static void sev_es_put_ghcb(struct ghcb_state *state)
++{
++	bool *active = this_cpu_ptr(&ghcb_active);
++	struct ghcb *ghcb = (struct ghcb *)this_cpu_ptr(ghcb_page);
++
++	if (state->ghcb) {
++		/* Restore saved state and free backup memory */
++		*ghcb = *state->ghcb;
++		kfree(state->ghcb);
++		state->ghcb = NULL;
++	} else {
++		*active = false;
++	}
++}
++
+ /* Needed in vc_early_vc_forward_exception */
+ extern void early_exception(struct pt_regs *regs, int trapnr);
+ 
+@@ -272,6 +320,7 @@ static void vc_forward_exception(struct es_em_ctxt *ctxt)
+ 
+ dotraplinkage void do_vmm_communication(struct pt_regs *regs, unsigned long exit_code)
  {
- 	unsigned long exit_code = regs->orig_ax;
++	struct ghcb_state state;
+ 	struct es_em_ctxt ctxt;
+ 	enum es_result result;
+ 	struct ghcb *ghcb;
+@@ -282,14 +331,20 @@ dotraplinkage void do_vmm_communication(struct pt_regs *regs, unsigned long exit
+ 	 * keep the IRQs disabled to protect us against concurrent TLB flushes.
+ 	 */
+ 
+-	ghcb = (struct ghcb *)this_cpu_ptr(ghcb_page);
+-
+-	vc_ghcb_invalidate(ghcb);
+-	result = vc_init_em_ctxt(&ctxt, regs, exit_code);
++	ghcb = sev_es_get_ghcb(&state);
++	if (!ghcb) {
++		/* This can only fail on an allocation error, so just retry */
++		result = ES_RETRY;
++	} else {
++		vc_ghcb_invalidate(ghcb);
++		result = vc_init_em_ctxt(&ctxt, regs, exit_code);
++	}
+ 
+ 	if (result == ES_OK)
+ 		result = vc_handle_exitcode(&ctxt, ghcb, exit_code);
+ 
++	sev_es_put_ghcb(&state);
++
+ 	/* Done - now check the result */
+ 	switch (result) {
+ 	case ES_OK:
 -- 
 2.17.1
 
