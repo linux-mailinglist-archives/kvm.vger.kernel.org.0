@@ -2,115 +2,185 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 88BCF18B2BB
-	for <lists+kvm@lfdr.de>; Thu, 19 Mar 2020 12:54:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 69E2E18B2FF
+	for <lists+kvm@lfdr.de>; Thu, 19 Mar 2020 13:10:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727180AbgCSLyY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Mar 2020 07:54:24 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:55405 "EHLO
-        us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726983AbgCSLyY (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 19 Mar 2020 07:54:24 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1584618862;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=NgmFdXPOG5BK0FnreGKbBxPndGxBWswzYRCil+17m78=;
-        b=JH9MbPIJJumLJY+23r6cgnTR1Fkwj9q40NnXZo/5RxLmfsiec2WNH7DMAfQ5Pqn+q8Ym0O
-        OWlxqOxoHfzv+WLboPuQnb+2vlwWdroX1ukFl6fmpkaTAJFRwjlzcjlcLTyTRhGE3M8clx
-        EKUPdI82KTZuPCaoSPQ1rgOD+G8Rfgs=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-175-4xgUZqN-P4SdvjjdpM8eeg-1; Thu, 19 Mar 2020 07:54:21 -0400
-X-MC-Unique: 4xgUZqN-P4SdvjjdpM8eeg-1
-Received: by mail-wr1-f70.google.com with SMTP id q18so892426wrw.5
-        for <kvm@vger.kernel.org>; Thu, 19 Mar 2020 04:54:20 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=NgmFdXPOG5BK0FnreGKbBxPndGxBWswzYRCil+17m78=;
-        b=c6nOWysIOLV4MuzEEMLH6zkQpseKt0jDTWDTZfe2FVxWqQ42Gldo1N41FTYHz3X9+u
-         P6z82lypA0qfykyZikD8n84TrRlyyQnZAHjTIz/00JeHuvtAwkT2EixxInAHxrl5ie6h
-         QuEBL+meTeqODDHFHJ8NgbajKHUI0v9mv1lf97jhRgp9oWqRMUW27rlmqoGP3ZI2I9aM
-         FTYHcyspHlXh52hk5cbSV4aGQpPMI9Wslpkhbv6IV8pdCISgIpF8X9ZjFu8gLs8JEYKp
-         hH3CmP7nQ6/cObb29xDzFeaBHe+O/nE7boEyHocqwgHKeFydZEcU8yUx7rnMBydOYWuR
-         VIiQ==
-X-Gm-Message-State: ANhLgQ1kwmxrn/o4Pva+h6q1wdDnSJQi1AhFzBVrAb5wOYCnnXNs3QtK
-        HgFpKkzCrTDm7Wq8rkgHmN6zHml5LhtwNNkoAbCD/6n11TCApzkN3u9owGBzQpdnL9TKjsaXC02
-        mTT84oF6nPhaY
-X-Received: by 2002:adf:9f48:: with SMTP id f8mr3802356wrg.199.1584618859837;
-        Thu, 19 Mar 2020 04:54:19 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vsu3nXFTlHZSaVLF6tppAjucUFLUwOcJMICRZCJpCgEsgJNvT5OyT1FK100J/5bltZ93l6MXA==
-X-Received: by 2002:adf:9f48:: with SMTP id f8mr3802335wrg.199.1584618859599;
-        Thu, 19 Mar 2020 04:54:19 -0700 (PDT)
-Received: from [192.168.178.58] ([151.21.15.43])
-        by smtp.gmail.com with ESMTPSA id 98sm3142089wrk.52.2020.03.19.04.54.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 19 Mar 2020 04:54:19 -0700 (PDT)
-Subject: Re: [PATCH 0/7] tools/kvm_stat: add logfile support
-To:     Stefan Raspl <raspl@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     rkrcmar@redhat.com
-References: <20200306114250.57585-1-raspl@linux.ibm.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <7f396df1-9589-6dd0-0adf-af4376aa8314@redhat.com>
-Date:   Thu, 19 Mar 2020 12:54:17 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+        id S1727001AbgCSMKO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Mar 2020 08:10:14 -0400
+Received: from mail.kernel.org ([198.145.29.99]:57686 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726785AbgCSMKO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 Mar 2020 08:10:14 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 2C90F20663;
+        Thu, 19 Mar 2020 12:10:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1584619813;
+        bh=6rNervqAIpsCbSWbaL/JCxlPQb2xA9V11QRKwIxvVgM=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=VkE/6xNgNrrioz0QRL3zM5ILQU3OSG57GIjlZZrKDGhV/HVFLdz56qJBc3Y579LxN
+         YJiAgzgnKU+1JFICbzzROJb4RBh3sc7b3ZVObwQXYIrmOddLbmPeJRQFc+j3Qnyv5i
+         +f6MY4lnf0La6fi+k75jfCDTuaKdSxcKPM8M8/OY=
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+        by disco-boy.misterjones.org with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        (Exim 4.92)
+        (envelope-from <maz@kernel.org>)
+        id 1jEu03-00DvjA-9X; Thu, 19 Mar 2020 12:10:11 +0000
 MIME-Version: 1.0
-In-Reply-To: <20200306114250.57585-1-raspl@linux.ibm.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
 Content-Transfer-Encoding: 7bit
+Date:   Thu, 19 Mar 2020 12:10:11 +0000
+From:   Marc Zyngier <maz@kernel.org>
+To:     Zenghui Yu <yuzenghui@huawei.com>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
+        Jason Cooper <jason@lakedaemon.net>,
+        Robert Richter <rrichter@marvell.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Eric Auger <eric.auger@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>
+Subject: Re: [PATCH v5 20/23] KVM: arm64: GICv4.1: Plumb SGI implementation
+ selection in the distributor
+In-Reply-To: <72832f51-bbde-8502-3e03-189ac20a0143@huawei.com>
+References: <20200304203330.4967-1-maz@kernel.org>
+ <20200304203330.4967-21-maz@kernel.org>
+ <72832f51-bbde-8502-3e03-189ac20a0143@huawei.com>
+Message-ID: <4a06fae9c93e10351276d173747d17f4@kernel.org>
+X-Sender: maz@kernel.org
+User-Agent: Roundcube Webmail/1.3.10
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, lorenzo.pieralisi@arm.com, jason@lakedaemon.net, rrichter@marvell.com, tglx@linutronix.de, eric.auger@redhat.com, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 06/03/20 12:42, Stefan Raspl wrote:
-> This patch series provides a couple of new options to make logging to
-> files feasible.
-> Specifically, we add command line switches to specify an arbitrary time
-> interval for logging, and to toggle between a .csv and the previous
-> file format. Furthermore, we allow logging to files, where we utilize a
-> rotating set of 6 logfiles, each with its own header for easy post-
-> processing, especially when using .csv format.
-> Since specifying logfile size limits might be a non-trivial exercise,
-> we're throwing in yet another command line option that allows to
-> specify the minimum timeframe that should be covered by logs.
-> Finally, there's a minimal systemd unit file to deploy kvm_stat-based
-> logging in Linux distributions.
-> Note that the decision to write our own logfiles rather than to log to
-> e.g. systemd journal is a conscious one: It is effectively impossible to
-> write csv records into the systemd journal, the header will either
-> disappear after a while or has to be repeated from time to time, which
-> defeats the purpose of having a .csv format that can be easily post-
-> processed, etc.
-> See individual patch description for further details.
-> 
-> 
-> Stefan Raspl (7):
->   tools/kvm_stat: rework command line sequence and message texts
->   tools/kvm_stat: switch to argparse
->   tools/kvm_stat: add command line switch '-s' to set update interval
->   tools/kvm_stat: add command line switch '-c' to log in csv format
->   tools/kvm_stat: add rotating log support
->   tools/kvm_stat: add command line switch '-T'
->   tools/kvm_stat: add sample systemd unit file
-> 
->  tools/kvm/kvm_stat/kvm_stat         | 434 +++++++++++++++++++++-------
->  tools/kvm/kvm_stat/kvm_stat.service |  15 +
->  tools/kvm/kvm_stat/kvm_stat.txt     |  59 ++--
->  3 files changed, 384 insertions(+), 124 deletions(-)
->  create mode 100644 tools/kvm/kvm_stat/kvm_stat.service
-> 
+Hi Zenghui,
 
-I queued patches 1-4.  For the others, however, I would prefer to add
-support for SIGHUP instead (to reopen the logfile), so that one can use
-the usual logrotate services.
+On 2020-03-18 06:34, Zenghui Yu wrote:
+> Hi Marc,
+> 
+> On 2020/3/5 4:33, Marc Zyngier wrote:
+>> The GICv4.1 architecture gives the hypervisor the option to let
+>> the guest choose whether it wants the good old SGIs with an
+>> active state, or the new, HW-based ones that do not have one.
+>> 
+>> For this, plumb the configuration of SGIs into the GICv3 MMIO
+>> handling, present the GICD_TYPER2.nASSGIcap to the guest,
+>> and handle the GICD_CTLR.nASSGIreq setting.
+>> 
+>> In order to be able to deal with the restore of a guest, also
+>> apply the GICD_CTLR.nASSGIreq setting at first run so that we
+>> can move the restored SGIs to the HW if that's what the guest
+>> had selected in a previous life.
+> 
+> I'm okay with the restore path.  But it seems that we still fail to
+> save the pending state of vSGI - software pending_latch of HW-based
+> vSGIs will not be updated (and always be false) because we directly
+> inject them through ITS, so vgic_v3_uaccess_read_pending() can't
+> tell the correct pending state to user-space (the correct one should
+> be latched in HW).
+> 
+> It would be good if we can sync the hardware state into pending_latch
+> at an appropriate time (just before save), but not sure if we can...
 
-Paolo
+The problem is to find the "appropriate time". It would require to 
+define
+a point in the save sequence where we transition the state from HW to
+SW. I'm not keen on adding more state than we already have.
 
+But what we can do is to just ask the HW to give us the right state
+on userspace access, at all times. How about this:
+
+diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c 
+b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+index 48fd9fc229a2..281fe7216c59 100644
+--- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
++++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+@@ -305,8 +305,18 @@ static unsigned long 
+vgic_v3_uaccess_read_pending(struct kvm_vcpu *vcpu,
+  	 */
+  	for (i = 0; i < len * 8; i++) {
+  		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
++		bool state = irq->pending_latch;
+
+-		if (irq->pending_latch)
++		if (irq->hw && vgic_irq_is_sgi(irq->intid)) {
++			int err;
++
++			err = irq_get_irqchip_state(irq->host_irq,
++						    IRQCHIP_STATE_PENDING,
++						    &state);
++			WARN_ON(err);
++		}
++
++		if (state)
+  			value |= (1U << i);
+
+  		vgic_put_irq(vcpu->kvm, irq);
+
+I can add this to "KVM: arm64: GICv4.1: Add direct injection capability 
+to SGI registers".
+
+> 
+>> 
+>> Signed-off-by: Marc Zyngier <maz@kernel.org>
+>> ---
+>>   virt/kvm/arm/vgic/vgic-mmio-v3.c | 48 
+>> ++++++++++++++++++++++++++++++--
+>>   virt/kvm/arm/vgic/vgic-v3.c      |  2 ++
+>>   2 files changed, 48 insertions(+), 2 deletions(-)
+>> 
+>> diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c 
+>> b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+>> index de89da76a379..442f3b8c2559 100644
+>> --- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
+>> +++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+>> @@ -3,6 +3,7 @@
+>>    * VGICv3 MMIO handling functions
+>>    */
+>>   +#include <linux/bitfield.h>
+>>   #include <linux/irqchip/arm-gic-v3.h>
+>>   #include <linux/kvm.h>
+>>   #include <linux/kvm_host.h>
+>> @@ -70,6 +71,8 @@ static unsigned long vgic_mmio_read_v3_misc(struct 
+>> kvm_vcpu *vcpu,
+>>   		if (vgic->enabled)
+>>   			value |= GICD_CTLR_ENABLE_SS_G1;
+>>   		value |= GICD_CTLR_ARE_NS | GICD_CTLR_DS;
+>> +		if (kvm_vgic_global_state.has_gicv4_1 && vgic->nassgireq)
+> 
+> Looking at how we handle the GICD_CTLR.nASSGIreq setting, I think
+> "nassgireq==true" already indicates "has_gicv4_1==true".  So this
+> can be simplified.
+
+Indeed. I've now dropped the has_gicv4.1 check.
+
+> But I wonder that should we use nassgireq to *only* keep track what
+> the guest had written into the GICD_CTLR.nASSGIreq.  If not, we may
+> lose the guest-request bit after migration among hosts with different
+> has_gicv4_1 settings.
+
+I'm unsure of what you're suggesting here. If userspace tries to set
+GICD_CTLR.nASSGIreq on a non-4.1 host, this bit will not latch.
+Userspace can check that at restore time. Or we could fail the
+userspace write, which is a bit odd (the bit is otherwise RES0).
+
+Could you clarify your proposal?
+
+> The remaining patches all look good to me :-). I will wait for you to
+> confirm these two concerns.
+
+Thanks,
+
+         M.
+-- 
+Jazz is not dead. It just smells funny...
