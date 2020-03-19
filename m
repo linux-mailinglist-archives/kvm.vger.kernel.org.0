@@ -2,131 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B4C0218ADF7
-	for <lists+kvm@lfdr.de>; Thu, 19 Mar 2020 09:08:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A0BD618AE2E
+	for <lists+kvm@lfdr.de>; Thu, 19 Mar 2020 09:15:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726592AbgCSIIr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Mar 2020 04:08:47 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:56252 "EHLO
+        id S1727003AbgCSIPx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Mar 2020 04:15:53 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:48875 "EHLO
         us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725895AbgCSIIr (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 19 Mar 2020 04:08:47 -0400
+        by vger.kernel.org with ESMTP id S1726765AbgCSIPx (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 19 Mar 2020 04:15:53 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1584605326;
+        s=mimecast20190719; t=1584605751;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=SlJrsOiPEFfP8xQL+2MTzWgFawZiNaS1jJXa4jmFhqA=;
-        b=iYlLg5hIVV2TyvX3y0YaBXJF//DSwwn78FJCDwDUvvV5v0JADbapACF6kEaI3Ysa+IO60M
-        jDGb8m3ODXoYLfvO+qXVuRu6Tm+3mmEZFCt+pXxq+jz4rEN9AoX4lt3Gc+qrEwWJ1bDJXg
-        qsGsRpcO+/uu61Lm7XNtbbZ5rZSidRU=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-100-lJgZ2d6BPTiKkytqLO5VmQ-1; Thu, 19 Mar 2020 04:08:44 -0400
-X-MC-Unique: lJgZ2d6BPTiKkytqLO5VmQ-1
-Received: by mail-wm1-f72.google.com with SMTP id m4so389599wmi.5
-        for <kvm@vger.kernel.org>; Thu, 19 Mar 2020 01:08:44 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=SlJrsOiPEFfP8xQL+2MTzWgFawZiNaS1jJXa4jmFhqA=;
-        b=AYBwOzEI+o4gdoPehWJhEOBXCzUmSIotha0QCrh5HK/CqRIWrKYvh8lc7JmKONa24M
-         JOAhdvrn7heMoXR41eH0fQiuV5JQTYG8kKHcUCSqLbs7/UpausVb2dO5N1xad1LIoCdR
-         ayQkhTI2zONmyR0BAUO6i010zgvFQYEZxkMkCMcs/yNr/QS8yVKpDDtE8VwWXM1s3yP1
-         3XrLBgctU7J1quaLmwvCxcnLP8xUX1nqqyYKRjAQm/CWEW71ehTTEA1mwsviuejOc0u2
-         jjdcGYSGvts2V2zmwpaZ8kt4nDR+y/LgYrOx5oCfDsDJewGN2nbAQCp20jIPRoaLoB8A
-         NlAA==
-X-Gm-Message-State: ANhLgQ1hl316dGbvCPKW27KGzWceqAgNzKsinwrGQS0HbJI8jwdtu1yZ
-        QG2gMPBto5TWfJ948ZNh6HcPQGHiLvs4QPMrtfI7M8fVLnn8bHjaTrF6a9+N97ZS74UpkHGacSU
-        zPuMm5IaADyO6
-X-Received: by 2002:a7b:c4cd:: with SMTP id g13mr2246557wmk.151.1584605322951;
-        Thu, 19 Mar 2020 01:08:42 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vuHul2WwD85TA8ajS4E+DeyZ8lqBhFZsQV3ofqPUzIbkGIIMM6eJzdwpfnX3UGfRPKInTOCMw==
-X-Received: by 2002:a7b:c4cd:: with SMTP id g13mr2246536wmk.151.1584605322742;
-        Thu, 19 Mar 2020 01:08:42 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id r18sm2275564wro.13.2020.03.19.01.08.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Mar 2020 01:08:42 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Jon Doron <arilou@gmail.com>
-Cc:     kvm@vger.kernel.org, linux-hyperv@vger.kernel.org
-Subject: Re: [PATCH v8 1/5] x86/kvm/hyper-v: Explicitly align hcall param for kvm_hyperv_exit
-In-Reply-To: <20200319063836.678562-2-arilou@gmail.com>
-References: <20200319063836.678562-1-arilou@gmail.com> <20200319063836.678562-2-arilou@gmail.com>
-Date:   Thu, 19 Mar 2020 09:08:41 +0100
-Message-ID: <87k13g22d2.fsf@vitty.brq.redhat.com>
+        bh=TgtDtG3cRVj31mITgFClFTokcEIBD9CXpdML9H7Wb8k=;
+        b=OQZKXqXxdyRhU92rEGhd7sJG3gAi4j5gU6xdxv8iZ4VD99LArR56QY+N/pCIwGQBAxx4Z6
+        1iTx6grokSq+CHArLU/s2fLFzfO5gWvroP+U3t5RoS6zvvMIHlOdo4tC4Z/h1AflHFP8nH
+        GJzY3y1BvqHfAEoVWCg+kMqcG7pa3HI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-270-1bCvthWzPxO0ZFGWraD_bQ-1; Thu, 19 Mar 2020 04:15:50 -0400
+X-MC-Unique: 1bCvthWzPxO0ZFGWraD_bQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 49FA9189D6C3;
+        Thu, 19 Mar 2020 08:15:47 +0000 (UTC)
+Received: from [10.72.12.119] (ovpn-12-119.pek2.redhat.com [10.72.12.119])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 3A67B19756;
+        Thu, 19 Mar 2020 08:14:40 +0000 (UTC)
+Subject: Re: [PATCH V6 8/8] virtio: Intel IFC VF driver for VDPA
+To:     Jason Gunthorpe <jgg@mellanox.com>
+Cc:     mst@redhat.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        maxime.coquelin@redhat.com, cunming.liang@intel.com,
+        zhihong.wang@intel.com, rob.miller@broadcom.com,
+        xiao.w.wang@intel.com, lingshan.zhu@intel.com, eperezma@redhat.com,
+        lulu@redhat.com, parav@mellanox.com, kevin.tian@intel.com,
+        stefanha@redhat.com, rdunlap@infradead.org, hch@infradead.org,
+        aadam@redhat.com, jiri@mellanox.com, shahafs@mellanox.com,
+        hanand@xilinx.com, mhabets@solarflare.com, gdawar@xilinx.com,
+        saugatm@xilinx.com, vmireyno@marvell.com,
+        Bie Tiwei <tiwei.bie@intel.com>
+References: <20200318080327.21958-1-jasowang@redhat.com>
+ <20200318080327.21958-9-jasowang@redhat.com>
+ <20200318122255.GG13183@mellanox.com>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <30359bae-d66a-0311-0028-d7d33b8295f2@redhat.com>
+Date:   Thu, 19 Mar 2020 16:14:37 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <20200318122255.GG13183@mellanox.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Jon Doron <arilou@gmail.com> writes:
 
-> The problem the patch is trying to address is the fact that 'struct
-> kvm_hyperv_exit' has different layout on when compiling in 32 and 64 bit
-> modes.
+On 2020/3/18 =E4=B8=8B=E5=8D=888:22, Jason Gunthorpe wrote:
+> On Wed, Mar 18, 2020 at 04:03:27PM +0800, Jason Wang wrote:
+>> From: Zhu Lingshan <lingshan.zhu@intel.com>
+>> +
+>> +static int ifcvf_vdpa_attach(struct ifcvf_adapter *adapter)
+>> +{
+>> +	int ret;
+>> +
+>> +	adapter->vdpa_dev  =3D vdpa_alloc_device(adapter->dev, adapter->dev,
+>> +					       &ifc_vdpa_ops);
+>> +	if (IS_ERR(adapter->vdpa_dev)) {
+>> +		IFCVF_ERR(adapter->dev, "Failed to init ifcvf on vdpa bus");
+>> +		put_device(&adapter->vdpa_dev->dev);
+>> +		return -ENODEV;
+>> +	}
+> The point of having an alloc call is so that the drivers
+> ifcvf_adaptor memory could be placed in the same struct - eg use
+> container_of to flip between them, and have a kref for both memories.
 >
-> In 64-bit mode the default alignment boundary is 64 bits thus
-> forcing extra gaps after 'type' and 'msr' but in 32-bit mode the
-> boundary is at 32 bits thus no extra gaps.
->
-> This is an issue as even when the kernel is 64 bit, the userspace using
-> the interface can be both 32 and 64 bit but the same 32 bit userspace has
-> to work with 32 bit kernel.
->
-> The issue is fixed by forcing the 64 bit layout, this leads to ABI
-> change for 32 bit builds and while we are obviously breaking '32 bit
-> userspace with 32 bit kernel' case, we're fixing the '32 bit userspace
-> with 64 bit kernel' one.
->
-> As the interface has no (known) users and 32 bit KVM is rather baroque
-> nowadays, this seems like a reasonable decision.
->
-> Signed-off-by: Jon Doron <arilou@gmail.com>
-> ---
->  Documentation/virt/kvm/api.rst | 2 ++
->  include/uapi/linux/kvm.h       | 2 ++
->  2 files changed, 4 insertions(+)
->
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index ebd383fba939..4872c47bbcff 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -5025,9 +5025,11 @@ EOI was received.
->    #define KVM_EXIT_HYPERV_SYNIC          1
->    #define KVM_EXIT_HYPERV_HCALL          2
->  			__u32 type;
-> +			__u32 pad1;
->  			union {
->  				struct {
->  					__u32 msr;
-> +					__u32 pad2;
->  					__u64 control;
->  					__u64 evt_page;
->  					__u64 msg_page;
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index 4b95f9a31a2f..7ee0ddc4c457 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -189,9 +189,11 @@ struct kvm_hyperv_exit {
->  #define KVM_EXIT_HYPERV_SYNIC          1
->  #define KVM_EXIT_HYPERV_HCALL          2
->  	__u32 type;
-> +	__u32 pad1;
->  	union {
->  		struct {
->  			__u32 msr;
-> +			__u32 pad2;
->  			__u64 control;
->  			__u64 evt_page;
->  			__u64 msg_page;
+> It seem really weird to have an alloc followed immediately by
+> register.
 
-Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 
--- 
-Vitaly
+I admit the ifcvf_adapter is not correctly ref-counted. What you suggest=20
+should work. But it looks to me the following is more cleaner since the=20
+members of ifcvf_adapter are all related to PCI device not vDPA itself.
+
+- keep the current layout of ifcvf_adapter
+- merge vdpa_alloc_device() and vdpa_register_device()
+- use devres to bind ifcvf_adapter refcnt/lifcycle to the under PCI devic=
+e
+
+If we go for the container_of method, we probably need
+
+- accept a size of parent parent structure in vdpa_alloc_device() and=20
+mandate vdpa_device to be the first member of ifcvf_adapter
+- we need provide a way to free resources of parent structure when we=20
+destroy vDPA device
+
+What's your thought?
+
+
+>> diff --git a/drivers/virtio/virtio_vdpa.c b/drivers/virtio/virtio_vdpa=
+.c
+>> index c30eb55030be..de64b88ee7e4 100644
+>> +++ b/drivers/virtio/virtio_vdpa.c
+>> @@ -362,6 +362,7 @@ static int virtio_vdpa_probe(struct vdpa_device *v=
+dpa)
+>>   		goto err;
+>>  =20
+>>   	vdpa_set_drvdata(vdpa, vd_dev);
+>> +	dev_info(vd_dev->vdev.dev.parent, "device attached to VDPA bus\n");
+>>  =20
+>>   	return 0;
+> This hunk seems out of place
+>
+> Jason
+
+
+Right, will fix.
+
+Thanks
 
