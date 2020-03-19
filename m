@@ -2,226 +2,134 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9921618BFC2
-	for <lists+kvm@lfdr.de>; Thu, 19 Mar 2020 19:57:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 39A6918BF82
+	for <lists+kvm@lfdr.de>; Thu, 19 Mar 2020 19:40:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727297AbgCSS56 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Mar 2020 14:57:58 -0400
-Received: from 14.mo3.mail-out.ovh.net ([188.165.43.98]:52030 "EHLO
-        14.mo3.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726881AbgCSS54 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 Mar 2020 14:57:56 -0400
-X-Greylist: delayed 8862 seconds by postgrey-1.27 at vger.kernel.org; Thu, 19 Mar 2020 14:57:55 EDT
-Received: from player756.ha.ovh.net (unknown [10.108.35.185])
-        by mo3.mail-out.ovh.net (Postfix) with ESMTP id 8DD3E247BBC
-        for <kvm@vger.kernel.org>; Thu, 19 Mar 2020 17:30:12 +0100 (CET)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net [82.253.208.248])
-        (Authenticated sender: groug@kaod.org)
-        by player756.ha.ovh.net (Postfix) with ESMTPSA id 8E596FC4FAA2;
-        Thu, 19 Mar 2020 16:30:07 +0000 (UTC)
-Date:   Thu, 19 Mar 2020 17:30:00 +0100
-From:   Greg Kurz <groug@kaod.org>
-To:     Paul Mackerras <paulus@ozlabs.org>
-Cc:     kvm@vger.kernel.org, kvm-ppc@vger.kernel.org,
-        David Gibson <david@gibson.dropbear.id.au>,
-        Ram Pai <linuxram@us.ibm.com>
-Subject: Re: [PATCH] KVM: PPC: Book3S HV: Add a capability for enabling
- secure guests
-Message-ID: <20200319173000.20e10c7b@bahia.lan>
-In-Reply-To: <20200319043301.GA13052@blackberry>
-References: <20200319043301.GA13052@blackberry>
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+        id S1727282AbgCSSky (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Mar 2020 14:40:54 -0400
+Received: from mail.kernel.org ([198.145.29.99]:60782 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726663AbgCSSkx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 Mar 2020 14:40:53 -0400
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 7778121473
+        for <kvm@vger.kernel.org>; Thu, 19 Mar 2020 18:40:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1584643252;
+        bh=Nnz8DKyINwp4/CvCy4G7iAxgaPQesPB+hm/vCt15eTU=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=R55Y0XT+kDu4C+QH9pSvmerrrpvk8vLjCLyhz6RGjBEy+fuKyV/rBtZviY5CH2bji
+         i224dYCMGcoHWaxtOQJty0JTZzlS1PN6iuSbG/Wuu4j5JlPKdprJK/yKOP6Xvpa3E7
+         eUIY9FLatITEQ3vemNqnCSh3CuYYaov+WXaxPVpE=
+Received: by mail-wm1-f54.google.com with SMTP id d1so3569906wmb.2
+        for <kvm@vger.kernel.org>; Thu, 19 Mar 2020 11:40:52 -0700 (PDT)
+X-Gm-Message-State: ANhLgQ1JfmaNqaN2L8l/B93D0NEMvOH8cs4LW2E0Htri7o9Blb1OGpWa
+        EALZMugMVrcb7W9C1/QeTYeQe4PXf30rHKez8Q5EtQ==
+X-Google-Smtp-Source: ADFU+vvWBH0AH3H+Jf2dJbQy+fo/OsWleVD+wRMeOKLdEDzg7ZJ7+mROEy3ck/x1sUe+/gBAEu7toV/J5yrTI9VoQ/4=
+X-Received: by 2002:a1c:b0c3:: with SMTP id z186mr5129118wme.36.1584643250721;
+ Thu, 19 Mar 2020 11:40:50 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 11390729361711405499
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedugedrudefledgkeelucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfgjfhfogggtgfesthejredtredtvdenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdekvddrvdehfedrvddtkedrvdegkeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejheeirdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtohepkhhvmhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
+References: <20200319091407.1481-1-joro@8bytes.org> <20200319091407.1481-71-joro@8bytes.org>
+ <CALCETrUOQneBHjoZkP-7T5PDijb=WOyv7xF7TD0GLR2Aw77vyA@mail.gmail.com> <20200319160749.GC5122@8bytes.org>
+In-Reply-To: <20200319160749.GC5122@8bytes.org>
+From:   Andy Lutomirski <luto@kernel.org>
+Date:   Thu, 19 Mar 2020 11:40:39 -0700
+X-Gmail-Original-Message-ID: <CALCETrXY5M87C1Fc3QvTkc6MdbQ_3gAuOPUeWJktAzK4T60QNQ@mail.gmail.com>
+Message-ID: <CALCETrXY5M87C1Fc3QvTkc6MdbQ_3gAuOPUeWJktAzK4T60QNQ@mail.gmail.com>
+Subject: Re: [PATCH 70/70] x86/sev-es: Add NMI state tracking
+To:     Joerg Roedel <joro@8bytes.org>
+Cc:     Andy Lutomirski <luto@kernel.org>, X86 ML <x86@kernel.org>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Thomas Hellstrom <thellstrom@vmware.com>,
+        Jiri Slaby <jslaby@suse.cz>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Juergen Gross <jgross@suse.com>,
+        Kees Cook <keescook@chromium.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        kvm list <kvm@vger.kernel.org>,
+        Linux Virtualization <virtualization@lists.linux-foundation.org>,
+        Joerg Roedel <jroedel@suse.de>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 19 Mar 2020 15:33:01 +1100
-Paul Mackerras <paulus@ozlabs.org> wrote:
+On Thu, Mar 19, 2020 at 9:07 AM Joerg Roedel <joro@8bytes.org> wrote:
+>
+> Hi Andy,
+>
+> On Thu, Mar 19, 2020 at 08:35:59AM -0700, Andy Lutomirski wrote:
+> > On Thu, Mar 19, 2020 at 2:14 AM Joerg Roedel <joro@8bytes.org> wrote:
+> > >
+> > > From: Joerg Roedel <jroedel@suse.de>
+> > >
+> > > Keep NMI state in SEV-ES code so the kernel can re-enable NMIs for the
+> > > vCPU when it reaches IRET.
+> >
+> > IIRC I suggested just re-enabling NMI in C from do_nmi().  What was
+> > wrong with that approach?
+>
+> If I understand the code correctly a nested NMI will just reset the
+> interrupted NMI handler to start executing again at 'restart_nmi'.
+> The interrupted NMI handler could be in the #VC handler, and it is not
+> safe to just jump back to the start of the NMI handler from somewhere
+> within the #VC handler.
 
-> At present, on Power systems with Protected Execution Facility
-> hardware and an ultravisor, a KVM guest can transition to being a
-> secure guest at will.  Userspace (QEMU) has no way of knowing
-> whether a host system is capable of running secure guests.  This
-> will present a problem in future when the ultravisor is capable of
-> migrating secure guests from one host to another, because
-> virtualization management software will have no way to ensure that
-> secure guests only run in domains where all of the hosts can
-> support secure guests.
-> 
-> This adds a VM capability which has two functions: (a) userspace
-> can query it to find out whether the host can support secure guests,
-> and (b) userspace can enable it for a guest, which allows that
-> guest to become a secure guest.  If userspace does not enable it,
-> KVM will return an error when the ultravisor does the hypercall
-> that indicates that the guest is starting to transition to a
-> secure guest.  The ultravisor will then abort the transition and
-> the guest will terminate.
-> 
-> Signed-off-by: Paul Mackerras <paulus@ozlabs.org>
-> ---
+Nope.  A nested NMI will reset the interrupted NMI's return frame to
+cause it to run again when it's done.  I don't think this will have
+any real interaction with #VC.  There's no longjmp() here.
 
-Reviewed-by: Greg Kurz <groug@kaod.org>
+>
+> So I decided to not allow NMI nesting for SEV-ES and only re-enable the
+> NMI window when the first NMI returns. This is not implemented in this
+> patch, but I will do that once Thomas' entry-code rewrite is upstream.
+>
 
-Is someone working on wiring this up in QEMU ?
+I certainly *like* preventing nesting, but I don't think we really
+want a whole alternate NMI path just for a couple of messed-up AMD
+generations.  And the TF trick is not so pretty either.
 
-> Note, only compile-tested.  Ram, please test.
-> 
->  Documentation/virt/kvm/api.rst      | 17 +++++++++++++++++
->  arch/powerpc/include/asm/kvm_host.h |  1 +
->  arch/powerpc/include/asm/kvm_ppc.h  |  1 +
->  arch/powerpc/kvm/book3s_hv.c        | 13 +++++++++++++
->  arch/powerpc/kvm/book3s_hv_uvmem.c  |  4 ++++
->  arch/powerpc/kvm/powerpc.c          | 13 +++++++++++++
->  include/uapi/linux/kvm.h            |  1 +
->  7 files changed, 50 insertions(+)
-> 
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index 158d118..a925500 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -5779,6 +5779,23 @@ it hard or impossible to use it correctly.  The availability of
->  KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2 signals that those bugs are fixed.
->  Userspace should not try to use KVM_CAP_MANUAL_DIRTY_LOG_PROTECT.
->  
-> +7.19 KVM_CAP_PPC_SECURE_GUEST
-> +------------------------------
-> +
-> +:Architectures: ppc
-> +
-> +This capability indicates that KVM is running on a host that has
-> +ultravisor firmware and thus can support a secure guest.  On such a
-> +system, a guest can ask the ultravisor to make it a secure guest,
-> +one whose memory is inaccessible to the host except for pages which
-> +are explicitly requested to be shared with the host.  The ultravisor
-> +notifies KVM when a guest requests to become a secure guest, and KVM
-> +has the opportunity to veto the transition.
-> +
-> +If present, this capability can be enabled for a VM, meaning that KVM
-> +will allow the transition to secure guest mode.  Otherwise KVM will
-> +veto the transition.
-> +
->  8. Other capabilities.
->  ======================
->  
-> diff --git a/arch/powerpc/include/asm/kvm_host.h b/arch/powerpc/include/asm/kvm_host.h
-> index 6e8b8ff..f99b433 100644
-> --- a/arch/powerpc/include/asm/kvm_host.h
-> +++ b/arch/powerpc/include/asm/kvm_host.h
-> @@ -303,6 +303,7 @@ struct kvm_arch {
->  	u8 radix;
->  	u8 fwnmi_enabled;
->  	u8 secure_guest;
-> +	u8 svm_enabled;
->  	bool threads_indep;
->  	bool nested_enable;
->  	pgd_t *pgtable;
-> diff --git a/arch/powerpc/include/asm/kvm_ppc.h b/arch/powerpc/include/asm/kvm_ppc.h
-> index 406ec46..0733618 100644
-> --- a/arch/powerpc/include/asm/kvm_ppc.h
-> +++ b/arch/powerpc/include/asm/kvm_ppc.h
-> @@ -316,6 +316,7 @@ struct kvmppc_ops {
->  			       int size);
->  	int (*store_to_eaddr)(struct kvm_vcpu *vcpu, ulong *eaddr, void *ptr,
->  			      int size);
-> +	int (*enable_svm)(struct kvm *kvm);
->  	int (*svm_off)(struct kvm *kvm);
->  };
->  
-> diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-> index fbc55a1..36da720 100644
-> --- a/arch/powerpc/kvm/book3s_hv.c
-> +++ b/arch/powerpc/kvm/book3s_hv.c
-> @@ -5423,6 +5423,18 @@ static void unpin_vpa_reset(struct kvm *kvm, struct kvmppc_vpa *vpa)
->  }
->  
->  /*
-> + * Enable a guest to become a secure VM.
-> + * Called when the KVM_CAP_PPC_SECURE_GUEST capability is enabled.
-> + */
-> +static int kvmhv_enable_svm(struct kvm *kvm)
-> +{
-> +	if (!firmware_has_feature(FW_FEATURE_ULTRAVISOR))
-> +		return -EINVAL;
-> +	kvm->arch.svm_enabled = 1;
-> +	return 0;
-> +}
-> +
-> +/*
->   *  IOCTL handler to turn off secure mode of guest
->   *
->   * - Release all device pages
-> @@ -5543,6 +5555,7 @@ static struct kvmppc_ops kvm_ops_hv = {
->  	.enable_nested = kvmhv_enable_nested,
->  	.load_from_eaddr = kvmhv_load_from_eaddr,
->  	.store_to_eaddr = kvmhv_store_to_eaddr,
-> +	.enable_svm = kvmhv_enable_svm,
->  	.svm_off = kvmhv_svm_off,
->  };
->  
-> diff --git a/arch/powerpc/kvm/book3s_hv_uvmem.c b/arch/powerpc/kvm/book3s_hv_uvmem.c
-> index 79b1202..2ad999f 100644
-> --- a/arch/powerpc/kvm/book3s_hv_uvmem.c
-> +++ b/arch/powerpc/kvm/book3s_hv_uvmem.c
-> @@ -216,6 +216,10 @@ unsigned long kvmppc_h_svm_init_start(struct kvm *kvm)
->  	if (!kvm_is_radix(kvm))
->  		return H_UNSUPPORTED;
->  
-> +	/* NAK the transition to secure if not enabled */
-> +	if (!kvm->arch.svm_enabled)
-> +		return H_AUTHORITY;
-> +
->  	srcu_idx = srcu_read_lock(&kvm->srcu);
->  	slots = kvm_memslots(kvm);
->  	kvm_for_each_memslot(memslot, slots) {
-> diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
-> index 62ee66d..c32e6cc2 100644
-> --- a/arch/powerpc/kvm/powerpc.c
-> +++ b/arch/powerpc/kvm/powerpc.c
-> @@ -670,6 +670,11 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->  		     (hv_enabled && cpu_has_feature(CPU_FTR_P9_TM_HV_ASSIST));
->  		break;
->  #endif
-> +#if defined(CONFIG_KVM_BOOK3S_HV_POSSIBLE) && defined(CONFIG_PPC_UV)
-> +	case KVM_CAP_PPC_SECURE_GUEST:
-> +		r = hv_enabled && !!firmware_has_feature(FW_FEATURE_ULTRAVISOR);
-> +		break;
-> +#endif
->  	default:
->  		r = 0;
->  		break;
-> @@ -2170,6 +2175,14 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
->  		r = kvm->arch.kvm_ops->enable_nested(kvm);
->  		break;
->  #endif
-> +#if defined(CONFIG_KVM_BOOK3S_HV_POSSIBLE) && defined(CONFIG_PPC_UV)
-> +	case KVM_CAP_PPC_SECURE_GUEST:
-> +		r = -EINVAL;
-> +		if (!is_kvmppc_hv_enabled(kvm) || !kvm->arch.kvm_ops->enable_svm)
-> +			break;
-> +		r = kvm->arch.kvm_ops->enable_svm(kvm);
-> +		break;
-> +#endif
->  	default:
->  		r = -EINVAL;
->  		break;
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index 5e6234c..428c7dd 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -1016,6 +1016,7 @@ struct kvm_ppc_resize_hpt {
->  #define KVM_CAP_ARM_INJECT_EXT_DABT 178
->  #define KVM_CAP_S390_VCPU_RESETS 179
->  #define KVM_CAP_S390_PROTECTED 180
-> +#define KVM_CAP_PPC_SECURE_GUEST 181
->  
->  #ifdef KVM_CAP_IRQ_ROUTING
->  
+> > This causes us to pop the NMI frame off the stack.  Assuming the NMI
+> > restart logic is invoked (which is maybe impossible?), we get #DB,
+> > which presumably is actually delivered.  And we end up on the #DB
+> > stack, which might already have been in use, so we have a potential
+> > increase in nesting.  Also, #DB may be called from an unexpected
+> > context.
+>
+> An SEV-ES hypervisor is required to intercept #DB, which means that the
+> #DB exception actually ends up being a #VC exception. So it will not end
+> up on the #DB stack.
 
+With your patch set, #DB doesn't seem to end up on the #DB stack either.
+
+>
+> > I think there are two credible ways to approach this:
+> >
+> > 1. Just put the NMI unmask in do_nmi().  The kernel *already* knows
+> > how to handle running do_nmi() with NMIs unmasked.  This is much, much
+> > simpler than your code.
+>
+> Right, and I thought about that, but the implication is that the
+> complexity is moved somewhere else, namely into the #VC handler, which
+> then has to be restartable.
+
+As above, I don't think there's an actual problem here.
+
+>
+> > 2. Have an entirely separate NMI path for the
+> > SEV-ES-on-misdesigned-CPU case.  And have very clear documentation for
+> > what prevents this code from being executed on future CPUs (Zen3?)
+> > that have this issue fixed for real?
+>
+> That sounds like a good alternative, I will investigate this approach.
+> The NMI handler should be much simpler as it doesn't need to allow NMI
+> nesting. The question is, does the C code down the NMI path depend on
+> the NMI handlers stack frame layout (e.g. the in-nmi flag)?
+
+Nope.  In particular, the 32-bit path doesn't have all this.
