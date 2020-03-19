@@ -2,203 +2,198 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id AC54D18C188
-	for <lists+kvm@lfdr.de>; Thu, 19 Mar 2020 21:38:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3C7FD18C1A6
+	for <lists+kvm@lfdr.de>; Thu, 19 Mar 2020 21:49:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726975AbgCSUiy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Mar 2020 16:38:54 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:43141 "EHLO
-        us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726785AbgCSUix (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 19 Mar 2020 16:38:53 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1584650332;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=uShTuto7PeNwwk0OxuI8oVZpBKc3YZzPGr0sD1pMJCE=;
-        b=iW61pHPQn3h7nHdPuUMAxdh1a5yX61ZdteDSuREauUxUgSfEvD1RNZJoKmPGOsuXYtftNY
-        mW3EiCtXA5FGGdJxS1pjUMaM5sSd+5gfgJfGd85fLLfLJBkrN6aiKVDauAlCxkGvbJB4Lg
-        OVbmqe1Z461syra4mJqmWSY4d7xOfxE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-54-iwln2pr0NWmBbDRRtDVBdA-1; Thu, 19 Mar 2020 16:38:48 -0400
-X-MC-Unique: iwln2pr0NWmBbDRRtDVBdA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3D355189F781;
-        Thu, 19 Mar 2020 20:38:46 +0000 (UTC)
-Received: from [10.36.113.142] (ovpn-113-142.ams2.redhat.com [10.36.113.142])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id CD8B11036B46;
-        Thu, 19 Mar 2020 20:38:42 +0000 (UTC)
-Subject: Re: [PATCH v5 20/23] KVM: arm64: GICv4.1: Plumb SGI implementation
- selection in the distributor
-To:     Marc Zyngier <maz@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>
-Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
-        Jason Cooper <jason@lakedaemon.net>,
-        Robert Richter <rrichter@marvell.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>
-References: <20200304203330.4967-1-maz@kernel.org>
- <20200304203330.4967-21-maz@kernel.org>
- <72832f51-bbde-8502-3e03-189ac20a0143@huawei.com>
- <4a06fae9c93e10351276d173747d17f4@kernel.org>
-From:   Auger Eric <eric.auger@redhat.com>
-Message-ID: <49995ec9-3970-1f62-5dfc-118563ca00fc@redhat.com>
-Date:   Thu, 19 Mar 2020 21:38:40 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
-MIME-Version: 1.0
-In-Reply-To: <4a06fae9c93e10351276d173747d17f4@kernel.org>
-Content-Type: text/plain; charset=windows-1252
+        id S1726975AbgCSUtH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Mar 2020 16:49:07 -0400
+Received: from mail-mw2nam12on2121.outbound.protection.outlook.com ([40.107.244.121]:61248
+        "EHLO NAM12-MW2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725787AbgCSUtH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 Mar 2020 16:49:07 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=WvoOcu/wafDKG6MhBhKNS6F16xzRHySL3d+lMhuogq+d0mvkuCkE8Xc7/oTux/D4PTk7A+fQxmFE5+1euqEeInOy1Ou1Y77SzAlFajGMe1J+YC7K1NR4vPydoZvposKJXPiY9ay1x5sdlNczRrh8Z66Ii2qW/gF8nqgoIuP5OsT0BtoY25Re/8ilXqjN1DLH1dDjAVf1XZAO1nh7yFjnsgi+HzmuBIF4pAf1oaEOwjbdxcEVZ+3Qfee1tqxQjDnpBGube1ATlYrJxOcv+uvLhsAml7BYxawqQQinlpMqbDSCcULp6TqF13jvsKW2dbA0rbgjaYwXM2Mm5PIIA/efWg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=F61YRBI6iznorIltp5qZLGSCwUgJUJPBJmsjVcsv+M0=;
+ b=bodeVZ5KvXD08TyJCTrPGFNFqhtb+pL0HlFyQsh5XYDw9wAcH0/1CgqP915ojph0KlbWUfAHnXa/xeEwe1CMi6/T3ZjoOr/nMv9vzzT9eV/bDC1Npnn0Z834Neg9lGA/S9HyX6OoWlINcspP0yRVI/GxMqVYeCTOaiTMwWH/JlbrvJ3DmMxozmCYBOEZPeVtt53Syd2SAvxW0CNOzzHOeDviqTADVsubSv6XdY792jc36OtmCG8ErIRiJTFN8z41QZBtgPdMvzjC2YZy0kpU0AO1GOF3DuSdbm6hTKZ8GrRQEQXib0rDWQOqlW6Do8JFhn4t8hz1r3g131kpXr0dog==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microsoft.com; dmarc=pass action=none
+ header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=F61YRBI6iznorIltp5qZLGSCwUgJUJPBJmsjVcsv+M0=;
+ b=N5JRqq3ayWJHv2O8ywdN1703ix/rr0EnXExiS4OeRyD27iau4aaf9UF8bsdTZmXHbrt+rPyvsZfdhNeteabeneq3g+SSO7g5KEjYeItOYb3gR1EUK+tZvmkIE9f6G/MHBh7/boNiyVkSCzDp5Ddm1xp0U9977jLJJuwv8jPIZD4=
+Received: from MW2PR2101MB1052.namprd21.prod.outlook.com (2603:10b6:302:a::16)
+ by MW2PR2101MB1114.namprd21.prod.outlook.com (2603:10b6:302:a::31) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2856.1; Thu, 19 Mar
+ 2020 20:49:01 +0000
+Received: from MW2PR2101MB1052.namprd21.prod.outlook.com
+ ([fe80::71ee:121:71bd:6156]) by MW2PR2101MB1052.namprd21.prod.outlook.com
+ ([fe80::71ee:121:71bd:6156%10]) with mapi id 15.20.2856.003; Thu, 19 Mar 2020
+ 20:49:01 +0000
+From:   Michael Kelley <mikelley@microsoft.com>
+To:     Jon Doron <arilou@gmail.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>
+CC:     vkuznets <vkuznets@redhat.com>
+Subject: RE: [PATCH v8 2/5] x86/hyper-v: Add synthetic debugger definitions
+Thread-Topic: [PATCH v8 2/5] x86/hyper-v: Add synthetic debugger definitions
+Thread-Index: AQHV/bkRMMUyPxTkAEeuFf0GP1+Y4ahQY+qw
+Date:   Thu, 19 Mar 2020 20:49:01 +0000
+Message-ID: <MW2PR2101MB10524691B2FC06269E67E8FCD7F40@MW2PR2101MB1052.namprd21.prod.outlook.com>
+References: <20200319063836.678562-1-arilou@gmail.com>
+ <20200319063836.678562-3-arilou@gmail.com>
+In-Reply-To: <20200319063836.678562-3-arilou@gmail.com>
+Accept-Language: en-US
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+msip_labels: MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=True;
+ MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;
+ MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Owner=mikelley@ntdev.microsoft.com;
+ MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2020-03-19T20:48:59.1055636Z;
+ MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=General;
+ MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Application=Microsoft Azure
+ Information Protection;
+ MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=f47dd57c-1b5e-485c-96da-8c6d1d26f1ae;
+ MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Extended_MSFT_Method=Automatic
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=mikelley@microsoft.com; 
+x-originating-ip: [24.22.167.197]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-ht: Tenant
+x-ms-office365-filtering-correlation-id: 8df82f72-df39-42f7-2475-08d7cc46f45d
+x-ms-traffictypediagnostic: MW2PR2101MB1114:|MW2PR2101MB1114:
+x-ld-processed: 72f988bf-86f1-41af-91ab-2d7cd011db47,ExtAddr
+x-microsoft-antispam-prvs: <MW2PR2101MB1114D0013DD1365A834BB877D7F40@MW2PR2101MB1114.namprd21.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:10000;
+x-forefront-prvs: 0347410860
+x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(4636009)(39860400002)(396003)(366004)(346002)(136003)(376002)(199004)(76116006)(52536014)(10290500003)(110136005)(86362001)(66946007)(316002)(478600001)(81156014)(81166006)(8676002)(8936002)(26005)(71200400001)(55016002)(7696005)(8990500004)(186003)(4326008)(33656002)(2906002)(6506007)(5660300002)(9686003)(66556008)(66476007)(64756008)(66446008);DIR:OUT;SFP:1102;SCL:1;SRVR:MW2PR2101MB1114;H:MW2PR2101MB1052.namprd21.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;
+received-spf: None (protection.outlook.com: microsoft.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: /QPsjQR9yzIEfmv6jL66BO/Nd3fTyRpLYOPs0iTgHKa9d4K9DmH+6hawzhHK8NjCdBXcf6+ollEjeQqtpjfJ2YNE6q41NY7Ow37YnEBtK+Vh0MEdIEeEaAgvuiePB5X0hUPF1Et7CPn3cxkZG+bs9TnzQBatHmknLWNaIUy/ZMLte4wVePofGLXBv95truEeoxYx9obVIWvDiFo9MWhGVpp6MBHXLfkJESTXC79WirbtZAR35BDKirtTmpPYrxGgL4NNT9WuMRKg7dGXhN8rhdrFS8CbSsbNnxHj/0ung4FCh5kGQJF/9AN9xoXrLcbjZ1IjUW1IJUvtE1n/LoURn//CZqnDLoilIqQZ+5vGbtqya63e1hgLyWFNmKiq9uIvvNF/duwaMurO1wWs/gws1Fb2/ZorakIplixJkVP8qEixUy1LmXidYQl8Cp1gnQKg
+x-ms-exchange-antispam-messagedata: zxU13xnl8zc4DdTLbzwwIVMpMPzsfVSrH+aJc5nw11ZN+sbE1jrIL6i6KXXWf/GodMTtNIjSUaeyGpiKKDTXOqSuqsL8uVqR6ifhJQZwYcydVeM70lS8sk86nrDpFP+ld3vGehDO8KXz4VybnO+wIA==
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: microsoft.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8df82f72-df39-42f7-2475-08d7cc46f45d
+X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Mar 2020 20:49:01.3767
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: KhiI4eu140F/QBPhbu3fU+nvHQBrbiNL0JO0uEFR+oi+bMBKAo2iRb8Q5E/D2X+//OD6DUSFnBsWPi+N7ZDFTZYILcgHf0okwTm7v2WNzEA=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW2PR2101MB1114
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
-On 3/19/20 1:10 PM, Marc Zyngier wrote:
-> Hi Zenghui,
+From: Jon Doron <arilou@gmail.com> Sent: Wednesday, March 18, 2020 11:39 PM
 >=20
-> On 2020-03-18 06:34, Zenghui Yu wrote:
->> Hi Marc,
->>
->> On 2020/3/5 4:33, Marc Zyngier wrote:
->>> The GICv4.1 architecture gives the hypervisor the option to let
->>> the guest choose whether it wants the good old SGIs with an
->>> active state, or the new, HW-based ones that do not have one.
->>>
->>> For this, plumb the configuration of SGIs into the GICv3 MMIO
->>> handling, present the GICD_TYPER2.nASSGIcap to the guest,
->>> and handle the GICD_CTLR.nASSGIreq setting.
->>>
->>> In order to be able to deal with the restore of a guest, also
->>> apply the GICD_CTLR.nASSGIreq setting at first run so that we
->>> can move the restored SGIs to the HW if that's what the guest
->>> had selected in a previous life.
->>
->> I'm okay with the restore path.=A0 But it seems that we still fail to
->> save the pending state of vSGI - software pending_latch of HW-based
->> vSGIs will not be updated (and always be false) because we directly
->> inject them through ITS, so vgic_v3_uaccess_read_pending() can't
->> tell the correct pending state to user-space (the correct one should
->> be latched in HW).
->>
->> It would be good if we can sync the hardware state into pending_latch
->> at an appropriate time (just before save), but not sure if we can...
+> Hyper-V synthetic debugger has two modes, one that uses MSRs and
+> the other that use Hypercalls.
 >=20
-> The problem is to find the "appropriate time". It would require to defi=
-ne
-> a point in the save sequence where we transition the state from HW to
-> SW. I'm not keen on adding more state than we already have.
+> Add all the required definitions to both types of synthetic debugger
+> interface.
+>=20
+> Some of the required new CPUIDs and MSRs are not documented in the TLFS
+> so they are in hyperv.h instead.
+>=20
+> The reason they are not documented is because they are subjected to be
+> removed in future versions of Windows.
+>=20
+> Signed-off-by: Jon Doron <arilou@gmail.com>
 
-may be we could use a dedicated device group/attr as we have for the ITS
-save tables? the user space would choose.
+Reviewed-by: Michael Kelley <mikelley@microsoft.com>
 
-Thanks
-
-Eric
+> ---
+>  arch/x86/include/asm/hyperv-tlfs.h |  6 ++++++
+>  arch/x86/kvm/hyperv.h              | 27 +++++++++++++++++++++++++++
+>  2 files changed, 33 insertions(+)
 >=20
-> But what we can do is to just ask the HW to give us the right state
-> on userspace access, at all times. How about this:
+> diff --git a/arch/x86/include/asm/hyperv-tlfs.h b/arch/x86/include/asm/hy=
+perv-tlfs.h
+> index 92abc1e42bfc..671ce2a39d4b 100644
+> --- a/arch/x86/include/asm/hyperv-tlfs.h
+> +++ b/arch/x86/include/asm/hyperv-tlfs.h
+> @@ -131,6 +131,8 @@
+>  #define HV_FEATURE_FREQUENCY_MSRS_AVAILABLE		BIT(8)
+>  /* Crash MSR available */
+>  #define HV_FEATURE_GUEST_CRASH_MSR_AVAILABLE		BIT(10)
+> +/* Support for debug MSRs available */
+> +#define HV_FEATURE_DEBUG_MSRS_AVAILABLE			BIT(11)
+>  /* stimer Direct Mode is available */
+>  #define HV_STIMER_DIRECT_MODE_AVAILABLE			BIT(19)
 >=20
-> diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c
-> b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-> index 48fd9fc229a2..281fe7216c59 100644
-> --- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
-> +++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-> @@ -305,8 +305,18 @@ static unsigned long
-> vgic_v3_uaccess_read_pending(struct kvm_vcpu *vcpu,
-> =A0=A0=A0=A0=A0 */
-> =A0=A0=A0=A0 for (i =3D 0; i < len * 8; i++) {
-> =A0=A0=A0=A0=A0=A0=A0=A0 struct vgic_irq *irq =3D vgic_get_irq(vcpu->kv=
-m, vcpu, intid + i);
-> +=A0=A0=A0=A0=A0=A0=A0 bool state =3D irq->pending_latch;
+> @@ -376,6 +378,9 @@ struct hv_tsc_emulation_status {
+>  #define HVCALL_SEND_IPI_EX			0x0015
+>  #define HVCALL_POST_MESSAGE			0x005c
+>  #define HVCALL_SIGNAL_EVENT			0x005d
+> +#define HVCALL_POST_DEBUG_DATA			0x0069
+> +#define HVCALL_RETRIEVE_DEBUG_DATA		0x006a
+> +#define HVCALL_RESET_DEBUG_SESSION		0x006b
+>  #define HVCALL_FLUSH_GUEST_PHYSICAL_ADDRESS_SPACE 0x00af
+>  #define HVCALL_FLUSH_GUEST_PHYSICAL_ADDRESS_LIST 0x00b0
 >=20
-> -=A0=A0=A0=A0=A0=A0=A0 if (irq->pending_latch)
-> +=A0=A0=A0=A0=A0=A0=A0 if (irq->hw && vgic_irq_is_sgi(irq->intid)) {
-> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 int err;
+> @@ -419,6 +424,7 @@ enum HV_GENERIC_SET_FORMAT {
+>  #define HV_STATUS_INVALID_HYPERCALL_INPUT	3
+>  #define HV_STATUS_INVALID_ALIGNMENT		4
+>  #define HV_STATUS_INVALID_PARAMETER		5
+> +#define HV_STATUS_OPERATION_DENIED		8
+>  #define HV_STATUS_INSUFFICIENT_MEMORY		11
+>  #define HV_STATUS_INVALID_PORT_ID		17
+>  #define HV_STATUS_INVALID_CONNECTION_ID		18
+> diff --git a/arch/x86/kvm/hyperv.h b/arch/x86/kvm/hyperv.h
+> index 757cb578101c..5e4780bf6dd7 100644
+> --- a/arch/x86/kvm/hyperv.h
+> +++ b/arch/x86/kvm/hyperv.h
+> @@ -23,6 +23,33 @@
+>=20
+>  #include <linux/kvm_host.h>
+>=20
+> +/*
+> + * The #defines related to the synthetic debugger are required by KDNet,=
+ but
+> + * they are not documented in the Hyper-V TLFS because the synthetic deb=
+ugger
+> + * functionality has been deprecated and is subject to removal in future=
+ versions
+> + * of Windows.
+> + */
+> +#define HYPERV_CPUID_SYNDBG_VENDOR_AND_MAX_FUNCTIONS	0x40000080
+> +#define HYPERV_CPUID_SYNDBG_INTERFACE			0x40000081
+> +#define HYPERV_CPUID_SYNDBG_PLATFORM_CAPABILITIES	0x40000082
 > +
-> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 err =3D irq_get_irqchip_state(irq->h=
-ost_irq,
-> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
-=A0=A0=A0 IRQCHIP_STATE_PENDING,
-> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
-=A0=A0=A0 &state);
-> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 WARN_ON(err);
-> +=A0=A0=A0=A0=A0=A0=A0 }
+> +/*
+> + * Hyper-V synthetic debugger platform capabilities
+> + * These are HYPERV_CPUID_SYNDBG_PLATFORM_CAPABILITIES.EAX bits.
+> + */
+> +#define HV_X64_SYNDBG_CAP_ALLOW_KERNEL_DEBUGGING	BIT(1)
 > +
-> +=A0=A0=A0=A0=A0=A0=A0 if (state)
-> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 value |=3D (1U << i);
->=20
-> =A0=A0=A0=A0=A0=A0=A0=A0 vgic_put_irq(vcpu->kvm, irq);
->=20
-> I can add this to "KVM: arm64: GICv4.1: Add direct injection capability
-> to SGI registers".
->=20
->>
->>>
->>> Signed-off-by: Marc Zyngier <maz@kernel.org>
->>> ---
->>> =A0 virt/kvm/arm/vgic/vgic-mmio-v3.c | 48 +++++++++++++++++++++++++++=
-+++--
->>> =A0 virt/kvm/arm/vgic/vgic-v3.c=A0=A0=A0=A0=A0 |=A0 2 ++
->>> =A0 2 files changed, 48 insertions(+), 2 deletions(-)
->>>
->>> diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c
->>> b/virt/kvm/arm/vgic/vgic-mmio-v3.c
->>> index de89da76a379..442f3b8c2559 100644
->>> --- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
->>> +++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
->>> @@ -3,6 +3,7 @@
->>> =A0=A0 * VGICv3 MMIO handling functions
->>> =A0=A0 */
->>> =A0 +#include <linux/bitfield.h>
->>> =A0 #include <linux/irqchip/arm-gic-v3.h>
->>> =A0 #include <linux/kvm.h>
->>> =A0 #include <linux/kvm_host.h>
->>> @@ -70,6 +71,8 @@ static unsigned long vgic_mmio_read_v3_misc(struct
->>> kvm_vcpu *vcpu,
->>> =A0=A0=A0=A0=A0=A0=A0=A0=A0 if (vgic->enabled)
->>> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 value |=3D GICD_CTLR_ENABLE_S=
-S_G1;
->>> =A0=A0=A0=A0=A0=A0=A0=A0=A0 value |=3D GICD_CTLR_ARE_NS | GICD_CTLR_D=
-S;
->>> +=A0=A0=A0=A0=A0=A0=A0 if (kvm_vgic_global_state.has_gicv4_1 && vgic-=
->nassgireq)
->>
->> Looking at how we handle the GICD_CTLR.nASSGIreq setting, I think
->> "nassgireq=3D=3Dtrue" already indicates "has_gicv4_1=3D=3Dtrue".=A0 So=
- this
->> can be simplified.
->=20
-> Indeed. I've now dropped the has_gicv4.1 check.
->=20
->> But I wonder that should we use nassgireq to *only* keep track what
->> the guest had written into the GICD_CTLR.nASSGIreq.=A0 If not, we may
->> lose the guest-request bit after migration among hosts with different
->> has_gicv4_1 settings.
->=20
-> I'm unsure of what you're suggesting here. If userspace tries to set
-> GICD_CTLR.nASSGIreq on a non-4.1 host, this bit will not latch.
-> Userspace can check that at restore time. Or we could fail the
-> userspace write, which is a bit odd (the bit is otherwise RES0).
->=20
-> Could you clarify your proposal?
->=20
->> The remaining patches all look good to me :-). I will wait for you to
->> confirm these two concerns.
->=20
-> Thanks,
->=20
-> =A0=A0=A0=A0=A0=A0=A0 M.
+> +/* Hyper-V Synthetic debug options MSR */
+> +#define HV_X64_MSR_SYNDBG_CONTROL		0x400000F1
+> +#define HV_X64_MSR_SYNDBG_STATUS		0x400000F2
+> +#define HV_X64_MSR_SYNDBG_SEND_BUFFER		0x400000F3
+> +#define HV_X64_MSR_SYNDBG_RECV_BUFFER		0x400000F4
+> +#define HV_X64_MSR_SYNDBG_PENDING_BUFFER	0x400000F5
+> +#define HV_X64_MSR_SYNDBG_OPTIONS		0x400000FF
+> +
+> +/* Hyper-V HV_X64_MSR_SYNDBG_OPTIONS bits */
+> +#define HV_X64_SYNDBG_OPTION_USE_HCALLS		BIT(2)
+> +
+>  static inline struct kvm_vcpu_hv *vcpu_to_hv_vcpu(struct kvm_vcpu *vcpu)
+>  {
+>  	return &vcpu->arch.hyperv;
+> --
+> 2.24.1
 
