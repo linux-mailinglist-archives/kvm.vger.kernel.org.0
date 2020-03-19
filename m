@@ -2,17 +2,17 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0C00A18AF79
-	for <lists+kvm@lfdr.de>; Thu, 19 Mar 2020 10:17:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A061B18AF76
+	for <lists+kvm@lfdr.de>; Thu, 19 Mar 2020 10:17:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727428AbgCSJQ7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Mar 2020 05:16:59 -0400
-Received: from 8bytes.org ([81.169.241.247]:51922 "EHLO theia.8bytes.org"
+        id S1727673AbgCSJQx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Mar 2020 05:16:53 -0400
+Received: from 8bytes.org ([81.169.241.247]:52476 "EHLO theia.8bytes.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727426AbgCSJOm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S1727428AbgCSJOm (ORCPT <rfc822;kvm@vger.kernel.org>);
         Thu, 19 Mar 2020 05:14:42 -0400
 Received: by theia.8bytes.org (Postfix, from userid 1000)
-        id 55DCAD19; Thu, 19 Mar 2020 10:14:25 +0100 (CET)
+        id 876FDE7B; Thu, 19 Mar 2020 10:14:25 +0100 (CET)
 From:   Joerg Roedel <joro@8bytes.org>
 To:     x86@kernel.org
 Cc:     hpa@zytor.com, Andy Lutomirski <luto@kernel.org>,
@@ -27,9 +27,9 @@ Cc:     hpa@zytor.com, Andy Lutomirski <luto@kernel.org>,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         virtualization@lists.linux-foundation.org,
         Joerg Roedel <joro@8bytes.org>, Joerg Roedel <jroedel@suse.de>
-Subject: [PATCH 48/70] x86/sev-es: Handle MMIO String Instructions
-Date:   Thu, 19 Mar 2020 10:13:45 +0100
-Message-Id: <20200319091407.1481-49-joro@8bytes.org>
+Subject: [PATCH 49/70] x86/sev-es: Handle MSR events
+Date:   Thu, 19 Mar 2020 10:13:46 +0100
+Message-Id: <20200319091407.1481-50-joro@8bytes.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200319091407.1481-1-joro@8bytes.org>
 References: <20200319091407.1481-1-joro@8bytes.org>
@@ -38,112 +38,69 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Joerg Roedel <jroedel@suse.de>
+From: Tom Lendacky <thomas.lendacky@amd.com>
 
-Add handling for emulation the MOVS instruction on MMIO regions, as done
-by the memcpy_toio() and memcpy_fromio() functions.
+Implement a handler for #VC exceptions caused by RDMSR/WRMSR
+instructions.
 
+Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
+[ jroedel@suse.de: Adapt to #VC handling infrastructure ]
+Co-developed-by: Joerg Roedel <jroedel@suse.de>
 Signed-off-by: Joerg Roedel <jroedel@suse.de>
 ---
- arch/x86/kernel/sev-es.c | 78 ++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 78 insertions(+)
+ arch/x86/kernel/sev-es.c | 32 ++++++++++++++++++++++++++++++++
+ 1 file changed, 32 insertions(+)
 
 diff --git a/arch/x86/kernel/sev-es.c b/arch/x86/kernel/sev-es.c
-index 6b0f82f81229..a040959e512d 100644
+index a040959e512d..163b8a7f98a4 100644
 --- a/arch/x86/kernel/sev-es.c
 +++ b/arch/x86/kernel/sev-es.c
-@@ -415,6 +415,74 @@ static enum es_result vc_handle_mmio_twobyte_ops(struct ghcb *ghcb,
- 	return ret;
- }
+@@ -262,6 +262,35 @@ static phys_addr_t vc_slow_virt_to_phys(struct ghcb *ghcb, long vaddr)
+ /* Include code shared with pre-decompression boot stage */
+ #include "sev-es-shared.c"
  
-+/*
-+ * The MOVS instruction has two memory operands, which raises the
-+ * problem that it is not known whether the access to the source or the
-+ * destination caused the #VC exception (and hence whether an MMIO read
-+ * or write operation needs to be emulated).
-+ *
-+ * Instead of playing games with walking page-tables and trying to guess
-+ * whether the source or destination is an MMIO range, this code splits
-+ * the move into two operations, a read and a write with only one
-+ * memory operand. This will cause a nested #VC exception on the MMIO
-+ * address which can then be handled.
-+ *
-+ * This implementation has the benefit that it also supports MOVS where
-+ * source _and_ destination are MMIO regions.
-+ *
-+ * It will slow MOVS on MMIO down a lot, but in SEV-ES guests it is a
-+ * rare operation. If it turns out to be a performance problem the split
-+ * operations can be moved to memcpy_fromio() and memcpy_toio().
-+ */
-+static enum es_result vc_handle_mmio_movs(struct es_em_ctxt *ctxt,
-+					  unsigned int bytes)
++static enum es_result vc_handle_msr(struct ghcb *ghcb, struct es_em_ctxt *ctxt)
 +{
-+	unsigned long ds_base, es_base;
-+	unsigned char *src, *dst;
-+	unsigned char buffer[8];
++	struct pt_regs *regs = ctxt->regs;
 +	enum es_result ret;
-+	bool rep;
-+	int off;
++	bool write;
++	u64 exit_info_1;
 +
-+	ds_base = insn_get_seg_base(ctxt->regs, INAT_SEG_REG_DS);
-+	es_base = insn_get_seg_base(ctxt->regs, INAT_SEG_REG_ES);
++	write = (ctxt->insn.opcode.bytes[1] == 0x30);
 +
-+	if (ds_base == -1L || es_base == -1L) {
-+		ctxt->fi.vector = X86_TRAP_GP;
-+		ctxt->fi.error_code = 0;
-+		return ES_EXCEPTION;
++	ghcb_set_rcx(ghcb, regs->cx);
++	if (write) {
++		ghcb_set_rax(ghcb, regs->ax);
++		ghcb_set_rdx(ghcb, regs->dx);
++		exit_info_1 = 1;
++	} else {
++		exit_info_1 = 0;
 +	}
 +
-+	src = ds_base + (unsigned char *)ctxt->regs->si;
-+	dst = es_base + (unsigned char *)ctxt->regs->di;
-+
-+	ret = vc_read_mem(ctxt, src, buffer, bytes);
++	ret = sev_es_ghcb_hv_call(ghcb, ctxt, SVM_EXIT_MSR, exit_info_1, 0);
 +	if (ret != ES_OK)
 +		return ret;
++	else if (!write) {
++		regs->ax = ghcb->save.rax;
++		regs->dx = ghcb->save.rdx;
++	}
 +
-+	ret = vc_write_mem(ctxt, dst, buffer, bytes);
-+	if (ret != ES_OK)
-+		return ret;
-+
-+	if (ctxt->regs->flags & X86_EFLAGS_DF)
-+		off = -bytes;
-+	else
-+		off =  bytes;
-+
-+	ctxt->regs->si += off;
-+	ctxt->regs->di += off;
-+
-+	rep = insn_rep_prefix(&ctxt->insn);
-+
-+	if (rep)
-+		ctxt->regs->cx -= 1;
-+
-+	if (!rep || ctxt->regs->cx == 0)
-+		return ES_OK;
-+	else
-+		return ES_RETRY;
++	return ret;
 +}
 +
- static enum es_result vc_handle_mmio(struct ghcb *ghcb,
- 				     struct es_em_ctxt *ctxt)
- {
-@@ -469,6 +537,16 @@ static enum es_result vc_handle_mmio(struct ghcb *ghcb,
- 		memcpy(reg_data, ghcb->shared_buffer, bytes);
+ /*
+  * This function runs on the first #VC exception after the kernel
+  * switched to virtual addresses.
+@@ -571,6 +600,9 @@ static enum es_result vc_handle_exitcode(struct es_em_ctxt *ctxt,
+ 	case SVM_EXIT_IOIO:
+ 		result = vc_handle_ioio(ghcb, ctxt);
  		break;
- 
-+		/* MOVS instruction */
-+	case 0xa4:
-+		bytes = 1;
-+		/* Fallthrough */
-+	case 0xa5:
-+		if (!bytes)
-+			bytes = insn->opnd_bytes;
-+
-+		ret = vc_handle_mmio_movs(ctxt, bytes);
++	case SVM_EXIT_MSR:
++		result = vc_handle_msr(ghcb, ctxt);
 +		break;
- 		/* Two-Byte Opcodes */
- 	case 0x0f:
- 		ret = vc_handle_mmio_twobyte_ops(ghcb, ctxt);
+ 	case SVM_EXIT_NPF:
+ 		result = vc_handle_mmio(ghcb, ctxt);
+ 		break;
 -- 
 2.17.1
 
