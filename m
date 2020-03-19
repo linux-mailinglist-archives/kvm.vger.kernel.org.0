@@ -2,363 +2,357 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8312F18AB40
-	for <lists+kvm@lfdr.de>; Thu, 19 Mar 2020 04:45:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 92C3718AB48
+	for <lists+kvm@lfdr.de>; Thu, 19 Mar 2020 04:49:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726987AbgCSDpb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Mar 2020 23:45:31 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:20551 "EHLO
+        id S1726774AbgCSDth (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Mar 2020 23:49:37 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:26617 "EHLO
         us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726847AbgCSDpb (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 18 Mar 2020 23:45:31 -0400
+        by vger.kernel.org with ESMTP id S1726596AbgCSDth (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 18 Mar 2020 23:49:37 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1584589529;
+        s=mimecast20190719; t=1584589775;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=OBu2gTYsV/OxbOApp+diN/WQ5jcPJ9oT2fm0EfkE6m4=;
-        b=b6n7Xw+JeiHrqtXQ526Xd1cWQ2Nq4rvC5GCFYYqHCmaD/0LEni4KkoQHrFy1JLzbGmKiBm
-        ZWY9lCc7gYoiBKirgG3tXotOwbl8JZ+o/J8EGGG45kPKBIMB/hGnmSYOQ8deg47ezVpQhs
-        GWgs3p3VCXFCyNxg8reMyZYXPJTwvKI=
+        bh=uO1RoX6B1c6+5qo8eSQdyFUhFZRZh++XxoREtKizSI4=;
+        b=JZcPiDU5DxXTVYZXYfKMSi3o3yRYXITuZTQSS0tFjD+dy0DZ4fq/ElBchTafgFRLdOcug/
+        HvJI3nPEZTbBBskE9Z2WbRW/C/h5MmBoTztICS2ORUx/eQeUx3HknQEI5MD6EuL/bqA2Dt
+        7zLOnEzeFvbLdD961psvbvxWXhwD3z0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-397-rHt6uWn_OHGe6obUfuDVbA-1; Wed, 18 Mar 2020 23:45:27 -0400
-X-MC-Unique: rHt6uWn_OHGe6obUfuDVbA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+ us-mta-296-di4np1yQPPe9keZfBxj36w-1; Wed, 18 Mar 2020 23:49:31 -0400
+X-MC-Unique: di4np1yQPPe9keZfBxj36w-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 00632100550D;
-        Thu, 19 Mar 2020 03:45:25 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BBCA91857BE0;
+        Thu, 19 Mar 2020 03:49:28 +0000 (UTC)
 Received: from w520.home (ovpn-112-162.phx2.redhat.com [10.3.112.162])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A090D5D9E2;
-        Thu, 19 Mar 2020 03:45:23 +0000 (UTC)
-Date:   Wed, 18 Mar 2020 21:45:23 -0600
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 4B75560BF1;
+        Thu, 19 Mar 2020 03:49:27 +0000 (UTC)
+Date:   Wed, 18 Mar 2020 21:49:26 -0600
 From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Kirti Wankhede <kwankhede@nvidia.com>
-Cc:     <cjia@nvidia.com>, <kevin.tian@intel.com>, <ziye.yang@intel.com>,
-        <changpeng.liu@intel.com>, <yi.l.liu@intel.com>,
-        <mlevitsk@redhat.com>, <eskultet@redhat.com>, <cohuck@redhat.com>,
-        <dgilbert@redhat.com>, <jonathan.davies@nutanix.com>,
-        <eauger@redhat.com>, <aik@ozlabs.ru>, <pasic@linux.ibm.com>,
-        <felipe@nutanix.com>, <Zhengxiao.zx@Alibaba-inc.com>,
-        <shuangtai.tst@alibaba-inc.com>, <Ken.Xue@amd.com>,
-        <zhi.a.wang@intel.com>, <yan.y.zhao@intel.com>,
-        <qemu-devel@nongnu.org>, <kvm@vger.kernel.org>
-Subject: Re: [PATCH v14 Kernel 7/7] vfio: Selective dirty page tracking if
- IOMMU backed device pins pages
-Message-ID: <20200318214523.5cc7d066@w520.home>
-In-Reply-To: <1584560474-19946-8-git-send-email-kwankhede@nvidia.com>
+To:     Yan Zhao <yan.y.zhao@intel.com>
+Cc:     Kirti Wankhede <kwankhede@nvidia.com>,
+        "cjia@nvidia.com" <cjia@nvidia.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "Yang, Ziye" <ziye.yang@intel.com>,
+        "Liu, Changpeng" <changpeng.liu@intel.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>,
+        "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
+        "eskultet@redhat.com" <eskultet@redhat.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "dgilbert@redhat.com" <dgilbert@redhat.com>,
+        "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>,
+        "eauger@redhat.com" <eauger@redhat.com>,
+        "aik@ozlabs.ru" <aik@ozlabs.ru>,
+        "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
+        "felipe@nutanix.com" <felipe@nutanix.com>,
+        "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@Alibaba-inc.com>,
+        "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
+        "Ken.Xue@amd.com" <Ken.Xue@amd.com>,
+        "Wang, Zhi A" <zhi.a.wang@intel.com>,
+        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: Re: [PATCH v14 Kernel 1/7] vfio: KABI for migration interface for
+ device state
+Message-ID: <20200318214926.5a0157e5@w520.home>
+In-Reply-To: <20200319011703.GC4641@joy-OptiPlex-7040>
 References: <1584560474-19946-1-git-send-email-kwankhede@nvidia.com>
-        <1584560474-19946-8-git-send-email-kwankhede@nvidia.com>
+        <1584560474-19946-2-git-send-email-kwankhede@nvidia.com>
+        <20200319011703.GC4641@joy-OptiPlex-7040>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 19 Mar 2020 01:11:14 +0530
-Kirti Wankhede <kwankhede@nvidia.com> wrote:
+On Wed, 18 Mar 2020 21:17:03 -0400
+Yan Zhao <yan.y.zhao@intel.com> wrote:
 
-> Added a check such that only singleton IOMMU groups can pin pages.
-> From the point when vendor driver pins any pages, consider IOMMU group
-> dirty page scope to be limited to pinned pages.
+> On Thu, Mar 19, 2020 at 03:41:08AM +0800, Kirti Wankhede wrote:
+> > - Defined MIGRATION region type and sub-type.
+> > 
+> > - Defined vfio_device_migration_info structure which will be placed at the
+> >   0th offset of migration region to get/set VFIO device related
+> >   information. Defined members of structure and usage on read/write access.
+> > 
+> > - Defined device states and state transition details.
+> > 
+> > - Defined sequence to be followed while saving and resuming VFIO device.
+> > 
+> > Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+> > Reviewed-by: Neo Jia <cjia@nvidia.com>
+> > ---
+> >  include/uapi/linux/vfio.h | 227 ++++++++++++++++++++++++++++++++++++++++++++++
+> >  1 file changed, 227 insertions(+)
+> > 
+> > diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+> > index 9e843a147ead..d0021467af53 100644
+> > --- a/include/uapi/linux/vfio.h
+> > +++ b/include/uapi/linux/vfio.h
+> > @@ -305,6 +305,7 @@ struct vfio_region_info_cap_type {
+> >  #define VFIO_REGION_TYPE_PCI_VENDOR_MASK	(0xffff)
+> >  #define VFIO_REGION_TYPE_GFX                    (1)
+> >  #define VFIO_REGION_TYPE_CCW			(2)
+> > +#define VFIO_REGION_TYPE_MIGRATION              (3)
+> >  
+> >  /* sub-types for VFIO_REGION_TYPE_PCI_* */
+> >  
+> > @@ -379,6 +380,232 @@ struct vfio_region_gfx_edid {
+> >  /* sub-types for VFIO_REGION_TYPE_CCW */
+> >  #define VFIO_REGION_SUBTYPE_CCW_ASYNC_CMD	(1)
+> >  
+> > +/* sub-types for VFIO_REGION_TYPE_MIGRATION */
+> > +#define VFIO_REGION_SUBTYPE_MIGRATION           (1)
+> > +
+> > +/*
+> > + * The structure vfio_device_migration_info is placed at the 0th offset of
+> > + * the VFIO_REGION_SUBTYPE_MIGRATION region to get and set VFIO device related
+> > + * migration information. Field accesses from this structure are only supported
+> > + * at their native width and alignment. Otherwise, the result is undefined and
+> > + * vendor drivers should return an error.
+> > + *
+> > + * device_state: (read/write)
+> > + *      - The user application writes to this field to inform the vendor driver
+> > + *        about the device state to be transitioned to.
+> > + *      - The vendor driver should take the necessary actions to change the
+> > + *        device state. After successful transition to a given state, the
+> > + *        vendor driver should return success on write(device_state, state)
+> > + *        system call. If the device state transition fails, the vendor driver
+> > + *        should return an appropriate -errno for the fault condition.
+> > + *      - On the user application side, if the device state transition fails,
+> > + *	  that is, if write(device_state, state) returns an error, read
+> > + *	  device_state again to determine the current state of the device from
+> > + *	  the vendor driver.
+> > + *      - The vendor driver should return previous state of the device unless
+> > + *        the vendor driver has encountered an internal error, in which case
+> > + *        the vendor driver may report the device_state VFIO_DEVICE_STATE_ERROR.
+> > + *      - The user application must use the device reset ioctl to recover the
+> > + *        device from VFIO_DEVICE_STATE_ERROR state. If the device is
+> > + *        indicated to be in a valid device state by reading device_state, the
+> > + *        user application may attempt to transition the device to any valid
+> > + *        state reachable from the current state or terminate itself.
+> > + *
+> > + *      device_state consists of 3 bits:
+> > + *      - If bit 0 is set, it indicates the _RUNNING state. If bit 0 is clear,
+> > + *        it indicates the _STOP state. When the device state is changed to
+> > + *        _STOP, driver should stop the device before write() returns.
+> > + *      - If bit 1 is set, it indicates the _SAVING state, which means that the
+> > + *        driver should start gathering device state information that will be
+> > + *        provided to the VFIO user application to save the device's state.
+> > + *      - If bit 2 is set, it indicates the _RESUMING state, which means that
+> > + *        the driver should prepare to resume the device. Data provided through
+> > + *        the migration region should be used to resume the device.
+> > + *      Bits 3 - 31 are reserved for future use. To preserve them, the user
+> > + *      application should perform a read-modify-write operation on this
+> > + *      field when modifying the specified bits.
+> > + *
+> > + *  +------- _RESUMING
+> > + *  |+------ _SAVING
+> > + *  ||+----- _RUNNING
+> > + *  |||
+> > + *  000b => Device Stopped, not saving or resuming
+> > + *  001b => Device running, which is the default state
+> > + *  010b => Stop the device & save the device state, stop-and-copy state
+> > + *  011b => Device running and save the device state, pre-copy state
+> > + *  100b => Device stopped and the device state is resuming
+> > + *  101b => Invalid state
+> > + *  110b => Error state
+> > + *  111b => Invalid state
+> > + *
+> > + * State transitions:
+> > + *
+> > + *              _RESUMING  _RUNNING    Pre-copy    Stop-and-copy   _STOP
+> > + *                (100b)     (001b)     (011b)        (010b)       (000b)
+> > + * 0. Running or default state
+> > + *                             |
+> > + *
+> > + * 1. Normal Shutdown (optional)
+> > + *                             |------------------------------------->|
+> > + *
+> > + * 2. Save the state or suspend
+> > + *                             |------------------------->|---------->|
+> > + *
+> > + * 3. Save the state during live migration
+> > + *                             |----------->|------------>|---------->|
+> > + *
+> > + * 4. Resuming
+> > + *                  |<---------|
+> > + *
+> > + * 5. Resumed
+> > + *                  |--------->|
+> > + *
+> > + * 0. Default state of VFIO device is _RUNNNG when the user application starts.
+> > + * 1. During normal shutdown of the user application, the user application may
+> > + *    optionally change the VFIO device state from _RUNNING to _STOP. This
+> > + *    transition is optional. The vendor driver must support this transition but
+> > + *    must not require it.
+> > + * 2. When the user application saves state or suspends the application, the
+> > + *    device state transitions from _RUNNING to stop-and-copy and then to _STOP.
+> > + *    On state transition from _RUNNING to stop-and-copy, driver must stop the
+> > + *    device, save the device state and send it to the application through the
+> > + *    migration region. The sequence to be followed for such transition is given
+> > + *    below.
+> > + * 3. In live migration of user application, the state transitions from _RUNNING
+> > + *    to pre-copy, to stop-and-copy, and to _STOP.
+> > + *    On state transition from _RUNNING to pre-copy, the driver should start
+> > + *    gathering the device state while the application is still running and send
+> > + *    the device state data to application through the migration region.
+> > + *    On state transition from pre-copy to stop-and-copy, the driver must stop
+> > + *    the device, save the device state and send it to the user application
+> > + *    through the migration region.
+> > + *    Vendor drivers must support the pre-copy state even for implementations
+> > + *    where no data is provided to the user before the stop-and-copy state. The
+> > + *    user must not be required to consume all migration data before the device
+> > + *    transitions to a new state, including the stop-and-copy state.
+> > + *    The sequence to be followed for above two transitions is given below.
+> > + * 4. To start the resuming phase, the device state should be transitioned from
+> > + *    the _RUNNING to the _RESUMING state.
+> > + *    In the _RESUMING state, the driver should use the device state data
+> > + *    received through the migration region to resume the device.
+> > + * 5. After providing saved device data to the driver, the application should
+> > + *    change the state from _RESUMING to _RUNNING.
+> > + *
+> > + * reserved:
+> > + *      Reads on this field return zero and writes are ignored.
+> > + *
+> > + * pending_bytes: (read only)
+> > + *      The number of pending bytes still to be migrated from the vendor driver.
+> > + *
+> > + * data_offset: (read only)
+> > + *      The user application should read data_offset in the migration region
+> > + *      from where the user application should read the device data during the
+> > + *      _SAVING state or write the device data during the _RESUMING state. See
+> > + *      below for details of sequence to be followed.
+> > + *
+> > + * data_size: (read/write)
+> > + *      The user application should read data_size to get the size in bytes of
+> > + *      the data copied in the migration region during the _SAVING state and
+> > + *      write the size in bytes of the data copied in the migration region
+> > + *      during the _RESUMING state.
+> > + *
+> > + * The format of the migration region is as follows:
+> > + *  ------------------------------------------------------------------
+> > + * |vfio_device_migration_info|    data section                      |
+> > + * |                          |     ///////////////////////////////  |
+> > + * ------------------------------------------------------------------
+> > + *   ^                              ^
+> > + *  offset 0-trapped part        data_offset
+> > + *
+> > + * The structure vfio_device_migration_info is always followed by the data
+> > + * section in the region, so data_offset will always be nonzero. The offset
+> > + * from where the data is copied is decided by the kernel driver. The data
+> > + * section can be trapped, mapped, or partitioned, depending on how the kernel
+> > + * driver defines the data section. The data section partition can be defined
+> > + * as mapped by the sparse mmap capability. If mmapped, data_offset should be
+> > + * page aligned, whereas initial section which contains the
+> > + * vfio_device_migration_info structure, might not end at the offset, which is
+> > + * page aligned. The user is not required to access through mmap regardless
+> > + * of the capabilities of the region mmap.
+> > + * The vendor driver should determine whether and how to partition the data
+> > + * section. The vendor driver should return data_offset accordingly.
+> > + *
+> > + * The sequence to be followed for the _SAVING|_RUNNING device state or
+> > + * pre-copy phase and for the _SAVING device state or stop-and-copy phase is as
+> > + * follows:
+> > + * a. Read pending_bytes, indicating the start of a new iteration to get device
+> > + *    data. Repeated read on pending_bytes at this stage should have no side
+> > + *    effects.
+> > + *    If pending_bytes == 0, the user application should not iterate to get data
+> > + *    for that device.
+> > + *    If pending_bytes > 0, perform the following steps.
+> > + * b. Read data_offset, indicating that the vendor driver should make data
+> > + *    available through the data section. The vendor driver should return this
+> > + *    read operation only after data is available from (region + data_offset)
+> > + *    to (region + data_offset + data_size).
+> > + * c. Read data_size, which is the amount of data in bytes available through
+> > + *    the migration region.
+> > + *    Read on data_offset and data_size should return the offset and size of
+> > + *    the current buffer if the user application reads data_offset and
+> > + *    data_size more than once here.  
+> If data region is mmaped, merely reading data_offset and data_size
+> cannot let kernel know what are correct values to return.
+> Consider to add a read operation which is trapped into kernel to let
+> kernel exactly know it needs to move to the next offset and update data_size
+> ?
+
+Both operations b. and c. above are to trapped registers, operation d.
+below may potentially be to an mmap'd area, which is why we have step
+f. which indicates to the vendor driver that the data has been
+consumed.  Does that address your concern?  Thanks,
+
+Alex
+
+> > + * d. Read data_size bytes of data from (region + data_offset) from the
+> > + *    migration region.
+> > + * e. Process the data.
+> > + * f. Read pending_bytes, which indicates that the data from the previous
+> > + *    iteration has been read. If pending_bytes > 0, go to step b.
+> > + *
+> > + * If an error occurs during the above sequence, the vendor driver can return
+> > + * an error code for next read() or write() operation, which will terminate the
+> > + * loop. The user application should then take the next necessary action, for
+> > + * example, failing migration or terminating the user application.
+> > + *
+> > + * The user application can transition from the _SAVING|_RUNNING
+> > + * (pre-copy state) to the _SAVING (stop-and-copy) state regardless of the
+> > + * number of pending bytes. The user application should iterate in _SAVING
+> > + * (stop-and-copy) until pending_bytes is 0.
+> > + *
+> > + * The sequence to be followed while _RESUMING device state is as follows:
+> > + * While data for this device is available, repeat the following steps:
+> > + * a. Read data_offset from where the user application should write data.
+> > + * b. Write migration data starting at the migration region + data_offset for
+> > + *    the length determined by data_size from the migration source.
+> > + * c. Write data_size, which indicates to the vendor driver that data is
+> > + *    written in the migration region. Vendor driver should apply the
+> > + *    user-provided migration region data to the device resume state.
+> > + *
+> > + * For the user application, data is opaque. The user application should write
+> > + * data in the same order as the data is received and the data should be of
+> > + * same transaction size at the source.
+> > + */
+> > +
+> > +struct vfio_device_migration_info {
+> > +	__u32 device_state;         /* VFIO device state */
+> > +#define VFIO_DEVICE_STATE_STOP      (0)
+> > +#define VFIO_DEVICE_STATE_RUNNING   (1 << 0)
+> > +#define VFIO_DEVICE_STATE_SAVING    (1 << 1)
+> > +#define VFIO_DEVICE_STATE_RESUMING  (1 << 2)
+> > +#define VFIO_DEVICE_STATE_MASK      (VFIO_DEVICE_STATE_RUNNING | \
+> > +				     VFIO_DEVICE_STATE_SAVING |  \
+> > +				     VFIO_DEVICE_STATE_RESUMING)
+> > +
+> > +#define VFIO_DEVICE_STATE_VALID(state) \
+> > +	(state & VFIO_DEVICE_STATE_RESUMING ? \
+> > +	(state & VFIO_DEVICE_STATE_MASK) == VFIO_DEVICE_STATE_RESUMING : 1)
+> > +
+> > +#define VFIO_DEVICE_STATE_IS_ERROR(state) \
+> > +	((state & VFIO_DEVICE_STATE_MASK) == (VFIO_DEVICE_STATE_SAVING | \
+> > +					      VFIO_DEVICE_STATE_RESUMING))
+> > +
+> > +#define VFIO_DEVICE_STATE_SET_ERROR(state) \
+> > +	((state & ~VFIO_DEVICE_STATE_MASK) | VFIO_DEVICE_SATE_SAVING | \
+> > +					     VFIO_DEVICE_STATE_RESUMING)
+> > +
+> > +	__u32 reserved;
+> > +	__u64 pending_bytes;
+> > +	__u64 data_offset;
+> > +	__u64 data_size;
+> > +} __attribute__((packed));
+> > +
+> >  /*
+> >   * The MSIX mappable capability informs that MSIX data of a BAR can be mmapped
+> >   * which allows direct access to non-MSIX registers which happened to be within
+> > -- 
+> > 2.7.0
+> >   
 > 
-> To optimize to avoid walking list often, added flag
-> pinned_page_dirty_scope to indicate if all of the vfio_groups for each
-> vfio_domain in the domain_list dirty page scope is limited to pinned
-> pages. This flag is updated on first pinned pages request for that IOMMU
-> group and on attaching/detaching group.
-> 
-> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-> Reviewed-by: Neo Jia <cjia@nvidia.com>
-> ---
->  drivers/vfio/vfio.c             | 13 +++++--
->  drivers/vfio/vfio_iommu_type1.c | 77 +++++++++++++++++++++++++++++++++++++++--
->  include/linux/vfio.h            |  4 ++-
->  3 files changed, 87 insertions(+), 7 deletions(-)
-> 
-> diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
-> index 210fcf426643..311b5e4e111e 100644
-> --- a/drivers/vfio/vfio.c
-> +++ b/drivers/vfio/vfio.c
-> @@ -85,6 +85,7 @@ struct vfio_group {
->  	atomic_t			opened;
->  	wait_queue_head_t		container_q;
->  	bool				noiommu;
-> +	unsigned int			dev_counter;
->  	struct kvm			*kvm;
->  	struct blocking_notifier_head	notifier;
->  };
-> @@ -555,6 +556,7 @@ struct vfio_device *vfio_group_create_device(struct vfio_group *group,
->  
->  	mutex_lock(&group->device_lock);
->  	list_add(&device->group_next, &group->device_list);
-> +	group->dev_counter++;
->  	mutex_unlock(&group->device_lock);
->  
->  	return device;
-> @@ -567,6 +569,7 @@ static void vfio_device_release(struct kref *kref)
->  	struct vfio_group *group = device->group;
->  
->  	list_del(&device->group_next);
-> +	group->dev_counter--;
->  	mutex_unlock(&group->device_lock);
->  
->  	dev_set_drvdata(device->dev, NULL);
-> @@ -1933,6 +1936,9 @@ int vfio_pin_pages(struct device *dev, unsigned long *user_pfn, int npage,
->  	if (!group)
->  		return -ENODEV;
->  
-> +	if (group->dev_counter > 1)
-> +		return -EINVAL;
-> +
->  	ret = vfio_group_add_container_user(group);
->  	if (ret)
->  		goto err_pin_pages;
-> @@ -1940,7 +1946,8 @@ int vfio_pin_pages(struct device *dev, unsigned long *user_pfn, int npage,
->  	container = group->container;
->  	driver = container->iommu_driver;
->  	if (likely(driver && driver->ops->pin_pages))
-> -		ret = driver->ops->pin_pages(container->iommu_data, user_pfn,
-> +		ret = driver->ops->pin_pages(container->iommu_data,
-> +					     group->iommu_group, user_pfn,
->  					     npage, prot, phys_pfn);
->  	else
->  		ret = -ENOTTY;
-> @@ -2038,8 +2045,8 @@ int vfio_group_pin_pages(struct vfio_group *group,
->  	driver = container->iommu_driver;
->  	if (likely(driver && driver->ops->pin_pages))
->  		ret = driver->ops->pin_pages(container->iommu_data,
-> -					     user_iova_pfn, npage,
-> -					     prot, phys_pfn);
-> +					     group->iommu_group, user_iova_pfn,
-> +					     npage, prot, phys_pfn);
->  	else
->  		ret = -ENOTTY;
->  
-> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> index 912629320719..deec09f4b0f6 100644
-> --- a/drivers/vfio/vfio_iommu_type1.c
-> +++ b/drivers/vfio/vfio_iommu_type1.c
-> @@ -72,6 +72,7 @@ struct vfio_iommu {
->  	bool			v2;
->  	bool			nesting;
->  	bool			dirty_page_tracking;
-> +	bool			pinned_page_dirty_scope;
->  };
->  
->  struct vfio_domain {
-> @@ -99,6 +100,7 @@ struct vfio_group {
->  	struct iommu_group	*iommu_group;
->  	struct list_head	next;
->  	bool			mdev_group;	/* An mdev group */
-> +	bool			pinned_page_dirty_scope;
->  };
->  
->  struct vfio_iova {
-> @@ -132,6 +134,10 @@ struct vfio_regions {
->  static int put_pfn(unsigned long pfn, int prot);
->  static unsigned long vfio_pgsize_bitmap(struct vfio_iommu *iommu);
->  
-> +static struct vfio_group *vfio_iommu_find_iommu_group(struct vfio_iommu *iommu,
-> +					       struct iommu_group *iommu_group);
-> +
-> +static void update_pinned_page_dirty_scope(struct vfio_iommu *iommu);
->  /*
->   * This code handles mapping and unmapping of user data buffers
->   * into DMA'ble space using the IOMMU
-> @@ -556,11 +562,13 @@ static int vfio_unpin_page_external(struct vfio_dma *dma, dma_addr_t iova,
->  }
->  
->  static int vfio_iommu_type1_pin_pages(void *iommu_data,
-> +				      struct iommu_group *iommu_group,
->  				      unsigned long *user_pfn,
->  				      int npage, int prot,
->  				      unsigned long *phys_pfn)
->  {
->  	struct vfio_iommu *iommu = iommu_data;
-> +	struct vfio_group *group;
->  	int i, j, ret;
->  	unsigned long remote_vaddr;
->  	struct vfio_dma *dma;
-> @@ -630,8 +638,14 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
->  				   (vpfn->iova - dma->iova) >> pgshift, 1);
->  		}
->  	}
-> -
->  	ret = i;
-> +
-> +	group = vfio_iommu_find_iommu_group(iommu, iommu_group);
-> +	if (!group->pinned_page_dirty_scope) {
-> +		group->pinned_page_dirty_scope = true;
-> +		update_pinned_page_dirty_scope(iommu);
-> +	}
-> +
->  	goto pin_done;
->  
->  pin_unwind:
-> @@ -913,8 +927,11 @@ static int vfio_iova_dirty_bitmap(struct vfio_iommu *iommu, dma_addr_t iova,
->  	npages = dma->size >> pgshift;
->  	bitmap_size = DIRTY_BITMAP_BYTES(npages);
->  
-> -	/* mark all pages dirty if all pages are pinned and mapped. */
-> -	if (dma->iommu_mapped)
-> +	/*
-> +	 * mark all pages dirty if any IOMMU capable device is not able
-> +	 * to report dirty pages and all pages are pinned and mapped.
-> +	 */
-> +	if (!iommu->pinned_page_dirty_scope && dma->iommu_mapped)
->  		bitmap_set(dma->bitmap, 0, npages);
->  
->  	if (copy_to_user((void __user *)bitmap, dma->bitmap, bitmap_size))
-> @@ -1393,6 +1410,51 @@ static struct vfio_group *find_iommu_group(struct vfio_domain *domain,
->  	return NULL;
->  }
->  
-> +static struct vfio_group *vfio_iommu_find_iommu_group(struct vfio_iommu *iommu,
-> +					       struct iommu_group *iommu_group)
-> +{
-> +	struct vfio_domain *domain;
-> +	struct vfio_group *group = NULL;
-> +
-> +	list_for_each_entry(domain, &iommu->domain_list, next) {
-> +		group = find_iommu_group(domain, iommu_group);
-> +		if (group)
-> +			return group;
-> +	}
-> +
-> +	if (iommu->external_domain)
-> +		group = find_iommu_group(iommu->external_domain, iommu_group);
-> +
-> +	return group;
-> +}
-> +
-> +static void update_pinned_page_dirty_scope(struct vfio_iommu *iommu)
-> +{
-> +	struct vfio_domain *domain;
-> +	struct vfio_group *group;
-> +
-> +	list_for_each_entry(domain, &iommu->domain_list, next) {
-> +		list_for_each_entry(group, &domain->group_list, next) {
-> +			if (!group->pinned_page_dirty_scope) {
-> +				iommu->pinned_page_dirty_scope = false;
-> +				return;
-> +			}
-> +		}
-> +	}
-> +
-> +	if (iommu->external_domain) {
-> +		domain = iommu->external_domain;
-> +		list_for_each_entry(group, &domain->group_list, next) {
-> +			if (!group->pinned_page_dirty_scope) {
-> +				iommu->pinned_page_dirty_scope = false;
-> +				return;
-> +			}
-> +		}
-> +	}
-> +
-> +	iommu->pinned_page_dirty_scope = true;
-> +}
-> +
->  static bool vfio_iommu_has_sw_msi(struct list_head *group_resv_regions,
->  				  phys_addr_t *base)
->  {
-> @@ -1799,6 +1861,9 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
->  
->  			list_add(&group->next,
->  				 &iommu->external_domain->group_list);
-> +			group->pinned_page_dirty_scope = true;
-> +			if (!iommu->pinned_page_dirty_scope)
-> +				update_pinned_page_dirty_scope(iommu);
-
-A comment above this would be good since this wasn't entirely obvious,
-maybe:
-
-/*
- * Non-iommu backed group cannot dirty memory directly,
- * it can only use interfaces that provide dirty tracking.
- * The iommu scope can only be promoted with the addition
- * of a dirty tracking group.
- */
-
->  			mutex_unlock(&iommu->lock);
->  
->  			return 0;
-> @@ -1921,6 +1986,7 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
->  done:
->  	/* Delete the old one and insert new iova list */
->  	vfio_iommu_iova_insert_copy(iommu, &iova_copy);
-> +	iommu->pinned_page_dirty_scope = false;
-
-Likewise here:
-
-/*
- * An iommu backed group can dirty memory directly and therefore
- * demotes the iommu scope until it declares itself dirty tracking
- * capable via the page pinning interface.
- */
-
->  	mutex_unlock(&iommu->lock);
->  	vfio_iommu_resv_free(&group_resv_regions);
->  
-> @@ -2073,6 +2139,7 @@ static void vfio_iommu_type1_detach_group(void *iommu_data,
->  	struct vfio_iommu *iommu = iommu_data;
->  	struct vfio_domain *domain;
->  	struct vfio_group *group;
-> +	bool update_dirty_scope = false;
->  	LIST_HEAD(iova_copy);
->  
->  	mutex_lock(&iommu->lock);
-> @@ -2080,6 +2147,7 @@ static void vfio_iommu_type1_detach_group(void *iommu_data,
->  	if (iommu->external_domain) {
->  		group = find_iommu_group(iommu->external_domain, iommu_group);
->  		if (group) {
-> +			update_dirty_scope = !group->pinned_page_dirty_scope;
->  			list_del(&group->next);
->  			kfree(group);
->  
-> @@ -2109,6 +2177,7 @@ static void vfio_iommu_type1_detach_group(void *iommu_data,
->  			continue;
->  
->  		vfio_iommu_detach_group(domain, group);
-> +		update_dirty_scope = !group->pinned_page_dirty_scope;
->  		list_del(&group->next);
->  		kfree(group);
->  		/*
-> @@ -2139,6 +2208,8 @@ static void vfio_iommu_type1_detach_group(void *iommu_data,
->  		vfio_iommu_iova_free(&iova_copy);
->  
->  detach_group_done:
-> +	if (update_dirty_scope)
-> +		update_pinned_page_dirty_scope(iommu);
-
-And one more
-
-/*
- * Removal of a group without dirty tracking may
- * allow the iommu scope to be promoted.
- */
-
->  	mutex_unlock(&iommu->lock);
->  }
->  
-> diff --git a/include/linux/vfio.h b/include/linux/vfio.h
-> index be2bd358b952..702e1d7b6e8b 100644
-> --- a/include/linux/vfio.h
-> +++ b/include/linux/vfio.h
-> @@ -72,7 +72,9 @@ struct vfio_iommu_driver_ops {
->  					struct iommu_group *group);
->  	void		(*detach_group)(void *iommu_data,
->  					struct iommu_group *group);
-> -	int		(*pin_pages)(void *iommu_data, unsigned long *user_pfn,
-> +	int		(*pin_pages)(void *iommu_data,
-> +				     struct iommu_group *group,
-> +				     unsigned long *user_pfn,
->  				     int npage, int prot,
->  				     unsigned long *phys_pfn);
->  	int		(*unpin_pages)(void *iommu_data,
 
