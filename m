@@ -2,74 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4DFF218B241
-	for <lists+kvm@lfdr.de>; Thu, 19 Mar 2020 12:21:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 88BCF18B2BB
+	for <lists+kvm@lfdr.de>; Thu, 19 Mar 2020 12:54:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726892AbgCSLVu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Mar 2020 07:21:50 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:37010 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725787AbgCSLVt (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 19 Mar 2020 07:21:49 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 02JBAWfB135771
-        for <kvm@vger.kernel.org>; Thu, 19 Mar 2020 07:21:48 -0400
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2yu7ad7vu7-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Thu, 19 Mar 2020 07:21:48 -0400
-Received: from localhost
-        by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <raspl@linux.ibm.com>;
-        Thu, 19 Mar 2020 11:21:46 -0000
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
-        by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Thu, 19 Mar 2020 11:21:43 -0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 02JBLgQ444630230
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 19 Mar 2020 11:21:42 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D3CB2AE053;
-        Thu, 19 Mar 2020 11:21:42 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B1709AE04D;
-        Thu, 19 Mar 2020 11:21:42 +0000 (GMT)
-Received: from [9.145.6.140] (unknown [9.145.6.140])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 19 Mar 2020 11:21:42 +0000 (GMT)
+        id S1727180AbgCSLyY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Mar 2020 07:54:24 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:55405 "EHLO
+        us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726983AbgCSLyY (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 19 Mar 2020 07:54:24 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1584618862;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=NgmFdXPOG5BK0FnreGKbBxPndGxBWswzYRCil+17m78=;
+        b=JH9MbPIJJumLJY+23r6cgnTR1Fkwj9q40NnXZo/5RxLmfsiec2WNH7DMAfQ5Pqn+q8Ym0O
+        OWlxqOxoHfzv+WLboPuQnb+2vlwWdroX1ukFl6fmpkaTAJFRwjlzcjlcLTyTRhGE3M8clx
+        EKUPdI82KTZuPCaoSPQ1rgOD+G8Rfgs=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-175-4xgUZqN-P4SdvjjdpM8eeg-1; Thu, 19 Mar 2020 07:54:21 -0400
+X-MC-Unique: 4xgUZqN-P4SdvjjdpM8eeg-1
+Received: by mail-wr1-f70.google.com with SMTP id q18so892426wrw.5
+        for <kvm@vger.kernel.org>; Thu, 19 Mar 2020 04:54:20 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=NgmFdXPOG5BK0FnreGKbBxPndGxBWswzYRCil+17m78=;
+        b=c6nOWysIOLV4MuzEEMLH6zkQpseKt0jDTWDTZfe2FVxWqQ42Gldo1N41FTYHz3X9+u
+         P6z82lypA0qfykyZikD8n84TrRlyyQnZAHjTIz/00JeHuvtAwkT2EixxInAHxrl5ie6h
+         QuEBL+meTeqODDHFHJ8NgbajKHUI0v9mv1lf97jhRgp9oWqRMUW27rlmqoGP3ZI2I9aM
+         FTYHcyspHlXh52hk5cbSV4aGQpPMI9Wslpkhbv6IV8pdCISgIpF8X9ZjFu8gLs8JEYKp
+         hH3CmP7nQ6/cObb29xDzFeaBHe+O/nE7boEyHocqwgHKeFydZEcU8yUx7rnMBydOYWuR
+         VIiQ==
+X-Gm-Message-State: ANhLgQ1kwmxrn/o4Pva+h6q1wdDnSJQi1AhFzBVrAb5wOYCnnXNs3QtK
+        HgFpKkzCrTDm7Wq8rkgHmN6zHml5LhtwNNkoAbCD/6n11TCApzkN3u9owGBzQpdnL9TKjsaXC02
+        mTT84oF6nPhaY
+X-Received: by 2002:adf:9f48:: with SMTP id f8mr3802356wrg.199.1584618859837;
+        Thu, 19 Mar 2020 04:54:19 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vsu3nXFTlHZSaVLF6tppAjucUFLUwOcJMICRZCJpCgEsgJNvT5OyT1FK100J/5bltZ93l6MXA==
+X-Received: by 2002:adf:9f48:: with SMTP id f8mr3802335wrg.199.1584618859599;
+        Thu, 19 Mar 2020 04:54:19 -0700 (PDT)
+Received: from [192.168.178.58] ([151.21.15.43])
+        by smtp.gmail.com with ESMTPSA id 98sm3142089wrk.52.2020.03.19.04.54.18
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 19 Mar 2020 04:54:19 -0700 (PDT)
 Subject: Re: [PATCH 0/7] tools/kvm_stat: add logfile support
-From:   Stefan Raspl <raspl@linux.ibm.com>
-To:     kvm@vger.kernel.org
-Cc:     pbonzini@redhat.com
+To:     Stefan Raspl <raspl@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     rkrcmar@redhat.com
 References: <20200306114250.57585-1-raspl@linux.ibm.com>
-Date:   Thu, 19 Mar 2020 12:21:42 +0100
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <7f396df1-9589-6dd0-0adf-af4376aa8314@redhat.com>
+Date:   Thu, 19 Mar 2020 12:54:17 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
 In-Reply-To: <20200306114250.57585-1-raspl@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 20031911-0016-0000-0000-000002F3CE29
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20031911-0017-0000-0000-00003357578E
-Message-Id: <d1c5e601-f7e3-4fa1-3418-4bc2679f3204@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.645
- definitions=2020-03-19_02:2020-03-19,2020-03-19 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0
- priorityscore=1501 mlxscore=0 lowpriorityscore=0 bulkscore=0
- suspectscore=1 clxscore=1015 adultscore=0 spamscore=0 impostorscore=0
- malwarescore=0 mlxlogscore=999 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2003020000 definitions=main-2003190048
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2020-03-06 12:42, Stefan Raspl wrote:
+On 06/03/20 12:42, Stefan Raspl wrote:
 > This patch series provides a couple of new options to make logging to
 > files feasible.
 > Specifically, we add command line switches to specify an arbitrary time
@@ -107,8 +108,9 @@ On 2020-03-06 12:42, Stefan Raspl wrote:
 >  create mode 100644 tools/kvm/kvm_stat/kvm_stat.service
 > 
 
-Any consideration yet...?
+I queued patches 1-4.  For the others, however, I would prefer to add
+support for SIGHUP instead (to reopen the logfile), so that one can use
+the usual logrotate services.
 
-Ciao,
-Stefan
+Paolo
 
