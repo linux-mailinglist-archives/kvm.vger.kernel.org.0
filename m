@@ -2,145 +2,157 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A9C5918BFBA
-	for <lists+kvm@lfdr.de>; Thu, 19 Mar 2020 19:56:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D302518BFBF
+	for <lists+kvm@lfdr.de>; Thu, 19 Mar 2020 19:57:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727082AbgCSS4S (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Mar 2020 14:56:18 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:36686 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726881AbgCSS4S (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 Mar 2020 14:56:18 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02JIirN3049186;
-        Thu, 19 Mar 2020 18:56:15 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2020-01-29;
- bh=h0BPCn5kWMDTJdRZqmOIj5/kwc8bwemVB3+LYAVkPM4=;
- b=DYwwCnRBdTMqakFcoYaj61hm5PRyHqoO7wAc9Gu0a3zEA0qvbTzm7ZGr0Tz+sr87Z3AH
- gNc7U7UNoL73l/SyRvT6IOpKNRElmJHVvwvgbwhvn+W6Q6/uUVUftZhnfE4uPAy0GFFQ
- 4eDhy2s296ZszJ6nGR+9z614as+EN5u92dvyMcllcT0HuYlhw3IPuHMOZkQaBo/3gzJw
- +mqCGTnOtumcLa+7b514mLc1jZgpiwgZgaJK7k3kTb68JIlAzXLgXF9eTtM5axf4Sj17
- KqHUCK4pdAjE9tzJrVBSFOtZ8HIL8aTuBoCYDV4W/HFLeaYv5YSpdm1DYT5bNumfZa0n 4w== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by userp2120.oracle.com with ESMTP id 2yub279yq2-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 19 Mar 2020 18:56:14 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02JInoxl139237;
-        Thu, 19 Mar 2020 18:56:14 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by aserp3020.oracle.com with ESMTP id 2ys92mxsca-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 19 Mar 2020 18:56:13 +0000
-Received: from abhmp0016.oracle.com (abhmp0016.oracle.com [141.146.116.22])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 02JIuCfi014085;
-        Thu, 19 Mar 2020 18:56:12 GMT
-Received: from localhost.localdomain (/10.65.178.104)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Thu, 19 Mar 2020 11:56:12 -0700
-Subject: Re: [PATCH] KVM: nSVM: check for EFER.SVME=1 before entering guest
-To:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-References: <1584535300-6571-1-git-send-email-pbonzini@redhat.com>
- <b5cb03b1-9840-f8f5-843a-1eab680d5e8e@oracle.com>
- <6426c98d-d206-aeb7-93fa-da62b77df21a@redhat.com>
-From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Message-ID: <3ce6d879-5e53-cdf1-a876-542044511836@oracle.com>
-Date:   Thu, 19 Mar 2020 11:56:02 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+        id S1726943AbgCSS5m (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Mar 2020 14:57:42 -0400
+Received: from hqnvemgate24.nvidia.com ([216.228.121.143]:13955 "EHLO
+        hqnvemgate24.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726589AbgCSS5m (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 Mar 2020 14:57:42 -0400
+Received: from hqpgpgate102.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate24.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+        id <B5e73c0430000>; Thu, 19 Mar 2020 11:56:03 -0700
+Received: from hqmail.nvidia.com ([172.20.161.6])
+  by hqpgpgate102.nvidia.com (PGP Universal service);
+  Thu, 19 Mar 2020 11:57:41 -0700
+X-PGP-Universal: processed;
+        by hqpgpgate102.nvidia.com on Thu, 19 Mar 2020 11:57:41 -0700
+Received: from [10.40.102.54] (10.124.1.5) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Thu, 19 Mar
+ 2020 18:57:32 +0000
+Subject: Re: [PATCH v14 Kernel 4/7] vfio iommu: Implementation of ioctl for
+ dirty pages tracking.
+To:     Alex Williamson <alex.williamson@redhat.com>
+CC:     <cjia@nvidia.com>, <kevin.tian@intel.com>, <ziye.yang@intel.com>,
+        <changpeng.liu@intel.com>, <yi.l.liu@intel.com>,
+        <mlevitsk@redhat.com>, <eskultet@redhat.com>, <cohuck@redhat.com>,
+        <dgilbert@redhat.com>, <jonathan.davies@nutanix.com>,
+        <eauger@redhat.com>, <aik@ozlabs.ru>, <pasic@linux.ibm.com>,
+        <felipe@nutanix.com>, <Zhengxiao.zx@Alibaba-inc.com>,
+        <shuangtai.tst@alibaba-inc.com>, <Ken.Xue@amd.com>,
+        <zhi.a.wang@intel.com>, <yan.y.zhao@intel.com>,
+        <qemu-devel@nongnu.org>, <kvm@vger.kernel.org>
+References: <1584560474-19946-1-git-send-email-kwankhede@nvidia.com>
+ <1584560474-19946-5-git-send-email-kwankhede@nvidia.com>
+ <20200318214500.1a0cb985@w520.home>
+X-Nvconfidentiality: public
+From:   Kirti Wankhede <kwankhede@nvidia.com>
+Message-ID: <be22d111-123c-e1bb-a376-e66b10ebe55f@nvidia.com>
+Date:   Fri, 20 Mar 2020 00:27:28 +0530
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <6426c98d-d206-aeb7-93fa-da62b77df21a@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200318214500.1a0cb985@w520.home>
+X-Originating-IP: [10.124.1.5]
+X-ClientProxiedBy: HQMAIL101.nvidia.com (172.20.187.10) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Language: en-US
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9565 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 mlxlogscore=999
- mlxscore=0 spamscore=0 bulkscore=0 adultscore=0 suspectscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2003190078
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9565 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 impostorscore=0
- mlxlogscore=999 mlxscore=0 phishscore=0 adultscore=0 suspectscore=0
- clxscore=1015 priorityscore=1501 lowpriorityscore=0 bulkscore=0
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2003190078
+Content-Transfer-Encoding: quoted-printable
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1584644163; bh=vfV88Ij06FqO4WLmvlV/YCflIZKfz0v6Hvy6pULwZuo=;
+        h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
+         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
+         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
+         Content-Transfer-Encoding;
+        b=js7IJV3SHXnODSgCqg8UiUybsPrToVSihTWkqALlgfltkrfbUtz38Z/Luc+B2LOtl
+         nhj2unhILoPL8ylxCKt4T7/cx5xxsJ0TnqUJqulGfYgDHTVYXL/mfyYgBSaH53Bk9I
+         Cf7KlYbENjlJ9u2xHnGlSxeNPEsjdykAAU3nX3gb7AeSQquxZnX05kRpuveFq5wNwo
+         F09yhhuJ8Ld3bbCUe2qcdWdU7vN+D4FB8yVzKSHcv299nOZ9pbLcrHdYnMNg8joYWj
+         AkS0OtxrQovgYRdbl9GrKOn9VyrfzoNEccn6WJAAFclQiKnffwv6rohXXxGCwoLcxt
+         lO9MCHV7w473g==
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
-On 3/19/20 3:05 AM, Paolo Bonzini wrote:
-> On 18/03/20 19:40, Krish Sadhukhan wrote:
->> On 3/18/20 5:41 AM, Paolo Bonzini wrote:
->>> EFER is set for L2 using svm_set_efer, which hardcodes EFER_SVME to 1
->>> and hides
->>> an incorrect value for EFER.SVME in the L1 VMCB.  Perform the check
->>> manually
->>> to detect invalid guest state.
->>>
->>> Reported-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
->>> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
->>> ---
->>>    arch/x86/kvm/svm.c | 3 +++
->>>    1 file changed, 3 insertions(+)
->>>
->>> diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
->>> index 08568ae9f7a1..2125c6ae5951 100644
->>> --- a/arch/x86/kvm/svm.c
->>> +++ b/arch/x86/kvm/svm.c
->>> @@ -3558,6 +3558,9 @@ static bool nested_svm_vmrun_msrpm(struct
->>> vcpu_svm *svm)
->>>      static bool nested_vmcb_checks(struct vmcb *vmcb)
->>>    {
->>> +    if ((vmcb->save.efer & EFER_SVME) == 0)
->>> +        return false;
->>> +
->>>        if ((vmcb->control.intercept & (1ULL << INTERCEPT_VMRUN)) == 0)
->>>            return false;
->>>    
->> Ah! This now tells me that I forgot the KVM fix that was supposed to
->> accompany my patchset.
-> Heh, indeed.  I was puzzled for a second after applying it, then decided
-> I would just fix it myself. :)
->
->> Do we need this check in software ? I wasn't checking the bit in KVM and
->> instead I was just making sure that L0 sets that bit based on the
->> setting in nested vmcb:
-Thanks !
-> The only effect of the function below over svm_set_efer is to guarantee
-> a vmrun error to happen.  Doing the test in nested_vmcb_checks is more
-> consistent with other must-be-one bits such as the VMRUN intercept, and
-> it's also a smaller patch.
 
-Reviewed-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
-
->
-> Paolo
->
->> +static void nested_svm_set_efer(struct kvm_vcpu *vcpu, u64
->> nested_vmcb_efer)
->> +{
->> +       svm_set_efer(vcpu, nested_vmcb_efer);
->> +
->> +       if (!(nested_vmcb_efer & EFER_SVME))
->> +               to_svm(vcpu)->vmcb->save.efer &= ~EFER_SVME;
->> +}
->> +
->>   static int is_external_interrupt(u32 info)
->>   {
->>          info &= SVM_EVTINJ_TYPE_MASK | SVM_EVTINJ_VALID;
->> @@ -3554,7 +3562,7 @@ static void enter_svm_guest_mode(struct vcpu_svm
->> *svm, u64
->>          svm->vmcb->save.gdtr = nested_vmcb->save.gdtr;
->>          svm->vmcb->save.idtr = nested_vmcb->save.idtr;
->>          kvm_set_rflags(&svm->vcpu, nested_vmcb->save.rflags);
->> -       svm_set_efer(&svm->vcpu, nested_vmcb->save.efer);
->> +       nested_svm_set_efer(&svm->vcpu, nested_vmcb->save.efer);
->>          svm_set_cr0(&svm->vcpu, nested_vmcb->save.cr0);
->>          svm_set_cr4(&svm->vcpu, nested_vmcb->save.cr4);
->>          if (npt_enabled) {
+On 3/19/2020 9:15 AM, Alex Williamson wrote:
+> On Thu, 19 Mar 2020 01:11:11 +0530
+> Kirti Wankhede <kwankhede@nvidia.com> wrote:
+>=20
+>> VFIO_IOMMU_DIRTY_PAGES ioctl performs three operations:
+>> - Start dirty pages tracking while migration is active
+>> - Stop dirty pages tracking.
+>> - Get dirty pages bitmap. Its user space application's responsibility to
+>>    copy content of dirty pages from source to destination during migrati=
+on.
 >>
+>> To prevent DoS attack, memory for bitmap is allocated per vfio_dma
+>> structure. Bitmap size is calculated considering smallest supported page
+>> size. Bitmap is allocated for all vfio_dmas when dirty logging is enable=
+d
+>>
+>> Bitmap is populated for already pinned pages when bitmap is allocated fo=
+r
+>> a vfio_dma with the smallest supported page size. Update bitmap from
+>> pinning functions when tracking is enabled. When user application querie=
+s
+>> bitmap, check if requested page size is same as page size used to
+>> populated bitmap. If it is equal, copy bitmap, but if not equal, return
+>> error.
+>>
+>> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+>> Reviewed-by: Neo Jia <cjia@nvidia.com>
+>> ---
+>>   drivers/vfio/vfio_iommu_type1.c | 205 ++++++++++++++++++++++++++++++++=
++++++++-
+>>   1 file changed, 203 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_t=
+ype1.c
+>> index 70aeab921d0f..d6417fb02174 100644
+>> --- a/drivers/vfio/vfio_iommu_type1.c
+>> +++ b/drivers/vfio/vfio_iommu_type1.c
+>> @@ -71,6 +71,7 @@ struct vfio_iommu {
+>>   	unsigned int		dma_avail;
+>>   	bool			v2;
+>>   	bool			nesting;
+>> +	bool			dirty_page_tracking;
+>>   };
+>>  =20
+>>   struct vfio_domain {
+>> @@ -91,6 +92,7 @@ struct vfio_dma {
+>>   	bool			lock_cap;	/* capable(CAP_IPC_LOCK) */
+>>   	struct task_struct	*task;
+>>   	struct rb_root		pfn_list;	/* Ex-user pinned pfn list */
+>> +	unsigned long		*bitmap;
+>=20
+> We've made the bitmap a width invariant u64 else, should be here as
+> well.
+>=20
+
+Changing to u64 causes compile time warnings as below. Keeping 'unsigned=20
+long *'
+
+drivers/vfio/vfio_iommu_type1.c: In function =E2=80=98vfio_dma_bitmap_alloc=
+_all=E2=80=99:
+drivers/vfio/vfio_iommu_type1.c:232:8: warning: passing argument 1 of=20
+=E2=80=98bitmap_set=E2=80=99 from incompatible pointer type [enabled by def=
+ault]
+         (vpfn->iova - dma->iova) / pgsize, 1);
+         ^
+In file included from ./include/linux/cpumask.h:12:0,
+                  from ./arch/x86/include/asm/cpumask.h:5,
+                  from ./arch/x86/include/asm/msr.h:11,
+                  from ./arch/x86/include/asm/processor.h:22,
+                  from ./arch/x86/include/asm/cpufeature.h:5,
+                  from ./arch/x86/include/asm/thread_info.h:53,
+                  from ./include/linux/thread_info.h:38,
+                  from ./arch/x86/include/asm/preempt.h:7,
+                  from ./include/linux/preempt.h:78,
+                  from ./include/linux/spinlock.h:51,
+                  from ./include/linux/seqlock.h:36,
+                  from ./include/linux/time.h:6,
+                  from ./include/linux/compat.h:10,
+                  from drivers/vfio/vfio_iommu_type1.c:24:
+./include/linux/bitmap.h:405:29: note: expected =E2=80=98long unsigned int =
+*=E2=80=99=20
+but argument is of type =E2=80=98u64 *=E2=80=99
+  static __always_inline void bitmap_set(unsigned long *map, unsigned=20
+int start,
+
+Thanks,
+Kirti
