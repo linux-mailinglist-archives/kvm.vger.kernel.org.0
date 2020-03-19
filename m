@@ -2,167 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3194018ACC8
-	for <lists+kvm@lfdr.de>; Thu, 19 Mar 2020 07:32:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E865A18ACE2
+	for <lists+kvm@lfdr.de>; Thu, 19 Mar 2020 07:38:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727009AbgCSGca (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Mar 2020 02:32:30 -0400
-Received: from mga09.intel.com ([134.134.136.24]:58758 "EHLO mga09.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725812AbgCSGc3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 Mar 2020 02:32:29 -0400
-IronPort-SDR: WRT2l8f2km0FJ2c4U3P+8FWKB6PkHqELlSXkgkY6geTcMSQcEj5BjJdZeFKHZ4ALV8yBMVitUr
- /0Pu2d5NfYBA==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Mar 2020 23:32:28 -0700
-IronPort-SDR: yuLWXQ20POQiaxpvj7gRtb757nMFGoTsMxk0Gx/43z3Ps+R3wBac0acsr7KL++97uqWHyjK1gu
- PVxmbO56RSTA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,570,1574150400"; 
-   d="scan'208";a="279989133"
-Received: from fmsmsx106.amr.corp.intel.com ([10.18.124.204])
-  by fmsmga002.fm.intel.com with ESMTP; 18 Mar 2020 23:32:28 -0700
-Received: from fmsmsx606.amr.corp.intel.com (10.18.126.86) by
- FMSMSX106.amr.corp.intel.com (10.18.124.204) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Wed, 18 Mar 2020 23:32:28 -0700
-Received: from fmsmsx606.amr.corp.intel.com (10.18.126.86) by
- fmsmsx606.amr.corp.intel.com (10.18.126.86) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1713.5; Wed, 18 Mar 2020 23:32:27 -0700
-Received: from shsmsx102.ccr.corp.intel.com (10.239.4.154) by
- fmsmsx606.amr.corp.intel.com (10.18.126.86) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id 15.1.1713.5
- via Frontend Transport; Wed, 18 Mar 2020 23:32:27 -0700
-Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.206]) by
- shsmsx102.ccr.corp.intel.com ([169.254.2.50]) with mapi id 14.03.0439.000;
- Thu, 19 Mar 2020 14:32:25 +0800
-From:   "Tian, Kevin" <kevin.tian@intel.com>
-To:     Alex Williamson <alex.williamson@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-CC:     "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "dev@dpdk.org" <dev@dpdk.org>,
-        "mtosatti@redhat.com" <mtosatti@redhat.com>,
-        "thomas@monjalon.net" <thomas@monjalon.net>,
-        "bluca@debian.org" <bluca@debian.org>,
-        "jerinjacobk@gmail.com" <jerinjacobk@gmail.com>,
-        "Richardson, Bruce" <bruce.richardson@intel.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>
-Subject: RE: [PATCH v3 0/7] vfio/pci: SR-IOV support
-Thread-Topic: [PATCH v3 0/7] vfio/pci: SR-IOV support
-Thread-Index: AQHV9/A6HGVyF5dk00ispia0mQepRahPe52A
-Date:   Thu, 19 Mar 2020 06:32:25 +0000
-Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D19D7DAFD5@SHSMSX104.ccr.corp.intel.com>
-References: <158396044753.5601.14804870681174789709.stgit@gimli.home>
-In-Reply-To: <158396044753.5601.14804870681174789709.stgit@gimli.home>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-version: 11.2.0.6
-dlp-reaction: no-action
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        id S1727177AbgCSGiw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Mar 2020 02:38:52 -0400
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:40550 "EHLO
+        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727120AbgCSGiw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 Mar 2020 02:38:52 -0400
+Received: by mail-wm1-f68.google.com with SMTP id z12so700843wmf.5;
+        Wed, 18 Mar 2020 23:38:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=gUcps1XM9Cn7Ral3obTmLHmlyiV6Ruxu367UiIJawY8=;
+        b=My9EpVpa5DWwqQPRF2N8bCYCYC5/m49C3+ZuNWTRsSk8vPx9vBNRa/W+hnmcKq1kub
+         uRXNkl01SJR33kVLqk3gyqBEsYww/ztTjq3fUzDLiphupb0D6ZkQ0LEqwtNSxwcnhg9D
+         3pfC1m8cfDLN36utNyTiZnQZvZPkQDogwbbGsNCZKGO/2PCzp3WzEFO05KCAAnWp6Mh3
+         wlU6i2LmWw6mSiKde3eloOf95h4hVm4pIl33tht86zx0mPC0+bJ/td8xpHplAzZA3OcG
+         ACLQXgkCWb1uK5l+JOXpc8YlbzGQRwFT4z3dPxA9sUL4kPOPSNyvX2WACAAr6ViVCX6S
+         o8sA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=gUcps1XM9Cn7Ral3obTmLHmlyiV6Ruxu367UiIJawY8=;
+        b=oai7kGMa9VkXcTOChgnbexiQgJ0LKN4jZVlaGQgDmRfHb65kVjtTS/VBb/nmLsaX6x
+         OENtFAEy16ye0Lf2Hej46SS5ZlFSj37WFrDQ0p/11Ywg1Kn1vkiAnrXFBAvohreSIyPB
+         12vakT5/086UeWq8xvKrePRbII6oi92KPFk0jUadYQEYEL09wLZK5EhljT5k+yCb7rGG
+         0RU2Mx4m1T/gSD2uPdnhxHj8BnuUcT/dlg85hhG72aS/9SpdYPJLTEMpIX9PojL9UBNG
+         1HOxLNvbED66bhF+Pt3YNieEw+3MhopHQ4S9CIRAvIrOtNfqkrwV3muldAQ+c2YJ12V9
+         FmCw==
+X-Gm-Message-State: ANhLgQ214Qt3Iij0B2S3T09LC8JjGUonKRWSbrWQ24rGKrMP/mFV5APZ
+        p+8I34Gmxn2MtcAjjCSTWyrgWLzrwQo=
+X-Google-Smtp-Source: ADFU+vtwpaGid4XmsOar+JdBuJb6aiDNGDn48cGf7cu+d0Kw8mwCD6O4raWD9X1iFlr1TUbfMe7/bA==
+X-Received: by 2002:a7b:cd97:: with SMTP id y23mr1731000wmj.161.1584599928867;
+        Wed, 18 Mar 2020 23:38:48 -0700 (PDT)
+Received: from jondnuc.lan (IGLD-84-229-155-229.inter.net.il. [84.229.155.229])
+        by smtp.gmail.com with ESMTPSA id l13sm1945665wrm.57.2020.03.18.23.38.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 18 Mar 2020 23:38:48 -0700 (PDT)
+From:   Jon Doron <arilou@gmail.com>
+To:     kvm@vger.kernel.org, linux-hyperv@vger.kernel.org
+Cc:     vkuznets@redhat.com, Jon Doron <arilou@gmail.com>
+Subject: [PATCH v8 0/5] x86/kvm/hyper-v: add support for synthetic debugger
+Date:   Thu, 19 Mar 2020 08:38:31 +0200
+Message-Id: <20200319063836.678562-1-arilou@gmail.com>
+X-Mailer: git-send-email 2.24.1
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-PiBGcm9tOiBBbGV4IFdpbGxpYW1zb24gPGFsZXgud2lsbGlhbXNvbkByZWRoYXQuY29tPg0KPiBT
-ZW50OiBUaHVyc2RheSwgTWFyY2ggMTIsIDIwMjAgNTo1OCBBTQ0KPiANCj4gT25seSBtaW5vciB0
-d2Vha3Mgc2luY2UgdjIsIEdFVCBhbmQgU0VUIG9uIFZGSU9fREVWSUNFX0ZFQVRVUkUgYXJlDQo+
-IGVuZm9yY2VkIG11dHVhbGx5IGV4Y2x1c2l2ZSBleGNlcHQgd2l0aCB0aGUgUFJPQkUgb3B0aW9u
-IGFzIHN1Z2dlc3RlZA0KPiBieSBDb25uaWUsIHRoZSBtb2RpbmZvIHRleHQgaGFzIGJlZW4gZXhw
-YW5kZWQgZm9yIHRoZSBvcHQtaW4gdG8gZW5hYmxlDQo+IFNSLUlPViBzdXBwb3J0IGluIHRoZSB2
-ZmlvLXBjaSBkcml2ZXIgcGVyIGRpc2N1c3Npb24gd2l0aCBLZXZpbi4NCj4gDQo+IEkgaGF2ZSBu
-b3QgaW5jb3Jwb3JhdGVkIHJ1bnRpbWUgd2FybmluZ3MgYXR0ZW1wdGluZyB0byBkZXRlY3QgbWlz
-dXNlDQo+IG9mIFNSLUlPViBvciBpbXBvc2VkIGEgc2Vzc2lvbiBsaWZldGltZSBvZiBhIFZGIHRv
-a2VuLCBib3RoIG9mIHdoaWNoDQo+IHdlcmUgc2lnbmlmaWNhbnQgcG9ydGlvbnMgb2YgdGhlIGRp
-c2N1c3Npb24gb2YgdGhlIHYyIHNlcmllcy4gIEJvdGggb2YNCj4gdGhlc2UgYWxzbyBzZWVtIHRv
-IGltcG9zZSBhIHVzYWdlIG1vZGVsIG9yIG1ha2UgYXNzdW1wdGlvbnMgYWJvdXQgVkYNCj4gcmVz
-b3VyY2UgdXNhZ2Ugb3IgY29uZmlndXJhdGlvbiByZXF1aXJlbWVudHMgdGhhdCBkb24ndCBzZWVt
-IG5lY2Vzc2FyeQ0KPiBleGNlcHQgZm9yIHRoZSBzYWtlIG9mIGdlbmVyYXRpbmcgYSB3YXJuaW5n
-IG9yIHJlcXVpcmluZyBhbiBvdGhlcndpc2UNCj4gdW5uZWNlc3NhcnkgYW5kIGltcGxpY2l0IHRv
-a2VuIHJlaW5pdGlhbGl6YXRpb24uICBJZiB0aGVyZSBhcmUgbmV3DQo+IHRob3VnaHRzIGFyb3Vu
-ZCB0aGVzZSBvciBvdGhlciBkaXNjdXNzaW9uIHBvaW50cywgcGxlYXNlIHJhaXNlIHRoZW0uDQo+
-IA0KPiBTZXJpZXMgb3ZlcnZpZXcgKHNhbWUgYXMgcHJvdmlkZWQgd2l0aCB2MSk6DQo+IA0KPiBU
-aGUgc3lub3BzaXMgb2YgdGhpcyBzZXJpZXMgaXMgdGhhdCB3ZSBoYXZlIGFuIG9uZ29pbmcgZGVz
-aXJlIHRvIGRyaXZlDQo+IFBDSWUgU1ItSU9WIFBGcyBmcm9tIHVzZXJzcGFjZSB3aXRoIFZGSU8u
-ICBUaGVyZSdzIGFuIGltbWVkaWF0ZSBuZWVkDQo+IGZvciB0aGlzIHdpdGggRFBESyBkcml2ZXJz
-IGFuZCBwb3RlbnRpYWxseSBpbnRlcmVzdGluZyBmdXR1cmUgdXNlDQo+IGNhc2VzIGluIHZpcnR1
-YWxpemF0aW9uLiAgV2UndmUgYmVlbiByZWx1Y3RhbnQgdG8gYWRkIHRoaXMgc3VwcG9ydA0KPiBw
-cmV2aW91c2x5IGR1ZSB0byB0aGUgZGVwZW5kZW5jeSBhbmQgdHJ1c3QgcmVsYXRpb25zaGlwIGJl
-dHdlZW4gdGhlDQo+IFZGIGRldmljZSBhbmQgUEYgZHJpdmVyLiAgTWluaW1hbGx5IHRoZSBQRiBk
-cml2ZXIgY2FuIGluZHVjZSBhIGRlbmlhbA0KPiBvZiBzZXJ2aWNlIHRvIHRoZSBWRiwgYnV0IGRl
-cGVuZGluZyBvbiB0aGUgc3BlY2lmaWMgaW1wbGVtZW50YXRpb24sDQo+IHRoZSBQRiBkcml2ZXIg
-bWlnaHQgYWxzbyBiZSByZXNwb25zaWJsZSBmb3IgbW92aW5nIGRhdGEgYmV0d2VlbiBWRnMNCj4g
-b3IgaGF2ZSBkaXJlY3QgYWNjZXNzIHRvIHRoZSBzdGF0ZSBvZiB0aGUgVkYsIGluY2x1ZGluZyBk
-YXRhIG9yIHN0YXRlDQo+IG90aGVyd2lzZSBwcml2YXRlIHRvIHRoZSBWRiBvciBWRiBkcml2ZXIu
-DQo+IA0KPiBUbyBoZWxwIHJlc29sdmUgdGhlc2UgY29uY2VybnMsIHdlIGludHJvZHVjZSBhIFZG
-IHRva2VuIGludG8gdGhlIFZGSU8NCj4gUENJIEFCSSwgd2hpY2ggYWN0cyBhcyBhIHNoYXJlZCBz
-ZWNyZXQga2V5IGJldHdlZW4gZHJpdmVycy4gIFRoZQ0KPiB1c2Vyc3BhY2UgUEYgZHJpdmVyIGlz
-IHJlcXVpcmVkIHRvIHNldCB0aGUgVkYgdG9rZW4gdG8gYSBrbm93biB2YWx1ZQ0KPiBhbmQgdXNl
-cnNwYWNlIFZGIGRyaXZlcnMgYXJlIHJlcXVpcmVkIHRvIHByb3ZpZGUgdGhlIHRva2VuIHRvIGFj
-Y2Vzcw0KPiB0aGUgVkYgZGV2aWNlLiAgSWYgYSBQRiBkcml2ZXIgaXMgcmVzdGFydGVkIHdpdGgg
-VkYgZHJpdmVycyBpbiB1c2UsIGl0DQo+IG11c3QgYWxzbyBwcm92aWRlIHRoZSBjdXJyZW50IHRv
-a2VuIGluIG9yZGVyIHRvIHByZXZlbnQgYSByb2d1ZQ0KPiB1bnRydXN0ZWQgUEYgZHJpdmVyIGZy
-b20gcmVwbGFjaW5nIGEga25vd24gZHJpdmVyLiAgVGhlIGRlZ3JlZSB0bw0KPiB3aGljaCB0aGlz
-IG5ldyB0b2tlbiBpcyBjb25zaWRlcmVkIHNlY3JldCBpcyBsZWZ0IHRvIHRoZSB1c2Vyc3BhY2UN
-Cj4gZHJpdmVycywgdGhlIGtlcm5lbCBpbnRlbnRpb25hbGx5IHByb3ZpZGVzIG5vIG1lYW5zIHRv
-IHJldHJpZXZlIHRoZQ0KPiBjdXJyZW50IHRva2VuLg0KPiANCj4gTm90ZSB0aGF0IHRoZSBhYm92
-ZSB0b2tlbiBpcyBvbmx5IHJlcXVpcmVkIGZvciB0aGlzIG5ldyBtb2RlbCB3aGVyZQ0KPiBib3Ro
-IHRoZSBQRiBhbmQgVkYgZGV2aWNlcyBhcmUgdXNhYmxlIHRocm91Z2ggdmZpby1wY2kuICBFeGlz
-dGluZw0KPiBtb2RlbHMgb2YgVkZJTyBkcml2ZXJzIHdoZXJlIHRoZSBQRiBpcyB1c2VkIHdpdGhv
-dXQgU1ItSU9WIGVuYWJsZWQNCj4gb3IgdGhlIFZGIGlzIGJvdW5kIHRvIGEgdXNlcnNwYWNlIGRy
-aXZlciB3aXRoIGFuIGluLWtlcm5lbCwgaG9zdCBQRg0KPiBkcml2ZXIgYXJlIHVuYWZmZWN0ZWQu
-DQo+IA0KPiBUaGUgbGF0dGVyIGNvbmZpZ3VyYXRpb24gYWJvdmUgYWxzbyBoaWdobGlnaHRzIGEg
-bmV3IGludmVydGVkIHNjZW5hcmlvDQo+IHRoYXQgaXMgbm93IHBvc3NpYmxlLCBhIHVzZXJzcGFj
-ZSBQRiBkcml2ZXIgd2l0aCBpbi1rZXJuZWwgVkYgZHJpdmVycy4NCj4gSSBiZWxpZXZlIHRoaXMg
-aXMgYSBzY2VuYXJpbyB0aGF0IHNob3VsZCBiZSBhbGxvd2VkLCBidXQgc2hvdWxkIG5vdCBiZQ0K
-PiBlbmFibGVkIGJ5IGRlZmF1bHQuICBUaGlzIHNlcmllcyBpbmNsdWRlcyBjb2RlIHRvIHNldCBh
-IGRlZmF1bHQNCj4gZHJpdmVyX292ZXJyaWRlIGZvciBWRnMgc291cmNlZCBmcm9tIGEgdmZpby1w
-Y2kgdXNlciBvd25lZCBQRiwgc3VjaA0KPiB0aGF0IHRoZSBWRnMgYXJlIGFsc28gYm91bmQgdG8g
-dmZpby1wY2kuICBUaGlzIG1vZGVsIGlzIGNvbXBhdGlibGUNCj4gd2l0aCB0b29scyBsaWtlIGRy
-aXZlcmN0bCBhbmQgYWxsb3dzIHRoZSBzeXN0ZW0gYWRtaW5pc3RyYXRvciB0bw0KPiBkZWNpZGUg
-aWYgb3RoZXIgYmluZGluZ3Mgc2hvdWxkIGJlIGVuYWJsZWQuICBUaGUgVkYgdG9rZW4gaW50ZXJm
-YWNlDQo+IGFib3ZlIGV4aXN0cyBvbmx5IGJldHdlZW4gdmZpby1wY2kgUEYgYW5kIFZGIGRyaXZl
-cnMsIG9uY2UgYSBWRiBpcw0KPiBib3VuZCB0byBhbm90aGVyIGRyaXZlciwgdGhlIGFkbWluaXN0
-cmF0b3IgaGFzIGVmZmVjdGl2ZWx5IHByb25vdW5jZWQNCj4gdGhlIGRldmljZSBhcyB0cnVzdGVk
-LiAgVGhlIHZmaW8tcGNpIGRyaXZlciB3aWxsIG5vdGUgYWx0ZXJuYXRlDQo+IGJpbmRpbmcgaW4g
-ZG1lc2cgZm9yIGxvZ2dpbmcgYW5kIGRlYnVnZ2luZyBwdXJwb3Nlcy4NCj4gDQo+IFBsZWFzZSBy
-ZXZpZXcsIGNvbW1lbnQsIGFuZCB0ZXN0LiAgVGhlIGV4YW1wbGUgUUVNVSBpbXBsZW1lbnRhdGlv
-bg0KPiBwcm92aWRlZCB3aXRoIHRoZSBSRkMgaXMgc3RpbGwgY3VycmVudCBmb3IgdGhpcyB2ZXJz
-aW9uLiAgVGhhbmtzLA0KPiANCj4gQWxleA0KDQpUaGUgd2hvbGUgc2VyaWVzIGxvb2tzIGdvb2Qg
-dG8gbWU6DQoJUmV2aWV3ZWQtYnk6IEtldmluIFRpYW4gPGtldmluLnRpYW5AaW50ZWwuY29tPg0K
-DQphbmQgY29uZmlybSBvbmUgdW5kZXJzdGFuZGluZyBoZXJlLCBzaW5jZSBpdCBpcyBub3QgZGlz
-Y3Vzc2VkIGFueXdoZXJlLiBGb3INClZNIGxpdmUgbWlncmF0aW9uIHdpdGggYXNzaWduZWQgVkYg
-ZGV2aWNlLCBpdCBpcyBub3QgbmVjZXNzYXJ5IHRvIG1pZ3JhdGUgdGhlDQpWRiB0b2tlbiBpdHNl
-bGYgYW5kIGFjdHVhbGx5IHdlIGRvbid0IGFsbG93IHVzZXJzcGFjZSB0byByZXRyaWV2ZSBpdC4g
-SW5zdGVhZCwNClFlbXUganVzdCBmb2xsb3dzIHdoYXRldmVyIHRva2VuIHJlcXVpcmVtZW50IG9u
-IHRoZSBkZXN0IHRvIG9wZW4gdGhlIG5ldw0KVkY6IGNvdWxkIGJlIHNhbWUgb3IgZGlmZmVyZW50
-IHRva2VuIGFzL2Zyb20gc3JjLCBvciBldmVuIG5vIHRva2VuIGlmIFBGDQpkcml2ZXIgcnVucyBp
-biBrZXJuZWwgb24gZGVzdC4gSSBzdXBwb3NlIGVpdGhlciBjb21iaW5hdGlvbiBjb3VsZCB3b3Jr
-LCBjb3JyZWN0Pw0KDQpUaGFua3MNCktldmluDQoNCj4gDQo+IFJGQzoNCj4gaHR0cHM6Ly9sb3Jl
-Lmtlcm5lbC5vcmcvbGttbC8xNTgwODUzMzc1ODIuOTQ0NS4xNzY4MjI2NjQzNzU4MzUwNTUwMi5z
-dGcNCj4gaXRAZ2ltbGkuaG9tZS8NCj4gdjE6DQo+IGh0dHBzOi8vbG9yZS5rZXJuZWwub3JnL2xr
-bWwvMTU4MTQ1NDcyNjA0LjE2ODI3LjE1NzUxMzc1NTQwMTAyMjk4MTMwLnN0DQo+IGdpdEBnaW1s
-aS5ob21lLw0KPiB2MjoNCj4gaHR0cHM6Ly9sb3JlLmtlcm5lbC5vcmcvbGttbC8xNTgyMTM3MTY5
-NTkuMTcwOTAuODM5OTQyNzAxNzQwMzUwNzExNC5zdGcNCj4gaXRAZ2ltbGkuaG9tZS8NCj4gDQo+
-IC0tLQ0KPiANCj4gQWxleCBXaWxsaWFtc29uICg3KToNCj4gICAgICAgdmZpbzogSW5jbHVkZSBv
-cHRpb25hbCBkZXZpY2UgbWF0Y2ggaW4gdmZpb19kZXZpY2Vfb3BzIGNhbGxiYWNrcw0KPiAgICAg
-ICB2ZmlvL3BjaTogSW1wbGVtZW50IG1hdGNoIG9wcw0KPiAgICAgICB2ZmlvL3BjaTogSW50cm9k
-dWNlIFZGIHRva2VuDQo+ICAgICAgIHZmaW86IEludHJvZHVjZSBWRklPX0RFVklDRV9GRUFUVVJF
-IGlvY3RsIGFuZCBmaXJzdCB1c2VyDQo+ICAgICAgIHZmaW8vcGNpOiBBZGQgc3Jpb3ZfY29uZmln
-dXJlIHN1cHBvcnQNCj4gICAgICAgdmZpby9wY2k6IFJlbW92ZSBkZXZfZm10IGRlZmluaXRpb24N
-Cj4gICAgICAgdmZpby9wY2k6IENsZWFudXAgLnByb2JlKCkgZXhpdCBwYXRocw0KPiANCj4gDQo+
-ICBkcml2ZXJzL3ZmaW8vcGNpL3ZmaW9fcGNpLmMgICAgICAgICB8ICAzOTANCj4gKysrKysrKysr
-KysrKysrKysrKysrKysrKysrKysrKysrLS0NCj4gIGRyaXZlcnMvdmZpby9wY2kvdmZpb19wY2lf
-cHJpdmF0ZS5oIHwgICAxMCArDQo+ICBkcml2ZXJzL3ZmaW8vdmZpby5jICAgICAgICAgICAgICAg
-ICB8ICAgMjAgKy0NCj4gIGluY2x1ZGUvbGludXgvdmZpby5oICAgICAgICAgICAgICAgIHwgICAg
-NA0KPiAgaW5jbHVkZS91YXBpL2xpbnV4L3ZmaW8uaCAgICAgICAgICAgfCAgIDM3ICsrKw0KPiAg
-NSBmaWxlcyBjaGFuZ2VkLCA0MzMgaW5zZXJ0aW9ucygrKSwgMjggZGVsZXRpb25zKC0pDQoNCg==
+Add support for the synthetic debugger interface of hyper-v, the
+synthetic debugger has 2 modes.
+1. Use a set of MSRs to send/recv information (undocumented so it's not
+   going to the hyperv-tlfs.h)
+2. Use hypercalls
+
+The first mode is based the following MSRs:
+1. Control/Status MSRs which either asks for a send/recv .
+2. Send/Recv MSRs each holds GPA where the send/recv buffers are.
+3. Pending MSR, holds a GPA to a PAGE that simply has a boolean that
+   indicates if there is data pending to issue a recv VMEXIT.
+
+The first mode implementation is to simply exit to user-space when
+either the control MSR or the pending MSR are being set.
+Then it's up-to userspace to implement the rest of the logic of sending/recving.
+
+In the second mode instead of using MSRs KNet will simply issue
+Hypercalls with the information to send/recv, in this mode the data
+being transferred is UDP encapsulated, unlike in the previous mode in
+which you get just the data to send.
+
+The new hypercalls will exit to userspace which will be incharge of
+re-encapsulating if needed the UDP packets to be sent.
+
+There is an issue though in which KDNet does not respect the hypercall
+page and simply issues vmcall/vmmcall instructions depending on the cpu
+type expecting them to be handled as it a real hypercall was issued.
+
+It's important to note that part of this feature has been subject to be
+removed in future versions of Windows, which is why some of the
+defintions will not be present the the TLFS but in the kvm hyperv header
+instead.
+
+Jon Doron (5):
+  x86/kvm/hyper-v: Explicitly align hcall param for kvm_hyperv_exit
+  x86/hyper-v: Add synthetic debugger definitions
+  x86/kvm/hyper-v: Add support for synthetic debugger capability
+  x86/kvm/hyper-v: enable hypercalls without hypercall page with syndbg
+  x86/kvm/hyper-v: Add support for synthetic debugger via hypercalls
+
+ Documentation/virt/kvm/api.rst     |  18 +++
+ arch/x86/include/asm/hyperv-tlfs.h |   6 +
+ arch/x86/include/asm/kvm_host.h    |  14 +++
+ arch/x86/kvm/hyperv.c              | 179 ++++++++++++++++++++++++++++-
+ arch/x86/kvm/hyperv.h              |  33 ++++++
+ arch/x86/kvm/trace.h               |  51 ++++++++
+ arch/x86/kvm/x86.c                 |  13 +++
+ include/uapi/linux/kvm.h           |  13 +++
+ 8 files changed, 325 insertions(+), 2 deletions(-)
+
+-- 
+2.24.1
+
