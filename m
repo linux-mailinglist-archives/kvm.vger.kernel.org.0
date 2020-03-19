@@ -2,79 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0BA1218BE4E
-	for <lists+kvm@lfdr.de>; Thu, 19 Mar 2020 18:39:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C326D18BE89
+	for <lists+kvm@lfdr.de>; Thu, 19 Mar 2020 18:43:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728557AbgCSRj3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Mar 2020 13:39:29 -0400
-Received: from mga14.intel.com ([192.55.52.115]:50665 "EHLO mga14.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727738AbgCSRj2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 Mar 2020 13:39:28 -0400
-IronPort-SDR: lGRe65Fvn0RIp5w8PoNxDLU6MYG7n4/XUEVCNzIPF4qnCF+BRynnuhLGBPYs4IWiUFMnhwt7lc
- dmVYY+/UV2/Q==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Mar 2020 10:39:28 -0700
-IronPort-SDR: ZPRFzhgSiT9jQbcRgtc1cApiGfS2EB2VD6ZV4hvWWsCwVorO9ZXxMC8HrCVv1XwlzXPZmgI+0q
- J1WkJpGjamVA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,572,1574150400"; 
-   d="scan'208";a="444657304"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
-  by fmsmga005.fm.intel.com with ESMTP; 19 Mar 2020 10:39:27 -0700
-Date:   Thu, 19 Mar 2020 10:39:27 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     syzbot <syzbot+00be5da1d75f1cc95f6b@syzkaller.appspotmail.com>,
-        bp@alien8.de, hpa@zytor.com, jmattson@google.com, joro@8bytes.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        mingo@redhat.com, rkrcmar@redhat.com,
-        syzkaller-bugs@googlegroups.com, tglx@linutronix.de,
-        vkuznets@redhat.com, wanpengli@tencent.com, x86@kernel.org
-Subject: Re: WARNING in vcpu_enter_guest
-Message-ID: <20200319173927.GD11305@linux.intel.com>
-References: <000000000000f965b8059877e5e6@google.com>
- <00000000000081861f05a132b9cd@google.com>
- <20200319144952.GB11305@linux.intel.com>
- <20be9560-fce7-1495-3a83-e2b56dbc2389@redhat.com>
- <20200319173549.GC11305@linux.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200319173549.GC11305@linux.intel.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+        id S1728739AbgCSRnY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Mar 2020 13:43:24 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:26000 "EHLO
+        us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727561AbgCSRnX (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 19 Mar 2020 13:43:23 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1584639802;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc; bh=arXREge8xmNm33ojJlI2/DsuKy1gZAPWYFzbLrZKzuE=;
+        b=bENnoaQTkZoyMJKtHZVTdrbLhmxIiQVbEqjn7oOU1ld//j7z7+jtfZfftxIQgsVayqGS9t
+        25LaGLT87SRTCqB+C0VToT7jziDQoIzU9HiKIltPwKpQJvYsl3LVE90wiXDwVSWGN3P+YF
+        NsFjscnha8mUKK9LMEvtKfDvxCm0b+U=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-400-xNA2rQfpPRacroWjr_yhsA-1; Thu, 19 Mar 2020 13:43:20 -0400
+X-MC-Unique: xNA2rQfpPRacroWjr_yhsA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B7DB18024EA;
+        Thu, 19 Mar 2020 17:43:19 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 02C055C545;
+        Thu, 19 Mar 2020 17:43:18 +0000 (UTC)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     syzbot+00be5da1d75f1cc95f6b@syzkaller.appspotmail.com,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Subject: [PATCH] KVM: x86: remove bogus user-triggerable WARN_ON
+Date:   Thu, 19 Mar 2020 13:43:18 -0400
+Message-Id: <20200319174318.20752-1-pbonzini@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 19, 2020 at 10:35:49AM -0700, Sean Christopherson wrote:
-> On Thu, Mar 19, 2020 at 04:14:55PM +0100, Paolo Bonzini wrote:
-> > On 19/03/20 15:49, Sean Christopherson wrote:
-> > > On Thu, Mar 19, 2020 at 03:35:16AM -0700, syzbot wrote:
-> > >> syzbot has found a reproducer for the following crash on:
-> > >>
-> > >> HEAD commit:    5076190d mm: slub: be more careful about the double cmpxch..
-> > >> git tree:       upstream
-> > >> console output: https://syzkaller.appspot.com/x/log.txt?x=143ca61de00000
-> > >> kernel config:  https://syzkaller.appspot.com/x/.config?x=9f894bd92023de02
-> > >> dashboard link: https://syzkaller.appspot.com/bug?extid=00be5da1d75f1cc95f6b
-> > >> compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
-> > >> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=10bb4023e00000
-> > >>
-> > >> IMPORTANT: if you fix the bug, please add the following tag to the commit:
-> > >> Reported-by: syzbot+00be5da1d75f1cc95f6b@syzkaller.appspotmail.com
-> > > Reproduced with a little tweaking of the reproducer, debug in progress.
-> > > 
-> > 
-> > I think the WARN_ON at x86.c:2447 is just bogus.  You can always get it
-> > to trigger if garbage is passed to KVM_SET_CLOCK.
-> 
-> Yep.  I worked through logic/math, mostly to gain a wee bit of knowledge
-> about the clock stuff, and it's sound.  The KVM_SET_CLOCK from syzkaller
-> is simply making time go backwards.
+The WARN_ON is essentially comparing a user-provided value with 0.  It is
+trivial to trigger it just by passing garbage to KVM_SET_CLOCK.  Guests
+can break if you do so, but if it hurts when you do like this just do not
+do it.
 
-Actually, would it make sense to return -EINVAL for KVM_SET_CLOCK if the
-user tries to make kvmclock_offset go backwards?
+Reported-by: syzbot+00be5da1d75f1cc95f6b@syzkaller.appspotmail.com
+Fixes: 9446e6fce0ab ("KVM: x86: fix WARN_ON check of an unsigned less than zero")
+Cc: Sean Christopherson <sean.j.christopherson@intel.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ arch/x86/kvm/x86.c | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 3156e25b0774..d65ff2008cf1 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -2444,7 +2444,6 @@ static int kvm_guest_time_update(struct kvm_vcpu *v)
+ 	vcpu->hv_clock.tsc_timestamp = tsc_timestamp;
+ 	vcpu->hv_clock.system_time = kernel_ns + v->kvm->arch.kvmclock_offset;
+ 	vcpu->last_guest_tsc = tsc_timestamp;
+-	WARN_ON((s64)vcpu->hv_clock.system_time < 0);
+ 
+ 	/* If the host uses TSC clocksource, then it is stable */
+ 	pvclock_flags = 0;
+-- 
+2.18.2
+
