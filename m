@@ -2,95 +2,76 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A806818BE91
-	for <lists+kvm@lfdr.de>; Thu, 19 Mar 2020 18:44:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 56E1818BE98
+	for <lists+kvm@lfdr.de>; Thu, 19 Mar 2020 18:45:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727561AbgCSRoe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Mar 2020 13:44:34 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:56882 "EHLO
-        us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727212AbgCSRoe (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 19 Mar 2020 13:44:34 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1584639872;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=nEJ/BlKieSWG5w9g4ZAooVBvmg0v+6w1VOLQ6ao4BaI=;
-        b=Huno5fMh+DeJ3CXA/JCN264dYymJwZyGSi2z9Fztm++DFHhpsi3LuKnhAOWsBsURPDyxlN
-        jfFtVfH2QlPeRTzax0BG00TuI+d2vZN8VkVN4Bn9SYHCc1MZ63CMP8vTdhZbGkEiJZl19H
-        dNesjRzauaz6si0y3zdUSC4AN3dRERU=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-19-tbsqPbnuNbSj9_wEFQ5xbg-1; Thu, 19 Mar 2020 13:44:30 -0400
-X-MC-Unique: tbsqPbnuNbSj9_wEFQ5xbg-1
-Received: by mail-wm1-f72.google.com with SMTP id f9so1300262wme.7
-        for <kvm@vger.kernel.org>; Thu, 19 Mar 2020 10:44:30 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=nEJ/BlKieSWG5w9g4ZAooVBvmg0v+6w1VOLQ6ao4BaI=;
-        b=ZMybscfYxeDN4BiE81gLUiVryCbwvkIU1LbuhgleS5OWFKKHJR/OjMWRphiCYoSYQJ
-         p+OGpkrfz28lnovJhPG8hcj7/cAeVenppmtzar7WiRVpNLiSrTdpnli1BcmwoL+IihN0
-         d0cVfx04bgAMYMM2ijHQVaMvC7yds8xGHXy0IJWpd4Ugk1jQA4+kMEYLmOSi7x+Wltna
-         N4JNZ+37kzNPX4A0Y3DsxhOVk/2a1EtV1+Qyy4GGPJwIGUJrcM3SKMY//Pl/6vNxwDpM
-         GUKjOe9S5vnqKcFfT2ivhsYA22Q1n5s8wTg5kM6u7V+AtAK5bn8z/cZJmsgXrnLhWryh
-         +Sag==
-X-Gm-Message-State: ANhLgQ1N9j/4HZ+ze+rNWtDaWaoyPGGSdxEhHQSWEF5quHDWL9YqwdSO
-        tEIT5a8LBRM0E8KqS1BSHTVPalY9o6VU2QK5r4+yoU6kyHqUvEUen/gn7e/Hl7yF1Hw5rMU+BSD
-        EMF0LMYXDD+x0
-X-Received: by 2002:adf:bb06:: with SMTP id r6mr5766074wrg.324.1584639869828;
-        Thu, 19 Mar 2020 10:44:29 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vvfLnSZwvyZi0DTLzdUGLabMXyW1faCjMXt0UNAVL0JLf4pVGRQsNCLqsXOTxe3p+rOH+Qizw==
-X-Received: by 2002:adf:bb06:: with SMTP id r6mr5766051wrg.324.1584639869593;
-        Thu, 19 Mar 2020 10:44:29 -0700 (PDT)
-Received: from [192.168.178.58] ([151.21.15.43])
-        by smtp.gmail.com with ESMTPSA id h26sm1623923wmb.19.2020.03.19.10.44.27
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 19 Mar 2020 10:44:28 -0700 (PDT)
-Subject: Re: WARNING in vcpu_enter_guest
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     syzbot <syzbot+00be5da1d75f1cc95f6b@syzkaller.appspotmail.com>,
-        bp@alien8.de, hpa@zytor.com, jmattson@google.com, joro@8bytes.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        mingo@redhat.com, rkrcmar@redhat.com,
-        syzkaller-bugs@googlegroups.com, tglx@linutronix.de,
-        vkuznets@redhat.com, wanpengli@tencent.com, x86@kernel.org
-References: <000000000000f965b8059877e5e6@google.com>
- <00000000000081861f05a132b9cd@google.com>
- <20200319144952.GB11305@linux.intel.com>
- <20be9560-fce7-1495-3a83-e2b56dbc2389@redhat.com>
- <20200319173549.GC11305@linux.intel.com>
- <20200319173927.GD11305@linux.intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <cd32ee6d-f30d-b221-8126-cf995ffca52e@redhat.com>
-Date:   Thu, 19 Mar 2020 18:44:26 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+        id S1728655AbgCSRpJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Mar 2020 13:45:09 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:11558 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727769AbgCSRpH (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 19 Mar 2020 13:45:07 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 02JHcNgn121429;
+        Thu, 19 Mar 2020 13:44:59 -0400
+Received: from ppma03wdc.us.ibm.com (ba.79.3fa9.ip4.static.sl-reverse.com [169.63.121.186])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2yvcw9rr3k-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 19 Mar 2020 13:44:59 -0400
+Received: from pps.filterd (ppma03wdc.us.ibm.com [127.0.0.1])
+        by ppma03wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 02JHWdYG017794;
+        Thu, 19 Mar 2020 17:44:58 GMT
+Received: from b03cxnp08028.gho.boulder.ibm.com (b03cxnp08028.gho.boulder.ibm.com [9.17.130.20])
+        by ppma03wdc.us.ibm.com with ESMTP id 2yrpw6t6wj-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 19 Mar 2020 17:44:58 +0000
+Received: from b03ledav004.gho.boulder.ibm.com (b03ledav004.gho.boulder.ibm.com [9.17.130.235])
+        by b03cxnp08028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 02JHivuv29491622
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 19 Mar 2020 17:44:57 GMT
+Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 95B6778060;
+        Thu, 19 Mar 2020 17:44:57 +0000 (GMT)
+Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 7E3527805C;
+        Thu, 19 Mar 2020 17:44:56 +0000 (GMT)
+Received: from localhost (unknown [9.85.143.6])
+        by b03ledav004.gho.boulder.ibm.com (Postfix) with ESMTPS;
+        Thu, 19 Mar 2020 17:44:55 +0000 (GMT)
+From:   Fabiano Rosas <farosas@linux.ibm.com>
+To:     Greg Kurz <groug@kaod.org>, Paul Mackerras <paulus@ozlabs.org>
+Cc:     kvm@vger.kernel.org, kvm-ppc@vger.kernel.org,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Ram Pai <linuxram@us.ibm.com>
+Subject: Re: [PATCH] KVM: PPC: Book3S HV: Add a capability for enabling secure guests
+In-Reply-To: <20200319173000.20e10c7b@bahia.lan>
+References: <20200319043301.GA13052@blackberry> <20200319173000.20e10c7b@bahia.lan>
+Date:   Thu, 19 Mar 2020 14:44:53 -0300
+Message-ID: <87eetoutm2.fsf@linux.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <20200319173927.GD11305@linux.intel.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.645
+ definitions=2020-03-19_06:2020-03-19,2020-03-19 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 suspectscore=1
+ impostorscore=0 adultscore=0 mlxlogscore=881 spamscore=0
+ priorityscore=1501 clxscore=1011 malwarescore=0 mlxscore=0 bulkscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2003190073
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 19/03/20 18:39, Sean Christopherson wrote:
->> Yep.  I worked through logic/math, mostly to gain a wee bit of knowledge
->> about the clock stuff, and it's sound.  The KVM_SET_CLOCK from syzkaller
->> is simply making time go backwards.
-> Actually, would it make sense to return -EINVAL for KVM_SET_CLOCK if the
-> user tries to make kvmclock_offset go backwards?
+Greg Kurz <groug@kaod.org> writes:
 
-No, it is possible to do that depending on the clock setup on the live
-migration source.  You could cause the warning anyway by setting the
-clock to a very high (signed) value so that kernel_ns + kvmclock_offset
-overflows.
+>
+> Reviewed-by: Greg Kurz <groug@kaod.org>
+>
+> Is someone working on wiring this up in QEMU ?
+>
 
-Paolo
+I just did so I could test it. =)
 
+If no one else is doing it I could send my patch as an RFC and we
+iterate from that.
