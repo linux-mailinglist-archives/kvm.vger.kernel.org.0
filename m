@@ -2,29 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 79E5E18D77F
-	for <lists+kvm@lfdr.de>; Fri, 20 Mar 2020 19:42:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B90BC18D80B
+	for <lists+kvm@lfdr.de>; Fri, 20 Mar 2020 19:59:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726783AbgCTSmU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Mar 2020 14:42:20 -0400
-Received: from hqnvemgate26.nvidia.com ([216.228.121.65]:14495 "EHLO
-        hqnvemgate26.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725446AbgCTSmU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Mar 2020 14:42:20 -0400
-Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate26.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
-        id <B5e750e7d0001>; Fri, 20 Mar 2020 11:42:06 -0700
-Received: from hqmail.nvidia.com ([172.20.161.6])
-  by hqpgpgate101.nvidia.com (PGP Universal service);
-  Fri, 20 Mar 2020 11:42:19 -0700
-X-PGP-Universal: processed;
-        by hqpgpgate101.nvidia.com on Fri, 20 Mar 2020 11:42:19 -0700
-Received: from [10.40.103.10] (10.124.1.5) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Fri, 20 Mar
- 2020 18:42:09 +0000
-Subject: Re: [PATCH v15 Kernel 4/7] vfio iommu: Implementation of ioctl for
- dirty pages tracking.
-To:     Alex Williamson <alex.williamson@redhat.com>
-CC:     <cjia@nvidia.com>, <kevin.tian@intel.com>, <ziye.yang@intel.com>,
+        id S1726997AbgCTS70 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Mar 2020 14:59:26 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:54520 "EHLO
+        us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726773AbgCTS70 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 20 Mar 2020 14:59:26 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1584730764;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Situe7CkKHU86H3iJ44BkECuWp01b+xagpPXOCTpCOY=;
+        b=B4x7/FrPjNtfOdM7Xjl1JOZNNeuwe9jjd7HmqJV2VtgbQSsnFgWDsVADfsG74bdHVh+fY4
+        yrqy0pZ/jKiPNEthNE27fAlmemb1jYs0y950HE7+l20r1JJq3knT2veF8yiKmc+54Tw/1B
+        iDDPlbvHRm/KbGMElMeZzg2bqfgvqSA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-407-2eeLGvj1OHWqJYT6I5UM3w-1; Fri, 20 Mar 2020 14:59:17 -0400
+X-MC-Unique: 2eeLGvj1OHWqJYT6I5UM3w-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0D5A7190681F;
+        Fri, 20 Mar 2020 18:59:13 +0000 (UTC)
+Received: from w520.home (ovpn-112-162.phx2.redhat.com [10.3.112.162])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 391151001938;
+        Fri, 20 Mar 2020 18:59:11 +0000 (UTC)
+Date:   Fri, 20 Mar 2020 12:59:10 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Kirti Wankhede <kwankhede@nvidia.com>
+Cc:     <cjia@nvidia.com>, <kevin.tian@intel.com>, <ziye.yang@intel.com>,
         <changpeng.liu@intel.com>, <yi.l.liu@intel.com>,
         <mlevitsk@redhat.com>, <eskultet@redhat.com>, <cohuck@redhat.com>,
         <dgilbert@redhat.com>, <jonathan.davies@nutanix.com>,
@@ -33,127 +45,120 @@ CC:     <cjia@nvidia.com>, <kevin.tian@intel.com>, <ziye.yang@intel.com>,
         <shuangtai.tst@alibaba-inc.com>, <Ken.Xue@amd.com>,
         <zhi.a.wang@intel.com>, <yan.y.zhao@intel.com>,
         <qemu-devel@nongnu.org>, <kvm@vger.kernel.org>
+Subject: Re: [PATCH v15 Kernel 4/7] vfio iommu: Implementation of ioctl for
+ dirty pages tracking.
+Message-ID: <20200320125910.028d7af5@w520.home>
+In-Reply-To: <cf0ee134-c1c7-f60c-afc2-8948268d8880@nvidia.com>
 References: <1584649004-8285-1-git-send-email-kwankhede@nvidia.com>
- <1584649004-8285-5-git-send-email-kwankhede@nvidia.com>
- <20200319165704.1f4eb36a@w520.home>
- <bc48ae5c-67f9-d95e-5d60-6c42359bb790@nvidia.com>
- <20200320120137.6acd89ee@x1.home>
-X-Nvconfidentiality: public
-From:   Kirti Wankhede <kwankhede@nvidia.com>
-Message-ID: <cf0ee134-c1c7-f60c-afc2-8948268d8880@nvidia.com>
-Date:   Sat, 21 Mar 2020 00:12:04 +0530
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+        <1584649004-8285-5-git-send-email-kwankhede@nvidia.com>
+        <20200319165704.1f4eb36a@w520.home>
+        <bc48ae5c-67f9-d95e-5d60-6c42359bb790@nvidia.com>
+        <20200320120137.6acd89ee@x1.home>
+        <cf0ee134-c1c7-f60c-afc2-8948268d8880@nvidia.com>
 MIME-Version: 1.0
-In-Reply-To: <20200320120137.6acd89ee@x1.home>
-X-Originating-IP: [10.124.1.5]
-X-ClientProxiedBy: HQMAIL101.nvidia.com (172.20.187.10) To
- HQMAIL107.nvidia.com (172.20.187.13)
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1584729726; bh=hWqEMqGjcjLbX1dudD5jfb/W5JW8uQKkE5TYekIBFFs=;
-        h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
-         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
-         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
-         Content-Transfer-Encoding;
-        b=jkYZVcTIRXZJ2TlcNLaDDZzURzyQC3Ed07iBXv8NPBU8wu2+pSvV5j8/p0/SUnXED
-         Ap/kTUh1gx41kfezG5vb1TQc3vf9Da1HVUA8up3daKw5ot4J37fnXGYj2rjcx2IYkE
-         IMe545G2jYUrkOvYPXiVHu+z5CMhNjjgKyh47Ct6eecb4x36rXjpTJeimBFCR7kXn0
-         57wlRg1nIDa8BfgVcTWduoAlK31c2V5Q9fhC+PrY1dmeUZcWM/D1rbCX1O30EgCSrS
-         gmiIpWpiJfKzmf2lC8a7svO79PQTCiFWEQ2luHMMCyVWgFtMuKo5weKtgMyCsUmSHw
-         Zex3jh4TV0vVQ==
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Sat, 21 Mar 2020 00:12:04 +0530
+Kirti Wankhede <kwankhede@nvidia.com> wrote:
 
-
-On 3/20/2020 11:31 PM, Alex Williamson wrote:
-> On Fri, 20 Mar 2020 23:19:14 +0530
-> Kirti Wankhede <kwankhede@nvidia.com> wrote:
+> On 3/20/2020 11:31 PM, Alex Williamson wrote:
+> > On Fri, 20 Mar 2020 23:19:14 +0530
+> > Kirti Wankhede <kwankhede@nvidia.com> wrote:
+> >   
+> >> On 3/20/2020 4:27 AM, Alex Williamson wrote:  
+> >>> On Fri, 20 Mar 2020 01:46:41 +0530
+> >>> Kirti Wankhede <kwankhede@nvidia.com> wrote:
+> >>>      
 > 
->> On 3/20/2020 4:27 AM, Alex Williamson wrote:
->>> On Fri, 20 Mar 2020 01:46:41 +0530
->>> Kirti Wankhede <kwankhede@nvidia.com> wrote:
->>>    
-
-<snip>
-
->>>> +static int vfio_iova_dirty_bitmap(struct vfio_iommu *iommu, dma_addr_t iova,
->>>> +				  size_t size, uint64_t pgsize,
->>>> +				  u64 __user *bitmap)
->>>> +{
->>>> +	struct vfio_dma *dma;
->>>> +	unsigned long pgshift = __ffs(pgsize);
->>>> +	unsigned int npages, bitmap_size;
->>>> +
->>>> +	dma = vfio_find_dma(iommu, iova, 1);
->>>> +
->>>> +	if (!dma)
->>>> +		return -EINVAL;
->>>> +
->>>> +	if (dma->iova != iova || dma->size != size)
->>>> +		return -EINVAL;
->>>> +
->>>> +	npages = dma->size >> pgshift;
->>>> +	bitmap_size = DIRTY_BITMAP_BYTES(npages);
->>>> +
->>>> +	/* mark all pages dirty if all pages are pinned and mapped. */
->>>> +	if (dma->iommu_mapped)
->>>> +		bitmap_set(dma->bitmap, 0, npages);
->>>> +
->>>> +	if (copy_to_user((void __user *)bitmap, dma->bitmap, bitmap_size))
->>>> +		return -EFAULT;
->>>
->>> We still need to reset the bitmap here, clearing and re-adding the
->>> pages that are still pinned.
->>>
->>> https://lore.kernel.org/kvm/20200319070635.2ff5db56@x1.home/
->>>    
->>
->> I thought you agreed on my reply to it
->> https://lore.kernel.org/kvm/31621b70-02a9-2ea5-045f-f72b671fe703@nvidia.com/
->>
->>   > Why re-populate when there will be no change since
->>   > vfio_iova_dirty_bitmap() is called holding iommu->lock? If there is any
->>   > pin request while vfio_iova_dirty_bitmap() is still working, it will
->>   > wait till iommu->lock is released. Bitmap will be populated when page is
->>   > pinned.
+> <snip>
 > 
-> As coded, dirty bits are only ever set in the bitmap, never cleared.
-> If a page is unpinned between iterations of the user recording the
-> dirty bitmap, it should be marked dirty in the iteration immediately
-> after the unpinning and not marked dirty in the following iteration.
-> That doesn't happen here.  We're reporting cumulative dirty pages since
-> logging was enabled, we need to be reporting dirty pages since the user
-> last retrieved the dirty bitmap.  The bitmap should be cleared and
-> currently pinned pages re-added after copying to the user.  Thanks,
+> >>>> +static int vfio_iova_dirty_bitmap(struct vfio_iommu *iommu, dma_addr_t iova,
+> >>>> +				  size_t size, uint64_t pgsize,
+> >>>> +				  u64 __user *bitmap)
+> >>>> +{
+> >>>> +	struct vfio_dma *dma;
+> >>>> +	unsigned long pgshift = __ffs(pgsize);
+> >>>> +	unsigned int npages, bitmap_size;
+> >>>> +
+> >>>> +	dma = vfio_find_dma(iommu, iova, 1);
+> >>>> +
+> >>>> +	if (!dma)
+> >>>> +		return -EINVAL;
+> >>>> +
+> >>>> +	if (dma->iova != iova || dma->size != size)
+> >>>> +		return -EINVAL;
+> >>>> +
+> >>>> +	npages = dma->size >> pgshift;
+> >>>> +	bitmap_size = DIRTY_BITMAP_BYTES(npages);
+> >>>> +
+> >>>> +	/* mark all pages dirty if all pages are pinned and mapped. */
+> >>>> +	if (dma->iommu_mapped)
+> >>>> +		bitmap_set(dma->bitmap, 0, npages);
+> >>>> +
+> >>>> +	if (copy_to_user((void __user *)bitmap, dma->bitmap, bitmap_size))
+> >>>> +		return -EFAULT;  
+> >>>
+> >>> We still need to reset the bitmap here, clearing and re-adding the
+> >>> pages that are still pinned.
+> >>>
+> >>> https://lore.kernel.org/kvm/20200319070635.2ff5db56@x1.home/
+> >>>      
+> >>
+> >> I thought you agreed on my reply to it
+> >> https://lore.kernel.org/kvm/31621b70-02a9-2ea5-045f-f72b671fe703@nvidia.com/
+> >>  
+> >>   > Why re-populate when there will be no change since
+> >>   > vfio_iova_dirty_bitmap() is called holding iommu->lock? If there is any
+> >>   > pin request while vfio_iova_dirty_bitmap() is still working, it will
+> >>   > wait till iommu->lock is released. Bitmap will be populated when page is
+> >>   > pinned.  
+> > 
+> > As coded, dirty bits are only ever set in the bitmap, never cleared.
+> > If a page is unpinned between iterations of the user recording the
+> > dirty bitmap, it should be marked dirty in the iteration immediately
+> > after the unpinning and not marked dirty in the following iteration.
+> > That doesn't happen here.  We're reporting cumulative dirty pages since
+> > logging was enabled, we need to be reporting dirty pages since the user
+> > last retrieved the dirty bitmap.  The bitmap should be cleared and
+> > currently pinned pages re-added after copying to the user.  Thanks,
+> >   
 > 
+> Does that mean, we have to track every iteration? do we really need that 
+> tracking?
+> 
+> Generally the flow is:
+> - vendor driver pin x pages
+> - Enter pre-copy-phase where vCPUs are running - user starts dirty pages 
+> tracking, then user asks dirty bitmap, x pages reported dirty by 
+> VFIO_IOMMU_DIRTY_PAGES ioctl with _GET flag
+> - In pre-copy phase, vendor driver pins y more pages, now bitmap 
+> consists of x+y bits set
+> - In pre-copy phase, vendor driver unpins z pages, but bitmap is not 
+> updated, so again bitmap consists of x+y bits set.
+> - Enter in stop-and-copy phase, vCPUs are stopped, mdev devices are stopped
+> - user asks dirty bitmap - Since here vCPU and mdev devices are stopped, 
+> pages should not get dirty by guest driver or the physical device. 
+> Hence, x+y dirty pages would be reported.
+> 
+> I don't think we need to track every iteration of bitmap reporting.
 
-Does that mean, we have to track every iteration? do we really need that 
-tracking?
+Yes, once a bitmap is read, it's reset.  In your example, after
+unpinning z pages the user should still see a bitmap with x+y pages,
+but once they've read that bitmap, the next bitmap should be x+y-z.
+Userspace can make decisions about when to switch from pre-copy to
+stop-and-copy based on convergence, ie. the slope of the line recording
+dirty pages per iteration.  The implementation here never allows an
+inflection point, dirty pages reported through vfio would always either
+be flat or climbing.  There might also be a case that an iommu backed
+device could start pinning pages during the course of a migration, how
+would the bitmap ever revert from fully populated to only tracking the
+pinned pages?  Thanks,
 
-Generally the flow is:
-- vendor driver pin x pages
-- Enter pre-copy-phase where vCPUs are running - user starts dirty pages 
-tracking, then user asks dirty bitmap, x pages reported dirty by 
-VFIO_IOMMU_DIRTY_PAGES ioctl with _GET flag
-- In pre-copy phase, vendor driver pins y more pages, now bitmap 
-consists of x+y bits set
-- In pre-copy phase, vendor driver unpins z pages, but bitmap is not 
-updated, so again bitmap consists of x+y bits set.
-- Enter in stop-and-copy phase, vCPUs are stopped, mdev devices are stopped
-- user asks dirty bitmap - Since here vCPU and mdev devices are stopped, 
-pages should not get dirty by guest driver or the physical device. 
-Hence, x+y dirty pages would be reported.
-
-I don't think we need to track every iteration of bitmap reporting.
-
-Thanks,
-Kirti
-
-
+Alex
 
