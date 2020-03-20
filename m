@@ -2,166 +2,177 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 36B4818C807
-	for <lists+kvm@lfdr.de>; Fri, 20 Mar 2020 08:13:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5F1E018C865
+	for <lists+kvm@lfdr.de>; Fri, 20 Mar 2020 09:00:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726855AbgCTHN2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Mar 2020 03:13:28 -0400
-Received: from mail-oi1-f196.google.com ([209.85.167.196]:38402 "EHLO
-        mail-oi1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725802AbgCTHN1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Mar 2020 03:13:27 -0400
-Received: by mail-oi1-f196.google.com with SMTP id k21so5505166oij.5;
-        Fri, 20 Mar 2020 00:13:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Nus3/Oxhup1mA4rIPM1vWTISc0W/aM8ttpO1+GX9e+s=;
-        b=je4H4XALva/9h69wXhWHLip6eWIDnW96x4PZ6q5hQtPh/WpRWdFAyAj1IaQIZX5fJ2
-         93AQUFtvBabkFiT9sziM06PidkqmfgdJDuQodRs7Pd6hoJZtDnbUY7zVrpv407KDl536
-         b3oPY0i8D8MsWN/qfp51ull2k5Qn7nOfyykIWfCaQVC4nJwHeQ8g5BkoEnfWgMsUCg/e
-         B1nh2Ldifh1LXTXmOJHlfA9KEUp6BVMdE9qiAiX9sgfxUGfRMY4jSdIzOMr7qy4G/tZe
-         TdWSvt18GjIfMbeuf3dR/z0j6PwmavKLlcD0QCEcI2bh/xIvW/GGo/IeM4RfNtQ3hbvv
-         sjIw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Nus3/Oxhup1mA4rIPM1vWTISc0W/aM8ttpO1+GX9e+s=;
-        b=fu4bXDGFMHDFFGn7O1QbtkNbs+Qp2LQz/FMVf3o12WHaheq06EbdRC4DziMONTuUun
-         Nylo9XaAI8/C+tpXwwgNybNZhzhFD+zxl3eatii2XEHu3jyl+64yrbMmNOOXxhj2+T/i
-         ntj2lVtaQD0sDaOcPmAIqX29TBT64MzK3jqcCjah1gyn23cRULbI4QjrPMWBg94gf8Rl
-         2SwqTROUFhpPv5/fVbUaY9GFJWYVXChSOjoGQo9AMEVd83oHivCfa9MRdHmwKSV9yE0f
-         I+sV6XUfNwJLDQQPUkgRR9Jr29m6KuLf7hqF8uQCjHVkibcbDVFXHPkVrO6Z2jtpfdxh
-         W4BA==
-X-Gm-Message-State: ANhLgQ23JAFhvvs0WIa3jJ38/L5WVoRj9pXVBTFc6h4pZABtNyDa5kJe
-        uujh8xGnn+qq0XFamLPZ4BOuGQKnj6kHj97BsdM=
-X-Google-Smtp-Source: ADFU+vugXzr8b7e3gXVDsichbHX3oi7rs0aJ+TbPlvNRlI/11+aRPEJC2tf96cTD9wompyk+YHlhR4h4baCw+EYhqeQ=
-X-Received: by 2002:aca:5f09:: with SMTP id t9mr5503594oib.5.1584688405741;
- Fri, 20 Mar 2020 00:13:25 -0700 (PDT)
-MIME-Version: 1.0
-References: <1584687967-332859-1-git-send-email-zhe.he@windriver.com>
-In-Reply-To: <1584687967-332859-1-git-send-email-zhe.he@windriver.com>
-From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Fri, 20 Mar 2020 15:13:14 +0800
-Message-ID: <CANRm+Cxq22-Ygxpx18zLSLc2S_gh89S62pLJUaVUHVX2Gwiehg@mail.gmail.com>
-Subject: Re: [PATCH] KVM: LAPIC: Mark hrtimer for period or oneshot mode to
- expire in hard interrupt context
-To:     zhe.he@windriver.com
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
+        id S1726869AbgCTIAA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Mar 2020 04:00:00 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:52070 "EHLO
+        us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726704AbgCTIAA (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 20 Mar 2020 04:00:00 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1584691199;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=NCLldPyucn2EtjkD/YGvXmu67T8oQjms+EaHjNLuyLQ=;
+        b=EPJ8F59uR2xsFbWETRKBMlOHuhQq87+4ZApFLoFrwPEzuYsqskYMdU9VgLPVpelbEKTRP3
+        VtHXxpoG+VezMF4d2MG5mtgJhlc7R1a2dIusOzEqFfWeBm3a2xvexBVsWon9mYBW5S1OQr
+        mYIrDfldOs0i442vdRtZN9n0AL6fs0k=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-145-KENkeixLMkCVD1dP4OHYhg-1; Fri, 20 Mar 2020 03:59:54 -0400
+X-MC-Unique: KENkeixLMkCVD1dP4OHYhg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CBAB8800D53;
+        Fri, 20 Mar 2020 07:59:52 +0000 (UTC)
+Received: from [10.36.113.142] (ovpn-113-142.ams2.redhat.com [10.36.113.142])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id B2F365C1A5;
+        Fri, 20 Mar 2020 07:59:49 +0000 (UTC)
+Subject: Re: [PATCH v5 20/23] KVM: arm64: GICv4.1: Plumb SGI implementation
+ selection in the distributor
+To:     Zenghui Yu <yuzenghui@huawei.com>, Marc Zyngier <maz@kernel.org>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
+        Jason Cooper <jason@lakedaemon.net>,
+        Robert Richter <rrichter@marvell.com>,
         Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        "the arch/x86 maintainers" <x86@kernel.org>,
-        kvm <kvm@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>,
-        Sebastian Sewior <bigeasy@linutronix.de>,
-        linux-rt-users <linux-rt-users@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>
+References: <20200304203330.4967-1-maz@kernel.org>
+ <20200304203330.4967-21-maz@kernel.org>
+ <72832f51-bbde-8502-3e03-189ac20a0143@huawei.com>
+ <4a06fae9c93e10351276d173747d17f4@kernel.org>
+ <49995ec9-3970-1f62-5dfc-118563ca00fc@redhat.com>
+ <b98855a1-6300-d323-80f6-82d3b9854290@huawei.com>
+From:   Auger Eric <eric.auger@redhat.com>
+Message-ID: <e60578b5-910c-0355-d231-29322900679d@redhat.com>
+Date:   Fri, 20 Mar 2020 08:59:48 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
+MIME-Version: 1.0
+In-Reply-To: <b98855a1-6300-d323-80f6-82d3b9854290@huawei.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 20 Mar 2020 at 15:10, <zhe.he@windriver.com> wrote:
->
-> From: He Zhe <zhe.he@windriver.com>
->
-> apic->lapic_timer.timer was initialized with HRTIMER_MODE_ABS_HARD but
-> started later with HRTIMER_MODE_ABS, which may cause the following warning
-> in PREEMPT_RT kernel.
->
-> WARNING: CPU: 1 PID: 2957 at kernel/time/hrtimer.c:1129 hrtimer_start_range_ns+0x348/0x3f0
-> CPU: 1 PID: 2957 Comm: qemu-system-x86 Not tainted 5.4.23-rt11 #1
-> Hardware name: Supermicro SYS-E300-9A-8C/A2SDi-8C-HLN4F, BIOS 1.1a 09/18/2018
-> RIP: 0010:hrtimer_start_range_ns+0x348/0x3f0
-> Code: 4d b8 0f 94 c1 0f b6 c9 e8 35 f1 ff ff 4c 8b 45
->       b0 e9 3b fd ff ff e8 d7 3f fa ff 48 98 4c 03 34
->       c5 a0 26 bf 93 e9 a1 fd ff ff <0f> 0b e9 fd fc ff
->       ff 65 8b 05 fa b7 90 6d 89 c0 48 0f a3 05 60 91
-> RSP: 0018:ffffbc60026ffaf8 EFLAGS: 00010202
-> RAX: 0000000000000001 RBX: ffff9d81657d4110 RCX: 0000000000000000
-> RDX: 0000000000000000 RSI: 0000006cc7987bcf RDI: ffff9d81657d4110
-> RBP: ffffbc60026ffb58 R08: 0000000000000001 R09: 0000000000000010
-> R10: 0000000000000000 R11: 0000000000000000 R12: 0000006cc7987bcf
-> R13: 0000000000000000 R14: 0000006cc7987bcf R15: ffffbc60026d6a00
-> FS: 00007f401daed700(0000) GS:ffff9d81ffa40000(0000) knlGS:0000000000000000
-> CS: 0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 00000000ffffffff CR3: 0000000fa7574000 CR4: 00000000003426e0
-> Call Trace:
-> ? kvm_release_pfn_clean+0x22/0x60 [kvm]
-> start_sw_timer+0x85/0x230 [kvm]
-> ? vmx_vmexit+0x1b/0x30 [kvm_intel]
-> kvm_lapic_switch_to_sw_timer+0x72/0x80 [kvm]
-> vmx_pre_block+0x1cb/0x260 [kvm_intel]
-> ? vmx_vmexit+0xf/0x30 [kvm_intel]
-> ? vmx_vmexit+0x1b/0x30 [kvm_intel]
-> ? vmx_vmexit+0xf/0x30 [kvm_intel]
-> ? vmx_vmexit+0x1b/0x30 [kvm_intel]
-> ? vmx_vmexit+0xf/0x30 [kvm_intel]
-> ? vmx_vmexit+0x1b/0x30 [kvm_intel]
-> ? vmx_vmexit+0xf/0x30 [kvm_intel]
-> ? vmx_vmexit+0xf/0x30 [kvm_intel]
-> ? vmx_vmexit+0x1b/0x30 [kvm_intel]
-> ? vmx_vmexit+0xf/0x30 [kvm_intel]
-> ? vmx_vmexit+0x1b/0x30 [kvm_intel]
-> ? vmx_vmexit+0xf/0x30 [kvm_intel]
-> ? vmx_vmexit+0x1b/0x30 [kvm_intel]
-> ? vmx_vmexit+0xf/0x30 [kvm_intel]
-> ? vmx_vmexit+0x1b/0x30 [kvm_intel]
-> ? vmx_vmexit+0xf/0x30 [kvm_intel]
-> ? vmx_sync_pir_to_irr+0x9e/0x100 [kvm_intel]
-> ? kvm_apic_has_interrupt+0x46/0x80 [kvm]
-> kvm_arch_vcpu_ioctl_run+0x85b/0x1fa0 [kvm]
-> ? _raw_spin_unlock_irqrestore+0x18/0x50
-> ? _copy_to_user+0x2c/0x30
-> kvm_vcpu_ioctl+0x235/0x660 [kvm]
-> ? rt_spin_unlock+0x2c/0x50
-> do_vfs_ioctl+0x3e4/0x650
-> ? __fget+0x7a/0xa0
-> ksys_ioctl+0x67/0x90
-> __x64_sys_ioctl+0x1a/0x20
-> do_syscall_64+0x4d/0x120
-> entry_SYSCALL_64_after_hwframe+0x44/0xa9
-> RIP: 0033:0x7f4027cc54a7
-> Code: 00 00 90 48 8b 05 e9 59 0c 00 64 c7 00 26 00 00
->       00 48 c7 c0 ff ff ff ff c3 66 2e 0f 1f 84 00 00
->       00 00 00 b8 10 00 00 00 0f 05 <48> 3d 01 f0 ff ff
->       73 01 c3 48 8b 0d b9 59 0c 00 f7 d8 64 89 01 48
-> RSP: 002b:00007f401dae9858 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-> RAX: ffffffffffffffda RBX: 00005558bd029690 RCX: 00007f4027cc54a7
-> RDX: 0000000000000000 RSI: 000000000000ae80 RDI: 000000000000000d
-> RBP: 00007f4028b72000 R08: 00005558bc829ad0 R09: 00000000ffffffff
-> R10: 00005558bcf90ca0 R11: 0000000000000246 R12: 0000000000000000
-> R13: 0000000000000000 R14: 0000000000000000 R15: 00005558bce1c840
-> --[ end trace 0000000000000002 ]--
->
-> Signed-off-by: He Zhe <zhe.he@windriver.com>
+Hi Zenghui,
 
-Reviewed-by: Wanpeng Li <wanpengli@tencent.com>
+On 3/20/20 4:08 AM, Zenghui Yu wrote:
+> On 2020/3/20 4:38, Auger Eric wrote:
+>> Hi Marc,
+>> On 3/19/20 1:10 PM, Marc Zyngier wrote:
+>>> Hi Zenghui,
+>>>
+>>> On 2020-03-18 06:34, Zenghui Yu wrote:
+>>>> Hi Marc,
+>>>>
+>>>> On 2020/3/5 4:33, Marc Zyngier wrote:
+>>>>> The GICv4.1 architecture gives the hypervisor the option to let
+>>>>> the guest choose whether it wants the good old SGIs with an
+>>>>> active state, or the new, HW-based ones that do not have one.
+>>>>>
+>>>>> For this, plumb the configuration of SGIs into the GICv3 MMIO
+>>>>> handling, present the GICD_TYPER2.nASSGIcap to the guest,
+>>>>> and handle the GICD_CTLR.nASSGIreq setting.
+>>>>>
+>>>>> In order to be able to deal with the restore of a guest, also
+>>>>> apply the GICD_CTLR.nASSGIreq setting at first run so that we
+>>>>> can move the restored SGIs to the HW if that's what the guest
+>>>>> had selected in a previous life.
+>>>>
+>>>> I'm okay with the restore path.=A0 But it seems that we still fail t=
+o
+>>>> save the pending state of vSGI - software pending_latch of HW-based
+>>>> vSGIs will not be updated (and always be false) because we directly
+>>>> inject them through ITS, so vgic_v3_uaccess_read_pending() can't
+>>>> tell the correct pending state to user-space (the correct one should
+>>>> be latched in HW).
+>>>>
+>>>> It would be good if we can sync the hardware state into pending_latc=
+h
+>>>> at an appropriate time (just before save), but not sure if we can...
+>>>
+>>> The problem is to find the "appropriate time". It would require to
+>>> define
+>>> a point in the save sequence where we transition the state from HW to
+>>> SW. I'm not keen on adding more state than we already have.
+>>
+>> may be we could use a dedicated device group/attr as we have for the I=
+TS
+>> save tables? the user space would choose.
+>=20
+> It means that userspace will be aware of some form of GICv4.1 details
+> (e.g., get/set vSGI state at HW level) that KVM has implemented.
+> Is it something that userspace required to know? I'm open to this ;-)
+Not sure we would be obliged to expose fine details. This could be a
+generic save/restore device group/attr whose implementation at KVM level
+could differ depending on the version being implemented, no?
 
-> ---
->  arch/x86/kvm/lapic.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> index e3099c6..929511e 100644
-> --- a/arch/x86/kvm/lapic.c
-> +++ b/arch/x86/kvm/lapic.c
-> @@ -1715,7 +1715,7 @@ static void start_sw_period(struct kvm_lapic *apic)
->
->         hrtimer_start(&apic->lapic_timer.timer,
->                 apic->lapic_timer.target_expiration,
-> -               HRTIMER_MODE_ABS);
-> +               HRTIMER_MODE_ABS_HARD);
->  }
->
->  bool kvm_lapic_hv_timer_in_use(struct kvm_vcpu *vcpu)
-> --
-> 2.7.4
->
+Thanks
+
+Eric
+>=20
+>>
+>> Thanks
+>>
+>> Eric
+>>>
+>>> But what we can do is to just ask the HW to give us the right state
+>>> on userspace access, at all times. How about this:
+>>>
+>>> diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c
+>>> b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+>>> index 48fd9fc229a2..281fe7216c59 100644
+>>> --- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
+>>> +++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+>>> @@ -305,8 +305,18 @@ static unsigned long
+>>> vgic_v3_uaccess_read_pending(struct kvm_vcpu *vcpu,
+>>> =A0=A0=A0=A0=A0=A0 */
+>>> =A0=A0=A0=A0=A0 for (i =3D 0; i < len * 8; i++) {
+>>> =A0=A0=A0=A0=A0=A0=A0=A0=A0 struct vgic_irq *irq =3D vgic_get_irq(vcp=
+u->kvm, vcpu, intid
+>>> + i);
+>>> +=A0=A0=A0=A0=A0=A0=A0 bool state =3D irq->pending_latch;
+>>>
+>>> -=A0=A0=A0=A0=A0=A0=A0 if (irq->pending_latch)
+>>> +=A0=A0=A0=A0=A0=A0=A0 if (irq->hw && vgic_irq_is_sgi(irq->intid)) {
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 int err;
+>>> +
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 err =3D irq_get_irqchip_state(irq-=
+>host_irq,
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0 IRQCHIP_STATE_PENDING,
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0 &state);
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 WARN_ON(err);
+>>> +=A0=A0=A0=A0=A0=A0=A0 }
+>>> +
+>>> +=A0=A0=A0=A0=A0=A0=A0 if (state)
+>>> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 value |=3D (1U << i);
+>>>
+>>> =A0=A0=A0=A0=A0=A0=A0=A0=A0 vgic_put_irq(vcpu->kvm, irq);
+>=20
+> Anyway this looks good to me and will do the right thing on a userspace
+> save.
+>=20
+>>>
+>>> I can add this to "KVM: arm64: GICv4.1: Add direct injection capabili=
+ty
+>>> to SGI registers".
+>=20
+> Thanks,
+> Zenghui
+>=20
+
