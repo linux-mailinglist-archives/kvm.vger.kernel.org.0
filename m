@@ -2,267 +2,170 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4A01B18D341
-	for <lists+kvm@lfdr.de>; Fri, 20 Mar 2020 16:47:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E774418D349
+	for <lists+kvm@lfdr.de>; Fri, 20 Mar 2020 16:48:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727403AbgCTPri (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Mar 2020 11:47:38 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:37127 "EHLO
-        us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727044AbgCTPrh (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 20 Mar 2020 11:47:37 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1584719255;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=2ilC8KwGDz/CQ02ddp+qbmntN6dYKnhQXGe+TwdF4Wg=;
-        b=JrvZs818gL0+fBdvgI+b1+gRhI+zZb1ZgpkJZ84NSp5df4RBmpMX6N57GTwZ7houkCZI6f
-        KxowZD50mQa5g1vNQfJSSgyhVPwASkzbxDG6xt46uiFxztIun0LfUIQqyr4u6r42dUorEI
-        qevtF1FTHoC0zSWupZ24IhsnkOk+46Q=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-235-jAAo-4OfP5Sd35fQlZ-hMQ-1; Fri, 20 Mar 2020 11:47:31 -0400
-X-MC-Unique: jAAo-4OfP5Sd35fQlZ-hMQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C72E11005514;
-        Fri, 20 Mar 2020 15:47:28 +0000 (UTC)
-Received: from w520.home (ovpn-112-162.phx2.redhat.com [10.3.112.162])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 7C1C1912B5;
-        Fri, 20 Mar 2020 15:47:27 +0000 (UTC)
-Date:   Fri, 20 Mar 2020 09:47:27 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Yan Zhao <yan.y.zhao@intel.com>
-Cc:     Kirti Wankhede <kwankhede@nvidia.com>,
-        "cjia@nvidia.com" <cjia@nvidia.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "Yang, Ziye" <ziye.yang@intel.com>,
-        "Liu, Changpeng" <changpeng.liu@intel.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>,
-        "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
-        "eskultet@redhat.com" <eskultet@redhat.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "dgilbert@redhat.com" <dgilbert@redhat.com>,
-        "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>,
-        "eauger@redhat.com" <eauger@redhat.com>,
-        "aik@ozlabs.ru" <aik@ozlabs.ru>,
-        "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
-        "felipe@nutanix.com" <felipe@nutanix.com>,
-        "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@Alibaba-inc.com>,
-        "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
-        "Ken.Xue@amd.com" <Ken.Xue@amd.com>,
-        "Wang, Zhi A" <zhi.a.wang@intel.com>,
-        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: Re: [PATCH v14 Kernel 5/7] vfio iommu: Update UNMAP_DMA ioctl to
- get dirty bitmap before unmap
-Message-ID: <20200320094727.12aba30e@w520.home>
-In-Reply-To: <20200320094039.4d99408d@w520.home>
-References: <1584560474-19946-1-git-send-email-kwankhede@nvidia.com>
-        <1584560474-19946-6-git-send-email-kwankhede@nvidia.com>
-        <20200320083529.GA5456@joy-OptiPlex-7040>
-        <20200320094039.4d99408d@w520.home>
+        id S1727190AbgCTPsf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Mar 2020 11:48:35 -0400
+Received: from mga12.intel.com ([192.55.52.136]:58103 "EHLO mga12.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726144AbgCTPsf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Mar 2020 11:48:35 -0400
+IronPort-SDR: UdFXWonmYTSKUWPCM15tMfqt71IV5ryomFt/WCF9/tuELBEKHbeOAQdCOPXEIjMbw8oZmyC417
+ xYRzuqT2bHrA==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Mar 2020 08:48:35 -0700
+IronPort-SDR: IM65Mmj0Ap/p+aqvrO7YfQfcDwKOrQI3s/YrbUmx31ZpgRjdkYmjIImq+/Z/44oLOotIL/MFaM
+ P8wJX8VR45nQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.72,285,1580803200"; 
+   d="scan'208";a="446689727"
+Received: from lkp-server01.sh.intel.com (HELO lkp-server01) ([10.239.97.150])
+  by fmsmga006.fm.intel.com with ESMTP; 20 Mar 2020 08:48:32 -0700
+Received: from kbuild by lkp-server01 with local (Exim 4.89)
+        (envelope-from <lkp@intel.com>)
+        id 1jFJsu-00058x-5m; Fri, 20 Mar 2020 23:48:32 +0800
+Date:   Fri, 20 Mar 2020 23:48:17 +0800
+From:   kbuild test robot <lkp@intel.com>
+To:     Yang Weijiang <weijiang.yang@intel.com>
+Cc:     kbuild-all@lists.01.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, sean.j.christopherson@intel.com,
+        pbonzini@redhat.com, jmattson@google.com
+Subject: Re: [PATCH v10 6/8] KVM: X86: Add userspace access interface for CET
+ MSRs
+Message-ID: <202003202309.SvJfslTC%lkp@intel.com>
+References: <20200320034342.26610-7-weijiang.yang@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200320034342.26610-7-weijiang.yang@intel.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 20 Mar 2020 09:40:39 -0600
-Alex Williamson <alex.williamson@redhat.com> wrote:
+Hi Yang,
 
-> On Fri, 20 Mar 2020 04:35:29 -0400
-> Yan Zhao <yan.y.zhao@intel.com> wrote:
-> 
-> > On Thu, Mar 19, 2020 at 03:41:12AM +0800, Kirti Wankhede wrote:  
-> > > DMA mapped pages, including those pinned by mdev vendor drivers, might
-> > > get unpinned and unmapped while migration is active and device is still
-> > > running. For example, in pre-copy phase while guest driver could access
-> > > those pages, host device or vendor driver can dirty these mapped pages.
-> > > Such pages should be marked dirty so as to maintain memory consistency
-> > > for a user making use of dirty page tracking.
-> > > 
-> > > To get bitmap during unmap, user should set flag
-> > > VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP, bitmap memory should be allocated and
-> > > zeroed by user space application. Bitmap size and page size should be set
-> > > by user application.
-> > > 
-> > > Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-> > > Reviewed-by: Neo Jia <cjia@nvidia.com>
-> > > ---
-> > >  drivers/vfio/vfio_iommu_type1.c | 55 ++++++++++++++++++++++++++++++++++++++---
-> > >  include/uapi/linux/vfio.h       | 11 +++++++++
-> > >  2 files changed, 62 insertions(+), 4 deletions(-)
-> > > 
-> > > diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> > > index d6417fb02174..aa1ac30f7854 100644
-> > > --- a/drivers/vfio/vfio_iommu_type1.c
-> > > +++ b/drivers/vfio/vfio_iommu_type1.c
-> > > @@ -939,7 +939,8 @@ static int verify_bitmap_size(uint64_t npages, uint64_t bitmap_size)
-> > >  }
-> > >  
-> > >  static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
-> > > -			     struct vfio_iommu_type1_dma_unmap *unmap)
-> > > +			     struct vfio_iommu_type1_dma_unmap *unmap,
-> > > +			     struct vfio_bitmap *bitmap)
-> > >  {
-> > >  	uint64_t mask;
-> > >  	struct vfio_dma *dma, *dma_last = NULL;
-> > > @@ -990,6 +991,10 @@ static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
-> > >  	 * will be returned if these conditions are not met.  The v2 interface
-> > >  	 * will only return success and a size of zero if there were no
-> > >  	 * mappings within the range.
-> > > +	 *
-> > > +	 * When VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP flag is set, unmap request
-> > > +	 * must be for single mapping. Multiple mappings with this flag set is
-> > > +	 * not supported.
-> > >  	 */
-> > >  	if (iommu->v2) {
-> > >  		dma = vfio_find_dma(iommu, unmap->iova, 1);
-> > > @@ -997,6 +1002,13 @@ static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
-> > >  			ret = -EINVAL;
-> > >  			goto unlock;
-> > >  		}
-> > > +
-> > > +		if ((unmap->flags & VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP) &&
-> > > +		    (dma->iova != unmap->iova || dma->size != unmap->size)) {    
-> > dma is probably NULL here!  
-> 
-> Yep, I didn't look closely enough there.  This is situated right
-> between the check to make sure we're not bisecting a mapping at the
-> start of the unmap and the check to make sure we're not bisecting a
-> mapping at the end of the unmap.  There's no guarantee that we have a
-> valid pointer here.  The test should be in the while() loop below this
-> code.
+Thank you for the patch! Perhaps something to improve:
 
-Actually the test could remain here, we can exit here if we can't find
-a dma at the start of the unmap range with the GET_DIRTY_BITMAP flag,
-but we absolutely cannot deref dma without testing it.
+[auto build test WARNING on kvm/linux-next]
+[also build test WARNING on next-20200319]
+[cannot apply to vhost/linux-next tip/auto-latest linux/master linus/master v5.6-rc6]
+[if your patch is applied to the wrong git tree, please drop us a note to help
+improve the system. BTW, we also suggest to use '--base' option to specify the
+base tree in git format-patch, please see https://stackoverflow.com/a/37406982]
 
-> > And this restriction on UNMAP would make some UNMAP operations of vIOMMU
-> > fail.
-> > 
-> > e.g. below condition indeed happens in reality.
-> > an UNMAP ioctl comes for IOVA range from 0xff800000, of size 0x200000
-> > However, IOVAs in this range are mapped page by page.i.e., dma->size is 0x1000.
-> > 
-> > Previous, this UNMAP ioctl could unmap successfully as a whole.  
-> 
-> What triggers this in the guest?  Note that it's only when using the
-> GET_DIRTY_BITMAP flag that this is restricted.  Does the event you're
-> referring to potentially occur under normal circumstances in that mode?
-> Thanks,
-> 
-> Alex
-> 
-> 
-> > > +			ret = -EINVAL;
-> > > +			goto unlock;
-> > > +		}
-> > > +
-> > >  		dma = vfio_find_dma(iommu, unmap->iova + unmap->size - 1, 0);
-> > >  		if (dma && dma->iova + dma->size != unmap->iova + unmap->size) {
-> > >  			ret = -EINVAL;
-> > > @@ -1014,6 +1026,12 @@ static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
-> > >  		if (dma->task->mm != current->mm)
-> > >  			break;
-> > >  
-> > > +		if ((unmap->flags & VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP) &&
-> > > +		     iommu->dirty_page_tracking)
-> > > +			vfio_iova_dirty_bitmap(iommu, dma->iova, dma->size,
-> > > +					bitmap->pgsize,
-> > > +					(unsigned char __user *) bitmap->data);
-> > > +
-> > >  		if (!RB_EMPTY_ROOT(&dma->pfn_list)) {
-> > >  			struct vfio_iommu_type1_dma_unmap nb_unmap;
-> > >  
-> > > @@ -2369,17 +2387,46 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
-> > >  
-> > >  	} else if (cmd == VFIO_IOMMU_UNMAP_DMA) {
-> > >  		struct vfio_iommu_type1_dma_unmap unmap;
-> > > -		long ret;
-> > > +		struct vfio_bitmap bitmap = { 0 };
-> > > +		int ret;
-> > >  
-> > >  		minsz = offsetofend(struct vfio_iommu_type1_dma_unmap, size);
-> > >  
-> > >  		if (copy_from_user(&unmap, (void __user *)arg, minsz))
-> > >  			return -EFAULT;
-> > >  
-> > > -		if (unmap.argsz < minsz || unmap.flags)
-> > > +		if (unmap.argsz < minsz ||
-> > > +		    unmap.flags & ~VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP)
-> > >  			return -EINVAL;
-> > >  
-> > > -		ret = vfio_dma_do_unmap(iommu, &unmap);
-> > > +		if (unmap.flags & VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP) {
-> > > +			unsigned long pgshift;
-> > > +			uint64_t iommu_pgsize =
-> > > +					 1 << __ffs(vfio_pgsize_bitmap(iommu));
-> > > +
-> > > +			if (unmap.argsz < (minsz + sizeof(bitmap)))
-> > > +				return -EINVAL;
-> > > +
-> > > +			if (copy_from_user(&bitmap,
-> > > +					   (void __user *)(arg + minsz),
-> > > +					   sizeof(bitmap)))
-> > > +				return -EFAULT;
-> > > +
-> > > +			/* allow only min supported pgsize */
-> > > +			if (bitmap.pgsize != iommu_pgsize)
-> > > +				return -EINVAL;
-> > > +			if (!access_ok((void __user *)bitmap.data, bitmap.size))
-> > > +				return -EINVAL;
-> > > +
-> > > +			pgshift = __ffs(bitmap.pgsize);
-> > > +			ret = verify_bitmap_size(unmap.size >> pgshift,
-> > > +						 bitmap.size);
-> > > +			if (ret)
-> > > +				return ret;
-> > > +
-> > > +		}
-> > > +
-> > > +		ret = vfio_dma_do_unmap(iommu, &unmap, &bitmap);
-> > >  		if (ret)
-> > >  			return ret;
-> > >  
-> > > diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-> > > index 043e9eafb255..a704e5380f04 100644
-> > > --- a/include/uapi/linux/vfio.h
-> > > +++ b/include/uapi/linux/vfio.h
-> > > @@ -1010,12 +1010,23 @@ struct vfio_bitmap {
-> > >   * field.  No guarantee is made to the user that arbitrary unmaps of iova
-> > >   * or size different from those used in the original mapping call will
-> > >   * succeed.
-> > > + * VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP should be set to get dirty bitmap
-> > > + * before unmapping IO virtual addresses. When this flag is set, user must
-> > > + * provide data[] as structure vfio_bitmap. User must allocate memory to get
-> > > + * bitmap, clear the bitmap memory by setting zero and must set size of
-> > > + * allocated memory in vfio_bitmap.size field. One bit in bitmap
-> > > + * represents per page, page of user provided page size in 'pgsize',
-> > > + * consecutively starting from iova offset. Bit set indicates page at that
-> > > + * offset from iova is dirty. Bitmap of pages in the range of unmapped size is
-> > > + * returned in vfio_bitmap.data
-> > >   */
-> > >  struct vfio_iommu_type1_dma_unmap {
-> > >  	__u32	argsz;
-> > >  	__u32	flags;
-> > > +#define VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP (1 << 0)
-> > >  	__u64	iova;				/* IO virtual address */
-> > >  	__u64	size;				/* Size of mapping (bytes) */
-> > > +	__u8    data[];
-> > >  };
-> > >  
-> > >  #define VFIO_IOMMU_UNMAP_DMA _IO(VFIO_TYPE, VFIO_BASE + 14)
-> > > -- 
-> > > 2.7.0
-> > >     
-> >   
-> 
+url:    https://github.com/0day-ci/linux/commits/Yang-Weijiang/Introduce-support-for-guest-CET-feature/20200320-155517
+base:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git linux-next
+reproduce:
+        # apt-get install sparse
+        # sparse version: v0.6.1-181-g83789bbc-dirty
+        make ARCH=x86_64 allmodconfig
+        make C=1 CF='-fdiagnostic-prefix -D__CHECK_ENDIAN__'
 
+If you fix the issue, kindly add following tag
+Reported-by: kbuild test robot <lkp@intel.com>
+
+
+sparse warnings: (new ones prefixed by >>)
+
+   arch/x86/kvm/x86.c:809:60: sparse: sparse: undefined identifier 'X86_CR4_CET'
+   arch/x86/kvm/x86.c:1233:23: sparse: sparse: undefined identifier 'MSR_IA32_U_CET'
+   arch/x86/kvm/x86.c:1233:39: sparse: sparse: undefined identifier 'MSR_IA32_S_CET'
+   arch/x86/kvm/x86.c:1234:9: sparse: sparse: undefined identifier 'MSR_IA32_PL0_SSP'
+   arch/x86/kvm/x86.c:1234:27: sparse: sparse: undefined identifier 'MSR_IA32_PL1_SSP'
+   arch/x86/kvm/x86.c:1234:45: sparse: sparse: undefined identifier 'MSR_IA32_PL2_SSP'
+   arch/x86/kvm/x86.c:1235:9: sparse: sparse: undefined identifier 'MSR_IA32_PL3_SSP'
+   arch/x86/kvm/x86.c:1235:27: sparse: sparse: undefined identifier 'MSR_IA32_INT_SSP_TAB'
+   arch/x86/kvm/x86.c:1512:14: sparse: sparse: undefined identifier 'MSR_IA32_PL0_SSP'
+   arch/x86/kvm/x86.c:1512:35: sparse: sparse: undefined identifier 'MSR_IA32_PL3_SSP'
+   arch/x86/kvm/x86.c:1513:14: sparse: sparse: undefined identifier 'MSR_IA32_U_CET'
+   arch/x86/kvm/x86.c:1514:14: sparse: sparse: undefined identifier 'MSR_IA32_S_CET'
+   arch/x86/kvm/x86.c:1515:14: sparse: sparse: undefined identifier 'MSR_IA32_INT_SSP_TAB'
+>> arch/x86/kvm/x86.c:1512:14: sparse: sparse: incompatible types for 'case' statement
+   arch/x86/kvm/x86.c:1512:35: sparse: sparse: incompatible types for 'case' statement
+   arch/x86/kvm/x86.c:1513:14: sparse: sparse: incompatible types for 'case' statement
+   arch/x86/kvm/x86.c:1514:14: sparse: sparse: incompatible types for 'case' statement
+   arch/x86/kvm/x86.c:1515:14: sparse: sparse: incompatible types for 'case' statement
+   arch/x86/kvm/x86.c:2646:38: sparse: sparse: incorrect type in argument 1 (different address spaces) @@    expected void const [noderef] <asn:1> * @@    got  const [noderef] <asn:1> * @@
+   arch/x86/kvm/x86.c:2646:38: sparse:    expected void const [noderef] <asn:1> *
+   arch/x86/kvm/x86.c:2646:38: sparse:    got unsigned char [usertype] *
+   arch/x86/kvm/x86.c:3267:25: sparse: sparse: undefined identifier 'MSR_IA32_U_CET'
+   arch/x86/kvm/x86.c:7549:15: sparse: sparse: incompatible types in comparison expression (different address spaces):
+   arch/x86/kvm/x86.c:7549:15: sparse:    struct kvm_apic_map [noderef] <asn:4> *
+   arch/x86/kvm/x86.c:7549:15: sparse:    struct kvm_apic_map *
+   arch/x86/kvm/x86.c:9678:44: sparse: sparse: undefined identifier 'XFEATURE_MASK_CET_USER'
+   arch/x86/kvm/x86.c:9678:44: sparse: sparse: undefined identifier 'XFEATURE_MASK_CET_KERNEL'
+   arch/x86/kvm/x86.c:9912:16: sparse: sparse: incompatible types in comparison expression (different address spaces):
+   arch/x86/kvm/x86.c:9912:16: sparse:    struct kvm_apic_map [noderef] <asn:4> *
+   arch/x86/kvm/x86.c:9912:16: sparse:    struct kvm_apic_map *
+   arch/x86/kvm/x86.c:9913:15: sparse: sparse: incompatible types in comparison expression (different address spaces):
+   arch/x86/kvm/x86.c:9913:15: sparse:    struct kvm_pmu_event_filter [noderef] <asn:4> *
+   arch/x86/kvm/x86.c:9913:15: sparse:    struct kvm_pmu_event_filter *
+   arch/x86/kvm/x86.c:1512:14: sparse: sparse: Expected constant expression in case statement
+   arch/x86/kvm/x86.c:1512:35: sparse: sparse: Expected constant expression in case statement
+   arch/x86/kvm/x86.c:1513:14: sparse: sparse: Expected constant expression in case statement
+   arch/x86/kvm/x86.c:1514:14: sparse: sparse: Expected constant expression in case statement
+   arch/x86/kvm/x86.c:1515:14: sparse: sparse: Expected constant expression in case statement
+
+vim +/case +1512 arch/x86/kvm/x86.c
+
+  1475	
+  1476	/*
+  1477	 * Write @data into the MSR specified by @index.  Select MSR specific fault
+  1478	 * checks are bypassed if @host_initiated is %true.
+  1479	 * Returns 0 on success, non-0 otherwise.
+  1480	 * Assumes vcpu_load() was already called.
+  1481	 */
+  1482	static int __kvm_set_msr(struct kvm_vcpu *vcpu, u32 index, u64 data,
+  1483				 bool host_initiated)
+  1484	{
+  1485		struct msr_data msr;
+  1486	
+  1487		switch (index) {
+  1488		case MSR_FS_BASE:
+  1489		case MSR_GS_BASE:
+  1490		case MSR_KERNEL_GS_BASE:
+  1491		case MSR_CSTAR:
+  1492		case MSR_LSTAR:
+  1493			if (is_noncanonical_address(data, vcpu))
+  1494				return 1;
+  1495			break;
+  1496		case MSR_IA32_SYSENTER_EIP:
+  1497		case MSR_IA32_SYSENTER_ESP:
+  1498			/*
+  1499			 * IA32_SYSENTER_ESP and IA32_SYSENTER_EIP cause #GP if
+  1500			 * non-canonical address is written on Intel but not on
+  1501			 * AMD (which ignores the top 32-bits, because it does
+  1502			 * not implement 64-bit SYSENTER).
+  1503			 *
+  1504			 * 64-bit code should hence be able to write a non-canonical
+  1505			 * value on AMD.  Making the address canonical ensures that
+  1506			 * vmentry does not fail on Intel after writing a non-canonical
+  1507			 * value, and that something deterministic happens if the guest
+  1508			 * invokes 64-bit SYSENTER.
+  1509			 */
+  1510			data = get_canonical(data, vcpu_virt_addr_bits(vcpu));
+  1511			break;
+> 1512		case MSR_IA32_PL0_SSP ... MSR_IA32_PL3_SSP:
+  1513		case MSR_IA32_U_CET:
+  1514		case MSR_IA32_S_CET:
+  1515		case MSR_IA32_INT_SSP_TAB:
+  1516			if (is_noncanonical_address(data, vcpu))
+  1517				return 1;
+  1518		}
+  1519	
+  1520		msr.data = data;
+  1521		msr.index = index;
+  1522		msr.host_initiated = host_initiated;
+  1523	
+  1524		return kvm_x86_ops->set_msr(vcpu, &msr);
+  1525	}
+  1526	
+
+---
+0-DAY CI Kernel Test Service, Intel Corporation
+https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
