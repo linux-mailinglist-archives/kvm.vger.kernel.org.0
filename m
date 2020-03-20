@@ -2,148 +2,158 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 34BE418D712
-	for <lists+kvm@lfdr.de>; Fri, 20 Mar 2020 19:34:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 79E5E18D77F
+	for <lists+kvm@lfdr.de>; Fri, 20 Mar 2020 19:42:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727148AbgCTSed (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Mar 2020 14:34:33 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:25243 "EHLO
-        us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726783AbgCTSec (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 20 Mar 2020 14:34:32 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1584729272;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=y0Np0CarGBUbN7siKQ/jnSvkwfPUS2q7/dKzjlzIzSk=;
-        b=ZicfqZHk+TlxbNQOrRNQzsTgqZNOSC1PgPpKYsyI1jmmnzlPjVd5viN7xDGCr76SJT4M0d
-        eCqyTiqphIue4HUlTlibtnu9ON137wHBe2eMAn7yuU4SRY2xRcrHKmxgH5CUxOpdIc7E3L
-        xd72LPMiwnT9D0iic7G7kw3RhkjqXpA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-429-A2lGiqZvP1aGsscMkHDWpQ-1; Fri, 20 Mar 2020 14:34:28 -0400
-X-MC-Unique: A2lGiqZvP1aGsscMkHDWpQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C0CFF101FC64;
-        Fri, 20 Mar 2020 18:34:26 +0000 (UTC)
-Received: from w520.home (ovpn-112-162.phx2.redhat.com [10.3.112.162])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 4A2A45C3FD;
-        Fri, 20 Mar 2020 18:34:26 +0000 (UTC)
-Date:   Fri, 20 Mar 2020 12:34:25 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Yonghyun Hwang <yonghyun@google.com>
-Cc:     Kirti Wankhede <kwankhede@nvidia.com>,
-        Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Havard Skinnemoen <hskinnemoen@google.com>,
-        Moritz Fischer <mdf@kernel.org>
-Subject: Re: [PATCH] vfio-mdev: support mediated device creation in kernel
-Message-ID: <20200320123425.49c6568e@w520.home>
-In-Reply-To: <20200320175910.180266-1-yonghyun@google.com>
-References: <20200320175910.180266-1-yonghyun@google.com>
+        id S1726783AbgCTSmU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Mar 2020 14:42:20 -0400
+Received: from hqnvemgate26.nvidia.com ([216.228.121.65]:14495 "EHLO
+        hqnvemgate26.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725446AbgCTSmU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Mar 2020 14:42:20 -0400
+Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate26.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+        id <B5e750e7d0001>; Fri, 20 Mar 2020 11:42:06 -0700
+Received: from hqmail.nvidia.com ([172.20.161.6])
+  by hqpgpgate101.nvidia.com (PGP Universal service);
+  Fri, 20 Mar 2020 11:42:19 -0700
+X-PGP-Universal: processed;
+        by hqpgpgate101.nvidia.com on Fri, 20 Mar 2020 11:42:19 -0700
+Received: from [10.40.103.10] (10.124.1.5) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Fri, 20 Mar
+ 2020 18:42:09 +0000
+Subject: Re: [PATCH v15 Kernel 4/7] vfio iommu: Implementation of ioctl for
+ dirty pages tracking.
+To:     Alex Williamson <alex.williamson@redhat.com>
+CC:     <cjia@nvidia.com>, <kevin.tian@intel.com>, <ziye.yang@intel.com>,
+        <changpeng.liu@intel.com>, <yi.l.liu@intel.com>,
+        <mlevitsk@redhat.com>, <eskultet@redhat.com>, <cohuck@redhat.com>,
+        <dgilbert@redhat.com>, <jonathan.davies@nutanix.com>,
+        <eauger@redhat.com>, <aik@ozlabs.ru>, <pasic@linux.ibm.com>,
+        <felipe@nutanix.com>, <Zhengxiao.zx@Alibaba-inc.com>,
+        <shuangtai.tst@alibaba-inc.com>, <Ken.Xue@amd.com>,
+        <zhi.a.wang@intel.com>, <yan.y.zhao@intel.com>,
+        <qemu-devel@nongnu.org>, <kvm@vger.kernel.org>
+References: <1584649004-8285-1-git-send-email-kwankhede@nvidia.com>
+ <1584649004-8285-5-git-send-email-kwankhede@nvidia.com>
+ <20200319165704.1f4eb36a@w520.home>
+ <bc48ae5c-67f9-d95e-5d60-6c42359bb790@nvidia.com>
+ <20200320120137.6acd89ee@x1.home>
+X-Nvconfidentiality: public
+From:   Kirti Wankhede <kwankhede@nvidia.com>
+Message-ID: <cf0ee134-c1c7-f60c-afc2-8948268d8880@nvidia.com>
+Date:   Sat, 21 Mar 2020 00:12:04 +0530
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20200320120137.6acd89ee@x1.home>
+X-Originating-IP: [10.124.1.5]
+X-ClientProxiedBy: HQMAIL101.nvidia.com (172.20.187.10) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1584729726; bh=hWqEMqGjcjLbX1dudD5jfb/W5JW8uQKkE5TYekIBFFs=;
+        h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
+         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
+         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
+         Content-Transfer-Encoding;
+        b=jkYZVcTIRXZJ2TlcNLaDDZzURzyQC3Ed07iBXv8NPBU8wu2+pSvV5j8/p0/SUnXED
+         Ap/kTUh1gx41kfezG5vb1TQc3vf9Da1HVUA8up3daKw5ot4J37fnXGYj2rjcx2IYkE
+         IMe545G2jYUrkOvYPXiVHu+z5CMhNjjgKyh47Ct6eecb4x36rXjpTJeimBFCR7kXn0
+         57wlRg1nIDa8BfgVcTWduoAlK31c2V5Q9fhC+PrY1dmeUZcWM/D1rbCX1O30EgCSrS
+         gmiIpWpiJfKzmf2lC8a7svO79PQTCiFWEQ2luHMMCyVWgFtMuKo5weKtgMyCsUmSHw
+         Zex3jh4TV0vVQ==
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 20 Mar 2020 10:59:10 -0700
-Yonghyun Hwang <yonghyun@google.com> wrote:
 
-> To enable a mediated device, a device driver registers its device to VFIO
-> MDev framework. Once the mediated device gets enabled, UUID gets fed onto
-> the sysfs attribute, "create", to create the mediated device. This
-> additional step happens after boot-up gets complete. If the driver knows
-> how many mediated devices need to be created during probing time, the
-> additional step becomes cumbersome. This commit implements a new function
-> to allow the driver to create a mediated device in kernel.
 
-But pre-creating mdev devices seems like a policy decision.  Why can't
-userspace make such a policy decision, and do so with persistent uuids,
-via something like mdevctl?  Thanks,
-
-Alex
-
- 
-> Signed-off-by: Yonghyun Hwang <yonghyun@google.com>
-> ---
->  drivers/vfio/mdev/mdev_core.c | 45 +++++++++++++++++++++++++++++++++++
->  include/linux/mdev.h          |  3 +++
->  2 files changed, 48 insertions(+)
+On 3/20/2020 11:31 PM, Alex Williamson wrote:
+> On Fri, 20 Mar 2020 23:19:14 +0530
+> Kirti Wankhede <kwankhede@nvidia.com> wrote:
 > 
-> diff --git a/drivers/vfio/mdev/mdev_core.c b/drivers/vfio/mdev/mdev_core.c
-> index b558d4cfd082..a6d32516de42 100644
-> --- a/drivers/vfio/mdev/mdev_core.c
-> +++ b/drivers/vfio/mdev/mdev_core.c
-> @@ -350,6 +350,51 @@ int mdev_device_create(struct kobject *kobj,
->  	return ret;
->  }
->  
-> +/*
-> + * mdev_create_device : Create a mdev device
-> + * @dev: device structure representing parent device.
-> + * @uuid: uuid char string for a mdev device.
-> + * @group: index to supported type groups for a mdev device.
-> + *
-> + * Create a mdev device in kernel.
-> + * Returns a negative value on error, otherwise 0.
-> + */
-> +int mdev_create_device(struct device *dev,
-> +			const char *uuid, int group)
-> +{
-> +	struct mdev_parent *parent = NULL;
-> +	struct mdev_type *type = NULL;
-> +	guid_t guid;
-> +	int i = 1;
-> +	int ret;
-> +
-> +	ret = guid_parse(uuid, &guid);
-> +	if (ret) {
-> +		dev_err(dev, "Failed to parse UUID");
-> +		return ret;
-> +	}
-> +
-> +	parent = __find_parent_device(dev);
-> +	if (!parent) {
-> +		dev_err(dev, "Failed to find parent mdev device");
-> +		return -ENODEV;
-> +	}
-> +
-> +	list_for_each_entry(type, &parent->type_list, next) {
-> +		if (i == group)
-> +			break;
-> +		i++;
-> +	}
-> +
-> +	if (!type || i != group) {
-> +		dev_err(dev, "Failed to find mdev device");
-> +		return -ENODEV;
-> +	}
-> +
-> +	return mdev_device_create(&type->kobj, parent->dev, &guid);
-> +}
-> +EXPORT_SYMBOL(mdev_create_device);
-> +
->  int mdev_device_remove(struct device *dev)
->  {
->  	struct mdev_device *mdev, *tmp;
-> diff --git a/include/linux/mdev.h b/include/linux/mdev.h
-> index 0ce30ca78db0..b66f67998916 100644
-> --- a/include/linux/mdev.h
-> +++ b/include/linux/mdev.h
-> @@ -145,4 +145,7 @@ struct device *mdev_parent_dev(struct mdev_device *mdev);
->  struct device *mdev_dev(struct mdev_device *mdev);
->  struct mdev_device *mdev_from_dev(struct device *dev);
->  
-> +extern int mdev_create_device(struct device *dev,
-> +			const char *uuid, int group_idx);
-> +
->  #endif /* MDEV_H */
+>> On 3/20/2020 4:27 AM, Alex Williamson wrote:
+>>> On Fri, 20 Mar 2020 01:46:41 +0530
+>>> Kirti Wankhede <kwankhede@nvidia.com> wrote:
+>>>    
+
+<snip>
+
+>>>> +static int vfio_iova_dirty_bitmap(struct vfio_iommu *iommu, dma_addr_t iova,
+>>>> +				  size_t size, uint64_t pgsize,
+>>>> +				  u64 __user *bitmap)
+>>>> +{
+>>>> +	struct vfio_dma *dma;
+>>>> +	unsigned long pgshift = __ffs(pgsize);
+>>>> +	unsigned int npages, bitmap_size;
+>>>> +
+>>>> +	dma = vfio_find_dma(iommu, iova, 1);
+>>>> +
+>>>> +	if (!dma)
+>>>> +		return -EINVAL;
+>>>> +
+>>>> +	if (dma->iova != iova || dma->size != size)
+>>>> +		return -EINVAL;
+>>>> +
+>>>> +	npages = dma->size >> pgshift;
+>>>> +	bitmap_size = DIRTY_BITMAP_BYTES(npages);
+>>>> +
+>>>> +	/* mark all pages dirty if all pages are pinned and mapped. */
+>>>> +	if (dma->iommu_mapped)
+>>>> +		bitmap_set(dma->bitmap, 0, npages);
+>>>> +
+>>>> +	if (copy_to_user((void __user *)bitmap, dma->bitmap, bitmap_size))
+>>>> +		return -EFAULT;
+>>>
+>>> We still need to reset the bitmap here, clearing and re-adding the
+>>> pages that are still pinned.
+>>>
+>>> https://lore.kernel.org/kvm/20200319070635.2ff5db56@x1.home/
+>>>    
+>>
+>> I thought you agreed on my reply to it
+>> https://lore.kernel.org/kvm/31621b70-02a9-2ea5-045f-f72b671fe703@nvidia.com/
+>>
+>>   > Why re-populate when there will be no change since
+>>   > vfio_iova_dirty_bitmap() is called holding iommu->lock? If there is any
+>>   > pin request while vfio_iova_dirty_bitmap() is still working, it will
+>>   > wait till iommu->lock is released. Bitmap will be populated when page is
+>>   > pinned.
+> 
+> As coded, dirty bits are only ever set in the bitmap, never cleared.
+> If a page is unpinned between iterations of the user recording the
+> dirty bitmap, it should be marked dirty in the iteration immediately
+> after the unpinning and not marked dirty in the following iteration.
+> That doesn't happen here.  We're reporting cumulative dirty pages since
+> logging was enabled, we need to be reporting dirty pages since the user
+> last retrieved the dirty bitmap.  The bitmap should be cleared and
+> currently pinned pages re-added after copying to the user.  Thanks,
+> 
+
+Does that mean, we have to track every iteration? do we really need that 
+tracking?
+
+Generally the flow is:
+- vendor driver pin x pages
+- Enter pre-copy-phase where vCPUs are running - user starts dirty pages 
+tracking, then user asks dirty bitmap, x pages reported dirty by 
+VFIO_IOMMU_DIRTY_PAGES ioctl with _GET flag
+- In pre-copy phase, vendor driver pins y more pages, now bitmap 
+consists of x+y bits set
+- In pre-copy phase, vendor driver unpins z pages, but bitmap is not 
+updated, so again bitmap consists of x+y bits set.
+- Enter in stop-and-copy phase, vCPUs are stopped, mdev devices are stopped
+- user asks dirty bitmap - Since here vCPU and mdev devices are stopped, 
+pages should not get dirty by guest driver or the physical device. 
+Hence, x+y dirty pages would be reported.
+
+I don't think we need to track every iteration of bitmap reporting.
+
+Thanks,
+Kirti
+
+
 
