@@ -2,26 +2,26 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1C97418DAD7
-	for <lists+kvm@lfdr.de>; Fri, 20 Mar 2020 23:05:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2106C18DADC
+	for <lists+kvm@lfdr.de>; Fri, 20 Mar 2020 23:06:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727531AbgCTWFs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Mar 2020 18:05:48 -0400
-Received: from Galois.linutronix.de ([193.142.43.55]:37483 "EHLO
+        id S1727499AbgCTWGB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Mar 2020 18:06:01 -0400
+Received: from Galois.linutronix.de ([193.142.43.55]:37480 "EHLO
         Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727197AbgCTWEO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Mar 2020 18:04:14 -0400
+        with ESMTP id S1726973AbgCTWEN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Mar 2020 18:04:13 -0400
 Received: from p5de0bf0b.dip0.t-ipconnect.de ([93.224.191.11] helo=nanos.tec.linutronix.de)
         by Galois.linutronix.de with esmtpsa (TLS1.2:DHE_RSA_AES_256_CBC_SHA256:256)
         (Exim 4.80)
         (envelope-from <tglx@linutronix.de>)
-        id 1jFPk1-0004TP-M1; Fri, 20 Mar 2020 23:03:45 +0100
+        id 1jFPk1-0004TS-TX; Fri, 20 Mar 2020 23:03:46 +0100
 Received: from nanos.tec.linutronix.de (localhost [IPv6:::1])
-        by nanos.tec.linutronix.de (Postfix) with ESMTP id 256901039FD;
+        by nanos.tec.linutronix.de (Postfix) with ESMTP id 62AEC1039FF;
         Fri, 20 Mar 2020 23:03:45 +0100 (CET)
-Message-Id: <20200320180032.614150506@linutronix.de>
+Message-Id: <20200320180032.708673769@linutronix.de>
 User-Agent: quilt/0.65
-Date:   Fri, 20 Mar 2020 18:59:58 +0100
+Date:   Fri, 20 Mar 2020 18:59:59 +0100
 From:   Thomas Gleixner <tglx@linutronix.de>
 To:     LKML <linux-kernel@vger.kernel.org>
 Cc:     x86@kernel.org, Paul McKenney <paulmck@kernel.org>,
@@ -38,8 +38,8 @@ Cc:     x86@kernel.org, Paul McKenney <paulmck@kernel.org>,
         Peter Zijlstra <peterz@infradead.org>,
         Tom Lendacky <thomas.lendacky@amd.com>,
         Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Subject: [RESEND][patch V3 02/23] rcu: Add comments marking transitions
- between RCU watching and not
+Subject: [RESEND][patch V3 03/23] vmlinux.lds.h: Create section for protection
+ against instrumentation
 References: <20200320175956.033706968@linutronix.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -52,130 +52,127 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: "Paul E. McKenney" <paulmck@kernel.org>
+Some code pathes, especially the low level entry code, must be protected
+against instrumentation for various reasons:
 
-It is not as clear as it might be just where in RCU's idle entry/exit
-code RCU stops and starts watching the current CPU.  This commit therefore
-adds comments calling out the transitions.
+ - Low level entry code can be a fragile beast, especially on x86.
 
-Reported-by: Thomas Gleixner <tglx@linutronix.de>
-Signed-off-by: Paul E. McKenney <paulmck@kernel.org>
+ - With NO_HZ_FULL RCU state needs to be established before using it.
+
+Having a dedicated section for such code allows to validate with tooling
+that no unsafe functions are invoked.
+
+Add the .noinstr.text section and the noinstr attribute to mark
+functions. noinstr implies notrace. Kprobes will gain a section check
+later.
+
+Provide also two sets of markers:
+
+ - instr_begin()/end()
+
+   This is used to mark code inside in a noinstr function which calls
+   into regular instrumentable text section as safe.
+
+ - noinstr_call_begin()/end()
+
+   Same as above but used to mark indirect calls which cannot be tracked by
+   tooling and need to be audited manually.
+
 Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
-Link: https://lkml.kernel.org/r/20200313024046.27622-2-paulmck@kernel.org
-
 ---
- kernel/rcu/tree.c |   29 +++++++++++++++++++++++++----
- 1 file changed, 25 insertions(+), 4 deletions(-)
+ include/asm-generic/sections.h    |    3 +++
+ include/asm-generic/vmlinux.lds.h |    4 ++++
+ include/linux/compiler.h          |   24 ++++++++++++++++++++++++
+ include/linux/compiler_types.h    |    4 ++++
+ scripts/mod/modpost.c             |    2 +-
+ 5 files changed, 36 insertions(+), 1 deletion(-)
 
---- a/kernel/rcu/tree.c
-+++ b/kernel/rcu/tree.c
-@@ -224,7 +224,9 @@ void rcu_softirq_qs(void)
+--- a/include/asm-generic/sections.h
++++ b/include/asm-generic/sections.h
+@@ -53,6 +53,9 @@ extern char __ctors_start[], __ctors_end
+ /* Start and end of .opd section - used for function descriptors. */
+ extern char __start_opd[], __end_opd[];
  
++/* Start and end of instrumentation protected text section */
++extern char __noinstr_text_start[], __noinstr_text_end[];
++
+ extern __visible const void __nosave_begin, __nosave_end;
+ 
+ /* Function descriptor handling (if any).  Override in asm/sections.h */
+--- a/include/asm-generic/vmlinux.lds.h
++++ b/include/asm-generic/vmlinux.lds.h
+@@ -550,6 +550,10 @@
+ #define TEXT_TEXT							\
+ 		ALIGN_FUNCTION();					\
+ 		*(.text.hot TEXT_MAIN .text.fixup .text.unlikely)	\
++		ALIGN_FUNCTION();					\
++		__noinstr_text_start = .;				\
++		*(.noinstr.text)					\
++		__noinstr_text_end = .;					\
+ 		*(.text..refcount)					\
+ 		*(.ref.text)						\
+ 	MEM_KEEP(init.text*)						\
+--- a/include/linux/compiler.h
++++ b/include/linux/compiler.h
+@@ -120,12 +120,36 @@ void ftrace_likely_update(struct ftrace_
+ /* Annotate a C jump table to allow objtool to follow the code flow */
+ #define __annotate_jump_table __section(.rodata..c_jump_table)
+ 
++/* Begin/end of an instrumentation safe region */
++#define instr_begin() ({						\
++	asm volatile("%c0:\n\t"						\
++		     ".pushsection .discard.instr_begin\n\t"		\
++		     ".long %c0b - .\n\t"				\
++		     ".popsection\n\t" : : "i" (__COUNTER__));		\
++})
++
++#define instr_end() ({							\
++	asm volatile("%c0:\n\t"						\
++		     ".pushsection .discard.instr_end\n\t"		\
++		     ".long %c0b - .\n\t"				\
++		     ".popsection\n\t" : : "i" (__COUNTER__));		\
++})
++
+ #else
+ #define annotate_reachable()
+ #define annotate_unreachable()
+ #define __annotate_jump_table
++#define instr_begin()		do { } while(0)
++#define instr_end()		do { } while(0)
+ #endif
+ 
++/*
++ * Annotation for audited indirect calls. Distinct from instr_begin() on
++ * purpose because the called function has to be noinstr as well.
++ */
++#define noinstr_call_begin()		instr_begin()
++#define noinstr_call_end()		instr_end()
++
+ #ifndef ASM_UNREACHABLE
+ # define ASM_UNREACHABLE
+ #endif
+--- a/include/linux/compiler_types.h
++++ b/include/linux/compiler_types.h
+@@ -118,6 +118,10 @@ struct ftrace_likely_data {
+ #define notrace			__attribute__((__no_instrument_function__))
+ #endif
+ 
++/* Section for code which can't be instrumented at all */
++#define noinstr								\
++	noinline notrace __attribute((__section__(".noinstr.text")))
++
  /*
-  * Record entry into an extended quiescent state.  This is only to be
-- * called when not already in an extended quiescent state.
-+ * called when not already in an extended quiescent state, that is,
-+ * RCU is watching prior to the call to this function and is no longer
-+ * watching upon return.
-  */
- static void rcu_dynticks_eqs_enter(void)
- {
-@@ -237,7 +239,7 @@ static void rcu_dynticks_eqs_enter(void)
- 	 * next idle sojourn.
- 	 */
- 	seq = atomic_add_return(RCU_DYNTICK_CTRL_CTR, &rdp->dynticks);
--	/* Better be in an extended quiescent state! */
-+	// RCU is no longer watching.  Better be in extended quiescent state!
- 	WARN_ON_ONCE(IS_ENABLED(CONFIG_RCU_EQS_DEBUG) &&
- 		     (seq & RCU_DYNTICK_CTRL_CTR));
- 	/* Better not have special action (TLB flush) pending! */
-@@ -247,7 +249,8 @@ static void rcu_dynticks_eqs_enter(void)
+  * it doesn't make sense on ARM (currently the only user of __naked)
+  * to trace naked functions because then mcount is called without
+--- a/scripts/mod/modpost.c
++++ b/scripts/mod/modpost.c
+@@ -953,7 +953,7 @@ static void check_section(const char *mo
  
- /*
-  * Record exit from an extended quiescent state.  This is only to be
-- * called from an extended quiescent state.
-+ * called from an extended quiescent state, that is, RCU is not watching
-+ * prior to the call to this function and is watching upon return.
-  */
- static void rcu_dynticks_eqs_exit(void)
- {
-@@ -260,6 +263,7 @@ static void rcu_dynticks_eqs_exit(void)
- 	 * critical section.
- 	 */
- 	seq = atomic_add_return(RCU_DYNTICK_CTRL_CTR, &rdp->dynticks);
-+	// RCU is now watching.  Better not be in an extended quiescent state!
- 	WARN_ON_ONCE(IS_ENABLED(CONFIG_RCU_EQS_DEBUG) &&
- 		     !(seq & RCU_DYNTICK_CTRL_CTR));
- 	if (seq & RCU_DYNTICK_CTRL_MASK) {
-@@ -562,6 +566,7 @@ static void rcu_eqs_enter(bool user)
- 	WARN_ON_ONCE(IS_ENABLED(CONFIG_RCU_EQS_DEBUG) &&
- 		     rdp->dynticks_nesting == 0);
- 	if (rdp->dynticks_nesting != 1) {
-+		// RCU will still be watching, so just do accounting and leave.
- 		rdp->dynticks_nesting--;
- 		return;
- 	}
-@@ -574,7 +579,9 @@ static void rcu_eqs_enter(bool user)
- 	rcu_prepare_for_idle();
- 	rcu_preempt_deferred_qs(current);
- 	WRITE_ONCE(rdp->dynticks_nesting, 0); /* Avoid irq-access tearing. */
-+	// RCU is watching here ...
- 	rcu_dynticks_eqs_enter();
-+	// ... but is no longer watching here.
- 	rcu_dynticks_task_enter();
- }
- 
-@@ -654,7 +661,9 @@ static __always_inline void rcu_nmi_exit
- 	if (irq)
- 		rcu_prepare_for_idle();
- 
-+	// RCU is watching here ...
- 	rcu_dynticks_eqs_enter();
-+	// ... but is no longer watching here.
- 
- 	if (irq)
- 		rcu_dynticks_task_enter();
-@@ -729,11 +738,14 @@ static void rcu_eqs_exit(bool user)
- 	oldval = rdp->dynticks_nesting;
- 	WARN_ON_ONCE(IS_ENABLED(CONFIG_RCU_EQS_DEBUG) && oldval < 0);
- 	if (oldval) {
-+		// RCU was already watching, so just do accounting and leave.
- 		rdp->dynticks_nesting++;
- 		return;
- 	}
- 	rcu_dynticks_task_exit();
-+	// RCU is not watching here ...
- 	rcu_dynticks_eqs_exit();
-+	// ... but is watching here.
- 	rcu_cleanup_after_idle();
- 	trace_rcu_dyntick(TPS("End"), rdp->dynticks_nesting, 1, atomic_read(&rdp->dynticks));
- 	WARN_ON_ONCE(IS_ENABLED(CONFIG_RCU_EQS_DEBUG) && !user && !is_idle_task(current));
-@@ -810,7 +822,9 @@ static __always_inline void rcu_nmi_ente
- 		if (irq)
- 			rcu_dynticks_task_exit();
- 
-+		// RCU is not watching here ...
- 		rcu_dynticks_eqs_exit();
-+		// ... but is watching here.
- 
- 		if (irq)
- 			rcu_cleanup_after_idle();
-@@ -819,9 +833,16 @@ static __always_inline void rcu_nmi_ente
- 	} else if (irq && tick_nohz_full_cpu(rdp->cpu) &&
- 		   rdp->dynticks_nmi_nesting == DYNTICK_IRQ_NONIDLE &&
- 		   READ_ONCE(rdp->rcu_urgent_qs) && !rdp->rcu_forced_tick) {
-+		// We get here only if we had already exited the extended
-+		// quiescent state and this was an interrupt (not an NMI).
-+		// Therefore, (1) RCU is already watching and (2) The fact
-+		// that we are in an interrupt handler and that the rcu_node
-+		// lock is an irq-disabled lock prevents self-deadlock.
-+		// So we can safely recheck under the lock.
- 		raw_spin_lock_rcu_node(rdp->mynode);
--		// Recheck under lock.
- 		if (rdp->rcu_urgent_qs && !rdp->rcu_forced_tick) {
-+			// A nohz_full CPU is in the kernel and RCU
-+			// needs a quiescent state.  Turn on the tick!
- 			rdp->rcu_forced_tick = true;
- 			tick_dep_set_cpu(rdp->cpu, TICK_DEP_BIT_RCU);
- 		}
+ #define DATA_SECTIONS ".data", ".data.rel"
+ #define TEXT_SECTIONS ".text", ".text.unlikely", ".sched.text", \
+-		".kprobes.text", ".cpuidle.text"
++		".kprobes.text", ".cpuidle.text", ".noinstr.text"
+ #define OTHER_TEXT_SECTIONS ".ref.text", ".head.text", ".spinlock.text", \
+ 		".fixup", ".entry.text", ".exception.text", ".text.*", \
+ 		".coldtext"
 
