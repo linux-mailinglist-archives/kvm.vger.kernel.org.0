@@ -2,107 +2,181 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A8DEC18D830
-	for <lists+kvm@lfdr.de>; Fri, 20 Mar 2020 20:13:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6584218D838
+	for <lists+kvm@lfdr.de>; Fri, 20 Mar 2020 20:14:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726958AbgCTTNN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Mar 2020 15:13:13 -0400
-Received: from mail-co1nam11on2055.outbound.protection.outlook.com ([40.107.220.55]:6218
-        "EHLO NAM11-CO1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726814AbgCTTNN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Mar 2020 15:13:13 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=GC1tTRhlvIYYaYF59hJ4PWVCYP4mo+hRT/pjlA284oYsvCphTX0VcSje5A/bHcAooWJFguD2V3iuMReemNZ4sDGVmqGp7tcCatd7Omhf5gzxI1nwNHkAn8GvQcx2X1G/gqGSTMrIiFwarEaaf6ztTMXvlbfyJmA59l78GzYyjnJDs/roZCRlGmcu81pkwdYajJ0a5Lo/bqjEjtXrzoxsHmjJzXaKsqzView6baN69+crJZMN2cbAxicVquh+nWXjJAlWMwY5ju0uEZB1Kxmdca899pJ0LXQmtAAiocJGi4lQyIwg++6R6KclXq3kgZUTBEh28h/O2Gwt+HN0kFo/KA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Shnng4AvX5lOhmnWKLU9C1Q4b+WEC4dXj3oLRhH8riM=;
- b=DrKM9MDlcgB3M9ToQsI91NgtYqAIHPietPcue+sta9VjQf4SCEeIo7lSWTlUN++SdtNUHS/0TyA5U7NvidvEcXF73WGE0vtBU0yL6eAnrSzTLLFLeHGrmAa2KJEbnxrxzJ8g3PxUSTcWJGTuNQoc170mEigo1YnK6Q3sh21/MIisohkbAqDijaPY6W54vVxdOrtfL9H+Xnmer3ZnTQkWjbQnnK3xAczOaRpqmAomL+blLct/zaMFdIOd3Mkcw/xdk8coGcdW6TuQ383Gj6vuX7KsgNEFB49SsRtOZ2Dx7EmOfNGopVTbAz589o8s3j6BC4fWXH1eX4oyf6hv8tZ5og==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Shnng4AvX5lOhmnWKLU9C1Q4b+WEC4dXj3oLRhH8riM=;
- b=PEvj5kKodr+PsLuZWxONSnsk3juv0OUw8+ceO7Jf+6UmUvzbXeUOGy7MYnCWqK953wxGB6ByjzgIvXB7eB/F9PaVQXMialkN/2pRgxLzzpz8pu/KRQkTE05TId35BSH0XMUakJHkk34dL1IwFyfq+pNwyF6S0OjVFZsjLKs8g/E=
-Authentication-Results: spf=none (sender IP is )
- smtp.mailfrom=brijesh.singh@amd.com; 
-Received: from CY4PR12MB1926.namprd12.prod.outlook.com (2603:10b6:903:11b::11)
- by CY4PR12MB1525.namprd12.prod.outlook.com (2603:10b6:910:11::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2835.20; Fri, 20 Mar
- 2020 19:13:09 +0000
-Received: from CY4PR12MB1926.namprd12.prod.outlook.com
- ([fe80::e5ec:63d5:a9a8:74c4]) by CY4PR12MB1926.namprd12.prod.outlook.com
- ([fe80::e5ec:63d5:a9a8:74c4%12]) with mapi id 15.20.2835.017; Fri, 20 Mar
- 2020 19:13:09 +0000
-Cc:     brijesh.singh@amd.com
-Subject: Re: [PATCH] KVM: SVM: document KVM_MEM_ENCRYPT_OP, let userspace
- detect if SEV is available
-To:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-References: <20200320174245.5220-1-pbonzini@redhat.com>
-From:   Brijesh Singh <brijesh.singh@amd.com>
-Message-ID: <e7a293bf-acbf-b69a-a082-4a2cce9701b0@amd.com>
-Date:   Fri, 20 Mar 2020 14:14:19 -0500
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:68.0)
- Gecko/20100101 Thunderbird/68.5.0
-In-Reply-To: <20200320174245.5220-1-pbonzini@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-ClientProxiedBy: SN4PR0501CA0024.namprd05.prod.outlook.com
- (2603:10b6:803:40::37) To CY4PR12MB1926.namprd12.prod.outlook.com
- (2603:10b6:903:11b::11)
+        id S1727358AbgCTTOp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Mar 2020 15:14:45 -0400
+Received: from hqnvemgate25.nvidia.com ([216.228.121.64]:16792 "EHLO
+        hqnvemgate25.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726851AbgCTTOp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Mar 2020 15:14:45 -0400
+Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate25.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+        id <B5e7515f10000>; Fri, 20 Mar 2020 12:13:53 -0700
+Received: from hqmail.nvidia.com ([172.20.161.6])
+  by hqpgpgate101.nvidia.com (PGP Universal service);
+  Fri, 20 Mar 2020 12:14:44 -0700
+X-PGP-Universal: processed;
+        by hqpgpgate101.nvidia.com on Fri, 20 Mar 2020 12:14:44 -0700
+Received: from [10.40.103.10] (10.124.1.5) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Fri, 20 Mar
+ 2020 19:14:36 +0000
+Subject: Re: [PATCH v14 Kernel 5/7] vfio iommu: Update UNMAP_DMA ioctl to get
+ dirty bitmap before unmap
+To:     Alex Williamson <alex.williamson@redhat.com>,
+        Yan Zhao <yan.y.zhao@intel.com>
+CC:     "cjia@nvidia.com" <cjia@nvidia.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "Yang, Ziye" <ziye.yang@intel.com>,
+        "Liu, Changpeng" <changpeng.liu@intel.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>,
+        "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
+        "eskultet@redhat.com" <eskultet@redhat.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "dgilbert@redhat.com" <dgilbert@redhat.com>,
+        "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>,
+        "eauger@redhat.com" <eauger@redhat.com>,
+        "aik@ozlabs.ru" <aik@ozlabs.ru>,
+        "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
+        "felipe@nutanix.com" <felipe@nutanix.com>,
+        "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@Alibaba-inc.com>,
+        "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
+        "Ken.Xue@amd.com" <Ken.Xue@amd.com>,
+        "Wang, Zhi A" <zhi.a.wang@intel.com>,
+        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+References: <1584560474-19946-1-git-send-email-kwankhede@nvidia.com>
+ <1584560474-19946-6-git-send-email-kwankhede@nvidia.com>
+ <20200320083529.GA5456@joy-OptiPlex-7040> <20200320094039.4d99408d@w520.home>
+ <20200320094727.12aba30e@w520.home>
+X-Nvconfidentiality: public
+From:   Kirti Wankhede <kwankhede@nvidia.com>
+Message-ID: <aa76ad96-394f-f1fb-2e8d-a453bd69a39b@nvidia.com>
+Date:   Sat, 21 Mar 2020 00:44:32 +0530
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from Brijeshs-MacBook-Pro.local (165.204.77.11) by SN4PR0501CA0024.namprd05.prod.outlook.com (2603:10b6:803:40::37) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2835.12 via Frontend Transport; Fri, 20 Mar 2020 19:13:08 +0000
-X-Originating-IP: [165.204.77.11]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 7668df3a-f9ee-40d1-9e80-08d7cd02ba11
-X-MS-TrafficTypeDiagnostic: CY4PR12MB1525:|CY4PR12MB1525:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <CY4PR12MB1525412092667CEDB3CDF5BCE5F50@CY4PR12MB1525.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
-X-Forefront-PRVS: 03484C0ABF
-X-Forefront-Antispam-Report: SFV:NSPM;SFS:(10009020)(4636009)(136003)(346002)(366004)(39860400002)(396003)(376002)(199004)(2906002)(36756003)(52116002)(44832011)(5660300002)(478600001)(186003)(8936002)(16526019)(6666004)(4326008)(2616005)(81156014)(31686004)(26005)(956004)(316002)(4744005)(81166006)(31696002)(86362001)(6506007)(8676002)(66946007)(53546011)(6512007)(66556008)(6486002)(66476007);DIR:OUT;SFP:1101;SCL:1;SRVR:CY4PR12MB1525;H:CY4PR12MB1926.namprd12.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;
-Received-SPF: None (protection.outlook.com: amd.com does not designate
- permitted sender hosts)
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 88ON0HfLkkNTVm61RWpiKni4qhDLtmPTuW5V6m1ikDYiKDmf+SE9j0j/xf08YTkSW41n905cvr1unnXRWl89HejSdF+rv4KS2FQNFO9o7KCX0LMLIZeADhOMmrxfLbfidv14QLdaV/H0owPu0ZCXnLBwalC5CeC08kYIM3Mv33HcS0TeMSSfCAwRhPnvQhUIgnXAkP9pIspjiKzb1L/0EEVhf7B2l5Xl/OhAg64T1djxZvCM+CiD8NEi57S4kYLnlojaeOdCHiOnCeT3Dm4ynLVWQSqrrTJj7lkFsFd4F75hnw1+jd3gT1agczFWQzzTB1i1WxBj5+b4iyuNvp7xWUekFg0cLskdi1JFdApST1rhDdXA+xIa5umsttMH1PVM4W2az1UQGOl8f9OczK8qWzu9gMY0J7SQXmOQ7ycKq3LHn9quGmBwlzart+owjY1X
-X-MS-Exchange-AntiSpam-MessageData: fGgF5qZof3t5ZFMqP6+yjgNNNbJ0DA2+iqw3pVUEIGW1S0Z8VB0Ky/BWMHPOv44Zj+aandLtwDLhlisW6hybT5ytUyQNqqi0TsQcWzqZ4CHgWEBOaYh61qtym+FZaAxntzywfSD6eIh28VUYpXTLkg==
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7668df3a-f9ee-40d1-9e80-08d7cd02ba11
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Mar 2020 19:13:09.4718
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: eb3R7EMRrXnX9rPTNASL+ou24m5eH2TSTmtdxsxaz2xXi1YWV1Apwn1UpTzzsZEXDVJb/KUH9Vc2OriLO2zP4A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR12MB1525
+In-Reply-To: <20200320094727.12aba30e@w520.home>
+X-Originating-IP: [10.124.1.5]
+X-ClientProxiedBy: HQMAIL101.nvidia.com (172.20.187.10) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1584731633; bh=528tuGcpedSGkPlvPwNWSbpIROZ1laa2lT/gg/YXaIg=;
+        h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
+         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
+         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
+         Content-Transfer-Encoding;
+        b=aP3qc34b+pO7rkgBTMV6FHVu5yDPXmMsbp0Hw6DjgWEVceR8o5u+AlzuzH8zt0PYn
+         qHVAzepjDEbp10zcQ7Uo4EY698C2XsR+9j0NmZNGkrs8fKP75cG6UBFgJWpMvHPPL2
+         dUgNJN+pHPRuM6fkbU7HArGI/eJwB+YN2cpO4QSzxWqZ4WAn96X7HL6v9qKYiutpUp
+         GEdO8oFhhe2Ml81irlM0T6vVtnzEFyFMB+FQKDuwC2s5SEjcl0ZxHrtrkbfMl2F5IZ
+         g5TP76GPTpdm4a1ML5LE7RpS0UjLlgg5U0vGUSVIbnHn029kYdGgHH6QECX3oRtBbm
+         ROCG5U1qtpABw==
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
-On 3/20/20 12:42 PM, Paolo Bonzini wrote:
-> Userspace has no way to query if SEV has been disabled with the
-> sev module parameter of kvm-amd.ko.  Actually it has one, but it
-> is a hack: do ioctl(KVM_MEM_ENCRYPT_OP, NULL) and check if it
-> returns EFAULT.  Make it a little nicer by returning zero for
-> SEV enabled and NULL argument, and while at it document the
-> ioctl arguments.
->
-> Cc: Brijesh Singh <brijesh.singh@amd.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 
-thanks
+On 3/20/2020 9:17 PM, Alex Williamson wrote:
+> On Fri, 20 Mar 2020 09:40:39 -0600
+> Alex Williamson <alex.williamson@redhat.com> wrote:
+> 
+>> On Fri, 20 Mar 2020 04:35:29 -0400
+>> Yan Zhao <yan.y.zhao@intel.com> wrote:
+>>
+>>> On Thu, Mar 19, 2020 at 03:41:12AM +0800, Kirti Wankhede wrote:
+>>>> DMA mapped pages, including those pinned by mdev vendor drivers, might
+>>>> get unpinned and unmapped while migration is active and device is still
+>>>> running. For example, in pre-copy phase while guest driver could access
+>>>> those pages, host device or vendor driver can dirty these mapped pages.
+>>>> Such pages should be marked dirty so as to maintain memory consistency
+>>>> for a user making use of dirty page tracking.
+>>>>
+>>>> To get bitmap during unmap, user should set flag
+>>>> VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP, bitmap memory should be allocated and
+>>>> zeroed by user space application. Bitmap size and page size should be set
+>>>> by user application.
+>>>>
+>>>> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+>>>> Reviewed-by: Neo Jia <cjia@nvidia.com>
+>>>> ---
+>>>>   drivers/vfio/vfio_iommu_type1.c | 55 ++++++++++++++++++++++++++++++++++++++---
+>>>>   include/uapi/linux/vfio.h       | 11 +++++++++
+>>>>   2 files changed, 62 insertions(+), 4 deletions(-)
+>>>>
+>>>> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+>>>> index d6417fb02174..aa1ac30f7854 100644
+>>>> --- a/drivers/vfio/vfio_iommu_type1.c
+>>>> +++ b/drivers/vfio/vfio_iommu_type1.c
+>>>> @@ -939,7 +939,8 @@ static int verify_bitmap_size(uint64_t npages, uint64_t bitmap_size)
+>>>>   }
+>>>>   
+>>>>   static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
+>>>> -			     struct vfio_iommu_type1_dma_unmap *unmap)
+>>>> +			     struct vfio_iommu_type1_dma_unmap *unmap,
+>>>> +			     struct vfio_bitmap *bitmap)
+>>>>   {
+>>>>   	uint64_t mask;
+>>>>   	struct vfio_dma *dma, *dma_last = NULL;
+>>>> @@ -990,6 +991,10 @@ static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
+>>>>   	 * will be returned if these conditions are not met.  The v2 interface
+>>>>   	 * will only return success and a size of zero if there were no
+>>>>   	 * mappings within the range.
+>>>> +	 *
+>>>> +	 * When VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP flag is set, unmap request
+>>>> +	 * must be for single mapping. Multiple mappings with this flag set is
+>>>> +	 * not supported.
+>>>>   	 */
+>>>>   	if (iommu->v2) {
+>>>>   		dma = vfio_find_dma(iommu, unmap->iova, 1);
+>>>> @@ -997,6 +1002,13 @@ static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
+>>>>   			ret = -EINVAL;
+>>>>   			goto unlock;
+>>>>   		}
+>>>> +
+>>>> +		if ((unmap->flags & VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP) &&
+>>>> +		    (dma->iova != unmap->iova || dma->size != unmap->size)) {
+>>> dma is probably NULL here!
+>>
+>> Yep, I didn't look closely enough there.  This is situated right
+>> between the check to make sure we're not bisecting a mapping at the
+>> start of the unmap and the check to make sure we're not bisecting a
+>> mapping at the end of the unmap.  There's no guarantee that we have a
+>> valid pointer here.  The test should be in the while() loop below this
+>> code.
+> 
+> Actually the test could remain here, we can exit here if we can't find
+> a dma at the start of the unmap range with the GET_DIRTY_BITMAP flag,
+> but we absolutely cannot deref dma without testing it.
+> 
 
-Reviewed-by: Brijesh Singh <brijesh.singh@amd.com>
+In the check above newly added check, if dma is NULL then its an error 
+condition, because Unmap requests must fully cover previous mappings, right?
 
+>>> And this restriction on UNMAP would make some UNMAP operations of vIOMMU
+>>> fail.
+>>>
+>>> e.g. below condition indeed happens in reality.
+>>> an UNMAP ioctl comes for IOVA range from 0xff800000, of size 0x200000
+>>> However, IOVAs in this range are mapped page by page.i.e., dma->size is 0x1000.
+>>>
+>>> Previous, this UNMAP ioctl could unmap successfully as a whole.
+>>
+>> What triggers this in the guest?  Note that it's only when using the
+>> GET_DIRTY_BITMAP flag that this is restricted.  Does the event you're
+>> referring to potentially occur under normal circumstances in that mode?
+>> Thanks,
+>>
 
+Such unmap would callback vfio_iommu_map_notify() in QEMU. In 
+vfio_iommu_map_notify(), unmap is called on same range <iova, 
+iotlb->addr_mask + 1> which was used for map. Secondly unmap with bitmap 
+will be called only when device state has _SAVING flag set.
+
+Thanks,
+Kirti
