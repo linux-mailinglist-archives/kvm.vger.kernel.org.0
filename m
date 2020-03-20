@@ -2,113 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1F78E18D648
-	for <lists+kvm@lfdr.de>; Fri, 20 Mar 2020 18:54:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6664018D658
+	for <lists+kvm@lfdr.de>; Fri, 20 Mar 2020 18:59:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726847AbgCTRyf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Mar 2020 13:54:35 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:54686 "EHLO
-        us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726801AbgCTRyf (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 20 Mar 2020 13:54:35 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1584726874;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=B7pBoiCHAs8bcJTkEMMi143lyjjU81buEh22ZNHuEI4=;
-        b=esef4ct7Er2s2aolX4cehy7LlAO46ei+oH6I8H4StqJuYIwiqkYLsI8zlgAzIaArHBtj+L
-        vg5lqcVJAVUUvkNGv7Wkn0qAN7BsCf2ttsh3wGUFxlfL0owszdizla0mBH4CDhJav6YNdN
-        dttrJ9REbTmt795i6b+kDfG9/24795Y=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-32-QtD8dI07Ne6GmMjWRKfgkQ-1; Fri, 20 Mar 2020 13:54:32 -0400
-X-MC-Unique: QtD8dI07Ne6GmMjWRKfgkQ-1
-Received: by mail-wm1-f70.google.com with SMTP id g26so2660047wmk.6
-        for <kvm@vger.kernel.org>; Fri, 20 Mar 2020 10:54:32 -0700 (PDT)
+        id S1727196AbgCTR7T (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Mar 2020 13:59:19 -0400
+Received: from mail-pf1-f201.google.com ([209.85.210.201]:53089 "EHLO
+        mail-pf1-f201.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726816AbgCTR7S (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Mar 2020 13:59:18 -0400
+Received: by mail-pf1-f201.google.com with SMTP id g8so5054478pfo.19
+        for <kvm@vger.kernel.org>; Fri, 20 Mar 2020 10:59:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=BFKQlA+rN199Va5nr23TqQIycC+OcxA0r1dVNGT3ndc=;
+        b=WwkwjMkfWqynU21gEP781F/xVflZE/NNYGlclPqx9ywAgFasUK5BRdkXiEO/2xQ/51
+         2Xk+I1WmJSTBxZiaAzPm3nOr365l+PvdkDSfwjOffNT14H0bSUgVbnqgzdLZBbSUtblu
+         2+q3FcoYntWBHEqeBZX0kD3P3w8IFRnrL/yzHF8z2OC5mIdPjHvKW49zgEFueK/7tqn3
+         ivhbjPu2byo3GLM7K29s3buNddcau6QtYP6Ct5Kb20HEE86ZUHq2pmykK4Zq1snArdQC
+         W2Z3eKS9C+DQ6DwdtmMUc9IVpbSyWXWGW6upL7+iaciknJSb47en+Syvht6qk55+takl
+         4yDg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=B7pBoiCHAs8bcJTkEMMi143lyjjU81buEh22ZNHuEI4=;
-        b=RqSb7GS/mRNNtTfGa5c/tlso8aNXLVR/NVRZB2P4W2nWvR/u8/odnpqElEoVRBfw5M
-         OjjiiovOqD59CCR07Hz2fAV+XfdKdlH0yV9thsTbN2FFI7hgEXiGHzjbvOFg1bikAG1X
-         JtYZfBzE3BxWaqVyNaEOeNdUwR8gPYuZ1KtxtZrRTNCXupEYmtksrizuqwKVZucuhhnp
-         wq/fhkn8xfPq6nTe1YjGqy0ld2vGqM6CtP7hxo9UVB7Rsr2HUSyP8gYPFGVieffo2VIH
-         WSeN5u7a1VmX69GQ1J+ckfnrZXcDaAwl4aJr0I5duEuJCu7PxT7thx7k4RR8waorHDEx
-         BCwg==
-X-Gm-Message-State: ANhLgQ1c4/5fXY3BfrUrCJ6eLV0OD2P/P+PAaQiUKkB6PElg4qQ1pOx6
-        6JAcygRT3oML5QtvTW2t+Juwgw4eal+tScS+aVQebMWTixKAmXVQ8bdf1SGTjcgvL0l350p4JFp
-        6dyaof1o5v/MG
-X-Received: by 2002:a7b:c005:: with SMTP id c5mr11557245wmb.170.1584726871124;
-        Fri, 20 Mar 2020 10:54:31 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vs44QQWTWk7W3M5U1BvlqlzDCUzcc3qbLd7ulidyTIpxhd4cCtMJeyFTUB5e02d20yLjGlVrA==
-X-Received: by 2002:a7b:c005:: with SMTP id c5mr11557223wmb.170.1584726870839;
-        Fri, 20 Mar 2020 10:54:30 -0700 (PDT)
-Received: from [192.168.178.58] ([151.21.15.43])
-        by smtp.gmail.com with ESMTPSA id f15sm8603592wmj.25.2020.03.20.10.54.29
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 20 Mar 2020 10:54:29 -0700 (PDT)
-Subject: Re: [PATCH] KVM: let declaration of kvm_get_running_vcpus match
- implementation
-To:     Christian Borntraeger <borntraeger@de.ibm.com>
-Cc:     KVM <kvm@vger.kernel.org>, arc Zyngier <maz@kernel.org>
-References: <20200228084941.9362-1-borntraeger@de.ibm.com>
- <8c3e2a26-c04d-338e-16c6-39bb13c715af@redhat.com>
- <758621ef-0ca1-d040-0979-c6359a3532d2@de.ibm.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <17304566-fd9c-420d-17fe-89ef822362f6@redhat.com>
-Date:   Fri, 20 Mar 2020 18:54:29 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
-MIME-Version: 1.0
-In-Reply-To: <758621ef-0ca1-d040-0979-c6359a3532d2@de.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=BFKQlA+rN199Va5nr23TqQIycC+OcxA0r1dVNGT3ndc=;
+        b=eXKVF6YlYtvCmDKFJdu0PT6vKAHn99zs66DxYmbde4e4x6uakyxktBoXm1VRwuX9gl
+         l4lMaouDF6tyvNL8OwA0bpn7H5N9CUpLKf8HBDlEiUSZlkb+eVj6Uyib+wutc27dXkrw
+         0rmNlTP152DGB1TD5fCssgshu8zOHITmt/vxK36UEfuqrZZARCNE17J7/LTDMIDHIWvJ
+         1Ya2yMTf6abf1Vqik0EAi2lRlQ0ScfuuU5UpEfcD0eEvoh2xl0BzQIcEhXAwOfOabRrh
+         QPXV2OxBXnPlyYtWp/BthzpN9x8Wk0NnpaN4qZEoIW792eyhr1M957JsSu7/gcgXxcsJ
+         piSQ==
+X-Gm-Message-State: ANhLgQ2VvD20SMHjzsY+UoI6tSmTnrKUv51WMCRufa9epo82ml3FHMig
+        uHT1QvwZ4YigiTC4Pc4VxI+adYR3Cs0D2Q==
+X-Google-Smtp-Source: ADFU+vs8Z2St3JcTr4qu4OOe01NMcgpT5FDfG+os5ZS9ricqsq1zYpSsmAAH0fUB4R4FqDOC2oN6QmtHff8a8w==
+X-Received: by 2002:a17:90a:d205:: with SMTP id o5mr10592978pju.46.1584727157226;
+ Fri, 20 Mar 2020 10:59:17 -0700 (PDT)
+Date:   Fri, 20 Mar 2020 10:59:10 -0700
+Message-Id: <20200320175910.180266-1-yonghyun@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.25.1.696.g5e7596f4ac-goog
+Subject: [PATCH] vfio-mdev: support mediated device creation in kernel
+From:   Yonghyun Hwang <yonghyun@google.com>
+To:     Kirti Wankhede <kwankhede@nvidia.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Havard Skinnemoen <hskinnemoen@google.com>,
+        Moritz Fischer <mdf@kernel.org>
+Cc:     Yonghyun Hwang <yonghyun@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 20/03/20 15:29, Christian Borntraeger wrote:
-> 
-> 
-> On 28.02.20 10:34, Paolo Bonzini wrote:
->> On 28/02/20 09:49, Christian Borntraeger wrote:
->>> Sparse notices that declaration and implementation do not match:
->>> arch/s390/kvm/../../../virt/kvm/kvm_main.c:4435:17: warning: incorrect type in return expression (different address spaces)
->>> arch/s390/kvm/../../../virt/kvm/kvm_main.c:4435:17:    expected struct kvm_vcpu [noderef] <asn:3> **
->>> arch/s390/kvm/../../../virt/kvm/kvm_main.c:4435:17:    got struct kvm_vcpu *[noderef] <asn:3> *
->>>
->>> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
->>> ---
->>>  include/linux/kvm_host.h | 2 +-
->>>  1 file changed, 1 insertion(+), 1 deletion(-)
->>>
->>> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
->>> index 7944ad6ac10b..bcb9b2ac0791 100644
->>> --- a/include/linux/kvm_host.h
->>> +++ b/include/linux/kvm_host.h
->>> @@ -1344,7 +1344,7 @@ static inline void kvm_vcpu_set_dy_eligible(struct kvm_vcpu *vcpu, bool val)
->>>  #endif /* CONFIG_HAVE_KVM_CPU_RELAX_INTERCEPT */
->>>  
->>>  struct kvm_vcpu *kvm_get_running_vcpu(void);
->>> -struct kvm_vcpu __percpu **kvm_get_running_vcpus(void);
->>> +struct kvm_vcpu * __percpu *kvm_get_running_vcpus(void);
->>>  
->>>  #ifdef CONFIG_HAVE_KVM_IRQ_BYPASS
->>>  bool kvm_arch_has_irq_bypass(void);
->>>
->>
->> Queued, thanks.
-> 
-> Ping. I cant find this in kvm/next.
-> 
+To enable a mediated device, a device driver registers its device to VFIO
+MDev framework. Once the mediated device gets enabled, UUID gets fed onto
+the sysfs attribute, "create", to create the mediated device. This
+additional step happens after boot-up gets complete. If the driver knows
+how many mediated devices need to be created during probing time, the
+additional step becomes cumbersome. This commit implements a new function
+to allow the driver to create a mediated device in kernel.
 
-It's in 5.6-rc4.
+Signed-off-by: Yonghyun Hwang <yonghyun@google.com>
+---
+ drivers/vfio/mdev/mdev_core.c | 45 +++++++++++++++++++++++++++++++++++
+ include/linux/mdev.h          |  3 +++
+ 2 files changed, 48 insertions(+)
 
-Paolo
+diff --git a/drivers/vfio/mdev/mdev_core.c b/drivers/vfio/mdev/mdev_core.c
+index b558d4cfd082..a6d32516de42 100644
+--- a/drivers/vfio/mdev/mdev_core.c
++++ b/drivers/vfio/mdev/mdev_core.c
+@@ -350,6 +350,51 @@ int mdev_device_create(struct kobject *kobj,
+ 	return ret;
+ }
+ 
++/*
++ * mdev_create_device : Create a mdev device
++ * @dev: device structure representing parent device.
++ * @uuid: uuid char string for a mdev device.
++ * @group: index to supported type groups for a mdev device.
++ *
++ * Create a mdev device in kernel.
++ * Returns a negative value on error, otherwise 0.
++ */
++int mdev_create_device(struct device *dev,
++			const char *uuid, int group)
++{
++	struct mdev_parent *parent = NULL;
++	struct mdev_type *type = NULL;
++	guid_t guid;
++	int i = 1;
++	int ret;
++
++	ret = guid_parse(uuid, &guid);
++	if (ret) {
++		dev_err(dev, "Failed to parse UUID");
++		return ret;
++	}
++
++	parent = __find_parent_device(dev);
++	if (!parent) {
++		dev_err(dev, "Failed to find parent mdev device");
++		return -ENODEV;
++	}
++
++	list_for_each_entry(type, &parent->type_list, next) {
++		if (i == group)
++			break;
++		i++;
++	}
++
++	if (!type || i != group) {
++		dev_err(dev, "Failed to find mdev device");
++		return -ENODEV;
++	}
++
++	return mdev_device_create(&type->kobj, parent->dev, &guid);
++}
++EXPORT_SYMBOL(mdev_create_device);
++
+ int mdev_device_remove(struct device *dev)
+ {
+ 	struct mdev_device *mdev, *tmp;
+diff --git a/include/linux/mdev.h b/include/linux/mdev.h
+index 0ce30ca78db0..b66f67998916 100644
+--- a/include/linux/mdev.h
++++ b/include/linux/mdev.h
+@@ -145,4 +145,7 @@ struct device *mdev_parent_dev(struct mdev_device *mdev);
+ struct device *mdev_dev(struct mdev_device *mdev);
+ struct mdev_device *mdev_from_dev(struct device *dev);
+ 
++extern int mdev_create_device(struct device *dev,
++			const char *uuid, int group_idx);
++
+ #endif /* MDEV_H */
+-- 
+2.25.1.696.g5e7596f4ac-goog
 
