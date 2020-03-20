@@ -2,170 +2,160 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E774418D349
-	for <lists+kvm@lfdr.de>; Fri, 20 Mar 2020 16:48:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0675118D38F
+	for <lists+kvm@lfdr.de>; Fri, 20 Mar 2020 17:07:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727190AbgCTPsf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Mar 2020 11:48:35 -0400
-Received: from mga12.intel.com ([192.55.52.136]:58103 "EHLO mga12.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726144AbgCTPsf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Mar 2020 11:48:35 -0400
-IronPort-SDR: UdFXWonmYTSKUWPCM15tMfqt71IV5ryomFt/WCF9/tuELBEKHbeOAQdCOPXEIjMbw8oZmyC417
- xYRzuqT2bHrA==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Mar 2020 08:48:35 -0700
-IronPort-SDR: IM65Mmj0Ap/p+aqvrO7YfQfcDwKOrQI3s/YrbUmx31ZpgRjdkYmjIImq+/Z/44oLOotIL/MFaM
- P8wJX8VR45nQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.72,285,1580803200"; 
-   d="scan'208";a="446689727"
-Received: from lkp-server01.sh.intel.com (HELO lkp-server01) ([10.239.97.150])
-  by fmsmga006.fm.intel.com with ESMTP; 20 Mar 2020 08:48:32 -0700
-Received: from kbuild by lkp-server01 with local (Exim 4.89)
-        (envelope-from <lkp@intel.com>)
-        id 1jFJsu-00058x-5m; Fri, 20 Mar 2020 23:48:32 +0800
-Date:   Fri, 20 Mar 2020 23:48:17 +0800
-From:   kbuild test robot <lkp@intel.com>
-To:     Yang Weijiang <weijiang.yang@intel.com>
-Cc:     kbuild-all@lists.01.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, sean.j.christopherson@intel.com,
-        pbonzini@redhat.com, jmattson@google.com
-Subject: Re: [PATCH v10 6/8] KVM: X86: Add userspace access interface for CET
- MSRs
-Message-ID: <202003202309.SvJfslTC%lkp@intel.com>
-References: <20200320034342.26610-7-weijiang.yang@intel.com>
+        id S1727140AbgCTQH1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Mar 2020 12:07:27 -0400
+Received: from mail-mw2nam12on2055.outbound.protection.outlook.com ([40.107.244.55]:29205
+        "EHLO NAM12-MW2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726801AbgCTQH1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Mar 2020 12:07:27 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=MsQNDax5xu1dm77EI/fB1uAQwEwFdumaxqyJznNB0V0Kd1Xyf/14YgRxUX9hwEvv+VRfZPnQkKSFkUTJaEDJGWtlTlOQ0+xdV/lmrYa1YNw/KP/s/ig+f+q9Ga3evX/dx7Jxz7ZNYeimneV21yQcLsKVVq67d9c+aLqQZaAzmOSK6IGRZbh/i3JFX1314C7dIh6rCqGge9sZZAF8h9dGrqrJRDpmfktxkrJtR5A5juqMA76ZFrtb9kwcdwUMLTReN9NqKbRWptqcnksEhkzMuF1KzpwOGs+q8Xcrfu0dYBDPAvo6gW/S1lMGg/SO9sV4cO3kHxxpd7bA2WT9F63Klw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=jcSUvjmPVj9MOMcNAcCDLYw3mDeUTIfAbz1UKrFI3qA=;
+ b=CXUtdFAONT4YDOCnvWspuWBGvJCX1ooK6cg0TZZGlTLAeCEdh6VQbUouPd+jiB1DvylaIDq881tIzile4B6VeLPMVFxLQvWDcCFzJlrryXlfCxpcLLdp69WYRvdhhuh4ynLXtNTBxI6GqlK/vnLJXtL/gDDBBhQxRG+0WhP7MkeyM1ShnUcY+O8vgRfzbUYgJ27f45im+qxOAuoXZSdjIbfp2eNb/Q23TMp6WboO+6Ev3z2rv82eG4bY2quZdjuHWaKQYEnw4U6x88IBQD89VR+544sdh7GGXytgCIrBxKUsOdlQl6Vq0HDGFBtWZd18XPJrdO9MRxi6slIqckmA/w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=jcSUvjmPVj9MOMcNAcCDLYw3mDeUTIfAbz1UKrFI3qA=;
+ b=aFVwLwZL946gHVMubM14TXpiE0auflm190KFCRw7Hq6lXgDzvigS5fV6Ah25I3NBvQ1gWH1wENRphkqac5IxjHgIjuC99ewBUYQTN57Ck9MvqEOPGvuats1Tuil3DtdQC/ropLOM3EH3btTHkSqwsp7EkLwV16IFUXxXiMGvnVQ=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=Thomas.Lendacky@amd.com; 
+Received: from DM6PR12MB3163.namprd12.prod.outlook.com (2603:10b6:5:15e::26)
+ by DM6PR12MB4467.namprd12.prod.outlook.com (2603:10b6:5:2a8::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2835.19; Fri, 20 Mar
+ 2020 16:07:22 +0000
+Received: from DM6PR12MB3163.namprd12.prod.outlook.com
+ ([fe80::f0f9:a88f:f840:2733]) by DM6PR12MB3163.namprd12.prod.outlook.com
+ ([fe80::f0f9:a88f:f840:2733%7]) with mapi id 15.20.2814.025; Fri, 20 Mar 2020
+ 16:07:22 +0000
+From:   Tom Lendacky <thomas.lendacky@amd.com>
+To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        David Rientjes <rientjes@google.com>
+Subject: [PATCH] KVM: SVM: Issue WBINVD after deactivating an SEV guest
+Date:   Fri, 20 Mar 2020 11:07:07 -0500
+Message-Id: <c8bf9087ca3711c5770bdeaafa3e45b717dc5ef4.1584720426.git.thomas.lendacky@amd.com>
+X-Mailer: git-send-email 2.17.1
+Content-Type: text/plain
+X-ClientProxiedBy: DM6PR14CA0045.namprd14.prod.outlook.com
+ (2603:10b6:5:18f::22) To DM6PR12MB3163.namprd12.prod.outlook.com
+ (2603:10b6:5:15e::26)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200320034342.26610-7-weijiang.yang@intel.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from tlendack-t1.amd.com (165.204.77.1) by DM6PR14CA0045.namprd14.prod.outlook.com (2603:10b6:5:18f::22) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2835.19 via Frontend Transport; Fri, 20 Mar 2020 16:07:21 +0000
+X-Mailer: git-send-email 2.17.1
+X-Originating-IP: [165.204.77.1]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: 5038347a-264c-4821-946f-08d7cce8c5ad
+X-MS-TrafficTypeDiagnostic: DM6PR12MB4467:|DM6PR12MB4467:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <DM6PR12MB44679A0E04C7E1D40649C7DDECF50@DM6PR12MB4467.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:6430;
+X-Forefront-PRVS: 03484C0ABF
+X-Forefront-Antispam-Report: SFV:NSPM;SFS:(10009020)(4636009)(396003)(376002)(366004)(39860400002)(136003)(346002)(199004)(956004)(81156014)(16526019)(86362001)(4326008)(8676002)(2906002)(81166006)(186003)(52116002)(26005)(7696005)(6486002)(54906003)(478600001)(8936002)(316002)(2616005)(5660300002)(66946007)(36756003)(66556008)(66476007)(6666004)(136400200001);DIR:OUT;SFP:1101;SCL:1;SRVR:DM6PR12MB4467;H:DM6PR12MB3163.namprd12.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;
+Received-SPF: None (protection.outlook.com: amd.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: U9TykCzCiLrtdeeZPaZ0/b5Uoq3UmF/uQvCMZ9WWCswDO0hO6UHj/Xt/gYcf+beOsQNnFXb6fVnyx+Y/stw/JwKRkEi2xH9guO2mifnnXjBN0hvA5nzDAOc54rqcY6+nxMO8HTU1PazVafKAvgPnqqw3gLn+H0pH02O0rhoCh6HhJv6uyJm0VJku3JXc5+uipdUznConzXlEEGSBsjdb/FxJXo+oP8dZN3TXNBWapam0hrybawrNjoYA1u/JKknwseTWrY3sLygNsAa5LCMnYe6Vi5j+5e5n9Dev22tjySbsxXcsbZ++wn7g3iU2A0BYRoTqerP9LKrvHGzVgqNISaO9ov1+d5Y2FyiETv0yIoV0I861j/dzUNtE/ywSJL8oU7LbZGrg5jyRzQdK6cjo7KFtTYT8LJGBdnRFfa2Op1sBAdBwx9WgA2TJ+3/JEhOsBG/RIkQ9EDqrFuEg6UeVd7lNNoUEcVS9HDFMVFGA+FdlEySDCKxv0OKJnzKpa1/j
+X-MS-Exchange-AntiSpam-MessageData: ndNwna2iAeNBTdImWrM/PBzUDDArBm/RhqgADL7/vAMpnrj6ETEQtOvS3jdFIWDuqW9XB1Nt7EHfxFlXWGRi/smWGlCAnD+vXrDd1qZyx7L0WJT+8bzu/vvr8HO+Cdjxz0tdu+AoZq3vEda8eAol6Q==
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5038347a-264c-4821-946f-08d7cce8c5ad
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Mar 2020 16:07:21.9939
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 5eN2YB/iNTM327zoNYjYHXVGywiwZJtow16YYW1PyZHDyNJtvwN6hVURwGEgUSPUVDBhHw2yVgatvSQdJBYuiw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4467
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Yang,
+Currently, CLFLUSH is used to flush SEV guest memory before the guest is
+terminated (or a memory hotplug region is removed). However, CLFLUSH is
+not enough to ensure that SEV guest tagged data is flushed from the cache.
 
-Thank you for the patch! Perhaps something to improve:
+With 33af3a7ef9e6 ("KVM: SVM: Reduce WBINVD/DF_FLUSH invocations"), the
+original WBINVD was removed. This then exposed crashes at random times
+because of a cache flush race with a page that had both a hypervisor and
+a guest tag in the cache.
 
-[auto build test WARNING on kvm/linux-next]
-[also build test WARNING on next-20200319]
-[cannot apply to vhost/linux-next tip/auto-latest linux/master linus/master v5.6-rc6]
-[if your patch is applied to the wrong git tree, please drop us a note to help
-improve the system. BTW, we also suggest to use '--base' option to specify the
-base tree in git format-patch, please see https://stackoverflow.com/a/37406982]
+Restore the WBINVD when destroying an SEV guest and add a WBINVD to the
+svm_unregister_enc_region() function to ensure hotplug memory is flushed
+when removed. The DF_FLUSH can still be avoided at this point.
 
-url:    https://github.com/0day-ci/linux/commits/Yang-Weijiang/Introduce-support-for-guest-CET-feature/20200320-155517
-base:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git linux-next
-reproduce:
-        # apt-get install sparse
-        # sparse version: v0.6.1-181-g83789bbc-dirty
-        make ARCH=x86_64 allmodconfig
-        make C=1 CF='-fdiagnostic-prefix -D__CHECK_ENDIAN__'
-
-If you fix the issue, kindly add following tag
-Reported-by: kbuild test robot <lkp@intel.com>
-
-
-sparse warnings: (new ones prefixed by >>)
-
-   arch/x86/kvm/x86.c:809:60: sparse: sparse: undefined identifier 'X86_CR4_CET'
-   arch/x86/kvm/x86.c:1233:23: sparse: sparse: undefined identifier 'MSR_IA32_U_CET'
-   arch/x86/kvm/x86.c:1233:39: sparse: sparse: undefined identifier 'MSR_IA32_S_CET'
-   arch/x86/kvm/x86.c:1234:9: sparse: sparse: undefined identifier 'MSR_IA32_PL0_SSP'
-   arch/x86/kvm/x86.c:1234:27: sparse: sparse: undefined identifier 'MSR_IA32_PL1_SSP'
-   arch/x86/kvm/x86.c:1234:45: sparse: sparse: undefined identifier 'MSR_IA32_PL2_SSP'
-   arch/x86/kvm/x86.c:1235:9: sparse: sparse: undefined identifier 'MSR_IA32_PL3_SSP'
-   arch/x86/kvm/x86.c:1235:27: sparse: sparse: undefined identifier 'MSR_IA32_INT_SSP_TAB'
-   arch/x86/kvm/x86.c:1512:14: sparse: sparse: undefined identifier 'MSR_IA32_PL0_SSP'
-   arch/x86/kvm/x86.c:1512:35: sparse: sparse: undefined identifier 'MSR_IA32_PL3_SSP'
-   arch/x86/kvm/x86.c:1513:14: sparse: sparse: undefined identifier 'MSR_IA32_U_CET'
-   arch/x86/kvm/x86.c:1514:14: sparse: sparse: undefined identifier 'MSR_IA32_S_CET'
-   arch/x86/kvm/x86.c:1515:14: sparse: sparse: undefined identifier 'MSR_IA32_INT_SSP_TAB'
->> arch/x86/kvm/x86.c:1512:14: sparse: sparse: incompatible types for 'case' statement
-   arch/x86/kvm/x86.c:1512:35: sparse: sparse: incompatible types for 'case' statement
-   arch/x86/kvm/x86.c:1513:14: sparse: sparse: incompatible types for 'case' statement
-   arch/x86/kvm/x86.c:1514:14: sparse: sparse: incompatible types for 'case' statement
-   arch/x86/kvm/x86.c:1515:14: sparse: sparse: incompatible types for 'case' statement
-   arch/x86/kvm/x86.c:2646:38: sparse: sparse: incorrect type in argument 1 (different address spaces) @@    expected void const [noderef] <asn:1> * @@    got  const [noderef] <asn:1> * @@
-   arch/x86/kvm/x86.c:2646:38: sparse:    expected void const [noderef] <asn:1> *
-   arch/x86/kvm/x86.c:2646:38: sparse:    got unsigned char [usertype] *
-   arch/x86/kvm/x86.c:3267:25: sparse: sparse: undefined identifier 'MSR_IA32_U_CET'
-   arch/x86/kvm/x86.c:7549:15: sparse: sparse: incompatible types in comparison expression (different address spaces):
-   arch/x86/kvm/x86.c:7549:15: sparse:    struct kvm_apic_map [noderef] <asn:4> *
-   arch/x86/kvm/x86.c:7549:15: sparse:    struct kvm_apic_map *
-   arch/x86/kvm/x86.c:9678:44: sparse: sparse: undefined identifier 'XFEATURE_MASK_CET_USER'
-   arch/x86/kvm/x86.c:9678:44: sparse: sparse: undefined identifier 'XFEATURE_MASK_CET_KERNEL'
-   arch/x86/kvm/x86.c:9912:16: sparse: sparse: incompatible types in comparison expression (different address spaces):
-   arch/x86/kvm/x86.c:9912:16: sparse:    struct kvm_apic_map [noderef] <asn:4> *
-   arch/x86/kvm/x86.c:9912:16: sparse:    struct kvm_apic_map *
-   arch/x86/kvm/x86.c:9913:15: sparse: sparse: incompatible types in comparison expression (different address spaces):
-   arch/x86/kvm/x86.c:9913:15: sparse:    struct kvm_pmu_event_filter [noderef] <asn:4> *
-   arch/x86/kvm/x86.c:9913:15: sparse:    struct kvm_pmu_event_filter *
-   arch/x86/kvm/x86.c:1512:14: sparse: sparse: Expected constant expression in case statement
-   arch/x86/kvm/x86.c:1512:35: sparse: sparse: Expected constant expression in case statement
-   arch/x86/kvm/x86.c:1513:14: sparse: sparse: Expected constant expression in case statement
-   arch/x86/kvm/x86.c:1514:14: sparse: sparse: Expected constant expression in case statement
-   arch/x86/kvm/x86.c:1515:14: sparse: sparse: Expected constant expression in case statement
-
-vim +/case +1512 arch/x86/kvm/x86.c
-
-  1475	
-  1476	/*
-  1477	 * Write @data into the MSR specified by @index.  Select MSR specific fault
-  1478	 * checks are bypassed if @host_initiated is %true.
-  1479	 * Returns 0 on success, non-0 otherwise.
-  1480	 * Assumes vcpu_load() was already called.
-  1481	 */
-  1482	static int __kvm_set_msr(struct kvm_vcpu *vcpu, u32 index, u64 data,
-  1483				 bool host_initiated)
-  1484	{
-  1485		struct msr_data msr;
-  1486	
-  1487		switch (index) {
-  1488		case MSR_FS_BASE:
-  1489		case MSR_GS_BASE:
-  1490		case MSR_KERNEL_GS_BASE:
-  1491		case MSR_CSTAR:
-  1492		case MSR_LSTAR:
-  1493			if (is_noncanonical_address(data, vcpu))
-  1494				return 1;
-  1495			break;
-  1496		case MSR_IA32_SYSENTER_EIP:
-  1497		case MSR_IA32_SYSENTER_ESP:
-  1498			/*
-  1499			 * IA32_SYSENTER_ESP and IA32_SYSENTER_EIP cause #GP if
-  1500			 * non-canonical address is written on Intel but not on
-  1501			 * AMD (which ignores the top 32-bits, because it does
-  1502			 * not implement 64-bit SYSENTER).
-  1503			 *
-  1504			 * 64-bit code should hence be able to write a non-canonical
-  1505			 * value on AMD.  Making the address canonical ensures that
-  1506			 * vmentry does not fail on Intel after writing a non-canonical
-  1507			 * value, and that something deterministic happens if the guest
-  1508			 * invokes 64-bit SYSENTER.
-  1509			 */
-  1510			data = get_canonical(data, vcpu_virt_addr_bits(vcpu));
-  1511			break;
-> 1512		case MSR_IA32_PL0_SSP ... MSR_IA32_PL3_SSP:
-  1513		case MSR_IA32_U_CET:
-  1514		case MSR_IA32_S_CET:
-  1515		case MSR_IA32_INT_SSP_TAB:
-  1516			if (is_noncanonical_address(data, vcpu))
-  1517				return 1;
-  1518		}
-  1519	
-  1520		msr.data = data;
-  1521		msr.index = index;
-  1522		msr.host_initiated = host_initiated;
-  1523	
-  1524		return kvm_x86_ops->set_msr(vcpu, &msr);
-  1525	}
-  1526	
-
+Fixes: 33af3a7ef9e6 ("KVM: SVM: Reduce WBINVD/DF_FLUSH invocations")
+Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
 ---
-0-DAY CI Kernel Test Service, Intel Corporation
-https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
+ arch/x86/kvm/svm.c | 22 ++++++++++++++--------
+ 1 file changed, 14 insertions(+), 8 deletions(-)
+
+diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
+index 08568ae9f7a1..d54cdca9c140 100644
+--- a/arch/x86/kvm/svm.c
++++ b/arch/x86/kvm/svm.c
+@@ -1980,14 +1980,6 @@ static void sev_clflush_pages(struct page *pages[], unsigned long npages)
+ static void __unregister_enc_region_locked(struct kvm *kvm,
+ 					   struct enc_region *region)
+ {
+-	/*
+-	 * The guest may change the memory encryption attribute from C=0 -> C=1
+-	 * or vice versa for this memory range. Lets make sure caches are
+-	 * flushed to ensure that guest data gets written into memory with
+-	 * correct C-bit.
+-	 */
+-	sev_clflush_pages(region->pages, region->npages);
+-
+ 	sev_unpin_memory(kvm, region->pages, region->npages);
+ 	list_del(&region->list);
+ 	kfree(region);
+@@ -2004,6 +1996,13 @@ static void sev_vm_destroy(struct kvm *kvm)
+ 
+ 	mutex_lock(&kvm->lock);
+ 
++	/*
++	 * Ensure that all guest tagged cache entries are flushed before
++	 * releasing the pages back to the system for use. CLFLUSH will
++	 * not do this, so issue a WBINVD.
++	 */
++	wbinvd_on_all_cpus();
++
+ 	/*
+ 	 * if userspace was terminated before unregistering the memory regions
+ 	 * then lets unpin all the registered memory.
+@@ -7247,6 +7246,13 @@ static int svm_unregister_enc_region(struct kvm *kvm,
+ 		goto failed;
+ 	}
+ 
++	/*
++	 * Ensure that all guest tagged cache entries are flushed before
++	 * releasing the pages back to the system for use. CLFLUSH will
++	 * not do this, so issue a WBINVD.
++	 */
++	wbinvd_on_all_cpus();
++
+ 	__unregister_enc_region_locked(kvm, region);
+ 
+ 	mutex_unlock(&kvm->lock);
+-- 
+2.17.1
+
