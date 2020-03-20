@@ -2,110 +2,148 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2D4E018D7AD
-	for <lists+kvm@lfdr.de>; Fri, 20 Mar 2020 19:51:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 34BE418D712
+	for <lists+kvm@lfdr.de>; Fri, 20 Mar 2020 19:34:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726953AbgCTSvD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Mar 2020 14:51:03 -0400
-Received: from mail.kernel.org ([198.145.29.99]:44758 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725446AbgCTSvC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Mar 2020 14:51:02 -0400
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        id S1727148AbgCTSed (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Mar 2020 14:34:33 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:25243 "EHLO
+        us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726783AbgCTSec (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 20 Mar 2020 14:34:32 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1584729272;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=y0Np0CarGBUbN7siKQ/jnSvkwfPUS2q7/dKzjlzIzSk=;
+        b=ZicfqZHk+TlxbNQOrRNQzsTgqZNOSC1PgPpKYsyI1jmmnzlPjVd5viN7xDGCr76SJT4M0d
+        eCqyTiqphIue4HUlTlibtnu9ON137wHBe2eMAn7yuU4SRY2xRcrHKmxgH5CUxOpdIc7E3L
+        xd72LPMiwnT9D0iic7G7kw3RhkjqXpA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-429-A2lGiqZvP1aGsscMkHDWpQ-1; Fri, 20 Mar 2020 14:34:28 -0400
+X-MC-Unique: A2lGiqZvP1aGsscMkHDWpQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 45E4020775;
-        Fri, 20 Mar 2020 18:51:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1584730262;
-        bh=5HBp55Qd0ZlDS4O1ANEKvvb5uWfigs52A8nGgoRcatg=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=jUkC9TuKpkImJWmjzw3wTwnRfi5RRCk40sjhLFhKBMHqB+k8MK9u8JxqmSh38Moye
-         S2a8q2qWH9agwUwTGBZw1W+N23guJfuODPPbgqyqWysSLtPtkbe2om/FYFhjf6Kvxs
-         KmRH5r67MOT1VjVphVsoH+XcbM3VGJNgyHcAPx/Y=
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
-        by disco-boy.misterjones.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <maz@kernel.org>)
-        id 1jFMKC-00EKAx-Fl; Fri, 20 Mar 2020 18:24:52 +0000
-From:   Marc Zyngier <maz@kernel.org>
-To:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
-        Jason Cooper <jason@lakedaemon.net>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [PATCH v6 23/23] KVM: arm64: GICv4.1: Expose HW-based SGIs in debugfs
-Date:   Fri, 20 Mar 2020 18:24:06 +0000
-Message-Id: <20200320182406.23465-24-maz@kernel.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200320182406.23465-1-maz@kernel.org>
-References: <20200320182406.23465-1-maz@kernel.org>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C0CFF101FC64;
+        Fri, 20 Mar 2020 18:34:26 +0000 (UTC)
+Received: from w520.home (ovpn-112-162.phx2.redhat.com [10.3.112.162])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 4A2A45C3FD;
+        Fri, 20 Mar 2020 18:34:26 +0000 (UTC)
+Date:   Fri, 20 Mar 2020 12:34:25 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Yonghyun Hwang <yonghyun@google.com>
+Cc:     Kirti Wankhede <kwankhede@nvidia.com>,
+        Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Havard Skinnemoen <hskinnemoen@google.com>,
+        Moritz Fischer <mdf@kernel.org>
+Subject: Re: [PATCH] vfio-mdev: support mediated device creation in kernel
+Message-ID: <20200320123425.49c6568e@w520.home>
+In-Reply-To: <20200320175910.180266-1-yonghyun@google.com>
+References: <20200320175910.180266-1-yonghyun@google.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, lorenzo.pieralisi@arm.com, jason@lakedaemon.net, tglx@linutronix.de, yuzenghui@huawei.com, eric.auger@redhat.com, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The vgic-state debugfs file could do with showing the pending state
-of the HW-backed SGIs. Plug it into the low-level code.
+On Fri, 20 Mar 2020 10:59:10 -0700
+Yonghyun Hwang <yonghyun@google.com> wrote:
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
-Reviewed-by: Zenghui Yu <yuzenghui@huawei.com>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
-Link: https://lore.kernel.org/r/20200304203330.4967-24-maz@kernel.org
----
- virt/kvm/arm/vgic/vgic-debug.c | 14 +++++++++++++-
- 1 file changed, 13 insertions(+), 1 deletion(-)
+> To enable a mediated device, a device driver registers its device to VFIO
+> MDev framework. Once the mediated device gets enabled, UUID gets fed onto
+> the sysfs attribute, "create", to create the mediated device. This
+> additional step happens after boot-up gets complete. If the driver knows
+> how many mediated devices need to be created during probing time, the
+> additional step becomes cumbersome. This commit implements a new function
+> to allow the driver to create a mediated device in kernel.
 
-diff --git a/virt/kvm/arm/vgic/vgic-debug.c b/virt/kvm/arm/vgic/vgic-debug.c
-index cc12fe9b2df3..b13a9e3f99dd 100644
---- a/virt/kvm/arm/vgic/vgic-debug.c
-+++ b/virt/kvm/arm/vgic/vgic-debug.c
-@@ -178,6 +178,8 @@ static void print_irq_state(struct seq_file *s, struct vgic_irq *irq,
- 			    struct kvm_vcpu *vcpu)
- {
- 	char *type;
-+	bool pending;
-+
- 	if (irq->intid < VGIC_NR_SGIS)
- 		type = "SGI";
- 	else if (irq->intid < VGIC_NR_PRIVATE_IRQS)
-@@ -190,6 +192,16 @@ static void print_irq_state(struct seq_file *s, struct vgic_irq *irq,
- 	if (irq->intid ==0 || irq->intid == VGIC_NR_PRIVATE_IRQS)
- 		print_header(s, irq, vcpu);
+But pre-creating mdev devices seems like a policy decision.  Why can't
+userspace make such a policy decision, and do so with persistent uuids,
+via something like mdevctl?  Thanks,
+
+Alex
+
  
-+	pending = irq->pending_latch;
-+	if (irq->hw && vgic_irq_is_sgi(irq->intid)) {
-+		int err;
-+
-+		err = irq_get_irqchip_state(irq->host_irq,
-+					    IRQCHIP_STATE_PENDING,
-+					    &pending);
-+		WARN_ON_ONCE(err);
-+	}
-+
- 	seq_printf(s, "       %s %4d "
- 		      "    %2d "
- 		      "%d%d%d%d%d%d%d "
-@@ -201,7 +213,7 @@ static void print_irq_state(struct seq_file *s, struct vgic_irq *irq,
- 		      "\n",
- 			type, irq->intid,
- 			(irq->target_vcpu) ? irq->target_vcpu->vcpu_id : -1,
--			irq->pending_latch,
-+			pending,
- 			irq->line_level,
- 			irq->active,
- 			irq->enabled,
--- 
-2.20.1
+> Signed-off-by: Yonghyun Hwang <yonghyun@google.com>
+> ---
+>  drivers/vfio/mdev/mdev_core.c | 45 +++++++++++++++++++++++++++++++++++
+>  include/linux/mdev.h          |  3 +++
+>  2 files changed, 48 insertions(+)
+> 
+> diff --git a/drivers/vfio/mdev/mdev_core.c b/drivers/vfio/mdev/mdev_core.c
+> index b558d4cfd082..a6d32516de42 100644
+> --- a/drivers/vfio/mdev/mdev_core.c
+> +++ b/drivers/vfio/mdev/mdev_core.c
+> @@ -350,6 +350,51 @@ int mdev_device_create(struct kobject *kobj,
+>  	return ret;
+>  }
+>  
+> +/*
+> + * mdev_create_device : Create a mdev device
+> + * @dev: device structure representing parent device.
+> + * @uuid: uuid char string for a mdev device.
+> + * @group: index to supported type groups for a mdev device.
+> + *
+> + * Create a mdev device in kernel.
+> + * Returns a negative value on error, otherwise 0.
+> + */
+> +int mdev_create_device(struct device *dev,
+> +			const char *uuid, int group)
+> +{
+> +	struct mdev_parent *parent = NULL;
+> +	struct mdev_type *type = NULL;
+> +	guid_t guid;
+> +	int i = 1;
+> +	int ret;
+> +
+> +	ret = guid_parse(uuid, &guid);
+> +	if (ret) {
+> +		dev_err(dev, "Failed to parse UUID");
+> +		return ret;
+> +	}
+> +
+> +	parent = __find_parent_device(dev);
+> +	if (!parent) {
+> +		dev_err(dev, "Failed to find parent mdev device");
+> +		return -ENODEV;
+> +	}
+> +
+> +	list_for_each_entry(type, &parent->type_list, next) {
+> +		if (i == group)
+> +			break;
+> +		i++;
+> +	}
+> +
+> +	if (!type || i != group) {
+> +		dev_err(dev, "Failed to find mdev device");
+> +		return -ENODEV;
+> +	}
+> +
+> +	return mdev_device_create(&type->kobj, parent->dev, &guid);
+> +}
+> +EXPORT_SYMBOL(mdev_create_device);
+> +
+>  int mdev_device_remove(struct device *dev)
+>  {
+>  	struct mdev_device *mdev, *tmp;
+> diff --git a/include/linux/mdev.h b/include/linux/mdev.h
+> index 0ce30ca78db0..b66f67998916 100644
+> --- a/include/linux/mdev.h
+> +++ b/include/linux/mdev.h
+> @@ -145,4 +145,7 @@ struct device *mdev_parent_dev(struct mdev_device *mdev);
+>  struct device *mdev_dev(struct mdev_device *mdev);
+>  struct mdev_device *mdev_from_dev(struct device *dev);
+>  
+> +extern int mdev_create_device(struct device *dev,
+> +			const char *uuid, int group_idx);
+> +
+>  #endif /* MDEV_H */
 
