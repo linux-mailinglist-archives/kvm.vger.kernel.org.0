@@ -2,100 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 464D218C996
-	for <lists+kvm@lfdr.de>; Fri, 20 Mar 2020 10:09:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B8E8618C9D9
+	for <lists+kvm@lfdr.de>; Fri, 20 Mar 2020 10:14:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726838AbgCTJJh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Mar 2020 05:09:37 -0400
-Received: from mail.kernel.org ([198.145.29.99]:34352 "EHLO mail.kernel.org"
+        id S1727372AbgCTJOx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Mar 2020 05:14:53 -0400
+Received: from foss.arm.com ([217.140.110.172]:46286 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726527AbgCTJJh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Mar 2020 05:09:37 -0400
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id E871A20752;
-        Fri, 20 Mar 2020 09:09:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1584695377;
-        bh=lKTpTlYWFEgvmkW6XkcldhhG5+woVU4cLcAGikERfqo=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=wqxswQOYA6BABIMXoM2nOSVgWJ47cTHAzkq5NO+OYTws4zesQC/Bq4/lMrY5xYdT3
-         LLMxbcIFzNwWU+tjzVGlaWY8W7/DyefzA7Y7u6Z+ryCAs80UEFGKtPql/c5ERxj9ZT
-         Yf7rVSM+Zww6zuKaVgksoCp+gttl1NC23l6B3Fpc=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
-        by disco-boy.misterjones.org with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.92)
-        (envelope-from <maz@kernel.org>)
-        id 1jFDep-00EBy9-8B; Fri, 20 Mar 2020 09:09:35 +0000
+        id S1727368AbgCTJOv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Mar 2020 05:14:51 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id F326830E;
+        Fri, 20 Mar 2020 02:14:50 -0700 (PDT)
+Received: from [192.168.0.106] (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EB82B3F305;
+        Fri, 20 Mar 2020 02:14:49 -0700 (PDT)
+Subject: Re: [PATCH kvmtool v3] Add emulation for CFI compatible flash memory
+To:     Will Deacon <will@kernel.org>,
+        Andre Przywara <andre.przywara@arm.com>
+Cc:     Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Raphael Gault <raphael.gault@arm.com>,
+        Sami Mujawar <sami.mujawar@arm.com>,
+        kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
+        kvm@vger.kernel.org
+References: <20200221165532.90618-1-andre.przywara@arm.com>
+ <20200318215847.GC8477@willie-the-truck>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <1a9578a8-8907-94f6-0f8f-ad8ff08b5028@arm.com>
+Date:   Fri, 20 Mar 2020 09:15:11 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
+In-Reply-To: <20200318215847.GC8477@willie-the-truck>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Date:   Fri, 20 Mar 2020 09:09:35 +0000
-From:   Marc Zyngier <maz@kernel.org>
-To:     Zenghui Yu <yuzenghui@huawei.com>
-Cc:     Auger Eric <eric.auger@redhat.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
-        Jason Cooper <jason@lakedaemon.net>,
-        Robert Richter <rrichter@marvell.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: Re: [PATCH v5 23/23] KVM: arm64: GICv4.1: Expose HW-based SGIs in
- debugfs
-In-Reply-To: <e1a1e537-9f8e-5cfb-0132-f796e8bf06c9@huawei.com>
-References: <20200304203330.4967-1-maz@kernel.org>
- <20200304203330.4967-24-maz@kernel.org>
- <4cb4c3d4-7b02-bb77-cd7a-c185346b6a2f@redhat.com>
- <45c282bddd43420024633943c1befac3@kernel.org>
- <e1a1e537-9f8e-5cfb-0132-f796e8bf06c9@huawei.com>
-Message-ID: <b63950513f519d9a04f9719f5aa6a2db@kernel.org>
-X-Sender: maz@kernel.org
-User-Agent: Roundcube Webmail/1.3.10
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: yuzenghui@huawei.com, eric.auger@redhat.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, lorenzo.pieralisi@arm.com, jason@lakedaemon.net, rrichter@marvell.com, tglx@linutronix.de, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Language: en-US
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Zenghui,
+Hi Will,
 
-On 2020-03-20 04:38, Zenghui Yu wrote:
-> Hi Marc,
-> 
-> On 2020/3/19 23:21, Marc Zyngier wrote:
->> With GICv4.1, you can introspect the HW state for SGIs. You can also
->> look at the vLPI state by peeking at the virtual pending table, but
->> you'd need to unmap the VPE first,
-> 
-> Out of curiosity, could you please point me to the "unmap the VPE"
-> requirement in the v4.1 spec? I'd like to have a look.
+On 3/18/20 9:58 PM, Will Deacon wrote:
 
-Sure. See IHI0069F, 5.3.19 (VMAPP GICv4.1), "Caching of virtual LPI data
-structures", and the bit that says:
+> On Fri, Feb 21, 2020 at 04:55:32PM +0000, Andre Przywara wrote:
+>> From: Raphael Gault <raphael.gault@arm.com>
+>>
+>> The EDK II UEFI firmware implementation requires some storage for the EFI
+>> variables, which is typically some flash storage.
+>> Since this is already supported on the EDK II side, we add a CFI flash
+>> emulation to kvmtool.
+>> This is backed by a file, specified via the --flash or -F command line
+>> option. Any flash writes done by the guest will immediately be reflected
+>> into this file (kvmtool mmap's the file).
+>> The flash will be limited to the nearest power-of-2 size, so only the
+>> first 2 MB of a 3 MB file will be used.
+>>
+>> This implements a CFI flash using the "Intel/Sharp extended command
+>> set", as specified in:
+>> - JEDEC JESD68.01
+>> - JEDEC JEP137B
+>> - Intel Application Note 646
+>> Some gaps in those specs have been filled by looking at real devices and
+>> other implementations (QEMU, Linux kernel driver).
+>>
+>> At the moment this relies on DT to advertise the base address of the
+>> flash memory (mapped into the MMIO address space) and is only enabled
+>> for ARM/ARM64. The emulation itself is architecture agnostic, though.
+>>
+>> This is one missing piece toward a working UEFI boot with kvmtool on
+>> ARM guests, the other is to provide writable PCI BARs, which is WIP.
+>>
+>> Signed-off-by: Raphael Gault <raphael.gault@arm.com>
+>> [Andre: rewriting and fixing]
+>> Signed-off-by: Andre Przywra <andre.przywara@arm.com>
+>> ---
+>> Hi,
+>>
+>> an update fixing Alexandru's review comments (many thanks for those!)
+>> The biggest change code-wise is the split of the MMIO handler into three
+>> different functions. Another significant change is the rounding *down* of
+>> the present flash file size to the nearest power-of-two, to match flash
+>> hardware chips and Linux' expectations.
+> Alexandru -- are you happy with this now?
 
-"A VMAPP with {V,Alloc}=={0,1} cleans and invalidates any caching of the
-Virtual Pending Table and Virtual Configuration Table associated with 
-the
-vPEID held in the GIC"
+I really appreciate taking the time to look at it, but at the moment I'm busy
+testing v3 of the reassignable BARs and PCIE support [1]. I'll try to send the
+patches as soon as possible, then I'll review this patch.
 
-which is what was crucially missing from the GICv4.0 spec (it doesn't 
-say
-when the GIC is done writing to memory).
-
-Side note: it'd be good to know what the rules are for your own GICv4
-implementations, so that we can at least make sure the current code is 
-safe.
+[1] https://www.spinics.net/lists/kvm/msg204878.html
 
 Thanks,
-
-         M.
--- 
-Jazz is not dead. It just smells funny...
+Alex
+>
+> Will
