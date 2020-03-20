@@ -2,108 +2,190 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 667FB18D394
-	for <lists+kvm@lfdr.de>; Fri, 20 Mar 2020 17:08:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D5C5118D398
+	for <lists+kvm@lfdr.de>; Fri, 20 Mar 2020 17:09:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727148AbgCTQIw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Mar 2020 12:08:52 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:47032 "EHLO
+        id S1727417AbgCTQJy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Mar 2020 12:09:54 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:32838 "EHLO
         us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726840AbgCTQIv (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 20 Mar 2020 12:08:51 -0400
+        by vger.kernel.org with ESMTP id S1727092AbgCTQJy (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 20 Mar 2020 12:09:54 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1584720530;
+        s=mimecast20190719; t=1584720592;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=R+2BZLljduDR4gY9kJvfaxoG77rg51FKrPLFzBeLubM=;
-        b=KZhx8odyDLqY/cCqwW445AjCK9R7MnjzROOB/V0psd2U1rzrG9On1cjxWYvk0XxfNvipyH
-        VU/06jYO9lk8oUgJ8nDs/uVqaMi5FHx3Xo70bwfbx5SmfpnSYgJHpUhRtlH/EM0koWv/vR
-        GKBNP05f/YrFQmsPS/iVxtwONL+u46s=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-452-Hzfp_iVnOSGZJHG0uhihkA-1; Fri, 20 Mar 2020 12:08:48 -0400
-X-MC-Unique: Hzfp_iVnOSGZJHG0uhihkA-1
-Received: by mail-wm1-f70.google.com with SMTP id n188so1974045wmf.0
-        for <kvm@vger.kernel.org>; Fri, 20 Mar 2020 09:08:48 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=R+2BZLljduDR4gY9kJvfaxoG77rg51FKrPLFzBeLubM=;
-        b=V+Khie4Bi2Cx1PpVd6FyIWinwfeKUTUzq0GXjduwFrflPS5I17+33hYMR6VfYKW6+Y
-         EO3LtK1b4oEaBSrLmMathB4n4v/WEjXbF0OW59AR8x/1NUXgNfeDgFtgmM26RqyildMB
-         cIxhCuJfZnkLgOYr3FHqfpwtRilaTuNuMxb6k4TJlrd7fEQWd7Bw8mAnnp0hKbt+l2oW
-         U7T66yKZsp+VDv2TNEdWTh23l1yYTI79O/9rbbKjDiJ2jhLJYaBXoBu12Ap10Cu73jl0
-         xQLT7/lAtGzz0zaZP43NdT+qv/vRYbVp6JN1e7Ht94Nc16eO6uM3ixoXRjsbVAXKaEEd
-         0/gA==
-X-Gm-Message-State: ANhLgQ1bei1QRRt1LZpNnVw1OICLzr2QJe6HITVm/q8iw3rwc8i43ym9
-        rH+o4qBUcAR0Zd4xelFJORmrrqOoY2R68UN3ezy3pAEY/l7+2vqcCfCS5/d6YDnw4XqH+jFZKUU
-        pCALBApsh7LNz
-X-Received: by 2002:a05:6000:370:: with SMTP id f16mr12276230wrf.9.1584720527389;
-        Fri, 20 Mar 2020 09:08:47 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vvO1+wVJWGCOAIsUa5XTIUbHwop7hDHw1XAgSOqKk8kdtayaPKfI3Y8uamOGk69TeQA1/LHmQ==
-X-Received: by 2002:a05:6000:370:: with SMTP id f16mr12276192wrf.9.1584720527078;
-        Fri, 20 Mar 2020 09:08:47 -0700 (PDT)
-Received: from xz-x1 (CPEf81d0fb19163-CMf81d0fb19160.cpe.net.fido.ca. [72.137.123.47])
-        by smtp.gmail.com with ESMTPSA id x5sm9157795wrv.67.2020.03.20.09.08.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Mar 2020 09:08:46 -0700 (PDT)
-Date:   Fri, 20 Mar 2020 12:08:42 -0400
-From:   Peter Xu <peterx@redhat.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Qian Cai <cai@lca.pw>, Paolo Bonzini <pbonzini@redhat.com>,
-        kvm@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
-        Marc Zyngier <maz@kernel.org>,
-        Christoffer Dall <christoffer.dall@arm.com>
-Subject: Re: slab-out-of-bounds due to "KVM: Dynamically size memslot array
- based on number of used slots"
-Message-ID: <20200320160842.GE127076@xz-x1>
-References: <8922D835-ED2A-4C48-840A-F568E20B5A7C@lca.pw>
- <20200320043403.GH11305@linux.intel.com>
- <5FF6AF4E-EB99-4111-BBB2-FE09FFBEF5C4@lca.pw>
- <20200320135346.GA16533@linux.intel.com>
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=mt6W53kP88DRiZTuoqb3J/Hxj12DaCnXpHIxP03GIz0=;
+        b=YBPEX9OEmnYL/9bYWF1ElLnDFbSXSn6e/XS5i/g1RjdcBQ2XCcEmP0snCG8S18VnUEUEIW
+        L18DbfFFYtDjgQT6awiK5FwVV0xy+lPENLADL5nCQF0NbMqJiY7NV2FHLi8u2KTYtwOgMs
+        b0Nx5itKJ/j8U8Ad3m0+4w6NMOdQ9Ms=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-433-8p6GmzW8PH6jK-84OtJ-OQ-1; Fri, 20 Mar 2020 12:09:49 -0400
+X-MC-Unique: 8p6GmzW8PH6jK-84OtJ-OQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7EA8B100550E;
+        Fri, 20 Mar 2020 16:09:46 +0000 (UTC)
+Received: from laptop.redhat.com (ovpn-113-142.ams2.redhat.com [10.36.113.142])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 742A45C1D8;
+        Fri, 20 Mar 2020 16:09:37 +0000 (UTC)
+From:   Eric Auger <eric.auger@redhat.com>
+To:     eric.auger.pro@gmail.com, eric.auger@redhat.com,
+        iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, joro@8bytes.org,
+        alex.williamson@redhat.com, jacob.jun.pan@linux.intel.com,
+        yi.l.liu@intel.com, jean-philippe.brucker@arm.com,
+        will.deacon@arm.com, robin.murphy@arm.com
+Cc:     marc.zyngier@arm.com, peter.maydell@linaro.org,
+        zhangfei.gao@gmail.com
+Subject: [PATCH v10 00/13] SMMUv3 Nested Stage Setup (IOMMU part)
+Date:   Fri, 20 Mar 2020 17:09:19 +0100
+Message-Id: <20200320160932.27222-1-eric.auger@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20200320135346.GA16533@linux.intel.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Mar 20, 2020 at 06:53:46AM -0700, Sean Christopherson wrote:
-> On Fri, Mar 20, 2020 at 09:49:03AM -0400, Qian Cai wrote:
-> > 
-> > 
-> > > On Mar 20, 2020, at 12:34 AM, Sean Christopherson <sean.j.christopherson@intel.com> wrote:
-> > > 
-> > > On Thu, Mar 19, 2020 at 11:59:23PM -0400, Qian Cai wrote:
-> > >> Reverted the linux-next commit 36947254e5f98 (“KVM: Dynamically size memslot array based on number of used slots”)
-> > >> fixed illegal slab object redzone accesses.
-> > >> 
-> > >> [6727.939776][ T1818] BUG: KASAN: slab-out-of-bounds in gfn_to_hva+0xc1/0x2b0 [kvm]
-> > >> search_memslots at include/linux/kvm_host.h:1035
-> > > 
-> > > Drat.  I'm guessing lru_slot is out of range after a memslot is deleted.
-> > > This should fix the issue, though it may not be the most proper fix, e.g.
-> > > it might be better to reset lru_slot when deleting a memslot.  I'll try and
-> > > reproduce tomorrow, unless you can confirm this does the trick.
-> > 
-> > It works fine.
-> 
-> Thanks!  I'll send a proper patch in a bit, tweaking a selftest to try and
-> hit this as well.
+This is a rebase on top of Will's arm-smmu-updates branch
+(git://git.kernel.org/pub/scm/linux/kernel/git/will/linux.git tags/arm-sm=
+mu-updates)
 
-Would resetting lru_slot be better?  So to avoid other potential
-references to an obsolete lru_slot outside search_memslots().  E.g., I
-see that s390 has another function (gfn_to_memslot_approx) used it.
+This work has been stalled since Plumber 2019. Since then
+some users expressed interest in that work and tested v9:
+- https://patchwork.kernel.org/cover/11039995/#23012381
+- https://patchwork.kernel.org/cover/11039995/#23197235
 
-Thanks,
+The VFIO series is sent separately.
 
--- 
-Peter Xu
+Background:
+
+This series brings the IOMMU part of HW nested paging support
+in the SMMUv3. The VFIO part is submitted separately.
+
+The IOMMU API is extended to support 2 new API functionalities:
+1) pass the guest stage 1 configuration
+2) pass stage 1 MSI bindings
+
+Then those capabilities gets implemented in the SMMUv3 driver.
+
+The virtualizer passes information through the VFIO user API
+which cascades them to the iommu subsystem. This allows the guest
+to own stage 1 tables and context descriptors (so-called PASID
+table) while the host owns stage 2 tables and main configuration
+structures (STE).
+
+Best Regards
+
+Eric
+
+This series can be found at:
+https://github.com/eauger/linux/tree/will-arm-smmu-updates-2stage-v10
+(also includes the VFIO part)
+
+History:
+
+v9 -> v10:
+- rebase on top of 5.6.0-rc3
+
+v8 -> v9:
+- rebase on 5.3
+- split iommu/vfio parts
+
+v6 -> v8:
+- Implement VFIO-PCI device specific interrupt framework
+
+v7 -> v8:
+- rebase on top of v5.2-rc1 and especially
+  8be39a1a04c1  iommu/arm-smmu-v3: Add a master->domain pointer
+- dynamic alloc of s1_cfg/s2_cfg
+- __arm_smmu_tlb_inv_asid/s1_range_nosync
+- check there is no HW MSI regions
+- asid invalidation using pasid extended struct (change in the uapi)
+- add s1_live/s2_live checks
+- move check about support of nested stages in domain finalise
+- fixes in error reporting according to the discussion with Robin
+- reordered the patches to have first iommu/smmuv3 patches and then
+  VFIO patches
+
+v6 -> v7:
+- removed device handle from bind/unbind_guest_msi
+- added "iommu/smmuv3: Nested mode single MSI doorbell per domain
+  enforcement"
+- added few uapi comments as suggested by Jean, Jacop and Alex
+
+v5 -> v6:
+- Fix compilation issue when CONFIG_IOMMU_API is unset
+
+v4 -> v5:
+- fix bug reported by Vincent: fault handler unregistration now happens i=
+n
+  vfio_pci_release
+- IOMMU_FAULT_PERM_* moved outside of struct definition + small
+  uapi changes suggested by Kean-Philippe (except fetch_addr)
+- iommu: introduce device fault report API: removed the PRI part.
+- see individual logs for more details
+- reset the ste abort flag on detach
+
+v3 -> v4:
+- took into account Alex, jean-Philippe and Robin's comments on v3
+- rework of the smmuv3 driver integration
+- add tear down ops for msi binding and PASID table binding
+- fix S1 fault propagation
+- put fault reporting patches at the beginning of the series following
+  Jean-Philippe's request
+- update of the cache invalidate and fault API uapis
+- VFIO fault reporting rework with 2 separate regions and one mmappable
+  segment for the fault queue
+- moved to PATCH
+
+v2 -> v3:
+- When registering the S1 MSI binding we now store the device handle. Thi=
+s
+  addresses Robin's comment about discimination of devices beonging to
+  different S1 groups and using different physical MSI doorbells.
+- Change the fault reporting API: use VFIO_PCI_DMA_FAULT_IRQ_INDEX to
+  set the eventfd and expose the faults through an mmappable fault region
+
+v1 -> v2:
+- Added the fault reporting capability
+- asid properly passed on invalidation (fix assignment of multiple
+  devices)
+- see individual change logs for more info
+
+Eric Auger (11):
+  iommu: Introduce bind/unbind_guest_msi
+  iommu/smmuv3: Dynamically allocate s1_cfg and s2_cfg
+  iommu/smmuv3: Get prepared for nested stage support
+  iommu/smmuv3: Implement attach/detach_pasid_table
+  iommu/smmuv3: Allow stage 1 invalidation with unmanaged ASIDs
+  iommu/smmuv3: Implement cache_invalidate
+  dma-iommu: Implement NESTED_MSI cookie
+  iommu/smmuv3: Nested mode single MSI doorbell per domain enforcement
+  iommu/smmuv3: Enforce incompatibility between nested mode and HW MSI
+    regions
+  iommu/smmuv3: Implement bind/unbind_guest_msi
+  iommu/smmuv3: Report non recoverable faults
+
+Jacob Pan (1):
+  iommu: Introduce attach/detach_pasid_table API
+
+Jean-Philippe Brucker (1):
+  iommu/arm-smmu-v3: Maintain a SID->device structure
+
+ drivers/iommu/arm-smmu-v3.c | 738 ++++++++++++++++++++++++++++++++----
+ drivers/iommu/dma-iommu.c   | 142 ++++++-
+ drivers/iommu/iommu.c       |  56 +++
+ include/linux/dma-iommu.h   |  16 +
+ include/linux/iommu.h       |  37 ++
+ include/uapi/linux/iommu.h  |  51 +++
+ 6 files changed, 968 insertions(+), 72 deletions(-)
+
+--=20
+2.20.1
 
