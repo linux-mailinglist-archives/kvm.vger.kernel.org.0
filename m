@@ -2,215 +2,197 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 06D7218DAC0
-	for <lists+kvm@lfdr.de>; Fri, 20 Mar 2020 23:04:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 46C2F18DAE2
+	for <lists+kvm@lfdr.de>; Fri, 20 Mar 2020 23:07:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727604AbgCTWEu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Mar 2020 18:04:50 -0400
-Received: from Galois.linutronix.de ([193.142.43.55]:37510 "EHLO
-        Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727443AbgCTWET (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Mar 2020 18:04:19 -0400
-Received: from p5de0bf0b.dip0.t-ipconnect.de ([93.224.191.11] helo=nanos.tec.linutronix.de)
-        by Galois.linutronix.de with esmtpsa (TLS1.2:DHE_RSA_AES_256_CBC_SHA256:256)
-        (Exim 4.80)
-        (envelope-from <tglx@linutronix.de>)
-        id 1jFPkC-0004gl-PW; Fri, 20 Mar 2020 23:03:57 +0100
-Received: from nanos.tec.linutronix.de (localhost [IPv6:::1])
-        by nanos.tec.linutronix.de (Postfix) with ESMTP id 524131040D0;
-        Fri, 20 Mar 2020 23:03:50 +0100 (CET)
-Message-Id: <20200320180034.672927065@linutronix.de>
-User-Agent: quilt/0.65
-Date:   Fri, 20 Mar 2020 19:00:19 +0100
-From:   Thomas Gleixner <tglx@linutronix.de>
-To:     LKML <linux-kernel@vger.kernel.org>
-Cc:     x86@kernel.org, Paul McKenney <paulmck@kernel.org>,
-        Josh Poimboeuf <jpoimboe@redhat.com>,
-        "Joel Fernandes (Google)" <joel@joelfernandes.org>,
-        "Steven Rostedt (VMware)" <rostedt@goodmis.org>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Alexei Starovoitov <ast@kernel.org>,
-        Frederic Weisbecker <frederic@kernel.org>,
-        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-        Brian Gerst <brgerst@gmail.com>,
-        Juergen Gross <jgross@suse.com>,
-        Alexandre Chartre <alexandre.chartre@oracle.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        Peter Zijlstra <peterz@infradead.org>
-Subject: [RESEND][patch V3 23/23] x86/kvm/svm: Move guest enter/exit into
- .noinstr.text
-References: <20200320175956.033706968@linutronix.de>
+        id S1727197AbgCTWH3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Mar 2020 18:07:29 -0400
+Received: from mail-ed1-f66.google.com ([209.85.208.66]:39251 "EHLO
+        mail-ed1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726840AbgCTWH2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Mar 2020 18:07:28 -0400
+Received: by mail-ed1-f66.google.com with SMTP id a43so8969458edf.6
+        for <kvm@vger.kernel.org>; Fri, 20 Mar 2020 15:07:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=Wh832PW/B1ZgleHxeKKirrgEKzecxyBhNJtn0lhwADc=;
+        b=MEta4Wf9GQWtqP9zfzhGnHT1uVRTqhsv0k0HpdrMcd5nXqYD/oZ5XQkcvyjcRBLxvK
+         4sjs3srDN4vRDd/1/A5aywN1VHgeJ56SUmTLpj37QG+9Q+Sar4AK4yxSIAbjCDAocg8I
+         bEuiugbnwliceIspvKxYjjPcJxE6UuklQR9VqVhpMo+Um3Yea4J9S7JI5Av+XvDYhkwv
+         uvwRdatsyTBwel1vtOBU3nWvcPLEWjmk18oTq8WiEWmkIKLVTsx06V63yofilVl69glZ
+         wIb1bdf3V6k6bHQCg+WGKkP49BmZcXUBFbzf0HtfTkbEl7uJP7esc0Q3H2i8f0Ma0s0F
+         ZD9w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=Wh832PW/B1ZgleHxeKKirrgEKzecxyBhNJtn0lhwADc=;
+        b=LNEuCkKI/mwW5hvhQQ1uNZK9iPrJO4yRqunJovuS5Mo7KFYjRcp8Vko3yAEs3J85cZ
+         BQCnxKhDOa0FnX+79nY3mCBAB6XFiRG2Gq5nn8rb/mim+GgYg+YqlJyBg+HoGNtCqnDz
+         35H+w8nVCF2LNvrbhj9c2QSAWMAi3ahxCm6LJGLS+HTyJRnEROpeI3XMc7mmDofkddM2
+         orbZViXw6mrsk3Bz83HSqikqew5YZ9xldflK4Mw0gsxsKjQapvGsySxKkQgz2NRJHC1v
+         LG8VeWsWcuqx3HQGR6eY8Rnfw2TQ3iuJ909Ne67c/Jge6p2C3MRCqZmfCBlcBAMgnJC+
+         +++w==
+X-Gm-Message-State: ANhLgQ2h9DH5OsdVElLaCq6WAeTMUqEUm+TiI58FEskR5FzCxpy6pre6
+        o0TgIwS7oGJ5+Nvm+yeP83uEQC4o2sPGnV9rcttuZA==
+X-Google-Smtp-Source: ADFU+vvMZyPS+wPi1ycr/20HKTaxuIp65bGgppsOIattbmrIpYaU1PgnwSdKnstpYWRRM5ZFTdryZbvhjNC04CydJL8=
+X-Received: by 2002:a05:6402:22c7:: with SMTP id dm7mr10403457edb.283.1584742046426;
+ Fri, 20 Mar 2020 15:07:26 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-transfer-encoding: 8-bit
-X-Linutronix-Spam-Score: -1.0
-X-Linutronix-Spam-Level: -
-X-Linutronix-Spam-Status: No , -1.0 points, 5.0 required,  ALL_TRUSTED=-1,SHORTCIRCUIT=-0.0001
+References: <20200320175910.180266-1-yonghyun@google.com> <20200320123425.49c6568e@w520.home>
+ <CAEauFbx1Su7Lg5kdxXnvUwfwLCH67qaGB6EZ7g3OOH-tbRfBBA@mail.gmail.com> <20200320145935.4617c7c0@w520.home>
+In-Reply-To: <20200320145935.4617c7c0@w520.home>
+From:   Yonghyun Hwang <yonghyun@google.com>
+Date:   Fri, 20 Mar 2020 15:07:15 -0700
+Message-ID: <CAEauFbyE547joLxswMVLn2mreKgp-kEeQ_S4xyOQmmRsOqr_Wg@mail.gmail.com>
+Subject: Re: [PATCH] vfio-mdev: support mediated device creation in kernel
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     Kirti Wankhede <kwankhede@nvidia.com>,
+        Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Havard Skinnemoen <hskinnemoen@google.com>,
+        Moritz Fischer <mdf@kernel.org>,
+        Joshua Lang <joshualang@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Split out the really last steps of guest enter and the early guest exit
-code and mark it .noinstr.text. Add the required instr_begin()/end() pairs
-around "safe" code and replace the wrmsr() with native_wrmsr() to prevent a
-tracepoint injection.
+If my patch is not aligned with the direction, it results in a
+maintenance burden for the kernel. Thanks for sharing the direction
+and  Yan's vendor-ops approach[1].
 
-Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
-Cc: Tom Lendacky <thomas.lendacky@amd.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org
----
- arch/x86/kvm/svm.c |  114 ++++++++++++++++++++++++++++-------------------------
- 1 file changed, 62 insertions(+), 52 deletions(-)
+Thank you,
+Yonghyun
 
---- a/arch/x86/kvm/svm.c
-+++ b/arch/x86/kvm/svm.c
-@@ -5714,58 +5714,9 @@ static void svm_cancel_injection(struct
- 	svm_complete_interrupts(svm);
- }
- 
--static void svm_vcpu_run(struct kvm_vcpu *vcpu)
-+static noinstr void svm_vcpu_enter_exit(struct kvm_vcpu *vcpu,
-+					struct vcpu_svm *svm)
- {
--	struct vcpu_svm *svm = to_svm(vcpu);
--
--	svm->vmcb->save.rax = vcpu->arch.regs[VCPU_REGS_RAX];
--	svm->vmcb->save.rsp = vcpu->arch.regs[VCPU_REGS_RSP];
--	svm->vmcb->save.rip = vcpu->arch.regs[VCPU_REGS_RIP];
--
--	/*
--	 * A vmexit emulation is required before the vcpu can be executed
--	 * again.
--	 */
--	if (unlikely(svm->nested.exit_required))
--		return;
--
--	/*
--	 * Disable singlestep if we're injecting an interrupt/exception.
--	 * We don't want our modified rflags to be pushed on the stack where
--	 * we might not be able to easily reset them if we disabled NMI
--	 * singlestep later.
--	 */
--	if (svm->nmi_singlestep && svm->vmcb->control.event_inj) {
--		/*
--		 * Event injection happens before external interrupts cause a
--		 * vmexit and interrupts are disabled here, so smp_send_reschedule
--		 * is enough to force an immediate vmexit.
--		 */
--		disable_nmi_singlestep(svm);
--		smp_send_reschedule(vcpu->cpu);
--	}
--
--	pre_svm_run(svm);
--
--	sync_lapic_to_cr8(vcpu);
--
--	svm->vmcb->save.cr2 = vcpu->arch.cr2;
--
--	clgi();
--	kvm_load_guest_xsave_state(vcpu);
--
--	if (lapic_in_kernel(vcpu) &&
--		vcpu->arch.apic->lapic_timer.timer_advance_ns)
--		kvm_wait_lapic_expire(vcpu);
--
--	/*
--	 * If this vCPU has touched SPEC_CTRL, restore the guest's value if
--	 * it's non-zero. Since vmentry is serialising on affected CPUs, there
--	 * is no need to worry about the conditional branch over the wrmsr
--	 * being speculatively taken.
--	 */
--	x86_spec_ctrl_set_guest(svm->spec_ctrl, svm->virt_spec_ctrl);
--
- 	/*
- 	 * VMENTER enables interrupts (host state), but the kernel state is
- 	 * interrupts disabled when this is invoked. Also tell RCU about
-@@ -5780,8 +5731,10 @@ static void svm_vcpu_run(struct kvm_vcpu
- 	 * take locks (lockdep needs RCU) and calls into world and some
- 	 * more.
- 	 */
-+	instr_begin();
- 	__trace_hardirqs_on();
- 	lockdep_hardirqs_on_prepare(CALLER_ADDR0);
-+	instr_end();
- 	guest_enter_irqoff();
- 	lockdep_hardirqs_on(CALLER_ADDR0);
- 
-@@ -5881,7 +5834,7 @@ static void svm_vcpu_run(struct kvm_vcpu
- 	vmexit_fill_RSB();
- 
- #ifdef CONFIG_X86_64
--	wrmsrl(MSR_GS_BASE, svm->host.gs_base);
-+	native_wrmsrl(MSR_GS_BASE, svm->host.gs_base);
- #else
- 	loadsegment(fs, svm->host.fs);
- #ifndef CONFIG_X86_32_LAZY_GS
-@@ -5904,7 +5857,64 @@ static void svm_vcpu_run(struct kvm_vcpu
- 	 */
- 	lockdep_hardirqs_off(CALLER_ADDR0);
- 	guest_exit_irqoff();
-+	instr_begin();
- 	__trace_hardirqs_off();
-+	instr_end();
-+}
-+
-+static void svm_vcpu_run(struct kvm_vcpu *vcpu)
-+{
-+	struct vcpu_svm *svm = to_svm(vcpu);
-+
-+	svm->vmcb->save.rax = vcpu->arch.regs[VCPU_REGS_RAX];
-+	svm->vmcb->save.rsp = vcpu->arch.regs[VCPU_REGS_RSP];
-+	svm->vmcb->save.rip = vcpu->arch.regs[VCPU_REGS_RIP];
-+
-+	/*
-+	 * A vmexit emulation is required before the vcpu can be executed
-+	 * again.
-+	 */
-+	if (unlikely(svm->nested.exit_required))
-+		return;
-+
-+	/*
-+	 * Disable singlestep if we're injecting an interrupt/exception.
-+	 * We don't want our modified rflags to be pushed on the stack where
-+	 * we might not be able to easily reset them if we disabled NMI
-+	 * singlestep later.
-+	 */
-+	if (svm->nmi_singlestep && svm->vmcb->control.event_inj) {
-+		/*
-+		 * Event injection happens before external interrupts cause a
-+		 * vmexit and interrupts are disabled here, so smp_send_reschedule
-+		 * is enough to force an immediate vmexit.
-+		 */
-+		disable_nmi_singlestep(svm);
-+		smp_send_reschedule(vcpu->cpu);
-+	}
-+
-+	pre_svm_run(svm);
-+
-+	sync_lapic_to_cr8(vcpu);
-+
-+	svm->vmcb->save.cr2 = vcpu->arch.cr2;
-+
-+	clgi();
-+	kvm_load_guest_xsave_state(vcpu);
-+
-+	if (lapic_in_kernel(vcpu) &&
-+		vcpu->arch.apic->lapic_timer.timer_advance_ns)
-+		kvm_wait_lapic_expire(vcpu);
-+
-+	/*
-+	 * If this vCPU has touched SPEC_CTRL, restore the guest's value if
-+	 * it's non-zero. Since vmentry is serialising on affected CPUs, there
-+	 * is no need to worry about the conditional branch over the wrmsr
-+	 * being speculatively taken.
-+	 */
-+	x86_spec_ctrl_set_guest(svm->spec_ctrl, svm->virt_spec_ctrl);
-+
-+	svm_vcpu_enter_exit(vcpu, svm);
- 
- 	/*
- 	 * We do not use IBRS in the kernel. If this vCPU has used the
-
+On Fri, Mar 20, 2020 at 1:59 PM Alex Williamson
+<alex.williamson@redhat.com> wrote:
+>
+> On Fri, 20 Mar 2020 13:46:04 -0700
+> Yonghyun Hwang <yonghyun@google.com> wrote:
+>
+> > On Fri, Mar 20, 2020 at 11:34 AM Alex Williamson
+> > <alex.williamson@redhat.com> wrote:
+> > >
+> > > On Fri, 20 Mar 2020 10:59:10 -0700
+> > > Yonghyun Hwang <yonghyun@google.com> wrote:
+> > >
+> > > > To enable a mediated device, a device driver registers its device to VFIO
+> > > > MDev framework. Once the mediated device gets enabled, UUID gets fed onto
+> > > > the sysfs attribute, "create", to create the mediated device. This
+> > > > additional step happens after boot-up gets complete. If the driver knows
+> > > > how many mediated devices need to be created during probing time, the
+> > > > additional step becomes cumbersome. This commit implements a new function
+> > > > to allow the driver to create a mediated device in kernel.
+> > >
+> > > But pre-creating mdev devices seems like a policy decision.  Why can't
+> > > userspace make such a policy decision, and do so with persistent uuids,
+> > > via something like mdevctl?  Thanks,
+> > >
+> > > Alex
+> >
+> > Yep, it can be viewed as the policy decision and userspace can make
+> > the decision. However, it would be handy and plausible, if a device
+> > driver can pre-create "fixed or default" # of mdev devices, while
+> > allowing the device policy to come into play after bootup gets
+> > complete. Without this patch, a device driver should release the
+> > policy and the policy should be aligned with the driver, which would
+> > be cumbersome (sometimes painful) in a cloud environment. My use case
+> > with mdev is to enable a subset of vfio-pci features without losing my
+> > device driver.
+>
+> Does this last comment suggest the parent device is not being
+> multiplexed through mdev, but only mediated?  If so, would something
+> like Yan's vendor-ops approach[1] be better?  Without a multiplexed
+> device, the lifecycle management of an mdev device doesn't make a lot
+> of sense, and I wonder if that's what you're trying to bypass here.
+> Even SR-IOV devices have moved to userspace enablement with most module
+> options to enable a default number of VFs being deprecated.  I do see
+> that that transition left a gap, but I'm not sure that heading in the
+> opposite direction with mdevs is a good idea either.  Thanks,
+>
+> Alex
+>
+> [1]https://lore.kernel.org/kvm/20200131020803.27519-1-yan.y.zhao@intel.com/
+>
+>
+> > > > Signed-off-by: Yonghyun Hwang <yonghyun@google.com>
+> > > > ---
+> > > >  drivers/vfio/mdev/mdev_core.c | 45 +++++++++++++++++++++++++++++++++++
+> > > >  include/linux/mdev.h          |  3 +++
+> > > >  2 files changed, 48 insertions(+)
+> > > >
+> > > > diff --git a/drivers/vfio/mdev/mdev_core.c b/drivers/vfio/mdev/mdev_core.c
+> > > > index b558d4cfd082..a6d32516de42 100644
+> > > > --- a/drivers/vfio/mdev/mdev_core.c
+> > > > +++ b/drivers/vfio/mdev/mdev_core.c
+> > > > @@ -350,6 +350,51 @@ int mdev_device_create(struct kobject *kobj,
+> > > >       return ret;
+> > > >  }
+> > > >
+> > > > +/*
+> > > > + * mdev_create_device : Create a mdev device
+> > > > + * @dev: device structure representing parent device.
+> > > > + * @uuid: uuid char string for a mdev device.
+> > > > + * @group: index to supported type groups for a mdev device.
+> > > > + *
+> > > > + * Create a mdev device in kernel.
+> > > > + * Returns a negative value on error, otherwise 0.
+> > > > + */
+> > > > +int mdev_create_device(struct device *dev,
+> > > > +                     const char *uuid, int group)
+> > > > +{
+> > > > +     struct mdev_parent *parent = NULL;
+> > > > +     struct mdev_type *type = NULL;
+> > > > +     guid_t guid;
+> > > > +     int i = 1;
+> > > > +     int ret;
+> > > > +
+> > > > +     ret = guid_parse(uuid, &guid);
+> > > > +     if (ret) {
+> > > > +             dev_err(dev, "Failed to parse UUID");
+> > > > +             return ret;
+> > > > +     }
+> > > > +
+> > > > +     parent = __find_parent_device(dev);
+> > > > +     if (!parent) {
+> > > > +             dev_err(dev, "Failed to find parent mdev device");
+> > > > +             return -ENODEV;
+> > > > +     }
+> > > > +
+> > > > +     list_for_each_entry(type, &parent->type_list, next) {
+> > > > +             if (i == group)
+> > > > +                     break;
+> > > > +             i++;
+> > > > +     }
+> > > > +
+> > > > +     if (!type || i != group) {
+> > > > +             dev_err(dev, "Failed to find mdev device");
+> > > > +             return -ENODEV;
+> > > > +     }
+> > > > +
+> > > > +     return mdev_device_create(&type->kobj, parent->dev, &guid);
+> > > > +}
+> > > > +EXPORT_SYMBOL(mdev_create_device);
+> > > > +
+> > > >  int mdev_device_remove(struct device *dev)
+> > > >  {
+> > > >       struct mdev_device *mdev, *tmp;
+> > > > diff --git a/include/linux/mdev.h b/include/linux/mdev.h
+> > > > index 0ce30ca78db0..b66f67998916 100644
+> > > > --- a/include/linux/mdev.h
+> > > > +++ b/include/linux/mdev.h
+> > > > @@ -145,4 +145,7 @@ struct device *mdev_parent_dev(struct mdev_device *mdev);
+> > > >  struct device *mdev_dev(struct mdev_device *mdev);
+> > > >  struct mdev_device *mdev_from_dev(struct device *dev);
+> > > >
+> > > > +extern int mdev_create_device(struct device *dev,
+> > > > +                     const char *uuid, int group_idx);
+> > > > +
+> > > >  #endif /* MDEV_H */
+> > >
+> >
+>
