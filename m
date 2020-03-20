@@ -2,26 +2,26 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E787B18DACB
-	for <lists+kvm@lfdr.de>; Fri, 20 Mar 2020 23:05:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AD49818DAB4
+	for <lists+kvm@lfdr.de>; Fri, 20 Mar 2020 23:04:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727693AbgCTWFO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Mar 2020 18:05:14 -0400
-Received: from Galois.linutronix.de ([193.142.43.55]:37505 "EHLO
+        id S1727470AbgCTWET (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Mar 2020 18:04:19 -0400
+Received: from Galois.linutronix.de ([193.142.43.55]:37496 "EHLO
         Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727425AbgCTWES (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Mar 2020 18:04:18 -0400
+        with ESMTP id S1727141AbgCTWER (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Mar 2020 18:04:17 -0400
 Received: from p5de0bf0b.dip0.t-ipconnect.de ([93.224.191.11] helo=nanos.tec.linutronix.de)
         by Galois.linutronix.de with esmtpsa (TLS1.2:DHE_RSA_AES_256_CBC_SHA256:256)
         (Exim 4.80)
         (envelope-from <tglx@linutronix.de>)
-        id 1jFPk2-0004TY-Bh; Fri, 20 Mar 2020 23:03:46 +0100
+        id 1jFPk2-0004Tb-L5; Fri, 20 Mar 2020 23:03:46 +0100
 Received: from nanos.tec.linutronix.de (localhost [IPv6:::1])
-        by nanos.tec.linutronix.de (Postfix) with ESMTP id DB9A41039FC;
-        Fri, 20 Mar 2020 23:03:45 +0100 (CET)
-Message-Id: <20200320180032.895128936@linutronix.de>
+        by nanos.tec.linutronix.de (Postfix) with ESMTP id 2324A1039FD;
+        Fri, 20 Mar 2020 23:03:46 +0100 (CET)
+Message-Id: <20200320180032.994128577@linutronix.de>
 User-Agent: quilt/0.65
-Date:   Fri, 20 Mar 2020 19:00:01 +0100
+Date:   Fri, 20 Mar 2020 19:00:02 +0100
 From:   Thomas Gleixner <tglx@linutronix.de>
 To:     LKML <linux-kernel@vger.kernel.org>
 Cc:     x86@kernel.org, Paul McKenney <paulmck@kernel.org>,
@@ -38,8 +38,7 @@ Cc:     x86@kernel.org, Paul McKenney <paulmck@kernel.org>,
         Peter Zijlstra <peterz@infradead.org>,
         Tom Lendacky <thomas.lendacky@amd.com>,
         Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Subject: [RESEND][patch V3 05/23] tracing: Provide lockdep less
- trace_hardirqs_on/off() variants
+Subject: [RESEND][patch V3 06/23] bug: Annotate WARN/BUG/stackfail as noinstr safe
 References: <20200320175956.033706968@linutronix.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -52,81 +51,76 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-trace_hardirqs_on/off() is only partially safe vs. RCU idle. The tracer
-core itself is safe, but the resulting tracepoints can be utilized by
-e.g. BPF which is unsafe.
+Warnings, bugs and stack protection fails from noinstr sections, e.g. low
+level and early entry code, are likely to be fatal.
 
-Provide variants which do not contain the lockdep invocation so the lockdep
-and tracer invocations can be split at the call site and placed properly.
-
-The new variants also do not use rcuidle as they are going to be called
-from entry code after/before context tracking.
+Mark them as "safe" to be invoked from noinstr protected code to avoid
+annotating all usage sites. Getting the information out is important.
 
 Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
 ---
-V2: New patch
----
- include/linux/irqflags.h        |    4 ++++
- kernel/trace/trace_preemptirq.c |   23 +++++++++++++++++++++++
- 2 files changed, 27 insertions(+)
+ arch/x86/include/asm/bug.h |    3 +++
+ include/asm-generic/bug.h  |    9 +++++++--
+ kernel/panic.c             |    4 +++-
+ 3 files changed, 13 insertions(+), 3 deletions(-)
 
---- a/include/linux/irqflags.h
-+++ b/include/linux/irqflags.h
-@@ -29,6 +29,8 @@
- #endif
- 
- #ifdef CONFIG_TRACE_IRQFLAGS
-+  extern void __trace_hardirqs_on(void);
-+  extern void __trace_hardirqs_off(void);
-   extern void trace_hardirqs_on(void);
-   extern void trace_hardirqs_off(void);
- # define trace_hardirq_context(p)	((p)->hardirq_context)
-@@ -52,6 +54,8 @@ do {						\
- 	current->softirq_context--;		\
+--- a/arch/x86/include/asm/bug.h
++++ b/arch/x86/include/asm/bug.h
+@@ -70,13 +70,16 @@ do {									\
+ #define HAVE_ARCH_BUG
+ #define BUG()							\
+ do {								\
++	instr_begin();						\
+ 	_BUG_FLAGS(ASM_UD2, 0);					\
+ 	unreachable();						\
  } while (0)
+ 
+ #define __WARN_FLAGS(flags)					\
+ do {								\
++	instr_begin();						\
+ 	_BUG_FLAGS(ASM_UD2, BUGFLAG_WARNING|(flags));		\
++	instr_end();						\
+ 	annotate_reachable();					\
+ } while (0)
+ 
+--- a/include/asm-generic/bug.h
++++ b/include/asm-generic/bug.h
+@@ -83,14 +83,19 @@ extern __printf(4, 5)
+ void warn_slowpath_fmt(const char *file, const int line, unsigned taint,
+ 		       const char *fmt, ...);
+ #define __WARN()		__WARN_printf(TAINT_WARN, NULL)
+-#define __WARN_printf(taint, arg...)					\
+-	warn_slowpath_fmt(__FILE__, __LINE__, taint, arg)
++#define __WARN_printf(taint, arg...) do {				\
++	instr_begin();							\
++	warn_slowpath_fmt(__FILE__, __LINE__, taint, arg);		\
++	instr_end();							\
++	while (0)
  #else
-+# define __trace_hardirqs_on()		do { } while (0)
-+# define __trace_hardirqs_off()		do { } while (0)
- # define trace_hardirqs_on()		do { } while (0)
- # define trace_hardirqs_off()		do { } while (0)
- # define trace_hardirq_context(p)	0
---- a/kernel/trace/trace_preemptirq.c
-+++ b/kernel/trace/trace_preemptirq.c
-@@ -19,6 +19,17 @@
- /* Per-cpu variable to prevent redundant calls when IRQs already off */
- static DEFINE_PER_CPU(int, tracing_irq_cpu);
- 
-+void __trace_hardirqs_on(void)
-+{
-+	if (this_cpu_read(tracing_irq_cpu)) {
-+		if (!in_nmi())
-+			trace_irq_enable(CALLER_ADDR0, CALLER_ADDR1);
-+		tracer_hardirqs_on(CALLER_ADDR0, CALLER_ADDR1);
-+		this_cpu_write(tracing_irq_cpu, 0);
-+	}
-+}
-+NOKPROBE_SYMBOL(__trace_hardirqs_on);
-+
- void trace_hardirqs_on(void)
+ extern __printf(1, 2) void __warn_printk(const char *fmt, ...);
+ #define __WARN()		__WARN_FLAGS(BUGFLAG_TAINT(TAINT_WARN))
+ #define __WARN_printf(taint, arg...) do {				\
++		instr_begin();						\
+ 		__warn_printk(arg);					\
+ 		__WARN_FLAGS(BUGFLAG_NO_CUT_HERE | BUGFLAG_TAINT(taint));\
++		instr_end();						\
+ 	} while (0)
+ #define WARN_ON_ONCE(condition) ({				\
+ 	int __ret_warn_on = !!(condition);			\
+--- a/kernel/panic.c
++++ b/kernel/panic.c
+@@ -662,10 +662,12 @@ device_initcall(register_warn_debugfs);
+  * Called when gcc's -fstack-protector feature is used, and
+  * gcc detects corruption of the on-stack canary value
+  */
+-__visible void __stack_chk_fail(void)
++__visible noinstr void __stack_chk_fail(void)
  {
- 	if (this_cpu_read(tracing_irq_cpu)) {
-@@ -33,6 +44,18 @@ void trace_hardirqs_on(void)
- EXPORT_SYMBOL(trace_hardirqs_on);
- NOKPROBE_SYMBOL(trace_hardirqs_on);
++	instr_begin();
+ 	panic("stack-protector: Kernel stack is corrupted in: %pB",
+ 		__builtin_return_address(0));
++	instr_end();
+ }
+ EXPORT_SYMBOL(__stack_chk_fail);
  
-+void __trace_hardirqs_off(void)
-+{
-+	if (!this_cpu_read(tracing_irq_cpu)) {
-+		this_cpu_write(tracing_irq_cpu, 1);
-+		tracer_hardirqs_off(CALLER_ADDR0, CALLER_ADDR1);
-+		if (!in_nmi())
-+			trace_irq_disable(CALLER_ADDR0, CALLER_ADDR1);
-+	}
-+
-+}
-+NOKPROBE_SYMBOL(__trace_hardirqs_off);
-+
- void trace_hardirqs_off(void)
- {
- 	if (!this_cpu_read(tracing_irq_cpu)) {
 
