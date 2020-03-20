@@ -2,232 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 23A7018C91B
-	for <lists+kvm@lfdr.de>; Fri, 20 Mar 2020 09:45:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8232918C91D
+	for <lists+kvm@lfdr.de>; Fri, 20 Mar 2020 09:45:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726801AbgCTIpE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Mar 2020 04:45:04 -0400
-Received: from mga14.intel.com ([192.55.52.115]:57059 "EHLO mga14.intel.com"
+        id S1726840AbgCTIpv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Mar 2020 04:45:51 -0400
+Received: from mga03.intel.com ([134.134.136.65]:58600 "EHLO mga03.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726232AbgCTIpE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Mar 2020 04:45:04 -0400
-IronPort-SDR: mwtNSkv2ibYSugq/wR3jgtxszvtGX5vnjBPV078SdfkgWs6h9V/Zk783a3w4RLTRxB76p3u7Fb
- 7gvTBEmCp04Q==
+        id S1726767AbgCTIpu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Mar 2020 04:45:50 -0400
+IronPort-SDR: 9XomDNd3tMdpymeRrO3qxFPjGAiC0z++Pf0VKWhQfaaStLk6WKy0NQqamaer79CE1kiTInL2Nr
+ IZ/VBS5NzuPA==
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Mar 2020 01:45:03 -0700
-IronPort-SDR: nNrMH6GPses5RmUwVIeFI9qYGCkVUMZMviDujdJLGKnIa+DslPz8GvrMZt5RkP5pUkrTuQB53C
- 2OlWn0A3GdrQ==
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Mar 2020 01:45:50 -0700
+IronPort-SDR: 5T1C30mSaU7qaOolo5XckRkhJ0nDDnwxM5w043asqU1T28Dx/O+hHzy8nXj9/WQxzzBKTL2RyQ
+ DvkYL+e6IhAQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.72,283,1580803200"; 
-   d="scan'208";a="444901022"
-Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040) ([10.239.13.16])
-  by fmsmga005.fm.intel.com with ESMTP; 20 Mar 2020 01:44:59 -0700
-Date:   Fri, 20 Mar 2020 04:35:29 -0400
-From:   Yan Zhao <yan.y.zhao@intel.com>
-To:     Kirti Wankhede <kwankhede@nvidia.com>
-Cc:     "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "cjia@nvidia.com" <cjia@nvidia.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "Yang, Ziye" <ziye.yang@intel.com>,
-        "Liu, Changpeng" <changpeng.liu@intel.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>,
-        "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
-        "eskultet@redhat.com" <eskultet@redhat.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "dgilbert@redhat.com" <dgilbert@redhat.com>,
-        "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>,
-        "eauger@redhat.com" <eauger@redhat.com>,
-        "aik@ozlabs.ru" <aik@ozlabs.ru>,
-        "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
-        "felipe@nutanix.com" <felipe@nutanix.com>,
-        "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@Alibaba-inc.com>,
-        "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
-        "Ken.Xue@amd.com" <Ken.Xue@amd.com>,
-        "Wang, Zhi A" <zhi.a.wang@intel.com>,
-        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: Re: [PATCH v14 Kernel 5/7] vfio iommu: Update UNMAP_DMA ioctl to get
- dirty bitmap before unmap
-Message-ID: <20200320083529.GA5456@joy-OptiPlex-7040>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-References: <1584560474-19946-1-git-send-email-kwankhede@nvidia.com>
- <1584560474-19946-6-git-send-email-kwankhede@nvidia.com>
+   d="scan'208";a="446590259"
+Received: from likexu-mobl1.ccr.corp.intel.com (HELO [10.238.4.82]) ([10.238.4.82])
+  by fmsmga006.fm.intel.com with ESMTP; 20 Mar 2020 01:45:46 -0700
+Reply-To: like.xu@intel.com
+Subject: Re: [PATCH v9 00/10] Guest Last Branch Recording Enabling
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>
+Cc:     kvm@vger.kernel.org, Andi Kleen <ak@linux.intel.com>,
+        Jim Mattson <jmattson@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Liran Alon <liran.alon@oracle.com>,
+        Liang Kan <kan.liang@linux.intel.com>,
+        Wei Wang <wei.w.wang@intel.com>, linux-kernel@vger.kernel.org,
+        Vitaly Kuznetsov <vkuznets@redhat.com>
+References: <20200313021616.112322-1-like.xu@linux.intel.com>
+From:   "Xu, Like" <like.xu@intel.com>
+Organization: Intel OTC
+Message-ID: <446eef98-4d9f-4a9b-bdae-d29e36f6e07e@intel.com>
+Date:   Fri, 20 Mar 2020 16:45:45 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1584560474-19946-6-git-send-email-kwankhede@nvidia.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+In-Reply-To: <20200313021616.112322-1-like.xu@linux.intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 19, 2020 at 03:41:12AM +0800, Kirti Wankhede wrote:
-> DMA mapped pages, including those pinned by mdev vendor drivers, might
-> get unpinned and unmapped while migration is active and device is still
-> running. For example, in pre-copy phase while guest driver could access
-> those pages, host device or vendor driver can dirty these mapped pages.
-> Such pages should be marked dirty so as to maintain memory consistency
-> for a user making use of dirty page tracking.
-> 
-> To get bitmap during unmap, user should set flag
-> VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP, bitmap memory should be allocated and
-> zeroed by user space application. Bitmap size and page size should be set
-> by user application.
-> 
-> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-> Reviewed-by: Neo Jia <cjia@nvidia.com>
-> ---
->  drivers/vfio/vfio_iommu_type1.c | 55 ++++++++++++++++++++++++++++++++++++++---
->  include/uapi/linux/vfio.h       | 11 +++++++++
->  2 files changed, 62 insertions(+), 4 deletions(-)
-> 
-> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> index d6417fb02174..aa1ac30f7854 100644
-> --- a/drivers/vfio/vfio_iommu_type1.c
-> +++ b/drivers/vfio/vfio_iommu_type1.c
-> @@ -939,7 +939,8 @@ static int verify_bitmap_size(uint64_t npages, uint64_t bitmap_size)
->  }
->  
->  static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
-> -			     struct vfio_iommu_type1_dma_unmap *unmap)
-> +			     struct vfio_iommu_type1_dma_unmap *unmap,
-> +			     struct vfio_bitmap *bitmap)
->  {
->  	uint64_t mask;
->  	struct vfio_dma *dma, *dma_last = NULL;
-> @@ -990,6 +991,10 @@ static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
->  	 * will be returned if these conditions are not met.  The v2 interface
->  	 * will only return success and a size of zero if there were no
->  	 * mappings within the range.
-> +	 *
-> +	 * When VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP flag is set, unmap request
-> +	 * must be for single mapping. Multiple mappings with this flag set is
-> +	 * not supported.
->  	 */
->  	if (iommu->v2) {
->  		dma = vfio_find_dma(iommu, unmap->iova, 1);
-> @@ -997,6 +1002,13 @@ static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
->  			ret = -EINVAL;
->  			goto unlock;
->  		}
-> +
-> +		if ((unmap->flags & VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP) &&
-> +		    (dma->iova != unmap->iova || dma->size != unmap->size)) {
-dma is probably NULL here!
+Hi Peter,
+any comments on the host perf changes?
 
-And this restriction on UNMAP would make some UNMAP operations of vIOMMU
-fail.
+Hi Paolo,
+any comments on the kvm changes? Isn't this feature interesting to you?
 
-e.g. below condition indeed happens in reality.
-an UNMAP ioctl comes for IOVA range from 0xff800000, of size 0x200000
-However, IOVAs in this range are mapped page by page.i.e., dma->size is 0x1000.
+Just kindly ping.
 
-Previous, this UNMAP ioctl could unmap successfully as a whole.
+Thanks,
+Like Xu
 
-Thanks
-Yan
+On 2020/3/13 10:16, Like Xu wrote:
+> Hi all,
+>
+> Please help review your interesting parts in this stable version,
+> e.g. the first four patches involve the perf event subsystem
+> and the fifth patch concerns the KVM userspace interface.
 
-> +			ret = -EINVAL;
-> +			goto unlock;
-> +		}
-> +
->  		dma = vfio_find_dma(iommu, unmap->iova + unmap->size - 1, 0);
->  		if (dma && dma->iova + dma->size != unmap->iova + unmap->size) {
->  			ret = -EINVAL;
-> @@ -1014,6 +1026,12 @@ static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
->  		if (dma->task->mm != current->mm)
->  			break;
->  
-> +		if ((unmap->flags & VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP) &&
-> +		     iommu->dirty_page_tracking)
-> +			vfio_iova_dirty_bitmap(iommu, dma->iova, dma->size,
-> +					bitmap->pgsize,
-> +					(unsigned char __user *) bitmap->data);
-> +
->  		if (!RB_EMPTY_ROOT(&dma->pfn_list)) {
->  			struct vfio_iommu_type1_dma_unmap nb_unmap;
->  
-> @@ -2369,17 +2387,46 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
->  
->  	} else if (cmd == VFIO_IOMMU_UNMAP_DMA) {
->  		struct vfio_iommu_type1_dma_unmap unmap;
-> -		long ret;
-> +		struct vfio_bitmap bitmap = { 0 };
-> +		int ret;
->  
->  		minsz = offsetofend(struct vfio_iommu_type1_dma_unmap, size);
->  
->  		if (copy_from_user(&unmap, (void __user *)arg, minsz))
->  			return -EFAULT;
->  
-> -		if (unmap.argsz < minsz || unmap.flags)
-> +		if (unmap.argsz < minsz ||
-> +		    unmap.flags & ~VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP)
->  			return -EINVAL;
->  
-> -		ret = vfio_dma_do_unmap(iommu, &unmap);
-> +		if (unmap.flags & VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP) {
-> +			unsigned long pgshift;
-> +			uint64_t iommu_pgsize =
-> +					 1 << __ffs(vfio_pgsize_bitmap(iommu));
-> +
-> +			if (unmap.argsz < (minsz + sizeof(bitmap)))
-> +				return -EINVAL;
-> +
-> +			if (copy_from_user(&bitmap,
-> +					   (void __user *)(arg + minsz),
-> +					   sizeof(bitmap)))
-> +				return -EFAULT;
-> +
-> +			/* allow only min supported pgsize */
-> +			if (bitmap.pgsize != iommu_pgsize)
-> +				return -EINVAL;
-> +			if (!access_ok((void __user *)bitmap.data, bitmap.size))
-> +				return -EINVAL;
-> +
-> +			pgshift = __ffs(bitmap.pgsize);
-> +			ret = verify_bitmap_size(unmap.size >> pgshift,
-> +						 bitmap.size);
-> +			if (ret)
-> +				return ret;
-> +
-> +		}
-> +
-> +		ret = vfio_dma_do_unmap(iommu, &unmap, &bitmap);
->  		if (ret)
->  			return ret;
->  
-> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-> index 043e9eafb255..a704e5380f04 100644
-> --- a/include/uapi/linux/vfio.h
-> +++ b/include/uapi/linux/vfio.h
-> @@ -1010,12 +1010,23 @@ struct vfio_bitmap {
->   * field.  No guarantee is made to the user that arbitrary unmaps of iova
->   * or size different from those used in the original mapping call will
->   * succeed.
-> + * VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP should be set to get dirty bitmap
-> + * before unmapping IO virtual addresses. When this flag is set, user must
-> + * provide data[] as structure vfio_bitmap. User must allocate memory to get
-> + * bitmap, clear the bitmap memory by setting zero and must set size of
-> + * allocated memory in vfio_bitmap.size field. One bit in bitmap
-> + * represents per page, page of user provided page size in 'pgsize',
-> + * consecutively starting from iova offset. Bit set indicates page at that
-> + * offset from iova is dirty. Bitmap of pages in the range of unmapped size is
-> + * returned in vfio_bitmap.data
->   */
->  struct vfio_iommu_type1_dma_unmap {
->  	__u32	argsz;
->  	__u32	flags;
-> +#define VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP (1 << 0)
->  	__u64	iova;				/* IO virtual address */
->  	__u64	size;				/* Size of mapping (bytes) */
-> +	__u8    data[];
->  };
->  
->  #define VFIO_IOMMU_UNMAP_DMA _IO(VFIO_TYPE, VFIO_BASE + 14)
-> -- 
-> 2.7.0
-> 
+> v8->v9 Changelog:
+> - using guest_lbr_constraint to create guest LBR event without hw counter;
+>    (please check perf changes in patch 0003)
+> - rename 'cpuc->vcpu_lbr' to 'cpuc->guest_lbr_enabled';
+>    (please check host LBR changes in patch 0004)
+> - replace 'pmu->lbr_used' mechanism with lazy release kvm_pmu_lbr_cleanup();
+> - refactor IA32_PERF_CAPABILITIES trap via get_perf_capabilities();
+> - refactor kvm_pmu_lbr_enable() with kvm_pmu_lbr_setup();
+> - simplify model-specific LBR functionality check;
+> - rename x86_perf_get_lbr_stack to x86_perf_get_lbr;
+> - rename intel_pmu_lbr_confirm() to kvm_pmu_availability_check();
+>
+> Previous:
+> https://lore.kernel.org/lkml/1565075774-26671-1-git-send-email-wei.w.wang@intel.com/
+>
+> Like Xu (7):
+>    perf/x86/lbr: Add interface to get basic information about LBR stack
+>    perf/x86: Add constraint to create guest LBR event without hw counter
+>    perf/x86: Keep LBR stack unchanged on the host for guest LBR event
+>    KVM: x86: Add KVM_CAP_X86_GUEST_LBR interface to dis/enable LBR
+>      feature
+>    KVM: x86/pmu: Add LBR feature emulation via guest LBR event
+>    KVM: x86/pmu: Release guest LBR event via vPMU lazy release mechanism
+>    KVM: x86: Expose MSR_IA32_PERF_CAPABILITIES to guest for LBR record
+>      format
+>
+> Wei Wang (3):
+>    perf/x86: Fix msr variable type for the LBR msrs
+>    KVM: x86/pmu: Tweak kvm_pmu_get_msr to pass 'struct msr_data' in
+>    KVM: x86: Remove the common trap handler of the MSR_IA32_DEBUGCTLMSR
+>
+>   Documentation/virt/kvm/api.rst    |  28 +++
+>   arch/x86/events/core.c            |   9 +-
+>   arch/x86/events/intel/core.c      |  29 +++
+>   arch/x86/events/intel/lbr.c       |  55 +++++-
+>   arch/x86/events/perf_event.h      |  21 ++-
+>   arch/x86/include/asm/kvm_host.h   |   7 +
+>   arch/x86/include/asm/perf_event.h |  24 ++-
+>   arch/x86/kvm/cpuid.c              |   3 +-
+>   arch/x86/kvm/pmu.c                |  28 ++-
+>   arch/x86/kvm/pmu.h                |  26 ++-
+>   arch/x86/kvm/pmu_amd.c            |   7 +-
+>   arch/x86/kvm/vmx/pmu_intel.c      | 291 ++++++++++++++++++++++++++++--
+>   arch/x86/kvm/vmx/vmx.c            |   4 +-
+>   arch/x86/kvm/vmx/vmx.h            |   2 +
+>   arch/x86/kvm/x86.c                |  42 +++--
+>   include/linux/perf_event.h        |   7 +
+>   include/uapi/linux/kvm.h          |   1 +
+>   kernel/events/core.c              |   7 -
+>   tools/include/uapi/linux/kvm.h    |   1 +
+>   19 files changed, 540 insertions(+), 52 deletions(-)
+>
+
