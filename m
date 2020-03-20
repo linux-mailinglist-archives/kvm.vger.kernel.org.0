@@ -2,172 +2,247 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4BB5518D9A8
-	for <lists+kvm@lfdr.de>; Fri, 20 Mar 2020 21:46:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6865E18D9BC
+	for <lists+kvm@lfdr.de>; Fri, 20 Mar 2020 21:53:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726880AbgCTUqS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Mar 2020 16:46:18 -0400
-Received: from mail-ed1-f68.google.com ([209.85.208.68]:35587 "EHLO
-        mail-ed1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726783AbgCTUqR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Mar 2020 16:46:17 -0400
-Received: by mail-ed1-f68.google.com with SMTP id a20so8745940edj.2
-        for <kvm@vger.kernel.org>; Fri, 20 Mar 2020 13:46:16 -0700 (PDT)
+        id S1726855AbgCTUxN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Mar 2020 16:53:13 -0400
+Received: from mail-pj1-f67.google.com ([209.85.216.67]:35600 "EHLO
+        mail-pj1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726738AbgCTUxM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Mar 2020 16:53:12 -0400
+Received: by mail-pj1-f67.google.com with SMTP id md6so36162pjb.0
+        for <kvm@vger.kernel.org>; Fri, 20 Mar 2020 13:53:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=/PDiCfVzJR6fbRiqtmPfVAOBY9XV5yzFUyxAY7cQmzw=;
-        b=tkGRj8xZJfs2RvgR+4qOK2ziAbf0K6kdOl8ufOPd6164iOO08RbnkY7zFwFfC3DsgM
-         ldbMShmk4xhjfhZ8hFfbAKecG+uVtemC5hiXQEC2CVKkOG5y/ad8GOsZnvREFECLGHvX
-         smJ1VwBSRYmRXtodlcQNTHsGW9K7BVYEV3f5tZY7Ra5pBpzwfl8BF8s21cztiSBlqRlW
-         Fl8uqP9x9Bc+Pdcs6PeZNoqCIkVbSXtmJuJcX4cCJ+4I6Jofbr/X5Iq0lyKwy0ctFq6F
-         cd3a+m89Xx+8tIWMhwlTBJ+q1Kwc4mvgC0uInHJKdIAHFSgzBSSoMJoD4hAXMbUbA10R
-         bT7g==
+        h=date:from:to:cc:subject:in-reply-to:message-id:references
+         :user-agent:mime-version;
+        bh=J/8p3UslkfxkazuuIhw9AGyhLcWU24JMkJmDvprnAhY=;
+        b=nOwZCr2ivALZt1aDv9YFo6F4kwz4JRZolQqjxNvEdRHdm8SyYBRHW2HIIp6WKHnO02
+         V1Y9ERrmONv+hlcSM+SoFxnCtjFOffoFK88FB5ActwZ7Ly1gS6nkKs85c2DZcXEf7Sji
+         ohs+9aoo5+rurAFbIdYMY74Mb3i+hj2DcEq0Pf1YemnM98/uyDAnZUsYfzG8X1IhIXrq
+         C1bUti2JiW0WDPgSlWk1p/Cp9MDjnyfPD+/jc0zUymBi8yQNYSBn68WSCtHz6Fdy36TU
+         HfR71t5JNxGtAdGySpJw8rKPjkwFBKyb3pBQ5IutgR5ECR6FWy+QmVxhgzJevlb5FiDh
+         oVIg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=/PDiCfVzJR6fbRiqtmPfVAOBY9XV5yzFUyxAY7cQmzw=;
-        b=Sj0qFwVX6fYzFXO5Ummo9YcDtQcPAwnqxKa6AfH6dz9UEE/dgKY8ksMcp5nkDlbIpt
-         8wAxFKGsJBTQ++XX2zj7F/kAQbUmRzTWNlRZvVBXewMrhUn90HE3p6rABpf9ZACHy4fN
-         +KNyUbYg+dssndi6w9WfvF+Ss+TRrbdAlQNr3kQnNCzzfw3Fz8OwAxOt8RkR64GC6844
-         HajpvshjjX+ce3Kw2E838GuHoZiEigw5kCZdi2vV3gY7tiR2kgLx8yYlIkNa/isFCy3/
-         GM+pyvFHkub1Mg/XlZJtJenmxnPniHaa6cjctlAUsWwB/lhnJiENwxBAx5H2KTeok/VP
-         sT6A==
-X-Gm-Message-State: ANhLgQ1ABB7MqQuPm1gE8PkOURFP6e/vamlSqrY4kdjYpJprHCYXgwJT
-        lhyGNhbWdzo4tcniQXf/q/ksS7RJTAsPbNvZ1z+fRw==
-X-Google-Smtp-Source: ADFU+vtNahf1ktCk9uXI6lwbWpCy1CyBcl/mn73xmDSWeKU/+hJQIqGxgwfvUbpvn3jz2flPR1KB+RMwMge5xFhjAxk=
-X-Received: by 2002:a17:906:7e51:: with SMTP id z17mr9972500ejr.373.1584737175024;
- Fri, 20 Mar 2020 13:46:15 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:in-reply-to:message-id
+         :references:user-agent:mime-version;
+        bh=J/8p3UslkfxkazuuIhw9AGyhLcWU24JMkJmDvprnAhY=;
+        b=lSWfdhvyTQ5q0/C5amQ3QnhmtTFNj7sHmJzD41j+iybwyEwHSMQdMGxdePRIReKekR
+         iKbnEsAkxHcfDLZFRRNxyKqENWTT3/Fsk25fXH3A7yQstXQMlWn73TjNMvlgRBDcGdKo
+         MgHYWvAdw4/QyWMOfilwFhPLgWr8K3VeZXr3z/gARzeG2FDsEiPMbJcaEk8K8ngmHpH3
+         Rh2zwlKcHv4JviUGKfN8ZERkfcrQPydwvgfCLD6a3x0miORCCtD938omCdP+bjGSARaf
+         JHxBPAYVjzVzMZZDrfS17OSqtoO+8E0E11go1HuuEuJpuiiBIiX8cdnXXjEezyTtYE94
+         03YQ==
+X-Gm-Message-State: ANhLgQ1WJwWTk/FO03QQSzO6c2swyrm8MW7flYbbIYbK0LGsLPnctti4
+        Kax7ywRVc85CzUmeaSFg/USuGA==
+X-Google-Smtp-Source: ADFU+vubVfAdTukwmO0ljrIThZF6+MhebcGkYcCypvlm4XwSD9cP0lf8G4PA9GO3s3pCxaj3g3nDwg==
+X-Received: by 2002:a17:90b:3613:: with SMTP id ml19mr11555148pjb.71.1584737590060;
+        Fri, 20 Mar 2020 13:53:10 -0700 (PDT)
+Received: from [2620:15c:17:3:3a5:23a7:5e32:4598] ([2620:15c:17:3:3a5:23a7:5e32:4598])
+        by smtp.gmail.com with ESMTPSA id u18sm6538998pfl.40.2020.03.20.13.53.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 20 Mar 2020 13:53:09 -0700 (PDT)
+Date:   Fri, 20 Mar 2020 13:53:08 -0700 (PDT)
+From:   David Rientjes <rientjes@google.com>
+X-X-Sender: rientjes@chino.kir.corp.google.com
+To:     Joerg Roedel <joro@8bytes.org>
+cc:     x86@kernel.org, hpa@zytor.com, Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Thomas Hellstrom <thellstrom@vmware.com>,
+        Jiri Slaby <jslaby@suse.cz>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Juergen Gross <jgross@suse.com>,
+        Kees Cook <keescook@chromium.org>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        Joerg Roedel <jroedel@suse.de>
+Subject: Re: [PATCH 21/70] x86/boot/compressed/64: Add function to map a page
+ unencrypted
+In-Reply-To: <20200319091407.1481-22-joro@8bytes.org>
+Message-ID: <alpine.DEB.2.21.2003201350300.205664@chino.kir.corp.google.com>
+References: <20200319091407.1481-1-joro@8bytes.org> <20200319091407.1481-22-joro@8bytes.org>
+User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
 MIME-Version: 1.0
-References: <20200320175910.180266-1-yonghyun@google.com> <20200320123425.49c6568e@w520.home>
-In-Reply-To: <20200320123425.49c6568e@w520.home>
-From:   Yonghyun Hwang <yonghyun@google.com>
-Date:   Fri, 20 Mar 2020 13:46:04 -0700
-Message-ID: <CAEauFbx1Su7Lg5kdxXnvUwfwLCH67qaGB6EZ7g3OOH-tbRfBBA@mail.gmail.com>
-Subject: Re: [PATCH] vfio-mdev: support mediated device creation in kernel
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     Kirti Wankhede <kwankhede@nvidia.com>,
-        Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Havard Skinnemoen <hskinnemoen@google.com>,
-        Moritz Fischer <mdf@kernel.org>,
-        Joshua Lang <joshualang@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Mar 20, 2020 at 11:34 AM Alex Williamson
-<alex.williamson@redhat.com> wrote:
->
-> On Fri, 20 Mar 2020 10:59:10 -0700
-> Yonghyun Hwang <yonghyun@google.com> wrote:
->
-> > To enable a mediated device, a device driver registers its device to VFIO
-> > MDev framework. Once the mediated device gets enabled, UUID gets fed onto
-> > the sysfs attribute, "create", to create the mediated device. This
-> > additional step happens after boot-up gets complete. If the driver knows
-> > how many mediated devices need to be created during probing time, the
-> > additional step becomes cumbersome. This commit implements a new function
-> > to allow the driver to create a mediated device in kernel.
->
-> But pre-creating mdev devices seems like a policy decision.  Why can't
-> userspace make such a policy decision, and do so with persistent uuids,
-> via something like mdevctl?  Thanks,
->
-> Alex
+On Thu, 19 Mar 2020, Joerg Roedel wrote:
 
-Yep, it can be viewed as the policy decision and userspace can make
-the decision. However, it would be handy and plausible, if a device
-driver can pre-create "fixed or default" # of mdev devices, while
-allowing the device policy to come into play after bootup gets
-complete. Without this patch, a device driver should release the
-policy and the policy should be aligned with the driver, which would
-be cumbersome (sometimes painful) in a cloud environment. My use case
-with mdev is to enable a subset of vfio-pci features without losing my
-device driver.
+> From: Joerg Roedel <jroedel@suse.de>
+> 
+> This function is needed to map the GHCB for SEV-ES guests. The GHCB is
+> used for communication with the hypervisor, so its content must not be
+> encrypted.
+> 
+> Signed-off-by: Joerg Roedel <jroedel@suse.de>
+> ---
+>  arch/x86/boot/compressed/ident_map_64.c | 125 ++++++++++++++++++++++++
+>  arch/x86/boot/compressed/misc.h         |   1 +
+>  2 files changed, 126 insertions(+)
+> 
+> diff --git a/arch/x86/boot/compressed/ident_map_64.c b/arch/x86/boot/compressed/ident_map_64.c
+> index feb180cced28..04a5ff4bda66 100644
+> --- a/arch/x86/boot/compressed/ident_map_64.c
+> +++ b/arch/x86/boot/compressed/ident_map_64.c
+> @@ -26,6 +26,7 @@
+>  #include <asm/init.h>
+>  #include <asm/pgtable.h>
+>  #include <asm/trap_defs.h>
+> +#include <asm/cmpxchg.h>
+>  /* Use the static base for this part of the boot process */
+>  #undef __PAGE_OFFSET
+>  #define __PAGE_OFFSET __PAGE_OFFSET_BASE
+> @@ -157,6 +158,130 @@ void initialize_identity_maps(void)
+>  	write_cr3(top_level_pgt);
+>  }
+>  
+> +static pte_t *split_large_pmd(struct x86_mapping_info *info,
+> +			      pmd_t *pmdp, unsigned long __address)
+> +{
+> +	unsigned long page_flags;
+> +	unsigned long address;
+> +	pte_t *pte;
+> +	pmd_t pmd;
+> +	int i;
+> +
+> +	pte = (pte_t *)info->alloc_pgt_page(info->context);
+> +	if (!pte)
+> +		return NULL;
+> +
+> +	address     = __address & PMD_MASK;
+> +	/* No large page - clear PSE flag */
+> +	page_flags  = info->page_flag & ~_PAGE_PSE;
+> +
+> +	/* Populate the PTEs */
+> +	for (i = 0; i < PTRS_PER_PMD; i++) {
+> +		set_pte(&pte[i], __pte(address | page_flags));
+> +		address += PAGE_SIZE;
+> +	}
+> +
+> +	/*
+> +	 * Ideally we need to clear the large PMD first and do a TLB
+> +	 * flush before we write the new PMD. But the 2M range of the
+> +	 * PMD might contain the code we execute and/or the stack
+> +	 * we are on, so we can't do that. But that should be safe here
+> +	 * because we are going from large to small mappings and we are
+> +	 * also the only user of the page-table, so there is no chance
+> +	 * of a TLB multihit.
+> +	 */
+> +	pmd = __pmd((unsigned long)pte | info->kernpg_flag);
+> +	set_pmd(pmdp, pmd);
+> +	/* Flush TLB to establish the new PMD */
+> +	write_cr3(top_level_pgt);
+> +
+> +	return pte + pte_index(__address);
+> +}
+> +
+> +static void clflush_page(unsigned long address)
+> +{
+> +	unsigned int flush_size;
+> +	char *cl, *start, *end;
+> +
+> +	/*
+> +	 * Hardcode cl-size to 64 - CPUID can't be used here because that might
+> +	 * cause another #VC exception and the GHCB is not ready to use yet.
+> +	 */
+> +	flush_size = 64;
+> +	start      = (char *)(address & PAGE_MASK);
+> +	end        = start + PAGE_SIZE;
+> +
+> +	/*
+> +	 * First make sure there are no pending writes on the cache-lines to
+> +	 * flush.
+> +	 */
+> +	asm volatile("mfence" : : : "memory");
+> +
+> +	for (cl = start; cl != end; cl += flush_size)
+> +		clflush(cl);
+> +}
+> +
+> +static int __set_page_decrypted(struct x86_mapping_info *info,
+> +				unsigned long address)
+> +{
+> +	unsigned long scratch, *target;
+> +	pgd_t *pgdp = (pgd_t *)top_level_pgt;
+> +	p4d_t *p4dp;
+> +	pud_t *pudp;
+> +	pmd_t *pmdp;
+> +	pte_t *ptep, pte;
+> +
+> +	/*
+> +	 * First make sure there is a PMD mapping for 'address'.
+> +	 * It should already exist, but keep things generic.
+> +	 *
+> +	 * To map the page just read from it and fault it in if there is no
+> +	 * mapping yet. add_identity_map() can't be called here because that
+> +	 * would unconditionally map the address on PMD level, destroying any
+> +	 * PTE-level mappings that might already exist.  Also do something
+> +	 * useless with 'scratch' so the access won't be optimized away.
+> +	 */
+> +	target = (unsigned long *)address;
+> +	scratch = *target;
+> +	arch_cmpxchg(target, scratch, scratch);
+> +
+> +	/*
+> +	 * The page is mapped at least with PMD size - so skip checks and walk
+> +	 * directly to the PMD.
+> +	 */
+> +	p4dp = p4d_offset(pgdp, address);
+> +	pudp = pud_offset(p4dp, address);
+> +	pmdp = pmd_offset(pudp, address);
+> +
+> +	if (pmd_large(*pmdp))
+> +		ptep = split_large_pmd(info, pmdp, address);
+> +	else
+> +		ptep = pte_offset_kernel(pmdp, address);
+> +
+> +	if (!ptep)
+> +		return -ENOMEM;
+> +
+> +	/* Clear encryption flag and write new pte */
+> +	pte = pte_clear_flags(*ptep, _PAGE_ENC);
+> +	set_pte(ptep, pte);
+> +
+> +	/* Flush TLB to map the page unencrypted */
+> +	write_cr3(top_level_pgt);
+> +
 
-Thank you,
-Yonghyun
+Is there a guarantee that this flushes the tlb if cr3 == top_level_pgt 
+alrady without an invlpg?
 
-
->
->
-> > Signed-off-by: Yonghyun Hwang <yonghyun@google.com>
-> > ---
-> >  drivers/vfio/mdev/mdev_core.c | 45 +++++++++++++++++++++++++++++++++++
-> >  include/linux/mdev.h          |  3 +++
-> >  2 files changed, 48 insertions(+)
-> >
-> > diff --git a/drivers/vfio/mdev/mdev_core.c b/drivers/vfio/mdev/mdev_core.c
-> > index b558d4cfd082..a6d32516de42 100644
-> > --- a/drivers/vfio/mdev/mdev_core.c
-> > +++ b/drivers/vfio/mdev/mdev_core.c
-> > @@ -350,6 +350,51 @@ int mdev_device_create(struct kobject *kobj,
-> >       return ret;
-> >  }
-> >
-> > +/*
-> > + * mdev_create_device : Create a mdev device
-> > + * @dev: device structure representing parent device.
-> > + * @uuid: uuid char string for a mdev device.
-> > + * @group: index to supported type groups for a mdev device.
-> > + *
-> > + * Create a mdev device in kernel.
-> > + * Returns a negative value on error, otherwise 0.
-> > + */
-> > +int mdev_create_device(struct device *dev,
-> > +                     const char *uuid, int group)
-> > +{
-> > +     struct mdev_parent *parent = NULL;
-> > +     struct mdev_type *type = NULL;
-> > +     guid_t guid;
-> > +     int i = 1;
-> > +     int ret;
-> > +
-> > +     ret = guid_parse(uuid, &guid);
-> > +     if (ret) {
-> > +             dev_err(dev, "Failed to parse UUID");
-> > +             return ret;
-> > +     }
-> > +
-> > +     parent = __find_parent_device(dev);
-> > +     if (!parent) {
-> > +             dev_err(dev, "Failed to find parent mdev device");
-> > +             return -ENODEV;
-> > +     }
-> > +
-> > +     list_for_each_entry(type, &parent->type_list, next) {
-> > +             if (i == group)
-> > +                     break;
-> > +             i++;
-> > +     }
-> > +
-> > +     if (!type || i != group) {
-> > +             dev_err(dev, "Failed to find mdev device");
-> > +             return -ENODEV;
-> > +     }
-> > +
-> > +     return mdev_device_create(&type->kobj, parent->dev, &guid);
-> > +}
-> > +EXPORT_SYMBOL(mdev_create_device);
-> > +
-> >  int mdev_device_remove(struct device *dev)
-> >  {
-> >       struct mdev_device *mdev, *tmp;
-> > diff --git a/include/linux/mdev.h b/include/linux/mdev.h
-> > index 0ce30ca78db0..b66f67998916 100644
-> > --- a/include/linux/mdev.h
-> > +++ b/include/linux/mdev.h
-> > @@ -145,4 +145,7 @@ struct device *mdev_parent_dev(struct mdev_device *mdev);
-> >  struct device *mdev_dev(struct mdev_device *mdev);
-> >  struct mdev_device *mdev_from_dev(struct device *dev);
-> >
-> > +extern int mdev_create_device(struct device *dev,
-> > +                     const char *uuid, int group_idx);
-> > +
-> >  #endif /* MDEV_H */
->
+> +	/*
+> +	 * Changing encryption attributes of a page requires to flush it from
+> +	 * the caches.
+> +	 */
+> +	clflush_page(address);
+> +
+> +	return 0;
+> +}
+> +
+> +int set_page_decrypted(unsigned long address)
+> +{
+> +	return __set_page_decrypted(&mapping_info, address);
+> +}
+> +
+>  static void pf_error(unsigned long error_code, unsigned long address,
+>  		     struct pt_regs *regs)
+>  {
+> diff --git a/arch/x86/boot/compressed/misc.h b/arch/x86/boot/compressed/misc.h
+> index 0e3508c5c15c..42f68a858a35 100644
+> --- a/arch/x86/boot/compressed/misc.h
+> +++ b/arch/x86/boot/compressed/misc.h
+> @@ -98,6 +98,7 @@ static inline void choose_random_location(unsigned long input,
+>  #endif
+>  
+>  #ifdef CONFIG_X86_64
+> +extern int set_page_decrypted(unsigned long address);
+>  extern unsigned char _pgtable[];
+>  #endif
+>  
