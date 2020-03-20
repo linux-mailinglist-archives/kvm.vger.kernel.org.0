@@ -2,137 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 10F8F18D594
-	for <lists+kvm@lfdr.de>; Fri, 20 Mar 2020 18:19:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C89C518D5C2
+	for <lists+kvm@lfdr.de>; Fri, 20 Mar 2020 18:28:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727158AbgCTRSx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Mar 2020 13:18:53 -0400
-Received: from mga01.intel.com ([192.55.52.88]:27716 "EHLO mga01.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726867AbgCTRSx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Mar 2020 13:18:53 -0400
-IronPort-SDR: h8AV/6FI2EEoHL9RglLWgBtAbT/CsoOWhWocIMy00S/A7vCdLO47wPLE+eauroEVneQB80BBmU
- GwxkwLJpzCKQ==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Mar 2020 10:18:52 -0700
-IronPort-SDR: 0cz85uFwoQtLLVv7DCcCeNiE5EgXeu5SUeyZK1XhF4/047s7fdBY9zcyPOUOvtE0HMNoksIQW9
- c7qhA4E3mdDg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.72,285,1580803200"; 
-   d="scan'208";a="239283183"
-Received: from lkp-server01.sh.intel.com (HELO lkp-server01) ([10.239.97.150])
-  by orsmga008.jf.intel.com with ESMTP; 20 Mar 2020 10:18:50 -0700
-Received: from kbuild by lkp-server01 with local (Exim 4.89)
-        (envelope-from <lkp@intel.com>)
-        id 1jFLIH-0003RB-CC; Sat, 21 Mar 2020 01:18:49 +0800
-Date:   Sat, 21 Mar 2020 01:18:14 +0800
-From:   kbuild test robot <lkp@intel.com>
-To:     Yang Weijiang <weijiang.yang@intel.com>
-Cc:     kbuild-all@lists.01.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, sean.j.christopherson@intel.com,
-        pbonzini@redhat.com, jmattson@google.com
-Subject: Re: [PATCH v10 8/8] KVM: X86: Set CET feature bits for CPUID
- enumeration
-Message-ID: <202003210154.29vmxMsO%lkp@intel.com>
-References: <20200320034342.26610-9-weijiang.yang@intel.com>
+        id S1727022AbgCTR2v (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Mar 2020 13:28:51 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:44910 "EHLO
+        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725446AbgCTR2v (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Mar 2020 13:28:51 -0400
+Received: by mail-wr1-f66.google.com with SMTP id j14so623766wrb.11;
+        Fri, 20 Mar 2020 10:28:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=dpvhqwRYw1qK6j1rjp4VmuYOJGPSPljg5Ewku7G0J+c=;
+        b=bImwAdo43YjbEYIAW4e1v87x+01rV4kvnpJrmHuiDYu8guEawZVIIbEyBJpbl+i6XF
+         qhBTlAoxUB2KVSPhLCgUEM3XXYaLWgQ37vqn9g8jlXLjYVZrJxxl2rTFm0e6aGkwXUEp
+         u1vNNx5oTg+yLfHx6lEHLVXKOS5tveVA09o9S67yw26XWmYoW7w44mSYzhemhveyo93t
+         w0jfLRZxuXNl/wuyLmH9Ode7HfhvagUZBcCz8oPnVlOpBXw4y6ol0gtgolFdTJhEg3dg
+         Gj1eTv2AWgG1YzvE9GXGKyYvC/vlgh3PIvHskB6MbN0gSs8sF9YC1mu6IsfUIqsqNY/s
+         qi0w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=dpvhqwRYw1qK6j1rjp4VmuYOJGPSPljg5Ewku7G0J+c=;
+        b=e4foobh5YxJT0FG1x/15e6CPKMn04IxfFC/YvzYlVZgT6rT6QjHlHEPNSGFuGBIwI1
+         nSJRWZGpgzTj1eGOzN6wxxK/ADIqwWN5El1h2QetaQDGe8BqtX3JqNL5ugqrpUq49794
+         7gctlMaD6kugAOmcbJHnuXQMfUN5QBYDbnFHSb/Bczr6+mY/Qa3MkUaA+c+JsToabLaY
+         oSlAs01L4YIPEDsw0JJ3gjm1tnJLUHOdJEBh1OFTD/N5pwEPMJvcvjvVzu53arB09ok7
+         1uTFLdwcOODssmENf1wAE7FKBvoKta7+VvbW3YX4G5vcQohFasGrc8SqJxqDld+w9gbR
+         3DNA==
+X-Gm-Message-State: ANhLgQ2go1ZCIxnLu6SrFuD0BON8Of7YN6o5zffzVLhtteSXKmFohGkS
+        ETX7xabCIo7lYBVXTJMNf3uThcxxBTk=
+X-Google-Smtp-Source: ADFU+vuqYqNrfEWDKPA1t64oIJcfbVFs/Kjhgs4cTypkOa67P8c/7QCwPUlNzRwkrqrOChHHuZKHKg==
+X-Received: by 2002:adf:f309:: with SMTP id i9mr13332572wro.0.1584725328088;
+        Fri, 20 Mar 2020 10:28:48 -0700 (PDT)
+Received: from jondnuc.lan (IGLD-84-229-155-229.inter.net.il. [84.229.155.229])
+        by smtp.gmail.com with ESMTPSA id q4sm11028333wmj.1.2020.03.20.10.28.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 20 Mar 2020 10:28:47 -0700 (PDT)
+From:   Jon Doron <arilou@gmail.com>
+To:     kvm@vger.kernel.org, linux-hyperv@vger.kernel.org
+Cc:     vkuznets@redhat.com, Jon Doron <arilou@gmail.com>
+Subject: [PATCH v9 0/6] x86/kvm/hyper-v: add support for synthetic debugger
+Date:   Fri, 20 Mar 2020 19:28:33 +0200
+Message-Id: <20200320172839.1144395-1-arilou@gmail.com>
+X-Mailer: git-send-email 2.24.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200320034342.26610-9-weijiang.yang@intel.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Yang,
+Add support for the synthetic debugger interface of hyper-v, the
+synthetic debugger has 2 modes.
+1. Use a set of MSRs to send/recv information (undocumented so it's not
+   going to the hyperv-tlfs.h)
+2. Use hypercalls
 
-Thank you for the patch! Perhaps something to improve:
+The first mode is based the following MSRs:
+1. Control/Status MSRs which either asks for a send/recv .
+2. Send/Recv MSRs each holds GPA where the send/recv buffers are.
+3. Pending MSR, holds a GPA to a PAGE that simply has a boolean that
+   indicates if there is data pending to issue a recv VMEXIT.
 
-[auto build test WARNING on kvm/linux-next]
-[also build test WARNING on next-20200320]
-[cannot apply to vhost/linux-next tip/auto-latest linux/master linus/master v5.6-rc6]
-[if your patch is applied to the wrong git tree, please drop us a note to help
-improve the system. BTW, we also suggest to use '--base' option to specify the
-base tree in git format-patch, please see https://stackoverflow.com/a/37406982]
+The first mode implementation is to simply exit to user-space when
+either the control MSR or the pending MSR are being set.
+Then it's up-to userspace to implement the rest of the logic of sending/recving.
 
-url:    https://github.com/0day-ci/linux/commits/Yang-Weijiang/Introduce-support-for-guest-CET-feature/20200320-155517
-base:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git linux-next
-reproduce:
-        # apt-get install sparse
-        # sparse version: v0.6.1-181-g83789bbc-dirty
-        make ARCH=x86_64 allmodconfig
-        make C=1 CF='-fdiagnostic-prefix -D__CHECK_ENDIAN__'
+In the second mode instead of using MSRs KNet will simply issue
+Hypercalls with the information to send/recv, in this mode the data
+being transferred is UDP encapsulated, unlike in the previous mode in
+which you get just the data to send.
 
-If you fix the issue, kindly add following tag
-Reported-by: kbuild test robot <lkp@intel.com>
+The new hypercalls will exit to userspace which will be incharge of
+re-encapsulating if needed the UDP packets to be sent.
 
+There is an issue though in which KDNet does not respect the hypercall
+page and simply issues vmcall/vmmcall instructions depending on the cpu
+type expecting them to be handled as it a real hypercall was issued.
 
-sparse warnings: (new ones prefixed by >>)
+It's important to note that part of this feature has been subject to be
+removed in future versions of Windows, which is why some of the
+defintions will not be present the the TLFS but in the kvm hyperv header
+instead.
 
-   arch/x86/kvm/x86.c:98:46: sparse: sparse: undefined identifier 'X86_CR4_CET'
->> arch/x86/kvm/x86.c:98:46: sparse: sparse: cast from unknown type
-   arch/x86/kvm/x86.c:809:60: sparse: sparse: undefined identifier 'X86_CR4_CET'
-   arch/x86/kvm/x86.c:940:29: sparse: sparse: undefined identifier 'X86_CR4_CET'
-   arch/x86/kvm/x86.c:940:29: sparse: sparse: cast from unknown type
-   arch/x86/kvm/x86.c:956:19: sparse: sparse: undefined identifier 'X86_CR4_CET'
-   arch/x86/kvm/x86.c:956:19: sparse: sparse: cast from unknown type
-   arch/x86/kvm/x86.c:1233:23: sparse: sparse: undefined identifier 'MSR_IA32_U_CET'
-   arch/x86/kvm/x86.c:1233:39: sparse: sparse: undefined identifier 'MSR_IA32_S_CET'
-   arch/x86/kvm/x86.c:1234:9: sparse: sparse: undefined identifier 'MSR_IA32_PL0_SSP'
-   arch/x86/kvm/x86.c:1234:27: sparse: sparse: undefined identifier 'MSR_IA32_PL1_SSP'
-   arch/x86/kvm/x86.c:1234:45: sparse: sparse: undefined identifier 'MSR_IA32_PL2_SSP'
-   arch/x86/kvm/x86.c:1235:9: sparse: sparse: undefined identifier 'MSR_IA32_PL3_SSP'
-   arch/x86/kvm/x86.c:1235:27: sparse: sparse: undefined identifier 'MSR_IA32_INT_SSP_TAB'
-   arch/x86/kvm/x86.c:1512:14: sparse: sparse: undefined identifier 'MSR_IA32_PL0_SSP'
-   arch/x86/kvm/x86.c:1512:35: sparse: sparse: undefined identifier 'MSR_IA32_PL3_SSP'
-   arch/x86/kvm/x86.c:1513:14: sparse: sparse: undefined identifier 'MSR_IA32_U_CET'
-   arch/x86/kvm/x86.c:1514:14: sparse: sparse: undefined identifier 'MSR_IA32_S_CET'
-   arch/x86/kvm/x86.c:1515:14: sparse: sparse: undefined identifier 'MSR_IA32_INT_SSP_TAB'
-   arch/x86/kvm/x86.c:1512:14: sparse: sparse: incompatible types for 'case' statement
-   arch/x86/kvm/x86.c:1512:35: sparse: sparse: incompatible types for 'case' statement
-   arch/x86/kvm/x86.c:1513:14: sparse: sparse: incompatible types for 'case' statement
-   arch/x86/kvm/x86.c:1514:14: sparse: sparse: incompatible types for 'case' statement
-   arch/x86/kvm/x86.c:1515:14: sparse: sparse: incompatible types for 'case' statement
-   arch/x86/kvm/x86.c:2646:38: sparse: sparse: incorrect type in argument 1 (different address spaces) @@    expected void const [noderef] <asn:1> * @@    got  const [noderef] <asn:1> * @@
-   arch/x86/kvm/x86.c:2646:38: sparse:    expected void const [noderef] <asn:1> *
-   arch/x86/kvm/x86.c:2646:38: sparse:    got unsigned char [usertype] *
-   arch/x86/kvm/x86.c:3267:25: sparse: sparse: undefined identifier 'MSR_IA32_U_CET'
-   arch/x86/kvm/x86.c:7549:15: sparse: sparse: incompatible types in comparison expression (different address spaces):
-   arch/x86/kvm/x86.c:7549:15: sparse:    struct kvm_apic_map [noderef] <asn:4> *
-   arch/x86/kvm/x86.c:7549:15: sparse:    struct kvm_apic_map *
-   arch/x86/kvm/x86.c:9678:44: sparse: sparse: undefined identifier 'XFEATURE_MASK_CET_USER'
-   arch/x86/kvm/x86.c:9678:44: sparse: sparse: undefined identifier 'XFEATURE_MASK_CET_KERNEL'
-   arch/x86/kvm/x86.c:9912:16: sparse: sparse: incompatible types in comparison expression (different address spaces):
-   arch/x86/kvm/x86.c:9912:16: sparse:    struct kvm_apic_map [noderef] <asn:4> *
-   arch/x86/kvm/x86.c:9912:16: sparse:    struct kvm_apic_map *
-   arch/x86/kvm/x86.c:9913:15: sparse: sparse: incompatible types in comparison expression (different address spaces):
-   arch/x86/kvm/x86.c:9913:15: sparse:    struct kvm_pmu_event_filter [noderef] <asn:4> *
-   arch/x86/kvm/x86.c:9913:15: sparse:    struct kvm_pmu_event_filter *
-   arch/x86/kvm/x86.c:1512:14: sparse: sparse: Expected constant expression in case statement
-   arch/x86/kvm/x86.c:1512:35: sparse: sparse: Expected constant expression in case statement
-   arch/x86/kvm/x86.c:1513:14: sparse: sparse: Expected constant expression in case statement
-   arch/x86/kvm/x86.c:1514:14: sparse: sparse: Expected constant expression in case statement
-   arch/x86/kvm/x86.c:1515:14: sparse: sparse: Expected constant expression in case statement
---
-   arch/x86/kvm/emulate.c:5495:21: sparse: sparse: arithmetics on pointers to functions
-   arch/x86/kvm/emulate.c:4206:17: sparse: sparse: undefined identifier 'X86_CR4_CET'
->> arch/x86/kvm/emulate.c:4206:17: sparse: sparse: cast from unknown type
+Jon Doron (6):
+  x86/kvm/hyper-v: Explicitly align hcall param for kvm_hyperv_exit
+  x86/kvm/hyper-v: Simplify addition for custom cpuid leafs
+  x86/hyper-v: Add synthetic debugger definitions
+  x86/kvm/hyper-v: Add support for synthetic debugger capability
+  x86/kvm/hyper-v: enable hypercalls without hypercall page with syndbg
+  x86/kvm/hyper-v: Add support for synthetic debugger via hypercalls
 
-vim +98 arch/x86/kvm/x86.c
+ Documentation/virt/kvm/api.rst     |  18 +++
+ arch/x86/include/asm/hyperv-tlfs.h |   6 +
+ arch/x86/include/asm/kvm_host.h    |  14 ++
+ arch/x86/kvm/hyperv.c              | 235 +++++++++++++++++++++++++++--
+ arch/x86/kvm/hyperv.h              |  33 ++++
+ arch/x86/kvm/trace.h               |  51 +++++++
+ arch/x86/kvm/x86.c                 |  13 ++
+ include/uapi/linux/kvm.h           |  13 ++
+ 8 files changed, 368 insertions(+), 15 deletions(-)
 
-313a3dc75da206 drivers/kvm/x86.c  Carsten Otte        2007-10-11  97  
-b11306b53b2540 arch/x86/kvm/x86.c Sean Christopherson 2019-12-10 @98  static u64 __read_mostly cr4_reserved_bits = CR4_RESERVED_BITS;
-b11306b53b2540 arch/x86/kvm/x86.c Sean Christopherson 2019-12-10  99  
+-- 
+2.24.1
 
-:::::: The code at line 98 was first introduced by commit
-:::::: b11306b53b2540c6ba068c4deddb6a17d9f8d95b KVM: x86: Don't let userspace set host-reserved cr4 bits
-
-:::::: TO: Sean Christopherson <sean.j.christopherson@intel.com>
-:::::: CC: Paolo Bonzini <pbonzini@redhat.com>
-
----
-0-DAY CI Kernel Test Service, Intel Corporation
-https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
