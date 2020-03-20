@@ -2,130 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 04FF018C7FF
-	for <lists+kvm@lfdr.de>; Fri, 20 Mar 2020 08:10:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5C5D518C7F5
+	for <lists+kvm@lfdr.de>; Fri, 20 Mar 2020 08:06:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726809AbgCTHKE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Mar 2020 03:10:04 -0400
-Received: from mail5.windriver.com ([192.103.53.11]:35148 "EHLO mail5.wrs.com"
+        id S1726829AbgCTHGi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Mar 2020 03:06:38 -0400
+Received: from mga03.intel.com ([134.134.136.65]:51858 "EHLO mga03.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726603AbgCTHKE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Mar 2020 03:10:04 -0400
-Received: from ALA-HCA.corp.ad.wrs.com (ala-hca.corp.ad.wrs.com [147.11.189.40])
-        by mail5.wrs.com (8.15.2/8.15.2) with ESMTPS id 02K76MJm001145
-        (version=TLSv1 cipher=AES256-SHA bits=256 verify=FAIL);
-        Fri, 20 Mar 2020 00:06:32 -0700
-Received: from pek-lpg-core2.corp.ad.wrs.com (128.224.153.41) by
- ALA-HCA.corp.ad.wrs.com (147.11.189.40) with Microsoft SMTP Server id
- 14.3.487.0; Fri, 20 Mar 2020 00:06:11 -0700
-From:   <zhe.he@windriver.com>
-To:     <pbonzini@redhat.com>, <sean.j.christopherson@intel.com>,
-        <vkuznets@redhat.com>, <wanpengli@tencent.com>,
-        <jmattson@google.com>, <joro@8bytes.org>, <tglx@linutronix.de>,
-        <mingo@redhat.com>, <bp@alien8.de>, <hpa@zytor.com>,
-        <x86@kernel.org>, <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <bigeasy@linutronix.de>,
-        <linux-rt-users@vger.kernel.org>, <zhe.he@windriver.com>
-Subject: [PATCH] KVM: LAPIC: Mark hrtimer for period or oneshot mode to expire in hard interrupt context
-Date:   Fri, 20 Mar 2020 15:06:07 +0800
-Message-ID: <1584687967-332859-1-git-send-email-zhe.he@windriver.com>
-X-Mailer: git-send-email 2.7.4
+        id S1726614AbgCTHGi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Mar 2020 03:06:38 -0400
+IronPort-SDR: /5RtDVa0fYimAIkILgAmXLIfuYv+MFFR4M6jlQ+8+VBUrSF1TeQEqKe72sp7jkBrTpzO0mTS9D
+ MbZWMivTYT3w==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Mar 2020 00:06:37 -0700
+IronPort-SDR: qQTFLsdf6C7DljdvIuIQN6Y1afZcxjIFlDqm5oREhf3SQKLv3Q8zMsPRwvvsQ2xfMB1iJdT5ye
+ 7yUiw7Egm94Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.72,283,1580803200"; 
+   d="scan'208";a="356328149"
+Received: from sxu27-mobl2.ccr.corp.intel.com (HELO [10.254.214.109]) ([10.254.214.109])
+  by fmsmga001.fm.intel.com with ESMTP; 20 Mar 2020 00:06:26 -0700
+Cc:     baolu.lu@linux.intel.com,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>,
+        David Airlie <airlied@linux.ie>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Marek Szyprowski <m.szyprowski@samsung.com>,
+        Kukjin Kim <kgene@kernel.org>,
+        Krzysztof Kozlowski <krzk@kernel.org>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Andy Gross <agross@kernel.org>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Matthias Brugger <matthias.bgg@gmail.com>,
+        Rob Clark <robdclark@gmail.com>,
+        Heiko Stuebner <heiko@sntech.de>,
+        Gerald Schaefer <gerald.schaefer@de.ibm.com>,
+        Thierry Reding <thierry.reding@gmail.com>,
+        Jonathan Hunter <jonathanh@nvidia.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Marc Zyngier <maz@kernel.org>,
+        Julien Grall <julien.grall@arm.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-arm-kernel@lists.infradead.org,
+        linux-samsung-soc@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+        linux-mediatek@lists.infradead.org,
+        linux-rockchip@lists.infradead.org, linux-s390@vger.kernel.org,
+        linux-tegra@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org
+Subject: Re: [PATCH 3/8] iommu/vt-d: Remove IOVA handling code from
+ non-dma_ops path
+To:     Tom Murphy <murphyt7@tcd.ie>, iommu@lists.linux-foundation.org
+References: <20191221150402.13868-1-murphyt7@tcd.ie>
+ <20191221150402.13868-4-murphyt7@tcd.ie>
+ <CALQxJuuue2MCF+xAAAcWCW=301HHZ9yWBmYV-K-ubCxO4s5eqQ@mail.gmail.com>
+From:   Lu Baolu <baolu.lu@linux.intel.com>
+Message-ID: <46bf21e2-bb3e-1c1e-8dae-2c5bd8c5274f@linux.intel.com>
+Date:   Fri, 20 Mar 2020 15:06:24 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <CALQxJuuue2MCF+xAAAcWCW=301HHZ9yWBmYV-K-ubCxO4s5eqQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: He Zhe <zhe.he@windriver.com>
+On 2020/3/20 14:30, Tom Murphy wrote:
+> Could we merge patch 1-3 from this series? it just cleans up weird
+> code and merging these patches will cover some of the work needed to
+> move the intel iommu driver to the dma-iommu api in the future.
 
-apic->lapic_timer.timer was initialized with HRTIMER_MODE_ABS_HARD but
-started later with HRTIMER_MODE_ABS, which may cause the following warning
-in PREEMPT_RT kernel.
+Can you please take a look at this patch series?
 
-WARNING: CPU: 1 PID: 2957 at kernel/time/hrtimer.c:1129 hrtimer_start_range_ns+0x348/0x3f0
-CPU: 1 PID: 2957 Comm: qemu-system-x86 Not tainted 5.4.23-rt11 #1
-Hardware name: Supermicro SYS-E300-9A-8C/A2SDi-8C-HLN4F, BIOS 1.1a 09/18/2018
-RIP: 0010:hrtimer_start_range_ns+0x348/0x3f0
-Code: 4d b8 0f 94 c1 0f b6 c9 e8 35 f1 ff ff 4c 8b 45
-      b0 e9 3b fd ff ff e8 d7 3f fa ff 48 98 4c 03 34
-      c5 a0 26 bf 93 e9 a1 fd ff ff <0f> 0b e9 fd fc ff
-      ff 65 8b 05 fa b7 90 6d 89 c0 48 0f a3 05 60 91
-RSP: 0018:ffffbc60026ffaf8 EFLAGS: 00010202
-RAX: 0000000000000001 RBX: ffff9d81657d4110 RCX: 0000000000000000
-RDX: 0000000000000000 RSI: 0000006cc7987bcf RDI: ffff9d81657d4110
-RBP: ffffbc60026ffb58 R08: 0000000000000001 R09: 0000000000000010
-R10: 0000000000000000 R11: 0000000000000000 R12: 0000006cc7987bcf
-R13: 0000000000000000 R14: 0000006cc7987bcf R15: ffffbc60026d6a00
-FS: 00007f401daed700(0000) GS:ffff9d81ffa40000(0000) knlGS:0000000000000000
-CS: 0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00000000ffffffff CR3: 0000000fa7574000 CR4: 00000000003426e0
-Call Trace:
-? kvm_release_pfn_clean+0x22/0x60 [kvm]
-start_sw_timer+0x85/0x230 [kvm]
-? vmx_vmexit+0x1b/0x30 [kvm_intel]
-kvm_lapic_switch_to_sw_timer+0x72/0x80 [kvm]
-vmx_pre_block+0x1cb/0x260 [kvm_intel]
-? vmx_vmexit+0xf/0x30 [kvm_intel]
-? vmx_vmexit+0x1b/0x30 [kvm_intel]
-? vmx_vmexit+0xf/0x30 [kvm_intel]
-? vmx_vmexit+0x1b/0x30 [kvm_intel]
-? vmx_vmexit+0xf/0x30 [kvm_intel]
-? vmx_vmexit+0x1b/0x30 [kvm_intel]
-? vmx_vmexit+0xf/0x30 [kvm_intel]
-? vmx_vmexit+0xf/0x30 [kvm_intel]
-? vmx_vmexit+0x1b/0x30 [kvm_intel]
-? vmx_vmexit+0xf/0x30 [kvm_intel]
-? vmx_vmexit+0x1b/0x30 [kvm_intel]
-? vmx_vmexit+0xf/0x30 [kvm_intel]
-? vmx_vmexit+0x1b/0x30 [kvm_intel]
-? vmx_vmexit+0xf/0x30 [kvm_intel]
-? vmx_vmexit+0x1b/0x30 [kvm_intel]
-? vmx_vmexit+0xf/0x30 [kvm_intel]
-? vmx_sync_pir_to_irr+0x9e/0x100 [kvm_intel]
-? kvm_apic_has_interrupt+0x46/0x80 [kvm]
-kvm_arch_vcpu_ioctl_run+0x85b/0x1fa0 [kvm]
-? _raw_spin_unlock_irqrestore+0x18/0x50
-? _copy_to_user+0x2c/0x30
-kvm_vcpu_ioctl+0x235/0x660 [kvm]
-? rt_spin_unlock+0x2c/0x50
-do_vfs_ioctl+0x3e4/0x650
-? __fget+0x7a/0xa0
-ksys_ioctl+0x67/0x90
-__x64_sys_ioctl+0x1a/0x20
-do_syscall_64+0x4d/0x120
-entry_SYSCALL_64_after_hwframe+0x44/0xa9
-RIP: 0033:0x7f4027cc54a7
-Code: 00 00 90 48 8b 05 e9 59 0c 00 64 c7 00 26 00 00
-      00 48 c7 c0 ff ff ff ff c3 66 2e 0f 1f 84 00 00
-      00 00 00 b8 10 00 00 00 0f 05 <48> 3d 01 f0 ff ff
-      73 01 c3 48 8b 0d b9 59 0c 00 f7 d8 64 89 01 48
-RSP: 002b:00007f401dae9858 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 00005558bd029690 RCX: 00007f4027cc54a7
-RDX: 0000000000000000 RSI: 000000000000ae80 RDI: 000000000000000d
-RBP: 00007f4028b72000 R08: 00005558bc829ad0 R09: 00000000ffffffff
-R10: 00005558bcf90ca0 R11: 0000000000000246 R12: 0000000000000000
-R13: 0000000000000000 R14: 0000000000000000 R15: 00005558bce1c840
---[ end trace 0000000000000002 ]--
+https://lkml.org/lkml/2020/3/13/1162
 
-Signed-off-by: He Zhe <zhe.he@windriver.com>
----
- arch/x86/kvm/lapic.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+It probably makes this series easier.
 
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index e3099c6..929511e 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -1715,7 +1715,7 @@ static void start_sw_period(struct kvm_lapic *apic)
- 
- 	hrtimer_start(&apic->lapic_timer.timer,
- 		apic->lapic_timer.target_expiration,
--		HRTIMER_MODE_ABS);
-+		HRTIMER_MODE_ABS_HARD);
- }
- 
- bool kvm_lapic_hv_timer_in_use(struct kvm_vcpu *vcpu)
--- 
-2.7.4
+Best regards,
+baolu
 
+> 
+> On Sat, 21 Dec 2019 at 07:04, Tom Murphy<murphyt7@tcd.ie>  wrote:
+>> Remove all IOVA handling code from the non-dma_ops path in the intel
+>> iommu driver.
+>>
+>> There's no need for the non-dma_ops path to keep track of IOVAs. The
+>> whole point of the non-dma_ops path is that it allows the IOVAs to be
+>> handled separately. The IOVA handling code removed in this patch is
+>> pointless.
+>>
+>> Signed-off-by: Tom Murphy<murphyt7@tcd.ie>
