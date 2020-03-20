@@ -2,126 +2,149 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8232918C91D
-	for <lists+kvm@lfdr.de>; Fri, 20 Mar 2020 09:45:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D5ACF18C968
+	for <lists+kvm@lfdr.de>; Fri, 20 Mar 2020 10:01:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726840AbgCTIpv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Mar 2020 04:45:51 -0400
-Received: from mga03.intel.com ([134.134.136.65]:58600 "EHLO mga03.intel.com"
+        id S1726897AbgCTJBp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Mar 2020 05:01:45 -0400
+Received: from mail.kernel.org ([198.145.29.99]:59310 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726767AbgCTIpu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Mar 2020 04:45:50 -0400
-IronPort-SDR: 9XomDNd3tMdpymeRrO3qxFPjGAiC0z++Pf0VKWhQfaaStLk6WKy0NQqamaer79CE1kiTInL2Nr
- IZ/VBS5NzuPA==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Mar 2020 01:45:50 -0700
-IronPort-SDR: 5T1C30mSaU7qaOolo5XckRkhJ0nDDnwxM5w043asqU1T28Dx/O+hHzy8nXj9/WQxzzBKTL2RyQ
- DvkYL+e6IhAQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.72,283,1580803200"; 
-   d="scan'208";a="446590259"
-Received: from likexu-mobl1.ccr.corp.intel.com (HELO [10.238.4.82]) ([10.238.4.82])
-  by fmsmga006.fm.intel.com with ESMTP; 20 Mar 2020 01:45:46 -0700
-Reply-To: like.xu@intel.com
-Subject: Re: [PATCH v9 00/10] Guest Last Branch Recording Enabling
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>
-Cc:     kvm@vger.kernel.org, Andi Kleen <ak@linux.intel.com>,
-        Jim Mattson <jmattson@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Liran Alon <liran.alon@oracle.com>,
-        Liang Kan <kan.liang@linux.intel.com>,
-        Wei Wang <wei.w.wang@intel.com>, linux-kernel@vger.kernel.org,
-        Vitaly Kuznetsov <vkuznets@redhat.com>
-References: <20200313021616.112322-1-like.xu@linux.intel.com>
-From:   "Xu, Like" <like.xu@intel.com>
-Organization: Intel OTC
-Message-ID: <446eef98-4d9f-4a9b-bdae-d29e36f6e07e@intel.com>
-Date:   Fri, 20 Mar 2020 16:45:45 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+        id S1726690AbgCTJBo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Mar 2020 05:01:44 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 1E46520752;
+        Fri, 20 Mar 2020 09:01:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1584694903;
+        bh=5GzmaNdbQWq4mwgMPIV3aDUnqAewqh/ptfOGOHCK+xw=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=jYCIgVPLeSi75fxMO5TZ8B5x9GAI/akoG5C2R9NKp2C++xG9c/7L59CgHOC3bQ/KK
+         kxFbkaBZ/58TE5YR3tosXwXXhILQr5LeIR5nykEBB/cPR+MxWI5ff+pta1Dvp7u55A
+         a0/KdFglc2/CRpBetrGMRzDIrczZ3ze842l/MkGE=
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+        by disco-boy.misterjones.org with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        (Exim 4.92)
+        (envelope-from <maz@kernel.org>)
+        id 1jFDXA-00EBob-Vl; Fri, 20 Mar 2020 09:01:41 +0000
 MIME-Version: 1.0
-In-Reply-To: <20200313021616.112322-1-like.xu@linux.intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8;
+ format=flowed
+Content-Transfer-Encoding: 8bit
+Date:   Fri, 20 Mar 2020 09:01:40 +0000
+From:   Marc Zyngier <maz@kernel.org>
+To:     Zenghui Yu <yuzenghui@huawei.com>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
+        Jason Cooper <jason@lakedaemon.net>,
+        Robert Richter <rrichter@marvell.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Eric Auger <eric.auger@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>
+Subject: Re: [PATCH v5 20/23] KVM: arm64: GICv4.1: Plumb SGI implementation
+ selection in the distributor
+In-Reply-To: <1c9fdfc8-bdb2-88b6-4bdc-2b9254dfa55c@huawei.com>
+References: <20200304203330.4967-1-maz@kernel.org>
+ <20200304203330.4967-21-maz@kernel.org>
+ <72832f51-bbde-8502-3e03-189ac20a0143@huawei.com>
+ <4a06fae9c93e10351276d173747d17f4@kernel.org>
+ <1c9fdfc8-bdb2-88b6-4bdc-2b9254dfa55c@huawei.com>
+Message-ID: <256b58a9679412c96600217f316f424f@kernel.org>
+X-Sender: maz@kernel.org
+User-Agent: Roundcube Webmail/1.3.10
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, lorenzo.pieralisi@arm.com, jason@lakedaemon.net, rrichter@marvell.com, tglx@linutronix.de, eric.auger@redhat.com, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Peter,
-any comments on the host perf changes?
+Hi Zenghui,
 
-Hi Paolo,
-any comments on the kvm changes? Isn't this feature interesting to you?
+On 2020-03-20 03:53, Zenghui Yu wrote:
+> Hi Marc,
+> 
+> On 2020/3/19 20:10, Marc Zyngier wrote:
+>>> But I wonder that should we use nassgireq to *only* keep track what
+>>> the guest had written into the GICD_CTLR.nASSGIreq.  If not, we may
+>>> lose the guest-request bit after migration among hosts with different
+>>> has_gicv4_1 settings.
+>> 
+>> I'm unsure of what you're suggesting here. If userspace tries to set
+>> GICD_CTLR.nASSGIreq on a non-4.1 host, this bit will not latch.
+> 
+> This is exactly what I *was* concerning about.
+> 
+>> Userspace can check that at restore time. Or we could fail the
+>> userspace write, which is a bit odd (the bit is otherwise RES0).
+>> 
+>> Could you clarify your proposal?
+> 
+> Let's assume two hosts below. 'has_gicv4_1' is true on host-A while
+> it is false on host-B because of lack of HW support or the kernel
+> parameter "kvm-arm.vgic_v4_enable=0".
+> 
+> If we migrate guest through A->B->A, we may end-up lose the initial
+> guest-request "nASSGIreq=1" and don't use direct vSGI delivery for
+> this guest when it's migrated back to host-A.
 
-Just kindly ping.
+My point above is that we shouldn't allow the A->B migration the first
+place, and fail it as quickly as possible. We don't know what the guest
+has observed in terms of GIC capability, and it may not have enabled the
+new flavour of SGIs just yet.
 
-Thanks,
-Like Xu
+> This can be "fixed" by keep track of what guest had written into
+> nASSGIreq. And we need to evaluate the need for using direct vSGI
+> for a specified guest by 'has_gicv4_1 && nassgireq'.
 
-On 2020/3/13 10:16, Like Xu wrote:
-> Hi all,
->
-> Please help review your interesting parts in this stable version,
-> e.g. the first four patches involve the perf event subsystem
-> and the fifth patch concerns the KVM userspace interface.
+It feels odd. It means we have more state than the HW normally has.
+I have an alternative proposal, see below.
 
-> v8->v9 Changelog:
-> - using guest_lbr_constraint to create guest LBR event without hw counter;
->    (please check perf changes in patch 0003)
-> - rename 'cpuc->vcpu_lbr' to 'cpuc->guest_lbr_enabled';
->    (please check host LBR changes in patch 0004)
-> - replace 'pmu->lbr_used' mechanism with lazy release kvm_pmu_lbr_cleanup();
-> - refactor IA32_PERF_CAPABILITIES trap via get_perf_capabilities();
-> - refactor kvm_pmu_lbr_enable() with kvm_pmu_lbr_setup();
-> - simplify model-specific LBR functionality check;
-> - rename x86_perf_get_lbr_stack to x86_perf_get_lbr;
-> - rename intel_pmu_lbr_confirm() to kvm_pmu_availability_check();
->
-> Previous:
-> https://lore.kernel.org/lkml/1565075774-26671-1-git-send-email-wei.w.wang@intel.com/
->
-> Like Xu (7):
->    perf/x86/lbr: Add interface to get basic information about LBR stack
->    perf/x86: Add constraint to create guest LBR event without hw counter
->    perf/x86: Keep LBR stack unchanged on the host for guest LBR event
->    KVM: x86: Add KVM_CAP_X86_GUEST_LBR interface to dis/enable LBR
->      feature
->    KVM: x86/pmu: Add LBR feature emulation via guest LBR event
->    KVM: x86/pmu: Release guest LBR event via vPMU lazy release mechanism
->    KVM: x86: Expose MSR_IA32_PERF_CAPABILITIES to guest for LBR record
->      format
->
-> Wei Wang (3):
->    perf/x86: Fix msr variable type for the LBR msrs
->    KVM: x86/pmu: Tweak kvm_pmu_get_msr to pass 'struct msr_data' in
->    KVM: x86: Remove the common trap handler of the MSR_IA32_DEBUGCTLMSR
->
->   Documentation/virt/kvm/api.rst    |  28 +++
->   arch/x86/events/core.c            |   9 +-
->   arch/x86/events/intel/core.c      |  29 +++
->   arch/x86/events/intel/lbr.c       |  55 +++++-
->   arch/x86/events/perf_event.h      |  21 ++-
->   arch/x86/include/asm/kvm_host.h   |   7 +
->   arch/x86/include/asm/perf_event.h |  24 ++-
->   arch/x86/kvm/cpuid.c              |   3 +-
->   arch/x86/kvm/pmu.c                |  28 ++-
->   arch/x86/kvm/pmu.h                |  26 ++-
->   arch/x86/kvm/pmu_amd.c            |   7 +-
->   arch/x86/kvm/vmx/pmu_intel.c      | 291 ++++++++++++++++++++++++++++--
->   arch/x86/kvm/vmx/vmx.c            |   4 +-
->   arch/x86/kvm/vmx/vmx.h            |   2 +
->   arch/x86/kvm/x86.c                |  42 +++--
->   include/linux/perf_event.h        |   7 +
->   include/uapi/linux/kvm.h          |   1 +
->   kernel/events/core.c              |   7 -
->   tools/include/uapi/linux/kvm.h    |   1 +
->   19 files changed, 540 insertions(+), 52 deletions(-)
->
+> But if it's expected that "if userspace tries to set nASSGIreq on
+> a non-4.1 host, this bit will not latch", then this shouldn't be
+> a problem at all.
 
+Well, that is the semantics of the RES0 bit. It applies from both
+guest and userspace.
+
+And actually, maybe we can handle that pretty cheaply. If userspace
+tries to restore GICD_TYPER2 to a value that isn't what KVM can
+offer, we just return an error. Exactly like we do for GICD_IIDR.
+Hence the following patch:
+
+diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c 
+b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+index 28b639fd1abc..e72dcc454247 100644
+--- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
++++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+@@ -156,6 +156,7 @@ static int vgic_mmio_uaccess_write_v3_misc(struct 
+kvm_vcpu *vcpu,
+  	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
+
+  	switch (addr & 0x0c) {
++	case GICD_TYPER2:
+  	case GICD_IIDR:
+  		if (val != vgic_mmio_read_v3_misc(vcpu, addr, len))
+  			return -EINVAL;
+
+Being a RO register, writing something that isn't compatible with the
+possible behaviour of the hypervisor will just return an error.
+
+What do you think?
+
+> Anyway this is not a big deal to me and I won't complain about it
+> in the future ;-) Either way, for this patch:
+> 
+> Reviewed-by: Zenghui Yu <yuzenghui@huawei.com>
+
+Thanks a lot!
+
+         M.
+-- 
+Jazz is not dead. It just smells funny...
