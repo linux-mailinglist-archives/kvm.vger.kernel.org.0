@@ -2,309 +2,145 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E48AB18CA4E
-	for <lists+kvm@lfdr.de>; Fri, 20 Mar 2020 10:25:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8488018CAA0
+	for <lists+kvm@lfdr.de>; Fri, 20 Mar 2020 10:46:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727231AbgCTJZn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Mar 2020 05:25:43 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:23472 "EHLO
-        us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727213AbgCTJZm (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 20 Mar 2020 05:25:42 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1584696342;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=a5t+K99nOllz6/nKHgn1LHqrPr5sxfTVf2PPG+27oSQ=;
-        b=fWw8R5oh8VulmNcr/Sav5pjNBNhHAyK06olHPFhiV1G3o58cuu7NESX8ouVktPHRnY0E8o
-        vqUH2zKNsEOrFq7ZhxO8SpGsJGO0OgT0y9ChqpzrzykDtJYM4Cer32e7Mb9728BXYl6pNH
-        XbmitK53osmgVPUHix3yeoxxqwJf2II=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-414-vLEtzNdIOh6WSnEv-oVOsA-1; Fri, 20 Mar 2020 05:25:40 -0400
-X-MC-Unique: vLEtzNdIOh6WSnEv-oVOsA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S1726789AbgCTJqo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Mar 2020 05:46:44 -0400
+Received: from mail.kernel.org ([198.145.29.99]:52760 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726527AbgCTJqo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Mar 2020 05:46:44 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0CA15DB60;
-        Fri, 20 Mar 2020 09:25:39 +0000 (UTC)
-Received: from laptop.redhat.com (ovpn-113-142.ams2.redhat.com [10.36.113.142])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 744D95C1D8;
-        Fri, 20 Mar 2020 09:25:33 +0000 (UTC)
-From:   Eric Auger <eric.auger@redhat.com>
-To:     eric.auger.pro@gmail.com, eric.auger@redhat.com, maz@kernel.org,
-        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        qemu-devel@nongnu.org, qemu-arm@nongnu.org
-Cc:     drjones@redhat.com, andre.przywara@arm.com,
-        peter.maydell@linaro.org, yuzenghui@huawei.com,
-        alexandru.elisei@arm.com, thuth@redhat.com
-Subject: [kvm-unit-tests PATCH v7 13/13] arm/arm64: ITS: pending table migration test
-Date:   Fri, 20 Mar 2020 10:24:28 +0100
-Message-Id: <20200320092428.20880-14-eric.auger@redhat.com>
-In-Reply-To: <20200320092428.20880-1-eric.auger@redhat.com>
-References: <20200320092428.20880-1-eric.auger@redhat.com>
+        by mail.kernel.org (Postfix) with ESMTPSA id 1465B20722;
+        Fri, 20 Mar 2020 09:46:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1584697603;
+        bh=sH00fgk3RsESsOzjD0MUh1sZMoSY4NuqAFqEGyvk7e0=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=ItI1QpzyKSVUkFN7wa/i/V45ewgZpp3DClIR0InqIMZkVG+EK7K0pAmfLrqHF4Q8J
+         /SS89IRYjdwgTYFXEFX+noGtt2gjTx+ON+a+YTUI98bq9b3jN92UQezsjndwCXQU+F
+         CQVQp/L7o6zEDC/1uCi6hANuXAqBro9utoN1iB0w=
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+        by disco-boy.misterjones.org with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        (Exim 4.92)
+        (envelope-from <maz@kernel.org>)
+        id 1jFEEj-00ECaQ-Cs; Fri, 20 Mar 2020 09:46:41 +0000
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8;
+ format=flowed
+Content-Transfer-Encoding: 8bit
+Date:   Fri, 20 Mar 2020 09:46:41 +0000
+From:   Marc Zyngier <maz@kernel.org>
+To:     Auger Eric <eric.auger@redhat.com>
+Cc:     Zenghui Yu <yuzenghui@huawei.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
+        Jason Cooper <jason@lakedaemon.net>,
+        Robert Richter <rrichter@marvell.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>
+Subject: Re: [PATCH v5 20/23] KVM: arm64: GICv4.1: Plumb SGI implementation
+ selection in the distributor
+In-Reply-To: <e60578b5-910c-0355-d231-29322900679d@redhat.com>
+References: <20200304203330.4967-1-maz@kernel.org>
+ <20200304203330.4967-21-maz@kernel.org>
+ <72832f51-bbde-8502-3e03-189ac20a0143@huawei.com>
+ <4a06fae9c93e10351276d173747d17f4@kernel.org>
+ <49995ec9-3970-1f62-5dfc-118563ca00fc@redhat.com>
+ <b98855a1-6300-d323-80f6-82d3b9854290@huawei.com>
+ <e60578b5-910c-0355-d231-29322900679d@redhat.com>
+Message-ID: <dfaf8a1b7c7fd8b769a244a8a779d952@kernel.org>
+X-Sender: maz@kernel.org
+User-Agent: Roundcube Webmail/1.3.10
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: eric.auger@redhat.com, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, lorenzo.pieralisi@arm.com, jason@lakedaemon.net, rrichter@marvell.com, tglx@linutronix.de, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add two new migration tests. One testing the migration of
-a topology where collection were unmapped. The second test
-checks the migration of the pending table.
+On 2020-03-20 07:59, Auger Eric wrote:
+> Hi Zenghui,
+> 
+> On 3/20/20 4:08 AM, Zenghui Yu wrote:
+>> On 2020/3/20 4:38, Auger Eric wrote:
+>>> Hi Marc,
+>>> On 3/19/20 1:10 PM, Marc Zyngier wrote:
+>>>> Hi Zenghui,
+>>>> 
+>>>> On 2020-03-18 06:34, Zenghui Yu wrote:
+>>>>> Hi Marc,
+>>>>> 
+>>>>> On 2020/3/5 4:33, Marc Zyngier wrote:
+>>>>>> The GICv4.1 architecture gives the hypervisor the option to let
+>>>>>> the guest choose whether it wants the good old SGIs with an
+>>>>>> active state, or the new, HW-based ones that do not have one.
+>>>>>> 
+>>>>>> For this, plumb the configuration of SGIs into the GICv3 MMIO
+>>>>>> handling, present the GICD_TYPER2.nASSGIcap to the guest,
+>>>>>> and handle the GICD_CTLR.nASSGIreq setting.
+>>>>>> 
+>>>>>> In order to be able to deal with the restore of a guest, also
+>>>>>> apply the GICD_CTLR.nASSGIreq setting at first run so that we
+>>>>>> can move the restored SGIs to the HW if that's what the guest
+>>>>>> had selected in a previous life.
+>>>>> 
+>>>>> I'm okay with the restore path.  But it seems that we still fail to
+>>>>> save the pending state of vSGI - software pending_latch of HW-based
+>>>>> vSGIs will not be updated (and always be false) because we directly
+>>>>> inject them through ITS, so vgic_v3_uaccess_read_pending() can't
+>>>>> tell the correct pending state to user-space (the correct one 
+>>>>> should
+>>>>> be latched in HW).
+>>>>> 
+>>>>> It would be good if we can sync the hardware state into 
+>>>>> pending_latch
+>>>>> at an appropriate time (just before save), but not sure if we 
+>>>>> can...
+>>>> 
+>>>> The problem is to find the "appropriate time". It would require to
+>>>> define
+>>>> a point in the save sequence where we transition the state from HW 
+>>>> to
+>>>> SW. I'm not keen on adding more state than we already have.
+>>> 
+>>> may be we could use a dedicated device group/attr as we have for the 
+>>> ITS
+>>> save tables? the user space would choose.
+>> 
+>> It means that userspace will be aware of some form of GICv4.1 details
+>> (e.g., get/set vSGI state at HW level) that KVM has implemented.
+>> Is it something that userspace required to know? I'm open to this ;-)
+> Not sure we would be obliged to expose fine details. This could be a
+> generic save/restore device group/attr whose implementation at KVM 
+> level
+> could differ depending on the version being implemented, no?
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
+What prevents us from hooking this synchronization to the current 
+behaviour
+of KVM_DEV_ARM_VGIC_SAVE_PENDING_TABLES? After all, this is already the 
+point
+where we synchronize the KVM view of the pending state with userspace.
+Here, it's just a matter of picking the information from some other 
+place
+(i.e. the host's virtual pending table).
 
----
+The thing we need though is the guarantee that the guest isn't going to
+get more vLPIs at that stage, as they would be lost. This effectively
+assumes that we can also save/restore the state of the signalling 
+devices,
+and I don't know if we're quite there yet.
 
-v6 -> v7:
-- test_migrate_unmapped_collection now uses pe0=3D0. Otherwise,
-  depending on SMP value it collides with collections created
-  by setup1()
-- use of for_each_present_cpu
+Thanks,
 
-v5 -> v6:
-- s/Set the PTZ/Clear the PTZ
-- Move the collection inval after MAPC
-- remove the unmap collection test
-
-v4 -> v5:
-- move stub from header to arm/gic.c
-
-v3 -> v4:
-- do not talk about odd/even CPUs, use pe0 and pe1
-- comment the delay
-
-v2 -> v3:
-- tests belong to both its and migration groups
-- use LPI(i)
-- gicv3_lpi_set_pending_table_bit renamed into gicv3_lpi_set_clr_pending
----
- arm/gic.c         | 138 ++++++++++++++++++++++++++++++++++++++++++++++
- arm/unittests.cfg |  16 ++++++
- 2 files changed, 154 insertions(+)
-
-diff --git a/arm/gic.c b/arm/gic.c
-index 6ecfdbc..2c661dc 100644
---- a/arm/gic.c
-+++ b/arm/gic.c
-@@ -193,6 +193,7 @@ static void lpi_handler(struct pt_regs *regs __unused=
-)
- 	smp_rmb(); /* pairs with wmb in lpi_stats_expect */
- 	lpi_stats.observed.cpu_id =3D smp_processor_id();
- 	lpi_stats.observed.lpi_id =3D irqnr;
-+	acked[lpi_stats.observed.cpu_id]++;
- 	smp_wmb(); /* pairs with rmb in check_lpi_stats */
- }
-=20
-@@ -236,6 +237,22 @@ static void secondary_lpi_test(void)
- 	while (1)
- 		wfi();
- }
-+
-+static void check_lpi_hits(int *expected, const char *msg)
-+{
-+	bool pass =3D true;
-+	int i;
-+
-+	for_each_present_cpu(i) {
-+		if (acked[i] !=3D expected[i]) {
-+			report_info("expected %d LPIs on PE #%d, %d observed",
-+				    expected[i], i, acked[i]);
-+			pass =3D false;
-+			break;
-+		}
-+	}
-+	report(pass, "%s", msg);
-+}
- #endif
-=20
- static void gicv2_ipi_send_self(void)
-@@ -591,6 +608,8 @@ static void gic_test_mmio(void)
- static void test_its_introspection(void) {}
- static void test_its_trigger(void) {}
- static void test_its_migration(void) {}
-+static void test_its_pending_migration(void) {}
-+static void test_migrate_unmapped_collection(void) {}
-=20
- #else /* __aarch64__ */
-=20
-@@ -659,6 +678,15 @@ static int its_prerequisites(int nb_cpus)
- 	return 0;
- }
-=20
-+static void set_lpi(struct its_device *dev, u32 eventid, u32 physid,
-+		    struct its_collection *col)
-+{
-+	assert(dev && col);
-+
-+	its_send_mapti(dev, physid, eventid, col);
-+	gicv3_lpi_set_config(physid, LPI_PROP_DEFAULT);
-+}
-+
- /*
-  * Setup the configuration for those mappings:
-  * dev_id=3D2 event=3D20 -> vcpu 3, intid=3D8195
-@@ -790,6 +818,108 @@ static void test_its_migration(void)
- 	its_send_int(dev7, 255);
- 	check_lpi_stats("dev7/eventid=3D255 triggers LPI 8196 on PE #2 after mi=
-gration");
- }
-+
-+static void test_migrate_unmapped_collection(void)
-+{
-+	struct its_collection *col;
-+	struct its_device *dev2, *dev7;
-+	int pe0 =3D 0;
-+	u8 config;
-+
-+	if (its_setup1())
-+		return;
-+
-+	col =3D its_create_collection(pe0, pe0);
-+	dev2 =3D its_get_device(2);
-+	dev7 =3D its_get_device(7);
-+
-+	/* MAPTI with the collection unmapped */
-+	set_lpi(dev2, 0, 8192, col);
-+
-+	puts("Now migrate the VM, then press a key to continue...\n");
-+	(void)getchar();
-+	report_info("Migration complete");
-+
-+	/* on the destination, map the collection */
-+	its_send_mapc(col, true);
-+	its_send_invall(col);
-+
-+	lpi_stats_expect(2, 8196);
-+	its_send_int(dev7, 255);
-+	check_lpi_stats("dev7/eventid=3D 255 triggered LPI 8196 on PE #2");
-+
-+	config =3D gicv3_lpi_get_config(8192);
-+	report(config =3D=3D LPI_PROP_DEFAULT,
-+	       "Config of LPI 8192 was properly migrated");
-+
-+	lpi_stats_expect(pe0, 8192);
-+	its_send_int(dev2, 0);
-+	check_lpi_stats("dev2/eventid =3D 0 triggered LPI 8192 on PE0");
-+}
-+
-+static void test_its_pending_migration(void)
-+{
-+	struct its_device *dev;
-+	struct its_collection *collection[2];
-+	int *expected =3D malloc(nr_cpus * sizeof(int));
-+	int pe0 =3D nr_cpus - 1, pe1 =3D nr_cpus - 2;
-+	u64 pendbaser;
-+	void *ptr;
-+	int i;
-+
-+	if (its_prerequisites(4))
-+		return;
-+
-+	dev =3D its_create_device(2 /* dev id */, 8 /* nb_ites */);
-+	its_send_mapd(dev, true);
-+
-+	collection[0] =3D its_create_collection(pe0, pe0);
-+	collection[1] =3D its_create_collection(pe1, pe1);
-+	its_send_mapc(collection[0], true);
-+	its_send_mapc(collection[1], true);
-+
-+	/* disable lpi at redist level */
-+	gicv3_lpi_rdist_disable(pe0);
-+	gicv3_lpi_rdist_disable(pe1);
-+
-+	/* lpis are interleaved inbetween the 2 PEs */
-+	for (i =3D 0; i < 256; i++) {
-+		struct its_collection *col =3D i % 2 ? collection[0] :
-+						     collection[1];
-+		int vcpu =3D col->target_address >> 16;
-+
-+		its_send_mapti(dev, LPI(i), i, col);
-+		gicv3_lpi_set_config(LPI(i), LPI_PROP_DEFAULT);
-+		gicv3_lpi_set_clr_pending(vcpu, LPI(i), true);
-+	}
-+	its_send_invall(collection[0]);
-+	its_send_invall(collection[1]);
-+
-+	/* Clear the PTZ bit on each pendbaser */
-+
-+	expected[pe0] =3D 128;
-+	expected[pe1] =3D 128;
-+
-+	ptr =3D gicv3_data.redist_base[pe0] + GICR_PENDBASER;
-+	pendbaser =3D readq(ptr);
-+	writeq(pendbaser & ~GICR_PENDBASER_PTZ, ptr);
-+
-+	ptr =3D gicv3_data.redist_base[pe1] + GICR_PENDBASER;
-+	pendbaser =3D readq(ptr);
-+	writeq(pendbaser & ~GICR_PENDBASER_PTZ, ptr);
-+
-+	gicv3_lpi_rdist_enable(pe0);
-+	gicv3_lpi_rdist_enable(pe1);
-+
-+	puts("Now migrate the VM, then press a key to continue...\n");
-+	(void)getchar();
-+	report_info("Migration complete");
-+
-+	/* let's wait for the 256 LPIs to be handled */
-+	mdelay(1000);
-+
-+	check_lpi_hits(expected, "128 LPIs on both PE0 and PE1 after migration"=
-);
-+}
- #endif
-=20
- int main(int argc, char **argv)
-@@ -831,6 +961,14 @@ int main(int argc, char **argv)
- 		report_prefix_push(argv[1]);
- 		test_its_migration();
- 		report_prefix_pop();
-+	} else if (!strcmp(argv[1], "its-pending-migration")) {
-+		report_prefix_push(argv[1]);
-+		test_its_pending_migration();
-+		report_prefix_pop();
-+	} else if (!strcmp(argv[1], "its-migrate-unmapped-collection")) {
-+		report_prefix_push(argv[1]);
-+		test_migrate_unmapped_collection();
-+		report_prefix_pop();
- 	} else if (strcmp(argv[1], "its-introspection") =3D=3D 0) {
- 		report_prefix_push(argv[1]);
- 		test_its_introspection();
-diff --git a/arm/unittests.cfg b/arm/unittests.cfg
-index 480adec..b96f0a1 100644
---- a/arm/unittests.cfg
-+++ b/arm/unittests.cfg
-@@ -144,6 +144,22 @@ extra_params =3D -machine gic-version=3D3 -append 'i=
-ts-migration'
- groups =3D its migration
- arch =3D arm64
-=20
-+[its-pending-migration]
-+file =3D gic.flat
-+smp =3D $MAX_SMP
-+accel =3D kvm
-+extra_params =3D -machine gic-version=3D3 -append 'its-pending-migration=
-'
-+groups =3D its migration
-+arch =3D arm64
-+
-+[its-migrate-unmapped-collection]
-+file =3D gic.flat
-+smp =3D $MAX_SMP
-+accel =3D kvm
-+extra_params =3D -machine gic-version=3D3 -append 'its-migrate-unmapped-=
-collection'
-+groups =3D its migration
-+arch =3D arm64
-+
- # Test PSCI emulation
- [psci]
- file =3D psci.flat
---=20
-2.20.1
-
+         M.
+-- 
+Jazz is not dead. It just smells funny...
