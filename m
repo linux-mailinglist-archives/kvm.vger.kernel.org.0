@@ -2,28 +2,28 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 85CF618DA25
-	for <lists+kvm@lfdr.de>; Fri, 20 Mar 2020 22:29:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1402318DA3B
+	for <lists+kvm@lfdr.de>; Fri, 20 Mar 2020 22:30:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727461AbgCTV27 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Mar 2020 17:28:59 -0400
+        id S1727478AbgCTV3A (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Mar 2020 17:29:00 -0400
 Received: from mga09.intel.com ([134.134.136.24]:37248 "EHLO mga09.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727432AbgCTV26 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S1727445AbgCTV26 (ORCPT <rfc822;kvm@vger.kernel.org>);
         Fri, 20 Mar 2020 17:28:58 -0400
-IronPort-SDR: jGy0ZSASAuFBkGIfmOAoCJO55wVlPG1B/ZJ1K2KkqMxSzIWZ42aWYJyitpaLPHtpDmN1CPbLjT
- azFiO+7Rc5jQ==
+IronPort-SDR: loKqlfHEIS/HV8gVtscVGUMvnIP12bgfSd3KOI4spr8lw3CzAI6RHLOhEPX+kBknY2H0hYHY5L
+ Ebd3I5q4fftw==
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga004.fm.intel.com ([10.253.24.48])
   by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Mar 2020 14:28:57 -0700
-IronPort-SDR: vsaU9LhyLxWfWNUNR896JtRsQoDJozwg9IOtnzFiCmpu0aEjh3PsMU8jovp9eJmt9IGeJKtPuU
- bh02n0Fjlk8w==
+IronPort-SDR: t8PxrdRe/T6Yly0mSlEmDIx2VhQpOXdEMHQYz6cyrwkgzoQfbgxdOK+3frxerDllanquPW9fW8
+ 3+nxpSryUyuw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.72,286,1580803200"; 
-   d="scan'208";a="269224501"
+   d="scan'208";a="269224504"
 Received: from sjchrist-coffee.jf.intel.com ([10.54.74.202])
-  by fmsmga004.fm.intel.com with ESMTP; 20 Mar 2020 14:28:56 -0700
+  by fmsmga004.fm.intel.com with ESMTP; 20 Mar 2020 14:28:57 -0700
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
@@ -38,9 +38,9 @@ Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
         John Haxby <john.haxby@oracle.com>,
         Miaohe Lin <linmiaohe@huawei.com>,
         Tom Lendacky <thomas.lendacky@amd.com>
-Subject: [PATCH v3 27/37] KVM: nVMX: Reload APIC access page on nested VM-Exit only if necessary
-Date:   Fri, 20 Mar 2020 14:28:23 -0700
-Message-Id: <20200320212833.3507-28-sean.j.christopherson@intel.com>
+Subject: [PATCH v3 28/37] KVM: VMX: Retrieve APIC access page HPA only when necessary
+Date:   Fri, 20 Mar 2020 14:28:24 -0700
+Message-Id: <20200320212833.3507-29-sean.j.christopherson@intel.com>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200320212833.3507-1-sean.j.christopherson@intel.com>
 References: <20200320212833.3507-1-sean.j.christopherson@intel.com>
@@ -51,72 +51,97 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Defer reloading L1's APIC page by logging the need for a reload and
-processing it during nested VM-Exit instead of unconditionally reloading
-the APIC page on nested VM-Exit.  This eliminates a TLB flush on the
-majority of VM-Exits as the APIC page rarely needs to be reloaded.
+Move the retrieval of the HPA associated with L1's APIC access page into
+VMX code to avoid unnecessarily calling gfn_to_page(), e.g. when the
+vCPU is in guest mode (L2).  Alternatively, the optimization logic in
+VMX could be mirrored into the common x86 code, but that will get ugly
+fast when further optimizations are introduced.
 
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 ---
- arch/x86/kvm/vmx/nested.c |  9 ++++-----
- arch/x86/kvm/vmx/vmx.c    | 10 +++++++---
- arch/x86/kvm/vmx/vmx.h    |  1 +
- 3 files changed, 12 insertions(+), 8 deletions(-)
+ arch/x86/include/asm/kvm_host.h |  2 +-
+ arch/x86/kvm/vmx/vmx.c          | 16 ++++++++++++++--
+ arch/x86/kvm/x86.c              | 13 +------------
+ 3 files changed, 16 insertions(+), 15 deletions(-)
 
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index e630d656b211..06fc0b68ecf3 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -4367,11 +4367,10 @@ void nested_vmx_vmexit(struct kvm_vcpu *vcpu, u32 exit_reason,
- 	kvm_vcpu_unmap(vcpu, &vmx->nested.pi_desc_map, true);
- 	vmx->nested.pi_desc = NULL;
- 
--	/*
--	 * We are now running in L2, mmu_notifier will force to reload the
--	 * page's hpa for L2 vmcs. Need to reload it for L1 before entering L1.
--	 */
--	kvm_make_request(KVM_REQ_APIC_PAGE_RELOAD, vcpu);
-+	if (vmx->nested.reload_vmcs01_apic_access_page) {
-+		vmx->nested.reload_vmcs01_apic_access_page = false;
-+		kvm_make_request(KVM_REQ_APIC_PAGE_RELOAD, vcpu);
-+	}
- 
- 	if ((exit_reason != -1) && (enable_shadow_vmcs || vmx->nested.hv_evmcs))
- 		vmx->nested.need_vmcs12_to_shadow_sync = true;
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 26fa52450569..31aa93088bf9 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1154,7 +1154,7 @@ struct kvm_x86_ops {
+ 	bool (*guest_apic_has_interrupt)(struct kvm_vcpu *vcpu);
+ 	void (*load_eoi_exitmap)(struct kvm_vcpu *vcpu, u64 *eoi_exit_bitmap);
+ 	void (*set_virtual_apic_mode)(struct kvm_vcpu *vcpu);
+-	void (*set_apic_access_page_addr)(struct kvm_vcpu *vcpu, hpa_t hpa);
++	void (*set_apic_access_page_addr)(struct kvm_vcpu *vcpu);
+ 	int (*deliver_posted_interrupt)(struct kvm_vcpu *vcpu, int vector);
+ 	int (*sync_pir_to_irr)(struct kvm_vcpu *vcpu);
+ 	int (*set_tss_addr)(struct kvm *kvm, unsigned int addr);
 diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index ae7279802652..3155329bf844 100644
+index 3155329bf844..e8d409b50afd 100644
 --- a/arch/x86/kvm/vmx/vmx.c
 +++ b/arch/x86/kvm/vmx/vmx.c
-@@ -6138,10 +6138,14 @@ void vmx_set_virtual_apic_mode(struct kvm_vcpu *vcpu)
+@@ -6136,16 +6136,28 @@ void vmx_set_virtual_apic_mode(struct kvm_vcpu *vcpu)
+ 	vmx_update_msr_bitmap(vcpu);
+ }
  
- static void vmx_set_apic_access_page_addr(struct kvm_vcpu *vcpu, hpa_t hpa)
+-static void vmx_set_apic_access_page_addr(struct kvm_vcpu *vcpu, hpa_t hpa)
++static void vmx_set_apic_access_page_addr(struct kvm_vcpu *vcpu)
  {
--	if (!is_guest_mode(vcpu)) {
--		vmcs_write64(APIC_ACCESS_ADDR, hpa);
--		vmx_flush_tlb_current(vcpu);
-+	/* Defer reload until vmcs01 is the current VMCS. */
-+	if (is_guest_mode(vcpu)) {
-+		to_vmx(vcpu)->nested.reload_vmcs01_apic_access_page = true;
-+		return;
- 	}
++	struct page *page;
 +
-+	vmcs_write64(APIC_ACCESS_ADDR, hpa);
-+	vmx_flush_tlb_current(vcpu);
+ 	/* Defer reload until vmcs01 is the current VMCS. */
+ 	if (is_guest_mode(vcpu)) {
+ 		to_vmx(vcpu)->nested.reload_vmcs01_apic_access_page = true;
+ 		return;
+ 	}
+ 
+-	vmcs_write64(APIC_ACCESS_ADDR, hpa);
++	page = gfn_to_page(vcpu->kvm, APIC_DEFAULT_PHYS_BASE >> PAGE_SHIFT);
++	if (is_error_page(page))
++		return;
++
++	vmcs_write64(APIC_ACCESS_ADDR, page_to_phys(page));
+ 	vmx_flush_tlb_current(vcpu);
++
++	/*
++	 * Do not pin apic access page in memory, the MMU notifier
++	 * will call us again if it is migrated or swapped out.
++	 */
++	put_page(page);
  }
  
  static void vmx_hwapic_isr_update(struct kvm_vcpu *vcpu, int max_isr)
-diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-index 571249e18bb6..66cc9f639e4b 100644
---- a/arch/x86/kvm/vmx/vmx.h
-+++ b/arch/x86/kvm/vmx/vmx.h
-@@ -138,6 +138,7 @@ struct nested_vmx {
- 	bool vmcs02_initialized;
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index cccfcf612008..26c24af87cca 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -8157,24 +8157,13 @@ int kvm_arch_mmu_notifier_invalidate_range(struct kvm *kvm,
  
- 	bool change_vmcs01_virtual_apic_mode;
-+	bool reload_vmcs01_apic_access_page;
+ void kvm_vcpu_reload_apic_access_page(struct kvm_vcpu *vcpu)
+ {
+-	struct page *page = NULL;
+-
+ 	if (!lapic_in_kernel(vcpu))
+ 		return;
  
- 	/*
- 	 * Enlightened VMCS has been enabled. It does not mean that L1 has to
+ 	if (!kvm_x86_ops->set_apic_access_page_addr)
+ 		return;
+ 
+-	page = gfn_to_page(vcpu->kvm, APIC_DEFAULT_PHYS_BASE >> PAGE_SHIFT);
+-	if (is_error_page(page))
+-		return;
+-	kvm_x86_ops->set_apic_access_page_addr(vcpu, page_to_phys(page));
+-
+-	/*
+-	 * Do not pin apic access page in memory, the MMU notifier
+-	 * will call us again if it is migrated or swapped out.
+-	 */
+-	put_page(page);
++	kvm_x86_ops->set_apic_access_page_addr(vcpu);
+ }
+ 
+ void __kvm_request_immediate_exit(struct kvm_vcpu *vcpu)
 -- 
 2.24.1
 
