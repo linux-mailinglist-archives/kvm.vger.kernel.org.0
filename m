@@ -2,52 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id BA50C18D2C0
-	for <lists+kvm@lfdr.de>; Fri, 20 Mar 2020 16:23:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6945A18D30E
+	for <lists+kvm@lfdr.de>; Fri, 20 Mar 2020 16:37:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727432AbgCTPXc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Mar 2020 11:23:32 -0400
-Received: from Galois.linutronix.de ([193.142.43.55]:36251 "EHLO
-        Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727177AbgCTPXc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Mar 2020 11:23:32 -0400
-Received: from p5de0bf0b.dip0.t-ipconnect.de ([93.224.191.11] helo=nanos.tec.linutronix.de)
-        by Galois.linutronix.de with esmtpsa (TLS1.2:DHE_RSA_AES_256_CBC_SHA256:256)
-        (Exim 4.80)
-        (envelope-from <tglx@linutronix.de>)
-        id 1jFJUe-0006fU-2I; Fri, 20 Mar 2020 16:23:28 +0100
-Received: by nanos.tec.linutronix.de (Postfix, from userid 1000)
-        id 8E72F100375; Fri, 20 Mar 2020 16:23:27 +0100 (CET)
-From:   Thomas Gleixner <tglx@linutronix.de>
-To:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     syzbot+00be5da1d75f1cc95f6b@syzkaller.appspotmail.com,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-Subject: Re: [PATCH] KVM: x86: remove bogus user-triggerable WARN_ON
-In-Reply-To: <87o8sr59v9.fsf@nanos.tec.linutronix.de>
-References: <20200319174318.20752-1-pbonzini@redhat.com> <87o8sr59v9.fsf@nanos.tec.linutronix.de>
-Date:   Fri, 20 Mar 2020 16:23:27 +0100
-Message-ID: <87lfnv59u8.fsf@nanos.tec.linutronix.de>
+        id S1727400AbgCTPhz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Mar 2020 11:37:55 -0400
+Received: from mta-02.yadro.com ([89.207.88.252]:53308 "EHLO mta-01.yadro.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726144AbgCTPhy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Mar 2020 11:37:54 -0400
+Received: from localhost (unknown [127.0.0.1])
+        by mta-01.yadro.com (Postfix) with ESMTP id 89B344128C;
+        Fri, 20 Mar 2020 15:37:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=yadro.com; h=
+        in-reply-to:content-disposition:content-type:content-type
+        :mime-version:references:message-id:subject:subject:from:from
+        :date:date:received:received:received; s=mta-01; t=1584718671;
+         x=1586533072; bh=VqYrnn/X2CeMed9ITJDVjqk6MSDuOUjwTrG6eHUxqeA=; b=
+        hcroZSm1D4Pl/wQr4rcUpriOjynV/xR3QgDidB7R5vU/SHHTpS+nOJ4f0RgjjKjN
+        HEAoLhHqzY7dlHejD4mHzSOFDIfY3VONNHGsmcWoiezEWLAzcVrhcC3xSAlZvdXK
+        e7XtLCMhS6epdOoCIwZ5C2Z0snQLPAxBSRZJMxbHwc4=
+X-Virus-Scanned: amavisd-new at yadro.com
+Received: from mta-01.yadro.com ([127.0.0.1])
+        by localhost (mta-01.yadro.com [127.0.0.1]) (amavisd-new, port 10024)
+        with ESMTP id d5Idnsge28k3; Fri, 20 Mar 2020 18:37:51 +0300 (MSK)
+Received: from T-EXCH-02.corp.yadro.com (t-exch-02.corp.yadro.com [172.17.10.102])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mta-01.yadro.com (Postfix) with ESMTPS id 70C04412EA;
+        Fri, 20 Mar 2020 18:37:51 +0300 (MSK)
+Received: from localhost (172.17.204.212) by T-EXCH-02.corp.yadro.com
+ (172.17.10.102) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P384) id 15.1.669.32; Fri, 20
+ Mar 2020 18:37:51 +0300
+Date:   Fri, 20 Mar 2020 18:37:51 +0300
+From:   Roman Bolshakov <r.bolshakov@yadro.com>
+To:     <kvm@vger.kernel.org>
+CC:     Cameron Esfahani <dirty@apple.com>
+Subject: Re: [kvm-unit-tests PATCH 0/2] Add support of hvf accel
+Message-ID: <20200320153751.GF77771@SPB-NB-133.local>
+References: <20200320145541.38578-1-r.bolshakov@yadro.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Linutronix-Spam-Score: -1.0
-X-Linutronix-Spam-Level: -
-X-Linutronix-Spam-Status: No , -1.0 points, 5.0 required,  ALL_TRUSTED=-1,SHORTCIRCUIT=-0.0001
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20200320145541.38578-1-r.bolshakov@yadro.com>
+X-Originating-IP: [172.17.204.212]
+X-ClientProxiedBy: T-EXCH-01.corp.yadro.com (172.17.10.101) To
+ T-EXCH-02.corp.yadro.com (172.17.10.102)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Thomas Gleixner <tglx@linutronix.de> writes:
+I'm sorry for broken formating in the cover letter. Here's a reformat at
+your convenience.
 
-> Paolo Bonzini <pbonzini@redhat.com> writes:
->> The WARN_ON is essentially comparing a user-provided value with 0.  It is
->> trivial to trigger it just by passing garbage to KVM_SET_CLOCK.  Guests
->> can break if you do so, but if it hurts when you do like this just do not
->> do it.
->
-> Yes, it's a user provided value and it's completely unchecked. If that
-> value is bogus then the guest will go sideways because timekeeping is
-> completely busted. At least you should explain WHY you don't care.
+HVF is a para-virtualized QEMU accelerator for macOS based on
+Hypervisor.framework (HVF). Hypervisor.framework is a thin user-space
+wrapper around Intel VT/VMX that enables to run VMMs such as QEMU in
+non-privileged mode.
 
-Or why it does not matter....
+The unit tests can be run on macOS to verify completeness of the HVF
+accel implementation.
+
+Regards,
+Roman
