@@ -2,117 +2,151 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 99E0418D61E
-	for <lists+kvm@lfdr.de>; Fri, 20 Mar 2020 18:43:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6FCA118D623
+	for <lists+kvm@lfdr.de>; Fri, 20 Mar 2020 18:43:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726982AbgCTRmu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Mar 2020 13:42:50 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:27504 "EHLO
+        id S1727273AbgCTRnT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Mar 2020 13:43:19 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:45452 "EHLO
         us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726814AbgCTRmu (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 20 Mar 2020 13:42:50 -0400
+        by vger.kernel.org with ESMTP id S1726974AbgCTRnS (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 20 Mar 2020 13:43:18 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1584726169;
+        s=mimecast20190719; t=1584726197;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc; bh=ef36637kDnXkE6FllS0yNPka1X9FChEYgiakf6+7Z7c=;
-        b=EXteLxpIPtvpvuZEpCDVmeV2uOacj9OqidEjQBwSo0KCmWWQ8kt2vqFUnpSZGwDt0yEMd3
-        IRCpOHiMq2I+M9RalrsJjo1bcIAnPTyQ9bP3KfBYw0td4tJtvxq6TSJhqqMLl4iElLatZD
-        5fLn436FeLEV6dUcK5301FNIwD8T+uE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-308-JCGm1F3lNn-DLjAE_M3WPg-1; Fri, 20 Mar 2020 13:42:47 -0400
-X-MC-Unique: JCGm1F3lNn-DLjAE_M3WPg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 97C389B823;
-        Fri, 20 Mar 2020 17:42:46 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 3932D19757;
-        Fri, 20 Mar 2020 17:42:46 +0000 (UTC)
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=7krMgYrLviqR5RFlOfg+d+WWKR25x9POwU7DsBJYErA=;
+        b=FwrVwZknKSqy+VU41I40B+Xmzz77SLboH6h4McC01cApx2bW2idMGDzGVr+WiYan+U5iDB
+        H9O3+bizHHtp1Ufg8vO3yKwnIXVVbqcFjN3YAdetNTvAMFcyMElRJTpKFqPCYzbfdIDBpW
+        xwDvzNVnP+9ZKK2nDM+F9Tm+omxa9x8=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-324-TRj7MfV1PrGdbGkyiSIBFw-1; Fri, 20 Mar 2020 13:43:15 -0400
+X-MC-Unique: TRj7MfV1PrGdbGkyiSIBFw-1
+Received: by mail-wm1-f70.google.com with SMTP id p18so2070650wmk.9
+        for <kvm@vger.kernel.org>; Fri, 20 Mar 2020 10:43:15 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=7krMgYrLviqR5RFlOfg+d+WWKR25x9POwU7DsBJYErA=;
+        b=LlHiqwdzsvwhi0G1NePSIjZee9TS0jhT+zqvHvA2zjS17mb1aghilYOfBZCPvE2/Y6
+         7H0HiadrWzBEyvYPkzerRbYTBWe8E04sFIobgo38ELhipNKYGiAEoTvL9/t/DevHfbaP
+         cOe89q718WQJ1ctFhyskzUcYya8jzENGq0vUA5wrQH2nV9J3DRz93waIDi6kDsy0Nwb6
+         flcMwTD22J74UOyLKK1YizkiiY5+ySkimmO9cXnwvRgDC11/Spjz+12PtVTnAhJM8HVK
+         eQeKbVUA+y9Ffd5R9gibjMUUGs/4PhBmPA4asKR1fEntFKi5IhmF0LLrGkE5F8yfEyo0
+         sNmg==
+X-Gm-Message-State: ANhLgQ03KF9fmL8OaiYq3PlyFHb6y4qseJHSnZ8HtwEr7YHbZGQTuwQj
+        x5E1Bm+RH1sdh4rvuLGvFDNID9prokTaizxRZ792ivlDoa99B9JFT8/o4OXmCmrHZhu0KHYC18y
+        kBMYX7Bs1Cz3n
+X-Received: by 2002:a1c:8108:: with SMTP id c8mr11432326wmd.50.1584726194455;
+        Fri, 20 Mar 2020 10:43:14 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vsAtEWKoguJOc/KY7Vn81oqAla4zRc1CqqIumjVg73UvF25mFsHXlpV+BDb1BfgzQqXX+HPyw==
+X-Received: by 2002:a1c:8108:: with SMTP id c8mr11432291wmd.50.1584726194078;
+        Fri, 20 Mar 2020 10:43:14 -0700 (PDT)
+Received: from [192.168.178.58] ([151.21.15.43])
+        by smtp.gmail.com with ESMTPSA id f10sm9339428wrw.96.2020.03.20.10.43.12
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 20 Mar 2020 10:43:13 -0700 (PDT)
+Subject: Re: [PATCH] KVM: SVM: Issue WBINVD after deactivating an SEV guest
+To:     Tom Lendacky <thomas.lendacky@amd.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        David Rientjes <rientjes@google.com>
+References: <c8bf9087ca3711c5770bdeaafa3e45b717dc5ef4.1584720426.git.thomas.lendacky@amd.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Brijesh Singh <brijesh.singh@amd.com>
-Subject: [PATCH] KVM: SVM: document KVM_MEM_ENCRYPT_OP, let userspace detect if SEV is available
-Date:   Fri, 20 Mar 2020 13:42:45 -0400
-Message-Id: <20200320174245.5220-1-pbonzini@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Message-ID: <db38f194-cdd0-23a0-00d9-78ef5eaa1534@redhat.com>
+Date:   Fri, 20 Mar 2020 18:43:12 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
+MIME-Version: 1.0
+In-Reply-To: <c8bf9087ca3711c5770bdeaafa3e45b717dc5ef4.1584720426.git.thomas.lendacky@amd.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Userspace has no way to query if SEV has been disabled with the
-sev module parameter of kvm-amd.ko.  Actually it has one, but it
-is a hack: do ioctl(KVM_MEM_ENCRYPT_OP, NULL) and check if it
-returns EFAULT.  Make it a little nicer by returning zero for
-SEV enabled and NULL argument, and while at it document the
-ioctl arguments.
+On 20/03/20 17:07, Tom Lendacky wrote:
+> Currently, CLFLUSH is used to flush SEV guest memory before the guest is
+> terminated (or a memory hotplug region is removed). However, CLFLUSH is
+> not enough to ensure that SEV guest tagged data is flushed from the cache.
+> 
+> With 33af3a7ef9e6 ("KVM: SVM: Reduce WBINVD/DF_FLUSH invocations"), the
+> original WBINVD was removed. This then exposed crashes at random times
+> because of a cache flush race with a page that had both a hypervisor and
+> a guest tag in the cache.
+> 
+> Restore the WBINVD when destroying an SEV guest and add a WBINVD to the
+> svm_unregister_enc_region() function to ensure hotplug memory is flushed
+> when removed. The DF_FLUSH can still be avoided at this point.
+> 
+> Fixes: 33af3a7ef9e6 ("KVM: SVM: Reduce WBINVD/DF_FLUSH invocations")
+> Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
+> ---
+>  arch/x86/kvm/svm.c | 22 ++++++++++++++--------
+>  1 file changed, 14 insertions(+), 8 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
+> index 08568ae9f7a1..d54cdca9c140 100644
+> --- a/arch/x86/kvm/svm.c
+> +++ b/arch/x86/kvm/svm.c
+> @@ -1980,14 +1980,6 @@ static void sev_clflush_pages(struct page *pages[], unsigned long npages)
+>  static void __unregister_enc_region_locked(struct kvm *kvm,
+>  					   struct enc_region *region)
+>  {
+> -	/*
+> -	 * The guest may change the memory encryption attribute from C=0 -> C=1
+> -	 * or vice versa for this memory range. Lets make sure caches are
+> -	 * flushed to ensure that guest data gets written into memory with
+> -	 * correct C-bit.
+> -	 */
+> -	sev_clflush_pages(region->pages, region->npages);
+> -
+>  	sev_unpin_memory(kvm, region->pages, region->npages);
+>  	list_del(&region->list);
+>  	kfree(region);
+> @@ -2004,6 +1996,13 @@ static void sev_vm_destroy(struct kvm *kvm)
+>  
+>  	mutex_lock(&kvm->lock);
+>  
+> +	/*
+> +	 * Ensure that all guest tagged cache entries are flushed before
+> +	 * releasing the pages back to the system for use. CLFLUSH will
+> +	 * not do this, so issue a WBINVD.
+> +	 */
+> +	wbinvd_on_all_cpus();
+> +
+>  	/*
+>  	 * if userspace was terminated before unregistering the memory regions
+>  	 * then lets unpin all the registered memory.
+> @@ -7247,6 +7246,13 @@ static int svm_unregister_enc_region(struct kvm *kvm,
+>  		goto failed;
+>  	}
+>  
+> +	/*
+> +	 * Ensure that all guest tagged cache entries are flushed before
+> +	 * releasing the pages back to the system for use. CLFLUSH will
+> +	 * not do this, so issue a WBINVD.
+> +	 */
+> +	wbinvd_on_all_cpus();
+> +
+>  	__unregister_enc_region_locked(kvm, region);
+>  
+>  	mutex_unlock(&kvm->lock);
+> 
 
-Cc: Brijesh Singh <brijesh.singh@amd.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- .../virt/kvm/amd-memory-encryption.rst        | 25 +++++++++++++++++++
- arch/x86/kvm/svm.c                            |  3 +++
- 2 files changed, 28 insertions(+)
+Queued for kvm/master, thanks.
 
-diff --git a/Documentation/virt/kvm/amd-memory-encryption.rst b/Documentation/virt/kvm/amd-memory-encryption.rst
-index d18c97b4e140..c3129b9ba5cb 100644
---- a/Documentation/virt/kvm/amd-memory-encryption.rst
-+++ b/Documentation/virt/kvm/amd-memory-encryption.rst
-@@ -53,6 +53,29 @@ key management interface to perform common hypervisor activities such as
- encrypting bootstrap code, snapshot, migrating and debugging the guest. For more
- information, see the SEV Key Management spec [api-spec]_
- 
-+The main ioctl to access SEV is KVM_MEM_ENCRYPT_OP.  If the argument
-+to KVM_MEM_ENCRYPT_OP is NULL, the ioctl returns 0 if SEV is enabled
-+and ``ENOTTY` if it is disabled (on some older versions of Linux,
-+the ioctl runs normally even with a NULL argument, and therefore will
-+likely return ``EFAULT``).  If non-NULL, the argument to KVM_MEM_ENCRYPT_OP
-+must be a struct kvm_sev_cmd::
-+
-+       struct kvm_sev_cmd {
-+               __u32 id;
-+               __u64 data;
-+               __u32 error;
-+               __u32 sev_fd;
-+       };
-+
-+
-+The ``id`` field contains the subcommand, and the ``data`` field points to
-+another struct containing arguments specific to command.  The ``sev_fd``
-+should point to a file descriptor that is opened on the ``/dev/sev``
-+device, if needed (see individual commands).
-+
-+On output, ``error`` is zero on success, or an error code.  Error codes
-+are defined in ``<linux/psp-dev.h>`.
-+
- KVM implements the following commands to support common lifecycle events of SEV
- guests, such as launching, running, snapshotting, migrating and decommissioning.
- 
-@@ -90,6 +113,8 @@ Returns: 0 on success, -negative on error
- 
- On success, the 'handle' field contains a new handle and on error, a negative value.
- 
-+KVM_SEV_LAUNCH_START requires the ``sev_fd`` field to be valid.
-+
- For more details, see SEV spec Section 6.2.
- 
- 3. KVM_SEV_LAUNCH_UPDATE_DATA
-diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
-index 91000501756e..f0aa9ff9666f 100644
---- a/arch/x86/kvm/svm.c
-+++ b/arch/x86/kvm/svm.c
-@@ -7158,6 +7158,9 @@ static int svm_mem_enc_op(struct kvm *kvm, void __user *argp)
- 	if (!svm_sev_enabled())
- 		return -ENOTTY;
- 
-+	if (!argp)
-+		return 0;
-+
- 	if (copy_from_user(&sev_cmd, argp, sizeof(struct kvm_sev_cmd)))
- 		return -EFAULT;
- 
--- 
-2.18.2
+Paolo
 
