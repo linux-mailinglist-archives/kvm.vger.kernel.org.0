@@ -2,128 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 046D718C77C
-	for <lists+kvm@lfdr.de>; Fri, 20 Mar 2020 07:33:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 04FF018C7FF
+	for <lists+kvm@lfdr.de>; Fri, 20 Mar 2020 08:10:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726773AbgCTGdN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Mar 2020 02:33:13 -0400
-Received: from mail-il1-f199.google.com ([209.85.166.199]:46492 "EHLO
-        mail-il1-f199.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726673AbgCTGdM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Mar 2020 02:33:12 -0400
-Received: by mail-il1-f199.google.com with SMTP id a2so4125811ill.13
-        for <kvm@vger.kernel.org>; Thu, 19 Mar 2020 23:33:12 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
-         :from:to;
-        bh=aIjWOOeVSbMqGFDf1KXbdBDP3+ZOOZ1c61Dtot2dRLk=;
-        b=mOVl8U6pTsfhplPq9EZsx/zw9sHcofMtBGS08Cyhg3unLud9WMNqAD+VQOZ4HMJI+j
-         PqxDbWGSy4mDFBJNNFbDbvud/oQ7BpX/XOUhnm57Md/36NwMzviyUh63MiVEmJXLrK9N
-         Wk/3qvSuU+dbcn4NxswAhD1cYJ7pG48KmusVu5NppraAXNCaQnfbJGNlg9v/XrT2SPdI
-         SkMGFD8I7KeEba2XYZg8MMPiYndPR1HwqbW6fm+mUvcXZbIxdlFI8yzxTV2UlyeV6N6W
-         o6kYOKkKuR5V9KO4buSO+fVy3udvsR0Az37WzCHSDPnW7CqHQoW2k7l9zxzI7JYCgMKQ
-         k8lw==
-X-Gm-Message-State: ANhLgQ3NwYESAb+mXWqsquc23V0upm3w6I3WnmzOQqWO3WqH+RMCFuFw
-        h31xWbDi5C/2aGl0zKeEB0ohJcUyvqHQwjxFW3ZETa1s5ftN
-X-Google-Smtp-Source: ADFU+vtTq8cIJVuWt0w5KzYYk7j+KyKZMlUfEI2gf6aCXrGEhN2SYodBb+wCExJNrmBYFSZnrAmpUyZX8fMHlb5TGTenb24Q2T1o
+        id S1726809AbgCTHKE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Mar 2020 03:10:04 -0400
+Received: from mail5.windriver.com ([192.103.53.11]:35148 "EHLO mail5.wrs.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726603AbgCTHKE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Mar 2020 03:10:04 -0400
+Received: from ALA-HCA.corp.ad.wrs.com (ala-hca.corp.ad.wrs.com [147.11.189.40])
+        by mail5.wrs.com (8.15.2/8.15.2) with ESMTPS id 02K76MJm001145
+        (version=TLSv1 cipher=AES256-SHA bits=256 verify=FAIL);
+        Fri, 20 Mar 2020 00:06:32 -0700
+Received: from pek-lpg-core2.corp.ad.wrs.com (128.224.153.41) by
+ ALA-HCA.corp.ad.wrs.com (147.11.189.40) with Microsoft SMTP Server id
+ 14.3.487.0; Fri, 20 Mar 2020 00:06:11 -0700
+From:   <zhe.he@windriver.com>
+To:     <pbonzini@redhat.com>, <sean.j.christopherson@intel.com>,
+        <vkuznets@redhat.com>, <wanpengli@tencent.com>,
+        <jmattson@google.com>, <joro@8bytes.org>, <tglx@linutronix.de>,
+        <mingo@redhat.com>, <bp@alien8.de>, <hpa@zytor.com>,
+        <x86@kernel.org>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <bigeasy@linutronix.de>,
+        <linux-rt-users@vger.kernel.org>, <zhe.he@windriver.com>
+Subject: [PATCH] KVM: LAPIC: Mark hrtimer for period or oneshot mode to expire in hard interrupt context
+Date:   Fri, 20 Mar 2020 15:06:07 +0800
+Message-ID: <1584687967-332859-1-git-send-email-zhe.he@windriver.com>
+X-Mailer: git-send-email 2.7.4
 MIME-Version: 1.0
-X-Received: by 2002:a02:94cb:: with SMTP id x69mr6360372jah.19.1584685991884;
- Thu, 19 Mar 2020 23:33:11 -0700 (PDT)
-Date:   Thu, 19 Mar 2020 23:33:11 -0700
-In-Reply-To: <000000000000e0d794057592192b@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000a079b705a1437544@google.com>
-Subject: Re: INFO: rcu detected stall in kvm_vcpu_ioctl
-From:   syzbot <syzbot+e9b1e8f574404b6e4ed3@syzkaller.appspotmail.com>
-To:     hpa@zytor.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        mingo@redhat.com, pbonzini@redhat.com, rkrcmar@redhat.com,
-        syzkaller-bugs@googlegroups.com, tglx@linutronix.de, x86@kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-syzbot has found a reproducer for the following crash on:
+From: He Zhe <zhe.he@windriver.com>
 
-HEAD commit:    770fbb32 Add linux-next specific files for 20200228
-git tree:       linux-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=1589e139e00000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=576314276bce4ad5
-dashboard link: https://syzkaller.appspot.com/bug?extid=e9b1e8f574404b6e4ed3
-compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1576a61de00000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=178ef32de00000
+apic->lapic_timer.timer was initialized with HRTIMER_MODE_ABS_HARD but
+started later with HRTIMER_MODE_ABS, which may cause the following warning
+in PREEMPT_RT kernel.
 
-IMPORTANT: if you fix the bug, please add the following tag to the commit:
-Reported-by: syzbot+e9b1e8f574404b6e4ed3@syzkaller.appspotmail.com
-
-hrtimer: interrupt took 60270 ns
-rcu: INFO: rcu_preempt self-detected stall on CPU
-rcu: 	1-....: (15560 ticks this GP) idle=16a/1/0x4000000000000002 softirq=11581/11583 fqs=5243 
-	(t=10500 jiffies g=8917 q=171)
-NMI backtrace for cpu 1
-CPU: 1 PID: 9821 Comm: syz-executor148 Not tainted 5.6.0-rc3-next-20200228-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+WARNING: CPU: 1 PID: 2957 at kernel/time/hrtimer.c:1129 hrtimer_start_range_ns+0x348/0x3f0
+CPU: 1 PID: 2957 Comm: qemu-system-x86 Not tainted 5.4.23-rt11 #1
+Hardware name: Supermicro SYS-E300-9A-8C/A2SDi-8C-HLN4F, BIOS 1.1a 09/18/2018
+RIP: 0010:hrtimer_start_range_ns+0x348/0x3f0
+Code: 4d b8 0f 94 c1 0f b6 c9 e8 35 f1 ff ff 4c 8b 45
+      b0 e9 3b fd ff ff e8 d7 3f fa ff 48 98 4c 03 34
+      c5 a0 26 bf 93 e9 a1 fd ff ff <0f> 0b e9 fd fc ff
+      ff 65 8b 05 fa b7 90 6d 89 c0 48 0f a3 05 60 91
+RSP: 0018:ffffbc60026ffaf8 EFLAGS: 00010202
+RAX: 0000000000000001 RBX: ffff9d81657d4110 RCX: 0000000000000000
+RDX: 0000000000000000 RSI: 0000006cc7987bcf RDI: ffff9d81657d4110
+RBP: ffffbc60026ffb58 R08: 0000000000000001 R09: 0000000000000010
+R10: 0000000000000000 R11: 0000000000000000 R12: 0000006cc7987bcf
+R13: 0000000000000000 R14: 0000006cc7987bcf R15: ffffbc60026d6a00
+FS: 00007f401daed700(0000) GS:ffff9d81ffa40000(0000) knlGS:0000000000000000
+CS: 0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00000000ffffffff CR3: 0000000fa7574000 CR4: 00000000003426e0
 Call Trace:
- <IRQ>
- __dump_stack lib/dump_stack.c:77 [inline]
- dump_stack+0x188/0x20d lib/dump_stack.c:118
- nmi_cpu_backtrace.cold+0x70/0xb1 lib/nmi_backtrace.c:101
- nmi_trigger_cpumask_backtrace+0x231/0x27e lib/nmi_backtrace.c:62
- trigger_single_cpu_backtrace include/linux/nmi.h:165 [inline]
- rcu_dump_cpu_stacks+0x19e/0x1e8 kernel/rcu/tree_stall.h:254
- print_cpu_stall kernel/rcu/tree_stall.h:475 [inline]
- check_cpu_stall kernel/rcu/tree_stall.h:549 [inline]
- rcu_pending kernel/rcu/tree.c:3237 [inline]
- rcu_sched_clock_irq.cold+0x560/0xcfa kernel/rcu/tree.c:2308
- update_process_times+0x25/0x60 kernel/time/timer.c:1727
- tick_sched_handle+0x9b/0x180 kernel/time/tick-sched.c:171
- tick_sched_timer+0x4e/0x140 kernel/time/tick-sched.c:1314
- __run_hrtimer kernel/time/hrtimer.c:1517 [inline]
- __hrtimer_run_queues+0x32c/0xdd0 kernel/time/hrtimer.c:1579
- hrtimer_interrupt+0x312/0x770 kernel/time/hrtimer.c:1641
- local_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1119 [inline]
- smp_apic_timer_interrupt+0x15b/0x600 arch/x86/kernel/apic/apic.c:1144
- apic_timer_interrupt+0xf/0x20 arch/x86/entry/entry_64.S:829
- </IRQ>
-RIP: 0010:lock_acquire+0x1b/0x420 kernel/locking/lockdep.c:4709
-Code: ff 0f 1f 40 00 66 2e 0f 1f 84 00 00 00 00 00 48 b8 00 00 00 00 00 fc ff df 41 57 4d 89 cf 41 56 41 89 ce 41 55 41 89 d5 41 54 <41> 89 f4 55 48 89 fd 65 48 8b 14 25 c0 1e 02 00 48 8d ba 9c 08 00
-RSP: 0018:ffffc90001e575f8 EFLAGS: 00000286 ORIG_RAX: ffffffffffffff13
-RAX: dffffc0000000000 RBX: ffff88808ac24140 RCX: 0000000000000001
-RDX: 0000000000000000 RSI: 0000000000000000 RDI: ffff88808e54b318
-RBP: ffffffff8821ec40 R08: 0000000000000001 R09: 0000000000000000
-R10: ffffed1011329681 R11: ffff88808994b40b R12: 0000000000000045
-R13: 0000000000000000 R14: 0000000000000001 R15: 0000000000000000
- __might_fault mm/memory.c:4780 [inline]
- __might_fault+0x152/0x1d0 mm/memory.c:4765
- __copy_from_user include/linux/uaccess.h:69 [inline]
- __kvm_read_guest_page+0x65/0xc0 arch/x86/kvm/../../../virt/kvm/kvm_main.c:2046
- kvm_fetch_guest_virt+0x13d/0x1b0 arch/x86/kvm/x86.c:5473
- __do_insn_fetch_bytes+0x2f9/0x6c0 arch/x86/kvm/emulate.c:907
- x86_decode_insn+0x176c/0x5730 arch/x86/kvm/emulate.c:5179
- x86_emulate_instruction+0x8bc/0x1c20 arch/x86/kvm/x86.c:6787
- kvm_mmu_page_fault+0x37b/0x1660 arch/x86/kvm/mmu/mmu.c:5488
- vmx_handle_exit+0x2b8/0x1710 arch/x86/kvm/vmx/vmx.c:5955
- vcpu_enter_guest+0x33df/0x6120 arch/x86/kvm/x86.c:8447
- vcpu_run arch/x86/kvm/x86.c:8511 [inline]
- kvm_arch_vcpu_ioctl_run+0x41c/0x1790 arch/x86/kvm/x86.c:8733
- kvm_vcpu_ioctl+0x493/0xe60 arch/x86/kvm/../../../virt/kvm/kvm_main.c:2932
- vfs_ioctl fs/ioctl.c:47 [inline]
- ksys_ioctl+0x11a/0x180 fs/ioctl.c:763
- __do_sys_ioctl fs/ioctl.c:772 [inline]
- __se_sys_ioctl fs/ioctl.c:770 [inline]
- __x64_sys_ioctl+0x6f/0xb0 fs/ioctl.c:770
- do_syscall_64+0xf6/0x790 arch/x86/entry/common.c:295
- entry_SYSCALL_64_after_hwframe+0x49/0xbe
-RIP: 0033:0x444349
-Code: 18 89 d0 c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 0f 83 1b 0c fc ff c3 66 2e 0f 1f 84 00 00 00 00
-RSP: 002b:00007ffc83efaa28 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 00007ffc83efaa30 RCX: 0000000000444349
-RDX: 0000000000000000 RSI: 000000000000ae80 RDI: 0000000000000006
-RBP: 0000000000000000 R08: 0000000000402070 R09: 0000000000402070
-R10: fffffffffffffffe R11: 0000000000000246 R12: 00000000004053f0
-R13: 0000000000405480 R14: 0000000000000000 R15: 0000000000000000
+? kvm_release_pfn_clean+0x22/0x60 [kvm]
+start_sw_timer+0x85/0x230 [kvm]
+? vmx_vmexit+0x1b/0x30 [kvm_intel]
+kvm_lapic_switch_to_sw_timer+0x72/0x80 [kvm]
+vmx_pre_block+0x1cb/0x260 [kvm_intel]
+? vmx_vmexit+0xf/0x30 [kvm_intel]
+? vmx_vmexit+0x1b/0x30 [kvm_intel]
+? vmx_vmexit+0xf/0x30 [kvm_intel]
+? vmx_vmexit+0x1b/0x30 [kvm_intel]
+? vmx_vmexit+0xf/0x30 [kvm_intel]
+? vmx_vmexit+0x1b/0x30 [kvm_intel]
+? vmx_vmexit+0xf/0x30 [kvm_intel]
+? vmx_vmexit+0xf/0x30 [kvm_intel]
+? vmx_vmexit+0x1b/0x30 [kvm_intel]
+? vmx_vmexit+0xf/0x30 [kvm_intel]
+? vmx_vmexit+0x1b/0x30 [kvm_intel]
+? vmx_vmexit+0xf/0x30 [kvm_intel]
+? vmx_vmexit+0x1b/0x30 [kvm_intel]
+? vmx_vmexit+0xf/0x30 [kvm_intel]
+? vmx_vmexit+0x1b/0x30 [kvm_intel]
+? vmx_vmexit+0xf/0x30 [kvm_intel]
+? vmx_sync_pir_to_irr+0x9e/0x100 [kvm_intel]
+? kvm_apic_has_interrupt+0x46/0x80 [kvm]
+kvm_arch_vcpu_ioctl_run+0x85b/0x1fa0 [kvm]
+? _raw_spin_unlock_irqrestore+0x18/0x50
+? _copy_to_user+0x2c/0x30
+kvm_vcpu_ioctl+0x235/0x660 [kvm]
+? rt_spin_unlock+0x2c/0x50
+do_vfs_ioctl+0x3e4/0x650
+? __fget+0x7a/0xa0
+ksys_ioctl+0x67/0x90
+__x64_sys_ioctl+0x1a/0x20
+do_syscall_64+0x4d/0x120
+entry_SYSCALL_64_after_hwframe+0x44/0xa9
+RIP: 0033:0x7f4027cc54a7
+Code: 00 00 90 48 8b 05 e9 59 0c 00 64 c7 00 26 00 00
+      00 48 c7 c0 ff ff ff ff c3 66 2e 0f 1f 84 00 00
+      00 00 00 b8 10 00 00 00 0f 05 <48> 3d 01 f0 ff ff
+      73 01 c3 48 8b 0d b9 59 0c 00 f7 d8 64 89 01 48
+RSP: 002b:00007f401dae9858 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 00005558bd029690 RCX: 00007f4027cc54a7
+RDX: 0000000000000000 RSI: 000000000000ae80 RDI: 000000000000000d
+RBP: 00007f4028b72000 R08: 00005558bc829ad0 R09: 00000000ffffffff
+R10: 00005558bcf90ca0 R11: 0000000000000246 R12: 0000000000000000
+R13: 0000000000000000 R14: 0000000000000000 R15: 00005558bce1c840
+--[ end trace 0000000000000002 ]--
+
+Signed-off-by: He Zhe <zhe.he@windriver.com>
+---
+ arch/x86/kvm/lapic.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+index e3099c6..929511e 100644
+--- a/arch/x86/kvm/lapic.c
++++ b/arch/x86/kvm/lapic.c
+@@ -1715,7 +1715,7 @@ static void start_sw_period(struct kvm_lapic *apic)
+ 
+ 	hrtimer_start(&apic->lapic_timer.timer,
+ 		apic->lapic_timer.target_expiration,
+-		HRTIMER_MODE_ABS);
++		HRTIMER_MODE_ABS_HARD);
+ }
+ 
+ bool kvm_lapic_hv_timer_in_use(struct kvm_vcpu *vcpu)
+-- 
+2.7.4
 
