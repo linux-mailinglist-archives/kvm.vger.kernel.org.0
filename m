@@ -2,189 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id AB0CF18D441
-	for <lists+kvm@lfdr.de>; Fri, 20 Mar 2020 17:21:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 10F8F18D594
+	for <lists+kvm@lfdr.de>; Fri, 20 Mar 2020 18:19:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727674AbgCTQVS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Mar 2020 12:21:18 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:25795 "EHLO
-        us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727772AbgCTQVR (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 20 Mar 2020 12:21:17 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1584721276;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=bXG84dHL0m4cU/Qn0Lqwx5Wj56OC04pQ0TdubjShMr8=;
-        b=Efz02iCVYVvLvrZ12HilRvENS5JcnD2N0xSEbEeFJnw6wXRSswWjMoL0G8EvwblDpGqmhC
-        cEI4WlXamh1SBbKMEEiF6NZpVgosPaq9t8baATtaCZNaKvUnwpWbDZjUpTAQBFxmFWCJk/
-        dvP0+xmC5Pj2u7SUaeRTD1t/vKxRpuI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-415-Pi0HcnQSPJ6M84wPvl51YQ-1; Fri, 20 Mar 2020 12:21:13 -0400
-X-MC-Unique: Pi0HcnQSPJ6M84wPvl51YQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F1B381005510;
-        Fri, 20 Mar 2020 16:21:09 +0000 (UTC)
-Received: from laptop.redhat.com (ovpn-113-142.ams2.redhat.com [10.36.113.142])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 85DEC60BFB;
-        Fri, 20 Mar 2020 16:20:59 +0000 (UTC)
-From:   Eric Auger <eric.auger@redhat.com>
-To:     eric.auger.pro@gmail.com, eric.auger@redhat.com,
-        iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, joro@8bytes.org,
-        alex.williamson@redhat.com, jacob.jun.pan@linux.intel.com,
-        yi.l.liu@intel.com, jean-philippe.brucker@arm.com,
-        will.deacon@arm.com, robin.murphy@arm.com
-Cc:     marc.zyngier@arm.com, peter.maydell@linaro.org,
-        zhangfei.gao@gmail.com
-Subject: [PATCH v10 11/11] vfio: Document nested stage control
-Date:   Fri, 20 Mar 2020 17:19:11 +0100
-Message-Id: <20200320161911.27494-12-eric.auger@redhat.com>
-In-Reply-To: <20200320161911.27494-1-eric.auger@redhat.com>
-References: <20200320161911.27494-1-eric.auger@redhat.com>
+        id S1727158AbgCTRSx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Mar 2020 13:18:53 -0400
+Received: from mga01.intel.com ([192.55.52.88]:27716 "EHLO mga01.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726867AbgCTRSx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Mar 2020 13:18:53 -0400
+IronPort-SDR: h8AV/6FI2EEoHL9RglLWgBtAbT/CsoOWhWocIMy00S/A7vCdLO47wPLE+eauroEVneQB80BBmU
+ GwxkwLJpzCKQ==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Mar 2020 10:18:52 -0700
+IronPort-SDR: 0cz85uFwoQtLLVv7DCcCeNiE5EgXeu5SUeyZK1XhF4/047s7fdBY9zcyPOUOvtE0HMNoksIQW9
+ c7qhA4E3mdDg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.72,285,1580803200"; 
+   d="scan'208";a="239283183"
+Received: from lkp-server01.sh.intel.com (HELO lkp-server01) ([10.239.97.150])
+  by orsmga008.jf.intel.com with ESMTP; 20 Mar 2020 10:18:50 -0700
+Received: from kbuild by lkp-server01 with local (Exim 4.89)
+        (envelope-from <lkp@intel.com>)
+        id 1jFLIH-0003RB-CC; Sat, 21 Mar 2020 01:18:49 +0800
+Date:   Sat, 21 Mar 2020 01:18:14 +0800
+From:   kbuild test robot <lkp@intel.com>
+To:     Yang Weijiang <weijiang.yang@intel.com>
+Cc:     kbuild-all@lists.01.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, sean.j.christopherson@intel.com,
+        pbonzini@redhat.com, jmattson@google.com
+Subject: Re: [PATCH v10 8/8] KVM: X86: Set CET feature bits for CPUID
+ enumeration
+Message-ID: <202003210154.29vmxMsO%lkp@intel.com>
+References: <20200320034342.26610-9-weijiang.yang@intel.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200320034342.26610-9-weijiang.yang@intel.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The VFIO API was enhanced to support nested stage control: a bunch of
-new iotcls, one DMA FAULT region and an associated specific IRQ.
+Hi Yang,
 
-Let's document the process to follow to set up nested mode.
+Thank you for the patch! Perhaps something to improve:
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
+[auto build test WARNING on kvm/linux-next]
+[also build test WARNING on next-20200320]
+[cannot apply to vhost/linux-next tip/auto-latest linux/master linus/master v5.6-rc6]
+[if your patch is applied to the wrong git tree, please drop us a note to help
+improve the system. BTW, we also suggest to use '--base' option to specify the
+base tree in git format-patch, please see https://stackoverflow.com/a/37406982]
+
+url:    https://github.com/0day-ci/linux/commits/Yang-Weijiang/Introduce-support-for-guest-CET-feature/20200320-155517
+base:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git linux-next
+reproduce:
+        # apt-get install sparse
+        # sparse version: v0.6.1-181-g83789bbc-dirty
+        make ARCH=x86_64 allmodconfig
+        make C=1 CF='-fdiagnostic-prefix -D__CHECK_ENDIAN__'
+
+If you fix the issue, kindly add following tag
+Reported-by: kbuild test robot <lkp@intel.com>
+
+
+sparse warnings: (new ones prefixed by >>)
+
+   arch/x86/kvm/x86.c:98:46: sparse: sparse: undefined identifier 'X86_CR4_CET'
+>> arch/x86/kvm/x86.c:98:46: sparse: sparse: cast from unknown type
+   arch/x86/kvm/x86.c:809:60: sparse: sparse: undefined identifier 'X86_CR4_CET'
+   arch/x86/kvm/x86.c:940:29: sparse: sparse: undefined identifier 'X86_CR4_CET'
+   arch/x86/kvm/x86.c:940:29: sparse: sparse: cast from unknown type
+   arch/x86/kvm/x86.c:956:19: sparse: sparse: undefined identifier 'X86_CR4_CET'
+   arch/x86/kvm/x86.c:956:19: sparse: sparse: cast from unknown type
+   arch/x86/kvm/x86.c:1233:23: sparse: sparse: undefined identifier 'MSR_IA32_U_CET'
+   arch/x86/kvm/x86.c:1233:39: sparse: sparse: undefined identifier 'MSR_IA32_S_CET'
+   arch/x86/kvm/x86.c:1234:9: sparse: sparse: undefined identifier 'MSR_IA32_PL0_SSP'
+   arch/x86/kvm/x86.c:1234:27: sparse: sparse: undefined identifier 'MSR_IA32_PL1_SSP'
+   arch/x86/kvm/x86.c:1234:45: sparse: sparse: undefined identifier 'MSR_IA32_PL2_SSP'
+   arch/x86/kvm/x86.c:1235:9: sparse: sparse: undefined identifier 'MSR_IA32_PL3_SSP'
+   arch/x86/kvm/x86.c:1235:27: sparse: sparse: undefined identifier 'MSR_IA32_INT_SSP_TAB'
+   arch/x86/kvm/x86.c:1512:14: sparse: sparse: undefined identifier 'MSR_IA32_PL0_SSP'
+   arch/x86/kvm/x86.c:1512:35: sparse: sparse: undefined identifier 'MSR_IA32_PL3_SSP'
+   arch/x86/kvm/x86.c:1513:14: sparse: sparse: undefined identifier 'MSR_IA32_U_CET'
+   arch/x86/kvm/x86.c:1514:14: sparse: sparse: undefined identifier 'MSR_IA32_S_CET'
+   arch/x86/kvm/x86.c:1515:14: sparse: sparse: undefined identifier 'MSR_IA32_INT_SSP_TAB'
+   arch/x86/kvm/x86.c:1512:14: sparse: sparse: incompatible types for 'case' statement
+   arch/x86/kvm/x86.c:1512:35: sparse: sparse: incompatible types for 'case' statement
+   arch/x86/kvm/x86.c:1513:14: sparse: sparse: incompatible types for 'case' statement
+   arch/x86/kvm/x86.c:1514:14: sparse: sparse: incompatible types for 'case' statement
+   arch/x86/kvm/x86.c:1515:14: sparse: sparse: incompatible types for 'case' statement
+   arch/x86/kvm/x86.c:2646:38: sparse: sparse: incorrect type in argument 1 (different address spaces) @@    expected void const [noderef] <asn:1> * @@    got  const [noderef] <asn:1> * @@
+   arch/x86/kvm/x86.c:2646:38: sparse:    expected void const [noderef] <asn:1> *
+   arch/x86/kvm/x86.c:2646:38: sparse:    got unsigned char [usertype] *
+   arch/x86/kvm/x86.c:3267:25: sparse: sparse: undefined identifier 'MSR_IA32_U_CET'
+   arch/x86/kvm/x86.c:7549:15: sparse: sparse: incompatible types in comparison expression (different address spaces):
+   arch/x86/kvm/x86.c:7549:15: sparse:    struct kvm_apic_map [noderef] <asn:4> *
+   arch/x86/kvm/x86.c:7549:15: sparse:    struct kvm_apic_map *
+   arch/x86/kvm/x86.c:9678:44: sparse: sparse: undefined identifier 'XFEATURE_MASK_CET_USER'
+   arch/x86/kvm/x86.c:9678:44: sparse: sparse: undefined identifier 'XFEATURE_MASK_CET_KERNEL'
+   arch/x86/kvm/x86.c:9912:16: sparse: sparse: incompatible types in comparison expression (different address spaces):
+   arch/x86/kvm/x86.c:9912:16: sparse:    struct kvm_apic_map [noderef] <asn:4> *
+   arch/x86/kvm/x86.c:9912:16: sparse:    struct kvm_apic_map *
+   arch/x86/kvm/x86.c:9913:15: sparse: sparse: incompatible types in comparison expression (different address spaces):
+   arch/x86/kvm/x86.c:9913:15: sparse:    struct kvm_pmu_event_filter [noderef] <asn:4> *
+   arch/x86/kvm/x86.c:9913:15: sparse:    struct kvm_pmu_event_filter *
+   arch/x86/kvm/x86.c:1512:14: sparse: sparse: Expected constant expression in case statement
+   arch/x86/kvm/x86.c:1512:35: sparse: sparse: Expected constant expression in case statement
+   arch/x86/kvm/x86.c:1513:14: sparse: sparse: Expected constant expression in case statement
+   arch/x86/kvm/x86.c:1514:14: sparse: sparse: Expected constant expression in case statement
+   arch/x86/kvm/x86.c:1515:14: sparse: sparse: Expected constant expression in case statement
+--
+   arch/x86/kvm/emulate.c:5495:21: sparse: sparse: arithmetics on pointers to functions
+   arch/x86/kvm/emulate.c:4206:17: sparse: sparse: undefined identifier 'X86_CR4_CET'
+>> arch/x86/kvm/emulate.c:4206:17: sparse: sparse: cast from unknown type
+
+vim +98 arch/x86/kvm/x86.c
+
+313a3dc75da206 drivers/kvm/x86.c  Carsten Otte        2007-10-11  97  
+b11306b53b2540 arch/x86/kvm/x86.c Sean Christopherson 2019-12-10 @98  static u64 __read_mostly cr4_reserved_bits = CR4_RESERVED_BITS;
+b11306b53b2540 arch/x86/kvm/x86.c Sean Christopherson 2019-12-10  99  
+
+:::::: The code at line 98 was first introduced by commit
+:::::: b11306b53b2540c6ba068c4deddb6a17d9f8d95b KVM: x86: Don't let userspace set host-reserved cr4 bits
+
+:::::: TO: Sean Christopherson <sean.j.christopherson@intel.com>
+:::::: CC: Paolo Bonzini <pbonzini@redhat.com>
 
 ---
-
-v8 -> v9:
-- new names for SET_MSI_BINDING and SET_PASID_TABLE
-- new layout for the DMA FAULT memory region and specific IRQ
-
-v2 -> v3:
-- document the new fault API
-
-v1 -> v2:
-- use the new ioctl names
-- add doc related to fault handling
----
- Documentation/driver-api/vfio.rst | 77 +++++++++++++++++++++++++++++++
- 1 file changed, 77 insertions(+)
-
-diff --git a/Documentation/driver-api/vfio.rst b/Documentation/driver-api=
-/vfio.rst
-index f1a4d3c3ba0b..563ebcec9224 100644
---- a/Documentation/driver-api/vfio.rst
-+++ b/Documentation/driver-api/vfio.rst
-@@ -239,6 +239,83 @@ group and can access them as follows::
- 	/* Gratuitous device reset and go... */
- 	ioctl(device, VFIO_DEVICE_RESET);
-=20
-+IOMMU Dual Stage Control
-+------------------------
-+
-+Some IOMMUs support 2 stages/levels of translation. "Stage" corresponds =
-to
-+the ARM terminology while "level" corresponds to Intel's VTD terminology=
-. In
-+the following text we use either without distinction.
-+
-+This is useful when the guest is exposed with a virtual IOMMU and some
-+devices are assigned to the guest through VFIO. Then the guest OS can us=
-e
-+stage 1 (IOVA -> GPA), while the hypervisor uses stage 2 for VM isolatio=
-n
-+(GPA -> HPA).
-+
-+The guest gets ownership of the stage 1 page tables and also owns stage =
-1
-+configuration structures. The hypervisor owns the root configuration str=
-ucture
-+(for security reason), including stage 2 configuration. This works as lo=
-ng
-+configuration structures and page table format are compatible between th=
-e
-+virtual IOMMU and the physical IOMMU.
-+
-+Assuming the HW supports it, this nested mode is selected by choosing th=
-e
-+VFIO_TYPE1_NESTING_IOMMU type through:
-+
-+ioctl(container, VFIO_SET_IOMMU, VFIO_TYPE1_NESTING_IOMMU);
-+
-+This forces the hypervisor to use the stage 2, leaving stage 1 available=
- for
-+guest usage.
-+
-+Once groups are attached to the container, the guest stage 1 translation
-+configuration data can be passed to VFIO by using
-+
-+ioctl(container, VFIO_IOMMU_SET_PASID_TABLE, &pasid_table_info);
-+
-+This allows to combine the guest stage 1 configuration structure along w=
-ith
-+the hypervisor stage 2 configuration structure. Stage 1 configuration
-+structures are dependent on the IOMMU type.
-+
-+As the stage 1 translation is fully delegated to the HW, translation fau=
-lts
-+encountered during the translation process need to be propagated up to
-+the virtualizer and re-injected into the guest.
-+
-+The userspace must be prepared to receive faults. The VFIO-PCI device
-+exposes one dedicated DMA FAULT region: it contains a ring buffer and
-+its header that allows to manage the head/tail indices. The region is
-+identified by the following index/subindex:
-+- VFIO_REGION_TYPE_NESTED/VFIO_REGION_SUBTYPE_NESTED_DMA_FAULT
-+
-+The DMA FAULT region exposes a VFIO_REGION_INFO_CAP_PRODUCER_FAULT
-+region capability that allows the userspace to retrieve the ABI version
-+of the fault records filled by the host.
-+
-+On top of that region, the userspace can be notified whenever a fault
-+occurs at the physical level. It can use the VFIO_IRQ_TYPE_NESTED/
-+VFIO_IRQ_SUBTYPE_DMA_FAULT specific IRQ to attach the eventfd to be
-+signalled.
-+
-+The ring buffer containing the fault records can be mmapped. When
-+the userspace consumes a fault in the queue, it should increment
-+the consumer index to allow new fault records to replace the used ones.
-+
-+The queue size and the entry size can be retrieved in the header.
-+The tail index should never overshoot the producer index as in any
-+other circular buffer scheme. Also it must be less than the queue size
-+otherwise the change fails.
-+
-+When the guest invalidates stage 1 related caches, invalidations must be
-+forwarded to the host through
-+ioctl(container, VFIO_IOMMU_CACHE_INVALIDATE, &inv_data);
-+Those invalidations can happen at various granularity levels, page, cont=
-ext, ...
-+
-+The ARM SMMU specification introduces another challenge: MSIs are transl=
-ated by
-+both the virtual SMMU and the physical SMMU. To build a nested mapping f=
-or the
-+IOVA programmed into the assigned device, the guest needs to pass its IO=
-VA/MSI
-+doorbell GPA binding to the host. Then the hypervisor can build a nested=
- stage 2
-+binding eventually translating into the physical MSI doorbell.
-+
-+This is achieved by calling
-+ioctl(container, VFIO_IOMMU_SET_MSI_BINDING, &guest_binding);
-+
- VFIO User API
- ------------------------------------------------------------------------=
--------
-=20
---=20
-2.20.1
-
+0-DAY CI Kernel Test Service, Intel Corporation
+https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
