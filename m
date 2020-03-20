@@ -2,284 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5C7FE18C774
-	for <lists+kvm@lfdr.de>; Fri, 20 Mar 2020 07:31:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 046D718C77C
+	for <lists+kvm@lfdr.de>; Fri, 20 Mar 2020 07:33:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726816AbgCTGbE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Mar 2020 02:31:04 -0400
-Received: from mail-io1-f68.google.com ([209.85.166.68]:43440 "EHLO
-        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726697AbgCTGbD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Mar 2020 02:31:03 -0400
-Received: by mail-io1-f68.google.com with SMTP id n21so4837296ioo.10
-        for <kvm@vger.kernel.org>; Thu, 19 Mar 2020 23:31:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=tcd-ie.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=1/VIn1wtF4hsQJkFxlnmnWv82JMKOrPFn/SqXh1kTXo=;
-        b=ALp9alTQuLJLrtYNnyRjvA8PMiz1K4ZRf5nzLyAi+v2/I3lM5M5naHCyPFAdUU7NU9
-         wx8SODJR6FU9l1lCyIMN3qqLsbRNFpv0ypNDVGw6BO/60a5FCcILJuKIcbnqlN/29fnY
-         A4sy1/pR6UT8YJDvQK2RN9cauHsQ63ohAuCF3DyO7KtZ0AxycSd7Un2OryglDuoIIt3J
-         YLdR7e5RgpvbG4fcchtVZYh60gsXK5GYIrsKc232S+xWkPGrmZZ90ZhY2oUjJX7P8a3U
-         Qu4cOmU0u7PmBgUf3ublP3r8gsr/zoNScg4QxMSmvJ/EEGXtQ3shCFRNsg4sf6wGEuEt
-         3H4w==
+        id S1726773AbgCTGdN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Mar 2020 02:33:13 -0400
+Received: from mail-il1-f199.google.com ([209.85.166.199]:46492 "EHLO
+        mail-il1-f199.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726673AbgCTGdM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Mar 2020 02:33:12 -0400
+Received: by mail-il1-f199.google.com with SMTP id a2so4125811ill.13
+        for <kvm@vger.kernel.org>; Thu, 19 Mar 2020 23:33:12 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=1/VIn1wtF4hsQJkFxlnmnWv82JMKOrPFn/SqXh1kTXo=;
-        b=VArdNiQYzeAZagwQB7oD79cWzVgWLCeP2FeObmkm0Hlt0q0g7Lf3TZ0vXB7uMg8BQz
-         g/k/45wXI5AZrWFD9DNXNKO5n/kTtSI8doqnxW/46Zr8piWU5fK5fTSMtQw/5xmSNbyt
-         mWOgowPYwoXNjjnI/9LfiFE86Xcr8xDb1HQgnLW3EpMnz7Oxfk4ba7AWxybHAzWvRntZ
-         ZTe4XTKbam94pM0v5CzLoaOKe45+AjycaU17foFDOvEJ8ZLkilPfUl4oXv0u8QylSvq8
-         JaSmHqzzAI6MP1bydhODA3GIj9ZCg1v92yoGJbc4cFLdwGUrK2S8GeIVfjB87J2XDncp
-         bRnw==
-X-Gm-Message-State: ANhLgQ3eU9D13ixMM08uJfaV/NcRCSYdX6qYjhLy3vNZhIsF5A5T+nyI
-        b5TVJUxMXMu2modXqVum8ksJE36e2BCF1UXtZGm3Ng==
-X-Google-Smtp-Source: ADFU+vv0RVPDe7OSqYC09UstbxEpj6UJl/ooVVvm+TTFONFef168+lVao+hBMRX+yBG3YxegODoM+L1qUGjcesJyDlI=
-X-Received: by 2002:a5d:8405:: with SMTP id i5mr5964251ion.197.1584685862390;
- Thu, 19 Mar 2020 23:31:02 -0700 (PDT)
+        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
+         :from:to;
+        bh=aIjWOOeVSbMqGFDf1KXbdBDP3+ZOOZ1c61Dtot2dRLk=;
+        b=mOVl8U6pTsfhplPq9EZsx/zw9sHcofMtBGS08Cyhg3unLud9WMNqAD+VQOZ4HMJI+j
+         PqxDbWGSy4mDFBJNNFbDbvud/oQ7BpX/XOUhnm57Md/36NwMzviyUh63MiVEmJXLrK9N
+         Wk/3qvSuU+dbcn4NxswAhD1cYJ7pG48KmusVu5NppraAXNCaQnfbJGNlg9v/XrT2SPdI
+         SkMGFD8I7KeEba2XYZg8MMPiYndPR1HwqbW6fm+mUvcXZbIxdlFI8yzxTV2UlyeV6N6W
+         o6kYOKkKuR5V9KO4buSO+fVy3udvsR0Az37WzCHSDPnW7CqHQoW2k7l9zxzI7JYCgMKQ
+         k8lw==
+X-Gm-Message-State: ANhLgQ3NwYESAb+mXWqsquc23V0upm3w6I3WnmzOQqWO3WqH+RMCFuFw
+        h31xWbDi5C/2aGl0zKeEB0ohJcUyvqHQwjxFW3ZETa1s5ftN
+X-Google-Smtp-Source: ADFU+vtTq8cIJVuWt0w5KzYYk7j+KyKZMlUfEI2gf6aCXrGEhN2SYodBb+wCExJNrmBYFSZnrAmpUyZX8fMHlb5TGTenb24Q2T1o
 MIME-Version: 1.0
-References: <20191221150402.13868-1-murphyt7@tcd.ie> <20191221150402.13868-4-murphyt7@tcd.ie>
-In-Reply-To: <20191221150402.13868-4-murphyt7@tcd.ie>
-From:   Tom Murphy <murphyt7@tcd.ie>
-Date:   Thu, 19 Mar 2020 23:30:51 -0700
-Message-ID: <CALQxJuuue2MCF+xAAAcWCW=301HHZ9yWBmYV-K-ubCxO4s5eqQ@mail.gmail.com>
-Subject: Re: [PATCH 3/8] iommu/vt-d: Remove IOVA handling code from
- non-dma_ops path
-To:     iommu@lists.linux-foundation.org
-Cc:     Jani Nikula <jani.nikula@linux.intel.com>,
-        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>,
-        David Airlie <airlied@linux.ie>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Marek Szyprowski <m.szyprowski@samsung.com>,
-        Kukjin Kim <kgene@kernel.org>,
-        Krzysztof Kozlowski <krzk@kernel.org>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Lu Baolu <baolu.lu@linux.intel.com>,
-        Andy Gross <agross@kernel.org>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Matthias Brugger <matthias.bgg@gmail.com>,
-        Rob Clark <robdclark@gmail.com>,
-        Heiko Stuebner <heiko@sntech.de>,
-        Gerald Schaefer <gerald.schaefer@de.ibm.com>,
-        Thierry Reding <thierry.reding@gmail.com>,
-        Jonathan Hunter <jonathanh@nvidia.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Marc Zyngier <maz@kernel.org>,
-        Julien Grall <julien.grall@arm.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-arm-kernel@lists.infradead.org,
-        linux-samsung-soc@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-        linux-mediatek@lists.infradead.org,
-        linux-rockchip@lists.infradead.org, linux-s390@vger.kernel.org,
-        linux-tegra@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org
+X-Received: by 2002:a02:94cb:: with SMTP id x69mr6360372jah.19.1584685991884;
+ Thu, 19 Mar 2020 23:33:11 -0700 (PDT)
+Date:   Thu, 19 Mar 2020 23:33:11 -0700
+In-Reply-To: <000000000000e0d794057592192b@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000a079b705a1437544@google.com>
+Subject: Re: INFO: rcu detected stall in kvm_vcpu_ioctl
+From:   syzbot <syzbot+e9b1e8f574404b6e4ed3@syzkaller.appspotmail.com>
+To:     hpa@zytor.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        mingo@redhat.com, pbonzini@redhat.com, rkrcmar@redhat.com,
+        syzkaller-bugs@googlegroups.com, tglx@linutronix.de, x86@kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Could we merge patch 1-3 from this series? it just cleans up weird
-code and merging these patches will cover some of the work needed to
-move the intel iommu driver to the dma-iommu api in the future.
+syzbot has found a reproducer for the following crash on:
 
-On Sat, 21 Dec 2019 at 07:04, Tom Murphy <murphyt7@tcd.ie> wrote:
->
-> Remove all IOVA handling code from the non-dma_ops path in the intel
-> iommu driver.
->
-> There's no need for the non-dma_ops path to keep track of IOVAs. The
-> whole point of the non-dma_ops path is that it allows the IOVAs to be
-> handled separately. The IOVA handling code removed in this patch is
-> pointless.
->
-> Signed-off-by: Tom Murphy <murphyt7@tcd.ie>
-> ---
->  drivers/iommu/intel-iommu.c | 89 ++++++++++++++-----------------------
->  1 file changed, 33 insertions(+), 56 deletions(-)
->
-> diff --git a/drivers/iommu/intel-iommu.c b/drivers/iommu/intel-iommu.c
-> index 64b1a9793daa..8d72ea0fb843 100644
-> --- a/drivers/iommu/intel-iommu.c
-> +++ b/drivers/iommu/intel-iommu.c
-> @@ -1908,7 +1908,8 @@ static void domain_exit(struct dmar_domain *domain)
->         domain_remove_dev_info(domain);
->
->         /* destroy iovas */
-> -       put_iova_domain(&domain->iovad);
-> +       if (domain->domain.type == IOMMU_DOMAIN_DMA)
-> +               put_iova_domain(&domain->iovad);
->
->         if (domain->pgd) {
->                 struct page *freelist;
-> @@ -2671,19 +2672,9 @@ static struct dmar_domain *set_domain_for_dev(struct device *dev,
->  }
->
->  static int iommu_domain_identity_map(struct dmar_domain *domain,
-> -                                    unsigned long long start,
-> -                                    unsigned long long end)
-> +                                    unsigned long first_vpfn,
-> +                                    unsigned long last_vpfn)
->  {
-> -       unsigned long first_vpfn = start >> VTD_PAGE_SHIFT;
-> -       unsigned long last_vpfn = end >> VTD_PAGE_SHIFT;
-> -
-> -       if (!reserve_iova(&domain->iovad, dma_to_mm_pfn(first_vpfn),
-> -                         dma_to_mm_pfn(last_vpfn))) {
-> -               pr_err("Reserving iova failed\n");
-> -               return -ENOMEM;
-> -       }
-> -
-> -       pr_debug("Mapping reserved region %llx-%llx\n", start, end);
->         /*
->          * RMRR range might have overlap with physical memory range,
->          * clear it first
-> @@ -2760,7 +2751,8 @@ static int __init si_domain_init(int hw)
->
->                 for_each_mem_pfn_range(i, nid, &start_pfn, &end_pfn, NULL) {
->                         ret = iommu_domain_identity_map(si_domain,
-> -                                       PFN_PHYS(start_pfn), PFN_PHYS(end_pfn));
-> +                                       mm_to_dma_pfn(start_pfn),
-> +                                       mm_to_dma_pfn(end_pfn));
->                         if (ret)
->                                 return ret;
->                 }
-> @@ -4593,58 +4585,37 @@ static int intel_iommu_memory_notifier(struct notifier_block *nb,
->                                        unsigned long val, void *v)
->  {
->         struct memory_notify *mhp = v;
-> -       unsigned long long start, end;
-> -       unsigned long start_vpfn, last_vpfn;
-> +       unsigned long start_vpfn = mm_to_dma_pfn(mhp->start_pfn);
-> +       unsigned long last_vpfn = mm_to_dma_pfn(mhp->start_pfn +
-> +                       mhp->nr_pages - 1);
->
->         switch (val) {
->         case MEM_GOING_ONLINE:
-> -               start = mhp->start_pfn << PAGE_SHIFT;
-> -               end = ((mhp->start_pfn + mhp->nr_pages) << PAGE_SHIFT) - 1;
-> -               if (iommu_domain_identity_map(si_domain, start, end)) {
-> -                       pr_warn("Failed to build identity map for [%llx-%llx]\n",
-> -                               start, end);
-> +               if (iommu_domain_identity_map(si_domain, start_vpfn,
-> +                                       last_vpfn)) {
-> +                       pr_warn("Failed to build identity map for [%lx-%lx]\n",
-> +                               start_vpfn, last_vpfn);
->                         return NOTIFY_BAD;
->                 }
->                 break;
->
->         case MEM_OFFLINE:
->         case MEM_CANCEL_ONLINE:
-> -               start_vpfn = mm_to_dma_pfn(mhp->start_pfn);
-> -               last_vpfn = mm_to_dma_pfn(mhp->start_pfn + mhp->nr_pages - 1);
-> -               while (start_vpfn <= last_vpfn) {
-> -                       struct iova *iova;
-> +               {
->                         struct dmar_drhd_unit *drhd;
->                         struct intel_iommu *iommu;
->                         struct page *freelist;
->
-> -                       iova = find_iova(&si_domain->iovad, start_vpfn);
-> -                       if (iova == NULL) {
-> -                               pr_debug("Failed get IOVA for PFN %lx\n",
-> -                                        start_vpfn);
-> -                               break;
-> -                       }
-> -
-> -                       iova = split_and_remove_iova(&si_domain->iovad, iova,
-> -                                                    start_vpfn, last_vpfn);
-> -                       if (iova == NULL) {
-> -                               pr_warn("Failed to split IOVA PFN [%lx-%lx]\n",
-> -                                       start_vpfn, last_vpfn);
-> -                               return NOTIFY_BAD;
-> -                       }
-> -
-> -                       freelist = domain_unmap(si_domain, iova->pfn_lo,
-> -                                              iova->pfn_hi);
-> +                       freelist = domain_unmap(si_domain, start_vpfn,
-> +                                       last_vpfn);
->
->                         rcu_read_lock();
->                         for_each_active_iommu(iommu, drhd)
->                                 iommu_flush_iotlb_psi(iommu, si_domain,
-> -                                       iova->pfn_lo, iova_size(iova),
-> +                                       start_vpfn, mhp->nr_pages,
->                                         !freelist, 0);
->                         rcu_read_unlock();
->                         dma_free_pagelist(freelist);
-> -
-> -                       start_vpfn = iova->pfn_hi + 1;
-> -                       free_iova_mem(iova);
->                 }
->                 break;
->         }
-> @@ -4672,8 +4643,9 @@ static void free_all_cpu_cached_iovas(unsigned int cpu)
->                 for (did = 0; did < cap_ndoms(iommu->cap); did++) {
->                         domain = get_iommu_domain(iommu, (u16)did);
->
-> -                       if (!domain)
-> +                       if (!domain || domain->domain.type != IOMMU_DOMAIN_DMA)
->                                 continue;
-> +
->                         free_cpu_cached_iovas(cpu, &domain->iovad);
->                 }
->         }
-> @@ -5095,9 +5067,6 @@ static int md_domain_init(struct dmar_domain *domain, int guest_width)
->  {
->         int adjust_width;
->
-> -       init_iova_domain(&domain->iovad, VTD_PAGE_SIZE, IOVA_START_PFN);
-> -       domain_reserve_special_ranges(domain);
-> -
->         /* calculate AGAW */
->         domain->gaw = guest_width;
->         adjust_width = guestwidth_to_adjustwidth(guest_width);
-> @@ -5116,6 +5085,18 @@ static int md_domain_init(struct dmar_domain *domain, int guest_width)
->         return 0;
->  }
->
-> +static void intel_init_iova_domain(struct dmar_domain *dmar_domain)
-> +{
-> +       init_iova_domain(&dmar_domain->iovad, VTD_PAGE_SIZE, IOVA_START_PFN);
-> +       copy_reserved_iova(&reserved_iova_list, &dmar_domain->iovad);
-> +
-> +       if (init_iova_flush_queue(&dmar_domain->iovad, iommu_flush_iova,
-> +                               iova_entry_free)) {
-> +               pr_warn("iova flush queue initialization failed\n");
-> +               intel_iommu_strict = 1;
-> +       }
-> +}
-> +
->  static struct iommu_domain *intel_iommu_domain_alloc(unsigned type)
->  {
->         struct dmar_domain *dmar_domain;
-> @@ -5136,12 +5117,8 @@ static struct iommu_domain *intel_iommu_domain_alloc(unsigned type)
->                         return NULL;
->                 }
->
-> -               if (type == IOMMU_DOMAIN_DMA &&
-> -                   init_iova_flush_queue(&dmar_domain->iovad,
-> -                                         iommu_flush_iova, iova_entry_free)) {
-> -                       pr_warn("iova flush queue initialization failed\n");
-> -                       intel_iommu_strict = 1;
-> -               }
-> +               if (type == IOMMU_DOMAIN_DMA)
-> +                       intel_init_iova_domain(dmar_domain);
->
->                 domain_update_iommu_cap(dmar_domain);
->
-> --
-> 2.20.1
->
+HEAD commit:    770fbb32 Add linux-next specific files for 20200228
+git tree:       linux-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=1589e139e00000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=576314276bce4ad5
+dashboard link: https://syzkaller.appspot.com/bug?extid=e9b1e8f574404b6e4ed3
+compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1576a61de00000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=178ef32de00000
+
+IMPORTANT: if you fix the bug, please add the following tag to the commit:
+Reported-by: syzbot+e9b1e8f574404b6e4ed3@syzkaller.appspotmail.com
+
+hrtimer: interrupt took 60270 ns
+rcu: INFO: rcu_preempt self-detected stall on CPU
+rcu: 	1-....: (15560 ticks this GP) idle=16a/1/0x4000000000000002 softirq=11581/11583 fqs=5243 
+	(t=10500 jiffies g=8917 q=171)
+NMI backtrace for cpu 1
+CPU: 1 PID: 9821 Comm: syz-executor148 Not tainted 5.6.0-rc3-next-20200228-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+Call Trace:
+ <IRQ>
+ __dump_stack lib/dump_stack.c:77 [inline]
+ dump_stack+0x188/0x20d lib/dump_stack.c:118
+ nmi_cpu_backtrace.cold+0x70/0xb1 lib/nmi_backtrace.c:101
+ nmi_trigger_cpumask_backtrace+0x231/0x27e lib/nmi_backtrace.c:62
+ trigger_single_cpu_backtrace include/linux/nmi.h:165 [inline]
+ rcu_dump_cpu_stacks+0x19e/0x1e8 kernel/rcu/tree_stall.h:254
+ print_cpu_stall kernel/rcu/tree_stall.h:475 [inline]
+ check_cpu_stall kernel/rcu/tree_stall.h:549 [inline]
+ rcu_pending kernel/rcu/tree.c:3237 [inline]
+ rcu_sched_clock_irq.cold+0x560/0xcfa kernel/rcu/tree.c:2308
+ update_process_times+0x25/0x60 kernel/time/timer.c:1727
+ tick_sched_handle+0x9b/0x180 kernel/time/tick-sched.c:171
+ tick_sched_timer+0x4e/0x140 kernel/time/tick-sched.c:1314
+ __run_hrtimer kernel/time/hrtimer.c:1517 [inline]
+ __hrtimer_run_queues+0x32c/0xdd0 kernel/time/hrtimer.c:1579
+ hrtimer_interrupt+0x312/0x770 kernel/time/hrtimer.c:1641
+ local_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1119 [inline]
+ smp_apic_timer_interrupt+0x15b/0x600 arch/x86/kernel/apic/apic.c:1144
+ apic_timer_interrupt+0xf/0x20 arch/x86/entry/entry_64.S:829
+ </IRQ>
+RIP: 0010:lock_acquire+0x1b/0x420 kernel/locking/lockdep.c:4709
+Code: ff 0f 1f 40 00 66 2e 0f 1f 84 00 00 00 00 00 48 b8 00 00 00 00 00 fc ff df 41 57 4d 89 cf 41 56 41 89 ce 41 55 41 89 d5 41 54 <41> 89 f4 55 48 89 fd 65 48 8b 14 25 c0 1e 02 00 48 8d ba 9c 08 00
+RSP: 0018:ffffc90001e575f8 EFLAGS: 00000286 ORIG_RAX: ffffffffffffff13
+RAX: dffffc0000000000 RBX: ffff88808ac24140 RCX: 0000000000000001
+RDX: 0000000000000000 RSI: 0000000000000000 RDI: ffff88808e54b318
+RBP: ffffffff8821ec40 R08: 0000000000000001 R09: 0000000000000000
+R10: ffffed1011329681 R11: ffff88808994b40b R12: 0000000000000045
+R13: 0000000000000000 R14: 0000000000000001 R15: 0000000000000000
+ __might_fault mm/memory.c:4780 [inline]
+ __might_fault+0x152/0x1d0 mm/memory.c:4765
+ __copy_from_user include/linux/uaccess.h:69 [inline]
+ __kvm_read_guest_page+0x65/0xc0 arch/x86/kvm/../../../virt/kvm/kvm_main.c:2046
+ kvm_fetch_guest_virt+0x13d/0x1b0 arch/x86/kvm/x86.c:5473
+ __do_insn_fetch_bytes+0x2f9/0x6c0 arch/x86/kvm/emulate.c:907
+ x86_decode_insn+0x176c/0x5730 arch/x86/kvm/emulate.c:5179
+ x86_emulate_instruction+0x8bc/0x1c20 arch/x86/kvm/x86.c:6787
+ kvm_mmu_page_fault+0x37b/0x1660 arch/x86/kvm/mmu/mmu.c:5488
+ vmx_handle_exit+0x2b8/0x1710 arch/x86/kvm/vmx/vmx.c:5955
+ vcpu_enter_guest+0x33df/0x6120 arch/x86/kvm/x86.c:8447
+ vcpu_run arch/x86/kvm/x86.c:8511 [inline]
+ kvm_arch_vcpu_ioctl_run+0x41c/0x1790 arch/x86/kvm/x86.c:8733
+ kvm_vcpu_ioctl+0x493/0xe60 arch/x86/kvm/../../../virt/kvm/kvm_main.c:2932
+ vfs_ioctl fs/ioctl.c:47 [inline]
+ ksys_ioctl+0x11a/0x180 fs/ioctl.c:763
+ __do_sys_ioctl fs/ioctl.c:772 [inline]
+ __se_sys_ioctl fs/ioctl.c:770 [inline]
+ __x64_sys_ioctl+0x6f/0xb0 fs/ioctl.c:770
+ do_syscall_64+0xf6/0x790 arch/x86/entry/common.c:295
+ entry_SYSCALL_64_after_hwframe+0x49/0xbe
+RIP: 0033:0x444349
+Code: 18 89 d0 c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 0f 83 1b 0c fc ff c3 66 2e 0f 1f 84 00 00 00 00
+RSP: 002b:00007ffc83efaa28 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 00007ffc83efaa30 RCX: 0000000000444349
+RDX: 0000000000000000 RSI: 000000000000ae80 RDI: 0000000000000006
+RBP: 0000000000000000 R08: 0000000000402070 R09: 0000000000402070
+R10: fffffffffffffffe R11: 0000000000000246 R12: 00000000004053f0
+R13: 0000000000405480 R14: 0000000000000000 R15: 0000000000000000
+
