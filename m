@@ -2,134 +2,150 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5A20518DB22
-	for <lists+kvm@lfdr.de>; Fri, 20 Mar 2020 23:26:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A7F4018DB48
+	for <lists+kvm@lfdr.de>; Fri, 20 Mar 2020 23:40:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727333AbgCTW0M (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Mar 2020 18:26:12 -0400
-Received: from mga01.intel.com ([192.55.52.88]:52469 "EHLO mga01.intel.com"
+        id S1727372AbgCTWkn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Mar 2020 18:40:43 -0400
+Received: from mga18.intel.com ([134.134.136.126]:39389 "EHLO mga18.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726986AbgCTW0L (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Mar 2020 18:26:11 -0400
-IronPort-SDR: 5oae9lr1DR7YnTuMPyIKVq9uikw1h2afR8lRoBN/SYgD1xCZU+zOgSfY0FpDSRo64VTQ2c6ywU
- AlPfDV7ZJLkQ==
+        id S1726980AbgCTWkm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Mar 2020 18:40:42 -0400
+IronPort-SDR: kH4iqVVYDt6+SS39nW8uFDshNbmpVDCXtVBmE2sPGrMOsWikQgMDr9rzyzws6q4jckN+9s9Duf
+ 99Pv+Ds9TIQg==
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Mar 2020 15:26:11 -0700
-IronPort-SDR: eyfjU/3afmq/lYVoj6U1vAa+a6b0nhDXARn/0B+hLA6VkS8skVcKVvgZrdXoIqU3S+Dswk5Nqw
- 4ubbc879OyKw==
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Mar 2020 15:40:41 -0700
+IronPort-SDR: pyLLTZi2gIvKDVwpeObT3yARmB1LpSwiUyS7YsjM6UsmLLLB7zHgQgvKKuu+Ms0OtUaA2gjW2F
+ VgogiJExqp3g==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.72,286,1580803200"; 
-   d="scan'208";a="249016191"
-Received: from jralexan-mobl.amr.corp.intel.com (HELO [10.254.187.105]) ([10.254.187.105])
-  by orsmga006.jf.intel.com with ESMTP; 20 Mar 2020 15:26:09 -0700
-Subject: Re: [PATCH 21/70] x86/boot/compressed/64: Add function to map a page
- unencrypted
-To:     Joerg Roedel <joro@8bytes.org>
-Cc:     David Rientjes <rientjes@google.com>, x86@kernel.org,
-        hpa@zytor.com, Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Thomas Hellstrom <thellstrom@vmware.com>,
-        Jiri Slaby <jslaby@suse.cz>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Juergen Gross <jgross@suse.com>,
-        Kees Cook <keescook@chromium.org>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        Joerg Roedel <jroedel@suse.de>
-References: <20200319091407.1481-1-joro@8bytes.org>
- <20200319091407.1481-22-joro@8bytes.org>
- <alpine.DEB.2.21.2003201350300.205664@chino.kir.corp.google.com>
- <8a50c19f-aaf8-90bd-a415-0e3b71e5a010@intel.com>
- <20200320221213.GK5122@8bytes.org>
-From:   Dave Hansen <dave.hansen@intel.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- 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
-Message-ID: <9b69d49f-969c-5720-5723-f89ff0e000c0@intel.com>
-Date:   Fri, 20 Mar 2020 15:26:09 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+   d="scan'208";a="239357468"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
+  by orsmga008.jf.intel.com with ESMTP; 20 Mar 2020 15:40:41 -0700
+Date:   Fri, 20 Mar 2020 15:40:41 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Peter Xu <peterx@redhat.com>
+Cc:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Qian Cai <cai@lca.pw>
+Subject: Re: [PATCH 1/7] KVM: Fix out of range accesses to memslots
+Message-ID: <20200320224041.GB3866@linux.intel.com>
+References: <20200320205546.2396-1-sean.j.christopherson@intel.com>
+ <20200320205546.2396-2-sean.j.christopherson@intel.com>
+ <20200320221708.GF127076@xz-x1>
 MIME-Version: 1.0
-In-Reply-To: <20200320221213.GK5122@8bytes.org>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200320221708.GF127076@xz-x1>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 3/20/20 3:12 PM, Joerg Roedel wrote:
-> On Fri, Mar 20, 2020 at 02:02:13PM -0700, Dave Hansen wrote:
->> It *never* flushes global pages.  For a generic function like this, that
->> seems pretty dangerous because the PTEs it goes after could quite easily
->> be Global.  It's also not _obviously_ correct if PCIDs are in play
->> (which I don't think they are on AMD).
->>
->> A flush_tlb_global() is probably more appropriate.  Better yet, is there
->> a reason not to use flush_tlb_kernel_range()?  I don't think it's
->> necessary to whack the entire TLB for one PTE set.
+On Fri, Mar 20, 2020 at 06:17:08PM -0400, Peter Xu wrote:
+> On Fri, Mar 20, 2020 at 01:55:40PM -0700, Sean Christopherson wrote:
+> > Reset the LRU slot if it becomes invalid when deleting a memslot to fix
+> > an out-of-bounds/use-after-free access when searching through memslots.
+> > 
+> > Explicitly check for there being no used slots in search_memslots(), and
+> > in the caller of s390's approximation variant.
+> > 
+> > Fixes: 36947254e5f9 ("KVM: Dynamically size memslot array based on number of used slots")
+> > Reported-by: Qian Cai <cai@lca.pw>
+> > Cc: Peter Xu <peterx@redhat.com>
+> > Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> > ---
+> >  arch/s390/kvm/kvm-s390.c | 3 +++
+> >  include/linux/kvm_host.h | 3 +++
+> >  virt/kvm/kvm_main.c      | 3 +++
+> >  3 files changed, 9 insertions(+)
+> > 
+> > diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> > index 807ed6d722dd..cb15fdda1fee 100644
+> > --- a/arch/s390/kvm/kvm-s390.c
+> > +++ b/arch/s390/kvm/kvm-s390.c
+> > @@ -2002,6 +2002,9 @@ static int kvm_s390_get_cmma(struct kvm *kvm, struct kvm_s390_cmma_log *args,
+> >  	struct kvm_memslots *slots = kvm_memslots(kvm);
+> >  	struct kvm_memory_slot *ms;
+> >  
+> > +	if (unlikely(!slots->used_slots))
+> > +		return 0;
+> > +
+> >  	cur_gfn = kvm_s390_next_dirty_cmma(slots, args->start_gfn);
+> >  	ms = gfn_to_memslot(kvm, cur_gfn);
+> >  	args->count = 0;
+> > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> > index 35bc52e187a2..b19dee4ed7d9 100644
+> > --- a/include/linux/kvm_host.h
+> > +++ b/include/linux/kvm_host.h
+> > @@ -1032,6 +1032,9 @@ search_memslots(struct kvm_memslots *slots, gfn_t gfn)
+> >  	int slot = atomic_read(&slots->lru_slot);
+> >  	struct kvm_memory_slot *memslots = slots->memslots;
+> >  
+> > +	if (unlikely(!slots->used_slots))
+> > +		return NULL;
+> > +
+> >  	if (gfn >= memslots[slot].base_gfn &&
+> >  	    gfn < memslots[slot].base_gfn + memslots[slot].npages)
+> >  		return &memslots[slot];
+> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> > index 28eae681859f..f744bc603c53 100644
+> > --- a/virt/kvm/kvm_main.c
+> > +++ b/virt/kvm/kvm_main.c
+> > @@ -882,6 +882,9 @@ static inline void kvm_memslot_delete(struct kvm_memslots *slots,
+> >  
+> >  	slots->used_slots--;
+> >  
+> > +	if (atomic_read(&slots->lru_slot) >= slots->used_slots)
+> > +		atomic_set(&slots->lru_slot, 0);
 > 
-> This code runs before the actual kernel image is decompressed, so there
-> is no PCID and no global pages (I think CR4.PGE is still 0). So a
-> cr3-write is enough to flush the TLB. Also the TLB-flush helpers of the
-> running kernel are not available here.
+> Nit: could we drop the atomic ops?  The "slots" is still only used in
+> the current thread before the rcu assignment, so iirc it's fine (and
+> RCU assignment should have a mem barrier when needed anyway).
 
-Geez, I always forget about the compressed code. :)  Good point about PCIDs.
+No, atomic_t wraps an int inside a struct to prevent direct usage, e.g.
 
-In any case, I thought this all came through initialize_identity_maps(),
-which does, for instance:
+virt/kvm/kvm_main.c: In function ‘kvm_memslot_delete’:
+virt/kvm/kvm_main.c:885:22: error: invalid operands to binary >= (have ‘atomic_t {aka struct <anonymous>}’ and ‘int’)
+  if (slots->lru_slot >= slots->used_slots)
+                      ^
+virt/kvm/kvm_main.c:886:19: error: incompatible types when assigning to type ‘atomic_t {aka struct <anonymous>}’ from type ‘int’
+   slots->lru_slot = 0;
 
-        mapping_info.page_flag = __PAGE_KERNEL_LARGE_EXEC | sme_me_mask;
 
-Where:
+Buy yeah, the compiler barrier associated with atomic_read() isn't
+necessary.
 
-#define __PAGE_KERNEL_LARGE_EXEC (__PP|__RW|   0|___A|   0|___D|_PSE|___G)
+> I thought resetting lru_slot to zero would be good enough when
+> duplicating the slots... however if we want to do finer grained reset,
+> maybe even better to reset also those invalidated ones (since we know
+> this information)?
+> 
+>    	if (slots->lru_slot >= slots->id_to_index[memslot->id])
+>    		slots->lru_slot = 0;
 
-That looks like it has the Global bit set.  Does that not apply here
-somehow?
+I'd prefer to go with the more obviously correct version.  This code will
+rarely trigger, e.g. larger slots have lower indices and are more likely to
+be the LRU (by virtue of being the biggest), and dynamic memslot deletion
+is usually for relatively small ranges that are being remapped by the guest.
+
+> Thanks,
+> 
+> > +
+> >  	for (i = slots->id_to_index[memslot->id]; i < slots->used_slots; i++) {
+> >  		mslots[i] = mslots[i + 1];
+> >  		slots->id_to_index[mslots[i].id] = i;
+> > -- 
+> > 2.24.1
+> > 
+> 
+> -- 
+> Peter Xu
+> 
