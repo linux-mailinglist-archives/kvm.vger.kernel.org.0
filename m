@@ -2,28 +2,28 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C137118DA33
-	for <lists+kvm@lfdr.de>; Fri, 20 Mar 2020 22:29:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EF6CB18DA26
+	for <lists+kvm@lfdr.de>; Fri, 20 Mar 2020 22:29:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727525AbgCTV3C (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        id S1727531AbgCTV3C (ORCPT <rfc822;lists+kvm@lfdr.de>);
         Fri, 20 Mar 2020 17:29:02 -0400
-Received: from mga09.intel.com ([134.134.136.24]:37251 "EHLO mga09.intel.com"
+Received: from mga09.intel.com ([134.134.136.24]:37248 "EHLO mga09.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727464AbgCTV27 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Mar 2020 17:28:59 -0400
-IronPort-SDR: S+kNTz+Ca2P8ijDnvM4ENUShzw0Qsl+FciRF5cZRbg4RIWuQEbeof6UNBIcbBgJeRxYV/RNplb
- JeZnd8ySm1ng==
+        id S1727471AbgCTV3A (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Mar 2020 17:29:00 -0400
+IronPort-SDR: WMZlB4YdnvF3TfxTwJyi7aMY5UV0qkABwkKb412w+dWrnK8vtGJGC7S4Gk9yk4Zzex9KNPRbYF
+ lMA89y5ycpeQ==
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga004.fm.intel.com ([10.253.24.48])
   by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Mar 2020 14:28:59 -0700
-IronPort-SDR: Pz5h6Pt6IKRABLbELMnLS8nJe1vFzK0tlge+EwhI7nus2COGZVDL4pUxCbkINtsettnVsa3ond
- XpQs91dN3o+w==
+IronPort-SDR: /1oWUYtsLwZuN0ce5+LqHg2F5Sbv0xKWpsRQ/h18+JNu9jBdCOiSgfnhy9kIJJDV7HZ7qlLnss
+ tya41tqf0HLw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.72,286,1580803200"; 
-   d="scan'208";a="269224516"
+   d="scan'208";a="269224523"
 Received: from sjchrist-coffee.jf.intel.com ([10.54.74.202])
-  by fmsmga004.fm.intel.com with ESMTP; 20 Mar 2020 14:28:58 -0700
+  by fmsmga004.fm.intel.com with ESMTP; 20 Mar 2020 14:28:59 -0700
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
@@ -38,9 +38,9 @@ Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
         John Haxby <john.haxby@oracle.com>,
         Miaohe Lin <linmiaohe@huawei.com>,
         Tom Lendacky <thomas.lendacky@amd.com>
-Subject: [PATCH v3 31/37] KVM: x86/mmu: Add separate override for MMU sync during fast CR3 switch
-Date:   Fri, 20 Mar 2020 14:28:27 -0700
-Message-Id: <20200320212833.3507-32-sean.j.christopherson@intel.com>
+Subject: [PATCH v3 33/37] KVM: nVMX: Skip MMU sync on nested VMX transition when possible
+Date:   Fri, 20 Mar 2020 14:28:29 -0700
+Message-Id: <20200320212833.3507-34-sean.j.christopherson@intel.com>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200320212833.3507-1-sean.j.christopherson@intel.com>
 References: <20200320212833.3507-1-sean.j.christopherson@intel.com>
@@ -51,108 +51,99 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add a separate "skip" override for MMU sync, a future change to avoid
-TLB flushes on nested VMX transitions may need to sync the MMU even if
-the TLB flush is unnecessary.
+Skip the MMU sync when reusing a cached root if EPT is enabled or L1
+enabled VPID for L2.
 
-Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+If EPT is enabled, guest-physical mappings aren't flushed even if VPID
+is disabled, i.e. L1 can't expect stale TLB entries to be flushed if it
+has enabled EPT and L0 isn't shadowing PTEs (for L1 or L2) if L1 has
+EPT disabled.
+
+If VPID is enabled (and EPT is disabled), then L1 can't expect stale TLB
+entries to be flushed (for itself or L2).
+
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 ---
- arch/x86/include/asm/kvm_host.h |  3 ++-
- arch/x86/kvm/mmu/mmu.c          | 13 +++++++------
- arch/x86/kvm/vmx/nested.c       |  2 +-
- arch/x86/kvm/x86.c              |  2 +-
- 4 files changed, 11 insertions(+), 9 deletions(-)
+ arch/x86/kvm/mmu/mmu.c    |  2 +-
+ arch/x86/kvm/vmx/nested.c | 44 ++++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 44 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 31aa93088bf9..6fca2e45886c 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1517,7 +1517,8 @@ int kvm_mmu_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa, u64 error_code,
- 		       void *insn, int insn_len);
- void kvm_mmu_invlpg(struct kvm_vcpu *vcpu, gva_t gva);
- void kvm_mmu_invpcid_gva(struct kvm_vcpu *vcpu, gva_t gva, unsigned long pcid);
--void kvm_mmu_new_cr3(struct kvm_vcpu *vcpu, gpa_t new_cr3, bool skip_tlb_flush);
-+void kvm_mmu_new_cr3(struct kvm_vcpu *vcpu, gpa_t new_cr3, bool skip_tlb_flush,
-+		     bool skip_mmu_sync);
- 
- void kvm_configure_mmu(bool enable_tdp, int tdp_page_level);
- 
 diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index b95933198f4c..06e94ca59a2d 100644
+index 6a986b66c867..84e1e748c2b3 100644
 --- a/arch/x86/kvm/mmu/mmu.c
 +++ b/arch/x86/kvm/mmu/mmu.c
-@@ -4307,7 +4307,7 @@ static bool fast_cr3_switch(struct kvm_vcpu *vcpu, gpa_t new_cr3,
- 
- static void __kvm_mmu_new_cr3(struct kvm_vcpu *vcpu, gpa_t new_cr3,
- 			      union kvm_mmu_page_role new_role,
--			      bool skip_tlb_flush)
-+			      bool skip_tlb_flush, bool skip_mmu_sync)
- {
- 	if (!fast_cr3_switch(vcpu, new_cr3, new_role)) {
- 		kvm_mmu_free_roots(vcpu, vcpu->arch.mmu, KVM_MMU_ROOT_CURRENT);
-@@ -4322,10 +4322,10 @@ static void __kvm_mmu_new_cr3(struct kvm_vcpu *vcpu, gpa_t new_cr3,
- 	 */
- 	kvm_make_request(KVM_REQ_LOAD_MMU_PGD, vcpu);
- 
--	if (!skip_tlb_flush) {
-+	if (!skip_mmu_sync)
- 		kvm_make_request(KVM_REQ_MMU_SYNC, vcpu);
-+	if (!skip_tlb_flush)
- 		kvm_make_request(KVM_REQ_TLB_FLUSH_CURRENT, vcpu);
--	}
- 
- 	/*
- 	 * The last MMIO access's GVA and GPA are cached in the VCPU. When
-@@ -4338,10 +4338,11 @@ static void __kvm_mmu_new_cr3(struct kvm_vcpu *vcpu, gpa_t new_cr3,
- 	__clear_sp_write_flooding_count(page_header(vcpu->arch.mmu->root_hpa));
- }
- 
--void kvm_mmu_new_cr3(struct kvm_vcpu *vcpu, gpa_t new_cr3, bool skip_tlb_flush)
-+void kvm_mmu_new_cr3(struct kvm_vcpu *vcpu, gpa_t new_cr3, bool skip_tlb_flush,
-+		     bool skip_mmu_sync)
- {
- 	__kvm_mmu_new_cr3(vcpu, new_cr3, kvm_mmu_calc_root_page_role(vcpu),
--			  skip_tlb_flush);
-+			  skip_tlb_flush, skip_mmu_sync);
- }
- EXPORT_SYMBOL_GPL(kvm_mmu_new_cr3);
- 
-@@ -5034,7 +5035,7 @@ void kvm_init_shadow_ept_mmu(struct kvm_vcpu *vcpu, bool execonly,
+@@ -5038,7 +5038,7 @@ void kvm_init_shadow_ept_mmu(struct kvm_vcpu *vcpu, bool execonly,
  		kvm_calc_shadow_ept_root_page_role(vcpu, accessed_dirty,
  						   execonly, level);
  
--	__kvm_mmu_new_cr3(vcpu, new_eptp, new_role.base, false);
-+	__kvm_mmu_new_cr3(vcpu, new_eptp, new_role.base, false, false);
+-	__kvm_mmu_new_cr3(vcpu, new_eptp, new_role.base, false, false);
++	__kvm_mmu_new_cr3(vcpu, new_eptp, new_role.base, false, true);
  
  	if (new_role.as_u64 == context->mmu_role.as_u64)
  		return;
 diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 06fc0b68ecf3..dd58563ee793 100644
+index dd58563ee793..db3ce8f297c2 100644
 --- a/arch/x86/kvm/vmx/nested.c
 +++ b/arch/x86/kvm/vmx/nested.c
-@@ -1123,7 +1123,7 @@ static int nested_vmx_load_cr3(struct kvm_vcpu *vcpu, unsigned long cr3, bool ne
+@@ -1095,6 +1095,44 @@ static bool nested_cr3_valid(struct kvm_vcpu *vcpu, unsigned long val)
+ 	return (val & invalid_mask) == 0;
+ }
+ 
++/*
++ * Returns true if the MMU needs to be sync'd on nested VM-Enter/VM-Exit.  The
++ * MMU needs to be sync if L0 is using shadow paging (EPT disabled) and L1
++ * didn't enable VPID for L2, i.e. L1 expects a TLB flush on VMX transitions.
++ *
++ * If EPT is enabled by L0 but disabled by L1, then L0 is not shadowing L1 or
++ * L2 PTEs, there cannot be unsync'd SPTEs for either L1 or L2.
++ *
++ * If EPT is enabled by L1 (and therefore L0), then L0 doesn't need to sync on
++ * VM-Enter as VM-Enter isn't required to invalidate guest-physical mappings
++ * (irrespective of VPID), i.e. L1 can't rely on the (virtual) CPU to flush
++ * stale GPA->HPA translations for L2 from the TLB.  And as above, L0 isn't
++ * shadowing L1 PTEs so there are no unsync'd SPTEs to sync on VM-Exit.
++ *
++ * If VPID is enabled by L1 (for L2), then L0 doesn't need to sync as VM-Enter
++ * and VM-Exit aren't required to invaliate linear mappings (EPT is disabled so
++ * there are no combined or guest-physical mappings), i.e. L1 can't rely on the
++ * (virtual) CPU to flush stale VA->PA mappings for either L2 or itself (L1).
++ *
++ * If EPT is disabled (by L0 and therefore L1) and VPID is disabled by L1, then
++ * a sync is needed as L1 expects all VA->PA mappings to be flushed on both
++ * VM-Enter and VM-Exit.
++ *
++ * Note, this logic is subtly different than nested_has_guest_tlb_tag(), which
++ * additionally checks that L2 has been assigned a VPID (when EPT is disabled).
++ * Whether or not L2 has been assigned a VPID by L0 is irrelevant with respect
++ * to L1's expectations, e.g. L0 needs to invalidate hardware TLB entries if L2
++ * doesn't have a unique VPID to prevent reusing L1's entries (assuming L1 has
++ * been assigned a VPID), but L0 doesn't need to do a MMU sync because L1
++ * doesn't expect stale (virtual) TLB entries to be flushed, i.e. L1 doesn't
++ * know that L0 will flush the TLB and so L1 will do INVVPID as needed to flush
++ * stale TLB entries, at which point L0 will sync L2's MMU.
++ */
++static bool nested_vmx_transition_mmu_sync(struct kvm_vcpu *vcpu)
++{
++	return !enable_ept && !nested_cpu_has_vpid(get_vmcs12(vcpu));
++}
++
+ /*
+  * Load guest's/host's cr3 at nested entry/exit.  @nested_ept is true if we are
+  * emulating VM-Entry into a guest with EPT enabled.  On failure, the expected
+@@ -1122,8 +1160,12 @@ static int nested_vmx_load_cr3(struct kvm_vcpu *vcpu, unsigned long cr3, bool ne
+ 		}
  	}
  
++	/*
++	 * See nested_vmx_transition_mmu_sync for details on skipping the MMU sync.
++	 */
  	if (!nested_ept)
--		kvm_mmu_new_cr3(vcpu, cr3, false);
-+		kvm_mmu_new_cr3(vcpu, cr3, false, false);
+-		kvm_mmu_new_cr3(vcpu, cr3, false, false);
++		kvm_mmu_new_cr3(vcpu, cr3, false,
++				!nested_vmx_transition_mmu_sync(vcpu));
  
  	vcpu->arch.cr3 = cr3;
  	kvm_register_mark_available(vcpu, VCPU_EXREG_CR3);
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 26c24af87cca..0d1572a0791c 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -1045,7 +1045,7 @@ int kvm_set_cr3(struct kvm_vcpu *vcpu, unsigned long cr3)
- 		 !load_pdptrs(vcpu, vcpu->arch.walk_mmu, cr3))
- 		return 1;
- 
--	kvm_mmu_new_cr3(vcpu, cr3, skip_tlb_flush);
-+	kvm_mmu_new_cr3(vcpu, cr3, skip_tlb_flush, skip_tlb_flush);
- 	vcpu->arch.cr3 = cr3;
- 	kvm_register_mark_available(vcpu, VCPU_EXREG_CR3);
- 
 -- 
 2.24.1
 
