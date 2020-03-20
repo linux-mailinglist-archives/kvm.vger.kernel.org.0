@@ -2,52 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 91F8F18D9F9
-	for <lists+kvm@lfdr.de>; Fri, 20 Mar 2020 22:03:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8B4FD18DA0A
+	for <lists+kvm@lfdr.de>; Fri, 20 Mar 2020 22:16:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727259AbgCTVDW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Mar 2020 17:03:22 -0400
-Received: from mail-pj1-f68.google.com ([209.85.216.68]:35087 "EHLO
-        mail-pj1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726851AbgCTVDW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Mar 2020 17:03:22 -0400
-Received: by mail-pj1-f68.google.com with SMTP id md6so46188pjb.0
-        for <kvm@vger.kernel.org>; Fri, 20 Mar 2020 14:03:20 -0700 (PDT)
+        id S1727145AbgCTVQm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Mar 2020 17:16:42 -0400
+Received: from mail-pf1-f196.google.com ([209.85.210.196]:38837 "EHLO
+        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727096AbgCTVQm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Mar 2020 17:16:42 -0400
+Received: by mail-pf1-f196.google.com with SMTP id z5so3948517pfn.5
+        for <kvm@vger.kernel.org>; Fri, 20 Mar 2020 14:16:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:from:to:cc:subject:in-reply-to:message-id:references
          :user-agent:mime-version;
-        bh=WYYlGXUS3P8mSLml0PfuMtkaHgB4uo3FYgrE6c+G15I=;
-        b=pRH0aoVutp+j7/hs6yUmMIiksmihV0r7fS29fJRk1HmOS60I6S8F8Y00otTlC41vDa
-         CDeYyh7d+RGSQ7ltUXsqLP5jY5OqH3GDt0AztZKZ5L9rSImvpoCvYSQFHZ17rpCIEpv6
-         2j4cBbV+yix8EGN6Nm1m0zL/+B9Aube0W5x89jywr7JgvOELYaRZsJgPKvpK1eiqkTgx
-         mauyoC1OMzZ+Xze6gfZy5s1yjQGY7t4bWMpw0QXUf2eESzKSMVF9WsF0/3gYkn6Ncyoa
-         bkc7tUMdml8at3BCMInzRle5HOBXd7Cd+ItHjY883S5tG9FJlwKfGRo1h2U4OPBppcHw
-         +AQQ==
+        bh=sPNjOMWv5tH+y8DR9zRGwW8VovTIaVhSNxirxK4bRvw=;
+        b=qJm7mQBhow7miniq3pN1Q0zWjYozOumz39ILHSWw5JPNezgYzOMGhNX+L3gKPrP27d
+         JCjmsCPRkVyEbcgRfYDdTRw756dZEeSiZm2bgGoOeHSwclYC/Q1n0YWq2oJIvhrqalQZ
+         iIoxbXPSUZ+4hW1YimFiHj6PW1vVqP4J9uvDihDGDjsAIYnjHjkXGJoVDCNA/5mnRr08
+         2IT4AItr8pVs0MiF6TVuU/mdnwbZrK0lO1TCBzT/eaelPWrdDtLsUKkndAfY5GRdMkTD
+         j9gYnTDx702HAwTyhozUabvs/Zwb/OMoq/7nXZfJc6BeTqYrX0fnwJWqQwZgOhA3KAww
+         5vtg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:in-reply-to:message-id
          :references:user-agent:mime-version;
-        bh=WYYlGXUS3P8mSLml0PfuMtkaHgB4uo3FYgrE6c+G15I=;
-        b=LbMLpqUWxwJPmQ50nWbw5o74dyy6Y9QTpROkkQiQRn6espDCIRrQVbBeQsygdq4XaX
-         Iokohf0uNvib0gpFwVQi8TRuvY35fhXkZwsoOz8ZZNFoS/XGqcTKnV4wHPuS5kOLMUuh
-         U3Ikwi+mM13HAhuCj4GZw33e1fZJtqIvoEbj0NRQv9R8ALBlLFiymVzmUXVFMim5pSuo
-         cfUzEx8GAPfOuGWFFEmsvq+Wlt/bNWTQymSxv8n5jTWn9oYHMV/KQbwBlYJ03dFINmFv
-         wIbMjM6rs+Bt6IXq4cjZ/p1PRHMLyBWJpmZQAlxRqtSme6gwbCXsYEHbEA3c1UbySayC
-         GVNw==
-X-Gm-Message-State: ANhLgQ3aDF4i05Ym6OXsJDFqc1MuhV0S8JCaD49TJsGvf/sS59Eorzhn
-        J9VGwJMuvSqFw/UyNXgSb73/kA==
-X-Google-Smtp-Source: ADFU+vuuP/36y96S10UPJdwP1UH04V2RRgoGTIhdrclxmmiSIlGSq1DzwE5Ciqko8aYhLbwKgyNcCQ==
-X-Received: by 2002:a17:90a:950b:: with SMTP id t11mr11370990pjo.79.1584738199120;
-        Fri, 20 Mar 2020 14:03:19 -0700 (PDT)
+        bh=sPNjOMWv5tH+y8DR9zRGwW8VovTIaVhSNxirxK4bRvw=;
+        b=k3283I8KrsLCXzRtJBPmIY+YxzRXe+o1m50p7nJ/HqKtkkweAN8OZtt4WGctoueWOo
+         NJZZ7bZC9Rx2+k8PHH5KlAanmeCHYwjct2o6yXT1LbYx3wJZqtZ1AcF41dNKTH1FtFvn
+         x7vfPhgM+RE6RcUoX6L9tOSQFHAhCbT8sMOq3wwMmIRUDRTZ9Ko0OE1bNJnCURUOuZ1s
+         0iESLv/Gk2Sfm4AW5f1fBqXInWoGhhcgTISmikDz8ib33jfrQzHEWHo9Mjz7lugDuVBE
+         NJUpW5cauqc0e4SJpwHnnnpt/PuiIWfMq3kUDVNBFaYjNfSzxZZ1ovu7g9MXb/X9xPMa
+         eMXA==
+X-Gm-Message-State: ANhLgQ3iW5fRlqoqh4HCOA1TdnkM977jAiHJLoeIBLcANQGPOFReloET
+        JbAIZbwofgaKicJ5IXuZFFmJWw==
+X-Google-Smtp-Source: ADFU+vt7tmXBZHZs8iTn2PbuBTIF+ft5pzs2V8T7GPerNEV6PCz3cI+0aORiv3PtC3ghNqnqMdZWjg==
+X-Received: by 2002:a63:30c4:: with SMTP id w187mr10906683pgw.239.1584739000823;
+        Fri, 20 Mar 2020 14:16:40 -0700 (PDT)
 Received: from [2620:15c:17:3:3a5:23a7:5e32:4598] ([2620:15c:17:3:3a5:23a7:5e32:4598])
-        by smtp.gmail.com with ESMTPSA id c83sm6430364pfb.44.2020.03.20.14.03.18
+        by smtp.gmail.com with ESMTPSA id g14sm6323165pfb.131.2020.03.20.14.16.39
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Mar 2020 14:03:18 -0700 (PDT)
-Date:   Fri, 20 Mar 2020 14:03:17 -0700 (PDT)
+        Fri, 20 Mar 2020 14:16:39 -0700 (PDT)
+Date:   Fri, 20 Mar 2020 14:16:39 -0700 (PDT)
 From:   David Rientjes <rientjes@google.com>
 X-X-Sender: rientjes@chino.kir.corp.google.com
-To:     Joerg Roedel <joro@8bytes.org>
+To:     Joerg Roedel <joro@8bytes.org>, erdemaktas@google.com
 cc:     x86@kernel.org, hpa@zytor.com, Andy Lutomirski <luto@kernel.org>,
         Dave Hansen <dave.hansen@linux.intel.com>,
         Peter Zijlstra <peterz@infradead.org>,
@@ -60,11 +60,10 @@ cc:     x86@kernel.org, hpa@zytor.com, Andy Lutomirski <luto@kernel.org>,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         virtualization@lists.linux-foundation.org,
         Joerg Roedel <jroedel@suse.de>
-Subject: Re: [PATCH 23/70] x86/sev-es: Add support for handling IOIO
- exceptions
-In-Reply-To: <20200319091407.1481-24-joro@8bytes.org>
-Message-ID: <alpine.DEB.2.21.2003201402100.205664@chino.kir.corp.google.com>
-References: <20200319091407.1481-1-joro@8bytes.org> <20200319091407.1481-24-joro@8bytes.org>
+Subject: Re: [PATCH 18/70] x86/boot/compressed/64: Add stage1 #VC handler
+In-Reply-To: <20200319091407.1481-19-joro@8bytes.org>
+Message-ID: <alpine.DEB.2.21.2003201413010.205664@chino.kir.corp.google.com>
+References: <20200319091407.1481-1-joro@8bytes.org> <20200319091407.1481-19-joro@8bytes.org>
 User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
@@ -75,282 +74,144 @@ X-Mailing-List: kvm@vger.kernel.org
 
 On Thu, 19 Mar 2020, Joerg Roedel wrote:
 
-> From: Tom Lendacky <thomas.lendacky@amd.com>
-> 
-> Add support for decoding and handling #VC exceptions for IOIO events.
-> 
-> Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
-> [ jroedel@suse.de: Adapted code to #VC handling framework ]
-> Co-developed-by: Joerg Roedel <jroedel@suse.de>
-> Signed-off-by: Joerg Roedel <jroedel@suse.de>
-> ---
->  arch/x86/boot/compressed/sev-es.c |  32 +++++
->  arch/x86/kernel/sev-es-shared.c   | 202 ++++++++++++++++++++++++++++++
->  2 files changed, 234 insertions(+)
-> 
-> diff --git a/arch/x86/boot/compressed/sev-es.c b/arch/x86/boot/compressed/sev-es.c
-> index 193c970a3379..ae5fbd371fd9 100644
-> --- a/arch/x86/boot/compressed/sev-es.c
-> +++ b/arch/x86/boot/compressed/sev-es.c
-> @@ -18,6 +18,35 @@
->  struct ghcb boot_ghcb_page __aligned(PAGE_SIZE);
->  struct ghcb *boot_ghcb;
->  
+> diff --git a/arch/x86/include/asm/sev-es.h b/arch/x86/include/asm/sev-es.h
+> new file mode 100644
+> index 000000000000..f524b40aef07
+> --- /dev/null
+> +++ b/arch/x86/include/asm/sev-es.h
+> @@ -0,0 +1,45 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
 > +/*
-> + * Copy a version of this function here - insn-eval.c can't be used in
-> + * pre-decompression code.
+> + * AMD Encrypted Register State Support
+> + *
+> + * Author: Joerg Roedel <jroedel@suse.de>
 > + */
-> +static bool insn_rep_prefix(struct insn *insn)
+> +
+> +#ifndef __ASM_ENCRYPTED_STATE_H
+> +#define __ASM_ENCRYPTED_STATE_H
+> +
+> +#include <linux/types.h>
+> +
+> +#define GHCB_SEV_CPUID_REQ	0x004UL
+> +#define		GHCB_CPUID_REQ_EAX	0
+> +#define		GHCB_CPUID_REQ_EBX	1
+> +#define		GHCB_CPUID_REQ_ECX	2
+> +#define		GHCB_CPUID_REQ_EDX	3
+> +#define		GHCB_CPUID_REQ(fn, reg) (GHCB_SEV_CPUID_REQ | \
+> +					(((unsigned long)reg & 3) << 30) | \
+> +					(((unsigned long)fn) << 32))
+> +
+> +#define GHCB_SEV_CPUID_RESP	0x005UL
+> +#define GHCB_SEV_TERMINATE	0x100UL
+> +
+> +#define	GHCB_SEV_GHCB_RESP_CODE(v)	((v) & 0xfff)
+> +#define	VMGEXIT()			{ asm volatile("rep; vmmcall\n\r"); }
+
+Since preemption and irqs should be disabled before updating the GHCB and 
+its MSR and until the contents have been accessed following VMGEXIT, 
+should there be checks in place to ensure that's always the case?
+
+> +
+> +static inline u64 lower_bits(u64 val, unsigned int bits)
 > +{
-> +	int i;
+> +	u64 mask = (1ULL << bits) - 1;
 > +
-> +	insn_get_prefixes(insn);
-> +
-> +	for (i = 0; i < insn->prefixes.nbytes; i++) {
-> +		insn_byte_t p = insn->prefixes.bytes[i];
-> +
-> +		if (p == 0xf2 || p == 0xf3)
-> +			return true;
-> +	}
-> +
-> +	return false;
+> +	return (val & mask);
 > +}
 > +
-> +/*
-> + * Only a dummy for insn_get_seg_base() - Early boot-code is 64bit only and
-> + * doesn't use segments.
-> + */
-> +static unsigned long insn_get_seg_base(struct pt_regs *regs, int seg_reg_idx)
+> +static inline u64 copy_lower_bits(u64 out, u64 in, unsigned int bits)
 > +{
-> +	return 0UL;
+> +	u64 mask = (1ULL << bits) - 1;
+> +
+> +	out &= ~mask;
+> +	out |= lower_bits(in, bits);
+> +
+> +	return out;
 > +}
 > +
->  static inline u64 sev_es_rd_ghcb_msr(void)
->  {
->  	unsigned long low, high;
-> @@ -117,6 +146,9 @@ void boot_vc_handler(struct pt_regs *regs, unsigned long exit_code)
->  		goto finish;
+> +#endif
+> diff --git a/arch/x86/include/asm/trap_defs.h b/arch/x86/include/asm/trap_defs.h
+> index 488f82ac36da..af45d65f0458 100644
+> --- a/arch/x86/include/asm/trap_defs.h
+> +++ b/arch/x86/include/asm/trap_defs.h
+> @@ -24,6 +24,7 @@ enum {
+>  	X86_TRAP_AC,		/* 17, Alignment Check */
+>  	X86_TRAP_MC,		/* 18, Machine Check */
+>  	X86_TRAP_XF,		/* 19, SIMD Floating-Point Exception */
+> +	X86_TRAP_VC = 29,	/* 29, VMM Communication Exception */
+>  	X86_TRAP_IRET = 32,	/* 32, IRET Exception */
+>  };
 >  
->  	switch (exit_code) {
-> +	case SVM_EXIT_IOIO:
-> +		result = vc_handle_ioio(boot_ghcb, &ctxt);
-> +		break;
->  	default:
->  		result = ES_UNSUPPORTED;
->  		break;
 > diff --git a/arch/x86/kernel/sev-es-shared.c b/arch/x86/kernel/sev-es-shared.c
-> index f0947ea3c601..46fc5318d1d7 100644
-> --- a/arch/x86/kernel/sev-es-shared.c
+> new file mode 100644
+> index 000000000000..e963b48d3e86
+> --- /dev/null
 > +++ b/arch/x86/kernel/sev-es-shared.c
-> @@ -205,3 +205,205 @@ static enum es_result vc_insn_string_write(struct es_em_ctxt *ctxt,
->  
->  	return ret;
->  }
+> @@ -0,0 +1,65 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * AMD Encrypted Register State Support
+> + *
+> + * Author: Joerg Roedel <jroedel@suse.de>
+> + *
+> + * This file is not compiled stand-alone. It contains code shared
+> + * between the pre-decompression boot code and the running Linux kernel
+> + * and is included directly into both code-bases.
+> + */
 > +
-> +#define IOIO_TYPE_STR  BIT(2)
-> +#define IOIO_TYPE_IN   1
-> +#define IOIO_TYPE_INS  (IOIO_TYPE_IN | IOIO_TYPE_STR)
-> +#define IOIO_TYPE_OUT  0
-> +#define IOIO_TYPE_OUTS (IOIO_TYPE_OUT | IOIO_TYPE_STR)
-> +
-> +#define IOIO_REP       BIT(3)
-> +
-> +#define IOIO_ADDR_64   BIT(9)
-> +#define IOIO_ADDR_32   BIT(8)
-> +#define IOIO_ADDR_16   BIT(7)
-> +
-> +#define IOIO_DATA_32   BIT(6)
-> +#define IOIO_DATA_16   BIT(5)
-> +#define IOIO_DATA_8    BIT(4)
-> +
-> +#define IOIO_SEG_ES    (0 << 10)
-> +#define IOIO_SEG_DS    (3 << 10)
-> +
-> +static enum es_result vc_ioio_exitinfo(struct es_em_ctxt *ctxt, u64 *exitinfo)
+> +/*
+> + * Boot VC Handler - This is the first VC handler during boot, there is no GHCB
+> + * page yet, so it only supports the MSR based communication with the
+> + * hypervisor and only the CPUID exit-code.
+> + */
+> +void __init vc_no_ghcb_handler(struct pt_regs *regs, unsigned long exit_code)
 > +{
-> +	struct insn *insn = &ctxt->insn;
-> +	*exitinfo = 0;
+> +	unsigned int fn = lower_bits(regs->ax, 32);
+> +	unsigned long val;
 > +
-> +	switch (insn->opcode.bytes[0]) {
-> +	/* INS opcodes */
-> +	case 0x6c:
-> +	case 0x6d:
-> +		*exitinfo |= IOIO_TYPE_INS;
-> +		*exitinfo |= IOIO_SEG_ES;
-> +		*exitinfo |= (ctxt->regs->dx & 0xffff) << 16;
-> +		break;
+> +	/* Only CPUID is supported via MSR protocol */
+> +	if (exit_code != SVM_EXIT_CPUID)
+> +		goto fail;
 > +
-> +	/* OUTS opcodes */
-> +	case 0x6e:
-> +	case 0x6f:
-> +		*exitinfo |= IOIO_TYPE_OUTS;
-> +		*exitinfo |= IOIO_SEG_DS;
-> +		*exitinfo |= (ctxt->regs->dx & 0xffff) << 16;
-> +		break;
+> +	sev_es_wr_ghcb_msr(GHCB_CPUID_REQ(fn, GHCB_CPUID_REQ_EAX));
+> +	VMGEXIT();
+> +	val = sev_es_rd_ghcb_msr();
+> +	if (GHCB_SEV_GHCB_RESP_CODE(val) != GHCB_SEV_CPUID_RESP)
+> +		goto fail;
+> +	regs->ax = val >> 32;
 > +
-> +	/* IN immediate opcodes */
-> +	case 0xe4:
-> +	case 0xe5:
-> +		*exitinfo |= IOIO_TYPE_IN;
-> +		*exitinfo |= insn->immediate.value << 16;
-> +		break;
+> +	sev_es_wr_ghcb_msr(GHCB_CPUID_REQ(fn, GHCB_CPUID_REQ_EBX));
+> +	VMGEXIT();
+> +	val = sev_es_rd_ghcb_msr();
+> +	if (GHCB_SEV_GHCB_RESP_CODE(val) != GHCB_SEV_CPUID_RESP)
+> +		goto fail;
+> +	regs->bx = val >> 32;
 > +
-> +	/* OUT immediate opcodes */
-> +	case 0xe6:
-> +	case 0xe7:
-> +		*exitinfo |= IOIO_TYPE_OUT;
-> +		*exitinfo |= insn->immediate.value << 16;
-> +		break;
+> +	sev_es_wr_ghcb_msr(GHCB_CPUID_REQ(fn, GHCB_CPUID_REQ_ECX));
+> +	VMGEXIT();
+> +	val = sev_es_rd_ghcb_msr();
+> +	if (GHCB_SEV_GHCB_RESP_CODE(val) != GHCB_SEV_CPUID_RESP)
+> +		goto fail;
+> +	regs->cx = val >> 32;
 > +
-> +	/* IN register opcodes */
-> +	case 0xec:
-> +	case 0xed:
-> +		*exitinfo |= IOIO_TYPE_IN;
-> +		*exitinfo |= (ctxt->regs->dx & 0xffff) << 16;
-> +		break;
+> +	sev_es_wr_ghcb_msr(GHCB_CPUID_REQ(fn, GHCB_CPUID_REQ_EDX));
+> +	VMGEXIT();
+> +	val = sev_es_rd_ghcb_msr();
+> +	if (GHCB_SEV_GHCB_RESP_CODE(val) != GHCB_SEV_CPUID_RESP)
+> +		goto fail;
+> +	regs->dx = val >> 32;
 > +
-> +	/* OUT register opcodes */
-> +	case 0xee:
-> +	case 0xef:
-> +		*exitinfo |= IOIO_TYPE_OUT;
-> +		*exitinfo |= (ctxt->regs->dx & 0xffff) << 16;
-> +		break;
+> +	regs->ip += 2;
 > +
-> +	default:
-> +		return ES_DECODE_FAILED;
-> +	}
+> +	return;
 > +
-> +	switch (insn->opcode.bytes[0]) {
-> +	case 0x6c:
-> +	case 0x6e:
-> +	case 0xe4:
-> +	case 0xe6:
-> +	case 0xec:
-> +	case 0xee:
-> +		/* Single byte opcodes */
-> +		*exitinfo |= IOIO_DATA_8;
-> +		break;
-> +	default:
-> +		/* Length determined by instruction parsing */
-> +		*exitinfo |= (insn->opnd_bytes == 2) ? IOIO_DATA_16
-> +						     : IOIO_DATA_32;
-> +	}
-> +	switch (insn->addr_bytes) {
-> +	case 2:
-> +		*exitinfo |= IOIO_ADDR_16;
-> +		break;
-> +	case 4:
-> +		*exitinfo |= IOIO_ADDR_32;
-> +		break;
-> +	case 8:
-> +		*exitinfo |= IOIO_ADDR_64;
-> +		break;
-> +	}
+> +fail:
+> +	sev_es_wr_ghcb_msr(GHCB_SEV_TERMINATE);
+> +	VMGEXIT();
 > +
-> +	if (insn_rep_prefix(insn))
-> +		*exitinfo |= IOIO_REP;
-> +
-> +	return ES_OK;
-> +}
-> +
-> +static enum es_result vc_handle_ioio(struct ghcb *ghcb, struct es_em_ctxt *ctxt)
-> +{
-> +	struct pt_regs *regs = ctxt->regs;
-> +	u64 exit_info_1, exit_info_2;
-> +	enum es_result ret;
-> +
-> +	ret = vc_ioio_exitinfo(ctxt, &exit_info_1);
-> +	if (ret != ES_OK)
-> +		return ret;
-> +
-> +	if (exit_info_1 & IOIO_TYPE_STR) {
-> +		int df = (regs->flags & X86_EFLAGS_DF) ? -1 : 1;
-> +		unsigned int io_bytes, exit_bytes;
-> +		unsigned int ghcb_count, op_count;
-> +		unsigned long es_base;
-> +		u64 sw_scratch;
-> +
-> +		/*
-> +		 * For the string variants with rep prefix the amount of in/out
-> +		 * operations per #VC exception is limited so that the kernel
-> +		 * has a chance to take interrupts an re-schedule while the
-> +		 * instruction is emulated.
-> +		 */
-> +		io_bytes   = (exit_info_1 >> 4) & 0x7;
-> +		ghcb_count = sizeof(ghcb->shared_buffer) / io_bytes;
-> +
-> +		op_count    = (exit_info_1 & IOIO_REP) ? regs->cx : 1;
-> +		exit_info_2 = min(op_count, ghcb_count);
-> +		exit_bytes  = exit_info_2 * io_bytes;
-> +
-> +		es_base = insn_get_seg_base(ctxt->regs, INAT_SEG_REG_ES);
-> +
-> +		if (!(exit_info_1 & IOIO_TYPE_IN)) {
-> +			ret = vc_insn_string_read(ctxt,
-> +					       (void *)(es_base + regs->si),
-> +					       ghcb->shared_buffer, io_bytes,
-> +					       exit_info_2, df);
-
-The last argument to vc_insn_string_read() is "bool backwards" which in 
-this case it appears will always be true?
-
-> +			if (ret)
-> +				return ret;
-> +		}
-> +
-> +		sw_scratch = __pa(ghcb) + offsetof(struct ghcb, shared_buffer);
-> +		ghcb_set_sw_scratch(ghcb, sw_scratch);
-> +		ret = sev_es_ghcb_hv_call(ghcb, ctxt, SVM_EXIT_IOIO,
-> +				   exit_info_1, exit_info_2);
-> +		if (ret != ES_OK)
-> +			return ret;
-> +
-> +		/* Everything went well, write back results */
-> +		if (exit_info_1 & IOIO_TYPE_IN) {
-> +			ret = vc_insn_string_write(ctxt,
-> +						(void *)(es_base + regs->di),
-> +						ghcb->shared_buffer, io_bytes,
-> +						exit_info_2, df);
-> +			if (ret)
-> +				return ret;
-> +
-> +			if (df)
-> +				regs->di -= exit_bytes;
-> +			else
-> +				regs->di += exit_bytes;
-> +		} else {
-> +			if (df)
-> +				regs->si -= exit_bytes;
-> +			else
-> +				regs->si += exit_bytes;
-> +		}
-> +
-> +		if (exit_info_1 & IOIO_REP)
-> +			regs->cx -= exit_info_2;
-> +
-> +		ret = regs->cx ? ES_RETRY : ES_OK;
-> +
-> +	} else {
-> +		int bits = (exit_info_1 & 0x70) >> 1;
-> +		u64 rax = 0;
-> +
-> +		if (!(exit_info_1 & IOIO_TYPE_IN))
-> +			rax = lower_bits(regs->ax, bits);
-> +
-> +		ghcb_set_rax(ghcb, rax);
-> +
-> +		ret = sev_es_ghcb_hv_call(ghcb, ctxt, SVM_EXIT_IOIO, exit_info_1, 0);
-> +		if (ret != ES_OK)
-> +			return ret;
-> +
-> +		if (exit_info_1 & IOIO_TYPE_IN) {
-> +			if (!ghcb_is_valid_rax(ghcb))
-> +				return ES_VMM_ERROR;
-> +			regs->ax = lower_bits(ghcb->save.rax, bits);
-> +		}
-> +	}
-> +
-> +	return ret;
+> +	/* Shouldn't get here - if we do halt the machine */
+> +	while (true)
+> +		asm volatile("hlt\n");
 > +}
 > -- 
 > 2.17.1
