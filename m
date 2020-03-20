@@ -2,95 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 67A1E18DA47
-	for <lists+kvm@lfdr.de>; Fri, 20 Mar 2020 22:30:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7C94218DAC7
+	for <lists+kvm@lfdr.de>; Fri, 20 Mar 2020 23:05:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727323AbgCTVaH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Mar 2020 17:30:07 -0400
-Received: from mga09.intel.com ([134.134.136.24]:37248 "EHLO mga09.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727468AbgCTV27 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Mar 2020 17:28:59 -0400
-IronPort-SDR: bAUz1lmTYRIaUZ7acz1xFRqpQCs0qLmlZOjqY8sIfyQrQ2qQo0S1DK3r9k+NZu0YIzbMqenvmk
- jbQIEJA+Rg5Q==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Mar 2020 14:28:59 -0700
-IronPort-SDR: uY8gHHOhXase0nA2Gow8VeiweRlWGfUrIL7CsMroiMPU971b42zejyn/uJGAsahYm+aX4sMHZM
- pRuOZH03b4Fg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.72,286,1580803200"; 
-   d="scan'208";a="269224520"
-Received: from sjchrist-coffee.jf.intel.com ([10.54.74.202])
-  by fmsmga004.fm.intel.com with ESMTP; 20 Mar 2020 14:28:59 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Ben Gardon <bgardon@google.com>,
-        Junaid Shahid <junaids@google.com>,
-        Liran Alon <liran.alon@oracle.com>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        John Haxby <john.haxby@oracle.com>,
-        Miaohe Lin <linmiaohe@huawei.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>
-Subject: [PATCH v3 32/37] KVM: x86/mmu: Add module param to force TLB flush on root reuse
-Date:   Fri, 20 Mar 2020 14:28:28 -0700
-Message-Id: <20200320212833.3507-33-sean.j.christopherson@intel.com>
-X-Mailer: git-send-email 2.24.1
-In-Reply-To: <20200320212833.3507-1-sean.j.christopherson@intel.com>
-References: <20200320212833.3507-1-sean.j.christopherson@intel.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        id S1727671AbgCTWFI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Mar 2020 18:05:08 -0400
+Received: from Galois.linutronix.de ([193.142.43.55]:37507 "EHLO
+        Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727426AbgCTWET (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Mar 2020 18:04:19 -0400
+Received: from p5de0bf0b.dip0.t-ipconnect.de ([93.224.191.11] helo=nanos.tec.linutronix.de)
+        by Galois.linutronix.de with esmtpsa (TLS1.2:DHE_RSA_AES_256_CBC_SHA256:256)
+        (Exim 4.80)
+        (envelope-from <tglx@linutronix.de>)
+        id 1jFPk1-0004TN-5N; Fri, 20 Mar 2020 23:03:45 +0100
+Received: from nanos.tec.linutronix.de (localhost [IPv6:::1])
+        by nanos.tec.linutronix.de (Postfix) with ESMTP id 9F4A8FFC8D;
+        Fri, 20 Mar 2020 23:03:44 +0100 (CET)
+Message-Id: <20200320175956.033706968@linutronix.de>
+User-Agent: quilt/0.65
+Date:   Fri, 20 Mar 2020 18:59:56 +0100
+From:   Thomas Gleixner <tglx@linutronix.de>
+To:     LKML <linux-kernel@vger.kernel.org>
+Cc:     x86@kernel.org, Paul McKenney <paulmck@kernel.org>,
+        Josh Poimboeuf <jpoimboe@redhat.com>,
+        "Joel Fernandes (Google)" <joel@joelfernandes.org>,
+        "Steven Rostedt (VMware)" <rostedt@goodmis.org>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Alexei Starovoitov <ast@kernel.org>,
+        Frederic Weisbecker <frederic@kernel.org>,
+        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+        Brian Gerst <brgerst@gmail.com>,
+        Juergen Gross <jgross@suse.com>,
+        Alexandre Chartre <alexandre.chartre@oracle.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+Subject: [RESEND][patch V3 00/23] x86/entry: Consolidation part II (syscalls)
+Content-transfer-encoding: 8-bit
+X-Linutronix-Spam-Score: -1.0
+X-Linutronix-Spam-Level: -
+X-Linutronix-Spam-Status: No , -1.0 points, 5.0 required,  ALL_TRUSTED=-1,SHORTCIRCUIT=-0.0001
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add a module param, flush_on_reuse, to override skip_tlb_flush and
-skip_mmu_sync when performing a so called "fast cr3 switch", i.e. when
-reusing a cached root.  The primary motiviation for the control is to
-provide a fallback mechanism in the event that TLB flushing and/or MMU
-sync bugs are exposed/introduced by upcoming changes to stop
-unconditionally flushing on nested VMX transitions.
+Hi!
 
-Suggested-by: Jim Mattson <jmattson@google.com>
-Suggested-by: Junaid Shahid <junaids@google.com>
-Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+Sorry for the resend noise. I managed to fatfinger one of my scripts
+so it dropped all Ccs and sent it only to LKML. Sigh....
+
+This is the third version of the syscall entry code consolidation
+series. V2 can be found here:
+
+  https://lore.kernel.org/r/20200308222359.370649591@linutronix.de
+
+It applies on top of
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip.git x86/entry
+
+and is also available from git:
+
+    git://git.kernel.org/pub/scm/linux/kernel/git/tglx/devel entry-v3-part2
+
+The changes vs. V2:
+
+ - A massive rework utilizing Peter Zijlstras objtool patches to analyze
+   the new .noinstr.text section:
+
+   https://lore.kernel.org/r/20200317170234.897520633@infradead.org
+
+   Working with this was really helpful as it clearly pin pointed code
+   which calls out of the protected section which is much more efficient
+   and focussed than chasing everything manually.
+
+ - Picked up the two RCU patches from Paul for completeness. The bugfix
+   is required anyway and the comments have been really helpful to see
+   where the defense line has to be.
+
+ - As the tool flagged KVM as red zone, I looked at the context tracking
+   usage there and it has similar if not worse issues. New set of patches
+   dealing with that.
+
+Please have a close look at the approach and the resulting protected areas.
+
+Known issues:
+
+  - The kprobes '.noinstr.text' exclusion currently works only for built
+    in code. Haven't figured out how to to fix that, but I'm sure that
+    Masami knows :)
+
+  - The various SANitizers if enabled ruin the picture. Peter and I still
+    have no brilliant idea what to do about that.
+
+Thanks,
+
+	tglx
 ---
- arch/x86/kvm/mmu/mmu.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+ arch/x86/entry/common.c                |  173 ++++++++++++++++++++++++---------
+ arch/x86/entry/entry_32.S              |   24 ----
+ arch/x86/entry/entry_64.S              |    6 -
+ arch/x86/entry/entry_64_compat.S       |   32 ------
+ arch/x86/entry/thunk_64.S              |   45 +++++++-
+ arch/x86/include/asm/bug.h             |    3 
+ arch/x86/include/asm/hardirq.h         |    4 
+ arch/x86/include/asm/irqflags.h        |    3 
+ arch/x86/include/asm/nospec-branch.h   |    4 
+ arch/x86/include/asm/paravirt.h        |    3 
+ arch/x86/kvm/svm.c                     |  152 ++++++++++++++++++----------
+ arch/x86/kvm/vmx/ops.h                 |    4 
+ arch/x86/kvm/vmx/vmenter.S             |    2 
+ arch/x86/kvm/vmx/vmx.c                 |   78 +++++++++++---
+ arch/x86/kvm/x86.c                     |    4 
+ b/include/asm-generic/bug.h            |    9 +
+ include/asm-generic/sections.h         |    3 
+ include/asm-generic/vmlinux.lds.h      |    4 
+ include/linux/compiler.h               |   24 ++++
+ include/linux/compiler_types.h         |    4 
+ include/linux/context_tracking.h       |   27 +++--
+ include/linux/context_tracking_state.h |    6 -
+ include/linux/irqflags.h               |    6 +
+ include/linux/sched.h                  |    1 
+ kernel/context_tracking.c              |   14 +-
+ kernel/kprobes.c                       |   11 ++
+ kernel/locking/lockdep.c               |   66 +++++++++---
+ kernel/panic.c                         |    4 
+ kernel/rcu/tree.c                      |   91 +++++++++++------
+ kernel/rcu/tree_plugin.h               |    4 
+ kernel/rcu/update.c                    |    7 -
+ kernel/trace/trace_preemptirq.c        |   25 ++++
+ lib/debug_locks.c                      |    2 
+ lib/smp_processor_id.c                 |   10 -
+ scripts/mod/modpost.c                  |    2 
+ 35 files changed, 590 insertions(+), 267 deletions(-)
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 06e94ca59a2d..6a986b66c867 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -78,6 +78,9 @@ module_param_cb(nx_huge_pages_recovery_ratio, &nx_huge_pages_recovery_ratio_ops,
- 		&nx_huge_pages_recovery_ratio, 0644);
- __MODULE_PARM_TYPE(nx_huge_pages_recovery_ratio, "uint");
- 
-+static bool __read_mostly force_flush_and_sync_on_reuse;
-+module_param_named(flush_on_reuse, force_flush_and_sync_on_reuse, bool, 0644);
-+
- /*
-  * When setting this variable to true it enables Two-Dimensional-Paging
-  * where the hardware walks 2 page tables:
-@@ -4322,9 +4325,9 @@ static void __kvm_mmu_new_cr3(struct kvm_vcpu *vcpu, gpa_t new_cr3,
- 	 */
- 	kvm_make_request(KVM_REQ_LOAD_MMU_PGD, vcpu);
- 
--	if (!skip_mmu_sync)
-+	if (!skip_mmu_sync || force_flush_and_sync_on_reuse)
- 		kvm_make_request(KVM_REQ_MMU_SYNC, vcpu);
--	if (!skip_tlb_flush)
-+	if (!skip_tlb_flush || force_flush_and_sync_on_reuse)
- 		kvm_make_request(KVM_REQ_TLB_FLUSH_CURRENT, vcpu);
- 
- 	/*
--- 
-2.24.1
 
