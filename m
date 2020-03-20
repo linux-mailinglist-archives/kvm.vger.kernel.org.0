@@ -2,33 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7154718D9F2
-	for <lists+kvm@lfdr.de>; Fri, 20 Mar 2020 22:02:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 91F8F18D9F9
+	for <lists+kvm@lfdr.de>; Fri, 20 Mar 2020 22:03:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727113AbgCTVCQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Mar 2020 17:02:16 -0400
-Received: from mga04.intel.com ([192.55.52.120]:57314 "EHLO mga04.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726738AbgCTVCQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Mar 2020 17:02:16 -0400
-IronPort-SDR: iUK8NiCv3loTp/wr8ZYxFgfWPjSVJD3C0sPehK0RT9t5gkCvtWcDOgVIbDbI3ajlKpYCsbsOs/
- irATOZkwFA2Q==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Mar 2020 14:02:15 -0700
-IronPort-SDR: HboxVKvwZZOgIV6yB3TxFGy0JAOwS7iAeF7LpBdEIi7eqh2wKjhoIIwTOwu1SLQWSmMlA2rOa1
- Dpx0Kp/ZA3PA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.72,285,1580803200"; 
-   d="scan'208";a="248999174"
-Received: from jralexan-mobl.amr.corp.intel.com (HELO [10.254.187.105]) ([10.254.187.105])
-  by orsmga006.jf.intel.com with ESMTP; 20 Mar 2020 14:02:14 -0700
-Subject: Re: [PATCH 21/70] x86/boot/compressed/64: Add function to map a page
- unencrypted
-To:     David Rientjes <rientjes@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Cc:     x86@kernel.org, hpa@zytor.com, Andy Lutomirski <luto@kernel.org>,
+        id S1727259AbgCTVDW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Mar 2020 17:03:22 -0400
+Received: from mail-pj1-f68.google.com ([209.85.216.68]:35087 "EHLO
+        mail-pj1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726851AbgCTVDW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Mar 2020 17:03:22 -0400
+Received: by mail-pj1-f68.google.com with SMTP id md6so46188pjb.0
+        for <kvm@vger.kernel.org>; Fri, 20 Mar 2020 14:03:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:in-reply-to:message-id:references
+         :user-agent:mime-version;
+        bh=WYYlGXUS3P8mSLml0PfuMtkaHgB4uo3FYgrE6c+G15I=;
+        b=pRH0aoVutp+j7/hs6yUmMIiksmihV0r7fS29fJRk1HmOS60I6S8F8Y00otTlC41vDa
+         CDeYyh7d+RGSQ7ltUXsqLP5jY5OqH3GDt0AztZKZ5L9rSImvpoCvYSQFHZ17rpCIEpv6
+         2j4cBbV+yix8EGN6Nm1m0zL/+B9Aube0W5x89jywr7JgvOELYaRZsJgPKvpK1eiqkTgx
+         mauyoC1OMzZ+Xze6gfZy5s1yjQGY7t4bWMpw0QXUf2eESzKSMVF9WsF0/3gYkn6Ncyoa
+         bkc7tUMdml8at3BCMInzRle5HOBXd7Cd+ItHjY883S5tG9FJlwKfGRo1h2U4OPBppcHw
+         +AQQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:in-reply-to:message-id
+         :references:user-agent:mime-version;
+        bh=WYYlGXUS3P8mSLml0PfuMtkaHgB4uo3FYgrE6c+G15I=;
+        b=LbMLpqUWxwJPmQ50nWbw5o74dyy6Y9QTpROkkQiQRn6espDCIRrQVbBeQsygdq4XaX
+         Iokohf0uNvib0gpFwVQi8TRuvY35fhXkZwsoOz8ZZNFoS/XGqcTKnV4wHPuS5kOLMUuh
+         U3Ikwi+mM13HAhuCj4GZw33e1fZJtqIvoEbj0NRQv9R8ALBlLFiymVzmUXVFMim5pSuo
+         cfUzEx8GAPfOuGWFFEmsvq+Wlt/bNWTQymSxv8n5jTWn9oYHMV/KQbwBlYJ03dFINmFv
+         wIbMjM6rs+Bt6IXq4cjZ/p1PRHMLyBWJpmZQAlxRqtSme6gwbCXsYEHbEA3c1UbySayC
+         GVNw==
+X-Gm-Message-State: ANhLgQ3aDF4i05Ym6OXsJDFqc1MuhV0S8JCaD49TJsGvf/sS59Eorzhn
+        J9VGwJMuvSqFw/UyNXgSb73/kA==
+X-Google-Smtp-Source: ADFU+vuuP/36y96S10UPJdwP1UH04V2RRgoGTIhdrclxmmiSIlGSq1DzwE5Ciqko8aYhLbwKgyNcCQ==
+X-Received: by 2002:a17:90a:950b:: with SMTP id t11mr11370990pjo.79.1584738199120;
+        Fri, 20 Mar 2020 14:03:19 -0700 (PDT)
+Received: from [2620:15c:17:3:3a5:23a7:5e32:4598] ([2620:15c:17:3:3a5:23a7:5e32:4598])
+        by smtp.gmail.com with ESMTPSA id c83sm6430364pfb.44.2020.03.20.14.03.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 20 Mar 2020 14:03:18 -0700 (PDT)
+Date:   Fri, 20 Mar 2020 14:03:17 -0700 (PDT)
+From:   David Rientjes <rientjes@google.com>
+X-X-Sender: rientjes@chino.kir.corp.google.com
+To:     Joerg Roedel <joro@8bytes.org>
+cc:     x86@kernel.org, hpa@zytor.com, Andy Lutomirski <luto@kernel.org>,
         Dave Hansen <dave.hansen@linux.intel.com>,
         Peter Zijlstra <peterz@infradead.org>,
         Thomas Hellstrom <thellstrom@vmware.com>,
@@ -40,87 +60,299 @@ Cc:     x86@kernel.org, hpa@zytor.com, Andy Lutomirski <luto@kernel.org>,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         virtualization@lists.linux-foundation.org,
         Joerg Roedel <jroedel@suse.de>
-References: <20200319091407.1481-1-joro@8bytes.org>
- <20200319091407.1481-22-joro@8bytes.org>
- <alpine.DEB.2.21.2003201350300.205664@chino.kir.corp.google.com>
-From:   Dave Hansen <dave.hansen@intel.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- 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
-Message-ID: <8a50c19f-aaf8-90bd-a415-0e3b71e5a010@intel.com>
-Date:   Fri, 20 Mar 2020 14:02:13 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+Subject: Re: [PATCH 23/70] x86/sev-es: Add support for handling IOIO
+ exceptions
+In-Reply-To: <20200319091407.1481-24-joro@8bytes.org>
+Message-ID: <alpine.DEB.2.21.2003201402100.205664@chino.kir.corp.google.com>
+References: <20200319091407.1481-1-joro@8bytes.org> <20200319091407.1481-24-joro@8bytes.org>
+User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
 MIME-Version: 1.0
-In-Reply-To: <alpine.DEB.2.21.2003201350300.205664@chino.kir.corp.google.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 3/20/20 1:53 PM, David Rientjes wrote:
->> +
->> +	/* Clear encryption flag and write new pte */
->> +	pte = pte_clear_flags(*ptep, _PAGE_ENC);
->> +	set_pte(ptep, pte);
->> +
->> +	/* Flush TLB to map the page unencrypted */
->> +	write_cr3(top_level_pgt);
->> +
-> Is there a guarantee that this flushes the tlb if cr3 == top_level_pgt 
-> alrady without an invlpg?
+On Thu, 19 Mar 2020, Joerg Roedel wrote:
 
-Ahh, good catch.
+> From: Tom Lendacky <thomas.lendacky@amd.com>
+> 
+> Add support for decoding and handling #VC exceptions for IOIO events.
+> 
+> Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
+> [ jroedel@suse.de: Adapted code to #VC handling framework ]
+> Co-developed-by: Joerg Roedel <jroedel@suse.de>
+> Signed-off-by: Joerg Roedel <jroedel@suse.de>
+> ---
+>  arch/x86/boot/compressed/sev-es.c |  32 +++++
+>  arch/x86/kernel/sev-es-shared.c   | 202 ++++++++++++++++++++++++++++++
+>  2 files changed, 234 insertions(+)
+> 
+> diff --git a/arch/x86/boot/compressed/sev-es.c b/arch/x86/boot/compressed/sev-es.c
+> index 193c970a3379..ae5fbd371fd9 100644
+> --- a/arch/x86/boot/compressed/sev-es.c
+> +++ b/arch/x86/boot/compressed/sev-es.c
+> @@ -18,6 +18,35 @@
+>  struct ghcb boot_ghcb_page __aligned(PAGE_SIZE);
+>  struct ghcb *boot_ghcb;
+>  
+> +/*
+> + * Copy a version of this function here - insn-eval.c can't be used in
+> + * pre-decompression code.
+> + */
+> +static bool insn_rep_prefix(struct insn *insn)
+> +{
+> +	int i;
+> +
+> +	insn_get_prefixes(insn);
+> +
+> +	for (i = 0; i < insn->prefixes.nbytes; i++) {
+> +		insn_byte_t p = insn->prefixes.bytes[i];
+> +
+> +		if (p == 0xf2 || p == 0xf3)
+> +			return true;
+> +	}
+> +
+> +	return false;
+> +}
+> +
+> +/*
+> + * Only a dummy for insn_get_seg_base() - Early boot-code is 64bit only and
+> + * doesn't use segments.
+> + */
+> +static unsigned long insn_get_seg_base(struct pt_regs *regs, int seg_reg_idx)
+> +{
+> +	return 0UL;
+> +}
+> +
+>  static inline u64 sev_es_rd_ghcb_msr(void)
+>  {
+>  	unsigned long low, high;
+> @@ -117,6 +146,9 @@ void boot_vc_handler(struct pt_regs *regs, unsigned long exit_code)
+>  		goto finish;
+>  
+>  	switch (exit_code) {
+> +	case SVM_EXIT_IOIO:
+> +		result = vc_handle_ioio(boot_ghcb, &ctxt);
+> +		break;
+>  	default:
+>  		result = ES_UNSUPPORTED;
+>  		break;
+> diff --git a/arch/x86/kernel/sev-es-shared.c b/arch/x86/kernel/sev-es-shared.c
+> index f0947ea3c601..46fc5318d1d7 100644
+> --- a/arch/x86/kernel/sev-es-shared.c
+> +++ b/arch/x86/kernel/sev-es-shared.c
+> @@ -205,3 +205,205 @@ static enum es_result vc_insn_string_write(struct es_em_ctxt *ctxt,
+>  
+>  	return ret;
+>  }
+> +
+> +#define IOIO_TYPE_STR  BIT(2)
+> +#define IOIO_TYPE_IN   1
+> +#define IOIO_TYPE_INS  (IOIO_TYPE_IN | IOIO_TYPE_STR)
+> +#define IOIO_TYPE_OUT  0
+> +#define IOIO_TYPE_OUTS (IOIO_TYPE_OUT | IOIO_TYPE_STR)
+> +
+> +#define IOIO_REP       BIT(3)
+> +
+> +#define IOIO_ADDR_64   BIT(9)
+> +#define IOIO_ADDR_32   BIT(8)
+> +#define IOIO_ADDR_16   BIT(7)
+> +
+> +#define IOIO_DATA_32   BIT(6)
+> +#define IOIO_DATA_16   BIT(5)
+> +#define IOIO_DATA_8    BIT(4)
+> +
+> +#define IOIO_SEG_ES    (0 << 10)
+> +#define IOIO_SEG_DS    (3 << 10)
+> +
+> +static enum es_result vc_ioio_exitinfo(struct es_em_ctxt *ctxt, u64 *exitinfo)
+> +{
+> +	struct insn *insn = &ctxt->insn;
+> +	*exitinfo = 0;
+> +
+> +	switch (insn->opcode.bytes[0]) {
+> +	/* INS opcodes */
+> +	case 0x6c:
+> +	case 0x6d:
+> +		*exitinfo |= IOIO_TYPE_INS;
+> +		*exitinfo |= IOIO_SEG_ES;
+> +		*exitinfo |= (ctxt->regs->dx & 0xffff) << 16;
+> +		break;
+> +
+> +	/* OUTS opcodes */
+> +	case 0x6e:
+> +	case 0x6f:
+> +		*exitinfo |= IOIO_TYPE_OUTS;
+> +		*exitinfo |= IOIO_SEG_DS;
+> +		*exitinfo |= (ctxt->regs->dx & 0xffff) << 16;
+> +		break;
+> +
+> +	/* IN immediate opcodes */
+> +	case 0xe4:
+> +	case 0xe5:
+> +		*exitinfo |= IOIO_TYPE_IN;
+> +		*exitinfo |= insn->immediate.value << 16;
+> +		break;
+> +
+> +	/* OUT immediate opcodes */
+> +	case 0xe6:
+> +	case 0xe7:
+> +		*exitinfo |= IOIO_TYPE_OUT;
+> +		*exitinfo |= insn->immediate.value << 16;
+> +		break;
+> +
+> +	/* IN register opcodes */
+> +	case 0xec:
+> +	case 0xed:
+> +		*exitinfo |= IOIO_TYPE_IN;
+> +		*exitinfo |= (ctxt->regs->dx & 0xffff) << 16;
+> +		break;
+> +
+> +	/* OUT register opcodes */
+> +	case 0xee:
+> +	case 0xef:
+> +		*exitinfo |= IOIO_TYPE_OUT;
+> +		*exitinfo |= (ctxt->regs->dx & 0xffff) << 16;
+> +		break;
+> +
+> +	default:
+> +		return ES_DECODE_FAILED;
+> +	}
+> +
+> +	switch (insn->opcode.bytes[0]) {
+> +	case 0x6c:
+> +	case 0x6e:
+> +	case 0xe4:
+> +	case 0xe6:
+> +	case 0xec:
+> +	case 0xee:
+> +		/* Single byte opcodes */
+> +		*exitinfo |= IOIO_DATA_8;
+> +		break;
+> +	default:
+> +		/* Length determined by instruction parsing */
+> +		*exitinfo |= (insn->opnd_bytes == 2) ? IOIO_DATA_16
+> +						     : IOIO_DATA_32;
+> +	}
+> +	switch (insn->addr_bytes) {
+> +	case 2:
+> +		*exitinfo |= IOIO_ADDR_16;
+> +		break;
+> +	case 4:
+> +		*exitinfo |= IOIO_ADDR_32;
+> +		break;
+> +	case 8:
+> +		*exitinfo |= IOIO_ADDR_64;
+> +		break;
+> +	}
+> +
+> +	if (insn_rep_prefix(insn))
+> +		*exitinfo |= IOIO_REP;
+> +
+> +	return ES_OK;
+> +}
+> +
+> +static enum es_result vc_handle_ioio(struct ghcb *ghcb, struct es_em_ctxt *ctxt)
+> +{
+> +	struct pt_regs *regs = ctxt->regs;
+> +	u64 exit_info_1, exit_info_2;
+> +	enum es_result ret;
+> +
+> +	ret = vc_ioio_exitinfo(ctxt, &exit_info_1);
+> +	if (ret != ES_OK)
+> +		return ret;
+> +
+> +	if (exit_info_1 & IOIO_TYPE_STR) {
+> +		int df = (regs->flags & X86_EFLAGS_DF) ? -1 : 1;
+> +		unsigned int io_bytes, exit_bytes;
+> +		unsigned int ghcb_count, op_count;
+> +		unsigned long es_base;
+> +		u64 sw_scratch;
+> +
+> +		/*
+> +		 * For the string variants with rep prefix the amount of in/out
+> +		 * operations per #VC exception is limited so that the kernel
+> +		 * has a chance to take interrupts an re-schedule while the
+> +		 * instruction is emulated.
+> +		 */
+> +		io_bytes   = (exit_info_1 >> 4) & 0x7;
+> +		ghcb_count = sizeof(ghcb->shared_buffer) / io_bytes;
+> +
+> +		op_count    = (exit_info_1 & IOIO_REP) ? regs->cx : 1;
+> +		exit_info_2 = min(op_count, ghcb_count);
+> +		exit_bytes  = exit_info_2 * io_bytes;
+> +
+> +		es_base = insn_get_seg_base(ctxt->regs, INAT_SEG_REG_ES);
+> +
+> +		if (!(exit_info_1 & IOIO_TYPE_IN)) {
+> +			ret = vc_insn_string_read(ctxt,
+> +					       (void *)(es_base + regs->si),
+> +					       ghcb->shared_buffer, io_bytes,
+> +					       exit_info_2, df);
 
-It *never* flushes global pages.  For a generic function like this, that
-seems pretty dangerous because the PTEs it goes after could quite easily
-be Global.  It's also not _obviously_ correct if PCIDs are in play
-(which I don't think they are on AMD).
+The last argument to vc_insn_string_read() is "bool backwards" which in 
+this case it appears will always be true?
 
-A flush_tlb_global() is probably more appropriate.  Better yet, is there
-a reason not to use flush_tlb_kernel_range()?  I don't think it's
-necessary to whack the entire TLB for one PTE set.
+> +			if (ret)
+> +				return ret;
+> +		}
+> +
+> +		sw_scratch = __pa(ghcb) + offsetof(struct ghcb, shared_buffer);
+> +		ghcb_set_sw_scratch(ghcb, sw_scratch);
+> +		ret = sev_es_ghcb_hv_call(ghcb, ctxt, SVM_EXIT_IOIO,
+> +				   exit_info_1, exit_info_2);
+> +		if (ret != ES_OK)
+> +			return ret;
+> +
+> +		/* Everything went well, write back results */
+> +		if (exit_info_1 & IOIO_TYPE_IN) {
+> +			ret = vc_insn_string_write(ctxt,
+> +						(void *)(es_base + regs->di),
+> +						ghcb->shared_buffer, io_bytes,
+> +						exit_info_2, df);
+> +			if (ret)
+> +				return ret;
+> +
+> +			if (df)
+> +				regs->di -= exit_bytes;
+> +			else
+> +				regs->di += exit_bytes;
+> +		} else {
+> +			if (df)
+> +				regs->si -= exit_bytes;
+> +			else
+> +				regs->si += exit_bytes;
+> +		}
+> +
+> +		if (exit_info_1 & IOIO_REP)
+> +			regs->cx -= exit_info_2;
+> +
+> +		ret = regs->cx ? ES_RETRY : ES_OK;
+> +
+> +	} else {
+> +		int bits = (exit_info_1 & 0x70) >> 1;
+> +		u64 rax = 0;
+> +
+> +		if (!(exit_info_1 & IOIO_TYPE_IN))
+> +			rax = lower_bits(regs->ax, bits);
+> +
+> +		ghcb_set_rax(ghcb, rax);
+> +
+> +		ret = sev_es_ghcb_hv_call(ghcb, ctxt, SVM_EXIT_IOIO, exit_info_1, 0);
+> +		if (ret != ES_OK)
+> +			return ret;
+> +
+> +		if (exit_info_1 & IOIO_TYPE_IN) {
+> +			if (!ghcb_is_valid_rax(ghcb))
+> +				return ES_VMM_ERROR;
+> +			regs->ax = lower_bits(ghcb->save.rax, bits);
+> +		}
+> +	}
+> +
+> +	return ret;
+> +}
+> -- 
+> 2.17.1
+> 
+> 
