@@ -2,236 +2,183 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id BA21F18D9C9
-	for <lists+kvm@lfdr.de>; Fri, 20 Mar 2020 21:56:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2A09318D9E5
+	for <lists+kvm@lfdr.de>; Fri, 20 Mar 2020 21:59:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727270AbgCTUz5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Mar 2020 16:55:57 -0400
-Received: from mga11.intel.com ([192.55.52.93]:32133 "EHLO mga11.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727261AbgCTUzu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Mar 2020 16:55:50 -0400
-IronPort-SDR: 8BiWnNS+6mXPlf4+gzqOzbZ6athxilkvaY5AY5DwpOuvj/w6Y8GmsdlCo60KzmEpipwuwRN+3u
- bZ6mD/W67mow==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Mar 2020 13:55:49 -0700
-IronPort-SDR: +0unh8FONmtrG2sfnffBwNWGCe9gpTodDsZWyehaUdctPxUcGfVFDt60dRhTfzLxKOIwlyUizX
- FJNNMGUF3iLw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.72,285,1580803200"; 
-   d="scan'208";a="280543339"
-Received: from sjchrist-coffee.jf.intel.com ([10.54.74.202])
-  by fmsmga002.fm.intel.com with ESMTP; 20 Mar 2020 13:55:49 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     David Hildenbrand <david@redhat.com>,
+        id S1727041AbgCTU7o (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Mar 2020 16:59:44 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:35550 "EHLO
+        us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726738AbgCTU7o (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 20 Mar 2020 16:59:44 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1584737983;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=VGrhaAgQuGc4nR5mDjGTeAxa5W8ePSIqBYL4zLw6fxw=;
+        b=NQHdd1Ufrd2XZ4jmcrfUNFilIKq+IDUOkmCN8S/o4ASL8sj52NY/2z7yBsa6hCLJULd4We
+        alYLcBr/Z3S0WuVKkKZi0L2aumoCNkEqmAjl4/Wozl7qV+N7u4+sA9ibAaoU26t7xGr1d/
+        Y91YHbkrZJnQeJQEnzdDXuR4MV9B0sQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-135-H-tmYnP7P422El7JWjAGDQ-1; Fri, 20 Mar 2020 16:59:37 -0400
+X-MC-Unique: H-tmYnP7P422El7JWjAGDQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5EF2A107ACC4;
+        Fri, 20 Mar 2020 20:59:36 +0000 (UTC)
+Received: from w520.home (ovpn-112-162.phx2.redhat.com [10.3.112.162])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id B1B5D17B91;
+        Fri, 20 Mar 2020 20:59:35 +0000 (UTC)
+Date:   Fri, 20 Mar 2020 14:59:35 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Yonghyun Hwang <yonghyun@google.com>
+Cc:     Kirti Wankhede <kwankhede@nvidia.com>,
         Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Qian Cai <cai@lca.pw>,
-        Peter Xu <peterx@redhat.com>
-Subject: [PATCH 7/7] KVM: selftests: Add "delete" testcase to set_memory_region_test
-Date:   Fri, 20 Mar 2020 13:55:46 -0700
-Message-Id: <20200320205546.2396-8-sean.j.christopherson@intel.com>
-X-Mailer: git-send-email 2.24.1
-In-Reply-To: <20200320205546.2396-1-sean.j.christopherson@intel.com>
-References: <20200320205546.2396-1-sean.j.christopherson@intel.com>
+        linux-kernel@vger.kernel.org,
+        Havard Skinnemoen <hskinnemoen@google.com>,
+        Moritz Fischer <mdf@kernel.org>,
+        Joshua Lang <joshualang@google.com>
+Subject: Re: [PATCH] vfio-mdev: support mediated device creation in kernel
+Message-ID: <20200320145935.4617c7c0@w520.home>
+In-Reply-To: <CAEauFbx1Su7Lg5kdxXnvUwfwLCH67qaGB6EZ7g3OOH-tbRfBBA@mail.gmail.com>
+References: <20200320175910.180266-1-yonghyun@google.com>
+        <20200320123425.49c6568e@w520.home>
+        <CAEauFbx1Su7Lg5kdxXnvUwfwLCH67qaGB6EZ7g3OOH-tbRfBBA@mail.gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add coverate for running a guest with no memslots, and for deleting
-memslots while the guest is running.  Enhance the test to use, and
-expect, a unique value for MMIO reads, e.g. to verify each stage of
-the test.
+On Fri, 20 Mar 2020 13:46:04 -0700
+Yonghyun Hwang <yonghyun@google.com> wrote:
 
-Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
----
- .../kvm/x86_64/set_memory_region_test.c       | 122 ++++++++++++++++--
- 1 file changed, 108 insertions(+), 14 deletions(-)
+> On Fri, Mar 20, 2020 at 11:34 AM Alex Williamson
+> <alex.williamson@redhat.com> wrote:
+> >
+> > On Fri, 20 Mar 2020 10:59:10 -0700
+> > Yonghyun Hwang <yonghyun@google.com> wrote:
+> >  
+> > > To enable a mediated device, a device driver registers its device to VFIO
+> > > MDev framework. Once the mediated device gets enabled, UUID gets fed onto
+> > > the sysfs attribute, "create", to create the mediated device. This
+> > > additional step happens after boot-up gets complete. If the driver knows
+> > > how many mediated devices need to be created during probing time, the
+> > > additional step becomes cumbersome. This commit implements a new function
+> > > to allow the driver to create a mediated device in kernel.  
+> >
+> > But pre-creating mdev devices seems like a policy decision.  Why can't
+> > userspace make such a policy decision, and do so with persistent uuids,
+> > via something like mdevctl?  Thanks,
+> >
+> > Alex  
+> 
+> Yep, it can be viewed as the policy decision and userspace can make
+> the decision. However, it would be handy and plausible, if a device
+> driver can pre-create "fixed or default" # of mdev devices, while
+> allowing the device policy to come into play after bootup gets
+> complete. Without this patch, a device driver should release the
+> policy and the policy should be aligned with the driver, which would
+> be cumbersome (sometimes painful) in a cloud environment. My use case
+> with mdev is to enable a subset of vfio-pci features without losing my
+> device driver.
 
-diff --git a/tools/testing/selftests/kvm/x86_64/set_memory_region_test.c b/tools/testing/selftests/kvm/x86_64/set_memory_region_test.c
-index c6691cff4e19..44aed8ac932b 100644
---- a/tools/testing/selftests/kvm/x86_64/set_memory_region_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/set_memory_region_test.c
-@@ -26,42 +26,109 @@
- #define MEM_REGION_SIZE		0x200000
- #define MEM_REGION_SLOT		10
- 
--static void guest_code(void)
-+static const uint64_t MMIO_VAL = 0xbeefull;
-+
-+extern const uint64_t final_rip_start;
-+extern const uint64_t final_rip_end;
-+
-+static inline uint64_t guest_spin_on_val(uint64_t spin_val)
- {
- 	uint64_t val;
- 
- 	do {
- 		val = READ_ONCE(*((uint64_t *)MEM_REGION_GPA));
--	} while (!val);
-+	} while (val == spin_val);
-+	return val;
-+}
- 
--	if (val != 1)
--		ucall(UCALL_ABORT, 1, val);
-+static void guest_code(void)
-+{
-+	uint64_t val;
- 
--	GUEST_DONE();
-+	/*
-+	 * Spin until the memory region is moved to a misaligned address.  This
-+	 * may or may not trigger MMIO, as the window where the memslot is
-+	 * invalid is quite small.
-+	 */
-+	val = guest_spin_on_val(0);
-+	GUEST_ASSERT(val == 1 || val == MMIO_VAL);
-+
-+	/* Spin until the memory region is realigned. */
-+	GUEST_ASSERT(guest_spin_on_val(MMIO_VAL) == 1);
-+
-+	/* Spin until the memory region is deleted. */
-+	GUEST_ASSERT(guest_spin_on_val(1) == MMIO_VAL);
-+
-+	/* Spin until the memory region is recreated. */
-+	GUEST_ASSERT(guest_spin_on_val(MMIO_VAL) == 0);
-+
-+	/* Spin until the memory region is deleted. */
-+	GUEST_ASSERT(guest_spin_on_val(0) == MMIO_VAL);
-+
-+	asm("1:\n\t"
-+	    ".pushsection .rodata\n\t"
-+	    ".global final_rip_start\n\t"
-+	    "final_rip_start: .quad 1b\n\t"
-+	    ".popsection");
-+
-+	/* Spin indefinitely (until the code memslot is deleted). */
-+	guest_spin_on_val(MMIO_VAL);
-+
-+	asm("1:\n\t"
-+	    ".pushsection .rodata\n\t"
-+	    ".global final_rip_end\n\t"
-+	    "final_rip_end: .quad 1b\n\t"
-+	    ".popsection");
-+
-+	GUEST_ASSERT(0);
- }
- 
- static void *vcpu_worker(void *data)
- {
- 	struct kvm_vm *vm = data;
-+	struct kvm_regs regs;
- 	struct kvm_run *run;
- 	struct ucall uc;
--	uint64_t cmd;
- 
- 	/*
- 	 * Loop until the guest is done.  Re-enter the guest on all MMIO exits,
--	 * which will occur if the guest attempts to access a memslot while it
--	 * is being moved.
-+	 * which will occur if the guest attempts to access a memslot after it
-+	 * has been deleted or while it is being moved .
- 	 */
- 	run = vcpu_state(vm, VCPU_ID);
--	do {
-+
-+	memcpy(run->mmio.data, &MMIO_VAL, 8);
-+	while (1) {
- 		vcpu_run(vm, VCPU_ID);
--	} while (run->exit_reason == KVM_EXIT_MMIO);
-+		if (run->exit_reason != KVM_EXIT_MMIO)
-+			break;
- 
--	TEST_ASSERT(run->exit_reason == KVM_EXIT_IO,
-+		TEST_ASSERT(!run->mmio.is_write, "Unexpected exit mmio write");
-+		TEST_ASSERT(run->mmio.len == 8,
-+			    "Unexpected exit mmio size = %u", run->mmio.len);
-+
-+		TEST_ASSERT(run->mmio.phys_addr == MEM_REGION_GPA,
-+			    "Unexpected exit mmio address = 0x%llx",
-+			    run->mmio.phys_addr);
-+	}
-+
-+	if (run->exit_reason == KVM_EXIT_IO) {
-+		(void)get_ucall(vm, VCPU_ID, &uc);
-+		TEST_FAIL("%s at %s:%ld",
-+			  (const char *)uc.args[0], __FILE__, uc.args[1]);
-+	}
-+
-+	TEST_ASSERT(run->exit_reason == KVM_EXIT_SHUTDOWN ||
-+		    run->exit_reason == KVM_INTERNAL_ERROR_EMULATION,
- 		    "Unexpected exit reason = %d", run->exit_reason);
- 
--	cmd = get_ucall(vm, VCPU_ID, &uc);
--	TEST_ASSERT(cmd == UCALL_DONE, "Unexpected val in guest = %lu", uc.args[0]);
-+	vcpu_regs_get(vm, VCPU_ID, &regs);
-+
-+	TEST_ASSERT(regs.rip >= final_rip_start &&
-+		    regs.rip < final_rip_end,
-+		    "Bad rip, expected 0x%lx - 0x%lx, got 0x%llx\n",
-+		    final_rip_start, final_rip_end, regs.rip);
-+
- 	return NULL;
- }
- 
-@@ -72,6 +139,13 @@ static void test_move_memory_region(void)
- 	uint64_t *hva;
- 	uint64_t gpa;
- 
-+	vm = vm_create(VM_MODE_DEFAULT, 0, O_RDWR);
-+	vm_vcpu_add(vm, VCPU_ID);
-+	/* Fails with ENOSPC because the MMU can't create pages (no slots). */
-+	TEST_ASSERT(_vcpu_run(vm, VCPU_ID) == -1 && errno == ENOSPC,
-+		    "Unexpected error code = %d", errno);
-+	kvm_vm_free(vm);
-+
- 	vm = vm_create_default(VCPU_ID, 0, guest_code);
- 
- 	vcpu_set_cpuid(vm, VCPU_ID, kvm_get_supported_cpuid());
-@@ -105,7 +179,6 @@ static void test_move_memory_region(void)
- 	 */
- 	vm_mem_region_move(vm, MEM_REGION_SLOT, MEM_REGION_GPA - 4096);
- 	WRITE_ONCE(*hva, 2);
--
- 	usleep(100000);
- 
- 	/*
-@@ -116,6 +189,27 @@ static void test_move_memory_region(void)
- 
- 	/* Restore the original base, the guest should see "1". */
- 	vm_mem_region_move(vm, MEM_REGION_SLOT, MEM_REGION_GPA);
-+	usleep(100000);
-+
-+	/* Delete the memory region, the guest should not die. */
-+	vm_mem_region_delete(vm, MEM_REGION_SLOT);
-+	usleep(100000);
-+
-+	/* Recreate the memory region.  The guest should see "0". */
-+	vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS_THP,
-+				    MEM_REGION_GPA, MEM_REGION_SLOT,
-+				    MEM_REGION_SIZE / getpagesize(), 0);
-+	usleep(100000);
-+
-+	/* Delete the region again so that there's only one memslot left. */
-+	vm_mem_region_delete(vm, MEM_REGION_SLOT);
-+	usleep(100000);
-+
-+	/*
-+	 * Delete the primary memslot.  This should cause an emulation error or
-+	 * shutdown due to the page tables getting nuked.
-+	 */
-+	vm_mem_region_delete(vm, VM_PRIMARY_MEM_SLOT);
- 
- 	pthread_join(vcpu_thread, NULL);
- 
--- 
-2.24.1
+Does this last comment suggest the parent device is not being
+multiplexed through mdev, but only mediated?  If so, would something
+like Yan's vendor-ops approach[1] be better?  Without a multiplexed
+device, the lifecycle management of an mdev device doesn't make a lot
+of sense, and I wonder if that's what you're trying to bypass here.
+Even SR-IOV devices have moved to userspace enablement with most module
+options to enable a default number of VFs being deprecated.  I do see
+that that transition left a gap, but I'm not sure that heading in the
+opposite direction with mdevs is a good idea either.  Thanks,
+
+Alex
+
+[1]https://lore.kernel.org/kvm/20200131020803.27519-1-yan.y.zhao@intel.com/
+
+
+> > > Signed-off-by: Yonghyun Hwang <yonghyun@google.com>
+> > > ---
+> > >  drivers/vfio/mdev/mdev_core.c | 45 +++++++++++++++++++++++++++++++++++
+> > >  include/linux/mdev.h          |  3 +++
+> > >  2 files changed, 48 insertions(+)
+> > >
+> > > diff --git a/drivers/vfio/mdev/mdev_core.c b/drivers/vfio/mdev/mdev_core.c
+> > > index b558d4cfd082..a6d32516de42 100644
+> > > --- a/drivers/vfio/mdev/mdev_core.c
+> > > +++ b/drivers/vfio/mdev/mdev_core.c
+> > > @@ -350,6 +350,51 @@ int mdev_device_create(struct kobject *kobj,
+> > >       return ret;
+> > >  }
+> > >
+> > > +/*
+> > > + * mdev_create_device : Create a mdev device
+> > > + * @dev: device structure representing parent device.
+> > > + * @uuid: uuid char string for a mdev device.
+> > > + * @group: index to supported type groups for a mdev device.
+> > > + *
+> > > + * Create a mdev device in kernel.
+> > > + * Returns a negative value on error, otherwise 0.
+> > > + */
+> > > +int mdev_create_device(struct device *dev,
+> > > +                     const char *uuid, int group)
+> > > +{
+> > > +     struct mdev_parent *parent = NULL;
+> > > +     struct mdev_type *type = NULL;
+> > > +     guid_t guid;
+> > > +     int i = 1;
+> > > +     int ret;
+> > > +
+> > > +     ret = guid_parse(uuid, &guid);
+> > > +     if (ret) {
+> > > +             dev_err(dev, "Failed to parse UUID");
+> > > +             return ret;
+> > > +     }
+> > > +
+> > > +     parent = __find_parent_device(dev);
+> > > +     if (!parent) {
+> > > +             dev_err(dev, "Failed to find parent mdev device");
+> > > +             return -ENODEV;
+> > > +     }
+> > > +
+> > > +     list_for_each_entry(type, &parent->type_list, next) {
+> > > +             if (i == group)
+> > > +                     break;
+> > > +             i++;
+> > > +     }
+> > > +
+> > > +     if (!type || i != group) {
+> > > +             dev_err(dev, "Failed to find mdev device");
+> > > +             return -ENODEV;
+> > > +     }
+> > > +
+> > > +     return mdev_device_create(&type->kobj, parent->dev, &guid);
+> > > +}
+> > > +EXPORT_SYMBOL(mdev_create_device);
+> > > +
+> > >  int mdev_device_remove(struct device *dev)
+> > >  {
+> > >       struct mdev_device *mdev, *tmp;
+> > > diff --git a/include/linux/mdev.h b/include/linux/mdev.h
+> > > index 0ce30ca78db0..b66f67998916 100644
+> > > --- a/include/linux/mdev.h
+> > > +++ b/include/linux/mdev.h
+> > > @@ -145,4 +145,7 @@ struct device *mdev_parent_dev(struct mdev_device *mdev);
+> > >  struct device *mdev_dev(struct mdev_device *mdev);
+> > >  struct mdev_device *mdev_from_dev(struct device *dev);
+> > >
+> > > +extern int mdev_create_device(struct device *dev,
+> > > +                     const char *uuid, int group_idx);
+> > > +
+> > >  #endif /* MDEV_H */  
+> >  
+> 
 
