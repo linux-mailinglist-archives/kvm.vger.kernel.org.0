@@ -2,70 +2,153 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2AF1218CF83
-	for <lists+kvm@lfdr.de>; Fri, 20 Mar 2020 14:53:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 897CD18D069
+	for <lists+kvm@lfdr.de>; Fri, 20 Mar 2020 15:24:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727154AbgCTNxr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Mar 2020 09:53:47 -0400
-Received: from mga02.intel.com ([134.134.136.20]:48143 "EHLO mga02.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726778AbgCTNxr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Mar 2020 09:53:47 -0400
-IronPort-SDR: ip6yiPGxMQo+lTkNRk/SbreZheGigzoCJM/BOcwaW7bCkw3SwIJo8sLHgomrQ0AJtfSZe4hAf/
- 0qjQbU4vhyFQ==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Mar 2020 06:53:46 -0700
-IronPort-SDR: gmdAWcBXmpzaTYcm0AnNoq5+jjZPB3q9980RAUKlGVDhF98GZNtOmdT0sAd9wh/RyG0VLkkdCu
- 30xNVdd5+Dyg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.72,284,1580803200"; 
-   d="scan'208";a="392156602"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
-  by orsmga004.jf.intel.com with ESMTP; 20 Mar 2020 06:53:46 -0700
-Date:   Fri, 20 Mar 2020 06:53:46 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Qian Cai <cai@lca.pw>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        LKML <linux-kernel@vger.kernel.org>,
-        Peter Xu <peterx@redhat.com>, Marc Zyngier <maz@kernel.org>,
-        Christoffer Dall <christoffer.dall@arm.com>
-Subject: Re: slab-out-of-bounds due to "KVM: Dynamically size memslot array
- based on number of used slots"
-Message-ID: <20200320135346.GA16533@linux.intel.com>
-References: <8922D835-ED2A-4C48-840A-F568E20B5A7C@lca.pw>
- <20200320043403.GH11305@linux.intel.com>
- <5FF6AF4E-EB99-4111-BBB2-FE09FFBEF5C4@lca.pw>
+        id S1727646AbgCTOYB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Mar 2020 10:24:01 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:37622 "EHLO
+        us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727448AbgCTOYA (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 20 Mar 2020 10:24:00 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1584714239;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=1p3RF/uo8TYxiZRcGBLV1Qt5le5LuOGxE0TdWNhAnKc=;
+        b=F6NPPXw3JRDB7VVSvqTgFA/jVKFVm9k0SZCEsfTt+buzmgtb4Tuy8DE+wSUqMpuTpTg0jq
+        RWYIIicybe3gDTxDKvJz9uuxQgHd2mfoh4UUZ1W+oZozO5W6QPv5oive8GoqNrsdfyXqCM
+        xN8bgeGux0Hz1u3hz0jeyTIFO6+tmfM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-413-bbA7gwh2NHyIupKzLH8_mQ-1; Fri, 20 Mar 2020 10:23:57 -0400
+X-MC-Unique: bbA7gwh2NHyIupKzLH8_mQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2FCDCA0CBF;
+        Fri, 20 Mar 2020 14:23:55 +0000 (UTC)
+Received: from [10.36.113.142] (ovpn-113-142.ams2.redhat.com [10.36.113.142])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 10CA95C1B0;
+        Fri, 20 Mar 2020 14:23:49 +0000 (UTC)
+Subject: Re: [PATCH v5 05/23] irqchip/gic-v4.1: Ensure mutual exclusion betwen
+ invalidations on the same RD
+To:     Marc Zyngier <maz@kernel.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
+        Jason Cooper <jason@lakedaemon.net>,
+        Robert Richter <rrichter@marvell.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>
+References: <20200304203330.4967-1-maz@kernel.org>
+ <20200304203330.4967-6-maz@kernel.org>
+From:   Auger Eric <eric.auger@redhat.com>
+Message-ID: <1722e947-2af8-7137-7e71-f6647cdf91d7@redhat.com>
+Date:   Fri, 20 Mar 2020 15:23:47 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <5FF6AF4E-EB99-4111-BBB2-FE09FFBEF5C4@lca.pw>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <20200304203330.4967-6-maz@kernel.org>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Mar 20, 2020 at 09:49:03AM -0400, Qian Cai wrote:
-> 
-> 
-> > On Mar 20, 2020, at 12:34 AM, Sean Christopherson <sean.j.christopherson@intel.com> wrote:
-> > 
-> > On Thu, Mar 19, 2020 at 11:59:23PM -0400, Qian Cai wrote:
-> >> Reverted the linux-next commit 36947254e5f98 (“KVM: Dynamically size memslot array based on number of used slots”)
-> >> fixed illegal slab object redzone accesses.
-> >> 
-> >> [6727.939776][ T1818] BUG: KASAN: slab-out-of-bounds in gfn_to_hva+0xc1/0x2b0 [kvm]
-> >> search_memslots at include/linux/kvm_host.h:1035
-> > 
-> > Drat.  I'm guessing lru_slot is out of range after a memslot is deleted.
-> > This should fix the issue, though it may not be the most proper fix, e.g.
-> > it might be better to reset lru_slot when deleting a memslot.  I'll try and
-> > reproduce tomorrow, unless you can confirm this does the trick.
-> 
-> It works fine.
+Hi,
 
-Thanks!  I'll send a proper patch in a bit, tweaking a selftest to try and
-hit this as well.
+On 3/4/20 9:33 PM, Marc Zyngier wrote:
+> The GICv4.1 spec says that it is CONTRAINED UNPREDICTABLE to write to
+> any of the GICR_INV{LPI,ALL}R registers if GICR_SYNCR.Busy == 1.
+> 
+> To deal with it, we must ensure that only a single invalidation can
+> happen at a time for a given redistributor. Add a per-RD lock to that
+> effect and take it around the invalidation/syncr-read to deal with this.
+> 
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+
+Eric
+> ---
+>  drivers/irqchip/irq-gic-v3-its.c   | 6 ++++++
+>  drivers/irqchip/irq-gic-v3.c       | 1 +
+>  include/linux/irqchip/arm-gic-v3.h | 1 +
+>  3 files changed, 8 insertions(+)
+> 
+> diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
+> index c84370245bea..fc5788584df7 100644
+> --- a/drivers/irqchip/irq-gic-v3-its.c
+> +++ b/drivers/irqchip/irq-gic-v3-its.c
+> @@ -1373,10 +1373,12 @@ static void direct_lpi_inv(struct irq_data *d)
+>  
+>  	/* Target the redistributor this LPI is currently routed to */
+>  	cpu = irq_to_cpuid_lock(d, &flags);
+> +	raw_spin_lock(&gic_data_rdist_cpu(cpu)->rd_lock);
+>  	rdbase = per_cpu_ptr(gic_rdists->rdist, cpu)->rd_base;
+>  	gic_write_lpir(val, rdbase + GICR_INVLPIR);
+>  
+>  	wait_for_syncr(rdbase);
+> +	raw_spin_unlock(&gic_data_rdist_cpu(cpu)->rd_lock);
+>  	irq_to_cpuid_unlock(d, flags);
+>  }
+>  
+> @@ -3662,9 +3664,11 @@ static void its_vpe_send_inv(struct irq_data *d)
+>  		void __iomem *rdbase;
+>  
+>  		/* Target the redistributor this VPE is currently known on */
+> +		raw_spin_lock(&gic_data_rdist_cpu(vpe->col_idx)->rd_lock);
+>  		rdbase = per_cpu_ptr(gic_rdists->rdist, vpe->col_idx)->rd_base;
+>  		gic_write_lpir(d->parent_data->hwirq, rdbase + GICR_INVLPIR);
+>  		wait_for_syncr(rdbase);
+> +		raw_spin_unlock(&gic_data_rdist_cpu(vpe->col_idx)->rd_lock);
+>  	} else {
+>  		its_vpe_send_cmd(vpe, its_send_inv);
+>  	}
+> @@ -3825,10 +3829,12 @@ static void its_vpe_4_1_invall(struct its_vpe *vpe)
+>  	val |= FIELD_PREP(GICR_INVALLR_VPEID, vpe->vpe_id);
+>  
+>  	/* Target the redistributor this vPE is currently known on */
+> +	raw_spin_lock(&gic_data_rdist_cpu(vpe->col_idx)->rd_lock);
+>  	rdbase = per_cpu_ptr(gic_rdists->rdist, vpe->col_idx)->rd_base;
+>  	gic_write_lpir(val, rdbase + GICR_INVALLR);
+>  
+>  	wait_for_syncr(rdbase);
+> +	raw_spin_unlock(&gic_data_rdist_cpu(vpe->col_idx)->rd_lock);
+>  }
+>  
+>  static int its_vpe_4_1_set_vcpu_affinity(struct irq_data *d, void *vcpu_info)
+> diff --git a/drivers/irqchip/irq-gic-v3.c b/drivers/irqchip/irq-gic-v3.c
+> index 73e87e176d76..ba405becab53 100644
+> --- a/drivers/irqchip/irq-gic-v3.c
+> +++ b/drivers/irqchip/irq-gic-v3.c
+> @@ -835,6 +835,7 @@ static int __gic_populate_rdist(struct redist_region *region, void __iomem *ptr)
+>  	typer = gic_read_typer(ptr + GICR_TYPER);
+>  	if ((typer >> 32) == aff) {
+>  		u64 offset = ptr - region->redist_base;
+> +		raw_spin_lock_init(&gic_data_rdist()->rd_lock);
+>  		gic_data_rdist_rd_base() = ptr;
+>  		gic_data_rdist()->phys_base = region->phys_base + offset;
+>  
+> diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
+> index c29a02678a6f..b28acfa71f82 100644
+> --- a/include/linux/irqchip/arm-gic-v3.h
+> +++ b/include/linux/irqchip/arm-gic-v3.h
+> @@ -652,6 +652,7 @@
+>  
+>  struct rdists {
+>  	struct {
+> +		raw_spinlock_t	rd_lock;
+>  		void __iomem	*rd_base;
+>  		struct page	*pend_page;
+>  		phys_addr_t	phys_base;
+> 
+
