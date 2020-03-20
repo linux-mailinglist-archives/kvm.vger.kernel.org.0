@@ -2,14 +2,14 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5BDC718D3D3
+	by mail.lfdr.de (Postfix) with ESMTP id CC22618D3D4
 	for <lists+kvm@lfdr.de>; Fri, 20 Mar 2020 17:12:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727692AbgCTQLi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Mar 2020 12:11:38 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:30640 "EHLO
+        id S1727699AbgCTQLj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Mar 2020 12:11:39 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:21815 "EHLO
         us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727672AbgCTQLh (ORCPT
+        by vger.kernel.org with ESMTP id S1727677AbgCTQLh (ORCPT
         <rfc822;kvm@vger.kernel.org>); Fri, 20 Mar 2020 12:11:37 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
         s=mimecast20190719; t=1584720696;
@@ -17,22 +17,22 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=A6IbVHowGVmCEtJxEyB0XyhD6b7mHixP1jCoZdykCEQ=;
-        b=TCgfcLNpFcKCrNCO5g3Mvi1wPof0VjmTw2kIKjV3toZpTL1XjDkHh5qBCTu8LZ6Zwe6Uec
-        dEZMROlpPqPVKsgEdJC08++tBqgZLHEEJTn4ZIJCouTniutsRV+U/bkYlytEvkeRvcW0NA
-        kkd8aKFJv8IQrri9BRHGaE1DVCk7gPY=
+        bh=TnDoNnd4YsR8NC/JFy6W/OCirBwOrncQkzNJmNWOGZw=;
+        b=cJzqgELp/nj7f6jvhuPLqt2KxUGhoJNCtFytuuvHzn6OMB9+f1e7b93jV6ad+tXpjWP6m8
+        PSI/Skads8cLjqG7tmEnEPG2r5/zo8lGvYUz0LOklAhMuFczalYDxsI0pm94r7PNukDWKl
+        t4gXM5LP/48hllUnfwEEuz4vNBV/usU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-340-rLwQWradNPqRmW3o5iE7BA-1; Fri, 20 Mar 2020 12:11:32 -0400
-X-MC-Unique: rLwQWradNPqRmW3o5iE7BA-1
+ us-mta-391-hoqmHRsnMiCwN9mQx_aLrw-1; Fri, 20 Mar 2020 12:11:32 -0400
+X-MC-Unique: hoqmHRsnMiCwN9mQx_aLrw-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0C589801FC5;
-        Fri, 20 Mar 2020 16:11:10 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 229D71137850;
+        Fri, 20 Mar 2020 16:11:14 +0000 (UTC)
 Received: from laptop.redhat.com (ovpn-113-142.ams2.redhat.com [10.36.113.142])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id C66345C1D8;
-        Fri, 20 Mar 2020 16:11:03 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 7D1095C1D8;
+        Fri, 20 Mar 2020 16:11:10 +0000 (UTC)
 From:   Eric Auger <eric.auger@redhat.com>
 To:     eric.auger.pro@gmail.com, eric.auger@redhat.com,
         iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
@@ -42,9 +42,9 @@ To:     eric.auger.pro@gmail.com, eric.auger@redhat.com,
         will.deacon@arm.com, robin.murphy@arm.com
 Cc:     marc.zyngier@arm.com, peter.maydell@linaro.org,
         zhangfei.gao@gmail.com
-Subject: [PATCH v10 10/13] iommu/smmuv3: Nested mode single MSI doorbell per domain enforcement
-Date:   Fri, 20 Mar 2020 17:09:29 +0100
-Message-Id: <20200320160932.27222-11-eric.auger@redhat.com>
+Subject: [PATCH v10 11/13] iommu/smmuv3: Enforce incompatibility between nested mode and HW MSI regions
+Date:   Fri, 20 Mar 2020 17:09:30 +0100
+Message-Id: <20200320160932.27222-12-eric.auger@redhat.com>
 In-Reply-To: <20200320160932.27222-1-eric.auger@redhat.com>
 References: <20200320160932.27222-1-eric.auger@redhat.com>
 MIME-Version: 1.0
@@ -55,81 +55,62 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-In nested mode we enforce the rule that all devices belonging
-to the same iommu_domain share the same msi_domain.
+Nested mode currently is not compatible with HW MSI reserved regions.
+Indeed MSI transactions targeting this MSI doorbells bypass the SMMU.
 
-Indeed if there were several physical MSI doorbells being used
-within a single iommu_domain, it becomes really difficult to
-resolve the nested stage mapping translating into the correct
-physical doorbell. So let's forbid this situation.
+Let's check nested mode is not attempted in such configuration.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 ---
- drivers/iommu/arm-smmu-v3.c | 41 +++++++++++++++++++++++++++++++++++++
- 1 file changed, 41 insertions(+)
+ drivers/iommu/arm-smmu-v3.c | 23 +++++++++++++++++++++--
+ 1 file changed, 21 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/iommu/arm-smmu-v3.c b/drivers/iommu/arm-smmu-v3.c
-index 538e368c2e13..84dce0b2e935 100644
+index 84dce0b2e935..106f9c563823 100644
 --- a/drivers/iommu/arm-smmu-v3.c
 +++ b/drivers/iommu/arm-smmu-v3.c
-@@ -2890,6 +2890,37 @@ static void arm_smmu_detach_dev(struct arm_smmu_ma=
-ster *master)
- 	arm_smmu_install_ste_for_dev(master);
+@@ -2921,6 +2921,23 @@ static bool arm_smmu_share_msi_domain(struct iommu=
+_domain *domain,
+ 	return share;
  }
 =20
-+static bool arm_smmu_share_msi_domain(struct iommu_domain *domain,
-+				      struct device *dev)
++static bool arm_smmu_has_hw_msi_resv_region(struct device *dev)
 +{
-+	struct arm_smmu_domain *smmu_domain =3D to_smmu_domain(domain);
-+	struct irq_domain *irqd =3D dev_get_msi_domain(dev);
-+	struct arm_smmu_master *master;
-+	unsigned long flags;
-+	bool share =3D false;
++	struct iommu_resv_region *region;
++	bool has_msi_resv_region =3D false;
++	LIST_HEAD(resv_regions);
 +
-+	if (!irqd)
-+		return true;
-+
-+	spin_lock_irqsave(&smmu_domain->devices_lock, flags);
-+	list_for_each_entry(master, &smmu_domain->devices, domain_head) {
-+		struct irq_domain *d =3D dev_get_msi_domain(master->dev);
-+
-+		if (!d)
-+			continue;
-+		if (irqd !=3D d) {
-+			dev_info(dev, "Nested mode forbids to attach devices "
-+				 "using different physical MSI doorbells "
-+				 "to the same iommu_domain");
-+			goto unlock;
++	iommu_get_resv_regions(dev, &resv_regions);
++	list_for_each_entry(region, &resv_regions, list) {
++		if (region->type =3D=3D IOMMU_RESV_MSI) {
++			has_msi_resv_region =3D true;
++			break;
 +		}
 +	}
-+	share =3D true;
-+unlock:
-+	spin_unlock_irqrestore(&smmu_domain->devices_lock, flags);
-+	return share;
++	iommu_put_resv_regions(dev, &resv_regions);
++	return has_msi_resv_region;
 +}
 +
  static int arm_smmu_attach_dev(struct iommu_domain *domain, struct devic=
 e *dev)
  {
  	int ret =3D 0;
-@@ -2931,6 +2962,16 @@ static int arm_smmu_attach_dev(struct iommu_domain=
- *domain, struct device *dev)
+@@ -2965,10 +2982,12 @@ static int arm_smmu_attach_dev(struct iommu_domai=
+n *domain, struct device *dev)
+ 	/*
+ 	 * In nested mode we must check all devices belonging to the
+ 	 * domain share the same physical MSI doorbell. Otherwise nested
+-	 * stage MSI binding is not supported.
++	 * stage MSI binding is not supported. Also nested mode is not
++	 * compatible with MSI HW reserved regions.
+ 	 */
+ 	if (smmu_domain->stage =3D=3D ARM_SMMU_DOMAIN_NESTED &&
+-		!arm_smmu_share_msi_domain(domain, dev)) {
++		(!arm_smmu_share_msi_domain(domain, dev) ||
++		 arm_smmu_has_hw_msi_resv_region(dev))) {
  		ret =3D -EINVAL;
  		goto out_unlock;
  	}
-+	/*
-+	 * In nested mode we must check all devices belonging to the
-+	 * domain share the same physical MSI doorbell. Otherwise nested
-+	 * stage MSI binding is not supported.
-+	 */
-+	if (smmu_domain->stage =3D=3D ARM_SMMU_DOMAIN_NESTED &&
-+		!arm_smmu_share_msi_domain(domain, dev)) {
-+		ret =3D -EINVAL;
-+		goto out_unlock;
-+	}
-=20
- 	master->domain =3D smmu_domain;
-=20
 --=20
 2.20.1
 
