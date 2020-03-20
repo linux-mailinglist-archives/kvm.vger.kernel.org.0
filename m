@@ -2,122 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1AFD018CB20
-	for <lists+kvm@lfdr.de>; Fri, 20 Mar 2020 11:05:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 259CC18CBA8
+	for <lists+kvm@lfdr.de>; Fri, 20 Mar 2020 11:33:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726851AbgCTKFY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Mar 2020 06:05:24 -0400
-Received: from mail.kernel.org ([198.145.29.99]:33696 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726527AbgCTKFY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Mar 2020 06:05:24 -0400
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 0226120739;
-        Fri, 20 Mar 2020 10:05:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1584698723;
-        bh=xLCoBe0k1tJ3NSXx1P/PDSVPbSYu5y2TzULMMiyBlTg=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=fG3/FshLRVkUpD6f8kWzo2ZRvJ1Hf8TYHFGIVvQTGCajdFE86lnw5LcRvB+oaiwhz
-         LIpRK5YowcZKkauW9vpsoRF0N5qgJXofZdNSufOEynagyl2fv09fg4W9jMxYhRQq8k
-         PDi+QMvsd3CnTUcHcBthjBlrGzlCLFculZqkoH7w=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
-        by disco-boy.misterjones.org with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.92)
-        (envelope-from <maz@kernel.org>)
-        id 1jFEWn-00ECvU-B0; Fri, 20 Mar 2020 10:05:21 +0000
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date:   Fri, 20 Mar 2020 10:05:21 +0000
-From:   Marc Zyngier <maz@kernel.org>
-To:     Auger Eric <eric.auger@redhat.com>
-Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        id S1726778AbgCTKda (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Mar 2020 06:33:30 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:43965 "EHLO
+        us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726527AbgCTKd3 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 20 Mar 2020 06:33:29 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1584700408;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=v+O0TKG7RluopsB5+yUxCz0n+VTKJBvttmlO7TI6cs8=;
+        b=Ygr0LUwBSWhEqqPRHto5Rj7i4QCE7yHzN8F78O3YTAduZWXoNd5IbrwIBjKwb2/wIelAjR
+        6QdvaSwJrnQfNp8SG5UI9XvfR5f8TJWslBH8hjrV/0JPvK+Tum5Y9KUCNBWFuSb1E7y732
+        O3VOaYH0Cl6+4sExWipcqMn/yCX9Mjg=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-300-psLs4Iv9MweQX3JuhxeUdQ-1; Fri, 20 Mar 2020 06:33:27 -0400
+X-MC-Unique: psLs4Iv9MweQX3JuhxeUdQ-1
+Received: by mail-wr1-f69.google.com with SMTP id e10so647071wru.6
+        for <kvm@vger.kernel.org>; Fri, 20 Mar 2020 03:33:27 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=v+O0TKG7RluopsB5+yUxCz0n+VTKJBvttmlO7TI6cs8=;
+        b=ugEyR7A5X8zBCF/67i3iBU8Fu2LGS41nYGuR3pPjZPNc3yxLyOr+7mtkGYFpbFM0KJ
+         yKuVlecxh73GX7djaMk4f5Q194eI0+4ISZqFXBGdhokZk3kd7i1UBL+0EokutzTIt/N/
+         U2a7bfY+G6KVYR1AOFv2LL17PMOwyBS7nG6Dmrhmmw7+Aw7R5HKuwWFm3Fe9kThO9d89
+         RovtPlGSjc3pAxPuwRFjw5a0sEZJtasLGaT3ks+nXLpyaIMgO5ul8jr9hyiMs9RONfKO
+         5R9YtcjvM7HZE+GOwx4e6eWFyA+ZgThk1zGDBnp99Jw4yrNttU5XPp9JVMzAO6A+RH45
+         gRkg==
+X-Gm-Message-State: ANhLgQ1YCDr33MsRm4qNeQGUr1DjBJBmFwB3UeGPlL2OwZ5OH56+H5MM
+        10hhGP17XDXRC0KSbGRcKCj07e1FWw5WhDYE9TBF45vTNqaAuRNoI8sQt5s0U75+SU5qxkO76+/
+        p6CAj4t8akE9R
+X-Received: by 2002:a7b:ce81:: with SMTP id q1mr9754274wmj.156.1584700406056;
+        Fri, 20 Mar 2020 03:33:26 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vt/QEmQN3xweTWPa2FLy03BaS+TOE+v1glMmu3TqcsJub4MqPOEiz7Nyx/IluChnKlphGwSIQ==
+X-Received: by 2002:a7b:ce81:: with SMTP id q1mr9754249wmj.156.1584700405771;
+        Fri, 20 Mar 2020 03:33:25 -0700 (PDT)
+Received: from [192.168.178.58] ([151.21.15.43])
+        by smtp.gmail.com with ESMTPSA id 61sm8303356wrn.82.2020.03.20.03.33.22
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 20 Mar 2020 03:33:25 -0700 (PDT)
+Subject: Re: WARNING in vcpu_enter_guest
+To:     Thomas Gleixner <tglx@linutronix.de>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     syzbot <syzbot+00be5da1d75f1cc95f6b@syzkaller.appspotmail.com>,
+        bp@alien8.de, hpa@zytor.com, jmattson@google.com, joro@8bytes.org,
         kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
-        Jason Cooper <jason@lakedaemon.net>,
-        Robert Richter <rrichter@marvell.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: Re: [PATCH v5 18/23] KVM: arm64: GICv4.1: Add direct injection
- capability to SGI registers
-In-Reply-To: <06705d70-0f99-e719-af52-1a5f778562d8@redhat.com>
-References: <20200304203330.4967-1-maz@kernel.org>
- <20200304203330.4967-19-maz@kernel.org>
- <06705d70-0f99-e719-af52-1a5f778562d8@redhat.com>
-Message-ID: <3f7094ffd77a6615d7179be94dbecc60@kernel.org>
-X-Sender: maz@kernel.org
-User-Agent: Roundcube Webmail/1.3.10
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: eric.auger@redhat.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, lorenzo.pieralisi@arm.com, jason@lakedaemon.net, rrichter@marvell.com, tglx@linutronix.de, yuzenghui@huawei.com, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+        mingo@redhat.com, rkrcmar@redhat.com,
+        syzkaller-bugs@googlegroups.com, vkuznets@redhat.com,
+        wanpengli@tencent.com, x86@kernel.org
+References: <000000000000f965b8059877e5e6@google.com>
+ <00000000000081861f05a132b9cd@google.com>
+ <20200319144952.GB11305@linux.intel.com>
+ <20be9560-fce7-1495-3a83-e2b56dbc2389@redhat.com>
+ <20200319173549.GC11305@linux.intel.com>
+ <20200319173927.GD11305@linux.intel.com>
+ <cd32ee6d-f30d-b221-8126-cf995ffca52e@redhat.com>
+ <87k13f516q.fsf@nanos.tec.linutronix.de>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <6686bde5-c1e8-5be5-f27a-61403c419a91@redhat.com>
+Date:   Fri, 20 Mar 2020 11:33:22 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
+MIME-Version: 1.0
+In-Reply-To: <87k13f516q.fsf@nanos.tec.linutronix.de>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Eric,
+On 20/03/20 01:18, Thomas Gleixner wrote:
+>> No, it is possible to do that depending on the clock setup on the live
+>> migration source.  You could cause the warning anyway by setting the
+>> clock to a very high (signed) value so that kernel_ns + kvmclock_offset
+>> overflows.
+>
+> If that overflow happens, then the original and the new host have an
+> uptime difference in the range of >200 hundreds of years. Very realistic
+> scenario...
+> 
+> Of course this can happen if you feed crap into the interface, but do
+> you really think that forwarding all crap to a guest is the right thing
+> to do?
+> 
+> As we all know the hypervisor orchestration stuff is perfect and would
+> never feed crap into the kernel which happily proliferates that crap to
+> the guest...
 
-On 2020-03-20 08:11, Auger Eric wrote:
-> Hi Marc,
-> On 3/4/20 9:33 PM, Marc Zyngier wrote:
->> Most of the GICv3 emulation code that deals with SGIs now has to be
->> aware of the v4.1 capabilities in order to benefit from it.
->> 
->> Add such support, keyed on the interrupt having the hw flag set and
->> being a SGI.
->> 
->> Signed-off-by: Marc Zyngier <maz@kernel.org>
->> ---
->>  virt/kvm/arm/vgic/vgic-mmio-v3.c | 15 +++++-
->>  virt/kvm/arm/vgic/vgic-mmio.c    | 88 
->> ++++++++++++++++++++++++++++++--
->>  2 files changed, 96 insertions(+), 7 deletions(-)
->> 
+But the point is, is there a sensible way to detect it?  Only allowing
+>= -2^62 and < 2^62 or something like that is an ad hoc fix for a
+warning that probably will never trigger outside fuzzing.  I would
+expect that passing the wrong sign is a more likely mistake than being
+off by 2^63.
 
-[...]
+This data is available everywhere between strace, kernel tracepoints and
+QEMU tracepoints or guest checkpoint (live migration) data.  I just
+don't see much advantage in keeping the warning.
 
->> @@ -113,7 +125,21 @@ void vgic_mmio_write_senable(struct kvm_vcpu 
->> *vcpu,
->>  		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
->> 
->>  		raw_spin_lock_irqsave(&irq->irq_lock, flags);
->> -		if (vgic_irq_is_mapped_level(irq)) {
->> +		if (irq->hw && vgic_irq_is_sgi(irq->intid)) {
->> +			if (!irq->enabled) {
->> +				struct irq_data *data;
->> +
->> +				irq->enabled = true;
->> +				data = &irq_to_desc(irq->host_irq)->irq_data;
->> +				while (irqd_irq_disabled(data))
->> +					enable_irq(irq->host_irq);
-> could you explain me why the while() is requested?
+Paolo
 
-Ah, interesting question: disable_irq() (and its variants) can nest. 
-This
-means that if you have done two disable_irq(), you must do two 
-enable_irq()
-to get back to the interrupt being enabled.
-
-The locking should ensure that this nesting doesn't happen, but I'm 
-paranoid
-(see the GICv4.0 doorbell handling). It also makes it easier to reason 
-about
-the initial state.
-
-[...]
-
-> Reviewed-by: Eric Auger <eric.auger@redhat.com>
-
-Thanks!
-
-          M.
--- 
-Jazz is not dead. It just smells funny...
