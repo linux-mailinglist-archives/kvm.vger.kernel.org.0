@@ -2,26 +2,26 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4A5D518DADE
-	for <lists+kvm@lfdr.de>; Fri, 20 Mar 2020 23:06:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AF80C18DABE
+	for <lists+kvm@lfdr.de>; Fri, 20 Mar 2020 23:04:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727580AbgCTWGB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Mar 2020 18:06:01 -0400
-Received: from Galois.linutronix.de ([193.142.43.55]:37472 "EHLO
+        id S1727520AbgCTWEn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Mar 2020 18:04:43 -0400
+Received: from Galois.linutronix.de ([193.142.43.55]:37512 "EHLO
         Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726666AbgCTWEN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Mar 2020 18:04:13 -0400
+        with ESMTP id S1727473AbgCTWEU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Mar 2020 18:04:20 -0400
 Received: from p5de0bf0b.dip0.t-ipconnect.de ([93.224.191.11] helo=nanos.tec.linutronix.de)
         by Galois.linutronix.de with esmtpsa (TLS1.2:DHE_RSA_AES_256_CBC_SHA256:256)
         (Exim 4.80)
         (envelope-from <tglx@linutronix.de>)
-        id 1jFPk9-0004d8-QA; Fri, 20 Mar 2020 23:03:53 +0100
+        id 1jFPkF-0004dk-8e; Fri, 20 Mar 2020 23:03:59 +0100
 Received: from nanos.tec.linutronix.de (localhost [IPv6:::1])
-        by nanos.tec.linutronix.de (Postfix) with ESMTP id 1AAE61040C9;
+        by nanos.tec.linutronix.de (Postfix) with ESMTP id 56B941040CB;
         Fri, 20 Mar 2020 23:03:49 +0100 (CET)
-Message-Id: <20200320180034.203489576@linutronix.de>
+Message-Id: <20200320180034.297670977@linutronix.de>
 User-Agent: quilt/0.65
-Date:   Fri, 20 Mar 2020 19:00:14 +0100
+Date:   Fri, 20 Mar 2020 19:00:15 +0100
 From:   Thomas Gleixner <tglx@linutronix.de>
 To:     LKML <linux-kernel@vger.kernel.org>
 Cc:     x86@kernel.org, Paul McKenney <paulmck@kernel.org>,
@@ -35,10 +35,10 @@ Cc:     x86@kernel.org, Paul McKenney <paulmck@kernel.org>,
         Brian Gerst <brgerst@gmail.com>,
         Juergen Gross <jgross@suse.com>,
         Alexandre Chartre <alexandre.chartre@oracle.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
         Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        Peter Zijlstra <peterz@infradead.org>
-Subject: [RESEND][patch V3 18/23] x86/kvm: Move context tracking where it belongs
+        Peter Zijlstra <peterz@infradead.org>,
+        Tom Lendacky <thomas.lendacky@amd.com>
+Subject: [RESEND][patch V3 19/23] x86/kvm/vmx: Add hardirq tracing to guest enter/exit
 References: <20200320175956.033706968@linutronix.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -51,123 +51,64 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The invocation of guest_enter_irqoff() is way before the actual VMENTER
-happens. guest_exit_irqoff() happens way after the VMEXIT.
+The VMX code does not track hard interrupt state correctly. The state in
+tracing and lockdep is 'OFF' all the way during guest mode. From the host
+point of view this is wrong because the VMENTER reenables interrupts like a
+return to user space and VMENTER disables them again like an entry from
+user space.
 
-While the comment in guest_enter_irqoff() says that KVM does not hold
-references to RCU protected data, for the whole call chain before VMENTER
-and after VMEXIT there is no guarantee that no RCU protected data is
-accessed.
-
-There are tracepoints hidden in MSR access functions and there are calls
-into code which takes locks. The latter might cause lockdep to run into RCU
-trouble. As the call chains are hard to follow it's unclear whether there
-might be RCU trouble lurking in some corner cases.
-
-The VMENTER path after context tracking contains also exit conditions which
-abort the VMENTER. The VMEXIT return path reenables interrupts before
-switching RCU back on which means that the interrupt entry/exit has to
-switch in on and then off again. If tracepoints on local_irq_enable() and
-local_irqdisable() are enabled then two more RCU on/off transitions are
-happening.
-
-Move it down into the VMX/SVM code close to the actual entry/exit. This is
-the first step to bring parts of this code into the .noinstr.text section
-so it can be verified with objtool.
+Make it do exactly the same thing as enter/exit user mode does.
 
 Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
-Cc: Tom Lendacky <thomas.lendacky@amd.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org
 ---
- arch/x86/kvm/svm.c     |   18 ++++++++++++++++++
- arch/x86/kvm/vmx/vmx.c |   10 ++++++++++
- arch/x86/kvm/x86.c     |    2 --
- 3 files changed, 28 insertions(+), 2 deletions(-)
+ arch/x86/kvm/vmx/vmx.c |   25 +++++++++++++++++++++++--
+ 1 file changed, 23 insertions(+), 2 deletions(-)
 
---- a/arch/x86/kvm/svm.c
-+++ b/arch/x86/kvm/svm.c
-@@ -5766,6 +5766,15 @@ static void svm_vcpu_run(struct kvm_vcpu
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -6538,9 +6538,19 @@ static void vmx_vcpu_run(struct kvm_vcpu
+ 	x86_spec_ctrl_set_guest(vmx->spec_ctrl, 0);
+ 
+ 	/*
+-	 * Tell context tracking that this CPU is about to enter guest mode.
++	 * VMENTER enables interrupts (host state), but the kernel state is
++	 * interrupts disabled when this is invoked. Also tell RCU about
++	 * it. This is the same logic as for exit_to_user_mode().
++	 *
++	 * 1) Trace interrupts on state
++	 * 2) Prepare lockdep with RCU on
++	 * 3) Invoke context tracking if enabled to adjust RCU state
++	 * 4) Tell lockdep that interrupts are enabled
  	 */
- 	x86_spec_ctrl_set_guest(svm->spec_ctrl, svm->virt_spec_ctrl);
++	__trace_hardirqs_on();
++	lockdep_hardirqs_on_prepare(CALLER_ADDR0);
+ 	guest_enter_irqoff();
++	lockdep_hardirqs_on(CALLER_ADDR0);
  
-+	/*
-+	 * Tell context tracking that this CPU is about to enter guest
-+	 * mode. This has to be after x86_spec_ctrl_set_guest() because
-+	 * that can take locks (lockdep needs RCU) and calls into world and
-+	 * some more.
-+	 */
-+	guest_enter_irqoff();
-+
-+	/* This is wrong vs. lockdep. Will be fixed in the next step */
- 	local_irq_enable();
+ 	/* L1D Flush includes CPU buffer clear to mitigate MDS */
+ 	if (static_branch_unlikely(&vmx_l1d_should_flush))
+@@ -6557,9 +6567,20 @@ static void vmx_vcpu_run(struct kvm_vcpu
+ 	vcpu->arch.cr2 = read_cr2();
  
- 	asm volatile (
-@@ -5869,6 +5878,14 @@ static void svm_vcpu_run(struct kvm_vcpu
- 	loadsegment(gs, svm->host.gs);
- #endif
- #endif
-+	/*
-+	 * Tell context tracking that this CPU is back.
+ 	/*
+-	 * Tell context tracking that this CPU is back.
++	 * VMEXIT disables interrupts (host state), but tracing and lockdep
++	 * have them in state 'on'. Same as enter_from_user_mode().
++	 *
++	 * 1) Tell lockdep that interrupts are disabled
++	 * 2) Invoke context tracking if enabled to reactivate RCU
++	 * 3) Trace interrupts off state
 +	 *
 +	 * This needs to be done before the below as native_read_msr()
 +	 * contains a tracepoint and x86_spec_ctrl_restore_host() calls
 +	 * into world and some more.
-+	 */
-+	guest_exit_irqoff();
- 
- 	/*
- 	 * We do not use IBRS in the kernel. If this vCPU has used the
-@@ -5890,6 +5907,7 @@ static void svm_vcpu_run(struct kvm_vcpu
- 
- 	reload_tss(vcpu);
- 
-+	/* This is wrong vs. lockdep. Will be fixed in the next step */
- 	local_irq_disable();
- 
- 	x86_spec_ctrl_restore_host(svm->spec_ctrl, svm->virt_spec_ctrl);
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -6537,6 +6537,11 @@ static void vmx_vcpu_run(struct kvm_vcpu
  	 */
- 	x86_spec_ctrl_set_guest(vmx->spec_ctrl, 0);
- 
-+	/*
-+	 * Tell context tracking that this CPU is about to enter guest mode.
-+	 */
-+	guest_enter_irqoff();
-+
- 	/* L1D Flush includes CPU buffer clear to mitigate MDS */
- 	if (static_branch_unlikely(&vmx_l1d_should_flush))
- 		vmx_l1d_flush(vcpu);
-@@ -6552,6 +6557,11 @@ static void vmx_vcpu_run(struct kvm_vcpu
- 	vcpu->arch.cr2 = read_cr2();
++	lockdep_hardirqs_off(CALLER_ADDR0);
+ 	guest_exit_irqoff();
++	__trace_hardirqs_off();
  
  	/*
-+	 * Tell context tracking that this CPU is back.
-+	 */
-+	guest_exit_irqoff();
-+
-+	/*
  	 * We do not use IBRS in the kernel. If this vCPU has used the
- 	 * SPEC_CTRL MSR it may have left it on; save the value and
- 	 * turn it off. This is much more efficient than blindly adding
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -8350,7 +8350,6 @@ static int vcpu_enter_guest(struct kvm_v
- 	}
- 
- 	trace_kvm_entry(vcpu->vcpu_id);
--	guest_enter_irqoff();
- 
- 	fpregs_assert_state_consistent();
- 	if (test_thread_flag(TIF_NEED_FPU_LOAD))
-@@ -8413,7 +8412,6 @@ static int vcpu_enter_guest(struct kvm_v
- 	local_irq_disable();
- 	kvm_after_interrupt(vcpu);
- 
--	guest_exit_irqoff();
- 	if (lapic_in_kernel(vcpu)) {
- 		s64 delta = vcpu->arch.apic->lapic_timer.advance_expire_delta;
- 		if (delta != S64_MIN) {
 
