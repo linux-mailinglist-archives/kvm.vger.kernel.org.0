@@ -2,116 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C304F18D5C9
-	for <lists+kvm@lfdr.de>; Fri, 20 Mar 2020 18:29:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 99E0418D61E
+	for <lists+kvm@lfdr.de>; Fri, 20 Mar 2020 18:43:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727281AbgCTR27 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Mar 2020 13:28:59 -0400
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:35354 "EHLO
-        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727197AbgCTR27 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Mar 2020 13:28:59 -0400
-Received: by mail-wm1-f68.google.com with SMTP id m3so7289552wmi.0;
-        Fri, 20 Mar 2020 10:28:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=bF7ST+Uw4AP61YhxxvxFJK3psApCGN0GVo19aRVBb+k=;
-        b=RbkJQ8QQKdMX25KSA2Et2VsxBEOhkKWd8C0EPVQwzaiZAFN5g8J7DK9bEWXsyF7yTy
-         2tOt3nYaMcIz/ubNAvPxA/0N1a+jqG7MNrn/iJUNZcyEyTgvlQ4kktJpud4nlaBgt3Rf
-         lFOT3OCzL5KCHw5DDD9mUuxkGNeB7teAZ0UnkgZ6MpqtEI5o+jp1ltJOzwSGFBFz0zGx
-         EqXgy06s9AXVzxxze3adyYR7MJLR72LZL3V0tzAPXtMTR2nCdCnk0kYR5mEmmuxY75NJ
-         JejKiF89e3IOu/1ibgewwR2KfpR/B32rn5V6bbtcX4Hbh1u7SJXLgJAY/oVSujkZR8/Q
-         JSMg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=bF7ST+Uw4AP61YhxxvxFJK3psApCGN0GVo19aRVBb+k=;
-        b=AbXBoOJ9YJuKh+Wej9mMnlmlRVu6HUiHBOgwUubkOjEDL6QlBVfCBAhVtORrP33kkR
-         +kiXVcPRpjINiMYTnCIZ3wtQm/L+9Deb5hjjO4uyepvYj3BntuA7HjTqhm3wuY3S68OM
-         C2/JlxW+cvTxLgF9JHkfUYPqRPu/EkJaElH4rdQIWuuYkPU9UPulfYRMXQ+ZMOXpTZDQ
-         d0T6D4a61PJdP9f8z9NIznXSaAQ9i9aN8JhFHuqwWZYTgmYpx9LXxjJzpgzT0g/fJuVy
-         4RnZMsJmFB16AmWTvuyu1Qioy9TB8OlT8dq0bA/vJIEkSiVyZV2Fq5ulq43Ce5osFGzZ
-         mQvA==
-X-Gm-Message-State: ANhLgQ15BPXmjlzjV3mV7tApoIPvv98tsNAcmvL70uZvMnDMc2B5C/NN
-        8Ji2vuGsrwZH38BY25DRy+Vyw+uYcc4=
-X-Google-Smtp-Source: ADFU+vuPRAkCXWQGqIt8DiRO6X0wzcHXMyKhfH4/qINz4oo0MU24Q2dX5qcB01+Hl39yU6ChI4eoZA==
-X-Received: by 2002:a1c:25c5:: with SMTP id l188mr12027372wml.105.1584725335196;
-        Fri, 20 Mar 2020 10:28:55 -0700 (PDT)
-Received: from jondnuc.lan (IGLD-84-229-155-229.inter.net.il. [84.229.155.229])
-        by smtp.gmail.com with ESMTPSA id q4sm11028333wmj.1.2020.03.20.10.28.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Mar 2020 10:28:54 -0700 (PDT)
-From:   Jon Doron <arilou@gmail.com>
-To:     kvm@vger.kernel.org, linux-hyperv@vger.kernel.org
-Cc:     vkuznets@redhat.com, Jon Doron <arilou@gmail.com>
-Subject: [PATCH v9 6/6] x86/kvm/hyper-v: Add support for synthetic debugger via hypercalls
-Date:   Fri, 20 Mar 2020 19:28:39 +0200
-Message-Id: <20200320172839.1144395-7-arilou@gmail.com>
-X-Mailer: git-send-email 2.24.1
-In-Reply-To: <20200320172839.1144395-1-arilou@gmail.com>
-References: <20200320172839.1144395-1-arilou@gmail.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        id S1726982AbgCTRmu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Mar 2020 13:42:50 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:27504 "EHLO
+        us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726814AbgCTRmu (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 20 Mar 2020 13:42:50 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1584726169;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc; bh=ef36637kDnXkE6FllS0yNPka1X9FChEYgiakf6+7Z7c=;
+        b=EXteLxpIPtvpvuZEpCDVmeV2uOacj9OqidEjQBwSo0KCmWWQ8kt2vqFUnpSZGwDt0yEMd3
+        IRCpOHiMq2I+M9RalrsJjo1bcIAnPTyQ9bP3KfBYw0td4tJtvxq6TSJhqqMLl4iElLatZD
+        5fLn436FeLEV6dUcK5301FNIwD8T+uE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-308-JCGm1F3lNn-DLjAE_M3WPg-1; Fri, 20 Mar 2020 13:42:47 -0400
+X-MC-Unique: JCGm1F3lNn-DLjAE_M3WPg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 97C389B823;
+        Fri, 20 Mar 2020 17:42:46 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 3932D19757;
+        Fri, 20 Mar 2020 17:42:46 +0000 (UTC)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     Brijesh Singh <brijesh.singh@amd.com>
+Subject: [PATCH] KVM: SVM: document KVM_MEM_ENCRYPT_OP, let userspace detect if SEV is available
+Date:   Fri, 20 Mar 2020 13:42:45 -0400
+Message-Id: <20200320174245.5220-1-pbonzini@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-There is another mode for the synthetic debugger which uses hypercalls
-to send/recv network data instead of the MSR interface.
+Userspace has no way to query if SEV has been disabled with the
+sev module parameter of kvm-amd.ko.  Actually it has one, but it
+is a hack: do ioctl(KVM_MEM_ENCRYPT_OP, NULL) and check if it
+returns EFAULT.  Make it a little nicer by returning zero for
+SEV enabled and NULL argument, and while at it document the
+ioctl arguments.
 
-This interface is much slower and less recommended since you might get
-a lot of VMExits while KDVM polling for new packets to recv, rather
-than simply checking the pending page to see if there is data avialble
-and then request.
-
-Signed-off-by: Jon Doron <arilou@gmail.com>
+Cc: Brijesh Singh <brijesh.singh@amd.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- arch/x86/kvm/hyperv.c | 28 ++++++++++++++++++++++++++++
- 1 file changed, 28 insertions(+)
+ .../virt/kvm/amd-memory-encryption.rst        | 25 +++++++++++++++++++
+ arch/x86/kvm/svm.c                            |  3 +++
+ 2 files changed, 28 insertions(+)
 
-diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
-index c130a386f4c1..f17156d36419 100644
---- a/arch/x86/kvm/hyperv.c
-+++ b/arch/x86/kvm/hyperv.c
-@@ -1829,6 +1829,34 @@ int kvm_hv_hypercall(struct kvm_vcpu *vcpu)
- 		}
- 		ret = kvm_hv_send_ipi(vcpu, ingpa, outgpa, true, false);
- 		break;
-+	case HVCALL_POST_DEBUG_DATA:
-+	case HVCALL_RETRIEVE_DEBUG_DATA:
-+		if (unlikely(fast)) {
-+			ret = HV_STATUS_INVALID_PARAMETER;
-+			break;
-+		}
-+		fallthrough;
-+	case HVCALL_RESET_DEBUG_SESSION: {
-+		struct kvm_hv_syndbg *syndbg = vcpu_to_hv_syndbg(vcpu);
+diff --git a/Documentation/virt/kvm/amd-memory-encryption.rst b/Documentation/virt/kvm/amd-memory-encryption.rst
+index d18c97b4e140..c3129b9ba5cb 100644
+--- a/Documentation/virt/kvm/amd-memory-encryption.rst
++++ b/Documentation/virt/kvm/amd-memory-encryption.rst
+@@ -53,6 +53,29 @@ key management interface to perform common hypervisor activities such as
+ encrypting bootstrap code, snapshot, migrating and debugging the guest. For more
+ information, see the SEV Key Management spec [api-spec]_
+ 
++The main ioctl to access SEV is KVM_MEM_ENCRYPT_OP.  If the argument
++to KVM_MEM_ENCRYPT_OP is NULL, the ioctl returns 0 if SEV is enabled
++and ``ENOTTY` if it is disabled (on some older versions of Linux,
++the ioctl runs normally even with a NULL argument, and therefore will
++likely return ``EFAULT``).  If non-NULL, the argument to KVM_MEM_ENCRYPT_OP
++must be a struct kvm_sev_cmd::
 +
-+		if (!syndbg->active) {
-+			ret = HV_STATUS_INVALID_HYPERCALL_CODE;
-+			break;
-+		}
++       struct kvm_sev_cmd {
++               __u32 id;
++               __u64 data;
++               __u32 error;
++               __u32 sev_fd;
++       };
 +
-+		if (!(syndbg->options & HV_X64_SYNDBG_OPTION_USE_HCALLS)) {
-+			ret = HV_STATUS_OPERATION_DENIED;
-+			break;
-+		}
-+		vcpu->run->exit_reason = KVM_EXIT_HYPERV;
-+		vcpu->run->hyperv.type = KVM_EXIT_HYPERV_HCALL;
-+		vcpu->run->hyperv.u.hcall.input = param;
-+		vcpu->run->hyperv.u.hcall.params[0] = ingpa;
-+		vcpu->run->hyperv.u.hcall.params[1] = outgpa;
-+		vcpu->arch.complete_userspace_io =
-+				kvm_hv_hypercall_complete_userspace;
++
++The ``id`` field contains the subcommand, and the ``data`` field points to
++another struct containing arguments specific to command.  The ``sev_fd``
++should point to a file descriptor that is opened on the ``/dev/sev``
++device, if needed (see individual commands).
++
++On output, ``error`` is zero on success, or an error code.  Error codes
++are defined in ``<linux/psp-dev.h>`.
++
+ KVM implements the following commands to support common lifecycle events of SEV
+ guests, such as launching, running, snapshotting, migrating and decommissioning.
+ 
+@@ -90,6 +113,8 @@ Returns: 0 on success, -negative on error
+ 
+ On success, the 'handle' field contains a new handle and on error, a negative value.
+ 
++KVM_SEV_LAUNCH_START requires the ``sev_fd`` field to be valid.
++
+ For more details, see SEV spec Section 6.2.
+ 
+ 3. KVM_SEV_LAUNCH_UPDATE_DATA
+diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
+index 91000501756e..f0aa9ff9666f 100644
+--- a/arch/x86/kvm/svm.c
++++ b/arch/x86/kvm/svm.c
+@@ -7158,6 +7158,9 @@ static int svm_mem_enc_op(struct kvm *kvm, void __user *argp)
+ 	if (!svm_sev_enabled())
+ 		return -ENOTTY;
+ 
++	if (!argp)
 +		return 0;
-+	}
- 	default:
- 		ret = HV_STATUS_INVALID_HYPERCALL_CODE;
- 		break;
++
+ 	if (copy_from_user(&sev_cmd, argp, sizeof(struct kvm_sev_cmd)))
+ 		return -EFAULT;
+ 
 -- 
-2.24.1
+2.18.2
 
