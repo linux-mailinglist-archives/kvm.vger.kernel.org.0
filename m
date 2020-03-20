@@ -2,26 +2,26 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B594918DAB2
-	for <lists+kvm@lfdr.de>; Fri, 20 Mar 2020 23:04:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 27B6418DAD3
+	for <lists+kvm@lfdr.de>; Fri, 20 Mar 2020 23:05:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727445AbgCTWES (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Mar 2020 18:04:18 -0400
-Received: from Galois.linutronix.de ([193.142.43.55]:37482 "EHLO
+        id S1727783AbgCTWFi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Mar 2020 18:05:38 -0400
+Received: from Galois.linutronix.de ([193.142.43.55]:37487 "EHLO
         Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727196AbgCTWEO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Mar 2020 18:04:14 -0400
+        with ESMTP id S1726840AbgCTWEP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Mar 2020 18:04:15 -0400
 Received: from p5de0bf0b.dip0.t-ipconnect.de ([93.224.191.11] helo=nanos.tec.linutronix.de)
         by Galois.linutronix.de with esmtpsa (TLS1.2:DHE_RSA_AES_256_CBC_SHA256:256)
         (Exim 4.80)
         (envelope-from <tglx@linutronix.de>)
-        id 1jFPkB-0004Zg-53; Fri, 20 Mar 2020 23:03:55 +0100
+        id 1jFPk7-0004aL-4A; Fri, 20 Mar 2020 23:03:51 +0100
 Received: from nanos.tec.linutronix.de (localhost [IPv6:::1])
-        by nanos.tec.linutronix.de (Postfix) with ESMTP id D5FFC1040A1;
-        Fri, 20 Mar 2020 23:03:47 +0100 (CET)
-Message-Id: <20200320180033.681580918@linutronix.de>
+        by nanos.tec.linutronix.de (Postfix) with ESMTP id 1D5C61039FD;
+        Fri, 20 Mar 2020 23:03:48 +0100 (CET)
+Message-Id: <20200320180033.790597451@linutronix.de>
 User-Agent: quilt/0.65
-Date:   Fri, 20 Mar 2020 19:00:09 +0100
+Date:   Fri, 20 Mar 2020 19:00:10 +0100
 From:   Thomas Gleixner <tglx@linutronix.de>
 To:     LKML <linux-kernel@vger.kernel.org>
 Cc:     x86@kernel.org, Paul McKenney <paulmck@kernel.org>,
@@ -38,7 +38,8 @@ Cc:     x86@kernel.org, Paul McKenney <paulmck@kernel.org>,
         Peter Zijlstra <peterz@infradead.org>,
         Tom Lendacky <thomas.lendacky@amd.com>,
         Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Subject: [RESEND][patch V3 13/23] lib/smp_processor_id: Move it into noinstr section
+Subject: [RESEND][patch V3 14/23] x86/speculation/mds: Mark
+ mds_user_clear_cpu_buffers() __always_inline
 References: <20200320175956.033706968@linutronix.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -51,72 +52,33 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-That code is already not traceable. Move it into the noinstr section so the
-objtool section validation does not trigger.
-
-Annotate the warning code as "safe". While it might be not under all
-circumstances, getting the information out is important enough.
-
-Should this ever trigger from the sensitive code which is shielded against
-instrumentation, e.g. low level entry, then the printk is the least of the
-worries.
-
-Addresses the objtool warnings:
- vmlinux.o: warning: objtool: context_tracking_recursion_enter()+0x7: call to __this_cpu_preempt_check() leaves .noinstr.text section
- vmlinux.o: warning: objtool: __context_tracking_exit()+0x17: call to __this_cpu_preempt_check() leaves .noinstr.text section
- vmlinux.o: warning: objtool: __context_tracking_enter()+0x2a: call to __this_cpu_preempt_check() leaves .noinstr.text section
+Prevent the compiler from uninlining and creating traceable/probable
+functions as this is invoked _after_ context tracking switched to
+CONTEXT_USER and rcu idle.
 
 Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
 ---
-V3: New patch
----
- lib/smp_processor_id.c |   10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ arch/x86/include/asm/nospec-branch.h |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
---- a/lib/smp_processor_id.c
-+++ b/lib/smp_processor_id.c
-@@ -8,7 +8,7 @@
- #include <linux/kprobes.h>
- #include <linux/sched.h>
- 
--notrace static nokprobe_inline
-+noinstr static
- unsigned int check_preemption_disabled(const char *what1, const char *what2)
+--- a/arch/x86/include/asm/nospec-branch.h
++++ b/arch/x86/include/asm/nospec-branch.h
+@@ -319,7 +319,7 @@ DECLARE_STATIC_KEY_FALSE(mds_idle_clear)
+  * combination with microcode which triggers a CPU buffer flush when the
+  * instruction is executed.
+  */
+-static inline void mds_clear_cpu_buffers(void)
++static __always_inline void mds_clear_cpu_buffers(void)
  {
- 	int this_cpu = raw_smp_processor_id();
-@@ -37,6 +37,7 @@ unsigned int check_preemption_disabled(c
- 	 */
- 	preempt_disable_notrace();
+ 	static const u16 ds = __KERNEL_DS;
  
-+	instr_begin();
- 	if (!printk_ratelimit())
- 		goto out_enable;
- 
-@@ -45,6 +46,7 @@ unsigned int check_preemption_disabled(c
- 
- 	printk("caller is %pS\n", __builtin_return_address(0));
- 	dump_stack();
-+	instr_end();
- 
- out_enable:
- 	preempt_enable_no_resched_notrace();
-@@ -52,16 +54,14 @@ unsigned int check_preemption_disabled(c
- 	return this_cpu;
- }
- 
--notrace unsigned int debug_smp_processor_id(void)
-+noinstr unsigned int debug_smp_processor_id(void)
+@@ -340,7 +340,7 @@ static inline void mds_clear_cpu_buffers
+  *
+  * Clear CPU buffers if the corresponding static key is enabled
+  */
+-static inline void mds_user_clear_cpu_buffers(void)
++static __always_inline void mds_user_clear_cpu_buffers(void)
  {
- 	return check_preemption_disabled("smp_processor_id", "");
- }
- EXPORT_SYMBOL(debug_smp_processor_id);
--NOKPROBE_SYMBOL(debug_smp_processor_id);
- 
--notrace void __this_cpu_preempt_check(const char *op)
-+noinstr void __this_cpu_preempt_check(const char *op)
- {
- 	check_preemption_disabled("__this_cpu_", op);
- }
- EXPORT_SYMBOL(__this_cpu_preempt_check);
--NOKPROBE_SYMBOL(__this_cpu_preempt_check);
+ 	if (static_branch_likely(&mds_user_clear))
+ 		mds_clear_cpu_buffers();
 
