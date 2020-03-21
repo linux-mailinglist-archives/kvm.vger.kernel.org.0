@@ -2,26 +2,26 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 744F618E401
-	for <lists+kvm@lfdr.de>; Sat, 21 Mar 2020 20:37:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 24C7218E402
+	for <lists+kvm@lfdr.de>; Sat, 21 Mar 2020 20:38:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728044AbgCUThz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 21 Mar 2020 15:37:55 -0400
+        id S1728075AbgCUTh6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 21 Mar 2020 15:37:58 -0400
 Received: from mga11.intel.com ([192.55.52.93]:55983 "EHLO mga11.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727658AbgCUThy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 21 Mar 2020 15:37:54 -0400
-IronPort-SDR: +zoDqsTSQK1GcIgGbhRCiFPDoj4jPHHYpdMd0YkBdhpGSnTRhkWARZH7USRU7HDcDSozr6ohez
- yKMQIwoz788A==
+        id S1728002AbgCUThz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 21 Mar 2020 15:37:55 -0400
+IronPort-SDR: YEPGJGsmLH+vBwZWtcRTk5LgGPZL23LPz+7Z8txALzKWKhpjpqoraeMaHfheFkH398LkHPERu3
+ m1BYZKoTVQRA==
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Mar 2020 12:37:53 -0700
-IronPort-SDR: Lqc48/gyfK7Dvjiwl5Oz5MhClOsTKlGUW0A/k71PzqZ35dNXPcJzWD+lsr/RdAK+G7W2MnT74N
- wp71pyXdkO2g==
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Mar 2020 12:37:54 -0700
+IronPort-SDR: 7/Pw17EirO65eChZhWblkEnEYmODISes7aBhq9UXgg0738zsHHSc1re5gY5JBmp+uRnM8Vm1L2
+ DnB4/pEbGW4A==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.72,289,1580803200"; 
-   d="scan'208";a="445353681"
+   d="scan'208";a="445353684"
 Received: from sjchrist-coffee.jf.intel.com ([10.54.74.202])
   by fmsmga005.fm.intel.com with ESMTP; 21 Mar 2020 12:37:53 -0700
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
@@ -32,9 +32,9 @@ Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v2 2/3] KVM: VMX: Fold loaded_vmcs_init() into alloc_loaded_vmcs()
-Date:   Sat, 21 Mar 2020 12:37:50 -0700
-Message-Id: <20200321193751.24985-3-sean.j.christopherson@intel.com>
+Subject: [PATCH v2 3/3] KVM: VMX: Gracefully handle faults on VMXON
+Date:   Sat, 21 Mar 2020 12:37:51 -0700
+Message-Id: <20200321193751.24985-4-sean.j.christopherson@intel.com>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200321193751.24985-1-sean.j.christopherson@intel.com>
 References: <20200321193751.24985-1-sean.j.christopherson@intel.com>
@@ -45,64 +45,78 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Subsume loaded_vmcs_init() into alloc_loaded_vmcs(), its only remaining
-caller, and drop the VMCLEAR on the shadow VMCS, which is guaranteed to
-be NULL.  loaded_vmcs_init() was previously used by loaded_vmcs_clear(),
-but loaded_vmcs_clear() also subsumed loaded_vmcs_init() to properly
-handle smp_wmb() with respect to VMCLEAR.
+Gracefully handle faults on VMXON, e.g. #GP due to VMX being disabled by
+BIOS, instead of letting the fault crash the system.  Now that KVM uses
+cpufeatures to query support instead of reading MSR_IA32_FEAT_CTL
+directly, it's possible for a bug in a different subsystem to cause KVM
+to incorrectly attempt VMXON[*].  Crashing the system is especially
+annoying if the system is configured such that hardware_enable() will
+be triggered during boot.
 
+Oppurtunistically rename @addr to @vmxon_pointer and use a named param
+to reference it in the inline assembly.
+
+Print 0xdeadbeef in the ultra-"rare" case that reading MSR_IA32_FEAT_CTL
+also faults.
+
+[*] https://lkml.kernel.org/r/20200226231615.13664-1-sean.j.christopherson@intel.com
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 ---
- arch/x86/kvm/vmx/vmx.c | 14 ++++----------
- arch/x86/kvm/vmx/vmx.h |  1 -
- 2 files changed, 4 insertions(+), 11 deletions(-)
+ arch/x86/kvm/vmx/vmx.c | 24 +++++++++++++++++++++---
+ 1 file changed, 21 insertions(+), 3 deletions(-)
 
 diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index efaca09455bf..07634caa560d 100644
+index 07634caa560d..3aba51d782e2 100644
 --- a/arch/x86/kvm/vmx/vmx.c
 +++ b/arch/x86/kvm/vmx/vmx.c
-@@ -653,15 +653,6 @@ static int vmx_set_guest_msr(struct vcpu_vmx *vmx, struct shared_msr_entry *msr,
- 	return ret;
+@@ -2218,18 +2218,33 @@ static __init int vmx_disabled_by_bios(void)
+ 	       !boot_cpu_has(X86_FEATURE_VMX);
  }
  
--void loaded_vmcs_init(struct loaded_vmcs *loaded_vmcs)
--{
--	vmcs_clear(loaded_vmcs->vmcs);
--	if (loaded_vmcs->shadow_vmcs && loaded_vmcs->launched)
--		vmcs_clear(loaded_vmcs->shadow_vmcs);
--	loaded_vmcs->cpu = -1;
--	loaded_vmcs->launched = 0;
--}
--
- #ifdef CONFIG_KEXEC_CORE
- static void crash_vmclear_local_loaded_vmcss(void)
+-static void kvm_cpu_vmxon(u64 addr)
++static int kvm_cpu_vmxon(u64 vmxon_pointer)
  {
-@@ -2555,9 +2546,12 @@ int alloc_loaded_vmcs(struct loaded_vmcs *loaded_vmcs)
- 	if (!loaded_vmcs->vmcs)
- 		return -ENOMEM;
- 
-+	vmcs_clear(loaded_vmcs->vmcs);
++	u64 msr;
 +
- 	loaded_vmcs->shadow_vmcs = NULL;
- 	loaded_vmcs->hv_timer_soft_disabled = false;
--	loaded_vmcs_init(loaded_vmcs);
-+	loaded_vmcs->cpu = -1;
-+	loaded_vmcs->launched = 0;
+ 	cr4_set_bits(X86_CR4_VMXE);
+ 	intel_pt_handle_vmx(1);
  
- 	if (cpu_has_vmx_msr_bitmap()) {
- 		loaded_vmcs->msr_bitmap = (unsigned long *)
-diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-index be93d597306c..79d38f41ef7a 100644
---- a/arch/x86/kvm/vmx/vmx.h
-+++ b/arch/x86/kvm/vmx/vmx.h
-@@ -492,7 +492,6 @@ struct vmcs *alloc_vmcs_cpu(bool shadow, int cpu, gfp_t flags);
- void free_vmcs(struct vmcs *vmcs);
- int alloc_loaded_vmcs(struct loaded_vmcs *loaded_vmcs);
- void free_loaded_vmcs(struct loaded_vmcs *loaded_vmcs);
--void loaded_vmcs_init(struct loaded_vmcs *loaded_vmcs);
- void loaded_vmcs_clear(struct loaded_vmcs *loaded_vmcs);
+-	asm volatile ("vmxon %0" : : "m"(addr));
++	asm_volatile_goto("1: vmxon %[vmxon_pointer]\n\t"
++			  _ASM_EXTABLE(1b, %l[fault])
++			  : : [vmxon_pointer] "m"(vmxon_pointer)
++			  : : fault);
++	return 0;
++
++fault:
++	WARN_ONCE(1, "VMXON faulted, MSR_IA32_FEAT_CTL (0x3a) = 0x%llx\n",
++		  rdmsrl_safe(MSR_IA32_FEAT_CTL, &msr) ? 0xdeadbeef : msr);
++	intel_pt_handle_vmx(0);
++	cr4_clear_bits(X86_CR4_VMXE);
++
++	return -EFAULT;
+ }
  
- static inline struct vmcs *alloc_vmcs(bool shadow)
+ static int hardware_enable(void)
+ {
+ 	int cpu = raw_smp_processor_id();
+ 	u64 phys_addr = __pa(per_cpu(vmxarea, cpu));
++	int r;
+ 
+ 	if (cr4_read_shadow() & X86_CR4_VMXE)
+ 		return -EBUSY;
+@@ -2246,7 +2261,10 @@ static int hardware_enable(void)
+ 	INIT_LIST_HEAD(&per_cpu(blocked_vcpu_on_cpu, cpu));
+ 	spin_lock_init(&per_cpu(blocked_vcpu_on_cpu_lock, cpu));
+ 
+-	kvm_cpu_vmxon(phys_addr);
++	r = kvm_cpu_vmxon(phys_addr);
++	if (r)
++		return r;
++
+ 	if (enable_ept)
+ 		ept_sync_global();
+ 
 -- 
 2.24.1
 
