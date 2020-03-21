@@ -2,133 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3FEE718DCBD
-	for <lists+kvm@lfdr.de>; Sat, 21 Mar 2020 01:48:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 93D6518DDEC
+	for <lists+kvm@lfdr.de>; Sat, 21 Mar 2020 06:07:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727333AbgCUAsL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Mar 2020 20:48:11 -0400
-Received: from mga07.intel.com ([134.134.136.100]:38993 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726773AbgCUAsL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Mar 2020 20:48:11 -0400
-IronPort-SDR: 5R15SZoh7AZiclf1w9evz1bU7LMdhcUjdQ44lKItTBQiFG63ouhJimwQoxt1r4Nf74eJgnDqYm
- ZKBIo82Hz35A==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Mar 2020 17:48:10 -0700
-IronPort-SDR: i5vQ175Ng+lcCjl+Bl79blk5YiTScZY6WjHYMecLuiIj/YLsjx59boYwX4W0kSCQFartxO1zC0
- qaVTNFI0JdcQ==
-X-IronPort-AV: E=Sophos;i="5.72,286,1580803200"; 
-   d="scan'208";a="237376262"
-Received: from agluck-desk2.sc.intel.com (HELO agluck-desk2.amr.corp.intel.com) ([10.3.52.68])
-  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Mar 2020 17:48:10 -0700
-Date:   Fri, 20 Mar 2020 17:48:09 -0700
-From:   "Luck, Tony" <tony.luck@intel.com>
-To:     Xiaoyao Li <xiaoyao.li@intel.com>
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        hpa@zytor.com, Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        kvm@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org,
-        Andy Lutomirski <luto@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Arvind Sankar <nivedita@alum.mit.edu>,
-        Fenghua Yu <fenghua.yu@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>
-Subject: Re: [PATCH v5 4/9] x86/split_lock: Export handle_user_split_lock()
-Message-ID: <20200321004809.GD6578@agluck-desk2.amr.corp.intel.com>
-References: <20200315050517.127446-1-xiaoyao.li@intel.com>
- <20200315050517.127446-5-xiaoyao.li@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200315050517.127446-5-xiaoyao.li@intel.com>
+        id S1727882AbgCUFHu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 21 Mar 2020 01:07:50 -0400
+Received: from mail-pf1-f193.google.com ([209.85.210.193]:33947 "EHLO
+        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725440AbgCUFHu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 21 Mar 2020 01:07:50 -0400
+Received: by mail-pf1-f193.google.com with SMTP id 23so4417919pfj.1
+        for <kvm@vger.kernel.org>; Fri, 20 Mar 2020 22:07:49 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=49BuhoPB/LV65DGt5z0/eg7O0OzojYhf2QWVo/kHTnA=;
+        b=dlQ0FbvDSrgCI0wUxafmy5v/Kc8YogcDi05k6GIU7914IandyOgaBIou0Mg0eIl2aZ
+         2CWfSSSPzSrCG/CR/o/rOLaUlWyBmDbZDHaaxwWXfotRwTBURVAQsEZy17FvoDPmjA5o
+         LZTe7FCmt8coKM/LooAlE+PlmmrF3uek5zegWlkvJ3tBqkYY+p2jhSNySfo6M2TcvXfu
+         bJU5AS2fYgm8yRadIwAcip4+Kpu1/Uk/IUzwj1lFiiNOnNGju7W0PDunItUw02Uz313W
+         pbR+yaLFEPjbCqJ8+c8JI6gbjTN6ejWC4RKe5sqMza+JhG3ZVVqyHA4DOIVFIk92N9NP
+         HUdw==
+X-Gm-Message-State: ANhLgQ1apckc7jhYAqkoFzfvAzTXObhGqIiP3dXDu9MSnpONM/qaWQYH
+        mRJ/sOsfNDEMoQ0GtlokORvw0BpYNJA=
+X-Google-Smtp-Source: ADFU+vtcFs9SIAbeve8621dMFSO4oz9Sa937sKD5p1tsYNgB7EMgNFJ7j12QgwE/c64Omfw907l76g==
+X-Received: by 2002:aa7:9888:: with SMTP id r8mr13526553pfl.293.1584767268664;
+        Fri, 20 Mar 2020 22:07:48 -0700 (PDT)
+Received: from sc2-haas01-esx0118.eng.vmware.com ([66.170.99.1])
+        by smtp.gmail.com with ESMTPSA id b9sm6391524pgi.75.2020.03.20.22.07.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 20 Mar 2020 22:07:47 -0700 (PDT)
+From:   Nadav Amit <namit@vmware.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, Nadav Amit <namit@vmware.com>
+Subject: [PATCH] x86: vmx: Fix "EPT violation - paging structure" test
+Date:   Fri, 20 Mar 2020 22:05:55 -0700
+Message-Id: <20200321050555.4212-1-namit@vmware.com>
+X-Mailer: git-send-email 2.17.1
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Mar 15, 2020 at 01:05:12PM +0800, Xiaoyao Li wrote:
-> In the future, KVM will use handle_user_split_lock() to handle #AC
-> caused by split lock in guest. Due to the fact that KVM doesn't have
-> a @regs context and will pre-check EFLASG.AC, move the EFLAGS.AC check
-> to do_alignment_check().
-> 
-> Suggested-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
-> ---
->  arch/x86/include/asm/cpu.h  | 4 ++--
->  arch/x86/kernel/cpu/intel.c | 7 ++++---
->  arch/x86/kernel/traps.c     | 2 +-
->  3 files changed, 7 insertions(+), 6 deletions(-)
-> 
-> diff --git a/arch/x86/include/asm/cpu.h b/arch/x86/include/asm/cpu.h
-> index ff6f3ca649b3..ff567afa6ee1 100644
-> --- a/arch/x86/include/asm/cpu.h
-> +++ b/arch/x86/include/asm/cpu.h
-> @@ -43,11 +43,11 @@ unsigned int x86_stepping(unsigned int sig);
->  #ifdef CONFIG_CPU_SUP_INTEL
->  extern void __init cpu_set_core_cap_bits(struct cpuinfo_x86 *c);
->  extern void switch_to_sld(unsigned long tifn);
-> -extern bool handle_user_split_lock(struct pt_regs *regs, long error_code);
-> +extern bool handle_user_split_lock(unsigned long ip);
->  #else
->  static inline void __init cpu_set_core_cap_bits(struct cpuinfo_x86 *c) {}
->  static inline void switch_to_sld(unsigned long tifn) {}
-> -static inline bool handle_user_split_lock(struct pt_regs *regs, long error_code)
-> +static inline bool handle_user_split_lock(unsigned long ip)
->  {
->  	return false;
->  }
-> diff --git a/arch/x86/kernel/cpu/intel.c b/arch/x86/kernel/cpu/intel.c
-> index 3eeab717a0d0..c401d174c8db 100644
-> --- a/arch/x86/kernel/cpu/intel.c
-> +++ b/arch/x86/kernel/cpu/intel.c
-> @@ -1102,13 +1102,13 @@ static void split_lock_init(struct cpuinfo_x86 *c)
->  	sld_state = sld_disable;
->  }
->  
-> -bool handle_user_split_lock(struct pt_regs *regs, long error_code)
-> +bool handle_user_split_lock(unsigned long ip)
->  {
-> -	if ((regs->flags & X86_EFLAGS_AC) || sld_state == sld_fatal)
-> +	if (sld_state == sld_fatal)
->  		return false;
->  
->  	pr_warn_ratelimited("#AC: %s/%d took a split_lock trap at address: 0x%lx\n",
-> -			    current->comm, current->pid, regs->ip);
-> +			    current->comm, current->pid, ip);
->  
->  	/*
->  	 * Disable the split lock detection for this task so it can make
-> @@ -1119,6 +1119,7 @@ bool handle_user_split_lock(struct pt_regs *regs, long error_code)
->  	set_tsk_thread_flag(current, TIF_SLD);
->  	return true;
->  }
-> +EXPORT_SYMBOL_GPL(handle_user_split_lock);
->  
->  /*
->   * This function is called only when switching between tasks with
-> diff --git a/arch/x86/kernel/traps.c b/arch/x86/kernel/traps.c
-> index 0ef5befaed7d..407ff9be610f 100644
-> --- a/arch/x86/kernel/traps.c
-> +++ b/arch/x86/kernel/traps.c
-> @@ -304,7 +304,7 @@ dotraplinkage void do_alignment_check(struct pt_regs *regs, long error_code)
->  
->  	local_irq_enable();
->  
-> -	if (handle_user_split_lock(regs, error_code))
-> +	if (!(regs->flags & X86_EFLAGS_AC) && handle_user_split_lock(regs->ip))
->  		return;
->  
->  	do_trap(X86_TRAP_AC, SIGBUS, "alignment check", regs,
-> -- 
-> 2.20.1
-> 
+Running the tests with more than 4GB of memory results in the following
+failure:
 
-Looks good to me.
+  FAIL: EPT violation - paging structure
 
-Reviewed-by: Tony Luck <tony.luck@intel.com>
+It appears that the test mistakenly used get_ept_pte() to retrieve the
+guest PTE, but this function is intended for accessing EPT and not the
+guest page tables. Use get_pte_level() instead of get_ept_pte().
+
+Tested on bare-metal only.
+
+Signed-off-by: Nadav Amit <namit@vmware.com>
+---
+ x86/vmx_tests.c | 17 +++++++++--------
+ 1 file changed, 9 insertions(+), 8 deletions(-)
+
+diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
+index be5c952..1f97fe3 100644
+--- a/x86/vmx_tests.c
++++ b/x86/vmx_tests.c
+@@ -1312,12 +1312,14 @@ static int ept_exit_handler_common(union exit_reason exit_reason, bool have_ad)
+ 	u64 guest_cr3;
+ 	u32 insn_len;
+ 	u32 exit_qual;
+-	static unsigned long data_page1_pte, data_page1_pte_pte, memaddr_pte;
++	static unsigned long data_page1_pte, data_page1_pte_pte, memaddr_pte,
++			     guest_pte_addr;
+ 
+ 	guest_rip = vmcs_read(GUEST_RIP);
+ 	guest_cr3 = vmcs_read(GUEST_CR3);
+ 	insn_len = vmcs_read(EXI_INST_LEN);
+ 	exit_qual = vmcs_read(EXI_QUALIFICATION);
++	pteval_t *ptep;
+ 	switch (exit_reason.basic) {
+ 	case VMX_VMCALL:
+ 		switch (vmx_get_test_stage()) {
+@@ -1364,12 +1366,11 @@ static int ept_exit_handler_common(union exit_reason exit_reason, bool have_ad)
+ 			ept_sync(INVEPT_SINGLE, eptp);
+ 			break;
+ 		case 4:
+-			TEST_ASSERT(get_ept_pte(pml4, (unsigned long)data_page1,
+-						2, &data_page1_pte));
+-			data_page1_pte &= PAGE_MASK;
+-			TEST_ASSERT(get_ept_pte(pml4, data_page1_pte,
+-						2, &data_page1_pte_pte));
+-			set_ept_pte(pml4, data_page1_pte, 2,
++			ptep = get_pte_level((pgd_t *)guest_cr3, data_page1, /*level=*/2);
++			guest_pte_addr = virt_to_phys(ptep) & PAGE_MASK;
++
++			TEST_ASSERT(get_ept_pte(pml4, guest_pte_addr, 2, &data_page1_pte_pte));
++			set_ept_pte(pml4, guest_pte_addr, 2,
+ 				data_page1_pte_pte & ~EPT_PRESENT);
+ 			ept_sync(INVEPT_SINGLE, eptp);
+ 			break;
+@@ -1437,7 +1438,7 @@ static int ept_exit_handler_common(union exit_reason exit_reason, bool have_ad)
+ 					  (have_ad ? EPT_VLT_WR : 0) |
+ 					  EPT_VLT_LADDR_VLD))
+ 				vmx_inc_test_stage();
+-			set_ept_pte(pml4, data_page1_pte, 2,
++			set_ept_pte(pml4, guest_pte_addr, 2,
+ 				data_page1_pte_pte | (EPT_PRESENT));
+ 			ept_sync(INVEPT_SINGLE, eptp);
+ 			break;
+-- 
+2.17.1
 
