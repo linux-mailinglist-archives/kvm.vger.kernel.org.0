@@ -2,102 +2,136 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2B72E18E31E
-	for <lists+kvm@lfdr.de>; Sat, 21 Mar 2020 18:06:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CA96C18E3DA
+	for <lists+kvm@lfdr.de>; Sat, 21 Mar 2020 20:12:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727403AbgCURGj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 21 Mar 2020 13:06:39 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:42032 "EHLO
-        us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727033AbgCURGj (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sat, 21 Mar 2020 13:06:39 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1584810397;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=qBf1jZFDWJfil6GPICcnYrVVsebcDeSgyL/zqAgKcgA=;
-        b=HPqkszbtV32QtdDB57zQUK+dFPENV5DzFAKwulhh79T5AT+kQXZyaU+zx/gUFEdlHfGVs0
-        8J66jWa1qDuxqQSKbDopWierHQuM7yp96ZDB2SV7SiPG6CPTlWlKPg7N/bfvdCfK4xa1WE
-        EFBMlATqPrcgpDKr1sUYMNi+OCXgtjY=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-157-vHk0V8cgPsKgOmopn_taMQ-1; Sat, 21 Mar 2020 13:06:36 -0400
-X-MC-Unique: vHk0V8cgPsKgOmopn_taMQ-1
-Received: by mail-wr1-f71.google.com with SMTP id l17so4120841wro.3
-        for <kvm@vger.kernel.org>; Sat, 21 Mar 2020 10:06:36 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=qBf1jZFDWJfil6GPICcnYrVVsebcDeSgyL/zqAgKcgA=;
-        b=hvLOsDjOtxHNMjWHNzYUbxj0uB8tRXxIngQeoz0FNEkXfIGW7YUbSboIh6VZGAdxJt
-         UiL+ZpkI9N3AxgVnvMok5YaQGthD+OyUhu++oj7qsIScn6wclWLEhquokSWV4rxTZXR0
-         ms54qxyttPyc7b/FBudLI3Fo6RLpia0LfDhhN/yF5PRPjHZwA22Nq19RICpnWXui7OUx
-         y/JEH3JRx7OtqJo/Q6nq+2jf/0y0QHcq4fBHe0kOmqpVT3Bj2oiqcUOWwEtyiqt3gOm6
-         bcFBGfoCptST5wsL7XcjyS4+HDodY1D4MS4c4ENYmZR8XKpOKWAqsbExmkdWcI5fzonK
-         YzOA==
-X-Gm-Message-State: ANhLgQ17ssvYT9ZRI9D2IQqsjRxOSmSF5Ii/bFROIjoYUVpYIkEf1wcf
-        Ng6YIqVwRVh1usrtuM0RsK/GSDbQgKxpOKFHmNCaybH9sAM209QiWAbx4NKAAZufwDKfBLqzEVq
-        CxgOjRxajfxRn
-X-Received: by 2002:adf:a54a:: with SMTP id j10mr19111329wrb.188.1584810395125;
-        Sat, 21 Mar 2020 10:06:35 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vuQWpokduTrQpxfBkLp1mdxfKHuTe0bXRbdEj8z+pkh5ZTL/y0qBziCDs5v7r/l08R5TSnuUg==
-X-Received: by 2002:adf:a54a:: with SMTP id j10mr19111297wrb.188.1584810394875;
-        Sat, 21 Mar 2020 10:06:34 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:24d8:ed40:c82a:8a01? ([2001:b07:6468:f312:24d8:ed40:c82a:8a01])
-        by smtp.gmail.com with ESMTPSA id q72sm13155861wme.31.2020.03.21.10.06.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 21 Mar 2020 10:06:34 -0700 (PDT)
-Subject: Re: [PATCH] KVM: SVM: Issue WBINVD after deactivating an SEV guest
-To:     Tom Lendacky <thomas.lendacky@amd.com>, Greg KH <greg@kroah.com>
-Cc:     David Rientjes <rientjes@google.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
+        id S1727610AbgCUTMv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 21 Mar 2020 15:12:51 -0400
+Received: from mga06.intel.com ([134.134.136.31]:4567 "EHLO mga06.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727028AbgCUTMv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 21 Mar 2020 15:12:51 -0400
+IronPort-SDR: BF5uw76TWSpmJxU09thk8Rga+09mJZDkusnxTEn3SaqeAcxZxSGDysE4Je6pOjXMgHW2+z6esi
+ NLND2S5j8ACA==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Mar 2020 12:12:50 -0700
+IronPort-SDR: LEGngsaaDdt6kb5w+R52hg45Dzy0hFhk3Ck92J3u+FrpKnfuQtr4UDreSOVg9rQ4FlkgxuE9Gt
+ SLzGcxHyB8IQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.72,289,1580803200"; 
+   d="scan'208";a="419063818"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
+  by orsmga005.jf.intel.com with ESMTP; 21 Mar 2020 12:12:50 -0700
+Date:   Sat, 21 Mar 2020 12:12:50 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Peter Xu <peterx@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        "Michael S . Tsirkin" <mst@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Brijesh Singh <brijesh.singh@amd.com>
-References: <c8bf9087ca3711c5770bdeaafa3e45b717dc5ef4.1584720426.git.thomas.lendacky@amd.com>
- <alpine.DEB.2.21.2003201333510.205664@chino.kir.corp.google.com>
- <7b8d0c8c-d685-627b-676c-01c3d194fc82@amd.com>
- <20200321090030.GA884290@kroah.com>
- <fd8fccbb-2221-dcef-fd88-931a9c6b1b85@amd.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <34e7eef3-9f13-c471-89b5-914126e9e499@redhat.com>
-Date:   Sat, 21 Mar 2020 18:06:33 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+        Yan Zhao <yan.y.zhao@intel.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        Christophe de Dinechin <dinechin@redhat.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH v7 06/14] KVM: Make dirty ring exclusive to dirty bitmap
+ log
+Message-ID: <20200321191250.GB13851@linux.intel.com>
+References: <20200318163720.93929-1-peterx@redhat.com>
+ <20200318163720.93929-7-peterx@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <fd8fccbb-2221-dcef-fd88-931a9c6b1b85@amd.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200318163720.93929-7-peterx@redhat.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 21/03/20 13:16, Tom Lendacky wrote:
->>
->> Yes, I have had to go around and clean up after maintainers who don't
->> seem to realize this, but for KVM patches I have been explicitly told to
->> NOT take any patch unless it has a cc: stable on it, due to issues that
->> have happened in the past.
->>
->> So for this subsystem, what you suggested guaranteed it would NOT get
->> picked up, please do not do that.
+On Wed, Mar 18, 2020 at 12:37:12PM -0400, Peter Xu wrote:
+> There's no good reason to use both the dirty bitmap logging and the
+> new dirty ring buffer to track dirty bits.  We should be able to even
+> support both of them at the same time, but it could complicate things
+> which could actually help little.  Let's simply make it the rule
+> before we enable dirty ring on any arch, that we don't allow these two
+> interfaces to be used together.
 > 
-> Thanks for clarifying that, Greg.
+> The big world switch would be KVM_CAP_DIRTY_LOG_RING capability
+> enablement.  That's where we'll switch from the default dirty logging
+> way to the dirty ring way.  As long as kvm->dirty_ring_size is setup
+> correctly, we'll once and for all switch to the dirty ring buffer mode
+> for the current virtual machine.
 > 
-> Then, yes, it should have the Cc: to stable that David mentioned. If it
-> gets applied without that, I'll follow the process to send an email to
-> stable to get it included in 5.5-stable.
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> ---
+>  Documentation/virt/kvm/api.rst |  7 +++++++
+>  virt/kvm/kvm_main.c            | 12 ++++++++++++
+>  2 files changed, 19 insertions(+)
+> 
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index 99ee9cfc20c4..8f3a83298d3f 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -6202,3 +6202,10 @@ make sure all the existing dirty gfns are flushed to the dirty rings.
+>  
+>  The dirty ring can gets full.  When it happens, the KVM_RUN of the
+>  vcpu will return with exit reason KVM_EXIT_DIRTY_LOG_FULL.
+> +
+> +NOTE: the KVM_CAP_DIRTY_LOG_RING capability and the new ioctl
 
-No, don't worry, I do add the stable tags myself based on the Fixes tags.
+Leave off "new", it'll be stale a few months/years from now.
 
-Paolo
+> +KVM_RESET_DIRTY_RINGS are exclusive to the existing KVM_GET_DIRTY_LOG
 
+Did you mean "mutually exclusive with"?  "exclusive to" would mean they
+can only be used by KVM_GET_DIRTY_LOG with doesn't match the next
+sentence.
+
+> +interface.  After enabling KVM_CAP_DIRTY_LOG_RING with an acceptable
+> +dirty ring size, the virtual machine will switch to the dirty ring
+> +tracking mode, and KVM_GET_DIRTY_LOG, KVM_CLEAR_DIRTY_LOG ioctls will
+> +stop working.
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 54a1e893d17b..b289d3bddd5c 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -1352,6 +1352,10 @@ int kvm_get_dirty_log(struct kvm *kvm, struct kvm_dirty_log *log,
+>  	unsigned long n;
+>  	unsigned long any = 0;
+>  
+> +	/* Dirty ring tracking is exclusive to dirty log tracking */
+> +	if (kvm->dirty_ring_size)
+> +		return -EINVAL;
+> +
+>  	*memslot = NULL;
+>  	*is_dirty = 0;
+>  
+> @@ -1413,6 +1417,10 @@ static int kvm_get_dirty_log_protect(struct kvm *kvm, struct kvm_dirty_log *log)
+>  	unsigned long *dirty_bitmap_buffer;
+>  	bool flush;
+>  
+> +	/* Dirty ring tracking is exclusive to dirty log tracking */
+> +	if (kvm->dirty_ring_size)
+> +		return -EINVAL;
+> +
+>  	as_id = log->slot >> 16;
+>  	id = (u16)log->slot;
+>  	if (as_id >= KVM_ADDRESS_SPACE_NUM || id >= KVM_USER_MEM_SLOTS)
+> @@ -1521,6 +1529,10 @@ static int kvm_clear_dirty_log_protect(struct kvm *kvm,
+>  	unsigned long *dirty_bitmap_buffer;
+>  	bool flush;
+>  
+> +	/* Dirty ring tracking is exclusive to dirty log tracking */
+> +	if (kvm->dirty_ring_size)
+> +		return -EINVAL;
+> +
+>  	as_id = log->slot >> 16;
+>  	id = (u16)log->slot;
+>  	if (as_id >= KVM_ADDRESS_SPACE_NUM || id >= KVM_USER_MEM_SLOTS)
+> -- 
+> 2.24.1
+> 
