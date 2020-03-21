@@ -2,26 +2,26 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 638FF18E404
-	for <lists+kvm@lfdr.de>; Sat, 21 Mar 2020 20:38:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E15C418E406
+	for <lists+kvm@lfdr.de>; Sat, 21 Mar 2020 20:38:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728091AbgCUTiF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 21 Mar 2020 15:38:05 -0400
+        id S1727932AbgCUThy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 21 Mar 2020 15:37:54 -0400
 Received: from mga11.intel.com ([192.55.52.93]:55983 "EHLO mga11.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727028AbgCUThz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 21 Mar 2020 15:37:55 -0400
-IronPort-SDR: +Rx1ZYW07g0Ptr3eTy5pTl/0VFKi5XxeGN/1roJVNf32H7zeMrc4a2WpQARhhWP33u4enAmQH0
- jxK197J7eBYw==
+        id S1727028AbgCUThy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 21 Mar 2020 15:37:54 -0400
+IronPort-SDR: Gwu08gbtiuFj/OhEBY9nrkPQ+oBnhAh4D1tzSHd/ozgmF7LNavET69wkRpGsXD3PWEnFSuLQLe
+ pl0RV5BYHEmA==
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga005.fm.intel.com ([10.253.24.32])
   by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Mar 2020 12:37:53 -0700
-IronPort-SDR: WXb3xou5Qmr5WW8ex0hNZM+Ew9D7J/HSFYceqXfQGAiXC65lJSoEKuSP40uZ6LHZkD582big0+
- tsz1jHfT/rrg==
+IronPort-SDR: efQx6clHZAyfj791VdGLAKKVJr/L0nd1o6q2vwvK/bk2MMYKNy1k0tTcaOuvtZATFdNToDKrsg
+ +w4SkRO08jUA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.72,289,1580803200"; 
-   d="scan'208";a="445353676"
+   d="scan'208";a="445353678"
 Received: from sjchrist-coffee.jf.intel.com ([10.54.74.202])
   by fmsmga005.fm.intel.com with ESMTP; 21 Mar 2020 12:37:52 -0700
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
@@ -32,10 +32,12 @@ Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v2 0/3] KVM: VMX: Fix for kexec VMCLEAR and VMXON cleanup
-Date:   Sat, 21 Mar 2020 12:37:48 -0700
-Message-Id: <20200321193751.24985-1-sean.j.christopherson@intel.com>
+Subject: [PATCH v2 1/3] KVM: VMX: Always VMCLEAR in-use VMCSes during crash with kexec support
+Date:   Sat, 21 Mar 2020 12:37:49 -0700
+Message-Id: <20200321193751.24985-2-sean.j.christopherson@intel.com>
 X-Mailer: git-send-email 2.24.1
+In-Reply-To: <20200321193751.24985-1-sean.j.christopherson@intel.com>
+References: <20200321193751.24985-1-sean.j.christopherson@intel.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
@@ -43,103 +45,174 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Patch 1 fixes a a theoretical bug where a crashdump NMI that arrives
-while KVM is messing with the percpu VMCS list would result in one or more
-VMCSes not being cleared, potentially causing memory corruption in the new
-kexec'd kernel.
+VMCLEAR all in-use VMCSes during a crash, even if kdump's NMI shootdown
+interrupted a KVM update of the percpu in-use VMCS list.
 
-Patch 2 is cleanup that's made possible by patch 1.
+Because NMIs are not blocked by disabling IRQs, it's possible that
+crash_vmclear_local_loaded_vmcss() could be called while the percpu list
+of VMCSes is being modified, e.g. in the middle of list_add() in
+vmx_vcpu_load_vmcs().  This potential corner case was called out in the
+original commit[*], but the analysis of its impact was wrong.
 
-Patch 3 isn't directly related, but it conflicts with the crash cleanup
-changes, both from a code and a semantics perspective.  Without the crash
-cleanup, IMO hardware_enable() should do crash_disable_local_vmclear()
-if VMXON fails, i.e. clean up after itself.  But hardware_disable()
-doesn't even do crash_disable_local_vmclear() (which is what got me
-looking at that code in the first place).  Basing the VMXON change on top
-of the crash cleanup avoids the debate entirely.
+Skipping the VMCLEARs is wrong because it all but guarantees that a
+loaded, and therefore cached, VMCS will live across kexec and corrupt
+memory in the new kernel.  Corruption will occur because the CPU's VMCS
+cache is non-coherent, i.e. not snooped, and so the writeback of VMCS
+memory on its eviction will overwrite random memory in the new kernel.
+The VMCS will live because the NMI shootdown also disables VMX, i.e. the
+in-progress VMCLEAR will #UD, and existing Intel CPUs do not flush the
+VMCS cache on VMXOFF.
 
-v2:
-  - Inverted the code flow, i.e. move code from loaded_vmcs_init() to
-    __loaded_vmcs_clear().  Trying to share loaded_vmcs_init() with
-    alloc_loaded_vmcs() was taking more code than it saved. [Paolo]
+Furthermore, interrupting list_add() and list_del() is safe due to
+crash_vmclear_local_loaded_vmcss() using forward iteration.  list_add()
+ensures the new entry is not visible to forward iteration unless the
+entire add completes, via WRITE_ONCE(prev->next, new).  A bad "prev"
+pointer could be observed if the NMI shootdown interrupted list_del() or
+list_add(), but list_for_each_entry() does not consume ->prev.
 
+In addition to removing the temporary disabling of VMCLEAR, open code
+loaded_vmcs_init() in __loaded_vmcs_clear() and reorder VMCLEAR so that
+the VMCS is deleted from the list only after it's been VMCLEAR'd.
+Deleting the VMCS before VMCLEAR would allow a race where the NMI
+shootdown could arrive between list_del() and vmcs_clear() and thus
+neither flow would execute a successful VMCLEAR.  Alternatively, more
+code could be moved into loaded_vmcs_init(), but that gets rather silly
+as the only other user, alloc_loaded_vmcs(), doesn't need the smp_wmb()
+and would need to work around the list_del().
 
-Gory details on the crashdump bug:
+Update the smp_*() comments related to the list manipulation, and
+opportunistically reword them to improve clarity.
 
-I verified my analysis of the NMI bug by simulating what would happen if
-an NMI arrived in the middle of list_add() and list_del().  The below
-output matches expectations, e.g. nothing hangs, the entry being added
-doesn't show up, and the entry being deleted _does_ show up.
+[*] https://patchwork.kernel.org/patch/1675731/#3720461
 
-[    8.205898] KVM: testing NMI in list_add()
-[    8.205898] KVM: testing NMI in list_del()
-[    8.205899] KVM: found e3
-[    8.205899] KVM: found e2
-[    8.205899] KVM: found e1
-[    8.205900] KVM: found e3
-[    8.205900] KVM: found e1
+Fixes: 8f536b7697a0 ("KVM: VMX: provide the vmclear function and a bitmap to support VMCLEAR in kdump")
+Cc: stable@vger.kernel.org
+Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+---
+ arch/x86/kvm/vmx/vmx.c | 67 ++++++++++--------------------------------
+ 1 file changed, 16 insertions(+), 51 deletions(-)
 
-static void vmx_test_list(struct list_head *list, struct list_head *e1,
-                          struct list_head *e2, struct list_head *e3)
-{
-        struct list_head *tmp;
-
-        list_for_each(tmp, list) {
-                if (tmp == e1)
-                        pr_warn("KVM: found e1\n");
-                else if (tmp == e2)
-                        pr_warn("KVM: found e2\n");
-                else if (tmp == e3)
-                        pr_warn("KVM: found e3\n");
-                else
-                        pr_warn("KVM: kaboom\n");
-        }
-}
-
-static int __init vmx_init(void)
-{
-        LIST_HEAD(list);
-        LIST_HEAD(e1);
-        LIST_HEAD(e2);
-        LIST_HEAD(e3);
-
-        pr_warn("KVM: testing NMI in list_add()\n");
-
-        list.next->prev = &e1;
-        vmx_test_list(&list, &e1, &e2, &e3);
-
-        e1.next = list.next;
-        vmx_test_list(&list, &e1, &e2, &e3);
-
-        e1.prev = &list;
-        vmx_test_list(&list, &e1, &e2, &e3);
-
-        INIT_LIST_HEAD(&list);
-        INIT_LIST_HEAD(&e1);
-
-        list_add(&e1, &list);
-        list_add(&e2, &list);
-        list_add(&e3, &list);
-
-        pr_warn("KVM: testing NMI in list_del()\n");
-
-        e3.prev = &e1;
-        vmx_test_list(&list, &e1, &e2, &e3);
-
-        list_del(&e2);
-        list.prev = &e1;
-        vmx_test_list(&list, &e1, &e2, &e3);
-}
-
-Sean Christopherson (3):
-  KVM: VMX: Always VMCLEAR in-use VMCSes during crash with kexec support
-  KVM: VMX: Fold loaded_vmcs_init() into alloc_loaded_vmcs()
-  KVM: VMX: Gracefully handle faults on VMXON
-
- arch/x86/kvm/vmx/vmx.c | 103 ++++++++++++++++-------------------------
- arch/x86/kvm/vmx/vmx.h |   1 -
- 2 files changed, 40 insertions(+), 64 deletions(-)
-
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 07299a957d4a..efaca09455bf 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -663,43 +663,15 @@ void loaded_vmcs_init(struct loaded_vmcs *loaded_vmcs)
+ }
+ 
+ #ifdef CONFIG_KEXEC_CORE
+-/*
+- * This bitmap is used to indicate whether the vmclear
+- * operation is enabled on all cpus. All disabled by
+- * default.
+- */
+-static cpumask_t crash_vmclear_enabled_bitmap = CPU_MASK_NONE;
+-
+-static inline void crash_enable_local_vmclear(int cpu)
+-{
+-	cpumask_set_cpu(cpu, &crash_vmclear_enabled_bitmap);
+-}
+-
+-static inline void crash_disable_local_vmclear(int cpu)
+-{
+-	cpumask_clear_cpu(cpu, &crash_vmclear_enabled_bitmap);
+-}
+-
+-static inline int crash_local_vmclear_enabled(int cpu)
+-{
+-	return cpumask_test_cpu(cpu, &crash_vmclear_enabled_bitmap);
+-}
+-
+ static void crash_vmclear_local_loaded_vmcss(void)
+ {
+ 	int cpu = raw_smp_processor_id();
+ 	struct loaded_vmcs *v;
+ 
+-	if (!crash_local_vmclear_enabled(cpu))
+-		return;
+-
+ 	list_for_each_entry(v, &per_cpu(loaded_vmcss_on_cpu, cpu),
+ 			    loaded_vmcss_on_cpu_link)
+ 		vmcs_clear(v->vmcs);
+ }
+-#else
+-static inline void crash_enable_local_vmclear(int cpu) { }
+-static inline void crash_disable_local_vmclear(int cpu) { }
+ #endif /* CONFIG_KEXEC_CORE */
+ 
+ static void __loaded_vmcs_clear(void *arg)
+@@ -711,19 +683,24 @@ static void __loaded_vmcs_clear(void *arg)
+ 		return; /* vcpu migration can race with cpu offline */
+ 	if (per_cpu(current_vmcs, cpu) == loaded_vmcs->vmcs)
+ 		per_cpu(current_vmcs, cpu) = NULL;
+-	crash_disable_local_vmclear(cpu);
++
++	vmcs_clear(loaded_vmcs->vmcs);
++	if (loaded_vmcs->shadow_vmcs && loaded_vmcs->launched)
++		vmcs_clear(loaded_vmcs->shadow_vmcs);
++
+ 	list_del(&loaded_vmcs->loaded_vmcss_on_cpu_link);
+ 
+ 	/*
+-	 * we should ensure updating loaded_vmcs->loaded_vmcss_on_cpu_link
+-	 * is before setting loaded_vmcs->vcpu to -1 which is done in
+-	 * loaded_vmcs_init. Otherwise, other cpu can see vcpu = -1 fist
+-	 * then adds the vmcs into percpu list before it is deleted.
++	 * Ensure all writes to loaded_vmcs, including deleting it from its
++	 * current percpu list, complete before setting loaded_vmcs->vcpu to
++	 * -1, otherwise a different cpu can see vcpu == -1 first and add
++	 * loaded_vmcs to its percpu list before it's deleted from this cpu's
++	 * list. Pairs with the smp_rmb() in vmx_vcpu_load_vmcs().
+ 	 */
+ 	smp_wmb();
+ 
+-	loaded_vmcs_init(loaded_vmcs);
+-	crash_enable_local_vmclear(cpu);
++	loaded_vmcs->cpu = -1;
++	loaded_vmcs->launched = 0;
+ }
+ 
+ void loaded_vmcs_clear(struct loaded_vmcs *loaded_vmcs)
+@@ -1342,18 +1319,17 @@ void vmx_vcpu_load_vmcs(struct kvm_vcpu *vcpu, int cpu)
+ 	if (!already_loaded) {
+ 		loaded_vmcs_clear(vmx->loaded_vmcs);
+ 		local_irq_disable();
+-		crash_disable_local_vmclear(cpu);
+ 
+ 		/*
+-		 * Read loaded_vmcs->cpu should be before fetching
+-		 * loaded_vmcs->loaded_vmcss_on_cpu_link.
+-		 * See the comments in __loaded_vmcs_clear().
++		 * Ensure loaded_vmcs->cpu is read before adding loaded_vmcs to
++		 * this cpu's percpu list, otherwise it may not yet be deleted
++		 * from its previous cpu's percpu list.  Pairs with the
++		 * smb_wmb() in __loaded_vmcs_clear().
+ 		 */
+ 		smp_rmb();
+ 
+ 		list_add(&vmx->loaded_vmcs->loaded_vmcss_on_cpu_link,
+ 			 &per_cpu(loaded_vmcss_on_cpu, cpu));
+-		crash_enable_local_vmclear(cpu);
+ 		local_irq_enable();
+ 	}
+ 
+@@ -2279,17 +2255,6 @@ static int hardware_enable(void)
+ 	INIT_LIST_HEAD(&per_cpu(blocked_vcpu_on_cpu, cpu));
+ 	spin_lock_init(&per_cpu(blocked_vcpu_on_cpu_lock, cpu));
+ 
+-	/*
+-	 * Now we can enable the vmclear operation in kdump
+-	 * since the loaded_vmcss_on_cpu list on this cpu
+-	 * has been initialized.
+-	 *
+-	 * Though the cpu is not in VMX operation now, there
+-	 * is no problem to enable the vmclear operation
+-	 * for the loaded_vmcss_on_cpu list is empty!
+-	 */
+-	crash_enable_local_vmclear(cpu);
+-
+ 	kvm_cpu_vmxon(phys_addr);
+ 	if (enable_ept)
+ 		ept_sync_global();
 -- 
 2.24.1
 
