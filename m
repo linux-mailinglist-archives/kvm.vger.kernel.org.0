@@ -2,33 +2,33 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id BDEDE18EAB5
-	for <lists+kvm@lfdr.de>; Sun, 22 Mar 2020 18:21:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7865918EB63
+	for <lists+kvm@lfdr.de>; Sun, 22 Mar 2020 19:11:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726666AbgCVRVS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 22 Mar 2020 13:21:18 -0400
-Received: from mga02.intel.com ([134.134.136.20]:62728 "EHLO mga02.intel.com"
+        id S1726710AbgCVSLb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 22 Mar 2020 14:11:31 -0400
+Received: from mga14.intel.com ([192.55.52.115]:48547 "EHLO mga14.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725985AbgCVRVR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 22 Mar 2020 13:21:17 -0400
-IronPort-SDR: +OP+jfDmzKHR7mUNy5Xdr99+1zw1XYZMLfFpWjfJn1YKe97mQ50k8AX9LvaLBPyRYBiDkKhkEa
- pN/LHqld8PdQ==
+        id S1725785AbgCVSLb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 22 Mar 2020 14:11:31 -0400
+IronPort-SDR: QOhWpGQo0V/5nBbNEoNx3KWrf8m2JSCM0gjpwwFqu91wr/NmMVwaJoUlnPW7nkis7wlXpoQyIk
+ rxxf/Ps7D32g==
 X-Amp-Result: UNKNOWN
 X-Amp-Original-Verdict: FILE UNKNOWN
 X-Amp-File-Uploaded: False
 Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Mar 2020 10:21:12 -0700
-IronPort-SDR: yhRGqY/McD2RLOvnanOWIUv/ZM0gHtGEufkIIUSRghc1w5oTvjQolubwx5BO29Vyj1q0UFuFZC
- u+kbxSDOdBLQ==
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Mar 2020 11:11:27 -0700
+IronPort-SDR: qJmDP2f4XNkSc3xnrCrz40yX+4zxaUNsdnGUHo3vGT9BOOL2fBSCybx44W03i5qa4XufV7b/iv
+ MfF/38HskDCA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.72,293,1580803200"; 
-   d="gz'50?scan'50,208,50";a="269634594"
+   d="gz'50?scan'50,208,50";a="269641629"
 Received: from lkp-server01.sh.intel.com (HELO lkp-server01) ([10.239.97.150])
-  by fmsmga004.fm.intel.com with ESMTP; 22 Mar 2020 10:21:07 -0700
+  by fmsmga004.fm.intel.com with ESMTP; 22 Mar 2020 11:11:22 -0700
 Received: from kbuild by lkp-server01 with local (Exim 4.89)
         (envelope-from <lkp@intel.com>)
-        id 1jG4Ha-0008Gd-Ue; Mon, 23 Mar 2020 01:21:06 +0800
-Date:   Mon, 23 Mar 2020 01:20:56 +0800
+        id 1jG54E-0000Hx-3H; Mon, 23 Mar 2020 02:11:22 +0800
+Date:   Mon, 23 Mar 2020 02:10:55 +0800
 From:   kbuild test robot <lkp@intel.com>
 To:     "Liu, Yi L" <yi.l.liu@intel.com>
 Cc:     kbuild-all@lists.01.org, alex.williamson@redhat.com,
@@ -38,14 +38,13 @@ Cc:     kbuild-all@lists.01.org, alex.williamson@redhat.com,
         yi.y.sun@intel.com, jean-philippe@linaro.org, peterx@redhat.com,
         iommu@lists.linux-foundation.org, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org, hao.wu@intel.com
-Subject: Re: [PATCH v1 2/8] vfio/type1: Add vfio_iommu_type1 parameter for
- quota tuning
-Message-ID: <202003230148.4Wl4xvVM%lkp@intel.com>
-References: <1584880325-10561-3-git-send-email-yi.l.liu@intel.com>
+Subject: Re: [PATCH v1 6/8] vfio/type1: Bind guest page tables to host
+Message-ID: <202003230231.zWRABTJF%lkp@intel.com>
+References: <1584880325-10561-7-git-send-email-yi.l.liu@intel.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="6c2NcOVqGQ03X4Wi"
+Content-Type: multipart/mixed; boundary="vkogqOf2sHV7VnPd"
 Content-Disposition: inline
-In-Reply-To: <1584880325-10561-3-git-send-email-yi.l.liu@intel.com>
+In-Reply-To: <1584880325-10561-7-git-send-email-yi.l.liu@intel.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
@@ -53,7 +52,7 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
---6c2NcOVqGQ03X4Wi
+--vkogqOf2sHV7VnPd
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 
@@ -82,172 +81,248 @@ Reported-by: kbuild test robot <lkp@intel.com>
 
 All errors (new ones prefixed by >>):
 
-   drivers/vfio/vfio.c: In function 'vfio_create_mm':
-   drivers/vfio/vfio.c:2149:8: error: implicit declaration of function 'ioasid_alloc_set'; did you mean 'ioasid_alloc'? [-Werror=implicit-function-declaration]
-    2149 |  ret = ioasid_alloc_set((struct ioasid_set *) mm,
-         |        ^~~~~~~~~~~~~~~~
-         |        ioasid_alloc
-   drivers/vfio/vfio.c:2158:13: warning: assignment to 'long long unsigned int' from 'struct mm_struct *' makes integer from pointer without a cast [-Wint-conversion]
-    2158 |  token->val = mm;
-         |             ^
-   drivers/vfio/vfio.c: In function 'vfio_mm_unlock_and_free':
-   drivers/vfio/vfio.c:2170:2: error: implicit declaration of function 'ioasid_free_set'; did you mean 'ioasid_free'? [-Werror=implicit-function-declaration]
-    2170 |  ioasid_free_set(vmm->ioasid_sid, true);
-         |  ^~~~~~~~~~~~~~~
-         |  ioasid_free
-   drivers/vfio/vfio.c: In function 'vfio_mm_pasid_alloc':
->> drivers/vfio/vfio.c:2230:3: error: implicit declaration of function 'ioasid_adjust_set' [-Werror=implicit-function-declaration]
-    2230 |   ioasid_adjust_set(vmm->ioasid_sid, quota);
-         |   ^~~~~~~~~~~~~~~~~
-   drivers/vfio/vfio.c:2233:26: warning: passing argument 1 of 'ioasid_alloc' makes pointer from integer without a cast [-Wint-conversion]
-    2233 |  pasid = ioasid_alloc(vmm->ioasid_sid, min, max, NULL);
-         |                       ~~~^~~~~~~~~~~~
-         |                          |
-         |                          int
-   In file included from include/linux/iommu.h:16,
-                    from drivers/vfio/vfio.c:20:
-   include/linux/ioasid.h:45:56: note: expected 'struct ioasid_set *' but argument is of type 'int'
-      45 | static inline ioasid_t ioasid_alloc(struct ioasid_set *set, ioasid_t min,
-         |                                     ~~~~~~~~~~~~~~~~~~~^~~
-   drivers/vfio/vfio.c: In function 'vfio_mm_pasid_free':
-   drivers/vfio/vfio.c:2252:25: warning: passing argument 1 of 'ioasid_find' makes pointer from integer without a cast [-Wint-conversion]
-    2252 |  pdata = ioasid_find(vmm->ioasid_sid, pasid, NULL);
-         |                      ~~~^~~~~~~~~~~~
-         |                         |
-         |                         int
-   In file included from include/linux/iommu.h:16,
-                    from drivers/vfio/vfio.c:20:
-   include/linux/ioasid.h:55:52: note: expected 'struct ioasid_set *' but argument is of type 'int'
-      55 | static inline void *ioasid_find(struct ioasid_set *set, ioasid_t ioasid,
-         |                                 ~~~~~~~~~~~~~~~~~~~^~~
+   drivers/vfio/vfio_iommu_type1.c: In function 'vfio_iommu_get_stage1_format':
+   drivers/vfio/vfio_iommu_type1.c:2300:4: error: 'DOMAIN_ATTR_PASID_FORMAT' undeclared (first use in this function)
+    2300 |    DOMAIN_ATTR_PASID_FORMAT, &format)) {
+         |    ^~~~~~~~~~~~~~~~~~~~~~~~
+   drivers/vfio/vfio_iommu_type1.c:2300:4: note: each undeclared identifier is reported only once for each function it appears in
+   drivers/vfio/vfio_iommu_type1.c: In function 'vfio_iommu_type1_ioctl':
+   drivers/vfio/vfio_iommu_type1.c:2464:11: error: implicit declaration of function 'iommu_get_uapi_version' [-Werror=implicit-function-declaration]
+    2464 |    return iommu_get_uapi_version();
+         |           ^~~~~~~~~~~~~~~~~~~~~~
+>> drivers/vfio/vfio_iommu_type1.c:2626:15: error: implicit declaration of function 'iommu_uapi_get_data_size' [-Werror=implicit-function-declaration]
+    2626 |   data_size = iommu_uapi_get_data_size(
+         |               ^~~~~~~~~~~~~~~~~~~~~~~~
+>> drivers/vfio/vfio_iommu_type1.c:2627:5: error: 'IOMMU_UAPI_BIND_GPASID' undeclared (first use in this function)
+    2627 |     IOMMU_UAPI_BIND_GPASID, version);
+         |     ^~~~~~~~~~~~~~~~~~~~~~
    cc1: some warnings being treated as errors
 
-vim +/ioasid_adjust_set +2230 drivers/vfio/vfio.c
+vim +/iommu_uapi_get_data_size +2626 drivers/vfio/vfio_iommu_type1.c
 
-  2133	
-  2134	/**
-  2135	 * VFIO_MM objects - create, release, get, put, search
-  2136	 * Caller of the function should have held vfio.vfio_mm_lock.
-  2137	 */
-  2138	static struct vfio_mm *vfio_create_mm(struct mm_struct *mm)
-  2139	{
-  2140		struct vfio_mm *vmm;
-  2141		struct vfio_mm_token *token;
-  2142		int ret = 0;
-  2143	
-  2144		vmm = kzalloc(sizeof(*vmm), GFP_KERNEL);
-  2145		if (!vmm)
-  2146			return ERR_PTR(-ENOMEM);
-  2147	
-  2148		/* Per mm IOASID set used for quota control and group operations */
-  2149		ret = ioasid_alloc_set((struct ioasid_set *) mm,
-  2150				       VFIO_DEFAULT_PASID_QUOTA, &vmm->ioasid_sid);
-  2151		if (ret) {
-  2152			kfree(vmm);
-  2153			return ERR_PTR(ret);
-  2154		}
-  2155	
-  2156		kref_init(&vmm->kref);
-  2157		token = &vmm->token;
-> 2158		token->val = mm;
-  2159		vmm->pasid_quota = VFIO_DEFAULT_PASID_QUOTA;
-  2160		mutex_init(&vmm->pasid_lock);
-  2161	
-  2162		list_add(&vmm->vfio_next, &vfio.vfio_mm_list);
-  2163	
-  2164		return vmm;
-  2165	}
-  2166	
-  2167	static void vfio_mm_unlock_and_free(struct vfio_mm *vmm)
-  2168	{
-  2169		/* destroy the ioasid set */
-  2170		ioasid_free_set(vmm->ioasid_sid, true);
-  2171		mutex_unlock(&vfio.vfio_mm_lock);
-  2172		kfree(vmm);
-  2173	}
-  2174	
-  2175	/* called with vfio.vfio_mm_lock held */
-  2176	static void vfio_mm_release(struct kref *kref)
-  2177	{
-  2178		struct vfio_mm *vmm = container_of(kref, struct vfio_mm, kref);
-  2179	
-  2180		list_del(&vmm->vfio_next);
-  2181		vfio_mm_unlock_and_free(vmm);
-  2182	}
-  2183	
-  2184	void vfio_mm_put(struct vfio_mm *vmm)
-  2185	{
-  2186		kref_put_mutex(&vmm->kref, vfio_mm_release, &vfio.vfio_mm_lock);
-  2187	}
-  2188	EXPORT_SYMBOL_GPL(vfio_mm_put);
-  2189	
-  2190	/* Assume vfio_mm_lock or vfio_mm reference is held */
-  2191	static void vfio_mm_get(struct vfio_mm *vmm)
-  2192	{
-  2193		kref_get(&vmm->kref);
-  2194	}
-  2195	
-  2196	struct vfio_mm *vfio_mm_get_from_task(struct task_struct *task)
-  2197	{
-  2198		struct mm_struct *mm = get_task_mm(task);
-  2199		struct vfio_mm *vmm;
-  2200		unsigned long long val = (unsigned long long) mm;
-  2201	
-  2202		mutex_lock(&vfio.vfio_mm_lock);
-  2203		list_for_each_entry(vmm, &vfio.vfio_mm_list, vfio_next) {
-  2204			if (vmm->token.val == val) {
-  2205				vfio_mm_get(vmm);
-  2206				goto out;
-  2207			}
-  2208		}
-  2209	
-  2210		vmm = vfio_create_mm(mm);
-  2211		if (IS_ERR(vmm))
-  2212			vmm = NULL;
-  2213	out:
-  2214		mutex_unlock(&vfio.vfio_mm_lock);
-  2215		mmput(mm);
-  2216		return vmm;
-  2217	}
-  2218	EXPORT_SYMBOL_GPL(vfio_mm_get_from_task);
-  2219	
-  2220	int vfio_mm_pasid_alloc(struct vfio_mm *vmm, int quota, int min, int max)
-  2221	{
-  2222		ioasid_t pasid;
-  2223		int ret = -ENOSPC;
-  2224	
-  2225		mutex_lock(&vmm->pasid_lock);
-  2226	
-  2227		/* update quota as it is tunable by admin */
-  2228		if (vmm->pasid_quota != quota) {
-  2229			vmm->pasid_quota = quota;
-> 2230			ioasid_adjust_set(vmm->ioasid_sid, quota);
-  2231		}
-  2232	
-  2233		pasid = ioasid_alloc(vmm->ioasid_sid, min, max, NULL);
-  2234		if (pasid == INVALID_IOASID) {
-  2235			ret = -ENOSPC;
-  2236			goto out_unlock;
-  2237		}
-  2238	
-  2239		ret = pasid;
-  2240	out_unlock:
-  2241		mutex_unlock(&vmm->pasid_lock);
-  2242		return ret;
-  2243	}
-  2244	EXPORT_SYMBOL_GPL(vfio_mm_pasid_alloc);
-  2245	
+  2446	
+  2447	static long vfio_iommu_type1_ioctl(void *iommu_data,
+  2448					   unsigned int cmd, unsigned long arg)
+  2449	{
+  2450		struct vfio_iommu *iommu = iommu_data;
+  2451		unsigned long minsz;
+  2452	
+  2453		if (cmd == VFIO_CHECK_EXTENSION) {
+  2454			switch (arg) {
+  2455			case VFIO_TYPE1_IOMMU:
+  2456			case VFIO_TYPE1v2_IOMMU:
+  2457			case VFIO_TYPE1_NESTING_IOMMU:
+  2458				return 1;
+  2459			case VFIO_DMA_CC_IOMMU:
+  2460				if (!iommu)
+  2461					return 0;
+  2462				return vfio_domains_have_iommu_cache(iommu);
+  2463			case VFIO_NESTING_IOMMU_UAPI:
+  2464				return iommu_get_uapi_version();
+  2465			default:
+  2466				return 0;
+  2467			}
+  2468		} else if (cmd == VFIO_IOMMU_GET_INFO) {
+  2469			struct vfio_iommu_type1_info info;
+  2470			struct vfio_info_cap caps = { .buf = NULL, .size = 0 };
+  2471			unsigned long capsz;
+  2472			int ret;
+  2473	
+  2474			minsz = offsetofend(struct vfio_iommu_type1_info, iova_pgsizes);
+  2475	
+  2476			/* For backward compatibility, cannot require this */
+  2477			capsz = offsetofend(struct vfio_iommu_type1_info, cap_offset);
+  2478	
+  2479			if (copy_from_user(&info, (void __user *)arg, minsz))
+  2480				return -EFAULT;
+  2481	
+  2482			if (info.argsz < minsz)
+  2483				return -EINVAL;
+  2484	
+  2485			if (info.argsz >= capsz) {
+  2486				minsz = capsz;
+  2487				info.cap_offset = 0; /* output, no-recopy necessary */
+  2488			}
+  2489	
+  2490			info.flags = VFIO_IOMMU_INFO_PGSIZES;
+  2491	
+  2492			info.iova_pgsizes = vfio_pgsize_bitmap(iommu);
+  2493	
+  2494			ret = vfio_iommu_iova_build_caps(iommu, &caps);
+  2495			if (ret)
+  2496				return ret;
+  2497	
+  2498			ret = vfio_iommu_info_add_nesting_cap(iommu, &caps);
+  2499			if (ret)
+  2500				return ret;
+  2501	
+  2502			if (caps.size) {
+  2503				info.flags |= VFIO_IOMMU_INFO_CAPS;
+  2504	
+  2505				if (info.argsz < sizeof(info) + caps.size) {
+  2506					info.argsz = sizeof(info) + caps.size;
+  2507				} else {
+  2508					vfio_info_cap_shift(&caps, sizeof(info));
+  2509					if (copy_to_user((void __user *)arg +
+  2510							sizeof(info), caps.buf,
+  2511							caps.size)) {
+  2512						kfree(caps.buf);
+  2513						return -EFAULT;
+  2514					}
+  2515					info.cap_offset = sizeof(info);
+  2516				}
+  2517	
+  2518				kfree(caps.buf);
+  2519			}
+  2520	
+  2521			return copy_to_user((void __user *)arg, &info, minsz) ?
+  2522				-EFAULT : 0;
+  2523	
+  2524		} else if (cmd == VFIO_IOMMU_MAP_DMA) {
+  2525			struct vfio_iommu_type1_dma_map map;
+  2526			uint32_t mask = VFIO_DMA_MAP_FLAG_READ |
+  2527					VFIO_DMA_MAP_FLAG_WRITE;
+  2528	
+  2529			minsz = offsetofend(struct vfio_iommu_type1_dma_map, size);
+  2530	
+  2531			if (copy_from_user(&map, (void __user *)arg, minsz))
+  2532				return -EFAULT;
+  2533	
+  2534			if (map.argsz < minsz || map.flags & ~mask)
+  2535				return -EINVAL;
+  2536	
+  2537			return vfio_dma_do_map(iommu, &map);
+  2538	
+  2539		} else if (cmd == VFIO_IOMMU_UNMAP_DMA) {
+  2540			struct vfio_iommu_type1_dma_unmap unmap;
+  2541			long ret;
+  2542	
+  2543			minsz = offsetofend(struct vfio_iommu_type1_dma_unmap, size);
+  2544	
+  2545			if (copy_from_user(&unmap, (void __user *)arg, minsz))
+  2546				return -EFAULT;
+  2547	
+  2548			if (unmap.argsz < minsz || unmap.flags)
+  2549				return -EINVAL;
+  2550	
+  2551			ret = vfio_dma_do_unmap(iommu, &unmap);
+  2552			if (ret)
+  2553				return ret;
+  2554	
+  2555			return copy_to_user((void __user *)arg, &unmap, minsz) ?
+  2556				-EFAULT : 0;
+  2557	
+  2558		} else if (cmd == VFIO_IOMMU_PASID_REQUEST) {
+  2559			struct vfio_iommu_type1_pasid_request req;
+  2560			unsigned long offset;
+  2561	
+  2562			minsz = offsetofend(struct vfio_iommu_type1_pasid_request,
+  2563					    flags);
+  2564	
+  2565			if (copy_from_user(&req, (void __user *)arg, minsz))
+  2566				return -EFAULT;
+  2567	
+  2568			if (req.argsz < minsz ||
+  2569			    !vfio_iommu_type1_pasid_req_valid(req.flags))
+  2570				return -EINVAL;
+  2571	
+  2572			if (copy_from_user((void *)&req + minsz,
+  2573					   (void __user *)arg + minsz,
+  2574					   sizeof(req) - minsz))
+  2575				return -EFAULT;
+  2576	
+  2577			switch (req.flags & VFIO_PASID_REQUEST_MASK) {
+  2578			case VFIO_IOMMU_PASID_ALLOC:
+  2579			{
+  2580				int ret = 0, result;
+  2581	
+  2582				result = vfio_iommu_type1_pasid_alloc(iommu,
+  2583								req.alloc_pasid.min,
+  2584								req.alloc_pasid.max);
+  2585				if (result > 0) {
+  2586					offset = offsetof(
+  2587						struct vfio_iommu_type1_pasid_request,
+  2588						alloc_pasid.result);
+  2589					ret = copy_to_user(
+  2590						      (void __user *) (arg + offset),
+  2591						      &result, sizeof(result));
+  2592				} else {
+  2593					pr_debug("%s: PASID alloc failed\n", __func__);
+  2594					ret = -EFAULT;
+  2595				}
+  2596				return ret;
+  2597			}
+  2598			case VFIO_IOMMU_PASID_FREE:
+  2599				return vfio_iommu_type1_pasid_free(iommu,
+  2600								   req.free_pasid);
+  2601			default:
+  2602				return -EINVAL;
+  2603			}
+  2604	
+  2605		} else if (cmd == VFIO_IOMMU_BIND) {
+  2606			struct vfio_iommu_type1_bind bind;
+  2607			u32 version;
+  2608			int data_size;
+  2609			void *gbind_data;
+  2610			int ret;
+  2611	
+  2612			minsz = offsetofend(struct vfio_iommu_type1_bind, flags);
+  2613	
+  2614			if (copy_from_user(&bind, (void __user *)arg, minsz))
+  2615				return -EFAULT;
+  2616	
+  2617			if (bind.argsz < minsz)
+  2618				return -EINVAL;
+  2619	
+  2620			/* Get the version of struct iommu_gpasid_bind_data */
+  2621			if (copy_from_user(&version,
+  2622				(void __user *) (arg + minsz),
+  2623						sizeof(version)))
+  2624				return -EFAULT;
+  2625	
+> 2626			data_size = iommu_uapi_get_data_size(
+> 2627					IOMMU_UAPI_BIND_GPASID, version);
+  2628			gbind_data = kzalloc(data_size, GFP_KERNEL);
+  2629			if (!gbind_data)
+  2630				return -ENOMEM;
+  2631	
+  2632			if (copy_from_user(gbind_data,
+  2633				 (void __user *) (arg + minsz), data_size)) {
+  2634				kfree(gbind_data);
+  2635				return -EFAULT;
+  2636			}
+  2637	
+  2638			switch (bind.flags & VFIO_IOMMU_BIND_MASK) {
+  2639			case VFIO_IOMMU_BIND_GUEST_PGTBL:
+  2640				ret = vfio_iommu_type1_bind_gpasid(iommu,
+  2641								   gbind_data);
+  2642				break;
+  2643			case VFIO_IOMMU_UNBIND_GUEST_PGTBL:
+  2644				ret = vfio_iommu_type1_unbind_gpasid(iommu,
+  2645								     gbind_data);
+  2646				break;
+  2647			default:
+  2648				ret = -EINVAL;
+  2649				break;
+  2650			}
+  2651			kfree(gbind_data);
+  2652			return ret;
+  2653		}
+  2654	
+  2655		return -ENOTTY;
+  2656	}
+  2657	
 
 ---
 0-DAY CI Kernel Test Service, Intel Corporation
 https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
 
---6c2NcOVqGQ03X4Wi
+--vkogqOf2sHV7VnPd
 Content-Type: application/gzip
 Content-Disposition: attachment; filename=".config.gz"
 Content-Transfer-Encoding: base64
 
-H4sICOyTd14AAy5jb25maWcAnDzZcty2su/5iqnkJalT8ZlNsnJv6QEEQQ4y3AyAMyO/sCby
+H4sICC+cd14AAy5jb25maWcAnDzZcty2su/5iqnkJalT8ZlNsnJv6QEEQQ4y3AyAMyO/sCby
 2FHFknxGUhL//ekGuAAgqPjelJN4uht7o3fwh+9+mJGX58f74/Pd7fHz56+zT6eH0/n4fPow
 +3j3+fS/s7icFaWasZirN0Cc3T28/P3v4/n+cj27eHPxZv7z+fZitj2dH06fZ/Tx4ePdpxdo
 fvf48N0P38GfHwB4/wV6Ov/P7Hg83/5+uf75M/bx86fb29mPKaU/zX55s3wzB1paFglPG0ob
@@ -1109,4 +1184,4 @@ R2E4Si0uiNOFMWpcmzZw78wseCgak6FZ4uccmo7XM0R+XYT1Wz15RGQG83X1ClZzy48oixU8
 u8S7/YwhKxPswhAMEe5tkdUFqZ8zC6VrDc7MJ+wYNgTJ6cXhpG8mykLOUARJqFgQYc5+BNZA
 gK32nYwRDJggwLA9arOcfJKmqV3+/we9bmBCjyQDAA==
 
---6c2NcOVqGQ03X4Wi--
+--vkogqOf2sHV7VnPd--
