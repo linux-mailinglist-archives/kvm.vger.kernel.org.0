@@ -2,85 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 12FC218E91E
-	for <lists+kvm@lfdr.de>; Sun, 22 Mar 2020 14:26:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 64DA318E923
+	for <lists+kvm@lfdr.de>; Sun, 22 Mar 2020 14:29:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725971AbgCVN00 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 22 Mar 2020 09:26:26 -0400
-Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21125 "EHLO
-        sender4-of-o51.zoho.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725881AbgCVN00 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 22 Mar 2020 09:26:26 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1584883560; cv=none; 
-        d=zohomail.com; s=zohoarc; 
-        b=PUA2rav7S464oaj27BsBRp71D1qRUXFbRLRSRvYU169HOSVXE3B5ZhAH6ft2uZWZF+poPKyGizITaFCQxzP/DvIK0bEqEckuAXXzqBvB37wa1kA3uYmVZhGoh6I/Oiu+y4N8liPz7fKFiHSPnV3necyCHt/KNJIkOjMMrJStMt8=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-        t=1584883560; h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To; 
-        bh=XkVQVYMwoMmya8jsH4/MrXVATQWsBdeWppgcbaofbYc=; 
-        b=Fri8IlmYIY4TFfz64pTjbFetWslTSXubWly3uTG18r6M8deocUGVS03+z/p31rvbSbav/vmgcyaBbWENZxtA1xyutiaTU09UCA1bASeAVyXiem0zfJMltRNa3bLpFDwq7I3hN6lMWnUu7f6gr80k3IznRqrCVnj4tUsE9qXFGEU=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-        spf=pass  smtp.mailfrom=no-reply@patchew.org;
-        dmarc=pass header.from=<no-reply@patchew.org> header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by mx.zohomail.com
-        with SMTPS id 1584883557386510.8700688990451; Sun, 22 Mar 2020 06:25:57 -0700 (PDT)
-In-Reply-To: <1584880579-12178-1-git-send-email-yi.l.liu@intel.com>
-Subject: Re: [PATCH v1 00/22] intel_iommu: expose Shared Virtual Addressing to VMs
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <158488355518.31203.1202436273292692388@39012742ff91>
+        id S1726748AbgCVN3E (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 22 Mar 2020 09:29:04 -0400
+Received: from mail-io1-f71.google.com ([209.85.166.71]:37431 "EHLO
+        mail-io1-f71.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725970AbgCVN3D (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 22 Mar 2020 09:29:03 -0400
+Received: by mail-io1-f71.google.com with SMTP id p4so9079450ioo.4
+        for <kvm@vger.kernel.org>; Sun, 22 Mar 2020 06:29:03 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
+         :from:to;
+        bh=jmLK9Nx0sV4n9spz6FizKEO/UiXLat+guCFQpWcvF0A=;
+        b=O8NRmQxLIXjwH/w8jcqtIKUBIVZV5mkBusngBDj+UOU5CEHgtnrmdONJp9jLDh7Jog
+         IX61miwuFbaQdBpYP8fj6ZD5AKcUToMknZIzlZMSgoD+w+q7bq+mqvYff8jOOF7+xJhI
+         HYutpk0DBApQ5UonGcHmMLx0shx2PqKX8btsJ9HBcKH4G/NXyyNDj2koMUtSH2y9gGGg
+         ZtcR+1g5IDwUuLkGOsp10zXjQo19pK+ZPEm7LOaBqGrTO7i6YgA3D7TLeJCrf5tFMhI2
+         n6a+ZLjlrS7cjQcfLNoXa1q0K82E9CtleTaCoVrOdWFPGjEHfBzngIw9q6dCnVW0ghGT
+         XzEg==
+X-Gm-Message-State: ANhLgQ1xPGCGndtVXZ6H/BO/9D/6JnW4mszH8tlx4iev1umYQ9uDgSgX
+        792pZFGu6bilMH7KX7GXEPRwNUcpqGYCsDUtD+5FBITzN5Rj
+X-Google-Smtp-Source: ADFU+vuxGqce5HdcWsT4uwnV72WS992615JlGUhT5JCgdY61XjgcaVQW8M8Cui/rAj31oWjxi4kC07HBUM/mm6t6pOUvYSxhRcSr
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From:   no-reply@patchew.org
-To:     yi.l.liu@intel.com
-Cc:     qemu-devel@nongnu.org, alex.williamson@redhat.com,
-        peterx@redhat.com, jean-philippe@linaro.org, kevin.tian@intel.com,
-        yi.l.liu@intel.com, kvm@vger.kernel.org, mst@redhat.com,
-        jun.j.tian@intel.com, eric.auger@redhat.com, yi.y.sun@intel.com,
-        pbonzini@redhat.com, hao.wu@intel.com, david@gibson.dropbear.id.au
-Date:   Sun, 22 Mar 2020 06:25:57 -0700 (PDT)
-X-ZohoMailClient: External
+X-Received: by 2002:a05:6638:398:: with SMTP id y24mr5155770jap.125.1584883742893;
+ Sun, 22 Mar 2020 06:29:02 -0700 (PDT)
+Date:   Sun, 22 Mar 2020 06:29:02 -0700
+In-Reply-To: <000000000000277a0405a16bd5c9@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000008172fe05a17180aa@google.com>
+Subject: Re: BUG: unable to handle kernel NULL pointer dereference in handle_external_interrupt_irqoff
+From:   syzbot <syzbot+3f29ca2efb056a761e38@syzkaller.appspotmail.com>
+To:     bp@alien8.de, clang-built-linux@googlegroups.com,
+        davem@davemloft.net, dhowells@redhat.com, dvyukov@google.com,
+        hpa@zytor.com, jmattson@google.com, joro@8bytes.org,
+        kuba@kernel.org, kvm@vger.kernel.org,
+        linux-afs@lists.infradead.org, linux-kernel@vger.kernel.org,
+        mingo@redhat.com, netdev@vger.kernel.org, pbonzini@redhat.com,
+        sean.j.christopherson@intel.com, syzkaller-bugs@googlegroups.com,
+        tglx@linutronix.de, vkuznets@redhat.com, wanpengli@tencent.com,
+        x86@kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTg0ODgwNTc5LTEyMTc4LTEt
-Z2l0LXNlbmQtZW1haWwteWkubC5saXVAaW50ZWwuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZh
-aWxlZCB0aGUgZG9ja2VyLW1pbmd3QGZlZG9yYSBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUg
-dGVzdGluZyBjb21tYW5kcyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2Nr
-ZXIgaW5zdGFsbGVkLCB5b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09
-IFRFU1QgU0NSSVBUIEJFR0lOID09PQojISAvYmluL2Jhc2gKZXhwb3J0IEFSQ0g9eDg2XzY0Cm1h
-a2UgZG9ja2VyLWltYWdlLWZlZG9yYSBWPTEgTkVUV09SSz0xCnRpbWUgbWFrZSBkb2NrZXItdGVz
-dC1taW5nd0BmZWRvcmEgSj0xNCBORVRXT1JLPTEKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KCiAg
-ICAgICAgICAgICAgICAgZnJvbSAvdG1wL3FlbXUtdGVzdC9zcmMvaW5jbHVkZS9ody9wY2kvcGNp
-X2J1cy5oOjQsCiAgICAgICAgICAgICAgICAgZnJvbSAvdG1wL3FlbXUtdGVzdC9zcmMvaW5jbHVk
-ZS9ody9wY2ktaG9zdC9pNDQwZnguaDoxNSwKICAgICAgICAgICAgICAgICBmcm9tIC90bXAvcWVt
-dS10ZXN0L3NyYy9zdHVicy9wY2ktaG9zdC1waWl4LmM6MjoKL3RtcC9xZW11LXRlc3Qvc3JjL2lu
-Y2x1ZGUvaHcvaW9tbXUvaG9zdF9pb21tdV9jb250ZXh0Lmg6Mjg6MTA6IGZhdGFsIGVycm9yOiBs
-aW51eC9pb21tdS5oOiBObyBzdWNoIGZpbGUgb3IgZGlyZWN0b3J5CiAjaW5jbHVkZSA8bGludXgv
-aW9tbXUuaD4KICAgICAgICAgIF5+fn5+fn5+fn5+fn5+fgpjb21waWxhdGlvbiB0ZXJtaW5hdGVk
-LgptYWtlOiAqKiogWy90bXAvcWVtdS10ZXN0L3NyYy9ydWxlcy5tYWs6Njk6IHN0dWJzL3BjaS1o
-b3N0LXBpaXgub10gRXJyb3IgMQptYWtlOiAqKiogV2FpdGluZyBmb3IgdW5maW5pc2hlZCBqb2Jz
-Li4uLgpUcmFjZWJhY2sgKG1vc3QgcmVjZW50IGNhbGwgbGFzdCk6CiAgRmlsZSAiLi90ZXN0cy9k
-b2NrZXIvZG9ja2VyLnB5IiwgbGluZSA2NjQsIGluIDxtb2R1bGU+Ci0tLQogICAgcmFpc2UgQ2Fs
-bGVkUHJvY2Vzc0Vycm9yKHJldGNvZGUsIGNtZCkKc3VicHJvY2Vzcy5DYWxsZWRQcm9jZXNzRXJy
-b3I6IENvbW1hbmQgJ1snc3VkbycsICctbicsICdkb2NrZXInLCAncnVuJywgJy0tbGFiZWwnLCAn
-Y29tLnFlbXUuaW5zdGFuY2UudXVpZD1mNDViNTNhMDFjOGE0NDZkYmE1MTIwZGE3YzNmNjNlMics
-ICctdScsICcxMDAzJywgJy0tc2VjdXJpdHktb3B0JywgJ3NlY2NvbXA9dW5jb25maW5lZCcsICct
-LXJtJywgJy1lJywgJ1RBUkdFVF9MSVNUPScsICctZScsICdFWFRSQV9DT05GSUdVUkVfT1BUUz0n
-LCAnLWUnLCAnVj0nLCAnLWUnLCAnSj0xNCcsICctZScsICdERUJVRz0nLCAnLWUnLCAnU0hPV19F
-TlY9JywgJy1lJywgJ0NDQUNIRV9ESVI9L3Zhci90bXAvY2NhY2hlJywgJy12JywgJy9ob21lL3Bh
-dGNoZXcyLy5jYWNoZS9xZW11LWRvY2tlci1jY2FjaGU6L3Zhci90bXAvY2NhY2hlOnonLCAnLXYn
-LCAnL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLWdxbXlwNnBlL3NyYy9kb2NrZXItc3JjLjIw
-MjAtMDMtMjItMDkuMjQuMTEuMTI2Mzg6L3Zhci90bXAvcWVtdTp6LHJvJywgJ3FlbXU6ZmVkb3Jh
-JywgJy92YXIvdG1wL3FlbXUvcnVuJywgJ3Rlc3QtbWluZ3cnXScgcmV0dXJuZWQgbm9uLXplcm8g
-ZXhpdCBzdGF0dXMgMi4KZmlsdGVyPS0tZmlsdGVyPWxhYmVsPWNvbS5xZW11Lmluc3RhbmNlLnV1
-aWQ9ZjQ1YjUzYTAxYzhhNDQ2ZGJhNTEyMGRhN2MzZjYzZTIKbWFrZVsxXTogKioqIFtkb2NrZXIt
-cnVuXSBFcnJvciAxCm1ha2VbMV06IExlYXZpbmcgZGlyZWN0b3J5IGAvdmFyL3RtcC9wYXRjaGV3
-LXRlc3Rlci10bXAtZ3FteXA2cGUvc3JjJwptYWtlOiAqKiogW2RvY2tlci1ydW4tdGVzdC1taW5n
-d0BmZWRvcmFdIEVycm9yIDIKCnJlYWwgICAgMW00My4zMDBzCnVzZXIgICAgMG04LjE4M3MKCgpU
-aGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzE1ODQ4
-ODA1NzktMTIxNzgtMS1naXQtc2VuZC1lbWFpbC15aS5sLmxpdUBpbnRlbC5jb20vdGVzdGluZy5k
-b2NrZXItbWluZ3dAZmVkb3JhLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0
-b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5k
-IHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+syzbot has bisected this bug to:
+
+commit f71dbf2fb28489a79bde0dca1c8adfb9cdb20a6b
+Author: David Howells <dhowells@redhat.com>
+Date:   Thu Jan 30 21:50:36 2020 +0000
+
+    rxrpc: Fix insufficient receive notification generation
+
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=1483bb19e00000
+start commit:   b74b991f Merge tag 'block-5.6-20200320' of git://git.kerne..
+git tree:       upstream
+final crash:    https://syzkaller.appspot.com/x/report.txt?x=1683bb19e00000
+console output: https://syzkaller.appspot.com/x/log.txt?x=1283bb19e00000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=6dfa02302d6db985
+dashboard link: https://syzkaller.appspot.com/bug?extid=3f29ca2efb056a761e38
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1199c0c5e00000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=15097373e00000
+
+Reported-by: syzbot+3f29ca2efb056a761e38@syzkaller.appspotmail.com
+Fixes: f71dbf2fb284 ("rxrpc: Fix insufficient receive notification generation")
+
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
