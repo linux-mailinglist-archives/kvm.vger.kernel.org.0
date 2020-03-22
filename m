@@ -2,33 +2,33 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 814CE18EA96
-	for <lists+kvm@lfdr.de>; Sun, 22 Mar 2020 17:45:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BDEDE18EAB5
+	for <lists+kvm@lfdr.de>; Sun, 22 Mar 2020 18:21:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726836AbgCVQpV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 22 Mar 2020 12:45:21 -0400
-Received: from mga12.intel.com ([192.55.52.136]:58405 "EHLO mga12.intel.com"
+        id S1726666AbgCVRVS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 22 Mar 2020 13:21:18 -0400
+Received: from mga02.intel.com ([134.134.136.20]:62728 "EHLO mga02.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725881AbgCVQpU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 22 Mar 2020 12:45:20 -0400
-IronPort-SDR: Dd+EN6SP3/+omeBrTI8e5wKYwyfb2kbuzwW79pCXqbsjNJvf4Qt/3euwPpikntylnkzZ7ocq6z
- 2EjmcuArJ6hA==
+        id S1725985AbgCVRVR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 22 Mar 2020 13:21:17 -0400
+IronPort-SDR: +OP+jfDmzKHR7mUNy5Xdr99+1zw1XYZMLfFpWjfJn1YKe97mQ50k8AX9LvaLBPyRYBiDkKhkEa
+ pN/LHqld8PdQ==
 X-Amp-Result: UNKNOWN
 X-Amp-Original-Verdict: FILE UNKNOWN
 X-Amp-File-Uploaded: False
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Mar 2020 09:45:05 -0700
-IronPort-SDR: 3OWjIMTnjASZnSYppHRG1mYrsclbN/C4j63OGrPyoT/TACrbKpW+KmNotkhTMetbfX8OlF+5MO
- WQeIxd6YocfA==
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Mar 2020 10:21:12 -0700
+IronPort-SDR: yhRGqY/McD2RLOvnanOWIUv/ZM0gHtGEufkIIUSRghc1w5oTvjQolubwx5BO29Vyj1q0UFuFZC
+ u+kbxSDOdBLQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.72,293,1580803200"; 
-   d="gz'50?scan'50,208,50";a="447169957"
+   d="gz'50?scan'50,208,50";a="269634594"
 Received: from lkp-server01.sh.intel.com (HELO lkp-server01) ([10.239.97.150])
-  by fmsmga006.fm.intel.com with ESMTP; 22 Mar 2020 09:45:02 -0700
+  by fmsmga004.fm.intel.com with ESMTP; 22 Mar 2020 10:21:07 -0700
 Received: from kbuild by lkp-server01 with local (Exim 4.89)
         (envelope-from <lkp@intel.com>)
-        id 1jG3if-000Arv-K0; Mon, 23 Mar 2020 00:45:01 +0800
-Date:   Mon, 23 Mar 2020 00:44:38 +0800
+        id 1jG4Ha-0008Gd-Ue; Mon, 23 Mar 2020 01:21:06 +0800
+Date:   Mon, 23 Mar 2020 01:20:56 +0800
 From:   kbuild test robot <lkp@intel.com>
 To:     "Liu, Yi L" <yi.l.liu@intel.com>
 Cc:     kbuild-all@lists.01.org, alex.williamson@redhat.com,
@@ -38,14 +38,14 @@ Cc:     kbuild-all@lists.01.org, alex.williamson@redhat.com,
         yi.y.sun@intel.com, jean-philippe@linaro.org, peterx@redhat.com,
         iommu@lists.linux-foundation.org, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org, hao.wu@intel.com
-Subject: Re: [PATCH v1 5/8] vfio/type1: Report 1st-level/stage-1 format to
- userspace
-Message-ID: <202003230052.c48Tr8B0%lkp@intel.com>
-References: <1584880325-10561-6-git-send-email-yi.l.liu@intel.com>
+Subject: Re: [PATCH v1 2/8] vfio/type1: Add vfio_iommu_type1 parameter for
+ quota tuning
+Message-ID: <202003230148.4Wl4xvVM%lkp@intel.com>
+References: <1584880325-10561-3-git-send-email-yi.l.liu@intel.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="sm4nu43k4a2Rpi4c"
+Content-Type: multipart/mixed; boundary="6c2NcOVqGQ03X4Wi"
 Content-Disposition: inline
-In-Reply-To: <1584880325-10561-6-git-send-email-yi.l.liu@intel.com>
+In-Reply-To: <1584880325-10561-3-git-send-email-yi.l.liu@intel.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
@@ -53,7 +53,7 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
---sm4nu43k4a2Rpi4c
+--6c2NcOVqGQ03X4Wi
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 
@@ -82,78 +82,172 @@ Reported-by: kbuild test robot <lkp@intel.com>
 
 All errors (new ones prefixed by >>):
 
-   drivers/vfio/vfio_iommu_type1.c: In function 'vfio_iommu_get_stage1_format':
->> drivers/vfio/vfio_iommu_type1.c:2273:4: error: 'DOMAIN_ATTR_PASID_FORMAT' undeclared (first use in this function)
-    2273 |    DOMAIN_ATTR_PASID_FORMAT, &format)) {
-         |    ^~~~~~~~~~~~~~~~~~~~~~~~
-   drivers/vfio/vfio_iommu_type1.c:2273:4: note: each undeclared identifier is reported only once for each function it appears in
-   drivers/vfio/vfio_iommu_type1.c: In function 'vfio_iommu_type1_ioctl':
-   drivers/vfio/vfio_iommu_type1.c:2355:11: error: implicit declaration of function 'iommu_get_uapi_version' [-Werror=implicit-function-declaration]
-    2355 |    return iommu_get_uapi_version();
-         |           ^~~~~~~~~~~~~~~~~~~~~~
+   drivers/vfio/vfio.c: In function 'vfio_create_mm':
+   drivers/vfio/vfio.c:2149:8: error: implicit declaration of function 'ioasid_alloc_set'; did you mean 'ioasid_alloc'? [-Werror=implicit-function-declaration]
+    2149 |  ret = ioasid_alloc_set((struct ioasid_set *) mm,
+         |        ^~~~~~~~~~~~~~~~
+         |        ioasid_alloc
+   drivers/vfio/vfio.c:2158:13: warning: assignment to 'long long unsigned int' from 'struct mm_struct *' makes integer from pointer without a cast [-Wint-conversion]
+    2158 |  token->val = mm;
+         |             ^
+   drivers/vfio/vfio.c: In function 'vfio_mm_unlock_and_free':
+   drivers/vfio/vfio.c:2170:2: error: implicit declaration of function 'ioasid_free_set'; did you mean 'ioasid_free'? [-Werror=implicit-function-declaration]
+    2170 |  ioasid_free_set(vmm->ioasid_sid, true);
+         |  ^~~~~~~~~~~~~~~
+         |  ioasid_free
+   drivers/vfio/vfio.c: In function 'vfio_mm_pasid_alloc':
+>> drivers/vfio/vfio.c:2230:3: error: implicit declaration of function 'ioasid_adjust_set' [-Werror=implicit-function-declaration]
+    2230 |   ioasid_adjust_set(vmm->ioasid_sid, quota);
+         |   ^~~~~~~~~~~~~~~~~
+   drivers/vfio/vfio.c:2233:26: warning: passing argument 1 of 'ioasid_alloc' makes pointer from integer without a cast [-Wint-conversion]
+    2233 |  pasid = ioasid_alloc(vmm->ioasid_sid, min, max, NULL);
+         |                       ~~~^~~~~~~~~~~~
+         |                          |
+         |                          int
+   In file included from include/linux/iommu.h:16,
+                    from drivers/vfio/vfio.c:20:
+   include/linux/ioasid.h:45:56: note: expected 'struct ioasid_set *' but argument is of type 'int'
+      45 | static inline ioasid_t ioasid_alloc(struct ioasid_set *set, ioasid_t min,
+         |                                     ~~~~~~~~~~~~~~~~~~~^~~
+   drivers/vfio/vfio.c: In function 'vfio_mm_pasid_free':
+   drivers/vfio/vfio.c:2252:25: warning: passing argument 1 of 'ioasid_find' makes pointer from integer without a cast [-Wint-conversion]
+    2252 |  pdata = ioasid_find(vmm->ioasid_sid, pasid, NULL);
+         |                      ~~~^~~~~~~~~~~~
+         |                         |
+         |                         int
+   In file included from include/linux/iommu.h:16,
+                    from drivers/vfio/vfio.c:20:
+   include/linux/ioasid.h:55:52: note: expected 'struct ioasid_set *' but argument is of type 'int'
+      55 | static inline void *ioasid_find(struct ioasid_set *set, ioasid_t ioasid,
+         |                                 ~~~~~~~~~~~~~~~~~~~^~~
    cc1: some warnings being treated as errors
 
-vim +/DOMAIN_ATTR_PASID_FORMAT +2273 drivers/vfio/vfio_iommu_type1.c
+vim +/ioasid_adjust_set +2230 drivers/vfio/vfio.c
 
-  2257	
-  2258	static int vfio_iommu_get_stage1_format(struct vfio_iommu *iommu,
-  2259						 u32 *stage1_format)
-  2260	{
-  2261		struct vfio_domain *domain;
-  2262		u32 format = 0, tmp_format = 0;
-  2263		int ret;
-  2264	
-  2265		mutex_lock(&iommu->lock);
-  2266		if (list_empty(&iommu->domain_list)) {
-  2267			mutex_unlock(&iommu->lock);
-  2268			return -EINVAL;
-  2269		}
-  2270	
-  2271		list_for_each_entry(domain, &iommu->domain_list, next) {
-  2272			if (iommu_domain_get_attr(domain->domain,
-> 2273				DOMAIN_ATTR_PASID_FORMAT, &format)) {
-  2274				ret = -EINVAL;
-  2275				format = 0;
-  2276				goto out_unlock;
-  2277			}
-  2278			/*
-  2279			 * format is always non-zero (the first format is
-  2280			 * IOMMU_PASID_FORMAT_INTEL_VTD which is 1). For
-  2281			 * the reason of potential different backed IOMMU
-  2282			 * formats, here we expect to have identical formats
-  2283			 * in the domain list, no mixed formats support.
-  2284			 * return -EINVAL to fail the attempt of setup
-  2285			 * VFIO_TYPE1_NESTING_IOMMU if non-identical formats
-  2286			 * are detected.
-  2287			 */
-  2288			if (tmp_format && tmp_format != format) {
-  2289				ret = -EINVAL;
-  2290				format = 0;
-  2291				goto out_unlock;
-  2292			}
-  2293	
-  2294			tmp_format = format;
-  2295		}
-  2296		ret = 0;
-  2297	
-  2298	out_unlock:
-  2299		if (format)
-  2300			*stage1_format = format;
-  2301		mutex_unlock(&iommu->lock);
-  2302		return ret;
-  2303	}
-  2304	
+  2133	
+  2134	/**
+  2135	 * VFIO_MM objects - create, release, get, put, search
+  2136	 * Caller of the function should have held vfio.vfio_mm_lock.
+  2137	 */
+  2138	static struct vfio_mm *vfio_create_mm(struct mm_struct *mm)
+  2139	{
+  2140		struct vfio_mm *vmm;
+  2141		struct vfio_mm_token *token;
+  2142		int ret = 0;
+  2143	
+  2144		vmm = kzalloc(sizeof(*vmm), GFP_KERNEL);
+  2145		if (!vmm)
+  2146			return ERR_PTR(-ENOMEM);
+  2147	
+  2148		/* Per mm IOASID set used for quota control and group operations */
+  2149		ret = ioasid_alloc_set((struct ioasid_set *) mm,
+  2150				       VFIO_DEFAULT_PASID_QUOTA, &vmm->ioasid_sid);
+  2151		if (ret) {
+  2152			kfree(vmm);
+  2153			return ERR_PTR(ret);
+  2154		}
+  2155	
+  2156		kref_init(&vmm->kref);
+  2157		token = &vmm->token;
+> 2158		token->val = mm;
+  2159		vmm->pasid_quota = VFIO_DEFAULT_PASID_QUOTA;
+  2160		mutex_init(&vmm->pasid_lock);
+  2161	
+  2162		list_add(&vmm->vfio_next, &vfio.vfio_mm_list);
+  2163	
+  2164		return vmm;
+  2165	}
+  2166	
+  2167	static void vfio_mm_unlock_and_free(struct vfio_mm *vmm)
+  2168	{
+  2169		/* destroy the ioasid set */
+  2170		ioasid_free_set(vmm->ioasid_sid, true);
+  2171		mutex_unlock(&vfio.vfio_mm_lock);
+  2172		kfree(vmm);
+  2173	}
+  2174	
+  2175	/* called with vfio.vfio_mm_lock held */
+  2176	static void vfio_mm_release(struct kref *kref)
+  2177	{
+  2178		struct vfio_mm *vmm = container_of(kref, struct vfio_mm, kref);
+  2179	
+  2180		list_del(&vmm->vfio_next);
+  2181		vfio_mm_unlock_and_free(vmm);
+  2182	}
+  2183	
+  2184	void vfio_mm_put(struct vfio_mm *vmm)
+  2185	{
+  2186		kref_put_mutex(&vmm->kref, vfio_mm_release, &vfio.vfio_mm_lock);
+  2187	}
+  2188	EXPORT_SYMBOL_GPL(vfio_mm_put);
+  2189	
+  2190	/* Assume vfio_mm_lock or vfio_mm reference is held */
+  2191	static void vfio_mm_get(struct vfio_mm *vmm)
+  2192	{
+  2193		kref_get(&vmm->kref);
+  2194	}
+  2195	
+  2196	struct vfio_mm *vfio_mm_get_from_task(struct task_struct *task)
+  2197	{
+  2198		struct mm_struct *mm = get_task_mm(task);
+  2199		struct vfio_mm *vmm;
+  2200		unsigned long long val = (unsigned long long) mm;
+  2201	
+  2202		mutex_lock(&vfio.vfio_mm_lock);
+  2203		list_for_each_entry(vmm, &vfio.vfio_mm_list, vfio_next) {
+  2204			if (vmm->token.val == val) {
+  2205				vfio_mm_get(vmm);
+  2206				goto out;
+  2207			}
+  2208		}
+  2209	
+  2210		vmm = vfio_create_mm(mm);
+  2211		if (IS_ERR(vmm))
+  2212			vmm = NULL;
+  2213	out:
+  2214		mutex_unlock(&vfio.vfio_mm_lock);
+  2215		mmput(mm);
+  2216		return vmm;
+  2217	}
+  2218	EXPORT_SYMBOL_GPL(vfio_mm_get_from_task);
+  2219	
+  2220	int vfio_mm_pasid_alloc(struct vfio_mm *vmm, int quota, int min, int max)
+  2221	{
+  2222		ioasid_t pasid;
+  2223		int ret = -ENOSPC;
+  2224	
+  2225		mutex_lock(&vmm->pasid_lock);
+  2226	
+  2227		/* update quota as it is tunable by admin */
+  2228		if (vmm->pasid_quota != quota) {
+  2229			vmm->pasid_quota = quota;
+> 2230			ioasid_adjust_set(vmm->ioasid_sid, quota);
+  2231		}
+  2232	
+  2233		pasid = ioasid_alloc(vmm->ioasid_sid, min, max, NULL);
+  2234		if (pasid == INVALID_IOASID) {
+  2235			ret = -ENOSPC;
+  2236			goto out_unlock;
+  2237		}
+  2238	
+  2239		ret = pasid;
+  2240	out_unlock:
+  2241		mutex_unlock(&vmm->pasid_lock);
+  2242		return ret;
+  2243	}
+  2244	EXPORT_SYMBOL_GPL(vfio_mm_pasid_alloc);
+  2245	
 
 ---
 0-DAY CI Kernel Test Service, Intel Corporation
 https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
 
---sm4nu43k4a2Rpi4c
+--6c2NcOVqGQ03X4Wi
 Content-Type: application/gzip
 Content-Disposition: attachment; filename=".config.gz"
 Content-Transfer-Encoding: base64
 
-H4sICFKLd14AAy5jb25maWcAnDzZcty2su/5iqnkJalT8ZlNsnJv6QEEQQ4y3AyAMyO/sCby
+H4sICOyTd14AAy5jb25maWcAnDzZcty2su/5iqnkJalT8ZlNsnJv6QEEQQ4y3AyAMyO/sCby
 2FHFknxGUhL//ekGuAAgqPjelJN4uht7o3fwh+9+mJGX58f74/Pd7fHz56+zT6eH0/n4fPow
 +3j3+fS/s7icFaWasZirN0Cc3T28/P3v4/n+cj27eHPxZv7z+fZitj2dH06fZ/Tx4ePdpxdo
 fvf48N0P38GfHwB4/wV6Ov/P7Hg83/5+uf75M/bx86fb29mPKaU/zX55s3wzB1paFglPG0ob
@@ -1015,4 +1109,4 @@ R2E4Si0uiNOFMWpcmzZw78wseCgak6FZ4uccmo7XM0R+XYT1Wz15RGQG83X1ClZzy48oixU8
 u8S7/YwhKxPswhAMEe5tkdUFqZ8zC6VrDc7MJ+wYNgTJ6cXhpG8mykLOUARJqFgQYc5+BNZA
 gK32nYwRDJggwLA9arOcfJKmqV3+/we9bmBCjyQDAA==
 
---sm4nu43k4a2Rpi4c--
+--6c2NcOVqGQ03X4Wi--
