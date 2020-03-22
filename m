@@ -2,449 +2,231 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9216718E8C3
-	for <lists+kvm@lfdr.de>; Sun, 22 Mar 2020 13:28:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7E8D918E8DE
+	for <lists+kvm@lfdr.de>; Sun, 22 Mar 2020 13:31:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727303AbgCVM1i (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 22 Mar 2020 08:27:38 -0400
-Received: from mga14.intel.com ([192.55.52.115]:23953 "EHLO mga14.intel.com"
+        id S1727241AbgCVMbG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 22 Mar 2020 08:31:06 -0400
+Received: from mga17.intel.com ([192.55.52.151]:58572 "EHLO mga17.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727117AbgCVM1d (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 22 Mar 2020 08:27:33 -0400
-IronPort-SDR: AZWnW3B9TIgegvjY9Qvtdq2YQpp3rVmN9W2X+kMps/tQyFzVCzzukHhlP7MxDP8HpOAU5FsIBE
- 8KQ/JMWV1VcA==
+        id S1726990AbgCVMaj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 22 Mar 2020 08:30:39 -0400
+IronPort-SDR: 24R/LK/4pB9as9K3EP/wnFu/dWhdtSX3AJMagDKglXfXHHTMuq38ryD8G23hJgzpypTyyoIOOR
+ JAQ7Tc9rcWtQ==
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Mar 2020 05:27:32 -0700
-IronPort-SDR: mrJEpjYY/nWi64DTjb00cmdEkk087Bn/UCjBNTdgkPivfCtDTkNkRPZv6/SMfo2EMXsHTKjrLr
- pBtpv5eAGZSw==
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Mar 2020 05:30:38 -0700
+IronPort-SDR: uSfxUwmnjJc1rtK+WmXQLMJcsd8CSy8SPd1SvU5zGoXlsFBUNjtT+ToMX5uo2k7Tmehe46lfs/
+ vY8cMjO59o5Q==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.72,292,1580803200"; 
-   d="scan'208";a="356846587"
+   d="scan'208";a="239664350"
 Received: from jacob-builder.jf.intel.com ([10.7.199.155])
-  by fmsmga001.fm.intel.com with ESMTP; 22 Mar 2020 05:27:32 -0700
-From:   "Liu, Yi L" <yi.l.liu@intel.com>
-To:     alex.williamson@redhat.com, eric.auger@redhat.com
-Cc:     kevin.tian@intel.com, jacob.jun.pan@linux.intel.com,
-        joro@8bytes.org, ashok.raj@intel.com, yi.l.liu@intel.com,
-        jun.j.tian@intel.com, yi.y.sun@intel.com, jean-philippe@linaro.org,
-        peterx@redhat.com, iommu@lists.linux-foundation.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org, hao.wu@intel.com
-Subject: [PATCH v1 2/2] vfio/pci: Emulate PASID/PRI capability for VFs
-Date:   Sun, 22 Mar 2020 05:33:14 -0700
-Message-Id: <1584880394-11184-3-git-send-email-yi.l.liu@intel.com>
+  by orsmga008.jf.intel.com with ESMTP; 22 Mar 2020 05:30:37 -0700
+From:   Liu Yi L <yi.l.liu@intel.com>
+To:     qemu-devel@nongnu.org, alex.williamson@redhat.com,
+        peterx@redhat.com
+Cc:     eric.auger@redhat.com, pbonzini@redhat.com, mst@redhat.com,
+        david@gibson.dropbear.id.au, kevin.tian@intel.com,
+        yi.l.liu@intel.com, jun.j.tian@intel.com, yi.y.sun@intel.com,
+        kvm@vger.kernel.org, hao.wu@intel.com, jean-philippe@linaro.org
+Subject: [PATCH v1 00/22] intel_iommu: expose Shared Virtual Addressing to VMs
+Date:   Sun, 22 Mar 2020 05:35:57 -0700
+Message-Id: <1584880579-12178-1-git-send-email-yi.l.liu@intel.com>
 X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1584880394-11184-1-git-send-email-yi.l.liu@intel.com>
-References: <1584880394-11184-1-git-send-email-yi.l.liu@intel.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Liu Yi L <yi.l.liu@intel.com>
+Shared Virtual Addressing (SVA), a.k.a, Shared Virtual Memory (SVM) on
+Intel platforms allows address space sharing between device DMA and
+applications. SVA can reduce programming complexity and enhance security.
 
-Per PCIe r5.0, sec 9.3.7.14, if a PF implements the PASID Capability, the
-PF PASID configuration is shared by its VFs.  VFs must not implement their
-own PASID Capability.
+This QEMU series is intended to expose SVA usage to VMs. i.e. Sharing
+guest application address space with passthru devices. This is called
+vSVA in this series. The whole vSVA enabling requires QEMU/VFIO/IOMMU
+changes.
 
-Per PCIe r5.0, sec 9.3.7.11, VFs must not implement the PRI Capability. If
-the PF implements PRI, it is shared by the VFs.
+The high-level architecture for SVA virtualization is as below, the key
+design of vSVA support is to utilize the dual-stage IOMMU translation (
+also known as IOMMU nesting translation) capability in host IOMMU.
 
-On bare metal, it has been fixed by below efforts.
-to PASID/PRI are
-https://lkml.org/lkml/2019/9/5/996
-https://lkml.org/lkml/2019/9/5/995
+    .-------------.  .---------------------------.
+    |   vIOMMU    |  | Guest process CR3, FL only|
+    |             |  '---------------------------'
+    .----------------/
+    | PASID Entry |--- PASID cache flush -
+    '-------------'                       |
+    |             |                       V
+    |             |                CR3 in GPA
+    '-------------'
+Guest
+------| Shadow |--------------------------|--------
+      v        v                          v
+Host
+    .-------------.  .----------------------.
+    |   pIOMMU    |  | Bind FL for GVA-GPA  |
+    |             |  '----------------------'
+    .----------------/  |
+    | PASID Entry |     V (Nested xlate)
+    '----------------\.------------------------------.
+    |             |   |SL for GPA-HPA, default domain|
+    |             |   '------------------------------'
+    '-------------'
+Where:
+ - FL = First level/stage one page tables
+ - SL = Second level/stage two page tables
 
-This patch adds emulated PASID/PRI capabilities for VFs when assigned to
-VMs via vfio-pci driver. This is required for enabling vSVA on pass-through
-VFs as VFs have no PASID/PRI capability structure in its configure space.
+The complete vSVA kernel upstream patches are divided into three phases:
+    1. Common APIs and PCI device direct assignment
+    2. IOMMU-backed Mediated Device assignment
+    3. Page Request Services (PRS) support
 
-Cc: Kevin Tian <kevin.tian@intel.com>
-CC: Jacob Pan <jacob.jun.pan@linux.intel.com>
-Cc: Alex Williamson <alex.williamson@redhat.com>
-Cc: Eric Auger <eric.auger@redhat.com>
-Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>
-Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
----
- drivers/vfio/pci/vfio_pci_config.c | 325 ++++++++++++++++++++++++++++++++++++-
- 1 file changed, 323 insertions(+), 2 deletions(-)
+This QEMU patchset is aiming for the phase 1 and phase 2. It is based
+on the two kernel series below.
+[1] [PATCH V10 00/11] Nested Shared Virtual Address (SVA) VT-d support:
+https://lkml.org/lkml/2020/3/20/1172
+[2] [PATCH v1 0/8] vfio: expose virtual Shared Virtual Addressing to VMs
+https://lkml.org/lkml/2020/3/22/116
 
-diff --git a/drivers/vfio/pci/vfio_pci_config.c b/drivers/vfio/pci/vfio_pci_config.c
-index 4b9af99..84b4ea0 100644
---- a/drivers/vfio/pci/vfio_pci_config.c
-+++ b/drivers/vfio/pci/vfio_pci_config.c
-@@ -1509,11 +1509,304 @@ static int vfio_cap_init(struct vfio_pci_device *vdev)
- 	return 0;
- }
- 
-+static int vfio_fill_custom_vconfig_bytes(struct vfio_pci_device *vdev,
-+					int offset, uint8_t *data, int size)
-+{
-+	int ret = 0, data_offset = 0;
-+
-+	while (size) {
-+		int filled;
-+
-+		if (size >= 4 && !(offset % 4)) {
-+			__le32 *dwordp = (__le32 *)&vdev->vconfig[offset];
-+			u32 dword;
-+
-+			memcpy(&dword, data + data_offset, 4);
-+			*dwordp = cpu_to_le32(dword);
-+			filled = 4;
-+		} else if (size >= 2 && !(offset % 2)) {
-+			__le16 *wordp = (__le16 *)&vdev->vconfig[offset];
-+			u16 word;
-+
-+			memcpy(&word, data + data_offset, 2);
-+			*wordp = cpu_to_le16(word);
-+			filled = 2;
-+		} else {
-+			u8 *byte = &vdev->vconfig[offset];
-+
-+			memcpy(byte, data + data_offset, 1);
-+			filled = 1;
-+		}
-+
-+		offset += filled;
-+		data_offset += filled;
-+		size -= filled;
-+	}
-+
-+	return ret;
-+}
-+
-+static int vfio_pci_get_ecap_content(struct pci_dev *pdev,
-+					int cap, int cap_len, u8 *content)
-+{
-+	int pos, offset, len = cap_len, ret = 0;
-+
-+	pos = pci_find_ext_capability(pdev, cap);
-+	if (!pos)
-+		return -EINVAL;
-+
-+	offset = 0;
-+	while (len) {
-+		int fetched;
-+
-+		if (len >= 4 && !(pos % 4)) {
-+			u32 *dwordp = (u32 *) (content + offset);
-+			u32 dword;
-+			__le32 *dwptr = (__le32 *) &dword;
-+
-+			ret = pci_read_config_dword(pdev, pos, &dword);
-+			if (ret)
-+				return ret;
-+			*dwordp = le32_to_cpu(*dwptr);
-+			fetched = 4;
-+		} else if (len >= 2 && !(pos % 2)) {
-+			u16 *wordp = (u16 *) (content + offset);
-+			u16 word;
-+			__le16 *wptr = (__le16 *) &word;
-+
-+			ret = pci_read_config_word(pdev, pos, &word);
-+			if (ret)
-+				return ret;
-+			*wordp = le16_to_cpu(*wptr);
-+			fetched = 2;
-+		} else {
-+			u8 *byte = (u8 *) (content + offset);
-+
-+			ret = pci_read_config_byte(pdev, pos, byte);
-+			if (ret)
-+				return ret;
-+			fetched = 1;
-+		}
-+
-+		pos += fetched;
-+		offset += fetched;
-+		len -= fetched;
-+	}
-+
-+	return ret;
-+}
-+
-+struct vfio_pci_pasid_cap_data {
-+	u32 id:16;
-+	u32 version:4;
-+	u32 next:12;
-+	union {
-+		u16 cap_reg_val;
-+		struct {
-+			u16 rsv1:1;
-+			u16 execs:1;
-+			u16 prvs:1;
-+			u16 rsv2:5;
-+			u16 pasid_bits:5;
-+			u16 rsv3:3;
-+		};
-+	} cap_reg;
-+	union {
-+		u16 control_reg_val;
-+		struct {
-+			u16 paside:1;
-+			u16 exece:1;
-+			u16 prve:1;
-+			u16 rsv4:13;
-+		};
-+	} control_reg;
-+};
-+
-+static int vfio_pci_add_pasid_cap(struct vfio_pci_device *vdev,
-+				    struct pci_dev *pdev,
-+				    u16 epos, u16 *next, __le32 **prevp)
-+{
-+	u8 *map = vdev->pci_config_map;
-+	int ecap = PCI_EXT_CAP_ID_PASID;
-+	int len = pci_ext_cap_length[ecap];
-+	struct vfio_pci_pasid_cap_data pasid_cap;
-+	struct vfio_pci_pasid_cap_data vpasid_cap;
-+	int ret;
-+
-+	/*
-+	 * If no cap filled in this function, should make sure the next
-+	 * pointer points to current epos.
-+	 */
-+	*next = epos;
-+
-+	if (!len) {
-+		pr_info("%s: VF %s hiding PASID capability\n",
-+				__func__, dev_name(&vdev->pdev->dev));
-+		ret = 0;
-+		goto out;
-+	}
-+
-+	/* Add PASID capability*/
-+	ret = vfio_pci_get_ecap_content(pdev, ecap,
-+					len, (u8 *)&pasid_cap);
-+	if (ret)
-+		goto out;
-+
-+	if (!pasid_cap.control_reg.paside) {
-+		pr_debug("%s: its PF's PASID capability is not enabled\n",
-+			dev_name(&vdev->pdev->dev));
-+		ret = 0;
-+		goto out;
-+	}
-+
-+	memcpy(&vpasid_cap, &pasid_cap, len);
-+
-+	vpasid_cap.id = 0x18;
-+	vpasid_cap.next = 0;
-+	/* clear the control reg for guest */
-+	memset(&vpasid_cap.control_reg, 0x0,
-+			sizeof(vpasid_cap.control_reg));
-+
-+	memset(map + epos, vpasid_cap.id, len);
-+	ret = vfio_fill_custom_vconfig_bytes(vdev, epos,
-+					(u8 *)&vpasid_cap, len);
-+	if (!ret) {
-+		/*
-+		 * Successfully filled in PASID cap, update
-+		 * the next offset in previous cap header,
-+		 * and also update caller about the offset
-+		 * of next cap if any.
-+		 */
-+		u32 val = epos;
-+		**prevp &= cpu_to_le32(~(0xffcU << 20));
-+		**prevp |= cpu_to_le32(val << 20);
-+		*prevp = (__le32 *)&vdev->vconfig[epos];
-+		*next = epos + len;
-+	}
-+
-+out:
-+	return ret;
-+}
-+
-+struct vfio_pci_pri_cap_data {
-+	u32 id:16;
-+	u32 version:4;
-+	u32 next:12;
-+	union {
-+		u16 control_reg_val;
-+		struct {
-+			u16 enable:1;
-+			u16 reset:1;
-+			u16 rsv1:14;
-+		};
-+	} control_reg;
-+	union {
-+		u16 status_reg_val;
-+		struct {
-+			u16 rf:1;
-+			u16 uprgi:1;
-+			u16 rsv2:6;
-+			u16 stop:1;
-+			u16 rsv3:6;
-+			u16 pasid_required:1;
-+		};
-+	} status_reg;
-+	u32 prq_capacity;
-+	u32 prq_quota;
-+};
-+
-+static int vfio_pci_add_pri_cap(struct vfio_pci_device *vdev,
-+				    struct pci_dev *pdev,
-+				    u16 epos, u16 *next, __le32 **prevp)
-+{
-+	u8 *map = vdev->pci_config_map;
-+	int ecap = PCI_EXT_CAP_ID_PRI;
-+	int len = pci_ext_cap_length[ecap];
-+	struct vfio_pci_pri_cap_data pri_cap;
-+	struct vfio_pci_pri_cap_data vpri_cap;
-+	int ret;
-+
-+	/*
-+	 * If no cap filled in this function, should make sure the next
-+	 * pointer points to current epos.
-+	 */
-+	*next = epos;
-+
-+	if (!len) {
-+		pr_info("%s: VF %s hiding PRI capability\n",
-+				__func__, dev_name(&vdev->pdev->dev));
-+		ret = 0;
-+		goto out;
-+	}
-+
-+	/* Add PASID capability*/
-+	ret = vfio_pci_get_ecap_content(pdev, ecap,
-+					len, (u8 *)&pri_cap);
-+	if (ret)
-+		goto out;
-+
-+	if (!pri_cap.control_reg.enable) {
-+		pr_debug("%s: its PF's PRI capability is not enabled\n",
-+			dev_name(&vdev->pdev->dev));
-+		ret = 0;
-+		goto out;
-+	}
-+
-+	memcpy(&vpri_cap, &pri_cap, len);
-+
-+	vpri_cap.id = 0x19;
-+	vpri_cap.next = 0;
-+	/* clear the control reg for guest */
-+	memset(&vpri_cap.control_reg, 0x0,
-+			sizeof(vpri_cap.control_reg));
-+
-+	memset(map + epos, vpri_cap.id, len);
-+	ret = vfio_fill_custom_vconfig_bytes(vdev, epos,
-+					(u8 *)&vpri_cap, len);
-+	if (!ret) {
-+		/*
-+		 * Successfully filled in PASID cap, update
-+		 * the next offset in previous cap header,
-+		 * and also update caller about the offset
-+		 * of next cap if any.
-+		 */
-+		u32 val = epos;
-+		**prevp &= cpu_to_le32(~(0xffcU << 20));
-+		**prevp |= cpu_to_le32(val << 20);
-+		*prevp = (__le32 *)&vdev->vconfig[epos];
-+		*next = epos + len;
-+	}
-+
-+out:
-+	return ret;
-+}
-+
-+static int vfio_pci_add_emulated_cap_for_vf(struct vfio_pci_device *vdev,
-+			struct pci_dev *pdev, u16 start_epos, __le32 *prev)
-+{
-+	__le32 *__prev = prev;
-+	u16 epos = start_epos, epos_next = start_epos;
-+	int ret = 0;
-+
-+	/* Add PASID capability*/
-+	ret = vfio_pci_add_pasid_cap(vdev, pdev, epos,
-+					&epos_next, &__prev);
-+	if (ret)
-+		return ret;
-+
-+	/* Add PRI capability */
-+	epos = epos_next;
-+	ret = vfio_pci_add_pri_cap(vdev, pdev, epos,
-+				   &epos_next, &__prev);
-+
-+	return ret;
-+}
-+
- static int vfio_ecap_init(struct vfio_pci_device *vdev)
- {
- 	struct pci_dev *pdev = vdev->pdev;
- 	u8 *map = vdev->pci_config_map;
--	u16 epos;
-+	u16 epos, epos_max;
- 	__le32 *prev = NULL;
- 	int loops, ret, ecaps = 0;
- 
-@@ -1521,6 +1814,7 @@ static int vfio_ecap_init(struct vfio_pci_device *vdev)
- 		return 0;
- 
- 	epos = PCI_CFG_SPACE_SIZE;
-+	epos_max = PCI_CFG_SPACE_SIZE;
- 
- 	loops = (pdev->cfg_size - PCI_CFG_SPACE_SIZE) / PCI_CAP_SIZEOF;
- 
-@@ -1545,6 +1839,9 @@ static int vfio_ecap_init(struct vfio_pci_device *vdev)
- 			}
- 		}
- 
-+		if (epos_max <= (epos + len))
-+			epos_max = epos + len;
-+
- 		if (!len) {
- 			pci_info(pdev, "%s: hiding ecap %#x@%#x\n",
- 				 __func__, ecap, epos);
-@@ -1604,6 +1901,18 @@ static int vfio_ecap_init(struct vfio_pci_device *vdev)
- 	if (!ecaps)
- 		*(u32 *)&vdev->vconfig[PCI_CFG_SPACE_SIZE] = 0;
- 
-+#ifdef CONFIG_PCI_ATS
-+	if (pdev->is_virtfn) {
-+		struct pci_dev *physfn = pdev->physfn;
-+
-+		ret = vfio_pci_add_emulated_cap_for_vf(vdev,
-+					physfn, epos_max, prev);
-+		if (ret)
-+			pr_info("%s, failed to add special caps for VF %s\n",
-+				__func__, dev_name(&vdev->pdev->dev));
-+	}
-+#endif
-+
- 	return 0;
- }
- 
-@@ -1748,6 +2057,17 @@ static size_t vfio_pci_cap_remaining_dword(struct vfio_pci_device *vdev,
- 	return i;
- }
- 
-+static bool vfio_pci_need_virt_perm(struct pci_dev *pdev, u8 cap_id)
-+{
-+#ifdef CONFIG_PCI_ATS
-+	return (pdev->is_virtfn &&
-+		(cap_id == PCI_EXT_CAP_ID_PASID ||
-+		 cap_id == PCI_EXT_CAP_ID_PRI));
-+#else
-+	return false;
-+#endif
-+}
-+
- static ssize_t vfio_config_do_rw(struct vfio_pci_device *vdev, char __user *buf,
- 				 size_t count, loff_t *ppos, bool iswrite)
- {
-@@ -1781,7 +2101,8 @@ static ssize_t vfio_config_do_rw(struct vfio_pci_device *vdev, char __user *buf,
- 	if (cap_id == PCI_CAP_ID_INVALID) {
- 		perm = &unassigned_perms;
- 		cap_start = *ppos;
--	} else if (cap_id == PCI_CAP_ID_INVALID_VIRT) {
-+	} else if (cap_id == PCI_CAP_ID_INVALID_VIRT ||
-+		   vfio_pci_need_virt_perm(pdev, cap_id)) {
- 		perm = &virt_perms;
- 		cap_start = *ppos;
- 	} else {
+There are roughly two parts:
+ 1. Introduce HostIOMMUContext as abstract of host IOMMU. It provides explicit
+    method for vIOMMU emulators to communicate with host IOMMU. e.g. propagate
+    guest page table binding to host IOMMU to setup dual-stage DMA translation
+    in host IOMMU and flush iommu iotlb.
+ 2. Setup dual-stage IOMMU translation for Intel vIOMMU. Includes 
+    - Check IOMMU uAPI version compatibility and VFIO Nesting capabilities which
+      includes hardware compatibility (stage 1 format) and VFIO_PASID_REQ
+      availability. This is preparation for setting up dual-stage DMA translation
+      in host IOMMU.
+    - Propagate guest PASID allocation and free request to host.
+    - Propagate guest page table binding to host to setup dual-stage IOMMU DMA
+      translation in host IOMMU.
+    - Propagate guest IOMMU cache invalidation to host to ensure iotlb
+      correctness.
+
+The complete QEMU set can be found in below link:
+https://github.com/luxis1999/qemu.git: sva_vtd_v10_v1
+
+Complete kernel can be found in:
+https://github.com/luxis1999/linux-vsva.git: vsva-linux-5.6-rc6
+
+Tests: basci vSVA functionality test, VM reboot/shutdown/crash, kernel build in
+guest, boot VM with vSVA disabled, full comapilation.
+
+Regards,
+Yi Liu
+
+Changelog:
+	- RFC v3.1 -> Patch v1:
+	  a) Implement HostIOMMUContext in QOM manner.
+	  b) Add pci_set/unset_iommu_context() to register HostIOMMUContext to
+	     vIOMMU, thus the lifecircle of HostIOMMUContext is awared in vIOMMU
+	     side. In such way, vIOMMU could use the methods provided by the
+	     HostIOMMUContext safely.
+	  c) Add back patch "[RFC v3 01/25] hw/pci: modify pci_setup_iommu() to set PCIIOMMUOps"
+	  RFCv3.1: https://patchwork.kernel.org/cover/11397879/
+
+	- RFC v3 -> v3.1:
+	  a) Drop IOMMUContext, and rename DualStageIOMMUObject to HostIOMMUContext.
+	     HostIOMMUContext is per-vfio-container, it is exposed to  vIOMMU via PCI
+	     layer. VFIO registers a PCIHostIOMMUFunc callback to PCI layer, vIOMMU
+	     could get HostIOMMUContext instance via it.
+	  b) Check IOMMU uAPI version by VFIO_CHECK_EXTENSION
+	  c) Add a check on VFIO_PASID_REQ availability via VFIO_GET_IOMMU_IHNFO
+	  d) Reorder the series, put vSVA linux header file update in the beginning
+	     put the x-scalable-mode option mofification in the end of the series.
+	  e) Dropped patch "[RFC v3 01/25] hw/pci: modify pci_setup_iommu() to set PCIIOMMUOps"
+	  RFCv3: https://patchwork.kernel.org/cover/11356033/
+
+	- RFC v2 -> v3:
+	  a) Introduce DualStageIOMMUObject to abstract the host IOMMU programming
+	  capability. e.g. request PASID from host, setup IOMMU nesting translation
+	  on host IOMMU. The pasid_alloc/bind_guest_page_table/iommu_cache_flush
+	  operations are moved to be DualStageIOMMUOps. Thus, DualStageIOMMUObject
+	  is an abstract layer which provides QEMU vIOMMU emulators with an explicit
+	  method to program host IOMMU.
+	  b) Compared with RFC v2, the IOMMUContext has also been updated. It is
+	  modified to provide an abstract for vIOMMU emulators. It provides the
+	  method for pass-through modules (like VFIO) to communicate with host IOMMU.
+	  e.g. tell vIOMMU emulators about the IOMMU nesting capability on host side
+	  and report the host IOMMU DMA translation faults to vIOMMU emulators.
+	  RFC v2: https://www.spinics.net/lists/kvm/msg198556.html
+
+	- RFC v1 -> v2:
+	  Introduce IOMMUContext to abstract the connection between VFIO
+	  and vIOMMU emulators, which is a replacement of the PCIPASIDOps
+	  in RFC v1. Modify x-scalable-mode to be string option instead of
+	  adding a new option as RFC v1 did. Refined the pasid cache management
+	  and addressed the TODOs mentioned in RFC v1. 
+	  RFC v1: https://patchwork.kernel.org/cover/11033657/
+
+
+Eric Auger (1):
+  scripts/update-linux-headers: Import iommu.h
+
+Liu Yi L (21):
+  header file update VFIO/IOMMU vSVA APIs
+  vfio: check VFIO_TYPE1_NESTING_IOMMU support
+  hw/iommu: introduce HostIOMMUContext
+  hw/pci: modify pci_setup_iommu() to set PCIIOMMUOps
+  hw/pci: introduce pci_device_set/unset_iommu_context()
+  intel_iommu: add set/unset_iommu_context callback
+  vfio: init HostIOMMUContext per-container
+  vfio/common: check PASID alloc/free availability
+  intel_iommu: add virtual command capability support
+  intel_iommu: process PASID cache invalidation
+  intel_iommu: add PASID cache management infrastructure
+  vfio: add bind stage-1 page table support
+  intel_iommu: bind/unbind guest page table to host
+  intel_iommu: replay guest pasid bindings to host
+  intel_iommu: replay pasid binds after context cache invalidation
+  intel_iommu: do not pass down pasid bind for PASID #0
+  vfio: add support for flush iommu stage-1 cache
+  intel_iommu: process PASID-based iotlb invalidation
+  intel_iommu: propagate PASID-based iotlb invalidation to host
+  intel_iommu: process PASID-based Device-TLB invalidation
+  intel_iommu: modify x-scalable-mode to be string option
+
+ hw/Makefile.objs                      |    1 +
+ hw/alpha/typhoon.c                    |    6 +-
+ hw/arm/smmu-common.c                  |    6 +-
+ hw/hppa/dino.c                        |    6 +-
+ hw/i386/amd_iommu.c                   |    6 +-
+ hw/i386/intel_iommu.c                 | 1221 ++++++++++++++++++++++++++++++++-
+ hw/i386/intel_iommu_internal.h        |  118 ++++
+ hw/i386/trace-events                  |    6 +
+ hw/iommu/Makefile.objs                |    1 +
+ hw/iommu/host_iommu_context.c         |  178 +++++
+ hw/pci-host/designware.c              |    6 +-
+ hw/pci-host/pnv_phb3.c                |    6 +-
+ hw/pci-host/pnv_phb4.c                |    6 +-
+ hw/pci-host/ppce500.c                 |    6 +-
+ hw/pci-host/prep.c                    |    6 +-
+ hw/pci-host/sabre.c                   |    6 +-
+ hw/pci/pci.c                          |   53 +-
+ hw/ppc/ppc440_pcix.c                  |    6 +-
+ hw/ppc/spapr_pci.c                    |    6 +-
+ hw/s390x/s390-pci-bus.c               |    8 +-
+ hw/vfio/common.c                      |  257 ++++++-
+ hw/vfio/pci.c                         |   13 +
+ hw/virtio/virtio-iommu.c              |    6 +-
+ include/hw/i386/intel_iommu.h         |   62 +-
+ include/hw/iommu/host_iommu_context.h |  116 ++++
+ include/hw/pci/pci.h                  |   18 +-
+ include/hw/pci/pci_bus.h              |    2 +-
+ include/hw/vfio/vfio-common.h         |    4 +
+ linux-headers/linux/iommu.h           |  378 ++++++++++
+ linux-headers/linux/vfio.h            |  127 ++++
+ scripts/update-linux-headers.sh       |    2 +-
+ 31 files changed, 2599 insertions(+), 44 deletions(-)
+ create mode 100644 hw/iommu/Makefile.objs
+ create mode 100644 hw/iommu/host_iommu_context.c
+ create mode 100644 include/hw/iommu/host_iommu_context.h
+ create mode 100644 linux-headers/linux/iommu.h
+
 -- 
 2.7.4
 
