@@ -2,26 +2,26 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 638D718E8CC
-	for <lists+kvm@lfdr.de>; Sun, 22 Mar 2020 13:31:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EC05218E8D7
+	for <lists+kvm@lfdr.de>; Sun, 22 Mar 2020 13:31:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727132AbgCVMal (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 22 Mar 2020 08:30:41 -0400
-Received: from mga12.intel.com ([192.55.52.136]:40476 "EHLO mga12.intel.com"
+        id S1727270AbgCVMav (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 22 Mar 2020 08:30:51 -0400
+Received: from mga17.intel.com ([192.55.52.151]:58574 "EHLO mga17.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727100AbgCVMak (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 22 Mar 2020 08:30:40 -0400
-IronPort-SDR: fqeprYLCP23bhp81bEA8jsvIpJP0IbPriILEPwIG8dRf5w/0Qu3UmOg/RbUyrZ6sWoTmNyR9R9
- EazFzf0UHumg==
+        id S1727100AbgCVMal (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 22 Mar 2020 08:30:41 -0400
+IronPort-SDR: LcRzOWx4AaFpB52xMMAx9dS81e8md/whPvSVckSZIUC79wOluzfd704/mrcejdTZP4x0yES6Wu
+ UrursrGlaJzA==
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Mar 2020 05:30:39 -0700
-IronPort-SDR: ynszA//vr04ujZBixMlQ8rbWpYmqA1Br100n2VWTY4/tkVwrgkkRyi82oNzIfWKHHG8qOPfj0i
- S8kKGcBFMiNQ==
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Mar 2020 05:30:39 -0700
+IronPort-SDR: 1DrJEvFmLOUcp5Ps0uHn86gzLlpL+bJdRsJ26xeTLP+MrzZiB38bQjF8QXbJV1pZGNppzr8EHh
+ JgP381s0YN2A==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.72,292,1580803200"; 
-   d="scan'208";a="239664392"
+   d="scan'208";a="239664395"
 Received: from jacob-builder.jf.intel.com ([10.7.199.155])
   by orsmga008.jf.intel.com with ESMTP; 22 Mar 2020 05:30:38 -0700
 From:   Liu Yi L <yi.l.liu@intel.com>
@@ -34,9 +34,9 @@ Cc:     eric.auger@redhat.com, pbonzini@redhat.com, mst@redhat.com,
         Jacob Pan <jacob.jun.pan@linux.intel.com>,
         Yi Sun <yi.y.sun@linux.intel.com>,
         Richard Henderson <rth@twiddle.net>
-Subject: [PATCH v1 14/22] intel_iommu: bind/unbind guest page table to host
-Date:   Sun, 22 Mar 2020 05:36:11 -0700
-Message-Id: <1584880579-12178-15-git-send-email-yi.l.liu@intel.com>
+Subject: [PATCH v1 15/22] intel_iommu: replay guest pasid bindings to host
+Date:   Sun, 22 Mar 2020 05:36:12 -0700
+Message-Id: <1584880579-12178-16-git-send-email-yi.l.liu@intel.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1584880579-12178-1-git-send-email-yi.l.liu@intel.com>
 References: <1584880579-12178-1-git-send-email-yi.l.liu@intel.com>
@@ -45,13 +45,22 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This patch captures the guest PASID table entry modifications and
-propagates the changes to host to setup dual stage DMA translation.
-The guest page table is configured as 1st level page table (GVA->GPA)
-whose translation result would further go through host VT-d 2nd
-level page table(GPA->HPA) under nested translation mode. This is the
-key part of vSVA support, and also a key to support IOVA over 1st-
-level page table for Intel VT-d in virtualization environment.
+This patch adds guest pasid bindings replay for domain
+selective pasid cache invalidation(dsi) and global pasid
+cache invalidation by walking guest pasid table.
+
+Reason:
+Guest OS may flush the pasid cache with a larger granularity.
+e.g. guest does a svm_bind() but flush the pasid cache with
+global or domain selective pasid cache invalidation instead
+of pasid selective(psi) pasid cache invalidation. Regards to
+such case, it works in host. Per spec, a global or domain
+selective pasid cache invalidation should be able to cover
+what a pasid selective invalidation does. The only concern
+is performance deduction since dsi and global cache invalidation
+will flush more than psi. To align with native, vIOMMU needs
+emulator needs to do replay for the two invalidation granularity
+to reflect the latest pasid bindings in guest pasid table.
 
 Cc: Kevin Tian <kevin.tian@intel.com>
 Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
@@ -61,194 +70,188 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>
 Cc: Richard Henderson <rth@twiddle.net>
 Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
 ---
- hw/i386/intel_iommu.c          | 98 +++++++++++++++++++++++++++++++++++++++---
- hw/i386/intel_iommu_internal.h | 25 +++++++++++
- 2 files changed, 118 insertions(+), 5 deletions(-)
+ hw/i386/intel_iommu.c          | 128 ++++++++++++++++++++++++++++++++++++++++-
+ hw/i386/intel_iommu_internal.h |   1 +
+ 2 files changed, 127 insertions(+), 2 deletions(-)
 
 diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-index c985cae..0423c83 100644
+index 0423c83..8ec638f 100644
 --- a/hw/i386/intel_iommu.c
 +++ b/hw/i386/intel_iommu.c
-@@ -41,6 +41,7 @@
- #include "migration/vmstate.h"
- #include "trace.h"
- #include "qemu/jhash.h"
-+#include <linux/iommu.h>
- 
- /* context entry operations */
- #define VTD_CE_GET_RID2PASID(ce) \
-@@ -695,6 +696,16 @@ static inline uint16_t vtd_pe_get_domain_id(VTDPASIDEntry *pe)
-     return VTD_SM_PASID_ENTRY_DID((pe)->val[1]);
- }
- 
-+static inline uint32_t vtd_pe_get_fl_aw(VTDPASIDEntry *pe)
-+{
-+    return 48 + ((pe->val[2] >> 2) & VTD_SM_PASID_ENTRY_FLPM) * 9;
-+}
-+
-+static inline dma_addr_t vtd_pe_get_flpt_base(VTDPASIDEntry *pe)
-+{
-+    return pe->val[2] & VTD_SM_PASID_ENTRY_FLPTPTR;
-+}
-+
- static inline bool vtd_pdire_present(VTDPASIDDirEntry *pdire)
- {
-     return pdire->val & 1;
-@@ -1856,6 +1867,81 @@ static void vtd_context_global_invalidate(IntelIOMMUState *s)
-     vtd_iommu_replay_all(s);
+@@ -2717,6 +2717,130 @@ static VTDPASIDAddressSpace *vtd_add_find_pasid_as(IntelIOMMUState *s,
+     return vtd_pasid_as;
  }
  
 +/**
-+ * Caller should hold iommu_lock.
++ * Constant information used during pasid table walk
++   @vtd_bus, @devfn: device info
++ * @flags: indicates if it is domain selective walk
++ * @did: domain ID of the pasid table walk
 + */
-+static int vtd_bind_guest_pasid(IntelIOMMUState *s, VTDBus *vtd_bus,
-+                                int devfn, int pasid, VTDPASIDEntry *pe,
-+                                VTDPASIDOp op)
++typedef struct {
++    VTDBus *vtd_bus;
++    uint16_t devfn;
++#define VTD_PASID_TABLE_DID_SEL_WALK   (1ULL << 0);
++    uint32_t flags;
++    uint16_t did;
++} vtd_pasid_table_walk_info;
++
++/**
++ * Caller of this function should hold iommu_lock.
++ */
++static bool vtd_sm_pasid_table_walk_one(IntelIOMMUState *s,
++                                        dma_addr_t pt_base,
++                                        int start,
++                                        int end,
++                                        vtd_pasid_table_walk_info *info)
 +{
-+    VTDHostIOMMUContext *vtd_dev_icx;
-+    HostIOMMUContext *host_icx;
-+    DualIOMMUStage1BindData *bind_data;
-+    struct iommu_gpasid_bind_data *g_bind_data;
-+    int ret = -1;
++    VTDPASIDEntry pe;
++    int pasid = start;
++    int pasid_next;
++    VTDPASIDAddressSpace *vtd_pasid_as;
++    VTDPASIDCacheEntry *pc_entry;
 +
-+    vtd_dev_icx = vtd_bus->dev_icx[devfn];
-+    if (!vtd_dev_icx) {
-+        return -EINVAL;
++    while (pasid < end) {
++        pasid_next = pasid + 1;
++
++        if (!vtd_get_pe_in_pasid_leaf_table(s, pasid, pt_base, &pe)
++            && vtd_pe_present(&pe)) {
++            vtd_pasid_as = vtd_add_find_pasid_as(s,
++                                       info->vtd_bus, info->devfn, pasid);
++            pc_entry = &vtd_pasid_as->pasid_cache_entry;
++            if (s->pasid_cache_gen == pc_entry->pasid_cache_gen) {
++                vtd_update_pe_in_cache(s, vtd_pasid_as, &pe);
++            } else {
++                vtd_fill_in_pe_in_cache(s, vtd_pasid_as, &pe);
++            }
++        }
++        pasid = pasid_next;
 +    }
-+
-+    host_icx = vtd_dev_icx->host_icx;
-+    if (!host_icx) {
-+        return -EINVAL;
-+    }
-+
-+    if (!(host_icx->stage1_formats
-+             & IOMMU_PASID_FORMAT_INTEL_VTD)) {
-+        error_report_once("IOMMU Stage 1 format is not compatible!\n");
-+    }
-+
-+    bind_data = g_malloc0(sizeof(*bind_data));
-+    bind_data->pasid = pasid;
-+    g_bind_data = &bind_data->bind_data.gpasid_bind;
-+
-+    g_bind_data->flags = 0;
-+    g_bind_data->vtd.flags = 0;
-+    switch (op) {
-+    case VTD_PASID_BIND:
-+    case VTD_PASID_UPDATE:
-+        g_bind_data->version = IOMMU_UAPI_VERSION;
-+        g_bind_data->format = IOMMU_PASID_FORMAT_INTEL_VTD;
-+        g_bind_data->gpgd = vtd_pe_get_flpt_base(pe);
-+        g_bind_data->addr_width = vtd_pe_get_fl_aw(pe);
-+        g_bind_data->hpasid = pasid;
-+        g_bind_data->gpasid = pasid;
-+        g_bind_data->flags |= IOMMU_SVA_GPASID_VAL;
-+        g_bind_data->vtd.flags =
-+                             (VTD_SM_PASID_ENTRY_SRE_BIT(pe->val[2]) ? 1 : 0)
-+                           | (VTD_SM_PASID_ENTRY_EAFE_BIT(pe->val[2]) ? 1 : 0)
-+                           | (VTD_SM_PASID_ENTRY_PCD_BIT(pe->val[1]) ? 1 : 0)
-+                           | (VTD_SM_PASID_ENTRY_PWT_BIT(pe->val[1]) ? 1 : 0)
-+                           | (VTD_SM_PASID_ENTRY_EMTE_BIT(pe->val[1]) ? 1 : 0)
-+                           | (VTD_SM_PASID_ENTRY_CD_BIT(pe->val[1]) ? 1 : 0);
-+        g_bind_data->vtd.pat = VTD_SM_PASID_ENTRY_PAT(pe->val[1]);
-+        g_bind_data->vtd.emt = VTD_SM_PASID_ENTRY_EMT(pe->val[1]);
-+        ret = host_iommu_ctx_bind_stage1_pgtbl(host_icx, bind_data);
-+        break;
-+    case VTD_PASID_UNBIND:
-+        g_bind_data->version = IOMMU_UAPI_VERSION;
-+        g_bind_data->format = IOMMU_PASID_FORMAT_INTEL_VTD;
-+        g_bind_data->gpgd = 0;
-+        g_bind_data->addr_width = 0;
-+        g_bind_data->hpasid = pasid;
-+        g_bind_data->gpasid = pasid;
-+        g_bind_data->flags |= IOMMU_SVA_GPASID_VAL;
-+        ret = host_iommu_ctx_unbind_stage1_pgtbl(host_icx, bind_data);
-+        break;
-+    default:
-+        error_report_once("Unknown VTDPASIDOp!!!\n");
-+        break;
-+    }
-+
-+    g_free(bind_data);
-+
-+    return ret;
++    return true;
 +}
 +
- /* Do a context-cache device-selective invalidation.
-  * @func_mask: FM field after shifting
-  */
-@@ -2481,10 +2567,10 @@ static inline void vtd_fill_in_pe_in_cache(IntelIOMMUState *s,
++/*
++ * Currently, VT-d scalable mode pasid table is a two level table,
++ * this function aims to loop a range of PASIDs in a given pasid
++ * table to identify the pasid config in guest.
++ * Caller of this function should hold iommu_lock.
++ */
++static void vtd_sm_pasid_table_walk(IntelIOMMUState *s,
++                                    dma_addr_t pdt_base,
++                                    int start,
++                                    int end,
++                                    vtd_pasid_table_walk_info *info)
++{
++    VTDPASIDDirEntry pdire;
++    int pasid = start;
++    int pasid_next;
++    dma_addr_t pt_base;
++
++    while (pasid < end) {
++        pasid_next = pasid + VTD_PASID_TBL_ENTRY_NUM;
++        if (!vtd_get_pdire_from_pdir_table(pdt_base, pasid, &pdire)
++            && vtd_pdire_present(&pdire)) {
++            pt_base = pdire.val & VTD_PASID_TABLE_BASE_ADDR_MASK;
++            if (!vtd_sm_pasid_table_walk_one(s,
++                              pt_base, pasid, pasid_next, info)) {
++                break;
++            }
++        }
++        pasid = pasid_next;
++    }
++}
++
++/**
++ * This function replay the guest pasid bindings to hots by
++ * walking the guest PASID table. This ensures host will have
++ * latest guest pasid bindings.
++ */
++static void vtd_replay_guest_pasid_bindings(IntelIOMMUState *s,
++                                            uint16_t *did,
++                                            bool is_dsi)
++{
++    VTDContextEntry ce;
++    VTDHostIOMMUContext *vtd_dev_icx;
++    int bus_n, devfn;
++    vtd_pasid_table_walk_info info;
++
++    if (is_dsi) {
++        info.flags = VTD_PASID_TABLE_DID_SEL_WALK;
++        info.did = *did;
++    }
++
++    /*
++     * In this replay, only needs to care about the devices which
++     * are backed by host IOMMU. For such devices, their vtd_dev_icx
++     * instances are in the s->vtd_dev_icx_list. For devices which
++     * are not backed byhost IOMMU, it is not necessary to replay
++     * the bindings since their cache could be re-created in the future
++     * DMA address transaltion.
++     */
++    vtd_iommu_lock(s);
++    QLIST_FOREACH(vtd_dev_icx, &s->vtd_dev_icx_list, next) {
++        bus_n = pci_bus_num(vtd_dev_icx->vtd_bus->bus);
++        devfn = vtd_dev_icx->devfn;
++
++        if (!vtd_dev_to_context_entry(s, bus_n, devfn, &ce)) {
++            info.vtd_bus = vtd_dev_icx->vtd_bus;
++            info.devfn = devfn;
++            vtd_sm_pasid_table_walk(s,
++                                    VTD_CE_GET_PASID_DIR_TABLE(&ce),
++                                    0,
++                                    VTD_MAX_HPASID,
++                                    &info);
++        }
++    }
++    vtd_iommu_unlock(s);
++}
++
+ static int vtd_pasid_cache_dsi(IntelIOMMUState *s, uint16_t domain_id)
+ {
+     VTDPASIDCacheInfo pc_info;
+@@ -2735,7 +2859,6 @@ static int vtd_pasid_cache_dsi(IntelIOMMUState *s, uint16_t domain_id)
+     vtd_iommu_unlock(s);
  
-     pc_entry->pasid_entry = *pe;
-     pc_entry->pasid_cache_gen = s->pasid_cache_gen;
--    /*
+     /*
 -     * TODO:
--     * - send pasid bind to host for passthru devices
--     */
-+    vtd_bind_guest_pasid(s, vtd_pasid_as->vtd_bus,
-+                         vtd_pasid_as->devfn,
-+                         vtd_pasid_as->pasid,
-+                         pe, VTD_PASID_BIND);
+      * Domain selective PASID cache invalidation flushes
+      * all the pasid caches within a domain. To be safe,
+      * after invalidating the pasid caches, emulator needs
+@@ -2743,6 +2866,7 @@ static int vtd_pasid_cache_dsi(IntelIOMMUState *s, uint16_t domain_id)
+      * dir and pasid table. e.g. When the guest setup a new
+      * PASID entry then send a PASID DSI.
+      */
++    vtd_replay_guest_pasid_bindings(s, &domain_id, true);
+     return 0;
  }
  
- /**
-@@ -2574,11 +2660,13 @@ static gboolean vtd_flush_pasid(gpointer key, gpointer value,
-      * - when pasid-base-iotlb(piotlb) infrastructure is ready,
-      *   should invalidate QEMU piotlb togehter with this change.
-      */
-+
-     return false;
- remove:
-+    vtd_bind_guest_pasid(s, vtd_bus, devfn,
-+                         pasid, NULL, VTD_PASID_UNBIND);
+@@ -2881,13 +3005,13 @@ static int vtd_pasid_cache_gsi(IntelIOMMUState *s)
+     vtd_iommu_unlock(s);
+ 
      /*
-      * TODO:
--     * - send pasid bind to host for passthru devices
-      * - when pasid-base-iotlb(piotlb) infrastructure is ready,
-      *   should invalidate QEMU piotlb togehter with this change.
+-     * TODO:
+      * Global PASID cache invalidation flushes all
+      * the pasid caches. To be safe, after invalidating
+      * the pasid caches, emulator needs to replay the
+      * pasid bindings by walking guest pasid dir and
+      * pasid table.
       */
++    vtd_replay_guest_pasid_bindings(s, NULL, false);
+     return 0;
+ }
+ 
 diff --git a/hw/i386/intel_iommu_internal.h b/hw/i386/intel_iommu_internal.h
-index 01fd95c..4451acf 100644
+index 4451acf..b0a324c 100644
 --- a/hw/i386/intel_iommu_internal.h
 +++ b/hw/i386/intel_iommu_internal.h
-@@ -516,6 +516,20 @@ typedef struct VTDRootEntry VTDRootEntry;
- #define VTD_SM_CONTEXT_ENTRY_RSVD_VAL0(aw)  (0x1e0ULL | ~VTD_HAW_MASK(aw))
- #define VTD_SM_CONTEXT_ENTRY_RSVD_VAL1      0xffffffffffe00000ULL
+@@ -554,6 +554,7 @@ typedef struct VTDPASIDCacheInfo VTDPASIDCacheInfo;
+ #define VTD_PASID_TABLE_BITS_MASK     (0x3fULL)
+ #define VTD_PASID_TABLE_INDEX(pasid)  ((pasid) & VTD_PASID_TABLE_BITS_MASK)
+ #define VTD_PASID_ENTRY_FPD           (1ULL << 1) /* Fault Processing Disable */
++#define VTD_PASID_TBL_ENTRY_NUM       (1ULL << 6)
  
-+enum VTD_DUAL_STAGE_UAPI {
-+    UAPI_BIND_GPASID,
-+    UAPI_NUM
-+};
-+typedef enum VTD_DUAL_STAGE_UAPI VTD_DUAL_STAGE_UAPI;
-+
-+enum VTDPASIDOp {
-+    VTD_PASID_BIND,
-+    VTD_PASID_UNBIND,
-+    VTD_PASID_UPDATE,
-+    VTD_OP_NUM
-+};
-+typedef enum VTDPASIDOp VTDPASIDOp;
-+
- struct VTDPASIDCacheInfo {
- #define VTD_PASID_CACHE_GLOBAL   (1ULL << 0)
- #define VTD_PASID_CACHE_DOMSI    (1ULL << 1)
-@@ -552,6 +566,17 @@ typedef struct VTDPASIDCacheInfo VTDPASIDCacheInfo;
- #define VTD_SM_PASID_ENTRY_AW          7ULL /* Adjusted guest-address-width */
- #define VTD_SM_PASID_ENTRY_DID(val)    ((val) & VTD_DOMAIN_ID_MASK)
- 
-+#define VTD_SM_PASID_ENTRY_FLPM          3ULL
-+#define VTD_SM_PASID_ENTRY_FLPTPTR       (~0xfffULL)
-+#define VTD_SM_PASID_ENTRY_SRE_BIT(val)  (!!((val) & 1ULL))
-+#define VTD_SM_PASID_ENTRY_EAFE_BIT(val) (!!(((val) >> 7) & 1ULL))
-+#define VTD_SM_PASID_ENTRY_PCD_BIT(val)  (!!(((val) >> 31) & 1ULL))
-+#define VTD_SM_PASID_ENTRY_PWT_BIT(val)  (!!(((val) >> 30) & 1ULL))
-+#define VTD_SM_PASID_ENTRY_EMTE_BIT(val) (!!(((val) >> 26) & 1ULL))
-+#define VTD_SM_PASID_ENTRY_CD_BIT(val)   (!!(((val) >> 25) & 1ULL))
-+#define VTD_SM_PASID_ENTRY_PAT(val)      (((val) >> 32) & 0xFFFFFFFFULL)
-+#define VTD_SM_PASID_ENTRY_EMT(val)      (((val) >> 27) & 0x7ULL)
-+
- /* Second Level Page Translation Pointer*/
- #define VTD_SM_PASID_ENTRY_SLPTPTR     (~0xfffULL)
- 
+ /* PASID Granular Translation Type Mask */
+ #define VTD_PASID_ENTRY_P              1ULL
 -- 
 2.7.4
 
