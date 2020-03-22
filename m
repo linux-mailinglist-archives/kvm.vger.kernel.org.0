@@ -2,136 +2,155 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7A9CA18E7AA
-	for <lists+kvm@lfdr.de>; Sun, 22 Mar 2020 09:53:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B8D8D18E8B2
+	for <lists+kvm@lfdr.de>; Sun, 22 Mar 2020 13:27:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726839AbgCVIxP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 22 Mar 2020 04:53:15 -0400
-Received: from mail-il1-f199.google.com ([209.85.166.199]:35459 "EHLO
-        mail-il1-f199.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726789AbgCVIxO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 22 Mar 2020 04:53:14 -0400
-Received: by mail-il1-f199.google.com with SMTP id t10so627045ilf.2
-        for <kvm@vger.kernel.org>; Sun, 22 Mar 2020 01:53:14 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
-         :from:to;
-        bh=fs5jc3eIRHHo8L1ECG1ULfTEDpxhJnx6F8XmPXsog80=;
-        b=c3eulu1D1kEA/FU78Wx2FyhHTGu7Lw1lFEb1K3tGcW078Zp111+1txA4QL4FLWD2k5
-         EoEO/n6Ajb8DxA3Nc7cqEwbyen0WpdBvFuMSRE2EBcPV7dddxc4ONGs9KbI6hFWfRBDL
-         rd3t7Tu95mdxiSfJ9h/HaNDLQsX79tXuOMqELKLUdxWAnjA2AHbhCM18ADVeC6gSml6n
-         sOAgoh/lrDvN1CD6Lb8AYVUzAvgC/fR/KRIBe6DVFgqODiV/LRTdtrqCRCBwC0Ftl3HY
-         8qNnX9A+Y55l3A1ZUdtSD4vRpGVo0OWyibEle8I+6qGMgN9pLBrkgajBiNQ2+qdUoYLI
-         V8iQ==
-X-Gm-Message-State: ANhLgQ3YDGma+YyFLGmOIz1AjOfMDSqXw2Y/g+edtX75bhXCrXhV65+s
-        4Q8hJjoVxcqMZer7AYOXz1s1ML9aZTPTDmG3LL8C39PoUy6q
-X-Google-Smtp-Source: ADFU+vuNmvXsGzWBPx94GchqX7DyUV81SJhWLj2po4wAn6k5uduZHPAkZ4hvi09+TXeGV9vhrPchthdNwhk1v89lXBTuT9P5mARf
-MIME-Version: 1.0
-X-Received: by 2002:a6b:b241:: with SMTP id b62mr7802759iof.99.1584867193709;
- Sun, 22 Mar 2020 01:53:13 -0700 (PDT)
-Date:   Sun, 22 Mar 2020 01:53:13 -0700
-In-Reply-To: <000000000000277a0405a16bd5c9@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000018e82205a16da6f0@google.com>
-Subject: Re: BUG: unable to handle kernel NULL pointer dereference in handle_external_interrupt_irqoff
-From:   syzbot <syzbot+3f29ca2efb056a761e38@syzkaller.appspotmail.com>
-To:     bp@alien8.de, clang-built-linux@googlegroups.com,
-        dvyukov@google.com, hpa@zytor.com, jmattson@google.com,
-        joro@8bytes.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        mingo@redhat.com, pbonzini@redhat.com,
-        sean.j.christopherson@intel.com, syzkaller-bugs@googlegroups.com,
-        tglx@linutronix.de, vkuznets@redhat.com, wanpengli@tencent.com,
-        x86@kernel.org
-Content-Type: text/plain; charset="UTF-8"
+        id S1727212AbgCVM0x (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 22 Mar 2020 08:26:53 -0400
+Received: from mga18.intel.com ([134.134.136.126]:51562 "EHLO mga18.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726984AbgCVM0Z (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 22 Mar 2020 08:26:25 -0400
+IronPort-SDR: VbsgSx7gSsGf0N6hgS7G+ORwFbJCKjK9GL+4sY/Na9D3xsa/K+iMMK0VegOFi7XmAvrjF+u+tB
+ YrsqFxuW5C5g==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Mar 2020 05:26:23 -0700
+IronPort-SDR: Cy6rHL7Yt8Bx00K+whxJzVWM95dDmNBC+s3FORZdpg1GwjHmSDiRC2tikfoh+bCYeuAvqfteE8
+ Zdeyt14VdXSw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.72,292,1580803200"; 
+   d="scan'208";a="239663862"
+Received: from jacob-builder.jf.intel.com ([10.7.199.155])
+  by orsmga008.jf.intel.com with ESMTP; 22 Mar 2020 05:26:23 -0700
+From:   "Liu, Yi L" <yi.l.liu@intel.com>
+To:     alex.williamson@redhat.com, eric.auger@redhat.com
+Cc:     kevin.tian@intel.com, jacob.jun.pan@linux.intel.com,
+        joro@8bytes.org, ashok.raj@intel.com, yi.l.liu@intel.com,
+        jun.j.tian@intel.com, yi.y.sun@intel.com, jean-philippe@linaro.org,
+        peterx@redhat.com, iommu@lists.linux-foundation.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org, hao.wu@intel.com
+Subject: [PATCH v1 0/8] vfio: expose virtual Shared Virtual Addressing to VMs
+Date:   Sun, 22 Mar 2020 05:31:57 -0700
+Message-Id: <1584880325-10561-1-git-send-email-yi.l.liu@intel.com>
+X-Mailer: git-send-email 2.7.4
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-syzbot has found a reproducer for the following crash on:
+From: Liu Yi L <yi.l.liu@intel.com>
 
-HEAD commit:    b74b991f Merge tag 'block-5.6-20200320' of git://git.kerne..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=13059373e00000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=6dfa02302d6db985
-dashboard link: https://syzkaller.appspot.com/bug?extid=3f29ca2efb056a761e38
-compiler:       clang version 10.0.0 (https://github.com/llvm/llvm-project/ c2443155a0fb245c8f17f2c1c72b6ea391e86e81)
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1199c0c5e00000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=15097373e00000
+Shared Virtual Addressing (SVA), a.k.a, Shared Virtual Memory (SVM) on
+Intel platforms allows address space sharing between device DMA and
+applications. SVA can reduce programming complexity and enhance security.
 
-IMPORTANT: if you fix the bug, please add the following tag to the commit:
-Reported-by: syzbot+3f29ca2efb056a761e38@syzkaller.appspotmail.com
+This VFIO series is intended to expose SVA usage to VMs. i.e. Sharing
+guest application address space with passthru devices. This is called
+vSVA in this series. The whole vSVA enabling requires QEMU/VFIO/IOMMU
+changes. For IOMMU and QEMU changes, they are in separate series (listed
+in the "Related series").
 
-BUG: kernel NULL pointer dereference, address: 0000000000000086
-#PF: supervisor instruction fetch in kernel mode
-#PF: error_code(0x0010) - not-present page
-PGD 9330b067 P4D 9330b067 PUD 9e66f067 PMD 0 
-Oops: 0010 [#1] PREEMPT SMP KASAN
-CPU: 1 PID: 8439 Comm: syz-executor724 Not tainted 5.6.0-rc6-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-RIP: 0010:0x86
-Code: Bad RIP value.
-RSP: 0018:ffffc900022e7998 EFLAGS: 00010086
-RAX: ffffc900022e79c8 RBX: fffffe0000000000 RCX: ffff88809dcf2500
-RDX: 0000000000000000 RSI: 0000000000000001 RDI: 0000000000000000
-RBP: 0000000000000ec0 R08: ffffffff83987523 R09: ffffffff811c7eca
-R10: ffff88809dcf2500 R11: 0000000000000002 R12: dffffc0000000000
-R13: fffffe0000000ec8 R14: ffffffff880016f0 R15: fffffe0000000ecb
-FS:  0000000001d0d880(0000) GS:ffff8880ae900000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000000000000005c CR3: 00000000978c3000 CR4: 00000000001426e0
-Call Trace:
- handle_external_interrupt_irqoff+0x154/0x280 arch/x86/kvm/vmx/vmx.c:6274
- kvm_before_interrupt arch/x86/kvm/x86.h:343 [inline]
- handle_external_interrupt_irqoff+0x132/0x280 arch/x86/kvm/vmx/vmx.c:6272
- __irqentry_text_start+0x8/0x8
- vcpu_enter_guest+0x6c77/0x9290 arch/x86/kvm/x86.c:8405
- save_stack mm/kasan/common.c:72 [inline]
- set_track mm/kasan/common.c:80 [inline]
- kasan_set_free_info mm/kasan/common.c:337 [inline]
- __kasan_slab_free+0x12e/0x1e0 mm/kasan/common.c:476
- __cache_free mm/slab.c:3426 [inline]
- kfree+0x10a/0x220 mm/slab.c:3757
- tomoyo_path_number_perm+0x525/0x690 security/tomoyo/file.c:736
- security_file_ioctl+0x55/0xb0 security/security.c:1441
- entry_SYSCALL_64_after_hwframe+0x49/0xbe
- __lock_acquire+0xc5a/0x1bc0 kernel/locking/lockdep.c:3954
- paravirt_write_msr arch/x86/include/asm/paravirt.h:167 [inline]
- wrmsrl arch/x86/include/asm/paravirt.h:200 [inline]
- native_x2apic_icr_write arch/x86/include/asm/apic.h:249 [inline]
- __x2apic_send_IPI_dest arch/x86/kernel/apic/x2apic_phys.c:112 [inline]
- x2apic_send_IPI+0x96/0xc0 arch/x86/kernel/apic/x2apic_phys.c:41
- test_bit include/asm-generic/bitops/instrumented-non-atomic.h:110 [inline]
- hlock_class kernel/locking/lockdep.c:163 [inline]
- mark_lock+0x107/0x1650 kernel/locking/lockdep.c:3642
- lock_acquire+0x154/0x250 kernel/locking/lockdep.c:4484
- rcu_lock_acquire+0x9/0x30 include/linux/rcupdate.h:208
- vcpu_run+0x3a3/0xd50 arch/x86/kvm/x86.c:8513
- kvm_arch_vcpu_ioctl_run+0x419/0x880 arch/x86/kvm/x86.c:8735
- kvm_vcpu_ioctl+0x67c/0xa80 arch/x86/kvm/../../../virt/kvm/kvm_main.c:2932
- lock_is_held include/linux/lockdep.h:361 [inline]
- rcu_read_lock_sched_held+0x106/0x170 kernel/rcu/update.c:121
- kvm_vm_release+0x50/0x50 arch/x86/kvm/../../../virt/kvm/kvm_main.c:858
- vfs_ioctl fs/ioctl.c:47 [inline]
- ksys_ioctl fs/ioctl.c:763 [inline]
- __do_sys_ioctl fs/ioctl.c:772 [inline]
- __se_sys_ioctl+0xf9/0x160 fs/ioctl.c:770
- do_syscall_64+0xf3/0x1b0 arch/x86/entry/common.c:294
- entry_SYSCALL_64_after_hwframe+0x49/0xbe
-Modules linked in:
-CR2: 0000000000000086
----[ end trace 480d6b60d5a9226d ]---
-RIP: 0010:0x86
-Code: Bad RIP value.
-RSP: 0018:ffffc900022e7998 EFLAGS: 00010086
-RAX: ffffc900022e79c8 RBX: fffffe0000000000 RCX: ffff88809dcf2500
-RDX: 0000000000000000 RSI: 0000000000000001 RDI: 0000000000000000
-RBP: 0000000000000ec0 R08: ffffffff83987523 R09: ffffffff811c7eca
-R10: ffff88809dcf2500 R11: 0000000000000002 R12: dffffc0000000000
-R13: fffffe0000000ec8 R14: ffffffff880016f0 R15: fffffe0000000ecb
-FS:  0000000001d0d880(0000) GS:ffff8880ae900000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000000000000005c CR3: 00000000978c3000 CR4: 00000000001426e0
+The high-level architecture for SVA virtualization is as below, the key
+design of vSVA support is to utilize the dual-stage IOMMU translation (
+also known as IOMMU nesting translation) capability in host IOMMU.
+
+
+    .-------------.  .---------------------------.
+    |   vIOMMU    |  | Guest process CR3, FL only|
+    |             |  '---------------------------'
+    .----------------/
+    | PASID Entry |--- PASID cache flush -
+    '-------------'                       |
+    |             |                       V
+    |             |                CR3 in GPA
+    '-------------'
+Guest
+------| Shadow |--------------------------|--------
+      v        v                          v
+Host
+    .-------------.  .----------------------.
+    |   pIOMMU    |  | Bind FL for GVA-GPA  |
+    |             |  '----------------------'
+    .----------------/  |
+    | PASID Entry |     V (Nested xlate)
+    '----------------\.------------------------------.
+    |             |   |SL for GPA-HPA, default domain|
+    |             |   '------------------------------'
+    '-------------'
+Where:
+ - FL = First level/stage one page tables
+ - SL = Second level/stage two page tables
+
+There are roughly four parts in this patchset which are
+corresponding to the basic vSVA support for PCI device
+assignment
+ 1. vfio support for PASID allocation and free for VMs
+ 2. vfio support for guest page table binding request from VMs
+ 3. vfio support for IOMMU cache invalidation from VMs
+ 4. vfio support for vSVA usage on IOMMU-backed mdevs
+
+The complete vSVA kernel upstream patches are divided into three phases:
+    1. Common APIs and PCI device direct assignment
+    2. IOMMU-backed Mediated Device assignment
+    3. Page Request Services (PRS) support
+
+This patchset is aiming for the phase 1 and phase 2, and based on Jacob's
+below series.
+[PATCH V10 00/11] Nested Shared Virtual Address (SVA) VT-d support:
+https://lkml.org/lkml/2020/3/20/1172
+
+Complete set for current vSVA can be found in below branch.
+https://github.com/luxis1999/linux-vsva.git: vsva-linux-5.6-rc6
+
+The corresponding QEMU patch series is as below, complete QEMU set can be
+found in below branch.
+[PATCH v1 00/22] intel_iommu: expose Shared Virtual Addressing to VMs
+complete QEMU set can be found in below link:
+https://github.com/luxis1999/qemu.git: sva_vtd_v10_v1
+
+Regards,
+Yi Liu
+
+Changelog:
+	- RFC v1 -> Patch v1:
+	  a) Address comments to the PASID request(alloc/free) path
+	  b) Report PASID alloc/free availabitiy to user-space
+	  c) Add a vfio_iommu_type1 parameter to support pasid quota tuning
+	  d) Adjusted to latest ioasid code implementation. e.g. remove the
+	     code for tracking the allocated PASIDs as latest ioasid code
+	     will track it, VFIO could use ioasid_free_set() to free all
+	     PASIDs.
+
+	- RFC v2 -> v3:
+	  a) Refine the whole patchset to fit the roughly parts in this series
+	  b) Adds complete vfio PASID management framework. e.g. pasid alloc,
+	  free, reclaim in VM crash/down and per-VM PASID quota to prevent
+	  PASID abuse.
+	  c) Adds IOMMU uAPI version check and page table format check to ensure
+	  version compatibility and hardware compatibility.
+	  d) Adds vSVA vfio support for IOMMU-backed mdevs.
+
+	- RFC v1 -> v2:
+	  Dropped vfio: VFIO_IOMMU_ATTACH/DETACH_PASID_TABLE.
+
+Liu Yi L (8):
+  vfio: Add VFIO_IOMMU_PASID_REQUEST(alloc/free)
+  vfio/type1: Add vfio_iommu_type1 parameter for quota tuning
+  vfio/type1: Report PASID alloc/free support to userspace
+  vfio: Check nesting iommu uAPI version
+  vfio/type1: Report 1st-level/stage-1 format to userspace
+  vfio/type1: Bind guest page tables to host
+  vfio/type1: Add VFIO_IOMMU_CACHE_INVALIDATE
+  vfio/type1: Add vSVA support for IOMMU-backed mdevs
+
+ drivers/vfio/vfio.c             | 136 +++++++++++++
+ drivers/vfio/vfio_iommu_type1.c | 419 ++++++++++++++++++++++++++++++++++++++++
+ include/linux/vfio.h            |  21 ++
+ include/uapi/linux/vfio.h       | 127 ++++++++++++
+ 4 files changed, 703 insertions(+)
+
+-- 
+2.7.4
 
