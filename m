@@ -2,196 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8B64C18FA20
-	for <lists+kvm@lfdr.de>; Mon, 23 Mar 2020 17:43:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6208618FA25
+	for <lists+kvm@lfdr.de>; Mon, 23 Mar 2020 17:44:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727228AbgCWQnZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Mar 2020 12:43:25 -0400
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:42936 "EHLO
-        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727005AbgCWQnZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 Mar 2020 12:43:25 -0400
-Received: by mail-wr1-f66.google.com with SMTP id h15so5741959wrx.9
-        for <kvm@vger.kernel.org>; Mon, 23 Mar 2020 09:43:24 -0700 (PDT)
+        id S1727537AbgCWQoG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Mar 2020 12:44:06 -0400
+Received: from mail-qk1-f196.google.com ([209.85.222.196]:46837 "EHLO
+        mail-qk1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727461AbgCWQoG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 Mar 2020 12:44:06 -0400
+Received: by mail-qk1-f196.google.com with SMTP id u4so4103951qkj.13
+        for <kvm@vger.kernel.org>; Mon, 23 Mar 2020 09:44:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=o3gpu5Dh3IkmQ0CUfMWQNecQHinVRuCfaD2dWh59NM4=;
-        b=E2ENxM6BCjX2iSyQOz5UXndmTg8C/UDO9pqwl3ekGdObVwqQAbk/7BsOBBVfkB/LEz
-         4kM1BjeBatmpFVCjAyKzIpRivRXjHwAGks/hGdKVHSOoIuaLrJcSkC/XbXExkleSB1Yf
-         pfN8K9zfvdtHlBDbJ2hi3s7IZbXXstV63NT7X/YZF9dTm6bUytfdjhPkLzHhG2xwyoLr
-         qQ6qrv01OPrHxm+F46aoe6tvz4Bgn+xCtcYqvuC2Tu0sD26ulf/i9UfvON+j6RKu9B3H
-         iApR+SeRgR83EAavacj1tZ5vlWc+37Pj4H5rpGR4YJVQA63qwzCPPGc61UigX1q4yGUQ
-         MB0A==
+        d=ziepe.ca; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=gOqUZhrB3tbP37O07iZXzI++c1tt+580wf55GATS2SM=;
+        b=CHkzV0CUaFfnHgtED9IRJD4ztA7/XKt6w3TMqe+emVP/CoIvuvXtYA2Rntt9fhIupT
+         FDhFCWE3zOJ+1mdE4OhnqVBGkGJplnaoVMH6yWifoIndPxyJWU6t2TbUiHx+Fabkz4AU
+         Bo6VUH5I/z+vdpQyLloUPnUFcyCsVgk/ZKOq7fZWdshq+tD1F2JqhgynUuOC9Clph639
+         oYUZtEi9XKMwwJh4wsqKYBmavQEBgUhAg1WuJMXTB5ek2FIUwDvyCE3rofJYHNfQbqHY
+         1ibApMJdvmmqRPne6+/xBnr+WdEY9aK5/EWxYtSutuEpgLnfjdVKLjxpd/vvow8QZIkD
+         0bzA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=o3gpu5Dh3IkmQ0CUfMWQNecQHinVRuCfaD2dWh59NM4=;
-        b=BekaCdoNT6LMUwZCvPsCw0/U4CtNzQL5dFmAp7uMGXsawvLmaWELBam7jGE+cQPxEj
-         yBcNn+G2x3hXiAF4fz6uUMcNOT5gAYy+q11Idq2xecpZIdij00Ly3zyKQb/l3ayJab8C
-         3R0+OkrlW9wf0s0mBEihkaIzqqJT8GsvErZqJEyy6Mjt/yOnl/nvbZA425ZpvHnbHYtq
-         ns4u6y08n4XOHaIoKbrU3VW+meKp3+vXp9COxpAyN/ZE5YQ/LUkY9dB/BLXPjK5KOloZ
-         lCAzB/dmQgEEkkbEy8s9IVYE/HJhUR71hnnvl9K8gObpvq2gadCwGuI8fT74teR1UaiP
-         VUeQ==
-X-Gm-Message-State: ANhLgQ0He1mkBP5HuHYWWaHrQcMfw7MHXNp+ihO9srMNdusRRsaJzRyr
-        WhQvGWIH1h19knHwhqtM34unPPtfavSsMYgFBj4qwg==
-X-Google-Smtp-Source: ADFU+vuEZdhdBL7F8sKgJyYGiLp/J+ZzFKBxy7wTXWtQp5cqrsuPoL3YxmXuAl+cIONiVKr560clDRKOHoX8VxMDJU8=
-X-Received: by 2002:adf:b60f:: with SMTP id f15mr32483854wre.372.1584981803024;
- Mon, 23 Mar 2020 09:43:23 -0700 (PDT)
-MIME-Version: 1.0
-References: <000000000000277a0405a16bd5c9@google.com> <CACT4Y+b1WFT87pWQaXD3CWjyjoQaP1jcycHdHF+rtxoR5xW1ww@mail.gmail.com>
- <5058aabe-f32d-b8ef-57ed-f9c0206304c5@redhat.com> <CAG_fn=WYtSoyi63ACaz-ya=Dbi+BFU-_mADDpL6gQvDimQscmw@mail.gmail.com>
- <20200323163925.GP28711@linux.intel.com>
-In-Reply-To: <20200323163925.GP28711@linux.intel.com>
-From:   Alexander Potapenko <glider@google.com>
-Date:   Mon, 23 Mar 2020 17:43:11 +0100
-Message-ID: <CAG_fn=VSQTxAfC_AJmAmjEwn=o5MAW+Mb7aHqXghzezzzZFCEA@mail.gmail.com>
-Subject: Re: BUG: unable to handle kernel NULL pointer dereference in handle_external_interrupt_irqoff
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=gOqUZhrB3tbP37O07iZXzI++c1tt+580wf55GATS2SM=;
+        b=c+5vxoz1ZTaMxTAxLx5St+XI6el5FH3B2rON900z+lKbB0iy/X//vG2AogbHlFS1w4
+         Mr5wNfXGE5wIn5lfaWnKTy2ot67ComeXt3znuhOWuma0Gsf35HA9oBfOHVRP6hopvbu1
+         W1aFbsWQ5gHl3L7FQEkgUJE1m6+Nxy/TYYZD8MVzEBd7LYmQ3MgbKYspVXsbwasw38N8
+         61KzfI4ByT/w3f5MBobL3d3snI5hAMjWnTICnt/7GuioKefmOfQtneLkbdmsRwC5zTJC
+         3uJm6wELPAJOhCeCfSIu3XriC9xGwvjeCl09IGLACK4Rqv+/lWVKqVhQwy24546U0JOF
+         hclg==
+X-Gm-Message-State: ANhLgQ0I4h2WTnEaf8PuSve24/qiOqMU/2tR60phSQYuJ1RZDhss+XbO
+        aGNIhRIbd2yI8WdqUraGB53oqg==
+X-Google-Smtp-Source: ADFU+vtcop8zgZHP+bMT/hRGVH1iCEYh7uqN8r13iYqMZjJ4sAKMDQgt2z2v/hovRrjc1FG+Yk1+6Q==
+X-Received: by 2002:a05:620a:84d:: with SMTP id u13mr21724625qku.94.1584981845232;
+        Mon, 23 Mar 2020 09:44:05 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-142-68-57-212.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.57.212])
+        by smtp.gmail.com with ESMTPSA id f13sm12827393qte.53.2020.03.23.09.44.03
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Mon, 23 Mar 2020 09:44:04 -0700 (PDT)
+Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1jGQBH-0005fK-Aj; Mon, 23 Mar 2020 13:44:03 -0300
+Date:   Mon, 23 Mar 2020 13:44:03 -0300
+From:   Jason Gunthorpe <jgg@ziepe.ca>
 To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Dmitry Vyukov <dvyukov@google.com>,
-        syzbot <syzbot+3f29ca2efb056a761e38@syzkaller.appspotmail.com>,
-        clang-built-linux <clang-built-linux@googlegroups.com>,
-        Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, KVM list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        syzkaller-bugs <syzkaller-bugs@googlegroups.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>, wanpengli@tencent.com,
-        "the arch/x86 maintainers" <x86@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Cc:     Mike Kravetz <mike.kravetz@oracle.com>,
+        "Longpeng (Mike, Cloud Infrastructure Service Product Dept.)" 
+        <longpeng2@huawei.com>, akpm@linux-foundation.org,
+        kirill.shutemov@linux.intel.com, linux-kernel@vger.kernel.org,
+        arei.gonglei@huawei.com, weidong.huang@huawei.com,
+        weifuqiang@huawei.com, kvm@vger.kernel.org, linux-mm@kvack.org,
+        Matthew Wilcox <willy@infradead.org>, stable@vger.kernel.org
+Subject: Re: [PATCH v2] mm/hugetlb: fix a addressing exception caused by
+ huge_pte_offset()
+Message-ID: <20200323164403.GZ20941@ziepe.ca>
+References: <1582342427-230392-1-git-send-email-longpeng2@huawei.com>
+ <51a25d55-de49-4c0a-c994-bf1a8cfc8638@oracle.com>
+ <5700f44e-9df9-1b12-bc29-68e0463c2860@huawei.com>
+ <e16fe81b-5c4c-e689-2f48-214f2025df2f@oracle.com>
+ <20200323144030.GA28711@linux.intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200323144030.GA28711@linux.intel.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Mar 23, 2020 at 5:39 PM Sean Christopherson
-<sean.j.christopherson@intel.com> wrote:
->
-> On Mon, Mar 23, 2020 at 05:31:15PM +0100, Alexander Potapenko wrote:
-> > On Mon, Mar 23, 2020 at 9:18 AM Paolo Bonzini <pbonzini@redhat.com> wro=
-te:
-> > >
-> > > On 22/03/20 07:59, Dmitry Vyukov wrote:
-> > > >
-> > > > The commit range is presumably
-> > > > fb279f4e238617417b132a550f24c1e86d922558..63849c8f410717eb2e6662f39=
-53ff674727303e7
-> > > > But I don't see anything that says "it's me". The only commit that
-> > > > does non-trivial changes to x86/vmx seems to be "KVM: VMX: check
-> > > > descriptor table exits on instruction emulation":
-> > >
-> > > That seems unlikely, it's a completely different file and it would on=
-ly
-> > > affect the outside (non-nested) environment rather than your own kern=
-el.
-> > >
-> > > The only instance of "0x86" in the registers is in the flags:
-> > >
-> > > > RSP: 0018:ffffc90001ac7998 EFLAGS: 00010086
-> > > > RAX: ffffc90001ac79c8 RBX: fffffe0000000000 RCX: 0000000000040000
-> > > > RDX: ffffc9000e20f000 RSI: 000000000000b452 RDI: 000000000000b453
-> > > > RBP: 0000000000000ec0 R08: ffffffff83987523 R09: ffffffff811c7eca
-> > > > R10: ffff8880a4e94200 R11: 0000000000000002 R12: dffffc0000000000
-> > > > R13: fffffe0000000ec8 R14: ffffffff880016f0 R15: fffffe0000000ecb
-> > > > FS:  00007fb50e370700(0000) GS:ffff8880ae800000(0000) knlGS:0000000=
-000000000
-> > > > CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> > > > CR2: 000000000000005c CR3: 0000000092fc7000 CR4: 00000000001426f0
-> > > > DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> > > > DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> > >
-> > > That would suggest a miscompilation of the inline assembly, which doe=
-s
-> > > push the flags:
-> > >
-> > > #ifdef CONFIG_X86_64
-> > >                 "mov %%" _ASM_SP ", %[sp]\n\t"
-> > >                 "and $0xfffffffffffffff0, %%" _ASM_SP "\n\t"
-> > >                 "push $%c[ss]\n\t"
-> > >                 "push %[sp]\n\t"
-> > > #endif
-> > >                 "pushf\n\t"
-> > >                 __ASM_SIZE(push) " $%c[cs]\n\t"
-> > >                 CALL_NOSPEC
-> > >
-> > >
-> > > It would not explain why it suddenly started to break, unless the cla=
-ng
-> > > version also changed, but it would be easy to ascertain and fix (in
-> > > either KVM or clang).  Dmitry, can you send me the vmx.o and
-> > > kvm-intel.ko files?
-> >
-> > On a quick glance, Clang does not miscompile this part.
->
-> Clang definitely miscompiles the asm, the indirect call operates on the
-> EFLAGS value, not on @entry as expected.  It looks like clang doesn't hon=
-or
-> ASM_CALL_CONSTRAINT, which effectively tells the compiler that %rsp is
-> getting clobbered, e.g. the "mov %r14,0x8(%rsp)" is loading @entry for
-> "callq *0x8(%rsp)", which breaks because of asm's pushes.
+On Mon, Mar 23, 2020 at 07:40:31AM -0700, Sean Christopherson wrote:
+> On Sun, Mar 22, 2020 at 07:54:32PM -0700, Mike Kravetz wrote:
+> > On 3/22/20 7:03 PM, Longpeng (Mike, Cloud Infrastructure Service Product Dept.) wrote:
+> > > 
+> > > On 2020/3/22 7:38, Mike Kravetz wrote:
+> > >> On 2/21/20 7:33 PM, Longpeng(Mike) wrote:
+> > >>> From: Longpeng <longpeng2@huawei.com>
+> > I have not looked closely at the generated code for lookup_address_in_pgd.
+> > It appears that it would dereference p4d, pud and pmd multiple times.  Sean
+> > seemed to think there was something about the calling context that would
+> > make issues like those seen with huge_pte_offset less likely to happen.  I
+> > do not know if this is accurate or not.
+> 
+> Only for KVM's calls to lookup_address_in_mm(), I can't speak to other
+> calls that funnel into to lookup_address_in_pgd().
+> 
+> KVM uses a combination of tracking and blocking mmu_notifier calls to ensure
+> PTE changes/invalidations between gup() and lookup_address_in_pgd() cause a
+> restart of the faulting instruction, and that pending changes/invalidations
+> are blocked until installation of the pfn in KVM's secondary MMU completes.
+> 
+> kvm_mmu_page_fault():
+> 
+> 	mmu_seq = kvm->mmu_notifier_seq;
+> 	smp_rmb();
+> 
+> 	pfn = gup(hva);
+> 
+> 	spin_lock(&kvm->mmu_lock);
+> 	smp_rmb();
+> 	if (kvm->mmu_notifier_seq != mmu_seq)
+> 		goto out_unlock: // Restart guest, i.e. retry the fault
+> 
+> 	lookup_address_in_mm(hva, ...);
 
-Ugh, I completely overlooked this. Right, this is something to work
-this on the Clang side.
+It works because the mmu_lock spinlock is taken before and after any
+change to the page table via invalidate_range_start/end() callbacks.
 
+So if you are in the spinlock and mmu_notifier_count == 0, then nobody
+can be writing to the page tables. 
 
-> clang:
->
->         kvm_before_interrupt(vcpu);
->
->         asm volatile(
-> ffffffff811b798e:       4c 89 74 24 08          mov    %r14,0x8(%rsp)
-> ffffffff811b7993:       48 89 e0                mov    %rsp,%rax
-> ffffffff811b7996:       48 83 e4 f0             and    $0xfffffffffffffff=
-0,%rsp
-> ffffffff811b799a:       6a 18                   pushq  $0x18
-> ffffffff811b799c:       50                      push   %rax
-> ffffffff811b799d:       9c                      pushfq
-> ffffffff811b799e:       6a 10                   pushq  $0x10
-> ffffffff811b79a0:       ff 54 24 08             callq  *0x8(%rsp) <------=
---- calls the EFLAGS value
-> kvm_after_interrupt():
->
->
-> gcc:
->         kvm_before_interrupt(vcpu);
->
->         asm volatile(
-> ffffffff8118e17c:       48 89 e0                mov    %rsp,%rax
-> ffffffff8118e17f:       48 83 e4 f0             and    $0xfffffffffffffff=
-0,%rsp
-> ffffffff8118e183:       6a 18                   pushq  $0x18
-> ffffffff8118e185:       50                      push   %rax
-> ffffffff8118e186:       9c                      pushfq
-> ffffffff8118e187:       6a 10                   pushq  $0x10
-> ffffffff8118e189:       ff d3                   callq  *%rbx <-------- ca=
-lls @entry
-> kvm_after_interrupt():
->
-> --
-> You received this message because you are subscribed to the Google Groups=
- "syzkaller-bugs" group.
-> To unsubscribe from this group and stop receiving emails from it, send an=
- email to syzkaller-bugs+unsubscribe@googlegroups.com.
-> To view this discussion on the web visit https://groups.google.com/d/msgi=
-d/syzkaller-bugs/20200323163925.GP28711%40linux.intel.com.
+It is effectively a full page table lock, so any page table read under
+that lock do not need to worry about any data races.
 
-
-
---=20
-Alexander Potapenko
-Software Engineer
-
-Google Germany GmbH
-Erika-Mann-Stra=C3=9Fe, 33
-80636 M=C3=BCnchen
-
-Gesch=C3=A4ftsf=C3=BChrer: Paul Manicle, Halimah DeLaine Prado
-Registergericht und -nummer: Hamburg, HRB 86891
-Sitz der Gesellschaft: Hamburg
+Jason
