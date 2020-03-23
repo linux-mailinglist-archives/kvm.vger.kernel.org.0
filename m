@@ -2,106 +2,149 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6DC9918F08A
-	for <lists+kvm@lfdr.de>; Mon, 23 Mar 2020 09:01:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8728118F0AB
+	for <lists+kvm@lfdr.de>; Mon, 23 Mar 2020 09:11:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727527AbgCWIBD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Mar 2020 04:01:03 -0400
-Received: from 107-174-27-60-host.colocrossing.com ([107.174.27.60]:50648 "EHLO
-        ozlabs.ru" rhost-flags-OK-FAIL-OK-OK) by vger.kernel.org with ESMTP
-        id S1727507AbgCWIBC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 Mar 2020 04:01:02 -0400
-Received: from fstn1-p1.ozlabs.ibm.com (localhost [IPv6:::1])
-        by ozlabs.ru (Postfix) with ESMTP id 7E139AE807F2;
-        Mon, 23 Mar 2020 03:52:36 -0400 (EDT)
-From:   Alexey Kardashevskiy <aik@ozlabs.ru>
-To:     linuxppc-dev@lists.ozlabs.org
-Cc:     David Gibson <david@gibson.dropbear.id.au>,
-        kvm-ppc@vger.kernel.org, kvm@vger.kernel.org,
-        Alistair Popple <alistair@popple.id.au>,
-        Fabiano Rosas <farosas@linux.ibm.com>,
-        Alexey Kardashevskiy <aik@ozlabs.ru>
-Subject: [PATCH kernel v2 7/7] vfio/spapr_tce: Advertise and allow a huge DMA windows at 4GB
-Date:   Mon, 23 Mar 2020 18:53:54 +1100
-Message-Id: <20200323075354.93825-8-aik@ozlabs.ru>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200323075354.93825-1-aik@ozlabs.ru>
-References: <20200323075354.93825-1-aik@ozlabs.ru>
+        id S1727513AbgCWILT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Mar 2020 04:11:19 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:35004 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727422AbgCWILT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 Mar 2020 04:11:19 -0400
+Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.60])
+        by Forcepoint Email with ESMTP id CDDB242FB3B17C38F76B;
+        Mon, 23 Mar 2020 16:11:09 +0800 (CST)
+Received: from [127.0.0.1] (10.173.222.27) by DGGEMS403-HUB.china.huawei.com
+ (10.3.19.203) with Microsoft SMTP Server id 14.3.487.0; Mon, 23 Mar 2020
+ 16:11:02 +0800
+Subject: Re: [PATCH v5 20/23] KVM: arm64: GICv4.1: Plumb SGI implementation
+ selection in the distributor
+To:     Marc Zyngier <maz@kernel.org>
+CC:     <linux-arm-kernel@lists.infradead.org>,
+        <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>,
+        Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
+        Jason Cooper <jason@lakedaemon.net>,
+        "Robert Richter" <rrichter@marvell.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        "Eric Auger" <eric.auger@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        "Julien Thierry" <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>
+References: <20200304203330.4967-1-maz@kernel.org>
+ <20200304203330.4967-21-maz@kernel.org>
+ <72832f51-bbde-8502-3e03-189ac20a0143@huawei.com>
+ <4a06fae9c93e10351276d173747d17f4@kernel.org>
+ <1c9fdfc8-bdb2-88b6-4bdc-2b9254dfa55c@huawei.com>
+ <256b58a9679412c96600217f316f424f@kernel.org>
+From:   Zenghui Yu <yuzenghui@huawei.com>
+Message-ID: <cf5d7cf3-076f-47a7-83cf-717a619dc13e@huawei.com>
+Date:   Mon, 23 Mar 2020 16:11:00 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
+MIME-Version: 1.0
+In-Reply-To: <256b58a9679412c96600217f316f424f@kernel.org>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.173.222.27]
+X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-So far the only option for a big 64big DMA window was a window located
-at 0x800.0000.0000.0000 (1<<59) which creates problems for devices
-supporting smaller DMA masks.
+Hi Marc,
 
-This exploits a POWER9 PHB option to allow the second DMA window to map
-at 0 and advertises it with a 4GB offset to avoid overlap with
-the default 32bit window.
+On 2020/3/20 17:01, Marc Zyngier wrote:
+> Hi Zenghui,
+> 
+> On 2020-03-20 03:53, Zenghui Yu wrote:
+>> Hi Marc,
+>>
+>> On 2020/3/19 20:10, Marc Zyngier wrote:
+>>>> But I wonder that should we use nassgireq to *only* keep track what
+>>>> the guest had written into the GICD_CTLR.nASSGIreq.  If not, we may
+>>>> lose the guest-request bit after migration among hosts with different
+>>>> has_gicv4_1 settings.
+>>>
+>>> I'm unsure of what you're suggesting here. If userspace tries to set
+>>> GICD_CTLR.nASSGIreq on a non-4.1 host, this bit will not latch.
+>>
+>> This is exactly what I *was* concerning about.
+>>
+>>> Userspace can check that at restore time. Or we could fail the
+>>> userspace write, which is a bit odd (the bit is otherwise RES0).
+>>>
+>>> Could you clarify your proposal?
+>>
+>> Let's assume two hosts below. 'has_gicv4_1' is true on host-A while
+>> it is false on host-B because of lack of HW support or the kernel
+>> parameter "kvm-arm.vgic_v4_enable=0".
+>>
+>> If we migrate guest through A->B->A, we may end-up lose the initial
+>> guest-request "nASSGIreq=1" and don't use direct vSGI delivery for
+>> this guest when it's migrated back to host-A.
+> 
+> My point above is that we shouldn't allow the A->B migration the first
+> place, and fail it as quickly as possible. We don't know what the guest
+> has observed in terms of GIC capability, and it may not have enabled the
+> new flavour of SGIs just yet.
 
-Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
----
- include/uapi/linux/vfio.h           |  2 ++
- drivers/vfio/vfio_iommu_spapr_tce.c | 13 +++++++------
- 2 files changed, 9 insertions(+), 6 deletions(-)
+Indeed. I didn't realize it.
 
-diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-index 9e843a147ead..c7f89d47335a 100644
---- a/include/uapi/linux/vfio.h
-+++ b/include/uapi/linux/vfio.h
-@@ -831,9 +831,11 @@ struct vfio_iommu_spapr_tce_info {
- 	__u32 argsz;
- 	__u32 flags;
- #define VFIO_IOMMU_SPAPR_INFO_DDW	(1 << 0)	/* DDW supported */
-+#define VFIO_IOMMU_SPAPR_INFO_DDW_START	(1 << 1)	/* DDW offset */
- 	__u32 dma32_window_start;	/* 32 bit window start (bytes) */
- 	__u32 dma32_window_size;	/* 32 bit window size (bytes) */
- 	struct vfio_iommu_spapr_tce_ddw_info ddw;
-+	__u64 dma64_window_start;
- };
- 
- #define VFIO_IOMMU_SPAPR_TCE_GET_INFO	_IO(VFIO_TYPE, VFIO_BASE + 12)
-diff --git a/drivers/vfio/vfio_iommu_spapr_tce.c b/drivers/vfio/vfio_iommu_spapr_tce.c
-index 750a0676e9b7..315fd56e51a7 100644
---- a/drivers/vfio/vfio_iommu_spapr_tce.c
-+++ b/drivers/vfio/vfio_iommu_spapr_tce.c
-@@ -691,7 +691,7 @@ static long tce_iommu_create_window(struct tce_container *container,
- 	container->tables[num] = tbl;
- 
- 	/* Return start address assigned by platform in create_table() */
--	*start_addr = tbl->it_offset << tbl->it_page_shift;
-+	*start_addr = (tbl->it_offset + tbl->it_tceoff) << tbl->it_page_shift;
- 
- 	return 0;
- 
-@@ -777,7 +777,7 @@ static long tce_iommu_ioctl(void *iommu_data,
- 				 unsigned int cmd, unsigned long arg)
- {
- 	struct tce_container *container = iommu_data;
--	unsigned long minsz, ddwsz;
-+	unsigned long minsz;
- 	long ret;
- 
- 	switch (cmd) {
-@@ -842,12 +842,13 @@ static long tce_iommu_ioctl(void *iommu_data,
- 			info.ddw.levels = table_group->max_levels;
- 		}
- 
--		ddwsz = offsetofend(struct vfio_iommu_spapr_tce_info, ddw);
-+		info.flags |= VFIO_IOMMU_SPAPR_INFO_DDW_START;
-+		info.dma64_window_start = table_group->tce64_start;
- 
--		if (info.argsz >= ddwsz)
--			minsz = ddwsz;
-+		if (info.argsz > sizeof(info))
-+			info.argsz = sizeof(info);
- 
--		if (copy_to_user((void __user *)arg, &info, minsz))
-+		if (copy_to_user((void __user *)arg, &info, info.argsz))
- 			return -EFAULT;
- 
- 		return 0;
--- 
-2.17.1
+> 
+>> This can be "fixed" by keep track of what guest had written into
+>> nASSGIreq. And we need to evaluate the need for using direct vSGI
+>> for a specified guest by 'has_gicv4_1 && nassgireq'.
+> 
+> It feels odd. It means we have more state than the HW normally has.
+> I have an alternative proposal, see below.
+> 
+>> But if it's expected that "if userspace tries to set nASSGIreq on
+>> a non-4.1 host, this bit will not latch", then this shouldn't be
+>> a problem at all.
+> 
+> Well, that is the semantics of the RES0 bit. It applies from both
+> guest and userspace.
+> 
+> And actually, maybe we can handle that pretty cheaply. If userspace
+> tries to restore GICD_TYPER2 to a value that isn't what KVM can
+> offer, we just return an error. Exactly like we do for GICD_IIDR.
+> Hence the following patch:
+> 
+> diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c 
+> b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+> index 28b639fd1abc..e72dcc454247 100644
+> --- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
+> +++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+> @@ -156,6 +156,7 @@ static int vgic_mmio_uaccess_write_v3_misc(struct 
+> kvm_vcpu *vcpu,
+>       struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
+> 
+>       switch (addr & 0x0c) {
+> +    case GICD_TYPER2:
+>       case GICD_IIDR:
+>           if (val != vgic_mmio_read_v3_misc(vcpu, addr, len))
+>               return -EINVAL;
+> 
+> Being a RO register, writing something that isn't compatible with the
+> possible behaviour of the hypervisor will just return an error.
+
+This is really a nice point to address my concern! I'm happy to see
+this in v6 now.
+
+> 
+> What do you think?
+
+I agreed with you, with a bit nervous though. Some old guests (which
+have no knowledge about GICv4.1 vSGIs and don't care about nASSGIcap
+at all) will also fail to migrate from A to B, just because now we
+present two different (unused) GICD_TYPER2 registers to them.
+
+Is it a little unfair to them :-) ?
+
+
+Thanks,
+Zenghui
 
