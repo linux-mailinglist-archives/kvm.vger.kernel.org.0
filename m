@@ -2,64 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A87D918F8CE
-	for <lists+kvm@lfdr.de>; Mon, 23 Mar 2020 16:39:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0A6E618F8D3
+	for <lists+kvm@lfdr.de>; Mon, 23 Mar 2020 16:40:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727267AbgCWPjo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Mar 2020 11:39:44 -0400
-Received: from mga03.intel.com ([134.134.136.65]:41400 "EHLO mga03.intel.com"
+        id S1727361AbgCWPk1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Mar 2020 11:40:27 -0400
+Received: from mail.kernel.org ([198.145.29.99]:40874 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727119AbgCWPjo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 Mar 2020 11:39:44 -0400
-IronPort-SDR: oFPFApnlOFo+TXG699Pe6H+2xs2Tu4k03C8+dPPEAJFhL7MCZkT6+sOa6buVXK1eO4OC/M9sIt
- +Uuf6Q9EqHoQ==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Mar 2020 08:38:04 -0700
-IronPort-SDR: 9+1ObKw03rdINnymPRfYKrF7RSRXlP6uiMZXg8gBrh9a6pVNyoKoE2F80qOku+lRShN01imbPW
- nmmRx4WRdMAA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.72,296,1580803200"; 
-   d="scan'208";a="235253307"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
-  by orsmga007.jf.intel.com with ESMTP; 23 Mar 2020 08:38:04 -0700
-Date:   Mon, 23 Mar 2020 08:38:04 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 6/9] KVM: x86: Copy kvm_x86_ops by value to eliminate
- layer of indirection
-Message-ID: <20200323153803.GF28711@linux.intel.com>
-References: <20200321202603.19355-1-sean.j.christopherson@intel.com>
- <20200321202603.19355-7-sean.j.christopherson@intel.com>
- <87d0939r5t.fsf@vitty.brq.redhat.com>
+        id S1726049AbgCWPk1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 Mar 2020 11:40:27 -0400
+Received: from [192.168.1.112] (c-24-9-64-241.hsd1.co.comcast.net [24.9.64.241])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id BBB5420409;
+        Mon, 23 Mar 2020 15:40:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1584978027;
+        bh=aEPoTGtrihRR9CH44YGoaszH2LRi7APPappXtHmIFNk=;
+        h=Subject:To:References:From:Cc:Date:In-Reply-To:From;
+        b=KNgh82obI3osbkUxHnuobfS9X7n1lCRLSiAiWlyeFI9Yc+/taXeC72yNyrqn0o0Sb
+         IJHCafFadCeJiyrWniexKrnkgZYeWzY/KeLph4cThEXqPbV32P1qPXx4D3VNK6oV5g
+         BbikkzEiPRzSs3VmfhhDHFOzAezxobj46Ii2/Ce8=
+Subject: Re: [PATCH 1/2] kvm: selftests: Fix no directory error when OUTPUT
+ specified
+To:     Xiaoyao Li <xiaoyao.li@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+References: <20200315093425.33600-1-xiaoyao.li@intel.com>
+ <20200315093425.33600-2-xiaoyao.li@intel.com>
+From:   shuah <shuah@kernel.org>
+Cc:     shuah <shuah@kernel.org>
+Message-ID: <99584925-69e7-7dab-7dd9-ee920ac343a0@kernel.org>
+Date:   Mon, 23 Mar 2020 09:40:26 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87d0939r5t.fsf@vitty.brq.redhat.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <20200315093425.33600-2-xiaoyao.li@intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Mar 23, 2020 at 01:44:46PM +0100, Vitaly Kuznetsov wrote:
-> (OK, I have to admit I trust the fact that GCC is still able to build
-> KVM modules more than my own eyes)
+On 3/15/20 3:34 AM, Xiaoyao Li wrote:
+> When build kvm selftests to an specified directory with
+> 
+> 	make OUTPUT=~/kvm-selftests
+> 
+> it encouters following error：
 
-Ha, yep, I trust gcc far more than my grep skills.
+btw lib.mk can't handle relative paths yet. The problems
+you are seeing are related to that as well. This relative
+path issue should be fixed in lib.mk and not in individual
+tests.
+
+> 
+> /usr/bin/ld: cannot open output file
+> /home/lxy/kvm-selftests/x86_64/cr4_cpuid_sync_test: No such file or
+> directory
+> collect2: error: ld returned 1 exit status
+> make: *** [../lib.mk:141:
+> /home/lxy/kvm-selftests/x86_64/cr4_cpuid_sync_test] Error 1
+> 
+> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+> ---
+>   tools/testing/selftests/kvm/Makefile | 1 +
+>   1 file changed, 1 insertion(+)
+> 
+> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+> index d91c53b726e6..86797e0242d4 100644
+> --- a/tools/testing/selftests/kvm/Makefile
+> +++ b/tools/testing/selftests/kvm/Makefile
+> @@ -66,6 +66,7 @@ LDFLAGS += -pthread $(no-pie-option) $(pgste-option)
+>   # After inclusion, $(OUTPUT) is defined and
+>   # $(TEST_GEN_PROGS) starts with $(OUTPUT)/
+>   include ../lib.mk
+> +x := $(shell mkdir -p $(sort $(dir $(TEST_GEN_PROGS))))
+
+lib.mk would have created the directory.
+
+thanks,
+-- Shuah
+
