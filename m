@@ -2,124 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id CB9F9190059
-	for <lists+kvm@lfdr.de>; Mon, 23 Mar 2020 22:30:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DC526190067
+	for <lists+kvm@lfdr.de>; Mon, 23 Mar 2020 22:33:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727239AbgCWVaV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Mar 2020 17:30:21 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:50714 "EHLO
-        us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726643AbgCWVaU (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 23 Mar 2020 17:30:20 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1584999019;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=ZVsEY6cNKMHIU4w2rXsM2TCIqoA6fSVNDl3M8SH4l6g=;
-        b=dmIBPfG9V1I/WxDzg/hZwdfDj2J8fpaXgoK18IerITJF56Ddpi9jz3NEVWoAQ5TtRromFK
-        yGMPPAUf6vKI79VGCeIg+mfa8pvFnR7NEGRS2el0H4eoiKWROLLDuWnScdLgjIaBqHT41n
-        CMLiGcfygK3Q5oPgZF4x4p3pcN7IkYA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-426-suLvxhWCM16kHxyllzdYtw-1; Mon, 23 Mar 2020 17:30:15 -0400
-X-MC-Unique: suLvxhWCM16kHxyllzdYtw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E714A10CE782;
-        Mon, 23 Mar 2020 21:30:12 +0000 (UTC)
-Received: from w520.home (ovpn-112-162.phx2.redhat.com [10.3.112.162])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 21B2F60BF3;
-        Mon, 23 Mar 2020 21:30:00 +0000 (UTC)
-Date:   Mon, 23 Mar 2020 15:29:59 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Yan Zhao <yan.y.zhao@intel.com>
-Cc:     "intel-gvt-dev@lists.freedesktop.org" 
-        <intel-gvt-dev@lists.freedesktop.org>,
-        "aik@ozlabs.ru" <aik@ozlabs.ru>,
-        "Zhengxiao.zx@alibaba-inc.com" <Zhengxiao.zx@alibaba-inc.com>,
-        "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
-        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-        "eauger@redhat.com" <eauger@redhat.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>,
-        "Yang, Ziye" <ziye.yang@intel.com>,
-        "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
-        "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
-        "felipe@nutanix.com" <felipe@nutanix.com>,
-        "Liu, Changpeng" <changpeng.liu@intel.com>,
-        "Ken.Xue@amd.com" <Ken.Xue@amd.com>,
-        "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>,
-        "He, Shaopeng" <shaopeng.he@intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "libvir-list@redhat.com" <libvir-list@redhat.com>,
-        "dgilbert@redhat.com" <dgilbert@redhat.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
-        "Wang, Zhi A" <zhi.a.wang@intel.com>,
-        "cjia@nvidia.com" <cjia@nvidia.com>,
-        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-        "berrange@redhat.com" <berrange@redhat.com>,
-        "dinechin@redhat.com" <dinechin@redhat.com>
-Subject: Re: [PATCH v4 0/2] introduction of migration_version attribute for
- VFIO live migration
-Message-ID: <20200323152959.1c39e9a7@w520.home>
-In-Reply-To: <20190604003422.GA30229@joy-OptiPlex-7040>
-References: <20190531004438.24528-1-yan.y.zhao@intel.com>
-        <20190603132932.1b5dc7fe@x1.home>
-        <20190604003422.GA30229@joy-OptiPlex-7040>
+        id S1726986AbgCWVd0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Mar 2020 17:33:26 -0400
+Received: from mail-ed1-f66.google.com ([209.85.208.66]:33951 "EHLO
+        mail-ed1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726263AbgCWVdZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 Mar 2020 17:33:25 -0400
+Received: by mail-ed1-f66.google.com with SMTP id i24so18135568eds.1
+        for <kvm@vger.kernel.org>; Mon, 23 Mar 2020 14:33:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=zhnknTMAfH/wRzM1aNoHZGvfELya9SoXYzFYD0LL+XY=;
+        b=JHiCizBxgvc+j7w2CR8qEtF10rjJazyvP28JcwYjWY87NnULzuRquBD2xdCHOmt58I
+         9Bgvr/GpRQrQycF5UnWMEul7qpIT6iQY10T0PpLTH32rvyfntrMD50ZKh7etd0+RE63Q
+         L7mAsD3Udvg8QJPSaS8rCC4NL04WOHi/5ZiWE+57KIjPERgxGhGpIcPb9nZKPfuS3+Sn
+         L0neJPcZHC0cjgfQZm4waK/O87Z8q1FVKq2koyFn1c5RWjPUGoSvVXGhroDs2BQ9N+D3
+         BYdv5NUKccrnJvxxxe//kFazPj7rCGqVspuFjNoHAUaBDQe7JIWS1DrAJVUyzVIqtbyA
+         ueXA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=zhnknTMAfH/wRzM1aNoHZGvfELya9SoXYzFYD0LL+XY=;
+        b=Cx2Fd3BEIWn9i2PNvGo6JWkIXsUJHt4VFgH13rWfCObxL/Tkobzgk1RwBg4rNucfXV
+         pG8bHMgiNz1f+AaPAFXYMwA8bJB8rXilb7G3ZV/zFzqwWMThJjR2mYGY+6HbLyZtfiNP
+         IIRxzE2vQ+JbrxnBDQWTVC2M2vgGKFeadLj8a56jj5Q+rUbSyWuybSdvnf4lpnUGpGjH
+         kOyhaiBZ9fcitHAZMOTSpFME0hOwYJO9KY6iUH1+RFAivNkIb9dmKgQG6ph/GLM6j2bs
+         P49RkI+yMJ1mQNoOD2vG6mZhrjoRO15SVsd0Hune9fUgHveUtCodHCFxyf/sXgILIo0y
+         r78A==
+X-Gm-Message-State: ANhLgQ3KBnvUY7wHupFAN5BefYpIzLNadXeDiciPhS6xzVfCV/DZxFl/
+        H+Lf4ZffY7SSKS6grb0K2nM8widltreF4nlepsoULPWm
+X-Google-Smtp-Source: ADFU+vuJarP63ymQBTXL3joEpixrNSQwYHFgXElydF5vi1pdd4W1J4ZjXKpEs9Et3yCFPhnm1VGPn1bDtVwod8wCF6g=
+X-Received: by 2002:a17:906:af57:: with SMTP id ly23mr7224694ejb.6.1584999202172;
+ Mon, 23 Mar 2020 14:33:22 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+References: <20200320175910.180266-1-yonghyun@google.com> <20200323111404.GA4554@infradead.org>
+In-Reply-To: <20200323111404.GA4554@infradead.org>
+From:   Yonghyun Hwang <yonghyun@google.com>
+Date:   Mon, 23 Mar 2020 14:33:11 -0700
+Message-ID: <CAEauFbww3X2WZuOvMbnhOD2ONBjqR-JS2BrxWPO=HqzXVcKakw@mail.gmail.com>
+Subject: Re: [PATCH] vfio-mdev: support mediated device creation in kernel
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Kirti Wankhede <kwankhede@nvidia.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Havard Skinnemoen <hskinnemoen@google.com>,
+        Moritz Fischer <mdf@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 3 Jun 2019 20:34:22 -0400
-Yan Zhao <yan.y.zhao@intel.com> wrote:
+On Mon, Mar 23, 2020 at 4:14 AM Christoph Hellwig <hch@infradead.org> wrote:
+>
+> On Fri, Mar 20, 2020 at 10:59:10AM -0700, Yonghyun Hwang wrote:
+> > To enable a mediated device, a device driver registers its device to VFIO
+> > MDev framework. Once the mediated device gets enabled, UUID gets fed onto
+> > the sysfs attribute, "create", to create the mediated device. This
+> > additional step happens after boot-up gets complete. If the driver knows
+> > how many mediated devices need to be created during probing time, the
+> > additional step becomes cumbersome. This commit implements a new function
+> > to allow the driver to create a mediated device in kernel.
+>
+> Please send this along with your proposed user so that we can understand
+> the use.  Without that new exports have no chance of going in anyway.
 
-> On Tue, Jun 04, 2019 at 03:29:32AM +0800, Alex Williamson wrote:
-> > On Thu, 30 May 2019 20:44:38 -0400
-> > Yan Zhao <yan.y.zhao@intel.com> wrote:
-> >   
-> > > This patchset introduces a migration_version attribute under sysfs of VFIO
-> > > Mediated devices.
-> > > 
-> > > This migration_version attribute is used to check migration compatibility
-> > > between two mdev devices of the same mdev type.
-> > > 
-> > > Patch 1 defines migration_version attribute in
-> > > Documentation/vfio-mediated-device.txt
-> > > 
-> > > Patch 2 uses GVT as an example to show how to expose migration_version
-> > > attribute and check migration compatibility in vendor driver.  
-> > 
-> > Thanks for iterating through this, it looks like we've settled on
-> > something reasonable, but now what?  This is one piece of the puzzle to
-> > supporting mdev migration, but I don't think it makes sense to commit
-> > this upstream on its own without also defining the remainder of how we
-> > actually do migration, preferably with more than one working
-> > implementation and at least prototyped, if not final, QEMU support.  I
-> > hope that was the intent, and maybe it's now time to look at the next
-> > piece of the puzzle.  Thanks,
-> > 
-> > Alex  
-> 
-> Got it. 
-> Also thank you and all for discussing and guiding all along:)
-> We'll move to the next episode now.
+My driver is still under development. Do you recommend me to implement
+an example code for the new exports and re-submit the commit?
 
-Hi Yan,
-
-As we're hopefully moving towards a migration API, would it make sense
-to refresh this series at the same time?  I think we're still expecting
-a vendor driver implementing Kirti's migration API to also implement
-this sysfs interface for compatibility verification.  Thanks,
-
-Alex
-
+Thank you,
+Yonghyun
