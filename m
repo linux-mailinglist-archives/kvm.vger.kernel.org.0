@@ -2,55 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 867FC18FC48
-	for <lists+kvm@lfdr.de>; Mon, 23 Mar 2020 19:06:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 51FF718FC4E
+	for <lists+kvm@lfdr.de>; Mon, 23 Mar 2020 19:06:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727564AbgCWSGa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Mar 2020 14:06:30 -0400
-Received: from mail-pf1-f176.google.com ([209.85.210.176]:40267 "EHLO
-        mail-pf1-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727090AbgCWSGa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 Mar 2020 14:06:30 -0400
-Received: by mail-pf1-f176.google.com with SMTP id l184so7861039pfl.7
-        for <kvm@vger.kernel.org>; Mon, 23 Mar 2020 11:06:29 -0700 (PDT)
+        id S1727689AbgCWSGu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Mar 2020 14:06:50 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:40338 "EHLO
+        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727163AbgCWSGu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 Mar 2020 14:06:50 -0400
+Received: by mail-wr1-f68.google.com with SMTP id f3so18274021wrw.7
+        for <kvm@vger.kernel.org>; Mon, 23 Mar 2020 11:06:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=KXLJ6VFfxrFZrwSfkhbx8s/k+sv6GEa0mybadcnXPi4=;
-        b=agTtoD7/xmJ76Q4f/peu0SvnIjf7I/7ksbIm0Dq+4fUNxLcMT2a0PIU6yYxxb8P9XT
-         x5VOKrLwrBNTz8XRvlXqLlDqCejbirKNcUSVG7Axs25XUnNuk8nCuF1iabTudPDZG2Km
-         2jZqkUF4poz4tErZlCkaG8SOhPsXgB+P2LL3mqfQ1TWa23WKqaxTK5FD4HfYK6SuEHk0
-         H0vNjCupJ1MjHt8xYibjjBpqt7Bj2Uu6S6Y72fhZBgqw3+irZ90L6+Mw0kWKrm8EaJ18
-         Bzf5/J7NWIA1fESjMMHerWOoSNDpfKFjm1xe5KiarSpG2Ebfii/xr+wta77CMVsqXciN
-         z6ig==
+        bh=hPUm/HhpONACSgj8NcmzE9a98krdtrzc27JDL5LBNKQ=;
+        b=nTKGbJ64Trr4thrThDxbIV2WGfup7R/kt56W8gtCc0GJQFu62G5jb8ufTMvwPcS3H+
+         uy7vPLpawyjtkoXkUf9FhUHOQSNUUYAIWgHq6iw+CMOWL1fO92pCVR5dCbzjvoYRKtA9
+         n4NXerLYtcyV4+0h4gfi0brs+dFhYIEGDuxe9OBqtVflmCd+trcADnuBg7/jnAxfxlFW
+         0D22pmxbRULBKGFWKFWB+f1u9iD6uIBGt3QYoiaTLyxDxZC9LUD0o+Oy5uP6AtG0zFuc
+         qjKSW+Pry3/I6djMz2hqTEnQM4ymDQ3HIYyI0HVI+xZfLvbOEFB9LjGrB9AA7kX8GclZ
+         eVoQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=KXLJ6VFfxrFZrwSfkhbx8s/k+sv6GEa0mybadcnXPi4=;
-        b=L5vznXiKseIPYMOruPNuyvaNnKCDTShPF+FIpzCqOEI8VukGT/WXtYOiiYDg1aKb44
-         bmORKzH32S1qYirhf0uDhRFPMBhD2LRYo20kTc+c8sgcltlY3EJkummHBZhPCmJVuHAi
-         bIDVuzY/40+F3E06VcOMhKZolLBNmrUJIBOdgc8wYd41lwoYDIsOfMI7T1ZmKzA7UwzH
-         oIUVYY2LJ0xqlxJtIrEiwCNfbFDxwI/7uZ54A1ZHriQyC3zygrdcqCV6kVKPKiNPMMmS
-         w9YXdlEmFP7alJ6TRHRkk69XPu25TSEPE3GcfA1mErQ3SGsB3W9OXmgysSbXGCU0m7AE
-         +nww==
-X-Gm-Message-State: ANhLgQ3KkGC5wahCHRdEJahjjBIO1qTRPumWIdpIbgXhfMPr04bVOMS5
-        ME5DpxJaezdpWlOhkhw8t+yZRjYZ7BxxJ+XBoo3Fyg==
-X-Google-Smtp-Source: ADFU+vtGnpMIgFHH3SOOLWJ9G91PYJwF/AxwafsOHarZSBsqA4YP+vmLIs/CLtKIK7wnnWINd78LJn5Kdc2Ha2nzYYQ=
-X-Received: by 2002:a63:4e22:: with SMTP id c34mr23785364pgb.263.1584986788735;
- Mon, 23 Mar 2020 11:06:28 -0700 (PDT)
+        bh=hPUm/HhpONACSgj8NcmzE9a98krdtrzc27JDL5LBNKQ=;
+        b=SuzkZT/2CsXxrhQSodimfF4ei0MgIEayupBxCG9LJzy1JXMyu9DboEUr/v5vDOnOh6
+         8hbZPpca3VMy0j2Jw5svUT7eyINJk7cwNvvKJMDWuf8JNAX+uIqI6xcN0+pcugteFPn7
+         zrElVrKjri/od4U6iwNUytkXvRUz2cB8jlCLsGtdewyGsifwMe3YG2/u5it/uz4FXO7c
+         Qc9est8FwGmMvO3HPEzVmg3oxucBc3zyZnLLaj8xcu4CcUotiyDg9yU401dPqKWVKq1/
+         4d8TmK/thT3cBfmcBAAMaZ75ruOVXEWy8SF5ZPPsFp4G0lGkSfW6I8US5SrCkrP6pPIg
+         wh1w==
+X-Gm-Message-State: ANhLgQ3RiS4bpm7636/KlADF0QPemF2H0hvDJOqdfF43KVE6l4oEf2WY
+        nfsGeZfiwdm63qFGV+Mg6vHuU4efY34wR1g+Fi+omg==
+X-Google-Smtp-Source: ADFU+vv8LJRvApnLoC3YWQlOBxqsAybTAfaFiTIPOB4Kp6JDPrX3l9J3X/09U0KYtYXyDnl9ZV9/u7pRaZJBUlCvwCA=
+X-Received: by 2002:a05:6000:100f:: with SMTP id a15mr29739901wrx.382.1584986808806;
+ Mon, 23 Mar 2020 11:06:48 -0700 (PDT)
 MIME-Version: 1.0
 References: <000000000000277a0405a16bd5c9@google.com> <CACT4Y+b1WFT87pWQaXD3CWjyjoQaP1jcycHdHF+rtxoR5xW1ww@mail.gmail.com>
  <5058aabe-f32d-b8ef-57ed-f9c0206304c5@redhat.com> <CAG_fn=WYtSoyi63ACaz-ya=Dbi+BFU-_mADDpL6gQvDimQscmw@mail.gmail.com>
  <20200323163925.GP28711@linux.intel.com> <CAKwvOdkE8OAu=Gj4MKWwpctka6==6EtrbF3e1tvF=jS2hBB3Ow@mail.gmail.com>
  <CAKwvOdkXi1MN2Yqqoa6ghw14tQ25WYgyJkSv35-+1KRb=cmhZw@mail.gmail.com> <CAG_fn=WE0BmuHSxUoBJWQ9dnZ4X5ZpBqcT9rQaDE_6HAfTYKQA@mail.gmail.com>
 In-Reply-To: <CAG_fn=WE0BmuHSxUoBJWQ9dnZ4X5ZpBqcT9rQaDE_6HAfTYKQA@mail.gmail.com>
-From:   Nick Desaulniers <ndesaulniers@google.com>
-Date:   Mon, 23 Mar 2020 11:06:16 -0700
-Message-ID: <CAKwvOdkfaSeXV5zd2unGAtPdzmS9N1Z7kSUB0g13aGHDg9fc8w@mail.gmail.com>
+From:   Alexander Potapenko <glider@google.com>
+Date:   Mon, 23 Mar 2020 19:06:37 +0100
+Message-ID: <CAG_fn=Uf2dDo4K9X==wE=eL8HQMc1an8m8H18tvWd9Mkyhpskg@mail.gmail.com>
 Subject: Re: BUG: unable to handle kernel NULL pointer dereference in handle_external_interrupt_irqoff
-To:     Alexander Potapenko <glider@google.com>
+To:     Nick Desaulniers <ndesaulniers@google.com>
 Cc:     Dmitry Vyukov <dvyukov@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
         syzbot <syzbot+3f29ca2efb056a761e38@syzkaller.appspotmail.com>,
@@ -73,7 +73,7 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Mar 23, 2020 at 10:55 AM Alexander Potapenko <glider@google.com> wrote:
+On Mon, Mar 23, 2020 at 6:55 PM Alexander Potapenko <glider@google.com> wrote:
 >
 > I've reduced the faulty test case to the following code:
 >
@@ -115,20 +115,6 @@ On Mon, Mar 23, 2020 at 10:55 AM Alexander Potapenko <glider@google.com> wrote:
 > Intuitively it is, but explicitly adding RSP to the clobber list
 > sounds a bit more bulletproof.
 
-Ok, I think this reproducer demonstrates the issue:
-https://godbolt.org/z/jAafjz
-I *think* what's happening is that we're not specifying correctly that
-the stack is being modified by inline asm, so using variable
-references against the stack pointer is not correct.
-
-commit f5caf621ee357 ("x86/asm: Fix inline asm call constraints for Clang")
-has more context about ASM_CALL_CONSTRAINT.
-
-It seems that specifying "rsp" in the clobber list is a -Wdeprecated
-warning in GCC, and an error in Clang (unless you remove
-current_stack_pointer as an output, but will get Clang to produce the
-correct code).
-
--- 
-Thanks,
-~Nick Desaulniers
+Ok, I am wrong: according to
+https://gcc.gnu.org/onlinedocs/gcc/Extended-Asm.html it's incorrect to
+list RSP in the clobber list.
