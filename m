@@ -2,146 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A28CE18F9C2
-	for <lists+kvm@lfdr.de>; Mon, 23 Mar 2020 17:33:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D9B2418F9F9
+	for <lists+kvm@lfdr.de>; Mon, 23 Mar 2020 17:36:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727517AbgCWQdP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Mar 2020 12:33:15 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:48577 "EHLO
-        us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727334AbgCWQdO (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 23 Mar 2020 12:33:14 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1584981193;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=KCvacwiU6OTRKkamU+WDDamahYADSqAV/L9BazSCR94=;
-        b=FyDsCBjAuszSEz/Qix1nNSdnyL8pT1oGIeUj/ny9Rdbll9TDFSuTM/URQBIeIYU7x63+UP
-        +uRuUcbVIEcLMaqW76YMJFsfykPuMxx7I4M7qHclek8LX7GBZZSvYTKC1MVAXUS+jMLWNQ
-        k5V5YUGm/45UUpjDgSkGbCnRuDn9oDs=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-365-agW3G8k2OPGF3nY442HOFg-1; Mon, 23 Mar 2020 12:33:11 -0400
-X-MC-Unique: agW3G8k2OPGF3nY442HOFg-1
-Received: by mail-wr1-f71.google.com with SMTP id r9so5503291wrs.13
-        for <kvm@vger.kernel.org>; Mon, 23 Mar 2020 09:33:11 -0700 (PDT)
+        id S1727821AbgCWQgf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Mar 2020 12:36:35 -0400
+Received: from mail-io1-f68.google.com ([209.85.166.68]:38802 "EHLO
+        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727571AbgCWQge (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 Mar 2020 12:36:34 -0400
+Received: by mail-io1-f68.google.com with SMTP id m15so9710335iob.5
+        for <kvm@vger.kernel.org>; Mon, 23 Mar 2020 09:36:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=xZed4vuzAn5/aNVB1Kdbz5tqSTALBHIWaW5u1icHeCY=;
+        b=U/UGFiIz7X9b1XORx4G0t8VK2Vtpq2Ha1+ZZX+tSAZSdmyebvAE6+Y5V3rx3lRKG75
+         CaHAQofdlayPv8CK04pkyFPISqwOZ12wVaCKtxGqI4L8OqxNPE68vVotVCsaseur+Ke9
+         SDsz2XIy4C592KfSooSZAhWPZTKCfbcd5AWndoy4+d4IIEx/bHdOUdzz6BxLR7+ixqYW
+         rcJzSdbZIBxjMhIqu4WIJZNRXUn2zvi37lc4UaBlYGHLeJvWuz0qY8+n2KBNobObumAh
+         Vyp5WAg+o0j7apYcrfEYWq3QtkCZfO+hrK1eyHyvgtlR5wWrZY2JasZicfeV2wqt3zB2
+         yg5Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=KCvacwiU6OTRKkamU+WDDamahYADSqAV/L9BazSCR94=;
-        b=XHllpxfJLAiDwj0EdrEwp/b4bx85ctyHAf+l3XZnk1g4PVzWQV3vwXru5cf3+/lNlp
-         I4BA1LkygVbFsIsbzCGN3BgG36WJAd7Qr7nE9EUzIRhp5a6XbTeu6clTh9ltB+VvUVzQ
-         OZpkvlTEgAXR5/bPztd8Cn9nHp6YJIbLQZhY+4apej24OLCAlzTJbWLgjJaNQyh1Ti79
-         eJYleSNIKik+srw1lJyQEh+nTRf+sch1315XGrK9hQpI6m+3eMN0kgQqUKLKx8IIf6jg
-         Cj0YHe0YwTBlCMeJLs4MIYaNfGB1W0QIbKDJkfIW3XpRi/CRYjxlrLVijaME9b/kiQzT
-         7G9Q==
-X-Gm-Message-State: ANhLgQ3GIu3sRyIkoQsxmmHyMjIT8xJw3cn5illhOBhGYg4RrMKc1J5I
-        jikJb5B1h3bzxO1VnpKWy2FYs4WYNlCOq2xJ0PdBnqUT0ZXPdrFezJPzSc2qkvYtwipKX9cDZ+R
-        HU7aDY2G5TciO
-X-Received: by 2002:adf:a387:: with SMTP id l7mr30790724wrb.250.1584981190740;
-        Mon, 23 Mar 2020 09:33:10 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vu5DQvhi2385iSKFZyFJgeZoUq4ZNFT6SaoQ4GLJpPuvChdtB8xZdp32gM1w6hlQUmPYIQLCg==
-X-Received: by 2002:adf:a387:: with SMTP id l7mr30790696wrb.250.1584981190471;
-        Mon, 23 Mar 2020 09:33:10 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id 61sm26456602wrn.82.2020.03.23.09.33.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Mar 2020 09:33:09 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=xZed4vuzAn5/aNVB1Kdbz5tqSTALBHIWaW5u1icHeCY=;
+        b=Jcc0XIYeH+pPCa2u8wiZGkzwwAbq0zffJ1KBoH2Hch/uynw7POIero/drWtcTVBFbt
+         F3rPLQNzR3TGZAO/PQkWpnAI5dSNI+1fwo9QLBvU346XozGbYMvyQupYIWuOtdRp1rW9
+         hVXy1NvM0m6/8zCWCXGbq9ki2E2PnLWWxaQkvCoFyRwEgXojoG5cmnZfH5eKKq0JqtNa
+         5ZUrr9VPNDVzK6jIDJNqKDv1f3N45nBRY3JQBzUMyv5CnGmSItsyXfYGmHlxR9VSPGwv
+         TS2Rkh4ac6aifIbzTkBPweAD8nQNQ53AVP7v/JYF0glX40ZtuFT1etoV0PDHu7FYeO9S
+         ifUA==
+X-Gm-Message-State: ANhLgQ2XC+wEvI0dF2DPjhSJEw0Wh10EwCm6v2APd+DQTJjnDHXCJDjN
+        f81rB15cPWUFqeOZzWzboiap4gV7EizUPEwojy4hAg==
+X-Google-Smtp-Source: ADFU+vsWzcumLwhqw56m/BCbndSZWQyTZy977Pe1EcOchX9GJbFfWlVB9Xjq+FDtNdouWnpRTTre4vuCJsXIdPHUUk8=
+X-Received: by 2002:a02:5a87:: with SMTP id v129mr19330387jaa.48.1584981393823;
+ Mon, 23 Mar 2020 09:36:33 -0700 (PDT)
+MIME-Version: 1.0
+References: <20200320212833.3507-1-sean.j.christopherson@intel.com>
+ <20200320212833.3507-4-sean.j.christopherson@intel.com> <CALMp9eR5Uu7nRDOS2nQHGzb+Gi6vjDEk1AmuiqkkGWFjKNG+sA@mail.gmail.com>
+ <20200323162807.GN28711@linux.intel.com>
+In-Reply-To: <20200323162807.GN28711@linux.intel.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Mon, 23 Mar 2020 09:36:22 -0700
+Message-ID: <CALMp9eR42eM7g81EgHieyNky+kP2mycO7UyMN+y2ibLoqrD2Yg@mail.gmail.com>
+Subject: Re: [PATCH v3 03/37] KVM: nVMX: Invalidate all EPTP contexts when
+ emulating INVEPT for L1
 To:     Sean Christopherson <sean.j.christopherson@intel.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Ben Gardon <bgardon@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Ben Gardon <bgardon@google.com>,
         Junaid Shahid <junaids@google.com>,
         Liran Alon <liran.alon@oracle.com>,
         Boris Ostrovsky <boris.ostrovsky@oracle.com>,
         John Haxby <john.haxby@oracle.com>,
         Miaohe Lin <linmiaohe@huawei.com>,
         Tom Lendacky <thomas.lendacky@amd.com>
-Subject: Re: [PATCH v3 04/37] KVM: nVMX: Invalidate all roots when emulating INVVPID without EPT
-In-Reply-To: <20200323160432.GJ28711@linux.intel.com>
-References: <20200320212833.3507-1-sean.j.christopherson@intel.com> <20200320212833.3507-5-sean.j.christopherson@intel.com> <87v9mv84qu.fsf@vitty.brq.redhat.com> <20200323160432.GJ28711@linux.intel.com>
-Date:   Mon, 23 Mar 2020 17:33:08 +0100
-Message-ID: <87lfnr820r.fsf@vitty.brq.redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sean Christopherson <sean.j.christopherson@intel.com> writes:
-
-> On Mon, Mar 23, 2020 at 04:34:17PM +0100, Vitaly Kuznetsov wrote:
->> Sean Christopherson <sean.j.christopherson@intel.com> writes:
->> 
->> > From: Junaid Shahid <junaids@google.com>
->> >
->> > Free all roots when emulating INVVPID for L1 and EPT is disabled, as
->> > outstanding changes to the page tables managed by L1 need to be
->> > recognized.  Because L1 and L2 share an MMU when EPT is disabled, and
->> > because VPID is not tracked by the MMU role, all roots in the current
->> > MMU (root_mmu) need to be freed, otherwise a future nested VM-Enter or
->> > VM-Exit could do a fast CR3 switch (without a flush/sync) and consume
->> > stale SPTEs.
->> >
->> > Fixes: 5c614b3583e7b ("KVM: nVMX: nested VPID emulation")
->> > Signed-off-by: Junaid Shahid <junaids@google.com>
->> > [sean: ported to upstream KVM, reworded the comment and changelog]
->> > Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
->> > ---
->> >  arch/x86/kvm/vmx/nested.c | 14 ++++++++++++++
->> >  1 file changed, 14 insertions(+)
->> >
->> > diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
->> > index 9624cea4ed9f..bc74fbbf33c6 100644
->> > --- a/arch/x86/kvm/vmx/nested.c
->> > +++ b/arch/x86/kvm/vmx/nested.c
->> > @@ -5250,6 +5250,20 @@ static int handle_invvpid(struct kvm_vcpu *vcpu)
->> >  		return kvm_skip_emulated_instruction(vcpu);
->> >  	}
->> >  
->> > +	/*
->> > +	 * Sync the shadow page tables if EPT is disabled, L1 is invalidating
->> > +	 * linear mappings for L2 (tagged with L2's VPID).  Free all roots as
->> > +	 * VPIDs are not tracked in the MMU role.
->> > +	 *
->> > +	 * Note, this operates on root_mmu, not guest_mmu, as L1 and L2 share
->> > +	 * an MMU when EPT is disabled.
->> > +	 *
->> > +	 * TODO: sync only the affected SPTEs for INVDIVIDUAL_ADDR.
->> > +	 */
->> > +	if (!enable_ept)
->> > +		kvm_mmu_free_roots(vcpu, &vcpu->arch.root_mmu,
->> > +				   KVM_MMU_ROOTS_ALL);
->> > +
->> 
->> This is related to my remark on the previous patch; the comment above
->> makes me think I'm missing something obvious, enlighten me please)
->> 
->> My understanding is that L1 and L2 will share arch.root_mmu not only
->> when EPT is globally disabled, we seem to switch between
->> root_mmu/guest_mmu only when nested_cpu_has_ept(vmcs12) but different L2
->> guests may be different on this. Do we need to handle this somehow?
+On Mon, Mar 23, 2020 at 9:28 AM Sean Christopherson
+<sean.j.christopherson@intel.com> wrote:
 >
-> guest_mmu is used iff nested EPT is enabled, which requires enable_ept=1.
-> enable_ept is global and cannot be changed without reloading kvm_intel.
+> On Mon, Mar 23, 2020 at 09:24:25AM -0700, Jim Mattson wrote:
+> > On Fri, Mar 20, 2020 at 2:29 PM Sean Christopherson
+> > <sean.j.christopherson@intel.com> wrote:
+> > >
+> > > Free all L2 (guest_mmu) roots when emulating INVEPT for L1.  Outstanding
+> > > changes to the EPT tables managed by L1 need to be recognized, and
+> > > relying on KVM to always flush L2's EPTP context on nested VM-Enter is
+> > > dangerous.
+> > >
+> > > Similar to handle_invpcid(), rely on kvm_mmu_free_roots() to do a remote
+> > > TLB flush if necessary, e.g. if L1 has never entered L2 then there is
+> > > nothing to be done.
+> > >
+> > > Nuking all L2 roots is overkill for the single-context variant, but it's
+> > > the safe and easy bet.  A more precise zap mechanism will be added in
+> > > the future.  Add a TODO to call out that KVM only needs to invalidate
+> > > affected contexts.
+> > >
+> > > Fixes: b119019847fbc ("kvm: nVMX: Remove unnecessary sync_roots from handle_invept")
+> >
+> > The bug existed well before the commit indicated in the "Fixes" line.
 >
-> This most definitely over-invalidates, e.g. it blasts away L1's page
-> tables.  But, fixing that requires tracking VPID in mmu_role and/or adding
-> support for using guest_mmu when L1 isn't using TDP, i.e. nested EPT is
-> disabled.  Assuming the vast majority of nested deployments enable EPT in
-> L0, the cost of both options likely outweighs the benefits.
+> Ah, my bad.  A cursory glance at commit b119019847fbc makes that quite
+> obvious.  This should be
 >
+>   Fixes: bfd0a56b9000 ("nEPT: Nested INVEPT")
 
-Yes but my question rather was: what if global 'enable_ept' is true but
-nested EPT is not being used by L1, don't we still need to do
-kvm_mmu_free_roots(&vcpu->arch.root_mmu) here?
-
--- 
-Vitaly
-
+Actually, I think that things were fine back then (though we
+gratuitously flushed L1's TLB as a result of an emulated INVEPT). The
+problem started when we stopped flushing the TLB on every emulated
+VM-entry (i.e. L1 -> L2 transitions). I'm not sure what that commit
+was, but I think you referenced it in an earlier email.
