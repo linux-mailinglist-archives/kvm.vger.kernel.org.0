@@ -2,129 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5295218FD5B
-	for <lists+kvm@lfdr.de>; Mon, 23 Mar 2020 20:12:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 08BDE18FD81
+	for <lists+kvm@lfdr.de>; Mon, 23 Mar 2020 20:20:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727784AbgCWTMM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Mar 2020 15:12:12 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:28088 "EHLO
-        us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727624AbgCWTMM (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 23 Mar 2020 15:12:12 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1584990731;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=fgrAHu1BxFkFO8E2XTbHvJRFF+z4d/8YKZf4AbCghtU=;
-        b=BzGKmwYHvORXIg48h0vUhAxwKV18cjs6WMvEJVtY5jSUeedmm+x7RYf0nv0MeXq/EEchzI
-        nQvwtE9F8HNzu3dbYN7PulU6BkoqHk1OPTrAn37Ofw59Rebh6STtwxjenlyi6M3ygyKHGd
-        Ck9f7D1HCHNbkhjAHfZqmQRKjZqN7l4=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-21-YrtcqZEwOeGpdx6QLviK0g-1; Mon, 23 Mar 2020 15:12:09 -0400
-X-MC-Unique: YrtcqZEwOeGpdx6QLviK0g-1
-Received: by mail-wm1-f70.google.com with SMTP id f185so207454wmf.8
-        for <kvm@vger.kernel.org>; Mon, 23 Mar 2020 12:12:08 -0700 (PDT)
+        id S1727826AbgCWTUG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Mar 2020 15:20:06 -0400
+Received: from mail-qv1-f74.google.com ([209.85.219.74]:56873 "EHLO
+        mail-qv1-f74.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727179AbgCWTUG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 Mar 2020 15:20:06 -0400
+Received: by mail-qv1-f74.google.com with SMTP id ee5so13664597qvb.23
+        for <kvm@vger.kernel.org>; Mon, 23 Mar 2020 12:20:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+         :cc;
+        bh=EuEgHEvOOlLZGILEOt39luhrShhjhA+dXySCvlN5S/w=;
+        b=frWZZr05u+jNrEcB3GH0499Ea350wyE93JmIJPfup0N2Iea+YPd3q6/qiz0WC7FuIP
+         WBoyPuMVzyQ4O0/YDSAKhAYkgwpj2nq/kGj7IXWW8nzOpSAWmDkEmkHZBHhOdIb7x4pd
+         qlvurUUNUqAF0ALylfTDWTBWNPTw17zbfsbVbCkiBao+3wRoTcRnmjsmmCReJ48hIwth
+         B68OT7qccAkZcNrdsb1H/LUCmoznz/xEpUxBHTQXSMH4jktAFRqwWvBTNfrNypJtUtaF
+         YcA+zNaafJAhGeMyIFSuEJaN92/9bAes2ovUyOw85AoB7NNsikFkTqC7SY5py2h97KEV
+         vWNg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=fgrAHu1BxFkFO8E2XTbHvJRFF+z4d/8YKZf4AbCghtU=;
-        b=ekD2gg2cXculSuUU1IC2G70m35tUv4JcYb+jLY8utANVQy3mWLpoInamHTS5xnuy1Y
-         JQQA+Vgwz79eeih47AAHyHgoV/V+Dl82D4zhSZsZxvF7dPbEtJsagdURcAhoKjiYIbv1
-         2fcK6QiZelEa0Tus3zjq+J6u/gHYUPslVsgWOfHIrcXdK8TW/+IVXfwfAbzck8XmJH92
-         L5CBXt53LGqiqZkdt+eS44m6oHIcE88x0be5ZNULrJ55/Uk19cL/XiGJLRGfe8WKLSt7
-         OoPtSfFYPM4Mr6eQ/meYN8Taie+m+Yrf9Xrk0VxpVvvg/era4cQXw3n6NxbRXte/mT7U
-         ZWFA==
-X-Gm-Message-State: ANhLgQ0V1atRne0cm5DykvDL8/nrhWGt7L0TYulyjduxYfOY6a3PEUn+
-        +Cn7kFV5FVusFMSIeUudwkGay0bM7YnbQWYZP0dTg16SrSqdGwRsAoJ2bhxpUjlw1VTM5NylRcP
-        QxfFR9wp8NZGs
-X-Received: by 2002:a05:600c:20c7:: with SMTP id y7mr969801wmm.38.1584990727798;
-        Mon, 23 Mar 2020 12:12:07 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vvI6FN87AuoICeOVZww+CrDUVby7jnBBCp+g/rZiiNhh884vbdRbO+WpvR0BsEJUCbSMTPLFA==
-X-Received: by 2002:a05:600c:20c7:: with SMTP id y7mr969764wmm.38.1584990727468;
-        Mon, 23 Mar 2020 12:12:07 -0700 (PDT)
-Received: from xz-x1 ([2607:9880:19c0:32::2])
-        by smtp.gmail.com with ESMTPSA id s22sm655926wmc.16.2020.03.23.12.12.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Mar 2020 12:12:06 -0700 (PDT)
-Date:   Mon, 23 Mar 2020 15:12:02 -0400
-From:   Peter Xu <peterx@redhat.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Qian Cai <cai@lca.pw>
-Subject: Re: [PATCH 6/7] KVM: selftests: Expose the primary memslot number to
- tests
-Message-ID: <20200323191202.GN127076@xz-x1>
-References: <20200320205546.2396-1-sean.j.christopherson@intel.com>
- <20200320205546.2396-7-sean.j.christopherson@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20200320205546.2396-7-sean.j.christopherson@intel.com>
+        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
+         :references:subject:from:to:cc;
+        bh=EuEgHEvOOlLZGILEOt39luhrShhjhA+dXySCvlN5S/w=;
+        b=atIe8vZNk1mTXfLkx2xgX4sKQTNFeuyHHTsJ2QOx2xJs3w57czyHeV1fHM0nbOnzj1
+         JrDgkmYyTZ+o+SYCFwkWy1+nw3jXHKMBPXOod152Dk4IMWFlrRooTGPgd1MWhvJ7EXxT
+         Ox+mGLjqJzPNeIfl/XPH08jAS94lWFU7nBi/xg/jMlIQjfEcwz4V1lp4rpfZjMIr3izA
+         VcAjiIQ1wYZIGsR+sdt/GfbhNUjA6sz+2WWShVwztSlhR6B5WOiMYVlPtHrmeTIFOXAM
+         LG8rz7Gba8KKWyfDPBeIR6ksvA0op5h+XrCAIDS0kkYjQn52b1Xb+Q8uSUf4/RKtEwDJ
+         uARw==
+X-Gm-Message-State: ANhLgQ1Cb6t66na2xMAsPwig0lxKrIn8qTsV+wG64cEmhlOQknQNFcNc
+        pLW+0QxYbs4YOrelBuWa3/WIlpuiVO08dN1nTqM=
+X-Google-Smtp-Source: ADFU+vvHiSEJBBT42wVNqrw/x1QVUgfHCyw0l5oYHfNcWj0WqOy/M8fE1DC3Ojv4iFuGiQeAk5S8n+b6TA1pOtTBh1A=
+X-Received: by 2002:a0c:fd85:: with SMTP id p5mr6095302qvr.205.1584991205290;
+ Mon, 23 Mar 2020 12:20:05 -0700 (PDT)
+Date:   Mon, 23 Mar 2020 12:12:43 -0700
+In-Reply-To: <CAKwvOdn10Ts_AU6i+7toj7NkMwK-+0yr5wTrN0XEDudBWS0sPQ@mail.gmail.com>
+Message-Id: <20200323191243.30002-1-ndesaulniers@google.com>
+Mime-Version: 1.0
+References: <CAKwvOdn10Ts_AU6i+7toj7NkMwK-+0yr5wTrN0XEDudBWS0sPQ@mail.gmail.com>
+X-Mailer: git-send-email 2.25.1.696.g5e7596f4ac-goog
+Subject: [PATCH] KVM: VMX: don't allow memory operands for inline asm that
+ modifies SP
+From:   Nick Desaulniers <ndesaulniers@google.com>
+To:     pbonzini@redhat.com, sean.j.christopherson@intel.com
+Cc:     ndesaulniers@google.com, bp@alien8.de,
+        clang-built-linux@googlegroups.com, dvyukov@google.com,
+        glider@google.com, hpa@zytor.com, jmattson@google.com,
+        joro@8bytes.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        mingo@redhat.com,
+        syzbot+3f29ca2efb056a761e38@syzkaller.appspotmail.com,
+        syzkaller-bugs@googlegroups.com, tglx@linutronix.de,
+        vkuznets@redhat.com, wanpengli@tencent.com, x86@kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Mar 20, 2020 at 01:55:45PM -0700, Sean Christopherson wrote:
-> Add a define for the primary memslot number so that tests can manipulate
-> the memslot, e.g. to delete it.
-> 
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> ---
->  tools/testing/selftests/kvm/include/kvm_util.h | 2 ++
->  tools/testing/selftests/kvm/lib/kvm_util.c     | 4 ++--
->  2 files changed, 4 insertions(+), 2 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
-> index 0f0e86e188c4..43b5feb546c6 100644
-> --- a/tools/testing/selftests/kvm/include/kvm_util.h
-> +++ b/tools/testing/selftests/kvm/include/kvm_util.h
-> @@ -60,6 +60,8 @@ enum vm_mem_backing_src_type {
->  	VM_MEM_SRC_ANONYMOUS_HUGETLB,
->  };
->  
-> +#define VM_PRIMARY_MEM_SLOT	0
-> +
->  int kvm_check_cap(long cap);
->  int vm_enable_cap(struct kvm_vm *vm, struct kvm_enable_cap *cap);
->  
-> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-> index f69fa84c9a4c..6a1af0455e44 100644
-> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
-> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-> @@ -247,8 +247,8 @@ struct kvm_vm *_vm_create(enum vm_guest_mode mode, uint64_t phy_pages, int perm)
->  	/* Allocate and setup memory for guest. */
->  	vm->vpages_mapped = sparsebit_alloc();
->  	if (phy_pages != 0)
-> -		vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS,
-> -					    0, 0, phy_pages, 0);
-> +		vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS, 0,
-> +					    VM_PRIMARY_MEM_SLOT, phy_pages, 0);
+THUNK_TARGET defines [thunk_target] as having "rm" input constraints
+when CONFIG_RETPOLINE is not set, which isn't constrained enough for
+this specific case.
 
-IIUC VM_PRIMARY_MEM_SLOT should be used more than here... E.g., to all
-the places that allocate page tables in virt_map() as the last param?
-I didn't check other places.
+For inline assembly that modifies the stack pointer before using this
+input, the underspecification of constraints is dangerous, and results
+in an indirect call to a previously pushed flags register.
 
-Maybe it's simpler to drop this patch for now and use 0 directly as
-before for now, after all in the last patch the comment is good enough
-for me to understand slot 0 is the default slot.
+In this case `entry`'s stack slot is good enough to satisfy the "m"
+constraint in "rm", but the inline assembly in
+handle_external_interrupt_irqoff() modifies the stack pointer via
+push+pushf before using this input, which in this case results in
+calling what was the previous state of the flags register, rather than
+`entry`.
 
-Thanks,
+Be more specific in the constraints by requiring `entry` be in a
+register, and not a memory operand.
 
->  
->  	return vm;
->  }
-> -- 
-> 2.24.1
-> 
+Reported-by: Dmitry Vyukov <dvyukov@google.com>
+Reported-by: syzbot+3f29ca2efb056a761e38@syzkaller.appspotmail.com
+Debugged-by: Alexander Potapenko <glider@google.com>
+Debugged-by: Paolo Bonzini <pbonzini@redhat.com>
+Debugged-by: Sean Christopherson <sean.j.christopherson@intel.com>
+Signed-off-by: Nick Desaulniers <ndesaulniers@google.com>
+---
+ arch/x86/kvm/vmx/vmx.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 4d22b1b5e822..310e8c1169b8 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -6277,7 +6277,7 @@ static void handle_external_interrupt_irqoff(struct kvm_vcpu *vcpu)
+ #endif
+ 		ASM_CALL_CONSTRAINT
+ 		:
+-		THUNK_TARGET(entry),
++		[thunk_target]"r"(entry),
+ 		[ss]"i"(__KERNEL_DS),
+ 		[cs]"i"(__KERNEL_CS)
+ 	);
 -- 
-Peter Xu
+2.25.1.696.g5e7596f4ac-goog
 
