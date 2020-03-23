@@ -2,146 +2,146 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 97B4618F9B9
-	for <lists+kvm@lfdr.de>; Mon, 23 Mar 2020 17:31:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A28CE18F9C2
+	for <lists+kvm@lfdr.de>; Mon, 23 Mar 2020 17:33:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727558AbgCWQbk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Mar 2020 12:31:40 -0400
-Received: from mga07.intel.com ([134.134.136.100]:48804 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727546AbgCWQbj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 Mar 2020 12:31:39 -0400
-IronPort-SDR: iFXscG6X/tylu1tKeCS7jZvcIQ6v4+/5LhyIrkhJqw1qGclb8KHTcuXn8p+4dVRCjoWCOtL6Vn
- kgKH8ptzLcUw==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Mar 2020 09:31:38 -0700
-IronPort-SDR: szHRtSFDap8tPDDbCZjY8IsJB86JbCOaVx3NCNFM02k1aZo2cLfAgzLVZG93EZD2pGO8Xl0/T8
- x/vNCF1+MuCQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.72,297,1580803200"; 
-   d="scan'208";a="357141639"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
-  by fmsmga001.fm.intel.com with ESMTP; 23 Mar 2020 09:31:37 -0700
-Date:   Mon, 23 Mar 2020 09:31:36 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+        id S1727517AbgCWQdP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Mar 2020 12:33:15 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:48577 "EHLO
+        us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727334AbgCWQdO (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 23 Mar 2020 12:33:14 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1584981193;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=KCvacwiU6OTRKkamU+WDDamahYADSqAV/L9BazSCR94=;
+        b=FyDsCBjAuszSEz/Qix1nNSdnyL8pT1oGIeUj/ny9Rdbll9TDFSuTM/URQBIeIYU7x63+UP
+        +uRuUcbVIEcLMaqW76YMJFsfykPuMxx7I4M7qHclek8LX7GBZZSvYTKC1MVAXUS+jMLWNQ
+        k5V5YUGm/45UUpjDgSkGbCnRuDn9oDs=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-365-agW3G8k2OPGF3nY442HOFg-1; Mon, 23 Mar 2020 12:33:11 -0400
+X-MC-Unique: agW3G8k2OPGF3nY442HOFg-1
+Received: by mail-wr1-f71.google.com with SMTP id r9so5503291wrs.13
+        for <kvm@vger.kernel.org>; Mon, 23 Mar 2020 09:33:11 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=KCvacwiU6OTRKkamU+WDDamahYADSqAV/L9BazSCR94=;
+        b=XHllpxfJLAiDwj0EdrEwp/b4bx85ctyHAf+l3XZnk1g4PVzWQV3vwXru5cf3+/lNlp
+         I4BA1LkygVbFsIsbzCGN3BgG36WJAd7Qr7nE9EUzIRhp5a6XbTeu6clTh9ltB+VvUVzQ
+         OZpkvlTEgAXR5/bPztd8Cn9nHp6YJIbLQZhY+4apej24OLCAlzTJbWLgjJaNQyh1Ti79
+         eJYleSNIKik+srw1lJyQEh+nTRf+sch1315XGrK9hQpI6m+3eMN0kgQqUKLKx8IIf6jg
+         Cj0YHe0YwTBlCMeJLs4MIYaNfGB1W0QIbKDJkfIW3XpRi/CRYjxlrLVijaME9b/kiQzT
+         7G9Q==
+X-Gm-Message-State: ANhLgQ3GIu3sRyIkoQsxmmHyMjIT8xJw3cn5illhOBhGYg4RrMKc1J5I
+        jikJb5B1h3bzxO1VnpKWy2FYs4WYNlCOq2xJ0PdBnqUT0ZXPdrFezJPzSc2qkvYtwipKX9cDZ+R
+        HU7aDY2G5TciO
+X-Received: by 2002:adf:a387:: with SMTP id l7mr30790724wrb.250.1584981190740;
+        Mon, 23 Mar 2020 09:33:10 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vu5DQvhi2385iSKFZyFJgeZoUq4ZNFT6SaoQ4GLJpPuvChdtB8xZdp32gM1w6hlQUmPYIQLCg==
+X-Received: by 2002:adf:a387:: with SMTP id l7mr30790696wrb.250.1584981190471;
+        Mon, 23 Mar 2020 09:33:10 -0700 (PDT)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id 61sm26456602wrn.82.2020.03.23.09.33.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 23 Mar 2020 09:33:09 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 2/9] KVM: x86: Move init-only kvm_x86_ops to separate
- struct
-Message-ID: <20200323163136.GO28711@linux.intel.com>
-References: <20200321202603.19355-1-sean.j.christopherson@intel.com>
- <20200321202603.19355-3-sean.j.christopherson@intel.com>
- <87lfnr9sqn.fsf@vitty.brq.redhat.com>
- <20200323152909.GE28711@linux.intel.com>
- <87o8sn82ef.fsf@vitty.brq.redhat.com>
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Ben Gardon <bgardon@google.com>,
+        Junaid Shahid <junaids@google.com>,
+        Liran Alon <liran.alon@oracle.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        John Haxby <john.haxby@oracle.com>,
+        Miaohe Lin <linmiaohe@huawei.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>
+Subject: Re: [PATCH v3 04/37] KVM: nVMX: Invalidate all roots when emulating INVVPID without EPT
+In-Reply-To: <20200323160432.GJ28711@linux.intel.com>
+References: <20200320212833.3507-1-sean.j.christopherson@intel.com> <20200320212833.3507-5-sean.j.christopherson@intel.com> <87v9mv84qu.fsf@vitty.brq.redhat.com> <20200323160432.GJ28711@linux.intel.com>
+Date:   Mon, 23 Mar 2020 17:33:08 +0100
+Message-ID: <87lfnr820r.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87o8sn82ef.fsf@vitty.brq.redhat.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Mar 23, 2020 at 05:24:56PM +0100, Vitaly Kuznetsov wrote:
-> Sean Christopherson <sean.j.christopherson@intel.com> writes:
-> 
-> > On Mon, Mar 23, 2020 at 01:10:40PM +0100, Vitaly Kuznetsov wrote:
-> >> Sean Christopherson <sean.j.christopherson@intel.com> writes:
-> >> 
-> >> > +
-> >> > +	.runtime_ops = &svm_x86_ops,
-> >> > +};
-> >> 
-> >> Unrelated to your patch but I think we can make the naming of some of
-> >> these functions more consistend on SVM/VMX, in particular I'd suggest 
-> >> 
-> >> has_svm() -> cpu_has_svm_support()
-> >> is_disabled -> svm_disabled_by_bios()
-> >> ...
-> >> (see below for VMX)
-> >> 
-> >> > +
-> >> >  static int __init svm_init(void)
-> >> >  {
-> >> > -	return kvm_init(&svm_x86_ops, sizeof(struct vcpu_svm),
-> >> > +	return kvm_init(&svm_init_ops, sizeof(struct vcpu_svm),
-> >> >  			__alignof__(struct vcpu_svm), THIS_MODULE);
-> >> >  }
-> >> >  
-> >> > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> >> > index 07299a957d4a..ffcdcc86f5b7 100644
-> >> > --- a/arch/x86/kvm/vmx/vmx.c
-> >> > +++ b/arch/x86/kvm/vmx/vmx.c
-> >> > @@ -7842,11 +7842,8 @@ static bool vmx_check_apicv_inhibit_reasons(ulong bit)
-> >> >  }
-> >> >  
-> >> >  static struct kvm_x86_ops vmx_x86_ops __ro_after_init = {
-> >> > -	.cpu_has_kvm_support = cpu_has_kvm_support,
-> >> > -	.disabled_by_bios = vmx_disabled_by_bios,
-> >> > -	.hardware_setup = hardware_setup,
-> >> >  	.hardware_unsetup = hardware_unsetup,
-> >> > -	.check_processor_compatibility = vmx_check_processor_compat,
-> >> > +
-> >> >  	.hardware_enable = hardware_enable,
-> >> >  	.hardware_disable = hardware_disable,
-> >> >  	.cpu_has_accelerated_tpr = report_flexpriority,
-> >> > @@ -7981,6 +7978,15 @@ static struct kvm_x86_ops vmx_x86_ops __ro_after_init = {
-> >> >  	.apic_init_signal_blocked = vmx_apic_init_signal_blocked,
-> >> >  };
-> >> >  
-> >> > +static struct kvm_x86_init_ops vmx_init_ops __initdata = {
-> >> > +	.cpu_has_kvm_support = cpu_has_kvm_support,
-> >> > +	.disabled_by_bios = vmx_disabled_by_bios,
-> >> > +	.check_processor_compatibility = vmx_check_processor_compat,
-> >> > +	.hardware_setup = hardware_setup,
-> >> 
-> >> cpu_has_kvm_support() -> cpu_has_vmx_support()
-> >> hardware_setup() -> vmx_hardware_setup()
-> >
-> > Preaching to the choir on this one.  The VMX functions without prefixes in
-> > in particular annoy me to no end, e.g. hardware_setup().  Though the worst
-> > is probably ".vcpu_create = vmx_create_vcpu", if I had a nickel for every
-> > time I've tried to find vmx_vcpu_create()...
-> >
-> > What if we added a macro to auto-generate the common/required hooks?  E.g.:
-> >
-> >   static struct kvm_x86_ops vmx_x86_ops __ro_after_init = {
-> > 	MANDATORY_KVM_X86_OPS(vmx),
-> >
-> > 	.pmu_ops = &intel_pmu_ops,
-> >
-> > 	...
-> >   };
-> >
-> > That'd enforce consistent naming, and would provide a bit of documentation
-> > as to which hooks are optional, e.g. many of the nested hooks, and which
-> > must be defined for KVM to function.
-> 
-> Sounds cool! (not sure that with only two implementations people won't
-> call it 'over-engineered' but cool). My personal wish would just be that
-> function names in function implementations are not auto-generated so
-> e.g. a simple 'git grep vmx_hardware_setup' works but the way how we
-> fill vmx_x86_ops in can be macroed I guess.
+Sean Christopherson <sean.j.christopherson@intel.com> writes:
 
-Ya, I was thinking of just the macro.  Even that has downsides though, e.g.
-chasing kvm_x86_ops.hardware_setup() to find VMX's hardware_setup() becomes
-a bit kludgy.  On the other hand, _if_ you know how the fill macro works,
-getting to the implementation should be easier.
+> On Mon, Mar 23, 2020 at 04:34:17PM +0100, Vitaly Kuznetsov wrote:
+>> Sean Christopherson <sean.j.christopherson@intel.com> writes:
+>> 
+>> > From: Junaid Shahid <junaids@google.com>
+>> >
+>> > Free all roots when emulating INVVPID for L1 and EPT is disabled, as
+>> > outstanding changes to the page tables managed by L1 need to be
+>> > recognized.  Because L1 and L2 share an MMU when EPT is disabled, and
+>> > because VPID is not tracked by the MMU role, all roots in the current
+>> > MMU (root_mmu) need to be freed, otherwise a future nested VM-Enter or
+>> > VM-Exit could do a fast CR3 switch (without a flush/sync) and consume
+>> > stale SPTEs.
+>> >
+>> > Fixes: 5c614b3583e7b ("KVM: nVMX: nested VPID emulation")
+>> > Signed-off-by: Junaid Shahid <junaids@google.com>
+>> > [sean: ported to upstream KVM, reworded the comment and changelog]
+>> > Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+>> > ---
+>> >  arch/x86/kvm/vmx/nested.c | 14 ++++++++++++++
+>> >  1 file changed, 14 insertions(+)
+>> >
+>> > diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+>> > index 9624cea4ed9f..bc74fbbf33c6 100644
+>> > --- a/arch/x86/kvm/vmx/nested.c
+>> > +++ b/arch/x86/kvm/vmx/nested.c
+>> > @@ -5250,6 +5250,20 @@ static int handle_invvpid(struct kvm_vcpu *vcpu)
+>> >  		return kvm_skip_emulated_instruction(vcpu);
+>> >  	}
+>> >  
+>> > +	/*
+>> > +	 * Sync the shadow page tables if EPT is disabled, L1 is invalidating
+>> > +	 * linear mappings for L2 (tagged with L2's VPID).  Free all roots as
+>> > +	 * VPIDs are not tracked in the MMU role.
+>> > +	 *
+>> > +	 * Note, this operates on root_mmu, not guest_mmu, as L1 and L2 share
+>> > +	 * an MMU when EPT is disabled.
+>> > +	 *
+>> > +	 * TODO: sync only the affected SPTEs for INVDIVIDUAL_ADDR.
+>> > +	 */
+>> > +	if (!enable_ept)
+>> > +		kvm_mmu_free_roots(vcpu, &vcpu->arch.root_mmu,
+>> > +				   KVM_MMU_ROOTS_ALL);
+>> > +
+>> 
+>> This is related to my remark on the previous patch; the comment above
+>> makes me think I'm missing something obvious, enlighten me please)
+>> 
+>> My understanding is that L1 and L2 will share arch.root_mmu not only
+>> when EPT is globally disabled, we seem to switch between
+>> root_mmu/guest_mmu only when nested_cpu_has_ept(vmcs12) but different L2
+>> guests may be different on this. Do we need to handle this somehow?
+>
+> guest_mmu is used iff nested EPT is enabled, which requires enable_ept=1.
+> enable_ept is global and cannot be changed without reloading kvm_intel.
+>
+> This most definitely over-invalidates, e.g. it blasts away L1's page
+> tables.  But, fixing that requires tracking VPID in mmu_role and/or adding
+> support for using guest_mmu when L1 isn't using TDP, i.e. nested EPT is
+> disabled.  Assuming the vast majority of nested deployments enable EPT in
+> L0, the cost of both options likely outweighs the benefits.
+>
+
+Yes but my question rather was: what if global 'enable_ept' is true but
+nested EPT is not being used by L1, don't we still need to do
+kvm_mmu_free_roots(&vcpu->arch.root_mmu) here?
+
+-- 
+Vitaly
+
