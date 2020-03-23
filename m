@@ -2,167 +2,187 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 65E5C18FB76
-	for <lists+kvm@lfdr.de>; Mon, 23 Mar 2020 18:28:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6923C18FB79
+	for <lists+kvm@lfdr.de>; Mon, 23 Mar 2020 18:29:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727601AbgCWR2R (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Mar 2020 13:28:17 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:50022 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727361AbgCWR2Q (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 Mar 2020 13:28:16 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02NHOM0A135226;
-        Mon, 23 Mar 2020 17:27:52 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2020-01-29;
- bh=0W36mKXR8dI8W6580WJSeXTMIu4rnf7ZVMgMB4QK/yA=;
- b=nlvazGfwrgieAp50GxGSPba1CgOnLmgI32F+ViNfApFCZweBCh2Ky/DZi0rhjippPRX5
- IxqbvNJD6bjZAtSmxBbNtC+vUWIU313nPgImQ2uJQXtGfJ6lt45XvzK27xm+O2frN2It
- WtKyjy6JSzJHOi/JZ+KvdpTCsEEh164PvarY9j99CccKghMEJYPma/ZKzd5yYokz/nRA
- Gb+/nFuREBQemarlXWr9cq3PkA9jpFMFTo7HmMOKIgeUvMBxd5WSsDjhlHbdmp6Ocia8
- Jrk/uTBuLZSA12Ev5HKUHlPUt6jIO9ui5m1bU1P7FnSyY8zDZ1o7EBZR2A7vbV/MvUkV TQ== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by userp2120.oracle.com with ESMTP id 2yx8abvwtn-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 23 Mar 2020 17:27:52 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02NHLO5q003163;
-        Mon, 23 Mar 2020 17:27:52 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by aserp3030.oracle.com with ESMTP id 2yxw915dxu-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 23 Mar 2020 17:27:51 +0000
-Received: from abhmp0010.oracle.com (abhmp0010.oracle.com [141.146.116.16])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 02NHRnYS000750;
-        Mon, 23 Mar 2020 17:27:50 GMT
-Received: from [192.168.1.206] (/71.63.128.209)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Mon, 23 Mar 2020 10:27:49 -0700
-Subject: Re: [PATCH v2] mm/hugetlb: fix a addressing exception caused by
- huge_pte_offset()
-To:     Jason Gunthorpe <jgg@ziepe.ca>
-Cc:     "Longpeng (Mike)" <longpeng2@huawei.com>,
-        akpm@linux-foundation.org, kirill.shutemov@linux.intel.com,
-        linux-kernel@vger.kernel.org, arei.gonglei@huawei.com,
-        weidong.huang@huawei.com, weifuqiang@huawei.com,
-        kvm@vger.kernel.org, linux-mm@kvack.org,
-        Matthew Wilcox <willy@infradead.org>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        stable@vger.kernel.org
-References: <1582342427-230392-1-git-send-email-longpeng2@huawei.com>
- <51a25d55-de49-4c0a-c994-bf1a8cfc8638@oracle.com>
- <20200323160955.GY20941@ziepe.ca>
-From:   Mike Kravetz <mike.kravetz@oracle.com>
-Message-ID: <69055395-e7e5-a8e2-7f3e-f61607149318@oracle.com>
-Date:   Mon, 23 Mar 2020 10:27:48 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+        id S1727678AbgCWR3H (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Mar 2020 13:29:07 -0400
+Received: from mail-pj1-f68.google.com ([209.85.216.68]:35765 "EHLO
+        mail-pj1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727498AbgCWR3F (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 Mar 2020 13:29:05 -0400
+Received: by mail-pj1-f68.google.com with SMTP id g9so142662pjp.0
+        for <kvm@vger.kernel.org>; Mon, 23 Mar 2020 10:29:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=W+gJxpxvFbfNBEOfkvfTA+dUu8PDaWOK6s/6neYRg5U=;
+        b=nST53KuQbnhYyOCSHRRYxQ2NOAPH5T4CnztaFDPdCnJGTLxcHZWg+R3+k4ODA2BJPF
+         MIzjhMMmvIqGumrXcyN+f17sEA65dbG+b+43UQqkHyPIPvdYo+7+VBvNaoSDqGWJlPce
+         DtZ1ggvLFOU2zuT/fMpAL08Xcgn7N4e+I8T7ww4uzRiBgGBZcWy8eoJwvGL/9aE0gMO/
+         Pp5kCwCdrybSDZ0dHabn2u10hsjc8EJprC6GfW9uPEdOPUDf/7Un7ZxgWrOmXwoKBHKV
+         DSYBssYb9LUULMVb3q8/fx6fSQxSlqp6CwF0M7hyeNA/B2dsOfZZd/b6Ky9KiEHZlvkk
+         EH5A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=W+gJxpxvFbfNBEOfkvfTA+dUu8PDaWOK6s/6neYRg5U=;
+        b=S9H1q4lf2AQCnf+PIpSethiGDRQCElc4VfZ5ffRvZhmbNhl+4azXwFf3n6lMh6JkZk
+         1PfEZK/dwGrN24T7s6NBBB2/2gIZhDtW4OBLyx9sRxiJGxjtjxmdX4y8wFSJXeAStOG2
+         SYMqdYbz6xjmfHpwssA/sn3dx5YJgBIWKQ/EaIWpClGT+idUsfmU222oEgQdRPBOip4A
+         KOk94zYLUOYkyXxoB6nQTPKLwkEJeiLkz5wH0blHsrOEyUs9KSd9+J7Q0CYGfrIzhE7U
+         T4neVdIEFI6uYAjI0MoC8/BSAKk0hRX5sitY014EITifs5mx2DhPnx3dPTwLbZB62mM9
+         aRjA==
+X-Gm-Message-State: ANhLgQ2yAPzdEzSuqurtwKbSe+v14YPeLg7WG+BTiREWGIfGWuUsOaZ4
+        Fd3CoUuBRCQ0u6Q8nC15UzAiDETGtr208xhvPLYPvA==
+X-Google-Smtp-Source: ADFU+vspZ9THbwKZxEtPew+mV6NrQtoZQ96vWXT1Ie/mEZuPOWjmu2zXsJ8HvikT0dP1Y4Elpl00k8LUKnadBtrqxsM=
+X-Received: by 2002:a17:902:22e:: with SMTP id 43mr21721280plc.119.1584984544159;
+ Mon, 23 Mar 2020 10:29:04 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200323160955.GY20941@ziepe.ca>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9569 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 spamscore=0 bulkscore=0
- adultscore=0 mlxscore=0 malwarescore=0 mlxlogscore=942 suspectscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
- definitions=main-2003230091
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9569 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 clxscore=1011
- lowpriorityscore=0 suspectscore=0 priorityscore=1501 malwarescore=0
- mlxscore=0 adultscore=0 phishscore=0 impostorscore=0 mlxlogscore=981
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2003230091
+References: <000000000000277a0405a16bd5c9@google.com> <CACT4Y+b1WFT87pWQaXD3CWjyjoQaP1jcycHdHF+rtxoR5xW1ww@mail.gmail.com>
+ <5058aabe-f32d-b8ef-57ed-f9c0206304c5@redhat.com> <CAG_fn=WYtSoyi63ACaz-ya=Dbi+BFU-_mADDpL6gQvDimQscmw@mail.gmail.com>
+ <20200323163925.GP28711@linux.intel.com> <CAKwvOdkE8OAu=Gj4MKWwpctka6==6EtrbF3e1tvF=jS2hBB3Ow@mail.gmail.com>
+In-Reply-To: <CAKwvOdkE8OAu=Gj4MKWwpctka6==6EtrbF3e1tvF=jS2hBB3Ow@mail.gmail.com>
+From:   Nick Desaulniers <ndesaulniers@google.com>
+Date:   Mon, 23 Mar 2020 10:28:52 -0700
+Message-ID: <CAKwvOdkXi1MN2Yqqoa6ghw14tQ25WYgyJkSv35-+1KRb=cmhZw@mail.gmail.com>
+Subject: Re: BUG: unable to handle kernel NULL pointer dereference in handle_external_interrupt_irqoff
+To:     Dmitry Vyukov <dvyukov@google.com>
+Cc:     Alexander Potapenko <glider@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        syzbot <syzbot+3f29ca2efb056a761e38@syzkaller.appspotmail.com>,
+        clang-built-linux <clang-built-linux@googlegroups.com>,
+        Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, KVM list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        syzkaller-bugs <syzkaller-bugs@googlegroups.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        "the arch/x86 maintainers" <x86@kernel.org>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 3/23/20 9:09 AM, Jason Gunthorpe wrote:
-> On Sat, Mar 21, 2020 at 04:38:19PM -0700, Mike Kravetz wrote:
-> 
->> Andrew dropped this patch from his tree which caused me to go back and
->> look at the status of this patch/issue.
->>
->> It is pretty obvious that code in the current huge_pte_offset routine
->> is racy.  I checked out the assembly code produced by my compiler and
->> verified that the line,
->>
->> 	if (pud_huge(*pud) || !pud_present(*pud))
->>
->> does actually dereference *pud twice.  So, the value could change between
->> those two dereferences.   Longpeng (Mike) could easlily recreate the issue
->> if he put a delay between the two dereferences.  I believe the only
->> reservations/concerns about the patch below was the use of READ_ONCE().
->> Is that correct?
-> 
-> I'm looking at a similar situation in pagewalk.c right now with PUD,
-> and it is very confusing to see that locks are being held, memory
-> accessed without READ_ONCE, but actually it has concurrent writes.
-> 
-> I think it is valuable to annotate with READ_ONCE when the author
-> knows this is an unlocked data access, regardless of what the compiler
-> does.
-> 
-> pagewalk probably has the same racy bug you show here, I'm going to
-> send a very similar looking patch to pagewalk hopefully soon.
+On Mon, Mar 23, 2020 at 9:57 AM Nick Desaulniers
+<ndesaulniers@google.com> wrote:
+>
+> On Mon, Mar 23, 2020 at 9:39 AM Sean Christopherson
+> <sean.j.christopherson@intel.com> wrote:
+> >
+> > On Mon, Mar 23, 2020 at 05:31:15PM +0100, Alexander Potapenko wrote:
+> > > On Mon, Mar 23, 2020 at 9:18 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+> > > >
+> > > > On 22/03/20 07:59, Dmitry Vyukov wrote:
+> > > > >
+> > > > > The commit range is presumably
+> > > > > fb279f4e238617417b132a550f24c1e86d922558..63849c8f410717eb2e6662f3953ff674727303e7
+> > > > > But I don't see anything that says "it's me". The only commit that
+> > > > > does non-trivial changes to x86/vmx seems to be "KVM: VMX: check
+> > > > > descriptor table exits on instruction emulation":
+> > > >
+> > > > That seems unlikely, it's a completely different file and it would only
+> > > > affect the outside (non-nested) environment rather than your own kernel.
+> > > >
+> > > > The only instance of "0x86" in the registers is in the flags:
+> > > >
+> > > > > RSP: 0018:ffffc90001ac7998 EFLAGS: 00010086
+> > > > > RAX: ffffc90001ac79c8 RBX: fffffe0000000000 RCX: 0000000000040000
+> > > > > RDX: ffffc9000e20f000 RSI: 000000000000b452 RDI: 000000000000b453
+> > > > > RBP: 0000000000000ec0 R08: ffffffff83987523 R09: ffffffff811c7eca
+> > > > > R10: ffff8880a4e94200 R11: 0000000000000002 R12: dffffc0000000000
+> > > > > R13: fffffe0000000ec8 R14: ffffffff880016f0 R15: fffffe0000000ecb
+> > > > > FS:  00007fb50e370700(0000) GS:ffff8880ae800000(0000) knlGS:0000000000000000
+> > > > > CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> > > > > CR2: 000000000000005c CR3: 0000000092fc7000 CR4: 00000000001426f0
+> > > > > DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> > > > > DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> > > >
+> > > > That would suggest a miscompilation of the inline assembly, which does
+> > > > push the flags:
+> > > >
+> > > > #ifdef CONFIG_X86_64
+> > > >                 "mov %%" _ASM_SP ", %[sp]\n\t"
+> > > >                 "and $0xfffffffffffffff0, %%" _ASM_SP "\n\t"
+> > > >                 "push $%c[ss]\n\t"
+> > > >                 "push %[sp]\n\t"
+> > > > #endif
+> > > >                 "pushf\n\t"
+> > > >                 __ASM_SIZE(push) " $%c[cs]\n\t"
+> > > >                 CALL_NOSPEC
+> > > >
+> > > >
+> > > > It would not explain why it suddenly started to break, unless the clang
+> > > > version also changed, but it would be easy to ascertain and fix (in
+> > > > either KVM or clang).  Dmitry, can you send me the vmx.o and
+> > > > kvm-intel.ko files?
+> > >
+> > > On a quick glance, Clang does not miscompile this part.
+> >
+> > Clang definitely miscompiles the asm, the indirect call operates on the
+> > EFLAGS value, not on @entry as expected.  It looks like clang doesn't honor
+> > ASM_CALL_CONSTRAINT, which effectively tells the compiler that %rsp is
 
-Thanks Jason.
+I noticed that in the syzcaller config I have, that CONFIG_RETPOLINE
+is not set.  I'm more reliably able to reproduce this with
+clang+defconfig+CONFIG_KVM=y+CONFIG_KVM_INTEL=y+CONFIG_RETPOLINE=n,
+ie. by manually disabling retpoline.
 
-Unfortunately, I replied to the thread without full context for the discussion
-we were having.  The primary objection to this patch was the use of READ_ONCE
-in these two instances:
+> > getting clobbered, e.g. the "mov %r14,0x8(%rsp)" is loading @entry for
+> > "callq *0x8(%rsp)", which breaks because of asm's pushes.
+> >
+> > clang:
+> >
+> >         kvm_before_interrupt(vcpu);
+> >
+> >         asm volatile(
+> > ffffffff811b798e:       4c 89 74 24 08          mov    %r14,0x8(%rsp)
+> > ffffffff811b7993:       48 89 e0                mov    %rsp,%rax
+> > ffffffff811b7996:       48 83 e4 f0             and    $0xfffffffffffffff0,%rsp
+> > ffffffff811b799a:       6a 18                   pushq  $0x18
+> > ffffffff811b799c:       50                      push   %rax
+> > ffffffff811b799d:       9c                      pushfq
+> > ffffffff811b799e:       6a 10                   pushq  $0x10
+> > ffffffff811b79a0:       ff 54 24 08             callq  *0x8(%rsp) <--------- calls the EFLAGS value
+> > kvm_after_interrupt():
+> >
+> >
+> > gcc:
+> >         kvm_before_interrupt(vcpu);
+> >
+> >         asm volatile(
+> > ffffffff8118e17c:       48 89 e0                mov    %rsp,%rax
+> > ffffffff8118e17f:       48 83 e4 f0             and    $0xfffffffffffffff0,%rsp
+> > ffffffff8118e183:       6a 18                   pushq  $0x18
+> > ffffffff8118e185:       50                      push   %rax
+> > ffffffff8118e186:       9c                      pushfq
+> > ffffffff8118e187:       6a 10                   pushq  $0x10
+> > ffffffff8118e189:       ff d3                   callq  *%rbx <-------- calls @entry
+> > kvm_after_interrupt():
+>
+> Thanks for this analysis, it looks like this is dependent on some
+> particular configuration; here's clang+defconfig+CONFIG_KVM_INTEL=y:
+>
+>    0x000000000000528f <+127>:   pushq  $0x18
+>    0x0000000000005291 <+129>:   push   %rcx
+>    0x0000000000005292 <+130>:   pushfq
+>    0x0000000000005293 <+131>:   pushq  $0x10
+>    0x0000000000005295 <+133>:   callq  *%rax
+>
+> --
+> Thanks,
+> ~Nick Desaulniers
 
->  	pgd = pgd_offset(mm, addr);
-> -	if (!pgd_present(*pgd))
-> +	if (!pgd_present(READ_ONCE(*pgd)))
->  		return NULL;
->  	p4d = p4d_offset(pgd, addr);
-> -	if (!p4d_present(*p4d))
-> +	if (!p4d_present(READ_ONCE(*p4d)))
->  		return NULL;
->  
->       pud = pud_offset(p4d, addr);
 
-One would argue that pgd and p4d can not change from present to !present
-during the execution of this code.  To me, that seems like the issue which
-would cause an issue.  Of course, I could be missing something.
-
-> Also, the remark about pmd_offset() seems accurate. The
-> get_user_fast_pages() pattern seems like the correct one to emulate:
-> 
->   pud = READ_ONCE(*pudp);
->   if (pud_none(pud)) 
->      ..
->   if (!pud_'is a pmd pointer')
->      ..
->   pmdp = pmd_offset(&pud, address);
->   pmd = READ_ONCE(*pmd);
->   [...]
-> 
-> Passing &pud in avoids another de-reference of the pudp. Honestly all
-> these APIs that take in page table pointers and internally
-> de-reference them seem very hard to use correctly when the page table
-> access isn't fully locked against write.
-> 
-> This also relies on 'some kind of locking' to prevent the pmdp from
-> becoming freed concurrently while this is running.
-> 
-> .. also this only works if READ_ONCE() is atomic, ie the pud can't be
-> 64 bit on a 32 bit platform. At least pmd has this problem, I haven't
-> figured out if pud does??
-> 
->> Are there any objections to the patch if the READ_ONCE() calls are removed?
-> 
-> I think if we know there is no concurrent data access then it makes
-> sense to keep the READ_ONCE.
-> 
-> It looks like at least the p4d read from the pgd is also unlocked here
-> as handle_mm_fault() writes to it??
-
-Yes, there is no locking required to call huge_pte_offset().
 
 -- 
-Mike Kravetz
+Thanks,
+~Nick Desaulniers
