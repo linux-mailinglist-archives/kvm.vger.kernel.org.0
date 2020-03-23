@@ -2,122 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8B1CC18F935
-	for <lists+kvm@lfdr.de>; Mon, 23 Mar 2020 17:04:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E66FE18F956
+	for <lists+kvm@lfdr.de>; Mon, 23 Mar 2020 17:09:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727443AbgCWQEe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Mar 2020 12:04:34 -0400
-Received: from mga05.intel.com ([192.55.52.43]:53089 "EHLO mga05.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727194AbgCWQEd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 Mar 2020 12:04:33 -0400
-IronPort-SDR: COJtxdyDi78DFmABqF/UJ0spSQE+qPnpYFmOQHmOTvtajj3f4TihAL4BHi75Ju3me/2SLrr1T7
- l7Vn8l+FYeYg==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Mar 2020 09:04:33 -0700
-IronPort-SDR: 8160iWQQn2QB9EBkZ/5az9FGQyLtlP8gpZ2wwPk4GGyG8uGZK6pSLjteJMiLAc6G0Mv9/pLSSz
- btIvTAF8I0UQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.72,296,1580803200"; 
-   d="scan'208";a="269922152"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
-  by fmsmga004.fm.intel.com with ESMTP; 23 Mar 2020 09:04:32 -0700
-Date:   Mon, 23 Mar 2020 09:04:32 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Ben Gardon <bgardon@google.com>,
-        Junaid Shahid <junaids@google.com>,
-        Liran Alon <liran.alon@oracle.com>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        John Haxby <john.haxby@oracle.com>,
-        Miaohe Lin <linmiaohe@huawei.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>
-Subject: Re: [PATCH v3 04/37] KVM: nVMX: Invalidate all roots when emulating
- INVVPID without EPT
-Message-ID: <20200323160432.GJ28711@linux.intel.com>
-References: <20200320212833.3507-1-sean.j.christopherson@intel.com>
- <20200320212833.3507-5-sean.j.christopherson@intel.com>
- <87v9mv84qu.fsf@vitty.brq.redhat.com>
+        id S1727337AbgCWQJ6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Mar 2020 12:09:58 -0400
+Received: from mail-qk1-f196.google.com ([209.85.222.196]:38660 "EHLO
+        mail-qk1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727262AbgCWQJ6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 Mar 2020 12:09:58 -0400
+Received: by mail-qk1-f196.google.com with SMTP id h14so15825804qke.5
+        for <kvm@vger.kernel.org>; Mon, 23 Mar 2020 09:09:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=kAhcxP8/eNJxKmPp4P/1zEx2VH3e7bOqUzz83MhM5no=;
+        b=eNuL1zAguHPlqQybPhPa1MXls3PQYb5vdLS5AZjgIq8RkZBCaxVVIIJpgVPW7QrGSY
+         KA7ZAYszAWHP6UbEIF7t3zDnHlCOL9PW6k4i9mtF7oVXKTMo0W6DhnV6FOCLEaxS3BZL
+         Nl+nfv/a30GWZzhldB3ExREp3xIPvsWdTuISOXGXdlKFmE6QIipUAkCffJK9vyX8B5L+
+         bVwjJ+7ef9TJV7QA9dy/U3o8SdwKDb5X7jK6dCtQUslWMIalmrWiQxEGYimgiQYMsFYf
+         di9FRqrqUb+Wgu/STcRhGoXM0jqV7OuNMKpOEUF2xp2NMaMyKKc9aLgUCcsVQJUjR88e
+         okYQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=kAhcxP8/eNJxKmPp4P/1zEx2VH3e7bOqUzz83MhM5no=;
+        b=T9Zq1OvrSmdlXcbLNMStMD5g5nf4scNyaeSn/OMTq9vSXRAemCtDj9rgXFpO2Fdmkz
+         +njiV3TAojbvolhrmmmSDq0yMHH0AK2FQKokt+wosePQSijVrYiLApK/2f+g/I/f67FS
+         tpgJCjRbFdsDug9MOLbG8sK6voDSEBm9OrhVGrUif9Nvap/ycY5rhYKtU0lmDK3crIM+
+         8+yxqPHX4Cv4cONUBwB2f+My+Xmw4vbZ3XAuVNr5Eh5GzZjcCIGAWtLbHnFD4hIp5OrH
+         dppZgI/xWh08vaXq/cedetu3aXeFUsh/dlmctKmlI1Ti18ODXtlbTDjE/bmLVgFNVHnX
+         RrxA==
+X-Gm-Message-State: ANhLgQ3yw34ueTzZFekTqGmjYpQQi2kl9zQ2AG0i3/cT/Z1h8b8Jik7B
+        uykOcqakDGSFtNYF7a72f/hiGQ==
+X-Google-Smtp-Source: ADFU+vsws2eqOZlxDQQkmlsIvJQ1ivBDR/Au9oUOqDUQqVvEuamycFbO8yG/pIZC6ehrGORsRcL+Yg==
+X-Received: by 2002:a05:620a:22ef:: with SMTP id p15mr19433497qki.495.1584979796923;
+        Mon, 23 Mar 2020 09:09:56 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-142-68-57-212.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.57.212])
+        by smtp.gmail.com with ESMTPSA id a11sm1005364qto.57.2020.03.23.09.09.55
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Mon, 23 Mar 2020 09:09:56 -0700 (PDT)
+Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1jGPeF-00053p-1f; Mon, 23 Mar 2020 13:09:55 -0300
+Date:   Mon, 23 Mar 2020 13:09:55 -0300
+From:   Jason Gunthorpe <jgg@ziepe.ca>
+To:     Mike Kravetz <mike.kravetz@oracle.com>
+Cc:     "Longpeng (Mike)" <longpeng2@huawei.com>,
+        akpm@linux-foundation.org, kirill.shutemov@linux.intel.com,
+        linux-kernel@vger.kernel.org, arei.gonglei@huawei.com,
+        weidong.huang@huawei.com, weifuqiang@huawei.com,
+        kvm@vger.kernel.org, linux-mm@kvack.org,
+        Matthew Wilcox <willy@infradead.org>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        stable@vger.kernel.org
+Subject: Re: [PATCH v2] mm/hugetlb: fix a addressing exception caused by
+ huge_pte_offset()
+Message-ID: <20200323160955.GY20941@ziepe.ca>
+References: <1582342427-230392-1-git-send-email-longpeng2@huawei.com>
+ <51a25d55-de49-4c0a-c994-bf1a8cfc8638@oracle.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <87v9mv84qu.fsf@vitty.brq.redhat.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <51a25d55-de49-4c0a-c994-bf1a8cfc8638@oracle.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Mar 23, 2020 at 04:34:17PM +0100, Vitaly Kuznetsov wrote:
-> Sean Christopherson <sean.j.christopherson@intel.com> writes:
-> 
-> > From: Junaid Shahid <junaids@google.com>
-> >
-> > Free all roots when emulating INVVPID for L1 and EPT is disabled, as
-> > outstanding changes to the page tables managed by L1 need to be
-> > recognized.  Because L1 and L2 share an MMU when EPT is disabled, and
-> > because VPID is not tracked by the MMU role, all roots in the current
-> > MMU (root_mmu) need to be freed, otherwise a future nested VM-Enter or
-> > VM-Exit could do a fast CR3 switch (without a flush/sync) and consume
-> > stale SPTEs.
-> >
-> > Fixes: 5c614b3583e7b ("KVM: nVMX: nested VPID emulation")
-> > Signed-off-by: Junaid Shahid <junaids@google.com>
-> > [sean: ported to upstream KVM, reworded the comment and changelog]
-> > Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> > ---
-> >  arch/x86/kvm/vmx/nested.c | 14 ++++++++++++++
-> >  1 file changed, 14 insertions(+)
-> >
-> > diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> > index 9624cea4ed9f..bc74fbbf33c6 100644
-> > --- a/arch/x86/kvm/vmx/nested.c
-> > +++ b/arch/x86/kvm/vmx/nested.c
-> > @@ -5250,6 +5250,20 @@ static int handle_invvpid(struct kvm_vcpu *vcpu)
-> >  		return kvm_skip_emulated_instruction(vcpu);
-> >  	}
-> >  
-> > +	/*
-> > +	 * Sync the shadow page tables if EPT is disabled, L1 is invalidating
-> > +	 * linear mappings for L2 (tagged with L2's VPID).  Free all roots as
-> > +	 * VPIDs are not tracked in the MMU role.
-> > +	 *
-> > +	 * Note, this operates on root_mmu, not guest_mmu, as L1 and L2 share
-> > +	 * an MMU when EPT is disabled.
-> > +	 *
-> > +	 * TODO: sync only the affected SPTEs for INVDIVIDUAL_ADDR.
-> > +	 */
-> > +	if (!enable_ept)
-> > +		kvm_mmu_free_roots(vcpu, &vcpu->arch.root_mmu,
-> > +				   KVM_MMU_ROOTS_ALL);
-> > +
-> 
-> This is related to my remark on the previous patch; the comment above
-> makes me think I'm missing something obvious, enlighten me please)
-> 
-> My understanding is that L1 and L2 will share arch.root_mmu not only
-> when EPT is globally disabled, we seem to switch between
-> root_mmu/guest_mmu only when nested_cpu_has_ept(vmcs12) but different L2
-> guests may be different on this. Do we need to handle this somehow?
+On Sat, Mar 21, 2020 at 04:38:19PM -0700, Mike Kravetz wrote:
 
-guest_mmu is used iff nested EPT is enabled, which requires enable_ept=1.
-enable_ept is global and cannot be changed without reloading kvm_intel.
-
-This most definitely over-invalidates, e.g. it blasts away L1's page
-tables.  But, fixing that requires tracking VPID in mmu_role and/or adding
-support for using guest_mmu when L1 isn't using TDP, i.e. nested EPT is
-disabled.  Assuming the vast majority of nested deployments enable EPT in
-L0, the cost of both options likely outweighs the benefits.
-
-> >  	return nested_vmx_succeed(vcpu);
-> >  }
+> Andrew dropped this patch from his tree which caused me to go back and
+> look at the status of this patch/issue.
 > 
-> -- 
-> Vitaly
+> It is pretty obvious that code in the current huge_pte_offset routine
+> is racy.  I checked out the assembly code produced by my compiler and
+> verified that the line,
 > 
+> 	if (pud_huge(*pud) || !pud_present(*pud))
+> 
+> does actually dereference *pud twice.  So, the value could change between
+> those two dereferences.   Longpeng (Mike) could easlily recreate the issue
+> if he put a delay between the two dereferences.  I believe the only
+> reservations/concerns about the patch below was the use of READ_ONCE().
+> Is that correct?
+
+I'm looking at a similar situation in pagewalk.c right now with PUD,
+and it is very confusing to see that locks are being held, memory
+accessed without READ_ONCE, but actually it has concurrent writes.
+
+I think it is valuable to annotate with READ_ONCE when the author
+knows this is an unlocked data access, regardless of what the compiler
+does.
+
+pagewalk probably has the same racy bug you show here, I'm going to
+send a very similar looking patch to pagewalk hopefully soon.
+
+Also, the remark about pmd_offset() seems accurate. The
+get_user_fast_pages() pattern seems like the correct one to emulate:
+
+  pud = READ_ONCE(*pudp);
+  if (pud_none(pud)) 
+     ..
+  if (!pud_'is a pmd pointer')
+     ..
+  pmdp = pmd_offset(&pud, address);
+  pmd = READ_ONCE(*pmd);
+  [...]
+
+Passing &pud in avoids another de-reference of the pudp. Honestly all
+these APIs that take in page table pointers and internally
+de-reference them seem very hard to use correctly when the page table
+access isn't fully locked against write.
+
+This also relies on 'some kind of locking' to prevent the pmdp from
+becoming freed concurrently while this is running.
+
+.. also this only works if READ_ONCE() is atomic, ie the pud can't be
+64 bit on a 32 bit platform. At least pmd has this problem, I haven't
+figured out if pud does??
+
+> Are there any objections to the patch if the READ_ONCE() calls are removed?
+
+I think if we know there is no concurrent data access then it makes
+sense to keep the READ_ONCE.
+
+It looks like at least the p4d read from the pgd is also unlocked here
+as handle_mm_fault() writes to it??
+
+Jason
