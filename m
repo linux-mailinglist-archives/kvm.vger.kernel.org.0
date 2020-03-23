@@ -2,127 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id CDFC518F680
-	for <lists+kvm@lfdr.de>; Mon, 23 Mar 2020 15:00:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0612918F71B
+	for <lists+kvm@lfdr.de>; Mon, 23 Mar 2020 15:40:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728593AbgCWOAc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Mar 2020 10:00:32 -0400
-Received: from mail.kernel.org ([198.145.29.99]:33692 "EHLO mail.kernel.org"
+        id S1727160AbgCWOkc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Mar 2020 10:40:32 -0400
+Received: from mga11.intel.com ([192.55.52.93]:36173 "EHLO mga11.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728446AbgCWOAc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 Mar 2020 10:00:32 -0400
-Received: from devnote2 (NE2965lan1.rev.em-net.ne.jp [210.141.244.193])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 9D4B62076A;
-        Mon, 23 Mar 2020 14:00:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1584972031;
-        bh=exgRrTmUoY/hOqEmhXYfHo51IME1kdaFE/gpQs547BQ=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=hnN9lgoAuW0Z0z4uYsyccACHjB7hMDgg0zDpdxxyjn+4FQjkPt6C0mkYPRdZJptVx
-         xIVFqCMvP6ZmfZPVCFlrpwd3cppNwBn1MsB4+J+MxhaCaA3v/HOvYmqmsJukLTlwFX
-         A9l318vlJup0XGMIYVxwdQTcG+nAbad5kTN0i0b4=
-Date:   Mon, 23 Mar 2020 23:00:25 +0900
-From:   Masami Hiramatsu <mhiramat@kernel.org>
-To:     Thomas Gleixner <tglx@linutronix.de>
-Cc:     LKML <linux-kernel@vger.kernel.org>, x86@kernel.org,
-        Paul McKenney <paulmck@kernel.org>,
-        Josh Poimboeuf <jpoimboe@redhat.com>,
-        "Joel Fernandes (Google)" <joel@joelfernandes.org>,
-        "Steven Rostedt (VMware)" <rostedt@goodmis.org>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Alexei Starovoitov <ast@kernel.org>,
-        Frederic Weisbecker <frederic@kernel.org>,
-        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-        Brian Gerst <brgerst@gmail.com>,
-        Juergen Gross <jgross@suse.com>,
-        Alexandre Chartre <alexandre.chartre@oracle.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Subject: Re: [patch V3 04/23] kprobes: Prevent probes in .noinstr.text
- section
-Message-Id: <20200323230025.a24f949a2143dbd5f208f00c@kernel.org>
-In-Reply-To: <20200320180032.799569116@linutronix.de>
-References: <20200320175956.033706968@linutronix.de>
-        <20200320180032.799569116@linutronix.de>
-X-Mailer: Sylpheed 3.5.1 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+        id S1725816AbgCWOkc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 Mar 2020 10:40:32 -0400
+IronPort-SDR: Qpl0iO+boptv/rFvsCLtEjQES3Wx5TAqXIPorZycf/k0cIsNiCEdpgsToA0JxOFdnrtrQYjqbw
+ +o3jOC4ppSrQ==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Mar 2020 07:40:31 -0700
+IronPort-SDR: a0XCa+e1GQIxpO/K/RToaMSSO1oaOTImJsmySbWz2YU8TW1xDo40/Phqv/W3fNuNgQ8un+lC8s
+ 3W5AZzlHSq2A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.72,296,1580803200"; 
+   d="scan'208";a="419518847"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
+  by orsmga005.jf.intel.com with ESMTP; 23 Mar 2020 07:40:31 -0700
+Date:   Mon, 23 Mar 2020 07:40:31 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Mike Kravetz <mike.kravetz@oracle.com>
+Cc:     "Longpeng (Mike, Cloud Infrastructure Service Product Dept.)" 
+        <longpeng2@huawei.com>, akpm@linux-foundation.org,
+        kirill.shutemov@linux.intel.com, linux-kernel@vger.kernel.org,
+        arei.gonglei@huawei.com, weidong.huang@huawei.com,
+        weifuqiang@huawei.com, kvm@vger.kernel.org, linux-mm@kvack.org,
+        Matthew Wilcox <willy@infradead.org>, stable@vger.kernel.org
+Subject: Re: [PATCH v2] mm/hugetlb: fix a addressing exception caused by
+ huge_pte_offset()
+Message-ID: <20200323144030.GA28711@linux.intel.com>
+References: <1582342427-230392-1-git-send-email-longpeng2@huawei.com>
+ <51a25d55-de49-4c0a-c994-bf1a8cfc8638@oracle.com>
+ <5700f44e-9df9-1b12-bc29-68e0463c2860@huawei.com>
+ <e16fe81b-5c4c-e689-2f48-214f2025df2f@oracle.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e16fe81b-5c4c-e689-2f48-214f2025df2f@oracle.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Thomas,
+On Sun, Mar 22, 2020 at 07:54:32PM -0700, Mike Kravetz wrote:
+> On 3/22/20 7:03 PM, Longpeng (Mike, Cloud Infrastructure Service Product Dept.) wrote:
+> > 
+> > On 2020/3/22 7:38, Mike Kravetz wrote:
+> >> On 2/21/20 7:33 PM, Longpeng(Mike) wrote:
+> >>> From: Longpeng <longpeng2@huawei.com>
+> I have not looked closely at the generated code for lookup_address_in_pgd.
+> It appears that it would dereference p4d, pud and pmd multiple times.  Sean
+> seemed to think there was something about the calling context that would
+> make issues like those seen with huge_pte_offset less likely to happen.  I
+> do not know if this is accurate or not.
 
-On Fri, 20 Mar 2020 19:00:00 +0100
-Thomas Gleixner <tglx@linutronix.de> wrote:
+Only for KVM's calls to lookup_address_in_mm(), I can't speak to other
+calls that funnel into to lookup_address_in_pgd().
 
-> Instrumentation is forbidden in the .noinstr.text section. Make kprobes
-> respect this.
+KVM uses a combination of tracking and blocking mmu_notifier calls to ensure
+PTE changes/invalidations between gup() and lookup_address_in_pgd() cause a
+restart of the faulting instruction, and that pending changes/invalidations
+are blocked until installation of the pfn in KVM's secondary MMU completes.
+
+kvm_mmu_page_fault():
+
+	mmu_seq = kvm->mmu_notifier_seq;
+	smp_rmb();
+
+	pfn = gup(hva);
+
+	spin_lock(&kvm->mmu_lock);
+	smp_rmb();
+	if (kvm->mmu_notifier_seq != mmu_seq)
+		goto out_unlock: // Restart guest, i.e. retry the fault
+
+	lookup_address_in_mm(hva, ...);
+
+	...
+
+  out_unlock:
+	spin_unlock(&kvm->mmu_lock);
+
+
+kvm_mmu_notifier_change_pte() / kvm_mmu_notifier_invalidate_range_end():
+
+	spin_lock(&kvm->mmu_lock);
+	kvm->mmu_notifier_seq++;
+	smp_wmb();
+	spin_unlock(&kvm->mmu_lock);
+
+
+> Let's remove the two READ_ONCE calls and move this patch forward.  We can
+> look closer at lookup_address_in_pgd and generate another patch if that needs
+> to be fixed as well.
 > 
-> This lacks support for .noinstr.text sections in modules, which is required
-> to handle VMX and SVM.
-> 
-
-Would you have any plan to list or mark the noinstr symbols on
-some debugfs interface? I need a blacklist of those symbols so that
-user (and perf-probe) can check which function can not be probed.
-
-It is just calling kprobe_add_area_blacklist() like below.
-
-diff --git a/kernel/kprobes.c b/kernel/kprobes.c
-index 2625c241ac00..4835b644bd2b 100644
---- a/kernel/kprobes.c
-+++ b/kernel/kprobes.c
-@@ -2212,6 +2212,10 @@ static int __init populate_kprobe_blacklist(unsigned long *start,
- 	ret = kprobe_add_area_blacklist((unsigned long)__kprobes_text_start,
- 					(unsigned long)__kprobes_text_end);
- 
-+	/* Symbols in noinstr section are blacklisted */
-+	ret = kprobe_add_area_blacklist((unsigned long)__noinstr_text_start,
-+					(unsigned long)__noinstr_text_end);
-+
- 	return ret ? : arch_populate_kprobe_blacklist();
- }
- 
-Thank you,
-
-
-> Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
-> ---
->  kernel/kprobes.c |   11 +++++++++++
->  1 file changed, 11 insertions(+)
-> 
-> --- a/kernel/kprobes.c
-> +++ b/kernel/kprobes.c
-> @@ -1443,10 +1443,21 @@ static bool __within_kprobe_blacklist(un
->  	return false;
->  }
->  
-> +/* Functions in .noinstr.text must not be probed */
-> +static bool within_noinstr_text(unsigned long addr)
-> +{
-> +	/* FIXME: Handle module .noinstr.text */
-> +	return addr >= (unsigned long)__noinstr_text_start &&
-> +	       addr < (unsigned long)__noinstr_text_end;
-> +}
-> +
->  bool within_kprobe_blacklist(unsigned long addr)
->  {
->  	char symname[KSYM_NAME_LEN], *p;
->  
-> +	if (within_noinstr_text(addr))
-> +		return true;
-> +
->  	if (__within_kprobe_blacklist(addr))
->  		return true;
->  
-> 
-
-
--- 
-Masami Hiramatsu <mhiramat@kernel.org>
+> Thanks
+> -- 
+> Mike Kravetz
