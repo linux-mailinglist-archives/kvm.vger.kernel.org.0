@@ -2,88 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0736418F9A1
-	for <lists+kvm@lfdr.de>; Mon, 23 Mar 2020 17:24:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A25CD18F99F
+	for <lists+kvm@lfdr.de>; Mon, 23 Mar 2020 17:24:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727357AbgCWQYi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Mar 2020 12:24:38 -0400
-Received: from mail-io1-f68.google.com ([209.85.166.68]:39598 "EHLO
-        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725893AbgCWQYi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 Mar 2020 12:24:38 -0400
-Received: by mail-io1-f68.google.com with SMTP id c19so14751868ioo.6
-        for <kvm@vger.kernel.org>; Mon, 23 Mar 2020 09:24:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=szMpm1YHgB+ek/GLf0Q9znil+A6chCIsHv9XnjC6wnU=;
-        b=hK+AE+H5QEe79Ixitmvqv2R3HJWBBiY+uk5cy6vqPzyp6RRYzVKOY1yI6KN9ITyiDl
-         rHVf7JZXS+6XiwgQCmg3Qk2K1zUoxMyRqBFZO3ShH1a3vIdyQ+6ui55W9Y1WgD3AV80G
-         4FsIYQ8PNslp31hPnLuC/M29GplL1v6q7549yAHCOdLUNCM3bnev4A1n4NRGDqdRa545
-         jBfx/r7xmzNAVda7gngzIjz/zjmlf8NcJIDD4XIh8IBejiDVjZiV5/uq3gvdYBdrCkwU
-         ubfJWq5Vz0UltwxYBvtUqzhL7INCSnCsNez4NvSYbOz0WVZiGmzDeC8oHxHfnt+qkbHc
-         A8Qg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=szMpm1YHgB+ek/GLf0Q9znil+A6chCIsHv9XnjC6wnU=;
-        b=cn8y58jL5rbcWWG4tEoUuixTWtWkUyQ+TD+qhXHScugK/xmlLqQm8T2cbBU9z5A1tE
-         03JpvFg2wGCNIQsNduZhse+qamjIkYalIm3t/PHhkxsP3NHyXLL9i+xrVcQWPi3PkaXk
-         YJLMv447xUgR30uk2OJS+5eeSaYH6jHODh2FSviWQ1kbvPgeL4ICLoGuksrzpNEa9D3g
-         JMZPlyhum8XrPQbT8SSN2qgnQxxRNK8U1uQNL4oFSx7pcREpdRZCTQNEIfFlLz61/HYa
-         yJP4uESkKyHtdabNqPW2vg8oHdAzca5QlLw6V9r9llYUh7ouPC/8q9BqTwclsNfGtczT
-         hAFg==
-X-Gm-Message-State: ANhLgQ3Q+AieVjW9wFIOGPuQeAPbjWGUpStk+hW7HDzGjed/wXiOHhqy
-        IBctKVCVOqbgCcgH5+6CM73AvEgts/9xO0evpzOQDA==
-X-Google-Smtp-Source: ADFU+vus/6qIchDGH8hxBBNtI6zsWwfXLYMmjF5wwgd0drF19BSkmHMMb6n8O5PXjqQkAtnJaxYvTdHsE0KjN2GWnfE=
-X-Received: by 2002:a6b:c408:: with SMTP id y8mr2864354ioa.12.1584980676836;
- Mon, 23 Mar 2020 09:24:36 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200320212833.3507-1-sean.j.christopherson@intel.com> <20200320212833.3507-4-sean.j.christopherson@intel.com>
-In-Reply-To: <20200320212833.3507-4-sean.j.christopherson@intel.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Mon, 23 Mar 2020 09:24:25 -0700
-Message-ID: <CALMp9eR5Uu7nRDOS2nQHGzb+Gi6vjDEk1AmuiqkkGWFjKNG+sA@mail.gmail.com>
-Subject: Re: [PATCH v3 03/37] KVM: nVMX: Invalidate all EPTP contexts when
- emulating INVEPT for L1
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
+        id S1727527AbgCWQYl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Mar 2020 12:24:41 -0400
+Received: from mga02.intel.com ([134.134.136.20]:34255 "EHLO mga02.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727318AbgCWQYj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 Mar 2020 12:24:39 -0400
+IronPort-SDR: HcBSzj9ijTKrdAFhkbiKhwgpC1LWpzLV0Tg0Aa2eSDxXIbBG7R/UojpG8ZRnq+qL8JWnGE2yJ+
+ t7sFUs2DF56g==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Mar 2020 09:24:34 -0700
+IronPort-SDR: ILxdQq3+j9Vnb0zCRl2g3RbrQ/rEFfNL+NiB/AhCXo3ug7V9WcN3CMUcLGYSGlc4vQNmCJEc1x
+ 4RwWn8KfWJsQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.72,297,1580803200"; 
+   d="scan'208";a="447444518"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
+  by fmsmga006.fm.intel.com with ESMTP; 23 Mar 2020 09:24:33 -0700
+Date:   Mon, 23 Mar 2020 09:24:33 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Ben Gardon <bgardon@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Ben Gardon <bgardon@google.com>,
         Junaid Shahid <junaids@google.com>,
         Liran Alon <liran.alon@oracle.com>,
         Boris Ostrovsky <boris.ostrovsky@oracle.com>,
         John Haxby <john.haxby@oracle.com>,
         Miaohe Lin <linmiaohe@huawei.com>,
         Tom Lendacky <thomas.lendacky@amd.com>
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [PATCH v3 05/37] KVM: x86: Export kvm_propagate_fault() (as
+ kvm_inject_emulated_page_fault)
+Message-ID: <20200323162433.GM28711@linux.intel.com>
+References: <20200320212833.3507-1-sean.j.christopherson@intel.com>
+ <20200320212833.3507-6-sean.j.christopherson@intel.com>
+ <87sghz844a.fsf@vitty.brq.redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87sghz844a.fsf@vitty.brq.redhat.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Mar 20, 2020 at 2:29 PM Sean Christopherson
-<sean.j.christopherson@intel.com> wrote:
->
-> Free all L2 (guest_mmu) roots when emulating INVEPT for L1.  Outstanding
-> changes to the EPT tables managed by L1 need to be recognized, and
-> relying on KVM to always flush L2's EPTP context on nested VM-Enter is
-> dangerous.
->
-> Similar to handle_invpcid(), rely on kvm_mmu_free_roots() to do a remote
-> TLB flush if necessary, e.g. if L1 has never entered L2 then there is
-> nothing to be done.
->
-> Nuking all L2 roots is overkill for the single-context variant, but it's
-> the safe and easy bet.  A more precise zap mechanism will be added in
-> the future.  Add a TODO to call out that KVM only needs to invalidate
-> affected contexts.
->
-> Fixes: b119019847fbc ("kvm: nVMX: Remove unnecessary sync_roots from handle_invept")
+On Mon, Mar 23, 2020 at 04:47:49PM +0100, Vitaly Kuznetsov wrote:
+> Sean Christopherson <sean.j.christopherson@intel.com> writes:
+> 
+> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> > index e54c6ad628a8..64ed6e6e2b56 100644
+> > --- a/arch/x86/kvm/x86.c
+> > +++ b/arch/x86/kvm/x86.c
+> > @@ -611,8 +611,11 @@ void kvm_inject_page_fault(struct kvm_vcpu *vcpu, struct x86_exception *fault)
+> >  }
+> >  EXPORT_SYMBOL_GPL(kvm_inject_page_fault);
+> >  
+> > -static bool kvm_propagate_fault(struct kvm_vcpu *vcpu, struct x86_exception *fault)
+> > +bool kvm_inject_emulated_page_fault(struct kvm_vcpu *vcpu,
+> > +				    struct x86_exception *fault)
+> >  {
+> > +	WARN_ON_ONCE(fault->vector != PF_VECTOR);
+> > +
+> >  	if (mmu_is_nested(vcpu) && !fault->nested_page_fault)
+> >  		vcpu->arch.nested_mmu.inject_page_fault(vcpu, fault);
+> >  	else
+> > @@ -620,6 +623,7 @@ static bool kvm_propagate_fault(struct kvm_vcpu *vcpu, struct x86_exception *fau
+> >  
+> >  	return fault->nested_page_fault;
+> >  }
+> > +EXPORT_SYMBOL_GPL(kvm_inject_emulated_page_fault);
+> 
+> We don't seem to use the return value a lot, actually,
+> inject_emulated_exception() seems to be the only one, the rest just call
+> it without checking the return value. Judging by the new name, I'd guess
+> that the function returns whether it was able to inject the exception or
+> not but this doesn't seem to be the case. My suggestion would then be to
+> make it return 'void' and return 'fault->nested_page_fault' separately
+> in inject_emulated_exception().
 
-The bug existed well before the commit indicated in the "Fixes" line.
+Oooh, I like that idea.  The return from the common helper also confuses me
+every time I look at it.
+
+> >  void kvm_inject_nmi(struct kvm_vcpu *vcpu)
+> >  {
+> > @@ -6373,7 +6377,7 @@ static bool inject_emulated_exception(struct kvm_vcpu *vcpu)
+> >  {
+> >  	struct x86_emulate_ctxt *ctxt = vcpu->arch.emulate_ctxt;
+> >  	if (ctxt->exception.vector == PF_VECTOR)
+> > -		return kvm_propagate_fault(vcpu, &ctxt->exception);
+> > +		return kvm_inject_emulated_page_fault(vcpu, &ctxt->exception);
+> >  
+> >  	if (ctxt->exception.error_code_valid)
+> >  		kvm_queue_exception_e(vcpu, ctxt->exception.vector,
+> 
+> With or without the change suggested above,
+> 
+> Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> 
+> -- 
+> Vitaly
+> 
