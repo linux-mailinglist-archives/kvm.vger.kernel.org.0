@@ -2,112 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C533218F4FD
-	for <lists+kvm@lfdr.de>; Mon, 23 Mar 2020 13:48:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 11CC618F51F
+	for <lists+kvm@lfdr.de>; Mon, 23 Mar 2020 13:59:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728301AbgCWMss (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Mar 2020 08:48:48 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:47329 "EHLO
+        id S1728268AbgCWM7C (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Mar 2020 08:59:02 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:21744 "EHLO
         us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728222AbgCWMss (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 23 Mar 2020 08:48:48 -0400
+        by vger.kernel.org with ESMTP id S1727582AbgCWM7B (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 23 Mar 2020 08:59:01 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1584967726;
+        s=mimecast20190719; t=1584968340;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=wF/Z91rii7js9BxWiPX/IJSf6cOn716YQpoQOgnhvlY=;
-        b=ARrj8gKK3SXwVvsPenusscI6xrrsboAUYUC3b5FR8n8ZRR93y7tZEXKPVL6l5T5Al1Rx81
-        97/fL5Ii85gzYTP9Do5JV7gptw/sVihobhsYQxtq7UFMl0U/JhDPH+zSoBkD+ajOxbL9Gb
-        7kIjkjkKnAMi29wYBHNPCKA8LzkY7mo=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-277-kK8Mm7PBMrm3VLzVfU6tNQ-1; Mon, 23 Mar 2020 08:48:45 -0400
-X-MC-Unique: kK8Mm7PBMrm3VLzVfU6tNQ-1
-Received: by mail-wr1-f70.google.com with SMTP id m15so2901108wrb.0
-        for <kvm@vger.kernel.org>; Mon, 23 Mar 2020 05:48:45 -0700 (PDT)
+        bh=4HTzcRz3o3qfXex5hqeXQ2T6ofF+yWf+Qi36UvhbgGw=;
+        b=WWqhrv4KQVT+H9DSogKuqUZa4Tb/8gDeUTUgXGdCUOUXiCo0a8aQljT5zvklTZVM5kBi2G
+        7kMdg9+jeelyHh8O2OvVkDEmvRJ3yYfALjzG/kYSOAnsklf2lFPnCCWVtwTm3n79XR1Urm
+        UTlGeexGW+KFP6t+w8Gsdzu+SSH6ggY=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-83-PmQFysFEOsGzbTAWyeX7XA-1; Mon, 23 Mar 2020 08:58:59 -0400
+X-MC-Unique: PmQFysFEOsGzbTAWyeX7XA-1
+Received: by mail-wr1-f71.google.com with SMTP id p2so7329517wrw.8
+        for <kvm@vger.kernel.org>; Mon, 23 Mar 2020 05:58:59 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=wF/Z91rii7js9BxWiPX/IJSf6cOn716YQpoQOgnhvlY=;
-        b=MtjIhqQ1MbiSiTP2E30fSNkWWHd87RXDcvsZYshjWOjeV24+D22NQKsgSm3/kjhISZ
-         1yrTFgu+QDSkOgGNxG8jAYXvRXaOyLwplm3avhjCEMyBs7tJuCFp3G/N/uYkhrxNVCVs
-         KgSeO73L7j2jf8fCQbvJA7VpECjfKgkEzbVnUcAVUgJbNvllbp1dVhGaQZcef1m8Q/sx
-         /jJ1Gi74w6+z7ThE0ycUNvEQ5GCinQvy56MK/drv508dEvk8AKnAEdcAGtu0L6nlS855
-         wJwmoAzKTkA7uPQqMLThLir6zIviLz3FoTw+jDMsvIKamRN88h+Grs81pNX1lgu+rwcW
-         WxHA==
-X-Gm-Message-State: ANhLgQ2JfT+nl815goy3HNZdzXFxIUS7qNjWYH3M3AfKYdmbAmcP+Cuw
-        v4wgi8QDPvJWW4Y0eVZY1ST1CUb632CJd4uT5WjX6RCeJusMNWEdPa/b4gtqQxTnLcQG1deAhzt
-        ymY+vBsSoW6fh
-X-Received: by 2002:a1c:5544:: with SMTP id j65mr25700720wmb.60.1584967724309;
-        Mon, 23 Mar 2020 05:48:44 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vsE+BwUdC/3N3MhWCg3gX3gw8CdW/xveukJtA9Qqd5DxMyzUeCK03I5juokdRkfNo1dgo0DkQ==
-X-Received: by 2002:a1c:5544:: with SMTP id j65mr25700677wmb.60.1584967724024;
-        Mon, 23 Mar 2020 05:48:44 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id j39sm24686004wre.11.2020.03.23.05.48.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Mar 2020 05:48:43 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Paul Mackerras <paulus@ozlabs.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 9/9] KVM: SVM: Annotate svm_x86_ops as __initdata
-In-Reply-To: <20200321202603.19355-10-sean.j.christopherson@intel.com>
-References: <20200321202603.19355-1-sean.j.christopherson@intel.com> <20200321202603.19355-10-sean.j.christopherson@intel.com>
-Date:   Mon, 23 Mar 2020 13:48:41 +0100
-Message-ID: <874kuf9qza.fsf@vitty.brq.redhat.com>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=4HTzcRz3o3qfXex5hqeXQ2T6ofF+yWf+Qi36UvhbgGw=;
+        b=cYgK01wHy0incSCQ85knfFac4C6KcwKMDTVjB3ujazZAHOyYPyqAwugIGYSnIeVIxQ
+         rx7fUrTNX9Dh4KCJ89B/a8qTQx3Uob5LJct8q0/RTDD/PZArbbR7HcW0kHbkmHlzTNrB
+         yWa/mm/FV5YVAKA2r3DdBp8HqwchZgJ5NbbS5jMdFheqh7E68S2ZA3h8DAC6YHlstBbf
+         unGHD8QpgekR9jp8+vTKkezcHAvcM7FnUlDA58RZ+5NKX0tzYwlmeZ2y7CNkHEQ3WZJY
+         WpERMNBA52Ea1ew9sNf4nxtxZ6nADZk3wtEksrxoN/c6Y1HMCKZxwMe45kCpIvdbtOur
+         lzZw==
+X-Gm-Message-State: ANhLgQ2WcnAbBhswrGcuyev22D8cecyDBp+z/9LLIcSBDuPGmG9b47aV
+        jzHIBu19SyALtmzO4n0llZgw5bmpZa2LOgyvPQuTUmseh1SI89z2va+BJN51bcYPHRnLpNdwhZ4
+        jA9NuXIfq/Tfx
+X-Received: by 2002:adf:aacc:: with SMTP id i12mr31396968wrc.116.1584968338289;
+        Mon, 23 Mar 2020 05:58:58 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vu6lNHTTDFNS1+6/voSjetJ50D0n//DWfUviVLJPhmz+dU6+d94lOeUVvb31wDc7vbhL+vjfQ==
+X-Received: by 2002:adf:aacc:: with SMTP id i12mr31396943wrc.116.1584968337983;
+        Mon, 23 Mar 2020 05:58:57 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:24d8:ed40:c82a:8a01? ([2001:b07:6468:f312:24d8:ed40:c82a:8a01])
+        by smtp.gmail.com with ESMTPSA id g14sm22381288wme.32.2020.03.23.05.58.57
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 23 Mar 2020 05:58:57 -0700 (PDT)
+Subject: Re: [PATCH] KVM: x86: Expose fast short REP MOV for supported cpuid
+To:     Zhenyu Wang <zhenyuw@linux.intel.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20200323092236.3703-1-zhenyuw@linux.intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <5bf4035d-4c37-be3f-cfe2-759ccc0bc17d@redhat.com>
+Date:   Mon, 23 Mar 2020 13:58:56 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <20200323092236.3703-1-zhenyuw@linux.intel.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sean Christopherson <sean.j.christopherson@intel.com> writes:
-
-> Tag svm_x86_ops with __initdata now the the struct is copied by value to
-
-Same typo, "now that the struct".
-
-> a common x86 instance of kvm_x86_ops as part of kvm_init().
->
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+On 23/03/20 10:22, Zhenyu Wang wrote:
+> For CPU supporting fast short REP MOV (XF86_FEATURE_FSRM) e.g Icelake,
+> Tigerlake, expose it in KVM supported cpuid as well.
+> 
+> Signed-off-by: Zhenyu Wang <zhenyuw@linux.intel.com>
 > ---
->  arch/x86/kvm/svm.c | 2 +-
+>  arch/x86/kvm/cpuid.c | 2 +-
 >  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
-> index b61bb306602b..ab2a1cf6c188 100644
-> --- a/arch/x86/kvm/svm.c
-> +++ b/arch/x86/kvm/svm.c
-> @@ -7350,7 +7350,7 @@ static void svm_pre_update_apicv_exec_ctrl(struct kvm *kvm, bool activate)
->  	avic_update_access_page(kvm, activate);
->  }
+> 
+> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> index 435a7da07d5f..cf6da12bd17a 100644
+> --- a/arch/x86/kvm/cpuid.c
+> +++ b/arch/x86/kvm/cpuid.c
+> @@ -338,7 +338,7 @@ void kvm_set_cpu_caps(void)
+>  	kvm_cpu_cap_mask(CPUID_7_EDX,
+>  		F(AVX512_4VNNIW) | F(AVX512_4FMAPS) | F(SPEC_CTRL) |
+>  		F(SPEC_CTRL_SSBD) | F(ARCH_CAPABILITIES) | F(INTEL_STIBP) |
+> -		F(MD_CLEAR) | F(AVX512_VP2INTERSECT)
+> +		F(MD_CLEAR) | F(AVX512_VP2INTERSECT) | F(FSRM)
+>  	);
 >  
-> -static struct kvm_x86_ops svm_x86_ops __ro_after_init = {
-> +static struct kvm_x86_ops svm_x86_ops __initdata = {
->  	.hardware_unsetup = svm_hardware_teardown,
->  	.hardware_enable = svm_hardware_enable,
->  	.hardware_disable = svm_hardware_disable,
+>  	/* TSC_ADJUST and ARCH_CAPABILITIES are emulated in software. */
+> 
 
-Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+Queued, thanks.
 
--- 
-Vitaly
+Paolo
 
