@@ -2,230 +2,167 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7B6DA18FB32
-	for <lists+kvm@lfdr.de>; Mon, 23 Mar 2020 18:19:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 65E5C18FB76
+	for <lists+kvm@lfdr.de>; Mon, 23 Mar 2020 18:28:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727934AbgCWRTe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Mar 2020 13:19:34 -0400
-Received: from inva020.nxp.com ([92.121.34.13]:50604 "EHLO inva020.nxp.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727915AbgCWRTe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 Mar 2020 13:19:34 -0400
-Received: from inva020.nxp.com (localhost [127.0.0.1])
-        by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id 0A0CE1A18A0;
-        Mon, 23 Mar 2020 18:19:32 +0100 (CET)
-Received: from inva024.eu-rdc02.nxp.com (inva024.eu-rdc02.nxp.com [134.27.226.22])
-        by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id F189B1A14C9;
-        Mon, 23 Mar 2020 18:19:31 +0100 (CET)
-Received: from fsr-ub1864-111.ea.freescale.net (fsr-ub1864-111.ea.freescale.net [10.171.82.141])
-        by inva024.eu-rdc02.nxp.com (Postfix) with ESMTP id 7E2742035C;
-        Mon, 23 Mar 2020 18:19:31 +0100 (CET)
-From:   Diana Craciun <diana.craciun@oss.nxp.com>
-To:     kvm@vger.kernel.org, alex.williamson@redhat.com,
-        laurentiu.tudor@nxp.com, linux-arm-kernel@lists.infradead.org,
-        bharatb.yadav@gmail.com
-Cc:     linux-kernel@vger.kernel.org,
-        Diana Craciun <diana.craciun@nxp.com>,
-        Bharat Bhushan <Bharat.Bhushan@nxp.com>
-Subject: [PATCH 9/9] vfio/fsl-mc: Add read/write support for fsl-mc devices
-Date:   Mon, 23 Mar 2020 19:19:11 +0200
-Message-Id: <20200323171911.27178-10-diana.craciun@oss.nxp.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200323171911.27178-1-diana.craciun@oss.nxp.com>
-References: <20200323171911.27178-1-diana.craciun@oss.nxp.com>
-X-Virus-Scanned: ClamAV using ClamSMTP
+        id S1727601AbgCWR2R (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Mar 2020 13:28:17 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:50022 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727361AbgCWR2Q (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 Mar 2020 13:28:16 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02NHOM0A135226;
+        Mon, 23 Mar 2020 17:27:52 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2020-01-29;
+ bh=0W36mKXR8dI8W6580WJSeXTMIu4rnf7ZVMgMB4QK/yA=;
+ b=nlvazGfwrgieAp50GxGSPba1CgOnLmgI32F+ViNfApFCZweBCh2Ky/DZi0rhjippPRX5
+ IxqbvNJD6bjZAtSmxBbNtC+vUWIU313nPgImQ2uJQXtGfJ6lt45XvzK27xm+O2frN2It
+ WtKyjy6JSzJHOi/JZ+KvdpTCsEEh164PvarY9j99CccKghMEJYPma/ZKzd5yYokz/nRA
+ Gb+/nFuREBQemarlXWr9cq3PkA9jpFMFTo7HmMOKIgeUvMBxd5WSsDjhlHbdmp6Ocia8
+ Jrk/uTBuLZSA12Ev5HKUHlPUt6jIO9ui5m1bU1P7FnSyY8zDZ1o7EBZR2A7vbV/MvUkV TQ== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by userp2120.oracle.com with ESMTP id 2yx8abvwtn-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 23 Mar 2020 17:27:52 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02NHLO5q003163;
+        Mon, 23 Mar 2020 17:27:52 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by aserp3030.oracle.com with ESMTP id 2yxw915dxu-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 23 Mar 2020 17:27:51 +0000
+Received: from abhmp0010.oracle.com (abhmp0010.oracle.com [141.146.116.16])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 02NHRnYS000750;
+        Mon, 23 Mar 2020 17:27:50 GMT
+Received: from [192.168.1.206] (/71.63.128.209)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Mon, 23 Mar 2020 10:27:49 -0700
+Subject: Re: [PATCH v2] mm/hugetlb: fix a addressing exception caused by
+ huge_pte_offset()
+To:     Jason Gunthorpe <jgg@ziepe.ca>
+Cc:     "Longpeng (Mike)" <longpeng2@huawei.com>,
+        akpm@linux-foundation.org, kirill.shutemov@linux.intel.com,
+        linux-kernel@vger.kernel.org, arei.gonglei@huawei.com,
+        weidong.huang@huawei.com, weifuqiang@huawei.com,
+        kvm@vger.kernel.org, linux-mm@kvack.org,
+        Matthew Wilcox <willy@infradead.org>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        stable@vger.kernel.org
+References: <1582342427-230392-1-git-send-email-longpeng2@huawei.com>
+ <51a25d55-de49-4c0a-c994-bf1a8cfc8638@oracle.com>
+ <20200323160955.GY20941@ziepe.ca>
+From:   Mike Kravetz <mike.kravetz@oracle.com>
+Message-ID: <69055395-e7e5-a8e2-7f3e-f61607149318@oracle.com>
+Date:   Mon, 23 Mar 2020 10:27:48 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
+MIME-Version: 1.0
+In-Reply-To: <20200323160955.GY20941@ziepe.ca>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9569 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 spamscore=0 bulkscore=0
+ adultscore=0 mlxscore=0 malwarescore=0 mlxlogscore=942 suspectscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
+ definitions=main-2003230091
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9569 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 clxscore=1011
+ lowpriorityscore=0 suspectscore=0 priorityscore=1501 malwarescore=0
+ mlxscore=0 adultscore=0 phishscore=0 impostorscore=0 mlxlogscore=981
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2003230091
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Diana Craciun <diana.craciun@nxp.com>
+On 3/23/20 9:09 AM, Jason Gunthorpe wrote:
+> On Sat, Mar 21, 2020 at 04:38:19PM -0700, Mike Kravetz wrote:
+> 
+>> Andrew dropped this patch from his tree which caused me to go back and
+>> look at the status of this patch/issue.
+>>
+>> It is pretty obvious that code in the current huge_pte_offset routine
+>> is racy.  I checked out the assembly code produced by my compiler and
+>> verified that the line,
+>>
+>> 	if (pud_huge(*pud) || !pud_present(*pud))
+>>
+>> does actually dereference *pud twice.  So, the value could change between
+>> those two dereferences.   Longpeng (Mike) could easlily recreate the issue
+>> if he put a delay between the two dereferences.  I believe the only
+>> reservations/concerns about the patch below was the use of READ_ONCE().
+>> Is that correct?
+> 
+> I'm looking at a similar situation in pagewalk.c right now with PUD,
+> and it is very confusing to see that locks are being held, memory
+> accessed without READ_ONCE, but actually it has concurrent writes.
+> 
+> I think it is valuable to annotate with READ_ONCE when the author
+> knows this is an unlocked data access, regardless of what the compiler
+> does.
+> 
+> pagewalk probably has the same racy bug you show here, I'm going to
+> send a very similar looking patch to pagewalk hopefully soon.
 
-The software uses a memory-mapped I/O command interface (MC portals) to
-communicate with the MC hardware. This command interface is used to
-discover, enumerate, configure and remove DPAA2 objects. The DPAA2
-objects use MSIs, so the command interface needs to be emulated
-such that the correct MSI is configured in the hardware (the guest
-has the virtual MSIs).
+Thanks Jason.
 
-This patch is adding read/write support for fsl-mc devices. The mc
-commands are emulated by the userspace. The host is just passing
-the correct command to the hardware.
+Unfortunately, I replied to the thread without full context for the discussion
+we were having.  The primary objection to this patch was the use of READ_ONCE
+in these two instances:
 
-Also the current patch limits userspace to write complete
-64byte command once and read 64byte response by one ioctl.
+>  	pgd = pgd_offset(mm, addr);
+> -	if (!pgd_present(*pgd))
+> +	if (!pgd_present(READ_ONCE(*pgd)))
+>  		return NULL;
+>  	p4d = p4d_offset(pgd, addr);
+> -	if (!p4d_present(*p4d))
+> +	if (!p4d_present(READ_ONCE(*p4d)))
+>  		return NULL;
+>  
+>       pud = pud_offset(p4d, addr);
 
-Signed-off-by: Bharat Bhushan <Bharat.Bhushan@nxp.com>
-Signed-off-by: Diana Craciun <diana.craciun@nxp.com>
----
- drivers/vfio/fsl-mc/vfio_fsl_mc.c         | 122 +++++++++++++++++++++-
- drivers/vfio/fsl-mc/vfio_fsl_mc_private.h |   1 +
- 2 files changed, 121 insertions(+), 2 deletions(-)
+One would argue that pgd and p4d can not change from present to !present
+during the execution of this code.  To me, that seems like the issue which
+would cause an issue.  Of course, I could be missing something.
 
-diff --git a/drivers/vfio/fsl-mc/vfio_fsl_mc.c b/drivers/vfio/fsl-mc/vfio_fsl_mc.c
-index ceb9d6b06624..107b4ab7b2d8 100644
---- a/drivers/vfio/fsl-mc/vfio_fsl_mc.c
-+++ b/drivers/vfio/fsl-mc/vfio_fsl_mc.c
-@@ -12,6 +12,7 @@
- #include <linux/types.h>
- #include <linux/vfio.h>
- #include <linux/fsl/mc.h>
-+#include <linux/delay.h>
- 
- #include "vfio_fsl_mc_private.h"
- 
-@@ -114,6 +115,11 @@ static int vfio_fsl_mc_regions_init(struct vfio_fsl_mc_device *vdev)
- 
- static void vfio_fsl_mc_regions_cleanup(struct vfio_fsl_mc_device *vdev)
- {
-+	int i;
-+
-+	for (i = 0; i < vdev->num_regions; i++)
-+		iounmap(vdev->regions[i].ioaddr);
-+
- 	vdev->num_regions = 0;
- 	kfree(vdev->regions);
- }
-@@ -307,13 +313,125 @@ static long vfio_fsl_mc_ioctl(void *device_data, unsigned int cmd,
- static ssize_t vfio_fsl_mc_read(void *device_data, char __user *buf,
- 				size_t count, loff_t *ppos)
- {
--	return -EINVAL;
-+	struct vfio_fsl_mc_device *vdev = device_data;
-+	unsigned int index = VFIO_FSL_MC_OFFSET_TO_INDEX(*ppos);
-+	loff_t off = *ppos & VFIO_FSL_MC_OFFSET_MASK;
-+	struct vfio_fsl_mc_region *region;
-+	u64 data[8];
-+	int i;
-+
-+	/* Read ioctl supported only for DPRC and DPMCP device */
-+	if (strcmp(vdev->mc_dev->obj_desc.type, "dprc") &&
-+	    strcmp(vdev->mc_dev->obj_desc.type, "dpmcp"))
-+		return -EINVAL;
-+
-+	if (index >= vdev->num_regions)
-+		return -EINVAL;
-+
-+	region = &vdev->regions[index];
-+
-+	if (!(region->flags & VFIO_REGION_INFO_FLAG_READ))
-+		return -EINVAL;
-+
-+	if (!region->ioaddr) {
-+		region->ioaddr = ioremap(region->addr, region->size);
-+		if (!region->ioaddr)
-+			return -ENOMEM;
-+	}
-+
-+	if (count != 64 || off != 0)
-+		return -EINVAL;
-+
-+	for (i = 7; i >= 0; i--)
-+		data[i] = readq(region->ioaddr + i * sizeof(uint64_t));
-+
-+	if (copy_to_user(buf, data, 64))
-+		return -EFAULT;
-+
-+	return count;
-+}
-+
-+#define MC_CMD_COMPLETION_TIMEOUT_MS    5000
-+#define MC_CMD_COMPLETION_POLLING_MAX_SLEEP_USECS    500
-+
-+static int vfio_fsl_mc_send_command(void __iomem *ioaddr, uint64_t *cmd_data)
-+{
-+	int i;
-+	enum mc_cmd_status status;
-+	unsigned long timeout_usecs = MC_CMD_COMPLETION_TIMEOUT_MS * 1000;
-+
-+	/* Write at command parameter into portal */
-+	for (i = 7; i >= 1; i--)
-+		writeq_relaxed(cmd_data[i], ioaddr + i * sizeof(uint64_t));
-+
-+	/* Write command header in the end */
-+	writeq(cmd_data[0], ioaddr);
-+
-+	/* Wait for response before returning to user-space
-+	 * This can be optimized in future to even prepare response
-+	 * before returning to user-space and avoid read ioctl.
-+	 */
-+	for (;;) {
-+		u64 header;
-+		struct mc_cmd_header *resp_hdr;
-+
-+		header = cpu_to_le64(readq_relaxed(ioaddr));
-+
-+		resp_hdr = (struct mc_cmd_header *)&header;
-+		status = (enum mc_cmd_status)resp_hdr->status;
-+		if (status != MC_CMD_STATUS_READY)
-+			break;
-+
-+		udelay(MC_CMD_COMPLETION_POLLING_MAX_SLEEP_USECS);
-+		timeout_usecs -= MC_CMD_COMPLETION_POLLING_MAX_SLEEP_USECS;
-+		if (timeout_usecs == 0)
-+			return -ETIMEDOUT;
-+	}
-+
-+	return 0;
- }
- 
- static ssize_t vfio_fsl_mc_write(void *device_data, const char __user *buf,
- 				 size_t count, loff_t *ppos)
- {
--	return -EINVAL;
-+	struct vfio_fsl_mc_device *vdev = device_data;
-+	unsigned int index = VFIO_FSL_MC_OFFSET_TO_INDEX(*ppos);
-+	loff_t off = *ppos & VFIO_FSL_MC_OFFSET_MASK;
-+	struct vfio_fsl_mc_region *region;
-+	u64 data[8];
-+	int ret;
-+
-+	/* Write ioctl supported only for DPRC and DPMCP device */
-+	if (strcmp(vdev->mc_dev->obj_desc.type, "dprc") &&
-+	    strcmp(vdev->mc_dev->obj_desc.type, "dpmcp"))
-+		return -EINVAL;
-+
-+	if (index >= vdev->num_regions)
-+		return -EINVAL;
-+
-+	region = &vdev->regions[index];
-+
-+	if (!(region->flags & VFIO_REGION_INFO_FLAG_WRITE))
-+		return -EINVAL;
-+
-+	if (!region->ioaddr) {
-+		region->ioaddr = ioremap(region->addr, region->size);
-+		if (!region->ioaddr)
-+			return -ENOMEM;
-+	}
-+
-+	if (count != 64 || off != 0)
-+		return -EINVAL;
-+
-+	if (copy_from_user(&data, buf, 64))
-+		return -EFAULT;
-+
-+	ret = vfio_fsl_mc_send_command(region->ioaddr, data);
-+	if (ret)
-+		return ret;
-+
-+	return count;
-+
- }
- 
- static int vfio_fsl_mc_mmap_mmio(struct vfio_fsl_mc_region region,
-diff --git a/drivers/vfio/fsl-mc/vfio_fsl_mc_private.h b/drivers/vfio/fsl-mc/vfio_fsl_mc_private.h
-index cac0b205c3d4..70824c4b10d6 100644
---- a/drivers/vfio/fsl-mc/vfio_fsl_mc_private.h
-+++ b/drivers/vfio/fsl-mc/vfio_fsl_mc_private.h
-@@ -34,6 +34,7 @@ struct vfio_fsl_mc_region {
- 	u32			type;
- 	u64			addr;
- 	resource_size_t		size;
-+	void __iomem		*ioaddr;
- };
- 
- struct vfio_fsl_mc_device {
+> Also, the remark about pmd_offset() seems accurate. The
+> get_user_fast_pages() pattern seems like the correct one to emulate:
+> 
+>   pud = READ_ONCE(*pudp);
+>   if (pud_none(pud)) 
+>      ..
+>   if (!pud_'is a pmd pointer')
+>      ..
+>   pmdp = pmd_offset(&pud, address);
+>   pmd = READ_ONCE(*pmd);
+>   [...]
+> 
+> Passing &pud in avoids another de-reference of the pudp. Honestly all
+> these APIs that take in page table pointers and internally
+> de-reference them seem very hard to use correctly when the page table
+> access isn't fully locked against write.
+> 
+> This also relies on 'some kind of locking' to prevent the pmdp from
+> becoming freed concurrently while this is running.
+> 
+> .. also this only works if READ_ONCE() is atomic, ie the pud can't be
+> 64 bit on a 32 bit platform. At least pmd has this problem, I haven't
+> figured out if pud does??
+> 
+>> Are there any objections to the patch if the READ_ONCE() calls are removed?
+> 
+> I think if we know there is no concurrent data access then it makes
+> sense to keep the READ_ONCE.
+> 
+> It looks like at least the p4d read from the pgd is also unlocked here
+> as handle_mm_fault() writes to it??
+
+Yes, there is no locking required to call huge_pte_offset().
+
 -- 
-2.17.1
-
+Mike Kravetz
