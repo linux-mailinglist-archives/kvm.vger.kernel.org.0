@@ -2,105 +2,142 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D9B2418F9F9
-	for <lists+kvm@lfdr.de>; Mon, 23 Mar 2020 17:36:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 70A2418FA11
+	for <lists+kvm@lfdr.de>; Mon, 23 Mar 2020 17:39:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727821AbgCWQgf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Mar 2020 12:36:35 -0400
-Received: from mail-io1-f68.google.com ([209.85.166.68]:38802 "EHLO
-        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727571AbgCWQge (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 Mar 2020 12:36:34 -0400
-Received: by mail-io1-f68.google.com with SMTP id m15so9710335iob.5
-        for <kvm@vger.kernel.org>; Mon, 23 Mar 2020 09:36:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=xZed4vuzAn5/aNVB1Kdbz5tqSTALBHIWaW5u1icHeCY=;
-        b=U/UGFiIz7X9b1XORx4G0t8VK2Vtpq2Ha1+ZZX+tSAZSdmyebvAE6+Y5V3rx3lRKG75
-         CaHAQofdlayPv8CK04pkyFPISqwOZ12wVaCKtxGqI4L8OqxNPE68vVotVCsaseur+Ke9
-         SDsz2XIy4C592KfSooSZAhWPZTKCfbcd5AWndoy4+d4IIEx/bHdOUdzz6BxLR7+ixqYW
-         rcJzSdbZIBxjMhIqu4WIJZNRXUn2zvi37lc4UaBlYGHLeJvWuz0qY8+n2KBNobObumAh
-         Vyp5WAg+o0j7apYcrfEYWq3QtkCZfO+hrK1eyHyvgtlR5wWrZY2JasZicfeV2wqt3zB2
-         yg5Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=xZed4vuzAn5/aNVB1Kdbz5tqSTALBHIWaW5u1icHeCY=;
-        b=Jcc0XIYeH+pPCa2u8wiZGkzwwAbq0zffJ1KBoH2Hch/uynw7POIero/drWtcTVBFbt
-         F3rPLQNzR3TGZAO/PQkWpnAI5dSNI+1fwo9QLBvU346XozGbYMvyQupYIWuOtdRp1rW9
-         hVXy1NvM0m6/8zCWCXGbq9ki2E2PnLWWxaQkvCoFyRwEgXojoG5cmnZfH5eKKq0JqtNa
-         5ZUrr9VPNDVzK6jIDJNqKDv1f3N45nBRY3JQBzUMyv5CnGmSItsyXfYGmHlxR9VSPGwv
-         TS2Rkh4ac6aifIbzTkBPweAD8nQNQ53AVP7v/JYF0glX40ZtuFT1etoV0PDHu7FYeO9S
-         ifUA==
-X-Gm-Message-State: ANhLgQ2XC+wEvI0dF2DPjhSJEw0Wh10EwCm6v2APd+DQTJjnDHXCJDjN
-        f81rB15cPWUFqeOZzWzboiap4gV7EizUPEwojy4hAg==
-X-Google-Smtp-Source: ADFU+vsWzcumLwhqw56m/BCbndSZWQyTZy977Pe1EcOchX9GJbFfWlVB9Xjq+FDtNdouWnpRTTre4vuCJsXIdPHUUk8=
-X-Received: by 2002:a02:5a87:: with SMTP id v129mr19330387jaa.48.1584981393823;
- Mon, 23 Mar 2020 09:36:33 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200320212833.3507-1-sean.j.christopherson@intel.com>
- <20200320212833.3507-4-sean.j.christopherson@intel.com> <CALMp9eR5Uu7nRDOS2nQHGzb+Gi6vjDEk1AmuiqkkGWFjKNG+sA@mail.gmail.com>
- <20200323162807.GN28711@linux.intel.com>
-In-Reply-To: <20200323162807.GN28711@linux.intel.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Mon, 23 Mar 2020 09:36:22 -0700
-Message-ID: <CALMp9eR42eM7g81EgHieyNky+kP2mycO7UyMN+y2ibLoqrD2Yg@mail.gmail.com>
-Subject: Re: [PATCH v3 03/37] KVM: nVMX: Invalidate all EPTP contexts when
- emulating INVEPT for L1
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
+        id S1727620AbgCWQj1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Mar 2020 12:39:27 -0400
+Received: from mga09.intel.com ([134.134.136.24]:20398 "EHLO mga09.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727479AbgCWQj1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 Mar 2020 12:39:27 -0400
+IronPort-SDR: YQD3g7pZTFbkZtaxU6+O1FOEqGnvMkziwgZwnUpar6yJxQ4Q2eWUhG2KxxHnYainQmqfdLGsfV
+ fnBhqoUQrfUg==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Mar 2020 09:39:26 -0700
+IronPort-SDR: CbB0ngl3XhoDgFa+je1ygSyt/uHRvif4A2KEUIoYhgEeWnTyYSiYMqs3zRyRyuhEtk4MF8sbae
+ 3iVvhMFf35uw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.72,297,1580803200"; 
+   d="scan'208";a="419559426"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
+  by orsmga005.jf.intel.com with ESMTP; 23 Mar 2020 09:39:25 -0700
+Date:   Mon, 23 Mar 2020 09:39:25 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Alexander Potapenko <glider@google.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm list <kvm@vger.kernel.org>,
+        Dmitry Vyukov <dvyukov@google.com>,
+        syzbot <syzbot+3f29ca2efb056a761e38@syzkaller.appspotmail.com>,
+        clang-built-linux <clang-built-linux@googlegroups.com>,
+        Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, KVM list <kvm@vger.kernel.org>,
         LKML <linux-kernel@vger.kernel.org>,
-        Ben Gardon <bgardon@google.com>,
-        Junaid Shahid <junaids@google.com>,
-        Liran Alon <liran.alon@oracle.com>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        John Haxby <john.haxby@oracle.com>,
-        Miaohe Lin <linmiaohe@huawei.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>
-Content-Type: text/plain; charset="UTF-8"
+        Ingo Molnar <mingo@redhat.com>,
+        syzkaller-bugs <syzkaller-bugs@googlegroups.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>, wanpengli@tencent.com,
+        the arch/x86 maintainers <x86@kernel.org>
+Subject: Re: BUG: unable to handle kernel NULL pointer dereference in
+ handle_external_interrupt_irqoff
+Message-ID: <20200323163925.GP28711@linux.intel.com>
+References: <000000000000277a0405a16bd5c9@google.com>
+ <CACT4Y+b1WFT87pWQaXD3CWjyjoQaP1jcycHdHF+rtxoR5xW1ww@mail.gmail.com>
+ <5058aabe-f32d-b8ef-57ed-f9c0206304c5@redhat.com>
+ <CAG_fn=WYtSoyi63ACaz-ya=Dbi+BFU-_mADDpL6gQvDimQscmw@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAG_fn=WYtSoyi63ACaz-ya=Dbi+BFU-_mADDpL6gQvDimQscmw@mail.gmail.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Mar 23, 2020 at 9:28 AM Sean Christopherson
-<sean.j.christopherson@intel.com> wrote:
->
-> On Mon, Mar 23, 2020 at 09:24:25AM -0700, Jim Mattson wrote:
-> > On Fri, Mar 20, 2020 at 2:29 PM Sean Christopherson
-> > <sean.j.christopherson@intel.com> wrote:
-> > >
-> > > Free all L2 (guest_mmu) roots when emulating INVEPT for L1.  Outstanding
-> > > changes to the EPT tables managed by L1 need to be recognized, and
-> > > relying on KVM to always flush L2's EPTP context on nested VM-Enter is
-> > > dangerous.
-> > >
-> > > Similar to handle_invpcid(), rely on kvm_mmu_free_roots() to do a remote
-> > > TLB flush if necessary, e.g. if L1 has never entered L2 then there is
-> > > nothing to be done.
-> > >
-> > > Nuking all L2 roots is overkill for the single-context variant, but it's
-> > > the safe and easy bet.  A more precise zap mechanism will be added in
-> > > the future.  Add a TODO to call out that KVM only needs to invalidate
-> > > affected contexts.
-> > >
-> > > Fixes: b119019847fbc ("kvm: nVMX: Remove unnecessary sync_roots from handle_invept")
+On Mon, Mar 23, 2020 at 05:31:15PM +0100, Alexander Potapenko wrote:
+> On Mon, Mar 23, 2020 at 9:18 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
 > >
-> > The bug existed well before the commit indicated in the "Fixes" line.
->
-> Ah, my bad.  A cursory glance at commit b119019847fbc makes that quite
-> obvious.  This should be
->
->   Fixes: bfd0a56b9000 ("nEPT: Nested INVEPT")
+> > On 22/03/20 07:59, Dmitry Vyukov wrote:
+> > >
+> > > The commit range is presumably
+> > > fb279f4e238617417b132a550f24c1e86d922558..63849c8f410717eb2e6662f3953ff674727303e7
+> > > But I don't see anything that says "it's me". The only commit that
+> > > does non-trivial changes to x86/vmx seems to be "KVM: VMX: check
+> > > descriptor table exits on instruction emulation":
+> >
+> > That seems unlikely, it's a completely different file and it would only
+> > affect the outside (non-nested) environment rather than your own kernel.
+> >
+> > The only instance of "0x86" in the registers is in the flags:
+> >
+> > > RSP: 0018:ffffc90001ac7998 EFLAGS: 00010086
+> > > RAX: ffffc90001ac79c8 RBX: fffffe0000000000 RCX: 0000000000040000
+> > > RDX: ffffc9000e20f000 RSI: 000000000000b452 RDI: 000000000000b453
+> > > RBP: 0000000000000ec0 R08: ffffffff83987523 R09: ffffffff811c7eca
+> > > R10: ffff8880a4e94200 R11: 0000000000000002 R12: dffffc0000000000
+> > > R13: fffffe0000000ec8 R14: ffffffff880016f0 R15: fffffe0000000ecb
+> > > FS:  00007fb50e370700(0000) GS:ffff8880ae800000(0000) knlGS:0000000000000000
+> > > CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> > > CR2: 000000000000005c CR3: 0000000092fc7000 CR4: 00000000001426f0
+> > > DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> > > DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> >
+> > That would suggest a miscompilation of the inline assembly, which does
+> > push the flags:
+> >
+> > #ifdef CONFIG_X86_64
+> >                 "mov %%" _ASM_SP ", %[sp]\n\t"
+> >                 "and $0xfffffffffffffff0, %%" _ASM_SP "\n\t"
+> >                 "push $%c[ss]\n\t"
+> >                 "push %[sp]\n\t"
+> > #endif
+> >                 "pushf\n\t"
+> >                 __ASM_SIZE(push) " $%c[cs]\n\t"
+> >                 CALL_NOSPEC
+> >
+> >
+> > It would not explain why it suddenly started to break, unless the clang
+> > version also changed, but it would be easy to ascertain and fix (in
+> > either KVM or clang).  Dmitry, can you send me the vmx.o and
+> > kvm-intel.ko files?
+> 
+> On a quick glance, Clang does not miscompile this part.
 
-Actually, I think that things were fine back then (though we
-gratuitously flushed L1's TLB as a result of an emulated INVEPT). The
-problem started when we stopped flushing the TLB on every emulated
-VM-entry (i.e. L1 -> L2 transitions). I'm not sure what that commit
-was, but I think you referenced it in an earlier email.
+Clang definitely miscompiles the asm, the indirect call operates on the
+EFLAGS value, not on @entry as expected.  It looks like clang doesn't honor
+ASM_CALL_CONSTRAINT, which effectively tells the compiler that %rsp is
+getting clobbered, e.g. the "mov %r14,0x8(%rsp)" is loading @entry for
+"callq *0x8(%rsp)", which breaks because of asm's pushes.
+
+clang:
+
+	kvm_before_interrupt(vcpu);
+
+	asm volatile(
+ffffffff811b798e:	4c 89 74 24 08       	mov    %r14,0x8(%rsp)
+ffffffff811b7993:	48 89 e0             	mov    %rsp,%rax
+ffffffff811b7996:	48 83 e4 f0          	and    $0xfffffffffffffff0,%rsp
+ffffffff811b799a:	6a 18                	pushq  $0x18
+ffffffff811b799c:	50                   	push   %rax
+ffffffff811b799d:	9c                   	pushfq 
+ffffffff811b799e:	6a 10                	pushq  $0x10
+ffffffff811b79a0:	ff 54 24 08          	callq  *0x8(%rsp) <--------- calls the EFLAGS value
+kvm_after_interrupt():
+
+
+gcc:
+	kvm_before_interrupt(vcpu);
+
+	asm volatile(
+ffffffff8118e17c:	48 89 e0             	mov    %rsp,%rax
+ffffffff8118e17f:	48 83 e4 f0          	and    $0xfffffffffffffff0,%rsp
+ffffffff8118e183:	6a 18                	pushq  $0x18
+ffffffff8118e185:	50                   	push   %rax
+ffffffff8118e186:	9c                   	pushfq 
+ffffffff8118e187:	6a 10                	pushq  $0x10
+ffffffff8118e189:	ff d3                	callq  *%rbx <-------- calls @entry
+kvm_after_interrupt():
