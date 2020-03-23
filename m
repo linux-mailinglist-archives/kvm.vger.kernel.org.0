@@ -2,135 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E66FE18F956
-	for <lists+kvm@lfdr.de>; Mon, 23 Mar 2020 17:09:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 33C3218F975
+	for <lists+kvm@lfdr.de>; Mon, 23 Mar 2020 17:16:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727337AbgCWQJ6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Mar 2020 12:09:58 -0400
-Received: from mail-qk1-f196.google.com ([209.85.222.196]:38660 "EHLO
-        mail-qk1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727262AbgCWQJ6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 Mar 2020 12:09:58 -0400
-Received: by mail-qk1-f196.google.com with SMTP id h14so15825804qke.5
-        for <kvm@vger.kernel.org>; Mon, 23 Mar 2020 09:09:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=kAhcxP8/eNJxKmPp4P/1zEx2VH3e7bOqUzz83MhM5no=;
-        b=eNuL1zAguHPlqQybPhPa1MXls3PQYb5vdLS5AZjgIq8RkZBCaxVVIIJpgVPW7QrGSY
-         KA7ZAYszAWHP6UbEIF7t3zDnHlCOL9PW6k4i9mtF7oVXKTMo0W6DhnV6FOCLEaxS3BZL
-         Nl+nfv/a30GWZzhldB3ExREp3xIPvsWdTuISOXGXdlKFmE6QIipUAkCffJK9vyX8B5L+
-         bVwjJ+7ef9TJV7QA9dy/U3o8SdwKDb5X7jK6dCtQUslWMIalmrWiQxEGYimgiQYMsFYf
-         di9FRqrqUb+Wgu/STcRhGoXM0jqV7OuNMKpOEUF2xp2NMaMyKKc9aLgUCcsVQJUjR88e
-         okYQ==
+        id S1727513AbgCWQQe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Mar 2020 12:16:34 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:25044 "EHLO
+        us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727267AbgCWQQe (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 23 Mar 2020 12:16:34 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1584980193;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=IYrLYvqnGZEV23VKew7hMTB9MLlxza06argJ9Y4MphY=;
+        b=VijpbEx1sJLsDOOMoOR5ARqJrAdHi9pTk1gBgUL8gYCCsm6A8LnZ23AGHOHmIW6Uh6GD+z
+        IlVxsoYtOI0Kl2B6W43Ikzi/Y5ZdaQYtTN5qB1dSqV0wiq9nQaPzaJAwA6PiJAoN/kap5W
+        PfQd9TxorXNB9c4m5PFQ8dvPVkd/Yys=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-356-WNra2aQ7PLel0T5ebnWq9w-1; Mon, 23 Mar 2020 12:16:31 -0400
+X-MC-Unique: WNra2aQ7PLel0T5ebnWq9w-1
+Received: by mail-wr1-f69.google.com with SMTP id u18so7552029wrn.11
+        for <kvm@vger.kernel.org>; Mon, 23 Mar 2020 09:16:31 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=kAhcxP8/eNJxKmPp4P/1zEx2VH3e7bOqUzz83MhM5no=;
-        b=T9Zq1OvrSmdlXcbLNMStMD5g5nf4scNyaeSn/OMTq9vSXRAemCtDj9rgXFpO2Fdmkz
-         +njiV3TAojbvolhrmmmSDq0yMHH0AK2FQKokt+wosePQSijVrYiLApK/2f+g/I/f67FS
-         tpgJCjRbFdsDug9MOLbG8sK6voDSEBm9OrhVGrUif9Nvap/ycY5rhYKtU0lmDK3crIM+
-         8+yxqPHX4Cv4cONUBwB2f+My+Xmw4vbZ3XAuVNr5Eh5GzZjcCIGAWtLbHnFD4hIp5OrH
-         dppZgI/xWh08vaXq/cedetu3aXeFUsh/dlmctKmlI1Ti18ODXtlbTDjE/bmLVgFNVHnX
-         RrxA==
-X-Gm-Message-State: ANhLgQ3yw34ueTzZFekTqGmjYpQQi2kl9zQ2AG0i3/cT/Z1h8b8Jik7B
-        uykOcqakDGSFtNYF7a72f/hiGQ==
-X-Google-Smtp-Source: ADFU+vsws2eqOZlxDQQkmlsIvJQ1ivBDR/Au9oUOqDUQqVvEuamycFbO8yG/pIZC6ehrGORsRcL+Yg==
-X-Received: by 2002:a05:620a:22ef:: with SMTP id p15mr19433497qki.495.1584979796923;
-        Mon, 23 Mar 2020 09:09:56 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-142-68-57-212.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.57.212])
-        by smtp.gmail.com with ESMTPSA id a11sm1005364qto.57.2020.03.23.09.09.55
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Mon, 23 Mar 2020 09:09:56 -0700 (PDT)
-Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1jGPeF-00053p-1f; Mon, 23 Mar 2020 13:09:55 -0300
-Date:   Mon, 23 Mar 2020 13:09:55 -0300
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Mike Kravetz <mike.kravetz@oracle.com>
-Cc:     "Longpeng (Mike)" <longpeng2@huawei.com>,
-        akpm@linux-foundation.org, kirill.shutemov@linux.intel.com,
-        linux-kernel@vger.kernel.org, arei.gonglei@huawei.com,
-        weidong.huang@huawei.com, weifuqiang@huawei.com,
-        kvm@vger.kernel.org, linux-mm@kvack.org,
-        Matthew Wilcox <willy@infradead.org>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        stable@vger.kernel.org
-Subject: Re: [PATCH v2] mm/hugetlb: fix a addressing exception caused by
- huge_pte_offset()
-Message-ID: <20200323160955.GY20941@ziepe.ca>
-References: <1582342427-230392-1-git-send-email-longpeng2@huawei.com>
- <51a25d55-de49-4c0a-c994-bf1a8cfc8638@oracle.com>
+         :mime-version:content-disposition:in-reply-to;
+        bh=IYrLYvqnGZEV23VKew7hMTB9MLlxza06argJ9Y4MphY=;
+        b=Z+66scLAzBJv5Fu1TWbMUlP6ZbS37oTaNbOCIwSSxDmCkuX9gdzOGTXFV0nUChzPgS
+         H7frsbMJRbE0dqF9J2nXpODeqW3qS7SSu7E2KTSfu0NgPO48ZuuIPvAmrYyqiEgn76kH
+         g1jnaEbnT/TnZUdn2P86aZzcEpl2+pYKcGgQ3sreMFUTeCLNWcWcKhObd7MUG/kANvNL
+         y8lHiirxwzxuQFIsnONBXVyuHvp3YrwGjBX9571d60dFKCV79pg2tA4bEV3OwGHDI7om
+         3/ouOvIbM9MDaL3C4BW1o/A7QO4DbU3a0rttsGbzS7Kt08FVkXwAQcQOIHyn5GpHEi8b
+         wpYg==
+X-Gm-Message-State: ANhLgQ1gXRRyt0UsGU2iJo49J0aSD0o/gok23c/SI40F1XL+WR3Q4njH
+        MHppxQxOPmZJ424ZBGqUisd7XvscrvkmDBERVRG5VJM3q6TsqvXabejpBh6YlHErY8g+h4GiYeB
+        56VzQZxHOigb1
+X-Received: by 2002:adf:ecc3:: with SMTP id s3mr28227566wro.32.1584980190357;
+        Mon, 23 Mar 2020 09:16:30 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vvbW0tcdx3bsp/p23/luhT8S5W7BBOXb4FD91QyavWn3XWwFNHTv4rOmubmFt012JdzIk11aA==
+X-Received: by 2002:adf:ecc3:: with SMTP id s3mr28227526wro.32.1584980190068;
+        Mon, 23 Mar 2020 09:16:30 -0700 (PDT)
+Received: from xz-x1 ([2607:9880:19c0:32::2])
+        by smtp.gmail.com with ESMTPSA id s7sm23648472wro.10.2020.03.23.09.16.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 23 Mar 2020 09:16:29 -0700 (PDT)
+Date:   Mon, 23 Mar 2020 12:16:26 -0400
+From:   Peter Xu <peterx@redhat.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Yan Zhao <yan.y.zhao@intel.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        Christophe de Dinechin <dinechin@redhat.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH v7 06/14] KVM: Make dirty ring exclusive to dirty bitmap
+ log
+Message-ID: <20200323161626.GJ127076@xz-x1>
+References: <20200318163720.93929-1-peterx@redhat.com>
+ <20200318163720.93929-7-peterx@redhat.com>
+ <20200321191250.GB13851@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <51a25d55-de49-4c0a-c994-bf1a8cfc8638@oracle.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+In-Reply-To: <20200321191250.GB13851@linux.intel.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Mar 21, 2020 at 04:38:19PM -0700, Mike Kravetz wrote:
-
-> Andrew dropped this patch from his tree which caused me to go back and
-> look at the status of this patch/issue.
+On Sat, Mar 21, 2020 at 12:12:50PM -0700, Sean Christopherson wrote:
+> On Wed, Mar 18, 2020 at 12:37:12PM -0400, Peter Xu wrote:
+> > There's no good reason to use both the dirty bitmap logging and the
+> > new dirty ring buffer to track dirty bits.  We should be able to even
+> > support both of them at the same time, but it could complicate things
+> > which could actually help little.  Let's simply make it the rule
+> > before we enable dirty ring on any arch, that we don't allow these two
+> > interfaces to be used together.
+> > 
+> > The big world switch would be KVM_CAP_DIRTY_LOG_RING capability
+> > enablement.  That's where we'll switch from the default dirty logging
+> > way to the dirty ring way.  As long as kvm->dirty_ring_size is setup
+> > correctly, we'll once and for all switch to the dirty ring buffer mode
+> > for the current virtual machine.
+> > 
+> > Signed-off-by: Peter Xu <peterx@redhat.com>
+> > ---
+> >  Documentation/virt/kvm/api.rst |  7 +++++++
+> >  virt/kvm/kvm_main.c            | 12 ++++++++++++
+> >  2 files changed, 19 insertions(+)
+> > 
+> > diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> > index 99ee9cfc20c4..8f3a83298d3f 100644
+> > --- a/Documentation/virt/kvm/api.rst
+> > +++ b/Documentation/virt/kvm/api.rst
+> > @@ -6202,3 +6202,10 @@ make sure all the existing dirty gfns are flushed to the dirty rings.
+> >  
+> >  The dirty ring can gets full.  When it happens, the KVM_RUN of the
+> >  vcpu will return with exit reason KVM_EXIT_DIRTY_LOG_FULL.
+> > +
+> > +NOTE: the KVM_CAP_DIRTY_LOG_RING capability and the new ioctl
 > 
-> It is pretty obvious that code in the current huge_pte_offset routine
-> is racy.  I checked out the assembly code produced by my compiler and
-> verified that the line,
+> Leave off "new", it'll be stale a few months/years from now.
+
+Ok.
+
 > 
-> 	if (pud_huge(*pud) || !pud_present(*pud))
+> > +KVM_RESET_DIRTY_RINGS are exclusive to the existing KVM_GET_DIRTY_LOG
 > 
-> does actually dereference *pud twice.  So, the value could change between
-> those two dereferences.   Longpeng (Mike) could easlily recreate the issue
-> if he put a delay between the two dereferences.  I believe the only
-> reservations/concerns about the patch below was the use of READ_ONCE().
-> Is that correct?
+> Did you mean "mutually exclusive with"?  "exclusive to" would mean they
+> can only be used by KVM_GET_DIRTY_LOG with doesn't match the next
+> sentence.
 
-I'm looking at a similar situation in pagewalk.c right now with PUD,
-and it is very confusing to see that locks are being held, memory
-accessed without READ_ONCE, but actually it has concurrent writes.
+I meant "mutual-exclusive".  I'll fix it up.
 
-I think it is valuable to annotate with READ_ONCE when the author
-knows this is an unlocked data access, regardless of what the compiler
-does.
+Thanks,
 
-pagewalk probably has the same racy bug you show here, I'm going to
-send a very similar looking patch to pagewalk hopefully soon.
+-- 
+Peter Xu
 
-Also, the remark about pmd_offset() seems accurate. The
-get_user_fast_pages() pattern seems like the correct one to emulate:
-
-  pud = READ_ONCE(*pudp);
-  if (pud_none(pud)) 
-     ..
-  if (!pud_'is a pmd pointer')
-     ..
-  pmdp = pmd_offset(&pud, address);
-  pmd = READ_ONCE(*pmd);
-  [...]
-
-Passing &pud in avoids another de-reference of the pudp. Honestly all
-these APIs that take in page table pointers and internally
-de-reference them seem very hard to use correctly when the page table
-access isn't fully locked against write.
-
-This also relies on 'some kind of locking' to prevent the pmdp from
-becoming freed concurrently while this is running.
-
-.. also this only works if READ_ONCE() is atomic, ie the pud can't be
-64 bit on a 32 bit platform. At least pmd has this problem, I haven't
-figured out if pud does??
-
-> Are there any objections to the patch if the READ_ONCE() calls are removed?
-
-I think if we know there is no concurrent data access then it makes
-sense to keep the READ_ONCE.
-
-It looks like at least the p4d read from the pgd is also unlocked here
-as handle_mm_fault() writes to it??
-
-Jason
