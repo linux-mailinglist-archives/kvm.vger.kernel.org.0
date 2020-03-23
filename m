@@ -2,157 +2,144 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B3C5C18FC52
-	for <lists+kvm@lfdr.de>; Mon, 23 Mar 2020 19:07:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6527518FC80
+	for <lists+kvm@lfdr.de>; Mon, 23 Mar 2020 19:16:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727598AbgCWSHJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Mar 2020 14:07:09 -0400
-Received: from mail-qv1-f65.google.com ([209.85.219.65]:43642 "EHLO
-        mail-qv1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727011AbgCWSHJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 Mar 2020 14:07:09 -0400
-Received: by mail-qv1-f65.google.com with SMTP id c28so7678090qvb.10
-        for <kvm@vger.kernel.org>; Mon, 23 Mar 2020 11:07:08 -0700 (PDT)
+        id S1727420AbgCWSQ1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Mar 2020 14:16:27 -0400
+Received: from mail-pg1-f194.google.com ([209.85.215.194]:41904 "EHLO
+        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725880AbgCWSQ0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 Mar 2020 14:16:26 -0400
+Received: by mail-pg1-f194.google.com with SMTP id b1so7594775pgm.8
+        for <kvm@vger.kernel.org>; Mon, 23 Mar 2020 11:16:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=Ve+05QZoYPi0YuCClTc3ohV/03rfuQ4cI5EZopsltg8=;
-        b=E35zVOramVTjTIS6drDV83CSHrAgJPiYFUoVqNBHtPyK9X35M60UZwZG6SSSLLDYKr
-         q/RqNqf6mOSsd+zI56V1XOoxQZbXKVhpHBYHt5MZHQUFkGhzyG1hNHYzEhnAot+WSWfO
-         kfFNOMiVnVUVs5USpcWkGRWwMiWJi64X9THbLAV55FJRRzpwhfCl7HJZNPWOqra5Sv8h
-         4NV/Qyj1sQxJHR4LySQ3DXTfik7aePNd5x21MPt/McAvqKJ3a+leXieu9VRHrESgh8jS
-         tRVfxpBZTL43WBIXoijBiFGORijdgIhNfgBX5fRq99kzb7x00bFvRBs0si5toj6xo8+o
-         NxBQ==
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=oF1tkIGle6loJ68IzLpATfP9PzEsBIHwJQBtleldmqY=;
+        b=hukwjY/xfQ3ON3p60ApXpQlAWY0xmuNX5Tj1X0+k1zGrlfaSGUofPsl1hjqi3v0Bsv
+         eFUfIZD5p37PtdZt1CMm1r23pm0lm5cvqOrzv3c485vfu2I4rJILQio0rN0BmWAoL00P
+         3r7X7Ja+n5tH5Yaf3jkKOMcUNzlCtdfi3oh/oocSZ+hVKPRNKa7sKKzHChe5GLiTBOdT
+         mL0oNFo3e8oI9TV/N3pnSLjTh9kAdIXISMT1Uz7KXHgHsJi+8XnUrHYfa5oqKT9LwO/c
+         sHcyr+OTTSHFSwUMr6Uv8ULzsQ5ZzbbNlcDM+LFz9h6YmfVw78SnC+GrmCdxIymFnoSR
+         NZZQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=Ve+05QZoYPi0YuCClTc3ohV/03rfuQ4cI5EZopsltg8=;
-        b=Oakw9esHncQUdRXdpb4KOQuCCwH+ztlSwkMr0NpNBDRpP+k+/lgmUFIbhkZyB/K/6U
-         LWc8npwmhYEPvhZ61Ujisq0nJgOIckS2zkt3J1nngRmRdEqafaCXGmceA2XRKXdEQ3rN
-         RoKuUjNG8WZHJv+hBikcXXYhInCgwryunGVa782yg2F/AWG23MSbKBR32B/EhEuvDquJ
-         t1k26M1Muf1isZX351tpY2c7vREtHDmd4/Mt41NoE9bxqH5KZ65xMQzwq7JwozxLz7Ag
-         i/eSINNfoMLFwM/gc44M2NBWvY3yX5GqT2EfQYUqxsirRLYSl6nosUT0c07iAttisY4m
-         /0XQ==
-X-Gm-Message-State: ANhLgQ13ojwx93fJcaJG5FOvke8z3Pl4hYUr2BfuacEskFLK3ElEwx0b
-        eAqwahrWPzRybU+DPLM6+gB64A==
-X-Google-Smtp-Source: ADFU+vuowy4C5rdMepqxAT9zd7FYcK5Ujxe+LT8j7Las+WeIQGlDbrUdlqbheocEhFlIdJyQaD+iDQ==
-X-Received: by 2002:ad4:5401:: with SMTP id f1mr1081151qvt.209.1584986827928;
-        Mon, 23 Mar 2020 11:07:07 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-142-68-57-212.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.57.212])
-        by smtp.gmail.com with ESMTPSA id c27sm1504978qkk.0.2020.03.23.11.07.06
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Mon, 23 Mar 2020 11:07:07 -0700 (PDT)
-Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1jGRTe-0007Xi-GP; Mon, 23 Mar 2020 15:07:06 -0300
-Date:   Mon, 23 Mar 2020 15:07:06 -0300
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Mike Kravetz <mike.kravetz@oracle.com>
-Cc:     "Longpeng (Mike)" <longpeng2@huawei.com>,
-        akpm@linux-foundation.org, kirill.shutemov@linux.intel.com,
-        linux-kernel@vger.kernel.org, arei.gonglei@huawei.com,
-        weidong.huang@huawei.com, weifuqiang@huawei.com,
-        kvm@vger.kernel.org, linux-mm@kvack.org,
-        Matthew Wilcox <willy@infradead.org>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        stable@vger.kernel.org
-Subject: Re: [PATCH v2] mm/hugetlb: fix a addressing exception caused by
- huge_pte_offset()
-Message-ID: <20200323180706.GC20941@ziepe.ca>
-References: <1582342427-230392-1-git-send-email-longpeng2@huawei.com>
- <51a25d55-de49-4c0a-c994-bf1a8cfc8638@oracle.com>
- <20200323160955.GY20941@ziepe.ca>
- <69055395-e7e5-a8e2-7f3e-f61607149318@oracle.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=oF1tkIGle6loJ68IzLpATfP9PzEsBIHwJQBtleldmqY=;
+        b=hcVRv65YBZpprLUUZ4mPRVnXS30d5CsbaHWHV0pMQ6+i620j8qiirLBAL/WooKoYuk
+         TcNnEGLVWKSvc1y8lpZAG/UrMjsHwsDaOInnsnGCuD8wfo9Az0mSf24GgmOrQ5kbhQq9
+         DFmU33bmG3hdTC7tBsRwklpYDXkteTEN/+Q6PDjfuxIidgfI3lu/g6iHrmPjmn+0lWDT
+         df48vWq1JIAW78TmP4n2DCI9QTMtFB4aMBfj53fZkGZ+NU8b1ehV4wMZU0duVHv5j/og
+         +cJnGDfpt90ZhnwSdxdq7rlAFbedP6ux7L/8wPDFM3ZcWTCakyNehdhMuAyl7xTq/pv7
+         4UCw==
+X-Gm-Message-State: ANhLgQ0ROgVoSdnXuqTAnVNJ8iPFR1DLdfoHrSrB22Jba/47FTprEHhJ
+        eqLt8R67CdrbVA7lEoP9cWQql84S9MExeHekndFOEA==
+X-Google-Smtp-Source: ADFU+vv2iYLu1L6anIRJMMN/E+Q1Cdon51m2vsAakkb8bamzkUGQXaFvTiRkRiQhJ1qag+Z6OSvcOdlD220MkIz4r4M=
+X-Received: by 2002:a63:4453:: with SMTP id t19mr22058669pgk.381.1584987385383;
+ Mon, 23 Mar 2020 11:16:25 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <69055395-e7e5-a8e2-7f3e-f61607149318@oracle.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+References: <000000000000277a0405a16bd5c9@google.com> <CACT4Y+b1WFT87pWQaXD3CWjyjoQaP1jcycHdHF+rtxoR5xW1ww@mail.gmail.com>
+ <5058aabe-f32d-b8ef-57ed-f9c0206304c5@redhat.com> <CAG_fn=WYtSoyi63ACaz-ya=Dbi+BFU-_mADDpL6gQvDimQscmw@mail.gmail.com>
+ <20200323163925.GP28711@linux.intel.com> <CAKwvOdkE8OAu=Gj4MKWwpctka6==6EtrbF3e1tvF=jS2hBB3Ow@mail.gmail.com>
+ <CAKwvOdkXi1MN2Yqqoa6ghw14tQ25WYgyJkSv35-+1KRb=cmhZw@mail.gmail.com>
+ <CAG_fn=WE0BmuHSxUoBJWQ9dnZ4X5ZpBqcT9rQaDE_6HAfTYKQA@mail.gmail.com> <CAG_fn=Uf2dDo4K9X==wE=eL8HQMc1an8m8H18tvWd9Mkyhpskg@mail.gmail.com>
+In-Reply-To: <CAG_fn=Uf2dDo4K9X==wE=eL8HQMc1an8m8H18tvWd9Mkyhpskg@mail.gmail.com>
+From:   Nick Desaulniers <ndesaulniers@google.com>
+Date:   Mon, 23 Mar 2020 11:16:12 -0700
+Message-ID: <CAKwvOdntYiM8afOA2nX6dtLp9FWk-1E3Mc+oVRJ_Y8X-9kr81Q@mail.gmail.com>
+Subject: Re: BUG: unable to handle kernel NULL pointer dereference in handle_external_interrupt_irqoff
+To:     Alexander Potapenko <glider@google.com>
+Cc:     Dmitry Vyukov <dvyukov@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        syzbot <syzbot+3f29ca2efb056a761e38@syzkaller.appspotmail.com>,
+        clang-built-linux <clang-built-linux@googlegroups.com>,
+        Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, KVM list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        syzkaller-bugs <syzkaller-bugs@googlegroups.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        "the arch/x86 maintainers" <x86@kernel.org>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Mar 23, 2020 at 10:27:48AM -0700, Mike Kravetz wrote:
+On Mon, Mar 23, 2020 at 11:06 AM Alexander Potapenko <glider@google.com> wrote:
+>
+> On Mon, Mar 23, 2020 at 6:55 PM Alexander Potapenko <glider@google.com> wrote:
+> >
+> > I've reduced the faulty test case to the following code:
+> >
+> > =================================
+> > a;
+> > long b;
+> > register unsigned long current_stack_pointer asm("rsp");
+> > handle_external_interrupt_irqoff() {
+> >   asm("and $0xfffffffffffffff0, %%rsp\n\tpush $%c[ss]\n\tpush "
+> >       "%[sp]\n\tpushf\n\tpushq $%c[cs]\n\tcall *%[thunk_target]\n"
+> >       : [ sp ] "=&r"(b), "+r" (current_stack_pointer)
+> >       : [ thunk_target ] "rm"(a), [ ss ] "i"(3 * 8), [ cs ] "i"(2 * 8) );
+> > }
+> > =================================
+> > (in fact creduce even throws away current_stack_pointer, but we
+> > probably want to keep it to prove the point).
+> >
+> > Clang generates the following code for it:
+> >
+> > $ clang vmx.i -O2 -c -w -o vmx.o
+> > $ objdump -d vmx.o
+> > ...
+> > 0000000000000000 <handle_external_interrupt_irqoff>:
+> >    0: 8b 05 00 00 00 00    mov    0x0(%rip),%eax        # 6
+> > <handle_external_interrupt_irqoff+0x6>
+> >    6: 89 44 24 fc          mov    %eax,-0x4(%rsp)
+> >    a: 48 83 e4 f0          and    $0xfffffffffffffff0,%rsp
+> >    e: 6a 18                pushq  $0x18
+> >   10: 50                    push   %rax
+> >   11: 9c                    pushfq
+> >   12: 6a 10                pushq  $0x10
+> >   14: ff 54 24 fc          callq  *-0x4(%rsp)
+> >   18: 48 89 05 00 00 00 00 mov    %rax,0x0(%rip)        # 1f
+> > <handle_external_interrupt_irqoff+0x1f>
+> >   1f: c3                    retq
+> >
+> > The question is whether using current_stack_pointer as an output is
+> > actually a valid way to tell the compiler it should not clobber RSP.
+> > Intuitively it is, but explicitly adding RSP to the clobber list
+> > sounds a bit more bulletproof.
+>
+> Ok, I am wrong: according to
+> https://gcc.gnu.org/onlinedocs/gcc/Extended-Asm.html it's incorrect to
+> list RSP in the clobber list.
 
-> >  	pgd = pgd_offset(mm, addr);
-> > -	if (!pgd_present(*pgd))
-> > +	if (!pgd_present(READ_ONCE(*pgd)))
-> >  		return NULL;
-> >  	p4d = p4d_offset(pgd, addr);
-> > -	if (!p4d_present(*p4d))
-> > +	if (!p4d_present(READ_ONCE(*p4d)))
-> >  		return NULL;
-> >  
-> >       pud = pud_offset(p4d, addr);
-> 
-> One would argue that pgd and p4d can not change from present to !present
-> during the execution of this code.  To me, that seems like the issue which
-> would cause an issue.  Of course, I could be missing something.
+You could force `entry` into a register:
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 4d22b1b5e822..083a7e980bb5 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -6277,7 +6277,7 @@ static void
+handle_external_interrupt_irqoff(struct kvm_vcpu *vcpu)
+ #endif
+                ASM_CALL_CONSTRAINT
+                :
+-               THUNK_TARGET(entry),
++               [thunk_target] "a"(entry),
+                [ss]"i"(__KERNEL_DS),
+                [cs]"i"(__KERNEL_CS)
+        );
 
-This I am not sure of, I think it must be true under the read side of
-the mmap_sem, but probably not guarenteed under RCU..
-
-In any case, it doesn't matter, the fact that *p4d can change at all
-is problematic. Unwinding the above inlines we get:
-
-  p4d = p4d_offset(pgd, addr)
-  if (!p4d_present(*p4d))
-      return NULL;
-  pud = (pud_t *)p4d_page_vaddr(*p4d) + pud_index(address);
-
-According to our memory model the compiler/CPU is free to execute this
-as:
-
-  p4d = p4d_offset(pgd, addr)
-  p4d_for_vaddr = *p4d;
-  if (!p4d_present(*p4d))
-      return NULL;
-  pud = (pud_t *)p4d_page_vaddr(p4d_for_vaddr) + pud_index(address);
-
-In the case where p4 goes from !present -> present (ie
-handle_mm_fault()):
-
-p4d_for_vaddr == p4d_none, and p4d_present(*p4d) == true, meaning the
-p4d_page_vaddr() will crash.
-
-Basically the problem here is not just missing READ_ONCE, but that the
-p4d is read multiple times at all. It should be written like gup_fast
-does, to guarantee a single CPU read of the unstable data:
-
-  p4d = READ_ONCE(*p4d_offset(pgdp, addr));
-  if (!p4d_present(p4))
-      return NULL;
-  pud = pud_offset(&p4d, addr);
-
-At least this is what I've been able to figure out :\
-
-> > Also, the remark about pmd_offset() seems accurate. The
-> > get_user_fast_pages() pattern seems like the correct one to emulate:
-> > 
-> >   pud = READ_ONCE(*pudp);
-> >   if (pud_none(pud)) 
-> >      ..
-> >   if (!pud_'is a pmd pointer')
-> >      ..
-> >   pmdp = pmd_offset(&pud, address);
-> >   pmd = READ_ONCE(*pmd);
-> >   [...]
-> > 
-> > Passing &pud in avoids another de-reference of the pudp. Honestly all
-> > these APIs that take in page table pointers and internally
-> > de-reference them seem very hard to use correctly when the page table
-> > access isn't fully locked against write.
-
-And the same protocol for the PUD, etc.
-
-> > It looks like at least the p4d read from the pgd is also unlocked here
-> > as handle_mm_fault() writes to it??
-> 
-> Yes, there is no locking required to call huge_pte_offset().
-
-None? Not RCU or read mmap_sem?
-
-Jason
+(https://stackoverflow.com/a/48877683/1027966 had some interesting
+feedback to this problem)
+-- 
+Thanks,
+~Nick Desaulniers
