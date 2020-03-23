@@ -2,162 +2,167 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8206B18F9A5
-	for <lists+kvm@lfdr.de>; Mon, 23 Mar 2020 17:25:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 67DD518F9A8
+	for <lists+kvm@lfdr.de>; Mon, 23 Mar 2020 17:26:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727551AbgCWQZF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Mar 2020 12:25:05 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:31754 "EHLO
+        id S1727406AbgCWQ01 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Mar 2020 12:26:27 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:38776 "EHLO
         us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727426AbgCWQZE (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 23 Mar 2020 12:25:04 -0400
+        by vger.kernel.org with ESMTP id S1727277AbgCWQ00 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 23 Mar 2020 12:26:26 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1584980702;
+        s=mimecast20190719; t=1584980784;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=X1Ry1yiWvSlF/GO2rvf8iBUf/GEmj9nn1/CSsWhpLSU=;
-        b=iQgmmUKVXFU01WwLyTFDQUnuj47GkPVa+Ca5ngviep3gHSDXt2tU/K9QHPAJaIppk9kHPx
-        X1bXhnADQXdJAV0DnH99DaMEK9PFLNB2yZO3O0ZuBMqC+sm4Mww2komDCBUwApoNfzhNzA
-        uLTANGkowWYMfEIg2HrsVpQQOxza4N0=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-108-7hR_ShylNs-n5H68V8thsQ-1; Mon, 23 Mar 2020 12:25:00 -0400
-X-MC-Unique: 7hR_ShylNs-n5H68V8thsQ-1
-Received: by mail-wm1-f72.google.com with SMTP id p18so15060wmk.9
-        for <kvm@vger.kernel.org>; Mon, 23 Mar 2020 09:24:59 -0700 (PDT)
+        bh=Ehj56ajVRi23GK2T3VjArh7Mw9HqSg7LkHrp/uuAqAM=;
+        b=iCCDAtZu1JQ6OJ118HCcY93NZVfuKGySfp5H4zlVtiEah+bjRIfmMf9NTMb48b2czBS6bs
+        nCNuSOOtiJyP5zZ7wJj3z4na57cgzxUFEq1WpXrkhRbnGAGpkzOUZK2/Rm/l77f+A81L1b
+        YO/BiUtdZXJi7VhZuJldmW/iYAum/Es=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-449-t_aCfB5MOkmVeqKev15yYA-1; Mon, 23 Mar 2020 12:26:23 -0400
+X-MC-Unique: t_aCfB5MOkmVeqKev15yYA-1
+Received: by mail-wr1-f72.google.com with SMTP id w12so987043wrl.23
+        for <kvm@vger.kernel.org>; Mon, 23 Mar 2020 09:26:23 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=X1Ry1yiWvSlF/GO2rvf8iBUf/GEmj9nn1/CSsWhpLSU=;
-        b=noEfwLZi4lQlG2Fpv5kK3OJv6xdZ5nCWxQmvwAaJHUdbhqLxEMLYnweyxmb2FBa2pA
-         nsPEesOJE3y+0mtwt3LHFX+wcA95cf+sp7lFSxNBK29iwfoWHQzVncarFa7eowX97n7+
-         OLryQYCHivD+0lmswqpGqZ3koFVTttzMHWFaZKfs0aUJ1pyB8hYgD0NyX4REYO9xnM2I
-         PEVaqIicNZeJYw4BIdD0lL/UK8UaBOmfu3xY+zzGMMtXX1kco/1jIgihCpGRHxoTD0EB
-         QoWeCKNBuoxxfAKMYWIQGmuc1AJfRMBBNKTznlRAm8lxJQayRPJeiZfDPhZfJrH/UzEn
-         KIQA==
-X-Gm-Message-State: ANhLgQ27BREpleyWcTk+D5uPwFcOqnTB7ni8pKOB2t8Dk3hhr6etmWdL
-        fMJkeCEHoT2iIRx1+DeLCUJT+w1Vj4HG7uU90u4oXi+LgC3T/xLZ9IEv3tSxxo0mVx6nz6Kf/3Q
-        ARc4R7ICbc/zh
-X-Received: by 2002:a05:600c:3cb:: with SMTP id z11mr75054wmd.94.1584980698694;
-        Mon, 23 Mar 2020 09:24:58 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vsn477+cxrvpcfJzZ9WXWmF0SKMmbIayFwHATIum/A7SWzS2LgH2WXH6U684IfdISlyncs+7g==
-X-Received: by 2002:a05:600c:3cb:: with SMTP id z11mr75027wmd.94.1584980698414;
-        Mon, 23 Mar 2020 09:24:58 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id p10sm19419160wrm.6.2020.03.23.09.24.56
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=Ehj56ajVRi23GK2T3VjArh7Mw9HqSg7LkHrp/uuAqAM=;
+        b=nHXNfNDYCoqkgulL8rR3eN1gptlOOiNtyU/OUG0CStKasA3GfohqjOgi2QsrXvv2/j
+         GDow9ZWA06jSLcYX63PSWdpwJIq/INrM5TRfr0pgPbaY8HsO4S/kbYDZJXbcu+S7rZPn
+         l8+Ft7h6bbJT7hzknalzZmTCuS2eL88WiBtG09yzpuwi5zwERz/jxXv5HvMn/s1vsCEZ
+         tyMuCLpzJ6LGQLPpM9boN+uECcu3hwmGfUiFUVsaHuh+xPAQ1aUJlMt+ZtQ1R05ST+Nf
+         OpsWP7jC5ztbmd90XqlAPG37Gm2Czea+c196l5Bt93gqIuQhHYg41X0b5q6I7QZfJ/pV
+         xr8Q==
+X-Gm-Message-State: ANhLgQ1SirFc2CRizQLtWddf+mDohg6m9Jvb1/ibRlfsDyiLi1vnk8GJ
+        XseHu2gwKh/oMR5Nhik1RuY8z7f6a2GmhDRa0WT8afc9fXN7GQcnMNz+GHFqNq7YMBFbmxidJbr
+        bLeeKXf4eAbJa
+X-Received: by 2002:adf:edcf:: with SMTP id v15mr21828459wro.309.1584980782064;
+        Mon, 23 Mar 2020 09:26:22 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vtMysjez2ebPBp50c+OTI7OG21qECbdMaArQCV37S+j+P83ACU6Rz9s2G4ofu1vahE6S+f0NQ==
+X-Received: by 2002:adf:edcf:: with SMTP id v15mr21828443wro.309.1584980781832;
+        Mon, 23 Mar 2020 09:26:21 -0700 (PDT)
+Received: from xz-x1 ([2607:9880:19c0:32::2])
+        by smtp.gmail.com with ESMTPSA id a8sm66129wmb.39.2020.03.23.09.26.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Mar 2020 09:24:57 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+        Mon, 23 Mar 2020 09:26:21 -0700 (PDT)
+Date:   Mon, 23 Mar 2020 12:26:17 -0400
+From:   Peter Xu <peterx@redhat.com>
 To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 2/9] KVM: x86: Move init-only kvm_x86_ops to separate struct
-In-Reply-To: <20200323152909.GE28711@linux.intel.com>
-References: <20200321202603.19355-1-sean.j.christopherson@intel.com> <20200321202603.19355-3-sean.j.christopherson@intel.com> <87lfnr9sqn.fsf@vitty.brq.redhat.com> <20200323152909.GE28711@linux.intel.com>
-Date:   Mon, 23 Mar 2020 17:24:56 +0100
-Message-ID: <87o8sn82ef.fsf@vitty.brq.redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Yan Zhao <yan.y.zhao@intel.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        Christophe de Dinechin <dinechin@redhat.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH v7 03/14] KVM: X86: Don't track dirty for
+ KVM_SET_[TSS_ADDR|IDENTITY_MAP_ADDR]
+Message-ID: <20200323162617.GK127076@xz-x1>
+References: <20200318163720.93929-1-peterx@redhat.com>
+ <20200318163720.93929-4-peterx@redhat.com>
+ <20200321192211.GC13851@linux.intel.com>
+ <20200323145824.GI127076@xz-x1>
+ <20200323154216.GG28711@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20200323154216.GG28711@linux.intel.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sean Christopherson <sean.j.christopherson@intel.com> writes:
+On Mon, Mar 23, 2020 at 08:42:16AM -0700, Sean Christopherson wrote:
+> On Mon, Mar 23, 2020 at 10:58:24AM -0400, Peter Xu wrote:
+> > On Sat, Mar 21, 2020 at 12:22:11PM -0700, Sean Christopherson wrote:
+> > > On Wed, Mar 18, 2020 at 12:37:09PM -0400, Peter Xu wrote:
+> > > > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> > > > index e54c6ad628a8..a5123a0aa7d6 100644
+> > > > --- a/arch/x86/kvm/x86.c
+> > > > +++ b/arch/x86/kvm/x86.c
+> > > > @@ -9786,7 +9786,34 @@ void kvm_arch_sync_events(struct kvm *kvm)
+> > > >  	kvm_free_pit(kvm);
+> > > >  }
+> > > >  
+> > > > -int __x86_set_memory_region(struct kvm *kvm, int id, gpa_t gpa, u32 size)
+> > > > +#define  ERR_PTR_USR(e)  ((void __user *)ERR_PTR(e))
+> > > > +
+> > > > +/**
+> > > > + * __x86_set_memory_region: Setup KVM internal memory slot
+> > > > + *
+> > > > + * @kvm: the kvm pointer to the VM.
+> > > > + * @id: the slot ID to setup.
+> > > > + * @gpa: the GPA to install the slot (unused when @size == 0).
+> > > > + * @size: the size of the slot. Set to zero to uninstall a slot.
+> > > > + *
+> > > > + * This function helps to setup a KVM internal memory slot.  Specify
+> > > > + * @size > 0 to install a new slot, while @size == 0 to uninstall a
+> > > > + * slot.  The return code can be one of the following:
+> > > > + *
+> > > > + *   HVA:           on success (uninstall will return a bogus HVA)
+> > > > + *   -errno:        on error
+> > > > + *
+> > > > + * The caller should always use IS_ERR() to check the return value
+> > > > + * before use.  NOTE: KVM internal memory slots are guaranteed and
+> > > 
+> > > "are guaranteed" to ...
+> > > 
+> > > > + * won't change until the VM is destroyed. This is also true to the
+> > > > + * returned HVA when installing a new memory slot.  The HVA can be
+> > > > + * invalidated by either an errornous userspace program or a VM under
+> > > > + * destruction, however as long as we use __copy_{to|from}_user()
+> > > > + * properly upon the HVAs and handle the failure paths always then
+> > > > + * we're safe.
+> > > 
+> > > Regarding the HVA, it's a bit confusing saying that it's guaranteed to be
+> > > valid, and then contradicting that in the second clause.  Maybe something
+> > > like this to explain the GPA->HVA is guaranteed to be valid, but the
+> > > HVA->HPA is not.
+> > >  
+> > > /*
+> > >  * before use.  Note, KVM internal memory slots are guaranteed to remain valid
+> > >  * and unchanged until the VM is destroyed, i.e. the GPA->HVA translation will
+> > >  * not change.  However, the HVA is a user address, i.e. its accessibility is
+> > >  * not guaranteed, and must be accessed via __copy_{to,from}_user().
+> > >  */
+> > 
+> > Sure I can switch to this, though note that I still think the GPA->HVA
+> > is not guaranteed logically because the userspace can unmap any HVA it
+> > wants..
+> 
+> You're conflating the GPA->HVA translation with the validity of the HVA,
+> i.e. the HVA->HPA and/or HVA->VMA translation/association.  GPA->HVA is
+> guaranteed because userspace doesn't have access to the memslot which
+> defines that transation.
 
-> On Mon, Mar 23, 2020 at 01:10:40PM +0100, Vitaly Kuznetsov wrote:
->> Sean Christopherson <sean.j.christopherson@intel.com> writes:
->> 
->> > +
->> > +	.runtime_ops = &svm_x86_ops,
->> > +};
->> 
->> Unrelated to your patch but I think we can make the naming of some of
->> these functions more consistend on SVM/VMX, in particular I'd suggest 
->> 
->> has_svm() -> cpu_has_svm_support()
->> is_disabled -> svm_disabled_by_bios()
->> ...
->> (see below for VMX)
->> 
->> > +
->> >  static int __init svm_init(void)
->> >  {
->> > -	return kvm_init(&svm_x86_ops, sizeof(struct vcpu_svm),
->> > +	return kvm_init(&svm_init_ops, sizeof(struct vcpu_svm),
->> >  			__alignof__(struct vcpu_svm), THIS_MODULE);
->> >  }
->> >  
->> > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
->> > index 07299a957d4a..ffcdcc86f5b7 100644
->> > --- a/arch/x86/kvm/vmx/vmx.c
->> > +++ b/arch/x86/kvm/vmx/vmx.c
->> > @@ -7842,11 +7842,8 @@ static bool vmx_check_apicv_inhibit_reasons(ulong bit)
->> >  }
->> >  
->> >  static struct kvm_x86_ops vmx_x86_ops __ro_after_init = {
->> > -	.cpu_has_kvm_support = cpu_has_kvm_support,
->> > -	.disabled_by_bios = vmx_disabled_by_bios,
->> > -	.hardware_setup = hardware_setup,
->> >  	.hardware_unsetup = hardware_unsetup,
->> > -	.check_processor_compatibility = vmx_check_processor_compat,
->> > +
->> >  	.hardware_enable = hardware_enable,
->> >  	.hardware_disable = hardware_disable,
->> >  	.cpu_has_accelerated_tpr = report_flexpriority,
->> > @@ -7981,6 +7978,15 @@ static struct kvm_x86_ops vmx_x86_ops __ro_after_init = {
->> >  	.apic_init_signal_blocked = vmx_apic_init_signal_blocked,
->> >  };
->> >  
->> > +static struct kvm_x86_init_ops vmx_init_ops __initdata = {
->> > +	.cpu_has_kvm_support = cpu_has_kvm_support,
->> > +	.disabled_by_bios = vmx_disabled_by_bios,
->> > +	.check_processor_compatibility = vmx_check_processor_compat,
->> > +	.hardware_setup = hardware_setup,
->> 
->> cpu_has_kvm_support() -> cpu_has_vmx_support()
->> hardware_setup() -> vmx_hardware_setup()
->
-> Preaching to the choir on this one.  The VMX functions without prefixes in
-> in particular annoy me to no end, e.g. hardware_setup().  Though the worst
-> is probably ".vcpu_create = vmx_create_vcpu", if I had a nickel for every
-> time I've tried to find vmx_vcpu_create()...
->
-> What if we added a macro to auto-generate the common/required hooks?  E.g.:
->
->   static struct kvm_x86_ops vmx_x86_ops __ro_after_init = {
-> 	MANDATORY_KVM_X86_OPS(vmx),
->
-> 	.pmu_ops = &intel_pmu_ops,
->
-> 	...
->   };
->
-> That'd enforce consistent naming, and would provide a bit of documentation
-> as to which hooks are optional, e.g. many of the nested hooks, and which
-> must be defined for KVM to function.
+Yes I completely agree if you mean the pure mapping of GPA->HVA.
 
-Sounds cool! (not sure that with only two implementations people won't
-call it 'over-engineered' but cool). My personal wish would just be that
-function names in function implementations are not auto-generated so
-e.g. a simple 'git grep vmx_hardware_setup' works but the way how we
-fill vmx_x86_ops in can be macroed I guess.
+I think it's a matter of how to define the "valid" when you say
+"guaranteed to remain valid", because I don't think the mapping is
+still valid from the most strict sense if e.g. the backing HVA does
+not exist any more for that GPA->HVA mapping, then the memslot won't
+be anything useful.
+
+> 
+> > However I agree that shouldn't be important from kvm's perspective as long as
+> > we always emphasize on using legal HVA accessors.
+> 
+> The fact that GPA->HVA can't change _is_ important, otherwise KVM would
+> need to take steps to ensure that whatever can change GPA->HVA can't run
+> concurrently with consuming the HVA. 
+
+I wanted to mean "the userspace unmaps the HVA" is not important.  The
+mapping is for sure important!
+
+Thanks,
 
 -- 
-Vitaly
+Peter Xu
 
