@@ -2,133 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6CD5718F22F
-	for <lists+kvm@lfdr.de>; Mon, 23 Mar 2020 10:53:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9CAE418F242
+	for <lists+kvm@lfdr.de>; Mon, 23 Mar 2020 10:58:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727803AbgCWJxZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Mar 2020 05:53:25 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:52053 "EHLO
-        us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727752AbgCWJxZ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 23 Mar 2020 05:53:25 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1584957204;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=VPD/Jl19hS8LZpj/pgb6n0uGZoGyOvZALf7c52VQrx0=;
-        b=M8Qc5BB2PNsvHbRy7T+7eBpesAJkyc6nSktbwho/j8RqzQsH5WlDaRU5Nl2Z0oNWGSEhbI
-        NrceOWRW8Ntx1rJtk6kmeHTh+nSHa0sW0IlPJMMTX5d2shZF2y2E3JrzckmtsmtD4dDvcI
-        bLLaQ8l8yesDTXEBGWGYqjugNlxFSDw=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-401-uzbLIV-EMsC4rvL0b9BBLQ-1; Mon, 23 Mar 2020 05:53:22 -0400
-X-MC-Unique: uzbLIV-EMsC4rvL0b9BBLQ-1
-Received: by mail-wr1-f71.google.com with SMTP id f15so1710830wrt.4
-        for <kvm@vger.kernel.org>; Mon, 23 Mar 2020 02:53:22 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=VPD/Jl19hS8LZpj/pgb6n0uGZoGyOvZALf7c52VQrx0=;
-        b=VdR+skxdUBOxFebFOVdrTa1a4XgFmZviCTOeXOHoDS0tAit5UF992wVu6Jru3TqZLc
-         gjw37KSeIWjTAa36OUmmBQYQ28e6E/jG6WMhk686BCsYtDlh2xys9UJ6jwPzG7n06yqB
-         RCtlwRyWpZwpyNES0PpsL8oKILizwyrM4bo8CyCZMOlGRKz0iJpA+xIJP5qF966vod2i
-         3J+6hmX0VVQCuMLX0QjGRVvTCvlc2b+lVlA+oGRz2+YVPYzNoGjpF8dfJD46khkHzaHA
-         JNNssFzt85zYF+bvpPzcbeth5/aEuhF/a2ru3bREUoc6tqR4OgroUEkVt1I9RSIi57Fw
-         kgKA==
-X-Gm-Message-State: ANhLgQ24iwibfFzgi8DYJV09HWRSub5cuwwQVdIK0gesxONrTHvoCYOZ
-        o4lulz4vRbBCK7eQe5vRuSu4cBRqahcZGIvzhXjJw230xl/8/tRmpCro6hMcN8+cNszsB1e7SFY
-        IxngM981Mw8/v
-X-Received: by 2002:a1c:3241:: with SMTP id y62mr27598457wmy.66.1584957201449;
-        Mon, 23 Mar 2020 02:53:21 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vtwCAOGgPAR0vwL4cDhzymGqUrzBFlAq+C1qd3tAwY4wzCvAxHsdZwLP/SPzxu8jkejeHa20A==
-X-Received: by 2002:a1c:3241:: with SMTP id y62mr27598435wmy.66.1584957201245;
-        Mon, 23 Mar 2020 02:53:21 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id v7sm21926822wml.18.2020.03.23.02.53.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Mar 2020 02:53:20 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Jon Doron <arilou@gmail.com>
-Cc:     kvm@vger.kernel.org, linux-hyperv@vger.kernel.org
-Subject: Re: [PATCH v9 1/6] x86/kvm/hyper-v: Explicitly align hcall param for kvm_hyperv_exit
-In-Reply-To: <20200320172839.1144395-2-arilou@gmail.com>
-References: <20200320172839.1144395-1-arilou@gmail.com> <20200320172839.1144395-2-arilou@gmail.com>
-Date:   Mon, 23 Mar 2020 10:53:19 +0100
-Message-ID: <87zhc79z3k.fsf@vitty.brq.redhat.com>
+        id S1727798AbgCWJ6S (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Mar 2020 05:58:18 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:50282 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727761AbgCWJ6S (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 23 Mar 2020 05:58:18 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 02N9XtO7097847
+        for <kvm@vger.kernel.org>; Mon, 23 Mar 2020 05:58:17 -0400
+Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2ywe7rm6d4-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Mon, 23 Mar 2020 05:58:16 -0400
+Received: from localhost
+        by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <raspl@linux.ibm.com>;
+        Mon, 23 Mar 2020 09:58:14 -0000
+Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
+        by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Mon, 23 Mar 2020 09:58:12 -0000
+Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 02N9wBBn36962712
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 23 Mar 2020 09:58:11 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 6DB3E4203F;
+        Mon, 23 Mar 2020 09:58:11 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 304FA42049;
+        Mon, 23 Mar 2020 09:58:11 +0000 (GMT)
+Received: from [9.145.48.138] (unknown [9.145.48.138])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon, 23 Mar 2020 09:58:11 +0000 (GMT)
+Subject: Re: [PATCH 0/7] tools/kvm_stat: add logfile support
+To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+Cc:     rkrcmar@redhat.com
+References: <20200306114250.57585-1-raspl@linux.ibm.com>
+ <7f396df1-9589-6dd0-0adf-af4376aa8314@redhat.com>
+From:   Stefan Raspl <raspl@linux.ibm.com>
+Date:   Mon, 23 Mar 2020 10:58:10 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <7f396df1-9589-6dd0-0adf-af4376aa8314@redhat.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 20032309-0012-0000-0000-000003961EBC
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20032309-0013-0000-0000-000021D30E4B
+Message-Id: <d893c37d-705c-b9a1-cf98-db997edf3bce@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.645
+ definitions=2020-03-23_02:2020-03-21,2020-03-23 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999
+ impostorscore=0 bulkscore=0 phishscore=0 spamscore=0 adultscore=0
+ mlxscore=0 lowpriorityscore=0 suspectscore=0 malwarescore=0
+ priorityscore=1501 clxscore=1015 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2003020000 definitions=main-2003230054
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Jon Doron <arilou@gmail.com> writes:
+On 2020-03-19 12:54, Paolo Bonzini wrote:
+> On 06/03/20 12:42, Stefan Raspl wrote:
+>> This patch series provides a couple of new options to make logging to
+>> files feasible.
+>> Specifically, we add command line switches to specify an arbitrary time
+>> interval for logging, and to toggle between a .csv and the previous
+>> file format. Furthermore, we allow logging to files, where we utilize a
+>> rotating set of 6 logfiles, each with its own header for easy post-
+>> processing, especially when using .csv format.
+>> Since specifying logfile size limits might be a non-trivial exercise,
+>> we're throwing in yet another command line option that allows to
+>> specify the minimum timeframe that should be covered by logs.
+>> Finally, there's a minimal systemd unit file to deploy kvm_stat-based
+>> logging in Linux distributions.
+>> Note that the decision to write our own logfiles rather than to log to
+>> e.g. systemd journal is a conscious one: It is effectively impossible to
+>> write csv records into the systemd journal, the header will either
+>> disappear after a while or has to be repeated from time to time, which
+>> defeats the purpose of having a .csv format that can be easily post-
+>> processed, etc.
+>> See individual patch description for further details.
+>>
+>>
+>> Stefan Raspl (7):
+>>   tools/kvm_stat: rework command line sequence and message texts
+>>   tools/kvm_stat: switch to argparse
+>>   tools/kvm_stat: add command line switch '-s' to set update interval
+>>   tools/kvm_stat: add command line switch '-c' to log in csv format
+>>   tools/kvm_stat: add rotating log support
+>>   tools/kvm_stat: add command line switch '-T'
+>>   tools/kvm_stat: add sample systemd unit file
+>>
+>>  tools/kvm/kvm_stat/kvm_stat         | 434 +++++++++++++++++++++-------
+>>  tools/kvm/kvm_stat/kvm_stat.service |  15 +
+>>  tools/kvm/kvm_stat/kvm_stat.txt     |  59 ++--
+>>  3 files changed, 384 insertions(+), 124 deletions(-)
+>>  create mode 100644 tools/kvm/kvm_stat/kvm_stat.service
+>>
+> 
+> I queued patches 1-4.  For the others, however, I would prefer to add
+> support for SIGHUP instead (to reopen the logfile), so that one can use
+> the usual logrotate services.
 
-> The problem the patch is trying to address is the fact that 'struct
-> kvm_hyperv_exit' has different layout on when compiling in 32 and 64 bit
-> modes.
->
-> In 64-bit mode the default alignment boundary is 64 bits thus
-> forcing extra gaps after 'type' and 'msr' but in 32-bit mode the
-> boundary is at 32 bits thus no extra gaps.
->
-> This is an issue as even when the kernel is 64 bit, the userspace using
-> the interface can be both 32 and 64 bit but the same 32 bit userspace has
-> to work with 32 bit kernel.
->
-> The issue is fixed by forcing the 64 bit layout, this leads to ABI
-> change for 32 bit builds and while we are obviously breaking '32 bit
-> userspace with 32 bit kernel' case, we're fixing the '32 bit userspace
-> with 64 bit kernel' one.
->
-> As the interface has no (known) users and 32 bit KVM is rather baroque
-> nowadays, this seems like a reasonable decision.
->
-> Signed-off-by: Jon Doron <arilou@gmail.com>
-> ---
->  Documentation/virt/kvm/api.rst | 2 ++
->  include/uapi/linux/kvm.h       | 2 ++
->  2 files changed, 4 insertions(+)
->
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index ebd383fba939..4872c47bbcff 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -5025,9 +5025,11 @@ EOI was received.
->    #define KVM_EXIT_HYPERV_SYNIC          1
->    #define KVM_EXIT_HYPERV_HCALL          2
->  			__u32 type;
-> +			__u32 pad1;
->  			union {
->  				struct {
->  					__u32 msr;
-> +					__u32 pad2;
->  					__u64 control;
->  					__u64 evt_page;
->  					__u64 msg_page;
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index 4b95f9a31a2f..7ee0ddc4c457 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -189,9 +189,11 @@ struct kvm_hyperv_exit {
->  #define KVM_EXIT_HYPERV_SYNIC          1
->  #define KVM_EXIT_HYPERV_HCALL          2
->  	__u32 type;
-> +	__u32 pad1;
->  	union {
->  		struct {
->  			__u32 msr;
-> +			__u32 pad2;
->  			__u64 control;
->  			__u64 evt_page;
->  			__u64 msg_page;
+Thx!
+As for SIGHUP: The problem that I see with logrotate and likewise approaches is
+how the heading is being handled: If it is reprinted every x lines (like the
+original logging format in kvmstat does), then it messes up any chance of
+loading the output in external tools for further processing.
+If the heading is printed once only, then it will get pushed out of the log
+files at some time - which is fatal, since '-f <fields>' allows to specify
+custom fields, so one cannot reconstruct what the fields were.
+That's why I did things as I did - which works great for .csv output.
+I'd really like to preserve the use-case where a user has a chance to
+post-process the output, especially .csv, in other tools. So how how about we do
+both, add support for SIGHUP for users who want to use logrotate (I imagine this
+would be used with the original logging format only), and keep the suggested
+support for 'native' log-rotation for .csv users?
 
-Already said that on v8 but the tag got lost,
-
-Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-
--- 
-Vitaly
+Ciao,
+Stefan
 
