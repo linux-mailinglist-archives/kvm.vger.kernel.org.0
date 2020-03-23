@@ -2,123 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 139DF18FB13
-	for <lists+kvm@lfdr.de>; Mon, 23 Mar 2020 18:14:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 662F418FB46
+	for <lists+kvm@lfdr.de>; Mon, 23 Mar 2020 18:20:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727234AbgCWROE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Mar 2020 13:14:04 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:25991 "EHLO
-        us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726987AbgCWROE (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 23 Mar 2020 13:14:04 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1584983643;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=anWzOdOgydkXrVKrOdnLEoUCtM0RcJIym3nCiuRJjrM=;
-        b=JJEmfeHnnYPCj6ztzd9VODLMJdpR6rombwaC3ORLRaYRqUIctKi+q9UW7MrdjkLQlLQWHV
-        8K35g/x0i+3m2ygdUZHbGWdyfNX4yrHu/HBP+GyrlSZdq0pcWxtzic8iN4Z1fJY34lPwr/
-        jiM+vrW6FNk6bIyFCY+IJapyYeAlXuA=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-389-fZuwqPc5OYaFFrJGXLmLFg-1; Mon, 23 Mar 2020 13:14:02 -0400
-X-MC-Unique: fZuwqPc5OYaFFrJGXLmLFg-1
-Received: by mail-wm1-f70.google.com with SMTP id p18so63310wmk.9
-        for <kvm@vger.kernel.org>; Mon, 23 Mar 2020 10:14:02 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=anWzOdOgydkXrVKrOdnLEoUCtM0RcJIym3nCiuRJjrM=;
-        b=bNYiMqA/ruCK+0JHjIr2FxTqS4O5ShYQ+vBrFBZ57NWpA9Kanw4Odass5KKbjC6+Ac
-         Ez58e9J1ardljOwPDfhn6bDrDj8nZuhhl+3nKlzpwD4aKsyHXeUdWjvT66KwBtznF/NM
-         S9bzHZ6tZ7UqJQ/uI1gqgT6pb5OdefwxqA3Aqd1GeedfmsXoh4nN16g/KDbeOZ3NSqsE
-         Tt+5m4TazY6ETJswVf9/p1cCQQH4rIqtKz4btbyP30pisuit75+z8pBPGqcaHKaTNlkG
-         ISEs6f4X/wN8DdPAw0et8CPxFwLj1tUy447bpm0ECUKhjc5f3n2j2AI8hqSHvDP4TN1D
-         pFNg==
-X-Gm-Message-State: ANhLgQ1OGAzoIzd9m+Ed2xTfoxksk59rrAZ1MCpJzmH3xL0Yd5m056ew
-        XBvPN6TA2Mcg7uBy0WmyUsUNhfiyrHImboPHdlgnT3H+4bVeaQyYPxZdT9+SXQjSd8kcT8QtZfI
-        jkgsCMfTzQN7O
-X-Received: by 2002:a1c:6608:: with SMTP id a8mr257456wmc.113.1584983639173;
-        Mon, 23 Mar 2020 10:13:59 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vtFs4cMXB58aHkd+sJ2rJvzjNXQnaBV17W4ys2qEcHxMUKHMNNVjeSlWnIw66VFZcu5zRYmXA==
-X-Received: by 2002:a1c:6608:: with SMTP id a8mr257428wmc.113.1584983638901;
-        Mon, 23 Mar 2020 10:13:58 -0700 (PDT)
-Received: from xz-x1 (CPEf81d0fb19163-CMf81d0fb19160.cpe.net.fido.ca. [72.137.123.47])
-        by smtp.gmail.com with ESMTPSA id a192sm306901wme.5.2020.03.23.10.13.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Mar 2020 10:13:58 -0700 (PDT)
-Date:   Mon, 23 Mar 2020 13:13:53 -0400
-From:   Peter Xu <peterx@redhat.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Yan Zhao <yan.y.zhao@intel.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        Christophe de Dinechin <dinechin@redhat.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Kevin Tian <kevin.tian@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v7 03/14] KVM: X86: Don't track dirty for
- KVM_SET_[TSS_ADDR|IDENTITY_MAP_ADDR]
-Message-ID: <20200323171353.GL127076@xz-x1>
-References: <20200318163720.93929-1-peterx@redhat.com>
- <20200318163720.93929-4-peterx@redhat.com>
- <20200321192211.GC13851@linux.intel.com>
- <20200323145824.GI127076@xz-x1>
- <20200323154216.GG28711@linux.intel.com>
- <20200323162617.GK127076@xz-x1>
- <20200323165551.GS28711@linux.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20200323165551.GS28711@linux.intel.com>
+        id S1727542AbgCWRT3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Mar 2020 13:19:29 -0400
+Received: from inva020.nxp.com ([92.121.34.13]:50434 "EHLO inva020.nxp.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727113AbgCWRT3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 Mar 2020 13:19:29 -0400
+Received: from inva020.nxp.com (localhost [127.0.0.1])
+        by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id E6EA11A14C5;
+        Mon, 23 Mar 2020 18:19:26 +0100 (CET)
+Received: from inva024.eu-rdc02.nxp.com (inva024.eu-rdc02.nxp.com [134.27.226.22])
+        by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id DA8FF1A14A9;
+        Mon, 23 Mar 2020 18:19:26 +0100 (CET)
+Received: from fsr-ub1864-111.ea.freescale.net (fsr-ub1864-111.ea.freescale.net [10.171.82.141])
+        by inva024.eu-rdc02.nxp.com (Postfix) with ESMTP id 8C0B72035C;
+        Mon, 23 Mar 2020 18:19:26 +0100 (CET)
+From:   Diana Craciun <diana.craciun@oss.nxp.com>
+To:     kvm@vger.kernel.org, alex.williamson@redhat.com,
+        laurentiu.tudor@nxp.com, linux-arm-kernel@lists.infradead.org,
+        bharatb.yadav@gmail.com
+Cc:     linux-kernel@vger.kernel.org,
+        Diana Craciun <diana.craciun@oss.nxp.com>
+Subject: [PATCH 0/9] vfio/fsl-mc: VFIO support for FSL-MC devices
+Date:   Mon, 23 Mar 2020 19:19:02 +0200
+Message-Id: <20200323171911.27178-1-diana.craciun@oss.nxp.com>
+X-Mailer: git-send-email 2.17.1
+X-Virus-Scanned: ClamAV using ClamSMTP
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Mar 23, 2020 at 09:55:51AM -0700, Sean Christopherson wrote:
-> On Mon, Mar 23, 2020 at 12:26:17PM -0400, Peter Xu wrote:
-> > On Mon, Mar 23, 2020 at 08:42:16AM -0700, Sean Christopherson wrote:
-> > > > > Regarding the HVA, it's a bit confusing saying that it's guaranteed to be
-> > > > > valid, and then contradicting that in the second clause.  Maybe something
-> > > > > like this to explain the GPA->HVA is guaranteed to be valid, but the
-> > > > > HVA->HPA is not.
-> > > > >  
-> > > > > /*
-> > > > >  * before use.  Note, KVM internal memory slots are guaranteed to remain valid
-> > > > >  * and unchanged until the VM is destroyed, i.e. the GPA->HVA translation will
-> > > > >  * not change.  However, the HVA is a user address, i.e. its accessibility is
-> > > > >  * not guaranteed, and must be accessed via __copy_{to,from}_user().
-> > > > >  */
-> > > > 
-> > > > Sure I can switch to this, though note that I still think the GPA->HVA
-> > > > is not guaranteed logically because the userspace can unmap any HVA it
-> > > > wants..
-> > > 
-> > > You're conflating the GPA->HVA translation with the validity of the HVA,
-> > > i.e. the HVA->HPA and/or HVA->VMA translation/association.  GPA->HVA is
-> > > guaranteed because userspace doesn't have access to the memslot which
-> > > defines that transation.
-> > 
-> > Yes I completely agree if you mean the pure mapping of GPA->HVA.
-> > 
-> > I think it's a matter of how to define the "valid" when you say
-> > "guaranteed to remain valid", because I don't think the mapping is
-> > still valid from the most strict sense if e.g. the backing HVA does
-> > not exist any more for that GPA->HVA mapping, then the memslot won't
-> > be anything useful.
-> 
-> Yes.  That's why my proposed comment is worded to state that the _memslot_
-> will remain valid.  It deliberately avoids mentioning "valid HVA".
+DPAA2 (Data Path Acceleration Architecture) consists in
+mechanisms for processing Ethernet packets, queue management,
+accelerators, etc.
 
-OK, I see the point.  I did re-read the two versions again, I agree
-yours is better, which I'll replace with.  Thanks!
+The Management Complex (mc) is a hardware entity that manages the DPAA2
+hardware resources. It provides an object-based abstraction for software
+drivers to use the DPAA2 hardware. The MC mediates operations such as
+create, discover, destroy of DPAA2 objects.
+The MC provides memory-mapped I/O command interfaces (MC portals) which
+DPAA2 software drivers use to operate on DPAA2 objects.
+
+A DPRC is a container object that holds other types of DPAA2 objects.
+Each object in the DPRC is a Linux device and bound to a driver.
+The MC-bus driver is a platform driver (different from PCI or platform
+bus). The DPRC driver does runtime management of a bus instance. It
+performs the initial scan of the DPRC and handles changes in the DPRC
+configuration (adding/removing objects).
+
+All objects inside a container share the same hardware isolation
+context, meaning that only an entire DPRC can be assigned to
+a virtual machine.
+When a container is assigned to a virtual machine, all the objects
+within that container are assigned to that virtual machine.
+The DPRC container assigned to the virtual machine is not allowed
+to change contents (add/remove objects) by the guest. The restriction
+is set by the host and enforced by the mc hardware.
+
+The DPAA2 objects can be directly assigned to the guest. However
+the MC portals (the memory mapped command interface to the MC) need
+to be emulated because there are commands that configure the
+interrupts and the isolation IDs which are virtual in the guest.
+
+Example:
+echo vfio-fsl-mc > /sys/bus/fsl-mc/devices/dprc.2/driver_override
+echo dprc.2 > /sys/bus/fsl-mc/drivers/vfio-fsl-mc/bind
+
+The dprc.2 is bound to the VFIO driver and all the objects within
+dprc.2 are going to be bound to the VFIO driver.
+
+More details about the DPAA2 objects can be found here:
+Documentation/networking/device_drivers/freescale/dpaa2/overview.rst
+
+The patches are dependent on some changes in the mc-bus (bus/fsl-mc)
+driver. The changes were needed in order to re-use code and to export
+some more functions that are needed by the VFIO driver.
+Currenlty the mc-bus patches are under review:
+https://www.spinics.net/lists/kernel/msg3447567.html
+
+Bharat Bhushan (1):
+  vfio/fsl-mc: Add VFIO framework skeleton for fsl-mc devices
+
+Diana Craciun (8):
+  vfio/fsl-mc: Scan DPRC objects on vfio-fsl-mc driver bind
+  vfio/fsl-mc: Implement VFIO_DEVICE_GET_INFO ioctl
+  vfio/fsl-mc: Implement VFIO_DEVICE_GET_REGION_INFO ioctl call
+  vfio/fsl-mc: Allow userspace to MMAP fsl-mc device MMIO regions
+  vfio/fsl-mc: Added lock support in preparation for interrupt handling
+  vfio/fsl-mc: Add irq infrastructure for fsl-mc devices
+  vfio/fsl-mc: trigger an interrupt via eventfd
+  vfio/fsl-mc: Add read/write support for fsl-mc devices
+
+ MAINTAINERS                               |   6 +
+ drivers/vfio/Kconfig                      |   1 +
+ drivers/vfio/Makefile                     |   1 +
+ drivers/vfio/fsl-mc/Kconfig               |   9 +
+ drivers/vfio/fsl-mc/Makefile              |   4 +
+ drivers/vfio/fsl-mc/vfio_fsl_mc.c         | 660 ++++++++++++++++++++++
+ drivers/vfio/fsl-mc/vfio_fsl_mc_intr.c    | 221 ++++++++
+ drivers/vfio/fsl-mc/vfio_fsl_mc_private.h |  56 ++
+ include/uapi/linux/vfio.h                 |   1 +
+ 9 files changed, 959 insertions(+)
+ create mode 100644 drivers/vfio/fsl-mc/Kconfig
+ create mode 100644 drivers/vfio/fsl-mc/Makefile
+ create mode 100644 drivers/vfio/fsl-mc/vfio_fsl_mc.c
+ create mode 100644 drivers/vfio/fsl-mc/vfio_fsl_mc_intr.c
+ create mode 100644 drivers/vfio/fsl-mc/vfio_fsl_mc_private.h
 
 -- 
-Peter Xu
+2.17.1
 
