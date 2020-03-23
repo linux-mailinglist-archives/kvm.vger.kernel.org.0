@@ -2,110 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 23FA118F99A
-	for <lists+kvm@lfdr.de>; Mon, 23 Mar 2020 17:23:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0736418F9A1
+	for <lists+kvm@lfdr.de>; Mon, 23 Mar 2020 17:24:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727501AbgCWQXc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Mar 2020 12:23:32 -0400
-Received: from mga04.intel.com ([192.55.52.120]:36300 "EHLO mga04.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725893AbgCWQXc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 Mar 2020 12:23:32 -0400
-IronPort-SDR: gQzCMp241bU8eK/RZ3x29jPXZD5tVTjHHEeE/FpEcmBgTNEHxni39DUJhrf9LZPrassVE8tPmz
- chz8MUI144Ew==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Mar 2020 09:23:06 -0700
-IronPort-SDR: MSUbytwPG21W6dHu5U5WS4F+QkOtlYnEVMtPHZM2yy05ToGOBSa/Iia6kA8iGdkqDv5h8AChKj
- rBEIy+2a4Nvg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.72,297,1580803200"; 
-   d="scan'208";a="357139587"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
-  by fmsmga001.fm.intel.com with ESMTP; 23 Mar 2020 09:23:05 -0700
-Date:   Mon, 23 Mar 2020 09:23:05 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 4/9] KVM: VMX: Configure runtime hooks using
- vmx_x86_ops
-Message-ID: <20200323162305.GL28711@linux.intel.com>
-References: <20200321202603.19355-1-sean.j.christopherson@intel.com>
- <20200321202603.19355-5-sean.j.christopherson@intel.com>
- <87ftdz9ryn.fsf@vitty.brq.redhat.com>
+        id S1727357AbgCWQYi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Mar 2020 12:24:38 -0400
+Received: from mail-io1-f68.google.com ([209.85.166.68]:39598 "EHLO
+        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725893AbgCWQYi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 Mar 2020 12:24:38 -0400
+Received: by mail-io1-f68.google.com with SMTP id c19so14751868ioo.6
+        for <kvm@vger.kernel.org>; Mon, 23 Mar 2020 09:24:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=szMpm1YHgB+ek/GLf0Q9znil+A6chCIsHv9XnjC6wnU=;
+        b=hK+AE+H5QEe79Ixitmvqv2R3HJWBBiY+uk5cy6vqPzyp6RRYzVKOY1yI6KN9ITyiDl
+         rHVf7JZXS+6XiwgQCmg3Qk2K1zUoxMyRqBFZO3ShH1a3vIdyQ+6ui55W9Y1WgD3AV80G
+         4FsIYQ8PNslp31hPnLuC/M29GplL1v6q7549yAHCOdLUNCM3bnev4A1n4NRGDqdRa545
+         jBfx/r7xmzNAVda7gngzIjz/zjmlf8NcJIDD4XIh8IBejiDVjZiV5/uq3gvdYBdrCkwU
+         ubfJWq5Vz0UltwxYBvtUqzhL7INCSnCsNez4NvSYbOz0WVZiGmzDeC8oHxHfnt+qkbHc
+         A8Qg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=szMpm1YHgB+ek/GLf0Q9znil+A6chCIsHv9XnjC6wnU=;
+        b=cn8y58jL5rbcWWG4tEoUuixTWtWkUyQ+TD+qhXHScugK/xmlLqQm8T2cbBU9z5A1tE
+         03JpvFg2wGCNIQsNduZhse+qamjIkYalIm3t/PHhkxsP3NHyXLL9i+xrVcQWPi3PkaXk
+         YJLMv447xUgR30uk2OJS+5eeSaYH6jHODh2FSviWQ1kbvPgeL4ICLoGuksrzpNEa9D3g
+         JMZPlyhum8XrPQbT8SSN2qgnQxxRNK8U1uQNL4oFSx7pcREpdRZCTQNEIfFlLz61/HYa
+         yJP4uESkKyHtdabNqPW2vg8oHdAzca5QlLw6V9r9llYUh7ouPC/8q9BqTwclsNfGtczT
+         hAFg==
+X-Gm-Message-State: ANhLgQ3Q+AieVjW9wFIOGPuQeAPbjWGUpStk+hW7HDzGjed/wXiOHhqy
+        IBctKVCVOqbgCcgH5+6CM73AvEgts/9xO0evpzOQDA==
+X-Google-Smtp-Source: ADFU+vus/6qIchDGH8hxBBNtI6zsWwfXLYMmjF5wwgd0drF19BSkmHMMb6n8O5PXjqQkAtnJaxYvTdHsE0KjN2GWnfE=
+X-Received: by 2002:a6b:c408:: with SMTP id y8mr2864354ioa.12.1584980676836;
+ Mon, 23 Mar 2020 09:24:36 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87ftdz9ryn.fsf@vitty.brq.redhat.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+References: <20200320212833.3507-1-sean.j.christopherson@intel.com> <20200320212833.3507-4-sean.j.christopherson@intel.com>
+In-Reply-To: <20200320212833.3507-4-sean.j.christopherson@intel.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Mon, 23 Mar 2020 09:24:25 -0700
+Message-ID: <CALMp9eR5Uu7nRDOS2nQHGzb+Gi6vjDEk1AmuiqkkGWFjKNG+sA@mail.gmail.com>
+Subject: Re: [PATCH v3 03/37] KVM: nVMX: Invalidate all EPTP contexts when
+ emulating INVEPT for L1
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Ben Gardon <bgardon@google.com>,
+        Junaid Shahid <junaids@google.com>,
+        Liran Alon <liran.alon@oracle.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        John Haxby <john.haxby@oracle.com>,
+        Miaohe Lin <linmiaohe@huawei.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Mar 23, 2020 at 01:27:28PM +0100, Vitaly Kuznetsov wrote:
-> Sean Christopherson <sean.j.christopherson@intel.com> writes:
-> 
-> > Configure VMX's runtime hooks by modifying vmx_x86_ops directly instead
-> > of using the global kvm_x86_ops.  This sets the stage for waiting until
-> > after ->hardware_setup() to set kvm_x86_ops with the vendor's
-> > implementation.
-> >
-> > Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> > ---
-> >  arch/x86/kvm/vmx/nested.c | 15 ++++++++-------
-> >  arch/x86/kvm/vmx/nested.h |  3 ++-
-> >  arch/x86/kvm/vmx/vmx.c    | 27 ++++++++++++++-------------
-> >  3 files changed, 24 insertions(+), 21 deletions(-)
-> >
-> > diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> > index 4ff859c99946..87fea22c3799 100644
-> > --- a/arch/x86/kvm/vmx/nested.c
-> > +++ b/arch/x86/kvm/vmx/nested.c
-> > @@ -6241,7 +6241,8 @@ void nested_vmx_hardware_unsetup(void)
-> >  	}
-> >  }
-> >  
-> > -__init int nested_vmx_hardware_setup(int (*exit_handlers[])(struct kvm_vcpu *))
-> > +__init int nested_vmx_hardware_setup(struct kvm_x86_ops *ops,
-> > +				     int (*exit_handlers[])(struct kvm_vcpu *))
-> >  {
-> >  	int i;
-> >  
-> > @@ -6277,12 +6278,12 @@ __init int nested_vmx_hardware_setup(int (*exit_handlers[])(struct kvm_vcpu *))
-> >  	exit_handlers[EXIT_REASON_INVVPID]	= handle_invvpid;
-> >  	exit_handlers[EXIT_REASON_VMFUNC]	= handle_vmfunc;
-> >  
-> > -	kvm_x86_ops->check_nested_events = vmx_check_nested_events;
-> > -	kvm_x86_ops->get_nested_state = vmx_get_nested_state;
-> > -	kvm_x86_ops->set_nested_state = vmx_set_nested_state;
-> > -	kvm_x86_ops->get_vmcs12_pages = nested_get_vmcs12_pages;
-> > -	kvm_x86_ops->nested_enable_evmcs = nested_enable_evmcs;
-> > -	kvm_x86_ops->nested_get_evmcs_version = nested_get_evmcs_version;
-> > +	ops->check_nested_events = vmx_check_nested_events;
-> > +	ops->get_nested_state = vmx_get_nested_state;
-> > +	ops->set_nested_state = vmx_set_nested_state;
-> > +	ops->get_vmcs12_pages = nested_get_vmcs12_pages;
-> > +	ops->nested_enable_evmcs = nested_enable_evmcs;
-> > +	ops->nested_get_evmcs_version = nested_get_evmcs_version;
-> 
-> 
-> A lazy guy like me would appreciate 'ops' -> 'vmx_x86_ops' rename as it
-> would make 'git grep vmx_x86_ops' output more complete.
+On Fri, Mar 20, 2020 at 2:29 PM Sean Christopherson
+<sean.j.christopherson@intel.com> wrote:
+>
+> Free all L2 (guest_mmu) roots when emulating INVEPT for L1.  Outstanding
+> changes to the EPT tables managed by L1 need to be recognized, and
+> relying on KVM to always flush L2's EPTP context on nested VM-Enter is
+> dangerous.
+>
+> Similar to handle_invpcid(), rely on kvm_mmu_free_roots() to do a remote
+> TLB flush if necessary, e.g. if L1 has never entered L2 then there is
+> nothing to be done.
+>
+> Nuking all L2 roots is overkill for the single-context variant, but it's
+> the safe and easy bet.  A more precise zap mechanism will be added in
+> the future.  Add a TODO to call out that KVM only needs to invalidate
+> affected contexts.
+>
+> Fixes: b119019847fbc ("kvm: nVMX: Remove unnecessary sync_roots from handle_invept")
 
-Ah, didn't think about that, obviously.
+The bug existed well before the commit indicated in the "Fixes" line.
