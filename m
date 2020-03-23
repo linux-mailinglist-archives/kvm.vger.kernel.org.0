@@ -2,104 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id BE79918F932
-	for <lists+kvm@lfdr.de>; Mon, 23 Mar 2020 17:04:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8B1CC18F935
+	for <lists+kvm@lfdr.de>; Mon, 23 Mar 2020 17:04:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727365AbgCWQEC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Mar 2020 12:04:02 -0400
-Received: from Galois.linutronix.de ([193.142.43.55]:41889 "EHLO
-        Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727239AbgCWQEC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 Mar 2020 12:04:02 -0400
-Received: from p5de0bf0b.dip0.t-ipconnect.de ([93.224.191.11] helo=nanos.tec.linutronix.de)
-        by Galois.linutronix.de with esmtpsa (TLS1.2:DHE_RSA_AES_256_CBC_SHA256:256)
-        (Exim 4.80)
-        (envelope-from <tglx@linutronix.de>)
-        id 1jGPXx-0001ch-LY; Mon, 23 Mar 2020 17:03:25 +0100
-Received: by nanos.tec.linutronix.de (Postfix, from userid 1000)
-        id 056D11040AA; Mon, 23 Mar 2020 17:03:24 +0100 (CET)
-From:   Thomas Gleixner <tglx@linutronix.de>
-To:     Masami Hiramatsu <mhiramat@kernel.org>
-Cc:     LKML <linux-kernel@vger.kernel.org>, x86@kernel.org,
-        Paul McKenney <paulmck@kernel.org>,
-        Josh Poimboeuf <jpoimboe@redhat.com>,
-        "Joel Fernandes \(Google\)" <joel@joelfernandes.org>,
-        "Steven Rostedt \(VMware\)" <rostedt@goodmis.org>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Alexei Starovoitov <ast@kernel.org>,
-        Frederic Weisbecker <frederic@kernel.org>,
-        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-        Brian Gerst <brgerst@gmail.com>,
-        Juergen Gross <jgross@suse.com>,
-        Alexandre Chartre <alexandre.chartre@oracle.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Subject: Re: [patch V3 04/23] kprobes: Prevent probes in .noinstr.text section
-In-Reply-To: <20200323230025.a24f949a2143dbd5f208f00c@kernel.org>
-References: <20200320175956.033706968@linutronix.de> <20200320180032.799569116@linutronix.de> <20200323230025.a24f949a2143dbd5f208f00c@kernel.org>
-Date:   Mon, 23 Mar 2020 17:03:24 +0100
-Message-ID: <87mu87oy7n.fsf@nanos.tec.linutronix.de>
+        id S1727443AbgCWQEe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Mar 2020 12:04:34 -0400
+Received: from mga05.intel.com ([192.55.52.43]:53089 "EHLO mga05.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727194AbgCWQEd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 Mar 2020 12:04:33 -0400
+IronPort-SDR: COJtxdyDi78DFmABqF/UJ0spSQE+qPnpYFmOQHmOTvtajj3f4TihAL4BHi75Ju3me/2SLrr1T7
+ l7Vn8l+FYeYg==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Mar 2020 09:04:33 -0700
+IronPort-SDR: 8160iWQQn2QB9EBkZ/5az9FGQyLtlP8gpZ2wwPk4GGyG8uGZK6pSLjteJMiLAc6G0Mv9/pLSSz
+ btIvTAF8I0UQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.72,296,1580803200"; 
+   d="scan'208";a="269922152"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
+  by fmsmga004.fm.intel.com with ESMTP; 23 Mar 2020 09:04:32 -0700
+Date:   Mon, 23 Mar 2020 09:04:32 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Ben Gardon <bgardon@google.com>,
+        Junaid Shahid <junaids@google.com>,
+        Liran Alon <liran.alon@oracle.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        John Haxby <john.haxby@oracle.com>,
+        Miaohe Lin <linmiaohe@huawei.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>
+Subject: Re: [PATCH v3 04/37] KVM: nVMX: Invalidate all roots when emulating
+ INVVPID without EPT
+Message-ID: <20200323160432.GJ28711@linux.intel.com>
+References: <20200320212833.3507-1-sean.j.christopherson@intel.com>
+ <20200320212833.3507-5-sean.j.christopherson@intel.com>
+ <87v9mv84qu.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Linutronix-Spam-Score: -1.0
-X-Linutronix-Spam-Level: -
-X-Linutronix-Spam-Status: No , -1.0 points, 5.0 required,  ALL_TRUSTED=-1,SHORTCIRCUIT=-0.0001
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87v9mv84qu.fsf@vitty.brq.redhat.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Masami,
+On Mon, Mar 23, 2020 at 04:34:17PM +0100, Vitaly Kuznetsov wrote:
+> Sean Christopherson <sean.j.christopherson@intel.com> writes:
+> 
+> > From: Junaid Shahid <junaids@google.com>
+> >
+> > Free all roots when emulating INVVPID for L1 and EPT is disabled, as
+> > outstanding changes to the page tables managed by L1 need to be
+> > recognized.  Because L1 and L2 share an MMU when EPT is disabled, and
+> > because VPID is not tracked by the MMU role, all roots in the current
+> > MMU (root_mmu) need to be freed, otherwise a future nested VM-Enter or
+> > VM-Exit could do a fast CR3 switch (without a flush/sync) and consume
+> > stale SPTEs.
+> >
+> > Fixes: 5c614b3583e7b ("KVM: nVMX: nested VPID emulation")
+> > Signed-off-by: Junaid Shahid <junaids@google.com>
+> > [sean: ported to upstream KVM, reworded the comment and changelog]
+> > Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> > ---
+> >  arch/x86/kvm/vmx/nested.c | 14 ++++++++++++++
+> >  1 file changed, 14 insertions(+)
+> >
+> > diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> > index 9624cea4ed9f..bc74fbbf33c6 100644
+> > --- a/arch/x86/kvm/vmx/nested.c
+> > +++ b/arch/x86/kvm/vmx/nested.c
+> > @@ -5250,6 +5250,20 @@ static int handle_invvpid(struct kvm_vcpu *vcpu)
+> >  		return kvm_skip_emulated_instruction(vcpu);
+> >  	}
+> >  
+> > +	/*
+> > +	 * Sync the shadow page tables if EPT is disabled, L1 is invalidating
+> > +	 * linear mappings for L2 (tagged with L2's VPID).  Free all roots as
+> > +	 * VPIDs are not tracked in the MMU role.
+> > +	 *
+> > +	 * Note, this operates on root_mmu, not guest_mmu, as L1 and L2 share
+> > +	 * an MMU when EPT is disabled.
+> > +	 *
+> > +	 * TODO: sync only the affected SPTEs for INVDIVIDUAL_ADDR.
+> > +	 */
+> > +	if (!enable_ept)
+> > +		kvm_mmu_free_roots(vcpu, &vcpu->arch.root_mmu,
+> > +				   KVM_MMU_ROOTS_ALL);
+> > +
+> 
+> This is related to my remark on the previous patch; the comment above
+> makes me think I'm missing something obvious, enlighten me please)
+> 
+> My understanding is that L1 and L2 will share arch.root_mmu not only
+> when EPT is globally disabled, we seem to switch between
+> root_mmu/guest_mmu only when nested_cpu_has_ept(vmcs12) but different L2
+> guests may be different on this. Do we need to handle this somehow?
 
-Masami Hiramatsu <mhiramat@kernel.org> writes:
-> On Fri, 20 Mar 2020 19:00:00 +0100
-> Thomas Gleixner <tglx@linutronix.de> wrote:
->
->> Instrumentation is forbidden in the .noinstr.text section. Make kprobes
->> respect this.
->> 
->> This lacks support for .noinstr.text sections in modules, which is required
->> to handle VMX and SVM.
->> 
->
-> Would you have any plan to list or mark the noinstr symbols on
-> some debugfs interface? I need a blacklist of those symbols so that
-> user (and perf-probe) can check which function can not be probed.
->
-> It is just calling kprobe_add_area_blacklist() like below.
->
-> diff --git a/kernel/kprobes.c b/kernel/kprobes.c
-> index 2625c241ac00..4835b644bd2b 100644
-> --- a/kernel/kprobes.c
-> +++ b/kernel/kprobes.c
-> @@ -2212,6 +2212,10 @@ static int __init populate_kprobe_blacklist(unsigned long *start,
->  	ret = kprobe_add_area_blacklist((unsigned long)__kprobes_text_start,
->  					(unsigned long)__kprobes_text_end);
->  
-> +	/* Symbols in noinstr section are blacklisted */
-> +	ret = kprobe_add_area_blacklist((unsigned long)__noinstr_text_start,
-> +					(unsigned long)__noinstr_text_end);
-> +
->  	return ret ? : arch_populate_kprobe_blacklist();
->  }
+guest_mmu is used iff nested EPT is enabled, which requires enable_ept=1.
+enable_ept is global and cannot be changed without reloading kvm_intel.
 
-So that extra function is not required when adding that, right?
+This most definitely over-invalidates, e.g. it blasts away L1's page
+tables.  But, fixing that requires tracking VPID in mmu_role and/or adding
+support for using guest_mmu when L1 isn't using TDP, i.e. nested EPT is
+disabled.  Assuming the vast majority of nested deployments enable EPT in
+L0, the cost of both options likely outweighs the benefits.
 
->> +/* Functions in .noinstr.text must not be probed */
->> +static bool within_noinstr_text(unsigned long addr)
->> +{
->> +	/* FIXME: Handle module .noinstr.text */
->> +	return addr >= (unsigned long)__noinstr_text_start &&
->> +	       addr < (unsigned long)__noinstr_text_end;
->> +}
->> +
->>  bool within_kprobe_blacklist(unsigned long addr)
->>  {
->>  	char symname[KSYM_NAME_LEN], *p;
->>  
->> +	if (within_noinstr_text(addr))
->> +		return true;
->> +
->>  	if (__within_kprobe_blacklist(addr))
->>  		return true;
+> >  	return nested_vmx_succeed(vcpu);
+> >  }
+> 
+> -- 
+> Vitaly
+> 
