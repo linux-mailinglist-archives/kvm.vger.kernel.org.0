@@ -2,124 +2,178 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 45EDB18FF91
-	for <lists+kvm@lfdr.de>; Mon, 23 Mar 2020 21:30:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E201318FFA3
+	for <lists+kvm@lfdr.de>; Mon, 23 Mar 2020 21:36:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727063AbgCWUa4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Mar 2020 16:30:56 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:49691 "EHLO
-        us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725861AbgCWUa4 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 23 Mar 2020 16:30:56 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1584995455;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=UlIULzxpZnyUqrzlDG0sOgiICKn19mY66jy1Bqo/I1Y=;
-        b=KEMxozL/YLiMvNM5octX8gzuYcZLZMnPYrbQs2vjHU6zN4IXNlZ7yJTq+oMJh29H7U8IVK
-        u46zj68XON8k2JdInNpG8oLUKZcFA5UpUVrIQdBUe9yYmnEcsDjSO1AYtlVnWLuxokJR/n
-        BSPy5rXcD7ajSde7a91c6qpvnpk8BVs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-345-G0bunP3LPU6Vu93X0USvQQ-1; Mon, 23 Mar 2020 16:30:53 -0400
-X-MC-Unique: G0bunP3LPU6Vu93X0USvQQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9A692107ACCD;
-        Mon, 23 Mar 2020 20:30:50 +0000 (UTC)
-Received: from [10.36.113.142] (ovpn-113-142.ams2.redhat.com [10.36.113.142])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id BD48D9496C;
-        Mon, 23 Mar 2020 20:30:42 +0000 (UTC)
-Subject: Re: [PATCH v15 Kernel 2/7] vfio iommu: Remove atomicity of ref_count
- of pinned pages
-To:     Kirti Wankhede <kwankhede@nvidia.com>, alex.williamson@redhat.com,
-        cjia@nvidia.com
-Cc:     kevin.tian@intel.com, ziye.yang@intel.com, changpeng.liu@intel.com,
-        yi.l.liu@intel.com, mlevitsk@redhat.com, eskultet@redhat.com,
-        cohuck@redhat.com, dgilbert@redhat.com,
-        jonathan.davies@nutanix.com, eauger@redhat.com, aik@ozlabs.ru,
-        pasic@linux.ibm.com, felipe@nutanix.com,
-        Zhengxiao.zx@Alibaba-inc.com, shuangtai.tst@alibaba-inc.com,
-        Ken.Xue@amd.com, zhi.a.wang@intel.com, yan.y.zhao@intel.com,
-        qemu-devel@nongnu.org, kvm@vger.kernel.org
-References: <1584649004-8285-1-git-send-email-kwankhede@nvidia.com>
- <1584649004-8285-3-git-send-email-kwankhede@nvidia.com>
-From:   Auger Eric <eric.auger@redhat.com>
-Message-ID: <b2e791ee-e55a-3142-119c-c2f4300fabd5@redhat.com>
-Date:   Mon, 23 Mar 2020 21:30:41 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+        id S1726203AbgCWUg3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Mar 2020 16:36:29 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:60172 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725861AbgCWUg3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 Mar 2020 16:36:29 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02NKSX6b149459;
+        Mon, 23 Mar 2020 20:35:12 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2020-01-29;
+ bh=wwxhSAMWDlm/98wU2yz/vgcA4Tu2rqqR726uLbXjGSU=;
+ b=IPXt3lUWeX7PguP4B4RNX8E0aLvmJbb+o8spOITHl19aJbCc/DFJrYtt8VWX3eLH9008
+ uv7yjmL/4JORhX5lFL9PYRXvxfJBlJIrrxiLoFsILlK3MFvM/MD72C3kKaZGps+J2LL2
+ DamS/I+AMpjzsepJUFg1F3+9fauFAJKUHG1XdQ+95DmfAT2nNYeGAJ3K4bxW7E+w0IGe
+ mgd9I8PWfhZxdHqaIUhcIeJCYWuRF974w/KgQ9H+hLENzYK+VluVGx2575jofgMskdx1
+ 8359XvYN3+f6YV+JbtnmmbYaWsGhH9+NC194tERPJ5/ELo6Uq0Tco903MBui5tSm+a+z WA== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by userp2120.oracle.com with ESMTP id 2yx8abwtqt-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 23 Mar 2020 20:35:12 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02NKRnhb033737;
+        Mon, 23 Mar 2020 20:35:11 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by aserp3020.oracle.com with ESMTP id 2yxw7gdcm1-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 23 Mar 2020 20:35:11 +0000
+Received: from abhmp0005.oracle.com (abhmp0005.oracle.com [141.146.116.11])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 02NKZ9X1004980;
+        Mon, 23 Mar 2020 20:35:09 GMT
+Received: from [192.168.1.206] (/71.63.128.209)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Mon, 23 Mar 2020 13:35:08 -0700
+Subject: Re: [PATCH v2] mm/hugetlb: fix a addressing exception caused by
+ huge_pte_offset()
+To:     Jason Gunthorpe <jgg@ziepe.ca>
+Cc:     "Longpeng (Mike)" <longpeng2@huawei.com>,
+        akpm@linux-foundation.org, kirill.shutemov@linux.intel.com,
+        linux-kernel@vger.kernel.org, arei.gonglei@huawei.com,
+        weidong.huang@huawei.com, weifuqiang@huawei.com,
+        kvm@vger.kernel.org, linux-mm@kvack.org,
+        Matthew Wilcox <willy@infradead.org>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        stable@vger.kernel.org
+References: <1582342427-230392-1-git-send-email-longpeng2@huawei.com>
+ <51a25d55-de49-4c0a-c994-bf1a8cfc8638@oracle.com>
+ <20200323160955.GY20941@ziepe.ca>
+ <69055395-e7e5-a8e2-7f3e-f61607149318@oracle.com>
+ <20200323180706.GC20941@ziepe.ca>
+From:   Mike Kravetz <mike.kravetz@oracle.com>
+Message-ID: <88698dd7-eb87-4b0b-7ba7-44ef6eab6a6c@oracle.com>
+Date:   Mon, 23 Mar 2020 13:35:07 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <1584649004-8285-3-git-send-email-kwankhede@nvidia.com>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <20200323180706.GC20941@ziepe.ca>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9569 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 mlxlogscore=821 spamscore=0
+ adultscore=0 phishscore=0 suspectscore=0 malwarescore=0 mlxscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
+ definitions=main-2003230102
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9569 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 suspectscore=0 priorityscore=1501 malwarescore=0
+ mlxscore=0 adultscore=0 phishscore=0 impostorscore=0 mlxlogscore=860
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2003230102
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Kirti,
-
-On 3/19/20 9:16 PM, Kirti Wankhede wrote:
-> vfio_pfn.ref_count is always updated by holding iommu->lock, using atomic
-> variable is overkill.
+On 3/23/20 11:07 AM, Jason Gunthorpe wrote:
+> On Mon, Mar 23, 2020 at 10:27:48AM -0700, Mike Kravetz wrote:
 > 
-> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-> Reviewed-by: Neo Jia <cjia@nvidia.com>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
-
-Thanks
-
-Eric
-> ---
->  drivers/vfio/vfio_iommu_type1.c | 9 +++++----
->  1 file changed, 5 insertions(+), 4 deletions(-)
+>>>  	pgd = pgd_offset(mm, addr);
+>>> -	if (!pgd_present(*pgd))
+>>> +	if (!pgd_present(READ_ONCE(*pgd)))
+>>>  		return NULL;
+>>>  	p4d = p4d_offset(pgd, addr);
+>>> -	if (!p4d_present(*p4d))
+>>> +	if (!p4d_present(READ_ONCE(*p4d)))
+>>>  		return NULL;
+>>>  
+>>>       pud = pud_offset(p4d, addr);
+>>
+>> One would argue that pgd and p4d can not change from present to !present
+>> during the execution of this code.  To me, that seems like the issue which
+>> would cause an issue.  Of course, I could be missing something.
 > 
-> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> index 9fdfae1cb17a..70aeab921d0f 100644
-> --- a/drivers/vfio/vfio_iommu_type1.c
-> +++ b/drivers/vfio/vfio_iommu_type1.c
-> @@ -112,7 +112,7 @@ struct vfio_pfn {
->  	struct rb_node		node;
->  	dma_addr_t		iova;		/* Device address */
->  	unsigned long		pfn;		/* Host pfn */
-> -	atomic_t		ref_count;
-> +	unsigned int		ref_count;
->  };
->  
->  struct vfio_regions {
-> @@ -233,7 +233,7 @@ static int vfio_add_to_pfn_list(struct vfio_dma *dma, dma_addr_t iova,
->  
->  	vpfn->iova = iova;
->  	vpfn->pfn = pfn;
-> -	atomic_set(&vpfn->ref_count, 1);
-> +	vpfn->ref_count = 1;
->  	vfio_link_pfn(dma, vpfn);
->  	return 0;
->  }
-> @@ -251,7 +251,7 @@ static struct vfio_pfn *vfio_iova_get_vfio_pfn(struct vfio_dma *dma,
->  	struct vfio_pfn *vpfn = vfio_find_vpfn(dma, iova);
->  
->  	if (vpfn)
-> -		atomic_inc(&vpfn->ref_count);
-> +		vpfn->ref_count++;
->  	return vpfn;
->  }
->  
-> @@ -259,7 +259,8 @@ static int vfio_iova_put_vfio_pfn(struct vfio_dma *dma, struct vfio_pfn *vpfn)
->  {
->  	int ret = 0;
->  
-> -	if (atomic_dec_and_test(&vpfn->ref_count)) {
-> +	vpfn->ref_count--;
-> +	if (!vpfn->ref_count) {
->  		ret = put_pfn(vpfn->pfn, dma->prot);
->  		vfio_remove_from_pfn_list(dma, vpfn);
->  	}
+> This I am not sure of, I think it must be true under the read side of
+> the mmap_sem, but probably not guarenteed under RCU..
+> 
+> In any case, it doesn't matter, the fact that *p4d can change at all
+> is problematic. Unwinding the above inlines we get:
+> 
+>   p4d = p4d_offset(pgd, addr)
+>   if (!p4d_present(*p4d))
+>       return NULL;
+>   pud = (pud_t *)p4d_page_vaddr(*p4d) + pud_index(address);
+> 
+> According to our memory model the compiler/CPU is free to execute this
+> as:
+> 
+>   p4d = p4d_offset(pgd, addr)
+>   p4d_for_vaddr = *p4d;
+>   if (!p4d_present(*p4d))
+>       return NULL;
+>   pud = (pud_t *)p4d_page_vaddr(p4d_for_vaddr) + pud_index(address);
 > 
 
+Wow!  How do you know this?  You don't need to answer :)
+
+> In the case where p4 goes from !present -> present (ie
+> handle_mm_fault()):
+> 
+> p4d_for_vaddr == p4d_none, and p4d_present(*p4d) == true, meaning the
+> p4d_page_vaddr() will crash.
+> 
+> Basically the problem here is not just missing READ_ONCE, but that the
+> p4d is read multiple times at all. It should be written like gup_fast
+> does, to guarantee a single CPU read of the unstable data:
+> 
+>   p4d = READ_ONCE(*p4d_offset(pgdp, addr));
+>   if (!p4d_present(p4))
+>       return NULL;
+>   pud = pud_offset(&p4d, addr);
+> 
+> At least this is what I've been able to figure out :\
+
+In that case, I believe there are a bunch of similar routines with this issue.
+
+For this patch, I was primarily interested in seeing the obvious multiple
+dereferences in C fixed up.  This is above and beyond that! :)
+
+>>> Also, the remark about pmd_offset() seems accurate. The
+>>> get_user_fast_pages() pattern seems like the correct one to emulate:
+>>>
+>>>   pud = READ_ONCE(*pudp);
+>>>   if (pud_none(pud)) 
+>>>      ..
+>>>   if (!pud_'is a pmd pointer')
+>>>      ..
+>>>   pmdp = pmd_offset(&pud, address);
+>>>   pmd = READ_ONCE(*pmd);
+>>>   [...]
+>>>
+>>> Passing &pud in avoids another de-reference of the pudp. Honestly all
+>>> these APIs that take in page table pointers and internally
+>>> de-reference them seem very hard to use correctly when the page table
+>>> access isn't fully locked against write.
+> 
+> And the same protocol for the PUD, etc.
+> 
+>>> It looks like at least the p4d read from the pgd is also unlocked here
+>>> as handle_mm_fault() writes to it??
+>>
+>> Yes, there is no locking required to call huge_pte_offset().
+> 
+> None? Not RCU or read mmap_sem?
+
+Yes, mmap_sem in read mode.
+Sorry, I was confusing this with additional locking requirements for hugetlb
+specific code.
+
+-- 
+Mike Kravetz
