@@ -2,111 +2,226 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1071818FE63
-	for <lists+kvm@lfdr.de>; Mon, 23 Mar 2020 21:01:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6999E18FF42
+	for <lists+kvm@lfdr.de>; Mon, 23 Mar 2020 21:25:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727120AbgCWUBA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Mar 2020 16:01:00 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:40896 "EHLO
-        us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725903AbgCWUA7 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 23 Mar 2020 16:00:59 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1584993657;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=cY+H9r1hyt0W+F/eh6c6o3kR9Aied7i4vmIsTGqyvm8=;
-        b=YKepk1PQoth/BbGlTItKh75O0DfIwuOYZauBAJwGqPr74RJMvhRAjRVBds6OnSo4FyJb29
-        fJScBbuYtHiYHdLWwVB+YHf+1GwSLbz09CAvgXvpXgErEGOr7n0+KV1EsOpVWcABP/jSPV
-        XfR6PHFndWGa16LNHcwAsLPWiqsZ6vo=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-113-tKB9RlWaP5yLP2P61dSTkw-1; Mon, 23 Mar 2020 16:00:55 -0400
-X-MC-Unique: tKB9RlWaP5yLP2P61dSTkw-1
-Received: by mail-wm1-f70.google.com with SMTP id x23so278361wmj.1
-        for <kvm@vger.kernel.org>; Mon, 23 Mar 2020 13:00:54 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=cY+H9r1hyt0W+F/eh6c6o3kR9Aied7i4vmIsTGqyvm8=;
-        b=WOZBVX9q9avyg1xPT2CvSqdjvU6OrBqRiKBRuoauje4VYx2yoCNVAx3SjuOUfFddQG
-         fwUjl8ocerjx4EiuU0LzhVL3LTEdTyu29Y0OaSirsowLca8W5seW/OOMB7vdojXaq697
-         7PC2qCUZdO72Fs/lVYZ4ngPTEofcWQlJaRIwYhZjOxTD2R+/HmiZj5M3ZIOkmwELKSIG
-         pF6/VmbdhDB1NNu4XWRe6CuLNbDlR/56ouGBtqfNto0pQsHOXEy8Ut3BQYBY2v+1frXL
-         56lNkuPnMJ454EgzIy3l12OWaCZtMVIWOqHXR47grI+KF39DCbKLD77+anW1Wr9rbwF7
-         g4rA==
-X-Gm-Message-State: ANhLgQ1yfh5jarTqh90pQQFt+XzAK/qlwbhJ1HHN9U/GCX1j8u2W0Ijo
-        Ov6YqVKiixUcI5lJgUyvOcuVAr7GzwceJJ03GZHBLI3sRvZn5+XJjiANO5HCy4qdKp7qVjWTXeC
-        nmmyPN3K4ivuK
-X-Received: by 2002:adf:f3c5:: with SMTP id g5mr26655839wrp.230.1584993653911;
-        Mon, 23 Mar 2020 13:00:53 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vvXyqIbkkktOwq1/2ooUCj01kGPzulVzA6RfK1uS8wG/GOec0veo7shFCpnK1NWAqj8WTc9EQ==
-X-Received: by 2002:adf:f3c5:: with SMTP id g5mr26655802wrp.230.1584993653686;
-        Mon, 23 Mar 2020 13:00:53 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:24d8:ed40:c82a:8a01? ([2001:b07:6468:f312:24d8:ed40:c82a:8a01])
-        by smtp.gmail.com with ESMTPSA id 98sm25182715wrk.52.2020.03.23.13.00.52
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 23 Mar 2020 13:00:53 -0700 (PDT)
-Subject: Re: [PATCH v3 4/9] KVM: VMX: Configure runtime hooks using
- vmx_x86_ops
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Paul Mackerras <paulus@ozlabs.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
+        id S1727457AbgCWUY6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Mar 2020 16:24:58 -0400
+Received: from Galois.linutronix.de ([193.142.43.55]:42768 "EHLO
+        Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725991AbgCWUY5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 Mar 2020 16:24:57 -0400
+Received: from p5de0bf0b.dip0.t-ipconnect.de ([93.224.191.11] helo=nanos.tec.linutronix.de)
+        by Galois.linutronix.de with esmtpsa (TLS1.2:DHE_RSA_AES_256_CBC_SHA256:256)
+        (Exim 4.80)
+        (envelope-from <tglx@linutronix.de>)
+        id 1jGTcm-0006Yi-2v; Mon, 23 Mar 2020 21:24:40 +0100
+Received: by nanos.tec.linutronix.de (Postfix, from userid 1000)
+        id 2D0391040AA; Mon, 23 Mar 2020 21:24:39 +0100 (CET)
+From:   Thomas Gleixner <tglx@linutronix.de>
+To:     Xiaoyao Li <xiaoyao.li@intel.com>, Ingo Molnar <mingo@redhat.com>,
+        Borislav Petkov <bp@alien8.de>, hpa@zytor.com,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        kvm@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org
+Cc:     Andy Lutomirski <luto@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Arvind Sankar <nivedita@alum.mit.edu>,
+        Fenghua Yu <fenghua.yu@intel.com>,
+        Tony Luck <tony.luck@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org
-References: <20200321202603.19355-1-sean.j.christopherson@intel.com>
- <20200321202603.19355-5-sean.j.christopherson@intel.com>
- <87ftdz9ryn.fsf@vitty.brq.redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <c7915319-8795-e466-e2df-478b1bf9734c@redhat.com>
-Date:   Mon, 23 Mar 2020 21:00:50 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+        Xiaoyao Li <xiaoyao.li@intel.com>
+Subject: Re: [PATCH v5 1/9] x86/split_lock: Rework the initialization flow of split lock detection
+In-Reply-To: <87zhc7ovhj.fsf@nanos.tec.linutronix.de>
+References: <20200315050517.127446-1-xiaoyao.li@intel.com> <20200315050517.127446-2-xiaoyao.li@intel.com> <87zhc7ovhj.fsf@nanos.tec.linutronix.de>
+Date:   Mon, 23 Mar 2020 21:24:39 +0100
+Message-ID: <87lfnqq0oo.fsf@nanos.tec.linutronix.de>
 MIME-Version: 1.0
-In-Reply-To: <87ftdz9ryn.fsf@vitty.brq.redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+X-Linutronix-Spam-Score: -1.0
+X-Linutronix-Spam-Level: -
+X-Linutronix-Spam-Status: No , -1.0 points, 5.0 required,  ALL_TRUSTED=-1,SHORTCIRCUIT=-0.0001
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 23/03/20 13:27, Vitaly Kuznetsov wrote:
->> -	kvm_x86_ops->check_nested_events = vmx_check_nested_events;
->> -	kvm_x86_ops->get_nested_state = vmx_get_nested_state;
->> -	kvm_x86_ops->set_nested_state = vmx_set_nested_state;
->> -	kvm_x86_ops->get_vmcs12_pages = nested_get_vmcs12_pages;
->> -	kvm_x86_ops->nested_enable_evmcs = nested_enable_evmcs;
->> -	kvm_x86_ops->nested_get_evmcs_version = nested_get_evmcs_version;
->> +	ops->check_nested_events = vmx_check_nested_events;
->> +	ops->get_nested_state = vmx_get_nested_state;
->> +	ops->set_nested_state = vmx_set_nested_state;
->> +	ops->get_vmcs12_pages = nested_get_vmcs12_pages;
->> +	ops->nested_enable_evmcs = nested_enable_evmcs;
->> +	ops->nested_get_evmcs_version = nested_get_evmcs_version;
-> 
-> A lazy guy like me would appreciate 'ops' -> 'vmx_x86_ops' rename as it
-> would make 'git grep vmx_x86_ops' output more complete.
-> 
+Thomas Gleixner <tglx@linutronix.de> writes:
+> Xiaoyao Li <xiaoyao.li@intel.com> writes:
+>
+>> Current initialization flow of split lock detection has following issues:
+>> 1. It assumes the initial value of MSR_TEST_CTRL.SPLIT_LOCK_DETECT to be
+>>    zero. However, it's possible that BIOS/firmware has set it.
+>
+> Ok.
+>
+>> 2. X86_FEATURE_SPLIT_LOCK_DETECT flag is unconditionally set even if
+>>    there is a virtualization flaw that FMS indicates the existence while
+>>    it's actually not supported.
+>>
+>> 3. Because of #2, KVM cannot rely on X86_FEATURE_SPLIT_LOCK_DETECT flag
+>>    to check verify if feature does exist, so cannot expose it to
+>>    guest.
+>
+> Sorry this does not make anny sense. KVM is the hypervisor, so it better
+> can rely on the detect flag. Unless you talk about nested virt and a
+> broken L1 hypervisor.
+>
+>> To solve these issues, introducing a new sld_state, "sld_not_exist",
+>> as
+>
+> The usual naming convention is sld_not_supported.
 
-I would prefer even more a kvm_x86_ops.nested struct but I would be okay
-with a separate patch.
+But this extra state is not needed at all, it already exists:
 
-Paolo
+    X86_FEATURE_SPLIT_LOCK_DETECT
+
+You just need to make split_lock_setup() a bit smarter. Soemthing like
+the below. It just wants to be split into separate patches.
+
+Thanks,
+
+        tglx
+---
+--- a/arch/x86/kernel/cpu/intel.c
++++ b/arch/x86/kernel/cpu/intel.c
+@@ -45,6 +45,7 @@ enum split_lock_detect_state {
+  * split lock detect, unless there is a command line override.
+  */
+ static enum split_lock_detect_state sld_state = sld_off;
++static DEFINE_PER_CPU(u64, msr_test_ctrl_cache);
+ 
+ /*
+  * Processors which have self-snooping capability can handle conflicting
+@@ -984,11 +985,32 @@ static inline bool match_option(const ch
+ 	return len == arglen && !strncmp(arg, opt, len);
+ }
+ 
++static bool __init split_lock_verify_msr(bool on)
++{
++	u64 ctrl, tmp;
++
++	if (rdmsrl_safe(MSR_TEST_CTRL, &ctrl))
++		return false;
++	if (on)
++		ctrl |= MSR_TEST_CTRL_SPLIT_LOCK_DETECT;
++	else
++		ctrl &= ~MSR_TEST_CTRL_SPLIT_LOCK_DETECT;
++	if (wrmsrl_safe(MSR_TEST_CTRL, ctrl))
++		return false;
++	rdmsrl(MSR_TEST_CTRL, tmp);
++	return ctrl == tmp;
++}
++
+ static void __init split_lock_setup(void)
+ {
+ 	char arg[20];
+ 	int i, ret;
+ 
++	if (!split_lock_verify_msr(true) || !split_lock_verify_msr(false)) {
++		pr_info("MSR access failed: Disabled\n");
++		return;
++	}
++
+ 	setup_force_cpu_cap(X86_FEATURE_SPLIT_LOCK_DETECT);
+ 	sld_state = sld_warn;
+ 
+@@ -1007,7 +1029,6 @@ static void __init split_lock_setup(void
+ 	case sld_off:
+ 		pr_info("disabled\n");
+ 		break;
+-
+ 	case sld_warn:
+ 		pr_info("warning about user-space split_locks\n");
+ 		break;
+@@ -1018,44 +1039,40 @@ static void __init split_lock_setup(void
+ 	}
+ }
+ 
+-/*
+- * Locking is not required at the moment because only bit 29 of this
+- * MSR is implemented and locking would not prevent that the operation
+- * of one thread is immediately undone by the sibling thread.
+- * Use the "safe" versions of rdmsr/wrmsr here because although code
+- * checks CPUID and MSR bits to make sure the TEST_CTRL MSR should
+- * exist, there may be glitches in virtualization that leave a guest
+- * with an incorrect view of real h/w capabilities.
+- */
+-static bool __sld_msr_set(bool on)
++static void split_lock_init(void)
+ {
+-	u64 test_ctrl_val;
++	u64 ctrl;
+ 
+-	if (rdmsrl_safe(MSR_TEST_CTRL, &test_ctrl_val))
+-		return false;
++	if (!boot_cpu_has(X86_FEATURE_SPLIT_LOCK_DETECT))
++		return;
+ 
+-	if (on)
+-		test_ctrl_val |= MSR_TEST_CTRL_SPLIT_LOCK_DETECT;
++	rdmsrl(MSR_TEST_CTRL, ctrl);
++	if (sld_state == sld_off)
++		ctrl &= ~MSR_TEST_CTRL_SPLIT_LOCK_DETECT;
+ 	else
+-		test_ctrl_val &= ~MSR_TEST_CTRL_SPLIT_LOCK_DETECT;
+-
+-	return !wrmsrl_safe(MSR_TEST_CTRL, test_ctrl_val);
++		ctrl |= MSR_TEST_CTRL_SPLIT_LOCK_DETECT;
++	wrmsrl(MSR_TEST_CTRL, ctrl);
++	this_cpu_write(msr_test_ctrl_cache, ctrl);
+ }
+ 
+-static void split_lock_init(void)
++/*
++ * MSR_TEST_CTRL is per core, but we treat it like a per CPU MSR. Locking
++ * is not implemented as one thread could undo the setting of the other
++ * thread immediately after dropping the lock anyway.
++ */
++static void msr_test_ctrl_update(bool on, u64 mask)
+ {
+-	if (sld_state == sld_off)
+-		return;
++	u64 tmp, ctrl = this_cpu_read(msr_test_ctrl_cache);
+ 
+-	if (__sld_msr_set(true))
+-		return;
++	if (on)
++		tmp = ctrl | mask;
++	else
++		tmp = ctrl & ~mask;
+ 
+-	/*
+-	 * If this is anything other than the boot-cpu, you've done
+-	 * funny things and you get to keep whatever pieces.
+-	 */
+-	pr_warn("MSR fail -- disabled\n");
+-	sld_state = sld_off;
++	if (tmp != ctrl) {
++		wrmsrl(MSR_TEST_CTRL, ctrl);
++		this_cpu_write(msr_test_ctrl_cache, ctrl);
++	}
+ }
+ 
+ bool handle_user_split_lock(struct pt_regs *regs, long error_code)
+@@ -1071,7 +1088,7 @@ bool handle_user_split_lock(struct pt_re
+ 	 * progress and set TIF_SLD so the detection is re-enabled via
+ 	 * switch_to_sld() when the task is scheduled out.
+ 	 */
+-	__sld_msr_set(false);
++	msr_test_ctrl_update(false, MSR_TEST_CTRL_SPLIT_LOCK_DETECT);
+ 	set_tsk_thread_flag(current, TIF_SLD);
+ 	return true;
+ }
+@@ -1085,7 +1102,7 @@ bool handle_user_split_lock(struct pt_re
+  */
+ void switch_to_sld(unsigned long tifn)
+ {
+-	__sld_msr_set(!(tifn & _TIF_SLD));
++	msr_test_ctrl_update(!(tifn & _TIF_SLD), MSR_TEST_CTRL_SPLIT_LOCK_DETECT);
+ }
+ 
+ #define SPLIT_LOCK_CPU(model) {X86_VENDOR_INTEL, 6, model, X86_FEATURE_ANY}
+
 
