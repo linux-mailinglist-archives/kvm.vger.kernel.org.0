@@ -2,212 +2,275 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1149318FD15
-	for <lists+kvm@lfdr.de>; Mon, 23 Mar 2020 19:51:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 617F118FD4C
+	for <lists+kvm@lfdr.de>; Mon, 23 Mar 2020 20:06:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727771AbgCWSvc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Mar 2020 14:51:32 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:45886 "EHLO
+        id S1727743AbgCWTGy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Mar 2020 15:06:54 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:33352 "EHLO
         us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727460AbgCWSvc (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 23 Mar 2020 14:51:32 -0400
+        by vger.kernel.org with ESMTP id S1727536AbgCWTGy (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 23 Mar 2020 15:06:54 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1584989490;
+        s=mimecast20190719; t=1584990412;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=i5uNgQfCyHlEshudNjrdais8zXu8wZ0IgkAoADjIMfY=;
-        b=hd5ygnx7l5TkPPDW3zAXKxRMVBQxZYiXpaFULhqR3ijZRdmQi9qcIP2Q21hbdAmNjr6aAa
-        PzNUkZSxuslvXXa3FxlPrG/UTytrJOlo6L9i7Ok7EyIXq9wsHyUnz0X9ohqpTgL8bzLovn
-        o+OiCNDTefnYDJf1a6SIwDFDScA1fs0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-186-zkdOpzCwOWWhyPzdQZ8nFw-1; Mon, 23 Mar 2020 14:51:26 -0400
-X-MC-Unique: zkdOpzCwOWWhyPzdQZ8nFw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2DDB5A1365;
-        Mon, 23 Mar 2020 18:51:24 +0000 (UTC)
-Received: from work-vm (ovpn-112-29.ams2.redhat.com [10.36.112.29])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 965288AC30;
-        Mon, 23 Mar 2020 18:51:16 +0000 (UTC)
-Date:   Mon, 23 Mar 2020 18:51:14 +0000
-From:   "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     Kirti Wankhede <kwankhede@nvidia.com>, cjia@nvidia.com,
-        kevin.tian@intel.com, ziye.yang@intel.com, changpeng.liu@intel.com,
-        yi.l.liu@intel.com, mlevitsk@redhat.com, eskultet@redhat.com,
-        cohuck@redhat.com, jonathan.davies@nutanix.com, eauger@redhat.com,
-        aik@ozlabs.ru, pasic@linux.ibm.com, felipe@nutanix.com,
-        Zhengxiao.zx@alibaba-inc.com, shuangtai.tst@alibaba-inc.com,
-        Ken.Xue@amd.com, zhi.a.wang@intel.com, yan.y.zhao@intel.com,
-        qemu-devel@nongnu.org, kvm@vger.kernel.org
-Subject: Re: [PATCH v15 Kernel 4/7] vfio iommu: Implementation of ioctl for
- dirty pages tracking.
-Message-ID: <20200323185114.GF3017@work-vm>
-References: <1584649004-8285-1-git-send-email-kwankhede@nvidia.com>
- <1584649004-8285-5-git-send-email-kwankhede@nvidia.com>
- <20200319165704.1f4eb36a@w520.home>
- <bc48ae5c-67f9-d95e-5d60-6c42359bb790@nvidia.com>
- <20200320120137.6acd89ee@x1.home>
- <cf0ee134-c1c7-f60c-afc2-8948268d8880@nvidia.com>
- <20200320125910.028d7af5@w520.home>
- <7062f72a-bf06-a8cd-89f0-9e729699a454@nvidia.com>
- <20200323124448.2d3bc315@w520.home>
+        bh=APaNQRxHTARj8BaPbjn67e2tBGbsQUvwirTO/uswCns=;
+        b=DIvUTG/ynxPnqrKIQc9HeXrVc/3dl6Q6CMOPRVTDuhblJhhlpojxLWYTjFsAu/jj9Yry8R
+        datfo5A9nu9M0SNoXwEhwwFaBnghE6GQSZh573eSqUIVA9SMznVcyGkPxD1uM4njoNOKBl
+        L5xTI41n12LQ8NFFcM3lS6d/LowgS38=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-191-3Yd7ci4UOYCYztJh5W7QJQ-1; Mon, 23 Mar 2020 15:06:41 -0400
+X-MC-Unique: 3Yd7ci4UOYCYztJh5W7QJQ-1
+Received: by mail-wr1-f72.google.com with SMTP id l17so7435254wro.3
+        for <kvm@vger.kernel.org>; Mon, 23 Mar 2020 12:06:41 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=APaNQRxHTARj8BaPbjn67e2tBGbsQUvwirTO/uswCns=;
+        b=XLBkn6AMgsWNXEjMLdUvlouFEoZrKbd3z59W9+IlZic0o5DQUHaLYOc3kaelXh/Ib5
+         UnMjZcvzHAaghrVsojPi43U+MtWEdagQWL/wyaP+a/jQcTzzGjNu0uEKZfauy+RmqGGs
+         EbS24rKnSChwFWReThGzdleajEeJNWUkRba39QRNmwkBfvwdTs9D9zgGaGf1i5j3F57I
+         U19SoKmmv8M23/hcpSD7pKtXM1gm4Dkz8GHMEDfk1DK5+8hPC7Qu6fgZmvhXV7DtvynX
+         zXEp1RcRAnttPn2WJ+4Z9EMtOhYkIcoomrhOaDimRd7yEm+2owtrz2zySOQN2YfSEpm4
+         Ro3g==
+X-Gm-Message-State: ANhLgQ0irTyV/zrZUP/l+ABbVdrfvwX8A6Gl/wMR/FE9m41jmQWcf26W
+        9RBk3MdY83yD0wj/MixtXbzfsBsNRKtCEgh6Uqpi9ylNhWGM74n7nFTds3DZJqBrb0htxy5fmTM
+        RWqQMz0FcbKOi
+X-Received: by 2002:a5d:4ac8:: with SMTP id y8mr31386940wrs.272.1584990400701;
+        Mon, 23 Mar 2020 12:06:40 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vsWEwSE2Xr+j5tv0NNOh61W8hlsYhecrXZL3VhQYuKxOQc/p/2kgcq+l7apJoq1CJ9V3DenmA==
+X-Received: by 2002:a5d:4ac8:: with SMTP id y8mr31386901wrs.272.1584990400395;
+        Mon, 23 Mar 2020 12:06:40 -0700 (PDT)
+Received: from xz-x1 ([2607:9880:19c0:32::2])
+        by smtp.gmail.com with ESMTPSA id e9sm25072127wrw.30.2020.03.23.12.06.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 23 Mar 2020 12:06:39 -0700 (PDT)
+Date:   Mon, 23 Mar 2020 15:06:36 -0400
+From:   Peter Xu <peterx@redhat.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Qian Cai <cai@lca.pw>
+Subject: Re: [PATCH 7/7] KVM: selftests: Add "delete" testcase to
+ set_memory_region_test
+Message-ID: <20200323190636.GM127076@xz-x1>
+References: <20200320205546.2396-1-sean.j.christopherson@intel.com>
+ <20200320205546.2396-8-sean.j.christopherson@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20200323124448.2d3bc315@w520.home>
-User-Agent: Mutt/1.13.3 (2020-01-12)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <20200320205546.2396-8-sean.j.christopherson@intel.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-* Alex Williamson (alex.williamson@redhat.com) wrote:
-> On Mon, 23 Mar 2020 23:24:37 +0530
-> Kirti Wankhede <kwankhede@nvidia.com> wrote:
+On Fri, Mar 20, 2020 at 01:55:46PM -0700, Sean Christopherson wrote:
+> Add coverate for running a guest with no memslots, and for deleting
+> memslots while the guest is running.  Enhance the test to use, and
+> expect, a unique value for MMIO reads, e.g. to verify each stage of
+> the test.
 > 
-> > On 3/21/2020 12:29 AM, Alex Williamson wrote:
-> > > On Sat, 21 Mar 2020 00:12:04 +0530
-> > > Kirti Wankhede <kwankhede@nvidia.com> wrote:
-> > >   
-> > >> On 3/20/2020 11:31 PM, Alex Williamson wrote:  
-> > >>> On Fri, 20 Mar 2020 23:19:14 +0530
-> > >>> Kirti Wankhede <kwankhede@nvidia.com> wrote:
-> > >>>      
-> > >>>> On 3/20/2020 4:27 AM, Alex Williamson wrote:  
-> > >>>>> On Fri, 20 Mar 2020 01:46:41 +0530
-> > >>>>> Kirti Wankhede <kwankhede@nvidia.com> wrote:
-> > >>>>>         
-> > >>
-> > >> <snip>
-> > >>  
-> > >>>>>> +static int vfio_iova_dirty_bitmap(struct vfio_iommu *iommu, dma_addr_t iova,
-> > >>>>>> +				  size_t size, uint64_t pgsize,
-> > >>>>>> +				  u64 __user *bitmap)
-> > >>>>>> +{
-> > >>>>>> +	struct vfio_dma *dma;
-> > >>>>>> +	unsigned long pgshift = __ffs(pgsize);
-> > >>>>>> +	unsigned int npages, bitmap_size;
-> > >>>>>> +
-> > >>>>>> +	dma = vfio_find_dma(iommu, iova, 1);
-> > >>>>>> +
-> > >>>>>> +	if (!dma)
-> > >>>>>> +		return -EINVAL;
-> > >>>>>> +
-> > >>>>>> +	if (dma->iova != iova || dma->size != size)
-> > >>>>>> +		return -EINVAL;
-> > >>>>>> +
-> > >>>>>> +	npages = dma->size >> pgshift;
-> > >>>>>> +	bitmap_size = DIRTY_BITMAP_BYTES(npages);
-> > >>>>>> +
-> > >>>>>> +	/* mark all pages dirty if all pages are pinned and mapped. */
-> > >>>>>> +	if (dma->iommu_mapped)
-> > >>>>>> +		bitmap_set(dma->bitmap, 0, npages);
-> > >>>>>> +
-> > >>>>>> +	if (copy_to_user((void __user *)bitmap, dma->bitmap, bitmap_size))
-> > >>>>>> +		return -EFAULT;  
-> > >>>>>
-> > >>>>> We still need to reset the bitmap here, clearing and re-adding the
-> > >>>>> pages that are still pinned.
-> > >>>>>
-> > >>>>> https://lore.kernel.org/kvm/20200319070635.2ff5db56@x1.home/
-> > >>>>>         
-> > >>>>
-> > >>>> I thought you agreed on my reply to it
-> > >>>> https://lore.kernel.org/kvm/31621b70-02a9-2ea5-045f-f72b671fe703@nvidia.com/
-> > >>>>     
-> > >>>>    > Why re-populate when there will be no change since
-> > >>>>    > vfio_iova_dirty_bitmap() is called holding iommu->lock? If there is any
-> > >>>>    > pin request while vfio_iova_dirty_bitmap() is still working, it will
-> > >>>>    > wait till iommu->lock is released. Bitmap will be populated when page is
-> > >>>>    > pinned.  
-> > >>>
-> > >>> As coded, dirty bits are only ever set in the bitmap, never cleared.
-> > >>> If a page is unpinned between iterations of the user recording the
-> > >>> dirty bitmap, it should be marked dirty in the iteration immediately
-> > >>> after the unpinning and not marked dirty in the following iteration.
-> > >>> That doesn't happen here.  We're reporting cumulative dirty pages since
-> > >>> logging was enabled, we need to be reporting dirty pages since the user
-> > >>> last retrieved the dirty bitmap.  The bitmap should be cleared and
-> > >>> currently pinned pages re-added after copying to the user.  Thanks,
-> > >>>      
-> > >>
-> > >> Does that mean, we have to track every iteration? do we really need that
-> > >> tracking?
-> > >>
-> > >> Generally the flow is:
-> > >> - vendor driver pin x pages
-> > >> - Enter pre-copy-phase where vCPUs are running - user starts dirty pages
-> > >> tracking, then user asks dirty bitmap, x pages reported dirty by
-> > >> VFIO_IOMMU_DIRTY_PAGES ioctl with _GET flag
-> > >> - In pre-copy phase, vendor driver pins y more pages, now bitmap
-> > >> consists of x+y bits set
-> > >> - In pre-copy phase, vendor driver unpins z pages, but bitmap is not
-> > >> updated, so again bitmap consists of x+y bits set.
-> > >> - Enter in stop-and-copy phase, vCPUs are stopped, mdev devices are stopped
-> > >> - user asks dirty bitmap - Since here vCPU and mdev devices are stopped,
-> > >> pages should not get dirty by guest driver or the physical device.
-> > >> Hence, x+y dirty pages would be reported.
-> > >>
-> > >> I don't think we need to track every iteration of bitmap reporting.  
-> > > 
-> > > Yes, once a bitmap is read, it's reset.  In your example, after
-> > > unpinning z pages the user should still see a bitmap with x+y pages,
-> > > but once they've read that bitmap, the next bitmap should be x+y-z.
-> > > Userspace can make decisions about when to switch from pre-copy to
-> > > stop-and-copy based on convergence, ie. the slope of the line recording
-> > > dirty pages per iteration.  The implementation here never allows an
-> > > inflection point, dirty pages reported through vfio would always either
-> > > be flat or climbing.  There might also be a case that an iommu backed
-> > > device could start pinning pages during the course of a migration, how
-> > > would the bitmap ever revert from fully populated to only tracking the
-> > > pinned pages?  Thanks,
-> > >   
-> > 
-> > At KVM forum we discussed this - if guest driver pins say 1024 pages 
-> > before migration starts, during pre-copy phase device can dirty 0 pages 
-> > in best case and 1024 pages in worst case. In that case, user will 
-> > transfer content of 1024 pages during pre-copy phase and in 
-> > stop-and-copy phase also, that will be pages will be copied twice. So we 
-> > decided to only get dirty pages bitmap at stop-and-copy phase. If user 
-> > is going to get dirty pages in stop-and-copy phase only, then that will 
-> > be single iteration.
-> > There aren't any devices yet that can track sys memory dirty pages. So 
-> > we can go ahead with this patch and support for dirty pages tracking 
-> > during pre-copy phase can be added later when there will be consumers of 
-> > that functionality.
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> ---
+>  .../kvm/x86_64/set_memory_region_test.c       | 122 ++++++++++++++++--
+>  1 file changed, 108 insertions(+), 14 deletions(-)
 > 
-> So if I understand this right, you're expecting the dirty bitmap to
-> accumulate dirty bits, in perpetuity, so that the user can only
-> retrieve them once at the end of migration?  But if that's the case,
-> the user could simply choose to not retrieve the bitmap until the end
-> of migration, the result would be the same.  What we have here is that
-> dirty bits are never cleared, regardless of whether the user has seen
-> them, which is wrong.  Sorry, we had a lot of discussions at KVM forum,
-> I don't recall this specific one 5 months later and maybe we weren't
-> considering all aspects.  I see the behavior we have here as incorrect,
-> but it also seems relatively trivial to make correct.  I hope the QEMU
-> code isn't making us go through all this trouble to report a dirty
-> bitmap that gets thrown away because it expects the final one to be
-> cumulative since the beginning of dirty logging.  Thanks,
+> diff --git a/tools/testing/selftests/kvm/x86_64/set_memory_region_test.c b/tools/testing/selftests/kvm/x86_64/set_memory_region_test.c
+> index c6691cff4e19..44aed8ac932b 100644
+> --- a/tools/testing/selftests/kvm/x86_64/set_memory_region_test.c
+> +++ b/tools/testing/selftests/kvm/x86_64/set_memory_region_test.c
+> @@ -26,42 +26,109 @@
+>  #define MEM_REGION_SIZE		0x200000
+>  #define MEM_REGION_SLOT		10
+>  
+> -static void guest_code(void)
+> +static const uint64_t MMIO_VAL = 0xbeefull;
+> +
+> +extern const uint64_t final_rip_start;
+> +extern const uint64_t final_rip_end;
+> +
+> +static inline uint64_t guest_spin_on_val(uint64_t spin_val)
+>  {
+>  	uint64_t val;
+>  
+>  	do {
+>  		val = READ_ONCE(*((uint64_t *)MEM_REGION_GPA));
+> -	} while (!val);
+> +	} while (val == spin_val);
+> +	return val;
+> +}
+>  
+> -	if (val != 1)
+> -		ucall(UCALL_ABORT, 1, val);
+> +static void guest_code(void)
+> +{
+> +	uint64_t val;
+>  
+> -	GUEST_DONE();
+> +	/*
+> +	 * Spin until the memory region is moved to a misaligned address.  This
+> +	 * may or may not trigger MMIO, as the window where the memslot is
+> +	 * invalid is quite small.
+> +	 */
+> +	val = guest_spin_on_val(0);
+> +	GUEST_ASSERT(val == 1 || val == MMIO_VAL);
+> +
+> +	/* Spin until the memory region is realigned. */
+> +	GUEST_ASSERT(guest_spin_on_val(MMIO_VAL) == 1);
 
-I remember the discussion that we couldn't track the system memory
-dirtying with current hardware; so the question then is just to track
-what has been pinned and then ideally put that memory off until the end.
-(Which is interesting because I don't think we currently have  a way
-to delay RAM pages till the end in qemu).
+IIUC ideally we should do GUEST_SYNC() after each GUEST_ASSERT() to
+make sure the two threads are in sync.  Otherwise e.g. there's no
+guarantee that the main thread won't run too fast to quickly remove
+the memslot and re-add it back before the guest_spin_on_val() starts
+above, then the assert could trigger when it reads the value as zero.
 
-[I still worry whether migration will be usable with any
-significant amount of system ram that's pinned in this way; the
-downside will very easily get above the threshold that people like]
+> +
+> +	/* Spin until the memory region is deleted. */
+> +	GUEST_ASSERT(guest_spin_on_val(1) == MMIO_VAL);
+> +
+> +	/* Spin until the memory region is recreated. */
+> +	GUEST_ASSERT(guest_spin_on_val(MMIO_VAL) == 0);
+> +
+> +	/* Spin until the memory region is deleted. */
+> +	GUEST_ASSERT(guest_spin_on_val(0) == MMIO_VAL);
+> +
+> +	asm("1:\n\t"
+> +	    ".pushsection .rodata\n\t"
+> +	    ".global final_rip_start\n\t"
+> +	    "final_rip_start: .quad 1b\n\t"
+> +	    ".popsection");
+> +
+> +	/* Spin indefinitely (until the code memslot is deleted). */
+> +	guest_spin_on_val(MMIO_VAL);
+> +
+> +	asm("1:\n\t"
+> +	    ".pushsection .rodata\n\t"
+> +	    ".global final_rip_end\n\t"
+> +	    "final_rip_end: .quad 1b\n\t"
+> +	    ".popsection");
+> +
+> +	GUEST_ASSERT(0);
+>  }
+>  
+>  static void *vcpu_worker(void *data)
+>  {
+>  	struct kvm_vm *vm = data;
+> +	struct kvm_regs regs;
+>  	struct kvm_run *run;
+>  	struct ucall uc;
+> -	uint64_t cmd;
+>  
+>  	/*
+>  	 * Loop until the guest is done.  Re-enter the guest on all MMIO exits,
+> -	 * which will occur if the guest attempts to access a memslot while it
+> -	 * is being moved.
+> +	 * which will occur if the guest attempts to access a memslot after it
+> +	 * has been deleted or while it is being moved .
+>  	 */
+>  	run = vcpu_state(vm, VCPU_ID);
+> -	do {
+> +
+> +	memcpy(run->mmio.data, &MMIO_VAL, 8);
+> +	while (1) {
+>  		vcpu_run(vm, VCPU_ID);
+> -	} while (run->exit_reason == KVM_EXIT_MMIO);
+> +		if (run->exit_reason != KVM_EXIT_MMIO)
+> +			break;
+>  
+> -	TEST_ASSERT(run->exit_reason == KVM_EXIT_IO,
+> +		TEST_ASSERT(!run->mmio.is_write, "Unexpected exit mmio write");
+> +		TEST_ASSERT(run->mmio.len == 8,
+> +			    "Unexpected exit mmio size = %u", run->mmio.len);
+> +
+> +		TEST_ASSERT(run->mmio.phys_addr == MEM_REGION_GPA,
+> +			    "Unexpected exit mmio address = 0x%llx",
+> +			    run->mmio.phys_addr);
+> +	}
+> +
+> +	if (run->exit_reason == KVM_EXIT_IO) {
+> +		(void)get_ucall(vm, VCPU_ID, &uc);
+> +		TEST_FAIL("%s at %s:%ld",
+> +			  (const char *)uc.args[0], __FILE__, uc.args[1]);
+> +	}
+> +
+> +	TEST_ASSERT(run->exit_reason == KVM_EXIT_SHUTDOWN ||
+> +		    run->exit_reason == KVM_INTERNAL_ERROR_EMULATION,
+>  		    "Unexpected exit reason = %d", run->exit_reason);
+>  
+> -	cmd = get_ucall(vm, VCPU_ID, &uc);
+> -	TEST_ASSERT(cmd == UCALL_DONE, "Unexpected val in guest = %lu", uc.args[0]);
+> +	vcpu_regs_get(vm, VCPU_ID, &regs);
+> +
+> +	TEST_ASSERT(regs.rip >= final_rip_start &&
+> +		    regs.rip < final_rip_end,
+> +		    "Bad rip, expected 0x%lx - 0x%lx, got 0x%llx\n",
+> +		    final_rip_start, final_rip_end, regs.rip);
+> +
+>  	return NULL;
+>  }
+>  
+> @@ -72,6 +139,13 @@ static void test_move_memory_region(void)
+>  	uint64_t *hva;
+>  	uint64_t gpa;
+>  
+> +	vm = vm_create(VM_MODE_DEFAULT, 0, O_RDWR);
+> +	vm_vcpu_add(vm, VCPU_ID);
+> +	/* Fails with ENOSPC because the MMU can't create pages (no slots). */
+> +	TEST_ASSERT(_vcpu_run(vm, VCPU_ID) == -1 && errno == ENOSPC,
+> +		    "Unexpected error code = %d", errno);
+> +	kvm_vm_free(vm);
+> +
+>  	vm = vm_create_default(VCPU_ID, 0, guest_code);
+>  
+>  	vcpu_set_cpuid(vm, VCPU_ID, kvm_get_supported_cpuid());
+> @@ -105,7 +179,6 @@ static void test_move_memory_region(void)
+>  	 */
+>  	vm_mem_region_move(vm, MEM_REGION_SLOT, MEM_REGION_GPA - 4096);
+>  	WRITE_ONCE(*hva, 2);
+> -
+>  	usleep(100000);
+>  
+>  	/*
+> @@ -116,6 +189,27 @@ static void test_move_memory_region(void)
+>  
+>  	/* Restore the original base, the guest should see "1". */
+>  	vm_mem_region_move(vm, MEM_REGION_SLOT, MEM_REGION_GPA);
+> +	usleep(100000);
+> +
+> +	/* Delete the memory region, the guest should not die. */
+> +	vm_mem_region_delete(vm, MEM_REGION_SLOT);
+> +	usleep(100000);
+> +
+> +	/* Recreate the memory region.  The guest should see "0". */
+> +	vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS_THP,
+> +				    MEM_REGION_GPA, MEM_REGION_SLOT,
+> +				    MEM_REGION_SIZE / getpagesize(), 0);
+> +	usleep(100000);
+> +
+> +	/* Delete the region again so that there's only one memslot left. */
+> +	vm_mem_region_delete(vm, MEM_REGION_SLOT);
+> +	usleep(100000);
+> +
+> +	/*
+> +	 * Delete the primary memslot.  This should cause an emulation error or
+> +	 * shutdown due to the page tables getting nuked.
+> +	 */
+> +	vm_mem_region_delete(vm, VM_PRIMARY_MEM_SLOT);
+>  
+>  	pthread_join(vcpu_thread, NULL);
+>  
+> -- 
+> 2.24.1
+> 
 
-Dave
-
-> Alex
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+-- 
+Peter Xu
 
