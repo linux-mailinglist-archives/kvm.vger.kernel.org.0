@@ -2,183 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1C083190138
-	for <lists+kvm@lfdr.de>; Mon, 23 Mar 2020 23:52:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0E45D190237
+	for <lists+kvm@lfdr.de>; Tue, 24 Mar 2020 00:47:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726962AbgCWWw2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Mar 2020 18:52:28 -0400
-Received: from mail-qk1-f196.google.com ([209.85.222.196]:40771 "EHLO
-        mail-qk1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726203AbgCWWw2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 Mar 2020 18:52:28 -0400
-Received: by mail-qk1-f196.google.com with SMTP id l25so12494753qki.7
-        for <kvm@vger.kernel.org>; Mon, 23 Mar 2020 15:52:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=EN3/8nPrGjDFP5FiRDwnVv0jq98uFBAuJO6UXCJg8/8=;
-        b=XW7sHiomY4SolQ/XAgSERiGDv3GH1MG/5Sg/9yKQZY9xK/GcJ/pgyjjbWnF26Hys1A
-         cWeCjqUaPylhKJKv1+cbeNWqxJ2Q9mwTLJX9na4EwpF4MZJwCOBuOY8jpBBJtaarX00E
-         0zZAJXGiYhxFzkMlLRSCeTR2ZvMriueZTkDO71LwFyhKw3Ablck5cwnBHsjUQWH+o5/Y
-         +ikI1lSYDO2bWvz/8Na3VIilw2UY95CrKTdNv87bnnv0xIMyhmQ3VK4DqipqQpIRgU+g
-         J3b1FfXDPb7KChYjzS+o0o/c/sYpj1P8FOOxTx8n2TeqP25KA5E5wjO4LHKp3HSo0X6v
-         l45Q==
+        id S1727127AbgCWXq7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Mar 2020 19:46:59 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:52322 "EHLO
+        us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727011AbgCWXq7 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 23 Mar 2020 19:46:59 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1585007218;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=tSyvbG0jRJgoukd8LcpY1HnHy+eiw9SXpaYRxe+R7cU=;
+        b=U8EsLZBzxkOeC+eNCMRZderVA7HFHYE9n6DVSwPywY1bBEXwwQS7n3qI/zdNBPXqpfL32c
+        Zp4mHc8s+iZ/HV6LiY9Ax2tiFbSY/6szRj4txZj0gO3YxrrnTCfxH2t0l9/mTwY/amNV2T
+        8gp84P5CPl1px9jxEYz0fIxJUDKEaUs=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-189-SiLX-fcpPG6GL-F8TX3JIA-1; Mon, 23 Mar 2020 19:46:56 -0400
+X-MC-Unique: SiLX-fcpPG6GL-F8TX3JIA-1
+Received: by mail-wm1-f70.google.com with SMTP id g26so632875wmk.6
+        for <kvm@vger.kernel.org>; Mon, 23 Mar 2020 16:46:56 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=EN3/8nPrGjDFP5FiRDwnVv0jq98uFBAuJO6UXCJg8/8=;
-        b=ul0iIX+o8ApBSn0lSfpK9H5hqGu3rcb5BlP71lSVZoiApAtXTtKWLXIrCX95GcmP+b
-         ezr/Ny3HYho6iGMf/bvrP8KZdsT0aAsT+hpVNO0oVhR/IMCgpLmzKxQCsm6Y6MvP5acG
-         5a8DpzvoP3DARW4iCjF9f5smI2guXOItNj4Pv5aYY4SS1QGecTAb7CleOPZht9SHJwiO
-         3yRt5hz+KNp42MTNCNWUQdVAxM9uOe3F/+1nXX4ye5+YKkRCXQnHtI1PjdBjyYhjzXOg
-         UPb0f98BuEh9373wREYUinNP97qK0vlkSJbukHLdiy+P/mShQou26AAa2NYoR1xbJPKV
-         c4Uw==
-X-Gm-Message-State: ANhLgQ3YJN5DoTb8AsYwpSwVqGBeWIQzlGjicTXSUN88OQ7jIzTA3/pm
-        xlaJ6AVURWJAiML0Mcetvt9gcQ==
-X-Google-Smtp-Source: ADFU+vuIxvcXkLHkkUwg/gcivfQjs9y5Wtz9wozt9Y4PWM35iGAs1MxHMJOPkfq43QrdfzminBi6Qw==
-X-Received: by 2002:a37:4fc3:: with SMTP id d186mr24438557qkb.100.1585003946439;
-        Mon, 23 Mar 2020 15:52:26 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-142-68-57-212.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.57.212])
-        by smtp.gmail.com with ESMTPSA id w132sm11883304qkb.96.2020.03.23.15.52.25
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Mon, 23 Mar 2020 15:52:25 -0700 (PDT)
-Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1jGVvl-00063l-6Z; Mon, 23 Mar 2020 19:52:25 -0300
-Date:   Mon, 23 Mar 2020 19:52:25 -0300
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Mike Kravetz <mike.kravetz@oracle.com>
-Cc:     "Longpeng (Mike)" <longpeng2@huawei.com>,
-        akpm@linux-foundation.org, kirill.shutemov@linux.intel.com,
-        linux-kernel@vger.kernel.org, arei.gonglei@huawei.com,
-        weidong.huang@huawei.com, weifuqiang@huawei.com,
-        kvm@vger.kernel.org, linux-mm@kvack.org,
-        Matthew Wilcox <willy@infradead.org>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        stable@vger.kernel.org
-Subject: Re: [PATCH v2] mm/hugetlb: fix a addressing exception caused by
- huge_pte_offset()
-Message-ID: <20200323225225.GF20941@ziepe.ca>
-References: <1582342427-230392-1-git-send-email-longpeng2@huawei.com>
- <51a25d55-de49-4c0a-c994-bf1a8cfc8638@oracle.com>
- <20200323160955.GY20941@ziepe.ca>
- <69055395-e7e5-a8e2-7f3e-f61607149318@oracle.com>
- <20200323180706.GC20941@ziepe.ca>
- <88698dd7-eb87-4b0b-7ba7-44ef6eab6a6c@oracle.com>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=tSyvbG0jRJgoukd8LcpY1HnHy+eiw9SXpaYRxe+R7cU=;
+        b=B/Hi/d5nmvfNBASzP6iWGZPFbcsccKMEusVTF+Y0rLtUKzGE6UrvBy7g4M6ByqO1E9
+         VEY819YzFbprXY1jj2VWjn6GgHXE+YQyM9XyxdjJ9p4uCdW2kG5/UKIpC3lOhKbqSlbo
+         INHETxAle8Xitua6NRq1voLBPlPbwODcn1f8ePo3P+Snh9YImq9x/s7TzCyF6Am6Y8MV
+         9coCmATslzEoyUhz8rRcVOc+QPDgFzph1fXyWzAClJj/tcDn1RMpKW6TtxDNWwESWZrP
+         mW3h++IWRGgg0dbmtG6svgRUl0ao6RIin+4fvTMnYwTnAM+7gjBAVNp4HTHcfaANGEvb
+         t6ow==
+X-Gm-Message-State: ANhLgQ1D3Qbh4JO+aVMKaNCOBhzOFjcv6bWw+yXtXqK2hmYmBy5H3e5l
+        Q6Dr1PFFJtRNITjUTYjMsQgyo991EoKHv8RmHhEZCccgEr9rUPvrnIzaxDuUlG8l8KhzEEZxf8M
+        xZWIKQPdZkPgN
+X-Received: by 2002:adf:f7cb:: with SMTP id a11mr23524109wrq.79.1585007215284;
+        Mon, 23 Mar 2020 16:46:55 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vvZlGwBX5VRkEHJbRyonc3teesA7wqRwm+dtkXJfD8MCIKgHyy5njk4cisOjUOk59hS+iM0yg==
+X-Received: by 2002:adf:f7cb:: with SMTP id a11mr23524089wrq.79.1585007214986;
+        Mon, 23 Mar 2020 16:46:54 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:7848:99b4:482a:e888? ([2001:b07:6468:f312:7848:99b4:482a:e888])
+        by smtp.gmail.com with ESMTPSA id k9sm26815366wrd.74.2020.03.23.16.46.53
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 23 Mar 2020 16:46:54 -0700 (PDT)
+Subject: Re: [PATCH v3 02/37] KVM: nVMX: Validate the EPTP when emulating
+ INVEPT(EXTENT_CONTEXT)
+To:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Ben Gardon <bgardon@google.com>,
+        Junaid Shahid <junaids@google.com>,
+        Liran Alon <liran.alon@oracle.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        John Haxby <john.haxby@oracle.com>,
+        Miaohe Lin <linmiaohe@huawei.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>
+References: <20200320212833.3507-1-sean.j.christopherson@intel.com>
+ <20200320212833.3507-3-sean.j.christopherson@intel.com>
+ <871rpj9lay.fsf@vitty.brq.redhat.com>
+ <20200323154555.GH28711@linux.intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <b6fdc5db-2d50-5e4d-cfe8-4d4624c046e0@redhat.com>
+Date:   Tue, 24 Mar 2020 00:46:53 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <88698dd7-eb87-4b0b-7ba7-44ef6eab6a6c@oracle.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+In-Reply-To: <20200323154555.GH28711@linux.intel.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Mar 23, 2020 at 01:35:07PM -0700, Mike Kravetz wrote:
-> On 3/23/20 11:07 AM, Jason Gunthorpe wrote:
-> > On Mon, Mar 23, 2020 at 10:27:48AM -0700, Mike Kravetz wrote:
-> > 
-> >>>  	pgd = pgd_offset(mm, addr);
-> >>> -	if (!pgd_present(*pgd))
-> >>> +	if (!pgd_present(READ_ONCE(*pgd)))
-> >>>  		return NULL;
-> >>>  	p4d = p4d_offset(pgd, addr);
-> >>> -	if (!p4d_present(*p4d))
-> >>> +	if (!p4d_present(READ_ONCE(*p4d)))
-> >>>  		return NULL;
-> >>>  
-> >>>       pud = pud_offset(p4d, addr);
-> >>
-> >> One would argue that pgd and p4d can not change from present to !present
-> >> during the execution of this code.  To me, that seems like the issue which
-> >> would cause an issue.  Of course, I could be missing something.
-> > 
-> > This I am not sure of, I think it must be true under the read side of
-> > the mmap_sem, but probably not guarenteed under RCU..
-> > 
-> > In any case, it doesn't matter, the fact that *p4d can change at all
-> > is problematic. Unwinding the above inlines we get:
-> > 
-> >   p4d = p4d_offset(pgd, addr)
-> >   if (!p4d_present(*p4d))
-> >       return NULL;
-> >   pud = (pud_t *)p4d_page_vaddr(*p4d) + pud_index(address);
-> > 
-> > According to our memory model the compiler/CPU is free to execute this
-> > as:
-> > 
-> >   p4d = p4d_offset(pgd, addr)
-> >   p4d_for_vaddr = *p4d;
-> >   if (!p4d_present(*p4d))
-> >       return NULL;
-> >   pud = (pud_t *)p4d_page_vaddr(p4d_for_vaddr) + pud_index(address);
-> > 
+On 23/03/20 16:45, Sean Christopherson wrote:
+>> My question, however, transforms into "would it
+>> make sense to introduce nested_vmx_fail() implementing the logic from
+>> SDM:
+>>
+>> VMfail(ErrorNumber):
+>> 	IF VMCS pointer is valid
+>> 		THEN VMfailValid(ErrorNumber);
+>> 	ELSE VMfailInvalid;
+>> 	FI;
+>>
+> Hmm, I wouldn't be opposed to such a wrapper.  It would pair with
+> nested_vmx_succeed().
 > 
-> Wow!  How do you know this?  You don't need to answer :)
 
-It says explicitly in Documentation/memory-barriers.txt - see
-section COMPILER BARRIER:
+Neither would I.
 
- (*) The compiler is within its rights to reorder loads and stores
-     to the same variable, and in some cases, the CPU is within its
-     rights to reorder loads to the same variable.  This means that
-     the following code:
+Paolo
 
-        a[0] = x;
-        a[1] = x;
-
-     Might result in an older value of x stored in a[1] than in a[0].
-
-It also says READ_ONCE puts things in program order, but we don't use
-READ_ONCE inside pud_offset(), so it doesn't help us.
-
-Best answer is to code things so there is exactly one dereference of
-the pointer protected by READ_ONCE. Very clear to read, very safe.
-
-Maybe Longpeng can rework the patch around these principles?
-
-Also I wonder if the READ_ONCE(*pmdp) is OK. gup_pmd_range() uses it,
-but I can't explain why it shouldn't be pmd_read_atomic().
-
-> > In the case where p4 goes from !present -> present (ie
-> > handle_mm_fault()):
-> > 
-> > p4d_for_vaddr == p4d_none, and p4d_present(*p4d) == true, meaning the
-> > p4d_page_vaddr() will crash.
-> > 
-> > Basically the problem here is not just missing READ_ONCE, but that the
-> > p4d is read multiple times at all. It should be written like gup_fast
-> > does, to guarantee a single CPU read of the unstable data:
-> > 
-> >   p4d = READ_ONCE(*p4d_offset(pgdp, addr));
-> >   if (!p4d_present(p4))
-> >       return NULL;
-> >   pud = pud_offset(&p4d, addr);
-> > 
-> > At least this is what I've been able to figure out :\
-> 
-> In that case, I believe there are a bunch of similar routines with this issue.
-
-Yes, my look around page walk related users makes me come to a similar
-worry.
-
-Fortunately, I think this is largely theoretical as most likely the
-compiler will generate a single store for these coding patterns. 
-
-That said, there have been bugs in the past, see commit 26c191788f18
-("mm: pmd_read_atomic: fix 32bit PAE pmd walk vs pmd_populate SMP race
-condition") which is significantly related to the compiler lifting a
-load inside pte_offset to before the required 'if (pmd_*)' checks.
-
-> For this patch, I was primarily interested in seeing the obvious
-> multiple dereferences in C fixed up.  This is above and beyond that!
-> :)
-
-Well, I think it is worth solving the underlying problem
-properly. Otherwise we get weird solutions to data races like
-pmd_trans_unstable()...
-
-Jason
