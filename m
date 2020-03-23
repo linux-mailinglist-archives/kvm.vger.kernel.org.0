@@ -2,193 +2,189 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9FB6A18ED9B
-	for <lists+kvm@lfdr.de>; Mon, 23 Mar 2020 02:20:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4CD0B18EDD2
+	for <lists+kvm@lfdr.de>; Mon, 23 Mar 2020 03:03:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726946AbgCWBUT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 22 Mar 2020 21:20:19 -0400
-Received: from mga11.intel.com ([192.55.52.93]:40359 "EHLO mga11.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726916AbgCWBUT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 22 Mar 2020 21:20:19 -0400
-IronPort-SDR: NWVb3ricZQvujPRpAv5kQ64aWisAl/HZVy+iF7a7DstmDndFaKf+KEK/1w0HN1NQBrRVQ/vDim
- pBGTGlZQIcVA==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Mar 2020 18:20:18 -0700
-IronPort-SDR: C5W7DBlsZsmDNqxgn5kUVm+1enbfNIRY8NRiPmEjm6642kzxEs7IMjEmjO07Q/Q60ryxsAo7sW
- bQz/T9f6PUNg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.72,294,1580803200"; 
-   d="scan'208";a="392752188"
-Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040) ([10.239.13.16])
-  by orsmga004.jf.intel.com with ESMTP; 22 Mar 2020 18:20:11 -0700
-Date:   Sun, 22 Mar 2020 21:10:41 -0400
-From:   Yan Zhao <yan.y.zhao@intel.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     Kirti Wankhede <kwankhede@nvidia.com>,
-        "cjia@nvidia.com" <cjia@nvidia.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "Yang, Ziye" <ziye.yang@intel.com>,
-        "Liu, Changpeng" <changpeng.liu@intel.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>,
-        "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
-        "eskultet@redhat.com" <eskultet@redhat.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "dgilbert@redhat.com" <dgilbert@redhat.com>,
-        "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>,
-        "eauger@redhat.com" <eauger@redhat.com>,
-        "aik@ozlabs.ru" <aik@ozlabs.ru>,
-        "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
-        "felipe@nutanix.com" <felipe@nutanix.com>,
-        "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@Alibaba-inc.com>,
-        "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
-        "Ken.Xue@amd.com" <Ken.Xue@amd.com>,
-        "Wang, Zhi A" <zhi.a.wang@intel.com>,
-        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: Re: [PATCH v14 Kernel 5/7] vfio iommu: Update UNMAP_DMA ioctl to get
- dirty bitmap before unmap
-Message-ID: <20200323011041.GB5456@joy-OptiPlex-7040>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-References: <1584560474-19946-1-git-send-email-kwankhede@nvidia.com>
- <1584560474-19946-6-git-send-email-kwankhede@nvidia.com>
- <20200320083529.GA5456@joy-OptiPlex-7040>
- <20200320094039.4d99408d@w520.home>
- <20200320094727.12aba30e@w520.home>
- <aa76ad96-394f-f1fb-2e8d-a453bd69a39b@nvidia.com>
- <20200320132821.2fe80c29@w520.home>
+        id S1727031AbgCWCDs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 22 Mar 2020 22:03:48 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:37584 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726979AbgCWCDs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 22 Mar 2020 22:03:48 -0400
+Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.59])
+        by Forcepoint Email with ESMTP id 968B961BB91CCDCFEC8E;
+        Mon, 23 Mar 2020 10:03:39 +0800 (CST)
+Received: from [10.173.228.124] (10.173.228.124) by smtp.huawei.com
+ (10.3.19.213) with Microsoft SMTP Server (TLS) id 14.3.487.0; Mon, 23 Mar
+ 2020 10:03:33 +0800
+Subject: Re: [PATCH v2] mm/hugetlb: fix a addressing exception caused by
+ huge_pte_offset()
+To:     Mike Kravetz <mike.kravetz@oracle.com>
+CC:     <akpm@linux-foundation.org>, <kirill.shutemov@linux.intel.com>,
+        <linux-kernel@vger.kernel.org>, <arei.gonglei@huawei.com>,
+        <weidong.huang@huawei.com>, <weifuqiang@huawei.com>,
+        <kvm@vger.kernel.org>, <linux-mm@kvack.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        "Sean Christopherson" <sean.j.christopherson@intel.com>,
+        <stable@vger.kernel.org>
+References: <1582342427-230392-1-git-send-email-longpeng2@huawei.com>
+ <51a25d55-de49-4c0a-c994-bf1a8cfc8638@oracle.com>
+From:   "Longpeng (Mike, Cloud Infrastructure Service Product Dept.)" 
+        <longpeng2@huawei.com>
+Message-ID: <5700f44e-9df9-1b12-bc29-68e0463c2860@huawei.com>
+Date:   Mon, 23 Mar 2020 10:03:33 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200320132821.2fe80c29@w520.home>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+In-Reply-To: <51a25d55-de49-4c0a-c994-bf1a8cfc8638@oracle.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.173.228.124]
+X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Mar 21, 2020 at 03:28:21AM +0800, Alex Williamson wrote:
-> On Sat, 21 Mar 2020 00:44:32 +0530
-> Kirti Wankhede <kwankhede@nvidia.com> wrote:
-> 
-> > On 3/20/2020 9:17 PM, Alex Williamson wrote:
-> > > On Fri, 20 Mar 2020 09:40:39 -0600
-> > > Alex Williamson <alex.williamson@redhat.com> wrote:
-> > >   
-> > >> On Fri, 20 Mar 2020 04:35:29 -0400
-> > >> Yan Zhao <yan.y.zhao@intel.com> wrote:
-> > >>  
-> > >>> On Thu, Mar 19, 2020 at 03:41:12AM +0800, Kirti Wankhede wrote:  
-> > >>>> DMA mapped pages, including those pinned by mdev vendor drivers, might
-> > >>>> get unpinned and unmapped while migration is active and device is still
-> > >>>> running. For example, in pre-copy phase while guest driver could access
-> > >>>> those pages, host device or vendor driver can dirty these mapped pages.
-> > >>>> Such pages should be marked dirty so as to maintain memory consistency
-> > >>>> for a user making use of dirty page tracking.
-> > >>>>
-> > >>>> To get bitmap during unmap, user should set flag
-> > >>>> VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP, bitmap memory should be allocated and
-> > >>>> zeroed by user space application. Bitmap size and page size should be set
-> > >>>> by user application.
-> > >>>>
-> > >>>> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-> > >>>> Reviewed-by: Neo Jia <cjia@nvidia.com>
-> > >>>> ---
-> > >>>>   drivers/vfio/vfio_iommu_type1.c | 55 ++++++++++++++++++++++++++++++++++++++---
-> > >>>>   include/uapi/linux/vfio.h       | 11 +++++++++
-> > >>>>   2 files changed, 62 insertions(+), 4 deletions(-)
-> > >>>>
-> > >>>> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> > >>>> index d6417fb02174..aa1ac30f7854 100644
-> > >>>> --- a/drivers/vfio/vfio_iommu_type1.c
-> > >>>> +++ b/drivers/vfio/vfio_iommu_type1.c
-> > >>>> @@ -939,7 +939,8 @@ static int verify_bitmap_size(uint64_t npages, uint64_t bitmap_size)
-> > >>>>   }
-> > >>>>   
-> > >>>>   static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
-> > >>>> -			     struct vfio_iommu_type1_dma_unmap *unmap)
-> > >>>> +			     struct vfio_iommu_type1_dma_unmap *unmap,
-> > >>>> +			     struct vfio_bitmap *bitmap)
-> > >>>>   {
-> > >>>>   	uint64_t mask;
-> > >>>>   	struct vfio_dma *dma, *dma_last = NULL;
-> > >>>> @@ -990,6 +991,10 @@ static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
-> > >>>>   	 * will be returned if these conditions are not met.  The v2 interface
-> > >>>>   	 * will only return success and a size of zero if there were no
-> > >>>>   	 * mappings within the range.
-> > >>>> +	 *
-> > >>>> +	 * When VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP flag is set, unmap request
-> > >>>> +	 * must be for single mapping. Multiple mappings with this flag set is
-> > >>>> +	 * not supported.
-> > >>>>   	 */
-> > >>>>   	if (iommu->v2) {
-> > >>>>   		dma = vfio_find_dma(iommu, unmap->iova, 1);
-> > >>>> @@ -997,6 +1002,13 @@ static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
-> > >>>>   			ret = -EINVAL;
-> > >>>>   			goto unlock;
-> > >>>>   		}
-> > >>>> +
-> > >>>> +		if ((unmap->flags & VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP) &&
-> > >>>> +		    (dma->iova != unmap->iova || dma->size != unmap->size)) {  
-> > >>> dma is probably NULL here!  
-> > >>
-> > >> Yep, I didn't look closely enough there.  This is situated right
-> > >> between the check to make sure we're not bisecting a mapping at the
-> > >> start of the unmap and the check to make sure we're not bisecting a
-> > >> mapping at the end of the unmap.  There's no guarantee that we have a
-> > >> valid pointer here.  The test should be in the while() loop below this
-> > >> code.  
-> > > 
-> > > Actually the test could remain here, we can exit here if we can't find
-> > > a dma at the start of the unmap range with the GET_DIRTY_BITMAP flag,
-> > > but we absolutely cannot deref dma without testing it.
-> > >   
-> > 
-> > In the check above newly added check, if dma is NULL then its an error 
-> > condition, because Unmap requests must fully cover previous mappings, right?
-> 
-> Yes, but we'll do a null pointer deref before we return error.
->  
-> > >>> And this restriction on UNMAP would make some UNMAP operations of vIOMMU
-> > >>> fail.
-> > >>>
-> > >>> e.g. below condition indeed happens in reality.
-> > >>> an UNMAP ioctl comes for IOVA range from 0xff800000, of size 0x200000
-> > >>> However, IOVAs in this range are mapped page by page.i.e., dma->size is 0x1000.
-> > >>>
-> > >>> Previous, this UNMAP ioctl could unmap successfully as a whole.  
-> > >>
-> > >> What triggers this in the guest?  Note that it's only when using the
-> > >> GET_DIRTY_BITMAP flag that this is restricted.  Does the event you're
-> > >> referring to potentially occur under normal circumstances in that mode?
-> > >> Thanks,
-> > >>  
 
-it happens in vIOMMU Domain level invalidation of IOTLB
-(domain-selective invalidation, see vtd_iotlb_domain_invalidate() in qemu).
-common in VTD lazy mode, and NOT just happening once at boot time.
-rather than invalidate page by page, it batches the page invalidation.
-so, when this invalidation takes place, even higher level page tables
-have been invalid and therefore it has to invalidate a bigger combined range.
-That's why we see IOVAs are mapped in 4k pages, but are unmapped in 2M
-pages.
 
-I think those UNMAPs should also have GET_DIRTY_BIMTAP flag on, right?
-> > 
-> > Such unmap would callback vfio_iommu_map_notify() in QEMU. In 
-> > vfio_iommu_map_notify(), unmap is called on same range <iova, 
-> > iotlb->addr_mask + 1> which was used for map. Secondly unmap with bitmap 
-> > will be called only when device state has _SAVING flag set.
+On 2020/3/22 7:38, Mike Kravetz wrote:
+> On 2/21/20 7:33 PM, Longpeng(Mike) wrote:
+>> From: Longpeng <longpeng2@huawei.com>
+>>
+>> Our machine encountered a panic(addressing exception) after run
+>> for a long time and the calltrace is:
+>> RIP: 0010:[<ffffffff9dff0587>]  [<ffffffff9dff0587>] hugetlb_fault+0x307/0xbe0
+>> RSP: 0018:ffff9567fc27f808  EFLAGS: 00010286
+>> RAX: e800c03ff1258d48 RBX: ffffd3bb003b69c0 RCX: e800c03ff1258d48
+>> RDX: 17ff3fc00eda72b7 RSI: 00003ffffffff000 RDI: e800c03ff1258d48
+>> RBP: ffff9567fc27f8c8 R08: e800c03ff1258d48 R09: 0000000000000080
+>> R10: ffffaba0704c22a8 R11: 0000000000000001 R12: ffff95c87b4b60d8
+>> R13: 00005fff00000000 R14: 0000000000000000 R15: ffff9567face8074
+>> FS:  00007fe2d9ffb700(0000) GS:ffff956900e40000(0000) knlGS:0000000000000000
+>> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+>> CR2: ffffd3bb003b69c0 CR3: 000000be67374000 CR4: 00000000003627e0
+>> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+>> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+>> Call Trace:
+>>  [<ffffffff9df9b71b>] ? unlock_page+0x2b/0x30
+>>  [<ffffffff9dff04a2>] ? hugetlb_fault+0x222/0xbe0
+>>  [<ffffffff9dff1405>] follow_hugetlb_page+0x175/0x540
+>>  [<ffffffff9e15b825>] ? cpumask_next_and+0x35/0x50
+>>  [<ffffffff9dfc7230>] __get_user_pages+0x2a0/0x7e0
+>>  [<ffffffff9dfc648d>] __get_user_pages_unlocked+0x15d/0x210
+>>  [<ffffffffc068cfc5>] __gfn_to_pfn_memslot+0x3c5/0x460 [kvm]
+>>  [<ffffffffc06b28be>] try_async_pf+0x6e/0x2a0 [kvm]
+>>  [<ffffffffc06b4b41>] tdp_page_fault+0x151/0x2d0 [kvm]
+>>  [<ffffffffc075731c>] ? vmx_vcpu_run+0x2ec/0xc80 [kvm_intel]
+>>  [<ffffffffc0757328>] ? vmx_vcpu_run+0x2f8/0xc80 [kvm_intel]
+>>  [<ffffffffc06abc11>] kvm_mmu_page_fault+0x31/0x140 [kvm]
+>>  [<ffffffffc074d1ae>] handle_ept_violation+0x9e/0x170 [kvm_intel]
+>>  [<ffffffffc075579c>] vmx_handle_exit+0x2bc/0xc70 [kvm_intel]
+>>  [<ffffffffc074f1a0>] ? __vmx_complete_interrupts.part.73+0x80/0xd0 [kvm_intel]
+>>  [<ffffffffc07574c0>] ? vmx_vcpu_run+0x490/0xc80 [kvm_intel]
+>>  [<ffffffffc069f3be>] vcpu_enter_guest+0x7be/0x13a0 [kvm]
+>>  [<ffffffffc06cf53e>] ? kvm_check_async_pf_completion+0x8e/0xb0 [kvm]
+>>  [<ffffffffc06a6f90>] kvm_arch_vcpu_ioctl_run+0x330/0x490 [kvm]
+>>  [<ffffffffc068d919>] kvm_vcpu_ioctl+0x309/0x6d0 [kvm]
+>>  [<ffffffff9deaa8c2>] ? dequeue_signal+0x32/0x180
+>>  [<ffffffff9deae34d>] ? do_sigtimedwait+0xcd/0x230
+>>  [<ffffffff9e03aed0>] do_vfs_ioctl+0x3f0/0x540
+>>  [<ffffffff9e03b0c1>] SyS_ioctl+0xa1/0xc0
+>>  [<ffffffff9e53879b>] system_call_fastpath+0x22/0x27
+>>
+>> ( The kernel we used is older, but we think the latest kernel also has this
+>>   bug after dig into this problem. )
+>>
+>> For 1G hugepages, huge_pte_offset() wants to return NULL or pudp, but it
+>> may return a wrong 'pmdp' if there is a race. Please look at the following
+>> code snippet:
+>>     ...
+>>     pud = pud_offset(p4d, addr);
+>>     if (sz != PUD_SIZE && pud_none(*pud))
+>>         return NULL;
+>>     /* hugepage or swap? */
+>>     if (pud_huge(*pud) || !pud_present(*pud))
+>>         return (pte_t *)pud;
+>>
+>>     pmd = pmd_offset(pud, addr);
+>>     if (sz != PMD_SIZE && pmd_none(*pmd))
+>>         return NULL;
+>>     /* hugepage or swap? */
+>>     if (pmd_huge(*pmd) || !pmd_present(*pmd))
+>>         return (pte_t *)pmd;
+>>     ...
+>>
+>> The following sequence would trigger this bug:
+>> 1. CPU0: sz = PUD_SIZE and *pud = 0 , continue
+>> 1. CPU0: "pud_huge(*pud)" is false
+>> 2. CPU1: calling hugetlb_no_page and set *pud to xxxx8e7(PRESENT)
+>> 3. CPU0: "!pud_present(*pud)" is false, continue
+>> 4. CPU0: pmd = pmd_offset(pud, addr) and maybe return a wrong pmdp
+>> However, we want CPU0 to return NULL or pudp.
+>>
+>> We can avoid this race by read the pud only once. What's more, we also use
+>> READ_ONCE to access the entries for safe(e.g. avoid the compilier mischief)
+>>
+>> Cc: Matthew Wilcox <willy@infradead.org>
+>> Cc: Sean Christopherson <sean.j.christopherson@intel.com>
+>> Cc: Mike Kravetz <mike.kravetz@oracle.com>
+>> Cc: stable@vger.kernel.org
+>> Signed-off-by: Longpeng <longpeng2@huawei.com>
 > 
-in this case, iotlb->addr_mask in unmap is 0x200000 -1.
-different than 0x1000 -1 used for map.
-> It might be helpful for Yan, and everyone else, to see the latest QEMU
-> patch series.  Thanks,
->
-yes, please. also curious of log_sync part for vIOMMU. given most IOVAs in
-address space are unmapped and therefore no IOTLBs are able to be found.
+> Andrew dropped this patch from his tree which caused me to go back and
+> look at the status of this patch/issue.
+> 
+> It is pretty obvious that code in the current huge_pte_offset routine
+> is racy.  I checked out the assembly code produced by my compiler and
+> verified that the line,
+> 
+> 	if (pud_huge(*pud) || !pud_present(*pud))
+> 
+> does actually dereference *pud twice.  So, the value could change between
+> those two dereferences.   Longpeng (Mike) could easlily recreate the issue
+> if he put a delay between the two dereferences.  I believe the only
+> reservations/concerns about the patch below was the use of READ_ONCE().
+> Is that correct?
+> 
+Hi Mike,
 
-Thanks
-Yan
+It seems I've missed your another mail in my client, I found it here
+(https://lkml.org/lkml/2020/2/27/1927) just now.
+
+I think we have reached an agreement that the pud/pmd need READ_ONCE in
+huge_pte_offset() and disagreement is whether the pgd/p4d also need READ_ONCE,
+right ?
+
+> Are there any objections to the patch if the READ_ONCE() calls are removed?
+> 
+Because the pgd/p4g are only accessed and dereferenced once here, so some guys
+want to remove it.
+
+But we must make sure they are *really* accessed once, in other words, this
+makes we need to care about both the implementation of pgd_present/p4d_present
+and the behavior of any compiler, for example:
+
+'''
+static inline int func(int val)
+{
+    return subfunc1(val) & subfunc2(val);
+}
+
+func(*p); // int *p
+'''
+We must make sure there's no strange compiler to generate an assemble code that
+access and dereference 'p' more than once.
+
+I've not found any backwards with READ_ONCE here. However, if you also agree to
+remove READ_ONCE around pgd/p4d, I'll do.
+
+> Longpeng (Mike), can you recreate the issue by adding the delay and removing
+> the READ_ONCE() calls?
+> 
+I think remove the READ_ONCE around pgd/p4d won't cause any fucntional change.
+
+---
+Regards,
+Longpeng(Mike)
