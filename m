@@ -2,168 +2,263 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A23F519030F
-	for <lists+kvm@lfdr.de>; Tue, 24 Mar 2020 01:48:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 38AD719031A
+	for <lists+kvm@lfdr.de>; Tue, 24 Mar 2020 01:55:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727036AbgCXAr6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Mar 2020 20:47:58 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:33328 "EHLO
-        us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726986AbgCXAr6 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 23 Mar 2020 20:47:58 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1585010876;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=rl+mfoH6kKdfgtm7U9jABfG0W/KFJbp5iUypKMc+8BA=;
-        b=KD8IVJgrKezx2xPzOoD8LzLkgDnQTK9HfVJJeTq7e9VsDuKuGcS5bCpw6qXOf/9GrdIM0N
-        of1vwmDAUQ3owgnbIzT05mRiGuhGc04j4KofjFSs2tasH1T4uMpbxundPDJp2nPrN8hyUS
-        IjPiSmFDFIEvrq7J3UuPHPaYOrXwezU=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-290-ElHMXut5Nti8KmnTFRs_SA-1; Mon, 23 Mar 2020 20:47:55 -0400
-X-MC-Unique: ElHMXut5Nti8KmnTFRs_SA-1
-Received: by mail-wr1-f71.google.com with SMTP id w12so1731178wrl.23
-        for <kvm@vger.kernel.org>; Mon, 23 Mar 2020 17:47:55 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=rl+mfoH6kKdfgtm7U9jABfG0W/KFJbp5iUypKMc+8BA=;
-        b=gdV76mAuPbFBW6nbwxKNYwFvBMNhlAMXo82r9XFO+LZs/dR+/aCjk/LWSPtCIxpIAh
-         hvyDAFS0RZiGAB0U6rHTY3KFi/NFn9PokrNPGGl4M4aJCzbqEI3cVJ5zUo8g8adNT9E/
-         cMDhNbf2aisCKsXNo5ASeplwXf+6F+naIv1HhXTo9Pi072ISe19wD/eZ3mhLET5nJRwB
-         FtHN7wUj+2X6aJcJpYYPo7Rljxoayn0qENB1dPvd7IRyWqX0EPujCp521tfDZI9+mgC+
-         85GO9JG3MkttMpnHGZ4botO+T6y9W/m6+AO8JKukjWWuXmnyMNqGs9b/5r2SFNGVHUJZ
-         OJTg==
-X-Gm-Message-State: ANhLgQ0I5EXTN0pZqSs4VaDoMhgzBc4KhkKcDwljnfmMq4zUpjeKUsog
-        Wp8+3F95CvstxsfH/0fdz7KBxT9BLideVnijbjV6vDDxm510cnkFVvMaANcNtQa1HI3mNg+n/i6
-        c20JcpFZxmVyr
-X-Received: by 2002:a1c:648b:: with SMTP id y133mr2123668wmb.173.1585010873977;
-        Mon, 23 Mar 2020 17:47:53 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vvX2iebmj1yEz+8fw55gpX59C/DxKKYCVUHxVRdmbbxEtTsRf+QwDxmDZ7QlKxFkIPN89pjvw==
-X-Received: by 2002:a1c:648b:: with SMTP id y133mr2123643wmb.173.1585010873527;
-        Mon, 23 Mar 2020 17:47:53 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:7848:99b4:482a:e888? ([2001:b07:6468:f312:7848:99b4:482a:e888])
-        by smtp.gmail.com with ESMTPSA id z6sm24638859wrp.95.2020.03.23.17.47.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 23 Mar 2020 17:47:52 -0700 (PDT)
-Subject: Re: [PATCH v3 06/37] KVM: x86: Consolidate logic for injecting page
- faults to L1
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Ben Gardon <bgardon@google.com>,
-        Junaid Shahid <junaids@google.com>,
-        Liran Alon <liran.alon@oracle.com>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        John Haxby <john.haxby@oracle.com>,
-        Miaohe Lin <linmiaohe@huawei.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>
-References: <20200320212833.3507-1-sean.j.christopherson@intel.com>
- <20200320212833.3507-7-sean.j.christopherson@intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <5225c99c-8231-ae7a-62d3-f461749da7d0@redhat.com>
-Date:   Tue, 24 Mar 2020 01:47:49 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+        id S1727104AbgCXAzt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Mar 2020 20:55:49 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:51929 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727030AbgCXAzs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 Mar 2020 20:55:48 -0400
+Received: by ozlabs.org (Postfix, from userid 1003)
+        id 48mXqP38C5z9sQt; Tue, 24 Mar 2020 11:55:45 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
+        t=1585011345; bh=orGAd6AY4uP0sBwXn2BYvY+3dd++PXcSgm0Dyj3lsJo=;
+        h=Date:From:To:Cc:Subject:From;
+        b=BWY6fHO8gP8t5apiErS8ghU7MI+IBGHy+OyBTlqaoABB/0jifktVge1epVsYNG7Ef
+         sqJd9AkCs7yNBS4pea3ymYyAtESkr19B4zIutJKOGKdED+xWtMBCDLaHjuhyDqWrvm
+         R+VS2FmYbUJqCDmYtP2bGKu0igZwPKKYgqZ8nrvBaVoaxg580sxPGuaW3vXMLsYLjA
+         hP58yvm92pbXpMXL1EGMSckVgO5b0QVuo/rYq3vEul/nPyhk/a67s8RjvDd8BmOBH3
+         eIyabyCDV6BbKnZTSSeOFcXJWOsD5KG5ozBkLMuEMtkzq2xODAOpwqMzW7IEu3XSD9
+         y/Xu6X+7jwPUQ==
+Date:   Tue, 24 Mar 2020 11:55:39 +1100
+From:   Paul Mackerras <paulus@ozlabs.org>
+To:     kvm@vger.kernel.org
+Cc:     kvm-ppc@vger.kernel.org,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Ram Pai <linuxram@us.ibm.com>
+Subject: [PATCH v2] KVM: PPC: Book3S HV: Add a capability for enabling secure
+ guests
+Message-ID: <20200324005539.GB5604@blackberry>
 MIME-Version: 1.0
-In-Reply-To: <20200320212833.3507-7-sean.j.christopherson@intel.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 20/03/20 22:28, Sean Christopherson wrote:
-> +void kvm_inject_l1_page_fault(struct kvm_vcpu *vcpu,
-> +			      struct x86_exception *fault)
-> +{
-> +	vcpu->arch.mmu->inject_page_fault(vcpu, fault);
-> +}
-> +
->  bool kvm_inject_emulated_page_fault(struct kvm_vcpu *vcpu,
->  				    struct x86_exception *fault)
->  {
-> @@ -619,7 +625,7 @@ bool kvm_inject_emulated_page_fault(struct kvm_vcpu *vcpu,
->  	if (mmu_is_nested(vcpu) && !fault->nested_page_fault)
->  		vcpu->arch.nested_mmu.inject_page_fault(vcpu, fault);
->  	else
-> -		vcpu->arch.mmu->inject_page_fault(vcpu, fault);
-> +		kvm_inject_l1_page_fault(vcpu, fault);
->  
->  	return fault->nested_page_fault;
+At present, on Power systems with Protected Execution Facility
+hardware and an ultravisor, a KVM guest can transition to being a
+secure guest at will.  Userspace (QEMU) has no way of knowing
+whether a host system is capable of running secure guests.  This
+will present a problem in future when the ultravisor is capable of
+migrating secure guests from one host to another, because
+virtualization management software will have no way to ensure that
+secure guests only run in domains where all of the hosts can
+support secure guests.
 
-This all started with "I don't like the name of the function" but
-thinking more about it, we can also write this as
+This adds a VM capability which has two functions: (a) userspace
+can query it to find out whether the host can support secure guests,
+and (b) userspace can enable it for a guest, which allows that
+guest to become a secure guest.  If userspace does not enable it,
+KVM will return an error when the ultravisor does the hypercall
+that indicates that the guest is starting to transition to a
+secure guest.  The ultravisor will then abort the transition and
+the guest will terminate.
 
-	if (mmu_is_nested(vcpu) && !fault->nested_page_fault)
-		vcpu->arch.walk_mmu->inject_page_fault(vcpu, fault);
-	else
-		vcpu->arch.mmu->inject_page_fault(vcpu, fault);
+Signed-off-by: Paul Mackerras <paulus@ozlabs.org>
+---
+v2: Test that KVM uvmem code has initialized successfully as a
+condition of reporting that we support secure guests.
 
-Now, if !mmu_is_nested(vcpu) then walk_mmu == mmu, so it's much simpler
-up until this patch:
+ Documentation/virt/kvm/api.rst              | 17 +++++++++++++++++
+ arch/powerpc/include/asm/kvm_book3s_uvmem.h |  6 ++++++
+ arch/powerpc/include/asm/kvm_host.h         |  1 +
+ arch/powerpc/include/asm/kvm_ppc.h          |  1 +
+ arch/powerpc/kvm/book3s_hv.c                | 16 ++++++++++++++++
+ arch/powerpc/kvm/book3s_hv_uvmem.c          | 13 +++++++++++++
+ arch/powerpc/kvm/powerpc.c                  | 14 ++++++++++++++
+ include/uapi/linux/kvm.h                    |  1 +
+ 8 files changed, 69 insertions(+)
 
-	fault_mmu = fault->nested_page_fault ? vcpu->arch.mmu : vcpu->arch.walk_mmu;
-	fault_mmu->inject_page_fault(vcpu, fault);
-
-(which also matches how fault->nested_page_fault is assigned to).
-In patch 7 we add the invalidation in kvm_inject_l1_page_fault, but
-is it necessary to do it only in the else?
-
-+	if (!vcpu->arch.mmu->direct_map &&
-+	    (fault->error_code & PFERR_PRESENT_MASK))
-+		vcpu->arch.mmu->invlpg(vcpu, fault->address,
-+				       vcpu->arch.mmu->root_hpa);
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index 158d118..a925500 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -5779,6 +5779,23 @@ it hard or impossible to use it correctly.  The availability of
+ KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2 signals that those bugs are fixed.
+ Userspace should not try to use KVM_CAP_MANUAL_DIRTY_LOG_PROTECT.
+ 
++7.19 KVM_CAP_PPC_SECURE_GUEST
++------------------------------
 +
- 	vcpu->arch.mmu->inject_page_fault(vcpu, fault);
++:Architectures: ppc
++
++This capability indicates that KVM is running on a host that has
++ultravisor firmware and thus can support a secure guest.  On such a
++system, a guest can ask the ultravisor to make it a secure guest,
++one whose memory is inaccessible to the host except for pages which
++are explicitly requested to be shared with the host.  The ultravisor
++notifies KVM when a guest requests to become a secure guest, and KVM
++has the opportunity to veto the transition.
++
++If present, this capability can be enabled for a VM, meaning that KVM
++will allow the transition to secure guest mode.  Otherwise KVM will
++veto the transition.
++
+ 8. Other capabilities.
+ ======================
+ 
+diff --git a/arch/powerpc/include/asm/kvm_book3s_uvmem.h b/arch/powerpc/include/asm/kvm_book3s_uvmem.h
+index 5a9834e..9cb7d8b 100644
+--- a/arch/powerpc/include/asm/kvm_book3s_uvmem.h
++++ b/arch/powerpc/include/asm/kvm_book3s_uvmem.h
+@@ -5,6 +5,7 @@
+ #ifdef CONFIG_PPC_UV
+ int kvmppc_uvmem_init(void);
+ void kvmppc_uvmem_free(void);
++bool kvmppc_uvmem_available(void);
+ int kvmppc_uvmem_slot_init(struct kvm *kvm, const struct kvm_memory_slot *slot);
+ void kvmppc_uvmem_slot_free(struct kvm *kvm,
+ 			    const struct kvm_memory_slot *slot);
+@@ -30,6 +31,11 @@ static inline int kvmppc_uvmem_init(void)
+ 
+ static inline void kvmppc_uvmem_free(void) { }
+ 
++static inline bool kvmppc_uvmem_available(void)
++{
++	return false;
++}
++
+ static inline int
+ kvmppc_uvmem_slot_init(struct kvm *kvm, const struct kvm_memory_slot *slot)
+ {
+diff --git a/arch/powerpc/include/asm/kvm_host.h b/arch/powerpc/include/asm/kvm_host.h
+index 6e8b8ff..f99b433 100644
+--- a/arch/powerpc/include/asm/kvm_host.h
++++ b/arch/powerpc/include/asm/kvm_host.h
+@@ -303,6 +303,7 @@ struct kvm_arch {
+ 	u8 radix;
+ 	u8 fwnmi_enabled;
+ 	u8 secure_guest;
++	u8 svm_enabled;
+ 	bool threads_indep;
+ 	bool nested_enable;
+ 	pgd_t *pgtable;
+diff --git a/arch/powerpc/include/asm/kvm_ppc.h b/arch/powerpc/include/asm/kvm_ppc.h
+index e716862..94f5a32 100644
+--- a/arch/powerpc/include/asm/kvm_ppc.h
++++ b/arch/powerpc/include/asm/kvm_ppc.h
+@@ -313,6 +313,7 @@ struct kvmppc_ops {
+ 			       int size);
+ 	int (*store_to_eaddr)(struct kvm_vcpu *vcpu, ulong *eaddr, void *ptr,
+ 			      int size);
++	int (*enable_svm)(struct kvm *kvm);
+ 	int (*svm_off)(struct kvm *kvm);
+ };
+ 
+diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
+index 85e75b1..8b8e1ed 100644
+--- a/arch/powerpc/kvm/book3s_hv.c
++++ b/arch/powerpc/kvm/book3s_hv.c
+@@ -5419,6 +5419,21 @@ static void unpin_vpa_reset(struct kvm *kvm, struct kvmppc_vpa *vpa)
  }
  
-The direct_map check is really just an optimization to avoid a
-retpoline if ->invlpg is nonpaging_invlpg.  We can change it to
-!vcpu->arch.mmu->invlpg if nonpaging_invlpg is replaced with NULL,
-and then the same "if" condition can also be used for the nested_mmu
-i.e. what patch 7 writes as
-
-+		/*
-+		 * No need to sync SPTEs, the fault is being injected into L2,
-+		 * whose page tables are not being shadowed.
-+		 */
- 		vcpu->arch.nested_mmu.inject_page_fault(vcpu, fault);
-
-
-Finally, patch 7 also adds a tlb_flush_gva call which is already present
-in kvm_mmu_invlpg, and this brings the final form to look like this:
-
-bool kvm_inject_emulated_page_fault(struct kvm_vcpu *vcpu,
-                                    struct x86_exception *fault)
-{
-        struct kvm_mmu *fault_mmu;
-        WARN_ON_ONCE(fault->vector != PF_VECTOR);
-
-        fault_mmu = fault->nested_page_fault ? vcpu->arch.mmu : vcpu->arch.walk_mmu;
-
-        /*
-         * Invalidate the TLB entry for the faulting address, if it exists,
-         * else the access will fault indefinitely (and to emulate hardware).
-         */
-        if (fault->error_code & PFERR_PRESENT_MASK)
-                __kvm_mmu_invlpg(vcpu, fault_mmu, fault->address);
-
-        fault_mmu->inject_page_fault(vcpu, fault);
-        return fault->nested_page_fault;
-}
-
-This will become a formal mini-series replacing patches 6 and 7
-after I test it, so no need to do anything on your part.
-
-Paolo
+ /*
++ * Enable a guest to become a secure VM, or test whether
++ * that could be enabled.
++ * Called when the KVM_CAP_PPC_SECURE_GUEST capability is
++ * tested (kvm == NULL) or enabled (kvm != NULL).
++ */
++static int kvmhv_enable_svm(struct kvm *kvm)
++{
++	if (!kvmppc_uvmem_available())
++		return -EINVAL;
++	if (kvm)
++		kvm->arch.svm_enabled = 1;
++	return 0;
++}
++
++/*
+  *  IOCTL handler to turn off secure mode of guest
+  *
+  * - Release all device pages
+@@ -5538,6 +5553,7 @@ static struct kvmppc_ops kvm_ops_hv = {
+ 	.enable_nested = kvmhv_enable_nested,
+ 	.load_from_eaddr = kvmhv_load_from_eaddr,
+ 	.store_to_eaddr = kvmhv_store_to_eaddr,
++	.enable_svm = kvmhv_enable_svm,
+ 	.svm_off = kvmhv_svm_off,
+ };
+ 
+diff --git a/arch/powerpc/kvm/book3s_hv_uvmem.c b/arch/powerpc/kvm/book3s_hv_uvmem.c
+index 79b1202..da454e2 100644
+--- a/arch/powerpc/kvm/book3s_hv_uvmem.c
++++ b/arch/powerpc/kvm/book3s_hv_uvmem.c
+@@ -113,6 +113,15 @@ struct kvmppc_uvmem_page_pvt {
+ 	bool skip_page_out;
+ };
+ 
++bool kvmppc_uvmem_available(void)
++{
++	/*
++	 * If kvmppc_uvmem_bitmap != NULL, then there is an ultravisor
++	 * and our data structures have been initialized successfully.
++	 */
++	return !!kvmppc_uvmem_bitmap;
++}
++
+ int kvmppc_uvmem_slot_init(struct kvm *kvm, const struct kvm_memory_slot *slot)
+ {
+ 	struct kvmppc_uvmem_slot *p;
+@@ -216,6 +225,10 @@ unsigned long kvmppc_h_svm_init_start(struct kvm *kvm)
+ 	if (!kvm_is_radix(kvm))
+ 		return H_UNSUPPORTED;
+ 
++	/* NAK the transition to secure if not enabled */
++	if (!kvm->arch.svm_enabled)
++		return H_AUTHORITY;
++
+ 	srcu_idx = srcu_read_lock(&kvm->srcu);
+ 	slots = kvm_memslots(kvm);
+ 	kvm_for_each_memslot(memslot, slots) {
+diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
+index e229a81..c48862d 100644
+--- a/arch/powerpc/kvm/powerpc.c
++++ b/arch/powerpc/kvm/powerpc.c
+@@ -669,6 +669,12 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 		     (hv_enabled && cpu_has_feature(CPU_FTR_P9_TM_HV_ASSIST));
+ 		break;
+ #endif
++#if defined(CONFIG_KVM_BOOK3S_HV_POSSIBLE)
++	case KVM_CAP_PPC_SECURE_GUEST:
++		r = hv_enabled && kvmppc_hv_ops->enable_svm &&
++			!kvmppc_hv_ops->enable_svm(NULL);
++		break;
++#endif
+ 	default:
+ 		r = 0;
+ 		break;
+@@ -2167,6 +2173,14 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+ 		r = kvm->arch.kvm_ops->enable_nested(kvm);
+ 		break;
+ #endif
++#if defined(CONFIG_KVM_BOOK3S_HV_POSSIBLE)
++	case KVM_CAP_PPC_SECURE_GUEST:
++		r = -EINVAL;
++		if (!is_kvmppc_hv_enabled(kvm) || !kvm->arch.kvm_ops->enable_svm)
++			break;
++		r = kvm->arch.kvm_ops->enable_svm(kvm);
++		break;
++#endif
+ 	default:
+ 		r = -EINVAL;
+ 		break;
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index 5e6234c..428c7dd 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -1016,6 +1016,7 @@ struct kvm_ppc_resize_hpt {
+ #define KVM_CAP_ARM_INJECT_EXT_DABT 178
+ #define KVM_CAP_S390_VCPU_RESETS 179
+ #define KVM_CAP_S390_PROTECTED 180
++#define KVM_CAP_PPC_SECURE_GUEST 181
+ 
+ #ifdef KVM_CAP_IRQ_ROUTING
+ 
+-- 
+2.7.4
 
