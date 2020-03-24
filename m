@@ -2,67 +2,76 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C29E819195B
-	for <lists+kvm@lfdr.de>; Tue, 24 Mar 2020 19:43:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A1F78191985
+	for <lists+kvm@lfdr.de>; Tue, 24 Mar 2020 19:55:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727791AbgCXSmr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Mar 2020 14:42:47 -0400
-Received: from Galois.linutronix.de ([193.142.43.55]:45842 "EHLO
-        Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727567AbgCXSmr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 Mar 2020 14:42:47 -0400
-Received: from p5de0bf0b.dip0.t-ipconnect.de ([93.224.191.11] helo=nanos.tec.linutronix.de)
-        by Galois.linutronix.de with esmtpsa (TLS1.2:DHE_RSA_AES_256_CBC_SHA256:256)
-        (Exim 4.80)
-        (envelope-from <tglx@linutronix.de>)
-        id 1jGoVS-0003kz-O8; Tue, 24 Mar 2020 19:42:30 +0100
-Received: by nanos.tec.linutronix.de (Postfix, from userid 1000)
-        id EC729100292; Tue, 24 Mar 2020 19:42:29 +0100 (CET)
-From:   Thomas Gleixner <tglx@linutronix.de>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Xiaoyao Li <xiaoyao.li@intel.com>, Ingo Molnar <mingo@redhat.com>,
-        Borislav Petkov <bp@alien8.de>, hpa@zytor.com,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        x86@kernel.org, linux-kernel@vger.kernel.org,
-        Andy Lutomirski <luto@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Arvind Sankar <nivedita@alum.mit.edu>,
-        Fenghua Yu <fenghua.yu@intel.com>,
-        Tony Luck <tony.luck@intel.com>,
+        id S1727696AbgCXSzs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Mar 2020 14:55:48 -0400
+Received: from mga06.intel.com ([134.134.136.31]:49449 "EHLO mga06.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727543AbgCXSzs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 Mar 2020 14:55:48 -0400
+IronPort-SDR: yJW7tnWVtkH8e3owpxUQYpPY/NeW/PGAedlmyzWE6hKo9ddWPaoNVr5vnogesH3zN/wEVvzsYO
+ xq75IBkFrj0g==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Mar 2020 11:55:47 -0700
+IronPort-SDR: In7cgZMu3NkGD/UCKqQlH4ZNdzJZDxYiul/vchXAotnhR52/UqOtrXim3CmKEPSA7hOZsjlwxA
+ 6fki7FVS2Bmw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.72,301,1580803200"; 
+   d="scan'208";a="326005935"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
+  by orsmga001.jf.intel.com with ESMTP; 24 Mar 2020 11:55:46 -0700
+Date:   Tue, 24 Mar 2020 11:55:46 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Jim Mattson <jmattson@google.com>
+Cc:     Joerg Roedel <joro@8bytes.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>
-Subject: Re: [PATCH v5 3/9] x86/split_lock: Re-define the kernel param option for split_lock_detect
-In-Reply-To: <20200324180207.GD5998@linux.intel.com>
-References: <20200315050517.127446-1-xiaoyao.li@intel.com> <20200315050517.127446-4-xiaoyao.li@intel.com> <87r1xjov3a.fsf@nanos.tec.linutronix.de> <e708f6d2-8f96-903c-0bce-2eeecc4a237d@intel.com> <87r1xidoj1.fsf@nanos.tec.linutronix.de> <20200324180207.GD5998@linux.intel.com>
-Date:   Tue, 24 Mar 2020 19:42:29 +0100
-Message-ID: <87wo79d27e.fsf@nanos.tec.linutronix.de>
+        Wanpeng Li <wanpengli@tencent.com>,
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Ashish Kalra <Ashish.Kalra@amd.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH 0/4] KVM: SVM: Move and split up svm.c
+Message-ID: <20200324185545.GB7798@linux.intel.com>
+References: <20200324094154.32352-1-joro@8bytes.org>
+ <20200324183007.GA7798@linux.intel.com>
+ <CALMp9eRYNH+=Ra=1KSJdT5Ej5kTfdV8J7Rf6JcS9NGbPOYPj8A@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Linutronix-Spam-Score: -1.0
-X-Linutronix-Spam-Level: -
-X-Linutronix-Spam-Status: No , -1.0 points, 5.0 required,  ALL_TRUSTED=-1,SHORTCIRCUIT=-0.0001
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CALMp9eRYNH+=Ra=1KSJdT5Ej5kTfdV8J7Rf6JcS9NGbPOYPj8A@mail.gmail.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sean Christopherson <sean.j.christopherson@intel.com> writes:
-> On Tue, Mar 24, 2020 at 11:40:18AM +0100, Thomas Gleixner wrote:
->> 
->> It's very much about whether the host is split lock clean.
->> 
->> If your host kernel is not, then this wants to be fixed first. If your
->> host application is broken, then either fix it or use "warn".
->
-> The "kvm only" option was my suggestion.  The thought was to provide a way
-> for users to leverage KVM to debug/test kernels without having to have a
-> known good kernel and/or to minimize the risk of crashing their physical
-> system.  E.g. debug a misbehaving driver by assigning its associated device
-> to a guest.
+On Tue, Mar 24, 2020 at 11:42:21AM -0700, Jim Mattson wrote:
+> On Tue, Mar 24, 2020 at 11:30 AM Sean Christopherson
+> <sean.j.christopherson@intel.com> wrote:
+> >
+> > On Tue, Mar 24, 2020 at 10:41:50AM +0100, Joerg Roedel wrote:
+> > > Hi,
+> > >
+> > > here is a patch-set agains kvm/queue which moves svm.c into its own
+> > > subdirectory arch/x86/kvm/svm/ and splits moves parts of it into
+> > > separate source files:
+> >
+> > What are people's thoughts on using "arch/x86/kvm/{amd,intel}" instead of
+> > "arch/x86/kvm/{svm,vmx}"?  Maybe this won't be an issue for AMD/SVM, but on
+> > the Intel/VMX side, there is stuff in the pipeline that makes using "vmx"
+> > for the sub-directory quite awkward.  I wasn't planning on proposing the
+> > rename (from vmx->intel) until I could justify _why_, but perhaps it makes
+> > sense to bundle all the pain of a reorganizing code into a single kernel
+> > version?
+> 
+> Doesn't VIA have some CPUs that implement VMX?
 
-warn is giving you that, right? I won't crash the host because the #AC
-triggers in guest context.
-
-Thanks,
-
-        tglx
+Yes (and this is why I didn't want broach this subject without being able
+to go into details).  On the other hand, the module is kvm_intel...
