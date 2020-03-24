@@ -2,117 +2,78 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 47426191079
-	for <lists+kvm@lfdr.de>; Tue, 24 Mar 2020 14:31:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 21BCC1910E0
+	for <lists+kvm@lfdr.de>; Tue, 24 Mar 2020 14:32:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729597AbgCXN2h (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Mar 2020 09:28:37 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:34429 "EHLO
-        us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729622AbgCXN2f (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 24 Mar 2020 09:28:35 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1585056513;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=1Nbgg36XeJ0SkoOvyM0axieUMOjkCcVecsvZVfglBfA=;
-        b=CEn+c7bfUaC+3T8Z1qmCq0MJm2bMtfh+QdCWsch4TItnuvN2SQeSDETCq12Zm7Upm2ONQ2
-        3t/1zWDo1MYNYj6kaEVUvFLAIhb1f1hVf/Gf5YQiBcDbjDiYFZQ1UD9uVdBeXT6rcgpspK
-        DJCFlpxTrJaJ0SxtVlNqowp+Q24Ojqs=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-143-O66qDOcTMbiF2X3PVBpyIA-1; Tue, 24 Mar 2020 09:28:32 -0400
-X-MC-Unique: O66qDOcTMbiF2X3PVBpyIA-1
-Received: by mail-wr1-f71.google.com with SMTP id v6so9146713wrg.22
-        for <kvm@vger.kernel.org>; Tue, 24 Mar 2020 06:28:31 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=1Nbgg36XeJ0SkoOvyM0axieUMOjkCcVecsvZVfglBfA=;
-        b=FrkwI61wwV6l/rum/FLkdnagycWmNh6hMISjXffDvk8Lb/5NKHFeEVrxZPM3jmx9eK
-         NVI9YyessCcYagINBUCD6mxuCBpa5Xe5L1tlquROihfjTzXUFWNopmungKVYrtO03AJL
-         mFs2S7iBBPsJFOWjbuQzPx+ST1kLEXPu80icCSshkZM6YXGymufVS+qqwO9868OD45PJ
-         HOoGeKbTUGZC/Y3c2Pi7anf3zqnl9aINZ5g2sEUjI3UFsHsqrlOQvrgNHXB9L80OUhAd
-         TntbLHeUawnY7XUuZx0j9O7DZ18srhVofDKtj0+H37+F2Mo2p6HknN9opzWv3N2kCW2G
-         mSjA==
-X-Gm-Message-State: ANhLgQ1I/LEOfEdtFzj12Fe4Z/HS0e1IsTu8qP0vAzHOmZpYOQd1L7dg
-        V9vN+fdDE5fyLn4fK8O8EnSv+g5dCIzLICa9Pei95SEFCZXPK+CGzFgHMy+3990JpkpwpKRJF5v
-        kr+TQxOhCd9qH
-X-Received: by 2002:a1c:c257:: with SMTP id s84mr5612653wmf.0.1585056510761;
-        Tue, 24 Mar 2020 06:28:30 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vu+pmPGSpmmN/mSKsnMjvbTacJnshjSpGN9O/2Pk17BNy+smzoup721KMAL6lt6m/HClETc6g==
-X-Received: by 2002:a1c:c257:: with SMTP id s84mr5612634wmf.0.1585056510458;
-        Tue, 24 Mar 2020 06:28:30 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id q8sm29593589wrc.8.2020.03.24.06.28.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Mar 2020 06:28:29 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Jon Doron <arilou@gmail.com>, kvm@vger.kernel.org,
-        linux-hyperv@vger.kernel.org
-Cc:     Jon Doron <arilou@gmail.com>
-Subject: Re: [PATCH v10 5/7] x86/kvm/hyper-v: enable hypercalls without hypercall page with syndbg
-In-Reply-To: <20200324074341.1770081-6-arilou@gmail.com>
-References: <20200324074341.1770081-1-arilou@gmail.com> <20200324074341.1770081-6-arilou@gmail.com>
-Date:   Tue, 24 Mar 2020 14:28:28 +0100
-Message-ID: <87zhc57ugz.fsf@vitty.brq.redhat.com>
+        id S1728381AbgCXNbs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Mar 2020 09:31:48 -0400
+Received: from Galois.linutronix.de ([193.142.43.55]:44907 "EHLO
+        Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727686AbgCXNbr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 Mar 2020 09:31:47 -0400
+Received: from p5de0bf0b.dip0.t-ipconnect.de ([93.224.191.11] helo=nanos.tec.linutronix.de)
+        by Galois.linutronix.de with esmtpsa (TLS1.2:DHE_RSA_AES_256_CBC_SHA256:256)
+        (Exim 4.80)
+        (envelope-from <tglx@linutronix.de>)
+        id 1jGjeT-00059H-NX; Tue, 24 Mar 2020 14:31:29 +0100
+Received: by nanos.tec.linutronix.de (Postfix, from userid 1000)
+        id 68700100292; Tue, 24 Mar 2020 14:31:28 +0100 (CET)
+From:   Thomas Gleixner <tglx@linutronix.de>
+To:     Xiaoyao Li <xiaoyao.li@intel.com>, Ingo Molnar <mingo@redhat.com>,
+        Borislav Petkov <bp@alien8.de>, hpa@zytor.com,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        kvm@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org
+Cc:     Andy Lutomirski <luto@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Arvind Sankar <nivedita@alum.mit.edu>,
+        Fenghua Yu <fenghua.yu@intel.com>,
+        Tony Luck <tony.luck@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>
+Subject: Re: [PATCH v5 1/9] x86/split_lock: Rework the initialization flow of split lock detection
+In-Reply-To: <95093fb0-df88-0543-c7eb-32b94ac4f99e@intel.com>
+References: <20200315050517.127446-1-xiaoyao.li@intel.com> <20200315050517.127446-2-xiaoyao.li@intel.com> <87zhc7ovhj.fsf@nanos.tec.linutronix.de> <95093fb0-df88-0543-c7eb-32b94ac4f99e@intel.com>
+Date:   Tue, 24 Mar 2020 14:31:28 +0100
+Message-ID: <87imitev67.fsf@nanos.tec.linutronix.de>
 MIME-Version: 1.0
 Content-Type: text/plain
+X-Linutronix-Spam-Score: -1.0
+X-Linutronix-Spam-Level: -
+X-Linutronix-Spam-Status: No , -1.0 points, 5.0 required,  ALL_TRUSTED=-1,SHORTCIRCUIT=-0.0001
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Jon Doron <arilou@gmail.com> writes:
+Xiaoyao Li <xiaoyao.li@intel.com> writes:
+> On 3/24/2020 1:02 AM, Thomas Gleixner wrote:
+>> Xiaoyao Li <xiaoyao.li@intel.com> writes:
+>> 
+>>> Current initialization flow of split lock detection has following issues:
+>>> 1. It assumes the initial value of MSR_TEST_CTRL.SPLIT_LOCK_DETECT to be
+>>>     zero. However, it's possible that BIOS/firmware has set it.
+>> 
+>> Ok.
+>> 
+>>> 2. X86_FEATURE_SPLIT_LOCK_DETECT flag is unconditionally set even if
+>>>     there is a virtualization flaw that FMS indicates the existence while
+>>>     it's actually not supported.
+>>>
+>>> 3. Because of #2, KVM cannot rely on X86_FEATURE_SPLIT_LOCK_DETECT flag
+>>>     to check verify if feature does exist, so cannot expose it to
+>>>     guest.
+>> 
+>> Sorry this does not make anny sense. KVM is the hypervisor, so it better
+>> can rely on the detect flag. Unless you talk about nested virt and a
+>> broken L1 hypervisor.
+>> 
+>
+> Yeah. It is for the nested virt on a broken L1 hypervisor.
 
-> Microsoft's kdvm.dll dbgtransport module does not respect the hypercall
-> page and simply identifies the CPU being used (AMD/Intel) and according
-> to it simply makes hypercalls with the relevant instruction
-> (vmmcall/vmcall respectively).
->
-> The relevant function in kdvm is KdHvConnectHypervisor which first checks
-> if the hypercall page has been enabled via HV_X64_MSR_HYPERCALL_ENABLE,
-> and in case it was not it simply sets the HV_X64_MSR_GUEST_OS_ID to
-> 0x1000101010001 which means:
-> build_number = 0x0001
-> service_version = 0x01
-> minor_version = 0x01
-> major_version = 0x01
-> os_id = 0x00 (Undefined)
-> vendor_id = 1 (Microsoft)
-> os_type = 0 (A value of 0 indicates a proprietary, closed source OS)
->
-> and starts issuing the hypercall without setting the hypercall page.
->
-> To resolve this issue simply enable hypercalls also if the guest_os_id
-> is not 0 and the syndbg feature is enabled.
->
-> Signed-off-by: Jon Doron <arilou@gmail.com>
-> ---
->  arch/x86/kvm/hyperv.c | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
->
-> diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
-> index befe5b3b9e20..59c6eadb7eca 100644
-> --- a/arch/x86/kvm/hyperv.c
-> +++ b/arch/x86/kvm/hyperv.c
-> @@ -1650,7 +1650,10 @@ static u64 kvm_hv_send_ipi(struct kvm_vcpu *current_vcpu, u64 ingpa, u64 outgpa,
->  
->  bool kvm_hv_hypercall_enabled(struct kvm *kvm)
->  {
-> -	return READ_ONCE(kvm->arch.hyperv.hv_hypercall) & HV_X64_MSR_HYPERCALL_ENABLE;
-> +	struct kvm_hv *hv = &kvm->arch.hyperv;
-> +
-> +	return READ_ONCE(hv->hv_hypercall) & HV_X64_MSR_HYPERCALL_ENABLE ||
-> +	       (hv->hv_syndbg.active && READ_ONCE(hv->hv_guest_os_id) != 0);
->  }
->  
->  static void kvm_hv_hypercall_set_result(struct kvm_vcpu *vcpu, u64 result)
+Then please spell it out in the changelog. Changelogs which need crystalballs
+to decode are pretty useless.
 
-Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+Thanks,
 
--- 
-Vitaly
-
+        tglx
