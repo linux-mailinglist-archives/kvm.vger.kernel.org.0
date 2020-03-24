@@ -2,155 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7C60119161F
-	for <lists+kvm@lfdr.de>; Tue, 24 Mar 2020 17:20:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0100D191685
+	for <lists+kvm@lfdr.de>; Tue, 24 Mar 2020 17:35:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728877AbgCXQUK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Mar 2020 12:20:10 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:42004 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727444AbgCXQUH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 Mar 2020 12:20:07 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02OGEe2o178890;
-        Tue, 24 Mar 2020 16:19:46 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2020-01-29;
- bh=8+/c9w3BgxRJLSrj2uF9AmceMm8c9V83O9Cmas+6qpw=;
- b=r2u8CeTqtFkN2tBlnu64WUaXJv8VkQH2VTfXx7kCYGVemUCoz6Dl3XQVQpEYpTzXPqoo
- KQU5r/lfIJLCpdXfNuvR2j+Jvx6QAWFncs4keyDbOtjXja4HZVht0ckCecUcp6pZcSfM
- H7zRqz5F2HadZRnH6zsx+kAmglRI1zxkSZBKJAcT55fPgoJK2ocBq/L2URhduLlwsBGB
- h9iqo7yYppWkIHeP1uSzUidUehGKJ3jKA2eucbquHTP16FRRs/wMHykjIsr+JYFm3QD/
- FxzlFVtjd58/y6ISSFeVYMzCQ6HK+Xenb4Xa0DYUARFzP9SI49hT+QlLcUSGzy622IV5 xA== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
-        by userp2120.oracle.com with ESMTP id 2yx8ac293t-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 24 Mar 2020 16:19:46 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
-        by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02OGJhPk185489;
-        Tue, 24 Mar 2020 16:19:45 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by userp3020.oracle.com with ESMTP id 2yxw6n17rg-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 24 Mar 2020 16:19:45 +0000
-Received: from abhmp0014.oracle.com (abhmp0014.oracle.com [141.146.116.20])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 02OGJVTZ018297;
-        Tue, 24 Mar 2020 16:19:31 GMT
-Received: from [192.168.1.206] (/71.63.128.209)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Tue, 24 Mar 2020 09:19:31 -0700
-Subject: Re: [PATCH v2] mm/hugetlb: fix a addressing exception caused by
- huge_pte_offset()
-To:     Jason Gunthorpe <jgg@ziepe.ca>
-Cc:     "Longpeng (Mike, Cloud Infrastructure Service Product Dept.)" 
-        <longpeng2@huawei.com>, akpm@linux-foundation.org,
-        kirill.shutemov@linux.intel.com, linux-kernel@vger.kernel.org,
-        arei.gonglei@huawei.com, weidong.huang@huawei.com,
-        weifuqiang@huawei.com, kvm@vger.kernel.org, linux-mm@kvack.org,
-        Matthew Wilcox <willy@infradead.org>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        stable@vger.kernel.org
-References: <1582342427-230392-1-git-send-email-longpeng2@huawei.com>
- <51a25d55-de49-4c0a-c994-bf1a8cfc8638@oracle.com>
- <20200323160955.GY20941@ziepe.ca>
- <69055395-e7e5-a8e2-7f3e-f61607149318@oracle.com>
- <20200323180706.GC20941@ziepe.ca>
- <88698dd7-eb87-4b0b-7ba7-44ef6eab6a6c@oracle.com>
- <20200323225225.GF20941@ziepe.ca>
- <e8e71ba4-d609-269a-6160-153e373e7563@huawei.com>
- <20200324115541.GH20941@ziepe.ca>
- <98d35563-8af0-2693-7e76-e6435da0bbee@oracle.com>
- <20200324155552.GK20941@ziepe.ca>
-From:   Mike Kravetz <mike.kravetz@oracle.com>
-Message-ID: <66583587-ca4f-9847-c173-4a3d7938fec6@oracle.com>
-Date:   Tue, 24 Mar 2020 09:19:29 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+        id S1727673AbgCXQen (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Mar 2020 12:34:43 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:26126 "EHLO
+        us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727666AbgCXQem (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 24 Mar 2020 12:34:42 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1585067681;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=nBv8f1RRwkOGvG3E/mngEafi8ZBQtreikFX09brmDmA=;
+        b=GabZnEpnR36amn7jSwQ78I1jFov+kZQtp9LR63Xxc/f7rFdyI+S9Mq/3KlF/qRBieWTrXI
+        mKlF4+BdNiz+1ykFfJ7ZsIAu/8YI1n7IG51egiIL3t3O2xfTPc6sY20rfHtjkjsQ52nUE+
+        14/PVvMG7moj452LOCnh4sfZKNcVM/w=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-183-J1MB_8hbPb-m9khWenfJXQ-1; Tue, 24 Mar 2020 12:34:39 -0400
+X-MC-Unique: J1MB_8hbPb-m9khWenfJXQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 70B49189D6C7;
+        Tue, 24 Mar 2020 16:34:38 +0000 (UTC)
+Received: from gondolin (ovpn-113-109.ams2.redhat.com [10.36.113.109])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id F2F1B6EF86;
+        Tue, 24 Mar 2020 16:34:36 +0000 (UTC)
+Date:   Tue, 24 Mar 2020 17:34:31 +0100
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Eric Farman <farman@linux.ibm.com>
+Cc:     Halil Pasic <pasic@linux.ibm.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        Jared Rossi <jrossi@linux.ibm.com>, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org
+Subject: Re: [RFC PATCH v2 7/9] vfio-ccw: Wire up the CRW irq and CRW region
+Message-ID: <20200324173431.6ad09436.cohuck@redhat.com>
+In-Reply-To: <75bb9119-8692-c18e-1e7b-c7598d8ef25a@linux.ibm.com>
+References: <20200206213825.11444-1-farman@linux.ibm.com>
+        <20200206213825.11444-8-farman@linux.ibm.com>
+        <20200214143400.175c9e5e.cohuck@redhat.com>
+        <75bb9119-8692-c18e-1e7b-c7598d8ef25a@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-In-Reply-To: <20200324155552.GK20941@ziepe.ca>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9570 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 adultscore=0
- malwarescore=0 mlxscore=0 spamscore=0 mlxlogscore=999 bulkscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2003240087
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9570 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 suspectscore=0 priorityscore=1501 malwarescore=0
- mlxscore=0 adultscore=0 phishscore=0 impostorscore=0 mlxlogscore=999
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2003240087
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 3/24/20 8:55 AM, Jason Gunthorpe wrote:
-> On Tue, Mar 24, 2020 at 08:25:09AM -0700, Mike Kravetz wrote:
->> On 3/24/20 4:55 AM, Jason Gunthorpe wrote:
->>> Also, since CH moved all the get_user_pages_fast code out of the
->>> arch's many/all archs can drop their arch specific version of this
->>> routine. This is really just a specialized version of gup_fast's
->>> algorithm..
->>>
->>> (also the arch versions seem different, why do some return actual
->>>  ptes, not null?)
->>
->> Not sure I understand that last question.  The return value should be
->> a *pte or null.
-> 
-> I mean the common code ends like this:
-> 
-> 	pmd = pmd_offset(pud, addr);
-> 	if (sz != PMD_SIZE && pmd_none(*pmd))
-> 		return NULL;
-> 	/* hugepage or swap? */
-> 	if (pmd_huge(*pmd) || !pmd_present(*pmd))
-> 		return (pte_t *)pmd;
-> 
-> 	return NULL;
-> 
-> So it always returns a pointer into a PUD or PMD, while say, ppc
-> in __find_linux_pte() ends like:
-> 
-> 	return pte_offset_kernel(&pmd, ea);
-> 
-> Which is pointing to a PTE
+On Fri, 14 Feb 2020 11:24:39 -0500
+Eric Farman <farman@linux.ibm.com> wrote:
 
-Ok, now I understand the question.  huge_pte_offset will/should only be
-called for addresses that are in a vma backed by hugetlb pages.  So,
-pte_offset_kernel() will only return page table type (PUD/PMD/etc) associated
-with a huge page supported by the particular arch.
+> On 2/14/20 8:34 AM, Cornelia Huck wrote:
+> > On Thu,  6 Feb 2020 22:38:23 +0100
+> > Eric Farman <farman@linux.ibm.com> wrote:
 
-> So does sparc:
+> > (...)  
+> >> +static void vfio_ccw_alloc_crw(struct vfio_ccw_private *private,
+> >> +			       struct chp_link *link,
+> >> +			       unsigned int erc)
+> >> +{
+> >> +	struct vfio_ccw_crw *vc_crw;
+> >> +	struct crw *crw;
+> >> +
+> >> +	/*
+> >> +	 * If unable to allocate a CRW, just drop the event and
+> >> +	 * carry on.  The guest will either see a later one or
+> >> +	 * learn when it issues its own store subchannel.
+> >> +	 */
+> >> +	vc_crw = kzalloc(sizeof(*vc_crw), GFP_ATOMIC);
+> >> +	if (!vc_crw)
+> >> +		return;
+> >> +
+> >> +	/*
+> >> +	 * Build in the first CRW space, but don't chain anything
+> >> +	 * into the second one even though the space exists.
+> >> +	 */
+> >> +	crw = &vc_crw->crw[0];
+> >> +
+> >> +	/*
+> >> +	 * Presume every CRW we handle is reported by a channel-path.
+> >> +	 * Maybe not future-proof, but good for what we're doing now.  
+> > 
+> > You could pass in a source indication, maybe? Presumably, at least one
+> > of the callers further up the chain knows...  
 > 
->         pmd = pmd_offset(pud, addr);
->         if (pmd_none(*pmd))
->                 return NULL;
->         if (is_hugetlb_pmd(*pmd))
->                 return (pte_t *)pmd;
->         return pte_offset_map(pmd, addr);
-> 
-> Which is even worse because it is leaking a kmap..
-> 
-> etc
-> 
->> /*
->>  * huge_pte_offset() - Walk the page table to resolve the hugepage
->>  * entry at address @addr
->>  *
->>  * Return: Pointer to page table or swap entry (PUD or PMD) for
->                                               ^^^^^^^^^^^^^^^^^^^
-> 
-> Ie the above is not followed by the archs
-> 
-> I'm also scratching my head that a function that returns a pte_t *
-> always returns a PUD or PMD. Strange bit of type casting..
+> The "chain" is the vfio_ccw_chp_event() function called off the
+> .chp_event callback, and then to this point.  So I don't think there's
+> much we can get back from our callchain, other than the CHP_xxxLINE
+> event that got us here.
 
-Yes, the casting is curious.  The casting continues in potential subsequent
-calls to huge_pte_alloc().
--- 
-Mike Kravetz
+We might want to pass in CRW_RSC_CPATH, that would make it a bit more
+flexible. We can easily rearrange code internally later, though.
+
