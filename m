@@ -2,116 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 66771191433
-	for <lists+kvm@lfdr.de>; Tue, 24 Mar 2020 16:27:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6DDEC19145A
+	for <lists+kvm@lfdr.de>; Tue, 24 Mar 2020 16:28:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728119AbgCXPYv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Mar 2020 11:24:51 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:39906 "EHLO
-        us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728034AbgCXPYv (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 24 Mar 2020 11:24:51 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1585063490;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=xQhXogf83gPdcUUT+dzsTyfiEXNjWAAq9WGL/3QdsRU=;
-        b=EfdTOJMd1m+UbO8K/jKvXEuxXS1SKL9eHvofPVBa5r8lk27z9hr/OBExo6UmHgWp42UPYC
-        01hvDEPO3W9OBNelW/23oOyKeFaQ1tEyPkMXfrtv+kVhnrhhXfm/2xPk1bpFKJVJx/wzvI
-        iFrxvnyJUcg1DS8dbKsrV9Y2fmkx2jE=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-368-34XWmwZnMv61r3VoA5-e4w-1; Tue, 24 Mar 2020 11:24:49 -0400
-X-MC-Unique: 34XWmwZnMv61r3VoA5-e4w-1
-Received: by mail-wr1-f70.google.com with SMTP id f8so1719755wrp.1
-        for <kvm@vger.kernel.org>; Tue, 24 Mar 2020 08:24:48 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=xQhXogf83gPdcUUT+dzsTyfiEXNjWAAq9WGL/3QdsRU=;
-        b=ACqRcMV5C9vksvaeEYI4NEpk2fcEautKN/l4pgDULjfxOdzEQOMqhOg1+ouP7NcrHN
-         /xQ0m55oklpN2qNniJbK526BqJcksr3+PYTU4a2Fv7UxPI688L57wruL9q4ny7gUwyNG
-         PIRQSsKVLEVu0eTCDZ+dWylM1Tlmiz6Al6oJcVtKrXrev3mDQeTHD+HA4tpUzCS+PaXn
-         BthE4HEJqH8x4FHb/VGAPFn5/yfH1PYskIHjKQARblAJgL1X00Jkm4ciXvrnY/UuxYNq
-         hkuXlN+hN2G5Kan0Qhrf1GoMNle4OHKmXD/6UnxS77+67+/0f4Nr5s585ZqJ4jEKNYS2
-         xJFw==
-X-Gm-Message-State: ANhLgQ1tWi5JHtgBxbcs4d0J92fjl9Xy700NdtyqhcL3AJNbzy3nkpGl
-        9U7vdcRoQAX3UhTF2h5RHM9/4ENBbZyDBdq/N9GjjWjZzJgQ2PF43PB8X5SfCduA6mUGef0eVHy
-        7WOjjZ83MrM4f
-X-Received: by 2002:adf:e684:: with SMTP id r4mr6746175wrm.6.1585063487722;
-        Tue, 24 Mar 2020 08:24:47 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vtWlzNYRSY8iv4SdsIkUBo11qNCxFpdTHuub9iGt/riNcD7HwIClZ/QuMWQVVbxebvgW76tAg==
-X-Received: by 2002:adf:e684:: with SMTP id r4mr6746156wrm.6.1585063487562;
-        Tue, 24 Mar 2020 08:24:47 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id u16sm29555478wro.23.2020.03.24.08.24.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Mar 2020 08:24:46 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Wanpeng Li <kernellwp@gmail.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        id S1728401AbgCXPZn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Mar 2020 11:25:43 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:50918 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727491AbgCXPZn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 Mar 2020 11:25:43 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02OFOEua049070;
+        Tue, 24 Mar 2020 15:25:16 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2020-01-29;
+ bh=wmt/AtPlazx7PxA08PU/xQuPcDJRywUgyLYzzhVKDWo=;
+ b=HlxHhAZeFJAYDCA5fPvZT0XyZk1LtJIZKbYOmph4L9nsYBamLDoD/tnnT7M3MY8LWWjW
+ Y0ed+dfyRQ+D7Aqj2BxzqWWyCnlmK87v7Ni2SZxdHuzm1rC1rIe293zxj8WmxRXnxqyW
+ 5RJZ4Rv4+Plpi8RrD2WqK9xxzLs+0wFCIVTT7i/TVb5JAukeNu+INHfKC3Od9RBx3RWR
+ cvCp1lRb1xwZV/8qd5wg+5aFNN79N9U2Zbro/l2gwWi/z4rdPS9u0RQ3wB5aaove+jJp
+ C8VjRV7+tgNiC6j2sIPomHakY/vxF1EZnZGOxIwd+w9mfZNUOwwFs+uu4iGwiTSLVfCa 5g== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+        by userp2120.oracle.com with ESMTP id 2yx8ac1x7m-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 24 Mar 2020 15:25:16 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+        by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02OFMCS3150028;
+        Tue, 24 Mar 2020 15:25:15 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by userp3030.oracle.com with ESMTP id 2yxw4pg9dh-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 24 Mar 2020 15:25:15 +0000
+Received: from abhmp0015.oracle.com (abhmp0015.oracle.com [141.146.116.21])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 02OFPCct026939;
+        Tue, 24 Mar 2020 15:25:12 GMT
+Received: from [192.168.1.206] (/71.63.128.209)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Tue, 24 Mar 2020 08:25:12 -0700
+Subject: Re: [PATCH v2] mm/hugetlb: fix a addressing exception caused by
+ huge_pte_offset()
+To:     Jason Gunthorpe <jgg@ziepe.ca>,
+        "Longpeng (Mike, Cloud Infrastructure Service Product Dept.)" 
+        <longpeng2@huawei.com>
+Cc:     akpm@linux-foundation.org, kirill.shutemov@linux.intel.com,
+        linux-kernel@vger.kernel.org, arei.gonglei@huawei.com,
+        weidong.huang@huawei.com, weifuqiang@huawei.com,
+        kvm@vger.kernel.org, linux-mm@kvack.org,
+        Matthew Wilcox <willy@infradead.org>,
         Sean Christopherson <sean.j.christopherson@intel.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Subject: Re: [PATCH] KVM: LAPIC: Also cancel preemption timer when disarm LAPIC timer
-In-Reply-To: <1585031530-19823-1-git-send-email-wanpengli@tencent.com>
-References: <1585031530-19823-1-git-send-email-wanpengli@tencent.com>
-Date:   Tue, 24 Mar 2020 16:24:45 +0100
-Message-ID: <87imit7p36.fsf@vitty.brq.redhat.com>
+        stable@vger.kernel.org
+References: <1582342427-230392-1-git-send-email-longpeng2@huawei.com>
+ <51a25d55-de49-4c0a-c994-bf1a8cfc8638@oracle.com>
+ <20200323160955.GY20941@ziepe.ca>
+ <69055395-e7e5-a8e2-7f3e-f61607149318@oracle.com>
+ <20200323180706.GC20941@ziepe.ca>
+ <88698dd7-eb87-4b0b-7ba7-44ef6eab6a6c@oracle.com>
+ <20200323225225.GF20941@ziepe.ca>
+ <e8e71ba4-d609-269a-6160-153e373e7563@huawei.com>
+ <20200324115541.GH20941@ziepe.ca>
+From:   Mike Kravetz <mike.kravetz@oracle.com>
+Message-ID: <98d35563-8af0-2693-7e76-e6435da0bbee@oracle.com>
+Date:   Tue, 24 Mar 2020 08:25:09 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <20200324115541.GH20941@ziepe.ca>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9569 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 suspectscore=0
+ spamscore=0 mlxlogscore=856 adultscore=0 phishscore=0 mlxscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2003240085
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9569 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 suspectscore=0 priorityscore=1501 malwarescore=0
+ mlxscore=0 adultscore=0 phishscore=0 impostorscore=0 mlxlogscore=880
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2003240085
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Wanpeng Li <kernellwp@gmail.com> writes:
+On 3/24/20 4:55 AM, Jason Gunthorpe wrote:
+> Also, since CH moved all the get_user_pages_fast code out of the
+> arch's many/all archs can drop their arch specific version of this
+> routine. This is really just a specialized version of gup_fast's
+> algorithm..
+> 
+> (also the arch versions seem different, why do some return actual
+>  ptes, not null?)
 
-> From: Wanpeng Li <wanpengli@tencent.com>
->
-> The timer is disarmed when switching between TSC deadline and other modes, 
-> we should set everything to disarmed state, however, LAPIC timer can be 
-> emulated by preemption timer, it still works if vmx->hv_deadline_timer is 
-> not -1. This patch also cancels preemption timer when disarm LAPIC timer.
->
-> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
-> ---
->  arch/x86/kvm/lapic.c | 6 ++++++
->  1 file changed, 6 insertions(+)
->
-> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> index 338de38..a38f1a8 100644
-> --- a/arch/x86/kvm/lapic.c
-> +++ b/arch/x86/kvm/lapic.c
-> @@ -1445,6 +1445,8 @@ static void limit_periodic_timer_frequency(struct kvm_lapic *apic)
->  	}
->  }
->  
-> +static void cancel_hv_timer(struct kvm_lapic *apic);
-> +
+Not sure I understand that last question.  The return value should be
+a *pte or null.
 
-Nitpick: cancel_hv_timer() is only 4 lines long so I'd suggest we move
-it instead of adding a forward declaration.
-
->  static void apic_update_lvtt(struct kvm_lapic *apic)
->  {
->  	u32 timer_mode = kvm_lapic_get_reg(apic, APIC_LVTT) &
-> @@ -1454,6 +1456,10 @@ static void apic_update_lvtt(struct kvm_lapic *apic)
->  		if (apic_lvtt_tscdeadline(apic) != (timer_mode ==
->  				APIC_LVT_TIMER_TSCDEADLINE)) {
->  			hrtimer_cancel(&apic->lapic_timer.timer);
-> +			preempt_disable();
-> +			if (apic->lapic_timer.hv_timer_in_use)
-> +				cancel_hv_timer(apic);
-> +			preempt_enable();
->  			kvm_lapic_set_reg(apic, APIC_TMICT, 0);
->  			apic->lapic_timer.period = 0;
->  			apic->lapic_timer.tscdeadline = 0;
-
+/*
+ * huge_pte_offset() - Walk the page table to resolve the hugepage
+ * entry at address @addr
+ *
+ * Return: Pointer to page table or swap entry (PUD or PMD) for
+ * address @addr, or NULL if a p*d_none() entry is encountered and the
+ * size @sz doesn't match the hugepage size at this level of the page
+ * table.
+ */
 -- 
-Vitaly
-
+Mike Kravetz
