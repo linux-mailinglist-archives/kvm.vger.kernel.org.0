@@ -2,54 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0731319193B
-	for <lists+kvm@lfdr.de>; Tue, 24 Mar 2020 19:35:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 979AC191948
+	for <lists+kvm@lfdr.de>; Tue, 24 Mar 2020 19:38:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727548AbgCXSee (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Mar 2020 14:34:34 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:35292 "EHLO
+        id S1727495AbgCXSgU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Mar 2020 14:36:20 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:45735 "EHLO
         us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727318AbgCXSed (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 24 Mar 2020 14:34:33 -0400
+        by vger.kernel.org with ESMTP id S1727267AbgCXSgU (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 24 Mar 2020 14:36:20 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1585074871;
+        s=mimecast20190719; t=1585074979;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=6ZJqfs+Ow1XzRDF0cAMw7udrxVvYxzXME1Cp7ORdgzI=;
-        b=hPe2cVMWii3ZY3UiYrIWoGuUkDGejj+96Jkk1B8AfPftai/Sa0NWCcAxpHwOcAF93N1aZn
-        G2Q8wyiJN/HOtzLfM7YxL1hJ8cpuXzMhaZOtXSZTR3DJxwLA8+FnmRyP4AsmgKcawWOYaD
-        PuakX7yTUbA9LoGmyX+51rOMMj3IpFM=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-299-fw6JN4uHOhCszYy4jUpj3A-1; Tue, 24 Mar 2020 14:34:29 -0400
-X-MC-Unique: fw6JN4uHOhCszYy4jUpj3A-1
-Received: by mail-wm1-f69.google.com with SMTP id s15so1582668wmc.0
-        for <kvm@vger.kernel.org>; Tue, 24 Mar 2020 11:34:29 -0700 (PDT)
+        bh=i4A/xqWSGLtPDET9zjSQHOttB/0+koxppHPGSrmNT/M=;
+        b=FT2BC/JpMmzKCcZFk7a3uZGGu9BOqNxYq1S/kQzEMCtHjbyHh/+PA8EPGgMusWCD60nUiM
+        UpMTZcXcUCM83xojzu4Ttf76N3YML63GeQBsYkBrAhOjJV1+IDvPtWOvXoY4yiPkzWF7uX
+        04TGcumMzCitjHVp4KfRodaZN8E+lI4=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-172-g0jmaSRDOfS9frMUe7aQHA-1; Tue, 24 Mar 2020 14:36:18 -0400
+X-MC-Unique: g0jmaSRDOfS9frMUe7aQHA-1
+Received: by mail-wr1-f72.google.com with SMTP id y1so4645180wrn.10
+        for <kvm@vger.kernel.org>; Tue, 24 Mar 2020 11:36:17 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=6ZJqfs+Ow1XzRDF0cAMw7udrxVvYxzXME1Cp7ORdgzI=;
-        b=tI6ypBztrTgqdC1ncggVZYhQyF2Lc+xF77p0JrqFsuMnMFLMOjcOeiVuV78KHSIUiR
-         Y5m5p7Lhd8l3u5/PI+tx+I37tOgnwxBNXYPT9gr0UyJA7vGUEuM9EKw4+wVcinzYwHGg
-         X1oX8SBnMKYOMFlpd5rqP945Zp4V1Jg6WnmgtQ6BQuusPuOPVJavRfvT/86EVw4nbWhK
-         oMPMqjAdtDCFhVa0k9ygGmBM6UeqisSRiG4y8Z3GOhhO5SubqIt+96asOv/d7S3cjAKi
-         PIdRu2DDK1x3Z/3YBzX5lOx5BkimUIQy/ac+6oCbd4NUqabk/L2+JJX1kxMY8e+QWUj9
-         yqDg==
-X-Gm-Message-State: ANhLgQ0+qTyAkkQapMcV+tD+ExvhfzJo+QA/LEaUerenAoB+QruqOJt9
-        u0vLGIsbJtXc+PUqaozyYOg1JeC7DbCu0wmz4gqqGqjlQqjJdXWqaLbvQFGEHuaG1SrMCd0Ltlp
-        Cof4GBjGH/9O1
-X-Received: by 2002:adf:dd86:: with SMTP id x6mr31819803wrl.169.1585074868529;
-        Tue, 24 Mar 2020 11:34:28 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vuCAe/rn2Aicw35jdGbZd7Clfm6waLJyNnVeOjwPm9ho+IbIPYkPjybUosROUum4zOmxMNJsQ==
-X-Received: by 2002:adf:dd86:: with SMTP id x6mr31819768wrl.169.1585074868268;
-        Tue, 24 Mar 2020 11:34:28 -0700 (PDT)
+        bh=i4A/xqWSGLtPDET9zjSQHOttB/0+koxppHPGSrmNT/M=;
+        b=P5ihk7dvDHPuB1Qnb+Q/mu2YS1UcVqnoAdfpKd4+cLk20s1D6bDuW5kxsDwvnNQiOR
+         OscbBAOljArNnePkhrEWvUKHlZQnL7nby38ku5RagnTGiYEtrL4tYxmyIGRVA50/XFOj
+         yYLQZtdrw1t32pkTAPCADoAVblNXtiGGH1kKYjNNu/EHV5GnkqspvwkEBd04/lfADD9W
+         kQWl8xbSg3PM4V0szNN5ocabB5DwQVeJdkNOqXppTGRwXUYBq5H2O5Lo0CyGhCTIr6kg
+         FJ6nm+8HWMfzvpO2B/DqcA6tfolQ4GLf1Xsph2pX3mvJCsryxcKbitFW+UBmlidXfvh9
+         UASQ==
+X-Gm-Message-State: ANhLgQ3pPWwOrtA8x0WMU3ht9SgVC8V5yOhFt5TdvRGOyErnz+LnWo0+
+        WjJebD8FW9zDHCfdwv/mbCwwgtdDJuheVni/btsjc9tSb4dHv3MfsuILa9cnRk7u6wfYO5GOKcL
+        hof6sUOOPi2nc
+X-Received: by 2002:a5d:4acd:: with SMTP id y13mr3531506wrs.61.1585074976858;
+        Tue, 24 Mar 2020 11:36:16 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vswjB7Y+RnrWBQSeLWj9J4uwH9jrlwONHl7Gfp7nEUBIP16iMzsQGvZ9SX3IEZQ+jsiACKa8g==
+X-Received: by 2002:a5d:4acd:: with SMTP id y13mr3531473wrs.61.1585074976615;
+        Tue, 24 Mar 2020 11:36:16 -0700 (PDT)
 Received: from xz-x1 ([2607:9880:19c0:32::2])
-        by smtp.gmail.com with ESMTPSA id d6sm3754866wrw.10.2020.03.24.11.34.25
+        by smtp.gmail.com with ESMTPSA id b15sm29609833wru.70.2020.03.24.11.36.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Mar 2020 11:34:27 -0700 (PDT)
-Date:   Tue, 24 Mar 2020 14:34:23 -0400
+        Tue, 24 Mar 2020 11:36:15 -0700 (PDT)
+Date:   Tue, 24 Mar 2020 14:36:11 -0400
 From:   Peter Xu <peterx@redhat.com>
 To:     Liu Yi L <yi.l.liu@intel.com>
 Cc:     qemu-devel@nongnu.org, alex.williamson@redhat.com,
@@ -61,37 +61,25 @@ Cc:     qemu-devel@nongnu.org, alex.williamson@redhat.com,
         Yi Sun <yi.y.sun@linux.intel.com>,
         Richard Henderson <rth@twiddle.net>,
         Eduardo Habkost <ehabkost@redhat.com>
-Subject: Re: [PATCH v1 20/22] intel_iommu: propagate PASID-based iotlb
- invalidation to host
-Message-ID: <20200324183423.GE127076@xz-x1>
+Subject: Re: [PATCH v1 21/22] intel_iommu: process PASID-based Device-TLB
+ invalidation
+Message-ID: <20200324183611.GF127076@xz-x1>
 References: <1584880579-12178-1-git-send-email-yi.l.liu@intel.com>
- <1584880579-12178-21-git-send-email-yi.l.liu@intel.com>
+ <1584880579-12178-22-git-send-email-yi.l.liu@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <1584880579-12178-21-git-send-email-yi.l.liu@intel.com>
+In-Reply-To: <1584880579-12178-22-git-send-email-yi.l.liu@intel.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Mar 22, 2020 at 05:36:17AM -0700, Liu Yi L wrote:
-> This patch propagates PASID-based iotlb invalidation to host.
-> 
-> Intel VT-d 3.0 supports nested translation in PASID granular.
-> Guest SVA support could be implemented by configuring nested
-> translation on specific PASID. This is also known as dual stage
-> DMA translation.
-> 
-> Under such configuration, guest owns the GVA->GPA translation
-> which is configured as first level page table in host side for
-> a specific pasid, and host owns GPA->HPA translation. As guest
-> owns first level translation table, piotlb invalidation should
-> be propagated to host since host IOMMU will cache first level
-> page table related mappings during DMA address translation.
-> 
-> This patch traps the guest PASID-based iotlb flush and propagate
-> it to host.
+On Sun, Mar 22, 2020 at 05:36:18AM -0700, Liu Yi L wrote:
+> This patch adds an empty handling for PASID-based Device-TLB
+> invalidation. For now it is enough as it is not necessary to
+> propagate it to host for passthru device and also there is no
+> emulated device has device tlb.
 > 
 > Cc: Kevin Tian <kevin.tian@intel.com>
 > Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
@@ -101,202 +89,11 @@ On Sun, Mar 22, 2020 at 05:36:17AM -0700, Liu Yi L wrote:
 > Cc: Richard Henderson <rth@twiddle.net>
 > Cc: Eduardo Habkost <ehabkost@redhat.com>
 > Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
-> ---
->  hw/i386/intel_iommu.c          | 139 +++++++++++++++++++++++++++++++++++++++++
->  hw/i386/intel_iommu_internal.h |   7 +++
->  2 files changed, 146 insertions(+)
-> 
-> diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-> index b9ac07d..10d314d 100644
-> --- a/hw/i386/intel_iommu.c
-> +++ b/hw/i386/intel_iommu.c
-> @@ -3134,15 +3134,154 @@ static bool vtd_process_pasid_desc(IntelIOMMUState *s,
->      return (ret == 0) ? true : false;
->  }
->  
-> +/**
-> + * Caller of this function should hold iommu_lock.
-> + */
-> +static void vtd_invalidate_piotlb(IntelIOMMUState *s,
-> +                                  VTDBus *vtd_bus,
-> +                                  int devfn,
-> +                                  DualIOMMUStage1Cache *stage1_cache)
-> +{
-> +    VTDHostIOMMUContext *vtd_dev_icx;
-> +    HostIOMMUContext *host_icx;
-> +
-> +    vtd_dev_icx = vtd_bus->dev_icx[devfn];
-> +    if (!vtd_dev_icx) {
-> +        goto out;
-> +    }
-> +    host_icx = vtd_dev_icx->host_icx;
-> +    if (!host_icx) {
-> +        goto out;
-> +    }
-> +    if (host_iommu_ctx_flush_stage1_cache(host_icx, stage1_cache)) {
-> +        error_report("Cache flush failed");
 
-I think this should not easily be triggered by the guest, but just in
-case... Let's use error_report_once() to be safe.
-
-> +    }
-> +out:
-> +    return;
-> +}
-> +
-> +static inline bool vtd_pasid_cache_valid(
-> +                          VTDPASIDAddressSpace *vtd_pasid_as)
-> +{
-> +    return vtd_pasid_as->iommu_state &&
-
-This check can be dropped because always true?
-
-If you agree with both the changes, please add:
+OK this patch seems to be mostly meaningless... but OK since you've
+wrote it... :)
 
 Reviewed-by: Peter Xu <peterx@redhat.com>
-
-> +           (vtd_pasid_as->iommu_state->pasid_cache_gen
-> +             == vtd_pasid_as->pasid_cache_entry.pasid_cache_gen);
-> +}
-> +
-> +/**
-> + * This function is a loop function for the s->vtd_pasid_as
-> + * list with VTDPIOTLBInvInfo as execution filter. It propagates
-> + * the piotlb invalidation to host. Caller of this function
-> + * should hold iommu_lock.
-> + */
-> +static void vtd_flush_pasid_iotlb(gpointer key, gpointer value,
-> +                                  gpointer user_data)
-> +{
-> +    VTDPIOTLBInvInfo *piotlb_info = user_data;
-> +    VTDPASIDAddressSpace *vtd_pasid_as = value;
-> +    uint16_t did;
-> +
-> +    /*
-> +     * Needs to check whether the pasid entry cache stored in
-> +     * vtd_pasid_as is valid or not. "invalid" means the pasid
-> +     * cache has been flushed, thus host should have done piotlb
-> +     * invalidation together with a pasid cache invalidation, so
-> +     * no need to pass down piotlb invalidation to host for better
-> +     * performance. Only when pasid entry cache is "valid", should
-> +     * a piotlb invalidation be propagated to host since it means
-> +     * guest just modified a mapping in its page table.
-> +     */
-> +    if (!vtd_pasid_cache_valid(vtd_pasid_as)) {
-> +        return;
-> +    }
-> +
-> +    did = vtd_pe_get_domain_id(
-> +                &(vtd_pasid_as->pasid_cache_entry.pasid_entry));
-> +
-> +    if ((piotlb_info->domain_id == did) &&
-> +        (piotlb_info->pasid == vtd_pasid_as->pasid)) {
-> +        vtd_invalidate_piotlb(vtd_pasid_as->iommu_state,
-> +                              vtd_pasid_as->vtd_bus,
-> +                              vtd_pasid_as->devfn,
-> +                              piotlb_info->stage1_cache);
-> +    }
-> +
-> +    /*
-> +     * TODO: needs to add QEMU piotlb flush when QEMU piotlb
-> +     * infrastructure is ready. For now, it is enough for passthru
-> +     * devices.
-> +     */
-> +}
-> +
->  static void vtd_piotlb_pasid_invalidate(IntelIOMMUState *s,
->                                          uint16_t domain_id,
->                                          uint32_t pasid)
->  {
-> +    VTDPIOTLBInvInfo piotlb_info;
-> +    DualIOMMUStage1Cache *stage1_cache;
-> +    struct iommu_cache_invalidate_info *cache_info;
-> +
-> +    stage1_cache = g_malloc0(sizeof(*stage1_cache));
-> +    stage1_cache->pasid = pasid;
-> +
-> +    cache_info = &stage1_cache->cache_info;
-> +    cache_info->version = IOMMU_UAPI_VERSION;
-> +    cache_info->cache = IOMMU_CACHE_INV_TYPE_IOTLB;
-> +    cache_info->granularity = IOMMU_INV_GRANU_PASID;
-> +    cache_info->pasid_info.pasid = pasid;
-> +    cache_info->pasid_info.flags = IOMMU_INV_PASID_FLAGS_PASID;
-> +
-> +    piotlb_info.domain_id = domain_id;
-> +    piotlb_info.pasid = pasid;
-> +    piotlb_info.stage1_cache = stage1_cache;
-> +
-> +    vtd_iommu_lock(s);
-> +    /*
-> +     * Here loops all the vtd_pasid_as instances in s->vtd_pasid_as
-> +     * to find out the affected devices since piotlb invalidation
-> +     * should check pasid cache per architecture point of view.
-> +     */
-> +    g_hash_table_foreach(s->vtd_pasid_as,
-> +                         vtd_flush_pasid_iotlb, &piotlb_info);
-> +    vtd_iommu_unlock(s);
-> +    g_free(stage1_cache);
->  }
->  
->  static void vtd_piotlb_page_invalidate(IntelIOMMUState *s, uint16_t domain_id,
->                               uint32_t pasid, hwaddr addr, uint8_t am, bool ih)
->  {
-> +    VTDPIOTLBInvInfo piotlb_info;
-> +    DualIOMMUStage1Cache *stage1_cache;
-> +    struct iommu_cache_invalidate_info *cache_info;
-> +
-> +    stage1_cache = g_malloc0(sizeof(*stage1_cache));
-> +    stage1_cache->pasid = pasid;
-> +
-> +    cache_info = &stage1_cache->cache_info;
-> +    cache_info->version = IOMMU_UAPI_VERSION;
-> +    cache_info->cache = IOMMU_CACHE_INV_TYPE_IOTLB;
-> +    cache_info->granularity = IOMMU_INV_GRANU_ADDR;
-> +    cache_info->addr_info.flags = IOMMU_INV_ADDR_FLAGS_PASID;
-> +    cache_info->addr_info.flags |= ih ? IOMMU_INV_ADDR_FLAGS_LEAF : 0;
-> +    cache_info->addr_info.pasid = pasid;
-> +    cache_info->addr_info.addr = addr;
-> +    cache_info->addr_info.granule_size = 1 << (12 + am);
-> +    cache_info->addr_info.nb_granules = 1;
-> +
-> +    piotlb_info.domain_id = domain_id;
-> +    piotlb_info.pasid = pasid;
-> +    piotlb_info.stage1_cache = stage1_cache;
-> +
-> +    vtd_iommu_lock(s);
-> +    /*
-> +     * Here loops all the vtd_pasid_as instances in s->vtd_pasid_as
-> +     * to find out the affected devices since piotlb invalidation
-> +     * should check pasid cache per architecture point of view.
-> +     */
-> +    g_hash_table_foreach(s->vtd_pasid_as,
-> +                         vtd_flush_pasid_iotlb, &piotlb_info);
-> +    vtd_iommu_unlock(s);
-> +    g_free(stage1_cache);
->  }
->  
->  static bool vtd_process_piotlb_desc(IntelIOMMUState *s,
-> diff --git a/hw/i386/intel_iommu_internal.h b/hw/i386/intel_iommu_internal.h
-> index 314e2c4..967cc4f 100644
-> --- a/hw/i386/intel_iommu_internal.h
-> +++ b/hw/i386/intel_iommu_internal.h
-> @@ -560,6 +560,13 @@ struct VTDPASIDCacheInfo {
->                                        VTD_PASID_CACHE_DEVSI)
->  typedef struct VTDPASIDCacheInfo VTDPASIDCacheInfo;
->  
-> +struct VTDPIOTLBInvInfo {
-> +    uint16_t domain_id;
-> +    uint32_t pasid;
-> +    DualIOMMUStage1Cache *stage1_cache;
-> +};
-> +typedef struct VTDPIOTLBInvInfo VTDPIOTLBInvInfo;
-> +
->  /* PASID Table Related Definitions */
->  #define VTD_PASID_DIR_BASE_ADDR_MASK  (~0xfffULL)
->  #define VTD_PASID_TABLE_BASE_ADDR_MASK (~0xfffULL)
-> -- 
-> 2.7.4
-> 
 
 -- 
 Peter Xu
