@@ -2,84 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 708B4191957
-	for <lists+kvm@lfdr.de>; Tue, 24 Mar 2020 19:43:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C29E819195B
+	for <lists+kvm@lfdr.de>; Tue, 24 Mar 2020 19:43:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727509AbgCXSmg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Mar 2020 14:42:36 -0400
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:40815 "EHLO
-        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727318AbgCXSmg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 Mar 2020 14:42:36 -0400
-Received: by mail-wm1-f67.google.com with SMTP id a81so4662558wmf.5
-        for <kvm@vger.kernel.org>; Tue, 24 Mar 2020 11:42:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=pPtwMbJxrA1Es8ak0yumoRvEWX0T2QU5/hT413522OM=;
-        b=NI5YdHzmFt8MJznP4pojeq6KTnqd6bmIu2KrxmmLL1Xe2tr97ui/97+nEp55ClKB3A
-         873nWHtQXnaK/FX5EzwDrasARNrqwER0pd3f7CRkAouFGcpVFQkMlYif+tTNPzSaz3us
-         uS3/+WbLU5Q3bdhR8HkD65f/pkj8xXKg8MaFF5hnUjVgH7VH/j/XV2iBinR/ummxg4sZ
-         dtIGVSnPgJCL0JvVKo3PD1Fh1+wrNDfPW00mF9RjB3twX9vbQd3Dhhoxn0NbtIJN1Yr3
-         lPpOrd4Nskw3MoXDsIS+nUC8rfZQv2RFfR3ajZ46SDPVl/aJNryZLDoSrG6xfQZKJk18
-         Ss4Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=pPtwMbJxrA1Es8ak0yumoRvEWX0T2QU5/hT413522OM=;
-        b=sdn52jZ1xMHMXDjVXtVvKLY22zVZ0lM86tND4YYHxZHVUeztph94UvcMwjolNKt3Hn
-         s2HbE9QVz1hW48SK23V6FUkyi/QuzffB8udxKUf9o5MEwtaAl9FGkwAD0neWTwhoM0V/
-         wFM387Inyz821vZj23HNdBLcEghdtxzMxxL9BuCO8V+tB8zKdJZMM15d9ez/VH9dyaP7
-         QT+8CMu1pEz3KtFF9RMSwFJOzqsKsjPhlSNd12vwxV3SWI3GjleB97NZn0OQ/7PHYsN0
-         KZa4jK77nen/R/SDHyH3DOmIoeS9M9k0YAoIJeHc4DjPCK7x6Sz5G5+7dbhF7YrPSMvc
-         l7oQ==
-X-Gm-Message-State: ANhLgQ3yvrlX7ElWWsKXKsASLWqg31PmfPyWGREbYGUzyRMz8P5dvwhc
-        rm9Ye6YKagwntIQT9mLPOyGJkL4FP3Auvri8WDWOBw==
-X-Google-Smtp-Source: ADFU+vs4sQRYA41bjiNHunaQN2sONVEfP7brWVrPfFBwzK5q8MTUlZRXbUkGnnDCfaae5S4dUZwF76luoNfQxU9kSTE=
-X-Received: by 2002:a1c:bcd4:: with SMTP id m203mr7106648wmf.35.1585075353851;
- Tue, 24 Mar 2020 11:42:33 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200324094154.32352-1-joro@8bytes.org> <20200324183007.GA7798@linux.intel.com>
-In-Reply-To: <20200324183007.GA7798@linux.intel.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Tue, 24 Mar 2020 11:42:21 -0700
-Message-ID: <CALMp9eRYNH+=Ra=1KSJdT5Ej5kTfdV8J7Rf6JcS9NGbPOYPj8A@mail.gmail.com>
-Subject: Re: [PATCH 0/4] KVM: SVM: Move and split up svm.c
+        id S1727791AbgCXSmr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Mar 2020 14:42:47 -0400
+Received: from Galois.linutronix.de ([193.142.43.55]:45842 "EHLO
+        Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727567AbgCXSmr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 Mar 2020 14:42:47 -0400
+Received: from p5de0bf0b.dip0.t-ipconnect.de ([93.224.191.11] helo=nanos.tec.linutronix.de)
+        by Galois.linutronix.de with esmtpsa (TLS1.2:DHE_RSA_AES_256_CBC_SHA256:256)
+        (Exim 4.80)
+        (envelope-from <tglx@linutronix.de>)
+        id 1jGoVS-0003kz-O8; Tue, 24 Mar 2020 19:42:30 +0100
+Received: by nanos.tec.linutronix.de (Postfix, from userid 1000)
+        id EC729100292; Tue, 24 Mar 2020 19:42:29 +0100 (CET)
+From:   Thomas Gleixner <tglx@linutronix.de>
 To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Joerg Roedel <joro@8bytes.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
+Cc:     Xiaoyao Li <xiaoyao.li@intel.com>, Ingo Molnar <mingo@redhat.com>,
+        Borislav Petkov <bp@alien8.de>, hpa@zytor.com,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        x86@kernel.org, linux-kernel@vger.kernel.org,
+        Andy Lutomirski <luto@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Arvind Sankar <nivedita@alum.mit.edu>,
+        Fenghua Yu <fenghua.yu@intel.com>,
+        Tony Luck <tony.luck@intel.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Ashish Kalra <Ashish.Kalra@amd.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        Jim Mattson <jmattson@google.com>
+Subject: Re: [PATCH v5 3/9] x86/split_lock: Re-define the kernel param option for split_lock_detect
+In-Reply-To: <20200324180207.GD5998@linux.intel.com>
+References: <20200315050517.127446-1-xiaoyao.li@intel.com> <20200315050517.127446-4-xiaoyao.li@intel.com> <87r1xjov3a.fsf@nanos.tec.linutronix.de> <e708f6d2-8f96-903c-0bce-2eeecc4a237d@intel.com> <87r1xidoj1.fsf@nanos.tec.linutronix.de> <20200324180207.GD5998@linux.intel.com>
+Date:   Tue, 24 Mar 2020 19:42:29 +0100
+Message-ID: <87wo79d27e.fsf@nanos.tec.linutronix.de>
+MIME-Version: 1.0
+Content-Type: text/plain
+X-Linutronix-Spam-Score: -1.0
+X-Linutronix-Spam-Level: -
+X-Linutronix-Spam-Status: No , -1.0 points, 5.0 required,  ALL_TRUSTED=-1,SHORTCIRCUIT=-0.0001
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 24, 2020 at 11:30 AM Sean Christopherson
-<sean.j.christopherson@intel.com> wrote:
+Sean Christopherson <sean.j.christopherson@intel.com> writes:
+> On Tue, Mar 24, 2020 at 11:40:18AM +0100, Thomas Gleixner wrote:
+>> 
+>> It's very much about whether the host is split lock clean.
+>> 
+>> If your host kernel is not, then this wants to be fixed first. If your
+>> host application is broken, then either fix it or use "warn".
 >
-> On Tue, Mar 24, 2020 at 10:41:50AM +0100, Joerg Roedel wrote:
-> > Hi,
-> >
-> > here is a patch-set agains kvm/queue which moves svm.c into its own
-> > subdirectory arch/x86/kvm/svm/ and splits moves parts of it into
-> > separate source files:
->
-> What are people's thoughts on using "arch/x86/kvm/{amd,intel}" instead of
-> "arch/x86/kvm/{svm,vmx}"?  Maybe this won't be an issue for AMD/SVM, but on
-> the Intel/VMX side, there is stuff in the pipeline that makes using "vmx"
-> for the sub-directory quite awkward.  I wasn't planning on proposing the
-> rename (from vmx->intel) until I could justify _why_, but perhaps it makes
-> sense to bundle all the pain of a reorganizing code into a single kernel
-> version?
+> The "kvm only" option was my suggestion.  The thought was to provide a way
+> for users to leverage KVM to debug/test kernels without having to have a
+> known good kernel and/or to minimize the risk of crashing their physical
+> system.  E.g. debug a misbehaving driver by assigning its associated device
+> to a guest.
 
-Doesn't VIA have some CPUs that implement VMX?
+warn is giving you that, right? I won't crash the host because the #AC
+triggers in guest context.
+
+Thanks,
+
+        tglx
