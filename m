@@ -2,124 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A48F419033B
-	for <lists+kvm@lfdr.de>; Tue, 24 Mar 2020 02:16:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C9BB9190344
+	for <lists+kvm@lfdr.de>; Tue, 24 Mar 2020 02:19:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727118AbgCXBQn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Mar 2020 21:16:43 -0400
-Received: from mga05.intel.com ([192.55.52.43]:36066 "EHLO mga05.intel.com"
+        id S1727135AbgCXBTA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Mar 2020 21:19:00 -0400
+Received: from ozlabs.org ([203.11.71.1]:57285 "EHLO ozlabs.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727022AbgCXBQn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 Mar 2020 21:16:43 -0400
-IronPort-SDR: /aMfaVSg5FSceJkLsK3jwuo1LKKlpt+2fCsuGMYKto3RdjKZTidojnda0sC25xSzWu2fbsYNdu
- 5LNXDF79thyw==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Mar 2020 18:16:42 -0700
-IronPort-SDR: +5bKU5nywE10PLwFyRSYmQnQF5yjR57dbDpKy53jD0WTBWrSZuEbYAVnXqIn3DxaQqlPo/99Cw
- Jykmq2nej6RQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.72,298,1580803200"; 
-   d="scan'208";a="270144231"
-Received: from xiaoyaol-mobl.ccr.corp.intel.com (HELO [10.255.31.120]) ([10.255.31.120])
-  by fmsmga004.fm.intel.com with ESMTP; 23 Mar 2020 18:16:38 -0700
-Subject: Re: [PATCH v5 2/9] x86/split_lock: Avoid runtime reads of the
- TEST_CTRL MSR
-To:     Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        hpa@zytor.com, Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        kvm@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org
-Cc:     Andy Lutomirski <luto@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Arvind Sankar <nivedita@alum.mit.edu>,
-        Fenghua Yu <fenghua.yu@intel.com>,
-        Tony Luck <tony.luck@intel.com>,
+        id S1727050AbgCXBS7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 Mar 2020 21:18:59 -0400
+Received: by ozlabs.org (Postfix, from userid 1003)
+        id 48mYL92hc1z9sSL; Tue, 24 Mar 2020 12:18:57 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
+        t=1585012737; bh=fWyvQjgmoVE45UQb8yBNTXiPed69yDbrhs5hdq0egsU=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=mauSiS7oX6+4B1f4axm7Ayy0Hc0K4hbGipg06Vcls1bvNoep91a4i3dcGDcZKVpTJ
+         xQC/JEjuilfLaSd1tD8NcDipXJjAbo7uhRcrYKD9LE8of4vea9QfKCKUAAkkdF/Uz7
+         Dm7c/6XLcWYDVEm/PsidIOCTDafYwb4ENnFnDtX0zf2M52X8TbyUepK8RCjm3hj5Lu
+         u8f6BSKtFagIKKzXfDcwdZegidVRR/Rw5iEGwGP+42XDZ08MSFz0spgTcZk9vvMJUq
+         WBwqbuf0TPBzwB0coc1LPf1cCR+z4iTVCk1La6TvnzTrCQ1Bv8TD6+qUuXAoP37xGr
+         j9GwIDroxtTsA==
+Date:   Tue, 24 Mar 2020 12:18:54 +1100
+From:   Paul Mackerras <paulus@ozlabs.org>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>
-References: <20200315050517.127446-1-xiaoyao.li@intel.com>
- <20200315050517.127446-3-xiaoyao.li@intel.com>
- <87wo7bovb7.fsf@nanos.tec.linutronix.de>
-From:   Xiaoyao Li <xiaoyao.li@intel.com>
-Message-ID: <ec798425-5c1e-9f00-d4ac-6f420747572c@intel.com>
-Date:   Tue, 24 Mar 2020 09:16:38 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 1/9] KVM: Pass kvm_init()'s opaque param to additional
+ arch funcs
+Message-ID: <20200324011854.GC5604@blackberry>
+References: <20200321202603.19355-1-sean.j.christopherson@intel.com>
+ <20200321202603.19355-2-sean.j.christopherson@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <87wo7bovb7.fsf@nanos.tec.linutronix.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200321202603.19355-2-sean.j.christopherson@intel.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 3/24/2020 1:06 AM, Thomas Gleixner wrote:
-> Xiaoyao Li <xiaoyao.li@intel.com> writes:
->> +/*
->> + * Soft copy of MSR_TEST_CTRL initialized when we first read the
->> + * MSR. Used at runtime to avoid using rdmsr again just to collect
->> + * the reserved bits in the MSR. We assume reserved bits are the
->> + * same on all CPUs.
->> + */
->> +static u64 test_ctrl_val;
->> +
->>   /*
->>    * Locking is not required at the moment because only bit 29 of this
->>    * MSR is implemented and locking would not prevent that the operation
->> @@ -1027,16 +1035,14 @@ static void __init split_lock_setup(void)
->>    */
->>   static void __sld_msr_set(bool on)
->>   {
->> -	u64 test_ctrl_val;
->> -
->> -	rdmsrl(MSR_TEST_CTRL, test_ctrl_val);
->> +	u64 val = test_ctrl_val;
->>   
->>   	if (on)
->> -		test_ctrl_val |= MSR_TEST_CTRL_SPLIT_LOCK_DETECT;
->> +		val |= MSR_TEST_CTRL_SPLIT_LOCK_DETECT;
->>   	else
->> -		test_ctrl_val &= ~MSR_TEST_CTRL_SPLIT_LOCK_DETECT;
->> +		val &= ~MSR_TEST_CTRL_SPLIT_LOCK_DETECT;
->>   
->> -	wrmsrl(MSR_TEST_CTRL, test_ctrl_val);
->> +	wrmsrl(MSR_TEST_CTRL, val);
->>   }
->>   
->>   /*
->> @@ -1048,11 +1054,13 @@ static void __sld_msr_set(bool on)
->>    */
->>   static void split_lock_init(struct cpuinfo_x86 *c)
->>   {
->> -	u64 test_ctrl_val;
->> +	u64 val;
->>   
->> -	if (rdmsrl_safe(MSR_TEST_CTRL, &test_ctrl_val))
->> +	if (rdmsrl_safe(MSR_TEST_CTRL, &val))
->>   		goto msr_broken;
->>   
->> +	test_ctrl_val = val;
->> +
->>   	switch (sld_state) {
->>   	case sld_off:
->>   		if (wrmsrl_safe(MSR_TEST_CTRL, test_ctrl_val & ~MSR_TEST_CTRL_SPLIT_LOCK_DETECT))
+On Sat, Mar 21, 2020 at 01:25:55PM -0700, Sean Christopherson wrote:
+> Pass @opaque to kvm_arch_hardware_setup() and
+> kvm_arch_check_processor_compat() to allow architecture specific code to
+> reference @opaque without having to stash it away in a temporary global
+> variable.  This will enable x86 to separate its vendor specific callback
+> ops, which are passed via @opaque, into "init" and "runtime" ops without
+> having to stash away the "init" ops.
 > 
-> That's just broken. Simply because
+> No functional change intended.
 > 
->         case sld_warn:
->         case sld_fatal:
-> 
-> set the split lock detect bit, but the cache variable has it cleared
-> unless it was set at boot time already.
+> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+> Tested-by: Cornelia Huck <cohuck@redhat.com> #s390
+> Acked-by: Marc Zyngier <maz@kernel.org>
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 
-The test_ctrl_val is not to cache the value of MSR_TEST_CTRL, but cache 
-the reserved/unused bits other than MSR_TEST_CTRL_SPLIT_LOCK_DETECT bit.
-
-> Thanks,
-> 
->          tglx
-> 
-
+Acked-by: Paul Mackerras <paulus@ozlabs.org>
