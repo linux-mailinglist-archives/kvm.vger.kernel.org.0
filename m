@@ -2,104 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C1786190C47
-	for <lists+kvm@lfdr.de>; Tue, 24 Mar 2020 12:19:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BC1D8190C4B
+	for <lists+kvm@lfdr.de>; Tue, 24 Mar 2020 12:19:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727196AbgCXLTE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Mar 2020 07:19:04 -0400
-Received: from mga03.intel.com ([134.134.136.65]:65367 "EHLO mga03.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726911AbgCXLTE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 Mar 2020 07:19:04 -0400
-IronPort-SDR: wBZMDvowo+SDu/vQTJKb81RvEye/nHar4ckwHFg4orNX7tSD7B7ME2I+pADewYj4lg1bLdeSVz
- SPRYr1GRK0lw==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Mar 2020 04:19:03 -0700
-IronPort-SDR: H+pji3yQ8v4Usbv7c8Q43RSLYLQWzfSoZ9yDokfdhYLywsvyUPwWr65OVvLnAVwmX7QNbvbfFo
- e/aMqcwipizA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.72,300,1580803200"; 
-   d="scan'208";a="447845405"
-Received: from fmsmsx103.amr.corp.intel.com ([10.18.124.201])
-  by fmsmga006.fm.intel.com with ESMTP; 24 Mar 2020 04:19:03 -0700
-Received: from shsmsx105.ccr.corp.intel.com (10.239.4.158) by
- FMSMSX103.amr.corp.intel.com (10.18.124.201) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Tue, 24 Mar 2020 04:19:02 -0700
-Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.206]) by
- SHSMSX105.ccr.corp.intel.com ([169.254.11.144]) with mapi id 14.03.0439.000;
- Tue, 24 Mar 2020 19:18:59 +0800
-From:   "Liu, Yi L" <yi.l.liu@intel.com>
-To:     Peter Xu <peterx@redhat.com>
-CC:     "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "mst@redhat.com" <mst@redhat.com>,
-        "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "Tian, Jun J" <jun.j.tian@intel.com>,
-        "Sun, Yi Y" <yi.y.sun@intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Wu, Hao" <hao.wu@intel.com>,
-        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
-        Jacob Pan <jacob.jun.pan@linux.intel.com>,
-        Yi Sun <yi.y.sun@linux.intel.com>
-Subject: RE: [PATCH v1 09/22] vfio/common: check PASID alloc/free
- availability
-Thread-Topic: [PATCH v1 09/22] vfio/common: check PASID alloc/free
- availability
-Thread-Index: AQHWAEW15Jx0RCLPSU2RY4n7wVdCtqhWOBCAgAFjAVA=
-Date:   Tue, 24 Mar 2020 11:18:58 +0000
-Message-ID: <A2975661238FB949B60364EF0F2C25743A200444@SHSMSX104.ccr.corp.intel.com>
-References: <1584880579-12178-1-git-send-email-yi.l.liu@intel.com>
- <1584880579-12178-10-git-send-email-yi.l.liu@intel.com>
- <20200323220653.GT127076@xz-x1>
-In-Reply-To: <20200323220653.GT127076@xz-x1>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-version: 11.2.0.6
-dlp-reaction: no-action
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        id S1727262AbgCXLTM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Mar 2020 07:19:12 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:35214 "EHLO
+        us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727207AbgCXLTM (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 24 Mar 2020 07:19:12 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1585048750;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=pgtxWIUqOe7RBV8y1HKFvXo0TcPt4L4/Y/Q8yOwJg8A=;
+        b=NTT5PpmbyVx7tbxDQ31t1MxaVYgxt56kV1o7RGjtYqsNA0Q49m1D/4orPYUTORuNki+8Yf
+        uXFjuysoOmxXKFVjr7DbYADNtWX3k8bA9EgCccUCWsbt6yKJuCxZHZM1ogOG2lBoqG4t2+
+        601nqdXK/NruHGXhWEM8HcZDqmk4ITE=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-48-DXiCh7UZPEmLz94nRmnLkw-1; Tue, 24 Mar 2020 07:19:08 -0400
+X-MC-Unique: DXiCh7UZPEmLz94nRmnLkw-1
+Received: by mail-wr1-f71.google.com with SMTP id e10so6317854wrm.2
+        for <kvm@vger.kernel.org>; Tue, 24 Mar 2020 04:19:08 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=pgtxWIUqOe7RBV8y1HKFvXo0TcPt4L4/Y/Q8yOwJg8A=;
+        b=tgJFqAPi3AuFTFdbgKH16dUKAlAEKga9h5NQSugi/9obHiwKZ5+qvXW84CB3cua0dk
+         b9GxQ1QdxlMZ6SKjWfVH3sAUzjztG6ku4xv1kz5uKyl+gwF8Ly/hlUECgaCL/RdoGtJD
+         s6jGldB68pSrJKSbasXff/A+hJEDNDm/X8tuZbbG/IlQ0wGCxnQkJo0XeN9AHZ3z7qKG
+         O8VmI1XZudmXEOW7dzB4T9RU9CGnygWRQu4qs1yCpnIR+9359/GH7TpQ8yCXHRRKZHqj
+         I8c9jnIHwn/dstbgy2Z98y3Gsjk4W8jvDXXcrldKsfkY/MMN5NLqtMEDb3Ukcm5HSoca
+         Va3A==
+X-Gm-Message-State: ANhLgQ0EBonFZ09rLISa3t+C4ChvNIuSk08qPrBPxJMikpSA+KRmq2/s
+        sqYz8CBHTorGFnjxaI76VapwyW9OMgkdy5BYNEfhPVlxSUf86XhsE7p623M+5NZhgb0lGmU3fsE
+        p/Jzbn91LEleR
+X-Received: by 2002:a05:600c:581:: with SMTP id o1mr5113379wmd.111.1585048747382;
+        Tue, 24 Mar 2020 04:19:07 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vtXyFp93ixS0SdKYFgvGRSwDxD5NqQm7QdTATcvy69g/jxwWIl5BkMKFytFLvaIGtv/e8sHJg==
+X-Received: by 2002:a05:600c:581:: with SMTP id o1mr5113351wmd.111.1585048747127;
+        Tue, 24 Mar 2020 04:19:07 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:7848:99b4:482a:e888? ([2001:b07:6468:f312:7848:99b4:482a:e888])
+        by smtp.gmail.com with ESMTPSA id r18sm28608611wro.13.2020.03.24.04.19.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 24 Mar 2020 04:19:06 -0700 (PDT)
+Subject: Re: [PATCH v3 33/37] KVM: nVMX: Skip MMU sync on nested VMX
+ transition when possible
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Ben Gardon <bgardon@google.com>,
+        Junaid Shahid <junaids@google.com>,
+        Liran Alon <liran.alon@oracle.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        John Haxby <john.haxby@oracle.com>,
+        Miaohe Lin <linmiaohe@huawei.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>
+References: <20200320212833.3507-1-sean.j.christopherson@intel.com>
+ <20200320212833.3507-34-sean.j.christopherson@intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <51707375-51a6-637e-ebc5-f63f1c81f6b1@redhat.com>
+Date:   Tue, 24 Mar 2020 12:19:05 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
+In-Reply-To: <20200320212833.3507-34-sean.j.christopherson@intel.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-PiBGcm9tOiBQZXRlciBYdSA8cGV0ZXJ4QHJlZGhhdC5jb20+DQo+IFNlbnQ6IFR1ZXNkYXksIE1h
-cmNoIDI0LCAyMDIwIDY6MDcgQU0NCj4gVG86IExpdSwgWWkgTCA8eWkubC5saXVAaW50ZWwuY29t
-Pg0KPiBTdWJqZWN0OiBSZTogW1BBVENIIHYxIDA5LzIyXSB2ZmlvL2NvbW1vbjogY2hlY2sgUEFT
-SUQgYWxsb2MvZnJlZSBhdmFpbGFiaWxpdHkNCj4gDQo+IE9uIFN1biwgTWFyIDIyLCAyMDIwIGF0
-IDA1OjM2OjA2QU0gLTA3MDAsIExpdSBZaSBMIHdyb3RlOg0KPiANCj4gWy4uLl0NCj4gDQo+ID4g
-QEAgLTEyNTYsMTEgKzEzMzQsMTkgQEAgc3RhdGljIGludCB2ZmlvX2luaXRfY29udGFpbmVyKFZG
-SU9Db250YWluZXINCj4gKmNvbnRhaW5lciwgaW50IGdyb3VwX2ZkLA0KPiA+ICAgICAgfQ0KPiA+
-DQo+ID4gICAgICBpZiAoaW9tbXVfdHlwZSA9PSBWRklPX1RZUEUxX05FU1RJTkdfSU9NTVUpIHsN
-Cj4gPiAtICAgICAgICAvKg0KPiA+IC0gICAgICAgICAqIFRPRE86IGNvbmZpZyBmbGFncyBwZXIg
-aG9zdCBJT01NVSBuZXN0aW5nIGNhcGFiaWxpdHkNCj4gPiAtICAgICAgICAgKiBlLmcuIGNoZWNr
-IGlmIFZGSU9fVFlQRTFfTkVTVElOR19JT01NVSBzdXBwb3J0cyBQQVNJRA0KPiA+IC0gICAgICAg
-ICAqIGFsbG9jL2ZyZWUNCj4gPiAtICAgICAgICAgKi8NCj4gPiArICAgICAgICBzdHJ1Y3QgdmZp
-b19pb21tdV90eXBlMV9pbmZvX2NhcF9uZXN0aW5nIG5lc3RpbmcgPSB7DQo+ID4gKyAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgLm5lc3RpbmdfY2FwYWJpbGl0aWVzID0g
-MHgwLA0KPiA+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIC5zdGFn
-ZTFfZm9ybWF0cyA9IDAsIH07DQo+ID4gKw0KPiA+ICsgICAgICAgIHJldCA9IHZmaW9fZ2V0X25l
-c3RpbmdfaW9tbXVfY2FwKGNvbnRhaW5lciwgJm5lc3RpbmcpOw0KPiA+ICsgICAgICAgIGlmIChy
-ZXQpIHsNCj4gPiArICAgICAgICAgICAgZXJyb3Jfc2V0Z19lcnJubyhlcnJwLCAtcmV0LA0KPiA+
-ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICJGYWlsZWQgdG8gZ2V0IG5lc3RpbmcgaW9t
-bXUgY2FwIik7DQo+ID4gKyAgICAgICAgICAgIHJldHVybiByZXQ7DQo+ID4gKyAgICAgICAgfQ0K
-PiA+ICsNCj4gPiArICAgICAgICBmbGFncyB8PSAobmVzdGluZy5uZXN0aW5nX2NhcGFiaWxpdGll
-cyAmIFZGSU9fSU9NTVVfUEFTSURfUkVRUykgPw0KPiA+ICsgICAgICAgICAgICAgICAgIEhPU1Rf
-SU9NTVVfUEFTSURfUkVRVUVTVCA6IDA7DQo+IA0KPiBJIHJlcGxpZWQgaW4gdGhlIHByZXZpb3Vz
-IHBhdGNoIGJ1dCBJIGZvcmdvdCB0byB1c2UgcmVwbHktYWxsLi4uDQo+IA0KPiBBbnl3YXkgSSds
-bCBjb21tZW50IGFnYWluIGhlcmUgLSBJIHRoaW5rIGl0J2xsIGJlIHNsaWdodGx5IGJldHRlciB3
-ZQ0KPiB1c2UgdGhlIHByZXZpb3VzIHBhdGNoIHRvIG9ubHkgb2ZmZXIgdGhlIHZmaW8gc3BlY2lm
-aWMgaG9va3MsIGFuZCB0aGlzDQo+IHBhdGNoIHRvIGRvIGFsbCB0aGUgcmVzdCBpbmNsdWRpbmcg
-aG9zdF9pb21tdV9jdHhfaW5pdCgpIGJlbG93LCB3aGljaA0KPiB3aWxsIGF2b2lkIGNyZWF0aW5n
-IHRoZSBob3N0X2lvbW11X2N0eF9pbml0KCkuDQoNCkdvdCBpdC4gTGV0IG1lIGRvIGl0IGluIG5l
-eHQgdmVyc2lvbi4NCg0KUmVnYXJkcywNCllpIExpdQ0K
+On 20/03/20 22:28, Sean Christopherson wrote:
+> Skip the MMU sync when reusing a cached root if EPT is enabled or L1
+> enabled VPID for L2.
+> 
+> If EPT is enabled, guest-physical mappings aren't flushed even if VPID
+> is disabled, i.e. L1 can't expect stale TLB entries to be flushed if it
+> has enabled EPT and L0 isn't shadowing PTEs (for L1 or L2) if L1 has
+> EPT disabled.
+> 
+> If VPID is enabled (and EPT is disabled), then L1 can't expect stale TLB
+> entries to be flushed (for itself or L2).
+> 
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+
+Great, just a small rephrasing here and there:
+
+/*
+ * Returns true if the MMU needs to be sync'd on nested VM-Enter/VM-Exit.
+ * tl;dr: the MMU needs a sync if L0 is using shadow paging and L1 didn't
+ * enable VPID for L2 (implying it expects a TLB flush on VMX transitions).
+ * Here's why.
+ *
+ * If EPT is enabled by L0 a sync is never needed:
+ * - if it is disabled by L1, then L0 is not shadowing L1 or L2 PTEs, there
+ *   cannot be unsync'd SPTEs for either L1 or L2.
+ *
+ * - if it is also enabled by L1, then L0 doesn't need to sync on VM-Enter
+ *   VM-Enter as VM-Enter isn't required to invalidate guest-physical mappings
+ *   (irrespective of VPID), i.e. L1 can't rely on the (virtual) CPU to flush
+ *   stale guest-physical mappings for L2 from the TLB.  And as above, L0 isn't
+ *   shadowing L1 PTEs so there are no unsync'd SPTEs to sync on VM-Exit.
+ *
+ * If EPT is disabled by L0:
+ * - if VPID is enabled by L1 (for L2), the situation is similar to when L1
+ *   enables EPT: L0 doesn't need to sync as VM-Enter and VM-Exit aren't
+ *   required to invalidate linear mappings (EPT is disabled so there are
+ *   no combined or guest-physical mappings), i.e. L1 can't rely on the
+ *   (virtual) CPU to flush stale linear mappings for either L2 or itself (L1).
+ *
+ * - however if VPID is disabled by L1, then a sync is needed as L1 expects all
+ *   linear mappings (EPT is disabled so there are no combined or guest-physical
+ *   mappings) to be invalidated on both VM-Enter and VM-Exit.
+ *
+ * Note, this logic is subtly different than nested_has_guest_tlb_tag(), which
+ * additionally checks that L2 has been assigned a VPID (when EPT is disabled).
+ * Whether or not L2 has been assigned a VPID by L0 is irrelevant with respect
+ * to L1's expectations, e.g. L0 needs to invalidate hardware TLB entries if L2
+ * doesn't have a unique VPID to prevent reusing L1's entries (assuming L1 has
+ * been assigned a VPID), but L0 doesn't need to do a MMU sync because L1
+ * doesn't expect stale (virtual) TLB entries to be flushed, i.e. L1 doesn't
+ * know that L0 will flush the TLB and so L1 will do INVVPID as needed to flush
+ * stale TLB entries, at which point L0 will sync L2's MMU.
+ */
+
+Paolo
+
