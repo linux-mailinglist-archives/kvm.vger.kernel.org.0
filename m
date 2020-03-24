@@ -2,93 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 824C51918C3
-	for <lists+kvm@lfdr.de>; Tue, 24 Mar 2020 19:20:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 637681918E7
+	for <lists+kvm@lfdr.de>; Tue, 24 Mar 2020 19:22:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727393AbgCXST0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Mar 2020 14:19:26 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:53478 "EHLO
-        us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727310AbgCXST0 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 24 Mar 2020 14:19:26 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1585073964;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=bfKxrcAYL3qJAjPqhp2KXWsKra1TFVjk/RLo1JNsOVY=;
-        b=UuZao6GNhoO8B0oAUoo93Uq2EYviRSKCB2BXNezcw9ERJsug44tnhIyH4FddyoWm3iJRJv
-        ycb/wIhAyk5hkcqK1TR1tzKrVXUMuxFWv1XSj0WiKluigPF5+Yo7SXL4VyA9mxfJ3IwdCX
-        lEgPFdjCtSKPuO7Mj1YFmOYeUDT0CoY=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-383-L1yIOjN_NLa_1TFQyD5W6w-1; Tue, 24 Mar 2020 14:19:22 -0400
-X-MC-Unique: L1yIOjN_NLa_1TFQyD5W6w-1
-Received: by mail-wm1-f70.google.com with SMTP id n25so1552316wmi.5
-        for <kvm@vger.kernel.org>; Tue, 24 Mar 2020 11:19:22 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=bfKxrcAYL3qJAjPqhp2KXWsKra1TFVjk/RLo1JNsOVY=;
-        b=ZcodD9O0odHV5xLyx74JMXk01PEqNhZeXIx0IKVDilX/ai+mhaLeUmEyntTT0/PLpt
-         GeL5c89yzBoT/EO3+bnakz8+o3FZ53Wmvrr9E/1VJPzVlhSHitjHUoFu6HPcyItaO3mU
-         XUbJ/mnouA/Goie7COI63NRuC4rBZ/m1vxSovRBXGhaLVSmEmH+dVQSVgHLCotXrrRxp
-         mbGn1ELGA1hNY/6PV++wxG73AzACgb87Ye29bxEBBQS+zV8r4rFAaJ2ULnDp1HOMfIXw
-         KhhxCNo8grb5hViFZJsdL147YMi6inPugXyqxCefVMW92GCTDBEa8j/e7GKBRFheNwPL
-         LY5Q==
-X-Gm-Message-State: ANhLgQ24kdxAbySshgVV/fvpc+KQ2JcEqWfiyj9WnRiVrqqVk2n0PjUy
-        Z8aYQYFiymYHRvyhQwIyxOhtP8S6CBveE3PeuR0lQ+J8I1P2qUfvfuCUjnwzJ7TyZ4nVCH+e3Jp
-        S2xaVUyUsxDs3
-X-Received: by 2002:adf:cf09:: with SMTP id o9mr37080579wrj.74.1585073961686;
-        Tue, 24 Mar 2020 11:19:21 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vtoyGu2Zn/sHDRK1B/QPFf7ailyYZQZxOfMhhUCMwv+32rQI+zwHFaIHeTUKFtQQbBMp9AAGQ==
-X-Received: by 2002:adf:cf09:: with SMTP id o9mr37080540wrj.74.1585073961431;
-        Tue, 24 Mar 2020 11:19:21 -0700 (PDT)
-Received: from xz-x1 ([2607:9880:19c0:32::2])
-        by smtp.gmail.com with ESMTPSA id u5sm23315254wrp.81.2020.03.24.11.19.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Mar 2020 11:19:20 -0700 (PDT)
-Date:   Tue, 24 Mar 2020 14:19:15 -0400
-From:   Peter Xu <peterx@redhat.com>
-To:     Liu Yi L <yi.l.liu@intel.com>
-Cc:     qemu-devel@nongnu.org, alex.williamson@redhat.com,
-        eric.auger@redhat.com, pbonzini@redhat.com, mst@redhat.com,
-        david@gibson.dropbear.id.au, kevin.tian@intel.com,
-        jun.j.tian@intel.com, yi.y.sun@intel.com, kvm@vger.kernel.org,
-        hao.wu@intel.com, jean-philippe@linaro.org,
-        Jacob Pan <jacob.jun.pan@linux.intel.com>,
-        Yi Sun <yi.y.sun@linux.intel.com>
-Subject: Re: [PATCH v1 18/22] vfio: add support for flush iommu stage-1 cache
-Message-ID: <20200324181915.GC127076@xz-x1>
-References: <1584880579-12178-1-git-send-email-yi.l.liu@intel.com>
- <1584880579-12178-19-git-send-email-yi.l.liu@intel.com>
+        id S1728162AbgCXSVF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Mar 2020 14:21:05 -0400
+Received: from mga07.intel.com ([134.134.136.100]:33976 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727379AbgCXSVF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 Mar 2020 14:21:05 -0400
+IronPort-SDR: YQ3IlUFAH0UZqrqfbHRQFKDbyJPAoPvGXPiPAD5m7KxpOAgbGtqmui7L6Ir88TyoRaoHDXx9Uj
+ Q7HOy6mgj47w==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Mar 2020 11:20:50 -0700
+IronPort-SDR: y/USM2b3SPl0LjjMZJcqAmjb2PYOuW/QAtqFht1aEDTm2RWTprcUGxDRQvFy8adhtqpy78sfUX
+ 6Y7gyFMhw+XA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.72,301,1580803200"; 
+   d="scan'208";a="246803473"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
+  by orsmga003.jf.intel.com with ESMTP; 24 Mar 2020 11:20:48 -0700
+Date:   Tue, 24 Mar 2020 11:20:48 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Christian Borntraeger <borntraeger@de.ibm.com>
+Cc:     James Hogan <jhogan@kernel.org>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Marc Zyngier <maz@kernel.org>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        linux-mips@vger.kernel.org, kvm-ppc@vger.kernel.org,
+        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+Subject: Re: [PATCH v4 19/19] KVM: selftests: Add test for
+ KVM_SET_USER_MEMORY_REGION
+Message-ID: <20200324182048.GF5998@linux.intel.com>
+References: <20191217204041.10815-1-sean.j.christopherson@intel.com>
+ <20191217204041.10815-20-sean.j.christopherson@intel.com>
+ <f962fafb-3956-746f-d077-3dbcefaae7c8@de.ibm.com>
+ <20191218163958.GC25201@linux.intel.com>
+ <78b21097-52e4-b851-fc78-da3442fd0904@de.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1584880579-12178-19-git-send-email-yi.l.liu@intel.com>
+In-Reply-To: <78b21097-52e4-b851-fc78-da3442fd0904@de.ibm.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Mar 22, 2020 at 05:36:15AM -0700, Liu Yi L wrote:
-> This patch adds flush_stage1_cache() definition in HostIOMUContextClass.
-> And adds corresponding implementation in VFIO. This is to expose a way
-> for vIOMMU to flush stage-1 cache in host side since guest owns stage-1
-> translation structures in dual stage DMA translation configuration.
+On Tue, Mar 24, 2020 at 10:43:07AM +0100, Christian Borntraeger wrote:
 > 
-> Cc: Kevin Tian <kevin.tian@intel.com>
-> Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
-> Cc: Peter Xu <peterx@redhat.com>
-> Cc: Eric Auger <eric.auger@redhat.com>
-> Cc: Yi Sun <yi.y.sun@linux.intel.com>
-> Cc: David Gibson <david@gibson.dropbear.id.au>
-> Cc: Alex Williamson <alex.williamson@redhat.com>
-> Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
+> On 18.12.19 17:39, Sean Christopherson wrote:
+> > On Wed, Dec 18, 2019 at 12:39:43PM +0100, Christian Borntraeger wrote:
+> >>
+> I started looking into this what it would cost to implement this on s390.
+> s390 is also returning EFAULT if no memory slot is available.
+> 
+> According to the doc this is not documented at all. So this part of the test
+>         vm = vm_create(VM_MODE_DEFAULT, 0, O_RDWR);
+>         vm_vcpu_add(vm, VCPU_ID);
+>         /* Fails with ENOSPC because the MMU can't create pages (no slots). */
+>         TEST_ASSERT(_vcpu_run(vm, VCPU_ID) == -1 && errno == ENOSPC,
+>                     "Unexpected error code = %d", errno);
+>         kvm_vm_free(vm);
+> 
+> is actually just testing that the implementation for x86 does not change the error
+> from ENOSPC to something else.
 
-Acked-by: Peter Xu <peterx@redhat.com>
+It's even worse than that.  There error isn't directly due to no having
+a memslots, it occurs because the limit on number of pages in the MMU is
+zero.  On x86, that limit is automatically derived from the total size of
+memslots.
 
--- 
-Peter Xu
+The selftest could add an explicit ioctl() call to manually override the
+number of allowed MMU pages, but that didn't seem any cleaner as it'd still
+rely on undocumented internal KVM behavior.
 
+TL;DR: I'm not a huge fan of the code either.
+
+> The question is: do we want to document the error for the "no memslot" case
+> and then change all existing platforms?
+
+At first blush, I like the idea of adding an explicit check in KVM_RUN to
+return an error if there isn't at least one usable memslot.  But, it'd be a
+little weird/kludgy on x86/VMX due to the existence of "private" memslots,
+i.e. the check should really fire on "no public memslots".  At that point,
+I'm not sure whether the well defined errno would be worth the extra code.
