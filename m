@@ -2,135 +2,158 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id AF1A6191387
-	for <lists+kvm@lfdr.de>; Tue, 24 Mar 2020 15:46:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7B93F191394
+	for <lists+kvm@lfdr.de>; Tue, 24 Mar 2020 15:50:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727888AbgCXOqE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Mar 2020 10:46:04 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:34093 "EHLO
+        id S1727852AbgCXOuM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Mar 2020 10:50:12 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:44525 "EHLO
         us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727065AbgCXOqE (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 24 Mar 2020 10:46:04 -0400
+        by vger.kernel.org with ESMTP id S1727065AbgCXOuL (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 24 Mar 2020 10:50:11 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1585061163;
+        s=mimecast20190719; t=1585061409;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=HJt9mIvAgLVdLWEY0GDl93Plvr0uiaSZhoPdCdZCYdw=;
-        b=K4Z+NEpmisi+iynUPDFtRJCCaAh80HX34drmy/RIx53PZejz0AXRA9Yfz8zzMDjznt/XND
-        ODEYEFSHdEDN1QiOmehZMJL4hYBLPuGnBH3EEiRN/b6R9VMV6amm19hlg30ra99g/OmVPV
-        NAZg+d1u5xhhpktUeWrxJsdXst+S0/8=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-237-MJFEIMSAOgOUa_YJTKIhdQ-1; Tue, 24 Mar 2020 10:45:59 -0400
-X-MC-Unique: MJFEIMSAOgOUa_YJTKIhdQ-1
-Received: by mail-wr1-f72.google.com with SMTP id e10so6580394wrm.2
-        for <kvm@vger.kernel.org>; Tue, 24 Mar 2020 07:45:59 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=HJt9mIvAgLVdLWEY0GDl93Plvr0uiaSZhoPdCdZCYdw=;
-        b=UrNVGV2yT4vR2LO/GWMDon5kGrngCU0YgAWkcZ4wMx8DHA2emChM53VqcAGwp7j7EZ
-         cdgiRM6QUHU9BN+WtFBYzaLAc0zycLaoEtBSvpKzzPaw4hHR+Tk6zzPfWx2CR8wEKctF
-         mezdaShomY8eXa5iv5omrL3rxl3MKgHYCR6+GAtlv0Fn4W8jYzjhLTUx4CSw5hKRMrr+
-         3MVZQVoDSIQfTKmtRczbRC4T7GOKJbVoWC5nbVDezLiSZ7OXdEgYKzenoH5OBZ+nm0cx
-         IIeemnEZu7mCWvzBX/rZW7LiM4wlVVeVkm/9LbZsIE5tFajkXIhjzn5vgWo6gSpoWfa1
-         oCCA==
-X-Gm-Message-State: ANhLgQ24bY19VqOkLuVbUeiFglw2nejXEDytFbF8teTUyPF0JMkndx0e
-        l+vNkMDsd03e/coSw0zhchdcL5AiXAEhHp0ZNAbZoxXrYqV2yLcntXg9q5W/emrQEC2qyDBnVFo
-        WNCV0Ef8vvFCx
-X-Received: by 2002:a7b:c189:: with SMTP id y9mr5703987wmi.47.1585061158241;
-        Tue, 24 Mar 2020 07:45:58 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vu3gn+H/ovKrBwuieprSiD/Bt+3YN3Wqy5eSJ0ZzLpDcEbr5d4ayWoIJreCQgp2R23siVAHqg==
-X-Received: by 2002:a7b:c189:: with SMTP id y9mr5703971wmi.47.1585061158024;
-        Tue, 24 Mar 2020 07:45:58 -0700 (PDT)
-Received: from xz-x1 (CPEf81d0fb19163-CMf81d0fb19160.cpe.net.fido.ca. [72.137.123.47])
-        by smtp.gmail.com with ESMTPSA id k9sm30312702wrd.74.2020.03.24.07.45.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Mar 2020 07:45:57 -0700 (PDT)
-Date:   Tue, 24 Mar 2020 10:45:53 -0400
-From:   Peter Xu <peterx@redhat.com>
-To:     "Liu, Yi L" <yi.l.liu@intel.com>
-Cc:     "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "mst@redhat.com" <mst@redhat.com>,
-        "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "Tian, Jun J" <jun.j.tian@intel.com>,
-        "Sun, Yi Y" <yi.y.sun@intel.com>,
+        bh=zI1iQYeYC9lt1kBrjAHropMSeNOxmOibl4mmPnXMvvM=;
+        b=L/lCnH6So+vYz1LmduWowtzE2aazsO6JVii5Aht/Ny9tdtI/Uh4Lwb5Q+TjvTDvC0qbe3N
+        hq996yLaeTFbXMoLG/za8HQhyIRX5T/Og8jKB3jNMdFgMVXrgwCGynfb3Esu+WgX+rUvVR
+        ZHkaMA2wZQ6uJvPHZL5trCUascgplHY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-401-dxBHpPlMMnKjecfa07nMQw-1; Tue, 24 Mar 2020 10:50:08 -0400
+X-MC-Unique: dxBHpPlMMnKjecfa07nMQw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 41EB58018A2;
+        Tue, 24 Mar 2020 14:50:05 +0000 (UTC)
+Received: from w520.home (ovpn-112-162.phx2.redhat.com [10.3.112.162])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A77B4171B1;
+        Tue, 24 Mar 2020 14:49:54 +0000 (UTC)
+Date:   Tue, 24 Mar 2020 08:49:54 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc:     Yan Zhao <yan.y.zhao@intel.com>,
+        "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        "aik@ozlabs.ru" <aik@ozlabs.ru>,
+        "Zhengxiao.zx@alibaba-inc.com" <Zhengxiao.zx@alibaba-inc.com>,
+        "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
+        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+        "eauger@redhat.com" <eauger@redhat.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>,
+        "Yang, Ziye" <ziye.yang@intel.com>,
+        "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
+        "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
+        "felipe@nutanix.com" <felipe@nutanix.com>,
+        "Liu, Changpeng" <changpeng.liu@intel.com>,
+        "Ken.Xue@amd.com" <Ken.Xue@amd.com>,
+        "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>,
+        "He, Shaopeng" <shaopeng.he@intel.com>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Wu, Hao" <hao.wu@intel.com>,
-        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
-        Jacob Pan <jacob.jun.pan@linux.intel.com>,
-        Yi Sun <yi.y.sun@linux.intel.com>
-Subject: Re: [PATCH v1 08/22] vfio: init HostIOMMUContext per-container
-Message-ID: <20200324144553.GU127076@xz-x1>
-References: <1584880579-12178-1-git-send-email-yi.l.liu@intel.com>
- <1584880579-12178-9-git-send-email-yi.l.liu@intel.com>
- <20200323213943.GR127076@xz-x1>
- <A2975661238FB949B60364EF0F2C25743A2006A9@SHSMSX104.ccr.corp.intel.com>
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "libvir-list@redhat.com" <libvir-list@redhat.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
+        "Wang, Zhi A" <zhi.a.wang@intel.com>,
+        "cjia@nvidia.com" <cjia@nvidia.com>,
+        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
+        "berrange@redhat.com" <berrange@redhat.com>,
+        "dinechin@redhat.com" <dinechin@redhat.com>
+Subject: Re: [PATCH v4 0/2] introduction of migration_version attribute for
+ VFIO live migration
+Message-ID: <20200324084954.0dd835e2@w520.home>
+In-Reply-To: <20200324092331.GA2645@work-vm>
+References: <20190531004438.24528-1-yan.y.zhao@intel.com>
+        <20190603132932.1b5dc7fe@x1.home>
+        <20190604003422.GA30229@joy-OptiPlex-7040>
+        <20200323152959.1c39e9a7@w520.home>
+        <20200324035316.GE5456@joy-OptiPlex-7040>
+        <20200324092331.GA2645@work-vm>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <A2975661238FB949B60364EF0F2C25743A2006A9@SHSMSX104.ccr.corp.intel.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 24, 2020 at 01:03:28PM +0000, Liu, Yi L wrote:
-> > From: Peter Xu <peterx@redhat.com>
-> > Sent: Tuesday, March 24, 2020 5:40 AM
-> > To: Liu, Yi L <yi.l.liu@intel.com>
-> > Subject: Re: [PATCH v1 08/22] vfio: init HostIOMMUContext per-container
-> > 
-> > On Sun, Mar 22, 2020 at 05:36:05AM -0700, Liu Yi L wrote:
-> > > After confirming dual stage DMA translation support with kernel by
-> > > checking VFIO_TYPE1_NESTING_IOMMU, VFIO inits HostIOMMUContet instance
-> > > and exposes it to PCI layer. Thus vIOMMU emualtors may make use of
-> > > such capability by leveraging the methods provided by HostIOMMUContext.
-> > >
-> > > Cc: Kevin Tian <kevin.tian@intel.com>
-> > > Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
-> > > Cc: Peter Xu <peterx@redhat.com>
-> > > Cc: Eric Auger <eric.auger@redhat.com>
-> > > Cc: Yi Sun <yi.y.sun@linux.intel.com>
-> > > Cc: David Gibson <david@gibson.dropbear.id.au>
-> > > Cc: Alex Williamson <alex.williamson@redhat.com>
-> > > Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
-> > > ---
-> > >  hw/vfio/common.c                      | 80 +++++++++++++++++++++++++++++++++++
-> > >  hw/vfio/pci.c                         | 13 ++++++
-> > >  include/hw/iommu/host_iommu_context.h |  3 ++
-> > >  include/hw/vfio/vfio-common.h         |  4 ++
-> > >  4 files changed, 100 insertions(+)
-> > >
-> > > diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-> > > index c276732..e4f5f10 100644
-> > > --- a/hw/vfio/common.c
-> > > +++ b/hw/vfio/common.c
-> > > @@ -1179,10 +1179,55 @@ static int vfio_get_iommu_type(VFIOContainer
-> > *container,
-> > >      return -EINVAL;
-> > >  }
-> > >
-> > > +static int vfio_host_icx_pasid_alloc(HostIOMMUContext *host_icx,
-> > 
-> > I'm not sure about Alex, but ... icx is confusing to me.  Maybe "ctx"
-> > as you always used?
+On Tue, 24 Mar 2020 09:23:31 +0000
+"Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+
+> * Yan Zhao (yan.y.zhao@intel.com) wrote:
+> > On Tue, Mar 24, 2020 at 05:29:59AM +0800, Alex Williamson wrote:  
+> > > On Mon, 3 Jun 2019 20:34:22 -0400
+> > > Yan Zhao <yan.y.zhao@intel.com> wrote:
+> > >   
+> > > > On Tue, Jun 04, 2019 at 03:29:32AM +0800, Alex Williamson wrote:  
+> > > > > On Thu, 30 May 2019 20:44:38 -0400
+> > > > > Yan Zhao <yan.y.zhao@intel.com> wrote:
+> > > > >     
+> > > > > > This patchset introduces a migration_version attribute under sysfs of VFIO
+> > > > > > Mediated devices.
+> > > > > > 
+> > > > > > This migration_version attribute is used to check migration compatibility
+> > > > > > between two mdev devices of the same mdev type.
+> > > > > > 
+> > > > > > Patch 1 defines migration_version attribute in
+> > > > > > Documentation/vfio-mediated-device.txt
+> > > > > > 
+> > > > > > Patch 2 uses GVT as an example to show how to expose migration_version
+> > > > > > attribute and check migration compatibility in vendor driver.    
+> > > > > 
+> > > > > Thanks for iterating through this, it looks like we've settled on
+> > > > > something reasonable, but now what?  This is one piece of the puzzle to
+> > > > > supporting mdev migration, but I don't think it makes sense to commit
+> > > > > this upstream on its own without also defining the remainder of how we
+> > > > > actually do migration, preferably with more than one working
+> > > > > implementation and at least prototyped, if not final, QEMU support.  I
+> > > > > hope that was the intent, and maybe it's now time to look at the next
+> > > > > piece of the puzzle.  Thanks,
+> > > > > 
+> > > > > Alex    
+> > > > 
+> > > > Got it. 
+> > > > Also thank you and all for discussing and guiding all along:)
+> > > > We'll move to the next episode now.  
+> > > 
+> > > Hi Yan,
+> > > 
+> > > As we're hopefully moving towards a migration API, would it make sense
+> > > to refresh this series at the same time?  I think we're still expecting
+> > > a vendor driver implementing Kirti's migration API to also implement
+> > > this sysfs interface for compatibility verification.  Thanks,
+> > >  
+> > Hi Alex
+> > Got it!
+> > Thanks for reminding of this. And as now we have vfio-pci implementing
+> > vendor ops to allow live migration of pass-through devices, is it
+> > necessary to implement similar sysfs node for those devices?
+> > or do you think just PCI IDs of those devices are enough for libvirt to
+> > know device compatibility ?  
 > 
-> At first I used vfio_host_iommu_ctx_pasid_alloc(), found it is long, so I
-> switched to "icx" which means iommu_context. Maybe the former one
-> looks better as it gives more precise info.
+> Wasn't the problem that we'd have to know how to check for things like:
+>   a) Whether different firmware versions in the device were actually
+> compatible
+>   b) Whether minor hardware differences were compatible - e.g. some
+> hardware might let you migrate to the next version of hardware up.
 
-vfio_host_iommu_ctx_pasid_alloc() isn't that bad imho.  I'll omit the
-"ctx" if I want to make it even shorter, but "icx" might be ambiguous.
+Yes, minor changes in hardware or firmware that may not be represented
+in the device ID or hardware revision.  Also the version is as much for
+indicating the compatibility of the vendor defined migration protocol
+as it is for the hardware itself.  I certainly wouldn't be so bold as
+to create a protocol that is guaranteed compatible forever.  We'll need
+to expose the same sysfs attribute in some standard location for
+non-mdev devices.  I assume vfio-pci would provide the vendor ops some
+mechanism to expose these in a standard namespace of sysfs attributes
+under the device itself.  Perhaps that indicates we need to link the
+mdev type version under the mdev device as well to make this
+transparent to userspace tools like libvirt.  Thanks,
 
-Thanks,
-
--- 
-Peter Xu
+Alex
 
