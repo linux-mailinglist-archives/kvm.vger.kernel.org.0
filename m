@@ -2,127 +2,307 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A09FF191246
-	for <lists+kvm@lfdr.de>; Tue, 24 Mar 2020 14:59:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 85664191360
+	for <lists+kvm@lfdr.de>; Tue, 24 Mar 2020 15:37:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727578AbgCXN6S (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Mar 2020 09:58:18 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:47439 "EHLO
+        id S1727549AbgCXOh3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Mar 2020 10:37:29 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:26211 "EHLO
         us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727398AbgCXN6S (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 24 Mar 2020 09:58:18 -0400
+        by vger.kernel.org with ESMTP id S1727385AbgCXOh2 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 24 Mar 2020 10:37:28 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1585058297;
+        s=mimecast20190719; t=1585060646;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=bBQ5X1xIXO9R19Gk4rRRsSNh0sMkDLAErblkw+/9zMk=;
-        b=RO7jp2fW28pXagZm0X7v7gQjXfeZfXWg4CoIqDC8ODggBxWoXnaajMslCIEpolM0lZEP2r
-        BIgaiwQuDXpJeDp4MupHEE8y5PwokpdGK99+To0ZyqawduC6RP90J5B2Kvb0Gj+NhYldcL
-        nRUBOqNb3FfmPxNzEjROjJSA8P5QFJs=
+         in-reply-to:in-reply-to:references:references;
+        bh=plhecBfqCE6Bwb2z8ZG6u6IZ5QGEo+rdjdeLaBnj5YQ=;
+        b=KttPrY8ezljE/A3rMk8lyKtz3yAVtv8rklMfSPfKMFz//YnhCtSBcRGYna9Lx9dDCFXMrr
+        vK3wuAB1obYgydJ0tfPseJexS2Gt90YHTgKQbmLwHCelDyUGDLT2r9hsLxvwJ1WlZidwuJ
+        /Uj+Splu9NTg6rdTbXyykIuLp+uEzMw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-360-oZDc8g_8On-FIqBdFyJSag-1; Tue, 24 Mar 2020 09:58:15 -0400
-X-MC-Unique: oZDc8g_8On-FIqBdFyJSag-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+ us-mta-65-h4cfLtrJMMu8MAmYq1NWHA-1; Tue, 24 Mar 2020 10:37:20 -0400
+X-MC-Unique: h4cfLtrJMMu8MAmYq1NWHA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4EF9BDBAC;
-        Tue, 24 Mar 2020 13:58:14 +0000 (UTC)
-Received: from [10.36.112.232] (ovpn-112-232.ams2.redhat.com [10.36.112.232])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 94FAF10016EB;
-        Tue, 24 Mar 2020 13:58:12 +0000 (UTC)
-Subject: Re: [PATCH 1/2] s390x: add myself as reviewer
-To:     Janosch Frank <frankja@linux.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, Thomas Huth <thuth@redhat.com>
-References: <20200324121722.9776-1-cohuck@redhat.com>
- <20200324121722.9776-2-cohuck@redhat.com>
- <2556051f-99d8-4d18-80eb-f6bdf7e886a1@linux.ibm.com>
-From:   David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat GmbH
-Message-ID: <906eeeb8-0fbc-3b15-0fb7-50873e91de7e@redhat.com>
-Date:   Tue, 24 Mar 2020 14:58:11 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C4FF819057AC;
+        Tue, 24 Mar 2020 14:37:16 +0000 (UTC)
+Received: from w520.home (ovpn-112-162.phx2.redhat.com [10.3.112.162])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 2E9BA1E6;
+        Tue, 24 Mar 2020 14:36:45 +0000 (UTC)
+Date:   Tue, 24 Mar 2020 08:36:44 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Yan Zhao <yan.y.zhao@intel.com>
+Cc:     "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        "cjia@nvidia.com" <cjia@nvidia.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "Yang, Ziye" <ziye.yang@intel.com>,
+        "Liu, Changpeng" <changpeng.liu@intel.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>,
+        "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
+        "eskultet@redhat.com" <eskultet@redhat.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>,
+        "eauger@redhat.com" <eauger@redhat.com>,
+        "aik@ozlabs.ru" <aik@ozlabs.ru>,
+        "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
+        "felipe@nutanix.com" <felipe@nutanix.com>,
+        "Zhengxiao.zx@alibaba-inc.com" <Zhengxiao.zx@alibaba-inc.com>,
+        "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
+        "Ken.Xue@amd.com" <Ken.Xue@amd.com>,
+        "Wang, Zhi A" <zhi.a.wang@intel.com>,
+        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: Re: [PATCH v15 Kernel 4/7] vfio iommu: Implementation of ioctl for
+ dirty pages tracking.
+Message-ID: <20200324083644.36494641@w520.home>
+In-Reply-To: <20200324030118.GD5456@joy-OptiPlex-7040>
+References: <1584649004-8285-1-git-send-email-kwankhede@nvidia.com>
+        <1584649004-8285-5-git-send-email-kwankhede@nvidia.com>
+        <20200319165704.1f4eb36a@w520.home>
+        <bc48ae5c-67f9-d95e-5d60-6c42359bb790@nvidia.com>
+        <20200320120137.6acd89ee@x1.home>
+        <cf0ee134-c1c7-f60c-afc2-8948268d8880@nvidia.com>
+        <20200320125910.028d7af5@w520.home>
+        <7062f72a-bf06-a8cd-89f0-9e729699a454@nvidia.com>
+        <20200323124448.2d3bc315@w520.home>
+        <20200323185114.GF3017@work-vm>
+        <20200324030118.GD5456@joy-OptiPlex-7040>
 MIME-Version: 1.0
-In-Reply-To: <2556051f-99d8-4d18-80eb-f6bdf7e886a1@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 24.03.20 13:25, Janosch Frank wrote:
-> On 3/24/20 1:17 PM, Cornelia Huck wrote:
->> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
->> ---
->>  MAINTAINERS | 1 +
->>  1 file changed, 1 insertion(+)
->>
->> diff --git a/MAINTAINERS b/MAINTAINERS
->> index 48da1dbdd1ac..471767a355c6 100644
->> --- a/MAINTAINERS
->> +++ b/MAINTAINERS
->> @@ -81,6 +81,7 @@ S390X
->>  M: Thomas Huth <thuth@redhat.com>
->>  M: David Hildenbrand <david@redhat.com>
->>  R: Janosch Frank <frankja@linux.ibm.com>
->=20
-> Hmm, so the patch to make me maintainer hasn't yet been pulled. Oo
-> @David, did it go missing once Thomas went on leave?
+On Mon, 23 Mar 2020 23:01:18 -0400
+Yan Zhao <yan.y.zhao@intel.com> wrote:
 
-Ehm, good question. I will pick that one up next week when I'm back from
-paid leave ("Balkonien"), along with these two patches. Thanks!
+> On Tue, Mar 24, 2020 at 02:51:14AM +0800, Dr. David Alan Gilbert wrote:
+> > * Alex Williamson (alex.williamson@redhat.com) wrote:  
+> > > On Mon, 23 Mar 2020 23:24:37 +0530
+> > > Kirti Wankhede <kwankhede@nvidia.com> wrote:
+> > >   
+> > > > On 3/21/2020 12:29 AM, Alex Williamson wrote:  
+> > > > > On Sat, 21 Mar 2020 00:12:04 +0530
+> > > > > Kirti Wankhede <kwankhede@nvidia.com> wrote:
+> > > > >     
+> > > > >> On 3/20/2020 11:31 PM, Alex Williamson wrote:    
+> > > > >>> On Fri, 20 Mar 2020 23:19:14 +0530
+> > > > >>> Kirti Wankhede <kwankhede@nvidia.com> wrote:
+> > > > >>>        
+> > > > >>>> On 3/20/2020 4:27 AM, Alex Williamson wrote:    
+> > > > >>>>> On Fri, 20 Mar 2020 01:46:41 +0530
+> > > > >>>>> Kirti Wankhede <kwankhede@nvidia.com> wrote:
+> > > > >>>>>           
+> > > > >>
+> > > > >> <snip>
+> > > > >>    
+> > > > >>>>>> +static int vfio_iova_dirty_bitmap(struct vfio_iommu *iommu, dma_addr_t iova,
+> > > > >>>>>> +				  size_t size, uint64_t pgsize,
+> > > > >>>>>> +				  u64 __user *bitmap)
+> > > > >>>>>> +{
+> > > > >>>>>> +	struct vfio_dma *dma;
+> > > > >>>>>> +	unsigned long pgshift = __ffs(pgsize);
+> > > > >>>>>> +	unsigned int npages, bitmap_size;
+> > > > >>>>>> +
+> > > > >>>>>> +	dma = vfio_find_dma(iommu, iova, 1);
+> > > > >>>>>> +
+> > > > >>>>>> +	if (!dma)
+> > > > >>>>>> +		return -EINVAL;
+> > > > >>>>>> +
+> > > > >>>>>> +	if (dma->iova != iova || dma->size != size)
+> > > > >>>>>> +		return -EINVAL;
+> > > > >>>>>> +
+> > > > >>>>>> +	npages = dma->size >> pgshift;
+> > > > >>>>>> +	bitmap_size = DIRTY_BITMAP_BYTES(npages);
+> > > > >>>>>> +
+> > > > >>>>>> +	/* mark all pages dirty if all pages are pinned and mapped. */
+> > > > >>>>>> +	if (dma->iommu_mapped)
+> > > > >>>>>> +		bitmap_set(dma->bitmap, 0, npages);
+> > > > >>>>>> +
+> > > > >>>>>> +	if (copy_to_user((void __user *)bitmap, dma->bitmap, bitmap_size))
+> > > > >>>>>> +		return -EFAULT;    
+> > > > >>>>>
+> > > > >>>>> We still need to reset the bitmap here, clearing and re-adding the
+> > > > >>>>> pages that are still pinned.
+> > > > >>>>>
+> > > > >>>>> https://lore.kernel.org/kvm/20200319070635.2ff5db56@x1.home/
+> > > > >>>>>           
+> > > > >>>>
+> > > > >>>> I thought you agreed on my reply to it
+> > > > >>>> https://lore.kernel.org/kvm/31621b70-02a9-2ea5-045f-f72b671fe703@nvidia.com/
+> > > > >>>>       
+> > > > >>>>    > Why re-populate when there will be no change since
+> > > > >>>>    > vfio_iova_dirty_bitmap() is called holding iommu->lock? If there is any
+> > > > >>>>    > pin request while vfio_iova_dirty_bitmap() is still working, it will
+> > > > >>>>    > wait till iommu->lock is released. Bitmap will be populated when page is
+> > > > >>>>    > pinned.    
+> > > > >>>
+> > > > >>> As coded, dirty bits are only ever set in the bitmap, never cleared.
+> > > > >>> If a page is unpinned between iterations of the user recording the
+> > > > >>> dirty bitmap, it should be marked dirty in the iteration immediately
+> > > > >>> after the unpinning and not marked dirty in the following iteration.
+> > > > >>> That doesn't happen here.  We're reporting cumulative dirty pages since
+> > > > >>> logging was enabled, we need to be reporting dirty pages since the user
+> > > > >>> last retrieved the dirty bitmap.  The bitmap should be cleared and
+> > > > >>> currently pinned pages re-added after copying to the user.  Thanks,
+> > > > >>>        
+> > > > >>
+> > > > >> Does that mean, we have to track every iteration? do we really need that
+> > > > >> tracking?
+> > > > >>
+> > > > >> Generally the flow is:
+> > > > >> - vendor driver pin x pages
+> > > > >> - Enter pre-copy-phase where vCPUs are running - user starts dirty pages
+> > > > >> tracking, then user asks dirty bitmap, x pages reported dirty by
+> > > > >> VFIO_IOMMU_DIRTY_PAGES ioctl with _GET flag
+> > > > >> - In pre-copy phase, vendor driver pins y more pages, now bitmap
+> > > > >> consists of x+y bits set
+> > > > >> - In pre-copy phase, vendor driver unpins z pages, but bitmap is not
+> > > > >> updated, so again bitmap consists of x+y bits set.
+> > > > >> - Enter in stop-and-copy phase, vCPUs are stopped, mdev devices are stopped
+> > > > >> - user asks dirty bitmap - Since here vCPU and mdev devices are stopped,
+> > > > >> pages should not get dirty by guest driver or the physical device.
+> > > > >> Hence, x+y dirty pages would be reported.
+> > > > >>
+> > > > >> I don't think we need to track every iteration of bitmap reporting.    
+> > > > > 
+> > > > > Yes, once a bitmap is read, it's reset.  In your example, after
+> > > > > unpinning z pages the user should still see a bitmap with x+y pages,
+> > > > > but once they've read that bitmap, the next bitmap should be x+y-z.
+> > > > > Userspace can make decisions about when to switch from pre-copy to
+> > > > > stop-and-copy based on convergence, ie. the slope of the line recording
+> > > > > dirty pages per iteration.  The implementation here never allows an
+> > > > > inflection point, dirty pages reported through vfio would always either
+> > > > > be flat or climbing.  There might also be a case that an iommu backed
+> > > > > device could start pinning pages during the course of a migration, how
+> > > > > would the bitmap ever revert from fully populated to only tracking the
+> > > > > pinned pages?  Thanks,
+> > > > >     
+> > > > 
+> > > > At KVM forum we discussed this - if guest driver pins say 1024 pages 
+> > > > before migration starts, during pre-copy phase device can dirty 0 pages 
+> > > > in best case and 1024 pages in worst case. In that case, user will 
+> > > > transfer content of 1024 pages during pre-copy phase and in 
+> > > > stop-and-copy phase also, that will be pages will be copied twice. So we 
+> > > > decided to only get dirty pages bitmap at stop-and-copy phase. If user 
+> > > > is going to get dirty pages in stop-and-copy phase only, then that will 
+> > > > be single iteration.
+> > > > There aren't any devices yet that can track sys memory dirty pages. So 
+> > > > we can go ahead with this patch and support for dirty pages tracking 
+> > > > during pre-copy phase can be added later when there will be consumers of 
+> > > > that functionality.  
+> > > 
+> > > So if I understand this right, you're expecting the dirty bitmap to
+> > > accumulate dirty bits, in perpetuity, so that the user can only
+> > > retrieve them once at the end of migration?  But if that's the case,
+> > > the user could simply choose to not retrieve the bitmap until the end
+> > > of migration, the result would be the same.  What we have here is that
+> > > dirty bits are never cleared, regardless of whether the user has seen
+> > > them, which is wrong.  Sorry, we had a lot of discussions at KVM forum,
+> > > I don't recall this specific one 5 months later and maybe we weren't
+> > > considering all aspects.  I see the behavior we have here as incorrect,
+> > > but it also seems relatively trivial to make correct.  I hope the QEMU
+> > > code isn't making us go through all this trouble to report a dirty
+> > > bitmap that gets thrown away because it expects the final one to be
+> > > cumulative since the beginning of dirty logging.  Thanks,  
+> > 
+> > I remember the discussion that we couldn't track the system memory
+> > dirtying with current hardware; so the question then is just to track  
+> hi Dave
+> there are already devices that are able to track the system memory,
+> through two ways:
+> (1) software method. like VFs for "Intel(R) Ethernet Controller XL710 Family
+> support".
+> (2) hardware method. through hardware internal buffer (as one Intel
+> internal hardware not yet to public, but very soon) or through VTD-3.0
+> IOMMU.
+> 
+> we have already had code verified using the two ways to track system memory
+> in fine-grained level.
+> 
+> 
+> > what has been pinned and then ideally put that memory off until the end.
+> > (Which is interesting because I don't think we currently have  a way
+> > to delay RAM pages till the end in qemu).  
+> 
+> I think the problem here is that we mixed pinned pages with dirty pages.
 
---
+We are reporting dirty pages, pinned pages are just assumed to be dirty.
 
-David / dhildenb
+> yes, pinned pages for mdev devices are continuously likely to be dirty
+> until device stopped.
+> But for devices that are able to report dirty pages, dirtied pages
+> will be marked again if hardware writes them later.
+> 
+> So, is it good to introduce a capability to let vfio/qemu know how to
+> treat the dirty pages?
+
+Dirty pages are dirty, QEMU doesn't need any special flag, instead we
+need to evolve different mechanisms for the vendor driver so that we
+can differentiate pages pinned for read vs pages pinned for write.
+Perhaps interfaces to pin pages without dirtying them, and a separate
+mechanism to dirty a previously pinned-page, ie. promote it permanently
+or transiently to a writable page.
+
+> (1) for devices have no fine-grained dirty page tracking capability
+>   a. pinned pages are regarded as dirty pages. they are not cleared by
+>   dirty page query
+>   b. unpinned pages are regarded as dirty pages. they are cleared by
+>   dirty page query or UNMAP ioctl.
+> (2) for devices that have fine-grained dirty page tracking capability
+>    a. pinned/unpinned pages are not regarded as dirty pages
+
+We need a pin-read-only interface for this.
+
+>    b. only pages they reported are regarded as dirty pages and are to be
+>    cleared by dirty page query and UNMAP ioctl.
+
+We need a set-dirty or promote-writable interface for this.
+
+> (3) for dirty pages marking APIs, like vfio_dma_rw()...
+>    pages marked by them are regared as dirty and are to be cleared by
+>    dirty page query and UNMAP ioctl
+> 
+> For (1), qemu VFIO only reports dirty page amount and would not transfer
+> those pages until last round.
+> for (2) and (3), qemu VFIO should report and transfer them in each
+> round.
+
+IMO, QEMU should not be aware of any of this.  Userspace has an
+interface to retrieve dirtied pages (period).  We should adjust the
+pages that we report as dirtied to be accurate based on the
+capabilities of the vendor driver.  We can evolve those internal APIs
+between the vendor driver and vfio iommu over time without modifying
+this user interface.
+
+> > [I still worry whether migration will be usable with any
+> > significant amount of system ram that's pinned in this way; the
+> > downside will very easily get above the threshold that people like]
+> >   
+> yes. that's why we have to do multi-round dirty page query and
+> transfer and clear the dirty bitmaps in each round for devices that are
+> able to track in fine grain.
+> and that's why we have to report the amount of dirty pages before
+> stop-and-copy phase for mdev devices, so that people are able to know
+> the real downtime as much as possible.
+
+Yes, the dirty bitmap should be accurate to report the pages dirtied
+since it was last retrieved and over time we can add internal
+interfaces to give vendor drivers more granularity in marking pinned
+pages dirty and perhaps even exposing the bitmap to the vendor drivers
+to set pages themselves.  I don't necessarily think it's worthwhile to
+create a new class of dirtied pages to transfer at the end, we're
+fighting a losing battle at that point.  We should be focusing on
+improving the granularity of page dirtying in order to reduce the pages
+transferred at the end of migration.  Thanks,
+
+Alex
 
