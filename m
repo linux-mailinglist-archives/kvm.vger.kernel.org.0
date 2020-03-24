@@ -2,402 +2,155 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4D47D1915AF
-	for <lists+kvm@lfdr.de>; Tue, 24 Mar 2020 17:09:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7C60119161F
+	for <lists+kvm@lfdr.de>; Tue, 24 Mar 2020 17:20:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727737AbgCXQJL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Mar 2020 12:09:11 -0400
-Received: from mail.kernel.org ([198.145.29.99]:52182 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727628AbgCXQJL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 Mar 2020 12:09:11 -0400
-Received: from paulmck-ThinkPad-P72.home (50-39-105-78.bvtn.or.frontiernet.net [50.39.105.78])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id CAAB920775;
-        Tue, 24 Mar 2020 16:09:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1585066149;
-        bh=AaT8eWh4mFXpJz4Lgi4w8mU/brid/vniuLUWuBHPBkQ=;
-        h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
-        b=YfW9u3k9KyGgrUNO6hl3nfH0+WNdJ5uuAcQBSwY5Ev3py3AmIaFg2V/6x/BP8S48n
-         kVKhhuUcRHDPnBJ7tIWqC7CT7W4STplv6Kvavr73WMuZcC9QDxf4gp7K9Fw15TaQos
-         2wyieljtVZ098AWg7CHH+UC07mCoMHnKObjSzjq4=
-Received: by paulmck-ThinkPad-P72.home (Postfix, from userid 1000)
-        id 9E4773522AE1; Tue, 24 Mar 2020 09:09:09 -0700 (PDT)
-Date:   Tue, 24 Mar 2020 09:09:09 -0700
-From:   "Paul E. McKenney" <paulmck@kernel.org>
-To:     Thomas Gleixner <tglx@linutronix.de>
-Cc:     LKML <linux-kernel@vger.kernel.org>, x86@kernel.org,
-        Josh Poimboeuf <jpoimboe@redhat.com>,
-        "Joel Fernandes (Google)" <joel@joelfernandes.org>,
-        "Steven Rostedt (VMware)" <rostedt@goodmis.org>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Alexei Starovoitov <ast@kernel.org>,
-        Frederic Weisbecker <frederic@kernel.org>,
-        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-        Brian Gerst <brgerst@gmail.com>,
-        Juergen Gross <jgross@suse.com>,
-        Alexandre Chartre <alexandre.chartre@oracle.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Subject: Re: [RESEND][patch V3 17/23] rcu/tree: Mark the idle relevant
- functions noinstr
-Message-ID: <20200324160909.GD19865@paulmck-ThinkPad-P72>
-Reply-To: paulmck@kernel.org
-References: <20200320175956.033706968@linutronix.de>
- <20200320180034.095809808@linutronix.de>
+        id S1728877AbgCXQUK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Mar 2020 12:20:10 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:42004 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727444AbgCXQUH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 Mar 2020 12:20:07 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02OGEe2o178890;
+        Tue, 24 Mar 2020 16:19:46 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2020-01-29;
+ bh=8+/c9w3BgxRJLSrj2uF9AmceMm8c9V83O9Cmas+6qpw=;
+ b=r2u8CeTqtFkN2tBlnu64WUaXJv8VkQH2VTfXx7kCYGVemUCoz6Dl3XQVQpEYpTzXPqoo
+ KQU5r/lfIJLCpdXfNuvR2j+Jvx6QAWFncs4keyDbOtjXja4HZVht0ckCecUcp6pZcSfM
+ H7zRqz5F2HadZRnH6zsx+kAmglRI1zxkSZBKJAcT55fPgoJK2ocBq/L2URhduLlwsBGB
+ h9iqo7yYppWkIHeP1uSzUidUehGKJ3jKA2eucbquHTP16FRRs/wMHykjIsr+JYFm3QD/
+ FxzlFVtjd58/y6ISSFeVYMzCQ6HK+Xenb4Xa0DYUARFzP9SI49hT+QlLcUSGzy622IV5 xA== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by userp2120.oracle.com with ESMTP id 2yx8ac293t-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 24 Mar 2020 16:19:46 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02OGJhPk185489;
+        Tue, 24 Mar 2020 16:19:45 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by userp3020.oracle.com with ESMTP id 2yxw6n17rg-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 24 Mar 2020 16:19:45 +0000
+Received: from abhmp0014.oracle.com (abhmp0014.oracle.com [141.146.116.20])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 02OGJVTZ018297;
+        Tue, 24 Mar 2020 16:19:31 GMT
+Received: from [192.168.1.206] (/71.63.128.209)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Tue, 24 Mar 2020 09:19:31 -0700
+Subject: Re: [PATCH v2] mm/hugetlb: fix a addressing exception caused by
+ huge_pte_offset()
+To:     Jason Gunthorpe <jgg@ziepe.ca>
+Cc:     "Longpeng (Mike, Cloud Infrastructure Service Product Dept.)" 
+        <longpeng2@huawei.com>, akpm@linux-foundation.org,
+        kirill.shutemov@linux.intel.com, linux-kernel@vger.kernel.org,
+        arei.gonglei@huawei.com, weidong.huang@huawei.com,
+        weifuqiang@huawei.com, kvm@vger.kernel.org, linux-mm@kvack.org,
+        Matthew Wilcox <willy@infradead.org>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        stable@vger.kernel.org
+References: <1582342427-230392-1-git-send-email-longpeng2@huawei.com>
+ <51a25d55-de49-4c0a-c994-bf1a8cfc8638@oracle.com>
+ <20200323160955.GY20941@ziepe.ca>
+ <69055395-e7e5-a8e2-7f3e-f61607149318@oracle.com>
+ <20200323180706.GC20941@ziepe.ca>
+ <88698dd7-eb87-4b0b-7ba7-44ef6eab6a6c@oracle.com>
+ <20200323225225.GF20941@ziepe.ca>
+ <e8e71ba4-d609-269a-6160-153e373e7563@huawei.com>
+ <20200324115541.GH20941@ziepe.ca>
+ <98d35563-8af0-2693-7e76-e6435da0bbee@oracle.com>
+ <20200324155552.GK20941@ziepe.ca>
+From:   Mike Kravetz <mike.kravetz@oracle.com>
+Message-ID: <66583587-ca4f-9847-c173-4a3d7938fec6@oracle.com>
+Date:   Tue, 24 Mar 2020 09:19:29 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200320180034.095809808@linutronix.de>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+In-Reply-To: <20200324155552.GK20941@ziepe.ca>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9570 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 adultscore=0
+ malwarescore=0 mlxscore=0 spamscore=0 mlxlogscore=999 bulkscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2003240087
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9570 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 suspectscore=0 priorityscore=1501 malwarescore=0
+ mlxscore=0 adultscore=0 phishscore=0 impostorscore=0 mlxlogscore=999
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2003240087
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Mar 20, 2020 at 07:00:13PM +0100, Thomas Gleixner wrote:
-> These functions are invoked from context tracking and other places in the
-> low level entry code. Move them into the .noinstr.text section to exclude
-> them from instrumentation.
+On 3/24/20 8:55 AM, Jason Gunthorpe wrote:
+> On Tue, Mar 24, 2020 at 08:25:09AM -0700, Mike Kravetz wrote:
+>> On 3/24/20 4:55 AM, Jason Gunthorpe wrote:
+>>> Also, since CH moved all the get_user_pages_fast code out of the
+>>> arch's many/all archs can drop their arch specific version of this
+>>> routine. This is really just a specialized version of gup_fast's
+>>> algorithm..
+>>>
+>>> (also the arch versions seem different, why do some return actual
+>>>  ptes, not null?)
+>>
+>> Not sure I understand that last question.  The return value should be
+>> a *pte or null.
 > 
-> Mark the places which are safe to invoke traceable functions with
-> instr_begin/end() so objtool won't complain.
+> I mean the common code ends like this:
 > 
-> Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
-
-A few questions and comments below.  I have not yet tried rcutorture
-on this series, but this is on my list.  (Just when you thought it
-was safe...)
-
-							Thanx, Paul
-
-> ---
-> V3: New patch
-> ---
->  kernel/rcu/tree.c        |   66 ++++++++++++++++++++++++++---------------------
->  kernel/rcu/tree_plugin.h |    4 +-
->  kernel/rcu/update.c      |    7 ++--
->  3 files changed, 42 insertions(+), 35 deletions(-)
+> 	pmd = pmd_offset(pud, addr);
+> 	if (sz != PMD_SIZE && pmd_none(*pmd))
+> 		return NULL;
+> 	/* hugepage or swap? */
+> 	if (pmd_huge(*pmd) || !pmd_present(*pmd))
+> 		return (pte_t *)pmd;
 > 
-> --- a/kernel/rcu/tree.c
-> +++ b/kernel/rcu/tree.c
-> @@ -75,9 +75,6 @@
->   */
->  #define RCU_DYNTICK_CTRL_MASK 0x1
->  #define RCU_DYNTICK_CTRL_CTR  (RCU_DYNTICK_CTRL_MASK + 1)
-> -#ifndef rcu_eqs_special_exit
-> -#define rcu_eqs_special_exit() do { } while (0)
-> -#endif
-
-Note to self:  Check to see if anyone is ever going to use
-rcu_eqs_special_set() and thus the bottom bit of ->dynticks, and get
-rid of both if not.  The rcu_eqs_special_exit() was to be how this
-bit was to be sensed by the user.
-
->  static DEFINE_PER_CPU_SHARED_ALIGNED(struct rcu_data, rcu_data) = {
->  	.dynticks_nesting = 1,
-> @@ -228,7 +225,7 @@ void rcu_softirq_qs(void)
->   * RCU is watching prior to the call to this function and is no longer
->   * watching upon return.
->   */
-> -static void rcu_dynticks_eqs_enter(void)
-> +static noinstr void rcu_dynticks_eqs_enter(void)
->  {
->  	struct rcu_data *rdp = this_cpu_ptr(&rcu_data);
->  	int seq;
-> @@ -252,7 +249,7 @@ static void rcu_dynticks_eqs_enter(void)
->   * called from an extended quiescent state, that is, RCU is not watching
->   * prior to the call to this function and is watching upon return.
->   */
-> -static void rcu_dynticks_eqs_exit(void)
-> +static noinstr void rcu_dynticks_eqs_exit(void)
->  {
->  	struct rcu_data *rdp = this_cpu_ptr(&rcu_data);
->  	int seq;
-> @@ -269,8 +266,6 @@ static void rcu_dynticks_eqs_exit(void)
->  	if (seq & RCU_DYNTICK_CTRL_MASK) {
->  		atomic_andnot(RCU_DYNTICK_CTRL_MASK, &rdp->dynticks);
->  		smp_mb__after_atomic(); /* _exit after clearing mask. */
-> -		/* Prefer duplicate flushes to losing a flush. */
-> -		rcu_eqs_special_exit();
->  	}
->  }
->  
-> @@ -298,7 +293,7 @@ static void rcu_dynticks_eqs_online(void
->   *
->   * No ordering, as we are sampling CPU-local information.
->   */
-> -static bool rcu_dynticks_curr_cpu_in_eqs(void)
-> +static __always_inline bool rcu_dynticks_curr_cpu_in_eqs(void)
->  {
->  	struct rcu_data *rdp = this_cpu_ptr(&rcu_data);
->  
-> @@ -557,7 +552,7 @@ EXPORT_SYMBOL_GPL(rcutorture_get_gp_data
->   * the possibility of usermode upcalls having messed up our count
->   * of interrupt nesting level during the prior busy period.
->   */
-> -static void rcu_eqs_enter(bool user)
-> +static noinstr void rcu_eqs_enter(bool user)
->  {
->  	struct rcu_data *rdp = this_cpu_ptr(&rcu_data);
->  
-> @@ -572,12 +567,14 @@ static void rcu_eqs_enter(bool user)
->  	}
->  
->  	lockdep_assert_irqs_disabled();
-> +	instr_begin();
->  	trace_rcu_dyntick(TPS("Start"), rdp->dynticks_nesting, 0, atomic_read(&rdp->dynticks));
->  	WARN_ON_ONCE(IS_ENABLED(CONFIG_RCU_EQS_DEBUG) && !user && !is_idle_task(current));
->  	rdp = this_cpu_ptr(&rcu_data);
->  	do_nocb_deferred_wakeup(rdp);
->  	rcu_prepare_for_idle();
->  	rcu_preempt_deferred_qs(current);
-> +	instr_end();
->  	WRITE_ONCE(rdp->dynticks_nesting, 0); /* Avoid irq-access tearing. */
->  	// RCU is watching here ...
->  	rcu_dynticks_eqs_enter();
-> @@ -614,7 +611,7 @@ void rcu_idle_enter(void)
->   * If you add or remove a call to rcu_user_enter(), be sure to test with
->   * CONFIG_RCU_EQS_DEBUG=y.
->   */
-> -void rcu_user_enter(void)
-> +noinstr void rcu_user_enter(void)
->  {
->  	lockdep_assert_irqs_disabled();
-
-Just out of curiosity -- this means that lockdep_assert_irqs_disabled()
-must be noinstr, correct?
-
->  	rcu_eqs_enter(true);
-> @@ -647,19 +644,23 @@ static __always_inline void rcu_nmi_exit
->  	 * leave it in non-RCU-idle state.
->  	 */
->  	if (rdp->dynticks_nmi_nesting != 1) {
-> +		instr_begin();
->  		trace_rcu_dyntick(TPS("--="), rdp->dynticks_nmi_nesting, rdp->dynticks_nmi_nesting - 2,
->  				  atomic_read(&rdp->dynticks));
->  		WRITE_ONCE(rdp->dynticks_nmi_nesting, /* No store tearing. */
->  			   rdp->dynticks_nmi_nesting - 2);
-> +		instr_end();
->  		return;
->  	}
->  
-> +		instr_begin();
-
-Indentation?
-
->  	/* This NMI interrupted an RCU-idle CPU, restore RCU-idleness. */
->  	trace_rcu_dyntick(TPS("Startirq"), rdp->dynticks_nmi_nesting, 0, atomic_read(&rdp->dynticks));
->  	WRITE_ONCE(rdp->dynticks_nmi_nesting, 0); /* Avoid store tearing. */
->  
->  	if (irq)
->  		rcu_prepare_for_idle();
-> +	instr_end();
->  
->  	// RCU is watching here ...
->  	rcu_dynticks_eqs_enter();
-> @@ -675,7 +676,7 @@ static __always_inline void rcu_nmi_exit
->   * If you add or remove a call to rcu_nmi_exit(), be sure to test
->   * with CONFIG_RCU_EQS_DEBUG=y.
->   */
-> -void rcu_nmi_exit(void)
-> +void noinstr rcu_nmi_exit(void)
->  {
->  	rcu_nmi_exit_common(false);
->  }
-> @@ -728,7 +729,7 @@ void rcu_irq_exit_irqson(void)
->   * allow for the possibility of usermode upcalls messing up our count of
->   * interrupt nesting level during the busy period that is just now starting.
->   */
-> -static void rcu_eqs_exit(bool user)
-> +static void noinstr rcu_eqs_exit(bool user)
->  {
->  	struct rcu_data *rdp;
->  	long oldval;
-> @@ -746,12 +747,14 @@ static void rcu_eqs_exit(bool user)
->  	// RCU is not watching here ...
->  	rcu_dynticks_eqs_exit();
->  	// ... but is watching here.
-> +	instr_begin();
->  	rcu_cleanup_after_idle();
->  	trace_rcu_dyntick(TPS("End"), rdp->dynticks_nesting, 1, atomic_read(&rdp->dynticks));
->  	WARN_ON_ONCE(IS_ENABLED(CONFIG_RCU_EQS_DEBUG) && !user && !is_idle_task(current));
->  	WRITE_ONCE(rdp->dynticks_nesting, 1);
->  	WARN_ON_ONCE(rdp->dynticks_nmi_nesting);
->  	WRITE_ONCE(rdp->dynticks_nmi_nesting, DYNTICK_IRQ_NONIDLE);
-> +	instr_end();
->  }
->  
->  /**
-> @@ -782,7 +785,7 @@ void rcu_idle_exit(void)
->   * If you add or remove a call to rcu_user_exit(), be sure to test with
->   * CONFIG_RCU_EQS_DEBUG=y.
->   */
-> -void rcu_user_exit(void)
-> +void noinstr rcu_user_exit(void)
->  {
->  	rcu_eqs_exit(1);
->  }
-> @@ -830,27 +833,33 @@ static __always_inline void rcu_nmi_ente
->  			rcu_cleanup_after_idle();
->  
->  		incby = 1;
-> -	} else if (irq && tick_nohz_full_cpu(rdp->cpu) &&
-> -		   rdp->dynticks_nmi_nesting == DYNTICK_IRQ_NONIDLE &&
-> -		   READ_ONCE(rdp->rcu_urgent_qs) && !rdp->rcu_forced_tick) {
-> +	} else if (irq) {
->  		// We get here only if we had already exited the extended
->  		// quiescent state and this was an interrupt (not an NMI).
->  		// Therefore, (1) RCU is already watching and (2) The fact
->  		// that we are in an interrupt handler and that the rcu_node
->  		// lock is an irq-disabled lock prevents self-deadlock.
->  		// So we can safely recheck under the lock.
-
-The above comment is a bit misleading in this location.
-
-> -		raw_spin_lock_rcu_node(rdp->mynode);
-> -		if (rdp->rcu_urgent_qs && !rdp->rcu_forced_tick) {
-> -			// A nohz_full CPU is in the kernel and RCU
-> -			// needs a quiescent state.  Turn on the tick!
-> -			rdp->rcu_forced_tick = true;
-> -			tick_dep_set_cpu(rdp->cpu, TICK_DEP_BIT_RCU);
-> +		instr_begin();
-> +		if (tick_nohz_full_cpu(rdp->cpu) &&
-> +		    rdp->dynticks_nmi_nesting == DYNTICK_IRQ_NONIDLE &&
-> +		    READ_ONCE(rdp->rcu_urgent_qs) && !rdp->rcu_forced_tick) {
-
-So how about like this?
-
-			// We get here only if we had already exited
-			// the extended quiescent state and this was an
-			// interrupt (not an NMI).  Therefore, (1) RCU is
-			// already watching and (2) The fact that we are in
-			// an interrupt handler and that the rcu_node lock
-			// is an irq-disabled lock prevents self-deadlock.
-			// So we can safely recheck under the lock.
-
-> +			raw_spin_lock_rcu_node(rdp->mynode);
-> +			if (rdp->rcu_urgent_qs && !rdp->rcu_forced_tick) {
-> +				// A nohz_full CPU is in the kernel and RCU
-> +				// needs a quiescent state.  Turn on the tick!
-> +				rdp->rcu_forced_tick = true;
-> +				tick_dep_set_cpu(rdp->cpu, TICK_DEP_BIT_RCU);
-> +			}
-> +			raw_spin_unlock_rcu_node(rdp->mynode);
->  		}
-> -		raw_spin_unlock_rcu_node(rdp->mynode);
-> +		instr_end();
->  	}
-> +	instr_begin();
->  	trace_rcu_dyntick(incby == 1 ? TPS("Endirq") : TPS("++="),
->  			  rdp->dynticks_nmi_nesting,
->  			  rdp->dynticks_nmi_nesting + incby, atomic_read(&rdp->dynticks));
-> +	instr_end();
->  	WRITE_ONCE(rdp->dynticks_nmi_nesting, /* Prevent store tearing. */
->  		   rdp->dynticks_nmi_nesting + incby);
->  	barrier();
-> @@ -859,11 +868,10 @@ static __always_inline void rcu_nmi_ente
->  /**
->   * rcu_nmi_enter - inform RCU of entry to NMI context
->   */
-> -void rcu_nmi_enter(void)
-> +noinstr void rcu_nmi_enter(void)
->  {
->  	rcu_nmi_enter_common(false);
->  }
-> -NOKPROBE_SYMBOL(rcu_nmi_enter);
->  
->  /**
->   * rcu_irq_enter - inform RCU that current CPU is entering irq away from idle
-> @@ -932,7 +940,7 @@ static void rcu_disable_urgency_upon_qs(
->   * if the current CPU is not in its idle loop or is in an interrupt or
->   * NMI handler, return true.
->   */
-> -bool notrace rcu_is_watching(void)
-> +noinstr bool rcu_is_watching(void)
->  {
->  	bool ret;
->  
-> @@ -976,7 +984,7 @@ void rcu_request_urgent_qs_task(struct t
->   * RCU on an offline processor during initial boot, hence the check for
->   * rcu_scheduler_fully_active.
->   */
-> -bool rcu_lockdep_current_cpu_online(void)
-> +noinstr bool rcu_lockdep_current_cpu_online(void)
->  {
->  	struct rcu_data *rdp;
->  	struct rcu_node *rnp;
-> @@ -984,12 +992,12 @@ bool rcu_lockdep_current_cpu_online(void
->  
->  	if (in_nmi() || !rcu_scheduler_fully_active)
->  		return true;
-> -	preempt_disable();
-> +	preempt_disable_notrace();
->  	rdp = this_cpu_ptr(&rcu_data);
->  	rnp = rdp->mynode;
->  	if (rdp->grpmask & rcu_rnp_online_cpus(rnp))
->  		ret = true;
-> -	preempt_enable();
-> +	preempt_enable_notrace();
->  	return ret;
->  }
->  EXPORT_SYMBOL_GPL(rcu_lockdep_current_cpu_online);
-> --- a/kernel/rcu/tree_plugin.h
-> +++ b/kernel/rcu/tree_plugin.h
-> @@ -2546,7 +2546,7 @@ static void rcu_bind_gp_kthread(void)
->  }
->  
->  /* Record the current task on dyntick-idle entry. */
-> -static void rcu_dynticks_task_enter(void)
-> +static void noinstr rcu_dynticks_task_enter(void)
->  {
->  #if defined(CONFIG_TASKS_RCU) && defined(CONFIG_NO_HZ_FULL)
->  	WRITE_ONCE(current->rcu_tasks_idle_cpu, smp_processor_id());
-> @@ -2554,7 +2554,7 @@ static void rcu_dynticks_task_enter(void
->  }
->  
->  /* Record no current task on dyntick-idle exit. */
-> -static void rcu_dynticks_task_exit(void)
-> +static void noinstr rcu_dynticks_task_exit(void)
->  {
->  #if defined(CONFIG_TASKS_RCU) && defined(CONFIG_NO_HZ_FULL)
->  	WRITE_ONCE(current->rcu_tasks_idle_cpu, -1);
-> --- a/kernel/rcu/update.c
-> +++ b/kernel/rcu/update.c
-> @@ -95,7 +95,7 @@ module_param(rcu_normal_after_boot, int,
->   * Similarly, we avoid claiming an RCU read lock held if the current
->   * CPU is offline.
->   */
-> -static bool rcu_read_lock_held_common(bool *ret)
-> +static noinstr bool rcu_read_lock_held_common(bool *ret)
->  {
->  	if (!debug_lockdep_rcu_enabled()) {
->  		*ret = 1;
-> @@ -112,7 +112,7 @@ static bool rcu_read_lock_held_common(bo
->  	return false;
->  }
->  
-> -int rcu_read_lock_sched_held(void)
-> +noinstr int rcu_read_lock_sched_held(void)
->  {
->  	bool ret;
->  
-> @@ -246,13 +246,12 @@ struct lockdep_map rcu_callback_map =
->  	STATIC_LOCKDEP_MAP_INIT("rcu_callback", &rcu_callback_key);
->  EXPORT_SYMBOL_GPL(rcu_callback_map);
->  
-> -int notrace debug_lockdep_rcu_enabled(void)
-> +noinstr int notrace debug_lockdep_rcu_enabled(void)
->  {
->  	return rcu_scheduler_active != RCU_SCHEDULER_INACTIVE && debug_locks &&
->  	       current->lockdep_recursion == 0;
->  }
->  EXPORT_SYMBOL_GPL(debug_lockdep_rcu_enabled);
-> -NOKPROBE_SYMBOL(debug_lockdep_rcu_enabled);
->  
->  /**
->   * rcu_read_lock_held() - might we be in RCU read-side critical section?
+> 	return NULL;
 > 
+> So it always returns a pointer into a PUD or PMD, while say, ppc
+> in __find_linux_pte() ends like:
+> 
+> 	return pte_offset_kernel(&pmd, ea);
+> 
+> Which is pointing to a PTE
+
+Ok, now I understand the question.  huge_pte_offset will/should only be
+called for addresses that are in a vma backed by hugetlb pages.  So,
+pte_offset_kernel() will only return page table type (PUD/PMD/etc) associated
+with a huge page supported by the particular arch.
+
+> So does sparc:
+> 
+>         pmd = pmd_offset(pud, addr);
+>         if (pmd_none(*pmd))
+>                 return NULL;
+>         if (is_hugetlb_pmd(*pmd))
+>                 return (pte_t *)pmd;
+>         return pte_offset_map(pmd, addr);
+> 
+> Which is even worse because it is leaking a kmap..
+> 
+> etc
+> 
+>> /*
+>>  * huge_pte_offset() - Walk the page table to resolve the hugepage
+>>  * entry at address @addr
+>>  *
+>>  * Return: Pointer to page table or swap entry (PUD or PMD) for
+>                                               ^^^^^^^^^^^^^^^^^^^
+> 
+> Ie the above is not followed by the archs
+> 
+> I'm also scratching my head that a function that returns a pte_t *
+> always returns a PUD or PMD. Strange bit of type casting..
+
+Yes, the casting is curious.  The casting continues in potential subsequent
+calls to huge_pte_alloc().
+-- 
+Mike Kravetz
