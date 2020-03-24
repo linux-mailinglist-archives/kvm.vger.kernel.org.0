@@ -2,118 +2,152 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7E23F190DA4
-	for <lists+kvm@lfdr.de>; Tue, 24 Mar 2020 13:35:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AF1F0190DCC
+	for <lists+kvm@lfdr.de>; Tue, 24 Mar 2020 13:39:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727407AbgCXMfL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Mar 2020 08:35:11 -0400
-Received: from mail.kernel.org ([198.145.29.99]:35818 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727130AbgCXMfK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 Mar 2020 08:35:10 -0400
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        id S1727399AbgCXMiw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Mar 2020 08:38:52 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:23000 "EHLO
+        us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727223AbgCXMiw (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 24 Mar 2020 08:38:52 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1585053531;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=2uftN846mv5IA+0FxdsilX9S+UyWk5Djyev1MZNlUGc=;
+        b=Y7LTRNNa2vG5YB8fUM5MGmVZcVpsU3+EQc//wNo1r8TO3PezV2Mx8EB8CwEgmxlg2ELtB7
+        iQanNwGFLj90+qHPqDJQRAlgSVkMwmXEB492b2gLIXDbY2BcJiYpsOGWLOZ/qWRBJj21kA
+        QjZCRkgYz29bUzIB2QpG9XohLndUxUE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-367-GeSMFY-tM5SWbUVumqF6Bg-1; Tue, 24 Mar 2020 08:38:49 -0400
+X-MC-Unique: GeSMFY-tM5SWbUVumqF6Bg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 24C3D2080C;
-        Tue, 24 Mar 2020 12:35:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1585053310;
-        bh=1JmNFomT0l3uDtttAy7pqv/qb5pJWZXxKY5fJT8GM/k=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=fZDmtzWt0FD2a12FpTHubNlYWp9GDkmFviVJyK6WuK9xHBDKCImt7q1gGHmBTZwlt
-         F+n8rX3WkyMa8JQ8up5AA97HK5uQEo3r5sTt8sBHMIwZOvATBD8/ftB4OkyuSEes8p
-         qkWe+2Miv9jT/3+ICE2sXw2LFsTMuhYbPLbCYGUI=
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why)
-        by disco-boy.misterjones.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <maz@kernel.org>)
-        id 1jGilw-00FFxJ-8y; Tue, 24 Mar 2020 12:35:08 +0000
-Date:   Tue, 24 Mar 2020 12:35:06 +0000
-From:   Marc Zyngier <maz@kernel.org>
-To:     Zenghui Yu <yuzenghui@huawei.com>
-Cc:     <linux-arm-kernel@lists.infradead.org>,
-        <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>,
-        Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
-        Jason Cooper <jason@lakedaemon.net>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Eric Auger <eric.auger@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: Re: [PATCH v6 14/23] irqchip/gic-v4.1: Add VSGI allocation/teardown
-Message-ID: <20200324123506.6d71b04a@why>
-In-Reply-To: <f778d757-0312-5412-668c-db9aee889cf0@huawei.com>
-References: <20200320182406.23465-1-maz@kernel.org>
-        <20200320182406.23465-15-maz@kernel.org>
-        <f778d757-0312-5412-668c-db9aee889cf0@huawei.com>
-Organization: Approximate
-X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7BD301005510;
+        Tue, 24 Mar 2020 12:38:48 +0000 (UTC)
+Received: from gondolin (ovpn-113-109.ams2.redhat.com [10.36.113.109])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 193BBA0A67;
+        Tue, 24 Mar 2020 12:38:41 +0000 (UTC)
+Date:   Tue, 24 Mar 2020 13:38:39 +0100
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Janosch Frank <frankja@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, thuth@redhat.com, linux-s390@vger.kernel.org,
+        david@redhat.com
+Subject: Re: [kvm-unit-tests PATCH 08/10] s390x: smp: Wait for sigp
+ completion
+Message-ID: <20200324133839.10efabf1.cohuck@redhat.com>
+In-Reply-To: <20200324081251.28810-9-frankja@linux.ibm.com>
+References: <20200324081251.28810-1-frankja@linux.ibm.com>
+        <20200324081251.28810-9-frankja@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, lorenzo.pieralisi@arm.com, jason@lakedaemon.net, tglx@linutronix.de, eric.auger@redhat.com, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 24 Mar 2020 10:43:09 +0800
-Zenghui Yu <yuzenghui@huawei.com> wrote:
+On Tue, 24 Mar 2020 04:12:49 -0400
+Janosch Frank <frankja@linux.ibm.com> wrote:
 
-> Hi Marc,
+> Sigp orders are not necessarily finished when the processor finished
+> the sigp instruction. We need to poll if the order has been finished
+> before we continue.
 > 
-> On 2020/3/21 2:23, Marc Zyngier wrote:
-> > Allocate per-VPE SGIs when initializing the GIC-specific part of the
-> > VPE data structure.
-> > 
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > Reviewed-by: Zenghui Yu <yuzenghui@huawei.com>
-> > Link: https://lore.kernel.org/r/20200304203330.4967-15-maz@kernel.org
-> > ---
-> >   drivers/irqchip/irq-gic-v3-its.c   |  2 +-
-> >   drivers/irqchip/irq-gic-v4.c       | 68 +++++++++++++++++++++++++++++-
-> >   include/linux/irqchip/arm-gic-v4.h |  4 +-
-> >   3 files changed, 71 insertions(+), 3 deletions(-)
-> > 
-> > diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
-> > index 15250faa9ef7..7ad46ff5f0b9 100644
-> > --- a/drivers/irqchip/irq-gic-v3-its.c
-> > +++ b/drivers/irqchip/irq-gic-v3-its.c
-> > @@ -4053,7 +4053,7 @@ static int its_sgi_set_vcpu_affinity(struct irq_data *d, void *vcpu_info)
-> >   	struct its_cmd_info *info = vcpu_info;  
-> >   >   	switch (info->cmd_type) {  
-> > -	case PROP_UPDATE_SGI:
-> > +	case PROP_UPDATE_VSGI:
-> >   		vpe->sgi_config[d->hwirq].priority = info->priority;
-> >   		vpe->sgi_config[d->hwirq].group = info->group;
-> >   		its_configure_sgi(d, false);  
+> For (re)start and stop we already use sigp sense running and sigp
+> sense loops. But we still lack completion checks for stop and store
+> status, as well as the cpu resets.
 > 
-> [...]
+> Let's add them.
 > 
-> > @@ -103,7 +105,7 @@ enum its_vcpu_info_cmd_type {
-> >   	SCHEDULE_VPE,
-> >   	DESCHEDULE_VPE,
-> >   	INVALL_VPE,
-> > -	PROP_UPDATE_SGI,
-> > +	PROP_UPDATE_VSGI,
-> >   };  
-> >   >   struct its_cmd_info {  
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> ---
+>  lib/s390x/smp.c | 8 ++++++++
+>  lib/s390x/smp.h | 1 +
+>  s390x/smp.c     | 4 ++++
+>  3 files changed, 13 insertions(+)
 > 
-> As Eric pointed out, this belongs to patch #12.
+> diff --git a/lib/s390x/smp.c b/lib/s390x/smp.c
+> index 6ef0335954fd4832..2555bf4f5e73d762 100644
+> --- a/lib/s390x/smp.c
+> +++ b/lib/s390x/smp.c
+> @@ -154,6 +154,14 @@ int smp_cpu_start(uint16_t addr, struct psw psw)
+>  	return rc;
+>  }
+>  
+> +void smp_cpu_wait_for_completion(uint16_t addr)
 
-Dammit. This is the *3rd* time I fsck the rebase. Someone *please* hit
-me on the head. Hard.
+Hm, that is more wait-for-idle than wait-for-completion, I guess? But
+only semantics, no need to change that.
 
-Now *really* fixed:
+> +{
+> +	uint32_t status;
+> +
+> +	/* Loops when cc == 2, i.e. when the cpu is busy with a sigp order */
+> +	sigp_retry(1, SIGP_SENSE, 0, &status);
+> +}
+> +
+>  int smp_cpu_destroy(uint16_t addr)
+>  {
+>  	struct cpu *cpu;
+> diff --git a/lib/s390x/smp.h b/lib/s390x/smp.h
+> index ce63a89880c045f3..a8b98c0fcf2b451c 100644
+> --- a/lib/s390x/smp.h
+> +++ b/lib/s390x/smp.h
+> @@ -45,6 +45,7 @@ int smp_cpu_restart(uint16_t addr);
+>  int smp_cpu_start(uint16_t addr, struct psw psw);
+>  int smp_cpu_stop(uint16_t addr);
+>  int smp_cpu_stop_store_status(uint16_t addr);
+> +void smp_cpu_wait_for_completion(uint16_t addr);
+>  int smp_cpu_destroy(uint16_t addr);
+>  int smp_cpu_setup(uint16_t addr, struct psw psw);
+>  void smp_teardown(void);
+> diff --git a/s390x/smp.c b/s390x/smp.c
+> index 74622113a2c4ad92..48321f4e346dc71d 100644
+> --- a/s390x/smp.c
+> +++ b/s390x/smp.c
+> @@ -75,6 +75,7 @@ static void test_stop_store_status(void)
+>  	lc->prefix_sa = 0;
+>  	lc->grs_sa[15] = 0;
+>  	smp_cpu_stop_store_status(1);
+> +	smp_cpu_wait_for_completion(1);
+>  	mb();
+>  	report(lc->prefix_sa == (uint32_t)(uintptr_t)cpu->lowcore, "prefix");
+>  	report(lc->grs_sa[15], "stack");
+> @@ -85,6 +86,7 @@ static void test_stop_store_status(void)
+>  	lc->prefix_sa = 0;
+>  	lc->grs_sa[15] = 0;
+>  	smp_cpu_stop_store_status(1);
+> +	smp_cpu_wait_for_completion(1);
+>  	mb();
+>  	report(lc->prefix_sa == (uint32_t)(uintptr_t)cpu->lowcore, "prefix");
+>  	report(lc->grs_sa[15], "stack");
+> @@ -215,6 +217,7 @@ static void test_reset_initial(void)
+>  	wait_for_flag();
+>  
+>  	sigp_retry(1, SIGP_INITIAL_CPU_RESET, 0, NULL);
+> +	smp_cpu_wait_for_completion(1);
+>  	sigp(1, SIGP_STORE_STATUS_AT_ADDRESS, (uintptr_t)status, NULL);
+>  
+>  	report_prefix_push("clear");
+> @@ -264,6 +267,7 @@ static void test_reset(void)
+>  	smp_cpu_start(1, psw);
+>  
+>  	sigp_retry(1, SIGP_CPU_RESET, 0, NULL);
+> +	smp_cpu_wait_for_completion(1);
+>  	report(smp_cpu_stopped(1), "cpu stopped");
+>  
+>  	set_flag(0);
 
-https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/commit/?h=kvm-arm64/gic-v4.1&id=05d32df13c6b3c0850b68928048536e9a736d520
+I'm wondering whether there's a place for a
+sigp-and-wait-for-completion function. But that's probably overkill.
 
-Thanks,
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 
-	M.
--- 
-Jazz is not dead. It just smells funny...
