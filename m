@@ -2,111 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6DDEC19145A
-	for <lists+kvm@lfdr.de>; Tue, 24 Mar 2020 16:28:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 329D6191494
+	for <lists+kvm@lfdr.de>; Tue, 24 Mar 2020 16:38:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728401AbgCXPZn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Mar 2020 11:25:43 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:50918 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727491AbgCXPZn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 Mar 2020 11:25:43 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02OFOEua049070;
-        Tue, 24 Mar 2020 15:25:16 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2020-01-29;
- bh=wmt/AtPlazx7PxA08PU/xQuPcDJRywUgyLYzzhVKDWo=;
- b=HlxHhAZeFJAYDCA5fPvZT0XyZk1LtJIZKbYOmph4L9nsYBamLDoD/tnnT7M3MY8LWWjW
- Y0ed+dfyRQ+D7Aqj2BxzqWWyCnlmK87v7Ni2SZxdHuzm1rC1rIe293zxj8WmxRXnxqyW
- 5RJZ4Rv4+Plpi8RrD2WqK9xxzLs+0wFCIVTT7i/TVb5JAukeNu+INHfKC3Od9RBx3RWR
- cvCp1lRb1xwZV/8qd5wg+5aFNN79N9U2Zbro/l2gwWi/z4rdPS9u0RQ3wB5aaove+jJp
- C8VjRV7+tgNiC6j2sIPomHakY/vxF1EZnZGOxIwd+w9mfZNUOwwFs+uu4iGwiTSLVfCa 5g== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
-        by userp2120.oracle.com with ESMTP id 2yx8ac1x7m-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 24 Mar 2020 15:25:16 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
-        by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02OFMCS3150028;
-        Tue, 24 Mar 2020 15:25:15 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
-        by userp3030.oracle.com with ESMTP id 2yxw4pg9dh-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 24 Mar 2020 15:25:15 +0000
-Received: from abhmp0015.oracle.com (abhmp0015.oracle.com [141.146.116.21])
-        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 02OFPCct026939;
-        Tue, 24 Mar 2020 15:25:12 GMT
-Received: from [192.168.1.206] (/71.63.128.209)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Tue, 24 Mar 2020 08:25:12 -0700
-Subject: Re: [PATCH v2] mm/hugetlb: fix a addressing exception caused by
- huge_pte_offset()
-To:     Jason Gunthorpe <jgg@ziepe.ca>,
-        "Longpeng (Mike, Cloud Infrastructure Service Product Dept.)" 
-        <longpeng2@huawei.com>
-Cc:     akpm@linux-foundation.org, kirill.shutemov@linux.intel.com,
-        linux-kernel@vger.kernel.org, arei.gonglei@huawei.com,
-        weidong.huang@huawei.com, weifuqiang@huawei.com,
-        kvm@vger.kernel.org, linux-mm@kvack.org,
-        Matthew Wilcox <willy@infradead.org>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        stable@vger.kernel.org
-References: <1582342427-230392-1-git-send-email-longpeng2@huawei.com>
- <51a25d55-de49-4c0a-c994-bf1a8cfc8638@oracle.com>
- <20200323160955.GY20941@ziepe.ca>
- <69055395-e7e5-a8e2-7f3e-f61607149318@oracle.com>
- <20200323180706.GC20941@ziepe.ca>
- <88698dd7-eb87-4b0b-7ba7-44ef6eab6a6c@oracle.com>
- <20200323225225.GF20941@ziepe.ca>
- <e8e71ba4-d609-269a-6160-153e373e7563@huawei.com>
- <20200324115541.GH20941@ziepe.ca>
-From:   Mike Kravetz <mike.kravetz@oracle.com>
-Message-ID: <98d35563-8af0-2693-7e76-e6435da0bbee@oracle.com>
-Date:   Tue, 24 Mar 2020 08:25:09 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+        id S1728413AbgCXPhH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Mar 2020 11:37:07 -0400
+Received: from mga05.intel.com ([192.55.52.43]:40198 "EHLO mga05.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727980AbgCXPhF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 Mar 2020 11:37:05 -0400
+IronPort-SDR: LLb5cSzLtWtvLZow8PQek16+ibtPBzmxOii4zVNpooSmTneWwN8ZbvO6xfms3Mb63Gd0Sl/iFA
+ oJUuF1fBbo8Q==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Mar 2020 08:37:04 -0700
+IronPort-SDR: NW2j/PrriTw0QlQ/+lOlMn8Y1tzc6CVzaVQ2I5jYpByXrkvlhmdgGeOmwndNm65ka8Q/KZQbNV
+ jugDFZwqC/0w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.72,300,1580803200"; 
+   d="scan'208";a="393319653"
+Received: from lxy-clx-4s.sh.intel.com ([10.239.43.39])
+  by orsmga004.jf.intel.com with ESMTP; 24 Mar 2020 08:37:00 -0700
+From:   Xiaoyao Li <xiaoyao.li@intel.com>
+To:     Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        hpa@zytor.com, Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Andy Lutomirski <luto@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Arvind Sankar <nivedita@alum.mit.edu>,
+        Fenghua Yu <fenghua.yu@intel.com>,
+        Tony Luck <tony.luck@intel.com>,
+        Xiaoyao Li <xiaoyao.li@intel.com>
+Subject: [PATCH v6 0/8] x86/split_lock: Fix and virtualization of split lock detection
+Date:   Tue, 24 Mar 2020 23:18:51 +0800
+Message-Id: <20200324151859.31068-1-xiaoyao.li@intel.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-In-Reply-To: <20200324115541.GH20941@ziepe.ca>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9569 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 suspectscore=0
- spamscore=0 mlxlogscore=856 adultscore=0 phishscore=0 mlxscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2003240085
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9569 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 suspectscore=0 priorityscore=1501 malwarescore=0
- mlxscore=0 adultscore=0 phishscore=0 impostorscore=0 mlxlogscore=880
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2003240085
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 3/24/20 4:55 AM, Jason Gunthorpe wrote:
-> Also, since CH moved all the get_user_pages_fast code out of the
-> arch's many/all archs can drop their arch specific version of this
-> routine. This is really just a specialized version of gup_fast's
-> algorithm..
-> 
-> (also the arch versions seem different, why do some return actual
->  ptes, not null?)
+So sorry for the noise that I forgot to CC the maillist.
 
-Not sure I understand that last question.  The return value should be
-a *pte or null.
+This series aims to add the virtualization of split lock detection for
+guest, while containing some fixes of native kernel split lock handling. 
 
-/*
- * huge_pte_offset() - Walk the page table to resolve the hugepage
- * entry at address @addr
- *
- * Return: Pointer to page table or swap entry (PUD or PMD) for
- * address @addr, or NULL if a p*d_none() entry is encountered and the
- * size @sz doesn't match the hugepage size at this level of the page
- * table.
- */
+Note, this series is based on the kernel patch[1]. Patch 1-3 are x86
+kernel patches that based on the linux/master branch. Patch 4-8 are kvm
+patches that based on the kvm/queue branch.
+
+Patch 1 is the fix and enhancement for kernel split lock detction. It
+ensures X86_FEATURE_SPLIT_LOCK_DETECT flag is set only when feature does
+exist and not disabled on kernel params. And it explicitly turn off split
+lock when sld_off instead of assuming BIOS/firmware leaves it cleared.
+
+Patch 2 optimizes the runtime MSR accessing.
+
+Patch 3 are the preparation for enabling split lock detection
+virtualization in KVM.
+
+Patch 4 fixes the issue that malicious guest may exploit kvm emulator to
+attcact host kernel.
+
+Patch 5 handles guest's split lock when host turns split lock detect on.
+
+Patch 6-8 implement the virtualization of split lock detection in kvm.
+
+[1]: https://lore.kernel.org/lkml/158031147976.396.8941798847364718785.tip-bot2@tip-bot2/ 
+
+Changes in v6:
+ - Drop the sld_not_exist flag and use X86_FEATURE_SPLIT_LOCK_DETECT to
+   check whether need to init split lock detection. [tglx]
+ - Use tglx's method to verify the existence of split lock detectoin.
+ - small optimization of sld_update_msr() that the default value of
+   msr_test_ctrl_cache has split_lock_detect bit cleared.
+ - Drop the patch3 in v5 that introducing kvm_only option. [tglx]
+ - Rebase patch4-8 to kvm/queue.
+ - use the new kvm-cpu-cap to expose X86_FEATURE_CORE_CAPABILITIES in
+   Patch 6.
+
+Changes in v5:
+ - Use X86_FEATURE_SPLIT_LOCK_DETECT flag in kvm to ensure split lock
+   detection is really supported.
+ - Add and export sld related helper functions in their related usecase 
+   kvm patches.
+
+Changes in v4:
+ - Add patch 1 to rework the initialization flow of split lock
+   detection.
+ - Drop percpu MSR_TEST_CTRL cache, just use a static variable to cache
+   the reserved/unused bit of MSR_TEST_CTRL. [Sean]
+ - Add new option for split_lock_detect kernel param.
+ - Changlog refinement. [Sean]
+ - Add a new patch to enable MSR_TEST_CTRL for intel guest. [Sean]
+
+Xiaoyao Li (8):
+  x86/split_lock: Rework the initialization flow of split lock detection
+  x86/split_lock: Avoid runtime reads of the TEST_CTRL MSR
+  x86/split_lock: Export handle_user_split_lock()
+  kvm: x86: Emulate split-lock access as a write in emulator
+  kvm: vmx: Extend VMX's #AC interceptor to handle split lock #AC
+    happens in guest
+  kvm: x86: Emulate MSR IA32_CORE_CAPABILITIES
+  kvm: vmx: Enable MSR_TEST_CTRL for intel guest
+  kvm: vmx: virtualize split lock detection
+
+ arch/x86/include/asm/cpu.h      |  21 +++++-
+ arch/x86/include/asm/kvm_host.h |   1 +
+ arch/x86/kernel/cpu/intel.c     | 114 +++++++++++++++++++-------------
+ arch/x86/kernel/traps.c         |   2 +-
+ arch/x86/kvm/cpuid.c            |   1 +
+ arch/x86/kvm/vmx/vmx.c          |  75 ++++++++++++++++++++-
+ arch/x86/kvm/vmx/vmx.h          |   1 +
+ arch/x86/kvm/x86.c              |  42 +++++++++++-
+ 8 files changed, 203 insertions(+), 54 deletions(-)
+
 -- 
-Mike Kravetz
+2.20.1
+
