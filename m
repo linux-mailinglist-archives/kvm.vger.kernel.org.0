@@ -2,91 +2,209 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0FF70190AFF
-	for <lists+kvm@lfdr.de>; Tue, 24 Mar 2020 11:32:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D39D7190B0B
+	for <lists+kvm@lfdr.de>; Tue, 24 Mar 2020 11:34:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727261AbgCXKcN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Mar 2020 06:32:13 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:34298 "EHLO
-        us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727230AbgCXKcM (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 24 Mar 2020 06:32:12 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1585045931;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=UV9ud81YBTwdkQ+V+gKznrai6KmGHWHqg05YLt/rhFQ=;
-        b=CRFms1iJtM7+u7LYbxO4bvnbprqCHeBK/02XhtN9HgoYytJ1XnYd4xl+0DEAuiCLfi1Me8
-        uJx2IbgAuEKiUA6LBLxmgfwLXrDe3EyQ+tMAbwa+lmh5rYQG2jTaMkb07+Twr5HJCHaSXa
-        SkPz9NM281y5OElhV8iidD+1/e1w/0A=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-327-9g9p4s9HOS67wuZUp4j4QA-1; Tue, 24 Mar 2020 06:32:07 -0400
-X-MC-Unique: 9g9p4s9HOS67wuZUp4j4QA-1
-Received: by mail-wm1-f69.google.com with SMTP id n188so1100860wmf.0
-        for <kvm@vger.kernel.org>; Tue, 24 Mar 2020 03:32:07 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=UV9ud81YBTwdkQ+V+gKznrai6KmGHWHqg05YLt/rhFQ=;
-        b=UsCoXmi3sJV519c2rXvAvX5Q9ay8DsA7n9ci+XGHv9SRu5aDwOJjaRuER9AuikvfSi
-         aaE0FuqDfZ3xBVhKA/E7pcPNJ7TOKWGwj/msWNQlcTbO6OogYyVeBveciGzTo2B18QDi
-         uuzsTE/VMcga0tF/U3XGSTLconNKtIxEw54j7RNZoikFcfm0Ij9UdMAbh0YoyqL0kOm2
-         QlKq6qQIPHEa7ZtZNnAFodavCv76+2+lFL/5ZO2+UkQgPV54DD35yyxzsjIgG6HEQX+V
-         CRPQtpSbvaZTvQlNdSozP1ysSlUpGGPB9gov8GKmXw5jh4zEtwLs1AOYySpET/zKr7mW
-         20VA==
-X-Gm-Message-State: ANhLgQ3eVtn5vI12BMr8ben0XDcZzJbFFXdJP82BsnxXiBAkXTvhYCNG
-        I4myNrIuKWwNlolD/NRbbykEqMt7UFzt0XhkqpsEWclb9K6kkIVFeMgV+l6pyCradt9VNiQLMCn
-        ZN1U55ZNqoht5
-X-Received: by 2002:a5d:4085:: with SMTP id o5mr34240927wrp.327.1585045926560;
-        Tue, 24 Mar 2020 03:32:06 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vtBMvtz9k9ioXP95UpBgynAuCqmmPTYB8zbQkJXHAC4DCQ5zdb+6zmBIIMALmZ6zokl0maW0Q==
-X-Received: by 2002:a5d:4085:: with SMTP id o5mr34240898wrp.327.1585045926311;
-        Tue, 24 Mar 2020 03:32:06 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:7848:99b4:482a:e888? ([2001:b07:6468:f312:7848:99b4:482a:e888])
-        by smtp.gmail.com with ESMTPSA id i21sm4026154wmb.23.2020.03.24.03.32.05
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 24 Mar 2020 03:32:05 -0700 (PDT)
-Subject: Re: [PATCH 0/7] tools/kvm_stat: add logfile support
-To:     Stefan Raspl <raspl@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     rkrcmar@redhat.com
-References: <20200306114250.57585-1-raspl@linux.ibm.com>
- <7f396df1-9589-6dd0-0adf-af4376aa8314@redhat.com>
- <d893c37d-705c-b9a1-cf98-db997edf3bce@linux.ibm.com>
- <5c350f55-64be-43fc-237d-7f71b4e9afdc@redhat.com>
- <7c8b614a-a7a1-d33e-8762-b06d4b2fd45b@linux.ibm.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <d0143786-04e5-a9f8-bd87-d4c06cee1856@redhat.com>
-Date:   Tue, 24 Mar 2020 11:32:05 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+        id S1727163AbgCXKeC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Mar 2020 06:34:02 -0400
+Received: from mail.kernel.org ([198.145.29.99]:55928 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727120AbgCXKeB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 Mar 2020 06:34:01 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 4549620775;
+        Tue, 24 Mar 2020 10:34:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1585046040;
+        bh=bYlBEjd/f1p/2lpvFc3jhEpDR9HQLFUZ/kLJ31B5CWc=;
+        h=From:To:Cc:Subject:Date:From;
+        b=0RrKWVxxqJHLXM6u84gaBr9v6otD8EJJEHV2pLdXJW4KlWoISLAFAHD93FfrSI5eY
+         +a19wUmSXRSfxWF0VILZPLNuekrclWG2p4pGHE/dey82+f2/S6Ax8ZVyzVv5LCTxXE
+         Rs5Xr4f7CNlNaJmR6827T9uEjKOg0d4sEVtLFMW0=
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
+        by disco-boy.misterjones.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <maz@kernel.org>)
+        id 1jGgsg-00FE8V-FA; Tue, 24 Mar 2020 10:33:58 +0000
+From:   Marc Zyngier <maz@kernel.org>
+To:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org
+Cc:     Olof Johansson <olof@lixom.net>, Arnd Bergmann <arnd@arndb.de>,
+        Will Deacon <will@kernel.org>,
+        Vladimir Murzin <vladimir.murzin@arm.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Quentin Perret <qperret@google.com>,
+        Russell King <linux@arm.linux.org.uk>,
+        Stefan Agner <stefan@agner.ch>,
+        Jan Kiszka <jan.kiszka@siemens.com>,
+        Krzysztof Kozlowski <krzk@kernel.org>,
+        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+        Marek Szyprowski <m.szyprowski@samsung.com>,
+        Takashi Yoshi <takashi@yoshi.email>,
+        Daniel Golle <daniel@makrotopia.org>
+Subject: [PATCH v2 0/7] Removing support for 32bit KVM/arm host
+Date:   Tue, 24 Mar 2020 10:33:43 +0000
+Message-Id: <20200324103350.138077-1-maz@kernel.org>
+X-Mailer: git-send-email 2.25.0
 MIME-Version: 1.0
-In-Reply-To: <7c8b614a-a7a1-d33e-8762-b06d4b2fd45b@linux.ibm.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, olof@lixom.net, arnd@arndb.de, will@kernel.org, vladimir.murzin@arm.com, catalin.marinas@arm.com, linus.walleij@linaro.org, christoffer.dall@arm.com, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, pbonzini@redhat.com, qperret@google.com, linux@arm.linux.org.uk, stefan@agner.ch, jan.kiszka@siemens.com, krzk@kernel.org, b.zolnierkie@samsung.com, m.szyprowski@samsung.com, takashi@yoshi.email, daniel@makrotopia.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 24/03/20 09:26, Stefan Raspl wrote:
-> To be able to make use of the logfiles, we'd need to have the heading appear at
-> the top of each of the files.
-> Couldn't find much info on how logrotate works internally, but from what I
-> gathered, it seems it moves out the current logfile e.g. /var/log/kvm.log to
-> become /var/log/kvm.log.1, and sends a SIGHUP to kvm_stat so that it re-opens
-> /var/log/kvm.log - which would then start out with a header again.
-> That should work, but can you confirm that this is what you're suggesting?
-> If so: Keep the current semantics for the original logging mode, where we have
-> the heading printed every 20 lines? I would assume so, as that format is better
-> suited for console logs, but just in case you wanted that changed...
+KVM/arm was merged just over 7 years ago, and has lived a very quiet
+life so far. It mostly works if you're prepared to deal with its
+limitations, it has been a good prototype for the arm64 version,
+but it suffers a few problems:
 
-Yes to all. :)
+- It is incomplete (no debug support, no PMU)
+- It hasn't followed any of the architectural evolutions
+- It has zero^W very few users (I don't count myself here)
+- It is more and more getting in the way of new arm64 developments
 
-Paolo
+There has been quite a bit of discussion (see [1]) on whether we were
+depriving users of something they were depending on. Most people
+didn't object, and actually supported the removal. A few people *did*
+object to the removal:
+
+- Takashi uses it on a regular basis for developments
+- Daniel uses it as well, although he doesn't depend on it
+- Marek and Bartlomiej said that Samsung use it internally, without
+  any description of their usage model
+
+Alghouth I can really sympathetize with people above, I still don't
+think we should keep the 32bit port artificially alive for the sake of
+it, specially considering that the whole of the 32bit architecture is
+in best effort, maintenance mode. I'd rather drop KVM support now,
+while it is still in a decent shape, rather than seeing it bit-rot
+like it happened for ia64. I also plan to keep maintaining it in the
+various stable kernels, up to (and including) 5.6.
+
+To reiterate: 32bit guest support for arm64 stays, of course. Only
+32bit host goes. Once this is merged, I plan to move virt/kvm/arm to
+arm64, and cleanup all the now unnecessary abstractions.
+
+The patches have been generated with the -D option to avoid spamming
+everyone with huge diffs, and there is a kvm-arm/goodbye branch in
+my kernel.org repository.
+
+* From v1:
+  - Rebased on top of kvmarm/next
+  - Simplified the HYP vector replacement code
+  - Updated the MAINTAINERS file
+  - Collected Acks
+
+[1] https://lore.kernel.org/linux-arm-kernel/20200210141324.21090-1-maz@kernel.org/
+
+Marc Zyngier (7):
+  arm: Unplug KVM from the build system
+  arm: Remove KVM from config files
+  arm: Remove 32bit KVM host support
+  arm: Remove HYP/Stage-2 page-table support
+  arm: Remove GICv3 vgic compatibility macros
+  arm: Remove the ability to set HYP vectors outside of the decompressor
+  MAINTAINERS: RIP KVM/arm
+
+ Documentation/virt/kvm/arm/hyp-abi.rst |    5 +
+ MAINTAINERS                            |    5 +-
+ arch/arm/Kconfig                       |    2 -
+ arch/arm/Makefile                      |    1 -
+ arch/arm/configs/axm55xx_defconfig     |    2 -
+ arch/arm/include/asm/arch_gicv3.h      |  114 --
+ arch/arm/include/asm/kvm_arm.h         |  239 ----
+ arch/arm/include/asm/kvm_asm.h         |   77 --
+ arch/arm/include/asm/kvm_coproc.h      |   36 -
+ arch/arm/include/asm/kvm_emulate.h     |  372 ------
+ arch/arm/include/asm/kvm_host.h        |  457 --------
+ arch/arm/include/asm/kvm_hyp.h         |  127 ---
+ arch/arm/include/asm/kvm_mmu.h         |  435 -------
+ arch/arm/include/asm/kvm_ras.h         |   14 -
+ arch/arm/include/asm/pgtable-3level.h  |   20 -
+ arch/arm/include/asm/pgtable.h         |    9 -
+ arch/arm/include/asm/sections.h        |    6 +-
+ arch/arm/include/asm/stage2_pgtable.h  |   75 --
+ arch/arm/include/asm/virt.h            |   17 -
+ arch/arm/include/uapi/asm/kvm.h        |  314 -----
+ arch/arm/kernel/asm-offsets.c          |   11 -
+ arch/arm/kernel/hyp-stub.S             |   39 +-
+ arch/arm/kernel/vmlinux-xip.lds.S      |    8 -
+ arch/arm/kernel/vmlinux.lds.S          |    8 -
+ arch/arm/kernel/vmlinux.lds.h          |   10 -
+ arch/arm/kvm/Kconfig                   |   59 -
+ arch/arm/kvm/Makefile                  |   43 -
+ arch/arm/kvm/coproc.c                  | 1455 ------------------------
+ arch/arm/kvm/coproc.h                  |  130 ---
+ arch/arm/kvm/coproc_a15.c              |   39 -
+ arch/arm/kvm/coproc_a7.c               |   42 -
+ arch/arm/kvm/emulate.c                 |  166 ---
+ arch/arm/kvm/guest.c                   |  387 -------
+ arch/arm/kvm/handle_exit.c             |  175 ---
+ arch/arm/kvm/hyp/Makefile              |   34 -
+ arch/arm/kvm/hyp/banked-sr.c           |   70 --
+ arch/arm/kvm/hyp/cp15-sr.c             |   72 --
+ arch/arm/kvm/hyp/entry.S               |  121 --
+ arch/arm/kvm/hyp/hyp-entry.S           |  295 -----
+ arch/arm/kvm/hyp/s2-setup.c            |   22 -
+ arch/arm/kvm/hyp/switch.c              |  242 ----
+ arch/arm/kvm/hyp/tlb.c                 |   68 --
+ arch/arm/kvm/hyp/vfp.S                 |   57 -
+ arch/arm/kvm/init.S                    |  157 ---
+ arch/arm/kvm/interrupts.S              |   36 -
+ arch/arm/kvm/irq.h                     |   16 -
+ arch/arm/kvm/reset.c                   |   86 --
+ arch/arm/kvm/trace.h                   |   86 --
+ arch/arm/kvm/vgic-v3-coproc.c          |   27 -
+ arch/arm/mach-exynos/Kconfig           |    2 +-
+ arch/arm/mm/mmu.c                      |   26 -
+ 51 files changed, 16 insertions(+), 6300 deletions(-)
+ delete mode 100644 arch/arm/include/asm/kvm_arm.h
+ delete mode 100644 arch/arm/include/asm/kvm_asm.h
+ delete mode 100644 arch/arm/include/asm/kvm_coproc.h
+ delete mode 100644 arch/arm/include/asm/kvm_emulate.h
+ delete mode 100644 arch/arm/include/asm/kvm_host.h
+ delete mode 100644 arch/arm/include/asm/kvm_hyp.h
+ delete mode 100644 arch/arm/include/asm/kvm_mmu.h
+ delete mode 100644 arch/arm/include/asm/kvm_ras.h
+ delete mode 100644 arch/arm/include/asm/stage2_pgtable.h
+ delete mode 100644 arch/arm/include/uapi/asm/kvm.h
+ delete mode 100644 arch/arm/kvm/Kconfig
+ delete mode 100644 arch/arm/kvm/Makefile
+ delete mode 100644 arch/arm/kvm/coproc.c
+ delete mode 100644 arch/arm/kvm/coproc.h
+ delete mode 100644 arch/arm/kvm/coproc_a15.c
+ delete mode 100644 arch/arm/kvm/coproc_a7.c
+ delete mode 100644 arch/arm/kvm/emulate.c
+ delete mode 100644 arch/arm/kvm/guest.c
+ delete mode 100644 arch/arm/kvm/handle_exit.c
+ delete mode 100644 arch/arm/kvm/hyp/Makefile
+ delete mode 100644 arch/arm/kvm/hyp/banked-sr.c
+ delete mode 100644 arch/arm/kvm/hyp/cp15-sr.c
+ delete mode 100644 arch/arm/kvm/hyp/entry.S
+ delete mode 100644 arch/arm/kvm/hyp/hyp-entry.S
+ delete mode 100644 arch/arm/kvm/hyp/s2-setup.c
+ delete mode 100644 arch/arm/kvm/hyp/switch.c
+ delete mode 100644 arch/arm/kvm/hyp/tlb.c
+ delete mode 100644 arch/arm/kvm/hyp/vfp.S
+ delete mode 100644 arch/arm/kvm/init.S
+ delete mode 100644 arch/arm/kvm/interrupts.S
+ delete mode 100644 arch/arm/kvm/irq.h
+ delete mode 100644 arch/arm/kvm/reset.c
+ delete mode 100644 arch/arm/kvm/trace.h
+ delete mode 100644 arch/arm/kvm/vgic-v3-coproc.c
+
+-- 
+2.25.0
 
