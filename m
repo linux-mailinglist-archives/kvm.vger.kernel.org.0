@@ -2,280 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7A7DF190690
-	for <lists+kvm@lfdr.de>; Tue, 24 Mar 2020 08:45:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 88201190734
+	for <lists+kvm@lfdr.de>; Tue, 24 Mar 2020 09:13:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727493AbgCXHpz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Mar 2020 03:45:55 -0400
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:51620 "EHLO
-        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727420AbgCXHpz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 Mar 2020 03:45:55 -0400
-Received: by mail-wm1-f68.google.com with SMTP id c187so2096499wme.1;
-        Tue, 24 Mar 2020 00:45:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=E4laWHPFyqBGUJvtxwe1Z3Lus6v9LWPN8EYUI93Rtls=;
-        b=nFZASXcc4nB9pmEFKaBvek+Sq0SW3tv6Wj0W7n/XOB/B5YSO9c+sZoE+xGcmDzBje2
-         4K7EhILSluLpuSQJMwQUB51akbPlheh9Je2Spf42qULN8NE+9+nxB9bJMDToS6/nl8N4
-         7D0GKq8osTZujE8SKlDMDct4IIAO6chO9DZXWbcJD71cC1wI183M4fxAv/ZhInG/KLS2
-         MunnpqXeEM3TqOYonSwxMGyYSI/ojD2R3CBXV6+Ozu3TyphvhwYH8G+vDmCIzIgIdY8i
-         euq5ac00stByd//KwXHxAH4nT+1+c8GVfBPsIiJvYgnEPw4IALdyHUkGiLcXXdNKB3Jz
-         9Oxw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=E4laWHPFyqBGUJvtxwe1Z3Lus6v9LWPN8EYUI93Rtls=;
-        b=UyjeC4RqIb7NtnIVKKbC3fF26c3HMa15U1iZAjQyASmFANU3DnXsxQLQSJLVUsrL9s
-         ICWuYT3JErGwNmGoecFQnnczGSPVFU6ajzedzK8zmLueTI/iNGNBbneQu6jWVF70H+ou
-         c+pqnkDWxjM5e3M4awkUhCcCZF/qflvgzoF2/ERvnxYQcocaZAWJN7E9wt3Zq17DGT2V
-         BYMfe6IsXk1hpcoM+lk6iteuyDmjsxYlkRrPHpogFbk2mjqRULXOikKMvAvA75BY+EER
-         oScBasmyS2IKLVOCI4uhXe4zZ+XgYfQSSeXpI360MdvBrSXE45IPJWF+7siyvmFybZ2C
-         1sqQ==
-X-Gm-Message-State: ANhLgQ1KTBCG21FFEWNsUZXbnV6yXNAmKNT6JE0Xx509La7c+zE5RNVd
-        +7+z6hceTDWBMFXvnWSyMPSEt76plVM=
-X-Google-Smtp-Source: ADFU+vtpNGYv/4s7yUPo07m4ysTE2tFOwDv7Lx1NTwyDE7zqmYAgfgiEp3lYnHEHZ50c0cYCH1s2wA==
-X-Received: by 2002:a05:600c:24c:: with SMTP id 12mr1867336wmj.186.1585035952218;
-        Tue, 24 Mar 2020 00:45:52 -0700 (PDT)
-Received: from jondnuc.lan (IGLD-84-229-155-229.inter.net.il. [84.229.155.229])
-        by smtp.gmail.com with ESMTPSA id r15sm22066122wra.19.2020.03.24.00.45.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Mar 2020 00:45:51 -0700 (PDT)
-From:   Jon Doron <arilou@gmail.com>
-To:     kvm@vger.kernel.org, linux-hyperv@vger.kernel.org
-Cc:     vkuznets@redhat.com
-Subject: [PATCH v10 7/7] KVM: selftests: update hyperv_cpuid with SynDBG tests
-Date:   Tue, 24 Mar 2020 09:43:41 +0200
-Message-Id: <20200324074341.1770081-8-arilou@gmail.com>
-X-Mailer: git-send-email 2.24.1
-In-Reply-To: <20200324074341.1770081-1-arilou@gmail.com>
-References: <20200324074341.1770081-1-arilou@gmail.com>
+        id S1727107AbgCXING (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Mar 2020 04:13:06 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:5938 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726166AbgCXING (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 24 Mar 2020 04:13:06 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 02O85utI125783
+        for <kvm@vger.kernel.org>; Tue, 24 Mar 2020 04:13:05 -0400
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2ywd8ctk8m-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Tue, 24 Mar 2020 04:13:04 -0400
+Received: from localhost
+        by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <frankja@linux.ibm.com>;
+        Tue, 24 Mar 2020 08:13:01 -0000
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
+        by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Tue, 24 Mar 2020 08:12:58 -0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 02O8CwOq45809846
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 24 Mar 2020 08:12:58 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 938A8A4060;
+        Tue, 24 Mar 2020 08:12:58 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 6F047A4054;
+        Tue, 24 Mar 2020 08:12:57 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.145.9.40])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 24 Mar 2020 08:12:57 +0000 (GMT)
+From:   Janosch Frank <frankja@linux.ibm.com>
+To:     kvm@vger.kernel.org
+Cc:     thuth@redhat.com, linux-s390@vger.kernel.org, david@redhat.com
+Subject: [kvm-unit-tests PATCH 00/10] s390x: smp: Improve smp code part 2
+Date:   Tue, 24 Mar 2020 04:12:41 -0400
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 20032408-0008-0000-0000-00000362DE2D
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20032408-0009-0000-0000-00004A844979
+Message-Id: <20200324081251.28810-1-frankja@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.645
+ definitions=2020-03-24_02:2020-03-23,2020-03-24 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 suspectscore=0
+ malwarescore=0 mlxlogscore=574 spamscore=0 lowpriorityscore=0 phishscore=0
+ adultscore=0 priorityscore=1501 bulkscore=0 impostorscore=0 clxscore=1011
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
+ definitions=main-2003240042
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Vitaly Kuznetsov <vkuznets () redhat ! com>
+Let's continue cleaning up the smp test and smp related functions.
 
-Test all four combinations with eVMCS and SynDBG capabilities,
-check that we get the right number of entries and that
-0x40000000.EAX always returns the correct max leaf.
+We add:
+   * Test for external/emergency calls after reset
+   * Test SIGP restart while running
+   * SIGP stop and store status while running
+   * CR testing on reset
 
-Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
----
- .../selftests/kvm/x86_64/hyperv_cpuid.c       | 139 ++++++++++++------
- 1 file changed, 96 insertions(+), 43 deletions(-)
+We fix:
+   * Proper check for sigp completion
+   * smp_cpu_setup_state() loop and return address in r14
 
-diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c b/tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c
-index 443a2b54645b..e63b0e1c253d 100644
---- a/tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c
-+++ b/tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c
-@@ -26,18 +26,18 @@ static void guest_code(void)
- {
- }
- 
--static int smt_possible(void)
-+static bool smt_possible(void)
- {
- 	char buf[16];
- 	FILE *f;
--	bool res = 1;
-+	bool res = true;
- 
- 	f = fopen("/sys/devices/system/cpu/smt/control", "r");
- 	if (f) {
- 		if (fread(buf, sizeof(*buf), sizeof(buf), f) > 0) {
- 			if (!strncmp(buf, "forceoff", 8) ||
- 			    !strncmp(buf, "notsupported", 12))
--				res = 0;
-+				res = false;
- 		}
- 		fclose(f);
- 	}
-@@ -45,30 +45,48 @@ static int smt_possible(void)
- 	return res;
- }
- 
-+void vcpu_enable_syndbg(struct kvm_vm *vm, int vcpu_id)
-+{
-+	struct kvm_enable_cap enable_syndbg_cap = {
-+		.cap = KVM_CAP_HYPERV_SYNDBG,
-+	};
-+
-+	vcpu_ioctl(vm, vcpu_id, KVM_ENABLE_CAP, &enable_syndbg_cap);
-+}
-+
- static void test_hv_cpuid(struct kvm_cpuid2 *hv_cpuid_entries,
--			  int evmcs_enabled)
-+			  bool evmcs_enabled, bool syndbg_enabled)
- {
- 	int i;
-+	int nent = 6;
-+	u32 test_val;
-+
-+	if (evmcs_enabled)
-+		nent += 1; /* 0x4000000A */
- 
--	if (!evmcs_enabled)
--		TEST_ASSERT(hv_cpuid_entries->nent == 6,
--			    "KVM_GET_SUPPORTED_HV_CPUID should return 6 entries"
--			    " when Enlightened VMCS is disabled (returned %d)",
--			    hv_cpuid_entries->nent);
--	else
--		TEST_ASSERT(hv_cpuid_entries->nent == 7,
--			    "KVM_GET_SUPPORTED_HV_CPUID should return 7 entries"
--			    " when Enlightened VMCS is enabled (returned %d)",
--			    hv_cpuid_entries->nent);
-+	if (syndbg_enabled)
-+		nent += 3; /* 0x40000080 - 0x40000082 */
-+
-+	TEST_ASSERT(hv_cpuid_entries->nent == nent,
-+		    "KVM_GET_SUPPORTED_HV_CPUID should return %d entries"
-+		    " with evmcs=%d syndbg=%d (returned %d)",
-+		    nent, evmcs_enabled, syndbg_enabled,
-+		    hv_cpuid_entries->nent);
- 
- 	for (i = 0; i < hv_cpuid_entries->nent; i++) {
- 		struct kvm_cpuid_entry2 *entry = &hv_cpuid_entries->entries[i];
- 
- 		TEST_ASSERT((entry->function >= 0x40000000) &&
--			    (entry->function <= 0x4000000A),
-+			    (entry->function <= 0x40000082),
- 			    "function %lx is our of supported range",
- 			    entry->function);
- 
-+		TEST_ASSERT(evmcs_enabled || (entry->function != 0x4000000A),
-+			    "0x4000000A leaf should not be reported");
-+
-+		TEST_ASSERT(syndbg_enabled || (entry->function <= 0x4000000A),
-+			    "SYNDBG leaves should not be reported");
-+
- 		TEST_ASSERT(entry->index == 0,
- 			    ".index field should be zero");
- 
-@@ -78,12 +96,27 @@ static void test_hv_cpuid(struct kvm_cpuid2 *hv_cpuid_entries,
- 		TEST_ASSERT(!entry->padding[0] && !entry->padding[1] &&
- 			    !entry->padding[2], "padding should be zero");
- 
--		if (entry->function == 0x40000004) {
--			int nononarchcs = !!(entry->eax & (1UL << 18));
--
--			TEST_ASSERT(nononarchcs == !smt_possible(),
-+		switch (entry->function) {
-+		case 0x40000000:
-+			test_val = 0x40000005;
-+			if (evmcs_enabled)
-+				test_val = 0x4000000A;
-+			if (syndbg_enabled)
-+				test_val = 0x40000082;
-+
-+			TEST_ASSERT(entry->eax == test_val,
-+				    "Wrong max leaf report in 0x40000000.EAX: %x"
-+				    " (evmcs=%d syndbg=%d)",
-+				    entry->eax, evmcs_enabled, syndbg_enabled
-+				);
-+			break;
-+		case 0x40000004:
-+			test_val = entry->eax & (1UL << 18);
-+
-+			TEST_ASSERT(!!test_val == !smt_possible(),
- 				    "NoNonArchitecturalCoreSharing bit"
- 				    " doesn't reflect SMT setting");
-+			break;
- 		}
- 
- 		/*
-@@ -133,8 +166,9 @@ struct kvm_cpuid2 *kvm_get_supported_hv_cpuid(struct kvm_vm *vm)
- int main(int argc, char *argv[])
- {
- 	struct kvm_vm *vm;
--	int rv;
-+	int rv, stage;
- 	struct kvm_cpuid2 *hv_cpuid_entries;
-+	bool evmcs_enabled, syndbg_enabled;
- 
- 	/* Tell stdout not to buffer its content */
- 	setbuf(stdout, NULL);
-@@ -151,32 +185,51 @@ int main(int argc, char *argv[])
- 
- 	test_hv_cpuid_e2big(vm);
- 
--	hv_cpuid_entries = kvm_get_supported_hv_cpuid(vm);
--	if (!hv_cpuid_entries)
--		return 1;
--
--	test_hv_cpuid(hv_cpuid_entries, 0);
-+	kvm_vm_free(vm);
- 
--	free(hv_cpuid_entries);
-+	for (stage = 0; stage < 5; stage++) {
-+		evmcs_enabled = false;
-+		syndbg_enabled = false;
-+
-+		vm = vm_create_default(VCPU_ID, 0, guest_code);
-+		switch (stage) {
-+		case 0:
-+			test_hv_cpuid_e2big(vm);
-+			continue;
-+		case 1:
-+			break;
-+		case 2:
-+			if (!kvm_check_cap(KVM_CAP_HYPERV_ENLIGHTENED_VMCS)) {
-+				print_skip("Enlightened VMCS is unsupported");
-+				continue;
-+			}
-+			vcpu_enable_evmcs(vm, VCPU_ID);
-+			evmcs_enabled = true;
-+			break;
-+		case 3:
-+			if (!kvm_check_cap(KVM_CAP_HYPERV_SYNDBG)) {
-+				print_skip("Synthetic debugger is unsupported");
-+				continue;
-+			}
-+			vcpu_enable_syndbg(vm, VCPU_ID);
-+			syndbg_enabled = true;
-+			break;
-+		case 4:
-+			if (!kvm_check_cap(KVM_CAP_HYPERV_ENLIGHTENED_VMCS) ||
-+			    !kvm_check_cap(KVM_CAP_HYPERV_SYNDBG))
-+				continue;
-+			vcpu_enable_evmcs(vm, VCPU_ID);
-+			vcpu_enable_syndbg(vm, VCPU_ID);
-+			evmcs_enabled = true;
-+			syndbg_enabled = true;
-+			break;
-+		}
- 
--	if (!kvm_check_cap(KVM_CAP_HYPERV_ENLIGHTENED_VMCS)) {
--		fprintf(stderr,
--			"Enlightened VMCS is unsupported, skip related test\n");
--		goto vm_free;
-+		hv_cpuid_entries = kvm_get_supported_hv_cpuid(vm);
-+		test_hv_cpuid(hv_cpuid_entries, evmcs_enabled, syndbg_enabled);
-+		free(hv_cpuid_entries);
-+		kvm_vm_free(vm);
- 	}
- 
--	vcpu_enable_evmcs(vm, VCPU_ID);
--
--	hv_cpuid_entries = kvm_get_supported_hv_cpuid(vm);
--	if (!hv_cpuid_entries)
--		return 1;
--
--	test_hv_cpuid(hv_cpuid_entries, 1);
--
--	free(hv_cpuid_entries);
--
--vm_free:
--	kvm_vm_free(vm);
--
- 	return 0;
- }
+
+GIT: https://github.com/frankjaa/kvm-unit-tests/tree/smp_cleanup2
+
+
+Janosch Frank (10):
+  s390x: smp: Test all CRs on initial reset
+  s390x: smp: Dirty fpc before initial reset test
+  s390x: smp: Test stop and store status on a running and stopped cpu
+  s390x: smp: Test local interrupts after cpu reset
+  s390x: smp: Loop if secondary cpu returns into cpu setup again
+  s390x: smp: Remove unneeded cpu loops
+  s390x: smp: Use full PSW to bringup new cpu
+  s390x: smp: Wait for sigp completion
+  s390x: smp: Add restart when running test
+  s390x: Fix library constant definitions
+
+ lib/s390x/asm/arch_def.h |  8 ++--
+ lib/s390x/smp.c          | 10 +++++
+ lib/s390x/smp.h          |  1 +
+ s390x/cstart64.S         |  5 ++-
+ s390x/smp.c              | 84 ++++++++++++++++++++++++++++++++++++----
+ 5 files changed, 95 insertions(+), 13 deletions(-)
+
 -- 
-2.24.1
+2.25.1
 
