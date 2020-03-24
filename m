@@ -2,204 +2,84 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6063019194D
-	for <lists+kvm@lfdr.de>; Tue, 24 Mar 2020 19:39:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 708B4191957
+	for <lists+kvm@lfdr.de>; Tue, 24 Mar 2020 19:43:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727443AbgCXSj3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Mar 2020 14:39:29 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:45749 "EHLO
-        us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727146AbgCXSj2 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 24 Mar 2020 14:39:28 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1585075166;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=sL0eAVRaIWASbETqSE83z4WnVFPyEX+txd4A0EQ2lwc=;
-        b=dNLfwQlZAciArUmgRl0VaIbZ7T8rLImlwhi2GyNeZDeSfgc7UDiAZumC1c9tt7m5nn42n4
-        QrgWM2aJJ0eVkoCmm60a3cDADbTFPp97cWIy0s5AVlj9scoCSbvbVvH+Ba6QModVLW3ggm
-        I/6J+ExDObDpYwb1+Jdh08mhMqmpWQQ=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-375-daU4sS-uNLeGEoyvyya15A-1; Tue, 24 Mar 2020 14:39:24 -0400
-X-MC-Unique: daU4sS-uNLeGEoyvyya15A-1
-Received: by mail-wr1-f71.google.com with SMTP id d17so9651395wrw.19
-        for <kvm@vger.kernel.org>; Tue, 24 Mar 2020 11:39:24 -0700 (PDT)
+        id S1727509AbgCXSmg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Mar 2020 14:42:36 -0400
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:40815 "EHLO
+        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727318AbgCXSmg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 Mar 2020 14:42:36 -0400
+Received: by mail-wm1-f67.google.com with SMTP id a81so4662558wmf.5
+        for <kvm@vger.kernel.org>; Tue, 24 Mar 2020 11:42:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=pPtwMbJxrA1Es8ak0yumoRvEWX0T2QU5/hT413522OM=;
+        b=NI5YdHzmFt8MJznP4pojeq6KTnqd6bmIu2KrxmmLL1Xe2tr97ui/97+nEp55ClKB3A
+         873nWHtQXnaK/FX5EzwDrasARNrqwER0pd3f7CRkAouFGcpVFQkMlYif+tTNPzSaz3us
+         uS3/+WbLU5Q3bdhR8HkD65f/pkj8xXKg8MaFF5hnUjVgH7VH/j/XV2iBinR/ummxg4sZ
+         dtIGVSnPgJCL0JvVKo3PD1Fh1+wrNDfPW00mF9RjB3twX9vbQd3Dhhoxn0NbtIJN1Yr3
+         lPpOrd4Nskw3MoXDsIS+nUC8rfZQv2RFfR3ajZ46SDPVl/aJNryZLDoSrG6xfQZKJk18
+         Ss4Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=sL0eAVRaIWASbETqSE83z4WnVFPyEX+txd4A0EQ2lwc=;
-        b=i08xfI5xZuezRJHY/W3EzzAVVlDiBnWnkEMa7YNFCkG21zi18DrjnJDGUy28AKmhd4
-         E2iTkAaHMPpwJCHyY6x06RvbXRQBzW1OvJWGS+Y1LzkJtHc6mm+jWwKgCOvx0Wdcqf74
-         GF8J0YuIhUAYZ734ULh/GeMTnOwTUenUY2cXdTEhm0QttzB+uuRITQdtwmY201AiNSp4
-         X2AD3ZBxqt4OCPF8hSZsSwki4904ZPjToaRyo1q3lRgj8uT82Lnxg5ftzbXXoyHTIgNa
-         evOMwIyUSvjRCgO4ewdcnB5ab6qgXffjNcz7KqKMTnzYOfaDrgUzKcL2uHYSFyg/h3uv
-         V17A==
-X-Gm-Message-State: ANhLgQ2M+WbdkWhqC+92sx8CKZHeDq2NrZFqZ4Cf4sAeuVi0TAVCrz2/
-        ZcBFbobeNNOwS44kOLY0zozyll3nrsN5Ock3oqGgYhQkXNywa0XyXdzs/RBha/NBIWjCRTElEKg
-        TuZzbs9aGw3ZI
-X-Received: by 2002:adf:bc4a:: with SMTP id a10mr37906509wrh.7.1585075163723;
-        Tue, 24 Mar 2020 11:39:23 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vs86kYZ/+t0REuC2ggpfxrOYEhm3LfxtXq73FBGwpUfdi0cWoVqJ/8tqEMfzSw3nK3hElg0AQ==
-X-Received: by 2002:adf:bc4a:: with SMTP id a10mr37906470wrh.7.1585075163494;
-        Tue, 24 Mar 2020 11:39:23 -0700 (PDT)
-Received: from xz-x1 ([2607:9880:19c0:32::2])
-        by smtp.gmail.com with ESMTPSA id v2sm31518906wrt.58.2020.03.24.11.39.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Mar 2020 11:39:22 -0700 (PDT)
-Date:   Tue, 24 Mar 2020 14:39:18 -0400
-From:   Peter Xu <peterx@redhat.com>
-To:     Liu Yi L <yi.l.liu@intel.com>
-Cc:     qemu-devel@nongnu.org, alex.williamson@redhat.com,
-        eric.auger@redhat.com, pbonzini@redhat.com, mst@redhat.com,
-        david@gibson.dropbear.id.au, kevin.tian@intel.com,
-        jun.j.tian@intel.com, yi.y.sun@intel.com, kvm@vger.kernel.org,
-        hao.wu@intel.com, jean-philippe@linaro.org,
-        Jacob Pan <jacob.jun.pan@linux.intel.com>,
-        Yi Sun <yi.y.sun@linux.intel.com>,
-        Richard Henderson <rth@twiddle.net>,
-        Eduardo Habkost <ehabkost@redhat.com>
-Subject: Re: [PATCH v1 22/22] intel_iommu: modify x-scalable-mode to be
- string option
-Message-ID: <20200324183918.GG127076@xz-x1>
-References: <1584880579-12178-1-git-send-email-yi.l.liu@intel.com>
- <1584880579-12178-23-git-send-email-yi.l.liu@intel.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=pPtwMbJxrA1Es8ak0yumoRvEWX0T2QU5/hT413522OM=;
+        b=sdn52jZ1xMHMXDjVXtVvKLY22zVZ0lM86tND4YYHxZHVUeztph94UvcMwjolNKt3Hn
+         s2HbE9QVz1hW48SK23V6FUkyi/QuzffB8udxKUf9o5MEwtaAl9FGkwAD0neWTwhoM0V/
+         wFM387Inyz821vZj23HNdBLcEghdtxzMxxL9BuCO8V+tB8zKdJZMM15d9ez/VH9dyaP7
+         QT+8CMu1pEz3KtFF9RMSwFJOzqsKsjPhlSNd12vwxV3SWI3GjleB97NZn0OQ/7PHYsN0
+         KZa4jK77nen/R/SDHyH3DOmIoeS9M9k0YAoIJeHc4DjPCK7x6Sz5G5+7dbhF7YrPSMvc
+         l7oQ==
+X-Gm-Message-State: ANhLgQ3yvrlX7ElWWsKXKsASLWqg31PmfPyWGREbYGUzyRMz8P5dvwhc
+        rm9Ye6YKagwntIQT9mLPOyGJkL4FP3Auvri8WDWOBw==
+X-Google-Smtp-Source: ADFU+vs4sQRYA41bjiNHunaQN2sONVEfP7brWVrPfFBwzK5q8MTUlZRXbUkGnnDCfaae5S4dUZwF76luoNfQxU9kSTE=
+X-Received: by 2002:a1c:bcd4:: with SMTP id m203mr7106648wmf.35.1585075353851;
+ Tue, 24 Mar 2020 11:42:33 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1584880579-12178-23-git-send-email-yi.l.liu@intel.com>
+References: <20200324094154.32352-1-joro@8bytes.org> <20200324183007.GA7798@linux.intel.com>
+In-Reply-To: <20200324183007.GA7798@linux.intel.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Tue, 24 Mar 2020 11:42:21 -0700
+Message-ID: <CALMp9eRYNH+=Ra=1KSJdT5Ej5kTfdV8J7Rf6JcS9NGbPOYPj8A@mail.gmail.com>
+Subject: Re: [PATCH 0/4] KVM: SVM: Move and split up svm.c
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Joerg Roedel <joro@8bytes.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Ashish Kalra <Ashish.Kalra@amd.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Mar 22, 2020 at 05:36:19AM -0700, Liu Yi L wrote:
-> Intel VT-d 3.0 introduces scalable mode, and it has a bunch of capabilities
-> related to scalable mode translation, thus there are multiple combinations.
-> While this vIOMMU implementation wants simplify it for user by providing
-> typical combinations. User could config it by "x-scalable-mode" option. The
-> usage is as below:
-> 
-> "-device intel-iommu,x-scalable-mode=["legacy"|"modern"|"off"]"
-> 
->  - "legacy": gives support for SL page table
->  - "modern": gives support for FL page table, pasid, virtual command
->  - "off": no scalable mode support
->  -  if not configured, means no scalable mode support, if not proper
->     configured, will throw error
-> 
-> Note: this patch is supposed to be merged when  the whole vSVA patch series
-> were merged.
-> 
-> Cc: Kevin Tian <kevin.tian@intel.com>
-> Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
-> Cc: Peter Xu <peterx@redhat.com>
-> Cc: Yi Sun <yi.y.sun@linux.intel.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Richard Henderson <rth@twiddle.net>
-> Cc: Eduardo Habkost <ehabkost@redhat.com>
-> Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
-> Signed-off-by: Yi Sun <yi.y.sun@linux.intel.com>
-> ---
->  hw/i386/intel_iommu.c          | 29 +++++++++++++++++++++++++++--
->  hw/i386/intel_iommu_internal.h |  4 ++++
->  include/hw/i386/intel_iommu.h  |  2 ++
->  3 files changed, 33 insertions(+), 2 deletions(-)
-> 
-> diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-> index 72cd739..ea1f5c4 100644
-> --- a/hw/i386/intel_iommu.c
-> +++ b/hw/i386/intel_iommu.c
-> @@ -4171,7 +4171,7 @@ static Property vtd_properties[] = {
->      DEFINE_PROP_UINT8("aw-bits", IntelIOMMUState, aw_bits,
->                        VTD_HOST_ADDRESS_WIDTH),
->      DEFINE_PROP_BOOL("caching-mode", IntelIOMMUState, caching_mode, FALSE),
-> -    DEFINE_PROP_BOOL("x-scalable-mode", IntelIOMMUState, scalable_mode, FALSE),
-> +    DEFINE_PROP_STRING("x-scalable-mode", IntelIOMMUState, scalable_mode_str),
->      DEFINE_PROP_BOOL("dma-drain", IntelIOMMUState, dma_drain, true),
->      DEFINE_PROP_END_OF_LIST(),
->  };
-> @@ -4802,8 +4802,12 @@ static void vtd_init(IntelIOMMUState *s)
->      }
->  
->      /* TODO: read cap/ecap from host to decide which cap to be exposed. */
-> -    if (s->scalable_mode) {
-> +    if (s->scalable_mode && !s->scalable_modern) {
->          s->ecap |= VTD_ECAP_SMTS | VTD_ECAP_SRS | VTD_ECAP_SLTS;
-> +    } else if (s->scalable_mode && s->scalable_modern) {
-> +        s->ecap |= VTD_ECAP_SMTS | VTD_ECAP_SRS | VTD_ECAP_PASID
-> +                   | VTD_ECAP_FLTS | VTD_ECAP_PSS | VTD_ECAP_VCS;
-> +        s->vccap |= VTD_VCCAP_PAS;
->      }
->  
->      vtd_reset_caches(s);
-> @@ -4935,6 +4939,27 @@ static bool vtd_decide_config(IntelIOMMUState *s, Error **errp)
->          return false;
->      }
->  
-> +    if (s->scalable_mode_str &&
-> +        (strcmp(s->scalable_mode_str, "modern") &&
-> +         strcmp(s->scalable_mode_str, "legacy"))) {
+On Tue, Mar 24, 2020 at 11:30 AM Sean Christopherson
+<sean.j.christopherson@intel.com> wrote:
+>
+> On Tue, Mar 24, 2020 at 10:41:50AM +0100, Joerg Roedel wrote:
+> > Hi,
+> >
+> > here is a patch-set agains kvm/queue which moves svm.c into its own
+> > subdirectory arch/x86/kvm/svm/ and splits moves parts of it into
+> > separate source files:
+>
+> What are people's thoughts on using "arch/x86/kvm/{amd,intel}" instead of
+> "arch/x86/kvm/{svm,vmx}"?  Maybe this won't be an issue for AMD/SVM, but on
+> the Intel/VMX side, there is stuff in the pipeline that makes using "vmx"
+> for the sub-directory quite awkward.  I wasn't planning on proposing the
+> rename (from vmx->intel) until I could justify _why_, but perhaps it makes
+> sense to bundle all the pain of a reorganizing code into a single kernel
+> version?
 
-The 'off' check is missing?
-
-> +        error_setg(errp, "Invalid x-scalable-mode config,"
-> +                         "Please use \"modern\", \"legacy\" or \"off\"");
-> +        return false;
-> +    }
-> +
-> +    if (s->scalable_mode_str &&
-> +        !strcmp(s->scalable_mode_str, "legacy")) {
-> +        s->scalable_mode = true;
-> +        s->scalable_modern = false;
-> +    } else if (s->scalable_mode_str &&
-> +        !strcmp(s->scalable_mode_str, "modern")) {
-> +        s->scalable_mode = true;
-> +        s->scalable_modern = true;
-> +    } else {
-> +        s->scalable_mode = false;
-> +        s->scalable_modern = false;
-> +    }
-> +
->      return true;
->  }
->  
-> diff --git a/hw/i386/intel_iommu_internal.h b/hw/i386/intel_iommu_internal.h
-> index b5507ce..52b25ff 100644
-> --- a/hw/i386/intel_iommu_internal.h
-> +++ b/hw/i386/intel_iommu_internal.h
-> @@ -196,8 +196,12 @@
->  #define VTD_ECAP_PT                 (1ULL << 6)
->  #define VTD_ECAP_MHMV               (15ULL << 20)
->  #define VTD_ECAP_SRS                (1ULL << 31)
-> +#define VTD_ECAP_PSS                (19ULL << 35)
-> +#define VTD_ECAP_PASID              (1ULL << 40)
->  #define VTD_ECAP_SMTS               (1ULL << 43)
-> +#define VTD_ECAP_VCS                (1ULL << 44)
->  #define VTD_ECAP_SLTS               (1ULL << 46)
-> +#define VTD_ECAP_FLTS               (1ULL << 47)
->  
->  /* CAP_REG */
->  /* (offset >> 4) << 24 */
-> diff --git a/include/hw/i386/intel_iommu.h b/include/hw/i386/intel_iommu.h
-> index 9782ac4..07494d4 100644
-> --- a/include/hw/i386/intel_iommu.h
-> +++ b/include/hw/i386/intel_iommu.h
-> @@ -268,6 +268,8 @@ struct IntelIOMMUState {
->  
->      bool caching_mode;              /* RO - is cap CM enabled? */
->      bool scalable_mode;             /* RO - is Scalable Mode supported? */
-> +    char *scalable_mode_str;        /* RO - admin's Scalable Mode config */
-> +    bool scalable_modern;           /* RO - is modern SM supported? */
->  
->      dma_addr_t root;                /* Current root table pointer */
->      bool root_scalable;             /* Type of root table (scalable or not) */
-> -- 
-> 2.7.4
-> 
-
--- 
-Peter Xu
-
+Doesn't VIA have some CPUs that implement VMX?
