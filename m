@@ -2,101 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id AC55C190250
-	for <lists+kvm@lfdr.de>; Tue, 24 Mar 2020 00:56:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E6E4519028F
+	for <lists+kvm@lfdr.de>; Tue, 24 Mar 2020 01:13:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727239AbgCWX4j (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Mar 2020 19:56:39 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:42815 "EHLO
-        us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727054AbgCWX4j (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 23 Mar 2020 19:56:39 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1585007798;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=qLT9PP21JpSVg8g9Ca0QcaUFbJS8dx+sxPNM6+3EIvA=;
-        b=EwWFwfg2uxzXYF0Rv46gQmUstqeoXVU0aKIS7Al+ui1+MffDiNSuvqVTPnR1pKgIVjG0sT
-        R1bB8yJJdHpnR7bRFGHamG8j4yTG4jD3JfPDwRB5Lo1YL3WIlAlEbWE6bkKI9jvR7lo4SN
-        w1CPlrOhO4LEJAhi08KASx4mhBddWok=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-210-uCI97mkkPJqdSRKhNMzrHw-1; Mon, 23 Mar 2020 19:56:36 -0400
-X-MC-Unique: uCI97mkkPJqdSRKhNMzrHw-1
-Received: by mail-wr1-f71.google.com with SMTP id l17so7907337wro.3
-        for <kvm@vger.kernel.org>; Mon, 23 Mar 2020 16:56:36 -0700 (PDT)
+        id S1727425AbgCXAMQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Mar 2020 20:12:16 -0400
+Received: from mail-io1-f65.google.com ([209.85.166.65]:39484 "EHLO
+        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727414AbgCXAMQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 Mar 2020 20:12:16 -0400
+Received: by mail-io1-f65.google.com with SMTP id c19so16342964ioo.6
+        for <kvm@vger.kernel.org>; Mon, 23 Mar 2020 17:12:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=Frtkek3ERXBMHbMs52Wt6U/vIOFGM5o4rI98r+84Zvs=;
+        b=lXJcxWQki4RLClZml8Uw1p+iCf3elgEZQ2BtbaWtCNm1C9BhktBTPbc1u0UC+Jc/Hn
+         9i3RcocLtEXdzm5Jj6dRfLKDnJ88IWUkFHFcfsaevwXH+e2m4A0u0dLIUrRPekJEPlUR
+         a8jwh6/Et+DysEHpmcULQ7m/0JfZSHRpxiVbOmMMn9Z54MJEZYzx9409Cke7Kvm5W+YV
+         jpgdlPhbqqoX+69GZisysMSNsXD1aMg68XiM7VC34eBRh4KRZGi0P0HLNtPjn1XXK3ed
+         nS06qZ3is+xYDLAM0kT0P5DY6GF0B8Aob0NHAYPJhNYMciUK6sjrXNVNuuIYM36HGUSw
+         pMYg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=qLT9PP21JpSVg8g9Ca0QcaUFbJS8dx+sxPNM6+3EIvA=;
-        b=jM0cb0vr5ek2np0VxVSBxmCNizAPCZ3hxbG+KqifwFGokBX4CfsV+Mcf2iIiYWkjpf
-         hAOpVzugqNx5yGnZGdHMRjKiSktmnwUD5BlKWu0amGCoblgcQz0WdojpUKwX8A/31kNi
-         MO7AjU934ztKhSP6HXyDYh61DX/D9U0sYW0C95EhdTfK5oYFfQ9f+yB0IqsIS8I88POd
-         eM3/2yi8KIUVrMlXtTpaiRBlUbI3lfDxC4MJDk9Z1kqO4+VbZ8gk97iNSuAp73Yqwzoa
-         e7IGNse6B0SVNK/pXwuuY63ia2gdJuXaymwzEK3cyD6ELJD74XC7YSteaNc499RS1w7+
-         Y2HA==
-X-Gm-Message-State: ANhLgQ1Ntfqz6P4oIeybpLg4e2SLEFX6bZrziW6cYRzWipEqdrqBPMS9
-        psAowfOQgexAEU9SUJr0S4E8IBARQ2AE/aRUpbB8VS3JY2KsKOYaRQJG/GP3/hDlIBvwVf0JrIa
-        aM17u0//xRu+p
-X-Received: by 2002:adf:a54a:: with SMTP id j10mr33957039wrb.188.1585007795333;
-        Mon, 23 Mar 2020 16:56:35 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vtA2yqwy0OwlfJUMK17zDbiP8PQ7IbBWxWzAUrDpK93gZxWeKy0DQaWOZHLglMy/9Tmdrqomw==
-X-Received: by 2002:adf:a54a:: with SMTP id j10mr33957012wrb.188.1585007795099;
-        Mon, 23 Mar 2020 16:56:35 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:7848:99b4:482a:e888? ([2001:b07:6468:f312:7848:99b4:482a:e888])
-        by smtp.gmail.com with ESMTPSA id t16sm23019727wra.17.2020.03.23.16.56.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 23 Mar 2020 16:56:34 -0700 (PDT)
-Subject: Re: [PATCH v3 05/37] KVM: x86: Export kvm_propagate_fault() (as
- kvm_inject_emulated_page_fault)
-To:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Ben Gardon <bgardon@google.com>,
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=Frtkek3ERXBMHbMs52Wt6U/vIOFGM5o4rI98r+84Zvs=;
+        b=cEf7h/Mm9IjWeFuSI/hrz6AXhrIuoulodKEMopkYGORad44pMsYoYYM3ho3DTpsAV+
+         4ze8xxmdIz9Kmsn3yaGvitkZstaxTbO7kdSk+Z7Q5zIF0XBiibUZs1VwP5wuKVOk2s6N
+         Bj1xIiq4zpaUdJUB9iq3USuQB6pBUDm/cYVpNkVdZIxJ3iCETKQznPw2nnMdv3l1i3JP
+         1p6IkKeBENOiFnhRjXzpjNLMW7qDUpsvJKy2Pj0iv+vpyH/4u6F9kHqvXz2T/TuqUaZa
+         /TOxR1Eyoqkh3NpuzAWS4FsO6VzRoXVLKJMD6sK7LfFvRyyWKJB08oA1zNWA3v8lzMcz
+         Y0zQ==
+X-Gm-Message-State: ANhLgQ35giXSagHygkELI7gnNKnN44hiqiGeHt+s0U5Ag/5Yj7wM/OLa
+        lHZTsqP3dwO8FaSlgfeBi7LX5x0qbbjLIaRmIA+Jcw==
+X-Google-Smtp-Source: ADFU+vs4T4owZbp9NLgLiyMN+JqDFKJAzoNdh7TqSfJJEEkuFCgXdRh0KDDS5vdk0H/LlQPyZnmJEXu4ihoSzeyHN6k=
+X-Received: by 2002:a02:5a87:: with SMTP id v129mr21018278jaa.48.1585008735321;
+ Mon, 23 Mar 2020 17:12:15 -0700 (PDT)
+MIME-Version: 1.0
+References: <20200320212833.3507-1-sean.j.christopherson@intel.com>
+ <20200320212833.3507-4-sean.j.christopherson@intel.com> <CALMp9eR5Uu7nRDOS2nQHGzb+Gi6vjDEk1AmuiqkkGWFjKNG+sA@mail.gmail.com>
+ <20200323162807.GN28711@linux.intel.com> <CALMp9eR42eM7g81EgHieyNky+kP2mycO7UyMN+y2ibLoqrD2Yg@mail.gmail.com>
+ <20200323164447.GQ28711@linux.intel.com> <8d99cdf0-606a-f4df-35e7-3b856bb3ea0e@redhat.com>
+In-Reply-To: <8d99cdf0-606a-f4df-35e7-3b856bb3ea0e@redhat.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Mon, 23 Mar 2020 17:12:04 -0700
+Message-ID: <CALMp9eQ-rzdZHdM0DFzVyaynEhf0+e9rYGqi57fhN54VTFcNnA@mail.gmail.com>
+Subject: Re: [PATCH v3 03/37] KVM: nVMX: Invalidate all EPTP contexts when
+ emulating INVEPT for L1
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Ben Gardon <bgardon@google.com>,
         Junaid Shahid <junaids@google.com>,
         Liran Alon <liran.alon@oracle.com>,
         Boris Ostrovsky <boris.ostrovsky@oracle.com>,
         John Haxby <john.haxby@oracle.com>,
         Miaohe Lin <linmiaohe@huawei.com>,
         Tom Lendacky <thomas.lendacky@amd.com>
-References: <20200320212833.3507-1-sean.j.christopherson@intel.com>
- <20200320212833.3507-6-sean.j.christopherson@intel.com>
- <87sghz844a.fsf@vitty.brq.redhat.com>
- <20200323162433.GM28711@linux.intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <7012fd88-5590-e50d-cee2-d14fb54ce742@redhat.com>
-Date:   Tue, 24 Mar 2020 00:56:32 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
-MIME-Version: 1.0
-In-Reply-To: <20200323162433.GM28711@linux.intel.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 23/03/20 17:24, Sean Christopherson wrote:
->> We don't seem to use the return value a lot, actually,
->> inject_emulated_exception() seems to be the only one, the rest just call
->> it without checking the return value. Judging by the new name, I'd guess
->> that the function returns whether it was able to inject the exception or
->> not but this doesn't seem to be the case. My suggestion would then be to
->> make it return 'void' and return 'fault->nested_page_fault' separately
->> in inject_emulated_exception().
-> Oooh, I like that idea.  The return from the common helper also confuses me
-> every time I look at it.
-> 
+On Mon, Mar 23, 2020 at 4:51 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 23/03/20 17:44, Sean Christopherson wrote:
+> > So I think
+> >
+> >   Fixes: 14c07ad89f4d ("x86/kvm/mmu: introduce guest_mmu")
+> >
+> > would be appropriate?
+> >
+>
+> Yes.
 
-Separate patch, please.  I'm not sure it makes a great difference though.
-
-Paolo
-
+I think it was actually commit efebf0aaec3d ("KVM: nVMX: Do not flush
+TLB on L1<->L2 transitions if L1 uses VPID and EPT").
