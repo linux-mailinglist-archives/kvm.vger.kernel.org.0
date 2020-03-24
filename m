@@ -2,86 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D13E4191863
-	for <lists+kvm@lfdr.de>; Tue, 24 Mar 2020 19:03:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DA941191896
+	for <lists+kvm@lfdr.de>; Tue, 24 Mar 2020 19:08:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727797AbgCXSCQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Mar 2020 14:02:16 -0400
-Received: from mga06.intel.com ([134.134.136.31]:44915 "EHLO mga06.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727466AbgCXSCQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 Mar 2020 14:02:16 -0400
-IronPort-SDR: vNku9zUzny8Uuw9u1Zs0fnRB+6BT0NOL1mG8dN/MnV9/pNwkhiQ66QgYUn+nka7Nnbt61e379y
- rmmc8mr0JgQg==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Mar 2020 11:02:08 -0700
-IronPort-SDR: OYNmRJu447qOcND1nZkGVdZNobHuJ6KpDHrR/c/VCRNJ9Xf1O6/kIyfSfkNhndXoOg3chI0nLn
- jX3d1rqFGfMw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.72,301,1580803200"; 
-   d="scan'208";a="325988332"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
-  by orsmga001.jf.intel.com with ESMTP; 24 Mar 2020 11:02:07 -0700
-Date:   Tue, 24 Mar 2020 11:02:07 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Thomas Gleixner <tglx@linutronix.de>
-Cc:     Xiaoyao Li <xiaoyao.li@intel.com>, Ingo Molnar <mingo@redhat.com>,
-        Borislav Petkov <bp@alien8.de>, hpa@zytor.com,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        x86@kernel.org, linux-kernel@vger.kernel.org,
-        Andy Lutomirski <luto@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Arvind Sankar <nivedita@alum.mit.edu>,
-        Fenghua Yu <fenghua.yu@intel.com>,
-        Tony Luck <tony.luck@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>
-Subject: Re: [PATCH v5 3/9] x86/split_lock: Re-define the kernel param option
- for split_lock_detect
-Message-ID: <20200324180207.GD5998@linux.intel.com>
-References: <20200315050517.127446-1-xiaoyao.li@intel.com>
- <20200315050517.127446-4-xiaoyao.li@intel.com>
- <87r1xjov3a.fsf@nanos.tec.linutronix.de>
- <e708f6d2-8f96-903c-0bce-2eeecc4a237d@intel.com>
- <87r1xidoj1.fsf@nanos.tec.linutronix.de>
+        id S1728005AbgCXSIH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Mar 2020 14:08:07 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:43077 "EHLO
+        us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727366AbgCXSIG (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 24 Mar 2020 14:08:06 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1585073285;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=o9VfLtJGvU0fUYHvZhFRdklkTco3oGHxaMAk7MxTBnM=;
+        b=PMXp+sOUpsKQ/QTUEWP+lOaBSeO/kfcXbO6pduv+8YQQ1X5cGq3wjzpSADpWmrFw0vjf6f
+        dfi3JvUevoNlSWDZf+VXil1tIzH3B4kLf3UAaI6LDb2T8XttOirs4h9jUpu2cEHSctO4ha
+        59CsCK1FYacD+JVlIH3HaOrfqarzR70=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-224-xU1-6Sf0MbOu3WnNjIeE6w-1; Tue, 24 Mar 2020 14:08:03 -0400
+X-MC-Unique: xU1-6Sf0MbOu3WnNjIeE6w-1
+Received: by mail-wr1-f71.google.com with SMTP id p2so9585600wrw.8
+        for <kvm@vger.kernel.org>; Tue, 24 Mar 2020 11:08:03 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=o9VfLtJGvU0fUYHvZhFRdklkTco3oGHxaMAk7MxTBnM=;
+        b=ZQL10l+ZopNCBWHULohCbqLS68DJDc+ojZWBB9FG+rWYpc0ok3+8OtJxoP2t90k0gN
+         Gx5NRFrcRTLeEolOf9+VTPDxirlmigndVjIBo1CKhMF5adCltpwipd9LeIjfYSl5KYxI
+         DYyl8TESb0fR7FtgkQT/e0mDSqFz+1mBN6eMMvfOzA5k3+0JFhmni2cB62lbXoXh16pE
+         85Y3v2FMylrPkRrlo+fEUwGT8SzjdcTZOvaR7KmFzvq+9/ptoStlHpQD0IjeElrGc53Y
+         IgVYqVtLeJmY6HGyyQ6zq/EKoVdVjBzf5GxeU34oA/imkyPtDs/guduDEw9M/3XUhv9w
+         mcgA==
+X-Gm-Message-State: ANhLgQ2itI55nnw8XNLtEYnw9I7AnVwNtypVgJ25KmauwJEgOn4z7yDS
+        k8SprkCre8eG01kda9mAW7EyW5cBiaKA9+JqezCAbr9ZZwJR8aGQ3BbByNWz6pl9/6p8pEG64BN
+        QWChSNnkG9L3K
+X-Received: by 2002:adf:e98a:: with SMTP id h10mr27948322wrm.370.1585073282523;
+        Tue, 24 Mar 2020 11:08:02 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vvE8lDc4aoctvV5poB+k76p6FHaiGufJuqzX/crtbLgsKOF//dAt/qo48ojBqgwBugtg6Du9g==
+X-Received: by 2002:adf:e98a:: with SMTP id h10mr27948305wrm.370.1585073282349;
+        Tue, 24 Mar 2020 11:08:02 -0700 (PDT)
+Received: from xz-x1 ([2607:9880:19c0:32::2])
+        by smtp.gmail.com with ESMTPSA id c18sm28384987wrx.5.2020.03.24.11.07.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 24 Mar 2020 11:08:01 -0700 (PDT)
+Date:   Tue, 24 Mar 2020 14:07:55 -0400
+From:   Peter Xu <peterx@redhat.com>
+To:     Liu Yi L <yi.l.liu@intel.com>
+Cc:     qemu-devel@nongnu.org, alex.williamson@redhat.com,
+        eric.auger@redhat.com, pbonzini@redhat.com, mst@redhat.com,
+        david@gibson.dropbear.id.au, kevin.tian@intel.com,
+        jun.j.tian@intel.com, yi.y.sun@intel.com, kvm@vger.kernel.org,
+        hao.wu@intel.com, jean-philippe@linaro.org,
+        Jacob Pan <jacob.jun.pan@linux.intel.com>,
+        Yi Sun <yi.y.sun@linux.intel.com>,
+        Richard Henderson <rth@twiddle.net>,
+        Eduardo Habkost <ehabkost@redhat.com>
+Subject: Re: [PATCH v1 16/22] intel_iommu: replay pasid binds after context
+ cache invalidation
+Message-ID: <20200324180755.GA127076@xz-x1>
+References: <1584880579-12178-1-git-send-email-yi.l.liu@intel.com>
+ <1584880579-12178-17-git-send-email-yi.l.liu@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <87r1xidoj1.fsf@nanos.tec.linutronix.de>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <1584880579-12178-17-git-send-email-yi.l.liu@intel.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 24, 2020 at 11:40:18AM +0100, Thomas Gleixner wrote:
-> Xiaoyao Li <xiaoyao.li@intel.com> writes:
-> > On 3/24/2020 1:10 AM, Thomas Gleixner wrote:
-> >> Xiaoyao Li <xiaoyao.li@intel.com> writes:
-> >> 
-> >>> Change sld_off to sld_disable, which means disabling feature split lock
-> >>> detection and it cannot be used in kernel nor can kvm expose it guest.
-> >>> Of course, the X86_FEATURE_SPLIT_LOCK_DETECT is not set.
-> >>>
-> >>> Add a new optioin sld_kvm_only, which means kernel turns split lock
-> >>> detection off, but kvm can expose it to guest.
-> >> 
-> >> What's the point of this? If the host is not clean, then you better fix
-> >> the host first before trying to expose it to guests.
-> >
-> > It's not about whether or not host is clean. It's for the cases that 
-> > users just don't want it enabled on host, to not break the applications 
-> > or drivers that do have split lock issue.
+On Sun, Mar 22, 2020 at 05:36:13AM -0700, Liu Yi L wrote:
+> This patch replays guest pasid bindings after context cache
+> invalidation. This is a behavior to ensure safety. Actually,
+> programmer should issue pasid cache invalidation with proper
+> granularity after issuing a context cache invalidation.
 > 
-> It's very much about whether the host is split lock clean.
+> Cc: Kevin Tian <kevin.tian@intel.com>
+> Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
+> Cc: Peter Xu <peterx@redhat.com>
+> Cc: Yi Sun <yi.y.sun@linux.intel.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Richard Henderson <rth@twiddle.net>
+> Cc: Eduardo Habkost <ehabkost@redhat.com>
+> Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
+> ---
+>  hw/i386/intel_iommu.c          | 68 ++++++++++++++++++++++++++++++++++++++++++
+>  hw/i386/intel_iommu_internal.h |  6 +++-
+>  hw/i386/trace-events           |  1 +
+>  3 files changed, 74 insertions(+), 1 deletion(-)
 > 
-> If your host kernel is not, then this wants to be fixed first. If your
-> host application is broken, then either fix it or use "warn".
+> diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+> index 8ec638f..1e0ccde 100644
+> --- a/hw/i386/intel_iommu.c
+> +++ b/hw/i386/intel_iommu.c
+> @@ -68,6 +68,10 @@ static void vtd_address_space_refresh_all(IntelIOMMUState *s);
+>  static void vtd_address_space_unmap(VTDAddressSpace *as, IOMMUNotifier *n);
+>  
+>  static void vtd_pasid_cache_reset(IntelIOMMUState *s);
+> +static void vtd_replay_guest_pasid_bindings(IntelIOMMUState *s,
+> +                                           uint16_t *did, bool is_dsi);
+> +static void vtd_pasid_cache_devsi(IntelIOMMUState *s,
+> +                                  VTDBus *vtd_bus, uint16_t devfn);
+>  
+>  static void vtd_panic_require_caching_mode(void)
+>  {
+> @@ -1865,6 +1869,8 @@ static void vtd_context_global_invalidate(IntelIOMMUState *s)
+>       * VT-d emulation codes.
+>       */
+>      vtd_iommu_replay_all(s);
+> +
+> +    vtd_replay_guest_pasid_bindings(s, NULL, false);
 
-The "kvm only" option was my suggestion.  The thought was to provide a way
-for users to leverage KVM to debug/test kernels without having to have a
-known good kernel and/or to minimize the risk of crashing their physical
-system.  E.g. debug a misbehaving driver by assigning its associated device
-to a guest.
+I think the only uncertain thing is whether you still want to rework
+the vtd_replay_guest_pasid_bindings() interface.  It'll depend on the
+future discussion of previous patches.  Besides that this patch looks
+good to me.
+
+-- 
+Peter Xu
+
