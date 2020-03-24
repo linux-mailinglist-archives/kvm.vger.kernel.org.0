@@ -2,136 +2,190 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C51F2191A46
-	for <lists+kvm@lfdr.de>; Tue, 24 Mar 2020 20:47:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A042A191A4E
+	for <lists+kvm@lfdr.de>; Tue, 24 Mar 2020 20:49:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726954AbgCXTr0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Mar 2020 15:47:26 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:41980 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725835AbgCXTr0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 Mar 2020 15:47:26 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02OJiGco030029;
-        Tue, 24 Mar 2020 19:47:12 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2020-01-29;
- bh=aH2gS92pizO8Ui8+GY3Utx9mk0wsuhwC71eXWonUlwo=;
- b=pC0tAQKy3mtbwgPKbDSmmFZYlsI+uBsK4T+u8zgUBplY9RZEfsJFKBCXYddayy9Qrjwh
- K9it2225dQPjjmnbjnxmVnwR9BIuPuHNYIki0TW2tdUhhoBUKqq77Gl31UQP2j+DZImJ
- SxUyEF/GshfoRMuRyoTGd0t3NvvmRT6hICW4mM+UkPHDOJGvsZTXxvxJgXWTsZl/nWhU
- hVcb8qj+2vVPkZKWkIqC+2DY/pmLGudj1qXcjT1pwK5fOI6qQg4KQPZxkld7HjYxp4n8
- nmKsUTIiuCWvP05WBV0E8EdACdR9fy7688Jflu+2DrzPiL6EBqjukdLSD9aPzLRwBG/+ gQ== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
-        by userp2120.oracle.com with ESMTP id 2yx8ac3avv-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 24 Mar 2020 19:47:12 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
-        by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02OJgLR3050472;
-        Tue, 24 Mar 2020 19:47:12 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
-        by userp3030.oracle.com with ESMTP id 2yxw4px6ya-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 24 Mar 2020 19:47:12 +0000
-Received: from abhmp0001.oracle.com (abhmp0001.oracle.com [141.146.116.7])
-        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 02OJl8qZ008773;
-        Tue, 24 Mar 2020 19:47:08 GMT
-Received: from [192.168.1.206] (/71.63.128.209)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Tue, 24 Mar 2020 12:47:08 -0700
-Subject: Re: [PATCH v2] mm/hugetlb: fix a addressing exception caused by
- huge_pte_offset()
-To:     Jason Gunthorpe <jgg@ziepe.ca>
-Cc:     "Longpeng (Mike, Cloud Infrastructure Service Product Dept.)" 
-        <longpeng2@huawei.com>, akpm@linux-foundation.org,
-        kirill.shutemov@linux.intel.com, linux-kernel@vger.kernel.org,
-        arei.gonglei@huawei.com, weidong.huang@huawei.com,
-        weifuqiang@huawei.com, kvm@vger.kernel.org, linux-mm@kvack.org,
-        Matthew Wilcox <willy@infradead.org>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        stable@vger.kernel.org
-References: <20200323160955.GY20941@ziepe.ca>
- <69055395-e7e5-a8e2-7f3e-f61607149318@oracle.com>
- <20200323180706.GC20941@ziepe.ca>
- <88698dd7-eb87-4b0b-7ba7-44ef6eab6a6c@oracle.com>
- <20200323225225.GF20941@ziepe.ca>
- <e8e71ba4-d609-269a-6160-153e373e7563@huawei.com>
- <20200324115541.GH20941@ziepe.ca>
- <98d35563-8af0-2693-7e76-e6435da0bbee@oracle.com>
- <20200324155552.GK20941@ziepe.ca>
- <66583587-ca4f-9847-c173-4a3d7938fec6@oracle.com>
- <20200324175918.GL20941@ziepe.ca>
-From:   Mike Kravetz <mike.kravetz@oracle.com>
-Message-ID: <c47402fe-b873-2e52-52be-7f9cc9eef0a1@oracle.com>
-Date:   Tue, 24 Mar 2020 12:47:05 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+        id S1726067AbgCXTth (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Mar 2020 15:49:37 -0400
+Received: from hqnvemgate24.nvidia.com ([216.228.121.143]:16246 "EHLO
+        hqnvemgate24.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725877AbgCXTth (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 Mar 2020 15:49:37 -0400
+Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate24.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+        id <B5e7a63f60000>; Tue, 24 Mar 2020 12:48:06 -0700
+Received: from hqmail.nvidia.com ([172.20.161.6])
+  by hqpgpgate101.nvidia.com (PGP Universal service);
+  Tue, 24 Mar 2020 12:49:36 -0700
+X-PGP-Universal: processed;
+        by hqpgpgate101.nvidia.com on Tue, 24 Mar 2020 12:49:36 -0700
+Received: from [10.40.103.72] (10.124.1.5) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Tue, 24 Mar
+ 2020 19:49:27 +0000
+Subject: Re: [PATCH v15 Kernel 3/7] vfio iommu: Add ioctl definition for dirty
+ pages tracking.
+To:     Auger Eric <eric.auger@redhat.com>, <alex.williamson@redhat.com>,
+        <cjia@nvidia.com>
+CC:     <kevin.tian@intel.com>, <ziye.yang@intel.com>,
+        <changpeng.liu@intel.com>, <yi.l.liu@intel.com>,
+        <mlevitsk@redhat.com>, <eskultet@redhat.com>, <cohuck@redhat.com>,
+        <dgilbert@redhat.com>, <jonathan.davies@nutanix.com>,
+        <eauger@redhat.com>, <aik@ozlabs.ru>, <pasic@linux.ibm.com>,
+        <felipe@nutanix.com>, <Zhengxiao.zx@Alibaba-inc.com>,
+        <shuangtai.tst@alibaba-inc.com>, <Ken.Xue@amd.com>,
+        <zhi.a.wang@intel.com>, <yan.y.zhao@intel.com>,
+        <qemu-devel@nongnu.org>, <kvm@vger.kernel.org>
+References: <1584649004-8285-1-git-send-email-kwankhede@nvidia.com>
+ <1584649004-8285-4-git-send-email-kwankhede@nvidia.com>
+ <6c58c249-9dc8-77bd-454e-9418216cdf92@redhat.com>
+X-Nvconfidentiality: public
+From:   Kirti Wankhede <kwankhede@nvidia.com>
+Message-ID: <f32e2007-17d6-57d1-59eb-6f3a8de83107@nvidia.com>
+Date:   Wed, 25 Mar 2020 01:19:22 +0530
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20200324175918.GL20941@ziepe.ca>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <6c58c249-9dc8-77bd-454e-9418216cdf92@redhat.com>
+X-Originating-IP: [10.124.1.5]
+X-ClientProxiedBy: HQMAIL101.nvidia.com (172.20.187.10) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+Content-Type: text/plain; charset="windows-1252"; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9570 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 suspectscore=0
- spamscore=0 mlxlogscore=952 adultscore=0 phishscore=0 mlxscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2003240097
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9570 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 suspectscore=0 priorityscore=1501 malwarescore=0
- mlxscore=0 adultscore=0 phishscore=0 impostorscore=0 mlxlogscore=999
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2003240097
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1585079286; bh=RdAy2FBF0O9VSVyz3xc8php8cO+9Bp16RiUmoATviYc=;
+        h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
+         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
+         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
+         Content-Transfer-Encoding;
+        b=Cg7i1KOYCqiXUN1SyINPqn7igYUL9H55sfOfYzdkwfmO1K7cASlxybC/E/kzGv5CG
+         ZvLDchyaK5YX6d/jRJ6sK40l0Dp6vYz51rULdFefcp5c6m5gi6IRLRjv3e5wl90tyd
+         lDoFlmnx3/Oh4oDEawSKOyjCh+d75d6/uXrNogVrli5wK5bpmgaCZuR52FE5C1shQS
+         RafT8bwDQzWXlCVfNi50KxWA070hQ67+y1x6IzRR3EQn9Hi2O0GNTQGA5N40yCnUoo
+         xMGy72p43IHmtC/u+XUk9ODGD1zIo8gSmW+87dtkn8GE3wKBnmeKJhUlkO2mVvcHRp
+         6BRP5Np56O2aw==
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 3/24/20 10:59 AM, Jason Gunthorpe wrote:
-> On Tue, Mar 24, 2020 at 09:19:29AM -0700, Mike Kravetz wrote:
->> On 3/24/20 8:55 AM, Jason Gunthorpe wrote:
->>> On Tue, Mar 24, 2020 at 08:25:09AM -0700, Mike Kravetz wrote:
->>>> On 3/24/20 4:55 AM, Jason Gunthorpe wrote:
->>>>> Also, since CH moved all the get_user_pages_fast code out of the
->>>>> arch's many/all archs can drop their arch specific version of this
->>>>> routine. This is really just a specialized version of gup_fast's
->>>>> algorithm..
->>>>>
->>>>> (also the arch versions seem different, why do some return actual
->>>>>  ptes, not null?)
->>>>
->>>> Not sure I understand that last question.  The return value should be
->>>> a *pte or null.
->>>
->>> I mean the common code ends like this:
->>>
->>> 	pmd = pmd_offset(pud, addr);
->>> 	if (sz != PMD_SIZE && pmd_none(*pmd))
->>> 		return NULL;
->>> 	/* hugepage or swap? */
->>> 	if (pmd_huge(*pmd) || !pmd_present(*pmd))
->>> 		return (pte_t *)pmd;
->>>
->>> 	return NULL;
->>>
->>> So it always returns a pointer into a PUD or PMD, while say, ppc
->>> in __find_linux_pte() ends like:
->>>
->>> 	return pte_offset_kernel(&pmd, ea);
->>>
->>> Which is pointing to a PTE
->>
->> Ok, now I understand the question.  huge_pte_offset will/should only be
->> called for addresses that are in a vma backed by hugetlb pages.  So,
->> pte_offset_kernel() will only return page table type (PUD/PMD/etc) associated
->> with a huge page supported by the particular arch.
-> 
-> I thought pte_offset_kernel always returns PTEs (ie the 4k entries on
-> x86), I suppose what you are saying is that since the caller knows
-> this is always a PUD or PMD due to the VMA the pte_offset is dead code.
 
-Yes, for x86 the address will correspond to a PUD or PMD or NULL.  For huge
-page mappings/vmas on x86, there are no corresponding PTEs.
--- 
-Mike Kravetz
+
+On 3/24/2020 2:41 AM, Auger Eric wrote:
+> Hi Kirti,
+> 
+> On 3/19/20 9:16 PM, Kirti Wankhede wrote:
+>> IOMMU container maintains a list of all pages pinned by vfio_pin_pages API.
+>> All pages pinned by vendor driver through this API should be considered as
+>> dirty during migration. When container consists of IOMMU capable device and
+>> all pages are pinned and mapped, then all pages are marked dirty.
+>> Added support to start/stop dirtied pages tracking and to get bitmap of all
+>> dirtied pages for requested IO virtual address range.
+>>
+>> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+>> Reviewed-by: Neo Jia <cjia@nvidia.com>
+>> ---
+>>   include/uapi/linux/vfio.h | 55 +++++++++++++++++++++++++++++++++++++++++++++++
+>>   1 file changed, 55 insertions(+)
+>>
+>> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+>> index d0021467af53..8138f94cac15 100644
+>> --- a/include/uapi/linux/vfio.h
+>> +++ b/include/uapi/linux/vfio.h
+>> @@ -995,6 +995,12 @@ struct vfio_iommu_type1_dma_map {
+>>   
+>>   #define VFIO_IOMMU_MAP_DMA _IO(VFIO_TYPE, VFIO_BASE + 13)
+>>   
+>> +struct vfio_bitmap {
+>> +	__u64        pgsize;	/* page size for bitmap */
+> in bytes as well
+
+Added.
+
+>> +	__u64        size;	/* in bytes */
+>> +	__u64 __user *data;	/* one bit per page */
+>> +};
+>> +
+>>   /**
+>>    * VFIO_IOMMU_UNMAP_DMA - _IOWR(VFIO_TYPE, VFIO_BASE + 14,
+>>    *							struct vfio_dma_unmap)
+>> @@ -1021,6 +1027,55 @@ struct vfio_iommu_type1_dma_unmap {
+>>   #define VFIO_IOMMU_ENABLE	_IO(VFIO_TYPE, VFIO_BASE + 15)
+>>   #define VFIO_IOMMU_DISABLE	_IO(VFIO_TYPE, VFIO_BASE + 16)
+>>   
+>> +/**
+>> + * VFIO_IOMMU_DIRTY_PAGES - _IOWR(VFIO_TYPE, VFIO_BASE + 17,
+>> + *                                     struct vfio_iommu_type1_dirty_bitmap)
+>> + * IOCTL is used for dirty pages tracking. Caller sets argsz, which is size of> + * struct vfio_iommu_type1_dirty_bitmap.
+> nit: This may become outdated when adding new fields. argz use mode is
+> documented at the beginning of the file.
+>
+
+Ok.
+
+>   Caller set flag depend on which
+>> + * operation to perform, details as below:
+>> + *
+>> + * When IOCTL is called with VFIO_IOMMU_DIRTY_PAGES_FLAG_START set, indicates
+>> + * migration is active and IOMMU module should track pages which are dirtied or
+>> + * potentially dirtied by device.
+>> + * Dirty pages are tracked until tracking is stopped by user application by
+>> + * setting VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP flag.
+>> + *
+>> + * When IOCTL is called with VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP set, indicates
+>> + * IOMMU should stop tracking dirtied pages.
+>> + *
+>> + * When IOCTL is called with VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP flag set,
+>> + * IOCTL returns dirty pages bitmap for IOMMU container during migration for
+>> + * given IOVA range. User must provide data[] as the structure
+>> + * vfio_iommu_type1_dirty_bitmap_get through which user provides IOVA range
+> I think the fact the IOVA range must match the vfio dma_size must be
+> documented.
+
+Added.
+
+>   and
+>> + * pgsize. This interface supports to get bitmap of smallest supported pgsize
+>> + * only and can be modified in future to get bitmap of specified pgsize.
+>> + * User must allocate memory for bitmap, zero the bitmap memory and set size
+>> + * of allocated memory in bitmap_size field. One bit is used to represent one
+>> + * page consecutively starting from iova offset. User should provide page size
+>> + * in 'pgsize'. Bit set in bitmap indicates page at that offset from iova is
+>> + * dirty. Caller must set argsz including size of structure
+>> + * vfio_iommu_type1_dirty_bitmap_get.
+> nit: ditto
+
+I think this is still needed here because vfio_bitmap is only used in 
+case of this particular flag.
+
+Thanks,
+Kirti
+
+>> + *
+>> + * Only one of the flags _START, STOP and _GET may be specified at a time.
+>> + *
+>> + */
+>> +struct vfio_iommu_type1_dirty_bitmap {
+>> +	__u32        argsz;
+>> +	__u32        flags;
+>> +#define VFIO_IOMMU_DIRTY_PAGES_FLAG_START	(1 << 0)
+>> +#define VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP	(1 << 1)
+>> +#define VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP	(1 << 2)
+>> +	__u8         data[];
+>> +};
+>> +
+>> +struct vfio_iommu_type1_dirty_bitmap_get {
+>> +	__u64              iova;	/* IO virtual address */
+>> +	__u64              size;	/* Size of iova range */
+>> +	struct vfio_bitmap bitmap;
+>> +};
+>> +
+>> +#define VFIO_IOMMU_DIRTY_PAGES             _IO(VFIO_TYPE, VFIO_BASE + 17)
+>> +
+>>   /* -------- Additional API for SPAPR TCE (Server POWERPC) IOMMU -------- */
+>>   
+>>   /*
+>>
+> Thanks
+> 
+> Eric
+> 
