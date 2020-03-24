@@ -2,103 +2,320 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E13AC190773
-	for <lists+kvm@lfdr.de>; Tue, 24 Mar 2020 09:26:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0EF2C190872
+	for <lists+kvm@lfdr.de>; Tue, 24 Mar 2020 10:05:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726185AbgCXI0V (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Mar 2020 04:26:21 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:52542 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726091AbgCXI0V (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 24 Mar 2020 04:26:21 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 02O82jJB120554
-        for <kvm@vger.kernel.org>; Tue, 24 Mar 2020 04:26:19 -0400
-Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2ywf0nq52j-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Tue, 24 Mar 2020 04:26:19 -0400
-Received: from localhost
-        by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <raspl@linux.ibm.com>;
-        Tue, 24 Mar 2020 08:26:16 -0000
-Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
-        by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Tue, 24 Mar 2020 08:26:14 -0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 02O8QEB742860946
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 24 Mar 2020 08:26:14 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 9A2B7A405F;
-        Tue, 24 Mar 2020 08:26:14 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6F388A4060;
-        Tue, 24 Mar 2020 08:26:14 +0000 (GMT)
-Received: from [9.145.65.250] (unknown [9.145.65.250])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 24 Mar 2020 08:26:14 +0000 (GMT)
-Subject: Re: [PATCH 0/7] tools/kvm_stat: add logfile support
-To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Cc:     rkrcmar@redhat.com
-References: <20200306114250.57585-1-raspl@linux.ibm.com>
- <7f396df1-9589-6dd0-0adf-af4376aa8314@redhat.com>
- <d893c37d-705c-b9a1-cf98-db997edf3bce@linux.ibm.com>
- <5c350f55-64be-43fc-237d-7f71b4e9afdc@redhat.com>
-From:   Stefan Raspl <raspl@linux.ibm.com>
-Date:   Tue, 24 Mar 2020 09:26:14 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+        id S1726231AbgCXJFu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Mar 2020 05:05:50 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:54203 "EHLO
+        us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726166AbgCXJFu (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 24 Mar 2020 05:05:50 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1585040748;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=LLJDKnz60hQ/rtR0UzkHHM3ofuTozwYEgaLts68tRKE=;
+        b=Qcg14M4BJeLITnGcXn6jcmrbluSYT3KrW/64067l5UQOAk5iXQgUIj4T78rTKOPAaz3Xtd
+        MoKib34K9OBECjYfeM/T80hv9k7pWEgmmvc5k7MhWDcVkqUcBo6xEii5MNuLkgQU+hCS6a
+        M/fc05BOPlG3vvZXklOBIUpKsIqRYeQ=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-117-Pq-QyWs1NcmokmGWNisohg-1; Tue, 24 Mar 2020 05:05:45 -0400
+X-MC-Unique: Pq-QyWs1NcmokmGWNisohg-1
+Received: by mail-wr1-f71.google.com with SMTP id v6so8827029wrg.22
+        for <kvm@vger.kernel.org>; Tue, 24 Mar 2020 02:05:45 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=LLJDKnz60hQ/rtR0UzkHHM3ofuTozwYEgaLts68tRKE=;
+        b=d8nCBeKsRoa70DXCN+S3iRW/uslLH18gS662wTYO24s/wDJYWnWjD/6CcP70WLVKdk
+         8oaEThFOxr3pPTngicpk+hVq0QlZhmBlq9WsN7wbQTtwq8s0qC2yznkBWK0irT4IrkqT
+         A32YuD3vI+tDvbZ7tyCA+08RxS0Z2TCovLzhRO3RbRAWuk14JTVppQEiVUMik0XriM4k
+         xw5E+2bGXTkaH1wtkyY4kywPquf3kcqQ5mO0prvwZV9PfAkLe33GalOZ2Vj8UZ+PbAPS
+         W9UC/pmzNzx76Iz6hAGlaAfsyIrX1Jx1OVvM44FGc0J+KH+9d+hZ9XySPHqKJo0tfBLL
+         726A==
+X-Gm-Message-State: ANhLgQ2hYBzYBnvtzdEuzeiofybNwgjF28V70mPSIqeCaScytQNqpRqz
+        OIUVdHmZC+7KjperY3afdwkkyAnab48jd5Ilmk/9pGOiMy3W5j96Vvlp44Y2NUMQ01tNtj/hE19
+        Rvy/SG/0QWH3X
+X-Received: by 2002:a1c:4645:: with SMTP id t66mr4493738wma.6.1585040744931;
+        Tue, 24 Mar 2020 02:05:44 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vtBlDagAsqeiIsI/mF7Dewgq14pztAh12G/i3D/M5Dw21WSc+D1tgf66xNIATRVwxHXNfkBZA==
+X-Received: by 2002:a1c:4645:: with SMTP id t66mr4493715wma.6.1585040744669;
+        Tue, 24 Mar 2020 02:05:44 -0700 (PDT)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id w7sm28772515wrr.60.2020.03.24.02.05.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 24 Mar 2020 02:05:43 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Jon Doron <arilou@gmail.com>
+Cc:     kvm@vger.kernel.org, linux-hyperv@vger.kernel.org
+Subject: Re: [PATCH v10 7/7] KVM: selftests: update hyperv_cpuid with SynDBG tests
+In-Reply-To: <20200324074341.1770081-8-arilou@gmail.com>
+References: <20200324074341.1770081-1-arilou@gmail.com> <20200324074341.1770081-8-arilou@gmail.com>
+Date:   Tue, 24 Mar 2020 10:05:42 +0100
+Message-ID: <87d09286mx.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <5c350f55-64be-43fc-237d-7f71b4e9afdc@redhat.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 20032408-0012-0000-0000-00000396B528
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20032408-0013-0000-0000-000021D3A866
-Message-Id: <7c8b614a-a7a1-d33e-8762-b06d4b2fd45b@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.645
- definitions=2020-03-24_01:2020-03-23,2020-03-24 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- phishscore=0 impostorscore=0 malwarescore=0 mlxlogscore=950 spamscore=0
- clxscore=1015 lowpriorityscore=0 adultscore=0 suspectscore=0 bulkscore=0
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2003240039
+Content-Type: multipart/mixed; boundary="=-=-="
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2020-03-23 11:12, Paolo Bonzini wrote:
-> On 23/03/20 10:58, Stefan Raspl wrote:
->> Thx!
->> As for SIGHUP: The problem that I see with logrotate and likewise approaches is
->> how the heading is being handled: If it is reprinted every x lines (like the
->> original logging format in kvmstat does), then it messes up any chance of
->> loading the output in external tools for further processing.
->> If the heading is printed once only, then it will get pushed out of the log
->> files at some time - which is fatal, since '-f <fields>' allows to specify
->> custom fields, so one cannot reconstruct what the fields were.
-> 
-> For CSV output, can't you print the heading immediately after SIGHUP
-> reopens the files?  (Maybe I am missing something and this is a stupid
-> suggestion, I don't know).
+--=-=-=
+Content-Type: text/plain
 
-(Same for me LOL)
-To be able to make use of the logfiles, we'd need to have the heading appear at
-the top of each of the files.
-Couldn't find much info on how logrotate works internally, but from what I
-gathered, it seems it moves out the current logfile e.g. /var/log/kvm.log to
-become /var/log/kvm.log.1, and sends a SIGHUP to kvm_stat so that it re-opens
-/var/log/kvm.log - which would then start out with a header again.
-That should work, but can you confirm that this is what you're suggesting?
-If so: Keep the current semantics for the original logging mode, where we have
-the heading printed every 20 lines? I would assume so, as that format is better
-suited for console logs, but just in case you wanted that changed...
+Jon Doron <arilou@gmail.com> writes:
 
-Ciao,
-Stefan
+> From: Vitaly Kuznetsov <vkuznets () redhat ! com>
+>
+> Test all four combinations with eVMCS and SynDBG capabilities,
+> check that we get the right number of entries and that
+> 0x40000000.EAX always returns the correct max leaf.
+>
+> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+
+Something weird happened to this patch. It fails to apply on kvm/queue
+but it's also a bit different from what I've sent yesterday. I fixed and
+tested it, please find the result attached.
+
+-- 
+Vitaly
+
+
+--=-=-=
+Content-Type: text/x-patch
+Content-Disposition: inline;
+ filename=0001-KVM-selftests-update-hyperv_cpuid-with-SynDBG-tests.patch
+
+From ae2c688389c20a99d7457861e57ce97054780908 Mon Sep 17 00:00:00 2001
+From: Vitaly Kuznetsov <vkuznets () redhat ! com>
+Date: Tue, 24 Mar 2020 09:43:41 +0200
+Subject: [PATCH v10 7/7 FIXED] KVM: selftests: update hyperv_cpuid with SynDBG
+ tests
+
+Test all four combinations with eVMCS and SynDBG capabilities,
+check that we get the right number of entries and that
+0x40000000.EAX always returns the correct max leaf.
+
+Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+---
+ .../selftests/kvm/x86_64/hyperv_cpuid.c       | 143 ++++++++++++------
+ 1 file changed, 95 insertions(+), 48 deletions(-)
+
+diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c b/tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c
+index 83323f3d7ca0..5268abf9ad80 100644
+--- a/tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c
++++ b/tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c
+@@ -26,18 +26,18 @@ static void guest_code(void)
+ {
+ }
+ 
+-static int smt_possible(void)
++static bool smt_possible(void)
+ {
+ 	char buf[16];
+ 	FILE *f;
+-	bool res = 1;
++	bool res = true;
+ 
+ 	f = fopen("/sys/devices/system/cpu/smt/control", "r");
+ 	if (f) {
+ 		if (fread(buf, sizeof(*buf), sizeof(buf), f) > 0) {
+ 			if (!strncmp(buf, "forceoff", 8) ||
+ 			    !strncmp(buf, "notsupported", 12))
+-				res = 0;
++				res = false;
+ 		}
+ 		fclose(f);
+ 	}
+@@ -45,30 +45,48 @@ static int smt_possible(void)
+ 	return res;
+ }
+ 
++void vcpu_enable_syndbg(struct kvm_vm *vm, int vcpu_id)
++{
++	struct kvm_enable_cap enable_syndbg_cap = {
++		.cap = KVM_CAP_HYPERV_SYNDBG,
++	};
++
++	vcpu_ioctl(vm, vcpu_id, KVM_ENABLE_CAP, &enable_syndbg_cap);
++}
++
+ static void test_hv_cpuid(struct kvm_cpuid2 *hv_cpuid_entries,
+-			  int evmcs_enabled)
++			  bool evmcs_enabled, bool syndbg_enabled)
+ {
+ 	int i;
++	int nent = 6;
++	u32 test_val;
++
++	if (evmcs_enabled)
++		nent += 1; /* 0x4000000A */
+ 
+-	if (!evmcs_enabled)
+-		TEST_ASSERT(hv_cpuid_entries->nent == 6,
+-			    "KVM_GET_SUPPORTED_HV_CPUID should return 6 entries"
+-			    " when Enlightened VMCS is disabled (returned %d)",
+-			    hv_cpuid_entries->nent);
+-	else
+-		TEST_ASSERT(hv_cpuid_entries->nent == 7,
+-			    "KVM_GET_SUPPORTED_HV_CPUID should return 7 entries"
+-			    " when Enlightened VMCS is enabled (returned %d)",
+-			    hv_cpuid_entries->nent);
++	if (syndbg_enabled)
++		nent += 3; /* 0x40000080 - 0x40000082 */
++
++	TEST_ASSERT(hv_cpuid_entries->nent == nent,
++		    "KVM_GET_SUPPORTED_HV_CPUID should return %d entries"
++		    " with evmcs=%d syndbg=%d (returned %d)",
++		    nent, evmcs_enabled, syndbg_enabled,
++		    hv_cpuid_entries->nent);
+ 
+ 	for (i = 0; i < hv_cpuid_entries->nent; i++) {
+ 		struct kvm_cpuid_entry2 *entry = &hv_cpuid_entries->entries[i];
+ 
+ 		TEST_ASSERT((entry->function >= 0x40000000) &&
+-			    (entry->function <= 0x4000000A),
++			    (entry->function <= 0x40000082),
+ 			    "function %x is our of supported range",
+ 			    entry->function);
+ 
++		TEST_ASSERT(evmcs_enabled || (entry->function != 0x4000000A),
++			    "0x4000000A leaf should not be reported");
++
++		TEST_ASSERT(syndbg_enabled || (entry->function <= 0x4000000A),
++			    "SYNDBG leaves should not be reported");
++
+ 		TEST_ASSERT(entry->index == 0,
+ 			    ".index field should be zero");
+ 
+@@ -78,12 +96,27 @@ static void test_hv_cpuid(struct kvm_cpuid2 *hv_cpuid_entries,
+ 		TEST_ASSERT(!entry->padding[0] && !entry->padding[1] &&
+ 			    !entry->padding[2], "padding should be zero");
+ 
+-		if (entry->function == 0x40000004) {
+-			int nononarchcs = !!(entry->eax & (1UL << 18));
+-
+-			TEST_ASSERT(nononarchcs == !smt_possible(),
++		switch (entry->function) {
++		case 0x40000000:
++			test_val = 0x40000005;
++			if (evmcs_enabled)
++				test_val = 0x4000000A;
++			if (syndbg_enabled)
++				test_val = 0x40000082;
++
++			TEST_ASSERT(entry->eax == test_val,
++				    "Wrong max leaf report in 0x40000000.EAX: %x"
++				    " (evmcs=%d syndbg=%d)",
++				    entry->eax, evmcs_enabled, syndbg_enabled
++				);
++			break;
++		case 0x40000004:
++			test_val = entry->eax & (1UL << 18);
++
++			TEST_ASSERT(!!test_val == !smt_possible(),
+ 				    "NoNonArchitecturalCoreSharing bit"
+ 				    " doesn't reflect SMT setting");
++			break;
+ 		}
+ 
+ 		/*
+@@ -133,8 +166,9 @@ struct kvm_cpuid2 *kvm_get_supported_hv_cpuid(struct kvm_vm *vm)
+ int main(int argc, char *argv[])
+ {
+ 	struct kvm_vm *vm;
+-	int rv;
++	int rv, stage;
+ 	struct kvm_cpuid2 *hv_cpuid_entries;
++	bool evmcs_enabled, syndbg_enabled;
+ 
+ 	/* Tell stdout not to buffer its content */
+ 	setbuf(stdout, NULL);
+@@ -145,36 +179,49 @@ int main(int argc, char *argv[])
+ 		exit(KSFT_SKIP);
+ 	}
+ 
+-	/* Create VM */
+-	vm = vm_create_default(VCPU_ID, 0, guest_code);
+-
+-	test_hv_cpuid_e2big(vm);
+-
+-	hv_cpuid_entries = kvm_get_supported_hv_cpuid(vm);
+-	if (!hv_cpuid_entries)
+-		return 1;
+-
+-	test_hv_cpuid(hv_cpuid_entries, 0);
+-
+-	free(hv_cpuid_entries);
++	for (stage = 0; stage < 5; stage++) {
++		evmcs_enabled = false;
++		syndbg_enabled = false;
++
++		vm = vm_create_default(VCPU_ID, 0, guest_code);
++		switch (stage) {
++		case 0:
++			test_hv_cpuid_e2big(vm);
++			continue;
++		case 1:
++			break;
++		case 2:
++			if (!kvm_check_cap(KVM_CAP_HYPERV_ENLIGHTENED_VMCS)) {
++				print_skip("Enlightened VMCS is unsupported");
++				continue;
++			}
++			vcpu_enable_evmcs(vm, VCPU_ID);
++			evmcs_enabled = true;
++			break;
++		case 3:
++			if (!kvm_check_cap(KVM_CAP_HYPERV_SYNDBG)) {
++				print_skip("Synthetic debugger is unsupported");
++				continue;
++			}
++			vcpu_enable_syndbg(vm, VCPU_ID);
++			syndbg_enabled = true;
++			break;
++		case 4:
++			if (!kvm_check_cap(KVM_CAP_HYPERV_ENLIGHTENED_VMCS) ||
++			    !kvm_check_cap(KVM_CAP_HYPERV_SYNDBG))
++				continue;
++			vcpu_enable_evmcs(vm, VCPU_ID);
++			vcpu_enable_syndbg(vm, VCPU_ID);
++			evmcs_enabled = true;
++			syndbg_enabled = true;
++			break;
++		}
+ 
+-	if (!kvm_check_cap(KVM_CAP_HYPERV_ENLIGHTENED_VMCS)) {
+-		print_skip("Enlightened VMCS is unsupported");
+-		goto vm_free;
++		hv_cpuid_entries = kvm_get_supported_hv_cpuid(vm);
++		test_hv_cpuid(hv_cpuid_entries, evmcs_enabled, syndbg_enabled);
++		free(hv_cpuid_entries);
++		kvm_vm_free(vm);
+ 	}
+ 
+-	vcpu_enable_evmcs(vm, VCPU_ID);
+-
+-	hv_cpuid_entries = kvm_get_supported_hv_cpuid(vm);
+-	if (!hv_cpuid_entries)
+-		return 1;
+-
+-	test_hv_cpuid(hv_cpuid_entries, 1);
+-
+-	free(hv_cpuid_entries);
+-
+-vm_free:
+-	kvm_vm_free(vm);
+-
+ 	return 0;
+ }
+-- 
+2.25.1
+
+
+--=-=-=--
 
