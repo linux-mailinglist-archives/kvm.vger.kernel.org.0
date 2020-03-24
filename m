@@ -2,72 +2,79 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C9BB9190344
-	for <lists+kvm@lfdr.de>; Tue, 24 Mar 2020 02:19:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 356E8190359
+	for <lists+kvm@lfdr.de>; Tue, 24 Mar 2020 02:38:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727135AbgCXBTA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Mar 2020 21:19:00 -0400
-Received: from ozlabs.org ([203.11.71.1]:57285 "EHLO ozlabs.org"
+        id S1727126AbgCXBig (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Mar 2020 21:38:36 -0400
+Received: from mga11.intel.com ([192.55.52.93]:28454 "EHLO mga11.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727050AbgCXBS7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 Mar 2020 21:18:59 -0400
-Received: by ozlabs.org (Postfix, from userid 1003)
-        id 48mYL92hc1z9sSL; Tue, 24 Mar 2020 12:18:57 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
-        t=1585012737; bh=fWyvQjgmoVE45UQb8yBNTXiPed69yDbrhs5hdq0egsU=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=mauSiS7oX6+4B1f4axm7Ayy0Hc0K4hbGipg06Vcls1bvNoep91a4i3dcGDcZKVpTJ
-         xQC/JEjuilfLaSd1tD8NcDipXJjAbo7uhRcrYKD9LE8of4vea9QfKCKUAAkkdF/Uz7
-         Dm7c/6XLcWYDVEm/PsidIOCTDafYwb4ENnFnDtX0zf2M52X8TbyUepK8RCjm3hj5Lu
-         u8f6BSKtFagIKKzXfDcwdZegidVRR/Rw5iEGwGP+42XDZ08MSFz0spgTcZk9vvMJUq
-         WBwqbuf0TPBzwB0coc1LPf1cCR+z4iTVCk1La6TvnzTrCQ1Bv8TD6+qUuXAoP37xGr
-         j9GwIDroxtTsA==
-Date:   Tue, 24 Mar 2020 12:18:54 +1100
-From:   Paul Mackerras <paulus@ozlabs.org>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
+        id S1727102AbgCXBif (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 Mar 2020 21:38:35 -0400
+IronPort-SDR: fptz7yYNEIC+i9q+pRreHWp5nBmNGQ80F8E60IJjFq5VjceYcMNeBXD2OEjV4OqX3I5/8nzzom
+ T0cRm0fYCOVA==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Mar 2020 18:38:35 -0700
+IronPort-SDR: Fp1vKMVheC0S+iVbmeEbtCgRPQYmeZ6Q4gBmT7xJ1Z6eA3qxqgXym6lxe3arpUuN6y/M6jSVHp
+ 0qNSGsz04L3Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.72,298,1580803200"; 
+   d="scan'208";a="270169232"
+Received: from xiaoyaol-mobl.ccr.corp.intel.com (HELO [10.255.31.120]) ([10.255.31.120])
+  by fmsmga004.fm.intel.com with ESMTP; 23 Mar 2020 18:38:31 -0700
+Subject: Re: [PATCH v5 3/9] x86/split_lock: Re-define the kernel param option
+ for split_lock_detect
+To:     Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        hpa@zytor.com, Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        kvm@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org
+Cc:     Andy Lutomirski <luto@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Arvind Sankar <nivedita@alum.mit.edu>,
+        Fenghua Yu <fenghua.yu@intel.com>,
+        Tony Luck <tony.luck@intel.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 1/9] KVM: Pass kvm_init()'s opaque param to additional
- arch funcs
-Message-ID: <20200324011854.GC5604@blackberry>
-References: <20200321202603.19355-1-sean.j.christopherson@intel.com>
- <20200321202603.19355-2-sean.j.christopherson@intel.com>
+        Jim Mattson <jmattson@google.com>
+References: <20200315050517.127446-1-xiaoyao.li@intel.com>
+ <20200315050517.127446-4-xiaoyao.li@intel.com>
+ <87r1xjov3a.fsf@nanos.tec.linutronix.de>
+From:   Xiaoyao Li <xiaoyao.li@intel.com>
+Message-ID: <e708f6d2-8f96-903c-0bce-2eeecc4a237d@intel.com>
+Date:   Tue, 24 Mar 2020 09:38:30 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200321202603.19355-2-sean.j.christopherson@intel.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <87r1xjov3a.fsf@nanos.tec.linutronix.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Mar 21, 2020 at 01:25:55PM -0700, Sean Christopherson wrote:
-> Pass @opaque to kvm_arch_hardware_setup() and
-> kvm_arch_check_processor_compat() to allow architecture specific code to
-> reference @opaque without having to stash it away in a temporary global
-> variable.  This will enable x86 to separate its vendor specific callback
-> ops, which are passed via @opaque, into "init" and "runtime" ops without
-> having to stash away the "init" ops.
+On 3/24/2020 1:10 AM, Thomas Gleixner wrote:
+> Xiaoyao Li <xiaoyao.li@intel.com> writes:
 > 
-> No functional change intended.
+>> Change sld_off to sld_disable, which means disabling feature split lock
+>> detection and it cannot be used in kernel nor can kvm expose it guest.
+>> Of course, the X86_FEATURE_SPLIT_LOCK_DETECT is not set.
+>>
+>> Add a new optioin sld_kvm_only, which means kernel turns split lock
+>> detection off, but kvm can expose it to guest.
 > 
-> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-> Tested-by: Cornelia Huck <cohuck@redhat.com> #s390
-> Acked-by: Marc Zyngier <maz@kernel.org>
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> What's the point of this? If the host is not clean, then you better fix
+> the host first before trying to expose it to guests.
 
-Acked-by: Paul Mackerras <paulus@ozlabs.org>
+It's not about whether or not host is clean. It's for the cases that 
+users just don't want it enabled on host, to not break the applications 
+or drivers that do have split lock issue.
+
+> Thanks,
+> 
+>          tglx
+> 
+
