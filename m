@@ -2,187 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2D20E190A44
-	for <lists+kvm@lfdr.de>; Tue, 24 Mar 2020 11:09:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2C8A2190A82
+	for <lists+kvm@lfdr.de>; Tue, 24 Mar 2020 11:19:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727259AbgCXKJe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Mar 2020 06:09:34 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:30074 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726818AbgCXKJe (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 24 Mar 2020 06:09:34 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 02OA4Jow072479
-        for <kvm@vger.kernel.org>; Tue, 24 Mar 2020 06:09:33 -0400
-Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2ywf0nta24-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Tue, 24 Mar 2020 06:09:32 -0400
-Received: from localhost
-        by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
-        Tue, 24 Mar 2020 10:09:29 -0000
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
-        by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Tue, 24 Mar 2020 10:09:26 -0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 02OA9QDS41746680
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 24 Mar 2020 10:09:26 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 10371A4062;
-        Tue, 24 Mar 2020 10:09:26 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 70158A405F;
-        Tue, 24 Mar 2020 10:09:25 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.145.187.35])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 24 Mar 2020 10:09:25 +0000 (GMT)
-Subject: Re: [kvm-unit-tests PATCH 01/10] s390x: smp: Test all CRs on initial
- reset
-To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     thuth@redhat.com, linux-s390@vger.kernel.org, david@redhat.com
-References: <20200324081251.28810-1-frankja@linux.ibm.com>
- <20200324081251.28810-2-frankja@linux.ibm.com>
- <fb384a50-6c38-b636-ecde-ad220aad950c@de.ibm.com>
- <c1f01ea5-219e-4680-72bd-56f68270bf9b@linux.ibm.com>
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
-Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
- 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
- nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Date:   Tue, 24 Mar 2020 11:09:25 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+        id S1727212AbgCXKTP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Mar 2020 06:19:15 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:46805 "EHLO
+        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726994AbgCXKTO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 Mar 2020 06:19:14 -0400
+Received: by mail-wr1-f66.google.com with SMTP id j17so17274602wru.13
+        for <kvm@vger.kernel.org>; Tue, 24 Mar 2020 03:19:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=references:user-agent:from:to:cc:subject:in-reply-to:date
+         :message-id:mime-version:content-transfer-encoding;
+        bh=jNTB9UiCOvEmZjdiIH1rwukYdAv+6PN2ItTLYIoQp10=;
+        b=BZFTuAGhrPosqNHtG2ThFLUKrJxn1iphk2I9uBufgX9715CyWvkWclFXFwjKFUBpUC
+         XXR2vFMmN+rMpUCeI1rZynm1HlCWLwt1HrrvS1/X2GTjJme8ogdtZ1HffjIMVnKB+LmP
+         ngOh51KctMLiewVGCknh4sVmHGmgtrGSN75IIn3Ag9oePsg4iTWZOllCbcE94vJWKgEp
+         HJhE/Z5BBdc6YfkDK2Wx9COpjbbHI24U9UvkcELc1vONa0hwTZFPcz50/E3n6ivfgKc+
+         5gU3GtcKtwPWRul4K0gurOzbPj1Rs68SLCzByOtdDL6/aLBycS5RVoOT4HXe+FzJCGxT
+         FxXg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:references:user-agent:from:to:cc:subject
+         :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+        bh=jNTB9UiCOvEmZjdiIH1rwukYdAv+6PN2ItTLYIoQp10=;
+        b=E2kOQlC2+VjOOuHEusfhGy7q6vICDuN2YC8Mc5V+o9qDMODrqJUNnQhDhKk0ljkXBW
+         eqHVLtkXrs0bEmIMd3mdKhA7CE43Z8SW3mKe4My/E4Mh7giUUusqZaiOzBHhYAzucTBi
+         83x9kj+73x9sn84E4v51HCLjTKe8HIt9iTvov4PD4sfqD3y5SL0YbTQ51+8SNsKZ5sZ2
+         t5eTQ7IX+VMo6AK9GjilW8UWWBFtV+R2jtX8rNHgfDZKmIqtivronGDx/c9n098qdE0C
+         0Uk3tdo7dd61TRtPOXMAhD3MhrrwSKBAatc60RidUcKuxnN9VPrcacGnpekLi6Xi7TS5
+         WxiQ==
+X-Gm-Message-State: ANhLgQ3ZawmhyXLG/pq38JV4H0deOjNZazK8D/OjDN2BJ9ty/xpjJ9my
+        t6lnpNyY3PeewTVUgIdZb9x0IQ==
+X-Google-Smtp-Source: ADFU+vv/B74lHFDdcqb1FElgKEv/8dK7Vt4iGG0rHUCyaQVT8JMJDur/53v+0aFjl3b5b50jwyj3WA==
+X-Received: by 2002:adf:f310:: with SMTP id i16mr35512055wro.100.1585045152301;
+        Tue, 24 Mar 2020 03:19:12 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+        by smtp.gmail.com with ESMTPSA id j39sm29471981wre.11.2020.03.24.03.19.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 24 Mar 2020 03:19:11 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+        by zen.linaroharston (Postfix) with ESMTP id 2C1211FF7E;
+        Tue, 24 Mar 2020 10:19:10 +0000 (GMT)
+References: <20200130163232.10446-1-philmd@redhat.com>
+ <20200130163232.10446-8-philmd@redhat.com>
+User-agent: mu4e 1.3.10; emacs 28.0.50
+From:   Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To:     Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc:     qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>,
+        Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+        Cleber Rosa <crosa@redhat.com>,
+        Wainer dos Santos Moschetta <wainersm@redhat.com>,
+        qemu-block@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>,
+        Juan Quintela <quintela@redhat.com>,
+        =?utf-8?Q?Dan?= =?utf-8?Q?iel_P_=2E_Berrang=C3=A9?= 
+        <berrange@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>,
+        Max Reitz <mreitz@redhat.com>,
+        Markus Armbruster <armbru@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
+        kvm@vger.kernel.org
+Subject: Re: [PATCH v2 07/12] tests/acceptance: Remove shebang header
+In-reply-to: <20200130163232.10446-8-philmd@redhat.com>
+Date:   Tue, 24 Mar 2020 10:19:10 +0000
+Message-ID: <87369yawdd.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <c1f01ea5-219e-4680-72bd-56f68270bf9b@linux.ibm.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 20032410-0012-0000-0000-00000396C187
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20032410-0013-0000-0000-000021D3B51D
-Message-Id: <5be194c7-924d-df25-2c21-f5d3195236b3@de.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.645
- definitions=2020-03-24_02:2020-03-23,2020-03-24 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- phishscore=0 impostorscore=0 malwarescore=0 mlxlogscore=999 spamscore=0
- clxscore=1015 lowpriorityscore=0 adultscore=0 suspectscore=0 bulkscore=0
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2003240053
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
 
-On 24.03.20 11:08, Janosch Frank wrote:
-> On 3/24/20 10:52 AM, Christian Borntraeger wrote:
->>
->>
->> On 24.03.20 09:12, Janosch Frank wrote:
->>> All CRs are set to 0 and CRs 0 and 14 are set to pre-defined values,
->>> so we also need to test 1-13 and 15 for 0.
->>>
->>> And while we're at it, let's also set some values to cr 1, 7 and 13, so
->>> we can actually be sure that they will be zeroed.
->>>
->>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
->>> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
->>> ---
->>>  s390x/smp.c | 16 +++++++++++++++-
->>>  1 file changed, 15 insertions(+), 1 deletion(-)
->>>
->>> diff --git a/s390x/smp.c b/s390x/smp.c
->>> index fa40753524f321d4..8c9b98aabd9e8222 100644
->>> --- a/s390x/smp.c
->>> +++ b/s390x/smp.c
->>> @@ -182,16 +182,28 @@ static void test_emcall(void)
->>>  	report_prefix_pop();
->>>  }
->>>
->>> +/* Used to dirty registers of cpu #1 before it is reset */
->>> +static void test_func_initial(void)
->>> +{
->>> +	lctlg(1, 0x42000UL);
->>> +	lctlg(7, 0x43000UL);
->>> +	lctlg(13, 0x44000UL);
->>> +	set_flag(1);
->>> +}
->>> +
->>>  static void test_reset_initial(void)
->>>  {
->>>  	struct cpu_status *status = alloc_pages(0);
->>> +	uint64_t nullp[12] = {};
->>>  	struct psw psw;
->>>
->>>  	psw.mask = extract_psw_mask();
->>> -	psw.addr = (unsigned long)test_func;
->>> +	psw.addr = (unsigned long)test_func_initial;
->>>
->>>  	report_prefix_push("reset initial");
->>> +	set_flag(0);
->>>  	smp_cpu_start(1, psw);
->>> +	wait_for_flag();
->>>
->>>  	sigp_retry(1, SIGP_INITIAL_CPU_RESET, 0, NULL);
->>>  	sigp(1, SIGP_STORE_STATUS_AT_ADDRESS, (uintptr_t)status, NULL);
->>> @@ -202,6 +214,8 @@ static void test_reset_initial(void)
->>>  	report(!status->fpc, "fpc");
->>>  	report(!status->cputm, "cpu timer");
->>>  	report(!status->todpr, "todpr");
->>> +	report(!memcmp(&status->crs[1], nullp, sizeof(status->crs[1]) * 12), "cr1-13 == 0");
->>> +	report(status->crs[15] == 0, "cr15 == 0");
->>>  	report_prefix_pop();
->>
->> Why not add a check for crs[0] == 0xe0 
->> and crs[14] = 0xc2000000
-> 
-> You mean the checks which are done a few lines below this?
-> This patch just actually dirties registers which should be set to 0 so
-> we can really be sure that they have been touched.
+> Patch created mechanically by running:
+>
+>   $ chmod 644 $(git grep -lF '#!/usr/bin/env python' \
+>       | xargs grep -L 'if __name__.*__main__')
+>   $ sed -i "/^#\!\/usr\/bin\/\(env\ \)\?python.\?$/d" \
+>       $(git grep -lF '#!/usr/bin/env python' \
+>       | xargs grep -L 'if __name__.*__main__')
 
-Right. So feel free to add my RB. 
+OK, but my question is why? Aren't shebangs considered good practice for
+finding the executable for a script?
 
+If the acceptance scripts are special in this regard we should say why
+in the commit message.
+
+>
+> Reported-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Suggested-by: Stefan Hajnoczi <stefanha@redhat.com>
+> Reviewed-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
+> Acked-by: Stefan Hajnoczi <stefanha@redhat.com>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> ---
+>  tests/acceptance/virtio_seg_max_adjust.py  | 1 -
+>  tests/acceptance/x86_cpu_model_versions.py | 1 -
+>  2 files changed, 2 deletions(-)
+>  mode change 100755 =3D> 100644 tests/acceptance/virtio_seg_max_adjust.py
+>
+> diff --git a/tests/acceptance/virtio_seg_max_adjust.py b/tests/acceptance=
+/virtio_seg_max_adjust.py
+> old mode 100755
+> new mode 100644
+> index 5458573138..8d4f24da49
+> --- a/tests/acceptance/virtio_seg_max_adjust.py
+> +++ b/tests/acceptance/virtio_seg_max_adjust.py
+> @@ -1,4 +1,3 @@
+> -#!/usr/bin/env python
+>  #
+>  # Test virtio-scsi and virtio-blk queue settings for all machine types
+>  #
+> diff --git a/tests/acceptance/x86_cpu_model_versions.py b/tests/acceptanc=
+e/x86_cpu_model_versions.py
+> index 90558d9a71..01ff614ec2 100644
+> --- a/tests/acceptance/x86_cpu_model_versions.py
+> +++ b/tests/acceptance/x86_cpu_model_versions.py
+> @@ -1,4 +1,3 @@
+> -#!/usr/bin/env python
+>  #
+>  # Basic validation of x86 versioned CPU models and CPU model aliases
+>  #
+
+
+--=20
+Alex Benn=C3=A9e
