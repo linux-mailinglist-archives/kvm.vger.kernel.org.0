@@ -2,110 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A91D919242C
-	for <lists+kvm@lfdr.de>; Wed, 25 Mar 2020 10:33:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 743A719244F
+	for <lists+kvm@lfdr.de>; Wed, 25 Mar 2020 10:37:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727384AbgCYJds (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Mar 2020 05:33:48 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:44612 "EHLO
-        us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727158AbgCYJds (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 25 Mar 2020 05:33:48 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1585128827;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=FqKcPmzDmL8rF2Z/EiXuHTwdjieWNY5JJ3KzgO/0zPg=;
-        b=IuEmDoBcCSJf4i3qXqD5bEP2SC8puZzwnpncjQ/YCwoJoeHILNHjZHjfD6oKR3jS1mQGtX
-        VlRqSSdKTekveojnXZVf+HTLoWVLVea5dxXMhRAV/vHJi3KKYHYNyAzGBc8lnwDlQfSR4O
-        5BKp8BLNU+igcJrPGPu8U+zNuYrxBq8=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-8-meZ72gZiOYKKz9TRAcN62w-1; Wed, 25 Mar 2020 05:33:45 -0400
-X-MC-Unique: meZ72gZiOYKKz9TRAcN62w-1
-Received: by mail-wr1-f70.google.com with SMTP id d17so853514wrw.19
-        for <kvm@vger.kernel.org>; Wed, 25 Mar 2020 02:33:45 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=FqKcPmzDmL8rF2Z/EiXuHTwdjieWNY5JJ3KzgO/0zPg=;
-        b=r+5UxVS7WSwEK2pObz0NAeUwF9Qtyyiesui0LgkPbg2hNefMgCf4C6nZIeYX9PIMXX
-         zIFv/PvDtQdGaHbSNTLzMLrgWLd4+vyiiB5e2vLZyWG8Muw9a+yRfTyQq+XUUcaNdmoN
-         6brSNSxLt7/MdWpMWb2zje0BNBYuIzru3mqVSYNWkHhwBddjbQBF42UcqNC9ULCtyb8n
-         K7XaIjirfycjA+WlVLZ5xi7voUD4rssniPseCPaXWFCfKnURcFPB85TPWBTJadVRlbGI
-         O/CbXYHTA3PFvV5c4g4qiU8k2D9u+lWPasjzQHkwDqR9vKy42uYEX1CZgmcqnJh2ufXX
-         lKBw==
-X-Gm-Message-State: ANhLgQ3ue7d3glXFrupJgPJ/5izjxTbOxyzWf7nalV9beVTCfikvrXZf
-        lzJuYbsu2/t0JDXYeENnrN3HiIPMMqw0ZZiCgNXS6tUyElUarPvq+Hz07el4csFpaPeVm5QMQt8
-        WZf6Xz65qVJ11
-X-Received: by 2002:a5d:62c9:: with SMTP id o9mr2519038wrv.2.1585128824624;
-        Wed, 25 Mar 2020 02:33:44 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vvQpW/9fkYnOQqZExpXHTfk1pdnBJ6eo/ok7Y4W/2/lHPQf6KxLZ0Xeuq73xxY9DUlYJgklVg==
-X-Received: by 2002:a5d:62c9:: with SMTP id o9mr2519008wrv.2.1585128824381;
-        Wed, 25 Mar 2020 02:33:44 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id j6sm31648430wrb.4.2020.03.25.02.33.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Mar 2020 02:33:43 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Ben Gardon <bgardon@google.com>,
-        Junaid Shahid <junaids@google.com>,
-        Liran Alon <liran.alon@oracle.com>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        John Haxby <john.haxby@oracle.com>,
-        Miaohe Lin <linmiaohe@huawei.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>
-Subject: Re: [PATCH v3 08/37] KVM: VMX: Skip global INVVPID fallback if vpid==0 in vpid_sync_context()
-In-Reply-To: <20200320212833.3507-9-sean.j.christopherson@intel.com>
-References: <20200320212833.3507-1-sean.j.christopherson@intel.com> <20200320212833.3507-9-sean.j.christopherson@intel.com>
-Date:   Wed, 25 Mar 2020 10:33:41 +0100
-Message-ID: <877dz87p8q.fsf@vitty.brq.redhat.com>
+        id S1727406AbgCYJhn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Mar 2020 05:37:43 -0400
+Received: from mga01.intel.com ([192.55.52.88]:60380 "EHLO mga01.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726239AbgCYJhm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 Mar 2020 05:37:42 -0400
+IronPort-SDR: xHo6eUKhr4hH2SCTPyjc4MvI2IyFHDI78pjp11M3Jrufm/6ug9PU6zh1ic/+E2ORieTYCfGUxX
+ t4+wNvd9An9w==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Mar 2020 02:37:42 -0700
+IronPort-SDR: vhPjM/cowDlQDWyPp9g8cDTlRnVOlTcGWufI14tK3cz67FB29nlKsk1CIcqtF35xUflW9rwh1d
+ xZn0wNGBUPHQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.72,303,1580803200"; 
+   d="scan'208";a="393574042"
+Received: from fmsmsx103.amr.corp.intel.com ([10.18.124.201])
+  by orsmga004.jf.intel.com with ESMTP; 25 Mar 2020 02:37:41 -0700
+Received: from fmsmsx158.amr.corp.intel.com (10.18.116.75) by
+ FMSMSX103.amr.corp.intel.com (10.18.124.201) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Wed, 25 Mar 2020 02:37:41 -0700
+Received: from shsmsx152.ccr.corp.intel.com (10.239.6.52) by
+ fmsmsx158.amr.corp.intel.com (10.18.116.75) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Wed, 25 Mar 2020 02:37:41 -0700
+Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.206]) by
+ SHSMSX152.ccr.corp.intel.com ([169.254.6.155]) with mapi id 14.03.0439.000;
+ Wed, 25 Mar 2020 17:37:37 +0800
+From:   "Liu, Yi L" <yi.l.liu@intel.com>
+To:     Peter Xu <peterx@redhat.com>
+CC:     "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "mst@redhat.com" <mst@redhat.com>,
+        "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "Tian, Jun J" <jun.j.tian@intel.com>,
+        "Sun, Yi Y" <yi.y.sun@intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "Wu, Hao" <hao.wu@intel.com>,
+        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
+        Jacob Pan <jacob.jun.pan@linux.intel.com>,
+        Yi Sun <yi.y.sun@linux.intel.com>,
+        Richard Henderson <rth@twiddle.net>,
+        Eduardo Habkost <ehabkost@redhat.com>
+Subject: RE: [PATCH v1 07/22] intel_iommu: add set/unset_iommu_context
+ callback
+Thread-Topic: [PATCH v1 07/22] intel_iommu: add set/unset_iommu_context
+ callback
+Thread-Index: AQHWAEW1iID+2pWxMk+TzTXpt3GsyKhWLYeAgAFYgbD//9PfAIABtbwQ
+Date:   Wed, 25 Mar 2020 09:37:37 +0000
+Message-ID: <A2975661238FB949B60364EF0F2C25743A201DFC@SHSMSX104.ccr.corp.intel.com>
+References: <1584880579-12178-1-git-send-email-yi.l.liu@intel.com>
+ <1584880579-12178-8-git-send-email-yi.l.liu@intel.com>
+ <20200323212911.GQ127076@xz-x1>
+ <A2975661238FB949B60364EF0F2C25743A20041A@SHSMSX104.ccr.corp.intel.com>
+ <20200324152416.GV127076@xz-x1>
+In-Reply-To: <20200324152416.GV127076@xz-x1>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sean Christopherson <sean.j.christopherson@intel.com> writes:
-
-> Skip the global INVVPID in the unlikely scenario that vpid==0 and the
-> SINGLE_CONTEXT variant of INVVPID is unsupported.  If vpid==0, there's
-> no need to INVVPID as it's impossible to do VM-Enter with VPID enabled
-> and vmcs.VPID==0, i.e. there can't be any TLB entries for the vCPU with
-> vpid==0.  The fact that the SINGLE_CONTEXT variant isn't supported is
-> irrelevant.
->
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> ---
->  arch/x86/kvm/vmx/ops.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/arch/x86/kvm/vmx/ops.h b/arch/x86/kvm/vmx/ops.h
-> index 45eaedee2ac0..33645a8e5463 100644
-> --- a/arch/x86/kvm/vmx/ops.h
-> +++ b/arch/x86/kvm/vmx/ops.h
-> @@ -285,7 +285,7 @@ static inline void vpid_sync_context(int vpid)
->  {
->  	if (cpu_has_vmx_invvpid_single())
->  		vpid_sync_vcpu_single(vpid);
-> -	else
-> +	else if (vpid != 0)
->  		vpid_sync_vcpu_global();
->  }
-
-Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-
-(personally, I also prefer 'vpid !=0' to '!vpid', however, nested.c
-uses expressions like '&& !vmcs12->virtual_processor_id' instead...)
-
--- 
-Vitaly
-
+PiBGcm9tOiBQZXRlciBYdSA8cGV0ZXJ4QHJlZGhhdC5jb20+DQo+IFNlbnQ6IFR1ZXNkYXksIE1h
+cmNoIDI0LCAyMDIwIDExOjI0IFBNDQo+IFRvOiBMaXUsIFlpIEwgPHlpLmwubGl1QGludGVsLmNv
+bT4NCj4gU3ViamVjdDogUmU6IFtQQVRDSCB2MSAwNy8yMl0gaW50ZWxfaW9tbXU6IGFkZCBzZXQv
+dW5zZXRfaW9tbXVfY29udGV4dCBjYWxsYmFjaw0KPiANCj4gT24gVHVlLCBNYXIgMjQsIDIwMjAg
+YXQgMTE6MTU6MjRBTSArMDAwMCwgTGl1LCBZaSBMIHdyb3RlOg0KPiANCj4gWy4uLl0NCj4gDQo+
+ID4gPiA+ICBzdHJ1Y3QgVlRESU9UTEJFbnRyeSB7DQo+ID4gPiA+IEBAIC0yNzEsNiArMjgyLDgg
+QEAgc3RydWN0IEludGVsSU9NTVVTdGF0ZSB7DQo+ID4gPiA+ICAgICAgLyoNCj4gPiA+ID4gICAg
+ICAgKiBQcm90ZWN0cyBJT01NVSBzdGF0ZXMgaW4gZ2VuZXJhbC4gIEN1cnJlbnRseSBpdCBwcm90
+ZWN0cyB0aGUNCj4gPiA+ID4gICAgICAgKiBwZXItSU9NTVUgSU9UTEIgY2FjaGUsIGFuZCBjb250
+ZXh0IGVudHJ5IGNhY2hlIGluIFZUREFkZHJlc3NTcGFjZS4NCj4gPiA+ID4gKyAgICAgKiBQcm90
+ZWN0IHRoZSB1cGRhdGUvdXNhZ2Ugb2YgSG9zdElPTU1VQ29udGV4dCBwb2ludGVyIGNhY2hlZCBp
+bg0KPiA+ID4gPiArICAgICAqIFZUREJ1cy0+ZGV2X2ljeCBhcnJheSBhcyBhcnJheSBlbGVtZW50
+cyBtYXkgYmUgdXBkYXRlZCBieQ0KPiA+ID4gPiArIGhvdHBsdWcNCj4gPiA+DQo+ID4gPiBJIHRo
+aW5rIHRoZSBjb250ZXh0IHVwZGF0ZSBkb2VzIG5vdCBuZWVkIHRvIGJlIHVwZGF0ZWQsIGJlY2F1
+c2UgdGhleQ0KPiA+ID4gc2hvdWxkIGFsd2F5cyBiZSB3aXRoIHRoZSBCUUwsIHJpZ2h0Pw0KPiA+
+DQo+ID4gSG1tbW0sIG1heWJlIEkgdXNlZCBiYWQgZGVzY3JpcHRpb24uIE15IHB1cnBvc2UgaXMg
+dG8gcHJvdGVjdCB0aGUNCj4gPiBzdG9yZWQgSG9zdElPTU1VQ29udGV4dCBwb2ludGVyIGluIHZJ
+T01NVS4gV2l0aA0KPiA+IHBjaV9kZXZpY2Vfc2V0L3Vuc2V0X2lvbW11X2NvbnRleHQsDQo+ID4g
+dklPTU1VIGhhdmUgYSBjb3B5IG9mIEhvc3RJT01NVUNvbnRleHQuIElmIFZGSU8gY29udGFpbmVy
+IGlzIHJlbGVhc2VkDQo+ID4gKGUuZy4gaG90cHVsZyBvdXQgZGV2aWNlKSwgSG9zdElPTU1VQ29u
+dGV4dCB3aWxsIGFsb3MgYmUgcmVsZWFzZWQuDQo+ID4gVGhpcyB3aWxsIHRyaWdnZXIgdGhlIHBj
+aV9kZXZpY2VfdW5zZXRfaW9tbXVfY29udGV4dCgpIHRvIGNsZWFuIHRoZQ0KPiA+IGNvcHkuIFRv
+IGF2b2lkIHVzaW5nIGEgc3RhbGVkIEhvc3RJT01NVUNvbnRleHQgaW4gdklPTU1VLCB2SU9NTVUN
+Cj4gPiBzaG91bGQgaGF2ZSBhIGxvY2sgdG8gYmxvY2sgdGhlIHBjaV9kZXZpY2VfdW5zZXRfaW9t
+bXVfY29udGV4dCgpDQo+ID4gY2FsbGluZyB1bnRpbCBvdGhlciB0aHJlYWRzIGZpbmlzaGVkIHRo
+ZWlyIEhvc3RJT01NVUNvbnRleHQgdXNhZ2UuIERvDQo+ID4geW91IHdhbnQgYSBkZXNjcmlwdGlv
+biB1cGRhdGUgaGVyZSBvciBvdGhlciBwcmVmZXJlbmNlPw0KPiANCj4gWWVhaCwgYnV0IGhvdCBw
+bHVnL3VucGx1ZyB3aWxsIHN0aWxsIHRha2UgdGhlIEJRTD8NCj4NCj4gQWggYnR3IEkgdGhpbmsg
+aXQncyBhbHNvIE9LIHRvIHRha2UgdGhlIGxvY2sgaWYgeW91IHdhbnQgb3Igbm90IHN1cmUgYWJv
+dXQgd2hldGhlcg0KPiB3ZSdsbCBhbHdheXMgdGFrZSB0aGUgQlFMIGluIHRoZXNlIHBhdGhzLiAN
+Cg0KSSBndWVzcyBiZXR0ZXIgdG8gaGF2ZSBhbiBpbnRlcm5hbCBzeW5jIHRvIGF2b2lkIHJlZmVy
+ZW5jZSBzdGFsZXMgSG9zdElPTU1VQ29udGV4dC4gOi0pDQoNCj4gQnV0IGlmIHNvLCBpbnN0ZWFk
+IG9mIGFkZGluZyBhbm90aGVyDQo+ICJQcm90ZWN0IHRoZSAuLi4iIHNlbnRlbmNlIHRvIHRoZSBj
+b21tZW50LCB3b3VsZCB5b3UgbWluZCBsaXN0IG91dCB3aGF0IHRoZSBsb2NrIGlzDQo+IHByb3Rl
+Y3Rpbmc/DQo+IA0KPiAgIC8qDQo+ICAgICogaW9tbXVfbG9jayBwcm90ZWN0czoNCj4gICAgKiAt
+IHBlci1JT01NVSBJT1RMQiBjYWNoZXMNCj4gICAgKiAtIGNvbnRleHQgZW50cnkgY2FjaGVzDQo+
+ICAgICogLSAuLi4NCj4gICAgKi8NCj4gDQo+IE9yIGFueXRoaW5nIGJldHRlciB0aGFuIHRoYXQu
+ICBUaGFua3MsDQoNCkl0IGxvb2tzIGdvb2QgdG8gbWUuIExldCBtZSB1cGRhdGUgaXQgaW4gbmV4
+dCB2ZXJzaW9uLg0KDQpSZWdhcmRzLA0KWWkgTGl1DQo=
