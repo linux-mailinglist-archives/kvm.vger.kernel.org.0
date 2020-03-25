@@ -2,159 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6F47F19328A
-	for <lists+kvm@lfdr.de>; Wed, 25 Mar 2020 22:20:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C8DBB193419
+	for <lists+kvm@lfdr.de>; Thu, 26 Mar 2020 00:02:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727837AbgCYVU5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Mar 2020 17:20:57 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:55747 "EHLO
-        us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727351AbgCYVU5 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 25 Mar 2020 17:20:57 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1585171255;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=5OAiw4H8RHcYJgUDa0Alkcr13a5bPAHpwGb7bMq8gRE=;
-        b=UVW04CcL6UdYdXTiMA82P5SEQsX/U8XdtZlnk6qIm/+m1FioHXHkfQf972TIOug+4/mnc5
-        zRsRRrmDzK+fwVxd1CFN2A6UwY5/sZ51Gmg+InAFthiTgfrlrce4Y6RNa/CO4PSc/UgWxx
-        6IogNkC+w88J6TA7HitEEMt7k1oxMFs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-214-TBF9AnAZOf6sXTlQ7Bb0AA-1; Wed, 25 Mar 2020 17:20:53 -0400
-X-MC-Unique: TBF9AnAZOf6sXTlQ7Bb0AA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AFE36107ACCD;
-        Wed, 25 Mar 2020 21:20:51 +0000 (UTC)
-Received: from [10.36.113.142] (ovpn-113-142.ams2.redhat.com [10.36.113.142])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 57E20100EBAA;
-        Wed, 25 Mar 2020 21:20:45 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH v7 08/13] arm/arm64: ITS: Device and
- collection Initialization
-To:     Zenghui Yu <yuzenghui@huawei.com>
-Cc:     peter.maydell@linaro.org, drjones@redhat.com, kvm@vger.kernel.org,
-        maz@kernel.org, qemu-devel@nongnu.org, qemu-arm@nongnu.org,
-        andre.przywara@arm.com, thuth@redhat.com, alexandru.elisei@arm.com,
-        kvmarm@lists.cs.columbia.edu, eric.auger.pro@gmail.com
-References: <20200320092428.20880-1-eric.auger@redhat.com>
- <20200320092428.20880-9-eric.auger@redhat.com>
- <63f3d8aa-c1e3-f40f-32a1-fb6d22e70541@huawei.com>
-From:   Auger Eric <eric.auger@redhat.com>
-Message-ID: <c5ce7101-9ea3-8b04-7ec0-cb27dfbdc116@redhat.com>
-Date:   Wed, 25 Mar 2020 22:20:43 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
-MIME-Version: 1.0
-In-Reply-To: <63f3d8aa-c1e3-f40f-32a1-fb6d22e70541@huawei.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Content-Transfer-Encoding: quoted-printable
+        id S1727456AbgCYXCz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Mar 2020 19:02:55 -0400
+Received: from mail-pj1-f74.google.com ([209.85.216.74]:34411 "EHLO
+        mail-pj1-f74.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727389AbgCYXCz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 Mar 2020 19:02:55 -0400
+Received: by mail-pj1-f74.google.com with SMTP id v8so4708558pju.1
+        for <kvm@vger.kernel.org>; Wed, 25 Mar 2020 16:02:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+         :cc;
+        bh=bbByUOh82ool+SbMsA1rd5UPSytjb2ekUWaOBWg/qH4=;
+        b=pErYkr8SQ3js+o0QvaCZ2l96awDpkh8EUrjdNxFzM5tLCD4mbraW9JddFtQK0HyshT
+         Avi04q5RiTad5YbeGKaK3qQDIhPmHtahpbjhp5ypqqp+ISs/DtHKySkISX00+naohPBc
+         fD3TM90efw7F9/2EnWg7pGK8DCYDlEqC0oNDigZIPpWkrmi6AIFt6BNa1XFMFl7CJiAV
+         hOVMaSzmXzi4wiklS783i7sQOVKxezXdi9uI4PDANgNCZwRz2ZppnvtKA8qRImOl3799
+         C2kTOSxfz7k/WCYqwqQHvko0fPJ2rYwW0Ofl7E40p6/OWTpnb50TopRg525DkYJy2QEP
+         maug==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
+         :references:subject:from:to:cc;
+        bh=bbByUOh82ool+SbMsA1rd5UPSytjb2ekUWaOBWg/qH4=;
+        b=l+JHB6Ko/xSWSBIHc40zivlaWq5eCvz4nYUYiE9gbhSoldXLFXCfDQzMU6o2bupwCS
+         36wmjL4CgKCZSlYdp4F34OeXKj7TLrkj6eoHjn5G3TsvetX4zq1gtSSHPsoJW77l3KZ4
+         zcPVS5TsktGLTllgQvnhYyreWDMInzAQjQnlx5t+F1Jlp01GcRSRx7xABVNoKGaB7kxM
+         DJWY4Fuu6KIiq34RhI+w83rH0eH7939UsuxA1KT9Tij90nuikoP4OqGLIP0pzSnhp67g
+         saT3N1viQxGlQ606quRM0WldfoaaZtj0a0xprs3x0hAkRt3CgjYlcd8nx3lQQ2LQ9OgH
+         Xfjw==
+X-Gm-Message-State: ANhLgQ3AaYphr32r78+qpXjP/Oz9NKtm0aeGmR/xgI2qm0pGzZ0bnHbz
+        CEoTD15Y9UCcHxgvb3BZmZ4Lmz5pIYY=
+X-Google-Smtp-Source: ADFU+vtou3JvMD6bdJEzfSY7dZ8y8OPdFIieV20IdIhHvT/Kq/C6dfCeM9T+fChX6v9277hrJ2rP5pCwomI=
+X-Received: by 2002:a17:90a:a484:: with SMTP id z4mr6308167pjp.77.1585177373743;
+ Wed, 25 Mar 2020 16:02:53 -0700 (PDT)
+Date:   Wed, 25 Mar 2020 16:02:43 -0700
+In-Reply-To: <20200214032635.75434-1-dancol@google.com>
+Message-Id: <20200325230245.184786-1-dancol@google.com>
+Mime-Version: 1.0
+References: <20200214032635.75434-1-dancol@google.com>
+X-Mailer: git-send-email 2.25.1.696.g5e7596f4ac-goog
+Subject: [PATCH v2 0/3] SELinux support for anonymous inodes and UFFD
+From:   Daniel Colascione <dancol@google.com>
+To:     timmurray@google.com, selinux@vger.kernel.org,
+        linux-security-module@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, viro@zeniv.linux.org.uk, paul@paul-moore.com,
+        nnk@google.com, sds@tycho.nsa.gov, lokeshgidra@google.com
+Cc:     Daniel Colascione <dancol@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Zenghui,
+Userfaultfd in unprivileged contexts could be potentially very
+useful. We'd like to harden userfaultfd to make such unprivileged use
+less risky. This patch series allows SELinux to manage userfaultfd
+file descriptors and in the future, other kinds of
+anonymous-inode-based file descriptor.  SELinux policy authors can
+apply policy types to anonymous inodes by providing name-based
+transition rules keyed off the anonymous inode internal name (
+"[userfaultfd]" in the case of userfaultfd(2) file descriptors) and
+applying policy to the new SIDs thus produced.
 
-On 3/25/20 9:10 AM, Zenghui Yu wrote:
-> Hi Eric,
->=20
-> On 2020/3/20 17:24, Eric Auger wrote:
->> Introduce an helper functions to register
->> - a new device, characterized by its device id and the
->> =C2=A0=C2=A0 max number of event IDs that dimension its ITT (Interrupt
->> =C2=A0=C2=A0 Translation Table).=C2=A0 The function allocates the ITT.
->>
->> - a new collection, characterized by its ID and the
->> =C2=A0=C2=A0 target processing engine (PE).
->>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->>
->> ---
->>
->> v3 -> v4:
->> - remove unused its_baser variable from its_create_device()
->> - use get_order()
->> - device->itt becomes a GVA instead of GPA
->>
->> v2 -> v3:
->> - s/report_abort/assert
->>
->> v1 -> v2:
->> - s/nb_/nr_
->> ---
->> =C2=A0 lib/arm64/asm/gic-v3-its.h | 19 +++++++++++++++++++
->> =C2=A0 lib/arm64/gic-v3-its.c=C2=A0=C2=A0=C2=A0=C2=A0 | 38 +++++++++++=
-+++++++++++++++++++++++++++
->> =C2=A0 2 files changed, 57 insertions(+)
->>
->> diff --git a/lib/arm64/asm/gic-v3-its.h b/lib/arm64/asm/gic-v3-its.h
->> index 4683011..adcb642 100644
->> --- a/lib/arm64/asm/gic-v3-its.h
->> +++ b/lib/arm64/asm/gic-v3-its.h
->> @@ -31,6 +31,19 @@ struct its_baser {
->> =C2=A0 };
->> =C2=A0 =C2=A0 #define GITS_BASER_NR_REGS=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 8
->> +#define GITS_MAX_DEVICES=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 8
->> +#define GITS_MAX_COLLECTIONS=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- 8
->> +
->> +struct its_device {
->> +=C2=A0=C2=A0=C2=A0 u32 device_id;=C2=A0=C2=A0=C2=A0 /* device ID */
->> +=C2=A0=C2=A0=C2=A0 u32 nr_ites;=C2=A0=C2=A0=C2=A0 /* Max Interrupt Tr=
-anslation Entries */
->> +=C2=A0=C2=A0=C2=A0 void *itt;=C2=A0=C2=A0=C2=A0 /* Interrupt Translat=
-ion Table GVA */
->> +};
->> +
->> +struct its_collection {
->> +=C2=A0=C2=A0=C2=A0 u64 target_address;
->> +=C2=A0=C2=A0=C2=A0 u16 col_id;
->> +};
->> =C2=A0 =C2=A0 struct its_data {
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 void *base;
->> @@ -39,6 +52,10 @@ struct its_data {
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 struct its_baser coll_baser;
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 struct its_cmd_block *cmd_base;
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 struct its_cmd_block *cmd_write;
->> +=C2=A0=C2=A0=C2=A0 struct its_device devices[GITS_MAX_DEVICES];
->> +=C2=A0=C2=A0=C2=A0 u32 nr_devices;=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 /* Allocated Devices */
->> +=C2=A0=C2=A0=C2=A0 struct its_collection collections[GITS_MAX_COLLECT=
-IONS];
->> +=C2=A0=C2=A0=C2=A0 u32 nr_collections;=C2=A0=C2=A0=C2=A0 /* Allocated=
- Collections */
->> =C2=A0 };
->> =C2=A0 =C2=A0 extern struct its_data its_data;
->> @@ -93,5 +110,7 @@ extern void its_parse_typer(void);
->> =C2=A0 extern void its_init(void);
->> =C2=A0 extern int its_baser_lookup(int i, struct its_baser *baser);
->> =C2=A0 extern void its_enable_defaults(void);
->> +extern struct its_device *its_create_device(u32 dev_id, int nr_ites);
->> +extern struct its_collection *its_create_collection(u32 col_id, u32
->> target_pe);
->=20
-> Maybe use 'u16 col_id'?
-fair enough. At this point, not sure this is worth a respin though ;-)
->=20
-> Besides,
-> Reviewed-by: Zenghui Yu <yuzenghui@huawei.com>
-Thanks!
+Inside the kernel, a pair of new anon_inodes interface,
+anon_inode_getfile_secure and anon_inode_getfd_secure, allow callers
+to opt into this SELinux management. In this new "secure" mode,
+anon_inodes creates new ephemeral inodes for anonymous file objects
+instead of reusing the normal anon_inodes singleton dummy inode. A new
+LSM hook gives security modules an opportunity to configure and veto
+these ephemeral inodes.
 
-Eric
+This patch series is one of two fork of [1] and is an
+alternative to [2].
 
+The primary difference between the two patch series is that this
+partch series creates a unique inode for each "secure" anonymous
+inode, while the other patch series ([2]) continues using the
+singleton dummy anonymous inode and adds a way to attach SELinux
+security information directly to file objects.
 
+I prefer the approach in this patch series because 1) it's a smaller
+patch than [2], and 2) it produces a more regular security
+architecture: in this patch series, secure anonymous inodes aren't
+S_PRIVATE and they maintain the SELinux property that the label for a
+file is in its inode. We do need an additional inode per anonymous
+file, but per-struct-file inode creation doesn't seem to be a problem
+for pipes and sockets.
 
+The previous version of this feature ([1]) created a new SELinux
+security class for userfaultfd file descriptors. This version adopts
+the generic transition-based approach of [2].
 
->=20
->=20
-> Thanks
->=20
->=20
+This patch series also differs from [2] in that it doesn't affect all
+anonymous inodes right away --- instead requiring anon_inodes callers
+to opt in --- but this difference isn't one of basic approach. The
+important question to resolve is whether we should be creating new
+inodes or enhancing per-file data.
+
+Changes from the first version of the patch:
+
+  - Removed some error checks
+  - Defined a new anon_inode SELinux class to resolve the
+    ambiguity in [3]
+  - Inherit sclass as well as descriptor from context inode
+
+[1] https://lore.kernel.org/lkml/20200211225547.235083-1-dancol@google.com/
+[2] https://lore.kernel.org/linux-fsdevel/20200213194157.5877-1-sds@tycho.nsa.gov/
+[3] https://lore.kernel.org/lkml/23f725ca-5b5a-5938-fcc8-5bbbfc9ba9bc@tycho.nsa.gov/
+
+Daniel Colascione (3):
+  Add a new LSM-supporting anonymous inode interface
+  Teach SELinux about anonymous inodes
+  Wire UFFD up to SELinux
+
+ fs/anon_inodes.c                    | 196 ++++++++++++++++++++++------
+ fs/userfaultfd.c                    |  30 ++++-
+ include/linux/anon_inodes.h         |  13 ++
+ include/linux/lsm_hooks.h           |   9 ++
+ include/linux/security.h            |   4 +
+ security/security.c                 |  10 ++
+ security/selinux/hooks.c            |  54 ++++++++
+ security/selinux/include/classmap.h |   2 +
+ 8 files changed, 272 insertions(+), 46 deletions(-)
+
+-- 
+2.25.1.696.g5e7596f4ac-goog
 
