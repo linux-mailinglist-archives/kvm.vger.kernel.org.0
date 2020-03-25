@@ -2,131 +2,165 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3F9BC192D03
-	for <lists+kvm@lfdr.de>; Wed, 25 Mar 2020 16:41:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6D0D6192D2F
+	for <lists+kvm@lfdr.de>; Wed, 25 Mar 2020 16:47:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727868AbgCYPlN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Mar 2020 11:41:13 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:51512 "EHLO
+        id S1727832AbgCYPrG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Mar 2020 11:47:06 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:23787 "EHLO
         us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727574AbgCYPlN (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 25 Mar 2020 11:41:13 -0400
+        by vger.kernel.org with ESMTP id S1727604AbgCYPrF (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 25 Mar 2020 11:47:05 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1585150872;
+        s=mimecast20190719; t=1585151224;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=/Ngiuyi2mPOkcihv5oJIqBDsHsKSsKleu59l1oFbskM=;
-        b=RyKwMif1TJyCfgXvXlK70cF/HAH2Z6Kux+E7tqzMnclvUOrjWHZrlYkyUe9jx8xQ7+xVWE
-        /C/Ka6LqMqq3dUPUG1sHTjs/zn2FouVs/O4B8MgOEScsyHl0w9lvXW7ILmnZih2LEM6pWc
-        4jXloO5hOVtEYA6zP0euqE5XtBVHd5k=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-230-gz7eeyyPN2-Vj0Sjoh2UsQ-1; Wed, 25 Mar 2020 11:41:10 -0400
-X-MC-Unique: gz7eeyyPN2-Vj0Sjoh2UsQ-1
-Received: by mail-wr1-f69.google.com with SMTP id i18so1311476wrx.17
-        for <kvm@vger.kernel.org>; Wed, 25 Mar 2020 08:41:10 -0700 (PDT)
+        bh=qsbegkRHan3DuLAELekm42LLJlFfOlzRQS+36Fq49pk=;
+        b=DrkW3h+jrpqaKjuT7YyVUngqTMoI+otackCmfh7MeP/7Jpqmc3EbgyGdqReo4UK7AN7P7w
+        COiMi26EJPm4ufOCVCvjG0Szy5OMQ1ph0YTqUN0gHMOMaEQo2/hllaKEsJhAx6LXWxwpUw
+        1p/3GW57HweE4r1IAjX3LbzYV0DW1JY=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-250-8_37EQ8LNVqdMPGkBj7Mlg-1; Wed, 25 Mar 2020 11:47:02 -0400
+X-MC-Unique: 8_37EQ8LNVqdMPGkBj7Mlg-1
+Received: by mail-wm1-f69.google.com with SMTP id g9so2635311wmh.1
+        for <kvm@vger.kernel.org>; Wed, 25 Mar 2020 08:47:02 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=/Ngiuyi2mPOkcihv5oJIqBDsHsKSsKleu59l1oFbskM=;
-        b=rDiyYOrt/tbwvixzKI+uzVaMv0kuJfq1YHiZFpjwVkUPhXvqKPlhRWXuSe7ki0m9QB
-         t9M1cBGGIt2jN+YaL+w5Yg9xbiKhLTl5ZnTXHk11rw3c5B/23nlbpvu4k2TfwJLROlnh
-         9WhbD6YasAujKGA/WaMVEt35uxVQwY423cBYrP9jbzExbD6krBJfwJdGStBCX4Sd2PAs
-         J2CPaIt14rtokIJqtJsPKLUAefky2Ptp4gXu/s7Lowvh+cHCZs7r4GxT14Wo9ngdRndE
-         vyAqLTd3CwD1Lx7J4JPNnYDK+AHen30JkqFUPeiQxEtcY/+0V9jvPfD4BookAV7mJKTm
-         RsiA==
-X-Gm-Message-State: ANhLgQ3VEraoFbxdohJ7ex8eUHSXH6kjAla4jszFvdXfHZcv1I+6rpBk
-        JpgUnlMvYgRkdura9NLylbwli3YxKMoo9qAOC57oiCyV5P0ohh0+NppIStV5AOP1FAIWN7klNw9
-        ZC2Gf0uw6PeMF
-X-Received: by 2002:a7b:c92d:: with SMTP id h13mr3959971wml.120.1585150869592;
-        Wed, 25 Mar 2020 08:41:09 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vvbr1+l/xZMbMViqldvquG3f4mIsOv7XLQLH9qfgp9XfXr6o0IjBTSGNeUaZgxu8Y59Ae59mQ==
-X-Received: by 2002:a7b:c92d:: with SMTP id h13mr3959958wml.120.1585150869364;
-        Wed, 25 Mar 2020 08:41:09 -0700 (PDT)
+        bh=qsbegkRHan3DuLAELekm42LLJlFfOlzRQS+36Fq49pk=;
+        b=JdknArvyGVbME1+sTl+dbeiq44unNz4tbikJEulRZ1GNnsBHE7rYzoletomMh6xKiX
+         ebKVpeUpL07Rq7hVZpO4GrkxxlByoAKYarYKjY6w0ea46rqGqSMY0NhwvaWVbkQXvK5B
+         WOyybjMWots3WDnaq4/VXaJtq3exzRpv+ff6N/JkuxTYKxYS/cgf98pmYx0uv/wq0lRL
+         QMqFmA8+3Rttkw3BbMAVvo2UVftsin7pXvEssmyB42pELPYZhpsPUnon6+5A1MHM2hiB
+         Kan2lyJCNfA4HutewiaZ1DRJpLhtzkp0T8LSyf9TYEE2f/vFt6Dg1u4jw97GNJ4adYbA
+         0zsw==
+X-Gm-Message-State: ANhLgQ1uC6peImdZ9x8AXcmcnSjvmicFhqOoZtoT+ZP1mut9nePwnhiL
+        flafBKlenmK0TyD61qxOUw86O3lvX8KKWVsnwRHBIpAsPkj3CJ7dtjm3R26yyengN9LZTKIbuUw
+        mnED3kvZbPBvt
+X-Received: by 2002:adf:aa04:: with SMTP id p4mr3916821wrd.238.1585151221107;
+        Wed, 25 Mar 2020 08:47:01 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vsZHECaet0KUWkvOJFnDgmZuy8qHncmITJGzzqdVDGD2FrO8zw/XQ7rMXn+OVGg5IylvX4GdA==
+X-Received: by 2002:adf:aa04:: with SMTP id p4mr3916792wrd.238.1585151220818;
+        Wed, 25 Mar 2020 08:47:00 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:e4f4:3c00:2b79:d6dc? ([2001:b07:6468:f312:e4f4:3c00:2b79:d6dc])
-        by smtp.gmail.com with ESMTPSA id n9sm6377963wru.50.2020.03.25.08.41.07
+        by smtp.gmail.com with ESMTPSA id m5sm2523976wmg.13.2020.03.25.08.46.59
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 25 Mar 2020 08:41:08 -0700 (PDT)
-Subject: Re: [PATCH v3 14/37] KVM: x86: Move "flush guest's TLB" logic to
- separate kvm_x86_ops hook
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Wanpeng Li <wanpengli@tencent.com>,
+        Wed, 25 Mar 2020 08:47:00 -0700 (PDT)
+Subject: Re: linux-next: Tree for Mar 25 (arch/x86/kvm/)
+To:     Randy Dunlap <rdunlap@infradead.org>,
+        Stephen Rothwell <sfr@canb.auug.org.au>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>
+Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        KVM <kvm@vger.kernel.org>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Ben Gardon <bgardon@google.com>,
-        Junaid Shahid <junaids@google.com>,
-        Liran Alon <liran.alon@oracle.com>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        John Haxby <john.haxby@oracle.com>,
-        Miaohe Lin <linmiaohe@huawei.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>
-References: <20200320212833.3507-1-sean.j.christopherson@intel.com>
- <20200320212833.3507-15-sean.j.christopherson@intel.com>
- <87369w7mxe.fsf@vitty.brq.redhat.com>
+        Joerg Roedel <joro@8bytes.org>
+References: <20200325195350.7300fee9@canb.auug.org.au>
+ <e9286016-66ae-9505-ea52-834527cdae27@infradead.org>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <9d1ef88c-2b68-58c5-c62e-8b123187e573@redhat.com>
-Date:   Wed, 25 Mar 2020 16:41:07 +0100
+Message-ID: <d9af8094-96c3-3b7f-835c-4e48d157e582@redhat.com>
+Date:   Wed, 25 Mar 2020 16:46:58 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <87369w7mxe.fsf@vitty.brq.redhat.com>
+In-Reply-To: <e9286016-66ae-9505-ea52-834527cdae27@infradead.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 25/03/20 11:23, Vitaly Kuznetsov wrote:
-> What do you think about the following (very lightly
-> tested)?
+On 25/03/20 16:30, Randy Dunlap wrote:
+> 24 (only showing one of them here) BUILD_BUG() errors in arch/x86/kvm/cpuid.h
+> function __cpuid_entry_get_reg(), for the default: case.
 > 
-> commit 485b4a579605597b9897b3d9ec118e0f7f1138ad
-> Author: Vitaly Kuznetsov <vkuznets@redhat.com>
-> Date:   Wed Mar 25 11:14:25 2020 +0100
 > 
->     KVM: x86: make Hyper-V PV TLB flush use tlb_flush_guest()
->     
->     Hyper-V PV TLB flush mechanism does TLB flush on behalf of the guest
->     so doing tlb_flush_all() is an overkill, switch to using tlb_flush_guest()
->     (just like KVM PV TLB flush mechanism) instead. Introduce
->     KVM_REQ_HV_TLB_FLUSH to support the change.
->     
->     Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+>   CC      arch/x86/kvm/cpuid.o
+> In file included from ../include/linux/export.h:43:0,
+>                  from ../include/linux/linkage.h:7,
+>                  from ../include/linux/preempt.h:10,
+>                  from ../include/linux/hardirq.h:5,
+>                  from ../include/linux/kvm_host.h:7,
+>                  from ../arch/x86/kvm/cpuid.c:12:
+> In function ‘__cpuid_entry_get_reg’,
+>     inlined from ‘kvm_cpu_cap_mask’ at ../arch/x86/kvm/cpuid.c:272:25,
+>     inlined from ‘kvm_set_cpu_caps’ at ../arch/x86/kvm/cpuid.c:292:2:
+> ../include/linux/compiler.h:394:38: error: call to ‘__compiletime_assert_114’ declared with attribute error: BUILD_BUG failed
+>   _compiletime_assert(condition, msg, __compiletime_assert_, __LINE__)
+>                                       ^
+> ../include/linux/compiler.h:375:4: note: in definition of macro ‘__compiletime_assert’
+>     prefix ## suffix();    \
+>     ^~~~~~
+> ../include/linux/compiler.h:394:2: note: in expansion of macro ‘_compiletime_assert’
+>   _compiletime_assert(condition, msg, __compiletime_assert_, __LINE__)
+>   ^~~~~~~~~~~~~~~~~~~
+> ../include/linux/build_bug.h:39:37: note: in expansion of macro ‘compiletime_assert’
+>  #define BUILD_BUG_ON_MSG(cond, msg) compiletime_assert(!(cond), msg)
+>                                      ^~~~~~~~~~~~~~~~~~
+> ../include/linux/build_bug.h:59:21: note: in expansion of macro ‘BUILD_BUG_ON_MSG’
+>  #define BUILD_BUG() BUILD_BUG_ON_MSG(1, "BUILD_BUG failed")
+>                      ^~~~~~~~~~~~~~~~
+> ../arch/x86/kvm/cpuid.h:114:3: note: in expansion of macro ‘BUILD_BUG’
+>    BUILD_BUG();
+>    ^~~~~~~~~
 > 
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 167729624149..8c5659ed211b 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -84,6 +84,7 @@
->  #define KVM_REQ_APICV_UPDATE \
->  	KVM_ARCH_REQ_FLAGS(25, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
->  #define KVM_REQ_TLB_FLUSH_CURRENT	KVM_ARCH_REQ(26)
-> +#define KVM_REQ_HV_TLB_FLUSH		KVM_ARCH_REQ(27)
->  
->  #define CR0_RESERVED_BITS                                               \
->  	(~(unsigned long)(X86_CR0_PE | X86_CR0_MP | X86_CR0_EM | X86_CR0_TS \
-> diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
-> index a86fda7a1d03..0d051ed11f38 100644
-> --- a/arch/x86/kvm/hyperv.c
-> +++ b/arch/x86/kvm/hyperv.c
-> @@ -1425,8 +1425,7 @@ static u64 kvm_hv_flush_tlb(struct kvm_vcpu *current_vcpu, u64 ingpa,
->  	 * vcpu->arch.cr3 may not be up-to-date for running vCPUs so we can't
->  	 * analyze it here, flush TLB regardless of the specified address space.
->  	 */
-> -	kvm_make_vcpus_request_mask(kvm,
-> -				    KVM_REQ_TLB_FLUSH | KVM_REQUEST_NO_WAKEUP,
-> +	kvm_make_vcpus_request_mask(kvm, KVM_REQ_HV_TLB_FLUSH,
->  				    vcpu_mask, &hv_vcpu->tlb_flush);
->  
 
-Looks good, but why are you dropping KVM_REQUEST_NO_WAKEUP?
+Looks like the compiler is not smart enough to figure out the constant 
+expressions in BUILD_BUG.  I think we need to do something like this:
+
+diff --git a/arch/x86/kvm/cpuid.h b/arch/x86/kvm/cpuid.h
+index 23b4cd1ad986..8f711b0cdec0 100644
+--- a/arch/x86/kvm/cpuid.h
++++ b/arch/x86/kvm/cpuid.h
+@@ -40,6 +40,7 @@ struct cpuid_reg {
+ 	int reg;
+ };
+ 
++/* Update reverse_cpuid_check as well when adding an entry.  */
+ static const struct cpuid_reg reverse_cpuid[] = {
+ 	[CPUID_1_EDX]         = {         1, 0, CPUID_EDX},
+ 	[CPUID_8000_0001_EDX] = {0x80000001, 0, CPUID_EDX},
+@@ -68,12 +69,21 @@ static const struct cpuid_reg reverse_cpuid[] = {
+  */
+ static __always_inline void reverse_cpuid_check(unsigned int x86_leaf)
+ {
+-	BUILD_BUG_ON(x86_leaf == CPUID_LNX_1);
+-	BUILD_BUG_ON(x86_leaf == CPUID_LNX_2);
+-	BUILD_BUG_ON(x86_leaf == CPUID_LNX_3);
+-	BUILD_BUG_ON(x86_leaf == CPUID_LNX_4);
+-	BUILD_BUG_ON(x86_leaf >= ARRAY_SIZE(reverse_cpuid));
+-	BUILD_BUG_ON(reverse_cpuid[x86_leaf].function == 0);
++	BUILD_BUG_ON(x86_leaf != CPUID_1_EDX &&
++	             x86_leaf != CPUID_8000_0001_EDX &&
++	             x86_leaf != CPUID_8086_0001_EDX &&
++	             x86_leaf != CPUID_1_ECX &&
++	             x86_leaf != CPUID_C000_0001_EDX &&
++	             x86_leaf != CPUID_8000_0001_ECX &&
++	             x86_leaf != CPUID_7_0_EBX &&
++	             x86_leaf != CPUID_D_1_EAX &&
++	             x86_leaf != CPUID_8000_0008_EBX &&
++	             x86_leaf != CPUID_6_EAX &&
++	             x86_leaf != CPUID_8000_000A_EDX &&
++	             x86_leaf != CPUID_7_ECX &&
++	             x86_leaf != CPUID_8000_0007_EBX &&
++	             x86_leaf != CPUID_7_EDX &&
++	             x86_leaf != CPUID_7_1_EAX);
+ }
+ 
+ /*
+
+Randy, can you test it with your compiler?
+
+Thanks,
 
 Paolo
 
