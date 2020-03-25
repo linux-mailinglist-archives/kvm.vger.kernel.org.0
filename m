@@ -2,54 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 84E85192BD8
-	for <lists+kvm@lfdr.de>; Wed, 25 Mar 2020 16:06:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D2D4F192BF1
+	for <lists+kvm@lfdr.de>; Wed, 25 Mar 2020 16:12:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727890AbgCYPGp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Mar 2020 11:06:45 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:48170 "EHLO
+        id S1727697AbgCYPMa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Mar 2020 11:12:30 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:41212 "EHLO
         us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727642AbgCYPGo (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 25 Mar 2020 11:06:44 -0400
+        by vger.kernel.org with ESMTP id S1726102AbgCYPM3 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 25 Mar 2020 11:12:29 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1585148803;
+        s=mimecast20190719; t=1585149148;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=FAab9/HeMr7kMt5AjMuUFNn2lljVsGjPi5izW+gN+7c=;
-        b=DxOxkkkWi3GQT79jwnTxKSbRWM/9fYYmKwVIlOJB8E71ANBCWTICwf4fLKmfdLUcIQfwFy
-        vkCuoQ6dCO22b3FrORqMByMoYtI55o3mcNRRNocjKasuICjCK+gtlJkrzFntZAQMabbJj2
-        n2LN6w0oCZM7ItWzGDI7+tEn2i39YSI=
+        bh=BF8rpSmfd7uy+0GUmrMmaYfuGnMqUZoMQRMQpXoo6Oc=;
+        b=Z0q/ZIywGvvqLaH+Leb9NNs7WD2PD1gxEry7n9hh8eDl90PurRd3G1RK2g8xct7kCMMYSL
+        FqrFp/hL3dk1pU25YrO8wc2LUi5WUqAsbtZhXmYgMVKlNyRdOauPuErpCtJUb8VuB0eb4/
+        z66tvVSa7uGqvZg7obQumdyzdrHMtPo=
 Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
  [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-167-da23c1xbMN-3j7W5msRqBw-1; Wed, 25 Mar 2020 11:06:42 -0400
-X-MC-Unique: da23c1xbMN-3j7W5msRqBw-1
-Received: by mail-wr1-f71.google.com with SMTP id f15so1293100wrt.4
-        for <kvm@vger.kernel.org>; Wed, 25 Mar 2020 08:06:40 -0700 (PDT)
+ us-mta-198-7E13GZBFOGOnGI1r4WVdig-1; Wed, 25 Mar 2020 11:12:11 -0400
+X-MC-Unique: 7E13GZBFOGOnGI1r4WVdig-1
+Received: by mail-wr1-f71.google.com with SMTP id o18so1289313wrx.9
+        for <kvm@vger.kernel.org>; Wed, 25 Mar 2020 08:12:11 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=FAab9/HeMr7kMt5AjMuUFNn2lljVsGjPi5izW+gN+7c=;
-        b=AH6knuOlA3wFWH2SBTGWS4Yc8d413tnbxqQBcBC18u5U+KxtM2jasUEheCEBFe8uQA
-         l2NttSUxyuYfx+HVXbzbLBI5jf/A77oxNUX0idrBI1lmjhI3ZeHNDDFo2HovDBqwmxr2
-         iLm1yZL89lqFIyoGrgd0oLQVgj3wwe6tKWWUnr0sLk8m9i5QOG8PWXpJGkLv93IWWDi+
-         bz6ndBIz4Fwh+L7BajcVmUbK5P3GpqtVjiTSOHk1BURJxejH6TGA3msDSfjxnpuXoLJS
-         xiAiR8IOKWT7ZIioPGGk35Jgumi0lrpF0b4Skx37OI3sc/Vv8eqX0wucCgpdIlV30FeS
-         y4Hg==
-X-Gm-Message-State: ANhLgQ3fSs/GPxGGNiZSiDy1NASTaZ0y9AxfydwG1o2jyfd3vGY8COQK
-        tLjvUZ01HQFij+Bnpw/ses/hPP3vBC8W1fpc8SXppQnRF0pab+JOTuNQLocE0tNVPL36jcHEpkt
-        XeQJEKCOGXecY
-X-Received: by 2002:adf:b641:: with SMTP id i1mr3983429wre.18.1585148799873;
-        Wed, 25 Mar 2020 08:06:39 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vt5ETVSo8dR+R+7i8SSLf/LUWWs9NXlkdrJEmQOHyPVXPwdmfg86Sy0hcGgWkpOc6gB33aZuA==
-X-Received: by 2002:adf:b641:: with SMTP id i1mr3983412wre.18.1585148799682;
-        Wed, 25 Mar 2020 08:06:39 -0700 (PDT)
+        bh=BF8rpSmfd7uy+0GUmrMmaYfuGnMqUZoMQRMQpXoo6Oc=;
+        b=b7QivK43XuL/VhFpPJUUMunfqdhLHk0HOcQY3pM+u7JiIFIE312CtHS9UhUsH98ISg
+         yOqkaPyi8GrpIs0Mh7UmSb7OlR+te2ES/E/XvCsqGnOA0NVF4XazW8Ey+7785SJweEuv
+         z7EqVR5Po/L3Lon39zdJUcc1XhpVzJ+Fft4GSzBkJbL+eKZldP3fKUqK6vfMxQwJpzZ0
+         gDgTLobR8fTtPWRK7thaxZXXgoDzifm1ocM8mc8on/7R5QiOOddg1VvYe9nUulV48pr9
+         qHTh3xf2WO92l2KKGDisEyhuCmlgYbOofpNC7NoPDwuDN6SjwLc5UdddmgVUpJOpREHJ
+         RGwg==
+X-Gm-Message-State: ANhLgQ0Vt+B0JbgfZMLC4AMEZlXA949GAvOLkIdl3Lt2LmbbIKl3sCoC
+        5RaaHaxw4ezYJ0Krz8wyf3U3Y7eY2K+gPMgi690IOiuIBcsxrHQivQQGd6VWQo6tyE2M5HamJ6T
+        3n5I+hXVFU9Ys
+X-Received: by 2002:adf:82a6:: with SMTP id 35mr3958056wrc.307.1585149130644;
+        Wed, 25 Mar 2020 08:12:10 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vvJSAeAijCToDir/jXjYps+m1+WT66rSqwQyM4y5jMfMZPwTvoFMa55jDZ/hXUUp/cd520hqw==
+X-Received: by 2002:adf:82a6:: with SMTP id 35mr3958028wrc.307.1585149130322;
+        Wed, 25 Mar 2020 08:12:10 -0700 (PDT)
 Received: from xz-x1 ([2607:9880:19c0:32::2])
-        by smtp.gmail.com with ESMTPSA id w204sm9654772wma.1.2020.03.25.08.06.36
+        by smtp.gmail.com with ESMTPSA id k126sm9743577wme.4.2020.03.25.08.12.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Mar 2020 08:06:39 -0700 (PDT)
-Date:   Wed, 25 Mar 2020 11:06:34 -0400
+        Wed, 25 Mar 2020 08:12:09 -0700 (PDT)
+Date:   Wed, 25 Mar 2020 11:12:05 -0400
 From:   Peter Xu <peterx@redhat.com>
 To:     "Liu, Yi L" <yi.l.liu@intel.com>
 Cc:     "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
@@ -66,88 +66,101 @@ Cc:     "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
         "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
         Jacob Pan <jacob.jun.pan@linux.intel.com>,
         Yi Sun <yi.y.sun@linux.intel.com>,
-        Richard Henderson <rth@twiddle.net>
-Subject: Re: [PATCH v1 15/22] intel_iommu: replay guest pasid bindings to host
-Message-ID: <20200325150634.GC354390@xz-x1>
+        Richard Henderson <rth@twiddle.net>,
+        Eduardo Habkost <ehabkost@redhat.com>
+Subject: Re: [PATCH v1 17/22] intel_iommu: do not pass down pasid bind for
+ PASID #0
+Message-ID: <20200325151205.GD354390@xz-x1>
 References: <1584880579-12178-1-git-send-email-yi.l.liu@intel.com>
- <1584880579-12178-16-git-send-email-yi.l.liu@intel.com>
- <20200324180013.GZ127076@xz-x1>
- <A2975661238FB949B60364EF0F2C25743A202251@SHSMSX104.ccr.corp.intel.com>
+ <1584880579-12178-18-git-send-email-yi.l.liu@intel.com>
+ <20200324181326.GB127076@xz-x1>
+ <A2975661238FB949B60364EF0F2C25743A201FC7@SHSMSX104.ccr.corp.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <A2975661238FB949B60364EF0F2C25743A202251@SHSMSX104.ccr.corp.intel.com>
+In-Reply-To: <A2975661238FB949B60364EF0F2C25743A201FC7@SHSMSX104.ccr.corp.intel.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 25, 2020 at 01:14:26PM +0000, Liu, Yi L wrote:
-
-[...]
-
-> > > +/**
-> > > + * Caller of this function should hold iommu_lock.
-> > > + */
-> > > +static bool vtd_sm_pasid_table_walk_one(IntelIOMMUState *s,
-> > > +                                        dma_addr_t pt_base,
-> > > +                                        int start,
-> > > +                                        int end,
-> > > +                                        vtd_pasid_table_walk_info *info)
-> > > +{
-> > > +    VTDPASIDEntry pe;
-> > > +    int pasid = start;
-> > > +    int pasid_next;
-> > > +    VTDPASIDAddressSpace *vtd_pasid_as;
-> > > +    VTDPASIDCacheEntry *pc_entry;
-> > > +
-> > > +    while (pasid < end) {
-> > > +        pasid_next = pasid + 1;
-> > > +
-> > > +        if (!vtd_get_pe_in_pasid_leaf_table(s, pasid, pt_base, &pe)
-> > > +            && vtd_pe_present(&pe)) {
-> > > +            vtd_pasid_as = vtd_add_find_pasid_as(s,
-> > > +                                       info->vtd_bus, info->devfn, pasid);
+On Wed, Mar 25, 2020 at 10:42:25AM +0000, Liu, Yi L wrote:
+> > From: Peter Xu < peterx@redhat.com>
+> > Sent: Wednesday, March 25, 2020 2:13 AM
+> > To: Liu, Yi L <yi.l.liu@intel.com>
+> > Subject: Re: [PATCH v1 17/22] intel_iommu: do not pass down pasid bind for PASID
+> > #0
 > > 
-> > For this chunk:
+> > On Sun, Mar 22, 2020 at 05:36:14AM -0700, Liu Yi L wrote:
+> > > RID_PASID field was introduced in VT-d 3.0 spec, it is used for DMA
+> > > requests w/o PASID in scalable mode VT-d. It is also known as IOVA.
+> > > And in VT-d 3.1 spec, there is definition on it:
+> > >
+> > > "Implementations not supporting RID_PASID capability (ECAP_REG.RPS is
+> > > 0b), use a PASID value of 0 to perform address translation for
+> > > requests without PASID."
+> > >
+> > > This patch adds a check against the PASIDs which are going to be bound
+> > > to device. For PASID #0, it is not necessary to pass down pasid bind
+> > > request for it since PASID #0 is used as RID_PASID for DMA requests
+> > > without pasid. Further reason is current Intel vIOMMU supports gIOVA
+> > > by shadowing guest 2nd level page table. However, in future, if guest
+> > > IOMMU driver uses 1st level page table to store IOVA mappings, then
+> > > guest IOVA support will also be done via nested translation. When
+> > > gIOVA is over FLPT, then vIOMMU should pass down the pasid bind
+> > > request for PASID #0 to host, host needs to bind the guest IOVA page
+> > > table to a proper PASID. e.g PASID value in RID_PASID field for PF/VF
+> > > if ECAP_REG.RPS is clear or default PASID for ADI (Assignable Device
+> > > Interface in Scalable IOV solution).
+> > >
+> > > IOVA over FLPT support on Intel VT-d:
+> > > https://lkml.org/lkml/2019/9/23/297
+> > >
+> > > Cc: Kevin Tian <kevin.tian@intel.com>
+> > > Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
+> > > Cc: Peter Xu <peterx@redhat.com>
+> > > Cc: Yi Sun <yi.y.sun@linux.intel.com>
+> > > Cc: Paolo Bonzini <pbonzini@redhat.com>
+> > > Cc: Richard Henderson <rth@twiddle.net>
+> > > Cc: Eduardo Habkost <ehabkost@redhat.com>
+> > > Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
+> > > ---
+> > >  hw/i386/intel_iommu.c | 10 ++++++++++
+> > >  1 file changed, 10 insertions(+)
+> > >
+> > > diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c index
+> > > 1e0ccde..b007715 100644
+> > > --- a/hw/i386/intel_iommu.c
+> > > +++ b/hw/i386/intel_iommu.c
+> > > @@ -1886,6 +1886,16 @@ static int vtd_bind_guest_pasid(IntelIOMMUState *s,
+> > VTDBus *vtd_bus,
+> > >      struct iommu_gpasid_bind_data *g_bind_data;
+> > >      int ret = -1;
+> > >
+> > > +    if (pasid < VTD_MIN_HPASID) {
+> > > +        /*
+> > > +         * If pasid < VTD_HPASID_MIN, this pasid is not allocated
 > > 
-> > > +            pc_entry = &vtd_pasid_as->pasid_cache_entry;
-> > > +            if (s->pasid_cache_gen == pc_entry->pasid_cache_gen) {
-> > > +                vtd_update_pe_in_cache(s, vtd_pasid_as, &pe);
-> > > +            } else {
-> > > +                vtd_fill_in_pe_in_cache(s, vtd_pasid_as, &pe);
-> > > +            }
-> > 
-> > We already got &pe, then would it be easier to simply call:
-> > 
-> >                vtd_update_pe_in_cache(s, vtd_pasid_as, &pe);
-> > 
-> > ?
+> > s/VTD_HPASID_MIN/VTD_MIN_HPASID/.
 > 
-> If the pasid_cache_gen is equal to iommu_state's, then it means there is
-> a chance that the cached pasid entry is equal to pe here. While for the
-> else case, it is surely there is no valid pasid entry in the pasid_as. And
-> the difference between vtd_update_pe_in_cache() and
-> vtd_fill_in_pe_in_cache() is whether do a compare between the new pasid entry
-> and cached pasid entry.
+> Got it.
 > 
-> > Since IIUC the cache_gen is only helpful to avoid looking up the &pe.
-> > And the vtd_pasid_entry_compare() check should be even more solid than
-> > the cache_gen.
+> > 
+> > > +         * from host. No need to pass down the changes on it to host.
+> > > +         * TODO: when IOVA over FLPT is ready, this switch should be
+> > > +         * refined.
+> > 
+> > What will happen if without this patch?  Is it a must?
 > 
-> But if the cache_gen is not equal the one in iommu_state, then the cached
-> pasid entry is not valid at all. The compare is only needed after the cache_gen
-> is checked.
+> Before gIOVA is supported by nested translation, it is a must. This requires
+> IOVA over 1st level page table is ready in guest kernel, also requires the
+> QEMU/VFIO supports to bind the guest IOVA page table to host.
+> Currently, guest kernel side is ready. However, QEMU and VFIO side is
+> not.
 
-Wait... If "the pasid entry context" is already exactly the same as
-the "cached pasid entry context", why we still care the generation
-number?  I'd just update the generation to latest and cache it again.
-Maybe there's a tricky point when &pe==cache but generation number is
-old, then IIUC what we can do better is simply update the generation
-number to latest.
+OK:
 
-But OK - let's keep that.  I don't see anything incorrect with current
-code either.
+Reviewed-by: Peter Xu <peterx@redhat.com>
 
 -- 
 Peter Xu
