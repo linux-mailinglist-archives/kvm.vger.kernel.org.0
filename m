@@ -2,96 +2,145 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id DAE5E192D87
-	for <lists+kvm@lfdr.de>; Wed, 25 Mar 2020 16:55:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 89242192D92
+	for <lists+kvm@lfdr.de>; Wed, 25 Mar 2020 16:58:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727710AbgCYPzs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Mar 2020 11:55:48 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:28070 "EHLO
-        us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727592AbgCYPzs (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 25 Mar 2020 11:55:48 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1585151746;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Uyp5KQDbaTuA45q/Xax3q7Sq5x15XAtmyACKrevDWP4=;
-        b=AuKPokZljxUH28lSzuymVHwICEJ/MmjauPsiRDZQY4S+CHugABfleArJQ6tvSfPNV8FYIb
-        zpOsYRRxY8wW/mDZyXo2Oev6SPoapPreVELa8xaGA/8szej8trEzldpKUNtY5OhbKfie+e
-        wFummDeLCsQBFQH2Xgc0Rn/eKbvaanM=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-262-Yp9ch34mMBqeO03QSYzRHA-1; Wed, 25 Mar 2020 11:55:44 -0400
-X-MC-Unique: Yp9ch34mMBqeO03QSYzRHA-1
-Received: by mail-wr1-f69.google.com with SMTP id e10so1358505wrm.2
-        for <kvm@vger.kernel.org>; Wed, 25 Mar 2020 08:55:43 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=Uyp5KQDbaTuA45q/Xax3q7Sq5x15XAtmyACKrevDWP4=;
-        b=PCYA6fuiiOSAuaV+hQkGDjDdwSd/tmvsxTJ6KTtzCFP7gmMWoyEzefl0hcKbFHKN3a
-         SG0DdN+pwbPtnqqPZdClboqDdQDBy1jUqXNNDnZNS1X3MBpsOGBQMTY5rB5vD9yGIw9M
-         IMMhYxdN2PK1+S8jW/Ljrpknx6icuC8nYb3HzJCdwgBMZcW0S1QQlJS54x80m/bvnx/X
-         39lcNcoTa3ARoc0ElG92vypB1A0WVNXO6Xxb2swrMiLbvMaVX1afFfMKEcvZgO6IJ9OX
-         ASZuer6dIcDQOrxdKH6QM3yxrG5HFo9Gb8KZWLCr2EwtEWj3+v0cuqyf+Ls/t1s3DuPs
-         XOQw==
-X-Gm-Message-State: ANhLgQ1OyVKNzt8UOjzL8yCHEgpTKIINktbZ7djztmfzeQZsUbvPKIWN
-        +4K5KLMVvtXQDNAXJDy0QulaFQ+0+WoPqKVFrIU+gBOZHH+0ocQJOA1BOZqkSZWjdIXfQORFJdU
-        nr8Mrmz9ozexG
-X-Received: by 2002:a5d:510d:: with SMTP id s13mr4108644wrt.110.1585151742842;
-        Wed, 25 Mar 2020 08:55:42 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vtr84A74132XneFu/qdjCKJKKAo6gtWQw73ZQv5xSzVApoFiDmSQRc9YzMzr0NqEKEw83Qidw==
-X-Received: by 2002:a5d:510d:: with SMTP id s13mr4108625wrt.110.1585151742652;
-        Wed, 25 Mar 2020 08:55:42 -0700 (PDT)
-Received: from [192.168.10.150] ([93.56.170.5])
-        by smtp.gmail.com with ESMTPSA id y200sm9674775wmc.20.2020.03.25.08.55.41
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 25 Mar 2020 08:55:41 -0700 (PDT)
-Subject: Re: [PATCH] KVM: LAPIC: Also cancel preemption timer when disarm
- LAPIC timer
-To:     Wanpeng Li <kernellwp@gmail.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        id S1727768AbgCYP5v (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Mar 2020 11:57:51 -0400
+Received: from bombadil.infradead.org ([198.137.202.133]:51790 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727456AbgCYP5v (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 Mar 2020 11:57:51 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
+        Content-Type:In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:
+        Subject:Sender:Reply-To:Content-ID:Content-Description;
+        bh=0Nq4yxa20BJ37D0s9zLhKVxO/JAu1Z42ScKUYri07QE=; b=Z/NtPChqiONDSQ1rBH5Zm0gRDL
+        fJ27q2PwIEazs4iALNhvZqw0guyErk+s5SN9N1OTzDukEAwKlvvAGObBeZh96TXJujzhaBs2hjg6h
+        UtBvh3Irht1oTEwVXwZnrF8Nm5JvyUQbG27ZzZchwXrVcx0aMtxkmVZHKls3U990Q8CEgbnPtanli
+        k03nHr1rNW43oAke4lBo8U16gihxsyqTy0cbJvPq9a/Ffi+GEje+uCqYT4Bjj09y7Gm2UeaqGgBPb
+        OimelX9k2iqf78qNic+/dkvBoawQ2RaKZGnYCmisjVjuwrX6ZsjQ370U1u3NOrj0LS+4v1V0fWNFF
+        ADbH30MA==;
+Received: from [2601:1c0:6280:3f0::19c2]
+        by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1jH8PJ-0000jp-Ru; Wed, 25 Mar 2020 15:57:29 +0000
+Subject: Re: linux-next: Tree for Mar 25 (arch/x86/kvm/)
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Stephen Rothwell <sfr@canb.auug.org.au>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>
+Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        KVM <kvm@vger.kernel.org>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>
-References: <1585031530-19823-1-git-send-email-wanpengli@tencent.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <708f1914-be5e-91a0-2fdf-8d34b78ca7da@redhat.com>
-Date:   Wed, 25 Mar 2020 16:55:40 +0100
+References: <20200325195350.7300fee9@canb.auug.org.au>
+ <e9286016-66ae-9505-ea52-834527cdae27@infradead.org>
+ <d9af8094-96c3-3b7f-835c-4e48d157e582@redhat.com>
+From:   Randy Dunlap <rdunlap@infradead.org>
+Message-ID: <064720eb-2147-1b92-7a62-f89d6380f40a@infradead.org>
+Date:   Wed, 25 Mar 2020 08:57:28 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <1585031530-19823-1-git-send-email-wanpengli@tencent.com>
+In-Reply-To: <d9af8094-96c3-3b7f-835c-4e48d157e582@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 24/03/20 07:32, Wanpeng Li wrote:
->  			hrtimer_cancel(&apic->lapic_timer.timer);
-> +			preempt_disable();
-> +			if (apic->lapic_timer.hv_timer_in_use)
-> +				cancel_hv_timer(apic);
-> +			preempt_enable();
->  			kvm_lapic_set_reg(apic, APIC_TMICT, 0);
->  			apic->lapic_timer.period = 0;
->  			apic->lapic_timer.tscdeadline = 0;
+On 3/25/20 8:46 AM, Paolo Bonzini wrote:
+> On 25/03/20 16:30, Randy Dunlap wrote:
+>> 24 (only showing one of them here) BUILD_BUG() errors in arch/x86/kvm/cpuid.h
+>> function __cpuid_entry_get_reg(), for the default: case.
+>>
+>>
+>>   CC      arch/x86/kvm/cpuid.o
+>> In file included from ../include/linux/export.h:43:0,
+>>                  from ../include/linux/linkage.h:7,
+>>                  from ../include/linux/preempt.h:10,
+>>                  from ../include/linux/hardirq.h:5,
+>>                  from ../include/linux/kvm_host.h:7,
+>>                  from ../arch/x86/kvm/cpuid.c:12:
+>> In function ‘__cpuid_entry_get_reg’,
+>>     inlined from ‘kvm_cpu_cap_mask’ at ../arch/x86/kvm/cpuid.c:272:25,
+>>     inlined from ‘kvm_set_cpu_caps’ at ../arch/x86/kvm/cpuid.c:292:2:
+>> ../include/linux/compiler.h:394:38: error: call to ‘__compiletime_assert_114’ declared with attribute error: BUILD_BUG failed
+>>   _compiletime_assert(condition, msg, __compiletime_assert_, __LINE__)
+>>                                       ^
+>> ../include/linux/compiler.h:375:4: note: in definition of macro ‘__compiletime_assert’
+>>     prefix ## suffix();    \
+>>     ^~~~~~
+>> ../include/linux/compiler.h:394:2: note: in expansion of macro ‘_compiletime_assert’
+>>   _compiletime_assert(condition, msg, __compiletime_assert_, __LINE__)
+>>   ^~~~~~~~~~~~~~~~~~~
+>> ../include/linux/build_bug.h:39:37: note: in expansion of macro ‘compiletime_assert’
+>>  #define BUILD_BUG_ON_MSG(cond, msg) compiletime_assert(!(cond), msg)
+>>                                      ^~~~~~~~~~~~~~~~~~
+>> ../include/linux/build_bug.h:59:21: note: in expansion of macro ‘BUILD_BUG_ON_MSG’
+>>  #define BUILD_BUG() BUILD_BUG_ON_MSG(1, "BUILD_BUG failed")
+>>                      ^~~~~~~~~~~~~~~~
+>> ../arch/x86/kvm/cpuid.h:114:3: note: in expansion of macro ‘BUILD_BUG’
+>>    BUILD_BUG();
+>>    ^~~~~~~~~
+>>
+> 
+> Looks like the compiler is not smart enough to figure out the constant 
+> expressions in BUILD_BUG.  I think we need to do something like this:
+> 
+> diff --git a/arch/x86/kvm/cpuid.h b/arch/x86/kvm/cpuid.h
+> index 23b4cd1ad986..8f711b0cdec0 100644
+> --- a/arch/x86/kvm/cpuid.h
+> +++ b/arch/x86/kvm/cpuid.h
+> @@ -40,6 +40,7 @@ struct cpuid_reg {
+>  	int reg;
+>  };
+>  
+> +/* Update reverse_cpuid_check as well when adding an entry.  */
+>  static const struct cpuid_reg reverse_cpuid[] = {
+>  	[CPUID_1_EDX]         = {         1, 0, CPUID_EDX},
+>  	[CPUID_8000_0001_EDX] = {0x80000001, 0, CPUID_EDX},
+> @@ -68,12 +69,21 @@ static const struct cpuid_reg reverse_cpuid[] = {
+>   */
+>  static __always_inline void reverse_cpuid_check(unsigned int x86_leaf)
+>  {
+> -	BUILD_BUG_ON(x86_leaf == CPUID_LNX_1);
+> -	BUILD_BUG_ON(x86_leaf == CPUID_LNX_2);
+> -	BUILD_BUG_ON(x86_leaf == CPUID_LNX_3);
+> -	BUILD_BUG_ON(x86_leaf == CPUID_LNX_4);
+> -	BUILD_BUG_ON(x86_leaf >= ARRAY_SIZE(reverse_cpuid));
+> -	BUILD_BUG_ON(reverse_cpuid[x86_leaf].function == 0);
+> +	BUILD_BUG_ON(x86_leaf != CPUID_1_EDX &&
+> +	             x86_leaf != CPUID_8000_0001_EDX &&
+> +	             x86_leaf != CPUID_8086_0001_EDX &&
+> +	             x86_leaf != CPUID_1_ECX &&
+> +	             x86_leaf != CPUID_C000_0001_EDX &&
+> +	             x86_leaf != CPUID_8000_0001_ECX &&
+> +	             x86_leaf != CPUID_7_0_EBX &&
+> +	             x86_leaf != CPUID_D_1_EAX &&
+> +	             x86_leaf != CPUID_8000_0008_EBX &&
+> +	             x86_leaf != CPUID_6_EAX &&
+> +	             x86_leaf != CPUID_8000_000A_EDX &&
+> +	             x86_leaf != CPUID_7_ECX &&
+> +	             x86_leaf != CPUID_8000_0007_EBX &&
+> +	             x86_leaf != CPUID_7_EDX &&
+> +	             x86_leaf != CPUID_7_1_EAX);
+>  }
+>  
+>  /*
+> 
+> Randy, can you test it with your compiler?
 
-There are a few other occurrences of hrtimer_cancel, and all of them
-probably have a similar issue.  What about adding a cancel_apic_timer
-function that contains the combination of
-hrtimer_cancel/preempt_disable/cancel_hv_timer/preempt_enable?
+Nope, no help.  That's the wrong location.
+Need a patch for this:
+>> 24 (only showing one of them here) BUILD_BUG() errors in arch/x86/kvm/cpuid.h
+>> function __cpuid_entry_get_reg(), for the default: case.
 
-Thanks,
 
-Paolo
+-- 
+~Randy
 
