@@ -2,92 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8E3911921DE
-	for <lists+kvm@lfdr.de>; Wed, 25 Mar 2020 08:47:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 65727192228
+	for <lists+kvm@lfdr.de>; Wed, 25 Mar 2020 09:11:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726098AbgCYHq5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Mar 2020 03:46:57 -0400
-Received: from mail-ed1-f65.google.com ([209.85.208.65]:40966 "EHLO
-        mail-ed1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725832AbgCYHq5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 Mar 2020 03:46:57 -0400
-Received: by mail-ed1-f65.google.com with SMTP id v1so1208943edq.8
-        for <kvm@vger.kernel.org>; Wed, 25 Mar 2020 00:46:55 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=UaBcRiu0jhd+aZ3qoAfM9Jyg226NuZ7pG6QSrBAUzKE=;
-        b=H0SgN0D5vxyrEoXtGEZ7G2Erjp7gjEESleD79MCln2h+7nGdrlgCTJnhc/56DZEpXx
-         2JF+bvcT2B6NeQ0Yk3JNM8SQysELL2F47IhaqrELv37S21H9uX/A5k+0+YCMgMMeTs4u
-         rR6ucSJgPCZg1IV/DO9YuVepXgezwjih2etXIrHytlWaGFWX8v1suYCiPr2xwUhMAGOM
-         xBQsr1BDb7t9niL9gegy3MwH8eXcYAX8MRNRgu7K6JIa3DFja7CQ/so9ooz6GGlTCNoW
-         2lvFT/sFR6BINyrDnZFJlmNTpj6Z9V3ANb0cFumqR7aGqLptGfMqyXvCCKB0LwxaHKgt
-         w/bA==
-X-Gm-Message-State: ANhLgQ0dw7uJe3wcKBqmFWcyLYlxhsi+gbj+1K496Ov6p7WWM7FrT1mo
-        heNqIZM4j2cgiX0OGLHH7rU=
-X-Google-Smtp-Source: ADFU+vtMcCFFhN/9DmhxAFJzYhIdK+iRP4YL5ukwhPlffOfTndxsoNgCwnBl7CzNaMJbVvRaQUDS1w==
-X-Received: by 2002:a17:906:c4f:: with SMTP id t15mr2040012ejf.193.1585122414316;
-        Wed, 25 Mar 2020 00:46:54 -0700 (PDT)
-Received: from kozik-lap ([194.230.155.125])
-        by smtp.googlemail.com with ESMTPSA id b5sm1497332edk.72.2020.03.25.00.46.51
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Wed, 25 Mar 2020 00:46:53 -0700 (PDT)
-Date:   Wed, 25 Mar 2020 08:46:49 +0100
-From:   Krzysztof Kozlowski <krzk@kernel.org>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, Olof Johansson <olof@lixom.net>,
-        Arnd Bergmann <arnd@arndb.de>, Will Deacon <will@kernel.org>,
-        Vladimir Murzin <vladimir.murzin@arm.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Christoffer Dall <christoffer.dall@arm.com>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Quentin Perret <qperret@google.com>,
-        Russell King <linux@arm.linux.org.uk>,
-        Stefan Agner <stefan@agner.ch>,
-        Jan Kiszka <jan.kiszka@siemens.com>,
-        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
-        Marek Szyprowski <m.szyprowski@samsung.com>,
-        Takashi Yoshi <takashi@yoshi.email>,
-        Daniel Golle <daniel@makrotopia.org>
-Subject: Re: [PATCH v2 1/7] arm: Unplug KVM from the build system
-Message-ID: <20200325074649.GA4640@kozik-lap>
-References: <20200324103350.138077-1-maz@kernel.org>
- <20200324103350.138077-2-maz@kernel.org>
+        id S1727275AbgCYILX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Mar 2020 04:11:23 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:12192 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725907AbgCYILW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 Mar 2020 04:11:22 -0400
+Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.60])
+        by Forcepoint Email with ESMTP id EA89594B89FE7E0A7589;
+        Wed, 25 Mar 2020 16:11:02 +0800 (CST)
+Received: from [127.0.0.1] (10.173.222.27) by DGGEMS412-HUB.china.huawei.com
+ (10.3.19.212) with Microsoft SMTP Server id 14.3.487.0; Wed, 25 Mar 2020
+ 16:10:53 +0800
+Subject: Re: [kvm-unit-tests PATCH v7 08/13] arm/arm64: ITS: Device and
+ collection Initialization
+To:     Eric Auger <eric.auger@redhat.com>
+CC:     <eric.auger.pro@gmail.com>, <maz@kernel.org>,
+        <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>,
+        <qemu-devel@nongnu.org>, <qemu-arm@nongnu.org>,
+        <drjones@redhat.com>, <andre.przywara@arm.com>,
+        <peter.maydell@linaro.org>, <alexandru.elisei@arm.com>,
+        <thuth@redhat.com>
+References: <20200320092428.20880-1-eric.auger@redhat.com>
+ <20200320092428.20880-9-eric.auger@redhat.com>
+From:   Zenghui Yu <yuzenghui@huawei.com>
+Message-ID: <63f3d8aa-c1e3-f40f-32a1-fb6d22e70541@huawei.com>
+Date:   Wed, 25 Mar 2020 16:10:51 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20200324103350.138077-2-maz@kernel.org>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+In-Reply-To: <20200320092428.20880-9-eric.auger@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.173.222.27]
+X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 24, 2020 at 10:33:44AM +0000, Marc Zyngier wrote:
-> As we're about to drop KVM/arm on the floor, carefully unplug
-> it from the build system.
+Hi Eric,
+
+On 2020/3/20 17:24, Eric Auger wrote:
+> Introduce an helper functions to register
+> - a new device, characterized by its device id and the
+>    max number of event IDs that dimension its ITT (Interrupt
+>    Translation Table).  The function allocates the ITT.
 > 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> Acked-by: Olof Johansson <olof@lixom.net>
-> Acked-by: Arnd Bergmann <arnd@arndb.de>
-> Acked-by: Will Deacon <will@kernel.org>
-> Acked-by: Vladimir Murzin <vladimir.murzin@arm.com>
-> Acked-by: Catalin Marinas <catalin.marinas@arm.com>
-> Acked-by: Linus Walleij <linus.walleij@linaro.org>
-> Acked-by: Christoffer Dall <christoffer.dall@arm.com>
+> - a new collection, characterized by its ID and the
+>    target processing engine (PE).
+> 
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> 
 > ---
->  arch/arm/Kconfig             | 2 --
->  arch/arm/Makefile            | 1 -
->  arch/arm/mach-exynos/Kconfig | 2 +-
+> 
+> v3 -> v4:
+> - remove unused its_baser variable from its_create_device()
+> - use get_order()
+> - device->itt becomes a GVA instead of GPA
+> 
+> v2 -> v3:
+> - s/report_abort/assert
+> 
+> v1 -> v2:
+> - s/nb_/nr_
+> ---
+>   lib/arm64/asm/gic-v3-its.h | 19 +++++++++++++++++++
+>   lib/arm64/gic-v3-its.c     | 38 ++++++++++++++++++++++++++++++++++++++
+>   2 files changed, 57 insertions(+)
+> 
+> diff --git a/lib/arm64/asm/gic-v3-its.h b/lib/arm64/asm/gic-v3-its.h
+> index 4683011..adcb642 100644
+> --- a/lib/arm64/asm/gic-v3-its.h
+> +++ b/lib/arm64/asm/gic-v3-its.h
+> @@ -31,6 +31,19 @@ struct its_baser {
+>   };
+>   
+>   #define GITS_BASER_NR_REGS		8
+> +#define GITS_MAX_DEVICES		8
+> +#define GITS_MAX_COLLECTIONS		8
+> +
+> +struct its_device {
+> +	u32 device_id;	/* device ID */
+> +	u32 nr_ites;	/* Max Interrupt Translation Entries */
+> +	void *itt;	/* Interrupt Translation Table GVA */
+> +};
+> +
+> +struct its_collection {
+> +	u64 target_address;
+> +	u16 col_id;
+> +};
+>   
+>   struct its_data {
+>   	void *base;
+> @@ -39,6 +52,10 @@ struct its_data {
+>   	struct its_baser coll_baser;
+>   	struct its_cmd_block *cmd_base;
+>   	struct its_cmd_block *cmd_write;
+> +	struct its_device devices[GITS_MAX_DEVICES];
+> +	u32 nr_devices;		/* Allocated Devices */
+> +	struct its_collection collections[GITS_MAX_COLLECTIONS];
+> +	u32 nr_collections;	/* Allocated Collections */
+>   };
+>   
+>   extern struct its_data its_data;
+> @@ -93,5 +110,7 @@ extern void its_parse_typer(void);
+>   extern void its_init(void);
+>   extern int its_baser_lookup(int i, struct its_baser *baser);
+>   extern void its_enable_defaults(void);
+> +extern struct its_device *its_create_device(u32 dev_id, int nr_ites);
+> +extern struct its_collection *its_create_collection(u32 col_id, u32 target_pe);
 
-For Exynos:
-Acked-by: Krzysztof Kozlowski <krzk@kernel.org>
+Maybe use 'u16 col_id'?
 
-Best regards,
-Krzysztof
+Besides,
+Reviewed-by: Zenghui Yu <yuzenghui@huawei.com>
+
+
+Thanks
+
