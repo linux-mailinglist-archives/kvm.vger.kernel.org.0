@@ -2,130 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5FD68192713
-	for <lists+kvm@lfdr.de>; Wed, 25 Mar 2020 12:26:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 910B0192720
+	for <lists+kvm@lfdr.de>; Wed, 25 Mar 2020 12:28:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727413AbgCYL0G (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Mar 2020 07:26:06 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:57094 "EHLO
-        us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727290AbgCYL0G (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 25 Mar 2020 07:26:06 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1585135564;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=ae3Bh1ZlBbd/KBQwXPKN94pXtAOxkLC5jA3b9yhby3k=;
-        b=auIs9v0qfrhrMr50Ie6U/lh5krwTQKRrZU+20Ov2BB/4LaLwPGHfIeoDFstJmF0qutZevE
-        z1JcTa/x1HdhqjwzTJV1Kmk6q6EkTyU1m3Wd9d+HWnEAz0K7CVXtTxjmcn1ddE9OgwH8+1
-        u3yXGlqcP6TW/2h3C9IcSiuDA43IjJM=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-18-bZb-MNbaO6OHmhZLCBKVRw-1; Wed, 25 Mar 2020 07:26:03 -0400
-X-MC-Unique: bZb-MNbaO6OHmhZLCBKVRw-1
-Received: by mail-wm1-f69.google.com with SMTP id m4so2383938wme.0
-        for <kvm@vger.kernel.org>; Wed, 25 Mar 2020 04:26:03 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=ae3Bh1ZlBbd/KBQwXPKN94pXtAOxkLC5jA3b9yhby3k=;
-        b=fU8PubUSULzDq+41oNbZ0nIOBJgsgVixjannLd06J5TtshLWhTbgA/7izcRzzRraa2
-         yYey3IpSPbh+bLwsqJZMTEqsQitgUurH/azLle990aEZkGXsAf5t2qlNWSS6S+YIF+xf
-         jXF4jnOa4Sk05mMtnA/ebylOAmoCIVU8nBSKd/WLZsxIpLbg+7XNApCBWCSj4AcOKyKf
-         DgOmCYgmMn3D2AbgthlweHLUnHez25SHW2zFPm1MZtDC5tZ9uaZBimIcEokVLL6YUor3
-         adhNph0qx2rI7LpVMWnlOUnnG3X9jJAD35m8chV6P2/ZkSu8I6NA26ueT7zkIbm0G95N
-         EIvQ==
-X-Gm-Message-State: ANhLgQ08dnnAhtvRGfglVi0VgI/x3zAgNAr+PXR51AgQxNXAHaHbq2Ze
-        +lEhPaWJil4OhGBykYRGbaK+VgBJiD2pP2TxWx8YMyVc37PhFZW81z70NGuUS6gYQ32P/adsjo+
-        q3l3gBr0rnD6h
-X-Received: by 2002:adf:db49:: with SMTP id f9mr2754394wrj.145.1585135562106;
-        Wed, 25 Mar 2020 04:26:02 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vspLasieFBMXL6fs0QKpXZ526e9DIUxbZmAHTCJGxNfXakPND5GK++oNxLnkbN0fT32b1RV3w==
-X-Received: by 2002:adf:db49:: with SMTP id f9mr2754380wrj.145.1585135561893;
-        Wed, 25 Mar 2020 04:26:01 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id u16sm33886558wro.23.2020.03.25.04.26.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Mar 2020 04:26:01 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Ben Gardon <bgardon@google.com>,
-        Junaid Shahid <junaids@google.com>,
-        Liran Alon <liran.alon@oracle.com>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        John Haxby <john.haxby@oracle.com>,
-        Miaohe Lin <linmiaohe@huawei.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>
-Subject: Re: [PATCH v3 19/37] KVM: nVMX: Move nested_get_vpid02() to vmx/nested.h
-In-Reply-To: <20200320212833.3507-20-sean.j.christopherson@intel.com>
-References: <20200320212833.3507-1-sean.j.christopherson@intel.com> <20200320212833.3507-20-sean.j.christopherson@intel.com>
-Date:   Wed, 25 Mar 2020 12:25:59 +0100
-Message-ID: <87r1xg65h4.fsf@vitty.brq.redhat.com>
+        id S1727356AbgCYL2G (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Mar 2020 07:28:06 -0400
+Received: from mail.kernel.org ([198.145.29.99]:43932 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726658AbgCYL2G (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 Mar 2020 07:28:06 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 2A45D20775;
+        Wed, 25 Mar 2020 11:28:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1585135685;
+        bh=BHTyMXxT7R8s+L2COQD3ZAPpvsUWEcKjOljLSm0Wu3A=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=1bwUEUqjm9b6Mu/q9P+ajsOvu8VDv0nzyoM8tr0rAOdb3wfxf8xV6I1bG+QkYdolU
+         YSaXl0Qj0TcdTgpWBURD98tmoz+quFnMkGo4VZOE7xJYVAF/x7xnDnGnM6Gkj13Tcj
+         6CNsTSaqH9S+u4kijUyZl5p+ocWanrS9G41Dtdts=
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+        by disco-boy.misterjones.org with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        (Exim 4.92)
+        (envelope-from <maz@kernel.org>)
+        id 1jH4CZ-00FYAH-Fv; Wed, 25 Mar 2020 11:28:03 +0000
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date:   Wed, 25 Mar 2020 11:28:03 +0000
+From:   Marc Zyngier <maz@kernel.org>
+To:     Zhenyu Ye <yezhenyu2@huawei.com>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Andre Przywara <andre.przywara@arm.com>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Dave Martin <Dave.Martin@arm.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Jintack Lim <jintack@cs.columbia.edu>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>
+Subject: Re: [PATCH v2 67/94] arm64: Add level-hinted TLB invalidation helper
+In-Reply-To: <b4120382-d175-0c2f-249e-cc77a09709db@huawei.com>
+References: <20200211174938.27809-1-maz@kernel.org>
+ <20200211174938.27809-68-maz@kernel.org>
+ <b4120382-d175-0c2f-249e-cc77a09709db@huawei.com>
+Message-ID: <ff18c6737eed7baa29adee5de4f044c5@kernel.org>
+X-Sender: maz@kernel.org
+User-Agent: Roundcube Webmail/1.3.10
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: yezhenyu2@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, suzuki.poulose@arm.com, andre.przywara@arm.com, christoffer.dall@arm.com, Dave.Martin@arm.com, james.morse@arm.com, alexandru.elisei@arm.com, jintack@cs.columbia.edu, julien.thierry.kdev@gmail.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sean Christopherson <sean.j.christopherson@intel.com> writes:
+Zhenyu,
 
-> Move nested_get_vpid02() to vmx/nested.h so that a future patch can
-> reference it from vmx.c to implement context-specific TLB flushing.
->
-> No functional change intended.
->
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> ---
->  arch/x86/kvm/vmx/nested.c | 7 -------
->  arch/x86/kvm/vmx/nested.h | 7 +++++++
->  2 files changed, 7 insertions(+), 7 deletions(-)
->
-> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> index 0c71db6fec5a..77819d890088 100644
-> --- a/arch/x86/kvm/vmx/nested.c
-> +++ b/arch/x86/kvm/vmx/nested.c
-> @@ -1154,13 +1154,6 @@ static bool nested_has_guest_tlb_tag(struct kvm_vcpu *vcpu)
->  	       (nested_cpu_has_vpid(vmcs12) && to_vmx(vcpu)->nested.vpid02);
->  }
->  
-> -static u16 nested_get_vpid02(struct kvm_vcpu *vcpu)
-> -{
-> -	struct vcpu_vmx *vmx = to_vmx(vcpu);
-> -
-> -	return vmx->nested.vpid02 ? vmx->nested.vpid02 : vmx->vpid;
-> -}
-> -
->  static bool is_bitwise_subset(u64 superset, u64 subset, u64 mask)
->  {
->  	superset &= mask;
-> diff --git a/arch/x86/kvm/vmx/nested.h b/arch/x86/kvm/vmx/nested.h
-> index 21d36652f213..debc5eeb5757 100644
-> --- a/arch/x86/kvm/vmx/nested.h
-> +++ b/arch/x86/kvm/vmx/nested.h
-> @@ -60,6 +60,13 @@ static inline int vmx_has_valid_vmcs12(struct kvm_vcpu *vcpu)
->  		vmx->nested.hv_evmcs;
->  }
->  
-> +static inline u16 nested_get_vpid02(struct kvm_vcpu *vcpu)
-> +{
-> +	struct vcpu_vmx *vmx = to_vmx(vcpu);
-> +
-> +	return vmx->nested.vpid02 ? vmx->nested.vpid02 : vmx->vpid;
-> +}
-> +
->  static inline unsigned long nested_ept_get_eptp(struct kvm_vcpu *vcpu)
->  {
->  	/* return the page table to be shadowed - in our case, EPT12 */
+On 2020-03-25 10:38, Zhenyu Ye wrote:
+> Hi Marc,
+> 
+> On 2020/2/12 1:49, Marc Zyngier wrote:
+>> Add a level-hinted TLB invalidation helper that only gets used if
+>> ARMv8.4-TTL gets detected.
+>> 
+>> Signed-off-by: Marc Zyngier <maz@kernel.org>
+>> ---
+>>  arch/arm64/include/asm/tlbflush.h | 30 ++++++++++++++++++++++++++++++
+>>  1 file changed, 30 insertions(+)
+>> 
+>> diff --git a/arch/arm64/include/asm/tlbflush.h 
+>> b/arch/arm64/include/asm/tlbflush.h
+>> index bc3949064725..a3f70778a325 100644
+>> --- a/arch/arm64/include/asm/tlbflush.h
+>> +++ b/arch/arm64/include/asm/tlbflush.h
+>> @@ -10,6 +10,7 @@
+>> 
+>>  #ifndef __ASSEMBLY__
+>> 
+>> +#include <linux/bitfield.h>
+>>  #include <linux/mm_types.h>
+>>  #include <linux/sched.h>
+>>  #include <asm/cputype.h>
+>> @@ -59,6 +60,35 @@
+>>  		__ta;						\
+>>  	})
+>> 
+>> +#define TLBI_TTL_MASK	GENMASK_ULL(47, 44)
+>> +
+>> +#define __tlbi_level(op, addr, level)					\
+>> +	do {								\
+>> +		u64 arg = addr;						\
+>> +									\
+>> +		if (cpus_have_const_cap(ARM64_HAS_ARMv8_4_TTL) &&	\
+>> +		    level) {						\
+>> +			u64 ttl = level;				\
+>> +									\
+>> +			switch (PAGE_SIZE) {				\
+>> +			case SZ_4K:					\
+>> +				ttl |= 1 << 2;				\
+>> +				break;					\
+>> +			case SZ_16K:					\
+>> +				ttl |= 2 << 2;				\
+>> +				break;					\
+>> +			case SZ_64K:					\
+>> +				ttl |= 3 << 2;				\
+>> +				break;					\
+>> +			}						\
+> 
+> Can we define a macro here to replace the switch? It will be more
+> clearly and efficient. Such as:
+> 
+> #define __TG ((PAGE_SHIFT - 12) / 2 + 1)
+> ttl |= __TG << 2;
 
-Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+Let me rephrase this: a convoluted formula with magic numbers in it
+is clearer than the values documented in the specification (Table 
+D5-53)?
+I have the exact opposite view.
 
+As for efficency, you do realize that the compiler always discards two 
+third
+of this code on any possible configuration, right?
+
+I think the code above is the clearest way to express table D5-53, and
+the only missing bit is a reference to that table.
+
+Thanks,
+
+         M.
 -- 
-Vitaly
-
+Jazz is not dead. It just smells funny...
