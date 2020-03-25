@@ -2,79 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9581B192DEC
-	for <lists+kvm@lfdr.de>; Wed, 25 Mar 2020 17:13:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E50DB192DF2
+	for <lists+kvm@lfdr.de>; Wed, 25 Mar 2020 17:14:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728014AbgCYQNv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Mar 2020 12:13:51 -0400
-Received: from mail.kernel.org ([198.145.29.99]:57606 "EHLO mail.kernel.org"
+        id S1728117AbgCYQOH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Mar 2020 12:14:07 -0400
+Received: from mga12.intel.com ([192.55.52.136]:50007 "EHLO mga12.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727174AbgCYQNv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 Mar 2020 12:13:51 -0400
-Received: from [192.168.1.112] (c-24-9-64-241.hsd1.co.comcast.net [24.9.64.241])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 7641720409;
-        Wed, 25 Mar 2020 16:13:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1585152830;
-        bh=z/l7SBBshWOFYbBGR0ClUkeQrd+UBb2CWsZuH43i4Vg=;
-        h=Subject:To:Cc:References:From:Date:In-Reply-To:From;
-        b=d5srGXVBWjNKP/w4N+eoVs88y3PQJBDFqAEI8Qpi/R/mv7gG84m3wE1+TDSovJtiw
-         ruLJW+9oq2T58EGMsju0piBrSirMWrctSS4dxMbZ15nrmdYnDSVUnhpvLQhV7keyQr
-         8G3VNE98fkGr35AEvcwLw5c7slY680aAF+jKxojQ=
-Subject: Re: [PATCH v2 0/6] Fix errors when try to build kvm selftests on
- specified output
-To:     Xiaoyao Li <xiaoyao.li@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-kernel@vger.kernel.org, shuah <shuah@kernel.org>
-References: <20200325140133.103236-1-xiaoyao.li@intel.com>
-From:   shuah <shuah@kernel.org>
-Message-ID: <8e5a7de6-25f3-7979-c6b9-49e1ea717f8e@kernel.org>
-Date:   Wed, 25 Mar 2020 10:12:55 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+        id S1727174AbgCYQOH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 Mar 2020 12:14:07 -0400
+IronPort-SDR: b8mTuNUUNP+XzqBeqZMRGIPT+eBg/gudpHhe9KB5USlCzEstht8eiuNexHoIdS+ZdZdrBHG6SO
+ n98FS7rkz5KQ==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Mar 2020 09:14:06 -0700
+IronPort-SDR: e2Ug/iZdOJlUCQRIUNttPiRngVaekzIE3L0ixyPw2HDDsCjj2pkvNXD8I7//zXaMmmVQzMAkbI
+ cBbKIh4y4fpA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.72,304,1580803200"; 
+   d="scan'208";a="270854277"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
+  by fmsmga004.fm.intel.com with ESMTP; 25 Mar 2020 09:14:06 -0700
+Date:   Wed, 25 Mar 2020 09:14:06 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Randy Dunlap <rdunlap@infradead.org>,
+        Stephen Rothwell <sfr@canb.auug.org.au>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        KVM <kvm@vger.kernel.org>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>
+Subject: Re: linux-next: Tree for Mar 25 (arch/x86/kvm/)
+Message-ID: <20200325161405.GG14294@linux.intel.com>
+References: <20200325195350.7300fee9@canb.auug.org.au>
+ <e9286016-66ae-9505-ea52-834527cdae27@infradead.org>
+ <d9af8094-96c3-3b7f-835c-4e48d157e582@redhat.com>
+ <064720eb-2147-1b92-7a62-f89d6380f40a@infradead.org>
+ <85430f7e-93e0-3652-0705-9cf6e948a9d8@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200325140133.103236-1-xiaoyao.li@intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <85430f7e-93e0-3652-0705-9cf6e948a9d8@redhat.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 3/25/20 8:01 AM, Xiaoyao Li wrote:
-> I attempted to build KVM selftests on a specified dir, unfortunately
-> neither	"make O=/path/to/mydir TARGETS=kvm" in tools/testing/selftests, nor
-> "make OUTPUT=/path/to/mydir" in tools/testing/selftests/kvm work.
+On Wed, Mar 25, 2020 at 05:08:03PM +0100, Paolo Bonzini wrote:
+> On 25/03/20 16:57, Randy Dunlap wrote:
+> >> Randy, can you test it with your compiler?
+> > Nope, no help.  That's the wrong location.
+> > Need a patch for this:
+> >>> 24 (only showing one of them here) BUILD_BUG() errors in arch/x86/kvm/cpuid.h
+> >>> function __cpuid_entry_get_reg(), for the default: case.
 > 
+> Doh, right.  I think the only solution for that one is to degrade it to
+> WARN_ON(1).
 
-Please elaborate on the problems you are seeing. I would like you
-to describe in detail the problems you are seeing and how you are
-fixing them in this patch series.
-
-The problem you are fixing here is subdir structure not being
-supported for relocatable builds and the Makefile not being
-able to locate headers files. These are issues, however, these
-need to be fixed in the kvm Makefile.
-
-Please look at arm64, android, futex tests as examples. lib.mk
-and main selftests Makefile allow for overrides for make targets.
-When a test has sub-dir structure and libraries, it is easier to
-handle these in the individual Makefile.
-
-Please fix the problems you are seeing in kvm Makefile.
-
- >I only test the sub TARGET of kvm.
- >In theory, it won't break other TARGET of selftests.
-
-When you change lib.mk which is a common infrastructure, theory
-doesn't help. Statements like this make me very reluctant to
-accept patches. :)
-
-This is one reason why I asked Paolo to drop these patches.
-
-thanks,
--- Shuah
+I reproduced the error, give me a bit to play with the code to see if the
+BUILD_BUG can be preserved.  I'm curious as to why kvm_cpu_cap_mask() is
+special, and why it only fails with this config.
