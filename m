@@ -2,111 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 331EB191F96
-	for <lists+kvm@lfdr.de>; Wed, 25 Mar 2020 04:14:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D2920191FB0
+	for <lists+kvm@lfdr.de>; Wed, 25 Mar 2020 04:23:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727320AbgCYDOP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Mar 2020 23:14:15 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:23225 "EHLO
-        us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727299AbgCYDOO (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 24 Mar 2020 23:14:14 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1585106054;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=tlnvEiI040ACQ537mohs9KaGt5WE1E8quEggSdqcSkQ=;
-        b=hMYo7AsFHTdsoGyeiDLi2aFT9wx2ExtrQYlAeLr/sCMXa8kfHpkDRpfEEn0mj9twl1cEAC
-        t4gPeOaPRF17d7cp386bmIEHh9RhkcCErC8ZbG9fytdq7HaMT1AFhSkDSzXeTs+r4L29KL
-        pSBAKha3fxW20S8A830UcwqbTatZTqg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-350-arsdJjnLP0upUxzGWPsajQ-1; Tue, 24 Mar 2020 23:14:02 -0400
-X-MC-Unique: arsdJjnLP0upUxzGWPsajQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S1727290AbgCYDXI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Mar 2020 23:23:08 -0400
+Received: from ozlabs.org ([203.11.71.1]:33351 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727253AbgCYDXH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 Mar 2020 23:23:07 -0400
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 509FE100550D;
-        Wed, 25 Mar 2020 03:14:01 +0000 (UTC)
-Received: from [10.72.12.54] (ovpn-12-54.pek2.redhat.com [10.72.12.54])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 44E028AC30;
-        Wed, 25 Mar 2020 03:13:55 +0000 (UTC)
-Subject: Re: [PATCH V7 3/8] vringh: IOTLB support
-To:     kbuild test robot <lkp@intel.com>
-Cc:     kbuild-all@lists.01.org, mst@redhat.com,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
-References: <20200324041458.27384-4-jasowang@redhat.com>
- <202003250217.stptJTnJ%lkp@intel.com>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <4032c9a2-a6c1-a041-fd59-81a8bf2fca46@redhat.com>
-Date:   Wed, 25 Mar 2020 11:13:54 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 48nD2w7478z9sRY;
+        Wed, 25 Mar 2020 14:23:04 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=canb.auug.org.au;
+        s=201702; t=1585106585;
+        bh=n7eiGYig6krIs++Oy5vPeQXUu0dNzX6a8k72efUO+xo=;
+        h=Date:From:To:Cc:Subject:From;
+        b=tw/wbObGXHTxQTh+05Er0CnzM9ef6++/fPqPPP0i/chwqQA4BPd63wiB0hoW7fiiv
+         +NvpcLNJdgEAeFZpX5805JMSOL2seNp1gvVQGwFGYR8/7H50ws8TwnQmssBgMH5r2Z
+         uJDfcHwhoMK38ZOqX0UtazIYwHrU5/4kVBH8+6GJPEAMppLbteBg3H2lkb2A9KwoQ1
+         W1esx9nylCD+EZ9xAI4u8+G6+o+AR06APU+2krnXzu+EnNY8EHgKMHX8WSw8ywWeoP
+         LZKjGAIa+tJlSyLFxWh4yqgZcPdUuEuBZQD8ZXV31hM8VTXhK5r5ov+nnOpbkTmRvj
+         WF6M5JTAvgUXw==
+Date:   Wed, 25 Mar 2020 14:23:02 +1100
+From:   Stephen Rothwell <sfr@canb.auug.org.au>
+To:     Christoffer Dall <cdall@cs.columbia.edu>,
+        Marc Zyngier <marc.zyngier@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Radim =?UTF-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        KVM <kvm@vger.kernel.org>
+Cc:     Linux Next Mailing List <linux-next@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Peter Xu <peterx@redhat.com>
+Subject: linux-next: manual merge of the kvm-arm tree with the kvm tree
+Message-ID: <20200325142302.75d5c4be@canb.auug.org.au>
 MIME-Version: 1.0
-In-Reply-To: <202003250217.stptJTnJ%lkp@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; boundary="Sig_/kZ.GubDEXycMN50rB_LcFxU";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+--Sig_/kZ.GubDEXycMN50rB_LcFxU
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-On 2020/3/25 =E4=B8=8A=E5=8D=882:19, kbuild test robot wrote:
-> Hi Jason,
->
-> I love your patch! Yet something to improve:
->
-> [auto build test ERROR on vhost/linux-next]
-> [also build test ERROR on linux/master linus/master v5.6-rc7 next-20200=
-324]
-> [if your patch is applied to the wrong git tree, please drop us a note =
-to help
-> improve the system. BTW, we also suggest to use '--base' option to spec=
-ify the
-> base tree in git format-patch, please see https://stackoverflow.com/a/3=
-7406982]
->
-> url:    https://github.com/0day-ci/linux/commits/Jason-Wang/vDPA-suppor=
-t/20200324-142634
-> base:   https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git l=
-inux-next
-> config: alpha-randconfig-a001-20200324 (attached as .config)
-> compiler: alpha-linux-gcc (GCC) 9.2.0
-> reproduce:
->          wget https://raw.githubusercontent.com/intel/lkp-tests/master/=
-sbin/make.cross -O ~/bin/make.cross
->          chmod +x ~/bin/make.cross
->          # save the attached .config to linux build tree
->          GCC_VERSION=3D9.2.0 make.cross ARCH=3Dalpha
->
-> If you fix the issue, kindly add following tag
-> Reported-by: kbuild test robot <lkp@intel.com>
->
-> All errors (new ones prefixed by >>):
->
->     alpha-linux-ld: drivers/vhost/vringh.o: in function `iotlb_translat=
-e':
->     drivers/vhost/vringh.c:1079: undefined reference to `vhost_iotlb_it=
-ree_first'
+Hi all,
 
+Today's linux-next merge of the kvm-arm tree got a conflict in:
 
-This is because VHOST now depends on VHOST_IOTLB, but it was still=20
-selected by MIC or VOP.
+  arch/arm/kvm/coproc.c
 
-Will fix this by switching to use "depends on" fro MIC and VOP
+between commit:
 
-Thanks.
+  4d395762599d ("KVM: Remove unnecessary asm/kvm_host.h includes")
 
+from the kvm tree and commit:
 
->>> alpha-linux-ld: drivers/vhost/vringh.c:1079: undefined reference to `=
-vhost_iotlb_itree_first'
-> ---
-> 0-DAY CI Kernel Test Service, Intel Corporation
-> https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
+  541ad0150ca4 ("arm: Remove 32bit KVM host support")
 
+from the kvm-arm tree.
+
+I fixed it up (I removed the file) and can carry the fix as necessary.
+This is now fixed as far as linux-next is concerned, but any non trivial
+conflicts should be mentioned to your upstream maintainer when your tree
+is submitted for merging.  You may also want to consider cooperating
+with the maintainer of the conflicting tree to minimise any particularly
+complex conflicts.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/kZ.GubDEXycMN50rB_LcFxU
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAl56zpYACgkQAVBC80lX
+0Gz2Jgf/eBESpCAhULsWMj2tymIqL397hLPFT0EfOxWq2TR2k2y+l+rQ/oL4z+nf
+LjF6yz+2KZDwCCYj9vRqs72H29+6DofzvU8teL3DYdR2enzfVlzanmZ7AgfUH1un
+TtNOlvBoQ3OQV1x0FVZPP0wEV98tsJsIElIU8+lS01lFo03Mv+OGIM4ppFqaBpDn
+Ja5fBPVt4GUTbCy4rk14bPGzxrYawWi0a168Pin4jAflAujZEeH/EU0+Z1wyGnVI
+89kNNEXyK213o7QPdsTu+rTZLvYMCuvEPEA3kSSve9RbIlkHEbysP7bvzgCpoHaG
+gsSrDxml0tJn62ADbE5PS0qZHu5szQ==
+=bF63
+-----END PGP SIGNATURE-----
+
+--Sig_/kZ.GubDEXycMN50rB_LcFxU--
