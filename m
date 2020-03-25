@@ -2,214 +2,289 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9CBCE192492
-	for <lists+kvm@lfdr.de>; Wed, 25 Mar 2020 10:49:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 583D119256E
+	for <lists+kvm@lfdr.de>; Wed, 25 Mar 2020 11:23:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727301AbgCYJt3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Mar 2020 05:49:29 -0400
-Received: from mga01.intel.com ([192.55.52.88]:60954 "EHLO mga01.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726116AbgCYJt3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 Mar 2020 05:49:29 -0400
-IronPort-SDR: mKnWsMsAhxugs+J/Q+QMZIRNL8ttJNiCUqWhqfNNBIQRxXxE1H/zh5+p3Z7jkhr7MyZ7ktESVJ
- zFhDgAx6de2g==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Mar 2020 02:49:28 -0700
-IronPort-SDR: QnDFwi1eOP9EOSUOS105zuJWf7fOshXREM51JHsW11j74I+ZSoKn8w6aHA43BWP6wXx4YDpyYY
- Gz9UOeCKr+4Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.72,303,1580803200"; 
-   d="scan'208";a="326182720"
-Received: from fmsmsx107.amr.corp.intel.com ([10.18.124.205])
-  by orsmga001.jf.intel.com with ESMTP; 25 Mar 2020 02:49:27 -0700
-Received: from fmsmsx609.amr.corp.intel.com (10.18.126.89) by
- fmsmsx107.amr.corp.intel.com (10.18.124.205) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Wed, 25 Mar 2020 02:49:27 -0700
-Received: from fmsmsx609.amr.corp.intel.com (10.18.126.89) by
- fmsmsx609.amr.corp.intel.com (10.18.126.89) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1713.5; Wed, 25 Mar 2020 02:49:27 -0700
-Received: from shsmsx108.ccr.corp.intel.com (10.239.4.97) by
- fmsmsx609.amr.corp.intel.com (10.18.126.89) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id 15.1.1713.5
- via Frontend Transport; Wed, 25 Mar 2020 02:49:26 -0700
-Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.206]) by
- SHSMSX108.ccr.corp.intel.com ([169.254.8.235]) with mapi id 14.03.0439.000;
- Wed, 25 Mar 2020 17:49:23 +0800
-From:   "Liu, Yi L" <yi.l.liu@intel.com>
-To:     Peter Xu <peterx@redhat.com>
-CC:     "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "mst@redhat.com" <mst@redhat.com>,
-        "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "Tian, Jun J" <jun.j.tian@intel.com>,
-        "Sun, Yi Y" <yi.y.sun@intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Wu, Hao" <hao.wu@intel.com>,
-        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
-        Jacob Pan <jacob.jun.pan@linux.intel.com>,
-        Yi Sun <yi.y.sun@linux.intel.com>
-Subject: RE: [PATCH v1 13/22] vfio: add bind stage-1 page table support
-Thread-Topic: [PATCH v1 13/22] vfio: add bind stage-1 page table support
-Thread-Index: AQHWAEW3G3tO+4+IDkCwmVDpgLUkb6hXgDSAgAGT8oA=
-Date:   Wed, 25 Mar 2020 09:49:22 +0000
-Message-ID: <A2975661238FB949B60364EF0F2C25743A201E70@SHSMSX104.ccr.corp.intel.com>
-References: <1584880579-12178-1-git-send-email-yi.l.liu@intel.com>
- <1584880579-12178-14-git-send-email-yi.l.liu@intel.com>
- <20200324174121.GX127076@xz-x1>
-In-Reply-To: <20200324174121.GX127076@xz-x1>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-version: 11.2.0.6
-dlp-reaction: no-action
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        id S1727407AbgCYKXt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Mar 2020 06:23:49 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:56938 "EHLO
+        us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727262AbgCYKXt (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 25 Mar 2020 06:23:49 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1585131827;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=6dJAVutViyziW48uoJ1vZ2A5XPOsDEHehNDmLJL+Tn8=;
+        b=Wwy7zP3z0/k4fwIzGQwZIJYkikWagSLxKdMMRtrNz/1C/tTc4tikvjRyYfuBsVi12uJoX1
+        wj82fHKzhJ2KlV1CcVnjjHfAQWZX8AMTR7zc13uWaFvOe3vZxdODMqEm0XabMkFwWJeiwh
+        msU1jsY8zqcwSnz1pUlC1CZS8cwWkfs=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-23-q5XXDLPqN--xevkJ_mai-w-1; Wed, 25 Mar 2020 06:23:46 -0400
+X-MC-Unique: q5XXDLPqN--xevkJ_mai-w-1
+Received: by mail-wr1-f72.google.com with SMTP id b2so493423wrq.8
+        for <kvm@vger.kernel.org>; Wed, 25 Mar 2020 03:23:45 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=6dJAVutViyziW48uoJ1vZ2A5XPOsDEHehNDmLJL+Tn8=;
+        b=Pm3W5O80ynTK4sEyNmU1B5GshMMIrVcxz6ZrOLtnufYv7uSvFeqUsR8uUMvKpq/yF7
+         BDf1Upr079AB8chSDbbHaXvBFU88ZGNuo8lCI1E8lj5VHILJE/TFfOYXxVACgCavxyHP
+         EtyYIQj73k3k8uT9qLMXn8pm/j70JiluWM612wHghXpFsfqb1QfcWaLfuPNKwdzZukhN
+         wSOWPnuwYrd0R722xAI3pLKMt5/6tq3XnPrc7I5N0p2T+p3B9Hgj+nM1X/Jh4WvVlaAE
+         Un/XWo+dJeyjr6eCl2Ct4Ng3FSaXqUq9PNa1TiUSAyB0TUjREgQI14hnJ4y2DiTdh29d
+         gSgw==
+X-Gm-Message-State: ANhLgQ3osWyHQ62dVNeFNAIQHVQT5WXsT6hZQB4dqh4uP9eVAn1Etp02
+        8SqNPFDszKr2Zhw0DeFvIXwVfvSQ35K3GS2yPc46K7XRqPb+doyzP0EpEo0wO/0ZyF98kPo7hSk
+        tUe0DmiBg/3/T
+X-Received: by 2002:a5d:66c3:: with SMTP id k3mr2586478wrw.407.1585131824807;
+        Wed, 25 Mar 2020 03:23:44 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vv6n1iEZwxUl0A6R9tozXB8P4hVHaC/oMdbsftTCdWmzxPturH/edEywa0J0gSH7MPaHg0cDw==
+X-Received: by 2002:a5d:66c3:: with SMTP id k3mr2586449wrw.407.1585131824427;
+        Wed, 25 Mar 2020 03:23:44 -0700 (PDT)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id f207sm8902528wme.9.2020.03.25.03.23.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 25 Mar 2020 03:23:43 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Ben Gardon <bgardon@google.com>,
+        Junaid Shahid <junaids@google.com>,
+        Liran Alon <liran.alon@oracle.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        John Haxby <john.haxby@oracle.com>,
+        Miaohe Lin <linmiaohe@huawei.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>
+Subject: Re: [PATCH v3 14/37] KVM: x86: Move "flush guest's TLB" logic to separate kvm_x86_ops hook
+In-Reply-To: <20200320212833.3507-15-sean.j.christopherson@intel.com>
+References: <20200320212833.3507-1-sean.j.christopherson@intel.com> <20200320212833.3507-15-sean.j.christopherson@intel.com>
+Date:   Wed, 25 Mar 2020 11:23:41 +0100
+Message-ID: <87369w7mxe.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
+Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-PiBGcm9tOiBQZXRlciBYdSA8cGV0ZXJ4QHJlZGhhdC5jb20+DQo+IFNlbnQ6IFdlZG5lc2RheSwg
-TWFyY2ggMjUsIDIwMjAgMTo0MSBBTQ0KPiBUbzogTGl1LCBZaSBMIDx5aS5sLmxpdUBpbnRlbC5j
-b20+DQo+IFN1YmplY3Q6IFJlOiBbUEFUQ0ggdjEgMTMvMjJdIHZmaW86IGFkZCBiaW5kIHN0YWdl
-LTEgcGFnZSB0YWJsZSBzdXBwb3J0DQo+IA0KPiBPbiBTdW4sIE1hciAyMiwgMjAyMCBhdCAwNToz
-NjoxMEFNIC0wNzAwLCBMaXUgWWkgTCB3cm90ZToNCj4gPiBUaGlzIHBhdGNoIGFkZHMgYmluZF9z
-dGFnZTFfcGd0YmwoKSBkZWZpbml0aW9uIGluDQo+ID4gSG9zdElPTU1VQ29udGV4dENsYXNzLCBh
-bHNvIGFkZHMgY29ycmVzcG9uZGluZyBpbXBsZW1lbnRhdGlvbiBpbiBWRklPLg0KPiA+IFRoaXMg
-aXMgdG8gZXhwb3NlIGEgd2F5IGZvciB2SU9NTVUgdG8gc2V0dXAgZHVhbCBzdGFnZSBETUEgdHJh
-bnNsYXRpb24NCj4gPiBmb3IgcGFzc3RocnUgZGV2aWNlcyBvbiBoYXJkd2FyZS4NCj4gPg0KPiA+
-IENjOiBLZXZpbiBUaWFuIDxrZXZpbi50aWFuQGludGVsLmNvbT4NCj4gPiBDYzogSmFjb2IgUGFu
-IDxqYWNvYi5qdW4ucGFuQGxpbnV4LmludGVsLmNvbT4NCj4gPiBDYzogUGV0ZXIgWHUgPHBldGVy
-eEByZWRoYXQuY29tPg0KPiA+IENjOiBFcmljIEF1Z2VyIDxlcmljLmF1Z2VyQHJlZGhhdC5jb20+
-DQo+ID4gQ2M6IFlpIFN1biA8eWkueS5zdW5AbGludXguaW50ZWwuY29tPg0KPiA+IENjOiBEYXZp
-ZCBHaWJzb24gPGRhdmlkQGdpYnNvbi5kcm9wYmVhci5pZC5hdT4NCj4gPiBDYzogQWxleCBXaWxs
-aWFtc29uIDxhbGV4LndpbGxpYW1zb25AcmVkaGF0LmNvbT4NCj4gPiBTaWduZWQtb2ZmLWJ5OiBM
-aXUgWWkgTCA8eWkubC5saXVAaW50ZWwuY29tPg0KPiA+IC0tLQ0KPiA+ICBody9pb21tdS9ob3N0
-X2lvbW11X2NvbnRleHQuYyAgICAgICAgIHwgNDkNCj4gKysrKysrKysrKysrKysrKysrKysrKysr
-KysrKysrLQ0KPiA+ICBody92ZmlvL2NvbW1vbi5jICAgICAgICAgICAgICAgICAgICAgIHwgNTUg
-KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKy0NCj4gPiAgaW5jbHVkZS9ody9pb21t
-dS9ob3N0X2lvbW11X2NvbnRleHQuaCB8IDI2ICsrKysrKysrKysrKysrKystDQo+ID4gIDMgZmls
-ZXMgY2hhbmdlZCwgMTI3IGluc2VydGlvbnMoKyksIDMgZGVsZXRpb25zKC0pDQo+ID4NCj4gPiBk
-aWZmIC0tZ2l0IGEvaHcvaW9tbXUvaG9zdF9pb21tdV9jb250ZXh0LmMNCj4gPiBiL2h3L2lvbW11
-L2hvc3RfaW9tbXVfY29udGV4dC5jIGluZGV4IGFmNjE4OTkuLjhhNTMzNzYgMTAwNjQ0DQo+ID4g
-LS0tIGEvaHcvaW9tbXUvaG9zdF9pb21tdV9jb250ZXh0LmMNCj4gPiArKysgYi9ody9pb21tdS9o
-b3N0X2lvbW11X2NvbnRleHQuYw0KPiA+IEBAIC02OSwyMSArNjksNjcgQEAgaW50IGhvc3RfaW9t
-bXVfY3R4X3Bhc2lkX2ZyZWUoSG9zdElPTU1VQ29udGV4dA0KPiAqaG9zdF9pY3gsIHVpbnQzMl90
-IHBhc2lkKQ0KPiA+ICAgICAgcmV0dXJuIGhpY3hjLT5wYXNpZF9mcmVlKGhvc3RfaWN4LCBwYXNp
-ZCk7ICB9DQo+ID4NCj4gPiAraW50IGhvc3RfaW9tbXVfY3R4X2JpbmRfc3RhZ2UxX3BndGJsKEhv
-c3RJT01NVUNvbnRleHQgKmhvc3RfaWN4LA0KPiA+ICsgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgRHVhbElPTU1VU3RhZ2UxQmluZERhdGEgKmRhdGEpIHsNCj4gPiArICAgIEhv
-c3RJT01NVUNvbnRleHRDbGFzcyAqaGljeGM7DQo+ID4gKw0KPiA+ICsgICAgaWYgKCFob3N0X2lj
-eCkgew0KPiA+ICsgICAgICAgIHJldHVybiAtRUlOVkFMOw0KPiA+ICsgICAgfQ0KPiA+ICsNCj4g
-PiArICAgIGhpY3hjID0gSE9TVF9JT01NVV9DT05URVhUX0dFVF9DTEFTUyhob3N0X2ljeCk7DQo+
-ID4gKyAgICBpZiAoIWhpY3hjKSB7DQo+ID4gKyAgICAgICAgcmV0dXJuIC1FSU5WQUw7DQo+ID4g
-KyAgICB9DQo+ID4gKw0KPiA+ICsgICAgaWYgKCEoaG9zdF9pY3gtPmZsYWdzICYgSE9TVF9JT01N
-VV9ORVNUSU5HKSB8fA0KPiA+ICsgICAgICAgICFoaWN4Yy0+YmluZF9zdGFnZTFfcGd0YmwpIHsN
-Cj4gPiArICAgICAgICByZXR1cm4gLUVJTlZBTDsNCj4gPiArICAgIH0NCj4gPiArDQo+ID4gKyAg
-ICByZXR1cm4gaGljeGMtPmJpbmRfc3RhZ2UxX3BndGJsKGhvc3RfaWN4LCBkYXRhKTsgfQ0KPiA+
-ICsNCj4gPiAraW50IGhvc3RfaW9tbXVfY3R4X3VuYmluZF9zdGFnZTFfcGd0YmwoSG9zdElPTU1V
-Q29udGV4dCAqaG9zdF9pY3gsDQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgIER1YWxJT01NVVN0YWdlMUJpbmREYXRhICpkYXRhKQ0KPiA+ICt7DQo+ID4gKyAgICBI
-b3N0SU9NTVVDb250ZXh0Q2xhc3MgKmhpY3hjOw0KPiA+ICsNCj4gPiArICAgIGlmICghaG9zdF9p
-Y3gpIHsNCj4gPiArICAgICAgICByZXR1cm4gLUVJTlZBTDsNCj4gPiArICAgIH0NCj4gPiArDQo+
-ID4gKyAgICBoaWN4YyA9IEhPU1RfSU9NTVVfQ09OVEVYVF9HRVRfQ0xBU1MoaG9zdF9pY3gpOw0K
-PiA+ICsgICAgaWYgKCFoaWN4Yykgew0KPiA+ICsgICAgICAgIHJldHVybiAtRUlOVkFMOw0KPiA+
-ICsgICAgfQ0KPiA+ICsNCj4gPiArICAgIGlmICghKGhvc3RfaWN4LT5mbGFncyAmIEhPU1RfSU9N
-TVVfTkVTVElORykgfHwNCj4gPiArICAgICAgICAhaGljeGMtPnVuYmluZF9zdGFnZTFfcGd0Ymwp
-IHsNCj4gPiArICAgICAgICByZXR1cm4gLUVJTlZBTDsNCj4gPiArICAgIH0NCj4gPiArDQo+ID4g
-KyAgICByZXR1cm4gaGljeGMtPnVuYmluZF9zdGFnZTFfcGd0YmwoaG9zdF9pY3gsIGRhdGEpOyB9
-DQo+ID4gKw0KPiA+ICB2b2lkIGhvc3RfaW9tbXVfY3R4X2luaXQodm9pZCAqX2hvc3RfaWN4LCBz
-aXplX3QgaW5zdGFuY2Vfc2l6ZSwNCj4gPiAgICAgICAgICAgICAgICAgICAgICAgICAgIGNvbnN0
-IGNoYXIgKm1ydHlwZW5hbWUsDQo+ID4gLSAgICAgICAgICAgICAgICAgICAgICAgICB1aW50NjRf
-dCBmbGFncykNCj4gPiArICAgICAgICAgICAgICAgICAgICAgICAgIHVpbnQ2NF90IGZsYWdzLCB1
-aW50MzJfdCBmb3JtYXRzKQ0KPiA+ICB7DQo+ID4gICAgICBIb3N0SU9NTVVDb250ZXh0ICpob3N0
-X2ljeDsNCj4gPg0KPiA+ICAgICAgb2JqZWN0X2luaXRpYWxpemUoX2hvc3RfaWN4LCBpbnN0YW5j
-ZV9zaXplLCBtcnR5cGVuYW1lKTsNCj4gPiAgICAgIGhvc3RfaWN4ID0gSE9TVF9JT01NVV9DT05U
-RVhUKF9ob3N0X2ljeCk7DQo+ID4gICAgICBob3N0X2ljeC0+ZmxhZ3MgPSBmbGFnczsNCj4gPiAr
-ICAgIGhvc3RfaWN4LT5zdGFnZTFfZm9ybWF0cyA9IGZvcm1hdHM7DQo+ID4gICAgICBob3N0X2lj
-eC0+aW5pdGlhbGl6ZWQgPSB0cnVlOw0KPiA+ICB9DQo+ID4NCj4gPiAgdm9pZCBob3N0X2lvbW11
-X2N0eF9kZXN0cm95KEhvc3RJT01NVUNvbnRleHQgKmhvc3RfaWN4KSAgew0KPiA+ICAgICAgaG9z
-dF9pY3gtPmZsYWdzID0gMHgwOw0KPiA+ICsgICAgaG9zdF9pY3gtPnN0YWdlMV9mb3JtYXRzID0g
-MHgwOw0KPiANCj4gVGhpcyBjb3VsZCBiZSBkcm9wcGVkIHRvbyB3aXRoIHRoZSBmdW5jdGlvbi4u
-DQoNCnllcywgaXQgaXMuDQoNCj4gPiAgICAgIGhvc3RfaWN4LT5pbml0aWFsaXplZCA9IGZhbHNl
-Ow0KPiA+ICB9DQo+ID4NCj4gPiBAQCAtOTIsNiArMTM4LDcgQEAgc3RhdGljIHZvaWQgaG9zdF9p
-Y3hfaW5pdF9mbihPYmplY3QgKm9iaikNCj4gPiAgICAgIEhvc3RJT01NVUNvbnRleHQgKmhvc3Rf
-aWN4ID0gSE9TVF9JT01NVV9DT05URVhUKG9iaik7DQo+ID4NCj4gPiAgICAgIGhvc3RfaWN4LT5m
-bGFncyA9IDB4MDsNCj4gPiArICAgIGhvc3RfaWN4LT5zdGFnZTFfZm9ybWF0cyA9IDB4MDsNCj4g
-DQo+IFNhbWUgaGVyZS4uLg0KDQplY2hvLg0KDQo+ID4gICAgICBob3N0X2ljeC0+aW5pdGlhbGl6
-ZWQgPSBmYWxzZTsNCj4gPiAgfQ0KPiA+DQo+ID4gZGlmZiAtLWdpdCBhL2h3L3ZmaW8vY29tbW9u
-LmMgYi9ody92ZmlvL2NvbW1vbi5jIGluZGV4DQo+ID4gZTBmMjgyOC4uNzcwYTc4NSAxMDA2NDQN
-Cj4gPiAtLS0gYS9ody92ZmlvL2NvbW1vbi5jDQo+ID4gKysrIGIvaHcvdmZpby9jb21tb24uYw0K
-PiA+IEBAIC0xMjIzLDYgKzEyMjMsNTIgQEAgc3RhdGljIGludA0KPiB2ZmlvX2hvc3RfaWN4X3Bh
-c2lkX2ZyZWUoSG9zdElPTU1VQ29udGV4dCAqaG9zdF9pY3gsDQo+ID4gICAgICByZXR1cm4gMDsN
-Cj4gPiAgfQ0KPiA+DQo+ID4gK3N0YXRpYyBpbnQgdmZpb19ob3N0X2ljeF9iaW5kX3N0YWdlMV9w
-Z3RibChIb3N0SU9NTVVDb250ZXh0DQo+ID4gKypob3N0X2ljeCwNCj4gDQo+IFNhbWUgbmFtZSBp
-c3N1ZSBvbiBpY3g/ICBGZWVsIGZyZWUgdG8gY2hvb3NlIGFueXRoaW5nIHRoYXQgYWxpZ25zIHdp
-dGggeW91cg0KPiBwcmV2aW91cyBkZWNpc2lvbi4uLg0KDQp5ZXMsIEknbGwgdXNlIF9ob3N0X2lv
-bW11X2N0eF8gaW5zdGVhZCBvZiBfaG9zdF9pY3hfLg0KDQo+ID4gKyAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICBEdWFsSU9NTVVTdGFnZTFCaW5kRGF0YQ0KPiA+ICsq
-YmluZF9kYXRhKSB7DQo+ID4gKyAgICBWRklPQ29udGFpbmVyICpjb250YWluZXIgPSBjb250YWlu
-ZXJfb2YoaG9zdF9pY3gsIFZGSU9Db250YWluZXIsIGhvc3RfaWN4KTsNCj4gPiArICAgIHN0cnVj
-dCB2ZmlvX2lvbW11X3R5cGUxX2JpbmQgKmJpbmQ7DQo+ID4gKyAgICB1bnNpZ25lZCBsb25nIGFy
-Z3N6Ow0KPiA+ICsgICAgaW50IHJldCA9IDA7DQo+ID4gKw0KPiA+ICsgICAgYXJnc3ogPSBzaXpl
-b2YoKmJpbmQpICsgc2l6ZW9mKGJpbmRfZGF0YS0+YmluZF9kYXRhKTsNCj4gPiArICAgIGJpbmQg
-PSBnX21hbGxvYzAoYXJnc3opOw0KPiA+ICsgICAgYmluZC0+YXJnc3ogPSBhcmdzejsNCj4gPiAr
-ICAgIGJpbmQtPmZsYWdzID0gVkZJT19JT01NVV9CSU5EX0dVRVNUX1BHVEJMOw0KPiA+ICsgICAg
-bWVtY3B5KCZiaW5kLT5kYXRhLCAmYmluZF9kYXRhLT5iaW5kX2RhdGEsDQo+ID4gKyBzaXplb2Yo
-YmluZF9kYXRhLT5iaW5kX2RhdGEpKTsNCj4gPiArDQo+ID4gKyAgICBpZiAoaW9jdGwoY29udGFp
-bmVyLT5mZCwgVkZJT19JT01NVV9CSU5ELCBiaW5kKSkgew0KPiA+ICsgICAgICAgIHJldCA9IC1l
-cnJubzsNCj4gPiArICAgICAgICBlcnJvcl9yZXBvcnQoIiVzOiBwYXNpZCAoJXUpIGJpbmQgZmFp
-bGVkOiAlZCIsDQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICBfX2Z1bmNfXywgYmluZF9kYXRh
-LT5wYXNpZCwgcmV0KTsNCj4gPiArICAgIH0NCj4gPiArICAgIGdfZnJlZShiaW5kKTsNCj4gPiAr
-ICAgIHJldHVybiByZXQ7DQo+ID4gK30NCj4gPiArDQo+ID4gK3N0YXRpYyBpbnQgdmZpb19ob3N0
-X2ljeF91bmJpbmRfc3RhZ2UxX3BndGJsKEhvc3RJT01NVUNvbnRleHQgKmhvc3RfaWN4LA0KPiA+
-ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgRHVhbElPTU1VU3RhZ2Ux
-QmluZERhdGENCj4gPiArKmJpbmRfZGF0YSkgew0KPiA+ICsgICAgVkZJT0NvbnRhaW5lciAqY29u
-dGFpbmVyID0gY29udGFpbmVyX29mKGhvc3RfaWN4LCBWRklPQ29udGFpbmVyLCBob3N0X2ljeCk7
-DQo+ID4gKyAgICBzdHJ1Y3QgdmZpb19pb21tdV90eXBlMV9iaW5kICpiaW5kOw0KPiA+ICsgICAg
-dW5zaWduZWQgbG9uZyBhcmdzejsNCj4gPiArICAgIGludCByZXQgPSAwOw0KPiA+ICsNCj4gPiAr
-ICAgIGFyZ3N6ID0gc2l6ZW9mKCpiaW5kKSArIHNpemVvZihiaW5kX2RhdGEtPmJpbmRfZGF0YSk7
-DQo+ID4gKyAgICBiaW5kID0gZ19tYWxsb2MwKGFyZ3N6KTsNCj4gPiArICAgIGJpbmQtPmFyZ3N6
-ID0gYXJnc3o7DQo+ID4gKyAgICBiaW5kLT5mbGFncyA9IFZGSU9fSU9NTVVfVU5CSU5EX0dVRVNU
-X1BHVEJMOw0KPiA+ICsgICAgbWVtY3B5KCZiaW5kLT5kYXRhLCAmYmluZF9kYXRhLT5iaW5kX2Rh
-dGEsDQo+ID4gKyBzaXplb2YoYmluZF9kYXRhLT5iaW5kX2RhdGEpKTsNCj4gPiArDQo+ID4gKyAg
-ICBpZiAoaW9jdGwoY29udGFpbmVyLT5mZCwgVkZJT19JT01NVV9CSU5ELCBiaW5kKSkgew0KPiA+
-ICsgICAgICAgIHJldCA9IC1lcnJubzsNCj4gPiArICAgICAgICBlcnJvcl9yZXBvcnQoIiVzOiBw
-YXNpZCAoJXUpIHVuYmluZCBmYWlsZWQ6ICVkIiwNCj4gPiArICAgICAgICAgICAgICAgICAgICAg
-IF9fZnVuY19fLCBiaW5kX2RhdGEtPnBhc2lkLCByZXQpOw0KPiA+ICsgICAgfQ0KPiA+ICsgICAg
-Z19mcmVlKGJpbmQpOw0KPiA+ICsgICAgcmV0dXJuIHJldDsNCj4gPiArfQ0KPiA+ICsNCj4gPiAg
-LyoqDQo+ID4gICAqIEdldCBpb21tdSBpbmZvIGZyb20gaG9zdC4gQ2FsbGVyIG9mIHRoaXMgZnVu
-Y2lvbiBzaG91bGQgZnJlZQ0KPiA+ICAgKiB0aGUgbWVtb3J5IHBvaW50ZWQgYnkgdGhlIHJldHVy
-bmVkIHBvaW50ZXIgc3RvcmVkIGluIEBpbmZvIEBADQo+ID4gLTEzMzcsNiArMTM4Myw3IEBAIHN0
-YXRpYyBpbnQgdmZpb19pbml0X2NvbnRhaW5lcihWRklPQ29udGFpbmVyICpjb250YWluZXIsIGlu
-dA0KPiBncm91cF9mZCwNCj4gPiAgICAgICAgICBzdHJ1Y3QgdmZpb19pb21tdV90eXBlMV9pbmZv
-X2NhcF9uZXN0aW5nIG5lc3RpbmcgPSB7DQo+ID4gICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgLm5lc3RpbmdfY2FwYWJpbGl0aWVzID0gMHgwLA0KPiA+ICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIC5zdGFnZTFfZm9ybWF0cyA9IDAsIH07
-DQo+ID4gKyAgICAgICAgdWludDMyX3Qgc3RhZ2UxX2Zvcm1hdHM7DQo+ID4NCj4gPiAgICAgICAg
-ICByZXQgPSB2ZmlvX2dldF9uZXN0aW5nX2lvbW11X2NhcChjb250YWluZXIsICZuZXN0aW5nKTsN
-Cj4gPiAgICAgICAgICBpZiAocmV0KSB7DQo+ID4gQEAgLTEzNDcsMTAgKzEzOTQsMTQgQEAgc3Rh
-dGljIGludCB2ZmlvX2luaXRfY29udGFpbmVyKFZGSU9Db250YWluZXINCj4gPiAqY29udGFpbmVy
-LCBpbnQgZ3JvdXBfZmQsDQo+ID4NCj4gPiAgICAgICAgICBmbGFncyB8PSAobmVzdGluZy5uZXN0
-aW5nX2NhcGFiaWxpdGllcyAmIFZGSU9fSU9NTVVfUEFTSURfUkVRUykgPw0KPiA+ICAgICAgICAg
-ICAgICAgICAgIEhPU1RfSU9NTVVfUEFTSURfUkVRVUVTVCA6IDA7DQo+ID4gKyAgICAgICAgZmxh
-Z3MgfD0gSE9TVF9JT01NVV9ORVNUSU5HOw0KPiA+ICsgICAgICAgIHN0YWdlMV9mb3JtYXRzID0g
-bmVzdGluZy5zdGFnZTFfZm9ybWF0czsNCj4gPiArDQo+ID4gICAgICAgICAgaG9zdF9pb21tdV9j
-dHhfaW5pdCgmY29udGFpbmVyLT5ob3N0X2ljeCwNCj4gPiAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgIHNpemVvZihjb250YWluZXItPmhvc3RfaWN4KSwNCj4gPiAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgIFRZUEVfVkZJT19IT1NUX0lPTU1VX0NPTlRFWFQsDQo+ID4gLSAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICBmbGFncyk7DQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICBmbGFncywNCj4gPiArICAgICAgICAgICAgICAgICAgICAgICAgICAgIHN0YWdlMV9mb3Jt
-YXRzKTsNCj4gDQo+IFdlIGNhbiBjb25zaWRlciBwYXNzaW5nIGluIG5lc3Rpbmcuc3RhZ2UxX2Zv
-cm1hdHMgYW5kIGRyb3Agc3RhZ2UxX2Zvcm1hdHMuDQoNCmFoYSwgeWVzLg0KDQpSZWdhcmRzLA0K
-WWkgTGl1DQoNCg==
+Sean Christopherson <sean.j.christopherson@intel.com> writes:
+
+> Add a dedicated hook to handle flushing TLB entries on behalf of the
+> guest, i.e. for a paravirtualized TLB flush, and use it directly instead
+> of bouncing through kvm_vcpu_flush_tlb().
+>
+> For VMX, change the effective implementation implementation to never do
+> INVEPT and flush only the current context, i.e. to always flush via
+> INVVPID(SINGLE_CONTEXT).  The INVEPT performed by __vmx_flush_tlb() when
+> @invalidate_gpa=false and enable_vpid=0 is unnecessary, as it will only
+> flush guest-physical mappings; linear and combined mappings are flushed
+> by VM-Enter when VPID is disabled, and changes in the guest pages tables
+> do not affect guest-physical mappings.
+>
+> When EPT and VPID are enabled, doing INVVPID is not required (by Intel's
+> architecture) to invalidate guest-physical mappings, i.e. TLB entries
+> that cache guest-physical mappings can live across INVVPID as the
+> mappings are associated with an EPTP, not a VPID.  The intent of
+> @invalidate_gpa is to inform vmx_flush_tlb() that it must "invalidate
+> gpa mappings", i.e. do INVEPT and not simply INVVPID.  Other than nested
+> VPID handling, which now calls vpid_sync_context() directly, the only
+> scenario where KVM can safely do INVVPID instead of INVEPT (when EPT is
+> enabled) is if KVM is flushing TLB entries from the guest's perspective,
+> i.e. is only required to invalidate linear mappings.
+>
+> For SVM, flushing TLB entries from the guest's perspective can be done
+> by flushing the current ASID, as changes to the guest's page tables are
+> associated only with the current ASID.
+>
+> Adding a dedicated ->tlb_flush_guest() paves the way toward removing
+> @invalidate_gpa, which is a potentially dangerous control flag as its
+> meaning is not exactly crystal clear, even for those who are familiar
+> with the subtleties of what mappings Intel CPUs are/aren't allowed to
+> keep across various invalidation scenarios.
+>
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> ---
+>  arch/x86/include/asm/kvm_host.h |  6 ++++++
+>  arch/x86/kvm/svm.c              |  6 ++++++
+>  arch/x86/kvm/vmx/vmx.c          | 13 +++++++++++++
+>  arch/x86/kvm/x86.c              |  2 +-
+>  4 files changed, 26 insertions(+), 1 deletion(-)
+>
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index cdbf822c5c8b..c08f4c0bf4d1 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -1118,6 +1118,12 @@ struct kvm_x86_ops {
+>  	 */
+>  	void (*tlb_flush_gva)(struct kvm_vcpu *vcpu, gva_t addr);
+>  
+> +	/*
+> +	 * Flush any TLB entries created by the guest.  Like tlb_flush_gva(),
+> +	 * does not need to flush GPA->HPA mappings.
+> +	 */
+> +	void (*tlb_flush_guest)(struct kvm_vcpu *vcpu);
+> +
+>  	void (*run)(struct kvm_vcpu *vcpu);
+>  	int (*handle_exit)(struct kvm_vcpu *vcpu,
+>  		enum exit_fastpath_completion exit_fastpath);
+> diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
+> index 08568ae9f7a1..396f42753489 100644
+> --- a/arch/x86/kvm/svm.c
+> +++ b/arch/x86/kvm/svm.c
+> @@ -5643,6 +5643,11 @@ static void svm_flush_tlb_gva(struct kvm_vcpu *vcpu, gva_t gva)
+>  	invlpga(gva, svm->vmcb->control.asid);
+>  }
+>  
+> +static void svm_flush_tlb_guest(struct kvm_vcpu *vcpu)
+> +{
+> +	svm_flush_tlb(vcpu, false);
+> +}
+> +
+>  static void svm_prepare_guest_switch(struct kvm_vcpu *vcpu)
+>  {
+>  }
+> @@ -7400,6 +7405,7 @@ static struct kvm_x86_ops svm_x86_ops __ro_after_init = {
+>  
+>  	.tlb_flush = svm_flush_tlb,
+>  	.tlb_flush_gva = svm_flush_tlb_gva,
+> +	.tlb_flush_guest = svm_flush_tlb_guest,
+>  
+>  	.run = svm_vcpu_run,
+>  	.handle_exit = handle_exit,
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index ba24bbda2c12..57c1cee58d18 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -2862,6 +2862,18 @@ static void vmx_flush_tlb_gva(struct kvm_vcpu *vcpu, gva_t addr)
+>  	 */
+>  }
+>  
+> +static void vmx_flush_tlb_guest(struct kvm_vcpu *vcpu)
+> +{
+> +	/*
+> +	 * vpid_sync_context() is a nop if vmx->vpid==0, e.g. if enable_vpid==0
+> +	 * or a vpid couldn't be allocated for this vCPU.  VM-Enter and VM-Exit
+> +	 * are required to flush GVA->{G,H}PA mappings from the TLB if vpid is
+> +	 * disabled (VM-Enter with vpid enabled and vpid==0 is disallowed),
+> +	 * i.e. no explicit INVVPID is necessary.
+> +	 */
+> +	vpid_sync_context(to_vmx(vcpu)->vpid);
+> +}
+> +
+>  static void vmx_decache_cr0_guest_bits(struct kvm_vcpu *vcpu)
+>  {
+>  	ulong cr0_guest_owned_bits = vcpu->arch.cr0_guest_owned_bits;
+> @@ -7875,6 +7887,7 @@ static struct kvm_x86_ops vmx_x86_ops __ro_after_init = {
+>  
+>  	.tlb_flush = vmx_flush_tlb,
+>  	.tlb_flush_gva = vmx_flush_tlb_gva,
+> +	.tlb_flush_guest = vmx_flush_tlb_guest,
+>  
+>  	.run = vmx_vcpu_run,
+>  	.handle_exit = vmx_handle_exit,
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index f506248d61a1..0b90ec2c93cf 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -2725,7 +2725,7 @@ static void record_steal_time(struct kvm_vcpu *vcpu)
+>  	trace_kvm_pv_tlb_flush(vcpu->vcpu_id,
+>  		st->preempted & KVM_VCPU_FLUSH_TLB);
+>  	if (xchg(&st->preempted, 0) & KVM_VCPU_FLUSH_TLB)
+> -		kvm_vcpu_flush_tlb(vcpu, false);
+> +		kvm_x86_ops->tlb_flush_guest(vcpu);
+>  
+>  	vcpu->arch.st.preempted = 0;
+
+Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+
+I *think* I've commented on the previous version that we also have
+hyperv-style PV TLB flush and this will likely need to be switched to
+tlb_flush_guest(). What do you think about the following (very lightly
+tested)?
+
+commit 485b4a579605597b9897b3d9ec118e0f7f1138ad
+Author: Vitaly Kuznetsov <vkuznets@redhat.com>
+Date:   Wed Mar 25 11:14:25 2020 +0100
+
+    KVM: x86: make Hyper-V PV TLB flush use tlb_flush_guest()
+    
+    Hyper-V PV TLB flush mechanism does TLB flush on behalf of the guest
+    so doing tlb_flush_all() is an overkill, switch to using tlb_flush_guest()
+    (just like KVM PV TLB flush mechanism) instead. Introduce
+    KVM_REQ_HV_TLB_FLUSH to support the change.
+    
+    Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 167729624149..8c5659ed211b 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -84,6 +84,7 @@
+ #define KVM_REQ_APICV_UPDATE \
+ 	KVM_ARCH_REQ_FLAGS(25, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
+ #define KVM_REQ_TLB_FLUSH_CURRENT	KVM_ARCH_REQ(26)
++#define KVM_REQ_HV_TLB_FLUSH		KVM_ARCH_REQ(27)
+ 
+ #define CR0_RESERVED_BITS                                               \
+ 	(~(unsigned long)(X86_CR0_PE | X86_CR0_MP | X86_CR0_EM | X86_CR0_TS \
+diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
+index a86fda7a1d03..0d051ed11f38 100644
+--- a/arch/x86/kvm/hyperv.c
++++ b/arch/x86/kvm/hyperv.c
+@@ -1425,8 +1425,7 @@ static u64 kvm_hv_flush_tlb(struct kvm_vcpu *current_vcpu, u64 ingpa,
+ 	 * vcpu->arch.cr3 may not be up-to-date for running vCPUs so we can't
+ 	 * analyze it here, flush TLB regardless of the specified address space.
+ 	 */
+-	kvm_make_vcpus_request_mask(kvm,
+-				    KVM_REQ_TLB_FLUSH | KVM_REQUEST_NO_WAKEUP,
++	kvm_make_vcpus_request_mask(kvm, KVM_REQ_HV_TLB_FLUSH,
+ 				    vcpu_mask, &hv_vcpu->tlb_flush);
+ 
+ ret_success:
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 210af343eebf..5096a9b1a04e 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -2702,6 +2702,12 @@ static void kvm_vcpu_flush_tlb_all(struct kvm_vcpu *vcpu)
+ 	kvm_x86_ops->tlb_flush_all(vcpu);
+ }
+ 
++static void kvm_vcpu_flush_tlb_guest(struct kvm_vcpu *vcpu)
++{
++	++vcpu->stat.tlb_flush;
++	kvm_x86_ops->tlb_flush_guest(vcpu);
++}
++
+ static void record_steal_time(struct kvm_vcpu *vcpu)
+ {
+ 	struct kvm_host_map map;
+@@ -2725,7 +2731,7 @@ static void record_steal_time(struct kvm_vcpu *vcpu)
+ 	trace_kvm_pv_tlb_flush(vcpu->vcpu_id,
+ 		st->preempted & KVM_VCPU_FLUSH_TLB);
+ 	if (xchg(&st->preempted, 0) & KVM_VCPU_FLUSH_TLB)
+-		kvm_x86_ops->tlb_flush_guest(vcpu);
++		kvm_vcpu_flush_tlb_guest(vcpu);
+ 
+ 	vcpu->arch.st.preempted = 0;
+ 
+@@ -8219,7 +8225,8 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+ 		}
+ 		if (kvm_check_request(KVM_REQ_TLB_FLUSH_CURRENT, vcpu))
+ 			kvm_vcpu_flush_tlb_current(vcpu);
+-
++		if (kvm_check_request(KVM_REQ_HV_TLB_FLUSH, vcpu))
++			kvm_vcpu_flush_tlb_guest(vcpu);
+ 		if (kvm_check_request(KVM_REQ_REPORT_TPR_ACCESS, vcpu)) {
+ 			vcpu->run->exit_reason = KVM_EXIT_TPR_ACCESS;
+ 			r = 0;
+
+-- 
+Vitaly
+
