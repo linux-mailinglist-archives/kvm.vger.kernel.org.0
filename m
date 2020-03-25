@@ -2,100 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6E899191F64
-	for <lists+kvm@lfdr.de>; Wed, 25 Mar 2020 03:42:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 331EB191F96
+	for <lists+kvm@lfdr.de>; Wed, 25 Mar 2020 04:14:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727368AbgCYCm3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Mar 2020 22:42:29 -0400
-Received: from mail-pj1-f65.google.com ([209.85.216.65]:55233 "EHLO
-        mail-pj1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727249AbgCYCm2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 Mar 2020 22:42:28 -0400
-Received: by mail-pj1-f65.google.com with SMTP id np9so397981pjb.4
-        for <kvm@vger.kernel.org>; Tue, 24 Mar 2020 19:42:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=mime-version:content-transfer-encoding:in-reply-to:references
-         :subject:from:cc:to:date:message-id:user-agent;
-        bh=tJVGZmmA1bFjoevn7/qDYyyvIJ/eyc0u4ubgnC7ziTY=;
-        b=H4706YZqf8/zScGoFg12vybnR9M2VsIQVJgSz3rS1dHY9dQHDGFEdxDFbUd7d1zTgX
-         a1SAGpNqJGQq66/k++qcyoET2sxmyH3emD3uXnYHai1yW2TdH35PONdQL7aDm0PfPzyp
-         tYlxhgWpkpR2jgcSCMS6Pg5GkhF65IhQxffKc=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:content-transfer-encoding
-         :in-reply-to:references:subject:from:cc:to:date:message-id
-         :user-agent;
-        bh=tJVGZmmA1bFjoevn7/qDYyyvIJ/eyc0u4ubgnC7ziTY=;
-        b=XabztJWUpIXzEK2EAKggAvD5hazYgSQsB/RufwZ0zH4m/KJldbmB2bhGb4aSBYnoOz
-         WS1m7ByS6Lm1r9qmdaD6P19n/nDpinfRoVheXRQtJ6MqkVgAvmhL0RMPQUgz6g+K9Qon
-         H+iGAI1rZUaIXiHwYWpyW8hh6JOi0bzOu7heS0xAK8GVhjXJTcIIx5tmxAqwQ6r0gF19
-         vYT8ueApsHhJJPBMsf6spp0Ndh3LaOcnhPARIdC1c3RsHbafRQggt3lyi991btpg3m/h
-         LgVWcpr6YP2xaeEXnWmIUGEapOKnlKd871mTxVmY8DL5GIxVeliFQVKJb6jg92b0yL8a
-         555w==
-X-Gm-Message-State: ANhLgQ2GDWkjNKcHdbrd7QswA4UyaQvj3P9TMAGOI1pqd54PoK/BXWUI
-        /p2lmPRlkUJ8pvYnMSVFVmHBVQ==
-X-Google-Smtp-Source: ADFU+vtS5LbLrzS1jhzDwYVrTj6A9lZWX06g/Mga4Nlp7aFIrRyOCBB7aq2FIo/kyw4uUBQ1+JG/MQ==
-X-Received: by 2002:a17:90a:33d1:: with SMTP id n75mr1033588pjb.167.1585104145832;
-        Tue, 24 Mar 2020 19:42:25 -0700 (PDT)
-Received: from chromium.org ([2620:15c:202:1:fa53:7765:582b:82b9])
-        by smtp.gmail.com with ESMTPSA id x4sm858194pgr.9.2020.03.24.19.42.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Mar 2020 19:42:25 -0700 (PDT)
-Content-Type: text/plain; charset="utf-8"
+        id S1727320AbgCYDOP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Mar 2020 23:14:15 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:23225 "EHLO
+        us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727299AbgCYDOO (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 24 Mar 2020 23:14:14 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1585106054;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=tlnvEiI040ACQ537mohs9KaGt5WE1E8quEggSdqcSkQ=;
+        b=hMYo7AsFHTdsoGyeiDLi2aFT9wx2ExtrQYlAeLr/sCMXa8kfHpkDRpfEEn0mj9twl1cEAC
+        t4gPeOaPRF17d7cp386bmIEHh9RhkcCErC8ZbG9fytdq7HaMT1AFhSkDSzXeTs+r4L29KL
+        pSBAKha3fxW20S8A830UcwqbTatZTqg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-350-arsdJjnLP0upUxzGWPsajQ-1; Tue, 24 Mar 2020 23:14:02 -0400
+X-MC-Unique: arsdJjnLP0upUxzGWPsajQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 509FE100550D;
+        Wed, 25 Mar 2020 03:14:01 +0000 (UTC)
+Received: from [10.72.12.54] (ovpn-12-54.pek2.redhat.com [10.72.12.54])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 44E028AC30;
+        Wed, 25 Mar 2020 03:13:55 +0000 (UTC)
+Subject: Re: [PATCH V7 3/8] vringh: IOTLB support
+To:     kbuild test robot <lkp@intel.com>
+Cc:     kbuild-all@lists.01.org, mst@redhat.com,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
+References: <20200324041458.27384-4-jasowang@redhat.com>
+ <202003250217.stptJTnJ%lkp@intel.com>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <4032c9a2-a6c1-a041-fd59-81a8bf2fca46@redhat.com>
+Date:   Wed, 25 Mar 2020 11:13:54 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
+In-Reply-To: <202003250217.stptJTnJ%lkp@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <5cfeed6df208b74913312a1c97235ee615180f91.1582361737.git.mchehab+huawei@kernel.org>
-References: <cover.1582361737.git.mchehab+huawei@kernel.org> <5cfeed6df208b74913312a1c97235ee615180f91.1582361737.git.mchehab+huawei@kernel.org>
-Subject: Re: [PATCH 3/7] docs: fix broken references to text files
-From:   Stephen Boyd <swboyd@chromium.org>
-Cc:     linux-arch@vger.kernel.org, linux-nfs@vger.kernel.org,
-        kvm@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
-        Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
-        netdev@vger.kernel.org, linux-unionfs@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, linux-mm@kvack.org,
-        dri-devel@lists.freedesktop.org, linux-fsdevel@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, kvmarm@lists.cs.columbia.edu,
-        linux-arm-kernel@lists.infradead.org, linux-rdma@vger.kernel.org
-To:     Linux Doc Mailing List <linux-doc@vger.kernel.org>,
-        Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-Date:   Tue, 24 Mar 2020 19:42:24 -0700
-Message-ID: <158510414428.125146.17397141028775937874@swboyd.mtv.corp.google.com>
-User-Agent: alot/0.9
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Quoting Mauro Carvalho Chehab (2020-02-22 01:00:03)
-> Several references got broken due to txt to ReST conversion.
->=20
-> Several of them can be automatically fixed with:
->=20
->         scripts/documentation-file-ref-check --fix
->=20
-> Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-> ---
->  drivers/hwtracing/coresight/Kconfig                  |  2 +-
->=20
-> diff --git a/drivers/hwtracing/coresight/Kconfig b/drivers/hwtracing/core=
-sight/Kconfig
-> index 6ff30e25af55..6d42a6d3766f 100644
-> --- a/drivers/hwtracing/coresight/Kconfig
-> +++ b/drivers/hwtracing/coresight/Kconfig
-> @@ -107,7 +107,7 @@ config CORESIGHT_CPU_DEBUG
->           can quickly get to know program counter (PC), secure state,
->           exception level, etc. Before use debugging functionality, platf=
-orm
->           needs to ensure the clock domain and power domain are enabled
-> -         properly, please refer Documentation/trace/coresight-cpu-debug.=
-rst
-> +         properly, please refer Documentation/trace/coresight/coresight-=
-cpu-debug.rst
->           for detailed description and the example for usage.
-> =20
->  endif
 
-I ran into this today and almost sent a patch. Can you split this patch
-up into more pieces and send it off to the respective subsystem
-maintainers?
+On 2020/3/25 =E4=B8=8A=E5=8D=882:19, kbuild test robot wrote:
+> Hi Jason,
+>
+> I love your patch! Yet something to improve:
+>
+> [auto build test ERROR on vhost/linux-next]
+> [also build test ERROR on linux/master linus/master v5.6-rc7 next-20200=
+324]
+> [if your patch is applied to the wrong git tree, please drop us a note =
+to help
+> improve the system. BTW, we also suggest to use '--base' option to spec=
+ify the
+> base tree in git format-patch, please see https://stackoverflow.com/a/3=
+7406982]
+>
+> url:    https://github.com/0day-ci/linux/commits/Jason-Wang/vDPA-suppor=
+t/20200324-142634
+> base:   https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git l=
+inux-next
+> config: alpha-randconfig-a001-20200324 (attached as .config)
+> compiler: alpha-linux-gcc (GCC) 9.2.0
+> reproduce:
+>          wget https://raw.githubusercontent.com/intel/lkp-tests/master/=
+sbin/make.cross -O ~/bin/make.cross
+>          chmod +x ~/bin/make.cross
+>          # save the attached .config to linux build tree
+>          GCC_VERSION=3D9.2.0 make.cross ARCH=3Dalpha
+>
+> If you fix the issue, kindly add following tag
+> Reported-by: kbuild test robot <lkp@intel.com>
+>
+> All errors (new ones prefixed by >>):
+>
+>     alpha-linux-ld: drivers/vhost/vringh.o: in function `iotlb_translat=
+e':
+>     drivers/vhost/vringh.c:1079: undefined reference to `vhost_iotlb_it=
+ree_first'
+
+
+This is because VHOST now depends on VHOST_IOTLB, but it was still=20
+selected by MIC or VOP.
+
+Will fix this by switching to use "depends on" fro MIC and VOP
+
+Thanks.
+
+
+>>> alpha-linux-ld: drivers/vhost/vringh.c:1079: undefined reference to `=
+vhost_iotlb_itree_first'
+> ---
+> 0-DAY CI Kernel Test Service, Intel Corporation
+> https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
+
