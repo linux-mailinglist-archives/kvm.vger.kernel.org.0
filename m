@@ -2,387 +2,79 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2622E1920A2
-	for <lists+kvm@lfdr.de>; Wed, 25 Mar 2020 06:31:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 02C35192144
+	for <lists+kvm@lfdr.de>; Wed, 25 Mar 2020 07:42:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725911AbgCYFbS convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Wed, 25 Mar 2020 01:31:18 -0400
-Received: from mga07.intel.com ([134.134.136.100]:5542 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725781AbgCYFbS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 Mar 2020 01:31:18 -0400
-IronPort-SDR: LZ+yPTzAVeoZyKzFbZtNdApmAe/36LCvBAHookeF9UVciiPvQHHUnjej6LozBmP67YJNK4naKE
- wYlnqrEBzs4g==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Mar 2020 22:31:17 -0700
-IronPort-SDR: FZLICKY7XSOBzu9GLXAw0kmFh2MjtGBT6Hq6yhuQdZu5jGyIj+tDMC8TtxMbpQtv89HALUvSHD
- HxC9yKMGhgHw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.72,303,1580803200"; 
-   d="scan'208";a="270692717"
-Received: from fmsmsx107.amr.corp.intel.com ([10.18.124.205])
-  by fmsmga004.fm.intel.com with ESMTP; 24 Mar 2020 22:31:16 -0700
-Received: from fmsmsx151.amr.corp.intel.com (10.18.125.4) by
- fmsmsx107.amr.corp.intel.com (10.18.124.205) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Tue, 24 Mar 2020 22:31:16 -0700
-Received: from shsmsx101.ccr.corp.intel.com (10.239.4.153) by
- FMSMSX151.amr.corp.intel.com (10.18.125.4) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Tue, 24 Mar 2020 22:31:16 -0700
-Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.206]) by
- SHSMSX101.ccr.corp.intel.com ([169.254.1.43]) with mapi id 14.03.0439.000;
- Wed, 25 Mar 2020 13:31:13 +0800
-From:   "Tian, Kevin" <kevin.tian@intel.com>
-To:     "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-        Alex Williamson <alex.williamson@redhat.com>
-CC:     "Zhao, Yan Y" <yan.y.zhao@intel.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        "cjia@nvidia.com" <cjia@nvidia.com>,
-        "Yang, Ziye" <ziye.yang@intel.com>,
-        "Liu, Changpeng" <changpeng.liu@intel.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>,
-        "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
-        "eskultet@redhat.com" <eskultet@redhat.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>,
-        "eauger@redhat.com" <eauger@redhat.com>,
-        "aik@ozlabs.ru" <aik@ozlabs.ru>,
-        "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
-        "felipe@nutanix.com" <felipe@nutanix.com>,
-        "Zhengxiao.zx@alibaba-inc.com" <Zhengxiao.zx@alibaba-inc.com>,
-        "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
-        "Ken.Xue@amd.com" <Ken.Xue@amd.com>,
-        "Wang, Zhi A" <zhi.a.wang@intel.com>,
-        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: RE: [PATCH v15 Kernel 4/7] vfio iommu: Implementation of ioctl for
- dirty pages tracking.
-Thread-Topic: [PATCH v15 Kernel 4/7] vfio iommu: Implementation of ioctl for
- dirty pages tracking.
-Thread-Index: AQHV/jAV21NxZGgpXU6dz1wdFLv9bqhQAO0AgAE8UwCAAAN2gIAAC00AgAAExwCABKT1gIAADgYAgAABzACAAIjsAIAAwk4AgABgwwCAARv/QA==
-Date:   Wed, 25 Mar 2020 05:31:13 +0000
-Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D19D7E8F15@SHSMSX104.ccr.corp.intel.com>
-References: <20200319165704.1f4eb36a@w520.home>
- <bc48ae5c-67f9-d95e-5d60-6c42359bb790@nvidia.com>
- <20200320120137.6acd89ee@x1.home>
- <cf0ee134-c1c7-f60c-afc2-8948268d8880@nvidia.com>
- <20200320125910.028d7af5@w520.home>
- <7062f72a-bf06-a8cd-89f0-9e729699a454@nvidia.com>
- <20200323124448.2d3bc315@w520.home> <20200323185114.GF3017@work-vm>
- <20200324030118.GD5456@joy-OptiPlex-7040>
- <20200324083644.36494641@w520.home> <20200324202304.GJ2645@work-vm>
-In-Reply-To: <20200324202304.GJ2645@work-vm>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-version: 11.2.0.6
-dlp-reaction: no-action
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+        id S1725815AbgCYGmA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Mar 2020 02:42:00 -0400
+Received: from sonic306-1.consmr.mail.bf2.yahoo.com ([74.6.132.40]:37771 "EHLO
+        sonic306-1.consmr.mail.bf2.yahoo.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725781AbgCYGmA (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 25 Mar 2020 02:42:00 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1585118518; bh=0kmsqXm9K+DyM/96L3DJNmWOe4qYy8f9mpn5lMuhelM=; h=Date:From:Reply-To:Subject:References:From:Subject; b=Qtgt9w0acPnCgiraNCEixE7Ih815eoRH7+AWCrBGfNEMhZEXQCNQWerv/tMBt5V/6e8o+sQWt4eyFVQ6EPUCsSNPF2TncEf5bwyGXhfR0hvk/Ag6BjxPKekxlvQfOf2A86HA8miguwZgvsyqTldCt8cd+ByvlEPgZzQX95zmOT5GLEei/nb3f7AS0w2fRIdEle0j9HzCoXVlaLxUlIIyu/oeFXyfOUMMTeL0zDy/v8iLyR5CDY9uok3/65E7h3OM9y339bWBPFaCJOruOfq7M86GjGRLnGwYP9tAZf7Y/3xLjLPAWCcQklVnpRBpaxq2WqMyfct2hdsgO/6JiFzD4w==
+X-YMail-OSG: 0VHvKCYVM1mbXAiQx21nDIpJRIDOOiDMLoTWSoWXtk650qaRvYsl5aLdMXnZTw_
+ g2oGwibbf1.DFT8Mp4Pq4k.LnA9b09EvR8xFsfpAwCnLmG38bSog9uNbp8YCuVuMLZLICWryFb.R
+ iSC3o9s.o6axRqr64puj18PA4fm2DBfwtcaTMUQ3ro5DCLZUHqsYIs9dXbiVRhUH8O.VHu9VTGaV
+ IWDHXy3GKKlMn8ijZDlA9kF_Nu0JupRmtXZih__CSmtx7qmTmraBDFLyOQ8yE1yebq_rHsS5tC_T
+ L65gLdZ7P1h2seAH0npWnXY.4LqVrB2n9Tp0JpHSOW.PyeIDk.7B8r7D5.ftGDzi9T5za5hpthhy
+ jwrV4y.ja8NYJoGNYof2nSei__f3HQ3urzKoqD2SlMHADskrkwPquOW_y1iSe0pNDAgKWVl2IjXg
+ uhm6PBqYXF0.VedUpqP0WwmywHJgkKC2D.mQHVNl9p5UtWKhUGWw0UNTXkGSyI_9V9ZIsg8O1ONU
+ Q0PvOWHQwEEM.PI_UIJW7A_5rdJMOu2HQaQVeKRPKJQjfUQMEKbfjekeqgBkznX8n_hgl3U1FQM0
+ AjkAdjAgBMg1wkHtT6VyotAmgQdfGOZIN6XO7v.nqvE5MbBHjYyCw1sGt_x5GAPJ.Z_MSlx0RNuH
+ pd0tJ7Lyp_WTQvPYy4ps4kjd6WNI1DIZHRIlvZzKrZ8sHFaGYUZDD3ux_XJ3mhE_AmF2Yq5Y3x5Z
+ 7c5Qnx56XyYFhZWSqm.UD3CLdiB3eh7nfadNvTBJ3AJR.n6iqIM5KAghi.XaceyjpNJ_gSum8wAP
+ iujX2cQ6VWj.VMzRgoHNZW91D80JGLJw8V1kYPmy.vccSLckGeAEtIBh4dQVXlObcaJkCueoDWdO
+ JYy4B4umfqtnA36md3s..Sf7QyCnwvb1e5VqLx9ceGllkx_IdD9e0bGxe9zNNmGXZmfQBFVe9sR9
+ Z76Jna1SYxLArEYOEnB9QX2mDrbmKzPB4GcG92uupXYBIMzxwufa_W0Ie7PLAdqMVKMM7jXjA2h6
+ tCIE1LnGu6SEy.PrdcUDuOq7N6yw2QZgqyBmQkWeYU3nPuzyOVYr4l6BeIP31p4cXdyv_QJAYCcM
+ AgyCzgbuWTyF2OcwTK8t6PV7vVyaVCkN1Q1vw.d7eKeG7fSDAXYAVy6xYoKfDthLDLN0E1W9_Ph7
+ KjtdHHu2IhFno.ts8a.LyBJQFE3QMuDHkHIGgBSw0.gaOpTYujqdUDJAr6dXdzqLecPNIug55vfb
+ mfu4BIX4kEWF1HBpIUc6l1G8dfLyTXh7kMfbTtV0DCY2Dqrh7Jq.sRKQHCg--
+Received: from sonic.gate.mail.ne1.yahoo.com by sonic306.consmr.mail.bf2.yahoo.com with HTTP; Wed, 25 Mar 2020 06:41:58 +0000
+Date:   Wed, 25 Mar 2020 06:41:54 +0000 (UTC)
+From:   Doris Laboso <mrabraham.abrahim@gmail.com>
+Reply-To: mrsdoris.laboso1@gmail.com
+Message-ID: <170490549.1098786.1585118514462@mail.yahoo.com>
+Subject: Good day
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+References: <170490549.1098786.1585118514462.ref@mail.yahoo.com>
+X-Mailer: WebService/1.1.15518 YMailNodin Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:74.0) Gecko/20100101 Firefox/74.0
+To:     unlisted-recipients:; (no To-header on input)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> From: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> Sent: Wednesday, March 25, 2020 4:23 AM
-> 
-> * Alex Williamson (alex.williamson@redhat.com) wrote:
-> > On Mon, 23 Mar 2020 23:01:18 -0400
-> > Yan Zhao <yan.y.zhao@intel.com> wrote:
-> >
-> > > On Tue, Mar 24, 2020 at 02:51:14AM +0800, Dr. David Alan Gilbert wrote:
-> > > > * Alex Williamson (alex.williamson@redhat.com) wrote:
-> > > > > On Mon, 23 Mar 2020 23:24:37 +0530
-> > > > > Kirti Wankhede <kwankhede@nvidia.com> wrote:
-> > > > >
-> > > > > > On 3/21/2020 12:29 AM, Alex Williamson wrote:
-> > > > > > > On Sat, 21 Mar 2020 00:12:04 +0530
-> > > > > > > Kirti Wankhede <kwankhede@nvidia.com> wrote:
-> > > > > > >
-> > > > > > >> On 3/20/2020 11:31 PM, Alex Williamson wrote:
-> > > > > > >>> On Fri, 20 Mar 2020 23:19:14 +0530
-> > > > > > >>> Kirti Wankhede <kwankhede@nvidia.com> wrote:
-> > > > > > >>>
-> > > > > > >>>> On 3/20/2020 4:27 AM, Alex Williamson wrote:
-> > > > > > >>>>> On Fri, 20 Mar 2020 01:46:41 +0530
-> > > > > > >>>>> Kirti Wankhede <kwankhede@nvidia.com> wrote:
-> > > > > > >>>>>
-> > > > > > >>
-> > > > > > >> <snip>
-> > > > > > >>
-> > > > > > >>>>>> +static int vfio_iova_dirty_bitmap(struct vfio_iommu
-> *iommu, dma_addr_t iova,
-> > > > > > >>>>>> +				  size_t size, uint64_t pgsize,
-> > > > > > >>>>>> +				  u64 __user *bitmap)
-> > > > > > >>>>>> +{
-> > > > > > >>>>>> +	struct vfio_dma *dma;
-> > > > > > >>>>>> +	unsigned long pgshift = __ffs(pgsize);
-> > > > > > >>>>>> +	unsigned int npages, bitmap_size;
-> > > > > > >>>>>> +
-> > > > > > >>>>>> +	dma = vfio_find_dma(iommu, iova, 1);
-> > > > > > >>>>>> +
-> > > > > > >>>>>> +	if (!dma)
-> > > > > > >>>>>> +		return -EINVAL;
-> > > > > > >>>>>> +
-> > > > > > >>>>>> +	if (dma->iova != iova || dma->size != size)
-> > > > > > >>>>>> +		return -EINVAL;
-> > > > > > >>>>>> +
-> > > > > > >>>>>> +	npages = dma->size >> pgshift;
-> > > > > > >>>>>> +	bitmap_size = DIRTY_BITMAP_BYTES(npages);
-> > > > > > >>>>>> +
-> > > > > > >>>>>> +	/* mark all pages dirty if all pages are pinned and
-> mapped. */
-> > > > > > >>>>>> +	if (dma->iommu_mapped)
-> > > > > > >>>>>> +		bitmap_set(dma->bitmap, 0, npages);
-> > > > > > >>>>>> +
-> > > > > > >>>>>> +	if (copy_to_user((void __user *)bitmap, dma-
-> >bitmap, bitmap_size))
-> > > > > > >>>>>> +		return -EFAULT;
-> > > > > > >>>>>
-> > > > > > >>>>> We still need to reset the bitmap here, clearing and re-adding
-> the
-> > > > > > >>>>> pages that are still pinned.
-> > > > > > >>>>>
-> > > > > > >>>>>
-> https://lore.kernel.org/kvm/20200319070635.2ff5db56@x1.home/
-> > > > > > >>>>>
-> > > > > > >>>>
-> > > > > > >>>> I thought you agreed on my reply to it
-> > > > > > >>>> https://lore.kernel.org/kvm/31621b70-02a9-2ea5-045f-
-> f72b671fe703@nvidia.com/
-> > > > > > >>>>
-> > > > > > >>>>    > Why re-populate when there will be no change since
-> > > > > > >>>>    > vfio_iova_dirty_bitmap() is called holding iommu->lock? If
-> there is any
-> > > > > > >>>>    > pin request while vfio_iova_dirty_bitmap() is still working, it
-> will
-> > > > > > >>>>    > wait till iommu->lock is released. Bitmap will be populated
-> when page is
-> > > > > > >>>>    > pinned.
-> > > > > > >>>
-> > > > > > >>> As coded, dirty bits are only ever set in the bitmap, never
-> cleared.
-> > > > > > >>> If a page is unpinned between iterations of the user recording
-> the
-> > > > > > >>> dirty bitmap, it should be marked dirty in the iteration
-> immediately
-> > > > > > >>> after the unpinning and not marked dirty in the following
-> iteration.
-> > > > > > >>> That doesn't happen here.  We're reporting cumulative dirty
-> pages since
-> > > > > > >>> logging was enabled, we need to be reporting dirty pages since
-> the user
-> > > > > > >>> last retrieved the dirty bitmap.  The bitmap should be cleared
-> and
-> > > > > > >>> currently pinned pages re-added after copying to the user.
-> Thanks,
-> > > > > > >>>
-> > > > > > >>
-> > > > > > >> Does that mean, we have to track every iteration? do we really
-> need that
-> > > > > > >> tracking?
-> > > > > > >>
-> > > > > > >> Generally the flow is:
-> > > > > > >> - vendor driver pin x pages
-> > > > > > >> - Enter pre-copy-phase where vCPUs are running - user starts
-> dirty pages
-> > > > > > >> tracking, then user asks dirty bitmap, x pages reported dirty by
-> > > > > > >> VFIO_IOMMU_DIRTY_PAGES ioctl with _GET flag
-> > > > > > >> - In pre-copy phase, vendor driver pins y more pages, now
-> bitmap
-> > > > > > >> consists of x+y bits set
-> > > > > > >> - In pre-copy phase, vendor driver unpins z pages, but bitmap is
-> not
-> > > > > > >> updated, so again bitmap consists of x+y bits set.
-> > > > > > >> - Enter in stop-and-copy phase, vCPUs are stopped, mdev devices
-> are stopped
-> > > > > > >> - user asks dirty bitmap - Since here vCPU and mdev devices are
-> stopped,
-> > > > > > >> pages should not get dirty by guest driver or the physical device.
-> > > > > > >> Hence, x+y dirty pages would be reported.
-> > > > > > >>
-> > > > > > >> I don't think we need to track every iteration of bitmap reporting.
-> > > > > > >
-> > > > > > > Yes, once a bitmap is read, it's reset.  In your example, after
-> > > > > > > unpinning z pages the user should still see a bitmap with x+y pages,
-> > > > > > > but once they've read that bitmap, the next bitmap should be x+y-
-> z.
-> > > > > > > Userspace can make decisions about when to switch from pre-
-> copy to
-> > > > > > > stop-and-copy based on convergence, ie. the slope of the line
-> recording
-> > > > > > > dirty pages per iteration.  The implementation here never allows
-> an
-> > > > > > > inflection point, dirty pages reported through vfio would always
-> either
-> > > > > > > be flat or climbing.  There might also be a case that an iommu
-> backed
-> > > > > > > device could start pinning pages during the course of a migration,
-> how
-> > > > > > > would the bitmap ever revert from fully populated to only tracking
-> the
-> > > > > > > pinned pages?  Thanks,
-> > > > > > >
-> > > > > >
-> > > > > > At KVM forum we discussed this - if guest driver pins say 1024 pages
-> > > > > > before migration starts, during pre-copy phase device can dirty 0
-> pages
-> > > > > > in best case and 1024 pages in worst case. In that case, user will
-> > > > > > transfer content of 1024 pages during pre-copy phase and in
-> > > > > > stop-and-copy phase also, that will be pages will be copied twice. So
-> we
-> > > > > > decided to only get dirty pages bitmap at stop-and-copy phase. If
-> user
-> > > > > > is going to get dirty pages in stop-and-copy phase only, then that will
-> > > > > > be single iteration.
-> > > > > > There aren't any devices yet that can track sys memory dirty pages.
-> So
-> > > > > > we can go ahead with this patch and support for dirty pages tracking
-> > > > > > during pre-copy phase can be added later when there will be
-> consumers of
-> > > > > > that functionality.
-> > > > >
-> > > > > So if I understand this right, you're expecting the dirty bitmap to
-> > > > > accumulate dirty bits, in perpetuity, so that the user can only
-> > > > > retrieve them once at the end of migration?  But if that's the case,
-> > > > > the user could simply choose to not retrieve the bitmap until the end
-> > > > > of migration, the result would be the same.  What we have here is
-> that
-> > > > > dirty bits are never cleared, regardless of whether the user has seen
-> > > > > them, which is wrong.  Sorry, we had a lot of discussions at KVM
-> forum,
-> > > > > I don't recall this specific one 5 months later and maybe we weren't
-> > > > > considering all aspects.  I see the behavior we have here as incorrect,
-> > > > > but it also seems relatively trivial to make correct.  I hope the QEMU
-> > > > > code isn't making us go through all this trouble to report a dirty
-> > > > > bitmap that gets thrown away because it expects the final one to be
-> > > > > cumulative since the beginning of dirty logging.  Thanks,
-> > > >
-> > > > I remember the discussion that we couldn't track the system memory
-> > > > dirtying with current hardware; so the question then is just to track
-> > > hi Dave
-> > > there are already devices that are able to track the system memory,
-> > > through two ways:
-> > > (1) software method. like VFs for "Intel(R) Ethernet Controller XL710
-> Family
-> > > support".
-> > > (2) hardware method. through hardware internal buffer (as one Intel
-> > > internal hardware not yet to public, but very soon) or through VTD-3.0
-> > > IOMMU.
-> > >
-> > > we have already had code verified using the two ways to track system
-> memory
-> > > in fine-grained level.
-> > >
-> > >
-> > > > what has been pinned and then ideally put that memory off until the
-> end.
-> > > > (Which is interesting because I don't think we currently have  a way
-> > > > to delay RAM pages till the end in qemu).
-> > >
-> > > I think the problem here is that we mixed pinned pages with dirty pages.
-> >
-> > We are reporting dirty pages, pinned pages are just assumed to be dirty.
-> >
-> > > yes, pinned pages for mdev devices are continuously likely to be dirty
-> > > until device stopped.
-> > > But for devices that are able to report dirty pages, dirtied pages
-> > > will be marked again if hardware writes them later.
-> > >
-> > > So, is it good to introduce a capability to let vfio/qemu know how to
-> > > treat the dirty pages?
-> >
-> > Dirty pages are dirty, QEMU doesn't need any special flag, instead we
-> > need to evolve different mechanisms for the vendor driver so that we
-> > can differentiate pages pinned for read vs pages pinned for write.
-> > Perhaps interfaces to pin pages without dirtying them, and a separate
-> > mechanism to dirty a previously pinned-page, ie. promote it permanently
-> > or transiently to a writable page.
-> >
-> > > (1) for devices have no fine-grained dirty page tracking capability
-> > >   a. pinned pages are regarded as dirty pages. they are not cleared by
-> > >   dirty page query
-> > >   b. unpinned pages are regarded as dirty pages. they are cleared by
-> > >   dirty page query or UNMAP ioctl.
-> > > (2) for devices that have fine-grained dirty page tracking capability
-> > >    a. pinned/unpinned pages are not regarded as dirty pages
-> >
-> > We need a pin-read-only interface for this.
-> >
-> > >    b. only pages they reported are regarded as dirty pages and are to be
-> > >    cleared by dirty page query and UNMAP ioctl.
-> >
-> > We need a set-dirty or promote-writable interface for this.
-> >
-> > > (3) for dirty pages marking APIs, like vfio_dma_rw()...
-> > >    pages marked by them are regared as dirty and are to be cleared by
-> > >    dirty page query and UNMAP ioctl
-> > >
-> > > For (1), qemu VFIO only reports dirty page amount and would not
-> transfer
-> > > those pages until last round.
-> > > for (2) and (3), qemu VFIO should report and transfer them in each
-> > > round.
-> >
-> > IMO, QEMU should not be aware of any of this.  Userspace has an
-> > interface to retrieve dirtied pages (period).  We should adjust the
-> > pages that we report as dirtied to be accurate based on the
-> > capabilities of the vendor driver.  We can evolve those internal APIs
-> > between the vendor driver and vfio iommu over time without modifying
-> > this user interface.
-> 
-> I'm not sure;  if you have a block of memory that's constantly marked
-> dirty in (1) - we need to avoid constantly retransmitting that memory to
-> the destination; there's no point in sending it until the end of the
-> iterations - so it shouldn't even get sent once in the iteration.
-> But at the same time, we can't ignore the fact that those pages are
-> going to be dirty - because that influences the downtime; so we need
-> to know we're going to be getting them later, even if we don't
-> initially mark them as dirty.
+Good day and God bless you as you read this massage, I am by name Doris  La=
+boso am 27 years old girl from Kenya, yes my Mother was Late Mrs. Lorna Lab=
+oso the former Kenyan Assistant Minister of Home and affairs who was among =
+the plan that crash on board in the remote area of Kalong=E2=80=99s western=
+ Kenya Read more about the crash with the below web site
 
-For that we possibly need a way to allow VFIO or vendor driver telling
-the userspace that I can report dirty pages to you but it is better to do
-it in the end since the set is sort of static and big thus not optimal to
-transfer them multiple rounds, and I can also report to you the number 
-of currently-tracked dirty pages so you may use it to make accurate
-prediction to decide when to exit the precopy. But such feature might
-be introduced orthogonal to the standard bitmap interface, i.e. not
-necessarily to block this series for the baseline live migration support...
+http://edition.cnn.com/2008/WORLD/africa/06/10/kenya.crash/index.html I am =
+constrained to contact you because of the maltreatment I am receiving from =
+my step mother. She planned to take away all my late mothers treasury and p=
+roperties from me since the unexpected death of my beloved mother. One day =
+I opened my mother brave case and secretly found out that my mother deposit=
+ed the sum of $ 27.5 million in BOA bank Burkina Faso with my name as the n=
+ext of kin, then I visited Burkina Faso to withdraw the money and take care=
+ of myself and start a new life, on my arrival the Bank Director whom I mee=
+t in person Mr. Batish Zongo told me that my mother left an instruction to =
+the bank, that the money should be release to me only when I am married or =
+I present a trustee who will help me and invest the money overseas.
 
-Thanks
-Kevin
+That is the reason why I am in search of a honest and reliable person who w=
+ill help me and stand as my trustee for the Bank to transfer the money to h=
+is account for me to come over and join you. It will be my great pleasure t=
+o compensate you with 30% of the money for your help and the balance shall =
+be my capital with your kind idea for me to invest under your control over =
+there in your country.
 
-> 
-> > > > [I still worry whether migration will be usable with any
-> > > > significant amount of system ram that's pinned in this way; the
-> > > > downside will very easily get above the threshold that people like]
-> > > >
-> > > yes. that's why we have to do multi-round dirty page query and
-> > > transfer and clear the dirty bitmaps in each round for devices that are
-> > > able to track in fine grain.
-> > > and that's why we have to report the amount of dirty pages before
-> > > stop-and-copy phase for mdev devices, so that people are able to know
-> > > the real downtime as much as possible.
-> >
-> > Yes, the dirty bitmap should be accurate to report the pages dirtied
-> > since it was last retrieved and over time we can add internal
-> > interfaces to give vendor drivers more granularity in marking pinned
-> > pages dirty and perhaps even exposing the bitmap to the vendor drivers
-> > to set pages themselves.  I don't necessarily think it's worthwhile to
-> > create a new class of dirtied pages to transfer at the end, we're
-> > fighting a losing battle at that point.  We should be focusing on
-> > improving the granularity of page dirtying in order to reduce the pages
-> > transferred at the end of migration.  Thanks,
-> 
-> Dave
-> 
-> > Alex
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+As soon as I receive your positive response showing your interest I will se=
+nd you my picture's in my next mail and death certificate of my Mon and how=
+ you will receive the money in your account.
 
+Thanks and God bless you
+Sincerely Doris Laboso =20
