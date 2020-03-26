@@ -2,104 +2,146 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 33F37193CD5
-	for <lists+kvm@lfdr.de>; Thu, 26 Mar 2020 11:17:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 627BA193CF2
+	for <lists+kvm@lfdr.de>; Thu, 26 Mar 2020 11:32:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727661AbgCZKRy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 Mar 2020 06:17:54 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:34149 "EHLO
-        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726292AbgCZKRy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 Mar 2020 06:17:54 -0400
-Received: by mail-wr1-f67.google.com with SMTP id 65so7061153wrl.1
-        for <kvm@vger.kernel.org>; Thu, 26 Mar 2020 03:17:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=UfJd8ZmzjrF5pKc68uc6PImNDV9eCz7+cwylT0iK8ts=;
-        b=JliWM1wRQBiU1WaxBOnbX9r9308kU10VLlDFX+c6Vs25LyF0yKjG7goxEoufVMmakc
-         Mj9RKrbTLuEH9Y1EledRjVwlPdhc9hUtkacV8R/wdQwQ0J8Syb6gDlyBi/x6KSaXYfCb
-         N7GvunUb7+SYEOy24EIclq9R/1WN4fab+iN6rM1ab/qlMgXCZKhdN7uyoJUbinhVchK0
-         TniWliY4kjeDAqmGViGAuy3rR5oA6hINMq2QTT+1cCYQC4rURY7HiWgpWEKGEmQrkaNS
-         z8+QW1f74x2aeFMaFfZL4MB2PRCxS5LUbB1w/d5JrvI/bkPvHOk3FCEyoHuWwax1WvYW
-         YdQg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=UfJd8ZmzjrF5pKc68uc6PImNDV9eCz7+cwylT0iK8ts=;
-        b=C+wiYZy9AJJ2i+fRj/t3ToS0upCVdHDGh8CAYlDI1qYnLHFZ9fUUE0wFdovC3eU0FS
-         SZZjW5wLBrE9fvGlhiO+6VK0pgwi7Ts+yI37I8dz/v/PG2FxnH4QOT/Ob06JlbAL7Xw0
-         GVez+o3oZsEdXTg5xPAI1+hkxCozzF7SRaWXwl149mEtTqORhj5URHeN6QnIRixeJfZg
-         h3TBtQK99abw+LGJQ4D/boNsRxXJESlkEnwxiRxmgXaMj84iEuAdaaBVnTE6axboXnEE
-         63URJKJRr7KR8lHOmdgCYzi06OOKmdXcVzep3cpZ1J2+dLcZ3pF3kcaaudUV4Wj9K2W5
-         ifVQ==
-X-Gm-Message-State: ANhLgQ3tRJmSlwAd2/8+9sT4OOyJOZZUmn2MYqeVW8zW1RI+5AZF2hLo
-        j98njjpWd6VbVjxsNs0HLwE1PA==
-X-Google-Smtp-Source: ADFU+vtYgdqu1iFA3EFU13wqSJRUhSE1RdRkdpnCijLZr09pmk1V43wx1G/9puarDu1bz5EjTdYlbQ==
-X-Received: by 2002:adf:fac7:: with SMTP id a7mr8803665wrs.191.1585217872055;
-        Thu, 26 Mar 2020 03:17:52 -0700 (PDT)
-Received: from google.com ([2a00:79e0:d:110:d6cc:2030:37c1:9964])
-        by smtp.gmail.com with ESMTPSA id g7sm2997217wrq.21.2020.03.26.03.17.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 Mar 2020 03:17:51 -0700 (PDT)
-Date:   Thu, 26 Mar 2020 10:17:48 +0000
-From:   Quentin Perret <qperret@google.com>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, Olof Johansson <olof@lixom.net>,
-        Arnd Bergmann <arnd@arndb.de>, Will Deacon <will@kernel.org>,
-        Vladimir Murzin <vladimir.murzin@arm.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Christoffer Dall <christoffer.dall@arm.com>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Russell King <linux@arm.linux.org.uk>,
-        Stefan Agner <stefan@agner.ch>,
-        Jan Kiszka <jan.kiszka@siemens.com>,
-        Krzysztof Kozlowski <krzk@kernel.org>,
-        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
-        Marek Szyprowski <m.szyprowski@samsung.com>,
-        Takashi Yoshi <takashi@yoshi.email>,
-        Daniel Golle <daniel@makrotopia.org>
-Subject: Re: [PATCH v2 0/7] Removing support for 32bit KVM/arm host
-Message-ID: <20200326101748.GA126150@google.com>
-References: <20200324103350.138077-1-maz@kernel.org>
+        id S1727892AbgCZKcZ convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Thu, 26 Mar 2020 06:32:25 -0400
+Received: from mail.kernel.org ([198.145.29.99]:59286 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726590AbgCZKcY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 Mar 2020 06:32:24 -0400
+From:   bugzilla-daemon@bugzilla.kernel.org
+Authentication-Results: mail.kernel.org; dkim=permerror (bad message/signature format)
+To:     kvm@vger.kernel.org
+Subject: [Bug 206977] New: AMD gpu Crash after power or reboot the VM
+Date:   Thu, 26 Mar 2020 10:32:23 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: new
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: high
+X-Bugzilla-Who: Hans.Wurst424@gmx.de
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_id short_desc product version
+ cf_kernel_version rep_platform op_sys cf_tree bug_status bug_severity
+ priority component assigned_to reporter cf_regression attachments.created
+Message-ID: <bug-206977-28872@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200324103350.138077-1-maz@kernel.org>
-User-Agent: Mutt/1.12.2 (2019-09-21)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
+https://bugzilla.kernel.org/show_bug.cgi?id=206977
 
-On Tuesday 24 Mar 2020 at 10:33:43 (+0000), Marc Zyngier wrote:
-> Marc Zyngier (7):
->   arm: Unplug KVM from the build system
->   arm: Remove KVM from config files
->   arm: Remove 32bit KVM host support
->   arm: Remove HYP/Stage-2 page-table support
->   arm: Remove GICv3 vgic compatibility macros
->   arm: Remove the ability to set HYP vectors outside of the decompressor
->   MAINTAINERS: RIP KVM/arm
+            Bug ID: 206977
+           Summary: AMD gpu Crash after power or reboot the VM
+           Product: Virtualization
+           Version: unspecified
+    Kernel Version: linux-lts 5.4.26 and 5.5.11 and 5.6.rc7 mainline krnel
+          Hardware: x86-64
+                OS: Linux
+              Tree: Mainline
+            Status: NEW
+          Severity: high
+          Priority: P1
+         Component: kvm
+          Assignee: virtualization_kvm@kernel-bugs.osdl.org
+          Reporter: Hans.Wurst424@gmx.de
+        Regression: No
 
-I've been staring at these patches for some time now and all looks good
-to me. So, for the entire series:
+Created attachment 288075
+  --> https://bugzilla.kernel.org/attachment.cgi?id=288075&action=edit
+AMD gpu Crash after power or reboot the VM logs
 
-Reviewed-by: Quentin Perret <qperret@google.com>
+Hartdware
+CPU:
+AMD RYZEN 1700X
+MAIBOARD:
+Asrock X370 Taichi
+bios:
+2.40 last bios version of cpu
+GPU1:
+amd radeon r7 260x it works good the rest.
+GPU2:
+SAPPHIRE Nitro Plus RX VEGA 64 it works not good the rest with the vfio-pci
+module.
 
-FWIW, as mentioned in a previous thread, I'm currently working with Will
-on an extension of KVM to support guest isolation, and the arm32 port
-was unfortunately making it really hard to do intrusive changes, so this
-is much appreciated!
 
-Thanks,
-Quentin
+
+I have a Problem with a corrupt Header on my AMD RX VEGA 64 Card after shutdown
+the VM.
+The GPU is with vfio in Qemu VM.
+arch linux kernel 5.5.10 and linux-lts 5.4. and linxu kernel 5.6rx7 make this
+BUG on my KVM server.
+I downgrade the kernel to 5.3.5 an the corrupt Header is fixed and the rest
+with the vfio-pci module work.
+I have mesa beta 20.0.1 and archlinux 19.3.4-2 tested. and the BUG is not
+fixed.
+see the log lspci -v > lspciv1.log for the 5.3.5 kernel loading in VM after
+shutdown.
+see the log lspci -v > lspci_header_corupt.log for the 5.4.26 or 5.5.10 kernel
+loading in VM after shutdown.
+see the dmesg >vfio_5.3.5.log for the 5.3.5 kernel loading in VM after
+shutdown.
+see the log dmesg > vfio_5.4.26.log for the 5.4.26 or 5.5.10 kernel loading in
+VM after shutdown.
+
+the gpu corrupt header has a gpu then not colling any more and fan rpm of 0.
+the gpu 30min - 40min after crash is the fan of 100% and pc must remove for
+engine and waiting 15min gpu coling down.
+
+
+
+Additional info:
+* linux linux-lts mesa 19.3.4-2
+* config and/or log files etc.
+* link to upstream bug report, if any
+
+Steps to reproduce:
+I starting a qemu q35 or qemu std VM with the gpu per vfio deice add and
+shoutdown the vm and the Header is corrupt.
+
+
+
+I post it in archlinux bug reporter 
+https://bugs.archlinux.org/task/65956
+
+
+server log after shoutdown VM.
+lspci -v >lspci_header_corupt.log
+--
+11:00.0 VGA compatible controller: Advanced Micro Devices, Inc. [AMD/ATI] Vega
+10 XL/XT [Radeon RX Vega 56/64] (rev ff) (prog-if ff)
+        !!! Unknown header type 7f
+        Kernel driver in use: vfio-pci
+        Kernel modules: amdgpu
+
+11:00.1 Audio device: Advanced Micro Devices, Inc. [AMD/ATI] Vega 10 HDMI Audio
+[Radeon Vega 56/64] (rev ff) (prog-if ff)
+        !!! Unknown header type 7f
+        Kernel driver in use: vfio-pci
+        Kernel modules: snd_hda_intel
+--
+server 
+grub boot parmter
+iommu=pt amd_iommu=on vfio-pci.ids=1002:687f,1002:aaf8,1022:145c
+rd.driver.pre=vfio-pci nopti
+
+VM WIDNWOS 7 work with the AMD RX veag 64 card good.
+
+-- 
+You are receiving this mail because:
+You are watching the assignee of the bug.
