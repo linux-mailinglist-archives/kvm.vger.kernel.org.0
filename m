@@ -2,152 +2,213 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 138CE193F59
-	for <lists+kvm@lfdr.de>; Thu, 26 Mar 2020 13:56:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BE742193F65
+	for <lists+kvm@lfdr.de>; Thu, 26 Mar 2020 14:02:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728241AbgCZM4U convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Thu, 26 Mar 2020 08:56:20 -0400
-Received: from mga09.intel.com ([134.134.136.24]:20529 "EHLO mga09.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728152AbgCZM4U (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 Mar 2020 08:56:20 -0400
-IronPort-SDR: cfs9XeRP9zJ6WaKyCTH+yKWQai43sQZKh9+4a6bWroOk+mI95eXbPPQk4Zar7YU/QXr23uLlZt
- YPd81w0DL1hQ==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Mar 2020 05:56:19 -0700
-IronPort-SDR: yiOsM0HzQtPs7uCAalT1rmEaVhDVR7PBoOr5v2NRZQDpTvBCDiL/gALwpPAPkTAp+Rfv0LXRHs
- WUCGki2QgF7w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.72,308,1580803200"; 
-   d="scan'208";a="393970616"
-Received: from fmsmsx103.amr.corp.intel.com ([10.18.124.201])
-  by orsmga004.jf.intel.com with ESMTP; 26 Mar 2020 05:56:18 -0700
-Received: from shsmsx102.ccr.corp.intel.com (10.239.4.154) by
- FMSMSX103.amr.corp.intel.com (10.18.124.201) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Thu, 26 Mar 2020 05:56:18 -0700
-Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.206]) by
- shsmsx102.ccr.corp.intel.com ([169.254.2.50]) with mapi id 14.03.0439.000;
- Thu, 26 Mar 2020 20:56:13 +0800
-From:   "Liu, Yi L" <yi.l.liu@intel.com>
-To:     "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>
-CC:     "Tian, Kevin" <kevin.tian@intel.com>,
-        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
+        id S1726291AbgCZNC6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 Mar 2020 09:02:58 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:23437 "EHLO
+        us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725994AbgCZNC6 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 26 Mar 2020 09:02:58 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1585227776;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=aFL1ls+s+Uuiosop9UleN9TMvWOg15DAPu9qEfNR8Rg=;
+        b=IBaR9beZaie5rXWs828DDBjlnBpE/2NlAKeHjY8gvW9FSKN9/p8feXKh7w9YlYhF3wsCxx
+        Jh0JxJ+qO3X8IEyGsrxpBC4eOnkGyGVpDey3E60ng76c7MKMpUb8I0o/m+h3WBhRwSXE1s
+        Frr/ZRpfYcU0h2GP9JZ8ZAEx5TOMLCs=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-358-KxIYgBPNO9S9MKt88D5XbA-1; Thu, 26 Mar 2020 09:02:54 -0400
+X-MC-Unique: KxIYgBPNO9S9MKt88D5XbA-1
+Received: by mail-wm1-f69.google.com with SMTP id f207so2426130wme.6
+        for <kvm@vger.kernel.org>; Thu, 26 Mar 2020 06:02:54 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=aFL1ls+s+Uuiosop9UleN9TMvWOg15DAPu9qEfNR8Rg=;
+        b=pvFqHOL2un8EPkPsCa97o1bSiw5/3VNDz0g19ZwJWnZhzOmxkaAZHEbHxWmyQwyddL
+         /vS6h3PEyUzveZwXtiy4G2NHFgBfjgiuCHgXbeKPACxLAhZE+ISrBcBlYr1FE3QxV0aN
+         tsGI2jzwPVXv83xL7TLF8XkHME/q60rtR9u58bdPPZMTvDStgRnyiNWQJG2T4g05Su7X
+         EwqVzQmO5oEPQmZCPngaHYGmeRcTnXMA1WOTxnqD+3jgnxgLbSXhfPjtrqwhf23RuDjB
+         a4yKEAs+4WwarBeM93XajnND93gGAm/vW4OKwULPN69cQtSsIDRd/QXdIYbIPd+nE2ps
+         7l7w==
+X-Gm-Message-State: ANhLgQ0IQCQnEDhIBXzEB9JRh/W2bX1wk1xpkpeSfkU9QANI3+s2wlgC
+        BUY1Ap7jGBSn+AO7fsUlxdtLqzFVf9oLFPg+I4gib7wpDT6hn8BiupSGFyUFwnW5pzA/eSgXPSt
+        O+4a/WitMOVCH
+X-Received: by 2002:a1c:1b0e:: with SMTP id b14mr3051562wmb.8.1585227773278;
+        Thu, 26 Mar 2020 06:02:53 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vtMgRy6rIRFIPEDHNzKZwjriK2grTT250mENOTsiMhkAWF5QKOJ25G/UwMdgEy1VCjOXC5BLQ==
+X-Received: by 2002:a1c:1b0e:: with SMTP id b14mr3051540wmb.8.1585227773049;
+        Thu, 26 Mar 2020 06:02:53 -0700 (PDT)
+Received: from xz-x1 ([2607:9880:19c0:32::2])
+        by smtp.gmail.com with ESMTPSA id n9sm3506624wru.50.2020.03.26.06.02.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 26 Mar 2020 06:02:52 -0700 (PDT)
+Date:   Thu, 26 Mar 2020 09:02:48 -0400
+From:   Peter Xu <peterx@redhat.com>
+To:     "Liu, Yi L" <yi.l.liu@intel.com>
+Cc:     "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "mst@redhat.com" <mst@redhat.com>,
+        "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
         "Tian, Jun J" <jun.j.tian@intel.com>,
         "Sun, Yi Y" <yi.y.sun@intel.com>,
-        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Wu, Hao" <hao.wu@intel.com>
-Subject: RE: [PATCH v1 0/8] vfio: expose virtual Shared Virtual Addressing
- to VMs
-Thread-Topic: [PATCH v1 0/8] vfio: expose virtual Shared Virtual Addressing
- to VMs
-Thread-Index: AQHWAEUdI4Sfhdx3H0+yWIyqzj+O7Kha2xeQ
-Date:   Thu, 26 Mar 2020 12:56:13 +0000
-Message-ID: <A2975661238FB949B60364EF0F2C25743A20440A@SHSMSX104.ccr.corp.intel.com>
-References: <1584880325-10561-1-git-send-email-yi.l.liu@intel.com>
-In-Reply-To: <1584880325-10561-1-git-send-email-yi.l.liu@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-version: 11.2.0.6
-dlp-reaction: no-action
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+        "Wu, Hao" <hao.wu@intel.com>,
+        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
+        Jacob Pan <jacob.jun.pan@linux.intel.com>,
+        Yi Sun <yi.y.sun@linux.intel.com>,
+        Richard Henderson <rth@twiddle.net>,
+        Eduardo Habkost <ehabkost@redhat.com>
+Subject: Re: [PATCH v1 20/22] intel_iommu: propagate PASID-based iotlb
+ invalidation to host
+Message-ID: <20200326130248.GB422390@xz-x1>
+References: <1584880579-12178-1-git-send-email-yi.l.liu@intel.com>
+ <1584880579-12178-21-git-send-email-yi.l.liu@intel.com>
+ <20200324183423.GE127076@xz-x1>
+ <A2975661238FB949B60364EF0F2C25743A2022C5@SHSMSX104.ccr.corp.intel.com>
+ <A2975661238FB949B60364EF0F2C25743A203E63@SHSMSX104.ccr.corp.intel.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <A2975661238FB949B60364EF0F2C25743A203E63@SHSMSX104.ccr.corp.intel.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> From: Liu, Yi L <yi.l.liu@intel.com>
-> Sent: Sunday, March 22, 2020 8:32 PM
-> To: alex.williamson@redhat.com; eric.auger@redhat.com
-> Subject: [PATCH v1 0/8] vfio: expose virtual Shared Virtual Addressing to VMs
-> 
-> From: Liu Yi L <yi.l.liu@intel.com>
-> 
-> Shared Virtual Addressing (SVA), a.k.a, Shared Virtual Memory (SVM) on
-> Intel platforms allows address space sharing between device DMA and
-> applications. SVA can reduce programming complexity and enhance security.
-> 
-> This VFIO series is intended to expose SVA usage to VMs. i.e. Sharing
-> guest application address space with passthru devices. This is called
-> vSVA in this series. The whole vSVA enabling requires QEMU/VFIO/IOMMU
-> changes. For IOMMU and QEMU changes, they are in separate series (listed
-> in the "Related series").
-> 
-> The high-level architecture for SVA virtualization is as below, the key
-> design of vSVA support is to utilize the dual-stage IOMMU translation (
-> also known as IOMMU nesting translation) capability in host IOMMU.
-> 
-> 
->     .-------------.  .---------------------------.
->     |   vIOMMU    |  | Guest process CR3, FL only|
->     |             |  '---------------------------'
->     .----------------/
->     | PASID Entry |--- PASID cache flush -
->     '-------------'                       |
->     |             |                       V
->     |             |                CR3 in GPA
->     '-------------'
-> Guest
-> ------| Shadow |--------------------------|--------
->       v        v                          v
-> Host
->     .-------------.  .----------------------.
->     |   pIOMMU    |  | Bind FL for GVA-GPA  |
->     |             |  '----------------------'
->     .----------------/  |
->     | PASID Entry |     V (Nested xlate)
->     '----------------\.------------------------------.
->     |             |   |SL for GPA-HPA, default domain|
->     |             |   '------------------------------'
->     '-------------'
-> Where:
->  - FL = First level/stage one page tables
->  - SL = Second level/stage two page tables
-> 
-> There are roughly four parts in this patchset which are
-> corresponding to the basic vSVA support for PCI device
-> assignment
->  1. vfio support for PASID allocation and free for VMs
->  2. vfio support for guest page table binding request from VMs
->  3. vfio support for IOMMU cache invalidation from VMs
->  4. vfio support for vSVA usage on IOMMU-backed mdevs
-> 
-> The complete vSVA kernel upstream patches are divided into three phases:
->     1. Common APIs and PCI device direct assignment
->     2. IOMMU-backed Mediated Device assignment
->     3. Page Request Services (PRS) support
-> 
-> This patchset is aiming for the phase 1 and phase 2, and based on Jacob's
-> below series.
-> [PATCH V10 00/11] Nested Shared Virtual Address (SVA) VT-d support:
-> https://lkml.org/lkml/2020/3/20/1172
-> 
-> Complete set for current vSVA can be found in below branch.
-> https://github.com/luxis1999/linux-vsva.git: vsva-linux-5.6-rc6
-> 
-> The corresponding QEMU patch series is as below, complete QEMU set can be
-> found in below branch.
-> [PATCH v1 00/22] intel_iommu: expose Shared Virtual Addressing to VMs
-> complete QEMU set can be found in below link:
-> https://github.com/luxis1999/qemu.git: sva_vtd_v10_v1
+On Thu, Mar 26, 2020 at 05:41:39AM +0000, Liu, Yi L wrote:
+> > From: Liu, Yi L
+> > Sent: Wednesday, March 25, 2020 9:22 PM
+> > To: 'Peter Xu' <peterx@redhat.com>
+> > Subject: RE: [PATCH v1 20/22] intel_iommu: propagate PASID-based iotlb
+> > invalidation to host
+> > 
+> > > From: Peter Xu <peterx@redhat.com>
+> > > Sent: Wednesday, March 25, 2020 2:34 AM
+> > > To: Liu, Yi L <yi.l.liu@intel.com>
+> > > Subject: Re: [PATCH v1 20/22] intel_iommu: propagate PASID-based iotlb
+> > > invalidation to host
+> > >
+> > > On Sun, Mar 22, 2020 at 05:36:17AM -0700, Liu Yi L wrote:
+> > > > This patch propagates PASID-based iotlb invalidation to host.
+> > > >
+> > > > Intel VT-d 3.0 supports nested translation in PASID granular.
+> > > > Guest SVA support could be implemented by configuring nested
+> > > > translation on specific PASID. This is also known as dual stage DMA
+> > > > translation.
+> > > >
+> > > > Under such configuration, guest owns the GVA->GPA translation which
+> > > > is configured as first level page table in host side for a specific
+> > > > pasid, and host owns GPA->HPA translation. As guest owns first level
+> > > > translation table, piotlb invalidation should be propagated to host
+> > > > since host IOMMU will cache first level page table related mappings
+> > > > during DMA address translation.
+> > > >
+> > > > This patch traps the guest PASID-based iotlb flush and propagate it
+> > > > to host.
+> > > >
+> > > > Cc: Kevin Tian <kevin.tian@intel.com>
+> > > > Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
+> > > > Cc: Peter Xu <peterx@redhat.com>
+> > > > Cc: Yi Sun <yi.y.sun@linux.intel.com>
+> > > > Cc: Paolo Bonzini <pbonzini@redhat.com>
+> > > > Cc: Richard Henderson <rth@twiddle.net>
+> > > > Cc: Eduardo Habkost <ehabkost@redhat.com>
+> > > > Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
+> > > > ---
+> > > >  hw/i386/intel_iommu.c          | 139
+> > > +++++++++++++++++++++++++++++++++++++++++
+> > > >  hw/i386/intel_iommu_internal.h |   7 +++
+> > > >  2 files changed, 146 insertions(+)
+> > > >
+> > > > diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c index
+> > > > b9ac07d..10d314d 100644
+> > > > --- a/hw/i386/intel_iommu.c
+> > > > +++ b/hw/i386/intel_iommu.c
+> > > > @@ -3134,15 +3134,154 @@ static bool
+> > > vtd_process_pasid_desc(IntelIOMMUState *s,
+> > > >      return (ret == 0) ? true : false;  }
+> > > >
+> > > > +/**
+> > > > + * Caller of this function should hold iommu_lock.
+> > > > + */
+> > > > +static void vtd_invalidate_piotlb(IntelIOMMUState *s,
+> > > > +                                  VTDBus *vtd_bus,
+> > > > +                                  int devfn,
+> > > > +                                  DualIOMMUStage1Cache
+> > > > +*stage1_cache) {
+> > > > +    VTDHostIOMMUContext *vtd_dev_icx;
+> > > > +    HostIOMMUContext *host_icx;
+> > > > +
+> > > > +    vtd_dev_icx = vtd_bus->dev_icx[devfn];
+> > > > +    if (!vtd_dev_icx) {
+> > > > +        goto out;
+> > > > +    }
+> > > > +    host_icx = vtd_dev_icx->host_icx;
+> > > > +    if (!host_icx) {
+> > > > +        goto out;
+> > > > +    }
+> > > > +    if (host_iommu_ctx_flush_stage1_cache(host_icx, stage1_cache)) {
+> > > > +        error_report("Cache flush failed");
+> > >
+> > > I think this should not easily be triggered by the guest, but just in
+> > > case... Let's use
+> > > error_report_once() to be safe.
+> > 
+> > Agreed.
+> > 
+> > > > +    }
+> > > > +out:
+> > > > +    return;
+> > > > +}
+> > > > +
+> > > > +static inline bool vtd_pasid_cache_valid(
+> > > > +                          VTDPASIDAddressSpace *vtd_pasid_as) {
+> > > > +    return vtd_pasid_as->iommu_state &&
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The ioasid extension is in the below link.
+> > >
+> > > This check can be dropped because always true?
+> > >
+> > > If you agree with both the changes, please add:
+> > >
+> > > Reviewed-by: Peter Xu <peterx@redhat.com>
+> > 
+> > I think the code should ensure all the pasid_as in hash table is valid. And we can
+> > since all the operations are under protection of iommu_lock.
+> > 
+> Peter,
+> 
+> I think my reply was wrong. pasid_as in has table may be stale since
+> the per pasid_as cache_gen may be not identical with the cache_gen
+> in iommu_state. e.g. vtd_pasid_cache_reset() only increases the
+> cache_gen in iommu_state. So there will be pasid_as in hash table
+> which has cached pasid entry but its cache_gen is not equal to the
+> one in iommu_state. For such pasid_as, we should treat it as stale.
+> So I guess the vtd_pasid_cache_valid() is still necessary.
 
-https://lkml.org/lkml/2020/3/25/874
+I guess you misread my comment. :)
 
-Regards,
-Yi Liu
+I was saying the "vtd_pasid_as->iommu_state" check is not needed,
+because iommu_state was always set if the address space is created.
+vtd_pasid_cache_valid() is needed.
+
+Also, please double confirm that vtd_pasid_cache_reset() should drop
+all the address spaces (as I think it should), not "only increase the
+cache_gen".  IMHO you should only increase the cache_gen in the PSI
+hook (vtd_pasid_cache_psi()) only.
+
+Thanks,
+
+-- 
+Peter Xu
+
