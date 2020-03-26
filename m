@@ -2,259 +2,81 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 27794193640
-	for <lists+kvm@lfdr.de>; Thu, 26 Mar 2020 04:05:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EA75D1936D7
+	for <lists+kvm@lfdr.de>; Thu, 26 Mar 2020 04:26:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727665AbgCZDEs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Mar 2020 23:04:48 -0400
-Received: from mga18.intel.com ([134.134.136.126]:52277 "EHLO mga18.intel.com"
+        id S1728069AbgCZDZc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Mar 2020 23:25:32 -0400
+Received: from mga18.intel.com ([134.134.136.126]:53303 "EHLO mga18.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727560AbgCZDEs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 Mar 2020 23:04:48 -0400
-IronPort-SDR: eLsQYSxNCj129uvEqQIg/nSsIPRkYHFJkk8PCJrRu0GX1poTiguTFtHMvbkasGkvTmqwco3TlH
- A9sg1WMgXhIQ==
+        id S1727639AbgCZDZa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 Mar 2020 23:25:30 -0400
+IronPort-SDR: s4UQgJmIejk3VLJLH41WWRqHY0jdBHvZcXuQMm9HI86DWyarjKvVIbWB3R2cF9iRyDytmI2Eoy
+ DhUE5XtXE57g==
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Mar 2020 20:04:47 -0700
-IronPort-SDR: UPb+WRKWpk1rY3eJsTc8YjSmh+W6oO5l02EayWS3IO4AENFWqiqbfPcAphDPPLacbEs7I2yBsT
- GqF21oJaDKqw==
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Mar 2020 20:25:29 -0700
+IronPort-SDR: TQP58wxqJHStCgf82omJMZzoodNQcpnqWADTBT0t3RDce8k4I2RL+UXv8iUUV8eyogYjZXR+oE
+ pJrP3oPHtEYA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.72,306,1580803200"; 
-   d="scan'208";a="250630391"
-Received: from fmsmsx108.amr.corp.intel.com ([10.18.124.206])
-  by orsmga006.jf.intel.com with ESMTP; 25 Mar 2020 20:04:46 -0700
-Received: from FMSMSX109.amr.corp.intel.com (10.18.116.9) by
- FMSMSX108.amr.corp.intel.com (10.18.124.206) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Wed, 25 Mar 2020 20:04:46 -0700
-Received: from shsmsx154.ccr.corp.intel.com (10.239.6.54) by
- fmsmsx109.amr.corp.intel.com (10.18.116.9) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Wed, 25 Mar 2020 20:04:46 -0700
-Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.206]) by
- SHSMSX154.ccr.corp.intel.com ([169.254.7.145]) with mapi id 14.03.0439.000;
- Thu, 26 Mar 2020 11:04:42 +0800
-From:   "Liu, Yi L" <yi.l.liu@intel.com>
-To:     Peter Xu <peterx@redhat.com>
-CC:     "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "mst@redhat.com" <mst@redhat.com>,
-        "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "Tian, Jun J" <jun.j.tian@intel.com>,
-        "Sun, Yi Y" <yi.y.sun@intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Wu, Hao" <hao.wu@intel.com>,
-        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
-        Jacob Pan <jacob.jun.pan@linux.intel.com>,
-        Yi Sun <yi.y.sun@linux.intel.com>,
-        Richard Henderson <rth@twiddle.net>
-Subject: RE: [PATCH v1 14/22] intel_iommu: bind/unbind guest page table to
- host
-Thread-Topic: [PATCH v1 14/22] intel_iommu: bind/unbind guest page table to
- host
-Thread-Index: AQHWAEW2HzdudG5l606qpAWL4DnMMKhXgbMAgAG+NaD//6SlAIABUHzw
-Date:   Thu, 26 Mar 2020 03:04:42 +0000
-Message-ID: <A2975661238FB949B60364EF0F2C25743A2037AD@SHSMSX104.ccr.corp.intel.com>
-References: <1584880579-12178-1-git-send-email-yi.l.liu@intel.com>
- <1584880579-12178-15-git-send-email-yi.l.liu@intel.com>
- <20200324174642.GY127076@xz-x1>
- <A2975661238FB949B60364EF0F2C25743A2021CD@SHSMSX104.ccr.corp.intel.com>
- <20200325145646.GB354390@xz-x1>
-In-Reply-To: <20200325145646.GB354390@xz-x1>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-version: 11.2.0.6
-dlp-reaction: no-action
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+   d="scan'208";a="446842797"
+Received: from lxy-clx-4s.sh.intel.com ([10.239.43.39])
+  by fmsmga005.fm.intel.com with ESMTP; 25 Mar 2020 20:25:27 -0700
+From:   Xiaoyao Li <xiaoyao.li@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>
+Cc:     kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>
+Subject: [RFC v3 0/3] Fix errors when try to build kvm selftests on specified output
+Date:   Thu, 26 Mar 2020 11:07:47 +0800
+Message-Id: <20200326030750.173972-1-xiaoyao.li@intel.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-PiBGcm9tOiBQZXRlciBYdSA8cGV0ZXJ4QHJlZGhhdC5jb20+DQo+IFNlbnQ6IFdlZG5lc2RheSwg
-TWFyY2ggMjUsIDIwMjAgMTA6NTcgUE0NCj4gVG86IExpdSwgWWkgTCA8eWkubC5saXVAaW50ZWwu
-Y29tPg0KPiBTdWJqZWN0OiBSZTogW1BBVENIIHYxIDE0LzIyXSBpbnRlbF9pb21tdTogYmluZC91
-bmJpbmQgZ3Vlc3QgcGFnZSB0YWJsZSB0byBob3N0DQo+IA0KPiBPbiBXZWQsIE1hciAyNSwgMjAy
-MCBhdCAxMjo0Mjo1OFBNICswMDAwLCBMaXUsIFlpIEwgd3JvdGU6DQo+ID4gPiBGcm9tOiBQZXRl
-ciBYdQ0KPiA+ID4gU2VudDogV2VkbmVzZGF5LCBNYXJjaCAyNSwgMjAyMCAxOjQ3IEFNDQo+ID4g
-PiBUbzogTGl1LCBZaSBMIDx5aS5sLmxpdUBpbnRlbC5jb20+DQo+ID4gPiBTdWJqZWN0OiBSZTog
-W1BBVENIIHYxIDE0LzIyXSBpbnRlbF9pb21tdTogYmluZC91bmJpbmQgZ3Vlc3QgcGFnZQ0KPiA+
-ID4gdGFibGUgdG8gaG9zdA0KPiA+ID4NCj4gPiA+IE9uIFN1biwgTWFyIDIyLCAyMDIwIGF0IDA1
-OjM2OjExQU0gLTA3MDAsIExpdSBZaSBMIHdyb3RlOg0KPiA+ID4gPiBUaGlzIHBhdGNoIGNhcHR1
-cmVzIHRoZSBndWVzdCBQQVNJRCB0YWJsZSBlbnRyeSBtb2RpZmljYXRpb25zIGFuZA0KPiA+ID4g
-PiBwcm9wYWdhdGVzIHRoZSBjaGFuZ2VzIHRvIGhvc3QgdG8gc2V0dXAgZHVhbCBzdGFnZSBETUEg
-dHJhbnNsYXRpb24uDQo+ID4gPiA+IFRoZSBndWVzdCBwYWdlIHRhYmxlIGlzIGNvbmZpZ3VyZWQg
-YXMgMXN0IGxldmVsIHBhZ2UgdGFibGUNCj4gPiA+ID4gKEdWQS0+R1BBKSB3aG9zZSB0cmFuc2xh
-dGlvbiByZXN1bHQgd291bGQgZnVydGhlciBnbyB0aHJvdWdoIGhvc3QNCj4gPiA+ID4gVlQtZCAy
-bmQgbGV2ZWwgcGFnZSB0YWJsZShHUEEtPkhQQSkgdW5kZXIgbmVzdGVkIHRyYW5zbGF0aW9uIG1v
-ZGUuDQo+ID4gPiA+IFRoaXMgaXMgdGhlIGtleSBwYXJ0IG9mIHZTVkEgc3VwcG9ydCwgYW5kIGFs
-c28gYSBrZXkgdG8gc3VwcG9ydA0KPiA+ID4gPiBJT1ZBIG92ZXIgMXN0LSBsZXZlbCBwYWdlIHRh
-YmxlIGZvciBJbnRlbCBWVC1kIGluIHZpcnR1YWxpemF0aW9uIGVudmlyb25tZW50Lg0KPiA+ID4g
-Pg0KPiA+ID4gPiBDYzogS2V2aW4gVGlhbiA8a2V2aW4udGlhbkBpbnRlbC5jb20+DQo+ID4gPiA+
-IENjOiBKYWNvYiBQYW4gPGphY29iLmp1bi5wYW5AbGludXguaW50ZWwuY29tPg0KPiA+ID4gPiBD
-YzogUGV0ZXIgWHUgPHBldGVyeEByZWRoYXQuY29tPg0KPiA+ID4gPiBDYzogWWkgU3VuIDx5aS55
-LnN1bkBsaW51eC5pbnRlbC5jb20+DQo+ID4gPiA+IENjOiBQYW9sbyBCb256aW5pIDxwYm9uemlu
-aUByZWRoYXQuY29tPg0KPiA+ID4gPiBDYzogUmljaGFyZCBIZW5kZXJzb24gPHJ0aEB0d2lkZGxl
-Lm5ldD4NCj4gPiA+ID4gU2lnbmVkLW9mZi1ieTogTGl1IFlpIEwgPHlpLmwubGl1QGludGVsLmNv
-bT4NCj4gPiA+ID4gLS0tDQo+ID4gPiA+ICBody9pMzg2L2ludGVsX2lvbW11LmMgICAgICAgICAg
-fCA5OA0KPiA+ID4gKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrLS0tDQo+
-ID4gPiA+ICBody9pMzg2L2ludGVsX2lvbW11X2ludGVybmFsLmggfCAyNSArKysrKysrKysrKw0K
-PiA+ID4gPiAgMiBmaWxlcyBjaGFuZ2VkLCAxMTggaW5zZXJ0aW9ucygrKSwgNSBkZWxldGlvbnMo
-LSkNCj4gPiA+ID4NCj4gPiA+ID4gZGlmZiAtLWdpdCBhL2h3L2kzODYvaW50ZWxfaW9tbXUuYyBi
-L2h3L2kzODYvaW50ZWxfaW9tbXUuYyBpbmRleA0KPiA+ID4gPiBjOTg1Y2FlLi4wNDIzYzgzIDEw
-MDY0NA0KPiA+ID4gPiAtLS0gYS9ody9pMzg2L2ludGVsX2lvbW11LmMNCj4gPiA+ID4gKysrIGIv
-aHcvaTM4Ni9pbnRlbF9pb21tdS5jDQo+ID4gPiA+IEBAIC00MSw2ICs0MSw3IEBADQo+ID4gPiA+
-ICAjaW5jbHVkZSAibWlncmF0aW9uL3Ztc3RhdGUuaCINCj4gPiA+ID4gICNpbmNsdWRlICJ0cmFj
-ZS5oIg0KPiA+ID4gPiAgI2luY2x1ZGUgInFlbXUvamhhc2guaCINCj4gPiA+ID4gKyNpbmNsdWRl
-IDxsaW51eC9pb21tdS5oPg0KPiA+ID4gPg0KPiA+ID4gPiAgLyogY29udGV4dCBlbnRyeSBvcGVy
-YXRpb25zICovDQo+ID4gPiA+ICAjZGVmaW5lIFZURF9DRV9HRVRfUklEMlBBU0lEKGNlKSBcIEBA
-IC02OTUsNiArNjk2LDE2IEBAIHN0YXRpYw0KPiA+ID4gPiBpbmxpbmUgdWludDE2X3QNCj4gPiA+
-IHZ0ZF9wZV9nZXRfZG9tYWluX2lkKFZURFBBU0lERW50cnkgKnBlKQ0KPiA+ID4gPiAgICAgIHJl
-dHVybiBWVERfU01fUEFTSURfRU5UUllfRElEKChwZSktPnZhbFsxXSk7DQo+ID4gPiA+ICB9DQo+
-ID4gPiA+DQo+ID4gPiA+ICtzdGF0aWMgaW5saW5lIHVpbnQzMl90IHZ0ZF9wZV9nZXRfZmxfYXco
-VlREUEFTSURFbnRyeSAqcGUpIHsNCj4gPiA+ID4gKyAgICByZXR1cm4gNDggKyAoKHBlLT52YWxb
-Ml0gPj4gMikgJiBWVERfU01fUEFTSURfRU5UUllfRkxQTSkgKg0KPiA+ID4gPiArOTsgfQ0KPiA+
-ID4gPiArDQo+ID4gPiA+ICtzdGF0aWMgaW5saW5lIGRtYV9hZGRyX3QgdnRkX3BlX2dldF9mbHB0
-X2Jhc2UoVlREUEFTSURFbnRyeSAqcGUpIHsNCj4gPiA+ID4gKyAgICByZXR1cm4gcGUtPnZhbFsy
-XSAmIFZURF9TTV9QQVNJRF9FTlRSWV9GTFBUUFRSOyB9DQo+ID4gPiA+ICsNCj4gPiA+ID4gIHN0
-YXRpYyBpbmxpbmUgYm9vbCB2dGRfcGRpcmVfcHJlc2VudChWVERQQVNJRERpckVudHJ5ICpwZGly
-ZSkgIHsNCj4gPiA+ID4gICAgICByZXR1cm4gcGRpcmUtPnZhbCAmIDE7DQo+ID4gPiA+IEBAIC0x
-ODU2LDYgKzE4NjcsODEgQEAgc3RhdGljIHZvaWQNCj4gPiA+IHZ0ZF9jb250ZXh0X2dsb2JhbF9p
-bnZhbGlkYXRlKEludGVsSU9NTVVTdGF0ZSAqcykNCj4gPiA+ID4gICAgICB2dGRfaW9tbXVfcmVw
-bGF5X2FsbChzKTsNCj4gPiA+ID4gIH0NCj4gPiA+ID4NCj4gPiA+ID4gKy8qKg0KPiA+ID4gPiAr
-ICogQ2FsbGVyIHNob3VsZCBob2xkIGlvbW11X2xvY2suDQo+ID4gPiA+ICsgKi8NCj4gPiA+ID4g
-K3N0YXRpYyBpbnQgdnRkX2JpbmRfZ3Vlc3RfcGFzaWQoSW50ZWxJT01NVVN0YXRlICpzLCBWVERC
-dXMgKnZ0ZF9idXMsDQo+ID4gPiA+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGlu
-dCBkZXZmbiwgaW50IHBhc2lkLCBWVERQQVNJREVudHJ5ICpwZSwNCj4gPiA+ID4gKyAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgVlREUEFTSURPcCBvcCkgew0KPiA+ID4gPiArICAgIFZU
-REhvc3RJT01NVUNvbnRleHQgKnZ0ZF9kZXZfaWN4Ow0KPiA+ID4gPiArICAgIEhvc3RJT01NVUNv
-bnRleHQgKmhvc3RfaWN4Ow0KPiA+ID4gPiArICAgIER1YWxJT01NVVN0YWdlMUJpbmREYXRhICpi
-aW5kX2RhdGE7DQo+ID4gPiA+ICsgICAgc3RydWN0IGlvbW11X2dwYXNpZF9iaW5kX2RhdGEgKmdf
-YmluZF9kYXRhOw0KPiA+ID4gPiArICAgIGludCByZXQgPSAtMTsNCj4gPiA+ID4gKw0KPiA+ID4g
-PiArICAgIHZ0ZF9kZXZfaWN4ID0gdnRkX2J1cy0+ZGV2X2ljeFtkZXZmbl07DQo+ID4gPiA+ICsg
-ICAgaWYgKCF2dGRfZGV2X2ljeCkgew0KPiA+ID4gPiArICAgICAgICByZXR1cm4gLUVJTlZBTDsN
-Cj4gPiA+ID4gKyAgICB9DQo+ID4gPiA+ICsNCj4gPiA+ID4gKyAgICBob3N0X2ljeCA9IHZ0ZF9k
-ZXZfaWN4LT5ob3N0X2ljeDsNCj4gPiA+ID4gKyAgICBpZiAoIWhvc3RfaWN4KSB7DQo+ID4gPiA+
-ICsgICAgICAgIHJldHVybiAtRUlOVkFMOw0KPiA+ID4gPiArICAgIH0NCj4gPiA+ID4gKw0KPiA+
-ID4gPiArICAgIGlmICghKGhvc3RfaWN4LT5zdGFnZTFfZm9ybWF0cw0KPiA+ID4gPiArICAgICAg
-ICAgICAgICYgSU9NTVVfUEFTSURfRk9STUFUX0lOVEVMX1ZURCkpIHsNCj4gPiA+ID4gKyAgICAg
-ICAgZXJyb3JfcmVwb3J0X29uY2UoIklPTU1VIFN0YWdlIDEgZm9ybWF0IGlzIG5vdA0KPiA+ID4g
-PiArIGNvbXBhdGlibGUhXG4iKTsNCj4gPiA+DQo+ID4gPiBTaG91bGRuJ3Qgd2UgZmFpbCB3aXRo
-IHRoaXM/DQo+ID4NCj4gPiBvaCwgeWVzLiBubyBuZWVkIHRvIGdvIGZ1cnRoZXIgdGhvdWdoIGhv
-c3Qgc2hvdWxkIGFsc28gZmFpbCBpdC4NCj4gPg0KPiA+ID4gPiArICAgIH0NCj4gPiA+ID4gKw0K
-PiA+ID4gPiArICAgIGJpbmRfZGF0YSA9IGdfbWFsbG9jMChzaXplb2YoKmJpbmRfZGF0YSkpOw0K
-PiA+ID4gPiArICAgIGJpbmRfZGF0YS0+cGFzaWQgPSBwYXNpZDsNCj4gPiA+ID4gKyAgICBnX2Jp
-bmRfZGF0YSA9ICZiaW5kX2RhdGEtPmJpbmRfZGF0YS5ncGFzaWRfYmluZDsNCj4gPiA+ID4gKw0K
-PiA+ID4gPiArICAgIGdfYmluZF9kYXRhLT5mbGFncyA9IDA7DQo+ID4gPiA+ICsgICAgZ19iaW5k
-X2RhdGEtPnZ0ZC5mbGFncyA9IDA7DQo+ID4gPiA+ICsgICAgc3dpdGNoIChvcCkgew0KPiA+ID4g
-PiArICAgIGNhc2UgVlREX1BBU0lEX0JJTkQ6DQo+ID4gPiA+ICsgICAgY2FzZSBWVERfUEFTSURf
-VVBEQVRFOg0KPiA+ID4NCj4gPiA+IElzIFZURF9QQVNJRF9VUERBVEUgdXNlZCBhbnl3aGVyZT8N
-Cj4gPiA+DQo+ID4gPiBCdXQgc2luY2UgaXQncyBjYWxsZWQgIlVQREFURSIuLi4gSSByZWFsbHkg
-d2FudCB0byBjb25maXJtIHdpdGggeW91DQo+ID4gPiB0aGF0IHRoZSBiaW5kKCkgdG8gdGhlIGtl
-cm5lbCB3aWxsIGhhbmRsZSB0aGUgVVBEQVRFIGNhc2UsIHJpZ2h0PyAgSQ0KPiA+ID4gbWVhbiwg
-d2UgbmVlZCB0byB1bmJpbmQgZmlyc3QgaWYgdGhlcmUgaXMgYW4gZXhpc3RpbmcgcGd0YWJsZSBw
-b2ludGVyLg0KPiA+DQo+ID4gSSBndWVzcyB5b3UgbWVhbiBob3N0IGtlcm5lbC4gcmlnaHQ/IEFj
-dHVhbGx5LCBpdCdzIGZpbmUuIGhvc3Qga2VybmVsDQo+ID4gb25seSBuZWVkcyB0byBmaWxsIGlu
-IHRoZSBsYXRlc3QgcGd0YWJsZSBwb2ludGVyIGFuZCBwZXJtaXNzaW9uDQo+ID4gY29uZmlncyB0
-byB0aGUgcGFzaWQgZW50cnkgYW5kIHRoZW4gaXNzdWUgYSBjYWNoZSBpbnZhbGlkYXRpb24uIE5v
-DQo+ID4gbmVlZCB0byBkbyB1bmJpbmQgZmlyc3RseSBzaW5jZSBrZXJuZWwgYWx3YXlzIG5lZWRz
-IHRvIGZsdXNoIGNhY2hlDQo+ID4gYWZ0ZXIgbW9kaWZ5aW5nIGEgcGFzaWQgZW50cnkgKGluY2x1
-ZGVzIHZhbGlkLT52YWxpZCkuDQo+IA0KPiBHcmVhdC4NCj4gDQo+ID4NCj4gPiA+DQo+ID4gPiBJ
-ZiB0aGUgYW5zd2VyIGlzIHllcywgdGhlbiBJIHRoaW5rIHdlJ3JlIGdvb2QsIGJ1dCB3ZSByZWFs
-bHkgbmVlZCB0bw0KPiA+ID4gY29tbWVudCBpdCBzb21ld2hlcmUgYWJvdXQgdGhlIGZhY3QuDQo+
-ID4gPg0KPiA+ID4gPiArICAgICAgICBnX2JpbmRfZGF0YS0+dmVyc2lvbiA9IElPTU1VX1VBUElf
-VkVSU0lPTjsNCj4gPiA+ID4gKyAgICAgICAgZ19iaW5kX2RhdGEtPmZvcm1hdCA9IElPTU1VX1BB
-U0lEX0ZPUk1BVF9JTlRFTF9WVEQ7DQo+ID4gPiA+ICsgICAgICAgIGdfYmluZF9kYXRhLT5ncGdk
-ID0gdnRkX3BlX2dldF9mbHB0X2Jhc2UocGUpOw0KPiA+ID4gPiArICAgICAgICBnX2JpbmRfZGF0
-YS0+YWRkcl93aWR0aCA9IHZ0ZF9wZV9nZXRfZmxfYXcocGUpOw0KPiA+ID4gPiArICAgICAgICBn
-X2JpbmRfZGF0YS0+aHBhc2lkID0gcGFzaWQ7DQo+ID4gPiA+ICsgICAgICAgIGdfYmluZF9kYXRh
-LT5ncGFzaWQgPSBwYXNpZDsNCj4gPiA+ID4gKyAgICAgICAgZ19iaW5kX2RhdGEtPmZsYWdzIHw9
-IElPTU1VX1NWQV9HUEFTSURfVkFMOw0KPiA+ID4gPiArICAgICAgICBnX2JpbmRfZGF0YS0+dnRk
-LmZsYWdzID0NCj4gPiA+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgKFZURF9TTV9Q
-QVNJRF9FTlRSWV9TUkVfQklUKHBlLT52YWxbMl0pID8gMSA6IDApDQo+ID4gPiA+ICsgICAgICAg
-ICAgICAgICAgICAgICAgICAgICB8IChWVERfU01fUEFTSURfRU5UUllfRUFGRV9CSVQocGUtPnZh
-bFsyXSkgPyAxIDogMCkNCj4gPiA+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgIHwgKFZU
-RF9TTV9QQVNJRF9FTlRSWV9QQ0RfQklUKHBlLT52YWxbMV0pID8gMSA6IDApDQo+ID4gPiA+ICsg
-ICAgICAgICAgICAgICAgICAgICAgICAgICB8IChWVERfU01fUEFTSURfRU5UUllfUFdUX0JJVChw
-ZS0+dmFsWzFdKSA/IDEgOiAwKQ0KPiA+ID4gPiArICAgICAgICAgICAgICAgICAgICAgICAgICAg
-fCAoVlREX1NNX1BBU0lEX0VOVFJZX0VNVEVfQklUKHBlLT52YWxbMV0pID8gMSA6IDApDQo+ID4g
-PiA+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICB8IChWVERfU01fUEFTSURfRU5UUllfQ0Rf
-QklUKHBlLT52YWxbMV0pID8gMSA6IDApOw0KPiA+ID4gPiArICAgICAgICBnX2JpbmRfZGF0YS0+
-dnRkLnBhdCA9IFZURF9TTV9QQVNJRF9FTlRSWV9QQVQocGUtPnZhbFsxXSk7DQo+ID4gPiA+ICsg
-ICAgICAgIGdfYmluZF9kYXRhLT52dGQuZW10ID0gVlREX1NNX1BBU0lEX0VOVFJZX0VNVChwZS0+
-dmFsWzFdKTsNCj4gPiA+ID4gKyAgICAgICAgcmV0ID0gaG9zdF9pb21tdV9jdHhfYmluZF9zdGFn
-ZTFfcGd0YmwoaG9zdF9pY3gsIGJpbmRfZGF0YSk7DQo+ID4gPiA+ICsgICAgICAgIGJyZWFrOw0K
-PiA+ID4gPiArICAgIGNhc2UgVlREX1BBU0lEX1VOQklORDoNCj4gPiA+ID4gKyAgICAgICAgZ19i
-aW5kX2RhdGEtPnZlcnNpb24gPSBJT01NVV9VQVBJX1ZFUlNJT047DQo+ID4gPiA+ICsgICAgICAg
-IGdfYmluZF9kYXRhLT5mb3JtYXQgPSBJT01NVV9QQVNJRF9GT1JNQVRfSU5URUxfVlREOw0KPiA+
-ID4gPiArICAgICAgICBnX2JpbmRfZGF0YS0+Z3BnZCA9IDA7DQo+ID4gPiA+ICsgICAgICAgIGdf
-YmluZF9kYXRhLT5hZGRyX3dpZHRoID0gMDsNCj4gPiA+ID4gKyAgICAgICAgZ19iaW5kX2RhdGEt
-PmhwYXNpZCA9IHBhc2lkOw0KPiA+ID4gPiArICAgICAgICBnX2JpbmRfZGF0YS0+Z3Bhc2lkID0g
-cGFzaWQ7DQo+ID4gPiA+ICsgICAgICAgIGdfYmluZF9kYXRhLT5mbGFncyB8PSBJT01NVV9TVkFf
-R1BBU0lEX1ZBTDsNCj4gPiA+ID4gKyAgICAgICAgcmV0ID0gaG9zdF9pb21tdV9jdHhfdW5iaW5k
-X3N0YWdlMV9wZ3RibChob3N0X2ljeCwgYmluZF9kYXRhKTsNCj4gPiA+ID4gKyAgICAgICAgYnJl
-YWs7DQo+ID4gPiA+ICsgICAgZGVmYXVsdDoNCj4gPiA+ID4gKyAgICAgICAgZXJyb3JfcmVwb3J0
-X29uY2UoIlVua25vd24gVlREUEFTSURPcCEhIVxuIik7DQo+ID4gPiA+ICsgICAgICAgIGJyZWFr
-Ow0KPiA+ID4gPiArICAgIH0NCj4gPiA+ID4gKw0KPiA+ID4gPiArICAgIGdfZnJlZShiaW5kX2Rh
-dGEpOw0KPiA+ID4gPiArDQo+ID4gPiA+ICsgICAgcmV0dXJuIHJldDsNCj4gPiA+ID4gK30NCj4g
-PiA+ID4gKw0KPiA+ID4gPiAgLyogRG8gYSBjb250ZXh0LWNhY2hlIGRldmljZS1zZWxlY3RpdmUg
-aW52YWxpZGF0aW9uLg0KPiA+ID4gPiAgICogQGZ1bmNfbWFzazogRk0gZmllbGQgYWZ0ZXIgc2hp
-ZnRpbmcNCj4gPiA+ID4gICAqLw0KPiA+ID4gPiBAQCAtMjQ4MSwxMCArMjU2NywxMCBAQCBzdGF0
-aWMgaW5saW5lIHZvaWQNCj4gPiA+ID4gdnRkX2ZpbGxfaW5fcGVfaW5fY2FjaGUoSW50ZWxJT01N
-VVN0YXRlICpzLA0KPiA+ID4gPg0KPiA+ID4gPiAgICAgIHBjX2VudHJ5LT5wYXNpZF9lbnRyeSA9
-ICpwZTsNCj4gPiA+ID4gICAgICBwY19lbnRyeS0+cGFzaWRfY2FjaGVfZ2VuID0gcy0+cGFzaWRf
-Y2FjaGVfZ2VuOw0KPiA+ID4gPiAtICAgIC8qDQo+ID4gPiA+IC0gICAgICogVE9ETzoNCj4gPiA+
-ID4gLSAgICAgKiAtIHNlbmQgcGFzaWQgYmluZCB0byBob3N0IGZvciBwYXNzdGhydSBkZXZpY2Vz
-DQo+ID4gPiA+IC0gICAgICovDQo+ID4gPiA+ICsgICAgdnRkX2JpbmRfZ3Vlc3RfcGFzaWQocywg
-dnRkX3Bhc2lkX2FzLT52dGRfYnVzLA0KPiA+ID4gPiArICAgICAgICAgICAgICAgICAgICAgICAg
-IHZ0ZF9wYXNpZF9hcy0+ZGV2Zm4sDQo+ID4gPiA+ICsgICAgICAgICAgICAgICAgICAgICAgICAg
-dnRkX3Bhc2lkX2FzLT5wYXNpZCwNCj4gPiA+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgICBw
-ZSwgVlREX1BBU0lEX0JJTkQpOw0KPiA+ID4gPiAgfQ0KPiA+ID4gPg0KPiA+ID4gPiAgLyoqDQo+
-ID4gPiA+IEBAIC0yNTc0LDExICsyNjYwLDEzIEBAIHN0YXRpYyBnYm9vbGVhbiB2dGRfZmx1c2hf
-cGFzaWQoZ3BvaW50ZXINCj4gPiA+ID4ga2V5LA0KPiA+ID4gZ3BvaW50ZXIgdmFsdWUsDQo+ID4g
-PiA+ICAgICAgICogLSB3aGVuIHBhc2lkLWJhc2UtaW90bGIocGlvdGxiKSBpbmZyYXN0cnVjdHVy
-ZSBpcyByZWFkeSwNCj4gPiA+ID4gICAgICAgKiAgIHNob3VsZCBpbnZhbGlkYXRlIFFFTVUgcGlv
-dGxiIHRvZ2VodGVyIHdpdGggdGhpcyBjaGFuZ2UuDQo+ID4gPiA+ICAgICAgICovDQo+ID4gPiA+
-ICsNCj4gPiA+ID4gICAgICByZXR1cm4gZmFsc2U7DQo+ID4gPiA+ICByZW1vdmU6DQo+ID4gPiA+
-ICsgICAgdnRkX2JpbmRfZ3Vlc3RfcGFzaWQocywgdnRkX2J1cywgZGV2Zm4sDQo+ID4gPiA+ICsg
-ICAgICAgICAgICAgICAgICAgICAgICAgcGFzaWQsIE5VTEwsIFZURF9QQVNJRF9VTkJJTkQpOw0K
-PiA+ID4gPiAgICAgIC8qDQo+ID4gPiA+ICAgICAgICogVE9ETzoNCj4gPiA+ID4gLSAgICAgKiAt
-IHNlbmQgcGFzaWQgYmluZCB0byBob3N0IGZvciBwYXNzdGhydSBkZXZpY2VzDQo+ID4gPiA+ICAg
-ICAgICogLSB3aGVuIHBhc2lkLWJhc2UtaW90bGIocGlvdGxiKSBpbmZyYXN0cnVjdHVyZSBpcyBy
-ZWFkeSwNCj4gPiA+ID4gICAgICAgKiAgIHNob3VsZCBpbnZhbGlkYXRlIFFFTVUgcGlvdGxiIHRv
-Z2VodGVyIHdpdGggdGhpcyBjaGFuZ2UuDQo+ID4gPiA+ICAgICAgICovDQo+ID4gPiA+IGRpZmYg
-LS1naXQgYS9ody9pMzg2L2ludGVsX2lvbW11X2ludGVybmFsLmgNCj4gPiA+ID4gYi9ody9pMzg2
-L2ludGVsX2lvbW11X2ludGVybmFsLmggaW5kZXggMDFmZDk1Yy4uNDQ1MWFjZiAxMDA2NDQNCj4g
-PiA+ID4gLS0tIGEvaHcvaTM4Ni9pbnRlbF9pb21tdV9pbnRlcm5hbC5oDQo+ID4gPiA+ICsrKyBi
-L2h3L2kzODYvaW50ZWxfaW9tbXVfaW50ZXJuYWwuaA0KPiA+ID4gPiBAQCAtNTE2LDYgKzUxNiwy
-MCBAQCB0eXBlZGVmIHN0cnVjdCBWVERSb290RW50cnkgVlREUm9vdEVudHJ5Ow0KPiA+ID4gPiAj
-ZGVmaW5lIFZURF9TTV9DT05URVhUX0VOVFJZX1JTVkRfVkFMMChhdykgICgweDFlMFVMTCB8DQo+
-ID4gPiB+VlREX0hBV19NQVNLKGF3KSkNCj4gPiA+ID4gICNkZWZpbmUgVlREX1NNX0NPTlRFWFRf
-RU5UUllfUlNWRF9WQUwxICAgICAgMHhmZmZmZmZmZmZmZTAwMDAwVUxMDQo+ID4gPiA+DQo+ID4g
-PiA+ICtlbnVtIFZURF9EVUFMX1NUQUdFX1VBUEkgew0KPiA+ID4gPiArICAgIFVBUElfQklORF9H
-UEFTSUQsDQo+ID4gPiA+ICsgICAgVUFQSV9OVU0NCj4gPiA+ID4gK307DQo+ID4gPiA+ICt0eXBl
-ZGVmIGVudW0gVlREX0RVQUxfU1RBR0VfVUFQSSBWVERfRFVBTF9TVEFHRV9VQVBJOw0KPiA+ID4g
-PiArDQo+ID4gPiA+ICtlbnVtIFZURFBBU0lET3Agew0KPiA+ID4gPiArICAgIFZURF9QQVNJRF9C
-SU5ELA0KPiA+ID4gPiArICAgIFZURF9QQVNJRF9VTkJJTkQsDQo+ID4gPiA+ICsgICAgVlREX1BB
-U0lEX1VQREFURSwNCj4gPiA+DQo+ID4gPiBTYW1lIGhlcmUgKHdoZXRoZXIgdG8gZHJvcD8pLg0K
-PiA+ID4NCj4gPiBJZiBhYm92ZSByZXBseSBkb2Vzbid0IG1ha2Ugc2Vuc2UsIG1heSBkcm9wIGl0
-Lg0KPiANCj4gWW91ciByZXBseSBtYWtlcyBwZXJmZWN0IHNlbnNlLCBidXQgc3RpbGwsIGNvdWxk
-IHdlIGRyb3AgaXQgYmVjYXVzZSBpdCdzIG5vdCB1c2VkPyA6KQ0KPiANCj4gSSBzdWdnZXN0IGRy
-b3AgVVBEQVRFLCB0aGVuIGVpdGhlcjoNCj4gDQo+ICAgLSBjb21tZW50IGF0IFZURF9QQVNJRF9C
-SU5EIHRoYXQgd2hlbiBiaW5kaW5nIGV4aXN0cywgd2UnbGwgdXBkYXRlDQo+ICAgICB0aGUgZW50
-cnkgc28gdGhlIGNhbGxlciBkb2VzIG5vdCBuZWVkIHRvIGNhbGwgdW5iaW5kLCBvciwNCj4gDQo+
-ICAgLSByZW5hbWUgQklORCB0byBCSU5EX1VQREFURSB0byBzaG93IHRoYXQNCj4gDQo+IFdoYXQg
-ZG8geW91IHRoaW5rPw0KDQpJIHNlZS4gQXQgdGhlIGJlZ2lubmluZywgdGhlcmUgaXMgZXhwbGlj
-aXQgdXNhZ2UgZm9yIGl0LiBCdXQgZHVlIHRvIGNvZGUNCm1lcmdlLCB0aGVyZSBpcyBubyBleHBs
-aWNpdCB1c2FnZSBub3cuIFNvIEkgY2FuIGRyb3AgaXQuIEJ1dCB5ZWFoLCBJJ2xsDQpzZWUgaWYg
-aXQgaXMgbmVlZGVkIHdoZW4gc3dpdGNoIHRvIHVzZSByZXBsYXkgY29kZSBmb3IgYm90aCBQU0kg
-YW5kIERTSS9HU0kNCmNhc2UuIElmIHNvLCB3aWxsIGFwcGx5IHRoZSB0d28gb3B0aW9ucyBpbiB5
-b3VyIHJlcGx5Lg0KDQpSZWdhcmRzLA0KWWkgTGl1DQo=
+Hi Shuah,
+
+Hope you're happy with this version that I only touch KVM's Makefile.
+
+I attempted to build KVM selftests on a specified dir, unfortunately
+neither	"make O=/path/to/mydir TARGETS=kvm" in tools/testing/selftests, nor
+"make OUTPUT=/path/to/mydir" in tools/testing/selftests/kvm work.
+
+This series aims to fix them.
+
+Patch 1 and Patch 3 are the fix patch, please see the seperate for details.
+While Patch 2 is more or less an fix for the future issue, since it works
+without Patch 2 currently.
+
+Changes in v3:
+ - Drop all the patches that touch things out of KVM
+ - Create OUTPUT dir in KVM's Makefile
+ - Correct the INSTALL_HDR_PATH in KVM's Makefile
+
+Changes in v2:
+https://lore.kernel.org/kvm/20200325140133.103236-1-xiaoyao.li@intel.com/
+ - fix the no directory issue in lib.mk
+ - make kvm fixes seperate patch
+ - Add the patch to fix linux src tree not clean issue
+
+v1:
+https://lore.kernel.org/kvm/20200315093425.33600-1-xiaoyao.li@intel.com/
+
+Xiaoyao Li (3):
+  kvm: selftests: Fix no directory error when OUTPUT specified
+  kvm: selftests: Use the right INSTALL_HDR_PATH when OUTPUT specified
+    and MAKELEVEL is 0
+  kvm: selftests: Fix header path when built from parent level with O
+    specified
+
+ tools/testing/selftests/kvm/Makefile | 15 ++++++++++++++-
+ 1 file changed, 14 insertions(+), 1 deletion(-)
+
+-- 
+2.20.1
+
