@@ -2,229 +2,314 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 423371940D5
-	for <lists+kvm@lfdr.de>; Thu, 26 Mar 2020 15:04:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EE8171940BA
+	for <lists+kvm@lfdr.de>; Thu, 26 Mar 2020 15:02:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728328AbgCZOD4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 Mar 2020 10:03:56 -0400
-Received: from UHIL19PA37.eemsg.mail.mil ([214.24.21.196]:40123 "EHLO
-        UHIL19PA37.eemsg.mail.mil" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728294AbgCZOD4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 Mar 2020 10:03:56 -0400
-X-Greylist: delayed 426 seconds by postgrey-1.27 at vger.kernel.org; Thu, 26 Mar 2020 10:03:55 EDT
-X-EEMSG-check-017: 89856681|UHIL19PA37_ESA_OUT03.csd.disa.mil
-X-IronPort-AV: E=Sophos;i="5.72,308,1580774400"; 
-   d="scan'208";a="89856681"
-Received: from emsm-gh1-uea10.ncsc.mil ([214.29.60.2])
-  by UHIL19PA37.eemsg.mail.mil with ESMTP/TLS/DHE-RSA-AES256-SHA256; 26 Mar 2020 13:56:47 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=tycho.nsa.gov; i=@tycho.nsa.gov; q=dns/txt;
-  s=tycho.nsa.gov; t=1585231008; x=1616767008;
-  h=subject:to:references:from:message-id:date:mime-version:
-   in-reply-to:content-transfer-encoding;
-  bh=4klW1VsqpgpHGLj7aCzdzQeSrTNXwsMKRK/eE1tKzn0=;
-  b=NQVSQC5kzZwKlTNahP27uiFEE2PijMn+eSdTQxXAX/reZBYnduWMzXp/
-   IBW8kcEQqzd0xmQmTfuOdzEcFDRQUuZi8E2mz1HP3p4YI9xgMnHuHBYPO
-   t63uD9p0F9BoSk8uFgCfVtzD81FNVH8Xp5OzMG64FN5Sg9bJREQGJbXq5
-   lJ+BmrlPXOt0TIv6zcQAu6k9lM0s23dOxCrb3IbO8tYVssz6S03JrSUAg
-   0/WcczEkpg2D8JjS3wHWL9+Ebrh2LNpvYE8Xf4bAoD32JR1ZqBSYPPIQ8
-   JEdhffqyLn5UVCs5PJYquMFpfwn99UhWfDsG55leiM/SqmQb5G2Kla45S
-   Q==;
-X-IronPort-AV: E=Sophos;i="5.72,308,1580774400"; 
-   d="scan'208";a="34628563"
-IronPort-PHdr: =?us-ascii?q?9a23=3Aou2MNRaqYuCnBWTiuirW+Pf/LSx+4OfEezUN45?=
- =?us-ascii?q?9isYplN5qZpsqybR7h7PlgxGXEQZ/co6odzbaP7+a5BDJLvMjJmUtBWaIPfi?=
- =?us-ascii?q?dNsd8RkQ0kDZzNImzAB9muURYHGt9fXkRu5XCxPBsdMs//Y1rPvi/6tmZKSV?=
- =?us-ascii?q?3wOgVvO+v6BJPZgdip2OCu4Z3TZBhDiCagbb9oIxi6sArcutMLjYZiK6s9xR?=
- =?us-ascii?q?vEr3pVcOlK2G1kIk6ekBn76sqs5pBo7j5eu+gm985OUKX6e7o3QLlFBzk4MG?=
- =?us-ascii?q?47+dPmuwDbQQSA+nUTXGMWkgFVAwfe9xH1Qo3xsirhueVj3iSRIND7Qqo1WT?=
- =?us-ascii?q?Sm6KdrVQPohSIaPDM37G3blsp9h79ArRm/uxJw3ZLbYICNNPp/YKzde88aRX?=
- =?us-ascii?q?FcVcpVTiBNH5+wY5cKA+cHM+lYtY39rEYQoxW4CwenGefjxiZGi3Ly2KE31f?=
- =?us-ascii?q?kqHwPb0ww6B98ArWrarNv1OqkRX+66wqbHwjffYP1Zwjr99IrFfwo9rf2QU7?=
- =?us-ascii?q?99c8zcwlQvGQPfiVWQrJToMS6J1usTq2ib7/RvVeSygGA6rgF+uDyvxsMyhY?=
- =?us-ascii?q?jJm4kYzUvE+jhiwIsuOd25SFJ0Yd6jEJdKsSGaLJF5TtktQ2FvpiY307sLso?=
- =?us-ascii?q?O4cigS0Jkr2hHSZvOdf4WI/x7vTvidLDhmiH5/Zb6ygQu5/1K6xe3mTMa01U?=
- =?us-ascii?q?5Hri9CktbRqH8AzwfT6s2bSvtl+UehxCqP2xjT6u5aJUA0krLWK4I7zb4ql5?=
- =?us-ascii?q?oTrF/DEjXqmET2kKCWdkIk9vKu6+v7ebXpuoWQN4p1igH6Kqgum8q/DvokMg?=
- =?us-ascii?q?UWQmSW9uux2Kfj8EHkWrlGkPI7nrfDvJzHPcgbo7S2Aw5R0oYt8Ra/CDKm3c?=
- =?us-ascii?q?wDnXYaN1JIYw6Hjoj1NFHOJ/D0F/G/g0+2nztxyPDGOaPhDo3XLnffiLfhYa?=
- =?us-ascii?q?p960lExQUu199f4Y5bCrYFIP/oVU/xs9vYDhA9MwOq2eroFNJ91oYGU2KVHq?=
- =?us-ascii?q?CZKL/SsUOP5u83P+mMZYoVuDPgK/g//f7hl384lEQSfamu2psXZ3S4Eep8L0?=
- =?us-ascii?q?qFZnrsh88LEX0WsQomUOzqlFqCXCZIZ3msW6I85zc7CJ+pDIrYWICtj6KO3D?=
- =?us-ascii?q?2hEp1VeG9GEFaMHmnsd4meXPcMci2SKNd7kjMYTbihV5Mh1Ra2uQ/+yrpnKP?=
- =?us-ascii?q?fU+yIBuZL4ytd6+/DTlQsz9TxoD8WRymSNT2ZpkWMVQz85wrtyoVJyylidy6?=
- =?us-ascii?q?h0mf9YGsJJ5/NPTAg6MYTQz+tgC9D9QgjBZMuGSE66QtW6BjE8VtYxw94IY0?=
- =?us-ascii?q?ZgFNSulx7D3zG3DLALibyEGpg0/7nC33j+Ocl90WzK1Ko/gFk8RMtAK2mmir?=
- =?us-ascii?q?R49wjJCI7Di1+ZmLqydaQAwC7N83+OzW6PvEFeTQ5xXrzJXXMBaUvMq9T2+E?=
- =?us-ascii?q?fCQqSwCbQoLARB09SOKqhUZd3zi1VJWvPjNM7ZY2KrlGe6HQyIya+UbIr2Z2?=
- =?us-ascii?q?Ud2z3QCEsakwAW5nuGKwc+CTm7o27EDzxhC0jvY0Xy/ul6sn+7SVU0zw6SZU?=
- =?us-ascii?q?17y7W14gIVheCbS/4LwLIEuT0hqzJvEVe8wd3WDduApxR7cKVYYNM95kpH1G?=
- =?us-ascii?q?3Duwx6JJygILpuhkMdcw5vpUPhyw13CplckcgttH4q1BB9Kb+c0F5abzOXx4?=
- =?us-ascii?q?3wOrnOJmn3+xCvbLTW1U/E3NmK/acP7ewyq0//swGxCkoi73Jn3sFT03ua5Z?=
- =?us-ascii?q?XHFwUSUZX2UkY48xh1uavWbTU654PRzXdsK7W7sife29I1A+so0hKgf9BcMK?=
- =?us-ascii?q?yaDw/yE8IaB8mzJ+wwgVekdR0EPOdV9K47O8OpaeGK17KsPOZlz3qaijFr6Y?=
- =?us-ascii?q?Z830bE3C14Q/XD3pEDzrnM0gKBXDD4pFimtc/zlMZPYjREWiKjyC3hGZRLb7?=
- =?us-ascii?q?xacoEMBmOjZcaww5E2nJPpWnhF5Ha9CF4cnsykYxyfaxr6xwIUnUAWp2G33D?=
- =?us-ascii?q?C1xCFuki0466+Y0DHKzsz8excdfG1GXm9viRHrO4fwx9QbWlW4KgYymBa76E?=
- =?us-ascii?q?LS2adWvuJ8InPVTEMOeDL5aylmU62tpv+BbtRJ5ZcArypaSqK/bEqcR7q7pA?=
- =?us-ascii?q?EVl2vgAW522j82bXept4//khg8j3iSaD5trWDeUdN9wxbBotjdQ+NBmD0cS2?=
- =?us-ascii?q?9lin2fHlGhO/Gx9MiQ0pLEtfqzEWmmU9kbdy/o5YyHsyS/6CthBhj71/S0md?=
- =?us-ascii?q?D8EQc73TXy/9ZtUirMoVD3ZYy4+b69NLdcYkRwBFL6o/F/E4V6n5p40Iocwl?=
- =?us-ascii?q?AGl56V+jwBim61PtJFj/GtJEERTCIGloaGqDPu31duezfQnNP0?=
-X-IPAS-Result: =?us-ascii?q?A2B0AAAltHxe/wHyM5BmHAEBAQEBBwEBEQEEBAEBgWkFA?=
- =?us-ascii?q?QELAYF8LIFBMiqEGo58gWwliXqPUoEkA1QKAQEBAQEBAQEBNAECBAEBhEQCg?=
- =?us-ascii?q?i8kNgcOAhABAQEFAQEBAQEFAwEBbIVigjspAYJ/AQUjBBFRCw4KAgImAgJXB?=
- =?us-ascii?q?gEMBgIBAYJjP4JYJa1zfzOFS4NSgT6BDioBjC4aeYEHgREnDAOCXj6ES4MRg?=
- =?us-ascii?q?l4Elw9xmFWCRoJWlC0GHYJMjQKMEY8RnXYBMTeBISsIAhgIIQ+DJ1AYDY4pF?=
- =?us-ascii?q?41sVSUDMIEGAQGOHQEB?=
-Received: from tarius.tycho.ncsc.mil ([144.51.242.1])
-  by EMSM-GH1-UEA10.NCSC.MIL with ESMTP; 26 Mar 2020 13:56:46 +0000
-Received: from moss-pluto.infosec.tycho.ncsc.mil (moss-pluto.infosec.tycho.ncsc.mil [192.168.25.131])
-        by tarius.tycho.ncsc.mil (8.14.7/8.14.4) with ESMTP id 02QDv8uu044529;
-        Thu, 26 Mar 2020 09:57:08 -0400
-Subject: Re: [PATCH v2 2/3] Teach SELinux about anonymous inodes
-To:     Daniel Colascione <dancol@google.com>, timmurray@google.com,
-        selinux@vger.kernel.org, linux-security-module@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, viro@zeniv.linux.org.uk, paul@paul-moore.com,
-        nnk@google.com, lokeshgidra@google.com
-References: <20200214032635.75434-1-dancol@google.com>
- <20200325230245.184786-3-dancol@google.com>
-From:   Stephen Smalley <sds@tycho.nsa.gov>
-Message-ID: <b5999b89-6921-5667-9eb2-662b14d5f730@tycho.nsa.gov>
-Date:   Thu, 26 Mar 2020 09:58:05 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+        id S1728000AbgCZOCd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 Mar 2020 10:02:33 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:23526 "EHLO
+        us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727652AbgCZOCd (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 26 Mar 2020 10:02:33 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1585231352;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=hlxFFWslsjTIeOh65U/fkAb5jyciCQRgHFLi5X0yXEg=;
+        b=hFKQXPT/YUd8BaKLcrZN3mRQRG/2+uwFEBDQVT16YxZj0iZxfI2ojbXjFHchfE3bfAKjvN
+        wUIPTipKIRPzXuWOskwaltFAu3S3IeK6RgbS5FX5TabK4JbYUaG16TILwWTOXfAod7RHZN
+        ICafM5O7N9hY0Y81K7qZhdegqSVanE4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-379-uUgACe8UP5CiCYTA-MR9Pw-1; Thu, 26 Mar 2020 10:02:02 -0400
+X-MC-Unique: uUgACe8UP5CiCYTA-MR9Pw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1AD841926DA0;
+        Thu, 26 Mar 2020 14:01:59 +0000 (UTC)
+Received: from jason-ThinkPad-X1-Carbon-6th.redhat.com (ovpn-12-19.pek2.redhat.com [10.72.12.19])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 7944A60C80;
+        Thu, 26 Mar 2020 14:01:27 +0000 (UTC)
+From:   Jason Wang <jasowang@redhat.com>
+To:     mst@redhat.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
+Cc:     jgg@mellanox.com, maxime.coquelin@redhat.com,
+        cunming.liang@intel.com, zhihong.wang@intel.com,
+        rob.miller@broadcom.com, xiao.w.wang@intel.com,
+        lingshan.zhu@intel.com, eperezma@redhat.com, lulu@redhat.com,
+        parav@mellanox.com, kevin.tian@intel.com, stefanha@redhat.com,
+        rdunlap@infradead.org, hch@infradead.org, aadam@redhat.com,
+        jiri@mellanox.com, shahafs@mellanox.com, hanand@xilinx.com,
+        mhabets@solarflare.com, gdawar@xilinx.com, saugatm@xilinx.com,
+        vmireyno@marvell.com, zhangweining@ruijie.com.cn,
+        Jason Wang <jasowang@redhat.com>
+Subject: [PATCH V9 0/9] vDPA support
+Date:   Thu, 26 Mar 2020 22:01:16 +0800
+Message-Id: <20200326140125.19794-1-jasowang@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200325230245.184786-3-dancol@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 3/25/20 7:02 PM, Daniel Colascione wrote:
-> This change uses the anon_inodes and LSM infrastructure introduced in
-> the previous patch to give SELinux the ability to control
-> anonymous-inode files that are created using the new _secure()
-> anon_inodes functions.
-> 
-> A SELinux policy author detects and controls these anonymous inodes by
-> adding a name-based type_transition rule that assigns a new security
-> type to anonymous-inode files created in some domain. The name used
-> for the name-based transition is the name associated with the
-> anonymous inode for file listings --- e.g., "[userfaultfd]" or
-> "[perf_event]".
-> 
-> Example:
-> 
-> type uffd_t;
-> type_transition sysadm_t sysadm_t : file uffd_t "[userfaultfd]";
-> allow sysadm_t uffd_t:file { create };
-> 
-> (The next patch in this series is necessary for making userfaultfd
-> support this new interface.  The example above is just
-> for exposition.)
-> 
-> Signed-off-by: Daniel Colascione <dancol@google.com>
-> ---
->   security/selinux/hooks.c            | 54 +++++++++++++++++++++++++++++
->   security/selinux/include/classmap.h |  2 ++
->   2 files changed, 56 insertions(+)
-> 
-> diff --git a/security/selinux/hooks.c b/security/selinux/hooks.c
-> index 1659b59fb5d7..b9eb45c2e4e5 100644
-> --- a/security/selinux/hooks.c
-> +++ b/security/selinux/hooks.c
-> @@ -2915,6 +2915,59 @@ static int selinux_inode_init_security(struct inode *inode, struct inode *dir,
->   	return 0;
->   }
->   
-> +static int selinux_inode_init_security_anon(struct inode *inode,
-> +					    const struct qstr *name,
-> +					    const struct file_operations *fops,
-> +					    const struct inode *context_inode)
-> +{
-> +	const struct task_security_struct *tsec = selinux_cred(current_cred());
-> +	struct common_audit_data ad;
-> +	struct inode_security_struct *isec;
-> +	int rc;
-> +
-> +	if (unlikely(!selinux_state.initialized))
-> +		return 0;
+Hi all:
 
-This leaves secure anon inodes created before first policy load with the 
-unlabeled SID rather than defaulting to the SID of the creating task 
-(kernel SID in that situation).  Is that what you want?  Alternatively 
-you can just remove this test and let it proceed; nothing should be 
-break and the anon inodes will get the kernel SID.
+This is an update version of vDPA support in kernel.
 
-> +
-> +	isec = selinux_inode(inode);
-> +
-> +	/*
-> +	 * We only get here once per ephemeral inode.  The inode has
-> +	 * been initialized via inode_alloc_security but is otherwise
-> +	 * untouched.
-> +	 */
-> +
-> +	if (context_inode) {
-> +		struct inode_security_struct *context_isec =
-> +			selinux_inode(context_inode);
-> +		isec->sclass = context_isec->sclass;
-> +		isec->sid = context_isec->sid;
-> +	} else {
-> +		isec->sclass = SECCLASS_ANON_INODE;
-> +		rc = security_transition_sid(
-> +			&selinux_state, tsec->sid, tsec->sid,
-> +			SECCLASS_FILE, name, &isec->sid);
-> +		if (rc)
-> +			return rc;
-> +	}
-> +
-> +	isec->initialized = LABEL_INITIALIZED;
-> +
-> +	/*
-> +	 * Now that we've initialized security, check whether we're
-> +	 * allowed to actually create this type of anonymous inode.
-> +	 */
-> +
-> +	ad.type = LSM_AUDIT_DATA_INODE;
-> +	ad.u.inode = inode;
-> +
-> +	return avc_has_perm(&selinux_state,
-> +			    tsec->sid,
-> +			    isec->sid,
-> +			    isec->sclass,
-> +			    FILE__CREATE,
-> +			    &ad);
-> +}
-> +
->   static int selinux_inode_create(struct inode *dir, struct dentry *dentry, umode_t mode)
->   {
->   	return may_create(dir, dentry, SECCLASS_FILE);
-> @@ -6923,6 +6976,7 @@ static struct security_hook_list selinux_hooks[] __lsm_ro_after_init = {
->   
->   	LSM_HOOK_INIT(inode_free_security, selinux_inode_free_security),
->   	LSM_HOOK_INIT(inode_init_security, selinux_inode_init_security),
-> +	LSM_HOOK_INIT(inode_init_security_anon, selinux_inode_init_security_anon),
->   	LSM_HOOK_INIT(inode_create, selinux_inode_create),
->   	LSM_HOOK_INIT(inode_link, selinux_inode_link),
->   	LSM_HOOK_INIT(inode_unlink, selinux_inode_unlink),
-> diff --git a/security/selinux/include/classmap.h b/security/selinux/include/classmap.h
-> index 986f3ac14282..263750b6aaac 100644
-> --- a/security/selinux/include/classmap.h
-> +++ b/security/selinux/include/classmap.h
-> @@ -248,6 +248,8 @@ struct security_class_mapping secclass_map[] = {
->   	  {"open", "cpu", "kernel", "tracepoint", "read", "write"} },
->   	{ "lockdown",
->   	  { "integrity", "confidentiality", NULL } },
-> +	{ "anon_inode",
-> +	  { COMMON_FILE_PERMS, NULL } },
->   	{ NULL }
->     };
->   
-> 
+vDPA device is a device that uses a datapath which complies with the
+virtio specifications with vendor specific control path. vDPA devices
+can be both physically located on the hardware or emulated by
+software. vDPA hardware devices are usually implemented through PCIE
+with the following types:
+
+- PF (Physical Function) - A single Physical Function
+- VF (Virtual Function) - Device that supports single root I/O
+  virtualization (SR-IOV). Its Virtual Function (VF) represents a
+  virtualized instance of the device that can be assigned to different
+  partitions
+- ADI (Assignable Device Interface) and its equivalents - With
+  technologies such as Intel Scalable IOV, a virtual device (VDEV)
+  composed by host OS utilizing one or more ADIs. Or its equivalent
+  like SF (Sub function) from Mellanox.
+
+From a driver's perspective, depends on how and where the DMA
+translation is done, vDPA devices are split into two types:
+
+- Platform specific DMA translation - From the driver's perspective,
+  the device can be used on a platform where device access to data in
+  memory is limited and/or translated. An example is a PCIE vDPA whose
+  DMA request was tagged via a bus (e.g PCIE) specific way. DMA
+  translation and protection are done at PCIE bus IOMMU level.
+- Device specific DMA translation - The device implements DMA
+  isolation and protection through its own logic. An example is a vDPA
+  device which uses on-chip IOMMU.
+
+To hide the differences and complexity of the above types for a vDPA
+device/IOMMU options and in order to present a generic virtio device
+to the upper layer, a device agnostic framework is required.
+
+This series introduces a software vDPA bus which abstracts the
+common attributes of vDPA device, vDPA bus driver and the
+communication method, the bus operations (vdpa_config_ops) between the
+vDPA device abstraction and the vDPA bus driver. This allows multiple
+types of drivers to be used for vDPA device like the virtio_vdpa and
+vhost_vdpa driver to operate on the bus and allow vDPA device could be
+used by either kernel virtio driver or userspace vhost drivers as:
+
+   virtio drivers  vhost drivers
+          |             |
+    [virtio bus]   [vhost uAPI]
+          |             |
+   virtio device   vhost device
+   virtio_vdpa drv vhost_vdpa drv
+             \       /
+            [vDPA bus]
+                 |
+            vDPA device
+            hardware drv
+                 |
+            [hardware bus]
+                 |
+            vDPA hardware
+
+virtio_vdpa driver is a transport implementation for kernel virtio
+drivers on top of vDPA bus operations. An alternative is to refactor
+virtio bus which is sub-optimal since the bus and drivers are designed
+to be use by kernel subsystem, a non-trivial major refactoring is
+needed which may impact a brunches of drivers and devices
+implementation inside the kernel. Using a new transport may grealy
+simply both the design and changes.
+
+vhost_vdpa driver is a new type of vhost device which allows userspace
+vhost drivers to use vDPA devices via vhost uAPI (with minor
+extension). This help to minimize the changes of existed vhost drivers
+for using vDPA devices.
+
+With the abstraction of vDPA bus and vDPA bus operations, the
+difference and complexity of the under layer hardware is hidden from
+upper layer. The vDPA bus drivers on top can use a unified
+vdpa_config_ops to control different types of vDPA device.
+
+Two drivers were implemented with the framework introduced in this
+series:
+
+- Intel IFC VF driver which depends on the platform IOMMU for DMA
+  translation
+- VDPA simulator which is a software test device with an emulated
+  onchip IOMMU
+
+Future work:
+
+- direct doorbell mapping support
+- control virtqueue support
+- dirty page tracking support
+- direct interrupt support
+- management API (devlink)
+
+Please review.
+
+Thanks
+
+Changes from V8:
+
+- switch to use devres for PCI resoureces of IFCVF (Jason)
+- require the caller of vdap_alloc_device() to use "struct foo"
+  instead of foo (Jason)
+- some tweaks on the IFCVF driver
+
+Changes from V7:
+
+- refine kconfig to solve the dependency issues on archs that lacks of
+  CONFIG_VIRTUALIZATION (kbuild)
+
+Changes from V6:
+
+- vdpa_alloc_device() will allocate parent strcture (Jason)
+- remove the vdpa core dev info in IFCVF patch (Jason)
+- provide a free method in the vdpa bus operations for drivet to free
+  private data
+- switch to use new layout in vdapsim and IFCVF
+- make IFCVF depends on PCI_MSI (kbuild)
+- some tweaks on the IFCVF driver
+
+Changes from V5:
+
+- include Intel IFCVF driver and vhost-vdpa drivers
+- add the platform IOMMU support for vhost-vdpa
+- check the return value of dev_set_name() (Jason)
+- various tweaks and fixes
+
+Changes from V4:
+
+- use put_device() instead of kfree when fail to register virtio
+  device (Jason)
+- simplify the error handling when allocating vdpasim device (Jason)
+- don't use device_for_each_child() during module exit (Jason)
+- correct the error checking for vdpa_alloc_device() (Harpreet, Lingshan)
+
+Changes from V3:
+
+- various Kconfig fixes (Randy)
+
+Changes from V2:
+
+- release idr in the release function for put_device() unwind (Jason)
+- don't panic when fail to register vdpa bus (Jason)
+- use unsigned int instead of int for ida (Jason)
+- fix the wrong commit log in virito_vdpa patches (Jason)
+- make vdpa_sim depends on RUNTIME_TESTING_MENU (Michael)
+- provide a bus release function for vDPA device (Jason)
+- fix the wrong unwind when creating devices for vDPA simulator (Jason)
+- move vDPA simulator to a dedicated directory (Lingshan)
+- cancel the work before release vDPA simulator
+
+Changes from V1:
+
+- drop sysfs API, leave the management interface to future development
+  (Michael)
+- introduce incremental DMA ops (dma_map/dma_unmap) (Michael)
+- introduce dma_device and use it instead of parent device for doing
+  IOMMU or DMA from bus driver (Michael, Jason, Ling Shan, Tiwei)
+- accept parent device and dma device when register vdpa device
+- coding style and compile fixes (Randy)
+- using vdpa_xxx instead of xxx_vdpa (Jason)
+- ove vDPA accessors to header and make it static inline (Jason)
+- split vdp_register_device() into two helpers vdpa_init_device() and
+  vdpa_register_device() which allows intermediate step to be done (Jason=
+)
+- warn on invalidate queue state when fail to creating virtqueue (Jason)
+- make to_virtio_vdpa_device() static (Jason)
+- use kmalloc/kfree instead of devres for virtio vdpa device (Jason)
+- avoid using cast in vdpa bus function (Jason)
+- introduce module_vdpa_driver and fix module refcnt (Jason)
+- fix returning freed address in vdapsim coherent DMA addr allocation (Da=
+n)
+- various other fixes and tweaks
+
+V8: https://lkml.org/lkml/2020/3/25/125
+V7: https://lkml.org/lkml/2020/3/24/21
+V6: https://lkml.org/lkml/2020/3/18/88
+V5: https://lkml.org/lkml/2020/2/26/58
+V4: https://lkml.org/lkml/2020/2/20/59
+V3: https://lkml.org/lkml/2020/2/19/1347
+V2: https://lkml.org/lkml/2020/2/9/275
+V1: https://lkml.org/lkml/2020/1/16/353
+
+Jason Wang (7):
+  vhost: refine vhost and vringh kconfig
+  vhost: allow per device message handler
+  vhost: factor out IOTLB
+  vringh: IOTLB support
+  vDPA: introduce vDPA bus
+  virtio: introduce a vDPA based transport
+  vdpasim: vDPA device simulator
+
+Tiwei Bie (1):
+  vhost: introduce vDPA-based backend
+
+Zhu Lingshan (1):
+  virtio: Intel IFC VF driver for VDPA
+
+ MAINTAINERS                             |   2 +
+ arch/arm/kvm/Kconfig                    |   2 -
+ arch/arm64/kvm/Kconfig                  |   2 -
+ arch/mips/kvm/Kconfig                   |   2 -
+ arch/powerpc/kvm/Kconfig                |   2 -
+ arch/s390/kvm/Kconfig                   |   4 -
+ arch/x86/kvm/Kconfig                    |   4 -
+ drivers/Kconfig                         |   2 +
+ drivers/misc/mic/Kconfig                |   4 -
+ drivers/net/caif/Kconfig                |   4 -
+ drivers/vhost/Kconfig                   |  42 +-
+ drivers/vhost/Kconfig.vringh            |   6 -
+ drivers/vhost/Makefile                  |   6 +
+ drivers/vhost/iotlb.c                   | 177 +++++
+ drivers/vhost/net.c                     |   5 +-
+ drivers/vhost/scsi.c                    |   2 +-
+ drivers/vhost/vdpa.c                    | 883 ++++++++++++++++++++++++
+ drivers/vhost/vhost.c                   | 233 +++----
+ drivers/vhost/vhost.h                   |  45 +-
+ drivers/vhost/vringh.c                  | 421 ++++++++++-
+ drivers/vhost/vsock.c                   |   2 +-
+ drivers/virtio/Kconfig                  |  15 +
+ drivers/virtio/Makefile                 |   2 +
+ drivers/virtio/vdpa/Kconfig             |  37 +
+ drivers/virtio/vdpa/Makefile            |   4 +
+ drivers/virtio/vdpa/ifcvf/Makefile      |   3 +
+ drivers/virtio/vdpa/ifcvf/ifcvf_base.c  | 389 +++++++++++
+ drivers/virtio/vdpa/ifcvf/ifcvf_base.h  | 118 ++++
+ drivers/virtio/vdpa/ifcvf/ifcvf_main.c  | 435 ++++++++++++
+ drivers/virtio/vdpa/vdpa.c              | 180 +++++
+ drivers/virtio/vdpa/vdpa_sim/Makefile   |   2 +
+ drivers/virtio/vdpa/vdpa_sim/vdpa_sim.c | 629 +++++++++++++++++
+ drivers/virtio/virtio_vdpa.c            | 396 +++++++++++
+ include/linux/vdpa.h                    | 253 +++++++
+ include/linux/vhost_iotlb.h             |  47 ++
+ include/linux/vringh.h                  |  36 +
+ include/uapi/linux/vhost.h              |  24 +
+ include/uapi/linux/vhost_types.h        |   8 +
+ 38 files changed, 4180 insertions(+), 248 deletions(-)
+ delete mode 100644 drivers/vhost/Kconfig.vringh
+ create mode 100644 drivers/vhost/iotlb.c
+ create mode 100644 drivers/vhost/vdpa.c
+ create mode 100644 drivers/virtio/vdpa/Kconfig
+ create mode 100644 drivers/virtio/vdpa/Makefile
+ create mode 100644 drivers/virtio/vdpa/ifcvf/Makefile
+ create mode 100644 drivers/virtio/vdpa/ifcvf/ifcvf_base.c
+ create mode 100644 drivers/virtio/vdpa/ifcvf/ifcvf_base.h
+ create mode 100644 drivers/virtio/vdpa/ifcvf/ifcvf_main.c
+ create mode 100644 drivers/virtio/vdpa/vdpa.c
+ create mode 100644 drivers/virtio/vdpa/vdpa_sim/Makefile
+ create mode 100644 drivers/virtio/vdpa/vdpa_sim/vdpa_sim.c
+ create mode 100644 drivers/virtio/virtio_vdpa.c
+ create mode 100644 include/linux/vdpa.h
+ create mode 100644 include/linux/vhost_iotlb.h
+
+--=20
+2.20.1
 
