@@ -2,134 +2,141 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id EAAFE193E53
-	for <lists+kvm@lfdr.de>; Thu, 26 Mar 2020 12:54:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4A8F7193EB6
+	for <lists+kvm@lfdr.de>; Thu, 26 Mar 2020 13:17:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728106AbgCZLyX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 Mar 2020 07:54:23 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:38176 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727994AbgCZLyX (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 26 Mar 2020 07:54:23 -0400
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 02QBZMuI024060;
-        Thu, 26 Mar 2020 07:54:22 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2ywd2u8668-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 26 Mar 2020 07:54:22 -0400
-Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 02QBkVPU064173;
-        Thu, 26 Mar 2020 07:54:21 -0400
-Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2ywd2u865x-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 26 Mar 2020 07:54:21 -0400
-Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
-        by ppma01dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 02QBoW3K030042;
-        Thu, 26 Mar 2020 11:54:20 GMT
-Received: from b01cxnp22034.gho.pok.ibm.com (b01cxnp22034.gho.pok.ibm.com [9.57.198.24])
-        by ppma01dal.us.ibm.com with ESMTP id 2ywawmbnqv-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 26 Mar 2020 11:54:20 +0000
-Received: from b01ledav004.gho.pok.ibm.com (b01ledav004.gho.pok.ibm.com [9.57.199.109])
-        by b01cxnp22034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 02QBsKBf55378356
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 26 Mar 2020 11:54:20 GMT
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 18827112067;
-        Thu, 26 Mar 2020 11:54:20 +0000 (GMT)
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 9D45C112061;
-        Thu, 26 Mar 2020 11:54:19 +0000 (GMT)
-Received: from [9.160.3.123] (unknown [9.160.3.123])
-        by b01ledav004.gho.pok.ibm.com (Postfix) with ESMTP;
-        Thu, 26 Mar 2020 11:54:19 +0000 (GMT)
-Subject: Re: [RFC PATCH v2 2/9] vfio-ccw: Register a chp_event callback for
- vfio-ccw
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     Halil Pasic <pasic@linux.ibm.com>,
-        Jason Herne <jjherne@linux.ibm.com>,
-        Jared Rossi <jrossi@linux.ibm.com>, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org
-References: <20200206213825.11444-1-farman@linux.ibm.com>
- <20200206213825.11444-3-farman@linux.ibm.com>
- <20200214131147.0a98dd7d.cohuck@redhat.com>
- <459a60d1-699d-2f16-bb59-23f11b817b81@linux.ibm.com>
- <20200324165854.3d862d5b.cohuck@redhat.com>
- <302a0650-99b0-22ef-b95d-cecdeb0f9f04@linux.ibm.com>
- <20200326074759.5808c945.cohuck@redhat.com>
-From:   Eric Farman <farman@linux.ibm.com>
-Message-ID: <7dd0d142-dad2-c5d9-fb84-237f99bd9e7b@linux.ibm.com>
-Date:   Thu, 26 Mar 2020 07:54:19 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+        id S1728165AbgCZMRQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 Mar 2020 08:17:16 -0400
+Received: from mail-eopbgr00063.outbound.protection.outlook.com ([40.107.0.63]:54243
+        "EHLO EUR02-AM5-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727841AbgCZMRQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 Mar 2020 08:17:16 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=divM5xc/aYJJzXrPLOwLm9HHtGqj7SXDz9+0/p7LV9efhKx3m0OdVgEedK4TU8PrI8dOXwTueEdGRkaJjiB4kG+HfUWFP0maqPVpWmDSOVjTtMKZHHhnj6LjsI5IfkUnQi8Z8coevqw1lvKytdFG1KPNqHXeoxuEq2x9rgaJYinT4f57MX6ERMVd0zgHUZaCvuFaqAvn4yorzgG4MMEBl8Woy2oINJ1y+4F1qmMgFFWOeDqcF+/Gq85uiynnx3rVKfP4hA2t57HeXoAo54FBTVrIiiezYQleQv1LKRZ7/gxGWlEQ0AQ08y7zG0me9B9SlXl7ZBqL0AHr1F3NPKLMPg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=8kf2msLgn2Y6bPR4XlOADAK5LICYmgcHyBGVHIP7x5s=;
+ b=dOy0NoMAEtKOzxHRMxagPKZZirg5lkZiVY/emtpmBtcsfbykyzxlmsoLKq69j7QEvRdd+VjTlzidvecYvNABtYMWH8Va607LOyxe8C8DH5zu0s2cqZLovAlgcq7bBZIpSwA8RUkOGxA0uyox3IW+0hXO/LOVt6rvHMSGahoie8r6YkUp2UfNAz1nB8p82keSlRuo8wlrylOL9uT0Q32x8DUBVOsBARi9JsaaguAWyIKenruvAHTyedKHloNCx5HJNG9QNic9ouQaCRhQXmoA/6M0gZ4Hhn+7V0rjDuRIa8ER6WWoJGzSH4eY6uvHCwfYyKO/hfwBB8yuI+J9TMzR7w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=mellanox.com; dmarc=pass action=none header.from=mellanox.com;
+ dkim=pass header.d=mellanox.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Mellanox.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=8kf2msLgn2Y6bPR4XlOADAK5LICYmgcHyBGVHIP7x5s=;
+ b=rWfQwQVZddF3wSfdl44kW9TcZPv21RCGglaHrApx+V3JJUJxt60wecWZZOF30ViR7pt5i2eGPbkd7JHDoEGMJEbdOTQCJaSWIXqL9V6cxNa9uBxDNPo0mLUtXJiDxmeXoYMyB4AwkeMhZiS6fhQRLR9k6aUCEAWRjLAqZajAQk0=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=jgg@mellanox.com; 
+Received: from VI1PR05MB4141.eurprd05.prod.outlook.com (52.133.14.15) by
+ VI1PR05MB5853.eurprd05.prod.outlook.com (20.178.125.211) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2856.19; Thu, 26 Mar 2020 12:17:12 +0000
+Received: from VI1PR05MB4141.eurprd05.prod.outlook.com
+ ([fe80::18d2:a9ea:519:add3]) by VI1PR05MB4141.eurprd05.prod.outlook.com
+ ([fe80::18d2:a9ea:519:add3%7]) with mapi id 15.20.2856.019; Thu, 26 Mar 2020
+ 12:17:11 +0000
+Date:   Thu, 26 Mar 2020 09:17:05 -0300
+From:   Jason Gunthorpe <jgg@mellanox.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     mst@redhat.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        maxime.coquelin@redhat.com, cunming.liang@intel.com,
+        zhihong.wang@intel.com, rob.miller@broadcom.com,
+        xiao.w.wang@intel.com, lingshan.zhu@intel.com, eperezma@redhat.com,
+        lulu@redhat.com, parav@mellanox.com, kevin.tian@intel.com,
+        stefanha@redhat.com, rdunlap@infradead.org, hch@infradead.org,
+        aadam@redhat.com, jiri@mellanox.com, shahafs@mellanox.com,
+        hanand@xilinx.com, mhabets@solarflare.com, gdawar@xilinx.com,
+        saugatm@xilinx.com, vmireyno@marvell.com,
+        Bie Tiwei <tiwei.bie@intel.com>
+Subject: Re: [PATCH V8 9/9] virtio: Intel IFC VF driver for VDPA
+Message-ID: <20200326121705.GJ13183@mellanox.com>
+References: <20200325082711.1107-1-jasowang@redhat.com>
+ <20200325082711.1107-10-jasowang@redhat.com>
+ <20200325123410.GX13183@mellanox.com>
+ <ed04692d-236c-2eee-4429-6ef4d5d165fe@redhat.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ed04692d-236c-2eee-4429-6ef4d5d165fe@redhat.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-ClientProxiedBy: BL0PR03CA0012.namprd03.prod.outlook.com
+ (2603:10b6:208:2d::25) To VI1PR05MB4141.eurprd05.prod.outlook.com
+ (2603:10a6:803:44::15)
 MIME-Version: 1.0
-In-Reply-To: <20200326074759.5808c945.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.645
- definitions=2020-03-26_02:2020-03-26,2020-03-26 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- lowpriorityscore=0 suspectscore=0 spamscore=0 mlxscore=0 adultscore=0
- priorityscore=1501 malwarescore=0 phishscore=0 mlxlogscore=999 bulkscore=0
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2003260085
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from mlx.ziepe.ca (142.68.57.212) by BL0PR03CA0012.namprd03.prod.outlook.com (2603:10b6:208:2d::25) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2856.18 via Frontend Transport; Thu, 26 Mar 2020 12:17:11 +0000
+Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)     (envelope-from <jgg@mellanox.com>)      id 1jHRRZ-0003kY-Ac; Thu, 26 Mar 2020 09:17:05 -0300
+X-Originating-IP: [142.68.57.212]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: c2efe42e-1115-46e5-11ad-08d7d17f9c92
+X-MS-TrafficTypeDiagnostic: VI1PR05MB5853:|VI1PR05MB5853:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <VI1PR05MB58537EF3DCA4B72DC49FD733CFCF0@VI1PR05MB5853.eurprd05.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
+X-Forefront-PRVS: 0354B4BED2
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI1PR05MB4141.eurprd05.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(10009020)(4636009)(136003)(346002)(39860400002)(396003)(366004)(376002)(26005)(1076003)(478600001)(9786002)(8676002)(81156014)(81166006)(8936002)(186003)(316002)(52116002)(2906002)(9746002)(6916009)(66556008)(66476007)(66946007)(7416002)(4326008)(5660300002)(86362001)(36756003)(33656002)(2616005)(24400500001);DIR:OUT;SFP:1101;
+Received-SPF: None (protection.outlook.com: mellanox.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: J2bRjluQP8K2zSNOzjRD6zLaSySAoQ625fEWofB+jXkHnb0wNaZ9FGMhblWNwEVjmD7B7HGHnMAHtdcsSStdSPIADvJbnBZRFf5Zhn71YJe/R/x/u807GKCMNV7zK2ImGoi7NMRFInMutShHITs/mpY2cOoYD5jLzB5nP/hK1tv1fvt2MlUQstO2DpXCaZacqMlE2e4mYWC3xO+ynilMX2lT7n2EqD5nQLvWgG1cTOZEUGCAzIBb+giuWgqR9CKBxy59TpAy+Q/vACPBUgWYEIl42AHHHTdUZOZ/MC7R/+TirmnyLZvDJeHvbYLq1UX+Tb7g1YYajlFQb39f9HGa3HLxj+CA1XbeEezPp9vg48PITqDmqssmQcIr6Uauwyug9dFGcLL6/GpOkfs5SZua/lU9cSs1XOCuo6u2VAQv/PLJIOVSNBR9ROzNp9KYkC9zEGMOCVXQifocHBuD1NImuOLY1JfH5srTvLut17YKC/NBHz9bgmlefRrNhzAuXlht
+X-MS-Exchange-AntiSpam-MessageData: 22bXDp0f+v7oC2C42v83iadYQDV++m0Uc7kZCrLIZgUymmB6R/3apJX68rLdSx6WAYqcpWZCIcOr/5GzMQLqXPbSdU5Ad1nzcN+lbr+UTaK5dyHPvnXlJNvdLfh5NWWVT7W4HWQgNbUOrUTypyPloQ==
+X-OriginatorOrg: Mellanox.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c2efe42e-1115-46e5-11ad-08d7d17f9c92
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Mar 2020 12:17:11.7262
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: a652971c-7d2e-4d9b-a6a4-d149256f461b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: wVIVZIBRIuuHDoWGv+kAaFVV5Dm6ZEokNNECIl4H4YCwd+h5zzuDnz0cPqEaZxInVLv3p2o6Uzse/1N5WuSK7Q==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR05MB5853
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Thu, Mar 26, 2020 at 01:50:53PM +0800, Jason Wang wrote:
 
+> > > +	adapter->vdpa.dma_dev = dev;
+> > > +	ret = vdpa_register_device(&adapter->vdpa);
+> > > +	if (ret) {
+> > > +		IFCVF_ERR(adapter->dev, "Failed to register ifcvf to vdpa bus");
+> > > +		goto err_msix;
+> > > +	}
+> > > +
+> > > +	return 0;
+> > > +
+> > > +err_msix:
+> > > +	put_device(&adapter->vdpa.dev);
+> > > +	return ret;
+> > > +err_alloc:
+> > > +	pci_free_irq_vectors(pdev);
+> > > +err_vectors:
+> > > +	pci_release_regions(pdev);
+> > > +err_regions:
+> > > +	pci_disable_device(pdev);
+> > > +err_enable:
+> > > +	return ret;
+> > > +}
+> > I personally don't like seeing goto unwinds with multiple returns, and
+> > here I think it is actually a tiny bug.
+> > 
+> > All touches to the PCI device must stop before the driver core
+> > remove() returns - so these pci function cannot be in the kref put
+> > release function anyhow.
+> 
+> 
+> I'm not sure I get here. IFCVF held refcnt of its PCI parent, so it looks to
+> me it's safe to free PCI resources in vDPA free callback?
 
-On 3/26/20 2:47 AM, Cornelia Huck wrote:
-> On Wed, 25 Mar 2020 22:09:40 -0400
-> Eric Farman <farman@linux.ibm.com> wrote:
-> 
->> On 3/24/20 11:58 AM, Cornelia Huck wrote:
->>> On Fri, 14 Feb 2020 11:35:21 -0500
->>> Eric Farman <farman@linux.ibm.com> wrote:
->>>   
->>>> On 2/14/20 7:11 AM, Cornelia Huck wrote:  
->>>>> On Thu,  6 Feb 2020 22:38:18 +0100
->>>>> Eric Farman <farman@linux.ibm.com> wrote:  
-> 
->>>>>> +	case CHP_ONLINE:
->>>>>> +		/* Path became available */
->>>>>> +		sch->lpm |= mask & sch->opm;    
->>>>>
->>>>> If I'm not mistaken, this patch introduces the first usage of sch->opm
->>>>> in the vfio-ccw code.     
->>>>
->>>> Correct.
->>>>  
->>>>> Are we missing something?    
->>>>
->>>> Maybe?  :)
->>>>  
->>>>> Or am I missing
->>>>> something? :)
->>>>>     
->>>>
->>>> Since it's only used in this code, for acting as a step between
->>>> vary/config off/on, maybe this only needs to be dealing with the lpm
->>>> field itself?  
->>>
->>> Ok, I went over this again and also looked at what the standard I/O
->>> subchannel driver does, and I think this is fine, as the lpm basically
->>> factors in the opm already. (Will need to keep this in mind for the
->>> following patches.)  
->>
->> Just to make sure I don't misunderstand, when you say "I think this is
->> fine" ... Do you mean keeping the opm field within vfio-ccw, as this
->> patch does?  Or removing it, and only adjusting the lpm within vfio-ccw,
->> as I suggested in my response just above?
-> 
-> I meant the code change done in this patch: We update the lpm whenever
-> the opm is changed, and use the lpm. I'd like to keep the opm separate,
-> just so that we are clear where each value comes from.
-> 
+The refcnt doesn't prevent the driver core from re-binding the
+pci_device to another driver. Then the refcount put would do a
+pci_disable_device() after another driver has started
 
-Great.  Thanks for that clarification.
+For this reason all touches to a struct pci_device must stop before
+remove returns.
+
+Jason
