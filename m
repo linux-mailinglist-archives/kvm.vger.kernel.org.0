@@ -2,167 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 48A2F193BF8
-	for <lists+kvm@lfdr.de>; Thu, 26 Mar 2020 10:35:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2B3DE193C0B
+	for <lists+kvm@lfdr.de>; Thu, 26 Mar 2020 10:38:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727901AbgCZJfd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 Mar 2020 05:35:33 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:57628 "EHLO
-        us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727868AbgCZJfY (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 26 Mar 2020 05:35:24 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1585215323;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:in-reply-to:in-reply-to:references:references;
-        bh=L2sYLwTjpS4Wy/1BaruUB/j+qeV3x0Y8fENUYH2uZrU=;
-        b=TbKs66vsw47zidbVX+OktoypcYUi69/q6JGZUO8TQdZRCC2srek6wa3Up67jJl72d+jQWG
-        YmAwH6wLee05C1cc8ql47ySrwfCvEMoewKXPreiK+cWfR4CaoYStLE5mElXf571BXq9xe4
-        0jqCnP8IUB0yJm/ZVzWd2k5wKBeNPwM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-214-WkidQZtAOkig5nPGd6aNHw-1; Thu, 26 Mar 2020 05:35:21 -0400
-X-MC-Unique: WkidQZtAOkig5nPGd6aNHw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 24EF4DB21;
-        Thu, 26 Mar 2020 09:35:20 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 76FF69CA3;
-        Thu, 26 Mar 2020 09:35:19 +0000 (UTC)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Junaid Shahid <junaids@google.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>
-Subject: [PATCH 3/3] KVM: x86: Sync SPTEs when injecting page/EPT fault into L1
-Date:   Thu, 26 Mar 2020 05:35:16 -0400
-Message-Id: <20200326093516.24215-4-pbonzini@redhat.com>
-In-Reply-To: <20200326093516.24215-1-pbonzini@redhat.com>
-References: <20200326093516.24215-1-pbonzini@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+        id S1727843AbgCZJiL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 Mar 2020 05:38:11 -0400
+Received: from bombadil.infradead.org ([198.137.202.133]:41818 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727738AbgCZJiK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 Mar 2020 05:38:10 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=eIxU9D2p34AyD0LcFkAamRDcJSbLLbHXVWCZNZkPA64=; b=htiLJTEoNalekvmhBxZGNPfUQf
+        1NvDakxqrDuRl4RyY4QsQLL+5R/yN1EoFpAXTV4pr/5GkeqsGtqK+DO3zmJkGeRbpDvRN6hyTRNwl
+        60SlF+6JxRwhiBJGeZKZwAQodGHrcmbI6AXqa0dT1yazkJ4YItI3n9adkzzOHz+FcVNWsxOMvcwi9
+        ecQGHkmxmwRKUkFI3PhOGmIjLRc6OhSJ1wwGziK0AXownrW9SNSOLqvkuMC9i8ZMrorIyhbSaR8aG
+        z3PaNAuHQ1J3BbQh7GKjJjzcHMaDUr2C1MVLnvZ2CG4wi+iLt3b0LmBAv/iG+DqDiEKTnwBlpJcyf
+        zoKpKKBw==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1jHOxj-0005Mq-1H; Thu, 26 Mar 2020 09:38:07 +0000
+Date:   Thu, 26 Mar 2020 02:38:07 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Yonghyun Hwang <yonghyun@google.com>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Havard Skinnemoen <hskinnemoen@google.com>,
+        Moritz Fischer <mdf@kernel.org>
+Subject: Re: [PATCH] vfio-mdev: support mediated device creation in kernel
+Message-ID: <20200326093807.GB12078@infradead.org>
+References: <20200320175910.180266-1-yonghyun@google.com>
+ <20200323111404.GA4554@infradead.org>
+ <CAEauFbww3X2WZuOvMbnhOD2ONBjqR-JS2BrxWPO=HqzXVcKakw@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAEauFbww3X2WZuOvMbnhOD2ONBjqR-JS2BrxWPO=HqzXVcKakw@mail.gmail.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Junaid Shahid <junaids@google.com>
+On Mon, Mar 23, 2020 at 02:33:11PM -0700, Yonghyun Hwang wrote:
+> On Mon, Mar 23, 2020 at 4:14 AM Christoph Hellwig <hch@infradead.org> wrote:
+> >
+> > On Fri, Mar 20, 2020 at 10:59:10AM -0700, Yonghyun Hwang wrote:
+> > > To enable a mediated device, a device driver registers its device to VFIO
+> > > MDev framework. Once the mediated device gets enabled, UUID gets fed onto
+> > > the sysfs attribute, "create", to create the mediated device. This
+> > > additional step happens after boot-up gets complete. If the driver knows
+> > > how many mediated devices need to be created during probing time, the
+> > > additional step becomes cumbersome. This commit implements a new function
+> > > to allow the driver to create a mediated device in kernel.
+> >
+> > Please send this along with your proposed user so that we can understand
+> > the use.  Without that new exports have no chance of going in anyway.
+> 
+> My driver is still under development. Do you recommend me to implement
+> an example code for the new exports and re-submit the commit?
 
-When injecting a page fault or EPT violation/misconfiguration, KVM is
-not syncing any shadow PTEs associated with the faulting address,
-including those in previous MMUs that are associated with L1's current
-EPTP (in a nested EPT scenario), nor is it flushing any hardware TLB
-entries.  All this is done by kvm_mmu_invalidate_gva.
-
-Page faults that are either !PRESENT or RSVD are exempt from the flushing,
-as the CPU is not allowed to cache such translations.
-
-Signed-off-by: Junaid Shahid <junaids@google.com>
-Co-developed-by: Sean Christopherson <sean.j.christopherson@intel.com>
-Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-Message-Id: <20200320212833.3507-8-sean.j.christopherson@intel.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- arch/x86/kvm/vmx/nested.c | 12 ++++++------
- arch/x86/kvm/vmx/vmx.c    |  2 +-
- arch/x86/kvm/x86.c        | 11 ++++++++++-
- 3 files changed, 17 insertions(+), 8 deletions(-)
-
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 2c450b0ba592..1586b1b5ba93 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -4559,7 +4559,7 @@ static int nested_vmx_get_vmptr(struct kvm_vcpu *vcpu, gpa_t *vmpointer)
- 		return 1;
- 
- 	if (kvm_read_guest_virt(vcpu, gva, vmpointer, sizeof(*vmpointer), &e)) {
--		kvm_inject_page_fault(vcpu, &e);
-+		kvm_inject_emulated_page_fault(vcpu, &e);
- 		return 1;
- 	}
- 
-@@ -4868,7 +4868,7 @@ static int handle_vmread(struct kvm_vcpu *vcpu)
- 			return 1;
- 		/* _system ok, nested_vmx_check_permission has verified cpl=0 */
- 		if (kvm_write_guest_virt_system(vcpu, gva, &value, len, &e)) {
--			kvm_inject_page_fault(vcpu, &e);
-+			kvm_inject_emulated_page_fault(vcpu, &e);
- 			return 1;
- 		}
- 	}
-@@ -4942,7 +4942,7 @@ static int handle_vmwrite(struct kvm_vcpu *vcpu)
- 					instr_info, false, len, &gva))
- 			return 1;
- 		if (kvm_read_guest_virt(vcpu, gva, &value, len, &e)) {
--			kvm_inject_page_fault(vcpu, &e);
-+			kvm_inject_emulated_page_fault(vcpu, &e);
- 			return 1;
- 		}
- 	}
-@@ -5107,7 +5107,7 @@ static int handle_vmptrst(struct kvm_vcpu *vcpu)
- 	/* *_system ok, nested_vmx_check_permission has verified cpl=0 */
- 	if (kvm_write_guest_virt_system(vcpu, gva, (void *)&current_vmptr,
- 					sizeof(gpa_t), &e)) {
--		kvm_inject_page_fault(vcpu, &e);
-+		kvm_inject_emulated_page_fault(vcpu, &e);
- 		return 1;
- 	}
- 	return nested_vmx_succeed(vcpu);
-@@ -5151,7 +5151,7 @@ static int handle_invept(struct kvm_vcpu *vcpu)
- 			vmx_instruction_info, false, sizeof(operand), &gva))
- 		return 1;
- 	if (kvm_read_guest_virt(vcpu, gva, &operand, sizeof(operand), &e)) {
--		kvm_inject_page_fault(vcpu, &e);
-+		kvm_inject_emulated_page_fault(vcpu, &e);
- 		return 1;
- 	}
- 
-@@ -5219,7 +5219,7 @@ static int handle_invvpid(struct kvm_vcpu *vcpu)
- 			vmx_instruction_info, false, sizeof(operand), &gva))
- 		return 1;
- 	if (kvm_read_guest_virt(vcpu, gva, &operand, sizeof(operand), &e)) {
--		kvm_inject_page_fault(vcpu, &e);
-+		kvm_inject_emulated_page_fault(vcpu, &e);
- 		return 1;
- 	}
- 	if (operand.vpid >> 16)
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 07299a957d4a..c944726b3c0c 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -5404,7 +5404,7 @@ static int handle_invpcid(struct kvm_vcpu *vcpu)
- 		return 1;
- 
- 	if (kvm_read_guest_virt(vcpu, gva, &operand, sizeof(operand), &e)) {
--		kvm_inject_page_fault(vcpu, &e);
-+		kvm_inject_emulated_page_fault(vcpu, &e);
- 		return 1;
- 	}
- 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 522905523bf0..dbca6c3bd0db 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -618,8 +618,17 @@ bool kvm_inject_emulated_page_fault(struct kvm_vcpu *vcpu,
- 	WARN_ON_ONCE(fault->vector != PF_VECTOR);
- 
- 	fault_mmu = fault->nested_page_fault ? vcpu->arch.mmu : vcpu->arch.walk_mmu;
--	fault_mmu->inject_page_fault(vcpu, fault);
- 
-+	/*
-+	 * Invalidate the TLB entry for the faulting address, if it exists,
-+	 * else the access will fault indefinitely (and to emulate hardware).
-+	 */
-+	if ((fault->error_code & PFERR_PRESENT_MASK)
-+	    && !(fault->error_code & PFERR_RSVD_MASK))
-+		kvm_mmu_invalidate_gva(vcpu, fault_mmu,
-+				       fault->address, fault_mmu->root_hpa);
-+
-+	fault_mmu->inject_page_fault(vcpu, fault);
- 	return fault->nested_page_fault;
- }
- EXPORT_SYMBOL_GPL(kvm_inject_emulated_page_fault);
--- 
-2.18.2
-
+Hell no.  The point is that we don't add new APIs unless we have
+actual users (not example code!).  And as Alex mentioned the use case
+is rather questionable anyway, so without a user that actually shows a
+good use case which would remove those doubts it is a complete no-go.
