@@ -2,142 +2,152 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 07F3E193F2B
-	for <lists+kvm@lfdr.de>; Thu, 26 Mar 2020 13:48:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 138CE193F59
+	for <lists+kvm@lfdr.de>; Thu, 26 Mar 2020 13:56:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728205AbgCZMr6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 Mar 2020 08:47:58 -0400
-Received: from mga18.intel.com ([134.134.136.126]:16947 "EHLO mga18.intel.com"
+        id S1728241AbgCZM4U convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Thu, 26 Mar 2020 08:56:20 -0400
+Received: from mga09.intel.com ([134.134.136.24]:20529 "EHLO mga09.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727841AbgCZMr5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 Mar 2020 08:47:57 -0400
-IronPort-SDR: 7WQ/DVEfSuuuJ3MO3WQeXL8T/8epGDim1PVVmvtCBKg+uvtDnP7wCWZ/0KPE4930UYEIQejHHj
- UreKrO+Med0g==
+        id S1728152AbgCZM4U (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 Mar 2020 08:56:20 -0400
+IronPort-SDR: cfs9XeRP9zJ6WaKyCTH+yKWQai43sQZKh9+4a6bWroOk+mI95eXbPPQk4Zar7YU/QXr23uLlZt
+ YPd81w0DL1hQ==
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Mar 2020 05:47:57 -0700
-IronPort-SDR: 4MeGnowaMGpgEa9Oj0vOqTX6OTJWRFj2MYMvitJ08h0w8rixQahEakV1Y57nrNbL7Iv7suTABP
- oZzd3Exx34kg==
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Mar 2020 05:56:19 -0700
+IronPort-SDR: yiOsM0HzQtPs7uCAalT1rmEaVhDVR7PBoOr5v2NRZQDpTvBCDiL/gALwpPAPkTAp+Rfv0LXRHs
+ WUCGki2QgF7w==
+X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.72,308,1580803200"; 
-   d="scan'208";a="420687679"
-Received: from likexu-mobl1.ccr.corp.intel.com (HELO [10.249.175.106]) ([10.249.175.106])
-  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Mar 2020 05:47:54 -0700
-Subject: Re: [PATCH v2] KVM: x86/pmu: Reduce counter period change overhead
- and delay the effective time
-To:     pbonzini@redhat.com
-Cc:     ehankland@google.com, jmattson@google.com, joro@8bytes.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        sean.j.christopherson@intel.com, vkuznets@redhat.com,
-        wanpengli@tencent.com
-References: <20200317075315.70933-1-like.xu@linux.intel.com>
- <20200317081458.88714-1-like.xu@linux.intel.com>
-From:   Like Xu <like.xu@linux.intel.com>
-Organization: Intel OTC
-Message-ID: <1528e1b4-3dee-161b-9463-57471263b5a8@linux.intel.com>
-Date:   Thu, 26 Mar 2020 20:47:53 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
-MIME-Version: 1.0
-In-Reply-To: <20200317081458.88714-1-like.xu@linux.intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+   d="scan'208";a="393970616"
+Received: from fmsmsx103.amr.corp.intel.com ([10.18.124.201])
+  by orsmga004.jf.intel.com with ESMTP; 26 Mar 2020 05:56:18 -0700
+Received: from shsmsx102.ccr.corp.intel.com (10.239.4.154) by
+ FMSMSX103.amr.corp.intel.com (10.18.124.201) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Thu, 26 Mar 2020 05:56:18 -0700
+Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.206]) by
+ shsmsx102.ccr.corp.intel.com ([169.254.2.50]) with mapi id 14.03.0439.000;
+ Thu, 26 Mar 2020 20:56:13 +0800
+From:   "Liu, Yi L" <yi.l.liu@intel.com>
+To:     "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>
+CC:     "Tian, Kevin" <kevin.tian@intel.com>,
+        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "Tian, Jun J" <jun.j.tian@intel.com>,
+        "Sun, Yi Y" <yi.y.sun@intel.com>,
+        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Wu, Hao" <hao.wu@intel.com>
+Subject: RE: [PATCH v1 0/8] vfio: expose virtual Shared Virtual Addressing
+ to VMs
+Thread-Topic: [PATCH v1 0/8] vfio: expose virtual Shared Virtual Addressing
+ to VMs
+Thread-Index: AQHWAEUdI4Sfhdx3H0+yWIyqzj+O7Kha2xeQ
+Date:   Thu, 26 Mar 2020 12:56:13 +0000
+Message-ID: <A2975661238FB949B60364EF0F2C25743A20440A@SHSMSX104.ccr.corp.intel.com>
+References: <1584880325-10561-1-git-send-email-yi.l.liu@intel.com>
+In-Reply-To: <1584880325-10561-1-git-send-email-yi.l.liu@intel.com>
+Accept-Language: en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
+MIME-Version: 1.0
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Anyone to help review this change?
+> From: Liu, Yi L <yi.l.liu@intel.com>
+> Sent: Sunday, March 22, 2020 8:32 PM
+> To: alex.williamson@redhat.com; eric.auger@redhat.com
+> Subject: [PATCH v1 0/8] vfio: expose virtual Shared Virtual Addressing to VMs
+> 
+> From: Liu Yi L <yi.l.liu@intel.com>
+> 
+> Shared Virtual Addressing (SVA), a.k.a, Shared Virtual Memory (SVM) on
+> Intel platforms allows address space sharing between device DMA and
+> applications. SVA can reduce programming complexity and enhance security.
+> 
+> This VFIO series is intended to expose SVA usage to VMs. i.e. Sharing
+> guest application address space with passthru devices. This is called
+> vSVA in this series. The whole vSVA enabling requires QEMU/VFIO/IOMMU
+> changes. For IOMMU and QEMU changes, they are in separate series (listed
+> in the "Related series").
+> 
+> The high-level architecture for SVA virtualization is as below, the key
+> design of vSVA support is to utilize the dual-stage IOMMU translation (
+> also known as IOMMU nesting translation) capability in host IOMMU.
+> 
+> 
+>     .-------------.  .---------------------------.
+>     |   vIOMMU    |  | Guest process CR3, FL only|
+>     |             |  '---------------------------'
+>     .----------------/
+>     | PASID Entry |--- PASID cache flush -
+>     '-------------'                       |
+>     |             |                       V
+>     |             |                CR3 in GPA
+>     '-------------'
+> Guest
+> ------| Shadow |--------------------------|--------
+>       v        v                          v
+> Host
+>     .-------------.  .----------------------.
+>     |   pIOMMU    |  | Bind FL for GVA-GPA  |
+>     |             |  '----------------------'
+>     .----------------/  |
+>     | PASID Entry |     V (Nested xlate)
+>     '----------------\.------------------------------.
+>     |             |   |SL for GPA-HPA, default domain|
+>     |             |   '------------------------------'
+>     '-------------'
+> Where:
+>  - FL = First level/stage one page tables
+>  - SL = Second level/stage two page tables
+> 
+> There are roughly four parts in this patchset which are
+> corresponding to the basic vSVA support for PCI device
+> assignment
+>  1. vfio support for PASID allocation and free for VMs
+>  2. vfio support for guest page table binding request from VMs
+>  3. vfio support for IOMMU cache invalidation from VMs
+>  4. vfio support for vSVA usage on IOMMU-backed mdevs
+> 
+> The complete vSVA kernel upstream patches are divided into three phases:
+>     1. Common APIs and PCI device direct assignment
+>     2. IOMMU-backed Mediated Device assignment
+>     3. Page Request Services (PRS) support
+> 
+> This patchset is aiming for the phase 1 and phase 2, and based on Jacob's
+> below series.
+> [PATCH V10 00/11] Nested Shared Virtual Address (SVA) VT-d support:
+> https://lkml.org/lkml/2020/3/20/1172
+> 
+> Complete set for current vSVA can be found in below branch.
+> https://github.com/luxis1999/linux-vsva.git: vsva-linux-5.6-rc6
+> 
+> The corresponding QEMU patch series is as below, complete QEMU set can be
+> found in below branch.
+> [PATCH v1 00/22] intel_iommu: expose Shared Virtual Addressing to VMs
+> complete QEMU set can be found in below link:
+> https://github.com/luxis1999/qemu.git: sva_vtd_v10_v1
 
-Thanks,
-Like Xu
+The ioasid extension is in the below link.
 
-On 2020/3/17 16:14, Like Xu wrote:
-> The cost of perf_event_period() is unstable, and when the guest samples
-> multiple events, the overhead increases dramatically (5378 ns on E5-2699).
-> 
-> For a non-running counter, the effective time of the new period is when
-> its corresponding enable bit is enabled. Calling perf_event_period()
-> in advance is superfluous. For a running counter, it's safe to delay the
-> effective time until the KVM_REQ_PMU event is handled. If there are
-> multiple perf_event_period() calls before handling KVM_REQ_PMU,
-> it helps to reduce the total cost.
-> 
-> Signed-off-by: Like Xu <like.xu@linux.intel.com>
-> ---
->   arch/x86/kvm/pmu.c           | 11 -----------
->   arch/x86/kvm/pmu.h           | 11 +++++++++++
->   arch/x86/kvm/vmx/pmu_intel.c | 10 ++++------
->   3 files changed, 15 insertions(+), 17 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
-> index d1f8ca57d354..527a8bb85080 100644
-> --- a/arch/x86/kvm/pmu.c
-> +++ b/arch/x86/kvm/pmu.c
-> @@ -437,17 +437,6 @@ void kvm_pmu_init(struct kvm_vcpu *vcpu)
->   	kvm_pmu_refresh(vcpu);
->   }
->   
-> -static inline bool pmc_speculative_in_use(struct kvm_pmc *pmc)
-> -{
-> -	struct kvm_pmu *pmu = pmc_to_pmu(pmc);
-> -
-> -	if (pmc_is_fixed(pmc))
-> -		return fixed_ctrl_field(pmu->fixed_ctr_ctrl,
-> -			pmc->idx - INTEL_PMC_IDX_FIXED) & 0x3;
-> -
-> -	return pmc->eventsel & ARCH_PERFMON_EVENTSEL_ENABLE;
-> -}
-> -
->   /* Release perf_events for vPMCs that have been unused for a full time slice.  */
->   void kvm_pmu_cleanup(struct kvm_vcpu *vcpu)
->   {
-> diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
-> index d7da2b9e0755..cd112e825d2c 100644
-> --- a/arch/x86/kvm/pmu.h
-> +++ b/arch/x86/kvm/pmu.h
-> @@ -138,6 +138,17 @@ static inline u64 get_sample_period(struct kvm_pmc *pmc, u64 counter_value)
->   	return sample_period;
->   }
->   
-> +static inline bool pmc_speculative_in_use(struct kvm_pmc *pmc)
-> +{
-> +	struct kvm_pmu *pmu = pmc_to_pmu(pmc);
-> +
-> +	if (pmc_is_fixed(pmc))
-> +		return fixed_ctrl_field(pmu->fixed_ctr_ctrl,
-> +			pmc->idx - INTEL_PMC_IDX_FIXED) & 0x3;
-> +
-> +	return pmc->eventsel & ARCH_PERFMON_EVENTSEL_ENABLE;
-> +}
-> +
->   void reprogram_gp_counter(struct kvm_pmc *pmc, u64 eventsel);
->   void reprogram_fixed_counter(struct kvm_pmc *pmc, u8 ctrl, int fixed_idx);
->   void reprogram_counter(struct kvm_pmu *pmu, int pmc_idx);
-> diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
-> index 7c857737b438..20f654a0c09b 100644
-> --- a/arch/x86/kvm/vmx/pmu_intel.c
-> +++ b/arch/x86/kvm/vmx/pmu_intel.c
-> @@ -263,15 +263,13 @@ static int intel_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->   			if (!msr_info->host_initiated)
->   				data = (s64)(s32)data;
->   			pmc->counter += data - pmc_read_counter(pmc);
-> -			if (pmc->perf_event)
-> -				perf_event_period(pmc->perf_event,
-> -						  get_sample_period(pmc, data));
-> +			if (pmc_speculative_in_use(pmc))
-> +				kvm_make_request(KVM_REQ_PMU, vcpu);
->   			return 0;
->   		} else if ((pmc = get_fixed_pmc(pmu, msr))) {
->   			pmc->counter += data - pmc_read_counter(pmc);
-> -			if (pmc->perf_event)
-> -				perf_event_period(pmc->perf_event,
-> -						  get_sample_period(pmc, data));
-> +			if (pmc_speculative_in_use(pmc))
-> +				kvm_make_request(KVM_REQ_PMU, vcpu);
->   			return 0;
->   		} else if ((pmc = get_gp_pmc(pmu, msr, MSR_P6_EVNTSEL0))) {
->   			if (data == pmc->eventsel)
-> 
+https://lkml.org/lkml/2020/3/25/874
 
+Regards,
+Yi Liu
