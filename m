@@ -2,88 +2,153 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 52E781936DC
-	for <lists+kvm@lfdr.de>; Thu, 26 Mar 2020 04:26:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B1F5819369F
+	for <lists+kvm@lfdr.de>; Thu, 26 Mar 2020 04:17:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728097AbgCZDZh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Mar 2020 23:25:37 -0400
-Received: from mga18.intel.com ([134.134.136.126]:53303 "EHLO mga18.intel.com"
+        id S1727670AbgCZDRR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Mar 2020 23:17:17 -0400
+Received: from mga04.intel.com ([192.55.52.120]:27457 "EHLO mga04.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728091AbgCZDZe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 Mar 2020 23:25:34 -0400
-IronPort-SDR: l6DxRvyZmYypsM5UXg0z+8FoC/FymFGj+N/iYD65bXOgNEmPckZj6A3BkcR/t10z/yd4jsP+vW
- A27dT4u8fDLQ==
+        id S1727560AbgCZDRR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 Mar 2020 23:17:17 -0400
+IronPort-SDR: jQvf1mrRsSp1YQ1wJcKoiDzZcUCdCISSJxHMdHeJ32IlYZdW3QN6om+N9FXADba0r/oSqH6Lhf
+ XDUE/DZEFlSw==
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Mar 2020 20:25:33 -0700
-IronPort-SDR: LXjqAhcF6kDMzEy0by7c8b642y5+g9LGiqo6QedAJkauKrkA6dwIpeKt0KeAqWEHLG3W8rhJqF
- tz6vmJ2tAl3g==
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Mar 2020 20:17:16 -0700
+IronPort-SDR: 4XctIjodf/2i/mDbajyNmLuhzdxhi5SCDtvwf/pYvN/hCcEjd6qgp74RTAMtIx2xsUFKcEJIrp
+ /Oxr8Xd4vm2A==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.72,306,1580803200"; 
-   d="scan'208";a="446842833"
-Received: from lxy-clx-4s.sh.intel.com ([10.239.43.39])
-  by fmsmga005.fm.intel.com with ESMTP; 25 Mar 2020 20:25:32 -0700
-From:   Xiaoyao Li <xiaoyao.li@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>
-Cc:     kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>
-Subject: [RFC v3 3/3] kvm: selftests: Fix header path when built from parent level with O specified
-Date:   Thu, 26 Mar 2020 11:07:50 +0800
-Message-Id: <20200326030750.173972-4-xiaoyao.li@intel.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200326030750.173972-1-xiaoyao.li@intel.com>
-References: <20200326030750.173972-1-xiaoyao.li@intel.com>
+   d="scan'208";a="240557101"
+Received: from fmsmsx103.amr.corp.intel.com ([10.18.124.201])
+  by fmsmga008.fm.intel.com with ESMTP; 25 Mar 2020 20:17:16 -0700
+Received: from fmsmsx601.amr.corp.intel.com (10.18.126.81) by
+ FMSMSX103.amr.corp.intel.com (10.18.124.201) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Wed, 25 Mar 2020 20:17:16 -0700
+Received: from fmsmsx601.amr.corp.intel.com (10.18.126.81) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1713.5; Wed, 25 Mar 2020 20:17:16 -0700
+Received: from shsmsx103.ccr.corp.intel.com (10.239.4.69) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id 15.1.1713.5
+ via Frontend Transport; Wed, 25 Mar 2020 20:17:16 -0700
+Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.206]) by
+ SHSMSX103.ccr.corp.intel.com ([169.254.4.137]) with mapi id 14.03.0439.000;
+ Thu, 26 Mar 2020 11:17:12 +0800
+From:   "Liu, Yi L" <yi.l.liu@intel.com>
+To:     Peter Xu <peterx@redhat.com>
+CC:     "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "mst@redhat.com" <mst@redhat.com>,
+        "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "Tian, Jun J" <jun.j.tian@intel.com>,
+        "Sun, Yi Y" <yi.y.sun@intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "Wu, Hao" <hao.wu@intel.com>,
+        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
+        Jacob Pan <jacob.jun.pan@linux.intel.com>,
+        Yi Sun <yi.y.sun@linux.intel.com>,
+        Richard Henderson <rth@twiddle.net>
+Subject: RE: [PATCH v1 15/22] intel_iommu: replay guest pasid bindings to
+ host
+Thread-Topic: [PATCH v1 15/22] intel_iommu: replay guest pasid bindings to
+ host
+Thread-Index: AQHWAEW2TKrNzFeLS0yo5PxjKqQ+KahXhXqAgAHBPcD//6CTAIABTvqw
+Date:   Thu, 26 Mar 2020 03:17:12 +0000
+Message-ID: <A2975661238FB949B60364EF0F2C25743A2038A1@SHSMSX104.ccr.corp.intel.com>
+References: <1584880579-12178-1-git-send-email-yi.l.liu@intel.com>
+ <1584880579-12178-16-git-send-email-yi.l.liu@intel.com>
+ <20200324180013.GZ127076@xz-x1>
+ <A2975661238FB949B60364EF0F2C25743A202251@SHSMSX104.ccr.corp.intel.com>
+ <20200325150634.GC354390@xz-x1>
+In-Reply-To: <20200325150634.GC354390@xz-x1>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When build kvm selftests in tools/testing/selftests directory with
-
-	make O=/home/lxy/kselftests TARGETS=kvm
-
-it fails building some kvm test binaries due to lack of header files,
-e.g.,
-
-  x86_64/vmx_set_nested_state_test.c: In function ‘set_default_vmx_state’:
-  x86_64/vmx_set_nested_state_test.c:85:7: error: ‘struct
-  kvm_nested_state’ has no member named ‘hdr’
-    state->hdr.vmx.vmxon_pa = 0x1000;
-  ...
-
-With "O" is specified, it also takes effect on "make headers_install",
-which causes no header files generated in "kernel-src/usr".
-
-Fix INSTALL_HDR_PATH with correct path for this case.
-
-Opportunistically fix the case when KBUILD_OUTPUT specified as well,
-even though it can work currently.
-
-Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
----
- tools/testing/selftests/kvm/Makefile | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index 6a95878b2ab7..bf8f56488914 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -50,7 +50,11 @@ ifeq (0,$(MAKELEVEL))
- 	INSTALL_HDR_PATH := $(top_srcdir)/usr
-     endif
- else
-+    ifneq ($(O)$(KBUILD_OUTPUT),)
-+	INSTALL_HDR_PATH := $(BUILD)/usr
-+    else
- 	INSTALL_HDR_PATH := $(top_srcdir)/usr
-+    endif
- endif
- LINUX_HDR_PATH = $(INSTALL_HDR_PATH)/include/
- LINUX_TOOL_INCLUDE = $(top_srcdir)/tools/include
--- 
-2.20.1
-
+PiBGcm9tOiBQZXRlciBYdSA8cGV0ZXJ4QHJlZGhhdC5jb20+DQo+IFNlbnQ6IFdlZG5lc2RheSwg
+TWFyY2ggMjUsIDIwMjAgMTE6MDcgUE0NCj4gVG86IExpdSwgWWkgTCA8eWkubC5saXVAaW50ZWwu
+Y29tPg0KPiBDYzogcWVtdS1kZXZlbEBub25nbnUub3JnOyBhbGV4LndpbGxpYW1zb25AcmVkaGF0
+LmNvbTsNCj4gZXJpYy5hdWdlckByZWRoYXQuY29tOyBwYm9uemluaUByZWRoYXQuY29tOyBtc3RA
+cmVkaGF0LmNvbTsNCj4gZGF2aWRAZ2lic29uLmRyb3BiZWFyLmlkLmF1OyBUaWFuLCBLZXZpbiA8
+a2V2aW4udGlhbkBpbnRlbC5jb20+OyBUaWFuLCBKdW4gSg0KPiA8anVuLmoudGlhbkBpbnRlbC5j
+b20+OyBTdW4sIFlpIFkgPHlpLnkuc3VuQGludGVsLmNvbT47IGt2bUB2Z2VyLmtlcm5lbC5vcmc7
+IFd1LA0KPiBIYW8gPGhhby53dUBpbnRlbC5jb20+OyBqZWFuLXBoaWxpcHBlQGxpbmFyby5vcmc7
+IEphY29iIFBhbg0KPiA8amFjb2IuanVuLnBhbkBsaW51eC5pbnRlbC5jb20+OyBZaSBTdW4gPHlp
+Lnkuc3VuQGxpbnV4LmludGVsLmNvbT47IFJpY2hhcmQNCj4gSGVuZGVyc29uIDxydGhAdHdpZGRs
+ZS5uZXQ+DQo+IFN1YmplY3Q6IFJlOiBbUEFUQ0ggdjEgMTUvMjJdIGludGVsX2lvbW11OiByZXBs
+YXkgZ3Vlc3QgcGFzaWQgYmluZGluZ3MgdG8gaG9zdA0KPiANCj4gT24gV2VkLCBNYXIgMjUsIDIw
+MjAgYXQgMDE6MTQ6MjZQTSArMDAwMCwgTGl1LCBZaSBMIHdyb3RlOg0KPiANCj4gWy4uLl0NCj4g
+DQo+ID4gPiA+ICsvKioNCj4gPiA+ID4gKyAqIENhbGxlciBvZiB0aGlzIGZ1bmN0aW9uIHNob3Vs
+ZCBob2xkIGlvbW11X2xvY2suDQo+ID4gPiA+ICsgKi8NCj4gPiA+ID4gK3N0YXRpYyBib29sIHZ0
+ZF9zbV9wYXNpZF90YWJsZV93YWxrX29uZShJbnRlbElPTU1VU3RhdGUgKnMsDQo+ID4gPiA+ICsg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgZG1hX2FkZHJfdCBwdF9iYXNl
+LA0KPiA+ID4gPiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGludCBz
+dGFydCwNCj4gPiA+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBp
+bnQgZW5kLA0KPiA+ID4gPiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+IHZ0ZF9wYXNpZF90YWJsZV93YWxrX2luZm8gKmluZm8pDQo+ID4gPiA+ICt7DQo+ID4gPiA+ICsg
+ICAgVlREUEFTSURFbnRyeSBwZTsNCj4gPiA+ID4gKyAgICBpbnQgcGFzaWQgPSBzdGFydDsNCj4g
+PiA+ID4gKyAgICBpbnQgcGFzaWRfbmV4dDsNCj4gPiA+ID4gKyAgICBWVERQQVNJREFkZHJlc3NT
+cGFjZSAqdnRkX3Bhc2lkX2FzOw0KPiA+ID4gPiArICAgIFZURFBBU0lEQ2FjaGVFbnRyeSAqcGNf
+ZW50cnk7DQo+ID4gPiA+ICsNCj4gPiA+ID4gKyAgICB3aGlsZSAocGFzaWQgPCBlbmQpIHsNCj4g
+PiA+ID4gKyAgICAgICAgcGFzaWRfbmV4dCA9IHBhc2lkICsgMTsNCj4gPiA+ID4gKw0KPiA+ID4g
+PiArICAgICAgICBpZiAoIXZ0ZF9nZXRfcGVfaW5fcGFzaWRfbGVhZl90YWJsZShzLCBwYXNpZCwg
+cHRfYmFzZSwgJnBlKQ0KPiA+ID4gPiArICAgICAgICAgICAgJiYgdnRkX3BlX3ByZXNlbnQoJnBl
+KSkgew0KPiA+ID4gPiArICAgICAgICAgICAgdnRkX3Bhc2lkX2FzID0gdnRkX2FkZF9maW5kX3Bh
+c2lkX2FzKHMsDQo+ID4gPiA+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICBpbmZvLT52dGRfYnVzLCBpbmZvLT5kZXZmbiwgcGFzaWQpOw0KPiA+ID4NCj4gPiA+IEZvciB0
+aGlzIGNodW5rOg0KPiA+ID4NCj4gPiA+ID4gKyAgICAgICAgICAgIHBjX2VudHJ5ID0gJnZ0ZF9w
+YXNpZF9hcy0+cGFzaWRfY2FjaGVfZW50cnk7DQo+ID4gPiA+ICsgICAgICAgICAgICBpZiAocy0+
+cGFzaWRfY2FjaGVfZ2VuID09IHBjX2VudHJ5LT5wYXNpZF9jYWNoZV9nZW4pIHsNCj4gPiA+ID4g
+KyAgICAgICAgICAgICAgICB2dGRfdXBkYXRlX3BlX2luX2NhY2hlKHMsIHZ0ZF9wYXNpZF9hcywg
+JnBlKTsNCj4gPiA+ID4gKyAgICAgICAgICAgIH0gZWxzZSB7DQo+ID4gPiA+ICsgICAgICAgICAg
+ICAgICAgdnRkX2ZpbGxfaW5fcGVfaW5fY2FjaGUocywgdnRkX3Bhc2lkX2FzLCAmcGUpOw0KPiA+
+ID4gPiArICAgICAgICAgICAgfQ0KPiA+ID4NCj4gPiA+IFdlIGFscmVhZHkgZ290ICZwZSwgdGhl
+biB3b3VsZCBpdCBiZSBlYXNpZXIgdG8gc2ltcGx5IGNhbGw6DQo+ID4gPg0KPiA+ID4gICAgICAg
+ICAgICAgICAgdnRkX3VwZGF0ZV9wZV9pbl9jYWNoZShzLCB2dGRfcGFzaWRfYXMsICZwZSk7DQo+
+ID4gPg0KPiA+ID4gPw0KPiA+DQo+ID4gSWYgdGhlIHBhc2lkX2NhY2hlX2dlbiBpcyBlcXVhbCB0
+byBpb21tdV9zdGF0ZSdzLCB0aGVuIGl0IG1lYW5zIHRoZXJlIGlzDQo+ID4gYSBjaGFuY2UgdGhh
+dCB0aGUgY2FjaGVkIHBhc2lkIGVudHJ5IGlzIGVxdWFsIHRvIHBlIGhlcmUuIFdoaWxlIGZvciB0
+aGUNCj4gPiBlbHNlIGNhc2UsIGl0IGlzIHN1cmVseSB0aGVyZSBpcyBubyB2YWxpZCBwYXNpZCBl
+bnRyeSBpbiB0aGUgcGFzaWRfYXMuIEFuZA0KPiA+IHRoZSBkaWZmZXJlbmNlIGJldHdlZW4gdnRk
+X3VwZGF0ZV9wZV9pbl9jYWNoZSgpIGFuZA0KPiA+IHZ0ZF9maWxsX2luX3BlX2luX2NhY2hlKCkg
+aXMgd2hldGhlciBkbyBhIGNvbXBhcmUgYmV0d2VlbiB0aGUgbmV3IHBhc2lkIGVudHJ5DQo+ID4g
+YW5kIGNhY2hlZCBwYXNpZCBlbnRyeS4NCj4gPg0KPiA+ID4gU2luY2UgSUlVQyB0aGUgY2FjaGVf
+Z2VuIGlzIG9ubHkgaGVscGZ1bCB0byBhdm9pZCBsb29raW5nIHVwIHRoZSAmcGUuDQo+ID4gPiBB
+bmQgdGhlIHZ0ZF9wYXNpZF9lbnRyeV9jb21wYXJlKCkgY2hlY2sgc2hvdWxkIGJlIGV2ZW4gbW9y
+ZSBzb2xpZCB0aGFuDQo+ID4gPiB0aGUgY2FjaGVfZ2VuLg0KPiA+DQo+ID4gQnV0IGlmIHRoZSBj
+YWNoZV9nZW4gaXMgbm90IGVxdWFsIHRoZSBvbmUgaW4gaW9tbXVfc3RhdGUsIHRoZW4gdGhlIGNh
+Y2hlZA0KPiA+IHBhc2lkIGVudHJ5IGlzIG5vdCB2YWxpZCBhdCBhbGwuIFRoZSBjb21wYXJlIGlz
+IG9ubHkgbmVlZGVkIGFmdGVyIHRoZSBjYWNoZV9nZW4NCj4gPiBpcyBjaGVja2VkLg0KPiANCj4g
+V2FpdC4uLiBJZiAidGhlIHBhc2lkIGVudHJ5IGNvbnRleHQiIGlzIGFscmVhZHkgZXhhY3RseSB0
+aGUgc2FtZSBhcw0KPiB0aGUgImNhY2hlZCBwYXNpZCBlbnRyeSBjb250ZXh0Iiwgd2h5IHdlIHN0
+aWxsIGNhcmUgdGhlIGdlbmVyYXRpb24NCj4gbnVtYmVyPyAgSSdkIGp1c3QgdXBkYXRlIHRoZSBn
+ZW5lcmF0aW9uIHRvIGxhdGVzdCBhbmQgY2FjaGUgaXQgYWdhaW4uDQo+IE1heWJlIHRoZXJlJ3Mg
+YSB0cmlja3kgcG9pbnQgd2hlbiAmcGU9PWNhY2hlIGJ1dCBnZW5lcmF0aW9uIG51bWJlciBpcw0K
+PiBvbGQsIHRoZW4gSUlVQyB3aGF0IHdlIGNhbiBkbyBiZXR0ZXIgaXMgc2ltcGx5IHVwZGF0ZSB0
+aGUgZ2VuZXJhdGlvbg0KPiBudW1iZXIgdG8gbGF0ZXN0Lg0KPiANCj4gQnV0IE9LIC0gbGV0J3Mg
+a2VlcCB0aGF0LiAgSSBkb24ndCBzZWUgYW55dGhpbmcgaW5jb3JyZWN0IHdpdGggY3VycmVudA0K
+PiBjb2RlIGVpdGhlci4NCg0KSSBzZWUuIEFjdHVhbGx5LCBJIHRoaW5rIGl0J3MgYWxzbyBmaW5l
+IHRvIGZvbGxvdyB5b3VyIHN1Z2dlc3Rpb24gdG8gYWxsDQp2dGRfdXBkYXRlX3BlX2luX2NhY2hl
+KHMsIHZ0ZF9wYXNpZF9hcywgJnBlKTsgZm9yIHRoZSBlbHNlIHN3aXRjaC4NCklmIHN3aXRjaCB0
+byB1c2UgcmVwbGF5IGZvciBQU0ksIHRoZW4gSSBtYXkgZHJvcCB2dGRfZmlsbF9pbl9wZV9pbl9j
+YWNoZSgpDQphcyBpdCBpcyBpbnRyb2R1Y2VkIG1haW5seSBmb3IgUFNJLg0KDQpSZWdhcmRzLA0K
+WWkgTGl1DQoNCg==
