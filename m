@@ -2,65 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C642E193B3A
-	for <lists+kvm@lfdr.de>; Thu, 26 Mar 2020 09:44:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EC207193BEC
+	for <lists+kvm@lfdr.de>; Thu, 26 Mar 2020 10:33:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726296AbgCZIoU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 Mar 2020 04:44:20 -0400
-Received: from mga01.intel.com ([192.55.52.88]:16053 "EHLO mga01.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726210AbgCZIoU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 Mar 2020 04:44:20 -0400
-IronPort-SDR: 2xfqhe1QuHzqHynwP1lXQGCLPvlb0fyqhzxUcU08tbQATUzReoVu9R09yd+eEzLF8HmsABkzUI
- N7VbGQukyOBg==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Mar 2020 01:44:20 -0700
-IronPort-SDR: FFL2w924bMhPeZ2w1jVZRTG/tBILA4BP2bX28RtufMxD1+DnWTm65dvC6Pw/MCwjRCz7keA8Eu
- Q7L7mz+7m0QQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.72,307,1580803200"; 
-   d="scan'208";a="393907435"
-Received: from local-michael-cet-test.sh.intel.com (HELO localhost) ([10.239.159.128])
-  by orsmga004.jf.intel.com with ESMTP; 26 Mar 2020 01:44:18 -0700
-Date:   Thu, 26 Mar 2020 16:47:11 +0800
-From:   Yang Weijiang <weijiang.yang@intel.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, KVM list <kvm@vger.kernel.org>
-Subject: Re: status of kvm.git
-Message-ID: <20200326084710.GA6502@local-michael-cet-test.sh.intel.com>
-References: <ba6573bd-274e-3629-92f0-77eb5b82ac40@redhat.com>
- <20200325153557.GD14294@linux.intel.com>
- <8cd788f0-a7cf-3dc6-42b0-0e7a2e9d7f27@redhat.com>
- <20200325155009.GF14294@linux.intel.com>
+        id S1727750AbgCZJdm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 Mar 2020 05:33:42 -0400
+Received: from bombadil.infradead.org ([198.137.202.133]:40094 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727699AbgCZJdm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 Mar 2020 05:33:42 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=D7iUfyyuqm+dw4598KbpWIu+GERU4Vqzux8/iRw3Pco=; b=F6JlYzTiE+9B++gXkAJKN3WCxV
+        xWwamyGhjsFIpTTEiZN042yCZfOx7/WEBR+9I4WHpGyGUs0oazlAvy9UJ4SmSW35mN3rfl2IA3lfR
+        Niw5LZyeb2oojAHa0fYTjZEAWUqqOayoJPg8jTMXN3Px173WZEwiNsjQdhyl6CRIWTw/NoSVBLv84
+        DHTNLHasfYNNfophQ+se8/udStYa7K/hpOWKIBIA7h8D6BgoUVWf79Pft/YBAUMBtE89HdJBXH2N/
+        ajqcfx5Gc0BmlcoU2M4eD0w2EXPaBKcA3kGZuqwb8iZCnK4sZZqDIho14z/yBpzbzcBpx94aF0xpy
+        iyedccrA==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1jHOsw-0003Fy-SL; Thu, 26 Mar 2020 09:33:10 +0000
+Date:   Thu, 26 Mar 2020 02:33:10 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Kirti Wankhede <kwankhede@nvidia.com>
+Cc:     alex.williamson@redhat.com, cjia@nvidia.com, kevin.tian@intel.com,
+        ziye.yang@intel.com, changpeng.liu@intel.com, yi.l.liu@intel.com,
+        mlevitsk@redhat.com, eskultet@redhat.com, cohuck@redhat.com,
+        dgilbert@redhat.com, jonathan.davies@nutanix.com,
+        eauger@redhat.com, aik@ozlabs.ru, pasic@linux.ibm.com,
+        felipe@nutanix.com, Zhengxiao.zx@alibaba-inc.com,
+        shuangtai.tst@alibaba-inc.com, Ken.Xue@amd.com,
+        zhi.a.wang@intel.com, yan.y.zhao@intel.com, qemu-devel@nongnu.org,
+        kvm@vger.kernel.org
+Subject: Re: [PATCH v15 Kernel 1/7] vfio: KABI for migration interface for
+ device state
+Message-ID: <20200326093310.GA12078@infradead.org>
+References: <1584649004-8285-1-git-send-email-kwankhede@nvidia.com>
+ <1584649004-8285-2-git-send-email-kwankhede@nvidia.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200325155009.GF14294@linux.intel.com>
-User-Agent: Mutt/1.11.3 (2019-02-01)
+In-Reply-To: <1584649004-8285-2-git-send-email-kwankhede@nvidia.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 25, 2020 at 08:50:10AM -0700, Sean Christopherson wrote:
-> On Wed, Mar 25, 2020 at 04:47:36PM +0100, Paolo Bonzini wrote:
-> > On 25/03/20 16:35, Sean Christopherson wrote:
-> > > On Tue, Mar 24, 2020 at 12:53:11PM +0100, Paolo Bonzini wrote:
-> > >> For 5.8 I'd rather tone down the cleanups and focus on the new processor
-> > >> features (especially CET and SPP) and on nested AMD unit tests and bugfixes.
-> > > 
-> > > Roger that.  Reviewing the latest CET series is on my todo list.
-> > > 
-> > > Regarding SPP, I thought the plan was to wait until VMI landed before
-> > > taking SPP support?  Has that changed?
-> > 
-> > No, the latest VMI series included SPP but the code can go in separately
-> > since it has its own selftest.
-> 
-> Ah, gotcha.  In that case, I'll prioritize reviewing SPP as well.
+s/KABI/UAPI/ in the subject and anywhere else in the series.
 
-Thanks for your great support, two gurus! It makes me feel refreshed. ;-))
-BTW, I also enclosed CET unit-test app in KVM patch-set.
-
+Please avoid __packed__ structures and just properly pad them, they
+have a major performance impact on some platforms and will cause
+compiler warnings when taking addresses of members.
