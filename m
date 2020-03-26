@@ -2,318 +2,269 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C5E91194095
-	for <lists+kvm@lfdr.de>; Thu, 26 Mar 2020 14:57:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 74AAF1940AA
+	for <lists+kvm@lfdr.de>; Thu, 26 Mar 2020 15:01:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727705AbgCZN5R (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 Mar 2020 09:57:17 -0400
-Received: from mga03.intel.com ([134.134.136.65]:49095 "EHLO mga03.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727647AbgCZN5Q (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 Mar 2020 09:57:16 -0400
-IronPort-SDR: 3A5AE6w+nPN5+fVt7WQ6/xLmqoC1LqMzUXpNQmu0xYicmNQ4EBt4a24AcRrEbQi/RcSZqvj1+A
- U7cR9Tiyd2cw==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Mar 2020 06:57:15 -0700
-IronPort-SDR: WvFsKjg8McydGv2sqKL0pQLa81ywC5GEHvAYNxQfTdpL+yayY5/adiFWCwj0cmkyPUghuVSUJ8
- jos9NjLcyNTA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.72,308,1580803200"; 
-   d="scan'208";a="393988689"
-Received: from fmsmsx107.amr.corp.intel.com ([10.18.124.205])
-  by orsmga004.jf.intel.com with ESMTP; 26 Mar 2020 06:57:15 -0700
-Received: from fmsmsx601.amr.corp.intel.com (10.18.126.81) by
- fmsmsx107.amr.corp.intel.com (10.18.124.205) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Thu, 26 Mar 2020 06:57:15 -0700
-Received: from fmsmsx601.amr.corp.intel.com (10.18.126.81) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1713.5; Thu, 26 Mar 2020 06:57:14 -0700
-Received: from shsmsx106.ccr.corp.intel.com (10.239.4.159) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id 15.1.1713.5
- via Frontend Transport; Thu, 26 Mar 2020 06:57:14 -0700
-Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.206]) by
- SHSMSX106.ccr.corp.intel.com ([169.254.10.86]) with mapi id 14.03.0439.000;
- Thu, 26 Mar 2020 21:57:11 +0800
-From:   "Liu, Yi L" <yi.l.liu@intel.com>
-To:     Peter Xu <peterx@redhat.com>
-CC:     "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "mst@redhat.com" <mst@redhat.com>,
-        "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "Tian, Jun J" <jun.j.tian@intel.com>,
-        "Sun, Yi Y" <yi.y.sun@intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Wu, Hao" <hao.wu@intel.com>,
-        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
-        Jacob Pan <jacob.jun.pan@linux.intel.com>,
-        Yi Sun <yi.y.sun@linux.intel.com>,
-        Richard Henderson <rth@twiddle.net>,
-        Eduardo Habkost <ehabkost@redhat.com>
-Subject: RE: [PATCH v1 12/22] intel_iommu: add PASID cache management
- infrastructure
-Thread-Topic: [PATCH v1 12/22] intel_iommu: add PASID cache management
- infrastructure
-Thread-Index: AQHWAEW2aRFWWYnjH0GPsoJBjbzVK6hXfaKAgAGT69D//9G2gIABg8FwgAB/GtA=
-Date:   Thu, 26 Mar 2020 13:57:10 +0000
-Message-ID: <A2975661238FB949B60364EF0F2C25743A204614@SHSMSX104.ccr.corp.intel.com>
-References: <1584880579-12178-1-git-send-email-yi.l.liu@intel.com>
- <1584880579-12178-13-git-send-email-yi.l.liu@intel.com>
- <20200324173209.GW127076@xz-x1>
- <A2975661238FB949B60364EF0F2C25743A20213D@SHSMSX104.ccr.corp.intel.com>
- <20200325145209.GA354390@xz-x1>
- <A2975661238FB949B60364EF0F2C25743A203F2C@SHSMSX104.ccr.corp.intel.com>
-In-Reply-To: <A2975661238FB949B60364EF0F2C25743A203F2C@SHSMSX104.ccr.corp.intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-version: 11.2.0.6
-dlp-reaction: no-action
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        id S1727866AbgCZOBv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 Mar 2020 10:01:51 -0400
+Received: from USAT19PA21.eemsg.mail.mil ([214.24.22.195]:29294 "EHLO
+        USAT19PA21.eemsg.mail.mil" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727719AbgCZOBu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 Mar 2020 10:01:50 -0400
+X-Greylist: delayed 429 seconds by postgrey-1.27 at vger.kernel.org; Thu, 26 Mar 2020 10:01:50 EDT
+X-EEMSG-check-017: 93790637|USAT19PA21_ESA_OUT02.csd.disa.mil
+X-IronPort-AV: E=Sophos;i="5.72,308,1580774400"; 
+   d="scan'208";a="93790637"
+Received: from emsm-gh1-uea11.ncsc.mil ([214.29.60.3])
+  by USAT19PA21.eemsg.mail.mil with ESMTP/TLS/DHE-RSA-AES256-SHA256; 26 Mar 2020 13:52:55 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=tycho.nsa.gov; i=@tycho.nsa.gov; q=dns/txt;
+  s=tycho.nsa.gov; t=1585230776; x=1616766776;
+  h=subject:to:references:from:message-id:date:mime-version:
+   in-reply-to:content-transfer-encoding;
+  bh=PRC5UfyWl6IQ9UBuNWcLsZqqpUd9T1BiCJFbZ2b2SoE=;
+  b=osTE6e8tDFBpk1+AZovXnOout+0P/pqcK96IUpeTktdzyvUtLanmNSGr
+   uQxkbqhPkcaOmaL3v6CLZw5TGfVdPknqwx7Tk2jF2LMeQD+ehC9mP2+du
+   1vmROI8EObRDdcfSfZKbSpQfD3Li/Fmcxqol7dl9ArG/1eu05MNOT4a6a
+   1OGQnYPlCCPSOzDx7Dl70iFo32Ch/fquTpzMj0crWzCzZhwmD0W8PsdIK
+   Tz6ZcCVf9gdPxKt1Da4c3efLz4Sv87uUoO6sKRgTdjzV47LK+X1Z+8/5n
+   F2hpkPuG6mvDUa+ybb3i3Lh8R8+Kwdej7KASsL4GaiJgHXfuP2v2h/fFa
+   A==;
+X-IronPort-AV: E=Sophos;i="5.72,308,1580774400"; 
+   d="scan'208";a="41068397"
+IronPort-PHdr: =?us-ascii?q?9a23=3AL8nUcxJ7TqnkjlexidmcpTZWNBhigK39O0sv0r?=
+ =?us-ascii?q?FitYgXLfv4rarrMEGX3/hxlliBBdydt6sYzbOL7eu9BCQp2tWojjMrSNR0TR?=
+ =?us-ascii?q?gLiMEbzUQLIfWuLgnFFsPsdDEwB89YVVVorDmROElRH9viNRWJ+iXhpTEdFQ?=
+ =?us-ascii?q?/iOgVrO+/7BpDdj9it1+C15pbffxhEiCCybL9vIxi6txjdu8kXjIdtKqs8yg?=
+ =?us-ascii?q?bCr2dVdehR2W5nKlWfkgrm6Myt5pBj6SNQu/wg985ET6r3erkzQKJbAjo7LW?=
+ =?us-ascii?q?07/dXnuhbfQwSB4HscSXgWnQFTAwfZ9hH6X4z+vTX8u+FgxSSVJ8z2TbQzWT?=
+ =?us-ascii?q?S/86dmTQLjhSkbOzIl9mzcl9d9h7xHrh2/uxN/wpbUYICLO/p4YqPdZs4RSW?=
+ =?us-ascii?q?5YUspMSyBNHoawYo0BAOobOeZTspfzqV0AoxCjAQWgHe3ixztNinLwwKY00f?=
+ =?us-ascii?q?kuERve0QI9AdwOvnTaotb7OqgcXu+6zrXHwzrYYvNK2zrw8pTEfgwvrPyOW7?=
+ =?us-ascii?q?97bMrfyVMoFwPAllietJDlMC2N1uQNrWeb6fdrW/+qi2E9rwFxpiagx8cxgY?=
+ =?us-ascii?q?TOnYIa10vE+D5lwIc1OdK4SEl7bcSiEJtLrS6WLYR2QsQ8Q2xxvisx174IuY?=
+ =?us-ascii?q?ajcSQXx5kqyATTZvyaf4SS/B7uW/idLS1liH9jZbmxnQy98VK6xe35TsS01V?=
+ =?us-ascii?q?FKoTdbndTUrXAN0gDT6tCASvtg4ketwTaP2B7X6uFDOU00ibDUK4Qgwr4tjZ?=
+ =?us-ascii?q?ofq1jDHy/ql0X2i6+abEMk9fSz6+v7eLnmo56cN4tshgH/NKQhhNC/DPwlPg?=
+ =?us-ascii?q?UBUGWX4+Sx2KD58UHnT7hGkOc6nrTBvJDfP8sbp6q5AwFP0oYk7hayFyym38?=
+ =?us-ascii?q?kDnXQcMFJEeA6Ij4juO13UJvD4Fu2wj06jkDds2fDKJqfhDYnVLnjfjLfheq?=
+ =?us-ascii?q?5w5FNGxwo10d9f4JZUB6oOIPL0XU/xu9jYAQEjPwOoxObnDc131pkCVmKXHq?=
+ =?us-ascii?q?+ZLKTSvEeU5uIuJumMYZIVuCznK/c/5//jlnA5mVgafamm2ZsYdmq0EehhI0?=
+ =?us-ascii?q?WceXDsmMsOEX8WvgoiS+znkEaCXiBXZ3azWaI8+z46BZm4DYfMWI+tmqaN3C?=
+ =?us-ascii?q?SlEZ1MYGBJFFSMHW3vd4WeVPcGcDiSLdN5kjwYSbihTJcs1RWvtA/81rpmIf?=
+ =?us-ascii?q?PY+jYGup3/ydh1/ezTlQ0y9DBtCsSd1HyCT3xwnmwWXDI2wq9/rlJnyluZ0q?=
+ =?us-ascii?q?h3neZYFdpN6PNNSAs6MoTcz+NiAdDoRg3BZsuJSEqhQti+BTExT9Qxw8IBYk?=
+ =?us-ascii?q?pkFdWilQ3M0DS0A7ALk7yGH4I08q3C0HjrPcp9yGjJ1LMnj1Y4RstDL2qmhr?=
+ =?us-ascii?q?Rw9wLLHY7Gj12Zl7q2daQbxCPN8GaDzWyTvEBXSQJwUrvKXWoZZkTIqdT0/V?=
+ =?us-ascii?q?3CT7CwBrQ9KAdBytCNKrFMatL3iVVKXvDjOM7RY2ipgWe/GQ6Ixq+QbIrtY2?=
+ =?us-ascii?q?gd3zvdCE0fngAN8naJKxI+Cj2io23AFjxuE0zgY0f2/el5snO7QVc+zxuWYE?=
+ =?us-ascii?q?15y7q15hkViOSCS/MSxLIEvzwsqjRqE1a73tLWFcCMpw5gfKVafNM8701L1W?=
+ =?us-ascii?q?XDtwxyJJCgMqNijEYEcwtrp0Puywl3CoJYnMgytnwq0Q5yJLmA0FxbajOY2Y?=
+ =?us-ascii?q?n8OrjQKmn15hCgdbTa1U3Z0NaT4q0P8ug3q03/vAG1EUov63Nn099W03aH6Z?=
+ =?us-ascii?q?XKCw0SUZ31Ukkp7RR1u7baYiwl7YPOyXJsKbW0siPF298xAOslzRWgcMlEMK?=
+ =?us-ascii?q?OEGw/yEtAVB9K0J+ExlFipaRUEPO9W9KEqJc+pa/yG2KuzNuZ6gD2mlXhH4J?=
+ =?us-ascii?q?x60k+U9Sp8T+nI34wfw/GZxQuKTDH8g02kss/pmIBIfzYSHnCwyXusOIkESq?=
+ =?us-ascii?q?R0fIsPQUypJ8SszdR5gZOlD3JR8lWkA3sJ38imfRfUZFv4i0kYyUUSpGG9gy?=
+ =?us-ascii?q?Kp5zNzlD4to+yU2ymKi//vcBsBJ35jWmZvlxHvLJKygtRcW1KnK0AtlR249Q?=
+ =?us-ascii?q?PhyqNGvqVjPizWRktVeyXeMW5vSO2zu6CEbsoJ74kn9W1TUeKhcRWUUbLwvR?=
+ =?us-ascii?q?Ye+z3sEnEYxz0hcTyu/JLjkFgyjGObMWY2r3fDf8x07QnQ6caaRvNL2DcCAi?=
+ =?us-ascii?q?5ihn2fBUa5F8em8M/SlJrZtO26EWW7WdkbbyjxyquSuS26+ytuABuij7a0gN?=
+ =?us-ascii?q?KhDAt+mTfyyt1CTSzVqFP5ZY7x2uKxNucjNk9uB3fz7M11How4mYw1wNkU3n?=
+ =?us-ascii?q?sXnZWa/HYdmE/8NtJU3a+4Z30IAXYpytvY+0DA31d5L2nBk4D8UW+Hw9BJYd?=
+ =?us-ascii?q?C/b2JQ3TgyuZNkEqCRuYdYkDN1r1zwlgfYZfxwj39J0vc1wGILiOEO/gw2x2?=
+ =?us-ascii?q?OSBa5EThoQBjDlixndt4P2l65Qfmv6NOHrhUc=3D?=
+X-IPAS-Result: =?us-ascii?q?A2BhBwDYsnxe/wHyM5BmHAEBAQEBBwEBEQEEBAEBgXsCg?=
+ =?us-ascii?q?XssgUEyKoQajn1UBoESJYl6kHYDVAoBAQEBAQEBAQE0AQIEAQGERAKCLyQ4E?=
+ =?us-ascii?q?wIQAQEBBQEBAQEBBQMBAWyFYkIWAYFiKQGCfgEBAQECASMEEUYLCw4KAgImA?=
+ =?us-ascii?q?gJXBgEMBgIBAYJjP4JYBSCseXV/M4NMgX+DWYE+gQ4qAYg1g3kaeYEHgTgMA?=
+ =?us-ascii?q?4IpBy4+h1yCXgSXD3GJD49GgkaCVopciVEGHZtfjxGeBiI3gSErCAIYCCEPg?=
+ =?us-ascii?q?ydQGA2OKReNbFUlAzCBBgEBikyDUQEB?=
+Received: from tarius.tycho.ncsc.mil ([144.51.242.1])
+  by emsm-gh1-uea11.NCSC.MIL with ESMTP; 26 Mar 2020 13:52:50 +0000
+Received: from moss-pluto.infosec.tycho.ncsc.mil (moss-pluto.infosec.tycho.ncsc.mil [192.168.25.131])
+        by tarius.tycho.ncsc.mil (8.14.7/8.14.4) with ESMTP id 02QDr2ef044380;
+        Thu, 26 Mar 2020 09:53:06 -0400
+Subject: Re: [PATCH v2 1/3] Add a new LSM-supporting anonymous inode interface
+To:     Daniel Colascione <dancol@google.com>, timmurray@google.com,
+        selinux@vger.kernel.org, linux-security-module@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, viro@zeniv.linux.org.uk, paul@paul-moore.com,
+        nnk@google.com, lokeshgidra@google.com,
+        James Morris <jmorris@namei.org>
+References: <20200214032635.75434-1-dancol@google.com>
+ <20200325230245.184786-2-dancol@google.com>
+From:   Stephen Smalley <sds@tycho.nsa.gov>
+Message-ID: <70f7260d-d5b9-4035-c8a6-219c7637f601@tycho.nsa.gov>
+Date:   Thu, 26 Mar 2020 09:53:59 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
+In-Reply-To: <20200325230245.184786-2-dancol@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-PiBGcm9tOiBMaXUsIFlpIEwNCj4gU2VudDogVGh1cnNkYXksIE1hcmNoIDI2LCAyMDIwIDI6MTUg
-UE0NCj4gVG86ICdQZXRlciBYdScgPHBldGVyeEByZWRoYXQuY29tPg0KPiBTdWJqZWN0OiBSRTog
-W1BBVENIIHYxIDEyLzIyXSBpbnRlbF9pb21tdTogYWRkIFBBU0lEIGNhY2hlIG1hbmFnZW1lbnQN
-Cj4gaW5mcmFzdHJ1Y3R1cmUNCj4gDQo+ID4gRnJvbTogUGV0ZXIgWHUgPHBldGVyeEByZWRoYXQu
-Y29tPg0KPiA+IFNlbnQ6IFdlZG5lc2RheSwgTWFyY2ggMjUsIDIwMjAgMTA6NTIgUE0NCj4gPiBU
-bzogTGl1LCBZaSBMIDx5aS5sLmxpdUBpbnRlbC5jb20+DQo+ID4gU3ViamVjdDogUmU6IFtQQVRD
-SCB2MSAxMi8yMl0gaW50ZWxfaW9tbXU6IGFkZCBQQVNJRCBjYWNoZSBtYW5hZ2VtZW50DQo+ID4g
-aW5mcmFzdHJ1Y3R1cmUNCj4gPg0KPiA+IE9uIFdlZCwgTWFyIDI1LCAyMDIwIGF0IDEyOjIwOjIx
-UE0gKzAwMDAsIExpdSwgWWkgTCB3cm90ZToNCj4gPiA+ID4gRnJvbTogUGV0ZXIgWHUgPHBldGVy
-eEByZWRoYXQuY29tPg0KPiA+ID4gPiBTZW50OiBXZWRuZXNkYXksIE1hcmNoIDI1LCAyMDIwIDE6
-MzIgQU0NCj4gPiA+ID4gVG86IExpdSwgWWkgTCA8eWkubC5saXVAaW50ZWwuY29tPg0KPiA+ID4g
-PiBTdWJqZWN0OiBSZTogW1BBVENIIHYxIDEyLzIyXSBpbnRlbF9pb21tdTogYWRkIFBBU0lEIGNh
-Y2hlDQo+ID4gPiA+IG1hbmFnZW1lbnQgaW5mcmFzdHJ1Y3R1cmUNCj4gPiA+ID4NCj4gPiA+ID4g
-T24gU3VuLCBNYXIgMjIsIDIwMjAgYXQgMDU6MzY6MDlBTSAtMDcwMCwgTGl1IFlpIEwgd3JvdGU6
-DQo+ID4gPiA+ID4gVGhpcyBwYXRjaCBhZGRzIGEgUEFTSUQgY2FjaGUgbWFuYWdlbWVudCBpbmZy
-YXN0cnVjdHVyZSBiYXNlZCBvbg0KPiA+ID4gPiA+IG5ldyBhZGRlZCBzdHJ1Y3R1cmUgVlREUEFT
-SURBZGRyZXNzU3BhY2UsIHdoaWNoIGlzIHVzZWQgdG8gdHJhY2sNCj4gPiA+ID4gPiB0aGUgUEFT
-SUQgdXNhZ2UgYW5kIGZ1dHVyZSBQQVNJRCB0YWdnZWQgRE1BIGFkZHJlc3MgdHJhbnNsYXRpb24N
-Cj4gPiA+ID4gPiBzdXBwb3J0IGluIHZJT01NVS4NClsuLi5dDQo+ID4gPiA+DQo+ID4gPiA+IDxT
-VEFSVD4NCj4gPiA+ID4NCj4gPiA+ID4gPiArICAgIC8qDQo+ID4gPiA+ID4gKyAgICAgKiBTdGVw
-IDI6IGxvb3AgYWxsIHRoZSBleGlzaXRuZyB2dGRfZGV2X2ljeCBpbnN0YW5jZXMuDQo+ID4gPiA+
-ID4gKyAgICAgKiBJZGVhbGx5LCBuZWVkcyB0byBsb29wIGFsbCBkZXZpY2VzIHRvIGZpbmQgaWYg
-dGhlcmUgaXMgYW55IG5ldw0KPiA+ID4gPiA+ICsgICAgICogUEFTSUQgYmluZGluZyByZWdhcmRz
-IHRvIHRoZSBQQVNJRCBjYWNoZSBpbnZhbGlkYXRpb24gcmVxdWVzdC4NCj4gPiA+ID4gPiArICAg
-ICAqIEJ1dCBpdCBpcyBlbm91Z2ggdG8gbG9vcCB0aGUgZGV2aWNlcyB3aGljaCBhcmUgYmFja2Vk
-IGJ5IGhvc3QNCj4gPiA+ID4gPiArICAgICAqIElPTU1VLiBGb3IgZGV2aWNlcyBiYWNrZWQgYnkg
-dklPTU1VIChhLmsuYSBlbXVsYXRlZCBkZXZpY2VzKSwNCj4gPiA+ID4gPiArICAgICAqIGlmIG5l
-dyBQQVNJRCBoYXBwZW5lZCBvbiB0aGVtLCB0aGVpciB2dGRfcGFzaWRfYXMgaW5zdGFuY2UgY291
-bGQNCj4gPiA+ID4gPiArICAgICAqIGJlIGNyZWF0ZWQgZHVyaW5nIGZ1dHVyZSB2SU9NTVUgRE1B
-IHRyYW5zbGF0aW9uLg0KPiA+ID4gPiA+ICsgICAgICovDQo+ID4gPiA+ID4gKyAgICBRTElTVF9G
-T1JFQUNIKHZ0ZF9kZXZfaWN4LCAmcy0+dnRkX2Rldl9pY3hfbGlzdCwgbmV4dCkgew0KPiA+ID4g
-PiA+ICsgICAgICAgIFZURFBBU0lEQWRkcmVzc1NwYWNlICp2dGRfcGFzaWRfYXM7DQo+ID4gPiA+
-ID4gKyAgICAgICAgVlREUEFTSURDYWNoZUVudHJ5ICpwY19lbnRyeTsNCj4gPiA+ID4gPiArICAg
-ICAgICBWVERQQVNJREVudHJ5IHBlOw0KPiA+ID4gPiA+ICsgICAgICAgIFZUREJ1cyAqdnRkX2J1
-cyA9IHZ0ZF9kZXZfaWN4LT52dGRfYnVzOw0KPiA+ID4gPiA+ICsgICAgICAgIHVpbnQxNl90IGRl
-dmZuID0gdnRkX2Rldl9pY3gtPmRldmZuOw0KPiA+ID4gPiA+ICsgICAgICAgIGludCBidXNfbiA9
-IHBjaV9idXNfbnVtKHZ0ZF9idXMtPmJ1cyk7DQo+ID4gPiA+ID4gKw0KPiA+ID4gPiA+ICsgICAg
-ICAgIC8qIGkpIGZldGNoIHZ0ZF9wYXNpZF9hcyBhbmQgY2hlY2sgaWYgaXQgaXMgdmFsaWQgKi8N
-Cj4gPiA+ID4gPiArICAgICAgICB2dGRfcGFzaWRfYXMgPSB2dGRfYWRkX2ZpbmRfcGFzaWRfYXMo
-cywgdnRkX2J1cywNCj4gPiA+ID4gPiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgZGV2Zm4sIHBhc2lkKTsNCj4gPiA+ID4NCj4gPiA+ID4gSSBkb24ndCBmZWVs
-IGxpa2UgaXQncyBjb3JyZWN0IGhlcmUuLi4NCj4gPiA+ID4NCj4gPiA+ID4gQXNzdW1pbmcgd2Ug
-aGF2ZSB0d28gZGV2aWNlcyBhc3NpZ25lZCBEMSwgRDIuICBEMSB1c2VzIFBBU0lEPTEsIEQyDQo+
-ID4gPiA+IHVzZXMNCj4gPiBQQVNJRD0yLg0KPiA+ID4gPiBXaGVuIGludmFsaWRhdGluZyBhZ2Fp
-bnN0IFBBU0lEPTEsIGFyZSB5b3UgYWxzbyBnb2luZyB0byBjcmVhdGUgYQ0KPiA+ID4gPiBWVERQ
-QVNJREFkZHJlc3NTcGFjZSBhbHNvIGZvciBEMiB3aXRoIFBBU0lEPTE/DQo+ID4gPg0KPiA+ID4g
-QW5zd2VyIGlzIG5vLiBCZWZvcmUgZ29pbmcgZm9yd2FyZCwgbGV0J3Mgc2VlIGlmIHRoZSBiZWxv
-dyBmbG93IGxvb2tzIGdvb2QgdG8geW91Lg0KPiA+ID4NCj4gPiA+IExldCBtZSBhZGQgb25lIG1v
-cmUgZGV2aWNlIGJlc2lkZXMgRDEgYW5kIEQyLiBTYXkgZGV2aWNlIEQzIHdoaWNoDQo+ID4gPiBh
-bHNvIHVzZXMgUEFTSUQ9MS4gQW5kIGFzc3VtZSBpdCBiZWdpbnMgd2l0aCBubyBQQVNJRCB1c2Fn
-ZSBpbiBndWVzdC4NCj4gPiA+DQo+ID4gPiBUaGVuIHRoZSBmbG93IGZyb20gc2NyYXRjaCBpczoN
-Cj4gPiA+DQo+ID4gPiBhKSBndWVzdCBJT01NVSBkcml2ZXIgc2V0dXAgUEFTSUQgZW50cnkgZm9y
-IEQxIHdpdGggUEFTSUQ9MSwNCj4gPiA+ICAgIHRoZW4gaW52YWxpZGF0ZXMgYWdhaW5zdCBQQVNJ
-RCAjMQ0KPiA+ID4gYikgdHJhcCB0byBRRU1VLCBhbmQgY29tZXMgdG8gdGhpcyBmdW5jdGlvbi4g
-U2luY2UgdGhlcmUgaXMNCj4gPiA+ICAgIG5vIHByZXZpb3VzIHBhc2lkIGNhY2hlIGludmFsaWRh
-dGlvbiwgc28gdGhlIFN0ZXAgMSBvZiB0aGlzDQo+ID4gPiAgICBmdW5jdGlvbiBoYXMgbm90aGlu
-ZyB0byBkbywgdGhlbiBnb2VzIHRvIFN0ZXAgMiB3aGljaCBpcyB0bw0KPiA+ID4gICAgbG9vcCBh
-bGwgYXNzaWduZWQgZGV2aWNlcyBhbmQgY2hlY2sgaWYgdGhlIGd1ZXN0IHBhc2lkIGVudHJ5DQo+
-ID4gPiAgICBpcyBwcmVzZW50LiBJbiB0aGlzIGxvb3AsIHNob3VsZCBmaW5kIEQxJ3MgcGFzaWQg
-ZW50cnkgZm9yDQo+ID4gPiAgICBQQVNJRCMxIGlzIHByZXNlbnQuIFNvIGNyZWF0ZSB0aGUgVlRE
-UEFTSURBZGRyZXNzU3BhY2UgYW5kDQo+ID4gPiAgICBpbml0aWFsaXplIGl0cyBwYXNpZF9jYWNo
-ZV9lbnRyeSBhbmQgcGFzaWRfY2FjaGVfZ2VuIGZpZWxkcy4NCj4gPiA+IGMpIGd1ZXN0IElPTU1V
-IGRyaXZlciBzZXR1cCBQQVNJRCBlbnRyeSBmb3IgRDIgd2l0aCBQQVNJRD0yLA0KPiA+ID4gICAg
-dGhlbiBpbnZhbGlkYXRlcyBhZ2FpbnN0IFBBU0lEICMyDQo+ID4gPiBkKSBzYW1lIHdpdGggYiks
-IG9ubHkgZGlmZmVyZW5jZSBpcyB0aGUgU3RlcCAxIG9mIHRoaXMgZnVuY3Rpb24NCj4gPiA+ICAg
-IHdpbGwgbG9vcCB0aGUgVlREUEFTSURBZGRyZXNzU3BhY2UgY3JlYXRlZCBpbiBiKSwgYnV0IGl0
-cw0KPiA+ID4gICAgcGFzaWQgaXMgMSB3aGljaCBpcyBub3QgdGhlIHRhcmdldCBvZiBjdXJyZW50
-IHBhc2lkIGNhY2hlDQo+ID4gPiAgICBpbnZhbGlkYXRpb24uIFNhbWUgd2l0aCBiKSwgaW4gU3Rl
-cCAyLCBpdCB3aWxsIGNyZWF0ZSBhDQo+ID4gPiAgICBWVERQQVNJREFkZHJlc3NTcGFjZSBmb3Ig
-RDIrUEFTSUQjMg0KPiA+ID4gZSkgZ3Vlc3QgSU9NTVUgZHJpdmVyIHNldHVwIFBBU0lEIGVudHJ5
-IGZvciBEMyB3aXRoIFBBU0lEPTEsDQo+ID4gPiAgICB0aGVuIGludmFsaWRhdGVzIGFnYWluc3Qg
-UEFTSUQgIzENCj4gPiA+IGYpIHRyYXAgdG8gUUVNVSBhbmQgY29tZXMgdG8gdGhpcyBmdW5jdGlv
-bi4gU3RlcCAxIGxvb3BzIHR3bw0KPiA+ID4gICAgVlREUEFTSURBZGRyZXNzU3BhY2UgY3JlYXRl
-ZCBpbiBiKSBhbmQgZCksIGFuZCBpdCBmaW5kcyB0aGVyZQ0KPiA+ID4gICAgaXMgYSBWVERQQVNJ
-REFkZHJlc3NTcGFjZSB3aG9zZSBwYXNpZCBpcyAxLiB2dGRfZmx1c2hfcGFzaWQoKQ0KPiA+ID4g
-ICAgd2lsbCBjaGVjayBpZiB0aGUgY2FjaGVkIHBhc2lkIGVudHJ5IGlzIHRoZSBzYW1lIHdpdGgg
-dGhlIG9uZQ0KPiA+ID4gICAgaW4gZ3Vlc3QgbWVtb3J5LiBJbiB0aGlzIGZsb3csIGl0IHNob3Vs
-ZCBiZSB0aGUgc2FtZSwgc28NCj4gPiA+ICAgIHZ0ZF9mbHVzaF9wYXNpZCgpIHdpbGwgZG8gbm90
-aGluZyBmb3IgaXQuIFRoZW4gY29tZXMgdG8gU3RlcCAyLA0KPiA+ID4gICAgaXQgbG9vcHMgRDEs
-IEQyLCBEMy4NCj4gPiA+ICAgIC0gRm9yIEQxLCBubyBuZWVkIHRvIGRvIG1vcmUgc2luY2UgdGhl
-cmUgaXMgYWxyZWFkeSBhDQo+ID4gPiAgICAgIFZURFBBU0lEQWRkcmVzc1NwYWNlIGNyZWF0ZWQg
-Zm9yIEQxK1BBU0lEIzEuDQo+ID4gPiAgICAtIEZvciBEMiwgaXRzIGd1ZXN0IHBhc2lkIGVudHJ5
-IGZvciBQQVNJRCMxIGlzIG5vdCBwcmVzZW50LCBzbw0KPiA+ID4gICAgICBubyBuZWVkIHRvIGRv
-IGFueXRoaW5nIGZvciBpdC4NCj4gPiA+ICAgIC0gRm9yIEQzLCBpdHMgZ3Vlc3QgcGFzaWQgZW50
-cnkgZm9yIFBBU0lEIzEgaXMgcHJlc2VudCBhbmQgaXQNCj4gPiA+ICAgICAgaXMgZXhhY3RseSB0
-aGUgcmVhc29uIGZvciB0aGlzIGludmFsaWRhdGlvbi4gU28gY3JlYXRlIGENCj4gPiA+ICAgICAg
-VlREUEFTSURBZGRyZXNzU3BhY2UgZm9yIGFuZCBpbml0IHRoZSBwYXNpZF9jYWNoZV9lbnRyeSBh
-bmQNCj4gPiA+ICAgICAgcGFzaWRfY2FjaGVfZ2VuIGZpZWxkcy4NCj4gPiA+DQo+ID4gPiA+IEkg
-ZmVlbCBsaWtlIHdlIHNob3VsZG4ndCBjcmVhdGUgVlREUEFTSURBZGRyZXNzU3BhY2Ugb25seSBp
-ZiBpdA0KPiA+ID4gPiBleGlzdGVkLCBzYXksIHVudGlsIHdoZW4gd2UgcmVhY2ggdnRkX2Rldl9n
-ZXRfcGVfZnJvbV9wYXNpZCgpIGJlbG93IHdpdGgNCj4gcmV0Y29kZT09MC4NCj4gPiA+DQo+ID4g
-PiBZb3UgYXJlIHJpZ2h0LiBJIHRoaW5rIEkgZmFpbGVkIHRvIGRlc3Ryb3kgdGhlIFZUREFkZHJl
-c3NTcGFjZSB3aGVuDQo+ID4gPiB2dGRfZGV2X2dldF9wZV9mcm9tX3Bhc2lkKCkgcmV0dXJucyBl
-cnJvci4gVGh1cyB0aGUgY29kZSB3b24ndA0KPiA+ID4gY3JlYXRlIGEgVlREUEFTSURBZGRyZXNz
-U3BhY2UgZm9yIEQyK1BBU0lEIzEuDQo+ID4NCj4gPiBPSywgYnV0IHRoYXQgZnJlZSgpIGlzIHJl
-YWxseSBub3QgbmVjZXNzYXJ5Li4uICBQbGVhc2Ugc2VlIGJlbG93Lg0KPiA+DQo+ID4gPg0KPiA+
-ID4gPiBCZXNpZGVzIHRoaXMuLi4NCj4gPiA+ID4NCj4gPiA+ID4gPiArICAgICAgICBwY19lbnRy
-eSA9ICZ2dGRfcGFzaWRfYXMtPnBhc2lkX2NhY2hlX2VudHJ5Ow0KPiA+ID4gPiA+ICsgICAgICAg
-IGlmIChzLT5wYXNpZF9jYWNoZV9nZW4gPT0gcGNfZW50cnktPnBhc2lkX2NhY2hlX2dlbikgew0K
-PiA+ID4gPiA+ICsgICAgICAgICAgICAvKg0KPiA+ID4gPiA+ICsgICAgICAgICAgICAgKiBwYXNp
-ZF9jYWNoZV9nZW4gZXF1YWxzIHRvIHMtPnBhc2lkX2NhY2hlX2dlbiBtZWFucw0KPiA+ID4gPiA+
-ICsgICAgICAgICAgICAgKiB2dGRfcGFzaWRfYXMgaXMgdmFsaWQgYWZ0ZXIgdGhlIGFib3ZlIHMt
-PnZ0ZF9wYXNpZF9hcw0KPiA+ID4gPiA+ICsgICAgICAgICAgICAgKiB1cGRhdGVzIGluIFN0ZXAg
-MS4gVGh1cyBubyBuZWVkIGZvciB0aGUgYmVsb3cgc3RlcHMuDQo+ID4gPiA+ID4gKyAgICAgICAg
-ICAgICAqLw0KPiA+ID4gPiA+ICsgICAgICAgICAgICBjb250aW51ZTsNCj4gPiA+ID4gPiArICAg
-ICAgICB9DQo+ID4gPiA+ID4gKw0KPiA+ID4gPiA+ICsgICAgICAgIC8qDQo+ID4gPiA+ID4gKyAg
-ICAgICAgICogaWkpIHZ0ZF9wYXNpZF9hcyBpcyBub3QgdmFsaWQsIGl0J3MgcG90ZW50YWlsbHkg
-YSBuZXcNCj4gPiA+ID4gPiArICAgICAgICAgKiAgICBwYXNpZCBiaW5kLiBGZXRjaCBndWVzdCBw
-YXNpZCBlbnRyeS4NCj4gPiA+ID4gPiArICAgICAgICAgKi8NCj4gPiA+ID4gPiArICAgICAgICBp
-ZiAodnRkX2Rldl9nZXRfcGVfZnJvbV9wYXNpZChzLCBidXNfbiwgZGV2Zm4sIHBhc2lkLA0KPiA+
-ID4gPiA+ICsgJnBlKSkgew0KPiA+ID4NCj4gPiA+IFlpOiBzaG91bGQgZGVzdHJveSBwYXNpZF9h
-cyBhcyB0aGVyZSBpcyBubyB2YWxpZCBwYXNpZCBlbnRyeS4gVGh1cw0KPiA+ID4gdG8gZW5zdXJl
-IGFsbCB0aGUgcGFzaWRfYXMgaW4gaGFzaCB0YWJsZSBhcmUgdmFsaWQuDQo+ID4gPg0KPiA+ID4g
-PiA+ICsgICAgICAgICAgICBjb250aW51ZTsNCj4gPiA+ID4gPiArICAgICAgICB9DQo+ID4gPiA+
-ID4gKw0KPiA+ID4gPiA+ICsgICAgICAgIC8qDQo+ID4gPiA+ID4gKyAgICAgICAgICogaWlpKSBw
-YXNpZCBlbnRyeSBleGlzdHMsIHVwZGF0ZSBwYXNpZCBjYWNoZQ0KPiA+ID4gPiA+ICsgICAgICAg
-ICAqDQo+ID4gPiA+ID4gKyAgICAgICAgICogSGVyZSBuZWVkIHRvIGNoZWNrIGRvbWFpbiBJRCBz
-aW5jZSBndWVzdCBwYXNpZCBlbnRyeQ0KPiA+ID4gPiA+ICsgICAgICAgICAqIGV4aXN0cy4gV2hh
-dCBuZWVkcyB0byBkbyBhcmU6DQo+ID4gPiA+ID4gKyAgICAgICAgICogICAtIHVwZGF0ZSB0aGUg
-cGNfZW50cnkgaW4gdGhlIHZ0ZF9wYXNpZF9hcw0KPiA+ID4gPiA+ICsgICAgICAgICAqICAgLSBz
-ZXQgcHJvcGVyIHBjX2VudHJ5LnBhc2lkX2NhY2hlX2dlbg0KPiA+ID4gPiA+ICsgICAgICAgICAq
-ICAgLSBwYXNzIGRvd24gdGhlIGxhdGVzdCBndWVzdCBwYXNpZCBlbnRyeSBjb25maWcgdG8gaG9z
-dA0KPiA+ID4gPiA+ICsgICAgICAgICAqICAgICAod2lsbCBiZSBhZGRlZCBpbiBsYXRlciBwYXRj
-aCkNCj4gPiA+ID4gPiArICAgICAgICAgKi8NCj4gPiA+ID4gPiArICAgICAgICBpZiAoZG9tYWlu
-X2lkID09IHZ0ZF9wZV9nZXRfZG9tYWluX2lkKCZwZSkpIHsNCj4gPiA+ID4gPiArICAgICAgICAg
-ICAgdnRkX2ZpbGxfaW5fcGVfaW5fY2FjaGUocywgdnRkX3Bhc2lkX2FzLCAmcGUpOw0KPiA+ID4g
-PiA+ICsgICAgICAgIH0NCj4gPiA+ID4gPiArICAgIH0NCj4gPiA+ID4NCj4gPiA+ID4gPEVORD4N
-Cj4gPiA+ID4NCj4gPiA+ID4gLi4uIEknbSBhIGJpdCBjb25mdXNlZCBvbiB0aGUgd2hvbGUgcmFu
-Z2UgYmV0d2VlbiA8U1RBUlQ+IGFuZA0KPiA+ID4gPiA8RU5EPiBvbiBob3cgaXQgZGlmZmVycyBm
-cm9tIHRoZSB2dGRfcmVwbGF5X2d1ZXN0X3Bhc2lkX2JpbmRpbmdzKCkgeW91J3JlDQo+IGdvaW5n
-IHRvIGludHJvZHVjZS4NCj4gPiA+ID4gU2hvdWxkbid0IHRoZSByZXBsYXkgY29kZSBkbyBzaW1p
-bGFyIHRoaW5nPyAgQ2FuIHdlIG1lcmdlIHRoZW0/DQo+ID4gPg0KPiA+ID4gWWVzLCB0aGVyZSBp
-cyBzaW1pbGFyIHRoaW5nIHdoaWNoIGlzIHRvIGNyZWF0ZSBWVERQQVNJREFkZHJlc3NTcGFjZQ0K
-PiA+ID4gcGVyIHRoZSBndWVzdCBwYXNpZCBlbnRyeSBwcmVzZW5jZS4NCj4gPiA+DQo+ID4gPiBC
-dXQgdGhlcmUgYXJlIGRpZmZlcmVuY2VzLiBGb3Igb25lLCB0aGUgY29kZSBoZXJlIGlzIHRvIGxv
-b3AgYWxsDQo+ID4gPiBhc3NpZ25lZCBkZXZpY2VzIGZvciBhIHNwZWNpZmljIFBBU0lELiBXaGls
-ZSB0aGUgbG9naWMgaW4NCj4gPiA+IHZ0ZF9yZXBsYXlfZ3Vlc3RfcGFzaWRfYmluZGluZ3MoKSBp
-cyB0byBsb29wIGFsbCBhc3NpZ25lZCBkZXZpY2VzDQo+ID4gPiBhbmQgdGhlIFBBU0lEIHRhYmxl
-cyBiZWhpbmQgdGhlbS4gRm9yIHR3bywgdGhlIGNvZGUgaGVyZSBvbmx5IGNhcmVzDQo+ID4gPiBh
-Ym91dCB0aGUgY2FzZSB3aGljaCBndWVzdCBwYXNpZCBlbnRyeSBmcm9tIElOVkFMSUQtPlZBTElE
-Lg0KPiA+ID4gVGhlIHJlYXNvbiBpcyBpbiBTdGVwIDEgb2YgdGhpcyBmdW5jdGlvbiwgVkFMSUQt
-PklOVkFMSUQgYW5kDQo+ID4gPiBWQUxJRC0+VkFMSUQgY2FzZXMgYXJlIGFscmVhZHkgY292ZXJl
-ZC4gV2hpbGUgdGhlIGxvZ2ljIGluDQo+ID4gPiB2dGRfcmVwbGF5X2d1ZXN0X3Bhc2lkX2JpbmRp
-bmdzKCkgbmVlZHMgdG8gY292ZXIgYWxsIHRoZSB0aHJlZSBjYXNlcy4NCj4gPiA+IFRoZSBsYXN0
-IHJlYXNvbiBJIGRpZG4ndCBtZXJnZSB0aGVtIGlzIGluDQo+ID4gPiB2dGRfcmVwbGF5X2d1ZXN0
-X3Bhc2lkX2JpbmRpbmdzKCkgaXQgbmVlZHMgdG8gZGl2aWRlIHRoZSBwYXNpZCBlbnRyeQ0KPiA+
-ID4gZmV0Y2ggaW50byB0d28gc3RlcHMgYW5kIGNoZWNrIHRoZSByZXN1bHQgKGlmIGZldGNoIHBh
-c2lkIGRpcmVjdG9yeQ0KPiA+ID4gZW50cnkgZmFpbGVkLCBpdCBjb3VsZCBza2lwIGEgcmFuZ2Ug
-b2YgUEFTSURzKS4gV2hpbGUgdGhlIGNvZGUgaW4NCj4gPiA+IHRoaXMgZnVuY3Rpb24sIGl0IGRv
-ZXNuJ3QgY2FyZSBhYm91dCBpdCwgaXQgb25seSBjYXJlcyBpZiB0aGVyZSBpcyBhDQo+ID4gPiB2
-YWxpZCBwYXNpZCBlbnRyeSBmb3IgdGhpcyBzcGVjaWZpYyBwYXNpZC4NCj4gPiA+DQo+ID4gPiA+
-DQo+ID4gPiA+IE15IHVuZGVyc3RhbmRpbmcgaXMgdGhhdCB3ZSBjYW4ganVzdCBtYWtlIHN1cmUg
-dG8gZG8gaXQgcmlnaHQgb25jZQ0KPiA+ID4gPiBpbiB0aGUgcmVwbGF5IGNvZGUgKHRoZSB0aHJl
-ZSBjYXNlczogSU5WQUxJRC0+VkFMSUQsDQo+ID4gPiA+IFZBTElELT5JTlZBTElELA0KPiA+ID4g
-PiBWQUxJRC0+VkFMSUQpLCB0aGVuIG5vIG1hdHRlciB3aGV0aGVyIGl0J3MgRFNJL1BTSS9HU0ks
-IHdlIGNhbGwNCj4gPiA+ID4gVkFMSUQtPnRoZQ0KPiA+ID4gPiByZXBsYXkgY29kZSBwcm9iYWJs
-eSB3aXRoIFZURFBBU0lEQ2FjaGVJbmZvKiBwYXNzZWQgaW4sIHRoZW4gdGhlDQo+ID4gPiA+IHJl
-cGxheSBjb2RlDQo+ID4gd2lsbA0KPiA+ID4gPiBrbm93IHdoYXQgdG8gbG9vayBhZnRlci4NCj4g
-PiA+DQo+ID4gPiBIbW1tLCBsZXQgbWUgdGhpbmsgbW9yZSB0byBhYnN0cmFjdCB0aGUgY29kZSBi
-ZXR3ZWVuIHRoZSA8U1RBUlQ+IGFuZA0KPiA+ID4gPEVORD4gdG8gYmUgYSBoZWxwZXIgZnVuY3Rp
-b24gdG8gYmUgY2FsbGVkIGJ5DQo+ID4gPiB2dGRfcmVwbGF5X2d1ZXN0X3Bhc2lkX2JpbmRpbmdz
-KCkuIEFsc28sIGluIHRoYXQgY2FzZSwgSSBuZWVkIHRvDQo+ID4gPiBhcHBseSB0aGUgdHdvIHN0
-ZXAgY29uY2VwdCBpbiB0aGUgcmVwbGF5IGZ1bmN0aW9uLg0KPiA+DQo+ID4gLi4uIEkgdGhpbmsg
-eW91ciB2dGRfc21fcGFzaWRfdGFibGVfd2FsaygpIGlzIGFscmVhZHkgc3VpdGFibGUgZm9yDQo+
-ID4gdGhpcyBiZWNhdXNlIGl0IGFsbG93cyB0byBzcGVjaWZ5ICJzdGFydCIgYW5kICJlbmQiIHBh
-c2lkLiAgTm93IHlvdSdyZQ0KPiA+IGFsd2F5cyBwYXNzaW5nIGluIHRoZSAoMCwgVlREX01BWF9I
-UEFTSUQpIHR1cGxlLCBoZXJlIHlvdSBjYW4gc2ltcGx5DQo+ID4gcGFzcyBpbiAocGFzaWQsIHBh
-c2lkKzEpLiAgQnV0IEkgdGhpbmsgeW91IG5lZWQgdG8gdG91Y2ggdXANCj4gPiB2dGRfc21fcGFz
-aWRfdGFibGVfd2FsaygpIGEgYml0IHRvIG1ha2Ugc3VyZSBpdCBhbGxvd3MgdGhlIHBhc2lkIHRv
-IGJlDQo+ID4gbm90IGFsaWdlZCB0byBWVERfUEFTSURfVEJMX0VOVFJZX05VTS4NCj4gPg0KPiA+
-IEFub3RoZXIgdGhpbmcgaXMgSSB0aGluayB2dGRfc21fcGFzaWRfdGFibGVfd2Fsa19vbmUoKSBk
-aWRuJ3QgcmVhbGx5DQo+ID4gY2hlY2sgdnRkX3Bhc2lkX3RhYmxlX3dhbGtfaW5mby5kaWQgZG9t
-YWluIGluZm9ybWF0aW9uLi4uICBXaGVuIHRoYXQncw0KPiA+IGZpeGVkLCB0aGlzIGNhc2UgaXMg
-dGhlIHNhbWUgYXMgdGhlIERTSSB3YWxrIHdpdGggYSBzcGVjaWZpYyBwYXNpZA0KPiA+IHJhbmdl
-Lg0KPiANCj4gZ290IGl0LCBsZXQgbWUgcmVmYWN0b3IgdGhlbSAoUFNJIGFuZCByZXBsYXkpLg0K
-PiANCj4gPiBBbmQgYWdhaW4sIHBsZWFzZSBhbHNvIGNvbnNpZGVyIHRvIHVzZSBWVERQQVNJRENh
-Y2hlSW5mbyB0byBiZSB1c2VkDQo+ID4gZGlyZWN0bHkgZHVyaW5nIHRoZSBwYWdlIHdhbGssIHNv
-IHZ0ZF9wYXNpZF90YWJsZV93YWxrX2luZm8gY2FuIGJlDQo+ID4gcmVwbGFjZWQgSSB0aGluaywg
-YmVjYXVzZSBJSVVDIFZURFBBU0lEQ2FjaGVJbmZvIGNvbnRhaW5zIGFsbA0KPiA+IGluZm9ybWF0
-aW9uIHRoZSB0YWJsZSB3YWxrIHdpbGwgbmVlZC4NCj4gDQo+IHllcywgbm8gbmVlZCB0byBoYXZl
-IHRoZSB3YWxrX2luZm8gc3RydWN0dXJlLg0KSSdtIG5vdCBxdWl0ZSBnZXQgaGVyZS4gV2h5IGNh
-Y2hlX2dlbiBpbmNyZWFzZSBvbmx5IGhhcHBlbiBpbiBQU0kNCmhvb2s/IEkgdGhpbmsgY2FjaGVf
-Z2VuIHVzZWQgdG8gYXZvaWQgZHJvcCBhbGwgcGFzaWRfYXMgd2hlbiBhIHBhc2lkDQpjYWNoZSBy
-ZXNldCBoYXBwZW5lZC4NCg0KDQpUb2RheSwgSSdtIHRyeWluZyB0byByZXBsYWNlIHZ0ZF9wYXNp
-ZF90YWJsZV93YWxrX2luZm8gd2l0aA0KVlREUEFTSURDYWNoZUluZm8uIEJ1dCBJIGZvdW5kIGl0
-IG1heSBiZSBhIGxpdHRsZSBiaXQgc3RyYW5nZS4NClRoZSB2dGRfcGFzaWRfdGFibGVfd2Fsa19p
-bmZvIGluY2x1ZGUgdnRkX2J1cy9kZXZmbi9kaWQgYW5kIGENCmZsYWcgdG8gaW5kaWNhdGUgaWYg
-ZGlkIGlzIHVzZWZ1bC4gVGhlIGZpbmFsIHVzZXIgb2YgdGhlIHdhbGsNCmluZm8gaXMgdnRkX3Nt
-X3Bhc2lkX3RhYmxlX3dhbGtfb25lKCkgd2hpY2ggb25seSBjYXJlcyBhYm91dA0KdGhlIHRoZSB2
-dGRfYnVzL2RldmZuL2RpZC4gQnV0IFZURFBBU0lEQ2FjaGVJbmZvIGhhcyBhbiBleHRyYQ0KcGFz
-aWQgZmllbGQgYW5kIGFsc28gaGFzIG11bHRpcGxlIGZsYWcgZGVmaW5pdGlvbnMsIHdoaWNoIGFy
-ZQ0Kbm90IG5lY2Vzc2FyeSBmb3IgdGhlIHRhYmxlIHdvcmsuIFNvIGl0IGFwcGVhcnMgdG8gbWUg
-dXNlDQpzZXBhcmF0ZSBzdHJ1Y3R1cmUgd291bGQgYmUgYmV0dGVyLiBNYXliZSBJIGNhbiBzaG93
-IHlvdSB3aGVuDQpzZW5kaW5nIG91dCB0aGUgY29kZS4NCg0KPiA+ID4NCj4gPiA+ID4gPiArDQo+
-ID4gPiA+ID4gKyAgICB2dGRfaW9tbXVfdW5sb2NrKHMpOw0KPiA+ID4gPiA+ICAgICAgcmV0dXJu
-IDA7DQo+ID4gPiA+ID4gIH0NCj4gPiA+ID4gPg0KPiA+ID4gPiA+ICsvKioNCj4gPiA+ID4gPiAr
-ICogQ2FsbGVyIG9mIHRoaXMgZnVuY3Rpb24gc2hvdWxkIGhvbGQgaW9tbXVfbG9jayAgKi8gc3Rh
-dGljDQo+ID4gPiA+ID4gK3ZvaWQgdnRkX3Bhc2lkX2NhY2hlX3Jlc2V0KEludGVsSU9NTVVTdGF0
-ZSAqcykgew0KPiA+ID4gPiA+ICsgICAgVlREUEFTSURDYWNoZUluZm8gcGNfaW5mbzsNCj4gPiA+
-ID4gPiArDQo+ID4gPiA+ID4gKyAgICB0cmFjZV92dGRfcGFzaWRfY2FjaGVfcmVzZXQoKTsNCj4g
-PiA+ID4gPiArDQo+ID4gPiA+ID4gKyAgICBwY19pbmZvLmZsYWdzID0gVlREX1BBU0lEX0NBQ0hF
-X0dMT0JBTDsNCj4gPiA+ID4gPiArDQo+ID4gPiA+ID4gKyAgICAvKg0KPiA+ID4gPiA+ICsgICAg
-ICogUmVzZXQgcGFzaWQgY2FjaGUgaXMgYSBiaWcgaGFtbWVyLCBzbyB1c2UNCj4gPiA+ID4gPiAr
-ICAgICAqIGdfaGFzaF90YWJsZV9mb3JlYWNoX3JlbW92ZSB3aGljaCB3aWxsIGZyZWUNCj4gPiA+
-ID4gPiArICAgICAqIHRoZSB2dGRfcGFzaWRfYXMgaW5zdGFuY2VzLCBpbmRpY2F0ZXMgdGhlDQo+
-ID4gPiA+ID4gKyAgICAgKiBjYWNoZWQgcGFzaWRfY2FjaGVfZ2VuIHdvdWxkIGJlIHNldCB0byAw
-Lg0KPiA+ID4gPiA+ICsgICAgICovDQo+ID4gPiA+ID4gKyAgICBnX2hhc2hfdGFibGVfZm9yZWFj
-aF9yZW1vdmUocy0+dnRkX3Bhc2lkX2FzLA0KPiA+ID4gPiA+ICsgICAgICAgICAgICAgICAgICAg
-ICAgICAgICB2dGRfZmx1c2hfcGFzaWQsICZwY19pbmZvKTsNCj4gPiA+ID4NCj4gPiA+ID4gV291
-bGQgdGhpcyBtYWtlIHN1cmUgdGhlIHBlciBwYXNpZF9hcyBwYXNpZF9jYWNoZV9nZW4gd2lsbCBi
-ZSByZXNldCB0byB6ZXJvPw0KPiA+IEknbQ0KPiA+ID4gPiBub3QgdmVyeSBzdXJlLCBzYXksIHdo
-YXQgaWYgdGhlIG1lbW9yeSBpcyBzdGFsbCBkdXJpbmcgYSByZXNldCBhbmQNCj4gPiA+ID4gc3Rp
-bGwgaGF2ZSB0aGUNCj4gPiBvbGQNCj4gPiA+ID4gZGF0YT8NCj4gPiA+ID4NCj4gPiA+ID4gSSdt
-IG5vdCBzdXJlLCBidXQgSSBmZWVsIGxpa2Ugd2Ugc2hvdWxkIHNpbXBseSBkcm9wIGFsbCBwYXNp
-ZF9hcw0KPiA+ID4gPiBoZXJlLCByYXRoZXIgdGhhbiB1c2luZyB0aGUgc2FtZSBjb2RlIGZvciBh
-IGdsb2JhbCBwYXNpZCBpbnZhbGlkYXRpb24uDQo+ID4gPg0KPiA+ID4gSSBzZWUuIE1heWJlIEkg
-Y2FuIGdldCBhbm90aGVyIGhlbHBlciBmdW5jdGlvbiB3aGljaCBhbHdheXMgcmV0dXJucw0KPiA+
-ID4gdHJ1ZSwgYW5kIHJlcGxhY2UgdnRkX2ZsdXNoX3Bhc2lkIHdpdGggdGhlIG5ldyBmdW5jdGlv
-bi4gVGhpcyBzaG91bGQNCj4gPiA+IGVuc3VyZSBhbGwgcGFzaWRfYXMgYXJlIGRyb3BwZWQuIEhv
-dyBkbyB5b3UgdGhpbms/DQo+ID4NCj4gPiBnX2hhc2hfdGFibGVfcmVtb3ZlX2FsbCgpIG1pZ2h0
-IGJlIGVhc2llci4gOikNCj4gDQo+IHJpZ2h0LiBJJ2xsIG1ha2UgaXQuDQoNClNvcnJ5IHRvIHJl
-Y2xhaW0gbXkgcmVwbHkgaGVyZS4gSSB0aGluayBoZXJlIHN0aWxsIG5lZWRzIGEgZnVuY3Rpb24g
-KHNheQ0KdnRkX2ZsdXNoX3Bhc2lkKSB0byBjaGVjayBpZiBuZWVkcyB0byBub3RpZnkgaG9zdCBk
-byB1bmJpbmQuIGUuZy4gSWYgZ3Vlc3QNCnVuYmluZCBhIHBhc2lkIGluIGd1ZXN0LCBhbmQgaXNz
-dWVzIGEgR1NJIChwYXNpZCBjYWNoZSksIHJlbW92ZV9hbGwoKQ0Kd2lsbCBkcm9wIGFsbCBwYXNp
-ZF9hcywgdGhpcyB3b3VsZCBiZSBhIHByb2JsZW0uIFRoZSBndWVzdCB1bmJpbmQgd2lsbA0Kbm90
-IGJlIHByb3BhZ2F0ZWQgdG8gaG9zdC4gQW5kIGV2ZW4gd2UgYWRkIGEgcmVwbGF5IGFmdGVyIGl0
-LCBpdCBjYW4NCm9ubHkgc2hhZG93IHRoZSBiaW5kaW5ncyBpbiBndWVzdCB0byBob3N0LCBidXQg
-Y2Fubm90IGZpZ3VyZSBvdXQgYW4NCnVuYmluZC4gQnV0IEkgYWdyZWUgd2l0aCB5b3UgdGhhdCB2
-dGRfcGFzaWRfY2FjaGVfcmVzZXQoKSBzaG91bGQgZHJvcA0KYWxsIHBhc2lkX2FzIGJ1dCBhbHNv
-IG5lZWRzIHRvIG5vdGlmeSBob3N0IHByb3Blcmx5Lg0KDQpUaGFua3MsDQpZaSBMaXUNCg==
+On 3/25/20 7:02 PM, Daniel Colascione wrote:
+> This change adds two new functions, anon_inode_getfile_secure and
+> anon_inode_getfd_secure, that create anonymous-node files with
+> individual non-S_PRIVATE inodes to which security modules can apply
+> policy. Existing callers continue using the original singleton-inode
+> kind of anonymous-inode file. We can transition anonymous inode users
+> to the new kind of anonymous inode in individual patches for the sake
+> of bisection and review.
+> 
+> The new functions accept an optional context_inode parameter that
+> callers can use to provide additional contextual information to
+> security modules, e.g., indicating that one anonymous struct file is a
+> logical child of another, allowing a security model to propagate
+> security information from one to the other.
+> 
+> Signed-off-by: Daniel Colascione <dancol@google.com>
+> ---
+
+> diff --git a/fs/anon_inodes.c b/fs/anon_inodes.c
+> index 89714308c25b..114a04fc1db4 100644
+> --- a/fs/anon_inodes.c
+> +++ b/fs/anon_inodes.c
+> @@ -55,75 +55,135 @@ static struct file_system_type anon_inode_fs_type = {
+>   	.kill_sb	= kill_anon_super,
+>   };
+>   
+> -/**
+> - * anon_inode_getfile - creates a new file instance by hooking it up to an
+> - *                      anonymous inode, and a dentry that describe the "class"
+> - *                      of the file
+> - *
+> - * @name:    [in]    name of the "class" of the new file
+> - * @fops:    [in]    file operations for the new file
+> - * @priv:    [in]    private data for the new file (will be file's private_data)
+> - * @flags:   [in]    flags
+> - *
+> - * Creates a new file by hooking it on a single inode. This is useful for files
+> - * that do not need to have a full-fledged inode in order to operate correctly.
+> - * All the files created with anon_inode_getfile() will share a single inode,
+> - * hence saving memory and avoiding code duplication for the file/inode/dentry
+> - * setup.  Returns the newly created file* or an error pointer.
+> - */
+> -struct file *anon_inode_getfile(const char *name,
+> -				const struct file_operations *fops,
+> -				void *priv, int flags)
+> +static struct inode *anon_inode_make_secure_inode(
+> +	const char *name,
+> +	const struct inode *context_inode,
+> +	const struct file_operations *fops)
+> +{
+> +	struct inode *inode;
+> +	const struct qstr qname = QSTR_INIT(name, strlen(name));
+> +	int error;
+> +
+> +	inode = alloc_anon_inode(anon_inode_mnt->mnt_sb);
+> +	if (IS_ERR(inode))
+> +		return ERR_PTR(PTR_ERR(inode));
+
+Just return inode here?
+
+> +	inode->i_flags &= ~S_PRIVATE;
+> +	error =	security_inode_init_security_anon(
+> +		inode, &qname, fops, context_inode);
+
+Would drop fops argument to the security hook until we have an actual 
+user of it; one can always add it later.
+
+
+> diff --git a/fs/userfaultfd.c b/fs/userfaultfd.c
+> index 37df7c9eedb1..07b0f6e03849 100644
+> --- a/fs/userfaultfd.c
+> +++ b/fs/userfaultfd.c
+> @@ -1014,8 +1014,6 @@ static __poll_t userfaultfd_poll(struct file *file, poll_table *wait)
+>   	}
+>   }
+>   
+> -static const struct file_operations userfaultfd_fops;
+> -
+>   static int resolve_userfault_fork(struct userfaultfd_ctx *ctx,
+>   				  struct userfaultfd_ctx *new,
+>   				  struct uffd_msg *msg)
+> @@ -1920,7 +1918,7 @@ static void userfaultfd_show_fdinfo(struct seq_file *m, struct file *f)
+>   }
+>   #endif
+>   
+> -static const struct file_operations userfaultfd_fops = {
+> +const struct file_operations userfaultfd_fops = {
+>   #ifdef CONFIG_PROC_FS
+>   	.show_fdinfo	= userfaultfd_show_fdinfo,
+>   #endif
+
+These changes can be dropped entirely AFAICT.
+
+> diff --git a/include/linux/lsm_hooks.h b/include/linux/lsm_hooks.h
+> index 20d8cf194fb7..de5d37e388df 100644
+> --- a/include/linux/lsm_hooks.h
+> +++ b/include/linux/lsm_hooks.h
+> @@ -215,6 +215,10 @@
+>    *	Returns 0 if @name and @value have been successfully set,
+>    *	-EOPNOTSUPP if no security attribute is needed, or
+>    *	-ENOMEM on memory allocation failure.
+> + * @inode_init_security_anon:
+> + *      Set up a secure anonymous inode.
+> + *	Returns 0 on success. Returns -EPERM if	the security module denies
+> + *	the creation of this inode.
+
+I'd favor describing the arguments (@name, @context_inode) too.
+
+>    * @inode_create:
+>    *	Check permission to create a regular file.
+>    *	@dir contains inode structure of the parent of the new file.
+> @@ -1552,6 +1556,10 @@ union security_list_options {
+>   					const struct qstr *qstr,
+>   					const char **name, void **value,
+>   					size_t *len);
+> +	int (*inode_init_security_anon)(struct inode *inode,
+> +					const struct qstr *name,
+> +					const struct file_operations *fops,
+> +					const struct inode *context_inode);
+>   	int (*inode_create)(struct inode *dir, struct dentry *dentry,
+
+Can drop the fops argument.
+
+> diff --git a/include/linux/security.h b/include/linux/security.h
+> index 64b19f050343..8ea76af0be7a 100644
+> --- a/include/linux/security.h
+> +++ b/include/linux/security.h
+> @@ -320,6 +320,10 @@ void security_inode_free(struct inode *inode);
+>   int security_inode_init_security(struct inode *inode, struct inode *dir,
+>   				 const struct qstr *qstr,
+>   				 initxattrs initxattrs, void *fs_data);
+> +int security_inode_init_security_anon(struct inode *inode,
+> +				      const struct qstr *name,
+> +				      const struct file_operations *fops,
+> +				      const struct inode *context_inode);
+
+Ditto
+
+> diff --git a/security/security.c b/security/security.c
+> index 565bc9b67276..d06f3969c030 100644
+> --- a/security/security.c
+> +++ b/security/security.c
+> @@ -1033,6 +1033,16 @@ int security_inode_init_security(struct inode *inode, struct inode *dir,
+>   }
+>   EXPORT_SYMBOL(security_inode_init_security);
+>   
+> +int
+> +security_inode_init_security_anon(struct inode *inode,
+> +				  const struct qstr *name,
+> +				  const struct file_operations *fops,
+> +				  const struct inode *context_inode)
+> +{
+> +	return call_int_hook(inode_init_security_anon, 0, inode, name,
+> +			     fops, context_inode);
+> +}
+> +
+
+And again.
+
+
