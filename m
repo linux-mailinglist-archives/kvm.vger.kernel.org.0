@@ -2,29 +2,29 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2B0A7194306
+	by mail.lfdr.de (Postfix) with ESMTP id 54B72194307
 	for <lists+kvm@lfdr.de>; Thu, 26 Mar 2020 16:25:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727856AbgCZPY4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 Mar 2020 11:24:56 -0400
-Received: from foss.arm.com ([217.140.110.172]:33672 "EHLO foss.arm.com"
+        id S1728150AbgCZPY5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 Mar 2020 11:24:57 -0400
+Received: from foss.arm.com ([217.140.110.172]:33680 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726034AbgCZPYz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 Mar 2020 11:24:55 -0400
+        id S1726034AbgCZPY4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 Mar 2020 11:24:56 -0400
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 52BB51045;
-        Thu, 26 Mar 2020 08:24:55 -0700 (PDT)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6DF9D7FA;
+        Thu, 26 Mar 2020 08:24:56 -0700 (PDT)
 Received: from e123195-lin.cambridge.arm.com (e123195-lin.cambridge.arm.com [10.1.196.63])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 647C83F71E;
-        Thu, 26 Mar 2020 08:24:54 -0700 (PDT)
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 88B293F71E;
+        Thu, 26 Mar 2020 08:24:55 -0700 (PDT)
 From:   Alexandru Elisei <alexandru.elisei@arm.com>
 To:     kvm@vger.kernel.org
 Cc:     will@kernel.org, julien.thierry.kdev@gmail.com,
         andre.przywara@arm.com, sami.mujawar@arm.com,
         lorenzo.pieralisi@arm.com
-Subject: [PATCH v3 kvmtool 01/32] Makefile: Use correct objcopy binary when cross-compiling for x86_64
-Date:   Thu, 26 Mar 2020 15:24:07 +0000
-Message-Id: <20200326152438.6218-2-alexandru.elisei@arm.com>
+Subject: [PATCH v3 kvmtool 02/32] hw/i8042: Compile only for x86
+Date:   Thu, 26 Mar 2020 15:24:08 +0000
+Message-Id: <20200326152438.6218-3-alexandru.elisei@arm.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200326152438.6218-1-alexandru.elisei@arm.com>
 References: <20200326152438.6218-1-alexandru.elisei@arm.com>
@@ -35,37 +35,53 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Use the compiler toolchain version of objcopy instead of the native one
-when cross-compiling for the x86_64 architecture.
+The initialization function for the i8042 emulated device does exactly
+nothing for all architectures, except for x86. As a result, the device
+is usable only for x86, so let's make the file an architecture specific
+object file.
 
 Reviewed-by: Andre Przywara <andre.przywara@arm.com>
-Tested-by: Andre Przywara <andre.przywara@arm.com>
 Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 ---
- Makefile | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ Makefile   | 2 +-
+ hw/i8042.c | 4 ----
+ 2 files changed, 1 insertion(+), 5 deletions(-)
 
 diff --git a/Makefile b/Makefile
-index b76d844f2e01..6d6880dd4f8a 100644
+index 6d6880dd4f8a..33eddcbb4d66 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -22,6 +22,7 @@ CC	:= $(CROSS_COMPILE)gcc
- CFLAGS	:=
- LD	:= $(CROSS_COMPILE)ld
- LDFLAGS	:=
-+OBJCOPY	:= $(CROSS_COMPILE)objcopy
+@@ -103,7 +103,6 @@ OBJS	+= hw/pci-shmem.o
+ OBJS	+= kvm-ipc.o
+ OBJS	+= builtin-sandbox.o
+ OBJS	+= virtio/mmio.o
+-OBJS	+= hw/i8042.o
  
- FIND	:= find
- CSCOPE	:= cscope
-@@ -479,7 +480,7 @@ x86/bios/bios.bin.elf: x86/bios/entry.S x86/bios/e820.c x86/bios/int10.c x86/bio
+ # Translate uname -m into ARCH string
+ ARCH ?= $(shell uname -m | sed -e s/i.86/i386/ -e s/ppc.*/powerpc/ \
+@@ -124,6 +123,7 @@ endif
+ #x86
+ ifeq ($(ARCH),x86)
+ 	DEFINES += -DCONFIG_X86
++	OBJS	+= hw/i8042.o
+ 	OBJS	+= x86/boot.o
+ 	OBJS	+= x86/cpuid.o
+ 	OBJS	+= x86/interrupt.o
+diff --git a/hw/i8042.c b/hw/i8042.c
+index 288b7d1108ac..2d8c96e9c7e6 100644
+--- a/hw/i8042.c
++++ b/hw/i8042.c
+@@ -349,10 +349,6 @@ static struct ioport_operations kbd_ops = {
  
- x86/bios/bios.bin: x86/bios/bios.bin.elf
- 	$(E) "  OBJCOPY " $@
--	$(Q) objcopy -O binary -j .text x86/bios/bios.bin.elf x86/bios/bios.bin
-+	$(Q) $(OBJCOPY) -O binary -j .text x86/bios/bios.bin.elf x86/bios/bios.bin
- 
- x86/bios/bios-rom.o: x86/bios/bios-rom.S x86/bios/bios.bin x86/bios/bios-rom.h
- 	$(E) "  CC      " $@
+ int kbd__init(struct kvm *kvm)
+ {
+-#ifndef CONFIG_X86
+-	return 0;
+-#endif
+-
+ 	kbd_reset();
+ 	state.kvm = kvm;
+ 	ioport__register(kvm, I8042_DATA_REG, &kbd_ops, 2, NULL);
 -- 
 2.20.1
 
