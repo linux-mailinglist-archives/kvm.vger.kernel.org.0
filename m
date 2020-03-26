@@ -2,138 +2,166 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8571C193AAA
-	for <lists+kvm@lfdr.de>; Thu, 26 Mar 2020 09:17:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 623CD193AA4
+	for <lists+kvm@lfdr.de>; Thu, 26 Mar 2020 09:16:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727806AbgCZIRY convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Thu, 26 Mar 2020 04:17:24 -0400
-Received: from mga18.intel.com ([134.134.136.126]:3807 "EHLO mga18.intel.com"
+        id S1727656AbgCZIP7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 Mar 2020 04:15:59 -0400
+Received: from mga02.intel.com ([134.134.136.20]:27555 "EHLO mga02.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726422AbgCZIRY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 Mar 2020 04:17:24 -0400
-IronPort-SDR: WTK/femAOO9+0yEAtgG9o2l94aY6/Eynt7mINN5itLVNBaKqmNVcA6A+ir0tpAjD1yVhl9s22r
- U1rNsqPMTVAQ==
+        id S1726298AbgCZIP7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 Mar 2020 04:15:59 -0400
+IronPort-SDR: gETYUXWuPltYKHUr6p9v9L11Zo/TK0QCIxDnf2STY5FmrWkI2Z0W+3CxOSFJocdJKliVRCau93
+ qNCd6zs9Nc3Q==
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Mar 2020 01:17:23 -0700
-IronPort-SDR: LQ8gzi9lRpRZbSyEF+YxqZz3XfqhVzfPUEVcbmUnNbWj8QSvQ4RbAl7sEFmPV6r0Pu4gfKwGqN
- cZXhCBb0hgZA==
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Mar 2020 01:15:58 -0700
+IronPort-SDR: xk+6ZvxFpr0srCx4pxzWjlrkRVfTarECFniJ5feN/lkD/u/kKDbVGaadgS3ZZvaDdCnfeDvz/O
+ wiXc/zX24y+Q==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.72,307,1580803200"; 
-   d="scan'208";a="271088529"
-Received: from fmsmsx107.amr.corp.intel.com ([10.18.124.205])
-  by fmsmga004.fm.intel.com with ESMTP; 26 Mar 2020 01:17:23 -0700
-Received: from fmsmsx156.amr.corp.intel.com (10.18.116.74) by
- fmsmsx107.amr.corp.intel.com (10.18.124.205) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Thu, 26 Mar 2020 01:17:23 -0700
-Received: from shsmsx102.ccr.corp.intel.com (10.239.4.154) by
- fmsmsx156.amr.corp.intel.com (10.18.116.74) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Thu, 26 Mar 2020 01:17:22 -0700
-Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.206]) by
- shsmsx102.ccr.corp.intel.com ([169.254.2.50]) with mapi id 14.03.0439.000;
- Thu, 26 Mar 2020 16:17:20 +0800
-From:   "Tian, Kevin" <kevin.tian@intel.com>
-To:     Zhenyu Wang <zhenyuw@linux.intel.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>
-CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "intel-gvt-dev@lists.freedesktop.org" 
-        <intel-gvt-dev@lists.freedesktop.org>,
-        "Jiang, Dave" <dave.jiang@intel.com>
-Subject: RE: [PATCH v2 1/2]
- Documentation/driver-api/vfio-mediated-device.rst: update for aggregation
- support
-Thread-Topic: [PATCH v2 1/2]
- Documentation/driver-api/vfio-mediated-device.rst: update for aggregation
- support
-Thread-Index: AQHWAzE7mTmt3EWoYkGUa0oLcK4XDahahH9g
-Date:   Thu, 26 Mar 2020 08:17:20 +0000
-Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D19D7EAB69@SHSMSX104.ccr.corp.intel.com>
-References: <20200326054136.2543-1-zhenyuw@linux.intel.com>
- <20200326054136.2543-2-zhenyuw@linux.intel.com>
-In-Reply-To: <20200326054136.2543-2-zhenyuw@linux.intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-version: 11.2.0.6
-dlp-reaction: no-action
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
-MIME-Version: 1.0
+   d="scan'208";a="393898809"
+Received: from local-michael-cet-test.sh.intel.com ([10.239.159.128])
+  by orsmga004.jf.intel.com with ESMTP; 26 Mar 2020 01:15:55 -0700
+From:   Yang Weijiang <weijiang.yang@intel.com>
+To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        pbonzini@redhat.com, sean.j.christopherson@intel.com,
+        jmattson@google.com
+Cc:     yu.c.zhang@linux.intel.com, Yang Weijiang <weijiang.yang@intel.com>
+Subject: [PATCH v11 0/9] Introduce support for guest CET feature
+Date:   Thu, 26 Mar 2020 16:18:37 +0800
+Message-Id: <20200326081847.5870-1-weijiang.yang@intel.com>
+X-Mailer: git-send-email 2.17.2
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> From: Zhenyu Wang <zhenyuw@linux.intel.com>
-> Sent: Thursday, March 26, 2020 1:42 PM
-> 
-> Update doc for mdev aggregation support. Describe mdev generic
-> parameter directory under mdev device directory.
-> 
-> Cc: Kevin Tian <kevin.tian@intel.com>
-> Cc: "Jiang, Dave" <dave.jiang@intel.com>
-> Signed-off-by: Zhenyu Wang <zhenyuw@linux.intel.com>
-> ---
->  .../driver-api/vfio-mediated-device.rst       | 19 +++++++++++++++++++
->  1 file changed, 19 insertions(+)
-> 
-> diff --git a/Documentation/driver-api/vfio-mediated-device.rst
-> b/Documentation/driver-api/vfio-mediated-device.rst
-> index 25eb7d5b834b..29c29432a847 100644
-> --- a/Documentation/driver-api/vfio-mediated-device.rst
-> +++ b/Documentation/driver-api/vfio-mediated-device.rst
-> @@ -269,6 +269,9 @@ Directories and Files Under the sysfs for Each mdev
-> Device
->    |--- [$MDEV_UUID]
->           |--- remove
->           |--- mdev_type {link to its type}
-> +         |--- mdev [optional]
-> +	     |--- aggregated_instances [optional]
-> +	     |--- max_aggregation [optional]
->           |--- vendor-specific-attributes [optional]
-> 
->  * remove (write only)
-> @@ -281,6 +284,22 @@ Example::
-> 
->  	# echo 1 > /sys/bus/mdev/devices/$mdev_UUID/remove
-> 
-> +* mdev directory (optional)
+Control-flow Enforcement Technology (CET) provides protection against
+Return/Jump-Oriented Programming (ROP/JOP) attack. It includes two
+sub-features: Shadow Stack (SHSTK) and Indirect Branch Tracking (IBT).
 
-It sounds confusing to me when seeing a 'mdev' directory under a
-mdev instance. How could one tell which attribute should put inside
-or outside of 'mdev'?
+KVM needs to update to enable guest CET feature.
+This patchset implements CET related CPUID/XSAVES enumeration, MSRs
+and vmentry/vmexit configuration etc.so that guest kernel can setup CET
+runtime infrastructure based on them. Some CET MSRs and related feature
+flags used reference the definitions in kernel patchset.
 
-> +
-> +Vendor driver could create mdev directory to specify extra generic
-> parameters
-> +on mdev device by its type. Currently aggregation parameters are defined.
-> +Vendor driver should provide both items to support.
-> +
-> +1) aggregated_instances (read/write)
-> +
-> +Set target aggregated instances for device. Reading will show current
-> +count of aggregated instances. Writing value larger than max_aggregation
-> +would fail and return error.
+CET kernel patches are here:
+https://lkml.org/lkml/2020/2/5/593
+https://lkml.org/lkml/2020/2/5/604
 
-Can one write a value multiple-times and at any time? 
+v10 -> v11
+- Fixed a guest vmentry failure issue when guest reboots.
+- Used vm_xxx_control_{set, clear}bit() to avoid side effect, it'll
+  clear cached data instead of pure VMCS field bits.
+- Added vcpu->arch.guest_supported_xss dedidated for guest runtime mask,
+  this avoids supported_xss overwritten issue caused by an old qemu.
+- Separated vmentry/vmexit state setting with CR0/CR4 dependency check
+  to make the patch more clear.
+- Added CET VMCS states in dump_vmcs() for debugging purpose.
+- Other refactor based on testing.
+- This patch serial is built on top of below branch and CET kernel patches
+  for seeking xsaves support:
+  https://git.kernel.org/pub/scm/virt/kvm/kvm.git/log/?h=cpu-caps
 
-> +
-> +2) max_aggregation (read only)
-> +
-> +Show maxium instances for aggregation.
-> +
+v9 -> v10
+- Refactored code per Sean's review feedback.
+- Added CET support for nested VM.
+- Removed fix-patch for CPUID(0xd,N) enumeration as this part is done
+  by Paolo and Sean.
+- This new patchset is based on Paolo's queued cpu_caps branch.
+- Modified patch per XSAVES related change.
+- Consolidated KVM unit-test patch with KVM patches.
 
-"show maximum-allowed instances which can be aggregated for this device". is
-this value static or dynamic? if dynamic then the user is expected to read this
-field before every write. worthy of some clarification here.
+v8 -> v9:
+- Refactored msr-check functions per Sean's feedback.
+- Fixed a few issues per Sean's suggestion.
+- Rebased patch to kernel-v5.4.
+- Moved CET CPUID feature bits and CR4.CET to last patch.
 
->  Mediated device Hot plug
->  ------------------------
-> 
-> --
-> 2.25.1
+v7 -> v8:
+- Addressed Jim and Sean's feedback on: 1) CPUID(0xD,i) enumeration. 2)
+  sanity check when configure guest CET. 3) function improvement.
+- Added more sanity check functions.
+- Set host vmexit default status so that guest won't leak CET status to
+  host when vmexit.
+- Added CR0.WP vs. CR4.CET mutual constrains.
+
+v6 -> v7:
+- Rebased patch to kernel v5.3
+- Sean suggested to change CPUID(0xd, n) enumeration code as alined with
+  existing one, and I think it's better to make the fix as an independent patch 
+  since XSS MSR are being used widely on X86 platforms.
+- Check more host and guest status before configure guest CET
+  per Sean's feedback.
+- Add error-check before guest accesses CET MSRs per Sean's feedback.
+- Other minor fixes suggested by Sean.
+
+v5 -> v6:
+- Rebase patch to kernel v5.2.
+- Move CPUID(0xD, n>=1) helper to a seperate patch.
+- Merge xsave size fix with other patch.
+- Other minor fixes per community feedback.
+
+v4 -> v5:
+- Rebase patch to kernel v5.1.
+- Wrap CPUID(0xD, n>=1) code to a helper function.
+- Pass through MSR_IA32_PL1_SSP and MSR_IA32_PL2_SSP to Guest.
+- Add Co-developed-by expression in patch description.
+- Refine patch description.
+
+v3 -> v4:
+- Add Sean's patch for loading Guest fpu state before access XSAVES
+  managed CET MSRs.
+- Melt down CET bits setting into CPUID configuration patch.
+- Add VMX interface to query Host XSS.
+- Check Host and Guest XSS support bits before set Guest XSS.
+- Make Guest SHSTK and IBT feature enabling independent.
+- Do not report CET support to Guest when Host CET feature is Disabled.
+
+v2 -> v3:
+- Modified patches to make Guest CET independent to Host enabling.
+- Added patch 8 to add user space access for Guest CET MSR access.
+- Modified code comments and patch description to reflect changes.
+
+v1 -> v2:
+- Re-ordered patch sequence, combined one patch.
+- Added more description for CET related VMCS fields.
+- Added Host CET capability check while enabling Guest CET loading bit.
+- Added Host CET capability check while reporting Guest CPUID(EAX=7, EXC=0).
+- Modified code in reporting Guest CPUID(EAX=D,ECX>=1), make it clearer.
+- Added Host and Guest XSS mask check while setting bits for Guest XSS.
+
+
+
+Sean Christopherson (1):
+  KVM: X86: Load guest fpu state when access MSRs managed by XSAVES
+
+Yang Weijiang (8):
+  KVM: VMX: Introduce CET VMX fields and flags
+  KVM: VMX: Set guest CET MSRs per KVM and host configuration
+  KVM: VMX: Set host/guest CET states for vmexit/vmentry
+  KVM: VMX: Check CET dependencies on CR settings
+  KVM: X86: Refresh CPUID once guest XSS MSR changes
+  KVM: X86: Add userspace access interface for CET MSRs
+  KVM: VMX: Enable CET support for nested VM
+  KVM: X86: Set CET feature bits for CPUID enumeration
+
+ arch/x86/include/asm/kvm_host.h |   4 +-
+ arch/x86/include/asm/vmx.h      |   8 ++
+ arch/x86/include/uapi/asm/kvm.h |   1 +
+ arch/x86/kvm/cpuid.c            |  25 +++-
+ arch/x86/kvm/vmx/capabilities.h |  10 ++
+ arch/x86/kvm/vmx/nested.c       |  41 +++++-
+ arch/x86/kvm/vmx/vmcs12.c       |   6 +
+ arch/x86/kvm/vmx/vmcs12.h       |  14 +-
+ arch/x86/kvm/vmx/vmx.c          | 232 +++++++++++++++++++++++++++++++-
+ arch/x86/kvm/x86.c              |  46 ++++++-
+ arch/x86/kvm/x86.h              |   2 +-
+ 11 files changed, 376 insertions(+), 13 deletions(-)
+
+-- 
+2.17.2
 
