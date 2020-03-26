@@ -2,119 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8F4CC1947C5
-	for <lists+kvm@lfdr.de>; Thu, 26 Mar 2020 20:45:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 24D5B19482B
+	for <lists+kvm@lfdr.de>; Thu, 26 Mar 2020 21:03:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728665AbgCZTp4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 Mar 2020 15:45:56 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:23617 "EHLO
+        id S1728636AbgCZUDV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 Mar 2020 16:03:21 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:38986 "EHLO
         us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727026AbgCZTp4 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 26 Mar 2020 15:45:56 -0400
+        by vger.kernel.org with ESMTP id S1727851AbgCZUDV (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 26 Mar 2020 16:03:21 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1585251954;
+        s=mimecast20190719; t=1585253000;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=j/QkZIwZAYRuVJgK41SETHWfHlCLzylTanLn5vMvqiQ=;
-        b=P8Wwqk3wUhukJCt1HQEikimLeW9nCk1uT8Vqvqr9ZjgmAIIvTwrKz+0dTvVxHRMQBq2qCp
-        h2epB4smHqkGPMgmVSGjXGclPB+P0swrcXgBJv/URpclV48ulAhKmvAg+jTWGBaC8Mp8SF
-        cjOgZr2Nl6jM5eNhp6PztaOpzCOLsf4=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-188-NLFSVKP_O8a9wwDRATKFIw-1; Thu, 26 Mar 2020 15:45:53 -0400
-X-MC-Unique: NLFSVKP_O8a9wwDRATKFIw-1
-Received: by mail-wm1-f69.google.com with SMTP id v184so3021889wme.7
-        for <kvm@vger.kernel.org>; Thu, 26 Mar 2020 12:45:53 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=j/QkZIwZAYRuVJgK41SETHWfHlCLzylTanLn5vMvqiQ=;
-        b=nA+weYlknNfp90sClBW7zhiNSFJC52lkFv9DCnMqBCBVu6Ghj2qLbGzLNiYK4DH30O
-         14SgZKpEOYYTLRLJmvK3ObMYMv5qW8kOEsnwZt2+dMq8Ss2HJFI41j92hFlBC7iV2hs4
-         rHHD498/Vl4/bshs+C1nWpBEMSxJl9AFnCV4/ujofmKGGs/8Vj3xQMcVxUHgs4Ws9cZY
-         n0L3jlh9xBaH0Y5tsvL0W2PhEN2aNQpffq3XvPZvxJIc/1BaM53IQpivJ+lRnIyvnva3
-         00xT2Zd+MbnF7bhzvOyvOI3ayXqDL56FLcAAkNTvMPJ90K2jEsCKdJCivuN7L08y0Yot
-         i8iw==
-X-Gm-Message-State: ANhLgQ1lXQMm0WYMFBklLxHehA/FxE6CXDEhqrAVgJDe5z4qllvs+qam
-        jQQemUQuF2Ba9vDq4DRSyWnIYkRpGrs4daljC0FWgGUFfK0VUbqkk7ROw8Q9OUQiIoARsPA8gh2
-        etDehH3zSBwvH
-X-Received: by 2002:a7b:c74a:: with SMTP id w10mr1556649wmk.148.1585251948905;
-        Thu, 26 Mar 2020 12:45:48 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vtkzjJVQR0L2kBAgXHawkwn6IjmfgdffWupvHBQgJ6axyAXNIWiCOxX44A6i4JirFtb4neiag==
-X-Received: by 2002:a7b:c74a:: with SMTP id w10mr1556624wmk.148.1585251948653;
-        Thu, 26 Mar 2020 12:45:48 -0700 (PDT)
-Received: from [192.168.10.150] ([93.56.170.5])
-        by smtp.gmail.com with ESMTPSA id t21sm4755144wmt.43.2020.03.26.12.45.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 26 Mar 2020 12:45:47 -0700 (PDT)
-Subject: Re: [PATCH 2/3] KVM: x86: cleanup kvm_inject_emulated_page_fault
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     Junaid Shahid <junaids@google.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-References: <20200326093516.24215-1-pbonzini@redhat.com>
- <20200326093516.24215-3-pbonzini@redhat.com>
- <877dz75j4i.fsf@vitty.brq.redhat.com>
+         to:to:cc:cc; bh=IKJXvHsw2viIBMjcPMcNthSEpAPOCGzoH1WTxzpDB7k=;
+        b=FcYx2KNs1tT3NRjtXdPH+l7+1PQKleMS8X8RMUCjQnipORIMn043LOC+PW0bKbjRj0jRWx
+        GgmsLHmZM3tWhgzyFof3H0NkzDJhY3PWNXzF3jZ/AsPNhsXLC7RPqBL4WFkUp0Mk2i20V8
+        NOhyIzriba7sfjzzG4gvzOcOTuHjrGQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-49-0uD2s0BPO4-KlYUbF5eL5A-1; Thu, 26 Mar 2020 16:03:13 -0400
+X-MC-Unique: 0uD2s0BPO4-KlYUbF5eL5A-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C3AE61007268;
+        Thu, 26 Mar 2020 20:03:12 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 4F41B60BF3;
+        Thu, 26 Mar 2020 20:03:12 +0000 (UTC)
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <d2222e81-8618-b3b0-baf3-2bda72d48ede@redhat.com>
-Date:   Thu, 26 Mar 2020 20:45:47 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
-MIME-Version: 1.0
-In-Reply-To: <877dz75j4i.fsf@vitty.brq.redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+To:     torvalds@linux-foundation.org
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: [GIT PULL] KVM fixes for Linux 5.6 final (or -rc8)
+Date:   Thu, 26 Mar 2020 16:03:11 -0400
+Message-Id: <20200326200311.28222-1-pbonzini@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 26/03/20 14:41, Vitaly Kuznetsov wrote:
-> Paolo Bonzini <pbonzini@redhat.com> writes:
-> 
->> To reconstruct the kvm_mmu to be used for page fault injection, we
->> can simply use fault->nested_page_fault.  This matches how
->> fault->nested_page_fault is assigned in the first place by
->> FNAME(walk_addr_generic).
->>
->> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
->> ---
->>  arch/x86/kvm/mmu/mmu.c         | 6 ------
->>  arch/x86/kvm/mmu/paging_tmpl.h | 2 +-
->>  arch/x86/kvm/x86.c             | 7 +++----
->>  3 files changed, 4 insertions(+), 11 deletions(-)
->>
->> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
->> index e26c9a583e75..6250e31ac617 100644
->> --- a/arch/x86/kvm/mmu/mmu.c
->> +++ b/arch/x86/kvm/mmu/mmu.c
->> @@ -4353,12 +4353,6 @@ static unsigned long get_cr3(struct kvm_vcpu *vcpu)
->>  	return kvm_read_cr3(vcpu);
->>  }
->>  
->> -static void inject_page_fault(struct kvm_vcpu *vcpu,
->> -			      struct x86_exception *fault)
->> -{
->> -	vcpu->arch.mmu->inject_page_fault(vcpu, fault);
->> -}
->> -
-> 
-> This is already gone with Sean's "KVM: x86: Consolidate logic for
-> injecting page faults to L1".
-> 
-> It would probably make sense to have a combined series (or a branch on
-> kvm.git) to simplify testing efforts.
+Linus,
 
-Yes, these three patches replace part of Sean's (the patch you mention
-and the next one, "KVM: x86: Sync SPTEs when injecting page/EPT fault
-into L1").
+The following changes since commit 018cabb694e3923998fdc2908af5268f1d89f48f:
 
-I pushed the result to a branch named kvm-tlb-cleanup on kvm.git.
+  Merge branch 'kvm-null-pointer-fix' into kvm-master (2020-03-14 12:49:37 +0100)
 
-Paolo
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
+
+for you to fetch changes up to e1be9ac8e6014a9b0a216aebae7250f9863e9fc3:
+
+  KVM: X86: Narrow down the IPI fastpath to single target IPI (2020-03-26 05:44:21 -0400)
+
+----------------------------------------------------------------
+x86 bug fixes.
+
+----------------------------------------------------------------
+He Zhe (1):
+      KVM: LAPIC: Mark hrtimer for period or oneshot mode to expire in hard interrupt context
+
+Nick Desaulniers (1):
+      KVM: VMX: don't allow memory operands for inline asm that modifies SP
+
+Paolo Bonzini (2):
+      KVM: x86: remove bogus user-triggerable WARN_ON
+      KVM: SVM: document KVM_MEM_ENCRYPT_OP, let userspace detect if SEV is available
+
+Tom Lendacky (1):
+      KVM: SVM: Issue WBINVD after deactivating an SEV guest
+
+Wanpeng Li (2):
+      KVM: LAPIC: Also cancel preemption timer when disarm LAPIC timer
+      KVM: X86: Narrow down the IPI fastpath to single target IPI
+
+ Documentation/virt/kvm/amd-memory-encryption.rst | 25 ++++++++++++++++++++++++
+ arch/x86/kvm/lapic.c                             |  8 +++++++-
+ arch/x86/kvm/svm.c                               | 25 ++++++++++++++++--------
+ arch/x86/kvm/vmx/vmx.c                           |  2 +-
+ arch/x86/kvm/x86.c                               |  6 ++++--
+ 5 files changed, 54 insertions(+), 12 deletions(-)
 
