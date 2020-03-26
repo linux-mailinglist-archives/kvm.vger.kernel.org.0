@@ -2,142 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id ECD78193FF1
-	for <lists+kvm@lfdr.de>; Thu, 26 Mar 2020 14:41:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B851E194092
+	for <lists+kvm@lfdr.de>; Thu, 26 Mar 2020 14:57:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727708AbgCZNlI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 Mar 2020 09:41:08 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:43233 "EHLO
+        id S1727690AbgCZN5Q (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 Mar 2020 09:57:16 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:34810 "EHLO
         us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725994AbgCZNlH (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 26 Mar 2020 09:41:07 -0400
+        by vger.kernel.org with ESMTP id S1726359AbgCZN5Q (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 26 Mar 2020 09:57:16 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1585230066;
+        s=mimecast20190719; t=1585231035;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=oGdFXcuSNv1lFds/DpxLS9JrxVpkM15AF9tzkx4/Jpw=;
-        b=fI5LR61t3VQSe1+0hddr0guNzMnNK8cvRf0PXx97Y/NecbWETohVUJAkdeFH6VWQSlbkF4
-        Q1/Cw+O9Dk+gkPnjnEPm+LPdV7D41LUvItpmle3OkjE3J9WgWp4Qzpe54RyZ9Oa2cYhiEj
-        KXXNSzFkxVgHuW3o1D3mrZUSJ50Y4Q0=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-19-bdDucGl1OxuOIv4KaLxWoQ-1; Thu, 26 Mar 2020 09:41:05 -0400
-X-MC-Unique: bdDucGl1OxuOIv4KaLxWoQ-1
-Received: by mail-wm1-f70.google.com with SMTP id r19so2459449wmg.8
-        for <kvm@vger.kernel.org>; Thu, 26 Mar 2020 06:41:04 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=oGdFXcuSNv1lFds/DpxLS9JrxVpkM15AF9tzkx4/Jpw=;
-        b=eqSjmZtkN+3QZ3GyIjq6NtJkzdF8AnUHvc+TIfK6m3/S3TgHdgY/iLrTAMgxB+CSJs
-         QNJVc1cDiAKWcQZhxyL+F36BA5ac4lfNqetXY0wvuV5377LfDsU758iyEswN5EQviKBQ
-         t4huG/jUEJ8PHnGRvy7m7cHz4R+MUgtww1EzyregaKPQIrvurU1SY1VLr0rnNwBSl0D6
-         VmGR+lK46OQ4vhwyrRhEtG+FJ2Mkk0HUAVxTGAaW+5qXIDtmxG+6lBKFyD+XibldqUkF
-         oHUrLSWdInJzc5CX4L4iIaw7xsHRBx1RNeEeX5fukAivLugkXSGycWiilZ2/+bYoGKjx
-         YIYg==
-X-Gm-Message-State: ANhLgQ0Fiw0kxRrvd5MTr3dc0EF5od1h4NHSbbRK0OYD2AFpLV3PDf1D
-        iaFo0MxuX80DqgPnOriUdE4IsIqL4kL4U0VFGPKBFYl6lL8zbzh8WrSRb8f29EaoI6Gwbci1/Th
-        vRCupcLTAbriG
-X-Received: by 2002:a1c:2404:: with SMTP id k4mr2006wmk.87.1585230063508;
-        Thu, 26 Mar 2020 06:41:03 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vtbbJGmBwGro5wmdPWHJOZmcvHECfDoJz68BZJMx279+d/UfjAoFqC4VUFQQs7980HsVdEJAw==
-X-Received: by 2002:a1c:2404:: with SMTP id k4mr1979wmk.87.1585230063220;
-        Thu, 26 Mar 2020 06:41:03 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id y11sm3755358wrd.65.2020.03.26.06.41.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 Mar 2020 06:41:02 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Junaid Shahid <junaids@google.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH 2/3] KVM: x86: cleanup kvm_inject_emulated_page_fault
-In-Reply-To: <20200326093516.24215-3-pbonzini@redhat.com>
-References: <20200326093516.24215-1-pbonzini@redhat.com> <20200326093516.24215-3-pbonzini@redhat.com>
-Date:   Thu, 26 Mar 2020 14:41:01 +0100
-Message-ID: <877dz75j4i.fsf@vitty.brq.redhat.com>
+        bh=uTy9XzunUpSqneSBWA8G2EaCSTiTKP7tCVW6EiON0Oc=;
+        b=L2p42bnGJWVElHNvl6AAemYAHywKfbRHCaq07e9DxhgvZame76U+t6/pevNU7Xdrh/8B4+
+        7l4Zt2cd2a/SOkeWC1Bn3mlgoLnvw7xCvDQktGva7699/OCeTuwQxF/gR7cvicSUZIYbuc
+        LxrYyG/ssooXVqzzLqKsCeFrlB3Jc2w=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-154-aLmbfdiSP4iuwWm6Alh4Rw-1; Thu, 26 Mar 2020 09:57:12 -0400
+X-MC-Unique: aLmbfdiSP4iuwWm6Alh4Rw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 82830800D50;
+        Thu, 26 Mar 2020 13:57:09 +0000 (UTC)
+Received: from [10.72.12.19] (ovpn-12-19.pek2.redhat.com [10.72.12.19])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id CFE2E60BF3;
+        Thu, 26 Mar 2020 13:56:49 +0000 (UTC)
+Subject: Re: [PATCH V8 9/9] virtio: Intel IFC VF driver for VDPA
+To:     Jason Gunthorpe <jgg@mellanox.com>
+Cc:     mst@redhat.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        maxime.coquelin@redhat.com, cunming.liang@intel.com,
+        zhihong.wang@intel.com, rob.miller@broadcom.com,
+        xiao.w.wang@intel.com, lingshan.zhu@intel.com, eperezma@redhat.com,
+        lulu@redhat.com, parav@mellanox.com, kevin.tian@intel.com,
+        stefanha@redhat.com, rdunlap@infradead.org, hch@infradead.org,
+        aadam@redhat.com, jiri@mellanox.com, shahafs@mellanox.com,
+        hanand@xilinx.com, mhabets@solarflare.com, gdawar@xilinx.com,
+        saugatm@xilinx.com, vmireyno@marvell.com,
+        Bie Tiwei <tiwei.bie@intel.com>
+References: <20200325082711.1107-1-jasowang@redhat.com>
+ <20200325082711.1107-10-jasowang@redhat.com>
+ <20200325123410.GX13183@mellanox.com>
+ <ed04692d-236c-2eee-4429-6ef4d5d165fe@redhat.com>
+ <20200326121705.GJ13183@mellanox.com>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <a03edad7-e1c9-ae2f-5843-d63907289a3f@redhat.com>
+Date:   Thu, 26 Mar 2020 21:56:48 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <20200326121705.GJ13183@mellanox.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
 
-> To reconstruct the kvm_mmu to be used for page fault injection, we
-> can simply use fault->nested_page_fault.  This matches how
-> fault->nested_page_fault is assigned in the first place by
-> FNAME(walk_addr_generic).
+On 2020/3/26 =E4=B8=8B=E5=8D=888:17, Jason Gunthorpe wrote:
+> On Thu, Mar 26, 2020 at 01:50:53PM +0800, Jason Wang wrote:
 >
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  arch/x86/kvm/mmu/mmu.c         | 6 ------
->  arch/x86/kvm/mmu/paging_tmpl.h | 2 +-
->  arch/x86/kvm/x86.c             | 7 +++----
->  3 files changed, 4 insertions(+), 11 deletions(-)
+>>>> +	adapter->vdpa.dma_dev =3D dev;
+>>>> +	ret =3D vdpa_register_device(&adapter->vdpa);
+>>>> +	if (ret) {
+>>>> +		IFCVF_ERR(adapter->dev, "Failed to register ifcvf to vdpa bus");
+>>>> +		goto err_msix;
+>>>> +	}
+>>>> +
+>>>> +	return 0;
+>>>> +
+>>>> +err_msix:
+>>>> +	put_device(&adapter->vdpa.dev);
+>>>> +	return ret;
+>>>> +err_alloc:
+>>>> +	pci_free_irq_vectors(pdev);
+>>>> +err_vectors:
+>>>> +	pci_release_regions(pdev);
+>>>> +err_regions:
+>>>> +	pci_disable_device(pdev);
+>>>> +err_enable:
+>>>> +	return ret;
+>>>> +}
+>>> I personally don't like seeing goto unwinds with multiple returns, an=
+d
+>>> here I think it is actually a tiny bug.
+>>>
+>>> All touches to the PCI device must stop before the driver core
+>>> remove() returns - so these pci function cannot be in the kref put
+>>> release function anyhow.
+>>
+>> I'm not sure I get here. IFCVF held refcnt of its PCI parent, so it lo=
+oks to
+>> me it's safe to free PCI resources in vDPA free callback?
+> The refcnt doesn't prevent the driver core from re-binding the
+> pci_device to another driver. Then the refcount put would do a
+> pci_disable_device() after another driver has started
 >
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index e26c9a583e75..6250e31ac617 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -4353,12 +4353,6 @@ static unsigned long get_cr3(struct kvm_vcpu *vcpu)
->  	return kvm_read_cr3(vcpu);
->  }
->  
-> -static void inject_page_fault(struct kvm_vcpu *vcpu,
-> -			      struct x86_exception *fault)
-> -{
-> -	vcpu->arch.mmu->inject_page_fault(vcpu, fault);
-> -}
-> -
+> For this reason all touches to a struct pci_device must stop before
+> remove returns.
+>
+> Jason
 
-This is already gone with Sean's "KVM: x86: Consolidate logic for
-injecting page faults to L1".
 
-It would probably make sense to have a combined series (or a branch on
-kvm.git) to simplify testing efforts.
+Ok, will send a new version shortly.
 
->  static bool sync_mmio_spte(struct kvm_vcpu *vcpu, u64 *sptep, gfn_t gfn,
->  			   unsigned int access, int *nr_present)
->  {
-> diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
-> index 1ddbfff64ccc..ae646acf6703 100644
-> --- a/arch/x86/kvm/mmu/paging_tmpl.h
-> +++ b/arch/x86/kvm/mmu/paging_tmpl.h
-> @@ -812,7 +812,7 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, gpa_t addr, u32 error_code,
->  	if (!r) {
->  		pgprintk("%s: guest page fault\n", __func__);
->  		if (!prefault)
-> -			inject_page_fault(vcpu, &walker.fault);
-> +			kvm_inject_emulated_page_fault(vcpu, &walker.fault);
->  
->  		return RET_PF_RETRY;
->  	}
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 64ed6e6e2b56..522905523bf0 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -614,12 +614,11 @@ EXPORT_SYMBOL_GPL(kvm_inject_page_fault);
->  bool kvm_inject_emulated_page_fault(struct kvm_vcpu *vcpu,
->  				    struct x86_exception *fault)
->  {
-> +	struct kvm_mmu *fault_mmu;
->  	WARN_ON_ONCE(fault->vector != PF_VECTOR);
->  
-> -	if (mmu_is_nested(vcpu) && !fault->nested_page_fault)
-> -		vcpu->arch.nested_mmu.inject_page_fault(vcpu, fault);
-> -	else
-> -		vcpu->arch.mmu->inject_page_fault(vcpu, fault);
-> +	fault_mmu = fault->nested_page_fault ? vcpu->arch.mmu : vcpu->arch.walk_mmu;
-> +	fault_mmu->inject_page_fault(vcpu, fault);
->  
->  	return fault->nested_page_fault;
->  }
+Thanks
 
--- 
-Vitaly
+
+>
 
