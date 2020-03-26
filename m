@@ -2,197 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 50F2D194400
-	for <lists+kvm@lfdr.de>; Thu, 26 Mar 2020 17:07:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BA9A9194534
+	for <lists+kvm@lfdr.de>; Thu, 26 Mar 2020 18:16:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728495AbgCZQHh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 Mar 2020 12:07:37 -0400
-Received: from mga18.intel.com ([134.134.136.126]:30493 "EHLO mga18.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726296AbgCZQHh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 Mar 2020 12:07:37 -0400
-IronPort-SDR: FGBz2xMdMIi+o/OCF5qQySPSeZ12Gg8g3cRRzWIL73yfO7JzcX6ze28KenGVvCk3/iCGD6KS0B
- Srmhc1ms8Alw==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Mar 2020 09:07:14 -0700
-IronPort-SDR: 60DD6ASrQKnWWSECPVfEjeSbkN5gTk45rYzmuNG77KnGiv+UN8YRKtQ5Dvi3vOf2aRMLVgoo4/
- Iv+gAKAm3bpA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.72,309,1580803200"; 
-   d="scan'208";a="358191585"
-Received: from sjchrist-coffee.jf.intel.com ([10.54.74.202])
-  by fmsmga001.fm.intel.com with ESMTP; 26 Mar 2020 09:07:14 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH] KVM: VMX: Add a trampoline to fix VMREAD error handling
-Date:   Thu, 26 Mar 2020 09:07:12 -0700
-Message-Id: <20200326160712.28803-1-sean.j.christopherson@intel.com>
-X-Mailer: git-send-email 2.24.1
+        id S1727779AbgCZRQm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 Mar 2020 13:16:42 -0400
+Received: from mail-ed1-f65.google.com ([209.85.208.65]:39038 "EHLO
+        mail-ed1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726163AbgCZRQm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 Mar 2020 13:16:42 -0400
+Received: by mail-ed1-f65.google.com with SMTP id a43so7756210edf.6
+        for <kvm@vger.kernel.org>; Thu, 26 Mar 2020 10:16:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=h4Bafici+74bpF8/r43zm3/RopJlj6eRGLXVN/i+YAg=;
+        b=qUQfHuNsWF6kO67FxUkLRz1M4ZFMCKjyrWxyDnE7r/Isct3HcfF2g8z3i2KR9arNjt
+         CpgVwwczRA74FnXG3R3V+Hc2blucW5GbCvG+HrpFYo+QoZCHfeiK9V6IdZVKknJo68Pb
+         9i5FIhLcGzaNgey/mIOBGYk9eTRDHwtDC6GPXK6X9xQ1rVgoqc6mXnE3COOJdA0rv5gU
+         WSpd9l7bOT1awZi7+RyWXmvYEILyBN2Z81CgGIi3HUSg5t0osLBoVMZmFHuIeeDXUyiW
+         rH36ZQBdOuD4rMKMdkbjXJHaVhbd1zEwiRTJxinPePp+a0pAeFzTSoA28ae1PjM9mBvc
+         eR8A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=h4Bafici+74bpF8/r43zm3/RopJlj6eRGLXVN/i+YAg=;
+        b=a3pJdoe1Pmk9Um9bA3I6fWNIH414ErTa3ka79k+M4HmQfpHQRxRGHXsEXEDp95tNc4
+         PKDzZ1lPCfZelbSE0zxi1uwzOdEbbmBkX7geqrNAr8GQ5QylGICryMN15N6i7vKHrn5V
+         wfwRx5pM7dAHQcyUaFkIQ2wgxYoPWrDZSgkjsko8zsxG5xekyrAfnv5a8Q2sxbz66N0+
+         GTMlbZAiArteGMjhoNOscZ/wpaRs0JtcWKDJrIeZW0vkkqu1LLLkAxODQJGU8j3npkxW
+         LRXHNeMzpVxGQ5m+II3r1EOTucA2ibx29V9b+/LXrcANUxfr9QmS0ETrq0M9hweBPVxE
+         c1qg==
+X-Gm-Message-State: ANhLgQ2YYmMj9A27U9uB4Y2AUPqHWFPaXKiB2aO5n7ap8hmbb3T1T/8A
+        UPLYTDXF1VeXaYLViqSiZ0uvpm3Ft12/8VPvO8O1vg==
+X-Google-Smtp-Source: ADFU+vvXOq3qtuPx24TK/wg4PIU6jSvq4+J/DaUbhlRxbosamCkpUbgMonGFEWLs123uOLU63ziMY8FIUgjT8Nr5Itc=
+X-Received: by 2002:a50:8d02:: with SMTP id s2mr9395936eds.81.1585242999701;
+ Thu, 26 Mar 2020 10:16:39 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20200320175910.180266-1-yonghyun@google.com> <20200323111404.GA4554@infradead.org>
+ <CAEauFbww3X2WZuOvMbnhOD2ONBjqR-JS2BrxWPO=HqzXVcKakw@mail.gmail.com> <20200326093807.GB12078@infradead.org>
+In-Reply-To: <20200326093807.GB12078@infradead.org>
+From:   Yonghyun Hwang <yonghyun@google.com>
+Date:   Thu, 26 Mar 2020 10:16:26 -0700
+Message-ID: <CAEauFbz_ACeQtn-=fmyhcrh4Ljctuij=3t908qjo_nehwKbXXQ@mail.gmail.com>
+Subject: Re: [PATCH] vfio-mdev: support mediated device creation in kernel
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Kirti Wankhede <kwankhede@nvidia.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Havard Skinnemoen <hskinnemoen@google.com>,
+        Moritz Fischer <mdf@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add a hand coded assembly trampoline to preserve volatile registers
-across vmread_error(), and to handle the calling convention differences
-between 64-bit and 32-bit due to asmlinkage on vmread_error().  Pass
-@field and @fault on the stack when invoking the trampoline to avoid
-clobbering volatile registers in the context of the inline assembly.
+On Thu, Mar 26, 2020 at 2:38 AM Christoph Hellwig <hch@infradead.org> wrote:
+>
+> On Mon, Mar 23, 2020 at 02:33:11PM -0700, Yonghyun Hwang wrote:
+> > On Mon, Mar 23, 2020 at 4:14 AM Christoph Hellwig <hch@infradead.org> wrote:
+> > >
+> > > On Fri, Mar 20, 2020 at 10:59:10AM -0700, Yonghyun Hwang wrote:
+> > > > To enable a mediated device, a device driver registers its device to VFIO
+> > > > MDev framework. Once the mediated device gets enabled, UUID gets fed onto
+> > > > the sysfs attribute, "create", to create the mediated device. This
+> > > > additional step happens after boot-up gets complete. If the driver knows
+> > > > how many mediated devices need to be created during probing time, the
+> > > > additional step becomes cumbersome. This commit implements a new function
+> > > > to allow the driver to create a mediated device in kernel.
+> > >
+> > > Please send this along with your proposed user so that we can understand
+> > > the use.  Without that new exports have no chance of going in anyway.
+> >
+> > My driver is still under development. Do you recommend me to implement
+> > an example code for the new exports and re-submit the commit?
+>
+> Hell no.  The point is that we don't add new APIs unless we have
+> actual users (not example code!).  And as Alex mentioned the use case
+> is rather questionable anyway, so without a user that actually shows a
+> good use case which would remove those doubts it is a complete no-go.
 
-Calling vmread_error() directly from inline assembly is partially broken
-on 64-bit, and completely broken on 32-bit.  On 64-bit, it will clobber
-%rdi and %rsi (used to pass @field and @fault) and any volatile regs
-written by vmread_error().  On 32-bit, asmlinkage means vmread_error()
-expects the parameters to be passed on the stack, not via regs.
-
-Opportunistically zero out the result in the trampoline to save a few
-bytes of code for every VMREAD.  A happy side effect of the trampoline
-is that the inline code footprint is reduced by three bytes on 64-bit
-due to PUSH/POP being more efficent (in terms of opcode bytes) than MOV.
-
-Fixes: 6e2020977e3e6 ("KVM: VMX: Add error handling to VMREAD helper")
-Cc: stable@vger.kernel.org
-Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
----
-
-Becuase there just isn't enough custom assembly in VMX :-)
-
-Simply reverting isn't a great option because we'd lose error reporting
-for VMREAD failure, i.e. it'd return garbage with no other indication that
-something went awry.
-
-Tested all paths (fail, fault w/o rebooting, fault w/ rebooting) on both
-64-bit and 32-bit.
-
- arch/x86/kvm/vmx/ops.h     | 28 +++++++++++++-----
- arch/x86/kvm/vmx/vmenter.S | 58 ++++++++++++++++++++++++++++++++++++++
- 2 files changed, 79 insertions(+), 7 deletions(-)
-
-diff --git a/arch/x86/kvm/vmx/ops.h b/arch/x86/kvm/vmx/ops.h
-index 45eaedee2ac0..09b0937d56b1 100644
---- a/arch/x86/kvm/vmx/ops.h
-+++ b/arch/x86/kvm/vmx/ops.h
-@@ -12,7 +12,8 @@
- 
- #define __ex(x) __kvm_handle_fault_on_reboot(x)
- 
--asmlinkage void vmread_error(unsigned long field, bool fault);
-+__attribute__((regparm(0))) void vmread_error_trampoline(unsigned long field,
-+							 bool fault);
- void vmwrite_error(unsigned long field, unsigned long value);
- void vmclear_error(struct vmcs *vmcs, u64 phys_addr);
- void vmptrld_error(struct vmcs *vmcs, u64 phys_addr);
-@@ -70,15 +71,28 @@ static __always_inline unsigned long __vmcs_readl(unsigned long field)
- 	asm volatile("1: vmread %2, %1\n\t"
- 		     ".byte 0x3e\n\t" /* branch taken hint */
- 		     "ja 3f\n\t"
--		     "mov %2, %%" _ASM_ARG1 "\n\t"
--		     "xor %%" _ASM_ARG2 ", %%" _ASM_ARG2 "\n\t"
--		     "2: call vmread_error\n\t"
--		     "xor %k1, %k1\n\t"
-+
-+		     /*
-+		      * VMREAD failed.  Push '0' for @fault, push the failing
-+		      * @field, and bounce through the trampoline to preserve
-+		      * volatile registers.
-+		      */
-+		     "push $0\n\t"
-+		     "push %2\n\t"
-+		     "2:call vmread_error_trampoline\n\t"
-+
-+		     /*
-+		      * Unwind the stack.  Note, the trampoline zeros out the
-+		      * memory for @fault so that the result is '0' on error.
-+		      */
-+		     "pop %2\n\t"
-+		     "pop %1\n\t"
- 		     "3:\n\t"
- 
-+		     /* VMREAD faulted.  As above, except push '1' for @fault. */
- 		     ".pushsection .fixup, \"ax\"\n\t"
--		     "4: mov %2, %%" _ASM_ARG1 "\n\t"
--		     "mov $1, %%" _ASM_ARG2 "\n\t"
-+		     "4: push $1\n\t"
-+		     "push %2\n\t"
- 		     "jmp 2b\n\t"
- 		     ".popsection\n\t"
- 		     _ASM_EXTABLE(1b, 4b)
-diff --git a/arch/x86/kvm/vmx/vmenter.S b/arch/x86/kvm/vmx/vmenter.S
-index 81ada2ce99e7..861ae40e7144 100644
---- a/arch/x86/kvm/vmx/vmenter.S
-+++ b/arch/x86/kvm/vmx/vmenter.S
-@@ -234,3 +234,61 @@ SYM_FUNC_START(__vmx_vcpu_run)
- 2:	mov $1, %eax
- 	jmp 1b
- SYM_FUNC_END(__vmx_vcpu_run)
-+
-+/**
-+ * vmread_error_trampoline - Trampoline from inline asm to vmread_error()
-+ * @field:	VMCS field encoding that failed
-+ * @fault:	%true if the VMREAD faulted, %false if it failed
-+
-+ * Save and restore volatile registers across a call to vmread_error().  Note,
-+ * all parameters are passed on the stack.
-+ */
-+SYM_FUNC_START(vmread_error_trampoline)
-+	push %_ASM_BP
-+	mov  %_ASM_SP, %_ASM_BP
-+
-+	push %_ASM_AX
-+	push %_ASM_CX
-+	push %_ASM_DX
-+#ifdef CONFIG_X86_64
-+	push %rdi
-+	push %rsi
-+	push %r8
-+	push %r9
-+	push %r10
-+	push %r11
-+#endif
-+#ifdef CONFIG_X86_64
-+	/* Load @field and @fault to arg1 and arg2 respectively. */
-+	mov 3*WORD_SIZE(%rbp), %_ASM_ARG2
-+	mov 2*WORD_SIZE(%rbp), %_ASM_ARG1
-+#else
-+	/* Parameters are passed on the stack for 32-bit (see asmlinkage). */
-+	push 3*WORD_SIZE(%ebp)
-+	push 2*WORD_SIZE(%ebp)
-+#endif
-+
-+	call vmread_error
-+
-+#ifndef CONFIG_X86_64
-+	add $8, %esp
-+#endif
-+
-+	/* Zero out @fault, which will be popped into the result register. */
-+	_ASM_MOV $0, 3*WORD_SIZE(%_ASM_BP)
-+
-+#ifdef CONFIG_X86_64
-+	pop %r11
-+	pop %r10
-+	pop %r9
-+	pop %r8
-+	pop %rsi
-+	pop %rdi
-+#endif
-+	pop %_ASM_DX
-+	pop %_ASM_CX
-+	pop %_ASM_AX
-+	pop %_ASM_BP
-+
-+	ret
-+SYM_FUNC_END(vmread_error_trampoline)
--- 
-2.24.1
-
+I see. Thank you for your clarification. (I got confused with the use
+case.) I hope you can understand email communication results in some
+confusion from time to time, which is especially true for kernel
+newbie like me.
