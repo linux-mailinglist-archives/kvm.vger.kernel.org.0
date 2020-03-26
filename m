@@ -2,108 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E39381936ED
-	for <lists+kvm@lfdr.de>; Thu, 26 Mar 2020 04:27:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C36B01937F3
+	for <lists+kvm@lfdr.de>; Thu, 26 Mar 2020 06:41:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727703AbgCZD1d (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Mar 2020 23:27:33 -0400
-Received: from ozlabs.org ([203.11.71.1]:40923 "EHLO ozlabs.org"
+        id S1725994AbgCZFlj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 Mar 2020 01:41:39 -0400
+Received: from mga14.intel.com ([192.55.52.115]:26877 "EHLO mga14.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727612AbgCZD1d (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 Mar 2020 23:27:33 -0400
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 48nr5Z0XdJz9sSH;
-        Thu, 26 Mar 2020 14:27:30 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=canb.auug.org.au;
-        s=201702; t=1585193250;
-        bh=ZKW7qcECKhZTwsefzZv3KK0kIUy8HwxrSNINue5nCKs=;
-        h=Date:From:To:Cc:Subject:From;
-        b=c+9UbtkwAW96p6Br+QzTYW/T3AyEVUODTofZrCm+Oi/BqcS9TH4rVDEiSjp8pm8o9
-         QEYb7n637GWve85Hp9VM47n9U53DdxkvtvnF2FvzWOivdVbmo5P2WygjIwnBTdsfd3
-         nZ42XDPTVdTBLiISrip/t0ZF0gYQxHYOJ6KmMBz9vT2Na3gXbmfv9fLG7QjTImzei8
-         1p6xBOoneIYOfwGx/g92bMlxQ+DXrMxY/eL0A7gzM6ECbZeOEFawSDhrRHwXcp9G5N
-         TgxK6zi+TixVFKl0q7U2oKzyrrKFtRcp2lRjfOllDZM2EedTmjQzsorYzN3XUKrCqm
-         QLzY+A7TgYlDQ==
-Date:   Thu, 26 Mar 2020 14:27:27 +1100
-From:   Stephen Rothwell <sfr@canb.auug.org.au>
-To:     Paolo Bonzini <pbonzini@redhat.com>, KVM <kvm@vger.kernel.org>,
-        Greg KH <greg@kroah.com>
-Cc:     Linux Next Mailing List <linux-next@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        Andrew Jones <drjones@redhat.com>
-Subject: linux-next: manual merge of the kvm tree with the spdx tree
-Message-ID: <20200326142727.6991104f@canb.auug.org.au>
+        id S1725819AbgCZFlj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 Mar 2020 01:41:39 -0400
+IronPort-SDR: VkQ2H+db0R4LyOFfZ/soR/arVFijvxviNa7C1ODALIVzDycN8OaFSWC4Wdp2Y2RAu2rLyeX0jm
+ rfS87PNPvUkA==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Mar 2020 22:41:39 -0700
+IronPort-SDR: wlkSnlxSudaj/8BAa5WVuoRT5YAw4yX+qM4Qc4Rki61dQfKy2m6Fp3S+2CCwZEt9nEh80jYizl
+ ImBFeDDycoew==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.72,307,1580803200"; 
+   d="scan'208";a="393862301"
+Received: from zhaji-mobl3.ccr.corp.intel.com (HELO dell-xps.ccr.corp.intel.com) ([10.249.174.174])
+  by orsmga004.jf.intel.com with ESMTP; 25 Mar 2020 22:41:37 -0700
+From:   Zhenyu Wang <zhenyuw@linux.intel.com>
+To:     alex.williamson@redhat.com
+Cc:     kvm@vger.kernel.org, kevin.tian@intel.com,
+        intel-gvt-dev@lists.freedesktop.org
+Subject: [PATCH v2 0/2] VFIO mdev aggregated resources handling
+Date:   Thu, 26 Mar 2020 13:41:34 +0800
+Message-Id: <20200326054136.2543-1-zhenyuw@linux.intel.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/VtZ6W2G_3YXyJV6tZQUt48y";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
---Sig_/VtZ6W2G_3YXyJV6tZQUt48y
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Hi,
 
-Hi all,
+This is a refresh on previous series: https://patchwork.kernel.org/cover/11208279/
+and https://patchwork.freedesktop.org/series/70425/
 
-Today's linux-next merge of the kvm tree got a conflict in:
+Current mdev device create interface depends on fixed mdev type, which
+get uuid from user to create instance of mdev device. If user wants to
+use customized number of resource for mdev device, then only can
+create new mdev type for that which may not be flexible. This
+requirement comes not only from to be able to allocate flexible
+resources for KVMGT, but also from Intel scalable IO virtualization
+which would use vfio/mdev to be able to allocate arbitrary resources
+on mdev instance. More info on [1] [2] [3].
 
-  tools/testing/selftests/kvm/.gitignore
+As we agreed that for current opaque mdev device type, we'd still
+explore management interface based on mdev sysfs definition. And this
+one tries to follow Alex's previous suggestion to create generic
+parameters under 'mdev' directory for each device, so vendor driver
+could provide support like as other defined mdev sysfs entries.
 
-between commit:
+For mdev type with aggregation support, files as "aggregated_instances"
+and "max_aggregation" should be created under 'mdev' directory. E.g
 
-  d198b34f3855 (".gitignore: add SPDX License Identifier")
+/sys/devices/pci0000:00/0000:00:02.0/<UUID>/mdev/
+   |-- aggregated_instances
+   |-- max_aggregation
 
-from the spdx tree and commit:
+"aggregated_instances" is used to set or return current number of
+instances for aggregation, which can not be larger than "max_aggregation".
 
-  1914f624f5e3 ("selftests: KVM: SVM: Add vmcall test to gitignore")
+The first patch is to update the document for new mdev parameter directory.
+The second one is to add aggregation support in GVT driver.
 
-from the kvm tree.
+References:
+[1] https://software.intel.com/en-us/download/intel-virtualization-technology-for-directed-io-architecture-specification
+[2] https://software.intel.com/en-us/download/intel-scalable-io-virtualization-technical-specification
+[3] https://schd.ws/hosted_files/lc32018/00/LC3-SIOV-final.pdf
 
-I fixed it up (see below) and can carry the fix as necessary. This
-is now fixed as far as linux-next is concerned, but any non trivial
-conflicts should be mentioned to your upstream maintainer when your tree
-is submitted for merging.  You may also want to consider cooperating
-with the maintainer of the conflicting tree to minimise any particularly
-complex conflicts.
+Zhenyu Wang (2):
+  Documentation/driver-api/vfio-mediated-device.rst: update for
+    aggregation support
+  drm/i915/gvt: mdev aggregation type
 
---=20
-Cheers,
-Stephen Rothwell
+ .../driver-api/vfio-mediated-device.rst       |  19 ++
+ drivers/gpu/drm/i915/gvt/aperture_gm.c        |  44 +++--
+ drivers/gpu/drm/i915/gvt/gtt.c                |   9 +-
+ drivers/gpu/drm/i915/gvt/gvt.c                |   7 +-
+ drivers/gpu/drm/i915/gvt/gvt.h                |  42 +++--
+ drivers/gpu/drm/i915/gvt/kvmgt.c              | 115 +++++++++++-
+ drivers/gpu/drm/i915/gvt/vgpu.c               | 172 ++++++++++++------
+ 7 files changed, 314 insertions(+), 94 deletions(-)
 
-diff --cc tools/testing/selftests/kvm/.gitignore
-index 2f85dc944fbd,16877c3daabf..000000000000
---- a/tools/testing/selftests/kvm/.gitignore
-+++ b/tools/testing/selftests/kvm/.gitignore
-@@@ -1,6 -1,6 +1,7 @@@
- +# SPDX-License-Identifier: GPL-2.0-only
-- /s390x/sync_regs_test
-  /s390x/memop
-+ /s390x/resets
-+ /s390x/sync_regs_test
-  /x86_64/cr4_cpuid_sync_test
-  /x86_64/evmcs_test
-  /x86_64/hyperv_cpuid
+-- 
+2.25.1
 
---Sig_/VtZ6W2G_3YXyJV6tZQUt48y
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAl58IR8ACgkQAVBC80lX
-0GwFSwf9Hl5x/JggSMeSvHGQsBqJIqanz2n818jJh/abF0ssh8XqI2Laz1iJD/4D
-EEKEhVSpZeDAFKseL5KC/xAi+lP5mRyrOirK0EolG+mPYDuyvGZnRferP9BITvgL
-Fb6ZNh0YZwp+P13hmU/r50goHdyt7KMrIp6CXLJkMBEq/8AM+QurePpFlx5K/PDR
-KGjgj+2Rt34hdpV95CFaV4KZ9LNaZigS44HOPA31qlecEQnhAljjk2s0jqwrz+Gi
-HEyuWAtz01IVkZFMmZAGG9gBsjyEPtRITnW0jzrkWuVFpIoTKg7iVb5HoMbXA+S/
-k3tdvYfZXMz4t3cGbKdYegDQV7i+KA==
-=5Cf/
------END PGP SIGNATURE-----
-
---Sig_/VtZ6W2G_3YXyJV6tZQUt48y--
