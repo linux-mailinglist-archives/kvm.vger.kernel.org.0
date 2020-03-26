@@ -2,29 +2,29 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4E34519431D
-	for <lists+kvm@lfdr.de>; Thu, 26 Mar 2020 16:25:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3FE4A194315
+	for <lists+kvm@lfdr.de>; Thu, 26 Mar 2020 16:25:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728421AbgCZPZX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        id S1728513AbgCZPZX (ORCPT <rfc822;lists+kvm@lfdr.de>);
         Thu, 26 Mar 2020 11:25:23 -0400
-Received: from foss.arm.com ([217.140.110.172]:33882 "EHLO foss.arm.com"
+Received: from foss.arm.com ([217.140.110.172]:33890 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728495AbgCZPZV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 Mar 2020 11:25:21 -0400
+        id S1728466AbgCZPZX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 Mar 2020 11:25:23 -0400
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 963841045;
-        Thu, 26 Mar 2020 08:25:21 -0700 (PDT)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B093F7FA;
+        Thu, 26 Mar 2020 08:25:22 -0700 (PDT)
 Received: from e123195-lin.cambridge.arm.com (e123195-lin.cambridge.arm.com [10.1.196.63])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id AF1FA3F71E;
-        Thu, 26 Mar 2020 08:25:20 -0700 (PDT)
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id C9A183F71E;
+        Thu, 26 Mar 2020 08:25:21 -0700 (PDT)
 From:   Alexandru Elisei <alexandru.elisei@arm.com>
 To:     kvm@vger.kernel.org
 Cc:     will@kernel.org, julien.thierry.kdev@gmail.com,
         andre.przywara@arm.com, sami.mujawar@arm.com,
         lorenzo.pieralisi@arm.com
-Subject: [PATCH v3 kvmtool 24/32] pci: Limit configuration transaction size to 32 bits
-Date:   Thu, 26 Mar 2020 15:24:30 +0000
-Message-Id: <20200326152438.6218-25-alexandru.elisei@arm.com>
+Subject: [PATCH v3 kvmtool 25/32] vfio/pci: Don't write configuration value twice
+Date:   Thu, 26 Mar 2020 15:24:31 +0000
+Message-Id: <20200326152438.6218-26-alexandru.elisei@arm.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200326152438.6218-1-alexandru.elisei@arm.com>
 References: <20200326152438.6218-1-alexandru.elisei@arm.com>
@@ -35,56 +35,44 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From PCI Local Bus Specification Revision 3.0. section 3.8 "64-Bit Bus
-Extension":
+After writing to the device fd as part of the PCI configuration space
+emulation, we read back from the device to make sure that the write
+finished. The value is read back into the PCI configuration space and
+afterwards, the same value is copied by the PCI emulation code. Let's
+read from the device fd into a temporary variable, to prevent this
+double write.
 
-"The bandwidth requirements for I/O and configuration transactions cannot
-justify the added complexity, and, therefore, only memory transactions
-support 64-bit data transfers".
-
-Further down, the spec also describes the possible responses of a target
-which has been requested to do a 64-bit transaction. Limit the transaction
-to the lower 32 bits, to match the second accepted behaviour.
+The double write is harmless in itself. But when we implement
+reassignable BARs, we need to keep track of the old BAR value, and the
+VFIO code is overwritting it.
 
 Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 ---
- pci.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ vfio/pci.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/pci.c b/pci.c
-index 7399c76c0819..611e2c0bf1da 100644
---- a/pci.c
-+++ b/pci.c
-@@ -119,6 +119,9 @@ static bool pci_config_data_out(struct ioport *ioport, struct kvm_cpu *vcpu, u16
- {
- 	union pci_config_address pci_config_address;
+diff --git a/vfio/pci.c b/vfio/pci.c
+index fe02574390f6..8b2a0c8dbac3 100644
+--- a/vfio/pci.c
++++ b/vfio/pci.c
+@@ -470,7 +470,7 @@ static void vfio_pci_cfg_write(struct kvm *kvm, struct pci_device_header *pci_hd
+ 	struct vfio_region_info *info;
+ 	struct vfio_pci_device *pdev;
+ 	struct vfio_device *vdev;
+-	void *base = pci_hdr;
++	u32 tmp;
  
-+	if (size > 4)
-+		size = 4;
-+
- 	pci_config_address.w = ioport__read32(&pci_config_address_bits);
- 	/*
- 	 * If someone accesses PCI configuration space offsets that are not
-@@ -135,6 +138,9 @@ static bool pci_config_data_in(struct ioport *ioport, struct kvm_cpu *vcpu, u16
- {
- 	union pci_config_address pci_config_address;
+ 	if (offset == PCI_ROM_ADDRESS)
+ 		return;
+@@ -490,7 +490,7 @@ static void vfio_pci_cfg_write(struct kvm *kvm, struct pci_device_header *pci_hd
+ 	if (pdev->irq_modes & VFIO_PCI_IRQ_MODE_MSI)
+ 		vfio_pci_msi_cap_write(kvm, vdev, offset, data, sz);
  
-+	if (size > 4)
-+		size = 4;
-+
- 	pci_config_address.w = ioport__read32(&pci_config_address_bits);
- 	/*
- 	 * If someone accesses PCI configuration space offsets that are not
-@@ -248,6 +254,9 @@ static void pci_config_mmio_access(struct kvm_cpu *vcpu, u64 addr, u8 *data,
- 	cfg_addr.w		= (u32)addr;
- 	cfg_addr.enable_bit	= 1;
- 
-+	if (len > 4)
-+		len = 4;
-+
- 	if (is_write)
- 		pci__config_wr(kvm, cfg_addr, data, len);
- 	else
+-	if (pread(vdev->fd, base + offset, sz, info->offset + offset) != sz)
++	if (pread(vdev->fd, &tmp, sz, info->offset + offset) != sz)
+ 		vfio_dev_warn(vdev, "Failed to read %d bytes from Configuration Space at 0x%x",
+ 			      sz, offset);
+ }
 -- 
 2.20.1
 
