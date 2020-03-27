@@ -2,107 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id DF8B01953E2
-	for <lists+kvm@lfdr.de>; Fri, 27 Mar 2020 10:24:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2BC611953EE
+	for <lists+kvm@lfdr.de>; Fri, 27 Mar 2020 10:27:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726284AbgC0JYF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Mar 2020 05:24:05 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:48630 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726002AbgC0JYF (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 27 Mar 2020 05:24:05 -0400
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 02R93QLJ097759;
-        Fri, 27 Mar 2020 05:24:04 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2ywd2v2pgx-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 27 Mar 2020 05:24:03 -0400
-Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 02R93sIM099089;
-        Fri, 27 Mar 2020 05:24:03 -0400
-Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2ywd2v2pgr-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 27 Mar 2020 05:24:03 -0400
-Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
-        by ppma01dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 02R9NIdj028461;
-        Fri, 27 Mar 2020 09:24:02 GMT
-Received: from b03cxnp08025.gho.boulder.ibm.com (b03cxnp08025.gho.boulder.ibm.com [9.17.130.17])
-        by ppma01dal.us.ibm.com with ESMTP id 2ywawmnbjv-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 27 Mar 2020 09:24:02 +0000
-Received: from b03ledav003.gho.boulder.ibm.com (b03ledav003.gho.boulder.ibm.com [9.17.130.234])
-        by b03cxnp08025.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 02R9NxTW55312846
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 27 Mar 2020 09:23:59 GMT
-Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id BAAD66A04D;
-        Fri, 27 Mar 2020 09:23:59 +0000 (GMT)
-Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 176BB6A04F;
-        Fri, 27 Mar 2020 09:23:59 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.114.17.106])
-        by b03ledav003.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Fri, 27 Mar 2020 09:23:58 +0000 (GMT)
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
-To:     Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.vnet.ibm.com>
-Cc:     KVM <kvm@vger.kernel.org>, David Hildenbrand <david@redhat.com>,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Heiko Carstens <heiko.carstens@de.ibm.com>
-Subject: [PATCH v2] s390/gmap: return proper error code on ksm unsharing
-Date:   Fri, 27 Mar 2020 05:23:56 -0400
-Message-Id: <20200327092356.25171-1-borntraeger@de.ibm.com>
-X-Mailer: git-send-email 2.25.1
+        id S1727125AbgC0J1S (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Mar 2020 05:27:18 -0400
+Received: from mail-oi1-f195.google.com ([209.85.167.195]:33336 "EHLO
+        mail-oi1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725946AbgC0J1Q (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 Mar 2020 05:27:16 -0400
+Received: by mail-oi1-f195.google.com with SMTP id m14so8251306oic.0;
+        Fri, 27 Mar 2020 02:27:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=mxJM5ZIhu7LpQ+5NV71sEjP70ux0ckHNNXazRf9xK2k=;
+        b=qclDenfHJNoe/IbZxPSfOepV1+OSvwFv2zwQd92O5HAfGOLqhoZDmdC5cKQ6tXtqDv
+         r9aF7m/wkriX8p0dI89Uj+oZ8xKuoXjKxkU0F02iKIfpjNBbI2cEKtNlVXfF9FugLVIA
+         ljpmEwXZzTrVQoLu/Xz37CPdnQqa+oku+v97n+FYIp6SkRhYY0bBq4R94hUB54htYP4m
+         9mHCZNoZ0F7DYNIbD3bC9N123yuXzAYbIM363NlRJrMmzlzyKQY3681J6v10P5h6FWyg
+         hGVbwkP6yhbRQSmLujKhFYgSg2bPcyvcwzonjl6bjmW0VCzoMzhO7KgXeKSDy8ffmKzp
+         Y50g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=mxJM5ZIhu7LpQ+5NV71sEjP70ux0ckHNNXazRf9xK2k=;
+        b=jvOXCowtkcJH4ecJ4eA8ZRIyxjmdagvlzLILJjFdDygefbf59JuXRbwlJ36eMFPIGq
+         QoARUIIR6Zo2sbxunBXtqUpBfVAWYzaCoiIQPnTnSShlQqhq+FqyW2+hYEu80k7KrzD6
+         s9ZW/IOjLrvvbAGd4ABb0ta4uenPMOwFa01vv7vXnokNBjXRkOqJKgvpa0+SAWX7KAhm
+         gmAJNQOqV89lTwSnYRQNpGgImkIEJdyhmspBUTTIxddJUAY5fwP7fiKT+QQKp5kQMYsL
+         alUArc8/MLzWk+0LDySlIxa/RcmFKfeaD8DaN/FdDFPJ0Fi9aFzerR5MxejmLFJ7jt2n
+         662Q==
+X-Gm-Message-State: ANhLgQ37qFsgPrjmpxUjh7NdVRY9slBI5mB0nVau2+CHn021b3lkIyci
+        P+DZ6UTgM3+7esFzAEamVXOhd1z81cvWJuSaMsM=
+X-Google-Smtp-Source: ADFU+vvxewAN9wA5TUvmoNDEwLFRuGiDSd8Fyty0Qven1rU+JHBVv9EW4qnwryLCjS/JFO3ppsHqsCEAN3uB3kOPAok=
+X-Received: by 2002:aca:f288:: with SMTP id q130mr3241437oih.33.1585301235733;
+ Fri, 27 Mar 2020 02:27:15 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.645
- definitions=2020-03-27_02:2020-03-26,2020-03-27 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- lowpriorityscore=0 suspectscore=0 spamscore=0 mlxscore=0 adultscore=0
- priorityscore=1501 malwarescore=0 phishscore=0 mlxlogscore=690 bulkscore=0
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2003270078
+References: <1585290240-18643-1-git-send-email-wanpengli@tencent.com>
+ <1585290240-18643-2-git-send-email-wanpengli@tencent.com> <87eete415a.fsf@vitty.brq.redhat.com>
+In-Reply-To: <87eete415a.fsf@vitty.brq.redhat.com>
+From:   Wanpeng Li <kernellwp@gmail.com>
+Date:   Fri, 27 Mar 2020 17:27:04 +0800
+Message-ID: <CANRm+CzHSTrGPpqxwzhtCvKtK-jpLvF=MvxVA06dCSAZbHgFng@mail.gmail.com>
+Subject: Re: [PATCH 2/2] KVM: LAPIC: Don't need to clear IPI delivery status
+ for x2apic
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-If a signal is pending we might return -ENOMEM instead of -EINTR.
-We should propagate the proper error during KSM unsharing.
+On Fri, 27 Mar 2020 at 17:07, Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
+>
+> Wanpeng Li <kernellwp@gmail.com> writes:
+>
+> > From: Wanpeng Li <wanpengli@tencent.com>
+> >
+> > IPI delivery status field is not present for x2apic, don't need
+> > to clear IPI delivery status for x2apic.
+> >
+> > Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+> > ---
+> >  arch/x86/kvm/lapic.c | 3 ++-
+> >  arch/x86/kvm/x86.c   | 1 -
+> >  2 files changed, 2 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> > index 88929b1..f6d69e2 100644
+> > --- a/arch/x86/kvm/lapic.c
+> > +++ b/arch/x86/kvm/lapic.c
+> > @@ -1942,7 +1942,8 @@ int kvm_lapic_reg_write(struct kvm_lapic *apic, u32 reg, u32 val)
+> >       }
+> >       case APIC_ICR:
+> >               /* No delay here, so we always clear the pending bit */
+>
+> 'Always' in the comment above now reads a bit odd, I'd suggest modifying
+> it to 'Immediately clear Delivery Status field in xAPIC mode' - or just
+> drop it altogeter.
 
-Fixes: 3ac8e38015d4 ("s390/mm: disable KSM for storage key enabled pages")
-Reviewed-by: Janosch Frank <frankja@linux.vnet.ibm.com>
-Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
----
- arch/s390/mm/gmap.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
+Thank you for your review, I guess Paolo can do it when apply.
 
-diff --git a/arch/s390/mm/gmap.c b/arch/s390/mm/gmap.c
-index 27926a06df32..1ef864c252e6 100644
---- a/arch/s390/mm/gmap.c
-+++ b/arch/s390/mm/gmap.c
-@@ -2552,12 +2552,13 @@ int gmap_mark_unmergeable(void)
- {
- 	struct mm_struct *mm = current->mm;
- 	struct vm_area_struct *vma;
-+	int ret;
- 
- 	for (vma = mm->mmap; vma; vma = vma->vm_next) {
--		if (ksm_madvise(vma, vma->vm_start, vma->vm_end,
--				MADV_UNMERGEABLE, &vma->vm_flags)) {
--			return -ENOMEM;
--		}
-+		ret = ksm_madvise(vma, vma->vm_start, vma->vm_end,
-+				  MADV_UNMERGEABLE, &vma->vm_flags);
-+		if (ret)
-+			return ret;
- 	}
- 	mm->def_flags &= ~VM_MERGEABLE;
- 	return 0;
--- 
-2.25.1
+    Wanpeng
 
+>
+> > -             val &= ~(1 << 12);
+> > +             if (!apic_x2apic_mode(apic))
+> > +                     val &= ~(1 << 12);
+> >               kvm_apic_send_ipi(apic, val, kvm_lapic_get_reg(apic, APIC_ICR2));
+> >               kvm_lapic_set_reg(apic, APIC_ICR, val);
+> >               break;
+> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> > index 495709f..6ced0e1 100644
+> > --- a/arch/x86/kvm/x86.c
+> > +++ b/arch/x86/kvm/x86.c
+> > @@ -1562,7 +1562,6 @@ static int handle_fastpath_set_x2apic_icr_irqoff(struct kvm_vcpu *vcpu, u64 data
+> >               ((data & APIC_MODE_MASK) == APIC_DM_FIXED) &&
+> >               ((u32)(data >> 32) != X2APIC_BROADCAST)) {
+> >
+> > -             data &= ~(1 << 12);
+> >               kvm_apic_send_ipi(vcpu->arch.apic, (u32)data, (u32)(data >> 32));
+> >               kvm_lapic_set_reg(vcpu->arch.apic, APIC_ICR2, (u32)(data >> 32));
+> >               kvm_lapic_set_reg(vcpu->arch.apic, APIC_ICR, (u32)data);
+>
+> Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+>
+> --
+> Vitaly
+>
