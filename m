@@ -2,199 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D3C31195A91
-	for <lists+kvm@lfdr.de>; Fri, 27 Mar 2020 17:03:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6E5E6195B27
+	for <lists+kvm@lfdr.de>; Fri, 27 Mar 2020 17:34:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727611AbgC0QDT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Mar 2020 12:03:19 -0400
-Received: from mail.kernel.org ([198.145.29.99]:45004 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726333AbgC0QDT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 Mar 2020 12:03:19 -0400
-Received: from [192.168.1.112] (c-24-9-64-241.hsd1.co.comcast.net [24.9.64.241])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 7A1A220716;
-        Fri, 27 Mar 2020 16:03:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1585324997;
-        bh=buElJtB4x/XrZOgypEpMPh22nhReLA0geldePbdmD4I=;
-        h=Subject:To:Cc:References:From:Date:In-Reply-To:From;
-        b=viFO5kDP/2s0/3AJx9TFLXHX6SV5+ibd4fa3+p65xOq3D6zaGzSmJwvR+YMS7agDw
-         52hjxt++Nekk6rPPLyuP2m6Hqm4Jn5G1fFpMR48LAHPBT00ULt4GWgmBUIsKIc9VvH
-         0WVB5OKiOkcJhJb7hWddUOndBUJwW3aaEynCjsss=
-Subject: Re: [RFC v3 0/3] Fix errors when try to build kvm selftests on
- specified output
-To:     Xiaoyao Li <xiaoyao.li@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-kernel@vger.kernel.org, shuah <shuah@kernel.org>
-References: <20200326030750.173972-1-xiaoyao.li@intel.com>
- <41d5d89e-79c2-6f7d-de3e-ca3255e910e8@kernel.org>
- <cb445047-ab84-0c49-cfba-ec6933971dc7@intel.com>
-From:   shuah <shuah@kernel.org>
-Message-ID: <71a5abdf-07b5-d927-1a08-de8019b3f39f@kernel.org>
-Date:   Fri, 27 Mar 2020 10:03:03 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+        id S1727803AbgC0QeG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Mar 2020 12:34:06 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:18102 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727352AbgC0QeF (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 27 Mar 2020 12:34:05 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 02RGWYrP064700
+        for <kvm@vger.kernel.org>; Fri, 27 Mar 2020 12:34:04 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3017jufnng-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Fri, 27 Mar 2020 12:34:04 -0400
+Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 02RGXSK1069567
+        for <kvm@vger.kernel.org>; Fri, 27 Mar 2020 12:34:04 -0400
+Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3017jufnn3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 27 Mar 2020 12:34:04 -0400
+Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
+        by ppma01dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 02RGPQ6F024667;
+        Fri, 27 Mar 2020 16:34:03 GMT
+Received: from b03cxnp08026.gho.boulder.ibm.com (b03cxnp08026.gho.boulder.ibm.com [9.17.130.18])
+        by ppma01dal.us.ibm.com with ESMTP id 2ywawmrgr9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 27 Mar 2020 16:34:03 +0000
+Received: from b03ledav004.gho.boulder.ibm.com (b03ledav004.gho.boulder.ibm.com [9.17.130.235])
+        by b03cxnp08026.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 02RGY09C59310432
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 27 Mar 2020 16:34:00 GMT
+Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 05FDE78063;
+        Fri, 27 Mar 2020 16:34:00 +0000 (GMT)
+Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A09247805C;
+        Fri, 27 Mar 2020 16:33:59 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.114.17.106])
+        by b03ledav004.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Fri, 27 Mar 2020 16:33:59 +0000 (GMT)
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+To:     David Hildenbrand <david@redhat.com>,
+        Janosch Frank <frankja@linux.ibm.com>
+Cc:     Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
+        Christian Borntraeger <borntraeger@de.ibm.com>
+Subject: [1/1] s390x/smp: fix detection of "running"
+Date:   Fri, 27 Mar 2020 12:33:55 -0400
+Message-Id: <20200327163355.24524-1-borntraeger@de.ibm.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-In-Reply-To: <cb445047-ab84-0c49-cfba-ec6933971dc7@intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.645
+ definitions=2020-03-27_05:2020-03-27,2020-03-27 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 mlxscore=0
+ phishscore=0 malwarescore=0 priorityscore=1501 impostorscore=0
+ clxscore=1015 mlxlogscore=788 bulkscore=0 spamscore=0 lowpriorityscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2003270144
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 3/27/20 7:31 AM, Xiaoyao Li wrote:
-> On 3/27/2020 4:57 AM, shuah wrote:
->> On 3/25/20 9:07 PM, Xiaoyao Li wrote:
->>> Hi Shuah,
->>>
->>> Hope you're happy with this version that I only touch KVM's Makefile.
->>>
->>> I attempted to build KVM selftests on a specified dir, unfortunately
->>> neither    "make O=/path/to/mydir TARGETS=kvm" in 
->>> tools/testing/selftests, nor
->>> "make OUTPUT=/path/to/mydir" in tools/testing/selftests/kvm work.
->>>
->>
->> Why are you running "make OUTPUT=/path/to/mydir"
->>
->> It isn't correct.
-> 
-> So what's the meaning of
-> 
-> ifeq (0,$(MAKELEVEL))
->      ifeq ($(OUTPUT),)
->      OUTPUT := $(shell pwd)
->      DEFAULT_INSTALL_HDR_PATH := 1
->      endif
-> endif
-> 
-> in lib.mk?
-> 
+On s390x hosts with a single CPU, the smp test case hangs (loops).
+The check is our restart has finished is wrong.
+Sigp sense running status checks if the CPU is currently backed by a
+real CPU. This means that on single CPU hosts a sigp sense running
+will never claim that a target is running. We need to check for not
+being stopped instead.
 
-O is the variable for selftests Makefile and which is handled in
-lib.mk. OUTPUT is internal and shouldn't set when running make.
+Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+---
+ lib/s390x/smp.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
->>
->> make O=/path/to/mydir is what you have to use. Please main Makefile
->> as well for O= and KBUILD_OUTPUT usages.
->>
->> Please see Documentation/dev-tools/kselftest.rst for use-cases.
->>
->> make O=/path/to/mydir TARGETS=kvm is a right use-case and I can see
->> it will fail to create x86_64 directory.
->>
->> Let's start with the following two commands and try to fix the
->> problems you are seeing.
->>
->> make O=/path/to/mydir in kvm directory (this is supported,
->> however, the following command from the main Makefile is
->> recommended use.)
-> 
-> Of course we can do this, but the "O=/path/to/mydir" only has effect on 
-> header install, the *.o files still generated in kvm/ directory.
-> 
+diff --git a/lib/s390x/smp.c b/lib/s390x/smp.c
+index 2555bf4..5ed8b7b 100644
+--- a/lib/s390x/smp.c
++++ b/lib/s390x/smp.c
+@@ -128,7 +128,7 @@ static int smp_cpu_restart_nolock(uint16_t addr, struct psw *psw)
+ 	 * The order has been accepted, but the actual restart may not
+ 	 * have been performed yet, so wait until the cpu is running.
+ 	 */
+-	while (!smp_cpu_running(addr))
++	while (smp_cpu_stopped(addr))
+ 		mb();
+ 	cpu->active = true;
+ 	return 0;
+-- 
+2.25.1
 
-Right. That is what needs to be fixed. This is the reason for your
-source directory getting dirty when kvm test is built.
-
-> And kvm's INSTALL_HDR_PATH cannot find the right headers.
-> 
-> That's why I choose to use "OUTPUT=/somewhere"
-> 
->>  From main Makefile in kernel srcdir
->> make O=/path/to/mydir TARGETS=kvm
-> 
-> I guess "kernel srcdir" means "kselftest srcdir", i.e., 
-> tools/testing/selftests/ ?
-
-This is kernel source root directory. The command you would
-use is:
-
-make kselftest-all O=/path/to/mydir TARGETS=kvm
-
-> 
-> Well, as I said in the first place, I tried
-> 
->      make O=/path/to/mydir TARGETS=kvm
-> 
-> but it doesn't work. So I did some fixup, and sent out the Patches.
-> 
-
-Right. It doesn't work for a couple of reasons:
-
-1. The Makefile doesn't create sub-dirs when build is relocatable.
-2. Makes source directory dirty.
-
-> If the patches are wrong, please point it out and give your comments how 
-> to make it right.
-> 
-
-The patches you sent are based on running the command with OUTPUT
-set. That is why I am asking you start with the right use-cases,
-and gave you pointers on tests to refer to that have sub-dirs
-and handle relocatable builds:
-
-futex
-arm64
-android
-
->> Also, just build isn't sufficient for you to be able to run the
->> tests.
->>
->> make kselftest-install O=/path/to/mydir TARGETS=kvm will generate
->> run script.
-> 
-> This command also has the x86_64 directory not created issue.
-> Since it generates header files in kernel_src/usr/include, it doesn't 
-> have headers path issue. But as result, the kernel_src directory is not 
-> clean, this requires me to run "make mrproper", I *really* don't like it.
-> 
-> 
-
-If the test leverages lib.mk headers install logic correctly, you
-shouldn't see this problem.
-
-Yes. It does make the source directory dirty. That is the problem we
-have to fix. I am seeing issues the issue of x86_64 not being created
-in the case of relocatable builds.
-
-Thanks for working on this by the way. It is one of the tests that
-identified as the one doesn't support relocatable builds.
-
-You will see fixes to others I already fixed in
-
-https://git.kernel.org/pub/scm/linux/kernel/git/shuah/linux-kselftest.git/log/?h=next
-
-Start withe the following use0-cases to fix and then test your fixes
-for these use-cases. The goal is to be able to run kvm from target
-directory and source directory staying clean.
-
-You will have to build the kernel first in all of these cases.
-Let's use kselftest-install which is what you would need if you
-want build and then run tests later. Also assuming you are doing
-native build on x86_64.
-
- From main kernel Makefile: (from kernel source root dir)
-
-Builds in the same source directory:
-make kselftest-install TARGETS=kvm
-
-Relocatable build: (from kernel source root dir)
-
-make O=/path/objdir  - build kernel
-make kselftest-install O=/path/objdir TARGETS=kvm
-
- From tools/testing/selftests/kvm directory:
-make O=/path/objdir install
-
-Install step is important especially for relocatable builds,
-as it makes sure all run-time dependencies are copied to the
-target directory.
-
-thanks,
--- Shuah
