@@ -2,100 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id ADDEE1956D0
-	for <lists+kvm@lfdr.de>; Fri, 27 Mar 2020 13:11:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A1AB4195778
+	for <lists+kvm@lfdr.de>; Fri, 27 Mar 2020 13:48:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727287AbgC0MLG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Mar 2020 08:11:06 -0400
-Received: from mail-qk1-f193.google.com ([209.85.222.193]:40099 "EHLO
-        mail-qk1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726515AbgC0MLG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 Mar 2020 08:11:06 -0400
-Received: by mail-qk1-f193.google.com with SMTP id l25so10469081qki.7
-        for <kvm@vger.kernel.org>; Fri, 27 Mar 2020 05:11:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=Ae32xXO67Uei3DTimjBj1wlAZ/pkH/el6Qiul9IT/30=;
-        b=Ex3D0PnD7gDl3aSUB2klXnKG6WqRJ7QfwnM6N9ZGFL92WovcOuAzEFRyYweVO4bxtE
-         7Xg8gqSK2Z3BuI8TP9K0fdhDNWpdwzHD/JkAmE9cJPZ0tZrDsJOHhAbWsH+vjsmkuIY6
-         uwK5871CUpjZLzSstezfN/aBg5CasNqsGxP8A9EfPWuZRYdJDyWQBXQ7ttS6IiSCsthL
-         ifCas0C0YCZ3fC4iuuQORU9gg8EUmyeqhcf3rCO0NRXcZ2xj0HrGTKS3hd6SWnksKhsW
-         VFFIjipCV/rNC4HQApb3Vkke+23D5s7p4BGXZmNMTKFYNFv1sR1pllPZ8YXvdvs0uPyV
-         9Few==
+        id S1727352AbgC0MsM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Mar 2020 08:48:12 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:54858 "EHLO
+        us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726959AbgC0MsK (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 27 Mar 2020 08:48:10 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1585313289;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=J3R9pjfcrLfveJt0OaJwOudwQhu7GzXewbxhBYVgwpg=;
+        b=YtBBVrJDC50J/yD40DXJrZED8DfubWOTp5A25VAQAUwquqeWKXkuWHn/Yai7dMMkWpG2oM
+        c3wlDafb4j31bhmqjZQV41YiS32LXvsHeyD4XKtZACwL/6doospHd3+e/tfQ9WHCrVgNCY
+        IWcw7whRTFcCWsbPhv2x5U7Is6oeY0w=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-65-fzXJnt-xM0q8uw4VSvc00w-1; Fri, 27 Mar 2020 08:48:07 -0400
+X-MC-Unique: fzXJnt-xM0q8uw4VSvc00w-1
+Received: by mail-wm1-f71.google.com with SMTP id f8so4311881wmh.4
+        for <kvm@vger.kernel.org>; Fri, 27 Mar 2020 05:48:07 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=Ae32xXO67Uei3DTimjBj1wlAZ/pkH/el6Qiul9IT/30=;
-        b=cOIsCrZyHK/PuSg4VOtqPcHnzN0zfIMv8T04rGNbjjz5Zb6G/dCk6RmOTLJIMJrGtk
-         Zkf1SAA/IsgoEJP19O+iZadA2Us5ZcwKIpaaJnxncnZBC74ZiqxFBh7xmCK33fKJx1hl
-         ha1uUa/WIL/ZLFChI6FkNCiDF4s3i9pxi61hH8L+WrNhLFJSzrXbsIPeNTLViOQV7ApP
-         JREaL7bxwQWb9JTjKbU6dbdwxdFAXYEeDKRHQrpa8TiLD+SJLyuF75DAcOPTXSupUCEz
-         lcWt0296chHGIkvOp+ORrOwQxlpKpT9uvJY7YlTLTDZpT5bbtQ4P4NWTRwJ/5MX+gbSN
-         6cBQ==
-X-Gm-Message-State: ANhLgQ3JTT3KupkehGmHhle1PNCMRcPgASBzyWV4KGjKud54/Ggt9wRO
-        KwcNxf95PJ8GamVxqbLSXwvpzg==
-X-Google-Smtp-Source: ADFU+vu5etCsTsz6Y5TtfPSyk7GQigfbQaUBOkfH75rGPq30AeujH7DUKAa3E9WYmWw4syrKT0bbug==
-X-Received: by 2002:a37:a746:: with SMTP id q67mr14014729qke.215.1585311063288;
-        Fri, 27 Mar 2020 05:11:03 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-142-68-57-212.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.57.212])
-        by smtp.gmail.com with ESMTPSA id t71sm3539359qke.55.2020.03.27.05.11.01
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Fri, 27 Mar 2020 05:11:02 -0700 (PDT)
-Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1jHnpE-0007MU-MC; Fri, 27 Mar 2020 09:11:00 -0300
-Date:   Fri, 27 Mar 2020 09:11:00 -0300
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     "Longpeng(Mike)" <longpeng2@huawei.com>
-Cc:     linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        kvm@vger.kernel.org, arei.gonglei@huawei.com,
-        weidong.huang@huawei.com, weifuqiang@huawei.com,
-        kirill.shutemov@linux.intel.com,
-        Mike Kravetz <mike.kravetz@oracle.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Matthew Wilcox <willy@infradead.org>,
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=J3R9pjfcrLfveJt0OaJwOudwQhu7GzXewbxhBYVgwpg=;
+        b=DffcOg4/CTToYdJgKcfPoWg2Fp5M0KhLIeQXxSNr3vZvN2MLAsdwt7BJLmwfNz3t73
+         3guteGjFqss2WHfyodiNqeRWiROytmFgJvszwY6JYEul8fvWIWLc5QcZzBPkY4PLVNqI
+         DiqSpF6ycHDIo/iTDrWPvbUTnp7Iv0xAB6o/dFCM96TiI6VJHLUwG9fxURoS1cOL9s1Z
+         ldPSUpJRatm7BtJ2FYGEA56N5XIedMtMmmpylK7FWiL9pTkpORWoaZCOCG/yjNxAnSf9
+         XALBKc5zGvnCDcPLwEa1vPn6kH0ifxWEvPIMlI+CYYIG1X6R00kRPpo0pM9+ObXd5H9o
+         +VcA==
+X-Gm-Message-State: ANhLgQ0p7sponzUH4GYV6lsf1SJUhgCRbRTwFvIbQozs1id5i3f0kmRi
+        jkvPyHmlDzR9B+NW62EIA1wbPvZ9SYB7gnWIigZSANEZ/7LMNReoG0f2dUYwWBEFZJ084A0rUlK
+        4n2BTCwZQRATp
+X-Received: by 2002:adf:f5c8:: with SMTP id k8mr13922487wrp.33.1585313286079;
+        Fri, 27 Mar 2020 05:48:06 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vt5vgDE/lGJRuJHFUg90TW5N/ADRnKJCzJQ3za8iF5BR3iNikqZ3JIgzc9k8sjECJJks2AE1A==
+X-Received: by 2002:adf:f5c8:: with SMTP id k8mr13922457wrp.33.1585313285753;
+        Fri, 27 Mar 2020 05:48:05 -0700 (PDT)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id a8sm7715284wmb.39.2020.03.27.05.48.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 27 Mar 2020 05:48:04 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Junaid Shahid <junaids@google.com>,
         Sean Christopherson <sean.j.christopherson@intel.com>,
-        stable@vger.kernel.org
-Subject: Re: [PATCH v3] mm/hugetlb: fix a addressing exception caused by
- huge_pte_offset
-Message-ID: <20200327121100.GR20941@ziepe.ca>
-References: <20200327014007.1915-1-longpeng2@huawei.com>
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH 2/3] KVM: x86: cleanup kvm_inject_emulated_page_fault
+In-Reply-To: <d2222e81-8618-b3b0-baf3-2bda72d48ede@redhat.com>
+References: <20200326093516.24215-1-pbonzini@redhat.com> <20200326093516.24215-3-pbonzini@redhat.com> <877dz75j4i.fsf@vitty.brq.redhat.com> <d2222e81-8618-b3b0-baf3-2bda72d48ede@redhat.com>
+Date:   Fri, 27 Mar 2020 13:48:04 +0100
+Message-ID: <87a7423qwr.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200327014007.1915-1-longpeng2@huawei.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Mar 27, 2020 at 09:40:07AM +0800, Longpeng(Mike) wrote:
-> diff --git a/mm/hugetlb.c b/mm/hugetlb.c
-> index dd8737a..d4fab68 100644
-> +++ b/mm/hugetlb.c
-> @@ -4909,29 +4909,33 @@ pte_t *huge_pte_offset(struct mm_struct *mm,
->  		       unsigned long addr, unsigned long sz)
->  {
->  	pgd_t *pgd;
-> -	p4d_t *p4d;
-> -	pud_t *pud;
-> -	pmd_t *pmd;
-> +	p4d_t *p4g, p4d_entry;
-> +	pud_t *pud, pud_entry;
-> +	pmd_t *pmd, pmd_entry;
->  
->  	pgd = pgd_offset(mm, addr);
->  	if (!pgd_present(*pgd))
->  		return NULL;
-> -	p4d = p4d_offset(pgd, addr);
-> -	if (!p4d_present(*p4d))
-> +
-> +	p4g = p4d_offset(pgd, addr);
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
-Why p4g here? Shouldn't it be p4d?
+> On 26/03/20 14:41, Vitaly Kuznetsov wrote:
+>> Paolo Bonzini <pbonzini@redhat.com> writes:
+>> 
+>>> To reconstruct the kvm_mmu to be used for page fault injection, we
+>>> can simply use fault->nested_page_fault.  This matches how
+>>> fault->nested_page_fault is assigned in the first place by
+>>> FNAME(walk_addr_generic).
+>>>
+>>> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+>>> ---
+>>>  arch/x86/kvm/mmu/mmu.c         | 6 ------
+>>>  arch/x86/kvm/mmu/paging_tmpl.h | 2 +-
+>>>  arch/x86/kvm/x86.c             | 7 +++----
+>>>  3 files changed, 4 insertions(+), 11 deletions(-)
+>>>
+>>> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+>>> index e26c9a583e75..6250e31ac617 100644
+>>> --- a/arch/x86/kvm/mmu/mmu.c
+>>> +++ b/arch/x86/kvm/mmu/mmu.c
+>>> @@ -4353,12 +4353,6 @@ static unsigned long get_cr3(struct kvm_vcpu *vcpu)
+>>>  	return kvm_read_cr3(vcpu);
+>>>  }
+>>>  
+>>> -static void inject_page_fault(struct kvm_vcpu *vcpu,
+>>> -			      struct x86_exception *fault)
+>>> -{
+>>> -	vcpu->arch.mmu->inject_page_fault(vcpu, fault);
+>>> -}
+>>> -
+>> 
+>> This is already gone with Sean's "KVM: x86: Consolidate logic for
+>> injecting page faults to L1".
+>> 
+>> It would probably make sense to have a combined series (or a branch on
+>> kvm.git) to simplify testing efforts.
+>
+> Yes, these three patches replace part of Sean's (the patch you mention
+> and the next one, "KVM: x86: Sync SPTEs when injecting page/EPT fault
+> into L1").
+>
+> I pushed the result to a branch named kvm-tlb-cleanup on kvm.git.
+>
 
-Jason
+Thank you,
+
+I've tested it with Hyper-V on both VMX and SVM with and without PV TLB
+flush and nothing immediately blew up. I'm also observing a very nice
+19000 -> 14000 cycles improvement on tight cpuid loop test (with EVMCS
+enabled).
+
+-- 
+Vitaly
+
