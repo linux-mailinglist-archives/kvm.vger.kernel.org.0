@@ -2,349 +2,199 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B7A73195A34
-	for <lists+kvm@lfdr.de>; Fri, 27 Mar 2020 16:46:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D3C31195A91
+	for <lists+kvm@lfdr.de>; Fri, 27 Mar 2020 17:03:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727707AbgC0Pqt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Mar 2020 11:46:49 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:11858 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727509AbgC0Pqs (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 27 Mar 2020 11:46:48 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 02RFY8BX027557
-        for <kvm@vger.kernel.org>; Fri, 27 Mar 2020 11:46:46 -0400
-Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2ywbv0dx9p-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Fri, 27 Mar 2020 11:46:46 -0400
-Received: from localhost
-        by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
-        Fri, 27 Mar 2020 15:46:37 -0000
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
-        by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Fri, 27 Mar 2020 15:46:35 -0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 02RFke2853149808
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 27 Mar 2020 15:46:40 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A98BB5204E;
-        Fri, 27 Mar 2020 15:46:40 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.145.169.170])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 075E752051;
-        Fri, 27 Mar 2020 15:46:39 +0000 (GMT)
-Subject: Re: vhost changes (batched) in linux-next after 12/13 trigger random
- crashes in KVM guests after reboot
-To:     =?UTF-8?Q?Eugenio_P=c3=a9rez?= <eperezma@redhat.com>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        Stephen Rothwell <sfr@canb.auug.org.au>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        kvm list <kvm@vger.kernel.org>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>
-References: <20200107042401-mutt-send-email-mst@kernel.org>
- <4c3f70b7-723a-8b0f-ac49-babef1bcc180@de.ibm.com>
- <50a79c3491ac483583c97df2fac29e2c3248fdea.camel@redhat.com>
- <8fbbfb49-99d1-7fee-e713-d6d5790fe866@de.ibm.com>
- <2364d0728c3bb4bcc0c13b591f774109a9274a30.camel@redhat.com>
- <bb9fb726-306c-5330-05aa-a86bd1b18097@de.ibm.com>
- <468983fad50a5e74a739f71487f0ea11e8d4dfd1.camel@redhat.com>
- <2dc1df65-1431-3917-40e5-c2b12096e2a7@de.ibm.com>
- <bd9c9b4d99abd20d5420583af5a4954ea1cf4618.camel@redhat.com>
- <e11ba53c-a5fa-0518-2e06-9296897ed529@de.ibm.com>
- <CAJaqyWfJFArAdpOwehTn5ci-frqai+pazGgcn2VvQSebqGRVtg@mail.gmail.com>
- <80520391-d90d-e10d-a107-7a18f2810900@de.ibm.com>
- <dabe59fe-e068-5935-f49e-bc1da3d8471a@de.ibm.com>
- <35dca16b9a85eb203f35d3e55dcaa9d0dae5a922.camel@redhat.com>
- <3144806d-436e-86a1-2e29-74f7027f7f0b@de.ibm.com>
- <8e226821a8878f53585d967b8af547526d84c73e.camel@redhat.com>
- <1ee3a272-e391-e2e8-9cbb-5d3e2d40bec2@de.ibm.com>
- <d093c51e5af2e86c1c7af0b2ee469157e92d8366.camel@redhat.com>
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
-Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
- 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
- nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Date:   Fri, 27 Mar 2020 16:46:39 +0100
+        id S1727611AbgC0QDT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Mar 2020 12:03:19 -0400
+Received: from mail.kernel.org ([198.145.29.99]:45004 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726333AbgC0QDT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 Mar 2020 12:03:19 -0400
+Received: from [192.168.1.112] (c-24-9-64-241.hsd1.co.comcast.net [24.9.64.241])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 7A1A220716;
+        Fri, 27 Mar 2020 16:03:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1585324997;
+        bh=buElJtB4x/XrZOgypEpMPh22nhReLA0geldePbdmD4I=;
+        h=Subject:To:Cc:References:From:Date:In-Reply-To:From;
+        b=viFO5kDP/2s0/3AJx9TFLXHX6SV5+ibd4fa3+p65xOq3D6zaGzSmJwvR+YMS7agDw
+         52hjxt++Nekk6rPPLyuP2m6Hqm4Jn5G1fFpMR48LAHPBT00ULt4GWgmBUIsKIc9VvH
+         0WVB5OKiOkcJhJb7hWddUOndBUJwW3aaEynCjsss=
+Subject: Re: [RFC v3 0/3] Fix errors when try to build kvm selftests on
+ specified output
+To:     Xiaoyao Li <xiaoyao.li@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        linux-kernel@vger.kernel.org, shuah <shuah@kernel.org>
+References: <20200326030750.173972-1-xiaoyao.li@intel.com>
+ <41d5d89e-79c2-6f7d-de3e-ca3255e910e8@kernel.org>
+ <cb445047-ab84-0c49-cfba-ec6933971dc7@intel.com>
+From:   shuah <shuah@kernel.org>
+Message-ID: <71a5abdf-07b5-d927-1a08-de8019b3f39f@kernel.org>
+Date:   Fri, 27 Mar 2020 10:03:03 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <d093c51e5af2e86c1c7af0b2ee469157e92d8366.camel@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <cb445047-ab84-0c49-cfba-ec6933971dc7@intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-x-cbid: 20032715-4275-0000-0000-000003B479C3
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20032715-4276-0000-0000-000038C9C189
-Message-Id: <fcefde19-38aa-9f62-0b9a-d657de8a0cce@de.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.645
- definitions=2020-03-27_05:2020-03-27,2020-03-27 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
- priorityscore=1501 lowpriorityscore=0 malwarescore=0 bulkscore=0
- adultscore=0 mlxscore=0 phishscore=0 impostorscore=0 mlxlogscore=999
- suspectscore=2 spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2003270137
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 27.03.20 12:08, Eugenio Pérez wrote:
-> Hi Christian.
+On 3/27/20 7:31 AM, Xiaoyao Li wrote:
+> On 3/27/2020 4:57 AM, shuah wrote:
+>> On 3/25/20 9:07 PM, Xiaoyao Li wrote:
+>>> Hi Shuah,
+>>>
+>>> Hope you're happy with this version that I only touch KVM's Makefile.
+>>>
+>>> I attempted to build KVM selftests on a specified dir, unfortunately
+>>> neither    "make O=/path/to/mydir TARGETS=kvm" in 
+>>> tools/testing/selftests, nor
+>>> "make OUTPUT=/path/to/mydir" in tools/testing/selftests/kvm work.
+>>>
+>>
+>> Why are you running "make OUTPUT=/path/to/mydir"
+>>
+>> It isn't correct.
 > 
-> Sorry for the late response. Could we try this one over eccb852f1fe6bede630e2e4f1a121a81e34354ab, and see if you still
-> can reproduce the bug?
-
-To much time has passed and too many things have changed on that system.
-I have trouble reproducing this with either
-eccb852f1fe6bede630e2e4f1a121a81e34354ab or 52c36ce7f334.
-I will try to reproduce this again :-/
-
+> So what's the meaning of
 > 
-> Apart from that, could you print me the backtrace when qemu calls vhost_kernel_set_vring_base and
-> vhost_kernel_get_vring_base functions?
+> ifeq (0,$(MAKELEVEL))
+>      ifeq ($(OUTPUT),)
+>      OUTPUT := $(shell pwd)
+>      DEFAULT_INSTALL_HDR_PATH := 1
+>      endif
+> endif
 > 
-> Thank you very much!
-> 
-> diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-> index e158159671fa..a1a4239512bb 100644
-> --- a/drivers/vhost/net.c
-> +++ b/drivers/vhost/net.c
-> @@ -1505,10 +1505,13 @@ static long vhost_net_set_backend(struct vhost_net *n, unsigned index, int fd)
->  
->  	mutex_lock(&n->dev.mutex);
->  	r = vhost_dev_check_owner(&n->dev);
-> -	if (r)
-> +	if (r) {
-> +		pr_debug("vhost_dev_check_owner index=%u fd=%d rc r=%d", index, fd, r);
->  		goto err;
-> +	}
->  
->  	if (index >= VHOST_NET_VQ_MAX) {
-> +		pr_debug("vhost_dev_check_owner index=%u fd=%d MAX=%d", index, fd, VHOST_NET_VQ_MAX);
->  		r = -ENOBUFS;
->  		goto err;
->  	}
-> @@ -1518,22 +1521,26 @@ static long vhost_net_set_backend(struct vhost_net *n, unsigned index, int fd)
->  
->  	/* Verify that ring has been setup correctly. */
->  	if (!vhost_vq_access_ok(vq)) {
-> +		pr_debug("vhost_net_set_backend index=%u fd=%d !vhost_vq_access_ok", index, fd);
->  		r = -EFAULT;
->  		goto err_vq;
->  	}
->  	sock = get_socket(fd);
->  	if (IS_ERR(sock)) {
->  		r = PTR_ERR(sock);
-> +		pr_debug("vhost_net_set_backend index=%u fd=%d get_socket err r=%d", index, fd, r);
->  		goto err_vq;
->  	}
->  
->  	/* start polling new socket */
->  	oldsock = vq->private_data;
->  	if (sock != oldsock) {
-> +		pr_debug("sock=%p != oldsock=%p index=%u fd=%d vq=%p", sock, oldsock, index, fd, vq);
->  		ubufs = vhost_net_ubuf_alloc(vq,
->  					     sock && vhost_sock_zcopy(sock));
->  		if (IS_ERR(ubufs)) {
->  			r = PTR_ERR(ubufs);
-> +			pr_debug("ubufs index=%u fd=%d err r=%d vq=%p", index, fd, r, vq);
->  			goto err_ubufs;
->  		}
->  
-> @@ -1541,11 +1548,15 @@ static long vhost_net_set_backend(struct vhost_net *n, unsigned index, int fd)
->  		vq->private_data = sock;
->  		vhost_net_buf_unproduce(nvq);
->  		r = vhost_vq_init_access(vq);
-> -		if (r)
-> +		if (r) {
-> +			pr_debug("init_access index=%u fd=%d r=%d vq=%p", index, fd, r, vq);
->  			goto err_used;
-> +		}
->  		r = vhost_net_enable_vq(n, vq);
-> -		if (r)
-> +		if (r) {
-> +			pr_debug("enable_vq index=%u fd=%d r=%d vq=%p", index, fd, r, vq);
->  			goto err_used;
-> +		}
->  		if (index == VHOST_NET_VQ_RX)
->  			nvq->rx_ring = get_tap_ptr_ring(fd);
->  
-> @@ -1559,6 +1570,8 @@ static long vhost_net_set_backend(struct vhost_net *n, unsigned index, int fd)
->  
->  	mutex_unlock(&vq->mutex);
->  
-> +	pr_debug("sock=%p", sock);
-> +
->  	if (oldubufs) {
->  		vhost_net_ubuf_put_wait_and_free(oldubufs);
->  		mutex_lock(&vq->mutex);
-> @@ -1712,6 +1725,9 @@ static long vhost_net_ioctl(struct file *f, unsigned int ioctl,
->  	case VHOST_NET_SET_BACKEND:
->  		if (copy_from_user(&backend, argp, sizeof backend))
->  			return -EFAULT;
-> +		pr_debug("VHOST_NET_SET_BACKEND [b.index=%u][b.fd=%d]",
-> +			 backend.index, backend.fd);
-> +		dump_stack();
->  		return vhost_net_set_backend(n, backend.index, backend.fd);
->  	case VHOST_GET_FEATURES:
->  		features = VHOST_NET_FEATURES;
-> diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
-> index b5a51b1f2e79..9dd0bcae0b22 100644
-> --- a/drivers/vhost/vhost.c
-> +++ b/drivers/vhost/vhost.c
-> @@ -372,6 +372,11 @@ static int vhost_worker(void *data)
->  	return 0;
->  }
->  
-> +static int vhost_vq_num_batch_descs(struct vhost_virtqueue *vq)
-> +{
-> +	return vq->max_descs - UIO_MAXIOV;
-> +}
-> +
->  static void vhost_vq_free_iovecs(struct vhost_virtqueue *vq)
->  {
->  	kfree(vq->descs);
-> @@ -394,7 +399,9 @@ static long vhost_dev_alloc_iovecs(struct vhost_dev *dev)
->  	for (i = 0; i < dev->nvqs; ++i) {
->  		vq = dev->vqs[i];
->  		vq->max_descs = dev->iov_limit;
-> -		vq->batch_descs = dev->iov_limit - UIO_MAXIOV;
-> +		if (vhost_vq_num_batch_descs(vq) < 0) {
-> +			return -EINVAL;
-> +		}
->  		vq->descs = kmalloc_array(vq->max_descs,
->  					  sizeof(*vq->descs),
->  					  GFP_KERNEL);
-> @@ -1642,15 +1649,27 @@ long vhost_vring_ioctl(struct vhost_dev *d, unsigned int ioctl, void __user *arg
->  			r = -EINVAL;
->  			break;
->  		}
-> +
-> +		pr_debug(
-> +			"VHOST_SET_VRING_BASE [vq=%p][s.index=%u][s.num=%u][vq->avail_idx=%d][vq->last_avail_idx=%d][vq-
->> ndescs=%d][vq->first_desc=%d]",
-> +			vq, s.index, s.num, vq->avail_idx, vq->last_avail_idx,
-> +			vq->ndescs, vq->first_desc);
-> +		dump_stack();
->  		vq->last_avail_idx = s.num;
->  		/* Forget the cached index value. */
->  		vq->avail_idx = vq->last_avail_idx;
-> +		vq->ndescs = vq->first_desc = 0;
->  		break;
->  	case VHOST_GET_VRING_BASE:
->  		s.index = idx;
->  		s.num = vq->last_avail_idx;
->  		if (copy_to_user(argp, &s, sizeof s))
->  			r = -EFAULT;
-> +		pr_debug(
-> +			"VHOST_GET_VRING_BASE [vq=%p][s.index=%u][s.num=%u][vq->avail_idx=%d][vq->last_avail_idx=%d][vq-
->> ndescs=%d][vq->first_desc=%d]",
-> +			vq, s.index, s.num, vq->avail_idx, vq->last_avail_idx,
-> +			vq->ndescs, vq->first_desc);
-> +		dump_stack();
->  		break;
->  	case VHOST_SET_VRING_KICK:
->  		if (copy_from_user(&f, argp, sizeof f)) {
-> @@ -2239,8 +2258,8 @@ static int fetch_buf(struct vhost_virtqueue *vq)
->  		vq->avail_idx = vhost16_to_cpu(vq, avail_idx);
->  
->  		if (unlikely((u16)(vq->avail_idx - last_avail_idx) > vq->num)) {
-> -			vq_err(vq, "Guest moved used index from %u to %u",
-> -				last_avail_idx, vq->avail_idx);
-> +			vq_err(vq, "Guest moved vq %p used index from %u to %u",
-> +				vq, last_avail_idx, vq->avail_idx);
->  			return -EFAULT;
->  		}
->  
-> @@ -2316,6 +2335,9 @@ static int fetch_buf(struct vhost_virtqueue *vq)
->  	BUG_ON(!(vq->used_flags & VRING_USED_F_NO_NOTIFY));
->  
->  	/* On success, increment avail index. */
-> +	pr_debug(
-> +		"[vq=%p][vq->last_avail_idx=%u][vq->avail_idx=%u][vq->ndescs=%d][vq->first_desc=%d]",
-> +		vq, vq->last_avail_idx, vq->avail_idx, vq->ndescs, vq->first_desc);
->  	vq->last_avail_idx++;
->  
->  	return 0;
-> @@ -2333,7 +2355,7 @@ static int fetch_descs(struct vhost_virtqueue *vq)
->  	if (vq->ndescs)
->  		return 0;
->  
-> -	while (!ret && vq->ndescs <= vq->batch_descs)
-> +	while (!ret && vq->ndescs <= vhost_vq_num_batch_descs(vq))
->  		ret = fetch_buf(vq);
->  
->  	return vq->ndescs ? 0 : ret;
-> @@ -2432,6 +2454,9 @@ EXPORT_SYMBOL_GPL(vhost_get_vq_desc);
->  /* Reverse the effect of vhost_get_vq_desc. Useful for error handling. */
->  void vhost_discard_vq_desc(struct vhost_virtqueue *vq, int n)
->  {
-> +	pr_debug(
-> +		"DISCARD [vq=%p][vq->last_avail_idx=%u][vq->avail_idx=%u][n=%d]",
-> +		vq, vq->last_avail_idx, vq->avail_idx, n);
->  	vq->last_avail_idx -= n;
->  }
->  EXPORT_SYMBOL_GPL(vhost_discard_vq_desc);
-> diff --git a/drivers/vhost/vhost.h b/drivers/vhost/vhost.h
-> index 661088ae6dc7..e648b9b997d4 100644
-> --- a/drivers/vhost/vhost.h
-> +++ b/drivers/vhost/vhost.h
-> @@ -102,7 +102,6 @@ struct vhost_virtqueue {
->  	int ndescs;
->  	int first_desc;
->  	int max_descs;
-> -	int batch_descs;
->  
->  	const struct vhost_umem_node *meta_iotlb[VHOST_NUM_ADDRS];
->  	struct file *kick;
+> in lib.mk?
 > 
 
+O is the variable for selftests Makefile and which is handled in
+lib.mk. OUTPUT is internal and shouldn't set when running make.
+
+>>
+>> make O=/path/to/mydir is what you have to use. Please main Makefile
+>> as well for O= and KBUILD_OUTPUT usages.
+>>
+>> Please see Documentation/dev-tools/kselftest.rst for use-cases.
+>>
+>> make O=/path/to/mydir TARGETS=kvm is a right use-case and I can see
+>> it will fail to create x86_64 directory.
+>>
+>> Let's start with the following two commands and try to fix the
+>> problems you are seeing.
+>>
+>> make O=/path/to/mydir in kvm directory (this is supported,
+>> however, the following command from the main Makefile is
+>> recommended use.)
+> 
+> Of course we can do this, but the "O=/path/to/mydir" only has effect on 
+> header install, the *.o files still generated in kvm/ directory.
+> 
+
+Right. That is what needs to be fixed. This is the reason for your
+source directory getting dirty when kvm test is built.
+
+> And kvm's INSTALL_HDR_PATH cannot find the right headers.
+> 
+> That's why I choose to use "OUTPUT=/somewhere"
+> 
+>>  From main Makefile in kernel srcdir
+>> make O=/path/to/mydir TARGETS=kvm
+> 
+> I guess "kernel srcdir" means "kselftest srcdir", i.e., 
+> tools/testing/selftests/ ?
+
+This is kernel source root directory. The command you would
+use is:
+
+make kselftest-all O=/path/to/mydir TARGETS=kvm
+
+> 
+> Well, as I said in the first place, I tried
+> 
+>      make O=/path/to/mydir TARGETS=kvm
+> 
+> but it doesn't work. So I did some fixup, and sent out the Patches.
+> 
+
+Right. It doesn't work for a couple of reasons:
+
+1. The Makefile doesn't create sub-dirs when build is relocatable.
+2. Makes source directory dirty.
+
+> If the patches are wrong, please point it out and give your comments how 
+> to make it right.
+> 
+
+The patches you sent are based on running the command with OUTPUT
+set. That is why I am asking you start with the right use-cases,
+and gave you pointers on tests to refer to that have sub-dirs
+and handle relocatable builds:
+
+futex
+arm64
+android
+
+>> Also, just build isn't sufficient for you to be able to run the
+>> tests.
+>>
+>> make kselftest-install O=/path/to/mydir TARGETS=kvm will generate
+>> run script.
+> 
+> This command also has the x86_64 directory not created issue.
+> Since it generates header files in kernel_src/usr/include, it doesn't 
+> have headers path issue. But as result, the kernel_src directory is not 
+> clean, this requires me to run "make mrproper", I *really* don't like it.
+> 
+> 
+
+If the test leverages lib.mk headers install logic correctly, you
+shouldn't see this problem.
+
+Yes. It does make the source directory dirty. That is the problem we
+have to fix. I am seeing issues the issue of x86_64 not being created
+in the case of relocatable builds.
+
+Thanks for working on this by the way. It is one of the tests that
+identified as the one doesn't support relocatable builds.
+
+You will see fixes to others I already fixed in
+
+https://git.kernel.org/pub/scm/linux/kernel/git/shuah/linux-kselftest.git/log/?h=next
+
+Start withe the following use0-cases to fix and then test your fixes
+for these use-cases. The goal is to be able to run kvm from target
+directory and source directory staying clean.
+
+You will have to build the kernel first in all of these cases.
+Let's use kselftest-install which is what you would need if you
+want build and then run tests later. Also assuming you are doing
+native build on x86_64.
+
+ From main kernel Makefile: (from kernel source root dir)
+
+Builds in the same source directory:
+make kselftest-install TARGETS=kvm
+
+Relocatable build: (from kernel source root dir)
+
+make O=/path/objdir  - build kernel
+make kselftest-install O=/path/objdir TARGETS=kvm
+
+ From tools/testing/selftests/kvm directory:
+make O=/path/objdir install
+
+Install step is important especially for relocatable builds,
+as it makes sure all run-time dependencies are copied to the
+target directory.
+
+thanks,
+-- Shuah
