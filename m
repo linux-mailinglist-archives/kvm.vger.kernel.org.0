@@ -2,21 +2,21 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3BF5B19621A
-	for <lists+kvm@lfdr.de>; Sat, 28 Mar 2020 00:41:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2BDB7196234
+	for <lists+kvm@lfdr.de>; Sat, 28 Mar 2020 00:58:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726947AbgC0Xlp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Mar 2020 19:41:45 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:59816 "EHLO huawei.com"
+        id S1726340AbgC0X6E (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Mar 2020 19:58:04 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:43686 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726071AbgC0Xlp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 Mar 2020 19:41:45 -0400
-Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id 8C3F841FB3F0F2BF885A;
-        Sat, 28 Mar 2020 07:41:42 +0800 (CST)
+        id S1726071AbgC0X6E (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 Mar 2020 19:58:04 -0400
+Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.58])
+        by Forcepoint Email with ESMTP id 8CA50B503EC0D91486CF;
+        Sat, 28 Mar 2020 07:58:00 +0800 (CST)
 Received: from DESKTOP-27KDQMV.china.huawei.com (10.173.228.124) by
- DGGEMS412-HUB.china.huawei.com (10.3.19.212) with Microsoft SMTP Server id
- 14.3.487.0; Sat, 28 Mar 2020 07:41:31 +0800
+ DGGEMS413-HUB.china.huawei.com (10.3.19.213) with Microsoft SMTP Server id
+ 14.3.487.0; Sat, 28 Mar 2020 07:57:52 +0800
 From:   "Longpeng(Mike)" <longpeng2@huawei.com>
 To:     <linux-kernel@vger.kernel.org>, <linux-mm@kvack.org>
 CC:     <kvm@vger.kernel.org>, <arei.gonglei@huawei.com>,
@@ -28,9 +28,9 @@ CC:     <kvm@vger.kernel.org>, <arei.gonglei@huawei.com>,
         Matthew Wilcox <willy@infradead.org>,
         "Sean Christopherson" <sean.j.christopherson@intel.com>,
         <stable@vger.kernel.org>
-Subject: [PATCH v4] mm/hugetlb: fix a addressing exception caused by huge_pte_offset
-Date:   Sat, 28 Mar 2020 07:41:22 +0800
-Message-ID: <20200327234122.1985-1-longpeng2@huawei.com>
+Subject: [PATCH RESEND v4] mm/hugetlb: fix a addressing exception caused by huge_pte_offset
+Date:   Sat, 28 Mar 2020 07:57:48 +0800
+Message-ID: <20200327235748.2048-1-longpeng2@huawei.com>
 X-Mailer: git-send-email 2.25.0.windows.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7BIT
@@ -148,7 +148,7 @@ Cc: stable@vger.kernel.org
 Suggested-by: Jason Gunthorpe <jgg@ziepe.ca>
 Signed-off-by: Longpeng <longpeng2@huawei.com>
 ---
-v4 -> v3:
+v3 -> v4:
   fix a typo s/p4g/p4d.  [Jason]
 v2 -> v3:
   make sure p4d/pud/pmd be dereferenced once. [Jason]
