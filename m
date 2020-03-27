@@ -2,44 +2,43 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6F6991954E9
-	for <lists+kvm@lfdr.de>; Fri, 27 Mar 2020 11:12:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EF18D1954F0
+	for <lists+kvm@lfdr.de>; Fri, 27 Mar 2020 11:16:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726215AbgC0KMp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Mar 2020 06:12:45 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:60035 "EHLO
+        id S1726612AbgC0KQI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Mar 2020 06:16:08 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:50345 "EHLO
         us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726027AbgC0KMo (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 27 Mar 2020 06:12:44 -0400
+        by vger.kernel.org with ESMTP id S1726096AbgC0KQI (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 27 Mar 2020 06:16:08 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1585303963;
+        s=mimecast20190719; t=1585304167;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=d6iP0LfmEsE9Yh+fVeMLpWkXsc0TvzhEJZnN3Ob0bIQ=;
-        b=AShdepetyJ6fFIi/h80e8mK0ieeR1H18F6sXIIzKIu9kzhU7M/IEIfBIyCJc6SpjNvobx+
-        x8h3K18wywTHCJbLayvvRYb0DZumcsAyao9AVHKVHBMiDL4ELSRtJw0WeQta2HgZr+KUlW
-        dPVeLfTVzXFI41qKlscXpnvtpWeVDLY=
+        bh=sxD5d7+S/7pew9bgFJZM+LEW+i+269sqQ/ELQrfl0yc=;
+        b=BWcakwzv9wWwcrf14tjfXP4KJnNAIc8K8Bj+aIkd/nOVEh8dWvOY1kiY5LUAQuPbIVFeby
+        BaWrNmbwYpMbZyxa4dHxPTxeaoEvPQl1yjB+qYO32LlCaiJY3QeuwITRSJNyZbSHsK9wrj
+        mHyFGTTJfvK2XWaCa2LfM9gW/YO5bEw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-231-miXzvLsKOre0PO6rVt9P4Q-1; Fri, 27 Mar 2020 06:12:40 -0400
-X-MC-Unique: miXzvLsKOre0PO6rVt9P4Q-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+ us-mta-189-XeaFTaNBMaKg2EFOMgTF5w-1; Fri, 27 Mar 2020 06:16:05 -0400
+X-MC-Unique: XeaFTaNBMaKg2EFOMgTF5w-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DEAAC18B9FC8;
-        Fri, 27 Mar 2020 10:12:39 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 18E00107ACC7;
+        Fri, 27 Mar 2020 10:16:04 +0000 (UTC)
 Received: from [10.36.112.108] (ovpn-112-108.ams2.redhat.com [10.36.112.108])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id B548160FF9;
-        Fri, 27 Mar 2020 10:12:34 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH] Add Janosch as a s390x maintainer
-To:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org,
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D3E081001B0B;
+        Fri, 27 Mar 2020 10:16:02 +0000 (UTC)
+Subject: Re: [PATCH 1/2] s390x: add myself as reviewer
+To:     Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, Thomas Huth <thuth@redhat.com>,
         Janosch Frank <frankja@linux.ibm.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Laurent Vivier <lvivier@redhat.com>,
-        Drew Jones <drjones@redhat.com>
-References: <20200205101935.19219-1-thuth@redhat.com>
+References: <20200324121722.9776-1-cohuck@redhat.com>
+ <20200324121722.9776-2-cohuck@redhat.com>
 From:   David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -85,52 +84,46 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
  FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
 Organization: Red Hat GmbH
-Message-ID: <dc9739e3-c892-020d-0f9c-7e5583449190@redhat.com>
-Date:   Fri, 27 Mar 2020 11:12:34 +0100
+Message-ID: <af4c9a66-8dcf-5fe0-82de-a2237a534fb7@redhat.com>
+Date:   Fri, 27 Mar 2020 11:16:01 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20200205101935.19219-1-thuth@redhat.com>
+In-Reply-To: <20200324121722.9776-2-cohuck@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 05.02.20 11:19, Thomas Huth wrote:
-> Both, David and I, often do not have as much spare time for the
-> kvm-unit-tests as we would like to have, so we could use a little
-> bit of additional help here. Janosch did some excellent work for
-> the s390x kvm-unit-tests in the past months and is listed as reviewer
-> for these patches since quite a while already, so he's a very well
-> suited for the maintainer job here, too.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+On 24.03.20 13:17, Cornelia Huck wrote:
+> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 > ---
->  MAINTAINERS | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  MAINTAINERS | 1 +
+>  1 file changed, 1 insertion(+)
 > 
 > diff --git a/MAINTAINERS b/MAINTAINERS
-> index 48da1db..082be95 100644
+> index 48da1dbdd1ac..471767a355c6 100644
 > --- a/MAINTAINERS
 > +++ b/MAINTAINERS
-> @@ -80,7 +80,7 @@ F: lib/ppc64/*
->  S390X
+> @@ -81,6 +81,7 @@ S390X
 >  M: Thomas Huth <thuth@redhat.com>
 >  M: David Hildenbrand <david@redhat.com>
-> -R: Janosch Frank <frankja@linux.ibm.com>
-> +M: Janosch Frank <frankja@linux.ibm.com>
+>  R: Janosch Frank <frankja@linux.ibm.com>
+> +R: Cornelia Huck <cohuck@redhat.com>
 >  L: kvm@vger.kernel.org
 >  F: s390x/*
 >  F: lib/s390x/*
 > 
 
-Added "MAINTAINERS: " prefix to the subject and queued to
+Added "MAINTAINERS: " as subject prefix and queued to
 
 https://github.com/davidhildenbrand/kvm-unit-tests.git s390x-next
+
+(rebased on Janosch MAINTAINERS change)
 
 -- 
 Thanks,
