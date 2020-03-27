@@ -2,120 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2BC611953EE
-	for <lists+kvm@lfdr.de>; Fri, 27 Mar 2020 10:27:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3DF2C195403
+	for <lists+kvm@lfdr.de>; Fri, 27 Mar 2020 10:31:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727125AbgC0J1S (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Mar 2020 05:27:18 -0400
-Received: from mail-oi1-f195.google.com ([209.85.167.195]:33336 "EHLO
-        mail-oi1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725946AbgC0J1Q (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 Mar 2020 05:27:16 -0400
-Received: by mail-oi1-f195.google.com with SMTP id m14so8251306oic.0;
-        Fri, 27 Mar 2020 02:27:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=mxJM5ZIhu7LpQ+5NV71sEjP70ux0ckHNNXazRf9xK2k=;
-        b=qclDenfHJNoe/IbZxPSfOepV1+OSvwFv2zwQd92O5HAfGOLqhoZDmdC5cKQ6tXtqDv
-         r9aF7m/wkriX8p0dI89Uj+oZ8xKuoXjKxkU0F02iKIfpjNBbI2cEKtNlVXfF9FugLVIA
-         ljpmEwXZzTrVQoLu/Xz37CPdnQqa+oku+v97n+FYIp6SkRhYY0bBq4R94hUB54htYP4m
-         9mHCZNoZ0F7DYNIbD3bC9N123yuXzAYbIM363NlRJrMmzlzyKQY3681J6v10P5h6FWyg
-         hGVbwkP6yhbRQSmLujKhFYgSg2bPcyvcwzonjl6bjmW0VCzoMzhO7KgXeKSDy8ffmKzp
-         Y50g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=mxJM5ZIhu7LpQ+5NV71sEjP70ux0ckHNNXazRf9xK2k=;
-        b=jvOXCowtkcJH4ecJ4eA8ZRIyxjmdagvlzLILJjFdDygefbf59JuXRbwlJ36eMFPIGq
-         QoARUIIR6Zo2sbxunBXtqUpBfVAWYzaCoiIQPnTnSShlQqhq+FqyW2+hYEu80k7KrzD6
-         s9ZW/IOjLrvvbAGd4ABb0ta4uenPMOwFa01vv7vXnokNBjXRkOqJKgvpa0+SAWX7KAhm
-         gmAJNQOqV89lTwSnYRQNpGgImkIEJdyhmspBUTTIxddJUAY5fwP7fiKT+QQKp5kQMYsL
-         alUArc8/MLzWk+0LDySlIxa/RcmFKfeaD8DaN/FdDFPJ0Fi9aFzerR5MxejmLFJ7jt2n
-         662Q==
-X-Gm-Message-State: ANhLgQ37qFsgPrjmpxUjh7NdVRY9slBI5mB0nVau2+CHn021b3lkIyci
-        P+DZ6UTgM3+7esFzAEamVXOhd1z81cvWJuSaMsM=
-X-Google-Smtp-Source: ADFU+vvxewAN9wA5TUvmoNDEwLFRuGiDSd8Fyty0Qven1rU+JHBVv9EW4qnwryLCjS/JFO3ppsHqsCEAN3uB3kOPAok=
-X-Received: by 2002:aca:f288:: with SMTP id q130mr3241437oih.33.1585301235733;
- Fri, 27 Mar 2020 02:27:15 -0700 (PDT)
+        id S1726149AbgC0Jbp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Mar 2020 05:31:45 -0400
+Received: from mga04.intel.com ([192.55.52.120]:7300 "EHLO mga04.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725946AbgC0Jbp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 Mar 2020 05:31:45 -0400
+IronPort-SDR: PngEAh6/yiYZHwnIAdqc4I05c+bGXWkDSvbt1XKi+Q+83+g9vlOrprtEpqy5GkRQH1mQboZl3m
+ CLPSFhFUchHQ==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Mar 2020 02:31:41 -0700
+IronPort-SDR: +JnlIPZ27gPEXG7U99ML/TBH534/qa0mhzss5+NvEB866bsW3sK02Ts7bJwBZdH9ofoKfq7o2L
+ VGqAD7Jo32Bw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.72,311,1580803200"; 
+   d="scan'208";a="247835315"
+Received: from fmsmsx103.amr.corp.intel.com ([10.18.124.201])
+  by orsmga003.jf.intel.com with ESMTP; 27 Mar 2020 02:31:40 -0700
+Received: from fmsmsx124.amr.corp.intel.com (10.18.125.39) by
+ FMSMSX103.amr.corp.intel.com (10.18.124.201) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Fri, 27 Mar 2020 02:31:39 -0700
+Received: from shsmsx102.ccr.corp.intel.com (10.239.4.154) by
+ fmsmsx124.amr.corp.intel.com (10.18.125.39) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Fri, 27 Mar 2020 02:31:40 -0700
+Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.206]) by
+ shsmsx102.ccr.corp.intel.com ([169.254.2.50]) with mapi id 14.03.0439.000;
+ Fri, 27 Mar 2020 17:31:36 +0800
+From:   "Tian, Kevin" <kevin.tian@intel.com>
+To:     Zhenyu Wang <zhenyuw@linux.intel.com>
+CC:     "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        "Jiang, Dave" <dave.jiang@intel.com>,
+        "Yuan, Hang" <hang.yuan@intel.com>
+Subject: RE: [PATCH v2 2/2] drm/i915/gvt: mdev aggregation type
+Thread-Topic: [PATCH v2 2/2] drm/i915/gvt: mdev aggregation type
+Thread-Index: AQHWAzE8uZfRrqms+UGN02f5QAMK/6hah5QggAEKxoCAAI40QP//frKAgACOdNA=
+Date:   Fri, 27 Mar 2020 09:31:35 +0000
+Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D19D7ED44B@SHSMSX104.ccr.corp.intel.com>
+References: <20200326054136.2543-1-zhenyuw@linux.intel.com>
+ <20200326054136.2543-3-zhenyuw@linux.intel.com>
+ <AADFC41AFE54684AB9EE6CBC0274A5D19D7ED10B@SHSMSX104.ccr.corp.intel.com>
+ <20200327081215.GJ8880@zhen-hp.sh.intel.com>
+ <AADFC41AFE54684AB9EE6CBC0274A5D19D7ED38D@SHSMSX104.ccr.corp.intel.com>
+ <20200327085825.GK8880@zhen-hp.sh.intel.com>
+In-Reply-To: <20200327085825.GK8880@zhen-hp.sh.intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-References: <1585290240-18643-1-git-send-email-wanpengli@tencent.com>
- <1585290240-18643-2-git-send-email-wanpengli@tencent.com> <87eete415a.fsf@vitty.brq.redhat.com>
-In-Reply-To: <87eete415a.fsf@vitty.brq.redhat.com>
-From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Fri, 27 Mar 2020 17:27:04 +0800
-Message-ID: <CANRm+CzHSTrGPpqxwzhtCvKtK-jpLvF=MvxVA06dCSAZbHgFng@mail.gmail.com>
-Subject: Re: [PATCH 2/2] KVM: LAPIC: Don't need to clear IPI delivery status
- for x2apic
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 27 Mar 2020 at 17:07, Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
->
-> Wanpeng Li <kernellwp@gmail.com> writes:
->
-> > From: Wanpeng Li <wanpengli@tencent.com>
-> >
-> > IPI delivery status field is not present for x2apic, don't need
-> > to clear IPI delivery status for x2apic.
-> >
-> > Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
-> > ---
-> >  arch/x86/kvm/lapic.c | 3 ++-
-> >  arch/x86/kvm/x86.c   | 1 -
-> >  2 files changed, 2 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> > index 88929b1..f6d69e2 100644
-> > --- a/arch/x86/kvm/lapic.c
-> > +++ b/arch/x86/kvm/lapic.c
-> > @@ -1942,7 +1942,8 @@ int kvm_lapic_reg_write(struct kvm_lapic *apic, u32 reg, u32 val)
-> >       }
-> >       case APIC_ICR:
-> >               /* No delay here, so we always clear the pending bit */
->
-> 'Always' in the comment above now reads a bit odd, I'd suggest modifying
-> it to 'Immediately clear Delivery Status field in xAPIC mode' - or just
-> drop it altogeter.
-
-Thank you for your review, I guess Paolo can do it when apply.
-
-    Wanpeng
-
->
-> > -             val &= ~(1 << 12);
-> > +             if (!apic_x2apic_mode(apic))
-> > +                     val &= ~(1 << 12);
-> >               kvm_apic_send_ipi(apic, val, kvm_lapic_get_reg(apic, APIC_ICR2));
-> >               kvm_lapic_set_reg(apic, APIC_ICR, val);
-> >               break;
-> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > index 495709f..6ced0e1 100644
-> > --- a/arch/x86/kvm/x86.c
-> > +++ b/arch/x86/kvm/x86.c
-> > @@ -1562,7 +1562,6 @@ static int handle_fastpath_set_x2apic_icr_irqoff(struct kvm_vcpu *vcpu, u64 data
-> >               ((data & APIC_MODE_MASK) == APIC_DM_FIXED) &&
-> >               ((u32)(data >> 32) != X2APIC_BROADCAST)) {
-> >
-> > -             data &= ~(1 << 12);
-> >               kvm_apic_send_ipi(vcpu->arch.apic, (u32)data, (u32)(data >> 32));
-> >               kvm_lapic_set_reg(vcpu->arch.apic, APIC_ICR2, (u32)(data >> 32));
-> >               kvm_lapic_set_reg(vcpu->arch.apic, APIC_ICR, (u32)data);
->
-> Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
->
-> --
-> Vitaly
->
+PiBGcm9tOiBaaGVueXUgV2FuZyA8emhlbnl1d0BsaW51eC5pbnRlbC5jb20+DQo+IFNlbnQ6IEZy
+aWRheSwgTWFyY2ggMjcsIDIwMjAgNDo1OCBQTQ0KPiANCj4gT24gMjAyMC4wMy4yNyAwODo0NDo1
+OSArMDAwMCwgVGlhbiwgS2V2aW4gd3JvdGU6DQo+ID4gPiBGcm9tOiBaaGVueXUgV2FuZyA8emhl
+bnl1d0BsaW51eC5pbnRlbC5jb20+DQo+ID4gPiBTZW50OiBGcmlkYXksIE1hcmNoIDI3LCAyMDIw
+IDQ6MTIgUE0NCj4gPiA+DQo+ID4gWy4uLl0NCj4gPiA+ID4gPiAraW50IGludGVsX3ZncHVfYWRq
+dXN0X3Jlc291cmNlX2NvdW50KHN0cnVjdCBpbnRlbF92Z3B1ICp2Z3B1KQ0KPiA+ID4gPiA+ICt7
+DQo+ID4gPiA+ID4gKwlpZiAoKHZncHVfYXBlcnR1cmVfc3oodmdwdSkgIT0gdmdwdS0+cGFyYW0u
+bG93X2dtX3N6ICoNCj4gPiA+ID4gPiArCSAgICAgdmdwdS0+cGFyYW0uYWdncmVnYXRpb24pIHx8
+DQo+ID4gPiA+ID4gKwkgICAgKHZncHVfaGlkZGVuX3N6KHZncHUpICE9IHZncHUtPnBhcmFtLmhp
+Z2hfZ21fc3ogKg0KPiA+ID4gPiA+ICsJICAgICB2Z3B1LT5wYXJhbS5hZ2dyZWdhdGlvbikpIHsN
+Cj4gPiA+ID4gPiArCQkvKiBoYW5kbGUgYWdncmVnYXRpb24gY2hhbmdlICovDQo+ID4gPiA+ID4g
+KwkJaW50ZWxfdmdwdV9mcmVlX3Jlc291cmNlX2NvdW50KHZncHUpOw0KPiA+ID4gPiA+ICsJCWlu
+dGVsX3ZncHVfYWxsb2NfcmVzb3VyY2VfY291bnQodmdwdSk7DQo+ID4gPiA+DQo+ID4gPiA+IHRo
+aXMgbG9naWMgc291bmRzIGxpa2UgZGlmZmVyZW50IGZyb20gdGhlIGNvbW1pdCBtc2cuIEVhcmxp
+ZXIgeW91DQo+ID4gPiA+IHNhaWQgdGhlIHJlc291cmNlIGlzIG5vdCBhbGxvY2F0ZWQgdW50aWwg
+bWRldiBvcGVuLCB3aGlsZSB0aGUNCj4gPiA+ID4gYWdncmVnYXRlZF9pbnRlcmZhY2VzIGlzIG9u
+bHkgYWxsb3dlZCB0byBiZSB3cml0dGVuIGJlZm9yZQ0KPiA+ID4gPiBtZGV2IG9wZW4uIEluIHN1
+Y2ggY2FzZSwgd2h5IHdvdWxkIGl0IHJlcXVpcmVkIHRvIGhhbmRsZSB0aGUNCj4gPiA+ID4gY2Fz
+ZSB3aGVyZSBhIHZncHUgYWxyZWFkeSBoYXMgcmVzb3VyY2UgYWxsb2NhdGVkIHRoZW4gY29taW5n
+DQo+ID4gPiA+IGEgbmV3IHJlcXVlc3QgdG8gYWRqdXN0IHRoZSBudW1iZXIgb2YgaW5zdGFuY2Vz
+Pw0KPiA+ID4NCj4gPiA+IFRoaXMgaXMgdG8gaGFuZGxlIHJlc291cmNlIGFjY291bnRpbmcgYmVm
+b3JlIG1kZXYgb3BlbiBieSBhZ2dyZWdhdGlvbg0KPiA+ID4gc2V0dGluZyBjaGFuZ2UuIFdoZW4g
+dmdwdSBjcmVhdGUgZnJvbSBtZGV2IHR5cGUsIGRlZmF1bHQgcmVzb3VyY2UNCj4gPiA+IGNvdW50
+IGFjY29yZGluZyB0byB0eXBlIGlzIHNldCBmb3IgdmdwdS4gU28gdGhpcyBmdW5jdGlvbiBpcyBq
+dXN0IHRvDQo+ID4gPiBjaGFuZ2UgcmVzb3VyY2UgY291bnQgYnkgYWdncmVnYXRpb24uDQo+ID4N
+Cj4gPiB0aGVuIGJldHRlciBjaGFuZ2UgdGhlIG5hbWUsIGUuZy4gLnh4eF9hZGp1c3RfcmVzb3Vy
+Y2VfYWNjb3VudGluZywNCj4gPiBvdGhlcndpc2UgaXQncyBlYXN5IHRvIGJlIGNvbmZ1c2VkLg0K
+PiA+DQo+IA0KPiBvaw0KPiANCj4gPiBbLi4uXQ0KPiA+ID4gPiA+ICAJaWYgKHJldCkNCj4gPiA+
+ID4gPiAgCQlnb3RvIG91dF9jbGVhbl92Z3B1X21taW87DQo+ID4gPiA+ID4NCj4gPiA+ID4gPiAt
+CXBvcHVsYXRlX3B2aW5mb19wYWdlKHZncHUpOw0KPiA+ID4gPiA+ICsJaWYgKCFkZWxheV9yZXNf
+YWxsb2MpIHsNCj4gPiA+ID4gPiArCQlyZXQgPSBpbnRlbF92Z3B1X3Jlc19hbGxvYyh2Z3B1KTsN
+Cj4gPiA+ID4gPiArCQlpZiAocmV0KQ0KPiA+ID4gPiA+ICsJCQlnb3RvIG91dF9jbGVhbl92Z3B1
+X21taW87DQo+ID4gPiA+ID4gKwl9DQo+ID4gPiA+DQo+ID4gPiA+IElmIGRlbGF5ZWQgcmVzb3Vy
+Y2UgYWxsb2NhdGlvbiB3b3JrcyBjb3JyZWN0bHksIHdoeSBkbyB3ZSBzdGlsbA0KPiA+ID4gPiBu
+ZWVkIHN1cHBvcnQgbm9uLWRlbGF5ZWQgZmxhdm9yPyBFdmVuIGEgdHlwZSBkb2Vzbid0IHN1cHBv
+cnQNCj4gPiA+ID4gYWdncmVnYXRpb24sIGl0IGRvZXNuJ3QgaHVydCB0byBkbyBhbGxvY2F0aW9u
+IHVudGlsIG1kZXYgb3Blbi4uLg0KPiA+ID4gPg0KPiA+ID4NCj4gPiA+IFRoZSBkaWZmZXJlbmNl
+IGlzIHVzZXIgZXhwZWN0YXRpb24gSSB0aGluaywgaWYgdGhlcmUncyByZWFsbHkNCj4gPiA+IGF3
+YXJlbmVzcyBvZiB0aGlzLiBBcyBvcmlnaW5hbCB3YXkgaXMgdG8gYWxsb2NhdGUgYXQgY3JlYXQg
+dGltZSwgc28NCj4gPiA+IG9uY2UgY3JlYXRlZCBzdWNjZXNzLCByZXNvdXJjZSBpcyBndWFyYW50
+ZWVkLiBCdXQgZm9yIGFnZ3JlZ2F0aW9uIHR5cGUNCj4gPiA+IHdoaWNoIGNvdWxkIGJlIGNoYW5n
+ZWQgYmVmb3JlIG9wZW4sIGFsbG9jIGhhcHBlbnMgYXQgdGhhdCB0aW1lIHdoaWNoDQo+ID4gPiBt
+YXkgaGF2ZSBkaWZmZXJlbnQgc2NlbmFyaW8sIGUuZyBtaWdodCBmYWlsIGNhdXNlZCBieSBvdGhl
+ciBpbnN0YW5jZQ0KPiA+ID4gb3IgaG9zdC4gU28gb3JpZ2luYWwgaWRlYSBpcyB0byBrZWVwIG9s
+ZCBiZWhhdmlvciBidXQgb25seSBjaGFuZ2UgZm9yDQo+ID4gPiBhZ2dyZWdhdGlvbiB0eXBlLg0K
+PiA+DQo+ID4gYnV0IGhvdyBjb3VsZCBvbmUgZXhwZWN0IGFueSBkaWZmZXJlbmNlIGJldHdlZW4g
+aW5zdGFudCBhbGxvY2F0aW9uDQo+ID4gYW5kIGRlbGF5ZWQgYWxsb2NhdGlvbj8gWW91IGFscmVh
+ZHkgdXBkYXRlIHJlc291cmNlIGFjY291bnRpbmcgc28NCj4gPiB0aGUgcmVtYWluaW5nIGluc3Rh
+bmNlcyBhcmUgYWNjdXJhdGUgYW55d2F5LiBUaGVuIHRoZSB1c2VyIG9ubHkga25vd3MNCj4gPiBo
+b3cgdGhlIHZncHUgbG9va3MgbGlrZSB3aGVuIGl0IGlzIG9wZW5lZC4uLg0KPiA+DQo+ID4gPg0K
+PiA+ID4gSWYgd2UgdGhpbmsgdGhpcyB1c2VyIGV4cGVjdGF0aW9uIGlzIG5vdCBpbXBvcnRhbnQs
+IGRlbGF5ZWQgYWxsb2MNCj4gPiA+IGNvdWxkIGhlbHAgdG8gY3JlYXRlIHZncHUgcXVpY2tseSBi
+dXQgbWF5IGhhdmUgbW9yZSBjaGFuY2UgdG8gZmFpbA0KPiA+ID4gbGF0ZXIuLg0KPiA+ID4NCj4g
+Pg0KPiA+IHdoeT8gSWYgZGVsYXllZCBhbGxvY2F0aW9uIGhhcyBtb3JlIGNoYW5jZSB0byBmYWls
+LCBpdCBtZWFucyBvdXINCj4gPiByZXNvdXJjZSBhY2NvdW50aW5nIGhhcyBwcm9ibGVtLiBFdmVu
+IGZvciB0eXBlIHcvbyBhZ2dyZWdhdGlvbg0KPiA+IGNhcGFiaWxpdHksIHdlIHNob3VsZCByZXNl
+cnZlIG9uZSBpbnN0YW5jZSByZXNvdXJjZSBieSBkZWZhdWx0IGFueXdheQ0KPiA+DQo+IA0KPiBJ
+ZiB1bmRlciByZWFsbHkgaGVhdnkgbG9hZCBvZiBob3N0IGFuZCBtYW55IG90aGVyIHZncHUgcnVu
+bmluZywgd2UNCj4gbWlnaHQgbm90IGhhdmUgbGVmdCBjb250aW51YWwgZ2Z4IG1lbSBzcGFjZS4u
+VGhpcyBpcyBub3QgbmV3IHByb2JsZW0sDQo+IGp1c3QgdGhhdCBub3cgd2UgaGFuZGxlIGl0IGF0
+IHZncHUgY3JlYXRlIHRpbWUgdG8gcmVzZXJ2ZSB0aGUNCj4gcmVzb3VyY2UuIE9uY2UgaG9zdCBz
+aWRlIGNvdWxkIHByb21pc2Ugc29tZSBsaW1pdCwgdGhlbiBvdXIgdXNhZ2UNCj4gd2lsbCBiZSBn
+dWFyYW50ZWVkLg0KPiANCg0KaGVhdnkgbG9hZCBkb2Vzbid0IG1lYW4gdGhhdCB5b3UgbWF5IGhh
+dmUgaGlnaGVyIHBvc3NpYmlsaXR5IG9mDQpzZWN1cmluZyByZXNvdXJjZSBhdCBhIGVhcmxpZXIg
+cG9pbnQuIEl0J3MgY29tcGxldGVseSBub25kZXRlcm1pbmlzdGljDQp3aGVuIHRoZSBzaXR1YXRp
+b24gaXMgd29yc2Ugb3IgYmV0dGVyLiBJbiBzdWNoIGNhc2UgSSBkb24ndCB0aGluayANCnRoZXJl
+IGlzIHN1YnRsZSBkaWZmZXJlbmNlIGJldHdlZW4gaW5zdGFudCBhbmQgZGVsYXllZCBhbGxvY2F0
+aW9uLA0Kd2hpbGUgdW5pZnlpbmcgb24gZGVsYXllZCBhbGxvY2F0aW9uIGNvdWxkIHNpbXBsaWZ5
+IG91ciBjb2RlLiDwn5iKDQoNClRoYW5rcw0KS2V2aW4NCg==
