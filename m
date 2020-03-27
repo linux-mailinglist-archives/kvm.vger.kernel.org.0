@@ -2,132 +2,155 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C039B195379
-	for <lists+kvm@lfdr.de>; Fri, 27 Mar 2020 10:00:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C154519539E
+	for <lists+kvm@lfdr.de>; Fri, 27 Mar 2020 10:11:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726739AbgC0JAV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Mar 2020 05:00:21 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:54058 "EHLO
-        us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725956AbgC0JAV (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 27 Mar 2020 05:00:21 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1585299619;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=xXn06OBqafJOcrur/EKuL7fTmScTGWRZwAAJXIbK1TM=;
-        b=C1OH9R8Nj5Jajv8Ex2lvtOvhdXxsGkdPCtYBQduuqh2C8d0Uonao7Sxv9zLdXgPJ11YLom
-        VCAzlWBUjHSBBLKOWCqc5/SdP904XYfv/P+Fbh9d82QOLCfddZKS7636FFrjSuyJHLRSnB
-        tOQpNy6w6Q4Q+doTHGDCz03slv0PaP0=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-319-W4ix9-X_P7Gage2-CzQWOg-1; Fri, 27 Mar 2020 05:00:17 -0400
-X-MC-Unique: W4ix9-X_P7Gage2-CzQWOg-1
-Received: by mail-wm1-f69.google.com with SMTP id g9so5339499wmh.1
-        for <kvm@vger.kernel.org>; Fri, 27 Mar 2020 02:00:17 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=xXn06OBqafJOcrur/EKuL7fTmScTGWRZwAAJXIbK1TM=;
-        b=gRs7/S0ECeEq0VtVXFnKty/ybud79XvEBhRrz70Px80XUFbAu88PxIHW3151of5bP1
-         rqUHZdgNH4IB5OER/WbiyBfgwIYwZxeyo/3f9i20afaJQP1vAzLZuJrswJE4RnK4osK9
-         wPHeO+EeQX6AMpjeDwow9Gek30TU/tij3q7Tc5oZ1SiIhyWKZTkqocrGpCvmx+d2HBTe
-         yROu1CANbWuksvnUbViNyw8d+eI+/251F8CBMN2fAHKR96gyvWBIczcgFc0O+jwL8fKY
-         HtPa5cKfqnblgc7dVvJW6iYwrvWWQqcpQOTKZnXFhH+nYfC73B6DHAEi1uDtVH8Q24P5
-         l1kA==
-X-Gm-Message-State: ANhLgQ3tU2cQiybsUisKxhx/VUQwR+L0GllJ9/jCNMzHkJdqvQSJwfzU
-        woGyvRQ5YKCaX7e/TmXYTqn07e84ffJmAxSYn18pkS4T4P5WC8sAtOxm8FtSxAd+2R0hbGM2XEO
-        ziUKj9R3RfFBC
-X-Received: by 2002:a7b:c005:: with SMTP id c5mr4246491wmb.170.1585299616261;
-        Fri, 27 Mar 2020 02:00:16 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vupCgbub67CH9ToceY2ONuYK3r55PSSyGg0pZYTP2Bzke32oW0juDI1XeKQGvWvA4hyB0SRUA==
-X-Received: by 2002:a7b:c005:: with SMTP id c5mr4246456wmb.170.1585299616001;
-        Fri, 27 Mar 2020 02:00:16 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id 71sm7846558wrc.53.2020.03.27.02.00.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 27 Mar 2020 02:00:15 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Wanpeng Li <kernellwp@gmail.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Subject: Re: [PATCH 1/2] KVM: X86: Filter the broadcast dest for IPI fastpath
-In-Reply-To: <1585290240-18643-1-git-send-email-wanpengli@tencent.com>
-References: <1585290240-18643-1-git-send-email-wanpengli@tencent.com>
-Date:   Fri, 27 Mar 2020 10:00:14 +0100
-Message-ID: <87h7ya41gh.fsf@vitty.brq.redhat.com>
+        id S1726656AbgC0JL3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Mar 2020 05:11:29 -0400
+Received: from mga12.intel.com ([192.55.52.136]:9210 "EHLO mga12.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726193AbgC0JL3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 Mar 2020 05:11:29 -0400
+IronPort-SDR: jofDQX44cSJoehTXLKa20YixjbTQdF2IU2dGoO4z2ihGUQwpRG4fq1e8p5XfwymXC8+iddjkEz
+ CQ2t02nhK2bg==
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Mar 2020 02:11:28 -0700
+IronPort-SDR: C/EOFXaQrjp2OBlaAuqxBO2bERxtEG/jc/NJ+MfjyL4DO8Ry82AFXpjAHT7TZkvhXA31dNzsZf
+ cpdQz7yHTeNQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.72,311,1580803200"; 
+   d="asc'?scan'208";a="358431438"
+Received: from zhen-hp.sh.intel.com (HELO zhen-hp) ([10.239.160.147])
+  by fmsmga001.fm.intel.com with ESMTP; 27 Mar 2020 02:11:27 -0700
+Date:   Fri, 27 Mar 2020 16:58:25 +0800
+From:   Zhenyu Wang <zhenyuw@linux.intel.com>
+To:     "Tian, Kevin" <kevin.tian@intel.com>
+Cc:     "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        "Jiang, Dave" <dave.jiang@intel.com>,
+        "Yuan, Hang" <hang.yuan@intel.com>
+Subject: Re: [PATCH v2 2/2] drm/i915/gvt: mdev aggregation type
+Message-ID: <20200327085825.GK8880@zhen-hp.sh.intel.com>
+Reply-To: Zhenyu Wang <zhenyuw@linux.intel.com>
+References: <20200326054136.2543-1-zhenyuw@linux.intel.com>
+ <20200326054136.2543-3-zhenyuw@linux.intel.com>
+ <AADFC41AFE54684AB9EE6CBC0274A5D19D7ED10B@SHSMSX104.ccr.corp.intel.com>
+ <20200327081215.GJ8880@zhen-hp.sh.intel.com>
+ <AADFC41AFE54684AB9EE6CBC0274A5D19D7ED38D@SHSMSX104.ccr.corp.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: multipart/signed; micalg=pgp-sha1;
+        protocol="application/pgp-signature"; boundary="hWmTLTlw74j3oMzq"
+Content-Disposition: inline
+In-Reply-To: <AADFC41AFE54684AB9EE6CBC0274A5D19D7ED38D@SHSMSX104.ccr.corp.intel.com>
+User-Agent: Mutt/1.10.0 (2018-05-17)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Wanpeng Li <kernellwp@gmail.com> writes:
 
-> From: Wanpeng Li <wanpengli@tencent.com>
+--hWmTLTlw74j3oMzq
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On 2020.03.27 08:44:59 +0000, Tian, Kevin wrote:
+> > From: Zhenyu Wang <zhenyuw@linux.intel.com>
+> > Sent: Friday, March 27, 2020 4:12 PM
+> >=20
+> [...]
+> > > > +int intel_vgpu_adjust_resource_count(struct intel_vgpu *vgpu)
+> > > > +{
+> > > > +	if ((vgpu_aperture_sz(vgpu) !=3D vgpu->param.low_gm_sz *
+> > > > +	     vgpu->param.aggregation) ||
+> > > > +	    (vgpu_hidden_sz(vgpu) !=3D vgpu->param.high_gm_sz *
+> > > > +	     vgpu->param.aggregation)) {
+> > > > +		/* handle aggregation change */
+> > > > +		intel_vgpu_free_resource_count(vgpu);
+> > > > +		intel_vgpu_alloc_resource_count(vgpu);
+> > >
+> > > this logic sounds like different from the commit msg. Earlier you
+> > > said the resource is not allocated until mdev open, while the
+> > > aggregated_interfaces is only allowed to be written before
+> > > mdev open. In such case, why would it required to handle the
+> > > case where a vgpu already has resource allocated then coming
+> > > a new request to adjust the number of instances?
+> >=20
+> > This is to handle resource accounting before mdev open by aggregation
+> > setting change. When vgpu create from mdev type, default resource
+> > count according to type is set for vgpu. So this function is just to
+> > change resource count by aggregation.
+>=20
+> then better change the name, e.g. .xxx_adjust_resource_accounting,
+> otherwise it's easy to be confused.
 >
-> Except destination shorthand, a destination value 0xffffffff is used to 
-> broadcast interrupts, let's also filter this for single target IPI fastpath.
->
-> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
-> ---
->  arch/x86/kvm/lapic.c | 3 ---
->  arch/x86/kvm/lapic.h | 3 +++
->  arch/x86/kvm/x86.c   | 3 ++-
->  3 files changed, 5 insertions(+), 4 deletions(-)
->
-> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> index a38f1a8..88929b1 100644
-> --- a/arch/x86/kvm/lapic.c
-> +++ b/arch/x86/kvm/lapic.c
-> @@ -59,9 +59,6 @@
->  #define MAX_APIC_VECTOR			256
->  #define APIC_VECTORS_PER_REG		32
->  
-> -#define APIC_BROADCAST			0xFF
-> -#define X2APIC_BROADCAST		0xFFFFFFFFul
-> -
->  static bool lapic_timer_advance_dynamic __read_mostly;
->  #define LAPIC_TIMER_ADVANCE_ADJUST_MIN	100	/* clock cycles */
->  #define LAPIC_TIMER_ADVANCE_ADJUST_MAX	10000	/* clock cycles */
-> diff --git a/arch/x86/kvm/lapic.h b/arch/x86/kvm/lapic.h
-> index bc76860..25b77a6 100644
-> --- a/arch/x86/kvm/lapic.h
-> +++ b/arch/x86/kvm/lapic.h
-> @@ -17,6 +17,9 @@
->  #define APIC_BUS_CYCLE_NS       1
->  #define APIC_BUS_FREQUENCY      (1000000000ULL / APIC_BUS_CYCLE_NS)
->  
-> +#define APIC_BROADCAST			0xFF
-> +#define X2APIC_BROADCAST		0xFFFFFFFFul
-> +
->  enum lapic_mode {
->  	LAPIC_MODE_DISABLED = 0,
->  	LAPIC_MODE_INVALID = X2APIC_ENABLE,
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index c4bb7d8..495709f 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -1559,7 +1559,8 @@ static int handle_fastpath_set_x2apic_icr_irqoff(struct kvm_vcpu *vcpu, u64 data
->  
->  	if (((data & APIC_SHORT_MASK) == APIC_DEST_NOSHORT) &&
->  		((data & APIC_DEST_MASK) == APIC_DEST_PHYSICAL) &&
-> -		((data & APIC_MODE_MASK) == APIC_DM_FIXED)) {
-> +		((data & APIC_MODE_MASK) == APIC_DM_FIXED) &&
-> +		((u32)(data >> 32) != X2APIC_BROADCAST)) {
->  
->  		data &= ~(1 << 12);
->  		kvm_apic_send_ipi(vcpu->arch.apic, (u32)data, (u32)(data >> 32));
 
-Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+ok
 
--- 
-Vitaly
+> [...]
+> > > >  	if (ret)
+> > > >  		goto out_clean_vgpu_mmio;
+> > > >
+> > > > -	populate_pvinfo_page(vgpu);
+> > > > +	if (!delay_res_alloc) {
+> > > > +		ret =3D intel_vgpu_res_alloc(vgpu);
+> > > > +		if (ret)
+> > > > +			goto out_clean_vgpu_mmio;
+> > > > +	}
+> > >
+> > > If delayed resource allocation works correctly, why do we still
+> > > need support non-delayed flavor? Even a type doesn't support
+> > > aggregation, it doesn't hurt to do allocation until mdev open...
+> > >
+> >=20
+> > The difference is user expectation I think, if there's really
+> > awareness of this. As original way is to allocate at creat time, so
+> > once created success, resource is guaranteed. But for aggregation type
+> > which could be changed before open, alloc happens at that time which
+> > may have different scenario, e.g might fail caused by other instance
+> > or host. So original idea is to keep old behavior but only change for
+> > aggregation type.
+>=20
+> but how could one expect any difference between instant allocation
+> and delayed allocation? You already update resource accounting so
+> the remaining instances are accurate anyway. Then the user only knows
+> how the vgpu looks like when it is opened...
+>=20
+> >=20
+> > If we think this user expectation is not important, delayed alloc
+> > could help to create vgpu quickly but may have more chance to fail
+> > later..
+> >=20
+>=20
+> why? If delayed allocation has more chance to fail, it means our
+> resource accounting has problem. Even for type w/o aggregation
+> capability, we should reserve one instance resource by default anyway
+>=20
 
+If under really heavy load of host and many other vgpu running, we
+might not have left continual gfx mem space..This is not new problem,
+just that now we handle it at vgpu create time to reserve the
+resource. Once host side could promise some limit, then our usage
+will be guaranteed.
+
+--=20
+Open Source Technology Center, Intel ltd.
+
+$gpg --keyserver wwwkeys.pgp.net --recv-keys 4D781827
+
+--hWmTLTlw74j3oMzq
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iF0EARECAB0WIQTXuabgHDW6LPt9CICxBBozTXgYJwUCXn3AMQAKCRCxBBozTXgY
+J4KuAJ4hN+LXuQnOB0N9RVitLx2kyP4PNQCdHDV6OLJ2/556lndHOjsPUqsOoJI=
+=ytmu
+-----END PGP SIGNATURE-----
+
+--hWmTLTlw74j3oMzq--
