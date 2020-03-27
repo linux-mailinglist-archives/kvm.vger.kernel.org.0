@@ -2,104 +2,217 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 514E7195102
-	for <lists+kvm@lfdr.de>; Fri, 27 Mar 2020 07:24:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A3BF7195155
+	for <lists+kvm@lfdr.de>; Fri, 27 Mar 2020 07:34:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727287AbgC0GYY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Mar 2020 02:24:24 -0400
-Received: from mail-pl1-f193.google.com ([209.85.214.193]:41175 "EHLO
-        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726215AbgC0GYX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 Mar 2020 02:24:23 -0400
-Received: by mail-pl1-f193.google.com with SMTP id t16so3078011plr.8;
-        Thu, 26 Mar 2020 23:24:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=cRB5KVU8flbbfiX95l71SFIi4ntzX1dMuUx4bGKIqDM=;
-        b=cVo+9E2hHHRzQHJTWVEneSorc4gh9x0wMNISSKyll0TgdUKFvleZWSCIJNhP9KwSY6
-         pD6NKX/jpUy7sC2+4sLF/8DGSlzbTD+vjcXpAjR1Br1DzizBmxRKXUl9Qqf9B9WYyOat
-         slO66rM94qBoF7sFEhJTg+DdZAYZnaRXEkEW127twNx9xaaAiSnYjvm1e1urhxN1xqoe
-         1zi2u8RQaru0JXV1/avx70S3OrKfH6yoF8ctyh4dMkckkXuba9yK/rRXHcUTjgOqCT/N
-         CBQWAwVv8Fy5m5fC7/M8Yi+tVXC/gWavMsQAYQnlVG3fKaX2mfQ3ctcILa/8bjkGnHpI
-         y8lw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references;
-        bh=cRB5KVU8flbbfiX95l71SFIi4ntzX1dMuUx4bGKIqDM=;
-        b=MUAAwku6ho2uxrxQUA5oNoqSMWBZxgEIt4+U53SoAcl2n41vYEsoMF3tlvIFS7+tsc
-         ZL2D7lRtiaygHlviTW5PmUNF8jIpReSzGENBLUP9hnrzsQ9LR7DtbRIrc15kwJC2k7bI
-         9IFtTTZuRvc0gFkcmWMAh85qjYFX5s4lhSJXR0PjLH2ySf1HrVJnXtx7gBgLiKFy1/9T
-         2bePy6qsUBekcydlZFgg+a37qWxzCiV3umJsMc9mTEBFKOyPksyaZNIfTVI6aeofzopv
-         fudri/zPRTjI+X1Jw+w1PcVO4Ud62JGKWbBT8VtIaLLl+w5RwKoLLK03CL9YZk2mbWlF
-         vkyw==
-X-Gm-Message-State: ANhLgQ3Ar1QteT8+9SmMhywyp7gWfdSXcU9mRKcgZIpHByCv0E1UXQee
-        a5mAb7NoqqC1AbhsiGt43meCRyjz
-X-Google-Smtp-Source: ADFU+vvXH26lmdQRHFtBd+cuhZLOY5ZhXl22R1Eq+0NX6XXjJAaO7iMU8+CBm698yNjV7POVcp3pjw==
-X-Received: by 2002:a17:90a:628a:: with SMTP id d10mr4195876pjj.25.1585290261458;
-        Thu, 26 Mar 2020 23:24:21 -0700 (PDT)
-Received: from localhost.localdomain ([103.7.29.6])
-        by smtp.googlemail.com with ESMTPSA id s4sm3262078pgm.18.2020.03.26.23.24.18
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-        Thu, 26 Mar 2020 23:24:21 -0700 (PDT)
-From:   Wanpeng Li <kernellwp@gmail.com>
-X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Subject: [PATCH 2/2] KVM: LAPIC: Don't need to clear IPI delivery status for x2apic
-Date:   Fri, 27 Mar 2020 14:24:00 +0800
-Message-Id: <1585290240-18643-2-git-send-email-wanpengli@tencent.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1585290240-18643-1-git-send-email-wanpengli@tencent.com>
-References: <1585290240-18643-1-git-send-email-wanpengli@tencent.com>
+        id S1726217AbgC0GeW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Mar 2020 02:34:22 -0400
+Received: from mga14.intel.com ([192.55.52.115]:58716 "EHLO mga14.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725936AbgC0GeW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 Mar 2020 02:34:22 -0400
+IronPort-SDR: hr3y6EavZeoaTK5POepIcZSMFgOoiFNAZGYnJcm2quZTSMJo+A2zS6Clj610oXNMxx1gM+Kih3
+ dS1FIdPWjjrA==
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Mar 2020 23:34:21 -0700
+IronPort-SDR: Qs8s4f1r9MjgsSFTvEJSHqqfg5IKKA+/EwsBM23zK2uAiss8E5EVtwZBAfDo3eTiV+s02T73Nd
+ hhgsRybD1diw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.72,311,1580803200"; 
+   d="asc'?scan'208";a="236537736"
+Received: from zhen-hp.sh.intel.com (HELO zhen-hp) ([10.239.160.147])
+  by orsmga007.jf.intel.com with ESMTP; 26 Mar 2020 23:34:19 -0700
+Date:   Fri, 27 Mar 2020 14:21:17 +0800
+From:   Zhenyu Wang <zhenyuw@linux.intel.com>
+To:     "Tian, Kevin" <kevin.tian@intel.com>
+Cc:     "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "Jiang, Dave" <dave.jiang@intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: Re: [PATCH v2 1/2]
+ Documentation/driver-api/vfio-mediated-device.rst: update for aggregation
+ support
+Message-ID: <20200327062117.GH8880@zhen-hp.sh.intel.com>
+Reply-To: Zhenyu Wang <zhenyuw@linux.intel.com>
+References: <20200326054136.2543-1-zhenyuw@linux.intel.com>
+ <20200326054136.2543-2-zhenyuw@linux.intel.com>
+ <AADFC41AFE54684AB9EE6CBC0274A5D19D7EAB69@SHSMSX104.ccr.corp.intel.com>
+ <20200326082142.GC8880@zhen-hp.sh.intel.com>
+ <AADFC41AFE54684AB9EE6CBC0274A5D19D7ECF0E@SHSMSX104.ccr.corp.intel.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+        protocol="application/pgp-signature"; boundary="pr2uf1USn+1lHhL+"
+Content-Disposition: inline
+In-Reply-To: <AADFC41AFE54684AB9EE6CBC0274A5D19D7ECF0E@SHSMSX104.ccr.corp.intel.com>
+User-Agent: Mutt/1.10.0 (2018-05-17)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Wanpeng Li <wanpengli@tencent.com>
 
-IPI delivery status field is not present for x2apic, don't need 
-to clear IPI delivery status for x2apic.
+--pr2uf1USn+1lHhL+
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
----
- arch/x86/kvm/lapic.c | 3 ++-
- arch/x86/kvm/x86.c   | 1 -
- 2 files changed, 2 insertions(+), 2 deletions(-)
+On 2020.03.27 06:16:11 +0000, Tian, Kevin wrote:
+> > From: Zhenyu Wang
+> > Sent: Thursday, March 26, 2020 4:22 PM
+> >=20
+> > On 2020.03.26 08:17:20 +0000, Tian, Kevin wrote:
+> > > > From: Zhenyu Wang <zhenyuw@linux.intel.com>
+> > > > Sent: Thursday, March 26, 2020 1:42 PM
+> > > >
+> > > > Update doc for mdev aggregation support. Describe mdev generic
+> > > > parameter directory under mdev device directory.
+> > > >
+> > > > Cc: Kevin Tian <kevin.tian@intel.com>
+> > > > Cc: "Jiang, Dave" <dave.jiang@intel.com>
+> > > > Signed-off-by: Zhenyu Wang <zhenyuw@linux.intel.com>
+> > > > ---
+> > > >  .../driver-api/vfio-mediated-device.rst       | 19 +++++++++++++++=
+++++
+> > > >  1 file changed, 19 insertions(+)
+> > > >
+> > > > diff --git a/Documentation/driver-api/vfio-mediated-device.rst
+> > > > b/Documentation/driver-api/vfio-mediated-device.rst
+> > > > index 25eb7d5b834b..29c29432a847 100644
+> > > > --- a/Documentation/driver-api/vfio-mediated-device.rst
+> > > > +++ b/Documentation/driver-api/vfio-mediated-device.rst
+> > > > @@ -269,6 +269,9 @@ Directories and Files Under the sysfs for Each
+> > mdev
+> > > > Device
+> > > >    |--- [$MDEV_UUID]
+> > > >           |--- remove
+> > > >           |--- mdev_type {link to its type}
+> > > > +         |--- mdev [optional]
+> > > > +	     |--- aggregated_instances [optional]
+> > > > +	     |--- max_aggregation [optional]
+> > > >           |--- vendor-specific-attributes [optional]
+> > > >
+> > > >  * remove (write only)
+> > > > @@ -281,6 +284,22 @@ Example::
+> > > >
+> > > >  	# echo 1 > /sys/bus/mdev/devices/$mdev_UUID/remove
+> > > >
+> > > > +* mdev directory (optional)
+> > >
+> > > It sounds confusing to me when seeing a 'mdev' directory under a
+> > > mdev instance. How could one tell which attribute should put inside
+> > > or outside of 'mdev'?
+> > >
+> >=20
+> > After mdev create you get uuid directory under normal device path, so
+> > from that point a 'mdev' directory can just tell this is a mdev
+> > device. And it's proposed by Alex before.
+>=20
+> I didn't quite get. Isn't $MDEV_UUID plus mdev_type already tell this is
+> a mdev device? If it is insufficient, then we're broken already since the=
+re
+> is no such 'mdev' sub-directory before.
+>
 
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index 88929b1..f6d69e2 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -1942,7 +1942,8 @@ int kvm_lapic_reg_write(struct kvm_lapic *apic, u32 reg, u32 val)
- 	}
- 	case APIC_ICR:
- 		/* No delay here, so we always clear the pending bit */
--		val &= ~(1 << 12);
-+		if (!apic_x2apic_mode(apic))
-+			val &= ~(1 << 12);
- 		kvm_apic_send_ipi(apic, val, kvm_lapic_get_reg(apic, APIC_ICR2));
- 		kvm_lapic_set_reg(apic, APIC_ICR, val);
- 		break;
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 495709f..6ced0e1 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -1562,7 +1562,6 @@ static int handle_fastpath_set_x2apic_icr_irqoff(struct kvm_vcpu *vcpu, u64 data
- 		((data & APIC_MODE_MASK) == APIC_DM_FIXED) &&
- 		((u32)(data >> 32) != X2APIC_BROADCAST)) {
- 
--		data &= ~(1 << 12);
- 		kvm_apic_send_ipi(vcpu->arch.apic, (u32)data, (u32)(data >> 32));
- 		kvm_lapic_set_reg(vcpu->arch.apic, APIC_ICR2, (u32)(data >> 32));
- 		kvm_lapic_set_reg(vcpu->arch.apic, APIC_ICR, (u32)data);
--- 
-2.7.4
+yep, I ignored mdev_type link there. The original purpose is to have a
+general agreed directory to put generic parameters on mdev.=20
 
+> Alex?
+>=20
+> >=20
+> > Currently only mdev core could create attribute e.g 'remove' under
+> > device dir, vendor specific attrs need to be in attrs group. So 'mdev'
+> > directory here tries to be optional generic interface.
+>=20
+> I'm a bit confused. Then why cannot the new nodes exposed through
+> vendor specific attributes? I may overlook previous discussion why using
+> attrs group doesn't work here. ????
+
+Vendor driver e.g vfio-ccw or future SIOV driver is free to have
+custom attributes for mdev resource definition. If you choose that
+way, fine it's just defined by vendor. But if utilize common mdev
+parameter attributes, you get common defined resource config method
+instead.
+
+>=20
+> >=20
+> > > > +
+> > > > +Vendor driver could create mdev directory to specify extra generic
+> > > > parameters
+> > > > +on mdev device by its type. Currently aggregation parameters are
+> > defined.
+> > > > +Vendor driver should provide both items to support.
+> > > > +
+> > > > +1) aggregated_instances (read/write)
+> > > > +
+> > > > +Set target aggregated instances for device. Reading will show curr=
+ent
+> > > > +count of aggregated instances. Writing value larger than
+> > max_aggregation
+> > > > +would fail and return error.
+> > >
+> > > Can one write a value multiple-times and at any time?
+> > >
+> >=20
+> > yeah, of coz multiple times, but normally won't succeed after open.
+> >=20
+> > > > +
+> > > > +2) max_aggregation (read only)
+> > > > +
+> > > > +Show maxium instances for aggregation.
+> > > > +
+> > >
+> > > "show maximum-allowed instances which can be aggregated for this
+> > device". is
+> > > this value static or dynamic? if dynamic then the user is expected to=
+ read
+> > this
+> > > field before every write. worthy of some clarification here.
+> >=20
+> > yeah, user needs to read this before setting actual number, either stat=
+ic or
+> > dynamic
+> > depends on vendor resource type.
+>=20
+> Then adding above information might make the description clearer.
+>
+
+Sure.
+
+Thanks
+
+> > > >  Mediated device Hot plug
+> > > >  ------------------------
+> > > >
+> > > > --
+> > > > 2.25.1
+> > >
+> >=20
+> > --
+> > Open Source Technology Center, Intel ltd.
+> >=20
+> > $gpg --keyserver wwwkeys.pgp.net --recv-keys 4D781827
+> _______________________________________________
+> intel-gvt-dev mailing list
+> intel-gvt-dev@lists.freedesktop.org
+> https://lists.freedesktop.org/mailman/listinfo/intel-gvt-dev
+
+--=20
+Open Source Technology Center, Intel ltd.
+
+$gpg --keyserver wwwkeys.pgp.net --recv-keys 4D781827
+
+--pr2uf1USn+1lHhL+
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iF0EARECAB0WIQTXuabgHDW6LPt9CICxBBozTXgYJwUCXn2bXQAKCRCxBBozTXgY
+J6hyAJ9XY82tEnzre25UQTo8ChGxJSzNagCfa/XraYcGwrYaCs5davu9xjeC/gI=
+=zTrn
+-----END PGP SIGNATURE-----
+
+--pr2uf1USn+1lHhL+--
