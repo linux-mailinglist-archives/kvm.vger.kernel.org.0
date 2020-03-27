@@ -2,115 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A7B7D195371
-	for <lists+kvm@lfdr.de>; Fri, 27 Mar 2020 09:59:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C039B195379
+	for <lists+kvm@lfdr.de>; Fri, 27 Mar 2020 10:00:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726063AbgC0I7c (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Mar 2020 04:59:32 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:9806 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725956AbgC0I7b (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 27 Mar 2020 04:59:31 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 02R8Y8uf129497
-        for <kvm@vger.kernel.org>; Fri, 27 Mar 2020 04:59:31 -0400
-Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2yxw7gxny7-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Fri, 27 Mar 2020 04:59:30 -0400
-Received: from localhost
-        by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <jwi@linux.ibm.com>;
-        Fri, 27 Mar 2020 08:59:21 -0000
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
-        by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Fri, 27 Mar 2020 08:59:18 -0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 02R8xOVd48037982
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 27 Mar 2020 08:59:24 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 55A18AE04D;
-        Fri, 27 Mar 2020 08:59:24 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 136ADAE053;
-        Fri, 27 Mar 2020 08:59:24 +0000 (GMT)
-Received: from [9.145.91.215] (unknown [9.145.91.215])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri, 27 Mar 2020 08:59:24 +0000 (GMT)
-Subject: Re: [PATCH] s390/gmap: return proper error code on ksm unsharing
-To:     Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.vnet.ibm.com>
-Cc:     KVM <kvm@vger.kernel.org>, David Hildenbrand <david@redhat.com>,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Heiko Carstens <heiko.carstens@de.ibm.com>
-References: <20200327085602.24535-1-borntraeger@de.ibm.com>
-From:   Julian Wiedmann <jwi@linux.ibm.com>
-Date:   Fri, 27 Mar 2020 09:59:23 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+        id S1726739AbgC0JAV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Mar 2020 05:00:21 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:54058 "EHLO
+        us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725956AbgC0JAV (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 27 Mar 2020 05:00:21 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1585299619;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=xXn06OBqafJOcrur/EKuL7fTmScTGWRZwAAJXIbK1TM=;
+        b=C1OH9R8Nj5Jajv8Ex2lvtOvhdXxsGkdPCtYBQduuqh2C8d0Uonao7Sxv9zLdXgPJ11YLom
+        VCAzlWBUjHSBBLKOWCqc5/SdP904XYfv/P+Fbh9d82QOLCfddZKS7636FFrjSuyJHLRSnB
+        tOQpNy6w6Q4Q+doTHGDCz03slv0PaP0=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-319-W4ix9-X_P7Gage2-CzQWOg-1; Fri, 27 Mar 2020 05:00:17 -0400
+X-MC-Unique: W4ix9-X_P7Gage2-CzQWOg-1
+Received: by mail-wm1-f69.google.com with SMTP id g9so5339499wmh.1
+        for <kvm@vger.kernel.org>; Fri, 27 Mar 2020 02:00:17 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=xXn06OBqafJOcrur/EKuL7fTmScTGWRZwAAJXIbK1TM=;
+        b=gRs7/S0ECeEq0VtVXFnKty/ybud79XvEBhRrz70Px80XUFbAu88PxIHW3151of5bP1
+         rqUHZdgNH4IB5OER/WbiyBfgwIYwZxeyo/3f9i20afaJQP1vAzLZuJrswJE4RnK4osK9
+         wPHeO+EeQX6AMpjeDwow9Gek30TU/tij3q7Tc5oZ1SiIhyWKZTkqocrGpCvmx+d2HBTe
+         yROu1CANbWuksvnUbViNyw8d+eI+/251F8CBMN2fAHKR96gyvWBIczcgFc0O+jwL8fKY
+         HtPa5cKfqnblgc7dVvJW6iYwrvWWQqcpQOTKZnXFhH+nYfC73B6DHAEi1uDtVH8Q24P5
+         l1kA==
+X-Gm-Message-State: ANhLgQ3tU2cQiybsUisKxhx/VUQwR+L0GllJ9/jCNMzHkJdqvQSJwfzU
+        woGyvRQ5YKCaX7e/TmXYTqn07e84ffJmAxSYn18pkS4T4P5WC8sAtOxm8FtSxAd+2R0hbGM2XEO
+        ziUKj9R3RfFBC
+X-Received: by 2002:a7b:c005:: with SMTP id c5mr4246491wmb.170.1585299616261;
+        Fri, 27 Mar 2020 02:00:16 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vupCgbub67CH9ToceY2ONuYK3r55PSSyGg0pZYTP2Bzke32oW0juDI1XeKQGvWvA4hyB0SRUA==
+X-Received: by 2002:a7b:c005:: with SMTP id c5mr4246456wmb.170.1585299616001;
+        Fri, 27 Mar 2020 02:00:16 -0700 (PDT)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id 71sm7846558wrc.53.2020.03.27.02.00.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 27 Mar 2020 02:00:15 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Wanpeng Li <kernellwp@gmail.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Subject: Re: [PATCH 1/2] KVM: X86: Filter the broadcast dest for IPI fastpath
+In-Reply-To: <1585290240-18643-1-git-send-email-wanpengli@tencent.com>
+References: <1585290240-18643-1-git-send-email-wanpengli@tencent.com>
+Date:   Fri, 27 Mar 2020 10:00:14 +0100
+Message-ID: <87h7ya41gh.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200327085602.24535-1-borntraeger@de.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 20032708-0020-0000-0000-000003BC4B8B
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20032708-0021-0000-0000-00002214DDB7
-Message-Id: <1b2c74f9-cbe3-cb0e-64cc-aff4fd73daf7@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.645
- definitions=2020-03-27_02:2020-03-26,2020-03-27 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- lowpriorityscore=0 malwarescore=0 spamscore=0 adultscore=0 mlxlogscore=504
- mlxscore=0 suspectscore=0 bulkscore=0 priorityscore=1501 phishscore=0
- clxscore=1011 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2003270073
+Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 27.03.20 09:56, Christian Borntraeger wrote:
-> If a signal is pending we might return -ENOMEM instead of -EINTR.
-> We should propagate the proper error during KSM unsharing.
-> 
-> Fixes: 3ac8e38015d4 ("s390/mm: disable KSM for storage key enabled pages")
-> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+Wanpeng Li <kernellwp@gmail.com> writes:
+
+> From: Wanpeng Li <wanpengli@tencent.com>
+>
+> Except destination shorthand, a destination value 0xffffffff is used to 
+> broadcast interrupts, let's also filter this for single target IPI fastpath.
+>
+> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
 > ---
->  arch/s390/mm/gmap.c | 11 ++++++-----
->  1 file changed, 6 insertions(+), 5 deletions(-)
-> 
-> diff --git a/arch/s390/mm/gmap.c b/arch/s390/mm/gmap.c
-> index 27926a06df32..2bf63035a295 100644
-> --- a/arch/s390/mm/gmap.c
-> +++ b/arch/s390/mm/gmap.c
-> @@ -2552,15 +2552,16 @@ int gmap_mark_unmergeable(void)
->  {
->  	struct mm_struct *mm = current->mm;
->  	struct vm_area_struct *vma;
-> +	int ret  = 0;
+>  arch/x86/kvm/lapic.c | 3 ---
+>  arch/x86/kvm/lapic.h | 3 +++
+>  arch/x86/kvm/x86.c   | 3 ++-
+>  3 files changed, 5 insertions(+), 4 deletions(-)
+>
+> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> index a38f1a8..88929b1 100644
+> --- a/arch/x86/kvm/lapic.c
+> +++ b/arch/x86/kvm/lapic.c
+> @@ -59,9 +59,6 @@
+>  #define MAX_APIC_VECTOR			256
+>  #define APIC_VECTORS_PER_REG		32
 >  
-
-extra whitespace
-
->  	for (vma = mm->mmap; vma; vma = vma->vm_next) {
-> -		if (ksm_madvise(vma, vma->vm_start, vma->vm_end,
-> -				MADV_UNMERGEABLE, &vma->vm_flags)) {
-> -			return -ENOMEM;
-> -		}
-> +		ret = ksm_madvise(vma, vma->vm_start, vma->vm_end,
-> +				MADV_UNMERGEABLE, &vma->vm_flags);
-> +		if (ret)
-> +			return ret;
->  	}
->  	mm->def_flags &= ~VM_MERGEABLE;
-> -	return 0;
-> +	return ret;
->  }
->  EXPORT_SYMBOL_GPL(gmap_mark_unmergeable);
+> -#define APIC_BROADCAST			0xFF
+> -#define X2APIC_BROADCAST		0xFFFFFFFFul
+> -
+>  static bool lapic_timer_advance_dynamic __read_mostly;
+>  #define LAPIC_TIMER_ADVANCE_ADJUST_MIN	100	/* clock cycles */
+>  #define LAPIC_TIMER_ADVANCE_ADJUST_MAX	10000	/* clock cycles */
+> diff --git a/arch/x86/kvm/lapic.h b/arch/x86/kvm/lapic.h
+> index bc76860..25b77a6 100644
+> --- a/arch/x86/kvm/lapic.h
+> +++ b/arch/x86/kvm/lapic.h
+> @@ -17,6 +17,9 @@
+>  #define APIC_BUS_CYCLE_NS       1
+>  #define APIC_BUS_FREQUENCY      (1000000000ULL / APIC_BUS_CYCLE_NS)
 >  
-> 
+> +#define APIC_BROADCAST			0xFF
+> +#define X2APIC_BROADCAST		0xFFFFFFFFul
+> +
+>  enum lapic_mode {
+>  	LAPIC_MODE_DISABLED = 0,
+>  	LAPIC_MODE_INVALID = X2APIC_ENABLE,
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index c4bb7d8..495709f 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -1559,7 +1559,8 @@ static int handle_fastpath_set_x2apic_icr_irqoff(struct kvm_vcpu *vcpu, u64 data
+>  
+>  	if (((data & APIC_SHORT_MASK) == APIC_DEST_NOSHORT) &&
+>  		((data & APIC_DEST_MASK) == APIC_DEST_PHYSICAL) &&
+> -		((data & APIC_MODE_MASK) == APIC_DM_FIXED)) {
+> +		((data & APIC_MODE_MASK) == APIC_DM_FIXED) &&
+> +		((u32)(data >> 32) != X2APIC_BROADCAST)) {
+>  
+>  		data &= ~(1 << 12);
+>  		kvm_apic_send_ipi(vcpu->arch.apic, (u32)data, (u32)(data >> 32));
+
+Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+
+-- 
+Vitaly
 
