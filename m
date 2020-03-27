@@ -2,138 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 97511195329
-	for <lists+kvm@lfdr.de>; Fri, 27 Mar 2020 09:45:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 980BA195365
+	for <lists+kvm@lfdr.de>; Fri, 27 Mar 2020 09:56:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726439AbgC0IpL convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Fri, 27 Mar 2020 04:45:11 -0400
-Received: from mga07.intel.com ([134.134.136.100]:35630 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725956AbgC0IpL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 Mar 2020 04:45:11 -0400
-IronPort-SDR: 908AAl8iqJUmE/KpMj1QzzqaYSRree4M9cAxNWy8r29R9Ic1gjWrhUiG77zoo6b1bq3ByYY0Js
- PUA9SD2Wcqsg==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Mar 2020 01:45:10 -0700
-IronPort-SDR: g5aJBSxuLxxptb3awRZSCaG4kfVmIEqrOTr8ut36C/e8Syz7Yn5C001z+pxFWnQ89wFudiFWXN
- jq/U0jHRofHQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.72,311,1580803200"; 
-   d="scan'208";a="239045384"
-Received: from fmsmsx103.amr.corp.intel.com ([10.18.124.201])
-  by fmsmga007.fm.intel.com with ESMTP; 27 Mar 2020 01:45:09 -0700
-Received: from fmsmsx151.amr.corp.intel.com (10.18.125.4) by
- FMSMSX103.amr.corp.intel.com (10.18.124.201) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Fri, 27 Mar 2020 01:45:09 -0700
-Received: from shsmsx152.ccr.corp.intel.com (10.239.6.52) by
- FMSMSX151.amr.corp.intel.com (10.18.125.4) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Fri, 27 Mar 2020 01:45:03 -0700
-Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.206]) by
- SHSMSX152.ccr.corp.intel.com ([169.254.6.155]) with mapi id 14.03.0439.000;
- Fri, 27 Mar 2020 16:44:59 +0800
-From:   "Tian, Kevin" <kevin.tian@intel.com>
-To:     Zhenyu Wang <zhenyuw@linux.intel.com>
-CC:     "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "intel-gvt-dev@lists.freedesktop.org" 
-        <intel-gvt-dev@lists.freedesktop.org>,
-        "Jiang, Dave" <dave.jiang@intel.com>,
-        "Yuan, Hang" <hang.yuan@intel.com>
-Subject: RE: [PATCH v2 2/2] drm/i915/gvt: mdev aggregation type
-Thread-Topic: [PATCH v2 2/2] drm/i915/gvt: mdev aggregation type
-Thread-Index: AQHWAzE8uZfRrqms+UGN02f5QAMK/6hah5QggAEKxoCAAI40QA==
-Date:   Fri, 27 Mar 2020 08:44:59 +0000
-Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D19D7ED38D@SHSMSX104.ccr.corp.intel.com>
-References: <20200326054136.2543-1-zhenyuw@linux.intel.com>
- <20200326054136.2543-3-zhenyuw@linux.intel.com>
- <AADFC41AFE54684AB9EE6CBC0274A5D19D7ED10B@SHSMSX104.ccr.corp.intel.com>
- <20200327081215.GJ8880@zhen-hp.sh.intel.com>
-In-Reply-To: <20200327081215.GJ8880@zhen-hp.sh.intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-version: 11.2.0.6
-dlp-reaction: no-action
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+        id S1726750AbgC0I4L (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Mar 2020 04:56:11 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:47084 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725946AbgC0I4K (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 27 Mar 2020 04:56:10 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 02R8Xb17016556;
+        Fri, 27 Mar 2020 04:56:09 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 301bvjbqjp-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 27 Mar 2020 04:56:09 -0400
+Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 02R8u9GN133673;
+        Fri, 27 Mar 2020 04:56:09 -0400
+Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.10])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 301bvjbqje-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 27 Mar 2020 04:56:09 -0400
+Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
+        by ppma02dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 02R8orY5001080;
+        Fri, 27 Mar 2020 08:56:08 GMT
+Received: from b03cxnp07028.gho.boulder.ibm.com (b03cxnp07028.gho.boulder.ibm.com [9.17.130.15])
+        by ppma02dal.us.ibm.com with ESMTP id 2ywaw2w5tf-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 27 Mar 2020 08:56:08 +0000
+Received: from b03ledav004.gho.boulder.ibm.com (b03ledav004.gho.boulder.ibm.com [9.17.130.235])
+        by b03cxnp07028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 02R8u5vg51970342
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 27 Mar 2020 08:56:05 GMT
+Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 4056C7805E;
+        Fri, 27 Mar 2020 08:56:05 +0000 (GMT)
+Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 90C277805F;
+        Fri, 27 Mar 2020 08:56:04 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.114.17.106])
+        by b03ledav004.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Fri, 27 Mar 2020 08:56:04 +0000 (GMT)
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+To:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.vnet.ibm.com>
+Cc:     KVM <kvm@vger.kernel.org>, David Hildenbrand <david@redhat.com>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Heiko Carstens <heiko.carstens@de.ibm.com>
+Subject: [PATCH] s390/gmap: return proper error code on ksm unsharing
+Date:   Fri, 27 Mar 2020 04:56:02 -0400
+Message-Id: <20200327085602.24535-1-borntraeger@de.ibm.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.645
+ definitions=2020-03-27_02:2020-03-26,2020-03-27 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0
+ lowpriorityscore=0 impostorscore=0 priorityscore=1501 mlxlogscore=567
+ mlxscore=0 adultscore=0 suspectscore=0 bulkscore=0 clxscore=1015
+ spamscore=0 malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2003270073
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> From: Zhenyu Wang <zhenyuw@linux.intel.com>
-> Sent: Friday, March 27, 2020 4:12 PM
-> 
-[...]
-> > > +int intel_vgpu_adjust_resource_count(struct intel_vgpu *vgpu)
-> > > +{
-> > > +	if ((vgpu_aperture_sz(vgpu) != vgpu->param.low_gm_sz *
-> > > +	     vgpu->param.aggregation) ||
-> > > +	    (vgpu_hidden_sz(vgpu) != vgpu->param.high_gm_sz *
-> > > +	     vgpu->param.aggregation)) {
-> > > +		/* handle aggregation change */
-> > > +		intel_vgpu_free_resource_count(vgpu);
-> > > +		intel_vgpu_alloc_resource_count(vgpu);
-> >
-> > this logic sounds like different from the commit msg. Earlier you
-> > said the resource is not allocated until mdev open, while the
-> > aggregated_interfaces is only allowed to be written before
-> > mdev open. In such case, why would it required to handle the
-> > case where a vgpu already has resource allocated then coming
-> > a new request to adjust the number of instances?
-> 
-> This is to handle resource accounting before mdev open by aggregation
-> setting change. When vgpu create from mdev type, default resource
-> count according to type is set for vgpu. So this function is just to
-> change resource count by aggregation.
+If a signal is pending we might return -ENOMEM instead of -EINTR.
+We should propagate the proper error during KSM unsharing.
 
-then better change the name, e.g. .xxx_adjust_resource_accounting,
-otherwise it's easy to be confused.
+Fixes: 3ac8e38015d4 ("s390/mm: disable KSM for storage key enabled pages")
+Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+---
+ arch/s390/mm/gmap.c | 11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
 
-[...]
-> > >  	if (ret)
-> > >  		goto out_clean_vgpu_mmio;
-> > >
-> > > -	populate_pvinfo_page(vgpu);
-> > > +	if (!delay_res_alloc) {
-> > > +		ret = intel_vgpu_res_alloc(vgpu);
-> > > +		if (ret)
-> > > +			goto out_clean_vgpu_mmio;
-> > > +	}
-> >
-> > If delayed resource allocation works correctly, why do we still
-> > need support non-delayed flavor? Even a type doesn't support
-> > aggregation, it doesn't hurt to do allocation until mdev open...
-> >
-> 
-> The difference is user expectation I think, if there's really
-> awareness of this. As original way is to allocate at creat time, so
-> once created success, resource is guaranteed. But for aggregation type
-> which could be changed before open, alloc happens at that time which
-> may have different scenario, e.g might fail caused by other instance
-> or host. So original idea is to keep old behavior but only change for
-> aggregation type.
+diff --git a/arch/s390/mm/gmap.c b/arch/s390/mm/gmap.c
+index 27926a06df32..2bf63035a295 100644
+--- a/arch/s390/mm/gmap.c
++++ b/arch/s390/mm/gmap.c
+@@ -2552,15 +2552,16 @@ int gmap_mark_unmergeable(void)
+ {
+ 	struct mm_struct *mm = current->mm;
+ 	struct vm_area_struct *vma;
++	int ret  = 0;
+ 
+ 	for (vma = mm->mmap; vma; vma = vma->vm_next) {
+-		if (ksm_madvise(vma, vma->vm_start, vma->vm_end,
+-				MADV_UNMERGEABLE, &vma->vm_flags)) {
+-			return -ENOMEM;
+-		}
++		ret = ksm_madvise(vma, vma->vm_start, vma->vm_end,
++				MADV_UNMERGEABLE, &vma->vm_flags);
++		if (ret)
++			return ret;
+ 	}
+ 	mm->def_flags &= ~VM_MERGEABLE;
+-	return 0;
++	return ret;
+ }
+ EXPORT_SYMBOL_GPL(gmap_mark_unmergeable);
+ 
+-- 
+2.25.1
 
-but how could one expect any difference between instant allocation
-and delayed allocation? You already update resource accounting so
-the remaining instances are accurate anyway. Then the user only knows
-how the vgpu looks like when it is opened...
-
-> 
-> If we think this user expectation is not important, delayed alloc
-> could help to create vgpu quickly but may have more chance to fail
-> later..
-> 
-
-why? If delayed allocation has more chance to fail, it means our
-resource accounting has problem. Even for type w/o aggregation
-capability, we should reserve one instance resource by default anyway
-
-Thanks
-Kevin
