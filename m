@@ -2,38 +2,39 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 86FED195BD3
-	for <lists+kvm@lfdr.de>; Fri, 27 Mar 2020 18:04:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D612C195BFF
+	for <lists+kvm@lfdr.de>; Fri, 27 Mar 2020 18:07:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727773AbgC0RED (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Mar 2020 13:04:03 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:25743 "EHLO
+        id S1727775AbgC0RHh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Mar 2020 13:07:37 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:41999 "EHLO
         us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726515AbgC0REC (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 27 Mar 2020 13:04:02 -0400
+        by vger.kernel.org with ESMTP id S1726333AbgC0RHg (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 27 Mar 2020 13:07:36 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1585328641;
+        s=mimecast20190719; t=1585328855;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=OQDF47lil51TLfYy2HK0tKspeN1b188hDk3snsOmZik=;
-        b=ITO7+o+PxlWQjB6xxKZ8GqVMNcMc1mwIC55WcW7+pq4nXGqX0I3g3OKGmByU6XKFSZ5tWH
-        E7w85dS9s1l6dD88VHjTi9Xbs+nHdFJYxk0/onabsE1ArIelVWwDiwBeq/4+9Cc9Gc/tdS
-        ltgxp1G7xu4iJ2s8+pC6Erv4LlKmq2E=
+        bh=6fMqyPrE9CghdqnKyiX0nKefADqCxkIogqce8GkR1/w=;
+        b=OI9eWL4gDvypBHQxXYkw+NiJOBNYrjfHsXLBG/x3yo2xK0jTTilUZxI7kTQQkbO08kfO/d
+        siBXoUPGicytFEAnMb+ezZPtoL30If/EjWE5uOXwUrc9PpuB+ZfTg7qLbzzZ4pjyW2sXbl
+        eVqjBWBpbhMposPdq+2hFOMJjEs2nRw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-155-MZ4vZhQbMD6GD5l1NLGb3w-1; Fri, 27 Mar 2020 13:03:57 -0400
-X-MC-Unique: MZ4vZhQbMD6GD5l1NLGb3w-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+ us-mta-46-mXF2a0XbOQioW7zIpxFdUA-1; Fri, 27 Mar 2020 13:07:31 -0400
+X-MC-Unique: mXF2a0XbOQioW7zIpxFdUA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4973EDB61;
-        Fri, 27 Mar 2020 17:03:52 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7F9C018B9F80;
+        Fri, 27 Mar 2020 17:07:27 +0000 (UTC)
 Received: from [10.36.112.108] (ovpn-112-108.ams2.redhat.com [10.36.112.108])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 39BB68B773;
-        Fri, 27 Mar 2020 17:03:27 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 5C5E55E02B;
+        Fri, 27 Mar 2020 17:07:09 +0000 (UTC)
 Subject: Re: [PATCH v2 00/10] virtio-mem: paravirtualized memory
+From:   David Hildenbrand <david@redhat.com>
 To:     Pankaj Gupta <pankaj.gupta.linux@gmail.com>
 Cc:     linux-kernel@vger.kernel.org, linux-mm@kvack.org,
         virtio-dev@lists.oasis-open.org,
@@ -74,7 +75,7 @@ Cc:     linux-kernel@vger.kernel.org, linux-mm@kvack.org,
         Wei Yang <richard.weiyang@gmail.com>
 References: <20200311171422.10484-1-david@redhat.com>
  <CAM9Jb+g6DEL1=L1ESfW+Jnr_rfO5rEtOwnp10eCLpajaAv8wvg@mail.gmail.com>
-From:   David Hildenbrand <david@redhat.com>
+ <6858c4d8-7570-2c2b-5d53-1a7f994c14ee@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
  dBrn+lhhOYjjNefFQou6478faXE6o2AhmebqT4KiQoUQFV4R7y1KMEKoSyy8hQaK1umALTdL
@@ -119,52 +120,58 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
  FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
 Organization: Red Hat GmbH
-Message-ID: <6858c4d8-7570-2c2b-5d53-1a7f994c14ee@redhat.com>
-Date:   Fri, 27 Mar 2020 18:03:26 +0100
+Message-ID: <c76749c9-407b-58aa-cdbe-0aef59a02b44@redhat.com>
+Date:   Fri, 27 Mar 2020 18:07:08 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <CAM9Jb+g6DEL1=L1ESfW+Jnr_rfO5rEtOwnp10eCLpajaAv8wvg@mail.gmail.com>
+In-Reply-To: <6858c4d8-7570-2c2b-5d53-1a7f994c14ee@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 27.03.20 17:58, Pankaj Gupta wrote:
-> Hi David,
+On 27.03.20 18:03, David Hildenbrand wrote:
+> On 27.03.20 17:58, Pankaj Gupta wrote:
+>> Hi David,
+>>
+>> Trying to test the series with the Qemu branch(virtio-mem) mentioned.
+>> Unfortunately,
+>> not able to hotplug memory. Is anything changed from your previous posting
+>> or I am doing something wrong?
+>>
+>> After giving value to "requested-size", I see size as zero.
+>>
+>> (qemu) qom-set vm0 requested-size 10G
+>> (qemu) info memory-devices
+>> Memory device [virtio-mem]: "vm0"
+>>   memaddr: 0x240000000
+>>   node: 0
+>>   requested-size: 10737418240
+>>   size: 0
+>>   max-size: 107374182400
+>>   block-size: 2097152
+>>   memdev: /objects/mem0
+>>
+>> Guest kernel: 5.6.0-rc4
+>> Using same Qemu commandline arguments mentioned in cover-letter.
 > 
-> Trying to test the series with the Qemu branch(virtio-mem) mentioned.
-> Unfortunately,
-> not able to hotplug memory. Is anything changed from your previous posting
-> or I am doing something wrong?
+> Are you booting from an initrd? Are you compiling virtio-mem as a kernel
+> module or into the kernel binary?
 > 
-> After giving value to "requested-size", I see size as zero.
-> 
-> (qemu) qom-set vm0 requested-size 10G
-> (qemu) info memory-devices
-> Memory device [virtio-mem]: "vm0"
->   memaddr: 0x240000000
->   node: 0
->   requested-size: 10737418240
->   size: 0
->   max-size: 107374182400
->   block-size: 2097152
->   memdev: /objects/mem0
-> 
-> Guest kernel: 5.6.0-rc4
-> Using same Qemu commandline arguments mentioned in cover-letter.
+> Make sure that the virtio-mem driver will actually be loaded. (lsmod  |
+> grep virtio-mem).
 
-Are you booting from an initrd? Are you compiling virtio-mem as a kernel
-module or into the kernel binary?
+"virtio_mem", of course :)
 
-Make sure that the virtio-mem driver will actually be loaded. (lsmod  |
-grep virtio-mem).
+> 
+> Also, double check if there are any virtio-mem dmesg errors/warnings.
+> 
 
-Also, double check if there are any virtio-mem dmesg errors/warnings.
 
 -- 
 Thanks,
