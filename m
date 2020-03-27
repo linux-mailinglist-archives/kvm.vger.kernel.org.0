@@ -2,43 +2,43 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id EF18D1954F0
-	for <lists+kvm@lfdr.de>; Fri, 27 Mar 2020 11:16:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B61111954F7
+	for <lists+kvm@lfdr.de>; Fri, 27 Mar 2020 11:17:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726612AbgC0KQI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Mar 2020 06:16:08 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:50345 "EHLO
+        id S1726400AbgC0KRc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Mar 2020 06:17:32 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:26418 "EHLO
         us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726096AbgC0KQI (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 27 Mar 2020 06:16:08 -0400
+        by vger.kernel.org with ESMTP id S1726002AbgC0KRc (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 27 Mar 2020 06:17:32 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1585304167;
+        s=mimecast20190719; t=1585304251;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=sxD5d7+S/7pew9bgFJZM+LEW+i+269sqQ/ELQrfl0yc=;
-        b=BWcakwzv9wWwcrf14tjfXP4KJnNAIc8K8Bj+aIkd/nOVEh8dWvOY1kiY5LUAQuPbIVFeby
-        BaWrNmbwYpMbZyxa4dHxPTxeaoEvPQl1yjB+qYO32LlCaiJY3QeuwITRSJNyZbSHsK9wrj
-        mHyFGTTJfvK2XWaCa2LfM9gW/YO5bEw=
+        bh=7xAQBOSXSjs+x2XvewL9zcqMAJCKSlcC0BadVElCogU=;
+        b=W/cmpGurKyxW5cuByMKB2FYkNc53IctnpX/t8peYHhyWrsSqKQx3A4EVDwJWFXDRemu2JN
+        qr2orww27BtrdUf2CuIsSI8VjFuladT3OvccW7DZtqFhxlP0LzkW596GvlyKhEzg2VVByH
+        fBfGAoyFfQX+izr0OQaDSp7eFxxQAa0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-189-XeaFTaNBMaKg2EFOMgTF5w-1; Fri, 27 Mar 2020 06:16:05 -0400
-X-MC-Unique: XeaFTaNBMaKg2EFOMgTF5w-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+ us-mta-449-o93DsmXRPKSpPzSOB0TrBw-1; Fri, 27 Mar 2020 06:17:29 -0400
+X-MC-Unique: o93DsmXRPKSpPzSOB0TrBw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 18E00107ACC7;
-        Fri, 27 Mar 2020 10:16:04 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 27D1B8018A2;
+        Fri, 27 Mar 2020 10:17:28 +0000 (UTC)
 Received: from [10.36.112.108] (ovpn-112-108.ams2.redhat.com [10.36.112.108])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D3E081001B0B;
-        Fri, 27 Mar 2020 10:16:02 +0000 (UTC)
-Subject: Re: [PATCH 1/2] s390x: add myself as reviewer
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 9B06A60BF4;
+        Fri, 27 Mar 2020 10:17:24 +0000 (UTC)
+Subject: Re: [PATCH 2/2] s390x: add linux-s390 list
 To:     Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org
 Cc:     linux-s390@vger.kernel.org, Thomas Huth <thuth@redhat.com>,
         Janosch Frank <frankja@linux.ibm.com>
 References: <20200324121722.9776-1-cohuck@redhat.com>
- <20200324121722.9776-2-cohuck@redhat.com>
+ <20200324121722.9776-3-cohuck@redhat.com>
 From:   David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -84,39 +84,41 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
  FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
 Organization: Red Hat GmbH
-Message-ID: <af4c9a66-8dcf-5fe0-82de-a2237a534fb7@redhat.com>
-Date:   Fri, 27 Mar 2020 11:16:01 +0100
+Message-ID: <a7805e54-01a4-9070-af4b-f972c0036a32@redhat.com>
+Date:   Fri, 27 Mar 2020 11:17:23 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20200324121722.9776-2-cohuck@redhat.com>
+In-Reply-To: <20200324121722.9776-3-cohuck@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 24.03.20 13:17, Cornelia Huck wrote:
+> It makes sense to cc: patches there as well.
+> 
 > Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 > ---
 >  MAINTAINERS | 1 +
 >  1 file changed, 1 insertion(+)
 > 
 > diff --git a/MAINTAINERS b/MAINTAINERS
-> index 48da1dbdd1ac..471767a355c6 100644
+> index 471767a355c6..8912533e441d 100644
 > --- a/MAINTAINERS
 > +++ b/MAINTAINERS
-> @@ -81,6 +81,7 @@ S390X
->  M: Thomas Huth <thuth@redhat.com>
->  M: David Hildenbrand <david@redhat.com>
+> @@ -83,6 +83,7 @@ M: David Hildenbrand <david@redhat.com>
 >  R: Janosch Frank <frankja@linux.ibm.com>
-> +R: Cornelia Huck <cohuck@redhat.com>
+>  R: Cornelia Huck <cohuck@redhat.com>
 >  L: kvm@vger.kernel.org
+> +L: linux-s390@vger.kernel.org
 >  F: s390x/*
 >  F: lib/s390x/*
+>  
 > 
 
 Added "MAINTAINERS: " as subject prefix and queued to
