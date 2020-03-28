@@ -2,209 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2BDB7196234
-	for <lists+kvm@lfdr.de>; Sat, 28 Mar 2020 00:58:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E22DF19636D
+	for <lists+kvm@lfdr.de>; Sat, 28 Mar 2020 04:53:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726340AbgC0X6E (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Mar 2020 19:58:04 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:43686 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726071AbgC0X6E (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 Mar 2020 19:58:04 -0400
-Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.58])
-        by Forcepoint Email with ESMTP id 8CA50B503EC0D91486CF;
-        Sat, 28 Mar 2020 07:58:00 +0800 (CST)
-Received: from DESKTOP-27KDQMV.china.huawei.com (10.173.228.124) by
- DGGEMS413-HUB.china.huawei.com (10.3.19.213) with Microsoft SMTP Server id
- 14.3.487.0; Sat, 28 Mar 2020 07:57:52 +0800
-From:   "Longpeng(Mike)" <longpeng2@huawei.com>
-To:     <linux-kernel@vger.kernel.org>, <linux-mm@kvack.org>
-CC:     <kvm@vger.kernel.org>, <arei.gonglei@huawei.com>,
-        <weidong.huang@huawei.com>, <weifuqiang@huawei.com>,
-        <kirill.shutemov@linux.intel.com>, Longpeng <longpeng2@huawei.com>,
-        "Mike Kravetz" <mike.kravetz@oracle.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Matthew Wilcox <willy@infradead.org>,
-        "Sean Christopherson" <sean.j.christopherson@intel.com>,
-        <stable@vger.kernel.org>
-Subject: [PATCH RESEND v4] mm/hugetlb: fix a addressing exception caused by huge_pte_offset
-Date:   Sat, 28 Mar 2020 07:57:48 +0800
-Message-ID: <20200327235748.2048-1-longpeng2@huawei.com>
-X-Mailer: git-send-email 2.25.0.windows.1
+        id S1726661AbgC1Dxk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Mar 2020 23:53:40 -0400
+Received: from sonic310-15.consmr.mail.bf2.yahoo.com ([74.6.135.125]:38961
+        "EHLO sonic310-15.consmr.mail.bf2.yahoo.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726225AbgC1Dxk (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 27 Mar 2020 23:53:40 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1585367619; bh=JAz8LFM6+4vHSsVAr/FuzFq2ArGEZnuE2vSkhU1Q0cc=; h=Date:From:Reply-To:Subject:References:From:Subject; b=aqjFR33+hKOWhOqoYHnG88iO1o70G8zAuo1p4AshQs4Xo6R+GCotwYkaclPxu37aKONvHaG63IEDjjjVZ1wsqqNofuJI7euep4Y1nP3EkRLmT9TQjsiF/IG7fLI36u8vHmrdmU2y+GjE3NNzphzAEckoNjr2NWApGo+hx69eVSbW8dH4ZxNcH6qotpKhlzqpwwLi0npY8Y0d+nHVeoMNl1MxR4272r6HQSjHJr9IGHm4oFzrJYPDk67I7BSx1SBe9fvSaBPOdaC3Lw+SihZW3TOgpHCiG7o292WKhlQ7bxmFRpo5fsY68Kmun3Vz+2h4Hh4iTjEkEw5rPIIZUsiQDQ==
+X-YMail-OSG: mlg_8SQVM1nLdOooP3pwusi50D_zV..JAnItx3IzEGkg6McKCwfHQvd9HEJSqmL
+ IEGJD6tpwRnbKDw8pA5fRf22FP0YuCwBR.iUgZX_i8e9HxjL2a.WoaKIgNhF_QhMUHd__jG80exE
+ P.cNfZ8bfQy0zmJvoAvX9DZ1kO0VRj1HHp0uyF1H2F3DgT5o02zTvKN8sdEixa2jn1zX7Ct0niGq
+ CRnwEXCoWPAVw6cgrc5g7GpPAfY6p2kg2FThNzvaDXJOsAY2oyrU4oddghQ7p_VWq1FM8QS3x5Xw
+ .KD4IaCiG06oz7VXshbmO5OkL2DlH3lsc.WfHMIL4Cp8YrIv7E.Po4khafCZkot1ErTN.GQglQfk
+ 3W_eipbxSXD1L7XB2sZNHIzbOy4st0n9rkvmu38dtFqkssDkWIKsKXSV4X1MAyayY7SV5oCie8S8
+ ctYEQAVvB6QVVxDvMjOgM4zsKjsudt8WhjAZqTeIxv4uTWHqtg9djK5ClKDx7MF63yKugQEq2K4S
+ JnpRcc3tjpCONU8Yx0u2GgQ4TQEVGBpsKjvtvwAoOaQKY9_eb5AzBg5F50MysiRg_F5ILSZEMl2W
+ lrDskeSwXjPn4GMGzPy5e4DVX8nwib8DoUNaTlU9vx5A6Z.KpXXL0qNfKu.SrGquUful_jfr7KWt
+ lHj4jElxCu16hB9ZLHMGFFcRhmXLzoMcXoIJjpPBuMAT6IN.5aw7_xoXVmfSHD1nDLYeqbg9vkrY
+ x_2mmd0Canu8iKG4m5r4fcM_srMUKIaXTXDFU1U9QExERLe0MNEtntlO94kGXk7xfbMvqkl8.k6M
+ BbBWCbGxkRkHttzL1iJ09EJDPtWLznMnSyy2NB0OCfavs4.aPOwTxSZ3NBsW5z0BMGqEyqAAHhhU
+ uXUnHHAGZpPF4TpdfVT94h7ddf3BDulo0v8ZuF6q.2EZZejVK9CsHD82pTucuOD55_Vtqc3lN.jU
+ qPc6ljZ0giKMSvjYiZBhvTsufiyV5ij_q6WspyKYxrcaQIUEfDSuM6897QPcqzRh9zdQLsXNTx3t
+ Rlrz78qIhvGc9b0gD25UsxtERd9xNVnXGJKTmvRI0LnC6LWhRgzC8r8esxMI4EkxW7uIoCKuLmp.
+ 1hIft0pgCfEIU.cLioddHc1j6SpJHq6hgtN_X00zAfkhsVgOQXUm6K3ysDmfm183HmHapdhSniOL
+ 4ZU.lKlBrrY99ueMkCoaUgm69Bcbr4sd_u16LuNbgsR8l.QQ56H8MPEf8aXg2M5CPORoE0eBjKpJ
+ TJtzcxgxJWpbgQaXSroJBfNsoFk9rBvv01SZENVFObqggXRbAIyGr9o.YUcALsZbCYMfzXAE1
+Received: from sonic.gate.mail.ne1.yahoo.com by sonic310.consmr.mail.bf2.yahoo.com with HTTP; Sat, 28 Mar 2020 03:53:39 +0000
+Date:   Sat, 28 Mar 2020 03:53:36 +0000 (UTC)
+From:   Islam Koudougou <islamkoudougou1@gmail.com>
+Reply-To: islamkoudougou2020@gmail.com
+Message-ID: <307875094.110371.1585367616794@mail.yahoo.com>
+Subject: i need your urgent help and assistance
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.173.228.124]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+References: <307875094.110371.1585367616794.ref@mail.yahoo.com>
+X-Mailer: WebService/1.1.15555 YMailNodin Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.149 Safari/537.36
+To:     unlisted-recipients:; (no To-header on input)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Longpeng <longpeng2@huawei.com>
 
-Our machine encountered a panic(addressing exception) after run
-for a long time and the calltrace is:
-RIP: 0010:[<ffffffff9dff0587>]  [<ffffffff9dff0587>] hugetlb_fault+0x307/0xbe0
-RSP: 0018:ffff9567fc27f808  EFLAGS: 00010286
-RAX: e800c03ff1258d48 RBX: ffffd3bb003b69c0 RCX: e800c03ff1258d48
-RDX: 17ff3fc00eda72b7 RSI: 00003ffffffff000 RDI: e800c03ff1258d48
-RBP: ffff9567fc27f8c8 R08: e800c03ff1258d48 R09: 0000000000000080
-R10: ffffaba0704c22a8 R11: 0000000000000001 R12: ffff95c87b4b60d8
-R13: 00005fff00000000 R14: 0000000000000000 R15: ffff9567face8074
-FS:  00007fe2d9ffb700(0000) GS:ffff956900e40000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: ffffd3bb003b69c0 CR3: 000000be67374000 CR4: 00000000003627e0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- [<ffffffff9df9b71b>] ? unlock_page+0x2b/0x30
- [<ffffffff9dff04a2>] ? hugetlb_fault+0x222/0xbe0
- [<ffffffff9dff1405>] follow_hugetlb_page+0x175/0x540
- [<ffffffff9e15b825>] ? cpumask_next_and+0x35/0x50
- [<ffffffff9dfc7230>] __get_user_pages+0x2a0/0x7e0
- [<ffffffff9dfc648d>] __get_user_pages_unlocked+0x15d/0x210
- [<ffffffffc068cfc5>] __gfn_to_pfn_memslot+0x3c5/0x460 [kvm]
- [<ffffffffc06b28be>] try_async_pf+0x6e/0x2a0 [kvm]
- [<ffffffffc06b4b41>] tdp_page_fault+0x151/0x2d0 [kvm]
- ...
- [<ffffffffc06a6f90>] kvm_arch_vcpu_ioctl_run+0x330/0x490 [kvm]
- [<ffffffffc068d919>] kvm_vcpu_ioctl+0x309/0x6d0 [kvm]
- [<ffffffff9deaa8c2>] ? dequeue_signal+0x32/0x180
- [<ffffffff9deae34d>] ? do_sigtimedwait+0xcd/0x230
- [<ffffffff9e03aed0>] do_vfs_ioctl+0x3f0/0x540
- [<ffffffff9e03b0c1>] SyS_ioctl+0xa1/0xc0
- [<ffffffff9e53879b>] system_call_fastpath+0x22/0x27
+Dear  Friend.
 
-For 1G hugepages, huge_pte_offset() wants to return NULL or pudp, but it
-may return a wrong 'pmdp' if there is a race. Please look at the following
-code snippet:
-    ...
-    pud = pud_offset(p4d, addr);
-    if (sz != PUD_SIZE && pud_none(*pud))
-        return NULL;
-    /* hugepage or swap? */
-    if (pud_huge(*pud) || !pud_present(*pud))
-        return (pte_t *)pud;
+I am Mr Islam Koudougou. the director of the accounts & auditing department at  the  bank Ouagadougou-Burkina Faso in west Africa. With due respect, I have decided to contact you on a business transaction that will be beneficial to both of us.
 
-    pmd = pmd_offset(pud, addr);
-    if (sz != PMD_SIZE && pmd_none(*pmd))
-        return NULL;
-    /* hugepage or swap? */
-    if (pmd_huge(*pmd) || !pmd_present(*pmd))
-        return (pte_t *)pmd;
-    ...
+At the bank's last accounts/auditing evaluations, my staffs came across an old account which was being maintained by a foreign client who we learn was among the deceased passengers of motor accident on November.2003, the deceased was unable to run this account since his death. The account has remained dormant without the knowledge of his family since it was put in a safe deposit account in the bank for future investment by the client.
 
-The following sequence would trigger this bug:
-1. CPU0: sz = PUD_SIZE and *pud = 0 , continue
-1. CPU0: "pud_huge(*pud)" is false
-2. CPU1: calling hugetlb_no_page and set *pud to xxxx8e7(PRESENT)
-3. CPU0: "!pud_present(*pud)" is false, continue
-4. CPU0: pmd = pmd_offset(pud, addr) and maybe return a wrong pmdp
-However, we want CPU0 to return NULL or pudp in this case.
+Since his demise, even the members of his family haven't applied for claims over this fund and it has been in the safe deposit account until I discovered that it cannot be claimed since our client is a foreign national and we are sure that he has no next of kin here to file claims over the money. As the director of the department, this discovery was brought to my office so as to decide what is to be done.I decided to seek ways through which to transfer this money out of the bank and out of the country too.
 
-Also, according to the section 'COMPILER BARRIER' of memory-barriers.txt:
-'''
- (*) The compiler is within its rights to reorder loads and stores
-     to the same variable, and in some cases, the CPU is within its
-     rights to reorder loads to the same variable.  This means that
-     the following code:
+The total amount in the account is ten million five hundred thousand dollars (USD 10,500,000.00).with my positions as staffs of the bank, I am handicapped because I cannot operate foreign accounts and cannot lay bonafide claim over this money. The client was a foreign national and you will only be asked to act as his next of kin and I will supply you with all the necessary information and bank data to assist you in being able to transfer this money to any bank of your choice where this money could be transferred into.
 
-        a[0] = x;
-        a[1] = x;
+The total sum will be shared as follows: 50% for me, 50% for you and expenses incidental occur during the transfer will be incur by both of us. The transfer is risk free on both sides hence you are going to follow my instruction till the fund transfer to your account.Since I work in this bank that is why you should be confident in the success of this transaction because you will be updated with information as at when desired.
 
-     Might result in an older value of x stored in a[1] than in a[0].
-'''
-there're several other data races in huge_pte_offset, for example:
-'''
-  p4d = p4d_offset(pgd, addr)
-  if (!p4d_present(*p4d))
-      return NULL;
-  pud = pud_offset(p4d, addr) <-- will be unwinded as:
-    pud = (pud_t *)p4d_page_vaddr(*p4d) + pud_index(address);
-'''
-which is free for the compiler/CPU to execute as:
-'''
-  p4d = p4d_offset(pgd, addr)
-  p4d_for_vaddr = *p4d;
-  if (!p4d_present(*p4d))
-      return NULL;
-  pud = (pud_t *)p4d_page_vaddr(p4d_for_vaddr) + pud_index(address);
-'''
-so in the case where *p4d goes from '!present' to 'present':
-p4d_present(*p4d) == true and p4d_for_vaddr == none, meaning the
-p4d_page_vaddr() will crash.
+I will wish you to keep this transaction secret and confidential as I am hoping to retire with my share of this money at the end of transaction which will be when this money is safety in your account. I will then come over to your country for sharing according to the previously agreed percentages. You might even have to advise me on possibilities of investment in your country or elsewhere of our choice. May God help you to help me to a restive retirement, Amen.
 
-For these reasons, we must make sure there is exactly one dereference of
-p4d, pud and pmd.
+Please for further information and inquires feel free to contact me back immediately for more explanation and better understanding I want you to assure me your capability of handling this project with trust.
 
-Cc: Mike Kravetz <mike.kravetz@oracle.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>
-Cc: Jason Gunthorpe <jgg@ziepe.ca>
-Cc: Matthew Wilcox <willy@infradead.org>
-Cc: Sean Christopherson <sean.j.christopherson@intel.com>
-Cc: stable@vger.kernel.org
-Suggested-by: Jason Gunthorpe <jgg@ziepe.ca>
-Signed-off-by: Longpeng <longpeng2@huawei.com>
----
-v3 -> v4:
-  fix a typo s/p4g/p4d.  [Jason]
-v2 -> v3:
-  make sure p4d/pud/pmd be dereferenced once. [Jason]
----
- mm/hugetlb.c | 26 +++++++++++++++-----------
- 1 file changed, 15 insertions(+), 11 deletions(-)
-
-diff --git a/mm/hugetlb.c b/mm/hugetlb.c
-index dd8737a..d4fab68 100644
---- a/mm/hugetlb.c
-+++ b/mm/hugetlb.c
-@@ -4909,29 +4909,33 @@ pte_t *huge_pte_offset(struct mm_struct *mm,
- 		       unsigned long addr, unsigned long sz)
- {
- 	pgd_t *pgd;
--	p4d_t *p4d;
--	pud_t *pud;
--	pmd_t *pmd;
-+	p4d_t *p4d, p4d_entry;
-+	pud_t *pud, pud_entry;
-+	pmd_t *pmd, pmd_entry;
- 
- 	pgd = pgd_offset(mm, addr);
- 	if (!pgd_present(*pgd))
- 		return NULL;
--	p4d = p4d_offset(pgd, addr);
--	if (!p4d_present(*p4d))
-+
-+	p4d = p4d_offset(pgd, addr);
-+	p4d_entry = READ_ONCE(*p4d);
-+	if (!p4d_present(p4d_entry))
- 		return NULL;
- 
--	pud = pud_offset(p4d, addr);
--	if (sz != PUD_SIZE && pud_none(*pud))
-+	pud = pud_offset(&p4d_entry, addr);
-+	pud_entry = READ_ONCE(*pud);
-+	if (sz != PUD_SIZE && pud_none(pud_entry))
- 		return NULL;
- 	/* hugepage or swap? */
--	if (pud_huge(*pud) || !pud_present(*pud))
-+	if (pud_huge(pud_entry) || !pud_present(pud_entry))
- 		return (pte_t *)pud;
- 
--	pmd = pmd_offset(pud, addr);
--	if (sz != PMD_SIZE && pmd_none(*pmd))
-+	pmd = pmd_offset(&pud_entry, addr);
-+	pmd_entry = READ_ONCE(*pmd);
-+	if (sz != PMD_SIZE && pmd_none(pmd_entry))
- 		return NULL;
- 	/* hugepage or swap? */
--	if (pmd_huge(*pmd) || !pmd_present(*pmd))
-+	if (pmd_huge(pmd_entry) || !pmd_present(pmd_entry))
- 		return (pte_t *)pmd;
- 
- 	return NULL;
--- 
-1.8.3.1
-
+Thanks and remain blessed
+Mr Islam Koudougou.
