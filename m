@@ -2,105 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 41D1719686E
-	for <lists+kvm@lfdr.de>; Sat, 28 Mar 2020 19:29:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 264CE1968A2
+	for <lists+kvm@lfdr.de>; Sat, 28 Mar 2020 19:41:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727163AbgC1S3w (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 28 Mar 2020 14:29:52 -0400
-Received: from mga02.intel.com ([134.134.136.20]:54936 "EHLO mga02.intel.com"
+        id S1726604AbgC1Slu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 28 Mar 2020 14:41:50 -0400
+Received: from mga01.intel.com ([192.55.52.88]:22605 "EHLO mga01.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726937AbgC1S3w (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 28 Mar 2020 14:29:52 -0400
-IronPort-SDR: A0tfWluWzFJAN1qmmXhYRkMAZGq20yiH1WUpT0nFXZtwy0vFxxMH1qXswNBoKoT2WCwRFval1P
- GCQdOW2IiT/g==
+        id S1725882AbgC1Slt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 28 Mar 2020 14:41:49 -0400
+IronPort-SDR: RlnRSN+pyFK1kJegySdbJRIBypfNEwgGSlc6LdmKhwyzxjn4gGfIDxYmuU3QwMWuv6LAsAgQjm
+ 8SkshtvpcDKg==
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Mar 2020 11:29:51 -0700
-IronPort-SDR: dZJ8l2AFLuB2WfezcrgkOfi5968u+3mDyCBouG/Kf/rrItkVep/KyH52pHpKcuUzQJpL497WJm
- g+FS51zzM+MA==
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Mar 2020 11:41:49 -0700
+IronPort-SDR: sdpObI+vzRvcuRArPN5Pm5hmAeAQrvPL3U7SKzrdF68D/YCGs2cDX1gUBFBJWLb3bsQ/A4O34P
+ pXiU6CCLVbTw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.72,317,1580803200"; 
-   d="scan'208";a="294209453"
+   d="scan'208";a="236953833"
 Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
-  by FMSMGA003.fm.intel.com with ESMTP; 28 Mar 2020 11:29:51 -0700
-Date:   Sat, 28 Mar 2020 11:29:51 -0700
+  by orsmga007.jf.intel.com with ESMTP; 28 Mar 2020 11:41:49 -0700
+Date:   Sat, 28 Mar 2020 11:41:49 -0700
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         Junaid Shahid <junaids@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>
-Subject: Re: [PATCH 3/3] KVM: x86: Sync SPTEs when injecting page/EPT fault
- into L1
-Message-ID: <20200328182951.GR8104@linux.intel.com>
+Subject: Re: [PATCH 2/3] KVM: x86: cleanup kvm_inject_emulated_page_fault
+Message-ID: <20200328184149.GS8104@linux.intel.com>
 References: <20200326093516.24215-1-pbonzini@redhat.com>
- <20200326093516.24215-4-pbonzini@redhat.com>
+ <20200326093516.24215-3-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200326093516.24215-4-pbonzini@redhat.com>
+In-Reply-To: <20200326093516.24215-3-pbonzini@redhat.com>
 User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 26, 2020 at 05:35:16AM -0400, Paolo Bonzini wrote:
-> From: Junaid Shahid <junaids@google.com>
+On Thu, Mar 26, 2020 at 05:35:15AM -0400, Paolo Bonzini wrote:
+> To reconstruct the kvm_mmu to be used for page fault injection, we
+> can simply use fault->nested_page_fault.  This matches how
+> fault->nested_page_fault is assigned in the first place by
+> FNAME(walk_addr_generic).
 > 
-> When injecting a page fault or EPT violation/misconfiguration, KVM is
-> not syncing any shadow PTEs associated with the faulting address,
-> including those in previous MMUs that are associated with L1's current
-> EPTP (in a nested EPT scenario), nor is it flushing any hardware TLB
-> entries.  All this is done by kvm_mmu_invalidate_gva.
-> 
-> Page faults that are either !PRESENT or RSVD are exempt from the flushing,
-> as the CPU is not allowed to cache such translations.
-> 
-> Signed-off-by: Junaid Shahid <junaids@google.com>
-> Co-developed-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> Message-Id: <20200320212833.3507-8-sean.j.christopherson@intel.com>
 > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 > ---
->  arch/x86/kvm/vmx/nested.c | 12 ++++++------
->  arch/x86/kvm/vmx/vmx.c    |  2 +-
->  arch/x86/kvm/x86.c        | 11 ++++++++++-
->  3 files changed, 17 insertions(+), 8 deletions(-)
+>  arch/x86/kvm/mmu/mmu.c         | 6 ------
+>  arch/x86/kvm/mmu/paging_tmpl.h | 2 +-
+>  arch/x86/kvm/x86.c             | 7 +++----
+>  3 files changed, 4 insertions(+), 11 deletions(-)
 > 
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index e26c9a583e75..6250e31ac617 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -4353,12 +4353,6 @@ static unsigned long get_cr3(struct kvm_vcpu *vcpu)
+>  	return kvm_read_cr3(vcpu);
+>  }
+>  
+> -static void inject_page_fault(struct kvm_vcpu *vcpu,
+> -			      struct x86_exception *fault)
+> -{
+> -	vcpu->arch.mmu->inject_page_fault(vcpu, fault);
+> -}
+> -
+>  static bool sync_mmio_spte(struct kvm_vcpu *vcpu, u64 *sptep, gfn_t gfn,
+>  			   unsigned int access, int *nr_present)
+>  {
+> diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
+> index 1ddbfff64ccc..ae646acf6703 100644
+> --- a/arch/x86/kvm/mmu/paging_tmpl.h
+> +++ b/arch/x86/kvm/mmu/paging_tmpl.h
+> @@ -812,7 +812,7 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, gpa_t addr, u32 error_code,
+>  	if (!r) {
+>  		pgprintk("%s: guest page fault\n", __func__);
+>  		if (!prefault)
+> -			inject_page_fault(vcpu, &walker.fault);
+> +			kvm_inject_emulated_page_fault(vcpu, &walker.fault);
+>  
+>  		return RET_PF_RETRY;
+>  	}
 > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 522905523bf0..dbca6c3bd0db 100644
+> index 64ed6e6e2b56..522905523bf0 100644
 > --- a/arch/x86/kvm/x86.c
 > +++ b/arch/x86/kvm/x86.c
-> @@ -618,8 +618,17 @@ bool kvm_inject_emulated_page_fault(struct kvm_vcpu *vcpu,
+> @@ -614,12 +614,11 @@ EXPORT_SYMBOL_GPL(kvm_inject_page_fault);
+>  bool kvm_inject_emulated_page_fault(struct kvm_vcpu *vcpu,
+>  				    struct x86_exception *fault)
+>  {
+> +	struct kvm_mmu *fault_mmu;
 >  	WARN_ON_ONCE(fault->vector != PF_VECTOR);
 >  
->  	fault_mmu = fault->nested_page_fault ? vcpu->arch.mmu : vcpu->arch.walk_mmu;
-> -	fault_mmu->inject_page_fault(vcpu, fault);
->  
-> +	/*
-> +	 * Invalidate the TLB entry for the faulting address, if it exists,
-> +	 * else the access will fault indefinitely (and to emulate hardware).
-> +	 */
-> +	if ((fault->error_code & PFERR_PRESENT_MASK)
-> +	    && !(fault->error_code & PFERR_RSVD_MASK))
+> -	if (mmu_is_nested(vcpu) && !fault->nested_page_fault)
+> -		vcpu->arch.nested_mmu.inject_page_fault(vcpu, fault);
+> -	else
+> -		vcpu->arch.mmu->inject_page_fault(vcpu, fault);
+> +	fault_mmu = fault->nested_page_fault ? vcpu->arch.mmu : vcpu->arch.walk_mmu;
 
-What kind of heathen puts && on the new line?  :-D
+Apparently I'm in a nitpicky mood.  IMO, a newline after the colon is
+easier to parse
 
-> +		kvm_mmu_invalidate_gva(vcpu, fault_mmu,
-> +				       fault->address, fault_mmu->root_hpa);
+	fault_mmu = fault->nested_page_fault ? vcpu->arch.mmu :
+					       vcpu->arch.walk_mmu;
 
-Another nit, why have the new line after fault_mmu?  I.e.
+FWIW, I really like that "inject into the nested_mmu if it's not a nested
+page fault" logic goes away.  That trips me up every time I look at it.
 
-		kvm_mmu_invalidate_gva(vcpu, fault_mmu, fault->address,
-				       fault_mmu->root_hpa);
-
-
-> +
 > +	fault_mmu->inject_page_fault(vcpu, fault);
+>  
 >  	return fault->nested_page_fault;
 >  }
->  EXPORT_SYMBOL_GPL(kvm_inject_emulated_page_fault);
 > -- 
 > 2.18.2
+> 
 > 
