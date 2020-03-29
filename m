@@ -2,107 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D3AC6196CED
-	for <lists+kvm@lfdr.de>; Sun, 29 Mar 2020 13:23:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 147CE196CF6
+	for <lists+kvm@lfdr.de>; Sun, 29 Mar 2020 13:34:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728108AbgC2LW3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 29 Mar 2020 07:22:29 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:54484 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727984AbgC2LW3 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sun, 29 Mar 2020 07:22:29 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 02TB3goL029039
-        for <kvm@vger.kernel.org>; Sun, 29 Mar 2020 07:22:28 -0400
-Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3022nkf5a9-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Sun, 29 Mar 2020 07:22:27 -0400
-Received: from localhost
-        by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <raspl@linux.ibm.com>;
-        Sun, 29 Mar 2020 12:22:18 +0100
-Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
-        by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Sun, 29 Mar 2020 12:22:15 +0100
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 02TBMMJL41288138
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Sun, 29 Mar 2020 11:22:22 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3E1F611C04C;
-        Sun, 29 Mar 2020 11:22:22 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1DD0B11C04A;
-        Sun, 29 Mar 2020 11:22:22 +0000 (GMT)
-Received: from [9.145.153.64] (unknown [9.145.153.64])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Sun, 29 Mar 2020 11:22:22 +0000 (GMT)
-Subject: Re: [PATCH 7/7] tools/kvm_stat: add sample systemd unit file
-From:   Stefan Raspl <raspl@linux.ibm.com>
-To:     kvm@vger.kernel.org
-Cc:     pbonzini@redhat.com
-References: <20200306114250.57585-1-raspl@linux.ibm.com>
- <20200306114250.57585-8-raspl@linux.ibm.com>
-Date:   Sun, 29 Mar 2020 13:22:21 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+        id S1728096AbgC2LeQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 29 Mar 2020 07:34:16 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:40798 "EHLO
+        us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727869AbgC2LeQ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sun, 29 Mar 2020 07:34:16 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1585481655;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=ViPGPqwEgspRtJgmZ4rE2OqFoX1oHWclqobpFUgHsnM=;
+        b=He/no2RAPkfymhV+3KbcSW24BNsO8sYmihMdWTVOIwLmI7MHQowgaFCJeI492JWjDGaJgY
+        E/IB8www1NV0Gac9ERd3sZwBosPtBsTXwlsbdtv1fsSl2KiKIQs6vnvmV4WcO3i3Zy4HpG
+        XnKKEplZo7LfetEPxAeUtNAFwn3AJIw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-224-gzzDmRD2MRCIB1hML660mw-1; Sun, 29 Mar 2020 07:34:11 -0400
+X-MC-Unique: gzzDmRD2MRCIB1hML660mw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EA33118B5F69;
+        Sun, 29 Mar 2020 11:34:09 +0000 (UTC)
+Received: from eperezma.remote.csb (ovpn-112-95.ams2.redhat.com [10.36.112.95])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 393DB5C1BE;
+        Sun, 29 Mar 2020 11:34:03 +0000 (UTC)
+From:   =?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        =?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
+        Stephen Rothwell <sfr@canb.auug.org.au>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>,
+        kvm list <kvm@vger.kernel.org>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: [PATCH 0/6] vhost: Reset batched descriptors on SET_VRING_BASE call
+Date:   Sun, 29 Mar 2020 13:33:53 +0200
+Message-Id: <20200329113359.30960-1-eperezma@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200306114250.57585-8-raspl@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 20032911-0008-0000-0000-000003666FA1
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20032911-0009-0000-0000-00004A87ECC0
-Message-Id: <7bfa384d-6739-f1c4-adbb-9e019dbe2948@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.645
- definitions=2020-03-29_04:2020-03-27,2020-03-29 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
- lowpriorityscore=0 malwarescore=0 mlxscore=0 spamscore=0 mlxlogscore=999
- bulkscore=0 impostorscore=0 phishscore=0 priorityscore=1501 suspectscore=1
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2003290106
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2020-03-06 12:42, Stefan Raspl wrote:
-> From: Stefan Raspl <raspl@de.ibm.com>
-> 
-> Add a sample unit file as a basis for systemd integration of kvm_stat
-> logs.
-> Note that output is written to a rotating set of logfiles in .csv format
-> for easy post-processing.
-> 
-> Signed-off-by: Stefan Raspl <raspl@linux.ibm.com>
-> ---
->  tools/kvm/kvm_stat/kvm_stat.service | 15 +++++++++++++++
->  1 file changed, 15 insertions(+)
->  create mode 100644 tools/kvm/kvm_stat/kvm_stat.service
-> 
-> diff --git a/tools/kvm/kvm_stat/kvm_stat.service b/tools/kvm/kvm_stat/kvm_stat.service
-> new file mode 100644
-> index 000000000000..5854b285c669
-> --- /dev/null
-> +++ b/tools/kvm/kvm_stat/kvm_stat.service
-> @@ -0,0 +1,15 @@
-> +# SPDX-License-Identifier: GPL-2.0-only
-> +
-> +[Unit]
-> +Description=Service that logs KVM kernel module trace events
-> +Before=qemu-kvm.service
-> +
-> +[Service]
-> +Type=simple
-> +ExecStart=/root/kvm_stat -dtcr /var/log/kvm_stat.csv -T 1w -s 10
-             ^^^^^^
-Oooops - this isn't supposed to be a full qualified path, and especially not
-this one.
+Vhost did not reset properly the batched descriptors on SET_VRING_BASE ev=
+ent. Because of that, is possible to return an invalid descriptor to the =
+guest.
 
-Ciao,
-Stefan
+This series ammend this, and creates a test to assert correct behavior. T=
+o do that, they need to expose a new function in virtio_ring, virtqueue_r=
+eset_free_head. Not sure if this can be avoided.
+
+Also, change from https://lkml.org/lkml/2020/3/27/108 is not included, th=
+at avoids to update a variable in a loop where it can be updated once.
+
+This is meant to be applied on top of eccb852f1fe6bede630e2e4f1a121a81e34=
+354ab in git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git, and some =
+commits should be squashed with that series.
+
+Eugenio P=C3=A9rez (6):
+  tools/virtio: Add --batch option
+  tools/virtio: Add --batch=3Drandom option
+  tools/virtio: Add --reset=3Drandom
+  tools/virtio: Make --reset reset ring idx
+  vhost: Delete virtqueue batch_descs member
+  fixup! vhost: batching fetches
+
+ drivers/vhost/test.c         |  57 ++++++++++++++++
+ drivers/vhost/test.h         |   1 +
+ drivers/vhost/vhost.c        |  12 +++-
+ drivers/vhost/vhost.h        |   1 -
+ drivers/virtio/virtio_ring.c |  18 +++++
+ include/linux/virtio.h       |   2 +
+ tools/virtio/linux/virtio.h  |   2 +
+ tools/virtio/virtio_test.c   | 123 +++++++++++++++++++++++++++++++----
+ 8 files changed, 201 insertions(+), 15 deletions(-)
+
+--=20
+2.18.1
 
