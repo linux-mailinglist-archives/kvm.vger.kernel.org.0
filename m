@@ -2,122 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7B88D1969F7
-	for <lists+kvm@lfdr.de>; Sun, 29 Mar 2020 00:08:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EE093196B92
+	for <lists+kvm@lfdr.de>; Sun, 29 Mar 2020 09:19:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727831AbgC1XIB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 28 Mar 2020 19:08:01 -0400
-Received: from mail-qt1-f193.google.com ([209.85.160.193]:37694 "EHLO
-        mail-qt1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727803AbgC1XIB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 28 Mar 2020 19:08:01 -0400
-Received: by mail-qt1-f193.google.com with SMTP id z24so10760800qtu.4
-        for <kvm@vger.kernel.org>; Sat, 28 Mar 2020 16:08:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=ll5/yGQZRWchp8TDCZLz4Mu8TR2gdnKXC0ek/0PcC6s=;
-        b=PRxrzlb0Wve/L9dD5bq3htIZlmqEDU9F7ufxGYc7pP/BjS+5KOylxKAwwIHMDMf1kK
-         GAiNOm04VMgVUa3Supcf92GHzUywRFQX9LS+j1yZM2inMGJrkklncyHL47zpUWxiJFxD
-         O0KXdR6lxe3K94eMF4vSmSgRVBZPOlclmZJzUwPUFieMfMIFqx9VB/L1KsAYQpVNzoT3
-         Taky/Ug6yOt+8eY58C7ZUJKPjJ66FkhBSnlOpCqrSaWD+arNpe78PUBiSZFcxWGATwqb
-         nM+gmuoFbKZCUlF7Fh1fbEu2DrYIZGbWgj64YoAVvRWg8gUWx9i1AZWznrb/ymk7cplj
-         J6tA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=ll5/yGQZRWchp8TDCZLz4Mu8TR2gdnKXC0ek/0PcC6s=;
-        b=W+lybE7HgG9fDWRoZftmMjhv/3dE0s/FUUPqzqAngPk6F0abRsum9hyOskK/lDbfey
-         rvKVuXONrob9PsIqNC3ZfHWKru1Rt4JB0zfw0SW2086DRgclrqoeXc+Ls+qtzohTGEND
-         Cs0S4ckEQ3LX0IAKjIAxQjP++GuffBydhXRIkBVpPNy4pdgFis0A70O2MKX/qhv9qe41
-         TReq4CpaL69I4b6A4Yl915v+hQ3m0r3YnneEPIutNxfWC168AoZmlmq1pDobtIOiuVgM
-         OT1SjnLlUSsOhMYZtcjkPPo32yVrm6f86rUWq7Wz7tHBnWVqBIw5nErJj/4KXFtrB4d5
-         bF/w==
-X-Gm-Message-State: ANhLgQ0qR/GRZ+Wm3hHmJztcTtd2XaghkWa31G/9XhlkSVpqAmQBdWUn
-        v8r+VK741cPR9nsMSzRefFj3qQ==
-X-Google-Smtp-Source: ADFU+vvA0LNIn6qdR1pCMkfY79ytftR4wg2Zm5m4Avobx1Rb43WaXRSlcWMRgHdIm+JTzaDT4ujOqQ==
-X-Received: by 2002:ac8:7c92:: with SMTP id y18mr5780170qtv.189.1585436880818;
-        Sat, 28 Mar 2020 16:08:00 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-142-68-57-212.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.57.212])
-        by smtp.gmail.com with ESMTPSA id x89sm7172921qtd.43.2020.03.28.16.08.00
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Sat, 28 Mar 2020 16:08:00 -0700 (PDT)
-Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1jIKYZ-0000ov-QB; Sat, 28 Mar 2020 20:07:59 -0300
-Date:   Sat, 28 Mar 2020 20:07:59 -0300
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     "Longpeng(Mike)" <longpeng2@huawei.com>
-Cc:     linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        kvm@vger.kernel.org, arei.gonglei@huawei.com,
-        weidong.huang@huawei.com, weifuqiang@huawei.com,
-        kirill.shutemov@linux.intel.com,
-        Mike Kravetz <mike.kravetz@oracle.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        stable@vger.kernel.org
-Subject: Re: [PATCH v4] mm/hugetlb: fix a addressing exception caused by
- huge_pte_offset
-Message-ID: <20200328230759.GD20941@ziepe.ca>
-References: <20200327234122.1985-1-longpeng2@huawei.com>
+        id S1727384AbgC2HLl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 29 Mar 2020 03:11:41 -0400
+Received: from mta-02.yadro.com ([89.207.88.252]:38724 "EHLO mta-01.yadro.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727302AbgC2HLk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 29 Mar 2020 03:11:40 -0400
+Received: from localhost (unknown [127.0.0.1])
+        by mta-01.yadro.com (Postfix) with ESMTP id C9FCC412CB;
+        Sun, 29 Mar 2020 07:11:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=yadro.com; h=
+        content-type:content-type:content-transfer-encoding:mime-version
+        :x-mailer:message-id:date:date:subject:subject:from:from
+        :received:received:received; s=mta-01; t=1585465897; x=
+        1587280298; bh=2cSHbNB51jSlGHATfwhD/NrmlqCB0ieKHzp9nS9g3JE=; b=U
+        2FLUuXbaNBZIBg18Jxi/hO1aZslgzvjGtfpZRF8sVGcWDl1O1cn8eltQxXm7gzNa
+        PstaM+oWHMnGMKsXixp+nJdmQ8jmF+6iF7o4uDbOJOyvFqmw1csmN1hxV+y1YZ7/
+        C0QwbsgUAJxJxYLrWN/8x+ImJ/pM1hD0y96md7zYWI=
+X-Virus-Scanned: amavisd-new at yadro.com
+Received: from mta-01.yadro.com ([127.0.0.1])
+        by localhost (mta-01.yadro.com [127.0.0.1]) (amavisd-new, port 10024)
+        with ESMTP id wGDyf2UlRISQ; Sun, 29 Mar 2020 10:11:37 +0300 (MSK)
+Received: from T-EXCH-02.corp.yadro.com (t-exch-02.corp.yadro.com [172.17.10.102])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mta-01.yadro.com (Postfix) with ESMTPS id ACE854127D;
+        Sun, 29 Mar 2020 10:11:37 +0300 (MSK)
+Received: from localhost (172.17.204.212) by T-EXCH-02.corp.yadro.com
+ (172.17.10.102) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P384) id 15.1.669.32; Sun, 29
+ Mar 2020 10:11:38 +0300
+From:   Roman Bolshakov <r.bolshakov@yadro.com>
+To:     <kvm@vger.kernel.org>
+CC:     Roman Bolshakov <r.bolshakov@yadro.com>,
+        Cameron Esfahani <dirty@apple.com>
+Subject: [kvm-unit-tests PATCH] x86: realmode: Test interrupt delivery after STI
+Date:   Sun, 29 Mar 2020 10:11:25 +0300
+Message-ID: <20200329071125.79253-1-r.bolshakov@yadro.com>
+X-Mailer: git-send-email 2.24.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200327234122.1985-1-longpeng2@huawei.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [172.17.204.212]
+X-ClientProxiedBy: T-EXCH-01.corp.yadro.com (172.17.10.101) To
+ T-EXCH-02.corp.yadro.com (172.17.10.102)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Mar 28, 2020 at 07:41:22AM +0800, Longpeng(Mike) wrote:
-> From: Longpeng <longpeng2@huawei.com>
-> 
-> Our machine encountered a panic(addressing exception) after run
-> for a long time and the calltrace is:
-> RIP: 0010:[<ffffffff9dff0587>]  [<ffffffff9dff0587>] hugetlb_fault+0x307/0xbe0
-> RSP: 0018:ffff9567fc27f808  EFLAGS: 00010286
-> RAX: e800c03ff1258d48 RBX: ffffd3bb003b69c0 RCX: e800c03ff1258d48
-> RDX: 17ff3fc00eda72b7 RSI: 00003ffffffff000 RDI: e800c03ff1258d48
-> RBP: ffff9567fc27f8c8 R08: e800c03ff1258d48 R09: 0000000000000080
-> R10: ffffaba0704c22a8 R11: 0000000000000001 R12: ffff95c87b4b60d8
-> R13: 00005fff00000000 R14: 0000000000000000 R15: ffff9567face8074
-> FS:  00007fe2d9ffb700(0000) GS:ffff956900e40000(0000) knlGS:0000000000000000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: ffffd3bb003b69c0 CR3: 000000be67374000 CR4: 00000000003627e0
-> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> Call Trace:
->  [<ffffffff9df9b71b>] ? unlock_page+0x2b/0x30
->  [<ffffffff9dff04a2>] ? hugetlb_fault+0x222/0xbe0
->  [<ffffffff9dff1405>] follow_hugetlb_page+0x175/0x540
->  [<ffffffff9e15b825>] ? cpumask_next_and+0x35/0x50
->  [<ffffffff9dfc7230>] __get_user_pages+0x2a0/0x7e0
->  [<ffffffff9dfc648d>] __get_user_pages_unlocked+0x15d/0x210
->  [<ffffffffc068cfc5>] __gfn_to_pfn_memslot+0x3c5/0x460 [kvm]
->  [<ffffffffc06b28be>] try_async_pf+0x6e/0x2a0 [kvm]
->  [<ffffffffc06b4b41>] tdp_page_fault+0x151/0x2d0 [kvm]
->  ...
->  [<ffffffffc06a6f90>] kvm_arch_vcpu_ioctl_run+0x330/0x490 [kvm]
->  [<ffffffffc068d919>] kvm_vcpu_ioctl+0x309/0x6d0 [kvm]
->  [<ffffffff9deaa8c2>] ? dequeue_signal+0x32/0x180
->  [<ffffffff9deae34d>] ? do_sigtimedwait+0xcd/0x230
->  [<ffffffff9e03aed0>] do_vfs_ioctl+0x3f0/0x540
->  [<ffffffff9e03b0c1>] SyS_ioctl+0xa1/0xc0
->  [<ffffffff9e53879b>] system_call_fastpath+0x22/0x27
+If interrupts are disabled, STI is inhibiting interrupts for the
+instruction following it. If STI is followed by HLT, the CPU is going to
+handle all pending or new interrupts as soon as HLT is executed.
 
-> Cc: Mike Kravetz <mike.kravetz@oracle.com>
-> Cc: Andrew Morton <akpm@linux-foundation.org>
-> Cc: Jason Gunthorpe <jgg@ziepe.ca>
-> Cc: Matthew Wilcox <willy@infradead.org>
-> Cc: Sean Christopherson <sean.j.christopherson@intel.com>
-> Cc: stable@vger.kernel.org
-> Suggested-by: Jason Gunthorpe <jgg@ziepe.ca>
-> Signed-off-by: Longpeng <longpeng2@huawei.com>
+Test if emulator properly clears inhibition state and allows the
+scenario outlined above.
 
-Reviewed-by: Jason Gunthorpe <jgg@mellanox.com>
+Cc: Cameron Esfahani <dirty@apple.com>
+Signed-off-by: Roman Bolshakov <r.bolshakov@yadro.com>
+---
+ x86/realmode.c | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
 
-Jason
+diff --git a/x86/realmode.c b/x86/realmode.c
+index 31f84d0..3518224 100644
+--- a/x86/realmode.c
++++ b/x86/realmode.c
+@@ -814,6 +814,26 @@ static void test_int(void)
+ 	report("int 1", 0, 1);
+ }
+ 
++static void test_sti_inhibit(void)
++{
++	init_inregs(NULL);
++
++	*(u32 *)(0x73 * 4) = 0x1000; /* Store IRQ 11 handler in the IDT */
++	*(u8 *)(0x1000) = 0xcf; /* 0x1000 contains an IRET instruction */
++
++	MK_INSN(sti_inhibit, "cli\n\t"
++			     "movw $0x200b, %dx\n\t"
++			     "movl $1, %eax\n\t"
++			     "outl %eax, %dx\n\t" /* Set IRQ11 */
++			     "movl $0, %eax\n\t"
++			     "outl %eax, %dx\n\t" /* Clear IRQ11 */
++			     "sti\n\t"
++			     "hlt\n\t");
++	exec_in_big_real_mode(&insn_sti_inhibit);
++
++	report("sti inhibit", ~0, 1);
++}
++
+ static void test_imul(void)
+ {
+ 	MK_INSN(imul8_1, "mov $2, %al\n\t"
+@@ -1739,6 +1759,7 @@ void realmode_start(void)
+ 	test_xchg();
+ 	test_iret();
+ 	test_int();
++	test_sti_inhibit();
+ 	test_imul();
+ 	test_mul();
+ 	test_div();
+-- 
+2.24.1
+
