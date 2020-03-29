@@ -2,161 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1C03D196CE4
-	for <lists+kvm@lfdr.de>; Sun, 29 Mar 2020 13:17:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 57913196CEA
+	for <lists+kvm@lfdr.de>; Sun, 29 Mar 2020 13:22:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727986AbgC2LRT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 29 Mar 2020 07:17:19 -0400
-Received: from mga02.intel.com ([134.134.136.20]:20380 "EHLO mga02.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726087AbgC2LRT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 29 Mar 2020 07:17:19 -0400
-IronPort-SDR: /PWVS2axRIoCN6uDna1OvMc0uPw+I3YnIbDNVE+VcLmSG2Zg3364hVWO0ESqQroJtr3BvBgTtK
- xJrNum0+kq4w==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Mar 2020 04:17:18 -0700
-IronPort-SDR: 1br1Y5RvtaSlhdYFonqv1HsmCdLKEIV9UW9CHth/Ldkw1sKFH44OL/RymJQ+jctpdhD8DGIzxJ
- U6wQgxIwwgTA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.72,320,1580803200"; 
-   d="scan'208";a="241370455"
-Received: from fmsmsx103.amr.corp.intel.com ([10.18.124.201])
-  by fmsmga008.fm.intel.com with ESMTP; 29 Mar 2020 04:17:18 -0700
-Received: from fmsmsx112.amr.corp.intel.com (10.18.116.6) by
- FMSMSX103.amr.corp.intel.com (10.18.124.201) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Sun, 29 Mar 2020 04:17:17 -0700
-Received: from shsmsx152.ccr.corp.intel.com (10.239.6.52) by
- FMSMSX112.amr.corp.intel.com (10.18.116.6) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Sun, 29 Mar 2020 04:17:17 -0700
-Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.225]) by
- SHSMSX152.ccr.corp.intel.com ([169.254.6.209]) with mapi id 14.03.0439.000;
- Sun, 29 Mar 2020 19:17:13 +0800
-From:   "Liu, Yi L" <yi.l.liu@intel.com>
-To:     Peter Xu <peterx@redhat.com>
-CC:     "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "mst@redhat.com" <mst@redhat.com>,
-        "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "Tian, Jun J" <jun.j.tian@intel.com>,
-        "Sun, Yi Y" <yi.y.sun@intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Wu, Hao" <hao.wu@intel.com>,
-        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
-        Jacob Pan <jacob.jun.pan@linux.intel.com>,
-        Yi Sun <yi.y.sun@linux.intel.com>,
-        Richard Henderson <rth@twiddle.net>,
-        Eduardo Habkost <ehabkost@redhat.com>
-Subject: RE: [PATCH v1 19/22] intel_iommu: process PASID-based iotlb
- invalidation
-Thread-Topic: [PATCH v1 19/22] intel_iommu: process PASID-based iotlb
- invalidation
-Thread-Index: AQHWAEW7LEF9U5OYaU6Z5+49z1fjtahXjMmAgAHFm8D//5dxAIAGjJFg
-Date:   Sun, 29 Mar 2020 11:17:12 +0000
-Message-ID: <A2975661238FB949B60364EF0F2C25743A2117B0@SHSMSX104.ccr.corp.intel.com>
-References: <1584880579-12178-1-git-send-email-yi.l.liu@intel.com>
- <1584880579-12178-20-git-send-email-yi.l.liu@intel.com>
- <20200324182623.GD127076@xz-x1>
- <A2975661238FB949B60364EF0F2C25743A202340@SHSMSX104.ccr.corp.intel.com>
- <20200325151540.GE354390@xz-x1>
-In-Reply-To: <20200325151540.GE354390@xz-x1>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-version: 11.2.0.6
-dlp-reaction: no-action
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        id S1727938AbgC2LWW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 29 Mar 2020 07:22:22 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:46686 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726087AbgC2LWV (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sun, 29 Mar 2020 07:22:21 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 02TB3k9o029570
+        for <kvm@vger.kernel.org>; Sun, 29 Mar 2020 07:22:20 -0400
+Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3022nkf58v-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Sun, 29 Mar 2020 07:22:20 -0400
+Received: from localhost
+        by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <raspl@linux.ibm.com>;
+        Sun, 29 Mar 2020 12:22:07 +0100
+Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
+        by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Sun, 29 Mar 2020 12:22:05 +0100
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 02TBMF1e38338884
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Sun, 29 Mar 2020 11:22:15 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 88F5C11C052;
+        Sun, 29 Mar 2020 11:22:15 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5F47511C04A;
+        Sun, 29 Mar 2020 11:22:15 +0000 (GMT)
+Received: from [9.145.153.64] (unknown [9.145.153.64])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Sun, 29 Mar 2020 11:22:15 +0000 (GMT)
+Subject: Re: [PATCH 0/7] tools/kvm_stat: add logfile support
+To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+References: <20200306114250.57585-1-raspl@linux.ibm.com>
+ <7f396df1-9589-6dd0-0adf-af4376aa8314@redhat.com>
+ <d893c37d-705c-b9a1-cf98-db997edf3bce@linux.ibm.com>
+ <5c350f55-64be-43fc-237d-7f71b4e9afdc@redhat.com>
+ <7c8b614a-a7a1-d33e-8762-b06d4b2fd45b@linux.ibm.com>
+ <d0143786-04e5-a9f8-bd87-d4c06cee1856@redhat.com>
+From:   Stefan Raspl <raspl@linux.ibm.com>
+Date:   Sun, 29 Mar 2020 13:22:15 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
+In-Reply-To: <d0143786-04e5-a9f8-bd87-d4c06cee1856@redhat.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 20032911-0020-0000-0000-000003BD91EF
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20032911-0021-0000-0000-000022162931
+Message-Id: <cb983917-2c40-5002-b001-093f25e199a2@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.645
+ definitions=2020-03-29_04:2020-03-27,2020-03-29 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
+ lowpriorityscore=0 malwarescore=0 mlxscore=0 spamscore=0 mlxlogscore=999
+ bulkscore=0 impostorscore=0 phishscore=0 priorityscore=1501 suspectscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2003290106
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-PiBGcm9tOiBQZXRlciBYdSA8cGV0ZXJ4QHJlZGhhdC5jb20+DQo+IFNlbnQ6IFdlZG5lc2RheSwg
-TWFyY2ggMjUsIDIwMjAgMTE6MTYgUE0NCj4gVG86IExpdSwgWWkgTCA8eWkubC5saXVAaW50ZWwu
-Y29tPg0KPiBTdWJqZWN0OiBSZTogW1BBVENIIHYxIDE5LzIyXSBpbnRlbF9pb21tdTogcHJvY2Vz
-cyBQQVNJRC1iYXNlZCBpb3RsYiBpbnZhbGlkYXRpb24NCj4gDQo+IE9uIFdlZCwgTWFyIDI1LCAy
-MDIwIGF0IDAxOjM2OjAzUE0gKzAwMDAsIExpdSwgWWkgTCB3cm90ZToNCj4gPiA+IEZyb206IFBl
-dGVyIFh1IDxwZXRlcnhAcmVkaGF0LmNvbT4NCj4gPiA+IFNlbnQ6IFdlZG5lc2RheSwgTWFyY2gg
-MjUsIDIwMjAgMjoyNiBBTQ0KPiA+ID4gVG86IExpdSwgWWkgTCA8eWkubC5saXVAaW50ZWwuY29t
-Pg0KPiA+ID4gU3ViamVjdDogUmU6IFtQQVRDSCB2MSAxOS8yMl0gaW50ZWxfaW9tbXU6IHByb2Nl
-c3MgUEFTSUQtYmFzZWQgaW90bGINCj4gPiA+IGludmFsaWRhdGlvbg0KPiA+ID4NCj4gPiA+IE9u
-IFN1biwgTWFyIDIyLCAyMDIwIGF0IDA1OjM2OjE2QU0gLTA3MDAsIExpdSBZaSBMIHdyb3RlOg0K
-PiA+ID4gPiBUaGlzIHBhdGNoIGFkZHMgdGhlIGJhc2ljIFBBU0lELWJhc2VkIGlvdGxiIChwaW90
-bGIpIGludmFsaWRhdGlvbg0KPiA+ID4gPiBzdXBwb3J0LiBwaW90bGIgaXMgdXNlZCBkdXJpbmcg
-d2Fsa2luZyBJbnRlbCBWVC1kIDFzdCBsZXZlbCBwYWdlDQo+ID4gPiA+IHRhYmxlLiBUaGlzIHBh
-dGNoIG9ubHkgYWRkcyB0aGUgYmFzaWMgcHJvY2Vzc2luZy4gRGV0YWlsZWQNCj4gPiA+ID4gaGFu
-ZGxpbmcgd2lsbCBiZSBhZGRlZCBpbiBuZXh0IHBhdGNoLg0KPiA+ID4gPg0KPiA+ID4gPiBDYzog
-S2V2aW4gVGlhbiA8a2V2aW4udGlhbkBpbnRlbC5jb20+DQo+ID4gPiA+IENjOiBKYWNvYiBQYW4g
-PGphY29iLmp1bi5wYW5AbGludXguaW50ZWwuY29tPg0KPiA+ID4gPiBDYzogUGV0ZXIgWHUgPHBl
-dGVyeEByZWRoYXQuY29tPg0KPiA+ID4gPiBDYzogWWkgU3VuIDx5aS55LnN1bkBsaW51eC5pbnRl
-bC5jb20+DQo+ID4gPiA+IENjOiBQYW9sbyBCb256aW5pIDxwYm9uemluaUByZWRoYXQuY29tPg0K
-PiA+ID4gPiBDYzogUmljaGFyZCBIZW5kZXJzb24gPHJ0aEB0d2lkZGxlLm5ldD4NCj4gPiA+ID4g
-Q2M6IEVkdWFyZG8gSGFia29zdCA8ZWhhYmtvc3RAcmVkaGF0LmNvbT4NCj4gPiA+ID4gU2lnbmVk
-LW9mZi1ieTogTGl1IFlpIEwgPHlpLmwubGl1QGludGVsLmNvbT4NCj4gPiA+ID4gLS0tDQo+ID4g
-PiA+ICBody9pMzg2L2ludGVsX2lvbW11LmMgICAgICAgICAgfCA1Nw0KPiA+ID4gKysrKysrKysr
-KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrDQo+ID4gPiA+ICBody9pMzg2L2ludGVs
-X2lvbW11X2ludGVybmFsLmggfCAxMyArKysrKysrKysrDQo+ID4gPiA+ICAyIGZpbGVzIGNoYW5n
-ZWQsIDcwIGluc2VydGlvbnMoKykNCj4gPiA+ID4NCj4gPiA+ID4gZGlmZiAtLWdpdCBhL2h3L2kz
-ODYvaW50ZWxfaW9tbXUuYyBiL2h3L2kzODYvaW50ZWxfaW9tbXUuYyBpbmRleA0KPiA+ID4gPiBi
-MDA3NzE1Li5iOWFjMDdkIDEwMDY0NA0KPiA+ID4gPiAtLS0gYS9ody9pMzg2L2ludGVsX2lvbW11
-LmMNCj4gPiA+ID4gKysrIGIvaHcvaTM4Ni9pbnRlbF9pb21tdS5jDQo+ID4gPiA+IEBAIC0zMTM0
-LDYgKzMxMzQsNTkgQEAgc3RhdGljIGJvb2wNCj4gPiA+ID4gdnRkX3Byb2Nlc3NfcGFzaWRfZGVz
-YyhJbnRlbElPTU1VU3RhdGUNCj4gPiA+ICpzLA0KPiA+ID4gPiAgICAgIHJldHVybiAocmV0ID09
-IDApID8gdHJ1ZSA6IGZhbHNlOyAgfQ0KPiA+ID4gPg0KPiA+ID4gPiArc3RhdGljIHZvaWQgdnRk
-X3Bpb3RsYl9wYXNpZF9pbnZhbGlkYXRlKEludGVsSU9NTVVTdGF0ZSAqcywNCj4gPiA+ID4gKyAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB1aW50MTZfdCBkb21haW5faWQs
-DQo+ID4gPiA+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgdWludDMy
-X3QgcGFzaWQpIHsgfQ0KPiA+ID4gPiArDQo+ID4gPiA+ICtzdGF0aWMgdm9pZCB2dGRfcGlvdGxi
-X3BhZ2VfaW52YWxpZGF0ZShJbnRlbElPTU1VU3RhdGUgKnMsIHVpbnQxNl90DQo+IGRvbWFpbl9p
-ZCwNCj4gPiA+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgdWludDMyX3QgcGFzaWQs
-IGh3YWRkciBhZGRyLCB1aW50OF90DQo+ID4gPiA+ICthbSwgYm9vbCBpaCkgeyB9DQo+ID4gPiA+
-ICsNCj4gPiA+ID4gK3N0YXRpYyBib29sIHZ0ZF9wcm9jZXNzX3Bpb3RsYl9kZXNjKEludGVsSU9N
-TVVTdGF0ZSAqcywNCj4gPiA+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-IFZUREludkRlc2MgKmludl9kZXNjKSB7DQo+ID4gPiA+ICsgICAgdWludDE2X3QgZG9tYWluX2lk
-Ow0KPiA+ID4gPiArICAgIHVpbnQzMl90IHBhc2lkOw0KPiA+ID4gPiArICAgIHVpbnQ4X3QgYW07
-DQo+ID4gPiA+ICsgICAgaHdhZGRyIGFkZHI7DQo+ID4gPiA+ICsNCj4gPiA+ID4gKyAgICBpZiAo
-KGludl9kZXNjLT52YWxbMF0gJiBWVERfSU5WX0RFU0NfUElPVExCX1JTVkRfVkFMMCkgfHwNCj4g
-PiA+ID4gKyAgICAgICAgKGludl9kZXNjLT52YWxbMV0gJiBWVERfSU5WX0RFU0NfUElPVExCX1JT
-VkRfVkFMMSkpIHsNCj4gPiA+ID4gKyAgICAgICAgZXJyb3JfcmVwb3J0X29uY2UoIm5vbi16ZXJv
-LWZpZWxkLWluLXBpb3RsYl9pbnZfZGVzYyBoaTogMHglIiBQUkl4NjQNCj4gPiA+ID4gKyAgICAg
-ICAgICAgICAgICAgICIgbG86IDB4JSIgUFJJeDY0LCBpbnZfZGVzYy0+dmFsWzFdLCBpbnZfZGVz
-Yy0+dmFsWzBdKTsNCj4gPiA+ID4gKyAgICAgICAgcmV0dXJuIGZhbHNlOw0KPiA+ID4gPiArICAg
-IH0NCj4gPiA+ID4gKw0KPiA+ID4gPiArICAgIGRvbWFpbl9pZCA9IFZURF9JTlZfREVTQ19QSU9U
-TEJfRElEKGludl9kZXNjLT52YWxbMF0pOw0KPiA+ID4gPiArICAgIHBhc2lkID0gVlREX0lOVl9E
-RVNDX1BJT1RMQl9QQVNJRChpbnZfZGVzYy0+dmFsWzBdKTsNCj4gPiA+ID4gKyAgICBzd2l0Y2gg
-KGludl9kZXNjLT52YWxbMF0gJiBWVERfSU5WX0RFU0NfSU9UTEJfRykgew0KPiA+ID4gPiArICAg
-IGNhc2UgVlREX0lOVl9ERVNDX1BJT1RMQl9BTExfSU5fUEFTSUQ6DQo+ID4gPiA+ICsgICAgICAg
-IHZ0ZF9waW90bGJfcGFzaWRfaW52YWxpZGF0ZShzLCBkb21haW5faWQsIHBhc2lkKTsNCj4gPiA+
-ID4gKyAgICAgICAgYnJlYWs7DQo+ID4gPiA+ICsNCj4gPiA+ID4gKyAgICBjYXNlIFZURF9JTlZf
-REVTQ19QSU9UTEJfUFNJX0lOX1BBU0lEOg0KPiA+ID4gPiArICAgICAgICBhbSA9IFZURF9JTlZf
-REVTQ19QSU9UTEJfQU0oaW52X2Rlc2MtPnZhbFsxXSk7DQo+ID4gPiA+ICsgICAgICAgIGFkZHIg
-PSAoaHdhZGRyKSBWVERfSU5WX0RFU0NfUElPVExCX0FERFIoaW52X2Rlc2MtPnZhbFsxXSk7DQo+
-ID4gPiA+ICsgICAgICAgIGlmIChhbSA+IFZURF9NQU1WKSB7DQo+ID4gPg0KPiA+ID4gSSBzYXcg
-dGhpcyBvZiBzcGVjIDEwLjQuMiwgTUFNVjoNCj4gPiA+DQo+ID4gPiAgICAgICAgIEluZGVwZW5k
-ZW50IG9mIHZhbHVlIHJlcG9ydGVkIGluIHRoaXMgZmllbGQsIGltcGxlbWVudGF0aW9ucw0KPiA+
-ID4gICAgICAgICBzdXBwb3J0aW5nIFNNVFMgbXVzdCBzdXBwb3J0IGFkZHJlc3Mtc2VsZWN0aXZl
-IFBBU0lELWJhc2VkDQo+ID4gPiAgICAgICAgIElPVExCIGludmFsaWRhdGlvbnMgKHBfaW90bGJf
-aW52X2RzYykgd2l0aCBhbnkgZGVmaW5lZCBhZGRyZXNzDQo+ID4gPiAgICAgICAgIG1hc2suDQo+
-ID4gPg0KPiA+ID4gRG9lcyBpdCBtZWFuIHdlIHNob3VsZCBldmVuIHN1cHBvcnQgbGFyZ2VyIEFN
-Pw0KPiA+ID4NCj4gPiA+IEJlc2lkZXMgdGhhdCwgdGhlIHBhdGNoIGxvb2tzIGdvb2QgdG8gbWUu
-DQo+ID4NCj4gPiBJIGRvbid0IHRoaW5rIHNvLiBUaGlzIGZpZWxkIGlzIGZvciBzZWNvbmQtbGV2
-ZWwgdGFibGUgaW4gc2NhbGFibGUNCj4gPiBtb2RlIGFuZCB0aGUgdHJhbnNsYXRpb24gdGFibGUg
-aW4gbGVnYWN5IG1vZGUuIEZvciBmaXJzdC1sZXZlbCB0YWJsZSwNCj4gPiBpdCBhbHdheXMgc3Vw
-cG9ydHMgcGFnZSBzZWxlY3RpdmUgaW52YWxpZGF0aW9uIGFuZCBhbGwgdGhlIHN1cHBvcnRlZA0K
-PiA+IG1hc2tzIHJlZ2FyZGxlc3Mgb2YgdGhlIFBTSSBzdXBwb3J0IGJpdCBhbmQgdGhlIE1BTVYg
-ZmllbGQgaW4gdGhlIENBUF9SRUcuDQo+IA0KPiBZZXMgdGhhdCdzIGV4YWN0bHkgd2hhdCBJIHdh
-bnRlZCB0byBhc2suLi4gIExldCBtZSB0cnkgYWdhaW4uDQo+IA0KPiBJIHRob3VnaHQgVlREX01B
-TVYgd2FzIG9ubHkgZm9yIDJuZCBsZXZlbCBwYWdlIHRhYmxlLCBub3QgZm9yIHBhc2lkLWlvdGxi
-DQo+IGludmFsaWRhdGlvbnMuICBTbyBJIHRoaW5rIHdlIHNob3VsZCByZW1vdmUgdGhpcyAiaWYi
-DQo+IGNoZWNrICh0aGF0IGNvcnJlc3BvbmRzIHRvICJ3ZSBzaG91bGQgZXZlbiBzdXBwb3J0IGxh
-cmdlciBBTSIpLCByaWdodD8NCg0KUmlnaHQuIEkgY29uZmlybWVkIHdpdGggc3BlYyBvd25lci4g
-V2lsbCByZW1vdmUgaXQuIDotKQ0KDQpSZWdhcmRzLA0KWWkgTGl1DQo=
+On 2020-03-24 11:32, Paolo Bonzini wrote:
+> On 24/03/20 09:26, Stefan Raspl wrote:
+>> To be able to make use of the logfiles, we'd need to have the heading appear at
+>> the top of each of the files.
+>> Couldn't find much info on how logrotate works internally, but from what I
+>> gathered, it seems it moves out the current logfile e.g. /var/log/kvm.log to
+>> become /var/log/kvm.log.1, and sends a SIGHUP to kvm_stat so that it re-opens
+>> /var/log/kvm.log - which would then start out with a header again.
+>> That should work, but can you confirm that this is what you're suggesting?
+>> If so: Keep the current semantics for the original logging mode, where we have
+>> the heading printed every 20 lines? I would assume so, as that format is better
+>> suited for console logs, but just in case you wanted that changed...
+> 
+> Yes to all. :)
+
+I wrote a respective patch and tried it out, and found this approach not to be
+workable for a number of reasons:
+- The implicit buffering that takes place when redirecting output of kvm_stat in
+  logging mode to a file messes up the format: logrotate moves the files on the
+  disks, but there might be still data buffered that hasn't been written out
+  yet. The SIGHUP triggers a new header to be written with the patch I came up
+  with, but that header would sometimes appear only after a couple of lines
+  written to the file, which messes up the format. Flushing stdout in the signal
+  handler won't help, either - it's already too late by then.
+- When restarting kvm_stat logging (e.g. after a reboot), appending to an
+  existing file should suppress a new header from being written, or it would end
+  up somewhere in the middle of the file, messing up the format. kvm_stat
+  doesn't know that or where its output is redirected to, so no chance of
+  suppressing it within kvm_stat. We would probably require some kind of wrapper
+  script (and possibly an extra cmd-line option to suppress the header on
+  start).
+- I was surprised to realize that SIGHUP is actually not part of logrotate -
+  one has to write that manually into the logrotate config as a postrotate...
+  and I'll openly admit that writing a respective killall-command that aims at a
+  python script doesn't seem to be trivial...
+
+Any idea how to address these issues?
+
+As much as I sympathize with re-use of existing components, I'd like to point
+out that my original patch was also re-using existing python code for rotating
+logs, and made things just _so_ much easier from a user perspective.
+
+Ciao,
+Stefan
+
