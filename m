@@ -2,30 +2,30 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B39C21978C7
-	for <lists+kvm@lfdr.de>; Mon, 30 Mar 2020 12:20:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4B650197907
+	for <lists+kvm@lfdr.de>; Mon, 30 Mar 2020 12:21:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729689AbgC3KUC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 30 Mar 2020 06:20:02 -0400
-Received: from mx01.bbu.dsd.mx.bitdefender.com ([91.199.104.161]:43862 "EHLO
+        id S1729868AbgC3KU7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 30 Mar 2020 06:20:59 -0400
+Received: from mx01.bbu.dsd.mx.bitdefender.com ([91.199.104.161]:43750 "EHLO
         mx01.bbu.dsd.mx.bitdefender.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729313AbgC3KUA (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 30 Mar 2020 06:20:00 -0400
+        by vger.kernel.org with ESMTP id S1729632AbgC3KUD (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 30 Mar 2020 06:20:03 -0400
 Received: from smtp.bitdefender.com (smtp02.buh.bitdefender.net [10.17.80.76])
-        by mx01.bbu.dsd.mx.bitdefender.com (Postfix) with ESMTPS id 97C8C305FFA3;
+        by mx01.bbu.dsd.mx.bitdefender.com (Postfix) with ESMTPS id AC3B1305FFA4;
         Mon, 30 Mar 2020 13:12:56 +0300 (EEST)
 Received: from localhost.localdomain (unknown [91.199.104.28])
-        by smtp.bitdefender.com (Postfix) with ESMTPSA id 69966305B7A1;
+        by smtp.bitdefender.com (Postfix) with ESMTPSA id 8DCA3305B7A0;
         Mon, 30 Mar 2020 13:12:56 +0300 (EEST)
 From:   =?UTF-8?q?Adalbert=20Laz=C4=83r?= <alazar@bitdefender.com>
 To:     kvm@vger.kernel.org
 Cc:     virtualization@lists.linux-foundation.org,
         Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?q?Mircea=20C=C3=AErjaliu?= <mcirjaliu@bitdefender.com>,
-        =?UTF-8?q?Adalbert=20Laz=C4=83r?= <alazar@bitdefender.com>
-Subject: [PATCH v8 48/81] KVM: introspection: add vCPU related data
-Date:   Mon, 30 Mar 2020 13:12:35 +0300
-Message-Id: <20200330101308.21702-49-alazar@bitdefender.com>
+        =?UTF-8?q?Adalbert=20Laz=C4=83r?= <alazar@bitdefender.com>,
+        =?UTF-8?q?Nicu=C8=99or=20C=C3=AE=C8=9Bu?= <ncitu@bitdefender.com>
+Subject: [PATCH v8 49/81] KVM: introspection: add a jobs list to every introspected vCPU
+Date:   Mon, 30 Mar 2020 13:12:36 +0300
+Message-Id: <20200330101308.21702-50-alazar@bitdefender.com>
 In-Reply-To: <20200330101308.21702-1-alazar@bitdefender.com>
 References: <20200330101308.21702-1-alazar@bitdefender.com>
 MIME-Version: 1.0
@@ -36,172 +36,174 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Mircea Cîrjaliu <mcirjaliu@bitdefender.com>
+Every vCPU has a lock-protected list in which the receiving worker
+places the jobs that has to be done by the vCPU thread
+once it is kicked out of guest (KVM_REQ_INTROSPECTION).
 
-Add an introspection structure to all vCPUs when the VM is hooked.
+A job is defined by a "do" function, a "free" function and a pointer
+(the context).
 
-Signed-off-by: Mircea Cîrjaliu <mcirjaliu@bitdefender.com>
+Co-developed-by: Nicușor Cîțu <ncitu@bitdefender.com>
+Signed-off-by: Nicușor Cîțu <ncitu@bitdefender.com>
 Signed-off-by: Adalbert Lazăr <alazar@bitdefender.com>
 ---
- arch/x86/include/asm/kvmi_host.h |  3 ++
- include/linux/kvm_host.h         |  1 +
- include/linux/kvmi_host.h        |  7 +++++
- virt/kvm/introspection/kvmi.c    | 51 ++++++++++++++++++++++++++++++++
- virt/kvm/kvm_main.c              |  2 ++
- 5 files changed, 64 insertions(+)
+ include/linux/kvmi_host.h         | 10 +++++
+ virt/kvm/introspection/kvmi.c     | 72 ++++++++++++++++++++++++++++++-
+ virt/kvm/introspection/kvmi_int.h |  1 +
+ 3 files changed, 81 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/include/asm/kvmi_host.h b/arch/x86/include/asm/kvmi_host.h
-index 38c398262913..360a57dd9019 100644
---- a/arch/x86/include/asm/kvmi_host.h
-+++ b/arch/x86/include/asm/kvmi_host.h
-@@ -2,6 +2,9 @@
- #ifndef _ASM_X86_KVMI_HOST_H
- #define _ASM_X86_KVMI_HOST_H
- 
-+struct kvm_vcpu_arch_introspection {
-+};
-+
- struct kvm_arch_introspection {
- };
- 
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 1f1b0dffabaa..8db92cbba435 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -321,6 +321,7 @@ struct kvm_vcpu {
- 	bool ready;
- 	struct kvm_vcpu_arch arch;
- 	struct dentry *debugfs_dentry;
-+	struct kvm_vcpu_introspection *kvmi;
- };
- 
- static inline int kvm_vcpu_exiting_guest_mode(struct kvm_vcpu *vcpu)
 diff --git a/include/linux/kvmi_host.h b/include/linux/kvmi_host.h
-index 41b22af771fb..ca2db8043a53 100644
+index ca2db8043a53..1d80d233fbd5 100644
 --- a/include/linux/kvmi_host.h
 +++ b/include/linux/kvmi_host.h
-@@ -5,11 +5,16 @@
- #include <uapi/linux/kvmi.h>
- 
- struct kvm;
-+struct kvm_vcpu;
- 
- #include <asm/kvmi_host.h>
+@@ -11,8 +11,18 @@ struct kvm_vcpu;
  
  #define KVMI_NUM_COMMANDS KVMI_NUM_MESSAGES
  
-+struct kvm_vcpu_introspection {
-+	struct kvm_vcpu_arch_introspection arch;
++struct kvmi_job {
++	struct list_head link;
++	void *ctx;
++	void (*fct)(struct kvm_vcpu *vcpu, void *ctx);
++	void (*free_fct)(void *ctx);
 +};
 +
+ struct kvm_vcpu_introspection {
+ 	struct kvm_vcpu_arch_introspection arch;
++
++	struct list_head job_list;
++	spinlock_t job_lock;
+ };
+ 
  struct kvm_introspection {
- 	struct kvm_arch_introspection arch;
- 	struct kvm *kvm;
-@@ -33,6 +38,7 @@ int kvmi_init(void);
- void kvmi_uninit(void);
- void kvmi_create_vm(struct kvm *kvm);
- void kvmi_destroy_vm(struct kvm *kvm);
-+void kvmi_vcpu_uninit(struct kvm_vcpu *vcpu);
- 
- int kvmi_ioctl_hook(struct kvm *kvm, void __user *argp);
- int kvmi_ioctl_unhook(struct kvm *kvm);
-@@ -46,6 +52,7 @@ static inline int kvmi_init(void) { return 0; }
- static inline void kvmi_uninit(void) { }
- static inline void kvmi_create_vm(struct kvm *kvm) { }
- static inline void kvmi_destroy_vm(struct kvm *kvm) { }
-+static inline void kvmi_vcpu_uninit(struct kvm_vcpu *vcpu) { }
- 
- #endif /* CONFIG_KVM_INTROSPECTION */
- 
 diff --git a/virt/kvm/introspection/kvmi.c b/virt/kvm/introspection/kvmi.c
-index 661e49a75835..a9f9afba6ba2 100644
+index a9f9afba6ba2..e36460b755e9 100644
 --- a/virt/kvm/introspection/kvmi.c
 +++ b/virt/kvm/introspection/kvmi.c
-@@ -81,16 +81,58 @@ void kvmi_uninit(void)
+@@ -17,6 +17,7 @@ DECLARE_BITMAP(Kvmi_known_vm_events, KVMI_NUM_EVENTS);
+ static DECLARE_BITMAP(Kvmi_known_vcpu_events, KVMI_NUM_EVENTS);
+ 
+ static struct kmem_cache *msg_cache;
++static struct kmem_cache *job_cache;
+ 
+ void *kvmi_msg_alloc(void)
+ {
+@@ -33,14 +34,19 @@ static void kvmi_cache_destroy(void)
+ {
+ 	kmem_cache_destroy(msg_cache);
+ 	msg_cache = NULL;
++	kmem_cache_destroy(job_cache);
++	job_cache = NULL;
+ }
+ 
+ static int kvmi_cache_create(void)
+ {
+ 	msg_cache = kmem_cache_create("kvmi_msg", KVMI_MSG_SIZE_ALLOC,
+ 				      4096, SLAB_ACCOUNT, NULL);
++	job_cache = kmem_cache_create("kvmi_job",
++				      sizeof(struct kvmi_job),
++				      0, SLAB_ACCOUNT, NULL);
+ 
+-	if (!msg_cache) {
++	if (!msg_cache || !job_cache) {
+ 		kvmi_cache_destroy();
+ 
+ 		return -1;
+@@ -81,6 +87,48 @@ void kvmi_uninit(void)
  	kvmi_cache_destroy();
  }
  
-+static bool alloc_vcpui(struct kvm_vcpu *vcpu)
++static int __kvmi_add_job(struct kvm_vcpu *vcpu,
++			  void (*fct)(struct kvm_vcpu *vcpu, void *ctx),
++			  void *ctx, void (*free_fct)(void *ctx))
 +{
-+	struct kvm_vcpu_introspection *vcpui;
++	struct kvm_vcpu_introspection *vcpui = VCPUI(vcpu);
++	struct kvmi_job *job;
 +
-+	vcpui = kzalloc(sizeof(*vcpui), GFP_KERNEL);
-+	if (!vcpui)
-+		return false;
-+
-+	vcpu->kvmi = vcpui;
-+
-+	return true;
-+}
-+
-+static int create_vcpui(struct kvm_vcpu *vcpu)
-+{
-+	if (!alloc_vcpui(vcpu))
++	job = kmem_cache_zalloc(job_cache, GFP_KERNEL);
++	if (unlikely(!job))
 +		return -ENOMEM;
++
++	INIT_LIST_HEAD(&job->link);
++	job->fct = fct;
++	job->ctx = ctx;
++	job->free_fct = free_fct;
++
++	spin_lock(&vcpui->job_lock);
++	list_add_tail(&job->link, &vcpui->job_list);
++	spin_unlock(&vcpui->job_lock);
 +
 +	return 0;
 +}
 +
-+static void free_vcpui(struct kvm_vcpu *vcpu)
++int kvmi_add_job(struct kvm_vcpu *vcpu,
++		 void (*fct)(struct kvm_vcpu *vcpu, void *ctx),
++		 void *ctx, void (*free_fct)(void *ctx))
 +{
-+	kfree(vcpu->kvmi);
-+	vcpu->kvmi = NULL;
++	int err;
++
++	err = __kvmi_add_job(vcpu, fct, ctx, free_fct);
++
++	return err;
 +}
 +
- static void free_kvmi(struct kvm *kvm)
++static void kvmi_free_job(struct kvmi_job *job)
++{
++	if (job->free_fct)
++		job->free_fct(job->ctx);
++
++	kmem_cache_free(job_cache, job);
++}
++
+ static bool alloc_vcpui(struct kvm_vcpu *vcpu)
  {
-+	struct kvm_vcpu *vcpu;
-+	int i;
+ 	struct kvm_vcpu_introspection *vcpui;
+@@ -89,6 +137,9 @@ static bool alloc_vcpui(struct kvm_vcpu *vcpu)
+ 	if (!vcpui)
+ 		return false;
+ 
++	INIT_LIST_HEAD(&vcpui->job_list);
++	spin_lock_init(&vcpui->job_lock);
 +
-+	kvm_for_each_vcpu(i, vcpu, kvm)
-+		free_vcpui(vcpu);
-+
- 	kfree(kvm->kvmi);
- 	kvm->kvmi = NULL;
+ 	vcpu->kvmi = vcpui;
+ 
+ 	return true;
+@@ -102,9 +153,26 @@ static int create_vcpui(struct kvm_vcpu *vcpu)
+ 	return 0;
  }
  
-+void kvmi_vcpu_uninit(struct kvm_vcpu *vcpu)
++static void free_vcpu_jobs(struct kvm_vcpu_introspection *vcpui)
 +{
-+	mutex_lock(&vcpu->kvm->kvmi_lock);
-+	free_vcpui(vcpu);
-+	mutex_unlock(&vcpu->kvm->kvmi_lock);
++	struct kvmi_job *cur, *next;
++
++	list_for_each_entry_safe(cur, next, &vcpui->job_list, link) {
++		list_del(&cur->link);
++		kvmi_free_job(cur);
++	}
 +}
 +
- static struct kvm_introspection *
- alloc_kvmi(struct kvm *kvm, const struct kvm_introspection_hook *hook)
+ static void free_vcpui(struct kvm_vcpu *vcpu)
  {
- 	struct kvm_introspection *kvmi;
-+	struct kvm_vcpu *vcpu;
-+	int i;
- 
- 	kvmi = kzalloc(sizeof(*kvmi), GFP_KERNEL);
- 	if (!kvmi)
-@@ -104,6 +146,15 @@ alloc_kvmi(struct kvm *kvm, const struct kvm_introspection_hook *hook)
- 
- 	atomic_set(&kvmi->ev_seq, 0);
- 
-+	kvm_for_each_vcpu(i, vcpu, kvm) {
-+		int err = create_vcpui(vcpu);
+-	kfree(vcpu->kvmi);
++	struct kvm_vcpu_introspection *vcpui = VCPUI(vcpu);
 +
-+		if (err) {
-+			free_kvmi(kvm);
-+			return NULL;
-+		}
-+	}
++	if (!vcpui)
++		return;
 +
- 	kvmi->kvm = kvm;
- 
- 	return kvmi;
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 86bc2ed680ce..8d2a4a1ae3b0 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -361,6 +361,8 @@ static void kvm_vcpu_init(struct kvm_vcpu *vcpu, struct kvm *kvm, unsigned id)
- 
- void kvm_vcpu_destroy(struct kvm_vcpu *vcpu)
- {
-+	kvmi_vcpu_uninit(vcpu);
++	free_vcpu_jobs(vcpui);
 +
- 	kvm_arch_vcpu_destroy(vcpu);
++	kfree(vcpui);
+ 	vcpu->kvmi = NULL;
+ }
  
- 	/*
+diff --git a/virt/kvm/introspection/kvmi_int.h b/virt/kvm/introspection/kvmi_int.h
+index 6a1808585a32..5d40d872e493 100644
+--- a/virt/kvm/introspection/kvmi_int.h
++++ b/virt/kvm/introspection/kvmi_int.h
+@@ -20,6 +20,7 @@ extern DECLARE_BITMAP(Kvmi_known_events, KVMI_NUM_EVENTS);
+ extern DECLARE_BITMAP(Kvmi_known_vm_events, KVMI_NUM_EVENTS);
+ 
+ #define KVMI(kvm) ((kvm)->kvmi)
++#define VCPUI(vcpu) ((vcpu)->kvmi)
+ 
+ /* kvmi_msg.c */
+ bool kvmi_sock_get(struct kvm_introspection *kvmi, int fd);
