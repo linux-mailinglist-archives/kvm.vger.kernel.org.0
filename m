@@ -2,180 +2,179 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3BCBE1976C7
-	for <lists+kvm@lfdr.de>; Mon, 30 Mar 2020 10:41:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 03BD51976D1
+	for <lists+kvm@lfdr.de>; Mon, 30 Mar 2020 10:43:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729439AbgC3IlM convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Mon, 30 Mar 2020 04:41:12 -0400
-Received: from mga07.intel.com ([134.134.136.100]:25475 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728994AbgC3IlM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 30 Mar 2020 04:41:12 -0400
-IronPort-SDR: N4Ah5x9e8fGgy48tKitjM6i1kpQBZ8+OA9aHZxa36L6+vmVzjD6CrnD+ldSXulj9XtoyoFvWx4
- Hpe9yAnhsmSw==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Mar 2020 01:41:11 -0700
-IronPort-SDR: wGVeRflbVpIH9JGxfzE+chG8cDJEH2vJJukJndIH4VToaUYWtUGnyBgb5ToVkdYz99P+KrnrCz
- RqZPZB/2TjIA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.72,323,1580803200"; 
-   d="scan'208";a="237283947"
-Received: from fmsmsx103.amr.corp.intel.com ([10.18.124.201])
-  by orsmga007.jf.intel.com with ESMTP; 30 Mar 2020 01:41:10 -0700
-Received: from fmsmsx161.amr.corp.intel.com (10.18.125.9) by
- FMSMSX103.amr.corp.intel.com (10.18.124.201) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Mon, 30 Mar 2020 01:40:59 -0700
-Received: from shsmsx101.ccr.corp.intel.com (10.239.4.153) by
- FMSMSX161.amr.corp.intel.com (10.18.125.9) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Mon, 30 Mar 2020 01:40:59 -0700
-Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.225]) by
- SHSMSX101.ccr.corp.intel.com ([169.254.1.129]) with mapi id 14.03.0439.000;
- Mon, 30 Mar 2020 16:40:55 +0800
-From:   "Tian, Kevin" <kevin.tian@intel.com>
-To:     "Liu, Yi L" <yi.l.liu@intel.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>
-CC:     "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "Tian, Jun J" <jun.j.tian@intel.com>,
-        "Sun, Yi Y" <yi.y.sun@intel.com>,
-        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Wu, Hao" <hao.wu@intel.com>
-Subject: RE: [PATCH v1 2/8] vfio/type1: Add vfio_iommu_type1 parameter for
- quota tuning
-Thread-Topic: [PATCH v1 2/8] vfio/type1: Add vfio_iommu_type1 parameter for
- quota tuning
-Thread-Index: AQHWAEUbX2o9koiJmUSoQpAjbhigyahg28IA
-Date:   Mon, 30 Mar 2020 08:40:55 +0000
-Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D19D7FF3C5@SHSMSX104.ccr.corp.intel.com>
-References: <1584880325-10561-1-git-send-email-yi.l.liu@intel.com>
- <1584880325-10561-3-git-send-email-yi.l.liu@intel.com>
-In-Reply-To: <1584880325-10561-3-git-send-email-yi.l.liu@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-version: 11.2.0.6
-dlp-reaction: no-action
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+        id S1729710AbgC3InQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 30 Mar 2020 04:43:16 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:55088 "EHLO
+        us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1729416AbgC3InQ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 30 Mar 2020 04:43:16 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1585557795;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+        bh=1n4MQR13LQJ/iU4eTwU6XCrDpEx8dLHzuKsg0M7QhLo=;
+        b=McQg0+3LAVeS1Kipfqr0VueGFMl3TZtIQ7ha/+V7kHXCWPqlVXqzlITSeHsh75HM8aSQ/a
+        tuDJ0V0qoTZq/95w+pp5+K2vp9wykclixXNYct+XxgqXqMEJWA9phYvYjk1n0MoBWVac13
+        leu+uW56bqRpLAtV2g6HURR7Ev8yFcg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-99-bHpM919_OYiB-wBZsfyfnw-1; Mon, 30 Mar 2020 04:43:11 -0400
+X-MC-Unique: bHpM919_OYiB-wBZsfyfnw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E206D107ACC4;
+        Mon, 30 Mar 2020 08:43:06 +0000 (UTC)
+Received: from [10.36.113.227] (ovpn-113-227.ams2.redhat.com [10.36.113.227])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 369E619756;
+        Mon, 30 Mar 2020 08:42:48 +0000 (UTC)
+Subject: Re: [PATCH v2 00/10] virtio-mem: paravirtualized memory
+To:     Pankaj Gupta <pankaj.gupta.linux@gmail.com>
+Cc:     linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        virtio-dev@lists.oasis-open.org,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        Michal Hocko <mhocko@kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Sebastien Boeuf <sebastien.boeuf@intel.com>,
+        Samuel Ortiz <samuel.ortiz@intel.com>,
+        Robert Bradford <robert.bradford@intel.com>,
+        Luiz Capitulino <lcapitulino@redhat.com>,
+        teawater <teawaterz@linux.alibaba.com>,
+        Igor Mammedov <imammedo@redhat.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        Alexander Duyck <alexander.h.duyck@linux.intel.com>,
+        Alexander Potapenko <glider@google.com>,
+        Anshuman Khandual <anshuman.khandual@arm.com>,
+        Anthony Yznaga <anthony.yznaga@oracle.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Dave Young <dyoung@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Juergen Gross <jgross@suse.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        Len Brown <lenb@kernel.org>,
+        Mel Gorman <mgorman@techsingularity.net>,
+        Michal Hocko <mhocko@suse.com>,
+        Mike Rapoport <rppt@linux.ibm.com>,
+        Oscar Salvador <osalvador@suse.com>,
+        Oscar Salvador <osalvador@suse.de>,
+        Pavel Tatashin <pasha.tatashin@soleen.com>,
+        Pavel Tatashin <pavel.tatashin@microsoft.com>,
+        Pingfan Liu <kernelfans@gmail.com>, Qian Cai <cai@lca.pw>,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Wei Yang <richard.weiyang@gmail.com>
+References: <20200311171422.10484-1-david@redhat.com>
+ <CAM9Jb+g6DEL1=L1ESfW+Jnr_rfO5rEtOwnp10eCLpajaAv8wvg@mail.gmail.com>
+ <6858c4d8-7570-2c2b-5d53-1a7f994c14ee@redhat.com>
+ <CAM9Jb+jbVciBwHBj09w4+sXbJ_dRwiXwe2DPUsx0P1fRsdAi0w@mail.gmail.com>
+From:   David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat GmbH
+Message-ID: <11c87dee-e94e-0475-76d2-143adfd50d9d@redhat.com>
+Date:   Mon, 30 Mar 2020 10:42:47 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
+In-Reply-To: <CAM9Jb+jbVciBwHBj09w4+sXbJ_dRwiXwe2DPUsx0P1fRsdAi0w@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> From: Liu, Yi L <yi.l.liu@intel.com>
-> Sent: Sunday, March 22, 2020 8:32 PM
+On 29.03.20 17:41, Pankaj Gupta wrote:
+>>> Hi David,
+>>>
+>>> Trying to test the series with the Qemu branch(virtio-mem) mentioned.
+>>> Unfortunately,
+>>> not able to hotplug memory. Is anything changed from your previous posting
+>>> or I am doing something wrong?
+>>>
+>>> After giving value to "requested-size", I see size as zero.
+>>>
+>>> (qemu) qom-set vm0 requested-size 10G
+>>> (qemu) info memory-devices
+>>> Memory device [virtio-mem]: "vm0"
+>>>   memaddr: 0x240000000
+>>>   node: 0
+>>>   requested-size: 10737418240
+>>>   size: 0
+>>>   max-size: 107374182400
+>>>   block-size: 2097152
+>>>   memdev: /objects/mem0
+>>>
+>>> Guest kernel: 5.6.0-rc4
+>>> Using same Qemu commandline arguments mentioned in cover-letter.
+>>
+>> Are you booting from an initrd? Are you compiling virtio-mem as a kernel
+>> module or into the kernel binary?
+> Ah was booting into wrong kernel version. Sorry! for the noise.
 > 
-> From: Liu Yi L <yi.l.liu@intel.com>
+> Working perfectly for me. Tried various cmbinations for both
+> hotplug/unplug with multiple
+> NUMA nodes and verified result in guest.
 > 
-> This patch adds a module option to make the PASID quota tunable by
-> administrator.
-> 
-> TODO: needs to think more on how to  make the tuning to be per-process.
-> 
-> Previous discussions:
-> https://patchwork.kernel.org/patch/11209429/
-> 
-> Cc: Kevin Tian <kevin.tian@intel.com>
-> CC: Jacob Pan <jacob.jun.pan@linux.intel.com>
-> Cc: Alex Williamson <alex.williamson@redhat.com>
-> Cc: Eric Auger <eric.auger@redhat.com>
-> Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>
-> Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
-> ---
->  drivers/vfio/vfio.c             | 8 +++++++-
->  drivers/vfio/vfio_iommu_type1.c | 7 ++++++-
->  include/linux/vfio.h            | 3 ++-
->  3 files changed, 15 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
-> index d13b483..020a792 100644
-> --- a/drivers/vfio/vfio.c
-> +++ b/drivers/vfio/vfio.c
-> @@ -2217,13 +2217,19 @@ struct vfio_mm *vfio_mm_get_from_task(struct
-> task_struct *task)
->  }
->  EXPORT_SYMBOL_GPL(vfio_mm_get_from_task);
-> 
-> -int vfio_mm_pasid_alloc(struct vfio_mm *vmm, int min, int max)
-> +int vfio_mm_pasid_alloc(struct vfio_mm *vmm, int quota, int min, int max)
->  {
->  	ioasid_t pasid;
->  	int ret = -ENOSPC;
-> 
->  	mutex_lock(&vmm->pasid_lock);
-> 
-> +	/* update quota as it is tunable by admin */
-> +	if (vmm->pasid_quota != quota) {
-> +		vmm->pasid_quota = quota;
-> +		ioasid_adjust_set(vmm->ioasid_sid, quota);
-> +	}
-> +
+> For the series, you can add:
+> Tested-by: Pankaj Gupta <pankaj.gupta.linux@gmail.com>
 
-It's a bit weird to have quota adjusted in the alloc path, since the latter might
-be initiated by non-privileged users. Why not doing the simple math in vfio_
-create_mm to set the quota when the ioasid set is created? even in the future
-you may allow per-process quota setting, that should come from separate 
-privileged path instead of thru alloc...
+Awesome, thanks!
 
->  	pasid = ioasid_alloc(vmm->ioasid_sid, min, max, NULL);
->  	if (pasid == INVALID_IOASID) {
->  		ret = -ENOSPC;
-> diff --git a/drivers/vfio/vfio_iommu_type1.c
-> b/drivers/vfio/vfio_iommu_type1.c
-> index 331ceee..e40afc0 100644
-> --- a/drivers/vfio/vfio_iommu_type1.c
-> +++ b/drivers/vfio/vfio_iommu_type1.c
-> @@ -60,6 +60,11 @@ module_param_named(dma_entry_limit,
-> dma_entry_limit, uint, 0644);
->  MODULE_PARM_DESC(dma_entry_limit,
->  		 "Maximum number of user DMA mappings per container
-> (65535).");
-> 
-> +static int pasid_quota = VFIO_DEFAULT_PASID_QUOTA;
-> +module_param_named(pasid_quota, pasid_quota, uint, 0644);
-> +MODULE_PARM_DESC(pasid_quota,
-> +		 "Quota of user owned PASIDs per vfio-based application
-> (1000).");
-> +
->  struct vfio_iommu {
->  	struct list_head	domain_list;
->  	struct list_head	iova_list;
-> @@ -2200,7 +2205,7 @@ static int vfio_iommu_type1_pasid_alloc(struct
-> vfio_iommu *iommu,
->  		goto out_unlock;
->  	}
->  	if (vmm)
-> -		ret = vfio_mm_pasid_alloc(vmm, min, max);
-> +		ret = vfio_mm_pasid_alloc(vmm, pasid_quota, min, max);
->  	else
->  		ret = -EINVAL;
->  out_unlock:
-> diff --git a/include/linux/vfio.h b/include/linux/vfio.h
-> index 75f9f7f1..af2ef78 100644
-> --- a/include/linux/vfio.h
-> +++ b/include/linux/vfio.h
-> @@ -106,7 +106,8 @@ struct vfio_mm {
-> 
->  extern struct vfio_mm *vfio_mm_get_from_task(struct task_struct *task);
->  extern void vfio_mm_put(struct vfio_mm *vmm);
-> -extern int vfio_mm_pasid_alloc(struct vfio_mm *vmm, int min, int max);
-> +extern int vfio_mm_pasid_alloc(struct vfio_mm *vmm,
-> +				int quota, int min, int max);
->  extern int vfio_mm_pasid_free(struct vfio_mm *vmm, ioasid_t pasid);
-> 
->  /*
-> --
-> 2.7.4
+-- 
+Thanks,
+
+David / dhildenb
 
