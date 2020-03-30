@@ -2,195 +2,234 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 57245198264
-	for <lists+kvm@lfdr.de>; Mon, 30 Mar 2020 19:30:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6A724198363
+	for <lists+kvm@lfdr.de>; Mon, 30 Mar 2020 20:28:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728732AbgC3Raz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 30 Mar 2020 13:30:55 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:25432 "EHLO
-        us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727779AbgC3Raz (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 30 Mar 2020 13:30:55 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1585589453;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=IV/RlnuWDyVAq/CY6VloTUUQJCsYYqNTqzlcq2lSUms=;
-        b=V8CzqCWkeBI0ZL+DFqZFw+VBlrOKWqQwpiZPDTnldWAlt3qXXmXQDfK2kjzvq1EXf+wulZ
-        LfnH9CZYKF1HjhS1fbYxxw+JX+macmGYhV45xMoKdRrHs7EaNn/5V641rrv3jagNYRQwpq
-        1+DMVO7B8p5FQrl+sC6mlEyDUDhs4SI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-486-BF3CDHVkMCuqbqSNNoh2sA-1; Mon, 30 Mar 2020 13:30:49 -0400
-X-MC-Unique: BF3CDHVkMCuqbqSNNoh2sA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7246A1005516;
-        Mon, 30 Mar 2020 17:30:47 +0000 (UTC)
-Received: from [10.36.112.58] (ovpn-112-58.ams2.redhat.com [10.36.112.58])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 6387D5D9E2;
-        Mon, 30 Mar 2020 17:30:31 +0000 (UTC)
-Subject: Re: [PATCH v2 06/22] hw/pci: introduce
- pci_device_set/unset_iommu_context()
-To:     Liu Yi L <yi.l.liu@intel.com>, qemu-devel@nongnu.org,
-        alex.williamson@redhat.com, peterx@redhat.com
-Cc:     pbonzini@redhat.com, mst@redhat.com, david@gibson.dropbear.id.au,
-        kevin.tian@intel.com, jun.j.tian@intel.com, yi.y.sun@intel.com,
-        kvm@vger.kernel.org, hao.wu@intel.com, jean-philippe@linaro.org,
-        Jacob Pan <jacob.jun.pan@linux.intel.com>,
-        Yi Sun <yi.y.sun@linux.intel.com>
-References: <1585542301-84087-1-git-send-email-yi.l.liu@intel.com>
- <1585542301-84087-7-git-send-email-yi.l.liu@intel.com>
-From:   Auger Eric <eric.auger@redhat.com>
-Message-ID: <01381db5-6f5f-8022-6891-e1a8dd7c3e65@redhat.com>
-Date:   Mon, 30 Mar 2020 19:30:27 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+        id S1727170AbgC3S2z (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 30 Mar 2020 14:28:55 -0400
+Received: from mail-bn8nam12on2065.outbound.protection.outlook.com ([40.107.237.65]:6079
+        "EHLO NAM12-BN8-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726017AbgC3S2z (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 30 Mar 2020 14:28:55 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=QJzUPj2RjqYUNMT8uGwGlq2vUu8TU5+X1VZiDOhqF/1PJrJ1J3JoPryTRmYuT74wtmIqvEr/TffKsbym30/WBcVyPy1SgqpSbpCUm0zN4KRP3Ohxh6lYnplqQKXrbrfR0GAbWAyAMsGU4gYDZV9wuEUD9zM/Jfgo3ilLYPtmFV1PAH47/nH6S8tUlxnh9j67iYE9yaqT2y0AajDaE80oGfS5qpl7FSfEhigPKh/ME9bCvf+QHfEJfKM5polXHp50UiOxjPjyoYP1BacC5VPAvmBQ9Jp0xj0pcJlU/ykeaY79CfAarJS2CS97o4ZAS5DhoXtRdmkpfi5r68dRr5fTbw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=7EYMuNwiPeT2FZlq0oW7bH6/P9EtVfDm+m588vILSBM=;
+ b=Yap44JvZ61NjV/out4BBqjAyzUR3nphKer2cuR4DT3oOeNJQ+PB2qsa3Zr0jwuAwd29QLKQpITuyRFJZ5fydRUNoeFfiF9BqvhVZn4Mi7WlwFXJHzskSIXFWl9VIu41q482k4RK32alt2GUueAB9RzKQoxJl58qGFgcMJYBeqoxzpI/6WpqHPtuo+GvSWu/D+3ItlvDVs1BW04lmAn5P6UOGGd+pvTRJIED//f/8W8GNVFO3CFn35NBq2mFcsKAjxyqvgT6BppCO9CJh4uLeP9eABV/XU7NituoX60WJrMeoeMKXeN1ftMFzlrzSmGOy6MYRbdhbLSIuuJf61TXl8Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=7EYMuNwiPeT2FZlq0oW7bH6/P9EtVfDm+m588vILSBM=;
+ b=vXAqeDkPIOnn4Xnqn8HFiLoc6pH3CHgy4mJuVuaR/jLwhzFUJDx6oaQ/R+IjtaR6a7n17OMqPri14bk0bm4EqU2tiIaNgTXAAKYTqZ0aTGUq4SR50xgtbdKecjr+8155A6TP6gcuogG9dzmfkYDeu+xw5SUl/ENUoTwLBt97HXU=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=Ashish.Kalra@amd.com; 
+Received: from DM5PR12MB1386.namprd12.prod.outlook.com (2603:10b6:3:77::9) by
+ DM5PR12MB2582.namprd12.prod.outlook.com (2603:10b6:4:b5::37) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2856.18; Mon, 30 Mar 2020 18:28:52 +0000
+Received: from DM5PR12MB1386.namprd12.prod.outlook.com
+ ([fe80::969:3d4e:6f37:c33c]) by DM5PR12MB1386.namprd12.prod.outlook.com
+ ([fe80::969:3d4e:6f37:c33c%12]) with mapi id 15.20.2856.019; Mon, 30 Mar 2020
+ 18:28:51 +0000
+Date:   Mon, 30 Mar 2020 18:28:45 +0000
+From:   Ashish Kalra <ashish.kalra@amd.com>
+To:     Venu Busireddy <venu.busireddy@oracle.com>
+Cc:     pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com,
+        hpa@zytor.com, joro@8bytes.org, bp@suse.de,
+        thomas.lendacky@amd.com, x86@kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, rientjes@google.com,
+        srutherford@google.com, luto@kernel.org, brijesh.singh@amd.com
+Subject: Re: [PATCH v6 00/14] Add AMD SEV guest live migration support
+Message-ID: <20200330182845.GA21740@ashkalra_ubuntu_server>
+References: <cover.1585548051.git.ashish.kalra@amd.com>
+ <20200330172446.GA584882@vbusired-dt>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200330172446.GA584882@vbusired-dt>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-ClientProxiedBy: SN1PR12CA0088.namprd12.prod.outlook.com
+ (2603:10b6:802:21::23) To DM5PR12MB1386.namprd12.prod.outlook.com
+ (2603:10b6:3:77::9)
 MIME-Version: 1.0
-In-Reply-To: <1585542301-84087-7-git-send-email-yi.l.liu@intel.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from ashkalra_ubuntu_server (165.204.77.1) by SN1PR12CA0088.namprd12.prod.outlook.com (2603:10b6:802:21::23) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2856.20 via Frontend Transport; Mon, 30 Mar 2020 18:28:50 +0000
+X-Originating-IP: [165.204.77.1]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: 3fb89fb6-9a23-4d1e-76aa-08d7d4d8322d
+X-MS-TrafficTypeDiagnostic: DM5PR12MB2582:|DM5PR12MB2582:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <DM5PR12MB2582ED756B8FE38BD02D23D18ECB0@DM5PR12MB2582.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:3826;
+X-Forefront-PRVS: 0358535363
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM5PR12MB1386.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(10009020)(4636009)(136003)(39860400002)(366004)(346002)(396003)(376002)(186003)(4326008)(16526019)(86362001)(81166006)(44832011)(8936002)(956004)(6666004)(81156014)(5660300002)(6496006)(1076003)(53546011)(52116002)(33656002)(66556008)(33716001)(45080400002)(26005)(8676002)(66476007)(478600001)(55016002)(66946007)(9686003)(2906002)(7416002)(316002)(6916009)(966005);DIR:OUT;SFP:1101;
+Received-SPF: None (protection.outlook.com: amd.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: WwtdXedJ9fIiek9ilqtHEjMmBw7kfMviK6YSzVC9VGHjhAZpeJl4YePJKBzbJ46z80+TXEkSNfT3seO937W6GW32LbfGSOLU5jBwwV+z1WuRbB06SGYp0Q9S7rhRoAfaXdATsd4L8KeHBpmaOOt/8o1pCvm4GRwHPZVdUPYOYTyYmhspges/et5B5D8D44U728tdWtK4KgLURCshhRhRHmcAypg3txjEBBQw7oFdX2RDFpqa7GDXv1fpu/MguVdJEU29JmeXkOIDECL3qpg4DgUXMU0kpqOsgSJ2CsCcIcxhwRK6eC9Pl0GeC/BF+1LWDUcGH0P0NUzenalctNm14nzW2eFJ8U/bZN+rVr5cxrSoygxz++58SUNqArZj+46R0r7Q7zByDQipQYUpSSiqCJfjsvm4DwvcuGM3GUeU5mSkMsd+sFmpX1M+em7KkucM9Ux7tIrdyEOEKe/tRSzdrnXUiOwqU0aG3VMYgcMQFr/YjEcvzkqLYV3hopkAsc2snw9kMSwnPGVGwGZqiJJUbg==
+X-MS-Exchange-AntiSpam-MessageData: ERLzSLGSonEfbNu3tC8CV/B3CajssN6NiEWEkmxHdrhRis5DeKmdqk+gr4LnHdWWcbkfguL+FVeoaxI4tvIz5AKEgvwgR00GhdsZVjM1cWSifSLtuHuLJtjltIXOmzDLBjfYHiAjyiFSuEMssJRykA==
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3fb89fb6-9a23-4d1e-76aa-08d7d4d8322d
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Mar 2020 18:28:51.8308
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: QFqOQieoN+4uOfrt6j43LtjiPay4nyf1njWnbNv8FIQMrFQD5Ku82Y1IIvfecqR8jc0+oCCO2twufqi+p9qGww==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR12MB2582
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Yi,
-On 3/30/20 6:24 AM, Liu Yi L wrote:
-> This patch adds pci_device_set/unset_iommu_context() to set/unset
-> host_iommu_context for a given device. New callback is added in
-> PCIIOMMUOps. As such, vIOMMU could make use of host IOMMU capability.
-> e.g setup nested translation.
+This is applied on top of Linux 5.6, as per commit below :
 
-I think you need to explain what this practically is supposed to do.
-such as: by attaching such context to a PCI device (for example VFIO
-assigned?), you tell the host that this PCIe device is protected by a FL
-stage controlled by the guest or something like that - if this is
-correct understanding (?) -
-> 
-> Cc: Kevin Tian <kevin.tian@intel.com>
-> Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
-> Cc: Peter Xu <peterx@redhat.com>
-> Cc: Eric Auger <eric.auger@redhat.com>
-> Cc: Yi Sun <yi.y.sun@linux.intel.com>
-> Cc: David Gibson <david@gibson.dropbear.id.au>
-> Cc: Michael S. Tsirkin <mst@redhat.com>
-> Reviewed-by: Peter Xu <peterx@redhat.com>
-> Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
-> ---
->  hw/pci/pci.c         | 49 ++++++++++++++++++++++++++++++++++++++++++++-----
->  include/hw/pci/pci.h | 10 ++++++++++
->  2 files changed, 54 insertions(+), 5 deletions(-)
-> 
-> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-> index aa9025c..af3c1a1 100644
-> --- a/hw/pci/pci.c
-> +++ b/hw/pci/pci.c
-> @@ -2638,7 +2638,8 @@ static void pci_device_class_base_init(ObjectClass *klass, void *data)
->      }
->  }
->  
-> -AddressSpace *pci_device_iommu_address_space(PCIDevice *dev)
-> +static void pci_device_get_iommu_bus_devfn(PCIDevice *dev,
-> +                              PCIBus **pbus, uint8_t *pdevfn)
->  {
->      PCIBus *bus = pci_get_bus(dev);
->      PCIBus *iommu_bus = bus;
-> @@ -2683,14 +2684,52 @@ AddressSpace *pci_device_iommu_address_space(PCIDevice *dev)
->  
->          iommu_bus = parent_bus;
->      }
-> -    if (iommu_bus && iommu_bus->iommu_ops &&
-> -                     iommu_bus->iommu_ops->get_address_space) {
-> -        return iommu_bus->iommu_ops->get_address_space(bus,
-> -                                 iommu_bus->iommu_opaque, devfn);
-> +    *pbus = iommu_bus;
-> +    *pdevfn = devfn;
-> +}
-> +
-> +AddressSpace *pci_device_iommu_address_space(PCIDevice *dev)
-> +{
-> +    PCIBus *bus;
-> +    uint8_t devfn;
-> +
-> +    pci_device_get_iommu_bus_devfn(dev, &bus, &devfn);
-> +    if (bus && bus->iommu_ops &&
-> +        bus->iommu_ops->get_address_space) {
-> +        return bus->iommu_ops->get_address_space(bus,
-> +                                bus->iommu_opaque, devfn);
->      }
->      return &address_space_memory;
->  }
->  
-> +int pci_device_set_iommu_context(PCIDevice *dev,
-> +                                 HostIOMMUContext *iommu_ctx)
-> +{
-> +    PCIBus *bus;
-> +    uint8_t devfn;
-> +
-> +    pci_device_get_iommu_bus_devfn(dev, &bus, &devfn);
-> +    if (bus && bus->iommu_ops &&
-> +        bus->iommu_ops->set_iommu_context) {
-> +        return bus->iommu_ops->set_iommu_context(bus,
-> +                              bus->iommu_opaque, devfn, iommu_ctx);
-> +    }
-> +    return -ENOENT;
-> +}
-> +
-> +void pci_device_unset_iommu_context(PCIDevice *dev)
-> +{
-> +    PCIBus *bus;
-> +    uint8_t devfn;
-> +
-> +    pci_device_get_iommu_bus_devfn(dev, &bus, &devfn);
-> +    if (bus && bus->iommu_ops &&
-> +        bus->iommu_ops->unset_iommu_context) {
-> +        bus->iommu_ops->unset_iommu_context(bus,
-> +                                 bus->iommu_opaque, devfn);
-> +    }
-> +}
-> +
->  void pci_setup_iommu(PCIBus *bus, const PCIIOMMUOps *ops, void *opaque)
->  {
->      bus->iommu_ops = ops;
-> diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
-> index ffe192d..0ec5680 100644
-> --- a/include/hw/pci/pci.h
-> +++ b/include/hw/pci/pci.h
-> @@ -9,6 +9,8 @@
->  
->  #include "hw/pci/pcie.h"
->  
-> +#include "hw/iommu/host_iommu_context.h"
-> +
->  extern bool pci_available;
->  
->  /* PCI bus */
-> @@ -489,9 +491,17 @@ typedef struct PCIIOMMUOps PCIIOMMUOps;
->  struct PCIIOMMUOps {
->      AddressSpace * (*get_address_space)(PCIBus *bus,
->                                  void *opaque, int32_t devfn);
-> +    int (*set_iommu_context)(PCIBus *bus, void *opaque,
-> +                             int32_t devfn,
-> +                             HostIOMMUContext *iommu_ctx);
-> +    void (*unset_iommu_context)(PCIBus *bus, void *opaque,
-> +                                int32_t devfn);
->  };
->  
->  AddressSpace *pci_device_iommu_address_space(PCIDevice *dev);
-> +int pci_device_set_iommu_context(PCIDevice *dev,
-> +                                 HostIOMMUContext *iommu_ctx);
-> +void pci_device_unset_iommu_context(PCIDevice *dev);
->  void pci_setup_iommu(PCIBus *bus, const PCIIOMMUOps *iommu_ops, void *opaque);
->  
->  static inline void
-> 
-Thanks
+commit 7111951b8d4973bda27ff663f2cf18b663d15b48 (tag: v5.6, origin/master, origin/HEAD)
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Sun Mar 29 15:25:41 2020 -0700
 
-Eric
+    Linux 5.6
 
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+Thanks,
+Ashish
+
+On Mon, Mar 30, 2020 at 12:24:46PM -0500, Venu Busireddy wrote:
+> On 2020-03-30 06:19:27 +0000, Ashish Kalra wrote:
+> > From: Ashish Kalra <ashish.kalra@amd.com>
+> > 
+> > The series add support for AMD SEV guest live migration commands. To protect the
+> > confidentiality of an SEV protected guest memory while in transit we need to
+> > use the SEV commands defined in SEV API spec [1].
+> > 
+> > SEV guest VMs have the concept of private and shared memory. Private memory
+> > is encrypted with the guest-specific key, while shared memory may be encrypted
+> > with hypervisor key. The commands provided by the SEV FW are meant to be used
+> > for the private memory only. The patch series introduces a new hypercall.
+> > The guest OS can use this hypercall to notify the page encryption status.
+> > If the page is encrypted with guest specific-key then we use SEV command during
+> > the migration. If page is not encrypted then fallback to default.
+> > 
+> > The patch adds new ioctls KVM_{SET,GET}_PAGE_ENC_BITMAP. The ioctl can be used
+> > by the qemu to get the page encrypted bitmap. Qemu can consult this bitmap
+> > during the migration to know whether the page is encrypted.
+> > 
+> > [1] https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Fdeveloper.amd.com%2Fwp-content%2Fresources%2F55766.PDF&amp;data=02%7C01%7CAshish.Kalra%40amd.com%7Cb87828d7e1eb41fe401c08d7d4cf4937%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C637211859771455979&amp;sdata=yN1OrvcuNb%2F8JAaLwlf2pIJtEvBRFOSvTKPYWz9ASUY%3D&amp;reserved=0
+> > 
+> > Changes since v5:
+> > - Fix build errors as
+> >   Reported-by: kbuild test robot <lkp@intel.com>
+> 
+> Which upstream tag should I use to apply this patch set? I tried the
+> top of Linus's tree, and I get the following error when I apply this
+> patch set.
+> 
+> $ git am PATCH-v6-01-14-KVM-SVM-Add-KVM_SEV-SEND_START-command.mbox
+> Applying: KVM: SVM: Add KVM_SEV SEND_START command
+> Applying: KVM: SVM: Add KVM_SEND_UPDATE_DATA command
+> Applying: KVM: SVM: Add KVM_SEV_SEND_FINISH command
+> Applying: KVM: SVM: Add KVM_SEV_RECEIVE_FINISH command
+> error: patch failed: Documentation/virt/kvm/amd-memory-encryption.rst:375
+> error: Documentation/virt/kvm/amd-memory-encryption.rst: patch does not apply
+> error: patch failed: arch/x86/kvm/svm.c:7632
+> error: arch/x86/kvm/svm.c: patch does not apply
+> Patch failed at 0004 KVM: SVM: Add KVM_SEV_RECEIVE_FINISH command
+> 
+> Thanks,
+> 
+> Venu
+> 
+> > 
+> > Changes since v4:
+> > - Host support has been added to extend KVM capabilities/feature bits to 
+> >   include a new KVM_FEATURE_SEV_LIVE_MIGRATION, which the guest can
+> >   query for host-side support for SEV live migration and a new custom MSR
+> >   MSR_KVM_SEV_LIVE_MIG_EN is added for guest to enable the SEV live
+> >   migration feature.
+> > - Ensure that _bss_decrypted section is marked as decrypted in the
+> >   page encryption bitmap.
+> > - Fixing KVM_GET_PAGE_ENC_BITMAP ioctl to return the correct bitmap
+> >   as per the number of pages being requested by the user. Ensure that
+> >   we only copy bmap->num_pages bytes in the userspace buffer, if
+> >   bmap->num_pages is not byte aligned we read the trailing bits
+> >   from the userspace and copy those bits as is. This fixes guest
+> >   page(s) corruption issues observed after migration completion.
+> > - Add kexec support for SEV Live Migration to reset the host's
+> >   page encryption bitmap related to kernel specific page encryption
+> >   status settings before we load a new kernel by kexec. We cannot
+> >   reset the complete page encryption bitmap here as we need to
+> >   retain the UEFI/OVMF firmware specific settings.
+> > 
+> > Changes since v3:
+> > - Rebasing to mainline and testing.
+> > - Adding a new KVM_PAGE_ENC_BITMAP_RESET ioctl, which resets the 
+> >   page encryption bitmap on a guest reboot event.
+> > - Adding a more reliable sanity check for GPA range being passed to
+> >   the hypercall to ensure that guest MMIO ranges are also marked
+> >   in the page encryption bitmap.
+> > 
+> > Changes since v2:
+> >  - reset the page encryption bitmap on vcpu reboot
+> > 
+> > Changes since v1:
+> >  - Add support to share the page encryption between the source and target
+> >    machine.
+> >  - Fix review feedbacks from Tom Lendacky.
+> >  - Add check to limit the session blob length.
+> >  - Update KVM_GET_PAGE_ENC_BITMAP icotl to use the base_gfn instead of
+> >    the memory slot when querying the bitmap.
+> > 
+> > Ashish Kalra (3):
+> >   KVM: x86: Introduce KVM_PAGE_ENC_BITMAP_RESET ioctl
+> >   KVM: x86: Introduce new KVM_FEATURE_SEV_LIVE_MIGRATION feature &
+> >     Custom MSR.
+> >   KVM: x86: Add kexec support for SEV Live Migration.
+> > 
+> > Brijesh Singh (11):
+> >   KVM: SVM: Add KVM_SEV SEND_START command
+> >   KVM: SVM: Add KVM_SEND_UPDATE_DATA command
+> >   KVM: SVM: Add KVM_SEV_SEND_FINISH command
+> >   KVM: SVM: Add support for KVM_SEV_RECEIVE_START command
+> >   KVM: SVM: Add KVM_SEV_RECEIVE_UPDATE_DATA command
+> >   KVM: SVM: Add KVM_SEV_RECEIVE_FINISH command
+> >   KVM: x86: Add AMD SEV specific Hypercall3
+> >   KVM: X86: Introduce KVM_HC_PAGE_ENC_STATUS hypercall
+> >   KVM: x86: Introduce KVM_GET_PAGE_ENC_BITMAP ioctl
+> >   mm: x86: Invoke hypercall when page encryption status is changed
+> >   KVM: x86: Introduce KVM_SET_PAGE_ENC_BITMAP ioctl
+> > 
+> >  .../virt/kvm/amd-memory-encryption.rst        | 120 +++
+> >  Documentation/virt/kvm/api.rst                |  62 ++
+> >  Documentation/virt/kvm/cpuid.rst              |   4 +
+> >  Documentation/virt/kvm/hypercalls.rst         |  15 +
+> >  Documentation/virt/kvm/msr.rst                |  10 +
+> >  arch/x86/include/asm/kvm_host.h               |  10 +
+> >  arch/x86/include/asm/kvm_para.h               |  12 +
+> >  arch/x86/include/asm/paravirt.h               |  10 +
+> >  arch/x86/include/asm/paravirt_types.h         |   2 +
+> >  arch/x86/include/uapi/asm/kvm_para.h          |   5 +
+> >  arch/x86/kernel/kvm.c                         |  32 +
+> >  arch/x86/kernel/paravirt.c                    |   1 +
+> >  arch/x86/kvm/cpuid.c                          |   3 +-
+> >  arch/x86/kvm/svm.c                            | 699 +++++++++++++++++-
+> >  arch/x86/kvm/vmx/vmx.c                        |   1 +
+> >  arch/x86/kvm/x86.c                            |  43 ++
+> >  arch/x86/mm/mem_encrypt.c                     |  69 +-
+> >  arch/x86/mm/pat/set_memory.c                  |   7 +
+> >  include/linux/psp-sev.h                       |   8 +-
+> >  include/uapi/linux/kvm.h                      |  53 ++
+> >  include/uapi/linux/kvm_para.h                 |   1 +
+> >  21 files changed, 1157 insertions(+), 10 deletions(-)
+> > 
+> > -- 
+> > 2.17.1
+> > 
