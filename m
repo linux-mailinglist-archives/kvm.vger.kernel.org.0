@@ -2,31 +2,28 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9165B1977DB
-	for <lists+kvm@lfdr.de>; Mon, 30 Mar 2020 11:27:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7B6671977DE
+	for <lists+kvm@lfdr.de>; Mon, 30 Mar 2020 11:28:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728680AbgC3J1v (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 30 Mar 2020 05:27:51 -0400
-Received: from foss.arm.com ([217.140.110.172]:48238 "EHLO foss.arm.com"
+        id S1728708AbgC3J2Z (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 30 Mar 2020 05:28:25 -0400
+Received: from foss.arm.com ([217.140.110.172]:48266 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728257AbgC3J1v (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 30 Mar 2020 05:27:51 -0400
+        id S1728031AbgC3J2Y (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 30 Mar 2020 05:28:24 -0400
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 75DBE31B;
-        Mon, 30 Mar 2020 02:27:50 -0700 (PDT)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CDE1331B;
+        Mon, 30 Mar 2020 02:28:23 -0700 (PDT)
 Received: from [192.168.3.111] (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 818BA3F52E;
-        Mon, 30 Mar 2020 02:27:49 -0700 (PDT)
-Subject: Re: [PATCH v2 kvmtool 15/30] virtio: Don't ignore initialization
- failures
-To:     Alexandru Elisei <alexandru.elisei@arm.com>
-Cc:     kvm@vger.kernel.org, will@kernel.org,
-        julien.thierry.kdev@gmail.com, sami.mujawar@arm.com,
-        lorenzo.pieralisi@arm.com, maz@kernel.org
-References: <20200123134805.1993-1-alexandru.elisei@arm.com>
- <20200123134805.1993-16-alexandru.elisei@arm.com>
- <20200130145120.0cad4a14@donnerap.cambridge.arm.com>
- <ad0199a8-bd18-4031-3489-eca9865b68fb@arm.com>
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C85643F52E;
+        Mon, 30 Mar 2020 02:28:22 -0700 (PDT)
+Subject: Re: [PATCH v3 kvmtool 08/32] pci: Fix ioport allocation size
+To:     Alexandru Elisei <alexandru.elisei@arm.com>, kvm@vger.kernel.org
+Cc:     will@kernel.org, julien.thierry.kdev@gmail.com,
+        sami.mujawar@arm.com, lorenzo.pieralisi@arm.com,
+        Julien Thierry <julien.thierry@arm.com>
+References: <20200326152438.6218-1-alexandru.elisei@arm.com>
+ <20200326152438.6218-9-alexandru.elisei@arm.com>
 From:   =?UTF-8?Q?Andr=c3=a9_Przywara?= <andre.przywara@arm.com>
 Autocrypt: addr=andre.przywara@arm.com; prefer-encrypt=mutual; keydata=
  xsFNBFNPCKMBEAC+6GVcuP9ri8r+gg2fHZDedOmFRZPtcrMMF2Cx6KrTUT0YEISsqPoJTKld
@@ -71,13 +68,14 @@ Autocrypt: addr=andre.przywara@arm.com; prefer-encrypt=mutual; keydata=
  Xpd2byn96Ivi8C8u9zJruXTueHH8vt7gJ1oax3yKRGU5o2eipCRiKZ0s/T7fvkdq+8beg9ku
  fDO4SAgJMIl6H5awliCY2zQvLHysS/Wb8QuB09hmhLZ4AifdHyF1J5qeePEhgTA+BaUbiUZf
  i4aIXCH3Wv6K
+X-Enigmail-Draft-Status: N11100
 Organization: ARM Ltd.
-Message-ID: <bd381d17-66d5-4a08-9883-c67b29d7de2e@arm.com>
-Date:   Mon, 30 Mar 2020 10:27:22 +0100
+Message-ID: <0dc3bf33-d2e0-66f7-c399-0585e744307b@arm.com>
+Date:   Mon, 30 Mar 2020 10:27:47 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <ad0199a8-bd18-4031-3489-eca9865b68fb@arm.com>
+In-Reply-To: <20200326152438.6218-9-alexandru.elisei@arm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -86,78 +84,125 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 06/03/2020 11:20, Alexandru Elisei wrote:
+On 26/03/2020 15:24, Alexandru Elisei wrote:
+> From: Julien Thierry <julien.thierry@arm.com>
 
 Hi,
 
-replying here after reviewing the v3 patch, and still seeing the problem.
+> The PCI Local Bus Specification, Rev. 3.0,
+> Section 6.2.5.1. "Address Maps" states:
+> "Devices that map control functions into I/O Space must not consume more
+> than 256 bytes per I/O Base Address register."
+> 
+> Yet all the PCI devices allocate IO ports of IOPORT_SIZE (= 1024 bytes).
+> 
+> Fix this by having PCI devices use 256 bytes ports for IO BARs.
+> 
+> There is no hard requirement on the size of the memory region described
+> by memory BARs. Since BAR 1 is supposed to offer the same functionality as
+> IO ports, let's make its size match BAR 0.
+> 
+> Signed-off-by: Julien Thierry <julien.thierry@arm.com>
+> [Added rationale for changing BAR1 size to PCI_IO_SIZE]
+> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 
-> On 1/30/20 2:51 PM, Andre Przywara wrote:
->> On Thu, 23 Jan 2020 13:47:50 +0000
->> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
->>
->> Hi,
->>
->>> Don't ignore an error in the bus specific initialization function in
->>> virtio_init; don't ignore the result of virtio_init; and don't return 0
->>> in virtio_blk__init and virtio_scsi__init when we encounter an error.
->>> Hopefully this will save some developer's time debugging faulty virtio
->>> devices in a guest.
->> Seems like the right thing to do, but I was wondering how you triggered this? AFAICS virtio_init only fails when calloc() fails or you pass an illegal transport, with the latter looking like being hard coded to one of the two supported.
-> 
-> I haven't triggered it. I found it by inspection. The transport-specific
-> initialization functions can fail for various reasons (ioport_register or
-> kvm__register_mmio can fail because some device emulation claimed all the MMIO
-> space or the MMIO space was configured incorrectly in the kvm-arch.h header file;
-> or memory allocation failed, etc) and this is the reason they return an int.
-> Because of this, virtio_init can fail and this is the reason it too returns an
-> int. It makes sense to check that the protocol that your device uses is actually
-> working.
-> 
->>
->> One minor thing below ...
-> 
-> [..]
-> 
->>> diff --git a/virtio/net.c b/virtio/net.c
->>> index 091406912a24..425c13ba1136 100644
->>> --- a/virtio/net.c
->>> +++ b/virtio/net.c
->>> @@ -910,7 +910,7 @@ done:
->>>  
->>>  static int virtio_net__init_one(struct virtio_net_params *params)
->>>  {
->>> -	int i, err;
->>> +	int i, r;
->>>  	struct net_dev *ndev;
->>>  	struct virtio_ops *ops;
->>>  	enum virtio_trans trans = VIRTIO_DEFAULT_TRANS(params->kvm);
->>> @@ -920,10 +920,8 @@ static int virtio_net__init_one(struct virtio_net_params *params)
->>>  		return -ENOMEM;
->>>  
->>>  	ops = malloc(sizeof(*ops));
->>> -	if (ops == NULL) {
->>> -		err = -ENOMEM;
->>> -		goto err_free_ndev;
->>> -	}
->>> +	if (ops == NULL)
->>> +		return -ENOMEM;
->> Doesn't that leave struct net_dev allocated? I am happy with removing the goto, but we should free(ndev) before we return, I think.
-> 
-> Nope, the cleanup routine in virtio_net__exit takes care of deallocating it (you
-> get there from virtio_net__init if virtio_net__init_one fails).
-
-First, I don't see where we actually deallocate the struct net_dev
-storage for each network device in __exit() - it seems to only call the
-downscript, if needed, but frees nothing.
-
-But more importantly, even that would only happen if this structure
-would be already part of the list, which happens only *after* the check
-for the ops malloc() return value. If we return prematurely due to this
-malloc() failing, the ndev pointer is lost on the stack.
-
-So I guess you need to free this here. As mentioned, you should still
-drop the goto, since there is only one user.
+Reviewed-by: Andre Przywara <andre.przywara@arm.com>
 
 Cheers,
-Andre.
+Andre
+
+> ---
+>  hw/vesa.c            |  4 ++--
+>  include/kvm/ioport.h |  1 -
+>  pci.c                |  2 +-
+>  virtio/pci.c         | 15 +++++++--------
+>  4 files changed, 10 insertions(+), 12 deletions(-)
+> 
+> diff --git a/hw/vesa.c b/hw/vesa.c
+> index 24fb46faad3b..d8d91aa9c873 100644
+> --- a/hw/vesa.c
+> +++ b/hw/vesa.c
+> @@ -63,8 +63,8 @@ struct framebuffer *vesa__init(struct kvm *kvm)
+>  
+>  	if (!kvm->cfg.vnc && !kvm->cfg.sdl && !kvm->cfg.gtk)
+>  		return NULL;
+> -	r = pci_get_io_port_block(IOPORT_SIZE);
+> -	r = ioport__register(kvm, r, &vesa_io_ops, IOPORT_SIZE, NULL);
+> +	r = pci_get_io_port_block(PCI_IO_SIZE);
+> +	r = ioport__register(kvm, r, &vesa_io_ops, PCI_IO_SIZE, NULL);
+>  	if (r < 0)
+>  		return ERR_PTR(r);
+>  
+> diff --git a/include/kvm/ioport.h b/include/kvm/ioport.h
+> index b10fcd5b4412..8c86b7151f25 100644
+> --- a/include/kvm/ioport.h
+> +++ b/include/kvm/ioport.h
+> @@ -14,7 +14,6 @@
+>  
+>  /* some ports we reserve for own use */
+>  #define IOPORT_DBG			0xe0
+> -#define IOPORT_SIZE			0x400
+>  
+>  struct kvm;
+>  
+> diff --git a/pci.c b/pci.c
+> index 80b5c5d3d7f3..b6892d974c08 100644
+> --- a/pci.c
+> +++ b/pci.c
+> @@ -20,7 +20,7 @@ static u16 io_port_blocks		= PCI_IOPORT_START;
+>  
+>  u16 pci_get_io_port_block(u32 size)
+>  {
+> -	u16 port = ALIGN(io_port_blocks, IOPORT_SIZE);
+> +	u16 port = ALIGN(io_port_blocks, PCI_IO_SIZE);
+>  
+>  	io_port_blocks = port + size;
+>  	return port;
+> diff --git a/virtio/pci.c b/virtio/pci.c
+> index d73414abde05..eeb5b5efa6e1 100644
+> --- a/virtio/pci.c
+> +++ b/virtio/pci.c
+> @@ -421,7 +421,7 @@ static void virtio_pci__io_mmio_callback(struct kvm_cpu *vcpu,
+>  {
+>  	struct virtio_pci *vpci = ptr;
+>  	int direction = is_write ? KVM_EXIT_IO_OUT : KVM_EXIT_IO_IN;
+> -	u16 port = vpci->port_addr + (addr & (IOPORT_SIZE - 1));
+> +	u16 port = vpci->port_addr + (addr & (PCI_IO_SIZE - 1));
+>  
+>  	kvm__emulate_io(vcpu, port, data, direction, len, 1);
+>  }
+> @@ -435,17 +435,16 @@ int virtio_pci__init(struct kvm *kvm, void *dev, struct virtio_device *vdev,
+>  	vpci->kvm = kvm;
+>  	vpci->dev = dev;
+>  
+> -	BUILD_BUG_ON(!is_power_of_two(IOPORT_SIZE));
+>  	BUILD_BUG_ON(!is_power_of_two(PCI_IO_SIZE));
+>  
+> -	r = pci_get_io_port_block(IOPORT_SIZE);
+> -	r = ioport__register(kvm, r, &virtio_pci__io_ops, IOPORT_SIZE, vdev);
+> +	r = pci_get_io_port_block(PCI_IO_SIZE);
+> +	r = ioport__register(kvm, r, &virtio_pci__io_ops, PCI_IO_SIZE, vdev);
+>  	if (r < 0)
+>  		return r;
+>  	vpci->port_addr = (u16)r;
+>  
+> -	vpci->mmio_addr = pci_get_mmio_block(IOPORT_SIZE);
+> -	r = kvm__register_mmio(kvm, vpci->mmio_addr, IOPORT_SIZE, false,
+> +	vpci->mmio_addr = pci_get_mmio_block(PCI_IO_SIZE);
+> +	r = kvm__register_mmio(kvm, vpci->mmio_addr, PCI_IO_SIZE, false,
+>  			       virtio_pci__io_mmio_callback, vpci);
+>  	if (r < 0)
+>  		goto free_ioport;
+> @@ -475,8 +474,8 @@ int virtio_pci__init(struct kvm *kvm, void *dev, struct virtio_device *vdev,
+>  							| PCI_BASE_ADDRESS_SPACE_MEMORY),
+>  		.status			= cpu_to_le16(PCI_STATUS_CAP_LIST),
+>  		.capabilities		= (void *)&vpci->pci_hdr.msix - (void *)&vpci->pci_hdr,
+> -		.bar_size[0]		= cpu_to_le32(IOPORT_SIZE),
+> -		.bar_size[1]		= cpu_to_le32(IOPORT_SIZE),
+> +		.bar_size[0]		= cpu_to_le32(PCI_IO_SIZE),
+> +		.bar_size[1]		= cpu_to_le32(PCI_IO_SIZE),
+>  		.bar_size[2]		= cpu_to_le32(PCI_IO_SIZE*2),
+>  	};
+>  
+> 
+
