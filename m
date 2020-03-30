@@ -2,189 +2,213 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4F6C2197CED
-	for <lists+kvm@lfdr.de>; Mon, 30 Mar 2020 15:30:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 602E8197D7E
+	for <lists+kvm@lfdr.de>; Mon, 30 Mar 2020 15:49:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727796AbgC3NaP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 30 Mar 2020 09:30:15 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:6670 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726923AbgC3NaP (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 30 Mar 2020 09:30:15 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 02UD4KWu062409
-        for <kvm@vger.kernel.org>; Mon, 30 Mar 2020 09:30:14 -0400
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3021vtkk8k-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Mon, 30 Mar 2020 09:30:14 -0400
-Received: from localhost
-        by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <frankja@linux.ibm.com>;
-        Mon, 30 Mar 2020 14:30:00 +0100
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
-        by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Mon, 30 Mar 2020 14:29:58 +0100
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 02UDU99s55181544
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 30 Mar 2020 13:30:09 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 21918A4054;
-        Mon, 30 Mar 2020 13:30:09 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D295EA405F;
-        Mon, 30 Mar 2020 13:30:08 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.145.43.209])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon, 30 Mar 2020 13:30:08 +0000 (GMT)
-Subject: Re: [kvm-unit-tests PATCH] s390x: Add stsi 3.2.2 tests
-To:     David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, cohuck@redhat.com,
-        borntraeger@de.ibm.com
-References: <20200330122035.19607-1-frankja@linux.ibm.com>
- <df745d0c-5d24-ee03-8600-ec495f1a5af6@redhat.com>
- <d42ac187-9f8f-81eb-c9b4-4d585fdef236@linux.ibm.com>
- <727e1ed5-99ea-e559-ca9c-0f067cbcc153@linux.ibm.com>
- <ab811a78-fe3c-1c6b-bb6d-85466e040ac6@redhat.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
-Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
- mQINBFubpD4BEADX0uhkRhkj2AVn7kI4IuPY3A8xKat0ihuPDXbynUC77mNox7yvK3X5QBO6
- qLqYr+qrG3buymJJRD9xkp4mqgasHdB5WR9MhXWKH08EvtvAMkEJLnqxgbqf8td3pCQ2cEpv
- 15mH49iKSmlTcJ+PvJpGZcq/jE42u9/0YFHhozm8GfQdb9SOI/wBSsOqcXcLTUeAvbdqSBZe
- zuMRBivJQQI1esD9HuADmxdE7c4AeMlap9MvxvUtWk4ZJ/1Z3swMVCGzZb2Xg/9jZpLsyQzb
- lDbbTlEeyBACeED7DYLZI3d0SFKeJZ1SUyMmSOcr9zeSh4S4h4w8xgDDGmeDVygBQZa1HaoL
- Esb8Y4avOYIgYDhgkCh0nol7XQ5i/yKLtnNThubAcxNyryw1xSstnKlxPRoxtqTsxMAiSekk
- 0m3WJwvwd1s878HrQNK0orWd8BzzlSswzjNfQYLF466JOjHPWFOok9pzRs+ucrs6MUwDJj0S
- cITWU9Rxb04XyigY4XmZ8dywaxwi2ZVTEg+MD+sPmRrTw+5F+sU83cUstuymF3w1GmyofgsU
- Z+/ldjToHnq21MNa1wx0lCEipCCyE/8K9B9bg9pUwy5lfx7yORP3JuAUfCYb8DVSHWBPHKNj
- HTOLb2g2UT65AjZEQE95U2AY9iYm5usMqaWD39pAHfhC09/7NQARAQABtCVKYW5vc2NoIEZy
- YW5rIDxmcmFua2phQGxpbnV4LmlibS5jb20+iQI3BBMBCAAhBQJbm6Q+AhsjBQsJCAcCBhUI
- CQoLAgQWAgMBAh4BAheAAAoJEONU5rjiOLn4p9gQALjkdj5euJVI2nNT3/IAxAhQSmRhPEt0
- AmnCYnuTcHRWPujNr5kqgtyER9+EMQ0ZkX44JU2q7OWxTdSNSAN/5Z7qmOR9JySvDOf4d3mS
- bMB5zxL9d8SbnSs1uW96H9ZBTlTQnmLfsiM9TetAjSrR8nUmjGhe2YUhJLR1v1LguME+YseT
- eXnLzIzqqpu311/eYiiIGcmaOjPCE+vFjcXL5oLnGUE73qSYiujwhfPCCUK0850o1fUAYq5p
- CNBCoKT4OddZR+0itKc/cT6NwEDwdokeg0+rAhxb4Rv5oFO70lziBplEjOxu3dqgIKbHbjza
- EXTb+mr7VI9O4tTdqrwJo2q9zLqqOfDBi7NDvZFLzaCewhbdEpDYVu6/WxprAY94hY3F4trT
- rQMHJKQENtF6ZTQc9fcT5I3gAmP+OEvDE5hcTALpWm6Z6SzxO7gEYCnF+qGXqp8sJVrweMub
- UscyLqHoqdZC2UG4LQ1OJ97nzDpIRe0g6oJ9ZIYHKmfw5jjwH6rASTld5MFWajWdNsqK15k/
- RZnHAGICKVIBOBsq26m4EsBlfCdt3b/6emuBjUXR1pyjHMz2awWzCq6/6OWs5eANZ0sdosNq
- dq2v0ULYTazJz2rlCXV89qRa7ukkNwdBSZNEwsD4eEMicj1LSrqWDZMAALw50L4jxaMD7lPL
- jJbauQINBFubpD4BEADAcUTRqXF/aY53OSH7IwIK9lFKxIm0IoFkOEh7LMfp7FGzaP7ANrZd
- cIzhZi38xyOkcaFY+npGEWvko7rlIAn0JpBO4x3hfhmhBD/WSY8LQIFQNNjEm3vzrMo7b9Jb
- JAqQxfbURY3Dql3GUzeWTG9uaJ00u+EEPlY8zcVShDltIl5PLih20e8xgTnNzx5c110lQSu0
- iZv2lAE6DM+2bJQTsMSYiwKlwTuv9LI9Chnoo6+tsN55NqyMxYqJgElk3VzlTXSr3+rtSCwf
- tq2cinETbzxc1XuhIX6pu/aCGnNfuEkM34b7G1D6CPzDMqokNFbyoO6DQ1+fW6c5gctXg/lZ
- 602iEl4C4rgcr3+EpfoPUWzKeM8JXv5Kpq4YDxhvbitr8Dm8gr38+UKFZKlWLlwhQ56r/zAU
- v6LIsm11GmFs2/cmgD1bqBTNHHcTWwWtRTLgmnqJbVisMJuYJt4KNPqphTWsPY8SEtbufIlY
- HXOJ2lqUzOReTrie2u0qcSvGAbSfec9apTFl2Xko/ddqPcZMpKhBiXmY8tJzSPk3+G4tqur4
- 6TYAm5ouitJsgAR61Cu7s+PNuq/pTLDhK+6/Njmc94NGBcRA4qTuysEGE79vYWP2oIAU4Fv6
- gqaWHZ4MEI2XTqH8wiwzPdCQPYsSE0fXWiYu7ObeErT6iLSTZGx4rQARAQABiQIfBBgBCAAJ
- BQJbm6Q+AhsMAAoJEONU5rjiOLn4DDEP/RuyckW65SZcPG4cMfNgWxZF8rVjeVl/9PBfy01K
- 8R0hajU40bWtXSMiby7j0/dMjz99jN6L+AJHJvrLz4qYRzn2Ys843W+RfXj62Zde4YNBE5SL
- jJweRCbMWKaJLj6499fctxTyeb9+AMLQS4yRSwHuAZLmAb5AyCW1gBcTWZb8ON5BmWnRqeGm
- IgC1EvCnHy++aBnHTn0m+zV89BhTLTUal35tcjUFwluBY39R2ux/HNlBO1GY3Z+WYXhBvq7q
- katThLjaQSmnOrMhzqYmdShP1leFTVbzXUUIYv/GbynO/YrL2gaQpaP1bEUEi8lUAfXJbEWG
- dnHFkciryi092E8/9j89DJg4mmZqOau7TtUxjRMlBcIliXkzSLUk+QvD4LK1kWievJse4mte
- FBdkWHfP4BH/+8DxapRcG1UAheSnSRQ5LiO50annOB7oXF+vgKIaie2TBfZxQNGAs3RQ+bga
- DchCqFm5adiSP5+OT4NjkKUeGpBe/aRyQSle/RropTgCi85pje/juYEn2P9UAgkfBJrOHvQ9
- Z+2Sva8FRd61NJLkCJ4LFumRn9wQlX2icFbi8UDV3do0hXJRRYTWCxrHscMhkrFWLhYiPF4i
- phX7UNdOWBQ90qpHyAxHmDazdo27gEjfvsgYMdveKknEOTEb5phwxWgg7BcIDoJf9UMC
-Date:   Mon, 30 Mar 2020 15:30:08 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+        id S1728428AbgC3Ntj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 30 Mar 2020 09:49:39 -0400
+Received: from hqnvemgate26.nvidia.com ([216.228.121.65]:16501 "EHLO
+        hqnvemgate26.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726028AbgC3Nti (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 30 Mar 2020 09:49:38 -0400
+Received: from hqpgpgate102.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate26.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+        id <B5e81f8e00001>; Mon, 30 Mar 2020 06:49:21 -0700
+Received: from hqmail.nvidia.com ([172.20.161.6])
+  by hqpgpgate102.nvidia.com (PGP Universal service);
+  Mon, 30 Mar 2020 06:49:34 -0700
+X-PGP-Universal: processed;
+        by hqpgpgate102.nvidia.com on Mon, 30 Mar 2020 06:49:34 -0700
+Received: from [10.40.101.165] (172.20.13.39) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Mon, 30 Mar
+ 2020 13:49:25 +0000
+Subject: Re: [PATCH v16 Kernel 4/7] vfio iommu: Implementation of ioctl for
+ dirty pages tracking.
+To:     Yan Zhao <yan.y.zhao@intel.com>
+CC:     "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "cjia@nvidia.com" <cjia@nvidia.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "Yang, Ziye" <ziye.yang@intel.com>,
+        "Liu, Changpeng" <changpeng.liu@intel.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>,
+        "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
+        "eskultet@redhat.com" <eskultet@redhat.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "dgilbert@redhat.com" <dgilbert@redhat.com>,
+        "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>,
+        "eauger@redhat.com" <eauger@redhat.com>,
+        "aik@ozlabs.ru" <aik@ozlabs.ru>,
+        "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
+        "felipe@nutanix.com" <felipe@nutanix.com>,
+        "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@Alibaba-inc.com>,
+        "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
+        "Ken.Xue@amd.com" <Ken.Xue@amd.com>,
+        "Wang, Zhi A" <zhi.a.wang@intel.com>,
+        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+References: <1585084732-18473-1-git-send-email-kwankhede@nvidia.com>
+ <20200325021135.GB20109@joy-OptiPlex-7040>
+ <33d38629-aeaf-1c30-26d4-958b998620b0@nvidia.com>
+ <20200327003055.GB26419@joy-OptiPlex-7040>
+ <deb8b18f-aa79-70d3-ce05-89b607f813c4@nvidia.com>
+ <20200330032437.GD30683@joy-OptiPlex-7040>
+X-Nvconfidentiality: public
+From:   Kirti Wankhede <kwankhede@nvidia.com>
+Message-ID: <e91dbf70-05bf-977f-208b-0fb5988af3a8@nvidia.com>
+Date:   Mon, 30 Mar 2020 19:19:21 +0530
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <ab811a78-fe3c-1c6b-bb6d-85466e040ac6@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="kH8bu86yVBFnOlrxnyJudRcInGHUbdEWI"
-X-TM-AS-GCONF: 00
-x-cbid: 20033013-0016-0000-0000-000002FAFF30
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20033013-0017-0000-0000-0000335EB8CF
-Message-Id: <2104b9a7-2ae0-6964-0eef-25ba7cca3119@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.645
- definitions=2020-03-30_01:2020-03-27,2020-03-30 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- priorityscore=1501 mlxlogscore=999 mlxscore=0 suspectscore=0 spamscore=0
- malwarescore=0 adultscore=0 clxscore=1015 impostorscore=0 bulkscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2003300121
+In-Reply-To: <20200330032437.GD30683@joy-OptiPlex-7040>
+X-Originating-IP: [172.20.13.39]
+X-ClientProxiedBy: HQMAIL107.nvidia.com (172.20.187.13) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1585576161; bh=hl5tuOx4m9EjFrKmVXf/ZGayKENorF3yrrdKQ+pBcpQ=;
+        h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
+         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
+         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
+         Content-Transfer-Encoding;
+        b=mOHacjA3H0HGixO/vWFBrs5lkqZdTu9S9JSlHPVtDI7LfYjInhEiJ2D5jFNZsjB4O
+         sCoL0ziQovkUpkOvfSdkYcUR5faHMLHdWRGbydsJrxbnHX4jjvfICM+3o7Urn2Lrp6
+         Ca5HTmwiJUTrr9ZCesoulLw7j1GInQlobhjOkXzmivYU186TYOx+tAipM9a+VS02aw
+         ZTnG/OoqCISJcncPDXPIy7En8RKijz9jAPxIa8qJD/84uI/csosOs+5Csna45sqC8N
+         M1Qubxk+IsWlmmKwrZo8B8M3BmDS9kqGJ+M9Lu3n4l6cf9fLZv1A7Nk6TTnmx6qiQp
+         bu6x04FGr37kg==
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---kH8bu86yVBFnOlrxnyJudRcInGHUbdEWI
-Content-Type: multipart/mixed; boundary="bXdmGyT9SUxowwpXP4EzbkroHDrf9J5J1"
 
---bXdmGyT9SUxowwpXP4EzbkroHDrf9J5J1
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
 
-On 3/30/20 3:15 PM, David Hildenbrand wrote:
-> On 30.03.20 15:09, Janosch Frank wrote:
->> On 3/30/20 3:03 PM, Janosch Frank wrote:
->>> On 3/30/20 2:50 PM, David Hildenbrand wrote:
->>>> On 30.03.20 14:20, Janosch Frank wrote:
->>>>> +	report(data->vm[0].total_cpus =3D=3D smp_query_num_cpus(), "cpu #=
- total");
->>>>> +	report(data->vm[0].conf_cpus =3D=3D smp_query_num_cpus(), "cpu # =
-configured");
->>>>> +	report(data->vm[0].standby_cpus =3D=3D 0, "cpu # standby");
->>>>> +	report(data->vm[0].reserved_cpus =3D=3D 0, "cpu # reserved");
->>>>
->>>> IIRC, using -smp 1,maxcpus=3DX, you could also test the reported res=
-erved
->>>> CPUs.
->>>
->>> Will try that
+On 3/30/2020 8:54 AM, Yan Zhao wrote:
+> On Fri, Mar 27, 2020 at 01:28:13PM +0800, Kirti Wankhede wrote:
+>> Hit send button little early.
 >>
->> Just like I thought, QEMU does not manipulate cpu counts and KVM
->> pre-sets standby and reserved to 0. So we have absolutely no change wh=
-en
->> adding the smp parameter.
->=20
-> Well, for TCG it is properly implemented. Is this a BUG in KVM's STSI c=
-ode?
->=20
+>>   >
+>>   > I checked v12, it's not like what I said.
+>>   > In v12, bitmaps are generated per vfio_dma, and combination of the
+>>   > bitmaps are required in order to generate a big bitmap suiting for dirty
+>>   > query. It can cause problem when offset not aligning.
+>>   > But what I propose here is to generate an rb tree orthogonal to the tree
+>>   > of vfio_dma.
+>>   >
+>>   > as to CPU cycles saving, I don't think iterating/translating page by page
+>>   > would achieve that purpose.
+>>   >
+>>
+>> Instead of creating one extra rb tree for dirty pages tracking in v10
+>> tried to use dma->pfn_list itself, we tried changes in v10, v11 and v12,
+>> latest version is evolved version with best possible approach after
+>> discussion. Probably, go through v11 as well.
+>> https://patchwork.kernel.org/patch/11298335/
+>>
+> I'm not sure why all those previous implementations are bound to
+> vfio_dma. for vIOMMU on, in most cases, a vfio_dma is only for a page,
+> so generating a one-byte bitmap for a single page in each vfio_dma ?
+> is it possible to creating one extra rb tree to keep dirty ranges, and
+> one fixed length kernel bitmap whose content is generated on query,
+> serving as a bouncing buffer for copy_to_user
+> 
 
-KVM tracks online cpus and created cpus, but only reports the online
-ones in stsi.
-Will QEMU register/create a reserved CPU with KVM?
+One fixed length? what should be fixed value? then isn't it better to 
+fix the size to dma->size?
 
-To fix this we could also fix-up the cpu reporting in QEMU after KVM
-wrote its results.
+This is also to prevent DoS attack, user space application can query a 
+very large range.
 
-@Christian: Guidance?
+>>
+>> On 3/27/2020 6:00 AM, Yan Zhao wrote:
+>>> On Fri, Mar 27, 2020 at 05:39:01AM +0800, Kirti Wankhede wrote:
+>>>>
+>>>>
+>>>> On 3/25/2020 7:41 AM, Yan Zhao wrote:
+>>>>> On Wed, Mar 25, 2020 at 05:18:52AM +0800, Kirti Wankhede wrote:
+>>>>>> VFIO_IOMMU_DIRTY_PAGES ioctl performs three operations:
+>>>>>> - Start dirty pages tracking while migration is active
+>>>>>> - Stop dirty pages tracking.
+>>>>>> - Get dirty pages bitmap. Its user space application's responsibility to
+>>>>>>      copy content of dirty pages from source to destination during migration.
+>>>>>>
+>>>>>> To prevent DoS attack, memory for bitmap is allocated per vfio_dma
+>>>>>> structure. Bitmap size is calculated considering smallest supported page
+>>>>>> size. Bitmap is allocated for all vfio_dmas when dirty logging is enabled
+>>>>>>
+>>>>>> Bitmap is populated for already pinned pages when bitmap is allocated for
+>>>>>> a vfio_dma with the smallest supported page size. Update bitmap from
+>>>>>> pinning functions when tracking is enabled. When user application queries
+>>>>>> bitmap, check if requested page size is same as page size used to
+>>>>>> populated bitmap. If it is equal, copy bitmap, but if not equal, return
+>>>>>> error.
+>>>>>>
+>>>>>> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+>>>>>> Reviewed-by: Neo Jia <cjia@nvidia.com>
+>>>>>> ---
+>>>>>>     drivers/vfio/vfio_iommu_type1.c | 266 +++++++++++++++++++++++++++++++++++++++-
+>>>>>>     1 file changed, 260 insertions(+), 6 deletions(-)
+>>>>>>
+>>>>>> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+>>>>>> index 70aeab921d0f..874a1a7ae925 100644
+>>>>>> --- a/drivers/vfio/vfio_iommu_type1.c
+>>>>>> +++ b/drivers/vfio/vfio_iommu_type1.c
+>>>>>> @@ -71,6 +71,7 @@ struct vfio_iommu {
+>>>>>>     	unsigned int		dma_avail;
+>>>>>>     	bool			v2;
+>>>>>>     	bool			nesting;
+>>>>>> +	bool			dirty_page_tracking;
+>>>>>>     };
+>>>>>>     
+>>>>>>     struct vfio_domain {
+>>>>>> @@ -91,6 +92,7 @@ struct vfio_dma {
+>>>>>>     	bool			lock_cap;	/* capable(CAP_IPC_LOCK) */
+>>>>>>     	struct task_struct	*task;
+>>>>>>     	struct rb_root		pfn_list;	/* Ex-user pinned pfn list */
+>>>>>> +	unsigned long		*bitmap;
+>>>>>>     };
+>>>>>>     
+>>>>>>     struct vfio_group {
+>>>>>> @@ -125,7 +127,21 @@ struct vfio_regions {
+>>>>>>     #define IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu)	\
+>>>>>>     					(!list_empty(&iommu->domain_list))
+>>>>>>     
+>>>>>> +#define DIRTY_BITMAP_BYTES(n)	(ALIGN(n, BITS_PER_TYPE(u64)) / BITS_PER_BYTE)
+>>>>>> +
+>>>>>> +/*
+>>>>>> + * Input argument of number of bits to bitmap_set() is unsigned integer, which
+>>>>>> + * further casts to signed integer for unaligned multi-bit operation,
+>>>>>> + * __bitmap_set().
+>>>>>> + * Then maximum bitmap size supported is 2^31 bits divided by 2^3 bits/byte,
+>>>>>> + * that is 2^28 (256 MB) which maps to 2^31 * 2^12 = 2^43 (8TB) on 4K page
+>>>>>> + * system.
+>>>>>> + */
+>>>>>> +#define DIRTY_BITMAP_PAGES_MAX	(uint64_t)(INT_MAX - 1)
+>>>>>> +#define DIRTY_BITMAP_SIZE_MAX	 DIRTY_BITMAP_BYTES(DIRTY_BITMAP_PAGES_MAX)
+>>>>>> +
+>>>>>>     static int put_pfn(unsigned long pfn, int prot);
+>>>>>> +static unsigned long vfio_pgsize_bitmap(struct vfio_iommu *iommu);
+>>>>>>     
+>>>>>>     /*
+>>>>>>      * This code handles mapping and unmapping of user data buffers
+>>>>>> @@ -175,6 +191,77 @@ static void vfio_unlink_dma(struct vfio_iommu *iommu, struct vfio_dma *old)
+>>>>>>     	rb_erase(&old->node, &iommu->dma_list);
+>>>>>>     }
+>>>>>>     
+>>>>>> +
+>>>>>> +static int vfio_dma_bitmap_alloc(struct vfio_dma *dma, uint64_t pgsize)
+>>>>>> +{
+>>>>>> +	uint64_t npages = dma->size / pgsize;
+>>>>>> +
+> If pgsize > dma->size, npages = 0.
+> wouldn't it cause problem?
+> 
 
+This patch-set supports bitmap for smallest supported page size, i.e. 
+PAGE_SIZE. vfio_dma_do_map() validates dma->size accordingly. So this 
+case will not happen.
 
---bXdmGyT9SUxowwpXP4EzbkroHDrf9J5J1--
-
---kH8bu86yVBFnOlrxnyJudRcInGHUbdEWI
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl6B9GAACgkQ41TmuOI4
-ufjtlw//Q0eDOo3bni0wOgfGCirXsYj/cnafz4rQPSoFiSeRI1rHy8iRT4Ni8yOP
-92a4a5Kl003p1dWVDjCQPsebnDWWnSUTroK/WwcSFn6IlzPtkSShGWgkVUSjyMJG
-8A5OOlv5LE3cmaPBzx9PABvvlkrQJBTGzhMNHOyCY1JFOpUexNIbkJ+Qh1sPWvTj
-mHERXaVNbwDUO35zCag+9A66+LrbUNF9WvIQJ/OvypJLeHGb8zNzVr5uQNgYCriU
-M1IRzYb7W4f8L/Vm/Jy1WUlKvVa2koaGaml//eY3llH5j8qNpMhL9D/asG67MMdS
-zLgm9nrNq9HEEIDvJLv57fE2ONnHrK9VkknmrOCgtwSkU3fECTd97YtjR+xJ4YZ8
-JAL0TEP9rSB+WFecvKh14BB+NIxQ8lTj3QvdW4EIHNAa5pHdp2zrsyk3j/15N4LR
-orXkuGo+mtWaBt3FpuAx/lSZZcLg/v6kJqHZLPfiTd5+5R21doAutSwLg8a5Za8S
-Byx53sTFY88/JNi+DZYxhm3YSyY5UuxloY8MVh5M3UQ+QpL1K5yUpuiyeJLvjxYG
-1Bbmqt+H50LDD4kQLeYEIHOh2TDnBrte62/Gpv7r/xPLvya7bsFdtnV03FWNjjBY
-7q9zL3jLsPv32CTDeu2JLqKDb293uWbqNKMqliFwXerqEaNb93U=
-=cxFM
------END PGP SIGNATURE-----
-
---kH8bu86yVBFnOlrxnyJudRcInGHUbdEWI--
+Thanks,
+Kirti
 
