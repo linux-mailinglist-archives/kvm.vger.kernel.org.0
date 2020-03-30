@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A79E719721B
-	for <lists+kvm@lfdr.de>; Mon, 30 Mar 2020 03:39:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EB1D8197217
+	for <lists+kvm@lfdr.de>; Mon, 30 Mar 2020 03:38:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728531AbgC3BjA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 29 Mar 2020 21:39:00 -0400
-Received: from mail-eopbgr750048.outbound.protection.outlook.com ([40.107.75.48]:39303
+        id S1728333AbgC3BiK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 29 Mar 2020 21:38:10 -0400
+Received: from mail-eopbgr750041.outbound.protection.outlook.com ([40.107.75.41]:37124
         "EHLO NAM02-BL2-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727815AbgC3BjA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 29 Mar 2020 21:39:00 -0400
+        id S1728077AbgC3BiK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 29 Mar 2020 21:38:10 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ZBW4zeGYREk2KsucA3GtyLzy1MrT+MFM+NNkpj62/A3Y61uVMpE0ogkLEC0Xf1LG5fQydPnnFdUWUcHgGYwkgKeRiDK4MZnGq6Jf+asRpCERe8OrPgeCBefM8QdcLshuy1U77BmG9yhnoWvWELAjBdUhjitTikIdVU32JmQqwBxTlsWCjZA0lgydGr3Age5mb5KVgn7BR1JUs/8LWmDV8Ii6qJzCYVhXCrcXs+s7rxjzNtu4QbK039iCsr7RcCjgyVp2fvodUEUEzyZlTsvrrG4nQ+0erlpWYaZAicup7YJoOLQ4El4igCz0zUCaxGE3XCWWUJ5icMIBzA8tc9QBVA==
+ b=Ao1sMX19/Otpl51X5Y0gErsQyguqAlYyZx86EoMBLWS5Zc4b4dsWEJoetnCD8Th6EbUDuCvukB578bHaQSOeXZ+Ol20yql6amvLM263UUWKfR/GbJllX11ZzRnEIYSMWnALdCfC0Vg3bJDQORP6r4T1PpWM6S7IkXXiQlRSEpY6TkTtT7VDFPqCJ/XxE/XMVT16ZrlbpI8zSm/x0Zn/9vwnyCwhVFAQmcuPvh5/hRKDRPer/gUXoufHJP7k4MSlM8v+MgTF2fkaH3spxQ+eVqPy85rwI+NgfR4qGIv5Aj5knfsgNQCsS4IWNvzohMkBVbwcbU7kCVrqknYtnTTosAA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=5mtUHk17blOSg2a6eSqI1/FBFC0Cg73y4oTIurroTLA=;
- b=W+jZ0rMdtQ9xrMP9c529/Mzc0ox4I7K0ypw6dw1vhJZhzxC+jXnPKYK/kMF1h44XONVH/t+SPbJmPV6YNIdNUbbi4OF8G+6CVEiXkl8M8hNVj3SFOA+RDjNFemXIqmp/AQ1wxtx+NkbpFYdc0GHthYJrjUK2qN7a4yZzZxTrkE8ruUZjtLaKRuwzKlSRNZU2zsQQ/xi9eUF3wgS59/7wd/guWdbX84ZAJPYhJsuo2cQRR43gsrdJyRcAo9vFrktFG8zc82+3S2AFRHFEyw19SJHVGEDuzI0YpdAUsLltMtpH3Sf2GP4nj5yLBQQNSjxoQMj1EkHu80YzuKAVQ33b6Q==
+ bh=T+rutv8RNZ9J9zGk1iW3DhPnA3eOyfwyJx1isTHf35I=;
+ b=TbzN03bF2DMJXHj7F1VtB2jcCubOVKtd12+R2jVL+r/VCXlGfZiU6SlTqrL0FfCg7RVc95rDKNu8yh6u8X6nRxMZWZO0coCSM1uuvesJtaAW7pbK0apuNA/By8nP4gMG44PaQm/SGSf6voM/xQd6BQv+wmNF70Lf5vvvBcydDbjTAl58CK9bG8odMkPB0VwfUOyfYJvK9hS+whRWvMRuAI3dmkomUX35iewocfehzd8z5I5UOhfr0IXPVKfImUjXA+q8vB0pVGScUMMXkY8jH5nIsTqngHDszoA5ZqJ75+MTr4MnyNTcVPHqgxvKOnmhMA42THqPrpcOPeA4wv9eRg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=5mtUHk17blOSg2a6eSqI1/FBFC0Cg73y4oTIurroTLA=;
- b=WC/VTATPEQJ4mG+D1PbbIKRKKSVQMmtQV/nBiwjDVprMUPBwxfaqRALqRRj7fL4xxPHbUuGpuAzSeF85JEW8EpqnELbayNBImFG5T/0F/Dtcu7AOm3A2zky6TohWKvaS5yn77XadfkFxn6kGuiGorigd9RdHM4RdXAK8i7dPS0Y=
+ bh=T+rutv8RNZ9J9zGk1iW3DhPnA3eOyfwyJx1isTHf35I=;
+ b=h8leF/kPS+OGuW2dHVXrBbnf8+fj2Rum5MpwT9Oc4eteW8g1TUHcugdQHy4H6q07cR0rnp3BP3DqKtwN1BO74eGwLzrozE1Dp4wsKN1AAO1s9DkAZ0jx3DpNghQ/m+nB7H8XniWRI4Pd+g0ukFt8gA0XtDoUpkB3B9OoOeHxyko=
 Authentication-Results: spf=none (sender IP is )
  smtp.mailfrom=Ashish.Kalra@amd.com; 
 Received: from DM5PR12MB1386.namprd12.prod.outlook.com (2603:10b6:3:77::9) by
  DM5PR12MB1387.namprd12.prod.outlook.com (2603:10b6:3:6c::16) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2856.20; Mon, 30 Mar 2020 01:36:46 +0000
+ 15.20.2856.20; Mon, 30 Mar 2020 01:37:32 +0000
 Received: from DM5PR12MB1386.namprd12.prod.outlook.com
  ([fe80::969:3d4e:6f37:c33c]) by DM5PR12MB1386.namprd12.prod.outlook.com
  ([fe80::969:3d4e:6f37:c33c%12]) with mapi id 15.20.2856.019; Mon, 30 Mar 2020
- 01:36:46 +0000
+ 01:37:32 +0000
 From:   Ashish Kalra <Ashish.Kalra@amd.com>
 To:     pbonzini@redhat.com
 Cc:     tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
@@ -44,45 +44,45 @@ Cc:     tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
         x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         rientjes@google.com, srutherford@google.com, luto@kernel.org,
         brijesh.singh@amd.com
-Subject: [PATCH v5 10/14] mm: x86: Invoke hypercall when page encryption status is changed
-Date:   Mon, 30 Mar 2020 01:36:37 +0000
-Message-Id: <7de8c7748914b9511175b5a8b252332d1c00d33f.1585531159.git.ashish.kalra@amd.com>
+Subject: [PATCH v5 11/14] KVM: x86: Introduce KVM_SET_PAGE_ENC_BITMAP ioctl
+Date:   Mon, 30 Mar 2020 01:37:21 +0000
+Message-Id: <ca84b8c580f3c1e411d4191b46e726f84ac25376.1585531159.git.ashish.kalra@amd.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <cover.1585531159.git.ashish.kalra@amd.com>
 References: <cover.1585531159.git.ashish.kalra@amd.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: SN4PR0801CA0023.namprd08.prod.outlook.com
- (2603:10b6:803:29::33) To DM5PR12MB1386.namprd12.prod.outlook.com
+X-ClientProxiedBy: SN4PR0801CA0022.namprd08.prod.outlook.com
+ (2603:10b6:803:29::32) To DM5PR12MB1386.namprd12.prod.outlook.com
  (2603:10b6:3:77::9)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from ashkalra_ubuntu_server.amd.com (165.204.77.1) by SN4PR0801CA0023.namprd08.prod.outlook.com (2603:10b6:803:29::33) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2856.20 via Frontend Transport; Mon, 30 Mar 2020 01:36:45 +0000
+Received: from ashkalra_ubuntu_server.amd.com (165.204.77.1) by SN4PR0801CA0022.namprd08.prod.outlook.com (2603:10b6:803:29::32) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2856.20 via Frontend Transport; Mon, 30 Mar 2020 01:37:31 +0000
 X-Mailer: git-send-email 2.17.1
 X-Originating-IP: [165.204.77.1]
 X-MS-PublicTrafficType: Email
 X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: e4e95d80-9108-4127-a224-08d7d44acf22
+X-MS-Office365-Filtering-Correlation-Id: dbc3d5d6-0f4a-483b-d16a-08d7d44aeaab
 X-MS-TrafficTypeDiagnostic: DM5PR12MB1387:|DM5PR12MB1387:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <DM5PR12MB1387BBBF9E130FE8C6AB6D618ECB0@DM5PR12MB1387.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:5516;
+X-Microsoft-Antispam-PRVS: <DM5PR12MB1387084D1F49D87F4A0545E28ECB0@DM5PR12MB1387.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:4303;
 X-Forefront-PRVS: 0358535363
 X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM5PR12MB1386.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(10009020)(4636009)(39860400002)(376002)(346002)(366004)(136003)(396003)(186003)(66574012)(66556008)(6666004)(66476007)(86362001)(6916009)(66946007)(316002)(4326008)(7696005)(52116002)(5660300002)(6486002)(16526019)(26005)(36756003)(478600001)(7416002)(81166006)(81156014)(8936002)(2616005)(8676002)(2906002)(956004)(136400200001);DIR:OUT;SFP:1101;
 Received-SPF: None (protection.outlook.com: amd.com does not designate
  permitted sender hosts)
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: MXt2I5hHfu7UcvvOq89UWjqt1pbvf06guiu3+PtGHJmpME0QZ3V0hyhh+hFd4AcChvjw3VeCZWiEbq8hV00haRjuv5wQsWrle7TFN0znIIzYCd3zufC3bQt/z3JL1F5gWVkZGBemiMKD9yGBEn4RixamXeHU46UcZsQcvKGKiOS3MEKB7svAjYWsmpkkiTXnkpRUF5xu3ONFwdV3kOqkD7js/rEnSRt4u4X7rQuYgp0HEB8QOVoTWKXkEM4LqIJN6L0cTrPhnwWbf+p8itikqepOCBTR7WWLqaNL/HJvPFiBvIS9jVMp/d19zjujzujJh7+wEQphCONa+OnJxYsP2537pTgFG3Zer6THgZJwBaFhtXGQJ/GOihbEC0qsorNc3zt8HqhEue0SS8vq402dtf+iebhbeMBNC8D3EOO81LOr2azQHCwFIKoyyYz24acm2wRDPTM8e1X39G2yEm3FRyQUXxCaPYowwfi0bw75NpFBRkAyGNErGJBKZp2OQ24r
-X-MS-Exchange-AntiSpam-MessageData: enxBITf6EyBdKAg9GAwemrhhS+3dEwizkyXMEeM+Ahbb09P6ZCBkEQNo9PbicXjtl759ciugl8jQvbWcdT9aLtYrFFM6nuceLliXRVwJ+FVqAMq8ZrCAYmDUAhD614i0q8nrvOrXLQyLc+9ZDmYXDA==
+X-Microsoft-Antispam-Message-Info: /vhpTj95Fh+c0T0876c+Pv75GuMMUCgxCp59p5v87fqU/mB/FIp8Pvo4QPn/U7jwlcThL9EdUUcu8x8hXNoqzrz0HvIGoDtZBwlqFybV+YJXJphaIeWrA6v7NsR/cAIbqE8fOUA6hOoZoYxe5+nQQUFfAOGnnHg35lW/jrDN9P5DFJZiEQ7+E/Aw4n99C/jvAHv6eeBBvFv1CWH7ZJmbnEEacNyShPogjxGniCyN7IgPtWO3TiFD5BFdowkCVF7XXhom/GsZNJsWmlxVzfWti8Pp6RNfZyTCif1NZIT+d996Ambrv8lNfucx/IymXM/vb3MF4t5uJmLNewtq/ffbe06vqKraRPzx3M7PnSptzvSP35mlgED0XdB6ADS/QJM0S95oD8lNOL1eaxXcro+BXDIPX3TjuHpNV6GTcZz8AlQHRy4CLIrmvQyXn8ubWHCC9oG3WCZE7Xl/dQs+a4BEHQis3yLPlHbZJCdQ46UPtqrLrPEYFKGTxMvl2DVsYjGM
+X-MS-Exchange-AntiSpam-MessageData: xkT3rTMRocpI3PLKSvwWNBLMcyEpFZcyxfkpdrowxJ7+2oUuGvI7OlWNtynmvjTry8chB2sgokrffUJdIw47TZobT/DefiIhm03ELYt8tns8fO6+foRrd8IvvIhfLPl2sbDo5z7wCUUkibq1bj4V+A==
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e4e95d80-9108-4127-a224-08d7d44acf22
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Mar 2020 01:36:46.5705
+X-MS-Exchange-CrossTenant-Network-Message-Id: dbc3d5d6-0f4a-483b-d16a-08d7d44aeaab
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Mar 2020 01:37:32.7731
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: PFDkl5eNR4nlZO5GWztb6+FqAGBBeDzGKYTdz9FJpb6HOik8QMQOZtX9M3WpNCWdZGnWnWp3Cf8wFKywwtBp1w==
+X-MS-Exchange-CrossTenant-UserPrincipalName: y52NFL86Tq+fysuGhueqgXvylS717lJHfM/ozgBK7flmUc/DL+jjQIBjQXwbgjTRmajcXqGJ8oBhE9OPoL6i1w==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR12MB1387
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
@@ -91,9 +91,8 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Brijesh Singh <Brijesh.Singh@amd.com>
 
-Invoke a hypercall when a memory region is changed from encrypted ->
-decrypted and vice versa. Hypervisor need to know the page encryption
-status during the guest migration.
+The ioctl can be used to set page encryption bitmap for an
+incoming guest.
 
 Cc: Thomas Gleixner <tglx@linutronix.de>
 Cc: Ingo Molnar <mingo@redhat.com>
@@ -109,188 +108,154 @@ Cc: linux-kernel@vger.kernel.org
 Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
 ---
- arch/x86/include/asm/paravirt.h       |  6 +++
- arch/x86/include/asm/paravirt_types.h |  2 +
- arch/x86/kernel/paravirt.c            |  1 +
- arch/x86/mm/mem_encrypt.c             | 57 ++++++++++++++++++++++++++-
- arch/x86/mm/pat/set_memory.c          |  7 ++++
- 5 files changed, 72 insertions(+), 1 deletion(-)
+ Documentation/virt/kvm/api.rst  | 22 +++++++++++++++++
+ arch/x86/include/asm/kvm_host.h |  2 ++
+ arch/x86/kvm/svm.c              | 42 +++++++++++++++++++++++++++++++++
+ arch/x86/kvm/x86.c              | 12 ++++++++++
+ include/uapi/linux/kvm.h        |  1 +
+ 5 files changed, 79 insertions(+)
 
-diff --git a/arch/x86/include/asm/paravirt.h b/arch/x86/include/asm/paravirt.h
-index 694d8daf4983..aa296af5d393 100644
---- a/arch/x86/include/asm/paravirt.h
-+++ b/arch/x86/include/asm/paravirt.h
-@@ -78,6 +78,12 @@ static inline void paravirt_arch_exit_mmap(struct mm_struct *mm)
- 	PVOP_VCALL1(mmu.exit_mmap, mm);
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index 8ad800ebb54f..4d1004a154f6 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -4675,6 +4675,28 @@ or shared. The bitmap can be used during the guest migration, if the page
+ is private then userspace need to use SEV migration commands to transmit
+ the page.
+ 
++4.126 KVM_SET_PAGE_ENC_BITMAP (vm ioctl)
++---------------------------------------
++
++:Capability: basic
++:Architectures: x86
++:Type: vm ioctl
++:Parameters: struct kvm_page_enc_bitmap (in/out)
++:Returns: 0 on success, -1 on error
++
++/* for KVM_SET_PAGE_ENC_BITMAP */
++struct kvm_page_enc_bitmap {
++	__u64 start_gfn;
++	__u64 num_pages;
++	union {
++		void __user *enc_bitmap; /* one bit per page */
++		__u64 padding2;
++	};
++};
++
++During the guest live migration the outgoing guest exports its page encryption
++bitmap, the KVM_SET_PAGE_ENC_BITMAP can be used to build the page encryption
++bitmap for an incoming guest.
+ 
+ 5. The kvm_run structure
+ ========================
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 27e43e3ec9d8..d30f770aaaea 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1271,6 +1271,8 @@ struct kvm_x86_ops {
+ 				  unsigned long sz, unsigned long mode);
+ 	int (*get_page_enc_bitmap)(struct kvm *kvm,
+ 				struct kvm_page_enc_bitmap *bmap);
++	int (*set_page_enc_bitmap)(struct kvm *kvm,
++				struct kvm_page_enc_bitmap *bmap);
+ };
+ 
+ struct kvm_arch_async_pf {
+diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
+index c417b1bfb5bf..e7fa196f3de1 100644
+--- a/arch/x86/kvm/svm.c
++++ b/arch/x86/kvm/svm.c
+@@ -7755,6 +7755,47 @@ static int svm_get_page_enc_bitmap(struct kvm *kvm,
+ 	return ret;
  }
  
-+static inline void page_encryption_changed(unsigned long vaddr, int npages,
-+						bool enc)
++static int svm_set_page_enc_bitmap(struct kvm *kvm,
++				   struct kvm_page_enc_bitmap *bmap)
 +{
-+	PVOP_VCALL3(mmu.page_encryption_changed, vaddr, npages, enc);
++	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
++	unsigned long gfn_start, gfn_end;
++	unsigned long *bitmap;
++	unsigned long sz, i;
++	int ret;
++
++	if (!sev_guest(kvm))
++		return -ENOTTY;
++
++	gfn_start = bmap->start_gfn;
++	gfn_end = gfn_start + bmap->num_pages;
++
++	sz = ALIGN(bmap->num_pages, BITS_PER_LONG) / 8;
++	bitmap = kmalloc(sz, GFP_KERNEL);
++	if (!bitmap)
++		return -ENOMEM;
++
++	ret = -EFAULT;
++	if (copy_from_user(bitmap, bmap->enc_bitmap, sz))
++		goto out;
++
++	mutex_lock(&kvm->lock);
++	ret = sev_resize_page_enc_bitmap(kvm, gfn_end);
++	if (ret)
++		goto unlock;
++
++	i = gfn_start;
++	for_each_clear_bit_from(i, bitmap, (gfn_end - gfn_start))
++		clear_bit(i + gfn_start, sev->page_enc_bmap);
++
++	ret = 0;
++unlock:
++	mutex_unlock(&kvm->lock);
++out:
++	kfree(bitmap);
++	return ret;
 +}
 +
- #ifdef CONFIG_PARAVIRT_XXL
- static inline void load_sp0(unsigned long sp0)
+ static int svm_mem_enc_op(struct kvm *kvm, void __user *argp)
  {
-diff --git a/arch/x86/include/asm/paravirt_types.h b/arch/x86/include/asm/paravirt_types.h
-index 732f62e04ddb..03bfd515c59c 100644
---- a/arch/x86/include/asm/paravirt_types.h
-+++ b/arch/x86/include/asm/paravirt_types.h
-@@ -215,6 +215,8 @@ struct pv_mmu_ops {
+ 	struct kvm_sev_cmd sev_cmd;
+@@ -8160,6 +8201,7 @@ static struct kvm_x86_ops svm_x86_ops __ro_after_init = {
  
- 	/* Hook for intercepting the destruction of an mm_struct. */
- 	void (*exit_mmap)(struct mm_struct *mm);
-+	void (*page_encryption_changed)(unsigned long vaddr, int npages,
-+					bool enc);
+ 	.page_enc_status_hc = svm_page_enc_status_hc,
+ 	.get_page_enc_bitmap = svm_get_page_enc_bitmap,
++	.set_page_enc_bitmap = svm_set_page_enc_bitmap,
+ };
  
- #ifdef CONFIG_PARAVIRT_XXL
- 	struct paravirt_callee_save read_cr2;
-diff --git a/arch/x86/kernel/paravirt.c b/arch/x86/kernel/paravirt.c
-index c131ba4e70ef..840c02b23aeb 100644
---- a/arch/x86/kernel/paravirt.c
-+++ b/arch/x86/kernel/paravirt.c
-@@ -367,6 +367,7 @@ struct paravirt_patch_template pv_ops = {
- 			(void (*)(struct mmu_gather *, void *))tlb_remove_page,
- 
- 	.mmu.exit_mmap		= paravirt_nop,
-+	.mmu.page_encryption_changed	= paravirt_nop,
- 
- #ifdef CONFIG_PARAVIRT_XXL
- 	.mmu.read_cr2		= __PV_IS_CALLEE_SAVE(native_read_cr2),
-diff --git a/arch/x86/mm/mem_encrypt.c b/arch/x86/mm/mem_encrypt.c
-index f4bd4b431ba1..c9800fa811f6 100644
---- a/arch/x86/mm/mem_encrypt.c
-+++ b/arch/x86/mm/mem_encrypt.c
-@@ -19,6 +19,7 @@
- #include <linux/kernel.h>
- #include <linux/bitops.h>
- #include <linux/dma-mapping.h>
-+#include <linux/kvm_para.h>
- 
- #include <asm/tlbflush.h>
- #include <asm/fixmap.h>
-@@ -29,6 +30,7 @@
- #include <asm/processor-flags.h>
- #include <asm/msr.h>
- #include <asm/cmdline.h>
-+#include <asm/kvm_para.h>
- 
- #include "mm_internal.h"
- 
-@@ -196,6 +198,47 @@ void __init sme_early_init(void)
- 		swiotlb_force = SWIOTLB_FORCE;
- }
- 
-+static void set_memory_enc_dec_hypercall(unsigned long vaddr, int npages,
-+					bool enc)
-+{
-+	unsigned long sz = npages << PAGE_SHIFT;
-+	unsigned long vaddr_end, vaddr_next;
+ static int __init svm_init(void)
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 3c3fea4e20b5..05e953b2ec61 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -5238,6 +5238,18 @@ long kvm_arch_vm_ioctl(struct file *filp,
+ 			r = kvm_x86_ops->get_page_enc_bitmap(kvm, &bitmap);
+ 		break;
+ 	}
++	case KVM_SET_PAGE_ENC_BITMAP: {
++		struct kvm_page_enc_bitmap bitmap;
 +
-+	vaddr_end = vaddr + sz;
++		r = -EFAULT;
++		if (copy_from_user(&bitmap, argp, sizeof(bitmap)))
++			goto out;
 +
-+	for (; vaddr < vaddr_end; vaddr = vaddr_next) {
-+		int psize, pmask, level;
-+		unsigned long pfn;
-+		pte_t *kpte;
-+
-+		kpte = lookup_address(vaddr, &level);
-+		if (!kpte || pte_none(*kpte))
-+			return;
-+
-+		switch (level) {
-+		case PG_LEVEL_4K:
-+			pfn = pte_pfn(*kpte);
-+			break;
-+		case PG_LEVEL_2M:
-+			pfn = pmd_pfn(*(pmd_t *)kpte);
-+			break;
-+		case PG_LEVEL_1G:
-+			pfn = pud_pfn(*(pud_t *)kpte);
-+			break;
-+		default:
-+			return;
-+		}
-+
-+		psize = page_level_size(level);
-+		pmask = page_level_mask(level);
-+
-+		kvm_sev_hypercall3(KVM_HC_PAGE_ENC_STATUS,
-+				   pfn << PAGE_SHIFT, psize >> PAGE_SHIFT, enc);
-+
-+		vaddr_next = (vaddr & pmask) + psize;
++		r = -ENOTTY;
++		if (kvm_x86_ops->set_page_enc_bitmap)
++			r = kvm_x86_ops->set_page_enc_bitmap(kvm, &bitmap);
++		break;
 +	}
-+}
-+
- static void __init __set_clr_pte_enc(pte_t *kpte, int level, bool enc)
- {
- 	pgprot_t old_prot, new_prot;
-@@ -253,12 +296,13 @@ static void __init __set_clr_pte_enc(pte_t *kpte, int level, bool enc)
- static int __init early_set_memory_enc_dec(unsigned long vaddr,
- 					   unsigned long size, bool enc)
- {
--	unsigned long vaddr_end, vaddr_next;
-+	unsigned long vaddr_end, vaddr_next, start;
- 	unsigned long psize, pmask;
- 	int split_page_size_mask;
- 	int level, ret;
- 	pte_t *kpte;
+ 	default:
+ 		r = -ENOTTY;
+ 	}
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index db1ebf85e177..b4b01d47e568 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -1489,6 +1489,7 @@ struct kvm_enc_region {
+ #define KVM_S390_CLEAR_RESET	_IO(KVMIO,   0xc4)
  
-+	start = vaddr;
- 	vaddr_next = vaddr;
- 	vaddr_end = vaddr + size;
+ #define KVM_GET_PAGE_ENC_BITMAP	_IOW(KVMIO, 0xc5, struct kvm_page_enc_bitmap)
++#define KVM_SET_PAGE_ENC_BITMAP	_IOW(KVMIO, 0xc6, struct kvm_page_enc_bitmap)
  
-@@ -313,6 +357,8 @@ static int __init early_set_memory_enc_dec(unsigned long vaddr,
- 
- 	ret = 0;
- 
-+	set_memory_enc_dec_hypercall(start, PAGE_ALIGN(size) >> PAGE_SHIFT,
-+					enc);
- out:
- 	__flush_tlb_all();
- 	return ret;
-@@ -451,6 +497,15 @@ void __init mem_encrypt_init(void)
- 	if (sev_active())
- 		static_branch_enable(&sev_enable_key);
- 
-+#ifdef CONFIG_PARAVIRT
-+	/*
-+	 * With SEV, we need to make a hypercall when page encryption state is
-+	 * changed.
-+	 */
-+	if (sev_active())
-+		pv_ops.mmu.page_encryption_changed = set_memory_enc_dec_hypercall;
-+#endif
-+
- 	pr_info("AMD %s active\n",
- 		sev_active() ? "Secure Encrypted Virtualization (SEV)"
- 			     : "Secure Memory Encryption (SME)");
-diff --git a/arch/x86/mm/pat/set_memory.c b/arch/x86/mm/pat/set_memory.c
-index c4aedd00c1ba..86b7804129fc 100644
---- a/arch/x86/mm/pat/set_memory.c
-+++ b/arch/x86/mm/pat/set_memory.c
-@@ -26,6 +26,7 @@
- #include <asm/proto.h>
- #include <asm/memtype.h>
- #include <asm/set_memory.h>
-+#include <asm/paravirt.h>
- 
- #include "../mm_internal.h"
- 
-@@ -1987,6 +1988,12 @@ static int __set_memory_enc_dec(unsigned long addr, int numpages, bool enc)
- 	 */
- 	cpa_flush(&cpa, 0);
- 
-+	/* Notify hypervisor that a given memory range is mapped encrypted
-+	 * or decrypted. The hypervisor will use this information during the
-+	 * VM migration.
-+	 */
-+	page_encryption_changed(addr, numpages, enc);
-+
- 	return ret;
- }
- 
+ /* Secure Encrypted Virtualization command */
+ enum sev_cmd_id {
 -- 
 2.17.1
 
