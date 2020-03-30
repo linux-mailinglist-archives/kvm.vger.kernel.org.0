@@ -2,205 +2,276 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 49705197823
-	for <lists+kvm@lfdr.de>; Mon, 30 Mar 2020 11:58:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 034D9197913
+	for <lists+kvm@lfdr.de>; Mon, 30 Mar 2020 12:21:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728257AbgC3J6I (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 30 Mar 2020 05:58:08 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:59495 "EHLO
-        us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727183AbgC3J6H (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 30 Mar 2020 05:58:07 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1585562286;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=QMWF8QuFs4FdQnn5PR+iMqYMNcjozcoCRuj7TDfrrJM=;
-        b=CIwAxxrh9aBXP2eU4/NBIuKlbggktT2hno42JatxcizjFJSqbcEpITooORCiaKSkI3v5iC
-        9GvGjFsFaDUfaq89xxZ7jStSKvCbXL/iH9i2hVUfArKFuKVhDzjeNlEy+hQEF836047VS5
-        w9vnYucCvE5ZiN/1xw1axtoOJRzxxZs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-346-a80OJPh6OOmn0-tzar3j5w-1; Mon, 30 Mar 2020 05:58:02 -0400
-X-MC-Unique: a80OJPh6OOmn0-tzar3j5w-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 72A47800D50;
-        Mon, 30 Mar 2020 09:58:00 +0000 (UTC)
-Received: from [10.36.112.58] (ovpn-112-58.ams2.redhat.com [10.36.112.58])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 9CFC05C1B5;
-        Mon, 30 Mar 2020 09:57:57 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH v7 09/13] arm/arm64: ITS: Commands
-To:     Zenghui Yu <yuzenghui@huawei.com>
-Cc:     eric.auger.pro@gmail.com, maz@kernel.org,
-        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        qemu-devel@nongnu.org, qemu-arm@nongnu.org, drjones@redhat.com,
-        andre.przywara@arm.com, peter.maydell@linaro.org,
-        alexandru.elisei@arm.com, thuth@redhat.com
-References: <20200320092428.20880-1-eric.auger@redhat.com>
- <20200320092428.20880-10-eric.auger@redhat.com>
- <84493416-7b0d-df3e-df56-cedcbdd72010@huawei.com>
-From:   Auger Eric <eric.auger@redhat.com>
-Message-ID: <885f656f-08a4-7e7b-f2b8-0e3921a58bb9@redhat.com>
-Date:   Mon, 30 Mar 2020 11:57:55 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+        id S1729533AbgC3KVS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 30 Mar 2020 06:21:18 -0400
+Received: from mx01.bbu.dsd.mx.bitdefender.com ([91.199.104.161]:43790 "EHLO
+        mx01.bbu.dsd.mx.bitdefender.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1729381AbgC3KUA (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 30 Mar 2020 06:20:00 -0400
+Received: from smtp.bitdefender.com (smtp02.buh.bitdefender.net [10.17.80.76])
+        by mx01.bbu.dsd.mx.bitdefender.com (Postfix) with ESMTPS id 3E227306E47B;
+        Mon, 30 Mar 2020 13:12:48 +0300 (EEST)
+Received: from localhost.localdomain (unknown [91.199.104.28])
+        by smtp.bitdefender.com (Postfix) with ESMTPSA id A4878303EF07;
+        Mon, 30 Mar 2020 13:12:47 +0300 (EEST)
+From:   =?UTF-8?q?Adalbert=20Laz=C4=83r?= <alazar@bitdefender.com>
+To:     kvm@vger.kernel.org
+Cc:     virtualization@lists.linux-foundation.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?q?Adalbert=20Laz=C4=83r?= <alazar@bitdefender.com>,
+        Edwin Zhai <edwin.zhai@intel.com>,
+        Jan Kiszka <jan.kiszka@siemens.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        Mathieu Tarral <mathieu.tarral@protonmail.com>,
+        Patrick Colp <patrick.colp@oracle.com>,
+        =?UTF-8?q?Samuel=20Laur=C3=A9n?= <samuel.lauren@iki.fi>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Tamas K Lengyel <tamas@tklengyel.com>,
+        Weijiang Yang <weijiang.yang@intel.com>,
+        Yu C Zhang <yu.c.zhang@intel.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>
+Subject: [PATCH v8 00/81] VM introspection
+Date:   Mon, 30 Mar 2020 13:11:47 +0300
+Message-Id: <20200330101308.21702-1-alazar@bitdefender.com>
 MIME-Version: 1.0
-In-Reply-To: <84493416-7b0d-df3e-df56-cedcbdd72010@huawei.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Zenghui,
+VM introspection
 
-On 3/30/20 11:22 AM, Zenghui Yu wrote:
-> Hi Eric,
->=20
-> On 2020/3/20 17:24, Eric Auger wrote:
->> Implement main ITS commands. The code is largely inherited from
->> the ITS driver.
->>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->=20
-> [...]
->=20
->> +/* ITS COMMANDS */
->> +
->> +static void its_encode_cmd(struct its_cmd_block *cmd, u8 cmd_nr)
->> +{
->> +=C2=A0=C2=A0=C2=A0 cmd->raw_cmd[0] &=3D ~0xffUL;
->> +=C2=A0=C2=A0=C2=A0 cmd->raw_cmd[0] |=3D cmd_nr;
->> +}
->> +
->> +static void its_encode_devid(struct its_cmd_block *cmd, u32 devid)
->> +{
->> +=C2=A0=C2=A0=C2=A0 cmd->raw_cmd[0] &=3D BIT_ULL(32) - 1;
->> +=C2=A0=C2=A0=C2=A0 cmd->raw_cmd[0] |=3D ((u64)devid) << 32;
->> +}
->> +
->> +static void its_encode_event_id(struct its_cmd_block *cmd, u32 id)
->> +{
->> +=C2=A0=C2=A0=C2=A0 cmd->raw_cmd[1] &=3D ~0xffffffffUL;
->> +=C2=A0=C2=A0=C2=A0 cmd->raw_cmd[1] |=3D id;
->> +}
->> +
->> +static void its_encode_phys_id(struct its_cmd_block *cmd, u32 phys_id=
-)
->> +{
->> +=C2=A0=C2=A0=C2=A0 cmd->raw_cmd[1] &=3D 0xffffffffUL;
->> +=C2=A0=C2=A0=C2=A0 cmd->raw_cmd[1] |=3D ((u64)phys_id) << 32;
->> +}
->> +
->> +static void its_encode_size(struct its_cmd_block *cmd, u8 size)
->> +{
->> +=C2=A0=C2=A0=C2=A0 cmd->raw_cmd[1] &=3D ~0x1fUL;
->> +=C2=A0=C2=A0=C2=A0 cmd->raw_cmd[1] |=3D size & 0x1f;
->> +}
->> +
->> +static void its_encode_itt(struct its_cmd_block *cmd, u64 itt_addr)
->> +{
->> +=C2=A0=C2=A0=C2=A0 cmd->raw_cmd[2] &=3D ~0xffffffffffffUL;
->> +=C2=A0=C2=A0=C2=A0 cmd->raw_cmd[2] |=3D itt_addr & 0xffffffffff00UL;
->> +}
->> +
->> +static void its_encode_valid(struct its_cmd_block *cmd, int valid)
->> +{
->> +=C2=A0=C2=A0=C2=A0 cmd->raw_cmd[2] &=3D ~(1UL << 63);
->> +=C2=A0=C2=A0=C2=A0 cmd->raw_cmd[2] |=3D ((u64)!!valid) << 63;
->> +}
->> +
->> +static void its_encode_target(struct its_cmd_block *cmd, u64
->> target_addr)
->> +{
->> +=C2=A0=C2=A0=C2=A0 cmd->raw_cmd[2] &=3D ~(0xfffffffffUL << 16);
->> +=C2=A0=C2=A0=C2=A0 cmd->raw_cmd[2] |=3D (target_addr & (0xffffffffUL =
-<< 16));
->> +}
->> +
->> +static void its_encode_collection(struct its_cmd_block *cmd, u16 col)
->> +{
->> +=C2=A0=C2=A0=C2=A0 cmd->raw_cmd[2] &=3D ~0xffffUL;
->> +=C2=A0=C2=A0=C2=A0 cmd->raw_cmd[2] |=3D col;
->> +}
->=20
-> The command encoding can be refactored like:
->=20
-> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/comm=
-it/?id=3D4d36f136d57aea6f6440886106e246bb7e5918d8
->=20
->=20
-> which will look much clearer.
-OK
->=20
-> [...]
->=20
->> +static void its_send_single_command(its_cmd_builder_t builder,
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 struct its_cmd_desc *desc)
->> +{
->> +=C2=A0=C2=A0=C2=A0 struct its_cmd_block *cmd, *next_cmd;
->> +
->> +=C2=A0=C2=A0=C2=A0 cmd =3D its_allocate_entry();
->> +=C2=A0=C2=A0=C2=A0 builder(cmd, desc);
->> +=C2=A0=C2=A0=C2=A0 next_cmd =3D its_post_commands();
->> +
->> +=C2=A0=C2=A0=C2=A0 its_wait_for_range_completion(cmd, next_cmd);
->> +}
->> +
->> +
->=20
-> extra line.
-OK
->=20
->> +static void its_build_mapd_cmd(struct its_cmd_block *cmd,
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 struct its_cmd_desc *desc)
->> +{
->> +=C2=A0=C2=A0=C2=A0 unsigned long itt_addr;
->> +=C2=A0=C2=A0=C2=A0 u8 size =3D 12; /* 4096 eventids */
->=20
-> Maybe use desc->its_mapd_cmd.dev->nr_ites instead as we already have it=
-?
-OK
->=20
->> +
->> +=C2=A0=C2=A0=C2=A0 itt_addr =3D (unsigned
->> long)(virt_to_phys(desc->its_mapd_cmd.dev->itt));
->> +=C2=A0=C2=A0=C2=A0 itt_addr =3D ALIGN(itt_addr, ITS_ITT_ALIGN);
->> +
->> +=C2=A0=C2=A0=C2=A0 its_encode_cmd(cmd, GITS_CMD_MAPD);
->> +=C2=A0=C2=A0=C2=A0 its_encode_devid(cmd, desc->its_mapd_cmd.dev->devi=
-ce_id);
->> +=C2=A0=C2=A0=C2=A0 its_encode_size(cmd, size - 1);
->> +=C2=A0=C2=A0=C2=A0 its_encode_itt(cmd, itt_addr);
->> +=C2=A0=C2=A0=C2=A0 its_encode_valid(cmd, desc->its_mapd_cmd.valid);
->> +=C2=A0=C2=A0=C2=A0 its_fixup_cmd(cmd);
->> +=C2=A0=C2=A0=C2=A0 if (desc->verbose)
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 printf("ITS: MAPD devid=3D=
-%d size =3D 0x%x itt=3D0x%lx valid=3D%d\n",
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 de=
-sc->its_mapd_cmd.dev->device_id,
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 si=
-ze, itt_addr, desc->its_mapd_cmd.valid);
->> +
->=20
-> extra line.
->=20
-> All of these are trivial things and feel free to ignore them,
-> Reviewed-by: Zenghui Yu <yuzenghui@huawei.com>
-thanks!
+The KVM introspection subsystem provides a facility for applications
+running on the host or in a separate VM, to control the execution of
+other VMs (pause, resume, shutdown), query the state of the vCPUs (GPRs,
+MSRs etc.), alter the page access bits in the shadow page tables (only
+for the hardware backed ones, eg. Intel's EPT) and receive notifications
+when events of interest have taken place (shadow page table level faults,
+key MSR writes, hypercalls etc.). Some notifications can be responded
+to with an action (like preventing an MSR from being written), others
+are mere informative (like breakpoint events which can be used for
+execution tracing).  With few exceptions, all events are optional. An
+application using this subsystem will explicitly register for them.
 
-Eric
->=20
->=20
-> Thanks
->=20
+The use case that gave way for the creation of this subsystem is to
+monitor the guest OS and as such the ABI/API is highly influenced by how
+the guest software (kernel, applications) sees the world. For example,
+some events provide information specific for the host CPU architecture
+(eg. MSR_IA32_SYSENTER_EIP) merely because its leveraged by guest software
+to implement a critical feature (fast system calls).
+
+At the moment, the target audience for KVMI are security software authors
+that wish to perform forensics on newly discovered threats (exploits)
+or to implement another layer of security like preventing a large set
+of kernel rootkits simply by "locking" the kernel image in the shadow
+page tables (ie. enforce .text r-x, .rodata rw- etc.). It's the latter
+case that made KVMI a separate subsystem, even though many of these
+features are available in the device manager. The ability to build a
+security application that does not interfere (in terms of performance)
+with the guest software asks for a specialized interface that is designed
+for minimum overhead.
+
+This patch series is based on kvm/master,
+commit 428b8f1d9f92 ("KVM: VMX: don't allow memory operands for inline asm that modifies SP").
+
+The previous version (v7) can be read here:
+
+	https://lore.kernel.org/kvm/20200207181636.1065-1-alazar@bitdefender.com/
+
+Patches 1-37: make preparatory changes
+
+Patches 38-79: add basic introspection capabilities
+
+Patch 80: support introspection tools that write-protect guest page tables
+
+Patch 81: notify the introspection tool even on emulation failures
+          (when the read/write callbacks used by the emulator,
+           kvm_page_preread/kvm_page_prewrite, are not invoked)
+
+Changes since v7:
+    - remove the RFC tag
+    - KVMI_EVENT_SINGLESTEP and KVMI_EVENT_TRAP doesn't have to
+      be enabled. These events are sent after a specific command
+      (KVMI_VCPU_CONTROL_SINGLESTEP/KVMI_VCPU_INJECT_EXCEPTION), as it is
+      the case with KVMI_VCPU_PAUSE/KVMI_EVENT_PAUSE.
+    - add kvm_x86_ops.desc_ctrl_supported()
+    - fix the descriptor-table and MSR events on AMD
+    - drop KVMI_EVENT_REPLY (use KVMI_EVENT instead; as we do with the commands)
+    - other small changes (code refactoring, message validation, etc.).
+
+Adalbert Lazăr (20):
+  sched/swait: add swait_event_killable_exclusive()
+  KVM: add new error codes for VM introspection
+  KVM: add kvm_vcpu_kick_and_wait()
+  KVM: doc: fix the hypercall numbering
+  KVM: x86: add .control_cr3_intercept() to struct kvm_x86_ops
+  KVM: x86: add .desc_ctrl_supported()
+  KVM: x86: add .control_desc_intercept()
+  KVM: x86: intercept the write access on sidt and other emulated
+    instructions
+  KVM: introspection: add hook/unhook ioctls
+  KVM: introspection: add permission access ioctls
+  KVM: introspection: add the read/dispatch message function
+  KVM: introspection: add KVMI_GET_VERSION
+  KVM: introspection: add KVMI_VM_CHECK_COMMAND and KVMI_VM_CHECK_EVENT
+  KVM: introspection: add KVMI_EVENT_UNHOOK
+  KVM: introspection: add KVMI_VM_CONTROL_EVENTS
+  KVM: introspection: add a jobs list to every introspected vCPU
+  KVM: introspection: add KVMI_VCPU_PAUSE
+  KVM: introspection: add KVMI_EVENT_PAUSE_VCPU
+  KVM: introspection: extend KVMI_GET_VERSION with struct kvmi_features
+  KVM: introspection: add KVMI_VCPU_TRANSLATE_GVA
+
+Marian Rotariu (1):
+  KVM: introspection: add KVMI_VCPU_GET_CPUID
+
+Mathieu Tarral (1):
+  export kill_pid_info()
+
+Mihai Donțu (35):
+  KVM: x86: add kvm_arch_vcpu_get_regs() and kvm_arch_vcpu_get_sregs()
+  KVM: x86: avoid injecting #PF when emulate the VMCALL instruction
+  KVM: x86: add .control_msr_intercept()
+  KVM: x86: vmx: use a symbolic constant when checking the exit
+    qualifications
+  KVM: x86: save the error code during EPT/NPF exits handling
+  KVM: x86: add .fault_gla()
+  KVM: x86: add .spt_fault()
+  KVM: x86: add .gpt_translation_fault()
+  KVM: x86: extend kvm_mmu_gva_to_gpa_system() with the 'access'
+    parameter
+  KVM: x86: page track: provide all page tracking hooks with the guest
+    virtual address
+  KVM: x86: page track: add track_create_slot() callback
+  KVM: x86: page_track: add support for preread, prewrite and preexec
+  KVM: x86: wire in the preread/prewrite/preexec page trackers
+  KVM: introduce VM introspection
+  KVM: introspection: add KVMI_VM_GET_INFO
+  KVM: introspection: add KVMI_VM_READ_PHYSICAL/KVMI_VM_WRITE_PHYSICAL
+  KVM: introspection: handle vCPU introspection requests
+  KVM: introspection: handle vCPU commands
+  KVM: introspection: add KVMI_VCPU_GET_INFO
+  KVM: introspection: add crash action handling on event reply
+  KVM: introspection: add KVMI_VCPU_CONTROL_EVENTS
+  KVM: introspection: add KVMI_VCPU_GET_REGISTERS
+  KVM: introspection: add KVMI_VCPU_SET_REGISTERS
+  KVM: introspection: add KVMI_EVENT_HYPERCALL
+  KVM: introspection: add KVMI_EVENT_BREAKPOINT
+  KVM: introspection: add KVMI_VCPU_CONTROL_CR and KVMI_EVENT_CR
+  KVM: introspection: add KVMI_VCPU_INJECT_EXCEPTION + KVMI_EVENT_TRAP
+  KVM: introspection: add KVMI_EVENT_XSETBV
+  KVM: introspection: add KVMI_VCPU_GET_XSAVE
+  KVM: introspection: add KVMI_VCPU_GET_MTRR_TYPE
+  KVM: introspection: add KVMI_VCPU_CONTROL_MSR and KVMI_EVENT_MSR
+  KVM: introspection: add KVMI_VM_SET_PAGE_ACCESS
+  KVM: introspection: add KVMI_EVENT_PF
+  KVM: introspection: emulate a guest page table walk on SPT violations
+    due to A/D bit updates
+  KVM: x86: call the page tracking code on emulation failure
+
+Mircea Cîrjaliu (2):
+  KVM: x86: disable gpa_available optimization for fetch and page-walk
+    NPF/EPT violations
+  KVM: introspection: add vCPU related data
+
+Nicușor Cîțu (20):
+  KVM: x86: add kvm_arch_vcpu_set_regs()
+  KVM: x86: add .bp_intercepted() to struct kvm_x86_ops
+  KVM: x86: add .cr3_write_intercepted()
+  KVM: svm: add support for descriptor-table exits
+  KVM: x86: add .desc_intercepted()
+  KVM: x86: export .msr_write_intercepted()
+  KVM: x86: use MSR_TYPE_R, MSR_TYPE_W and MSR_TYPE_RW with AMD code too
+  KVM: svm: pass struct kvm_vcpu to set_msr_interception()
+  KVM: vmx: pass struct kvm_vcpu to the intercept msr related functions
+  KVM: x86: add .control_singlestep()
+  KVM: x86: export kvm_arch_vcpu_set_guest_debug()
+  KVM: x86: export kvm_inject_pending_exception()
+  KVM: x86: export kvm_vcpu_ioctl_x86_get_xsave()
+  KVM: introspection: restore the state of #BP interception on unhook
+  KVM: introspection: restore the state of CR3 interception on unhook
+  KVM: introspection: add KVMI_EVENT_DESCRIPTOR
+  KVM: introspection: restore the state of descriptor-table register
+    interception on unhook
+  KVM: introspection: restore the state of MSR interception on unhook
+  KVM: introspection: add KVMI_VCPU_CONTROL_SINGLESTEP
+  KVM: introspection: add KVMI_EVENT_SINGLESTEP
+
+Ștefan Șicleru (2):
+  KVM: add kvm_get_max_gfn()
+  KVM: introspection: add KVMI_VM_GET_MAX_GFN
+
+ Documentation/virt/kvm/api.rst                |  150 ++
+ Documentation/virt/kvm/hypercalls.rst         |   39 +-
+ Documentation/virt/kvm/kvmi.rst               | 1440 +++++++++++++
+ arch/x86/include/asm/kvm_emulate.h            |    1 +
+ arch/x86/include/asm/kvm_host.h               |   37 +-
+ arch/x86/include/asm/kvm_page_track.h         |   71 +-
+ arch/x86/include/asm/kvmi_host.h              |   91 +
+ arch/x86/include/asm/vmx.h                    |    2 +
+ arch/x86/include/uapi/asm/kvmi.h              |  147 ++
+ arch/x86/kvm/Kconfig                          |    9 +
+ arch/x86/kvm/Makefile                         |    2 +
+ arch/x86/kvm/emulate.c                        |    4 +
+ arch/x86/kvm/kvmi.c                           | 1267 +++++++++++
+ arch/x86/kvm/mmu.h                            |    4 +
+ arch/x86/kvm/mmu/mmu.c                        |  160 +-
+ arch/x86/kvm/mmu/page_track.c                 |  142 +-
+ arch/x86/kvm/svm.c                            |  281 ++-
+ arch/x86/kvm/vmx/capabilities.h               |    7 +-
+ arch/x86/kvm/vmx/vmx.c                        |  256 ++-
+ arch/x86/kvm/vmx/vmx.h                        |    4 -
+ arch/x86/kvm/x86.c                            |  306 ++-
+ drivers/gpu/drm/i915/gvt/kvmgt.c              |    2 +-
+ include/linux/kvm_host.h                      |   18 +
+ include/linux/kvmi_host.h                     |  126 ++
+ include/linux/swait.h                         |   11 +
+ include/uapi/linux/kvm.h                      |   20 +
+ include/uapi/linux/kvm_para.h                 |    5 +
+ include/uapi/linux/kvmi.h                     |  227 ++
+ kernel/signal.c                               |    1 +
+ tools/testing/selftests/kvm/Makefile          |    1 +
+ .../testing/selftests/kvm/x86_64/kvmi_test.c  | 1857 +++++++++++++++++
+ virt/kvm/introspection/kvmi.c                 | 1409 +++++++++++++
+ virt/kvm/introspection/kvmi_int.h             |  135 ++
+ virt/kvm/introspection/kvmi_msg.c             | 1057 ++++++++++
+ virt/kvm/kvm_main.c                           |   70 +
+ 35 files changed, 9178 insertions(+), 181 deletions(-)
+ create mode 100644 Documentation/virt/kvm/kvmi.rst
+ create mode 100644 arch/x86/include/asm/kvmi_host.h
+ create mode 100644 arch/x86/include/uapi/asm/kvmi.h
+ create mode 100644 arch/x86/kvm/kvmi.c
+ create mode 100644 include/linux/kvmi_host.h
+ create mode 100644 include/uapi/linux/kvmi.h
+ create mode 100644 tools/testing/selftests/kvm/x86_64/kvmi_test.c
+ create mode 100644 virt/kvm/introspection/kvmi.c
+ create mode 100644 virt/kvm/introspection/kvmi_int.h
+ create mode 100644 virt/kvm/introspection/kvmi_msg.c
+
+
+base-commit: 428b8f1d9f92f838b73997adc10046d3c6e05790
+CC: Edwin Zhai <edwin.zhai@intel.com>
+CC: Jan Kiszka <jan.kiszka@siemens.com>
+CC: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+CC: Mathieu Tarral <mathieu.tarral@protonmail.com>
+CC: Patrick Colp <patrick.colp@oracle.com>
+CC: Samuel Laurén <samuel.lauren@iki.fi>
+CC: Stefan Hajnoczi <stefanha@redhat.com>
+CC: Tamas K Lengyel <tamas@tklengyel.com>
+CC: Weijiang Yang <weijiang.yang@intel.com>
+CC: Yu C Zhang <yu.c.zhang@intel.com>
+CC: Sean Christopherson <sean.j.christopherson@intel.com>
+CC: Joerg Roedel <joro@8bytes.org>
+CC: Vitaly Kuznetsov <vkuznets@redhat.com>
+CC: Wanpeng Li <wanpengli@tencent.com>
+CC: Jim Mattson <jmattson@google.com>
 
