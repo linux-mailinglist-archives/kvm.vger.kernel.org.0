@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 844E3197B05
-	for <lists+kvm@lfdr.de>; Mon, 30 Mar 2020 13:44:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 92F1C197B2F
+	for <lists+kvm@lfdr.de>; Mon, 30 Mar 2020 13:48:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729853AbgC3LoN convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Mon, 30 Mar 2020 07:44:13 -0400
-Received: from mga11.intel.com ([192.55.52.93]:45279 "EHLO mga11.intel.com"
+        id S1729896AbgC3Lsy convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Mon, 30 Mar 2020 07:48:54 -0400
+Received: from mga09.intel.com ([134.134.136.24]:30291 "EHLO mga09.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729669AbgC3LoN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 30 Mar 2020 07:44:13 -0400
-IronPort-SDR: fGrK7Kx3S7D9LmqV3mu5mJgnsFxR2Kw/gA0lXMESdzBNzxaVctWArifmVfg36mzV2KXHP8KJMC
- OnmKjdTaebFA==
+        id S1728764AbgC3Lsy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 30 Mar 2020 07:48:54 -0400
+IronPort-SDR: lKWFHWNZYnlqaBmkSxOp+ICIPdzooc5adi49GeZB83dBcTb4g7dqgLCwdj5WMn3WuQ7JlH7Yq8
+ f6ISoez1kUMw==
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Mar 2020 04:44:13 -0700
-IronPort-SDR: pap6UxZaH8kyXeJT1F0+Vr+6mRxFVAyDMde9bFQMLJzIDazoAMWUPvunXXv3N8tciS0IQ9lqVh
- t2Cc7iV78mHw==
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Mar 2020 04:48:53 -0700
+IronPort-SDR: 3n7ZaBt1QAtL8ckMyOn0+HIcWqDND4WEFimtAJUDCEPAMqYddkyHPVEF5IQ4bJL28vudceK//d
+ 7+ieRaMumCaA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.72,324,1580803200"; 
-   d="scan'208";a="421900900"
-Received: from fmsmsx108.amr.corp.intel.com ([10.18.124.206])
-  by orsmga005.jf.intel.com with ESMTP; 30 Mar 2020 04:44:12 -0700
-Received: from fmsmsx113.amr.corp.intel.com (10.18.116.7) by
- FMSMSX108.amr.corp.intel.com (10.18.124.206) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Mon, 30 Mar 2020 04:44:12 -0700
-Received: from shsmsx153.ccr.corp.intel.com (10.239.6.53) by
- FMSMSX113.amr.corp.intel.com (10.18.116.7) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Mon, 30 Mar 2020 04:44:12 -0700
+   d="scan'208";a="248674831"
+Received: from fmsmsx105.amr.corp.intel.com ([10.18.124.203])
+  by orsmga003.jf.intel.com with ESMTP; 30 Mar 2020 04:48:50 -0700
+Received: from fmsmsx119.amr.corp.intel.com (10.18.124.207) by
+ FMSMSX105.amr.corp.intel.com (10.18.124.203) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Mon, 30 Mar 2020 04:48:50 -0700
+Received: from shsmsx106.ccr.corp.intel.com (10.239.4.159) by
+ FMSMSX119.amr.corp.intel.com (10.18.124.207) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Mon, 30 Mar 2020 04:48:49 -0700
 Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.225]) by
- SHSMSX153.ccr.corp.intel.com ([169.254.12.89]) with mapi id 14.03.0439.000;
- Mon, 30 Mar 2020 19:44:08 +0800
+ SHSMSX106.ccr.corp.intel.com ([169.254.10.89]) with mapi id 14.03.0439.000;
+ Mon, 30 Mar 2020 19:48:46 +0800
 From:   "Tian, Kevin" <kevin.tian@intel.com>
 To:     "Liu, Yi L" <yi.l.liu@intel.com>,
         "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
@@ -48,20 +48,16 @@ CC:     "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         "Wu, Hao" <hao.wu@intel.com>
-Subject: RE: [PATCH v1 2/8] vfio/type1: Add vfio_iommu_type1 parameter for
- quota tuning
-Thread-Topic: [PATCH v1 2/8] vfio/type1: Add vfio_iommu_type1 parameter for
- quota tuning
-Thread-Index: AQHWAEUbX2o9koiJmUSoQpAjbhigyahg28IA//9+x4CAAI0HsP//fHmAgACn7gA=
-Date:   Mon, 30 Mar 2020 11:44:08 +0000
-Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D19D7FF888@SHSMSX104.ccr.corp.intel.com>
+Subject: RE: [PATCH v1 5/8] vfio/type1: Report 1st-level/stage-1 format to
+ userspace
+Thread-Topic: [PATCH v1 5/8] vfio/type1: Report 1st-level/stage-1 format to
+ userspace
+Thread-Index: AQHWAEUcrRt83jyTNECgMYM7VBywiqhg9Y6g
+Date:   Mon, 30 Mar 2020 11:48:45 +0000
+Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D19D7FF8BC@SHSMSX104.ccr.corp.intel.com>
 References: <1584880325-10561-1-git-send-email-yi.l.liu@intel.com>
- <1584880325-10561-3-git-send-email-yi.l.liu@intel.com>
- <AADFC41AFE54684AB9EE6CBC0274A5D19D7FF3C5@SHSMSX104.ccr.corp.intel.com>
- <A2975661238FB949B60364EF0F2C25743A217C68@SHSMSX104.ccr.corp.intel.com>
- <AADFC41AFE54684AB9EE6CBC0274A5D19D7FF46F@SHSMSX104.ccr.corp.intel.com>
- <A2975661238FB949B60364EF0F2C25743A217D97@SHSMSX104.ccr.corp.intel.com>
-In-Reply-To: <A2975661238FB949B60364EF0F2C25743A217D97@SHSMSX104.ccr.corp.intel.com>
+ <1584880325-10561-6-git-send-email-yi.l.liu@intel.com>
+In-Reply-To: <1584880325-10561-6-git-send-email-yi.l.liu@intel.com>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
@@ -79,114 +75,147 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 > From: Liu, Yi L <yi.l.liu@intel.com>
-> Sent: Monday, March 30, 2020 5:27 PM
+> Sent: Sunday, March 22, 2020 8:32 PM
 > 
-> > From: Tian, Kevin <kevin.tian@intel.com>
-> > Sent: Monday, March 30, 2020 5:20 PM
-> > To: Liu, Yi L <yi.l.liu@intel.com>; alex.williamson@redhat.com;
-> > Subject: RE: [PATCH v1 2/8] vfio/type1: Add vfio_iommu_type1 parameter
-> for quota
-> > tuning
-> >
-> > > From: Liu, Yi L <yi.l.liu@intel.com>
-> > > Sent: Monday, March 30, 2020 4:53 PM
-> > >
-> > > > From: Tian, Kevin <kevin.tian@intel.com>
-> > > > Sent: Monday, March 30, 2020 4:41 PM
-> > > > To: Liu, Yi L <yi.l.liu@intel.com>; alex.williamson@redhat.com;
-> > > > Subject: RE: [PATCH v1 2/8] vfio/type1: Add vfio_iommu_type1
-> > > > parameter
-> > > for quota
-> > > > tuning
-> > > >
-> > > > > From: Liu, Yi L <yi.l.liu@intel.com>
-> > > > > Sent: Sunday, March 22, 2020 8:32 PM
-> > > > >
-> > > > > From: Liu Yi L <yi.l.liu@intel.com>
-> > > > >
-> > > > > This patch adds a module option to make the PASID quota tunable by
-> > > > > administrator.
-> > > > >
-> > > > > TODO: needs to think more on how to  make the tuning to be per-
-> process.
-> > > > >
-> > > > > Previous discussions:
-> > > > > https://patchwork.kernel.org/patch/11209429/
-> > > > >
-> > > > > Cc: Kevin Tian <kevin.tian@intel.com>
-> > > > > CC: Jacob Pan <jacob.jun.pan@linux.intel.com>
-> > > > > Cc: Alex Williamson <alex.williamson@redhat.com>
-> > > > > Cc: Eric Auger <eric.auger@redhat.com>
-> > > > > Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>
-> > > > > Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
-> > > > > ---
-> > > > >  drivers/vfio/vfio.c             | 8 +++++++-
-> > > > >  drivers/vfio/vfio_iommu_type1.c | 7 ++++++-
-> > > > >  include/linux/vfio.h            | 3 ++-
-> > > > >  3 files changed, 15 insertions(+), 3 deletions(-)
-> > > > >
-> > > > > diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c index
-> > > > > d13b483..020a792 100644
-> > > > > --- a/drivers/vfio/vfio.c
-> > > > > +++ b/drivers/vfio/vfio.c
-> > > > > @@ -2217,13 +2217,19 @@ struct vfio_mm
-> > > *vfio_mm_get_from_task(struct
-> > > > > task_struct *task)
-> > > > >  }
-> > > > >  EXPORT_SYMBOL_GPL(vfio_mm_get_from_task);
-> > > > >
-> > > > > -int vfio_mm_pasid_alloc(struct vfio_mm *vmm, int min, int max)
-> > > > > +int vfio_mm_pasid_alloc(struct vfio_mm *vmm, int quota, int min,
-> > > > > +int
-> > > max)
-> > > > >  {
-> > > > >  	ioasid_t pasid;
-> > > > >  	int ret = -ENOSPC;
-> > > > >
-> > > > >  	mutex_lock(&vmm->pasid_lock);
-> > > > >
-> > > > > +	/* update quota as it is tunable by admin */
-> > > > > +	if (vmm->pasid_quota != quota) {
-> > > > > +		vmm->pasid_quota = quota;
-> > > > > +		ioasid_adjust_set(vmm->ioasid_sid, quota);
-> > > > > +	}
-> > > > > +
-> > > >
-> > > > It's a bit weird to have quota adjusted in the alloc path, since the
-> > > > latter
-> > > might
-> > > > be initiated by non-privileged users. Why not doing the simple math
-> > > > in
-> > > vfio_
-> > > > create_mm to set the quota when the ioasid set is created? even in
-> > > > the
-> > > future
-> > > > you may allow per-process quota setting, that should come from
-> > > > separate privileged path instead of thru alloc..
-> > >
-> > > The reason is the kernel parameter modification has no event which can
-> > > be used to adjust the quota. So I chose to adjust it in pasid_alloc
-> > > path. If it's not good, how about adding one more IOCTL to let user-
-> > > space trigger a quota adjustment event? Then even non-privileged user
-> > > could trigger quota adjustment, the quota is actually controlled by
-> > > privileged user. How about your opinion?
-> > >
-> >
-> > why do you need an event to adjust? As I said, you can set the quota when
-> the set is
-> > created in vfio_create_mm...
+> From: Liu Yi L <yi.l.liu@intel.com>
 > 
-> oh, it's to support runtime adjustments. I guess it may be helpful to let
-> per-VM quota tunable even the VM is running. If just set the quota in
-> vfio_create_mm(), it is not able to adjust at runtime.
+> VFIO exposes IOMMU nesting translation (a.k.a dual stage translation)
+> capability to userspace. Thus applications like QEMU could support
+> vIOMMU with hardware's nesting translation capability for pass-through
+> devices. Before setting up nesting translation for pass-through devices,
+> QEMU and other applications need to learn the supported 1st-lvl/stage-1
+> translation structure format like page table format.
 > 
+> Take vSVA (virtual Shared Virtual Addressing) as an example, to support
+> vSVA for pass-through devices, QEMU setup nesting translation for pass-
+> through devices. The guest page table are configured to host as 1st-lvl/
+> stage-1 page table. Therefore, guest format should be compatible with
+> host side.
+> 
+> This patch reports the supported 1st-lvl/stage-1 page table format on the
+> current platform to userspace. QEMU and other alike applications should
+> use this format info when trying to setup IOMMU nesting translation on
+> host IOMMU.
+> 
+> Cc: Kevin Tian <kevin.tian@intel.com>
+> CC: Jacob Pan <jacob.jun.pan@linux.intel.com>
+> Cc: Alex Williamson <alex.williamson@redhat.com>
+> Cc: Eric Auger <eric.auger@redhat.com>
+> Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>
+> Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
+> ---
+>  drivers/vfio/vfio_iommu_type1.c | 56
+> +++++++++++++++++++++++++++++++++++++++++
+>  include/uapi/linux/vfio.h       |  1 +
+>  2 files changed, 57 insertions(+)
+> 
+> diff --git a/drivers/vfio/vfio_iommu_type1.c
+> b/drivers/vfio/vfio_iommu_type1.c
+> index 9aa2a67..82a9e0b 100644
+> --- a/drivers/vfio/vfio_iommu_type1.c
+> +++ b/drivers/vfio/vfio_iommu_type1.c
+> @@ -2234,11 +2234,66 @@ static int vfio_iommu_type1_pasid_free(struct
+> vfio_iommu *iommu,
+>  	return ret;
+>  }
+> 
+> +static int vfio_iommu_get_stage1_format(struct vfio_iommu *iommu,
+> +					 u32 *stage1_format)
+> +{
+> +	struct vfio_domain *domain;
+> +	u32 format = 0, tmp_format = 0;
+> +	int ret;
+> +
+> +	mutex_lock(&iommu->lock);
+> +	if (list_empty(&iommu->domain_list)) {
+> +		mutex_unlock(&iommu->lock);
+> +		return -EINVAL;
+> +	}
+> +
+> +	list_for_each_entry(domain, &iommu->domain_list, next) {
+> +		if (iommu_domain_get_attr(domain->domain,
+> +			DOMAIN_ATTR_PASID_FORMAT, &format)) {
+> +			ret = -EINVAL;
+> +			format = 0;
+> +			goto out_unlock;
+> +		}
+> +		/*
+> +		 * format is always non-zero (the first format is
+> +		 * IOMMU_PASID_FORMAT_INTEL_VTD which is 1). For
+> +		 * the reason of potential different backed IOMMU
+> +		 * formats, here we expect to have identical formats
+> +		 * in the domain list, no mixed formats support.
+> +		 * return -EINVAL to fail the attempt of setup
+> +		 * VFIO_TYPE1_NESTING_IOMMU if non-identical formats
+> +		 * are detected.
+> +		 */
+> +		if (tmp_format && tmp_format != format) {
+> +			ret = -EINVAL;
+> +			format = 0;
+> +			goto out_unlock;
+> +		}
+> +
+> +		tmp_format = format;
+> +	}
 
-ok, I didn't note the module parameter was granted with a write permission.
-However there is a further problem. We cannot support PASID reclaim now.
-What about the admin sets a quota smaller than previous value while some
-IOASID sets already exceed the new quota? I'm not sure how to fail a runtime
-module parameter change due to that situation. possibly a normal sysfs 
-node better suites the runtime change requirement...
+this path is invoked only in VFIO_IOMMU_GET_INFO path. If we don't
+want to assume the status quo that one container holds only one
+device w/ vIOMMU (the prerequisite for vSVA), looks we also need
+check the format compatibility when attaching a new group to this
+container?
 
-Thanks
-Kevin
+> +	ret = 0;
+> +
+> +out_unlock:
+> +	if (format)
+> +		*stage1_format = format;
+> +	mutex_unlock(&iommu->lock);
+> +	return ret;
+> +}
+> +
+>  static int vfio_iommu_info_add_nesting_cap(struct vfio_iommu *iommu,
+>  					 struct vfio_info_cap *caps)
+>  {
+>  	struct vfio_info_cap_header *header;
+>  	struct vfio_iommu_type1_info_cap_nesting *nesting_cap;
+> +	u32 formats = 0;
+> +	int ret;
+> +
+> +	ret = vfio_iommu_get_stage1_format(iommu, &formats);
+> +	if (ret) {
+> +		pr_warn("Failed to get stage-1 format\n");
+> +		return ret;
+> +	}
+> 
+>  	header = vfio_info_cap_add(caps, sizeof(*nesting_cap),
+>  				   VFIO_IOMMU_TYPE1_INFO_CAP_NESTING,
+> 1);
+> @@ -2254,6 +2309,7 @@ static int vfio_iommu_info_add_nesting_cap(struct
+> vfio_iommu *iommu,
+>  		/* nesting iommu type supports PASID requests (alloc/free)
+> */
+>  		nesting_cap->nesting_capabilities |=
+> VFIO_IOMMU_PASID_REQS;
+>  	}
+> +	nesting_cap->stage1_formats = formats;
+> 
+>  	return 0;
+>  }
+> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+> index ed9881d..ebeaf3e 100644
+> --- a/include/uapi/linux/vfio.h
+> +++ b/include/uapi/linux/vfio.h
+> @@ -763,6 +763,7 @@ struct vfio_iommu_type1_info_cap_nesting {
+>  	struct	vfio_info_cap_header header;
+>  #define VFIO_IOMMU_PASID_REQS	(1 << 0)
+>  	__u32	nesting_capabilities;
+> +	__u32	stage1_formats;
+
+do you plan to support multiple formats? If not, use singular name.
+
+>  };
+> 
+>  #define VFIO_IOMMU_GET_INFO _IO(VFIO_TYPE, VFIO_BASE + 12)
+> --
+> 2.7.4
+
