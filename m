@@ -2,254 +2,438 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3F36D197C19
-	for <lists+kvm@lfdr.de>; Mon, 30 Mar 2020 14:38:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1E56C197C32
+	for <lists+kvm@lfdr.de>; Mon, 30 Mar 2020 14:46:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730221AbgC3Mir (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 30 Mar 2020 08:38:47 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:25746 "EHLO
-        us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1730064AbgC3Mir (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 30 Mar 2020 08:38:47 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1585571925;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Z4cUzeidLCschmMx+521qeR+2AGe9fkhbWsqAhHXFkg=;
-        b=Jei6MkZohwWkaJ0GFaOPY+9Wyuch94fZKKz9l/VPvrNx7L66Ahn45CvhnAYmYUu3pFt7C6
-        JDq9n8Dt6Veurj2Hkx7F1+EqAurISyI1pD/VQcwynZuezHaHizoT+7eddi1kxwmQMLpOS3
-        QuXk5q/T9LzJ51K/TLzeUwlEFUWBOoA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-198-e6d9mGMXOOW6hD0m0hqhTQ-1; Mon, 30 Mar 2020 08:38:41 -0400
-X-MC-Unique: e6d9mGMXOOW6hD0m0hqhTQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0A27618AB2C4;
-        Mon, 30 Mar 2020 12:38:40 +0000 (UTC)
-Received: from [10.36.112.58] (ovpn-112-58.ams2.redhat.com [10.36.112.58])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 89E3C5DA66;
-        Mon, 30 Mar 2020 12:38:34 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH v7 13/13] arm/arm64: ITS: pending table
- migration test
-To:     Zenghui Yu <yuzenghui@huawei.com>
-Cc:     peter.maydell@linaro.org, drjones@redhat.com, kvm@vger.kernel.org,
-        maz@kernel.org, qemu-devel@nongnu.org, qemu-arm@nongnu.org,
-        andre.przywara@arm.com, thuth@redhat.com, alexandru.elisei@arm.com,
-        kvmarm@lists.cs.columbia.edu, eric.auger.pro@gmail.com
-References: <20200320092428.20880-1-eric.auger@redhat.com>
- <20200320092428.20880-14-eric.auger@redhat.com>
- <296c574b-810c-9c90-a613-df732a9ac193@huawei.com>
-From:   Auger Eric <eric.auger@redhat.com>
-Message-ID: <ea74559c-2ab4-752c-e587-2bf40eab14b0@redhat.com>
-Date:   Mon, 30 Mar 2020 14:38:32 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
-MIME-Version: 1.0
-In-Reply-To: <296c574b-810c-9c90-a613-df732a9ac193@huawei.com>
-Content-Type: text/plain; charset=utf-8
+        id S1730245AbgC3Mqd convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Mon, 30 Mar 2020 08:46:33 -0400
+Received: from mga02.intel.com ([134.134.136.20]:39512 "EHLO mga02.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727339AbgC3Mqc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 30 Mar 2020 08:46:32 -0400
+IronPort-SDR: cqtUcB3RS8vXNKAVqck7h/sJZHSr09rqC3CePWN3Uj6mmwyqZDE27ezi7erFJ/GHXz+SX6oA7H
+ VmMLurKE0OOA==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Mar 2020 05:46:32 -0700
+IronPort-SDR: ZmgTllH2rwYKqmQOBfQC+QNwWhRCYpdrhR0M93hh/e7Wb5IKq7PyOyUTbiZrHbNqtwc28kbtbF
+ GFHJSvBVmpkQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.72,324,1580803200"; 
+   d="scan'208";a="395112191"
+Received: from fmsmsx103.amr.corp.intel.com ([10.18.124.201])
+  by orsmga004.jf.intel.com with ESMTP; 30 Mar 2020 05:46:31 -0700
+Received: from fmsmsx120.amr.corp.intel.com (10.18.124.208) by
+ FMSMSX103.amr.corp.intel.com (10.18.124.201) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Mon, 30 Mar 2020 05:46:31 -0700
+Received: from shsmsx151.ccr.corp.intel.com (10.239.6.50) by
+ fmsmsx120.amr.corp.intel.com (10.18.124.208) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Mon, 30 Mar 2020 05:46:31 -0700
+Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.225]) by
+ SHSMSX151.ccr.corp.intel.com ([169.254.3.22]) with mapi id 14.03.0439.000;
+ Mon, 30 Mar 2020 20:46:27 +0800
+From:   "Tian, Kevin" <kevin.tian@intel.com>
+To:     "Liu, Yi L" <yi.l.liu@intel.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>
+CC:     "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "Tian, Jun J" <jun.j.tian@intel.com>,
+        "Sun, Yi Y" <yi.y.sun@intel.com>,
+        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Wu, Hao" <hao.wu@intel.com>
+Subject: RE: [PATCH v1 6/8] vfio/type1: Bind guest page tables to host
+Thread-Topic: [PATCH v1 6/8] vfio/type1: Bind guest page tables to host
+Thread-Index: AQHWAEUdciXQImmqHUqKh8aSIRgOsKhhEgMg
+Date:   Mon, 30 Mar 2020 12:46:26 +0000
+Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D19D7FF98F@SHSMSX104.ccr.corp.intel.com>
+References: <1584880325-10561-1-git-send-email-yi.l.liu@intel.com>
+ <1584880325-10561-7-git-send-email-yi.l.liu@intel.com>
+In-Reply-To: <1584880325-10561-7-git-send-email-yi.l.liu@intel.com>
+Accept-Language: en-US
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Content-Transfer-Encoding: quoted-printable
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
+MIME-Version: 1.0
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Zenghui,
+> From: Liu, Yi L <yi.l.liu@intel.com>
+> Sent: Sunday, March 22, 2020 8:32 PM
+> 
+> From: Liu Yi L <yi.l.liu@intel.com>
+> 
+> VFIO_TYPE1_NESTING_IOMMU is an IOMMU type which is backed by
+> hardware
+> IOMMUs that have nesting DMA translation (a.k.a dual stage address
+> translation). For such hardware IOMMUs, there are two stages/levels of
+> address translation, and software may let userspace/VM to own the first-
+> level/stage-1 translation structures. Example of such usage is vSVA (
+> virtual Shared Virtual Addressing). VM owns the first-level/stage-1
+> translation structures and bind the structures to host, then hardware
+> IOMMU would utilize nesting translation when doing DMA translation fo
+> the devices behind such hardware IOMMU.
+> 
+> This patch adds vfio support for binding guest translation (a.k.a stage 1)
+> structure to host iommu. And for VFIO_TYPE1_NESTING_IOMMU, not only
+> bind
+> guest page table is needed, it also requires to expose interface to guest
+> for iommu cache invalidation when guest modified the first-level/stage-1
+> translation structures since hardware needs to be notified to flush stale
+> iotlbs. This would be introduced in next patch.
+> 
+> In this patch, guest page table bind and unbind are done by using flags
+> VFIO_IOMMU_BIND_GUEST_PGTBL and
+> VFIO_IOMMU_UNBIND_GUEST_PGTBL under IOCTL
+> VFIO_IOMMU_BIND, the bind/unbind data are conveyed by
+> struct iommu_gpasid_bind_data. Before binding guest page table to host,
+> VM should have got a PASID allocated by host via
+> VFIO_IOMMU_PASID_REQUEST.
+> 
+> Bind guest translation structures (here is guest page table) to host
 
-On 3/30/20 2:06 PM, Zenghui Yu wrote:
-> Hi Eric,
->=20
-> On 2020/3/20 17:24, Eric Auger wrote:
->> Add two new migration tests. One testing the migration of
->> a topology where collection were unmapped. The second test
->> checks the migration of the pending table.
->>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->=20
-> [...]
->=20
->> @@ -659,6 +678,15 @@ static int its_prerequisites(int nb_cpus)
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return 0;
->> =C2=A0 }
->> =C2=A0 +static void set_lpi(struct its_device *dev, u32 eventid, u32 p=
-hysid,
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 st=
-ruct its_collection *col)
->> +{
->> +=C2=A0=C2=A0=C2=A0 assert(dev && col);
->> +
->> +=C2=A0=C2=A0=C2=A0 its_send_mapti(dev, physid, eventid, col);
->> +=C2=A0=C2=A0=C2=A0 gicv3_lpi_set_config(physid, LPI_PROP_DEFAULT);
->> +}
->=20
-> I'd say we can just drop this helper and open-code it anywhere
-> necessarily. The name 'set_lpi' doesn't tell me too much about
-> what has been implemented inside the helper.
->=20
->> +
->> =C2=A0 /*
->> =C2=A0=C2=A0 * Setup the configuration for those mappings:
->> =C2=A0=C2=A0 * dev_id=3D2 event=3D20 -> vcpu 3, intid=3D8195
->> @@ -790,6 +818,108 @@ static void test_its_migration(void)
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 its_send_int(dev7, 255);
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 check_lpi_stats("dev7/eventid=3D255 tri=
-ggers LPI 8196 on PE #2
->> after migration");
->> =C2=A0 }
->> +
->> +static void test_migrate_unmapped_collection(void)
->> +{
->> +=C2=A0=C2=A0=C2=A0 struct its_collection *col;
->> +=C2=A0=C2=A0=C2=A0 struct its_device *dev2, *dev7;
->> +=C2=A0=C2=A0=C2=A0 int pe0 =3D 0;
->> +=C2=A0=C2=A0=C2=A0 u8 config;
->> +
->> +=C2=A0=C2=A0=C2=A0 if (its_setup1())
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return;
->> +
->> +=C2=A0=C2=A0=C2=A0 col =3D its_create_collection(pe0, pe0);
->> +=C2=A0=C2=A0=C2=A0 dev2 =3D its_get_device(2);
->> +=C2=A0=C2=A0=C2=A0 dev7 =3D its_get_device(7);
->> +
->> +=C2=A0=C2=A0=C2=A0 /* MAPTI with the collection unmapped */
->> +=C2=A0=C2=A0=C2=A0 set_lpi(dev2, 0, 8192, col);
->=20
-> ... and it's only invoked here.
->=20
->> +
->> +=C2=A0=C2=A0=C2=A0 puts("Now migrate the VM, then press a key to cont=
-inue...\n");
->> +=C2=A0=C2=A0=C2=A0 (void)getchar();
->> +=C2=A0=C2=A0=C2=A0 report_info("Migration complete");
->> +
->> +=C2=A0=C2=A0=C2=A0 /* on the destination, map the collection */
->> +=C2=A0=C2=A0=C2=A0 its_send_mapc(col, true);
->> +=C2=A0=C2=A0=C2=A0 its_send_invall(col);
->> +
->> +=C2=A0=C2=A0=C2=A0 lpi_stats_expect(2, 8196);
->> +=C2=A0=C2=A0=C2=A0 its_send_int(dev7, 255);
->> +=C2=A0=C2=A0=C2=A0 check_lpi_stats("dev7/eventid=3D 255 triggered LPI=
- 8196 on PE #2");
->> +
->> +=C2=A0=C2=A0=C2=A0 config =3D gicv3_lpi_get_config(8192);
->> +=C2=A0=C2=A0=C2=A0 report(config =3D=3D LPI_PROP_DEFAULT,
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "Config =
-of LPI 8192 was properly migrated");
->> +
->> +=C2=A0=C2=A0=C2=A0 lpi_stats_expect(pe0, 8192);
->> +=C2=A0=C2=A0=C2=A0 its_send_int(dev2, 0);
->> +=C2=A0=C2=A0=C2=A0 check_lpi_stats("dev2/eventid =3D 0 triggered LPI =
-8192 on PE0");
->> +}
->> +
->> +static void test_its_pending_migration(void)
->> +{
->> +=C2=A0=C2=A0=C2=A0 struct its_device *dev;
->> +=C2=A0=C2=A0=C2=A0 struct its_collection *collection[2];
->> +=C2=A0=C2=A0=C2=A0 int *expected =3D malloc(nr_cpus * sizeof(int));
->> +=C2=A0=C2=A0=C2=A0 int pe0 =3D nr_cpus - 1, pe1 =3D nr_cpus - 2;
->> +=C2=A0=C2=A0=C2=A0 u64 pendbaser;
->> +=C2=A0=C2=A0=C2=A0 void *ptr;
->> +=C2=A0=C2=A0=C2=A0 int i;
->> +
->> +=C2=A0=C2=A0=C2=A0 if (its_prerequisites(4))
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return;
->> +
->> +=C2=A0=C2=A0=C2=A0 dev =3D its_create_device(2 /* dev id */, 8 /* nb_=
-ites */);
->> +=C2=A0=C2=A0=C2=A0 its_send_mapd(dev, true);
->> +
->> +=C2=A0=C2=A0=C2=A0 collection[0] =3D its_create_collection(pe0, pe0);
->> +=C2=A0=C2=A0=C2=A0 collection[1] =3D its_create_collection(pe1, pe1);
->> +=C2=A0=C2=A0=C2=A0 its_send_mapc(collection[0], true);
->> +=C2=A0=C2=A0=C2=A0 its_send_mapc(collection[1], true);
->> +
->> +=C2=A0=C2=A0=C2=A0 /* disable lpi at redist level */
->> +=C2=A0=C2=A0=C2=A0 gicv3_lpi_rdist_disable(pe0);
->> +=C2=A0=C2=A0=C2=A0 gicv3_lpi_rdist_disable(pe1);
->> +
->> +=C2=A0=C2=A0=C2=A0 /* lpis are interleaved inbetween the 2 PEs */
->> +=C2=A0=C2=A0=C2=A0 for (i =3D 0; i < 256; i++) {
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 struct its_collection *col=
- =3D i % 2 ? collection[0] :
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 collection[1];
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 int vcpu =3D col->target_a=
-ddress >> 16;
->> +
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 its_send_mapti(dev, LPI(i)=
-, i, col);
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 gicv3_lpi_set_config(LPI(i=
-), LPI_PROP_DEFAULT);
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 gicv3_lpi_set_clr_pending(=
-vcpu, LPI(i), true);
->> +=C2=A0=C2=A0=C2=A0 }
->> +=C2=A0=C2=A0=C2=A0 its_send_invall(collection[0]);
->> +=C2=A0=C2=A0=C2=A0 its_send_invall(collection[1]);
->> +
->> +=C2=A0=C2=A0=C2=A0 /* Clear the PTZ bit on each pendbaser */
->> +
->> +=C2=A0=C2=A0=C2=A0 expected[pe0] =3D 128;
->> +=C2=A0=C2=A0=C2=A0 expected[pe1] =3D 128;
->=20
-> Do we need to initialize expected[] for other PEs? Or it has always
-> been zeroed by the kvm-unit-tests implementation of malloc()?
->=20
->> +
->> +=C2=A0=C2=A0=C2=A0 ptr =3D gicv3_data.redist_base[pe0] + GICR_PENDBAS=
-ER;
->> +=C2=A0=C2=A0=C2=A0 pendbaser =3D readq(ptr);
->> +=C2=A0=C2=A0=C2=A0 writeq(pendbaser & ~GICR_PENDBASER_PTZ, ptr);
->> +
->> +=C2=A0=C2=A0=C2=A0 ptr =3D gicv3_data.redist_base[pe1] + GICR_PENDBAS=
-ER;
->> +=C2=A0=C2=A0=C2=A0 pendbaser =3D readq(ptr);
->> +=C2=A0=C2=A0=C2=A0 writeq(pendbaser & ~GICR_PENDBASER_PTZ, ptr);
->> +
->> +=C2=A0=C2=A0=C2=A0 gicv3_lpi_rdist_enable(pe0);
->> +=C2=A0=C2=A0=C2=A0 gicv3_lpi_rdist_enable(pe1);
->=20
-> I don't know how the migration gets implemented in kvm-unit-tests.
-> But is there any guarantee that the LPIs will only be triggered on the
-> destination side? As once the EnableLPIs bit becomes 1, VGIC will start
-> reading the pending bit in guest memory and potentially injecting LPIs
-> into the target vcpu (in the source side).
+Bind -> Binding
 
-I expect some LPIs to hit on source and some others to hit on the
-destination. To me, this does not really matter as long as the handlers
-gets called and accumulate the stats. Given the number of LPIs, we will
-at least test the migration of some of the pending bits and especially
-adjacent ones. It does work as it allows to test your fix:
+> are the first step to setup vSVA (Virtual Shared Virtual Addressing).
 
-ca185b260951  KVM: arm/arm64: vgic: Don't rely on the wrong pending table
+are -> is. and you already explained vSVA earlier.
 
-Thanks
+> 
+> Cc: Kevin Tian <kevin.tian@intel.com>
+> CC: Jacob Pan <jacob.jun.pan@linux.intel.com>
+> Cc: Alex Williamson <alex.williamson@redhat.com>
+> Cc: Eric Auger <eric.auger@redhat.com>
+> Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>
+> Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.com>
+> Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
+> Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
+> ---
+>  drivers/vfio/vfio_iommu_type1.c | 158
+> ++++++++++++++++++++++++++++++++++++++++
+>  include/uapi/linux/vfio.h       |  46 ++++++++++++
+>  2 files changed, 204 insertions(+)
+> 
+> diff --git a/drivers/vfio/vfio_iommu_type1.c
+> b/drivers/vfio/vfio_iommu_type1.c
+> index 82a9e0b..a877747 100644
+> --- a/drivers/vfio/vfio_iommu_type1.c
+> +++ b/drivers/vfio/vfio_iommu_type1.c
+> @@ -130,6 +130,33 @@ struct vfio_regions {
+>  #define IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu)	\
+>  					(!list_empty(&iommu->domain_list))
+> 
+> +struct domain_capsule {
+> +	struct iommu_domain *domain;
+> +	void *data;
+> +};
+> +
+> +/* iommu->lock must be held */
+> +static int vfio_iommu_for_each_dev(struct vfio_iommu *iommu,
+> +		      int (*fn)(struct device *dev, void *data),
+> +		      void *data)
+> +{
+> +	struct domain_capsule dc = {.data = data};
+> +	struct vfio_domain *d;
+> +	struct vfio_group *g;
+> +	int ret = 0;
+> +
+> +	list_for_each_entry(d, &iommu->domain_list, next) {
+> +		dc.domain = d->domain;
+> +		list_for_each_entry(g, &d->group_list, next) {
+> +			ret = iommu_group_for_each_dev(g->iommu_group,
+> +						       &dc, fn);
+> +			if (ret)
+> +				break;
+> +		}
+> +	}
+> +	return ret;
+> +}
+> +
+>  static int put_pfn(unsigned long pfn, int prot);
+> 
+>  /*
+> @@ -2314,6 +2341,88 @@ static int
+> vfio_iommu_info_add_nesting_cap(struct vfio_iommu *iommu,
+>  	return 0;
+>  }
+> 
+> +static int vfio_bind_gpasid_fn(struct device *dev, void *data)
+> +{
+> +	struct domain_capsule *dc = (struct domain_capsule *)data;
+> +	struct iommu_gpasid_bind_data *gbind_data =
+> +		(struct iommu_gpasid_bind_data *) dc->data;
+> +
 
-Eric
->=20
->> +
->> +=C2=A0=C2=A0=C2=A0 puts("Now migrate the VM, then press a key to cont=
-inue...\n");
->> +=C2=A0=C2=A0=C2=A0 (void)getchar();
->> +=C2=A0=C2=A0=C2=A0 report_info("Migration complete");
->> +
->> +=C2=A0=C2=A0=C2=A0 /* let's wait for the 256 LPIs to be handled */
->> +=C2=A0=C2=A0=C2=A0 mdelay(1000);
->> +
->> +=C2=A0=C2=A0=C2=A0 check_lpi_hits(expected, "128 LPIs on both PE0 and=
- PE1 after
->> migration");
->> +}
->=20
->=20
-> Thanks,
-> Zenghui
->=20
->=20
+In Jacob's vSVA iommu series, [PATCH 06/11]:
+
++		/* REVISIT: upper layer/VFIO can track host process that bind the PASID.
++		 * ioasid_set = mm might be sufficient for vfio to check pasid VMM
++		 * ownership.
++		 */
+
+I asked him who exactly should be responsible for tracking the pasid
+ownership. Although no response yet, I expect vfio/iommu can have
+a clear policy and also documented here to provide consistent 
+message.
+
+> +	return iommu_sva_bind_gpasid(dc->domain, dev, gbind_data);
+> +}
+> +
+> +static int vfio_unbind_gpasid_fn(struct device *dev, void *data)
+> +{
+> +	struct domain_capsule *dc = (struct domain_capsule *)data;
+> +	struct iommu_gpasid_bind_data *gbind_data =
+> +		(struct iommu_gpasid_bind_data *) dc->data;
+> +
+> +	return iommu_sva_unbind_gpasid(dc->domain, dev,
+> +					gbind_data->hpasid);
+
+curious why we have to share the same bind_data structure
+between bind and unbind, especially when unbind requires
+only one field? I didn't see a clear reason, and just similar
+to earlier ALLOC/FREE which don't share structure either.
+Current way simply wastes space for unbind operation...
+
+> +}
+> +
+> +/**
+> + * Unbind specific gpasid, caller of this function requires hold
+> + * vfio_iommu->lock
+> + */
+> +static long vfio_iommu_type1_do_guest_unbind(struct vfio_iommu
+> *iommu,
+> +				struct iommu_gpasid_bind_data *gbind_data)
+> +{
+> +	return vfio_iommu_for_each_dev(iommu,
+> +				vfio_unbind_gpasid_fn, gbind_data);
+> +}
+> +
+> +static long vfio_iommu_type1_bind_gpasid(struct vfio_iommu *iommu,
+> +				struct iommu_gpasid_bind_data *gbind_data)
+> +{
+> +	int ret = 0;
+> +
+> +	mutex_lock(&iommu->lock);
+> +	if (!IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu)) {
+> +		ret = -EINVAL;
+> +		goto out_unlock;
+> +	}
+> +
+> +	ret = vfio_iommu_for_each_dev(iommu,
+> +			vfio_bind_gpasid_fn, gbind_data);
+> +	/*
+> +	 * If bind failed, it may not be a total failure. Some devices
+> +	 * within the iommu group may have bind successfully. Although
+> +	 * we don't enable pasid capability for non-singletion iommu
+> +	 * groups, a unbind operation would be helpful to ensure no
+> +	 * partial binding for an iommu group.
+> +	 */
+> +	if (ret)
+> +		/*
+> +		 * Undo all binds that already succeeded, no need to
+
+binds -> bindings
+
+> +		 * check the return value here since some device within
+> +		 * the group has no successful bind when coming to this
+> +		 * place switch.
+> +		 */
+
+remove 'switch'
+
+> +		vfio_iommu_type1_do_guest_unbind(iommu, gbind_data);
+> +
+> +out_unlock:
+> +	mutex_unlock(&iommu->lock);
+> +	return ret;
+> +}
+> +
+> +static long vfio_iommu_type1_unbind_gpasid(struct vfio_iommu *iommu,
+> +				struct iommu_gpasid_bind_data *gbind_data)
+> +{
+> +	int ret = 0;
+> +
+> +	mutex_lock(&iommu->lock);
+> +	if (!IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu)) {
+> +		ret = -EINVAL;
+> +		goto out_unlock;
+> +	}
+> +
+> +	ret = vfio_iommu_type1_do_guest_unbind(iommu, gbind_data);
+> +
+> +out_unlock:
+> +	mutex_unlock(&iommu->lock);
+> +	return ret;
+> +}
+> +
+>  static long vfio_iommu_type1_ioctl(void *iommu_data,
+>  				   unsigned int cmd, unsigned long arg)
+>  {
+> @@ -2471,6 +2580,55 @@ static long vfio_iommu_type1_ioctl(void
+> *iommu_data,
+>  		default:
+>  			return -EINVAL;
+>  		}
+> +
+> +	} else if (cmd == VFIO_IOMMU_BIND) {
+
+BIND what? VFIO_IOMMU_BIND_PASID sounds clearer to me.
+
+> +		struct vfio_iommu_type1_bind bind;
+> +		u32 version;
+> +		int data_size;
+> +		void *gbind_data;
+> +		int ret;
+> +
+> +		minsz = offsetofend(struct vfio_iommu_type1_bind, flags);
+> +
+> +		if (copy_from_user(&bind, (void __user *)arg, minsz))
+> +			return -EFAULT;
+> +
+> +		if (bind.argsz < minsz)
+> +			return -EINVAL;
+> +
+> +		/* Get the version of struct iommu_gpasid_bind_data */
+> +		if (copy_from_user(&version,
+> +			(void __user *) (arg + minsz),
+> +					sizeof(version)))
+> +			return -EFAULT;
+> +
+> +		data_size = iommu_uapi_get_data_size(
+> +				IOMMU_UAPI_BIND_GPASID, version);
+> +		gbind_data = kzalloc(data_size, GFP_KERNEL);
+> +		if (!gbind_data)
+> +			return -ENOMEM;
+> +
+> +		if (copy_from_user(gbind_data,
+> +			 (void __user *) (arg + minsz), data_size)) {
+> +			kfree(gbind_data);
+> +			return -EFAULT;
+> +		}
+> +
+> +		switch (bind.flags & VFIO_IOMMU_BIND_MASK) {
+> +		case VFIO_IOMMU_BIND_GUEST_PGTBL:
+> +			ret = vfio_iommu_type1_bind_gpasid(iommu,
+> +							   gbind_data);
+> +			break;
+> +		case VFIO_IOMMU_UNBIND_GUEST_PGTBL:
+> +			ret = vfio_iommu_type1_unbind_gpasid(iommu,
+> +							     gbind_data);
+> +			break;
+> +		default:
+> +			ret = -EINVAL;
+> +			break;
+> +		}
+> +		kfree(gbind_data);
+> +		return ret;
+>  	}
+> 
+>  	return -ENOTTY;
+> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+> index ebeaf3e..2235bc6 100644
+> --- a/include/uapi/linux/vfio.h
+> +++ b/include/uapi/linux/vfio.h
+> @@ -14,6 +14,7 @@
+> 
+>  #include <linux/types.h>
+>  #include <linux/ioctl.h>
+> +#include <linux/iommu.h>
+> 
+>  #define VFIO_API_VERSION	0
+> 
+> @@ -853,6 +854,51 @@ struct vfio_iommu_type1_pasid_request {
+>   */
+>  #define VFIO_IOMMU_PASID_REQUEST	_IO(VFIO_TYPE, VFIO_BASE +
+> 22)
+> 
+> +/**
+> + * Supported flags:
+> + *	- VFIO_IOMMU_BIND_GUEST_PGTBL: bind guest page tables to host
+> for
+> + *			nesting type IOMMUs. In @data field It takes struct
+> + *			iommu_gpasid_bind_data.
+> + *	- VFIO_IOMMU_UNBIND_GUEST_PGTBL: undo a bind guest page
+> table operation
+> + *			invoked by VFIO_IOMMU_BIND_GUEST_PGTBL.
+> + *
+> + */
+> +struct vfio_iommu_type1_bind {
+> +	__u32		argsz;
+> +	__u32		flags;
+> +#define VFIO_IOMMU_BIND_GUEST_PGTBL	(1 << 0)
+> +#define VFIO_IOMMU_UNBIND_GUEST_PGTBL	(1 << 1)
+> +	__u8		data[];
+> +};
+> +
+> +#define VFIO_IOMMU_BIND_MASK	(VFIO_IOMMU_BIND_GUEST_PGTBL
+> | \
+> +
+> 	VFIO_IOMMU_UNBIND_GUEST_PGTBL)
+> +
+> +/**
+> + * VFIO_IOMMU_BIND - _IOW(VFIO_TYPE, VFIO_BASE + 23,
+> + *				struct vfio_iommu_type1_bind)
+> + *
+> + * Manage address spaces of devices in this container. Initially a TYPE1
+> + * container can only have one address space, managed with
+> + * VFIO_IOMMU_MAP/UNMAP_DMA.
+
+the last sentence seems irrelevant and more suitable in commit msg.
+
+> + *
+> + * An IOMMU of type VFIO_TYPE1_NESTING_IOMMU can be managed by
+> both MAP/UNMAP
+> + * and BIND ioctls at the same time. MAP/UNMAP acts on the stage-2 (host)
+> page
+> + * tables, and BIND manages the stage-1 (guest) page tables. Other types of
+
+Are "other types" the counterpart to VFIO_TYPE1_NESTING_IOMMU?
+What are those types? I thought only NESTING_IOMMU allows two
+stage translation...
+
+> + * IOMMU may allow MAP/UNMAP and BIND to coexist, where
+
+The first sentence said the same thing. Then what is the exact difference?
+
+> MAP/UNMAP controls
+> + * the traffics only require single stage translation while BIND controls the
+> + * traffics require nesting translation. But this depends on the underlying
+> + * IOMMU architecture and isn't guaranteed. Example of this is the guest
+> SVA
+> + * traffics, such traffics need nesting translation to gain gVA->gPA and then
+> + * gPA->hPA translation.
+
+I'm a bit confused about the content since "other types of". Are they
+trying to state some exceptions/corner cases that this API cannot
+resolve or explain the desired behavior of the API? Especially the
+last example, which is worded as if the example for "isn't guaranteed"
+but isn't guest SVA the main purpose of this API?
+
+> + *
+> + * Availability of this feature depends on the device, its bus, the underlying
+> + * IOMMU and the CPU architecture.
+> + *
+> + * returns: 0 on success, -errno on failure.
+> + */
+> +#define VFIO_IOMMU_BIND		_IO(VFIO_TYPE, VFIO_BASE + 23)
+> +
+>  /* -------- Additional API for SPAPR TCE (Server POWERPC) IOMMU -------- */
+> 
+>  /*
+> --
+> 2.7.4
 
