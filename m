@@ -2,107 +2,84 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id CE78C1976E5
-	for <lists+kvm@lfdr.de>; Mon, 30 Mar 2020 10:47:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E563E1976F5
+	for <lists+kvm@lfdr.de>; Mon, 30 Mar 2020 10:49:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729493AbgC3IrK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 30 Mar 2020 04:47:10 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:53024 "EHLO
-        us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729422AbgC3IrK (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 30 Mar 2020 04:47:10 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1585558029;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=V3toyHtdmIDsvhTBATPytSTJjTPkQkswWc1NSEnUkCA=;
-        b=LTkVOMWBQRhpPmr+aAo23tg0yHahoUOyYTuWNPb/7yfuw5n66o/d2Ex8bF14OSGznhTSOO
-        ZOAdv5IPHsbVNyPJQ+ITOtaJMDbTKBGPab536hEQ9X8Qwr0UY2UPSKUD52+at9v7focON8
-        o+tgiIq6JmLDH5AiVthFIDCHgRG363A=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-318-PV9z_La-NdqheXia0TXc2w-1; Mon, 30 Mar 2020 04:47:05 -0400
-X-MC-Unique: PV9z_La-NdqheXia0TXc2w-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 427BD1937FC0;
-        Mon, 30 Mar 2020 08:47:04 +0000 (UTC)
-Received: from [10.36.112.58] (ovpn-112-58.ams2.redhat.com [10.36.112.58])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id C33CE19925;
-        Mon, 30 Mar 2020 08:46:58 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH v7 06/13] arm/arm64: ITS: Introspection
- tests
-To:     Zenghui Yu <yuzenghui@huawei.com>
-Cc:     eric.auger.pro@gmail.com, maz@kernel.org,
-        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        qemu-devel@nongnu.org, qemu-arm@nongnu.org, drjones@redhat.com,
-        andre.przywara@arm.com, peter.maydell@linaro.org,
-        alexandru.elisei@arm.com, thuth@redhat.com
-References: <20200320092428.20880-1-eric.auger@redhat.com>
- <20200320092428.20880-7-eric.auger@redhat.com>
- <947a79f5-1f79-532b-9ec7-6fd539ccd183@huawei.com>
-From:   Auger Eric <eric.auger@redhat.com>
-Message-ID: <8878be7f-7653-b427-cd0d-722f82fb6b65@redhat.com>
-Date:   Mon, 30 Mar 2020 10:46:57 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+        id S1729749AbgC3ItV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 30 Mar 2020 04:49:21 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:15382 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728759AbgC3ItV (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 30 Mar 2020 04:49:21 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 02U8XPOj151208;
+        Mon, 30 Mar 2020 04:49:19 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 30206wwuxn-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 30 Mar 2020 04:49:19 -0400
+Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 02U8XgN4152297;
+        Mon, 30 Mar 2020 04:49:19 -0400
+Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.10])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 30206wwuxg-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 30 Mar 2020 04:49:19 -0400
+Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
+        by ppma02dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 02U8lbpo009087;
+        Mon, 30 Mar 2020 08:49:18 GMT
+Received: from b03cxnp08028.gho.boulder.ibm.com (b03cxnp08028.gho.boulder.ibm.com [9.17.130.20])
+        by ppma02dal.us.ibm.com with ESMTP id 301x76k73n-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 30 Mar 2020 08:49:18 +0000
+Received: from b03ledav004.gho.boulder.ibm.com (b03ledav004.gho.boulder.ibm.com [9.17.130.235])
+        by b03cxnp08028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 02U8nHLH62652674
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 30 Mar 2020 08:49:17 GMT
+Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 4DB5F7805C;
+        Mon, 30 Mar 2020 08:49:17 +0000 (GMT)
+Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id ADAE27805F;
+        Mon, 30 Mar 2020 08:49:16 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.114.17.106])
+        by b03ledav004.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Mon, 30 Mar 2020 08:49:16 +0000 (GMT)
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+To:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.vnet.ibm.com>
+Cc:     KVM <kvm@vger.kernel.org>, David Hildenbrand <david@redhat.com>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Thomas Huth <thuth@redhat.com>
+Subject: [kvm-unit-tests 0/2] s390x/smp fix and enhancement
+Date:   Mon, 30 Mar 2020 04:49:09 -0400
+Message-Id: <20200330084911.34248-1-borntraeger@de.ibm.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-In-Reply-To: <947a79f5-1f79-532b-9ec7-6fd539ccd183@huawei.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.645
+ definitions=2020-03-30_01:2020-03-27,2020-03-30 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 malwarescore=0
+ spamscore=0 lowpriorityscore=0 adultscore=0 mlxlogscore=828 suspectscore=0
+ bulkscore=0 phishscore=0 priorityscore=1501 mlxscore=0 impostorscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
+ definitions=main-2003300076
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Zenghui,
+Christian Borntraeger (2):
+  s390x/smp: fix detection of "running"
+  s390x/smp: add minimal test for sigp sense running status
 
-On 3/30/20 10:30 AM, Zenghui Yu wrote:
-> Hi Eric,
->=20
-> On 2020/3/20 17:24, Eric Auger wrote:
->> +static void its_cmd_queue_init(void)
->> +{
->> +=C2=A0=C2=A0=C2=A0 unsigned long order =3D get_order(SZ_64K >> PAGE_S=
-HIFT);
->> +=C2=A0=C2=A0=C2=A0 u64 cbaser;
->> +
->> +=C2=A0=C2=A0=C2=A0 its_data.cmd_base =3D (void *)virt_to_phys(alloc_p=
-ages(order));
->=20
-> Shouldn't the cmd_base (and the cmd_write) be set as a GVA?
-yes it should
->=20
-> Otherwise I think we will end-up with memory corruption when writing
-> the command queue.=C2=A0 But it seems that everything just works fine .=
-..
-> So I'm really confused here :-/
-I was told by Paolo that the VA/PA memory map is flat in kvmunit test.
+ lib/s390x/smp.c |  4 ++--
+ lib/s390x/smp.h |  2 +-
+ s390x/smp.c     | 11 +++++++++++
+ 3 files changed, 14 insertions(+), 3 deletions(-)
 
->=20
->> +
->> +=C2=A0=C2=A0=C2=A0 cbaser =3D ((u64)its_data.cmd_base | (SZ_64K / SZ_=
-4K - 1)=C2=A0=C2=A0=C2=A0 |
->> GITS_CBASER_VALID);
->> +
->> +=C2=A0=C2=A0=C2=A0 writeq(cbaser, its_data.base + GITS_CBASER);
->> +
->> +=C2=A0=C2=A0=C2=A0 its_data.cmd_write =3D its_data.cmd_base;
->> +=C2=A0=C2=A0=C2=A0 writeq(0, its_data.base + GITS_CWRITER);
->> +}
->=20
-> Otherwise this looks good,
-> Reviewed-by: Zenghui Yu <yuzenghui@huawei.com>
-Thanks!
-
-Eric
->=20
->=20
-> Thanks
->=20
+-- 
+2.25.1
 
