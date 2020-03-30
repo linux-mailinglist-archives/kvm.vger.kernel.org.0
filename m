@@ -2,167 +2,158 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6BC7519778C
-	for <lists+kvm@lfdr.de>; Mon, 30 Mar 2020 11:14:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B0693197799
+	for <lists+kvm@lfdr.de>; Mon, 30 Mar 2020 11:16:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728071AbgC3JOD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 30 Mar 2020 05:14:03 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:32667 "EHLO
+        id S1728301AbgC3JP7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 30 Mar 2020 05:15:59 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:25243 "EHLO
         us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726385AbgC3JOC (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 30 Mar 2020 05:14:02 -0400
+        by vger.kernel.org with ESMTP id S1727925AbgC3JP7 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 30 Mar 2020 05:15:59 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1585559641;
+        s=mimecast20190719; t=1585559757;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=G3YtU9cQSu/MJLCZpAjz+jBQ87NL+MN25O2wNM+ILfI=;
-        b=WK4kMj6zCr5+qw+2ycIG/TM/Bq/kM+FYz52zsCNfccygywmOvqf5aeYwASbj0Ej9ArJxtn
-        eSHTlCXpME7zSjbw7+ns9/Ndu0RLPV7XMFS92E/4dHEVRREtyx3I+q1oA4uIGtJS0y4Bqb
-        VFRWsqYHFhJc3WGE/11k7bhZ4EJYnT4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-174-htfeA-L7OCOCs7vXl5OVkQ-1; Mon, 30 Mar 2020 05:13:59 -0400
-X-MC-Unique: htfeA-L7OCOCs7vXl5OVkQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 23080801A06;
-        Mon, 30 Mar 2020 09:13:58 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.40.193.172])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id C066D1036D00;
-        Mon, 30 Mar 2020 09:13:51 +0000 (UTC)
-Date:   Mon, 30 Mar 2020 11:13:48 +0200
-From:   Andrew Jones <drjones@redhat.com>
-To:     Auger Eric <eric.auger@redhat.com>
-Cc:     Zenghui Yu <yuzenghui@huawei.com>, peter.maydell@linaro.org,
-        kvm@vger.kernel.org, maz@kernel.org, qemu-devel@nongnu.org,
-        qemu-arm@nongnu.org, andre.przywara@arm.com, thuth@redhat.com,
-        alexandru.elisei@arm.com, kvmarm@lists.cs.columbia.edu,
-        eric.auger.pro@gmail.com
-Subject: Re: [kvm-unit-tests PATCH v7 08/13] arm/arm64: ITS: Device and
- collection Initialization
-Message-ID: <20200330091348.izdzq5ekc47vg2y3@kamzik.brq.redhat.com>
-References: <20200320092428.20880-1-eric.auger@redhat.com>
- <20200320092428.20880-9-eric.auger@redhat.com>
- <63f3d8aa-c1e3-f40f-32a1-fb6d22e70541@huawei.com>
- <c5ce7101-9ea3-8b04-7ec0-cb27dfbdc116@redhat.com>
+        bh=zemqa+eFWbSRqKFbVoTd6828wtJbQvKtR1Vj/t4nfws=;
+        b=ijkjwL5FqXjDfXTK6tSFRz/dMNqOl08HOKnAvrEWech/P8+rbowSpc9X5Y++NKQ24UNB0H
+        UHbqdTyh7sFzcQGMXdOP7ltvff1g45ILPVpg/fLNMhAgkeJHpNiur7C5E3GvT2IOIVvu1X
+        MOmyTpbgMbB09RzV3mQn4YJT7agPVFk=
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
+ [209.85.222.198]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-356-_mA3n72BOgG4XJzCkpkpJw-1; Mon, 30 Mar 2020 05:15:56 -0400
+X-MC-Unique: _mA3n72BOgG4XJzCkpkpJw-1
+Received: by mail-qk1-f198.google.com with SMTP id r64so13859378qkc.17
+        for <kvm@vger.kernel.org>; Mon, 30 Mar 2020 02:15:55 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=zemqa+eFWbSRqKFbVoTd6828wtJbQvKtR1Vj/t4nfws=;
+        b=n4US+4qx3uG6Jp5c2y+b85mQX8fWFuUMbfiGurRkuXCyqTngh9fDgh49rFLi/hxKCP
+         QbJNpWnkzHWM7FqhgDvEkDmstdKYQuHaFaKHAWz9krRZYe8b6SgG2gC4GiBm94R/HGbj
+         L85YZN9nIdylxDhC3DCY8bSRZUpzDcIFLLtwQQZ98gpr5TpVSE2PxBfoOTyPL2Zsb++d
+         Hfb1Z5ejOJPtSOuKZoipPMwh1lOV+iH6k1PJd1+yH+DHeviCMpC814m7J613BTYLF2vA
+         QWmyFIzlVeDL1QC1KSKe93v4xfRxCbAFdtxjS6MxeeJYS9j+yoyofddD7TvksVdqK0Zf
+         FOaQ==
+X-Gm-Message-State: ANhLgQ3sVZq7EEeVvodowNmuIPBiSryMsP984YvQF3vaCnue/KTl3b7U
+        tqU+T3HLy2ngmLthdglXbpr53jE+nqrY/vgDx/fOtiZZQ3u+qq/6g93nmDqDgKKiwNaktQ68BwB
+        ONxZFVvi/sIRt8elbXtz24eudlmgH
+X-Received: by 2002:ae9:eb12:: with SMTP id b18mr4617822qkg.168.1585559755410;
+        Mon, 30 Mar 2020 02:15:55 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vtmZS/6wgLxWT3ZU/CS/qVPDcBOgRfiDiQ203JJ58Kdixi7MMbXpUC+A+8C7IiEGVQnJsaMv5FmAfbHLS/iB3g=
+X-Received: by 2002:ae9:eb12:: with SMTP id b18mr4617794qkg.168.1585559754968;
+ Mon, 30 Mar 2020 02:15:54 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <c5ce7101-9ea3-8b04-7ec0-cb27dfbdc116@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+References: <20200329113359.30960-1-eperezma@redhat.com> <bb95e827-f219-32fd-0046-41046eec058b@de.ibm.com>
+ <CAJaqyWePfMcXhYEPxKYV22J3cYtO=DUXCj1Yf=7XH+khXHop9A@mail.gmail.com> <41dfa0e5-8013-db15-cbfe-aa4574cfb9a0@de.ibm.com>
+In-Reply-To: <41dfa0e5-8013-db15-cbfe-aa4574cfb9a0@de.ibm.com>
+From:   Eugenio Perez Martin <eperezma@redhat.com>
+Date:   Mon, 30 Mar 2020 11:15:18 +0200
+Message-ID: <CAJaqyWfq3TGiQ9GSqdFVAZyydg29BoKiJFGKep+h3BoV5POLHQ@mail.gmail.com>
+Subject: Re: [PATCH 0/6] vhost: Reset batched descriptors on SET_VRING_BASE call
+To:     Christian Borntraeger <borntraeger@de.ibm.com>
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Stephen Rothwell <sfr@canb.auug.org.au>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>,
+        kvm list <kvm@vger.kernel.org>,
+        Cornelia Huck <cohuck@redhat.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 25, 2020 at 10:20:43PM +0100, Auger Eric wrote:
-> Hi Zenghui,
->=20
-> On 3/25/20 9:10 AM, Zenghui Yu wrote:
-> > Hi Eric,
-> >=20
-> > On 2020/3/20 17:24, Eric Auger wrote:
-> >> Introduce an helper functions to register
-> >> - a new device, characterized by its device id and the
-> >> =A0=A0 max number of event IDs that dimension its ITT (Interrupt
-> >> =A0=A0 Translation Table).=A0 The function allocates the ITT.
+On Mon, Mar 30, 2020 at 9:34 AM Christian Borntraeger
+<borntraeger@de.ibm.com> wrote:
+>
+>
+>
+> On 30.03.20 09:18, Eugenio Perez Martin wrote:
+> > On Mon, Mar 30, 2020 at 9:14 AM Christian Borntraeger
+> > <borntraeger@de.ibm.com> wrote:
 > >>
-> >> - a new collection, characterized by its ID and the
-> >> =A0=A0 target processing engine (PE).
 > >>
-> >> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> >> On 29.03.20 13:33, Eugenio P=C3=A9rez wrote:
+> >>> Vhost did not reset properly the batched descriptors on SET_VRING_BAS=
+E event. Because of that, is possible to return an invalid descriptor to th=
+e guest.
 > >>
-> >> ---
+> >> I guess this could explain my problems that I have seen during reset?
 > >>
-> >> v3 -> v4:
-> >> - remove unused its_baser variable from its_create_device()
-> >> - use get_order()
-> >> - device->itt becomes a GVA instead of GPA
-> >>
-> >> v2 -> v3:
-> >> - s/report_abort/assert
-> >>
-> >> v1 -> v2:
-> >> - s/nb_/nr_
-> >> ---
-> >> =A0 lib/arm64/asm/gic-v3-its.h | 19 +++++++++++++++++++
-> >> =A0 lib/arm64/gic-v3-its.c=A0=A0=A0=A0 | 38 ++++++++++++++++++++++++=
-++++++++++++++
-> >> =A0 2 files changed, 57 insertions(+)
-> >>
-> >> diff --git a/lib/arm64/asm/gic-v3-its.h b/lib/arm64/asm/gic-v3-its.h
-> >> index 4683011..adcb642 100644
-> >> --- a/lib/arm64/asm/gic-v3-its.h
-> >> +++ b/lib/arm64/asm/gic-v3-its.h
-> >> @@ -31,6 +31,19 @@ struct its_baser {
-> >> =A0 };
-> >> =A0 =A0 #define GITS_BASER_NR_REGS=A0=A0=A0=A0=A0=A0=A0 8
-> >> +#define GITS_MAX_DEVICES=A0=A0=A0=A0=A0=A0=A0 8
-> >> +#define GITS_MAX_COLLECTIONS=A0=A0=A0=A0=A0=A0=A0 8
-> >> +
-> >> +struct its_device {
-> >> +=A0=A0=A0 u32 device_id;=A0=A0=A0 /* device ID */
-> >> +=A0=A0=A0 u32 nr_ites;=A0=A0=A0 /* Max Interrupt Translation Entrie=
-s */
-> >> +=A0=A0=A0 void *itt;=A0=A0=A0 /* Interrupt Translation Table GVA */
-> >> +};
-> >> +
-> >> +struct its_collection {
-> >> +=A0=A0=A0 u64 target_address;
-> >> +=A0=A0=A0 u16 col_id;
-> >> +};
-> >> =A0 =A0 struct its_data {
-> >> =A0=A0=A0=A0=A0 void *base;
-> >> @@ -39,6 +52,10 @@ struct its_data {
-> >> =A0=A0=A0=A0=A0 struct its_baser coll_baser;
-> >> =A0=A0=A0=A0=A0 struct its_cmd_block *cmd_base;
-> >> =A0=A0=A0=A0=A0 struct its_cmd_block *cmd_write;
-> >> +=A0=A0=A0 struct its_device devices[GITS_MAX_DEVICES];
-> >> +=A0=A0=A0 u32 nr_devices;=A0=A0=A0=A0=A0=A0=A0 /* Allocated Devices=
- */
-> >> +=A0=A0=A0 struct its_collection collections[GITS_MAX_COLLECTIONS];
-> >> +=A0=A0=A0 u32 nr_collections;=A0=A0=A0 /* Allocated Collections */
-> >> =A0 };
-> >> =A0 =A0 extern struct its_data its_data;
-> >> @@ -93,5 +110,7 @@ extern void its_parse_typer(void);
-> >> =A0 extern void its_init(void);
-> >> =A0 extern int its_baser_lookup(int i, struct its_baser *baser);
-> >> =A0 extern void its_enable_defaults(void);
-> >> +extern struct its_device *its_create_device(u32 dev_id, int nr_ites=
-);
-> >> +extern struct its_collection *its_create_collection(u32 col_id, u32
-> >> target_pe);
-> >=20
-> > Maybe use 'u16 col_id'?
-> fair enough. At this point, not sure this is worth a respin though ;-)
+> >
+> > Yes, I think so. The series has a test that should reproduce more or
+> > less what you are seeing. However, it would be useful to reproduce on
+> > your system and to know what causes qemu to send the reset :).
+>
+> I do see SET_VRING_BASE in the debug output
+> [228101.438630] [2113] vhost:vhost_vring_ioctl:1668: VHOST_GET_VRING_BASE=
+ [vq=3D00000000618905fc][s.index=3D1][s.num=3D42424][vq->avail_idx=3D42424]=
+[vq->last_avail_idx=3D42424][vq->ndescs=3D0][vq->first_desc=3D0]
+> [228101.438631] CPU: 54 PID: 2113 Comm: qemu-system-s39 Not tainted 5.5.0=
++ #344
+> [228101.438632] Hardware name: IBM 3906 M04 704 (LPAR)
+> [228101.438633] Call Trace:
+> [228101.438634]  [<00000004fc71c132>] show_stack+0x8a/0xd0
+> [228101.438636]  [<00000004fd10e72a>] dump_stack+0x8a/0xb8
+> [228101.438639]  [<000003ff80377600>] vhost_vring_ioctl+0x668/0x848 [vhos=
+t]
+> [228101.438640]  [<000003ff80395fd4>] vhost_net_ioctl+0x4f4/0x570 [vhost_=
+net]
+> [228101.438642]  [<00000004fc9ccdd8>] do_vfs_ioctl+0x430/0x6f8
+> [228101.438643]  [<00000004fc9cd124>] ksys_ioctl+0x84/0xb0
+> [228101.438645]  [<00000004fc9cd1ba>] __s390x_sys_ioctl+0x2a/0x38
+> [228101.438646]  [<00000004fd12ff72>] system_call+0x2a6/0x2c8
+> [228103.682732] [2122] vhost:vhost_vring_ioctl:1653: VHOST_SET_VRING_BASE=
+ [vq=3D000000009e1ac3e7][s.index=3D0][s.num=3D0][vq->avail_idx=3D27875][vq-=
+>last_avail_idx=3D27709][vq->ndescs=3D65][vq->first_desc=3D22]
+> [228103.682735] CPU: 44 PID: 2122 Comm: CPU 0/KVM Not tainted 5.5.0+ #344
+> [228103.682739] Hardware name: IBM 3906 M04 704 (LPAR)
+> [228103.682741] Call Trace:
+> [228103.682748]  [<00000004fc71c132>] show_stack+0x8a/0xd0
+> [228103.682752]  [<00000004fd10e72a>] dump_stack+0x8a/0xb8
+> [228103.682761]  [<000003ff80377422>] vhost_vring_ioctl+0x48a/0x848 [vhos=
+t]
+> [228103.682764]  [<000003ff80395fd4>] vhost_net_ioctl+0x4f4/0x570 [vhost_=
+net]
+> [228103.682767]  [<00000004fc9ccdd8>] do_vfs_ioctl+0x430/0x6f8
+> [228103.682769]  [<00000004fc9cd124>] ksys_ioctl+0x84/0xb0
+> [228103.682771]  [<00000004fc9cd1ba>] __s390x_sys_ioctl+0x2a/0x38
+> [228103.682773]  [<00000004fd12ff72>] system_call+0x2a6/0x2c8
+> [228103.682794] [2122] vhost:vhost_vring_ioctl:1653: VHOST_SET_VRING_BASE=
+ [vq=3D00000000618905fc][s.index=3D1][s.num=3D0][vq->avail_idx=3D42424][vq-=
+>last_avail_idx=3D42424][vq->ndescs=3D0][vq->first_desc=3D0]
+> [228103.682795] CPU: 44 PID: 2122 Comm: CPU 0/KVM Not tainted 5.5.0+ #344
+> [228103.682797] Hardware name: IBM 3906 M04 704 (LPAR)
+> [228103.682797] Call Trace:
+> [228103.682799]  [<00000004fc71c132>] show_stack+0x8a/0xd0
+> [228103.682801]  [<00000004fd10e72a>] dump_stack+0x8a/0xb8
+> [228103.682804]  [<000003ff80377422>] vhost_vring_ioctl+0x48a/0x848 [vhos=
+t]
+> [228103.682806]  [<000003ff80395fd4>] vhost_net_ioctl+0x4f4/0x570 [vhost_=
+net]
+> [228103.682808]  [<00000004fc9ccdd8>] do_vfs_ioctl+0x430/0x6f8
+> [228103.682810]  [<00000004fc9cd124>] ksys_ioctl+0x84/0xb0
+> [228103.682812]  [<00000004fc9cd1ba>] __s390x_sys_ioctl+0x2a/0x38
+> [228103.682813]  [<00000004fd12ff72>] system_call+0x2a6/0x2c8
+>
+>
+> Isnt that triggered by resetting the virtio devices during system reboot?
+>
 
-I'd like all the virt_to_phys calls removed where there are not necessary=
-,
-which was pointed out in a different patch. This can be fixed up at the
-same time.
+Yes. I don't know exactly why qemu is sending them, but vhost should
+be able to "protect/continue" the same way it used to be before
+batching patches.
 
-Thanks,
-drew
+Did you lose connectivity or experienced rebooting with this patches applie=
+d?
 
-> >=20
-> > Besides,
-> > Reviewed-by: Zenghui Yu <yuzenghui@huawei.com>
-> Thanks!
->=20
-> Eric
->=20
->=20
->=20
->=20
-> >=20
-> >=20
-> > Thanks
-> >=20
-> >=20
->=20
->=20
+Thanks!
 
