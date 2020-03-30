@@ -2,31 +2,30 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id DE26619792B
-	for <lists+kvm@lfdr.de>; Mon, 30 Mar 2020 12:22:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 168EC19790C
+	for <lists+kvm@lfdr.de>; Mon, 30 Mar 2020 12:21:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729409AbgC3KTz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 30 Mar 2020 06:19:55 -0400
-Received: from mx01.bbu.dsd.mx.bitdefender.com ([91.199.104.161]:43750 "EHLO
+        id S1729675AbgC3KVH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 30 Mar 2020 06:21:07 -0400
+Received: from mx01.bbu.dsd.mx.bitdefender.com ([91.199.104.161]:43774 "EHLO
         mx01.bbu.dsd.mx.bitdefender.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728864AbgC3KTx (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 30 Mar 2020 06:19:53 -0400
+        by vger.kernel.org with ESMTP id S1729448AbgC3KUC (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 30 Mar 2020 06:20:02 -0400
 Received: from smtp.bitdefender.com (smtp02.buh.bitdefender.net [10.17.80.76])
-        by mx01.bbu.dsd.mx.bitdefender.com (Postfix) with ESMTPS id E4A22305D3CE;
-        Mon, 30 Mar 2020 13:13:00 +0300 (EEST)
+        by mx01.bbu.dsd.mx.bitdefender.com (Postfix) with ESMTPS id 26751305D3CF;
+        Mon, 30 Mar 2020 13:13:01 +0300 (EEST)
 Received: from localhost.localdomain (unknown [91.199.104.28])
-        by smtp.bitdefender.com (Postfix) with ESMTPSA id B983A305B7A3;
+        by smtp.bitdefender.com (Postfix) with ESMTPSA id DE1DA305B7A4;
         Mon, 30 Mar 2020 13:13:00 +0300 (EEST)
 From:   =?UTF-8?q?Adalbert=20Laz=C4=83r?= <alazar@bitdefender.com>
 To:     kvm@vger.kernel.org
 Cc:     virtualization@lists.linux-foundation.org,
         Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?q?Mihai=20Don=C8=9Bu?= <mdontu@bitdefender.com>,
         =?UTF-8?q?Nicu=C8=99or=20C=C3=AE=C8=9Bu?= <ncitu@bitdefender.com>,
         =?UTF-8?q?Adalbert=20Laz=C4=83r?= <alazar@bitdefender.com>
-Subject: [PATCH v8 72/81] KVM: introspection: add KVMI_VCPU_CONTROL_MSR and KVMI_EVENT_MSR
-Date:   Mon, 30 Mar 2020 13:12:59 +0300
-Message-Id: <20200330101308.21702-73-alazar@bitdefender.com>
+Subject: [PATCH v8 73/81] KVM: introspection: restore the state of MSR interception on unhook
+Date:   Mon, 30 Mar 2020 13:13:00 +0300
+Message-Id: <20200330101308.21702-74-alazar@bitdefender.com>
 In-Reply-To: <20200330101308.21702-1-alazar@bitdefender.com>
 References: <20200330101308.21702-1-alazar@bitdefender.com>
 MIME-Version: 1.0
@@ -37,616 +36,330 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Mihai Donțu <mdontu@bitdefender.com>
+From: Nicușor Cîțu <ncitu@bitdefender.com>
 
-This command is used to enable/disable introspection for a specific
-MSR. The KVMI_EVENT_MSR event is sent when the tracked MSR is going to
-be changed. The introspection tool can respond by allowing the guest to
-continue with normal execution or by discarding the change.
+This commit also ensures that the introspection tool and the userspace
+do not disable each other the MSR access VM-exit.
 
-This is meant to prevent malicious changes to MSRs
-such as MSR_IA32_SYSENTER_EIP.
-
-Signed-off-by: Mihai Donțu <mdontu@bitdefender.com>
-Co-developed-by: Nicușor Cîțu <ncitu@bitdefender.com>
 Signed-off-by: Nicușor Cîțu <ncitu@bitdefender.com>
-Co-developed-by: Adalbert Lazăr <alazar@bitdefender.com>
 Signed-off-by: Adalbert Lazăr <alazar@bitdefender.com>
 ---
- Documentation/virt/kvm/kvmi.rst               |  75 +++++++++
- arch/x86/include/asm/kvmi_host.h              |  12 ++
- arch/x86/include/uapi/asm/kvmi.h              |  18 ++
- arch/x86/kvm/kvmi.c                           | 157 ++++++++++++++++++
- arch/x86/kvm/x86.c                            |   3 +
- include/uapi/linux/kvmi.h                     |   2 +
- .../testing/selftests/kvm/x86_64/kvmi_test.c  | 102 ++++++++++++
- virt/kvm/introspection/kvmi.c                 |   1 +
- virt/kvm/introspection/kvmi_int.h             |   2 +
- virt/kvm/introspection/kvmi_msg.c             |  13 ++
- 10 files changed, 385 insertions(+)
+ arch/x86/include/asm/kvmi_host.h |  12 +++
+ arch/x86/kvm/kvmi.c              | 133 +++++++++++++++++++++++++++----
+ arch/x86/kvm/svm.c               |  11 +++
+ arch/x86/kvm/vmx/vmx.c           |  11 +++
+ 4 files changed, 150 insertions(+), 17 deletions(-)
 
-diff --git a/Documentation/virt/kvm/kvmi.rst b/Documentation/virt/kvm/kvmi.rst
-index 6f6551230e11..3b9db943a549 100644
---- a/Documentation/virt/kvm/kvmi.rst
-+++ b/Documentation/virt/kvm/kvmi.rst
-@@ -550,6 +550,7 @@ the following events::
- 	KVMI_EVENT_CR
- 	KVMI_EVENT_DESCRIPTOR
- 	KVMI_EVENT_HYPERCALL
-+	KVMI_EVENT_MSR
- 	KVMI_EVENT_XSETBV
- 
- When an event is enabled, the introspection tool is notified and
-@@ -843,6 +844,45 @@ Returns the guest memory type for a specific physical address.
- * -KVM_EINVAL - the padding is not zero
- * -KVM_EAGAIN - the selected vCPU can't be introspected yet
- 
-+19. KVMI_VCPU_CONTROL_MSR
-+-------------------------
-+
-+:Architectures: x86
-+:Versions: >= 1
-+:Parameters:
-+
-+::
-+
-+	struct kvmi_vcpu_hdr;
-+	struct kvmi_vcpu_control_msr {
-+		__u8 enable;
-+		__u8 padding1;
-+		__u16 padding2;
-+		__u32 msr;
-+	};
-+
-+:Returns:
-+
-+::
-+
-+	struct kvmi_error_code
-+
-+Enables/disables introspection for a specific MSR and must be used
-+in addition to *KVMI_VCPU_CONTROL_EVENTS* with the *KVMI_EVENT_MSR* ID set.
-+
-+Currently, only MSRs within the following two ranges are supported. Trying
-+to control events for any other register will fail with -KVM_EINVAL::
-+
-+	0          ... 0x00001fff
-+	0xc0000000 ... 0xc0001fff
-+
-+:Errors:
-+
-+* -KVM_EINVAL - the selected vCPU is invalid
-+* -KVM_EINVAL - the specified MSR is invalid
-+* -KVM_EINVAL - the padding is not zero
-+* -KVM_EAGAIN - the selected vCPU can't be introspected yet
-+
- Events
- ======
- 
-@@ -1148,3 +1188,38 @@ introspection has been enabled for this event (see **KVMI_VCPU_CONTROL_EVENTS**)
- 	KVMI_DESC_TR
- 
- ``write`` is 1 if the descriptor was written, 0 otherwise.
-+
-+9. KVMI_EVENT_MSR
-+-----------------
-+
-+:Architectures: x86
-+:Versions: >= 1
-+:Actions: CONTINUE, CRASH
-+:Parameters:
-+
-+::
-+
-+	struct kvmi_event;
-+	struct kvmi_event_msr {
-+		__u32 msr;
-+		__u32 padding;
-+		__u64 old_value;
-+		__u64 new_value;
-+	};
-+
-+:Returns:
-+
-+::
-+
-+	struct kvmi_vcpu_hdr;
-+	struct kvmi_event_reply;
-+	struct kvmi_event_msr_reply {
-+		__u64 new_val;
-+	};
-+
-+This event is sent when a model specific register is going to be changed
-+and the introspection has been enabled for this event and for this specific
-+register (see **KVMI_VCPU_CONTROL_EVENTS**).
-+
-+``kvmi_event``, the MSR number, the old value and the new value are
-+sent to the introspection tool. The *CONTINUE* action will set the ``new_val``.
 diff --git a/arch/x86/include/asm/kvmi_host.h b/arch/x86/include/asm/kvmi_host.h
-index 3c4bba88b50d..a9326c8e8252 100644
+index a9326c8e8252..e6bb2d6f19d0 100644
 --- a/arch/x86/include/asm/kvmi_host.h
 +++ b/arch/x86/include/asm/kvmi_host.h
-@@ -2,7 +2,10 @@
- #ifndef _ASM_X86_KVMI_HOST_H
- #define _ASM_X86_KVMI_HOST_H
- 
-+struct msr_data;
-+
- #define KVMI_NUM_CR 5
-+#define KVMI_NUM_MSR 0x2000
- 
- struct kvmi_monitor_interception {
- 	bool kvmi_intercepted;
-@@ -15,6 +18,12 @@ struct kvmi_interception {
- 	struct kvmi_monitor_interception breakpoint;
- 	struct kvmi_monitor_interception cr3w;
- 	struct kvmi_monitor_interception descriptor;
-+	struct {
+@@ -23,6 +23,12 @@ struct kvmi_interception {
+ 			DECLARE_BITMAP(low, KVMI_NUM_MSR);
+ 			DECLARE_BITMAP(high, KVMI_NUM_MSR);
+ 		} kvmi_mask;
 +		struct {
 +			DECLARE_BITMAP(low, KVMI_NUM_MSR);
 +			DECLARE_BITMAP(high, KVMI_NUM_MSR);
-+		} kvmi_mask;
-+	} msrw;
++		} kvm_mask;
++		bool (*monitor_fct)(struct kvm_vcpu *vcpu, u32 msr,
++				    bool enable);
+ 	} msrw;
  };
  
- struct kvm_vcpu_arch_introspection {
-@@ -34,6 +43,7 @@ bool kvmi_monitor_cr3w_intercept(struct kvm_vcpu *vcpu, bool enable);
- void kvmi_xsetbv_event(struct kvm_vcpu *vcpu);
+@@ -44,6 +50,8 @@ void kvmi_xsetbv_event(struct kvm_vcpu *vcpu);
  bool kvmi_monitor_desc_intercept(struct kvm_vcpu *vcpu, bool enable);
  bool kvmi_descriptor_event(struct kvm_vcpu *vcpu, u8 descriptor, bool write);
-+bool kvmi_msr_event(struct kvm_vcpu *vcpu, struct msr_data *msr);
+ bool kvmi_msr_event(struct kvm_vcpu *vcpu, struct msr_data *msr);
++bool kvmi_monitor_msrw_intercept(struct kvm_vcpu *vcpu, u32 msr, bool enable);
++bool kvmi_msrw_intercept_originator(struct kvm_vcpu *vcpu);
  
  #else /* CONFIG_KVM_INTROSPECTION */
  
-@@ -50,6 +60,8 @@ static inline bool kvmi_monitor_desc_intercept(struct kvm_vcpu *vcpu,
- 					       bool enable) { return false; }
- static inline bool kvmi_descriptor_event(struct kvm_vcpu *vcpu, u8 descriptor,
+@@ -62,6 +70,10 @@ static inline bool kvmi_descriptor_event(struct kvm_vcpu *vcpu, u8 descriptor,
  					 bool write) { return true; }
-+static inline bool kvmi_msr_event(struct kvm_vcpu *vcpu, struct msr_data *msr)
-+				{ return true; }
+ static inline bool kvmi_msr_event(struct kvm_vcpu *vcpu, struct msr_data *msr)
+ 				{ return true; }
++static inline bool kvmi_monitor_msrw_intercept(struct kvm_vcpu *vcpu, u32 msr,
++					       bool enable) { return false; }
++static inline bool kvmi_msrw_intercept_originator(struct kvm_vcpu *vcpu)
++				{ return false; }
  
  #endif /* CONFIG_KVM_INTROSPECTION */
  
-diff --git a/arch/x86/include/uapi/asm/kvmi.h b/arch/x86/include/uapi/asm/kvmi.h
-index 691a501200b3..e4d591912f37 100644
---- a/arch/x86/include/uapi/asm/kvmi.h
-+++ b/arch/x86/include/uapi/asm/kvmi.h
-@@ -121,4 +121,22 @@ struct kvmi_event_descriptor {
- 	__u8 padding[6];
- };
- 
-+struct kvmi_vcpu_control_msr {
-+	__u8 enable;
-+	__u8 padding1;
-+	__u16 padding2;
-+	__u32 msr;
-+};
-+
-+struct kvmi_event_msr {
-+	__u32 msr;
-+	__u32 padding;
-+	__u64 old_value;
-+	__u64 new_value;
-+};
-+
-+struct kvmi_event_msr_reply {
-+	__u64 new_val;
-+};
-+
- #endif /* _UAPI_ASM_X86_KVMI_H */
 diff --git a/arch/x86/kvm/kvmi.c b/arch/x86/kvm/kvmi.c
-index 11178bd75cb4..b57b4320a19f 100644
+index b57b4320a19f..ccb11e553bde 100644
 --- a/arch/x86/kvm/kvmi.c
 +++ b/arch/x86/kvm/kvmi.c
-@@ -418,6 +418,76 @@ static void kvmi_arch_disable_desc_intercept(struct kvm_vcpu *vcpu)
- 	vcpu->arch.kvmi->descriptor.kvm_intercepted = false;
+@@ -423,22 +423,25 @@ static bool kvmi_msr_valid(unsigned int msr)
+ 	return msr <= 0x1fff || (msr >= 0xc0000000 && msr <= 0xc0001fff);
  }
  
-+static bool kvmi_msr_valid(unsigned int msr)
-+{
-+	return msr <= 0x1fff || (msr >= 0xc0000000 && msr <= 0xc0001fff);
-+}
-+
-+static unsigned long *msr_mask(struct kvm_vcpu *vcpu, unsigned int *msr)
-+{
-+	switch (*msr) {
-+	case 0 ... 0x1fff:
-+		return vcpu->arch.kvmi->msrw.kvmi_mask.low;
-+	case 0xc0000000 ... 0xc0001fff:
-+		*msr &= 0x1fff;
-+		return vcpu->arch.kvmi->msrw.kvmi_mask.high;
-+	}
-+
-+	return NULL;
-+}
-+
-+static bool test_msr_mask(struct kvm_vcpu *vcpu, unsigned int msr)
-+{
-+	unsigned long *mask = msr_mask(vcpu, &msr);
-+
-+	if (!mask)
-+		return false;
-+
-+	return !!test_bit(msr, mask);
-+}
-+
-+static bool msr_control(struct kvm_vcpu *vcpu, unsigned int msr, bool enable)
-+{
-+	unsigned long *mask = msr_mask(vcpu, &msr);
-+
-+	if (!mask)
-+		return false;
-+
-+	if (enable)
-+		set_bit(msr, mask);
-+	else
-+		clear_bit(msr, mask);
-+
-+	return true;
-+}
-+
-+static unsigned int msr_mask_to_base(struct kvm_vcpu *vcpu, unsigned long *mask)
-+{
-+	if (mask == vcpu->arch.kvmi->msrw.kvmi_mask.high)
-+		return 0xc0000000;
-+
-+	return 0;
-+}
-+
-+static void kvmi_arch_disable_msr_intercept(struct kvm_vcpu *vcpu,
-+					    unsigned long *mask)
-+{
-+	unsigned int msr_base = msr_mask_to_base(vcpu, mask);
-+	int offset = -1;
-+
-+	for (;;) {
-+		offset = find_next_bit(mask, KVMI_NUM_MSR, offset + 1);
-+
-+		if (offset >= KVMI_NUM_MSR)
-+			break;
-+
-+		kvm_x86_ops->control_msr_intercept(vcpu, msr_base + offset,
-+						   MSR_TYPE_W, false);
-+	}
-+
-+	bitmap_zero(mask, KVMI_NUM_MSR);
-+}
-+
- int kvmi_arch_cmd_control_intercept(struct kvm_vcpu *vcpu,
- 				    unsigned int event_id, bool enable)
+-static unsigned long *msr_mask(struct kvm_vcpu *vcpu, unsigned int *msr)
++static unsigned long *msr_mask(struct kvm_vcpu *vcpu, unsigned int *msr,
++			       bool kvmi)
  {
-@@ -467,6 +537,8 @@ bool kvmi_arch_restore_interception(struct kvm_vcpu *vcpu)
+ 	switch (*msr) {
+ 	case 0 ... 0x1fff:
+-		return vcpu->arch.kvmi->msrw.kvmi_mask.low;
++		return kvmi ? vcpu->arch.kvmi->msrw.kvmi_mask.low :
++			      vcpu->arch.kvmi->msrw.kvm_mask.low;
+ 	case 0xc0000000 ... 0xc0001fff:
+ 		*msr &= 0x1fff;
+-		return vcpu->arch.kvmi->msrw.kvmi_mask.high;
++		return kvmi ? vcpu->arch.kvmi->msrw.kvmi_mask.high :
++			      vcpu->arch.kvmi->msrw.kvm_mask.high;
+ 	}
+ 
+ 	return NULL;
+ }
+ 
+-static bool test_msr_mask(struct kvm_vcpu *vcpu, unsigned int msr)
++static bool test_msr_mask(struct kvm_vcpu *vcpu, unsigned int msr, bool kvmi)
+ {
+-	unsigned long *mask = msr_mask(vcpu, &msr);
++	unsigned long *mask = msr_mask(vcpu, &msr, kvmi);
+ 
+ 	if (!mask)
+ 		return false;
+@@ -446,9 +449,27 @@ static bool test_msr_mask(struct kvm_vcpu *vcpu, unsigned int msr)
+ 	return !!test_bit(msr, mask);
+ }
+ 
+-static bool msr_control(struct kvm_vcpu *vcpu, unsigned int msr, bool enable)
++/*
++ * Returns true if one side (kvm or kvmi) tries to disable the MSR write
++ * interception while the other side is still tracking it.
++ */
++bool kvmi_monitor_msrw_intercept(struct kvm_vcpu *vcpu, u32 msr, bool enable)
+ {
+-	unsigned long *mask = msr_mask(vcpu, &msr);
++	struct kvmi_interception *arch_vcpui;
++
++	if (!vcpu)
++		return false;
++
++	arch_vcpui = READ_ONCE(vcpu->arch.kvmi);
++
++	return (arch_vcpui && arch_vcpui->msrw.monitor_fct(vcpu, msr, enable));
++}
++EXPORT_SYMBOL(kvmi_monitor_msrw_intercept);
++
++static bool msr_control(struct kvm_vcpu *vcpu, unsigned int msr, bool enable,
++		       bool kvmi)
++{
++	unsigned long *mask = msr_mask(vcpu, &msr, kvmi);
+ 
+ 	if (!mask)
+ 		return false;
+@@ -461,6 +482,63 @@ static bool msr_control(struct kvm_vcpu *vcpu, unsigned int msr, bool enable)
+ 	return true;
+ }
+ 
++static bool msr_intercepted_by_kvmi(struct kvm_vcpu *vcpu, u32 msr)
++{
++	return test_msr_mask(vcpu, msr, true);
++}
++
++static bool msr_intercepted_by_kvm(struct kvm_vcpu *vcpu, u32 msr)
++{
++	return test_msr_mask(vcpu, msr, false);
++}
++
++static void record_msr_intercept_status_for_kvmi(struct kvm_vcpu *vcpu, u32 msr,
++						 bool enable)
++{
++	msr_control(vcpu, msr, enable, true);
++}
++
++static void record_msr_intercept_status_for_kvm(struct kvm_vcpu *vcpu, u32 msr,
++						bool enable)
++{
++	msr_control(vcpu, msr, enable, false);
++}
++
++static bool monitor_msrw_fct_kvmi(struct kvm_vcpu *vcpu, u32 msr, bool enable)
++{
++	bool ret = false;
++
++	if (enable) {
++		if (kvm_x86_ops->msr_write_intercepted(vcpu, msr))
++			record_msr_intercept_status_for_kvm(vcpu, msr, true);
++	} else {
++		if (unlikely(!msr_intercepted_by_kvmi(vcpu, msr)))
++			ret = true;
++
++		if (msr_intercepted_by_kvm(vcpu, msr))
++			ret = true;
++	}
++
++	record_msr_intercept_status_for_kvmi(vcpu, msr, enable);
++
++	return ret;
++}
++
++static bool monitor_msrw_fct_kvm(struct kvm_vcpu *vcpu, u32 msr, bool enable)
++{
++	bool ret = false;
++
++	if (!(msr_intercepted_by_kvmi(vcpu, msr)))
++		return false;
++
++	if (!enable)
++		ret = true;
++
++	record_msr_intercept_status_for_kvm(vcpu, msr, enable);
++
++	return ret;
++}
++
+ static unsigned int msr_mask_to_base(struct kvm_vcpu *vcpu, unsigned long *mask)
+ {
+ 	if (mask == vcpu->arch.kvmi->msrw.kvmi_mask.high)
+@@ -469,8 +547,16 @@ static unsigned int msr_mask_to_base(struct kvm_vcpu *vcpu, unsigned long *mask)
+ 	return 0;
+ }
+ 
+-static void kvmi_arch_disable_msr_intercept(struct kvm_vcpu *vcpu,
+-					    unsigned long *mask)
++static void kvmi_control_msrw_intercept(struct kvm_vcpu *vcpu, u32 msr,
++					bool enable)
++{
++	vcpu->arch.kvmi->msrw.monitor_fct = monitor_msrw_fct_kvmi;
++	kvm_x86_ops->control_msr_intercept(vcpu, msr, MSR_TYPE_W, enable);
++	vcpu->arch.kvmi->msrw.monitor_fct = monitor_msrw_fct_kvm;
++}
++
++static void kvmi_arch_disable_msrw_intercept(struct kvm_vcpu *vcpu,
++					     unsigned long *mask)
+ {
+ 	unsigned int msr_base = msr_mask_to_base(vcpu, mask);
+ 	int offset = -1;
+@@ -481,8 +567,7 @@ static void kvmi_arch_disable_msr_intercept(struct kvm_vcpu *vcpu,
+ 		if (offset >= KVMI_NUM_MSR)
+ 			break;
+ 
+-		kvm_x86_ops->control_msr_intercept(vcpu, msr_base + offset,
+-						   MSR_TYPE_W, false);
++		kvmi_control_msrw_intercept(vcpu, msr_base + offset, false);
+ 	}
+ 
+ 	bitmap_zero(mask, KVMI_NUM_MSR);
+@@ -537,8 +622,8 @@ bool kvmi_arch_restore_interception(struct kvm_vcpu *vcpu)
  	kvmi_arch_disable_bp_intercept(vcpu);
  	kvmi_arch_disable_cr3w_intercept(vcpu);
  	kvmi_arch_disable_desc_intercept(vcpu);
-+	kvmi_arch_disable_msr_intercept(vcpu, arch_vcpui->msrw.kvmi_mask.low);
-+	kvmi_arch_disable_msr_intercept(vcpu, arch_vcpui->msrw.kvmi_mask.high);
+-	kvmi_arch_disable_msr_intercept(vcpu, arch_vcpui->msrw.kvmi_mask.low);
+-	kvmi_arch_disable_msr_intercept(vcpu, arch_vcpui->msrw.kvmi_mask.high);
++	kvmi_arch_disable_msrw_intercept(vcpu, arch_vcpui->msrw.kvmi_mask.low);
++	kvmi_arch_disable_msrw_intercept(vcpu, arch_vcpui->msrw.kvmi_mask.high);
  
  	return true;
  }
-@@ -849,3 +921,88 @@ bool kvmi_descriptor_event(struct kvm_vcpu *vcpu, u8 descriptor, bool write)
- 	return ret;
+@@ -554,12 +639,14 @@ bool kvmi_arch_vcpu_alloc(struct kvm_vcpu *vcpu)
+ 	arch_vcpui->breakpoint.monitor_fct = monitor_bp_fct_kvm;
+ 	arch_vcpui->cr3w.monitor_fct = monitor_cr3w_fct_kvm;
+ 	arch_vcpui->descriptor.monitor_fct = monitor_desc_fct_kvm;
++	arch_vcpui->msrw.monitor_fct = monitor_msrw_fct_kvm;
+ 
+ 	/*
+ 	 * paired with:
+ 	 *  - kvmi_monitor_bp_intercept()
+ 	 *  - kvmi_monitor_cr3w_intercept()
+ 	 *  - kvmi_monitor_desc_intercept()
++	 *  - kvmi_monitor_msrw_intercept()
+ 	 */
+ 	smp_wmb();
+ 	WRITE_ONCE(vcpu->arch.kvmi, arch_vcpui);
+@@ -922,6 +1009,20 @@ bool kvmi_descriptor_event(struct kvm_vcpu *vcpu, u8 descriptor, bool write)
  }
  EXPORT_SYMBOL(kvmi_descriptor_event);
-+
-+int kvmi_arch_cmd_vcpu_control_msr(struct kvm_vcpu *vcpu,
-+				   const struct kvmi_vcpu_control_msr *req)
+ 
++bool kvmi_msrw_intercept_originator(struct kvm_vcpu *vcpu)
 +{
-+	if (req->padding1 || req->padding2)
-+		return -KVM_EINVAL;
++	struct kvmi_interception *arch_vcpui;
 +
-+	if (!kvmi_msr_valid(req->msr))
-+		return -KVM_EINVAL;
++	if (!vcpu)
++		return false;
 +
-+	kvm_x86_ops->control_msr_intercept(vcpu, req->msr, MSR_TYPE_W,
-+					   req->enable);
-+	msr_control(vcpu, req->msr, req->enable);
++	arch_vcpui = READ_ONCE(vcpu->arch.kvmi);
 +
-+	return 0;
++	return (arch_vcpui &&
++		arch_vcpui->msrw.monitor_fct == monitor_msrw_fct_kvmi);
 +}
++EXPORT_SYMBOL(kvmi_msrw_intercept_originator);
 +
-+static u32 kvmi_send_msr(struct kvm_vcpu *vcpu, u32 msr, u64 old_value,
-+			 u64 new_value, u64 *ret_value)
-+{
-+	struct kvmi_event_msr e;
-+	struct kvmi_event_msr_reply r;
-+	int err, action;
-+
-+	memset(&e, 0, sizeof(e));
-+	e.msr = msr;
-+	e.old_value = old_value;
-+	e.new_value = new_value;
-+
-+	err = kvmi_send_event(vcpu, KVMI_EVENT_MSR, &e, sizeof(e),
-+			      &r, sizeof(r), &action);
-+	if (err)
-+		return KVMI_EVENT_ACTION_CONTINUE;
-+
-+	*ret_value = r.new_val;
-+	return action;
-+}
-+
-+static bool __kvmi_msr_event(struct kvm_vcpu *vcpu, struct msr_data *msr)
-+{
-+	struct msr_data old_msr = {
-+		.host_initiated = true,
-+		.index = msr->index,
-+	};
-+	bool ret = false;
-+	u64 ret_value = msr->data;
-+	u32 action;
-+
-+	if (!test_msr_mask(vcpu, msr->index))
-+		return true;
-+	if (kvm_x86_ops->get_msr(vcpu, &old_msr))
-+		return true;
-+	if (old_msr.data == msr->data)
-+		return true;
-+
-+	action = kvmi_send_msr(vcpu, msr->index, old_msr.data, msr->data,
-+			       &ret_value);
-+	switch (action) {
-+	case KVMI_EVENT_ACTION_CONTINUE:
-+		msr->data = ret_value;
-+		ret = true;
-+		break;
-+	default:
-+		kvmi_handle_common_event_actions(vcpu->kvm, action, "MSR");
-+	}
-+
-+	return ret;
-+}
-+
-+bool kvmi_msr_event(struct kvm_vcpu *vcpu, struct msr_data *msr)
-+{
-+	struct kvm_introspection *kvmi;
-+	bool ret = true;
-+
-+	kvmi = kvmi_get(vcpu->kvm);
-+	if (!kvmi)
-+		return true;
-+
-+	if (is_event_enabled(vcpu, KVMI_EVENT_MSR))
-+		ret = __kvmi_msr_event(vcpu, msr);
-+
-+	kvmi_put(vcpu->kvm);
-+
-+	return ret;
-+}
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index ab0ad3b6ebc2..ce2f9d47d6f6 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -1490,6 +1490,9 @@ static int __kvm_set_msr(struct kvm_vcpu *vcpu, u32 index, u64 data,
- 	msr.index = index;
- 	msr.host_initiated = host_initiated;
- 
-+	if (!host_initiated && !kvmi_msr_event(vcpu, &msr))
-+		return 1;
-+
- 	return kvm_x86_ops->set_msr(vcpu, &msr);
- }
- 
-diff --git a/include/uapi/linux/kvmi.h b/include/uapi/linux/kvmi.h
-index 2ccc4045137f..04e6971ea0af 100644
---- a/include/uapi/linux/kvmi.h
-+++ b/include/uapi/linux/kvmi.h
-@@ -38,6 +38,7 @@ enum {
- 
- 	KVMI_VCPU_GET_XSAVE     = 18,
- 	KVMI_VCPU_GET_MTRR_TYPE = 19,
-+	KVMI_VCPU_CONTROL_MSR   = 20,
- 
- 	KVMI_NUM_MESSAGES
- };
-@@ -51,6 +52,7 @@ enum {
- 	KVMI_EVENT_TRAP       = 5,
- 	KVMI_EVENT_XSETBV     = 6,
- 	KVMI_EVENT_DESCRIPTOR = 7,
-+	KVMI_EVENT_MSR        = 8,
- 
- 	KVMI_NUM_EVENTS
- };
-diff --git a/tools/testing/selftests/kvm/x86_64/kvmi_test.c b/tools/testing/selftests/kvm/x86_64/kvmi_test.c
-index 4f2de304a6f8..955ef55e1346 100644
---- a/tools/testing/selftests/kvm/x86_64/kvmi_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/kvmi_test.c
-@@ -57,6 +57,7 @@ enum {
- 	GUEST_TEST_CR,
- 	GUEST_TEST_DESCRIPTOR,
- 	GUEST_TEST_HYPERCALL,
-+	GUEST_TEST_MSR,
- 	GUEST_TEST_XSETBV,
- };
- 
-@@ -97,6 +98,15 @@ static void guest_hypercall_test(void)
- 	asm volatile(".byte 0x0f,0x01,0xc1");
- }
- 
-+static void guest_msr_test(void)
-+{
-+	uint64_t msr;
-+
-+	msr = rdmsr(MSR_MISC_FEATURES_ENABLES);
-+	msr |= 1; /* MSR_MISC_FEATURES_ENABLES_CPUID_FAULT */
-+	wrmsr(MSR_MISC_FEATURES_ENABLES, msr);
-+}
-+
- /* from fpu/internal.h */
- static u64 xgetbv(u32 index)
+ int kvmi_arch_cmd_vcpu_control_msr(struct kvm_vcpu *vcpu,
+ 				   const struct kvmi_vcpu_control_msr *req)
  {
-@@ -154,6 +164,9 @@ static void guest_code(void)
- 		case GUEST_TEST_HYPERCALL:
- 			guest_hypercall_test();
- 			break;
-+		case GUEST_TEST_MSR:
-+			guest_msr_test();
-+			break;
- 		case GUEST_TEST_XSETBV:
- 			guest_xsetbv_test();
- 			break;
-@@ -1437,6 +1450,94 @@ static void test_event_descriptor(struct kvm_vm *vm)
- 	disable_vcpu_event(vm, event_id);
+@@ -931,9 +1032,7 @@ int kvmi_arch_cmd_vcpu_control_msr(struct kvm_vcpu *vcpu,
+ 	if (!kvmi_msr_valid(req->msr))
+ 		return -KVM_EINVAL;
+ 
+-	kvm_x86_ops->control_msr_intercept(vcpu, req->msr, MSR_TYPE_W,
+-					   req->enable);
+-	msr_control(vcpu, req->msr, req->enable);
++	kvmi_control_msrw_intercept(vcpu, req->msr, req->enable);
+ 
+ 	return 0;
  }
+@@ -969,7 +1068,7 @@ static bool __kvmi_msr_event(struct kvm_vcpu *vcpu, struct msr_data *msr)
+ 	u64 ret_value = msr->data;
+ 	u32 action;
  
-+static int cmd_control_msr(struct kvm_vm *vm, __u32 msr, bool enable)
-+{
-+	struct {
-+		struct kvmi_msg_hdr hdr;
-+		struct kvmi_vcpu_hdr vcpu_hdr;
-+		struct kvmi_vcpu_control_msr cmd;
-+	} req = {};
-+
-+	req.cmd.msr = msr;
-+	req.cmd.enable = enable ? 1 : 0;
-+
-+	return do_vcpu0_command(vm, KVMI_VCPU_CONTROL_MSR,
-+				&req.hdr, sizeof(req), NULL, 0);
-+}
-+
-+static void enable_msr_events(struct kvm_vm *vm, __u32 msr)
-+{
-+	int r;
-+
-+	enable_vcpu_event(vm, KVMI_EVENT_MSR);
-+
-+	r = cmd_control_msr(vm, msr, true);
-+	TEST_ASSERT(r == 0,
-+		"KVMI_EVENT_MSR failed, error %d(%s)\n",
-+		-r, kvm_strerror(-r));
-+}
-+
-+static void disable_msr_events(struct kvm_vm *vm, __u32 msr)
-+{
-+	int r;
-+
-+	r = cmd_control_msr(vm, msr, false);
-+	TEST_ASSERT(r == 0,
-+		"KVMI_EVENT_MSR failed, error %d(%s)\n",
-+		-r, kvm_strerror(-r));
-+
-+	disable_vcpu_event(vm, KVMI_EVENT_MSR);
-+}
-+
-+static void test_cmd_vcpu_control_msr(struct kvm_vm *vm)
-+{
-+	struct vcpu_worker_data data = {
-+		.vm = vm,
-+		.vcpu_id = VCPU_ID,
-+		.test_id = GUEST_TEST_MSR,
-+	};
-+	struct kvmi_msg_hdr hdr;
-+	struct {
-+		struct kvmi_event common;
-+		struct kvmi_event_msr msr;
-+	} ev;
-+	struct {
-+		struct vcpu_reply common;
-+		struct kvmi_event_msr_reply msr;
-+	} rpl = {};
-+	__u16 event_id = KVMI_EVENT_MSR;
-+	__u32 msr = MSR_MISC_FEATURES_ENABLES;
-+	uint64_t msr_data;
-+	pthread_t vcpu_thread;
-+
-+	enable_msr_events(vm, msr);
-+
-+	vcpu_thread = start_vcpu_worker(&data);
-+
-+	receive_event(&hdr, &ev.common, sizeof(ev), event_id);
-+
-+	DEBUG("MSR 0x%x, old 0x%llx, new 0x%llx\n",
-+		ev.msr.msr, ev.msr.old_value, ev.msr.new_value);
-+
-+	TEST_ASSERT(ev.msr.msr == msr,
-+		"Unexpected MSR event, received MSR 0x%x, expected MSR 0x%x",
-+		ev.msr.msr, msr);
-+
-+	rpl.msr.new_val = ev.msr.old_value;
-+
-+	reply_to_event(&hdr, &ev.common, KVMI_EVENT_ACTION_CONTINUE,
-+			&rpl.common, sizeof(rpl));
-+
-+	stop_vcpu_worker(vcpu_thread, &data);
-+
-+	disable_msr_events(vm, msr);
-+
-+	msr_data = vcpu_get_msr(vm, VCPU_ID, msr);
-+	TEST_ASSERT(msr_data == ev.msr.old_value,
-+		"Failed to block MSR 0x%x update, value 0x%x, expected 0x%x",
-+		msr, msr_data, ev.msr.old_value);
-+}
-+
- static void test_introspection(struct kvm_vm *vm)
- {
- 	srandom(time(0));
-@@ -1466,6 +1567,7 @@ static void test_introspection(struct kvm_vm *vm)
- 	test_cmd_vcpu_get_xsave(vm);
- 	test_cmd_vcpu_get_mtrr_type(vm);
- 	test_event_descriptor(vm);
-+	test_cmd_vcpu_control_msr(vm);
+-	if (!test_msr_mask(vcpu, msr->index))
++	if (!test_msr_mask(vcpu, msr->index, true))
+ 		return true;
+ 	if (kvm_x86_ops->get_msr(vcpu, &old_msr))
+ 		return true;
+diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
+index 0fdc4556057e..0df26556f317 100644
+--- a/arch/x86/kvm/svm.c
++++ b/arch/x86/kvm/svm.c
+@@ -1088,6 +1088,17 @@ static void set_msr_interception(struct kvm_vcpu *vcpu,
+ 	unsigned long tmp;
+ 	u32 offset;
  
- 	unhook_introspection(vm);
- }
-diff --git a/virt/kvm/introspection/kvmi.c b/virt/kvm/introspection/kvmi.c
-index db79744e5d2f..a858aba1672d 100644
---- a/virt/kvm/introspection/kvmi.c
-+++ b/virt/kvm/introspection/kvmi.c
-@@ -82,6 +82,7 @@ static void setup_known_events(void)
- 	set_bit(KVMI_EVENT_CR, Kvmi_known_vcpu_events);
- 	set_bit(KVMI_EVENT_DESCRIPTOR, Kvmi_known_vcpu_events);
- 	set_bit(KVMI_EVENT_HYPERCALL, Kvmi_known_vcpu_events);
-+	set_bit(KVMI_EVENT_MSR, Kvmi_known_vcpu_events);
- 	set_bit(KVMI_EVENT_PAUSE_VCPU, Kvmi_known_vcpu_events);
- 	set_bit(KVMI_EVENT_TRAP, Kvmi_known_vcpu_events);
- 	set_bit(KVMI_EVENT_XSETBV, Kvmi_known_vcpu_events);
-diff --git a/virt/kvm/introspection/kvmi_int.h b/virt/kvm/introspection/kvmi_int.h
-index 72c9d3a1a4b6..ba4bdfaef20d 100644
---- a/virt/kvm/introspection/kvmi_int.h
-+++ b/virt/kvm/introspection/kvmi_int.h
-@@ -107,5 +107,7 @@ int kvmi_arch_cmd_vcpu_get_xsave(struct kvm_vcpu *vcpu,
- 				 struct kvmi_vcpu_get_xsave_reply **dest,
- 				 size_t *dest_size);
- int kvmi_arch_cmd_vcpu_get_mtrr_type(struct kvm_vcpu *vcpu, u64 gpa, u8 *type);
-+int kvmi_arch_cmd_vcpu_control_msr(struct kvm_vcpu *vcpu,
-+				   const struct kvmi_vcpu_control_msr *req);
++#ifdef CONFIG_KVM_INTROSPECTION
++	if ((type & MSR_TYPE_W) &&
++	    kvmi_monitor_msrw_intercept(vcpu, msr, !value))
++		type &= ~MSR_TYPE_W;
++
++	/*
++	 * Avoid the below warning for kvmi intercepted msrs.
++	 */
++	if (!kvmi_msrw_intercept_originator(vcpu))
++#endif /* CONFIG_KVM_INTROSPECTION */
++
+ 	/*
+ 	 * If this warning triggers extend the direct_access_msrs list at the
+ 	 * beginning of the file
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 8745d696f592..fd748c165e78 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -3662,6 +3662,12 @@ static __always_inline void vmx_disable_intercept_for_msr(struct kvm_vcpu *vcpu,
+ 	if (!cpu_has_vmx_msr_bitmap())
+ 		return;
  
- #endif
-diff --git a/virt/kvm/introspection/kvmi_msg.c b/virt/kvm/introspection/kvmi_msg.c
-index 78ae52f05c29..191b60c290ee 100644
---- a/virt/kvm/introspection/kvmi_msg.c
-+++ b/virt/kvm/introspection/kvmi_msg.c
-@@ -31,6 +31,7 @@ static const char *const msg_IDs[] = {
- 	[KVMI_VM_WRITE_PHYSICAL]     = "KVMI_VM_WRITE_PHYSICAL",
- 	[KVMI_VCPU_CONTROL_CR]       = "KVMI_VCPU_CONTROL_CR",
- 	[KVMI_VCPU_CONTROL_EVENTS]   = "KVMI_VCPU_CONTROL_EVENTS",
-+	[KVMI_VCPU_CONTROL_MSR]      = "KVMI_VCPU_CONTROL_MSR",
- 	[KVMI_VCPU_GET_CPUID]        = "KVMI_VCPU_GET_CPUID",
- 	[KVMI_VCPU_GET_INFO]         = "KVMI_VCPU_GET_INFO",
- 	[KVMI_VCPU_GET_MTRR_TYPE]    = "KVMI_VCPU_GET_MTRR_TYPE",
-@@ -592,6 +593,17 @@ static int handle_vcpu_get_mtrr_type(const struct kvmi_vcpu_cmd_job *job,
- 	return kvmi_msg_vcpu_reply(job, msg, ec, &rpl, sizeof(rpl));
- }
++#ifdef CONFIG_KVM_INTROSPECTION
++	if ((type & MSR_TYPE_W) &&
++	    kvmi_monitor_msrw_intercept(vcpu, msr, false))
++		type &= ~MSR_TYPE_W;
++#endif /* CONFIG_KVM_INTROSPECTION */
++
+ 	if (static_branch_unlikely(&enable_evmcs))
+ 		evmcs_touch_msr_bitmap();
  
-+static int handle_vcpu_control_msr(const struct kvmi_vcpu_cmd_job *job,
-+				   const struct kvmi_msg_hdr *msg,
-+				   const void *req)
-+{
-+	int ec;
+@@ -3701,6 +3707,11 @@ static __always_inline void vmx_enable_intercept_for_msr(struct kvm_vcpu *vcpu,
+ 	if (!cpu_has_vmx_msr_bitmap())
+ 		return;
+ 
++#ifdef CONFIG_KVM_INTROSPECTION
++	if (type & MSR_TYPE_W)
++		kvmi_monitor_msrw_intercept(vcpu, msr, true);
++#endif /* CONFIG_KVM_INTROSPECTION */
 +
-+	ec = kvmi_arch_cmd_vcpu_control_msr(job->vcpu, req);
-+
-+	return kvmi_msg_vcpu_reply(job, msg, ec, NULL, 0);
-+}
-+
- /*
-  * These commands are executed from the vCPU thread. The receiving thread
-  * passes the messages using a newly allocated 'struct kvmi_vcpu_cmd_job'
-@@ -603,6 +615,7 @@ static int(*const msg_vcpu[])(const struct kvmi_vcpu_cmd_job *,
- 	[KVMI_EVENT]                 = handle_event_reply,
- 	[KVMI_VCPU_CONTROL_CR]       = handle_vcpu_control_cr,
- 	[KVMI_VCPU_CONTROL_EVENTS]   = handle_vcpu_control_events,
-+	[KVMI_VCPU_CONTROL_MSR]      = handle_vcpu_control_msr,
- 	[KVMI_VCPU_GET_CPUID]        = handle_get_cpuid,
- 	[KVMI_VCPU_GET_INFO]         = handle_get_vcpu_info,
- 	[KVMI_VCPU_GET_MTRR_TYPE]    = handle_vcpu_get_mtrr_type,
+ 	if (static_branch_unlikely(&enable_evmcs))
+ 		evmcs_touch_msr_bitmap();
+ 
