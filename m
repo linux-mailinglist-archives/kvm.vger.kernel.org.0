@@ -2,176 +2,153 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 470B31977FB
-	for <lists+kvm@lfdr.de>; Mon, 30 Mar 2020 11:43:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AE1CE19781B
+	for <lists+kvm@lfdr.de>; Mon, 30 Mar 2020 11:56:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728546AbgC3Jnl convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Mon, 30 Mar 2020 05:43:41 -0400
-Received: from mga07.intel.com ([134.134.136.100]:29415 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726127AbgC3Jnl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 30 Mar 2020 05:43:41 -0400
-IronPort-SDR: p7Titqo/XMUT0YTs6YIpQZN5jbCP7jQqKJBEWtReFF0xNtkW+NJ6dUPlCuKvdF1YWSpdEz+WYl
- Yh82ncY+aNNA==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Mar 2020 02:43:40 -0700
-IronPort-SDR: mEqY1RX1MCY6ySvEv+t7Uk7nMQ/U91q84IxfOtjhCSEtFW/RQg57S1z8VdDH+gOiqFfJHqjDy+
- tAefRkn3oyEA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.72,323,1580803200"; 
-   d="scan'208";a="251834926"
-Received: from fmsmsx107.amr.corp.intel.com ([10.18.124.205])
-  by orsmga006.jf.intel.com with ESMTP; 30 Mar 2020 02:43:39 -0700
-Received: from fmsmsx114.amr.corp.intel.com (10.18.116.8) by
- fmsmsx107.amr.corp.intel.com (10.18.124.205) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Mon, 30 Mar 2020 02:43:39 -0700
-Received: from shsmsx152.ccr.corp.intel.com (10.239.6.52) by
- FMSMSX114.amr.corp.intel.com (10.18.116.8) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Mon, 30 Mar 2020 02:43:39 -0700
-Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.225]) by
- SHSMSX152.ccr.corp.intel.com ([169.254.6.209]) with mapi id 14.03.0439.000;
- Mon, 30 Mar 2020 17:43:35 +0800
-From:   "Tian, Kevin" <kevin.tian@intel.com>
-To:     "Liu, Yi L" <yi.l.liu@intel.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>
-CC:     "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "Tian, Jun J" <jun.j.tian@intel.com>,
-        "Sun, Yi Y" <yi.y.sun@intel.com>,
-        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Wu, Hao" <hao.wu@intel.com>
-Subject: RE: [PATCH v1 3/8] vfio/type1: Report PASID alloc/free support to
- userspace
-Thread-Topic: [PATCH v1 3/8] vfio/type1: Report PASID alloc/free support to
- userspace
-Thread-Index: AQHWAEUdJcZWYB5B3kyVfi4eyRoo06hg6FCA
-Date:   Mon, 30 Mar 2020 09:43:35 +0000
-Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D19D7FF4FF@SHSMSX104.ccr.corp.intel.com>
-References: <1584880325-10561-1-git-send-email-yi.l.liu@intel.com>
- <1584880325-10561-4-git-send-email-yi.l.liu@intel.com>
-In-Reply-To: <1584880325-10561-4-git-send-email-yi.l.liu@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-version: 11.2.0.6
-dlp-reaction: no-action
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+        id S1728383AbgC3J4Q (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 30 Mar 2020 05:56:16 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:23061 "EHLO
+        us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727376AbgC3J4Q (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 30 Mar 2020 05:56:16 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1585562174;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=+i48u5EVTvTZXlAFzW/M3AOj4ZvswK4iw2XDLheQWkE=;
+        b=VM/SRVPBV35QbWYdC5U+u+DtMdAxlvziRX6wxaS7nIceLuTYsM7n5IgwbDas8J0ICzEXLb
+        nK1dt2J8A0uzjMRdxE05Y+PXwWCUoVrYf/sc2sc9XQmZQvlaj+RPivZsA+i/lM04rhsK/A
+        xskY7uMvSAIPXzdKJ2Zyvy1IN02uEWo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-27-jk6K2iO_ORCgrkaHNScO6Q-1; Mon, 30 Mar 2020 05:56:12 -0400
+X-MC-Unique: jk6K2iO_ORCgrkaHNScO6Q-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2B4E7801E53;
+        Mon, 30 Mar 2020 09:56:10 +0000 (UTC)
+Received: from [10.36.112.58] (ovpn-112-58.ams2.redhat.com [10.36.112.58])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id AA160953D6;
+        Mon, 30 Mar 2020 09:56:04 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH v7 06/13] arm/arm64: ITS: Introspection
+ tests
+To:     Andrew Jones <drjones@redhat.com>
+Cc:     Zenghui Yu <yuzenghui@huawei.com>, peter.maydell@linaro.org,
+        kvm@vger.kernel.org, maz@kernel.org, qemu-devel@nongnu.org,
+        qemu-arm@nongnu.org, andre.przywara@arm.com, thuth@redhat.com,
+        alexandru.elisei@arm.com, kvmarm@lists.cs.columbia.edu,
+        eric.auger.pro@gmail.com
+References: <20200320092428.20880-1-eric.auger@redhat.com>
+ <20200320092428.20880-7-eric.auger@redhat.com>
+ <947a79f5-1f79-532b-9ec7-6fd539ccd183@huawei.com>
+ <8878be7f-7653-b427-cd0d-722f82fb6b65@redhat.com>
+ <20200330091139.i2d6vv64f5diamlz@kamzik.brq.redhat.com>
+From:   Auger Eric <eric.auger@redhat.com>
+Message-ID: <7d6dc4e7-82b4-3c54-574f-2149d4a85c48@redhat.com>
+Date:   Mon, 30 Mar 2020 11:56:00 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
+In-Reply-To: <20200330091139.i2d6vv64f5diamlz@kamzik.brq.redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> From: Liu, Yi L <yi.l.liu@intel.com>
-> Sent: Sunday, March 22, 2020 8:32 PM
-> 
-> From: Liu Yi L <yi.l.liu@intel.com>
-> 
-> This patch reports PASID alloc/free availability to userspace (e.g. QEMU)
-> thus userspace could do a pre-check before utilizing this feature.
-> 
-> Cc: Kevin Tian <kevin.tian@intel.com>
-> CC: Jacob Pan <jacob.jun.pan@linux.intel.com>
-> Cc: Alex Williamson <alex.williamson@redhat.com>
-> Cc: Eric Auger <eric.auger@redhat.com>
-> Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>
-> Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
-> ---
->  drivers/vfio/vfio_iommu_type1.c | 28 ++++++++++++++++++++++++++++
->  include/uapi/linux/vfio.h       |  8 ++++++++
->  2 files changed, 36 insertions(+)
-> 
-> diff --git a/drivers/vfio/vfio_iommu_type1.c
-> b/drivers/vfio/vfio_iommu_type1.c
-> index e40afc0..ddd1ffe 100644
-> --- a/drivers/vfio/vfio_iommu_type1.c
-> +++ b/drivers/vfio/vfio_iommu_type1.c
-> @@ -2234,6 +2234,30 @@ static int vfio_iommu_type1_pasid_free(struct
-> vfio_iommu *iommu,
->  	return ret;
->  }
-> 
-> +static int vfio_iommu_info_add_nesting_cap(struct vfio_iommu *iommu,
-> +					 struct vfio_info_cap *caps)
-> +{
-> +	struct vfio_info_cap_header *header;
-> +	struct vfio_iommu_type1_info_cap_nesting *nesting_cap;
-> +
-> +	header = vfio_info_cap_add(caps, sizeof(*nesting_cap),
-> +				   VFIO_IOMMU_TYPE1_INFO_CAP_NESTING,
-> 1);
-> +	if (IS_ERR(header))
-> +		return PTR_ERR(header);
-> +
-> +	nesting_cap = container_of(header,
-> +				struct vfio_iommu_type1_info_cap_nesting,
-> +				header);
-> +
-> +	nesting_cap->nesting_capabilities = 0;
-> +	if (iommu->nesting) {
+Hi,
 
-Is it good to report a nesting cap when iommu->nesting is disabled? I suppose
-the check should move before vfio_info_cap_add...
+On 3/30/20 11:11 AM, Andrew Jones wrote:
+> On Mon, Mar 30, 2020 at 10:46:57AM +0200, Auger Eric wrote:
+>> Hi Zenghui,
+>>
+>> On 3/30/20 10:30 AM, Zenghui Yu wrote:
+>>> Hi Eric,
+>>>
+>>> On 2020/3/20 17:24, Eric Auger wrote:
+>>>> +static void its_cmd_queue_init(void)
+>>>> +{
+>>>> +=C2=A0=C2=A0=C2=A0 unsigned long order =3D get_order(SZ_64K >> PAGE=
+_SHIFT);
+>>>> +=C2=A0=C2=A0=C2=A0 u64 cbaser;
+>>>> +
+>>>> +=C2=A0=C2=A0=C2=A0 its_data.cmd_base =3D (void *)virt_to_phys(alloc=
+_pages(order));
+>>>
+>>> Shouldn't the cmd_base (and the cmd_write) be set as a GVA?
+>> yes it should
+>=20
+> If it's supposed to be a virtual address, when why do the virt_to_phys?
+What is programmed in CBASER register is a physical address. So the
+virt_to_phys() is relevant. The inconsistency is in its_allocate_entry()
+introduced later on where I return the physical address instead of the
+virtual address. I will fix that.
 
-> +		/* nesting iommu type supports PASID requests (alloc/free)
-> */
-> +		nesting_cap->nesting_capabilities |=
-> VFIO_IOMMU_PASID_REQS;
 
-VFIO_IOMMU_CAP_PASID_REQ? to avoid confusion with ioctl cmd
-VFIO_IOMMU_PASID_REQUEST...
+>=20
+>>>
+>>> Otherwise I think we will end-up with memory corruption when writing
+>>> the command queue.=C2=A0 But it seems that everything just works fine=
+ ...
+>>> So I'm really confused here :-/
+>> I was told by Paolo that the VA/PA memory map is flat in kvmunit test.
+>=20
+> What does flat mean?
 
-> +	}
-> +
-> +	return 0;
-> +}
-> +
->  static long vfio_iommu_type1_ioctl(void *iommu_data,
->  				   unsigned int cmd, unsigned long arg)
->  {
-> @@ -2283,6 +2307,10 @@ static long vfio_iommu_type1_ioctl(void
-> *iommu_data,
->  		if (ret)
->  			return ret;
-> 
-> +		ret = vfio_iommu_info_add_nesting_cap(iommu, &caps);
-> +		if (ret)
-> +			return ret;
-> +
->  		if (caps.size) {
->  			info.flags |= VFIO_IOMMU_INFO_CAPS;
-> 
-> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-> index 298ac80..8837219 100644
-> --- a/include/uapi/linux/vfio.h
-> +++ b/include/uapi/linux/vfio.h
-> @@ -748,6 +748,14 @@ struct vfio_iommu_type1_info_cap_iova_range {
->  	struct	vfio_iova_range iova_ranges[];
->  };
-> 
-> +#define VFIO_IOMMU_TYPE1_INFO_CAP_NESTING  2
-> +
-> +struct vfio_iommu_type1_info_cap_nesting {
-> +	struct	vfio_info_cap_header header;
-> +#define VFIO_IOMMU_PASID_REQS	(1 << 0)
-> +	__u32	nesting_capabilities;
-> +};
-> +
->  #define VFIO_IOMMU_GET_INFO _IO(VFIO_TYPE, VFIO_BASE + 12)
-> 
->  /**
-> --
-> 2.7.4
+Yes I meant an identity map.
+
+ kvm-unit-tests, at least arm/arm64, does prepare
+> an identity map of all physical memory, which explains why the above
+> is working.
+
+should be the same on x86
+
+ It's doing virt_to_phys(some-virt-addr), which gets a
+> phys addr, but when the ITS uses it as a virt addr it works because
+> we *also* have a virt addr =3D=3D phys addr mapping in the default page
+> table, which is named "idmap" for good reason.
+>=20
+> I think it would be better to test with the non-identity mapped address=
+es
+> though.
+
+is there any way to exercise a non idmap?
+
+Thanks
+
+Eric
+>=20
+> Thanks,
+> drew
+>=20
+>>
+>>>
+>>>> +
+>>>> +=C2=A0=C2=A0=C2=A0 cbaser =3D ((u64)its_data.cmd_base | (SZ_64K / S=
+Z_4K - 1)=C2=A0=C2=A0=C2=A0 |
+>>>> GITS_CBASER_VALID);
+>>>> +
+>>>> +=C2=A0=C2=A0=C2=A0 writeq(cbaser, its_data.base + GITS_CBASER);
+>>>> +
+>>>> +=C2=A0=C2=A0=C2=A0 its_data.cmd_write =3D its_data.cmd_base;
+>>>> +=C2=A0=C2=A0=C2=A0 writeq(0, its_data.base + GITS_CWRITER);
+>>>> +}
+>>>
+>>> Otherwise this looks good,
+>>> Reviewed-by: Zenghui Yu <yuzenghui@huawei.com>
+>> Thanks!
+>>
+>> Eric
+>>>
+>>>
+>>> Thanks
+>>>
+>>
+>>
 
