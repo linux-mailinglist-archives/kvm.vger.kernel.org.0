@@ -2,146 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 497E6197712
-	for <lists+kvm@lfdr.de>; Mon, 30 Mar 2020 10:53:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6BDBF197765
+	for <lists+kvm@lfdr.de>; Mon, 30 Mar 2020 11:03:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729810AbgC3Iw5 convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Mon, 30 Mar 2020 04:52:57 -0400
-Received: from mga17.intel.com ([192.55.52.151]:46065 "EHLO mga17.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728759AbgC3Iw5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 30 Mar 2020 04:52:57 -0400
-IronPort-SDR: QXpLRpUuvJqngAE/VFxwELgECsj4nQJSO3YmLU15Yd21t2hzULRSeqDvl1hyIJfya7kL8+No7h
- lYCHPuX/uWaQ==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Mar 2020 01:52:56 -0700
-IronPort-SDR: MBiyOOxUJF6fJNTvBj5/ir061eij3yZmO1MS3Xx9sjuiUH0gDp0qknfteIzyOpCabXDvhCf68F
- t54dPNvW9uUw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.72,323,1580803200"; 
-   d="scan'208";a="283528198"
-Received: from fmsmsx106.amr.corp.intel.com ([10.18.124.204])
-  by fmsmga002.fm.intel.com with ESMTP; 30 Mar 2020 01:52:56 -0700
-Received: from fmsmsx114.amr.corp.intel.com (10.18.116.8) by
- FMSMSX106.amr.corp.intel.com (10.18.124.204) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Mon, 30 Mar 2020 01:52:56 -0700
-Received: from shsmsx103.ccr.corp.intel.com (10.239.4.69) by
- FMSMSX114.amr.corp.intel.com (10.18.116.8) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Mon, 30 Mar 2020 01:52:55 -0700
-Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.225]) by
- SHSMSX103.ccr.corp.intel.com ([169.254.4.146]) with mapi id 14.03.0439.000;
- Mon, 30 Mar 2020 16:52:52 +0800
-From:   "Liu, Yi L" <yi.l.liu@intel.com>
-To:     "Tian, Kevin" <kevin.tian@intel.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>
-CC:     "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "Tian, Jun J" <jun.j.tian@intel.com>,
-        "Sun, Yi Y" <yi.y.sun@intel.com>,
-        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Wu, Hao" <hao.wu@intel.com>
-Subject: RE: [PATCH v1 2/8] vfio/type1: Add vfio_iommu_type1 parameter for
- quota tuning
-Thread-Topic: [PATCH v1 2/8] vfio/type1: Add vfio_iommu_type1 parameter for
- quota tuning
-Thread-Index: AQHWAEUbHl/tnnhWl0eaKvrwJMb1AqhgVzOAgACGb+A=
-Date:   Mon, 30 Mar 2020 08:52:51 +0000
-Message-ID: <A2975661238FB949B60364EF0F2C25743A217C68@SHSMSX104.ccr.corp.intel.com>
-References: <1584880325-10561-1-git-send-email-yi.l.liu@intel.com>
- <1584880325-10561-3-git-send-email-yi.l.liu@intel.com>
- <AADFC41AFE54684AB9EE6CBC0274A5D19D7FF3C5@SHSMSX104.ccr.corp.intel.com>
-In-Reply-To: <AADFC41AFE54684AB9EE6CBC0274A5D19D7FF3C5@SHSMSX104.ccr.corp.intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-version: 11.2.0.6
-dlp-reaction: no-action
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+        id S1729774AbgC3JD3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 30 Mar 2020 05:03:29 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:43398 "EHLO
+        us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1729649AbgC3JD2 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 30 Mar 2020 05:03:28 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1585559007;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+        bh=Vsj1BbjAtrR86c4lmCRUYn7M0e2CeyJvXzwnn3eRNXc=;
+        b=db8iNZx7EY9n9jQCTxMbSR2FrFt+5qO+5l0rsYZeaSD5jeI6U/bJIA/P/NqncI1OF32rEe
+        HP5Pf90A2jtScoHKQ+beLHzzOohx0Evc1rm5USCuDXemn3+9BgSOYFARRDLIqu/SowLXLV
+        OQxDME9ndsX5cygKua64ToB+5jpB5F4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-340-RKEwKQSANPWSOlUMzrdCBw-1; Mon, 30 Mar 2020 05:03:23 -0400
+X-MC-Unique: RKEwKQSANPWSOlUMzrdCBw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 58DC8100726D;
+        Mon, 30 Mar 2020 09:03:22 +0000 (UTC)
+Received: from [10.36.113.227] (ovpn-113-227.ams2.redhat.com [10.36.113.227])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id F3C0D100EBAF;
+        Mon, 30 Mar 2020 09:03:20 +0000 (UTC)
+Subject: Re: [kvm-unit-tests 1/2] s390x/smp: fix detection of "running"
+To:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.vnet.ibm.com>
+Cc:     KVM <kvm@vger.kernel.org>, linux-s390 <linux-s390@vger.kernel.org>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Thomas Huth <thuth@redhat.com>
+References: <20200330084911.34248-1-borntraeger@de.ibm.com>
+ <20200330084911.34248-2-borntraeger@de.ibm.com>
+From:   David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat GmbH
+Message-ID: <43aba287-844c-fbe3-50b9-3131c3a6b297@redhat.com>
+Date:   Mon, 30 Mar 2020 11:03:20 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
+In-Reply-To: <20200330084911.34248-2-borntraeger@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> From: Tian, Kevin <kevin.tian@intel.com>
-> Sent: Monday, March 30, 2020 4:41 PM
-> To: Liu, Yi L <yi.l.liu@intel.com>; alex.williamson@redhat.com;
-> Subject: RE: [PATCH v1 2/8] vfio/type1: Add vfio_iommu_type1 parameter for quota
-> tuning
+On 30.03.20 10:49, Christian Borntraeger wrote:
+> On s390x hosts with a single CPU, the smp test case hangs (loops).
+> The check is our restart has finished is wrong.
+> Sigp sense running status checks if the CPU is currently backed by a
+> real CPU. This means that on single CPU hosts a sigp sense running
+> will never claim that a target is running. We need to check for not
+> being stopped instead.
 > 
-> > From: Liu, Yi L <yi.l.liu@intel.com>
-> > Sent: Sunday, March 22, 2020 8:32 PM
-> >
-> > From: Liu Yi L <yi.l.liu@intel.com>
-> >
-> > This patch adds a module option to make the PASID quota tunable by
-> > administrator.
-> >
-> > TODO: needs to think more on how to  make the tuning to be per-process.
-> >
-> > Previous discussions:
-> > https://patchwork.kernel.org/patch/11209429/
-> >
-> > Cc: Kevin Tian <kevin.tian@intel.com>
-> > CC: Jacob Pan <jacob.jun.pan@linux.intel.com>
-> > Cc: Alex Williamson <alex.williamson@redhat.com>
-> > Cc: Eric Auger <eric.auger@redhat.com>
-> > Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>
-> > Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
-> > ---
-> >  drivers/vfio/vfio.c             | 8 +++++++-
-> >  drivers/vfio/vfio_iommu_type1.c | 7 ++++++-
-> >  include/linux/vfio.h            | 3 ++-
-> >  3 files changed, 15 insertions(+), 3 deletions(-)
-> >
-> > diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
-> > index d13b483..020a792 100644
-> > --- a/drivers/vfio/vfio.c
-> > +++ b/drivers/vfio/vfio.c
-> > @@ -2217,13 +2217,19 @@ struct vfio_mm *vfio_mm_get_from_task(struct
-> > task_struct *task)
-> >  }
-> >  EXPORT_SYMBOL_GPL(vfio_mm_get_from_task);
-> >
-> > -int vfio_mm_pasid_alloc(struct vfio_mm *vmm, int min, int max)
-> > +int vfio_mm_pasid_alloc(struct vfio_mm *vmm, int quota, int min, int max)
-> >  {
-> >  	ioasid_t pasid;
-> >  	int ret = -ENOSPC;
-> >
-> >  	mutex_lock(&vmm->pasid_lock);
-> >
-> > +	/* update quota as it is tunable by admin */
-> > +	if (vmm->pasid_quota != quota) {
-> > +		vmm->pasid_quota = quota;
-> > +		ioasid_adjust_set(vmm->ioasid_sid, quota);
-> > +	}
-> > +
+> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> ---
+>  lib/s390x/smp.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> It's a bit weird to have quota adjusted in the alloc path, since the latter might
-> be initiated by non-privileged users. Why not doing the simple math in vfio_
-> create_mm to set the quota when the ioasid set is created? even in the future
-> you may allow per-process quota setting, that should come from separate
-> privileged path instead of thru alloc..
+> diff --git a/lib/s390x/smp.c b/lib/s390x/smp.c
+> index 2555bf4..5ed8b7b 100644
+> --- a/lib/s390x/smp.c
+> +++ b/lib/s390x/smp.c
+> @@ -128,7 +128,7 @@ static int smp_cpu_restart_nolock(uint16_t addr, struct psw *psw)
+>  	 * The order has been accepted, but the actual restart may not
+>  	 * have been performed yet, so wait until the cpu is running.
+>  	 */
+> -	while (!smp_cpu_running(addr))
+> +	while (smp_cpu_stopped(addr))
+>  		mb();
+>  	cpu->active = true;
+>  	return 0;
+> 
 
-The reason is the kernel parameter modification has no event which
-can be used to adjust the quota. So I chose to adjust it in pasid_alloc
-path. If it's not good, how about adding one more IOCTL to let user-
-space trigger a quota adjustment event? Then even non-privileged
-user could trigger quota adjustment, the quota is actually controlled
-by privileged user. How about your opinion?
+Reviewed-by: David Hildenbrand <david@redhat.com>
 
-Regards,
-Yi Liu
+-- 
+Thanks,
+
+David / dhildenb
+
