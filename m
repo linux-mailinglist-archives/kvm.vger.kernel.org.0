@@ -2,220 +2,203 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 92F1C197B2F
-	for <lists+kvm@lfdr.de>; Mon, 30 Mar 2020 13:48:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7EEFF197B77
+	for <lists+kvm@lfdr.de>; Mon, 30 Mar 2020 14:06:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729896AbgC3Lsy convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Mon, 30 Mar 2020 07:48:54 -0400
-Received: from mga09.intel.com ([134.134.136.24]:30291 "EHLO mga09.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728764AbgC3Lsy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 30 Mar 2020 07:48:54 -0400
-IronPort-SDR: lKWFHWNZYnlqaBmkSxOp+ICIPdzooc5adi49GeZB83dBcTb4g7dqgLCwdj5WMn3WuQ7JlH7Yq8
- f6ISoez1kUMw==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Mar 2020 04:48:53 -0700
-IronPort-SDR: 3n7ZaBt1QAtL8ckMyOn0+HIcWqDND4WEFimtAJUDCEPAMqYddkyHPVEF5IQ4bJL28vudceK//d
- 7+ieRaMumCaA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.72,324,1580803200"; 
-   d="scan'208";a="248674831"
-Received: from fmsmsx105.amr.corp.intel.com ([10.18.124.203])
-  by orsmga003.jf.intel.com with ESMTP; 30 Mar 2020 04:48:50 -0700
-Received: from fmsmsx119.amr.corp.intel.com (10.18.124.207) by
- FMSMSX105.amr.corp.intel.com (10.18.124.203) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Mon, 30 Mar 2020 04:48:50 -0700
-Received: from shsmsx106.ccr.corp.intel.com (10.239.4.159) by
- FMSMSX119.amr.corp.intel.com (10.18.124.207) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Mon, 30 Mar 2020 04:48:49 -0700
-Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.225]) by
- SHSMSX106.ccr.corp.intel.com ([169.254.10.89]) with mapi id 14.03.0439.000;
- Mon, 30 Mar 2020 19:48:46 +0800
-From:   "Tian, Kevin" <kevin.tian@intel.com>
-To:     "Liu, Yi L" <yi.l.liu@intel.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>
-CC:     "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "Tian, Jun J" <jun.j.tian@intel.com>,
-        "Sun, Yi Y" <yi.y.sun@intel.com>,
-        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Wu, Hao" <hao.wu@intel.com>
-Subject: RE: [PATCH v1 5/8] vfio/type1: Report 1st-level/stage-1 format to
- userspace
-Thread-Topic: [PATCH v1 5/8] vfio/type1: Report 1st-level/stage-1 format to
- userspace
-Thread-Index: AQHWAEUcrRt83jyTNECgMYM7VBywiqhg9Y6g
-Date:   Mon, 30 Mar 2020 11:48:45 +0000
-Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D19D7FF8BC@SHSMSX104.ccr.corp.intel.com>
-References: <1584880325-10561-1-git-send-email-yi.l.liu@intel.com>
- <1584880325-10561-6-git-send-email-yi.l.liu@intel.com>
-In-Reply-To: <1584880325-10561-6-git-send-email-yi.l.liu@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-version: 11.2.0.6
-dlp-reaction: no-action
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+        id S1730043AbgC3MGs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 30 Mar 2020 08:06:48 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:12148 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1729669AbgC3MGs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 30 Mar 2020 08:06:48 -0400
+Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.58])
+        by Forcepoint Email with ESMTP id 9F0A01416568A269222E;
+        Mon, 30 Mar 2020 20:06:44 +0800 (CST)
+Received: from [127.0.0.1] (10.173.222.27) by DGGEMS413-HUB.china.huawei.com
+ (10.3.19.213) with Microsoft SMTP Server id 14.3.487.0; Mon, 30 Mar 2020
+ 20:06:36 +0800
+Subject: Re: [kvm-unit-tests PATCH v7 13/13] arm/arm64: ITS: pending table
+ migration test
+To:     Eric Auger <eric.auger@redhat.com>
+CC:     <eric.auger.pro@gmail.com>, <maz@kernel.org>,
+        <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>,
+        <qemu-devel@nongnu.org>, <qemu-arm@nongnu.org>,
+        <drjones@redhat.com>, <andre.przywara@arm.com>,
+        <peter.maydell@linaro.org>, <alexandru.elisei@arm.com>,
+        <thuth@redhat.com>
+References: <20200320092428.20880-1-eric.auger@redhat.com>
+ <20200320092428.20880-14-eric.auger@redhat.com>
+From:   Zenghui Yu <yuzenghui@huawei.com>
+Message-ID: <296c574b-810c-9c90-a613-df732a9ac193@huawei.com>
+Date:   Mon, 30 Mar 2020 20:06:35 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
+In-Reply-To: <20200320092428.20880-14-eric.auger@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.173.222.27]
+X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> From: Liu, Yi L <yi.l.liu@intel.com>
-> Sent: Sunday, March 22, 2020 8:32 PM
+Hi Eric,
+
+On 2020/3/20 17:24, Eric Auger wrote:
+> Add two new migration tests. One testing the migration of
+> a topology where collection were unmapped. The second test
+> checks the migration of the pending table.
 > 
-> From: Liu Yi L <yi.l.liu@intel.com>
-> 
-> VFIO exposes IOMMU nesting translation (a.k.a dual stage translation)
-> capability to userspace. Thus applications like QEMU could support
-> vIOMMU with hardware's nesting translation capability for pass-through
-> devices. Before setting up nesting translation for pass-through devices,
-> QEMU and other applications need to learn the supported 1st-lvl/stage-1
-> translation structure format like page table format.
-> 
-> Take vSVA (virtual Shared Virtual Addressing) as an example, to support
-> vSVA for pass-through devices, QEMU setup nesting translation for pass-
-> through devices. The guest page table are configured to host as 1st-lvl/
-> stage-1 page table. Therefore, guest format should be compatible with
-> host side.
-> 
-> This patch reports the supported 1st-lvl/stage-1 page table format on the
-> current platform to userspace. QEMU and other alike applications should
-> use this format info when trying to setup IOMMU nesting translation on
-> host IOMMU.
-> 
-> Cc: Kevin Tian <kevin.tian@intel.com>
-> CC: Jacob Pan <jacob.jun.pan@linux.intel.com>
-> Cc: Alex Williamson <alex.williamson@redhat.com>
-> Cc: Eric Auger <eric.auger@redhat.com>
-> Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>
-> Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
-> ---
->  drivers/vfio/vfio_iommu_type1.c | 56
-> +++++++++++++++++++++++++++++++++++++++++
->  include/uapi/linux/vfio.h       |  1 +
->  2 files changed, 57 insertions(+)
-> 
-> diff --git a/drivers/vfio/vfio_iommu_type1.c
-> b/drivers/vfio/vfio_iommu_type1.c
-> index 9aa2a67..82a9e0b 100644
-> --- a/drivers/vfio/vfio_iommu_type1.c
-> +++ b/drivers/vfio/vfio_iommu_type1.c
-> @@ -2234,11 +2234,66 @@ static int vfio_iommu_type1_pasid_free(struct
-> vfio_iommu *iommu,
->  	return ret;
->  }
-> 
-> +static int vfio_iommu_get_stage1_format(struct vfio_iommu *iommu,
-> +					 u32 *stage1_format)
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+
+[...]
+
+> @@ -659,6 +678,15 @@ static int its_prerequisites(int nb_cpus)
+>   	return 0;
+>   }
+>   
+> +static void set_lpi(struct its_device *dev, u32 eventid, u32 physid,
+> +		    struct its_collection *col)
 > +{
-> +	struct vfio_domain *domain;
-> +	u32 format = 0, tmp_format = 0;
-> +	int ret;
+> +	assert(dev && col);
 > +
-> +	mutex_lock(&iommu->lock);
-> +	if (list_empty(&iommu->domain_list)) {
-> +		mutex_unlock(&iommu->lock);
-> +		return -EINVAL;
-> +	}
-> +
-> +	list_for_each_entry(domain, &iommu->domain_list, next) {
-> +		if (iommu_domain_get_attr(domain->domain,
-> +			DOMAIN_ATTR_PASID_FORMAT, &format)) {
-> +			ret = -EINVAL;
-> +			format = 0;
-> +			goto out_unlock;
-> +		}
-> +		/*
-> +		 * format is always non-zero (the first format is
-> +		 * IOMMU_PASID_FORMAT_INTEL_VTD which is 1). For
-> +		 * the reason of potential different backed IOMMU
-> +		 * formats, here we expect to have identical formats
-> +		 * in the domain list, no mixed formats support.
-> +		 * return -EINVAL to fail the attempt of setup
-> +		 * VFIO_TYPE1_NESTING_IOMMU if non-identical formats
-> +		 * are detected.
-> +		 */
-> +		if (tmp_format && tmp_format != format) {
-> +			ret = -EINVAL;
-> +			format = 0;
-> +			goto out_unlock;
-> +		}
-> +
-> +		tmp_format = format;
-> +	}
+> +	its_send_mapti(dev, physid, eventid, col);
+> +	gicv3_lpi_set_config(physid, LPI_PROP_DEFAULT);
+> +}
 
-this path is invoked only in VFIO_IOMMU_GET_INFO path. If we don't
-want to assume the status quo that one container holds only one
-device w/ vIOMMU (the prerequisite for vSVA), looks we also need
-check the format compatibility when attaching a new group to this
-container?
+I'd say we can just drop this helper and open-code it anywhere
+necessarily. The name 'set_lpi' doesn't tell me too much about
+what has been implemented inside the helper.
 
-> +	ret = 0;
 > +
-> +out_unlock:
-> +	if (format)
-> +		*stage1_format = format;
-> +	mutex_unlock(&iommu->lock);
-> +	return ret;
+>   /*
+>    * Setup the configuration for those mappings:
+>    * dev_id=2 event=20 -> vcpu 3, intid=8195
+> @@ -790,6 +818,108 @@ static void test_its_migration(void)
+>   	its_send_int(dev7, 255);
+>   	check_lpi_stats("dev7/eventid=255 triggers LPI 8196 on PE #2 after migration");
+>   }
+> +
+> +static void test_migrate_unmapped_collection(void)
+> +{
+> +	struct its_collection *col;
+> +	struct its_device *dev2, *dev7;
+> +	int pe0 = 0;
+> +	u8 config;
+> +
+> +	if (its_setup1())
+> +		return;
+> +
+> +	col = its_create_collection(pe0, pe0);
+> +	dev2 = its_get_device(2);
+> +	dev7 = its_get_device(7);
+> +
+> +	/* MAPTI with the collection unmapped */
+> +	set_lpi(dev2, 0, 8192, col);
+
+... and it's only invoked here.
+
+> +
+> +	puts("Now migrate the VM, then press a key to continue...\n");
+> +	(void)getchar();
+> +	report_info("Migration complete");
+> +
+> +	/* on the destination, map the collection */
+> +	its_send_mapc(col, true);
+> +	its_send_invall(col);
+> +
+> +	lpi_stats_expect(2, 8196);
+> +	its_send_int(dev7, 255);
+> +	check_lpi_stats("dev7/eventid= 255 triggered LPI 8196 on PE #2");
+> +
+> +	config = gicv3_lpi_get_config(8192);
+> +	report(config == LPI_PROP_DEFAULT,
+> +	       "Config of LPI 8192 was properly migrated");
+> +
+> +	lpi_stats_expect(pe0, 8192);
+> +	its_send_int(dev2, 0);
+> +	check_lpi_stats("dev2/eventid = 0 triggered LPI 8192 on PE0");
 > +}
 > +
->  static int vfio_iommu_info_add_nesting_cap(struct vfio_iommu *iommu,
->  					 struct vfio_info_cap *caps)
->  {
->  	struct vfio_info_cap_header *header;
->  	struct vfio_iommu_type1_info_cap_nesting *nesting_cap;
-> +	u32 formats = 0;
-> +	int ret;
+> +static void test_its_pending_migration(void)
+> +{
+> +	struct its_device *dev;
+> +	struct its_collection *collection[2];
+> +	int *expected = malloc(nr_cpus * sizeof(int));
+> +	int pe0 = nr_cpus - 1, pe1 = nr_cpus - 2;
+> +	u64 pendbaser;
+> +	void *ptr;
+> +	int i;
 > +
-> +	ret = vfio_iommu_get_stage1_format(iommu, &formats);
-> +	if (ret) {
-> +		pr_warn("Failed to get stage-1 format\n");
-> +		return ret;
+> +	if (its_prerequisites(4))
+> +		return;
+> +
+> +	dev = its_create_device(2 /* dev id */, 8 /* nb_ites */);
+> +	its_send_mapd(dev, true);
+> +
+> +	collection[0] = its_create_collection(pe0, pe0);
+> +	collection[1] = its_create_collection(pe1, pe1);
+> +	its_send_mapc(collection[0], true);
+> +	its_send_mapc(collection[1], true);
+> +
+> +	/* disable lpi at redist level */
+> +	gicv3_lpi_rdist_disable(pe0);
+> +	gicv3_lpi_rdist_disable(pe1);
+> +
+> +	/* lpis are interleaved inbetween the 2 PEs */
+> +	for (i = 0; i < 256; i++) {
+> +		struct its_collection *col = i % 2 ? collection[0] :
+> +						     collection[1];
+> +		int vcpu = col->target_address >> 16;
+> +
+> +		its_send_mapti(dev, LPI(i), i, col);
+> +		gicv3_lpi_set_config(LPI(i), LPI_PROP_DEFAULT);
+> +		gicv3_lpi_set_clr_pending(vcpu, LPI(i), true);
 > +	}
-> 
->  	header = vfio_info_cap_add(caps, sizeof(*nesting_cap),
->  				   VFIO_IOMMU_TYPE1_INFO_CAP_NESTING,
-> 1);
-> @@ -2254,6 +2309,7 @@ static int vfio_iommu_info_add_nesting_cap(struct
-> vfio_iommu *iommu,
->  		/* nesting iommu type supports PASID requests (alloc/free)
-> */
->  		nesting_cap->nesting_capabilities |=
-> VFIO_IOMMU_PASID_REQS;
->  	}
-> +	nesting_cap->stage1_formats = formats;
-> 
->  	return 0;
->  }
-> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-> index ed9881d..ebeaf3e 100644
-> --- a/include/uapi/linux/vfio.h
-> +++ b/include/uapi/linux/vfio.h
-> @@ -763,6 +763,7 @@ struct vfio_iommu_type1_info_cap_nesting {
->  	struct	vfio_info_cap_header header;
->  #define VFIO_IOMMU_PASID_REQS	(1 << 0)
->  	__u32	nesting_capabilities;
-> +	__u32	stage1_formats;
+> +	its_send_invall(collection[0]);
+> +	its_send_invall(collection[1]);
+> +
+> +	/* Clear the PTZ bit on each pendbaser */
+> +
+> +	expected[pe0] = 128;
+> +	expected[pe1] = 128;
 
-do you plan to support multiple formats? If not, use singular name.
+Do we need to initialize expected[] for other PEs? Or it has always
+been zeroed by the kvm-unit-tests implementation of malloc()?
 
->  };
-> 
->  #define VFIO_IOMMU_GET_INFO _IO(VFIO_TYPE, VFIO_BASE + 12)
-> --
-> 2.7.4
+> +
+> +	ptr = gicv3_data.redist_base[pe0] + GICR_PENDBASER;
+> +	pendbaser = readq(ptr);
+> +	writeq(pendbaser & ~GICR_PENDBASER_PTZ, ptr);
+> +
+> +	ptr = gicv3_data.redist_base[pe1] + GICR_PENDBASER;
+> +	pendbaser = readq(ptr);
+> +	writeq(pendbaser & ~GICR_PENDBASER_PTZ, ptr);
+> +
+> +	gicv3_lpi_rdist_enable(pe0);
+> +	gicv3_lpi_rdist_enable(pe1);
+
+I don't know how the migration gets implemented in kvm-unit-tests.
+But is there any guarantee that the LPIs will only be triggered on the
+destination side? As once the EnableLPIs bit becomes 1, VGIC will start
+reading the pending bit in guest memory and potentially injecting LPIs
+into the target vcpu (in the source side).
+
+> +
+> +	puts("Now migrate the VM, then press a key to continue...\n");
+> +	(void)getchar();
+> +	report_info("Migration complete");
+> +
+> +	/* let's wait for the 256 LPIs to be handled */
+> +	mdelay(1000);
+> +
+> +	check_lpi_hits(expected, "128 LPIs on both PE0 and PE1 after migration");
+> +}
+
+
+Thanks,
+Zenghui
 
