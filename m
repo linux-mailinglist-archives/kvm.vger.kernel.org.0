@@ -2,142 +2,146 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 33F181976F9
-	for <lists+kvm@lfdr.de>; Mon, 30 Mar 2020 10:49:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 497E6197712
+	for <lists+kvm@lfdr.de>; Mon, 30 Mar 2020 10:53:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729768AbgC3ItZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 30 Mar 2020 04:49:25 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:61892 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729674AbgC3ItY (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 30 Mar 2020 04:49:24 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 02U8YIbK040325;
-        Mon, 30 Mar 2020 04:49:23 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 301yfedydx-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 30 Mar 2020 04:49:23 -0400
-Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 02U8YaGZ041517;
-        Mon, 30 Mar 2020 04:49:23 -0400
-Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com [169.55.91.170])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 301yfedydp-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 30 Mar 2020 04:49:23 -0400
-Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
-        by ppma02wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 02U8kvJK028660;
-        Mon, 30 Mar 2020 08:49:21 GMT
-Received: from b03cxnp07028.gho.boulder.ibm.com (b03cxnp07028.gho.boulder.ibm.com [9.17.130.15])
-        by ppma02wdc.us.ibm.com with ESMTP id 301x76fca0-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 30 Mar 2020 08:49:21 +0000
-Received: from b03ledav004.gho.boulder.ibm.com (b03ledav004.gho.boulder.ibm.com [9.17.130.235])
-        by b03cxnp07028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 02U8nKJX23462156
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 30 Mar 2020 08:49:20 GMT
-Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B6DC17805E;
-        Mon, 30 Mar 2020 08:49:20 +0000 (GMT)
-Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2D5D178060;
-        Mon, 30 Mar 2020 08:49:20 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.114.17.106])
-        by b03ledav004.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Mon, 30 Mar 2020 08:49:20 +0000 (GMT)
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
-To:     Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.vnet.ibm.com>
-Cc:     KVM <kvm@vger.kernel.org>, David Hildenbrand <david@redhat.com>,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Thomas Huth <thuth@redhat.com>
-Subject: [kvm-unit-tests 2/2] s390x/smp: add minimal test for sigp sense running status
-Date:   Mon, 30 Mar 2020 04:49:11 -0400
-Message-Id: <20200330084911.34248-3-borntraeger@de.ibm.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200330084911.34248-1-borntraeger@de.ibm.com>
-References: <20200330084911.34248-1-borntraeger@de.ibm.com>
+        id S1729810AbgC3Iw5 convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Mon, 30 Mar 2020 04:52:57 -0400
+Received: from mga17.intel.com ([192.55.52.151]:46065 "EHLO mga17.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728759AbgC3Iw5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 30 Mar 2020 04:52:57 -0400
+IronPort-SDR: QXpLRpUuvJqngAE/VFxwELgECsj4nQJSO3YmLU15Yd21t2hzULRSeqDvl1hyIJfya7kL8+No7h
+ lYCHPuX/uWaQ==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Mar 2020 01:52:56 -0700
+IronPort-SDR: MBiyOOxUJF6fJNTvBj5/ir061eij3yZmO1MS3Xx9sjuiUH0gDp0qknfteIzyOpCabXDvhCf68F
+ t54dPNvW9uUw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.72,323,1580803200"; 
+   d="scan'208";a="283528198"
+Received: from fmsmsx106.amr.corp.intel.com ([10.18.124.204])
+  by fmsmga002.fm.intel.com with ESMTP; 30 Mar 2020 01:52:56 -0700
+Received: from fmsmsx114.amr.corp.intel.com (10.18.116.8) by
+ FMSMSX106.amr.corp.intel.com (10.18.124.204) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Mon, 30 Mar 2020 01:52:56 -0700
+Received: from shsmsx103.ccr.corp.intel.com (10.239.4.69) by
+ FMSMSX114.amr.corp.intel.com (10.18.116.8) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Mon, 30 Mar 2020 01:52:55 -0700
+Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.225]) by
+ SHSMSX103.ccr.corp.intel.com ([169.254.4.146]) with mapi id 14.03.0439.000;
+ Mon, 30 Mar 2020 16:52:52 +0800
+From:   "Liu, Yi L" <yi.l.liu@intel.com>
+To:     "Tian, Kevin" <kevin.tian@intel.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>
+CC:     "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "Tian, Jun J" <jun.j.tian@intel.com>,
+        "Sun, Yi Y" <yi.y.sun@intel.com>,
+        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Wu, Hao" <hao.wu@intel.com>
+Subject: RE: [PATCH v1 2/8] vfio/type1: Add vfio_iommu_type1 parameter for
+ quota tuning
+Thread-Topic: [PATCH v1 2/8] vfio/type1: Add vfio_iommu_type1 parameter for
+ quota tuning
+Thread-Index: AQHWAEUbHl/tnnhWl0eaKvrwJMb1AqhgVzOAgACGb+A=
+Date:   Mon, 30 Mar 2020 08:52:51 +0000
+Message-ID: <A2975661238FB949B60364EF0F2C25743A217C68@SHSMSX104.ccr.corp.intel.com>
+References: <1584880325-10561-1-git-send-email-yi.l.liu@intel.com>
+ <1584880325-10561-3-git-send-email-yi.l.liu@intel.com>
+ <AADFC41AFE54684AB9EE6CBC0274A5D19D7FF3C5@SHSMSX104.ccr.corp.intel.com>
+In-Reply-To: <AADFC41AFE54684AB9EE6CBC0274A5D19D7FF3C5@SHSMSX104.ccr.corp.intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.645
- definitions=2020-03-30_01:2020-03-27,2020-03-30 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- suspectscore=0 impostorscore=0 mlxscore=0 phishscore=0 clxscore=1015
- bulkscore=0 malwarescore=0 spamscore=0 mlxlogscore=999 adultscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2003300076
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-make sure that sigp sense running status returns a sane value for
-stopped CPUs.
+> From: Tian, Kevin <kevin.tian@intel.com>
+> Sent: Monday, March 30, 2020 4:41 PM
+> To: Liu, Yi L <yi.l.liu@intel.com>; alex.williamson@redhat.com;
+> Subject: RE: [PATCH v1 2/8] vfio/type1: Add vfio_iommu_type1 parameter for quota
+> tuning
+> 
+> > From: Liu, Yi L <yi.l.liu@intel.com>
+> > Sent: Sunday, March 22, 2020 8:32 PM
+> >
+> > From: Liu Yi L <yi.l.liu@intel.com>
+> >
+> > This patch adds a module option to make the PASID quota tunable by
+> > administrator.
+> >
+> > TODO: needs to think more on how to  make the tuning to be per-process.
+> >
+> > Previous discussions:
+> > https://patchwork.kernel.org/patch/11209429/
+> >
+> > Cc: Kevin Tian <kevin.tian@intel.com>
+> > CC: Jacob Pan <jacob.jun.pan@linux.intel.com>
+> > Cc: Alex Williamson <alex.williamson@redhat.com>
+> > Cc: Eric Auger <eric.auger@redhat.com>
+> > Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>
+> > Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
+> > ---
+> >  drivers/vfio/vfio.c             | 8 +++++++-
+> >  drivers/vfio/vfio_iommu_type1.c | 7 ++++++-
+> >  include/linux/vfio.h            | 3 ++-
+> >  3 files changed, 15 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
+> > index d13b483..020a792 100644
+> > --- a/drivers/vfio/vfio.c
+> > +++ b/drivers/vfio/vfio.c
+> > @@ -2217,13 +2217,19 @@ struct vfio_mm *vfio_mm_get_from_task(struct
+> > task_struct *task)
+> >  }
+> >  EXPORT_SYMBOL_GPL(vfio_mm_get_from_task);
+> >
+> > -int vfio_mm_pasid_alloc(struct vfio_mm *vmm, int min, int max)
+> > +int vfio_mm_pasid_alloc(struct vfio_mm *vmm, int quota, int min, int max)
+> >  {
+> >  	ioasid_t pasid;
+> >  	int ret = -ENOSPC;
+> >
+> >  	mutex_lock(&vmm->pasid_lock);
+> >
+> > +	/* update quota as it is tunable by admin */
+> > +	if (vmm->pasid_quota != quota) {
+> > +		vmm->pasid_quota = quota;
+> > +		ioasid_adjust_set(vmm->ioasid_sid, quota);
+> > +	}
+> > +
+> 
+> It's a bit weird to have quota adjusted in the alloc path, since the latter might
+> be initiated by non-privileged users. Why not doing the simple math in vfio_
+> create_mm to set the quota when the ioasid set is created? even in the future
+> you may allow per-process quota setting, that should come from separate
+> privileged path instead of thru alloc..
 
-Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
----
- lib/s390x/smp.c |  2 +-
- lib/s390x/smp.h |  2 +-
- s390x/smp.c     | 11 +++++++++++
- 3 files changed, 13 insertions(+), 2 deletions(-)
+The reason is the kernel parameter modification has no event which
+can be used to adjust the quota. So I chose to adjust it in pasid_alloc
+path. If it's not good, how about adding one more IOCTL to let user-
+space trigger a quota adjustment event? Then even non-privileged
+user could trigger quota adjustment, the quota is actually controlled
+by privileged user. How about your opinion?
 
-diff --git a/lib/s390x/smp.c b/lib/s390x/smp.c
-index 5ed8b7b..492cb05 100644
---- a/lib/s390x/smp.c
-+++ b/lib/s390x/smp.c
-@@ -58,7 +58,7 @@ bool smp_cpu_stopped(uint16_t addr)
- 	return !!(status & (SIGP_STATUS_CHECK_STOP|SIGP_STATUS_STOPPED));
- }
- 
--bool smp_cpu_running(uint16_t addr)
-+bool smp_sense_running_status(uint16_t addr)
- {
- 	if (sigp(addr, SIGP_SENSE_RUNNING, 0, NULL) != SIGP_CC_STATUS_STORED)
- 		return true;
-diff --git a/lib/s390x/smp.h b/lib/s390x/smp.h
-index a8b98c0..639ec92 100644
---- a/lib/s390x/smp.h
-+++ b/lib/s390x/smp.h
-@@ -40,7 +40,7 @@ struct cpu_status {
- int smp_query_num_cpus(void);
- struct cpu *smp_cpu_from_addr(uint16_t addr);
- bool smp_cpu_stopped(uint16_t addr);
--bool smp_cpu_running(uint16_t addr);
-+bool smp_sense_running_status(uint16_t addr);
- int smp_cpu_restart(uint16_t addr);
- int smp_cpu_start(uint16_t addr, struct psw psw);
- int smp_cpu_stop(uint16_t addr);
-diff --git a/s390x/smp.c b/s390x/smp.c
-index 79cdc1f..f9f143d 100644
---- a/s390x/smp.c
-+++ b/s390x/smp.c
-@@ -210,6 +210,16 @@ static void test_emcall(void)
- 	report_prefix_pop();
- }
- 
-+static void test_sense_running(void)
-+{
-+	report_prefix_push("sense_running");
-+	/* make sure CPU is stopped */
-+	smp_cpu_stop(1);
-+	report(!smp_sense_running_status(1), "CPU1 sense claims not running");
-+	report_prefix_pop();
-+}
-+
-+
- /* Used to dirty registers of cpu #1 before it is reset */
- static void test_func_initial(void)
- {
-@@ -319,6 +329,7 @@ int main(void)
- 	test_store_status();
- 	test_ecall();
- 	test_emcall();
-+	test_sense_running();
- 	test_reset();
- 	test_reset_initial();
- 	smp_cpu_destroy(1);
--- 
-2.25.1
-
+Regards,
+Yi Liu
