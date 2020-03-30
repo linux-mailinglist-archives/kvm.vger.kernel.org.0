@@ -2,564 +2,235 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8AAE91972D0
-	for <lists+kvm@lfdr.de>; Mon, 30 Mar 2020 05:34:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D69CB197314
+	for <lists+kvm@lfdr.de>; Mon, 30 Mar 2020 06:19:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729184AbgC3DeQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 29 Mar 2020 23:34:16 -0400
-Received: from mga18.intel.com ([134.134.136.126]:12639 "EHLO mga18.intel.com"
+        id S1726781AbgC3ETQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 30 Mar 2020 00:19:16 -0400
+Received: from mga04.intel.com ([192.55.52.120]:46067 "EHLO mga04.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728987AbgC3DeP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 29 Mar 2020 23:34:15 -0400
-IronPort-SDR: 2ShVlc93pQVEzFoVSdzt4vtfyfGqRFuWIvWhcTH7fRH9ZEHiC+4wSGVGli+fMshCp0vnh57Hr8
- 4UBB4WASoCTQ==
+        id S1726044AbgC3ETQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 30 Mar 2020 00:19:16 -0400
+IronPort-SDR: 1+v1rhp08U6Ud8LtbNTqxfkZ9K0hqHFXQKlmRTwLr91bVKOBiSeR4vsjzQGOR5Vzhx1zCpFzdN
+ MyCvdZrzSVnA==
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Mar 2020 20:34:15 -0700
-IronPort-SDR: Ql80/dHgRunCIAEGpMH8PvJ5NTGi24BoaOb7/Wx5sM0rr28cVMC3XJy5T3JZZ4VirkOsZCuG9O
- vq0eAW1bMIpg==
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Mar 2020 21:19:15 -0700
+IronPort-SDR: q+c5MPo9IFL/9V7PdbleV9vATKvFOFudEpKJOzVUjeKfZggciT3YFD24j2yph1EHNhTVczdf13
+ p81jREaVor2g==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.72,322,1580803200"; 
-   d="scan'208";a="272236681"
-Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040) ([10.239.13.16])
-  by fmsmga004.fm.intel.com with ESMTP; 29 Mar 2020 20:34:10 -0700
-Date:   Sun, 29 Mar 2020 23:24:37 -0400
-From:   Yan Zhao <yan.y.zhao@intel.com>
-To:     Kirti Wankhede <kwankhede@nvidia.com>
-Cc:     "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "cjia@nvidia.com" <cjia@nvidia.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "Yang, Ziye" <ziye.yang@intel.com>,
-        "Liu, Changpeng" <changpeng.liu@intel.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>,
-        "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
-        "eskultet@redhat.com" <eskultet@redhat.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "dgilbert@redhat.com" <dgilbert@redhat.com>,
-        "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>,
-        "eauger@redhat.com" <eauger@redhat.com>,
-        "aik@ozlabs.ru" <aik@ozlabs.ru>,
-        "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
-        "felipe@nutanix.com" <felipe@nutanix.com>,
-        "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@Alibaba-inc.com>,
-        "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
-        "Ken.Xue@amd.com" <Ken.Xue@amd.com>,
-        "Wang, Zhi A" <zhi.a.wang@intel.com>,
-        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: Re: [PATCH v16 Kernel 4/7] vfio iommu: Implementation of ioctl for
- dirty pages tracking.
-Message-ID: <20200330032437.GD30683@joy-OptiPlex-7040>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-References: <1585084732-18473-1-git-send-email-kwankhede@nvidia.com>
- <20200325021135.GB20109@joy-OptiPlex-7040>
- <33d38629-aeaf-1c30-26d4-958b998620b0@nvidia.com>
- <20200327003055.GB26419@joy-OptiPlex-7040>
- <deb8b18f-aa79-70d3-ce05-89b607f813c4@nvidia.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <deb8b18f-aa79-70d3-ce05-89b607f813c4@nvidia.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+   d="scan'208";a="327632008"
+Received: from jacob-builder.jf.intel.com ([10.7.199.155])
+  by orsmga001.jf.intel.com with ESMTP; 29 Mar 2020 21:19:15 -0700
+From:   Liu Yi L <yi.l.liu@intel.com>
+To:     qemu-devel@nongnu.org, alex.williamson@redhat.com,
+        peterx@redhat.com
+Cc:     eric.auger@redhat.com, pbonzini@redhat.com, mst@redhat.com,
+        david@gibson.dropbear.id.au, kevin.tian@intel.com,
+        yi.l.liu@intel.com, jun.j.tian@intel.com, yi.y.sun@intel.com,
+        kvm@vger.kernel.org, hao.wu@intel.com, jean-philippe@linaro.org
+Subject: [PATCH v2 00/22] intel_iommu: expose Shared Virtual Addressing to VMs
+Date:   Sun, 29 Mar 2020 21:24:39 -0700
+Message-Id: <1585542301-84087-1-git-send-email-yi.l.liu@intel.com>
+X-Mailer: git-send-email 2.7.4
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Mar 27, 2020 at 01:28:13PM +0800, Kirti Wankhede wrote:
-> Hit send button little early.
-> 
->  >
->  > I checked v12, it's not like what I said.
->  > In v12, bitmaps are generated per vfio_dma, and combination of the
->  > bitmaps are required in order to generate a big bitmap suiting for dirty
->  > query. It can cause problem when offset not aligning.
->  > But what I propose here is to generate an rb tree orthogonal to the tree
->  > of vfio_dma.
->  >
->  > as to CPU cycles saving, I don't think iterating/translating page by page
->  > would achieve that purpose.
->  >
-> 
-> Instead of creating one extra rb tree for dirty pages tracking in v10 
-> tried to use dma->pfn_list itself, we tried changes in v10, v11 and v12, 
-> latest version is evolved version with best possible approach after 
-> discussion. Probably, go through v11 as well.
-> https://patchwork.kernel.org/patch/11298335/
->
-I'm not sure why all those previous implementations are bound to
-vfio_dma. for vIOMMU on, in most cases, a vfio_dma is only for a page,
-so generating a one-byte bitmap for a single page in each vfio_dma ?
-is it possible to creating one extra rb tree to keep dirty ranges, and
-one fixed length kernel bitmap whose content is generated on query,
-serving as a bouncing buffer for copy_to_user
+Shared Virtual Addressing (SVA), a.k.a, Shared Virtual Memory (SVM) on
+Intel platforms allows address space sharing between device DMA and
+applications. SVA can reduce programming complexity and enhance security.
 
-> 
-> On 3/27/2020 6:00 AM, Yan Zhao wrote:
-> > On Fri, Mar 27, 2020 at 05:39:01AM +0800, Kirti Wankhede wrote:
-> >>
-> >>
-> >> On 3/25/2020 7:41 AM, Yan Zhao wrote:
-> >>> On Wed, Mar 25, 2020 at 05:18:52AM +0800, Kirti Wankhede wrote:
-> >>>> VFIO_IOMMU_DIRTY_PAGES ioctl performs three operations:
-> >>>> - Start dirty pages tracking while migration is active
-> >>>> - Stop dirty pages tracking.
-> >>>> - Get dirty pages bitmap. Its user space application's responsibility to
-> >>>>     copy content of dirty pages from source to destination during migration.
-> >>>>
-> >>>> To prevent DoS attack, memory for bitmap is allocated per vfio_dma
-> >>>> structure. Bitmap size is calculated considering smallest supported page
-> >>>> size. Bitmap is allocated for all vfio_dmas when dirty logging is enabled
-> >>>>
-> >>>> Bitmap is populated for already pinned pages when bitmap is allocated for
-> >>>> a vfio_dma with the smallest supported page size. Update bitmap from
-> >>>> pinning functions when tracking is enabled. When user application queries
-> >>>> bitmap, check if requested page size is same as page size used to
-> >>>> populated bitmap. If it is equal, copy bitmap, but if not equal, return
-> >>>> error.
-> >>>>
-> >>>> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-> >>>> Reviewed-by: Neo Jia <cjia@nvidia.com>
-> >>>> ---
-> >>>>    drivers/vfio/vfio_iommu_type1.c | 266 +++++++++++++++++++++++++++++++++++++++-
-> >>>>    1 file changed, 260 insertions(+), 6 deletions(-)
-> >>>>
-> >>>> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> >>>> index 70aeab921d0f..874a1a7ae925 100644
-> >>>> --- a/drivers/vfio/vfio_iommu_type1.c
-> >>>> +++ b/drivers/vfio/vfio_iommu_type1.c
-> >>>> @@ -71,6 +71,7 @@ struct vfio_iommu {
-> >>>>    	unsigned int		dma_avail;
-> >>>>    	bool			v2;
-> >>>>    	bool			nesting;
-> >>>> +	bool			dirty_page_tracking;
-> >>>>    };
-> >>>>    
-> >>>>    struct vfio_domain {
-> >>>> @@ -91,6 +92,7 @@ struct vfio_dma {
-> >>>>    	bool			lock_cap;	/* capable(CAP_IPC_LOCK) */
-> >>>>    	struct task_struct	*task;
-> >>>>    	struct rb_root		pfn_list;	/* Ex-user pinned pfn list */
-> >>>> +	unsigned long		*bitmap;
-> >>>>    };
-> >>>>    
-> >>>>    struct vfio_group {
-> >>>> @@ -125,7 +127,21 @@ struct vfio_regions {
-> >>>>    #define IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu)	\
-> >>>>    					(!list_empty(&iommu->domain_list))
-> >>>>    
-> >>>> +#define DIRTY_BITMAP_BYTES(n)	(ALIGN(n, BITS_PER_TYPE(u64)) / BITS_PER_BYTE)
-> >>>> +
-> >>>> +/*
-> >>>> + * Input argument of number of bits to bitmap_set() is unsigned integer, which
-> >>>> + * further casts to signed integer for unaligned multi-bit operation,
-> >>>> + * __bitmap_set().
-> >>>> + * Then maximum bitmap size supported is 2^31 bits divided by 2^3 bits/byte,
-> >>>> + * that is 2^28 (256 MB) which maps to 2^31 * 2^12 = 2^43 (8TB) on 4K page
-> >>>> + * system.
-> >>>> + */
-> >>>> +#define DIRTY_BITMAP_PAGES_MAX	(uint64_t)(INT_MAX - 1)
-> >>>> +#define DIRTY_BITMAP_SIZE_MAX	 DIRTY_BITMAP_BYTES(DIRTY_BITMAP_PAGES_MAX)
-> >>>> +
-> >>>>    static int put_pfn(unsigned long pfn, int prot);
-> >>>> +static unsigned long vfio_pgsize_bitmap(struct vfio_iommu *iommu);
-> >>>>    
-> >>>>    /*
-> >>>>     * This code handles mapping and unmapping of user data buffers
-> >>>> @@ -175,6 +191,77 @@ static void vfio_unlink_dma(struct vfio_iommu *iommu, struct vfio_dma *old)
-> >>>>    	rb_erase(&old->node, &iommu->dma_list);
-> >>>>    }
-> >>>>    
-> >>>> +
-> >>>> +static int vfio_dma_bitmap_alloc(struct vfio_dma *dma, uint64_t pgsize)
-> >>>> +{
-> >>>> +	uint64_t npages = dma->size / pgsize;
-> >>>> +
-If pgsize > dma->size, npages = 0.
-wouldn't it cause problem?
+This QEMU series is intended to expose SVA usage to VMs. i.e. Sharing
+guest application address space with passthru devices. This is called
+vSVA in this series. The whole vSVA enabling requires QEMU/VFIO/IOMMU
+changes.
 
+The high-level architecture for SVA virtualization is as below, the key
+design of vSVA support is to utilize the dual-stage IOMMU translation (
+also known as IOMMU nesting translation) capability in host IOMMU.
 
-> >>>> +	if (npages > DIRTY_BITMAP_PAGES_MAX)
-> >>>> +		return -EINVAL;
-> >>>> +
-> >>>> +	dma->bitmap = kvzalloc(DIRTY_BITMAP_BYTES(npages), GFP_KERNEL);
-> >>>> +	if (!dma->bitmap)
-> >>>> +		return -ENOMEM;
-> >>>> +
-> >>>> +	return 0;
-> >>>> +}
-> >>>> +
-> >>>> +static void vfio_dma_bitmap_free(struct vfio_dma *dma)
-> >>>> +{
-> >>>> +	kfree(dma->bitmap);
-> >>>> +	dma->bitmap = NULL;
-> >>>> +}
-> >>>> +
-> >>>> +static void vfio_dma_populate_bitmap(struct vfio_dma *dma, uint64_t pgsize)
-> >>>> +{
-> >>>> +	struct rb_node *p;
-> >>>> +
-> >>>> +	if (RB_EMPTY_ROOT(&dma->pfn_list))
-> >>>> +		return;
-> >>>> +
-> >>>> +	for (p = rb_first(&dma->pfn_list); p; p = rb_next(p)) {
-> >>>> +		struct vfio_pfn *vpfn = rb_entry(p, struct vfio_pfn, node);
-> >>>> +
-> >>>> +		bitmap_set(dma->bitmap, (vpfn->iova - dma->iova) / pgsize, 1);
-> >>>> +	}
-> >>>> +}
-> >>>> +
-> >>>> +static int vfio_dma_bitmap_alloc_all(struct vfio_iommu *iommu, uint64_t pgsize)
-> >>>> +{
-> >>>> +	struct rb_node *n = rb_first(&iommu->dma_list);
-> >>>> +
-> >>>> +	for (; n; n = rb_next(n)) {
-> >>>> +		struct vfio_dma *dma = rb_entry(n, struct vfio_dma, node);
-> >>>> +		int ret;
-> >>>> +
-> >>>> +		ret = vfio_dma_bitmap_alloc(dma, pgsize);
-> >>>> +		if (ret) {
-> >>>> +			struct rb_node *p = rb_prev(n);
-> >>>> +
-> >>>> +			for (; p; p = rb_prev(p)) {
-> >>>> +				struct vfio_dma *dma = rb_entry(n,
-> >>>> +							struct vfio_dma, node);
-> >>>> +
-> >>>> +				vfio_dma_bitmap_free(dma);
-> >>>> +			}
-> >>>> +			return ret;
-> >>>> +		}
-> >>>> +		vfio_dma_populate_bitmap(dma, pgsize);
-> >>>> +	}
-> >>>> +	return 0;
-> >>>> +}
-> >>>> +
-> >>>> +static void vfio_dma_bitmap_free_all(struct vfio_iommu *iommu)
-> >>>> +{
-> >>>> +	struct rb_node *n = rb_first(&iommu->dma_list);
-> >>>> +
-> >>>> +	for (; n; n = rb_next(n)) {
-> >>>> +		struct vfio_dma *dma = rb_entry(n, struct vfio_dma, node);
-> >>>> +
-> >>>> +		vfio_dma_bitmap_free(dma);
-> >>>> +	}
-> >>>> +}
-> >>>> +
-> >>>>    /*
-> >>>>     * Helper Functions for host iova-pfn list
-> >>>>     */
-> >>>> @@ -567,6 +654,18 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
-> >>>>    			vfio_unpin_page_external(dma, iova, do_accounting);
-> >>>>    			goto pin_unwind;
-> >>>>    		}
-> >>>> +
-> >>>> +		if (iommu->dirty_page_tracking) {
-> >>>> +			unsigned long pgshift =
-> >>>> +					 __ffs(vfio_pgsize_bitmap(iommu));
-> >>>> +
-> >>>> +			/*
-> >>>> +			 * Bitmap populated with the smallest supported page
-> >>>> +			 * size
-> >>>> +			 */
-> >>>> +			bitmap_set(dma->bitmap,
-> >>>> +				   (vpfn->iova - dma->iova) >> pgshift, 1);
-> >>>> +		}
-> >>>>    	}
-> >>>>    
-> >>>>    	ret = i;
-> >>>> @@ -801,6 +900,7 @@ static void vfio_remove_dma(struct vfio_iommu *iommu, struct vfio_dma *dma)
-> >>>>    	vfio_unmap_unpin(iommu, dma, true);
-> >>>>    	vfio_unlink_dma(iommu, dma);
-> >>>>    	put_task_struct(dma->task);
-> >>>> +	vfio_dma_bitmap_free(dma);
-> >>>>    	kfree(dma);
-> >>>>    	iommu->dma_avail++;
-> >>>>    }
-> >>>> @@ -831,6 +931,57 @@ static unsigned long vfio_pgsize_bitmap(struct vfio_iommu *iommu)
-> >>>>    	return bitmap;
-> >>>>    }
-> >>>>    
-> >>>> +static int vfio_iova_dirty_bitmap(struct vfio_iommu *iommu, dma_addr_t iova,
-> >>>> +				  size_t size, uint64_t pgsize,
-> >>>> +				  u64 __user *bitmap)
-> >>>> +{
-> >>>> +	struct vfio_dma *dma;
-> >>>> +	unsigned long pgshift = __ffs(pgsize);
-> >>>> +	unsigned int npages, bitmap_size;
-> >>>> +
-> >>>> +	dma = vfio_find_dma(iommu, iova, 1);
-> >>>> +
-> >>>> +	if (!dma)
-> >>>> +		return -EINVAL;
-> >>>> +
-> >>>> +	if (dma->iova != iova || dma->size != size)
-> >>>> +		return -EINVAL;
-> >>>> +
-> >>> Still don't sure if it's a good practice.
-> >>> I saw the qemu implementation.
-> >>> Qemu just iterates the whole IOVA address space,
-> >>> It needs to find IOTLB entry for an IOVA
-> >>> (1) if it can find an IOTLB for an IOVA, do the DIRTY_PAGES IOCTL and
-> >>> increment IOVA by (iotlb.addr_mask + 1)
-> >>>
-> >>> (2) if no existing IOTLB found, the imrc->translate needs to go searching shadow
-> >>> page table to try to generate one.
-> >>> if it still fails,(most probably case, as IOMMU only maps a small part in its address
-> >>> space).  increment IOVA by 1 page.
-> >>>
-> >>> So, if the address space width is 39bit, and if there's only one page
-> >>> mapped, you still have to translate IOVA for around 2^27 times in each
-> >>> query. Isn't it too inefficient?
-> >>>
-> >>
-> >> This is Qemu side implementation, let discuss it on QEMU patches.
-> >>
-> > But kernel has to support it first, right?
-> > 
-> >>> So, IMHO, why we could not just save an rb tree specific for dirty pages, then generate
-> >>> a bitmap for each query?
-> >>
-> >> This is looping back to implentation in v10 - v12 version. There are
-> >> problems discussed during v10 to v12 version of patches with this approach.
-> >> - populating dirty bitmap at the time of query will add more CPU cycles.
-> >> - If we save these CPU cyles means dirty pages need to be tracked when
-> >> they are pinned or dirtied by CPU, that is, inttoduced per vfio_dma
-> >> bitmap. If ranges are not vfio_dma aligned, then copying bitmap to user
-> >> space becomes complicated and unefficient.
-> >>
-> >> So we decided to go with the approach implemented here.
-> > 
-> > I checked v12, it's not like what I said.
-> > In v12, bitmaps are generated per vfio_dma, and combination of the
-> > bitmaps are required in order to generate a big bitmap suiting for dirty
-> > query. It can cause problem when offset not aligning.
-> > But what I propose here is to generate an rb tree orthogonal to the tree
-> > of vfio_dma.
-> > 
-> > as to CPU cycles saving, I don't think iterating/translating page by page
-> > would achieve that purpose.
-> > 
-> > 
-> > 
-> >>>
-> >>>> +	npages = dma->size >> pgshift;
-> >>>> +	bitmap_size = DIRTY_BITMAP_BYTES(npages);
-> >>>> +
-> >>>> +	/* mark all pages dirty if all pages are pinned and mapped. */
-> >>>> +	if (dma->iommu_mapped)
-> >>>> +		bitmap_set(dma->bitmap, 0, npages);
-> >>>> +
-> >>>> +	if (copy_to_user((void __user *)bitmap, dma->bitmap, bitmap_size))
-> >>>> +		return -EFAULT;
-> >>>> +
-> >>>> +	/*
-> >>>> +	 * Re-populate bitmap to include all pinned pages which are considered
-> >>>> +	 * as dirty but exclude pages which are unpinned and pages which are
-> >>>> +	 * marked dirty by vfio_dma_rw()
-> >>>> +	 */
-> >>>> +	bitmap_clear(dma->bitmap, 0, npages);
-> >>>> +	vfio_dma_populate_bitmap(dma, pgsize);
-> >>> will this also repopulate bitmap for pinned pages set by pass-through devices in
-> >>> patch 07 ?
-> >>>
-> >>
-> >> If pass through device's driver pins pages using vfio_pin_pages and all
-> >> devices in the group pins pages through vfio_pin_pages, then
-> >> iommu->pinned_page_dirty_scope is set true, then bitmap is repolutated.
-> >>
-> >>
-> > pass-through devices already have all guest memory pinned, it would have
-> > no reason to call vfio_pin_pages if not attempting to mark page dirty.
-> > Then if it calls vfio_pin_pages, it means "the pages are accessed, please
-> > mark them dirty, feel free to clean it when you get it",
-> > not "the pages will be accesses, please mark them dirty continuously"
-> > 
-> > Thanks
-> > Yan
-> > 
-> >>
-> >>>
-> >>>> +	return 0;
-> >>>> +}
-> >>>> +
-> >>>> +static int verify_bitmap_size(uint64_t npages, uint64_t bitmap_size)
-> >>>> +{
-> >>>> +	uint64_t bsize;
-> >>>> +
-> >>>> +	if (!npages || !bitmap_size || (bitmap_size > DIRTY_BITMAP_SIZE_MAX))
-> >>>> +		return -EINVAL;
-> >>>> +
-> >>>> +	bsize = DIRTY_BITMAP_BYTES(npages);
-> >>>> +
-> >>>> +	if (bitmap_size < bsize)
-> >>>> +		return -EINVAL;
-> >>>> +
-> >>>> +	return 0;
-> >>>> +}
-> >>>> +
-> >>>>    static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
-> >>>>    			     struct vfio_iommu_type1_dma_unmap *unmap)
-> >>>>    {
-> >>>> @@ -1038,16 +1189,16 @@ static int vfio_dma_do_map(struct vfio_iommu *iommu,
-> >>>>    	unsigned long vaddr = map->vaddr;
-> >>>>    	size_t size = map->size;
-> >>>>    	int ret = 0, prot = 0;
-> >>>> -	uint64_t mask;
-> >>>> +	uint64_t pgsize;
-> >>>>    	struct vfio_dma *dma;
-> >>>>    
-> >>>>    	/* Verify that none of our __u64 fields overflow */
-> >>>>    	if (map->size != size || map->vaddr != vaddr || map->iova != iova)
-> >>>>    		return -EINVAL;
-> >>>>    
-> >>>> -	mask = ((uint64_t)1 << __ffs(vfio_pgsize_bitmap(iommu))) - 1;
-> >>>> +	pgsize = (uint64_t)1 << __ffs(vfio_pgsize_bitmap(iommu));
-> >>>>    
-> >>>> -	WARN_ON(mask & PAGE_MASK);
-> >>>> +	WARN_ON((pgsize - 1) & PAGE_MASK);
-> >>>>    
-> >>>>    	/* READ/WRITE from device perspective */
-> >>>>    	if (map->flags & VFIO_DMA_MAP_FLAG_WRITE)
-> >>>> @@ -1055,7 +1206,7 @@ static int vfio_dma_do_map(struct vfio_iommu *iommu,
-> >>>>    	if (map->flags & VFIO_DMA_MAP_FLAG_READ)
-> >>>>    		prot |= IOMMU_READ;
-> >>>>    
-> >>>> -	if (!prot || !size || (size | iova | vaddr) & mask)
-> >>>> +	if (!prot || !size || (size | iova | vaddr) & (pgsize - 1))
-> >>>>    		return -EINVAL;
-> >>>>    
-> >>>>    	/* Don't allow IOVA or virtual address wrap */
-> >>>> @@ -1130,6 +1281,12 @@ static int vfio_dma_do_map(struct vfio_iommu *iommu,
-> >>>>    	else
-> >>>>    		ret = vfio_pin_map_dma(iommu, dma, size);
-> >>>>    
-> >>>> +	if (!ret && iommu->dirty_page_tracking) {
-> >>>> +		ret = vfio_dma_bitmap_alloc(dma, pgsize);
-> >>>> +		if (ret)
-> >>>> +			vfio_remove_dma(iommu, dma);
-> >>>> +	}
-> >>>> +
-> >>>>    out_unlock:
-> >>>>    	mutex_unlock(&iommu->lock);
-> >>>>    	return ret;
-> >>>> @@ -2278,6 +2435,93 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
-> >>>>    
-> >>>>    		return copy_to_user((void __user *)arg, &unmap, minsz) ?
-> >>>>    			-EFAULT : 0;
-> >>>> +	} else if (cmd == VFIO_IOMMU_DIRTY_PAGES) {
-> >>>> +		struct vfio_iommu_type1_dirty_bitmap dirty;
-> >>>> +		uint32_t mask = VFIO_IOMMU_DIRTY_PAGES_FLAG_START |
-> >>>> +				VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP |
-> >>>> +				VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP;
-> >>>> +		int ret = 0;
-> >>>> +
-> >>>> +		if (!iommu->v2)
-> >>>> +			return -EACCES;
-> >>>> +
-> >>>> +		minsz = offsetofend(struct vfio_iommu_type1_dirty_bitmap,
-> >>>> +				    flags);
-> >>>> +
-> >>>> +		if (copy_from_user(&dirty, (void __user *)arg, minsz))
-> >>>> +			return -EFAULT;
-> >>>> +
-> >>>> +		if (dirty.argsz < minsz || dirty.flags & ~mask)
-> >>>> +			return -EINVAL;
-> >>>> +
-> >>>> +		/* only one flag should be set at a time */
-> >>>> +		if (__ffs(dirty.flags) != __fls(dirty.flags))
-> >>>> +			return -EINVAL;
-> >>>> +
-> >>>> +		if (dirty.flags & VFIO_IOMMU_DIRTY_PAGES_FLAG_START) {
-> >>>> +			uint64_t pgsize = 1 << __ffs(vfio_pgsize_bitmap(iommu));
-> >>>> +
-> >>>> +			mutex_lock(&iommu->lock);
-> >>>> +			if (!iommu->dirty_page_tracking) {
-> >>>> +				ret = vfio_dma_bitmap_alloc_all(iommu, pgsize);
-> >>>> +				if (!ret)
-> >>>> +					iommu->dirty_page_tracking = true;
-> >>>> +			}
-> >>>> +			mutex_unlock(&iommu->lock);
-> >>>> +			return ret;
-> >>>> +		} else if (dirty.flags & VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP) {
-> >>>> +			mutex_lock(&iommu->lock);
-> >>>> +			if (iommu->dirty_page_tracking) {
-> >>>> +				iommu->dirty_page_tracking = false;
-> >>>> +				vfio_dma_bitmap_free_all(iommu);
-> >>>> +			}
-> >>>> +			mutex_unlock(&iommu->lock);
-> >>>> +			return 0;
-> >>>> +		} else if (dirty.flags &
-> >>>> +				 VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP) {
-> >>>> +			struct vfio_iommu_type1_dirty_bitmap_get range;
-> >>>> +			unsigned long pgshift;
-> >>>> +			size_t data_size = dirty.argsz - minsz;
-> >>>> +			uint64_t iommu_pgsize =
-> >>>> +					 1 << __ffs(vfio_pgsize_bitmap(iommu));
-> >>>> +
-> >>>> +			if (!data_size || data_size < sizeof(range))
-> >>>> +				return -EINVAL;
-> >>>> +
-> >>>> +			if (copy_from_user(&range, (void __user *)(arg + minsz),
-> >>>> +					   sizeof(range)))
-> >>>> +				return -EFAULT;
-> >>>> +
-> >>>> +			/* allow only smallest supported pgsize */
-> >>>> +			if (range.bitmap.pgsize != iommu_pgsize)
-> >>>> +				return -EINVAL;
-> >>>> +			if (range.iova & (iommu_pgsize - 1))
-> >>>> +				return -EINVAL;
-> >>>> +			if (!range.size || range.size & (iommu_pgsize - 1))
-> >>>> +				return -EINVAL;
-> >>>> +			if (range.iova + range.size < range.iova)
-> >>>> +				return -EINVAL;
-> >>>> +			if (!access_ok((void __user *)range.bitmap.data,
-> >>>> +				       range.bitmap.size))
-> >>>> +				return -EINVAL;
-> >>>> +
-> >>>> +			pgshift = __ffs(range.bitmap.pgsize);
-> >>>> +			ret = verify_bitmap_size(range.size >> pgshift,
-> >>>> +						 range.bitmap.size);
-> >>>> +			if (ret)
-> >>>> +				return ret;
-> >>>> +
-> >>>> +			mutex_lock(&iommu->lock);
-> >>>> +			if (iommu->dirty_page_tracking)
-> >>>> +				ret = vfio_iova_dirty_bitmap(iommu, range.iova,
-> >>>> +						range.size, range.bitmap.pgsize,
-> >>>> +						range.bitmap.data);
-> >>>> +			else
-> >>>> +				ret = -EINVAL;
-> >>>> +			mutex_unlock(&iommu->lock);
-> >>>> +
-> >>>> +			return ret;
-> >>>> +		}
-> >>>>    	}
-> >>>>    
-> >>>>    	return -ENOTTY;
-> >>>> @@ -2345,10 +2589,20 @@ static int vfio_iommu_type1_dma_rw_chunk(struct vfio_iommu *iommu,
-> >>>>    
-> >>>>    	vaddr = dma->vaddr + offset;
-> >>>>    
-> >>>> -	if (write)
-> >>>> +	if (write) {
-> >>>>    		*copied = __copy_to_user((void __user *)vaddr, data,
-> >>>>    					 count) ? 0 : count;
-> >>>> -	else
-> >>>> +		if (*copied && iommu->dirty_page_tracking) {
-> >>>> +			unsigned long pgshift =
-> >>>> +				__ffs(vfio_pgsize_bitmap(iommu));
-> >>>> +			/*
-> >>>> +			 * Bitmap populated with the smallest supported page
-> >>>> +			 * size
-> >>>> +			 */
-> >>>> +			bitmap_set(dma->bitmap, offset >> pgshift,
-> >>>> +				   *copied >> pgshift);
-> >>>> +		}
-> >>>> +	} else
-> >>>>    		*copied = __copy_from_user(data, (void __user *)vaddr,
-> >>>>    					   count) ? 0 : count;
-> >>>>    	if (kthread)
-> >>>> -- 
-> >>>> 2.7.0
-> >>>>
+    .-------------.  .---------------------------.
+    |   vIOMMU    |  | Guest process CR3, FL only|
+    |             |  '---------------------------'
+    .----------------/
+    | PASID Entry |--- PASID cache flush -
+    '-------------'                       |
+    |             |                       V
+    |             |                CR3 in GPA
+    '-------------'
+Guest
+------| Shadow |--------------------------|--------
+      v        v                          v
+Host
+    .-------------.  .----------------------.
+    |   pIOMMU    |  | Bind FL for GVA-GPA  |
+    |             |  '----------------------'
+    .----------------/  |
+    | PASID Entry |     V (Nested xlate)
+    '----------------\.------------------------------.
+    |             |   |SL for GPA-HPA, default domain|
+    |             |   '------------------------------'
+    '-------------'
+Where:
+ - FL = First level/stage one page tables
+ - SL = Second level/stage two page tables
+
+The complete vSVA kernel upstream patches are divided into three phases:
+    1. Common APIs and PCI device direct assignment
+    2. IOMMU-backed Mediated Device assignment
+    3. Page Request Services (PRS) support
+
+This QEMU patchset is aiming for the phase 1 and phase 2. It is based
+on the two kernel series below.
+[1] [PATCH V10 00/11] Nested Shared Virtual Address (SVA) VT-d support:
+https://lkml.org/lkml/2020/3/20/1172
+[2] [PATCH v1 0/8] vfio: expose virtual Shared Virtual Addressing to VMs
+https://lkml.org/lkml/2020/3/22/116
+
+There are roughly two parts:
+ 1. Introduce HostIOMMUContext as abstract of host IOMMU. It provides explicit
+    method for vIOMMU emulators to communicate with host IOMMU. e.g. propagate
+    guest page table binding to host IOMMU to setup dual-stage DMA translation
+    in host IOMMU and flush iommu iotlb.
+ 2. Setup dual-stage IOMMU translation for Intel vIOMMU. Includes 
+    - Check IOMMU uAPI version compatibility and VFIO Nesting capabilities which
+      includes hardware compatibility (stage 1 format) and VFIO_PASID_REQ
+      availability. This is preparation for setting up dual-stage DMA translation
+      in host IOMMU.
+    - Propagate guest PASID allocation and free request to host.
+    - Propagate guest page table binding to host to setup dual-stage IOMMU DMA
+      translation in host IOMMU.
+    - Propagate guest IOMMU cache invalidation to host to ensure iotlb
+      correctness.
+
+The complete QEMU set can be found in below link:
+https://github.com/luxis1999/qemu.git: sva_vtd_v10_v2
+
+Complete kernel can be found in:
+https://github.com/luxis1999/linux-vsva.git: vsva-linux-5.6-rc6
+
+Tests: basci vSVA functionality test, VM reboot/shutdown/crash, kernel build in
+guest, boot VM with vSVA disabled, full comapilation with all archs.
+
+Regards,
+Yi Liu
+
+Changelog:
+	- Patch v1 -> Patch v2:
+	  a) Refactor the vfio HostIOMMUContext init code (patch 0008 - 0009 of v1 series)
+	  b) Refactor the pasid binding handling (patch 0011 - 0016 of v1 series)
+	  Patch v1: https://patchwork.ozlabs.org/cover/1259648/
+
+	- RFC v3.1 -> Patch v1:
+	  a) Implement HostIOMMUContext in QOM manner.
+	  b) Add pci_set/unset_iommu_context() to register HostIOMMUContext to
+	     vIOMMU, thus the lifecircle of HostIOMMUContext is awared in vIOMMU
+	     side. In such way, vIOMMU could use the methods provided by the
+	     HostIOMMUContext safely.
+	  c) Add back patch "[RFC v3 01/25] hw/pci: modify pci_setup_iommu() to set PCIIOMMUOps"
+	  RFCv3.1: https://patchwork.kernel.org/cover/11397879/
+
+	- RFC v3 -> v3.1:
+	  a) Drop IOMMUContext, and rename DualStageIOMMUObject to HostIOMMUContext.
+	     HostIOMMUContext is per-vfio-container, it is exposed to  vIOMMU via PCI
+	     layer. VFIO registers a PCIHostIOMMUFunc callback to PCI layer, vIOMMU
+	     could get HostIOMMUContext instance via it.
+	  b) Check IOMMU uAPI version by VFIO_CHECK_EXTENSION
+	  c) Add a check on VFIO_PASID_REQ availability via VFIO_GET_IOMMU_IHNFO
+	  d) Reorder the series, put vSVA linux header file update in the beginning
+	     put the x-scalable-mode option mofification in the end of the series.
+	  e) Dropped patch "[RFC v3 01/25] hw/pci: modify pci_setup_iommu() to set PCIIOMMUOps"
+	  RFCv3: https://patchwork.kernel.org/cover/11356033/
+
+	- RFC v2 -> v3:
+	  a) Introduce DualStageIOMMUObject to abstract the host IOMMU programming
+	  capability. e.g. request PASID from host, setup IOMMU nesting translation
+	  on host IOMMU. The pasid_alloc/bind_guest_page_table/iommu_cache_flush
+	  operations are moved to be DualStageIOMMUOps. Thus, DualStageIOMMUObject
+	  is an abstract layer which provides QEMU vIOMMU emulators with an explicit
+	  method to program host IOMMU.
+	  b) Compared with RFC v2, the IOMMUContext has also been updated. It is
+	  modified to provide an abstract for vIOMMU emulators. It provides the
+	  method for pass-through modules (like VFIO) to communicate with host IOMMU.
+	  e.g. tell vIOMMU emulators about the IOMMU nesting capability on host side
+	  and report the host IOMMU DMA translation faults to vIOMMU emulators.
+	  RFC v2: https://www.spinics.net/lists/kvm/msg198556.html
+
+	- RFC v1 -> v2:
+	  Introduce IOMMUContext to abstract the connection between VFIO
+	  and vIOMMU emulators, which is a replacement of the PCIPASIDOps
+	  in RFC v1. Modify x-scalable-mode to be string option instead of
+	  adding a new option as RFC v1 did. Refined the pasid cache management
+	  and addressed the TODOs mentioned in RFC v1. 
+	  RFC v1: https://patchwork.kernel.org/cover/11033657/
+
+Eric Auger (1):
+  scripts/update-linux-headers: Import iommu.h
+
+Liu Yi L (21):
+  header file update VFIO/IOMMU vSVA APIs
+  vfio: check VFIO_TYPE1_NESTING_IOMMU support
+  hw/iommu: introduce HostIOMMUContext
+  hw/pci: modify pci_setup_iommu() to set PCIIOMMUOps
+  hw/pci: introduce pci_device_set/unset_iommu_context()
+  intel_iommu: add set/unset_iommu_context callback
+  vfio/common: provide PASID alloc/free hooks
+  vfio/common: init HostIOMMUContext per-container
+  vfio/pci: set host iommu context to vIOMMU
+  intel_iommu: add virtual command capability support
+  intel_iommu: process PASID cache invalidation
+  intel_iommu: add PASID cache management infrastructure
+  vfio: add bind stage-1 page table support
+  intel_iommu: bind/unbind guest page table to host
+  intel_iommu: replay pasid binds after context cache invalidation
+  intel_iommu: do not pass down pasid bind for PASID #0
+  vfio: add support for flush iommu stage-1 cache
+  intel_iommu: process PASID-based iotlb invalidation
+  intel_iommu: propagate PASID-based iotlb invalidation to host
+  intel_iommu: process PASID-based Device-TLB invalidation
+  intel_iommu: modify x-scalable-mode to be string option
+
+ hw/Makefile.objs                      |    1 +
+ hw/alpha/typhoon.c                    |    6 +-
+ hw/arm/smmu-common.c                  |    6 +-
+ hw/hppa/dino.c                        |    6 +-
+ hw/i386/amd_iommu.c                   |    6 +-
+ hw/i386/intel_iommu.c                 | 1109 ++++++++++++++++++++++++++++++++-
+ hw/i386/intel_iommu_internal.h        |  114 ++++
+ hw/i386/trace-events                  |    6 +
+ hw/iommu/Makefile.objs                |    1 +
+ hw/iommu/host_iommu_context.c         |  161 +++++
+ hw/pci-host/designware.c              |    6 +-
+ hw/pci-host/pnv_phb3.c                |    6 +-
+ hw/pci-host/pnv_phb4.c                |    6 +-
+ hw/pci-host/ppce500.c                 |    6 +-
+ hw/pci-host/prep.c                    |    6 +-
+ hw/pci-host/sabre.c                   |    6 +-
+ hw/pci/pci.c                          |   53 +-
+ hw/ppc/ppc440_pcix.c                  |    6 +-
+ hw/ppc/spapr_pci.c                    |    6 +-
+ hw/s390x/s390-pci-bus.c               |    8 +-
+ hw/vfio/common.c                      |  260 +++++++-
+ hw/vfio/pci.c                         |   13 +
+ hw/virtio/virtio-iommu.c              |    6 +-
+ include/hw/i386/intel_iommu.h         |   57 +-
+ include/hw/iommu/host_iommu_context.h |  116 ++++
+ include/hw/pci/pci.h                  |   18 +-
+ include/hw/pci/pci_bus.h              |    2 +-
+ include/hw/vfio/vfio-common.h         |    4 +
+ linux-headers/linux/iommu.h           |  378 +++++++++++
+ linux-headers/linux/vfio.h            |  127 ++++
+ scripts/update-linux-headers.sh       |    2 +-
+ 31 files changed, 2463 insertions(+), 45 deletions(-)
+ create mode 100644 hw/iommu/Makefile.objs
+ create mode 100644 hw/iommu/host_iommu_context.c
+ create mode 100644 include/hw/iommu/host_iommu_context.h
+ create mode 100644 linux-headers/linux/iommu.h
+
+-- 
+2.7.4
+
