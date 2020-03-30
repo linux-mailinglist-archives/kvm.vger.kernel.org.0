@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6563B197C44
-	for <lists+kvm@lfdr.de>; Mon, 30 Mar 2020 14:51:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7F25A197C46
+	for <lists+kvm@lfdr.de>; Mon, 30 Mar 2020 14:51:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729995AbgC3MvE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 30 Mar 2020 08:51:04 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:46910 "EHLO
+        id S1730031AbgC3Mvu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 30 Mar 2020 08:51:50 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:37145 "EHLO
         us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729881AbgC3MvD (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 30 Mar 2020 08:51:03 -0400
+        by vger.kernel.org with ESMTP id S1729862AbgC3Mvu (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 30 Mar 2020 08:51:50 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1585572661;
+        s=mimecast20190719; t=1585572708;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=7rxAAhl0nylgMmn2ALvBmu2VV5bKFEIVOfZu+2O+XnM=;
-        b=Z1gJLau8gUuw0eFWYTZPcFvQfW3DRS1VXvvmLScOXyNzlPGffKlH1I4MjyLkS7aYsyCoDN
-        SkkOsFVJAu5RS0rkKJM0Fv18vq2S0SDHdyagi8/uv82/6+zjJXVHh78HhZ9PV0TQij1oPy
-        jcB65NnFxJrX2gv9zFmHLO8BmXy/twk=
+        bh=qIai/8yAc/aQBPGQaxCPp3+PWPRYNLkyOuk6kw9LX+U=;
+        b=SqFbGTzbJA3fN99Jfd7h9LKnEyGVJWUIDpRXfDMHoA4mZtFMBXJuR/ISBMCDfw+Kq85Tb4
+        RaGnq83VFj1fexmIdv3aFSrKK2vVdGp+ZCGRTC/F7WpQkrT7+RGjwREGya9kyNJ1Cq+sNe
+        QV0puUBuFJTymDsdVi8YuI1OlK13Ugk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-485-SnMVOu_1PDKlvXAW7IAz6Q-1; Mon, 30 Mar 2020 08:50:57 -0400
-X-MC-Unique: SnMVOu_1PDKlvXAW7IAz6Q-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+ us-mta-252-FeXtNvI0P1yvnvCo0ikx-g-1; Mon, 30 Mar 2020 08:51:44 -0400
+X-MC-Unique: FeXtNvI0P1yvnvCo0ikx-g-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AD9911083E88;
-        Mon, 30 Mar 2020 12:50:56 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7F81C8018A2;
+        Mon, 30 Mar 2020 12:51:43 +0000 (UTC)
 Received: from [10.36.113.227] (ovpn-113-227.ams2.redhat.com [10.36.113.227])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 7DC4BD7680;
-        Mon, 30 Mar 2020 12:50:55 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 5045E100EBB3;
+        Mon, 30 Mar 2020 12:51:42 +0000 (UTC)
 Subject: Re: [kvm-unit-tests PATCH] s390x: Add stsi 3.2.2 tests
 To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
 Cc:     linux-s390@vger.kernel.org, cohuck@redhat.com,
@@ -83,16 +83,16 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
  FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
 Organization: Red Hat GmbH
-Message-ID: <df745d0c-5d24-ee03-8600-ec495f1a5af6@redhat.com>
-Date:   Mon, 30 Mar 2020 14:50:54 +0200
+Message-ID: <860a5575-226a-9b6e-4db0-b1b9dc72b3ed@redhat.com>
+Date:   Mon, 30 Mar 2020 14:51:41 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
 In-Reply-To: <20200330122035.19607-1-frankja@linux.ibm.com>
 Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
@@ -101,20 +101,20 @@ X-Mailing-List: kvm@vger.kernel.org
 On 30.03.20 14:20, Janosch Frank wrote:
 > Subcode 3.2.2 is handled by KVM/QEMU and should therefore be tested
 > a bit more thorough.
->=20
+> 
 > In this test we set a custom name and uuid through the QEMU command
 > line. Both parameters will be passed to the guest on a stsi subcode
 > 3.2.2 call and will then be checked.
->=20
+> 
 > We also compare the total and configured cpu numbers against the smp
 > reported numbers.
->=20
+> 
 > Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
 > ---
 >  s390x/stsi.c        | 62 +++++++++++++++++++++++++++++++++++++++++++++
 >  s390x/unittests.cfg |  1 +
 >  2 files changed, 63 insertions(+)
->=20
+> 
 > diff --git a/s390x/stsi.c b/s390x/stsi.c
 > index e9206bca137d2edb..10e588a78cc05186 100644
 > --- a/s390x/stsi.c
@@ -124,15 +124,12 @@ On 30.03.20 14:20, Janosch Frank wrote:
 >  #include <asm/asm-offsets.h>
 >  #include <asm/interrupt.h>
 > +#include <smp.h>
-> =20
+>  
 > +struct stsi_322 {
 > +    uint8_t  reserved[31];
 > +    uint8_t  count;
 > +    struct {
 > +        uint8_t  reserved2[4];
-
-I dislike aligning the members using double-spaces ...
-
 > +        uint16_t total_cpus;
 > +        uint16_t conf_cpus;
 > +        uint16_t standby_cpus;
@@ -141,9 +138,6 @@ I dislike aligning the members using double-spaces ...
 > +        uint32_t caf;
 > +        uint8_t  cpi[16];
 > +        uint8_t reserved5[3];
-
-... e.g., here it's not aligned anymore. Just use single spaces.
-
 > +        uint8_t ext_name_encoding;
 > +        uint32_t reserved3;
 > +        uint8_t uuid[16];
@@ -151,63 +145,57 @@ I dislike aligning the members using double-spaces ...
 > +    uint8_t reserved4[1504];
 > +    uint8_t ext_names[8][256];
 > +};
->  static uint8_t pagebuf[PAGE_SIZE * 2] __attribute__((aligned(PAGE_SIZE=
- * 2)));
-> =20
+>  static uint8_t pagebuf[PAGE_SIZE * 2] __attribute__((aligned(PAGE_SIZE * 2)));
+>  
 >  static void test_specs(void)
 > @@ -76,11 +97,52 @@ static void test_fc(void)
->  	report(stsi_get_fc(pagebuf) >=3D 2, "query fc >=3D 2");
+>  	report(stsi_get_fc(pagebuf) >= 2, "query fc >= 2");
 >  }
-> =20
+>  
 > +static void test_3_2_2(void)
 > +{
 > +	int rc;
 > +	/* EBCDIC for "kvm-unit" */
-> +	uint8_t vm_name[] =3D { 0x92, 0xa5, 0x94, 0x60, 0xa4, 0x95, 0x89, 0xa=
-3 };
-> +	uint8_t uuid[] =3D { 0x0f, 0xb8, 0x4a, 0x86, 0x72, 0x7c,
+> +	uint8_t vm_name[] = { 0x92, 0xa5, 0x94, 0x60, 0xa4, 0x95, 0x89, 0xa3 };
+> +	uint8_t uuid[] = { 0x0f, 0xb8, 0x4a, 0x86, 0x72, 0x7c,
 > +			   0x11, 0xea, 0xbc, 0x55, 0x02, 0x42, 0xac, 0x13,
 > +			   0x00, 0x03 };
 > +	/* EBCDIC for "KVM/" */
-> +	uint8_t cpi_kvm[] =3D { 0xd2, 0xe5, 0xd4, 0x61 };
-
-All of these can be const.
-
-> +	const char *vm_name_ext =3D "kvm-unit-test";
-> +	struct stsi_322 *data =3D (void *)pagebuf;
+> +	uint8_t cpi_kvm[] = { 0xd2, 0xe5, 0xd4, 0x61 };
+> +	const char *vm_name_ext = "kvm-unit-test";
+> +	struct stsi_322 *data = (void *)pagebuf;
 > +
 > +	/* Is the function code available at all? */
 > +	if (stsi_get_fc(pagebuf) < 3)
-
-Maybe report_skip() ?
-
 > +		return;
 > +
 > +	report_prefix_push("3.2.2");
-> +	rc =3D stsi(pagebuf, 3, 2, 2);
+> +	rc = stsi(pagebuf, 3, 2, 2);
 > +	report(!rc, "call");
 > +
 > +	/* For now we concentrate on KVM/QEMU */
 > +	if (memcmp(&data->vm[0].cpi, cpi_kvm, sizeof(cpi_kvm)))
-
-Maybe report_skip() ?
-
 > +		goto out;
 > +
-> +	report(data->vm[0].total_cpus =3D=3D smp_query_num_cpus(), "cpu # tot=
-al");
-> +	report(data->vm[0].conf_cpus =3D=3D smp_query_num_cpus(), "cpu # conf=
-igured");
-> +	report(data->vm[0].standby_cpus =3D=3D 0, "cpu # standby");
-> +	report(data->vm[0].reserved_cpus =3D=3D 0, "cpu # reserved");
+> +	report(data->vm[0].total_cpus == smp_query_num_cpus(), "cpu # total");
+> +	report(data->vm[0].conf_cpus == smp_query_num_cpus(), "cpu # configured");
+> +	report(data->vm[0].standby_cpus == 0, "cpu # standby");
+> +	report(data->vm[0].reserved_cpus == 0, "cpu # reserved");
+> +	report(!memcmp(data->vm[0].name, vm_name, sizeof(data->vm[0].name)),
+> +	       "VM name == kvm-unit-test");
+> +	report(data->vm[0].ext_name_encoding == 2, "ext name encoding UTF-8");
 
-IIRC, using -smp 1,maxcpus=3DX, you could also test the reported reserved
-CPUs.
+should you rather do
 
+if (data->vm[0].ext_name_encoding == 2) {
+	...
+} else {
+	report_skip(...);
+}
 
-Also passes under TCG, nice :)
+to make this future-proof?
 
---=20
+-- 
 Thanks,
 
 David / dhildenb
