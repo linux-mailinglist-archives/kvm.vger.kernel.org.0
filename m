@@ -2,104 +2,78 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 312C4198221
-	for <lists+kvm@lfdr.de>; Mon, 30 Mar 2020 19:21:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 746DB198228
+	for <lists+kvm@lfdr.de>; Mon, 30 Mar 2020 19:22:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728537AbgC3RVx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 30 Mar 2020 13:21:53 -0400
-Received: from mga03.intel.com ([134.134.136.65]:28187 "EHLO mga03.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727368AbgC3RVx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 30 Mar 2020 13:21:53 -0400
-IronPort-SDR: E1zoANh8CBtGJ+mJCCAjyWN5TgkGvSeqEQwAMRpOjLqtiPMIfkDO9kBGwN4AYktROE+3oBp2oe
- HhLas9ozOTfg==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Mar 2020 10:21:52 -0700
-IronPort-SDR: lAFY4IqQ7clIr0678b617mSpps15tXYGkqSz/NkLtmZDop9HvFVrD1osx8tlC0W3XDcx1NMDf3
- ywclHsKHjI8w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.72,325,1580803200"; 
-   d="scan'208";a="421996405"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
-  by orsmga005.jf.intel.com with ESMTP; 30 Mar 2020 10:21:52 -0700
-Date:   Mon, 30 Mar 2020 10:21:52 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     "Kang, Luwei" <luwei.kang@intel.com>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,
-        "wanpengli@tencent.com" <wanpengli@tencent.com>,
-        "jmattson@google.com" <jmattson@google.com>,
-        "joro@8bytes.org" <joro@8bytes.org>
-Subject: Re: [PATCH] KVM: VMX: Disable Intel PT before VM-entry
-Message-ID: <20200330172152.GE24988@linux.intel.com>
-References: <1584503298-18731-1-git-send-email-luwei.kang@intel.com>
- <20200318154826.GC24357@linux.intel.com>
- <82D7661F83C1A047AF7DC287873BF1E1738A9724@SHSMSX104.ccr.corp.intel.com>
+        id S1729089AbgC3RWZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 30 Mar 2020 13:22:25 -0400
+Received: from bombadil.infradead.org ([198.137.202.133]:60620 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727255AbgC3RWY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 30 Mar 2020 13:22:24 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
+        Content-Type:In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:
+        Subject:Sender:Reply-To:Content-ID:Content-Description;
+        bh=RTo/l3mApqYi+FAC2NhO4jmI7vS3v+umdzjqut0gXrs=; b=epXZGh7AJkvwaCOfIcKqPes0O/
+        TZITBPLJ88zQPtBJYZxf/f+N9pIbvNHDFyWCZ0wjXtVdOjKd25Vc73LrepJ+kipztOfwjgUSVaryX
+        UG1rbVv8MnGL4HsfqIyw4Vh4iTHJCIU+4PhLMEhCEGoEC7az/TGfhzvfj0bNUpgc97iNQ8YDWnq5b
+        PRY3uA5tZ5rVg9ltHXbwyZolCXHdXcxmEXPANZeWq5aCsZrN1iq/sa05mLZwQMRu/PCBFRcpwsB3u
+        9nxP4tCR5U9Vp2iowEfYq/89hQp9GeyDH74PDtlQbZc8ZW54JObpESALTg8+N9k+oNVirfOtM2WJ0
+        Yp9p0LdA==;
+Received: from [2601:1c0:6280:3f0:897c:6038:c71d:ecac]
+        by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1jIy7E-0005n4-7Q; Mon, 30 Mar 2020 17:22:24 +0000
+Subject: Re: linux-next: Tree for Mar 30 (vhost)
+To:     Stephen Rothwell <sfr@canb.auug.org.au>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>
+Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        virtualization@lists.linux-foundation.org,
+        KVM <kvm@vger.kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>
+References: <20200330204307.669bbb4d@canb.auug.org.au>
+From:   Randy Dunlap <rdunlap@infradead.org>
+Message-ID: <347c851a-b9f6-0046-f6c8-1db0b42be213@infradead.org>
+Date:   Mon, 30 Mar 2020 10:22:22 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
+In-Reply-To: <20200330204307.669bbb4d@canb.auug.org.au>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <82D7661F83C1A047AF7DC287873BF1E1738A9724@SHSMSX104.ccr.corp.intel.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Mar 23, 2020 at 02:20:01AM -0700, Kang, Luwei wrote:
-> > On Wed, Mar 18, 2020 at 11:48:18AM +0800, Luwei Kang wrote:
-> > > If the logical processor is operating with Intel PT enabled (
-> > > IA32_RTIT_CTL.TraceEn = 1) at the time of VM entry, the “load
-> > > IA32_RTIT_CTL” VM-entry control must be 0(SDM 26.2.1.1).
-> > >
-> > > The first disabled the host Intel PT(Clear TraceEn) will make all the
-> > > buffered packets are flushed out of the processor and it may cause an
-> > > Intel PT PMI. The host Intel PT will be re-enabled in the host Intel
-> > > PT PMI handler.
-> > >
-> > > handle_pmi_common()
-> > >     -> intel_pt_interrupt()
-> > >             -> pt_config_start()
-> > 
-> > IIUC, this is only possible when PT "plays nice" with VMX, correct?
-> > Otherwise pt->vmx_on will be true and pt_config_start() would skip the
-> > WRMSR.
-> > 
-> > And IPT PMI must be delivered via NMI (though maybe they're always
-> > delivered via NMI?).
-> > 
-> > In any case, redoing WRMSR doesn't seem safe, and it certainly isn't
-> > performant, e.g. what prevents the second WRMSR from triggering a second
-> > IPT PMI?
-> > 
-> > pt_guest_enter() is called after the switch to the vCPU has already been
-> > recorded, can't this be handled in the IPT code, e.g. something like this?
-> > 
-> > diff --git a/arch/x86/events/intel/pt.c b/arch/x86/events/intel/pt.c index
-> > 1db7a51d9792..e38ddae9f0d1 100644
-> > --- a/arch/x86/events/intel/pt.c
-> > +++ b/arch/x86/events/intel/pt.c
-> > @@ -405,7 +405,7 @@ static void pt_config_start(struct perf_event *event)
-> >         ctl |= RTIT_CTL_TRACEEN;
-> >         if (READ_ONCE(pt->vmx_on))
-> >                 perf_aux_output_flag(&pt->handle, PERF_AUX_FLAG_PARTIAL);
-> > -       else
-> > +       else (!(current->flags & PF_VCPU))
-> >                 wrmsrl(MSR_IA32_RTIT_CTL, ctl);
+On 3/30/20 2:43 AM, Stephen Rothwell wrote:
+> Hi all,
 > 
-> Intel PT can work in SYSTEM and HOST_GUEST mode by setting the kvm-intel.ko
-> parameter "pt_mode".  In SYSTEM mode, the host and guest PT trace will be
-> saved in the host buffer. The KVM do nothing during VM-entry/exit in SYSTEM
-> mode and Intel PT PMI may happened on any place. The PT trace may be disabled
-> when running in KVM(PT only needs to be disabled before VM-entry in
-> HOST_GUEST mode).
+> The merge window has opened, so please do not add any material for the
+> next release into your linux-next included trees/branches until after
+> the merge window closes.
+> 
+> Changes since 20200327:
+> 
+> The vhost tree gained a conflict against the kvm-arm tree.
+> 
 
-Ah, right.  What about enhancing intel_pt_handle_vmx() and 'struct pt' to
-replace vmx_on with a field that incorporates the KVM mode?  From an
-outsider's perspective, that'd be an improvment irrespective of this bug
-fix as 'vmx_on' is misleading, e.g. it can be %false when the CPU is post-
-VMXON, and really means "post-VMXON and Intel PT can't trace it".
+(note: today's linux-next is on 5.6-rc7.)
+
+on x86_64:
+
+# CONFIG_EVENTFD is not set
+
+../drivers/vhost/vhost.c: In function 'vhost_vring_ioctl':
+../drivers/vhost/vhost.c:1577:33: error: implicit declaration of function 'eventfd_fget'; did you mean 'eventfd_signal'? [-Werror=implicit-function-declaration]
+   eventfp = f.fd == -1 ? NULL : eventfd_fget(f.fd);
+                                 ^~~~~~~~~~~~
+                                 eventfd_signal
+../drivers/vhost/vhost.c:1577:31: warning: pointer/integer type mismatch in conditional expression
+   eventfp = f.fd == -1 ? NULL : eventfd_fget(f.fd);
+                               ^
+
+-- 
+~Randy
+Reported-by: Randy Dunlap <rdunlap@infradead.org>
