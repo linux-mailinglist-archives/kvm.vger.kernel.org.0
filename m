@@ -2,129 +2,176 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id BFF3A1977ED
-	for <lists+kvm@lfdr.de>; Mon, 30 Mar 2020 11:36:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 470B31977FB
+	for <lists+kvm@lfdr.de>; Mon, 30 Mar 2020 11:43:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728502AbgC3Jgz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 30 Mar 2020 05:36:55 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:36123 "EHLO
-        us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726127AbgC3Jgz (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 30 Mar 2020 05:36:55 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1585561013;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=GsQts7KdvM7OmuNRLhUrsthOkUg/qgVxfy93Ru1gfZY=;
-        b=evy2x4vEuSEzfOEfMOBk7XF0LlGg9RwTvNCG35I6npTYRAPhPaZ6QfS7xiTu8M55RWmvbq
-        vBQEFdfY5KPNoZiKFA0tpVgcqz4OHMXaKLms+LMZBThs+zYCl3YbTWQzK4CvkFUP8SabPF
-        boQ5wulj/gkF+fAld2GXv73tuee+HbY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-493-H-Aylf-TMzeyq1sp7BqO4w-1; Mon, 30 Mar 2020 05:36:52 -0400
-X-MC-Unique: H-Aylf-TMzeyq1sp7BqO4w-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4A0A6E6BAC;
-        Mon, 30 Mar 2020 09:36:43 +0000 (UTC)
-Received: from [10.36.112.58] (ovpn-112-58.ams2.redhat.com [10.36.112.58])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id D17C9DA0FB;
-        Mon, 30 Mar 2020 09:36:23 +0000 (UTC)
-Subject: Re: [PATCH v2 03/22] vfio: check VFIO_TYPE1_NESTING_IOMMU support
-To:     Liu Yi L <yi.l.liu@intel.com>, qemu-devel@nongnu.org,
-        alex.williamson@redhat.com, peterx@redhat.com
-Cc:     pbonzini@redhat.com, mst@redhat.com, david@gibson.dropbear.id.au,
-        kevin.tian@intel.com, jun.j.tian@intel.com, yi.y.sun@intel.com,
-        kvm@vger.kernel.org, hao.wu@intel.com, jean-philippe@linaro.org,
-        Jacob Pan <jacob.jun.pan@linux.intel.com>,
-        Yi Sun <yi.y.sun@linux.intel.com>
-References: <1585542301-84087-1-git-send-email-yi.l.liu@intel.com>
- <1585542301-84087-4-git-send-email-yi.l.liu@intel.com>
-From:   Auger Eric <eric.auger@redhat.com>
-Message-ID: <2c65e531-1cc8-dc01-4b06-e7baff58addd@redhat.com>
-Date:   Mon, 30 Mar 2020 11:36:19 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
-MIME-Version: 1.0
-In-Reply-To: <1585542301-84087-4-git-send-email-yi.l.liu@intel.com>
-Content-Type: text/plain; charset=windows-1252
+        id S1728546AbgC3Jnl convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Mon, 30 Mar 2020 05:43:41 -0400
+Received: from mga07.intel.com ([134.134.136.100]:29415 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726127AbgC3Jnl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 30 Mar 2020 05:43:41 -0400
+IronPort-SDR: p7Titqo/XMUT0YTs6YIpQZN5jbCP7jQqKJBEWtReFF0xNtkW+NJ6dUPlCuKvdF1YWSpdEz+WYl
+ Yh82ncY+aNNA==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Mar 2020 02:43:40 -0700
+IronPort-SDR: mEqY1RX1MCY6ySvEv+t7Uk7nMQ/U91q84IxfOtjhCSEtFW/RQg57S1z8VdDH+gOiqFfJHqjDy+
+ tAefRkn3oyEA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.72,323,1580803200"; 
+   d="scan'208";a="251834926"
+Received: from fmsmsx107.amr.corp.intel.com ([10.18.124.205])
+  by orsmga006.jf.intel.com with ESMTP; 30 Mar 2020 02:43:39 -0700
+Received: from fmsmsx114.amr.corp.intel.com (10.18.116.8) by
+ fmsmsx107.amr.corp.intel.com (10.18.124.205) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Mon, 30 Mar 2020 02:43:39 -0700
+Received: from shsmsx152.ccr.corp.intel.com (10.239.6.52) by
+ FMSMSX114.amr.corp.intel.com (10.18.116.8) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Mon, 30 Mar 2020 02:43:39 -0700
+Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.225]) by
+ SHSMSX152.ccr.corp.intel.com ([169.254.6.209]) with mapi id 14.03.0439.000;
+ Mon, 30 Mar 2020 17:43:35 +0800
+From:   "Tian, Kevin" <kevin.tian@intel.com>
+To:     "Liu, Yi L" <yi.l.liu@intel.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>
+CC:     "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "Tian, Jun J" <jun.j.tian@intel.com>,
+        "Sun, Yi Y" <yi.y.sun@intel.com>,
+        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Wu, Hao" <hao.wu@intel.com>
+Subject: RE: [PATCH v1 3/8] vfio/type1: Report PASID alloc/free support to
+ userspace
+Thread-Topic: [PATCH v1 3/8] vfio/type1: Report PASID alloc/free support to
+ userspace
+Thread-Index: AQHWAEUdJcZWYB5B3kyVfi4eyRoo06hg6FCA
+Date:   Mon, 30 Mar 2020 09:43:35 +0000
+Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D19D7FF4FF@SHSMSX104.ccr.corp.intel.com>
+References: <1584880325-10561-1-git-send-email-yi.l.liu@intel.com>
+ <1584880325-10561-4-git-send-email-yi.l.liu@intel.com>
+In-Reply-To: <1584880325-10561-4-git-send-email-yi.l.liu@intel.com>
+Accept-Language: en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
+MIME-Version: 1.0
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Yi,
-
-On 3/30/20 6:24 AM, Liu Yi L wrote:
-> VFIO needs to check VFIO_TYPE1_NESTING_IOMMU support with Kernel before
-> further using it. e.g. requires to check IOMMU UAPI version.
+> From: Liu, Yi L <yi.l.liu@intel.com>
+> Sent: Sunday, March 22, 2020 8:32 PM
+> 
+> From: Liu Yi L <yi.l.liu@intel.com>
+> 
+> This patch reports PASID alloc/free availability to userspace (e.g. QEMU)
+> thus userspace could do a pre-check before utilizing this feature.
 > 
 > Cc: Kevin Tian <kevin.tian@intel.com>
-> Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
-> Cc: Peter Xu <peterx@redhat.com>
-> Cc: Eric Auger <eric.auger@redhat.com>
-> Cc: Yi Sun <yi.y.sun@linux.intel.com>
-> Cc: David Gibson <david@gibson.dropbear.id.au>
+> CC: Jacob Pan <jacob.jun.pan@linux.intel.com>
 > Cc: Alex Williamson <alex.williamson@redhat.com>
+> Cc: Eric Auger <eric.auger@redhat.com>
+> Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>
 > Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
-> Signed-off-by: Yi Sun <yi.y.sun@linux.intel.com>
 > ---
->  hw/vfio/common.c | 14 ++++++++++++--
->  1 file changed, 12 insertions(+), 2 deletions(-)
+>  drivers/vfio/vfio_iommu_type1.c | 28 ++++++++++++++++++++++++++++
+>  include/uapi/linux/vfio.h       |  8 ++++++++
+>  2 files changed, 36 insertions(+)
 > 
-> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-> index 0b3593b..c276732 100644
-> --- a/hw/vfio/common.c
-> +++ b/hw/vfio/common.c
-> @@ -1157,12 +1157,21 @@ static void vfio_put_address_space(VFIOAddressSpace *space)
->  static int vfio_get_iommu_type(VFIOContainer *container,
->                                 Error **errp)
+> diff --git a/drivers/vfio/vfio_iommu_type1.c
+> b/drivers/vfio/vfio_iommu_type1.c
+> index e40afc0..ddd1ffe 100644
+> --- a/drivers/vfio/vfio_iommu_type1.c
+> +++ b/drivers/vfio/vfio_iommu_type1.c
+> @@ -2234,6 +2234,30 @@ static int vfio_iommu_type1_pasid_free(struct
+> vfio_iommu *iommu,
+>  	return ret;
+>  }
+> 
+> +static int vfio_iommu_info_add_nesting_cap(struct vfio_iommu *iommu,
+> +					 struct vfio_info_cap *caps)
+> +{
+> +	struct vfio_info_cap_header *header;
+> +	struct vfio_iommu_type1_info_cap_nesting *nesting_cap;
+> +
+> +	header = vfio_info_cap_add(caps, sizeof(*nesting_cap),
+> +				   VFIO_IOMMU_TYPE1_INFO_CAP_NESTING,
+> 1);
+> +	if (IS_ERR(header))
+> +		return PTR_ERR(header);
+> +
+> +	nesting_cap = container_of(header,
+> +				struct vfio_iommu_type1_info_cap_nesting,
+> +				header);
+> +
+> +	nesting_cap->nesting_capabilities = 0;
+> +	if (iommu->nesting) {
+
+Is it good to report a nesting cap when iommu->nesting is disabled? I suppose
+the check should move before vfio_info_cap_add...
+
+> +		/* nesting iommu type supports PASID requests (alloc/free)
+> */
+> +		nesting_cap->nesting_capabilities |=
+> VFIO_IOMMU_PASID_REQS;
+
+VFIO_IOMMU_CAP_PASID_REQ? to avoid confusion with ioctl cmd
+VFIO_IOMMU_PASID_REQUEST...
+
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+>  static long vfio_iommu_type1_ioctl(void *iommu_data,
+>  				   unsigned int cmd, unsigned long arg)
 >  {
-> -    int iommu_types[] = { VFIO_TYPE1v2_IOMMU, VFIO_TYPE1_IOMMU,
-> +    int iommu_types[] = { VFIO_TYPE1_NESTING_IOMMU,
-> +                          VFIO_TYPE1v2_IOMMU, VFIO_TYPE1_IOMMU,
->                            VFIO_SPAPR_TCE_v2_IOMMU, VFIO_SPAPR_TCE_IOMMU };
-> -    int i;
-> +    int i, version;
->  
->      for (i = 0; i < ARRAY_SIZE(iommu_types); i++) {
->          if (ioctl(container->fd, VFIO_CHECK_EXTENSION, iommu_types[i])) {
-> +            if (iommu_types[i] == VFIO_TYPE1_NESTING_IOMMU) {
-> +                version = ioctl(container->fd, VFIO_CHECK_EXTENSION,
-> +                                VFIO_NESTING_IOMMU_UAPI);
-> +                if (version < IOMMU_UAPI_VERSION) {
-> +                    info_report("IOMMU UAPI incompatible for nesting");
-> +                    continue;
-> +                }
-> +            }
-This means that by default VFIO_TYPE1_NESTING_IOMMU wwould be chosen. I
-don't think this what we want. On ARM this would mean that for a
-standard VFIO assignment without vIOMMU, SL will be used instead of FL.
-This may not be harmless.
-
-For instance, in "[RFC v6 09/24] vfio: Force nested if iommu requires
-it", I use nested only if I detect we have a vSMMU. Otherwise I keep the
-legacy VFIO_TYPE1v2_IOMMU.
-
-Thanks
-
-Eric
->              return iommu_types[i];
->          }
->      }
-> @@ -1278,6 +1287,7 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
->      }
->  
->      switch (container->iommu_type) {
-> +    case VFIO_TYPE1_NESTING_IOMMU:
->      case VFIO_TYPE1v2_IOMMU:
->      case VFIO_TYPE1_IOMMU:
->      {
+> @@ -2283,6 +2307,10 @@ static long vfio_iommu_type1_ioctl(void
+> *iommu_data,
+>  		if (ret)
+>  			return ret;
 > 
+> +		ret = vfio_iommu_info_add_nesting_cap(iommu, &caps);
+> +		if (ret)
+> +			return ret;
+> +
+>  		if (caps.size) {
+>  			info.flags |= VFIO_IOMMU_INFO_CAPS;
+> 
+> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+> index 298ac80..8837219 100644
+> --- a/include/uapi/linux/vfio.h
+> +++ b/include/uapi/linux/vfio.h
+> @@ -748,6 +748,14 @@ struct vfio_iommu_type1_info_cap_iova_range {
+>  	struct	vfio_iova_range iova_ranges[];
+>  };
+> 
+> +#define VFIO_IOMMU_TYPE1_INFO_CAP_NESTING  2
+> +
+> +struct vfio_iommu_type1_info_cap_nesting {
+> +	struct	vfio_info_cap_header header;
+> +#define VFIO_IOMMU_PASID_REQS	(1 << 0)
+> +	__u32	nesting_capabilities;
+> +};
+> +
+>  #define VFIO_IOMMU_GET_INFO _IO(VFIO_TYPE, VFIO_BASE + 12)
+> 
+>  /**
+> --
+> 2.7.4
 
