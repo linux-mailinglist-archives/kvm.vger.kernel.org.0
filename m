@@ -2,450 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id F33E0198891
-	for <lists+kvm@lfdr.de>; Tue, 31 Mar 2020 01:59:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DB76E1988AE
+	for <lists+kvm@lfdr.de>; Tue, 31 Mar 2020 02:10:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729021AbgC3X6r (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 30 Mar 2020 19:58:47 -0400
-Received: from mga12.intel.com ([192.55.52.136]:32957 "EHLO mga12.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728901AbgC3X6q (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 30 Mar 2020 19:58:46 -0400
-IronPort-SDR: fkm9LKuVQ0frAFt3qLHhGOEFI2BVV4v2EnUV+wgpRpfh0N2tFUTRTTVKEd8irlzs1MuAHKJnrV
- 2Iet5xOG5aBQ==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Mar 2020 16:58:42 -0700
-IronPort-SDR: /Rds1xtWbzqIeuo4GdYbUL35pIWWSB/eISR0RdJMUFLTrpIuaGv9tG1AhGZTtsxKerMN/+Z8ce
- q06dbGKGwCZg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.72,326,1580803200"; 
-   d="scan'208";a="449973813"
-Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040) ([10.239.13.16])
-  by fmsmga006.fm.intel.com with ESMTP; 30 Mar 2020 16:58:38 -0700
-Date:   Mon, 30 Mar 2020 19:49:05 -0400
-From:   Yan Zhao <yan.y.zhao@intel.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     Kirti Wankhede <kwankhede@nvidia.com>,
-        "cjia@nvidia.com" <cjia@nvidia.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "Yang, Ziye" <ziye.yang@intel.com>,
-        "Liu, Changpeng" <changpeng.liu@intel.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>,
-        "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
-        "eskultet@redhat.com" <eskultet@redhat.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "dgilbert@redhat.com" <dgilbert@redhat.com>,
-        "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>,
-        "eauger@redhat.com" <eauger@redhat.com>,
-        "aik@ozlabs.ru" <aik@ozlabs.ru>,
-        "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
-        "felipe@nutanix.com" <felipe@nutanix.com>,
-        "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@Alibaba-inc.com>,
-        "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
-        "Ken.Xue@amd.com" <Ken.Xue@amd.com>,
-        "Wang, Zhi A" <zhi.a.wang@intel.com>,
-        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: Re: [PATCH v16 Kernel 4/7] vfio iommu: Implementation of ioctl for
- dirty pages tracking.
-Message-ID: <20200330234904.GA6478@joy-OptiPlex-7040>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-References: <1585084732-18473-1-git-send-email-kwankhede@nvidia.com>
- <20200325021135.GB20109@joy-OptiPlex-7040>
- <33d38629-aeaf-1c30-26d4-958b998620b0@nvidia.com>
- <20200327003055.GB26419@joy-OptiPlex-7040>
- <0fdf19d4-a45b-d0b1-b630-1ee9df087c15@nvidia.com>
- <20200330020708.GB30683@joy-OptiPlex-7040>
- <20200330144720.18acf66d@w520.home>
+        id S1729069AbgCaAKG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 30 Mar 2020 20:10:06 -0400
+Received: from gateway30.websitewelcome.com ([192.185.149.4]:15475 "EHLO
+        gateway30.websitewelcome.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728876AbgCaAKF (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 30 Mar 2020 20:10:05 -0400
+X-Greylist: delayed 1384 seconds by postgrey-1.27 at vger.kernel.org; Mon, 30 Mar 2020 20:10:05 EDT
+Received: from cm14.websitewelcome.com (cm14.websitewelcome.com [100.42.49.7])
+        by gateway30.websitewelcome.com (Postfix) with ESMTP id 8A53C27B75
+        for <kvm@vger.kernel.org>; Mon, 30 Mar 2020 18:46:58 -0500 (CDT)
+Received: from gator4166.hostgator.com ([108.167.133.22])
+        by cmsmtp with SMTP
+        id J47OjJ4FtXVkQJ47OjYDbc; Mon, 30 Mar 2020 18:46:58 -0500
+X-Authority-Reason: nr=8
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=embeddedor.com; s=default; h=Content-Type:MIME-Version:Message-ID:Subject:
+        Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+        Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+        :Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:
+        List-Subscribe:List-Post:List-Owner:List-Archive;
+        bh=MHojYII/Ua+k7l5hgugppwNvwPqnKoi9qCSV0tIDcMY=; b=WNCS8YARVVpPBy1UXYjUAQe9YQ
+        X6c2Xd0hKDmUu0kPnKn8t41HP/yVT8sZYIkv3JeBOsbBDfRQlq5t6x+EDWmdUmriVVWbPWd5tD8xz
+        GowGlSXb5Jq+w+PtislgOHg8eZkJMcxfaoI7hvVfWWQBkBv4DAN/3QFUj3nXR6fgMjoWN1gv4aFSu
+        vBKaN2abzcQMoalF4KmdvwXhed/SlJzZHdGf07Hp+3zb+jpFW/hIlfRi8f9Z1hS76bTL735ucbXY7
+        hNmup79QHHtRJuPUt1zGPS08cYCANg4ZNbwFHa2errdAWcmg5YlblLo2ZK/6JaNOw0LV87U5n/MQi
+        cMl/vKrg==;
+Received: from cablelink-189-218-116-241.hosts.intercable.net ([189.218.116.241]:34376 helo=embeddedor)
+        by gator4166.hostgator.com with esmtpa (Exim 4.92)
+        (envelope-from <gustavo@embeddedor.com>)
+        id 1jJ47M-000kyx-S1; Mon, 30 Mar 2020 18:46:56 -0500
+Date:   Mon, 30 Mar 2020 18:50:40 -0500
+From:   "Gustavo A. R. Silva" <gustavo@embeddedor.com>
+To:     "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Tiwei Bie <tiwei.bie@intel.com>,
+        Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>
+Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        "Gustavo A. R. Silva" <gustavo@embeddedor.com>
+Subject: [PATCH] vhost: vdpa: remove unnecessary null check
+Message-ID: <20200330235040.GA9997@embeddedor>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200330144720.18acf66d@w520.home>
 User-Agent: Mutt/1.9.4 (2018-02-28)
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - gator4166.hostgator.com
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - embeddedor.com
+X-BWhitelist: no
+X-Source-IP: 189.218.116.241
+X-Source-L: No
+X-Exim-ID: 1jJ47M-000kyx-S1
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
+X-Source-Sender: cablelink-189-218-116-241.hosts.intercable.net (embeddedor) [189.218.116.241]:34376
+X-Source-Auth: gustavo@embeddedor.com
+X-Email-Count: 11
+X-Source-Cap: Z3V6aWRpbmU7Z3V6aWRpbmU7Z2F0b3I0MTY2Lmhvc3RnYXRvci5jb20=
+X-Local-Domain: yes
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 31, 2020 at 04:47:20AM +0800, Alex Williamson wrote:
-> On Sun, 29 Mar 2020 22:07:08 -0400
-> Yan Zhao <yan.y.zhao@intel.com> wrote:
-> 
-> > On Fri, Mar 27, 2020 at 01:07:38PM +0800, Kirti Wankhede wrote:
-> > > 
-> > > 
-> > > On 3/27/2020 6:00 AM, Yan Zhao wrote:  
-> > > > On Fri, Mar 27, 2020 at 05:39:01AM +0800, Kirti Wankhede wrote:  
-> > > >>
-> > > >>
-> > > >> On 3/25/2020 7:41 AM, Yan Zhao wrote:  
-> > > >>> On Wed, Mar 25, 2020 at 05:18:52AM +0800, Kirti Wankhede wrote:  
-> > > >>>> VFIO_IOMMU_DIRTY_PAGES ioctl performs three operations:
-> > > >>>> - Start dirty pages tracking while migration is active
-> > > >>>> - Stop dirty pages tracking.
-> > > >>>> - Get dirty pages bitmap. Its user space application's responsibility to
-> > > >>>>     copy content of dirty pages from source to destination during migration.
-> > > >>>>
-> > > >>>> To prevent DoS attack, memory for bitmap is allocated per vfio_dma
-> > > >>>> structure. Bitmap size is calculated considering smallest supported page
-> > > >>>> size. Bitmap is allocated for all vfio_dmas when dirty logging is enabled
-> > > >>>>
-> > > >>>> Bitmap is populated for already pinned pages when bitmap is allocated for
-> > > >>>> a vfio_dma with the smallest supported page size. Update bitmap from
-> > > >>>> pinning functions when tracking is enabled. When user application queries
-> > > >>>> bitmap, check if requested page size is same as page size used to
-> > > >>>> populated bitmap. If it is equal, copy bitmap, but if not equal, return
-> > > >>>> error.
-> > > >>>>
-> > > >>>> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-> > > >>>> Reviewed-by: Neo Jia <cjia@nvidia.com>
-> > > >>>> ---
-> > > >>>>    drivers/vfio/vfio_iommu_type1.c | 266 +++++++++++++++++++++++++++++++++++++++-
-> > > >>>>    1 file changed, 260 insertions(+), 6 deletions(-)
-> > > >>>>
-> > > >>>> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> > > >>>> index 70aeab921d0f..874a1a7ae925 100644
-> > > >>>> --- a/drivers/vfio/vfio_iommu_type1.c
-> > > >>>> +++ b/drivers/vfio/vfio_iommu_type1.c
-> > > >>>> @@ -71,6 +71,7 @@ struct vfio_iommu {
-> > > >>>>    	unsigned int		dma_avail;
-> > > >>>>    	bool			v2;
-> > > >>>>    	bool			nesting;
-> > > >>>> +	bool			dirty_page_tracking;
-> > > >>>>    };
-> > > >>>>    
-> > > >>>>    struct vfio_domain {
-> > > >>>> @@ -91,6 +92,7 @@ struct vfio_dma {
-> > > >>>>    	bool			lock_cap;	/* capable(CAP_IPC_LOCK) */
-> > > >>>>    	struct task_struct	*task;
-> > > >>>>    	struct rb_root		pfn_list;	/* Ex-user pinned pfn list */
-> > > >>>> +	unsigned long		*bitmap;
-> > > >>>>    };
-> > > >>>>    
-> > > >>>>    struct vfio_group {
-> > > >>>> @@ -125,7 +127,21 @@ struct vfio_regions {
-> > > >>>>    #define IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu)	\
-> > > >>>>    					(!list_empty(&iommu->domain_list))
-> > > >>>>    
-> > > >>>> +#define DIRTY_BITMAP_BYTES(n)	(ALIGN(n, BITS_PER_TYPE(u64)) / BITS_PER_BYTE)
-> > > >>>> +
-> > > >>>> +/*
-> > > >>>> + * Input argument of number of bits to bitmap_set() is unsigned integer, which
-> > > >>>> + * further casts to signed integer for unaligned multi-bit operation,
-> > > >>>> + * __bitmap_set().
-> > > >>>> + * Then maximum bitmap size supported is 2^31 bits divided by 2^3 bits/byte,
-> > > >>>> + * that is 2^28 (256 MB) which maps to 2^31 * 2^12 = 2^43 (8TB) on 4K page
-> > > >>>> + * system.
-> > > >>>> + */
-> > > >>>> +#define DIRTY_BITMAP_PAGES_MAX	(uint64_t)(INT_MAX - 1)
-> > > >>>> +#define DIRTY_BITMAP_SIZE_MAX	 DIRTY_BITMAP_BYTES(DIRTY_BITMAP_PAGES_MAX)
-> > > >>>> +
-> > > >>>>    static int put_pfn(unsigned long pfn, int prot);
-> > > >>>> +static unsigned long vfio_pgsize_bitmap(struct vfio_iommu *iommu);
-> > > >>>>    
-> > > >>>>    /*
-> > > >>>>     * This code handles mapping and unmapping of user data buffers
-> > > >>>> @@ -175,6 +191,77 @@ static void vfio_unlink_dma(struct vfio_iommu *iommu, struct vfio_dma *old)
-> > > >>>>    	rb_erase(&old->node, &iommu->dma_list);
-> > > >>>>    }
-> > > >>>>    
-> > > >>>> +
-> > > >>>> +static int vfio_dma_bitmap_alloc(struct vfio_dma *dma, uint64_t pgsize)
-> > > >>>> +{
-> > > >>>> +	uint64_t npages = dma->size / pgsize;
-> > > >>>> +
-> > > >>>> +	if (npages > DIRTY_BITMAP_PAGES_MAX)
-> > > >>>> +		return -EINVAL;
-> > > >>>> +
-> > > >>>> +	dma->bitmap = kvzalloc(DIRTY_BITMAP_BYTES(npages), GFP_KERNEL);
-> > > >>>> +	if (!dma->bitmap)
-> > > >>>> +		return -ENOMEM;
-> > > >>>> +
-> > > >>>> +	return 0;
-> > > >>>> +}
-> > > >>>> +
-> > > >>>> +static void vfio_dma_bitmap_free(struct vfio_dma *dma)
-> > > >>>> +{
-> > > >>>> +	kfree(dma->bitmap);
-> > > >>>> +	dma->bitmap = NULL;
-> > > >>>> +}
-> > > >>>> +
-> > > >>>> +static void vfio_dma_populate_bitmap(struct vfio_dma *dma, uint64_t pgsize)
-> > > >>>> +{
-> > > >>>> +	struct rb_node *p;
-> > > >>>> +
-> > > >>>> +	if (RB_EMPTY_ROOT(&dma->pfn_list))
-> > > >>>> +		return;
-> > > >>>> +
-> > > >>>> +	for (p = rb_first(&dma->pfn_list); p; p = rb_next(p)) {
-> > > >>>> +		struct vfio_pfn *vpfn = rb_entry(p, struct vfio_pfn, node);
-> > > >>>> +
-> > > >>>> +		bitmap_set(dma->bitmap, (vpfn->iova - dma->iova) / pgsize, 1);
-> > > >>>> +	}
-> > > >>>> +}
-> > > >>>> +
-> > > >>>> +static int vfio_dma_bitmap_alloc_all(struct vfio_iommu *iommu, uint64_t pgsize)
-> > > >>>> +{
-> > > >>>> +	struct rb_node *n = rb_first(&iommu->dma_list);
-> > > >>>> +
-> > > >>>> +	for (; n; n = rb_next(n)) {
-> > > >>>> +		struct vfio_dma *dma = rb_entry(n, struct vfio_dma, node);
-> > > >>>> +		int ret;
-> > > >>>> +
-> > > >>>> +		ret = vfio_dma_bitmap_alloc(dma, pgsize);
-> > > >>>> +		if (ret) {
-> > > >>>> +			struct rb_node *p = rb_prev(n);
-> > > >>>> +
-> > > >>>> +			for (; p; p = rb_prev(p)) {
-> > > >>>> +				struct vfio_dma *dma = rb_entry(n,
-> > > >>>> +							struct vfio_dma, node);
-> > > >>>> +
-> > > >>>> +				vfio_dma_bitmap_free(dma);
-> > > >>>> +			}
-> > > >>>> +			return ret;
-> > > >>>> +		}
-> > > >>>> +		vfio_dma_populate_bitmap(dma, pgsize);
-> > > >>>> +	}
-> > > >>>> +	return 0;
-> > > >>>> +}
-> > > >>>> +
-> > > >>>> +static void vfio_dma_bitmap_free_all(struct vfio_iommu *iommu)
-> > > >>>> +{
-> > > >>>> +	struct rb_node *n = rb_first(&iommu->dma_list);
-> > > >>>> +
-> > > >>>> +	for (; n; n = rb_next(n)) {
-> > > >>>> +		struct vfio_dma *dma = rb_entry(n, struct vfio_dma, node);
-> > > >>>> +
-> > > >>>> +		vfio_dma_bitmap_free(dma);
-> > > >>>> +	}
-> > > >>>> +}
-> > > >>>> +
-> > > >>>>    /*
-> > > >>>>     * Helper Functions for host iova-pfn list
-> > > >>>>     */
-> > > >>>> @@ -567,6 +654,18 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
-> > > >>>>    			vfio_unpin_page_external(dma, iova, do_accounting);
-> > > >>>>    			goto pin_unwind;
-> > > >>>>    		}
-> > > >>>> +
-> > > >>>> +		if (iommu->dirty_page_tracking) {
-> > > >>>> +			unsigned long pgshift =
-> > > >>>> +					 __ffs(vfio_pgsize_bitmap(iommu));
-> > > >>>> +
-> > > >>>> +			/*
-> > > >>>> +			 * Bitmap populated with the smallest supported page
-> > > >>>> +			 * size
-> > > >>>> +			 */
-> > > >>>> +			bitmap_set(dma->bitmap,
-> > > >>>> +				   (vpfn->iova - dma->iova) >> pgshift, 1);
-> > > >>>> +		}
-> > > >>>>    	}
-> > > >>>>    
-> > > >>>>    	ret = i;
-> > > >>>> @@ -801,6 +900,7 @@ static void vfio_remove_dma(struct vfio_iommu *iommu, struct vfio_dma *dma)
-> > > >>>>    	vfio_unmap_unpin(iommu, dma, true);
-> > > >>>>    	vfio_unlink_dma(iommu, dma);
-> > > >>>>    	put_task_struct(dma->task);
-> > > >>>> +	vfio_dma_bitmap_free(dma);
-> > > >>>>    	kfree(dma);
-> > > >>>>    	iommu->dma_avail++;
-> > > >>>>    }
-> > > >>>> @@ -831,6 +931,57 @@ static unsigned long vfio_pgsize_bitmap(struct vfio_iommu *iommu)
-> > > >>>>    	return bitmap;
-> > > >>>>    }
-> > > >>>>    
-> > > >>>> +static int vfio_iova_dirty_bitmap(struct vfio_iommu *iommu, dma_addr_t iova,
-> > > >>>> +				  size_t size, uint64_t pgsize,
-> > > >>>> +				  u64 __user *bitmap)
-> > > >>>> +{
-> > > >>>> +	struct vfio_dma *dma;
-> > > >>>> +	unsigned long pgshift = __ffs(pgsize);
-> > > >>>> +	unsigned int npages, bitmap_size;
-> > > >>>> +
-> > > >>>> +	dma = vfio_find_dma(iommu, iova, 1);
-> > > >>>> +
-> > > >>>> +	if (!dma)
-> > > >>>> +		return -EINVAL;
-> > > >>>> +
-> > > >>>> +	if (dma->iova != iova || dma->size != size)
-> > > >>>> +		return -EINVAL;
-> > > >>>> +  
-> > > >>> Still don't sure if it's a good practice.
-> > > >>> I saw the qemu implementation.
-> > > >>> Qemu just iterates the whole IOVA address space,
-> > > >>> It needs to find IOTLB entry for an IOVA
-> > > >>> (1) if it can find an IOTLB for an IOVA, do the DIRTY_PAGES IOCTL and
-> > > >>> increment IOVA by (iotlb.addr_mask + 1)
-> > > >>>
-> > > >>> (2) if no existing IOTLB found, the imrc->translate needs to go searching shadow
-> > > >>> page table to try to generate one.
-> > > >>> if it still fails,(most probably case, as IOMMU only maps a small part in its address
-> > > >>> space).  increment IOVA by 1 page.
-> > > >>>
-> > > >>> So, if the address space width is 39bit, and if there's only one page
-> > > >>> mapped, you still have to translate IOVA for around 2^27 times in each
-> > > >>> query. Isn't it too inefficient?
-> > > >>>  
-> > > >>
-> > > >> This is Qemu side implementation, let discuss it on QEMU patches.
-> > > >>  
-> > > > But kernel has to support it first, right?
-> > > >   
-> > > 
-> > > Shadow page table will be in QEMU (?), as long as we support map and   
-> > Yes, shadow page table in QEMU.
-> > 
-> > > unmap in kernel space, QEMU part of changes should work. That shouldn't 
-> > > block kernel side patches.  
-> > Not sure whether this assertion is right:)
-> > I just want to raise the issue out.
-> 
-> And I think we need to make sure that we have a path to an efficient
-> userspace implementation.  Walking a shadow page table to unmap and
-> collect individual dirty bits is clearly better than blindly walking
-> every page of a 39 bit address space, but it would be an obvious
-> improvement if the QEMU code could zap entire levels at once.
-> 
-> The issues we raised before about combining multiple bitmaps are not
-> insurmountable, they're just complicated and potentially something that
-> we can defer for the initial implementation.  We can change the
-> implementation of the dirty bitmap without affecting the user, but we
-> would need to use another flag bit of the IOMMU_GET_INFO ioctl or expose
-> it via the CHECK_EXTENSION ioctl to indicate multi-mapping dirty bitmap
-> support.  In fact, the flags field on IOMMU_GET_INFO so far only
-> describes fields returned by the ioctl, not support for other ioctls.
-> Would the CHECK_EXTENSION ioctl be a better choice for both exposing
-> this initial support as well as a v2 when we have multi-mapping?
->
-ok.
+container_of is never null, so this null check is
+unnecessary.
 
-> > > >>> So, IMHO, why we could not just save an rb tree specific for dirty pages, then generate
-> > > >>> a bitmap for each query?  
-> 
-> I'm curious to know how this might work, I was strongly encouraging
-> that we must have a bitmap mechanism that supports copy_to_user(),
-> otherwise we don't have an efficient way to push the bits to the user.
-> We'd need to copy_from_user() a chunk of their bitmap, set bits, then
-> push it back with copy_to_user().  If you're thinking of an rb-tree, do
-> we have a node per dirty page?  The overhead for that seem excessive.
-hmm, maybe the kernel can allocate a fixed-length buffer that works as a
-transmitter for copy_to_user() ?
-The sequence is:
-1. when dirty bit tracking is on, alloc a fixed length buffer, say, 64k.
-2. when a query ioctl comes, searching the rb tree for the queried
-range, and filling the fixed length buffer by chunks and copy_to_user()
-by chunks as well.
-3. when dirty bit tracking is off, free the fixed length buffer.
+Addresses-Coverity-ID: 1492006 ("Logically dead code")
+Fixes: 20453a45fb06 ("vhost: introduce vDPA-based backend")
+Signed-off-by: Gustavo A. R. Silva <gustavo@embeddedor.com>
+---
+ drivers/vhost/vdpa.c | 2 --
+ 1 file changed, 2 deletions(-)
 
-yes, rb tree takes more memory than bitmap, but it only needs to alloc
-nodes for dirty page ranges. e.g. node 1 for range starting with
-address A, of size 0x200000, node 2 for range starting with address B,
-of size 0x1000, node 3 for range starting with address C, of size
-0x7000... as long as they are not overlapping.
+diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+index 421f02a8530a..3d2cb811757a 100644
+--- a/drivers/vhost/vdpa.c
++++ b/drivers/vhost/vdpa.c
+@@ -678,8 +678,6 @@ static int vhost_vdpa_open(struct inode *inode, struct file *filep)
+ 	int nvqs, i, r, opened;
+ 
+ 	v = container_of(inode->i_cdev, struct vhost_vdpa, cdev);
+-	if (!v)
+-		return -ENODEV;
+ 
+ 	opened = atomic_cmpxchg(&v->opened, 0, 1);
+ 	if (opened)
+-- 
+2.26.0
 
-for a vm with huge memory, is it still worthwhile?
-
-just an idea, for your consideration :)
-
-> I think we could support multi-mapping dirty bits using __bitmap_and(),
-> __bitmap_or(), and __bitmap_shift_left/right() to extract the unaligned
-> portion of the bitmap, or it into a previous segment, then shift the
-> remainder of the bitmap so that we could use copy_to_user() with it.
-> 
-
-> > > >> This is looping back to implentation in v10 - v12 version. There are
-> > > >> problems discussed during v10 to v12 version of patches with this approach.
-> > > >> - populating dirty bitmap at the time of query will add more CPU cycles.
-> > > >> - If we save these CPU cyles means dirty pages need to be tracked when
-> > > >> they are pinned or dirtied by CPU, that is, inttoduced per vfio_dma
-> > > >> bitmap. If ranges are not vfio_dma aligned, then copying bitmap to user
-> > > >> space becomes complicated and unefficient.
-> > > >>
-> > > >> So we decided to go with the approach implemented here.  
-> > > > 
-> > > > I checked v12, it's not like what I said.
-> > > > In v12, bitmaps are generated per vfio_dma, and combination of the
-> > > > bitmaps are required in order to generate a big bitmap suiting for dirty
-> > > > query. It can cause problem when offset not aligning.
-> > > > But what I propose here is to generate an rb tree orthogonal to the tree
-> > > > of vfio_dma.
-> > > > 
-> > > > as to CPU cycles saving, I don't think iterating/translating page by page
-> > > > would achieve that purpose.
-> > > > 
-> > > >   
-> > > 
-> > > 
-> > >   
-> > > >   
-> > > >>>  
-> > > >>>> +	npages = dma->size >> pgshift;
-> > > >>>> +	bitmap_size = DIRTY_BITMAP_BYTES(npages);
-> > > >>>> +
-> > > >>>> +	/* mark all pages dirty if all pages are pinned and mapped. */
-> > > >>>> +	if (dma->iommu_mapped)
-> > > >>>> +		bitmap_set(dma->bitmap, 0, npages);
-> > > >>>> +
-> > > >>>> +	if (copy_to_user((void __user *)bitmap, dma->bitmap, bitmap_size))
-> > > >>>> +		return -EFAULT;
-> > > >>>> +
-> > > >>>> +	/*
-> > > >>>> +	 * Re-populate bitmap to include all pinned pages which are considered
-> > > >>>> +	 * as dirty but exclude pages which are unpinned and pages which are
-> > > >>>> +	 * marked dirty by vfio_dma_rw()
-> > > >>>> +	 */
-> > > >>>> +	bitmap_clear(dma->bitmap, 0, npages);
-> > > >>>> +	vfio_dma_populate_bitmap(dma, pgsize);  
-> > > >>> will this also repopulate bitmap for pinned pages set by pass-through devices in
-> > > >>> patch 07 ?
-> > > >>>  
-> > > >>
-> > > >> If pass through device's driver pins pages using vfio_pin_pages and all
-> > > >> devices in the group pins pages through vfio_pin_pages, then
-> > > >> iommu->pinned_page_dirty_scope is set true, then bitmap is repolutated.
-> > > >>
-> > > >>  
-> > > > pass-through devices already have all guest memory pinned, it would have
-> > > > no reason to call vfio_pin_pages if not attempting to mark page dirty.
-> > > > Then if it calls vfio_pin_pages, it means "the pages are accessed, please
-> > > > mark them dirty, feel free to clean it when you get it",  
-> > > 
-> > > if you see vfio_dma_populate_bitmap() function, then if vfio_pin_pages 
-> > > is called, dma->pfn_list rb_tree will be non-empty and bitmap gets 
-> > > populates as per pinned pages.
-> > >   
-> > > > not "the pages will be accesses, please mark them dirty continuously"
-> > > >  
-> > > 
-> > > if vfio_pin_pages is not called, dma->pfn_list is empty, then it returns 
-> > > early.
-> > > If suppose there are 2 deviced in the group, one is IOMMU backed device 
-> > > and other non-IOMMU mdev device. In that case, all pages are pinned, 
-> > > iommu->pinned_page_dirty_scope is false, but dma->pfn_list is also not 
-> > > empty since non-IOMMU backed device pins pages using external API. We 
-> > > still have to populate bitmap according to dma->pfn_list here, because 
-> > > in prec-copy phase on first bitmap query, IOMMU backed device might pin 
-> > > pages using external API - with that iommu->pinned_page_dirty_scope will 
-> > > get updated to 'true', which means during next iteration report pinned 
-> > > pages by external API only.
-> > >  
-> > ok, I previously thought vfio_pin_pages for IOMMU backed device is to set
-> > dirty pages after it has write access to them. Looks your intention here
-> > is presume pinned pages are dirty so you have to re-fill them until they
-> > are unpinned.
-> > Maybe you can leave it as is, and we can add mark dirty interface later for
-> > the purpose I said above (mark dirty after write access).
-> 
-> Yes, just as with non-iommu backed devices, pinned pages are assumed to
-> be continuously dirtied.  A pin followed by unpin could be used by a
-> driver to indicate a transient dirty page, but I think we'd want to
-> think about a lower overhead interface when we have such a driver.
-> We'd essentially need vfio_dma_rw with only the portion that sets the
-> dirty bit on write.  Thanks,
-> 
-ok. got it.
-
-Thanks
-Yan
