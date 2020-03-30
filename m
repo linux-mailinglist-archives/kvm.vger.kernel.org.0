@@ -2,122 +2,178 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E955C197938
-	for <lists+kvm@lfdr.de>; Mon, 30 Mar 2020 12:22:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B48E21978D7
+	for <lists+kvm@lfdr.de>; Mon, 30 Mar 2020 12:20:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729669AbgC3KWT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 30 Mar 2020 06:22:19 -0400
-Received: from mx01.bbu.dsd.mx.bitdefender.com ([91.199.104.161]:43752 "EHLO
-        mx01.bbu.dsd.mx.bitdefender.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729114AbgC3KTt (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 30 Mar 2020 06:19:49 -0400
-Received: from smtp.bitdefender.com (smtp02.buh.bitdefender.net [10.17.80.76])
-        by mx01.bbu.dsd.mx.bitdefender.com (Postfix) with ESMTPS id E555C305D3D7;
-        Mon, 30 Mar 2020 13:13:02 +0300 (EEST)
-Received: from localhost.localdomain (unknown [91.199.104.28])
-        by smtp.bitdefender.com (Postfix) with ESMTPSA id B1394303EF21;
-        Mon, 30 Mar 2020 13:13:02 +0300 (EEST)
-From:   =?UTF-8?q?Adalbert=20Laz=C4=83r?= <alazar@bitdefender.com>
-To:     kvm@vger.kernel.org
-Cc:     virtualization@lists.linux-foundation.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?q?Mihai=20Don=C8=9Bu?= <mdontu@bitdefender.com>,
-        =?UTF-8?q?Adalbert=20Laz=C4=83r?= <alazar@bitdefender.com>
-Subject: [PATCH v8 81/81] KVM: x86: call the page tracking code on emulation failure
-Date:   Mon, 30 Mar 2020 13:13:08 +0300
-Message-Id: <20200330101308.21702-82-alazar@bitdefender.com>
-In-Reply-To: <20200330101308.21702-1-alazar@bitdefender.com>
-References: <20200330101308.21702-1-alazar@bitdefender.com>
+        id S1729894AbgC3KUN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 30 Mar 2020 06:20:13 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:53028 "EHLO
+        us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1729738AbgC3KUK (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 30 Mar 2020 06:20:10 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1585563609;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=k6E/dAk2RnlJp9AQMbHdDVYq/j7w3RXnkQoUbm2tREo=;
+        b=NY2uipgqmXJI5g174lTUvz1EaAsrNpp4E38e4xboYriYGfM6UrmbvdaCHGH3eM92Jcl7n/
+        Xw7NPy63rN4XwpVPDVGHZNCvOZNPkp9Lo2JQeXMJohGZGvoaKC9zGNebBJyOjIrQHhz5Nf
+        0x509QS9hK0FTw2OjlMRP8J0x4JQTAE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-149-YRVcN6SzOI-iXKPBNOz4nw-1; Mon, 30 Mar 2020 06:20:05 -0400
+X-MC-Unique: YRVcN6SzOI-iXKPBNOz4nw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 88E5F1005509;
+        Mon, 30 Mar 2020 10:20:03 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.40.193.172])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 8CDF61001925;
+        Mon, 30 Mar 2020 10:19:57 +0000 (UTC)
+Date:   Mon, 30 Mar 2020 12:19:55 +0200
+From:   Andrew Jones <drjones@redhat.com>
+To:     Auger Eric <eric.auger@redhat.com>
+Cc:     peter.maydell@linaro.org, thuth@redhat.com, kvm@vger.kernel.org,
+        maz@kernel.org, qemu-devel@nongnu.org, qemu-arm@nongnu.org,
+        andre.przywara@arm.com, Zenghui Yu <yuzenghui@huawei.com>,
+        alexandru.elisei@arm.com, kvmarm@lists.cs.columbia.edu,
+        eric.auger.pro@gmail.com
+Subject: Re: [kvm-unit-tests PATCH v7 06/13] arm/arm64: ITS: Introspection
+ tests
+Message-ID: <20200330101955.2rlksuzkkvopk52t@kamzik.brq.redhat.com>
+References: <20200320092428.20880-1-eric.auger@redhat.com>
+ <20200320092428.20880-7-eric.auger@redhat.com>
+ <947a79f5-1f79-532b-9ec7-6fd539ccd183@huawei.com>
+ <8878be7f-7653-b427-cd0d-722f82fb6b65@redhat.com>
+ <20200330091139.i2d6vv64f5diamlz@kamzik.brq.redhat.com>
+ <7d6dc4e7-82b4-3c54-574f-2149d4a85c48@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <7d6dc4e7-82b4-3c54-574f-2149d4a85c48@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Mihai Donțu <mdontu@bitdefender.com>
+On Mon, Mar 30, 2020 at 11:56:00AM +0200, Auger Eric wrote:
+> Hi,
+>=20
+> On 3/30/20 11:11 AM, Andrew Jones wrote:
+> > On Mon, Mar 30, 2020 at 10:46:57AM +0200, Auger Eric wrote:
+> >> Hi Zenghui,
+> >>
+> >> On 3/30/20 10:30 AM, Zenghui Yu wrote:
+> >>> Hi Eric,
+> >>>
+> >>> On 2020/3/20 17:24, Eric Auger wrote:
+> >>>> +static void its_cmd_queue_init(void)
+> >>>> +{
+> >>>> +=A0=A0=A0 unsigned long order =3D get_order(SZ_64K >> PAGE_SHIFT)=
+;
+> >>>> +=A0=A0=A0 u64 cbaser;
+> >>>> +
+> >>>> +=A0=A0=A0 its_data.cmd_base =3D (void *)virt_to_phys(alloc_pages(=
+order));
+> >>>
+> >>> Shouldn't the cmd_base (and the cmd_write) be set as a GVA?
+> >> yes it should
+> >=20
+> > If it's supposed to be a virtual address, when why do the virt_to_phy=
+s?
+> What is programmed in CBASER register is a physical address. So the
+> virt_to_phys() is relevant. The inconsistency is in its_allocate_entry(=
+)
+> introduced later on where I return the physical address instead of the
+> virtual address. I will fix that.
+>=20
+>=20
+> >=20
+> >>>
+> >>> Otherwise I think we will end-up with memory corruption when writin=
+g
+> >>> the command queue.=A0 But it seems that everything just works fine =
+...
+> >>> So I'm really confused here :-/
+> >> I was told by Paolo that the VA/PA memory map is flat in kvmunit tes=
+t.
+> >=20
+> > What does flat mean?
+>=20
+> Yes I meant an identity map.
+>=20
+>  kvm-unit-tests, at least arm/arm64, does prepare
+> > an identity map of all physical memory, which explains why the above
+> > is working.
+>=20
+> should be the same on x86
 
-The information we can provide this way is incomplete, but current users
-of the page tracking code can work with it.
+Maybe, but I didn't write or review how x86 does their default map, so I
+don't know.
 
-Signed-off-by: Mihai Donțu <mdontu@bitdefender.com>
-Signed-off-by: Adalbert Lazăr <alazar@bitdefender.com>
----
- arch/x86/kvm/x86.c | 49 ++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 49 insertions(+)
+>=20
+>  It's doing virt_to_phys(some-virt-addr), which gets a
+> > phys addr, but when the ITS uses it as a virt addr it works because
+> > we *also* have a virt addr =3D=3D phys addr mapping in the default pa=
+ge
+> > table, which is named "idmap" for good reason.
+> >=20
+> > I think it would be better to test with the non-identity mapped addre=
+sses
+> > though.
+>=20
+> is there any way to exercise a non idmap?
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 12e9b4689025..de90335d2e01 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -6793,6 +6793,51 @@ static bool is_vmware_backdoor_opcode(struct x86_emulate_ctxt *ctxt)
- 	return false;
- }
- 
-+/*
-+ * With introspection enabled, emulation failures translate in events being
-+ * missed because the read/write callbacks are not invoked. All we have is
-+ * the fetch event (kvm_page_track_preexec). Below we use the EPT/NPT VMEXIT
-+ * information to generate the events, but without providing accurate
-+ * data and size (the emulator would have computed those). If an instruction
-+ * would happen to read and write in the same page, the second event will
-+ * initially be missed and we rely on the page tracking mechanism to bring
-+ * us back here to send it.
-+ */
-+static bool kvm_page_track_emulation_failure(struct kvm_vcpu *vcpu, gpa_t gpa)
-+{
-+	u64 error_code = vcpu->arch.error_code;
-+	u8 data = 0;
-+	gva_t gva;
-+	bool ret;
-+
-+	/* MMIO emulation failures should be treated the normal way */
-+	if (unlikely(error_code & PFERR_RSVD_MASK))
-+		return true;
-+
-+	/* EPT/NTP must be enabled */
-+	if (unlikely(!vcpu->arch.mmu->direct_map))
-+		return true;
-+
-+	/*
-+	 * The A/D bit emulation should make this test unneeded, but just
-+	 * in case
-+	 */
-+	if (unlikely((error_code & PFERR_NESTED_GUEST_PAGE) ==
-+		     PFERR_NESTED_GUEST_PAGE))
-+		return true;
-+
-+	gva = kvm_x86_ops->fault_gla(vcpu);
-+
-+	if (error_code & PFERR_WRITE_MASK)
-+		ret = kvm_page_track_prewrite(vcpu, gpa, gva, &data, 0);
-+	else if (error_code & PFERR_USER_MASK)
-+		ret = kvm_page_track_preread(vcpu, gpa, gva, 0);
-+	else
-+		ret = true;
-+
-+	return ret;
-+}
-+
- int x86_emulate_instruction(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
- 			    int emulation_type, void *insn, int insn_len)
- {
-@@ -6842,6 +6887,8 @@ int x86_emulate_instruction(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
- 				kvm_queue_exception(vcpu, UD_VECTOR);
- 				return 1;
- 			}
-+			if (!kvm_page_track_emulation_failure(vcpu, cr2_or_gpa))
-+				return 1;
- 			if (reexecute_instruction(vcpu, cr2_or_gpa,
- 						  write_fault_to_spt,
- 						  emulation_type))
-@@ -6900,6 +6947,8 @@ int x86_emulate_instruction(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
- 		return 1;
- 
- 	if (r == EMULATION_FAILED) {
-+		if (!kvm_page_track_emulation_failure(vcpu, cr2_or_gpa))
-+			return 1;
- 		if (reexecute_instruction(vcpu, cr2_or_gpa, write_fault_to_spt,
- 					emulation_type))
- 			return 1;
+You could create your own map and then switch to it. See lib/arm/asm/mmu-=
+api.h
+
+But, you don't have to switch the whole map to use non-identity mapped
+addresses. Just create new virt mappings to the phys addresses you're
+interested in, and then use those new virt addresses instead. If you're
+worried that somewhere an identity mapped virt address is getting used
+because of a phys/virt address mix up, then you could probably sprinkle
+some assert(virt_to_phys(addr) !=3D addr)'s around to ensure it.
+
+Thanks,
+drew
+
+>=20
+> Thanks
+>=20
+> Eric
+> >=20
+> > Thanks,
+> > drew
+> >=20
+> >>
+> >>>
+> >>>> +
+> >>>> +=A0=A0=A0 cbaser =3D ((u64)its_data.cmd_base | (SZ_64K / SZ_4K - =
+1)=A0=A0=A0 |
+> >>>> GITS_CBASER_VALID);
+> >>>> +
+> >>>> +=A0=A0=A0 writeq(cbaser, its_data.base + GITS_CBASER);
+> >>>> +
+> >>>> +=A0=A0=A0 its_data.cmd_write =3D its_data.cmd_base;
+> >>>> +=A0=A0=A0 writeq(0, its_data.base + GITS_CWRITER);
+> >>>> +}
+> >>>
+> >>> Otherwise this looks good,
+> >>> Reviewed-by: Zenghui Yu <yuzenghui@huawei.com>
+> >> Thanks!
+> >>
+> >> Eric
+> >>>
+> >>>
+> >>> Thanks
+> >>>
+> >>
+> >>
+>=20
+>=20
+
