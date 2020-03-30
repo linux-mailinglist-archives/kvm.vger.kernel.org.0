@@ -2,251 +2,188 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9B8421979FB
-	for <lists+kvm@lfdr.de>; Mon, 30 Mar 2020 12:58:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B3F981979FF
+	for <lists+kvm@lfdr.de>; Mon, 30 Mar 2020 12:58:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729563AbgC3K6c (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 30 Mar 2020 06:58:32 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:12651 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1729313AbgC3K6c (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 30 Mar 2020 06:58:32 -0400
-Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.58])
-        by Forcepoint Email with ESMTP id 7C91EB38A8366729AFBE;
-        Mon, 30 Mar 2020 18:55:45 +0800 (CST)
-Received: from [127.0.0.1] (10.173.222.27) by DGGEMS411-HUB.china.huawei.com
- (10.3.19.211) with Microsoft SMTP Server id 14.3.487.0; Mon, 30 Mar 2020
- 18:55:37 +0800
-Subject: Re: [kvm-unit-tests PATCH v7 12/13] arm/arm64: ITS: migration tests
-To:     Eric Auger <eric.auger@redhat.com>
-CC:     <eric.auger.pro@gmail.com>, <maz@kernel.org>,
-        <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>,
-        <qemu-devel@nongnu.org>, <qemu-arm@nongnu.org>,
-        <drjones@redhat.com>, <andre.przywara@arm.com>,
-        <peter.maydell@linaro.org>, <alexandru.elisei@arm.com>,
-        <thuth@redhat.com>
-References: <20200320092428.20880-1-eric.auger@redhat.com>
- <20200320092428.20880-13-eric.auger@redhat.com>
-From:   Zenghui Yu <yuzenghui@huawei.com>
-Message-ID: <4ae2e841-2558-133a-1d19-693dc6f34f60@huawei.com>
-Date:   Mon, 30 Mar 2020 18:55:36 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+        id S1729596AbgC3K6o (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 30 Mar 2020 06:58:44 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:44670 "EHLO
+        us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1729525AbgC3K6n (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 30 Mar 2020 06:58:43 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1585565922;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+        bh=Q3crc4njuLeoM8ocQhCEFQNLgm17hH4bkqNOXW5hUto=;
+        b=FCkIzJi07T2zGi1KgQcWxs6hz5WcpisHcwc1n3G7nJh1sYGyZybUon1Ps8g7gILObZOTMG
+        B8XJ4cjhcNBn3Q3yF5DbVNRdyKLnnlO3plJ+UKQy7nNeQfIx28UNLguVuNA5tE2kWqa7s3
+        BcOVw34XX1wOvwO9uMI1YbqghGZ6az0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-380-OK4tzafXOB6Wnec6tOPBVw-1; Mon, 30 Mar 2020 06:58:38 -0400
+X-MC-Unique: OK4tzafXOB6Wnec6tOPBVw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5D5F21937FC0;
+        Mon, 30 Mar 2020 10:58:37 +0000 (UTC)
+Received: from [10.36.113.227] (ovpn-113-227.ams2.redhat.com [10.36.113.227])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 099A16EF9A;
+        Mon, 30 Mar 2020 10:58:35 +0000 (UTC)
+Subject: Re: [kvm-unit-tests 2/2] s390x/smp: add minimal test for sigp sense
+ running status
+To:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.vnet.ibm.com>
+Cc:     KVM <kvm@vger.kernel.org>, linux-s390 <linux-s390@vger.kernel.org>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Thomas Huth <thuth@redhat.com>
+References: <20200330084911.34248-1-borntraeger@de.ibm.com>
+ <20200330084911.34248-3-borntraeger@de.ibm.com>
+From:   David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat GmbH
+Message-ID: <2e511a31-b976-ec07-f0c4-a01c32ceba7f@redhat.com>
+Date:   Mon, 30 Mar 2020 12:58:34 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20200320092428.20880-13-eric.auger@redhat.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
+In-Reply-To: <20200330084911.34248-3-borntraeger@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.173.222.27]
-X-CFilter-Loop: Reflected
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Eric,
-
-On 2020/3/20 17:24, Eric Auger wrote:
-> This test maps LPIs (populates the device table, the collection table,
-> interrupt translation tables, configuration table), migrates and make
-> sure the translation is correct on the destination.
-> 
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> 
+On 30.03.20 10:49, Christian Borntraeger wrote:
+> make sure that sigp sense running status returns a sane value for
+> stopped CPUs.
+>=20
+> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
 > ---
-> v4 -> v5:
-> - move stub from header to arm/gic.c
-> 
-> v3 -> v4:
-> - assert in its_get_device/collection if the id is not found
-> ---
->   arm/gic.c                  | 58 ++++++++++++++++++++++++++++++++++----
->   arm/unittests.cfg          |  8 ++++++
->   lib/arm64/asm/gic-v3-its.h |  3 ++
->   lib/arm64/gic-v3-its.c     | 22 +++++++++++++++
->   4 files changed, 85 insertions(+), 6 deletions(-)
-> 
-> diff --git a/arm/gic.c b/arm/gic.c
-> index 5f1e595..6ecfdbc 100644
-> --- a/arm/gic.c
-> +++ b/arm/gic.c
-> @@ -590,6 +590,7 @@ static void gic_test_mmio(void)
->   
->   static void test_its_introspection(void) {}
->   static void test_its_trigger(void) {}
-> +static void test_its_migration(void) {}
->   
->   #else /* __aarch64__ */
->   
-> @@ -658,13 +659,19 @@ static int its_prerequisites(int nb_cpus)
->   	return 0;
->   }
->   
-> -static void test_its_trigger(void)
-> +/*
-> + * Setup the configuration for those mappings:
-> + * dev_id=2 event=20 -> vcpu 3, intid=8195
-> + * dev_id=7 event=255 -> vcpu 2, intid=8196
-> + * LPIs ready to hit
-> + */
-> +static int its_setup1(void)
->   {
->   	struct its_collection *col3, *col2;
->   	struct its_device *dev2, *dev7;
->   
->   	if (its_prerequisites(4))
-> -		return;
-> +		return -1;
->   
->   	dev2 = its_create_device(2 /* dev id */, 8 /* nb_ites */);
->   	dev7 = its_create_device(7 /* dev id */, 8 /* nb_ites */);
-> @@ -675,14 +682,10 @@ static void test_its_trigger(void)
->   	gicv3_lpi_set_config(8195, LPI_PROP_DEFAULT);
->   	gicv3_lpi_set_config(8196, LPI_PROP_DEFAULT);
->   
-> -	report_prefix_push("int");
->   	/*
->   	 * dev=2, eventid=20  -> lpi= 8195, col=3
->   	 * dev=7, eventid=255 -> lpi= 8196, col=2
-> -	 * Trigger dev2, eventid=20 and dev7, eventid=255
-> -	 * Check both LPIs hit
->   	 */
-> -
->   	its_send_mapd(dev2, true);
->   	its_send_mapd(dev7, true);
->   
-> @@ -694,6 +697,22 @@ static void test_its_trigger(void)
->   
->   	its_send_mapti(dev2, 8195 /* lpi id */, 20 /* event id */, col3);
->   	its_send_mapti(dev7, 8196 /* lpi id */, 255 /* event id */, col2);
-> +	return 0;
+>  lib/s390x/smp.c |  2 +-
+>  lib/s390x/smp.h |  2 +-
+>  s390x/smp.c     | 11 +++++++++++
+>  3 files changed, 13 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/lib/s390x/smp.c b/lib/s390x/smp.c
+> index 5ed8b7b..492cb05 100644
+> --- a/lib/s390x/smp.c
+> +++ b/lib/s390x/smp.c
+> @@ -58,7 +58,7 @@ bool smp_cpu_stopped(uint16_t addr)
+>  	return !!(status & (SIGP_STATUS_CHECK_STOP|SIGP_STATUS_STOPPED));
+>  }
+> =20
+> -bool smp_cpu_running(uint16_t addr)
+> +bool smp_sense_running_status(uint16_t addr)
+>  {
+>  	if (sigp(addr, SIGP_SENSE_RUNNING, 0, NULL) !=3D SIGP_CC_STATUS_STORE=
+D)
+>  		return true;
+> diff --git a/lib/s390x/smp.h b/lib/s390x/smp.h
+> index a8b98c0..639ec92 100644
+> --- a/lib/s390x/smp.h
+> +++ b/lib/s390x/smp.h
+> @@ -40,7 +40,7 @@ struct cpu_status {
+>  int smp_query_num_cpus(void);
+>  struct cpu *smp_cpu_from_addr(uint16_t addr);
+>  bool smp_cpu_stopped(uint16_t addr);
+> -bool smp_cpu_running(uint16_t addr);
+> +bool smp_sense_running_status(uint16_t addr);
+>  int smp_cpu_restart(uint16_t addr);
+>  int smp_cpu_start(uint16_t addr, struct psw psw);
+>  int smp_cpu_stop(uint16_t addr);
+> diff --git a/s390x/smp.c b/s390x/smp.c
+> index 79cdc1f..f9f143d 100644
+> --- a/s390x/smp.c
+> +++ b/s390x/smp.c
+> @@ -210,6 +210,16 @@ static void test_emcall(void)
+>  	report_prefix_pop();
+>  }
+> =20
+> +static void test_sense_running(void)
+> +{
+> +	report_prefix_push("sense_running");
+> +	/* make sure CPU is stopped */
+> +	smp_cpu_stop(1);
+> +	report(!smp_sense_running_status(1), "CPU1 sense claims not running")=
+;
+> +	report_prefix_pop();
 > +}
 > +
-> +static void test_its_trigger(void)
-> +{
-> +	struct its_collection *col3;
-> +	struct its_device *dev2, *dev7;
 > +
-> +	if (its_setup1())
-> +		return;
-> +
-> +	col3 = its_get_collection(3);
-> +	dev2 = its_get_device(2);
-> +	dev7 = its_get_device(7);
-> +
-> +	report_prefix_push("int");
->   
->   	lpi_stats_expect(3, 8195);
->   	its_send_int(dev2, 20);
-> @@ -748,6 +767,29 @@ static void test_its_trigger(void)
->   	check_lpi_stats("no LPI after device unmap");
->   	report_prefix_pop();
->   }
-> +
-> +static void test_its_migration(void)
-> +{
-> +	struct its_device *dev2, *dev7;
-> +
-> +	if (its_setup1())
-> +		return;
-> +
-> +	dev2 = its_get_device(2);
-> +	dev7 = its_get_device(7);
-> +
-> +	puts("Now migrate the VM, then press a key to continue...\n");
-> +	(void)getchar();
-> +	report_info("Migration complete");
-> +
-> +	lpi_stats_expect(3, 8195);
-> +	its_send_int(dev2, 20);
-> +	check_lpi_stats("dev2/eventid=20 triggers LPI 8195 en PE #3 after migration");
+>  /* Used to dirty registers of cpu #1 before it is reset */
+>  static void test_func_initial(void)
+>  {
+> @@ -319,6 +329,7 @@ int main(void)
+>  	test_store_status();
+>  	test_ecall();
+>  	test_emcall();
+> +	test_sense_running();
+>  	test_reset();
+>  	test_reset_initial();
+>  	smp_cpu_destroy(1);
+>=20
 
-typo: s/en PE #3/on PE #3/
+In kvm, we set/clear via kvm_arch_vcpu_load/kvm_arch_vcpu_put. This
+means, that a VCPU will also be indicated as running, in case we perform
+certain VCPU IOCTLs, while the VCPU is already stopped.
 
-Reviewed-by: Zenghui Yu <yuzenghui@huawei.com>
+Especially, there is a theoretical race between stopping a VCPU, and it
+still being in the kernel, and the other thread sensing the running
+status. This is the case with !kvm_s390_user_cpu_state_ctrl(), when
+leaving handle_stop() but also with kvm_s390_user_cpu_state_ctrl(), when
+setting the MP state via kvm_arch_vcpu_ioctl_set_mpstate().
 
+--=20
+Thanks,
 
-Thanks
-
-> +
-> +	lpi_stats_expect(2, 8196);
-> +	its_send_int(dev7, 255);
-> +	check_lpi_stats("dev7/eventid=255 triggers LPI 8196 on PE #2 after migration");
-> +}
->   #endif
->   
->   int main(int argc, char **argv)
-> @@ -785,6 +827,10 @@ int main(int argc, char **argv)
->   		report_prefix_push(argv[1]);
->   		test_its_trigger();
->   		report_prefix_pop();
-> +	} else if (!strcmp(argv[1], "its-migration")) {
-> +		report_prefix_push(argv[1]);
-> +		test_its_migration();
-> +		report_prefix_pop();
->   	} else if (strcmp(argv[1], "its-introspection") == 0) {
->   		report_prefix_push(argv[1]);
->   		test_its_introspection();
-> diff --git a/arm/unittests.cfg b/arm/unittests.cfg
-> index b9a7a2c..480adec 100644
-> --- a/arm/unittests.cfg
-> +++ b/arm/unittests.cfg
-> @@ -136,6 +136,14 @@ extra_params = -machine gic-version=3 -append 'its-trigger'
->   groups = its
->   arch = arm64
->   
-> +[its-migration]
-> +file = gic.flat
-> +smp = $MAX_SMP
-> +accel = kvm
-> +extra_params = -machine gic-version=3 -append 'its-migration'
-> +groups = its migration
-> +arch = arm64
-> +
->   # Test PSCI emulation
->   [psci]
->   file = psci.flat
-> diff --git a/lib/arm64/asm/gic-v3-its.h b/lib/arm64/asm/gic-v3-its.h
-> index e1e42c3..412f438 100644
-> --- a/lib/arm64/asm/gic-v3-its.h
-> +++ b/lib/arm64/asm/gic-v3-its.h
-> @@ -168,4 +168,7 @@ extern void __its_send_sync(struct its_collection *col, bool verbose);
->   #define its_send_movi_nv(dev, col, id)			__its_send_movi(dev, col, id, false)
->   #define its_send_sync_nv(col)				__its_send_sync(col, false)
->   
-> +extern struct its_device *its_get_device(u32 id);
-> +extern struct its_collection *its_get_collection(u32 id);
-> +
->   #endif /* _ASMARM64_GIC_V3_ITS_H_ */
-> diff --git a/lib/arm64/gic-v3-its.c b/lib/arm64/gic-v3-its.c
-> index f0a0381..c7755d9 100644
-> --- a/lib/arm64/gic-v3-its.c
-> +++ b/lib/arm64/gic-v3-its.c
-> @@ -147,3 +147,25 @@ struct its_collection *its_create_collection(u32 col_id, u32 pe)
->   	its_data.nr_collections++;
->   	return new;
->   }
-> +
-> +struct its_device *its_get_device(u32 id)
-> +{
-> +	int i;
-> +
-> +	for (i = 0; i < GITS_MAX_DEVICES; i++) {
-> +		if (its_data.devices[i].device_id == id)
-> +			return &its_data.devices[i];
-> +	}
-> +	assert(0);
-> +}
-> +
-> +struct its_collection *its_get_collection(u32 id)
-> +{
-> +	int i;
-> +
-> +	for (i = 0; i < GITS_MAX_COLLECTIONS; i++) {
-> +		if (its_data.collections[i].col_id == id)
-> +			return &its_data.collections[i];
-> +	}
-> +	assert(0);
-> +}
-> 
+David / dhildenb
 
