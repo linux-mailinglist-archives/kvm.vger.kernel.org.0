@@ -2,203 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7EEFF197B77
-	for <lists+kvm@lfdr.de>; Mon, 30 Mar 2020 14:06:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5262D197BB5
+	for <lists+kvm@lfdr.de>; Mon, 30 Mar 2020 14:19:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730043AbgC3MGs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 30 Mar 2020 08:06:48 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:12148 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1729669AbgC3MGs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 30 Mar 2020 08:06:48 -0400
-Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.58])
-        by Forcepoint Email with ESMTP id 9F0A01416568A269222E;
-        Mon, 30 Mar 2020 20:06:44 +0800 (CST)
-Received: from [127.0.0.1] (10.173.222.27) by DGGEMS413-HUB.china.huawei.com
- (10.3.19.213) with Microsoft SMTP Server id 14.3.487.0; Mon, 30 Mar 2020
- 20:06:36 +0800
-Subject: Re: [kvm-unit-tests PATCH v7 13/13] arm/arm64: ITS: pending table
- migration test
-To:     Eric Auger <eric.auger@redhat.com>
-CC:     <eric.auger.pro@gmail.com>, <maz@kernel.org>,
-        <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>,
-        <qemu-devel@nongnu.org>, <qemu-arm@nongnu.org>,
-        <drjones@redhat.com>, <andre.przywara@arm.com>,
-        <peter.maydell@linaro.org>, <alexandru.elisei@arm.com>,
-        <thuth@redhat.com>
-References: <20200320092428.20880-1-eric.auger@redhat.com>
- <20200320092428.20880-14-eric.auger@redhat.com>
-From:   Zenghui Yu <yuzenghui@huawei.com>
-Message-ID: <296c574b-810c-9c90-a613-df732a9ac193@huawei.com>
-Date:   Mon, 30 Mar 2020 20:06:35 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+        id S1729998AbgC3MTn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 30 Mar 2020 08:19:43 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:4698 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1729981AbgC3MTn (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 30 Mar 2020 08:19:43 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 02UC3bQl111005
+        for <kvm@vger.kernel.org>; Mon, 30 Mar 2020 08:19:42 -0400
+Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 30233787va-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Mon, 30 Mar 2020 08:19:42 -0400
+Received: from localhost
+        by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
+        Mon, 30 Mar 2020 13:19:33 +0100
+Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
+        by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Mon, 30 Mar 2020 13:19:30 +0100
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 02UCJZix47186258
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 30 Mar 2020 12:19:35 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 68379A4053;
+        Mon, 30 Mar 2020 12:19:35 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 56824A4051;
+        Mon, 30 Mar 2020 12:19:35 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Mon, 30 Mar 2020 12:19:35 +0000 (GMT)
+Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 25651)
+        id 184ACE024B; Mon, 30 Mar 2020 14:19:35 +0200 (CEST)
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     KVM <kvm@vger.kernel.org>,
+        Janosch Frank <frankja@linux.vnet.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>
+Subject: [GIT PULL 0/1] KVM: s390: Fix for 5.7 merge window
+Date:   Mon, 30 Mar 2020 14:19:33 +0200
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-In-Reply-To: <20200320092428.20880-14-eric.auger@redhat.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.173.222.27]
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 20033012-0012-0000-0000-0000039AEAEF
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20033012-0013-0000-0000-000021D7F2C3
+Message-Id: <20200330121934.28143-1-borntraeger@de.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.645
+ definitions=2020-03-30_01:2020-03-27,2020-03-30 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 suspectscore=0
+ impostorscore=0 mlxscore=0 malwarescore=0 clxscore=1015 adultscore=0
+ bulkscore=0 mlxlogscore=623 priorityscore=1501 phishscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2003300115
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Eric,
+Paolo,
 
-On 2020/3/20 17:24, Eric Auger wrote:
-> Add two new migration tests. One testing the migration of
-> a topology where collection were unmapped. The second test
-> checks the migration of the pending table.
-> 
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+The following changes since commit f3dd18d444c757840920434e62809b6104081b06:
 
-[...]
+  KVM: s390: mark sie block as 512 byte aligned (2020-03-23 18:30:33 +0100)
 
-> @@ -659,6 +678,15 @@ static int its_prerequisites(int nb_cpus)
->   	return 0;
->   }
->   
-> +static void set_lpi(struct its_device *dev, u32 eventid, u32 physid,
-> +		    struct its_collection *col)
-> +{
-> +	assert(dev && col);
-> +
-> +	its_send_mapti(dev, physid, eventid, col);
-> +	gicv3_lpi_set_config(physid, LPI_PROP_DEFAULT);
-> +}
+are available in the Git repository at:
 
-I'd say we can just drop this helper and open-code it anywhere
-necessarily. The name 'set_lpi' doesn't tell me too much about
-what has been implemented inside the helper.
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux.git  tags/kvm-s390-next-5.7-3
 
-> +
->   /*
->    * Setup the configuration for those mappings:
->    * dev_id=2 event=20 -> vcpu 3, intid=8195
-> @@ -790,6 +818,108 @@ static void test_its_migration(void)
->   	its_send_int(dev7, 255);
->   	check_lpi_stats("dev7/eventid=255 triggers LPI 8196 on PE #2 after migration");
->   }
-> +
-> +static void test_migrate_unmapped_collection(void)
-> +{
-> +	struct its_collection *col;
-> +	struct its_device *dev2, *dev7;
-> +	int pe0 = 0;
-> +	u8 config;
-> +
-> +	if (its_setup1())
-> +		return;
-> +
-> +	col = its_create_collection(pe0, pe0);
-> +	dev2 = its_get_device(2);
-> +	dev7 = its_get_device(7);
-> +
-> +	/* MAPTI with the collection unmapped */
-> +	set_lpi(dev2, 0, 8192, col);
+for you to fetch changes up to 7a2653612bb6f18fb236c5b0c4d28f7b459bf7c2:
 
-... and it's only invoked here.
+  s390/gmap: return proper error code on ksm unsharing (2020-03-27 06:42:53 -0400)
 
-> +
-> +	puts("Now migrate the VM, then press a key to continue...\n");
-> +	(void)getchar();
-> +	report_info("Migration complete");
-> +
-> +	/* on the destination, map the collection */
-> +	its_send_mapc(col, true);
-> +	its_send_invall(col);
-> +
-> +	lpi_stats_expect(2, 8196);
-> +	its_send_int(dev7, 255);
-> +	check_lpi_stats("dev7/eventid= 255 triggered LPI 8196 on PE #2");
-> +
-> +	config = gicv3_lpi_get_config(8192);
-> +	report(config == LPI_PROP_DEFAULT,
-> +	       "Config of LPI 8192 was properly migrated");
-> +
-> +	lpi_stats_expect(pe0, 8192);
-> +	its_send_int(dev2, 0);
-> +	check_lpi_stats("dev2/eventid = 0 triggered LPI 8192 on PE0");
-> +}
-> +
-> +static void test_its_pending_migration(void)
-> +{
-> +	struct its_device *dev;
-> +	struct its_collection *collection[2];
-> +	int *expected = malloc(nr_cpus * sizeof(int));
-> +	int pe0 = nr_cpus - 1, pe1 = nr_cpus - 2;
-> +	u64 pendbaser;
-> +	void *ptr;
-> +	int i;
-> +
-> +	if (its_prerequisites(4))
-> +		return;
-> +
-> +	dev = its_create_device(2 /* dev id */, 8 /* nb_ites */);
-> +	its_send_mapd(dev, true);
-> +
-> +	collection[0] = its_create_collection(pe0, pe0);
-> +	collection[1] = its_create_collection(pe1, pe1);
-> +	its_send_mapc(collection[0], true);
-> +	its_send_mapc(collection[1], true);
-> +
-> +	/* disable lpi at redist level */
-> +	gicv3_lpi_rdist_disable(pe0);
-> +	gicv3_lpi_rdist_disable(pe1);
-> +
-> +	/* lpis are interleaved inbetween the 2 PEs */
-> +	for (i = 0; i < 256; i++) {
-> +		struct its_collection *col = i % 2 ? collection[0] :
-> +						     collection[1];
-> +		int vcpu = col->target_address >> 16;
-> +
-> +		its_send_mapti(dev, LPI(i), i, col);
-> +		gicv3_lpi_set_config(LPI(i), LPI_PROP_DEFAULT);
-> +		gicv3_lpi_set_clr_pending(vcpu, LPI(i), true);
-> +	}
-> +	its_send_invall(collection[0]);
-> +	its_send_invall(collection[1]);
-> +
-> +	/* Clear the PTZ bit on each pendbaser */
-> +
-> +	expected[pe0] = 128;
-> +	expected[pe1] = 128;
+----------------------------------------------------------------
+KVM: s390: Fix for error codes
 
-Do we need to initialize expected[] for other PEs? Or it has always
-been zeroed by the kvm-unit-tests implementation of malloc()?
+- return the proper error to userspace when a signal interrupts the
+  KSM unsharing operation
 
-> +
-> +	ptr = gicv3_data.redist_base[pe0] + GICR_PENDBASER;
-> +	pendbaser = readq(ptr);
-> +	writeq(pendbaser & ~GICR_PENDBASER_PTZ, ptr);
-> +
-> +	ptr = gicv3_data.redist_base[pe1] + GICR_PENDBASER;
-> +	pendbaser = readq(ptr);
-> +	writeq(pendbaser & ~GICR_PENDBASER_PTZ, ptr);
-> +
-> +	gicv3_lpi_rdist_enable(pe0);
-> +	gicv3_lpi_rdist_enable(pe1);
+----------------------------------------------------------------
+Christian Borntraeger (1):
+      s390/gmap: return proper error code on ksm unsharing
 
-I don't know how the migration gets implemented in kvm-unit-tests.
-But is there any guarantee that the LPIs will only be triggered on the
-destination side? As once the EnableLPIs bit becomes 1, VGIC will start
-reading the pending bit in guest memory and potentially injecting LPIs
-into the target vcpu (in the source side).
-
-> +
-> +	puts("Now migrate the VM, then press a key to continue...\n");
-> +	(void)getchar();
-> +	report_info("Migration complete");
-> +
-> +	/* let's wait for the 256 LPIs to be handled */
-> +	mdelay(1000);
-> +
-> +	check_lpi_hits(expected, "128 LPIs on both PE0 and PE1 after migration");
-> +}
-
-
-Thanks,
-Zenghui
+ Documentation/virt/kvm/api.rst | 6 ++++++
+ arch/s390/mm/gmap.c            | 9 +++++----
+ 2 files changed, 11 insertions(+), 4 deletions(-)
 
