@@ -2,311 +2,151 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 387CE199E05
-	for <lists+kvm@lfdr.de>; Tue, 31 Mar 2020 20:29:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5913E199E54
+	for <lists+kvm@lfdr.de>; Tue, 31 Mar 2020 20:46:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727740AbgCaS3G (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 31 Mar 2020 14:29:06 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:26820 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726208AbgCaS3G (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 31 Mar 2020 14:29:06 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1585679345;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=b5dWIETr4KPTa4P1RR7LQV/Jn7WI6760rymnOFO4Dv0=;
-        b=dNJ1abXU1147B+lrmkB4uzqBCA3ZWrUXtvgPCgDMnvoiPtit+l8qZq2IJ44DIBFqccAiwI
-        +qjUE5YMW1Ah/uZdJYcLk9xqjiL/jUTlPOZl4hJZBFfq8YNGNR/BoNK+WE/L4so7dj9fwm
-        twSJhnAYDJMTvQM7bkoDcs6RZEWdmzc=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-330-tGVYhvBNPMCziq_0gYUsIg-1; Tue, 31 Mar 2020 14:29:00 -0400
-X-MC-Unique: tGVYhvBNPMCziq_0gYUsIg-1
-Received: by mail-wm1-f72.google.com with SMTP id w9so1035565wmi.2
-        for <kvm@vger.kernel.org>; Tue, 31 Mar 2020 11:29:00 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=b5dWIETr4KPTa4P1RR7LQV/Jn7WI6760rymnOFO4Dv0=;
-        b=mpJhhGaIASKtfdCjXNJ6bEDyC7hThLr3dE8CKe8lqIa+z/19A0BjXtfazP+IhkXZGg
-         sFe3h3Q/onjDwanTxMvdDRv18OYTg5oT3vFVtpOLsTA7a5GEKW2lCbmxQeM8hq1fs7hJ
-         Q5bIPRWyVBVhKjx9uMgiPW6+D6bqFmhHKAoznkrOS5OTrvZr60iC8YawIUB9wevrn8Fg
-         HaNRUW1xosnpJfnCenUYirAX2bGYkJQcxZM+xho0oj+DTffsCr9U8F+8LWfUHaA9ibfZ
-         OJOIA8VCpdOAjGw4EUH4ZkcZJu0zXpC0JfY4CRHrmWuQG2vqJ/8W4KaVyQL1vGkP2h1H
-         7S0w==
-X-Gm-Message-State: ANhLgQ14ihj1va/7oeqnOV0bxdzjwlVgjP5P7hoX44J3ywvOkgmttsIn
-        4HFiOs2y4QMtbwsXIw2/u/sKk/hKOBOnk0n92LM56DBsf6KCtDUfTXO9z0X0QIK+vYzEOtPF5MP
-        1wBVFY4wN+gfe
-X-Received: by 2002:a5d:51cf:: with SMTP id n15mr20377988wrv.195.1585679339609;
-        Tue, 31 Mar 2020 11:28:59 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vsrRT7SyDvbvcazCfYAPjh1HEODlf301z86ujp6Ln0x2zj42AzBsllsuuoC5zRxIsUp9SilHA==
-X-Received: by 2002:a5d:51cf:: with SMTP id n15mr20377958wrv.195.1585679339265;
-        Tue, 31 Mar 2020 11:28:59 -0700 (PDT)
-Received: from redhat.com (bzq-79-176-51-222.red.bezeqint.net. [79.176.51.222])
-        by smtp.gmail.com with ESMTPSA id u128sm4909462wmu.31.2020.03.31.11.28.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 31 Mar 2020 11:28:58 -0700 (PDT)
-Date:   Tue, 31 Mar 2020 14:28:55 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>
-Cc:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        kvm list <kvm@vger.kernel.org>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Stephen Rothwell <sfr@canb.auug.org.au>,
-        Christian Borntraeger <borntraeger@de.ibm.com>
-Subject: Re: [PATCH v2 1/8] vhost: Create accessors for virtqueues
- private_data
-Message-ID: <20200331142426-mutt-send-email-mst@kernel.org>
-References: <20200331180006.25829-1-eperezma@redhat.com>
- <20200331180006.25829-2-eperezma@redhat.com>
+        id S1727708AbgCaSq2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 31 Mar 2020 14:46:28 -0400
+Received: from hqnvemgate24.nvidia.com ([216.228.121.143]:8046 "EHLO
+        hqnvemgate24.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726209AbgCaSq1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 31 Mar 2020 14:46:27 -0400
+Received: from hqpgpgate102.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate24.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+        id <B5e838fa20000>; Tue, 31 Mar 2020 11:44:50 -0700
+Received: from hqmail.nvidia.com ([172.20.161.6])
+  by hqpgpgate102.nvidia.com (PGP Universal service);
+  Tue, 31 Mar 2020 11:46:27 -0700
+X-PGP-Universal: processed;
+        by hqpgpgate102.nvidia.com on Tue, 31 Mar 2020 11:46:27 -0700
+Received: from [10.40.162.111] (10.124.1.5) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Tue, 31 Mar
+ 2020 18:46:18 +0000
+Subject: Re: [PATCH v17 Kernel 5/7] vfio iommu: Update UNMAP_DMA ioctl to get
+ dirty bitmap before unmap
+To:     Alex Williamson <alex.williamson@redhat.com>
+CC:     <cjia@nvidia.com>, <kevin.tian@intel.com>, <ziye.yang@intel.com>,
+        <changpeng.liu@intel.com>, <yi.l.liu@intel.com>,
+        <mlevitsk@redhat.com>, <eskultet@redhat.com>, <cohuck@redhat.com>,
+        <dgilbert@redhat.com>, <jonathan.davies@nutanix.com>,
+        <eauger@redhat.com>, <aik@ozlabs.ru>, <pasic@linux.ibm.com>,
+        <felipe@nutanix.com>, <Zhengxiao.zx@Alibaba-inc.com>,
+        <shuangtai.tst@alibaba-inc.com>, <Ken.Xue@amd.com>,
+        <zhi.a.wang@intel.com>, <yan.y.zhao@intel.com>,
+        <qemu-devel@nongnu.org>, <kvm@vger.kernel.org>
+References: <1585587044-2408-1-git-send-email-kwankhede@nvidia.com>
+ <1585587044-2408-6-git-send-email-kwankhede@nvidia.com>
+ <20200330153421.6246c2c6@w520.home>
+X-Nvconfidentiality: public
+From:   Kirti Wankhede <kwankhede@nvidia.com>
+Message-ID: <66af06b5-4e87-9f7a-be85-08a68d6ab982@nvidia.com>
+Date:   Wed, 1 Apr 2020 00:16:13 +0530
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20200331180006.25829-2-eperezma@redhat.com>
+In-Reply-To: <20200330153421.6246c2c6@w520.home>
+X-Originating-IP: [10.124.1.5]
+X-ClientProxiedBy: HQMAIL105.nvidia.com (172.20.187.12) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1585680290; bh=iWzduZHbPfAp/fpaS0jcEjAbJwVc7RSEbxv51ssxb+4=;
+        h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
+         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
+         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
+         Content-Transfer-Encoding;
+        b=GAe7CXCcFLpbdEe0Z6rQS9Aw3uM2cOnGPiTMJuU9K4g8ym+NSf/4D3/Knjzaah3qI
+         Mbff020O6MmoXnpMhBzgjIYWbJm7uX61roLebl5dXcYkIoahYJD+wgPtY2K2iFTTOI
+         PLAls7X/ja/eatyNTXqMKEQ61EyK6IuK4zTucztDvAfFYiXrorx/eNff+KKsO1KnVy
+         d2z+77/dbdOzlxLxiNEgpFvSVUcsXPur2M3/c+8c+450+2bSL8atpkTfXHI1l8oJro
+         toOFZ6J2YzftnHLrGw7pyZfnHqH6UnhtkT+5kvaFFnytoCx3BpmncQz2nWbEklpq8g
+         OIxLNqGRUVJPA==
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 31, 2020 at 07:59:59PM +0200, Eugenio Pérez wrote:
-> Signed-off-by: Eugenio Pérez <eperezma@redhat.com>
-> ---
->  drivers/vhost/net.c   | 28 +++++++++++++++-------------
->  drivers/vhost/vhost.h | 28 ++++++++++++++++++++++++++++
->  drivers/vhost/vsock.c | 14 +++++++-------
 
 
-Seems to be missing scsi and test.
-
-
->  3 files changed, 50 insertions(+), 20 deletions(-)
+On 3/31/2020 3:04 AM, Alex Williamson wrote:
+> On Mon, 30 Mar 2020 22:20:42 +0530
+> Kirti Wankhede <kwankhede@nvidia.com> wrote:
 > 
-> diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-> index e158159671fa..6c5e7a6f712c 100644
-> --- a/drivers/vhost/net.c
-> +++ b/drivers/vhost/net.c
-> @@ -424,7 +424,7 @@ static void vhost_net_disable_vq(struct vhost_net *n,
->  	struct vhost_net_virtqueue *nvq =
->  		container_of(vq, struct vhost_net_virtqueue, vq);
->  	struct vhost_poll *poll = n->poll + (nvq - n->vqs);
-> -	if (!vq->private_data)
-> +	if (!vhost_vq_get_backend_opaque(vq))
->  		return;
->  	vhost_poll_stop(poll);
->  }
-> @@ -437,7 +437,7 @@ static int vhost_net_enable_vq(struct vhost_net *n,
->  	struct vhost_poll *poll = n->poll + (nvq - n->vqs);
->  	struct socket *sock;
->  
-> -	sock = vq->private_data;
-> +	sock = vhost_vq_get_backend_opaque(vq);
->  	if (!sock)
->  		return 0;
->  
-> @@ -524,7 +524,7 @@ static void vhost_net_busy_poll(struct vhost_net *net,
->  		return;
->  
->  	vhost_disable_notify(&net->dev, vq);
-> -	sock = rvq->private_data;
-> +	sock = vhost_vq_get_backend_opaque(rvq);
->  
->  	busyloop_timeout = poll_rx ? rvq->busyloop_timeout:
->  				     tvq->busyloop_timeout;
-> @@ -570,8 +570,10 @@ static int vhost_net_tx_get_vq_desc(struct vhost_net *net,
->  
->  	if (r == tvq->num && tvq->busyloop_timeout) {
->  		/* Flush batched packets first */
-> -		if (!vhost_sock_zcopy(tvq->private_data))
-> -			vhost_tx_batch(net, tnvq, tvq->private_data, msghdr);
-> +		if (!vhost_sock_zcopy(vhost_vq_get_backend_opaque(tvq)))
-> +			vhost_tx_batch(net, tnvq,
-> +				       vhost_vq_get_backend_opaque(tvq),
-> +				       msghdr);
->  
->  		vhost_net_busy_poll(net, rvq, tvq, busyloop_intr, false);
->  
-> @@ -685,7 +687,7 @@ static int vhost_net_build_xdp(struct vhost_net_virtqueue *nvq,
->  	struct vhost_virtqueue *vq = &nvq->vq;
->  	struct vhost_net *net = container_of(vq->dev, struct vhost_net,
->  					     dev);
-> -	struct socket *sock = vq->private_data;
-> +	struct socket *sock = vhost_vq_get_backend_opaque(vq);
->  	struct page_frag *alloc_frag = &net->page_frag;
->  	struct virtio_net_hdr *gso;
->  	struct xdp_buff *xdp = &nvq->xdp[nvq->batched_xdp];
-> @@ -952,7 +954,7 @@ static void handle_tx(struct vhost_net *net)
->  	struct socket *sock;
->  
->  	mutex_lock_nested(&vq->mutex, VHOST_NET_VQ_TX);
-> -	sock = vq->private_data;
-> +	sock = vhost_vq_get_backend_opaque(vq);
->  	if (!sock)
->  		goto out;
->  
-> @@ -1121,7 +1123,7 @@ static void handle_rx(struct vhost_net *net)
->  	int recv_pkts = 0;
->  
->  	mutex_lock_nested(&vq->mutex, VHOST_NET_VQ_RX);
-> -	sock = vq->private_data;
-> +	sock = vhost_vq_get_backend_opaque(vq);
->  	if (!sock)
->  		goto out;
->  
-> @@ -1344,9 +1346,9 @@ static struct socket *vhost_net_stop_vq(struct vhost_net *n,
->  		container_of(vq, struct vhost_net_virtqueue, vq);
->  
->  	mutex_lock(&vq->mutex);
-> -	sock = vq->private_data;
-> +	sock = vhost_vq_get_backend_opaque(vq);
->  	vhost_net_disable_vq(n, vq);
-> -	vq->private_data = NULL;
-> +	vhost_vq_set_backend_opaque(vq, NULL);
->  	vhost_net_buf_unproduce(nvq);
->  	nvq->rx_ring = NULL;
->  	mutex_unlock(&vq->mutex);
-> @@ -1528,7 +1530,7 @@ static long vhost_net_set_backend(struct vhost_net *n, unsigned index, int fd)
->  	}
->  
->  	/* start polling new socket */
-> -	oldsock = vq->private_data;
-> +	oldsock = vhost_vq_get_backend_opaque(vq);
->  	if (sock != oldsock) {
->  		ubufs = vhost_net_ubuf_alloc(vq,
->  					     sock && vhost_sock_zcopy(sock));
-> @@ -1538,7 +1540,7 @@ static long vhost_net_set_backend(struct vhost_net *n, unsigned index, int fd)
->  		}
->  
->  		vhost_net_disable_vq(n, vq);
-> -		vq->private_data = sock;
-> +		vhost_vq_set_backend_opaque(vq, sock);
->  		vhost_net_buf_unproduce(nvq);
->  		r = vhost_vq_init_access(vq);
->  		if (r)
-> @@ -1575,7 +1577,7 @@ static long vhost_net_set_backend(struct vhost_net *n, unsigned index, int fd)
->  	return 0;
->  
->  err_used:
-> -	vq->private_data = oldsock;
-> +	vhost_vq_set_backend_opaque(vq, oldsock);
->  	vhost_net_enable_vq(n, vq);
->  	if (ubufs)
->  		vhost_net_ubuf_put_wait_and_free(ubufs);
-> diff --git a/drivers/vhost/vhost.h b/drivers/vhost/vhost.h
-> index a123fd70847e..0808188f7e8f 100644
-> --- a/drivers/vhost/vhost.h
-> +++ b/drivers/vhost/vhost.h
-> @@ -244,6 +244,34 @@ enum {
->  			 (1ULL << VIRTIO_F_VERSION_1)
->  };
->  
-> +/**
-> + * vhost_vq_set_backend_opaque - Set backend opaque.
-> + *
-> + * @vq            Virtqueue.
-> + * @private_data  The private data.
-> + *
-> + * Context: Need to call with vq->mutex acquired.
-> + */
-> +static inline void vhost_vq_set_backend_opaque(struct vhost_virtqueue *vq,
-> +					       void *private_data)
-> +{
-> +	vq->private_data = private_data;
-> +}
-> +
-> +/**
-> + * vhost_vq_get_backend_opaque - Get backend opaque.
-> + *
-> + * @vq            Virtqueue.
-> + * @private_data  The private data.
-> + *
-> + * Context: Need to call with vq->mutex acquired.
-> + * Return: Opaque previously set with vhost_vq_set_backend_opaque.
+>> DMA mapped pages, including those pinned by mdev vendor drivers, might
+>> get unpinned and unmapped while migration is active and device is still
+>> running. For example, in pre-copy phase while guest driver could access
+>> those pages, host device or vendor driver can dirty these mapped pages.
+>> Such pages should be marked dirty so as to maintain memory consistency
+>> for a user making use of dirty page tracking.
+>>
+>> To get bitmap during unmap, user should allocate memory for bitmap, set
+>> size of allocated memory, set page size to be considered for bitmap and
+>> set flag VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP.
+>>
+>> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+>> Reviewed-by: Neo Jia <cjia@nvidia.com>
+>> ---
+>>   drivers/vfio/vfio_iommu_type1.c | 55 ++++++++++++++++++++++++++++++++++++++---
+>>   include/uapi/linux/vfio.h       | 10 ++++++++
+>>   2 files changed, 61 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+>> index 5efebc2b60e1..266550bd7307 100644
+>> --- a/drivers/vfio/vfio_iommu_type1.c
+>> +++ b/drivers/vfio/vfio_iommu_type1.c
+>> @@ -983,7 +983,8 @@ static int verify_bitmap_size(uint64_t npages, uint64_t bitmap_size)
+>>   }
+>>   
+>>   static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
+>> -			     struct vfio_iommu_type1_dma_unmap *unmap)
+>> +			     struct vfio_iommu_type1_dma_unmap *unmap,
+>> +			     struct vfio_bitmap *bitmap)
+>>   {
+>>   	uint64_t mask;
+>>   	struct vfio_dma *dma, *dma_last = NULL;
+>> @@ -1034,6 +1035,10 @@ static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
+>>   	 * will be returned if these conditions are not met.  The v2 interface
+>>   	 * will only return success and a size of zero if there were no
+>>   	 * mappings within the range.
+>> +	 *
+>> +	 * When VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP flag is set, unmap request
+>> +	 * must be for single mapping. Multiple mappings with this flag set is
+>> +	 * not supported.
+>>   	 */
+>>   	if (iommu->v2) {
+>>   		dma = vfio_find_dma(iommu, unmap->iova, 1);
+>> @@ -1041,6 +1046,14 @@ static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
+>>   			ret = -EINVAL;
+>>   			goto unlock;
+>>   		}
+>> +
+>> +		if ((unmap->flags & VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP) &&
+>> +		    dma &&
+>> +		    (dma->iova != unmap->iova || dma->size != unmap->size)) {
+> 
+> 
+> I think your intention was to return error if the user asked for the
+> dirty bitmap and the requested unmap range doesn't exactly match the
+> vfio_dma.  Not finding a vfio_dma should therefore also be an error.
+> For example, if we had a single mapping at {0x1000-0x1fff} and the user
+> unmapped with dirty bitmap {0x0-0x2fff}, that should return an error,
+> but it's not caught by the above because there is no vfio_dma @0x0.
+> Therefore I think you want:
+> 
+> ((unmap->flags & VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP) &&
+>   (!dma || dma->iova != unmap->iova || dma->size != unmap->size))
+> 
+> Right?  Thanks,
+> 
 
 
-I prefer opaque -> private data in comments.
+Yes, updating check.
 
-> + */
+Is !dma here also error case when VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP 
+flag is not set?
+DMA_UNMAP ioctl returns how much was unmapped, from user space 
+perspective this would be from start of range (unmap->iova), right?
 
-
-
-
-> +static inline void *vhost_vq_get_backend_opaque(struct vhost_virtqueue *vq)
-> +{
-> +	return vq->private_data;
-> +}
-> +
->  static inline bool vhost_has_feature(struct vhost_virtqueue *vq, int bit)
->  {
->  	return vq->acked_features & (1ULL << bit);
-> diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
-> index c2d7d57e98cf..6e20dbe14acd 100644
-> --- a/drivers/vhost/vsock.c
-> +++ b/drivers/vhost/vsock.c
-> @@ -91,7 +91,7 @@ vhost_transport_do_send_pkt(struct vhost_vsock *vsock,
->  
->  	mutex_lock(&vq->mutex);
->  
-> -	if (!vq->private_data)
-> +	if (!vhost_vq_get_backend_opaque(vq))
->  		goto out;
->  
->  	/* Avoid further vmexits, we're already processing the virtqueue */
-> @@ -440,7 +440,7 @@ static void vhost_vsock_handle_tx_kick(struct vhost_work *work)
->  
->  	mutex_lock(&vq->mutex);
->  
-> -	if (!vq->private_data)
-> +	if (!vhost_vq_get_backend_opaque(vq))
->  		goto out;
->  
->  	vhost_disable_notify(&vsock->dev, vq);
-> @@ -533,8 +533,8 @@ static int vhost_vsock_start(struct vhost_vsock *vsock)
->  			goto err_vq;
->  		}
->  
-> -		if (!vq->private_data) {
-> -			vq->private_data = vsock;
-> +		if (!vhost_vq_get_backend_opaque(vq)) {
-> +			vhost_vq_set_backend_opaque(vq, vsock);
->  			ret = vhost_vq_init_access(vq);
->  			if (ret)
->  				goto err_vq;
-> @@ -547,14 +547,14 @@ static int vhost_vsock_start(struct vhost_vsock *vsock)
->  	return 0;
->  
->  err_vq:
-> -	vq->private_data = NULL;
-> +	vhost_vq_set_backend_opaque(vq, NULL);
->  	mutex_unlock(&vq->mutex);
->  
->  	for (i = 0; i < ARRAY_SIZE(vsock->vqs); i++) {
->  		vq = &vsock->vqs[i];
->  
->  		mutex_lock(&vq->mutex);
-> -		vq->private_data = NULL;
-> +		vhost_vq_set_backend_opaque(vq, NULL);
->  		mutex_unlock(&vq->mutex);
->  	}
->  err:
-> @@ -577,7 +577,7 @@ static int vhost_vsock_stop(struct vhost_vsock *vsock)
->  		struct vhost_virtqueue *vq = &vsock->vqs[i];
->  
->  		mutex_lock(&vq->mutex);
-> -		vq->private_data = NULL;
-> +		vhost_vq_set_backend_opaque(vq, NULL);
->  		mutex_unlock(&vq->mutex);
->  	}
->  
-> -- 
-> 2.18.1
-
+Thanks,
+Kirti
