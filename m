@@ -2,230 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0A4CF198E25
-	for <lists+kvm@lfdr.de>; Tue, 31 Mar 2020 10:16:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6B9E2198E29
+	for <lists+kvm@lfdr.de>; Tue, 31 Mar 2020 10:18:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730185AbgCaIQq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 31 Mar 2020 04:16:46 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:58091 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726397AbgCaIQp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 31 Mar 2020 04:16:45 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1585642604;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=P6E3VyXfLxlF9DVTkMR/YxJEZTjAoewX0d81DAmSyDI=;
-        b=A+JueTyiT/2QK7ggnQp6Kl/LhCbt6yMx303NRLc2nT0cDk5D9GozLBqOmxQNoGfjogDwKx
-        frEGD6O3h+djdO8PLJV6ZJIEz4Xa0UCmoZs9wQ+iPLiSfPsTdxuysk6cB/mc7R8pOP78Jn
-        j6tFqDwC+MCGiT9K3Qi9DHy49ZXJinw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-258-MJ3ADzbsPfGZqkLniT-ASg-1; Tue, 31 Mar 2020 04:16:43 -0400
-X-MC-Unique: MJ3ADzbsPfGZqkLniT-ASg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4B3C41005509;
-        Tue, 31 Mar 2020 08:16:42 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.40.193.153])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 628E660BE0;
-        Tue, 31 Mar 2020 08:16:34 +0000 (UTC)
-Date:   Tue, 31 Mar 2020 10:16:32 +0200
-From:   Andrew Jones <drjones@redhat.com>
-To:     Wainer dos Santos Moschetta <wainersm@redhat.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com,
-        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        david@redhat.com
-Subject: Re: [PATCH 2/2] selftests: kvm: Add mem_slot_test test
-Message-ID: <20200331081632.ithcwuzjyjhiwphy@kamzik.brq.redhat.com>
-References: <20200330204310.21736-1-wainersm@redhat.com>
- <20200330204310.21736-3-wainersm@redhat.com>
+        id S1729950AbgCaIR5 convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Tue, 31 Mar 2020 04:17:57 -0400
+Received: from mga01.intel.com ([192.55.52.88]:53189 "EHLO mga01.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726528AbgCaIR5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 31 Mar 2020 04:17:57 -0400
+IronPort-SDR: 67ZQKu81zLM7PAU4TWk4AbNzmNvvfj5lHu0wOi2TareV7ZnpTytIlkt15QxVotMxuLH1FfphV+
+ lo+ODrY6qwYg==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Mar 2020 01:17:57 -0700
+IronPort-SDR: /DBBFxmhPzWtTuq7YmUEaIF0ft1fAGcDXCvBHKx2w8duWFEL0NpnBO5z+dT4Ey7hoc1z9vg/Bi
+ UOipnwdIOyWw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.72,327,1580803200"; 
+   d="scan'208";a="242292819"
+Received: from fmsmsx105.amr.corp.intel.com ([10.18.124.203])
+  by orsmga008.jf.intel.com with ESMTP; 31 Mar 2020 01:17:56 -0700
+Received: from fmsmsx609.amr.corp.intel.com (10.18.126.89) by
+ FMSMSX105.amr.corp.intel.com (10.18.124.203) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Tue, 31 Mar 2020 01:17:56 -0700
+Received: from fmsmsx609.amr.corp.intel.com (10.18.126.89) by
+ fmsmsx609.amr.corp.intel.com (10.18.126.89) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1713.5; Tue, 31 Mar 2020 01:17:56 -0700
+Received: from shsmsx106.ccr.corp.intel.com (10.239.4.159) by
+ fmsmsx609.amr.corp.intel.com (10.18.126.89) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id 15.1.1713.5
+ via Frontend Transport; Tue, 31 Mar 2020 01:17:55 -0700
+Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.225]) by
+ SHSMSX106.ccr.corp.intel.com ([169.254.10.89]) with mapi id 14.03.0439.000;
+ Tue, 31 Mar 2020 16:17:52 +0800
+From:   "Liu, Yi L" <yi.l.liu@intel.com>
+To:     Christoph Hellwig <hch@infradead.org>
+CC:     "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "Tian, Jun J" <jun.j.tian@intel.com>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Sun, Yi Y" <yi.y.sun@intel.com>, "Wu, Hao" <hao.wu@intel.com>
+Subject: RE: [PATCH v1 1/8] vfio: Add VFIO_IOMMU_PASID_REQUEST(alloc/free)
+Thread-Topic: [PATCH v1 1/8] vfio: Add VFIO_IOMMU_PASID_REQUEST(alloc/free)
+Thread-Index: AQHWAEUbC4GB74LMekup8jIcF6WIFqhh3EqAgACGbhA=
+Date:   Tue, 31 Mar 2020 08:17:52 +0000
+Message-ID: <A2975661238FB949B60364EF0F2C25743A21A919@SHSMSX104.ccr.corp.intel.com>
+References: <1584880325-10561-1-git-send-email-yi.l.liu@intel.com>
+ <1584880325-10561-2-git-send-email-yi.l.liu@intel.com>
+ <20200331075331.GA26583@infradead.org>
+In-Reply-To: <20200331075331.GA26583@infradead.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200330204310.21736-3-wainersm@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Mar 30, 2020 at 05:43:10PM -0300, Wainer dos Santos Moschetta wrote:
-> This patch introduces the mem_slot_test test which checks
-> an VM can have added memory slots up to the limit defined in
-> KVM_CAP_NR_MEMSLOTS. Then attempt to add one more slot to
-> verify it fails as expected.
+> From: Christoph Hellwig <hch@infradead.org>
+> Sent: Tuesday, March 31, 2020 3:54 PM
+> To: Liu, Yi L <yi.l.liu@intel.com>
+> Subject: Re: [PATCH v1 1/8] vfio: Add VFIO_IOMMU_PASID_REQUEST(alloc/free)
 > 
-> Signed-off-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
-> ---
->  tools/testing/selftests/kvm/.gitignore      |  1 +
->  tools/testing/selftests/kvm/Makefile        |  3 +
->  tools/testing/selftests/kvm/mem_slot_test.c | 92 +++++++++++++++++++++
->  3 files changed, 96 insertions(+)
->  create mode 100644 tools/testing/selftests/kvm/mem_slot_test.c
-> 
-> diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
-> index 30072c3f52fb..b1b94d50f6a2 100644
-> --- a/tools/testing/selftests/kvm/.gitignore
-> +++ b/tools/testing/selftests/kvm/.gitignore
-> @@ -17,3 +17,4 @@
->  /clear_dirty_log_test
->  /dirty_log_test
->  /kvm_create_max_vcpus
-> +/mem_slot_test
-> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-> index d91c53b726e6..070133349403 100644
-> --- a/tools/testing/selftests/kvm/Makefile
-> +++ b/tools/testing/selftests/kvm/Makefile
-> @@ -30,16 +30,19 @@ TEST_GEN_PROGS_x86_64 += x86_64/svm_vmcall_test
->  TEST_GEN_PROGS_x86_64 += clear_dirty_log_test
->  TEST_GEN_PROGS_x86_64 += dirty_log_test
->  TEST_GEN_PROGS_x86_64 += kvm_create_max_vcpus
-> +TEST_GEN_PROGS_x86_64 += mem_slot_test
->  
->  TEST_GEN_PROGS_aarch64 += clear_dirty_log_test
->  TEST_GEN_PROGS_aarch64 += dirty_log_test
->  TEST_GEN_PROGS_aarch64 += kvm_create_max_vcpus
-> +TEST_GEN_PROGS_aarch64 += mem_slot_test
->  
->  TEST_GEN_PROGS_s390x = s390x/memop
->  TEST_GEN_PROGS_s390x += s390x/sync_regs_test
->  TEST_GEN_PROGS_s390x += s390x/resets
->  TEST_GEN_PROGS_s390x += dirty_log_test
->  TEST_GEN_PROGS_s390x += kvm_create_max_vcpus
-> +TEST_GEN_PROGS_s390x += mem_slot_test
->  
->  TEST_GEN_PROGS += $(TEST_GEN_PROGS_$(UNAME_M))
->  LIBKVM += $(LIBKVM_$(UNAME_M))
-> diff --git a/tools/testing/selftests/kvm/mem_slot_test.c b/tools/testing/selftests/kvm/mem_slot_test.c
-> new file mode 100644
-> index 000000000000..75d2bbd71642
-> --- /dev/null
-> +++ b/tools/testing/selftests/kvm/mem_slot_test.c
-> @@ -0,0 +1,92 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +/*
-> + * mem_slot_test
-> + *
-> + * Copyright (C) 2020, Red Hat, Inc.
-> + *
-> + * Test it can be added memory slots up to KVM_CAP_NR_MEMSLOTS, then any
-> + * tentative to add further slots should fail.
-> + */
-> +#define _GNU_SOURCE /* for program_invocation_short_name */
-> +#include <linux/kvm.h>
-> +#include <sys/mman.h>
-> +#include <unistd.h>
-> +
-> +#include "test_util.h"
-> +#include "kvm_util.h"
-> +
-> +/* Memory region flags */
-> +#define MEM_REG_FLAGS KVM_MEM_LOG_DIRTY_PAGES
-> +
-> +/* Guest VM mode */
-> +#define GUEST_VM_MODE VM_MODE_DEFAULT
+> Who is going to use thse exports?  Please submit them together with
+> a driver actually using them.
 
-I'm not sure what the value of the two defines above are. I'd prefer we
-avoid unnecessary renaming. Also, do we need KVM_MEM_LOG_DIRTY_PAGES for
-this test?
+Hi Hellwig,
 
-> +
-> +int main(int argc, char *argv[])
-> +{
-> +	struct kvm_vm *vm;
-> +	/* Maximum allowed number of memory slots */
-> +	uint32_t max_mem_slots;
-> +	/* Slot number */
-> +	uint32_t slot;
-> +	/* Number of pages in a memory region */
-> +	uint64_t mem_reg_npages;
-> +	/* Memory region size */
-> +	uint64_t mem_reg_size;
-> +	/* Guest physical memory guest_address */
-> +	uint64_t guest_addr;
-> +	/* VM page size */
-> +	uint64_t vm_page_size;
+These are exposed for SVA (Shared Virtual Addressing) usage in VMs. If
+say a driver who actually using them, it is the iommu driver running in
+guest. The flow is: guest iommu driver programs the virtual command interface
+and it traps to host. The virtual IOMMU device model lays in QEMU will
+utilize the exported ioctl to get PASIDs.
+Here is iommu kernel driver patch which utilizes virtual command interface
+to request pasid alloc/free.
+https://lkml.org/lkml/2020/3/20/1176
+And, the below patch is one which utilizes the ioctl exported in this patch:
+https://patchwork.kernel.org/patch/11464601/
 
-nit: IMO, the variable names above are descriptive enough to drop the
-comments.
-
-> +	int ret;
-> +
-> +	max_mem_slots = kvm_check_cap(KVM_CAP_NR_MEMSLOTS);
-> +	TEST_ASSERT(max_mem_slots > 0,
-> +		    "KVM_CAP_NR_MEMSLOTS should be greater than 0");
-> +	DEBUG("Allowed number of memory slots: %i\n", max_mem_slots);
-
-DEBUG() no longer exists in kvm/queue. This should now be pr_debug().
-
-> +
-> +	vm = vm_create(GUEST_VM_MODE, 0, O_RDWR);
-> +
-> +	/* Determine the minimal number of pages as possible per region. */
-> +	vm_page_size = vm_get_page_size(vm);
-> +#ifdef __s390x__
-> +	mem_reg_size = 0x100000;
-> +#else
-> +	uint64_t host_page_size = sysconf(_SC_PAGESIZE);
-> +
-> +	mem_reg_size = (host_page_size > vm_page_size) ? host_page_size :
-> +							 vm_page_size;
-> +#endif
-> +	mem_reg_npages = mem_reg_size / vm_page_size;
-
-On kvm/queue the above 11 lines can now all be done with
-
-  mem_reg_size = SOME_ARBITRARY_MEM_REG_SIZE;
-  mem_reg_npages = vm_calc_num_guest_pages(VM_MODE_DEFAULT, mem_reg_size);
-
-> +	guest_addr = 0x0;
-> +
-> +	/* Check it can be added memory slots up to the maximum allowed */
-> +	DEBUG("Adding slots 0..%i, each memory region with %ldK size\n",
-> +	      (max_mem_slots - 1), mem_reg_size >> 10);
-> +	for (slot = 0; slot < max_mem_slots; slot++) {
-> +		vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS,
-> +					    guest_addr, slot, mem_reg_npages,
-> +					    MEM_REG_FLAGS);
-> +		guest_addr += mem_reg_size;
-> +	}
-> +
-> +	/* Check it cannot be added memory slots beyond the limit */
-> +	guest_addr += mem_reg_size;
-
-nit: shouldn't be necessary. We already incremented guest_addr on the
-last loop.
-
-> +	void *mem = mmap(NULL, mem_reg_size, PROT_READ | PROT_WRITE,
-> +			 MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-> +	TEST_ASSERT(mem != NULL, "Failed to mmap() host");
-> +
-> +	struct kvm_userspace_memory_region kvm_region = {
-> +		.slot = slot,
-> +		.flags = MEM_REG_FLAGS,
-> +		.guest_phys_addr = guest_addr,
-> +		.memory_size = mem_reg_size,
-> +		.userspace_addr = (uint64_t) mem,
-> +	};
-> +
-> +	ret = ioctl(vm_get_fd(vm), KVM_SET_USER_MEMORY_REGION, &kvm_region);
-> +	TEST_ASSERT(ret == -1, "Adding one more memory slot should fail");
-
-Shouldn't we also check that we get the correct errno?
-
-> +
-> +	munmap(mem, mem_reg_size);
-> +	kvm_vm_free(vm);
-> +
-> +	return 0;
-> +}
-> -- 
-> 2.17.2
->
-
-Thanks,
-drew
-
+Regards,
+Yi Liu
