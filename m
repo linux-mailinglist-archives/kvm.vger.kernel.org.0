@@ -2,125 +2,230 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2E72E198E03
-	for <lists+kvm@lfdr.de>; Tue, 31 Mar 2020 10:10:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0A4CF198E25
+	for <lists+kvm@lfdr.de>; Tue, 31 Mar 2020 10:16:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730065AbgCaIKo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 31 Mar 2020 04:10:44 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:60464 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729950AbgCaIKm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 31 Mar 2020 04:10:42 -0400
+        id S1730185AbgCaIQq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 31 Mar 2020 04:16:46 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:58091 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726397AbgCaIQp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 31 Mar 2020 04:16:45 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1585642241;
+        s=mimecast20190719; t=1585642604;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=5QowiphZETTq04QwDokDwsv9WQCJrcAvZuUSYA+aVq8=;
-        b=FqZZmUyoDALZjXNAhLBSzU8WwVLNpRjVAwakmVhpf2J/EZ4GUYAjlif4u/gYjzQldVBKap
-        kmvG62FIusECx8Nbu6ik/4zz0MRzzzyqRWlGcIDGChhAVZMz8a7KEPXhIeTvBI5PYZWiYU
-        x0oOFQ3Wh85wAx9/KLMS8WsZDDw+H8A=
+        bh=P6E3VyXfLxlF9DVTkMR/YxJEZTjAoewX0d81DAmSyDI=;
+        b=A+JueTyiT/2QK7ggnQp6Kl/LhCbt6yMx303NRLc2nT0cDk5D9GozLBqOmxQNoGfjogDwKx
+        frEGD6O3h+djdO8PLJV6ZJIEz4Xa0UCmoZs9wQ+iPLiSfPsTdxuysk6cB/mc7R8pOP78Jn
+        j6tFqDwC+MCGiT9K3Qi9DHy49ZXJinw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-4-AYnVJ3i4MXeX8hl8QMJuXg-1; Tue, 31 Mar 2020 04:10:34 -0400
-X-MC-Unique: AYnVJ3i4MXeX8hl8QMJuXg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+ us-mta-258-MJ3ADzbsPfGZqkLniT-ASg-1; Tue, 31 Mar 2020 04:16:43 -0400
+X-MC-Unique: MJ3ADzbsPfGZqkLniT-ASg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A29BC8017DF;
-        Tue, 31 Mar 2020 08:10:33 +0000 (UTC)
-Received: from [10.72.12.115] (ovpn-12-115.pek2.redhat.com [10.72.12.115])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 2500A101D480;
-        Tue, 31 Mar 2020 08:10:28 +0000 (UTC)
-Subject: Re: [vhost:linux-next 8/13] include/linux/vringh.h:18:10: fatal
- error: linux/vhost_iotlb.h: No such file or directory
-To:     "Xia, Hui" <hui.xia@intel.com>, lkp <lkp@intel.com>
-Cc:     "kbuild-all@lists.01.org" <kbuild-all@lists.01.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>
-References: <202003292026.dP7OOeCi%lkp@intel.com>
- <f1270de5-7a2c-76d2-431c-34364def851a@redhat.com>
- <2A5F4C9150EECB4DAA6291810D6D61B9745B7754@shsmsx102.ccr.corp.intel.com>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <ba85a677-85a8-b7d3-1401-4ac7674c8f3c@redhat.com>
-Date:   Tue, 31 Mar 2020 16:10:26 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4B3C41005509;
+        Tue, 31 Mar 2020 08:16:42 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.40.193.153])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 628E660BE0;
+        Tue, 31 Mar 2020 08:16:34 +0000 (UTC)
+Date:   Tue, 31 Mar 2020 10:16:32 +0200
+From:   Andrew Jones <drjones@redhat.com>
+To:     Wainer dos Santos Moschetta <wainersm@redhat.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com,
+        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        david@redhat.com
+Subject: Re: [PATCH 2/2] selftests: kvm: Add mem_slot_test test
+Message-ID: <20200331081632.ithcwuzjyjhiwphy@kamzik.brq.redhat.com>
+References: <20200330204310.21736-1-wainersm@redhat.com>
+ <20200330204310.21736-3-wainersm@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <2A5F4C9150EECB4DAA6291810D6D61B9745B7754@shsmsx102.ccr.corp.intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200330204310.21736-3-wainersm@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Mon, Mar 30, 2020 at 05:43:10PM -0300, Wainer dos Santos Moschetta wrote:
+> This patch introduces the mem_slot_test test which checks
+> an VM can have added memory slots up to the limit defined in
+> KVM_CAP_NR_MEMSLOTS. Then attempt to add one more slot to
+> verify it fails as expected.
+> 
+> Signed-off-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
+> ---
+>  tools/testing/selftests/kvm/.gitignore      |  1 +
+>  tools/testing/selftests/kvm/Makefile        |  3 +
+>  tools/testing/selftests/kvm/mem_slot_test.c | 92 +++++++++++++++++++++
+>  3 files changed, 96 insertions(+)
+>  create mode 100644 tools/testing/selftests/kvm/mem_slot_test.c
+> 
+> diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
+> index 30072c3f52fb..b1b94d50f6a2 100644
+> --- a/tools/testing/selftests/kvm/.gitignore
+> +++ b/tools/testing/selftests/kvm/.gitignore
+> @@ -17,3 +17,4 @@
+>  /clear_dirty_log_test
+>  /dirty_log_test
+>  /kvm_create_max_vcpus
+> +/mem_slot_test
+> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+> index d91c53b726e6..070133349403 100644
+> --- a/tools/testing/selftests/kvm/Makefile
+> +++ b/tools/testing/selftests/kvm/Makefile
+> @@ -30,16 +30,19 @@ TEST_GEN_PROGS_x86_64 += x86_64/svm_vmcall_test
+>  TEST_GEN_PROGS_x86_64 += clear_dirty_log_test
+>  TEST_GEN_PROGS_x86_64 += dirty_log_test
+>  TEST_GEN_PROGS_x86_64 += kvm_create_max_vcpus
+> +TEST_GEN_PROGS_x86_64 += mem_slot_test
+>  
+>  TEST_GEN_PROGS_aarch64 += clear_dirty_log_test
+>  TEST_GEN_PROGS_aarch64 += dirty_log_test
+>  TEST_GEN_PROGS_aarch64 += kvm_create_max_vcpus
+> +TEST_GEN_PROGS_aarch64 += mem_slot_test
+>  
+>  TEST_GEN_PROGS_s390x = s390x/memop
+>  TEST_GEN_PROGS_s390x += s390x/sync_regs_test
+>  TEST_GEN_PROGS_s390x += s390x/resets
+>  TEST_GEN_PROGS_s390x += dirty_log_test
+>  TEST_GEN_PROGS_s390x += kvm_create_max_vcpus
+> +TEST_GEN_PROGS_s390x += mem_slot_test
+>  
+>  TEST_GEN_PROGS += $(TEST_GEN_PROGS_$(UNAME_M))
+>  LIBKVM += $(LIBKVM_$(UNAME_M))
+> diff --git a/tools/testing/selftests/kvm/mem_slot_test.c b/tools/testing/selftests/kvm/mem_slot_test.c
+> new file mode 100644
+> index 000000000000..75d2bbd71642
+> --- /dev/null
+> +++ b/tools/testing/selftests/kvm/mem_slot_test.c
+> @@ -0,0 +1,92 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + * mem_slot_test
+> + *
+> + * Copyright (C) 2020, Red Hat, Inc.
+> + *
+> + * Test it can be added memory slots up to KVM_CAP_NR_MEMSLOTS, then any
+> + * tentative to add further slots should fail.
+> + */
+> +#define _GNU_SOURCE /* for program_invocation_short_name */
+> +#include <linux/kvm.h>
+> +#include <sys/mman.h>
+> +#include <unistd.h>
+> +
+> +#include "test_util.h"
+> +#include "kvm_util.h"
+> +
+> +/* Memory region flags */
+> +#define MEM_REG_FLAGS KVM_MEM_LOG_DIRTY_PAGES
+> +
+> +/* Guest VM mode */
+> +#define GUEST_VM_MODE VM_MODE_DEFAULT
 
-On 2020/3/31 =E4=B8=8B=E5=8D=883:31, Xia, Hui wrote:
->> -----Original Message-----
->> From: Jason Wang<jasowang@redhat.com>
->> Sent: 2020=E5=B9=B43=E6=9C=8830=E6=97=A5 10:47
->> To: lkp<lkp@intel.com>
->> Cc:kbuild-all@lists.01.org;kvm@vger.kernel.org;virtualization@lists.li=
-nux-
->> foundation.org;netdev@vger.kernel.org; Michael S. Tsirkin<mst@redhat.c=
-om>
->> Subject: Re: [vhost:linux-next 8/13] include/linux/vringh.h:18:10: fat=
-al error:
->> linux/vhost_iotlb.h: No such file or directory
->>
->>
->> On 2020/3/29 =E4=B8=8B=E5=8D=888:08, kbuild test robot wrote:
->>> tree:https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git  l=
-inux-next
->>> head:   f44a63f9ebf66a450c101084a35a3ef158ead209
->>> commit: c43908b0b9a900bd51f861f4c57b83cfd932f4d2 [8/13] vringh: IOTLB
->>> support
->>> config: arm-em_x270_defconfig (attached as .config)
->>> compiler: arm-linux-gnueabi-gcc (GCC) 9.3.0
->>> reproduce:
->>>           wgethttps://raw.githubusercontent.com/intel/lkp-
->> tests/master/sbin/make.cross -O ~/bin/make.cross
->>>           chmod +x ~/bin/make.cross
->>>           git checkout c43908b0b9a900bd51f861f4c57b83cfd932f4d2
->> I could not find this commit in the above branch.
->>
->>
->>>           # save the attached .config to linux build tree
->>>           GCC_VERSION=3D9.3.0 make.cross ARCH=3Darm
->> Try to use commit dc3b0673ae5efb73edab66ec5c2f074272e9a4df.
->>
->> But this command does not work (I remember it used to work):
->>
->> # GCC_VERSION=3D9.3.0 make.cross ARCH=3Darm
->> cd: received redirection to
->> `https://download.01.org/0day-ci/cross-package/'
->> lftpget -c
->> https://download.01.org/0day-ci/cross-package/./gcc-9.3.0-nolibc/x86_6=
-4-gcc-
->> 9.3.0-nolibc_arm-linux-gnueabihf.tar.xz
->> tar Jxf
->> gcc-9.3.0-nolibc/x86_64-gcc-9.3.0-nolibc_arm-linux-gnueabihf.tar.xz -C
->> /root/0day No cross compiler for arm setup_crosstool failed
-> Hi Jason, thanks for report this issue. It is caused by wrong finding i=
-n 2 cross tools for arm. And has been fixed. Thanks.
-> Regarding to the vhost build issue itself, it has gone in latest vhost/=
-linux-next. The cause is the code kbuild captured didn't have  patch " vh=
-ost: factor out IOTLB " which introduce linux/vhost_iotlb.h at that momen=
-t. So just ignore this issue since the missed patch has been added in lat=
-est vhost/linux-next.
+I'm not sure what the value of the two defines above are. I'd prefer we
+avoid unnecessary renaming. Also, do we need KVM_MEM_LOG_DIRTY_PAGES for
+this test?
 
+> +
+> +int main(int argc, char *argv[])
+> +{
+> +	struct kvm_vm *vm;
+> +	/* Maximum allowed number of memory slots */
+> +	uint32_t max_mem_slots;
+> +	/* Slot number */
+> +	uint32_t slot;
+> +	/* Number of pages in a memory region */
+> +	uint64_t mem_reg_npages;
+> +	/* Memory region size */
+> +	uint64_t mem_reg_size;
+> +	/* Guest physical memory guest_address */
+> +	uint64_t guest_addr;
+> +	/* VM page size */
+> +	uint64_t vm_page_size;
 
-Good to know this.
+nit: IMO, the variable names above are descriptive enough to drop the
+comments.
 
-Thanks for the updating.
+> +	int ret;
+> +
+> +	max_mem_slots = kvm_check_cap(KVM_CAP_NR_MEMSLOTS);
+> +	TEST_ASSERT(max_mem_slots > 0,
+> +		    "KVM_CAP_NR_MEMSLOTS should be greater than 0");
+> +	DEBUG("Allowed number of memory slots: %i\n", max_mem_slots);
 
+DEBUG() no longer exists in kvm/queue. This should now be pr_debug().
 
+> +
+> +	vm = vm_create(GUEST_VM_MODE, 0, O_RDWR);
+> +
+> +	/* Determine the minimal number of pages as possible per region. */
+> +	vm_page_size = vm_get_page_size(vm);
+> +#ifdef __s390x__
+> +	mem_reg_size = 0x100000;
+> +#else
+> +	uint64_t host_page_size = sysconf(_SC_PAGESIZE);
+> +
+> +	mem_reg_size = (host_page_size > vm_page_size) ? host_page_size :
+> +							 vm_page_size;
+> +#endif
+> +	mem_reg_npages = mem_reg_size / vm_page_size;
+
+On kvm/queue the above 11 lines can now all be done with
+
+  mem_reg_size = SOME_ARBITRARY_MEM_REG_SIZE;
+  mem_reg_npages = vm_calc_num_guest_pages(VM_MODE_DEFAULT, mem_reg_size);
+
+> +	guest_addr = 0x0;
+> +
+> +	/* Check it can be added memory slots up to the maximum allowed */
+> +	DEBUG("Adding slots 0..%i, each memory region with %ldK size\n",
+> +	      (max_mem_slots - 1), mem_reg_size >> 10);
+> +	for (slot = 0; slot < max_mem_slots; slot++) {
+> +		vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS,
+> +					    guest_addr, slot, mem_reg_npages,
+> +					    MEM_REG_FLAGS);
+> +		guest_addr += mem_reg_size;
+> +	}
+> +
+> +	/* Check it cannot be added memory slots beyond the limit */
+> +	guest_addr += mem_reg_size;
+
+nit: shouldn't be necessary. We already incremented guest_addr on the
+last loop.
+
+> +	void *mem = mmap(NULL, mem_reg_size, PROT_READ | PROT_WRITE,
+> +			 MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+> +	TEST_ASSERT(mem != NULL, "Failed to mmap() host");
+> +
+> +	struct kvm_userspace_memory_region kvm_region = {
+> +		.slot = slot,
+> +		.flags = MEM_REG_FLAGS,
+> +		.guest_phys_addr = guest_addr,
+> +		.memory_size = mem_reg_size,
+> +		.userspace_addr = (uint64_t) mem,
+> +	};
+> +
+> +	ret = ioctl(vm_get_fd(vm), KVM_SET_USER_MEMORY_REGION, &kvm_region);
+> +	TEST_ASSERT(ret == -1, "Adding one more memory slot should fail");
+
+Shouldn't we also check that we get the correct errno?
+
+> +
+> +	munmap(mem, mem_reg_size);
+> +	kvm_vm_free(vm);
+> +
+> +	return 0;
+> +}
+> -- 
+> 2.17.2
 >
+
+Thanks,
+drew
 
