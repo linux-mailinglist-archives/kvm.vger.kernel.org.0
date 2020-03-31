@@ -2,115 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 744B01997F7
-	for <lists+kvm@lfdr.de>; Tue, 31 Mar 2020 15:56:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9AECA19980F
+	for <lists+kvm@lfdr.de>; Tue, 31 Mar 2020 16:03:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730720AbgCaN4z (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 31 Mar 2020 09:56:55 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:33728 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1730216AbgCaN4y (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 31 Mar 2020 09:56:54 -0400
+        id S1730919AbgCaODc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 31 Mar 2020 10:03:32 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:32929 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1730755AbgCaODc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 31 Mar 2020 10:03:32 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1585663013;
+        s=mimecast20190719; t=1585663411;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=OUBFwMaCdyw1jFUI5caI8I7JvXKZGkBxj0a10nSzzRk=;
-        b=Xx0NsN32JpezzdSaL+HUH4PWW6uEmh92rHHGDbypcNFjyv8ge4CFNxtjJTrRR04LaScQtD
-        MPkxkTQTDmfZkqsQMzL7dsHqYOs6qABnXr8qsK8IhvOA8CXVCsVkZ+s3pNdwyiOIRqkuwI
-        OGf1ftQBV8OwuPyTathR6CpFhWeYmQk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-174-B7sSyFA1Ogi6Y2t9tub8HQ-1; Tue, 31 Mar 2020 09:56:51 -0400
-X-MC-Unique: B7sSyFA1Ogi6Y2t9tub8HQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 33B061005509;
-        Tue, 31 Mar 2020 13:56:50 +0000 (UTC)
-Received: from [10.36.112.58] (ovpn-112-58.ams2.redhat.com [10.36.112.58])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id DEA4F1036D00;
-        Tue, 31 Mar 2020 13:56:44 +0000 (UTC)
-Subject: Re: [RFC PATCH] vfio: Ignore -ENODEV when getting MSI cookie
-To:     Andre Przywara <andre.przywara@arm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Will Deacon <will@kernel.org>,
-        Robin Murphy <robin.murphy@arm.com>
-Cc:     Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        iommu@lists.linux-foundation.org
-References: <20200312181950.60664-1-andre.przywara@arm.com>
-From:   Auger Eric <eric.auger@redhat.com>
-Message-ID: <629dd065-4fc0-eed4-975a-db05dda8504d@redhat.com>
-Date:   Tue, 31 Mar 2020 15:56:43 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+        bh=q1HhUZIT2eXWaur2lhwyirTrp2FNrCuPmxOJW0kwlcg=;
+        b=h97VAV76J4Ycxw8/+INJEEDRbcJ/k6qDhOxu/x0Rp+QThfbSW3YpQMwBEgiE5Mi4+nIwpe
+        GKrWAbrN+knP6a8nhRtsjxZto5Zbln8uQybLPShGIjhyMClI5USZauVNoVraMtPZABC9Pl
+        sUY0lcPcO8kQ14cP43DTuKPLpJbVD8c=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-284-kwNVHPhlNAuPgZyTlpcGfw-1; Tue, 31 Mar 2020 10:03:29 -0400
+X-MC-Unique: kwNVHPhlNAuPgZyTlpcGfw-1
+Received: by mail-wm1-f71.google.com with SMTP id 2so1114266wmf.1
+        for <kvm@vger.kernel.org>; Tue, 31 Mar 2020 07:03:29 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=q1HhUZIT2eXWaur2lhwyirTrp2FNrCuPmxOJW0kwlcg=;
+        b=G/Cz5V94ve2mZ4s5TClC7/udI99S2NDnX3r93g+27M2U+nbP9+fGrO8ldUfyxuwPmO
+         7rrz+cUT+ileNqx8rt/gNQOFsPwtrBjTneNgy/VoGwszQHVFMtpmW976rXVHJrOuPtsW
+         OjKiBBs8py6irdLTbUWS8wjGpuaR+QkoGD/pCBB1TdiaelHX5C3ZNwdZLk+5zGXN9Yn6
+         hmHWdt1IC5mn4Ie3UATehgw8lop+b2R55x+0MlhUeb7gVxAOUUogdV5ivcxK5I95wMbf
+         UVqd02P6uHps9e7LMLVpvbsIlXUuxamp1LdhOGKmemM0PiJD2g+Ao/Rl0LB8+YUdlONT
+         LQVQ==
+X-Gm-Message-State: ANhLgQ1azh6rslG87K9KEe1fLjMXFO7fnNjukcR/gYMkSbPqKfiL3yfJ
+        e5g0EyH+F0Shit2EhNWfZiBdtDSWwdV2ZZ06dxuEchnDMS2MApxc03DH2rwCR3fOqNXBu+DT9f1
+        3xD/dnSZm6oqP
+X-Received: by 2002:a1c:2203:: with SMTP id i3mr3685831wmi.25.1585663408047;
+        Tue, 31 Mar 2020 07:03:28 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vulRkkpxXMxZEng5aERNo4jJ/g5cD0Vhw5jYc5ZRlaSa1jWBjmSh3+3XcGa4A4n7qFMJ8cR0g==
+X-Received: by 2002:a1c:2203:: with SMTP id i3mr3685803wmi.25.1585663407800;
+        Tue, 31 Mar 2020 07:03:27 -0700 (PDT)
+Received: from redhat.com (bzq-79-176-51-222.red.bezeqint.net. [79.176.51.222])
+        by smtp.gmail.com with ESMTPSA id r17sm26682436wrx.46.2020.03.31.07.03.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 31 Mar 2020 07:03:20 -0700 (PDT)
+Date:   Tue, 31 Mar 2020 10:03:12 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     "Gustavo A. R. Silva" <gustavo@embeddedor.com>
+Cc:     Jason Wang <jasowang@redhat.com>, Tiwei Bie <tiwei.bie@intel.com>,
+        Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] vhost: vdpa: remove unnecessary null check
+Message-ID: <20200331100122-mutt-send-email-mst@kernel.org>
+References: <20200330235040.GA9997@embeddedor>
 MIME-Version: 1.0
-In-Reply-To: <20200312181950.60664-1-andre.przywara@arm.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200330235040.GA9997@embeddedor>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Andre,
-
-On 3/12/20 7:19 PM, Andre Przywara wrote:
-> When we try to get an MSI cookie for a VFIO device, that can fail if
-> CONFIG_IOMMU_DMA is not set. In this case iommu_get_msi_cookie() returns
-> -ENODEV, and that should not be fatal.
+On Mon, Mar 30, 2020 at 06:50:40PM -0500, Gustavo A. R. Silva wrote:
+> container_of is never null, so this null check is
+> unnecessary.
 > 
-> Ignore that case and proceed with the initialisation.
-> 
-> This fixes VFIO with a platform device on the Calxeda Midway (no MSIs).
-> 
-> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> Addresses-Coverity-ID: 1492006 ("Logically dead code")
+> Fixes: 20453a45fb06 ("vhost: introduce vDPA-based backend")
+> Signed-off-by: Gustavo A. R. Silva <gustavo@embeddedor.com>
 
-Would you mind resending this as non RFC (+ R-b tags) so that it gets a
-chance to be taken by Alex for 5.7
+Yes weird. Was the point to test i_cdev? Tiwei?
 
-Thanks
-
-Eric
 > ---
-> Hi,
+>  drivers/vhost/vdpa.c | 2 --
+>  1 file changed, 2 deletions(-)
 > 
-> not sure this is the right fix, or we should rather check if the
-> platform doesn't support MSIs at all (which doesn't seem to be easy
-> to do).
-> Or is this because arm-smmu.c always reserves an IOMMU_RESV_SW_MSI
-> region?
-> 
-> Also this seems to be long broken, actually since Eric introduced MSI
-> support in 4.10-rc3, but at least since the initialisation order was
-> fixed with f6810c15cf9.
-> 
-> Grateful for any insight.
-> 
-> Cheers,
-> Andre
-> 
->  drivers/vfio/vfio_iommu_type1.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> index a177bf2c6683..467e217ef09a 100644
-> --- a/drivers/vfio/vfio_iommu_type1.c
-> +++ b/drivers/vfio/vfio_iommu_type1.c
-> @@ -1786,7 +1786,7 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
+> diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+> index 421f02a8530a..3d2cb811757a 100644
+> --- a/drivers/vhost/vdpa.c
+> +++ b/drivers/vhost/vdpa.c
+> @@ -678,8 +678,6 @@ static int vhost_vdpa_open(struct inode *inode, struct file *filep)
+>  	int nvqs, i, r, opened;
 >  
->  	if (resv_msi) {
->  		ret = iommu_get_msi_cookie(domain->domain, resv_msi_base);
-> -		if (ret)
-> +		if (ret && ret != -ENODEV)
->  			goto out_detach;
->  	}
+>  	v = container_of(inode->i_cdev, struct vhost_vdpa, cdev);
+> -	if (!v)
+> -		return -ENODEV;
 >  
-> 
+>  	opened = atomic_cmpxchg(&v->opened, 0, 1);
+>  	if (opened)
+> -- 
+> 2.26.0
 
