@@ -2,279 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8527619966D
-	for <lists+kvm@lfdr.de>; Tue, 31 Mar 2020 14:26:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D765619967D
+	for <lists+kvm@lfdr.de>; Tue, 31 Mar 2020 14:27:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730816AbgCaM0F convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Tue, 31 Mar 2020 08:26:05 -0400
-Received: from mga14.intel.com ([192.55.52.115]:2276 "EHLO mga14.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730780AbgCaM0F (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 31 Mar 2020 08:26:05 -0400
-IronPort-SDR: 9PiCgj++VN9JLPY92jXxbjmyL/2gKSwaVlK+lpmg2nxF7cJIVN5VDP22Nhk+BcuJg9bQFAEHLd
- 1srzrx3SXUAA==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Mar 2020 05:26:04 -0700
-IronPort-SDR: nnRd3nWz2wwxzw5xsvy8i6hxIiUie4b+GlxMpReJPIIc0gHBU7cpP/G6fjypOYSEKxlFYEWI9P
- aWaUZzLaz2mg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.72,327,1580803200"; 
-   d="scan'208";a="328067933"
-Received: from fmsmsx106.amr.corp.intel.com ([10.18.124.204])
-  by orsmga001.jf.intel.com with ESMTP; 31 Mar 2020 05:26:04 -0700
-Received: from fmsmsx119.amr.corp.intel.com (10.18.124.207) by
- FMSMSX106.amr.corp.intel.com (10.18.124.204) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Tue, 31 Mar 2020 05:26:04 -0700
-Received: from shsmsx106.ccr.corp.intel.com (10.239.4.159) by
- FMSMSX119.amr.corp.intel.com (10.18.124.207) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Tue, 31 Mar 2020 05:26:03 -0700
-Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.225]) by
- SHSMSX106.ccr.corp.intel.com ([169.254.10.89]) with mapi id 14.03.0439.000;
- Tue, 31 Mar 2020 20:26:00 +0800
-From:   "Liu, Yi L" <yi.l.liu@intel.com>
-To:     Auger Eric <eric.auger@redhat.com>,
-        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "peterx@redhat.com" <peterx@redhat.com>
-CC:     "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "mst@redhat.com" <mst@redhat.com>,
-        "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "Tian, Jun J" <jun.j.tian@intel.com>,
-        "Sun, Yi Y" <yi.y.sun@intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Wu, Hao" <hao.wu@intel.com>,
-        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
-        Jacob Pan <jacob.jun.pan@linux.intel.com>,
-        Yi Sun <yi.y.sun@linux.intel.com>,
-        "Richard Henderson" <rth@twiddle.net>,
-        Eduardo Habkost <ehabkost@redhat.com>
-Subject: RE: [PATCH v2 07/22] intel_iommu: add set/unset_iommu_context
- callback
-Thread-Topic: [PATCH v2 07/22] intel_iommu: add set/unset_iommu_context
- callback
-Thread-Index: AQHWBkpjC0u1RP4NDUSzp1PXmPweUahhD5IAgAGPy7A=
-Date:   Tue, 31 Mar 2020 12:25:59 +0000
-Message-ID: <A2975661238FB949B60364EF0F2C25743A21AF24@SHSMSX104.ccr.corp.intel.com>
-References: <1585542301-84087-1-git-send-email-yi.l.liu@intel.com>
- <1585542301-84087-8-git-send-email-yi.l.liu@intel.com>
- <a444318b-32c7-d43c-112a-d35a870b162d@redhat.com>
-In-Reply-To: <a444318b-32c7-d43c-112a-d35a870b162d@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-version: 11.2.0.6
-dlp-reaction: no-action
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+        id S1730810AbgCaM12 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 31 Mar 2020 08:27:28 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:53128 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1730343AbgCaM12 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 31 Mar 2020 08:27:28 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1585657646;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=+uwrvoeVxT29TBWalu2R/n+g95+vkG1UR1mvyvUSmtE=;
+        b=ce+0BpcbR9HkjvENUPBZWrCKCACZgP0G4pL0sW/pRMT9NKk0XnKSixDj0ZXkd9KeoAPS15
+        x7tcbxMuga6poG7j8rowb357KLhuy+ec3vdyGhm6PVQgCu/akmLazFKkUnabDv0qZY9aQB
+        sOLgPvcqJ1QqT2hPtnA1WDF5DSYoHT4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-350-Hmw76hB9Op2qOl9hNnscSg-1; Tue, 31 Mar 2020 08:27:23 -0400
+X-MC-Unique: Hmw76hB9Op2qOl9hNnscSg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0FA16DB85;
+        Tue, 31 Mar 2020 12:27:22 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-116-15.gru2.redhat.com [10.97.116.15])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 33D3B96F85;
+        Tue, 31 Mar 2020 12:27:18 +0000 (UTC)
+Subject: Re: [PATCH] selftests: kvm: Update .gitignore with missing binaries
+To:     Andrew Jones <drjones@redhat.com>,
+        Janosch Frank <frankja@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com,
+        linux-kernel@vger.kernel.org
+References: <20200330211922.24290-1-wainersm@redhat.com>
+ <49982d4c-ab12-28e6-d0f2-695c8781b26d@linux.ibm.com>
+ <20200331074903.lwqjkwyinfw2avzg@kamzik.brq.redhat.com>
+From:   Wainer dos Santos Moschetta <wainersm@redhat.com>
+Message-ID: <6f6a9c8f-8d10-c7be-0397-8f0a6df1422f@redhat.com>
+Date:   Tue, 31 Mar 2020 09:27:17 -0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
+In-Reply-To: <20200331074903.lwqjkwyinfw2avzg@kamzik.brq.redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Eric,
 
-> From: Auger Eric < eric.auger@redhat.com>
-> Sent: Tuesday, March 31, 2020 4:24 AM
-> To: Liu, Yi L <yi.l.liu@intel.com>; qemu-devel@nongnu.org;
-> Subject: Re: [PATCH v2 07/22] intel_iommu: add set/unset_iommu_context callback
-> 
-> Yi,
-> 
-> On 3/30/20 6:24 AM, Liu Yi L wrote:
-> > This patch adds set/unset_iommu_context() impelementation in Intel
-> This patch implements the set/unset_iommu_context() ops for Intel vIOMMU.
-> > vIOMMU. For Intel platform, pass-through modules (e.g. VFIO) could
-> > set HostIOMMUContext to Intel vIOMMU emulator.
-> >
-> > Cc: Kevin Tian <kevin.tian@intel.com>
-> > Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
-> > Cc: Peter Xu <peterx@redhat.com>
-> > Cc: Yi Sun <yi.y.sun@linux.intel.com>
-> > Cc: Paolo Bonzini <pbonzini@redhat.com>
-> > Cc: Richard Henderson <rth@twiddle.net>
-> > Cc: Eduardo Habkost <ehabkost@redhat.com>
-> > Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
-> > ---
-> >  hw/i386/intel_iommu.c         | 71
-> ++++++++++++++++++++++++++++++++++++++++---
-> >  include/hw/i386/intel_iommu.h | 21 ++++++++++---
-> >  2 files changed, 83 insertions(+), 9 deletions(-)
-> >
-> > diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-> > index 4b22910..fd349c6 100644
-> > --- a/hw/i386/intel_iommu.c
-> > +++ b/hw/i386/intel_iommu.c
-> > @@ -3354,23 +3354,33 @@ static const MemoryRegionOps vtd_mem_ir_ops = {
-> >      },
-> >  };
-> >
-> > -VTDAddressSpace *vtd_find_add_as(IntelIOMMUState *s, PCIBus *bus, int devfn)
-> > +/**
-> > + * Fetch a VTDBus instance for given PCIBus. If no existing instance,
-> > + * allocate one.
-> > + */
-> > +static VTDBus *vtd_find_add_bus(IntelIOMMUState *s, PCIBus *bus)
-> >  {
-> >      uintptr_t key = (uintptr_t)bus;
-> >      VTDBus *vtd_bus = g_hash_table_lookup(s->vtd_as_by_busptr, &key);
-> > -    VTDAddressSpace *vtd_dev_as;
-> > -    char name[128];
-> >
-> >      if (!vtd_bus) {
-> >          uintptr_t *new_key = g_malloc(sizeof(*new_key));
-> >          *new_key = (uintptr_t)bus;
-> >          /* No corresponding free() */
-> > -        vtd_bus = g_malloc0(sizeof(VTDBus) + sizeof(VTDAddressSpace *) * \
-> > -                            PCI_DEVFN_MAX);
-> > +        vtd_bus = g_malloc0(sizeof(VTDBus));
-> >          vtd_bus->bus = bus;
-> >          g_hash_table_insert(s->vtd_as_by_busptr, new_key, vtd_bus);
-> >      }
-> > +    return vtd_bus;
-> > +}
-> >
-> > +VTDAddressSpace *vtd_find_add_as(IntelIOMMUState *s, PCIBus *bus, int devfn)
-> > +{
-> > +    VTDBus *vtd_bus;
-> > +    VTDAddressSpace *vtd_dev_as;
-> > +    char name[128];
-> > +
-> > +    vtd_bus = vtd_find_add_bus(s, bus);
-> >      vtd_dev_as = vtd_bus->dev_as[devfn];
-> >
-> >      if (!vtd_dev_as) {
-> > @@ -3436,6 +3446,55 @@ VTDAddressSpace
-> *vtd_find_add_as(IntelIOMMUState *s, PCIBus *bus, int devfn)
-> >      return vtd_dev_as;
-> >  }
-> >
-> > +static int vtd_dev_set_iommu_context(PCIBus *bus, void *opaque,
-> > +                                     int devfn,
-> > +                                     HostIOMMUContext *iommu_ctx)
-> > +{
-> > +    IntelIOMMUState *s = opaque;
-> > +    VTDBus *vtd_bus;
-> > +    VTDHostIOMMUContext *vtd_dev_icx;
-> > +
-> > +    assert(0 <= devfn && devfn < PCI_DEVFN_MAX);
-> > +
-> > +    vtd_bus = vtd_find_add_bus(s, bus);
-> > +
-> > +    vtd_iommu_lock(s);
-> > +
-> > +    vtd_dev_icx = vtd_bus->dev_icx[devfn];
-> > +
-> > +    assert(!vtd_dev_icx);
-> > +
-> > +    vtd_bus->dev_icx[devfn] = vtd_dev_icx =
-> > +                    g_malloc0(sizeof(VTDHostIOMMUContext));
-> > +    vtd_dev_icx->vtd_bus = vtd_bus;
-> > +    vtd_dev_icx->devfn = (uint8_t)devfn;
-> > +    vtd_dev_icx->iommu_state = s;
-> > +    vtd_dev_icx->iommu_ctx = iommu_ctx;
-> > +
-> > +    vtd_iommu_unlock(s);
-> > +
-> > +    return 0;
-> > +}
-> > +
-> > +static void vtd_dev_unset_iommu_context(PCIBus *bus, void *opaque, int devfn)
-> > +{
-> > +    IntelIOMMUState *s = opaque;
-> > +    VTDBus *vtd_bus;
-> > +    VTDHostIOMMUContext *vtd_dev_icx;
-> > +
-> > +    assert(0 <= devfn && devfn < PCI_DEVFN_MAX);
-> > +
-> > +    vtd_bus = vtd_find_add_bus(s, bus);
-> > +
-> > +    vtd_iommu_lock(s);
-> > +
-> > +    vtd_dev_icx = vtd_bus->dev_icx[devfn];
-> > +    g_free(vtd_dev_icx);
-> > +    vtd_bus->dev_icx[devfn] = NULL;
-> > +
-> > +    vtd_iommu_unlock(s);
-> > +}
-> > +
-> >  static uint64_t get_naturally_aligned_size(uint64_t start,
-> >                                             uint64_t size, int gaw)
-> >  {
-> > @@ -3731,6 +3790,8 @@ static AddressSpace *vtd_host_dma_iommu(PCIBus
-> *bus, void *opaque, int devfn)
-> >
-> >  static PCIIOMMUOps vtd_iommu_ops = {
-> >      .get_address_space = vtd_host_dma_iommu,
-> > +    .set_iommu_context = vtd_dev_set_iommu_context,
-> > +    .unset_iommu_context = vtd_dev_unset_iommu_context,
-> >  };
-> >
-> >  static bool vtd_decide_config(IntelIOMMUState *s, Error **errp)
-> > diff --git a/include/hw/i386/intel_iommu.h b/include/hw/i386/intel_iommu.h
-> > index 3870052..b5fefb9 100644
-> > --- a/include/hw/i386/intel_iommu.h
-> > +++ b/include/hw/i386/intel_iommu.h
-> > @@ -64,6 +64,7 @@ typedef union VTD_IR_TableEntry VTD_IR_TableEntry;
-> >  typedef union VTD_IR_MSIAddress VTD_IR_MSIAddress;
-> >  typedef struct VTDPASIDDirEntry VTDPASIDDirEntry;
-> >  typedef struct VTDPASIDEntry VTDPASIDEntry;
-> > +typedef struct VTDHostIOMMUContext VTDHostIOMMUContext;
-> >
-> >  /* Context-Entry */
-> >  struct VTDContextEntry {
-> > @@ -112,10 +113,20 @@ struct VTDAddressSpace {
-> >      IOVATree *iova_tree;          /* Traces mapped IOVA ranges */
-> >  };
-> >
-> > +struct VTDHostIOMMUContext {
-> 
-> 
-> > +    VTDBus *vtd_bus;
-> > +    uint8_t devfn;
-> > +    HostIOMMUContext *iommu_ctx;
-> I don't get why we don't have standard QOM inheritance instead of this
-> handle?
-> VTDHostContext parent_obj;
-> 
-> like IOMMUMemoryRegion <- MemoryRegion <- Object
+On 3/31/20 4:49 AM, Andrew Jones wrote:
+> On Tue, Mar 31, 2020 at 09:09:17AM +0200, Janosch Frank wrote:
+>> On 3/30/20 11:19 PM, Wainer dos Santos Moschetta wrote:
+>>> Updated .gitignore to ignore x86_64/svm_vmcall_test and
+>>> s390x/resets test binaries.
+>>>
+>>> Signed-off-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
+>> Oh, didn't know I needed to do that...
+>> Thanks for fixing this up.
+> I've already sent these, and they've been merged to kvm/queue.
 
-Here it is not inherit the object. It's just cache the HostIOMMUContext
-pointer in vIOMMU. Just like AddressSpace, it has a MemoryRegion pointer.
-Here is the same, VTDHostIOMMUContext is just a wrapper to better manage
-it in vVT-d. It's not inheriting.
 
-> > +    IntelIOMMUState *iommu_state;
-> > +};
-> > +
-> >  struct VTDBus {
-> > -    PCIBus* bus;		/* A reference to the bus to provide translation for
-> */
-> > +    /* A reference to the bus to provide translation for */
-> > +    PCIBus *bus;
-> >      /* A table of VTDAddressSpace objects indexed by devfn */
-> > -    VTDAddressSpace *dev_as[];
-> > +    VTDAddressSpace *dev_as[PCI_DEVFN_MAX];
-> > +    /* A table of VTDHostIOMMUContext objects indexed by devfn */
-> > +    VTDHostIOMMUContext *dev_icx[PCI_DEVFN_MAX];
-> At this point of the review, it is unclear to me why the context is
-> associated to a device.
+Sorry, before sending mine I searched in the mailing list but did not 
+find any fix. Next time I look at queued patches as well.
 
-HostIOMMUContext can be per-device or not. It depends on how vIOMMU
-manage it. For vVT-d, it's per device as the container is per-device.
+Thanks!
 
-> Up to now you have not explained it should. If
-> so why isn't it part of VTDAddressSpace?
+>
+>> Acked-by: Janosch Frank <frankja@linux.ibm.com>
+>>
+>>> ---
+>>>   tools/testing/selftests/kvm/.gitignore | 2 ++
+>>>   1 file changed, 2 insertions(+)
+>>>
+>>> diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
+>>> index 30072c3f52fb..489b9cf9eed5 100644
+>>> --- a/tools/testing/selftests/kvm/.gitignore
+>>> +++ b/tools/testing/selftests/kvm/.gitignore
+>>> @@ -1,3 +1,4 @@
+>>> +/s390x/resets
+>>>   /s390x/sync_regs_test
+>>>   /s390x/memop
+>>>   /x86_64/cr4_cpuid_sync_test
+>>> @@ -8,6 +9,7 @@
+>>>   /x86_64/set_sregs_test
+>>>   /x86_64/smm_test
+>>>   /x86_64/state_test
+>>> +/x86_64/svm_vmcall_test
+>>>   /x86_64/sync_regs_test
+>>>   /x86_64/vmx_close_while_nested_test
+>>>   /x86_64/vmx_dirty_log_test
+>>>
+>>
+>
+>
 
-Ah, I did have considered it. But I chose to use a separate one as
-context is not really tied with an addresspace. It's better to mange
-it with a separate structure.
-
-Regards,
-Yi Liu
