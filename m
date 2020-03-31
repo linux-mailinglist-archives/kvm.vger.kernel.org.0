@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1D5B7199DDD
-	for <lists+kvm@lfdr.de>; Tue, 31 Mar 2020 20:14:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 387CE199E05
+	for <lists+kvm@lfdr.de>; Tue, 31 Mar 2020 20:29:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727509AbgCaSOb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 31 Mar 2020 14:14:31 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:42468 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726194AbgCaSOb (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 31 Mar 2020 14:14:31 -0400
+        id S1727740AbgCaS3G (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 31 Mar 2020 14:29:06 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:26820 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726208AbgCaS3G (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 31 Mar 2020 14:29:06 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1585678470;
+        s=mimecast20190719; t=1585679345;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=TSvrVqyL1Jx5FubyVmhg6f6i8aYPPkfIz/TD3nTqZyI=;
-        b=FVZ3Ph3du9/1mXQ4x5nSIQJAMai81j63BgNGwEPF6rJEgwzGUG5YcgueSUCrDiQAjDUPko
-        fWMwZl1QWY2duRVE9ray2VwLdwfw7NBJ62pyqU7F+t18RfamsEs0JwVJbnHM1rZu9dcVpq
-        2bYQn4IwC05n5rTViTBxJbwQDCnbU0E=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-201-ktBW3XjtNQODcLQ8_cZgfw-1; Tue, 31 Mar 2020 14:14:28 -0400
-X-MC-Unique: ktBW3XjtNQODcLQ8_cZgfw-1
-Received: by mail-wr1-f71.google.com with SMTP id v14so13326869wrq.13
-        for <kvm@vger.kernel.org>; Tue, 31 Mar 2020 11:14:28 -0700 (PDT)
+        bh=b5dWIETr4KPTa4P1RR7LQV/Jn7WI6760rymnOFO4Dv0=;
+        b=dNJ1abXU1147B+lrmkB4uzqBCA3ZWrUXtvgPCgDMnvoiPtit+l8qZq2IJ44DIBFqccAiwI
+        +qjUE5YMW1Ah/uZdJYcLk9xqjiL/jUTlPOZl4hJZBFfq8YNGNR/BoNK+WE/L4so7dj9fwm
+        twSJhnAYDJMTvQM7bkoDcs6RZEWdmzc=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-330-tGVYhvBNPMCziq_0gYUsIg-1; Tue, 31 Mar 2020 14:29:00 -0400
+X-MC-Unique: tGVYhvBNPMCziq_0gYUsIg-1
+Received: by mail-wm1-f72.google.com with SMTP id w9so1035565wmi.2
+        for <kvm@vger.kernel.org>; Tue, 31 Mar 2020 11:29:00 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:content-transfer-encoding
          :in-reply-to;
-        bh=TSvrVqyL1Jx5FubyVmhg6f6i8aYPPkfIz/TD3nTqZyI=;
-        b=nltH8NQaN0pQq6lBLqzBY5rVg57u1Dzo4VibNZ7vqr8zrr1ZZj8caMttl/0+57Seog
-         cmVpZ+mVCp5eETYitsxn+lvpp5sHtwptTYqV9YTTTaM4h4nA4ecaZb2uqWzdyD+gvWRX
-         3RH8jzg98oWQSIZ9fi2qFsP9hmWRWI4/hjRonpy/U6gsCCS6RyuqaimG2f2DB++4kRrf
-         Tsup2ObVYUMxMjS7D4faQxG9kryPfg2PoUG0fc3hYYCa4LEmELLGWi34SbJm9zLU5Acn
-         lPzCHns9sDZiRwIKPLYPAkKDOWsFWaNpDtGiQfWpwmhXWm268s97lOc1M9V9x+elOySS
-         Oktw==
-X-Gm-Message-State: AGi0PubnoUVeeiCpKLC4ecRM55Cfftl147ZR88LNPo4W1xQG7Du61/S1
-        5PvU/vd8Gwnh1iFHyQJsNdBpqG2cGEjqNmI5TNMNN3ZxAWrGTdqRk3yrV6NNNe4UuS5kVmsnN+W
-        zXTtHoX33LIqC
-X-Received: by 2002:a1c:e904:: with SMTP id q4mr133897wmc.84.1585678467304;
-        Tue, 31 Mar 2020 11:14:27 -0700 (PDT)
-X-Google-Smtp-Source: APiQypLVDQvmChaAxrN9xcoLakoPVPQCDmsEJBfNQTVUIzH6Z20zW9Y/lw5ZL804EkY8DW/XHdDNZg==
-X-Received: by 2002:a1c:e904:: with SMTP id q4mr133880wmc.84.1585678467042;
-        Tue, 31 Mar 2020 11:14:27 -0700 (PDT)
+        bh=b5dWIETr4KPTa4P1RR7LQV/Jn7WI6760rymnOFO4Dv0=;
+        b=mpJhhGaIASKtfdCjXNJ6bEDyC7hThLr3dE8CKe8lqIa+z/19A0BjXtfazP+IhkXZGg
+         sFe3h3Q/onjDwanTxMvdDRv18OYTg5oT3vFVtpOLsTA7a5GEKW2lCbmxQeM8hq1fs7hJ
+         Q5bIPRWyVBVhKjx9uMgiPW6+D6bqFmhHKAoznkrOS5OTrvZr60iC8YawIUB9wevrn8Fg
+         HaNRUW1xosnpJfnCenUYirAX2bGYkJQcxZM+xho0oj+DTffsCr9U8F+8LWfUHaA9ibfZ
+         OJOIA8VCpdOAjGw4EUH4ZkcZJu0zXpC0JfY4CRHrmWuQG2vqJ/8W4KaVyQL1vGkP2h1H
+         7S0w==
+X-Gm-Message-State: ANhLgQ14ihj1va/7oeqnOV0bxdzjwlVgjP5P7hoX44J3ywvOkgmttsIn
+        4HFiOs2y4QMtbwsXIw2/u/sKk/hKOBOnk0n92LM56DBsf6KCtDUfTXO9z0X0QIK+vYzEOtPF5MP
+        1wBVFY4wN+gfe
+X-Received: by 2002:a5d:51cf:: with SMTP id n15mr20377988wrv.195.1585679339609;
+        Tue, 31 Mar 2020 11:28:59 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vsrRT7SyDvbvcazCfYAPjh1HEODlf301z86ujp6Ln0x2zj42AzBsllsuuoC5zRxIsUp9SilHA==
+X-Received: by 2002:a5d:51cf:: with SMTP id n15mr20377958wrv.195.1585679339265;
+        Tue, 31 Mar 2020 11:28:59 -0700 (PDT)
 Received: from redhat.com (bzq-79-176-51-222.red.bezeqint.net. [79.176.51.222])
-        by smtp.gmail.com with ESMTPSA id h81sm5180039wme.42.2020.03.31.11.14.24
+        by smtp.gmail.com with ESMTPSA id u128sm4909462wmu.31.2020.03.31.11.28.57
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 31 Mar 2020 11:14:26 -0700 (PDT)
-Date:   Tue, 31 Mar 2020 14:14:23 -0400
+        Tue, 31 Mar 2020 11:28:58 -0700 (PDT)
+Date:   Tue, 31 Mar 2020 14:28:55 -0400
 From:   "Michael S. Tsirkin" <mst@redhat.com>
 To:     Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>
 Cc:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
@@ -65,7 +65,7 @@ Cc:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         Christian Borntraeger <borntraeger@de.ibm.com>
 Subject: Re: [PATCH v2 1/8] vhost: Create accessors for virtqueues
  private_data
-Message-ID: <20200331141244-mutt-send-email-mst@kernel.org>
+Message-ID: <20200331142426-mutt-send-email-mst@kernel.org>
 References: <20200331180006.25829-1-eperezma@redhat.com>
  <20200331180006.25829-2-eperezma@redhat.com>
 MIME-Version: 1.0
@@ -84,6 +84,11 @@ On Tue, Mar 31, 2020 at 07:59:59PM +0200, Eugenio Pérez wrote:
 >  drivers/vhost/net.c   | 28 +++++++++++++++-------------
 >  drivers/vhost/vhost.h | 28 ++++++++++++++++++++++++++++
 >  drivers/vhost/vsock.c | 14 +++++++-------
+
+
+Seems to be missing scsi and test.
+
+
 >  3 files changed, 50 insertions(+), 20 deletions(-)
 > 
 > diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
@@ -226,7 +231,15 @@ On Tue, Mar 31, 2020 at 07:59:59PM +0200, Eugenio Pérez wrote:
 > + *
 > + * Context: Need to call with vq->mutex acquired.
 > + * Return: Opaque previously set with vhost_vq_set_backend_opaque.
+
+
+I prefer opaque -> private data in comments.
+
 > + */
+
+
+
+
 > +static inline void *vhost_vq_get_backend_opaque(struct vhost_virtqueue *vq)
 > +{
 > +	return vq->private_data;
@@ -235,14 +248,6 @@ On Tue, Mar 31, 2020 at 07:59:59PM +0200, Eugenio Pérez wrote:
 >  static inline bool vhost_has_feature(struct vhost_virtqueue *vq, int bit)
 >  {
 >  	return vq->acked_features & (1ULL << bit);
-
-
-I think I prefer vhost_vq_get_backend and vhost_vq_set_backend.
-
-"opaque" just means that it's void * that is clear from the signature
-anyway.
-
-
 > diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
 > index c2d7d57e98cf..6e20dbe14acd 100644
 > --- a/drivers/vhost/vsock.c
