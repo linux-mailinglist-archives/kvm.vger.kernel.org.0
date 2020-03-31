@@ -2,326 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 609DB199F17
-	for <lists+kvm@lfdr.de>; Tue, 31 Mar 2020 21:30:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 29D88199FC8
+	for <lists+kvm@lfdr.de>; Tue, 31 Mar 2020 22:10:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728225AbgCaTaT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 31 Mar 2020 15:30:19 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:30608 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727708AbgCaTaT (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 31 Mar 2020 15:30:19 -0400
+        id S1729647AbgCaUKE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 31 Mar 2020 16:10:04 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:22063 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727720AbgCaUKE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 31 Mar 2020 16:10:04 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1585683017;
+        s=mimecast20190719; t=1585685403;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=UpUD1JgEMbiTeKuDtcfbarlvunPYOvi5RMSv8hFzL24=;
-        b=ITEqrRvR342ja9Z0GhkIzHxmgcYj3fWDORmYT966ZmxdvK5AXTKAg44OdVSQmSbdKVDzzL
-        6Vg1mVnwhusy2SfvMLvvgtQuWyVnyZsEvAQ1zAmHBA1HtcMc1KLr2IkqIebbhzUo45+Veq
-        qQBrT+woLmNLL+aphxmdtg+wyFm/xJs=
-Received: from mail-lf1-f71.google.com (mail-lf1-f71.google.com
- [209.85.167.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-111-AszhBcXsPCOGU_AfaUvL1w-1; Tue, 31 Mar 2020 15:30:16 -0400
-X-MC-Unique: AszhBcXsPCOGU_AfaUvL1w-1
-Received: by mail-lf1-f71.google.com with SMTP id b25so9175765lfi.21
-        for <kvm@vger.kernel.org>; Tue, 31 Mar 2020 12:30:15 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=UpUD1JgEMbiTeKuDtcfbarlvunPYOvi5RMSv8hFzL24=;
-        b=PkdQLi3HpLtvsEA8FJIvXz+hGhlrOBfpWsoxkch/Wclr2M1b3OQDaQklkLdzAjwf45
-         Dug2HVDmGKXQZBnmsCX0VTOKJSy1QTY0F7HQ3eZANLGFk899Qa0H28+aWr6BzkyCBchu
-         JkcRAnnOJSu7kjufujs4y3YiGtvlTwq5aImR44sWBoG9vokJGVGZJAOkZEimPKxDATyq
-         Yi/ZIMcxWOBk0yAWnK8aZ2pgaoeXEJ/+Q+bNRSePAmCaAoWbK4hLkfAYyMlnpFdrPGHI
-         b0eEhAdZbjnN3yqO48/M8UMOrTwW+q/XK9aIlzhlWZBXLLUUdIS7ba4C0Kw8iBQ3I1HP
-         MguQ==
-X-Gm-Message-State: AGi0PubPVHH0iB0ED6bBsrwWuq5rRQlnmAliPhCXqyW+YLttOMpWfBMZ
-        J1iFSP/D2weKkcBoH9GhtnDeXZrX9C3nha9Maddw/OTeTnnEO1V3voyK0romesSohOd/gvpsMkB
-        1YpMp3eYtgp+KDsoM9vZCkkIdaGl6
-X-Received: by 2002:ac2:4199:: with SMTP id z25mr12316652lfh.90.1585683014301;
-        Tue, 31 Mar 2020 12:30:14 -0700 (PDT)
-X-Google-Smtp-Source: APiQypJhWHR1e3yFKlW02voYvvq7yPGRxklHTLnYsbNB5eexsLfQZB5Gq+0Qo0MSOyWCKWui5xHhfhrh7QYm8fcFEMM=
-X-Received: by 2002:ac2:4199:: with SMTP id z25mr12316641lfh.90.1585683014001;
- Tue, 31 Mar 2020 12:30:14 -0700 (PDT)
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=9tiFegyAVmmAr1Blf/zEd5Ozn4gaTM1GAemIQes9+TA=;
+        b=MoDl2nTOr+jbsLEszC8VV16bROOGjp4feAM5qKrXjEvwA4oaDV+mZ9OM8uXxRssu3GwiHh
+        fHPKlPDZODFgS0i3rfjL5aUBNnlcVXssHnB41EbbWuKwlq7vTx4fq+Hgbw14Nxu7Y/t2UC
+        oZtKdYxunbCQkewBYsVFIBNa9rSf55I=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-422-1tFIgNMfN5aGcZnHSE4dlg-1; Tue, 31 Mar 2020 15:40:27 -0400
+X-MC-Unique: 1tFIgNMfN5aGcZnHSE4dlg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C2260DB6F;
+        Tue, 31 Mar 2020 19:40:26 +0000 (UTC)
+Received: from horse.redhat.com (ovpn-118-184.phx2.redhat.com [10.3.118.184])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 3339160BE0;
+        Tue, 31 Mar 2020 19:40:21 +0000 (UTC)
+Received: by horse.redhat.com (Postfix, from userid 10451)
+        id 595FB220291; Tue, 31 Mar 2020 15:40:20 -0400 (EDT)
+From:   Vivek Goyal <vgoyal@redhat.com>
+To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     virtio-fs@redhat.com, miklos@szeredi.hu, stefanha@redhat.com,
+        dgilbert@redhat.com, vgoyal@redhat.com, aarcange@redhat.com,
+        dhildenb@redhat.com
+Subject: [RFC PATCH 0/4] kvm,x86,async_pf: Add capability to return page fault error 
+Date:   Tue, 31 Mar 2020 15:40:07 -0400
+Message-Id: <20200331194011.24834-1-vgoyal@redhat.com>
 MIME-Version: 1.0
-References: <20200331180006.25829-1-eperezma@redhat.com> <20200331180006.25829-2-eperezma@redhat.com>
- <20200331141244-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20200331141244-mutt-send-email-mst@kernel.org>
-From:   Eugenio Perez Martin <eperezma@redhat.com>
-Date:   Tue, 31 Mar 2020 21:29:37 +0200
-Message-ID: <CAJaqyWe2xxSR5GpV8c-mPoOizwe8nw-HrKPdjvr4ykOL_garKQ@mail.gmail.com>
-Subject: Re: [PATCH v2 1/8] vhost: Create accessors for virtqueues private_data
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        kvm list <kvm@vger.kernel.org>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Stephen Rothwell <sfr@canb.auug.org.au>,
-        Christian Borntraeger <borntraeger@de.ibm.com>
-Content-Type: text/plain; charset="UTF-8"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 31, 2020 at 8:14 PM Michael S. Tsirkin <mst@redhat.com> wrote:
->
-> On Tue, Mar 31, 2020 at 07:59:59PM +0200, Eugenio P=C3=A9rez wrote:
-> > Signed-off-by: Eugenio P=C3=A9rez <eperezma@redhat.com>
-> > ---
-> >  drivers/vhost/net.c   | 28 +++++++++++++++-------------
-> >  drivers/vhost/vhost.h | 28 ++++++++++++++++++++++++++++
-> >  drivers/vhost/vsock.c | 14 +++++++-------
-> >  3 files changed, 50 insertions(+), 20 deletions(-)
-> >
-> > diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-> > index e158159671fa..6c5e7a6f712c 100644
-> > --- a/drivers/vhost/net.c
-> > +++ b/drivers/vhost/net.c
-> > @@ -424,7 +424,7 @@ static void vhost_net_disable_vq(struct vhost_net *=
-n,
-> >       struct vhost_net_virtqueue *nvq =3D
-> >               container_of(vq, struct vhost_net_virtqueue, vq);
-> >       struct vhost_poll *poll =3D n->poll + (nvq - n->vqs);
-> > -     if (!vq->private_data)
-> > +     if (!vhost_vq_get_backend_opaque(vq))
-> >               return;
-> >       vhost_poll_stop(poll);
-> >  }
-> > @@ -437,7 +437,7 @@ static int vhost_net_enable_vq(struct vhost_net *n,
-> >       struct vhost_poll *poll =3D n->poll + (nvq - n->vqs);
-> >       struct socket *sock;
-> >
-> > -     sock =3D vq->private_data;
-> > +     sock =3D vhost_vq_get_backend_opaque(vq);
-> >       if (!sock)
-> >               return 0;
-> >
-> > @@ -524,7 +524,7 @@ static void vhost_net_busy_poll(struct vhost_net *n=
-et,
-> >               return;
-> >
-> >       vhost_disable_notify(&net->dev, vq);
-> > -     sock =3D rvq->private_data;
-> > +     sock =3D vhost_vq_get_backend_opaque(rvq);
-> >
-> >       busyloop_timeout =3D poll_rx ? rvq->busyloop_timeout:
-> >                                    tvq->busyloop_timeout;
-> > @@ -570,8 +570,10 @@ static int vhost_net_tx_get_vq_desc(struct vhost_n=
-et *net,
-> >
-> >       if (r =3D=3D tvq->num && tvq->busyloop_timeout) {
-> >               /* Flush batched packets first */
-> > -             if (!vhost_sock_zcopy(tvq->private_data))
-> > -                     vhost_tx_batch(net, tnvq, tvq->private_data, msgh=
-dr);
-> > +             if (!vhost_sock_zcopy(vhost_vq_get_backend_opaque(tvq)))
-> > +                     vhost_tx_batch(net, tnvq,
-> > +                                    vhost_vq_get_backend_opaque(tvq),
-> > +                                    msghdr);
-> >
-> >               vhost_net_busy_poll(net, rvq, tvq, busyloop_intr, false);
-> >
-> > @@ -685,7 +687,7 @@ static int vhost_net_build_xdp(struct vhost_net_vir=
-tqueue *nvq,
-> >       struct vhost_virtqueue *vq =3D &nvq->vq;
-> >       struct vhost_net *net =3D container_of(vq->dev, struct vhost_net,
-> >                                            dev);
-> > -     struct socket *sock =3D vq->private_data;
-> > +     struct socket *sock =3D vhost_vq_get_backend_opaque(vq);
-> >       struct page_frag *alloc_frag =3D &net->page_frag;
-> >       struct virtio_net_hdr *gso;
-> >       struct xdp_buff *xdp =3D &nvq->xdp[nvq->batched_xdp];
-> > @@ -952,7 +954,7 @@ static void handle_tx(struct vhost_net *net)
-> >       struct socket *sock;
-> >
-> >       mutex_lock_nested(&vq->mutex, VHOST_NET_VQ_TX);
-> > -     sock =3D vq->private_data;
-> > +     sock =3D vhost_vq_get_backend_opaque(vq);
-> >       if (!sock)
-> >               goto out;
-> >
-> > @@ -1121,7 +1123,7 @@ static void handle_rx(struct vhost_net *net)
-> >       int recv_pkts =3D 0;
-> >
-> >       mutex_lock_nested(&vq->mutex, VHOST_NET_VQ_RX);
-> > -     sock =3D vq->private_data;
-> > +     sock =3D vhost_vq_get_backend_opaque(vq);
-> >       if (!sock)
-> >               goto out;
-> >
-> > @@ -1344,9 +1346,9 @@ static struct socket *vhost_net_stop_vq(struct vh=
-ost_net *n,
-> >               container_of(vq, struct vhost_net_virtqueue, vq);
-> >
-> >       mutex_lock(&vq->mutex);
-> > -     sock =3D vq->private_data;
-> > +     sock =3D vhost_vq_get_backend_opaque(vq);
-> >       vhost_net_disable_vq(n, vq);
-> > -     vq->private_data =3D NULL;
-> > +     vhost_vq_set_backend_opaque(vq, NULL);
-> >       vhost_net_buf_unproduce(nvq);
-> >       nvq->rx_ring =3D NULL;
-> >       mutex_unlock(&vq->mutex);
-> > @@ -1528,7 +1530,7 @@ static long vhost_net_set_backend(struct vhost_ne=
-t *n, unsigned index, int fd)
-> >       }
-> >
-> >       /* start polling new socket */
-> > -     oldsock =3D vq->private_data;
-> > +     oldsock =3D vhost_vq_get_backend_opaque(vq);
-> >       if (sock !=3D oldsock) {
-> >               ubufs =3D vhost_net_ubuf_alloc(vq,
-> >                                            sock && vhost_sock_zcopy(soc=
-k));
-> > @@ -1538,7 +1540,7 @@ static long vhost_net_set_backend(struct vhost_ne=
-t *n, unsigned index, int fd)
-> >               }
-> >
-> >               vhost_net_disable_vq(n, vq);
-> > -             vq->private_data =3D sock;
-> > +             vhost_vq_set_backend_opaque(vq, sock);
-> >               vhost_net_buf_unproduce(nvq);
-> >               r =3D vhost_vq_init_access(vq);
-> >               if (r)
-> > @@ -1575,7 +1577,7 @@ static long vhost_net_set_backend(struct vhost_ne=
-t *n, unsigned index, int fd)
-> >       return 0;
-> >
-> >  err_used:
-> > -     vq->private_data =3D oldsock;
-> > +     vhost_vq_set_backend_opaque(vq, oldsock);
-> >       vhost_net_enable_vq(n, vq);
-> >       if (ubufs)
-> >               vhost_net_ubuf_put_wait_and_free(ubufs);
-> > diff --git a/drivers/vhost/vhost.h b/drivers/vhost/vhost.h
-> > index a123fd70847e..0808188f7e8f 100644
-> > --- a/drivers/vhost/vhost.h
-> > +++ b/drivers/vhost/vhost.h
-> > @@ -244,6 +244,34 @@ enum {
-> >                        (1ULL << VIRTIO_F_VERSION_1)
-> >  };
-> >
-> > +/**
-> > + * vhost_vq_set_backend_opaque - Set backend opaque.
-> > + *
-> > + * @vq            Virtqueue.
-> > + * @private_data  The private data.
-> > + *
-> > + * Context: Need to call with vq->mutex acquired.
-> > + */
-> > +static inline void vhost_vq_set_backend_opaque(struct vhost_virtqueue =
-*vq,
-> > +                                            void *private_data)
-> > +{
-> > +     vq->private_data =3D private_data;
-> > +}
-> > +
-> > +/**
-> > + * vhost_vq_get_backend_opaque - Get backend opaque.
-> > + *
-> > + * @vq            Virtqueue.
-> > + * @private_data  The private data.
-> > + *
-> > + * Context: Need to call with vq->mutex acquired.
-> > + * Return: Opaque previously set with vhost_vq_set_backend_opaque.
-> > + */
-> > +static inline void *vhost_vq_get_backend_opaque(struct vhost_virtqueue=
- *vq)
-> > +{
-> > +     return vq->private_data;
-> > +}
-> > +
-> >  static inline bool vhost_has_feature(struct vhost_virtqueue *vq, int b=
-it)
-> >  {
-> >       return vq->acked_features & (1ULL << bit);
->
->
-> I think I prefer vhost_vq_get_backend and vhost_vq_set_backend.
->
-> "opaque" just means that it's void * that is clear from the signature
-> anyway.
->
+Current page fault logic in kvm seems to assume that host will always
+be able to successfully resolve page fault soon or later. There does not
+seem to be any mechanism for hypervisor to return an error say -EFAULT
+to guest.
 
-I agree. Changed in sent v3.
+We are writing DAX support for virtiofs filesystem. This will allow
+directly mapping host page cache page into guest user space process.
 
-Thanks!
+This mechanism now needs additional support from kvm where a page
+fault error needs to be propagated back into guest. For example, say
+guest process mmaped a file (and this did an mmap of portion of file
+on host into qemu address space). Now file gets truncated and guest
+process tries to access mapped region. It will generate page fault
+in host and it will try to map the file page. But page is not there
+any more so it will get back -EFAULT. But there is no mechanism to
+send this information back to guest and currently host sends PAGE_READY
+to guest, guest retries and fault happens again and host tries to
+resolve page fault again and this becomes an infinite loop.
 
->
-> > diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
-> > index c2d7d57e98cf..6e20dbe14acd 100644
-> > --- a/drivers/vhost/vsock.c
-> > +++ b/drivers/vhost/vsock.c
-> > @@ -91,7 +91,7 @@ vhost_transport_do_send_pkt(struct vhost_vsock *vsock=
-,
-> >
-> >       mutex_lock(&vq->mutex);
-> >
-> > -     if (!vq->private_data)
-> > +     if (!vhost_vq_get_backend_opaque(vq))
-> >               goto out;
-> >
-> >       /* Avoid further vmexits, we're already processing the virtqueue =
-*/
-> > @@ -440,7 +440,7 @@ static void vhost_vsock_handle_tx_kick(struct vhost=
-_work *work)
-> >
-> >       mutex_lock(&vq->mutex);
-> >
-> > -     if (!vq->private_data)
-> > +     if (!vhost_vq_get_backend_opaque(vq))
-> >               goto out;
-> >
-> >       vhost_disable_notify(&vsock->dev, vq);
-> > @@ -533,8 +533,8 @@ static int vhost_vsock_start(struct vhost_vsock *vs=
-ock)
-> >                       goto err_vq;
-> >               }
-> >
-> > -             if (!vq->private_data) {
-> > -                     vq->private_data =3D vsock;
-> > +             if (!vhost_vq_get_backend_opaque(vq)) {
-> > +                     vhost_vq_set_backend_opaque(vq, vsock);
-> >                       ret =3D vhost_vq_init_access(vq);
-> >                       if (ret)
-> >                               goto err_vq;
-> > @@ -547,14 +547,14 @@ static int vhost_vsock_start(struct vhost_vsock *=
-vsock)
-> >       return 0;
-> >
-> >  err_vq:
-> > -     vq->private_data =3D NULL;
-> > +     vhost_vq_set_backend_opaque(vq, NULL);
-> >       mutex_unlock(&vq->mutex);
-> >
-> >       for (i =3D 0; i < ARRAY_SIZE(vsock->vqs); i++) {
-> >               vq =3D &vsock->vqs[i];
-> >
-> >               mutex_lock(&vq->mutex);
-> > -             vq->private_data =3D NULL;
-> > +             vhost_vq_set_backend_opaque(vq, NULL);
-> >               mutex_unlock(&vq->mutex);
-> >       }
-> >  err:
-> > @@ -577,7 +577,7 @@ static int vhost_vsock_stop(struct vhost_vsock *vso=
-ck)
-> >               struct vhost_virtqueue *vq =3D &vsock->vqs[i];
-> >
-> >               mutex_lock(&vq->mutex);
-> > -             vq->private_data =3D NULL;
-> > +             vhost_vq_set_backend_opaque(vq, NULL);
-> >               mutex_unlock(&vq->mutex);
-> >       }
-> >
-> > --
-> > 2.18.1
->
+This is an RFC patch series which tries to extend async page fault
+mechanism to also be able to communicate back that an error occurred
+while resolving the page fault. Then guest can send SIGBUS to guest
+process accessing the truncated portion of file. Or if access happened
+in guest kernel, then it can try to fixup the exception and jump
+to error handling portion if there is one. =20
+
+This patch series tries to solve it only for x86 architecture on intel
+vmx only. Also it does not solve the problem for nested virtualization.
+
+Is extending async page fault mechanism to report error back to
+guest is right thing to do? Or there needs to be another way.
+
+Any feedback or comments are welcome.=20
+
+Thanks
+Vivek
+
+Vivek Goyal (4):
+  kvm: Add capability to be able to report async pf error to guest
+  kvm: async_pf: Send faulting gva address in case of error
+  kvm: Always get async page notifications
+  kvm,x86,async_pf: Search exception tables in case of error
+
+ Documentation/virt/kvm/cpuid.rst     |  4 ++
+ Documentation/virt/kvm/msr.rst       | 11 +++--
+ arch/x86/include/asm/kvm_host.h      | 17 ++++++-
+ arch/x86/include/asm/kvm_para.h      | 13 +++---
+ arch/x86/include/asm/vmx.h           |  2 +
+ arch/x86/include/uapi/asm/kvm_para.h | 12 ++++-
+ arch/x86/kernel/kvm.c                | 69 ++++++++++++++++++++++------
+ arch/x86/kvm/cpuid.c                 |  3 +-
+ arch/x86/kvm/mmu/mmu.c               | 12 +++--
+ arch/x86/kvm/vmx/nested.c            |  2 +-
+ arch/x86/kvm/vmx/vmx.c               | 11 ++++-
+ arch/x86/kvm/x86.c                   | 37 +++++++++++----
+ include/linux/kvm_host.h             |  1 +
+ virt/kvm/async_pf.c                  |  6 ++-
+ 14 files changed, 156 insertions(+), 44 deletions(-)
+
+--=20
+2.25.1
 
