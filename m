@@ -2,112 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2FFF11996AC
-	for <lists+kvm@lfdr.de>; Tue, 31 Mar 2020 14:39:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5119119961A
+	for <lists+kvm@lfdr.de>; Tue, 31 Mar 2020 14:16:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730786AbgCaMjb convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Tue, 31 Mar 2020 08:39:31 -0400
-Received: from mga04.intel.com ([192.55.52.120]:34738 "EHLO mga04.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730436AbgCaMjb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 31 Mar 2020 08:39:31 -0400
-IronPort-SDR: HQV7RznpuKrHH4KuKcrDFjE1A3dngekuAaMMzMY18I6AnKn2g12aWbBz3+pZdwmfKUD2Ddr/2C
- yJhAHP9HDLng==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Mar 2020 05:14:40 -0700
-IronPort-SDR: c/jlAASeeo0D7kvxdr2lVtRZVL9ME7VTbiviH+twBhyeGW5bh/L6Rctv5SYK1q1Zy4PcaYbWo0
- OnwnjyEdy7Zw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.72,327,1580803200"; 
-   d="scan'208";a="448652713"
-Received: from fmsmsx105.amr.corp.intel.com ([10.18.124.203])
-  by fmsmga005.fm.intel.com with ESMTP; 31 Mar 2020 05:14:39 -0700
-Received: from fmsmsx117.amr.corp.intel.com (10.18.116.17) by
- FMSMSX105.amr.corp.intel.com (10.18.124.203) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Tue, 31 Mar 2020 05:14:39 -0700
-Received: from shsmsx105.ccr.corp.intel.com (10.239.4.158) by
- fmsmsx117.amr.corp.intel.com (10.18.116.17) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Tue, 31 Mar 2020 05:14:39 -0700
-Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.225]) by
- SHSMSX105.ccr.corp.intel.com ([169.254.11.213]) with mapi id 14.03.0439.000;
- Tue, 31 Mar 2020 20:14:35 +0800
-From:   "Liu, Yi L" <yi.l.liu@intel.com>
-To:     Auger Eric <eric.auger@redhat.com>,
-        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "peterx@redhat.com" <peterx@redhat.com>
-CC:     "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "mst@redhat.com" <mst@redhat.com>,
-        "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "Tian, Jun J" <jun.j.tian@intel.com>,
-        "Sun, Yi Y" <yi.y.sun@intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Wu, Hao" <hao.wu@intel.com>,
-        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
-        Jacob Pan <jacob.jun.pan@linux.intel.com>,
-        Yi Sun <yi.y.sun@linux.intel.com>
-Subject: RE: [PATCH v2 06/22] hw/pci: introduce
- pci_device_set/unset_iommu_context()
-Thread-Topic: [PATCH v2 06/22] hw/pci: introduce
- pci_device_set/unset_iommu_context()
-Thread-Index: AQHWBkpmHXYvTlvRRkmnYpsj2ZFsFqhg3xyAgAG8g4A=
-Date:   Tue, 31 Mar 2020 12:14:35 +0000
-Message-ID: <A2975661238FB949B60364EF0F2C25743A21AE8C@SHSMSX104.ccr.corp.intel.com>
-References: <1585542301-84087-1-git-send-email-yi.l.liu@intel.com>
- <1585542301-84087-7-git-send-email-yi.l.liu@intel.com>
- <01381db5-6f5f-8022-6891-e1a8dd7c3e65@redhat.com>
-In-Reply-To: <01381db5-6f5f-8022-6891-e1a8dd7c3e65@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-version: 11.2.0.6
-dlp-reaction: no-action
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+        id S1730617AbgCaMQe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 31 Mar 2020 08:16:34 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:32517 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1730380AbgCaMQd (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 31 Mar 2020 08:16:33 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1585656992;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=AIkdm1RPzoMJraitwnvvrTQS82YbBm+BBWTAYvOw/a0=;
+        b=V7ygkBjjVC7byuxTLIiu/9ck2JdtrQ2EaL1EAwyB90fy8M0AG/aTVgTb+5EGZgwXPKvDqQ
+        h0qXSdUFKs8JuN2GuVKiiPAwnSS+On0oZXQrEHuObC52nL8HMEZEABvkpOV4CvBmAIt9ze
+        nhMZtuhqfSeIEj6VJYL+U+7VZlRotc4=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-415-WxlveDevNc-sWoiEONYcJQ-1; Tue, 31 Mar 2020 08:16:30 -0400
+X-MC-Unique: WxlveDevNc-sWoiEONYcJQ-1
+Received: by mail-wr1-f70.google.com with SMTP id q14so3297669wro.7
+        for <kvm@vger.kernel.org>; Tue, 31 Mar 2020 05:16:30 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=AIkdm1RPzoMJraitwnvvrTQS82YbBm+BBWTAYvOw/a0=;
+        b=BmDX7Sm5o5scW/EfsiP7M18gBioZD9/95lnIox4JSpIyfhLxoYnSLFuvAWQQx0iWvO
+         f5F6QNBK84NJc1SHga2Ct2ejZmqdWzeAGAkVTGS5u6MwAb4enQ7CZK4NEFnpq0sZ64I9
+         t5GymzhdpKyQYRVAd+JQY1LOg3GVsIAEjOZ6Kdj0k4YUyn0bwbsK5IQB6Hrpu/8R+mng
+         DJTf49DSidrqTn1OL2nUBE+XrC2GHYwBlYkuPkXFm0RCtj0nd9GHgJgAp9B/04VV/Ohk
+         gBlx4UZ2lk2gSt5VRa6ZRAc3n3xv1P343PH+tH2jf38bZLYEK8oi8plJbsaHauggu7vN
+         KpUg==
+X-Gm-Message-State: ANhLgQ3dleVlRxoCUI7Y4iAUEHEaznV3otHDQhUEbFaBOx6mQ7VQnecw
+        sDZK5LQAz18l77tJALFpgDcu7s7bPkJdJRUtr/cK92rPy6y3mDVvL5i30oLRHXU5Q2cQ/HlcpNR
+        pchLsZDEUES54
+X-Received: by 2002:a1c:f409:: with SMTP id z9mr3340246wma.51.1585656989319;
+        Tue, 31 Mar 2020 05:16:29 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vvcbyZLww2LXTEarvjb+E499WK7YYqe/vu5BI2QScvGR8UQClxweAMw8FUdntCdulV276PfnA==
+X-Received: by 2002:a1c:f409:: with SMTP id z9mr3340231wma.51.1585656989082;
+        Tue, 31 Mar 2020 05:16:29 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:b55d:5ed2:8a41:41ea? ([2001:b07:6468:f312:b55d:5ed2:8a41:41ea])
+        by smtp.gmail.com with ESMTPSA id b199sm3939974wme.23.2020.03.31.05.16.28
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 31 Mar 2020 05:16:28 -0700 (PDT)
+Subject: Re: [PATCH 1/3] KVM: x86: introduce kvm_mmu_invalidate_gva
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Junaid Shahid <junaids@google.com>
+References: <20200326093516.24215-1-pbonzini@redhat.com>
+ <20200326093516.24215-2-pbonzini@redhat.com>
+ <20200328182631.GQ8104@linux.intel.com>
+ <2a1f9477-c289-592e-25ff-f22a37044457@redhat.com>
+ <20200330184726.GJ24988@linux.intel.com>
+ <87v9mk24qy.fsf@vitty.brq.redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <bb7b1075-a4fc-e0d3-d8fd-f516d107d5e2@redhat.com>
+Date:   Tue, 31 Mar 2020 14:16:27 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
+In-Reply-To: <87v9mk24qy.fsf@vitty.brq.redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Eric,
+On 31/03/20 12:33, Vitaly Kuznetsov wrote:
+>> Works for me.  My vote is for anything other than guest_mmu :-)
+>
+> Oh come on guys, nobody protested when I called it this way :-)
 
-> From: Auger Eric < eric.auger@redhat.com>
-> Sent: Tuesday, March 31, 2020 1:30 AM
-> To: Liu, Yi L <yi.l.liu@intel.com>; qemu-devel@nongnu.org;
-> Subject: Re: [PATCH v2 06/22] hw/pci: introduce
-> pci_device_set/unset_iommu_context()
-> 
-> Yi,
-> On 3/30/20 6:24 AM, Liu Yi L wrote:
-> > This patch adds pci_device_set/unset_iommu_context() to set/unset
-> > host_iommu_context for a given device. New callback is added in
-> > PCIIOMMUOps. As such, vIOMMU could make use of host IOMMU capability.
-> > e.g setup nested translation.
-> 
-> I think you need to explain what this practically is supposed to do.
-> such as: by attaching such context to a PCI device (for example VFIO
-> assigned?), you tell the host that this PCIe device is protected by a FL
-> stage controlled by the guest or something like that - if this is
-> correct understanding (?) -
+Sure I take full responsibility for that. :)
 
-I'd like to say by attaching such context to a PCI device (for
-example VFIO assigned), this PCIe device is protected by a host
-IOMMU w/ nested-translation capability. Its DMA would be protected
-either through the FL stage controlled by the guest together with
-a SL stage page table owned by host or a single stage page table
-owned by host (e.g. shadow solution). It depends on the choice of
-vIOMMU the pci_device_set/unset_iommu_context() finally pass the
-context to vIOMMU. If vIOMMU binds guest FL stage page table to host,
-then it is prior case. If vIOMMU doesn't, do bind, then it is the
-latter case.
+> Peronally, I don't quite like 'shadow_tdp_mmu' because it doesn't have
+> any particular reference to the fact that it is a nested/L2 related
+> thing (maybe it's just a shadow MMU?)
 
-Regards,
-Yi Liu
+Well, nested virt is the only case in which you shadow TDP.  Both
+interpretations work:
+
+* "shadow tdp_mmu": an MMU for two-dimensional page tables that employs
+shadowing
+
+* "shadow_tdp MMU": the MMU for two-dimensional page tables.
+
+> Also, we already have a thing
+> called 'nested_mmu'... Maybe let's be bold and rename all three things,
+> like
+>
+> root_mmu -> l1_mmu
+> guest_mmu -> l1_nested_mmu
+> nested_mmu -> l2_mmu (l2_walk_mmu)
+
+I am not particularly fond of using l1/l2 outside code that specifically
+deals with nested virt.  Also, l1_nested_mmu is too confusing with
+respect to the current nested_mmu (likewise for root_mmu I would rename
+it to guest_mmu but it would be an awful source of mental confusion as
+well as semantic source code conflicts).
+
+That said, I wouldn't mind replacing nested_mmu to something else, for
+example nested_walk_mmu.
+
+Paolo
 
