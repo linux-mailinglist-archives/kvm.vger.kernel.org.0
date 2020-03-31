@@ -2,220 +2,251 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2D4AC19A065
-	for <lists+kvm@lfdr.de>; Tue, 31 Mar 2020 23:02:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B802719A0FA
+	for <lists+kvm@lfdr.de>; Tue, 31 Mar 2020 23:42:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730556AbgCaVCs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 31 Mar 2020 17:02:48 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:27294 "EHLO
+        id S1731319AbgCaVml (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 31 Mar 2020 17:42:41 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:56883 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727937AbgCaVCs (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 31 Mar 2020 17:02:48 -0400
+        by vger.kernel.org with ESMTP id S1728840AbgCaVmk (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 31 Mar 2020 17:42:40 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1585688567;
+        s=mimecast20190719; t=1585690959;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=evPqw0BJGBHuCQCL5T4N0et8BiAo9jpJbZ01jOkBDm0=;
-        b=GwjdDSk5st09KpCz5GEz4VC518vQI7+pUpGyD4XGdr2ON+32y6Ny45SITiTzT1N56MZT5B
-        fFyJtwnjYDw9QPZQQU6MK4b31wF8bJLJDhT7OSrzSQpb4aRt89+ErbP4oXHkomc8alJiN9
-        87kleKaN2B0Wq/dXMm2VYeckJw3aAWA=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-138-7TTdgZEvO1ullh1oJOBCTw-1; Tue, 31 Mar 2020 17:02:44 -0400
-X-MC-Unique: 7TTdgZEvO1ullh1oJOBCTw-1
-Received: by mail-wm1-f70.google.com with SMTP id p18so1551815wmk.9
-        for <kvm@vger.kernel.org>; Tue, 31 Mar 2020 14:02:43 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=evPqw0BJGBHuCQCL5T4N0et8BiAo9jpJbZ01jOkBDm0=;
-        b=giiVcreancFf0JSzoMXBiiwMRz4WujvVddqPyYErSM/+c0tCopgoh5SOOawZ+b/kMn
-         97Ro8DPdagne1nabOkCYm+qafJUM/QRdCwxSrA31O8lDEenTEB+vpFr5y3n2DcdULeVX
-         QJPf1/orr6IIrmHLbX1wkxFSsH6u3rezgoECTRjxKKu3n3DMKnktA6LCp/Eg679Y+rTq
-         EUg4Jb60mOnpeBUw38rRHHEMNO2wxK8zNFpwnVKYwhC+sQn7nMpXCLRalXo4PX1H9Tju
-         3TNbjg7tiCayX/gVTATFSURdmqQlKdTovOeWBOFdYgmgF1Q3ieVER6X3/R3ofN2vw4dd
-         yWUg==
-X-Gm-Message-State: AGi0PubK57zqWYzD/hAL/oOcFUlCsWJlqEMypU4WeCMJLgwlWCtXr8of
-        aWAkWXik7V1Pp6TKBRpw+Dvid/TOE7XcaTRvh2eg1ey+2TvehPP0d1Mxe1N8k7Giym7sh+8KdTp
-        by2RpfDSv5E1V
-X-Received: by 2002:a1c:2e10:: with SMTP id u16mr682495wmu.143.1585688562733;
-        Tue, 31 Mar 2020 14:02:42 -0700 (PDT)
-X-Google-Smtp-Source: APiQypIooK0PRHXKONQGWQahd0h26HD8mEBMSn4OL4ZdopSUPmYtG+faJNkpTNfQf20UcSWa7iPUMA==
-X-Received: by 2002:a1c:2e10:: with SMTP id u16mr682474wmu.143.1585688562405;
-        Tue, 31 Mar 2020 14:02:42 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:b55d:5ed2:8a41:41ea? ([2001:b07:6468:f312:b55d:5ed2:8a41:41ea])
-        by smtp.gmail.com with ESMTPSA id t81sm5269372wmb.15.2020.03.31.14.02.41
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 31 Mar 2020 14:02:41 -0700 (PDT)
-Subject: Re: [PATCH 2/3] tools/kvm_stat: Add command line switch '-L' to log
- to file
-To:     Stefan Raspl <raspl@linux.ibm.com>, kvm@vger.kernel.org
-References: <20200331200042.2026-1-raspl@linux.ibm.com>
- <20200331200042.2026-3-raspl@linux.ibm.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <fbc8948f-1d68-62b7-1bfb-08a89ae8e01e@redhat.com>
-Date:   Tue, 31 Mar 2020 23:02:41 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+        bh=iSUEPb+08epd9+83km1iAJ00vl6qYc6qO3FrpFZpauo=;
+        b=bNqp/fsq8ql0ICzo25zE++M2g2kF1joz4mzQqVcDT1J2T8MPMsST/OyWtjFKYHUS6WTI+6
+        vpoP1wavnRzC3VoaLbZ6RX+sLvz1WqB3Yq9yj/SrXilAYBdaG3gzlnEDIAfF+Q2YitbyoZ
+        5QOJQETW2ItRxJ9qNOmu7yRBFdw0OUc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-407-WQjfUEW2N36inoIIl3taBg-1; Tue, 31 Mar 2020 17:42:35 -0400
+X-MC-Unique: WQjfUEW2N36inoIIl3taBg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 59733800D6C;
+        Tue, 31 Mar 2020 21:42:34 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-116-15.gru2.redhat.com [10.97.116.15])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 164881001B09;
+        Tue, 31 Mar 2020 21:42:23 +0000 (UTC)
+Subject: Re: [PATCH 2/2] selftests: kvm: Add mem_slot_test test
+To:     Andrew Jones <drjones@redhat.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com,
+        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        david@redhat.com
+References: <20200330204310.21736-1-wainersm@redhat.com>
+ <20200330204310.21736-3-wainersm@redhat.com>
+ <20200331081632.ithcwuzjyjhiwphy@kamzik.brq.redhat.com>
+From:   Wainer dos Santos Moschetta <wainersm@redhat.com>
+Message-ID: <b261aa4f-87d5-2ac8-9f66-9f10e1a0803a@redhat.com>
+Date:   Tue, 31 Mar 2020 18:42:21 -0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-In-Reply-To: <20200331200042.2026-3-raspl@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+In-Reply-To: <20200331081632.ithcwuzjyjhiwphy@kamzik.brq.redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 31/03/20 22:00, Stefan Raspl wrote:
-> From: Stefan Raspl <raspl@de.ibm.com>
-> 
-> To integrate with logrotate, we have a signal handler that will re-open
-> the logfile.
-> Assuming we have a systemd unit file with
->      ExecStart=kvm_stat -dtc -s 10 -L /var/log/kvm_stat.csv
->      ExecReload=/bin/kill -HUP $MAINPID
-> and a logrotate config featuring
->      postrotate
->         /bin/systemctl restart kvm_stat.service
+Hi Andrew,
 
-Does reload work too?
+Nice review. Few comments below.
 
-Regarding the code, I only have a few nits.
+On 3/31/20 5:16 AM, Andrew Jones wrote:
+> On Mon, Mar 30, 2020 at 05:43:10PM -0300, Wainer dos Santos Moschetta wrote:
+>> This patch introduces the mem_slot_test test which checks
+>> an VM can have added memory slots up to the limit defined in
+>> KVM_CAP_NR_MEMSLOTS. Then attempt to add one more slot to
+>> verify it fails as expected.
+>>
+>> Signed-off-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
+>> ---
+>>   tools/testing/selftests/kvm/.gitignore      |  1 +
+>>   tools/testing/selftests/kvm/Makefile        |  3 +
+>>   tools/testing/selftests/kvm/mem_slot_test.c | 92 +++++++++++++++++++++
+>>   3 files changed, 96 insertions(+)
+>>   create mode 100644 tools/testing/selftests/kvm/mem_slot_test.c
+>>
+>> diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
+>> index 30072c3f52fb..b1b94d50f6a2 100644
+>> --- a/tools/testing/selftests/kvm/.gitignore
+>> +++ b/tools/testing/selftests/kvm/.gitignore
+>> @@ -17,3 +17,4 @@
+>>   /clear_dirty_log_test
+>>   /dirty_log_test
+>>   /kvm_create_max_vcpus
+>> +/mem_slot_test
+>> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+>> index d91c53b726e6..070133349403 100644
+>> --- a/tools/testing/selftests/kvm/Makefile
+>> +++ b/tools/testing/selftests/kvm/Makefile
+>> @@ -30,16 +30,19 @@ TEST_GEN_PROGS_x86_64 += x86_64/svm_vmcall_test
+>>   TEST_GEN_PROGS_x86_64 += clear_dirty_log_test
+>>   TEST_GEN_PROGS_x86_64 += dirty_log_test
+>>   TEST_GEN_PROGS_x86_64 += kvm_create_max_vcpus
+>> +TEST_GEN_PROGS_x86_64 += mem_slot_test
+>>   
+>>   TEST_GEN_PROGS_aarch64 += clear_dirty_log_test
+>>   TEST_GEN_PROGS_aarch64 += dirty_log_test
+>>   TEST_GEN_PROGS_aarch64 += kvm_create_max_vcpus
+>> +TEST_GEN_PROGS_aarch64 += mem_slot_test
+>>   
+>>   TEST_GEN_PROGS_s390x = s390x/memop
+>>   TEST_GEN_PROGS_s390x += s390x/sync_regs_test
+>>   TEST_GEN_PROGS_s390x += s390x/resets
+>>   TEST_GEN_PROGS_s390x += dirty_log_test
+>>   TEST_GEN_PROGS_s390x += kvm_create_max_vcpus
+>> +TEST_GEN_PROGS_s390x += mem_slot_test
+>>   
+>>   TEST_GEN_PROGS += $(TEST_GEN_PROGS_$(UNAME_M))
+>>   LIBKVM += $(LIBKVM_$(UNAME_M))
+>> diff --git a/tools/testing/selftests/kvm/mem_slot_test.c b/tools/testing/selftests/kvm/mem_slot_test.c
+>> new file mode 100644
+>> index 000000000000..75d2bbd71642
+>> --- /dev/null
+>> +++ b/tools/testing/selftests/kvm/mem_slot_test.c
+>> @@ -0,0 +1,92 @@
+>> +// SPDX-License-Identifier: GPL-2.0-only
+>> +/*
+>> + * mem_slot_test
+>> + *
+>> + * Copyright (C) 2020, Red Hat, Inc.
+>> + *
+>> + * Test it can be added memory slots up to KVM_CAP_NR_MEMSLOTS, then any
+>> + * tentative to add further slots should fail.
+>> + */
+>> +#define _GNU_SOURCE /* for program_invocation_short_name */
+>> +#include <linux/kvm.h>
+>> +#include <sys/mman.h>
+>> +#include <unistd.h>
+>> +
+>> +#include "test_util.h"
+>> +#include "kvm_util.h"
+>> +
+>> +/* Memory region flags */
+>> +#define MEM_REG_FLAGS KVM_MEM_LOG_DIRTY_PAGES
+>> +
+>> +/* Guest VM mode */
+>> +#define GUEST_VM_MODE VM_MODE_DEFAULT
+> I'm not sure what the value of the two defines above are. I'd prefer we
+> avoid unnecessary renaming. Also, do we need KVM_MEM_LOG_DIRTY_PAGES for
+> this test?
 
+It would be nice to exercise the code by adding slots with different 
+page flags. But for this test that simple checks the limit, the use of 
+KVM_MEM_READONLY is enough. I will change it on v2.
 
-> +            f.write(frmt.get_banner())
-> +            f.write('\n')
-> +        else:
-> +            print(frmt.get_banner())
+>
+>> +
+>> +int main(int argc, char *argv[])
+>> +{
+>> +	struct kvm_vm *vm;
+>> +	/* Maximum allowed number of memory slots */
+>> +	uint32_t max_mem_slots;
+>> +	/* Slot number */
+>> +	uint32_t slot;
+>> +	/* Number of pages in a memory region */
+>> +	uint64_t mem_reg_npages;
+>> +	/* Memory region size */
+>> +	uint64_t mem_reg_size;
+>> +	/* Guest physical memory guest_address */
+>> +	uint64_t guest_addr;
+>> +	/* VM page size */
+>> +	uint64_t vm_page_size;
+> nit: IMO, the variable names above are descriptive enough to drop the
+> comments.
+>
+>> +	int ret;
+>> +
+>> +	max_mem_slots = kvm_check_cap(KVM_CAP_NR_MEMSLOTS);
+>> +	TEST_ASSERT(max_mem_slots > 0,
+>> +		    "KVM_CAP_NR_MEMSLOTS should be greater than 0");
+>> +	DEBUG("Allowed number of memory slots: %i\n", max_mem_slots);
+> DEBUG() no longer exists in kvm/queue. This should now be pr_debug().
+Great. I will rebase my code to kvm/queue...
+>
+>> +
+>> +	vm = vm_create(GUEST_VM_MODE, 0, O_RDWR);
+>> +
+>> +	/* Determine the minimal number of pages as possible per region. */
+>> +	vm_page_size = vm_get_page_size(vm);
+>> +#ifdef __s390x__
+>> +	mem_reg_size = 0x100000;
+>> +#else
+>> +	uint64_t host_page_size = sysconf(_SC_PAGESIZE);
+>> +
+>> +	mem_reg_size = (host_page_size > vm_page_size) ? host_page_size :
+>> +							 vm_page_size;
+>> +#endif
+>> +	mem_reg_npages = mem_reg_size / vm_page_size;
+> On kvm/queue the above 11 lines can now all be done with
+>
+>    mem_reg_size = SOME_ARBITRARY_MEM_REG_SIZE;
+>    mem_reg_npages = vm_calc_num_guest_pages(VM_MODE_DEFAULT, mem_reg_size);
+>
+>> +	guest_addr = 0x0;
+>> +
+>> +	/* Check it can be added memory slots up to the maximum allowed */
+>> +	DEBUG("Adding slots 0..%i, each memory region with %ldK size\n",
+>> +	      (max_mem_slots - 1), mem_reg_size >> 10);
+>> +	for (slot = 0; slot < max_mem_slots; slot++) {
+>> +		vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS,
+>> +					    guest_addr, slot, mem_reg_npages,
+>> +					    MEM_REG_FLAGS);
+>> +		guest_addr += mem_reg_size;
+>> +	}
+>> +
+>> +	/* Check it cannot be added memory slots beyond the limit */
+>> +	guest_addr += mem_reg_size;
+> nit: shouldn't be necessary. We already incremented guest_addr on the
+> last loop.
+Good catch.
+>
+>> +	void *mem = mmap(NULL, mem_reg_size, PROT_READ | PROT_WRITE,
+>> +			 MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+>> +	TEST_ASSERT(mem != NULL, "Failed to mmap() host");
+>> +
+>> +	struct kvm_userspace_memory_region kvm_region = {
+>> +		.slot = slot,
+>> +		.flags = MEM_REG_FLAGS,
+>> +		.guest_phys_addr = guest_addr,
+>> +		.memory_size = mem_reg_size,
+>> +		.userspace_addr = (uint64_t) mem,
+>> +	};
+>> +
+>> +	ret = ioctl(vm_get_fd(vm), KVM_SET_USER_MEMORY_REGION, &kvm_region);
+>> +	TEST_ASSERT(ret == -1, "Adding one more memory slot should fail");
+> Shouldn't we also check that we get the correct errno?
 
-What about
+Good idea.
 
-      print(frmt.get_banner(), file=f or sys.stdout)
+In the kvm API document there isn't any mention to the errno returned 
+but looking at code it seems to be EINVAL for all errors (except for one 
+EEXIST).
 
-> +
-> +    def do_statline(opts):
-> +        statline = frmt.get_statline(keys, stats.get())
-> +        if len(statline) == 0:
-> +            return False
-> +        statline = datetime.now().strftime("%Y-%m-%d %H:%M:%S") + statline
-> +        if opts.log_to_file:
-> +            f.write(statline)
-> +            f.write('\n')
-> +        else:
-> +            print(statline)
+Thanks,
 
-... and likewise here?  (
+Wainer
 
->  
-> +        return True
-> +
-> +    do_banner(opts)
-> +    banner_printed = True
->      while True:
->          try:
->              time.sleep(opts.set_delay)
-> -            if line % banner_repeat == 0 and not banner_printed:
-> -                print(frmt.get_banner())
-> +            if signal_received:
-> +                banner_printed = True
-> +                line = 0
-> +                f.close()
-> +                do_banner(opts)
-> +                signal_received = False
-> +            if (line % banner_repeat == 0 and not banner_printed and
-> +                not (opts.log_to_file and isinstance(frmt, CSVFormat))):
-> +                do_banner(opts)
->                  banner_printed = True
-> -            statline = frmt.get_statline(keys, stats.get())
-> -            if len(statline) == 0:
-> +            if not do_statline(opts):
->                  continue
-> -            print(datetime.now().strftime("%Y-%m-%d %H:%M:%S") + statline)
->              line += 1
->              banner_printed = False
->          except KeyboardInterrupt:
->              break
->  
-> +    if opts.log_to_file:
-> +        f.close()
-
-"if f:"?
-
-> +
-> +
-> +def handle_signal(sig, frame):
-> +    global signal_received
-> +
-> +    signal_received = True
-> +
-> +    return
-> +
->  
->  def is_delay_valid(delay):
->      """Verify delay is in valid value range."""
-> @@ -1652,6 +1703,10 @@ Press any other key to refresh statistics immediately.
->                             default=False,
->                             help='run in logging mode (like vmstat)',
->                             )
-> +    argparser.add_argument('-L', '--log-to-file',
-> +                           type=str,
-> +                           help="like '--log', but logging to a file"
-> +                           )
->      argparser.add_argument('-p', '--pid',
->                             type=int,
->                             default=0,
-> @@ -1675,9 +1730,9 @@ Press any other key to refresh statistics immediately.
->                             help='omit records with all zeros in logging mode',
->                             )
->      options = argparser.parse_args()
-> -    if options.csv and not options.log:
-> +    if options.csv and not (options.log or options.log_to_file):
->          sys.exit('Error: Option -c/--csv requires -l/--log')
-
-"requires -l/-L"?
-
-> -    if options.skip_zero_records and not options.log:
-> +    if options.skip_zero_records and not (options.log or options.log_to_file):
->          sys.exit('Error: Option -z/--skip-zero-records requires -l/--log')
-
-Likewise.
-
->      try:
->          # verify that we were passed a valid regex up front
-> @@ -1758,7 +1813,9 @@ def main():
->          sys.stdout.write('  ' + '\n  '.join(sorted(set(event_list))) + '\n')
->          sys.exit(0)
->  
-> -    if options.log:
-> +    if options.log or options.log_to_file:
-> +        if options.log_to_file:
-> +            signal.signal(signal.SIGHUP, handle_signal)
->          keys = sorted(stats.get().keys())
->          if options.csv:
->              frmt = CSVFormat(keys, options.skip_zero_records)
-> diff --git a/tools/kvm/kvm_stat/kvm_stat.txt b/tools/kvm/kvm_stat/kvm_stat.txt
-> index 24296dccc00a..de7c4a2497f9 100644
-> --- a/tools/kvm/kvm_stat/kvm_stat.txt
-> +++ b/tools/kvm/kvm_stat/kvm_stat.txt
-> @@ -92,6 +92,11 @@ OPTIONS
->  --log::
->          run in logging mode (like vmstat)
->  
-> +
-> +-L::
-> +--log-to-file::
-> +        like '--log', but logging to a file
-
--L<file>:: / --log-to-file=<file>
-
-> +
->  -p<pid>::
->  --pid=<pid>::
->  	limit statistics to one virtual machine (pid)
-> 
+>
+>> +
+>> +	munmap(mem, mem_reg_size);
+>> +	kvm_vm_free(vm);
+>> +
+>> +	return 0;
+>> +}
+>> -- 
+>> 2.17.2
+>>
+> Thanks,
+> drew
 
