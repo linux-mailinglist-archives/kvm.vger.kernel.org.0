@@ -2,43 +2,44 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D23511996DA
-	for <lists+kvm@lfdr.de>; Tue, 31 Mar 2020 14:54:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4EBCC1996E4
+	for <lists+kvm@lfdr.de>; Tue, 31 Mar 2020 14:57:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730660AbgCaMyg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 31 Mar 2020 08:54:36 -0400
-Received: from mga14.intel.com ([192.55.52.115]:3913 "EHLO mga14.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730543AbgCaMyf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 31 Mar 2020 08:54:35 -0400
-IronPort-SDR: OTzpRK5maPDEKmB9CYq4QOw0RnYUbafAswjnADPsRMOY/tKKEY0X2ClY3epphvQXT1QTvL9OS+
- HfH6014SUvng==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Mar 2020 05:54:34 -0700
-IronPort-SDR: 0HXOpwlZ2XFefLe4jje/KEyjzynJwZg1ZQUl4xe1XN2aHLEW4GOViym4P45Hese37DcWgTYU0I
- r4BfggOqJtIw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.72,327,1580803200"; 
-   d="scan'208";a="267273472"
-Received: from fmsmsx108.amr.corp.intel.com ([10.18.124.206])
-  by orsmga002.jf.intel.com with ESMTP; 31 Mar 2020 05:54:32 -0700
-Received: from fmsmsx121.amr.corp.intel.com (10.18.125.36) by
- FMSMSX108.amr.corp.intel.com (10.18.124.206) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Tue, 31 Mar 2020 05:54:14 -0700
-Received: from shsmsx108.ccr.corp.intel.com (10.239.4.97) by
- fmsmsx121.amr.corp.intel.com (10.18.125.36) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Tue, 31 Mar 2020 05:54:14 -0700
-Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.225]) by
- SHSMSX108.ccr.corp.intel.com ([169.254.8.7]) with mapi id 14.03.0439.000;
- Tue, 31 Mar 2020 20:54:10 +0800
-From:   "Liu, Yi L" <yi.l.liu@intel.com>
-To:     Auger Eric <eric.auger@redhat.com>,
+        id S1730811AbgCaM5n (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 31 Mar 2020 08:57:43 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:45439 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1730710AbgCaM5m (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 31 Mar 2020 08:57:42 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1585659460;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=y6JMjvAf9MgeR+kO4xS912mPPXk3cw/VuCauhh/9zl8=;
+        b=VGaUe9QXx3rUJtxHeHruxDrI8xhcc/lae8436CieIH++EE6aIeArh7TZqhXIHkC71VKqSN
+        oALRMwRAM8nhoKCd+iNR2VPirgk2GCbEtGXYDyu49aW+MX53wYrh1UvhwK/RN2A1jeGx3i
+        6slHe77cU+NHhWxrc/0oF4D5K+kwnk4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-361-38MoiPtnOQan7yypvdaTTQ-1; Tue, 31 Mar 2020 08:57:38 -0400
+X-MC-Unique: 38MoiPtnOQan7yypvdaTTQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2AC2418C8C03;
+        Tue, 31 Mar 2020 12:57:36 +0000 (UTC)
+Received: from [10.36.112.58] (ovpn-112-58.ams2.redhat.com [10.36.112.58])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 7F17919C58;
+        Tue, 31 Mar 2020 12:57:24 +0000 (UTC)
+Subject: Re: [PATCH v2 07/22] intel_iommu: add set/unset_iommu_context
+ callback
+To:     "Liu, Yi L" <yi.l.liu@intel.com>,
         "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
         "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
         "peterx@redhat.com" <peterx@redhat.com>
-CC:     "pbonzini@redhat.com" <pbonzini@redhat.com>,
+Cc:     "pbonzini@redhat.com" <pbonzini@redhat.com>,
         "mst@redhat.com" <mst@redhat.com>,
         "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>,
         "Tian, Kevin" <kevin.tian@intel.com>,
@@ -48,167 +49,239 @@ CC:     "pbonzini@redhat.com" <pbonzini@redhat.com>,
         "Wu, Hao" <hao.wu@intel.com>,
         "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
         Jacob Pan <jacob.jun.pan@linux.intel.com>,
-        Yi Sun <yi.y.sun@linux.intel.com>
-Subject: RE: [PATCH v2 08/22] vfio/common: provide PASID alloc/free hooks
-Thread-Topic: [PATCH v2 08/22] vfio/common: provide PASID alloc/free hooks
-Thread-Index: AQHWBkpiGmk8cmt3gUmACGVeg+XtIahiAOgAgACGbQD//4FmgIAAnsjg
-Date:   Tue, 31 Mar 2020 12:54:10 +0000
-Message-ID: <A2975661238FB949B60364EF0F2C25743A21AFD5@SHSMSX104.ccr.corp.intel.com>
+        Yi Sun <yi.y.sun@linux.intel.com>,
+        Richard Henderson <rth@twiddle.net>,
+        Eduardo Habkost <ehabkost@redhat.com>
 References: <1585542301-84087-1-git-send-email-yi.l.liu@intel.com>
- <1585542301-84087-9-git-send-email-yi.l.liu@intel.com>
- <e6d9a5bc-fd54-c220-067d-0597ad8e86fc@redhat.com>
- <A2975661238FB949B60364EF0F2C25743A21AD6D@SHSMSX104.ccr.corp.intel.com>
- <ebd5b8ab-c3b8-87a7-d1cb-2a4c9c02fa61@redhat.com>
-In-Reply-To: <ebd5b8ab-c3b8-87a7-d1cb-2a4c9c02fa61@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-version: 11.2.0.6
-dlp-reaction: no-action
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+ <1585542301-84087-8-git-send-email-yi.l.liu@intel.com>
+ <a444318b-32c7-d43c-112a-d35a870b162d@redhat.com>
+ <A2975661238FB949B60364EF0F2C25743A21AF24@SHSMSX104.ccr.corp.intel.com>
+From:   Auger Eric <eric.auger@redhat.com>
+Message-ID: <0c9ed7c3-6d09-adac-a478-52bff476f804@redhat.com>
+Date:   Tue, 31 Mar 2020 14:57:22 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
+In-Reply-To: <A2975661238FB949B60364EF0F2C25743A21AF24@SHSMSX104.ccr.corp.intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-SGkgRXJpYywNCg0KPiBGcm9tOiBBdWdlciBFcmljIDxlcmljLmF1Z2VyQHJlZGhhdC5jb20+DQo+
-IFNlbnQ6IFR1ZXNkYXksIE1hcmNoIDMxLCAyMDIwIDc6MTYgUE0NCj4gVG86IExpdSwgWWkgTCA8
-eWkubC5saXVAaW50ZWwuY29tPjsgcWVtdS1kZXZlbEBub25nbnUub3JnOw0KPiBTdWJqZWN0OiBS
-ZTogW1BBVENIIHYyIDA4LzIyXSB2ZmlvL2NvbW1vbjogcHJvdmlkZSBQQVNJRCBhbGxvYy9mcmVl
-IGhvb2tzDQo+IA0KPiBIaSBZaSwNCj4gT24gMy8zMS8yMCAxMjo1OSBQTSwgTGl1LCBZaSBMIHdy
-b3RlOg0KPiA+IEhpIEVyaWMsDQo+ID4NCj4gPj4gRnJvbTogQXVnZXIgRXJpYw0KPiA+PiBTZW50
-OiBUdWVzZGF5LCBNYXJjaCAzMSwgMjAyMCA2OjQ4IFBNDQo+ID4+IFRvOiBMaXUsIFlpIEwgPHlp
-LmwubGl1QGludGVsLmNvbT47IHFlbXUtZGV2ZWxAbm9uZ251Lm9yZzsNCj4gPj4gYWxleC53aWxs
-aWFtc29uQHJlZGhhdC5jb207IHBldGVyeEByZWRoYXQuY29tDQo+ID4+IENjOiBwYm9uemluaUBy
-ZWRoYXQuY29tOyBtc3RAcmVkaGF0LmNvbTsgZGF2aWRAZ2lic29uLmRyb3BiZWFyLmlkLmF1OyBU
-aWFuLA0KPiA+PiBLZXZpbiA8a2V2aW4udGlhbkBpbnRlbC5jb20+OyBUaWFuLCBKdW4gSiA8anVu
-LmoudGlhbkBpbnRlbC5jb20+OyBTdW4sIFlpIFkNCj4gPj4gPHlpLnkuc3VuQGludGVsLmNvbT47
-IGt2bUB2Z2VyLmtlcm5lbC5vcmc7IFd1LCBIYW8gPGhhby53dUBpbnRlbC5jb20+Ow0KPiBqZWFu
-LQ0KPiA+PiBwaGlsaXBwZUBsaW5hcm8ub3JnOyBKYWNvYiBQYW4gPGphY29iLmp1bi5wYW5AbGlu
-dXguaW50ZWwuY29tPjsgWWkgU3VuDQo+ID4+IDx5aS55LnN1bkBsaW51eC5pbnRlbC5jb20+DQo+
-ID4+IFN1YmplY3Q6IFJlOiBbUEFUQ0ggdjIgMDgvMjJdIHZmaW8vY29tbW9uOiBwcm92aWRlIFBB
-U0lEIGFsbG9jL2ZyZWUgaG9va3MNCj4gPj4NCj4gPj4gWWksDQo+ID4+DQo+ID4+IE9uIDMvMzAv
-MjAgNjoyNCBBTSwgTGl1IFlpIEwgd3JvdGU6DQo+ID4+PiBUaGlzIHBhdGNoIGRlZmluZXMgdmZp
-b19ob3N0X2lvbW11X2NvbnRleHRfaW5mbywgaW1wbGVtZW50cyB0aGUgUEFTSUQNCj4gPj4+IGFs
-bG9jL2ZyZWUgaG9va3MgZGVmaW5lZCBpbiBIb3N0SU9NTVVDb250ZXh0Q2xhc3MuDQo+ID4+Pg0K
-PiA+Pj4gQ2M6IEtldmluIFRpYW4gPGtldmluLnRpYW5AaW50ZWwuY29tPg0KPiA+Pj4gQ2M6IEph
-Y29iIFBhbiA8amFjb2IuanVuLnBhbkBsaW51eC5pbnRlbC5jb20+DQo+ID4+PiBDYzogUGV0ZXIg
-WHUgPHBldGVyeEByZWRoYXQuY29tPg0KPiA+Pj4gQ2M6IEVyaWMgQXVnZXIgPGVyaWMuYXVnZXJA
-cmVkaGF0LmNvbT4NCj4gPj4+IENjOiBZaSBTdW4gPHlpLnkuc3VuQGxpbnV4LmludGVsLmNvbT4N
-Cj4gPj4+IENjOiBEYXZpZCBHaWJzb24gPGRhdmlkQGdpYnNvbi5kcm9wYmVhci5pZC5hdT4NCj4g
-Pj4+IENjOiBBbGV4IFdpbGxpYW1zb24gPGFsZXgud2lsbGlhbXNvbkByZWRoYXQuY29tPg0KPiA+
-Pj4gU2lnbmVkLW9mZi1ieTogTGl1IFlpIEwgPHlpLmwubGl1QGludGVsLmNvbT4NCj4gPj4+IC0t
-LQ0KPiA+Pj4gIGh3L3ZmaW8vY29tbW9uLmMgICAgICAgICAgICAgICAgICAgICAgfCA2OQ0KPiAr
-KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKw0KPiA+Pj4gIGluY2x1ZGUvaHcvaW9t
-bXUvaG9zdF9pb21tdV9jb250ZXh0LmggfCAgMyArKw0KPiA+Pj4gIGluY2x1ZGUvaHcvdmZpby92
-ZmlvLWNvbW1vbi5oICAgICAgICAgfCAgNCArKw0KPiA+Pj4gIDMgZmlsZXMgY2hhbmdlZCwgNzYg
-aW5zZXJ0aW9ucygrKQ0KPiA+Pj4NCj4gPj4+IGRpZmYgLS1naXQgYS9ody92ZmlvL2NvbW1vbi5j
-IGIvaHcvdmZpby9jb21tb24uYyBpbmRleA0KPiA+Pj4gYzI3NjczMi4uNWYzNTM0ZCAxMDA2NDQN
-Cj4gPj4+IC0tLSBhL2h3L3ZmaW8vY29tbW9uLmMNCj4gPj4+ICsrKyBiL2h3L3ZmaW8vY29tbW9u
-LmMNCj4gPj4+IEBAIC0xMTc5LDYgKzExNzksNTMgQEAgc3RhdGljIGludCB2ZmlvX2dldF9pb21t
-dV90eXBlKFZGSU9Db250YWluZXINCj4gPj4gKmNvbnRhaW5lciwNCj4gPj4+ICAgICAgcmV0dXJu
-IC1FSU5WQUw7DQo+ID4+PiAgfQ0KPiA+Pj4NCj4gPj4+ICtzdGF0aWMgaW50IHZmaW9faG9zdF9p
-b21tdV9jdHhfcGFzaWRfYWxsb2MoSG9zdElPTU1VQ29udGV4dCAqaW9tbXVfY3R4LA0KPiA+Pj4g
-KyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB1aW50MzJfdCBtaW4s
-IHVpbnQzMl90IG1heCwNCj4gPj4+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgdWludDMyX3QgKnBhc2lkKSB7DQo+ID4+PiArICAgIFZGSU9Db250YWluZXIgKmNv
-bnRhaW5lciA9IGNvbnRhaW5lcl9vZihpb21tdV9jdHgsDQo+ID4+PiArICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICBWRklPQ29udGFpbmVyLCBpb21tdV9jdHgpOw0K
-PiA+Pj4gKyAgICBzdHJ1Y3QgdmZpb19pb21tdV90eXBlMV9wYXNpZF9yZXF1ZXN0IHJlcTsNCj4g
-Pj4+ICsgICAgdW5zaWduZWQgbG9uZyBhcmdzejsNCj4gPj4geW91IGNhbiBlYXNpbHkgYXZvaWQg
-dXNpbmcgYXJnc3ogdmFyaWFibGUNCj4gPg0KPiA+IG9oLCByaWdodC4gOi0pDQo+ID4NCj4gPj4+
-ICsgICAgaW50IHJldDsNCj4gPj4+ICsNCj4gPj4+ICsgICAgYXJnc3ogPSBzaXplb2YocmVxKTsN
-Cj4gPj4+ICsgICAgcmVxLmFyZ3N6ID0gYXJnc3o7DQo+ID4+PiArICAgIHJlcS5mbGFncyA9IFZG
-SU9fSU9NTVVfUEFTSURfQUxMT0M7DQo+ID4+PiArICAgIHJlcS5hbGxvY19wYXNpZC5taW4gPSBt
-aW47DQo+ID4+PiArICAgIHJlcS5hbGxvY19wYXNpZC5tYXggPSBtYXg7DQo+ID4+PiArDQo+ID4+
-PiArICAgIGlmIChpb2N0bChjb250YWluZXItPmZkLCBWRklPX0lPTU1VX1BBU0lEX1JFUVVFU1Qs
-ICZyZXEpKSB7DQo+ID4+PiArICAgICAgICByZXQgPSAtZXJybm87DQo+ID4+PiArICAgICAgICBl
-cnJvcl9yZXBvcnQoIiVzOiAlZCwgYWxsb2MgZmFpbGVkIiwgX19mdW5jX18sIHJldCk7DQo+ID4+
-IGJldHRlciB1c2UgJW0gZGlyZWN0bHkgb3Igc3RyZXJyb3IoZXJybm8pIGFsc28gaW5jbHVkZSB2
-YmFzZWRldi0+bmFtZT8NCj4gPg0KPiA+IG9yIHllcywgdmJhc2VkZXYtPm5hbWUgaXMgYWxzbyBu
-aWNlIHRvIGhhdmUuDQo+ID4NCj4gPj4+ICsgICAgICAgIHJldHVybiByZXQ7DQo+ID4+PiArICAg
-IH0NCj4gPj4+ICsgICAgKnBhc2lkID0gcmVxLmFsbG9jX3Bhc2lkLnJlc3VsdDsNCj4gPj4+ICsg
-ICAgcmV0dXJuIDA7DQo+ID4+PiArfQ0KPiA+Pj4gKw0KPiA+Pj4gK3N0YXRpYyBpbnQgdmZpb19o
-b3N0X2lvbW11X2N0eF9wYXNpZF9mcmVlKEhvc3RJT01NVUNvbnRleHQgKmlvbW11X2N0eCwNCj4g
-Pj4+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB1aW50MzJfdCBw
-YXNpZCkgew0KPiA+Pj4gKyAgICBWRklPQ29udGFpbmVyICpjb250YWluZXIgPSBjb250YWluZXJf
-b2YoaW9tbXVfY3R4LA0KPiA+Pj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgVkZJT0NvbnRhaW5lciwgaW9tbXVfY3R4KTsNCj4gPj4+ICsgICAgc3RydWN0IHZm
-aW9faW9tbXVfdHlwZTFfcGFzaWRfcmVxdWVzdCByZXE7DQo+ID4+PiArICAgIHVuc2lnbmVkIGxv
-bmcgYXJnc3o7DQo+ID4+IHNhbWUNCj4gPg0KPiA+IGdvdCBpdC4NCj4gPg0KPiA+Pj4gKyAgICBp
-bnQgcmV0Ow0KPiA+Pj4gKw0KPiA+Pj4gKyAgICBhcmdzeiA9IHNpemVvZihyZXEpOw0KPiA+Pj4g
-KyAgICByZXEuYXJnc3ogPSBhcmdzejsNCj4gPj4+ICsgICAgcmVxLmZsYWdzID0gVkZJT19JT01N
-VV9QQVNJRF9GUkVFOw0KPiA+Pj4gKyAgICByZXEuZnJlZV9wYXNpZCA9IHBhc2lkOw0KPiA+Pj4g
-Kw0KPiA+Pj4gKyAgICBpZiAoaW9jdGwoY29udGFpbmVyLT5mZCwgVkZJT19JT01NVV9QQVNJRF9S
-RVFVRVNULCAmcmVxKSkgew0KPiA+Pj4gKyAgICAgICAgcmV0ID0gLWVycm5vOw0KPiA+Pj4gKyAg
-ICAgICAgZXJyb3JfcmVwb3J0KCIlczogJWQsIGZyZWUgZmFpbGVkIiwgX19mdW5jX18sIHJldCk7
-DQo+ID4+IHNhbWUNCj4gPg0KPiA+IHllcC4NCj4gPj4+ICsgICAgICAgIHJldHVybiByZXQ7DQo+
-ID4+PiArICAgIH0NCj4gPj4+ICsgICAgcmV0dXJuIDA7DQo+ID4+PiArfQ0KPiA+Pj4gKw0KPiA+
-Pj4gIHN0YXRpYyBpbnQgdmZpb19pbml0X2NvbnRhaW5lcihWRklPQ29udGFpbmVyICpjb250YWlu
-ZXIsIGludCBncm91cF9mZCwNCj4gPj4+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-RXJyb3IgKiplcnJwKSAgeyBAQCAtMTc5MSwzICsxODM4LDI1DQo+ID4+PiBAQCBpbnQgdmZpb19l
-ZWhfYXNfb3AoQWRkcmVzc1NwYWNlICphcywgdWludDMyX3Qgb3ApDQo+ID4+PiAgICAgIH0NCj4g
-Pj4+ICAgICAgcmV0dXJuIHZmaW9fZWVoX2NvbnRhaW5lcl9vcChjb250YWluZXIsIG9wKTsgIH0N
-Cj4gPj4+ICsNCj4gPj4+ICtzdGF0aWMgdm9pZCB2ZmlvX2hvc3RfaW9tbXVfY29udGV4dF9jbGFz
-c19pbml0KE9iamVjdENsYXNzICprbGFzcywNCj4gPj4+ICsgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgdm9pZCAqZGF0YSkgew0KPiA+Pj4gKyAg
-ICBIb3N0SU9NTVVDb250ZXh0Q2xhc3MgKmhpY3hjID0gSE9TVF9JT01NVV9DT05URVhUX0NMQVNT
-KGtsYXNzKTsNCj4gPj4+ICsNCj4gPj4+ICsgICAgaGljeGMtPnBhc2lkX2FsbG9jID0gdmZpb19o
-b3N0X2lvbW11X2N0eF9wYXNpZF9hbGxvYzsNCj4gPj4+ICsgICAgaGljeGMtPnBhc2lkX2ZyZWUg
-PSB2ZmlvX2hvc3RfaW9tbXVfY3R4X3Bhc2lkX2ZyZWU7IH0NCj4gPj4+ICsNCj4gPj4+ICtzdGF0
-aWMgY29uc3QgVHlwZUluZm8gdmZpb19ob3N0X2lvbW11X2NvbnRleHRfaW5mbyA9IHsNCj4gPj4+
-ICsgICAgLnBhcmVudCA9IFRZUEVfSE9TVF9JT01NVV9DT05URVhULA0KPiA+Pj4gKyAgICAubmFt
-ZSA9IFRZUEVfVkZJT19IT1NUX0lPTU1VX0NPTlRFWFQsDQo+ID4+PiArICAgIC5jbGFzc19pbml0
-ID0gdmZpb19ob3N0X2lvbW11X2NvbnRleHRfY2xhc3NfaW5pdCwNCj4gPj4gQWggT0sNCj4gPj4N
-Cj4gPj4gVGhpcyBpcyB0aGUgb2JqZWN0IGluaGVyaXRpbmcgZnJvbSB0aGUgYWJzdHJhY3QgVFlQ
-RV9IT1NUX0lPTU1VX0NPTlRFWFQuDQo+ID4NCj4gPiB5ZXMuIGl0IGlzLiA6LSkNCj4gPg0KPiA+
-PiBJIGluaXRpYWxseSB0aG91Z2h0IFZUREhvc3RJT01NVUNvbnRleHQgd2FzLCBzb3JyeSBmb3Ig
-dGhlIG1pc3VuZGVyc3RhbmRpbmcuDQo+ID4NCj4gPiBBaCwgbXkgZmF1bHQsIHNob3VsZCBoYXZl
-IGdvdCBpdCBlYXJsaWVyLiBzbyB3ZSBtYXkgaGF2ZSBqdXN0IGFsaWduZWQNCj4gPiBpbiBsYXN0
-IE9jdC4NCj4gPg0KPiA+PiBEbyB5b3UgZXhwZWN0IG90aGVyIEhvc3RJT01NVUNvbnRleHQgYmFj
-a2VuZHM/IEdpdmVuIHRoZSBuYW1lIGFuZCBvcHMsIGl0DQo+ID4+IGxvb2tzIHJlYWxseSByZWxh
-dGVkIHRvIFZGSU8/DQo+ID4NCj4gPiBGb3Igb3RoZXIgYmFja2VuZHMsIEkgZ3Vlc3MgeW91IG1l
-YW4gb3RoZXIgcGFzc3RocnUgbW9kdWxlcz8gSWYgeWVzLCBJDQo+ID4gdGhpbmsgdGhleSBzaG91
-bGQgaGF2ZSB0aGVpciBvd24gdHlwZSBuYW1lLiBKdXN0IGxpa2UgdklPTU1VcywgdGhlIGJlbG93
-DQo+ID4gdklPTU1VcyBkZWZpbmVzIHRoZWlyIG93biB0eXBlIG5hbWUgYW5kIGluaGVyaXRzIHRo
-ZSBzYW1lIHBhcmVudC4NCj4gPg0KPiA+IHN0YXRpYyBjb25zdCBUeXBlSW5mbyB2dGRfaW9tbXVf
-bWVtb3J5X3JlZ2lvbl9pbmZvID0gew0KPiA+ICAgICAucGFyZW50ID0gVFlQRV9JT01NVV9NRU1P
-UllfUkVHSU9OLA0KPiA+ICAgICAubmFtZSA9IFRZUEVfSU5URUxfSU9NTVVfTUVNT1JZX1JFR0lP
-TiwNCj4gPiAgICAgLmNsYXNzX2luaXQgPSB2dGRfaW9tbXVfbWVtb3J5X3JlZ2lvbl9jbGFzc19p
-bml0LA0KPiA+IH07DQo+ID4NCj4gPiBzdGF0aWMgY29uc3QgVHlwZUluZm8gc21tdXYzX2lvbW11
-X21lbW9yeV9yZWdpb25faW5mbyA9IHsNCj4gPiAgICAgLnBhcmVudCA9IFRZUEVfSU9NTVVfTUVN
-T1JZX1JFR0lPTiwNCj4gPiAgICAgLm5hbWUgPSBUWVBFX1NNTVVWM19JT01NVV9NRU1PUllfUkVH
-SU9OLA0KPiA+ICAgICAuY2xhc3NfaW5pdCA9IHNtbXV2M19pb21tdV9tZW1vcnlfcmVnaW9uX2Ns
-YXNzX2luaXQsDQo+ID4gfTsNCj4gPg0KPiA+IHN0YXRpYyBjb25zdCBUeXBlSW5mbyBhbWR2aV9p
-b21tdV9tZW1vcnlfcmVnaW9uX2luZm8gPSB7DQo+ID4gICAgIC5wYXJlbnQgPSBUWVBFX0lPTU1V
-X01FTU9SWV9SRUdJT04sDQo+ID4gICAgIC5uYW1lID0gVFlQRV9BTURfSU9NTVVfTUVNT1JZX1JF
-R0lPTiwNCj4gPiAgICAgLmNsYXNzX2luaXQgPSBhbWR2aV9pb21tdV9tZW1vcnlfcmVnaW9uX2Ns
-YXNzX2luaXQsDQo+ID4gfTsNCj4gU29ycnkgSSBhbSBjb25mdXNlZCBub3cuDQoNClRoZSB0aHJl
-ZSBhYm92ZSBkZWZpbml0aW9uIGFyZSBqdXN0IGFzIGFuIGV4YW1wbGUuIEp1c3Qgd2FudCB0byBl
-eHBsYWluDQp3aGF0IG1vZGVsIEknbSByZWZlcmVuY2luZy4gOi0pDQoNCj4gWW91IGRvbid0IGhh
-dmUgc3VjaCBraW5kIG9mIGluaGVyaXRhbmNlIGF0IHRoZSBtb21lbnQgaW4geW91ciBzZXJpZXMu
-DQoNCnllcywgb25seSB2ZmlvIGluaGVyaXRzIEhvc3RJT01NVUNvbnRleHQsIG5vIG90aGVyIG1v
-ZHVsZSBpbmhlcml0cy4NCkJ1dCBJIHdhbnQgdG8gc2hvdyBhIGNhc2UgaW4gd2hpY2ggdGhlcmUg
-YXJlIG11bHRpcGxlIG1vZHVsZSBpbmhlcml0cw0Kb25lIHNpbmdsZSBwYXJlbnQuIEp1c3QgbGFj
-ayBhIHZmaW8gZXF1aXZhbGVudCBtb2R1bGUgdG8gc2hvdyBpdC4gU28NCkkgdXNlZCB0aGUgaW9t
-bXVfbWVtb3J5X3JlZ2lvbiBleGFtcGxlLiBzb3JyeSB0byBjb25mdXNlIHlvdS4NCg0KPiANCj4g
-WW91IGhhdmUgYW4gYWJzdHJhY3Qgb2JqZWN0IChUWVBFX0hPU1RfSU9NTVVfQ09OVEVYVCwgSG9z
-dElPTU1VQ29udGV4dCkNCj4gd2hpY2ggaXMgZGVyaXZlZCBpbnRvIFRZUEVfVkZJT19IT1NUX0lP
-TU1VX0NPTlRFWFQuIE9ubHkgdGhlIGNsYXNzIG9wcw0KPiBhcmUgc3BlY2lhbGl6ZWQgZm9yIFZG
-SU8uIEJ1dCBJIGRvIG5vdCBmb3Jlc2VlIGFueSBvdGhlciB1c2VyIHRoYW4gVkZJTw0KPiAoaWUu
-IG90aGVyIGltcGxlbWVudGVycyBvZiB0aGUgY2xhc3Mgb3BzKSwgaGVuY2UgbXkgcXVlc3Rpb24u
-IEZvcg0KPiBpbnN0YW5jZSB3b3VsZCB2aXJ0aW8vdmhvc3QgZXZlciBpbXBsZW1lbnQgaXRzIFRZ
-UEVfSE9TVF9JT01NVV9DT05URVhULg0KDQpJIGRvbid0IGtub3cgZWl0aGVyLiBCdXQgSSB0aGlu
-ayBpdCdzIHBvc3NpYmxlLiBUaGV5IGNhbiBkbyBpdCBwZXIgdGhlaXINCm5lZWQgaW4gZnV0dXJl
-Lg0KDQo+IE9uIHRoZSBvdGhlciBoYW5kIHlvdSBoYXZlIFZUREhvc3RJT01NVUNvbnRleHQgd2hp
-Y2ggaXMgbm90IGEgUU9NDQo+IGRlcml2ZWQgb2JqZWN0Lg0KDQpPaywgSSBndWVzcyBJIG1hZGUg
-eW91IGJlbGlldmUgYm90aCB2ZmlvIGFuZCB2SU9NTVUgd2lsbCBpbmhlcml0IHRoZQ0KSG9zdElP
-TU1VQ29udGV4dCBub3cuIGlzIGl0Pw0KDQpBY3R1YWxseSwgaXQncyBub3QuIE9ubHkgdmZpbyBp
-bmhlcml0cyBIb3N0SU9NTVVDb250ZXh0IGluIFFPTSBtYW5uZXIuDQpGb3IgdGhlIFZUREhvc3RJ
-T01NVUNvbnRleHQsIGl0J3MganVzdCByZWZlcmVuY2luZyB0aGUgSG9zdElPTU1VQ29udGV4dA0K
-d2hpY2ggaXMgaW5pdGlhbGl6ZWQgYnkgdmZpby4NCg0KUmVnYXJkcywNCllpIExpdQ0K
+Hi Yi,
+
+On 3/31/20 2:25 PM, Liu, Yi L wrote:
+> Hi Eric,
+> 
+>> From: Auger Eric < eric.auger@redhat.com>
+>> Sent: Tuesday, March 31, 2020 4:24 AM
+>> To: Liu, Yi L <yi.l.liu@intel.com>; qemu-devel@nongnu.org;
+>> Subject: Re: [PATCH v2 07/22] intel_iommu: add set/unset_iommu_context callback
+>>
+>> Yi,
+>>
+>> On 3/30/20 6:24 AM, Liu Yi L wrote:
+>>> This patch adds set/unset_iommu_context() impelementation in Intel
+>> This patch implements the set/unset_iommu_context() ops for Intel vIOMMU.
+>>> vIOMMU. For Intel platform, pass-through modules (e.g. VFIO) could
+>>> set HostIOMMUContext to Intel vIOMMU emulator.
+>>>
+>>> Cc: Kevin Tian <kevin.tian@intel.com>
+>>> Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
+>>> Cc: Peter Xu <peterx@redhat.com>
+>>> Cc: Yi Sun <yi.y.sun@linux.intel.com>
+>>> Cc: Paolo Bonzini <pbonzini@redhat.com>
+>>> Cc: Richard Henderson <rth@twiddle.net>
+>>> Cc: Eduardo Habkost <ehabkost@redhat.com>
+>>> Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
+>>> ---
+>>>  hw/i386/intel_iommu.c         | 71
+>> ++++++++++++++++++++++++++++++++++++++++---
+>>>  include/hw/i386/intel_iommu.h | 21 ++++++++++---
+>>>  2 files changed, 83 insertions(+), 9 deletions(-)
+>>>
+>>> diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+>>> index 4b22910..fd349c6 100644
+>>> --- a/hw/i386/intel_iommu.c
+>>> +++ b/hw/i386/intel_iommu.c
+>>> @@ -3354,23 +3354,33 @@ static const MemoryRegionOps vtd_mem_ir_ops = {
+>>>      },
+>>>  };
+>>>
+>>> -VTDAddressSpace *vtd_find_add_as(IntelIOMMUState *s, PCIBus *bus, int devfn)
+>>> +/**
+>>> + * Fetch a VTDBus instance for given PCIBus. If no existing instance,
+>>> + * allocate one.
+>>> + */
+>>> +static VTDBus *vtd_find_add_bus(IntelIOMMUState *s, PCIBus *bus)
+>>>  {
+>>>      uintptr_t key = (uintptr_t)bus;
+>>>      VTDBus *vtd_bus = g_hash_table_lookup(s->vtd_as_by_busptr, &key);
+>>> -    VTDAddressSpace *vtd_dev_as;
+>>> -    char name[128];
+>>>
+>>>      if (!vtd_bus) {
+>>>          uintptr_t *new_key = g_malloc(sizeof(*new_key));
+>>>          *new_key = (uintptr_t)bus;
+>>>          /* No corresponding free() */
+>>> -        vtd_bus = g_malloc0(sizeof(VTDBus) + sizeof(VTDAddressSpace *) * \
+>>> -                            PCI_DEVFN_MAX);
+>>> +        vtd_bus = g_malloc0(sizeof(VTDBus));
+>>>          vtd_bus->bus = bus;
+>>>          g_hash_table_insert(s->vtd_as_by_busptr, new_key, vtd_bus);
+>>>      }
+>>> +    return vtd_bus;
+>>> +}
+>>>
+>>> +VTDAddressSpace *vtd_find_add_as(IntelIOMMUState *s, PCIBus *bus, int devfn)
+>>> +{
+>>> +    VTDBus *vtd_bus;
+>>> +    VTDAddressSpace *vtd_dev_as;
+>>> +    char name[128];
+>>> +
+>>> +    vtd_bus = vtd_find_add_bus(s, bus);
+>>>      vtd_dev_as = vtd_bus->dev_as[devfn];
+>>>
+>>>      if (!vtd_dev_as) {
+>>> @@ -3436,6 +3446,55 @@ VTDAddressSpace
+>> *vtd_find_add_as(IntelIOMMUState *s, PCIBus *bus, int devfn)
+>>>      return vtd_dev_as;
+>>>  }
+>>>
+>>> +static int vtd_dev_set_iommu_context(PCIBus *bus, void *opaque,
+>>> +                                     int devfn,
+>>> +                                     HostIOMMUContext *iommu_ctx)
+>>> +{
+>>> +    IntelIOMMUState *s = opaque;
+>>> +    VTDBus *vtd_bus;
+>>> +    VTDHostIOMMUContext *vtd_dev_icx;
+>>> +
+>>> +    assert(0 <= devfn && devfn < PCI_DEVFN_MAX);
+>>> +
+>>> +    vtd_bus = vtd_find_add_bus(s, bus);
+>>> +
+>>> +    vtd_iommu_lock(s);
+>>> +
+>>> +    vtd_dev_icx = vtd_bus->dev_icx[devfn];
+>>> +
+>>> +    assert(!vtd_dev_icx);
+>>> +
+>>> +    vtd_bus->dev_icx[devfn] = vtd_dev_icx =
+>>> +                    g_malloc0(sizeof(VTDHostIOMMUContext));
+>>> +    vtd_dev_icx->vtd_bus = vtd_bus;
+>>> +    vtd_dev_icx->devfn = (uint8_t)devfn;
+>>> +    vtd_dev_icx->iommu_state = s;
+>>> +    vtd_dev_icx->iommu_ctx = iommu_ctx;
+>>> +
+>>> +    vtd_iommu_unlock(s);
+>>> +
+>>> +    return 0;
+>>> +}
+>>> +
+>>> +static void vtd_dev_unset_iommu_context(PCIBus *bus, void *opaque, int devfn)
+>>> +{
+>>> +    IntelIOMMUState *s = opaque;
+>>> +    VTDBus *vtd_bus;
+>>> +    VTDHostIOMMUContext *vtd_dev_icx;
+>>> +
+>>> +    assert(0 <= devfn && devfn < PCI_DEVFN_MAX);
+>>> +
+>>> +    vtd_bus = vtd_find_add_bus(s, bus);
+>>> +
+>>> +    vtd_iommu_lock(s);
+>>> +
+>>> +    vtd_dev_icx = vtd_bus->dev_icx[devfn];
+>>> +    g_free(vtd_dev_icx);
+>>> +    vtd_bus->dev_icx[devfn] = NULL;
+>>> +
+>>> +    vtd_iommu_unlock(s);
+>>> +}
+>>> +
+>>>  static uint64_t get_naturally_aligned_size(uint64_t start,
+>>>                                             uint64_t size, int gaw)
+>>>  {
+>>> @@ -3731,6 +3790,8 @@ static AddressSpace *vtd_host_dma_iommu(PCIBus
+>> *bus, void *opaque, int devfn)
+>>>
+>>>  static PCIIOMMUOps vtd_iommu_ops = {
+>>>      .get_address_space = vtd_host_dma_iommu,
+>>> +    .set_iommu_context = vtd_dev_set_iommu_context,
+>>> +    .unset_iommu_context = vtd_dev_unset_iommu_context,
+>>>  };
+>>>
+>>>  static bool vtd_decide_config(IntelIOMMUState *s, Error **errp)
+>>> diff --git a/include/hw/i386/intel_iommu.h b/include/hw/i386/intel_iommu.h
+>>> index 3870052..b5fefb9 100644
+>>> --- a/include/hw/i386/intel_iommu.h
+>>> +++ b/include/hw/i386/intel_iommu.h
+>>> @@ -64,6 +64,7 @@ typedef union VTD_IR_TableEntry VTD_IR_TableEntry;
+>>>  typedef union VTD_IR_MSIAddress VTD_IR_MSIAddress;
+>>>  typedef struct VTDPASIDDirEntry VTDPASIDDirEntry;
+>>>  typedef struct VTDPASIDEntry VTDPASIDEntry;
+>>> +typedef struct VTDHostIOMMUContext VTDHostIOMMUContext;
+>>>
+>>>  /* Context-Entry */
+>>>  struct VTDContextEntry {
+>>> @@ -112,10 +113,20 @@ struct VTDAddressSpace {
+>>>      IOVATree *iova_tree;          /* Traces mapped IOVA ranges */
+>>>  };
+>>>
+>>> +struct VTDHostIOMMUContext {
+>>
+>>
+>>> +    VTDBus *vtd_bus;
+>>> +    uint8_t devfn;
+>>> +    HostIOMMUContext *iommu_ctx;
+>> I don't get why we don't have standard QOM inheritance instead of this
+>> handle?
+>> VTDHostContext parent_obj;
+>>
+>> like IOMMUMemoryRegion <- MemoryRegion <- Object
+> 
+> Here it is not inherit the object. It's just cache the HostIOMMUContext
+> pointer in vIOMMU. Just like AddressSpace, it has a MemoryRegion pointer.
+> Here is the same, VTDHostIOMMUContext is just a wrapper to better manage
+> it in vVT-d. It's not inheriting.
+
+Yep I've got it now ;-)
+> 
+>>> +    IntelIOMMUState *iommu_state;
+>>> +};
+>>> +
+>>>  struct VTDBus {
+>>> -    PCIBus* bus;		/* A reference to the bus to provide translation for
+>> */
+>>> +    /* A reference to the bus to provide translation for */
+>>> +    PCIBus *bus;
+>>>      /* A table of VTDAddressSpace objects indexed by devfn */
+>>> -    VTDAddressSpace *dev_as[];
+>>> +    VTDAddressSpace *dev_as[PCI_DEVFN_MAX];
+>>> +    /* A table of VTDHostIOMMUContext objects indexed by devfn */
+>>> +    VTDHostIOMMUContext *dev_icx[PCI_DEVFN_MAX];
+>> At this point of the review, it is unclear to me why the context is
+>> associated to a device.
+> 
+> HostIOMMUContext can be per-device or not. It depends on how vIOMMU
+> manage it. For vVT-d, it's per device as the container is per-device.
+> 
+>> Up to now you have not explained it should. If
+>> so why isn't it part of VTDAddressSpace?
+> 
+> Ah, I did have considered it. But I chose to use a separate one as
+> context is not really tied with an addresspace. It's better to mange
+> it with a separate structure.
+
+OK
+
+Thanks
+
+Eric
+> 
+> Regards,
+> Yi Liu
+> 
+
