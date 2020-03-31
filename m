@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7F8781996BB
-	for <lists+kvm@lfdr.de>; Tue, 31 Mar 2020 14:43:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D23511996DA
+	for <lists+kvm@lfdr.de>; Tue, 31 Mar 2020 14:54:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730755AbgCaMnq convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Tue, 31 Mar 2020 08:43:46 -0400
-Received: from mga02.intel.com ([134.134.136.20]:53147 "EHLO mga02.intel.com"
+        id S1730660AbgCaMyg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 31 Mar 2020 08:54:36 -0400
+Received: from mga14.intel.com ([192.55.52.115]:3913 "EHLO mga14.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730753AbgCaMnp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 31 Mar 2020 08:43:45 -0400
-IronPort-SDR: th6CjSULYz6nj93ZBdAeUhYrpe4lhOZng09lqpMRtxd2qIxO9Y372k/jDDVclMXyRCVONkr+5L
- 02WhXM9AJZaw==
+        id S1730543AbgCaMyf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 31 Mar 2020 08:54:35 -0400
+IronPort-SDR: OTzpRK5maPDEKmB9CYq4QOw0RnYUbafAswjnADPsRMOY/tKKEY0X2ClY3epphvQXT1QTvL9OS+
+ HfH6014SUvng==
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Mar 2020 05:43:43 -0700
-IronPort-SDR: 0pmWaSXKjGEBThp8w/U1ogPxmLxI5Ozlba45MQzhXyuUZvPMXjQGCVk1MEx89mibPhddw6hOIH
- 7jJLPEvdVVGA==
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Mar 2020 05:54:34 -0700
+IronPort-SDR: 0HXOpwlZ2XFefLe4jje/KEyjzynJwZg1ZQUl4xe1XN2aHLEW4GOViym4P45Hese37DcWgTYU0I
+ r4BfggOqJtIw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.72,327,1580803200"; 
-   d="scan'208";a="241903511"
-Received: from fmsmsx105.amr.corp.intel.com ([10.18.124.203])
-  by fmsmga008.fm.intel.com with ESMTP; 31 Mar 2020 05:43:43 -0700
-Received: from fmsmsx111.amr.corp.intel.com (10.18.116.5) by
- FMSMSX105.amr.corp.intel.com (10.18.124.203) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Tue, 31 Mar 2020 05:43:43 -0700
-Received: from shsmsx107.ccr.corp.intel.com (10.239.4.96) by
- fmsmsx111.amr.corp.intel.com (10.18.116.5) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Tue, 31 Mar 2020 05:43:42 -0700
+   d="scan'208";a="267273472"
+Received: from fmsmsx108.amr.corp.intel.com ([10.18.124.206])
+  by orsmga002.jf.intel.com with ESMTP; 31 Mar 2020 05:54:32 -0700
+Received: from fmsmsx121.amr.corp.intel.com (10.18.125.36) by
+ FMSMSX108.amr.corp.intel.com (10.18.124.206) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Tue, 31 Mar 2020 05:54:14 -0700
+Received: from shsmsx108.ccr.corp.intel.com (10.239.4.97) by
+ fmsmsx121.amr.corp.intel.com (10.18.125.36) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Tue, 31 Mar 2020 05:54:14 -0700
 Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.225]) by
- SHSMSX107.ccr.corp.intel.com ([169.254.9.191]) with mapi id 14.03.0439.000;
- Tue, 31 Mar 2020 20:43:38 +0800
+ SHSMSX108.ccr.corp.intel.com ([169.254.8.7]) with mapi id 14.03.0439.000;
+ Tue, 31 Mar 2020 20:54:10 +0800
 From:   "Liu, Yi L" <yi.l.liu@intel.com>
 To:     Auger Eric <eric.auger@redhat.com>,
         "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
@@ -49,17 +49,17 @@ CC:     "pbonzini@redhat.com" <pbonzini@redhat.com>,
         "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
         Jacob Pan <jacob.jun.pan@linux.intel.com>,
         Yi Sun <yi.y.sun@linux.intel.com>
-Subject: RE: [PATCH v2 04/22] hw/iommu: introduce HostIOMMUContext
-Thread-Topic: [PATCH v2 04/22] hw/iommu: introduce HostIOMMUContext
-Thread-Index: AQHWBkpipXk9AcbvW0ea4lbMrBMnp6hg3OsAgAEj3XD//83RgIAA1Bkw
-Date:   Tue, 31 Mar 2020 12:43:38 +0000
-Message-ID: <A2975661238FB949B60364EF0F2C25743A21AF91@SHSMSX104.ccr.corp.intel.com>
+Subject: RE: [PATCH v2 08/22] vfio/common: provide PASID alloc/free hooks
+Thread-Topic: [PATCH v2 08/22] vfio/common: provide PASID alloc/free hooks
+Thread-Index: AQHWBkpiGmk8cmt3gUmACGVeg+XtIahiAOgAgACGbQD//4FmgIAAnsjg
+Date:   Tue, 31 Mar 2020 12:54:10 +0000
+Message-ID: <A2975661238FB949B60364EF0F2C25743A21AFD5@SHSMSX104.ccr.corp.intel.com>
 References: <1585542301-84087-1-git-send-email-yi.l.liu@intel.com>
- <1585542301-84087-5-git-send-email-yi.l.liu@intel.com>
- <aa1bfbd5-e6de-6475-809e-a6ca46089aaa@redhat.com>
- <A2975661238FB949B60364EF0F2C25743A21A3D6@SHSMSX104.ccr.corp.intel.com>
- <34ca7553-089e-b05c-b923-1f2a9bd3eb23@redhat.com>
-In-Reply-To: <34ca7553-089e-b05c-b923-1f2a9bd3eb23@redhat.com>
+ <1585542301-84087-9-git-send-email-yi.l.liu@intel.com>
+ <e6d9a5bc-fd54-c220-067d-0597ad8e86fc@redhat.com>
+ <A2975661238FB949B60364EF0F2C25743A21AD6D@SHSMSX104.ccr.corp.intel.com>
+ <ebd5b8ab-c3b8-87a7-d1cb-2a4c9c02fa61@redhat.com>
+In-Reply-To: <ebd5b8ab-c3b8-87a7-d1cb-2a4c9c02fa61@redhat.com>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
@@ -68,431 +68,147 @@ dlp-product: dlpe-windows
 dlp-version: 11.2.0.6
 dlp-reaction: no-action
 x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Eric,
-
-> From: Auger Eric <eric.auger@redhat.com>
-> Sent: Tuesday, March 31, 2020 3:48 PM
-> To: Liu, Yi L <yi.l.liu@intel.com>; qemu-devel@nongnu.org;
-> Subject: Re: [PATCH v2 04/22] hw/iommu: introduce HostIOMMUContext
-> 
-> Yi,
-> 
-> On 3/31/20 6:10 AM, Liu, Yi L wrote:
-> > Hi Eric,
-> >
-> >> From: Auger Eric < eric.auger@redhat.com >
-> >> Sent: Tuesday, March 31, 2020 1:23 AM
-> >> To: Liu, Yi L <yi.l.liu@intel.com>; qemu-devel@nongnu.org;
-> >> Subject: Re: [PATCH v2 04/22] hw/iommu: introduce HostIOMMUContext
-> >>
-> >> Yi,
-> >>
-> >> On 3/30/20 6:24 AM, Liu Yi L wrote:
-> >>> Currently, many platform vendors provide the capability of dual
-> >>> stage DMA address translation in hardware. For example, nested
-> >>> translation on Intel VT-d scalable mode, nested stage translation on
-> >>> ARM SMMUv3, and etc. In dual stage DMA address translation, there
-> >>> are two stages address translation, stage-1 (a.k.a first-level) and
-> >>> stage-2 (a.k.a
-> >>> second-level) translation structures. Stage-1 translation results
-> >>> are also subjected to stage-2 translation structures. Take vSVA
-> >>> (Virtual Shared Virtual Addressing) as an example, guest IOMMU
-> >>> driver owns
-> >>> stage-1 translation structures (covers GVA->GPA translation), and
-> >>> host IOMMU driver owns stage-2 translation structures (covers
-> >>> GPA->HPA translation). VMM is responsible to bind stage-1
-> >>> translation structures to host, thus hardware could achieve GVA->GPA
-> >>> and then GPA->HPA translation. For more background on SVA, refer the below
-> links.
-> >>>  - https://www.youtube.com/watch?v=Kq_nfGK5MwQ
-> >>>  - https://events19.lfasiallc.com/wp-content/uploads/2017/11/\
-> >>> Shared-Virtual-Memory-in-KVM_Yi-Liu.pdf
-> >>>
-> >>> In QEMU, vIOMMU emulators expose IOMMUs to VM per their own spec (e.g.
-> >>> Intel VT-d spec). Devices are pass-through to guest via device pass-
-> >>> through components like VFIO. VFIO is a userspace driver framework
-> >>> which exposes host IOMMU programming capability to userspace in a
-> >>> secure manner. e.g. IOVA MAP/UNMAP requests. Thus the major
-> >>> connection between VFIO and vIOMMU are MAP/UNMAP. However, with the
-> >>> dual stage DMA translation support, there are more interactions
-> >>> between vIOMMU and VFIO as below:
-> >>
-> >> I think it is key to justify at some point why the IOMMU MR notifiers
-> >> are not usable for that purpose. If I remember correctly this is due
-> >> to the fact MR notifiers are not active on x86 in that use xase,
-> >> which is not the case on ARM dual stage enablement.
-> >
-> > yes, it's the major reason. Also I listed the former description here.
-> > BTW. I don't think notifier is suitable as it is unable to return value.
-> > right? The pasid alloc in this series actually requires to get the
-> > alloc result from vfio. So it's also a reason why notifier is not proper.
-> >
-> >   "Qemu has an existing notifier framework based on MemoryRegion, which
-> >   are used for MAP/UNMAP. However, it is not well suited for virt-SVA.
-> >   Reasons are as below:
-> >   - virt-SVA works along with PT = 1
-> >   - if PT = 1 IOMMU MR are disabled so MR notifier are not registered
-> >   - new notifiers do not fit nicely in this framework as they need to be
-> >     registered even if PT = 1
-> >   - need a new framework to attach the new notifiers
-> >   - Additional background can be got from:
-> >     https://lists.gnu.org/archive/html/qemu-devel/2017-04/msg04931.html"
-> >
-> > And there is a history on it. I think the earliest idea to introduce a
-> > new mechanism instead of using MR notifier for vSVA is from below link.
-> > https://lists.gnu.org/archive/html/qemu-devel/2017-04/msg05295.html
-> >
-> > And then, I have several versions patch series which try to add a
-> > notifier framework for vSVA based on IOMMUSVAContext.
-> > https://lists.gnu.org/archive/html/qemu-devel/2018-03/msg00078.html
-> >
-> > After the vSVA notifier framework patchset, then we somehow agreed to
-> > use PCIPASIDOps which sits in PCIDevice. This is proposed in below link.
-> > https://patchwork.kernel.org/cover/11033657/
-> > However, it was questioned to provide pasid allocation interface in a
-> > per-device manner.
-> >   "On Fri, Jul 05, 2019 at 07:01:38PM +0800, Liu Yi L wrote:
-> >   > This patch adds vfio implementation PCIPASIDOps.alloc_pasid/free_pasid().
-> >   > These two functions are used to propagate guest pasid allocation and
-> >   > free requests to host via vfio container ioctl.
-> >
-> >   As I said in an earlier comment, I think doing this on the device is
-> >   conceptually incorrect.  I think we need an explcit notion of an SVM
-> >   context (i.e. the namespace in which all the PASIDs live) - which will
-> >   IIUC usually be shared amongst multiple devices.  The create and free
-> >   PASID requests should be on that object."
-> > https://patchwork.kernel.org/patch/11033659/
-> >
-> > And the explicit notion of an SVM context from David inspired me to
-> > make an explicit way to facilitate the interaction between vfio and
-> > vIOMMU. So I came up with the SVMContext direction, and finally
-> > renamed it as HostIOMMUContext and place it in VFIOContainer as it is
-> > supposed to be per -container.
-> 
-> Thank you for summarizing the whole history. To make things clear I do not put into
-> question this last approach, I just meant the commit message should justify why this
-> is needed and why the existing IOMMUMRNotifier approach cannot be used.
-
-Ah, it's also a good recall for me. :-)
-
-> >> maybe: "Information, different from map/unmap notifications need to
-> >> be passed from QEMU vIOMMU device to/from the host IOMMU driver
-> >> through the VFIO/IOMMU layer: ..."
-> >
-> > I see. I'll adopt your description. thanks.
-> >
-> >>>  1) PASID allocation (allow host to intercept in PASID allocation)
-> >>>  2) bind stage-1 translation structures to host
-> >>>  3) propagate stage-1 cache invalidation to host
-> >>>  4) DMA address translation fault (I/O page fault) servicing etc.
-> >>
-> >>>
-> >>> With the above new interactions in QEMU, it requires an abstract
-> >>> layer to facilitate the above operations and expose to vIOMMU
-> >>> emulators as an explicit way for vIOMMU emulators call into VFIO.
-> >>> This patch introduces HostIOMMUContext to stand for hardware IOMMU
-> >>> w/ dual stage DMA address translation capability. And introduces
-> >>> HostIOMMUContextClass to provide methods for vIOMMU emulators to
-> >>> propagate dual-stage translation related requests to host. As a
-> >>> beginning, PASID allocation/free are defined to propagate PASID
-> >>> allocation/free requests to host which is helpful for the vendors
-> >>> who manage PASID in system-wide. In future, there will be more operations
-> like bind_stage1_pgtbl, flush_stage1_cache and etc.
-> >>>
-> >>> Cc: Kevin Tian <kevin.tian@intel.com>
-> >>> Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
-> >>> Cc: Peter Xu <peterx@redhat.com>
-> >>> Cc: Eric Auger <eric.auger@redhat.com>
-> >>> Cc: Yi Sun <yi.y.sun@linux.intel.com>
-> >>> Cc: David Gibson <david@gibson.dropbear.id.au>
-> >>> Cc: Michael S. Tsirkin <mst@redhat.com>
-> >>> Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
-> >>> ---
-> >>>  hw/Makefile.objs                      |  1 +
-> >>>  hw/iommu/Makefile.objs                |  1 +
-> >>>  hw/iommu/host_iommu_context.c         | 97
-> >> +++++++++++++++++++++++++++++++++++
-> >>>  include/hw/iommu/host_iommu_context.h | 75
-> >>> +++++++++++++++++++++++++++
-> >>>  4 files changed, 174 insertions(+)
-> >>>  create mode 100644 hw/iommu/Makefile.objs  create mode 100644
-> >>> hw/iommu/host_iommu_context.c  create mode 100644
-> >>> include/hw/iommu/host_iommu_context.h
-> >>>
-> >>> diff --git a/hw/Makefile.objs b/hw/Makefile.objs index
-> >>> 660e2b4..cab83fe 100644
-> >>> --- a/hw/Makefile.objs
-> >>> +++ b/hw/Makefile.objs
-> >>> @@ -40,6 +40,7 @@ devices-dirs-$(CONFIG_MEM_DEVICE) += mem/
-> >>>  devices-dirs-$(CONFIG_NUBUS) += nubus/  devices-dirs-y +=
-> >>> semihosting/  devices-dirs-y += smbios/
-> >>> +devices-dirs-y += iommu/
-> >>>  endif
-> >>>
-> >>>  common-obj-y += $(devices-dirs-y)
-> >>> diff --git a/hw/iommu/Makefile.objs b/hw/iommu/Makefile.objs new
-> >>> file mode 100644 index 0000000..e6eed4e
-> >>> --- /dev/null
-> >>> +++ b/hw/iommu/Makefile.objs
-> >>> @@ -0,0 +1 @@
-> >>> +obj-y += host_iommu_context.o
-> >>> diff --git a/hw/iommu/host_iommu_context.c
-> >> b/hw/iommu/host_iommu_context.c
-> >>> new file mode 100644
-> >>> index 0000000..5fb2223
-> >>> --- /dev/null
-> >>> +++ b/hw/iommu/host_iommu_context.c
-> >>> @@ -0,0 +1,97 @@
-> >>> +/*
-> >>> + * QEMU abstract of Host IOMMU
-> >>> + *
-> >>> + * Copyright (C) 2020 Intel Corporation.
-> >>> + *
-> >>> + * Authors: Liu Yi L <yi.l.liu@intel.com>
-> >>> + *
-> >>> + * This program is free software; you can redistribute it and/or
-> >>> +modify
-> >>> + * it under the terms of the GNU General Public License as
-> >>> +published by
-> >>> + * the Free Software Foundation; either version 2 of the License,
-> >>> +or
-> >>> + * (at your option) any later version.
-> >>> +
-> >>> + * This program is distributed in the hope that it will be useful,
-> >>> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> >>> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> >>> + * GNU General Public License for more details.
-> >>> +
-> >>> + * You should have received a copy of the GNU General Public
-> >>> + License along
-> >>> + * with this program; if not, see <http://www.gnu.org/licenses/>.
-> >>> + */
-> >>> +
-> >>> +#include "qemu/osdep.h"
-> >>> +#include "qapi/error.h"
-> >>> +#include "qom/object.h"
-> >>> +#include "qapi/visitor.h"
-> >>> +#include "hw/iommu/host_iommu_context.h"
-> >>> +
-> >>> +int host_iommu_ctx_pasid_alloc(HostIOMMUContext *iommu_ctx, uint32_t
-> min,
-> >>> +                               uint32_t max, uint32_t *pasid) {
-> >>> +    HostIOMMUContextClass *hicxc;
-> >>> +
-> >>> +    if (!iommu_ctx) {
-> >>> +        return -EINVAL;
-> >>> +    }
-> >>> +
-> >>> +    hicxc = HOST_IOMMU_CONTEXT_GET_CLASS(iommu_ctx);
-> >>> +
-> >>> +    if (!hicxc) {
-> >>> +        return -EINVAL;
-> >>> +    }
-> >>> +
-> >>> +    if (!(iommu_ctx->flags & HOST_IOMMU_PASID_REQUEST) ||
-> >>> +        !hicxc->pasid_alloc) {
-> >> At this point of the reading, I fail to understand why we need the flag.
-> >> Why isn't it sufficient to test whether the ops is set?
-> >
-> > I added it in case of the architecture which has no requirement for
-> > pasid alloc/free and only needs the other callbacks in the class. I'm
-> > not sure if I'm correct, it looks to be unnecessary for vSMMU. right?
-> vSMMU does not require it at the moment. But in that case, it shall not provide any
-> implementation for it and that should be sufficient, shouldn't it?
-
-Emm, but the hook is implemented by vfio. Forget it. I provided a bad
-argument.
-
-I'd better say it works when there is backend which doesn't
-want to provide pasid alloc/free. Also, the flags can be used
-by vIOMMU to enumerate host side's capability (e.g. pasid
-alloc/free, pasid bind, cache_inv, and pasid_table_bind). I
-guess my series has not made use of it in vIOMMU, but I
-do have such plan.
-
-> >
-> >>> +        return -EINVAL;
-> >>> +    }
-> >>> +
-> >>> +    return hicxc->pasid_alloc(iommu_ctx, min, max, pasid); }
-> >>> +
-> >>> +int host_iommu_ctx_pasid_free(HostIOMMUContext *iommu_ctx, uint32_t
-> >> pasid)
-> >>> +{
-> >>> +    HostIOMMUContextClass *hicxc;
-> >>> +
-> >>> +    if (!iommu_ctx) {
-> >>> +        return -EINVAL;
-> >>> +    }
-> >>> +
-> >>> +    hicxc = HOST_IOMMU_CONTEXT_GET_CLASS(iommu_ctx);
-> >>> +    if (!hicxc) {
-> >>> +        return -EINVAL;
-> >>> +    }
-> >>> +
-> >>> +    if (!(iommu_ctx->flags & HOST_IOMMU_PASID_REQUEST) ||
-> >>> +        !hicxc->pasid_free) {
-> >>> +        return -EINVAL;
-> >>> +    }
-> >>> +
-> >>> +    return hicxc->pasid_free(iommu_ctx, pasid); }
-> >>> +
-> >>> +void host_iommu_ctx_init(void *_iommu_ctx, size_t instance_size,
-> >>> +                         const char *mrtypename,
-> >>> +                         uint64_t flags) {
-> >>> +    HostIOMMUContext *iommu_ctx;
-> >>> +
-> >>> +    object_initialize(_iommu_ctx, instance_size, mrtypename);
-> >>> +    iommu_ctx = HOST_IOMMU_CONTEXT(_iommu_ctx);
-> >>> +    iommu_ctx->flags = flags;
-> >>> +    iommu_ctx->initialized = true;
-> >>> +}
-> >>> +
-> >>> +static const TypeInfo host_iommu_context_info = {
-> >>> +    .parent             = TYPE_OBJECT,
-> >>> +    .name               = TYPE_HOST_IOMMU_CONTEXT,
-> >>> +    .class_size         = sizeof(HostIOMMUContextClass),
-> >>> +    .instance_size      = sizeof(HostIOMMUContext),
-> >>> +    .abstract           = true,
-> >> Can't we use the usual .instance_init and .instance_finalize?
-> >>> +};
-> >>> +
-> >>> +static void host_iommu_ctx_register_types(void)
-> >>> +{
-> >>> +    type_register_static(&host_iommu_context_info);
-> >>> +}
-> >>> +
-> >>> +type_init(host_iommu_ctx_register_types)
-> >>> diff --git a/include/hw/iommu/host_iommu_context.h
-> >> b/include/hw/iommu/host_iommu_context.h
-> >>> new file mode 100644
-> >>> index 0000000..35c4861
-> >>> --- /dev/null
-> >>> +++ b/include/hw/iommu/host_iommu_context.h
-> >>> @@ -0,0 +1,75 @@
-> >>> +/*
-> >>> + * QEMU abstraction of Host IOMMU
-> >>> + *
-> >>> + * Copyright (C) 2020 Intel Corporation.
-> >>> + *
-> >>> + * Authors: Liu Yi L <yi.l.liu@intel.com>
-> >>> + *
-> >>> + * This program is free software; you can redistribute it and/or
-> >>> +modify
-> >>> + * it under the terms of the GNU General Public License as
-> >>> +published by
-> >>> + * the Free Software Foundation; either version 2 of the License,
-> >>> +or
-> >>> + * (at your option) any later version.
-> >>> +
-> >>> + * This program is distributed in the hope that it will be useful,
-> >>> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> >>> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> >>> + * GNU General Public License for more details.
-> >>> +
-> >>> + * You should have received a copy of the GNU General Public
-> >>> + License along
-> >>> + * with this program; if not, see <http://www.gnu.org/licenses/>.
-> >>> + */
-> >>> +
-> >>> +#ifndef HW_IOMMU_CONTEXT_H
-> >>> +#define HW_IOMMU_CONTEXT_H
-> >>> +
-> >>> +#include "qemu/queue.h"
-> >>> +#include "qemu/thread.h"
-> >>> +#include "qom/object.h"
-> >>> +#include <linux/iommu.h>
-> >>> +#ifndef CONFIG_USER_ONLY
-> >>> +#include "exec/hwaddr.h"
-> >>> +#endif
-> >>> +
-> >>> +#define TYPE_HOST_IOMMU_CONTEXT "qemu:host-iommu-context"
-> >>> +#define HOST_IOMMU_CONTEXT(obj) \
-> >>> +        OBJECT_CHECK(HostIOMMUContext, (obj),
-> >>> +TYPE_HOST_IOMMU_CONTEXT) #define
-> HOST_IOMMU_CONTEXT_GET_CLASS(obj) \
-> >>> +        OBJECT_GET_CLASS(HostIOMMUContextClass, (obj), \
-> >>> +                         TYPE_HOST_IOMMU_CONTEXT)
-> >>> +
-> >>> +typedef struct HostIOMMUContext HostIOMMUContext;
-> >>> +
-> >>> +typedef struct HostIOMMUContextClass {
-> >>> +    /* private */
-> >>> +    ObjectClass parent_class;
-> >>> +
-> >>> +    /* Allocate pasid from HostIOMMUContext (a.k.a. host software)
-> >>> + */
-> >> Request the host to allocate a PASID?
-> >> "from HostIOMMUContext (a.k.a. host software)" is a bit cryptic to me.
-> >
-> > oh, I mean to request pasid allocation from host.. sorry for the confusion.
-> >
-> >> Actually at this stage I do not understand what this HostIOMMUContext
-> >> abstracts. Is it an object associated to one guest FL context entry
-> >> (attached to one PASID). Meaning for just vIOMMU/VFIO using nested
-> >> paging (single PASID) I would use a single of such context per IOMMU MR?
-> >
-> > No, it's not for a single guest FL context. It's for the abstraction
-> > of the capability provided by a nested-translation capable host backend.
-> > In vfio, it's VFIO_IOMMU_TYPE1_NESTING.
-> >
-> > Here is the notion behind introducing the HostIOMMUContext. Existing
-> > vfio is a secure framework which provides userspace the capability to
-> > program mappings into a single isolation domain in host side. Compared
-> > with the legacy host IOMMU, nested-translation capable IOMMU provides
-> > more. It gives the user-space with the capability to program a
-> > FL/Stage
-> > -1 page table to host side. This is also called as bind_gpasid in this
-> > series. VFIO exposes nesting capability to userspace with the
-> > VFIO_IOMMU_TYPE1_NESTING type. And along with the type, the pasid
-> > alloc/ free and iommu_cache_inv are exposed as the capabilities
-> > provided by VFIO_IOMMU_TYPE1_NESTING.
-> 
-> OK so let me try to rephrase:
-> 
-> "the HostIOMMUContext is an object which allows to manage the stage-1
-> translation when a vIOMMU is implemented upon physical IOMMU nested paging
-> (VFIO case).
-> 
-> It is an abstract object which needs to be derived for each vIOMMU
-> immplementation based on physical nested paging.
-> 
-> An HostIOMMUContext derived object will be passed to each VFIO device protected
-> by a vIOMMU using physical nested paging.
-> "
-> 
-> Is that correct?
-
-you're better writer than me. yes, I think so.
-
->  Also, if we want, actually we could migrate
-> > the MAP/UNMAP notifier to be hooks in HostIOMMUContext. Then we can
-> > have an unified abstraction for the capabilities provided by host.
-> So then it becomes contradictory to what we said before because MAP/UNMAP are
-> used with single stage HW implementation.
-
-If we want to migrate the MAP/UNMAP to host context. Then, the object
-description should be updated as below. I don't think we'll do it so
-far. So just keep the above description for nesting case.
-
-"the HostIOMMUContext is an object which allows to manage the stage-1
-translation when a vIOMMU is implemented upon physical IOMMU nested paging
-or program single stage page mapping to host (VFIO case).
-
-It is an abstract object which needs to be derived for each vIOMMU
-implementation based on physical iommu paging.
-
-An HostIOMMUContext derived object will be passed to each VFIO device protected
-by a vIOMMU using physical iommu paging."
-
-Regards,
-Yi Liu
-
+SGkgRXJpYywNCg0KPiBGcm9tOiBBdWdlciBFcmljIDxlcmljLmF1Z2VyQHJlZGhhdC5jb20+DQo+
+IFNlbnQ6IFR1ZXNkYXksIE1hcmNoIDMxLCAyMDIwIDc6MTYgUE0NCj4gVG86IExpdSwgWWkgTCA8
+eWkubC5saXVAaW50ZWwuY29tPjsgcWVtdS1kZXZlbEBub25nbnUub3JnOw0KPiBTdWJqZWN0OiBS
+ZTogW1BBVENIIHYyIDA4LzIyXSB2ZmlvL2NvbW1vbjogcHJvdmlkZSBQQVNJRCBhbGxvYy9mcmVl
+IGhvb2tzDQo+IA0KPiBIaSBZaSwNCj4gT24gMy8zMS8yMCAxMjo1OSBQTSwgTGl1LCBZaSBMIHdy
+b3RlOg0KPiA+IEhpIEVyaWMsDQo+ID4NCj4gPj4gRnJvbTogQXVnZXIgRXJpYw0KPiA+PiBTZW50
+OiBUdWVzZGF5LCBNYXJjaCAzMSwgMjAyMCA2OjQ4IFBNDQo+ID4+IFRvOiBMaXUsIFlpIEwgPHlp
+LmwubGl1QGludGVsLmNvbT47IHFlbXUtZGV2ZWxAbm9uZ251Lm9yZzsNCj4gPj4gYWxleC53aWxs
+aWFtc29uQHJlZGhhdC5jb207IHBldGVyeEByZWRoYXQuY29tDQo+ID4+IENjOiBwYm9uemluaUBy
+ZWRoYXQuY29tOyBtc3RAcmVkaGF0LmNvbTsgZGF2aWRAZ2lic29uLmRyb3BiZWFyLmlkLmF1OyBU
+aWFuLA0KPiA+PiBLZXZpbiA8a2V2aW4udGlhbkBpbnRlbC5jb20+OyBUaWFuLCBKdW4gSiA8anVu
+LmoudGlhbkBpbnRlbC5jb20+OyBTdW4sIFlpIFkNCj4gPj4gPHlpLnkuc3VuQGludGVsLmNvbT47
+IGt2bUB2Z2VyLmtlcm5lbC5vcmc7IFd1LCBIYW8gPGhhby53dUBpbnRlbC5jb20+Ow0KPiBqZWFu
+LQ0KPiA+PiBwaGlsaXBwZUBsaW5hcm8ub3JnOyBKYWNvYiBQYW4gPGphY29iLmp1bi5wYW5AbGlu
+dXguaW50ZWwuY29tPjsgWWkgU3VuDQo+ID4+IDx5aS55LnN1bkBsaW51eC5pbnRlbC5jb20+DQo+
+ID4+IFN1YmplY3Q6IFJlOiBbUEFUQ0ggdjIgMDgvMjJdIHZmaW8vY29tbW9uOiBwcm92aWRlIFBB
+U0lEIGFsbG9jL2ZyZWUgaG9va3MNCj4gPj4NCj4gPj4gWWksDQo+ID4+DQo+ID4+IE9uIDMvMzAv
+MjAgNjoyNCBBTSwgTGl1IFlpIEwgd3JvdGU6DQo+ID4+PiBUaGlzIHBhdGNoIGRlZmluZXMgdmZp
+b19ob3N0X2lvbW11X2NvbnRleHRfaW5mbywgaW1wbGVtZW50cyB0aGUgUEFTSUQNCj4gPj4+IGFs
+bG9jL2ZyZWUgaG9va3MgZGVmaW5lZCBpbiBIb3N0SU9NTVVDb250ZXh0Q2xhc3MuDQo+ID4+Pg0K
+PiA+Pj4gQ2M6IEtldmluIFRpYW4gPGtldmluLnRpYW5AaW50ZWwuY29tPg0KPiA+Pj4gQ2M6IEph
+Y29iIFBhbiA8amFjb2IuanVuLnBhbkBsaW51eC5pbnRlbC5jb20+DQo+ID4+PiBDYzogUGV0ZXIg
+WHUgPHBldGVyeEByZWRoYXQuY29tPg0KPiA+Pj4gQ2M6IEVyaWMgQXVnZXIgPGVyaWMuYXVnZXJA
+cmVkaGF0LmNvbT4NCj4gPj4+IENjOiBZaSBTdW4gPHlpLnkuc3VuQGxpbnV4LmludGVsLmNvbT4N
+Cj4gPj4+IENjOiBEYXZpZCBHaWJzb24gPGRhdmlkQGdpYnNvbi5kcm9wYmVhci5pZC5hdT4NCj4g
+Pj4+IENjOiBBbGV4IFdpbGxpYW1zb24gPGFsZXgud2lsbGlhbXNvbkByZWRoYXQuY29tPg0KPiA+
+Pj4gU2lnbmVkLW9mZi1ieTogTGl1IFlpIEwgPHlpLmwubGl1QGludGVsLmNvbT4NCj4gPj4+IC0t
+LQ0KPiA+Pj4gIGh3L3ZmaW8vY29tbW9uLmMgICAgICAgICAgICAgICAgICAgICAgfCA2OQ0KPiAr
+KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKw0KPiA+Pj4gIGluY2x1ZGUvaHcvaW9t
+bXUvaG9zdF9pb21tdV9jb250ZXh0LmggfCAgMyArKw0KPiA+Pj4gIGluY2x1ZGUvaHcvdmZpby92
+ZmlvLWNvbW1vbi5oICAgICAgICAgfCAgNCArKw0KPiA+Pj4gIDMgZmlsZXMgY2hhbmdlZCwgNzYg
+aW5zZXJ0aW9ucygrKQ0KPiA+Pj4NCj4gPj4+IGRpZmYgLS1naXQgYS9ody92ZmlvL2NvbW1vbi5j
+IGIvaHcvdmZpby9jb21tb24uYyBpbmRleA0KPiA+Pj4gYzI3NjczMi4uNWYzNTM0ZCAxMDA2NDQN
+Cj4gPj4+IC0tLSBhL2h3L3ZmaW8vY29tbW9uLmMNCj4gPj4+ICsrKyBiL2h3L3ZmaW8vY29tbW9u
+LmMNCj4gPj4+IEBAIC0xMTc5LDYgKzExNzksNTMgQEAgc3RhdGljIGludCB2ZmlvX2dldF9pb21t
+dV90eXBlKFZGSU9Db250YWluZXINCj4gPj4gKmNvbnRhaW5lciwNCj4gPj4+ICAgICAgcmV0dXJu
+IC1FSU5WQUw7DQo+ID4+PiAgfQ0KPiA+Pj4NCj4gPj4+ICtzdGF0aWMgaW50IHZmaW9faG9zdF9p
+b21tdV9jdHhfcGFzaWRfYWxsb2MoSG9zdElPTU1VQ29udGV4dCAqaW9tbXVfY3R4LA0KPiA+Pj4g
+KyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB1aW50MzJfdCBtaW4s
+IHVpbnQzMl90IG1heCwNCj4gPj4+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgdWludDMyX3QgKnBhc2lkKSB7DQo+ID4+PiArICAgIFZGSU9Db250YWluZXIgKmNv
+bnRhaW5lciA9IGNvbnRhaW5lcl9vZihpb21tdV9jdHgsDQo+ID4+PiArICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICBWRklPQ29udGFpbmVyLCBpb21tdV9jdHgpOw0K
+PiA+Pj4gKyAgICBzdHJ1Y3QgdmZpb19pb21tdV90eXBlMV9wYXNpZF9yZXF1ZXN0IHJlcTsNCj4g
+Pj4+ICsgICAgdW5zaWduZWQgbG9uZyBhcmdzejsNCj4gPj4geW91IGNhbiBlYXNpbHkgYXZvaWQg
+dXNpbmcgYXJnc3ogdmFyaWFibGUNCj4gPg0KPiA+IG9oLCByaWdodC4gOi0pDQo+ID4NCj4gPj4+
+ICsgICAgaW50IHJldDsNCj4gPj4+ICsNCj4gPj4+ICsgICAgYXJnc3ogPSBzaXplb2YocmVxKTsN
+Cj4gPj4+ICsgICAgcmVxLmFyZ3N6ID0gYXJnc3o7DQo+ID4+PiArICAgIHJlcS5mbGFncyA9IFZG
+SU9fSU9NTVVfUEFTSURfQUxMT0M7DQo+ID4+PiArICAgIHJlcS5hbGxvY19wYXNpZC5taW4gPSBt
+aW47DQo+ID4+PiArICAgIHJlcS5hbGxvY19wYXNpZC5tYXggPSBtYXg7DQo+ID4+PiArDQo+ID4+
+PiArICAgIGlmIChpb2N0bChjb250YWluZXItPmZkLCBWRklPX0lPTU1VX1BBU0lEX1JFUVVFU1Qs
+ICZyZXEpKSB7DQo+ID4+PiArICAgICAgICByZXQgPSAtZXJybm87DQo+ID4+PiArICAgICAgICBl
+cnJvcl9yZXBvcnQoIiVzOiAlZCwgYWxsb2MgZmFpbGVkIiwgX19mdW5jX18sIHJldCk7DQo+ID4+
+IGJldHRlciB1c2UgJW0gZGlyZWN0bHkgb3Igc3RyZXJyb3IoZXJybm8pIGFsc28gaW5jbHVkZSB2
+YmFzZWRldi0+bmFtZT8NCj4gPg0KPiA+IG9yIHllcywgdmJhc2VkZXYtPm5hbWUgaXMgYWxzbyBu
+aWNlIHRvIGhhdmUuDQo+ID4NCj4gPj4+ICsgICAgICAgIHJldHVybiByZXQ7DQo+ID4+PiArICAg
+IH0NCj4gPj4+ICsgICAgKnBhc2lkID0gcmVxLmFsbG9jX3Bhc2lkLnJlc3VsdDsNCj4gPj4+ICsg
+ICAgcmV0dXJuIDA7DQo+ID4+PiArfQ0KPiA+Pj4gKw0KPiA+Pj4gK3N0YXRpYyBpbnQgdmZpb19o
+b3N0X2lvbW11X2N0eF9wYXNpZF9mcmVlKEhvc3RJT01NVUNvbnRleHQgKmlvbW11X2N0eCwNCj4g
+Pj4+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB1aW50MzJfdCBw
+YXNpZCkgew0KPiA+Pj4gKyAgICBWRklPQ29udGFpbmVyICpjb250YWluZXIgPSBjb250YWluZXJf
+b2YoaW9tbXVfY3R4LA0KPiA+Pj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgVkZJT0NvbnRhaW5lciwgaW9tbXVfY3R4KTsNCj4gPj4+ICsgICAgc3RydWN0IHZm
+aW9faW9tbXVfdHlwZTFfcGFzaWRfcmVxdWVzdCByZXE7DQo+ID4+PiArICAgIHVuc2lnbmVkIGxv
+bmcgYXJnc3o7DQo+ID4+IHNhbWUNCj4gPg0KPiA+IGdvdCBpdC4NCj4gPg0KPiA+Pj4gKyAgICBp
+bnQgcmV0Ow0KPiA+Pj4gKw0KPiA+Pj4gKyAgICBhcmdzeiA9IHNpemVvZihyZXEpOw0KPiA+Pj4g
+KyAgICByZXEuYXJnc3ogPSBhcmdzejsNCj4gPj4+ICsgICAgcmVxLmZsYWdzID0gVkZJT19JT01N
+VV9QQVNJRF9GUkVFOw0KPiA+Pj4gKyAgICByZXEuZnJlZV9wYXNpZCA9IHBhc2lkOw0KPiA+Pj4g
+Kw0KPiA+Pj4gKyAgICBpZiAoaW9jdGwoY29udGFpbmVyLT5mZCwgVkZJT19JT01NVV9QQVNJRF9S
+RVFVRVNULCAmcmVxKSkgew0KPiA+Pj4gKyAgICAgICAgcmV0ID0gLWVycm5vOw0KPiA+Pj4gKyAg
+ICAgICAgZXJyb3JfcmVwb3J0KCIlczogJWQsIGZyZWUgZmFpbGVkIiwgX19mdW5jX18sIHJldCk7
+DQo+ID4+IHNhbWUNCj4gPg0KPiA+IHllcC4NCj4gPj4+ICsgICAgICAgIHJldHVybiByZXQ7DQo+
+ID4+PiArICAgIH0NCj4gPj4+ICsgICAgcmV0dXJuIDA7DQo+ID4+PiArfQ0KPiA+Pj4gKw0KPiA+
+Pj4gIHN0YXRpYyBpbnQgdmZpb19pbml0X2NvbnRhaW5lcihWRklPQ29udGFpbmVyICpjb250YWlu
+ZXIsIGludCBncm91cF9mZCwNCj4gPj4+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+RXJyb3IgKiplcnJwKSAgeyBAQCAtMTc5MSwzICsxODM4LDI1DQo+ID4+PiBAQCBpbnQgdmZpb19l
+ZWhfYXNfb3AoQWRkcmVzc1NwYWNlICphcywgdWludDMyX3Qgb3ApDQo+ID4+PiAgICAgIH0NCj4g
+Pj4+ICAgICAgcmV0dXJuIHZmaW9fZWVoX2NvbnRhaW5lcl9vcChjb250YWluZXIsIG9wKTsgIH0N
+Cj4gPj4+ICsNCj4gPj4+ICtzdGF0aWMgdm9pZCB2ZmlvX2hvc3RfaW9tbXVfY29udGV4dF9jbGFz
+c19pbml0KE9iamVjdENsYXNzICprbGFzcywNCj4gPj4+ICsgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgdm9pZCAqZGF0YSkgew0KPiA+Pj4gKyAg
+ICBIb3N0SU9NTVVDb250ZXh0Q2xhc3MgKmhpY3hjID0gSE9TVF9JT01NVV9DT05URVhUX0NMQVNT
+KGtsYXNzKTsNCj4gPj4+ICsNCj4gPj4+ICsgICAgaGljeGMtPnBhc2lkX2FsbG9jID0gdmZpb19o
+b3N0X2lvbW11X2N0eF9wYXNpZF9hbGxvYzsNCj4gPj4+ICsgICAgaGljeGMtPnBhc2lkX2ZyZWUg
+PSB2ZmlvX2hvc3RfaW9tbXVfY3R4X3Bhc2lkX2ZyZWU7IH0NCj4gPj4+ICsNCj4gPj4+ICtzdGF0
+aWMgY29uc3QgVHlwZUluZm8gdmZpb19ob3N0X2lvbW11X2NvbnRleHRfaW5mbyA9IHsNCj4gPj4+
+ICsgICAgLnBhcmVudCA9IFRZUEVfSE9TVF9JT01NVV9DT05URVhULA0KPiA+Pj4gKyAgICAubmFt
+ZSA9IFRZUEVfVkZJT19IT1NUX0lPTU1VX0NPTlRFWFQsDQo+ID4+PiArICAgIC5jbGFzc19pbml0
+ID0gdmZpb19ob3N0X2lvbW11X2NvbnRleHRfY2xhc3NfaW5pdCwNCj4gPj4gQWggT0sNCj4gPj4N
+Cj4gPj4gVGhpcyBpcyB0aGUgb2JqZWN0IGluaGVyaXRpbmcgZnJvbSB0aGUgYWJzdHJhY3QgVFlQ
+RV9IT1NUX0lPTU1VX0NPTlRFWFQuDQo+ID4NCj4gPiB5ZXMuIGl0IGlzLiA6LSkNCj4gPg0KPiA+
+PiBJIGluaXRpYWxseSB0aG91Z2h0IFZUREhvc3RJT01NVUNvbnRleHQgd2FzLCBzb3JyeSBmb3Ig
+dGhlIG1pc3VuZGVyc3RhbmRpbmcuDQo+ID4NCj4gPiBBaCwgbXkgZmF1bHQsIHNob3VsZCBoYXZl
+IGdvdCBpdCBlYXJsaWVyLiBzbyB3ZSBtYXkgaGF2ZSBqdXN0IGFsaWduZWQNCj4gPiBpbiBsYXN0
+IE9jdC4NCj4gPg0KPiA+PiBEbyB5b3UgZXhwZWN0IG90aGVyIEhvc3RJT01NVUNvbnRleHQgYmFj
+a2VuZHM/IEdpdmVuIHRoZSBuYW1lIGFuZCBvcHMsIGl0DQo+ID4+IGxvb2tzIHJlYWxseSByZWxh
+dGVkIHRvIFZGSU8/DQo+ID4NCj4gPiBGb3Igb3RoZXIgYmFja2VuZHMsIEkgZ3Vlc3MgeW91IG1l
+YW4gb3RoZXIgcGFzc3RocnUgbW9kdWxlcz8gSWYgeWVzLCBJDQo+ID4gdGhpbmsgdGhleSBzaG91
+bGQgaGF2ZSB0aGVpciBvd24gdHlwZSBuYW1lLiBKdXN0IGxpa2UgdklPTU1VcywgdGhlIGJlbG93
+DQo+ID4gdklPTU1VcyBkZWZpbmVzIHRoZWlyIG93biB0eXBlIG5hbWUgYW5kIGluaGVyaXRzIHRo
+ZSBzYW1lIHBhcmVudC4NCj4gPg0KPiA+IHN0YXRpYyBjb25zdCBUeXBlSW5mbyB2dGRfaW9tbXVf
+bWVtb3J5X3JlZ2lvbl9pbmZvID0gew0KPiA+ICAgICAucGFyZW50ID0gVFlQRV9JT01NVV9NRU1P
+UllfUkVHSU9OLA0KPiA+ICAgICAubmFtZSA9IFRZUEVfSU5URUxfSU9NTVVfTUVNT1JZX1JFR0lP
+TiwNCj4gPiAgICAgLmNsYXNzX2luaXQgPSB2dGRfaW9tbXVfbWVtb3J5X3JlZ2lvbl9jbGFzc19p
+bml0LA0KPiA+IH07DQo+ID4NCj4gPiBzdGF0aWMgY29uc3QgVHlwZUluZm8gc21tdXYzX2lvbW11
+X21lbW9yeV9yZWdpb25faW5mbyA9IHsNCj4gPiAgICAgLnBhcmVudCA9IFRZUEVfSU9NTVVfTUVN
+T1JZX1JFR0lPTiwNCj4gPiAgICAgLm5hbWUgPSBUWVBFX1NNTVVWM19JT01NVV9NRU1PUllfUkVH
+SU9OLA0KPiA+ICAgICAuY2xhc3NfaW5pdCA9IHNtbXV2M19pb21tdV9tZW1vcnlfcmVnaW9uX2Ns
+YXNzX2luaXQsDQo+ID4gfTsNCj4gPg0KPiA+IHN0YXRpYyBjb25zdCBUeXBlSW5mbyBhbWR2aV9p
+b21tdV9tZW1vcnlfcmVnaW9uX2luZm8gPSB7DQo+ID4gICAgIC5wYXJlbnQgPSBUWVBFX0lPTU1V
+X01FTU9SWV9SRUdJT04sDQo+ID4gICAgIC5uYW1lID0gVFlQRV9BTURfSU9NTVVfTUVNT1JZX1JF
+R0lPTiwNCj4gPiAgICAgLmNsYXNzX2luaXQgPSBhbWR2aV9pb21tdV9tZW1vcnlfcmVnaW9uX2Ns
+YXNzX2luaXQsDQo+ID4gfTsNCj4gU29ycnkgSSBhbSBjb25mdXNlZCBub3cuDQoNClRoZSB0aHJl
+ZSBhYm92ZSBkZWZpbml0aW9uIGFyZSBqdXN0IGFzIGFuIGV4YW1wbGUuIEp1c3Qgd2FudCB0byBl
+eHBsYWluDQp3aGF0IG1vZGVsIEknbSByZWZlcmVuY2luZy4gOi0pDQoNCj4gWW91IGRvbid0IGhh
+dmUgc3VjaCBraW5kIG9mIGluaGVyaXRhbmNlIGF0IHRoZSBtb21lbnQgaW4geW91ciBzZXJpZXMu
+DQoNCnllcywgb25seSB2ZmlvIGluaGVyaXRzIEhvc3RJT01NVUNvbnRleHQsIG5vIG90aGVyIG1v
+ZHVsZSBpbmhlcml0cy4NCkJ1dCBJIHdhbnQgdG8gc2hvdyBhIGNhc2UgaW4gd2hpY2ggdGhlcmUg
+YXJlIG11bHRpcGxlIG1vZHVsZSBpbmhlcml0cw0Kb25lIHNpbmdsZSBwYXJlbnQuIEp1c3QgbGFj
+ayBhIHZmaW8gZXF1aXZhbGVudCBtb2R1bGUgdG8gc2hvdyBpdC4gU28NCkkgdXNlZCB0aGUgaW9t
+bXVfbWVtb3J5X3JlZ2lvbiBleGFtcGxlLiBzb3JyeSB0byBjb25mdXNlIHlvdS4NCg0KPiANCj4g
+WW91IGhhdmUgYW4gYWJzdHJhY3Qgb2JqZWN0IChUWVBFX0hPU1RfSU9NTVVfQ09OVEVYVCwgSG9z
+dElPTU1VQ29udGV4dCkNCj4gd2hpY2ggaXMgZGVyaXZlZCBpbnRvIFRZUEVfVkZJT19IT1NUX0lP
+TU1VX0NPTlRFWFQuIE9ubHkgdGhlIGNsYXNzIG9wcw0KPiBhcmUgc3BlY2lhbGl6ZWQgZm9yIFZG
+SU8uIEJ1dCBJIGRvIG5vdCBmb3Jlc2VlIGFueSBvdGhlciB1c2VyIHRoYW4gVkZJTw0KPiAoaWUu
+IG90aGVyIGltcGxlbWVudGVycyBvZiB0aGUgY2xhc3Mgb3BzKSwgaGVuY2UgbXkgcXVlc3Rpb24u
+IEZvcg0KPiBpbnN0YW5jZSB3b3VsZCB2aXJ0aW8vdmhvc3QgZXZlciBpbXBsZW1lbnQgaXRzIFRZ
+UEVfSE9TVF9JT01NVV9DT05URVhULg0KDQpJIGRvbid0IGtub3cgZWl0aGVyLiBCdXQgSSB0aGlu
+ayBpdCdzIHBvc3NpYmxlLiBUaGV5IGNhbiBkbyBpdCBwZXIgdGhlaXINCm5lZWQgaW4gZnV0dXJl
+Lg0KDQo+IE9uIHRoZSBvdGhlciBoYW5kIHlvdSBoYXZlIFZUREhvc3RJT01NVUNvbnRleHQgd2hp
+Y2ggaXMgbm90IGEgUU9NDQo+IGRlcml2ZWQgb2JqZWN0Lg0KDQpPaywgSSBndWVzcyBJIG1hZGUg
+eW91IGJlbGlldmUgYm90aCB2ZmlvIGFuZCB2SU9NTVUgd2lsbCBpbmhlcml0IHRoZQ0KSG9zdElP
+TU1VQ29udGV4dCBub3cuIGlzIGl0Pw0KDQpBY3R1YWxseSwgaXQncyBub3QuIE9ubHkgdmZpbyBp
+bmhlcml0cyBIb3N0SU9NTVVDb250ZXh0IGluIFFPTSBtYW5uZXIuDQpGb3IgdGhlIFZUREhvc3RJ
+T01NVUNvbnRleHQsIGl0J3MganVzdCByZWZlcmVuY2luZyB0aGUgSG9zdElPTU1VQ29udGV4dA0K
+d2hpY2ggaXMgaW5pdGlhbGl6ZWQgYnkgdmZpby4NCg0KUmVnYXJkcywNCllpIExpdQ0K
