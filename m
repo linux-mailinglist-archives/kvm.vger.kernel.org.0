@@ -2,73 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4BFB9198DA4
-	for <lists+kvm@lfdr.de>; Tue, 31 Mar 2020 09:56:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2E72E198E03
+	for <lists+kvm@lfdr.de>; Tue, 31 Mar 2020 10:10:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730153AbgCaH4G (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 31 Mar 2020 03:56:06 -0400
-Received: from bombadil.infradead.org ([198.137.202.133]:53358 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726397AbgCaH4G (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 31 Mar 2020 03:56:06 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=tVPpfazcLCn+rGmQCgJ5zFx/4NhoiRWfcsMxHXRN42o=; b=FFlNEE/nlwmrb0Bytn4bR4slz5
-        DIFgIBF6s9N6avl/FcU0oeGua2Y42YpqPuAivHRf8axXjj4MQSNcS3ne3ktFngaVB0i+Y3P2EUwWN
-        V2KClLrxzs589LKw7aEYMNJlL09rtXUi2Po090dVhWbpr40z+H/Ag4UoKqPZBQxEDdURIwGcdqkk6
-        q8EjEixndcchbHD/9Kf8bIMkWXZ03ArAmUaQ9rl7ja4K1T6yM4KUyunlW40SfWl7qiqV7rKKzYoU6
-        S16zsX2EoWgfit+02B9oGzvIfX43eDvQEiiL6ljkaebIIMhilw8jrQyo0IyP6ftKMn+nzxHpAN/ey
-        zvQoSzBg==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jJBkh-0001Rp-Pp; Tue, 31 Mar 2020 07:56:03 +0000
-Date:   Tue, 31 Mar 2020 00:56:03 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     "Liu, Yi L" <yi.l.liu@intel.com>
-Cc:     alex.williamson@redhat.com, eric.auger@redhat.com,
-        jean-philippe@linaro.org, kevin.tian@intel.com,
-        ashok.raj@intel.com, kvm@vger.kernel.org, jun.j.tian@intel.com,
-        iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
-        yi.y.sun@intel.com, hao.wu@intel.com
-Subject: Re: [PATCH v1 7/8] vfio/type1: Add VFIO_IOMMU_CACHE_INVALIDATE
-Message-ID: <20200331075603.GB26583@infradead.org>
-References: <1584880325-10561-1-git-send-email-yi.l.liu@intel.com>
- <1584880325-10561-8-git-send-email-yi.l.liu@intel.com>
+        id S1730065AbgCaIKo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 31 Mar 2020 04:10:44 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:60464 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729950AbgCaIKm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 31 Mar 2020 04:10:42 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1585642241;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=5QowiphZETTq04QwDokDwsv9WQCJrcAvZuUSYA+aVq8=;
+        b=FqZZmUyoDALZjXNAhLBSzU8WwVLNpRjVAwakmVhpf2J/EZ4GUYAjlif4u/gYjzQldVBKap
+        kmvG62FIusECx8Nbu6ik/4zz0MRzzzyqRWlGcIDGChhAVZMz8a7KEPXhIeTvBI5PYZWiYU
+        x0oOFQ3Wh85wAx9/KLMS8WsZDDw+H8A=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-4-AYnVJ3i4MXeX8hl8QMJuXg-1; Tue, 31 Mar 2020 04:10:34 -0400
+X-MC-Unique: AYnVJ3i4MXeX8hl8QMJuXg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A29BC8017DF;
+        Tue, 31 Mar 2020 08:10:33 +0000 (UTC)
+Received: from [10.72.12.115] (ovpn-12-115.pek2.redhat.com [10.72.12.115])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 2500A101D480;
+        Tue, 31 Mar 2020 08:10:28 +0000 (UTC)
+Subject: Re: [vhost:linux-next 8/13] include/linux/vringh.h:18:10: fatal
+ error: linux/vhost_iotlb.h: No such file or directory
+To:     "Xia, Hui" <hui.xia@intel.com>, lkp <lkp@intel.com>
+Cc:     "kbuild-all@lists.01.org" <kbuild-all@lists.01.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "Michael S. Tsirkin" <mst@redhat.com>
+References: <202003292026.dP7OOeCi%lkp@intel.com>
+ <f1270de5-7a2c-76d2-431c-34364def851a@redhat.com>
+ <2A5F4C9150EECB4DAA6291810D6D61B9745B7754@shsmsx102.ccr.corp.intel.com>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <ba85a677-85a8-b7d3-1401-4ac7674c8f3c@redhat.com>
+Date:   Tue, 31 Mar 2020 16:10:26 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1584880325-10561-8-git-send-email-yi.l.liu@intel.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <2A5F4C9150EECB4DAA6291810D6D61B9745B7754@shsmsx102.ccr.corp.intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> @@ -2629,6 +2638,46 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
->  		}
->  		kfree(gbind_data);
->  		return ret;
-> +	} else if (cmd == VFIO_IOMMU_CACHE_INVALIDATE) {
 
-Please refactor the spaghetti in this ioctl handler to use a switch
-statement and a helper function per command before growing it even more.
+On 2020/3/31 =E4=B8=8B=E5=8D=883:31, Xia, Hui wrote:
+>> -----Original Message-----
+>> From: Jason Wang<jasowang@redhat.com>
+>> Sent: 2020=E5=B9=B43=E6=9C=8830=E6=97=A5 10:47
+>> To: lkp<lkp@intel.com>
+>> Cc:kbuild-all@lists.01.org;kvm@vger.kernel.org;virtualization@lists.li=
+nux-
+>> foundation.org;netdev@vger.kernel.org; Michael S. Tsirkin<mst@redhat.c=
+om>
+>> Subject: Re: [vhost:linux-next 8/13] include/linux/vringh.h:18:10: fat=
+al error:
+>> linux/vhost_iotlb.h: No such file or directory
+>>
+>>
+>> On 2020/3/29 =E4=B8=8B=E5=8D=888:08, kbuild test robot wrote:
+>>> tree:https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git  l=
+inux-next
+>>> head:   f44a63f9ebf66a450c101084a35a3ef158ead209
+>>> commit: c43908b0b9a900bd51f861f4c57b83cfd932f4d2 [8/13] vringh: IOTLB
+>>> support
+>>> config: arm-em_x270_defconfig (attached as .config)
+>>> compiler: arm-linux-gnueabi-gcc (GCC) 9.3.0
+>>> reproduce:
+>>>           wgethttps://raw.githubusercontent.com/intel/lkp-
+>> tests/master/sbin/make.cross -O ~/bin/make.cross
+>>>           chmod +x ~/bin/make.cross
+>>>           git checkout c43908b0b9a900bd51f861f4c57b83cfd932f4d2
+>> I could not find this commit in the above branch.
+>>
+>>
+>>>           # save the attached .config to linux build tree
+>>>           GCC_VERSION=3D9.3.0 make.cross ARCH=3Darm
+>> Try to use commit dc3b0673ae5efb73edab66ec5c2f074272e9a4df.
+>>
+>> But this command does not work (I remember it used to work):
+>>
+>> # GCC_VERSION=3D9.3.0 make.cross ARCH=3Darm
+>> cd: received redirection to
+>> `https://download.01.org/0day-ci/cross-package/'
+>> lftpget -c
+>> https://download.01.org/0day-ci/cross-package/./gcc-9.3.0-nolibc/x86_6=
+4-gcc-
+>> 9.3.0-nolibc_arm-linux-gnueabihf.tar.xz
+>> tar Jxf
+>> gcc-9.3.0-nolibc/x86_64-gcc-9.3.0-nolibc_arm-linux-gnueabihf.tar.xz -C
+>> /root/0day No cross compiler for arm setup_crosstool failed
+> Hi Jason, thanks for report this issue. It is caused by wrong finding i=
+n 2 cross tools for arm. And has been fixed. Thanks.
+> Regarding to the vhost build issue itself, it has gone in latest vhost/=
+linux-next. The cause is the code kbuild captured didn't have  patch " vh=
+ost: factor out IOTLB " which introduce linux/vhost_iotlb.h at that momen=
+t. So just ignore this issue since the missed patch has been added in lat=
+est vhost/linux-next.
 
-> +		/* Get the version of struct iommu_cache_invalidate_info */
-> +		if (copy_from_user(&version,
-> +			(void __user *) (arg + minsz), sizeof(version)))
-> +			return -EFAULT;
-> +
-> +		info_size = iommu_uapi_get_data_size(
-> +					IOMMU_UAPI_CACHE_INVAL, version);
-> +
-> +		cache_info = kzalloc(info_size, GFP_KERNEL);
-> +		if (!cache_info)
-> +			return -ENOMEM;
-> +
-> +		if (copy_from_user(cache_info,
-> +			(void __user *) (arg + minsz), info_size)) {
 
-The user might have changed the version while you were allocating and
-freeing the memory, introducing potentially exploitable racing
-conditions.
+Good to know this.
+
+Thanks for the updating.
+
+
+>
+
