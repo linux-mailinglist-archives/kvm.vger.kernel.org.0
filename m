@@ -2,42 +2,43 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5C5511991AE
-	for <lists+kvm@lfdr.de>; Tue, 31 Mar 2020 11:21:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A589E199084
+	for <lists+kvm@lfdr.de>; Tue, 31 Mar 2020 11:12:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731222AbgCaJKb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 31 Mar 2020 05:10:31 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:30187 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1731435AbgCaJK1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 31 Mar 2020 05:10:27 -0400
+        id S1731437AbgCaJM3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 31 Mar 2020 05:12:29 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:50138 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1731027AbgCaJM2 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 31 Mar 2020 05:12:28 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1585645826;
+        s=mimecast20190719; t=1585645947;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=7ez9Q4sjZLqKXT5POYc/PEBcTi3bFRbCnmDVQuGhUaM=;
-        b=PxX33GNyO/BwQS0/asFzHMEUbkOwNm0cbhHqWVB6GZeFkm41XxMn0nqjMMHBQpYw/0iZlf
-        VWWMH8YgVJn8zKwgPXzeZUMp2mdeRMDf7noHf4PtfM91PblYYIDDZhiRa+z7j4OrfigBS/
-        ufuFhrx7DKa0IC5+nWeNKZDMOvUsldM=
+        bh=RQCLXtVwx31ToPiJyqFvIF35+chdtR9iNQ93cYPGwGM=;
+        b=hIN/tO/5DTJoAsDC/6Vfc3G9uPMTnXvHmDF6yb+friCW1B9RgXbplwWJPfZUwI7BfYj7cI
+        s8LzrmPPd9lZSdVnBrPBTZpy88eGcwxsnwaIZ7gYDuvQWFaiX9docoxNIV7Ntf09kw5IOW
+        6rt9Vl/8wh8tyjEXsoDUSArtvKO0l68=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-406-tccnYqx9OjGyPtD43vnRRA-1; Tue, 31 Mar 2020 05:10:24 -0400
-X-MC-Unique: tccnYqx9OjGyPtD43vnRRA-1
+ us-mta-190-yWO63DHzP1GoAkKxYxvoFw-1; Tue, 31 Mar 2020 05:12:25 -0400
+X-MC-Unique: yWO63DHzP1GoAkKxYxvoFw-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 30F4518CA243;
-        Tue, 31 Mar 2020 09:10:23 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 15A86108442E;
+        Tue, 31 Mar 2020 09:12:24 +0000 (UTC)
 Received: from [10.36.114.0] (ovpn-114-0.ams2.redhat.com [10.36.114.0])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 27A5D5C21B;
-        Tue, 31 Mar 2020 09:10:21 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH 08/10] s390x: smp: Wait for sigp completion
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 0F3795C1C5;
+        Tue, 31 Mar 2020 09:12:22 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH 09/10] s390x: smp: Add restart when running
+ test
 To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
 Cc:     thuth@redhat.com, linux-s390@vger.kernel.org
 References: <20200324081251.28810-1-frankja@linux.ibm.com>
- <20200324081251.28810-9-frankja@linux.ibm.com>
+ <20200324081251.28810-10-frankja@linux.ibm.com>
 From:   David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -83,12 +84,12 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
  FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
 Organization: Red Hat GmbH
-Message-ID: <91f0c373-f316-2898-4928-fea2e7283df7@redhat.com>
-Date:   Tue, 31 Mar 2020 11:10:21 +0200
+Message-ID: <363e6571-7cc5-70aa-a70b-98628a5661f4@redhat.com>
+Date:   Tue, 31 Mar 2020 11:12:22 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20200324081251.28810-9-frankja@linux.ibm.com>
+In-Reply-To: <20200324081251.28810-10-frankja@linux.ibm.com>
 Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -99,58 +100,59 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 24.03.20 09:12, Janosch Frank wrote:
-> Sigp orders are not necessarily finished when the processor finished
-> the sigp instruction. We need to poll if the order has been finished
-> before we continue.
+> Let's make sure we can restart a cpu that is already running.
+> Restarting it if it is stopped is implicitely tested by the the other
+> restart calls in the smp test.
 > 
-> For (re)start and stop we already use sigp sense running and sigp
-
-Nope, hopefully no longer "sense running".
-
-> sense loops. But we still lack completion checks for stop and store
-> status, as well as the cpu resets.
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> ---
+>  s390x/smp.c | 19 +++++++++++++++++++
+>  1 file changed, 19 insertions(+)
 > 
-> Let's add them.
+> diff --git a/s390x/smp.c b/s390x/smp.c
+> index 48321f4e346dc71d..79cdc1f6a4b0b491 100644
+> --- a/s390x/smp.c
+> +++ b/s390x/smp.c
+> @@ -52,6 +52,24 @@ static void test_start(void)
+>  	report(1, "start");
+>  }
+>  
+> +/*
+> + * Does only test restart when the target is running.
+> + * The other tests do restarts when stopped multiple times already.
+> + */
+> +static void test_restart(void)
+> +{
+> +	struct cpu *cpu = smp_cpu_from_addr(1);
+> +	struct lowcore *lc = cpu->lowcore;
+> +
+
+Maybe explicitly trigger a stop+start with a dummy here and wait until
+it was processed. This make the test independent of the other (previous)
+tests.
+
+> +	lc->restart_new_psw.mask = extract_psw_mask();
+> +	lc->restart_new_psw.addr = (unsigned long)test_func;
+> +
+> +	set_flag(0);
+> +	smp_cpu_restart(1);
+> +	wait_for_flag();
+> +	report(1, "restart while running");
+> +}
+> +
+>  static void test_stop(void)
+>  {
+>  	smp_cpu_stop(1);
+> @@ -295,6 +313,7 @@ int main(void)
+>  	smp_cpu_stop(1);
+>  
+>  	test_start();
+> +	test_restart();
+>  	test_stop();
+>  	test_stop_store_status();
+>  	test_store_status();
 > 
 
-
-[...]
-
-> @@ -75,6 +75,7 @@ static void test_stop_store_status(void)
->  	lc->prefix_sa = 0;
->  	lc->grs_sa[15] = 0;
->  	smp_cpu_stop_store_status(1);
-> +	smp_cpu_wait_for_completion(1);
->  	mb();
->  	report(lc->prefix_sa == (uint32_t)(uintptr_t)cpu->lowcore, "prefix");
->  	report(lc->grs_sa[15], "stack");
-> @@ -85,6 +86,7 @@ static void test_stop_store_status(void)
->  	lc->prefix_sa = 0;
->  	lc->grs_sa[15] = 0;
->  	smp_cpu_stop_store_status(1);
-> +	smp_cpu_wait_for_completion(1);
->  	mb();
->  	report(lc->prefix_sa == (uint32_t)(uintptr_t)cpu->lowcore, "prefix");
->  	report(lc->grs_sa[15], "stack");
-> @@ -215,6 +217,7 @@ static void test_reset_initial(void)
->  	wait_for_flag();
->  
->  	sigp_retry(1, SIGP_INITIAL_CPU_RESET, 0, NULL);
-> +	smp_cpu_wait_for_completion(1);
->  	sigp(1, SIGP_STORE_STATUS_AT_ADDRESS, (uintptr_t)status, NULL);
->  
->  	report_prefix_push("clear");
-> @@ -264,6 +267,7 @@ static void test_reset(void)
->  	smp_cpu_start(1, psw);
->  
->  	sigp_retry(1, SIGP_CPU_RESET, 0, NULL);
-> +	smp_cpu_wait_for_completion(1);
->  	report(smp_cpu_stopped(1), "cpu stopped");
->  
->  	set_flag(0);
-> 
-
-Looks sane to me.
 
 -- 
 Thanks,
