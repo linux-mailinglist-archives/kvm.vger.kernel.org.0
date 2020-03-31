@@ -2,270 +2,158 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B66F91991CE
-	for <lists+kvm@lfdr.de>; Tue, 31 Mar 2020 11:21:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5C5511991AE
+	for <lists+kvm@lfdr.de>; Tue, 31 Mar 2020 11:21:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731328AbgCaJJZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 31 Mar 2020 05:09:25 -0400
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:38179 "EHLO
-        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730948AbgCaJJY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 31 Mar 2020 05:09:24 -0400
-Received: by mail-wm1-f66.google.com with SMTP id f6so1689630wmj.3;
-        Tue, 31 Mar 2020 02:09:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=i22ZQA6yLmZMoZO/Ys64tPvaaV7DizoXI2gCdBKlzmw=;
-        b=VJQf9c9yp4DTJHeJnWmBct+Ii+sd87JXSUcDzExavZP19US/obSWJAde5NTQUyAUrN
-         a53aNKl0a8JOl5Mn6X6PtaW7G5/txWRli9dk9taOQgZ5AL2vt3KkSgwqsW3dCrXZAylY
-         FKAlKVnY4mYigkU4Q3S5r1YpeNpv4UMCJfYAAUfQ+FDJHWgOmiEtTIZxyjldK9LYXwn7
-         EHV0PLKKRU7bfkBjcQd8+CqRFFKl1ytuNWu7KqRDzOIMlB+EjiZocYs6X8/i0PZiFJX7
-         LxwZ9vruhgECADpLvr9/Y3BNHaEIs0jdi/rGiwh60bxVV2bh1lFaqboIUXeszI8s+mPM
-         mfng==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=i22ZQA6yLmZMoZO/Ys64tPvaaV7DizoXI2gCdBKlzmw=;
-        b=PP+6WCWY2bShYcHf+30yfTXcB+bWT9u4jGQa1ZMir/QfoPXQpp+aEr51Gt7Mc5SNnb
-         +BL2F3wRIxqzrAEvXW7OlplTJBubrC9V3IygY76N2WRJ93ApeXdmrnhgyjVnyPAVs1TM
-         ricSD6aFQjr4Oe5LmgWcGolUsztkDZJ3dFhZ5i9ziprG0z+a8bxe2tFtt/Wg2zO/6/Md
-         QW4YPnLWi89zBpZ9p6LrdCqM23AB2qEay+50l6d6dA7bXnGQK1WmBcsJGzPjn2kZCOGl
-         i6bbflfnS5t4zrELZau9agbRu1A4fwQasToMP/VoYUsj2pIpdti0p3MwnUC6MlgXgfO2
-         5xRQ==
-X-Gm-Message-State: ANhLgQ1M0lLXlXH4MHxdXPos+CA/czJtcmtForje8jB0df1/gFLg1qbn
-        8kRd+tnyqqTi4e0qcb+Lbp0PSsBu
-X-Google-Smtp-Source: ADFU+vsH4BDnMYsXGWqcq35Ioc0BDHVoghojzyDrHUGfBAWWqXSVgd/W6BFq09yVFwhT/6I7e2CZEA==
-X-Received: by 2002:a1c:ba04:: with SMTP id k4mr2399511wmf.10.1585645761805;
-        Tue, 31 Mar 2020 02:09:21 -0700 (PDT)
-Received: from Red ([2a01:cb1d:3d5:a100:2e56:dcff:fed2:c6d6])
-        by smtp.googlemail.com with ESMTPSA id f25sm3030600wml.11.2020.03.31.02.09.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 31 Mar 2020 02:09:21 -0700 (PDT)
-Date:   Tue, 31 Mar 2020 11:09:19 +0200
-From:   Corentin Labbe <clabbe.montjoie@gmail.com>
-To:     Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-Cc:     Linux Doc Mailing List <linux-doc@vger.kernel.org>,
-        linux-kernel@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Maxime Ripard <mripard@kernel.org>,
-        Chen-Yu Tsai <wens@csie.org>, kvm@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH 09/12] docs: fix broken references for ReST files that
- moved around
-Message-ID: <20200331090919.GA18238@Red>
-References: <cover.1584450500.git.mchehab+huawei@kernel.org>
- <6ea0adf72ae55935f3649f87e4b596830b616594.1584450500.git.mchehab+huawei@kernel.org>
+        id S1731222AbgCaJKb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 31 Mar 2020 05:10:31 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:30187 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1731435AbgCaJK1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 31 Mar 2020 05:10:27 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1585645826;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+        bh=7ez9Q4sjZLqKXT5POYc/PEBcTi3bFRbCnmDVQuGhUaM=;
+        b=PxX33GNyO/BwQS0/asFzHMEUbkOwNm0cbhHqWVB6GZeFkm41XxMn0nqjMMHBQpYw/0iZlf
+        VWWMH8YgVJn8zKwgPXzeZUMp2mdeRMDf7noHf4PtfM91PblYYIDDZhiRa+z7j4OrfigBS/
+        ufuFhrx7DKa0IC5+nWeNKZDMOvUsldM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-406-tccnYqx9OjGyPtD43vnRRA-1; Tue, 31 Mar 2020 05:10:24 -0400
+X-MC-Unique: tccnYqx9OjGyPtD43vnRRA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 30F4518CA243;
+        Tue, 31 Mar 2020 09:10:23 +0000 (UTC)
+Received: from [10.36.114.0] (ovpn-114-0.ams2.redhat.com [10.36.114.0])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 27A5D5C21B;
+        Tue, 31 Mar 2020 09:10:21 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH 08/10] s390x: smp: Wait for sigp completion
+To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     thuth@redhat.com, linux-s390@vger.kernel.org
+References: <20200324081251.28810-1-frankja@linux.ibm.com>
+ <20200324081251.28810-9-frankja@linux.ibm.com>
+From:   David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat GmbH
+Message-ID: <91f0c373-f316-2898-4928-fea2e7283df7@redhat.com>
+Date:   Tue, 31 Mar 2020 11:10:21 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <6ea0adf72ae55935f3649f87e4b596830b616594.1584450500.git.mchehab+huawei@kernel.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20200324081251.28810-9-frankja@linux.ibm.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 17, 2020 at 02:10:48PM +0100, Mauro Carvalho Chehab wrote:
-> Some broken references happened due to shifting files around
-> and ReST renames. Those can't be auto-fixed by the script,
-> so let's fix them manually.
+On 24.03.20 09:12, Janosch Frank wrote:
+> Sigp orders are not necessarily finished when the processor finished
+> the sigp instruction. We need to poll if the order has been finished
+> before we continue.
 > 
-> Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-> ---
->  Documentation/doc-guide/maintainer-profile.rst      | 2 +-
->  Documentation/virt/kvm/mmu.rst                      | 2 +-
->  Documentation/virt/kvm/review-checklist.rst         | 2 +-
->  arch/x86/kvm/mmu/mmu.c                              | 2 +-
->  drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c | 2 +-
->  drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c   | 2 +-
->  drivers/crypto/allwinner/sun8i-ss/sun8i-ss-cipher.c | 2 +-
->  drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c   | 2 +-
->  drivers/media/v4l2-core/v4l2-fwnode.c               | 2 +-
->  include/uapi/linux/kvm.h                            | 4 ++--
->  tools/include/uapi/linux/kvm.h                      | 4 ++--
->  11 files changed, 13 insertions(+), 13 deletions(-)
+> For (re)start and stop we already use sigp sense running and sigp
+
+Nope, hopefully no longer "sense running".
+
+> sense loops. But we still lack completion checks for stop and store
+> status, as well as the cpu resets.
 > 
-> diff --git a/Documentation/doc-guide/maintainer-profile.rst b/Documentation/doc-guide/maintainer-profile.rst
-> index 5afc0ddba40a..755d39f0d407 100644
-> --- a/Documentation/doc-guide/maintainer-profile.rst
-> +++ b/Documentation/doc-guide/maintainer-profile.rst
-> @@ -6,7 +6,7 @@ Documentation subsystem maintainer entry profile
->  The documentation "subsystem" is the central coordinating point for the
->  kernel's documentation and associated infrastructure.  It covers the
->  hierarchy under Documentation/ (with the exception of
-> -Documentation/device-tree), various utilities under scripts/ and, at least
-> +Documentation/devicetree), various utilities under scripts/ and, at least
->  some of the time, LICENSES/.
->  
->  It's worth noting, though, that the boundaries of this subsystem are rather
-> diff --git a/Documentation/virt/kvm/mmu.rst b/Documentation/virt/kvm/mmu.rst
-> index 60981887d20b..46126ecc70f7 100644
-> --- a/Documentation/virt/kvm/mmu.rst
-> +++ b/Documentation/virt/kvm/mmu.rst
-> @@ -319,7 +319,7 @@ Handling a page fault is performed as follows:
->  
->   - If both P bit and R/W bit of error code are set, this could possibly
->     be handled as a "fast page fault" (fixed without taking the MMU lock).  See
-> -   the description in Documentation/virt/kvm/locking.txt.
-> +   the description in Documentation/virt/kvm/locking.rst.
->  
->   - if needed, walk the guest page tables to determine the guest translation
->     (gva->gpa or ngpa->gpa)
-> diff --git a/Documentation/virt/kvm/review-checklist.rst b/Documentation/virt/kvm/review-checklist.rst
-> index 1f86a9d3f705..dc01aea4057b 100644
-> --- a/Documentation/virt/kvm/review-checklist.rst
-> +++ b/Documentation/virt/kvm/review-checklist.rst
-> @@ -10,7 +10,7 @@ Review checklist for kvm patches
->  2.  Patches should be against kvm.git master branch.
->  
->  3.  If the patch introduces or modifies a new userspace API:
-> -    - the API must be documented in Documentation/virt/kvm/api.txt
-> +    - the API must be documented in Documentation/virt/kvm/api.rst
->      - the API must be discoverable using KVM_CHECK_EXTENSION
->  
->  4.  New state must include support for save/restore.
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 560e85ebdf22..2bd9f35e9e91 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -3586,7 +3586,7 @@ static bool fast_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
->  		/*
->  		 * Currently, fast page fault only works for direct mapping
->  		 * since the gfn is not stable for indirect shadow page. See
-> -		 * Documentation/virt/kvm/locking.txt to get more detail.
-> +		 * Documentation/virt/kvm/locking.rst to get more detail.
->  		 */
->  		fault_handled = fast_pf_fix_direct_spte(vcpu, sp,
->  							iterator.sptep, spte,
-> diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c
-> index a5fd8975f3d3..a6abb701bfc6 100644
-> --- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c
-> +++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c
-> @@ -8,7 +8,7 @@
->   * This file add support for AES cipher with 128,192,256 bits keysize in
->   * CBC and ECB mode.
->   *
-> - * You could find a link for the datasheet in Documentation/arm/sunxi/README
-> + * You could find a link for the datasheet in Documentation/arm/sunxi.rst
->   */
->  
->  #include <linux/crypto.h>
-> diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c
-> index 3e4e4bbda34c..b957061424a1 100644
-> --- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c
-> +++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c
-> @@ -7,7 +7,7 @@
->   *
->   * Core file which registers crypto algorithms supported by the CryptoEngine.
->   *
-> - * You could find a link for the datasheet in Documentation/arm/sunxi/README
-> + * You could find a link for the datasheet in Documentation/arm/sunxi.rst
->   */
->  #include <linux/clk.h>
->  #include <linux/crypto.h>
-> diff --git a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-cipher.c b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-cipher.c
-> index 84d52fc3a2da..c89cb2ee2496 100644
-> --- a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-cipher.c
-> +++ b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-cipher.c
-> @@ -8,7 +8,7 @@
->   * This file add support for AES cipher with 128,192,256 bits keysize in
->   * CBC and ECB mode.
->   *
-> - * You could find a link for the datasheet in Documentation/arm/sunxi/README
-> + * You could find a link for the datasheet in Documentation/arm/sunxi.rst
->   */
->  
->  #include <linux/crypto.h>
-> diff --git a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c
-> index 6b301afffd11..8ba4f9c81dac 100644
-> --- a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c
-> +++ b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c
-> @@ -7,7 +7,7 @@
->   *
->   * Core file which registers crypto algorithms supported by the SecuritySystem
->   *
-> - * You could find a link for the datasheet in Documentation/arm/sunxi/README
-> + * You could find a link for the datasheet in Documentation/arm/sunxi.rst
->   */
->  #include <linux/clk.h>
->  #include <linux/crypto.h>
-> diff --git a/drivers/media/v4l2-core/v4l2-fwnode.c b/drivers/media/v4l2-core/v4l2-fwnode.c
-> index 97f0f8b23b5d..8a1e1b95b379 100644
-> --- a/drivers/media/v4l2-core/v4l2-fwnode.c
-> +++ b/drivers/media/v4l2-core/v4l2-fwnode.c
-> @@ -980,7 +980,7 @@ static int v4l2_fwnode_reference_parse(struct device *dev,
->   *
->   * THIS EXAMPLE EXISTS MERELY TO DOCUMENT THIS FUNCTION. DO NOT USE IT AS A
->   * REFERENCE IN HOW ACPI TABLES SHOULD BE WRITTEN!! See documentation under
-> - * Documentation/acpi/dsd instead and especially graph.txt,
-> + * Documentation/firmware-guide/acpi/dsd/ instead and especially graph.txt,
->   * data-node-references.txt and leds.txt .
->   *
->   *	Scope (\_SB.PCI0.I2C2)
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index 5e6234cb25a6..704bd4cd3689 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -116,7 +116,7 @@ struct kvm_irq_level {
->  	 * ACPI gsi notion of irq.
->  	 * For IA-64 (APIC model) IOAPIC0: irq 0-23; IOAPIC1: irq 24-47..
->  	 * For X86 (standard AT mode) PIC0/1: irq 0-15. IOAPIC0: 0-23..
-> -	 * For ARM: See Documentation/virt/kvm/api.txt
-> +	 * For ARM: See Documentation/virt/kvm/api.rst
->  	 */
->  	union {
->  		__u32 irq;
-> @@ -1106,7 +1106,7 @@ struct kvm_xen_hvm_config {
->   *
->   * KVM_IRQFD_FLAG_RESAMPLE indicates resamplefd is valid and specifies
->   * the irqfd to operate in resampling mode for level triggered interrupt
-> - * emulation.  See Documentation/virt/kvm/api.txt.
-> + * emulation.  See Documentation/virt/kvm/api.rst.
->   */
->  #define KVM_IRQFD_FLAG_RESAMPLE (1 << 1)
->  
-> diff --git a/tools/include/uapi/linux/kvm.h b/tools/include/uapi/linux/kvm.h
-> index 4b95f9a31a2f..e5f32fcec68f 100644
-> --- a/tools/include/uapi/linux/kvm.h
-> +++ b/tools/include/uapi/linux/kvm.h
-> @@ -116,7 +116,7 @@ struct kvm_irq_level {
->  	 * ACPI gsi notion of irq.
->  	 * For IA-64 (APIC model) IOAPIC0: irq 0-23; IOAPIC1: irq 24-47..
->  	 * For X86 (standard AT mode) PIC0/1: irq 0-15. IOAPIC0: 0-23..
-> -	 * For ARM: See Documentation/virt/kvm/api.txt
-> +	 * For ARM: See Documentation/virt/kvm/api.rst
->  	 */
->  	union {
->  		__u32 irq;
-> @@ -1100,7 +1100,7 @@ struct kvm_xen_hvm_config {
->   *
->   * KVM_IRQFD_FLAG_RESAMPLE indicates resamplefd is valid and specifies
->   * the irqfd to operate in resampling mode for level triggered interrupt
-> - * emulation.  See Documentation/virt/kvm/api.txt.
-> + * emulation.  See Documentation/virt/kvm/api.rst.
->   */
->  #define KVM_IRQFD_FLAG_RESAMPLE (1 << 1)
->  
-> -- 
-> 2.24.1
+> Let's add them.
 > 
 
-Hello
 
-for sun8i-ss and sun8i-ce:
-Acked-by: Corentin LABBE <clabbe.montjoie@gmail.com>
+[...]
 
-Thanks
+> @@ -75,6 +75,7 @@ static void test_stop_store_status(void)
+>  	lc->prefix_sa = 0;
+>  	lc->grs_sa[15] = 0;
+>  	smp_cpu_stop_store_status(1);
+> +	smp_cpu_wait_for_completion(1);
+>  	mb();
+>  	report(lc->prefix_sa == (uint32_t)(uintptr_t)cpu->lowcore, "prefix");
+>  	report(lc->grs_sa[15], "stack");
+> @@ -85,6 +86,7 @@ static void test_stop_store_status(void)
+>  	lc->prefix_sa = 0;
+>  	lc->grs_sa[15] = 0;
+>  	smp_cpu_stop_store_status(1);
+> +	smp_cpu_wait_for_completion(1);
+>  	mb();
+>  	report(lc->prefix_sa == (uint32_t)(uintptr_t)cpu->lowcore, "prefix");
+>  	report(lc->grs_sa[15], "stack");
+> @@ -215,6 +217,7 @@ static void test_reset_initial(void)
+>  	wait_for_flag();
+>  
+>  	sigp_retry(1, SIGP_INITIAL_CPU_RESET, 0, NULL);
+> +	smp_cpu_wait_for_completion(1);
+>  	sigp(1, SIGP_STORE_STATUS_AT_ADDRESS, (uintptr_t)status, NULL);
+>  
+>  	report_prefix_push("clear");
+> @@ -264,6 +267,7 @@ static void test_reset(void)
+>  	smp_cpu_start(1, psw);
+>  
+>  	sigp_retry(1, SIGP_CPU_RESET, 0, NULL);
+> +	smp_cpu_wait_for_completion(1);
+>  	report(smp_cpu_stopped(1), "cpu stopped");
+>  
+>  	set_flag(0);
+> 
+
+Looks sane to me.
+
+-- 
+Thanks,
+
+David / dhildenb
+
