@@ -2,67 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 90F181998E0
-	for <lists+kvm@lfdr.de>; Tue, 31 Mar 2020 16:47:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D1FF71998F5
+	for <lists+kvm@lfdr.de>; Tue, 31 Mar 2020 16:51:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730533AbgCaOrk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 31 Mar 2020 10:47:40 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:23768 "EHLO
+        id S1730533AbgCaOv7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 31 Mar 2020 10:51:59 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:37039 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1730105AbgCaOrk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 31 Mar 2020 10:47:40 -0400
+        with ESMTP id S1730153AbgCaOv6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 31 Mar 2020 10:51:58 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1585666059;
+        s=mimecast20190719; t=1585666317;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=fD56lo2CzF0TkcUSB2i8bItoMn26OtVWGRYz4s2D9Zw=;
-        b=ASMj3fCjCoHEaQRbyNIzmzg4xIfMoC9vtZg5F4IztZHfvsXpeenS9xVY1NRVXH+s26JtD8
-        CH4l4bNFx7Wmm/zjLw+UPRONcNl/AQ9lpOc+9j5tFzIQlbaQoVR3RIUaa+n89BMHcH01yU
-        BJnBAPiQ4IVRV8C6t5YadXQArF1YLqE=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-119-RUsWLXGWO2Wlk7p_o-yAlQ-1; Tue, 31 Mar 2020 10:47:37 -0400
-X-MC-Unique: RUsWLXGWO2Wlk7p_o-yAlQ-1
-Received: by mail-wr1-f71.google.com with SMTP id w12so13055910wrl.23
-        for <kvm@vger.kernel.org>; Tue, 31 Mar 2020 07:47:37 -0700 (PDT)
+        bh=BDECw4Jp5diyRW+zp7XYY468nsqeU3iwo9Wu7xQsHVE=;
+        b=NJB3JmEr+1RjW41SBCtJFHsiSGW8hNslv6Y2vJGOfDGCtKGbfggm+BkvUndgDqbYJD47tQ
+        rntAFyzAiZ8tti6eifzqDJ6a6+CkH4HX4TSarz2y9lrP38hrsGcrM2obXKlV5s1JGtqFar
+        hewcHu2Th1/53YDe0VOxIaWfYaFOXD0=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-406-LnhbRzj3PnuncsFGdnrhJg-1; Tue, 31 Mar 2020 10:51:56 -0400
+X-MC-Unique: LnhbRzj3PnuncsFGdnrhJg-1
+Received: by mail-wm1-f69.google.com with SMTP id w8so1164805wmk.5
+        for <kvm@vger.kernel.org>; Tue, 31 Mar 2020 07:51:55 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=fD56lo2CzF0TkcUSB2i8bItoMn26OtVWGRYz4s2D9Zw=;
-        b=faVlIATFZaHCEVeQWfLXcpf7P/YCorZPxqG0XHHcykNeYW8XBwOf1yvkC1sK41Isng
-         kH1/5M79l3kuVQysDZ8mALJBTEozTbF15TwWDSJGC3vZGDZhUymz5tBFreWoCkyQDxNH
-         4SXsnpQ9S34x3PTDOj9HwKZ09qT+oS4GbqarH0tIHx9q4QQcoa5L3xiMwTICTOYAVbn9
-         RYiAlhuLQ6EGi1oQ6JLZwjclgEgoFu/rPI3nhlrNwuxdvI6ygnbDBQhEXqirbDZBuFAp
-         NTQWsSmsUyzBnwRLRKJl9JO1cLk04lNniY6BMFDq1gAIfF5TPYb+aApcEjcse2AM9Xkg
-         3iGw==
-X-Gm-Message-State: ANhLgQ1ubyG6B2uUpaNueUmBDBCTalTQMizSJo/VkVV2H5jRTAF+Ui+V
-        JyV1q4BjVGLyjC474gjIatgJeo/Pg8nWnAWP8ItKGHBZczyH8hzdJAZmGKRn5oTZ96yNkqn/6p2
-        UERwThNaK6A0p
-X-Received: by 2002:a1c:9e16:: with SMTP id h22mr3760989wme.27.1585666056002;
-        Tue, 31 Mar 2020 07:47:36 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vv9UKQUyXBr2DyVJYnG+A1F4So9WE1o1E54eRR7FTTx5VsorxPuZbhF0pf6Moq2P1XJv5vwRA==
-X-Received: by 2002:a1c:9e16:: with SMTP id h22mr3760962wme.27.1585666055727;
-        Tue, 31 Mar 2020 07:47:35 -0700 (PDT)
+        bh=BDECw4Jp5diyRW+zp7XYY468nsqeU3iwo9Wu7xQsHVE=;
+        b=gJ2WpetxktmdhaV9yzBGwR6tWT7KIs2WttpAiD0NkEpyRDVorIzuNHomfJ6s3/6EtM
+         jndlS42YJk4BR6jSz9mC8f75z7Oa9fs4w4hJya3lJUxp+JQpB+VEHpYD4J/B73dBYrr+
+         ilQyWe/pCHHa5L/rRvsuxgzp+FHyHGfgjHJMGCojnZ2S+M4evuBP/IApLB+SartzrrG+
+         X7E6A1dFhKCvPodvwawcznvtvpFIt/T/B16zl7YnX6X60cKe61amNmNlFiOIiLl8WgKL
+         WrW4I4+IbWsZBbW36oNwzktlU5f2Wbtd0mouf7m0g1WpZnUTZlHofc7Ts0C1B7CUPt2i
+         MrGQ==
+X-Gm-Message-State: ANhLgQ22VXpa3ry+zIlJn0cvcE/h7jQPq0DVRdEkge1wlBMLrjHGHub6
+        6Dl6JALkyyPwwyBHyICyzlibj1iCYfzXGaKicnjY5H9aBAYaMjwJVVrNbYlN+n0rmS31LttaAPP
+        PyJeECs12oO3q
+X-Received: by 2002:adf:de01:: with SMTP id b1mr19917335wrm.376.1585666315009;
+        Tue, 31 Mar 2020 07:51:55 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vupXM5pQZMzUDS/XKpSKnf+xfUggsYlgWDrPztm8ckKXsUeZM/TnUcNGpHowo5uD4xx1p4Ydw==
+X-Received: by 2002:adf:de01:: with SMTP id b1mr19917312wrm.376.1585666314721;
+        Tue, 31 Mar 2020 07:51:54 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:b55d:5ed2:8a41:41ea? ([2001:b07:6468:f312:b55d:5ed2:8a41:41ea])
-        by smtp.gmail.com with ESMTPSA id c18sm27178480wrx.5.2020.03.31.07.47.35
+        by smtp.gmail.com with ESMTPSA id a13sm19618574wrt.64.2020.03.31.07.51.53
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 31 Mar 2020 07:47:35 -0700 (PDT)
-Subject: Re: [GIT PULL] Please pull my kvm-ppc-next-5.7-1 tag
-To:     Paul Mackerras <paulus@ozlabs.org>, kvm@vger.kernel.org
-Cc:     =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        kvm-ppc@vger.kernel.org
-References: <20200330230802.GB27514@blackberry>
+        Tue, 31 Mar 2020 07:51:54 -0700 (PDT)
+Subject: Re: [PATCH] KVM: x86: Fix BUILD_BUG() in __cpuid_entry_get_reg() w/
+ CONFIG_UBSAN=y
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Randy Dunlap <rdunlap@infradead.org>
+References: <20200325191259.23559-1-sean.j.christopherson@intel.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <a3f4815a-29f2-527e-208d-9196a2db15d8@redhat.com>
-Date:   Tue, 31 Mar 2020 16:47:32 +0200
+Message-ID: <d2f9a3a5-5ade-c810-4c61-cf8e9c92c93d@redhat.com>
+Date:   Tue, 31 Mar 2020 16:51:53 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200330230802.GB27514@blackberry>
+In-Reply-To: <20200325191259.23559-1-sean.j.christopherson@intel.com>
 Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -71,93 +75,71 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 31/03/20 01:08, Paul Mackerras wrote:
-> Paolo,
+On 25/03/20 20:12, Sean Christopherson wrote:
+> Take the target reg in __cpuid_entry_get_reg() instead of a pointer to a
+> struct cpuid_reg.  When building with -fsanitize=alignment (enabled by
+> CONFIG_UBSAN=y), some versions of gcc get tripped up on the pointer and
+> trigger the BUILD_BUG().
 > 
-> Please do a pull from my kvm-ppc-next-5.7-1 tag to get a PPC KVM
-> update for 5.7.
+> Reported-by: Randy Dunlap <rdunlap@infradead.org>
+> Fixes: d8577a4c238f8 ("KVM: x86: Do host CPUID at load time to mask KVM cpu caps")
+> Fixes: 4c61534aaae2a ("KVM: x86: Introduce cpuid_entry_{get,has}() accessors")
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> ---
+>  arch/x86/kvm/cpuid.c | 2 +-
+>  arch/x86/kvm/cpuid.h | 8 ++++----
+>  2 files changed, 5 insertions(+), 5 deletions(-)
 > 
-> Thanks,
-> Paul.
-> 
-> The following changes since commit 1c482452d5db0f52e4e8eed95bd7314eec537d78:
-> 
->   Merge tag 'kvm-s390-next-5.7-1' of git://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux into HEAD (2020-03-16 18:19:34 +0100)
-> 
-> are available in the git repository at:
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/paulus/powerpc tags/kvm-ppc-next-5.7-1
-> 
-> for you to fetch changes up to 9a5788c615f52f6d7bf0b61986a632d4ec86791d:
-> 
->   KVM: PPC: Book3S HV: Add a capability for enabling secure guests (2020-03-26 11:09:04 +1100)
-> 
-> ----------------------------------------------------------------
-> KVM PPC update for 5.7
-> 
-> * Add a capability for enabling secure guests under the Protected
->   Execution Framework ultravisor
-> 
-> * Various bug fixes and cleanups.
-> 
-> ----------------------------------------------------------------
-> Fabiano Rosas (1):
->       KVM: PPC: Book3S HV: Skip kvmppc_uvmem_free if Ultravisor is not supported
-> 
-> Greg Kurz (3):
->       KVM: PPC: Book3S PR: Fix kernel crash with PR KVM
->       KVM: PPC: Book3S PR: Move kvmppc_mmu_init() into PR KVM
->       KVM: PPC: Kill kvmppc_ops::mmu_destroy() and kvmppc_mmu_destroy()
-> 
-> Gustavo Romero (1):
->       KVM: PPC: Book3S HV: Treat TM-related invalid form instructions on P9 like the valid ones
-> 
-> Joe Perches (1):
->       KVM: PPC: Use fallthrough;
-> 
-> Laurent Dufour (2):
->       KVM: PPC: Book3S HV: Check caller of H_SVM_* Hcalls
->       KVM: PPC: Book3S HV: H_SVM_INIT_START must call UV_RETURN
-> 
-> Michael Ellerman (1):
->       KVM: PPC: Book3S HV: Use RADIX_PTE_INDEX_SIZE in Radix MMU code
-> 
-> Michael Roth (1):
->       KVM: PPC: Book3S HV: Fix H_CEDE return code for nested guests
-> 
-> Paul Mackerras (2):
->       KVM: PPC: Book3S HV: Use __gfn_to_pfn_memslot in HPT page fault handler
->       KVM: PPC: Book3S HV: Add a capability for enabling secure guests
-> 
->  Documentation/virt/kvm/api.rst              |  17 ++++
->  arch/powerpc/include/asm/kvm_asm.h          |   3 +
->  arch/powerpc/include/asm/kvm_book3s_uvmem.h |   6 ++
->  arch/powerpc/include/asm/kvm_host.h         |   1 +
->  arch/powerpc/include/asm/kvm_ppc.h          |   4 +-
->  arch/powerpc/kvm/book3s.c                   |   5 --
->  arch/powerpc/kvm/book3s.h                   |   1 +
->  arch/powerpc/kvm/book3s_32_mmu.c            |   2 +-
->  arch/powerpc/kvm/book3s_32_mmu_host.c       |   2 +-
->  arch/powerpc/kvm/book3s_64_mmu.c            |   2 +-
->  arch/powerpc/kvm/book3s_64_mmu_host.c       |   2 +-
->  arch/powerpc/kvm/book3s_64_mmu_hv.c         | 119 +++++++++++++---------------
->  arch/powerpc/kvm/book3s_64_mmu_radix.c      |   2 +-
->  arch/powerpc/kvm/book3s_hv.c                |  55 +++++++++----
->  arch/powerpc/kvm/book3s_hv_tm.c             |  28 +++++--
->  arch/powerpc/kvm/book3s_hv_tm_builtin.c     |  16 +++-
->  arch/powerpc/kvm/book3s_hv_uvmem.c          |  19 ++++-
->  arch/powerpc/kvm/book3s_pr.c                |   6 +-
->  arch/powerpc/kvm/booke.c                    |  11 +--
->  arch/powerpc/kvm/booke.h                    |   2 -
->  arch/powerpc/kvm/e500.c                     |   1 -
->  arch/powerpc/kvm/e500_mmu.c                 |   4 -
->  arch/powerpc/kvm/e500mc.c                   |   1 -
->  arch/powerpc/kvm/powerpc.c                  |  17 +++-
->  include/uapi/linux/kvm.h                    |   1 +
->  25 files changed, 205 insertions(+), 122 deletions(-)
+> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> index 08280d8a2ac9..16d3ae432420 100644
+> --- a/arch/x86/kvm/cpuid.c
+> +++ b/arch/x86/kvm/cpuid.c
+> @@ -269,7 +269,7 @@ static __always_inline void kvm_cpu_cap_mask(enum cpuid_leafs leaf, u32 mask)
+>  	cpuid_count(cpuid.function, cpuid.index,
+>  		    &entry.eax, &entry.ebx, &entry.ecx, &entry.edx);
+>  
+> -	kvm_cpu_caps[leaf] &= *__cpuid_entry_get_reg(&entry, &cpuid);
+> +	kvm_cpu_caps[leaf] &= *__cpuid_entry_get_reg(&entry, cpuid.reg);
+>  }
+>  
+>  void kvm_set_cpu_caps(void)
+> diff --git a/arch/x86/kvm/cpuid.h b/arch/x86/kvm/cpuid.h
+> index 23b4cd1ad986..63a70f6a3df3 100644
+> --- a/arch/x86/kvm/cpuid.h
+> +++ b/arch/x86/kvm/cpuid.h
+> @@ -99,9 +99,9 @@ static __always_inline struct cpuid_reg x86_feature_cpuid(unsigned int x86_featu
+>  }
+>  
+>  static __always_inline u32 *__cpuid_entry_get_reg(struct kvm_cpuid_entry2 *entry,
+> -						  const struct cpuid_reg *cpuid)
+> +						  u32 reg)
+>  {
+> -	switch (cpuid->reg) {
+> +	switch (reg) {
+>  	case CPUID_EAX:
+>  		return &entry->eax;
+>  	case CPUID_EBX:
+> @@ -121,7 +121,7 @@ static __always_inline u32 *cpuid_entry_get_reg(struct kvm_cpuid_entry2 *entry,
+>  {
+>  	const struct cpuid_reg cpuid = x86_feature_cpuid(x86_feature);
+>  
+> -	return __cpuid_entry_get_reg(entry, &cpuid);
+> +	return __cpuid_entry_get_reg(entry, cpuid.reg);
+>  }
+>  
+>  static __always_inline u32 cpuid_entry_get(struct kvm_cpuid_entry2 *entry,
+> @@ -189,7 +189,7 @@ static __always_inline u32 *guest_cpuid_get_register(struct kvm_vcpu *vcpu,
+>  	if (!entry)
+>  		return NULL;
+>  
+> -	return __cpuid_entry_get_reg(entry, &cpuid);
+> +	return __cpuid_entry_get_reg(entry, cpuid.reg);
+>  }
+>  
+>  static __always_inline bool guest_cpuid_has(struct kvm_vcpu *vcpu,
 > 
 
-Pulled, thanks.
+Queued, thanks.
 
 Paolo
 
