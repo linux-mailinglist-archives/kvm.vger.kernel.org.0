@@ -2,150 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 732E5199ECB
-	for <lists+kvm@lfdr.de>; Tue, 31 Mar 2020 21:16:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6662F199EEB
+	for <lists+kvm@lfdr.de>; Tue, 31 Mar 2020 21:28:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728428AbgCaTPv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 31 Mar 2020 15:15:51 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:22795 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728225AbgCaTPu (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 31 Mar 2020 15:15:50 -0400
+        id S1729060AbgCaT2U (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 31 Mar 2020 15:28:20 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:22650 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727795AbgCaT2U (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 31 Mar 2020 15:28:20 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1585682149;
+        s=mimecast20190719; t=1585682898;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=qkAVqUAWrxnIaS4ZIGuL832+xxu7v+rbaa9kj5GjiV8=;
-        b=iuuUiIZSN8G0n8XJuGYdbGv4qRcIsu6h50lIIl16xGu2ZnvRkPiub9vQB7LrIyhMa9dxTu
-        rd3gtjguWdlgy2FMAU3X7NgTmTY7RzA4ZBhLLgR/imPyq2OAUjsovV+wyOHXuKrrC8qiId
-        pHAXpm9klPU2JVwPFaIAIHP4/hCkbFE=
+         content-transfer-encoding:content-transfer-encoding;
+        bh=bZBZ2PvIvDxfPAe1u1A6kkjjW8ODyemq7LucCatSJOc=;
+        b=fkKgv8kkWljFwdfF4mCP69z7oHk+IQztyjfT7G4xNfc+nm4ra+KCZwQaXLVKiAmsA2DbfL
+        qIdXve7aCP0/08OYs3/G4rvYJpbH5E+UggdSpLZ0QM1neczgsAZEXK0GCsYJUFd4dF0Uhz
+        q8qIE8w2jWFVidPtOKO+AxalLJu5MFE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-159-aPivUx9GPEGR0mZe-nW1nA-1; Tue, 31 Mar 2020 15:15:45 -0400
-X-MC-Unique: aPivUx9GPEGR0mZe-nW1nA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+ us-mta-25-PaRuMewrOIaDewXx01564w-1; Tue, 31 Mar 2020 15:28:14 -0400
+X-MC-Unique: PaRuMewrOIaDewXx01564w-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4B67B1005509;
-        Tue, 31 Mar 2020 19:15:42 +0000 (UTC)
-Received: from w520.home (ovpn-112-162.phx2.redhat.com [10.3.112.162])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 64A0E5C1BB;
-        Tue, 31 Mar 2020 19:15:40 +0000 (UTC)
-Date:   Tue, 31 Mar 2020 13:15:39 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Kirti Wankhede <kwankhede@nvidia.com>
-Cc:     <cjia@nvidia.com>, <kevin.tian@intel.com>, <ziye.yang@intel.com>,
-        <changpeng.liu@intel.com>, <yi.l.liu@intel.com>,
-        <mlevitsk@redhat.com>, <eskultet@redhat.com>, <cohuck@redhat.com>,
-        <dgilbert@redhat.com>, <jonathan.davies@nutanix.com>,
-        <eauger@redhat.com>, <aik@ozlabs.ru>, <pasic@linux.ibm.com>,
-        <felipe@nutanix.com>, <Zhengxiao.zx@Alibaba-inc.com>,
-        <shuangtai.tst@alibaba-inc.com>, <Ken.Xue@amd.com>,
-        <zhi.a.wang@intel.com>, <yan.y.zhao@intel.com>,
-        <qemu-devel@nongnu.org>, <kvm@vger.kernel.org>
-Subject: Re: [PATCH v17 Kernel 6/7] vfio iommu: Adds flag to indicate dirty
- pages tracking capability support
-Message-ID: <20200331131539.390259e1@w520.home>
-In-Reply-To: <6c6e6625-6dfd-d885-23fe-511744816d5b@nvidia.com>
-References: <1585587044-2408-1-git-send-email-kwankhede@nvidia.com>
-        <1585587044-2408-7-git-send-email-kwankhede@nvidia.com>
-        <20200330145814.32d9b652@w520.home>
-        <6c6e6625-6dfd-d885-23fe-511744816d5b@nvidia.com>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F07C418A6EC1;
+        Tue, 31 Mar 2020 19:28:12 +0000 (UTC)
+Received: from eperezma.remote.csb (ovpn-112-92.ams2.redhat.com [10.36.112.92])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 6BE2898A57;
+        Tue, 31 Mar 2020 19:28:07 +0000 (UTC)
+From:   =?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Stephen Rothwell <sfr@canb.auug.org.au>,
+        kvm list <kvm@vger.kernel.org>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        =?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>
+Subject: [PATCH v3 0/8] vhost: Reset batched descriptors on SET_VRING_BASE call
+Date:   Tue, 31 Mar 2020 21:27:56 +0200
+Message-Id: <20200331192804.6019-1-eperezma@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 1 Apr 2020 00:38:49 +0530
-Kirti Wankhede <kwankhede@nvidia.com> wrote:
+Vhost did not reset properly the batched descriptors on SET_VRING_BASE
+event. Because of that, is possible to return an invalid descriptor to
+the guest.
 
-> On 3/31/2020 2:28 AM, Alex Williamson wrote:
-> > On Mon, 30 Mar 2020 22:20:43 +0530
-> > Kirti Wankhede <kwankhede@nvidia.com> wrote:
-> >   
-> >> Flag VFIO_IOMMU_INFO_DIRTY_PGS in VFIO_IOMMU_GET_INFO indicates that driver
-> >> support dirty pages tracking.
-> >>
-> >> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-> >> Reviewed-by: Neo Jia <cjia@nvidia.com>
-> >> ---
-> >>   drivers/vfio/vfio_iommu_type1.c | 3 ++-
-> >>   include/uapi/linux/vfio.h       | 5 +++--
-> >>   2 files changed, 5 insertions(+), 3 deletions(-)
-> >>
-> >> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> >> index 266550bd7307..9fe12b425976 100644
-> >> --- a/drivers/vfio/vfio_iommu_type1.c
-> >> +++ b/drivers/vfio/vfio_iommu_type1.c
-> >> @@ -2390,7 +2390,8 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
-> >>   			info.cap_offset = 0; /* output, no-recopy necessary */
-> >>   		}
-> >>   
-> >> -		info.flags = VFIO_IOMMU_INFO_PGSIZES;
-> >> +		info.flags = VFIO_IOMMU_INFO_PGSIZES |
-> >> +			     VFIO_IOMMU_INFO_DIRTY_PGS;
-> >>   
-> >>   		info.iova_pgsizes = vfio_pgsize_bitmap(iommu);
-> >>   
-> >> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-> >> index e3cbf8b78623..0fe7c9a6f211 100644
-> >> --- a/include/uapi/linux/vfio.h
-> >> +++ b/include/uapi/linux/vfio.h
-> >> @@ -985,8 +985,9 @@ struct vfio_device_feature {
-> >>   struct vfio_iommu_type1_info {
-> >>   	__u32	argsz;
-> >>   	__u32	flags;
-> >> -#define VFIO_IOMMU_INFO_PGSIZES (1 << 0)	/* supported page sizes info */
-> >> -#define VFIO_IOMMU_INFO_CAPS	(1 << 1)	/* Info supports caps */
-> >> +#define VFIO_IOMMU_INFO_PGSIZES   (1 << 0) /* supported page sizes info */
-> >> +#define VFIO_IOMMU_INFO_CAPS      (1 << 1) /* Info supports caps */
-> >> +#define VFIO_IOMMU_INFO_DIRTY_PGS (1 << 2) /* supports dirty page tracking */
-> >>   	__u64	iova_pgsizes;	/* Bitmap of supported page sizes */
-> >>   	__u32   cap_offset;	/* Offset within info struct of first cap */
-> >>   };  
-> > 
-> > 
-> > As I just mentioned in my reply to Yan, I'm wondering if
-> > VFIO_CHECK_EXTENSION would be a better way to expose this.  The
-> > difference is relatively trivial, but currently the only flag
-> > set by VFIO_IOMMU_GET_INFO is to indicate the presence of a field in
-> > the returned structure.  I think this is largely true of other INFO
-> > ioctls within vfio as well and we're already using the
-> > VFIO_CHECK_EXTENSION ioctl to check supported IOMMU models, and IOMMU
-> > cache coherency.  We'd simply need to define a VFIO_DIRTY_PGS_IOMMU
-> > value (9) and return 1 for that case.  Then when we enable support for
-> > dirt pages that can span multiple mappings, we can add a v2 extensions,
-> > or "MULTI" variant of this extension, since it should be backwards
-> > compatible.
-> > 
-> > The v2/multi version will again require that the user provide a zero'd
-> > bitmap, but I don't think that should be a problem as part of the
-> > definition of that version (we won't know if the user is using v1 or
-> > v2, but a v1 user should only retrieve bitmaps that exactly match
-> > existing mappings, where all bits will be written).  Thanks,
-> > 
-> > Alex
-> >   
-> 
-> I look at these two ioctls as : VFIO_CHECK_EXTENSION is used to get 
-> IOMMU type, while VFIO_IOMMU_GET_INFO is used to get properties of a 
-> particular IOMMU type, right?
+This series ammend this, resetting them every time backend changes, and
+creates a test to assert correct behavior. To do that, they need to
+expose a new function in virtio_ring, virtqueue_reset_free_head, only
+on test code.
 
-Not exclusively, see for example VFIO_DMA_CC_IOMMU,
+Another useful thing would be to check if mutex is properly get in
+vq private_data accessors. Not sure if mutex debug code allow that,
+similar to C++ unique lock::owns_lock. Not acquiring in the function
+because caller code holds the mutex in order to perform more actions.
 
-> Then I think VFIO_IOMMU_INFO_DIRTY_PGS should be part of 
-> VFIO_IOMMU_GET_INFO and when we add code for v2/multi, a flag should be 
-> added to VFIO_IOMMU_GET_INFO.
+v3:
+* Rename accesors functions.
+* Make scsi and test use the accesors too.
 
-Which burns through flags, which is a far more limited resource than
-our 32bit extension address space, especially when we're already
-planning for one or more extensions to this support.  Thanks,
+v2:
+* Squashed commits.
+* Create vq private_data accesors (mst).
 
-Alex
+This is meant to be applied on top of
+c4f1c41a6094582903c75c0dcfacb453c959d457 in
+git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git.
+
+Eugenio P=C3=A9rez (5):
+  vhost: Create accessors for virtqueues private_data
+  tools/virtio: Add --batch option
+  tools/virtio: Add --batch=3Drandom option
+  tools/virtio: Add --reset=3Drandom
+  tools/virtio: Make --reset reset ring idx
+
+Michael S. Tsirkin (3):
+  vhost: option to fetch descriptors through an independent struct
+  vhost: use batched version by default
+  vhost: batching fetches
+
+ drivers/vhost/net.c          |  28 ++--
+ drivers/vhost/scsi.c         |  14 +-
+ drivers/vhost/test.c         |  69 ++++++++-
+ drivers/vhost/test.h         |   1 +
+ drivers/vhost/vhost.c        | 271 +++++++++++++++++++++++------------
+ drivers/vhost/vhost.h        |  44 +++++-
+ drivers/vhost/vsock.c        |  14 +-
+ drivers/virtio/virtio_ring.c |  29 ++++
+ tools/virtio/linux/virtio.h  |   2 +
+ tools/virtio/virtio_test.c   | 123 ++++++++++++++--
+ 10 files changed, 456 insertions(+), 139 deletions(-)
+
+--=20
+2.18.1
 
