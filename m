@@ -2,47 +2,43 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 82597198ED8
-	for <lists+kvm@lfdr.de>; Tue, 31 Mar 2020 10:50:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5D85A198FFE
+	for <lists+kvm@lfdr.de>; Tue, 31 Mar 2020 11:08:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726488AbgCaIuj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 31 Mar 2020 04:50:39 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:29138 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1729925AbgCaIuj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 31 Mar 2020 04:50:39 -0400
+        id S1731135AbgCaJID (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 31 Mar 2020 05:08:03 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:57480 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1730683AbgCaJH6 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 31 Mar 2020 05:07:58 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1585644638;
+        s=mimecast20190719; t=1585645676;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=LbQMUvT5oKhfjUdwtFsLxH9y2kUn9twCF2JYhlBWJgI=;
-        b=VrZtbR4F5o9iTroiYIdSL9PqLGzz7BiRxF8I7iIilKSn2Q5mKG9Y9XqQOZMQEI7oI+OkpJ
-        eExNuiOOEoRbX+8loYMysfhwzVF495MDowF8Cp46g+qKynxN+yqszam09HK02xh0xPVY80
-        HRx3v5hB/TZoSAo+kzo34LJMentsamU=
+        bh=NSdAS61zVtIXs8uXBJOPignRHqmsSIed7uhuf1sC8rU=;
+        b=VVyKM/kqAkS7ypS6OXY/FUULHXZHlbAC2/opjfV2QrtadHAmFq3cGgD0YsjDAWr2UUG9gP
+        CiBltp7DKzcF8WzPzKON7xmWdTwCDhmWRq4IUX8TidWJ/K3/78DsEdQCzSY7CqX5D+Ufu9
+        YB8Km0vV3aLdOXTNezcre3oohTXeais=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-439-rU-Vj0MgNOSiViZ82BhWyQ-1; Tue, 31 Mar 2020 04:50:36 -0400
-X-MC-Unique: rU-Vj0MgNOSiViZ82BhWyQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+ us-mta-296-wUBmcXtuOq-vxnR85lt59w-1; Tue, 31 Mar 2020 05:07:55 -0400
+X-MC-Unique: wUBmcXtuOq-vxnR85lt59w-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 752B3801E67;
-        Tue, 31 Mar 2020 08:50:35 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 673E9100DFC5;
+        Tue, 31 Mar 2020 09:07:54 +0000 (UTC)
 Received: from [10.36.114.0] (ovpn-114-0.ams2.redhat.com [10.36.114.0])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 1BF5CA0A7A;
-        Tue, 31 Mar 2020 08:50:33 +0000 (UTC)
-Subject: Re: [kvm-unit-tests 1/2] s390x/smp: fix detection of "running"
-To:     Cornelia Huck <cohuck@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>
-Cc:     Janosch Frank <frankja@linux.vnet.ibm.com>,
-        KVM <kvm@vger.kernel.org>,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        Thomas Huth <thuth@redhat.com>
-References: <20200330084911.34248-1-borntraeger@de.ibm.com>
- <20200330084911.34248-2-borntraeger@de.ibm.com>
- <20200331084917.4ab3f405.cohuck@redhat.com>
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 8D79899DF8;
+        Tue, 31 Mar 2020 09:07:51 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH 04/10] s390x: smp: Test local interrupts
+ after cpu reset
+To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     thuth@redhat.com, linux-s390@vger.kernel.org
+References: <20200324081251.28810-1-frankja@linux.ibm.com>
+ <20200324081251.28810-5-frankja@linux.ibm.com>
 From:   David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -88,38 +84,77 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
  FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
 Organization: Red Hat GmbH
-Message-ID: <2eeedc49-5ffe-44b4-e88f-f00a2150d0d6@redhat.com>
-Date:   Tue, 31 Mar 2020 10:50:33 +0200
+Message-ID: <b6f1d06b-aaa5-bdd5-5491-32c8338f9ead@redhat.com>
+Date:   Tue, 31 Mar 2020 11:07:50 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20200331084917.4ab3f405.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20200324081251.28810-5-frankja@linux.ibm.com>
+Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 31.03.20 08:49, Cornelia Huck wrote:
-> On Mon, 30 Mar 2020 04:49:10 -0400
-> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
->=20
->> On s390x hosts with a single CPU, the smp test case hangs (loops).
->> The check is our restart has finished is wrong.
->=20
-> s/is/if/
+On 24.03.20 09:12, Janosch Frank wrote:
+> Local interrupts (external and emergency call) should be cleared after
+> any cpu reset.
+> 
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> ---
+>  s390x/smp.c | 22 ++++++++++++++++++++++
+>  1 file changed, 22 insertions(+)
+> 
+> diff --git a/s390x/smp.c b/s390x/smp.c
+> index 8a6cd1d8b17d76c6..a8e3dd7aac0c788c 100644
+> --- a/s390x/smp.c
+> +++ b/s390x/smp.c
+> @@ -243,6 +243,20 @@ static void test_reset_initial(void)
+>  	report_prefix_pop();
+>  }
+>  
+> +static void test_local_ints(void)
+> +{
+> +	unsigned long mask;
+> +
+> +	expect_ext_int();
+> +	/* Open masks for ecall and emcall */
+> +	ctl_set_bit(0, 13);
+> +	ctl_set_bit(0, 14);
+> +	mask = extract_psw_mask();
+> +	mask |= PSW_MASK_EXT;
+> +	load_psw_mask(mask);
+> +	set_flag(1);
+> +}
+> +
+>  static void test_reset(void)
+>  {
+>  	struct psw psw;
+> @@ -251,10 +265,18 @@ static void test_reset(void)
+>  	psw.addr = (unsigned long)test_func;
+>  
+>  	report_prefix_push("cpu reset");
+> +	sigp(1, SIGP_EMERGENCY_SIGNAL, 0, NULL);
+> +	sigp(1, SIGP_EXTERNAL_CALL, 0, NULL);
+>  	smp_cpu_start(1, psw);
+>  
+>  	sigp_retry(1, SIGP_CPU_RESET, 0, NULL);
+>  	report(smp_cpu_stopped(1), "cpu stopped");
+> +
+> +	set_flag(0);
+> +	psw.addr = (unsigned long)test_local_ints;
+> +	smp_cpu_start(1, psw);
+> +	wait_for_flag();
+> +	report(true, "local interrupts cleared");
 
-With that fixed up queued to
 
-https://github.com/davidhildenbrand/kvm-unit-tests.git s390x-next
+How can you be sure they were actually cleared/delivered?
 
-I'll wait with the other patch until we have a consent there regarding
-possible races.
 
---=20
+-- 
 Thanks,
 
 David / dhildenb
