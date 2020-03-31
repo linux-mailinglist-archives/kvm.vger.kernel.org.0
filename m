@@ -2,95 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 25836198D61
-	for <lists+kvm@lfdr.de>; Tue, 31 Mar 2020 09:49:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ADC04198D7D
+	for <lists+kvm@lfdr.de>; Tue, 31 Mar 2020 09:53:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730032AbgCaHtO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 31 Mar 2020 03:49:14 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:26664 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1729925AbgCaHtO (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 31 Mar 2020 03:49:14 -0400
+        id S1730053AbgCaHxN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 31 Mar 2020 03:53:13 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:31284 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726397AbgCaHxN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 31 Mar 2020 03:53:13 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1585640953;
+        s=mimecast20190719; t=1585641191;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=WQidleZHioAbMw3jPUbXbSj/Imf6yrz9eifvO/T2QX4=;
-        b=UKD9LCmunWQXMa4+0iMa1CQ7j82o70D9M7hI08xSTvIgO5s+u+IvIcALoj5SxEw1GIp5nb
-        2PlAbtYEdNfre4Ts1/z8VMdOFN/+bqOE5O4eNiugEbV1P9b0YVZsMHf65kKKn8EB+gc3ie
-        OyFa2NLa2QQXCcocd5GGu7NOy0tl5a8=
+        bh=iSH8M0zcab1cNkiV4UELPul1CGDjNENFoeHyEZgGIB8=;
+        b=UR+r0yf36+v5ihqkBQZ43gRvfNUfJ1PteEfSE4CANofYa1Z9U74mS+hiFu8Ve1TEbOlImb
+        /Mc0sw32Qr+l33lV8gU3bEl36QqRpIZR2k2bYU1c0bjot2CskKjqlcnRz/W2APeLGbLxBr
+        Ml/wbjnNCET8UNu8dY9TzIrvIk6iQMU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-94-VP2st1JzOUyUPktB7CCMwg-1; Tue, 31 Mar 2020 03:49:12 -0400
-X-MC-Unique: VP2st1JzOUyUPktB7CCMwg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+ us-mta-200-bZ0Wb73oM6-k8C_NCQRfsA-1; Tue, 31 Mar 2020 03:53:07 -0400
+X-MC-Unique: bZ0Wb73oM6-k8C_NCQRfsA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 317101083E84;
-        Tue, 31 Mar 2020 07:49:11 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1DF4B8017CC;
+        Tue, 31 Mar 2020 07:53:06 +0000 (UTC)
 Received: from kamzik.brq.redhat.com (unknown [10.40.193.153])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 8A77B10016EB;
-        Tue, 31 Mar 2020 07:49:06 +0000 (UTC)
-Date:   Tue, 31 Mar 2020 09:49:03 +0200
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 6F30760BE0;
+        Tue, 31 Mar 2020 07:52:58 +0000 (UTC)
+Date:   Tue, 31 Mar 2020 09:52:55 +0200
 From:   Andrew Jones <drjones@redhat.com>
-To:     Janosch Frank <frankja@linux.ibm.com>
-Cc:     Wainer dos Santos Moschetta <wainersm@redhat.com>,
-        kvm@vger.kernel.org, pbonzini@redhat.com,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] selftests: kvm: Update .gitignore with missing binaries
-Message-ID: <20200331074903.lwqjkwyinfw2avzg@kamzik.brq.redhat.com>
-References: <20200330211922.24290-1-wainersm@redhat.com>
- <49982d4c-ab12-28e6-d0f2-695c8781b26d@linux.ibm.com>
+To:     Wainer dos Santos Moschetta <wainersm@redhat.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com,
+        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        david@redhat.com
+Subject: Re: [PATCH 1/2] selftests: kvm: Add vm_get_fd() in kvm_util
+Message-ID: <20200331075255.w3kas64ogasqj6yq@kamzik.brq.redhat.com>
+References: <20200330204310.21736-1-wainersm@redhat.com>
+ <20200330204310.21736-2-wainersm@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <49982d4c-ab12-28e6-d0f2-695c8781b26d@linux.ibm.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+In-Reply-To: <20200330204310.21736-2-wainersm@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 31, 2020 at 09:09:17AM +0200, Janosch Frank wrote:
-> On 3/30/20 11:19 PM, Wainer dos Santos Moschetta wrote:
-> > Updated .gitignore to ignore x86_64/svm_vmcall_test and
-> > s390x/resets test binaries.
-> > 
-> > Signed-off-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
+On Mon, Mar 30, 2020 at 05:43:09PM -0300, Wainer dos Santos Moschetta wrote:
+> Introduces the vm_get_fd() function in kvm_util which returns
+> the VM file descriptor.
 > 
-> Oh, didn't know I needed to do that...
-> Thanks for fixing this up.
+> Signed-off-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
+> ---
+>  tools/testing/selftests/kvm/include/kvm_util.h | 1 +
+>  tools/testing/selftests/kvm/lib/kvm_util.c     | 5 +++++
+>  2 files changed, 6 insertions(+)
+> 
+> diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
+> index ae0d14c2540a..aa4a70f969ed 100644
+> --- a/tools/testing/selftests/kvm/include/kvm_util.h
+> +++ b/tools/testing/selftests/kvm/include/kvm_util.h
+> @@ -163,6 +163,7 @@ bool vm_is_unrestricted_guest(struct kvm_vm *vm);
+>  unsigned int vm_get_page_size(struct kvm_vm *vm);
+>  unsigned int vm_get_page_shift(struct kvm_vm *vm);
+>  unsigned int vm_get_max_gfn(struct kvm_vm *vm);
+> +unsigned int vm_get_fd(struct kvm_vm *vm);
+>  
+>  struct kvm_userspace_memory_region *
+>  kvm_userspace_memory_region_find(struct kvm_vm *vm, uint64_t start,
+> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+> index a6dd0401eb50..0961986c0d74 100644
+> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
+> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+> @@ -1703,3 +1703,8 @@ unsigned int vm_get_max_gfn(struct kvm_vm *vm)
+>  {
+>  	return vm->max_gfn;
+>  }
+> +
+> +unsigned int vm_get_fd(struct kvm_vm *vm)
+> +{
+> +	return vm->fd;
+> +}
+> -- 
+> 2.17.2
+>
 
-I've already sent these, and they've been merged to kvm/queue.
+Please use an int instead of 'unsigned int' to match the fd type.
 
-> 
-> Acked-by: Janosch Frank <frankja@linux.ibm.com>
-> 
-> > ---
-> >  tools/testing/selftests/kvm/.gitignore | 2 ++
-> >  1 file changed, 2 insertions(+)
-> > 
-> > diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
-> > index 30072c3f52fb..489b9cf9eed5 100644
-> > --- a/tools/testing/selftests/kvm/.gitignore
-> > +++ b/tools/testing/selftests/kvm/.gitignore
-> > @@ -1,3 +1,4 @@
-> > +/s390x/resets
-> >  /s390x/sync_regs_test
-> >  /s390x/memop
-> >  /x86_64/cr4_cpuid_sync_test
-> > @@ -8,6 +9,7 @@
-> >  /x86_64/set_sregs_test
-> >  /x86_64/smm_test
-> >  /x86_64/state_test
-> > +/x86_64/svm_vmcall_test
-> >  /x86_64/sync_regs_test
-> >  /x86_64/vmx_close_while_nested_test
-> >  /x86_64/vmx_dirty_log_test
-> > 
-> 
-> 
-
-
+Thanks,
+drew 
 
