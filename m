@@ -2,92 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 14639198C76
-	for <lists+kvm@lfdr.de>; Tue, 31 Mar 2020 08:42:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2132D198C86
+	for <lists+kvm@lfdr.de>; Tue, 31 Mar 2020 08:49:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726595AbgCaGmY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 31 Mar 2020 02:42:24 -0400
-Received: from mga07.intel.com ([134.134.136.100]:28670 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726001AbgCaGmY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 31 Mar 2020 02:42:24 -0400
-IronPort-SDR: 1dD4FeNwZRORgnTmh3EpD+TdNY/CXdXU+tNSVJJ149qze4l11V44IBHFtPZ63wQAsLWjJ5HmGP
- LsyHEafe6OKw==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Mar 2020 23:42:23 -0700
-IronPort-SDR: xoUG/BhU2jnZANEA8VZ2vxIgwIIacw3H+Zl+q0axYIZTylRMpn12afeVr1+JanZKvVh2UMDPKG
- 3Xheiq5zLXSQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.72,327,1580803200"; 
-   d="scan'208";a="359407571"
-Received: from fmsmsx106.amr.corp.intel.com ([10.18.124.204])
-  by fmsmga001.fm.intel.com with ESMTP; 30 Mar 2020 23:42:23 -0700
-Received: from fmsmsx113.amr.corp.intel.com (10.18.116.7) by
- FMSMSX106.amr.corp.intel.com (10.18.124.204) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Mon, 30 Mar 2020 23:42:23 -0700
-Received: from shsmsx107.ccr.corp.intel.com (10.239.4.96) by
- FMSMSX113.amr.corp.intel.com (10.18.116.7) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Mon, 30 Mar 2020 23:42:23 -0700
-Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.225]) by
- SHSMSX107.ccr.corp.intel.com ([169.254.9.191]) with mapi id 14.03.0439.000;
- Tue, 31 Mar 2020 14:42:19 +0800
-From:   "Liu, Yi L" <yi.l.liu@intel.com>
-To:     "Tian, Kevin" <kevin.tian@intel.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>
-CC:     "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "Tian, Jun J" <jun.j.tian@intel.com>,
-        "Sun, Yi Y" <yi.y.sun@intel.com>,
-        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Wu, Hao" <hao.wu@intel.com>
-Subject: RE: [PATCH v1 1/2] vfio/pci: Expose PCIe PASID capability to guest
-Thread-Topic: [PATCH v1 1/2] vfio/pci: Expose PCIe PASID capability to guest
-Thread-Index: AQHWAEVGhyrNdpmwzkqkYesGE5wb06hhx4yAgACGaqA=
-Date:   Tue, 31 Mar 2020 06:42:18 +0000
-Message-ID: <A2975661238FB949B60364EF0F2C25743A21A6F8@SHSMSX104.ccr.corp.intel.com>
-References: <1584880394-11184-1-git-send-email-yi.l.liu@intel.com>
- <1584880394-11184-2-git-send-email-yi.l.liu@intel.com>
- <AADFC41AFE54684AB9EE6CBC0274A5D19D801277@SHSMSX104.ccr.corp.intel.com>
-In-Reply-To: <AADFC41AFE54684AB9EE6CBC0274A5D19D801277@SHSMSX104.ccr.corp.intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-version: 11.2.0.6
-dlp-reaction: no-action
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        id S1726216AbgCaGt2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 31 Mar 2020 02:49:28 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:37698 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726174AbgCaGt2 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 31 Mar 2020 02:49:28 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1585637367;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=/vr+P7AE3WRAzHQofs1wx/Zyi3JrkyQjOoO1yXG2SIk=;
+        b=gJC2YPXRX/iXR40Y/+q0QP5/vQeXT28cvxSkZAs9Hle1Y1Q0xuQ3pPTrYhosM4MNjZIfqf
+        K5P4s52GDv556HbElCubDKVgIqgOSielDz+o4tptbcZ7t67EFbGfU7lPs9egAlpTndKMJk
+        /WotdMpCgTKS45zwX+/Bx4+/M+UfS1s=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-465-EYXG8K8OP7Gw_3ldLJlmVw-1; Tue, 31 Mar 2020 02:49:25 -0400
+X-MC-Unique: EYXG8K8OP7Gw_3ldLJlmVw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4F991107ACC9;
+        Tue, 31 Mar 2020 06:49:24 +0000 (UTC)
+Received: from gondolin (ovpn-112-229.ams2.redhat.com [10.36.112.229])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 766DA19C6A;
+        Tue, 31 Mar 2020 06:49:20 +0000 (UTC)
+Date:   Tue, 31 Mar 2020 08:49:17 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Christian Borntraeger <borntraeger@de.ibm.com>
+Cc:     Janosch Frank <frankja@linux.vnet.ibm.com>,
+        KVM <kvm@vger.kernel.org>, David Hildenbrand <david@redhat.com>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Thomas Huth <thuth@redhat.com>
+Subject: Re: [kvm-unit-tests 1/2] s390x/smp: fix detection of "running"
+Message-ID: <20200331084917.4ab3f405.cohuck@redhat.com>
+In-Reply-To: <20200330084911.34248-2-borntraeger@de.ibm.com>
+References: <20200330084911.34248-1-borntraeger@de.ibm.com>
+        <20200330084911.34248-2-borntraeger@de.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-PiBGcm9tOiBUaWFuLCBLZXZpbiA8a2V2aW4udGlhbkBpbnRlbC5jb20+DQo+IFNlbnQ6IFR1ZXNk
-YXksIE1hcmNoIDMxLCAyMDIwIDI6MzkgUE0NCj4gVG86IExpdSwgWWkgTCA8eWkubC5saXVAaW50
-ZWwuY29tPjsgYWxleC53aWxsaWFtc29uQHJlZGhhdC5jb207DQo+IFN1YmplY3Q6IFJFOiBbUEFU
-Q0ggdjEgMS8yXSB2ZmlvL3BjaTogRXhwb3NlIFBDSWUgUEFTSUQgY2FwYWJpbGl0eSB0byBndWVz
-dA0KPiANCj4gPiBGcm9tOiBMaXUsIFlpIEwgPHlpLmwubGl1QGludGVsLmNvbT4NCj4gPiBTZW50
-OiBTdW5kYXksIE1hcmNoIDIyLCAyMDIwIDg6MzMgUE0NCj4gPg0KPiA+IEZyb206IExpdSBZaSBM
-IDx5aS5sLmxpdUBpbnRlbC5jb20+DQo+ID4NCj4gPiBUaGlzIHBhdGNoIGV4cG9zZXMgUENJZSBQ
-QVNJRCBjYXBhYmlsaXR5IHRvIGd1ZXN0LiBFeGlzdGluZyB2ZmlvX3BjaQ0KPiA+IGRyaXZlciBo
-aWRlcyBpdCBmcm9tIGd1ZXN0IGJ5IHNldHRpbmcgdGhlIGNhcGFiaWxpdHkgbGVuZ3RoIGFzIDAg
-aW4NCj4gPiBwY2lfZXh0X2NhcF9sZW5ndGhbXS4NCj4gPg0KPiA+IFRoaXMgY2FwYWJpbGl0eSBp
-cyByZXF1aXJlZCBmb3IgdlNWQSBlbmFibGluZyBvbiBwYXNzLXRocm91Z2ggUENJZQ0KPiA+IGRl
-dmljZXMuDQo+IA0KPiBzaG91bGQgdGhpcyBiZSBbUEFUQ0ggMi8yXSwgYWZ0ZXIgeW91IGhhdmUg
-dGhlIGVtdWxhdGlvbiBpbiBwbGFjZT8NCg0Kb2gsIHllcywgSSBjYW4gcmUtc2VxdWVuY2UgaXQu
-DQoNCj4gYW5kIGl0IG1pZ2h0IGJlIHdvcnRoeSBvZiBub3RpbmcgdGhhdCBQUkkgaXMgYWxyZWFk
-eSBleHBvc2VkLCB0bw0KPiBhdm9pZCBjb25mdXNpb24gZnJvbSBvbmUgbGlrZSBtZSB0aGF0IHdo
-eSB0d28gY2FwYWJpbGl0aWVzIGFyZQ0KPiBlbXVsYXRlZCBpbiB0aGlzIHNlcmllcyB3aGlsZSBv
-bmx5IG9uZSBpcyBiZWluZyBleHBvc2VkLiDwn5iKDQoNCmdvdCBpdC4gaXQgd291bGQgYmUgaGVs
-cGZ1bC4gdGhhbmtzLg0KDQpSZWdhcmRzLA0KWWkgTGl1DQo=
+On Mon, 30 Mar 2020 04:49:10 -0400
+Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+
+> On s390x hosts with a single CPU, the smp test case hangs (loops).
+> The check is our restart has finished is wrong.
+
+s/is/if/
+
+> Sigp sense running status checks if the CPU is currently backed by a
+> real CPU. This means that on single CPU hosts a sigp sense running
+> will never claim that a target is running. We need to check for not
+> being stopped instead.
+> 
+> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> ---
+>  lib/s390x/smp.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/lib/s390x/smp.c b/lib/s390x/smp.c
+> index 2555bf4..5ed8b7b 100644
+> --- a/lib/s390x/smp.c
+> +++ b/lib/s390x/smp.c
+> @@ -128,7 +128,7 @@ static int smp_cpu_restart_nolock(uint16_t addr, struct psw *psw)
+>  	 * The order has been accepted, but the actual restart may not
+>  	 * have been performed yet, so wait until the cpu is running.
+>  	 */
+> -	while (!smp_cpu_running(addr))
+> +	while (smp_cpu_stopped(addr))
+>  		mb();
+>  	cpu->active = true;
+>  	return 0;
+
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+
