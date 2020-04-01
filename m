@@ -2,98 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id DA4A019A208
-	for <lists+kvm@lfdr.de>; Wed,  1 Apr 2020 00:42:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6E31819A2C8
+	for <lists+kvm@lfdr.de>; Wed,  1 Apr 2020 02:19:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731345AbgCaWm3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 31 Mar 2020 18:42:29 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:34012 "EHLO
-        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727955AbgCaWm2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 31 Mar 2020 18:42:28 -0400
-Received: by mail-wr1-f67.google.com with SMTP id 65so28275790wrl.1;
-        Tue, 31 Mar 2020 15:42:26 -0700 (PDT)
+        id S1731508AbgDAATd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 31 Mar 2020 20:19:33 -0400
+Received: from mail-pg1-f193.google.com ([209.85.215.193]:34194 "EHLO
+        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731470AbgDAATd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 31 Mar 2020 20:19:33 -0400
+Received: by mail-pg1-f193.google.com with SMTP id l14so4060986pgb.1;
+        Tue, 31 Mar 2020 17:19:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=sender:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=1jsuwtxuUphpE0RZhef4PDISQgTlLi4Ca2smnB8QhUI=;
-        b=qFpsBADrpxeqLat60SC4r8eFLqa9EQpyfUJ0PHJjOUDv77WE2TTxgmJJIvqryxuVqE
-         VIRRwBBYy8UymCCCsmMqHyLxeegl8aHL1M186n9xpumZduxYHgPAkyLPCGgRW7tupUbx
-         nUobJ22z7KXcOaqDf52le4WcqjXXJ7CK24z6WBMVsc/jZ8h8J/h3R2UKchatYLniqYKw
-         Yg6DWBaPlwL+w7vTkHkz9QbOtYo0W05KsdcCIvSOrPMhvHWiTmKtYyVfTJYpYRT4x8UZ
-         AVbqszIl251A+i2FjHwie8m0X8hECIZ6M7c/RUXHWIXefEkCY2YqMi6SrtjDqOEUKrUf
-         aXYg==
+        h=from:to:cc:subject:date:message-id;
+        bh=8Z8cYPNA1Nnx+ynlfYUK6Uh1qA4I2RWYXKrKRt2N0YE=;
+        b=qV7Egt69AFSYm63oan9OEeaDZCWNVhxRplH9ijcJinhqTPrM/ZGkiqPbKmU8fTx2Yn
+         sdAno83KlgvyAT7AxdzAGOzk1JBDZFky9/yTNV6jYBfe2iUy+eODWvlMPOVSNnjBr8PC
+         LMsn5q0GBsIUWIEM3ZiQxfcS0Jy/9SNx2hizD27ai+aVMAX4HjQ2NEm7GFMmcoP39JC1
+         Wz8pU4/8gRyBREb7ZdQolpMu9mNcr5xZBu1Qq7S5FNNRnops2NqT5ZPGwJFqNDUq7At+
+         AbXqAqsdSyfWZmRrzP7bpo/12+Kw7jw+BHEhPeqQBFUeZqzqQiTYh7Eg4z4O06E92eZ5
+         xEfw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
-         :mime-version:content-transfer-encoding;
-        bh=1jsuwtxuUphpE0RZhef4PDISQgTlLi4Ca2smnB8QhUI=;
-        b=VeADCdpQvFHtHfq1HTJ+hD7Gl1J0K7T6anCuIvcFyqFZC8y+Z507lQEOtU3kRHczn6
-         qAvZ8Qn215S+SazVZr+ei/Wl4kj5JzvTny6jqLrrWpoE4uq+GBOfl7mv8/1H+SzmDtoo
-         0/gZRwWc4Dwc2FRhuJGl75bIYPG60Rtg7vKsmOerBukseVcgXu7nBGO9WVehoLDjQEsS
-         Ha+scq4wUt53jmI/4m3Yo/9S/r65QUcW2RYSEX2sTo/+D9DCXG6uDbrOjAp3LLQMJXc+
-         QztYY6oLAbB1yzVbnMZiAM+gGXWASIGdI+wC4t+DNxgF0HGyR8zHJoTI+iO7m5ttbYG0
-         060w==
-X-Gm-Message-State: ANhLgQ1pD4lpwh9jnQGjWby7rLA7oexhcF/LGnQbVMt4FYDSO02ruMAz
-        kZ87RUJlzzrJlgILtBcSr1LzCLm0BtI=
-X-Google-Smtp-Source: ADFU+vvRoF9pFdVcJa9cMPcXPxkqycsPt/wZshyxiR0NL1tLIR0+e5n+OF7X4t22pk3doCclhV3r9g==
-X-Received: by 2002:adf:9dca:: with SMTP id q10mr22166975wre.11.1585694545103;
-        Tue, 31 Mar 2020 15:42:25 -0700 (PDT)
-Received: from donizetti.redhat.com ([2001:b07:6468:f312:b55d:5ed2:8a41:41ea])
-        by smtp.gmail.com with ESMTPSA id q13sm275388wrg.21.2020.03.31.15.42.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 31 Mar 2020 15:42:24 -0700 (PDT)
-From:   Paolo Bonzini <pbonzini@redhat.com>
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=8Z8cYPNA1Nnx+ynlfYUK6Uh1qA4I2RWYXKrKRt2N0YE=;
+        b=iJ6eHLI3V7OEzQZFNvPelCJ41HLIKaSlP0BWjRgikvVEQ9GyiSRlcb1JFsAwGzMCHW
+         GBS5DLpJzRw3P3HpiTm/IhXqR/ffdtx7ahkressPzUsTTCr2+ZC/xHa7oTlcTXJVyDVS
+         52+QKJCBK9CLj0yD2xF1w82UguvoOgSbIptm3taQLM2Y76Hnxb8UXb2FIKyv+yNzjbO/
+         wMQRkTWMK40klL42k0oy0TK/vdpJ06+cg7+TWz7DaX9cpwmlECEJyy8FzZtp1K/IZ93N
+         vvuk5483GiA8dxEq2sh4lfANPnCCvIMWi1MwWLlKbsMQDif3MjrSoaQ9ekKIOljRvjSz
+         xbxg==
+X-Gm-Message-State: ANhLgQ3wXLmIEVVv+Z1aONHd3WtjRn0ZNbgoD2mmS+RrM0cH+o6/U1Yt
+        6MVnP62AgQcuvuNkhmnXW+b/zX/r
+X-Google-Smtp-Source: ADFU+vuyLauhhsGiDnxRt45W7U5JB4YVBUGUkpBSElEOAwA/hE43H+Hki5xQrb+Z9SntSrnZUNFKRA==
+X-Received: by 2002:aa7:9844:: with SMTP id n4mr19644750pfq.98.1585700371738;
+        Tue, 31 Mar 2020 17:19:31 -0700 (PDT)
+Received: from localhost.localdomain ([103.7.29.6])
+        by smtp.googlemail.com with ESMTPSA id ci18sm206978pjb.23.2020.03.31.17.19.29
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
+        Tue, 31 Mar 2020 17:19:31 -0700 (PDT)
+From:   Wanpeng Li <kernellwp@gmail.com>
+X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     eesposit@redhat.com
-Subject: [PATCH] KVM: x86: move kvm_create_vcpu_debugfs after last failure point
-Date:   Wed,  1 Apr 2020 00:42:22 +0200
-Message-Id: <20200331224222.393439-1-pbonzini@redhat.com>
-X-Mailer: git-send-email 2.24.1
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>
+Subject: [PATCH v2 1/2] KVM: X86: Filter out the broadcast dest for IPI fastpath
+Date:   Wed,  1 Apr 2020 08:19:21 +0800
+Message-Id: <1585700362-11892-1-git-send-email-wanpengli@tencent.com>
+X-Mailer: git-send-email 2.7.4
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The placement of kvm_create_vcpu_debugfs is more or less irrelevant, since
-it cannot fail and userspace should not care about the debugfs entries until
-it knows the vcpu has been created.  Moving it after the last failure
-point removes the need to remove the directory when unwinding the creation.
+From: Wanpeng Li <wanpengli@tencent.com>
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Except destination shorthand, a destination value 0xffffffff is used to
+broadcast interrupts, let's also filter out this for single target IPI 
+fastpath.
+
+Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
 ---
- virt/kvm/kvm_main.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+v1 -> v2:
+ * update subject and patch description
 
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 027259af883e..0a78e1d874ed 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -2823,8 +2823,6 @@ static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, u32 id)
- 	if (r)
- 		goto vcpu_free_run_page;
+ arch/x86/kvm/lapic.c | 3 ---
+ arch/x86/kvm/lapic.h | 3 +++
+ arch/x86/kvm/x86.c   | 3 ++-
+ 3 files changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+index e24d405..d528bed 100644
+--- a/arch/x86/kvm/lapic.c
++++ b/arch/x86/kvm/lapic.c
+@@ -59,9 +59,6 @@
+ #define MAX_APIC_VECTOR			256
+ #define APIC_VECTORS_PER_REG		32
  
--	kvm_create_vcpu_debugfs(vcpu);
+-#define APIC_BROADCAST			0xFF
+-#define X2APIC_BROADCAST		0xFFFFFFFFul
 -
- 	mutex_lock(&kvm->lock);
- 	if (kvm_get_vcpu_by_id(kvm, id)) {
- 		r = -EEXIST;
-@@ -2853,11 +2851,11 @@ static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, u32 id)
+ static bool lapic_timer_advance_dynamic __read_mostly;
+ #define LAPIC_TIMER_ADVANCE_ADJUST_MIN	100	/* clock cycles */
+ #define LAPIC_TIMER_ADVANCE_ADJUST_MAX	10000	/* clock cycles */
+diff --git a/arch/x86/kvm/lapic.h b/arch/x86/kvm/lapic.h
+index bc76860..25b77a6 100644
+--- a/arch/x86/kvm/lapic.h
++++ b/arch/x86/kvm/lapic.h
+@@ -17,6 +17,9 @@
+ #define APIC_BUS_CYCLE_NS       1
+ #define APIC_BUS_FREQUENCY      (1000000000ULL / APIC_BUS_CYCLE_NS)
  
- 	mutex_unlock(&kvm->lock);
- 	kvm_arch_vcpu_postcreate(vcpu);
-+	kvm_create_vcpu_debugfs(vcpu);
- 	return r;
++#define APIC_BROADCAST			0xFF
++#define X2APIC_BROADCAST		0xFFFFFFFFul
++
+ enum lapic_mode {
+ 	LAPIC_MODE_DISABLED = 0,
+ 	LAPIC_MODE_INVALID = X2APIC_ENABLE,
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 5e95950..5a645df 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -1559,7 +1559,8 @@ static int handle_fastpath_set_x2apic_icr_irqoff(struct kvm_vcpu *vcpu, u64 data
  
- unlock_vcpu_destroy:
- 	mutex_unlock(&kvm->lock);
--	debugfs_remove_recursive(vcpu->debugfs_dentry);
- 	kvm_arch_vcpu_destroy(vcpu);
- vcpu_free_run_page:
- 	free_page((unsigned long)vcpu->run);
+ 	if (((data & APIC_SHORT_MASK) == APIC_DEST_NOSHORT) &&
+ 		((data & APIC_DEST_MASK) == APIC_DEST_PHYSICAL) &&
+-		((data & APIC_MODE_MASK) == APIC_DM_FIXED)) {
++		((data & APIC_MODE_MASK) == APIC_DM_FIXED) &&
++		((u32)(data >> 32) != X2APIC_BROADCAST)) {
+ 
+ 		data &= ~(1 << 12);
+ 		kvm_apic_send_ipi(vcpu->arch.apic, (u32)data, (u32)(data >> 32));
 -- 
-2.24.1
+2.7.4
 
