@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C2EBB19ADA5
-	for <lists+kvm@lfdr.de>; Wed,  1 Apr 2020 16:18:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0EB0F19ADCB
+	for <lists+kvm@lfdr.de>; Wed,  1 Apr 2020 16:27:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732958AbgDAOSP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 1 Apr 2020 10:18:15 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:32198 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1732205AbgDAOSN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 1 Apr 2020 10:18:13 -0400
+        id S1733015AbgDAO1e (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 1 Apr 2020 10:27:34 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:55931 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1732843AbgDAO1e (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 1 Apr 2020 10:27:34 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1585750692;
+        s=mimecast20190719; t=1585751252;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=koigHvjQZC19eKDd8fYYKD1byFLtuNk9rFfv+MSme6o=;
-        b=RkCOGQhNZFYpWV8BiKhBBm64nzMj1wRLeU/7/GGi2aYZtRbFH3rO4ZJki9BUK14X9V4c+B
-        jmRph7Uwb/k1CiQWF1hCxctaFf8ZGfmL4vL8cC8KogeBMGPbIXJ/RYZuv3nqIT/zV/FpT0
-        kmkKPKJihoTmwYt7qoWaPVS1YAQcEuI=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-387-J6TNiRPNPOSX2Wyd6ebffA-1; Wed, 01 Apr 2020 10:18:09 -0400
-X-MC-Unique: J6TNiRPNPOSX2Wyd6ebffA-1
-Received: by mail-wr1-f70.google.com with SMTP id e10so14625853wru.6
-        for <kvm@vger.kernel.org>; Wed, 01 Apr 2020 07:18:08 -0700 (PDT)
+        bh=AC+xCtqiJYVKw8uvibXZdquPbYJhxrP3dh8NvWfdbEs=;
+        b=T39+ywLgPvzLcVF1VQDBDxB5yEJbou4sk4+4utZK2bMNUR+C6qh50eJCWpCQ21BP9TuNWq
+        viKun2zeHvSzYICgLRhjqEJh5bB5HPg/MKt2mnrqraMoN85jRElx4uRpwMa+Nm9J5b/NoQ
+        zloxya17UMUYBltch/eB3fryqx4ib+k=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-349-qPXiEeM-PmyRdUSjVUC6OA-1; Wed, 01 Apr 2020 10:27:31 -0400
+X-MC-Unique: qPXiEeM-PmyRdUSjVUC6OA-1
+Received: by mail-wm1-f71.google.com with SMTP id z24so32403wml.9
+        for <kvm@vger.kernel.org>; Wed, 01 Apr 2020 07:27:30 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:content-transfer-encoding
          :in-reply-to;
-        bh=koigHvjQZC19eKDd8fYYKD1byFLtuNk9rFfv+MSme6o=;
-        b=ryZUZiFEJDX5vUJT+RR6k/VDcCcuq98OwTCrvcjobWcCxyPnua1iLX+nss+kxToYwg
-         SWu+NNOtznTjXBRGHifXwGvWV1u5JDm/zVPeoZjX42fGj3nwhxt288pfOcWVG1sfv+cx
-         uP8IgG8FUM7SuEuMc0eLt7q+k4q+5S77vxpCKHRD1JzL1541wnnmNmiEDe8GHDWissOE
-         PvAqnr8GX3+HLQBTifD32suQ8D051lZoVX3YuR/GN5OBON0lruSrYkuTAvdObhZsG4jg
-         vWyGB6jzszzlGAaXIShJQURrI2Zqn93JiqCMCC8CI1INkou7g7PrFu/7e+inU+8y2G0v
-         nqGw==
-X-Gm-Message-State: AGi0PuY86Zlrfn14KRsw+1yVSrxXOFJ5sWu6MFMFszgUhTL93E4jI9BL
-        gj8orHAGMy/b2Jgxl2vQyOv688tzYRyN/s38flJKjzrQ7ANNVtVuGbufXzIFbX+YLDlgCl6uN2n
-        CxDISvR2TdUHe
-X-Received: by 2002:a05:600c:2949:: with SMTP id n9mr4854308wmd.129.1585750687901;
-        Wed, 01 Apr 2020 07:18:07 -0700 (PDT)
-X-Google-Smtp-Source: APiQypIDbSLF7skcDOxwD6+QUFmg2lPeWzSgOX1pVJzAYBHdhN6pMa1uaSvkuWaE5DTOSSwxR6SXXw==
-X-Received: by 2002:a05:600c:2949:: with SMTP id n9mr4854274wmd.129.1585750687676;
-        Wed, 01 Apr 2020 07:18:07 -0700 (PDT)
+        bh=AC+xCtqiJYVKw8uvibXZdquPbYJhxrP3dh8NvWfdbEs=;
+        b=NPqmGadQNgpBP1KGKg0Yg9b1zBBDRoBDVycz1ntxqda2+RToRilJOnaqgLE+aLP0ER
+         93zMw+kw+G5W/Z+/2uK0qGodrr6fhuJ1N9PG4Wc7ZAGQabHxkvBPi2B67t2aD04MIK0P
+         kh4kDadxLhiG4O3qFDYKpYSPYdryGFQSkjo940HmOnkaN1KIlr89E275UcR+YgnoUj68
+         oNvTGU6+/WgrYI2XeYi6j8CY/f6EXvDNE7meJrlECEIWxgfo/z8mV9zQvgE38skNM9fR
+         agTeJZlAwz4zVtvYSSbVuIlA4RZFmuAeL8nQjCvWV8LhPzeaVRyQ8k6wnRCIYaF5OH7L
+         gLpQ==
+X-Gm-Message-State: AGi0PuZyxjA3sGUjMfSm/130YEY+a0+4C2b8+dbkQAFNYjZZzx/QjtTo
+        b1xIpysiaX/ET6feh4x4+M5UJRpnj2xeehj/BlDwurNLI4Xq1T+gYf/zHWbV53xlICxpujG/ALN
+        9cW4XNfBnDVQ0
+X-Received: by 2002:a1c:7d83:: with SMTP id y125mr4743889wmc.21.1585751249846;
+        Wed, 01 Apr 2020 07:27:29 -0700 (PDT)
+X-Google-Smtp-Source: APiQypJJt7lJi60JuKAIp/rXIjmTJwlS5cY9W7TmEAMkhxUGDg3AMcGVYKQShXzSwPvJ9KNLjAunKg==
+X-Received: by 2002:a1c:7d83:: with SMTP id y125mr4743844wmc.21.1585751249553;
+        Wed, 01 Apr 2020 07:27:29 -0700 (PDT)
 Received: from redhat.com (bzq-79-176-51-222.red.bezeqint.net. [79.176.51.222])
-        by smtp.gmail.com with ESMTPSA id r5sm2901223wmr.15.2020.04.01.07.18.04
+        by smtp.gmail.com with ESMTPSA id b127sm635666wmd.2.2020.04.01.07.27.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 Apr 2020 07:18:07 -0700 (PDT)
-Date:   Wed, 1 Apr 2020 10:18:03 -0400
+        Wed, 01 Apr 2020 07:27:28 -0700 (PDT)
+Date:   Wed, 1 Apr 2020 10:27:24 -0400
 From:   "Michael S. Tsirkin" <mst@redhat.com>
 To:     Jason Wang <jasowang@redhat.com>
 Cc:     Christian Borntraeger <borntraeger@de.ibm.com>,
@@ -67,7 +67,7 @@ Cc:     Christian Borntraeger <borntraeger@de.ibm.com>,
         mhabets@solarflare.com, gdawar@xilinx.com, saugatm@xilinx.com,
         vmireyno@marvell.com, zhangweining@ruijie.com.cn
 Subject: Re: [PATCH V9 1/9] vhost: refine vhost and vringh kconfig
-Message-ID: <20200401101634-mutt-send-email-mst@kernel.org>
+Message-ID: <20200401102631-mutt-send-email-mst@kernel.org>
 References: <20200326140125.19794-1-jasowang@redhat.com>
  <20200326140125.19794-2-jasowang@redhat.com>
  <fde312a4-56bd-f11f-799f-8aa952008012@de.ibm.com>
@@ -159,61 +159,61 @@ On Wed, Apr 01, 2020 at 10:13:29PM +0800, Jason Wang wrote:
 > 
 > Thanks
 
-I think I prefer 2, but does it auto-select VHOST_IOTLB then?
-Generally what was the reason to drop select VHOST from devices?
+OK I tried this:
+
+diff --git a/drivers/vhost/Kconfig b/drivers/vhost/Kconfig
+index 2523a1d4290a..a314b900d479 100644
+--- a/drivers/vhost/Kconfig
++++ b/drivers/vhost/Kconfig
+@@ -19,11 +19,10 @@ menuconfig VHOST
+ 	  This option is selected by any driver which needs to access
+ 	  the core of vhost.
+ 
+-if VHOST
+-
+ config VHOST_NET
+ 	tristate "Host kernel accelerator for virtio net"
+ 	depends on NET && EVENTFD && (TUN || !TUN) && (TAP || !TAP)
++	select VHOST
+ 	---help---
+ 	  This kernel module can be loaded in host kernel to accelerate
+ 	  guest networking with virtio_net. Not to be confused with virtio_net
+@@ -35,6 +34,7 @@ config VHOST_NET
+ config VHOST_SCSI
+ 	tristate "VHOST_SCSI TCM fabric driver"
+ 	depends on TARGET_CORE && EVENTFD
++	select VHOST
+ 	default n
+ 	---help---
+ 	Say M here to enable the vhost_scsi TCM fabric module
+@@ -44,6 +44,7 @@ config VHOST_VSOCK
+ 	tristate "vhost virtio-vsock driver"
+ 	depends on VSOCKETS && EVENTFD
+ 	select VIRTIO_VSOCKETS_COMMON
++	select VHOST
+ 	default n
+ 	---help---
+ 	This kernel module can be loaded in the host kernel to provide AF_VSOCK
+@@ -57,6 +58,7 @@ config VHOST_VDPA
+ 	tristate "Vhost driver for vDPA-based backend"
+ 	depends on EVENTFD
+ 	select VDPA
++	select VHOST
+ 	help
+ 	  This kernel module can be loaded in host kernel to accelerate
+ 	  guest virtio devices with the vDPA-based backends.
+@@ -78,5 +80,3 @@ config VHOST_CROSS_ENDIAN_LEGACY
+ 	  adds some overhead, it is disabled by default.
+ 
+ 	  If unsure, say "N".
+-
+-endif
 
 
-> 
-> > 
-> > ---
-> >   arch/s390/configs/debug_defconfig | 5 +++--
-> >   arch/s390/configs/defconfig       | 5 +++--
-> >   2 files changed, 6 insertions(+), 4 deletions(-)
-> > 
-> > diff --git a/arch/s390/configs/debug_defconfig b/arch/s390/configs/debug_defconfig
-> > index 46038bc58c9e..0b83274341ce 100644
-> > --- a/arch/s390/configs/debug_defconfig
-> > +++ b/arch/s390/configs/debug_defconfig
-> > @@ -57,8 +57,6 @@ CONFIG_PROTECTED_VIRTUALIZATION_GUEST=y
-> >   CONFIG_CMM=m
-> >   CONFIG_APPLDATA_BASE=y
-> >   CONFIG_KVM=m
-> > -CONFIG_VHOST_NET=m
-> > -CONFIG_VHOST_VSOCK=m
-> >   CONFIG_OPROFILE=m
-> >   CONFIG_KPROBES=y
-> >   CONFIG_JUMP_LABEL=y
-> > @@ -561,6 +559,9 @@ CONFIG_VFIO_MDEV_DEVICE=m
-> >   CONFIG_VIRTIO_PCI=m
-> >   CONFIG_VIRTIO_BALLOON=m
-> >   CONFIG_VIRTIO_INPUT=y
-> > +CONFIG_VHOST=m
-> > +CONFIG_VHOST_NET=m
-> > +CONFIG_VHOST_VSOCK=m
-> >   CONFIG_S390_CCW_IOMMU=y
-> >   CONFIG_S390_AP_IOMMU=y
-> >   CONFIG_EXT4_FS=y
-> > diff --git a/arch/s390/configs/defconfig b/arch/s390/configs/defconfig
-> > index 7cd0648c1f4e..39e69c4e8cf7 100644
-> > --- a/arch/s390/configs/defconfig
-> > +++ b/arch/s390/configs/defconfig
-> > @@ -57,8 +57,6 @@ CONFIG_PROTECTED_VIRTUALIZATION_GUEST=y
-> >   CONFIG_CMM=m
-> >   CONFIG_APPLDATA_BASE=y
-> >   CONFIG_KVM=m
-> > -CONFIG_VHOST_NET=m
-> > -CONFIG_VHOST_VSOCK=m
-> >   CONFIG_OPROFILE=m
-> >   CONFIG_KPROBES=y
-> >   CONFIG_JUMP_LABEL=y
-> > @@ -557,6 +555,9 @@ CONFIG_VFIO_MDEV_DEVICE=m
-> >   CONFIG_VIRTIO_PCI=m
-> >   CONFIG_VIRTIO_BALLOON=m
-> >   CONFIG_VIRTIO_INPUT=y
-> > +CONFIG_VHOST=m
-> > +CONFIG_VHOST_NET=m
-> > +CONFIG_VHOST_VSOCK=m
-> >   CONFIG_S390_CCW_IOMMU=y
-> >   CONFIG_S390_AP_IOMMU=y
-> >   CONFIG_EXT4_FS=y
+But now CONFIG_VHOST is always "y", never "m".
+Which I think will make it a built-in.
+Didn't figure out why yet.
+
+-- 
+MST
 
