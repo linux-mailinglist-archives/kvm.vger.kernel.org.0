@@ -2,119 +2,230 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5318119AE9D
-	for <lists+kvm@lfdr.de>; Wed,  1 Apr 2020 17:18:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A238A19AF29
+	for <lists+kvm@lfdr.de>; Wed,  1 Apr 2020 17:57:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732631AbgDAPSU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 1 Apr 2020 11:18:20 -0400
-Received: from mga05.intel.com ([192.55.52.43]:42676 "EHLO mga05.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1732504AbgDAPSU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 1 Apr 2020 11:18:20 -0400
-IronPort-SDR: AEMiQJr9fWk8kXqf9Q3lbKKQODIEFcyiXHB6M2cDgwDQigXgehRS5m+IE7fy6rrZrkLUOpBsXi
- 13m9209APCaA==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Apr 2020 08:18:19 -0700
-IronPort-SDR: OIR3dx6bgM/ubb1jkXpAKqvwRt7zK6DexWasa4lQsxqVDbAS4kpU8Wbo/8vsUgCubA7WbHEOW4
- HLIY0+xM/k8Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.72,332,1580803200"; 
-   d="scan'208";a="450596783"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
-  by fmsmga006.fm.intel.com with ESMTP; 01 Apr 2020 08:18:19 -0700
-Date:   Wed, 1 Apr 2020 08:18:19 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: VMX: fix crash cleanup when KVM wasn't used
-Message-ID: <20200401151819.GH31660@linux.intel.com>
-References: <20200401081348.1345307-1-vkuznets@redhat.com>
+        id S1733204AbgDAP5Z (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 1 Apr 2020 11:57:25 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:60646 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1733164AbgDAP5Z (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 1 Apr 2020 11:57:25 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1585756643;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=MJvti0HQwxkGVr50UmLlXHEkmoOLavfcErw++olR+Jo=;
+        b=YU2bBKijT6CWfrdyETj97cBby7OAxjy+9Tjzjo0un7WxfanqWalS7+CJrBQLBSKHKHTZ/j
+        /mFM/TDfZ0n/qK4H66umu1KI+trEAME7vlIEQksmebmEQxmmj1yEylP+BeAbcP8F1HXg6E
+        haFyn9dwESBgZhL+/o61uP9wUCVLqfU=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-364-BIQ3omrmPMqePbzPVGauFQ-1; Wed, 01 Apr 2020 11:57:20 -0400
+X-MC-Unique: BIQ3omrmPMqePbzPVGauFQ-1
+Received: by mail-wm1-f70.google.com with SMTP id o5so145625wmo.6
+        for <kvm@vger.kernel.org>; Wed, 01 Apr 2020 08:57:20 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=MJvti0HQwxkGVr50UmLlXHEkmoOLavfcErw++olR+Jo=;
+        b=rEE33aSNfcSjzpp5FbPv47ykyv6hvzrVu2tSRTZGNYCcYSucgp/idButbYLZCJQAQa
+         CGEcHwNPbfJ8btKe5w5N9de2x7oIFXt0gWi4EZzj7FYcEYNUEvbqtfmJuA6jBIXIvszt
+         pv4asZa+qTc2grZNzs/oOPrBCP/NDy3CU1cGBtvONeZKl6YHXJ5VCdd1u7fUdDUBIQi/
+         45wdiRv1ZSsSyocsaSBg9OmtMwW8hxVsSyTybhQJaSywmF45pjveAmo/xdX+LkqQhnsl
+         6UKtvCsMgnGz4JMdqpBQ7M5Nsha3Z8+R88WCfDmtSe/8NADZmtOk5boziRcokLsQ7m9w
+         poDw==
+X-Gm-Message-State: AGi0Pub6so4Jz4vCGjp+Q8Ve3vFsdNrOR/YJdriTVhsPl16SF+xJB/i1
+        QzeIVLXufpIGzPueS+MMfmAtARVhe4i9ZWPY7ZcHoQctUbJlxOHPZefRHAkRoVittApmH4aR2Oq
+        3BJXT+a+DQfqc
+X-Received: by 2002:a1c:1942:: with SMTP id 63mr5209039wmz.133.1585756639448;
+        Wed, 01 Apr 2020 08:57:19 -0700 (PDT)
+X-Google-Smtp-Source: APiQypKA2aA36/p1yS+4iSBINIMZYbsrQcGfbJmIXDjaLpAeYKGxwb5JBIS+CYjNIECD0H1M4kXpUQ==
+X-Received: by 2002:a1c:1942:: with SMTP id 63mr5209012wmz.133.1585756639201;
+        Wed, 01 Apr 2020 08:57:19 -0700 (PDT)
+Received: from redhat.com (bzq-79-176-51-222.red.bezeqint.net. [79.176.51.222])
+        by smtp.gmail.com with ESMTPSA id a8sm2954348wmb.39.2020.04.01.08.57.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 01 Apr 2020 08:57:18 -0700 (PDT)
+Date:   Wed, 1 Apr 2020 11:57:14 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        jgg@mellanox.com, maxime.coquelin@redhat.com,
+        cunming.liang@intel.com, zhihong.wang@intel.com,
+        rob.miller@broadcom.com, xiao.w.wang@intel.com,
+        lingshan.zhu@intel.com, eperezma@redhat.com, lulu@redhat.com,
+        parav@mellanox.com, kevin.tian@intel.com, stefanha@redhat.com,
+        rdunlap@infradead.org, hch@infradead.org, aadam@redhat.com,
+        jiri@mellanox.com, shahafs@mellanox.com, hanand@xilinx.com,
+        mhabets@solarflare.com, gdawar@xilinx.com, saugatm@xilinx.com,
+        vmireyno@marvell.com, zhangweining@ruijie.com.cn
+Subject: Re: [PATCH V9 1/9] vhost: refine vhost and vringh kconfig
+Message-ID: <20200401115650-mutt-send-email-mst@kernel.org>
+References: <20200326140125.19794-1-jasowang@redhat.com>
+ <20200326140125.19794-2-jasowang@redhat.com>
+ <fde312a4-56bd-f11f-799f-8aa952008012@de.ibm.com>
+ <41ee1f6a-3124-d44b-bf34-0f26604f9514@redhat.com>
+ <4726da4c-11ec-3b6e-1218-6d6d365d5038@de.ibm.com>
+ <39b96e3a-9f4e-6e1d-e988-8c4bcfb55879@de.ibm.com>
+ <c423c5b1-7817-7417-d7af-e07bef6368e7@redhat.com>
+ <20200401102631-mutt-send-email-mst@kernel.org>
+ <5e409bb4-2b06-5193-20c3-a9ddaafacf5a@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20200401081348.1345307-1-vkuznets@redhat.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <5e409bb4-2b06-5193-20c3-a9ddaafacf5a@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Apr 01, 2020 at 10:13:48AM +0200, Vitaly Kuznetsov wrote:
-> If KVM wasn't used at all before we crash the cleanup procedure fails with
->  BUG: unable to handle page fault for address: ffffffffffffffc8
->  #PF: supervisor read access in kernel mode
->  #PF: error_code(0x0000) - not-present page
->  PGD 23215067 P4D 23215067 PUD 23217067 PMD 0
->  Oops: 0000 [#8] SMP PTI
->  CPU: 0 PID: 3542 Comm: bash Kdump: loaded Tainted: G      D           5.6.0-rc2+ #823
->  RIP: 0010:crash_vmclear_local_loaded_vmcss.cold+0x19/0x51 [kvm_intel]
+On Wed, Apr 01, 2020 at 10:50:50PM +0800, Jason Wang wrote:
 > 
-> The root cause is that loaded_vmcss_on_cpu list is not yet initialized,
-> we initialize it in hardware_enable() but this only happens when we start
-> a VM.
+> On 2020/4/1 下午10:27, Michael S. Tsirkin wrote:
+> > On Wed, Apr 01, 2020 at 10:13:29PM +0800, Jason Wang wrote:
+> > > On 2020/4/1 下午9:02, Christian Borntraeger wrote:
+> > > > On 01.04.20 14:56, Christian Borntraeger wrote:
+> > > > > On 01.04.20 14:50, Jason Wang wrote:
+> > > > > > On 2020/4/1 下午7:21, Christian Borntraeger wrote:
+> > > > > > > On 26.03.20 15:01, Jason Wang wrote:
+> > > > > > > > Currently, CONFIG_VHOST depends on CONFIG_VIRTUALIZATION. But vhost is
+> > > > > > > > not necessarily for VM since it's a generic userspace and kernel
+> > > > > > > > communication protocol. Such dependency may prevent archs without
+> > > > > > > > virtualization support from using vhost.
+> > > > > > > > 
+> > > > > > > > To solve this, a dedicated vhost menu is created under drivers so
+> > > > > > > > CONIFG_VHOST can be decoupled out of CONFIG_VIRTUALIZATION.
+> > > > > > > FWIW, this now results in vhost not being build with defconfig kernels (in todays
+> > > > > > > linux-next).
+> > > > > > > 
+> > > > > > Hi Christian:
+> > > > > > 
+> > > > > > Did you meet it even with this commit https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git/commit/?id=a4be40cbcedba9b5b714f3c95182e8a45176e42d?
+> > > > > I simply used linux-next. The defconfig does NOT contain CONFIG_VHOST and therefore CONFIG_VHOST_NET and friends
+> > > > > can not be selected.
+> > > > > 
+> > > > > $ git checkout next-20200401
+> > > > > $ make defconfig
+> > > > >     HOSTCC  scripts/basic/fixdep
+> > > > >     HOSTCC  scripts/kconfig/conf.o
+> > > > >     HOSTCC  scripts/kconfig/confdata.o
+> > > > >     HOSTCC  scripts/kconfig/expr.o
+> > > > >     LEX     scripts/kconfig/lexer.lex.c
+> > > > >     YACC    scripts/kconfig/parser.tab.[ch]
+> > > > >     HOSTCC  scripts/kconfig/lexer.lex.o
+> > > > >     HOSTCC  scripts/kconfig/parser.tab.o
+> > > > >     HOSTCC  scripts/kconfig/preprocess.o
+> > > > >     HOSTCC  scripts/kconfig/symbol.o
+> > > > >     HOSTCC  scripts/kconfig/util.o
+> > > > >     HOSTLD  scripts/kconfig/conf
+> > > > > *** Default configuration is based on 'x86_64_defconfig'
+> > > > > #
+> > > > > # configuration written to .config
+> > > > > #
+> > > > > 
+> > > > > $ grep VHOST .config
+> > > > > # CONFIG_VHOST is not set
+> > > > > 
+> > > > > > If yes, what's your build config looks like?
+> > > > > > 
+> > > > > > Thanks
+> > > > This was x86. Not sure if that did work before.
+> > > > On s390 this is definitely a regression as the defconfig files
+> > > > for s390 do select VHOST_NET
+> > > > 
+> > > > grep VHOST arch/s390/configs/*
+> > > > arch/s390/configs/debug_defconfig:CONFIG_VHOST_NET=m
+> > > > arch/s390/configs/debug_defconfig:CONFIG_VHOST_VSOCK=m
+> > > > arch/s390/configs/defconfig:CONFIG_VHOST_NET=m
+> > > > arch/s390/configs/defconfig:CONFIG_VHOST_VSOCK=m
+> > > > 
+> > > > and this worked with 5.6, but does not work with next. Just adding
+> > > > CONFIG_VHOST=m to the defconfig solves the issue, something like
+> > > 
+> > > Right, I think we probably need
+> > > 
+> > > 1) add CONFIG_VHOST=m to all defconfigs that enables
+> > > CONFIG_VHOST_NET/VSOCK/SCSI.
+> > > 
+> > > or
+> > > 
+> > > 2) don't use menuconfig for CONFIG_VHOST, let NET/SCSI/VDPA just select it.
+> > > 
+> > > Thanks
+> > OK I tried this:
+> > 
+> > diff --git a/drivers/vhost/Kconfig b/drivers/vhost/Kconfig
+> > index 2523a1d4290a..a314b900d479 100644
+> > --- a/drivers/vhost/Kconfig
+> > +++ b/drivers/vhost/Kconfig
+> > @@ -19,11 +19,10 @@ menuconfig VHOST
+> >   	  This option is selected by any driver which needs to access
+> >   	  the core of vhost.
+> > -if VHOST
+> > -
+> >   config VHOST_NET
+> >   	tristate "Host kernel accelerator for virtio net"
+> >   	depends on NET && EVENTFD && (TUN || !TUN) && (TAP || !TAP)
+> > +	select VHOST
+> >   	---help---
+> >   	  This kernel module can be loaded in host kernel to accelerate
+> >   	  guest networking with virtio_net. Not to be confused with virtio_net
+> > @@ -35,6 +34,7 @@ config VHOST_NET
+> >   config VHOST_SCSI
+> >   	tristate "VHOST_SCSI TCM fabric driver"
+> >   	depends on TARGET_CORE && EVENTFD
+> > +	select VHOST
+> >   	default n
+> >   	---help---
+> >   	Say M here to enable the vhost_scsi TCM fabric module
+> > @@ -44,6 +44,7 @@ config VHOST_VSOCK
+> >   	tristate "vhost virtio-vsock driver"
+> >   	depends on VSOCKETS && EVENTFD
+> >   	select VIRTIO_VSOCKETS_COMMON
+> > +	select VHOST
+> >   	default n
+> >   	---help---
+> >   	This kernel module can be loaded in the host kernel to provide AF_VSOCK
+> > @@ -57,6 +58,7 @@ config VHOST_VDPA
+> >   	tristate "Vhost driver for vDPA-based backend"
+> >   	depends on EVENTFD
+> >   	select VDPA
+> > +	select VHOST
+> >   	help
+> >   	  This kernel module can be loaded in host kernel to accelerate
+> >   	  guest virtio devices with the vDPA-based backends.
+> > @@ -78,5 +80,3 @@ config VHOST_CROSS_ENDIAN_LEGACY
+> >   	  adds some overhead, it is disabled by default.
+> >   	  If unsure, say "N".
+> > -
+> > -endif
+> > 
+> > 
+> > But now CONFIG_VHOST is always "y", never "m".
+> > Which I think will make it a built-in.
+> > Didn't figure out why yet.
 > 
-> Previously, we used to have a bitmap with enabled CPUs and that was
-> preventing [masking] the issue.
 > 
-> Initialized loaded_vmcss_on_cpu list earlier, right before we assign
-> crash_vmclear_loaded_vmcss pointer. blocked_vcpu_on_cpu list and
-> blocked_vcpu_on_cpu_lock are moved altogether for consistency.
-> 
-> Fixes: 31603d4fc2bb ("KVM: VMX: Always VMCLEAR in-use VMCSes during crash with kexec support")
-> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-> ---
->  arch/x86/kvm/vmx/vmx.c | 12 +++++++-----
->  1 file changed, 7 insertions(+), 5 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 3aba51d782e2..39a5dde12b79 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -2257,10 +2257,6 @@ static int hardware_enable(void)
->  	    !hv_get_vp_assist_page(cpu))
->  		return -EFAULT;
->  
-> -	INIT_LIST_HEAD(&per_cpu(loaded_vmcss_on_cpu, cpu));
-> -	INIT_LIST_HEAD(&per_cpu(blocked_vcpu_on_cpu, cpu));
-> -	spin_lock_init(&per_cpu(blocked_vcpu_on_cpu_lock, cpu));
-> -
->  	r = kvm_cpu_vmxon(phys_addr);
->  	if (r)
->  		return r;
-> @@ -8006,7 +8002,7 @@ module_exit(vmx_exit);
->  
->  static int __init vmx_init(void)
->  {
-> -	int r;
-> +	int r, cpu;
->  
->  #if IS_ENABLED(CONFIG_HYPERV)
->  	/*
-> @@ -8060,6 +8056,12 @@ static int __init vmx_init(void)
->  		return r;
->  	}
->  
-> +	for_each_possible_cpu(cpu) {
-> +		INIT_LIST_HEAD(&per_cpu(loaded_vmcss_on_cpu, cpu));
-> +		INIT_LIST_HEAD(&per_cpu(blocked_vcpu_on_cpu, cpu));
-> +		spin_lock_init(&per_cpu(blocked_vcpu_on_cpu_lock, cpu));
+> Is it because the dependency of EVENTFD for CONFIG_VHOST?
 
-Hmm, part of me thinks the posted interrupt per_cpu variables should
-continue to be initialized during hardware_enable().  But it's a small
-part of me :-)
+Oh no, it's because I forgot to change menuconfig to config.
 
-Reviewed-by: Sean Christopherson <sean.j.christopherson@intel.com>
 
-> +	}
-> +
->  #ifdef CONFIG_KEXEC_CORE
->  	rcu_assign_pointer(crash_vmclear_loaded_vmcss,
->  			   crash_vmclear_local_loaded_vmcss);
-> -- 
-> 2.25.1
+> Remove that one for this patch, I can get CONFIG_VHOST=m.
 > 
+> But according to documentation/kbuild/kconfig.rst, select is used for option
+> without prompt.
+> 
+> Thanks
+> 
+> 
+> > 
+
