@@ -2,79 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id CDEE419A960
-	for <lists+kvm@lfdr.de>; Wed,  1 Apr 2020 12:18:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8FC5519A96D
+	for <lists+kvm@lfdr.de>; Wed,  1 Apr 2020 12:21:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732299AbgDAKSY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 1 Apr 2020 06:18:24 -0400
-Received: from mail-ot1-f65.google.com ([209.85.210.65]:42598 "EHLO
-        mail-ot1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732214AbgDAKRs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 1 Apr 2020 06:17:48 -0400
-Received: by mail-ot1-f65.google.com with SMTP id z5so25088922oth.9;
-        Wed, 01 Apr 2020 03:17:47 -0700 (PDT)
+        id S1732213AbgDAKUP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 1 Apr 2020 06:20:15 -0400
+Received: from mail-lj1-f193.google.com ([209.85.208.193]:45916 "EHLO
+        mail-lj1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732110AbgDAKUP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 1 Apr 2020 06:20:15 -0400
+Received: by mail-lj1-f193.google.com with SMTP id t17so25205370ljc.12
+        for <kvm@vger.kernel.org>; Wed, 01 Apr 2020 03:20:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=mBqh6Ypzy/m7vLTiZswTsYxCopoXAki18qhKtEVtcHw=;
-        b=j9VTKm54KKKt/Dc89MScCIynRAjGob+IOpTDusREKFmLssJHtzxUaQ0vJSpk2LkbQo
-         RoqogApLn002HQYkwOI+8MUNkHJoQLfuUgrQX8mzCHVgOIgvb41wFLKX6npdhu2Ej9W7
-         DsFRUxac8MBHPv74ccBLZLc8L5zF8mz9Dtpy+V1+j7wG4agEjEx6gD7NN/k5T70cz5tx
-         LdPLY59MiE2TNown13V2+moLjaFSwCGzLL4QLtoB9nGJn1vYuan+pTfh0vIdMP8lWCMO
-         id68Pu7eaCgp93Y/2w/jJjRECg83F/sueLAuH5PNppYp6kQBNJsokNF1zd/oe9BabCb/
-         vdaA==
+        d=cogentembedded-com.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=ENHstGjuwW2yo3COsGAECyjpxrxaSoZPQXrr2CDIHqY=;
+        b=ktrc8MpUEQ5QI60gYoRyEuvXwXfpEqx3M/fJrox89MhNAHgYG86XLaLOivQ4eQVGSK
+         G89OY/Z844A8pm6YBWQeSS0CI0luQUhL0yFIhrDRDU5jwFln6jdw3yd593tYuFNvpFFy
+         0Fq7m8s9XhFlbYHxrtmek5bt2Xh4APWdRr1dgaqv5KSP94GHOm7PRhJlpzgD6CXET2GK
+         Oa3eVgsfIYfPHmP+KqTY9XrTNUYqMf1lNt5eWOT/gT8/2zATPWyIhGwf3GLewEcss9qg
+         9AOKRvdVO/l5lA9eo+oCI4YtDu8dguLTOWS8IF6jTn5KrGbNF7S+8G2s8syNS+unUgSr
+         24UQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=mBqh6Ypzy/m7vLTiZswTsYxCopoXAki18qhKtEVtcHw=;
-        b=Geq9KhjYGCbazteZ6TTUBE/VxZNP28C6GbLUUs9Dh6eP1ALO62gV45TRWjH2r6HMNd
-         4qeIWmDJRLYhEK2h30cdUs820v+7/Ys8gev5kjaHFPScjvnNpJm4qEdVZ5iN6IMwK7AM
-         XuCP54SfLC/MLbTgYTDI08gl0Fv62cYFmdpTiCg7goJyQQyjp4klaAAHSeG9iI7P3Jm1
-         FzsOHkSpKjRRjgF1eJbPfYtr6ydFLFDzKmEK27yDOwWeQvL6yuuEz57wyYNfJFobyJFj
-         lUM6QPOJ4KrUVVvcKyBrMS6z163Ax40zThT2tp/SKD6FXaGkziK9zGVpC8iesZfgT158
-         Thyg==
-X-Gm-Message-State: ANhLgQ1huu68aOiLskPl222vce30sY9YXzdhpEg5qcWUs2RRs9IutT2/
-        alCZvDyIpiQMEISIorQuYqwZfT2pOq9f1Rs1HXk=
-X-Google-Smtp-Source: ADFU+vsqokJDJD0H6ZgmPXKH4DSiupsaCXOmvU2g/iHPni24FR6vnMyN5PaMcdlJ5f2LTgZ7CQNC8SwxSjEdppzlg38=
-X-Received: by 2002:a9d:306:: with SMTP id 6mr17124994otv.185.1585736267610;
- Wed, 01 Apr 2020 03:17:47 -0700 (PDT)
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=ENHstGjuwW2yo3COsGAECyjpxrxaSoZPQXrr2CDIHqY=;
+        b=nR2x2Fbi5gbt3ChUMIkp6YXqRPDnlc7C6KLrj+kbUEUKUqDGTUSTY8uS92RqitgeNB
+         ucpa25NbuqNENSdYexZ1vMyYphMQPT8M6CnVJ1SP9+h+6eO5BhViyOIBEINKpqbv99BB
+         m9YEM7MFx0BHfRSon/qr63tUChQDt3Ami8EJJ7Z71gi5JcnhIr2n4Lw7mJnm+d4ryhJg
+         F49W6bgVWZdhQz9M4WGPs2bzSGmAbUZh/oB9YxkH36cxc/TbZVuOaevC76BUG+b7IwWo
+         Qi9yrUY7gA048cnXxGM9r0/DVVafECJGDlR4A2CkWH0fEyjnof9JiUsnZU58ymbIBWEv
+         J8DQ==
+X-Gm-Message-State: AGi0PuYJjc8mOLbMFUOdon5szx+AERKclTtgedapEH291rUmK6AsyQfo
+        VXOxQuy7hkr/KmNTnvi9MaRYEA==
+X-Google-Smtp-Source: APiQypL9WDxbsq4oYKXr36Yb9n5DZ8OQKZ64pbm4DDxE1ew8kCL3RjSimoOmg9MTrlry5TTqx+bKuQ==
+X-Received: by 2002:a2e:9a54:: with SMTP id k20mr12504657ljj.272.1585736411428;
+        Wed, 01 Apr 2020 03:20:11 -0700 (PDT)
+Received: from ?IPv6:2a00:1fa0:245:3fc8:782f:cdd9:3f89:e462? ([2a00:1fa0:245:3fc8:782f:cdd9:3f89:e462])
+        by smtp.gmail.com with ESMTPSA id u30sm1307508lfn.2.2020.04.01.03.20.10
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 01 Apr 2020 03:20:10 -0700 (PDT)
+Subject: Re: [PATCH] KVM: MIPS: fix compilation
+To:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     linux-mips@vger.kernel.org, peterx@redhat.com, rppt@linux.ibm.com
+References: <20200331154749.5457-1-pbonzini@redhat.com>
+From:   Sergei Shtylyov <sergei.shtylyov@cogentembedded.com>
+Message-ID: <b2689d50-f5fe-c7ba-eede-f11920f1d012@cogentembedded.com>
+Date:   Wed, 1 Apr 2020 13:20:02 +0300
+User-Agent: Mozilla/5.0 (Windows NT 6.3; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-References: <1585700362-11892-1-git-send-email-wanpengli@tencent.com>
- <1585700362-11892-2-git-send-email-wanpengli@tencent.com> <6de1a454-60fc-2bda-841d-f9ceb606d4c6@redhat.com>
-In-Reply-To: <6de1a454-60fc-2bda-841d-f9ceb606d4c6@redhat.com>
-From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Wed, 1 Apr 2020 18:17:35 +0800
-Message-ID: <CANRm+CwkdO0dh2cio_dJjs=8XZMz0JFeT=fw-6sUQH9_3jxsYQ@mail.gmail.com>
-Subject: Re: [PATCH v2 2/2] KVM: LAPIC: Don't need to clear IPI delivery
- status in x2apic mode
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20200331154749.5457-1-pbonzini@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 1 Apr 2020 at 08:35, Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 01/04/20 02:19, Wanpeng Li wrote:
-> > -             /* No delay here, so we always clear the pending bit */
-> > -             val &= ~(1 << 12);
-> > +             /* Immediately clear Delivery Status in xAPIC mode */
-> > +             if (!apic_x2apic_mode(apic))
-> > +                     val &= ~(1 << 12);
->
-> This adds a conditional, and the old behavior was valid according to the
-> SDM: "software should not assume the value returned by reading the ICR
-> is the last written value".
+Hello!
 
-We can queue patch 1/2 separately to catch the merge window. :)
+On 31.03.2020 18:47, Paolo Bonzini wrote:
 
-    Wanpeng
+> Commit 31168f033e37 is correct that pud_index() & __pud_offset() are the same
+
+    You should also specify the commit's 1-line summary enclosed in ("").
+
+> when pud_index() is actually provided, however it does not take into account
+> the __PAGETABLE_PUD_FOLDED case.  Provide kvm_pud_index so that MIPS KVM
+> compiles.
+> 
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+[...]
+
+MBR, Sergei
