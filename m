@@ -2,244 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0628319AC51
-	for <lists+kvm@lfdr.de>; Wed,  1 Apr 2020 15:02:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 297F919AC71
+	for <lists+kvm@lfdr.de>; Wed,  1 Apr 2020 15:14:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732585AbgDANCP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 1 Apr 2020 09:02:15 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:47682 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1732572AbgDANCO (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 1 Apr 2020 09:02:14 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 031CdFTJ069501
-        for <kvm@vger.kernel.org>; Wed, 1 Apr 2020 09:02:13 -0400
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 304edwwkp0-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Wed, 01 Apr 2020 09:02:13 -0400
-Received: from localhost
-        by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
-        Wed, 1 Apr 2020 14:01:56 +0100
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
-        by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Wed, 1 Apr 2020 14:01:49 +0100
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 031D22HY48693250
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 1 Apr 2020 13:02:03 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D5B6A5204E;
-        Wed,  1 Apr 2020 13:02:02 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.145.71.143])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 46B925204F;
-        Wed,  1 Apr 2020 13:02:01 +0000 (GMT)
-Subject: Re: [PATCH V9 1/9] vhost: refine vhost and vringh kconfig
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
-To:     Jason Wang <jasowang@redhat.com>, mst@redhat.com,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
-Cc:     jgg@mellanox.com, maxime.coquelin@redhat.com,
-        cunming.liang@intel.com, zhihong.wang@intel.com,
-        rob.miller@broadcom.com, xiao.w.wang@intel.com,
-        lingshan.zhu@intel.com, eperezma@redhat.com, lulu@redhat.com,
-        parav@mellanox.com, kevin.tian@intel.com, stefanha@redhat.com,
-        rdunlap@infradead.org, hch@infradead.org, aadam@redhat.com,
-        jiri@mellanox.com, shahafs@mellanox.com, hanand@xilinx.com,
-        mhabets@solarflare.com, gdawar@xilinx.com, saugatm@xilinx.com,
-        vmireyno@marvell.com, zhangweining@ruijie.com.cn
-References: <20200326140125.19794-1-jasowang@redhat.com>
- <20200326140125.19794-2-jasowang@redhat.com>
- <fde312a4-56bd-f11f-799f-8aa952008012@de.ibm.com>
- <41ee1f6a-3124-d44b-bf34-0f26604f9514@redhat.com>
- <4726da4c-11ec-3b6e-1218-6d6d365d5038@de.ibm.com>
-Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
- 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
- nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Date:   Wed, 1 Apr 2020 15:02:00 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
-MIME-Version: 1.0
-In-Reply-To: <4726da4c-11ec-3b6e-1218-6d6d365d5038@de.ibm.com>
-Content-Type: text/plain; charset=utf-8
+        id S1732565AbgDANOA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 1 Apr 2020 09:14:00 -0400
+Received: from mga03.intel.com ([134.134.136.65]:40967 "EHLO mga03.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1732439AbgDANOA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 1 Apr 2020 09:14:00 -0400
+IronPort-SDR: AY5xfFEq/CCVKecAfh6tz433tmtIfFRGbE522/ujSHAm4F6/AEv5DvEeiFt6UoIqQxWtnqJl2g
+ nBGeGqt2BPQw==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Apr 2020 06:13:59 -0700
+IronPort-SDR: rZNdtC/kYipPD2Ebjt/Fz5xT+31tfE0O32t4WmAu6TY4ZirdoB03QiwzWTZF7D3dDO40r9csoJ
+ MErX6EAbTlbA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.72,331,1580803200"; 
+   d="scan'208";a="295328694"
+Received: from fmsmsx103.amr.corp.intel.com ([10.18.124.201])
+  by FMSMGA003.fm.intel.com with ESMTP; 01 Apr 2020 06:13:58 -0700
+Received: from fmsmsx153.amr.corp.intel.com (10.18.125.6) by
+ FMSMSX103.amr.corp.intel.com (10.18.124.201) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Wed, 1 Apr 2020 06:13:58 -0700
+Received: from shsmsx152.ccr.corp.intel.com (10.239.6.52) by
+ FMSMSX153.amr.corp.intel.com (10.18.125.6) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Wed, 1 Apr 2020 06:13:58 -0700
+Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.225]) by
+ SHSMSX152.ccr.corp.intel.com ([169.254.6.209]) with mapi id 14.03.0439.000;
+ Wed, 1 Apr 2020 21:13:54 +0800
+From:   "Liu, Yi L" <yi.l.liu@intel.com>
+To:     Auger Eric <eric.auger@redhat.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>
+CC:     "Tian, Kevin" <kevin.tian@intel.com>,
+        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "Tian, Jun J" <jun.j.tian@intel.com>,
+        "Sun, Yi Y" <yi.y.sun@intel.com>,
+        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Wu, Hao" <hao.wu@intel.com>
+Subject: RE: [PATCH v1 3/8] vfio/type1: Report PASID alloc/free support to
+ userspace
+Thread-Topic: [PATCH v1 3/8] vfio/type1: Report PASID alloc/free support to
+ userspace
+Thread-Index: AQHWAEUdmZ6qeWVhq0GPreoHiPHgtahjjLGAgAC7stA=
+Date:   Wed, 1 Apr 2020 13:13:53 +0000
+Message-ID: <A2975661238FB949B60364EF0F2C25743A21DBAF@SHSMSX104.ccr.corp.intel.com>
+References: <1584880325-10561-1-git-send-email-yi.l.liu@intel.com>
+ <1584880325-10561-4-git-send-email-yi.l.liu@intel.com>
+ <1b720777-8334-936e-5edb-802b3dae7b05@redhat.com>
+In-Reply-To: <1b720777-8334-936e-5edb-802b3dae7b05@redhat.com>
+Accept-Language: en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-x-cbid: 20040113-0016-0000-0000-000002FC566D
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20040113-0017-0000-0000-000033601B0C
-Message-Id: <39b96e3a-9f4e-6e1d-e988-8c4bcfb55879@de.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.676
- definitions=2020-04-01_01:2020-03-31,2020-03-31 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 spamscore=0
- phishscore=0 impostorscore=0 mlxlogscore=999 lowpriorityscore=0
- suspectscore=0 adultscore=0 priorityscore=1501 mlxscore=0 bulkscore=0
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2004010109
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 01.04.20 14:56, Christian Borntraeger wrote:
-> 
-> On 01.04.20 14:50, Jason Wang wrote:
->>
->> On 2020/4/1 下午7:21, Christian Borntraeger wrote:
->>> On 26.03.20 15:01, Jason Wang wrote:
->>>> Currently, CONFIG_VHOST depends on CONFIG_VIRTUALIZATION. But vhost is
->>>> not necessarily for VM since it's a generic userspace and kernel
->>>> communication protocol. Such dependency may prevent archs without
->>>> virtualization support from using vhost.
->>>>
->>>> To solve this, a dedicated vhost menu is created under drivers so
->>>> CONIFG_VHOST can be decoupled out of CONFIG_VIRTUALIZATION.
->>> FWIW, this now results in vhost not being build with defconfig kernels (in todays
->>> linux-next).
->>>
->>
->> Hi Christian:
->>
->> Did you meet it even with this commit https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git/commit/?id=a4be40cbcedba9b5b714f3c95182e8a45176e42d?
-> 
-> I simply used linux-next. The defconfig does NOT contain CONFIG_VHOST and therefore CONFIG_VHOST_NET and friends
-> can not be selected.
-> 
-> $ git checkout next-20200401
-> $ make defconfig
->   HOSTCC  scripts/basic/fixdep
->   HOSTCC  scripts/kconfig/conf.o
->   HOSTCC  scripts/kconfig/confdata.o
->   HOSTCC  scripts/kconfig/expr.o
->   LEX     scripts/kconfig/lexer.lex.c
->   YACC    scripts/kconfig/parser.tab.[ch]
->   HOSTCC  scripts/kconfig/lexer.lex.o
->   HOSTCC  scripts/kconfig/parser.tab.o
->   HOSTCC  scripts/kconfig/preprocess.o
->   HOSTCC  scripts/kconfig/symbol.o
->   HOSTCC  scripts/kconfig/util.o
->   HOSTLD  scripts/kconfig/conf
-> *** Default configuration is based on 'x86_64_defconfig'
-> #
-> # configuration written to .config
-> #
-> 
-> $ grep VHOST .config
-> # CONFIG_VHOST is not set
-> 
->  
->> If yes, what's your build config looks like?
->>
->> Thanks
-
-This was x86. Not sure if that did work before.
-On s390 this is definitely a regression as the defconfig files 
-for s390 do select VHOST_NET
-
-grep VHOST arch/s390/configs/*
-arch/s390/configs/debug_defconfig:CONFIG_VHOST_NET=m
-arch/s390/configs/debug_defconfig:CONFIG_VHOST_VSOCK=m
-arch/s390/configs/defconfig:CONFIG_VHOST_NET=m
-arch/s390/configs/defconfig:CONFIG_VHOST_VSOCK=m
-
-and this worked with 5.6, but does not work with next. Just adding
-CONFIG_VHOST=m to the defconfig solves the issue, something like
-
----
- arch/s390/configs/debug_defconfig | 5 +++--
- arch/s390/configs/defconfig       | 5 +++--
- 2 files changed, 6 insertions(+), 4 deletions(-)
-
-diff --git a/arch/s390/configs/debug_defconfig b/arch/s390/configs/debug_defconfig
-index 46038bc58c9e..0b83274341ce 100644
---- a/arch/s390/configs/debug_defconfig
-+++ b/arch/s390/configs/debug_defconfig
-@@ -57,8 +57,6 @@ CONFIG_PROTECTED_VIRTUALIZATION_GUEST=y
- CONFIG_CMM=m
- CONFIG_APPLDATA_BASE=y
- CONFIG_KVM=m
--CONFIG_VHOST_NET=m
--CONFIG_VHOST_VSOCK=m
- CONFIG_OPROFILE=m
- CONFIG_KPROBES=y
- CONFIG_JUMP_LABEL=y
-@@ -561,6 +559,9 @@ CONFIG_VFIO_MDEV_DEVICE=m
- CONFIG_VIRTIO_PCI=m
- CONFIG_VIRTIO_BALLOON=m
- CONFIG_VIRTIO_INPUT=y
-+CONFIG_VHOST=m
-+CONFIG_VHOST_NET=m
-+CONFIG_VHOST_VSOCK=m
- CONFIG_S390_CCW_IOMMU=y
- CONFIG_S390_AP_IOMMU=y
- CONFIG_EXT4_FS=y
-diff --git a/arch/s390/configs/defconfig b/arch/s390/configs/defconfig
-index 7cd0648c1f4e..39e69c4e8cf7 100644
---- a/arch/s390/configs/defconfig
-+++ b/arch/s390/configs/defconfig
-@@ -57,8 +57,6 @@ CONFIG_PROTECTED_VIRTUALIZATION_GUEST=y
- CONFIG_CMM=m
- CONFIG_APPLDATA_BASE=y
- CONFIG_KVM=m
--CONFIG_VHOST_NET=m
--CONFIG_VHOST_VSOCK=m
- CONFIG_OPROFILE=m
- CONFIG_KPROBES=y
- CONFIG_JUMP_LABEL=y
-@@ -557,6 +555,9 @@ CONFIG_VFIO_MDEV_DEVICE=m
- CONFIG_VIRTIO_PCI=m
- CONFIG_VIRTIO_BALLOON=m
- CONFIG_VIRTIO_INPUT=y
-+CONFIG_VHOST=m
-+CONFIG_VHOST_NET=m
-+CONFIG_VHOST_VSOCK=m
- CONFIG_S390_CCW_IOMMU=y
- CONFIG_S390_AP_IOMMU=y
- CONFIG_EXT4_FS=y
--- 
-2.25.1
-
+SGkgRXJpYywNCg0KPiBGcm9tOiBBdWdlciBFcmljIDxlcmljLmF1Z2VyQHJlZGhhdC5jb20+DQo+
+IFNlbnQ6IFdlZG5lc2RheSwgQXByaWwgMSwgMjAyMCA1OjQxIFBNDQo+IFRvOiBMaXUsIFlpIEwg
+PHlpLmwubGl1QGludGVsLmNvbT47IGFsZXgud2lsbGlhbXNvbkByZWRoYXQuY29tDQo+IFN1Ympl
+Y3Q6IFJlOiBbUEFUQ0ggdjEgMy84XSB2ZmlvL3R5cGUxOiBSZXBvcnQgUEFTSUQgYWxsb2MvZnJl
+ZSBzdXBwb3J0IHRvDQo+IHVzZXJzcGFjZQ0KPiANCj4gWWksDQo+IE9uIDMvMjIvMjAgMTozMiBQ
+TSwgTGl1LCBZaSBMIHdyb3RlOg0KPiA+IEZyb206IExpdSBZaSBMIDx5aS5sLmxpdUBpbnRlbC5j
+b20+DQo+ID4NCj4gPiBUaGlzIHBhdGNoIHJlcG9ydHMgUEFTSUQgYWxsb2MvZnJlZSBhdmFpbGFi
+aWxpdHkgdG8gdXNlcnNwYWNlIChlLmcuDQo+ID4gUUVNVSkgdGh1cyB1c2Vyc3BhY2UgY291bGQg
+ZG8gYSBwcmUtY2hlY2sgYmVmb3JlIHV0aWxpemluZyB0aGlzIGZlYXR1cmUuDQo+ID4NCj4gPiBD
+YzogS2V2aW4gVGlhbiA8a2V2aW4udGlhbkBpbnRlbC5jb20+DQo+ID4gQ0M6IEphY29iIFBhbiA8
+amFjb2IuanVuLnBhbkBsaW51eC5pbnRlbC5jb20+DQo+ID4gQ2M6IEFsZXggV2lsbGlhbXNvbiA8
+YWxleC53aWxsaWFtc29uQHJlZGhhdC5jb20+DQo+ID4gQ2M6IEVyaWMgQXVnZXIgPGVyaWMuYXVn
+ZXJAcmVkaGF0LmNvbT4NCj4gPiBDYzogSmVhbi1QaGlsaXBwZSBCcnVja2VyIDxqZWFuLXBoaWxp
+cHBlQGxpbmFyby5vcmc+DQo+ID4gU2lnbmVkLW9mZi1ieTogTGl1IFlpIEwgPHlpLmwubGl1QGlu
+dGVsLmNvbT4NCj4gPiAtLS0NCj4gPiAgZHJpdmVycy92ZmlvL3ZmaW9faW9tbXVfdHlwZTEuYyB8
+IDI4ICsrKysrKysrKysrKysrKysrKysrKysrKysrKysNCj4gPiAgaW5jbHVkZS91YXBpL2xpbnV4
+L3ZmaW8uaCAgICAgICB8ICA4ICsrKysrKysrDQo+ID4gIDIgZmlsZXMgY2hhbmdlZCwgMzYgaW5z
+ZXJ0aW9ucygrKQ0KPiA+DQo+ID4gZGlmZiAtLWdpdCBhL2RyaXZlcnMvdmZpby92ZmlvX2lvbW11
+X3R5cGUxLmMNCj4gPiBiL2RyaXZlcnMvdmZpby92ZmlvX2lvbW11X3R5cGUxLmMgaW5kZXggZTQw
+YWZjMC4uZGRkMWZmZSAxMDA2NDQNCj4gPiAtLS0gYS9kcml2ZXJzL3ZmaW8vdmZpb19pb21tdV90
+eXBlMS5jDQo+ID4gKysrIGIvZHJpdmVycy92ZmlvL3ZmaW9faW9tbXVfdHlwZTEuYw0KPiA+IEBA
+IC0yMjM0LDYgKzIyMzQsMzAgQEAgc3RhdGljIGludCB2ZmlvX2lvbW11X3R5cGUxX3Bhc2lkX2Zy
+ZWUoc3RydWN0DQo+IHZmaW9faW9tbXUgKmlvbW11LA0KPiA+ICAJcmV0dXJuIHJldDsNCj4gPiAg
+fQ0KPiA+DQo+ID4gK3N0YXRpYyBpbnQgdmZpb19pb21tdV9pbmZvX2FkZF9uZXN0aW5nX2NhcChz
+dHJ1Y3QgdmZpb19pb21tdSAqaW9tbXUsDQo+ID4gKwkJCQkJIHN0cnVjdCB2ZmlvX2luZm9fY2Fw
+ICpjYXBzKQ0KPiA+ICt7DQo+ID4gKwlzdHJ1Y3QgdmZpb19pbmZvX2NhcF9oZWFkZXIgKmhlYWRl
+cjsNCj4gPiArCXN0cnVjdCB2ZmlvX2lvbW11X3R5cGUxX2luZm9fY2FwX25lc3RpbmcgKm5lc3Rp
+bmdfY2FwOw0KPiA+ICsNCj4gPiArCWhlYWRlciA9IHZmaW9faW5mb19jYXBfYWRkKGNhcHMsIHNp
+emVvZigqbmVzdGluZ19jYXApLA0KPiA+ICsJCQkJICAgVkZJT19JT01NVV9UWVBFMV9JTkZPX0NB
+UF9ORVNUSU5HLCAxKTsNCj4gPiArCWlmIChJU19FUlIoaGVhZGVyKSkNCj4gPiArCQlyZXR1cm4g
+UFRSX0VSUihoZWFkZXIpOw0KPiA+ICsNCj4gPiArCW5lc3RpbmdfY2FwID0gY29udGFpbmVyX29m
+KGhlYWRlciwNCj4gPiArCQkJCXN0cnVjdCB2ZmlvX2lvbW11X3R5cGUxX2luZm9fY2FwX25lc3Rp
+bmcsDQo+ID4gKwkJCQloZWFkZXIpOw0KPiA+ICsNCj4gPiArCW5lc3RpbmdfY2FwLT5uZXN0aW5n
+X2NhcGFiaWxpdGllcyA9IDA7DQo+ID4gKwlpZiAoaW9tbXUtPm5lc3RpbmcpIHsNCj4gPiArCQkv
+KiBuZXN0aW5nIGlvbW11IHR5cGUgc3VwcG9ydHMgUEFTSUQgcmVxdWVzdHMgKGFsbG9jL2ZyZWUp
+ICovDQo+ID4gKwkJbmVzdGluZ19jYXAtPm5lc3RpbmdfY2FwYWJpbGl0aWVzIHw9IFZGSU9fSU9N
+TVVfUEFTSURfUkVRUzsNCj4gU3VwcG9ydGluZyBuZXN0aW5nIGRvZXMgbm90IG5lY2Vzc2FyaWx5
+IG1lYW4gc3VwcG9ydGluZyBQQVNJRC4NCg0KaGVyZSBJIHRoaW5rIHRoZSBQQVNJRCBpcyBzb21l
+aG93IElEcyBpbiBrZXJuZWwgd2hpY2ggY2FuIGJlIHVzZWQgdG8NCnRhZyB2YXJpb3VzIGFkZHJl
+c3Mgc3BhY2VzIHByb3ZpZGVkIGJ5IGd1ZXN0IHNvZnR3YXJlLiBJIHRoaW5rIHRoaXMNCmlzIHdo
+eSB3ZSBpbnRyb2R1Y2VkIHRoZSBpb2FzaWQuIDotKSBDdXJyZW50IGltcGxlbWVudGF0aW9uIGlz
+IGRvaW5nDQpQQVNJRCBhbGxvYy9mcmVlIGluIHZmaW8uDQoNCj4gPiArCX0NCj4gPiArDQo+ID4g
+KwlyZXR1cm4gMDsNCj4gPiArfQ0KPiA+ICsNCj4gPiAgc3RhdGljIGxvbmcgdmZpb19pb21tdV90
+eXBlMV9pb2N0bCh2b2lkICppb21tdV9kYXRhLA0KPiA+ICAJCQkJICAgdW5zaWduZWQgaW50IGNt
+ZCwgdW5zaWduZWQgbG9uZyBhcmcpICB7IEBAIC0NCj4gMjI4Myw2ICsyMzA3LDEwIEBADQo+ID4g
+c3RhdGljIGxvbmcgdmZpb19pb21tdV90eXBlMV9pb2N0bCh2b2lkICppb21tdV9kYXRhLA0KPiA+
+ICAJCWlmIChyZXQpDQo+ID4gIAkJCXJldHVybiByZXQ7DQo+ID4NCj4gPiArCQlyZXQgPSB2Zmlv
+X2lvbW11X2luZm9fYWRkX25lc3RpbmdfY2FwKGlvbW11LCAmY2Fwcyk7DQo+ID4gKwkJaWYgKHJl
+dCkNCj4gPiArCQkJcmV0dXJuIHJldDsNCj4gPiArDQo+ID4gIAkJaWYgKGNhcHMuc2l6ZSkgew0K
+PiA+ICAJCQlpbmZvLmZsYWdzIHw9IFZGSU9fSU9NTVVfSU5GT19DQVBTOw0KPiA+DQo+ID4gZGlm
+ZiAtLWdpdCBhL2luY2x1ZGUvdWFwaS9saW51eC92ZmlvLmggYi9pbmNsdWRlL3VhcGkvbGludXgv
+dmZpby5oDQo+ID4gaW5kZXggMjk4YWM4MC4uODgzNzIxOSAxMDA2NDQNCj4gPiAtLS0gYS9pbmNs
+dWRlL3VhcGkvbGludXgvdmZpby5oDQo+ID4gKysrIGIvaW5jbHVkZS91YXBpL2xpbnV4L3ZmaW8u
+aA0KPiA+IEBAIC03NDgsNiArNzQ4LDE0IEBAIHN0cnVjdCB2ZmlvX2lvbW11X3R5cGUxX2luZm9f
+Y2FwX2lvdmFfcmFuZ2Ugew0KPiA+ICAJc3RydWN0CXZmaW9faW92YV9yYW5nZSBpb3ZhX3Jhbmdl
+c1tdOw0KPiA+ICB9Ow0KPiA+DQo+ID4gKyNkZWZpbmUgVkZJT19JT01NVV9UWVBFMV9JTkZPX0NB
+UF9ORVNUSU5HICAyDQo+ID4gKw0KPiA+ICtzdHJ1Y3QgdmZpb19pb21tdV90eXBlMV9pbmZvX2Nh
+cF9uZXN0aW5nIHsNCj4gPiArCXN0cnVjdAl2ZmlvX2luZm9fY2FwX2hlYWRlciBoZWFkZXI7DQo+
+ID4gKyNkZWZpbmUgVkZJT19JT01NVV9QQVNJRF9SRVFTCSgxIDw8IDApDQo+IFBBU0lEX1JFUVMg
+c291bmRzIGEgYml0IGZhciBmcm9tIHRoZSBjbGFpbWVkIGhvc3QgbWFuYWdlZCBhbGxvYy9mcmVl
+DQo+IGNhcGFiaWxpdHkuDQo+IFZGSU9fSU9NTVVfU1lTVEVNX1dJREVfUEFTSUQ/DQoNCk9oLCB5
+ZXAuIEkgY2FuIHJlbmFtZSBpdC4NCg0KUmVnYXJkcywNCllpIExpdQ0K
