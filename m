@@ -2,80 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id F1BA119A397
-	for <lists+kvm@lfdr.de>; Wed,  1 Apr 2020 04:29:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A86E419A3EF
+	for <lists+kvm@lfdr.de>; Wed,  1 Apr 2020 05:20:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731579AbgDAC3s (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 31 Mar 2020 22:29:48 -0400
-Received: from mail-vs1-f66.google.com ([209.85.217.66]:45484 "EHLO
-        mail-vs1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731554AbgDAC3s (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 31 Mar 2020 22:29:48 -0400
-Received: by mail-vs1-f66.google.com with SMTP id x82so14849398vsc.12
-        for <kvm@vger.kernel.org>; Tue, 31 Mar 2020 19:29:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:reply-to:sender:from:date:message-id:subject:to;
-        bh=Xb6Gu1lzDmHx/NQgpResSBUvAPC9JsRrTa2hFaXvwiE=;
-        b=jD+K9KyD/KXKdPDQPYJzZg1gyf5K27cDprYhCTm8Rnf0mdEGzQ9BxzGdL20O9u7wbp
-         sVtE4c4r0xZzyGkfmO/V2L1jPVvhfGIOgnvZHLb+dhHz/hNLBWjKQ8NmjxwTCFCi1kiw
-         RV4Uul9Q9l54mk7S5ojKiysmMoEQCHvPBMgB6OgUuBZX/Ca8LZUZS14bgSM2trxywcuA
-         /oape0FSa7lO3dm4FnozmQqcVIHH3Z/QNz1YByHzgGH8a9bzAXgk8YPHuNU90fXTlNBU
-         hRYD+1APFypa7PxF03BjLtGKnymoIwlmfJ5q2QtdO+XltmglyP2L7/FGJ745Sr3cAZS7
-         IkaA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:reply-to:sender:from:date
-         :message-id:subject:to;
-        bh=Xb6Gu1lzDmHx/NQgpResSBUvAPC9JsRrTa2hFaXvwiE=;
-        b=dRucFaHIMHx9PxS4MJEVoUDFXrrHCJAYoboWsUVUE3P0Ml4yQAh4Cdea5k+0f9VBbQ
-         2wCRWxifc3lJ2WxwFVw0waTf9yJ4zPMNvFxAUmQHITpg4ziZMSgNjU4EDZ916bm2DADH
-         bd/Vv1MoYQ2IhtR7RD+joAIFTCrbmKWjEVwhrqnNbvvKjHh5hfQyGb3i+CX9/wIY89LL
-         3Jc1xWfbAlas4sGozLO0HDQxqeibk9mRwIi8VKPreTGMkEzCH1ees5ehwuvi3tOGN/0m
-         p3OzaW3sOQV7tKFhFKhqQgyBXGOYHBL2GvCY7YqK33cvEAZ0av1yCATfo49xoVxtCrqr
-         xp5Q==
-X-Gm-Message-State: AGi0PubWPq4mL1qipDlILF8kANclYQZZGfVzOmQLZGhCjqBYu4j9A8gF
-        UAUrl2lHxrei9IU5A4GjAqnL5tWVpIRTXboj0Ic=
-X-Google-Smtp-Source: APiQypIhnWcPevdykrmhYs3h0YAZcqNKLVW98KwzJfFWOgUxnK3OtK4nTVH12lena05gKohZZFsiMA6ZXamHExYHfGo=
-X-Received: by 2002:a67:845:: with SMTP id 66mr15485600vsi.189.1585708187310;
- Tue, 31 Mar 2020 19:29:47 -0700 (PDT)
+        id S1731608AbgDADUp convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Tue, 31 Mar 2020 23:20:45 -0400
+Received: from mga14.intel.com ([192.55.52.115]:5458 "EHLO mga14.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1731554AbgDADUp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 31 Mar 2020 23:20:45 -0400
+IronPort-SDR: ZEba9ujtZdmRiSieUY9ygiUEc2SThuikKz4jAa7hTlQxOjQY0tU3uJodlU5S/Lv3+Ptfa0ty8W
+ 5D1jvnQfVe2Q==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Mar 2020 20:20:44 -0700
+IronPort-SDR: DPK9gyQBnEe3V8YRFGyinPVh5PBvRNVxBeQIZ+D4NvjJv4fxznqQzxh6YPavIs5efZ9H7Ygq3b
+ 9kqc4lwjuDXg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.72,330,1580803200"; 
+   d="scan'208";a="450387728"
+Received: from fmsmsx107.amr.corp.intel.com ([10.18.124.205])
+  by fmsmga006.fm.intel.com with ESMTP; 31 Mar 2020 20:20:44 -0700
+Received: from fmsmsx601.amr.corp.intel.com (10.18.126.81) by
+ fmsmsx107.amr.corp.intel.com (10.18.124.205) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Tue, 31 Mar 2020 20:20:44 -0700
+Received: from fmsmsx601.amr.corp.intel.com (10.18.126.81) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1713.5; Tue, 31 Mar 2020 20:20:44 -0700
+Received: from shsmsx105.ccr.corp.intel.com (10.239.4.158) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id 15.1.1713.5
+ via Frontend Transport; Tue, 31 Mar 2020 20:20:44 -0700
+Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.225]) by
+ SHSMSX105.ccr.corp.intel.com ([169.254.11.213]) with mapi id 14.03.0439.000;
+ Wed, 1 Apr 2020 11:20:40 +0800
+From:   "Liu, Yi L" <yi.l.liu@intel.com>
+To:     Auger Eric <eric.auger@redhat.com>,
+        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "peterx@redhat.com" <peterx@redhat.com>
+CC:     "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "mst@redhat.com" <mst@redhat.com>,
+        "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "Tian, Jun J" <jun.j.tian@intel.com>,
+        "Sun, Yi Y" <yi.y.sun@intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "Wu, Hao" <hao.wu@intel.com>,
+        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
+        Jacob Pan <jacob.jun.pan@linux.intel.com>,
+        Yi Sun <yi.y.sun@linux.intel.com>
+Subject: RE: [PATCH v2 10/22] vfio/pci: set host iommu context to vIOMMU
+Thread-Topic: [PATCH v2 10/22] vfio/pci: set host iommu context to vIOMMU
+Thread-Index: AQHWBkpjlWASVTcKHUCJ2vYuB9rbdahiPwyAgAFDflA=
+Date:   Wed, 1 Apr 2020 03:20:40 +0000
+Message-ID: <A2975661238FB949B60364EF0F2C25743A21C0FB@SHSMSX104.ccr.corp.intel.com>
+References: <1585542301-84087-1-git-send-email-yi.l.liu@intel.com>
+ <1585542301-84087-11-git-send-email-yi.l.liu@intel.com>
+ <564d1a55-04df-a3bd-5241-e30f958a4e89@redhat.com>
+In-Reply-To: <564d1a55-04df-a3bd-5241-e30f958a4e89@redhat.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="iso-2022-jp"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-Reply-To: beaticej20@yandex.com
-Received: by 2002:a67:e150:0:0:0:0:0 with HTTP; Tue, 31 Mar 2020 19:29:46
- -0700 (PDT)
-From:   Beatrice Johnson <beatrcej20@gmail.com>
-Date:   Wed, 1 Apr 2020 04:29:46 +0200
-X-Google-Sender-Auth: FI1S2BSy7aCwQPSUr0EUqw0n5kc
-Message-ID: <CAJHcZ3j6xn3G=Vha7FrKJV8CU=Hqs9WVrw+FebW0u2Mioiw4-A@mail.gmail.com>
-Subject: I need Your Urgent assistance.
-To:     undisclosed-recipients:;
-Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-I need Your Urgent assistance.
+Hi Eric，
 
-My name is Beatrice Johnson. The only daughter of the late Mr. Madou
-Johnson. Here in Burkina Faso, i got your Email profile while
-searching for contact on Internet; I am contacting you to help me
-receive some amount of money in your country. So that I can travel to
-your country to continue my education over there,
+> From: Auger Eric <eric.auger@redhat.com>
+> Sent: Tuesday, March 31, 2020 10:30 PM
+> To: Liu, Yi L <yi.l.liu@intel.com>; qemu-devel@nongnu.org;
+> Subject: Re: [PATCH v2 10/22] vfio/pci: set host iommu context to vIOMMU
+> 
+> Yi,
+> 
+> On 3/30/20 6:24 AM, Liu Yi L wrote:
+> > For vfio-pci devices, it could use pci_device_set/unset_iommu() to
+> > expose host iommu context to vIOMMU emulators. vIOMMU emulators could
+> > make use the methods provided by host iommu context. e.g.
+> > propagate requests to host iommu.
+> I think I would squash this patch into the previous one.
 
-Before my father died he deposited the Sum of ($4.5 Million) in a bank
-here and he advised me before he died to look for a faithful and
-reliable foreigner, who can help receive the Funds outside country, So
-that I can travel to meet you in your country. For my share percentage
-of the total amount 4.5 Million.
+sure, I can make it. :-)
 
-I hope you are capable to receive the 4.5 Million in your country with
-trust.  I will like to travel to your country immediately the bank
-wire the funds into your account. You will take 30% of the total 4.5
-Million for your good and kind assistance to me. I will send to you
-the full details concerning the funds immediately I hear from you
-soon.
+> >
+> > Cc: Kevin Tian <kevin.tian@intel.com>
+> > Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
+> > Cc: Peter Xu <peterx@redhat.com>
+> > Cc: Eric Auger <eric.auger@redhat.com>
+> > Cc: Yi Sun <yi.y.sun@linux.intel.com>
+> > Cc: David Gibson <david@gibson.dropbear.id.au>
+> > Cc: Alex Williamson <alex.williamson@redhat.com>
+> > Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
+> > ---
+> >  hw/vfio/pci.c | 13 +++++++++++++
+> >  1 file changed, 13 insertions(+)
+> >
+> > diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c index 5e75a95..c140c88
+> > 100644
+> > --- a/hw/vfio/pci.c
+> > +++ b/hw/vfio/pci.c
+> > @@ -2717,6 +2717,7 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
+> >      VFIOPCIDevice *vdev = PCI_VFIO(pdev);
+> >      VFIODevice *vbasedev_iter;
+> >      VFIOGroup *group;
+> > +    VFIOContainer *container;
+> >      char *tmp, *subsys, group_path[PATH_MAX], *group_name;
+> >      Error *err = NULL;
+> >      ssize_t len;
+> > @@ -3028,6 +3029,11 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
+> >      vfio_register_req_notifier(vdev);
+> >      vfio_setup_resetfn_quirk(vdev);
+> >
+> > +    container = vdev->vbasedev.group->container;
+> > +    if (container->iommu_ctx.initialized) {
+> Sin't it possible to dynamically allocate the iommu_ctx so that you can simply check
+> container->iommu_ctx and discard the initialized field?
 
-My Regards,
+iommu_ctx is allocated along with container as it is not a pointer in VFIOContainer.
+The only way to check it is to have flag. :-)
 
-Beatrice Johnson.
+Regards,
+Yi Liu
