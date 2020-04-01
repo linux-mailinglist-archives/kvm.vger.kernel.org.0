@@ -2,232 +2,229 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A405019A62A
-	for <lists+kvm@lfdr.de>; Wed,  1 Apr 2020 09:20:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5381219A65F
+	for <lists+kvm@lfdr.de>; Wed,  1 Apr 2020 09:38:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732060AbgDAHUD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 1 Apr 2020 03:20:03 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:58632 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1732059AbgDAHUD (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 1 Apr 2020 03:20:03 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 031739wF141258
-        for <kvm@vger.kernel.org>; Wed, 1 Apr 2020 03:20:02 -0400
-Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 303wrx16r9-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Wed, 01 Apr 2020 03:20:01 -0400
-Received: from localhost
-        by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <frankja@linux.ibm.com>;
-        Wed, 1 Apr 2020 08:19:49 +0100
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
-        by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Wed, 1 Apr 2020 08:19:46 +0100
-Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0317JuAu54001784
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 1 Apr 2020 07:19:56 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3174342045;
-        Wed,  1 Apr 2020 07:19:56 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D9ACE42042;
-        Wed,  1 Apr 2020 07:19:55 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.145.149.76])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed,  1 Apr 2020 07:19:55 +0000 (GMT)
-Subject: Re: [kvm-unit-tests PATCH 04/10] s390x: smp: Test local interrupts
- after cpu reset
-To:     David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org
-Cc:     thuth@redhat.com, linux-s390@vger.kernel.org
-References: <20200324081251.28810-1-frankja@linux.ibm.com>
- <20200324081251.28810-5-frankja@linux.ibm.com>
- <b6f1d06b-aaa5-bdd5-5491-32c8338f9ead@redhat.com>
- <126883fa-6c1e-a1e3-34f0-689cd2c0b7c4@linux.ibm.com>
- <3631ad95-6920-1089-6e87-8687c9f100b6@redhat.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
-Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
- 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
-Date:   Wed, 1 Apr 2020 09:19:55 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+        id S1731999AbgDAHiH convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Wed, 1 Apr 2020 03:38:07 -0400
+Received: from mga06.intel.com ([134.134.136.31]:65228 "EHLO mga06.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1731968AbgDAHiH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 1 Apr 2020 03:38:07 -0400
+IronPort-SDR: cwuIyNo63sIQoFzP4wlB/Lt8KOWp04LJQpr+5xPgoWdyEGn/BhD2VA6Aq6BCRiXV8+MtR9Fu0f
+ woeRpyWJ41cg==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Apr 2020 00:38:05 -0700
+IronPort-SDR: qJldliYUR2XcyDxWgtedJMpFY/Vo1ZbIs/csueRUNAwXjyk9nBj6TAhYU5VWKZpzXWkQN+A/yk
+ grBX2A7Mp/Og==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.72,330,1580803200"; 
+   d="scan'208";a="450443701"
+Received: from fmsmsx103.amr.corp.intel.com ([10.18.124.201])
+  by fmsmga006.fm.intel.com with ESMTP; 01 Apr 2020 00:38:04 -0700
+Received: from fmsmsx120.amr.corp.intel.com (10.18.124.208) by
+ FMSMSX103.amr.corp.intel.com (10.18.124.201) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Wed, 1 Apr 2020 00:38:04 -0700
+Received: from shsmsx153.ccr.corp.intel.com (10.239.6.53) by
+ fmsmsx120.amr.corp.intel.com (10.18.124.208) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Wed, 1 Apr 2020 00:38:04 -0700
+Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.225]) by
+ SHSMSX153.ccr.corp.intel.com ([169.254.12.89]) with mapi id 14.03.0439.000;
+ Wed, 1 Apr 2020 15:38:00 +0800
+From:   "Liu, Yi L" <yi.l.liu@intel.com>
+To:     "Tian, Kevin" <kevin.tian@intel.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>
+CC:     "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "Tian, Jun J" <jun.j.tian@intel.com>,
+        "Sun, Yi Y" <yi.y.sun@intel.com>,
+        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Wu, Hao" <hao.wu@intel.com>
+Subject: RE: [PATCH v1 5/8] vfio/type1: Report 1st-level/stage-1 format to
+ userspace
+Thread-Topic: [PATCH v1 5/8] vfio/type1: Report 1st-level/stage-1 format to
+ userspace
+Thread-Index: AQHWAEUcqZEEdiOKbEGofjWp2Yic+6hgi66AgANAF4A=
+Date:   Wed, 1 Apr 2020 07:38:00 +0000
+Message-ID: <A2975661238FB949B60364EF0F2C25743A21D5C2@SHSMSX104.ccr.corp.intel.com>
+References: <1584880325-10561-1-git-send-email-yi.l.liu@intel.com>
+ <1584880325-10561-6-git-send-email-yi.l.liu@intel.com>
+ <AADFC41AFE54684AB9EE6CBC0274A5D19D7FF8BC@SHSMSX104.ccr.corp.intel.com>
+In-Reply-To: <AADFC41AFE54684AB9EE6CBC0274A5D19D7FF8BC@SHSMSX104.ccr.corp.intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-In-Reply-To: <3631ad95-6920-1089-6e87-8687c9f100b6@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="vkJC8xElT4Mmm5cGMn7V5xz2B3fUqL2PA"
-X-TM-AS-GCONF: 00
-x-cbid: 20040107-0008-0000-0000-0000036850C9
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20040107-0009-0000-0000-00004A89D7F9
-Message-Id: <9c11caa4-04ff-7cc9-8f62-371d2d200048@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.676
- definitions=2020-03-31_07:2020-03-31,2020-03-31 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 lowpriorityscore=0
- mlxlogscore=999 clxscore=1015 bulkscore=0 malwarescore=0 suspectscore=0
- phishscore=0 priorityscore=1501 spamscore=0 adultscore=0 impostorscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
- definitions=main-2004010059
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---vkJC8xElT4Mmm5cGMn7V5xz2B3fUqL2PA
-Content-Type: multipart/mixed; boundary="61YDvkVaaaKDiIBR2yHRg4Skc4mSea2kn"
+ > From: Tian, Kevin <kevin.tian@intel.com>
+> Sent: Monday, March 30, 2020 7:49 PM
+> To: Liu, Yi L <yi.l.liu@intel.com>; alex.williamson@redhat.com;
+> Subject: RE: [PATCH v1 5/8] vfio/type1: Report 1st-level/stage-1 format to
+> userspace
+> 
+> > From: Liu, Yi L <yi.l.liu@intel.com>
+> > Sent: Sunday, March 22, 2020 8:32 PM
+> >
+> > From: Liu Yi L <yi.l.liu@intel.com>
+> >
+> > VFIO exposes IOMMU nesting translation (a.k.a dual stage translation)
+> > capability to userspace. Thus applications like QEMU could support
+> > vIOMMU with hardware's nesting translation capability for pass-through
+> > devices. Before setting up nesting translation for pass-through
+> > devices, QEMU and other applications need to learn the supported
+> > 1st-lvl/stage-1 translation structure format like page table format.
+> >
+> > Take vSVA (virtual Shared Virtual Addressing) as an example, to
+> > support vSVA for pass-through devices, QEMU setup nesting translation
+> > for pass- through devices. The guest page table are configured to host
+> > as 1st-lvl/
+> > stage-1 page table. Therefore, guest format should be compatible with
+> > host side.
+> >
+> > This patch reports the supported 1st-lvl/stage-1 page table format on
+> > the current platform to userspace. QEMU and other alike applications
+> > should use this format info when trying to setup IOMMU nesting
+> > translation on host IOMMU.
+> >
+> > Cc: Kevin Tian <kevin.tian@intel.com>
+> > CC: Jacob Pan <jacob.jun.pan@linux.intel.com>
+> > Cc: Alex Williamson <alex.williamson@redhat.com>
+> > Cc: Eric Auger <eric.auger@redhat.com>
+> > Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>
+> > Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
+> > ---
+> >  drivers/vfio/vfio_iommu_type1.c | 56
+> > +++++++++++++++++++++++++++++++++++++++++
+> >  include/uapi/linux/vfio.h       |  1 +
+> >  2 files changed, 57 insertions(+)
+> >
+> > diff --git a/drivers/vfio/vfio_iommu_type1.c
+> > b/drivers/vfio/vfio_iommu_type1.c index 9aa2a67..82a9e0b 100644
+> > --- a/drivers/vfio/vfio_iommu_type1.c
+> > +++ b/drivers/vfio/vfio_iommu_type1.c
+> > @@ -2234,11 +2234,66 @@ static int vfio_iommu_type1_pasid_free(struct
+> > vfio_iommu *iommu,
+> >  	return ret;
+> >  }
+> >
+> > +static int vfio_iommu_get_stage1_format(struct vfio_iommu *iommu,
+> > +					 u32 *stage1_format)
+> > +{
+> > +	struct vfio_domain *domain;
+> > +	u32 format = 0, tmp_format = 0;
+> > +	int ret;
+> > +
+> > +	mutex_lock(&iommu->lock);
+> > +	if (list_empty(&iommu->domain_list)) {
+> > +		mutex_unlock(&iommu->lock);
+> > +		return -EINVAL;
+> > +	}
+> > +
+> > +	list_for_each_entry(domain, &iommu->domain_list, next) {
+> > +		if (iommu_domain_get_attr(domain->domain,
+> > +			DOMAIN_ATTR_PASID_FORMAT, &format)) {
+> > +			ret = -EINVAL;
+> > +			format = 0;
+> > +			goto out_unlock;
+> > +		}
+> > +		/*
+> > +		 * format is always non-zero (the first format is
+> > +		 * IOMMU_PASID_FORMAT_INTEL_VTD which is 1). For
+> > +		 * the reason of potential different backed IOMMU
+> > +		 * formats, here we expect to have identical formats
+> > +		 * in the domain list, no mixed formats support.
+> > +		 * return -EINVAL to fail the attempt of setup
+> > +		 * VFIO_TYPE1_NESTING_IOMMU if non-identical formats
+> > +		 * are detected.
+> > +		 */
+> > +		if (tmp_format && tmp_format != format) {
+> > +			ret = -EINVAL;
+> > +			format = 0;
+> > +			goto out_unlock;
+> > +		}
+> > +
+> > +		tmp_format = format;
+> > +	}
+> 
+> this path is invoked only in VFIO_IOMMU_GET_INFO path. If we don't want to
+> assume the status quo that one container holds only one device w/ vIOMMU
+> (the prerequisite for vSVA), looks we also need check the format
+> compatibility when attaching a new group to this container?
 
---61YDvkVaaaKDiIBR2yHRg4Skc4mSea2kn
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+right. if attaching to a nesting type container (vfio_iommu.nesting bit
+indicates it), it should check if it is compabile with prior domains in
+the domain list. But if it is the first one attached to this container,
+it's fine. is it good?
 
-On 3/31/20 7:27 PM, David Hildenbrand wrote:
-> On 31.03.20 11:28, Janosch Frank wrote:
->> On 3/31/20 11:07 AM, David Hildenbrand wrote:
->>> On 24.03.20 09:12, Janosch Frank wrote:
->>>> Local interrupts (external and emergency call) should be cleared aft=
-er
->>>> any cpu reset.
->>>>
->>>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
->>>> ---
->>>>  s390x/smp.c | 22 ++++++++++++++++++++++
->>>>  1 file changed, 22 insertions(+)
->>>>
->>>> diff --git a/s390x/smp.c b/s390x/smp.c
->>>> index 8a6cd1d8b17d76c6..a8e3dd7aac0c788c 100644
->>>> --- a/s390x/smp.c
->>>> +++ b/s390x/smp.c
->>>> @@ -243,6 +243,20 @@ static void test_reset_initial(void)
->>>>  	report_prefix_pop();
->>>>  }
->>>> =20
->>>> +static void test_local_ints(void)
->>>> +{
->>>> +	unsigned long mask;
->>>> +
->>>> +	expect_ext_int();
->>>> +	/* Open masks for ecall and emcall */
->>>> +	ctl_set_bit(0, 13);
->>>> +	ctl_set_bit(0, 14);
->>>> +	mask =3D extract_psw_mask();
->>>> +	mask |=3D PSW_MASK_EXT;
->>>> +	load_psw_mask(mask);
->>>> +	set_flag(1);
->>>> +}
->>>> +
->>>>  static void test_reset(void)
->>>>  {
->>>>  	struct psw psw;
->>>> @@ -251,10 +265,18 @@ static void test_reset(void)
->>>>  	psw.addr =3D (unsigned long)test_func;
->>>> =20
->>>>  	report_prefix_push("cpu reset");
->>>> +	sigp(1, SIGP_EMERGENCY_SIGNAL, 0, NULL);
->>>> +	sigp(1, SIGP_EXTERNAL_CALL, 0, NULL);
->>>>  	smp_cpu_start(1, psw);
->>>> =20
->>>>  	sigp_retry(1, SIGP_CPU_RESET, 0, NULL);
->>>>  	report(smp_cpu_stopped(1), "cpu stopped");
->>>> +
->>>> +	set_flag(0);
->>>> +	psw.addr =3D (unsigned long)test_local_ints;
->>>> +	smp_cpu_start(1, psw);
->>>> +	wait_for_flag();
->>>> +	report(true, "local interrupts cleared");
->>>
->>>
->>> How can you be sure they were actually cleared/delivered?
->>>
->> Because cpu 1 would get a ext int it didn't expect and would do a
->> report_abort() as pecified in lib/s390x/interrupt.c
->=20
-> But what if it *didn't* get the interrupts delivered.
+> > +	ret = 0;
+> > +
+> > +out_unlock:
+> > +	if (format)
+> > +		*stage1_format = format;
+> > +	mutex_unlock(&iommu->lock);
+> > +	return ret;
+> > +}
+> > +
+> >  static int vfio_iommu_info_add_nesting_cap(struct vfio_iommu *iommu,
+> >  					 struct vfio_info_cap *caps)
+> >  {
+> >  	struct vfio_info_cap_header *header;
+> >  	struct vfio_iommu_type1_info_cap_nesting *nesting_cap;
+> > +	u32 formats = 0;
+> > +	int ret;
+> > +
+> > +	ret = vfio_iommu_get_stage1_format(iommu, &formats);
+> > +	if (ret) {
+> > +		pr_warn("Failed to get stage-1 format\n");
+> > +		return ret;
+> > +	}
+> >
+> >  	header = vfio_info_cap_add(caps, sizeof(*nesting_cap),
+> >  				   VFIO_IOMMU_TYPE1_INFO_CAP_NESTING,
+> > 1);
+> > @@ -2254,6 +2309,7 @@ static int
+> > vfio_iommu_info_add_nesting_cap(struct
+> > vfio_iommu *iommu,
+> >  		/* nesting iommu type supports PASID requests (alloc/free) */
+> >  		nesting_cap->nesting_capabilities |= VFIO_IOMMU_PASID_REQS;
+> >  	}
+> > +	nesting_cap->stage1_formats = formats;
+> >
+> >  	return 0;
+> >  }
+> > diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+> > index ed9881d..ebeaf3e 100644
+> > --- a/include/uapi/linux/vfio.h
+> > +++ b/include/uapi/linux/vfio.h
+> > @@ -763,6 +763,7 @@ struct vfio_iommu_type1_info_cap_nesting {
+> >  	struct	vfio_info_cap_header header;
+> >  #define VFIO_IOMMU_PASID_REQS	(1 << 0)
+> >  	__u32	nesting_capabilities;
+> > +	__u32	stage1_formats;
+> 
+> do you plan to support multiple formats? If not, use singular name.
 
-Well, the target is still looping until the reset initial test is
-executed and from personal experience I can say that this test bites
-rather fast.
+I do have such plan. e.g. it may be helpful when one day a platform can
+support multiple formats.
 
-We could execute an instruction with a mandatory exit which will prompt
-KVM to inject any remaining IRQs before setting the flag to 1.
-
-Unfortunately we do not have a polling instruction for non-IO interrupts
-at the moment to verify this test.
-
->=20
-> Then cpu 1 will simply (test_local_ints()) unlock interrupts, load the
-> psw mask, set the flag and be done with it. What am I missing? How can
-> you be sure the interrupts on cpu 1 were actually delivered?
->
-
-
---61YDvkVaaaKDiIBR2yHRg4Skc4mSea2kn--
-
---vkJC8xElT4Mmm5cGMn7V5xz2B3fUqL2PA
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl6EQJsACgkQ41TmuOI4
-ufiTRBAAuzGx7dNmrudZWnWZc+cruG5A8mUhao6pZRuPeDowoqAo0o2GEyocu02r
-ILtR9fWfP+Q4aCahFa8s9taGRNAaYGwaGmDkRfORP1WqmuPEwFxYVtXGh+HhjTMQ
-LLcAnkmSWEIZNDPCLxcDv5cBK7+KRipgt11YYEoEiv2Ei19OoVfnODFXX79NT1S2
-ku4Cw++WT2ZAvtAdeK0143XrnTx5LEgm3CffJDUk7LMVBwGQ+9TSq8DwNdG1K7BS
-XNSBJIZTkX94kysFYjs99/Yn30G0zUliIAtPZtV3cn8vv9uQl5zJd9iUwk85y4lG
-zBIQNTyz8CcQU7w9ZSD8UetoEAyMvQ2DVmqwTESjTPdOfoRuZIT9k4tL1Mq8X9BM
-6aRda/CqeNC97N9w7Q7KWxjvwa/Qsx1UAeCCtbtHLZAvDfYZetMEMPLjYOjE5EmZ
-0vY0eaWC23TaTkBnqv7gUa5kaLiJZKyM8P9HEsdOSwPbR5/yNqsuFva+DmiOUJuT
-6a/4mI0GSuhV8W/eyeLxyHf9glAE9T7dzS1+CbZSQSH2HkKYE9QpybyblPgLJ/Y2
-1k6LclfXbzV4Dfvz92zFpo5wdikMZDQFPzq2WCaJzkdANrlO73VAAuUY69KcjhbI
-vXnlAKu4FByH3uYZP4BkbrgMXE7nKZqP3la24VTpc16rLCor3qU=
-=dgVV
------END PGP SIGNATURE-----
-
---vkJC8xElT4Mmm5cGMn7V5xz2B3fUqL2PA--
-
+Regards,
+Yi Liu
