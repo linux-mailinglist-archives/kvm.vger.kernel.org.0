@@ -2,369 +2,221 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E5E8519ACEA
-	for <lists+kvm@lfdr.de>; Wed,  1 Apr 2020 15:31:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 36F0D19AD4B
+	for <lists+kvm@lfdr.de>; Wed,  1 Apr 2020 16:01:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732669AbgDANbW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 1 Apr 2020 09:31:22 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:48466 "EHLO
+        id S1732874AbgDAOBh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 1 Apr 2020 10:01:37 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:41594 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1732645AbgDANbV (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 1 Apr 2020 09:31:21 -0400
+        by vger.kernel.org with ESMTP id S1732587AbgDAOBh (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 1 Apr 2020 10:01:37 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1585747880;
+        s=mimecast20190719; t=1585749695;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=khy6escS/gMZ60xgHqFZm3yT0ljG8MitkL6uMsVyZrM=;
-        b=BiaU3bOkcU5eOw1GnitfqwOSTuI5h8nyoWMpIpDkgM40BOosImt4KEo90PNXjWQmtcp7u1
-        uPifWq6EKc/AdHsPziwMzLzyeAZM6TtFSnoXntezzl6Zizc93fuCniP6hV1dY3veGDRK+y
-        BteoY2p/5hJnnpC0jiUWsYaA8UWx+vM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-248-8HNLeJx6OlOIfFbO4nsd0g-1; Wed, 01 Apr 2020 09:31:16 -0400
-X-MC-Unique: 8HNLeJx6OlOIfFbO4nsd0g-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C20B3DB30;
-        Wed,  1 Apr 2020 13:31:13 +0000 (UTC)
-Received: from [10.36.112.58] (ovpn-112-58.ams2.redhat.com [10.36.112.58])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 85DE619C70;
-        Wed,  1 Apr 2020 13:31:06 +0000 (UTC)
-Subject: Re: [PATCH v10 04/11] vfio/pci: Add VFIO_REGION_TYPE_NESTED region
- type
-To:     "Liu, Yi L" <yi.l.liu@intel.com>,
-        "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
-        "jean-philippe.brucker@arm.com" <jean-philippe.brucker@arm.com>,
-        "will.deacon@arm.com" <will.deacon@arm.com>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>
-Cc:     "marc.zyngier@arm.com" <marc.zyngier@arm.com>,
-        "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
-        "zhangfei.gao@gmail.com" <zhangfei.gao@gmail.com>,
-        "Jiang, Dave" <dave.jiang@intel.com>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>
-References: <20200320161911.27494-1-eric.auger@redhat.com>
- <20200320161911.27494-5-eric.auger@redhat.com>
- <A2975661238FB949B60364EF0F2C25743A21DBDF@SHSMSX104.ccr.corp.intel.com>
-From:   Auger Eric <eric.auger@redhat.com>
-Message-ID: <893039be-265a-8c70-8e48-74122d9857de@redhat.com>
-Date:   Wed, 1 Apr 2020 15:31:04 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+        bh=JTgkw/DNWNFnGK1V1mn43DeF8IkK7OE1WypLeTHLQVQ=;
+        b=GyDvtzxgdJe+NPo3SEjtIIeob7qke8JOdWOTN6yrCmOrAJJQCaamHpD32LB7fnhppxdtRP
+        vrT1CItyR7CVx2RtVvweQfbYDFNTfCPObT6BUunWfPgq8WdcRwK1qxzkcqtJAGVbDvlEIR
+        tMwYkVpdoBB2EJT8T06PiMFdbRQB1Ic=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-482-a3xzo1WtMciuM2Zh8uB4yQ-1; Wed, 01 Apr 2020 10:01:34 -0400
+X-MC-Unique: a3xzo1WtMciuM2Zh8uB4yQ-1
+Received: by mail-wm1-f70.google.com with SMTP id o5so10186wmo.6
+        for <kvm@vger.kernel.org>; Wed, 01 Apr 2020 07:01:34 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=JTgkw/DNWNFnGK1V1mn43DeF8IkK7OE1WypLeTHLQVQ=;
+        b=nbodK7p8tgT7DuCVDPxRdBIX1fIs1Wjyljvv9erQc5/P4QIr/4bMq+AQw8m1VdZHe4
+         A6W2gcZITLGfZdaxwcWONYOfmeO5zrB8Rt4iuaVYoyPUK/0SariOf3+/o3QB22x6PkHD
+         pJVxQL6zcR+Oc9mVqxHwt8O2lQcf4lxSgAUDCTbJd9813KZN9NIyhNC0+na5GSESe0nd
+         k3pp2J3Ok76nDNvQhhrU6lMte2pTgr6ZUMZvu7J7sR0w1H7CPB6WsIpJ9OUPbtdHZr6P
+         E6OtnxSsB9eoe8r5bZP4/DMWlfCTd35wQcnLd65eGDDb0YeiQ60vZvQIeVVChD/2rC+e
+         c6fg==
+X-Gm-Message-State: ANhLgQ2h7SikZeyhTqt01lFeUSx42uozpPVK+eAU5OgxGndQW9W+vbtS
+        LWyZZtlbiFLGBnTVjK3Kvbtpd2qMKiRSzZpBFcdD/JIAyFUTbbCb87/B8n8u0EFPzFdQiddmJYt
+        G9yeJ670oH6C7
+X-Received: by 2002:adf:9321:: with SMTP id 30mr24990271wro.330.1585749692208;
+        Wed, 01 Apr 2020 07:01:32 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vsFbKox39mO56Wdb4IkMUuB5u4BTlW+FZYATXuysnk2/9j76LmESJqT/c2PrF73AgslT1nk9A==
+X-Received: by 2002:adf:9321:: with SMTP id 30mr24990241wro.330.1585749691892;
+        Wed, 01 Apr 2020 07:01:31 -0700 (PDT)
+Received: from redhat.com (bzq-79-176-51-222.red.bezeqint.net. [79.176.51.222])
+        by smtp.gmail.com with ESMTPSA id 98sm3113112wrk.52.2020.04.01.07.01.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 01 Apr 2020 07:01:31 -0700 (PDT)
+Date:   Wed, 1 Apr 2020 10:01:26 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Christian Borntraeger <borntraeger@de.ibm.com>
+Cc:     Jason Wang <jasowang@redhat.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, jgg@mellanox.com,
+        maxime.coquelin@redhat.com, cunming.liang@intel.com,
+        zhihong.wang@intel.com, rob.miller@broadcom.com,
+        xiao.w.wang@intel.com, lingshan.zhu@intel.com, eperezma@redhat.com,
+        lulu@redhat.com, parav@mellanox.com, kevin.tian@intel.com,
+        stefanha@redhat.com, rdunlap@infradead.org, hch@infradead.org,
+        aadam@redhat.com, jiri@mellanox.com, shahafs@mellanox.com,
+        hanand@xilinx.com, mhabets@solarflare.com, gdawar@xilinx.com,
+        saugatm@xilinx.com, vmireyno@marvell.com,
+        zhangweining@ruijie.com.cn
+Subject: Re: [PATCH V9 1/9] vhost: refine vhost and vringh kconfig
+Message-ID: <20200401095820-mutt-send-email-mst@kernel.org>
+References: <20200326140125.19794-1-jasowang@redhat.com>
+ <20200326140125.19794-2-jasowang@redhat.com>
+ <fde312a4-56bd-f11f-799f-8aa952008012@de.ibm.com>
+ <41ee1f6a-3124-d44b-bf34-0f26604f9514@redhat.com>
+ <4726da4c-11ec-3b6e-1218-6d6d365d5038@de.ibm.com>
+ <39b96e3a-9f4e-6e1d-e988-8c4bcfb55879@de.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <A2975661238FB949B60364EF0F2C25743A21DBDF@SHSMSX104.ccr.corp.intel.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <39b96e3a-9f4e-6e1d-e988-8c4bcfb55879@de.ibm.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Yi,
-
-On 4/1/20 3:18 PM, Liu, Yi L wrote:
-> Hi Eric,
+On Wed, Apr 01, 2020 at 03:02:00PM +0200, Christian Borntraeger wrote:
 > 
-> Just curious about your plan on this patch, I just heard my colleague would like
-> to reference the functions from this patch in his dsa driver work.
-
-Well I intend to respin until somebody tells me it is completely vain or
-dead follows. Joking aside, feel free to embed it in any series it would
-be beneficial to, just please cc me in case code diverges.
-
-Thanks
-
-Eric
 > 
-> Regards,
-> Yi Liu
+> On 01.04.20 14:56, Christian Borntraeger wrote:
+> > 
+> > On 01.04.20 14:50, Jason Wang wrote:
+> >>
+> >> On 2020/4/1 下午7:21, Christian Borntraeger wrote:
+> >>> On 26.03.20 15:01, Jason Wang wrote:
+> >>>> Currently, CONFIG_VHOST depends on CONFIG_VIRTUALIZATION. But vhost is
+> >>>> not necessarily for VM since it's a generic userspace and kernel
+> >>>> communication protocol. Such dependency may prevent archs without
+> >>>> virtualization support from using vhost.
+> >>>>
+> >>>> To solve this, a dedicated vhost menu is created under drivers so
+> >>>> CONIFG_VHOST can be decoupled out of CONFIG_VIRTUALIZATION.
+> >>> FWIW, this now results in vhost not being build with defconfig kernels (in todays
+> >>> linux-next).
+> >>>
+> >>
+> >> Hi Christian:
+> >>
+> >> Did you meet it even with this commit https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git/commit/?id=a4be40cbcedba9b5b714f3c95182e8a45176e42d?
+> > 
+> > I simply used linux-next. The defconfig does NOT contain CONFIG_VHOST and therefore CONFIG_VHOST_NET and friends
+> > can not be selected.
+> > 
+> > $ git checkout next-20200401
+> > $ make defconfig
+> >   HOSTCC  scripts/basic/fixdep
+> >   HOSTCC  scripts/kconfig/conf.o
+> >   HOSTCC  scripts/kconfig/confdata.o
+> >   HOSTCC  scripts/kconfig/expr.o
+> >   LEX     scripts/kconfig/lexer.lex.c
+> >   YACC    scripts/kconfig/parser.tab.[ch]
+> >   HOSTCC  scripts/kconfig/lexer.lex.o
+> >   HOSTCC  scripts/kconfig/parser.tab.o
+> >   HOSTCC  scripts/kconfig/preprocess.o
+> >   HOSTCC  scripts/kconfig/symbol.o
+> >   HOSTCC  scripts/kconfig/util.o
+> >   HOSTLD  scripts/kconfig/conf
+> > *** Default configuration is based on 'x86_64_defconfig'
+> > #
+> > # configuration written to .config
+> > #
+> > 
+> > $ grep VHOST .config
+> > # CONFIG_VHOST is not set
+> > 
+> >  
+> >> If yes, what's your build config looks like?
+> >>
+> >> Thanks
 > 
->> From: Eric Auger <eric.auger@redhat.com>
->> Sent: Saturday, March 21, 2020 12:19 AM
->> To: eric.auger.pro@gmail.com; eric.auger@redhat.com; iommu@lists.linux-
->> foundation.org; linux-kernel@vger.kernel.org; kvm@vger.kernel.org;
->> kvmarm@lists.cs.columbia.edu; joro@8bytes.org; alex.williamson@redhat.com;
->> jacob.jun.pan@linux.intel.com; Liu, Yi L <yi.l.liu@intel.com>; jean-
->> philippe.brucker@arm.com; will.deacon@arm.com; robin.murphy@arm.com
->> Cc: marc.zyngier@arm.com; peter.maydell@linaro.org; zhangfei.gao@gmail.com
->> Subject: [PATCH v10 04/11] vfio/pci: Add VFIO_REGION_TYPE_NESTED region type
->>
->> Add a new specific DMA_FAULT region aiming to exposed nested mode
->> translation faults.
->>
->> The region has a ring buffer that contains the actual fault
->> records plus a header allowing to handle it (tail/head indices,
->> max capacity, entry size). At the moment the region is dimensionned
->> for 512 fault records.
->>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->>
->> ---
->>
->> v8 -> v9:
->> - Use a single region instead of a prod/cons region
->>
->> v4 -> v5
->> - check cons is not null in vfio_pci_check_cons_fault
->>
->> v3 -> v4:
->> - use 2 separate regions, respectively in read and write modes
->> - add the version capability
->> ---
->>  drivers/vfio/pci/vfio_pci.c         | 68 +++++++++++++++++++++++++++++
->>  drivers/vfio/pci/vfio_pci_private.h | 10 +++++
->>  drivers/vfio/pci/vfio_pci_rdwr.c    | 45 +++++++++++++++++++
->>  include/uapi/linux/vfio.h           | 35 +++++++++++++++
->>  4 files changed, 158 insertions(+)
->>
->> diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
->> index 379a02c36e37..586b89debed5 100644
->> --- a/drivers/vfio/pci/vfio_pci.c
->> +++ b/drivers/vfio/pci/vfio_pci.c
->> @@ -260,6 +260,69 @@ int vfio_pci_set_power_state(struct vfio_pci_device *vdev,
->> pci_power_t state)
->>  	return ret;
->>  }
->>
->> +static void vfio_pci_dma_fault_release(struct vfio_pci_device *vdev,
->> +				       struct vfio_pci_region *region)
->> +{
->> +}
->> +
->> +static int vfio_pci_dma_fault_add_capability(struct vfio_pci_device *vdev,
->> +					     struct vfio_pci_region *region,
->> +					     struct vfio_info_cap *caps)
->> +{
->> +	struct vfio_region_info_cap_fault cap = {
->> +		.header.id = VFIO_REGION_INFO_CAP_DMA_FAULT,
->> +		.header.version = 1,
->> +		.version = 1,
->> +	};
->> +	return vfio_info_add_capability(caps, &cap.header, sizeof(cap));
->> +}
->> +
->> +static const struct vfio_pci_regops vfio_pci_dma_fault_regops = {
->> +	.rw		= vfio_pci_dma_fault_rw,
->> +	.release	= vfio_pci_dma_fault_release,
->> +	.add_capability = vfio_pci_dma_fault_add_capability,
->> +};
->> +
->> +#define DMA_FAULT_RING_LENGTH 512
->> +
->> +static int vfio_pci_init_dma_fault_region(struct vfio_pci_device *vdev)
->> +{
->> +	struct vfio_region_dma_fault *header;
->> +	size_t size;
->> +	int ret;
->> +
->> +	mutex_init(&vdev->fault_queue_lock);
->> +
->> +	/*
->> +	 * We provision 1 page for the header and space for
->> +	 * DMA_FAULT_RING_LENGTH fault records in the ring buffer.
->> +	 */
->> +	size = ALIGN(sizeof(struct iommu_fault) *
->> +		     DMA_FAULT_RING_LENGTH, PAGE_SIZE) + PAGE_SIZE;
->> +
->> +	vdev->fault_pages = kzalloc(size, GFP_KERNEL);
->> +	if (!vdev->fault_pages)
->> +		return -ENOMEM;
->> +
->> +	ret = vfio_pci_register_dev_region(vdev,
->> +		VFIO_REGION_TYPE_NESTED,
->> +		VFIO_REGION_SUBTYPE_NESTED_DMA_FAULT,
->> +		&vfio_pci_dma_fault_regops, size,
->> +		VFIO_REGION_INFO_FLAG_READ |
->> VFIO_REGION_INFO_FLAG_WRITE,
->> +		vdev->fault_pages);
->> +	if (ret)
->> +		goto out;
->> +
->> +	header = (struct vfio_region_dma_fault *)vdev->fault_pages;
->> +	header->entry_size = sizeof(struct iommu_fault);
->> +	header->nb_entries = DMA_FAULT_RING_LENGTH;
->> +	header->offset = sizeof(struct vfio_region_dma_fault);
->> +	return 0;
->> +out:
->> +	kfree(vdev->fault_pages);
->> +	return ret;
->> +}
->> +
->>  static int vfio_pci_enable(struct vfio_pci_device *vdev)
->>  {
->>  	struct pci_dev *pdev = vdev->pdev;
->> @@ -358,6 +421,10 @@ static int vfio_pci_enable(struct vfio_pci_device *vdev)
->>  		}
->>  	}
->>
->> +	ret = vfio_pci_init_dma_fault_region(vdev);
->> +	if (ret)
->> +		goto disable_exit;
->> +
->>  	vfio_pci_probe_mmaps(vdev);
->>
->>  	return 0;
->> @@ -1383,6 +1450,7 @@ static void vfio_pci_remove(struct pci_dev *pdev)
->>
->>  	vfio_iommu_group_put(pdev->dev.iommu_group, &pdev->dev);
->>  	kfree(vdev->region);
->> +	kfree(vdev->fault_pages);
->>  	mutex_destroy(&vdev->ioeventfds_lock);
->>
->>  	if (!disable_idle_d3)
->> diff --git a/drivers/vfio/pci/vfio_pci_private.h b/drivers/vfio/pci/vfio_pci_private.h
->> index 8a2c7607d513..a392f50e3a99 100644
->> --- a/drivers/vfio/pci/vfio_pci_private.h
->> +++ b/drivers/vfio/pci/vfio_pci_private.h
->> @@ -119,6 +119,8 @@ struct vfio_pci_device {
->>  	int			ioeventfds_nr;
->>  	struct eventfd_ctx	*err_trigger;
->>  	struct eventfd_ctx	*req_trigger;
->> +	u8			*fault_pages;
->> +	struct mutex		fault_queue_lock;
->>  	struct list_head	dummy_resources_list;
->>  	struct mutex		ioeventfds_lock;
->>  	struct list_head	ioeventfds_list;
->> @@ -150,6 +152,14 @@ extern ssize_t vfio_pci_vga_rw(struct vfio_pci_device
->> *vdev, char __user *buf,
->>  extern long vfio_pci_ioeventfd(struct vfio_pci_device *vdev, loff_t offset,
->>  			       uint64_t data, int count, int fd);
->>
->> +struct vfio_pci_fault_abi {
->> +	u32 entry_size;
->> +};
->> +
->> +extern size_t vfio_pci_dma_fault_rw(struct vfio_pci_device *vdev,
->> +				    char __user *buf, size_t count,
->> +				    loff_t *ppos, bool iswrite);
->> +
->>  extern int vfio_pci_init_perm_bits(void);
->>  extern void vfio_pci_uninit_perm_bits(void);
->>
->> diff --git a/drivers/vfio/pci/vfio_pci_rdwr.c b/drivers/vfio/pci/vfio_pci_rdwr.c
->> index a87992892a9f..4004ab8cad0e 100644
->> --- a/drivers/vfio/pci/vfio_pci_rdwr.c
->> +++ b/drivers/vfio/pci/vfio_pci_rdwr.c
->> @@ -274,6 +274,51 @@ ssize_t vfio_pci_vga_rw(struct vfio_pci_device *vdev, char
->> __user *buf,
->>  	return done;
->>  }
->>
->> +size_t vfio_pci_dma_fault_rw(struct vfio_pci_device *vdev, char __user *buf,
->> +			     size_t count, loff_t *ppos, bool iswrite)
->> +{
->> +	unsigned int i = VFIO_PCI_OFFSET_TO_INDEX(*ppos) -
->> VFIO_PCI_NUM_REGIONS;
->> +	loff_t pos = *ppos & VFIO_PCI_OFFSET_MASK;
->> +	void *base = vdev->region[i].data;
->> +	int ret = -EFAULT;
->> +
->> +	if (pos >= vdev->region[i].size)
->> +		return -EINVAL;
->> +
->> +	count = min(count, (size_t)(vdev->region[i].size - pos));
->> +
->> +	mutex_lock(&vdev->fault_queue_lock);
->> +
->> +	if (iswrite) {
->> +		struct vfio_region_dma_fault *header =
->> +			(struct vfio_region_dma_fault *)base;
->> +		u32 new_tail;
->> +
->> +		if (pos != 0 || count != 4) {
->> +			ret = -EINVAL;
->> +			goto unlock;
->> +		}
->> +
->> +		if (copy_from_user((void *)&new_tail, buf, count))
->> +			goto unlock;
->> +
->> +		if (new_tail > header->nb_entries) {
->> +			ret = -EINVAL;
->> +			goto unlock;
->> +		}
->> +		header->tail = new_tail;
->> +	} else {
->> +		if (copy_to_user(buf, base + pos, count))
->> +			goto unlock;
->> +	}
->> +	*ppos += count;
->> +	ret = count;
->> +unlock:
->> +	mutex_unlock(&vdev->fault_queue_lock);
->> +	return ret;
->> +}
->> +
->> +
->>  static int vfio_pci_ioeventfd_handler(void *opaque, void *unused)
->>  {
->>  	struct vfio_pci_ioeventfd *ioeventfd = opaque;
->> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
->> index 9f2429eb1958..40d770f80e3d 100644
->> --- a/include/uapi/linux/vfio.h
->> +++ b/include/uapi/linux/vfio.h
->> @@ -330,6 +330,9 @@ struct vfio_region_info_cap_type {
->>  /* sub-types for VFIO_REGION_TYPE_GFX */
->>  #define VFIO_REGION_SUBTYPE_GFX_EDID            (1)
->>
->> +#define VFIO_REGION_TYPE_NESTED			(2)
->> +#define VFIO_REGION_SUBTYPE_NESTED_DMA_FAULT	(1)
->> +
->>  /**
->>   * struct vfio_region_gfx_edid - EDID region layout.
->>   *
->> @@ -708,6 +711,38 @@ struct vfio_device_ioeventfd {
->>
->>  #define VFIO_DEVICE_IOEVENTFD		_IO(VFIO_TYPE, VFIO_BASE + 16)
->>
->> +
->> +/*
->> + * Capability exposed by the DMA fault region
->> + * @version: ABI version
->> + */
->> +#define VFIO_REGION_INFO_CAP_DMA_FAULT	6
->> +
->> +struct vfio_region_info_cap_fault {
->> +	struct vfio_info_cap_header header;
->> +	__u32 version;
->> +};
->> +
->> +/*
->> + * DMA Fault Region Layout
->> + * @tail: index relative to the start of the ring buffer at which the
->> + *        consumer finds the next item in the buffer
->> + * @entry_size: fault ring buffer entry size in bytes
->> + * @nb_entries: max capacity of the fault ring buffer
->> + * @offset: ring buffer offset relative to the start of the region
->> + * @head: index relative to the start of the ring buffer at which the
->> + *        producer (kernel) inserts items into the buffers
->> + */
->> +struct vfio_region_dma_fault {
->> +	/* Write-Only */
->> +	__u32   tail;
->> +	/* Read-Only */
->> +	__u32   entry_size;
->> +	__u32	nb_entries;
->> +	__u32	offset;
->> +	__u32   head;
->> +};
->> +
->>  /* -------- API for Type1 VFIO IOMMU -------- */
->>
->>  /**
->> --
->> 2.20.1
+> This was x86. Not sure if that did work before.
+> On s390 this is definitely a regression as the defconfig files 
+> for s390 do select VHOST_NET
 > 
+> grep VHOST arch/s390/configs/*
+> arch/s390/configs/debug_defconfig:CONFIG_VHOST_NET=m
+> arch/s390/configs/debug_defconfig:CONFIG_VHOST_VSOCK=m
+> arch/s390/configs/defconfig:CONFIG_VHOST_NET=m
+> arch/s390/configs/defconfig:CONFIG_VHOST_VSOCK=m
+> 
+> and this worked with 5.6, but does not work with next. Just adding
+> CONFIG_VHOST=m to the defconfig solves the issue, something like
+
+And a bunch of other places I guess... and I guess we need to
+select VHOST_RING too?
+Also Jason, I just noticed that you added:
+
+config VHOST_RING
+        tristate
++        select VHOST_IOTLB
+        help
+          This option is selected by any driver which needs to access
+          the host side of a virtio ring.
+
+but are you sure this will do the right thing if VHOST_RING itself
+selected?
+
+
+> ---
+>  arch/s390/configs/debug_defconfig | 5 +++--
+>  arch/s390/configs/defconfig       | 5 +++--
+>  2 files changed, 6 insertions(+), 4 deletions(-)
+> 
+> diff --git a/arch/s390/configs/debug_defconfig b/arch/s390/configs/debug_defconfig
+> index 46038bc58c9e..0b83274341ce 100644
+> --- a/arch/s390/configs/debug_defconfig
+> +++ b/arch/s390/configs/debug_defconfig
+> @@ -57,8 +57,6 @@ CONFIG_PROTECTED_VIRTUALIZATION_GUEST=y
+>  CONFIG_CMM=m
+>  CONFIG_APPLDATA_BASE=y
+>  CONFIG_KVM=m
+> -CONFIG_VHOST_NET=m
+> -CONFIG_VHOST_VSOCK=m
+>  CONFIG_OPROFILE=m
+>  CONFIG_KPROBES=y
+>  CONFIG_JUMP_LABEL=y
+> @@ -561,6 +559,9 @@ CONFIG_VFIO_MDEV_DEVICE=m
+>  CONFIG_VIRTIO_PCI=m
+>  CONFIG_VIRTIO_BALLOON=m
+>  CONFIG_VIRTIO_INPUT=y
+> +CONFIG_VHOST=m
+> +CONFIG_VHOST_NET=m
+> +CONFIG_VHOST_VSOCK=m
+>  CONFIG_S390_CCW_IOMMU=y
+>  CONFIG_S390_AP_IOMMU=y
+>  CONFIG_EXT4_FS=y
+> diff --git a/arch/s390/configs/defconfig b/arch/s390/configs/defconfig
+> index 7cd0648c1f4e..39e69c4e8cf7 100644
+> --- a/arch/s390/configs/defconfig
+> +++ b/arch/s390/configs/defconfig
+> @@ -57,8 +57,6 @@ CONFIG_PROTECTED_VIRTUALIZATION_GUEST=y
+>  CONFIG_CMM=m
+>  CONFIG_APPLDATA_BASE=y
+>  CONFIG_KVM=m
+> -CONFIG_VHOST_NET=m
+> -CONFIG_VHOST_VSOCK=m
+>  CONFIG_OPROFILE=m
+>  CONFIG_KPROBES=y
+>  CONFIG_JUMP_LABEL=y
+> @@ -557,6 +555,9 @@ CONFIG_VFIO_MDEV_DEVICE=m
+>  CONFIG_VIRTIO_PCI=m
+>  CONFIG_VIRTIO_BALLOON=m
+>  CONFIG_VIRTIO_INPUT=y
+> +CONFIG_VHOST=m
+> +CONFIG_VHOST_NET=m
+> +CONFIG_VHOST_VSOCK=m
+>  CONFIG_S390_CCW_IOMMU=y
+>  CONFIG_S390_AP_IOMMU=y
+>  CONFIG_EXT4_FS=y
+> -- 
+> 2.25.1
 
