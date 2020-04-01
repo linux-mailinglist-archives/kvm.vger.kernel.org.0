@@ -2,79 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3C2A519AB99
-	for <lists+kvm@lfdr.de>; Wed,  1 Apr 2020 14:25:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BD38719AC03
+	for <lists+kvm@lfdr.de>; Wed,  1 Apr 2020 14:51:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732333AbgDAMY6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 1 Apr 2020 08:24:58 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:22346 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726804AbgDAMY6 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 1 Apr 2020 08:24:58 -0400
+        id S1732438AbgDAMvG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 1 Apr 2020 08:51:06 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:30129 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1732169AbgDAMvG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 1 Apr 2020 08:51:06 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1585743897;
+        s=mimecast20190719; t=1585745465;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=MC/MjZfh7TLCzD5LcVQ13kaOfc4HlhwLTdXB+ga+Cao=;
-        b=CByQabd6RCTdoFMfWEY/643yvxd3KAD11VQhUE7HiAVqeCrXzOvV3AttPuGrGOlBOBvzqv
-        AtYhKEe+QK585vR1GaWGxfwazwVMQL5ey7GDg+qAb+Ox+RdbIKSsmlCYMtbv7KrS7nU6fh
-        CcpJX6zr1LcMxKI+TYmG0DQa4JM9838=
+        bh=KZrEIeJJf1z/466R4PTGZhsuBRjfB99OXepaDxzJjTA=;
+        b=QGfhPHu0qbTRlC5zF+G2AnEC3HUuHihNcAiQKacmcqvmBCTXCbvA1WqbfD+rJA8g72p40X
+        PgNMKssEpc6uxf0Mj2l2V70JnFOvmi3N/bi2pmJqGmW1PH0nASvNwuC3gz82wv33rPlmkk
+        u8OSuUFXeP3E4HSKz2msEVV8OsHBCYA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-454-NbG52YPFNSWV1xleqSh0Qw-1; Wed, 01 Apr 2020 08:24:54 -0400
-X-MC-Unique: NbG52YPFNSWV1xleqSh0Qw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+ us-mta-3-2txM6OSVP8OwClyVv-NhKQ-1; Wed, 01 Apr 2020 08:50:58 -0400
+X-MC-Unique: 2txM6OSVP8OwClyVv-NhKQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 19DAE8017F3;
-        Wed,  1 Apr 2020 12:24:53 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.40.193.155])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id A198F5D9CD;
-        Wed,  1 Apr 2020 12:24:50 +0000 (UTC)
-Date:   Wed, 1 Apr 2020 14:24:45 +0200
-From:   Andrew Jones <drjones@redhat.com>
-To:     Jingyi Wang <wangjingyi11@huawei.com>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        wanghaibin.wang@huawei.com, yuzenghui@huawei.com
-Subject: Re: [kvm-unit-tests PATCH 0/2] arm/arm64: Add IPI/vtimer latency
-Message-ID: <20200401122445.exyobwo3a3agnuhk@kamzik.brq.redhat.com>
-References: <20200401100812.27616-1-wangjingyi11@huawei.com>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8B6AE477;
+        Wed,  1 Apr 2020 12:50:55 +0000 (UTC)
+Received: from [10.72.12.139] (ovpn-12-139.pek2.redhat.com [10.72.12.139])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 46B9A18A85;
+        Wed,  1 Apr 2020 12:50:37 +0000 (UTC)
+Subject: Re: [PATCH V9 1/9] vhost: refine vhost and vringh kconfig
+To:     Christian Borntraeger <borntraeger@de.ibm.com>, mst@redhat.com,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
+Cc:     jgg@mellanox.com, maxime.coquelin@redhat.com,
+        cunming.liang@intel.com, zhihong.wang@intel.com,
+        rob.miller@broadcom.com, xiao.w.wang@intel.com,
+        lingshan.zhu@intel.com, eperezma@redhat.com, lulu@redhat.com,
+        parav@mellanox.com, kevin.tian@intel.com, stefanha@redhat.com,
+        rdunlap@infradead.org, hch@infradead.org, aadam@redhat.com,
+        jiri@mellanox.com, shahafs@mellanox.com, hanand@xilinx.com,
+        mhabets@solarflare.com, gdawar@xilinx.com, saugatm@xilinx.com,
+        vmireyno@marvell.com, zhangweining@ruijie.com.cn
+References: <20200326140125.19794-1-jasowang@redhat.com>
+ <20200326140125.19794-2-jasowang@redhat.com>
+ <fde312a4-56bd-f11f-799f-8aa952008012@de.ibm.com>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <41ee1f6a-3124-d44b-bf34-0f26604f9514@redhat.com>
+Date:   Wed, 1 Apr 2020 20:50:36 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200401100812.27616-1-wangjingyi11@huawei.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+In-Reply-To: <fde312a4-56bd-f11f-799f-8aa952008012@de.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Apr 01, 2020 at 06:08:10PM +0800, Jingyi Wang wrote:
-> With the development of arm gic architecture, we think it will be useful
-> to add some simple performance test in kut to measure the cost of
-> interrupts. X86 arch has implemented similar test.
-> 
-> Jingyi Wang (2):
->   arm/arm64: gic: Add IPI latency test
->   arm/arm64: Add vtimer latency test
-> 
->  arm/gic.c   | 27 +++++++++++++++++++++++++++
->  arm/timer.c | 11 +++++++++++
->  2 files changed, 38 insertions(+)
-> 
-> -- 
-> 2.19.1
-> 
+
+On 2020/4/1 =E4=B8=8B=E5=8D=887:21, Christian Borntraeger wrote:
+> On 26.03.20 15:01, Jason Wang wrote:
+>> Currently, CONFIG_VHOST depends on CONFIG_VIRTUALIZATION. But vhost is
+>> not necessarily for VM since it's a generic userspace and kernel
+>> communication protocol. Such dependency may prevent archs without
+>> virtualization support from using vhost.
+>>
+>> To solve this, a dedicated vhost menu is created under drivers so
+>> CONIFG_VHOST can be decoupled out of CONFIG_VIRTUALIZATION.
+> FWIW, this now results in vhost not being build with defconfig kernels =
+(in todays
+> linux-next).
 >
 
-Hi Jingyi,
+Hi Christian:
 
-We already have an IPI latency test in arm/micro-bench.c I'd prefer that
-one be used, if possible, rather than conflating the gic functional tests
-with latency tests. Can you take a look at it and see if it satisfies
-your needs, extending it if necessary?
+Did you meet it even with this=20
+commit=C2=A0https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-ne=
+xt.git/commit/?id=3Da4be40cbcedba9b5b714f3c95182e8a45176e42d?
 
-Thanks,
-drew
+If yes, what's your build config looks like?
+
+Thanks
 
