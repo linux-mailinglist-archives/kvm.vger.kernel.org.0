@@ -2,219 +2,225 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5A65619A693
-	for <lists+kvm@lfdr.de>; Wed,  1 Apr 2020 09:51:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 779F319A698
+	for <lists+kvm@lfdr.de>; Wed,  1 Apr 2020 09:52:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732009AbgDAHvF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 1 Apr 2020 03:51:05 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:54291 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1731680AbgDAHvE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 1 Apr 2020 03:51:04 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1585727463;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=zKmkcFAeYkQC5+2s/XUIkEeLKqrQCJQCL5NCupQG9sM=;
-        b=HW3gUo3XIgy3dxb+Q6ReePu2IzBp3KLXsg7RXGhcH2ohWjusszKBXSdyTQ9BfO9Rtk2tSd
-        YaxxnGMHLUiNgWALLr6JR+Wm/CX6DIHIP+RqUgK/XRf8XGU43dF2eJ0NsQg+zTsVw8IjeC
-        WaNCUG5VZg3vVzARk5frVEcSAHBJIO8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-371-E1aw_hGBMYm1ayf1pDI5-Q-1; Wed, 01 Apr 2020 03:50:59 -0400
-X-MC-Unique: E1aw_hGBMYm1ayf1pDI5-Q-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 136F48017CC;
-        Wed,  1 Apr 2020 07:50:58 +0000 (UTC)
-Received: from [10.36.112.58] (ovpn-112-58.ams2.redhat.com [10.36.112.58])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id AA5E05D9CD;
-        Wed,  1 Apr 2020 07:50:46 +0000 (UTC)
-Subject: Re: [PATCH v2 09/22] vfio/common: init HostIOMMUContext per-container
-To:     Liu Yi L <yi.l.liu@intel.com>, qemu-devel@nongnu.org,
-        alex.williamson@redhat.com, peterx@redhat.com
-Cc:     pbonzini@redhat.com, mst@redhat.com, david@gibson.dropbear.id.au,
-        kevin.tian@intel.com, jun.j.tian@intel.com, yi.y.sun@intel.com,
-        kvm@vger.kernel.org, hao.wu@intel.com, jean-philippe@linaro.org,
-        Jacob Pan <jacob.jun.pan@linux.intel.com>,
-        Yi Sun <yi.y.sun@linux.intel.com>
-References: <1585542301-84087-1-git-send-email-yi.l.liu@intel.com>
- <1585542301-84087-10-git-send-email-yi.l.liu@intel.com>
-From:   Auger Eric <eric.auger@redhat.com>
-Message-ID: <55a767fb-ed98-bc30-5de1-0791f1ce8642@redhat.com>
-Date:   Wed, 1 Apr 2020 09:50:45 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
-MIME-Version: 1.0
-In-Reply-To: <1585542301-84087-10-git-send-email-yi.l.liu@intel.com>
-Content-Type: text/plain; charset=windows-1252
+        id S1731990AbgDAHwE convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Wed, 1 Apr 2020 03:52:04 -0400
+Received: from mga02.intel.com ([134.134.136.20]:62820 "EHLO mga02.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1731680AbgDAHwE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 1 Apr 2020 03:52:04 -0400
+IronPort-SDR: F6CSRIpF5bD5ZQ9zrep8BW6lnpHHABPR5cJHsIIXzKF6HvB2zwKWzVqh/+xWk9GA157pV6i0pT
+ DiNhhugw7Ikg==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Apr 2020 00:52:04 -0700
+IronPort-SDR: qjalB6i8rzSE1cNafZFtUEwCxr3AD+Ct8Vt4cK9JUv1EJgQwpxJlbROb+h7ao7o/id78UvK6qb
+ ahaUhs5mco5w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.72,330,1580803200"; 
+   d="scan'208";a="359774634"
+Received: from fmsmsx107.amr.corp.intel.com ([10.18.124.205])
+  by fmsmga001.fm.intel.com with ESMTP; 01 Apr 2020 00:52:03 -0700
+Received: from fmsmsx602.amr.corp.intel.com (10.18.126.82) by
+ fmsmsx107.amr.corp.intel.com (10.18.124.205) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Wed, 1 Apr 2020 00:52:03 -0700
+Received: from fmsmsx602.amr.corp.intel.com (10.18.126.82) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1713.5; Wed, 1 Apr 2020 00:52:03 -0700
+Received: from shsmsx101.ccr.corp.intel.com (10.239.4.153) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id 15.1.1713.5
+ via Frontend Transport; Wed, 1 Apr 2020 00:52:03 -0700
+Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.225]) by
+ SHSMSX101.ccr.corp.intel.com ([169.254.1.129]) with mapi id 14.03.0439.000;
+ Wed, 1 Apr 2020 15:51:59 +0800
+From:   "Liu, Yi L" <yi.l.liu@intel.com>
+To:     "Tian, Kevin" <kevin.tian@intel.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>
+CC:     "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "Tian, Jun J" <jun.j.tian@intel.com>,
+        "Sun, Yi Y" <yi.y.sun@intel.com>,
+        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Wu, Hao" <hao.wu@intel.com>
+Subject: RE: [PATCH v1 8/8] vfio/type1: Add vSVA support for IOMMU-backed
+ mdevs
+Thread-Topic: [PATCH v1 8/8] vfio/type1: Add vSVA support for IOMMU-backed
+ mdevs
+Thread-Index: AQHWAEUdm3FJ38v7KEeZ+HXvm2TTUKhgpNwAgANOv6A=
+Date:   Wed, 1 Apr 2020 07:51:58 +0000
+Message-ID: <A2975661238FB949B60364EF0F2C25743A21D71A@SHSMSX104.ccr.corp.intel.com>
+References: <1584880325-10561-1-git-send-email-yi.l.liu@intel.com>
+ <1584880325-10561-9-git-send-email-yi.l.liu@intel.com>
+ <AADFC41AFE54684AB9EE6CBC0274A5D19D7FFA90@SHSMSX104.ccr.corp.intel.com>
+In-Reply-To: <AADFC41AFE54684AB9EE6CBC0274A5D19D7FFA90@SHSMSX104.ccr.corp.intel.com>
+Accept-Language: en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
+MIME-Version: 1.0
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Yi,
-
-On 3/30/20 6:24 AM, Liu Yi L wrote:
-> In this patch, QEMU firstly gets iommu info from kernel to check the
-> supported capabilities by a VFIO_IOMMU_TYPE1_NESTING iommu. And inits
-> HostIOMMUContet instance.
+> From: Tian, Kevin <kevin.tian@intel.com>
+> Sent: Monday, March 30, 2020 9:19 PM
+> To: Liu, Yi L <yi.l.liu@intel.com>; alex.williamson@redhat.com;
+> Subject: RE: [PATCH v1 8/8] vfio/type1: Add vSVA support for IOMMU-backed
+> mdevs
 > 
-> Cc: Kevin Tian <kevin.tian@intel.com>
-> Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
-> Cc: Peter Xu <peterx@redhat.com>
-> Cc: Eric Auger <eric.auger@redhat.com>
-> Cc: Yi Sun <yi.y.sun@linux.intel.com>
-> Cc: David Gibson <david@gibson.dropbear.id.au>
-> Cc: Alex Williamson <alex.williamson@redhat.com>
-> Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
-> ---
->  hw/vfio/common.c | 99 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 99 insertions(+)
+> > From: Liu, Yi L <yi.l.liu@intel.com>
+> > Sent: Sunday, March 22, 2020 8:32 PM
+> >
+> > From: Liu Yi L <yi.l.liu@intel.com>
+> >
+> > Recent years, mediated device pass-through framework (e.g. vfio-mdev)
+> > are used to achieve flexible device sharing across domains (e.g. VMs).
 > 
-> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-> index 5f3534d..44b142c 100644
-> --- a/hw/vfio/common.c
-> +++ b/hw/vfio/common.c
-> @@ -1226,10 +1226,89 @@ static int vfio_host_iommu_ctx_pasid_free(HostIOMMUContext *iommu_ctx,
->      return 0;
->  }
->  
-> +/**
-> + * Get iommu info from host. Caller of this funcion should free
-> + * the memory pointed by the returned pointer stored in @info
-> + * after a successful calling when finished its usage.
-> + */
-> +static int vfio_get_iommu_info(VFIOContainer *container,
-> +                         struct vfio_iommu_type1_info **info)
-> +{
-> +
-> +    size_t argsz = sizeof(struct vfio_iommu_type1_info);
-> +
-> +    *info = g_malloc0(argsz);
-> +
-> +retry:
-> +    (*info)->argsz = argsz;
-> +
-> +    if (ioctl(container->fd, VFIO_IOMMU_GET_INFO, *info)) {
-> +        g_free(*info);
-> +        *info = NULL;
-> +        return -errno;
-> +    }
-> +
-> +    if (((*info)->argsz > argsz)) {
-> +        argsz = (*info)->argsz;
-> +        *info = g_realloc(*info, argsz);
-> +        goto retry;
-> +    }
-> +
-> +    return 0;
-> +}
-> +
-> +static struct vfio_info_cap_header *
-> +vfio_get_iommu_info_cap(struct vfio_iommu_type1_info *info, uint16_t id)
-> +{
-> +    struct vfio_info_cap_header *hdr;
-> +    void *ptr = info;
-> +
-> +    if (!(info->flags & VFIO_IOMMU_INFO_CAPS)) {
-> +        return NULL;
-> +    }
-> +
-> +    for (hdr = ptr + info->cap_offset; hdr != ptr; hdr = ptr + hdr->next) {
-> +        if (hdr->id == id) {
-> +            return hdr;
-> +        }
-> +    }
-> +
-> +    return NULL;
-> +}
-> +
-> +static int vfio_get_nesting_iommu_cap(VFIOContainer *container,
-> +                   struct vfio_iommu_type1_info_cap_nesting *cap_nesting)
-> +{
-> +    struct vfio_iommu_type1_info *info;
-> +    struct vfio_info_cap_header *hdr;
-> +    struct vfio_iommu_type1_info_cap_nesting *cap;
-> +    int ret;
-> +
-> +    ret = vfio_get_iommu_info(container, &info);
-> +    if (ret) {
-> +        return ret;
-> +    }
-> +
-> +    hdr = vfio_get_iommu_info_cap(info,
-> +                        VFIO_IOMMU_TYPE1_INFO_CAP_NESTING);
-> +    if (!hdr) {
-> +        g_free(info);
-> +        return -errno;
-> +    }
-> +
-> +    cap = container_of(hdr,
-> +                struct vfio_iommu_type1_info_cap_nesting, header);
-> +    *cap_nesting = *cap;
-> +
-> +    g_free(info);
-> +    return 0;
-> +}
-> +
->  static int vfio_init_container(VFIOContainer *container, int group_fd,
->                                 Error **errp)
->  {
->      int iommu_type, ret;
-> +    uint64_t flags = 0;
->  
->      iommu_type = vfio_get_iommu_type(container, errp);
->      if (iommu_type < 0) {
-> @@ -1257,6 +1336,26 @@ static int vfio_init_container(VFIOContainer *container, int group_fd,
->          return -errno;
->      }
->  
-> +    if (iommu_type == VFIO_TYPE1_NESTING_IOMMU) {
-> +        struct vfio_iommu_type1_info_cap_nesting nesting = {
-> +                                         .nesting_capabilities = 0x0,
-> +                                         .stage1_formats = 0, };
-> +
-> +        ret = vfio_get_nesting_iommu_cap(container, &nesting);
-> +        if (ret) {
-> +            error_setg_errno(errp, -ret,
-> +                             "Failed to get nesting iommu cap");
-> +            return ret;
-> +        }
-> +
-> +        flags |= (nesting.nesting_capabilities & VFIO_IOMMU_PASID_REQS) ?
-> +                 HOST_IOMMU_PASID_REQUEST : 0;
-I still don't get why you can't transform your iommu_ctx into a  pointer
-and do
-container->iommu_ctx = g_new0(HostIOMMUContext, 1);
-then
-host_iommu_ctx_init(container->iommu_ctx, flags);
+> are->is
 
-looks something similar to (hw/vfio/common.c). You may not even need to
-use a derived VFIOHostIOMMUContext object (As only VFIO does use that
-object)? Only the ops do change, no new field?
-        region->mem = g_new0(MemoryRegion, 1);
-        memory_region_init_io(region->mem, obj, &vfio_region_ops,
-                              region, name, region->size);
+got it.
 
-Thanks
-
-Eric
-
-> +        host_iommu_ctx_init(&container->iommu_ctx,
-> +                            sizeof(container->iommu_ctx),
-> +                            TYPE_VFIO_HOST_IOMMU_CONTEXT,
-> +                            flags);
-> +    }
-> +
->      container->iommu_type = iommu_type;
->      return 0;
->  }
+> > Also there are hardware assisted mediated pass-through solutions from
+> > platform vendors. e.g. Intel VT-d scalable mode which supports Intel
+> > Scalable I/O Virtualization technology. Such mdevs are called IOMMU-
+> > backed mdevs as there are IOMMU enforced DMA isolation for such mdevs.
+> > In kernel, IOMMU-backed mdevs are exposed to IOMMU layer by aux-
+> > domain concept, which means mdevs are protected by an iommu domain
+> > which is aux-domain of its physical device. Details can be found in
+> > the KVM
 > 
+> "by an iommu domain which is auxiliary to the domain that the kernel driver
+> primarily uses for DMA API"
 
+yep.
+
+> > presentation from Kevin Tian. IOMMU-backed equals to IOMMU-capable.
+> >
+> > https://events19.linuxfoundation.org/wp-content/uploads/2017/12/\
+> > Hardware-Assisted-Mediated-Pass-Through-with-VFIO-Kevin-Tian-Intel.pdf
+> >
+> > This patch supports NESTING IOMMU for IOMMU-backed mdevs by figuring
+> > out the physical device of an IOMMU-backed mdev and then invoking
+> > IOMMU requests to IOMMU layer with the physical device and the mdev's
+> > aux domain info.
+> 
+> "and then calling into the IOMMU layer to complete the vSVA operations on the aux
+> domain associated with that mdev"
+
+got it.
+> >
+> > With this patch, vSVA (Virtual Shared Virtual Addressing) can be used
+> > on IOMMU-backed mdevs.
+> >
+> > Cc: Kevin Tian <kevin.tian@intel.com>
+> > CC: Jacob Pan <jacob.jun.pan@linux.intel.com>
+> > CC: Jun Tian <jun.j.tian@intel.com>
+> > Cc: Alex Williamson <alex.williamson@redhat.com>
+> > Cc: Eric Auger <eric.auger@redhat.com>
+> > Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>
+> > Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
+> > ---
+> >  drivers/vfio/vfio_iommu_type1.c | 23 ++++++++++++++++++++---
+> >  1 file changed, 20 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/drivers/vfio/vfio_iommu_type1.c
+> > b/drivers/vfio/vfio_iommu_type1.c index 937ec3f..d473665 100644
+> > --- a/drivers/vfio/vfio_iommu_type1.c
+> > +++ b/drivers/vfio/vfio_iommu_type1.c
+> > @@ -132,6 +132,7 @@ struct vfio_regions {
+> >
+> >  struct domain_capsule {
+> >  	struct iommu_domain *domain;
+> > +	struct vfio_group *group;
+> >  	void *data;
+> >  };
+> >
+> > @@ -148,6 +149,7 @@ static int vfio_iommu_for_each_dev(struct
+> > vfio_iommu *iommu,
+> >  	list_for_each_entry(d, &iommu->domain_list, next) {
+> >  		dc.domain = d->domain;
+> >  		list_for_each_entry(g, &d->group_list, next) {
+> > +			dc.group = g;
+> >  			ret = iommu_group_for_each_dev(g->iommu_group,
+> >  						       &dc, fn);
+> >  			if (ret)
+> > @@ -2347,7 +2349,12 @@ static int vfio_bind_gpasid_fn(struct device
+> > *dev, void *data)
+> >  	struct iommu_gpasid_bind_data *gbind_data =
+> >  		(struct iommu_gpasid_bind_data *) dc->data;
+> >
+> > -	return iommu_sva_bind_gpasid(dc->domain, dev, gbind_data);
+> > +	if (dc->group->mdev_group)
+> > +		return iommu_sva_bind_gpasid(dc->domain,
+> > +			vfio_mdev_get_iommu_device(dev), gbind_data);
+> > +	else
+> > +		return iommu_sva_bind_gpasid(dc->domain,
+> > +						dev, gbind_data);
+> >  }
+> >
+> >  static int vfio_unbind_gpasid_fn(struct device *dev, void *data) @@
+> > -2356,8 +2363,13 @@ static int vfio_unbind_gpasid_fn(struct device
+> > *dev, void *data)
+> >  	struct iommu_gpasid_bind_data *gbind_data =
+> >  		(struct iommu_gpasid_bind_data *) dc->data;
+> >
+> > -	return iommu_sva_unbind_gpasid(dc->domain, dev,
+> > +	if (dc->group->mdev_group)
+> > +		return iommu_sva_unbind_gpasid(dc->domain,
+> > +					vfio_mdev_get_iommu_device(dev),
+> >  					gbind_data->hpasid);
+> > +	else
+> > +		return iommu_sva_unbind_gpasid(dc->domain, dev,
+> > +						gbind_data->hpasid);
+> >  }
+> >
+> >  /**
+> > @@ -2429,7 +2441,12 @@ static int vfio_cache_inv_fn(struct device
+> > *dev, void *data)
+> >  	struct iommu_cache_invalidate_info *cache_inv_info =
+> >  		(struct iommu_cache_invalidate_info *) dc->data;
+> >
+> > -	return iommu_cache_invalidate(dc->domain, dev, cache_inv_info);
+> > +	if (dc->group->mdev_group)
+> > +		return iommu_cache_invalidate(dc->domain,
+> > +			vfio_mdev_get_iommu_device(dev), cache_inv_info);
+> > +	else
+> > +		return iommu_cache_invalidate(dc->domain,
+> > +						dev, cache_inv_info);
+> >  }
+> 
+> possibly above could be simplified, e.g.
+> 
+> static struct device *vfio_get_iommu_device(struct vfio_group *group,
+> 	struct device *dev)
+> {
+> 	if  (group->mdev_group)
+> 		return vfio_mdev_get_iommu_device(dev);
+> 	else
+> 		return dev;
+> }
+> 
+> Then use it to replace plain 'dev' in all three places.
+
+yes, better for reading. thanks.
+
+Regards,
+Yi Liu
