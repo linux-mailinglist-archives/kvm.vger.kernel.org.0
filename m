@@ -2,80 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B161019B8C6
-	for <lists+kvm@lfdr.de>; Thu,  2 Apr 2020 01:01:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 262C619B8E8
+	for <lists+kvm@lfdr.de>; Thu,  2 Apr 2020 01:24:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1733292AbgDAXBI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 1 Apr 2020 19:01:08 -0400
-Received: from mga17.intel.com ([192.55.52.151]:34041 "EHLO mga17.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1732537AbgDAXBI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 1 Apr 2020 19:01:08 -0400
-IronPort-SDR: e1DY0cHw2HDK5Ow55JQY8vbOpoPaCZbUJFdLDD0/GF4ONuMXPhD9Xe1Hy+RASb3CPo2OUd95Pt
- dRbxnzCnCsPg==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Apr 2020 16:01:07 -0700
-IronPort-SDR: c8aegkgBR93uXjxZA+7OGa8JwuBeJpCRXw6HLauhJt8LJ7ID7HNB1NmEbLhnFS9NYUIF/3zPKE
- KAwKlAdc/UdQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.72,333,1580803200"; 
-   d="scan'208";a="396156610"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
-  by orsmga004.jf.intel.com with ESMTP; 01 Apr 2020 16:01:00 -0700
-Date:   Wed, 1 Apr 2020 16:01:00 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Nadav Amit <namit@vmware.com>
-Cc:     Wanpeng Li <kernellwp@gmail.com>,
+        id S1733293AbgDAXYK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 1 Apr 2020 19:24:10 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:41961 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1732661AbgDAXYH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 1 Apr 2020 19:24:07 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1585783445;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=AUx9a9NcckmBmbGmt8k9ozR5fOJNJ4SVtbmheE+GSig=;
+        b=E70eYhBpdmDCfFB/yyKtMy/HpSVH+Uiz0C3lCATNO3ypdcqTlPjPO8i2nWzW46IWW6I4UX
+        1AtIoDpwQAaiCvt1qq35SXqfpLz8TQIYiPkVBPfFbEtSZBzdU6LxEf/+Fmk7KYVCQW1LZf
+        2E5ibijXGfEj8gYcC1h0tr6OfbF1oK0=
+Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
+ [209.85.219.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-37-gMfNOfpDNFeCU4TDlSYM2Q-1; Wed, 01 Apr 2020 19:24:04 -0400
+X-MC-Unique: gMfNOfpDNFeCU4TDlSYM2Q-1
+Received: by mail-qv1-f71.google.com with SMTP id v8so1106274qvr.12
+        for <kvm@vger.kernel.org>; Wed, 01 Apr 2020 16:24:04 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=AUx9a9NcckmBmbGmt8k9ozR5fOJNJ4SVtbmheE+GSig=;
+        b=EUEAJmnogX7SoFqy0I2g/9il/cO9AHmPmkmd8cAwxOz6ms+gcBTnPHECYRzXEygvu0
+         Y173wpT9WxVMP8E+xm2u5Z9p/X/cDoG9fgUh4hBd+Cq3U9wxz/1f/9/tXTJZKenO/PNa
+         vp/9ZSHqNGUwEUN+68hOBPckxXivg8ZOWsTUi+UbJ51+l3TI/5xcCOIdMMBCaJPRA5Y1
+         R1/0/pPdAJD3du+r+vwpDaUMncpVovvZPZ8uiwFUqvL534PLbQ729WZ8opGRCw8EzbM9
+         Hfl8+Alif3MZ/LWTL/ZGRp5c+Z7JXOcdJU2lOtpf9w4iTKeMz0E5YxyOgQwLycBWXDT5
+         AkQw==
+X-Gm-Message-State: AGi0Pub6Dftpa1sElO3JC11yZdQ2mPVdV73Ok6BFOzWfm1MycvbSg+tn
+        fj08RkdpnayRljX9QQ9tbT47ajt46IDC76Pnw2BxuNvKRpwx3RiQ7qdRRnFrC7HPb05b2ZRQsMj
+        Rt9m/uzDtBMT9
+X-Received: by 2002:ac8:1c17:: with SMTP id a23mr205330qtk.239.1585783443324;
+        Wed, 01 Apr 2020 16:24:03 -0700 (PDT)
+X-Google-Smtp-Source: APiQypKs2sdWLelVFwa5wWDt7NfXNR0nWmfsLZw9a6O+nx9rOQNylkUrMsr/Rn+mFQtaWUda9LkQzA==
+X-Received: by 2002:ac8:1c17:: with SMTP id a23mr205318qtk.239.1585783443115;
+        Wed, 01 Apr 2020 16:24:03 -0700 (PDT)
+Received: from xz-x1 ([2607:9880:19c0:32::2])
+        by smtp.gmail.com with ESMTPSA id y41sm2502266qtc.72.2020.04.01.16.24.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 01 Apr 2020 16:24:02 -0700 (PDT)
+Date:   Wed, 1 Apr 2020 19:24:21 -0400
+From:   Peter Xu <peterx@redhat.com>
+To:     Andrew Jones <drjones@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Kevin Tian <kevin.tian@intel.com>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Christophe de Dinechin <dinechin@redhat.com>,
+        Yan Zhao <yan.y.zhao@intel.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Subject: Re: [PATCH v2 2/2] KVM: LAPIC: Don't need to clear IPI delivery
- status in x2apic mode
-Message-ID: <20200401230100.GE9603@linux.intel.com>
-References: <1585700362-11892-1-git-send-email-wanpengli@tencent.com>
- <1585700362-11892-2-git-send-email-wanpengli@tencent.com>
- <6de1a454-60fc-2bda-841d-f9ceb606d4c6@redhat.com>
- <CANRm+CzB3dWatF7qOO_WajXM_ZBn1U6Z8+uq4NxCuLG3TgwY1Q@mail.gmail.com>
- <CE34AD16-64A7-4AA0-9928-507C6F3FF6CD@vmware.com>
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+Subject: Re: [PATCH v8 11/14] KVM: selftests: Introduce after_vcpu_run hook
+ for dirty log test
+Message-ID: <20200401232421.GA7174@xz-x1>
+References: <20200331190000.659614-1-peterx@redhat.com>
+ <20200331190000.659614-12-peterx@redhat.com>
+ <20200401070322.yqdp5g2amzlbftk6@kamzik.brq.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <CE34AD16-64A7-4AA0-9928-507C6F3FF6CD@vmware.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <20200401070322.yqdp5g2amzlbftk6@kamzik.brq.redhat.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Apr 01, 2020 at 05:40:03PM +0000, Nadav Amit wrote:
-> > On Mar 31, 2020, at 11:46 PM, Wanpeng Li <kernellwp@gmail.com> wrote:
+On Wed, Apr 01, 2020 at 09:03:22AM +0200, Andrew Jones wrote:
+> On Tue, Mar 31, 2020 at 02:59:57PM -0400, Peter Xu wrote:
+> > Provide a hook for the checks after vcpu_run() completes.  Preparation
+> > for the dirty ring test because we'll need to take care of another
+> > exit reason.
 > > 
-> > Cc more people,
-> > On Wed, 1 Apr 2020 at 08:35, Paolo Bonzini <pbonzini@redhat.com> wrote:
-> >> On 01/04/20 02:19, Wanpeng Li wrote:
-> >>> -             /* No delay here, so we always clear the pending bit */
-> >>> -             val &= ~(1 << 12);
-> >>> +             /* Immediately clear Delivery Status in xAPIC mode */
-> >>> +             if (!apic_x2apic_mode(apic))
-> >>> +                     val &= ~(1 << 12);
-> >> 
-> >> This adds a conditional, and the old behavior was valid according to the
-> >> SDM: "software should not assume the value returned by reading the ICR
-> >> is the last written value".
-> > 
-> > Nadav, Sean, what do you think?
+> > Since at it, drop the pages_count because after all we have a better
+> > summary right now with statistics, and clean it up a bit.
 > 
-> I do not know. But if you write a KVM unit-test, I can run it on bare-metal
-> and give you feedback about how it behaves.
+> I don't see what you mean by "drop the pages_count", because it's still
+> there. But otherwise
+> 
+> Reviewed-by: Andrew Jones <drjones@redhat.com>
 
-I agree with Paolo, clearing the bit doesn't violate the SDM.  The
-conditional is just as costly as the AND, if not more so, even for x2APIC.
+I think the pages_count was dropped in some versions, at least the 1st
+version when I wrote the commit, but it must have went back during one
+of the rebases upon dirty_log_test.c...  To make it simple, I'll just
+remove this paragraph and pick the r-b (assuming it's valid with that).
 
-I would play it safe and clear the bit even in the x2APIC only path to
-avoid tripping up guest kernels that loop on the delivery status even when
-using x2APIC.
+Thanks,
+
+-- 
+Peter Xu
+
