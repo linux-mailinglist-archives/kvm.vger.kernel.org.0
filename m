@@ -2,88 +2,237 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id F40EE19C618
-	for <lists+kvm@lfdr.de>; Thu,  2 Apr 2020 17:40:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E181B19C622
+	for <lists+kvm@lfdr.de>; Thu,  2 Apr 2020 17:41:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389390AbgDBPkL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Apr 2020 11:40:11 -0400
-Received: from mail-qv1-f65.google.com ([209.85.219.65]:33436 "EHLO
-        mail-qv1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388591AbgDBPkK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Apr 2020 11:40:10 -0400
-Received: by mail-qv1-f65.google.com with SMTP id p19so1898991qve.0
-        for <kvm@vger.kernel.org>; Thu, 02 Apr 2020 08:40:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=lca.pw; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=PYelBMpM/3QJH1rKStk9XKPwcLOdDKg6wW/AuMLbwA0=;
-        b=lNlymgKIirJd7VAjfYBBqRftLBhc6UFUfiuiLaxma5vrER6aASiWEFCmMywJMyOy0k
-         kIDZGJS/JcyPGJbWqzFLb3ZypGU+/LSLc+SxxZGyW7+Aa0MsJ0Zkxkvfosuep4srSdPG
-         MebPu1XuXHTN9hCyHpf2KRMX9gGegmAuSOwj0jyJB3T+/cHQ8sXXfOA117NUCQw94uoJ
-         a6uNqw6Vlf/oi3ADr368GSxVXLzM38IzfW1RCjgUzX19TrxT8I4BptPljilD28rawM6G
-         72HG7DZfFcayoxN4BjA8cH0EaK2jVN19iK1Ebem1CJNUP2jGybMBzP6ejISXGkC4LRUc
-         kNVg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=PYelBMpM/3QJH1rKStk9XKPwcLOdDKg6wW/AuMLbwA0=;
-        b=WdF7dt7cSO3hNgGvFhxjfXSiiAw1S6M+HDPRDFKo+AiXRvt1lb7wilsPT3ShsLmpn1
-         t1t9sVhOiVSmUXXwJH22EB0qPKquUCzQsnJm0dQ+rzvXOTVpvZX412SqqfkgKtbRxoz7
-         XHN2RPvYH2ipzb2VVABGu/8ZdJbPlYVe+VNZ7pUFqhLeg5TeYTxdn43yL5Aebj17/isb
-         VbA6KGYkEeNcW+ejhKDyNEUsazQTyIAK/8yo0+2c3ekegDpRzmHR40Xy+puzyYZ4m9l6
-         Pufag6ssJzJwtwHNnccYhE97IPWSgrOlQUMRlSwb4oRk6MlXZ/Gj+OAMWAj1+9RBlrKS
-         Y0uA==
-X-Gm-Message-State: AGi0Pube2Sh2DWvBiDvczi1dOasoJ6vtHjxFTevE8TJKyesy59Gi6kMi
-        9A7/ALbymehjlm5EJMe/PX5ESg==
-X-Google-Smtp-Source: APiQypI9is3KJbPY3xl6sirQXhgEy8iEvNue4xUMKbvI46xXBmbp9jGdyrp8NAfqhBcHwxpEFMSMrQ==
-X-Received: by 2002:ad4:5012:: with SMTP id s18mr3982997qvo.162.1585842008226;
-        Thu, 02 Apr 2020 08:40:08 -0700 (PDT)
-Received: from ovpn-66-203.rdu2.redhat.com (pool-71-184-117-43.bstnma.fios.verizon.net. [71.184.117.43])
-        by smtp.gmail.com with ESMTPSA id n46sm4069873qtb.48.2020.04.02.08.40.06
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 02 Apr 2020 08:40:07 -0700 (PDT)
-From:   Qian Cai <cai@lca.pw>
-To:     pbonzini@redhat.com
-Cc:     sean.j.christopherson@intel.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Qian Cai <cai@lca.pw>
-Subject: [PATCH -next] x86/kvm: fix a missing-prototypes "vmread_error"
-Date:   Thu,  2 Apr 2020 11:39:55 -0400
-Message-Id: <20200402153955.1695-1-cai@lca.pw>
-X-Mailer: git-send-email 2.21.0 (Apple Git-122.2)
+        id S2389442AbgDBPlB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Apr 2020 11:41:01 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:46836 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S2388677AbgDBPlA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Apr 2020 11:41:00 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1585842059;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+        bh=6Jr96juqQIWCH6XSyzey8hii13+Jx8jdyfdTJqFgDdQ=;
+        b=J+OHza+a70ry2SKy4lnoUVNCL1c7gnlhj76bWOQLvz9CYcgQaVlm+rVD851Y43vJfRZ0Gk
+        Mia+4Gja/PCF4ffqUJsT4VNEAv3MqBISZIIUy26Z2GceRca5pKYFyO2eNOume6bAI5Mbn2
+        wrImvbrkCj3SjINa4iKeK73Ni64SGGM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-151-p0VJvvMfNI2E5Nhlcjx8-A-1; Thu, 02 Apr 2020 11:40:57 -0400
+X-MC-Unique: p0VJvvMfNI2E5Nhlcjx8-A-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A6777107ACCA;
+        Thu,  2 Apr 2020 15:40:56 +0000 (UTC)
+Received: from [10.36.114.29] (ovpn-114-29.ams2.redhat.com [10.36.114.29])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 70CEC5C1B0;
+        Thu,  2 Apr 2020 15:40:55 +0000 (UTC)
+Subject: Re: [kvm-unit-tests v2] s390x/smp: add minimal test for sigp sense
+ running status
+To:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        Thomas Huth <thuth@redhat.com>,
+        Janosch Frank <frankja@linux.ibm.com>
+Cc:     Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org
+References: <20200402110250.63677-1-borntraeger@de.ibm.com>
+ <0dc0189b-660b-c4ec-341a-27638cc64f04@redhat.com>
+ <8302fbeb-9b7a-b152-99fd-8097b0122aba@de.ibm.com>
+ <070a98b6-1ae5-d3bd-82d9-30beea9e06b9@redhat.com>
+ <71f6f0bc-c41d-641d-151c-bd080451cdde@de.ibm.com>
+From:   David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat GmbH
+Message-ID: <6d90b686-337e-b546-d2a2-ed36f9e32361@redhat.com>
+Date:   Thu, 2 Apr 2020 17:40:54 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <71f6f0bc-c41d-641d-151c-bd080451cdde@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The commit 842f4be95899 ("KVM: VMX: Add a trampoline to fix VMREAD error
-handling") removed the declaration of vmread_error() causes a W=1 build
-failure with KVM_WERROR=y. Fix it by adding it back.
+On 02.04.20 17:38, Christian Borntraeger wrote:
+> 
+> 
+> On 02.04.20 17:25, David Hildenbrand wrote:
+>> On 02.04.20 17:20, Christian Borntraeger wrote:
+>>>
+>>>
+>>> On 02.04.20 17:12, David Hildenbrand wrote:
+>>>> On 02.04.20 13:02, Christian Borntraeger wrote:
+>>>>> make sure that sigp sense running status returns a sane value for
+>>>>> stopped CPUs. To avoid potential races with the stop being processed we
+>>>>> wait until sense running status is first 0.
+>>>>>
+>>>>> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+>>>>> ---
+>>>>>  lib/s390x/smp.c |  2 +-
+>>>>>  lib/s390x/smp.h |  2 +-
+>>>>>  s390x/smp.c     | 13 +++++++++++++
+>>>>>  3 files changed, 15 insertions(+), 2 deletions(-)
+>>>>>
+>>>>> diff --git a/lib/s390x/smp.c b/lib/s390x/smp.c
+>>>>> index 5ed8b7b..492cb05 100644
+>>>>> --- a/lib/s390x/smp.c
+>>>>> +++ b/lib/s390x/smp.c
+>>>>> @@ -58,7 +58,7 @@ bool smp_cpu_stopped(uint16_t addr)
+>>>>>  	return !!(status & (SIGP_STATUS_CHECK_STOP|SIGP_STATUS_STOPPED));
+>>>>>  }
+>>>>>  
+>>>>> -bool smp_cpu_running(uint16_t addr)
+>>>>> +bool smp_sense_running_status(uint16_t addr)
+>>>>>  {
+>>>>>  	if (sigp(addr, SIGP_SENSE_RUNNING, 0, NULL) != SIGP_CC_STATUS_STORED)
+>>>>>  		return true;
+>>>>> diff --git a/lib/s390x/smp.h b/lib/s390x/smp.h
+>>>>> index a8b98c0..639ec92 100644
+>>>>> --- a/lib/s390x/smp.h
+>>>>> +++ b/lib/s390x/smp.h
+>>>>> @@ -40,7 +40,7 @@ struct cpu_status {
+>>>>>  int smp_query_num_cpus(void);
+>>>>>  struct cpu *smp_cpu_from_addr(uint16_t addr);
+>>>>>  bool smp_cpu_stopped(uint16_t addr);
+>>>>> -bool smp_cpu_running(uint16_t addr);
+>>>>> +bool smp_sense_running_status(uint16_t addr);
+>>>>>  int smp_cpu_restart(uint16_t addr);
+>>>>>  int smp_cpu_start(uint16_t addr, struct psw psw);
+>>>>>  int smp_cpu_stop(uint16_t addr);
+>>>>> diff --git a/s390x/smp.c b/s390x/smp.c
+>>>>> index 79cdc1f..b4b1ff2 100644
+>>>>> --- a/s390x/smp.c
+>>>>> +++ b/s390x/smp.c
+>>>>> @@ -210,6 +210,18 @@ static void test_emcall(void)
+>>>>>  	report_prefix_pop();
+>>>>>  }
+>>>>>  
+>>>>> +static void test_sense_running(void)
+>>>>> +{
+>>>>> +	report_prefix_push("sense_running");
+>>>>> +	/* make sure CPU is stopped */
+>>>>> +	smp_cpu_stop(1);
+>>>>> +	/* wait for stop to succeed. */
+>>>>> +	while(smp_sense_running_status(1));
+>>>>> +	report(!smp_sense_running_status(1), "CPU1 sense claims not running");
+>>>>> +	report_prefix_pop();
+>>>>> +}
+>>>>> +
+>>>>> +
+>>>>>  /* Used to dirty registers of cpu #1 before it is reset */
+>>>>>  static void test_func_initial(void)
+>>>>>  {
+>>>>> @@ -319,6 +331,7 @@ int main(void)
+>>>>>  	test_store_status();
+>>>>>  	test_ecall();
+>>>>>  	test_emcall();
+>>>>> +	test_sense_running();
+>>>>>  	test_reset();
+>>>>>  	test_reset_initial();
+>>>>>  	smp_cpu_destroy(1);
+>>>>>
+>>>>
+>>>> TBH, I am still not sure if this is completely free of races.
+>>>>
+>>>> Assume CPU 1 is in handle_stop()
+>>>>
+>>>> if (!kvm_s390_user_cpu_state_ctrl(vcpu->kvm))
+>>>> 	kvm_s390_vcpu_stop(vcpu);
+>>>> // CPU 1: gets scheduled out.
+>>>> // CPU 0: while(smp_sense_running_status(1)); finishes
+>>>> // CPU 1: gets scheduled in to return to user space
+>>>> return -EOPNOTSUPP;
+>>>> // CPU 0: report(!smp_sense_running_status(1), "CPU1 sense claims not
+>>>> running"); fails
+>>>>
+>>>> SIGP SENSE RUNNING is simply racy as hell and doesn't give you any
+>>>> guarantees. Which is good enough for some performance improvements
+>>>> (e.g., spinlocks).
+>>>>
+>>>> Now, I can queue this, but I wouldn't be surprised if we see random
+>>>> failures at one point.
+>>>
+>>> Which would speak for Janoschs variant. Loop until non running at least once 
+>>> and then report success?
+>>
+>> As long as the other CPU isn't always scheduled (unlikely) and always in
+>> the kernel (unlikely), this test would even pass without the
+>> smp_cpu_stop(). So the test doesn't say much except "sometimes,
+>> smp_sense_running_status(1) reports false". Agreed that the
+>> smp_cpu_stop() will make that appear faster.
+>>
+>> If we agree about these semantics, let's add them as a comment to the test.
+> 
+> 
+> Something like this: (I also added a test for running = true)
+> 
+> static void test_sense_running(void)
+> {
+>         report_prefix_push("sense_running");
+>         /* we are running */
+>         report(smp_sense_running_status(0), "CPU0 sense claims running");
+>         /* make sure CPU is stopped to speed up the not running case */
+>         smp_cpu_stop(1);
+>         /* Make sure to have at least one time with a not running indication */
+>         while(smp_sense_running_status(1));
+>         report(true, "CPU1 sense claims not running");
+>         report_prefix_pop();
+> }
 
-arch/x86/kvm/vmx/vmx.c:359:17: error: no previous prototype for 'vmread_error' [-Werror=missing-prototypes]
- asmlinkage void vmread_error(unsigned long field, bool fault)
-                 ^~~~~~~~~~~~
+Yeah, looks better IMHO. Thanks
 
-Signed-off-by: Qian Cai <cai@lca.pw>
----
- arch/x86/kvm/vmx/ops.h | 1 +
- 1 file changed, 1 insertion(+)
+Thanks,
 
-diff --git a/arch/x86/kvm/vmx/ops.h b/arch/x86/kvm/vmx/ops.h
-index 09b0937d56b1..19717d0a1100 100644
---- a/arch/x86/kvm/vmx/ops.h
-+++ b/arch/x86/kvm/vmx/ops.h
-@@ -12,6 +12,7 @@
- 
- #define __ex(x) __kvm_handle_fault_on_reboot(x)
- 
-+asmlinkage void vmread_error(unsigned long field, bool fault);
- __attribute__((regparm(0))) void vmread_error_trampoline(unsigned long field,
- 							 bool fault);
- void vmwrite_error(unsigned long field, unsigned long value);
--- 
-2.21.0 (Apple Git-122.2)
+David / dhildenb
 
