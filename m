@@ -2,202 +2,148 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6C1CA19C471
-	for <lists+kvm@lfdr.de>; Thu,  2 Apr 2020 16:39:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2B15B19C47B
+	for <lists+kvm@lfdr.de>; Thu,  2 Apr 2020 16:41:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388264AbgDBOiz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Apr 2020 10:38:55 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:38371 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388192AbgDBOiz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Apr 2020 10:38:55 -0400
+        id S1732754AbgDBOla (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Apr 2020 10:41:30 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:37672 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726927AbgDBOla (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 2 Apr 2020 10:41:30 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1585838333;
+        s=mimecast20190719; t=1585838489;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=5zJId47dIDTUhCxWFjRzhT8S4/K1qhmpRh3SERFybFs=;
-        b=ABEGgW3lYnkKyOG+uPX2h96bpwp0cmnxuLBoplBbGMjQgKfLnJr32Iu9jQZConzm7VhcaT
-        hXI0aPnroeMH2l+4yUvggQgkIRvGkEPB4QuxH5YmSuiDPY9uOcwtSFGGgkV2NCDl3CWqI3
-        EgFO041/Y6TKhDkMVuy/x4gguVk4EMI=
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
- [209.85.222.200]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-3-Uz7apy74NxOPMP5PTw7Bog-1; Thu, 02 Apr 2020 10:38:50 -0400
-X-MC-Unique: Uz7apy74NxOPMP5PTw7Bog-1
-Received: by mail-qk1-f200.google.com with SMTP id 64so3246989qkk.1
-        for <kvm@vger.kernel.org>; Thu, 02 Apr 2020 07:38:49 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=5zJId47dIDTUhCxWFjRzhT8S4/K1qhmpRh3SERFybFs=;
-        b=H1UX2FjQ6Rv2echPkU7oMmJFFkIZ8bBte8QiTpRbHBJrVHVk3rpH2wDdJqQRIeuSSd
-         5l3e94u8MiwZLlDX9+UFv5LLyoTZi2jz6BZHs3JuTHlwXSBCj63PRjsr+unaK0SX6JlK
-         fPZOAI1F0gT9bnY5i30IaYzGwSs2yR56xawGMTo7LxHj2A/zgZ8EW+bzO7Pj2KuanOa2
-         GdlsVBmGadngUucJJwbbKsXiWhWVPrDj2qfDGDdhMdr8PVp6pgKz9Qq8c18jpCp2+p1U
-         dIMnf/f8SIMHt1pEY089Jiw0VVCnUAso16pRKmWN8TPIyasp6ME5C6faDmp/yGcYmKAF
-         R++w==
-X-Gm-Message-State: AGi0PuYmocNAGxT+L68oP88lV0780yp19/BcdkEnImKpPiTu1T1txqpO
-        CgClxVtQzjjDt3A/jFg4q/qd7mls6c8ZFy8G9V3hK5P6KQR753guIUdJdRducjLOm7fdTG7AI58
-        X9v49kdeYZiyj
-X-Received: by 2002:ac8:24c1:: with SMTP id t1mr3248337qtt.275.1585838329491;
-        Thu, 02 Apr 2020 07:38:49 -0700 (PDT)
-X-Google-Smtp-Source: APiQypLhy6AetkOXTZr7DRk6EDkALT/IdoKI3LjJeVYjOumPny6hIpCUhk1U1rDap04t/JdFxAlwBg==
-X-Received: by 2002:ac8:24c1:: with SMTP id t1mr3248313qtt.275.1585838329193;
-        Thu, 02 Apr 2020 07:38:49 -0700 (PDT)
-Received: from redhat.com (bzq-79-176-51-222.red.bezeqint.net. [79.176.51.222])
-        by smtp.gmail.com with ESMTPSA id q1sm3489017qtn.69.2020.04.02.07.38.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Apr 2020 07:38:48 -0700 (PDT)
-Date:   Thu, 2 Apr 2020 10:38:39 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        jgg@mellanox.com, maxime.coquelin@redhat.com,
-        cunming.liang@intel.com, zhihong.wang@intel.com,
-        rob.miller@broadcom.com, xiao.w.wang@intel.com,
-        lingshan.zhu@intel.com, eperezma@redhat.com, lulu@redhat.com,
-        parav@mellanox.com, kevin.tian@intel.com, stefanha@redhat.com,
-        rdunlap@infradead.org, hch@infradead.org, aadam@redhat.com,
-        jiri@mellanox.com, shahafs@mellanox.com, hanand@xilinx.com,
-        mhabets@solarflare.com, gdawar@xilinx.com, saugatm@xilinx.com,
-        vmireyno@marvell.com, zhangweining@ruijie.com.cn
-Subject: Re: [PATCH V9 1/9] vhost: refine vhost and vringh kconfig
-Message-ID: <20200402103813-mutt-send-email-mst@kernel.org>
-References: <20200326140125.19794-1-jasowang@redhat.com>
- <20200326140125.19794-2-jasowang@redhat.com>
- <20200401092004-mutt-send-email-mst@kernel.org>
- <6b4d169a-9962-6014-5423-1507059343e9@redhat.com>
- <20200401100954-mutt-send-email-mst@kernel.org>
- <3dd3b7e7-e3d9-dba4-00fc-868081f95ab7@redhat.com>
- <20200401120643-mutt-send-email-mst@kernel.org>
- <c11c2195-88eb-2096-af47-40f2da5b389f@redhat.com>
- <20200402100257-mutt-send-email-mst@kernel.org>
- <279ed96c-5331-9da6-f9c1-b49e87d49c31@redhat.com>
+        bh=LQlIPwSA6eO8FaNGqaPVKwSvrWhWEma0a4EepOgZn9Y=;
+        b=atPJIU3pA8KzMLInKyK4TWyS5oY3Cfo0p9CrCD7uGZWBNc7eaHGeV7G/Wc1C26P4Ntq2k5
+        vk1l0sUaNiwcd0OjtqkytcUzUmBOU/3NWfe79esUHZAHEezVweM5wqXq6fIKrc8b3GilRs
+        CEzcPVfcGW4Ot3un34WyHD6tsUFfjjY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-497-jcwdGm7hNY6oM0oaAdC1ag-1; Thu, 02 Apr 2020 10:41:25 -0400
+X-MC-Unique: jcwdGm7hNY6oM0oaAdC1ag-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 94C7419067E7;
+        Thu,  2 Apr 2020 14:41:23 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.40.192.77])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 78A36D768E;
+        Thu,  2 Apr 2020 14:41:15 +0000 (UTC)
+Date:   Thu, 2 Apr 2020 16:41:12 +0200
+From:   Andrew Jones <drjones@redhat.com>
+To:     Zenghui Yu <yuzenghui@huawei.com>
+Cc:     Auger Eric <eric.auger@redhat.com>, peter.maydell@linaro.org,
+        kvm@vger.kernel.org, maz@kernel.org, qemu-devel@nongnu.org,
+        qemu-arm@nongnu.org, andre.przywara@arm.com, thuth@redhat.com,
+        alexandru.elisei@arm.com, kvmarm@lists.cs.columbia.edu,
+        eric.auger.pro@gmail.com
+Subject: Re: [kvm-unit-tests PATCH v7 10/13] arm/arm64: ITS: INT functional
+ tests
+Message-ID: <20200402144112.u6nwzkqe7mt3rr6c@kamzik.brq.redhat.com>
+References: <20200320092428.20880-1-eric.auger@redhat.com>
+ <20200320092428.20880-11-eric.auger@redhat.com>
+ <f7f1d7c4-2321-9123-2394-528af737bfa7@huawei.com>
+ <fa4e14f6-20ee-982f-0eda-74b101cddf7a@redhat.com>
+ <114f8bba-a1e0-0367-a1b4-e875718d8dba@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <279ed96c-5331-9da6-f9c1-b49e87d49c31@redhat.com>
+In-Reply-To: <114f8bba-a1e0-0367-a1b4-e875718d8dba@huawei.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Apr 02, 2020 at 10:23:59PM +0800, Jason Wang wrote:
-> 
-> On 2020/4/2 下午10:03, Michael S. Tsirkin wrote:
-> > On Thu, Apr 02, 2020 at 11:22:57AM +0800, Jason Wang wrote:
-> > > On 2020/4/2 上午12:08, Michael S. Tsirkin wrote:
-> > > > On Wed, Apr 01, 2020 at 10:29:32PM +0800, Jason Wang wrote:
-> > > > > >From 9b3a5d23b8bf6b0a11e65e688335d782f8e6aa5c Mon Sep 17 00:00:00 2001
-> > > > > From: Jason Wang <jasowang@redhat.com>
-> > > > > Date: Wed, 1 Apr 2020 22:17:27 +0800
-> > > > > Subject: [PATCH] vhost: let CONFIG_VHOST to be selected by drivers
-> > > > > 
-> > > > > The defconfig on some archs enable vhost_net or vhost_vsock by
-> > > > > default. So instead of adding CONFIG_VHOST=m to all of those files,
-> > > > > simply letting CONFIG_VHOST to be selected by all of the vhost
-> > > > > drivers. This fixes the build on the archs with CONFIG_VHOST_NET=m in
-> > > > > their defconfig.
-> > > > > 
-> > > > > Signed-off-by: Jason Wang <jasowang@redhat.com>
-> > > > > ---
-> > > > >    drivers/vhost/Kconfig | 15 +++++++++++----
-> > > > >    1 file changed, 11 insertions(+), 4 deletions(-)
-> > > > > 
-> > > > > diff --git a/drivers/vhost/Kconfig b/drivers/vhost/Kconfig
-> > > > > index 2523a1d4290a..362b832f5338 100644
-> > > > > --- a/drivers/vhost/Kconfig
-> > > > > +++ b/drivers/vhost/Kconfig
-> > > > > @@ -11,19 +11,23 @@ config VHOST_RING
-> > > > >    	  This option is selected by any driver which needs to access
-> > > > >    	  the host side of a virtio ring.
-> > > > > -menuconfig VHOST
-> > > > > -	tristate "Host kernel accelerator for virtio (VHOST)"
-> > > > > -	depends on EVENTFD
-> > > > > +config VHOST
-> > > > > +	tristate
-> > > > >    	select VHOST_IOTLB
-> > > > >    	help
-> > > > >    	  This option is selected by any driver which needs to access
-> > > > >    	  the core of vhost.
-> > > > > -if VHOST
-> > > > > +menuconfig VHOST_MENU
-> > > > > +	bool "VHOST drivers"
-> > > > > +	default y
-> > > > > +
-> > > > > +if VHOST_MENU
-> > > > >    config VHOST_NET
-> > > > >    	tristate "Host kernel accelerator for virtio net"
-> > > > >    	depends on NET && EVENTFD && (TUN || !TUN) && (TAP || !TAP)
-> > > > > +	select VHOST
-> > > > >    	---help---
-> > > > >    	  This kernel module can be loaded in host kernel to accelerate
-> > > > >    	  guest networking with virtio_net. Not to be confused with virtio_net
-> > > > > @@ -35,6 +39,7 @@ config VHOST_NET
-> > > > >    config VHOST_SCSI
-> > > > >    	tristate "VHOST_SCSI TCM fabric driver"
-> > > > >    	depends on TARGET_CORE && EVENTFD
-> > > > > +	select VHOST
-> > > > >    	default n
-> > > > >    	---help---
-> > > > >    	Say M here to enable the vhost_scsi TCM fabric module
-> > > > > @@ -43,6 +48,7 @@ config VHOST_SCSI
-> > > > >    config VHOST_VSOCK
-> > > > >    	tristate "vhost virtio-vsock driver"
-> > > > >    	depends on VSOCKETS && EVENTFD
-> > > > > +	select VHOST
-> > > > >    	select VIRTIO_VSOCKETS_COMMON
-> > > > >    	default n
-> > > > >    	---help---
-> > > > > @@ -56,6 +62,7 @@ config VHOST_VSOCK
-> > > > >    config VHOST_VDPA
-> > > > >    	tristate "Vhost driver for vDPA-based backend"
-> > > > >    	depends on EVENTFD
-> > > > > +	select VHOST
-> > > 
-> > > This part is not squashed.
-> > > 
-> > > 
-> > > > >    	select VDPA
-> > > > >    	help
-> > > > >    	  This kernel module can be loaded in host kernel to accelerate
-> > > > OK so I squashed this into the original buggy patch.
-> > > > Could you please play with vhost branch of my tree on various
-> > > > arches? If it looks ok to you let me know I'll push
-> > > > this to next.
-> > > 
-> > > With the above part squashed. I've tested all the archs whose defconfig have
-> > > VHOST_NET or VHOST_VSOCK enabled.
-> > > 
-> > > All looks fine.
-> > > 
-> > > Thanks
-> > 
-> > I'm a bit confused. So is the next tag in my tree ok now?
-> 
-> 
-> Still need to select CONFIG_VHOST for  CONFIG_VHOST_VDPA. Others are ok.
-> 
-> Thanks
+On Thu, Apr 02, 2020 at 08:40:42PM +0800, Zenghui Yu wrote:
+> Hi Eric,
+>=20
+> On 2020/4/2 16:50, Auger Eric wrote:
+> > Hi Zenghui,
+> >=20
+> > On 3/30/20 12:43 PM, Zenghui Yu wrote:
+> > > Hi Eric,
+> > >=20
+> > > On 2020/3/20 17:24, Eric Auger wrote:
+> > > > Triggers LPIs through the INT command.
+> > > >=20
+> > > > the test checks the LPI hits the right CPU and triggers
+> > > > the right LPI intid, ie. the translation is correct.
+> > > >=20
+> > > > Updates to the config table also are tested, along with inv
+> > > > and invall commands.
+> > > >=20
+> > > > Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> > >=20
+> > > [...]
+> > >=20
+> > > So I've tested this series and found that the "INT" test will somet=
+imes
+> > > fail.
+> > >=20
+> > > "not ok 12 - gicv3: its-migration: dev2/eventid=3D20 triggers LPI 8=
+195 en
+> > > PE #3 after migration
+> > > not ok 13 - gicv3: its-migration: dev7/eventid=3D255 triggers LPI 8=
+196 on
+> > > PE #2 after migration"
+> > >=20
+> > >  From logs:
+> > > "INFO: gicv3: its-migration: Migration complete
+> > > INT dev_id=3D2 event_id=3D20
+> > > INFO: gicv3: its-migration: No LPI received whereas (cpuid=3D3,
+> > > intid=3D8195) was expected
+> > > FAIL: gicv3: its-migration: dev2/eventid=3D20 triggers LPI 8195 en =
+PE #3
+> > > after migration
+> > > INT dev_id=3D7 event_id=3D255
+> > > INFO: gicv3: its-migration: No LPI received whereas (cpuid=3D2,
+> > > intid=3D8196) was expected
+> > > FAIL: gicv3: its-migration: dev7/eventid=3D255 triggers LPI 8196 on=
+ PE #2
+> > > after migration"
+> > >=20
+> > > > +static void check_lpi_stats(const char *msg)
+> > > > +{
+> > > > +=A0=A0=A0 bool pass =3D false;
+> > > > +
+> > > > +=A0=A0=A0 mdelay(100);
+> > >=20
+> > > After changing this to 'mdelay(1000)', the above error doesn't show=
+ up
+> > > anymore. But it sounds strange that 100ms is not enough to deliver =
+a
+> > > single LPI. I haven't dig it further but will get back here later.
+> >=20
+> > Did you find some time to investigate this issue. Changing 100 to 100=
+0
+> > has a huge impact on the overall test duration and I don't think it i=
+s
+> > sensible. Could you see what is your minimal value that pass the test=
+s?
+>=20
+> I can reproduce this issue with a very *low* probability so I failed
+> to investigate it :-(.  (It might because the LPI was delivered to a
+> busy vcpu...)
+>=20
+> You can leave it as it is until someone else complain about it again.
+> Or take the similar approach as check_acked() - wait up to 5s for the
+> interrupt to be delivered, and bail out as soon as we see it.
 
+I think the check_acked approach would be the best approach.
 
-Oh like this then?
+Thanks,
+drew
 
-diff --git a/drivers/vhost/Kconfig b/drivers/vhost/Kconfig
-index bdd270fede26..cb6b17323eb2 100644
---- a/drivers/vhost/Kconfig
-+++ b/drivers/vhost/Kconfig
-@@ -61,6 +63,7 @@ config VHOST_VSOCK
- config VHOST_VDPA
- 	tristate "Vhost driver for vDPA-based backend"
- 	depends on EVENTFD
-+	select VHOST
- 	select VDPA
- 	help
- 	  This kernel module can be loaded in host kernel to accelerate
+>=20
+>=20
+> Thanks,
+> Zenghui
+>=20
+>=20
 
