@@ -2,72 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1825B19CCDC
-	for <lists+kvm@lfdr.de>; Fri,  3 Apr 2020 00:28:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3C6C919CCE1
+	for <lists+kvm@lfdr.de>; Fri,  3 Apr 2020 00:32:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389851AbgDBW2I (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Apr 2020 18:28:08 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:51634 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388218AbgDBW2H (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Apr 2020 18:28:07 -0400
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 032MRgm1068806;
-        Thu, 2 Apr 2020 22:27:42 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2020-01-29;
- bh=jAtOGQm+gLhgkn3BMXlmRy2Rbyh9TwngF7eP1Ox/CB0=;
- b=qbUNrSMdwH/2gmNSiUVty35iiQCR27OSfSuuvVERn6RySLSWDw4XO4TjaFGrz93S+Xmt
- cLubtrS1gEU/OEp5zPvlE3qK0Tkpmkx4k0WucXIa/HEIfoGxQEoggJ2GnmmlRErz/0UI
- Q+QBnOpXpYeuAcyrHRNiSIJyOP1qlAXM9rZZrrasrVutPgz+Bg4jlu+xu9ka9oA172sX
- tG56Jb0P45DSxlvyTnLB1ljlbPovWBrBmnyjs4wv3kAHJAivPgTOREPp8pC6Z/TnBGDn
- gH8p6chLoQP1/fQMQWWVBr4913XWeMaqAE/Rm/k3dQQbcuFLGaRu24cbNui0q04tIpLA 8A== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by aserp2120.oracle.com with ESMTP id 303yungrrf-1
+        id S2389651AbgDBWcK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Apr 2020 18:32:10 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:48664 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2388218AbgDBWcK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Apr 2020 18:32:10 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 032MRvg1040823;
+        Thu, 2 Apr 2020 22:31:51 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : references : mime-version : content-type :
+ content-transfer-encoding : in-reply-to; s=corp-2020-01-29;
+ bh=SZocQty41xyA03Ov0i0QqgwxuviOkjnJM8QExzU6N2g=;
+ b=m+Syx9aMUfJ2fURsjo/qLKkSNfgsK6Mho//wZXvr6WoMcfNCLYkuAcZ4kMgPPyW4LTaT
+ L1px0J4q6J34c8IZlPlSEBkqmX0KgB9es4ZuhGvpokPclR93UNblcYxPN1BiXIB6UC0E
+ ZAB95qXMAyIYme3HeSuf9gD/5EwyzmzRpd1dXIlg4wOs4Yt5zkLa8Ibu+WLSpbOup3G1
+ x1TLESB5OM4DwWGWbq82xm2OwAZ+3iYlaScaqL7zndyLnMW/zd0cWKzwi6X5rAF+qldX
+ 0jWTIwHWx0z06pqh/G44gAm6XyHdRfvO/LJPtucSjEWTyEJ501PiYBecAhXJdUiiqyy1 Ug== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by userp2130.oracle.com with ESMTP id 303ceve6e9-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 02 Apr 2020 22:27:42 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 032MR8ar037919;
-        Thu, 2 Apr 2020 22:27:42 GMT
+        Thu, 02 Apr 2020 22:31:50 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 032MSKfl011576;
+        Thu, 2 Apr 2020 22:29:49 GMT
 Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by aserp3020.oracle.com with ESMTP id 304sjqrp3r-1
+        by aserp3030.oracle.com with ESMTP id 302g4w927r-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 02 Apr 2020 22:27:41 +0000
-Received: from abhmp0007.oracle.com (abhmp0007.oracle.com [141.146.116.13])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 032MReSx003606;
-        Thu, 2 Apr 2020 22:27:40 GMT
-Received: from localhost.localdomain (/10.159.142.52)
+        Thu, 02 Apr 2020 22:29:49 +0000
+Received: from abhmp0009.oracle.com (abhmp0009.oracle.com [141.146.116.15])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 032MTmW4004576;
+        Thu, 2 Apr 2020 22:29:48 GMT
+Received: from vbusired-dt (/10.154.166.66)
         by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Thu, 02 Apr 2020 15:27:40 -0700
-Subject: Re: [PATCH v6 06/14] KVM: SVM: Add KVM_SEV_RECEIVE_FINISH command
-To:     Ashish Kalra <Ashish.Kalra@amd.com>, pbonzini@redhat.com
-Cc:     tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
-        joro@8bytes.org, bp@suse.de, thomas.lendacky@amd.com,
-        x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        rientjes@google.com, srutherford@google.com, luto@kernel.org,
-        brijesh.singh@amd.com
+        with ESMTP ; Thu, 02 Apr 2020 15:29:48 -0700
+Date:   Thu, 2 Apr 2020 17:29:43 -0500
+From:   Venu Busireddy <venu.busireddy@oracle.com>
+To:     Ashish Kalra <Ashish.Kalra@amd.com>
+Cc:     pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com,
+        hpa@zytor.com, joro@8bytes.org, bp@suse.de,
+        thomas.lendacky@amd.com, x86@kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, rientjes@google.com,
+        srutherford@google.com, luto@kernel.org, brijesh.singh@amd.com
+Subject: Re: [PATCH v6 05/14] KVM: SVM: Add KVM_SEV_RECEIVE_UPDATE_DATA
+ command
+Message-ID: <20200402222943.GA659464@vbusired-dt>
 References: <cover.1585548051.git.ashish.kalra@amd.com>
- <0f8a2125c7acb7b38fc51a044a8088e8baa45e3d.1585548051.git.ashish.kalra@amd.com>
-From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Message-ID: <8694381f-2083-e477-bea1-04fb572519d0@oracle.com>
-Date:   Thu, 2 Apr 2020 15:27:39 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ <871a1e89a4dff59f50d9c264c6d9a4cfd0eab50f.1585548051.git.ashish.kalra@amd.com>
 MIME-Version: 1.0
-In-Reply-To: <0f8a2125c7acb7b38fc51a044a8088e8baa45e3d.1585548051.git.ashish.kalra@amd.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Content-Language: en-US
+In-Reply-To: <871a1e89a4dff59f50d9c264c6d9a4cfd0eab50f.1585548051.git.ashish.kalra@amd.com>
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9579 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 adultscore=0 mlxscore=0
- malwarescore=0 phishscore=0 suspectscore=0 mlxlogscore=999 spamscore=0
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 bulkscore=0 suspectscore=5
+ mlxscore=0 spamscore=0 malwarescore=0 mlxlogscore=999 phishscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
  definitions=main-2004020165
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9579 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 lowpriorityscore=0
- malwarescore=0 adultscore=0 priorityscore=1501 mlxlogscore=999 bulkscore=0
- suspectscore=0 mlxscore=0 spamscore=0 impostorscore=0 clxscore=1015
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 adultscore=0
+ clxscore=1015 phishscore=0 lowpriorityscore=0 spamscore=0 malwarescore=0
+ suspectscore=5 mlxscore=0 impostorscore=0 mlxlogscore=999 bulkscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
  definitions=main-2004020165
 Sender: kvm-owner@vger.kernel.org
@@ -75,13 +74,12 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-On 3/29/20 11:21 PM, Ashish Kalra wrote:
+On 2020-03-30 06:21:20 +0000, Ashish Kalra wrote:
 > From: Brijesh Singh <Brijesh.Singh@amd.com>
->
-> The command finalize the guest receiving process and make the SEV guest
-> ready for the execution.
->
+> 
+> The command is used for copying the incoming buffer into the
+> SEV guest memory space.
+> 
 > Cc: Thomas Gleixner <tglx@linutronix.de>
 > Cc: Ingo Molnar <mingo@redhat.com>
 > Cc: "H. Peter Anvin" <hpa@zytor.com>
@@ -95,69 +93,167 @@ On 3/29/20 11:21 PM, Ashish Kalra wrote:
 > Cc: linux-kernel@vger.kernel.org
 > Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 > Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+
+Reviewed-by: Venu Busireddy <venu.busireddy@oracle.com>
+
 > ---
->   .../virt/kvm/amd-memory-encryption.rst        |  8 +++++++
->   arch/x86/kvm/svm.c                            | 23 +++++++++++++++++++
->   2 files changed, 31 insertions(+)
->
+>  .../virt/kvm/amd-memory-encryption.rst        | 24 ++++++
+>  arch/x86/kvm/svm.c                            | 79 +++++++++++++++++++
+>  include/uapi/linux/kvm.h                      |  9 +++
+>  3 files changed, 112 insertions(+)
+> 
 > diff --git a/Documentation/virt/kvm/amd-memory-encryption.rst b/Documentation/virt/kvm/amd-memory-encryption.rst
-> index 554aa33a99cc..93cd95d9a6c0 100644
+> index ef1f1f3a5b40..554aa33a99cc 100644
 > --- a/Documentation/virt/kvm/amd-memory-encryption.rst
 > +++ b/Documentation/virt/kvm/amd-memory-encryption.rst
-> @@ -375,6 +375,14 @@ Returns: 0 on success, -negative on error
->                   __u32 trans_len;
->           };
->   
-> +15. KVM_SEV_RECEIVE_FINISH
-> +------------------------
+> @@ -351,6 +351,30 @@ On success, the 'handle' field contains a new handle and on error, a negative va
+>  
+>  For more details, see SEV spec Section 6.12.
+>  
+> +14. KVM_SEV_RECEIVE_UPDATE_DATA
+> +----------------------------
 > +
-> +After completion of the migration flow, the KVM_SEV_RECEIVE_FINISH command can be
-> +issued by the hypervisor to make the guest ready for execution.
+> +The KVM_SEV_RECEIVE_UPDATE_DATA command can be used by the hypervisor to copy
+> +the incoming buffers into the guest memory region with encryption context
+> +created during the KVM_SEV_RECEIVE_START.
+> +
+> +Parameters (in): struct kvm_sev_receive_update_data
 > +
 > +Returns: 0 on success, -negative on error
 > +
->   References
->   ==========
->   
+> +::
+> +
+> +        struct kvm_sev_launch_receive_update_data {
+> +                __u64 hdr_uaddr;        /* userspace address containing the packet header */
+> +                __u32 hdr_len;
+> +
+> +                __u64 guest_uaddr;      /* the destination guest memory region */
+> +                __u32 guest_len;
+> +
+> +                __u64 trans_uaddr;      /* the incoming buffer memory region  */
+> +                __u32 trans_len;
+> +        };
+> +
+>  References
+>  ==========
+>  
 > diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
-> index 5fc5355536d7..7c2721e18b06 100644
+> index 038b47685733..5fc5355536d7 100644
 > --- a/arch/x86/kvm/svm.c
 > +++ b/arch/x86/kvm/svm.c
-> @@ -7573,6 +7573,26 @@ static int sev_receive_update_data(struct kvm *kvm, struct kvm_sev_cmd *argp)
->   	return ret;
->   }
->   
-> +static int sev_receive_finish(struct kvm *kvm, struct kvm_sev_cmd *argp)
+> @@ -7497,6 +7497,82 @@ static int sev_receive_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>  	return ret;
+>  }
+>  
+> +static int sev_receive_update_data(struct kvm *kvm, struct kvm_sev_cmd *argp)
 > +{
 > +	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
-> +	struct sev_data_receive_finish *data;
-> +	int ret;
+> +	struct kvm_sev_receive_update_data params;
+> +	struct sev_data_receive_update_data *data;
+> +	void *hdr = NULL, *trans = NULL;
+> +	struct page **guest_page;
+> +	unsigned long n;
+> +	int ret, offset;
 > +
 > +	if (!sev_guest(kvm))
-> +		return -ENOTTY;
+> +		return -EINVAL;
 > +
+> +	if (copy_from_user(&params, (void __user *)(uintptr_t)argp->data,
+> +			sizeof(struct kvm_sev_receive_update_data)))
+> +		return -EFAULT;
+> +
+> +	if (!params.hdr_uaddr || !params.hdr_len ||
+> +	    !params.guest_uaddr || !params.guest_len ||
+> +	    !params.trans_uaddr || !params.trans_len)
+> +		return -EINVAL;
+> +
+> +	/* Check if we are crossing the page boundary */
+> +	offset = params.guest_uaddr & (PAGE_SIZE - 1);
+> +	if ((params.guest_len + offset > PAGE_SIZE))
+> +		return -EINVAL;
+> +
+> +	hdr = psp_copy_user_blob(params.hdr_uaddr, params.hdr_len);
+> +	if (IS_ERR(hdr))
+> +		return PTR_ERR(hdr);
+> +
+> +	trans = psp_copy_user_blob(params.trans_uaddr, params.trans_len);
+> +	if (IS_ERR(trans)) {
+> +		ret = PTR_ERR(trans);
+> +		goto e_free_hdr;
+> +	}
+> +
+> +	ret = -ENOMEM;
 > +	data = kzalloc(sizeof(*data), GFP_KERNEL);
 > +	if (!data)
-> +		return -ENOMEM;
+> +		goto e_free_trans;
 > +
+> +	data->hdr_address = __psp_pa(hdr);
+> +	data->hdr_len = params.hdr_len;
+> +	data->trans_address = __psp_pa(trans);
+> +	data->trans_len = params.trans_len;
+> +
+> +	/* Pin guest memory */
+> +	ret = -EFAULT;
+> +	guest_page = sev_pin_memory(kvm, params.guest_uaddr & PAGE_MASK,
+> +				    PAGE_SIZE, &n, 0);
+> +	if (!guest_page)
+> +		goto e_free;
+> +
+> +	/* The RECEIVE_UPDATE_DATA command requires C-bit to be always set. */
+> +	data->guest_address = (page_to_pfn(guest_page[0]) << PAGE_SHIFT) +
+> +				offset;
+> +	data->guest_address |= sev_me_mask;
+> +	data->guest_len = params.guest_len;
 > +	data->handle = sev->handle;
-> +	ret = sev_issue_cmd(kvm, SEV_CMD_RECEIVE_FINISH, data, &argp->error);
 > +
+> +	ret = sev_issue_cmd(kvm, SEV_CMD_RECEIVE_UPDATE_DATA, data,
+> +				&argp->error);
+> +
+> +	sev_unpin_memory(kvm, guest_page, n);
+> +
+> +e_free:
 > +	kfree(data);
+> +e_free_trans:
+> +	kfree(trans);
+> +e_free_hdr:
+> +	kfree(hdr);
+> +
 > +	return ret;
 > +}
 > +
->   static int svm_mem_enc_op(struct kvm *kvm, void __user *argp)
->   {
->   	struct kvm_sev_cmd sev_cmd;
-> @@ -7632,6 +7652,9 @@ static int svm_mem_enc_op(struct kvm *kvm, void __user *argp)
->   	case KVM_SEV_RECEIVE_UPDATE_DATA:
->   		r = sev_receive_update_data(kvm, &sev_cmd);
->   		break;
-> +	case KVM_SEV_RECEIVE_FINISH:
-> +		r = sev_receive_finish(kvm, &sev_cmd);
+>  static int svm_mem_enc_op(struct kvm *kvm, void __user *argp)
+>  {
+>  	struct kvm_sev_cmd sev_cmd;
+> @@ -7553,6 +7629,9 @@ static int svm_mem_enc_op(struct kvm *kvm, void __user *argp)
+>  	case KVM_SEV_RECEIVE_START:
+>  		r = sev_receive_start(kvm, &sev_cmd);
+>  		break;
+> +	case KVM_SEV_RECEIVE_UPDATE_DATA:
+> +		r = sev_receive_update_data(kvm, &sev_cmd);
 > +		break;
->   	default:
->   		r = -EINVAL;
->   		goto out;
-Reviewed-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
+>  	default:
+>  		r = -EINVAL;
+>  		goto out;
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index 74764b9db5fa..4e80c57a3182 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -1588,6 +1588,15 @@ struct kvm_sev_receive_start {
+>  	__u32 session_len;
+>  };
+>  
+> +struct kvm_sev_receive_update_data {
+> +	__u64 hdr_uaddr;
+> +	__u32 hdr_len;
+> +	__u64 guest_uaddr;
+> +	__u32 guest_len;
+> +	__u64 trans_uaddr;
+> +	__u32 trans_len;
+> +};
+> +
+>  #define KVM_DEV_ASSIGN_ENABLE_IOMMU	(1 << 0)
+>  #define KVM_DEV_ASSIGN_PCI_2_3		(1 << 1)
+>  #define KVM_DEV_ASSIGN_MASK_INTX	(1 << 2)
+> -- 
+> 2.17.1
+> 
