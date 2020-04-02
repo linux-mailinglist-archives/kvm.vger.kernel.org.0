@@ -2,119 +2,238 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 97D9D19C0FD
-	for <lists+kvm@lfdr.de>; Thu,  2 Apr 2020 14:18:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3D76919C100
+	for <lists+kvm@lfdr.de>; Thu,  2 Apr 2020 14:18:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388105AbgDBMSU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Apr 2020 08:18:20 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:12607 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S2387730AbgDBMSS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Apr 2020 08:18:18 -0400
-Received: from DGGEMS410-HUB.china.huawei.com (unknown [172.30.72.58])
-        by Forcepoint Email with ESMTP id 8DCB6735F0E567C3E1DB;
-        Thu,  2 Apr 2020 20:18:15 +0800 (CST)
-Received: from [127.0.0.1] (10.173.222.58) by DGGEMS410-HUB.china.huawei.com
- (10.3.19.210) with Microsoft SMTP Server id 14.3.487.0; Thu, 2 Apr 2020
- 20:18:08 +0800
-Subject: Re: [kvm-unit-tests PATCH 0/2] arm/arm64: Add IPI/vtimer latency
-To:     Zenghui Yu <yuzenghui@huawei.com>,
-        Andrew Jones <drjones@redhat.com>
-CC:     <kvm@vger.kernel.org>, <kvmarm@lists.cs.columbia.edu>,
-        <wanghaibin.wang@huawei.com>
-References: <20200401100812.27616-1-wangjingyi11@huawei.com>
- <20200401122445.exyobwo3a3agnuhk@kamzik.brq.redhat.com>
- <bbcd3dc4-79c1-7ba2-ea54-96d083dfcef9@huawei.com>
-From:   Jingyi Wang <wangjingyi11@huawei.com>
-Message-ID: <492aeb1e-39d0-5b56-8a4b-887de37b8c42@huawei.com>
-Date:   Thu, 2 Apr 2020 20:18:07 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+        id S2388130AbgDBMSp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Apr 2020 08:18:45 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:6424 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726252AbgDBMSo (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 2 Apr 2020 08:18:44 -0400
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 032C7m3B064917
+        for <kvm@vger.kernel.org>; Thu, 2 Apr 2020 08:18:43 -0400
+Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 304ym1gt9g-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Thu, 02 Apr 2020 08:18:42 -0400
+Received: from localhost
+        by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <frankja@linux.ibm.com>;
+        Thu, 2 Apr 2020 13:18:25 +0100
+Received: from b06avi18626390.portsmouth.uk.ibm.com (9.149.26.192)
+        by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Thu, 2 Apr 2020 13:18:23 +0100
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 032CHY2249479940
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 2 Apr 2020 12:17:34 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2A0004C044;
+        Thu,  2 Apr 2020 12:18:38 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D2BC34C050;
+        Thu,  2 Apr 2020 12:18:37 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.145.69.93])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu,  2 Apr 2020 12:18:37 +0000 (GMT)
+Subject: Re: [kvm-unit-tests v2] s390x/smp: add minimal test for sigp sense
+ running status
+To:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        Thomas Huth <thuth@redhat.com>,
+        David Hildenbrand <david@redhat.com>
+Cc:     Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org
+References: <20200402110250.63677-1-borntraeger@de.ibm.com>
+From:   Janosch Frank <frankja@linux.ibm.com>
+Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+Date:   Thu, 2 Apr 2020 14:18:37 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <bbcd3dc4-79c1-7ba2-ea54-96d083dfcef9@huawei.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.173.222.58]
-X-CFilter-Loop: Reflected
+In-Reply-To: <20200402110250.63677-1-borntraeger@de.ibm.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="QpAVlIIM7N6GDGGIftJILSj3DZPD3RETh"
+X-TM-AS-GCONF: 00
+x-cbid: 20040212-4275-0000-0000-000003B832F5
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20040212-4276-0000-0000-000038CD88F7
+Message-Id: <b1766baa-ca91-b1b4-c9e4-653ae4257cea@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.676
+ definitions=2020-04-02_03:2020-03-31,2020-04-02 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 bulkscore=0
+ impostorscore=0 malwarescore=0 mlxscore=0 lowpriorityscore=0 adultscore=0
+ spamscore=0 clxscore=1015 mlxlogscore=999 priorityscore=1501 phishscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
+ definitions=main-2004020110
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Drew, Zenghui,
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--QpAVlIIM7N6GDGGIftJILSj3DZPD3RETh
+Content-Type: multipart/mixed; boundary="da1cNu5grzWnlGXzrknjcJ3VrqgYPp30e"
 
-On 4/2/2020 7:52 PM, Zenghui Yu wrote:
-> Hi Drew, Jingyi,
-> 
-> On 2020/4/1 20:24, Andrew Jones wrote:
->> On Wed, Apr 01, 2020 at 06:08:10PM +0800, Jingyi Wang wrote:
->>> With the development of arm gic architecture, we think it will be useful
->>> to add some simple performance test in kut to measure the cost of
->>> interrupts. X86 arch has implemented similar test.
->>>
->>> Jingyi Wang (2):
->>>    arm/arm64: gic: Add IPI latency test
->>>    arm/arm64: Add vtimer latency test
->>>
->>>   arm/gic.c   | 27 +++++++++++++++++++++++++++
->>>   arm/timer.c | 11 +++++++++++
->>>   2 files changed, 38 insertions(+)
->>>
->>> -- 
->>> 2.19.1
->>>
->>>
->>
->> Hi Jingyi,
->>
->> We already have an IPI latency test in arm/micro-bench.c I'd prefer that
->> one be used, if possible, rather than conflating the gic functional tests
->> with latency tests. Can you take a look at it and see if it satisfies
->> your needs, extending it if necessary?
-> 
-> I think it'd be good to have these interrupt latency measurements in
-> kvm-unit-tests, and we can take the following interrupt types into
-> account:
-> 
-> - IPI
->    As Drew pointed out, we already have one in the micro-bench group.
->    But what I'm actually interested in is the latency of the new GICv4.1
->    vSGIs (which will be directly injected through ITS).  To measure it,
->    we should first make KUT be GICv4.1-awareness, see [1] for details.
->    (This way, we can even have a look at the interrupt latency in HW
->    level. Is it possible to have this in kvm-unit-tests, Drew?)
-> 
-> - PPI
->    Like what has been done in patch #2, you can choose the vtimer
->    interrupt as an example.
-> 
-> - LPI
->    I think we can easily build a LPI latency test based on Eric's "ITS
->    tests" series [2], which should be upstreamed soon.
-> 
-> - if you want to add more...
-> 
-> What do you think? I'd like to see a V2 of this series :-).
-> 
-> 
-> [1] 
-> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=0b04758b002bde9434053be2fff8064ac3d9d8bb 
-> 
-> [2] 
-> https://lore.kernel.org/kvm/20200320092428.20880-1-eric.auger@redhat.com/
-> 
-> 
-> Thanks,
-> Zenghui
-> 
-> 
-> .
+--da1cNu5grzWnlGXzrknjcJ3VrqgYPp30e
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-As Drew mentioned, I am thinking about adding other gic functional tests
-in arm/micro-bench.c. Thanks for your suggestion, I think it's of great
-help.
+On 4/2/20 1:02 PM, Christian Borntraeger wrote:
+> make sure that sigp sense running status returns a sane value for
 
-Thanks,
-Jingyi
+s/m/M/
+
+> stopped CPUs. To avoid potential races with the stop being processed we=
+
+> wait until sense running status is first 0.
+
+ENOPARSE "...is first 0?"
+
+>=20
+> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> ---
+>  lib/s390x/smp.c |  2 +-
+>  lib/s390x/smp.h |  2 +-
+>  s390x/smp.c     | 13 +++++++++++++
+>  3 files changed, 15 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/lib/s390x/smp.c b/lib/s390x/smp.c
+> index 5ed8b7b..492cb05 100644
+> --- a/lib/s390x/smp.c
+> +++ b/lib/s390x/smp.c
+> @@ -58,7 +58,7 @@ bool smp_cpu_stopped(uint16_t addr)
+>  	return !!(status & (SIGP_STATUS_CHECK_STOP|SIGP_STATUS_STOPPED));
+>  }
+> =20
+> -bool smp_cpu_running(uint16_t addr)
+> +bool smp_sense_running_status(uint16_t addr)
+>  {
+>  	if (sigp(addr, SIGP_SENSE_RUNNING, 0, NULL) !=3D SIGP_CC_STATUS_STORE=
+D)
+>  		return true;
+> diff --git a/lib/s390x/smp.h b/lib/s390x/smp.h
+> index a8b98c0..639ec92 100644
+> --- a/lib/s390x/smp.h
+> +++ b/lib/s390x/smp.h
+> @@ -40,7 +40,7 @@ struct cpu_status {
+>  int smp_query_num_cpus(void);
+>  struct cpu *smp_cpu_from_addr(uint16_t addr);
+>  bool smp_cpu_stopped(uint16_t addr);
+> -bool smp_cpu_running(uint16_t addr);
+> +bool smp_sense_running_status(uint16_t addr);
+
+That's completely unrelated to the test
+
+>  int smp_cpu_restart(uint16_t addr);
+>  int smp_cpu_start(uint16_t addr, struct psw psw);
+>  int smp_cpu_stop(uint16_t addr);
+> diff --git a/s390x/smp.c b/s390x/smp.c
+> index 79cdc1f..b4b1ff2 100644
+> --- a/s390x/smp.c
+> +++ b/s390x/smp.c
+> @@ -210,6 +210,18 @@ static void test_emcall(void)
+>  	report_prefix_pop();
+>  }
+> =20
+> +static void test_sense_running(void)
+> +{
+> +	report_prefix_push("sense_running");
+> +	/* make sure CPU is stopped */
+> +	smp_cpu_stop(1);
+> +	/* wait for stop to succeed. */
+> +	while(smp_sense_running_status(1));
+> +	report(!smp_sense_running_status(1), "CPU1 sense claims not running")=
+;
+
+That's basically true anyway after the loop, no?
+
+> +	report_prefix_pop();
+> +}
+> +
+> +
+>  /* Used to dirty registers of cpu #1 before it is reset */
+>  static void test_func_initial(void)
+>  {
+> @@ -319,6 +331,7 @@ int main(void)
+>  	test_store_status();
+>  	test_ecall();
+>  	test_emcall();
+> +	test_sense_running();
+>  	test_reset();
+>  	test_reset_initial();
+>  	smp_cpu_destroy(1);
+>=20
+
+
+
+--da1cNu5grzWnlGXzrknjcJ3VrqgYPp30e--
+
+--QpAVlIIM7N6GDGGIftJILSj3DZPD3RETh
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl6F2B0ACgkQ41TmuOI4
+ufh7DxAAwpRXiDPo+St4fKSzD/ILY3YVjXalyP+D7Zd5JSD4Bo2m+ii8nH8rYM+g
+ezVQFMs7ATo9jSvJ7SECoL7sRo8vG2m8IOUV4s2obmTUa/Wv9zJBdqE8VuxFM7cj
+3r9FVOb/4IVb5Nn+uLDH85kPVPuCe2VPLf/73zbalhOlrGiTZ49E0ccMMIfHfBba
+eaDMYJGaGVojNWcTOK/STCPXCaFfEgFFf+D6SrslyzMQPvQkmprUCC5jkcKtR1+X
+b5iB+42jh10TRef0wSFiDxE+TmF5YLG5B4f3SsaGexAQKwej6sNZ7DGTVr+3PYK3
+//tJ+wid3D4sGByiV9eYcaO4FpjS6jidETiu9ajavvebVMzsn3j9H8O0mACb3Z1x
+aUJw2V6+Rj5fHGWD2AiQ0Sm491qW4ESl7TySOwfweb+6O4A6FSjCrELXWinfJLHT
+Izx7XnMGgOV7YDR+uKYxh07wm8YM4KUAQYJN1cSnZAUWfY8r4D/bQ0f9DIgHoreD
+c0bG6JDOycIm9OW4alKPUuZcKWnjBhD1x7cq1j9jggsMPjpbUwD9t1ID+PsqJITQ
+SctP/6fi+DiBU38Jykeov1KDyW609EbRo6EyWDFKaQsQlP0zYx7ZYFFhFRRjyTMM
+d3OyC8J5xCor0TIZpUMCCzbxd9HE76MAz25ktBc3ld5Nje8e1WA=
+=GYGW
+-----END PGP SIGNATURE-----
+
+--QpAVlIIM7N6GDGGIftJILSj3DZPD3RETh--
 
