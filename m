@@ -2,205 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id F05D919C187
-	for <lists+kvm@lfdr.de>; Thu,  2 Apr 2020 14:55:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A5ADF19C192
+	for <lists+kvm@lfdr.de>; Thu,  2 Apr 2020 14:59:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388475AbgDBMz3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Apr 2020 08:55:29 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:54522 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S2388458AbgDBMz2 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 2 Apr 2020 08:55:28 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1585832127;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=b1Y+MoZfKqZ6pUzsjF5bfD9YIuZIACPBLdpnZnNR+yE=;
-        b=UjBk9VpIrWFBuhAzMwI673lkrRCYgtn5SlDnQJp+wCglwO9suwJlozNBBrGMAv9g/9dIvH
-        cEi8lyX5L85Xa/ZI8GrDXBvgy2FaDMnKkNlai1JJfx+azc09o8sP5gIWBcsJ2DwtgGVTrI
-        VauQLfopXmBBgF3m43ok6K3clUoo8bM=
-Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
- [209.85.222.197]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-138-CXIhMd4tNDeGN2pT5HB0Aw-1; Thu, 02 Apr 2020 08:55:26 -0400
-X-MC-Unique: CXIhMd4tNDeGN2pT5HB0Aw-1
-Received: by mail-qk1-f197.google.com with SMTP id h9so2934788qkm.5
-        for <kvm@vger.kernel.org>; Thu, 02 Apr 2020 05:55:26 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
-         :content-disposition:content-transfer-encoding;
-        bh=b1Y+MoZfKqZ6pUzsjF5bfD9YIuZIACPBLdpnZnNR+yE=;
-        b=F8B9gJYdSJpo3L6RelIsIqCJXYuUyjRLP4Tes5IFZP7FusdfGIXFTVN3hZUz+GbCxg
-         UQjyG5pFU1+2MSPFzxAvYttWD7vhdXDIL2mJ3y7KrSBrAyhOnEdpYFNZqhoj2jjoU/5Z
-         H7oVe3OhRO07TlD2fsHA/9n/CAfSClm30QIlFMOdw6Ln7CjqBZ4FVr+bmlV9ypFzQIkf
-         3crorELvy/r7Ak9Wd64CkoFeiKaKB2oiZwXllcuflsCybAmESzVqaDmzh5imZvVb6RNI
-         UTUbb5cJLvndn+QC2r6XHEsGBM5TgoHUL+o4zoF19djjcMuxPGn6kZ7unZwkn6aeeMPg
-         29nw==
-X-Gm-Message-State: AGi0PubxHBMnA/vIfqWPoYmoqatFlOlY5tiiY2O/vPBq0ToHZL27/9wF
-        IiqUvvwU9/6AZYPbanT3yuW5HgnGHxpaAReymkU7q4gBuaxKwhZUG1S5QfD/PAqTtfrF7oOjCgp
-        DKB+SRSRibBo7
-X-Received: by 2002:ac8:2a68:: with SMTP id l37mr2685098qtl.77.1585832125792;
-        Thu, 02 Apr 2020 05:55:25 -0700 (PDT)
-X-Google-Smtp-Source: APiQypIXMZqUA9fKM7j4ZEayWbkOS+B21xqe6c1yw8l/odLb8QfoZiOhyPhHGMworIpfrO+SJx15Qg==
-X-Received: by 2002:ac8:2a68:: with SMTP id l37mr2685076qtl.77.1585832125540;
-        Thu, 02 Apr 2020 05:55:25 -0700 (PDT)
-Received: from redhat.com (bzq-79-176-51-222.red.bezeqint.net. [79.176.51.222])
-        by smtp.gmail.com with ESMTPSA id x37sm3672315qtc.90.2020.04.02.05.55.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Apr 2020 05:55:24 -0700 (PDT)
-Date:   Thu, 2 Apr 2020 08:55:20 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     linux-kernel@vger.kernel.org
-Cc:     Jason Wang <jasowang@redhat.com>,
-        Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org
-Subject: [PATCH v2] virtio/test: fix up after IOTLB changes
-Message-ID: <20200402125406.9275-1-mst@redhat.com>
+        id S2388377AbgDBM71 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Apr 2020 08:59:27 -0400
+Received: from mga01.intel.com ([192.55.52.88]:9645 "EHLO mga01.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2387580AbgDBM71 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Apr 2020 08:59:27 -0400
+IronPort-SDR: U8fFDHVSjeVlXlD4EKP8TE/9ssuhQ9pDBGLyB9k1hkg+7bGtP4xsY5FC41d1p5Ego9SV4CCq8i
+ 1Lvz3kh8iKNQ==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Apr 2020 05:59:26 -0700
+IronPort-SDR: bEGpgJZprRIDmoHMkkS5N9YLtEFTpFrm+mDKLzY8ZgOyfEu+YD7Lu7xw2Az+DyHXYBec3Qaeql
+ vetwQFsUKYFQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.72,335,1580803200"; 
+   d="scan'208";a="273550937"
+Received: from xni5-mobl5.ccr.corp.intel.com (HELO [10.255.31.184]) ([10.255.31.184])
+  by fmsmga004.fm.intel.com with ESMTP; 02 Apr 2020 05:59:25 -0700
+Reply-To: like.xu@intel.com
+Subject: Re: [PATCH v9 00/10] Guest Last Branch Recording Enabling
+From:   "Xu, Like" <like.xu@intel.com>
+To:     Peter Zijlstra <peterz@infradead.org>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>
+References: <20200313021616.112322-1-like.xu@linux.intel.com>
+ <446eef98-4d9f-4a9b-bdae-d29e36f6e07e@intel.com>
+Organization: Intel OTC
+Message-ID: <22fdfc2d-51f9-9a53-e8b9-6c5c1bdf2536@intel.com>
+Date:   Thu, 2 Apr 2020 20:59:24 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+In-Reply-To: <446eef98-4d9f-4a9b-bdae-d29e36f6e07e@intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Mailer: git-send-email 2.24.1.751.gd10ce2899c
-X-Mutt-Fcc: =sent
+Content-Language: en-US
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Allow building vringh without IOTLB (that's the case for userspace
-builds, will be useful for CAIF/VOD down the road too).
-Update for API tweaks.
-Don't include vringh with userspace builds.
+Hi Peter,
 
-Cc: Jason Wang <jasowang@redhat.com>
-Cc: Eugenio Pérez <eperezma@redhat.com>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
----
+I'm not sure if you recently had a time to review the proposed change
+on the host perf subsystem, which was introduced to support guest LBR 
+enablement.
 
-changes from v1:
-	use IS_REACHEABLE to fix error reported by build bot
+The number of potential LBR users on the guest is growing and
+I have been looking forward to your comments on the patch 0001-0004 in this 
+version,
+even if it is completely negative.
 
- drivers/vhost/test.c              | 4 ++--
- drivers/vhost/vringh.c            | 5 +++++
- include/linux/vringh.h            | 6 ++++++
- tools/virtio/Makefile             | 5 +++--
- tools/virtio/generated/autoconf.h | 0
- 5 files changed, 16 insertions(+), 4 deletions(-)
- create mode 100644 tools/virtio/generated/autoconf.h
+Thanks,
+Like Xu
 
-diff --git a/drivers/vhost/test.c b/drivers/vhost/test.c
-index 394e2e5c772d..9a3a09005e03 100644
---- a/drivers/vhost/test.c
-+++ b/drivers/vhost/test.c
-@@ -120,7 +120,7 @@ static int vhost_test_open(struct inode *inode, struct file *f)
- 	vqs[VHOST_TEST_VQ] = &n->vqs[VHOST_TEST_VQ];
- 	n->vqs[VHOST_TEST_VQ].handle_kick = handle_vq_kick;
- 	vhost_dev_init(dev, vqs, VHOST_TEST_VQ_MAX, UIO_MAXIOV,
--		       VHOST_TEST_PKT_WEIGHT, VHOST_TEST_WEIGHT);
-+		       VHOST_TEST_PKT_WEIGHT, VHOST_TEST_WEIGHT, NULL);
- 
- 	f->private_data = n;
- 
-@@ -225,7 +225,7 @@ static long vhost_test_reset_owner(struct vhost_test *n)
- {
- 	void *priv = NULL;
- 	long err;
--	struct vhost_umem *umem;
-+	struct vhost_iotlb *umem;
- 
- 	mutex_lock(&n->dev.mutex);
- 	err = vhost_dev_check_owner(&n->dev);
-diff --git a/drivers/vhost/vringh.c b/drivers/vhost/vringh.c
-index ee0491f579ac..ba8e0d6cfd97 100644
---- a/drivers/vhost/vringh.c
-+++ b/drivers/vhost/vringh.c
-@@ -13,9 +13,11 @@
- #include <linux/uaccess.h>
- #include <linux/slab.h>
- #include <linux/export.h>
-+#if IS_REACHABLE(CONFIG_VHOST_IOTLB)
- #include <linux/bvec.h>
- #include <linux/highmem.h>
- #include <linux/vhost_iotlb.h>
-+#endif
- #include <uapi/linux/virtio_config.h>
- 
- static __printf(1,2) __cold void vringh_bad(const char *fmt, ...)
-@@ -1059,6 +1061,8 @@ int vringh_need_notify_kern(struct vringh *vrh)
- }
- EXPORT_SYMBOL(vringh_need_notify_kern);
- 
-+#if IS_REACHABLE(CONFIG_VHOST_IOTLB)
-+
- static int iotlb_translate(const struct vringh *vrh,
- 			   u64 addr, u64 len, struct bio_vec iov[],
- 			   int iov_size, u32 perm)
-@@ -1416,5 +1420,6 @@ int vringh_need_notify_iotlb(struct vringh *vrh)
- }
- EXPORT_SYMBOL(vringh_need_notify_iotlb);
- 
-+#endif
- 
- MODULE_LICENSE("GPL");
-diff --git a/include/linux/vringh.h b/include/linux/vringh.h
-index bd0503ca6f8f..9e2763d7c159 100644
---- a/include/linux/vringh.h
-+++ b/include/linux/vringh.h
-@@ -14,8 +14,10 @@
- #include <linux/virtio_byteorder.h>
- #include <linux/uio.h>
- #include <linux/slab.h>
-+#if IS_REACHABLE(CONFIG_VHOST_IOTLB)
- #include <linux/dma-direction.h>
- #include <linux/vhost_iotlb.h>
-+#endif
- #include <asm/barrier.h>
- 
- /* virtio_ring with information needed for host access. */
-@@ -254,6 +256,8 @@ static inline __virtio64 cpu_to_vringh64(const struct vringh *vrh, u64 val)
- 	return __cpu_to_virtio64(vringh_is_little_endian(vrh), val);
- }
- 
-+#if IS_REACHABLE(CONFIG_VHOST_IOTLB)
-+
- void vringh_set_iotlb(struct vringh *vrh, struct vhost_iotlb *iotlb);
- 
- int vringh_init_iotlb(struct vringh *vrh, u64 features,
-@@ -284,4 +288,6 @@ void vringh_notify_disable_iotlb(struct vringh *vrh);
- 
- int vringh_need_notify_iotlb(struct vringh *vrh);
- 
-+#endif /* CONFIG_VHOST_IOTLB */
-+
- #endif /* _LINUX_VRINGH_H */
-diff --git a/tools/virtio/Makefile b/tools/virtio/Makefile
-index f33f32f1d208..b587b9a7a124 100644
---- a/tools/virtio/Makefile
-+++ b/tools/virtio/Makefile
-@@ -4,7 +4,7 @@ test: virtio_test vringh_test
- virtio_test: virtio_ring.o virtio_test.o
- vringh_test: vringh_test.o vringh.o virtio_ring.o
- 
--CFLAGS += -g -O2 -Werror -Wall -I. -I../include/ -I ../../usr/include/ -Wno-pointer-sign -fno-strict-overflow -fno-strict-aliasing -fno-common -MMD -U_FORTIFY_SOURCE
-+CFLAGS += -g -O2 -Werror -Wall -I. -I../include/ -I ../../usr/include/ -Wno-pointer-sign -fno-strict-overflow -fno-strict-aliasing -fno-common -MMD -U_FORTIFY_SOURCE -include ../../include/linux/kconfig.h
- vpath %.c ../../drivers/virtio ../../drivers/vhost
- mod:
- 	${MAKE} -C `pwd`/../.. M=`pwd`/vhost_test V=${V}
-@@ -22,7 +22,8 @@ OOT_CONFIGS=\
- 	CONFIG_VHOST=m \
- 	CONFIG_VHOST_NET=n \
- 	CONFIG_VHOST_SCSI=n \
--	CONFIG_VHOST_VSOCK=n
-+	CONFIG_VHOST_VSOCK=n \
-+	CONFIG_VHOST_RING=n
- OOT_BUILD=KCFLAGS="-I "${OOT_VHOST} ${MAKE} -C ${OOT_KSRC} V=${V}
- oot-build:
- 	echo "UNSUPPORTED! Don't use the resulting modules in production!"
-diff --git a/tools/virtio/generated/autoconf.h b/tools/virtio/generated/autoconf.h
-new file mode 100644
-index 000000000000..e69de29bb2d1
--- 
-MST
+On 2020/3/20 16:45, Xu, Like wrote:
+> Hi Peter,
+> any comments on the host perf changes?
+>
+> Hi Paolo,
+> any comments on the kvm changes? Isn't this feature interesting to you?
+>
+> Just kindly ping.
+>
+> Thanks,
+> Like Xu
+>
+> On 2020/3/13 10:16, Like Xu wrote:
+>> Hi all,
+>>
+>> Please help review your interesting parts in this stable version,
+>> e.g. the first four patches involve the perf event subsystem
+>> and the fifth patch concerns the KVM userspace interface.
+>
+>> v8->v9 Changelog:
+>> - using guest_lbr_constraint to create guest LBR event without hw counter;
+>>    (please check perf changes in patch 0003)
+>> - rename 'cpuc->vcpu_lbr' to 'cpuc->guest_lbr_enabled';
+>>    (please check host LBR changes in patch 0004)
+>> - replace 'pmu->lbr_used' mechanism with lazy release 
+>> kvm_pmu_lbr_cleanup();
+>> - refactor IA32_PERF_CAPABILITIES trap via get_perf_capabilities();
+>> - refactor kvm_pmu_lbr_enable() with kvm_pmu_lbr_setup();
+>> - simplify model-specific LBR functionality check;
+>> - rename x86_perf_get_lbr_stack to x86_perf_get_lbr;
+>> - rename intel_pmu_lbr_confirm() to kvm_pmu_availability_check();
+>>
+>> Previous:
+>> https://lore.kernel.org/lkml/1565075774-26671-1-git-send-email-wei.w.wang@intel.com/ 
+>>
+>>
+>> Like Xu (7):
+>>    perf/x86/lbr: Add interface to get basic information about LBR stack
+>>    perf/x86: Add constraint to create guest LBR event without hw counter
+>>    perf/x86: Keep LBR stack unchanged on the host for guest LBR event
+>>    KVM: x86: Add KVM_CAP_X86_GUEST_LBR interface to dis/enable LBR
+>>      feature
+>>    KVM: x86/pmu: Add LBR feature emulation via guest LBR event
+>>    KVM: x86/pmu: Release guest LBR event via vPMU lazy release mechanism
+>>    KVM: x86: Expose MSR_IA32_PERF_CAPABILITIES to guest for LBR record
+>>      format
+>>
+>> Wei Wang (3):
+>>    perf/x86: Fix msr variable type for the LBR msrs
+>>    KVM: x86/pmu: Tweak kvm_pmu_get_msr to pass 'struct msr_data' in
+>>    KVM: x86: Remove the common trap handler of the MSR_IA32_DEBUGCTLMSR
+>>
+>>   Documentation/virt/kvm/api.rst    |  28 +++
+>>   arch/x86/events/core.c            |   9 +-
+>>   arch/x86/events/intel/core.c      |  29 +++
+>>   arch/x86/events/intel/lbr.c       |  55 +++++-
+>>   arch/x86/events/perf_event.h      |  21 ++-
+>>   arch/x86/include/asm/kvm_host.h   |   7 +
+>>   arch/x86/include/asm/perf_event.h |  24 ++-
+>>   arch/x86/kvm/cpuid.c              |   3 +-
+>>   arch/x86/kvm/pmu.c                |  28 ++-
+>>   arch/x86/kvm/pmu.h                |  26 ++-
+>>   arch/x86/kvm/pmu_amd.c            |   7 +-
+>>   arch/x86/kvm/vmx/pmu_intel.c      | 291 ++++++++++++++++++++++++++++--
+>>   arch/x86/kvm/vmx/vmx.c            |   4 +-
+>>   arch/x86/kvm/vmx/vmx.h            |   2 +
+>>   arch/x86/kvm/x86.c                |  42 +++--
+>>   include/linux/perf_event.h        |   7 +
+>>   include/uapi/linux/kvm.h          |   1 +
+>>   kernel/events/core.c              |   7 -
+>>   tools/include/uapi/linux/kvm.h    |   1 +
+>>   19 files changed, 540 insertions(+), 52 deletions(-)
+>>
+>
 
