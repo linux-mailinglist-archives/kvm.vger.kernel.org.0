@@ -2,564 +2,371 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A1D9919C852
-	for <lists+kvm@lfdr.de>; Thu,  2 Apr 2020 19:50:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2F18819C85D
+	for <lists+kvm@lfdr.de>; Thu,  2 Apr 2020 19:52:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387737AbgDBRuf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Apr 2020 13:50:35 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:25434 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S2387565AbgDBRuf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Apr 2020 13:50:35 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1585849833;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=6RVv7uhbYw3ggcMB/q5T8d7GuVij1zs9VQGdn3+xfkI=;
-        b=LnihWwoCPTHbRSfPFckn4MrzJ5D7Urqs22uciaVT3xdGNFiHnhJsUltLYsMLhAr7rPl1pe
-        w5C8+8pVSxAJInpOBQ0sAqE0XCFncnU8VCP4Z3iBgz1m0j4kqOyCH1s9+SU5uJL4epiuDy
-        h3GfkrpRr447GE4lijFw482E/2lHKXg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-355-EAna8UOCMAGNotx0AcOPDQ-1; Thu, 02 Apr 2020 13:50:27 -0400
-X-MC-Unique: EAna8UOCMAGNotx0AcOPDQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ED02C1005509;
-        Thu,  2 Apr 2020 17:50:24 +0000 (UTC)
-Received: from w520.home (ovpn-112-162.phx2.redhat.com [10.3.112.162])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 7C4A35D9CA;
-        Thu,  2 Apr 2020 17:50:18 +0000 (UTC)
-Date:   Thu, 2 Apr 2020 11:50:17 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     "Liu, Yi L" <yi.l.liu@intel.com>
-Cc:     eric.auger@redhat.com, kevin.tian@intel.com,
-        jacob.jun.pan@linux.intel.com, joro@8bytes.org,
-        ashok.raj@intel.com, jun.j.tian@intel.com, yi.y.sun@intel.com,
-        jean-philippe@linaro.org, peterx@redhat.com,
-        iommu@lists.linux-foundation.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, hao.wu@intel.com
-Subject: Re: [PATCH v1 1/8] vfio: Add VFIO_IOMMU_PASID_REQUEST(alloc/free)
-Message-ID: <20200402115017.0a0f55e2@w520.home>
-In-Reply-To: <1584880325-10561-2-git-send-email-yi.l.liu@intel.com>
-References: <1584880325-10561-1-git-send-email-yi.l.liu@intel.com>
-        <1584880325-10561-2-git-send-email-yi.l.liu@intel.com>
+        id S2388648AbgDBRwa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Apr 2020 13:52:30 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:33888 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726617AbgDBRwa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Apr 2020 13:52:30 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 032Hh4ja096652;
+        Thu, 2 Apr 2020 17:52:06 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2020-01-29;
+ bh=TX5zMc9PwD7oT3/VNkiEq/TnRI/NA7BQ48BXlX+gTIc=;
+ b=c/QD4IQy+1oGgkUWctV0sjlsivaWnzUZN1q38rwEymAg6k/EqrNOJwTpVPFy2I8swVPH
+ bf6T+kqWTHQ7iNX1r8E/i262Q1feg0eC+Ta18r0XXz2hzamQr6VvtOlrxK8/cpcJvYI5
+ eCml9lQhWB+fbk1sLG2iLlqpIlYygoAR1weunTaUBmDMx2ENCDxvFN32VBDgEPqEd1oy
+ aLiHqBpUGBJc7LFAUmvmf2JsKaybSWRfBBEqZCW5rL0H7T1phIdEvwFrZwTx3FFcoi0q
+ ecEe7O+nAJ7rk9KkXiJ1t/jtXH25KARgvZTPkuJZFdyNXjOTaUqcv1qNrV7S8OMp7wha bg== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by userp2120.oracle.com with ESMTP id 303aqhwdqj-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 02 Apr 2020 17:52:05 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 032Hh7fS018244;
+        Thu, 2 Apr 2020 17:52:04 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by aserp3020.oracle.com with ESMTP id 304sjq4jba-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 02 Apr 2020 17:52:04 +0000
+Received: from abhmp0004.oracle.com (abhmp0004.oracle.com [141.146.116.10])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 032HpuhB009656;
+        Thu, 2 Apr 2020 17:51:57 GMT
+Received: from localhost.localdomain (/10.159.142.52)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Thu, 02 Apr 2020 10:51:56 -0700
+Subject: Re: [PATCH v6 01/14] KVM: SVM: Add KVM_SEV SEND_START command
+To:     Ashish Kalra <Ashish.Kalra@amd.com>, pbonzini@redhat.com
+Cc:     tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
+        joro@8bytes.org, bp@suse.de, thomas.lendacky@amd.com,
+        x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        rientjes@google.com, srutherford@google.com, luto@kernel.org,
+        brijesh.singh@amd.com
+References: <cover.1585548051.git.ashish.kalra@amd.com>
+ <3f90333959fd49bed184d45a761cc338424bf614.1585548051.git.ashish.kalra@amd.com>
+From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Message-ID: <4a614d5f-2a01-7b1e-fc76-413b9618e135@oracle.com>
+Date:   Thu, 2 Apr 2020 10:51:48 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+In-Reply-To: <3f90333959fd49bed184d45a761cc338424bf614.1585548051.git.ashish.kalra@amd.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9579 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 adultscore=0 mlxscore=0
+ malwarescore=0 phishscore=0 suspectscore=2 mlxlogscore=999 spamscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
+ definitions=main-2004020137
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9579 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 phishscore=0 clxscore=1011
+ malwarescore=0 impostorscore=0 mlxlogscore=999 spamscore=0 mlxscore=0
+ priorityscore=1501 lowpriorityscore=0 adultscore=0 suspectscore=2
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
+ definitions=main-2004020137
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, 22 Mar 2020 05:31:58 -0700
-"Liu, Yi L" <yi.l.liu@intel.com> wrote:
 
-> From: Liu Yi L <yi.l.liu@intel.com>
-> 
-> For a long time, devices have only one DMA address space from platform
-> IOMMU's point of view. This is true for both bare metal and directed-
-> access in virtualization environment. Reason is the source ID of DMA in
-> PCIe are BDF (bus/dev/fnc ID), which results in only device granularity
-> DMA isolation. However, this is changing with the latest advancement in
-> I/O technology area. More and more platform vendors are utilizing the PCIe
-> PASID TLP prefix in DMA requests, thus to give devices with multiple DMA
-> address spaces as identified by their individual PASIDs. For example,
-> Shared Virtual Addressing (SVA, a.k.a Shared Virtual Memory) is able to
-> let device access multiple process virtual address space by binding the
-> virtual address space with a PASID. Wherein the PASID is allocated in
-> software and programmed to device per device specific manner. Devices
-> which support PASID capability are called PASID-capable devices. If such
-> devices are passed through to VMs, guest software are also able to bind
-> guest process virtual address space on such devices. Therefore, the guest
-> software could reuse the bare metal software programming model, which
-> means guest software will also allocate PASID and program it to device
-> directly. This is a dangerous situation since it has potential PASID
-> conflicts and unauthorized address space access. It would be safer to
-> let host intercept in the guest software's PASID allocation. Thus PASID
-> are managed system-wide.
-
-Providing an allocation interface only allows for collaborative usage
-of PASIDs though.  Do we have any ability to enforce PASID usage or can
-a user spoof other PASIDs on the same BDF?
-
-> This patch adds VFIO_IOMMU_PASID_REQUEST ioctl which aims to passdown
-> PASID allocation/free request from the virtual IOMMU. Additionally, such
-> requests are intended to be invoked by QEMU or other applications which
-> are running in userspace, it is necessary to have a mechanism to prevent
-> single application from abusing available PASIDs in system. With such
-> consideration, this patch tracks the VFIO PASID allocation per-VM. There
-> was a discussion to make quota to be per assigned devices. e.g. if a VM
-> has many assigned devices, then it should have more quota. However, it
-> is not sure how many PASIDs an assigned devices will use. e.g. it is
-> possible that a VM with multiples assigned devices but requests less
-> PASIDs. Therefore per-VM quota would be better.
-> 
-> This patch uses struct mm pointer as a per-VM token. We also considered
-> using task structure pointer and vfio_iommu structure pointer. However,
-> task structure is per-thread, which means it cannot achieve per-VM PASID
-> alloc tracking purpose. While for vfio_iommu structure, it is visible
-> only within vfio. Therefore, structure mm pointer is selected. This patch
-> adds a structure vfio_mm. A vfio_mm is created when the first vfio
-> container is opened by a VM. On the reverse order, vfio_mm is free when
-> the last vfio container is released. Each VM is assigned with a PASID
-> quota, so that it is not able to request PASID beyond its quota. This
-> patch adds a default quota of 1000. This quota could be tuned by
-> administrator. Making PASID quota tunable will be added in another patch
-> in this series.
-> 
-> Previous discussions:
-> https://patchwork.kernel.org/patch/11209429/
-> 
-> Cc: Kevin Tian <kevin.tian@intel.com>
-> CC: Jacob Pan <jacob.jun.pan@linux.intel.com>
-> Cc: Alex Williamson <alex.williamson@redhat.com>
-> Cc: Eric Auger <eric.auger@redhat.com>
-> Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>
-> Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
-> Signed-off-by: Yi Sun <yi.y.sun@linux.intel.com>
-> Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
+On 3/29/20 11:19 PM, Ashish Kalra wrote:
+> From: Brijesh Singh <Brijesh.Singh@amd.com>
+>
+> The command is used to create an outgoing SEV guest encryption context.
+>
+> Cc: Thomas Gleixner <tglx@linutronix.de>
+> Cc: Ingo Molnar <mingo@redhat.com>
+> Cc: "H. Peter Anvin" <hpa@zytor.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: "Radim Krčmář" <rkrcmar@redhat.com>
+> Cc: Joerg Roedel <joro@8bytes.org>
+> Cc: Borislav Petkov <bp@suse.de>
+> Cc: Tom Lendacky <thomas.lendacky@amd.com>
+> Cc: x86@kernel.org
+> Cc: kvm@vger.kernel.org
+> Cc: linux-kernel@vger.kernel.org
+> Reviewed-by: Steve Rutherford <srutherford@google.com>
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
 > ---
->  drivers/vfio/vfio.c             | 130 ++++++++++++++++++++++++++++++++++++++++
->  drivers/vfio/vfio_iommu_type1.c | 104 ++++++++++++++++++++++++++++++++
->  include/linux/vfio.h            |  20 +++++++
->  include/uapi/linux/vfio.h       |  41 +++++++++++++
->  4 files changed, 295 insertions(+)
-> 
-> diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
-> index c848262..d13b483 100644
-> --- a/drivers/vfio/vfio.c
-> +++ b/drivers/vfio/vfio.c
-> @@ -32,6 +32,7 @@
->  #include <linux/vfio.h>
->  #include <linux/wait.h>
->  #include <linux/sched/signal.h>
-> +#include <linux/sched/mm.h>
->  
->  #define DRIVER_VERSION	"0.3"
->  #define DRIVER_AUTHOR	"Alex Williamson <alex.williamson@redhat.com>"
-> @@ -46,6 +47,8 @@ static struct vfio {
->  	struct mutex			group_lock;
->  	struct cdev			group_cdev;
->  	dev_t				group_devt;
-> +	struct list_head		vfio_mm_list;
-> +	struct mutex			vfio_mm_lock;
->  	wait_queue_head_t		release_q;
->  } vfio;
->  
-> @@ -2129,6 +2132,131 @@ int vfio_unregister_notifier(struct device *dev, enum vfio_notify_type type,
->  EXPORT_SYMBOL(vfio_unregister_notifier);
->  
->  /**
-> + * VFIO_MM objects - create, release, get, put, search
-> + * Caller of the function should have held vfio.vfio_mm_lock.
-> + */
-> +static struct vfio_mm *vfio_create_mm(struct mm_struct *mm)
-> +{
-> +	struct vfio_mm *vmm;
-> +	struct vfio_mm_token *token;
-> +	int ret = 0;
+>   .../virt/kvm/amd-memory-encryption.rst        |  27 ++++
+>   arch/x86/kvm/svm.c                            | 128 ++++++++++++++++++
+>   include/linux/psp-sev.h                       |   8 +-
+>   include/uapi/linux/kvm.h                      |  12 ++
+>   4 files changed, 171 insertions(+), 4 deletions(-)
+>
+> diff --git a/Documentation/virt/kvm/amd-memory-encryption.rst b/Documentation/virt/kvm/amd-memory-encryption.rst
+> index c3129b9ba5cb..4fd34fc5c7a7 100644
+> --- a/Documentation/virt/kvm/amd-memory-encryption.rst
+> +++ b/Documentation/virt/kvm/amd-memory-encryption.rst
+> @@ -263,6 +263,33 @@ Returns: 0 on success, -negative on error
+>                   __u32 trans_len;
+>           };
+>   
+> +10. KVM_SEV_SEND_START
+> +----------------------
 > +
-> +	vmm = kzalloc(sizeof(*vmm), GFP_KERNEL);
-> +	if (!vmm)
-> +		return ERR_PTR(-ENOMEM);
+> +The KVM_SEV_SEND_START command can be used by the hypervisor to create an
+> +outgoing guest encryption context.
+Shouldn't we mention that this command is also used to save the guest to 
+the disk ?
 > +
-> +	/* Per mm IOASID set used for quota control and group operations */
-> +	ret = ioasid_alloc_set((struct ioasid_set *) mm,
-> +			       VFIO_DEFAULT_PASID_QUOTA, &vmm->ioasid_sid);
-> +	if (ret) {
-> +		kfree(vmm);
-> +		return ERR_PTR(ret);
-> +	}
+> +Parameters (in): struct kvm_sev_send_start
 > +
-> +	kref_init(&vmm->kref);
-> +	token = &vmm->token;
-> +	token->val = mm;
-> +	vmm->pasid_quota = VFIO_DEFAULT_PASID_QUOTA;
-> +	mutex_init(&vmm->pasid_lock);
+> +Returns: 0 on success, -negative on error
 > +
-> +	list_add(&vmm->vfio_next, &vfio.vfio_mm_list);
+> +::
+> +        struct kvm_sev_send_start {
+> +                __u32 policy;                 /* guest policy */
 > +
-> +	return vmm;
-> +}
+> +                __u64 pdh_cert_uaddr;         /* platform Diffie-Hellman certificate */
+> +                __u32 pdh_cert_len;
 > +
-> +static void vfio_mm_unlock_and_free(struct vfio_mm *vmm)
-> +{
-> +	/* destroy the ioasid set */
-> +	ioasid_free_set(vmm->ioasid_sid, true);
-> +	mutex_unlock(&vfio.vfio_mm_lock);
-> +	kfree(vmm);
-> +}
+> +                __u64 plat_certs_uadr;        /* platform certificate chain */
+> +                __u32 plat_certs_len;
 > +
-> +/* called with vfio.vfio_mm_lock held */
-> +static void vfio_mm_release(struct kref *kref)
-> +{
-> +	struct vfio_mm *vmm = container_of(kref, struct vfio_mm, kref);
+> +                __u64 amd_certs_uaddr;        /* AMD certificate */
+> +                __u32 amd_cert_len;
 > +
-> +	list_del(&vmm->vfio_next);
-> +	vfio_mm_unlock_and_free(vmm);
-> +}
+> +                __u64 session_uaddr;          /* Guest session information */
+> +                __u32 session_len;
+> +        };
 > +
-> +void vfio_mm_put(struct vfio_mm *vmm)
-> +{
-> +	kref_put_mutex(&vmm->kref, vfio_mm_release, &vfio.vfio_mm_lock);
-> +}
-> +EXPORT_SYMBOL_GPL(vfio_mm_put);
-> +
-> +/* Assume vfio_mm_lock or vfio_mm reference is held */
-> +static void vfio_mm_get(struct vfio_mm *vmm)
-> +{
-> +	kref_get(&vmm->kref);
-> +}
-> +
-> +struct vfio_mm *vfio_mm_get_from_task(struct task_struct *task)
-> +{
-> +	struct mm_struct *mm = get_task_mm(task);
-> +	struct vfio_mm *vmm;
-> +	unsigned long long val = (unsigned long long) mm;
-> +
-> +	mutex_lock(&vfio.vfio_mm_lock);
-> +	list_for_each_entry(vmm, &vfio.vfio_mm_list, vfio_next) {
-> +		if (vmm->token.val == val) {
-> +			vfio_mm_get(vmm);
-> +			goto out;
-> +		}
-> +	}
-> +
-> +	vmm = vfio_create_mm(mm);
-> +	if (IS_ERR(vmm))
-> +		vmm = NULL;
-> +out:
-> +	mutex_unlock(&vfio.vfio_mm_lock);
-> +	mmput(mm);
-> +	return vmm;
-> +}
-> +EXPORT_SYMBOL_GPL(vfio_mm_get_from_task);
-> +
-> +int vfio_mm_pasid_alloc(struct vfio_mm *vmm, int min, int max)
-> +{
-> +	ioasid_t pasid;
-> +	int ret = -ENOSPC;
-> +
-> +	mutex_lock(&vmm->pasid_lock);
-> +
-> +	pasid = ioasid_alloc(vmm->ioasid_sid, min, max, NULL);
-> +	if (pasid == INVALID_IOASID) {
-> +		ret = -ENOSPC;
-> +		goto out_unlock;
-> +	}
-> +
-> +	ret = pasid;
-> +out_unlock:
-> +	mutex_unlock(&vmm->pasid_lock);
-> +	return ret;
-> +}
-> +EXPORT_SYMBOL_GPL(vfio_mm_pasid_alloc);
-> +
-> +int vfio_mm_pasid_free(struct vfio_mm *vmm, ioasid_t pasid)
-> +{
-> +	void *pdata;
-> +	int ret = 0;
-> +
-> +	mutex_lock(&vmm->pasid_lock);
-> +	pdata = ioasid_find(vmm->ioasid_sid, pasid, NULL);
-> +	if (IS_ERR(pdata)) {
-> +		ret = PTR_ERR(pdata);
-> +		goto out_unlock;
-> +	}
-> +	ioasid_free(pasid);
-> +
-> +out_unlock:
-> +	mutex_unlock(&vmm->pasid_lock);
-> +	return ret;
-> +}
-> +EXPORT_SYMBOL_GPL(vfio_mm_pasid_free);
-> +
-> +/**
->   * Module/class support
->   */
->  static char *vfio_devnode(struct device *dev, umode_t *mode)
-> @@ -2151,8 +2279,10 @@ static int __init vfio_init(void)
->  	idr_init(&vfio.group_idr);
->  	mutex_init(&vfio.group_lock);
->  	mutex_init(&vfio.iommu_drivers_lock);
-> +	mutex_init(&vfio.vfio_mm_lock);
->  	INIT_LIST_HEAD(&vfio.group_list);
->  	INIT_LIST_HEAD(&vfio.iommu_drivers_list);
-> +	INIT_LIST_HEAD(&vfio.vfio_mm_list);
->  	init_waitqueue_head(&vfio.release_q);
->  
->  	ret = misc_register(&vfio_dev);
+>   References
+>   ==========
+>   
+> diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
+> index 50d1ebafe0b3..63d172e974ad 100644
+> --- a/arch/x86/kvm/svm.c
+> +++ b/arch/x86/kvm/svm.c
+> @@ -7149,6 +7149,131 @@ static int sev_launch_secret(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>   	return ret;
+>   }
+>   
+> +/* Userspace wants to query session length. */
+> +static int
+> +__sev_send_start_query_session_length(struct kvm *kvm, struct kvm_sev_cmd *argp,
 
-Is vfio.c the right place for any of the above?  It seems like it could
-all be in a separate vfio_pasid module, similar to our virqfd module.
 
-> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> index a177bf2..331ceee 100644
-> --- a/drivers/vfio/vfio_iommu_type1.c
-> +++ b/drivers/vfio/vfio_iommu_type1.c
-> @@ -70,6 +70,7 @@ struct vfio_iommu {
->  	unsigned int		dma_avail;
->  	bool			v2;
->  	bool			nesting;
-> +	struct vfio_mm		*vmm;
->  };
->  
->  struct vfio_domain {
-> @@ -2018,6 +2019,7 @@ static void vfio_iommu_type1_detach_group(void *iommu_data,
->  static void *vfio_iommu_type1_open(unsigned long arg)
->  {
->  	struct vfio_iommu *iommu;
-> +	struct vfio_mm *vmm = NULL;
->  
->  	iommu = kzalloc(sizeof(*iommu), GFP_KERNEL);
->  	if (!iommu)
-> @@ -2043,6 +2045,10 @@ static void *vfio_iommu_type1_open(unsigned long arg)
->  	iommu->dma_avail = dma_entry_limit;
->  	mutex_init(&iommu->lock);
->  	BLOCKING_INIT_NOTIFIER_HEAD(&iommu->notifier);
-> +	vmm = vfio_mm_get_from_task(current);
-> +	if (!vmm)
-> +		pr_err("Failed to get vfio_mm track\n");
+__sev_query_send_start_session_length a better name perhaps ?
 
-Doesn't this presume everyone is instantly running PASID capable hosts?
-Looks like a noisy support regression to me.
-
-> +	iommu->vmm = vmm;
->  
->  	return iommu;
->  }
-> @@ -2084,6 +2090,8 @@ static void vfio_iommu_type1_release(void *iommu_data)
->  	}
->  
->  	vfio_iommu_iova_free(&iommu->iova_list);
-> +	if (iommu->vmm)
-> +		vfio_mm_put(iommu->vmm);
->  
->  	kfree(iommu);
->  }
-> @@ -2172,6 +2180,55 @@ static int vfio_iommu_iova_build_caps(struct vfio_iommu *iommu,
->  	return ret;
->  }
->  
-> +static bool vfio_iommu_type1_pasid_req_valid(u32 flags)
+> +				      struct kvm_sev_send_start *params)
 > +{
-> +	return !((flags & ~VFIO_PASID_REQUEST_MASK) ||
-> +		 (flags & VFIO_IOMMU_PASID_ALLOC &&
-> +		  flags & VFIO_IOMMU_PASID_FREE));
-> +}
+> +	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+> +	struct sev_data_send_start *data;
+> +	int ret;
 > +
-> +static int vfio_iommu_type1_pasid_alloc(struct vfio_iommu *iommu,
-> +					 int min,
-> +					 int max)
-> +{
-> +	struct vfio_mm *vmm = iommu->vmm;
-> +	int ret = 0;
+> +	data = kzalloc(sizeof(*data), GFP_KERNEL_ACCOUNT);
+> +	if (data == NULL)
+> +		return -ENOMEM;
 > +
-> +	mutex_lock(&iommu->lock);
-> +	if (!IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu)) {
+> +	data->handle = sev->handle;
+> +	ret = sev_issue_cmd(kvm, SEV_CMD_SEND_START, data, &argp->error);
+
+
+We are not checking ret here as we are assuming that the command will 
+always be successful. Is there any chance that sev->handle can be junk 
+and should we have an ASSERT for it ?
+
+> +
+> +	params->session_len = data->session_len;
+> +	if (copy_to_user((void __user *)(uintptr_t)argp->data, params,
+> +				sizeof(struct kvm_sev_send_start)))
 > +		ret = -EFAULT;
-> +		goto out_unlock;
-> +	}
-
-Non-iommu backed mdevs are excluded from this?  Is this a matter of
-wiring the call out through the mdev parent device, or is this just
-possible?
-
-> +	if (vmm)
-> +		ret = vfio_mm_pasid_alloc(vmm, min, max);
-> +	else
-> +		ret = -EINVAL;
-> +out_unlock:
-> +	mutex_unlock(&iommu->lock);
+> +
+> +	kfree(data);
 > +	return ret;
 > +}
 > +
-> +static int vfio_iommu_type1_pasid_free(struct vfio_iommu *iommu,
-> +				       unsigned int pasid)
+> +static int sev_send_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
+
+
+For readability and ease of cscope searches, isn't it better to append 
+"svm" to all these functions ?
+
+It seems svm_sev_enabled() is an example of an appropriate naming style.
+
 > +{
-> +	struct vfio_mm *vmm = iommu->vmm;
-> +	int ret = 0;
+> +	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+> +	struct sev_data_send_start *data;
+> +	struct kvm_sev_send_start params;
+> +	void *amd_certs, *session_data;
+> +	void *pdh_cert, *plat_certs;
+> +	int ret;
 > +
-> +	mutex_lock(&iommu->lock);
-> +	if (!IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu)) {
-> +		ret = -EFAULT;
-> +		goto out_unlock;
+> +	if (!sev_guest(kvm))
+> +		return -ENOTTY;
+> +
+> +	if (copy_from_user(&params, (void __user *)(uintptr_t)argp->data,
+> +				sizeof(struct kvm_sev_send_start)))
+> +		return -EFAULT;
+> +
+> +	/* if session_len is zero, userspace wants to query the session length */
+> +	if (!params.session_len)
+> +		return __sev_send_start_query_session_length(kvm, argp,
+> +				&params);
+> +
+> +	/* some sanity checks */
+> +	if (!params.pdh_cert_uaddr || !params.pdh_cert_len ||
+> +	    !params.session_uaddr || params.session_len > SEV_FW_BLOB_MAX_SIZE)
+> +		return -EINVAL;
+
+
+What if params.plat_certs_uaddr or params.amd_certs_uaddr is NULL ?
+
+> +
+> +	/* allocate the memory to hold the session data blob */
+> +	session_data = kmalloc(params.session_len, GFP_KERNEL_ACCOUNT);
+> +	if (!session_data)
+> +		return -ENOMEM;
+> +
+> +	/* copy the certificate blobs from userspace */
+
+
+You haven't added comments for plat_cert and amd_cert. Also, it's much 
+more readable if you add block comments like,
+
+         /*
+
+          *  PDH cert
+
+          */
+
+> +	pdh_cert = psp_copy_user_blob(params.pdh_cert_uaddr,
+> +				params.pdh_cert_len);
+> +	if (IS_ERR(pdh_cert)) {
+> +		ret = PTR_ERR(pdh_cert);
+> +		goto e_free_session;
 > +	}
-
-So if a container had an iommu backed device when the pasid was
-allocated, but it was removed, now they can't free it?  Why do we need
-the check above?
-
 > +
-> +	if (vmm)
-> +		ret = vfio_mm_pasid_free(vmm, pasid);
-> +	else
-> +		ret = -EINVAL;
-> +out_unlock:
-> +	mutex_unlock(&iommu->lock);
+> +	plat_certs = psp_copy_user_blob(params.plat_certs_uaddr,
+> +				params.plat_certs_len);
+> +	if (IS_ERR(plat_certs)) {
+> +		ret = PTR_ERR(plat_certs);
+> +		goto e_free_pdh;
+> +	}
+> +
+> +	amd_certs = psp_copy_user_blob(params.amd_certs_uaddr,
+> +				params.amd_certs_len);
+> +	if (IS_ERR(amd_certs)) {
+> +		ret = PTR_ERR(amd_certs);
+> +		goto e_free_plat_cert;
+> +	}
+> +
+> +	data = kzalloc(sizeof(*data), GFP_KERNEL_ACCOUNT);
+> +	if (data == NULL) {
+> +		ret = -ENOMEM;
+> +		goto e_free_amd_cert;
+> +	}
+> +
+> +	/* populate the FW SEND_START field with system physical address */
+> +	data->pdh_cert_address = __psp_pa(pdh_cert);
+> +	data->pdh_cert_len = params.pdh_cert_len;
+> +	data->plat_certs_address = __psp_pa(plat_certs);
+> +	data->plat_certs_len = params.plat_certs_len;
+> +	data->amd_certs_address = __psp_pa(amd_certs);
+> +	data->amd_certs_len = params.amd_certs_len;
+> +	data->session_address = __psp_pa(session_data);
+> +	data->session_len = params.session_len;
+> +	data->handle = sev->handle;
+> +
+> +	ret = sev_issue_cmd(kvm, SEV_CMD_SEND_START, data, &argp->error);
+> +
+> +	if (ret)
+> +		goto e_free;
+> +
+> +	if (copy_to_user((void __user *)(uintptr_t) params.session_uaddr,
+> +			session_data, params.session_len)) {
+> +		ret = -EFAULT;
+> +		goto e_free;
+> +	}
+> +
+> +	params.policy = data->policy;
+> +	params.session_len = data->session_len;
+> +	if (copy_to_user((void __user *)(uintptr_t)argp->data, &params,
+> +				sizeof(struct kvm_sev_send_start)))
+> +		ret = -EFAULT;
+> +
+> +e_free:
+> +	kfree(data);
+> +e_free_amd_cert:
+> +	kfree(amd_certs);
+> +e_free_plat_cert:
+> +	kfree(plat_certs);
+> +e_free_pdh:
+> +	kfree(pdh_cert);
+> +e_free_session:
+> +	kfree(session_data);
 > +	return ret;
 > +}
 > +
->  static long vfio_iommu_type1_ioctl(void *iommu_data,
->  				   unsigned int cmd, unsigned long arg)
->  {
-> @@ -2276,6 +2333,53 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
->  
->  		return copy_to_user((void __user *)arg, &unmap, minsz) ?
->  			-EFAULT : 0;
-> +
-> +	} else if (cmd == VFIO_IOMMU_PASID_REQUEST) {
-> +		struct vfio_iommu_type1_pasid_request req;
-> +		unsigned long offset;
-> +
-> +		minsz = offsetofend(struct vfio_iommu_type1_pasid_request,
-> +				    flags);
-> +
-> +		if (copy_from_user(&req, (void __user *)arg, minsz))
-> +			return -EFAULT;
-> +
-> +		if (req.argsz < minsz ||
-> +		    !vfio_iommu_type1_pasid_req_valid(req.flags))
-> +			return -EINVAL;
-> +
-> +		if (copy_from_user((void *)&req + minsz,
-> +				   (void __user *)arg + minsz,
-> +				   sizeof(req) - minsz))
-> +			return -EFAULT;
+>   static int svm_mem_enc_op(struct kvm *kvm, void __user *argp)
+>   {
+>   	struct kvm_sev_cmd sev_cmd;
+> @@ -7193,6 +7318,9 @@ static int svm_mem_enc_op(struct kvm *kvm, void __user *argp)
+>   	case KVM_SEV_LAUNCH_SECRET:
+>   		r = sev_launch_secret(kvm, &sev_cmd);
+>   		break;
+> +	case KVM_SEV_SEND_START:
+> +		r = sev_send_start(kvm, &sev_cmd);
+> +		break;
+>   	default:
+>   		r = -EINVAL;
+>   		goto out;
+> diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
+> index 5167bf2bfc75..9f63b9d48b63 100644
+> --- a/include/linux/psp-sev.h
+> +++ b/include/linux/psp-sev.h
+> @@ -323,11 +323,11 @@ struct sev_data_send_start {
+>   	u64 pdh_cert_address;			/* In */
+>   	u32 pdh_cert_len;			/* In */
+>   	u32 reserved1;
+> -	u64 plat_cert_address;			/* In */
+> -	u32 plat_cert_len;			/* In */
+> +	u64 plat_certs_address;			/* In */
+> +	u32 plat_certs_len;			/* In */
 
-Huh?  Why do we have argsz if we're going to assume this is here?
 
-> +
-> +		switch (req.flags & VFIO_PASID_REQUEST_MASK) {
-> +		case VFIO_IOMMU_PASID_ALLOC:
-> +		{
-> +			int ret = 0, result;
-> +
-> +			result = vfio_iommu_type1_pasid_alloc(iommu,
-> +							req.alloc_pasid.min,
-> +							req.alloc_pasid.max);
-> +			if (result > 0) {
-> +				offset = offsetof(
-> +					struct vfio_iommu_type1_pasid_request,
-> +					alloc_pasid.result);
-> +				ret = copy_to_user(
-> +					      (void __user *) (arg + offset),
-> +					      &result, sizeof(result));
+It seems that the 'platform certificate' and the 'amd_certificate' are 
+single entities, meaning only copy is there for the particular platform 
+and particular the AMD product. Why are these plural then ?
 
-Again assuming argsz supports this.
 
-> +			} else {
-> +				pr_debug("%s: PASID alloc failed\n", __func__);
-
-rate limit?
-
-> +				ret = -EFAULT;
-> +			}
-> +			return ret;
-> +		}
-> +		case VFIO_IOMMU_PASID_FREE:
-> +			return vfio_iommu_type1_pasid_free(iommu,
-> +							   req.free_pasid);
-> +		default:
-> +			return -EINVAL;
-> +		}
->  	}
->  
->  	return -ENOTTY;
-> diff --git a/include/linux/vfio.h b/include/linux/vfio.h
-> index e42a711..75f9f7f1 100644
-> --- a/include/linux/vfio.h
-> +++ b/include/linux/vfio.h
-> @@ -89,6 +89,26 @@ extern int vfio_register_iommu_driver(const struct vfio_iommu_driver_ops *ops);
->  extern void vfio_unregister_iommu_driver(
->  				const struct vfio_iommu_driver_ops *ops);
->  
-> +#define VFIO_DEFAULT_PASID_QUOTA	1000
-> +struct vfio_mm_token {
-> +	unsigned long long val;
+>   	u32 reserved2;
+> -	u64 amd_cert_address;			/* In */
+> -	u32 amd_cert_len;			/* In */
+> +	u64 amd_certs_address;			/* In */
+> +	u32 amd_certs_len;			/* In */
+>   	u32 reserved3;
+>   	u64 session_address;			/* In */
+>   	u32 session_len;			/* In/Out */
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index 4b95f9a31a2f..17bef4c245e1 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -1558,6 +1558,18 @@ struct kvm_sev_dbg {
+>   	__u32 len;
+>   };
+>   
+> +struct kvm_sev_send_start {
+> +	__u32 policy;
+> +	__u64 pdh_cert_uaddr;
+> +	__u32 pdh_cert_len;
+> +	__u64 plat_certs_uaddr;
+> +	__u32 plat_certs_len;
+> +	__u64 amd_certs_uaddr;
+> +	__u32 amd_certs_len;
+> +	__u64 session_uaddr;
+> +	__u32 session_len;
 > +};
 > +
-> +struct vfio_mm {
-> +	struct kref			kref;
-> +	struct vfio_mm_token		token;
-> +	int				ioasid_sid;
-> +	/* protect @pasid_quota field and pasid allocation/free */
-> +	struct mutex			pasid_lock;
-> +	int				pasid_quota;
-> +	struct list_head		vfio_next;
-> +};
-> +
-> +extern struct vfio_mm *vfio_mm_get_from_task(struct task_struct *task);
-> +extern void vfio_mm_put(struct vfio_mm *vmm);
-> +extern int vfio_mm_pasid_alloc(struct vfio_mm *vmm, int min, int max);
-> +extern int vfio_mm_pasid_free(struct vfio_mm *vmm, ioasid_t pasid);
-> +
->  /*
->   * External user API
->   */
-> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-> index 9e843a1..298ac80 100644
-> --- a/include/uapi/linux/vfio.h
-> +++ b/include/uapi/linux/vfio.h
-> @@ -794,6 +794,47 @@ struct vfio_iommu_type1_dma_unmap {
->  #define VFIO_IOMMU_ENABLE	_IO(VFIO_TYPE, VFIO_BASE + 15)
->  #define VFIO_IOMMU_DISABLE	_IO(VFIO_TYPE, VFIO_BASE + 16)
->  
-> +/*
-> + * PASID (Process Address Space ID) is a PCIe concept which
-> + * has been extended to support DMA isolation in fine-grain.
-> + * With device assigned to user space (e.g. VMs), PASID alloc
-> + * and free need to be system wide. This structure defines
-> + * the info for pasid alloc/free between user space and kernel
-> + * space.
-> + *
-> + * @flag=VFIO_IOMMU_PASID_ALLOC, refer to the @alloc_pasid
-> + * @flag=VFIO_IOMMU_PASID_FREE, refer to @free_pasid
-> + */
-> +struct vfio_iommu_type1_pasid_request {
-> +	__u32	argsz;
-> +#define VFIO_IOMMU_PASID_ALLOC	(1 << 0)
-> +#define VFIO_IOMMU_PASID_FREE	(1 << 1)
-> +	__u32	flags;
-> +	union {
-> +		struct {
-> +			__u32 min;
-> +			__u32 max;
-> +			__u32 result;
-> +		} alloc_pasid;
-> +		__u32 free_pasid;
-> +	};
-
-We seem to be using __u8 data[] lately where the struct at data is
-defined by the flags.  should we do that here?
-
-> +};
-> +
-> +#define VFIO_PASID_REQUEST_MASK	(VFIO_IOMMU_PASID_ALLOC | \
-> +					 VFIO_IOMMU_PASID_FREE)
-> +
-> +/**
-> + * VFIO_IOMMU_PASID_REQUEST - _IOWR(VFIO_TYPE, VFIO_BASE + 22,
-> + *				struct vfio_iommu_type1_pasid_request)
-> + *
-> + * Availability of this feature depends on PASID support in the device,
-> + * its bus, the underlying IOMMU and the CPU architecture. In VFIO, it
-> + * is available after VFIO_SET_IOMMU.
-> + *
-> + * returns: 0 on success, -errno on failure.
-> + */
-> +#define VFIO_IOMMU_PASID_REQUEST	_IO(VFIO_TYPE, VFIO_BASE + 22)
-
-So a user needs to try to allocate a PASID in order to test for the
-support?  Should we have a PROBE flag?
-
-> +
->  /* -------- Additional API for SPAPR TCE (Server POWERPC) IOMMU -------- */
->  
->  /*
-
+>   #define KVM_DEV_ASSIGN_ENABLE_IOMMU	(1 << 0)
+>   #define KVM_DEV_ASSIGN_PCI_2_3		(1 << 1)
+>   #define KVM_DEV_ASSIGN_MASK_INTX	(1 << 2)
