@@ -2,194 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 197F619C073
-	for <lists+kvm@lfdr.de>; Thu,  2 Apr 2020 13:49:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 21DFE19C086
+	for <lists+kvm@lfdr.de>; Thu,  2 Apr 2020 13:53:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388122AbgDBLtr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Apr 2020 07:49:47 -0400
-Received: from mail.skyhub.de ([5.9.137.197]:59750 "EHLO mail.skyhub.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2387722AbgDBLtr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Apr 2020 07:49:47 -0400
-Received: from zn.tnic (p200300EC2F0A0E00AD683D730A68685D.dip0.t-ipconnect.de [IPv6:2003:ec:2f0a:e00:ad68:3d73:a68:685d])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id C35FB1EC0C84;
-        Thu,  2 Apr 2020 13:49:45 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1585828186;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=EBWepjr3mk654atQU7k38smGXPUg/5pwXX78nzJmpX0=;
-        b=DokBBq+VRrV0fFmq1KmeCXHDEHQVRm5kV7++LpllNWjMhx2/KgCZ4oe1NhNHMrUD6NF9JY
-        GlKuYNDL3k9duREm6BQ77ETmp+Gswh7SJXlMhtjRJi0nWZnGKDGIRzQAzC8DrbUmiKPioe
-        6zy+Qm9xMQN61MMLLZGD5orCRFZaF5U=
-Date:   Thu, 2 Apr 2020 13:49:41 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Joerg Roedel <joro@8bytes.org>
-Cc:     x86@kernel.org, hpa@zytor.com, Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Thomas Hellstrom <thellstrom@vmware.com>,
-        Jiri Slaby <jslaby@suse.cz>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Juergen Gross <jgross@suse.com>,
-        Kees Cook <keescook@chromium.org>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        Joerg Roedel <jroedel@suse.de>
-Subject: Re: [PATCH 14/70] x86/boot/compressed/64: Add page-fault handler
-Message-ID: <20200402114941.GA9352@zn.tnic>
-References: <20200319091407.1481-1-joro@8bytes.org>
- <20200319091407.1481-15-joro@8bytes.org>
+        id S2388070AbgDBLxP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Apr 2020 07:53:15 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:48284 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S2387963AbgDBLxP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Apr 2020 07:53:15 -0400
+Received: from DGGEMS407-HUB.china.huawei.com (unknown [172.30.72.58])
+        by Forcepoint Email with ESMTP id 39F40EDE49B3907DBDD7;
+        Thu,  2 Apr 2020 19:52:54 +0800 (CST)
+Received: from [127.0.0.1] (10.173.222.27) by DGGEMS407-HUB.china.huawei.com
+ (10.3.19.207) with Microsoft SMTP Server id 14.3.487.0; Thu, 2 Apr 2020
+ 19:52:44 +0800
+Subject: Re: [kvm-unit-tests PATCH 0/2] arm/arm64: Add IPI/vtimer latency
+To:     Andrew Jones <drjones@redhat.com>,
+        Jingyi Wang <wangjingyi11@huawei.com>
+CC:     <kvm@vger.kernel.org>, <kvmarm@lists.cs.columbia.edu>,
+        <wanghaibin.wang@huawei.com>
+References: <20200401100812.27616-1-wangjingyi11@huawei.com>
+ <20200401122445.exyobwo3a3agnuhk@kamzik.brq.redhat.com>
+From:   Zenghui Yu <yuzenghui@huawei.com>
+Message-ID: <bbcd3dc4-79c1-7ba2-ea54-96d083dfcef9@huawei.com>
+Date:   Thu, 2 Apr 2020 19:52:43 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20200319091407.1481-15-joro@8bytes.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20200401122445.exyobwo3a3agnuhk@kamzik.brq.redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.173.222.27]
+X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 19, 2020 at 10:13:11AM +0100, Joerg Roedel wrote:
-> From: Joerg Roedel <jroedel@suse.de>
+Hi Drew, Jingyi,
+
+On 2020/4/1 20:24, Andrew Jones wrote:
+> On Wed, Apr 01, 2020 at 06:08:10PM +0800, Jingyi Wang wrote:
+>> With the development of arm gic architecture, we think it will be useful
+>> to add some simple performance test in kut to measure the cost of
+>> interrupts. X86 arch has implemented similar test.
+>>
+>> Jingyi Wang (2):
+>>    arm/arm64: gic: Add IPI latency test
+>>    arm/arm64: Add vtimer latency test
+>>
+>>   arm/gic.c   | 27 +++++++++++++++++++++++++++
+>>   arm/timer.c | 11 +++++++++++
+>>   2 files changed, 38 insertions(+)
+>>
+>> -- 
+>> 2.19.1
+>>
+>>
 > 
-> Install a page-fault handler to add an identity mapping to addresses
-> not yet mapped. Also do some checking whether the error code is sane.
+> Hi Jingyi,
 > 
-> This makes non SEV-ES machines use the exception handling
-> infrastructure in the pre-decompressions boot code too, making it less
-> likely to break in the future.
-> 
-> Signed-off-by: Joerg Roedel <jroedel@suse.de>
-> ---
->  arch/x86/boot/compressed/ident_map_64.c    | 38 ++++++++++++++++++++++
->  arch/x86/boot/compressed/idt_64.c          |  2 ++
->  arch/x86/boot/compressed/idt_handlers_64.S |  2 ++
->  arch/x86/boot/compressed/misc.h            |  6 ++++
->  4 files changed, 48 insertions(+)
-> 
-> diff --git a/arch/x86/boot/compressed/ident_map_64.c b/arch/x86/boot/compressed/ident_map_64.c
-> index 3a2115582920..0865d181b85d 100644
-> --- a/arch/x86/boot/compressed/ident_map_64.c
-> +++ b/arch/x86/boot/compressed/ident_map_64.c
-> @@ -19,11 +19,13 @@
->  /* No PAGE_TABLE_ISOLATION support needed either: */
->  #undef CONFIG_PAGE_TABLE_ISOLATION
->  
-> +#include "error.h"
->  #include "misc.h"
->  
->  /* These actually do the work of building the kernel identity maps. */
->  #include <asm/init.h>
->  #include <asm/pgtable.h>
-> +#include <asm/trap_defs.h>
->  /* Use the static base for this part of the boot process */
->  #undef __PAGE_OFFSET
->  #define __PAGE_OFFSET __PAGE_OFFSET_BASE
-> @@ -163,3 +165,39 @@ void finalize_identity_maps(void)
->  {
->  	write_cr3(top_level_pgt);
->  }
-> +
-> +static void pf_error(unsigned long error_code, unsigned long address,
-> +		     struct pt_regs *regs)
+> We already have an IPI latency test in arm/micro-bench.c I'd prefer that
+> one be used, if possible, rather than conflating the gic functional tests
+> with latency tests. Can you take a look at it and see if it satisfies
+> your needs, extending it if necessary?
 
-AFAICT, that function is called below only so just merge its body into
-the call site instead...
+I think it'd be good to have these interrupt latency measurements in
+kvm-unit-tests, and we can take the following interrupt types into
+account:
 
-> +{
-> +	error_putstr("Unexpected page-fault:");
-> +	error_putstr("\nError Code: ");
-> +	error_puthex(error_code);
-> +	error_putstr("\nCR2: 0x");
-> +	error_puthex(address);
-> +	error_putstr("\nRIP relative to _head: 0x");
-> +	error_puthex(regs->ip - (unsigned long)_head);
-> +	error_putstr("\n");
-> +
-> +	error("Stopping.\n");
-> +}
-> +
-> +void do_boot_page_fault(struct pt_regs *regs)
-> +{
-> +	unsigned long address = native_read_cr2();
-> +	unsigned long error_code = regs->orig_ax;
-> +
-> +	/*
-> +	 * Check for unexpected error codes. Unexpected are:
-> +	 *	- Faults on present pages
-> +	 *	- User faults
-> +	 *	- Reserved bits set
-> +	 */
-> +	if (error_code & (X86_PF_PROT | X86_PF_USER | X86_PF_RSVD))
-> +		pf_error(error_code, address, regs);
-> +
-> +	/*
-> +	 * Error code is sane - now identity map the 2M region around
-> +	 * the faulting address.
-> +	 */
-> +	add_identity_map(address & PMD_MASK, PMD_SIZE);
-> +}
-> diff --git a/arch/x86/boot/compressed/idt_64.c b/arch/x86/boot/compressed/idt_64.c
-> index 46ecea671b90..84ba57d9d436 100644
-> --- a/arch/x86/boot/compressed/idt_64.c
-> +++ b/arch/x86/boot/compressed/idt_64.c
-> @@ -39,5 +39,7 @@ void load_stage2_idt(void)
->  {
->  	boot_idt_desc.address = (unsigned long)boot_idt;
->  
-> +	set_idt_entry(X86_TRAP_PF, boot_pf_handler);
-> +
->  	load_boot_idt(&boot_idt_desc);
->  }
-> diff --git a/arch/x86/boot/compressed/idt_handlers_64.S b/arch/x86/boot/compressed/idt_handlers_64.S
-> index 3d86ab35ef52..bfb3fc5aa144 100644
-> --- a/arch/x86/boot/compressed/idt_handlers_64.S
-> +++ b/arch/x86/boot/compressed/idt_handlers_64.S
-> @@ -73,3 +73,5 @@ SYM_FUNC_END(\name)
->  
->  	.text
->  	.code64
-> +
-> +EXCEPTION_HANDLER	boot_pf_handler do_boot_page_fault error_code=1
+- IPI
+   As Drew pointed out, we already have one in the micro-bench group.
+   But what I'm actually interested in is the latency of the new GICv4.1
+   vSGIs (which will be directly injected through ITS).  To measure it,
+   we should first make KUT be GICv4.1-awareness, see [1] for details.
+   (This way, we can even have a look at the interrupt latency in HW
+   level. Is it possible to have this in kvm-unit-tests, Drew?)
 
-			boot_page_fault do_boot_page_fault
+- PPI
+   Like what has been done in patch #2, you can choose the vtimer
+   interrupt as an example.
 
-equivalent to the PF handler proper naming pls. Grepping "page_fault"
-would give you all then.
+- LPI
+   I think we can easily build a LPI latency test based on Eric's "ITS
+   tests" series [2], which should be upstreamed soon.
 
-> diff --git a/arch/x86/boot/compressed/misc.h b/arch/x86/boot/compressed/misc.h
-> index 3a030a878d53..eff4ed0b1cea 100644
-> --- a/arch/x86/boot/compressed/misc.h
-> +++ b/arch/x86/boot/compressed/misc.h
-> @@ -37,6 +37,9 @@
->  #define memptr unsigned
->  #endif
->  
-> +/* boot/compressed/vmlinux start and end markers */
-> +extern char _head[], _end[];
-> +
->  /* misc.c */
->  extern memptr free_mem_ptr;
->  extern memptr free_mem_end_ptr;
-> @@ -146,4 +149,7 @@ extern pteval_t __default_kernel_pte_mask;
->  extern gate_desc boot_idt[BOOT_IDT_ENTRIES];
->  extern struct desc_ptr boot_idt_desc;
->  
-> +/* IDT Entry Points */
-> +void boot_pf_handler(void);
-> +
->  #endif /* BOOT_COMPRESSED_MISC_H */
-> -- 
-> 2.17.1
-> 
+- if you want to add more...
 
--- 
-Regards/Gruss,
-    Boris.
+What do you think? I'd like to see a V2 of this series :-).
 
-https://people.kernel.org/tglx/notes-about-netiquette
+
+[1] 
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=0b04758b002bde9434053be2fff8064ac3d9d8bb
+[2] 
+https://lore.kernel.org/kvm/20200320092428.20880-1-eric.auger@redhat.com/
+
+
+Thanks,
+Zenghui
+
