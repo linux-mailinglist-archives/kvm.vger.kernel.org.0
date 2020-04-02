@@ -2,101 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B21F819C419
-	for <lists+kvm@lfdr.de>; Thu,  2 Apr 2020 16:29:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 95EFE19C464
+	for <lists+kvm@lfdr.de>; Thu,  2 Apr 2020 16:37:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387819AbgDBO2p (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Apr 2020 10:28:45 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:28815 "EHLO
+        id S2388499AbgDBOgy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Apr 2020 10:36:54 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:57988 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1732245AbgDBO2p (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 2 Apr 2020 10:28:45 -0400
+        by vger.kernel.org with ESMTP id S2388126AbgDBOgw (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 2 Apr 2020 10:36:52 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1585837723;
+        s=mimecast20190719; t=1585838210;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=q6/Zdn4PdxHJ91S/7dMf7deMcEC4jxiYXpkPo4ursOU=;
-        b=AtpTb9HLyNnBiGcAYkirfds0y3SvqyvxmdpMlDEMbAfgiu0lLPEIH4ATZptEQDqPleKxsF
-        B/GfHBtDgHbmQcYD4Q6oEWzwF/jlHbRcXJlv47N91c05ImCIsGMC0oLecgIC6MQ03IVPoR
-        LposBxm4lW6S4UNPGxspb4gi1GZRoNY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-339-enE41F3_PCCPc9ZZekUOcg-1; Thu, 02 Apr 2020 10:28:42 -0400
-X-MC-Unique: enE41F3_PCCPc9ZZekUOcg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2FF0118C43F9;
-        Thu,  2 Apr 2020 14:28:32 +0000 (UTC)
-Received: from [10.72.12.172] (ovpn-12-172.pek2.redhat.com [10.72.12.172])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 668BD26172;
-        Thu,  2 Apr 2020 14:28:30 +0000 (UTC)
-Subject: Re: [PATCH] vhost: drop vring dependency on iotlb
-To:     "Michael S. Tsirkin" <mst@redhat.com>, linux-kernel@vger.kernel.org
-Cc:     virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        bh=WlR2TRXNoUHH0cejtWwgFkeiMST3WWqkeQGN0pr6VCA=;
+        b=gXzhi9blke8Ut2CtjcEE6gO0ne7PXiA24skhNMy8llV4Sw9g6HSx7iSTZIZZXWvd1KGjd/
+        7hQ6aWPny5UFuLDJNcn/DSkvCjfXmSnq2s7oiG2YPfYiHsRxo9gpFAHcalv+o7EYG3z9wz
+        L+PmxMNB25odJov8tdUDa7IltOt2VIw=
+Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
+ [209.85.219.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-26-ni63SI2YOhm4q_BFBWHLEA-1; Thu, 02 Apr 2020 10:36:49 -0400
+X-MC-Unique: ni63SI2YOhm4q_BFBWHLEA-1
+Received: by mail-qv1-f72.google.com with SMTP id z2so2854988qvw.7
+        for <kvm@vger.kernel.org>; Thu, 02 Apr 2020 07:36:49 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=WlR2TRXNoUHH0cejtWwgFkeiMST3WWqkeQGN0pr6VCA=;
+        b=WDdGQWJaj1J9r9VIaaveAS1W5fjMTy3bZvY+pdPT6x9Tg6rVlhuhyz9lQa5bqKklHq
+         VNYc8jXrgnKKZYHnXuMFTqD6tb6+M7v4o+v6u6/zlfS74wRCEYqkuhUT6fFhnFw04N9q
+         KT35NLbeaMNYjhZmiNSqg40R0eTalZQvwJ7Sw6uX3nP9WiZta9HhTI+rftj/tIo/QduT
+         XFGHXTAuvmH5sYTlYHvoiFkg718qET4Yl6fRSSRK8ej1YNIIU7MotysAuVW3ywx7pn9Q
+         QqEU2+OXtpjnjHUISblxgITR8ySvLb+yqCF1CIV6isp7XZfQCGJzWVNWPUr9umuXqGYW
+         08kA==
+X-Gm-Message-State: AGi0PuYL/r9SKhGS8qKTz9yHE3l42zHfP0WftkdoxjpXatZAE+7Bjg85
+        oS3Q7QLv/k5UUyGoXhoR9jNU4HcjUocBJTYteKX7Ddn7i8to99oE2bCuX2oAwCo9CwS4RBsQYJD
+        ydVyh6raELc9V
+X-Received: by 2002:ac8:1bf5:: with SMTP id m50mr3204225qtk.200.1585838208361;
+        Thu, 02 Apr 2020 07:36:48 -0700 (PDT)
+X-Google-Smtp-Source: APiQypJIJxmszAzRx8icml77RBvawgNMOKh/hgQNez6YoUnUaICm+K3+fAJ0a9bgYwRVNdObKb/nbw==
+X-Received: by 2002:ac8:1bf5:: with SMTP id m50mr3204184qtk.200.1585838207990;
+        Thu, 02 Apr 2020 07:36:47 -0700 (PDT)
+Received: from redhat.com (bzq-79-176-51-222.red.bezeqint.net. [79.176.51.222])
+        by smtp.gmail.com with ESMTPSA id u40sm3854770qtc.62.2020.04.02.07.36.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 02 Apr 2020 07:36:47 -0700 (PDT)
+Date:   Thu, 2 Apr 2020 10:36:42 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     linux-kernel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
         netdev@vger.kernel.org
+Subject: Re: [PATCH] vhost: drop vring dependency on iotlb
+Message-ID: <20200402103551-mutt-send-email-mst@kernel.org>
 References: <20200402141207.32628-1-mst@redhat.com>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <afe230b9-708f-02a1-c3af-51e9d4fdd212@redhat.com>
-Date:   Thu, 2 Apr 2020 22:28:28 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ <afe230b9-708f-02a1-c3af-51e9d4fdd212@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200402141207.32628-1-mst@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <afe230b9-708f-02a1-c3af-51e9d4fdd212@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Thu, Apr 02, 2020 at 10:28:28PM +0800, Jason Wang wrote:
+> 
+> On 2020/4/2 下午10:12, Michael S. Tsirkin wrote:
+> > vringh can now be built without IOTLB.
+> > Select IOTLB directly where it's used.
+> > 
+> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> > ---
+> > 
+> > This is on top of my previous patch (in vhost tree now).
+> > 
+> >   drivers/vdpa/Kconfig  | 1 +
+> >   drivers/vhost/Kconfig | 1 -
+> >   2 files changed, 1 insertion(+), 1 deletion(-)
+> > 
+> > diff --git a/drivers/vdpa/Kconfig b/drivers/vdpa/Kconfig
+> > index 7db1460104b7..08b615f2da39 100644
+> > --- a/drivers/vdpa/Kconfig
+> > +++ b/drivers/vdpa/Kconfig
+> > @@ -17,6 +17,7 @@ config VDPA_SIM
+> >   	depends on RUNTIME_TESTING_MENU
+> >   	select VDPA
+> >   	select VHOST_RING
+> > +	select VHOST_IOTLB
+> >   	default n
+> >   	help
+> >   	  vDPA networking device simulator which loop TX traffic back
+> > diff --git a/drivers/vhost/Kconfig b/drivers/vhost/Kconfig
+> > index 21feea0d69c9..bdd270fede26 100644
+> > --- a/drivers/vhost/Kconfig
+> > +++ b/drivers/vhost/Kconfig
+> > @@ -6,7 +6,6 @@ config VHOST_IOTLB
+> >   config VHOST_RING
+> >   	tristate
+> > -	select VHOST_IOTLB
+> >   	help
+> >   	  This option is selected by any driver which needs to access
+> >   	  the host side of a virtio ring.
+> 
+> 
+> Do we need to mention driver need to select VHOST_IOTLB by itself here?
+> 
+> Thanks
+> 
 
-On 2020/4/2 =E4=B8=8B=E5=8D=8810:12, Michael S. Tsirkin wrote:
-> vringh can now be built without IOTLB.
-> Select IOTLB directly where it's used.
->
-> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> ---
->
-> This is on top of my previous patch (in vhost tree now).
->
->   drivers/vdpa/Kconfig  | 1 +
->   drivers/vhost/Kconfig | 1 -
->   2 files changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/drivers/vdpa/Kconfig b/drivers/vdpa/Kconfig
-> index 7db1460104b7..08b615f2da39 100644
-> --- a/drivers/vdpa/Kconfig
-> +++ b/drivers/vdpa/Kconfig
-> @@ -17,6 +17,7 @@ config VDPA_SIM
->   	depends on RUNTIME_TESTING_MENU
->   	select VDPA
->   	select VHOST_RING
-> +	select VHOST_IOTLB
->   	default n
->   	help
->   	  vDPA networking device simulator which loop TX traffic back
-> diff --git a/drivers/vhost/Kconfig b/drivers/vhost/Kconfig
-> index 21feea0d69c9..bdd270fede26 100644
-> --- a/drivers/vhost/Kconfig
-> +++ b/drivers/vhost/Kconfig
-> @@ -6,7 +6,6 @@ config VHOST_IOTLB
->  =20
->   config VHOST_RING
->   	tristate
-> -	select VHOST_IOTLB
->   	help
->   	  This option is selected by any driver which needs to access
->   	  the host side of a virtio ring.
+OK but I guess it's best to do it near where VHOST_IOTLB is defined.
+Like this?
 
 
-Do we need to mention driver need to select VHOST_IOTLB by itself here?
-
-Thanks
-
-
+diff --git a/drivers/vhost/Kconfig b/drivers/vhost/Kconfig
+index bdd270fede26..ce51126f51e7 100644
+--- a/drivers/vhost/Kconfig
++++ b/drivers/vhost/Kconfig
+@@ -3,6 +3,8 @@ config VHOST_IOTLB
+ 	tristate
+ 	help
+ 	  Generic IOTLB implementation for vhost and vringh.
++	  This option is selected by any driver which needs to support
++	  an IOMMU in software.
+ 
+ config VHOST_RING
+ 	tristate
 
