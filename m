@@ -2,79 +2,36 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6135519BDA0
-	for <lists+kvm@lfdr.de>; Thu,  2 Apr 2020 10:34:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C517719BDA2
+	for <lists+kvm@lfdr.de>; Thu,  2 Apr 2020 10:34:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729477AbgDBIeQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Apr 2020 04:34:16 -0400
-Received: from foss.arm.com ([217.140.110.172]:39740 "EHLO foss.arm.com"
+        id S2387545AbgDBIed (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Apr 2020 04:34:33 -0400
+Received: from foss.arm.com ([217.140.110.172]:39752 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727012AbgDBIeQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Apr 2020 04:34:16 -0400
+        id S2387493AbgDBIec (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Apr 2020 04:34:32 -0400
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A44C631B;
-        Thu,  2 Apr 2020 01:34:15 -0700 (PDT)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C611D31B;
+        Thu,  2 Apr 2020 01:34:31 -0700 (PDT)
 Received: from [192.168.3.111] (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BC4A53F68F;
-        Thu,  2 Apr 2020 01:34:14 -0700 (PDT)
-Subject: Re: [PATCH v3 kvmtool 20/32] pci: Add helpers for BAR values and
- memory/IO space access
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DD1FA3F68F;
+        Thu,  2 Apr 2020 01:34:30 -0700 (PDT)
+Subject: Re: [PATCH v3 kvmtool 22/32] vfio: Destroy memslot when unmapping the
+ associated VAs
 To:     Alexandru Elisei <alexandru.elisei@arm.com>, kvm@vger.kernel.org
 Cc:     will@kernel.org, julien.thierry.kdev@gmail.com,
         sami.mujawar@arm.com, lorenzo.pieralisi@arm.com
 References: <20200326152438.6218-1-alexandru.elisei@arm.com>
- <20200326152438.6218-21-alexandru.elisei@arm.com>
+ <20200326152438.6218-23-alexandru.elisei@arm.com>
 From:   =?UTF-8?Q?Andr=c3=a9_Przywara?= <andre.przywara@arm.com>
-Autocrypt: addr=andre.przywara@arm.com; prefer-encrypt=mutual; keydata=
- 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
- i4aIXCH3Wv6K
 Organization: ARM Ltd.
-Message-ID: <7664f7c4-0535-6b6d-7ba9-edb407ecdee5@arm.com>
-Date:   Thu, 2 Apr 2020 09:33:41 +0100
+Message-ID: <2c194786-0baf-3b38-3f68-dfb7e09a93ca@arm.com>
+Date:   Thu, 2 Apr 2020 09:33:57 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20200326152438.6218-21-alexandru.elisei@arm.com>
+In-Reply-To: <20200326152438.6218-23-alexandru.elisei@arm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -84,10 +41,39 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 26/03/2020 15:24, Alexandru Elisei wrote:
-> We're going to be checking the BAR type, the address written to it and if
-> access to memory or I/O space is enabled quite often when we add support
-> for reasignable BARs; make our life easier by adding helpers for it.
+> When we want to map a device region into the guest address space, first we
+> perform an mmap on the device fd. The resulting VMA is a mapping between
+> host userspace addresses and physical addresses associated with the device.
+> Next, we create a memslot, which populates the stage 2 table with the
+> mappings between guest physical addresses and the device physical adresses.
 > 
+> However, when we want to unmap the device from the guest address space, we
+> only call munmap, which destroys the VMA and the stage 2 mappings, but
+> doesn't destroy the memslot and kvmtool's internal mem_bank structure
+> associated with the memslot.
+> 
+> This has been perfectly fine so far, because we only unmap a device region
+> when we exit kvmtool. This is will change when we add support for
+> reassignable BARs, and we will have to unmap vfio regions as the guest
+> kernel writes new addresses in the BARs. This can lead to two possible
+> problems:
+> 
+> - We refuse to create a valid BAR mapping because of a stale mem_bank
+>   structure which belonged to a previously unmapped region.
+> 
+> - It is possible that the mmap in vfio_map_region returns the same address
+>   that was used to create a memslot, but was unmapped by vfio_unmap_region.
+>   Guest accesses to the device memory will fault because the stage 2
+>   mappings are missing, and this can lead to performance degradation.
+> 
+> Let's do the right thing and destroy the memslot and the mem_bank struct
+> associated with it when we unmap a vfio region. Set host_addr to NULL after
+> the munmap call so we won't try to unmap an address which is currently used
+> by the process for something else if vfio_unmap_region gets called twice.
+> 
+
+Thanks for adding the locking here, looks alright now.
+
 > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 
 Reviewed-by: Andre Przywara <andre.przywara@arm.com>
@@ -96,114 +82,225 @@ Cheers,
 Andre
 
 > ---
->  include/kvm/pci.h   | 53 +++++++++++++++++++++++++++++++++++++++++++++
->  pci.c               |  4 ++--
->  powerpc/spapr_pci.c |  2 +-
->  3 files changed, 56 insertions(+), 3 deletions(-)
+>  include/kvm/kvm.h |   4 ++
+>  kvm.c             | 101 ++++++++++++++++++++++++++++++++++++++++------
+>  vfio/core.c       |   6 +++
+>  3 files changed, 99 insertions(+), 12 deletions(-)
 > 
-> diff --git a/include/kvm/pci.h b/include/kvm/pci.h
-> index ccb155e3e8fe..adb4b5c082d5 100644
-> --- a/include/kvm/pci.h
-> +++ b/include/kvm/pci.h
-> @@ -5,6 +5,7 @@
->  #include <linux/kvm.h>
->  #include <linux/pci_regs.h>
->  #include <endian.h>
-> +#include <stdbool.h>
+> diff --git a/include/kvm/kvm.h b/include/kvm/kvm.h
+> index 50119a8672eb..9428f57a1c0c 100644
+> --- a/include/kvm/kvm.h
+> +++ b/include/kvm/kvm.h
+> @@ -1,6 +1,7 @@
+>  #ifndef KVM__KVM_H
+>  #define KVM__KVM_H
 >  
->  #include "kvm/devices.h"
->  #include "kvm/msi.h"
-> @@ -161,4 +162,56 @@ void pci__config_rd(struct kvm *kvm, union pci_config_address addr, void *data,
+> +#include "kvm/mutex.h"
+>  #include "kvm/kvm-arch.h"
+>  #include "kvm/kvm-config.h"
+>  #include "kvm/util-init.h"
+> @@ -56,6 +57,7 @@ struct kvm_mem_bank {
+>  	void			*host_addr;
+>  	u64			size;
+>  	enum kvm_mem_type	type;
+> +	u32			slot;
+>  };
 >  
->  void *pci_find_cap(struct pci_device_header *hdr, u8 cap_type);
+>  struct kvm {
+> @@ -72,6 +74,7 @@ struct kvm {
+>  	u64			ram_size;
+>  	void			*ram_start;
+>  	u64			ram_pagesize;
+> +	struct mutex		mem_banks_lock;
+>  	struct list_head	mem_banks;
 >  
-> +static inline bool __pci__memory_space_enabled(u16 command)
-> +{
-> +	return command & PCI_COMMAND_MEMORY;
-> +}
-> +
-> +static inline bool pci__memory_space_enabled(struct pci_device_header *pci_hdr)
-> +{
-> +	return __pci__memory_space_enabled(pci_hdr->command);
-> +}
-> +
-> +static inline bool __pci__io_space_enabled(u16 command)
-> +{
-> +	return command & PCI_COMMAND_IO;
-> +}
-> +
-> +static inline bool pci__io_space_enabled(struct pci_device_header *pci_hdr)
-> +{
-> +	return __pci__io_space_enabled(pci_hdr->command);
-> +}
-> +
-> +static inline bool __pci__bar_is_io(u32 bar)
-> +{
-> +	return bar & PCI_BASE_ADDRESS_SPACE_IO;
-> +}
-> +
-> +static inline bool pci__bar_is_io(struct pci_device_header *pci_hdr, int bar_num)
-> +{
-> +	return __pci__bar_is_io(pci_hdr->bar[bar_num]);
-> +}
-> +
-> +static inline bool pci__bar_is_memory(struct pci_device_header *pci_hdr, int bar_num)
-> +{
-> +	return !pci__bar_is_io(pci_hdr, bar_num);
-> +}
-> +
-> +static inline u32 __pci__bar_address(u32 bar)
-> +{
-> +	if (__pci__bar_is_io(bar))
-> +		return bar & PCI_BASE_ADDRESS_IO_MASK;
-> +	return bar & PCI_BASE_ADDRESS_MEM_MASK;
-> +}
-> +
-> +static inline u32 pci__bar_address(struct pci_device_header *pci_hdr, int bar_num)
-> +{
-> +	return __pci__bar_address(pci_hdr->bar[bar_num]);
-> +}
-> +
-> +static inline u32 pci__bar_size(struct pci_device_header *pci_hdr, int bar_num)
-> +{
-> +	return pci_hdr->bar_size[bar_num];
-> +}
-> +
->  #endif /* KVM__PCI_H */
-> diff --git a/pci.c b/pci.c
-> index b6892d974c08..7399c76c0819 100644
-> --- a/pci.c
-> +++ b/pci.c
-> @@ -185,7 +185,7 @@ void pci__config_wr(struct kvm *kvm, union pci_config_address addr, void *data,
->  	 * size, it will write the address back.
->  	 */
->  	if (bar < 6) {
-> -		if (pci_hdr->bar[bar] & PCI_BASE_ADDRESS_SPACE_IO)
-> +		if (pci__bar_is_io(pci_hdr, bar))
->  			mask = (u32)PCI_BASE_ADDRESS_IO_MASK;
->  		else
->  			mask = (u32)PCI_BASE_ADDRESS_MEM_MASK;
-> @@ -211,7 +211,7 @@ void pci__config_wr(struct kvm *kvm, union pci_config_address addr, void *data,
->  		 */
->  		memcpy(&value, data, size);
->  		if (value == 0xffffffff)
-> -			value = ~(pci_hdr->bar_size[bar] - 1);
-> +			value = ~(pci__bar_size(pci_hdr, bar) - 1);
->  		/* Preserve the special bits. */
->  		value = (value & mask) | (pci_hdr->bar[bar] & ~mask);
->  		memcpy(base + offset, &value, size);
-> diff --git a/powerpc/spapr_pci.c b/powerpc/spapr_pci.c
-> index a15f7d895a46..7be44d950acb 100644
-> --- a/powerpc/spapr_pci.c
-> +++ b/powerpc/spapr_pci.c
-> @@ -369,7 +369,7 @@ int spapr_populate_pci_devices(struct kvm *kvm,
->  				of_pci_b_ddddd(devid) |
->  				of_pci_b_fff(fn) |
->  				of_pci_b_rrrrrrrr(bars[i]));
-> -			reg[n+1].size = cpu_to_be64(hdr->bar_size[i]);
-> +			reg[n+1].size = cpu_to_be64(pci__bar_size(hdr, i));
->  			reg[n+1].addr = 0;
+>  	bool			nmi_disabled;
+> @@ -106,6 +109,7 @@ void kvm__irq_line(struct kvm *kvm, int irq, int level);
+>  void kvm__irq_trigger(struct kvm *kvm, int irq);
+>  bool kvm__emulate_io(struct kvm_cpu *vcpu, u16 port, void *data, int direction, int size, u32 count);
+>  bool kvm__emulate_mmio(struct kvm_cpu *vcpu, u64 phys_addr, u8 *data, u32 len, u8 is_write);
+> +int kvm__destroy_mem(struct kvm *kvm, u64 guest_phys, u64 size, void *userspace_addr);
+>  int kvm__register_mem(struct kvm *kvm, u64 guest_phys, u64 size, void *userspace_addr,
+>  		      enum kvm_mem_type type);
+>  static inline int kvm__register_ram(struct kvm *kvm, u64 guest_phys, u64 size,
+> diff --git a/kvm.c b/kvm.c
+> index 57c4ff98ec4c..26f6b9bc58a3 100644
+> --- a/kvm.c
+> +++ b/kvm.c
+> @@ -157,6 +157,7 @@ struct kvm *kvm__new(void)
+>  	if (!kvm)
+>  		return ERR_PTR(-ENOMEM);
 >  
->  			assigned_addresses[n].phys_hi = cpu_to_be32(
+> +	mutex_init(&kvm->mem_banks_lock);
+>  	kvm->sys_fd = -1;
+>  	kvm->vm_fd = -1;
+>  
+> @@ -183,20 +184,84 @@ int kvm__exit(struct kvm *kvm)
+>  }
+>  core_exit(kvm__exit);
+>  
+> +int kvm__destroy_mem(struct kvm *kvm, u64 guest_phys, u64 size,
+> +		     void *userspace_addr)
+> +{
+> +	struct kvm_userspace_memory_region mem;
+> +	struct kvm_mem_bank *bank;
+> +	int ret;
+> +
+> +	mutex_lock(&kvm->mem_banks_lock);
+> +	list_for_each_entry(bank, &kvm->mem_banks, list)
+> +		if (bank->guest_phys_addr == guest_phys &&
+> +		    bank->size == size && bank->host_addr == userspace_addr)
+> +			break;
+> +
+> +	if (&bank->list == &kvm->mem_banks) {
+> +		pr_err("Region [%llx-%llx] not found", guest_phys,
+> +		       guest_phys + size - 1);
+> +		ret = -EINVAL;
+> +		goto out;
+> +	}
+> +
+> +	if (bank->type == KVM_MEM_TYPE_RESERVED) {
+> +		pr_err("Cannot delete reserved region [%llx-%llx]",
+> +		       guest_phys, guest_phys + size - 1);
+> +		ret = -EINVAL;
+> +		goto out;
+> +	}
+> +
+> +	mem = (struct kvm_userspace_memory_region) {
+> +		.slot			= bank->slot,
+> +		.guest_phys_addr	= guest_phys,
+> +		.memory_size		= 0,
+> +		.userspace_addr		= (unsigned long)userspace_addr,
+> +	};
+> +
+> +	ret = ioctl(kvm->vm_fd, KVM_SET_USER_MEMORY_REGION, &mem);
+> +	if (ret < 0) {
+> +		ret = -errno;
+> +		goto out;
+> +	}
+> +
+> +	list_del(&bank->list);
+> +	free(bank);
+> +	kvm->mem_slots--;
+> +	ret = 0;
+> +
+> +out:
+> +	mutex_unlock(&kvm->mem_banks_lock);
+> +	return ret;
+> +}
+> +
+>  int kvm__register_mem(struct kvm *kvm, u64 guest_phys, u64 size,
+>  		      void *userspace_addr, enum kvm_mem_type type)
+>  {
+>  	struct kvm_userspace_memory_region mem;
+>  	struct kvm_mem_bank *merged = NULL;
+>  	struct kvm_mem_bank *bank;
+> +	struct list_head *prev_entry;
+> +	u32 slot;
+>  	int ret;
+>  
+> -	/* Check for overlap */
+> +	mutex_lock(&kvm->mem_banks_lock);
+> +	/* Check for overlap and find first empty slot. */
+> +	slot = 0;
+> +	prev_entry = &kvm->mem_banks;
+>  	list_for_each_entry(bank, &kvm->mem_banks, list) {
+>  		u64 bank_end = bank->guest_phys_addr + bank->size - 1;
+>  		u64 end = guest_phys + size - 1;
+> -		if (guest_phys > bank_end || end < bank->guest_phys_addr)
+> +		if (guest_phys > bank_end || end < bank->guest_phys_addr) {
+> +			/*
+> +			 * Keep the banks sorted ascending by slot, so it's
+> +			 * easier for us to find a free slot.
+> +			 */
+> +			if (bank->slot == slot) {
+> +				slot++;
+> +				prev_entry = &bank->list;
+> +			}
+>  			continue;
+> +		}
+>  
+>  		/* Merge overlapping reserved regions */
+>  		if (bank->type == KVM_MEM_TYPE_RESERVED &&
+> @@ -226,38 +291,50 @@ int kvm__register_mem(struct kvm *kvm, u64 guest_phys, u64 size,
+>  		       kvm_mem_type_to_string(bank->type), bank->guest_phys_addr,
+>  		       bank->guest_phys_addr + bank->size - 1);
+>  
+> -		return -EINVAL;
+> +		ret = -EINVAL;
+> +		goto out;
+>  	}
+>  
+> -	if (merged)
+> -		return 0;
+> +	if (merged) {
+> +		ret = 0;
+> +		goto out;
+> +	}
+>  
+>  	bank = malloc(sizeof(*bank));
+> -	if (!bank)
+> -		return -ENOMEM;
+> +	if (!bank) {
+> +		ret = -ENOMEM;
+> +		goto out;
+> +	}
+>  
+>  	INIT_LIST_HEAD(&bank->list);
+>  	bank->guest_phys_addr		= guest_phys;
+>  	bank->host_addr			= userspace_addr;
+>  	bank->size			= size;
+>  	bank->type			= type;
+> +	bank->slot			= slot;
+>  
+>  	if (type != KVM_MEM_TYPE_RESERVED) {
+>  		mem = (struct kvm_userspace_memory_region) {
+> -			.slot			= kvm->mem_slots++,
+> +			.slot			= slot,
+>  			.guest_phys_addr	= guest_phys,
+>  			.memory_size		= size,
+>  			.userspace_addr		= (unsigned long)userspace_addr,
+>  		};
+>  
+>  		ret = ioctl(kvm->vm_fd, KVM_SET_USER_MEMORY_REGION, &mem);
+> -		if (ret < 0)
+> -			return -errno;
+> +		if (ret < 0) {
+> +			ret = -errno;
+> +			goto out;
+> +		}
+>  	}
+>  
+> -	list_add(&bank->list, &kvm->mem_banks);
+> +	list_add(&bank->list, prev_entry);
+> +	kvm->mem_slots++;
+> +	ret = 0;
+>  
+> -	return 0;
+> +out:
+> +	mutex_unlock(&kvm->mem_banks_lock);
+> +	return ret;
+>  }
+>  
+>  void *guest_flat_to_host(struct kvm *kvm, u64 offset)
+> diff --git a/vfio/core.c b/vfio/core.c
+> index 0ed1e6fee6bf..b80ebf3bb913 100644
+> --- a/vfio/core.c
+> +++ b/vfio/core.c
+> @@ -256,8 +256,14 @@ int vfio_map_region(struct kvm *kvm, struct vfio_device *vdev,
+>  
+>  void vfio_unmap_region(struct kvm *kvm, struct vfio_region *region)
+>  {
+> +	u64 map_size;
+> +
+>  	if (region->host_addr) {
+> +		map_size = ALIGN(region->info.size, PAGE_SIZE);
+> +		kvm__destroy_mem(kvm, region->guest_phys_addr, map_size,
+> +				 region->host_addr);
+>  		munmap(region->host_addr, region->info.size);
+> +		region->host_addr = NULL;
+>  	} else if (region->is_ioport) {
+>  		ioport__unregister(kvm, region->port_base);
+>  	} else {
 > 
 
