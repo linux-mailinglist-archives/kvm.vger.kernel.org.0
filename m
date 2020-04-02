@@ -2,156 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7A3DA19C88A
-	for <lists+kvm@lfdr.de>; Thu,  2 Apr 2020 20:09:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CE98A19C894
+	for <lists+kvm@lfdr.de>; Thu,  2 Apr 2020 20:13:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1733055AbgDBSJk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Apr 2020 14:09:40 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:42768 "EHLO
+        id S2388164AbgDBSNI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Apr 2020 14:13:08 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:43800 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728225AbgDBSJj (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 2 Apr 2020 14:09:39 -0400
+        by vger.kernel.org with ESMTP id S1727412AbgDBSNH (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 2 Apr 2020 14:13:07 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1585850978;
+        s=mimecast20190719; t=1585851187;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=BYGlXLwwyBgS36YV5wEkNKPI/aX5YIakZvgpmmU8bos=;
-        b=HegxnBPvIoH5Fhhvf8Rj89MlqIUtkqL8KQpexPL+Sh/WgET4yJNjVh0iaMcW1wL208+ltO
-        9V0hhG5Wv7vapROUbzQKASvs0ddPQnM2uu4NQiVzQqLZoIXi/2W8Pz1m4kGH16vsOtfL0b
-        +3Mn1b8O8Kz5BmrNkbFdnl/K68g6gOM=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-228-gl87SGMBNN6EovTMUjJgug-1; Thu, 02 Apr 2020 14:09:28 -0400
-X-MC-Unique: gl87SGMBNN6EovTMUjJgug-1
-Received: by mail-wr1-f72.google.com with SMTP id l17so1835077wro.3
-        for <kvm@vger.kernel.org>; Thu, 02 Apr 2020 11:09:27 -0700 (PDT)
+        bh=/w1XPcFrLz6tQEiDvBsmFImZ8MWG7D8gxR/TGmyIOfc=;
+        b=HDUU6nkNeP45JJLvxLi2tB8y8UbK2rIC63TCQpQeLIBJQOHBm90TI6tH75km1OXqLcZcqc
+        Ko3B4kVfZidQmZ179RtEWuoBRgPkCHcy4JjTbt7KzQ2QlHeJno7e/x78qhy8T1caw6z8wW
+        Pgg72O9jW7ExFtavNZcs5evsMSG32yI=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-151-EMLM6qtHMdmsOWIyCJX6Yw-1; Thu, 02 Apr 2020 14:13:03 -0400
+X-MC-Unique: EMLM6qtHMdmsOWIyCJX6Yw-1
+Received: by mail-wr1-f70.google.com with SMTP id w12so1807656wrl.23
+        for <kvm@vger.kernel.org>; Thu, 02 Apr 2020 11:13:03 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=BYGlXLwwyBgS36YV5wEkNKPI/aX5YIakZvgpmmU8bos=;
-        b=of7ySHP4eRJoiIcBOyG6CGSY6EttIWvxRKbzjSnisrXfncYlTC8IPTI/pIZZzF5bUA
-         dCBDzBxyMusy36K8UAzfUZEMNcpEOTmSlHB05FDYcfGPhOSGRjy6omHr7xyAJbeMzHXh
-         kq384s8u7rRatJLJovzGSE/SaEtxz3YASPOnWGHTdeQ48g1WgjutVMLFUZUAUFs3heoX
-         LoYsoslUL5jqLoZCfIY8zjsy38dR4mVU+/in9Ji2RqlTsqffBQFpOFDifGwrRgD4Y8ym
-         E/T7i4LDHeySksUq1cOXDPzJopNE/CeIHAWLuUIfM30MfmPflL4oIjXm/jjsLIPN57HG
-         YgOg==
-X-Gm-Message-State: AGi0PubkZn+e19/NpdFjDmFNsGoDPjsmrZfe/RByg91AosDTnQVDSATU
-        1BV4sssd7QbcC0cdafzxUbzVGv2AIMFCQZGY5zXsxiahucnSjINerwFlevAPQCrsEIes03yD09z
-        DGG1U68i6jgEq
-X-Received: by 2002:a7b:c343:: with SMTP id l3mr4761401wmj.38.1585850966853;
-        Thu, 02 Apr 2020 11:09:26 -0700 (PDT)
-X-Google-Smtp-Source: APiQypLyG70A7UCR5fhQk5BBlq4+WqeXvaVHltohvb6yhXwm60j2oQgl8OXZkqzptTlvn5SGWC9XLQ==
-X-Received: by 2002:a7b:c343:: with SMTP id l3mr4761369wmj.38.1585850966592;
-        Thu, 02 Apr 2020 11:09:26 -0700 (PDT)
+        bh=/w1XPcFrLz6tQEiDvBsmFImZ8MWG7D8gxR/TGmyIOfc=;
+        b=FJrhd2lDftGZXqCXu7aCe3nQiiaC82F7gtlLrngBmwB7FCjIESbCkKP78/c8EgSCWT
+         xP4eVXhnk1yYNJsvmwu1zYgDJfYDTcxusWj+5xZ+5ACrmMSaKHaLOLkpBziTG6yBtpw2
+         yzd2zZuCPei/wjznL1zNDCzG9BxcnJYyK2ACMQDAAJUb13z2xOl0+YgfyMf0F6kCQTrf
+         ztsMspfi+cd+jwzLyQxTfEjRBxSBOJEkTIECoFLBU3MJ2EVE0HnsJKC5MhciSJtwgtnp
+         Feo7Uf6zqrN+VDpDulM0SYf1nxf0iFPkN6OZecWSwCwWl7RADWiqtWv/bWzquSDxA0gn
+         uKRg==
+X-Gm-Message-State: AGi0PuYsGNu9yCOBfE0IMG97Vz2fEQC+0B03IT9aQW5joaywaAhOvnCz
+        Qeg3p7nwdEzEycurppM2dC0ynW7kn6ys5sBnByORH0Go8/SwuuDFCIeNXPlMfZcqu8UEKa4TTCv
+        WEzJCKg0wiA8R
+X-Received: by 2002:adf:82a6:: with SMTP id 35mr4724819wrc.307.1585851182461;
+        Thu, 02 Apr 2020 11:13:02 -0700 (PDT)
+X-Google-Smtp-Source: APiQypIXdqRzArUH2ZsL1EUSB0H8v1U9gywPCW/4wSXhaIAX48AOcIA+658s2GAe64Wr/fSqOsWFWA==
+X-Received: by 2002:adf:82a6:: with SMTP id 35mr4724805wrc.307.1585851182296;
+        Thu, 02 Apr 2020 11:13:02 -0700 (PDT)
 Received: from xz-x1 (CPEf81d0fb19163-CMf81d0fb19160.cpe.net.fido.ca. [72.137.123.47])
-        by smtp.gmail.com with ESMTPSA id n11sm9367892wrg.72.2020.04.02.11.09.23
+        by smtp.gmail.com with ESMTPSA id h26sm7882608wmb.19.2020.04.02.11.12.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Apr 2020 11:09:25 -0700 (PDT)
-Date:   Thu, 2 Apr 2020 14:09:20 -0400
+        Thu, 02 Apr 2020 11:13:01 -0700 (PDT)
+Date:   Thu, 2 Apr 2020 14:12:55 -0400
 From:   Peter Xu <peterx@redhat.com>
 To:     Liu Yi L <yi.l.liu@intel.com>
 Cc:     qemu-devel@nongnu.org, alex.williamson@redhat.com,
         eric.auger@redhat.com, pbonzini@redhat.com, mst@redhat.com,
         david@gibson.dropbear.id.au, kevin.tian@intel.com,
         jun.j.tian@intel.com, yi.y.sun@intel.com, kvm@vger.kernel.org,
-        hao.wu@intel.com, jean-philippe@linaro.org,
-        Jacob Pan <jacob.jun.pan@linux.intel.com>,
-        Yi Sun <yi.y.sun@linux.intel.com>,
-        Richard Henderson <rth@twiddle.net>
-Subject: Re: [PATCH v2 15/22] intel_iommu: bind/unbind guest page table to
- host
-Message-ID: <20200402180920.GD103677@xz-x1>
+        hao.wu@intel.com, jean-philippe@linaro.org
+Subject: Re: [PATCH v2 00/22] intel_iommu: expose Shared Virtual Addressing
+ to VMs
+Message-ID: <20200402181255.GE103677@xz-x1>
 References: <1585542301-84087-1-git-send-email-yi.l.liu@intel.com>
- <1585542301-84087-16-git-send-email-yi.l.liu@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <1585542301-84087-16-git-send-email-yi.l.liu@intel.com>
+In-Reply-To: <1585542301-84087-1-git-send-email-yi.l.liu@intel.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Mar 29, 2020 at 09:24:54PM -0700, Liu Yi L wrote:
-> +static int vtd_bind_guest_pasid(IntelIOMMUState *s, VTDBus *vtd_bus,
-> +                                int devfn, int pasid, VTDPASIDEntry *pe,
-> +                                VTDPASIDOp op)
-> +{
-> +    VTDHostIOMMUContext *vtd_dev_icx;
-> +    HostIOMMUContext *iommu_ctx;
-> +    DualIOMMUStage1BindData *bind_data;
-> +    struct iommu_gpasid_bind_data *g_bind_data;
-> +    int ret = -1;
-> +
-> +    vtd_dev_icx = vtd_bus->dev_icx[devfn];
-> +    if (!vtd_dev_icx) {
-> +        /* means no need to go further, e.g. for emulated devices */
-> +        return 0;
-> +    }
-> +
-> +    iommu_ctx = vtd_dev_icx->iommu_ctx;
-> +    if (!iommu_ctx) {
-> +        return -EINVAL;
-> +    }
-> +
-> +    if (!(iommu_ctx->stage1_formats
-> +             & IOMMU_PASID_FORMAT_INTEL_VTD)) {
-> +        error_report_once("IOMMU Stage 1 format is not compatible!\n");
-> +        return -EINVAL;
-> +    }
-> +
-> +    bind_data = g_malloc0(sizeof(*bind_data));
-> +    bind_data->pasid = pasid;
-> +    g_bind_data = &bind_data->bind_data.gpasid_bind;
-> +
-> +    g_bind_data->flags = 0;
-> +    g_bind_data->vtd.flags = 0;
-> +    switch (op) {
-> +    case VTD_PASID_BIND:
-> +        g_bind_data->version = IOMMU_UAPI_VERSION;
-> +        g_bind_data->format = IOMMU_PASID_FORMAT_INTEL_VTD;
-> +        g_bind_data->gpgd = vtd_pe_get_flpt_base(pe);
-> +        g_bind_data->addr_width = vtd_pe_get_fl_aw(pe);
-> +        g_bind_data->hpasid = pasid;
-> +        g_bind_data->gpasid = pasid;
-> +        g_bind_data->flags |= IOMMU_SVA_GPASID_VAL;
-> +        g_bind_data->vtd.flags =
-> +                             (VTD_SM_PASID_ENTRY_SRE_BIT(pe->val[2]) ? 1 : 0)
+On Sun, Mar 29, 2020 at 09:24:39PM -0700, Liu Yi L wrote:
+> Tests: basci vSVA functionality test,
 
-This evaluates to 1 if VTD_SM_PASID_ENTRY_SRE_BIT(pe->val[2]), or 0.
-Do you want to use IOMMU_SVA_VTD_GPASID_SRE instead of 1?  Same
-question to all the rest.
+Could you elaborate what's the functionality test?  Does that contains
+at least some IOs go through the SVA-capable device so the nested page
+table is used?  I thought it was a yes, but after I notice that the
+BIND message flags seems to be wrong, I really think I should ask this
+loud..
 
-> +                           | (VTD_SM_PASID_ENTRY_EAFE_BIT(pe->val[2]) ? 1 : 0)
-> +                           | (VTD_SM_PASID_ENTRY_PCD_BIT(pe->val[1]) ? 1 : 0)
-> +                           | (VTD_SM_PASID_ENTRY_PWT_BIT(pe->val[1]) ? 1 : 0)
-> +                           | (VTD_SM_PASID_ENTRY_EMTE_BIT(pe->val[1]) ? 1 : 0)
-> +                           | (VTD_SM_PASID_ENTRY_CD_BIT(pe->val[1]) ? 1 : 0);
-> +        g_bind_data->vtd.pat = VTD_SM_PASID_ENTRY_PAT(pe->val[1]);
-> +        g_bind_data->vtd.emt = VTD_SM_PASID_ENTRY_EMT(pe->val[1]);
-> +        ret = host_iommu_ctx_bind_stage1_pgtbl(iommu_ctx, bind_data);
-> +        break;
-> +    case VTD_PASID_UNBIND:
-> +        g_bind_data->version = IOMMU_UAPI_VERSION;
-> +        g_bind_data->format = IOMMU_PASID_FORMAT_INTEL_VTD;
-> +        g_bind_data->gpgd = 0;
-> +        g_bind_data->addr_width = 0;
-> +        g_bind_data->hpasid = pasid;
-> +        g_bind_data->gpasid = pasid;
-> +        g_bind_data->flags |= IOMMU_SVA_GPASID_VAL;
-> +        ret = host_iommu_ctx_unbind_stage1_pgtbl(iommu_ctx, bind_data);
-> +        break;
-> +    default:
-> +        error_report_once("Unknown VTDPASIDOp!!!\n");
-> +        break;
-> +    }
-> +
-> +    g_free(bind_data);
-> +
-> +    return ret;
-> +}
+> VM reboot/shutdown/crash,
+
+What's the VM crash test?
+
+> kernel build in
+> guest, boot VM with vSVA disabled, full comapilation with all archs.
+
+I believe I've said similar things, but...  I'd appreciate if you can
+also smoke on 2nd-level only with the series applied.
+
+Thanks,
 
 -- 
 Peter Xu
