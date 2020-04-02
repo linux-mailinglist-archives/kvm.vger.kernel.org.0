@@ -2,256 +2,142 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C5FAA19CCD6
-	for <lists+kvm@lfdr.de>; Fri,  3 Apr 2020 00:25:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6BEE719CCDA
+	for <lists+kvm@lfdr.de>; Fri,  3 Apr 2020 00:27:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389894AbgDBWZy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Apr 2020 18:25:54 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:49540 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2389574AbgDBWZy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Apr 2020 18:25:54 -0400
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 032M9eJ8140317;
-        Thu, 2 Apr 2020 22:25:31 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2020-01-29;
- bh=xHqDgWlOpxttXJcz2uGd8+ijlNwiCje2fkWcKJRG85c=;
- b=I/CHdSoIjfvv8zqlEIKBYl3Itcu4/ald6DL35D0XCH/Ei5yzdMJQ7Lxqy5ihev+5dl11
- i1xABaG9dTHG6z6bv9EVqSMVm0h8L7JnXTxpnfRJNqmJG+NsWL/FGnEpLzytoqx16QZZ
- LYG+PleWEgkuNaznm2oqDKMXqNxYiprtLoGFkxlaTPLKt01kCindA5JKw/gfB4E+oK97
- lbqV/yCza81ZXr3OHb45j/lAVOQN6F6f5P5jwkMnanPSx/86o0XkFLcZ9EvvzGNb8cYc
- wkmjQM4ISGmSLXk+8Pni11zENIVuAAJRJiYREBH3J375vdZODZACwRyoYe1EW7U5+/oy OQ== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by aserp2120.oracle.com with ESMTP id 303yungrk2-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 02 Apr 2020 22:25:31 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 032M8RlW055048;
-        Thu, 2 Apr 2020 22:25:31 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by aserp3030.oracle.com with ESMTP id 302g4w8wqg-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 02 Apr 2020 22:25:31 +0000
-Received: from abhmp0012.oracle.com (abhmp0012.oracle.com [141.146.116.18])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 032MPSDZ011277;
-        Thu, 2 Apr 2020 22:25:29 GMT
-Received: from localhost.localdomain (/10.159.142.52)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Thu, 02 Apr 2020 15:25:28 -0700
-Subject: Re: [PATCH v6 05/14] KVM: SVM: Add KVM_SEV_RECEIVE_UPDATE_DATA
- command
-To:     Ashish Kalra <Ashish.Kalra@amd.com>, pbonzini@redhat.com
-Cc:     tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
-        joro@8bytes.org, bp@suse.de, thomas.lendacky@amd.com,
-        x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        rientjes@google.com, srutherford@google.com, luto@kernel.org,
-        brijesh.singh@amd.com
-References: <cover.1585548051.git.ashish.kalra@amd.com>
- <871a1e89a4dff59f50d9c264c6d9a4cfd0eab50f.1585548051.git.ashish.kalra@amd.com>
-From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Message-ID: <bd3da2a5-8570-5cb5-56c9-6d78bcc75b5e@oracle.com>
-Date:   Thu, 2 Apr 2020 15:25:27 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+        id S2389777AbgDBW1j (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Apr 2020 18:27:39 -0400
+Received: from Galois.linutronix.de ([193.142.43.55]:39135 "EHLO
+        Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2388218AbgDBW1j (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Apr 2020 18:27:39 -0400
+Received: from p5de0bf0b.dip0.t-ipconnect.de ([93.224.191.11] helo=nanos.tec.linutronix.de)
+        by Galois.linutronix.de with esmtpsa (TLS1.2:DHE_RSA_AES_256_CBC_SHA256:256)
+        (Exim 4.80)
+        (envelope-from <tglx@linutronix.de>)
+        id 1jK8Ig-0004KC-Mz; Fri, 03 Apr 2020 00:27:03 +0200
+Received: by nanos.tec.linutronix.de (Postfix, from userid 1000)
+        id 35C96103A01; Fri,  3 Apr 2020 00:27:02 +0200 (CEST)
+From:   Thomas Gleixner <tglx@linutronix.de>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     x86@kernel.org, "Kenneth R . Crudup" <kenny@panix.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Fenghua Yu <fenghua.yu@intel.com>,
+        Xiaoyao Li <xiaoyao.li@intel.com>,
+        Nadav Amit <namit@vmware.com>,
+        Thomas Hellstrom <thellstrom@vmware.com>,
+        Tony Luck <tony.luck@intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Jessica Yu <jeyu@kernel.org>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 3/3] KVM: VMX: Extend VMX's #AC interceptor to handle split lock #AC in guest
+In-Reply-To: <20200402205109.GM13879@linux.intel.com>
+References: <20200402124205.334622628@linutronix.de> <20200402155554.27705-1-sean.j.christopherson@intel.com> <20200402155554.27705-4-sean.j.christopherson@intel.com> <87sghln6tr.fsf@nanos.tec.linutronix.de> <20200402174023.GI13879@linux.intel.com> <87h7y1mz2s.fsf@nanos.tec.linutronix.de> <20200402205109.GM13879@linux.intel.com>
+Date:   Fri, 03 Apr 2020 00:27:02 +0200
+Message-ID: <87zhbtle15.fsf@nanos.tec.linutronix.de>
 MIME-Version: 1.0
-In-Reply-To: <871a1e89a4dff59f50d9c264c6d9a4cfd0eab50f.1585548051.git.ashish.kalra@amd.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9579 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 bulkscore=0 suspectscore=2
- mlxscore=0 spamscore=0 malwarescore=0 mlxlogscore=999 phishscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
- definitions=main-2004020164
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9579 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 lowpriorityscore=0
- malwarescore=0 adultscore=0 priorityscore=1501 mlxlogscore=999 bulkscore=0
- suspectscore=2 mlxscore=0 spamscore=0 impostorscore=0 clxscore=1015
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
- definitions=main-2004020164
+Content-Type: text/plain
+X-Linutronix-Spam-Score: -1.0
+X-Linutronix-Spam-Level: -
+X-Linutronix-Spam-Status: No , -1.0 points, 5.0 required,  ALL_TRUSTED=-1,SHORTCIRCUIT=-0.0001
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Sean,
 
-On 3/29/20 11:21 PM, Ashish Kalra wrote:
-> From: Brijesh Singh <Brijesh.Singh@amd.com>
+Sean Christopherson <sean.j.christopherson@intel.com> writes:
+> On Thu, Apr 02, 2020 at 10:07:07PM +0200, Thomas Gleixner wrote:
+>> Sean Christopherson <sean.j.christopherson@intel.com> writes:
+>> AFAICT, #AC is not really something which is performance relevant, but I
+>> might obviously be uninformed on that.
+>> 
+>> Assumed it is not, then there is neither a hard requirement nor a real
+>> incentive to give up on intercepting #AC even when future CPUs have a
+>> fix for the above wreckage.
 >
-> The command is used for copying the incoming buffer into the
-> SEV guest memory space.
+> Agreed that there's no hard requirement, but general speaking, the less KVM
+> needs to poke into the guest the better.
+
+Fair enough.
+
+>> > some theoretical unknown #AC source would conditionally result in exits to
+>> > userspace depending on whether or not KVM wanted to intercept #AC for
+>> > other reasons.
+>> 
+>> I'd rather like to know when there is an unknown #AC source instead of
+>> letting the guest silently swallow it.
 >
-> Cc: Thomas Gleixner <tglx@linutronix.de>
-> Cc: Ingo Molnar <mingo@redhat.com>
-> Cc: "H. Peter Anvin" <hpa@zytor.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: "Radim Krčmář" <rkrcmar@redhat.com>
-> Cc: Joerg Roedel <joro@8bytes.org>
-> Cc: Borislav Petkov <bp@suse.de>
-> Cc: Tom Lendacky <thomas.lendacky@amd.com>
-> Cc: x86@kernel.org
-> Cc: kvm@vger.kernel.org
-> Cc: linux-kernel@vger.kernel.org
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
-> ---
->   .../virt/kvm/amd-memory-encryption.rst        | 24 ++++++
->   arch/x86/kvm/svm.c                            | 79 +++++++++++++++++++
->   include/uapi/linux/kvm.h                      |  9 +++
->   3 files changed, 112 insertions(+)
->
-> diff --git a/Documentation/virt/kvm/amd-memory-encryption.rst b/Documentation/virt/kvm/amd-memory-encryption.rst
-> index ef1f1f3a5b40..554aa33a99cc 100644
-> --- a/Documentation/virt/kvm/amd-memory-encryption.rst
-> +++ b/Documentation/virt/kvm/amd-memory-encryption.rst
-> @@ -351,6 +351,30 @@ On success, the 'handle' field contains a new handle and on error, a negative va
->   
->   For more details, see SEV spec Section 6.12.
->   
-> +14. KVM_SEV_RECEIVE_UPDATE_DATA
-> +----------------------------
-> +
-> +The KVM_SEV_RECEIVE_UPDATE_DATA command can be used by the hypervisor to copy
-> +the incoming buffers into the guest memory region with encryption context
-> +created during the KVM_SEV_RECEIVE_START.
-> +
-> +Parameters (in): struct kvm_sev_receive_update_data
-> +
-> +Returns: 0 on success, -negative on error
-> +
-> +::
-> +
-> +        struct kvm_sev_launch_receive_update_data {
-> +                __u64 hdr_uaddr;        /* userspace address containing the packet header */
-> +                __u32 hdr_len;
-> +
-> +                __u64 guest_uaddr;      /* the destination guest memory region */
-> +                __u32 guest_len;
-> +
-> +                __u64 trans_uaddr;      /* the incoming buffer memory region  */
-> +                __u32 trans_len;
-> +        };
-> +
->   References
->   ==========
->   
-> diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
-> index 038b47685733..5fc5355536d7 100644
-> --- a/arch/x86/kvm/svm.c
-> +++ b/arch/x86/kvm/svm.c
-> @@ -7497,6 +7497,82 @@ static int sev_receive_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
->   	return ret;
->   }
->   
-> +static int sev_receive_update_data(struct kvm *kvm, struct kvm_sev_cmd *argp)
-> +{
-> +	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
-> +	struct kvm_sev_receive_update_data params;
-> +	struct sev_data_receive_update_data *data;
-> +	void *hdr = NULL, *trans = NULL;
-> +	struct page **guest_page;
-> +	unsigned long n;
-> +	int ret, offset;
-> +
-> +	if (!sev_guest(kvm))
-> +		return -EINVAL;
-> +
-> +	if (copy_from_user(&params, (void __user *)(uintptr_t)argp->data,
-> +			sizeof(struct kvm_sev_receive_update_data)))
-> +		return -EFAULT;
-> +
-> +	if (!params.hdr_uaddr || !params.hdr_len ||
-> +	    !params.guest_uaddr || !params.guest_len ||
-> +	    !params.trans_uaddr || !params.trans_len)
-> +		return -EINVAL;
-> +
-> +	/* Check if we are crossing the page boundary */
-> +	offset = params.guest_uaddr & (PAGE_SIZE - 1);
-> +	if ((params.guest_len + offset > PAGE_SIZE))
-> +		return -EINVAL;
-> +
-> +	hdr = psp_copy_user_blob(params.hdr_uaddr, params.hdr_len);
-> +	if (IS_ERR(hdr))
-> +		return PTR_ERR(hdr);
-> +
-> +	trans = psp_copy_user_blob(params.trans_uaddr, params.trans_len);
-> +	if (IS_ERR(trans)) {
-> +		ret = PTR_ERR(trans);
-> +		goto e_free_hdr;
-> +	}
-> +
-> +	ret = -ENOMEM;
-> +	data = kzalloc(sizeof(*data), GFP_KERNEL);
-> +	if (!data)
-> +		goto e_free_trans;
-> +
-> +	data->hdr_address = __psp_pa(hdr);
-> +	data->hdr_len = params.hdr_len;
-> +	data->trans_address = __psp_pa(trans);
-> +	data->trans_len = params.trans_len;
-> +
-> +	/* Pin guest memory */
-> +	ret = -EFAULT;
-> +	guest_page = sev_pin_memory(kvm, params.guest_uaddr & PAGE_MASK,
-> +				    PAGE_SIZE, &n, 0);
-> +	if (!guest_page)
-> +		goto e_free;
-> +
-> +	/* The RECEIVE_UPDATE_DATA command requires C-bit to be always set. */
-> +	data->guest_address = (page_to_pfn(guest_page[0]) << PAGE_SHIFT) +
-> +				offset;
-> +	data->guest_address |= sev_me_mask;
-> +	data->guest_len = params.guest_len;
-> +	data->handle = sev->handle;
-> +
-> +	ret = sev_issue_cmd(kvm, SEV_CMD_RECEIVE_UPDATE_DATA, data,
-> +				&argp->error);
-> +
-> +	sev_unpin_memory(kvm, guest_page, n);
-> +
-> +e_free:
-> +	kfree(data);
-> +e_free_trans:
-> +	kfree(trans);
-> +e_free_hdr:
-> +	kfree(hdr);
-> +
-> +	return ret;
-> +}
-> +
->   static int svm_mem_enc_op(struct kvm *kvm, void __user *argp)
->   {
->   	struct kvm_sev_cmd sev_cmd;
-> @@ -7553,6 +7629,9 @@ static int svm_mem_enc_op(struct kvm *kvm, void __user *argp)
->   	case KVM_SEV_RECEIVE_START:
->   		r = sev_receive_start(kvm, &sev_cmd);
->   		break;
-> +	case KVM_SEV_RECEIVE_UPDATE_DATA:
-> +		r = sev_receive_update_data(kvm, &sev_cmd);
-> +		break;
->   	default:
->   		r = -EINVAL;
->   		goto out;
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index 74764b9db5fa..4e80c57a3182 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -1588,6 +1588,15 @@ struct kvm_sev_receive_start {
->   	__u32 session_len;
->   };
->   
-> +struct kvm_sev_receive_update_data {
-> +	__u64 hdr_uaddr;
-> +	__u32 hdr_len;
-> +	__u64 guest_uaddr;
-> +	__u32 guest_len;
-> +	__u64 trans_uaddr;
-> +	__u32 trans_len;
-> +};
-> +
->   #define KVM_DEV_ASSIGN_ENABLE_IOMMU	(1 << 0)
->   #define KVM_DEV_ASSIGN_PCI_2_3		(1 << 1)
->   #define KVM_DEV_ASSIGN_MASK_INTX	(1 << 2)
-Reviewed-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
+> Trying to prevent the guest from squashing a spurious fault is a fools
+> errand.   For example, with nested virtualization, the correct behavior
+> from an architectural perspective is to forward exceptions from L2 (the
+> nested VM) to L1 (the direct VM) that L1 wants to intercept.  E.g. if L1
+> wants to intercept #AC faults that happen in L2, then KVM reflects all #AC
+> faults into L1 as VM-Exits without ever reaching this code.
+
+Which means L1 should have some handling for that case at least those L1
+hypervisors which we can fix. If we want to go there.
+
+> Anyways, this particular case isn't a sticking point, i.e. I'd be ok with
+> exiting to userspace on a spurious #AC, I just don't see the value in doing
+> so.  Returning KVM_EXIT_EXCEPTION doesn't necessarily equate to throwing up
+> a red flag, e.g. from a kernel perspective you'd still be relying on the
+> userspace VMM to report the error in a sane manner.  I think at one point
+> Xiaoyao had a WARN_ON for a spurious #AC, but it was removed because the
+> odds of a false positive due to some funky corner case seemed higher than
+> detecting a CPU bug.
+
+Agreed. Relying on the user space side to crash and burn the guest is
+probably wishful thinking. So the right thing might be to just kill it
+right at the spot.
+
+But coming back to the above discussion:
+
+    if (!cpu_has(SLD) || guest_wants_regular_ac()) {
+    	kvm_queue_exception_e();
+        return 1;
+    }
+
+vs.
+
+    if (guest_wants_regular_ac()) {
+    	kvm_queue_exception_e();
+        return 1;
+    }
+
+The only situation where this makes a difference is when the CPU does
+not support SLD. If it does the thing became ambiguous today.
+
+With my previous attempt to bring sanity into this by not setting the
+feature flag when SLD is disabled at the command line, the check is
+consistent.
+
+But the detection of unaware hypervisors with the module scan brings us
+into a situation where we have sld_state == sld_off and the feature flag
+being set because we can't undo it anymore.
+
+So now you load VMWare which disables SLD, but the feature bit stays and
+then when you unload it and load VMX afterwards then you have exactly
+the same situation as with the feature check removed. Consistency gone.
+
+So with that we might want to go back to the sld_state check instead of
+the cpu feature check, but that does not make it more consistent:
+
+  As I just verified, it's possible to load the vmware module parallel
+  to the KVM/VMX one.
+
+So either we deal with it in some way or just decide that SLD and HV
+modules which do not have the MOD_INFO(sld_safe) magic cannot be loaded
+when SLD is enabled on the host. I'm fine with the latter :)
+
+What a mess.
+
+Thanks,
+
+        tglx
+
