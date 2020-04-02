@@ -2,162 +2,199 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 701FC19C55E
-	for <lists+kvm@lfdr.de>; Thu,  2 Apr 2020 17:03:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1925C19C598
+	for <lists+kvm@lfdr.de>; Thu,  2 Apr 2020 17:13:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389123AbgDBPDf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Apr 2020 11:03:35 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:21727 "EHLO
+        id S2389041AbgDBPNB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Apr 2020 11:13:01 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:24059 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S2388744AbgDBPDf (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 2 Apr 2020 11:03:35 -0400
+        by vger.kernel.org with ESMTP id S2388986AbgDBPNB (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 2 Apr 2020 11:13:01 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1585839813;
+        s=mimecast20190719; t=1585840379;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=3tCmUjElbtI+7rfW6lXDpkb9aCERk0wwpDFHP5OJmcc=;
-        b=gYQEIa/EymM18jMv+1QBauQ9wzy6tH3JLk2V5fdfM6mrNwvteya5MN2SWgLK0Pi0y26nMR
-        5G78ezGtJrnthvtfHuhmfaisMWv+/GRMNRi4yv/qXYJC0zmZtBe3RfLlSCLWRECrMzPcfE
-        kQ5+McqiMJ/oCZZQ+WWg/jm5gIHTsvs=
+         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+        bh=3mIm1lsiPXpE8lXMtW+VGBpwvyv8SqvjQPLCeq8qBi0=;
+        b=eD9DFsLWgbxpsnkgpKaQThgxxmGw76fmkQcLWy4JVILDOXhxlJgdxsQiql34/LyaR+NxYp
+        G1lcFXpE8SJ/TzFd4fkh9ip888t6MD+FIZb4MW2+jvcpcFmZsWJI5EEBqF9/2NpOFmj2az
+        DKieahPQd5YDpciPl4+qKpUP5XYWKjQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-304---bL9U9BOdyglyAS_KSfLw-1; Thu, 02 Apr 2020 11:03:32 -0400
-X-MC-Unique: --bL9U9BOdyglyAS_KSfLw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+ us-mta-46-d9-ei4-pNXaaWk2fA04g3w-1; Thu, 02 Apr 2020 11:12:55 -0400
+X-MC-Unique: d9-ei4-pNXaaWk2fA04g3w-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0E28D8017F4;
-        Thu,  2 Apr 2020 15:03:31 +0000 (UTC)
-Received: from gondolin (ovpn-113-176.ams2.redhat.com [10.36.113.176])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 33993DA118;
-        Thu,  2 Apr 2020 15:03:27 +0000 (UTC)
-Date:   Thu, 2 Apr 2020 17:03:24 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Christian Borntraeger <borntraeger@de.ibm.com>
-Cc:     Janosch Frank <frankja@linux.ibm.com>,
-        Thomas Huth <thuth@redhat.com>,
-        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B8A9780256D;
+        Thu,  2 Apr 2020 15:12:54 +0000 (UTC)
+Received: from [10.36.114.29] (ovpn-114-29.ams2.redhat.com [10.36.114.29])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 822E65C1B0;
+        Thu,  2 Apr 2020 15:12:53 +0000 (UTC)
 Subject: Re: [kvm-unit-tests v2] s390x/smp: add minimal test for sigp sense
  running status
-Message-ID: <20200402170324.75a2e276.cohuck@redhat.com>
-In-Reply-To: <c76d018e-9a70-06c0-a1be-aa6c4a76d27a@de.ibm.com>
+To:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        Thomas Huth <thuth@redhat.com>,
+        Janosch Frank <frankja@linux.ibm.com>
+Cc:     Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org
 References: <20200402110250.63677-1-borntraeger@de.ibm.com>
-        <b1766baa-ca91-b1b4-c9e4-653ae4257cea@linux.ibm.com>
-        <7ad39b82-171c-5ffa-a10c-1dd04358f6c2@de.ibm.com>
-        <c252805d-a396-bebe-a4c1-77521adf598f@linux.ibm.com>
-        <c76d018e-9a70-06c0-a1be-aa6c4a76d27a@de.ibm.com>
+From:   David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
 Organization: Red Hat GmbH
+Message-ID: <0dc0189b-660b-c4ec-341a-27638cc64f04@redhat.com>
+Date:   Thu, 2 Apr 2020 17:12:52 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <20200402110250.63677-1-borntraeger@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 2 Apr 2020 16:47:44 +0200
-Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+On 02.04.20 13:02, Christian Borntraeger wrote:
+> make sure that sigp sense running status returns a sane value for
+> stopped CPUs. To avoid potential races with the stop being processed we
+> wait until sense running status is first 0.
+>=20
+> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> ---
+>  lib/s390x/smp.c |  2 +-
+>  lib/s390x/smp.h |  2 +-
+>  s390x/smp.c     | 13 +++++++++++++
+>  3 files changed, 15 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/lib/s390x/smp.c b/lib/s390x/smp.c
+> index 5ed8b7b..492cb05 100644
+> --- a/lib/s390x/smp.c
+> +++ b/lib/s390x/smp.c
+> @@ -58,7 +58,7 @@ bool smp_cpu_stopped(uint16_t addr)
+>  	return !!(status & (SIGP_STATUS_CHECK_STOP|SIGP_STATUS_STOPPED));
+>  }
+> =20
+> -bool smp_cpu_running(uint16_t addr)
+> +bool smp_sense_running_status(uint16_t addr)
+>  {
+>  	if (sigp(addr, SIGP_SENSE_RUNNING, 0, NULL) !=3D SIGP_CC_STATUS_STORE=
+D)
+>  		return true;
+> diff --git a/lib/s390x/smp.h b/lib/s390x/smp.h
+> index a8b98c0..639ec92 100644
+> --- a/lib/s390x/smp.h
+> +++ b/lib/s390x/smp.h
+> @@ -40,7 +40,7 @@ struct cpu_status {
+>  int smp_query_num_cpus(void);
+>  struct cpu *smp_cpu_from_addr(uint16_t addr);
+>  bool smp_cpu_stopped(uint16_t addr);
+> -bool smp_cpu_running(uint16_t addr);
+> +bool smp_sense_running_status(uint16_t addr);
+>  int smp_cpu_restart(uint16_t addr);
+>  int smp_cpu_start(uint16_t addr, struct psw psw);
+>  int smp_cpu_stop(uint16_t addr);
+> diff --git a/s390x/smp.c b/s390x/smp.c
+> index 79cdc1f..b4b1ff2 100644
+> --- a/s390x/smp.c
+> +++ b/s390x/smp.c
+> @@ -210,6 +210,18 @@ static void test_emcall(void)
+>  	report_prefix_pop();
+>  }
+> =20
+> +static void test_sense_running(void)
+> +{
+> +	report_prefix_push("sense_running");
+> +	/* make sure CPU is stopped */
+> +	smp_cpu_stop(1);
+> +	/* wait for stop to succeed. */
+> +	while(smp_sense_running_status(1));
+> +	report(!smp_sense_running_status(1), "CPU1 sense claims not running")=
+;
+> +	report_prefix_pop();
+> +}
+> +
+> +
+>  /* Used to dirty registers of cpu #1 before it is reset */
+>  static void test_func_initial(void)
+>  {
+> @@ -319,6 +331,7 @@ int main(void)
+>  	test_store_status();
+>  	test_ecall();
+>  	test_emcall();
+> +	test_sense_running();
+>  	test_reset();
+>  	test_reset_initial();
+>  	smp_cpu_destroy(1);
+>=20
 
-> On 02.04.20 15:41, Janosch Frank wrote:
-> > On 4/2/20 2:29 PM, Christian Borntraeger wrote:  
-> >>
-> >>
-> >> On 02.04.20 14:18, Janosch Frank wrote:  
-> >>> On 4/2/20 1:02 PM, Christian Borntraeger wrote:  
-> >>>> make sure that sigp sense running status returns a sane value for  
-> >>>
-> >>> s/m/M/
-> >>>  
-> >>>> stopped CPUs. To avoid potential races with the stop being processed we
-> >>>> wait until sense running status is first 0.  
-> >>>
-> >>> ENOPARSE "...is first 0?"  
-> >>
-> >> Yes,  what about "....smp_sense_running_status returns false." ?  
-> > 
-> > sure, or "returns 0"
-> > "is first 0" just doesn't parse :)
-> >   
-> >>  
-> >>>  
-> >>>>
-> >>>> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> >>>> ---
-> >>>>  lib/s390x/smp.c |  2 +-
-> >>>>  lib/s390x/smp.h |  2 +-
-> >>>>  s390x/smp.c     | 13 +++++++++++++
-> >>>>  3 files changed, 15 insertions(+), 2 deletions(-)
-> >>>>
-> >>>> diff --git a/lib/s390x/smp.c b/lib/s390x/smp.c
-> >>>> index 5ed8b7b..492cb05 100644
-> >>>> --- a/lib/s390x/smp.c
-> >>>> +++ b/lib/s390x/smp.c
-> >>>> @@ -58,7 +58,7 @@ bool smp_cpu_stopped(uint16_t addr)
-> >>>>  	return !!(status & (SIGP_STATUS_CHECK_STOP|SIGP_STATUS_STOPPED));
-> >>>>  }
-> >>>>  
-> >>>> -bool smp_cpu_running(uint16_t addr)
-> >>>> +bool smp_sense_running_status(uint16_t addr)
-> >>>>  {
-> >>>>  	if (sigp(addr, SIGP_SENSE_RUNNING, 0, NULL) != SIGP_CC_STATUS_STORED)
-> >>>>  		return true;
-> >>>> diff --git a/lib/s390x/smp.h b/lib/s390x/smp.h
-> >>>> index a8b98c0..639ec92 100644
-> >>>> --- a/lib/s390x/smp.h
-> >>>> +++ b/lib/s390x/smp.h
-> >>>> @@ -40,7 +40,7 @@ struct cpu_status {
-> >>>>  int smp_query_num_cpus(void);
-> >>>>  struct cpu *smp_cpu_from_addr(uint16_t addr);
-> >>>>  bool smp_cpu_stopped(uint16_t addr);
-> >>>> -bool smp_cpu_running(uint16_t addr);
-> >>>> +bool smp_sense_running_status(uint16_t addr);  
-> >>>
-> >>> That's completely unrelated to the test  
-> >>
-> >> Right but this name seems to better reflect what the function does. Because this is not
-> >> the oppositite of cpu_stopped.  
-> > 
-> > I'm pondering if we want to split that out.  
-> 
-> A single patch for just 2 lines? I dont know.
+TBH, I am still not sure if this is completely free of races.
 
-I vote for keeping it in the patch and simply mentioning it in the
-commit message.
+Assume CPU 1 is in handle_stop()
 
-> >   
-> >>>  
-> >>>>  int smp_cpu_restart(uint16_t addr);
-> >>>>  int smp_cpu_start(uint16_t addr, struct psw psw);
-> >>>>  int smp_cpu_stop(uint16_t addr);
-> >>>> diff --git a/s390x/smp.c b/s390x/smp.c
-> >>>> index 79cdc1f..b4b1ff2 100644
-> >>>> --- a/s390x/smp.c
-> >>>> +++ b/s390x/smp.c
-> >>>> @@ -210,6 +210,18 @@ static void test_emcall(void)
-> >>>>  	report_prefix_pop();
-> >>>>  }
-> >>>>  
-> >>>> +static void test_sense_running(void)
-> >>>> +{
-> >>>> +	report_prefix_push("sense_running");
-> >>>> +	/* make sure CPU is stopped */
-> >>>> +	smp_cpu_stop(1);
-> >>>> +	/* wait for stop to succeed. */
-> >>>> +	while(smp_sense_running_status(1));
-> >>>> +	report(!smp_sense_running_status(1), "CPU1 sense claims not running");  
-> >>>
-> >>> That's basically true anyway after the loop, no?  
-> >>
-> >> Yes, but  you get no "positive" message in the more verbose output variants
-> >> without a report statement.  
-> > 
-> > report(true, "CPU1 sense claims not running");
-> > That's also possible, but I leave that up to you.  
-> 
-> I do not care, both variants are fine. Whatever you or David prefer. 
+if (!kvm_s390_user_cpu_state_ctrl(vcpu->kvm))
+	kvm_s390_vcpu_stop(vcpu);
+// CPU 1: gets scheduled out.
+// CPU 0: while(smp_sense_running_status(1)); finishes
+// CPU 1: gets scheduled in to return to user space
+return -EOPNOTSUPP;
+// CPU 0: report(!smp_sense_running_status(1), "CPU1 sense claims not
+running"); fails
 
-I'd keep the 'check' for !smp_sense_running_status(1) and add a comment.
+SIGP SENSE RUNNING is simply racy as hell and doesn't give you any
+guarantees. Which is good enough for some performance improvements
+(e.g., spinlocks).
+
+Now, I can queue this, but I wouldn't be surprised if we see random
+failures at one point.
+
+--=20
+Thanks,
+
+David / dhildenb
 
