@@ -2,95 +2,166 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id CE98A19C894
-	for <lists+kvm@lfdr.de>; Thu,  2 Apr 2020 20:13:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4C72519C8A0
+	for <lists+kvm@lfdr.de>; Thu,  2 Apr 2020 20:17:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388164AbgDBSNI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Apr 2020 14:13:08 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:43800 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727412AbgDBSNH (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 2 Apr 2020 14:13:07 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1585851187;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=/w1XPcFrLz6tQEiDvBsmFImZ8MWG7D8gxR/TGmyIOfc=;
-        b=HDUU6nkNeP45JJLvxLi2tB8y8UbK2rIC63TCQpQeLIBJQOHBm90TI6tH75km1OXqLcZcqc
-        Ko3B4kVfZidQmZ179RtEWuoBRgPkCHcy4JjTbt7KzQ2QlHeJno7e/x78qhy8T1caw6z8wW
-        Pgg72O9jW7ExFtavNZcs5evsMSG32yI=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-151-EMLM6qtHMdmsOWIyCJX6Yw-1; Thu, 02 Apr 2020 14:13:03 -0400
-X-MC-Unique: EMLM6qtHMdmsOWIyCJX6Yw-1
-Received: by mail-wr1-f70.google.com with SMTP id w12so1807656wrl.23
-        for <kvm@vger.kernel.org>; Thu, 02 Apr 2020 11:13:03 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=/w1XPcFrLz6tQEiDvBsmFImZ8MWG7D8gxR/TGmyIOfc=;
-        b=FJrhd2lDftGZXqCXu7aCe3nQiiaC82F7gtlLrngBmwB7FCjIESbCkKP78/c8EgSCWT
-         xP4eVXhnk1yYNJsvmwu1zYgDJfYDTcxusWj+5xZ+5ACrmMSaKHaLOLkpBziTG6yBtpw2
-         yzd2zZuCPei/wjznL1zNDCzG9BxcnJYyK2ACMQDAAJUb13z2xOl0+YgfyMf0F6kCQTrf
-         ztsMspfi+cd+jwzLyQxTfEjRBxSBOJEkTIECoFLBU3MJ2EVE0HnsJKC5MhciSJtwgtnp
-         Feo7Uf6zqrN+VDpDulM0SYf1nxf0iFPkN6OZecWSwCwWl7RADWiqtWv/bWzquSDxA0gn
-         uKRg==
-X-Gm-Message-State: AGi0PuYsGNu9yCOBfE0IMG97Vz2fEQC+0B03IT9aQW5joaywaAhOvnCz
-        Qeg3p7nwdEzEycurppM2dC0ynW7kn6ys5sBnByORH0Go8/SwuuDFCIeNXPlMfZcqu8UEKa4TTCv
-        WEzJCKg0wiA8R
-X-Received: by 2002:adf:82a6:: with SMTP id 35mr4724819wrc.307.1585851182461;
-        Thu, 02 Apr 2020 11:13:02 -0700 (PDT)
-X-Google-Smtp-Source: APiQypIXdqRzArUH2ZsL1EUSB0H8v1U9gywPCW/4wSXhaIAX48AOcIA+658s2GAe64Wr/fSqOsWFWA==
-X-Received: by 2002:adf:82a6:: with SMTP id 35mr4724805wrc.307.1585851182296;
-        Thu, 02 Apr 2020 11:13:02 -0700 (PDT)
-Received: from xz-x1 (CPEf81d0fb19163-CMf81d0fb19160.cpe.net.fido.ca. [72.137.123.47])
-        by smtp.gmail.com with ESMTPSA id h26sm7882608wmb.19.2020.04.02.11.12.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Apr 2020 11:13:01 -0700 (PDT)
-Date:   Thu, 2 Apr 2020 14:12:55 -0400
-From:   Peter Xu <peterx@redhat.com>
-To:     Liu Yi L <yi.l.liu@intel.com>
-Cc:     qemu-devel@nongnu.org, alex.williamson@redhat.com,
-        eric.auger@redhat.com, pbonzini@redhat.com, mst@redhat.com,
-        david@gibson.dropbear.id.au, kevin.tian@intel.com,
-        jun.j.tian@intel.com, yi.y.sun@intel.com, kvm@vger.kernel.org,
-        hao.wu@intel.com, jean-philippe@linaro.org
-Subject: Re: [PATCH v2 00/22] intel_iommu: expose Shared Virtual Addressing
- to VMs
-Message-ID: <20200402181255.GE103677@xz-x1>
-References: <1585542301-84087-1-git-send-email-yi.l.liu@intel.com>
+        id S2388381AbgDBSRi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Apr 2020 14:17:38 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:60468 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727412AbgDBSRi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Apr 2020 14:17:38 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 032I9cZD150233;
+        Thu, 2 Apr 2020 18:17:16 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : references : mime-version : content-type :
+ content-transfer-encoding : in-reply-to; s=corp-2020-01-29;
+ bh=qWI5T/N7iP2w4FARfmbmB5Xd+vJTWKb7aE+P85B2lzk=;
+ b=S6mH9uUICCcIkTsz52Ldr2OvROziVylaQhyM3AzENR09IOZ4pmGrX1PCl0ZMsKL+eUrI
+ UqPYZ9FFiVvHbWW8vi/UwRUYOc8Yov1EZxpyFx1oqnYtRUHzt8hOvGWX0UJMg27gz5M6
+ To3vbMhttsY2uIx6IA797QhRuVxaP9DR1E7bkXhFV0h3Drv6XTIx3hp5HOW9YBeeLNea
+ OKNCg7gE4BNpyeXtauupY98ZZCudBopcbjUTmpHk9EcXCri7x37YWB0qo+QNbGSOS4EX
+ PBOebfp0RtrpBkqar03d1bNlKmeffds4eB+rY+UbSe5+ECOXaigxEumbp3yRtKQ1e4x8 UA== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by aserp2120.oracle.com with ESMTP id 303yunfpc2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 02 Apr 2020 18:17:16 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 032ID8SM017175;
+        Thu, 2 Apr 2020 18:17:16 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by aserp3020.oracle.com with ESMTP id 304sjq6eb4-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 02 Apr 2020 18:17:15 +0000
+Received: from abhmp0005.oracle.com (abhmp0005.oracle.com [141.146.116.11])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 032IHEb9013046;
+        Thu, 2 Apr 2020 18:17:15 GMT
+Received: from vbusired-dt (/10.154.166.66)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Thu, 02 Apr 2020 11:17:14 -0700
+Date:   Thu, 2 Apr 2020 13:17:10 -0500
+From:   Venu Busireddy <venu.busireddy@oracle.com>
+To:     Ashish Kalra <Ashish.Kalra@amd.com>
+Cc:     pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com,
+        hpa@zytor.com, joro@8bytes.org, bp@suse.de,
+        thomas.lendacky@amd.com, x86@kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, rientjes@google.com,
+        srutherford@google.com, luto@kernel.org, brijesh.singh@amd.com
+Subject: Re: [PATCH v6 03/14] KVM: SVM: Add KVM_SEV_SEND_FINISH command
+Message-ID: <20200402181710.GA655710@vbusired-dt>
+References: <cover.1585548051.git.ashish.kalra@amd.com>
+ <798316bc964cef34d2760a87de0fb6dc4e5d9af3.1585548051.git.ashish.kalra@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <1585542301-84087-1-git-send-email-yi.l.liu@intel.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <798316bc964cef34d2760a87de0fb6dc4e5d9af3.1585548051.git.ashish.kalra@amd.com>
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9579 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 adultscore=0 mlxscore=0
+ malwarescore=0 phishscore=0 suspectscore=1 mlxlogscore=999 spamscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
+ definitions=main-2004020140
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9579 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 lowpriorityscore=0
+ malwarescore=0 adultscore=0 priorityscore=1501 mlxlogscore=999 bulkscore=0
+ suspectscore=1 mlxscore=0 spamscore=0 impostorscore=0 clxscore=1015
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
+ definitions=main-2004020139
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Mar 29, 2020 at 09:24:39PM -0700, Liu Yi L wrote:
-> Tests: basci vSVA functionality test,
+On 2020-03-30 06:20:49 +0000, Ashish Kalra wrote:
+> From: Brijesh Singh <Brijesh.Singh@amd.com>
+> 
+> The command is used to finailize the encryption context created with
+> KVM_SEV_SEND_START command.
+> 
+> Cc: Thomas Gleixner <tglx@linutronix.de>
+> Cc: Ingo Molnar <mingo@redhat.com>
+> Cc: "H. Peter Anvin" <hpa@zytor.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: "Radim Krčmář" <rkrcmar@redhat.com>
+> Cc: Joerg Roedel <joro@8bytes.org>
+> Cc: Borislav Petkov <bp@suse.de>
+> Cc: Tom Lendacky <thomas.lendacky@amd.com>
+> Cc: x86@kernel.org
+> Cc: kvm@vger.kernel.org
+> Cc: linux-kernel@vger.kernel.org
+> Reviewed-by: Steve Rutherford <srutherford@google.com>
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+> ---
+>  .../virt/kvm/amd-memory-encryption.rst        |  8 +++++++
+>  arch/x86/kvm/svm.c                            | 23 +++++++++++++++++++
+>  2 files changed, 31 insertions(+)
+> 
+> diff --git a/Documentation/virt/kvm/amd-memory-encryption.rst b/Documentation/virt/kvm/amd-memory-encryption.rst
+> index f46817ef7019..a45dcb5f8687 100644
+> --- a/Documentation/virt/kvm/amd-memory-encryption.rst
+> +++ b/Documentation/virt/kvm/amd-memory-encryption.rst
+> @@ -314,6 +314,14 @@ Returns: 0 on success, -negative on error
+>                  __u32 trans_len;
+>          };
+>  
+> +12. KVM_SEV_SEND_FINISH
+> +------------------------
+> +
+> +After completion of the migration flow, the KVM_SEV_SEND_FINISH command can be
+> +issued by the hypervisor to delete the encryption context.
+> +
+> +Returns: 0 on success, -negative on error
 
-Could you elaborate what's the functionality test?  Does that contains
-at least some IOs go through the SVA-capable device so the nested page
-table is used?  I thought it was a yes, but after I notice that the
-BIND message flags seems to be wrong, I really think I should ask this
-loud..
+Didn't notice this earlier. I would suggest changing all occurrences of
+"-negative" to either "negative" or "less than 0" in this file.
 
-> VM reboot/shutdown/crash,
-
-What's the VM crash test?
-
-> kernel build in
-> guest, boot VM with vSVA disabled, full comapilation with all archs.
-
-I believe I've said similar things, but...  I'd appreciate if you can
-also smoke on 2nd-level only with the series applied.
-
-Thanks,
-
--- 
-Peter Xu
-
+> +
+>  References
+>  ==========
+>  
+> diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
+> index 8561c47cc4f9..71a4cb3b817d 100644
+> --- a/arch/x86/kvm/svm.c
+> +++ b/arch/x86/kvm/svm.c
+> @@ -7399,6 +7399,26 @@ static int sev_send_update_data(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>  	return ret;
+>  }
+>  
+> +static int sev_send_finish(struct kvm *kvm, struct kvm_sev_cmd *argp)
+> +{
+> +	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+> +	struct sev_data_send_finish *data;
+> +	int ret;
+> +
+> +	if (!sev_guest(kvm))
+> +		return -ENOTTY;
+> +
+> +	data = kzalloc(sizeof(*data), GFP_KERNEL);
+> +	if (!data)
+> +		return -ENOMEM;
+> +
+> +	data->handle = sev->handle;
+> +	ret = sev_issue_cmd(kvm, SEV_CMD_SEND_FINISH, data, &argp->error);
+> +
+> +	kfree(data);
+> +	return ret;
+> +}
+> +
+>  static int svm_mem_enc_op(struct kvm *kvm, void __user *argp)
+>  {
+>  	struct kvm_sev_cmd sev_cmd;
+> @@ -7449,6 +7469,9 @@ static int svm_mem_enc_op(struct kvm *kvm, void __user *argp)
+>  	case KVM_SEV_SEND_UPDATE_DATA:
+>  		r = sev_send_update_data(kvm, &sev_cmd);
+>  		break;
+> +	case KVM_SEV_SEND_FINISH:
+> +		r = sev_send_finish(kvm, &sev_cmd);
+> +		break;
+>  	default:
+>  		r = -EINVAL;
+>  		goto out;
+> -- 
+> 2.17.1
+> 
