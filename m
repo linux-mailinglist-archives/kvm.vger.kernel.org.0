@@ -2,101 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 73C4719BE40
-	for <lists+kvm@lfdr.de>; Thu,  2 Apr 2020 10:57:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 23F5119BE47
+	for <lists+kvm@lfdr.de>; Thu,  2 Apr 2020 10:59:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387841AbgDBI5N (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Apr 2020 04:57:13 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:64104 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2387749AbgDBI5M (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 2 Apr 2020 04:57:12 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0328YVwq113638
-        for <kvm@vger.kernel.org>; Thu, 2 Apr 2020 04:57:12 -0400
-Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 301yfhp9rn-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Thu, 02 Apr 2020 04:57:12 -0400
-Received: from localhost
-        by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <raspl@linux.ibm.com>;
-        Thu, 2 Apr 2020 09:56:54 +0100
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
-        by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Thu, 2 Apr 2020 09:56:52 +0100
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0328v7ED56164566
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 2 Apr 2020 08:57:07 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0F87EA404D;
-        Thu,  2 Apr 2020 08:57:07 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D97E6A4055;
-        Thu,  2 Apr 2020 08:57:06 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu,  2 Apr 2020 08:57:06 +0000 (GMT)
-From:   Stefan Raspl <raspl@linux.ibm.com>
-To:     kvm@vger.kernel.org
-Cc:     pbonzini@redhat.com
-Subject: [PATCH v2 3/3] tools/kvm_stat: add sample systemd unit file
-Date:   Thu,  2 Apr 2020 10:57:05 +0200
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200402085705.61155-1-raspl@linux.ibm.com>
-References: <20200402085705.61155-1-raspl@linux.ibm.com>
-X-TM-AS-GCONF: 00
-x-cbid: 20040208-4275-0000-0000-000003B817EF
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20040208-4276-0000-0000-000038CD6D2A
-Message-Id: <20200402085705.61155-4-raspl@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.676
- definitions=2020-04-02_01:2020-03-31,2020-04-02 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- suspectscore=1 impostorscore=0 mlxscore=0 phishscore=0 clxscore=1015
- bulkscore=0 malwarescore=0 spamscore=0 mlxlogscore=999 adultscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2004020073
+        id S2387829AbgDBI7K (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Apr 2020 04:59:10 -0400
+Received: from foss.arm.com ([217.140.110.172]:40086 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2387749AbgDBI7K (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Apr 2020 04:59:10 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E376A31B;
+        Thu,  2 Apr 2020 01:59:09 -0700 (PDT)
+Received: from [192.168.3.111] (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id F01EA3F68F;
+        Thu,  2 Apr 2020 01:59:08 -0700 (PDT)
+Subject: Re: [PATCH v3 kvmtool 26/32] vesa: Create device exactly once
+To:     Alexandru Elisei <alexandru.elisei@arm.com>, kvm@vger.kernel.org
+Cc:     will@kernel.org, julien.thierry.kdev@gmail.com,
+        sami.mujawar@arm.com, lorenzo.pieralisi@arm.com
+References: <20200326152438.6218-1-alexandru.elisei@arm.com>
+ <20200326152438.6218-27-alexandru.elisei@arm.com>
+From:   =?UTF-8?Q?Andr=c3=a9_Przywara?= <andre.przywara@arm.com>
+Organization: ARM Ltd.
+Message-ID: <f80227c9-a57c-952f-f362-58d15e19690e@arm.com>
+Date:   Thu, 2 Apr 2020 09:58:35 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
+MIME-Version: 1.0
+In-Reply-To: <20200326152438.6218-27-alexandru.elisei@arm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Stefan Raspl <raspl@de.ibm.com>
+On 26/03/2020 15:24, Alexandru Elisei wrote:
+> A vesa device is used by the SDL, GTK or VNC framebuffers. Don't allow the
+> user to specify more than one of these options because kvmtool will create
+> identical devices and bad things will happen:
+> 
+> $ ./lkvm run -c2 -m2048 -k bzImage --sdl --gtk
+>   # lkvm run -k bzImage -m 2048 -c 2 --name guest-10159
+>   Error: device region [d0000000-d012bfff] would overlap device region [d0000000-d012bfff]
+> *** Error in `./lkvm': free(): invalid pointer: 0x00007fad78002e40 ***
+> *** Error in `./lkvm': free(): invalid pointer: 0x00007fad78002e40 ***
+> *** Error in `./lkvm': free(): invalid pointer: 0x00007fad78002e40 ***
+> ======= Backtrace: =========
+> ======= Backtrace: =========
+> /lib/x86_64-linux-gnu/libc.so.6(+0x777e5)[0x7fae0ed447e5]
+> ======= Backtrace: =========
+> /lib/x86_64-linux-gnu/libc.so.6/lib/x86_64-linux-gnu/libc.so.6(+0x8037a)[0x7fae0ed4d37a]
+> (+0x777e5)[0x7fae0ed447e5]
+> /lib/x86_64-linux-gnu/libc.so.6(+0x777e5)[0x7fae0ed447e5]
+> /lib/x86_64-linux-gnu/libc.so.6(+0x8037a)[0x7fae0ed4d37a]
+> /lib/x86_64-linux-gnu/libc.so.6(cfree+0x4c)[0x7fae0ed5153c]
+> *** Error in `./lkvm': free(): invalid pointer: 0x00007fad78002e40 ***
+> /lib/x86_64-linux-gnu/libglib-2.0.so.0(g_string_free+0x3b)[0x7fae0f814dab]
+> /lib/x86_64-linux-gnu/libglib-2.0.so.0(g_string_free+0x3b)[0x7fae0f814dab]
+> /usr/lib/x86_64-linux-gnu/libgtk-3.so.0(+0x21121c)[0x7fae1023321c]
+> /usr/lib/x86_64-linux-gnu/libgtk-3.so.0(+0x21121c)[0x7fae1023321c]
+> ======= Backtrace: =========
+> Aborted (core dumped)
+> 
+> The vesa device is explicitly created during the initialization phase of
+> the above framebuffers. Remove the superfluous check for their existence.
+> 
 
-Add a sample unit file as a basis for systemd integration of kvm_stat
-logs.
+Not really happy about this pointer comparison, but I don't see a better
+way, and it's surely good enough for that purpose.
 
-Signed-off-by: Stefan Raspl <raspl@linux.ibm.com>
----
- tools/kvm/kvm_stat/kvm_stat.service | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
- create mode 100644 tools/kvm/kvm_stat/kvm_stat.service
+> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 
-diff --git a/tools/kvm/kvm_stat/kvm_stat.service b/tools/kvm/kvm_stat/kvm_stat.service
-new file mode 100644
-index 000000000000..71aabaffe779
---- /dev/null
-+++ b/tools/kvm/kvm_stat/kvm_stat.service
-@@ -0,0 +1,16 @@
-+# SPDX-License-Identifier: GPL-2.0-only
-+
-+[Unit]
-+Description=Service that logs KVM kernel module trace events
-+Before=qemu-kvm.service
-+
-+[Service]
-+Type=simple
-+ExecStart=/usr/bin/kvm_stat -dtcz -s 10 -L /var/log/kvm_stat.csv
-+ExecReload=/bin/kill -HUP $MAINPID
-+Restart=always
-+SyslogIdentifier=kvm_stat
-+SyslogLevel=debug
-+
-+[Install]
-+WantedBy=multi-user.target
--- 
-2.17.1
+Reviewed-by: Andre Przywara <andre.przywara@arm.com>
+
+Cheers,
+Andre
+
+> ---
+>  hw/vesa.c | 7 +++++--
+>  1 file changed, 5 insertions(+), 2 deletions(-)
+> 
+> diff --git a/hw/vesa.c b/hw/vesa.c
+> index dd59a112330b..8071ad153f27 100644
+> --- a/hw/vesa.c
+> +++ b/hw/vesa.c
+> @@ -61,8 +61,11 @@ struct framebuffer *vesa__init(struct kvm *kvm)
+>  	BUILD_BUG_ON(!is_power_of_two(VESA_MEM_SIZE));
+>  	BUILD_BUG_ON(VESA_MEM_SIZE < VESA_BPP/8 * VESA_WIDTH * VESA_HEIGHT);
+>  
+> -	if (!kvm->cfg.vnc && !kvm->cfg.sdl && !kvm->cfg.gtk)
+> -		return NULL;
+> +	if (device__find_dev(vesa_device.bus_type, vesa_device.dev_num) == &vesa_device) {
+> +		r = -EEXIST;
+> +		goto out_error;
+> +	}
+> +
+>  	vesa_base_addr = pci_get_io_port_block(PCI_IO_SIZE);
+>  	r = ioport__register(kvm, vesa_base_addr, &vesa_io_ops, PCI_IO_SIZE, NULL);
+>  	if (r < 0)
+> 
 
