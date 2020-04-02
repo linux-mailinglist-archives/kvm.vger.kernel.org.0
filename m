@@ -2,373 +2,184 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7895019CAAF
-	for <lists+kvm@lfdr.de>; Thu,  2 Apr 2020 21:57:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EEDE019CABD
+	for <lists+kvm@lfdr.de>; Thu,  2 Apr 2020 22:04:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388502AbgDBT5Q (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Apr 2020 15:57:16 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:51178 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1733205AbgDBT5Q (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 2 Apr 2020 15:57:16 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1585857434;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=RxyoZsi9Tn8jWziDAMFiYcGYLKriOIyoSHN1gbJsJzs=;
-        b=UidUd81qqJ+6OufmiNf5Z8NHVxIUeOyWlBtTnU/mOxdNqGRFqh1JRgV2WN1MW9UMzHGnBT
-        ZNbTtLOBQMuoq5lu0Ys2NvMB2v+VK+xnvOpH1n6+TlFA/sU6rngIl/SJu0hNP/r7We1+BH
-        pMeT8SjuDoViCaO4ropItH1CTqE+JTg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-228-ZZW0JrYzMsWT_D_Z6zHGUA-1; Thu, 02 Apr 2020 15:57:09 -0400
-X-MC-Unique: ZZW0JrYzMsWT_D_Z6zHGUA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C5F32107ACCA;
-        Thu,  2 Apr 2020 19:57:07 +0000 (UTC)
-Received: from w520.home (ovpn-112-162.phx2.redhat.com [10.3.112.162])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 321BE1001B09;
-        Thu,  2 Apr 2020 19:57:01 +0000 (UTC)
-Date:   Thu, 2 Apr 2020 13:57:00 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     "Liu, Yi L" <yi.l.liu@intel.com>
-Cc:     eric.auger@redhat.com, kevin.tian@intel.com,
-        jacob.jun.pan@linux.intel.com, joro@8bytes.org,
-        ashok.raj@intel.com, jun.j.tian@intel.com, yi.y.sun@intel.com,
-        jean-philippe@linaro.org, peterx@redhat.com,
-        iommu@lists.linux-foundation.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, hao.wu@intel.com
-Subject: Re: [PATCH v1 6/8] vfio/type1: Bind guest page tables to host
-Message-ID: <20200402135700.0da30021@w520.home>
-In-Reply-To: <1584880325-10561-7-git-send-email-yi.l.liu@intel.com>
-References: <1584880325-10561-1-git-send-email-yi.l.liu@intel.com>
-        <1584880325-10561-7-git-send-email-yi.l.liu@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+        id S2388940AbgDBUEy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Apr 2020 16:04:54 -0400
+Received: from mail-dm6nam10on2066.outbound.protection.outlook.com ([40.107.93.66]:11041
+        "EHLO NAM10-DM6-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S2388781AbgDBUEy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Apr 2020 16:04:54 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=gWC+9KfLlXc2EAOz3dBA5htJ46EoWLv86RWiahvsnAnUNtH2Gbw0vnVJPb+mto0ne2EdBzlxRqhlvjvLY2Dkzk9RGrf8GupMHbTNcPOqPYh17T+SDhNpBcs+YFPmjU7VPnZKeAIzdhJCsZjn9rbGEn8c6bknMHYYrqgp4yqfJ4UZVXivzUZeK5CoyzztPz9fyPZQEbuyv13U1AlWw+nubBTy+G6kT9/upv/y5GcqaIITvXQgFsekAndx0G4ZL5OM9Gwg6sRCa/tMqeIzfEtF/TVuyZErpLChmZ137hR5UOvW283T+aRvqvlr2TiM3LNMPSB94XhZeKHiNib8eV8L4Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=uc7IuOMoqgZ2h0POKQTHiFou0/ojWSjUtD0orWlqjRo=;
+ b=k52DCN9lNaM+u3uzNACHG7sxfW5yEChdqHx8Opc8qY3P5LLvRtLhjSe1ghYCFn/UtdCnPTn26oqS7C0JjxY1GjHJtyAW7eG57nSyoCPKaRklX4SU0TJvJZS1t8yyIllaNFSCnyO5T4cPHHQwvk1NRYhrmC3WVAkHQAlm0wP9SMMz4s1f4nz9Q5i8vaFj/fy+PBfvVUH3aqi8grZHPLM1rKKNWCPQrdUR9JQKEfxVAIMONY4BFznUG2o/boPt6NMt1MBniPPjdL8AEzrcRRsOIr7rOfGGoZYaFlEAHdSB0qDit2zTi4OCuNofLZLg1i0TLCPxgvLQYfsDd2j6DLZHww==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=uc7IuOMoqgZ2h0POKQTHiFou0/ojWSjUtD0orWlqjRo=;
+ b=Iq9uel0bXynGurVBxR54RaQy5UcoN79V5WFGcVtD28aMgPtYH5FF5hbIAXoLL5nmyCWzFFl5n6RLAlrWiVO5ZzujxncVSwwwJ29PraGq2Au1a91V+3+fxsxXart/4gFh9VIvKIkCpTVlutyJG/PpxAp3cOSkMHQYtx0z9nnJ1Z8=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=brijesh.singh@amd.com; 
+Received: from SA0PR12MB4400.namprd12.prod.outlook.com (2603:10b6:806:95::13)
+ by SA0PR12MB4574.namprd12.prod.outlook.com (2603:10b6:806:94::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2856.19; Thu, 2 Apr
+ 2020 20:04:51 +0000
+Received: from SA0PR12MB4400.namprd12.prod.outlook.com
+ ([fe80::60d9:da58:71b4:35f3]) by SA0PR12MB4400.namprd12.prod.outlook.com
+ ([fe80::60d9:da58:71b4:35f3%7]) with mapi id 15.20.2856.019; Thu, 2 Apr 2020
+ 20:04:51 +0000
+Cc:     brijesh.singh@amd.com, Ashish Kalra <Ashish.Kalra@amd.com>,
+        pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com,
+        hpa@zytor.com, joro@8bytes.org, bp@suse.de,
+        thomas.lendacky@amd.com, x86@kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, rientjes@google.com,
+        srutherford@google.com, luto@kernel.org
+Subject: Re: [PATCH v6 01/14] KVM: SVM: Add KVM_SEV SEND_START command
+To:     Venu Busireddy <venu.busireddy@oracle.com>
+References: <cover.1585548051.git.ashish.kalra@amd.com>
+ <3f90333959fd49bed184d45a761cc338424bf614.1585548051.git.ashish.kalra@amd.com>
+ <20200402062726.GA647295@vbusired-dt>
+ <89a586e4-8074-0d32-f384-a4597975d129@amd.com>
+ <20200402163717.GA653926@vbusired-dt>
+ <8b1b4874-11a8-1422-5ea1-ed665f41ab5c@amd.com>
+ <20200402185706.GA655878@vbusired-dt>
+ <6ced22f7-cbe5-a698-e650-7716566d4d8a@amd.com>
+ <20200402194313.GA656773@vbusired-dt>
+From:   Brijesh Singh <brijesh.singh@amd.com>
+Message-ID: <f715bf99-0158-4d5f-77f3-b27743db3c59@amd.com>
+Date:   Thu, 2 Apr 2020 15:04:54 -0500
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:68.0)
+ Gecko/20100101 Thunderbird/68.6.0
+In-Reply-To: <20200402194313.GA656773@vbusired-dt>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Language: en-US
+X-ClientProxiedBy: SN4PR0401CA0008.namprd04.prod.outlook.com
+ (2603:10b6:803:21::18) To SA0PR12MB4400.namprd12.prod.outlook.com
+ (2603:10b6:806:95::13)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from Brijeshs-MacBook-Pro.local (165.204.77.11) by SN4PR0401CA0008.namprd04.prod.outlook.com (2603:10b6:803:21::18) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2878.15 via Frontend Transport; Thu, 2 Apr 2020 20:04:49 +0000
+X-Originating-IP: [165.204.77.11]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: 10259100-5399-48e9-eb50-08d7d7411a9e
+X-MS-TrafficTypeDiagnostic: SA0PR12MB4574:|SA0PR12MB4574:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <SA0PR12MB457414ED96BB6D126A2943C2E5C60@SA0PR12MB4574.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
+X-Forefront-PRVS: 0361212EA8
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA0PR12MB4400.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(10009020)(4636009)(136003)(39860400002)(366004)(376002)(396003)(346002)(52116002)(66946007)(66556008)(8676002)(5660300002)(7416002)(4326008)(6506007)(2906002)(66476007)(6916009)(6512007)(44832011)(8936002)(81156014)(6486002)(6666004)(36756003)(53546011)(956004)(81166006)(316002)(86362001)(2616005)(16526019)(478600001)(31686004)(186003)(26005)(31696002);DIR:OUT;SFP:1101;
+Received-SPF: None (protection.outlook.com: amd.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: elb1xbxps8B1hMTcwfwNW37SZJLBdQ55ToVKzkGKEMFnslHgJdh2NE2MlbQ3PnkUVp3FBbXfytKKGJRCFlr5a90A7O24Dq4HCFAfQ4XJkPnEElDtZ5e+LtLlWwcsHIZhFk4gOuv8NeTU/COXUa63L97LCLeBnDFlkWDjJOpaYiF5aDsx7TPBe7rTY/6tSdhjJOZmcrC/jEUBkpZxmZh/4sOd4qDnLwEKsax29SfSYhCGouB3wRyawlBLtPY3hU0T6UOq9/WHu8dRLPg6QZreSInU5oXYP/B+M6soztrh4Ij5IMhglhaWq648BzGgaypBK8droOamkyZY1COB9UWfdpYCNZgQENIJJTYaVk/D9g+gJUXUTt7RUKt0TbCcQd0EY+5rQqBZQiYyvd73otTyvAejXC6Vku0QEjh6BFALv/m3yPxlGfwalr8WBjgoqeHy
+X-MS-Exchange-AntiSpam-MessageData: 9TaUEpHp6jC54GWRx/ZHtPWXK5xD2FuL3A+aprG/knP43ZJdwIHuAENB/HAY6tPNbSXIh7dbXjaGVEYMHwTXSYaGlfFUCvSTMgTDjCNqDFTcSQn17VdUu+HVeYflFiUheC/SIauE09xQMfARIYVxIQ==
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 10259100-5399-48e9-eb50-08d7d7411a9e
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Apr 2020 20:04:51.7933
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: rBFhGRuuFQGOFmm8WvEvB2J2W8E81ICEuMgPsZf+xJYYxZQyKFEofDk8g/vBlTly/E09xpI1byZLmVBuac18Nw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4574
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, 22 Mar 2020 05:32:03 -0700
-"Liu, Yi L" <yi.l.liu@intel.com> wrote:
 
-> From: Liu Yi L <yi.l.liu@intel.com>
-> 
-> VFIO_TYPE1_NESTING_IOMMU is an IOMMU type which is backed by hardware
-> IOMMUs that have nesting DMA translation (a.k.a dual stage address
-> translation). For such hardware IOMMUs, there are two stages/levels of
-> address translation, and software may let userspace/VM to own the first-
-> level/stage-1 translation structures. Example of such usage is vSVA (
-> virtual Shared Virtual Addressing). VM owns the first-level/stage-1
-> translation structures and bind the structures to host, then hardware
-> IOMMU would utilize nesting translation when doing DMA translation fo
-> the devices behind such hardware IOMMU.
-> 
-> This patch adds vfio support for binding guest translation (a.k.a stage 1)
-> structure to host iommu. And for VFIO_TYPE1_NESTING_IOMMU, not only bind
-> guest page table is needed, it also requires to expose interface to guest
-> for iommu cache invalidation when guest modified the first-level/stage-1
-> translation structures since hardware needs to be notified to flush stale
-> iotlbs. This would be introduced in next patch.
-> 
-> In this patch, guest page table bind and unbind are done by using flags
-> VFIO_IOMMU_BIND_GUEST_PGTBL and VFIO_IOMMU_UNBIND_GUEST_PGTBL under IOCTL
-> VFIO_IOMMU_BIND, the bind/unbind data are conveyed by
-> struct iommu_gpasid_bind_data. Before binding guest page table to host,
-> VM should have got a PASID allocated by host via VFIO_IOMMU_PASID_REQUEST.
-> 
-> Bind guest translation structures (here is guest page table) to host
-> are the first step to setup vSVA (Virtual Shared Virtual Addressing).
-> 
-> Cc: Kevin Tian <kevin.tian@intel.com>
-> CC: Jacob Pan <jacob.jun.pan@linux.intel.com>
-> Cc: Alex Williamson <alex.williamson@redhat.com>
-> Cc: Eric Auger <eric.auger@redhat.com>
-> Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>
-> Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.com>
-> Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
-> Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
-> ---
->  drivers/vfio/vfio_iommu_type1.c | 158 ++++++++++++++++++++++++++++++++++++++++
->  include/uapi/linux/vfio.h       |  46 ++++++++++++
->  2 files changed, 204 insertions(+)
-> 
-> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> index 82a9e0b..a877747 100644
-> --- a/drivers/vfio/vfio_iommu_type1.c
-> +++ b/drivers/vfio/vfio_iommu_type1.c
-> @@ -130,6 +130,33 @@ struct vfio_regions {
->  #define IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu)	\
->  					(!list_empty(&iommu->domain_list))
->  
-> +struct domain_capsule {
-> +	struct iommu_domain *domain;
-> +	void *data;
-> +};
-> +
-> +/* iommu->lock must be held */
-> +static int vfio_iommu_for_each_dev(struct vfio_iommu *iommu,
-> +		      int (*fn)(struct device *dev, void *data),
-> +		      void *data)
-> +{
-> +	struct domain_capsule dc = {.data = data};
-> +	struct vfio_domain *d;
-> +	struct vfio_group *g;
-> +	int ret = 0;
-> +
-> +	list_for_each_entry(d, &iommu->domain_list, next) {
-> +		dc.domain = d->domain;
-> +		list_for_each_entry(g, &d->group_list, next) {
-> +			ret = iommu_group_for_each_dev(g->iommu_group,
-> +						       &dc, fn);
-> +			if (ret)
-> +				break;
-> +		}
-> +	}
-> +	return ret;
-> +}
-> +
->  static int put_pfn(unsigned long pfn, int prot);
->  
->  /*
-> @@ -2314,6 +2341,88 @@ static int vfio_iommu_info_add_nesting_cap(struct vfio_iommu *iommu,
->  	return 0;
->  }
->  
-> +static int vfio_bind_gpasid_fn(struct device *dev, void *data)
-> +{
-> +	struct domain_capsule *dc = (struct domain_capsule *)data;
-> +	struct iommu_gpasid_bind_data *gbind_data =
-> +		(struct iommu_gpasid_bind_data *) dc->data;
-> +
-> +	return iommu_sva_bind_gpasid(dc->domain, dev, gbind_data);
-> +}
-> +
-> +static int vfio_unbind_gpasid_fn(struct device *dev, void *data)
-> +{
-> +	struct domain_capsule *dc = (struct domain_capsule *)data;
-> +	struct iommu_gpasid_bind_data *gbind_data =
-> +		(struct iommu_gpasid_bind_data *) dc->data;
-> +
-> +	return iommu_sva_unbind_gpasid(dc->domain, dev,
-> +					gbind_data->hpasid);
-> +}
-> +
-> +/**
-> + * Unbind specific gpasid, caller of this function requires hold
-> + * vfio_iommu->lock
-> + */
-> +static long vfio_iommu_type1_do_guest_unbind(struct vfio_iommu *iommu,
-> +				struct iommu_gpasid_bind_data *gbind_data)
-> +{
-> +	return vfio_iommu_for_each_dev(iommu,
-> +				vfio_unbind_gpasid_fn, gbind_data);
-> +}
-> +
-> +static long vfio_iommu_type1_bind_gpasid(struct vfio_iommu *iommu,
-> +				struct iommu_gpasid_bind_data *gbind_data)
-> +{
-> +	int ret = 0;
-> +
-> +	mutex_lock(&iommu->lock);
-> +	if (!IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu)) {
-> +		ret = -EINVAL;
-> +		goto out_unlock;
-> +	}
-> +
-> +	ret = vfio_iommu_for_each_dev(iommu,
-> +			vfio_bind_gpasid_fn, gbind_data);
-> +	/*
-> +	 * If bind failed, it may not be a total failure. Some devices
-> +	 * within the iommu group may have bind successfully. Although
-> +	 * we don't enable pasid capability for non-singletion iommu
-> +	 * groups, a unbind operation would be helpful to ensure no
-> +	 * partial binding for an iommu group.
+On 4/2/20 2:43 PM, Venu Busireddy wrote:
+> On 2020-04-02 14:17:26 -0500, Brijesh Singh wrote:
+>> On 4/2/20 1:57 PM, Venu Busireddy wrote:
+>> [snip]...
+>>
+>>>> The question is, how does a userspace know the session length ? One
+>>>> method is you can precalculate a value based on your firmware version
+>>>> and have userspace pass that, or another approach is set
+>>>> params.session_len = 0 and query it from the FW. The FW spec allow to
+>>>> query the length, please see the spec. In the qemu patches I choose
+>>>> second approach. This is because session blob can change from one FW
+>>>> version to another and I tried to avoid calculating or hardcoding the
+>>>> length for a one version of the FW. You can certainly choose the first
+>>>> method. We want to ensure that kernel interface works on the both cases.
+>>> I like the fact that you have already implemented the functionality to
+>>> facilitate the user space to obtain the session length from the firmware
+>>> (by setting params.session_len to 0). However, I am trying to address
+>>> the case where the user space sets the params.session_len to a size
+>>> smaller than the size needed.
+>>>
+>>> Let me put it differently. Let us say that the session blob needs 128
+>>> bytes, but the user space sets params.session_len to 16. That results
+>>> in us allocating a buffer of 16 bytes, and set data->session_len to 16.
+>>>
+>>> What does the firmware do now?
+>>>
+>>> Does it copy 128 bytes into data->session_address, or, does it copy
+>>> 16 bytes?
+>>>
+>>> If it copies 128 bytes, we most certainly will end up with a kernel crash.
+>>>
+>>> If it copies 16 bytes, then what does it set in data->session_len? 16,
+>>> or 128? If 16, everything is good. If 128, we end up causing memory
+>>> access violation for the user space.
+>> My interpretation of the spec is, if user provided length is smaller
+>> than the FW expected length then FW will reports an error with
+>> data->session_len set to the expected length. In other words, it should
+>> *not* copy anything into the session buffer in the event of failure.
+> That is good, and expected behavior.
+>
+>> If FW is touching memory beyond what is specified in the session_len then
+>> its FW bug and we can't do much from kernel.
+> Agreed. But let us assume that the firmware is not touching memory that
+> it is not supposed to.
+>
+>> Am I missing something ?
+> I believe you are agreeing that if the session blob needs 128 bytes and
+> user space sets params.session_len to 16, the firmware does not copy
+> any data to data->session_address, and sets data->session_len to 128.
+>
+> Now, when we return, won't the user space try to access 128 bytes
+> (params.session_len) of data in params.session_uaddr, and crash? Because,
+> instead of returning an error that buffer is not large enough, we return
+> the call successfully!
 
-Where was the non-singleton group restriction done, I missed that.
 
-> +	 */
-> +	if (ret)
-> +		/*
-> +		 * Undo all binds that already succeeded, no need to
-> +		 * check the return value here since some device within
-> +		 * the group has no successful bind when coming to this
-> +		 * place switch.
-> +		 */
-> +		vfio_iommu_type1_do_guest_unbind(iommu, gbind_data);
+Ah, so the main issue is we should not be going to e_free on error. If
+session_len is less than the expected len then FW will return an error.
+In the case of an error we can skip copying the session_data into
+userspace buffer but we still need to pass the session_len and policy
+back to the userspace.
 
-However, the for_each_dev function stops when the callback function
-returns error, are we just assuming we stop at the same device as we
-faulted on the first time and that we traverse the same set of devices
-the second time?  It seems strange to me that unbind should be able to
-fail.
++	ret = sev_issue_cmd(kvm, SEV_CMD_SEND_START, data, &argp->error);
++
++	if (ret)
++		goto e_free;
++
 
-> +
-> +out_unlock:
-> +	mutex_unlock(&iommu->lock);
-> +	return ret;
-> +}
-> +
-> +static long vfio_iommu_type1_unbind_gpasid(struct vfio_iommu *iommu,
-> +				struct iommu_gpasid_bind_data *gbind_data)
-> +{
-> +	int ret = 0;
-> +
-> +	mutex_lock(&iommu->lock);
-> +	if (!IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu)) {
-> +		ret = -EINVAL;
-> +		goto out_unlock;
-> +	}
-> +
-> +	ret = vfio_iommu_type1_do_guest_unbind(iommu, gbind_data);
+If user space gets an error then it can decode it further to get
+additional information (e.g buffer too small).
 
-How is a user supposed to respond to their unbind failing?
-
-> +
-> +out_unlock:
-> +	mutex_unlock(&iommu->lock);
-> +	return ret;
-> +}
-> +
->  static long vfio_iommu_type1_ioctl(void *iommu_data,
->  				   unsigned int cmd, unsigned long arg)
->  {
-> @@ -2471,6 +2580,55 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
->  		default:
->  			return -EINVAL;
->  		}
-> +
-> +	} else if (cmd == VFIO_IOMMU_BIND) {
-> +		struct vfio_iommu_type1_bind bind;
-> +		u32 version;
-> +		int data_size;
-> +		void *gbind_data;
-> +		int ret;
-> +
-> +		minsz = offsetofend(struct vfio_iommu_type1_bind, flags);
-> +
-> +		if (copy_from_user(&bind, (void __user *)arg, minsz))
-> +			return -EFAULT;
-> +
-> +		if (bind.argsz < minsz)
-> +			return -EINVAL;
-> +
-> +		/* Get the version of struct iommu_gpasid_bind_data */
-> +		if (copy_from_user(&version,
-> +			(void __user *) (arg + minsz),
-> +					sizeof(version)))
-> +			return -EFAULT;
-
-Why are we coping things from beyond the size we've validated that the
-user has provided again?
-
-> +
-> +		data_size = iommu_uapi_get_data_size(
-> +				IOMMU_UAPI_BIND_GPASID, version);
-> +		gbind_data = kzalloc(data_size, GFP_KERNEL);
-> +		if (!gbind_data)
-> +			return -ENOMEM;
-> +
-> +		if (copy_from_user(gbind_data,
-> +			 (void __user *) (arg + minsz), data_size)) {
-> +			kfree(gbind_data);
-> +			return -EFAULT;
-> +		}
-
-And again.  argsz isn't just for minsz.
-
-> +
-> +		switch (bind.flags & VFIO_IOMMU_BIND_MASK) {
-> +		case VFIO_IOMMU_BIND_GUEST_PGTBL:
-> +			ret = vfio_iommu_type1_bind_gpasid(iommu,
-> +							   gbind_data);
-> +			break;
-> +		case VFIO_IOMMU_UNBIND_GUEST_PGTBL:
-> +			ret = vfio_iommu_type1_unbind_gpasid(iommu,
-> +							     gbind_data);
-> +			break;
-> +		default:
-> +			ret = -EINVAL;
-> +			break;
-> +		}
-> +		kfree(gbind_data);
-> +		return ret;
->  	}
->  
->  	return -ENOTTY;
-> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-> index ebeaf3e..2235bc6 100644
-> --- a/include/uapi/linux/vfio.h
-> +++ b/include/uapi/linux/vfio.h
-> @@ -14,6 +14,7 @@
->  
->  #include <linux/types.h>
->  #include <linux/ioctl.h>
-> +#include <linux/iommu.h>
->  
->  #define VFIO_API_VERSION	0
->  
-> @@ -853,6 +854,51 @@ struct vfio_iommu_type1_pasid_request {
->   */
->  #define VFIO_IOMMU_PASID_REQUEST	_IO(VFIO_TYPE, VFIO_BASE + 22)
->  
-> +/**
-> + * Supported flags:
-> + *	- VFIO_IOMMU_BIND_GUEST_PGTBL: bind guest page tables to host for
-> + *			nesting type IOMMUs. In @data field It takes struct
-> + *			iommu_gpasid_bind_data.
-> + *	- VFIO_IOMMU_UNBIND_GUEST_PGTBL: undo a bind guest page table operation
-> + *			invoked by VFIO_IOMMU_BIND_GUEST_PGTBL.
-
-This must require iommu_gpasid_bind_data in the data field as well,
-right?
-
-> + *
-> + */
-> +struct vfio_iommu_type1_bind {
-> +	__u32		argsz;
-> +	__u32		flags;
-> +#define VFIO_IOMMU_BIND_GUEST_PGTBL	(1 << 0)
-> +#define VFIO_IOMMU_UNBIND_GUEST_PGTBL	(1 << 1)
-> +	__u8		data[];
-> +};
-> +
-> +#define VFIO_IOMMU_BIND_MASK	(VFIO_IOMMU_BIND_GUEST_PGTBL | \
-> +					VFIO_IOMMU_UNBIND_GUEST_PGTBL)
-> +
-> +/**
-> + * VFIO_IOMMU_BIND - _IOW(VFIO_TYPE, VFIO_BASE + 23,
-> + *				struct vfio_iommu_type1_bind)
-> + *
-> + * Manage address spaces of devices in this container. Initially a TYPE1
-> + * container can only have one address space, managed with
-> + * VFIO_IOMMU_MAP/UNMAP_DMA.
-> + *
-> + * An IOMMU of type VFIO_TYPE1_NESTING_IOMMU can be managed by both MAP/UNMAP
-> + * and BIND ioctls at the same time. MAP/UNMAP acts on the stage-2 (host) page
-> + * tables, and BIND manages the stage-1 (guest) page tables. Other types of
-> + * IOMMU may allow MAP/UNMAP and BIND to coexist, where MAP/UNMAP controls
-> + * the traffics only require single stage translation while BIND controls the
-> + * traffics require nesting translation. But this depends on the underlying
-> + * IOMMU architecture and isn't guaranteed. Example of this is the guest SVA
-> + * traffics, such traffics need nesting translation to gain gVA->gPA and then
-> + * gPA->hPA translation.
-> + *
-> + * Availability of this feature depends on the device, its bus, the underlying
-> + * IOMMU and the CPU architecture.
-> + *
-> + * returns: 0 on success, -errno on failure.
-> + */
-> +#define VFIO_IOMMU_BIND		_IO(VFIO_TYPE, VFIO_BASE + 23)
-> +
->  /* -------- Additional API for SPAPR TCE (Server POWERPC) IOMMU -------- */
->  
->  /*
-
+>
+> That is why I was suggesting the following, which you seem to have
+> missed.
+>
+>>> Perhaps, this can be dealt a little differently? Why not always call
+>>> sev_issue_cmd(kvm, SEV_CMD_SEND_START, ...) with zeroed out data? Then,
+>>> if the user space has set params.session_len to 0, we return with the
+>>> needed params.session_len. Otherwise, we check if params.session_len is
+>>> large enough, and if not, we return -EINVAL?
+> Doesn't the above approach address all scenarios?
+>
