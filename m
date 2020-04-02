@@ -2,125 +2,448 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id CB36019C70A
-	for <lists+kvm@lfdr.de>; Thu,  2 Apr 2020 18:27:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AA71D19C732
+	for <lists+kvm@lfdr.de>; Thu,  2 Apr 2020 18:38:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389819AbgDBQ1U (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Apr 2020 12:27:20 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:54037 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1731892AbgDBQ1U (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 2 Apr 2020 12:27:20 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1585844839;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=YiGejvc/Z1PscIO5Y2Td9wzrTW6YFSsKAEAcda9xkVg=;
-        b=WGMhaXVKFwi04/dx6sLUHCE2DekZ2R+rAlwb+ZGdQbmGF0V+hTcXHfcmpp9pHeJpJ0T72p
-        Ev0GEJLx1ZXgyztm2Ry8Fm2Z2vM0dNe1irjIey3XqCnrIFYaDJbWWfS2jKIRLtAKhCDnG2
-        SBhA6j/DBapLsIvsVSz1HlXWS5BolM8=
-Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
- [209.85.219.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-265-kMukF2YINiaNzh8Ikuk4AQ-1; Thu, 02 Apr 2020 12:27:15 -0400
-X-MC-Unique: kMukF2YINiaNzh8Ikuk4AQ-1
-Received: by mail-qv1-f69.google.com with SMTP id z2so3174697qvw.7
-        for <kvm@vger.kernel.org>; Thu, 02 Apr 2020 09:27:15 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=YiGejvc/Z1PscIO5Y2Td9wzrTW6YFSsKAEAcda9xkVg=;
-        b=KckIjxuk1/5B+sDVuwCbYl28DVGtoDzcrWNQdeDqjtQxTyba0oW1fLNvwL0JB7AGTR
-         9Y1DmO6Cp+HMIwevwWnH92+ZlQUXiF0uzybmvuBHcHc7dYvuf4rVIGD6nVlVuX7CESME
-         NvwHiKOIIlzS+PwOjePSz2KifJMCedJSdOQpIjt4mrhfw0mPN++/hrKfS6umZ2Uvb3UM
-         Yyzb9rKFqArC7YncSb7L5gOis9kPAcWKK0fpSphBTCp1uLHFIvpOBvWGvGEcMckGTvDu
-         q7l6tu6nXGnrOb7zaMQ3ZUHTloFG+5OXHkKuLcJuQgAEXWb5ecjB6U0y9dWXsx0jrdCQ
-         x1ZA==
-X-Gm-Message-State: AGi0PuYn5Te+M7tIufpIQviXGhOFvTjiaRaIBY70s/IlRwd6L6ThXpgk
-        +H/+Cs9G/Y2dOlMWeytSJBwsojUP5jCMXwP7dAZTE1vm1euNCIpZ5VBRfgB6xNoQnp32wiFGK0E
-        iLbgwBjTfbE0F
-X-Received: by 2002:ac8:4641:: with SMTP id f1mr3595342qto.216.1585844834567;
-        Thu, 02 Apr 2020 09:27:14 -0700 (PDT)
-X-Google-Smtp-Source: APiQypI9uiNgZebAWGTM/6pTKMcpl2+Pbh6hcnrsxur+SijZm8gBzgmehd7nG3POHrAdyCwNw6XVFw==
-X-Received: by 2002:ac8:4641:: with SMTP id f1mr3595317qto.216.1585844834186;
-        Thu, 02 Apr 2020 09:27:14 -0700 (PDT)
-Received: from redhat.com (bzq-79-176-51-222.red.bezeqint.net. [79.176.51.222])
-        by smtp.gmail.com with ESMTPSA id v17sm3764796qkf.83.2020.04.02.09.27.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Apr 2020 09:27:13 -0700 (PDT)
-Date:   Thu, 2 Apr 2020 12:27:09 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     linux-kernel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        netdev@vger.kernel.org
-Subject: Re: [PATCH v2] vhost: drop vring dependency on iotlb
-Message-ID: <20200402122544-mutt-send-email-mst@kernel.org>
-References: <20200402144519.34194-1-mst@redhat.com>
- <44f9b9d3-3da2-fafe-aa45-edd574dc6484@redhat.com>
+        id S2389852AbgDBQhz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Apr 2020 12:37:55 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:45984 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2388555AbgDBQhy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Apr 2020 12:37:54 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 032G9bNx186492;
+        Thu, 2 Apr 2020 16:37:28 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : references : mime-version : content-type :
+ content-transfer-encoding : in-reply-to; s=corp-2020-01-29;
+ bh=nmnGr+7vh57uubOAYOuLY5ehia4gG0WmAEb8+bA6Isk=;
+ b=T8dE2Z0OuKOSl6plVr3FyesLNmzeg2aQsek4QbjkLHWsvUBDr1lTXDdgm+fwe5PPIAFy
+ 0B4w7CA+JetsPf+NHhcnRUdEaSFvcWPtJzCrMOh1iUloxd2BRzuJnOpIK3CKsW2ug1+9
+ 4AcoOvVG7cUPVXe9r80Ondhnz2j6FHX98NP5V9lH6Lk8HrTMFwp278XVtLP01KrB/vN0
+ UgmVeU5hC5Wt1XiB26taNJDSIKLu561zgYaNBYoPbpNSnE3lc0wiS9I6vh9MYrsS/3Xg
+ gPQmxJEbkKq4HLHqAbREjHOC757iABu33KyjErw8n0GSz3ZCyoK6XHikRRnhuKqMxvES 7g== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by aserp2120.oracle.com with ESMTP id 303yunf6bc-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 02 Apr 2020 16:37:27 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 032G8GiF159126;
+        Thu, 2 Apr 2020 16:37:27 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by userp3020.oracle.com with ESMTP id 302ga2qp6m-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 02 Apr 2020 16:37:26 +0000
+Received: from abhmp0020.oracle.com (abhmp0020.oracle.com [141.146.116.26])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 032GbM9Y019905;
+        Thu, 2 Apr 2020 16:37:22 GMT
+Received: from vbusired-dt (/10.154.166.66)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Thu, 02 Apr 2020 09:37:21 -0700
+Date:   Thu, 2 Apr 2020 11:37:17 -0500
+From:   Venu Busireddy <venu.busireddy@oracle.com>
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     Ashish Kalra <Ashish.Kalra@amd.com>, pbonzini@redhat.com,
+        tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
+        joro@8bytes.org, bp@suse.de, thomas.lendacky@amd.com,
+        x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        rientjes@google.com, srutherford@google.com, luto@kernel.org
+Subject: Re: [PATCH v6 01/14] KVM: SVM: Add KVM_SEV SEND_START command
+Message-ID: <20200402163717.GA653926@vbusired-dt>
+References: <cover.1585548051.git.ashish.kalra@amd.com>
+ <3f90333959fd49bed184d45a761cc338424bf614.1585548051.git.ashish.kalra@amd.com>
+ <20200402062726.GA647295@vbusired-dt>
+ <89a586e4-8074-0d32-f384-a4597975d129@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <44f9b9d3-3da2-fafe-aa45-edd574dc6484@redhat.com>
+In-Reply-To: <89a586e4-8074-0d32-f384-a4597975d129@amd.com>
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9579 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=5 malwarescore=0
+ mlxlogscore=999 bulkscore=0 mlxscore=0 spamscore=0 adultscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2004020131
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9579 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 lowpriorityscore=0
+ malwarescore=0 adultscore=0 priorityscore=1501 mlxlogscore=999 bulkscore=0
+ suspectscore=5 mlxscore=0 spamscore=0 impostorscore=0 clxscore=1015
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
+ definitions=main-2004020131
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Apr 02, 2020 at 11:01:13PM +0800, Jason Wang wrote:
+On 2020-04-02 07:59:54 -0500, Brijesh Singh wrote:
+> Hi Venu,
 > 
-> On 2020/4/2 下午10:46, Michael S. Tsirkin wrote:
-> > vringh can now be built without IOTLB.
-> > Select IOTLB directly where it's used.
-> > 
-> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> > ---
-> > 
-> > Applies on top of my vhost tree.
-> > Changes from v1:
-> > 	VDPA_SIM needs VHOST_IOTLB
+> Thanks for the feedback.
+> 
+> On 4/2/20 1:27 AM, Venu Busireddy wrote:
+> > On 2020-03-30 06:19:59 +0000, Ashish Kalra wrote:
+> >> From: Brijesh Singh <Brijesh.Singh@amd.com>
+> >>
+> >> The command is used to create an outgoing SEV guest encryption context.
+> >>
+> >> Cc: Thomas Gleixner <tglx@linutronix.de>
+> >> Cc: Ingo Molnar <mingo@redhat.com>
+> >> Cc: "H. Peter Anvin" <hpa@zytor.com>
+> >> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> >> Cc: "Radim Krčmář" <rkrcmar@redhat.com>
+> >> Cc: Joerg Roedel <joro@8bytes.org>
+> >> Cc: Borislav Petkov <bp@suse.de>
+> >> Cc: Tom Lendacky <thomas.lendacky@amd.com>
+> >> Cc: x86@kernel.org
+> >> Cc: kvm@vger.kernel.org
+> >> Cc: linux-kernel@vger.kernel.org
+> >> Reviewed-by: Steve Rutherford <srutherford@google.com>
+> >> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> >> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+> >> ---
+> >>  .../virt/kvm/amd-memory-encryption.rst        |  27 ++++
+> >>  arch/x86/kvm/svm.c                            | 128 ++++++++++++++++++
+> >>  include/linux/psp-sev.h                       |   8 +-
+> >>  include/uapi/linux/kvm.h                      |  12 ++
+> >>  4 files changed, 171 insertions(+), 4 deletions(-)
+> >>
+> >> diff --git a/Documentation/virt/kvm/amd-memory-encryption.rst b/Documentation/virt/kvm/amd-memory-encryption.rst
+> >> index c3129b9ba5cb..4fd34fc5c7a7 100644
+> >> --- a/Documentation/virt/kvm/amd-memory-encryption.rst
+> >> +++ b/Documentation/virt/kvm/amd-memory-encryption.rst
+> >> @@ -263,6 +263,33 @@ Returns: 0 on success, -negative on error
+> >>                  __u32 trans_len;
+> >>          };
+> >>  
+> >> +10. KVM_SEV_SEND_START
+> >> +----------------------
+> >> +
+> >> +The KVM_SEV_SEND_START command can be used by the hypervisor to create an
+> >> +outgoing guest encryption context.
+> >> +
+> >> +Parameters (in): struct kvm_sev_send_start
+> >> +
+> >> +Returns: 0 on success, -negative on error
+> >> +
+> >> +::
+> >> +        struct kvm_sev_send_start {
+> >> +                __u32 policy;                 /* guest policy */
+> >> +
+> >> +                __u64 pdh_cert_uaddr;         /* platform Diffie-Hellman certificate */
+> >> +                __u32 pdh_cert_len;
+> >> +
+> >> +                __u64 plat_certs_uadr;        /* platform certificate chain */
+> > Could this please be changed to plat_certs_uaddr, as it is referred to
+> > in the rest of the code?
+> >
+> >> +                __u32 plat_certs_len;
+> >> +
+> >> +                __u64 amd_certs_uaddr;        /* AMD certificate */
+> >> +                __u32 amd_cert_len;
+> > Could this please be changed to amd_certs_len, as it is referred to in
+> > the rest of the code?
+> >
+> >> +
+> >> +                __u64 session_uaddr;          /* Guest session information */
+> >> +                __u32 session_len;
+> >> +        };
+> >> +
+> >>  References
+> >>  ==========
+> >>  
+> >> diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
+> >> index 50d1ebafe0b3..63d172e974ad 100644
+> >> --- a/arch/x86/kvm/svm.c
+> >> +++ b/arch/x86/kvm/svm.c
+> >> @@ -7149,6 +7149,131 @@ static int sev_launch_secret(struct kvm *kvm, struct kvm_sev_cmd *argp)
+> >>  	return ret;
+> >>  }
+> >>  
+> >> +/* Userspace wants to query session length. */
+> >> +static int
+> >> +__sev_send_start_query_session_length(struct kvm *kvm, struct kvm_sev_cmd *argp,
+> >> +				      struct kvm_sev_send_start *params)
+> >> +{
+> >> +	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+> >> +	struct sev_data_send_start *data;
+> >> +	int ret;
+> >> +
+> >> +	data = kzalloc(sizeof(*data), GFP_KERNEL_ACCOUNT);
+> >> +	if (data == NULL)
+> >> +		return -ENOMEM;
+> >> +
+> >> +	data->handle = sev->handle;
+> >> +	ret = sev_issue_cmd(kvm, SEV_CMD_SEND_START, data, &argp->error);
+> >> +
+> >> +	params->session_len = data->session_len;
+> >> +	if (copy_to_user((void __user *)(uintptr_t)argp->data, params,
+> >> +				sizeof(struct kvm_sev_send_start)))
+> >> +		ret = -EFAULT;
+> >> +
+> >> +	kfree(data);
+> >> +	return ret;
+> >> +}
+> >> +
+> >> +static int sev_send_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
+> >> +{
+> >> +	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+> >> +	struct sev_data_send_start *data;
+> >> +	struct kvm_sev_send_start params;
+> >> +	void *amd_certs, *session_data;
+> >> +	void *pdh_cert, *plat_certs;
+> >> +	int ret;
+> >> +
+> >> +	if (!sev_guest(kvm))
+> >> +		return -ENOTTY;
+> >> +
+> >> +	if (copy_from_user(&params, (void __user *)(uintptr_t)argp->data,
+> >> +				sizeof(struct kvm_sev_send_start)))
+> >> +		return -EFAULT;
+> >> +
+> >> +	/* if session_len is zero, userspace wants to query the session length */
+> >> +	if (!params.session_len)
+> >> +		return __sev_send_start_query_session_length(kvm, argp,
+> >> +				&params);
+> >> +
+> >> +	/* some sanity checks */
+> >> +	if (!params.pdh_cert_uaddr || !params.pdh_cert_len ||
+> >> +	    !params.session_uaddr || params.session_len > SEV_FW_BLOB_MAX_SIZE)
+> >> +		return -EINVAL;
+> >> +
+> >> +	/* allocate the memory to hold the session data blob */
+> >> +	session_data = kmalloc(params.session_len, GFP_KERNEL_ACCOUNT);
+> >> +	if (!session_data)
+> >> +		return -ENOMEM;
+> >> +
+> >> +	/* copy the certificate blobs from userspace */
+> >> +	pdh_cert = psp_copy_user_blob(params.pdh_cert_uaddr,
+> >> +				params.pdh_cert_len);
+> >> +	if (IS_ERR(pdh_cert)) {
+> >> +		ret = PTR_ERR(pdh_cert);
+> >> +		goto e_free_session;
+> >> +	}
+> >> +
+> >> +	plat_certs = psp_copy_user_blob(params.plat_certs_uaddr,
+> >> +				params.plat_certs_len);
+> >> +	if (IS_ERR(plat_certs)) {
+> >> +		ret = PTR_ERR(plat_certs);
+> >> +		goto e_free_pdh;
+> >> +	}
+> >> +
+> >> +	amd_certs = psp_copy_user_blob(params.amd_certs_uaddr,
+> >> +				params.amd_certs_len);
+> >> +	if (IS_ERR(amd_certs)) {
+> >> +		ret = PTR_ERR(amd_certs);
+> >> +		goto e_free_plat_cert;
+> >> +	}
+> >> +
+> >> +	data = kzalloc(sizeof(*data), GFP_KERNEL_ACCOUNT);
+> >> +	if (data == NULL) {
+> >> +		ret = -ENOMEM;
+> >> +		goto e_free_amd_cert;
+> >> +	}
+> >> +
+> >> +	/* populate the FW SEND_START field with system physical address */
+> >> +	data->pdh_cert_address = __psp_pa(pdh_cert);
+> >> +	data->pdh_cert_len = params.pdh_cert_len;
+> >> +	data->plat_certs_address = __psp_pa(plat_certs);
+> >> +	data->plat_certs_len = params.plat_certs_len;
+> >> +	data->amd_certs_address = __psp_pa(amd_certs);
+> >> +	data->amd_certs_len = params.amd_certs_len;
+> >> +	data->session_address = __psp_pa(session_data);
+> >> +	data->session_len = params.session_len;
+> >> +	data->handle = sev->handle;
+> >> +
+> >> +	ret = sev_issue_cmd(kvm, SEV_CMD_SEND_START, data, &argp->error);
+> >> +
+> >> +	if (ret)
+> >> +		goto e_free;
+> >> +
+> >> +	if (copy_to_user((void __user *)(uintptr_t) params.session_uaddr,
+> >> +			session_data, params.session_len)) {
+> >> +		ret = -EFAULT;
+> >> +		goto e_free;
+> >> +	}
+> > To optimize the amount of data being copied to user space, could the
+> > above section of code changed as follows?
+> >
+> > 	params.session_len = data->session_len;
+> > 	if (copy_to_user((void __user *)(uintptr_t) params.session_uaddr,
+> > 			session_data, params.session_len)) {
+> > 		ret = -EFAULT;
+> > 		goto e_free;
+> > 	}
 > 
 > 
-> It looks to me the patch is identical to v1.
-> 
-> Thanks
+> We should not be using the data->session_len, it will cause -EFAULT when
+> user has not allocated enough space in the session_uaddr. Lets consider
+> the case where user passes session_len=10 but firmware thinks the
+> session length should be 64. In that case the data->session_len will
+> contains a value of 64 but userspace has allocated space for 10 bytes
+> and copy_to_user() will fail. If we are really concern about the amount
+> of data getting copied to userspace then use min_t(size_t,
+> params.session_len, data->session_len).
 
+We are allocating a buffer of params.session_len size and passing that
+buffer, and that length via data->session_len, to the firmware. Why would
+the firmware set data->session_len to a larger value, in spite of telling
+it that the buffer is only params.session_len long? I thought that only
+the reverse is possible, that is, the user sets the params.session_len
+to the MAX, but the session data is actually smaller than that size.
 
-you are right. I squashed the description into
-    virtio/test: fix up after IOTLB changes
-take a look at it in the vhost tree.
+Also, if for whatever reason the firmware sets data->session_len to
+a larger value than what is passed, what is the user space expected
+to do when the call returns? If the user space tries to access
+params.session_len amount of data, it will possibly get a memory access
+violation, because it did not originally allocate that large a buffer.
+
+If we do go with using min_t(size_t, params.session_len,
+data->session_len), then params.session_len should also be set to the
+smaller of the two, right?
+
+> >> +
+> >> +	params.policy = data->policy;
+> >> +	params.session_len = data->session_len;
+> >> +	if (copy_to_user((void __user *)(uintptr_t)argp->data, &params,
+> >> +				sizeof(struct kvm_sev_send_start)))
+> >> +		ret = -EFAULT;
+> > Since the only fields that are changed in the kvm_sev_send_start structure
+> > are session_len and policy, why do we need to copy the entire structure
+> > back to the user? Why not just those two values? Please see the changes
+> > proposed to kvm_sev_send_start structure further below to accomplish this.
+> 
+> I think we also need to consider the code readability while saving the
+> CPU cycles. This is very small structure. By duplicating into two calls
+> #1 copy params.policy and #2 copy params.session_len we will add more
+> CPU cycle. And, If we get creative and rearrange the structure then code
+> readability is lost because now the copy will depend on how the
+> structure is layout in the memory.
+
+I was not recommending splitting that call into two. That would certainly
+be more expensive, than copying the entire structure. That is the reason
+why I suggested reordering the members of kvm_sev_send_start. Isn't
+there plenty of code where structures are defined in a way to keep the
+data movement efficient? :-)
+
+Please see my other comment below.
 
 > 
-> > 
-> >   drivers/vdpa/Kconfig  | 1 +
-> >   drivers/vhost/Kconfig | 1 -
-> >   2 files changed, 1 insertion(+), 1 deletion(-)
-> > 
-> > diff --git a/drivers/vdpa/Kconfig b/drivers/vdpa/Kconfig
-> > index 7db1460104b7..08b615f2da39 100644
-> > --- a/drivers/vdpa/Kconfig
-> > +++ b/drivers/vdpa/Kconfig
-> > @@ -17,6 +17,7 @@ config VDPA_SIM
-> >   	depends on RUNTIME_TESTING_MENU
-> >   	select VDPA
-> >   	select VHOST_RING
-> > +	select VHOST_IOTLB
-> >   	default n
-> >   	help
-> >   	  vDPA networking device simulator which loop TX traffic back
-> > diff --git a/drivers/vhost/Kconfig b/drivers/vhost/Kconfig
-> > index f0404ce255d1..cb6b17323eb2 100644
-> > --- a/drivers/vhost/Kconfig
-> > +++ b/drivers/vhost/Kconfig
-> > @@ -8,7 +8,6 @@ config VHOST_IOTLB
-> >   config VHOST_RING
-> >   	tristate
-> > -	select VHOST_IOTLB
-> >   	help
-> >   	  This option is selected by any driver which needs to access
-> >   	  the host side of a virtio ring.
+> >
+> > 	params.policy = data->policy;
+> > 	if (copy_to_user((void __user *)(uintptr_t)argp->data, &params,
+> > 			sizeof(params.policy) + sizeof(params.session_len))
+> > 		ret = -EFAULT;
+> >> +
+> >> +e_free:
+> >> +	kfree(data);
+> >> +e_free_amd_cert:
+> >> +	kfree(amd_certs);
+> >> +e_free_plat_cert:
+> >> +	kfree(plat_certs);
+> >> +e_free_pdh:
+> >> +	kfree(pdh_cert);
+> >> +e_free_session:
+> >> +	kfree(session_data);
+> >> +	return ret;
+> >> +}
+> >> +
+> >>  static int svm_mem_enc_op(struct kvm *kvm, void __user *argp)
+> >>  {
+> >>  	struct kvm_sev_cmd sev_cmd;
+> >> @@ -7193,6 +7318,9 @@ static int svm_mem_enc_op(struct kvm *kvm, void __user *argp)
+> >>  	case KVM_SEV_LAUNCH_SECRET:
+> >>  		r = sev_launch_secret(kvm, &sev_cmd);
+> >>  		break;
+> >> +	case KVM_SEV_SEND_START:
+> >> +		r = sev_send_start(kvm, &sev_cmd);
+> >> +		break;
+> >>  	default:
+> >>  		r = -EINVAL;
+> >>  		goto out;
+> >> diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
+> >> index 5167bf2bfc75..9f63b9d48b63 100644
+> >> --- a/include/linux/psp-sev.h
+> >> +++ b/include/linux/psp-sev.h
+> >> @@ -323,11 +323,11 @@ struct sev_data_send_start {
+> >>  	u64 pdh_cert_address;			/* In */
+> >>  	u32 pdh_cert_len;			/* In */
+> >>  	u32 reserved1;
+> >> -	u64 plat_cert_address;			/* In */
+> >> -	u32 plat_cert_len;			/* In */
+> >> +	u64 plat_certs_address;			/* In */
+> >> +	u32 plat_certs_len;			/* In */
+> >>  	u32 reserved2;
+> >> -	u64 amd_cert_address;			/* In */
+> >> -	u32 amd_cert_len;			/* In */
+> >> +	u64 amd_certs_address;			/* In */
+> >> +	u32 amd_certs_len;			/* In */
+> >>  	u32 reserved3;
+> >>  	u64 session_address;			/* In */
+> >>  	u32 session_len;			/* In/Out */
+> >> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> >> index 4b95f9a31a2f..17bef4c245e1 100644
+> >> --- a/include/uapi/linux/kvm.h
+> >> +++ b/include/uapi/linux/kvm.h
+> >> @@ -1558,6 +1558,18 @@ struct kvm_sev_dbg {
+> >>  	__u32 len;
+> >>  };
+> >>  
+> >> +struct kvm_sev_send_start {
+> >> +	__u32 policy;
+> >> +	__u64 pdh_cert_uaddr;
+> >> +	__u32 pdh_cert_len;
+> >> +	__u64 plat_certs_uaddr;
+> >> +	__u32 plat_certs_len;
+> >> +	__u64 amd_certs_uaddr;
+> >> +	__u32 amd_certs_len;
+> >> +	__u64 session_uaddr;
+> >> +	__u32 session_len;
+> >> +};
+> > Redo this structure as below:
+> >
+> > struct kvm_sev_send_start {
+> > 	__u32 policy;
+> > 	__u32 session_len;
+> > 	__u64 session_uaddr;
+> > 	__u64 pdh_cert_uaddr;
+> > 	__u32 pdh_cert_len;
+> > 	__u64 plat_certs_uaddr;
+> > 	__u32 plat_certs_len;
+> > 	__u64 amd_certs_uaddr;
+> > 	__u32 amd_certs_len;
+> > };
+> >
+> > Or as below, just to make it look better.
+> >
+> > struct kvm_sev_send_start {
+> > 	__u32 policy;
+> > 	__u32 session_len;
+> > 	__u64 session_uaddr;
+> > 	__u32 pdh_cert_len;
+> > 	__u64 pdh_cert_uaddr;
+> > 	__u32 plat_certs_len;
+> > 	__u64 plat_certs_uaddr;
+> > 	__u32 amd_certs_len;
+> > 	__u64 amd_certs_uaddr;
+> > };
+> >
+> 
+> Wherever applicable, I tried  best to not divert from the SEV spec
+> structure layout. Anyone who is reading the SEV FW spec  will see a
+> similar structure layout in the KVM/PSP header files. I would prefer to
+> stick to that approach.
 
+This structure is in uapi, and is anyway different from the
+sev_data_send_start, right? Does it really need to stay close to the
+firmware structure layout? Just because the firmware folks thought of
+a structure layout, that should not prevent our code to be efficient.
+
+> 
+> 
+> >> +
+> >>  #define KVM_DEV_ASSIGN_ENABLE_IOMMU	(1 << 0)
+> >>  #define KVM_DEV_ASSIGN_PCI_2_3		(1 << 1)
+> >>  #define KVM_DEV_ASSIGN_MASK_INTX	(1 << 2)
+> >> -- 
+> >> 2.17.1
+> >>
