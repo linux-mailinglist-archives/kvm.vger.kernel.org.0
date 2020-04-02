@@ -2,171 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C374F19CB3F
-	for <lists+kvm@lfdr.de>; Thu,  2 Apr 2020 22:34:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 69DEF19CB48
+	for <lists+kvm@lfdr.de>; Thu,  2 Apr 2020 22:36:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389489AbgDBUeX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Apr 2020 16:34:23 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:26384 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728225AbgDBUeX (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 2 Apr 2020 16:34:23 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1585859661;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=ietQ1ekQOzxzT5ovszXdfNoG3WOzxptqDEC/u1Ud83U=;
-        b=QlGUyp1gjDEO1DfoeUcevd+5vjKCAcbIhpN1jHUdrVdus8Sh4CeU+fdpM/R63GtWm8vq+B
-        FXHK3VLXOr+1Gi130XF1M8VDvh8XQTyxsV/ntDD1kEExGDbvRmhGSI3YeAEKRfaN7hP5jS
-        9j66ew2RZ0NSGTrL31KsLq+I7W/ruDw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-51-DFSBZ6cTNdOUh55AKs7n4w-1; Thu, 02 Apr 2020 16:33:53 -0400
-X-MC-Unique: DFSBZ6cTNdOUh55AKs7n4w-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1D1381083EAA;
-        Thu,  2 Apr 2020 20:33:51 +0000 (UTC)
-Received: from w520.home (ovpn-112-162.phx2.redhat.com [10.3.112.162])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id BCF191147C6;
-        Thu,  2 Apr 2020 20:33:42 +0000 (UTC)
-Date:   Thu, 2 Apr 2020 14:33:42 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     "Liu, Yi L" <yi.l.liu@intel.com>
-Cc:     eric.auger@redhat.com, kevin.tian@intel.com,
-        jacob.jun.pan@linux.intel.com, joro@8bytes.org,
-        ashok.raj@intel.com, jun.j.tian@intel.com, yi.y.sun@intel.com,
-        jean-philippe@linaro.org, peterx@redhat.com,
-        iommu@lists.linux-foundation.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, hao.wu@intel.com
-Subject: Re: [PATCH v1 8/8] vfio/type1: Add vSVA support for IOMMU-backed
- mdevs
-Message-ID: <20200402143342.1e10c498@w520.home>
-In-Reply-To: <1584880325-10561-9-git-send-email-yi.l.liu@intel.com>
-References: <1584880325-10561-1-git-send-email-yi.l.liu@intel.com>
-        <1584880325-10561-9-git-send-email-yi.l.liu@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+        id S2388709AbgDBUgO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Apr 2020 16:36:14 -0400
+Received: from mail-pl1-f193.google.com ([209.85.214.193]:37591 "EHLO
+        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729549AbgDBUgN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Apr 2020 16:36:13 -0400
+Received: by mail-pl1-f193.google.com with SMTP id x1so1792126plm.4
+        for <kvm@vger.kernel.org>; Thu, 02 Apr 2020 13:36:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=amacapital-net.20150623.gappssmtp.com; s=20150623;
+        h=content-transfer-encoding:from:mime-version:subject:date:message-id
+         :references:cc:in-reply-to:to;
+        bh=5Tvvg+jX0GG9uHDoaYNmJitk6pKLfYUjlwPpA4nOY8c=;
+        b=h/TL51fwxBfbFddA9eXzFEK5DtH/YBEal9qplDsoh3mxwYkcQE2z1eJ5U3z+3lh5Bq
+         VLfCqQDeRi83OHvScQvnNm7luL6VtmLoEkbjTcpwqjPPvq2hCfNPT3SXFzOQT/piwXXH
+         T0NqBW+H0T9F8TTmOtrdr+SlwvZhvEszkuTUe2yiKGFFXO3yivBeiZCFKCgor6wO9RHF
+         BaH2hIyZwICXGZKQOoh8NmHFTGePT7fHHhXVVQ5bOJ6qwCmH6aTzXeNZ3H6x8+EJRYnS
+         3z0ND3iDD0zJ+0pM/YqgDE+4XT4jqtoOIkpj+AynzrjLvT07RRlb9YCnYhDNabv2GKNi
+         Sg3w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:content-transfer-encoding:from:mime-version
+         :subject:date:message-id:references:cc:in-reply-to:to;
+        bh=5Tvvg+jX0GG9uHDoaYNmJitk6pKLfYUjlwPpA4nOY8c=;
+        b=eoZswY5xe04+FNA69vUOxK3BZS9yEf18vs+u6TRbvQEPygEA2yPPfaAUL6Dh3/rjSP
+         6Ok/itJaCYSU7V+BgqIAFAx+Rs68XQQJHiaFgXgaVz76BL5RV118tJFxO4NelxUdfYND
+         rbdf+U45y4sh8wzXCdV0+9VxF1qKfjh8CR34douM59YqU43S0nbyj72qDJuUB66qPLqu
+         xmaQTKwo1M1KNM6oIoMYeIVSrT/X95GGo88gFeblNhP4br730/1l/QECslcPNudsLZzD
+         pGIULBPRVfRKMjFEy7ukkmC78R4GAbKRglsJbn/OOso1sgu/UFSuZTchjGjBjN+fDksh
+         3thg==
+X-Gm-Message-State: AGi0PubXJpDKIPyKuC1PgaslgciKDJENHf6mrGO5FNPCvw+rR5WlQG4I
+        Td0zX5cDSk6y1JwV95JXdKTV3w==
+X-Google-Smtp-Source: APiQypJwwiuCucj4ZpH3FL5V1GUvNK9TzMm3eb1wW/iOjUU0tRn1Sb/G6pQHUNrpI8dDCEvBaDVd/A==
+X-Received: by 2002:a17:90a:e64e:: with SMTP id ep14mr5954301pjb.149.1585859770830;
+        Thu, 02 Apr 2020 13:36:10 -0700 (PDT)
+Received: from ?IPv6:2601:646:c200:1ef2:20df:efa9:6ad3:9221? ([2601:646:c200:1ef2:20df:efa9:6ad3:9221])
+        by smtp.gmail.com with ESMTPSA id y207sm4428233pfb.189.2020.04.02.13.36.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 02 Apr 2020 13:36:10 -0700 (PDT)
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+From:   Andy Lutomirski <luto@amacapital.net>
+Mime-Version: 1.0 (1.0)
+Subject: Re: [PATCH 3/3] KVM: VMX: Extend VMX's #AC interceptor to handle split lock #AC in guest
+Date:   Thu, 2 Apr 2020 13:36:08 -0700
+Message-Id: <D6B8E21D-6DB2-4DF8-8B73-12DD36476F55@amacapital.net>
+References: <87h7y1mz2s.fsf@nanos.tec.linutronix.de>
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        x86@kernel.org, "Kenneth R . Crudup" <kenny@panix.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Fenghua Yu <fenghua.yu@intel.com>,
+        Xiaoyao Li <xiaoyao.li@intel.com>,
+        Nadav Amit <namit@vmware.com>,
+        Thomas Hellstrom <thellstrom@vmware.com>,
+        Tony Luck <tony.luck@intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Jessica Yu <jeyu@kernel.org>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+In-Reply-To: <87h7y1mz2s.fsf@nanos.tec.linutronix.de>
+To:     Thomas Gleixner <tglx@linutronix.de>
+X-Mailer: iPhone Mail (17D50)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, 22 Mar 2020 05:32:05 -0700
-"Liu, Yi L" <yi.l.liu@intel.com> wrote:
 
-> From: Liu Yi L <yi.l.liu@intel.com>
-> 
-> Recent years, mediated device pass-through framework (e.g. vfio-mdev)
-> are used to achieve flexible device sharing across domains (e.g. VMs).
-> Also there are hardware assisted mediated pass-through solutions from
-> platform vendors. e.g. Intel VT-d scalable mode which supports Intel
-> Scalable I/O Virtualization technology. Such mdevs are called IOMMU-
-> backed mdevs as there are IOMMU enforced DMA isolation for such mdevs.
-> In kernel, IOMMU-backed mdevs are exposed to IOMMU layer by aux-domain
-> concept, which means mdevs are protected by an iommu domain which is
-> aux-domain of its physical device. Details can be found in the KVM
-> presentation from Kevin Tian. IOMMU-backed equals to IOMMU-capable.
-> 
-> https://events19.linuxfoundation.org/wp-content/uploads/2017/12/\
-> Hardware-Assisted-Mediated-Pass-Through-with-VFIO-Kevin-Tian-Intel.pdf
-> 
-> This patch supports NESTING IOMMU for IOMMU-backed mdevs by figuring
-> out the physical device of an IOMMU-backed mdev and then invoking IOMMU
-> requests to IOMMU layer with the physical device and the mdev's aux
-> domain info.
-> 
-> With this patch, vSVA (Virtual Shared Virtual Addressing) can be used
-> on IOMMU-backed mdevs.
-> 
-> Cc: Kevin Tian <kevin.tian@intel.com>
-> CC: Jacob Pan <jacob.jun.pan@linux.intel.com>
-> CC: Jun Tian <jun.j.tian@intel.com>
-> Cc: Alex Williamson <alex.williamson@redhat.com>
-> Cc: Eric Auger <eric.auger@redhat.com>
-> Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>
-> Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
-> ---
->  drivers/vfio/vfio_iommu_type1.c | 23 ++++++++++++++++++++---
->  1 file changed, 20 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> index 937ec3f..d473665 100644
-> --- a/drivers/vfio/vfio_iommu_type1.c
-> +++ b/drivers/vfio/vfio_iommu_type1.c
-> @@ -132,6 +132,7 @@ struct vfio_regions {
->  
->  struct domain_capsule {
->  	struct iommu_domain *domain;
-> +	struct vfio_group *group;
->  	void *data;
->  };
->  
-> @@ -148,6 +149,7 @@ static int vfio_iommu_for_each_dev(struct vfio_iommu *iommu,
->  	list_for_each_entry(d, &iommu->domain_list, next) {
->  		dc.domain = d->domain;
->  		list_for_each_entry(g, &d->group_list, next) {
-> +			dc.group = g;
->  			ret = iommu_group_for_each_dev(g->iommu_group,
->  						       &dc, fn);
->  			if (ret)
-> @@ -2347,7 +2349,12 @@ static int vfio_bind_gpasid_fn(struct device *dev, void *data)
->  	struct iommu_gpasid_bind_data *gbind_data =
->  		(struct iommu_gpasid_bind_data *) dc->data;
->  
-> -	return iommu_sva_bind_gpasid(dc->domain, dev, gbind_data);
-> +	if (dc->group->mdev_group)
-> +		return iommu_sva_bind_gpasid(dc->domain,
-> +			vfio_mdev_get_iommu_device(dev), gbind_data);
 
-But we can't assume an mdev device is iommu backed, so this can call
-with NULL dev, which appears will pretty quickly segfault
-intel_svm_bind_gpasid.
+> On Apr 2, 2020, at 1:07 PM, Thomas Gleixner <tglx@linutronix.de> wrote:
+>=20
 
-> +	else
-> +		return iommu_sva_bind_gpasid(dc->domain,
-> +						dev, gbind_data);
->  }
->  
->  static int vfio_unbind_gpasid_fn(struct device *dev, void *data)
-> @@ -2356,8 +2363,13 @@ static int vfio_unbind_gpasid_fn(struct device *dev, void *data)
->  	struct iommu_gpasid_bind_data *gbind_data =
->  		(struct iommu_gpasid_bind_data *) dc->data;
->  
-> -	return iommu_sva_unbind_gpasid(dc->domain, dev,
-> +	if (dc->group->mdev_group)
-> +		return iommu_sva_unbind_gpasid(dc->domain,
-> +					vfio_mdev_get_iommu_device(dev),
->  					gbind_data->hpasid);
+>=20
+>=20
+> TBH, the more I learn about this, the more I tend to just give up on
+> this whole split lock stuff in its current form and wait until HW folks
+> provide something which is actually usable:
+>=20
+>   - Per thread
+>   - Properly distinguishable from a regular #AC via error code
 
-Same
+Why the latter?  I would argue that #AC from CPL3 with EFLAGS.AC set is almo=
+st by construction not a split lock. In particular, if you meet these condit=
+ions, how exactly can you do a split lock without simultaneously triggering a=
+n alignment check?  (Maybe CMPXCHG16B?
 
-> +	else
-> +		return iommu_sva_unbind_gpasid(dc->domain, dev,
-> +						gbind_data->hpasid);
->  }
->  
->  /**
-> @@ -2429,7 +2441,12 @@ static int vfio_cache_inv_fn(struct device *dev, void *data)
->  	struct iommu_cache_invalidate_info *cache_inv_info =
->  		(struct iommu_cache_invalidate_info *) dc->data;
->  
-> -	return iommu_cache_invalidate(dc->domain, dev, cache_inv_info);
-> +	if (dc->group->mdev_group)
-> +		return iommu_cache_invalidate(dc->domain,
-> +			vfio_mdev_get_iommu_device(dev), cache_inv_info);
-
-And again
-
-> +	else
-> +		return iommu_cache_invalidate(dc->domain,
-> +						dev, cache_inv_info);
->  }
->  
->  static long vfio_iommu_type1_ioctl(void *iommu_data,
-
+>=20
+> OTOH, that means I won't be able to use it before retirement. Oh well.
+>=20
+> Thanks,
+>=20
+>        tglx
