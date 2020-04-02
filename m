@@ -2,183 +2,427 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C877219BE08
-	for <lists+kvm@lfdr.de>; Thu,  2 Apr 2020 10:51:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3C49219BE1B
+	for <lists+kvm@lfdr.de>; Thu,  2 Apr 2020 10:52:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387752AbgDBIvV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Apr 2020 04:51:21 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:25944 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728612AbgDBIvV (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 2 Apr 2020 04:51:21 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1585817480;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=sYvVPnFREHaBsjFV0w/bTrbAuL3JWq47XvNz9FF44bw=;
-        b=b3dXIDBeq9pJkrv7qLqd15cza9An8rBNyJTOpCXPPSl2LzucNUrT1PxLO5gCNF0CuYn/wT
-        gQlEO92QiHJeXVCVvCZ/VkBQsY2000qNCRWYn2gPqsZc8bshRhIXhD/kAUWJlEeu7QvEMV
-        dzIaFRuyTnClkEcwPea0U9Y7qR1WM1c=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-86-gFp_BJr6O5iN_45Ms49SFQ-1; Thu, 02 Apr 2020 04:51:17 -0400
-X-MC-Unique: gFp_BJr6O5iN_45Ms49SFQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 145CD1005055;
-        Thu,  2 Apr 2020 08:51:16 +0000 (UTC)
-Received: from [10.36.114.29] (ovpn-114-29.ams2.redhat.com [10.36.114.29])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D58D51019611;
-        Thu,  2 Apr 2020 08:51:13 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH v1] s390x: STFLE operates on doublewords
-To:     kvm@vger.kernel.org
-Cc:     Thomas Huth <thuth@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>
-References: <20200401163305.31550-1-david@redhat.com>
-From:   David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat GmbH
-Message-ID: <a01b9522-f69b-a314-63e5-8b67e8e56891@redhat.com>
-Date:   Thu, 2 Apr 2020 10:51:12 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
-MIME-Version: 1.0
-In-Reply-To: <20200401163305.31550-1-david@redhat.com>
-Content-Type: text/plain; charset=utf-8
+        id S2387768AbgDBIwv convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Thu, 2 Apr 2020 04:52:51 -0400
+Received: from mga07.intel.com ([134.134.136.100]:9630 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728612AbgDBIwv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Apr 2020 04:52:51 -0400
+IronPort-SDR: +N1N28fDgjlrixnyXSatwV8LJfHgW6p51yAA1mTVnTsDfLPy8DkYngAmNBsnhLfDBKFLYudtmZ
+ a6/NWq5uC/pw==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Apr 2020 01:52:46 -0700
+IronPort-SDR: 8EJljdY07VLZBap2wMNzqJqdfLLEwonCRWdERy/w+euvtrUmQLEdQXHaLqafFGFPf9+H3YhqJw
+ zYTtxcnrHaqw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.72,335,1580803200"; 
+   d="scan'208";a="240768732"
+Received: from fmsmsx105.amr.corp.intel.com ([10.18.124.203])
+  by fmsmga007.fm.intel.com with ESMTP; 02 Apr 2020 01:52:46 -0700
+Received: from fmsmsx161.amr.corp.intel.com (10.18.125.9) by
+ FMSMSX105.amr.corp.intel.com (10.18.124.203) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Thu, 2 Apr 2020 01:52:46 -0700
+Received: from shsmsx105.ccr.corp.intel.com (10.239.4.158) by
+ FMSMSX161.amr.corp.intel.com (10.18.125.9) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Thu, 2 Apr 2020 01:52:46 -0700
+Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.225]) by
+ SHSMSX105.ccr.corp.intel.com ([169.254.11.213]) with mapi id 14.03.0439.000;
+ Thu, 2 Apr 2020 16:52:42 +0800
+From:   "Liu, Yi L" <yi.l.liu@intel.com>
+To:     Auger Eric <eric.auger@redhat.com>,
+        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "peterx@redhat.com" <peterx@redhat.com>
+CC:     "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        Jacob Pan <jacob.jun.pan@linux.intel.com>,
+        Yi Sun <yi.y.sun@linux.intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "mst@redhat.com" <mst@redhat.com>,
+        "Tian, Jun J" <jun.j.tian@intel.com>,
+        "Sun, Yi Y" <yi.y.sun@intel.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "Wu, Hao" <hao.wu@intel.com>,
+        "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>
+Subject: RE: [PATCH v2 05/22] hw/pci: modify pci_setup_iommu() to set
+ PCIIOMMUOps
+Thread-Topic: [PATCH v2 05/22] hw/pci: modify pci_setup_iommu() to set
+ PCIIOMMUOps
+Thread-Index: AQHWBkplYx1wDloSfEiqLsnvUo9sNqhgcquAgAUOJcA=
+Date:   Thu, 2 Apr 2020 08:52:41 +0000
+Message-ID: <A2975661238FB949B60364EF0F2C25743A21EDF9@SHSMSX104.ccr.corp.intel.com>
+References: <1585542301-84087-1-git-send-email-yi.l.liu@intel.com>
+ <1585542301-84087-6-git-send-email-yi.l.liu@intel.com>
+ <d7185758-701e-03f0-b804-f71587d65e65@redhat.com>
+In-Reply-To: <d7185758-701e-03f0-b804-f71587d65e65@redhat.com>
+Accept-Language: en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
+MIME-Version: 1.0
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 01.04.20 18:33, David Hildenbrand wrote:
-> STFLE operates on doublewords, not bytes. Passing in "256" resulted in
-> some ignored bits getting set. Not bad, but also not clean.
+> From: Auger Eric < eric.auger@redhat.com>
+> Sent: Monday, March 30, 2020 7:02 PM
+> To: Liu, Yi L <yi.l.liu@intel.com>; qemu-devel@nongnu.org;
+> Subject: Re: [PATCH v2 05/22] hw/pci: modify pci_setup_iommu() to set
+> PCIIOMMUOps
 > 
-> Let's just convert our stfle handling code to operate on doublewords.
 > 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->  lib/s390x/asm/facility.h | 14 +++++++-------
->  lib/s390x/io.c           |  2 +-
->  2 files changed, 8 insertions(+), 8 deletions(-)
 > 
-> diff --git a/lib/s390x/asm/facility.h b/lib/s390x/asm/facility.h
-> index e34dc2c..def2705 100644
-> --- a/lib/s390x/asm/facility.h
-> +++ b/lib/s390x/asm/facility.h
-> @@ -14,12 +14,12 @@
->  #include <asm/facility.h>
->  #include <asm/arch_def.h>
->  
-> -#define NR_STFL_BYTES 256
-> -extern uint8_t stfl_bytes[];
-> +#define NB_STFL_DOUBLEWORDS 32
-> +extern uint64_t stfl_doublewords[];
->  
->  static inline bool test_facility(int nr)
->  {
-> -	return stfl_bytes[nr / 8] & (0x80U >> (nr % 8));
-> +	return stfl_doublewords[nr / 64] & (0x8000000000000000UL >> (nr % 64));
->  }
->  
->  static inline void stfl(void)
-> @@ -27,9 +27,9 @@ static inline void stfl(void)
->  	asm volatile("	stfl	0(0)\n" : : : "memory");
->  }
->  
-> -static inline void stfle(uint8_t *fac, unsigned int len)
-> +static inline void stfle(uint64_t *fac, unsigned int nb_doublewords)
->  {
-> -	register unsigned long r0 asm("0") = len - 1;
-> +	register unsigned long r0 asm("0") = nb_doublewords - 1;
->  
->  	asm volatile("	.insn	s,0xb2b00000,0(%1)\n"
->  		     : "+d" (r0) : "a" (fac) : "memory", "cc");
-> @@ -40,9 +40,9 @@ static inline void setup_facilities(void)
->  	struct lowcore *lc = NULL;
->  
->  	stfl();
-> -	memcpy(stfl_bytes, &lc->stfl, sizeof(lc->stfl));
-> +	memcpy(stfl_doublewords, &lc->stfl, sizeof(lc->stfl));
->  	if (test_facility(7))
-> -		stfle(stfl_bytes, NR_STFL_BYTES);
-> +		stfle(stfl_doublewords, NB_STFL_DOUBLEWORDS);
->  }
->  
->  #endif
-> diff --git a/lib/s390x/io.c b/lib/s390x/io.c
-> index e091c37..c0f0bf7 100644
-> --- a/lib/s390x/io.c
-> +++ b/lib/s390x/io.c
-> @@ -19,7 +19,7 @@
->  #include "smp.h"
->  
->  extern char ipl_args[];
-> -uint8_t stfl_bytes[NR_STFL_BYTES] __attribute__((aligned(8)));
-> +uint64_t stfl_doublewords[NB_STFL_DOUBLEWORDS];
->  
->  static struct spinlock lock;
->  
-> 
+> On 3/30/20 6:24 AM, Liu Yi L wrote:
+> > This patch modifies pci_setup_iommu() to set PCIIOMMUOps instead of
+> > setting PCIIOMMUFunc. PCIIOMMUFunc is used to get an address space for
+> > a PCI device in vendor specific way. The PCIIOMMUOps still offers this
+> > functionality. But using PCIIOMMUOps leaves space to add more iommu
+> > related vendor specific operations.
+> >
+> > Cc: Kevin Tian <kevin.tian@intel.com>
+> > Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
+> > Cc: Peter Xu <peterx@redhat.com>
+> > Cc: Eric Auger <eric.auger@redhat.com>
+> > Cc: Yi Sun <yi.y.sun@linux.intel.com>
+> > Cc: David Gibson <david@gibson.dropbear.id.au>
+> > Cc: Michael S. Tsirkin <mst@redhat.com>
+> > Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+> > Reviewed-by: Peter Xu <peterx@redhat.com>
+> > Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
+> > ---
+> >  hw/alpha/typhoon.c       |  6 +++++-
+> >  hw/arm/smmu-common.c     |  6 +++++-
+> >  hw/hppa/dino.c           |  6 +++++-
+> >  hw/i386/amd_iommu.c      |  6 +++++-
+> >  hw/i386/intel_iommu.c    |  6 +++++-
+> >  hw/pci-host/designware.c |  6 +++++-
+> >  hw/pci-host/pnv_phb3.c   |  6 +++++-
+> >  hw/pci-host/pnv_phb4.c   |  6 +++++-
+> >  hw/pci-host/ppce500.c    |  6 +++++-
+> >  hw/pci-host/prep.c       |  6 +++++-
+> >  hw/pci-host/sabre.c      |  6 +++++-
+> >  hw/pci/pci.c             | 12 +++++++-----
+> >  hw/ppc/ppc440_pcix.c     |  6 +++++-
+> >  hw/ppc/spapr_pci.c       |  6 +++++-
+> >  hw/s390x/s390-pci-bus.c  |  8 ++++++--  hw/virtio/virtio-iommu.c |  6
+> > +++++-
+> >  include/hw/pci/pci.h     |  8 ++++++--
+> >  include/hw/pci/pci_bus.h |  2 +-
+> >  18 files changed, 90 insertions(+), 24 deletions(-)
+> >
+> > diff --git a/hw/alpha/typhoon.c b/hw/alpha/typhoon.c index
+> > 1795e2f..f271de1 100644
+> > --- a/hw/alpha/typhoon.c
+> > +++ b/hw/alpha/typhoon.c
+> > @@ -740,6 +740,10 @@ static AddressSpace *typhoon_pci_dma_iommu(PCIBus
+> *bus, void *opaque, int devfn)
+> >      return &s->pchip.iommu_as;
+> >  }
+> >
+> > +static const PCIIOMMUOps typhoon_iommu_ops = {
+> > +    .get_address_space = typhoon_pci_dma_iommu, };
+> > +
+> >  static void typhoon_set_irq(void *opaque, int irq, int level)  {
+> >      TyphoonState *s = opaque;
+> > @@ -897,7 +901,7 @@ PCIBus *typhoon_init(MemoryRegion *ram, ISABus
+> **isa_bus, qemu_irq *p_rtc_irq,
+> >                               "iommu-typhoon", UINT64_MAX);
+> >      address_space_init(&s->pchip.iommu_as, MEMORY_REGION(&s-
+> >pchip.iommu),
+> >                         "pchip0-pci");
+> > -    pci_setup_iommu(b, typhoon_pci_dma_iommu, s);
+> > +    pci_setup_iommu(b, &typhoon_iommu_ops, s);
+> >
+> >      /* Pchip0 PCI special/interrupt acknowledge, 0x801.F800.0000, 64MB.  */
+> >      memory_region_init_io(&s->pchip.reg_iack, OBJECT(s),
+> > &alpha_pci_iack_ops, diff --git a/hw/arm/smmu-common.c
+> > b/hw/arm/smmu-common.c index e13a5f4..447146e 100644
+> > --- a/hw/arm/smmu-common.c
+> > +++ b/hw/arm/smmu-common.c
+> > @@ -343,6 +343,10 @@ static AddressSpace *smmu_find_add_as(PCIBus *bus,
+> void *opaque, int devfn)
+> >      return &sdev->as;
+> >  }
+> >
+> > +static const PCIIOMMUOps smmu_ops = {
+> > +    .get_address_space = smmu_find_add_as, };
+> > +
+> >  IOMMUMemoryRegion *smmu_iommu_mr(SMMUState *s, uint32_t sid)  {
+> >      uint8_t bus_n, devfn;
+> > @@ -437,7 +441,7 @@ static void smmu_base_realize(DeviceState *dev, Error
+> **errp)
+> >      s->smmu_pcibus_by_busptr = g_hash_table_new(NULL, NULL);
+> >
+> >      if (s->primary_bus) {
+> > -        pci_setup_iommu(s->primary_bus, smmu_find_add_as, s);
+> > +        pci_setup_iommu(s->primary_bus, &smmu_ops, s);
+> >      } else {
+> >          error_setg(errp, "SMMU is not attached to any PCI bus!");
+> >      }
+> > diff --git a/hw/hppa/dino.c b/hw/hppa/dino.c index 2b1b38c..3da4f84
+> > 100644
+> > --- a/hw/hppa/dino.c
+> > +++ b/hw/hppa/dino.c
+> > @@ -459,6 +459,10 @@ static AddressSpace *dino_pcihost_set_iommu(PCIBus
+> *bus, void *opaque,
+> >      return &s->bm_as;
+> >  }
+> >
+> > +static const PCIIOMMUOps dino_iommu_ops = {
+> > +    .get_address_space = dino_pcihost_set_iommu, };
+> > +
+> >  /*
+> >   * Dino interrupts are connected as shown on Page 78, Table 23
+> >   * (Little-endian bit numbers)
+> > @@ -580,7 +584,7 @@ PCIBus *dino_init(MemoryRegion *addr_space,
+> >      memory_region_add_subregion(&s->bm, 0xfff00000,
+> >                                  &s->bm_cpu_alias);
+> >      address_space_init(&s->bm_as, &s->bm, "pci-bm");
+> > -    pci_setup_iommu(b, dino_pcihost_set_iommu, s);
+> > +    pci_setup_iommu(b, &dino_iommu_ops, s);
+> >
+> >      *p_rtc_irq = qemu_allocate_irq(dino_set_timer_irq, s, 0);
+> >      *p_ser_irq = qemu_allocate_irq(dino_set_serial_irq, s, 0); diff
+> > --git a/hw/i386/amd_iommu.c b/hw/i386/amd_iommu.c index
+> > b1175e5..5fec30e 100644
+> > --- a/hw/i386/amd_iommu.c
+> > +++ b/hw/i386/amd_iommu.c
+> > @@ -1451,6 +1451,10 @@ static AddressSpace
+> *amdvi_host_dma_iommu(PCIBus *bus, void *opaque, int devfn)
+> >      return &iommu_as[devfn]->as;
+> >  }
+> >
+> > +static const PCIIOMMUOps amdvi_iommu_ops = {
+> > +    .get_address_space = amdvi_host_dma_iommu, };
+> > +
+> >  static const MemoryRegionOps mmio_mem_ops = {
+> >      .read = amdvi_mmio_read,
+> >      .write = amdvi_mmio_write,
+> > @@ -1577,7 +1581,7 @@ static void amdvi_realize(DeviceState *dev,
+> > Error **errp)
+> >
+> >      sysbus_init_mmio(SYS_BUS_DEVICE(s), &s->mmio);
+> >      sysbus_mmio_map(SYS_BUS_DEVICE(s), 0, AMDVI_BASE_ADDR);
+> > -    pci_setup_iommu(bus, amdvi_host_dma_iommu, s);
+> > +    pci_setup_iommu(bus, &amdvi_iommu_ops, s);
+> >      s->devid = object_property_get_int(OBJECT(&s->pci), "addr", errp);
+> >      msi_init(&s->pci.dev, 0, 1, true, false, errp);
+> >      amdvi_init(s);
+> > diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c index
+> > df7ad25..4b22910 100644
+> > --- a/hw/i386/intel_iommu.c
+> > +++ b/hw/i386/intel_iommu.c
+> > @@ -3729,6 +3729,10 @@ static AddressSpace *vtd_host_dma_iommu(PCIBus
+> *bus, void *opaque, int devfn)
+> >      return &vtd_as->as;
+> >  }
+> >
+> > +static PCIIOMMUOps vtd_iommu_ops = {
+> static const
 
-Queued to
+got it.
 
-https://github.com/davidhildenbrand/kvm-unit-tests.git s390x-next
+> > +    .get_address_space = vtd_host_dma_iommu, };
+> > +
+> >  static bool vtd_decide_config(IntelIOMMUState *s, Error **errp)  {
+> >      X86IOMMUState *x86_iommu = X86_IOMMU_DEVICE(s); @@ -3840,7
+> > +3844,7 @@ static void vtd_realize(DeviceState *dev, Error **errp)
+> >                                                g_free, g_free);
+> >      vtd_init(s);
+> >      sysbus_mmio_map(SYS_BUS_DEVICE(s), 0,
+> Q35_HOST_BRIDGE_IOMMU_ADDR);
+> > -    pci_setup_iommu(bus, vtd_host_dma_iommu, dev);
+> > +    pci_setup_iommu(bus, &vtd_iommu_ops, dev);
+> >      /* Pseudo address space under root PCI bus. */
+> >      x86ms->ioapic_as = vtd_host_dma_iommu(bus, s,
+> Q35_PSEUDO_DEVFN_IOAPIC);
+> >      qemu_add_machine_init_done_notifier(&vtd_machine_done_notify);
+> > diff --git a/hw/pci-host/designware.c b/hw/pci-host/designware.c index
+> > dd24551..4c6338a 100644
+> > --- a/hw/pci-host/designware.c
+> > +++ b/hw/pci-host/designware.c
+> > @@ -645,6 +645,10 @@ static AddressSpace
+> *designware_pcie_host_set_iommu(PCIBus *bus, void *opaque,
+> >      return &s->pci.address_space;
+> >  }
+> >
+> > +static const PCIIOMMUOps designware_iommu_ops = {
+> > +    .get_address_space = designware_pcie_host_set_iommu, };
+> > +
+> >  static void designware_pcie_host_realize(DeviceState *dev, Error
+> > **errp)  {
+> >      PCIHostState *pci = PCI_HOST_BRIDGE(dev); @@ -686,7 +690,7 @@
+> > static void designware_pcie_host_realize(DeviceState *dev, Error **errp)
+> >      address_space_init(&s->pci.address_space,
+> >                         &s->pci.address_space_root,
+> >                         "pcie-bus-address-space");
+> > -    pci_setup_iommu(pci->bus, designware_pcie_host_set_iommu, s);
+> > +    pci_setup_iommu(pci->bus, &designware_iommu_ops, s);
+> >
+> >      qdev_set_parent_bus(DEVICE(&s->root), BUS(pci->bus));
+> >      qdev_init_nofail(DEVICE(&s->root));
+> > diff --git a/hw/pci-host/pnv_phb3.c b/hw/pci-host/pnv_phb3.c index
+> > 74618fa..ecfe627 100644
+> > --- a/hw/pci-host/pnv_phb3.c
+> > +++ b/hw/pci-host/pnv_phb3.c
+> > @@ -961,6 +961,10 @@ static AddressSpace *pnv_phb3_dma_iommu(PCIBus
+> *bus, void *opaque, int devfn)
+> >      return &ds->dma_as;
+> >  }
+> >
+> > +static PCIIOMMUOps pnv_phb3_iommu_ops = {
+> static const
+got it. :-)
 
-thanks for the review
+> > +    .get_address_space = pnv_phb3_dma_iommu, };
+> > +
+> >  static void pnv_phb3_instance_init(Object *obj)  {
+> >      PnvPHB3 *phb = PNV_PHB3(obj);
+> > @@ -1059,7 +1063,7 @@ static void pnv_phb3_realize(DeviceState *dev, Error
+> **errp)
+> >                                       &phb->pci_mmio, &phb->pci_io,
+> >                                       0, 4, TYPE_PNV_PHB3_ROOT_BUS);
+> >
+> > -    pci_setup_iommu(pci->bus, pnv_phb3_dma_iommu, phb);
+> > +    pci_setup_iommu(pci->bus, &pnv_phb3_iommu_ops, phb);
+> >
+> >      /* Add a single Root port */
+> >      qdev_prop_set_uint8(DEVICE(&phb->root), "chassis", phb->chip_id);
+> > diff --git a/hw/pci-host/pnv_phb4.c b/hw/pci-host/pnv_phb4.c index
+> > 23cf093..04e95e3 100644
+> > --- a/hw/pci-host/pnv_phb4.c
+> > +++ b/hw/pci-host/pnv_phb4.c
+> > @@ -1148,6 +1148,10 @@ static AddressSpace *pnv_phb4_dma_iommu(PCIBus
+> *bus, void *opaque, int devfn)
+> >      return &ds->dma_as;
+> >  }
+> >
+> > +static PCIIOMMUOps pnv_phb4_iommu_ops = {
+> idem
+will add const.
 
--- 
-Thanks,
+> > +    .get_address_space = pnv_phb4_dma_iommu, };
+> > +
+> >  static void pnv_phb4_instance_init(Object *obj)  {
+> >      PnvPHB4 *phb = PNV_PHB4(obj);
+> > @@ -1205,7 +1209,7 @@ static void pnv_phb4_realize(DeviceState *dev, Error
+> **errp)
+> >                                       pnv_phb4_set_irq, pnv_phb4_map_irq, phb,
+> >                                       &phb->pci_mmio, &phb->pci_io,
+> >                                       0, 4, TYPE_PNV_PHB4_ROOT_BUS);
+> > -    pci_setup_iommu(pci->bus, pnv_phb4_dma_iommu, phb);
+> > +    pci_setup_iommu(pci->bus, &pnv_phb4_iommu_ops, phb);
+> >
+> >      /* Add a single Root port */
+> >      qdev_prop_set_uint8(DEVICE(&phb->root), "chassis", phb->chip_id);
+> > diff --git a/hw/pci-host/ppce500.c b/hw/pci-host/ppce500.c index
+> > d710727..5baf5db 100644
+> > --- a/hw/pci-host/ppce500.c
+> > +++ b/hw/pci-host/ppce500.c
+> > @@ -439,6 +439,10 @@ static AddressSpace *e500_pcihost_set_iommu(PCIBus
+> *bus, void *opaque,
+> >      return &s->bm_as;
+> >  }
+> >
+> > +static const PCIIOMMUOps ppce500_iommu_ops = {
+> > +    .get_address_space = e500_pcihost_set_iommu, };
+> > +
+> >  static void e500_pcihost_realize(DeviceState *dev, Error **errp)  {
+> >      SysBusDevice *sbd = SYS_BUS_DEVICE(dev); @@ -473,7 +477,7 @@
+> > static void e500_pcihost_realize(DeviceState *dev, Error **errp)
+> >      memory_region_init(&s->bm, OBJECT(s), "bm-e500", UINT64_MAX);
+> >      memory_region_add_subregion(&s->bm, 0x0, &s->busmem);
+> >      address_space_init(&s->bm_as, &s->bm, "pci-bm");
+> > -    pci_setup_iommu(b, e500_pcihost_set_iommu, s);
+> > +    pci_setup_iommu(b, &ppce500_iommu_ops, s);
+> >
+> >      pci_create_simple(b, 0, "e500-host-bridge");
+> >
+> > diff --git a/hw/pci-host/prep.c b/hw/pci-host/prep.c index
+> > 1a02e9a..7c57311 100644
+> > --- a/hw/pci-host/prep.c
+> > +++ b/hw/pci-host/prep.c
+> > @@ -213,6 +213,10 @@ static AddressSpace *raven_pcihost_set_iommu(PCIBus
+> *bus, void *opaque,
+> >      return &s->bm_as;
+> >  }
+> >
+> > +static const PCIIOMMUOps raven_iommu_ops = {
+> > +    .get_address_space = raven_pcihost_set_iommu, };
+> > +
+> >  static void raven_change_gpio(void *opaque, int n, int level)  {
+> >      PREPPCIState *s = opaque;
+> > @@ -303,7 +307,7 @@ static void raven_pcihost_initfn(Object *obj)
+> >      memory_region_add_subregion(&s->bm, 0         , &s->bm_pci_memory_alias);
+> >      memory_region_add_subregion(&s->bm, 0x80000000, &s->bm_ram_alias);
+> >      address_space_init(&s->bm_as, &s->bm, "raven-bm");
+> > -    pci_setup_iommu(&s->pci_bus, raven_pcihost_set_iommu, s);
+> > +    pci_setup_iommu(&s->pci_bus, &raven_iommu_ops, s);
+> >
+> >      h->bus = &s->pci_bus;
+> >
+> > diff --git a/hw/pci-host/sabre.c b/hw/pci-host/sabre.c index
+> > 2b8503b..251549b 100644
+> > --- a/hw/pci-host/sabre.c
+> > +++ b/hw/pci-host/sabre.c
+> > @@ -112,6 +112,10 @@ static AddressSpace *sabre_pci_dma_iommu(PCIBus
+> *bus, void *opaque, int devfn)
+> >      return &is->iommu_as;
+> >  }
+> >
+> > +static const PCIIOMMUOps sabre_iommu_ops = {
+> > +    .get_address_space = sabre_pci_dma_iommu, };
+> > +
+> >  static void sabre_config_write(void *opaque, hwaddr addr,
+> >                                 uint64_t val, unsigned size)  { @@
+> > -402,7 +406,7 @@ static void sabre_realize(DeviceState *dev, Error **errp)
+> >      /* IOMMU */
+> >      memory_region_add_subregion_overlap(&s->sabre_config, 0x200,
+> >                      sysbus_mmio_get_region(SYS_BUS_DEVICE(s->iommu), 0), 1);
+> > -    pci_setup_iommu(phb->bus, sabre_pci_dma_iommu, s->iommu);
+> > +    pci_setup_iommu(phb->bus, &sabre_iommu_ops, s->iommu);
+> >
+> >      /* APB secondary busses */
+> >      pci_dev = pci_create_multifunction(phb->bus, PCI_DEVFN(1, 0),
+> > true, diff --git a/hw/pci/pci.c b/hw/pci/pci.c index e1ed667..aa9025c
+> > 100644
+> > --- a/hw/pci/pci.c
+> > +++ b/hw/pci/pci.c
+> > @@ -2644,7 +2644,7 @@ AddressSpace
+> *pci_device_iommu_address_space(PCIDevice *dev)
+> >      PCIBus *iommu_bus = bus;
+> >      uint8_t devfn = dev->devfn;
+> >
+> > -    while (iommu_bus && !iommu_bus->iommu_fn && iommu_bus->parent_dev)
+> {
+> > +    while (iommu_bus && !iommu_bus->iommu_ops &&
+> > + iommu_bus->parent_dev) {
+> Depending on future usage, this is not strictly identical to the original
+> code. You exit
+> the loop as soon as a iommu_bus->iommu_ops is set whatever the presence of
+> get_address_space().
 
-David / dhildenb
+To be identical with original code, may adding the get_address_space()
+presence check. Then the loop exits when the iommu_bus->iommu_ops is
+set and meanwhile iommu_bus->iommu_ops->get_address_space() is set.
+But is it possible that there is an intermediate iommu_bus which has
+iommu_ops set but the get_address_space() is clear. I guess not as
+iommu_ops is set by vIOMMU and vIOMMU won't differentiate buses?
 
+Also the get_address_space() presence will be checked when trying to
+use it. right?
+
+Regards,
+Yi Liu
