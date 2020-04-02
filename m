@@ -2,90 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id F005419C2EB
-	for <lists+kvm@lfdr.de>; Thu,  2 Apr 2020 15:46:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 174FE19C2F5
+	for <lists+kvm@lfdr.de>; Thu,  2 Apr 2020 15:47:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731579AbgDBNqL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Apr 2020 09:46:11 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:56192 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726425AbgDBNqL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Apr 2020 09:46:11 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1585835170;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=9A3CnEsiXSDPqkUmIOaIkmymme/2Og0VecqbFgiZyxU=;
-        b=GmCP4Xlt4C2KnIZlmoMX+bpvEaFIZhS7csuG2PVI71hrbp7Z0z/LZRBR1E5c7tkEPBELIX
-        lJsRHJppZCJX/QnUKUDPOQO2ac2EJYFfTTqz2g+rxS0D3HyMkhRMfMCRZ3sMkjEmSNS8+S
-        KqtulxM3oEbUe7TQd5FaEzBjju620tc=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-360-l5KILIX_NDq6BvMCbfnx_Q-1; Thu, 02 Apr 2020 09:46:07 -0400
-X-MC-Unique: l5KILIX_NDq6BvMCbfnx_Q-1
-Received: by mail-wr1-f69.google.com with SMTP id e10so1504973wru.6
-        for <kvm@vger.kernel.org>; Thu, 02 Apr 2020 06:46:07 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=9A3CnEsiXSDPqkUmIOaIkmymme/2Og0VecqbFgiZyxU=;
-        b=UTSNAP5dmA+iEEg81TI4o+BjG98NxRMgfcLzfcDh8LNADyYXLlBAnOCUUmqCGesSOA
-         NNJcjoBmu/E8MK4/CdVXMDTY88Vxhf/1cWN8e3RcNFKRmwRcJ1SKTflgI8dbOhPJZc9C
-         L/1fyf1HOMynrR2R1sTdFfXgBmrKghUZDWydegxp2VeQ5NqXeHDQlNWNF1ni2e2X2kAo
-         HPxzAzbclA8pOdJ6OwXqlNrresE28FHsSSD4wkTdVQ6sOpbBmSlM5nal3aqEunatnPcL
-         0wA8x7Cbp1+Ly8jMpWKlCtuhEvgdF5+lOzRtTfBZqXadIrdMckAl3Td/gyQBDJvcr3wk
-         QMbw==
-X-Gm-Message-State: AGi0PuaLKpSmIPZWPyCBpUQEFDrrhWezP5zrP1eKUVgOKTxFy4Gzh6Xx
-        ppIzcWjWtUwyfzAEWwHR6IWSkTW0npvGzPIfItck+SCfp9h+V2VoWGWVl1vNLjjlL3TR3W43w8K
-        bHPfYyFk6RrnR
-X-Received: by 2002:adf:ea83:: with SMTP id s3mr3918074wrm.25.1585835166200;
-        Thu, 02 Apr 2020 06:46:06 -0700 (PDT)
-X-Google-Smtp-Source: APiQypJZChRwPcgHJam48Q8buWnfLkcBSM2myx23vHYz3rJj5PGDm/NVXjc+sk4Us05VYvFGWrOXZw==
-X-Received: by 2002:adf:ea83:: with SMTP id s3mr3918048wrm.25.1585835165988;
-        Thu, 02 Apr 2020 06:46:05 -0700 (PDT)
-Received: from xz-x1 ([2607:9880:19c0:32::2])
-        by smtp.gmail.com with ESMTPSA id a82sm9404955wmh.0.2020.04.02.06.46.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Apr 2020 06:46:05 -0700 (PDT)
-Date:   Thu, 2 Apr 2020 09:46:01 -0400
-From:   Peter Xu <peterx@redhat.com>
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     Liu Yi L <yi.l.liu@intel.com>, qemu-devel@nongnu.org,
-        alex.williamson@redhat.com, jean-philippe@linaro.org,
-        kevin.tian@intel.com, kvm@vger.kernel.org, mst@redhat.com,
-        jun.j.tian@intel.com, eric.auger@redhat.com, yi.y.sun@intel.com,
-        pbonzini@redhat.com, hao.wu@intel.com, david@gibson.dropbear.id.au
-Subject: Re: [PATCH v2 00/22] intel_iommu: expose Shared Virtual Addressing
- to VMs
-Message-ID: <20200402134601.GJ7174@xz-x1>
-References: <1585542301-84087-1-git-send-email-yi.l.liu@intel.com>
- <984e6f47-2717-44fb-7ff2-95ca61d1858f@redhat.com>
+        id S1731945AbgDBNri (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Apr 2020 09:47:38 -0400
+Received: from foss.arm.com ([217.140.110.172]:42898 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729033AbgDBNri (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Apr 2020 09:47:38 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6A7EC30E;
+        Thu,  2 Apr 2020 06:47:37 -0700 (PDT)
+Received: from localhost (e113682-lin.copenhagen.arm.com [10.32.145.14])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id F1B173F52E;
+        Thu,  2 Apr 2020 06:47:36 -0700 (PDT)
+Date:   Thu, 2 Apr 2020 15:47:35 +0200
+From:   Christoffer Dall <christoffer.dall@arm.com>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>
+Subject: Re: [PATCH 1/2] KVM: arm64: PSCI: Narrow input registers when using
+ 32bit functions
+Message-ID: <20200402134735.GF3650@e113682-lin.lund.arm.com>
+References: <20200401165816.530281-1-maz@kernel.org>
+ <20200401165816.530281-2-maz@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <984e6f47-2717-44fb-7ff2-95ca61d1858f@redhat.com>
+In-Reply-To: <20200401165816.530281-2-maz@kernel.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Apr 02, 2020 at 04:33:02PM +0800, Jason Wang wrote:
-> > The complete QEMU set can be found in below link:
-> > https://github.com/luxis1999/qemu.git: sva_vtd_v10_v2
+On Wed, Apr 01, 2020 at 05:58:15PM +0100, Marc Zyngier wrote:
+> When a guest delibarately uses an SSMC32 function number (which is allowed),
+> we should make sure we drop the top 32bits from the input arguments, as they
+> could legitimately be junk.
 > 
+> Reported-by: Christoffer Dall <christoffer.dall@arm.com>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  virt/kvm/arm/psci.c | 16 ++++++++++++++++
+>  1 file changed, 16 insertions(+)
 > 
-> Hi Yi:
+> diff --git a/virt/kvm/arm/psci.c b/virt/kvm/arm/psci.c
+> index 17e2bdd4b76f..69ff4a51ceb5 100644
+> --- a/virt/kvm/arm/psci.c
+> +++ b/virt/kvm/arm/psci.c
+> @@ -187,6 +187,18 @@ static void kvm_psci_system_reset(struct kvm_vcpu *vcpu)
+>  	kvm_prepare_system_event(vcpu, KVM_SYSTEM_EVENT_RESET);
+>  }
+>  
+> +static void kvm_psci_narrow_to_32bit(struct kvm_vcpu *vcpu)
+> +{
+> +	int i;
+> +
+> +	/*
+> +	 * Zero the input registers' upper 32 bits. They will be fully
+> +	 * zeroed on exit, so we're fine changing them in place.
+> +	 */
+> +	for (i = 1; i < 4; i++)
+> +		vcpu_set_reg(vcpu, i, (u32)vcpu_get_reg(vcpu, i));
+> +}
+> +
+>  static int kvm_psci_0_2_call(struct kvm_vcpu *vcpu)
+>  {
+>  	struct kvm *kvm = vcpu->kvm;
+> @@ -211,12 +223,16 @@ static int kvm_psci_0_2_call(struct kvm_vcpu *vcpu)
+>  		val = PSCI_RET_SUCCESS;
+>  		break;
+>  	case PSCI_0_2_FN_CPU_ON:
+> +		kvm_psci_narrow_to_32bit(vcpu);
+> +		fallthrough;
+>  	case PSCI_0_2_FN64_CPU_ON:
+>  		mutex_lock(&kvm->lock);
+>  		val = kvm_psci_vcpu_on(vcpu);
+>  		mutex_unlock(&kvm->lock);
+>  		break;
+>  	case PSCI_0_2_FN_AFFINITY_INFO:
+> +		kvm_psci_narrow_to_32bit(vcpu);
+> +		fallthrough;
+>  	case PSCI_0_2_FN64_AFFINITY_INFO:
+>  		val = kvm_psci_vcpu_affinity_info(vcpu);
+>  		break;
+> -- 
+> 2.25.0
 > 
-> I could not find the branch there.
 
-Jason,
-
-He typed wrong... It's actually (I found it myself):
-
-https://github.com/luxis1999/qemu/tree/sva_vtd_v10_qemu_v2
-
--- 
-Peter Xu
-
+Reviewed-by: Christoffer Dall <christoffer.dall@arm.com>
