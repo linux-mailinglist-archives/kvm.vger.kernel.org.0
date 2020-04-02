@@ -2,106 +2,191 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 13BE619C3AC
-	for <lists+kvm@lfdr.de>; Thu,  2 Apr 2020 16:13:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5428E19C3F5
+	for <lists+kvm@lfdr.de>; Thu,  2 Apr 2020 16:25:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388331AbgDBONA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Apr 2020 10:13:00 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:44855 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728225AbgDBOM7 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 2 Apr 2020 10:12:59 -0400
+        id S1732970AbgDBOYf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Apr 2020 10:24:35 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:23664 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726927AbgDBOYe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Apr 2020 10:24:34 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1585836779;
+        s=mimecast20190719; t=1585837473;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-        bh=Lsas7jxJ1WMu8rRlGVbgJ8eIsxujsCQQeq8BgBAYBkI=;
-        b=TWz9U+cRrADAROTxO/jIEurRypEO+HCiCxkVY4DLlFxx4Sqg8t5w+nNEcS+3GCoOJ1r9cm
-        2SGneoW8OYJ3+ylNg8oHock4GKw86cAiseShJ4RA/0HVRiEUo/PEjcLJ3tOoYFwvNgQzgt
-        iPC1PNTNWIxktqguNnNKgrMNkYJ6DQs=
-Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
- [209.85.219.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-336-bVML2w1uNmGiCtFmIIyQbw-1; Thu, 02 Apr 2020 10:12:55 -0400
-X-MC-Unique: bVML2w1uNmGiCtFmIIyQbw-1
-Received: by mail-qv1-f70.google.com with SMTP id bp6so2764820qvb.17
-        for <kvm@vger.kernel.org>; Thu, 02 Apr 2020 07:12:55 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
-         :content-disposition;
-        bh=Lsas7jxJ1WMu8rRlGVbgJ8eIsxujsCQQeq8BgBAYBkI=;
-        b=k3I54TOzHFVH4kwEAx7fiokHUoxKY5ZEXtaS+B1yWbks+JMLE5Ytw3E3LgQcH9Phe8
-         5wxhuVRaggYpnuuVRF9gfrhPLtmNFGbhOJkl9tAd0v6a5XIXLEgtgkqZF+0EXrrI5cMT
-         x+RbWsK8qI6HqR3PNJZ35/+TzjskcirNvmA6d9mO6iZjPV60z+5xc3C+uI8RMPXx9+kc
-         Q4DbV8NvQ8xrNxSgjcUYMEF+hDsGQoV9GNeew+c1vLfrSrUtdwKolLsVprx9vYWObYHf
-         BKH9HOBKToTAIFadzSDs5vXc5kBPIdlvMMRQ5lz9cO/d4jvLHeHQLfe3sEbaWTyr0sVD
-         wcog==
-X-Gm-Message-State: AGi0Pub6ZS2kzfDNpmabImXDdW1Iqgy+RjRAFwThlq4C6OYuGTj20mFx
-        ORmZ4lUJGu9Svs2rv8rstPh6JIK343o13lMfaKYt3EwiiRqk8GDkbi/ZrVXZie2/YCKz1XKE6d9
-        IzizwRVu5UyO9
-X-Received: by 2002:a37:7c81:: with SMTP id x123mr3569432qkc.287.1585836775419;
-        Thu, 02 Apr 2020 07:12:55 -0700 (PDT)
-X-Google-Smtp-Source: APiQypLfJWfDXTGKKPJbCvXgetpUrdL/5Wc33Wc2j+KEgqsWojCWykGbIs6gJg6z/V4LYFVIdSjzNQ==
-X-Received: by 2002:a37:7c81:: with SMTP id x123mr3569380qkc.287.1585836774834;
-        Thu, 02 Apr 2020 07:12:54 -0700 (PDT)
-Received: from redhat.com (bzq-79-176-51-222.red.bezeqint.net. [79.176.51.222])
-        by smtp.gmail.com with ESMTPSA id b7sm3553494qkc.61.2020.04.02.07.12.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Apr 2020 07:12:53 -0700 (PDT)
-Date:   Thu, 2 Apr 2020 10:12:50 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     linux-kernel@vger.kernel.org
-Cc:     Jason Wang <jasowang@redhat.com>,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=jwultuJVHkd9Ea7iycYokx+RDR7CVNFkggWBY1P0GTQ=;
+        b=dhyWx0cWFGqWvi+maHhAom9jHKTe0130WPngLZD5v2ej19ovv4qmr7a8SB+V1ggwUS9s+l
+        82hZ+9FHEy4R6eqr1KDJWY1Dac9A8i56MD9HGsVbWDsUZlpxaQunID00tNupHKt43Ovol5
+        jA8hlfdHTxjZ5b+4fCA1s2L89HldmyQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-17-FMcVsSpPMIurF4xDneMD2A-1; Thu, 02 Apr 2020 10:18:28 -0400
+X-MC-Unique: FMcVsSpPMIurF4xDneMD2A-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C1188107BAAB;
+        Thu,  2 Apr 2020 14:18:26 +0000 (UTC)
+Received: from [10.72.12.172] (ovpn-12-172.pek2.redhat.com [10.72.12.172])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id BF1C95D9C9;
+        Thu,  2 Apr 2020 14:18:18 +0000 (UTC)
+Subject: Re: [PATCH] virtio/test: fix up after IOTLB changes
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     linux-kernel@vger.kernel.org,
+        =?UTF-8?Q?Eugenio_P=c3=a9rez?= <eperezma@redhat.com>,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
         netdev@vger.kernel.org
-Subject: [PATCH] vhost: drop vring dependency on iotlb
-Message-ID: <20200402141207.32628-1-mst@redhat.com>
+References: <20200401165100.276039-1-mst@redhat.com>
+ <921fe999-e183-058d-722a-1a6a6ab066e0@redhat.com>
+ <20200402084021-mutt-send-email-mst@kernel.org>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <481b8f28-e3a9-dda1-bfb7-df72b11e4073@redhat.com>
+Date:   Thu, 2 Apr 2020 22:18:16 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Mailer: git-send-email 2.24.1.751.gd10ce2899c
-X-Mutt-Fcc: =sent
+In-Reply-To: <20200402084021-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-vringh can now be built without IOTLB.
-Select IOTLB directly where it's used.
 
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
----
+On 2020/4/2 =E4=B8=8B=E5=8D=888:53, Michael S. Tsirkin wrote:
+> On Thu, Apr 02, 2020 at 12:01:56PM +0800, Jason Wang wrote:
+>> On 2020/4/2 =E4=B8=8A=E5=8D=8812:51, Michael S. Tsirkin wrote:
+>>> Allow building vringh without IOTLB (that's the case for userspace
+>>> builds, will be useful for CAIF/VOD down the road too).
+>>> Update for API tweaks.
+>>> Don't include vringh with kernel builds.
+>>
+>> I'm not quite sure we need this.
+>>
+>> E.g the userspace accessor is not used by CAIF/VOP.
+> Well any exported symbols are always compiled in, right?
+> So we can save some kernel memory by not building unused stuff ...
 
-This is on top of my previous patch (in vhost tree now).
 
- drivers/vdpa/Kconfig  | 1 +
- drivers/vhost/Kconfig | 1 -
- 2 files changed, 1 insertion(+), 1 deletion(-)
+Yes, just want to mention that the there's no user for userspace=20
+accessors now.
 
-diff --git a/drivers/vdpa/Kconfig b/drivers/vdpa/Kconfig
-index 7db1460104b7..08b615f2da39 100644
---- a/drivers/vdpa/Kconfig
-+++ b/drivers/vdpa/Kconfig
-@@ -17,6 +17,7 @@ config VDPA_SIM
- 	depends on RUNTIME_TESTING_MENU
- 	select VDPA
- 	select VHOST_RING
-+	select VHOST_IOTLB
- 	default n
- 	help
- 	  vDPA networking device simulator which loop TX traffic back
-diff --git a/drivers/vhost/Kconfig b/drivers/vhost/Kconfig
-index 21feea0d69c9..bdd270fede26 100644
---- a/drivers/vhost/Kconfig
-+++ b/drivers/vhost/Kconfig
-@@ -6,7 +6,6 @@ config VHOST_IOTLB
- 
- config VHOST_RING
- 	tristate
--	select VHOST_IOTLB
- 	help
- 	  This option is selected by any driver which needs to access
- 	  the host side of a virtio ring.
--- 
-MST
+
+>
+>
+>>> Cc: Jason Wang <jasowang@redhat.com>
+>>> Cc: Eugenio P=C3=A9rez <eperezma@redhat.com>
+>>> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+>>> ---
+>>>    drivers/vhost/test.c   | 4 ++--
+>>>    drivers/vhost/vringh.c | 5 +++++
+>>>    include/linux/vringh.h | 2 ++
+>>>    tools/virtio/Makefile  | 3 ++-
+>>>    4 files changed, 11 insertions(+), 3 deletions(-)
+>>>
+>>> diff --git a/drivers/vhost/test.c b/drivers/vhost/test.c
+>>> index 394e2e5c772d..9a3a09005e03 100644
+>>> --- a/drivers/vhost/test.c
+>>> +++ b/drivers/vhost/test.c
+>>> @@ -120,7 +120,7 @@ static int vhost_test_open(struct inode *inode, s=
+truct file *f)
+>>>    	vqs[VHOST_TEST_VQ] =3D &n->vqs[VHOST_TEST_VQ];
+>>>    	n->vqs[VHOST_TEST_VQ].handle_kick =3D handle_vq_kick;
+>>>    	vhost_dev_init(dev, vqs, VHOST_TEST_VQ_MAX, UIO_MAXIOV,
+>>> -		       VHOST_TEST_PKT_WEIGHT, VHOST_TEST_WEIGHT);
+>>> +		       VHOST_TEST_PKT_WEIGHT, VHOST_TEST_WEIGHT, NULL);
+>>>    	f->private_data =3D n;
+>>> @@ -225,7 +225,7 @@ static long vhost_test_reset_owner(struct vhost_t=
+est *n)
+>>>    {
+>>>    	void *priv =3D NULL;
+>>>    	long err;
+>>> -	struct vhost_umem *umem;
+>>> +	struct vhost_iotlb *umem;
+>>>    	mutex_lock(&n->dev.mutex);
+>>>    	err =3D vhost_dev_check_owner(&n->dev);
+>>> diff --git a/drivers/vhost/vringh.c b/drivers/vhost/vringh.c
+>>> index ee0491f579ac..878e565dfffe 100644
+>>> --- a/drivers/vhost/vringh.c
+>>> +++ b/drivers/vhost/vringh.c
+>>> @@ -13,9 +13,11 @@
+>>>    #include <linux/uaccess.h>
+>>>    #include <linux/slab.h>
+>>>    #include <linux/export.h>
+>>> +#ifdef VHOST_IOTLB
+>>
+>> Kbuild bot reports build issues with this.
+>>
+>> It looks to me we should use #if IS_ENABLED(CONFIG_VHOST_IOTLB) here a=
+nd
+>> following checks.
+>>
+>> Thanks
+>>
+> In fact IS_REACHEABLE is probably the right thing to do.
+
+
+Yes.
+
+Thanks
+
+
+>
+>
+>>>    #include <linux/bvec.h>
+>>>    #include <linux/highmem.h>
+>>>    #include <linux/vhost_iotlb.h>
+>>> +#endif
+>>>    #include <uapi/linux/virtio_config.h>
+>>>    static __printf(1,2) __cold void vringh_bad(const char *fmt, ...)
+>>> @@ -1059,6 +1061,8 @@ int vringh_need_notify_kern(struct vringh *vrh)
+>>>    }
+>>>    EXPORT_SYMBOL(vringh_need_notify_kern);
+>>> +#ifdef VHOST_IOTLB
+>>> +
+>>>    static int iotlb_translate(const struct vringh *vrh,
+>>>    			   u64 addr, u64 len, struct bio_vec iov[],
+>>>    			   int iov_size, u32 perm)
+>>> @@ -1416,5 +1420,6 @@ int vringh_need_notify_iotlb(struct vringh *vrh=
+)
+>>>    }
+>>>    EXPORT_SYMBOL(vringh_need_notify_iotlb);
+>>> +#endif
+>>>    MODULE_LICENSE("GPL");
+>>> diff --git a/include/linux/vringh.h b/include/linux/vringh.h
+>>> index bd0503ca6f8f..ebff121c0b02 100644
+>>> --- a/include/linux/vringh.h
+>>> +++ b/include/linux/vringh.h
+>>> @@ -14,8 +14,10 @@
+>>>    #include <linux/virtio_byteorder.h>
+>>>    #include <linux/uio.h>
+>>>    #include <linux/slab.h>
+>>> +#ifdef VHOST_IOTLB
+>>>    #include <linux/dma-direction.h>
+>>>    #include <linux/vhost_iotlb.h>
+>>> +#endif
+>>>    #include <asm/barrier.h>
+>>>    /* virtio_ring with information needed for host access. */
+>>> diff --git a/tools/virtio/Makefile b/tools/virtio/Makefile
+>>> index f33f32f1d208..d3f152f4660b 100644
+>>> --- a/tools/virtio/Makefile
+>>> +++ b/tools/virtio/Makefile
+>>> @@ -22,7 +22,8 @@ OOT_CONFIGS=3D\
+>>>    	CONFIG_VHOST=3Dm \
+>>>    	CONFIG_VHOST_NET=3Dn \
+>>>    	CONFIG_VHOST_SCSI=3Dn \
+>>> -	CONFIG_VHOST_VSOCK=3Dn
+>>> +	CONFIG_VHOST_VSOCK=3Dn \
+>>> +	CONFIG_VHOST_RING=3Dn
+>>>    OOT_BUILD=3DKCFLAGS=3D"-I "${OOT_VHOST} ${MAKE} -C ${OOT_KSRC} V=3D=
+${V}
+>>>    oot-build:
+>>>    	echo "UNSUPPORTED! Don't use the resulting modules in production!=
+"
 
