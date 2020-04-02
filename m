@@ -2,238 +2,215 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3D76919C100
-	for <lists+kvm@lfdr.de>; Thu,  2 Apr 2020 14:18:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 35D6619C10C
+	for <lists+kvm@lfdr.de>; Thu,  2 Apr 2020 14:30:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388130AbgDBMSp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Apr 2020 08:18:45 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:6424 "EHLO
+        id S2387580AbgDBMaG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Apr 2020 08:30:06 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:39970 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726252AbgDBMSo (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 2 Apr 2020 08:18:44 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 032C7m3B064917
-        for <kvm@vger.kernel.org>; Thu, 2 Apr 2020 08:18:43 -0400
-Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 304ym1gt9g-1
+        by vger.kernel.org with ESMTP id S1726252AbgDBMaF (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 2 Apr 2020 08:30:05 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 032C3KHN119242
+        for <kvm@vger.kernel.org>; Thu, 2 Apr 2020 08:30:04 -0400
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 304gstbsb0-1
         (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Thu, 02 Apr 2020 08:18:42 -0400
+        for <kvm@vger.kernel.org>; Thu, 02 Apr 2020 08:30:03 -0400
 Received: from localhost
-        by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <frankja@linux.ibm.com>;
-        Thu, 2 Apr 2020 13:18:25 +0100
-Received: from b06avi18626390.portsmouth.uk.ibm.com (9.149.26.192)
-        by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
+        Thu, 2 Apr 2020 13:29:59 +0100
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
+        by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
         (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Thu, 2 Apr 2020 13:18:23 +0100
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 032CHY2249479940
+        Thu, 2 Apr 2020 13:29:56 +0100
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 032CTv0b52887666
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 2 Apr 2020 12:17:34 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2A0004C044;
-        Thu,  2 Apr 2020 12:18:38 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D2BC34C050;
-        Thu,  2 Apr 2020 12:18:37 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.145.69.93])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu,  2 Apr 2020 12:18:37 +0000 (GMT)
+        Thu, 2 Apr 2020 12:29:57 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C5835A4057;
+        Thu,  2 Apr 2020 12:29:57 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 79A34A4051;
+        Thu,  2 Apr 2020 12:29:57 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.145.6.23])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu,  2 Apr 2020 12:29:57 +0000 (GMT)
 Subject: Re: [kvm-unit-tests v2] s390x/smp: add minimal test for sigp sense
  running status
-To:     Christian Borntraeger <borntraeger@de.ibm.com>,
+To:     Janosch Frank <frankja@linux.ibm.com>,
         Thomas Huth <thuth@redhat.com>,
         David Hildenbrand <david@redhat.com>
 Cc:     Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org
 References: <20200402110250.63677-1-borntraeger@de.ibm.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
-Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
- 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
-Date:   Thu, 2 Apr 2020 14:18:37 +0200
+ <b1766baa-ca91-b1b4-c9e4-653ae4257cea@linux.ibm.com>
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+ nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
+Date:   Thu, 2 Apr 2020 14:29:57 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200402110250.63677-1-borntraeger@de.ibm.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="QpAVlIIM7N6GDGGIftJILSj3DZPD3RETh"
+In-Reply-To: <b1766baa-ca91-b1b4-c9e4-653ae4257cea@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-x-cbid: 20040212-4275-0000-0000-000003B832F5
+x-cbid: 20040212-0028-0000-0000-000003F0A1D4
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20040212-4276-0000-0000-000038CD88F7
-Message-Id: <b1766baa-ca91-b1b4-c9e4-653ae4257cea@linux.ibm.com>
+x-cbparentid: 20040212-0029-0000-0000-000024B62BF1
+Message-Id: <7ad39b82-171c-5ffa-a10c-1dd04358f6c2@de.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.676
- definitions=2020-04-02_03:2020-03-31,2020-04-02 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 bulkscore=0
- impostorscore=0 malwarescore=0 mlxscore=0 lowpriorityscore=0 adultscore=0
- spamscore=0 clxscore=1015 mlxlogscore=999 priorityscore=1501 phishscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
- definitions=main-2004020110
+ definitions=2020-04-02_01:2020-03-31,2020-04-02 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 spamscore=0
+ malwarescore=0 suspectscore=0 priorityscore=1501 lowpriorityscore=0
+ phishscore=0 clxscore=1015 mlxlogscore=999 mlxscore=0 adultscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2004020105
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---QpAVlIIM7N6GDGGIftJILSj3DZPD3RETh
-Content-Type: multipart/mixed; boundary="da1cNu5grzWnlGXzrknjcJ3VrqgYPp30e"
-
---da1cNu5grzWnlGXzrknjcJ3VrqgYPp30e
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 4/2/20 1:02 PM, Christian Borntraeger wrote:
-> make sure that sigp sense running status returns a sane value for
-
-s/m/M/
-
-> stopped CPUs. To avoid potential races with the stop being processed we=
-
-> wait until sense running status is first 0.
-
-ENOPARSE "...is first 0?"
-
->=20
-> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> ---
->  lib/s390x/smp.c |  2 +-
->  lib/s390x/smp.h |  2 +-
->  s390x/smp.c     | 13 +++++++++++++
->  3 files changed, 15 insertions(+), 2 deletions(-)
->=20
-> diff --git a/lib/s390x/smp.c b/lib/s390x/smp.c
-> index 5ed8b7b..492cb05 100644
-> --- a/lib/s390x/smp.c
-> +++ b/lib/s390x/smp.c
-> @@ -58,7 +58,7 @@ bool smp_cpu_stopped(uint16_t addr)
->  	return !!(status & (SIGP_STATUS_CHECK_STOP|SIGP_STATUS_STOPPED));
->  }
-> =20
-> -bool smp_cpu_running(uint16_t addr)
-> +bool smp_sense_running_status(uint16_t addr)
->  {
->  	if (sigp(addr, SIGP_SENSE_RUNNING, 0, NULL) !=3D SIGP_CC_STATUS_STORE=
-D)
->  		return true;
-> diff --git a/lib/s390x/smp.h b/lib/s390x/smp.h
-> index a8b98c0..639ec92 100644
-> --- a/lib/s390x/smp.h
-> +++ b/lib/s390x/smp.h
-> @@ -40,7 +40,7 @@ struct cpu_status {
->  int smp_query_num_cpus(void);
->  struct cpu *smp_cpu_from_addr(uint16_t addr);
->  bool smp_cpu_stopped(uint16_t addr);
-> -bool smp_cpu_running(uint16_t addr);
-> +bool smp_sense_running_status(uint16_t addr);
-
-That's completely unrelated to the test
-
->  int smp_cpu_restart(uint16_t addr);
->  int smp_cpu_start(uint16_t addr, struct psw psw);
->  int smp_cpu_stop(uint16_t addr);
-> diff --git a/s390x/smp.c b/s390x/smp.c
-> index 79cdc1f..b4b1ff2 100644
-> --- a/s390x/smp.c
-> +++ b/s390x/smp.c
-> @@ -210,6 +210,18 @@ static void test_emcall(void)
->  	report_prefix_pop();
->  }
-> =20
-> +static void test_sense_running(void)
-> +{
-> +	report_prefix_push("sense_running");
-> +	/* make sure CPU is stopped */
-> +	smp_cpu_stop(1);
-> +	/* wait for stop to succeed. */
-> +	while(smp_sense_running_status(1));
-> +	report(!smp_sense_running_status(1), "CPU1 sense claims not running")=
-;
-
-That's basically true anyway after the loop, no?
-
-> +	report_prefix_pop();
-> +}
-> +
-> +
->  /* Used to dirty registers of cpu #1 before it is reset */
->  static void test_func_initial(void)
->  {
-> @@ -319,6 +331,7 @@ int main(void)
->  	test_store_status();
->  	test_ecall();
->  	test_emcall();
-> +	test_sense_running();
->  	test_reset();
->  	test_reset_initial();
->  	smp_cpu_destroy(1);
->=20
 
 
+On 02.04.20 14:18, Janosch Frank wrote:
+> On 4/2/20 1:02 PM, Christian Borntraeger wrote:
+>> make sure that sigp sense running status returns a sane value for
+> 
+> s/m/M/
+> 
+>> stopped CPUs. To avoid potential races with the stop being processed we
+>> wait until sense running status is first 0.
+> 
+> ENOPARSE "...is first 0?"
 
---da1cNu5grzWnlGXzrknjcJ3VrqgYPp30e--
+Yes,  what about "....smp_sense_running_status returns false." ?
 
---QpAVlIIM7N6GDGGIftJILSj3DZPD3RETh
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+> 
+>>
+>> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+>> ---
+>>  lib/s390x/smp.c |  2 +-
+>>  lib/s390x/smp.h |  2 +-
+>>  s390x/smp.c     | 13 +++++++++++++
+>>  3 files changed, 15 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/lib/s390x/smp.c b/lib/s390x/smp.c
+>> index 5ed8b7b..492cb05 100644
+>> --- a/lib/s390x/smp.c
+>> +++ b/lib/s390x/smp.c
+>> @@ -58,7 +58,7 @@ bool smp_cpu_stopped(uint16_t addr)
+>>  	return !!(status & (SIGP_STATUS_CHECK_STOP|SIGP_STATUS_STOPPED));
+>>  }
+>>  
+>> -bool smp_cpu_running(uint16_t addr)
+>> +bool smp_sense_running_status(uint16_t addr)
+>>  {
+>>  	if (sigp(addr, SIGP_SENSE_RUNNING, 0, NULL) != SIGP_CC_STATUS_STORED)
+>>  		return true;
+>> diff --git a/lib/s390x/smp.h b/lib/s390x/smp.h
+>> index a8b98c0..639ec92 100644
+>> --- a/lib/s390x/smp.h
+>> +++ b/lib/s390x/smp.h
+>> @@ -40,7 +40,7 @@ struct cpu_status {
+>>  int smp_query_num_cpus(void);
+>>  struct cpu *smp_cpu_from_addr(uint16_t addr);
+>>  bool smp_cpu_stopped(uint16_t addr);
+>> -bool smp_cpu_running(uint16_t addr);
+>> +bool smp_sense_running_status(uint16_t addr);
+> 
+> That's completely unrelated to the test
 
------BEGIN PGP SIGNATURE-----
+Right but this name seems to better reflect what the function does. Because this is not
+the oppositite of cpu_stopped.
+> 
+>>  int smp_cpu_restart(uint16_t addr);
+>>  int smp_cpu_start(uint16_t addr, struct psw psw);
+>>  int smp_cpu_stop(uint16_t addr);
+>> diff --git a/s390x/smp.c b/s390x/smp.c
+>> index 79cdc1f..b4b1ff2 100644
+>> --- a/s390x/smp.c
+>> +++ b/s390x/smp.c
+>> @@ -210,6 +210,18 @@ static void test_emcall(void)
+>>  	report_prefix_pop();
+>>  }
+>>  
+>> +static void test_sense_running(void)
+>> +{
+>> +	report_prefix_push("sense_running");
+>> +	/* make sure CPU is stopped */
+>> +	smp_cpu_stop(1);
+>> +	/* wait for stop to succeed. */
+>> +	while(smp_sense_running_status(1));
+>> +	report(!smp_sense_running_status(1), "CPU1 sense claims not running");
+> 
+> That's basically true anyway after the loop, no?
 
-iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl6F2B0ACgkQ41TmuOI4
-ufh7DxAAwpRXiDPo+St4fKSzD/ILY3YVjXalyP+D7Zd5JSD4Bo2m+ii8nH8rYM+g
-ezVQFMs7ATo9jSvJ7SECoL7sRo8vG2m8IOUV4s2obmTUa/Wv9zJBdqE8VuxFM7cj
-3r9FVOb/4IVb5Nn+uLDH85kPVPuCe2VPLf/73zbalhOlrGiTZ49E0ccMMIfHfBba
-eaDMYJGaGVojNWcTOK/STCPXCaFfEgFFf+D6SrslyzMQPvQkmprUCC5jkcKtR1+X
-b5iB+42jh10TRef0wSFiDxE+TmF5YLG5B4f3SsaGexAQKwej6sNZ7DGTVr+3PYK3
-//tJ+wid3D4sGByiV9eYcaO4FpjS6jidETiu9ajavvebVMzsn3j9H8O0mACb3Z1x
-aUJw2V6+Rj5fHGWD2AiQ0Sm491qW4ESl7TySOwfweb+6O4A6FSjCrELXWinfJLHT
-Izx7XnMGgOV7YDR+uKYxh07wm8YM4KUAQYJN1cSnZAUWfY8r4D/bQ0f9DIgHoreD
-c0bG6JDOycIm9OW4alKPUuZcKWnjBhD1x7cq1j9jggsMPjpbUwD9t1ID+PsqJITQ
-SctP/6fi+DiBU38Jykeov1KDyW609EbRo6EyWDFKaQsQlP0zYx7ZYFFhFRRjyTMM
-d3OyC8J5xCor0TIZpUMCCzbxd9HE76MAz25ktBc3ld5Nje8e1WA=
-=GYGW
------END PGP SIGNATURE-----
+Yes, but  you get no "positive" message in the more verbose output variants
+without a report statement.
 
---QpAVlIIM7N6GDGGIftJILSj3DZPD3RETh--
+> 
+>> +	report_prefix_pop();
+>> +}
+>> +
+>> +
+>>  /* Used to dirty registers of cpu #1 before it is reset */
+>>  static void test_func_initial(void)
+>>  {
+>> @@ -319,6 +331,7 @@ int main(void)
+>>  	test_store_status();
+>>  	test_ecall();
+>>  	test_emcall();
+>> +	test_sense_running();
+>>  	test_reset();
+>>  	test_reset_initial();
+>>  	smp_cpu_destroy(1);
+>>
+> 
+> 
 
