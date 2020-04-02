@@ -2,215 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 35D6619C10C
-	for <lists+kvm@lfdr.de>; Thu,  2 Apr 2020 14:30:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2CB5119C146
+	for <lists+kvm@lfdr.de>; Thu,  2 Apr 2020 14:40:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387580AbgDBMaG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Apr 2020 08:30:06 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:39970 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726252AbgDBMaF (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 2 Apr 2020 08:30:05 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 032C3KHN119242
-        for <kvm@vger.kernel.org>; Thu, 2 Apr 2020 08:30:04 -0400
-Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 304gstbsb0-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Thu, 02 Apr 2020 08:30:03 -0400
-Received: from localhost
-        by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
-        Thu, 2 Apr 2020 13:29:59 +0100
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
-        by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Thu, 2 Apr 2020 13:29:56 +0100
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 032CTv0b52887666
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 2 Apr 2020 12:29:57 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C5835A4057;
-        Thu,  2 Apr 2020 12:29:57 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 79A34A4051;
-        Thu,  2 Apr 2020 12:29:57 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.145.6.23])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu,  2 Apr 2020 12:29:57 +0000 (GMT)
-Subject: Re: [kvm-unit-tests v2] s390x/smp: add minimal test for sigp sense
- running status
-To:     Janosch Frank <frankja@linux.ibm.com>,
-        Thomas Huth <thuth@redhat.com>,
-        David Hildenbrand <david@redhat.com>
-Cc:     Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org
-References: <20200402110250.63677-1-borntraeger@de.ibm.com>
- <b1766baa-ca91-b1b4-c9e4-653ae4257cea@linux.ibm.com>
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
-Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
- 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
- nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Date:   Thu, 2 Apr 2020 14:29:57 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+        id S2388227AbgDBMkw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Apr 2020 08:40:52 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:12608 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S2388164AbgDBMkv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Apr 2020 08:40:51 -0400
+Received: from DGGEMS404-HUB.china.huawei.com (unknown [172.30.72.58])
+        by Forcepoint Email with ESMTP id D905A6F00FF2ADCB7EC9;
+        Thu,  2 Apr 2020 20:40:49 +0800 (CST)
+Received: from [127.0.0.1] (10.173.222.27) by DGGEMS404-HUB.china.huawei.com
+ (10.3.19.204) with Microsoft SMTP Server id 14.3.487.0; Thu, 2 Apr 2020
+ 20:40:43 +0800
+Subject: Re: [kvm-unit-tests PATCH v7 10/13] arm/arm64: ITS: INT functional
+ tests
+To:     Auger Eric <eric.auger@redhat.com>
+CC:     <eric.auger.pro@gmail.com>, <maz@kernel.org>,
+        <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>,
+        <qemu-devel@nongnu.org>, <qemu-arm@nongnu.org>,
+        <drjones@redhat.com>, <andre.przywara@arm.com>,
+        <peter.maydell@linaro.org>, <alexandru.elisei@arm.com>,
+        <thuth@redhat.com>
+References: <20200320092428.20880-1-eric.auger@redhat.com>
+ <20200320092428.20880-11-eric.auger@redhat.com>
+ <f7f1d7c4-2321-9123-2394-528af737bfa7@huawei.com>
+ <fa4e14f6-20ee-982f-0eda-74b101cddf7a@redhat.com>
+From:   Zenghui Yu <yuzenghui@huawei.com>
+Message-ID: <114f8bba-a1e0-0367-a1b4-e875718d8dba@huawei.com>
+Date:   Thu, 2 Apr 2020 20:40:42 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-In-Reply-To: <b1766baa-ca91-b1b4-c9e4-653ae4257cea@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <fa4e14f6-20ee-982f-0eda-74b101cddf7a@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-x-cbid: 20040212-0028-0000-0000-000003F0A1D4
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20040212-0029-0000-0000-000024B62BF1
-Message-Id: <7ad39b82-171c-5ffa-a10c-1dd04358f6c2@de.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.676
- definitions=2020-04-02_01:2020-03-31,2020-04-02 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 spamscore=0
- malwarescore=0 suspectscore=0 priorityscore=1501 lowpriorityscore=0
- phishscore=0 clxscore=1015 mlxlogscore=999 mlxscore=0 adultscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2004020105
+X-Originating-IP: [10.173.222.27]
+X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi Eric,
 
-
-On 02.04.20 14:18, Janosch Frank wrote:
-> On 4/2/20 1:02 PM, Christian Borntraeger wrote:
->> make sure that sigp sense running status returns a sane value for
+On 2020/4/2 16:50, Auger Eric wrote:
+> Hi Zenghui,
 > 
-> s/m/M/
-> 
->> stopped CPUs. To avoid potential races with the stop being processed we
->> wait until sense running status is first 0.
-> 
-> ENOPARSE "...is first 0?"
-
-Yes,  what about "....smp_sense_running_status returns false." ?
-
-> 
+> On 3/30/20 12:43 PM, Zenghui Yu wrote:
+>> Hi Eric,
 >>
->> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
->> ---
->>  lib/s390x/smp.c |  2 +-
->>  lib/s390x/smp.h |  2 +-
->>  s390x/smp.c     | 13 +++++++++++++
->>  3 files changed, 15 insertions(+), 2 deletions(-)
+>> On 2020/3/20 17:24, Eric Auger wrote:
+>>> Triggers LPIs through the INT command.
+>>>
+>>> the test checks the LPI hits the right CPU and triggers
+>>> the right LPI intid, ie. the translation is correct.
+>>>
+>>> Updates to the config table also are tested, along with inv
+>>> and invall commands.
+>>>
+>>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
 >>
->> diff --git a/lib/s390x/smp.c b/lib/s390x/smp.c
->> index 5ed8b7b..492cb05 100644
->> --- a/lib/s390x/smp.c
->> +++ b/lib/s390x/smp.c
->> @@ -58,7 +58,7 @@ bool smp_cpu_stopped(uint16_t addr)
->>  	return !!(status & (SIGP_STATUS_CHECK_STOP|SIGP_STATUS_STOPPED));
->>  }
->>  
->> -bool smp_cpu_running(uint16_t addr)
->> +bool smp_sense_running_status(uint16_t addr)
->>  {
->>  	if (sigp(addr, SIGP_SENSE_RUNNING, 0, NULL) != SIGP_CC_STATUS_STORED)
->>  		return true;
->> diff --git a/lib/s390x/smp.h b/lib/s390x/smp.h
->> index a8b98c0..639ec92 100644
->> --- a/lib/s390x/smp.h
->> +++ b/lib/s390x/smp.h
->> @@ -40,7 +40,7 @@ struct cpu_status {
->>  int smp_query_num_cpus(void);
->>  struct cpu *smp_cpu_from_addr(uint16_t addr);
->>  bool smp_cpu_stopped(uint16_t addr);
->> -bool smp_cpu_running(uint16_t addr);
->> +bool smp_sense_running_status(uint16_t addr);
-> 
-> That's completely unrelated to the test
-
-Right but this name seems to better reflect what the function does. Because this is not
-the oppositite of cpu_stopped.
-> 
->>  int smp_cpu_restart(uint16_t addr);
->>  int smp_cpu_start(uint16_t addr, struct psw psw);
->>  int smp_cpu_stop(uint16_t addr);
->> diff --git a/s390x/smp.c b/s390x/smp.c
->> index 79cdc1f..b4b1ff2 100644
->> --- a/s390x/smp.c
->> +++ b/s390x/smp.c
->> @@ -210,6 +210,18 @@ static void test_emcall(void)
->>  	report_prefix_pop();
->>  }
->>  
->> +static void test_sense_running(void)
->> +{
->> +	report_prefix_push("sense_running");
->> +	/* make sure CPU is stopped */
->> +	smp_cpu_stop(1);
->> +	/* wait for stop to succeed. */
->> +	while(smp_sense_running_status(1));
->> +	report(!smp_sense_running_status(1), "CPU1 sense claims not running");
-> 
-> That's basically true anyway after the loop, no?
-
-Yes, but  you get no "positive" message in the more verbose output variants
-without a report statement.
-
-> 
->> +	report_prefix_pop();
->> +}
->> +
->> +
->>  /* Used to dirty registers of cpu #1 before it is reset */
->>  static void test_func_initial(void)
->>  {
->> @@ -319,6 +331,7 @@ int main(void)
->>  	test_store_status();
->>  	test_ecall();
->>  	test_emcall();
->> +	test_sense_running();
->>  	test_reset();
->>  	test_reset_initial();
->>  	smp_cpu_destroy(1);
+>> [...]
 >>
+>> So I've tested this series and found that the "INT" test will sometimes
+>> fail.
+>>
+>> "not ok 12 - gicv3: its-migration: dev2/eventid=20 triggers LPI 8195 en
+>> PE #3 after migration
+>> not ok 13 - gicv3: its-migration: dev7/eventid=255 triggers LPI 8196 on
+>> PE #2 after migration"
+>>
+>>  From logs:
+>> "INFO: gicv3: its-migration: Migration complete
+>> INT dev_id=2 event_id=20
+>> INFO: gicv3: its-migration: No LPI received whereas (cpuid=3,
+>> intid=8195) was expected
+>> FAIL: gicv3: its-migration: dev2/eventid=20 triggers LPI 8195 en PE #3
+>> after migration
+>> INT dev_id=7 event_id=255
+>> INFO: gicv3: its-migration: No LPI received whereas (cpuid=2,
+>> intid=8196) was expected
+>> FAIL: gicv3: its-migration: dev7/eventid=255 triggers LPI 8196 on PE #2
+>> after migration"
+>>
+>>> +static void check_lpi_stats(const char *msg)
+>>> +{
+>>> +    bool pass = false;
+>>> +
+>>> +    mdelay(100);
+>>
+>> After changing this to 'mdelay(1000)', the above error doesn't show up
+>> anymore. But it sounds strange that 100ms is not enough to deliver a
+>> single LPI. I haven't dig it further but will get back here later.
 > 
-> 
+> Did you find some time to investigate this issue. Changing 100 to 1000
+> has a huge impact on the overall test duration and I don't think it is
+> sensible. Could you see what is your minimal value that pass the tests?
+
+I can reproduce this issue with a very *low* probability so I failed
+to investigate it :-(.  (It might because the LPI was delivered to a
+busy vcpu...)
+
+You can leave it as it is until someone else complain about it again.
+Or take the similar approach as check_acked() - wait up to 5s for the
+interrupt to be delivered, and bail out as soon as we see it.
+
+
+Thanks,
+Zenghui
 
