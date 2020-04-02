@@ -2,104 +2,149 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 809C719C9F8
-	for <lists+kvm@lfdr.de>; Thu,  2 Apr 2020 21:23:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3E46819CA65
+	for <lists+kvm@lfdr.de>; Thu,  2 Apr 2020 21:43:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389982AbgDBTXM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Apr 2020 15:23:12 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:47006 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S2388945AbgDBTXM (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 2 Apr 2020 15:23:12 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1585855390;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Cxt+LO+/D+LWZGAf62ME434VQmNIvwgAEaDvQHLIBZg=;
-        b=Wlbq/DL7uBloOHCNJNjpxjeZzj5cUcjwVqLL8MZe6YxJ63YFkrUZgcZ53zDg16yA+AcGod
-        Ak4mlDtTttOqr8oqGzwsQtGEbninpHwS0Va6xrjMMd/6rI6qmgc/rxAgGHf1VMm687UfyC
-        RUBooECKffWJ1Csi1FmPS19eg9lI4x4=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-484-14K0Q2A3MBW-0yePvNoSEA-1; Thu, 02 Apr 2020 15:23:08 -0400
-X-MC-Unique: 14K0Q2A3MBW-0yePvNoSEA-1
-Received: by mail-wm1-f69.google.com with SMTP id p12so125855wmi.0
-        for <kvm@vger.kernel.org>; Thu, 02 Apr 2020 12:23:08 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=Cxt+LO+/D+LWZGAf62ME434VQmNIvwgAEaDvQHLIBZg=;
-        b=Sozd7WDywBQZiw97ZCCVQ0Nr8SDSpEg9yFR0G0vf2fkCy/bJo2aBq8In+9B1FFgf3O
-         tS2E/EJjkJcS/xaSiCKyXnPHXe+x0t8VfwRBixjATBO3yTNplXW9J3lEiiPDoYQBNeu/
-         2MPDoRn/2EVuI0wWPcrLd5IEPoGTaZ7xiBx5Q8Z2GZfka/Il4j3qWDG1OFRTnXCmBshf
-         K9ZGs86nBbfCZWy/79SNqVsjz3GPNOrm/XBf2XjQi8a0eSlZbLckE72XZuDZbum0h5Nk
-         2g8kumtVxsUKgaRX2ZD9eX2LHGKaAmwjjoKb125P4pvn6wVzBsQr4MRyn4HADKQmmG7v
-         bXGQ==
-X-Gm-Message-State: AGi0Pub4vDS/lWvROc+TvUyoev/DFA/OEjfnBl68fyOCRqjxSvFkPXK8
-        2HG840Aw14az+JZgskmLQPfTKmS2OwnsOmhdDyVp0htS1tklE3pqG8ujFWWJfbM+jPNInhfUeHT
-        tavoyHoE75ydo
-X-Received: by 2002:a1c:9805:: with SMTP id a5mr4801361wme.119.1585855387493;
-        Thu, 02 Apr 2020 12:23:07 -0700 (PDT)
-X-Google-Smtp-Source: APiQypIhqOMduV95ID1TOu+8/286w64w+I2dfqIZk2Y7Q7JUkbcQkwaQl5dfAOKAwswECuH8pPBbbQ==
-X-Received: by 2002:a1c:9805:: with SMTP id a5mr4801347wme.119.1585855387242;
-        Thu, 02 Apr 2020 12:23:07 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:1868:42dd:216c:2c09? ([2001:b07:6468:f312:1868:42dd:216c:2c09])
-        by smtp.gmail.com with ESMTPSA id v7sm8596686wrs.96.2020.04.02.12.23.06
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 02 Apr 2020 12:23:06 -0700 (PDT)
-Subject: Re: [PATCH -next] x86/kvm: fix a missing-prototypes "vmread_error"
-To:     Qian Cai <cai@lca.pw>
-Cc:     sean.j.christopherson@intel.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20200402153955.1695-1-cai@lca.pw>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <2e823923-4b81-8cb5-59f6-4376dc71fce2@redhat.com>
-Date:   Thu, 2 Apr 2020 21:23:06 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+        id S2387726AbgDBTnk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Apr 2020 15:43:40 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:55818 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729033AbgDBTnk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Apr 2020 15:43:40 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 032JdkjM137611;
+        Thu, 2 Apr 2020 19:43:21 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=corp-2020-01-29;
+ bh=/GFNmv7VQzb8FXtdHAPCT782Li+VvJuG5j6p4uNWYkg=;
+ b=pABKxR6pRK8S7f+1V0CqUiBXPXEApT4H1Mvfr6cqvw0Cp407GYxY9hzK2SUYEd6u9IK4
+ oP49AOvsIKmF7pyBDJeAWljJcwXJPC46RHQRGKLUEoarbdC1EBV35k3z3Arga3+JhnjZ
+ 8j2JTQ8iDnbgOed+QwwT9JkbrXoQN3YdwHgyMyAgOkiW7UVywpBhN+Fz5tADNmlSP1D5
+ 03Z5aJ2hNA38Xfnoe07la2UaWtrcUHFGpbUux2NLaLu7AdKISn4fAg72ICmN0LFYKx0E
+ Mp8HRPMsCP7Iyfk7eBfVVajju2eHQUWv0HERbN8Cb6FwQN+rLqwSKAR3RzDyo/XhqJP4 SQ== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+        by userp2130.oracle.com with ESMTP id 303cevdhcc-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 02 Apr 2020 19:43:21 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+        by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 032Jb69D018370;
+        Thu, 2 Apr 2020 19:43:20 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by userp3030.oracle.com with ESMTP id 302g2k5sng-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 02 Apr 2020 19:43:20 +0000
+Received: from abhmp0005.oracle.com (abhmp0005.oracle.com [141.146.116.11])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 032JhIaE014830;
+        Thu, 2 Apr 2020 19:43:18 GMT
+Received: from vbusired-dt (/10.154.166.66)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Thu, 02 Apr 2020 12:43:18 -0700
+Date:   Thu, 2 Apr 2020 14:43:13 -0500
+From:   Venu Busireddy <venu.busireddy@oracle.com>
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     Ashish Kalra <Ashish.Kalra@amd.com>, pbonzini@redhat.com,
+        tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
+        joro@8bytes.org, bp@suse.de, thomas.lendacky@amd.com,
+        x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        rientjes@google.com, srutherford@google.com, luto@kernel.org
+Subject: Re: [PATCH v6 01/14] KVM: SVM: Add KVM_SEV SEND_START command
+Message-ID: <20200402194313.GA656773@vbusired-dt>
+References: <cover.1585548051.git.ashish.kalra@amd.com>
+ <3f90333959fd49bed184d45a761cc338424bf614.1585548051.git.ashish.kalra@amd.com>
+ <20200402062726.GA647295@vbusired-dt>
+ <89a586e4-8074-0d32-f384-a4597975d129@amd.com>
+ <20200402163717.GA653926@vbusired-dt>
+ <8b1b4874-11a8-1422-5ea1-ed665f41ab5c@amd.com>
+ <20200402185706.GA655878@vbusired-dt>
+ <6ced22f7-cbe5-a698-e650-7716566d4d8a@amd.com>
 MIME-Version: 1.0
-In-Reply-To: <20200402153955.1695-1-cai@lca.pw>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6ced22f7-cbe5-a698-e650-7716566d4d8a@amd.com>
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9579 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 spamscore=0 mlxscore=0
+ adultscore=0 phishscore=0 bulkscore=0 suspectscore=1 malwarescore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
+ definitions=main-2004020144
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9579 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 adultscore=0
+ clxscore=1015 phishscore=0 lowpriorityscore=0 spamscore=0 malwarescore=0
+ suspectscore=1 mlxscore=0 impostorscore=0 mlxlogscore=999 bulkscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
+ definitions=main-2004020144
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 02/04/20 17:39, Qian Cai wrote:
-> The commit 842f4be95899 ("KVM: VMX: Add a trampoline to fix VMREAD error
-> handling") removed the declaration of vmread_error() causes a W=1 build
-> failure with KVM_WERROR=y. Fix it by adding it back.
+On 2020-04-02 14:17:26 -0500, Brijesh Singh wrote:
 > 
-> arch/x86/kvm/vmx/vmx.c:359:17: error: no previous prototype for 'vmread_error' [-Werror=missing-prototypes]
->  asmlinkage void vmread_error(unsigned long field, bool fault)
->                  ^~~~~~~~~~~~
+> On 4/2/20 1:57 PM, Venu Busireddy wrote:
+> [snip]...
 > 
-> Signed-off-by: Qian Cai <cai@lca.pw>
-> ---
->  arch/x86/kvm/vmx/ops.h | 1 +
->  1 file changed, 1 insertion(+)
+> >> The question is, how does a userspace know the session length ? One
+> >> method is you can precalculate a value based on your firmware version
+> >> and have userspace pass that, or another approach is set
+> >> params.session_len = 0 and query it from the FW. The FW spec allow to
+> >> query the length, please see the spec. In the qemu patches I choose
+> >> second approach. This is because session blob can change from one FW
+> >> version to another and I tried to avoid calculating or hardcoding the
+> >> length for a one version of the FW. You can certainly choose the first
+> >> method. We want to ensure that kernel interface works on the both cases.
+> > I like the fact that you have already implemented the functionality to
+> > facilitate the user space to obtain the session length from the firmware
+> > (by setting params.session_len to 0). However, I am trying to address
+> > the case where the user space sets the params.session_len to a size
+> > smaller than the size needed.
+> >
+> > Let me put it differently. Let us say that the session blob needs 128
+> > bytes, but the user space sets params.session_len to 16. That results
+> > in us allocating a buffer of 16 bytes, and set data->session_len to 16.
+> >
+> > What does the firmware do now?
+> >
+> > Does it copy 128 bytes into data->session_address, or, does it copy
+> > 16 bytes?
+> >
+> > If it copies 128 bytes, we most certainly will end up with a kernel crash.
+> >
+> > If it copies 16 bytes, then what does it set in data->session_len? 16,
+> > or 128? If 16, everything is good. If 128, we end up causing memory
+> > access violation for the user space.
 > 
-> diff --git a/arch/x86/kvm/vmx/ops.h b/arch/x86/kvm/vmx/ops.h
-> index 09b0937d56b1..19717d0a1100 100644
-> --- a/arch/x86/kvm/vmx/ops.h
-> +++ b/arch/x86/kvm/vmx/ops.h
-> @@ -12,6 +12,7 @@
->  
->  #define __ex(x) __kvm_handle_fault_on_reboot(x)
->  
-> +asmlinkage void vmread_error(unsigned long field, bool fault);
->  __attribute__((regparm(0))) void vmread_error_trampoline(unsigned long field,
->  							 bool fault);
->  void vmwrite_error(unsigned long field, unsigned long value);
-> 
+> My interpretation of the spec is, if user provided length is smaller
+> than the FW expected length then FW will reports an error with
+> data->session_len set to the expected length. In other words, it should
+> *not* copy anything into the session buffer in the event of failure.
 
-Merged, thanks.
+That is good, and expected behavior.
 
-Paolo
+> If FW is touching memory beyond what is specified in the session_len then
+> its FW bug and we can't do much from kernel.
+
+Agreed. But let us assume that the firmware is not touching memory that
+it is not supposed to.
+
+> Am I missing something ?
+
+I believe you are agreeing that if the session blob needs 128 bytes and
+user space sets params.session_len to 16, the firmware does not copy
+any data to data->session_address, and sets data->session_len to 128.
+
+Now, when we return, won't the user space try to access 128 bytes
+(params.session_len) of data in params.session_uaddr, and crash? Because,
+instead of returning an error that buffer is not large enough, we return
+the call successfully!
+
+That is why I was suggesting the following, which you seem to have
+missed.
+
+> > Perhaps, this can be dealt a little differently? Why not always call
+> > sev_issue_cmd(kvm, SEV_CMD_SEND_START, ...) with zeroed out data? Then,
+> > if the user space has set params.session_len to 0, we return with the
+> > needed params.session_len. Otherwise, we check if params.session_len is
+> > large enough, and if not, we return -EINVAL?
+
+Doesn't the above approach address all scenarios?
 
