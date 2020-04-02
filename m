@@ -2,135 +2,226 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id EB0B319BDA8
-	for <lists+kvm@lfdr.de>; Thu,  2 Apr 2020 10:36:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6E70619BDFB
+	for <lists+kvm@lfdr.de>; Thu,  2 Apr 2020 10:50:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387719AbgDBIgR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Apr 2020 04:36:17 -0400
-Received: from foss.arm.com ([217.140.110.172]:39792 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728135AbgDBIgQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Apr 2020 04:36:16 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2BA7331B;
-        Thu,  2 Apr 2020 01:36:16 -0700 (PDT)
-Received: from [192.168.3.111] (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 48D733F68F;
-        Thu,  2 Apr 2020 01:36:15 -0700 (PDT)
-Subject: Re: [PATCH v3 kvmtool 25/32] vfio/pci: Don't write configuration
- value twice
-To:     Alexandru Elisei <alexandru.elisei@arm.com>, kvm@vger.kernel.org
-Cc:     will@kernel.org, julien.thierry.kdev@gmail.com,
-        sami.mujawar@arm.com, lorenzo.pieralisi@arm.com
-References: <20200326152438.6218-1-alexandru.elisei@arm.com>
- <20200326152438.6218-26-alexandru.elisei@arm.com>
-From:   =?UTF-8?Q?Andr=c3=a9_Przywara?= <andre.przywara@arm.com>
-Autocrypt: addr=andre.przywara@arm.com; prefer-encrypt=mutual; keydata=
- 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
- i4aIXCH3Wv6K
-Organization: ARM Ltd.
-Message-ID: <18d7c29d-84c8-4c30-79b8-29a84bbea14a@arm.com>
-Date:   Thu, 2 Apr 2020 09:35:41 +0100
+        id S2387800AbgDBIuO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Apr 2020 04:50:14 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:14260 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728612AbgDBIuN (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 2 Apr 2020 04:50:13 -0400
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0328YAdm016039
+        for <kvm@vger.kernel.org>; Thu, 2 Apr 2020 04:50:12 -0400
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 304mcc63fh-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Thu, 02 Apr 2020 04:50:11 -0400
+Received: from localhost
+        by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <frankja@linux.ibm.com>;
+        Thu, 2 Apr 2020 09:50:07 +0100
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
+        by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Thu, 2 Apr 2020 09:50:04 +0100
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0328o5da44040402
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 2 Apr 2020 08:50:05 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 39FEEA4068;
+        Thu,  2 Apr 2020 08:50:05 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D415FA405F;
+        Thu,  2 Apr 2020 08:50:04 +0000 (GMT)
+Received: from linux.fritz.box (unknown [9.145.14.236])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu,  2 Apr 2020 08:50:04 +0000 (GMT)
+Subject: Re: [kvm-unit-tests PATCH v1] s390x: STFLE operates on doublewords
+To:     David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org
+Cc:     Thomas Huth <thuth@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>
+References: <20200401163305.31550-1-david@redhat.com>
+From:   Janosch Frank <frankja@linux.ibm.com>
+Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+Date:   Thu, 2 Apr 2020 10:50:03 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <20200326152438.6218-26-alexandru.elisei@arm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20200401163305.31550-1-david@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="UsDvhk0g9B3sfToay3EvpnGmFphf1GFNl"
+X-TM-AS-GCONF: 00
+x-cbid: 20040208-0028-0000-0000-000003F08498
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20040208-0029-0000-0000-000024B60DCA
+Message-Id: <b2f9a3d7-7da7-4363-44ba-6446d879bf95@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.676
+ definitions=2020-04-02_01:2020-03-31,2020-04-02 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ suspectscore=0 bulkscore=0 mlxscore=0 adultscore=0 priorityscore=1501
+ clxscore=1015 lowpriorityscore=0 malwarescore=0 phishscore=0
+ mlxlogscore=999 spamscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2003020000 definitions=main-2004020073
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 26/03/2020 15:24, Alexandru Elisei wrote:
-> After writing to the device fd as part of the PCI configuration space
-> emulation, we read back from the device to make sure that the write
-> finished. The value is read back into the PCI configuration space and
-> afterwards, the same value is copied by the PCI emulation code. Let's
-> read from the device fd into a temporary variable, to prevent this
-> double write.
-> 
-> The double write is harmless in itself. But when we implement
-> reassignable BARs, we need to keep track of the old BAR value, and the
-> VFIO code is overwritting it.
-> 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--UsDvhk0g9B3sfToay3EvpnGmFphf1GFNl
+Content-Type: multipart/mixed; boundary="efkOKO1AOV0PVnpHyhfsFu80JbY59zBaA"
 
-It seems still a bit fragile, since we rely on code in other places to
-limit "sz" to 4 or less, but in practice we should be covered.
+--efkOKO1AOV0PVnpHyhfsFu80JbY59zBaA
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-Can you maybe add an assert here to prevent accidents on the stack?
+On 4/1/20 6:33 PM, David Hildenbrand wrote:
+> STFLE operates on doublewords, not bytes. Passing in "256" resulted in
+> some ignored bits getting set. Not bad, but also not clean.
+>=20
+> Let's just convert our stfle handling code to operate on doublewords.
+>=20
+> Signed-off-by: David Hildenbrand <david@redhat.com>
 
-> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-
-Cheers,
-Andre
+Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
 
 > ---
->  vfio/pci.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/vfio/pci.c b/vfio/pci.c
-> index fe02574390f6..8b2a0c8dbac3 100644
-> --- a/vfio/pci.c
-> +++ b/vfio/pci.c
-> @@ -470,7 +470,7 @@ static void vfio_pci_cfg_write(struct kvm *kvm, struct pci_device_header *pci_hd
->  	struct vfio_region_info *info;
->  	struct vfio_pci_device *pdev;
->  	struct vfio_device *vdev;
-> -	void *base = pci_hdr;
-> +	u32 tmp;
->  
->  	if (offset == PCI_ROM_ADDRESS)
->  		return;
-> @@ -490,7 +490,7 @@ static void vfio_pci_cfg_write(struct kvm *kvm, struct pci_device_header *pci_hd
->  	if (pdev->irq_modes & VFIO_PCI_IRQ_MODE_MSI)
->  		vfio_pci_msi_cap_write(kvm, vdev, offset, data, sz);
->  
-> -	if (pread(vdev->fd, base + offset, sz, info->offset + offset) != sz)
-> +	if (pread(vdev->fd, &tmp, sz, info->offset + offset) != sz)
->  		vfio_dev_warn(vdev, "Failed to read %d bytes from Configuration Space at 0x%x",
->  			      sz, offset);
+>  lib/s390x/asm/facility.h | 14 +++++++-------
+>  lib/s390x/io.c           |  2 +-
+>  2 files changed, 8 insertions(+), 8 deletions(-)
+>=20
+> diff --git a/lib/s390x/asm/facility.h b/lib/s390x/asm/facility.h
+> index e34dc2c..def2705 100644
+> --- a/lib/s390x/asm/facility.h
+> +++ b/lib/s390x/asm/facility.h
+> @@ -14,12 +14,12 @@
+>  #include <asm/facility.h>
+>  #include <asm/arch_def.h>
+> =20
+> -#define NR_STFL_BYTES 256
+> -extern uint8_t stfl_bytes[];
+> +#define NB_STFL_DOUBLEWORDS 32
+> +extern uint64_t stfl_doublewords[];
+> =20
+>  static inline bool test_facility(int nr)
+>  {
+> -	return stfl_bytes[nr / 8] & (0x80U >> (nr % 8));
+> +	return stfl_doublewords[nr / 64] & (0x8000000000000000UL >> (nr % 64)=
+);
 >  }
-> 
+> =20
+>  static inline void stfl(void)
+> @@ -27,9 +27,9 @@ static inline void stfl(void)
+>  	asm volatile("	stfl	0(0)\n" : : : "memory");
+>  }
+> =20
+> -static inline void stfle(uint8_t *fac, unsigned int len)
+> +static inline void stfle(uint64_t *fac, unsigned int nb_doublewords)
+>  {
+> -	register unsigned long r0 asm("0") =3D len - 1;
+> +	register unsigned long r0 asm("0") =3D nb_doublewords - 1;
+> =20
+>  	asm volatile("	.insn	s,0xb2b00000,0(%1)\n"
+>  		     : "+d" (r0) : "a" (fac) : "memory", "cc");
+> @@ -40,9 +40,9 @@ static inline void setup_facilities(void)
+>  	struct lowcore *lc =3D NULL;
+> =20
+>  	stfl();
+> -	memcpy(stfl_bytes, &lc->stfl, sizeof(lc->stfl));
+> +	memcpy(stfl_doublewords, &lc->stfl, sizeof(lc->stfl));
+>  	if (test_facility(7))
+> -		stfle(stfl_bytes, NR_STFL_BYTES);
+> +		stfle(stfl_doublewords, NB_STFL_DOUBLEWORDS);
+>  }
+> =20
+>  #endif
+> diff --git a/lib/s390x/io.c b/lib/s390x/io.c
+> index e091c37..c0f0bf7 100644
+> --- a/lib/s390x/io.c
+> +++ b/lib/s390x/io.c
+> @@ -19,7 +19,7 @@
+>  #include "smp.h"
+> =20
+>  extern char ipl_args[];
+> -uint8_t stfl_bytes[NR_STFL_BYTES] __attribute__((aligned(8)));
+> +uint64_t stfl_doublewords[NB_STFL_DOUBLEWORDS];
+> =20
+>  static struct spinlock lock;
+> =20
+>=20
+
+
+
+--efkOKO1AOV0PVnpHyhfsFu80JbY59zBaA--
+
+--UsDvhk0g9B3sfToay3EvpnGmFphf1GFNl
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl6FpzwACgkQ41TmuOI4
+ufjh1w/7Bx1dHrWze7oNPyHSiPep2m9CCm+JeRIQUH0hAK3lgMhHSsROlz/al4/t
+VOzuzXRgWIZGk8klFOH5/z6vwJfeZvmeLCcXmjAuaH0m6g7/s92cTB5ls4e8saaA
+OgidyNAjRD99+MzOijbtoj7JnZ0IakUy1OPjyXO7N+4UPcPQzeT+1QfAnTE6jTZB
++orNoKYlbVvTnW+KrRBujJXQiziQN4/Yqjdjw0yO69wgaJFQySpGnTKlTdvi9wnB
+OWHjZZN6r5WUU5pHoB2AlN+UCsHUMFz7DUyFnrpliWZbOyE1Jp0IvPZVo+C0BUnW
+iv8u3A6sFpShKNetX53roi0Tb4/JjJgoYvtf89YQDr2IXzZA1rYFMgWRPvjs3DB5
+keafTsoCcNbnimR5nF96WkIqbhZfac3caxYv/m48DN8Uy3mL5S06VXc1ToIVBs+S
+lW5gtiaZaug+Jh9bUKwCAzRldxKDT9+AGlgdxa0genj1sbWLtotzvZMXP8CNMKXN
+UQyqZ2QWihSzfflOzAJmNLhYPfn76qlvpmP8b+EmHTIaVgGvI5GQHAOpWM1Y84IB
+otdl6mrGJy9WbI/diQXwO+9pLStNafpwXyekgKxt6iFto2VJMjJ0Pbfrr8WRTPnd
+rIVwsLBXHEREis+1LcUUIwnqKqSXKrJ0NF73GYgiYnshfaWu56c=
+=7pKU
+-----END PGP SIGNATURE-----
+
+--UsDvhk0g9B3sfToay3EvpnGmFphf1GFNl--
 
