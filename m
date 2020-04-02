@@ -2,111 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id AADBA19C6F0
-	for <lists+kvm@lfdr.de>; Thu,  2 Apr 2020 18:19:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CB36019C70A
+	for <lists+kvm@lfdr.de>; Thu,  2 Apr 2020 18:27:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389788AbgDBQTa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Apr 2020 12:19:30 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:35081 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S2389458AbgDBQTa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Apr 2020 12:19:30 -0400
+        id S2389819AbgDBQ1U (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Apr 2020 12:27:20 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:54037 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1731892AbgDBQ1U (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 2 Apr 2020 12:27:20 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1585844369;
+        s=mimecast20190719; t=1585844839;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=85/xyrCo8QjmlhKA4FcVRatCKUNg8UqQsOxjVD1bFWU=;
-        b=NVWpZExVUMRnCcYv+zbacTLL0AL1o5UsYTNml2lz4W7zqfPGcZMpTNDrhcrm+4raI4uTLq
-        fon4ZP9lB2e1OkVm4DtQ2gjhiNjxzkXHmwXtfJE7SH9p3b2K8u6m2NqDAaS/VCKwTC+JJ5
-        eyFnptPOwyPdkq3eeCmAZis/DI9RSOE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-183-G_ch5ApxMp6UUpC7rLCB_w-1; Thu, 02 Apr 2020 12:19:27 -0400
-X-MC-Unique: G_ch5ApxMp6UUpC7rLCB_w-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 102118017CE;
-        Thu,  2 Apr 2020 16:19:26 +0000 (UTC)
-Received: from gondolin (ovpn-113-176.ams2.redhat.com [10.36.113.176])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 4FED919C69;
-        Thu,  2 Apr 2020 16:19:22 +0000 (UTC)
-Date:   Thu, 2 Apr 2020 18:19:19 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Christian Borntraeger <borntraeger@de.ibm.com>
-Cc:     Thomas Huth <thuth@redhat.com>,
-        David Hildenbrand <david@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
-Subject: Re: [kvm-unit-tests v3] s390x/smp: add minimal test for sigp sense
- running status
-Message-ID: <20200402181919.4662ecb0.cohuck@redhat.com>
-In-Reply-To: <20200402154441.13063-1-borntraeger@de.ibm.com>
-References: <20200402154441.13063-1-borntraeger@de.ibm.com>
-Organization: Red Hat GmbH
+        bh=YiGejvc/Z1PscIO5Y2Td9wzrTW6YFSsKAEAcda9xkVg=;
+        b=WGMhaXVKFwi04/dx6sLUHCE2DekZ2R+rAlwb+ZGdQbmGF0V+hTcXHfcmpp9pHeJpJ0T72p
+        Ev0GEJLx1ZXgyztm2Ry8Fm2Z2vM0dNe1irjIey3XqCnrIFYaDJbWWfS2jKIRLtAKhCDnG2
+        SBhA6j/DBapLsIvsVSz1HlXWS5BolM8=
+Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
+ [209.85.219.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-265-kMukF2YINiaNzh8Ikuk4AQ-1; Thu, 02 Apr 2020 12:27:15 -0400
+X-MC-Unique: kMukF2YINiaNzh8Ikuk4AQ-1
+Received: by mail-qv1-f69.google.com with SMTP id z2so3174697qvw.7
+        for <kvm@vger.kernel.org>; Thu, 02 Apr 2020 09:27:15 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=YiGejvc/Z1PscIO5Y2Td9wzrTW6YFSsKAEAcda9xkVg=;
+        b=KckIjxuk1/5B+sDVuwCbYl28DVGtoDzcrWNQdeDqjtQxTyba0oW1fLNvwL0JB7AGTR
+         9Y1DmO6Cp+HMIwevwWnH92+ZlQUXiF0uzybmvuBHcHc7dYvuf4rVIGD6nVlVuX7CESME
+         NvwHiKOIIlzS+PwOjePSz2KifJMCedJSdOQpIjt4mrhfw0mPN++/hrKfS6umZ2Uvb3UM
+         Yyzb9rKFqArC7YncSb7L5gOis9kPAcWKK0fpSphBTCp1uLHFIvpOBvWGvGEcMckGTvDu
+         q7l6tu6nXGnrOb7zaMQ3ZUHTloFG+5OXHkKuLcJuQgAEXWb5ecjB6U0y9dWXsx0jrdCQ
+         x1ZA==
+X-Gm-Message-State: AGi0PuYn5Te+M7tIufpIQviXGhOFvTjiaRaIBY70s/IlRwd6L6ThXpgk
+        +H/+Cs9G/Y2dOlMWeytSJBwsojUP5jCMXwP7dAZTE1vm1euNCIpZ5VBRfgB6xNoQnp32wiFGK0E
+        iLbgwBjTfbE0F
+X-Received: by 2002:ac8:4641:: with SMTP id f1mr3595342qto.216.1585844834567;
+        Thu, 02 Apr 2020 09:27:14 -0700 (PDT)
+X-Google-Smtp-Source: APiQypI9uiNgZebAWGTM/6pTKMcpl2+Pbh6hcnrsxur+SijZm8gBzgmehd7nG3POHrAdyCwNw6XVFw==
+X-Received: by 2002:ac8:4641:: with SMTP id f1mr3595317qto.216.1585844834186;
+        Thu, 02 Apr 2020 09:27:14 -0700 (PDT)
+Received: from redhat.com (bzq-79-176-51-222.red.bezeqint.net. [79.176.51.222])
+        by smtp.gmail.com with ESMTPSA id v17sm3764796qkf.83.2020.04.02.09.27.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 02 Apr 2020 09:27:13 -0700 (PDT)
+Date:   Thu, 2 Apr 2020 12:27:09 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     linux-kernel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        netdev@vger.kernel.org
+Subject: Re: [PATCH v2] vhost: drop vring dependency on iotlb
+Message-ID: <20200402122544-mutt-send-email-mst@kernel.org>
+References: <20200402144519.34194-1-mst@redhat.com>
+ <44f9b9d3-3da2-fafe-aa45-edd574dc6484@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <44f9b9d3-3da2-fafe-aa45-edd574dc6484@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu,  2 Apr 2020 11:44:41 -0400
-Christian Borntraeger <borntraeger@de.ibm.com> wrote:
-
-> Two minimal tests:
-> - our own CPU should be running when we check ourselves
-> - a CPU should at least have some times with a not running
-> indication. To speed things up we stop CPU1
+On Thu, Apr 02, 2020 at 11:01:13PM +0800, Jason Wang wrote:
 > 
-> Also rename smp_cpu_running to smp_sense_running_status.
+> On 2020/4/2 下午10:46, Michael S. Tsirkin wrote:
+> > vringh can now be built without IOTLB.
+> > Select IOTLB directly where it's used.
+> > 
+> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> > ---
+> > 
+> > Applies on top of my vhost tree.
+> > Changes from v1:
+> > 	VDPA_SIM needs VHOST_IOTLB
 > 
-> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> ---
->  lib/s390x/smp.c |  2 +-
->  lib/s390x/smp.h |  2 +-
->  s390x/smp.c     | 15 +++++++++++++++
->  3 files changed, 17 insertions(+), 2 deletions(-)
->
+> 
+> It looks to me the patch is identical to v1.
+> 
+> Thanks
 
-(...)
 
-> diff --git a/s390x/smp.c b/s390x/smp.c
-> index 79cdc1f..4450aff 100644
-> --- a/s390x/smp.c
-> +++ b/s390x/smp.c
-> @@ -210,6 +210,20 @@ static void test_emcall(void)
->  	report_prefix_pop();
->  }
->  
-> +static void test_sense_running(void)
-> +{
-> +	report_prefix_push("sense_running");
-> +	/* we are running */
+you are right. I squashed the description into
+    virtio/test: fix up after IOTLB changes
+take a look at it in the vhost tree.
 
-Maybe /* we (CPU0) are running */ ?
-
-> +	report(smp_sense_running_status(0), "CPU0 sense claims running");
-> +	/* make sure CPU is stopped to speed up the not running case */
-
-"the target CPU" ?
-
-> +	smp_cpu_stop(1);
-> +	/* Make sure to have at least one time with a not running indication */
-> +	while(smp_sense_running_status(1));
-> +	report(true, "CPU1 sense claims not running");
-> +	report_prefix_pop();
-> +}
-> +
-> +
->  /* Used to dirty registers of cpu #1 before it is reset */
->  static void test_func_initial(void)
->  {
-
-(...)
-
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+> 
+> > 
+> >   drivers/vdpa/Kconfig  | 1 +
+> >   drivers/vhost/Kconfig | 1 -
+> >   2 files changed, 1 insertion(+), 1 deletion(-)
+> > 
+> > diff --git a/drivers/vdpa/Kconfig b/drivers/vdpa/Kconfig
+> > index 7db1460104b7..08b615f2da39 100644
+> > --- a/drivers/vdpa/Kconfig
+> > +++ b/drivers/vdpa/Kconfig
+> > @@ -17,6 +17,7 @@ config VDPA_SIM
+> >   	depends on RUNTIME_TESTING_MENU
+> >   	select VDPA
+> >   	select VHOST_RING
+> > +	select VHOST_IOTLB
+> >   	default n
+> >   	help
+> >   	  vDPA networking device simulator which loop TX traffic back
+> > diff --git a/drivers/vhost/Kconfig b/drivers/vhost/Kconfig
+> > index f0404ce255d1..cb6b17323eb2 100644
+> > --- a/drivers/vhost/Kconfig
+> > +++ b/drivers/vhost/Kconfig
+> > @@ -8,7 +8,6 @@ config VHOST_IOTLB
+> >   config VHOST_RING
+> >   	tristate
+> > -	select VHOST_IOTLB
+> >   	help
+> >   	  This option is selected by any driver which needs to access
+> >   	  the host side of a virtio ring.
 
