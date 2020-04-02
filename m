@@ -2,159 +2,183 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0C19319BE06
-	for <lists+kvm@lfdr.de>; Thu,  2 Apr 2020 10:51:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C877219BE08
+	for <lists+kvm@lfdr.de>; Thu,  2 Apr 2020 10:51:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387592AbgDBIu6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Apr 2020 04:50:58 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:52507 "EHLO
+        id S2387752AbgDBIvV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Apr 2020 04:51:21 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:25944 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728612AbgDBIu6 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 2 Apr 2020 04:50:58 -0400
+        by vger.kernel.org with ESMTP id S1728612AbgDBIvV (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 2 Apr 2020 04:51:21 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1585817456;
+        s=mimecast20190719; t=1585817480;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=o2ROWoA/Q4kopE0GRuJxFR1Mdzx26gimKSY4bj8fFeY=;
-        b=JCX+YArr43XTVC3iGJfm+yjnCJOb9By03p+Vx2Fz6kXWO1A+Mu9NBGJMPF8T532021CK9X
-        UtSilwn+iOXhwYp1QLTqCnnF5LF3XzIShKQzd5Yj4dXQy89ZNN8WEPqJQ7tICxO0UL8Szf
-        p3K6n6jyJk5kIHPjMh8yhqXXfcVeHvQ=
+         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+        bh=sYvVPnFREHaBsjFV0w/bTrbAuL3JWq47XvNz9FF44bw=;
+        b=b3dXIDBeq9pJkrv7qLqd15cza9An8rBNyJTOpCXPPSl2LzucNUrT1PxLO5gCNF0CuYn/wT
+        gQlEO92QiHJeXVCVvCZ/VkBQsY2000qNCRWYn2gPqsZc8bshRhIXhD/kAUWJlEeu7QvEMV
+        dzIaFRuyTnClkEcwPea0U9Y7qR1WM1c=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-381-unMlZHFhMauk_GWmxdC6XA-1; Thu, 02 Apr 2020 04:50:53 -0400
-X-MC-Unique: unMlZHFhMauk_GWmxdC6XA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+ us-mta-86-gFp_BJr6O5iN_45Ms49SFQ-1; Thu, 02 Apr 2020 04:51:17 -0400
+X-MC-Unique: gFp_BJr6O5iN_45Ms49SFQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 69005800D6C;
-        Thu,  2 Apr 2020 08:50:50 +0000 (UTC)
-Received: from [10.36.112.58] (ovpn-112-58.ams2.redhat.com [10.36.112.58])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 3A9451C933;
-        Thu,  2 Apr 2020 08:50:47 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH v7 10/13] arm/arm64: ITS: INT functional
- tests
-To:     Zenghui Yu <yuzenghui@huawei.com>
-Cc:     eric.auger.pro@gmail.com, maz@kernel.org,
-        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        qemu-devel@nongnu.org, qemu-arm@nongnu.org, drjones@redhat.com,
-        andre.przywara@arm.com, peter.maydell@linaro.org,
-        alexandru.elisei@arm.com, thuth@redhat.com
-References: <20200320092428.20880-1-eric.auger@redhat.com>
- <20200320092428.20880-11-eric.auger@redhat.com>
- <f7f1d7c4-2321-9123-2394-528af737bfa7@huawei.com>
-From:   Auger Eric <eric.auger@redhat.com>
-Message-ID: <fa4e14f6-20ee-982f-0eda-74b101cddf7a@redhat.com>
-Date:   Thu, 2 Apr 2020 10:50:45 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 145CD1005055;
+        Thu,  2 Apr 2020 08:51:16 +0000 (UTC)
+Received: from [10.36.114.29] (ovpn-114-29.ams2.redhat.com [10.36.114.29])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D58D51019611;
+        Thu,  2 Apr 2020 08:51:13 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH v1] s390x: STFLE operates on doublewords
+To:     kvm@vger.kernel.org
+Cc:     Thomas Huth <thuth@redhat.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>
+References: <20200401163305.31550-1-david@redhat.com>
+From:   David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat GmbH
+Message-ID: <a01b9522-f69b-a314-63e5-8b67e8e56891@redhat.com>
+Date:   Thu, 2 Apr 2020 10:51:12 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <f7f1d7c4-2321-9123-2394-528af737bfa7@huawei.com>
+In-Reply-To: <20200401163305.31550-1-david@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Zenghui,
+On 01.04.20 18:33, David Hildenbrand wrote:
+> STFLE operates on doublewords, not bytes. Passing in "256" resulted in
+> some ignored bits getting set. Not bad, but also not clean.
+> 
+> Let's just convert our stfle handling code to operate on doublewords.
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>  lib/s390x/asm/facility.h | 14 +++++++-------
+>  lib/s390x/io.c           |  2 +-
+>  2 files changed, 8 insertions(+), 8 deletions(-)
+> 
+> diff --git a/lib/s390x/asm/facility.h b/lib/s390x/asm/facility.h
+> index e34dc2c..def2705 100644
+> --- a/lib/s390x/asm/facility.h
+> +++ b/lib/s390x/asm/facility.h
+> @@ -14,12 +14,12 @@
+>  #include <asm/facility.h>
+>  #include <asm/arch_def.h>
+>  
+> -#define NR_STFL_BYTES 256
+> -extern uint8_t stfl_bytes[];
+> +#define NB_STFL_DOUBLEWORDS 32
+> +extern uint64_t stfl_doublewords[];
+>  
+>  static inline bool test_facility(int nr)
+>  {
+> -	return stfl_bytes[nr / 8] & (0x80U >> (nr % 8));
+> +	return stfl_doublewords[nr / 64] & (0x8000000000000000UL >> (nr % 64));
+>  }
+>  
+>  static inline void stfl(void)
+> @@ -27,9 +27,9 @@ static inline void stfl(void)
+>  	asm volatile("	stfl	0(0)\n" : : : "memory");
+>  }
+>  
+> -static inline void stfle(uint8_t *fac, unsigned int len)
+> +static inline void stfle(uint64_t *fac, unsigned int nb_doublewords)
+>  {
+> -	register unsigned long r0 asm("0") = len - 1;
+> +	register unsigned long r0 asm("0") = nb_doublewords - 1;
+>  
+>  	asm volatile("	.insn	s,0xb2b00000,0(%1)\n"
+>  		     : "+d" (r0) : "a" (fac) : "memory", "cc");
+> @@ -40,9 +40,9 @@ static inline void setup_facilities(void)
+>  	struct lowcore *lc = NULL;
+>  
+>  	stfl();
+> -	memcpy(stfl_bytes, &lc->stfl, sizeof(lc->stfl));
+> +	memcpy(stfl_doublewords, &lc->stfl, sizeof(lc->stfl));
+>  	if (test_facility(7))
+> -		stfle(stfl_bytes, NR_STFL_BYTES);
+> +		stfle(stfl_doublewords, NB_STFL_DOUBLEWORDS);
+>  }
+>  
+>  #endif
+> diff --git a/lib/s390x/io.c b/lib/s390x/io.c
+> index e091c37..c0f0bf7 100644
+> --- a/lib/s390x/io.c
+> +++ b/lib/s390x/io.c
+> @@ -19,7 +19,7 @@
+>  #include "smp.h"
+>  
+>  extern char ipl_args[];
+> -uint8_t stfl_bytes[NR_STFL_BYTES] __attribute__((aligned(8)));
+> +uint64_t stfl_doublewords[NB_STFL_DOUBLEWORDS];
+>  
+>  static struct spinlock lock;
+>  
+> 
 
-On 3/30/20 12:43 PM, Zenghui Yu wrote:
-> Hi Eric,
->=20
-> On 2020/3/20 17:24, Eric Auger wrote:
->> Triggers LPIs through the INT command.
->>
->> the test checks the LPI hits the right CPU and triggers
->> the right LPI intid, ie. the translation is correct.
->>
->> Updates to the config table also are tested, along with inv
->> and invall commands.
->>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->=20
-> [...]
->=20
-> So I've tested this series and found that the "INT" test will sometimes
-> fail.
->=20
-> "not ok 12 - gicv3: its-migration: dev2/eventid=3D20 triggers LPI 8195 =
-en
-> PE #3 after migration
-> not ok 13 - gicv3: its-migration: dev7/eventid=3D255 triggers LPI 8196 =
-on
-> PE #2 after migration"
->=20
-> From logs:
-> "INFO: gicv3: its-migration: Migration complete
-> INT dev_id=3D2 event_id=3D20
-> INFO: gicv3: its-migration: No LPI received whereas (cpuid=3D3,
-> intid=3D8195) was expected
-> FAIL: gicv3: its-migration: dev2/eventid=3D20 triggers LPI 8195 en PE #=
-3
-> after migration
-> INT dev_id=3D7 event_id=3D255
-> INFO: gicv3: its-migration: No LPI received whereas (cpuid=3D2,
-> intid=3D8196) was expected
-> FAIL: gicv3: its-migration: dev7/eventid=3D255 triggers LPI 8196 on PE =
-#2
-> after migration"
->=20
->> +static void check_lpi_stats(const char *msg)
->> +{
->> +=C2=A0=C2=A0=C2=A0 bool pass =3D false;
->> +
->> +=C2=A0=C2=A0=C2=A0 mdelay(100);
->=20
-> After changing this to 'mdelay(1000)', the above error doesn't show up
-> anymore. But it sounds strange that 100ms is not enough to deliver a
-> single LPI. I haven't dig it further but will get back here later.
+Queued to
 
-Did you find some time to investigate this issue. Changing 100 to 1000
-has a huge impact on the overall test duration and I don't think it is
-sensible. Could you see what is your minimal value that pass the tests?
+https://github.com/davidhildenbrand/kvm-unit-tests.git s390x-next
 
-Thanks
+thanks for the review
 
-Eric
->=20
->> +=C2=A0=C2=A0=C2=A0 smp_rmb(); /* pairs with wmb in lpi_handler */
->> +=C2=A0=C2=A0=C2=A0 if (lpi_stats.observed.cpu_id !=3D lpi_stats.expec=
-ted.cpu_id ||
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 lpi_stats.observed.lpi_id =
-!=3D lpi_stats.expected.lpi_id) {
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (lpi_stats.observed.cpu=
-_id =3D=3D -1 &&
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 lp=
-i_stats.observed.lpi_id =3D=3D -1) {
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 re=
-port_info("No LPI received whereas (cpuid=3D%d, intid=3D%d) "
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "was expected", lpi_stats.e=
-xpected.cpu_id,
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 lpi_stats.expected.lpi_id);
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 } else {
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 re=
-port_info("Unexpected LPI (cpuid=3D%d, intid=3D%d)",
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 lpi_stats.observed.cpu_id,
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 lpi_stats.observed.lpi_id);
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->> +=C2=A0=C2=A0=C2=A0 } else {
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 pass =3D true;
->> +=C2=A0=C2=A0=C2=A0 }
->> +=C2=A0=C2=A0=C2=A0 report(pass, "%s", msg);
->> +}
->=20
-> This patch itself looks good to me,
-> Reviewed-by: Zenghui Yu <yuzenghui@huawei.com>
->=20
->=20
-> Thanks
->=20
+-- 
+Thanks,
+
+David / dhildenb
 
