@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0F18619DC1F
-	for <lists+kvm@lfdr.de>; Fri,  3 Apr 2020 18:52:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E3E3719DC1A
+	for <lists+kvm@lfdr.de>; Fri,  3 Apr 2020 18:52:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404018AbgDCQwN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 Apr 2020 12:52:13 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:38095 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S2404629AbgDCQv7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 3 Apr 2020 12:51:59 -0400
+        id S2404658AbgDCQwJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 Apr 2020 12:52:09 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:57792 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S2404665AbgDCQwD (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 3 Apr 2020 12:52:03 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1585932718;
+        s=mimecast20190719; t=1585932722;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=dbrbXbuWyZrlOy+yoiqtbmywqt31syCjQq35ukfw0g0=;
-        b=apAArPAaviI2tLrTHj1ai+SlvOL7M8yMKC8WEedKur3dBzOKOtgt97f7Tf902P+O12q/PO
-        +If1xKSKhg3NRk6swXbUQLYFqWtgb+D5kUdezEMyiDDJ07+MowPP3SpJAs+zJB1hvZERsJ
-        OoC1LKUrY6Xx/pKDuOEjemR2o9J0W8E=
+        bh=yMmscrcPxrNtAuLRokAXM6YRXQcJoZNIY/bvDej50a4=;
+        b=D3ya/KDKovjr2j4dzy2vJxLMQy9g4MMIfR9kNlpY82Wcjyk0gR5kQPbsXBey3rjZDLavPD
+        Fkh6LvtZAARe7xpeEv5HkxFzW9KqfiA3AsA656fW81H+6rdruktP44ROs2me3L8ObGY/9o
+        R23cbmj5EkznY6yjc5xBi/aeU2uvhLw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-292-Z_cMZfXAOEaxuRn1K_5rog-1; Fri, 03 Apr 2020 12:51:56 -0400
-X-MC-Unique: Z_cMZfXAOEaxuRn1K_5rog-1
+ us-mta-93-22eF_FI-NECPEOFPgRuKEw-1; Fri, 03 Apr 2020 12:51:59 -0400
+X-MC-Unique: 22eF_FI-NECPEOFPgRuKEw-1
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E7DD48018A8;
-        Fri,  3 Apr 2020 16:51:54 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BAABD477;
+        Fri,  3 Apr 2020 16:51:57 +0000 (UTC)
 Received: from eperezma.remote.csb (ovpn-113-28.ams2.redhat.com [10.36.113.28])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 76E8D18A85;
-        Fri,  3 Apr 2020 16:51:52 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 50155A0A7B;
+        Fri,  3 Apr 2020 16:51:55 +0000 (UTC)
 From:   =?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>
 To:     "Michael S. Tsirkin" <mst@redhat.com>
 Cc:     kvm list <kvm@vger.kernel.org>,
@@ -45,9 +45,9 @@ Cc:     kvm list <kvm@vger.kernel.org>,
         Halil Pasic <pasic@linux.ibm.com>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         Christian Borntraeger <borntraeger@de.ibm.com>
-Subject: [PATCH 7/8] tools/virtio: Reset index in virtio_test --reset.
-Date:   Fri,  3 Apr 2020 18:51:18 +0200
-Message-Id: <20200403165119.5030-8-eperezma@redhat.com>
+Subject: [PATCH 8/8] tools/virtio: Use tools/include/list.h instead of stubs
+Date:   Fri,  3 Apr 2020 18:51:19 +0200
+Message-Id: <20200403165119.5030-9-eperezma@redhat.com>
 In-Reply-To: <20200403165119.5030-1-eperezma@redhat.com>
 References: <20200403165119.5030-1-eperezma@redhat.com>
 MIME-Version: 1.0
@@ -59,115 +59,91 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This way behavior for vhost is more like a VM.
+It should not make any significant difference but reduce stub code.
 
 Signed-off-by: Eugenio P=C3=A9rez <eperezma@redhat.com>
 ---
- tools/virtio/virtio_test.c | 33 ++++++++++++++++++++++++++-------
- 1 file changed, 26 insertions(+), 7 deletions(-)
+ tools/virtio/linux/kernel.h | 7 +------
+ tools/virtio/linux/virtio.h | 5 ++---
+ tools/virtio/virtio_test.c  | 1 +
+ tools/virtio/vringh_test.c  | 2 ++
+ 4 files changed, 6 insertions(+), 9 deletions(-)
 
+diff --git a/tools/virtio/linux/kernel.h b/tools/virtio/linux/kernel.h
+index 6683b4a70b05..caab980211a6 100644
+--- a/tools/virtio/linux/kernel.h
++++ b/tools/virtio/linux/kernel.h
+@@ -11,6 +11,7 @@
+=20
+ #include <linux/compiler.h>
+ #include <linux/types.h>
++#include <linux/list.h>
+ #include <linux/printk.h>
+ #include <linux/bug.h>
+ #include <errno.h>
+@@ -135,10 +136,4 @@ static inline void free_page(unsigned long addr)
+ 	(void) (&_min1 =3D=3D &_min2);		\
+ 	_min1 < _min2 ? _min1 : _min2; })
+=20
+-/* TODO: empty stubs for now. Broken but enough for virtio_ring.c */
+-#define list_add_tail(a, b) do {} while (0)
+-#define list_del(a) do {} while (0)
+-#define list_for_each_entry(a, b, c) while (0)
+-/* end of stubs */
+-
+ #endif /* KERNEL_H */
+diff --git a/tools/virtio/linux/virtio.h b/tools/virtio/linux/virtio.h
+index b751350d4ce8..5d90254ddae4 100644
+--- a/tools/virtio/linux/virtio.h
++++ b/tools/virtio/linux/virtio.h
+@@ -11,12 +11,11 @@ struct device {
+ struct virtio_device {
+ 	struct device dev;
+ 	u64 features;
++	struct list_head vqs;
+ };
+=20
+ struct virtqueue {
+-	/* TODO: commented as list macros are empty stubs for now.
+-	 * Broken but enough for virtio_ring.c
+-	 * struct list_head list; */
++	struct list_head list;
+ 	void (*callback)(struct virtqueue *vq);
+ 	const char *name;
+ 	struct virtio_device *vdev;
 diff --git a/tools/virtio/virtio_test.c b/tools/virtio/virtio_test.c
-index 7b7829e510c0..82902fc3ba2a 100644
+index 82902fc3ba2a..cb3f29c09aff 100644
 --- a/tools/virtio/virtio_test.c
 +++ b/tools/virtio/virtio_test.c
-@@ -20,7 +20,6 @@
- #include "../../drivers/vhost/test.h"
+@@ -129,6 +129,7 @@ static void vdev_info_init(struct vdev_info* dev, uns=
+igned long long features)
+ 	int r;
+ 	memset(dev, 0, sizeof *dev);
+ 	dev->vdev.features =3D features;
++	INIT_LIST_HEAD(&dev->vdev.vqs);
+ 	dev->buf_size =3D 1024;
+ 	dev->buf =3D malloc(dev->buf_size);
+ 	assert(dev->buf);
+diff --git a/tools/virtio/vringh_test.c b/tools/virtio/vringh_test.c
+index 293653463303..fa87b58bd5fa 100644
+--- a/tools/virtio/vringh_test.c
++++ b/tools/virtio/vringh_test.c
+@@ -307,6 +307,7 @@ static int parallel_test(u64 features,
+ 		close(to_host[0]);
 =20
- #define RANDOM_BATCH -1
--#define RANDOM_RESET -1
+ 		gvdev.vdev.features =3D features;
++		INIT_LIST_HEAD(&gvdev.vdev.vqs);
+ 		gvdev.to_host_fd =3D to_host[1];
+ 		gvdev.notifies =3D 0;
 =20
- /* Unused */
- void *__kmalloc_fake, *__kfree_ignore_start, *__kfree_ignore_end;
-@@ -49,6 +48,7 @@ struct vdev_info {
+@@ -453,6 +454,7 @@ int main(int argc, char *argv[])
 =20
- static const struct vhost_vring_file no_backend =3D { .fd =3D -1 },
- 				     backend =3D { .fd =3D 1 };
-+static const struct vhost_vring_state null_state =3D {};
+ 	getrange =3D getrange_iov;
+ 	vdev.features =3D 0;
++	INIT_LIST_HEAD(&vdev.vqs);
 =20
- bool vq_notify(struct virtqueue *vq)
- {
-@@ -174,14 +174,19 @@ static void run_test(struct vdev_info *dev, struct =
-vq_info *vq,
- 	unsigned len;
- 	long long spurious =3D 0;
- 	const bool random_batch =3D batch =3D=3D RANDOM_BATCH;
-+
- 	r =3D ioctl(dev->control, VHOST_TEST_RUN, &test);
- 	assert(r >=3D 0);
-+	if (!reset_n) {
-+		next_reset =3D INT_MAX;
-+	}
-+
- 	for (;;) {
- 		virtqueue_disable_cb(vq->vq);
- 		completed_before =3D completed;
- 		started_before =3D started;
- 		do {
--			const bool reset =3D reset_n && completed > next_reset;
-+			const bool reset =3D completed > next_reset;
- 			if (random_batch)
- 				batch =3D (random() % vq->vring.num) + 1;
-=20
-@@ -224,10 +229,24 @@ static void run_test(struct vdev_info *dev, struct =
-vq_info *vq,
- 			}
-=20
- 			if (reset) {
-+				struct vhost_vring_state s =3D { .index =3D 0 };
-+
-+				vq_reset(vq, vq->vring.num, &dev->vdev);
-+
-+				r =3D ioctl(dev->control, VHOST_GET_VRING_BASE,
-+					  &s);
-+				assert(!r);
-+
-+				s.num =3D 0;
-+				r =3D ioctl(dev->control, VHOST_SET_VRING_BASE,
-+					  &null_state);
-+				assert(!r);
-+
- 				r =3D ioctl(dev->control, VHOST_TEST_SET_BACKEND,
- 					  &backend);
- 				assert(!r);
-=20
-+				started =3D completed;
- 				while (completed > next_reset)
- 					next_reset +=3D completed;
- 			}
-@@ -249,7 +268,9 @@ static void run_test(struct vdev_info *dev, struct vq=
-_info *vq,
- 	test =3D 0;
- 	r =3D ioctl(dev->control, VHOST_TEST_RUN, &test);
- 	assert(r >=3D 0);
--	fprintf(stderr, "spurious wakeups: 0x%llx\n", spurious);
-+	fprintf(stderr,
-+		"spurious wakeups: 0x%llx started=3D0x%lx completed=3D0x%lx\n",
-+		spurious, started, completed);
- }
-=20
- const char optstring[] =3D "h";
-@@ -312,7 +333,7 @@ static void help(void)
- 		" [--no-virtio-1]"
- 		" [--delayed-interrupt]"
- 		" [--batch=3Drandom/N]"
--		" [--reset=3Drandom/N]"
-+		" [--reset=3DN]"
- 		"\n");
- }
-=20
-@@ -360,11 +381,9 @@ int main(int argc, char **argv)
- 		case 'r':
- 			if (!optarg) {
- 				reset =3D 1;
--			} else if (0 =3D=3D strcmp(optarg, "random")) {
--				reset =3D RANDOM_RESET;
- 			} else {
- 				reset =3D strtol(optarg, NULL, 10);
--				assert(reset >=3D 0);
-+				assert(reset > 0);
- 				assert(reset < (long)INT_MAX + 1);
- 			}
- 			break;
+ 	while (argv[1]) {
+ 		if (strcmp(argv[1], "--indirect") =3D=3D 0)
 --=20
 2.18.1
 
