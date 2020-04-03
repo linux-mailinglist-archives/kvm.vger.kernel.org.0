@@ -2,54 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 86E9619D96F
-	for <lists+kvm@lfdr.de>; Fri,  3 Apr 2020 16:47:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7C32419D975
+	for <lists+kvm@lfdr.de>; Fri,  3 Apr 2020 16:49:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2403953AbgDCOr2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 Apr 2020 10:47:28 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:58842 "EHLO
+        id S2390915AbgDCOt1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 Apr 2020 10:49:27 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:24493 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728235AbgDCOr2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 3 Apr 2020 10:47:28 -0400
+        with ESMTP id S1727431AbgDCOt0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 3 Apr 2020 10:49:26 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1585925247;
+        s=mimecast20190719; t=1585925365;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=pIMdHeam2Dd57E1ij8qf+M+ClKnpGrmjjcDtBAmNnvM=;
-        b=E99SWDGmnlc3PPt11NiDMETMd4uXykPtiWvVXdEGeOC6BeMg5wG9o6MjZZhCyh3ma25gij
-        eMMkAs8iR8yYows6Jl4XCf3oz9xX9EromFCSJgU3YA/IBuEtEuibKP4euFCydvrTs9VfNF
-        WnvZQ6Oa3DEoaSTliqNZxBQwSSFHtZU=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-96-262pD_bnO4ebuuk9wxYmuQ-1; Fri, 03 Apr 2020 10:47:25 -0400
-X-MC-Unique: 262pD_bnO4ebuuk9wxYmuQ-1
-Received: by mail-wr1-f72.google.com with SMTP id u16so3193756wrp.14
-        for <kvm@vger.kernel.org>; Fri, 03 Apr 2020 07:47:25 -0700 (PDT)
+        bh=2yQcmseEyeVg6GPm96uWfFnmAMUahKPoXBAjzFAW3yI=;
+        b=SvteODAShmkpdQg4Zz/rFbjlTBB194bWfG7pr8s2eejjrN/sL3jRy218fwL2D8OjCYGYzE
+        wiZlZi6E4U/7dLfcROjFe2juAtQDHSqgtDurI0O5eUma2kqhdIFZNRqZm7S4tee+BgIro+
+        soTlzD/6gdwxJl55RQNCeURJgeu/6mo=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-38--4MazU2GN-akwzbiQ9G4fw-1; Fri, 03 Apr 2020 10:49:23 -0400
+X-MC-Unique: -4MazU2GN-akwzbiQ9G4fw-1
+Received: by mail-wm1-f71.google.com with SMTP id j18so2144466wmi.1
+        for <kvm@vger.kernel.org>; Fri, 03 Apr 2020 07:49:23 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=pIMdHeam2Dd57E1ij8qf+M+ClKnpGrmjjcDtBAmNnvM=;
-        b=Pvwx4TLQERTbVjmD+RLggDAFpKjQFBvJouUTMVpTFu2NnQ/Hll6rqcZauIlG1RB30j
-         A6JtYiifBwFy6vTcuaqtcsg3Qm2AEEdW4jIboHm2XYL5dRYR1jeEo5UGMYeggQSbuzLn
-         zwlI9MoTHrRkjipsbkM3F37K4Mpb8Jy9HblAD5y6m+WtXcY7fwt6mrY5UdYHgnjMK3Mh
-         hgc5Mc0/jVMmHvASmZSNxonnxleqNqNyr+UO8+nz7xeKndQP1e3mXgESBvmnxCDWi5rQ
-         XksO71WD+E1x/BByeq6wfJAMlnNevYqst59aRn/thmwCe17DgfMK7+h2jyaS8H+GSIll
-         RrxQ==
-X-Gm-Message-State: AGi0PubYcd/s2it/czCVV4N2/VzVK/WrwqudQ9LD0rRw2C2Dls55+xsF
-        2yvJ1XgV7KhHtm7dnsmqI/Z4r8iHPemjEvUADb2ycFXj9nh5MJ2nBfMuDlWjRGF+LGfklsD5OLT
-        6lNfhSCXUj302
-X-Received: by 2002:a7b:c148:: with SMTP id z8mr8859431wmi.31.1585925244240;
-        Fri, 03 Apr 2020 07:47:24 -0700 (PDT)
-X-Google-Smtp-Source: APiQypJ/slyncg9POzbP4k32yikwz4uR//iAykjMgD1RX8ERy9OxRDOu6M5CxkUlQ8AKnuQ1Xi3O1w==
-X-Received: by 2002:a7b:c148:: with SMTP id z8mr8859410wmi.31.1585925244062;
-        Fri, 03 Apr 2020 07:47:24 -0700 (PDT)
+        bh=2yQcmseEyeVg6GPm96uWfFnmAMUahKPoXBAjzFAW3yI=;
+        b=mHe2FsrOLi/ZStUqzp15H/Lw1JBD0J9Xm0Gv2yRr6yd7nrmTSxcsHFd5gOAFrF1EB7
+         9OXzjhappBW6psgoLIbUSkLdygHYHHJZlbxCCEr5sWLhE6fU44D3ah5rBybmfTozRGoO
+         Eu0sToyEdpDHBaLaeUMvWJRtcDEJpQdKSyPy/bmWeUlppWa2EToQ5/nBQUa4i3U1MGc0
+         2QMe0/OskfU42YWvxtl0b2xgP85eOobp9TnuOiR+qL+8yMNIGm0CA7cZzLfH8PoK3Ajx
+         6hDL/Um4Yof+F4Nq+aNM24FjBc5LZRZZzcibigCLuvCKOB1Omk//SI1oVZEQhD1cCnuU
+         K/Nw==
+X-Gm-Message-State: AGi0PuakjTP6316aNT9Cb1Zfps1z1XLTEAc2BI4+t1BacdxhodoLdB3H
+        Z3jdbKU4Li7EmqQSRcd1uX1LsFSLpLQ/jHK9ujn/UR1+E4/TINn8ATyzyyfpD8LDQE1FM1f9L3W
+        wNHi1UfZYomdD
+X-Received: by 2002:a5d:4844:: with SMTP id n4mr1876788wrs.314.1585925362128;
+        Fri, 03 Apr 2020 07:49:22 -0700 (PDT)
+X-Google-Smtp-Source: APiQypJ0AZHkfLKjPMnhj2b2pI772WnqimjJzNleJGck0W25rIEhP0qlqVTo5gotJo7M/k58Z4J98w==
+X-Received: by 2002:a5d:4844:: with SMTP id n4mr1876773wrs.314.1585925361963;
+        Fri, 03 Apr 2020 07:49:21 -0700 (PDT)
 Received: from xz-x1 ([2607:9880:19c0:32::3])
-        by smtp.gmail.com with ESMTPSA id n6sm12456186wrp.30.2020.04.03.07.47.21
+        by smtp.gmail.com with ESMTPSA id a13sm12168426wrh.80.2020.04.03.07.49.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 03 Apr 2020 07:47:23 -0700 (PDT)
-Date:   Fri, 3 Apr 2020 10:47:19 -0400
+        Fri, 03 Apr 2020 07:49:21 -0700 (PDT)
+Date:   Fri, 3 Apr 2020 10:49:16 -0400
 From:   Peter Xu <peterx@redhat.com>
 To:     Liu Yi L <yi.l.liu@intel.com>
 Cc:     qemu-devel@nongnu.org, alex.williamson@redhat.com,
@@ -61,25 +61,37 @@ Cc:     qemu-devel@nongnu.org, alex.williamson@redhat.com,
         Yi Sun <yi.y.sun@linux.intel.com>,
         Richard Henderson <rth@twiddle.net>,
         Eduardo Habkost <ehabkost@redhat.com>
-Subject: Re: [PATCH v2 19/22] intel_iommu: process PASID-based iotlb
- invalidation
-Message-ID: <20200403144719.GL103677@xz-x1>
+Subject: Re: [PATCH v2 22/22] intel_iommu: modify x-scalable-mode to be
+ string option
+Message-ID: <20200403144916.GM103677@xz-x1>
 References: <1585542301-84087-1-git-send-email-yi.l.liu@intel.com>
- <1585542301-84087-20-git-send-email-yi.l.liu@intel.com>
+ <1585542301-84087-23-git-send-email-yi.l.liu@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <1585542301-84087-20-git-send-email-yi.l.liu@intel.com>
+In-Reply-To: <1585542301-84087-23-git-send-email-yi.l.liu@intel.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Mar 29, 2020 at 09:24:58PM -0700, Liu Yi L wrote:
-> This patch adds the basic PASID-based iotlb (piotlb) invalidation
-> support. piotlb is used during walking Intel VT-d 1st level page
-> table. This patch only adds the basic processing. Detailed handling
-> will be added in next patch.
+On Sun, Mar 29, 2020 at 09:25:01PM -0700, Liu Yi L wrote:
+> Intel VT-d 3.0 introduces scalable mode, and it has a bunch of capabilities
+> related to scalable mode translation, thus there are multiple combinations.
+> While this vIOMMU implementation wants simplify it for user by providing
+> typical combinations. User could config it by "x-scalable-mode" option. The
+> usage is as below:
+> 
+> "-device intel-iommu,x-scalable-mode=["legacy"|"modern"|"off"]"
+> 
+>  - "legacy": gives support for SL page table
+>  - "modern": gives support for FL page table, pasid, virtual command
+>  - "off": no scalable mode support
+>  -  if not configured, means no scalable mode support, if not proper
+>     configured, will throw error
+> 
+> Note: this patch is supposed to be merged when  the whole vSVA patch series
+> were merged.
 > 
 > Cc: Kevin Tian <kevin.tian@intel.com>
 > Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
@@ -89,6 +101,7 @@ On Sun, Mar 29, 2020 at 09:24:58PM -0700, Liu Yi L wrote:
 > Cc: Richard Henderson <rth@twiddle.net>
 > Cc: Eduardo Habkost <ehabkost@redhat.com>
 > Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
+> Signed-off-by: Yi Sun <yi.y.sun@linux.intel.com>
 
 Reviewed-by: Peter Xu <peterx@redhat.com>
 
