@@ -2,211 +2,214 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id EDDF419D7CB
-	for <lists+kvm@lfdr.de>; Fri,  3 Apr 2020 15:39:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4635C19D7DA
+	for <lists+kvm@lfdr.de>; Fri,  3 Apr 2020 15:42:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390909AbgDCNjb convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Fri, 3 Apr 2020 09:39:31 -0400
-Received: from mga07.intel.com ([134.134.136.100]:36619 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728175AbgDCNjb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 3 Apr 2020 09:39:31 -0400
-IronPort-SDR: W7XAZGV9hPoJJcQU78XW7S08SS+/U9gLbS6m8Fg+F2lvuZRBV2QzMxU+jjmYWxNd3izKyZBum3
- Du8+KDs6etjg==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Apr 2020 06:39:30 -0700
-IronPort-SDR: 8GigXOadN4Q1oxFpOj79P+I8YV4QiER2FMPqfIQPp/S4zJTejr2TmdkwG9/FItHsUKUdrfzqzW
- Apt8v/rBmVtg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.72,339,1580803200"; 
-   d="scan'208";a="238885929"
-Received: from fmsmsx103.amr.corp.intel.com ([10.18.124.201])
-  by orsmga007.jf.intel.com with ESMTP; 03 Apr 2020 06:39:29 -0700
-Received: from fmsmsx126.amr.corp.intel.com (10.18.125.43) by
- FMSMSX103.amr.corp.intel.com (10.18.124.201) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Fri, 3 Apr 2020 06:39:29 -0700
-Received: from shsmsx106.ccr.corp.intel.com (10.239.4.159) by
- FMSMSX126.amr.corp.intel.com (10.18.125.43) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Fri, 3 Apr 2020 06:39:29 -0700
-Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.225]) by
- SHSMSX106.ccr.corp.intel.com ([169.254.10.89]) with mapi id 14.03.0439.000;
- Fri, 3 Apr 2020 21:39:27 +0800
-From:   "Liu, Yi L" <yi.l.liu@intel.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-CC:     "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "Tian, Jun J" <jun.j.tian@intel.com>,
-        "Sun, Yi Y" <yi.y.sun@intel.com>,
-        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Wu, Hao" <hao.wu@intel.com>
-Subject: RE: [PATCH v1 8/8] vfio/type1: Add vSVA support for IOMMU-backed
- mdevs
-Thread-Topic: [PATCH v1 8/8] vfio/type1: Add vSVA support for IOMMU-backed
- mdevs
-Thread-Index: AQHWAEUdm3FJ38v7KEeZ+HXvm2TTUKhl1VgAgAGinHA=
-Date:   Fri, 3 Apr 2020 13:39:26 +0000
-Message-ID: <A2975661238FB949B60364EF0F2C25743A220BCF@SHSMSX104.ccr.corp.intel.com>
-References: <1584880325-10561-1-git-send-email-yi.l.liu@intel.com>
-        <1584880325-10561-9-git-send-email-yi.l.liu@intel.com>
- <20200402143342.1e10c498@w520.home>
-In-Reply-To: <20200402143342.1e10c498@w520.home>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-version: 11.2.0.6
-dlp-reaction: no-action
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+        id S2390966AbgDCNmC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 Apr 2020 09:42:02 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:20966 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S2390944AbgDCNmB (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 3 Apr 2020 09:42:01 -0400
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 033DY2RI126012
+        for <kvm@vger.kernel.org>; Fri, 3 Apr 2020 09:42:00 -0400
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 304r51prkx-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Fri, 03 Apr 2020 09:41:59 -0400
+Received: from localhost
+        by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <frankja@linux.ibm.com>;
+        Fri, 3 Apr 2020 14:41:55 +0100
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
+        by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Fri, 3 Apr 2020 14:41:51 +0100
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 033Dfqfp45875236
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 3 Apr 2020 13:41:52 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E88C3AE056;
+        Fri,  3 Apr 2020 13:41:51 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 70E57AE045;
+        Fri,  3 Apr 2020 13:41:51 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.145.156.196])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri,  3 Apr 2020 13:41:51 +0000 (GMT)
+Subject: Re: [PATCH v1 1/5] KVM: s390: vsie: Fix region 1 ASCE sanity shadow
+ address checks
+To:     David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Heiko Carstens <heiko.carstens@de.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        stable@vger.kernel.org
+References: <20200402184819.34215-1-david@redhat.com>
+ <20200402184819.34215-2-david@redhat.com>
+From:   Janosch Frank <frankja@linux.ibm.com>
+Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+Date:   Fri, 3 Apr 2020 15:41:50 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
+In-Reply-To: <20200402184819.34215-2-david@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="VuYuhIihgc8kXyA392z7lxVZk0JYHRnZj"
+X-TM-AS-GCONF: 00
+x-cbid: 20040313-0028-0000-0000-000003F1522F
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20040313-0029-0000-0000-000024B6E00A
+Message-Id: <58888143-f27c-58e6-715e-41ff89ab6160@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.676
+ definitions=2020-04-03_10:2020-04-03,2020-04-03 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 impostorscore=0
+ phishscore=0 adultscore=0 lowpriorityscore=0 priorityscore=1501
+ spamscore=0 suspectscore=0 mlxscore=0 malwarescore=0 clxscore=1015
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2004030120
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Alex,
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--VuYuhIihgc8kXyA392z7lxVZk0JYHRnZj
+Content-Type: multipart/mixed; boundary="Vk5zZruvRNvPPgLPZS6eZqzObLnkFIpxv"
 
-> From: Alex Williamson <alex.williamson@redhat.com>
-> Sent: Friday, April 3, 2020 4:34 AM
-> To: Liu, Yi L <yi.l.liu@intel.com>
-> Subject: Re: [PATCH v1 8/8] vfio/type1: Add vSVA support for IOMMU-backed
-> mdevs
-> 
-> On Sun, 22 Mar 2020 05:32:05 -0700
-> "Liu, Yi L" <yi.l.liu@intel.com> wrote:
-> 
-> > From: Liu Yi L <yi.l.liu@intel.com>
-> >
-> > Recent years, mediated device pass-through framework (e.g. vfio-mdev)
-> > are used to achieve flexible device sharing across domains (e.g. VMs).
-> > Also there are hardware assisted mediated pass-through solutions from
-> > platform vendors. e.g. Intel VT-d scalable mode which supports Intel
-> > Scalable I/O Virtualization technology. Such mdevs are called IOMMU-
-> > backed mdevs as there are IOMMU enforced DMA isolation for such mdevs.
-> > In kernel, IOMMU-backed mdevs are exposed to IOMMU layer by aux-domain
-> > concept, which means mdevs are protected by an iommu domain which is
-> > aux-domain of its physical device. Details can be found in the KVM
-> > presentation from Kevin Tian. IOMMU-backed equals to IOMMU-capable.
-> >
-> > https://events19.linuxfoundation.org/wp-content/uploads/2017/12/\
-> > Hardware-Assisted-Mediated-Pass-Through-with-VFIO-Kevin-Tian-Intel.pdf
-> >
-> > This patch supports NESTING IOMMU for IOMMU-backed mdevs by figuring
-> > out the physical device of an IOMMU-backed mdev and then invoking IOMMU
-> > requests to IOMMU layer with the physical device and the mdev's aux
-> > domain info.
-> >
-> > With this patch, vSVA (Virtual Shared Virtual Addressing) can be used
-> > on IOMMU-backed mdevs.
-> >
-> > Cc: Kevin Tian <kevin.tian@intel.com>
-> > CC: Jacob Pan <jacob.jun.pan@linux.intel.com>
-> > CC: Jun Tian <jun.j.tian@intel.com>
-> > Cc: Alex Williamson <alex.williamson@redhat.com>
-> > Cc: Eric Auger <eric.auger@redhat.com>
-> > Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>
-> > Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
-> > ---
-> >  drivers/vfio/vfio_iommu_type1.c | 23 ++++++++++++++++++++---
-> >  1 file changed, 20 insertions(+), 3 deletions(-)
-> >
-> > diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> > index 937ec3f..d473665 100644
-> > --- a/drivers/vfio/vfio_iommu_type1.c
-> > +++ b/drivers/vfio/vfio_iommu_type1.c
-> > @@ -132,6 +132,7 @@ struct vfio_regions {
-> >
-> >  struct domain_capsule {
-> >  	struct iommu_domain *domain;
-> > +	struct vfio_group *group;
-> >  	void *data;
-> >  };
-> >
-> > @@ -148,6 +149,7 @@ static int vfio_iommu_for_each_dev(struct vfio_iommu
-> *iommu,
-> >  	list_for_each_entry(d, &iommu->domain_list, next) {
-> >  		dc.domain = d->domain;
-> >  		list_for_each_entry(g, &d->group_list, next) {
-> > +			dc.group = g;
-> >  			ret = iommu_group_for_each_dev(g->iommu_group,
-> >  						       &dc, fn);
-> >  			if (ret)
-> > @@ -2347,7 +2349,12 @@ static int vfio_bind_gpasid_fn(struct device *dev, void
-> *data)
-> >  	struct iommu_gpasid_bind_data *gbind_data =
-> >  		(struct iommu_gpasid_bind_data *) dc->data;
-> >
-> > -	return iommu_sva_bind_gpasid(dc->domain, dev, gbind_data);
-> > +	if (dc->group->mdev_group)
-> > +		return iommu_sva_bind_gpasid(dc->domain,
-> > +			vfio_mdev_get_iommu_device(dev), gbind_data);
-> 
-> But we can't assume an mdev device is iommu backed, so this can call
-> with NULL dev, which appears will pretty quickly segfault
-> intel_svm_bind_gpasid.
+--Vk5zZruvRNvPPgLPZS6eZqzObLnkFIpxv
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-I don't think the non-iommu backed mdev will not be in the
-iommu->domain_list. right? But, yeah, from this function p.o.v
-, it is still necessary to do a check. How about adding a check
-on the return of vfio_mdev_get_iommu_device(dev)? If iommu_device
-is fetch, the mdev should be iommu-backed. does it make sense?
+On 4/2/20 8:48 PM, David Hildenbrand wrote:
+> In case we have a region 1 ASCE, our shadow/g3 address can have any val=
+ue.
+> Unfortunately, (-1UL << 64) is undefined and triggers sometimes,
+> rejecting valid shadow addresses when trying to walk our shadow table
+> hierarchy.
+>=20
+> The result is that the prefix cannot get mapped and will loop basically=
 
-Regards,
-Yi Liu
+> forever trying to map it (-EAGAIN loop).
+>=20
+> After all, the broken check is only a sanity check, our table shadowing=
 
-> 
-> > +	else
-> > +		return iommu_sva_bind_gpasid(dc->domain,
-> > +						dev, gbind_data);
-> >  }
-> >
-> >  static int vfio_unbind_gpasid_fn(struct device *dev, void *data)
-> > @@ -2356,8 +2363,13 @@ static int vfio_unbind_gpasid_fn(struct device *dev,
-> void *data)
-> >  	struct iommu_gpasid_bind_data *gbind_data =
-> >  		(struct iommu_gpasid_bind_data *) dc->data;
-> >
-> > -	return iommu_sva_unbind_gpasid(dc->domain, dev,
-> > +	if (dc->group->mdev_group)
-> > +		return iommu_sva_unbind_gpasid(dc->domain,
-> > +					vfio_mdev_get_iommu_device(dev),
-> >  					gbind_data->hpasid);
-> 
-> Same
-> 
-> > +	else
-> > +		return iommu_sva_unbind_gpasid(dc->domain, dev,
-> > +						gbind_data->hpasid);
-> >  }
-> >
-> >  /**
-> > @@ -2429,7 +2441,12 @@ static int vfio_cache_inv_fn(struct device *dev, void
-> *data)
-> >  	struct iommu_cache_invalidate_info *cache_inv_info =
-> >  		(struct iommu_cache_invalidate_info *) dc->data;
-> >
-> > -	return iommu_cache_invalidate(dc->domain, dev, cache_inv_info);
-> > +	if (dc->group->mdev_group)
-> > +		return iommu_cache_invalidate(dc->domain,
-> > +			vfio_mdev_get_iommu_device(dev), cache_inv_info);
-> 
-> And again
-> 
-> > +	else
-> > +		return iommu_cache_invalidate(dc->domain,
-> > +						dev, cache_inv_info);
-> >  }
-> >
-> >  static long vfio_iommu_type1_ioctl(void *iommu_data,
+> code in kvm_s390_shadow_tables() already checks these conditions, injec=
+ting
+> proper translation exceptions. Turn it into a WARN_ON_ONCE().
+>=20
+> Fixes: 4be130a08420 ("s390/mm: add shadow gmap support")
+> Cc: <stable@vger.kernel.org> # v4.8+
+> Reported-by: Janosch Frank <frankja@linux.ibm.com>
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+
+With the WARN_ON_ONCE fix applied I don't run into stalls or warnings
+anymore, so:
+Tested-by: Janosch Frank <frankja@linux.ibm.com>
+
+> ---
+>  arch/s390/mm/gmap.c | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/arch/s390/mm/gmap.c b/arch/s390/mm/gmap.c
+> index 2fbece47ef6f..f3dbc5bdde50 100644
+> --- a/arch/s390/mm/gmap.c
+> +++ b/arch/s390/mm/gmap.c
+> @@ -787,14 +787,18 @@ static void gmap_call_notifier(struct gmap *gmap,=
+ unsigned long start,
+>  static inline unsigned long *gmap_table_walk(struct gmap *gmap,
+>  					     unsigned long gaddr, int level)
+>  {
+> +	const int asce_type =3D gmap->asce & _ASCE_TYPE_MASK;
+>  	unsigned long *table;
+> =20
+>  	if ((gmap->asce & _ASCE_TYPE_MASK) + 4 < (level * 4))
+>  		return NULL;
+>  	if (gmap_is_shadow(gmap) && gmap->removed)
+>  		return NULL;
+> -	if (gaddr & (-1UL << (31 + ((gmap->asce & _ASCE_TYPE_MASK) >> 2)*11))=
+)
+> +
+> +	if (WARN_ON_ONCE(asce_type !=3D _ASCE_TYPE_REGION1) &&
+> +			 gaddr & (-1UL << (31 + (asce_type >> 2) * 11)))
+>  		return NULL;
+> +
+>  	table =3D gmap->table;
+>  	switch (gmap->asce & _ASCE_TYPE_MASK) {
+>  	case _ASCE_TYPE_REGION1:
+>=20
+
+
+
+--Vk5zZruvRNvPPgLPZS6eZqzObLnkFIpxv--
+
+--VuYuhIihgc8kXyA392z7lxVZk0JYHRnZj
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl6HPR8ACgkQ41TmuOI4
+ufgb+RAAsxZfc7kuWec9oOuipxBnN6zTyl3YsseJhgREuvN4gfSxNKUBszxkzDe+
+AkHIrRmYTssGVaixZUec+N/x/rxOh7jIdWwTpHnQGWZNZoCHKTcFtbWGqgBQbnRY
+QSUhg8i+Xw+OYtvnt+54Qo2AUThNlUxF8xUVfz//Rj3Vc55DZ/T/4StxLg8aAVg3
+10YXv9/uuH2wBhQ2xZUwR6OTCcArA7ewTJx+ntjjawxY0BovxpWPdSc3AkErgXed
+lYB22XVCpe4SsbTLLvJLb0Tvr9lhuuPQZ6qU5iN+4Huh3ioZsMYEsC7Td/U+yCUG
+FGVKKdToeglKVV7A5vA8iHBzQRQ7Tx10jeSR8hBWSQcYNNG3MWEFy5YxAvwAAOTZ
+6SdXqz7lAcYhok44oexhpGV3Ccdq/orALKfeAZlqY1NLNyDqg+/9vVzSufF9ghfo
+PbRtHyjgw2hJUXGPLvP/cz22pIZ4wM2g7/0SP2QskUBqy4EZALeVXHeXEW0CEgK0
+V6rVojM/leoYaRqoxCD7VIv73xda3Zp6PMVAj3UNUfj8wQXh24VYEDnEe7ePJ6HX
+NW6nLxJnGYCRbAqpHP68VIYIy/BbS3YcgewMhcCH4Kpt19z1W5bAFFDGjXovBP1E
+m5AOfXT4s/E0nh6wtpGud43sjagTxQIoiUL77KS0V7+LkaqnLT4=
+=wb7M
+-----END PGP SIGNATURE-----
+
+--VuYuhIihgc8kXyA392z7lxVZk0JYHRnZj--
 
