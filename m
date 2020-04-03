@@ -2,170 +2,236 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7CBBB19D5FE
-	for <lists+kvm@lfdr.de>; Fri,  3 Apr 2020 13:46:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0EC8219D629
+	for <lists+kvm@lfdr.de>; Fri,  3 Apr 2020 13:56:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390789AbgDCLqO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 Apr 2020 07:46:14 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:33227 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S2390755AbgDCLqO (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 3 Apr 2020 07:46:14 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1585914372;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=lylFUfBjwP1rS+3oOHbc6N8wXNa4qKo/mQHq78UD10o=;
-        b=GSRqml9JfsAHIa17rXUBEk4e138MLgsIxZZAKtgySEADc3tMiSv5QPdIL9nhgJVV5TYxAs
-        B6gBAL05hNAyUmAmkEZuPCLTHsjjxr4h6egRvTIb95o2z9kXVSw33iTIl1cuW/bsiCY35N
-        lMdUM/bYEvkCw55o9LZ5RZ2tfeZeGmw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-239-eK1zNNGTMHOY36e2oJcGLQ-1; Fri, 03 Apr 2020 07:46:08 -0400
-X-MC-Unique: eK1zNNGTMHOY36e2oJcGLQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7731B8017F5;
-        Fri,  3 Apr 2020 11:46:07 +0000 (UTC)
-Received: from [10.36.112.213] (ovpn-112-213.ams2.redhat.com [10.36.112.213])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 6973B5DA76;
-        Fri,  3 Apr 2020 11:46:06 +0000 (UTC)
-Subject: Re: [PATCH kvm-unit-tests v2] s390x: unittests: Use smp parameter
-To:     Andrew Jones <drjones@redhat.com>
-Cc:     kvm@vger.kernel.org, thuth@redhat.com, frankja@linux.ibm.com
-References: <20200403094015.506838-1-drjones@redhat.com>
- <e66041e9-12bb-4b54-4532-b832726b216c@redhat.com>
- <20200403101208.dvx7llsrvoqpq4vz@kamzik.brq.redhat.com>
-From:   David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat GmbH
-Message-ID: <999c928c-0e23-986d-6ed3-c51065f3914f@redhat.com>
-Date:   Fri, 3 Apr 2020 13:46:05 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
-MIME-Version: 1.0
-In-Reply-To: <20200403101208.dvx7llsrvoqpq4vz@kamzik.brq.redhat.com>
-Content-Type: text/plain; charset=utf-8
+        id S2390863AbgDCL4Q convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Fri, 3 Apr 2020 07:56:16 -0400
+Received: from mga04.intel.com ([192.55.52.120]:57454 "EHLO mga04.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726087AbgDCL4Q (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 3 Apr 2020 07:56:16 -0400
+IronPort-SDR: Bp0XxvRLo+5ivD791nErX0Aa9SC+DxTHYqY/KdYcl1Pka49bZ4zu8A1oKEJ+9shlR4R9oTBBFS
+ oy3T6oqIYKUw==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Apr 2020 04:56:15 -0700
+IronPort-SDR: Pp6CaFev95o78liw4lTnYEJR0DHLihUaGmowtgmyYMORQqe2+n8CaEBN6qxKVI1C2PISbMWp+G
+ Ap82RDJi296g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.72,339,1580803200"; 
+   d="scan'208";a="268338356"
+Received: from fmsmsx105.amr.corp.intel.com ([10.18.124.203])
+  by orsmga002.jf.intel.com with ESMTP; 03 Apr 2020 04:56:14 -0700
+Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
+ FMSMSX105.amr.corp.intel.com (10.18.124.203) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Fri, 3 Apr 2020 04:56:13 -0700
+Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1713.5; Fri, 3 Apr 2020 04:56:13 -0700
+Received: from shsmsx152.ccr.corp.intel.com (10.239.6.52) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id 15.1.1713.5
+ via Frontend Transport; Fri, 3 Apr 2020 04:56:13 -0700
+Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.225]) by
+ SHSMSX152.ccr.corp.intel.com ([169.254.6.209]) with mapi id 14.03.0439.000;
+ Fri, 3 Apr 2020 19:56:09 +0800
+From:   "Liu, Yi L" <yi.l.liu@intel.com>
+To:     Jean-Philippe Brucker <jean-philippe@linaro.org>
+CC:     "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "Tian, Jun J" <jun.j.tian@intel.com>,
+        "Sun, Yi Y" <yi.y.sun@intel.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Wu, Hao" <hao.wu@intel.com>
+Subject: RE: [PATCH v1 1/8] vfio: Add VFIO_IOMMU_PASID_REQUEST(alloc/free)
+Thread-Topic: [PATCH v1 1/8] vfio: Add VFIO_IOMMU_PASID_REQUEST(alloc/free)
+Thread-Index: AQHWAEUbC4GB74LMekup8jIcF6WIFqhlZUwAgAH1tzA=
+Date:   Fri, 3 Apr 2020 11:56:09 +0000
+Message-ID: <A2975661238FB949B60364EF0F2C25743A2209E3@SHSMSX104.ccr.corp.intel.com>
+References: <1584880325-10561-1-git-send-email-yi.l.liu@intel.com>
+ <1584880325-10561-2-git-send-email-yi.l.liu@intel.com>
+ <20200402135240.GE1176452@myrica>
+In-Reply-To: <20200402135240.GE1176452@myrica>
+Accept-Language: en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
+MIME-Version: 1.0
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 03.04.20 12:12, Andrew Jones wrote:
-> On Fri, Apr 03, 2020 at 11:58:02AM +0200, David Hildenbrand wrote:
->> On 03.04.20 11:40, Andrew Jones wrote:
->>> Signed-off-by: Andrew Jones <drjones@redhat.com>
->>> Reviewed-by: David Hildenbrand <david@redhat.com>
->>> Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
->>> ---
->>>
->>> v2: Really just a repost, but also picked up the tags.
->>
->> (sorry, missed to pick this one up)
->>
->>>
->>>  s390x/unittests.cfg | 2 +-
->>>  1 file changed, 1 insertion(+), 1 deletion(-)
->>>
->>> diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
->>> index 07013b2b8748..aa6d5d96e292 100644
->>> --- a/s390x/unittests.cfg
->>> +++ b/s390x/unittests.cfg
->>> @@ -74,7 +74,7 @@ file = stsi.elf
->>>  
->>>  [smp]
->>>  file = smp.elf
->>> -extra_params =-smp 2
->>> +smp = 2
->>>  
->>>  [sclp-1g]
->>>  file = sclp.elf
->>>
->>
->> Thanks, queued to
->>
->> https://github.com/davidhildenbrand/kvm-unit-tests.git s390x-next
->>
->> On the branch, we also do have
->>
->> [stsi]
->> file = stsi.elf
->> extra_params=-name kvm-unit-test --uuid 0fb84a86-727c-11ea-bc55-0242ac130003 -smp 1,maxcpus=8
->>
->> Can that be expressed similarly?
->>
-> 
-> It would still work with QEMU if you changed it to
-> 
->  extra_params=-name kvm-unit-test --uuid 0fb84a86-727c-11ea-bc55-0242ac130003
->  smp = 1,maxcpus=8
-> 
-> which is similar to what powerpc has with one of their tests
-> 
->  smp = 2,threads=2
-> 
-> About the only problem I see with that is that we've documented the
-> 'smp' unittests parameter as taking a '<num>', and if we want to get
-> other KVM userspaces working with kvm-unit-tests then we should try
-> to keep our unittests.cfg files VMM agnostic, and stick to its
-> documentation.
-> 
-> IOW, I'd probably leave 'stsi' as is.
-> 
+Hi Jean,
 
-Makes sense, thanks!
+> From: Jean-Philippe Brucker <jean-philippe@linaro.org>
+> Sent: Thursday, April 2, 2020 9:53 PM
+> To: Liu, Yi L <yi.l.liu@intel.com>
+> Subject: Re: [PATCH v1 1/8] vfio: Add VFIO_IOMMU_PASID_REQUEST(alloc/free)
+> 
+> Hi Yi,
+> 
+> On Sun, Mar 22, 2020 at 05:31:58AM -0700, Liu, Yi L wrote:
+> > From: Liu Yi L <yi.l.liu@intel.com>
+> >
+> > For a long time, devices have only one DMA address space from platform
+> > IOMMU's point of view. This is true for both bare metal and directed-
+> > access in virtualization environment. Reason is the source ID of DMA in
+> > PCIe are BDF (bus/dev/fnc ID), which results in only device granularity
+> > DMA isolation. However, this is changing with the latest advancement in
+> > I/O technology area. More and more platform vendors are utilizing the PCIe
+> > PASID TLP prefix in DMA requests, thus to give devices with multiple DMA
+> > address spaces as identified by their individual PASIDs. For example,
+> > Shared Virtual Addressing (SVA, a.k.a Shared Virtual Memory) is able to
+> > let device access multiple process virtual address space by binding the
+> > virtual address space with a PASID. Wherein the PASID is allocated in
+> > software and programmed to device per device specific manner. Devices
+> > which support PASID capability are called PASID-capable devices. If such
+> > devices are passed through to VMs, guest software are also able to bind
+> > guest process virtual address space on such devices. Therefore, the guest
+> > software could reuse the bare metal software programming model, which
+> > means guest software will also allocate PASID and program it to device
+> > directly. This is a dangerous situation since it has potential PASID
+> > conflicts and unauthorized address space access.
+> 
+> It's worth noting that this applies to Intel VT-d with scalable mode, not
+> IOMMUs that use one PASID space per VM
 
+Oh yes. will add it.
 
--- 
-Thanks,
+> 
+> > It would be safer to
+> > let host intercept in the guest software's PASID allocation. Thus PASID
+> > are managed system-wide.
+> >
+> > This patch adds VFIO_IOMMU_PASID_REQUEST ioctl which aims to passdown
+> > PASID allocation/free request from the virtual IOMMU. Additionally, such
+> > requests are intended to be invoked by QEMU or other applications which
+> > are running in userspace, it is necessary to have a mechanism to prevent
+> > single application from abusing available PASIDs in system. With such
+> > consideration, this patch tracks the VFIO PASID allocation per-VM. There
+> > was a discussion to make quota to be per assigned devices. e.g. if a VM
+> > has many assigned devices, then it should have more quota. However, it
+> > is not sure how many PASIDs an assigned devices will use. e.g. it is
+> > possible that a VM with multiples assigned devices but requests less
+> > PASIDs. Therefore per-VM quota would be better.
+> >
+> > This patch uses struct mm pointer as a per-VM token. We also considered
+> > using task structure pointer and vfio_iommu structure pointer. However,
+> > task structure is per-thread, which means it cannot achieve per-VM PASID
+> > alloc tracking purpose. While for vfio_iommu structure, it is visible
+> > only within vfio. Therefore, structure mm pointer is selected. This patch
+> > adds a structure vfio_mm. A vfio_mm is created when the first vfio
+> > container is opened by a VM. On the reverse order, vfio_mm is free when
+> > the last vfio container is released. Each VM is assigned with a PASID
+> > quota, so that it is not able to request PASID beyond its quota. This
+> > patch adds a default quota of 1000. This quota could be tuned by
+> > administrator. Making PASID quota tunable will be added in another patch
+> > in this series.
+> >
+> > Previous discussions:
+> > https://patchwork.kernel.org/patch/11209429/
+> >
+> > Cc: Kevin Tian <kevin.tian@intel.com>
+> > CC: Jacob Pan <jacob.jun.pan@linux.intel.com>
+> > Cc: Alex Williamson <alex.williamson@redhat.com>
+> > Cc: Eric Auger <eric.auger@redhat.com>
+> > Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>
+> > Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
+> > Signed-off-by: Yi Sun <yi.y.sun@linux.intel.com>
+> > Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
+> > ---
+> >  drivers/vfio/vfio.c             | 130 ++++++++++++++++++++++++++++++++++++++++
+> >  drivers/vfio/vfio_iommu_type1.c | 104 ++++++++++++++++++++++++++++++++
+> >  include/linux/vfio.h            |  20 +++++++
+> >  include/uapi/linux/vfio.h       |  41 +++++++++++++
+> >  4 files changed, 295 insertions(+)
+> >
+> > diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
+> > index c848262..d13b483 100644
+> > --- a/drivers/vfio/vfio.c
+> > +++ b/drivers/vfio/vfio.c
+> > @@ -32,6 +32,7 @@
+> >  #include <linux/vfio.h>
+> >  #include <linux/wait.h>
+> >  #include <linux/sched/signal.h>
+> > +#include <linux/sched/mm.h>
+> >
+> >  #define DRIVER_VERSION	"0.3"
+> >  #define DRIVER_AUTHOR	"Alex Williamson <alex.williamson@redhat.com>"
+> > @@ -46,6 +47,8 @@ static struct vfio {
+> >  	struct mutex			group_lock;
+> >  	struct cdev			group_cdev;
+> >  	dev_t				group_devt;
+> > +	struct list_head		vfio_mm_list;
+> > +	struct mutex			vfio_mm_lock;
+> >  	wait_queue_head_t		release_q;
+> >  } vfio;
+> >
+> > @@ -2129,6 +2132,131 @@ int vfio_unregister_notifier(struct device *dev, enum
+> vfio_notify_type type,
+> >  EXPORT_SYMBOL(vfio_unregister_notifier);
+> >
+> >  /**
+> > + * VFIO_MM objects - create, release, get, put, search
+> > + * Caller of the function should have held vfio.vfio_mm_lock.
+> > + */
+> > +static struct vfio_mm *vfio_create_mm(struct mm_struct *mm)
+> > +{
+> > +	struct vfio_mm *vmm;
+> > +	struct vfio_mm_token *token;
+> > +	int ret = 0;
+> > +
+> > +	vmm = kzalloc(sizeof(*vmm), GFP_KERNEL);
+> > +	if (!vmm)
+> > +		return ERR_PTR(-ENOMEM);
+> > +
+> > +	/* Per mm IOASID set used for quota control and group operations */
+> > +	ret = ioasid_alloc_set((struct ioasid_set *) mm,
+> 
+> Hmm, either we need to change the token of ioasid_alloc_set() to "void *",
+> or pass an actual ioasid_set struct, but this cast doesn't look good :)
+>
+> As I commented on the IOASID series, I think we could embed a struct
+> ioasid_set into vfio_mm, pass that struct to all other ioasid_* functions,
+> and get rid of ioasid_sid.
 
-David / dhildenb
+I think change to "void *" is better as we needs the token to ensure all
+threads within a single VM share the same ioasid_set.
+
+> > +			       VFIO_DEFAULT_PASID_QUOTA, &vmm->ioasid_sid);
+> > +	if (ret) {
+> > +		kfree(vmm);
+> > +		return ERR_PTR(ret);
+> > +	}
+> > +
+> > +	kref_init(&vmm->kref);
+> > +	token = &vmm->token;
+> > +	token->val = mm;
+> 
+> Why the intermediate token struct?  Could we just store the mm_struct
+> pointer within vfio_mm?
+
+Hmm, here we only want to use the pointer as a token, instead of using
+the structure behind the pointer. If store the mm_struct directly, may
+leave a space to further use its content, this is not good.
+
+Regards,
+Yi Liu
 
