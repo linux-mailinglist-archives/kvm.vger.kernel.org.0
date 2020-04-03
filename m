@@ -2,148 +2,86 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E3E3719DC1A
-	for <lists+kvm@lfdr.de>; Fri,  3 Apr 2020 18:52:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D1F3419DCA7
+	for <lists+kvm@lfdr.de>; Fri,  3 Apr 2020 19:24:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404658AbgDCQwJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 Apr 2020 12:52:09 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:57792 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S2404665AbgDCQwD (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 3 Apr 2020 12:52:03 -0400
+        id S2391143AbgDCRYr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 Apr 2020 13:24:47 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:40656 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S2391126AbgDCRYr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 3 Apr 2020 13:24:47 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1585932722;
+        s=mimecast20190719; t=1585934686;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=yMmscrcPxrNtAuLRokAXM6YRXQcJoZNIY/bvDej50a4=;
-        b=D3ya/KDKovjr2j4dzy2vJxLMQy9g4MMIfR9kNlpY82Wcjyk0gR5kQPbsXBey3rjZDLavPD
-        Fkh6LvtZAARe7xpeEv5HkxFzW9KqfiA3AsA656fW81H+6rdruktP44ROs2me3L8ObGY/9o
-        R23cbmj5EkznY6yjc5xBi/aeU2uvhLw=
+         to:to:cc:cc; bh=TeNYEnMMfU3AiH0HRgQNWv1IhmQIdH3VbtTA4I/7zoQ=;
+        b=Fki8HQR0STTDXI20u7bY8oCYF/PdS/ozLY2QUReJdm40yfW/9UoLa90cHmWLvww0x0M9h7
+        PitlSLEXbfCO4Gg6PayfZ0ygXl04TYMth4G5xZQp/PAJUWbAykpITHgZ8/NS5IuFeQQXSr
+        SJic80bN1fd7shHKx5KJLIkfCe0GYrc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-93-22eF_FI-NECPEOFPgRuKEw-1; Fri, 03 Apr 2020 12:51:59 -0400
-X-MC-Unique: 22eF_FI-NECPEOFPgRuKEw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+ us-mta-77-AkRCr9DvPSGybudoVX-j4A-1; Fri, 03 Apr 2020 13:24:39 -0400
+X-MC-Unique: AkRCr9DvPSGybudoVX-j4A-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BAABD477;
-        Fri,  3 Apr 2020 16:51:57 +0000 (UTC)
-Received: from eperezma.remote.csb (ovpn-113-28.ams2.redhat.com [10.36.113.28])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 50155A0A7B;
-        Fri,  3 Apr 2020 16:51:55 +0000 (UTC)
-From:   =?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     kvm list <kvm@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>,
-        =?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
-        Stephen Rothwell <sfr@canb.auug.org.au>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>
-Subject: [PATCH 8/8] tools/virtio: Use tools/include/list.h instead of stubs
-Date:   Fri,  3 Apr 2020 18:51:19 +0200
-Message-Id: <20200403165119.5030-9-eperezma@redhat.com>
-In-Reply-To: <20200403165119.5030-1-eperezma@redhat.com>
-References: <20200403165119.5030-1-eperezma@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-Content-Transfer-Encoding: quoted-printable
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 304B7100550D;
+        Fri,  3 Apr 2020 17:24:38 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-116-15.gru2.redhat.com [10.97.116.15])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 135E05C1B0;
+        Fri,  3 Apr 2020 17:24:30 +0000 (UTC)
+From:   Wainer dos Santos Moschetta <wainersm@redhat.com>
+To:     pbonzini@redhat.com, kvm@vger.kernel.org
+Cc:     drjones@redhat.com, david@redhat.com, linux-kernel@vger.kernel.org,
+        linux-kselftest@vger.kernel.org
+Subject: [PATCH v2 0/2] selftests: kvm: Introduce the mem_slot_test test
+Date:   Fri,  3 Apr 2020 14:24:26 -0300
+Message-Id: <20200403172428.15574-1-wainersm@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-It should not make any significant difference but reduce stub code.
+This series introduces a new KVM selftest (mem_slot_test) that goal
+is to verify memory slots can be added up to the maximum allowed. An
+extra slot is attempted which should occur on error.
 
-Signed-off-by: Eugenio P=C3=A9rez <eperezma@redhat.com>
----
- tools/virtio/linux/kernel.h | 7 +------
- tools/virtio/linux/virtio.h | 5 ++---
- tools/virtio/virtio_test.c  | 1 +
- tools/virtio/vringh_test.c  | 2 ++
- 4 files changed, 6 insertions(+), 9 deletions(-)
+The patch 01 is needed so that the VM fd can be accessed from the
+test code (for the ioctl call attempting to add an extra slot).
 
-diff --git a/tools/virtio/linux/kernel.h b/tools/virtio/linux/kernel.h
-index 6683b4a70b05..caab980211a6 100644
---- a/tools/virtio/linux/kernel.h
-+++ b/tools/virtio/linux/kernel.h
-@@ -11,6 +11,7 @@
-=20
- #include <linux/compiler.h>
- #include <linux/types.h>
-+#include <linux/list.h>
- #include <linux/printk.h>
- #include <linux/bug.h>
- #include <errno.h>
-@@ -135,10 +136,4 @@ static inline void free_page(unsigned long addr)
- 	(void) (&_min1 =3D=3D &_min2);		\
- 	_min1 < _min2 ? _min1 : _min2; })
-=20
--/* TODO: empty stubs for now. Broken but enough for virtio_ring.c */
--#define list_add_tail(a, b) do {} while (0)
--#define list_del(a) do {} while (0)
--#define list_for_each_entry(a, b, c) while (0)
--/* end of stubs */
--
- #endif /* KERNEL_H */
-diff --git a/tools/virtio/linux/virtio.h b/tools/virtio/linux/virtio.h
-index b751350d4ce8..5d90254ddae4 100644
---- a/tools/virtio/linux/virtio.h
-+++ b/tools/virtio/linux/virtio.h
-@@ -11,12 +11,11 @@ struct device {
- struct virtio_device {
- 	struct device dev;
- 	u64 features;
-+	struct list_head vqs;
- };
-=20
- struct virtqueue {
--	/* TODO: commented as list macros are empty stubs for now.
--	 * Broken but enough for virtio_ring.c
--	 * struct list_head list; */
-+	struct list_head list;
- 	void (*callback)(struct virtqueue *vq);
- 	const char *name;
- 	struct virtio_device *vdev;
-diff --git a/tools/virtio/virtio_test.c b/tools/virtio/virtio_test.c
-index 82902fc3ba2a..cb3f29c09aff 100644
---- a/tools/virtio/virtio_test.c
-+++ b/tools/virtio/virtio_test.c
-@@ -129,6 +129,7 @@ static void vdev_info_init(struct vdev_info* dev, uns=
-igned long long features)
- 	int r;
- 	memset(dev, 0, sizeof *dev);
- 	dev->vdev.features =3D features;
-+	INIT_LIST_HEAD(&dev->vdev.vqs);
- 	dev->buf_size =3D 1024;
- 	dev->buf =3D malloc(dev->buf_size);
- 	assert(dev->buf);
-diff --git a/tools/virtio/vringh_test.c b/tools/virtio/vringh_test.c
-index 293653463303..fa87b58bd5fa 100644
---- a/tools/virtio/vringh_test.c
-+++ b/tools/virtio/vringh_test.c
-@@ -307,6 +307,7 @@ static int parallel_test(u64 features,
- 		close(to_host[0]);
-=20
- 		gvdev.vdev.features =3D features;
-+		INIT_LIST_HEAD(&gvdev.vdev.vqs);
- 		gvdev.to_host_fd =3D to_host[1];
- 		gvdev.notifies =3D 0;
-=20
-@@ -453,6 +454,7 @@ int main(int argc, char *argv[])
-=20
- 	getrange =3D getrange_iov;
- 	vdev.features =3D 0;
-+	INIT_LIST_HEAD(&vdev.vqs);
-=20
- 	while (argv[1]) {
- 		if (strcmp(argv[1], "--indirect") =3D=3D 0)
---=20
-2.18.1
+I ran the test successfully on x86_64, aarch64, and s390x.  This
+is why it is enabled to build on those arches.
+
+v1: https://lore.kernel.org/kvm/20200330204310.21736-1-wainersm@redhat.com
+
+Changes v1 -> v2:
+ - Rebased to queue
+ - vm_get_fd() returns int instead of unsigned int (patch 01) [drjones]
+ - Removed MEM_REG_FLAGS and GUEST_VM_MODE defines [drjones]
+ - Replaced DEBUG() with pr_info() [drjones]
+ - Calculate number of guest pages with vm_calc_num_guest_pages()
+   [drjones]
+ - Using memory region of 1 MB sized (matches mininum needed
+   for s390x)
+ - Removed the increment of guest_addr after the loop [drjones]
+ - Added assert for the errno when adding a slot beyond-the-limit [drjones]
+ - Prefer KVM_MEM_READONLY flag but on s390x it switch to KVM_MEM_LOG_DIRTY_PAGES,
+   so ensure the coverage of both flags. Also somewhat tests the KVM_CAP_READONLY_MEM capability check [drjones]
+ - Moved the test logic to test_add_max_slots(), this allows to more easily add new cases in the "suite".
+
+Wainer dos Santos Moschetta (2):
+  selftests: kvm: Add vm_get_fd() in kvm_util
+  selftests: kvm: Add mem_slot_test test
+
+ tools/testing/selftests/kvm/.gitignore        |  1 +
+ tools/testing/selftests/kvm/Makefile          |  3 +
+ .../testing/selftests/kvm/include/kvm_util.h  |  1 +
+ tools/testing/selftests/kvm/lib/kvm_util.c    |  5 ++
+ tools/testing/selftests/kvm/mem_slot_test.c   | 85 +++++++++++++++++++
+ 5 files changed, 95 insertions(+)
+ create mode 100644 tools/testing/selftests/kvm/mem_slot_test.c
+
+-- 
+2.17.2
 
