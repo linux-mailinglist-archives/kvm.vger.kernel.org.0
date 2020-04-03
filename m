@@ -2,274 +2,220 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id CFA0A19DA42
-	for <lists+kvm@lfdr.de>; Fri,  3 Apr 2020 17:34:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 980A819DAE9
+	for <lists+kvm@lfdr.de>; Fri,  3 Apr 2020 18:10:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404319AbgDCPez (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 Apr 2020 11:34:55 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:24276 "EHLO
+        id S2404133AbgDCQKf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 Apr 2020 12:10:35 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:35645 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S2404257AbgDCPez (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 3 Apr 2020 11:34:55 -0400
+        with ESMTP id S1728351AbgDCQKf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 3 Apr 2020 12:10:35 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1585928094;
+        s=mimecast20190719; t=1585930233;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=fgNAe0kFX8jwOB1IGnADdVWTUeU+aOcqCkGioFUGvME=;
-        b=SvGMPv+8idHBbsM5WrX5tYgZroJqGik6Qm32npxoWZtufqyuVVhzBM+Ky+I9Vhy25M46wT
-        slKxqo8bLdlyW502k0wmXY/P+P2ydWqJmzU/IcJx1EgaJffIelTE78kQ/viaKjRDjx7p7b
-        0ucfHMt/rzjdnLx0KnNOGhOnOpnSEQ0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-330-uzZvj-nxM0uyMHF_EGtW_Q-1; Fri, 03 Apr 2020 11:34:44 -0400
-X-MC-Unique: uzZvj-nxM0uyMHF_EGtW_Q-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E9E90800D50;
-        Fri,  3 Apr 2020 15:34:42 +0000 (UTC)
-Received: from w520.home (ovpn-112-162.phx2.redhat.com [10.3.112.162])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 92087A0A7B;
-        Fri,  3 Apr 2020 15:34:36 +0000 (UTC)
-Date:   Fri, 3 Apr 2020 09:34:36 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     "Tian, Kevin" <kevin.tian@intel.com>
-Cc:     "Liu, Yi L" <yi.l.liu@intel.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "Tian, Jun J" <jun.j.tian@intel.com>,
-        "Sun, Yi Y" <yi.y.sun@intel.com>,
-        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Wu, Hao" <hao.wu@intel.com>
-Subject: Re: [PATCH v1 7/8] vfio/type1: Add VFIO_IOMMU_CACHE_INVALIDATE
-Message-ID: <20200403093436.094b1928@w520.home>
-In-Reply-To: <AADFC41AFE54684AB9EE6CBC0274A5D19D807C4A@SHSMSX104.ccr.corp.intel.com>
-References: <1584880325-10561-1-git-send-email-yi.l.liu@intel.com>
-        <1584880325-10561-8-git-send-email-yi.l.liu@intel.com>
-        <20200402142428.2901432e@w520.home>
-        <AADFC41AFE54684AB9EE6CBC0274A5D19D807C4A@SHSMSX104.ccr.corp.intel.com>
+        bh=HxGDx8xMWngtG+W7aIWS1cH1WkrfSib7IwRlpCopMt0=;
+        b=Z7e1NsU6nw7FIGYfeznkl9r0ITcHEJGk/G460nxwlhjJbwrUs+/bJNEwny0FlLhkV5lQQA
+        PtBUOqYW7TXSdAs0GmaHJcrn59Ay1qc4tioPuOjii19Ov/VVD6UupyTwO25fDdmJIypugX
+        D/LXpmlxPdcykMTzoFuR4pKlJs207Bg=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-46-lZX97i_BNIO43clW2hQRrA-1; Fri, 03 Apr 2020 12:10:32 -0400
+X-MC-Unique: lZX97i_BNIO43clW2hQRrA-1
+Received: by mail-wr1-f72.google.com with SMTP id m15so3338875wrb.0
+        for <kvm@vger.kernel.org>; Fri, 03 Apr 2020 09:10:31 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=HxGDx8xMWngtG+W7aIWS1cH1WkrfSib7IwRlpCopMt0=;
+        b=pLFbhpklCORUeu7gYkIX2XlkZI6HjTUbZNqvrOOOLy5FJyhgfhDoJCUpeoXr3tJBBN
+         cyYsJRkpl1nQIK7mPj2a/IEoi7nKIK+ePDA2bevZjCFATvOjCL74UvCdMz7QNrOwKeaj
+         aN246mFqt3EKt5g8NFqe3Xko+6V7noF6vRqmb/LnP2zbk+voX6ZVV+OxGMIiCB/stsjs
+         nDADyoBltWHFt27FMIEGo1nWvjscVxrGi03bMrSC1ZoxtUslL3HymrRVur8NU3ZEAPMo
+         3NyZ8P/Czx8HF2VQR2lUv3qG7tmv7f5zvhff2CwmezZr9ulK5XZhphAVF7CFjJIzAudJ
+         wkvw==
+X-Gm-Message-State: AGi0PuaUeFbADRFAuicLd6vtTRu80qQopTEVHKeyVve72k50w5HCyBaB
+        Y5sDrJL7wW2TXYklxAtP4oPZTmRhDYqds/t7uPhJ4uFZTZqwYjW2uY91sGQc/2mvvrHZiDq4E54
+        qXBx9hOU2i07C
+X-Received: by 2002:adf:92a3:: with SMTP id 32mr1691695wrn.254.1585930230641;
+        Fri, 03 Apr 2020 09:10:30 -0700 (PDT)
+X-Google-Smtp-Source: APiQypLmrG+TV47aCCJhBBP60hCAWxJr4RwtTXo78EGqzfC86StxChKcxJSpL+guDENdVCsWHZ1/gQ==
+X-Received: by 2002:adf:92a3:: with SMTP id 32mr1691673wrn.254.1585930230347;
+        Fri, 03 Apr 2020 09:10:30 -0700 (PDT)
+Received: from redhat.com (bzq-79-176-51-222.red.bezeqint.net. [79.176.51.222])
+        by smtp.gmail.com with ESMTPSA id f141sm12222545wmf.3.2020.04.03.09.10.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 03 Apr 2020 09:10:29 -0700 (PDT)
+Date:   Fri, 3 Apr 2020 12:10:28 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     linux-kernel@vger.kernel.org
+Cc:     Jason Wang <jasowang@redhat.com>,
+        Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org
+Subject: [PATCH v3 1/2] virtio/test: fix up after IOTLB changes
+Message-ID: <20200403161011.13046-2-mst@redhat.com>
+References: <20200403161011.13046-1-mst@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200403161011.13046-1-mst@redhat.com>
+X-Mailer: git-send-email 2.24.1.751.gd10ce2899c
+X-Mutt-Fcc: =sent
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 3 Apr 2020 06:39:22 +0000
-"Tian, Kevin" <kevin.tian@intel.com> wrote:
+Allow building vringh without IOTLB (that's the case for userspace
+builds, will be useful for CAIF/VOD down the road too).
+Update for API tweaks.
+Don't include vringh with userspace builds.
 
-> > From: Alex Williamson <alex.williamson@redhat.com>
-> > Sent: Friday, April 3, 2020 4:24 AM
-> > 
-> > On Sun, 22 Mar 2020 05:32:04 -0700
-> > "Liu, Yi L" <yi.l.liu@intel.com> wrote:
-> >   
-> > > From: Liu Yi L <yi.l.liu@linux.intel.com>
-> > >
-> > > For VFIO IOMMUs with the type VFIO_TYPE1_NESTING_IOMMU, guest  
-> > "owns" the  
-> > > first-level/stage-1 translation structures, the host IOMMU driver has no
-> > > knowledge of first-level/stage-1 structure cache updates unless the guest
-> > > invalidation requests are trapped and propagated to the host.
-> > >
-> > > This patch adds a new IOCTL VFIO_IOMMU_CACHE_INVALIDATE to  
-> > propagate guest  
-> > > first-level/stage-1 IOMMU cache invalidations to host to ensure IOMMU  
-> > cache  
-> > > correctness.
-> > >
-> > > With this patch, vSVA (Virtual Shared Virtual Addressing) can be used safely
-> > > as the host IOMMU iotlb correctness are ensured.
-> > >
-> > > Cc: Kevin Tian <kevin.tian@intel.com>
-> > > CC: Jacob Pan <jacob.jun.pan@linux.intel.com>
-> > > Cc: Alex Williamson <alex.williamson@redhat.com>
-> > > Cc: Eric Auger <eric.auger@redhat.com>
-> > > Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>
-> > > Signed-off-by: Liu Yi L <yi.l.liu@linux.intel.com>
-> > > Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> > > Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
-> > > ---
-> > >  drivers/vfio/vfio_iommu_type1.c | 49  
-> > +++++++++++++++++++++++++++++++++++++++++  
-> > >  include/uapi/linux/vfio.h       | 22 ++++++++++++++++++
-> > >  2 files changed, 71 insertions(+)
-> > >
-> > > diff --git a/drivers/vfio/vfio_iommu_type1.c  
-> > b/drivers/vfio/vfio_iommu_type1.c  
-> > > index a877747..937ec3f 100644
-> > > --- a/drivers/vfio/vfio_iommu_type1.c
-> > > +++ b/drivers/vfio/vfio_iommu_type1.c
-> > > @@ -2423,6 +2423,15 @@ static long  
-> > vfio_iommu_type1_unbind_gpasid(struct vfio_iommu *iommu,  
-> > >  	return ret;
-> > >  }
-> > >
-> > > +static int vfio_cache_inv_fn(struct device *dev, void *data)
-> > > +{
-> > > +	struct domain_capsule *dc = (struct domain_capsule *)data;
-> > > +	struct iommu_cache_invalidate_info *cache_inv_info =
-> > > +		(struct iommu_cache_invalidate_info *) dc->data;
-> > > +
-> > > +	return iommu_cache_invalidate(dc->domain, dev, cache_inv_info);
-> > > +}
-> > > +
-> > >  static long vfio_iommu_type1_ioctl(void *iommu_data,
-> > >  				   unsigned int cmd, unsigned long arg)
-> > >  {
-> > > @@ -2629,6 +2638,46 @@ static long vfio_iommu_type1_ioctl(void  
-> > *iommu_data,  
-> > >  		}
-> > >  		kfree(gbind_data);
-> > >  		return ret;
-> > > +	} else if (cmd == VFIO_IOMMU_CACHE_INVALIDATE) {
-> > > +		struct vfio_iommu_type1_cache_invalidate cache_inv;
-> > > +		u32 version;
-> > > +		int info_size;
-> > > +		void *cache_info;
-> > > +		int ret;
-> > > +
-> > > +		minsz = offsetofend(struct  
-> > vfio_iommu_type1_cache_invalidate,  
-> > > +				    flags);  
-> > 
-> > This breaks backward compatibility as soon as struct
-> > iommu_cache_invalidate_info changes size by its defined versioning
-> > scheme.  ie. a field gets added, the version is bumped, all existing
-> > userspace breaks.  Our minsz is offsetofend to the version field,
-> > interpret the version to size, then reevaluate argsz.  
-> 
-> btw the version scheme is challenged by Christoph Hellwig. After
-> some discussions, we need your guidance how to move forward.
-> Jacob summarized available options below:
-> 	https://lkml.org/lkml/2020/4/2/876
+Cc: Jason Wang <jasowang@redhat.com>
+Cc: Eugenio Pérez <eperezma@redhat.com>
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+Acked-by: Jason Wang <jasowang@redhat.com>
+---
+ drivers/vhost/Kconfig             | 2 ++
+ drivers/vhost/test.c              | 4 ++--
+ drivers/vhost/vringh.c            | 5 +++++
+ include/linux/vringh.h            | 6 ++++++
+ tools/virtio/Makefile             | 5 +++--
+ tools/virtio/generated/autoconf.h | 0
+ 6 files changed, 18 insertions(+), 4 deletions(-)
+ create mode 100644 tools/virtio/generated/autoconf.h
 
-Ok
-
-> >   
-> > > +
-> > > +		if (copy_from_user(&cache_inv, (void __user *)arg, minsz))
-> > > +			return -EFAULT;
-> > > +
-> > > +		if (cache_inv.argsz < minsz || cache_inv.flags)
-> > > +			return -EINVAL;
-> > > +
-> > > +		/* Get the version of struct iommu_cache_invalidate_info */
-> > > +		if (copy_from_user(&version,
-> > > +			(void __user *) (arg + minsz), sizeof(version)))
-> > > +			return -EFAULT;
-> > > +
-> > > +		info_size = iommu_uapi_get_data_size(
-> > > +					IOMMU_UAPI_CACHE_INVAL,  
-> > version);  
-> > > +
-> > > +		cache_info = kzalloc(info_size, GFP_KERNEL);
-> > > +		if (!cache_info)
-> > > +			return -ENOMEM;
-> > > +
-> > > +		if (copy_from_user(cache_info,
-> > > +			(void __user *) (arg + minsz), info_size)) {
-> > > +			kfree(cache_info);
-> > > +			return -EFAULT;
-> > > +		}
-> > > +
-> > > +		mutex_lock(&iommu->lock);
-> > > +		ret = vfio_iommu_for_each_dev(iommu, vfio_cache_inv_fn,
-> > > +					    cache_info);  
-> > 
-> > How does a user respond when their cache invalidate fails?  Isn't this
-> > also another case where our for_each_dev can fail at an arbitrary point
-> > leaving us with no idea whether each device even had the opportunity to
-> > perform the invalidation request.  I don't see how we have any chance
-> > to maintain coherency after this faults.  
-> 
-> Then can we make it simple to support singleton group only? 
-
-Are you suggesting a single group per container or a single device per
-group?  Unless we have both, aren't we always going to have this issue.
-OTOH, why should a cache invalidate fail?
-
-> > > +		mutex_unlock(&iommu->lock);
-> > > +		kfree(cache_info);
-> > > +		return ret;
-> > >  	}
-> > >
-> > >  	return -ENOTTY;
-> > > diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-> > > index 2235bc6..62ca791 100644
-> > > --- a/include/uapi/linux/vfio.h
-> > > +++ b/include/uapi/linux/vfio.h
-> > > @@ -899,6 +899,28 @@ struct vfio_iommu_type1_bind {
-> > >   */
-> > >  #define VFIO_IOMMU_BIND		_IO(VFIO_TYPE, VFIO_BASE + 23)
-> > >
-> > > +/**
-> > > + * VFIO_IOMMU_CACHE_INVALIDATE - _IOW(VFIO_TYPE, VFIO_BASE + 24,
-> > > + *			struct vfio_iommu_type1_cache_invalidate)
-> > > + *
-> > > + * Propagate guest IOMMU cache invalidation to the host. The cache
-> > > + * invalidation information is conveyed by @cache_info, the content
-> > > + * format would be structures defined in uapi/linux/iommu.h. User
-> > > + * should be aware of that the struct  iommu_cache_invalidate_info
-> > > + * has a @version field, vfio needs to parse this field before getting
-> > > + * data from userspace.
-> > > + *
-> > > + * Availability of this IOCTL is after VFIO_SET_IOMMU.  
-> > 
-> > Is this a necessary qualifier?  A user can try to call this ioctl at
-> > any point, it only makes sense in certain configurations, but it should
-> > always "do the right thing" relative to the container iommu config.
-> > 
-> > Also, I don't see anything in these last few patches testing the
-> > operating IOMMU model, what happens when a user calls them when not
-> > using the nesting IOMMU?
-> > 
-> > Is this ioctl and the previous BIND ioctl only valid when configured
-> > for the nesting IOMMU type?  
-> 
-> I think so. We should add the nesting check in those new ioctls.
-> 
-> >   
-> > > + *
-> > > + * returns: 0 on success, -errno on failure.
-> > > + */
-> > > +struct vfio_iommu_type1_cache_invalidate {
-> > > +	__u32   argsz;
-> > > +	__u32   flags;
-> > > +	struct	iommu_cache_invalidate_info cache_info;
-> > > +};
-> > > +#define VFIO_IOMMU_CACHE_INVALIDATE      _IO(VFIO_TYPE, VFIO_BASE  
-> > + 24)
-> > 
-> > The future extension capabilities of this ioctl worry me, I wonder if
-> > we should do another data[] with flag defining that data as CACHE_INFO.  
-> 
-> Can you elaborate? Does it mean with this way we don't rely on iommu
-> driver to provide version_to_size conversion and instead we just pass
-> data[] to iommu driver for further audit?
-
-No, my concern is that this ioctl has a single function, strictly tied
-to the iommu uapi.  If we replace cache_info with data[] then we can
-define a flag to specify that data[] is struct
-iommu_cache_invalidate_info, and if we need to, a different flag to
-identify data[] as something else.  For example if we get stuck
-expanding cache_info to meet new demands and develop a new uapi to
-solve that, how would we expand this ioctl to support it rather than
-also create a new ioctl?  There's also a trade-off in making the ioctl
-usage more difficult for the user.  I'd still expect the vfio layer to
-check the flag and interpret data[] as indicated by the flag rather
-than just passing a blob of opaque data to the iommu layer though.
-Thanks,
-
-Alex
+diff --git a/drivers/vhost/Kconfig b/drivers/vhost/Kconfig
+index 362b832f5338..f0404ce255d1 100644
+--- a/drivers/vhost/Kconfig
++++ b/drivers/vhost/Kconfig
+@@ -3,6 +3,8 @@ config VHOST_IOTLB
+ 	tristate
+ 	help
+ 	  Generic IOTLB implementation for vhost and vringh.
++	  This option is selected by any driver which needs to support
++	  an IOMMU in software.
+ 
+ config VHOST_RING
+ 	tristate
+diff --git a/drivers/vhost/test.c b/drivers/vhost/test.c
+index 394e2e5c772d..9a3a09005e03 100644
+--- a/drivers/vhost/test.c
++++ b/drivers/vhost/test.c
+@@ -120,7 +120,7 @@ static int vhost_test_open(struct inode *inode, struct file *f)
+ 	vqs[VHOST_TEST_VQ] = &n->vqs[VHOST_TEST_VQ];
+ 	n->vqs[VHOST_TEST_VQ].handle_kick = handle_vq_kick;
+ 	vhost_dev_init(dev, vqs, VHOST_TEST_VQ_MAX, UIO_MAXIOV,
+-		       VHOST_TEST_PKT_WEIGHT, VHOST_TEST_WEIGHT);
++		       VHOST_TEST_PKT_WEIGHT, VHOST_TEST_WEIGHT, NULL);
+ 
+ 	f->private_data = n;
+ 
+@@ -225,7 +225,7 @@ static long vhost_test_reset_owner(struct vhost_test *n)
+ {
+ 	void *priv = NULL;
+ 	long err;
+-	struct vhost_umem *umem;
++	struct vhost_iotlb *umem;
+ 
+ 	mutex_lock(&n->dev.mutex);
+ 	err = vhost_dev_check_owner(&n->dev);
+diff --git a/drivers/vhost/vringh.c b/drivers/vhost/vringh.c
+index ee0491f579ac..ba8e0d6cfd97 100644
+--- a/drivers/vhost/vringh.c
++++ b/drivers/vhost/vringh.c
+@@ -13,9 +13,11 @@
+ #include <linux/uaccess.h>
+ #include <linux/slab.h>
+ #include <linux/export.h>
++#if IS_REACHABLE(CONFIG_VHOST_IOTLB)
+ #include <linux/bvec.h>
+ #include <linux/highmem.h>
+ #include <linux/vhost_iotlb.h>
++#endif
+ #include <uapi/linux/virtio_config.h>
+ 
+ static __printf(1,2) __cold void vringh_bad(const char *fmt, ...)
+@@ -1059,6 +1061,8 @@ int vringh_need_notify_kern(struct vringh *vrh)
+ }
+ EXPORT_SYMBOL(vringh_need_notify_kern);
+ 
++#if IS_REACHABLE(CONFIG_VHOST_IOTLB)
++
+ static int iotlb_translate(const struct vringh *vrh,
+ 			   u64 addr, u64 len, struct bio_vec iov[],
+ 			   int iov_size, u32 perm)
+@@ -1416,5 +1420,6 @@ int vringh_need_notify_iotlb(struct vringh *vrh)
+ }
+ EXPORT_SYMBOL(vringh_need_notify_iotlb);
+ 
++#endif
+ 
+ MODULE_LICENSE("GPL");
+diff --git a/include/linux/vringh.h b/include/linux/vringh.h
+index bd0503ca6f8f..9e2763d7c159 100644
+--- a/include/linux/vringh.h
++++ b/include/linux/vringh.h
+@@ -14,8 +14,10 @@
+ #include <linux/virtio_byteorder.h>
+ #include <linux/uio.h>
+ #include <linux/slab.h>
++#if IS_REACHABLE(CONFIG_VHOST_IOTLB)
+ #include <linux/dma-direction.h>
+ #include <linux/vhost_iotlb.h>
++#endif
+ #include <asm/barrier.h>
+ 
+ /* virtio_ring with information needed for host access. */
+@@ -254,6 +256,8 @@ static inline __virtio64 cpu_to_vringh64(const struct vringh *vrh, u64 val)
+ 	return __cpu_to_virtio64(vringh_is_little_endian(vrh), val);
+ }
+ 
++#if IS_REACHABLE(CONFIG_VHOST_IOTLB)
++
+ void vringh_set_iotlb(struct vringh *vrh, struct vhost_iotlb *iotlb);
+ 
+ int vringh_init_iotlb(struct vringh *vrh, u64 features,
+@@ -284,4 +288,6 @@ void vringh_notify_disable_iotlb(struct vringh *vrh);
+ 
+ int vringh_need_notify_iotlb(struct vringh *vrh);
+ 
++#endif /* CONFIG_VHOST_IOTLB */
++
+ #endif /* _LINUX_VRINGH_H */
+diff --git a/tools/virtio/Makefile b/tools/virtio/Makefile
+index f33f32f1d208..b587b9a7a124 100644
+--- a/tools/virtio/Makefile
++++ b/tools/virtio/Makefile
+@@ -4,7 +4,7 @@ test: virtio_test vringh_test
+ virtio_test: virtio_ring.o virtio_test.o
+ vringh_test: vringh_test.o vringh.o virtio_ring.o
+ 
+-CFLAGS += -g -O2 -Werror -Wall -I. -I../include/ -I ../../usr/include/ -Wno-pointer-sign -fno-strict-overflow -fno-strict-aliasing -fno-common -MMD -U_FORTIFY_SOURCE
++CFLAGS += -g -O2 -Werror -Wall -I. -I../include/ -I ../../usr/include/ -Wno-pointer-sign -fno-strict-overflow -fno-strict-aliasing -fno-common -MMD -U_FORTIFY_SOURCE -include ../../include/linux/kconfig.h
+ vpath %.c ../../drivers/virtio ../../drivers/vhost
+ mod:
+ 	${MAKE} -C `pwd`/../.. M=`pwd`/vhost_test V=${V}
+@@ -22,7 +22,8 @@ OOT_CONFIGS=\
+ 	CONFIG_VHOST=m \
+ 	CONFIG_VHOST_NET=n \
+ 	CONFIG_VHOST_SCSI=n \
+-	CONFIG_VHOST_VSOCK=n
++	CONFIG_VHOST_VSOCK=n \
++	CONFIG_VHOST_RING=n
+ OOT_BUILD=KCFLAGS="-I "${OOT_VHOST} ${MAKE} -C ${OOT_KSRC} V=${V}
+ oot-build:
+ 	echo "UNSUPPORTED! Don't use the resulting modules in production!"
+diff --git a/tools/virtio/generated/autoconf.h b/tools/virtio/generated/autoconf.h
+new file mode 100644
+index 000000000000..e69de29bb2d1
+-- 
+MST
 
