@@ -2,109 +2,173 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D6D7119D252
-	for <lists+kvm@lfdr.de>; Fri,  3 Apr 2020 10:35:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 083F719D246
+	for <lists+kvm@lfdr.de>; Fri,  3 Apr 2020 10:31:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390464AbgDCIfE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 Apr 2020 04:35:04 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:33715 "EHLO
-        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2390429AbgDCIfD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 3 Apr 2020 04:35:03 -0400
-Received: by mail-wr1-f67.google.com with SMTP id a25so7521455wrd.0
-        for <kvm@vger.kernel.org>; Fri, 03 Apr 2020 01:35:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=gSDnBtalBGHCeLhjHixwG2yB0Zm9Uo7yHmAg2UgLWeU=;
-        b=t1GnrrkQzojg5Ujx4Cx6gRfTF9IbKcMgckidZWrVxH8SZ3YPcQuVNqwXz9IWys1ocf
-         nP0Sz58PeL/xyaexdo3oj5Xq17DXktK9Mr6F1pi2PG4PpETrWOhxupj3XMNEohVCevRI
-         Zp0apcsoNnq2F3VYkJ318tjg0SZZN6xWy1Uj5Wh9Wqo5v/PQJhxiejM7ZwalDMNJtuAm
-         0yyXZPNqtRkAWhfOqoLIbeHsBGeSsvljtVT72J9o3BpItjmn9JDroP/om91tC2QEj5JB
-         ow+FeIgaKGa5ajlJIWJtSD/y31uh8MQVhb961019Lf/9or27Z/oHAP0ZDm0A2bynuxMC
-         QeaA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=gSDnBtalBGHCeLhjHixwG2yB0Zm9Uo7yHmAg2UgLWeU=;
-        b=C1/2n0xdLM5JA+zWNt5TNjh4LK64SSTGiWuDuYQbNfmXtdn0PWFLX2G1kyitrJcSjZ
-         VgcKnswPKQsvJO0TAYdAyhEeT87FE8o9fJIxEGrH/8IRyityx6OTQancy2RU2Ir+GQgS
-         Y6N91zkEkm4ARuvIAdRRqJRUIYI9pFXbLjpj3n8aJr/FOPYInHkAdEWJWtsNI32IlzSC
-         el45T1gDdFFYTNg3r3SoA34wGgQovtIU9TklW6NhFdJ3rK+J72OfBMsunGRblgxkfz9w
-         fwv7qToeUUX38RieFYk7zINAEF370T+cYYjURBrcBXwRXF44owmMbT41PuhRb5q+5gme
-         Qmew==
-X-Gm-Message-State: AGi0PuaHXNUoQuQ9nGcMLxdXmjGOGTAwqPmkrFlfrF9iXJ0ouGb7iqBx
-        KKT3X5gLjrUvBj3XMXl5nAR6oA==
-X-Google-Smtp-Source: APiQypLBXNwvFu6keSYM+miYTrHXIWwYEuTvwr0d2qKOYlQDhXSjNTC9FSVDKnLTWiEvjqmBKIE58A==
-X-Received: by 2002:adf:b6a9:: with SMTP id j41mr5268509wre.70.1585902900172;
-        Fri, 03 Apr 2020 01:35:00 -0700 (PDT)
-Received: from myrica ([2001:171b:226b:54a0:116c:c27a:3e7f:5eaf])
-        by smtp.gmail.com with ESMTPSA id m11sm10720712wmf.9.2020.04.03.01.34.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 03 Apr 2020 01:34:59 -0700 (PDT)
-Date:   Fri, 3 Apr 2020 10:34:52 +0200
-From:   Jean-Philippe Brucker <jean-philippe@linaro.org>
-To:     Yi L Liu <yi.l.liu@intel.com>
-Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "Tian, Jun J" <jun.j.tian@intel.com>,
-        "Sun, Yi Y" <yi.y.sun@intel.com>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Wu, Hao" <hao.wu@intel.com>
-Subject: Re: [PATCH v1 6/8] vfio/type1: Bind guest page tables to host
-Message-ID: <20200403083407.GB1269501@myrica>
-References: <1584880325-10561-1-git-send-email-yi.l.liu@intel.com>
- <1584880325-10561-7-git-send-email-yi.l.liu@intel.com>
- <AADFC41AFE54684AB9EE6CBC0274A5D19D7FF98F@SHSMSX104.ccr.corp.intel.com>
- <A2975661238FB949B60364EF0F2C25743A21D8C6@SHSMSX104.ccr.corp.intel.com>
- <AADFC41AFE54684AB9EE6CBC0274A5D19D805F75@SHSMSX104.ccr.corp.intel.com>
- <A2975661238FB949B60364EF0F2C25743A21ED01@SHSMSX104.ccr.corp.intel.com>
+        id S2390442AbgDCIbl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 Apr 2020 04:31:41 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:54928 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2389781AbgDCIbl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 3 Apr 2020 04:31:41 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0338OGmp055614;
+        Fri, 3 Apr 2020 08:30:44 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2020-01-29;
+ bh=+eYpj3cHN7M9X5gjvpZpB28S2rfw41z8Hx4eWOPQmqc=;
+ b=obY0/wpIduQrTs47sSo/eluXnEofW8KcMUwyYVc+JNZ8h06vI2YAxjQZDANz0qjW4Jzm
+ tg3w+rvrKG8Fx5Y0nYfSe4eODjuWrQ5ZBKzaMCrl+YlVL17II4mgc1sFxd7cTNE/TabD
+ 2fDQd4ggtzsk75a0JDt4+MgVBJrbT4hiAINiRiP7b+UIhdddZKtu12RRhh2j/xHOuuGA
+ j3eUizifKl16HobLqjbscQPvS/mBQYS2rvHPasb0SK3XSGQn3HuaMLDLjpeOuIFndNhK
+ l0Wp1fcBSs/2q9f5YGroyPougj4toKBsXLESH1HNn892AcnrVkT6luDxZU/dp33g7LFT Yg== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by aserp2120.oracle.com with ESMTP id 303yunj9k3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 03 Apr 2020 08:30:44 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0338MNp8180292;
+        Fri, 3 Apr 2020 08:30:43 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by aserp3030.oracle.com with ESMTP id 302g4x1xj9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 03 Apr 2020 08:30:43 +0000
+Received: from abhmp0015.oracle.com (abhmp0015.oracle.com [141.146.116.21])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 0338UeKT004493;
+        Fri, 3 Apr 2020 08:30:40 GMT
+Received: from linux-1.home (/92.157.90.160)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Fri, 03 Apr 2020 01:30:39 -0700
+Subject: Re: [RESEND][patch V3 05/23] tracing: Provide lockdep less
+ trace_hardirqs_on/off() variants
+To:     Thomas Gleixner <tglx@linutronix.de>,
+        LKML <linux-kernel@vger.kernel.org>
+Cc:     x86@kernel.org, Paul McKenney <paulmck@kernel.org>,
+        Josh Poimboeuf <jpoimboe@redhat.com>,
+        "Joel Fernandes (Google)" <joel@joelfernandes.org>,
+        "Steven Rostedt (VMware)" <rostedt@goodmis.org>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Alexei Starovoitov <ast@kernel.org>,
+        Frederic Weisbecker <frederic@kernel.org>,
+        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+        Brian Gerst <brgerst@gmail.com>,
+        Juergen Gross <jgross@suse.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+References: <20200320175956.033706968@linutronix.de>
+ <20200320180032.895128936@linutronix.de>
+From:   Alexandre Chartre <alexandre.chartre@oracle.com>
+Message-ID: <322ac9e0-9567-8e7c-e2af-e9e1107717bf@oracle.com>
+Date:   Fri, 3 Apr 2020 10:34:56 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <A2975661238FB949B60364EF0F2C25743A21ED01@SHSMSX104.ccr.corp.intel.com>
+In-Reply-To: <20200320180032.895128936@linutronix.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9579 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 bulkscore=0 suspectscore=0
+ mlxscore=0 spamscore=0 malwarescore=0 mlxlogscore=999 phishscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
+ definitions=main-2004030071
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9579 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 lowpriorityscore=0
+ malwarescore=0 adultscore=0 priorityscore=1501 mlxlogscore=999 bulkscore=0
+ suspectscore=0 mlxscore=0 spamscore=0 impostorscore=0 clxscore=1015
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
+ definitions=main-2004030071
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Apr 02, 2020 at 08:05:29AM +0000, Liu, Yi L wrote:
-> > > > > static long vfio_iommu_type1_ioctl(void *iommu_data,
-> > > > >  		default:
-> > > > >  			return -EINVAL;
-> > > > >  		}
-> > > > > +
-> > > > > +	} else if (cmd == VFIO_IOMMU_BIND) {
-> > > >
-> > > > BIND what? VFIO_IOMMU_BIND_PASID sounds clearer to me.
-> > >
-> > > Emm, it's up to the flags to indicate bind what. It was proposed to
-> > > cover the three cases below:
-> > > a) BIND/UNBIND_GPASID
-> > > b) BIND/UNBIND_GPASID_TABLE
-> > > c) BIND/UNBIND_PROCESS
-> > > <only a) is covered in this patch>
-> > > So it's called VFIO_IOMMU_BIND.
-> > 
-> > but aren't they all about PASID related binding?
+
+On 3/20/20 7:00 PM, Thomas Gleixner wrote:
+> trace_hardirqs_on/off() is only partially safe vs. RCU idle. The tracer
+> core itself is safe, but the resulting tracepoints can be utilized by
+> e.g. BPF which is unsafe.
 > 
-> yeah, I can rename it. :-)
+> Provide variants which do not contain the lockdep invocation so the lockdep
+> and tracer invocations can be split at the call site and placed properly.
+> 
+> The new variants also do not use rcuidle as they are going to be called
+> from entry code after/before context tracking.
+> 
+> Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+> ---
+> V2: New patch
+> ---
+>   include/linux/irqflags.h        |    4 ++++
+>   kernel/trace/trace_preemptirq.c |   23 +++++++++++++++++++++++
+>   2 files changed, 27 insertions(+)
+> 
+> --- a/include/linux/irqflags.h
+> +++ b/include/linux/irqflags.h
+> @@ -29,6 +29,8 @@
+>   #endif
+>   
+>   #ifdef CONFIG_TRACE_IRQFLAGS
+> +  extern void __trace_hardirqs_on(void);
+> +  extern void __trace_hardirqs_off(void);
+>     extern void trace_hardirqs_on(void);
+>     extern void trace_hardirqs_off(void);
+>   # define trace_hardirq_context(p)	((p)->hardirq_context)
+> @@ -52,6 +54,8 @@ do {						\
+>   	current->softirq_context--;		\
+>   } while (0)
+>   #else
+> +# define __trace_hardirqs_on()		do { } while (0)
+> +# define __trace_hardirqs_off()		do { } while (0)
+>   # define trace_hardirqs_on()		do { } while (0)
+>   # define trace_hardirqs_off()		do { } while (0)
+>   # define trace_hardirq_context(p)	0
+> --- a/kernel/trace/trace_preemptirq.c
+> +++ b/kernel/trace/trace_preemptirq.c
+> @@ -19,6 +19,17 @@
+>   /* Per-cpu variable to prevent redundant calls when IRQs already off */
+>   static DEFINE_PER_CPU(int, tracing_irq_cpu);
+>   
+> +void __trace_hardirqs_on(void)
+> +{
+> +	if (this_cpu_read(tracing_irq_cpu)) {
+> +		if (!in_nmi())
+> +			trace_irq_enable(CALLER_ADDR0, CALLER_ADDR1);
+> +		tracer_hardirqs_on(CALLER_ADDR0, CALLER_ADDR1);
+> +		this_cpu_write(tracing_irq_cpu, 0);
+> +	}
+> +}
+> +NOKPROBE_SYMBOL(__trace_hardirqs_on);
+> +
 
-I don't know if anyone intends to implement it, but SMMUv2 supports
-nesting translation without any PASID support. For that case the name
-VFIO_IOMMU_BIND_GUEST_PGTBL without "PASID" anywhere makes more sense.
-Ideally we'd also use a neutral name for the IOMMU API instead of
-bind_gpasid(), but that's easier to change later.
+It would be good to have a comment which highlights the difference between
+__trace_hardirqs_on/off and trace_hardirqs_on/off because the code difference
+is not obvious and the function names are so similar.
 
-Thanks,
-Jean
+alex.
 
+>   void trace_hardirqs_on(void)
+>   {
+>   	if (this_cpu_read(tracing_irq_cpu)) {
+> @@ -33,6 +44,18 @@ void trace_hardirqs_on(void)
+>   EXPORT_SYMBOL(trace_hardirqs_on);
+>   NOKPROBE_SYMBOL(trace_hardirqs_on);
+>   
+> +void __trace_hardirqs_off(void)
+> +{
+> +	if (!this_cpu_read(tracing_irq_cpu)) {
+> +		this_cpu_write(tracing_irq_cpu, 1);
+> +		tracer_hardirqs_off(CALLER_ADDR0, CALLER_ADDR1);
+> +		if (!in_nmi())
+> +			trace_irq_disable(CALLER_ADDR0, CALLER_ADDR1);
+> +	}
+> +
+> +}
+> +NOKPROBE_SYMBOL(__trace_hardirqs_off);
+> +
+>   void trace_hardirqs_off(void)
+>   {
+>   	if (!this_cpu_read(tracing_irq_cpu)) {
+> 
