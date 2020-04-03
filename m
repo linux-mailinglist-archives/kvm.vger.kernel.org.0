@@ -2,395 +2,635 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D39ED19DDAA
-	for <lists+kvm@lfdr.de>; Fri,  3 Apr 2020 20:11:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B059C19DDB2
+	for <lists+kvm@lfdr.de>; Fri,  3 Apr 2020 20:14:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404472AbgDCSLR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 Apr 2020 14:11:17 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:32374 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728464AbgDCSLR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 3 Apr 2020 14:11:17 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1585937475;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=QMrgKApG4lqSw6EF2f2sUD+oLvWJV8i8xepU3m9dg4Q=;
-        b=EDv+jKRUrQ/CXXq5JMDZ0CgP085w31a0JhasMpuy0I5naxYVdGnvUeoqC2U0mp00w0iqmg
-        yvvA6zFKl6qTeVvv49ffDOQ2T8kwnT2/b5lAJmWJtZYjnv0D93dT5D/b9zl2saAXsl4EZw
-        qq/g4kmtxZCS/UoOEv/YFwPBPO7JqXM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-149-rnpZ9zi_MRG1L4FBIY2mxg-1; Fri, 03 Apr 2020 14:11:11 -0400
-X-MC-Unique: rnpZ9zi_MRG1L4FBIY2mxg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B390513F8;
-        Fri,  3 Apr 2020 18:11:09 +0000 (UTC)
-Received: from w520.home (ovpn-112-162.phx2.redhat.com [10.3.112.162])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id DC6D960BF3;
-        Fri,  3 Apr 2020 18:11:02 +0000 (UTC)
-Date:   Fri, 3 Apr 2020 12:11:02 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     "Liu, Yi L" <yi.l.liu@intel.com>
-Cc:     "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "Tian, Jun J" <jun.j.tian@intel.com>,
-        "Sun, Yi Y" <yi.y.sun@intel.com>,
-        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Wu, Hao" <hao.wu@intel.com>
-Subject: Re: [PATCH v1 6/8] vfio/type1: Bind guest page tables to host
-Message-ID: <20200403121102.255f069c@w520.home>
-In-Reply-To: <A2975661238FB949B60364EF0F2C25743A220BA4@SHSMSX104.ccr.corp.intel.com>
-References: <1584880325-10561-1-git-send-email-yi.l.liu@intel.com>
-        <1584880325-10561-7-git-send-email-yi.l.liu@intel.com>
-        <20200402135700.0da30021@w520.home>
-        <A2975661238FB949B60364EF0F2C25743A220BA4@SHSMSX104.ccr.corp.intel.com>
+        id S2404156AbgDCSOE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 Apr 2020 14:14:04 -0400
+Received: from foss.arm.com ([217.140.110.172]:56128 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728066AbgDCSOE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 3 Apr 2020 14:14:04 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3B5991FB;
+        Fri,  3 Apr 2020 11:14:03 -0700 (PDT)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2F64D3F71E;
+        Fri,  3 Apr 2020 11:14:02 -0700 (PDT)
+Subject: Re: [PATCH v3 kvmtool 27/32] pci: Implement callbacks for toggling
+ BAR emulation
+To:     =?UTF-8?Q?Andr=c3=a9_Przywara?= <andre.przywara@arm.com>,
+        kvm@vger.kernel.org
+Cc:     will@kernel.org, julien.thierry.kdev@gmail.com,
+        sami.mujawar@arm.com, lorenzo.pieralisi@arm.com,
+        Alexandru Elisei <alexandru.elisei@gmail.com>
+References: <20200326152438.6218-1-alexandru.elisei@arm.com>
+ <20200326152438.6218-28-alexandru.elisei@arm.com>
+ <a04a7489-6660-aa7b-5391-2e49e6cabe0f@arm.com>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <8e6b0d53-67c9-5341-0d88-a56e0d5bf759@arm.com>
+Date:   Fri, 3 Apr 2020 19:14:21 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+In-Reply-To: <a04a7489-6660-aa7b-5391-2e49e6cabe0f@arm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 3 Apr 2020 13:30:49 +0000
-"Liu, Yi L" <yi.l.liu@intel.com> wrote:
+Hi,
 
-> Hi Alex,
-> 
-> > From: Alex Williamson <alex.williamson@redhat.com>
-> > Sent: Friday, April 3, 2020 3:57 AM
-> > To: Liu, Yi L <yi.l.liu@intel.com>
-> > 
-> > On Sun, 22 Mar 2020 05:32:03 -0700
-> > "Liu, Yi L" <yi.l.liu@intel.com> wrote:
-> >   
-> > > From: Liu Yi L <yi.l.liu@intel.com>
-> > >
-> > > VFIO_TYPE1_NESTING_IOMMU is an IOMMU type which is backed by hardware
-> > > IOMMUs that have nesting DMA translation (a.k.a dual stage address
-> > > translation). For such hardware IOMMUs, there are two stages/levels of
-> > > address translation, and software may let userspace/VM to own the first-
-> > > level/stage-1 translation structures. Example of such usage is vSVA (
-> > > virtual Shared Virtual Addressing). VM owns the first-level/stage-1
-> > > translation structures and bind the structures to host, then hardware
-> > > IOMMU would utilize nesting translation when doing DMA translation fo
-> > > the devices behind such hardware IOMMU.
-> > >
-> > > This patch adds vfio support for binding guest translation (a.k.a stage 1)
-> > > structure to host iommu. And for VFIO_TYPE1_NESTING_IOMMU, not only bind
-> > > guest page table is needed, it also requires to expose interface to guest
-> > > for iommu cache invalidation when guest modified the first-level/stage-1
-> > > translation structures since hardware needs to be notified to flush stale
-> > > iotlbs. This would be introduced in next patch.
-> > >
-> > > In this patch, guest page table bind and unbind are done by using flags
-> > > VFIO_IOMMU_BIND_GUEST_PGTBL and VFIO_IOMMU_UNBIND_GUEST_PGTBL  
-> > under IOCTL  
-> > > VFIO_IOMMU_BIND, the bind/unbind data are conveyed by
-> > > struct iommu_gpasid_bind_data. Before binding guest page table to host,
-> > > VM should have got a PASID allocated by host via VFIO_IOMMU_PASID_REQUEST.
-> > >
-> > > Bind guest translation structures (here is guest page table) to host
-> > > are the first step to setup vSVA (Virtual Shared Virtual Addressing).
-> > >
-> > > Cc: Kevin Tian <kevin.tian@intel.com>
-> > > CC: Jacob Pan <jacob.jun.pan@linux.intel.com>
-> > > Cc: Alex Williamson <alex.williamson@redhat.com>
-> > > Cc: Eric Auger <eric.auger@redhat.com>
-> > > Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>
-> > > Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.com>
-> > > Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
-> > > Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
-> > > ---
-> > >  drivers/vfio/vfio_iommu_type1.c | 158  
-> > ++++++++++++++++++++++++++++++++++++++++  
-> > >  include/uapi/linux/vfio.h       |  46 ++++++++++++
-> > >  2 files changed, 204 insertions(+)
-> > >
-> > > diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> > > index 82a9e0b..a877747 100644
-> > > --- a/drivers/vfio/vfio_iommu_type1.c
-> > > +++ b/drivers/vfio/vfio_iommu_type1.c
-> > > @@ -130,6 +130,33 @@ struct vfio_regions {
-> > >  #define IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu)	\
-> > >  					(!list_empty(&iommu->domain_list))
-> > >
-> > > +struct domain_capsule {
-> > > +	struct iommu_domain *domain;
-> > > +	void *data;
-> > > +};
-> > > +
-> > > +/* iommu->lock must be held */
-> > > +static int vfio_iommu_for_each_dev(struct vfio_iommu *iommu,
-> > > +		      int (*fn)(struct device *dev, void *data),
-> > > +		      void *data)
-> > > +{
-> > > +	struct domain_capsule dc = {.data = data};
-> > > +	struct vfio_domain *d;
-> > > +	struct vfio_group *g;
-> > > +	int ret = 0;
-> > > +
-> > > +	list_for_each_entry(d, &iommu->domain_list, next) {
-> > > +		dc.domain = d->domain;
-> > > +		list_for_each_entry(g, &d->group_list, next) {
-> > > +			ret = iommu_group_for_each_dev(g->iommu_group,
-> > > +						       &dc, fn);
-> > > +			if (ret)
-> > > +				break;
-> > > +		}
-> > > +	}
-> > > +	return ret;
-> > > +}
-> > > +
-> > >  static int put_pfn(unsigned long pfn, int prot);
-> > >
-> > >  /*
-> > > @@ -2314,6 +2341,88 @@ static int vfio_iommu_info_add_nesting_cap(struct  
-> > vfio_iommu *iommu,  
-> > >  	return 0;
-> > >  }
-> > >
-> > > +static int vfio_bind_gpasid_fn(struct device *dev, void *data)
-> > > +{
-> > > +	struct domain_capsule *dc = (struct domain_capsule *)data;
-> > > +	struct iommu_gpasid_bind_data *gbind_data =
-> > > +		(struct iommu_gpasid_bind_data *) dc->data;
-> > > +
-> > > +	return iommu_sva_bind_gpasid(dc->domain, dev, gbind_data);
-> > > +}
-> > > +
-> > > +static int vfio_unbind_gpasid_fn(struct device *dev, void *data)
-> > > +{
-> > > +	struct domain_capsule *dc = (struct domain_capsule *)data;
-> > > +	struct iommu_gpasid_bind_data *gbind_data =
-> > > +		(struct iommu_gpasid_bind_data *) dc->data;
-> > > +
-> > > +	return iommu_sva_unbind_gpasid(dc->domain, dev,
-> > > +					gbind_data->hpasid);
-> > > +}
-> > > +
-> > > +/**
-> > > + * Unbind specific gpasid, caller of this function requires hold
-> > > + * vfio_iommu->lock
-> > > + */
-> > > +static long vfio_iommu_type1_do_guest_unbind(struct vfio_iommu *iommu,
-> > > +				struct iommu_gpasid_bind_data *gbind_data)
-> > > +{
-> > > +	return vfio_iommu_for_each_dev(iommu,
-> > > +				vfio_unbind_gpasid_fn, gbind_data);
-> > > +}
-> > > +
-> > > +static long vfio_iommu_type1_bind_gpasid(struct vfio_iommu *iommu,
-> > > +				struct iommu_gpasid_bind_data *gbind_data)
-> > > +{
-> > > +	int ret = 0;
-> > > +
-> > > +	mutex_lock(&iommu->lock);
-> > > +	if (!IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu)) {
-> > > +		ret = -EINVAL;
-> > > +		goto out_unlock;
-> > > +	}
-> > > +
-> > > +	ret = vfio_iommu_for_each_dev(iommu,
-> > > +			vfio_bind_gpasid_fn, gbind_data);
-> > > +	/*
-> > > +	 * If bind failed, it may not be a total failure. Some devices
-> > > +	 * within the iommu group may have bind successfully. Although
-> > > +	 * we don't enable pasid capability for non-singletion iommu
-> > > +	 * groups, a unbind operation would be helpful to ensure no
-> > > +	 * partial binding for an iommu group.  
-> > 
-> > Where was the non-singleton group restriction done, I missed that.  
-> 
-> Hmm, it's missed. thanks for spotting it. How about adding this
-> check in the vfio_iommu_for_each_dev()? If looped a non-singleton
-> group, just skip it. It applies to the cache_inv path all the
-> same.
+On 4/3/20 12:57 PM, André Przywara wrote:
+> On 26/03/2020 15:24, Alexandru Elisei wrote:
+>
+> Hi,
+>
+>> From: Alexandru Elisei <alexandru.elisei@gmail.com>
+>>
+>> Implement callbacks for activating and deactivating emulation for a BAR
+>> region. This is in preparation for allowing a guest operating system to
+>> enable and disable access to I/O or memory space, or to reassign the
+>> BARs.
+>>
+>> The emulated vesa device framebuffer isn't designed to allow stopping and
+>> restarting at arbitrary points in the guest execution. Furthermore, on x86,
+>> the kernel will not change the BAR addresses, which on bare metal are
+>> programmed by the firmware, so take the easy way out and refuse to
+>> activate/deactivate emulation for the BAR regions. We also take this
+>> opportunity to make the vesa emulation code more consistent by moving all
+>> static variable definitions in one place, at the top of the file.
+>>
+>> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+>> ---
+>>  hw/vesa.c         |  70 ++++++++++++++++++++------------
+>>  include/kvm/pci.h |  18 ++++++++-
+>>  pci.c             |  44 ++++++++++++++++++++
+>>  vfio/pci.c        | 100 ++++++++++++++++++++++++++++++++++++++--------
+>>  virtio/pci.c      |  90 ++++++++++++++++++++++++++++++-----------
+>>  5 files changed, 254 insertions(+), 68 deletions(-)
+>>
+>> diff --git a/hw/vesa.c b/hw/vesa.c
+>> index 8071ad153f27..31c2d16ae4de 100644
+>> --- a/hw/vesa.c
+>> +++ b/hw/vesa.c
+>> @@ -18,6 +18,31 @@
+>>  #include <inttypes.h>
+>>  #include <unistd.h>
+>>  
+>> +static struct pci_device_header vesa_pci_device = {
+>> +	.vendor_id	= cpu_to_le16(PCI_VENDOR_ID_REDHAT_QUMRANET),
+>> +	.device_id	= cpu_to_le16(PCI_DEVICE_ID_VESA),
+>> +	.header_type	= PCI_HEADER_TYPE_NORMAL,
+>> +	.revision_id	= 0,
+>> +	.class[2]	= 0x03,
+>> +	.subsys_vendor_id = cpu_to_le16(PCI_SUBSYSTEM_VENDOR_ID_REDHAT_QUMRANET),
+>> +	.subsys_id	= cpu_to_le16(PCI_SUBSYSTEM_ID_VESA),
+>> +	.bar[1]		= cpu_to_le32(VESA_MEM_ADDR | PCI_BASE_ADDRESS_SPACE_MEMORY),
+>> +	.bar_size[1]	= VESA_MEM_SIZE,
+>> +};
+>> +
+>> +static struct device_header vesa_device = {
+>> +	.bus_type	= DEVICE_BUS_PCI,
+>> +	.data		= &vesa_pci_device,
+>> +};
+>> +
+>> +static struct framebuffer vesafb = {
+>> +	.width		= VESA_WIDTH,
+>> +	.height		= VESA_HEIGHT,
+>> +	.depth		= VESA_BPP,
+>> +	.mem_addr	= VESA_MEM_ADDR,
+>> +	.mem_size	= VESA_MEM_SIZE,
+>> +};
+>> +
+>>  static bool vesa_pci_io_in(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size)
+>>  {
+>>  	return true;
+>> @@ -33,24 +58,19 @@ static struct ioport_operations vesa_io_ops = {
+>>  	.io_out			= vesa_pci_io_out,
+>>  };
+>>  
+>> -static struct pci_device_header vesa_pci_device = {
+>> -	.vendor_id		= cpu_to_le16(PCI_VENDOR_ID_REDHAT_QUMRANET),
+>> -	.device_id		= cpu_to_le16(PCI_DEVICE_ID_VESA),
+>> -	.header_type		= PCI_HEADER_TYPE_NORMAL,
+>> -	.revision_id		= 0,
+>> -	.class[2]		= 0x03,
+>> -	.subsys_vendor_id	= cpu_to_le16(PCI_SUBSYSTEM_VENDOR_ID_REDHAT_QUMRANET),
+>> -	.subsys_id		= cpu_to_le16(PCI_SUBSYSTEM_ID_VESA),
+>> -	.bar[1]			= cpu_to_le32(VESA_MEM_ADDR | PCI_BASE_ADDRESS_SPACE_MEMORY),
+>> -	.bar_size[1]		= VESA_MEM_SIZE,
+>> -};
+>> -
+>> -static struct device_header vesa_device = {
+>> -	.bus_type	= DEVICE_BUS_PCI,
+>> -	.data		= &vesa_pci_device,
+>> -};
+>> +static int vesa__bar_activate(struct kvm *kvm, struct pci_device_header *pci_hdr,
+>> +			      int bar_num, void *data)
+>> +{
+>> +	/* We don't support remapping of the framebuffer. */
+>> +	return 0;
+>> +}
+>>  
+>> -static struct framebuffer vesafb;
+>> +static int vesa__bar_deactivate(struct kvm *kvm, struct pci_device_header *pci_hdr,
+>> +				int bar_num, void *data)
+>> +{
+>> +	/* We don't support remapping of the framebuffer. */
+>> +	return -EINVAL;
+>> +}
+>>  
+>>  struct framebuffer *vesa__init(struct kvm *kvm)
+>>  {
+>> @@ -73,6 +93,11 @@ struct framebuffer *vesa__init(struct kvm *kvm)
+>>  
+>>  	vesa_pci_device.bar[0]		= cpu_to_le32(vesa_base_addr | PCI_BASE_ADDRESS_SPACE_IO);
+>>  	vesa_pci_device.bar_size[0]	= PCI_IO_SIZE;
+>> +	r = pci__register_bar_regions(kvm, &vesa_pci_device, vesa__bar_activate,
+>> +				      vesa__bar_deactivate, NULL);
+>> +	if (r < 0)
+>> +		goto unregister_ioport;
+>> +
+>>  	r = device__register(&vesa_device);
+>>  	if (r < 0)
+>>  		goto unregister_ioport;
+>> @@ -87,15 +112,8 @@ struct framebuffer *vesa__init(struct kvm *kvm)
+>>  	if (r < 0)
+>>  		goto unmap_dev;
+>>  
+>> -	vesafb = (struct framebuffer) {
+>> -		.width			= VESA_WIDTH,
+>> -		.height			= VESA_HEIGHT,
+>> -		.depth			= VESA_BPP,
+>> -		.mem			= mem,
+>> -		.mem_addr		= VESA_MEM_ADDR,
+>> -		.mem_size		= VESA_MEM_SIZE,
+>> -		.kvm			= kvm,
+>> -	};
+>> +	vesafb.mem = mem;
+>> +	vesafb.kvm = kvm;
+>>  	return fb__register(&vesafb);
+>>  
+>>  unmap_dev:
+> Those transformations look correct to me.
+>
+>> diff --git a/include/kvm/pci.h b/include/kvm/pci.h
+>> index adb4b5c082d5..1d7d4c0cea5a 100644
+>> --- a/include/kvm/pci.h
+>> +++ b/include/kvm/pci.h
+>> @@ -89,12 +89,19 @@ struct pci_cap_hdr {
+>>  	u8	next;
+>>  };
+>>  
+>> +struct pci_device_header;
+>> +
+>> +typedef int (*bar_activate_fn_t)(struct kvm *kvm,
+>> +				 struct pci_device_header *pci_hdr,
+>> +				 int bar_num, void *data);
+>> +typedef int (*bar_deactivate_fn_t)(struct kvm *kvm,
+>> +				   struct pci_device_header *pci_hdr,
+>> +				   int bar_num, void *data);
+>> +
+>>  #define PCI_BAR_OFFSET(b)	(offsetof(struct pci_device_header, bar[b]))
+>>  #define PCI_DEV_CFG_SIZE	256
+>>  #define PCI_DEV_CFG_MASK	(PCI_DEV_CFG_SIZE - 1)
+>>  
+>> -struct pci_device_header;
+>> -
+>>  struct pci_config_operations {
+>>  	void (*write)(struct kvm *kvm, struct pci_device_header *pci_hdr,
+>>  		      u8 offset, void *data, int sz);
+>> @@ -136,6 +143,9 @@ struct pci_device_header {
+>>  
+>>  	/* Private to lkvm */
+>>  	u32		bar_size[6];
+>> +	bar_activate_fn_t	bar_activate_fn;
+>> +	bar_deactivate_fn_t	bar_deactivate_fn;
+>> +	void *data;
+>>  	struct pci_config_operations	cfg_ops;
+>>  	/*
+>>  	 * PCI INTx# are level-triggered, but virtual device often feature
+>> @@ -162,6 +172,10 @@ void pci__config_rd(struct kvm *kvm, union pci_config_address addr, void *data,
+>>  
+>>  void *pci_find_cap(struct pci_device_header *hdr, u8 cap_type);
+>>  
+>> +int pci__register_bar_regions(struct kvm *kvm, struct pci_device_header *pci_hdr,
+>> +			      bar_activate_fn_t bar_activate_fn,
+>> +			      bar_deactivate_fn_t bar_deactivate_fn, void *data);
+>> +
+>>  static inline bool __pci__memory_space_enabled(u16 command)
+>>  {
+>>  	return command & PCI_COMMAND_MEMORY;
+>> diff --git a/pci.c b/pci.c
+>> index 611e2c0bf1da..4ace190898f2 100644
+>> --- a/pci.c
+>> +++ b/pci.c
+>> @@ -66,6 +66,11 @@ void pci__assign_irq(struct device_header *dev_hdr)
+>>  		pci_hdr->irq_type = IRQ_TYPE_EDGE_RISING;
+>>  }
+>>  
+>> +static bool pci_bar_is_implemented(struct pci_device_header *pci_hdr, int bar_num)
+>> +{
+>> +	return pci__bar_size(pci_hdr, bar_num);
+>> +}
+>> +
+>>  static void *pci_config_address_ptr(u16 port)
+>>  {
+>>  	unsigned long offset;
+>> @@ -273,6 +278,45 @@ struct pci_device_header *pci__find_dev(u8 dev_num)
+>>  	return hdr->data;
+>>  }
+>>  
+>> +int pci__register_bar_regions(struct kvm *kvm, struct pci_device_header *pci_hdr,
+>> +			      bar_activate_fn_t bar_activate_fn,
+>> +			      bar_deactivate_fn_t bar_deactivate_fn, void *data)
+>> +{
+>> +	int i, r;
+>> +	bool has_bar_regions = false;
+>> +
+>> +	assert(bar_activate_fn && bar_deactivate_fn);
+>> +
+>> +	pci_hdr->bar_activate_fn = bar_activate_fn;
+>> +	pci_hdr->bar_deactivate_fn = bar_deactivate_fn;
+>> +	pci_hdr->data = data;
+>> +
+>> +	for (i = 0; i < 6; i++) {
+>> +		if (!pci_bar_is_implemented(pci_hdr, i))
+>> +			continue;
+>> +
+>> +		has_bar_regions = true;
+>> +
+>> +		if (pci__bar_is_io(pci_hdr, i) &&
+>> +		    pci__io_space_enabled(pci_hdr)) {
+>> +				r = bar_activate_fn(kvm, pci_hdr, i, data);
+>> +				if (r < 0)
+>> +					return r;
+>> +			}
+> Indentation seems to be off here, I think the last 4 lines need to have
+> one tab removed.
+>
+>> +
+>> +		if (pci__bar_is_memory(pci_hdr, i) &&
+>> +		    pci__memory_space_enabled(pci_hdr)) {
+>> +				r = bar_activate_fn(kvm, pci_hdr, i, data);
+>> +				if (r < 0)
+>> +					return r;
+>> +			}
+> Same indentation issue here.
 
-I don't really understand the singleton issue, which is why I was
-surprised to see this since I didn't see a discussion previously.
-Skipping a singleton group seems like unpredictable behavior to the
-user though.
+Nicely spotted, I'll fix it.
 
-> > > +	 */
-> > > +	if (ret)
-> > > +		/*
-> > > +		 * Undo all binds that already succeeded, no need to
-> > > +		 * check the return value here since some device within
-> > > +		 * the group has no successful bind when coming to this
-> > > +		 * place switch.
-> > > +		 */
-> > > +		vfio_iommu_type1_do_guest_unbind(iommu, gbind_data);  
-> > 
-> > However, the for_each_dev function stops when the callback function
-> > returns error, are we just assuming we stop at the same device as we
-> > faulted on the first time and that we traverse the same set of devices
-> > the second time?  It seems strange to me that unbind should be able to
-> > fail.  
-> 
-> unbind can fail if a user attempts to unbind a pasid which is not belonged
-> to it or a pasid which hasn't ever been bound. Otherwise, I didn't see a
-> reason to fail.
+>
+>> +	}
+>> +
+>> +	assert(has_bar_regions);
+> Is assert() here really a good idea? I see that it makes sense for our
+> emulated devices, but is that a valid check for VFIO?
+> From briefly looking I can't find a requirement for having at least one
+> valid BAR in general, and even if - I think we should rather return an
+> error than aborting the guest here - or ignore it altogether.
 
-Even if so, this doesn't address the first part of the question.  If
-our for_each_dev() callback returns error then the loop stops and we
-can't be sure we've triggered it everywhere that it needs to be
-triggered.  There are also aspects of whether it's an error to unbind
-something that is not bound because the result is still that the pasid
-is unbound, right?
+The assert here is to discover coding errors with devices, not with the PCI
+emulation. Calling pci__register_bar_regions and providing callbacks for when BAR
+access is toggled, but *without* any valid BARs looks like a coding error in the
+device emulation code to me.
 
-> > > +
-> > > +out_unlock:
-> > > +	mutex_unlock(&iommu->lock);
-> > > +	return ret;
-> > > +}
-> > > +
-> > > +static long vfio_iommu_type1_unbind_gpasid(struct vfio_iommu *iommu,
-> > > +				struct iommu_gpasid_bind_data *gbind_data)
-> > > +{
-> > > +	int ret = 0;
-> > > +
-> > > +	mutex_lock(&iommu->lock);
-> > > +	if (!IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu)) {
-> > > +		ret = -EINVAL;
-> > > +		goto out_unlock;
-> > > +	}
-> > > +
-> > > +	ret = vfio_iommu_type1_do_guest_unbind(iommu, gbind_data);  
-> > 
-> > How is a user supposed to respond to their unbind failing?  
-> 
-> If it's a malicious unbind (e.g. unbind a not yet bound pasid or unbind
-> a pasid which doesn't belong to current user).
+As for VFIO, I'm struggling to find a valid reason for someone to build a device
+that uses PCI, but doesn't have any BARs. Isn't that the entire point of PCI? I'm
+perfectly happy to remove the assert if you can provide an rationale for building
+such a device.
 
-And if it's not a malicious unbind?  To me this is similar semantics to
-free() failing.  Is there any remedy other than to abort?  Thanks,
+>
+>> +
+>> +	return 0;
+>> +}
+>> +
+>>  int pci__init(struct kvm *kvm)
+>>  {
+>>  	int r;
+>> diff --git a/vfio/pci.c b/vfio/pci.c
+>> index 8b2a0c8dbac3..18e22a8c5320 100644
+>> --- a/vfio/pci.c
+>> +++ b/vfio/pci.c
+>> @@ -8,6 +8,8 @@
+>>  #include <sys/resource.h>
+>>  #include <sys/time.h>
+>>  
+>> +#include <assert.h>
+>> +
+>>  /* Wrapper around UAPI vfio_irq_set */
+>>  union vfio_irq_eventfd {
+>>  	struct vfio_irq_set	irq;
+>> @@ -446,6 +448,81 @@ out_unlock:
+>>  	mutex_unlock(&pdev->msi.mutex);
+>>  }
+>>  
+>> +static int vfio_pci_bar_activate(struct kvm *kvm,
+>> +				 struct pci_device_header *pci_hdr,
+>> +				 int bar_num, void *data)
+>> +{
+>> +	struct vfio_device *vdev = data;
+>> +	struct vfio_pci_device *pdev = &vdev->pci;
+>> +	struct vfio_pci_msix_pba *pba = &pdev->msix_pba;
+>> +	struct vfio_pci_msix_table *table = &pdev->msix_table;
+>> +	struct vfio_region *region;
+>> +	bool has_msix;
+>> +	int ret;
+>> +
+>> +	assert((u32)bar_num < vdev->info.num_regions);
+>> +
+>> +	region = &vdev->regions[bar_num];
+>> +	has_msix = pdev->irq_modes & VFIO_PCI_IRQ_MODE_MSIX;
+>> +
+>> +	if (has_msix && (u32)bar_num == table->bar) {
+>> +		ret = kvm__register_mmio(kvm, table->guest_phys_addr,
+>> +					 table->size, false,
+>> +					 vfio_pci_msix_table_access, pdev);
+>> +		if (ret < 0 || table->bar != pba->bar)
+> I think this second expression deserves some comment.
+> If I understand correctly, this would register the PBA trap handler
+> separetely below if both the MSIX table and the PBA share a BAR?
 
+The MSIX table and the PBA structure can share the same BAR for the base address
+(that's why the MSIX capability has an offset field for both of them), but we
+register different regions for mmio emulation because we don't want to have a
+generic handler and always check if the mmio access was to the MSIX table of the
+PBA structure. I can add a comment stating that, sure.
+
+>
+>> +			goto out;
+> Is there any particular reason you are using goto here? I find it more
+> confusing if the "out:" label has just a return statement, without any
+> cleanup or lock dropping. Just a "return ret;" here would be much
+> cleaner I think. Same for other occassions in this function and
+> elsewhere in this patch.
+>
+> Or do you plan on adding some code here later? I don't see it in this
+> series though.
+
+The reason I'm doing this is because I prefer one exit point from the function,
+instead of return statements at arbitrary points in the function body. As a point
+of reference, the pattern is recommended in the MISRA C standard for safety, in
+section 17.4 "No more than one return statement", and is also used in the Linux
+kernel. I think it comes down to personal preference, so unless Will of Julien
+have a strong preference against it, I would rather keep it.
+
+>
+>> +	}
+>> +
+>> +	if (has_msix && (u32)bar_num == pba->bar) {
+>> +		ret = kvm__register_mmio(kvm, pba->guest_phys_addr,
+>> +					 pba->size, false,
+>> +					 vfio_pci_msix_pba_access, pdev);
+>> +		goto out;
+>> +	}
+>> +
+>> +	ret = vfio_map_region(kvm, vdev, region);
+>> +out:
+>> +	return ret;
+>> +}
+>> +
+>> +static int vfio_pci_bar_deactivate(struct kvm *kvm,
+>> +				   struct pci_device_header *pci_hdr,
+>> +				   int bar_num, void *data)
+>> +{
+>> +	struct vfio_device *vdev = data;
+>> +	struct vfio_pci_device *pdev = &vdev->pci;
+>> +	struct vfio_pci_msix_pba *pba = &pdev->msix_pba;
+>> +	struct vfio_pci_msix_table *table = &pdev->msix_table;
+>> +	struct vfio_region *region;
+>> +	bool has_msix, success;
+>> +	int ret;
+>> +
+>> +	assert((u32)bar_num < vdev->info.num_regions);
+>> +
+>> +	region = &vdev->regions[bar_num];
+>> +	has_msix = pdev->irq_modes & VFIO_PCI_IRQ_MODE_MSIX;
+>> +
+>> +	if (has_msix && (u32)bar_num == table->bar) {
+>> +		success = kvm__deregister_mmio(kvm, table->guest_phys_addr);
+>> +		/* kvm__deregister_mmio fails when the region is not found. */
+>> +		ret = (success ? 0 : -ENOENT);
+>> +		if (ret < 0 || table->bar!= pba->bar)
+>> +			goto out;
+>> +	}
+>> +
+>> +	if (has_msix && (u32)bar_num == pba->bar) {
+>> +		success = kvm__deregister_mmio(kvm, pba->guest_phys_addr);
+>> +		ret = (success ? 0 : -ENOENT);
+>> +		goto out;
+>> +	}
+>> +
+>> +	vfio_unmap_region(kvm, region);
+>> +	ret = 0;
+>> +
+>> +out:
+>> +	return ret;
+>> +}
+>> +
+>>  static void vfio_pci_cfg_read(struct kvm *kvm, struct pci_device_header *pci_hdr,
+>>  			      u8 offset, void *data, int sz)
+>>  {
+>> @@ -805,12 +882,6 @@ static int vfio_pci_create_msix_table(struct kvm *kvm, struct vfio_device *vdev)
+>>  		ret = -ENOMEM;
+>>  		goto out_free;
+>>  	}
+>> -	pba->guest_phys_addr = table->guest_phys_addr + table->size;
+>> -
+>> -	ret = kvm__register_mmio(kvm, table->guest_phys_addr, table->size,
+>> -				 false, vfio_pci_msix_table_access, pdev);
+>> -	if (ret < 0)
+>> -		goto out_free;
+>>  
+>>  	/*
+>>  	 * We could map the physical PBA directly into the guest, but it's
+>> @@ -820,10 +891,7 @@ static int vfio_pci_create_msix_table(struct kvm *kvm, struct vfio_device *vdev)
+>>  	 * between MSI-X table and PBA. For the sake of isolation, create a
+>>  	 * virtual PBA.
+>>  	 */
+>> -	ret = kvm__register_mmio(kvm, pba->guest_phys_addr, pba->size, false,
+>> -				 vfio_pci_msix_pba_access, pdev);
+>> -	if (ret < 0)
+>> -		goto out_free;
+>> +	pba->guest_phys_addr = table->guest_phys_addr + table->size;
+>>  
+>>  	pdev->msix.entries = entries;
+>>  	pdev->msix.nr_entries = nr_entries;
+>> @@ -894,11 +962,6 @@ static int vfio_pci_configure_bar(struct kvm *kvm, struct vfio_device *vdev,
+>>  		region->guest_phys_addr = pci_get_mmio_block(map_size);
+>>  	}
+>>  
+>> -	/* Map the BARs into the guest or setup a trap region. */
+>> -	ret = vfio_map_region(kvm, vdev, region);
+>> -	if (ret)
+>> -		return ret;
+>> -
+>>  	return 0;
+>>  }
+>>  
+>> @@ -945,7 +1008,12 @@ static int vfio_pci_configure_dev_regions(struct kvm *kvm,
+>>  	}
+>>  
+>>  	/* We've configured the BARs, fake up a Configuration Space */
+>> -	return vfio_pci_fixup_cfg_space(vdev);
+>> +	ret = vfio_pci_fixup_cfg_space(vdev);
+>> +	if (ret)
+>> +		return ret;
+>> +
+>> +	return pci__register_bar_regions(kvm, &pdev->hdr, vfio_pci_bar_activate,
+>> +					 vfio_pci_bar_deactivate, vdev);
+>>  }
+>>  
+>>  /*
+>> diff --git a/virtio/pci.c b/virtio/pci.c
+>> index d111dc499f5e..598da699c241 100644
+>> --- a/virtio/pci.c
+>> +++ b/virtio/pci.c
+>> @@ -11,6 +11,7 @@
+>>  #include <sys/ioctl.h>
+>>  #include <linux/virtio_pci.h>
+>>  #include <linux/byteorder.h>
+>> +#include <assert.h>
+>>  #include <string.h>
+>>  
+>>  static u16 virtio_pci__port_addr(struct virtio_pci *vpci)
+>> @@ -462,6 +463,64 @@ static void virtio_pci__io_mmio_callback(struct kvm_cpu *vcpu,
+>>  		virtio_pci__data_out(vcpu, vdev, addr - mmio_addr, data, len);
+>>  }
+>>  
+>> +static int virtio_pci__bar_activate(struct kvm *kvm,
+>> +				    struct pci_device_header *pci_hdr,
+>> +				    int bar_num, void *data)
+>> +{
+>> +	struct virtio_device *vdev = data;
+>> +	u32 bar_addr, bar_size;
+>> +	int r = -EINVAL;
+>> +
+>> +	assert(bar_num <= 2);
+>> +
+>> +	bar_addr = pci__bar_address(pci_hdr, bar_num);
+>> +	bar_size = pci__bar_size(pci_hdr, bar_num);
+>> +
+>> +	switch (bar_num) {
+>> +	case 0:
+>> +		r = ioport__register(kvm, bar_addr, &virtio_pci__io_ops,
+>> +				     bar_size, vdev);
+>> +		if (r > 0)
+>> +			r = 0;
+>> +		break;
+>> +	case 1:
+>> +		r =  kvm__register_mmio(kvm, bar_addr, bar_size, false,
+>> +					virtio_pci__io_mmio_callback, vdev);
+>> +		break;
+>> +	case 2:
+>> +		r =  kvm__register_mmio(kvm, bar_addr, bar_size, false,
+>> +					virtio_pci__msix_mmio_callback, vdev);
+> I think adding a break; here looks nicer.
+
+Sure, it will make the function look more consistent.
+
+Thanks,
 Alex
-
-> > > +
-> > > +out_unlock:
-> > > +	mutex_unlock(&iommu->lock);
-> > > +	return ret;
-> > > +}
-> > > +
-> > >  static long vfio_iommu_type1_ioctl(void *iommu_data,
-> > >  				   unsigned int cmd, unsigned long arg)
-> > >  {
-> > > @@ -2471,6 +2580,55 @@ static long vfio_iommu_type1_ioctl(void  
-> > *iommu_data,  
-> > >  		default:
-> > >  			return -EINVAL;
-> > >  		}
-> > > +
-> > > +	} else if (cmd == VFIO_IOMMU_BIND) {
-> > > +		struct vfio_iommu_type1_bind bind;
-> > > +		u32 version;
-> > > +		int data_size;
-> > > +		void *gbind_data;
-> > > +		int ret;
-> > > +
-> > > +		minsz = offsetofend(struct vfio_iommu_type1_bind, flags);
-> > > +
-> > > +		if (copy_from_user(&bind, (void __user *)arg, minsz))
-> > > +			return -EFAULT;
-> > > +
-> > > +		if (bind.argsz < minsz)
-> > > +			return -EINVAL;
-> > > +
-> > > +		/* Get the version of struct iommu_gpasid_bind_data */
-> > > +		if (copy_from_user(&version,
-> > > +			(void __user *) (arg + minsz),
-> > > +					sizeof(version)))
-> > > +			return -EFAULT;  
-> > 
-> > Why are we coping things from beyond the size we've validated that the
-> > user has provided again?  
-> 
-> let me wait for the result in Jacob's thread below. looks like need
-> to have a decision from you and Joreg. If using argsze is good, then
-> I guess we don't need the version-to-size mapping. right? Actually,
-> the version-to-size mapping is added to ensure vfio copy data correctly.
-> https://lkml.org/lkml/2020/4/2/876
-> 
-> > > +
-> > > +		data_size = iommu_uapi_get_data_size(
-> > > +				IOMMU_UAPI_BIND_GPASID, version);
-> > > +		gbind_data = kzalloc(data_size, GFP_KERNEL);
-> > > +		if (!gbind_data)
-> > > +			return -ENOMEM;
-> > > +
-> > > +		if (copy_from_user(gbind_data,
-> > > +			 (void __user *) (arg + minsz), data_size)) {
-> > > +			kfree(gbind_data);
-> > > +			return -EFAULT;
-> > > +		}  
-> > 
-> > And again.  argsz isn't just for minsz.
-> >  
-> > > +
-> > > +		switch (bind.flags & VFIO_IOMMU_BIND_MASK) {
-> > > +		case VFIO_IOMMU_BIND_GUEST_PGTBL:
-> > > +			ret = vfio_iommu_type1_bind_gpasid(iommu,
-> > > +							   gbind_data);
-> > > +			break;
-> > > +		case VFIO_IOMMU_UNBIND_GUEST_PGTBL:
-> > > +			ret = vfio_iommu_type1_unbind_gpasid(iommu,
-> > > +							     gbind_data);
-> > > +			break;
-> > > +		default:
-> > > +			ret = -EINVAL;
-> > > +			break;
-> > > +		}
-> > > +		kfree(gbind_data);
-> > > +		return ret;
-> > >  	}
-> > >
-> > >  	return -ENOTTY;
-> > > diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-> > > index ebeaf3e..2235bc6 100644
-> > > --- a/include/uapi/linux/vfio.h
-> > > +++ b/include/uapi/linux/vfio.h
-> > > @@ -14,6 +14,7 @@
-> > >
-> > >  #include <linux/types.h>
-> > >  #include <linux/ioctl.h>
-> > > +#include <linux/iommu.h>
-> > >
-> > >  #define VFIO_API_VERSION	0
-> > >
-> > > @@ -853,6 +854,51 @@ struct vfio_iommu_type1_pasid_request {
-> > >   */
-> > >  #define VFIO_IOMMU_PASID_REQUEST	_IO(VFIO_TYPE, VFIO_BASE + 22)
-> > >
-> > > +/**
-> > > + * Supported flags:
-> > > + *	- VFIO_IOMMU_BIND_GUEST_PGTBL: bind guest page tables to host for
-> > > + *			nesting type IOMMUs. In @data field It takes struct
-> > > + *			iommu_gpasid_bind_data.
-> > > + *	- VFIO_IOMMU_UNBIND_GUEST_PGTBL: undo a bind guest page table  
-> > operation  
-> > > + *			invoked by VFIO_IOMMU_BIND_GUEST_PGTBL.  
-> > 
-> > This must require iommu_gpasid_bind_data in the data field as well,
-> > right?  
-> 
-> yes.
-> 
-> Regards,
-> Yi Liu
-> 
-
+>
+> Cheers,
+> Andre
+>
+>
+>> +	}
+>> +
+>> +	return r;
+>> +}
+>> +
+>> +static int virtio_pci__bar_deactivate(struct kvm *kvm,
+>> +				      struct pci_device_header *pci_hdr,
+>> +				      int bar_num, void *data)
+>> +{
+>> +	u32 bar_addr;
+>> +	bool success;
+>> +	int r = -EINVAL;
+>> +
+>> +	assert(bar_num <= 2);
+>> +
+>> +	bar_addr = pci__bar_address(pci_hdr, bar_num);
+>> +
+>> +	switch (bar_num) {
+>> +	case 0:
+>> +		r = ioport__unregister(kvm, bar_addr);
+>> +		break;
+>> +	case 1:
+>> +	case 2:
+>> +		success = kvm__deregister_mmio(kvm, bar_addr);
+>> +		/* kvm__deregister_mmio fails when the region is not found. */
+>> +		r = (success ? 0 : -ENOENT);
+>> +	}
+>> +
+>> +	return r;
+>> +}
+>> +
+>>  int virtio_pci__init(struct kvm *kvm, void *dev, struct virtio_device *vdev,
+>>  		     int device_id, int subsys_id, int class)
+>>  {
+>> @@ -476,23 +535,8 @@ int virtio_pci__init(struct kvm *kvm, void *dev, struct virtio_device *vdev,
+>>  	BUILD_BUG_ON(!is_power_of_two(PCI_IO_SIZE));
+>>  
+>>  	port_addr = pci_get_io_port_block(PCI_IO_SIZE);
+>> -	r = ioport__register(kvm, port_addr, &virtio_pci__io_ops, PCI_IO_SIZE,
+>> -			     vdev);
+>> -	if (r < 0)
+>> -		return r;
+>> -	port_addr = (u16)r;
+>> -
+>>  	mmio_addr = pci_get_mmio_block(PCI_IO_SIZE);
+>> -	r = kvm__register_mmio(kvm, mmio_addr, PCI_IO_SIZE, false,
+>> -			       virtio_pci__io_mmio_callback, vdev);
+>> -	if (r < 0)
+>> -		goto free_ioport;
+>> -
+>>  	msix_io_block = pci_get_mmio_block(PCI_IO_SIZE * 2);
+>> -	r = kvm__register_mmio(kvm, msix_io_block, PCI_IO_SIZE * 2, false,
+>> -			       virtio_pci__msix_mmio_callback, vdev);
+>> -	if (r < 0)
+>> -		goto free_mmio;
+>>  
+>>  	vpci->pci_hdr = (struct pci_device_header) {
+>>  		.vendor_id		= cpu_to_le16(PCI_VENDOR_ID_REDHAT_QUMRANET),
+>> @@ -518,6 +562,12 @@ int virtio_pci__init(struct kvm *kvm, void *dev, struct virtio_device *vdev,
+>>  		.bar_size[2]		= cpu_to_le32(PCI_IO_SIZE*2),
+>>  	};
+>>  
+>> +	r = pci__register_bar_regions(kvm, &vpci->pci_hdr,
+>> +				      virtio_pci__bar_activate,
+>> +				      virtio_pci__bar_deactivate, vdev);
+>> +	if (r < 0)
+>> +		return r;
+>> +
+>>  	vpci->dev_hdr = (struct device_header) {
+>>  		.bus_type		= DEVICE_BUS_PCI,
+>>  		.data			= &vpci->pci_hdr,
+>> @@ -548,20 +598,12 @@ int virtio_pci__init(struct kvm *kvm, void *dev, struct virtio_device *vdev,
+>>  
+>>  	r = device__register(&vpci->dev_hdr);
+>>  	if (r < 0)
+>> -		goto free_msix_mmio;
+>> +		return r;
+>>  
+>>  	/* save the IRQ that device__register() has allocated */
+>>  	vpci->legacy_irq_line = vpci->pci_hdr.irq_line;
+>>  
+>>  	return 0;
+>> -
+>> -free_msix_mmio:
+>> -	kvm__deregister_mmio(kvm, msix_io_block);
+>> -free_mmio:
+>> -	kvm__deregister_mmio(kvm, mmio_addr);
+>> -free_ioport:
+>> -	ioport__unregister(kvm, port_addr);
+>> -	return r;
+>>  }
+>>  
+>>  int virtio_pci__reset(struct kvm *kvm, struct virtio_device *vdev)
+>>
