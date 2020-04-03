@@ -2,154 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 02F1119DB4D
-	for <lists+kvm@lfdr.de>; Fri,  3 Apr 2020 18:19:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D0E6C19DC07
+	for <lists+kvm@lfdr.de>; Fri,  3 Apr 2020 18:51:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404337AbgDCQTm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 Apr 2020 12:19:42 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:40982 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S2403834AbgDCQTl (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 3 Apr 2020 12:19:41 -0400
+        id S2403996AbgDCQvf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 Apr 2020 12:51:35 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:43579 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S2403858AbgDCQve (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 3 Apr 2020 12:51:34 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1585930779;
+        s=mimecast20190719; t=1585932694;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=jC5f8fZGiX7uKor8bbyTsCc+YaC+MPnESGHQw8UFRR4=;
-        b=Gf4Vn9EHJbTs+BRMg74Fhw3IYVIcwQZ0myaDiOPRCsZgT6ypziMzudA6diLoqncdPVtZIq
-        Pr3fc6pkiLeHHZwows4vkwdm+BH/OLhqIjl4bHdBHmZLF01CFWVbu+Xwoi6UZjY1FqmmZz
-        CS64/DFOXce7ceyIxoQICtSZ0plhEdo=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-376-foK-fHGuNveUUDFRrjxrTA-1; Fri, 03 Apr 2020 12:19:37 -0400
-X-MC-Unique: foK-fHGuNveUUDFRrjxrTA-1
-Received: by mail-wr1-f72.google.com with SMTP id o18so3340894wrx.9
-        for <kvm@vger.kernel.org>; Fri, 03 Apr 2020 09:19:37 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=jC5f8fZGiX7uKor8bbyTsCc+YaC+MPnESGHQw8UFRR4=;
-        b=LeMxVxbyfZFRAtiUvzOcMuq/FKN0OBTSSz8YYAKIar38dCLQGqON64u5XtLDx+Nmx1
-         r0GKySVLsXFlzSv5SoGdYXX6jX3KKVEl3/srtALtp3QkEfhC7BzvKr/ov/xpoKcFeoOz
-         ewyhlHyIruFGjbKaowl+0xrFL46cJipR3IvrTwczN2vq/fIS0iAUptLOWsDq4JlLe6aa
-         v3dM7YDaPvPph5aNidfsLB4R5bcYzC5lZID4l71WWQtTp6ZSIO3PR816MTF2SyG2Gtld
-         mha/uqaiEl2rfrqWggBYcCm13d8VlD0QGVuJaMb4bNrdBdRUQj/jWm0mNL2lEnAhFPl+
-         nc6g==
-X-Gm-Message-State: AGi0PuY1XR452U7SV/BVt+YwYxb3dhbCfCcr9VpaWp6tu9mgmJql6mg9
-        /Rs6Dzq4X36g00Wnbu3H9jYwpU/325NSAYDJZQPbgLM3+qcP3LIEgPREtjZNJ/OnTE2ROelYadt
-        /R0fymspAfpmR
-X-Received: by 2002:a1c:5410:: with SMTP id i16mr9509900wmb.150.1585930776479;
-        Fri, 03 Apr 2020 09:19:36 -0700 (PDT)
-X-Google-Smtp-Source: APiQypLY+zT3xRq5nEtQagJKJDJGIGotV34rqRYEb9vMb//qbdDy8BDqxKwC2pquDy6yEduGRb4pJA==
-X-Received: by 2002:a1c:5410:: with SMTP id i16mr9509883wmb.150.1585930776266;
-        Fri, 03 Apr 2020 09:19:36 -0700 (PDT)
-Received: from xz-x1 ([2607:9880:19c0:32::3])
-        by smtp.gmail.com with ESMTPSA id 127sm12731831wmd.38.2020.04.03.09.19.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 03 Apr 2020 09:19:35 -0700 (PDT)
-Date:   Fri, 3 Apr 2020 12:19:31 -0400
-From:   Peter Xu <peterx@redhat.com>
-To:     "Liu, Yi L" <yi.l.liu@intel.com>
-Cc:     "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "mst@redhat.com" <mst@redhat.com>,
-        "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "Tian, Jun J" <jun.j.tian@intel.com>,
-        "Sun, Yi Y" <yi.y.sun@intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Wu, Hao" <hao.wu@intel.com>,
-        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
-        Jacob Pan <jacob.jun.pan@linux.intel.com>,
-        Yi Sun <yi.y.sun@linux.intel.com>,
-        Richard Henderson <rth@twiddle.net>,
-        Eduardo Habkost <ehabkost@redhat.com>
-Subject: Re: [PATCH v2 13/22] intel_iommu: add PASID cache management
- infrastructure
-Message-ID: <20200403161931.GO103677@xz-x1>
-References: <1585542301-84087-1-git-send-email-yi.l.liu@intel.com>
- <1585542301-84087-14-git-send-email-yi.l.liu@intel.com>
- <20200402000225.GC7174@xz-x1>
- <A2975661238FB949B60364EF0F2C25743A21EAAD@SHSMSX104.ccr.corp.intel.com>
- <20200402134436.GI7174@xz-x1>
- <A2975661238FB949B60364EF0F2C25743A220DE7@SHSMSX104.ccr.corp.intel.com>
+         content-transfer-encoding:content-transfer-encoding;
+        bh=nhFm16Rn59ljHy8zT4BNa+1TatqX7wOcSX4H/Bklex4=;
+        b=ff4m51sAAZVKHnOuFxX43uniOzhykFICXbEi9tNijM41/cOVxmj4DWUJnvv5eQEWFV/qGm
+        dyLufyqMA7s2WroDSaclBfuNpke1EF8by7ehiDeln3S7SDgquXH0b/bZpUjgHeJcuYNHb3
+        7OodOmBhefxGHOR4dKN7njFi4pgHqNQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-318-vq3TbPQyPVGdok5uH-fH2g-1; Fri, 03 Apr 2020 12:51:30 -0400
+X-MC-Unique: vq3TbPQyPVGdok5uH-fH2g-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A4748100550D;
+        Fri,  3 Apr 2020 16:51:28 +0000 (UTC)
+Received: from eperezma.remote.csb (ovpn-113-28.ams2.redhat.com [10.36.113.28])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 0D4AA18A85;
+        Fri,  3 Apr 2020 16:51:23 +0000 (UTC)
+From:   =?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     kvm list <kvm@vger.kernel.org>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>,
+        =?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
+        Stephen Rothwell <sfr@canb.auug.org.au>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>
+Subject: [PATCH 0/8] tools/vhost: Reset virtqueue on tests
+Date:   Fri,  3 Apr 2020 18:51:11 +0200
+Message-Id: <20200403165119.5030-1-eperezma@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <A2975661238FB949B60364EF0F2C25743A220DE7@SHSMSX104.ccr.corp.intel.com>
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Apr 03, 2020 at 03:05:57PM +0000, Liu, Yi L wrote:
-> > From: Peter Xu <peterx@redhat.com>
-> > Sent: Thursday, April 2, 2020 9:45 PM
-> > To: Liu, Yi L <yi.l.liu@intel.com>
-> > Subject: Re: [PATCH v2 13/22] intel_iommu: add PASID cache management
-> > infrastructure
-> > 
-> > On Thu, Apr 02, 2020 at 06:46:11AM +0000, Liu, Yi L wrote:
-> > 
-> > [...]
-> > 
-> > > > > +/**
-> > > > > + * This function replay the guest pasid bindings to hots by
-> > > > > + * walking the guest PASID table. This ensures host will have
-> > > > > + * latest guest pasid bindings. Caller should hold iommu_lock.
-> > > > > + */
-> > > > > +static void vtd_replay_guest_pasid_bindings(IntelIOMMUState *s,
-> > > > > +                                            VTDPASIDCacheInfo
-> > > > > +*pc_info) {
-> > > > > +    VTDHostIOMMUContext *vtd_dev_icx;
-> > > > > +    int start = 0, end = VTD_HPASID_MAX;
-> > > > > +    vtd_pasid_table_walk_info walk_info = {.flags = 0};
-> > > >
-> > > > So vtd_pasid_table_walk_info is still used.  I thought we had
-> > > > reached a consensus that this can be dropped?
-> > >
-> > > yeah, I did have considered your suggestion and plan to do it. But
-> > > when I started coding, it looks a little bit weird to me:
-> > > For one, there is an input VTDPASIDCacheInfo in this function. It may
-> > > be nature to think about passing the parameter to further calling
-> > > (vtd_replay_pasid_bind_for_dev()). But, we can't do that. The
-> > > vtd_bus/devfn fields should be filled when looping the assigned
-> > > devices, not the one passed by vtd_replay_guest_pasid_bindings() caller.
-> > 
-> > Hacky way is we can directly modify VTDPASIDCacheInfo* with bus/devfn for the
-> > loop.  Otherwise we can duplicate the object when looping, so that we can avoid
-> > introducing a new struct which seems to contain mostly the same information.
-> 
-> I see. Please see below reply.
-> 
-> > > For two, reusing the VTDPASIDCacheInfo for passing walk info may
-> > > require the final user do the same thing as what the
-> > > vtd_replay_guest_pasid_bindings() has done here.
-> > 
-> > I don't see it happen, could you explain?
-> 
-> my concern is around flags field in VTDPASIDCacheInfo. The flags not
-> only indicates the invalidation granularity, but also indicates the
-> field presence. e.g. VTD_PASID_CACHE_DEVSI indicates the vtd_bus/devfn
-> fields are valid. If reuse it to pass walk info to vtd_sm_pasid_table_walk_one,
-> it would be meaningless as vtd_bus/devfn fields are always valid. But
-> I'm fine to reuse it's more prefered. Instead of modifying the vtd_bus/devn
-> in VTDPASIDCacheInfo*, I'd rather to define another VTDPASIDCacheInfo variable
-> and pass it to vtd_sm_pasid_table_walk_one. This may not affect the future
-> caller of vtd_replay_guest_pasid_bindings() as vtd_bus/devfn field are not
-> designed to bring something back to caller.
+This series add the tests used to validate the "vhost: Reset batched
+descriptors on SET_VRING_BASE call" series, with a small change on the
+reset code (delete an extra unneded reset on VHOST_SET_VRING_BASE).
 
-Yeah, let's give it a shot.  I know it's not ideal, but IMHO it's
-still better than defining the page_walk struct and that might confuse
-readers on what's the difference between the two.  When duplicating
-the object, we can add some comment explaining this.
+They are based on the tests sent back them, the ones that were not
+included (reasons in that thread). This series changes:
 
-Thanks,
+* Delete need to export the ugly function in virtio_ring, now all the
+code is added in tools/virtio (except the one line fix).
+* Add forgotten uses of vhost_vq_set_backend. Fix bad usage order in
+vhost_test_set_backend.
+* Drop random reset, not really needed.
+* Minor changes updating tests code.
 
--- 
-Peter Xu
+This serie is meant to be applied on top of
+5de4e0b7068337cf0d4ca48a4011746410115aae in
+git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git.
+
+Eugenio P=C3=A9rez (8):
+  tools/virtio: fix virtio_test.c indentation
+  vhost: Not cleaning batched descs in VHOST_SET_VRING_BASE ioctl
+  vhost: Replace vq->private_data access by backend accesors
+  vhost: Fix bad order in vhost_test_set_backend at enable
+  tools/virtio: Use __vring_new_virtqueue in virtio_test.c
+  tools/virtio: Extract virtqueue initialization in vq_reset
+  tools/virtio: Reset index in virtio_test --reset.
+  tools/virtio: Use tools/include/list.h instead of stubs
+
+ drivers/vhost/test.c        |  8 ++---
+ drivers/vhost/vhost.c       |  1 -
+ tools/virtio/linux/kernel.h |  7 +----
+ tools/virtio/linux/virtio.h |  5 ++--
+ tools/virtio/virtio_test.c  | 58 +++++++++++++++++++++++++++----------
+ tools/virtio/vringh_test.c  |  2 ++
+ 6 files changed, 51 insertions(+), 30 deletions(-)
+
+--=20
+2.18.1
 
