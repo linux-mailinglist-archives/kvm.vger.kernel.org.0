@@ -2,46 +2,46 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D8A4B19E026
-	for <lists+kvm@lfdr.de>; Fri,  3 Apr 2020 23:09:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 12A4119E028
+	for <lists+kvm@lfdr.de>; Fri,  3 Apr 2020 23:11:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728254AbgDCVJ3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 Apr 2020 17:09:29 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:50752 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727829AbgDCVJ3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 3 Apr 2020 17:09:29 -0400
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 033L7vn8015410;
-        Fri, 3 Apr 2020 21:09:07 GMT
+        id S1727977AbgDCVLJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 Apr 2020 17:11:09 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:42122 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727829AbgDCVLJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 3 Apr 2020 17:11:09 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 033L92HC132796;
+        Fri, 3 Apr 2020 21:10:49 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
  references : from : message-id : date : mime-version : in-reply-to :
  content-type : content-transfer-encoding; s=corp-2020-01-29;
- bh=Zi65tcjdHpPyPnpZ89iL9X+3dDG5TYStO2MVa6Ry6zI=;
- b=ToYaSMcDrXt1+y9IJvf5tkwMTG7cMn+ZuyH8R4urFVjHhQCqOp4mPEMKYmogmz3jWliP
- PXoManGO3ow+RyoCMtAhvExJZFaWl93DLEcuy4laiG1qzpqo29K2j+YSNiOdZswsnTIv
- Bw0Ytv+PHtOsqKS1csjXA1U4pPFbXJLB5yXMy/jpUVF6ih7ZlMWYTU5Zwq8MeBPQHUVB
- RamvUO3eddkX4wyIu3+TmqAt30o5CZ4/IGvv/e28gZi6sd4WzWBRRZp2jM31DnJgtEpv
- sl1ztSgFr8p9h7lV/t3zx4Kh2IG/kNGzah10bdHuYx8bdrdGFtdl7hZiLHvDORZfugO9 zA== 
+ bh=9NtL6bJW3Vibj3T2e+wi14Zc2JO1BYTNJgCkJSHA8U0=;
+ b=sUr7HY1KQlCqkIYO0JIzEbvDqNDsX0IQdCE7IIrtd1Ui1u8Y5P4henunpIpVFnBnhOE+
+ XVjtCHDSa83W5g3x1alQviV981Y8pN6S+1iDT8CWdY84J//Objh4qsrMHK0BJKliNovT
+ o8U2/NHxw9Ey5Zw8RtfrPq8RS2BP/UMKKko89U342DRBWup/JY2e6C0UpLTfjmMbJ/OY
+ 5asofsZ4DAi6p7Uj2Gyp5KKp9wLoL0w1qbyyBAtg2ds0R3jhg0SdMTRZsifqcK6l+UWJ
+ Ih2FRSivIx+/JTYCdwuOLYnVEQ+6ymvsrWRmYGXO8Uei0WE6e56zmAXLpzc1TJSdt96X kQ== 
 Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by userp2130.oracle.com with ESMTP id 303cevk7k0-1
+        by userp2120.oracle.com with ESMTP id 303aqj3qdk-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 03 Apr 2020 21:09:06 +0000
+        Fri, 03 Apr 2020 21:10:48 +0000
 Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 033L6Pjh144862;
-        Fri, 3 Apr 2020 21:07:06 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
-        by aserp3030.oracle.com with ESMTP id 302g4y6qq0-1
+        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 033L8WIQ150198;
+        Fri, 3 Apr 2020 21:10:48 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by aserp3030.oracle.com with ESMTP id 302g4y6yym-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 03 Apr 2020 21:07:06 +0000
-Received: from abhmp0011.oracle.com (abhmp0011.oracle.com [141.146.116.17])
-        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 033L74n6004609;
-        Fri, 3 Apr 2020 21:07:05 GMT
+        Fri, 03 Apr 2020 21:10:47 +0000
+Received: from abhmp0010.oracle.com (abhmp0010.oracle.com [141.146.116.16])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 033LAiZi016759;
+        Fri, 3 Apr 2020 21:10:44 GMT
 Received: from localhost.localdomain (/10.159.159.117)
         by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Fri, 03 Apr 2020 21:07:04 +0000
-Subject: Re: [PATCH v6 10/14] mm: x86: Invoke hypercall when page encryption
- status is changed
+        with ESMTP ; Fri, 03 Apr 2020 14:10:44 -0700
+Subject: Re: [PATCH v6 11/14] KVM: x86: Introduce KVM_SET_PAGE_ENC_BITMAP
+ ioctl
 To:     Ashish Kalra <Ashish.Kalra@amd.com>, pbonzini@redhat.com
 Cc:     tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
         joro@8bytes.org, bp@suse.de, thomas.lendacky@amd.com,
@@ -49,14 +49,14 @@ Cc:     tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
         rientjes@google.com, srutherford@google.com, luto@kernel.org,
         brijesh.singh@amd.com
 References: <cover.1585548051.git.ashish.kalra@amd.com>
- <05c9015fb13b25c07a84d5638a7cd65a8c136cf0.1585548051.git.ashish.kalra@amd.com>
+ <4d4fbe2b9acda82c04834682900acf782182ec23.1585548051.git.ashish.kalra@amd.com>
 From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Message-ID: <4021365b-c43a-02ae-475c-626199c8c451@oracle.com>
-Date:   Fri, 3 Apr 2020 14:07:02 -0700
+Message-ID: <56d25d86-f66c-d68c-a6ea-17a99927f3cd@oracle.com>
+Date:   Fri, 3 Apr 2020 14:10:42 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <05c9015fb13b25c07a84d5638a7cd65a8c136cf0.1585548051.git.ashish.kalra@amd.com>
+In-Reply-To: <4d4fbe2b9acda82c04834682900acf782182ec23.1585548051.git.ashish.kalra@amd.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
 Content-Language: en-US
@@ -66,9 +66,9 @@ X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 bulk
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
  definitions=main-2004030166
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9580 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 adultscore=0
- clxscore=1015 phishscore=0 lowpriorityscore=0 spamscore=0 malwarescore=0
- suspectscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 bulkscore=0
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 phishscore=0 clxscore=1015
+ malwarescore=0 impostorscore=0 mlxlogscore=999 spamscore=0 mlxscore=0
+ priorityscore=1501 lowpriorityscore=0 adultscore=0 suspectscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
  definitions=main-2004030166
 Sender: kvm-owner@vger.kernel.org
@@ -80,9 +80,8 @@ X-Mailing-List: kvm@vger.kernel.org
 On 3/29/20 11:22 PM, Ashish Kalra wrote:
 > From: Brijesh Singh <Brijesh.Singh@amd.com>
 >
-> Invoke a hypercall when a memory region is changed from encrypted ->
-> decrypted and vice versa. Hypervisor need to know the page encryption
-> status during the guest migration.
+> The ioctl can be used to set page encryption bitmap for an
+> incoming guest.
 >
 > Cc: Thomas Gleixner <tglx@linutronix.de>
 > Cc: Ingo Molnar <mingo@redhat.com>
@@ -98,207 +97,156 @@ On 3/29/20 11:22 PM, Ashish Kalra wrote:
 > Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 > Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
 > ---
->   arch/x86/include/asm/paravirt.h       | 10 +++++
->   arch/x86/include/asm/paravirt_types.h |  2 +
->   arch/x86/kernel/paravirt.c            |  1 +
->   arch/x86/mm/mem_encrypt.c             | 57 ++++++++++++++++++++++++++-
->   arch/x86/mm/pat/set_memory.c          |  7 ++++
->   5 files changed, 76 insertions(+), 1 deletion(-)
+>   Documentation/virt/kvm/api.rst  | 22 +++++++++++++++++
+>   arch/x86/include/asm/kvm_host.h |  2 ++
+>   arch/x86/kvm/svm.c              | 42 +++++++++++++++++++++++++++++++++
+>   arch/x86/kvm/x86.c              | 12 ++++++++++
+>   include/uapi/linux/kvm.h        |  1 +
+>   5 files changed, 79 insertions(+)
 >
-> diff --git a/arch/x86/include/asm/paravirt.h b/arch/x86/include/asm/paravirt.h
-> index 694d8daf4983..8127b9c141bf 100644
-> --- a/arch/x86/include/asm/paravirt.h
-> +++ b/arch/x86/include/asm/paravirt.h
-> @@ -78,6 +78,12 @@ static inline void paravirt_arch_exit_mmap(struct mm_struct *mm)
->   	PVOP_VCALL1(mmu.exit_mmap, mm);
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index 8ad800ebb54f..4d1004a154f6 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -4675,6 +4675,28 @@ or shared. The bitmap can be used during the guest migration, if the page
+>   is private then userspace need to use SEV migration commands to transmit
+>   the page.
+>   
+> +4.126 KVM_SET_PAGE_ENC_BITMAP (vm ioctl)
+> +---------------------------------------
+> +
+> +:Capability: basic
+> +:Architectures: x86
+> +:Type: vm ioctl
+> +:Parameters: struct kvm_page_enc_bitmap (in/out)
+> +:Returns: 0 on success, -1 on error
+> +
+> +/* for KVM_SET_PAGE_ENC_BITMAP */
+> +struct kvm_page_enc_bitmap {
+> +	__u64 start_gfn;
+> +	__u64 num_pages;
+> +	union {
+> +		void __user *enc_bitmap; /* one bit per page */
+> +		__u64 padding2;
+> +	};
+> +};
+> +
+> +During the guest live migration the outgoing guest exports its page encryption
+> +bitmap, the KVM_SET_PAGE_ENC_BITMAP can be used to build the page encryption
+> +bitmap for an incoming guest.
+>   
+>   5. The kvm_run structure
+>   ========================
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 27e43e3ec9d8..d30f770aaaea 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -1271,6 +1271,8 @@ struct kvm_x86_ops {
+>   				  unsigned long sz, unsigned long mode);
+>   	int (*get_page_enc_bitmap)(struct kvm *kvm,
+>   				struct kvm_page_enc_bitmap *bmap);
+> +	int (*set_page_enc_bitmap)(struct kvm *kvm,
+> +				struct kvm_page_enc_bitmap *bmap);
+>   };
+>   
+>   struct kvm_arch_async_pf {
+> diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
+> index bae783cd396a..313343a43045 100644
+> --- a/arch/x86/kvm/svm.c
+> +++ b/arch/x86/kvm/svm.c
+> @@ -7756,6 +7756,47 @@ static int svm_get_page_enc_bitmap(struct kvm *kvm,
+>   	return ret;
 >   }
 >   
-> +static inline void page_encryption_changed(unsigned long vaddr, int npages,
-> +						bool enc)
+> +static int svm_set_page_enc_bitmap(struct kvm *kvm,
+> +				   struct kvm_page_enc_bitmap *bmap)
 > +{
-> +	PVOP_VCALL3(mmu.page_encryption_changed, vaddr, npages, enc);
+> +	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+> +	unsigned long gfn_start, gfn_end;
+> +	unsigned long *bitmap;
+> +	unsigned long sz, i;
+> +	int ret;
+> +
+> +	if (!sev_guest(kvm))
+> +		return -ENOTTY;
+> +
+> +	gfn_start = bmap->start_gfn;
+> +	gfn_end = gfn_start + bmap->num_pages;
+
+
+Same comment as the previous one. Do we continue if num_pages is zero ?
+
+> +
+> +	sz = ALIGN(bmap->num_pages, BITS_PER_LONG) / 8;
+> +	bitmap = kmalloc(sz, GFP_KERNEL);
+> +	if (!bitmap)
+> +		return -ENOMEM;
+> +
+> +	ret = -EFAULT;
+> +	if (copy_from_user(bitmap, bmap->enc_bitmap, sz))
+> +		goto out;
+> +
+> +	mutex_lock(&kvm->lock);
+> +	ret = sev_resize_page_enc_bitmap(kvm, gfn_end);
+> +	if (ret)
+> +		goto unlock;
+> +
+> +	i = gfn_start;
+> +	for_each_clear_bit_from(i, bitmap, (gfn_end - gfn_start))
+> +		clear_bit(i + gfn_start, sev->page_enc_bmap);
+> +
+> +	ret = 0;
+> +unlock:
+> +	mutex_unlock(&kvm->lock);
+> +out:
+> +	kfree(bitmap);
+> +	return ret;
 > +}
 > +
->   #ifdef CONFIG_PARAVIRT_XXL
->   static inline void load_sp0(unsigned long sp0)
+>   static int svm_mem_enc_op(struct kvm *kvm, void __user *argp)
 >   {
-> @@ -946,6 +952,10 @@ static inline void paravirt_arch_dup_mmap(struct mm_struct *oldmm,
->   static inline void paravirt_arch_exit_mmap(struct mm_struct *mm)
->   {
->   }
-> +
-> +static inline void page_encryption_changed(unsigned long vaddr, int npages, bool enc)
-> +{
-> +}
->   #endif
->   #endif /* __ASSEMBLY__ */
->   #endif /* _ASM_X86_PARAVIRT_H */
-> diff --git a/arch/x86/include/asm/paravirt_types.h b/arch/x86/include/asm/paravirt_types.h
-> index 732f62e04ddb..03bfd515c59c 100644
-> --- a/arch/x86/include/asm/paravirt_types.h
-> +++ b/arch/x86/include/asm/paravirt_types.h
-> @@ -215,6 +215,8 @@ struct pv_mmu_ops {
+>   	struct kvm_sev_cmd sev_cmd;
+> @@ -8161,6 +8202,7 @@ static struct kvm_x86_ops svm_x86_ops __ro_after_init = {
 >   
->   	/* Hook for intercepting the destruction of an mm_struct. */
->   	void (*exit_mmap)(struct mm_struct *mm);
-> +	void (*page_encryption_changed)(unsigned long vaddr, int npages,
-> +					bool enc);
+>   	.page_enc_status_hc = svm_page_enc_status_hc,
+>   	.get_page_enc_bitmap = svm_get_page_enc_bitmap,
+> +	.set_page_enc_bitmap = svm_set_page_enc_bitmap,
+>   };
 >   
->   #ifdef CONFIG_PARAVIRT_XXL
->   	struct paravirt_callee_save read_cr2;
-> diff --git a/arch/x86/kernel/paravirt.c b/arch/x86/kernel/paravirt.c
-> index c131ba4e70ef..840c02b23aeb 100644
-> --- a/arch/x86/kernel/paravirt.c
-> +++ b/arch/x86/kernel/paravirt.c
-> @@ -367,6 +367,7 @@ struct paravirt_patch_template pv_ops = {
->   			(void (*)(struct mmu_gather *, void *))tlb_remove_page,
->   
->   	.mmu.exit_mmap		= paravirt_nop,
-> +	.mmu.page_encryption_changed	= paravirt_nop,
->   
->   #ifdef CONFIG_PARAVIRT_XXL
->   	.mmu.read_cr2		= __PV_IS_CALLEE_SAVE(native_read_cr2),
-> diff --git a/arch/x86/mm/mem_encrypt.c b/arch/x86/mm/mem_encrypt.c
-> index f4bd4b431ba1..c9800fa811f6 100644
-> --- a/arch/x86/mm/mem_encrypt.c
-> +++ b/arch/x86/mm/mem_encrypt.c
-> @@ -19,6 +19,7 @@
->   #include <linux/kernel.h>
->   #include <linux/bitops.h>
->   #include <linux/dma-mapping.h>
-> +#include <linux/kvm_para.h>
->   
->   #include <asm/tlbflush.h>
->   #include <asm/fixmap.h>
-> @@ -29,6 +30,7 @@
->   #include <asm/processor-flags.h>
->   #include <asm/msr.h>
->   #include <asm/cmdline.h>
-> +#include <asm/kvm_para.h>
->   
->   #include "mm_internal.h"
->   
-> @@ -196,6 +198,47 @@ void __init sme_early_init(void)
->   		swiotlb_force = SWIOTLB_FORCE;
->   }
->   
-> +static void set_memory_enc_dec_hypercall(unsigned long vaddr, int npages,
-> +					bool enc)
-> +{
-> +	unsigned long sz = npages << PAGE_SHIFT;
-> +	unsigned long vaddr_end, vaddr_next;
+>   static int __init svm_init(void)
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 3c3fea4e20b5..05e953b2ec61 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -5238,6 +5238,18 @@ long kvm_arch_vm_ioctl(struct file *filp,
+>   			r = kvm_x86_ops->get_page_enc_bitmap(kvm, &bitmap);
+>   		break;
+>   	}
+> +	case KVM_SET_PAGE_ENC_BITMAP: {
+> +		struct kvm_page_enc_bitmap bitmap;
 > +
-> +	vaddr_end = vaddr + sz;
+> +		r = -EFAULT;
+> +		if (copy_from_user(&bitmap, argp, sizeof(bitmap)))
+> +			goto out;
 > +
-> +	for (; vaddr < vaddr_end; vaddr = vaddr_next) {
-> +		int psize, pmask, level;
-> +		unsigned long pfn;
-> +		pte_t *kpte;
-> +
-> +		kpte = lookup_address(vaddr, &level);
-> +		if (!kpte || pte_none(*kpte))
-> +			return;
-> +
-> +		switch (level) {
-> +		case PG_LEVEL_4K:
-> +			pfn = pte_pfn(*kpte);
-> +			break;
-> +		case PG_LEVEL_2M:
-> +			pfn = pmd_pfn(*(pmd_t *)kpte);
-> +			break;
-> +		case PG_LEVEL_1G:
-> +			pfn = pud_pfn(*(pud_t *)kpte);
-> +			break;
-> +		default:
-> +			return;
-> +		}
-
-
-Is it possible to re-use the code in __set_clr_pte_enc() ?
-
-> +
-> +		psize = page_level_size(level);
-> +		pmask = page_level_mask(level);
-> +
-> +		kvm_sev_hypercall3(KVM_HC_PAGE_ENC_STATUS,
-> +				   pfn << PAGE_SHIFT, psize >> PAGE_SHIFT, enc);
-> +
-> +		vaddr_next = (vaddr & pmask) + psize;
+> +		r = -ENOTTY;
+> +		if (kvm_x86_ops->set_page_enc_bitmap)
+> +			r = kvm_x86_ops->set_page_enc_bitmap(kvm, &bitmap);
+> +		break;
 > +	}
-> +}
-> +
->   static void __init __set_clr_pte_enc(pte_t *kpte, int level, bool enc)
->   {
->   	pgprot_t old_prot, new_prot;
-> @@ -253,12 +296,13 @@ static void __init __set_clr_pte_enc(pte_t *kpte, int level, bool enc)
->   static int __init early_set_memory_enc_dec(unsigned long vaddr,
->   					   unsigned long size, bool enc)
->   {
-> -	unsigned long vaddr_end, vaddr_next;
-> +	unsigned long vaddr_end, vaddr_next, start;
->   	unsigned long psize, pmask;
->   	int split_page_size_mask;
->   	int level, ret;
->   	pte_t *kpte;
+>   	default:
+>   		r = -ENOTTY;
+>   	}
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index db1ebf85e177..b4b01d47e568 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -1489,6 +1489,7 @@ struct kvm_enc_region {
+>   #define KVM_S390_CLEAR_RESET	_IO(KVMIO,   0xc4)
 >   
-> +	start = vaddr;
->   	vaddr_next = vaddr;
->   	vaddr_end = vaddr + size;
+>   #define KVM_GET_PAGE_ENC_BITMAP	_IOW(KVMIO, 0xc5, struct kvm_page_enc_bitmap)
+> +#define KVM_SET_PAGE_ENC_BITMAP	_IOW(KVMIO, 0xc6, struct kvm_page_enc_bitmap)
 >   
-> @@ -313,6 +357,8 @@ static int __init early_set_memory_enc_dec(unsigned long vaddr,
->   
->   	ret = 0;
->   
-> +	set_memory_enc_dec_hypercall(start, PAGE_ALIGN(size) >> PAGE_SHIFT,
-> +					enc);
-
-
-If I haven't missed anything, it seems early_set_memory_encrypted() 
-doesn't have a caller. So is there a possibility that we can end up 
-calling it in non-SEV context and hence do we need to have the 
-sev_active() guard here ?
-
->   out:
->   	__flush_tlb_all();
->   	return ret;
-> @@ -451,6 +497,15 @@ void __init mem_encrypt_init(void)
->   	if (sev_active())
->   		static_branch_enable(&sev_enable_key);
->   
-> +#ifdef CONFIG_PARAVIRT
-> +	/*
-> +	 * With SEV, we need to make a hypercall when page encryption state is
-> +	 * changed.
-> +	 */
-> +	if (sev_active())
-> +		pv_ops.mmu.page_encryption_changed = set_memory_enc_dec_hypercall;
-> +#endif
-> +
->   	pr_info("AMD %s active\n",
->   		sev_active() ? "Secure Encrypted Virtualization (SEV)"
->   			     : "Secure Memory Encryption (SME)");
-> diff --git a/arch/x86/mm/pat/set_memory.c b/arch/x86/mm/pat/set_memory.c
-> index c4aedd00c1ba..86b7804129fc 100644
-> --- a/arch/x86/mm/pat/set_memory.c
-> +++ b/arch/x86/mm/pat/set_memory.c
-> @@ -26,6 +26,7 @@
->   #include <asm/proto.h>
->   #include <asm/memtype.h>
->   #include <asm/set_memory.h>
-> +#include <asm/paravirt.h>
->   
->   #include "../mm_internal.h"
->   
-> @@ -1987,6 +1988,12 @@ static int __set_memory_enc_dec(unsigned long addr, int numpages, bool enc)
->   	 */
->   	cpa_flush(&cpa, 0);
->   
-> +	/* Notify hypervisor that a given memory range is mapped encrypted
-> +	 * or decrypted. The hypervisor will use this information during the
-> +	 * VM migration.
-> +	 */
-> +	page_encryption_changed(addr, numpages, enc);
-> +
->   	return ret;
->   }
->   
+>   /* Secure Encrypted Virtualization command */
+>   enum sev_cmd_id {
+Reviewed-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
