@@ -2,239 +2,354 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 752C819D104
-	for <lists+kvm@lfdr.de>; Fri,  3 Apr 2020 09:17:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 069D119D136
+	for <lists+kvm@lfdr.de>; Fri,  3 Apr 2020 09:27:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388916AbgDCHQ5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 Apr 2020 03:16:57 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:17466 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1732205AbgDCHQ5 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 3 Apr 2020 03:16:57 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 03374WUQ062261
-        for <kvm@vger.kernel.org>; Fri, 3 Apr 2020 03:16:56 -0400
-Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3043ga3pjq-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Fri, 03 Apr 2020 03:16:55 -0400
-Received: from localhost
-        by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <frankja@linux.ibm.com>;
-        Fri, 3 Apr 2020 08:16:45 +0100
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
-        by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Fri, 3 Apr 2020 08:16:42 +0100
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0337Godv59768980
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 3 Apr 2020 07:16:50 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 766E74C052;
-        Fri,  3 Apr 2020 07:16:50 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 280C54C040;
-        Fri,  3 Apr 2020 07:16:50 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.145.45.133])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri,  3 Apr 2020 07:16:50 +0000 (GMT)
-Subject: Re: [kvm-unit-tests v3] s390x/smp: add minimal test for sigp sense
- running status
-To:     Christian Borntraeger <borntraeger@de.ibm.com>,
-        Thomas Huth <thuth@redhat.com>,
-        David Hildenbrand <david@redhat.com>
-Cc:     Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org
-References: <20200402154441.13063-1-borntraeger@de.ibm.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
-Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
- 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
-Date:   Fri, 3 Apr 2020 09:16:49 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+        id S2389688AbgDCH1r (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 Apr 2020 03:27:47 -0400
+Received: from mx0a-0016f401.pphosted.com ([67.231.148.174]:17454 "EHLO
+        mx0b-0016f401.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S2389010AbgDCH1r (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 3 Apr 2020 03:27:47 -0400
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+        by mx0a-0016f401.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0337K2HT030821;
+        Fri, 3 Apr 2020 00:27:24 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
+ subject : date : message-id : content-type : content-transfer-encoding :
+ mime-version; s=pfpt0818; bh=gj76iXxm8OOFF6yiGeQRXfI+FLtlMRI2bcldDEIJbJM=;
+ b=OO6pBT6B/ZiUa2ykXHEthoafgKgEqFpzc04MWGFSiCiN5ErSoXhl6QfvtpLvowB8hZqi
+ 54lOjaaU//ithHzvaWitwygrTuyLE7B668ZdN9DnIQtzmRJcN00V2BInclHGq03ncy5F
+ 46LtW3ze+LrkecxcAe+hXhhj3ni89dOurtpcE4UyBunk1dJhA4+89lnPX/sSIIhj0Tpg
+ 23Vymco9rsxx0KPUAOpi4NXFYNIUnzJ52y1M84chH1sIYaMAuH+8ezeiuMcB/f8B/TkR
+ PDZ45wwCqvyst9ryXnYEC20zS0LYGuol8AXOhfNPFQtkn2iUz5ni1TwSKcXNZg2InLzx Ww== 
+Received: from sc-exch02.marvell.com ([199.233.58.182])
+        by mx0a-0016f401.pphosted.com with ESMTP id 304855wk7g-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+        Fri, 03 Apr 2020 00:27:24 -0700
+Received: from SC-EXCH03.marvell.com (10.93.176.83) by SC-EXCH02.marvell.com
+ (10.93.176.82) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Fri, 3 Apr
+ 2020 00:27:22 -0700
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.105)
+ by SC-EXCH03.marvell.com (10.93.176.83) with Microsoft SMTP Server (TLS) id
+ 15.0.1497.2 via Frontend Transport; Fri, 3 Apr 2020 00:27:22 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=FM7Hn7ag4dNSROY654bhKcoaD8auvqQcK7vWjv5HwppWROJPuUSi10/NNL1efKrqqNEl7kN8G5sSyVH1DEfMkA2h35fxcnoUOmQ0Ln7nrgXte/ElPrH0qEG5Z4C2++o67UGJ6qvlopCiREAiG8qwdjI4oU8swu+J2+T42O3fDS9Am13sQiuduyJnwWmk+jqJU2XyGwaOsPdtntskbIj9Jsm6hhtgqf7VmFXkjz45XF3t2FBhWbeaFCoBsqh9unnD8rpyXYw4zMycqYzrnRBhGXCu7Mn9yd3ApqLyk7W1YXvbbJgepM9ps935Uyuzo7iL/zfnqzi/UvAlKYMqDB20vg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=gj76iXxm8OOFF6yiGeQRXfI+FLtlMRI2bcldDEIJbJM=;
+ b=DBLAGPNYoMFgPg91Kxmf5h+5qS+zt/1zsA56AYxvnKAUzYb6a4L3HxsXbhzKcnhfbji8NP8Uk4CofPTOXv61znKCRw3IyZn6+CLgZXFW+INCscBG/oTvwT8VUureDs3YsAMksHiQOd52osgI3KBirmyjvXAavP4HC8T4eSNMzqopdDJZxQoLZjUlm4QUNPn8HU2qNPKHLtJy0Ljj5PhwvXTSy1uoxFCnOvydf/yjFOvKCfVf+JC6BwG19KhDRRZ/d7eebfel5ANRJxYTDqAsh1PWdyQQD9+cz5tPfZgOtQEBEFLKh/Egoz0XNw8GGBJiJtibzb4stCK4d8VdC0c2pQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=marvell.com; dmarc=pass action=none header.from=marvell.com;
+ dkim=pass header.d=marvell.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=marvell.onmicrosoft.com; s=selector1-marvell-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=gj76iXxm8OOFF6yiGeQRXfI+FLtlMRI2bcldDEIJbJM=;
+ b=UlpqLUZibDokJxxzayek7jQe7QQyhBQ8OjuZzM6tvJDYknzx/vzZuZaBO3GeW48zTSr+Y664MqdpN0rzUY2oJG6r/VAEq2vp3V7Ri9LQDXFyA2ESnaj4n+DMbagzwgyQLZaCzy7We7byMzb92ArVj2qQsOvyE30xIxaSM/wjs1Q=
+Received: from MN2PR18MB2686.namprd18.prod.outlook.com (2603:10b6:208:ad::30)
+ by MN2PR18MB3103.namprd18.prod.outlook.com (2603:10b6:208:169::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2878.19; Fri, 3 Apr
+ 2020 07:27:21 +0000
+Received: from MN2PR18MB2686.namprd18.prod.outlook.com
+ ([fe80::f9b3:90dc:bbf:4ebc]) by MN2PR18MB2686.namprd18.prod.outlook.com
+ ([fe80::f9b3:90dc:bbf:4ebc%3]) with mapi id 15.20.2878.018; Fri, 3 Apr 2020
+ 07:27:21 +0000
+From:   George Cherian <gcherian@marvell.com>
+To:     "maz@kernel.org" <maz@kernel.org>
+CC:     "Dave.Martin@arm.com" <Dave.Martin@arm.com>,
+        "alexandru.elisei@arm.com" <alexandru.elisei@arm.com>,
+        "andre.przywara@arm.com" <andre.przywara@arm.com>,
+        "christoffer.dall@arm.com" <christoffer.dall@arm.com>,
+        "james.morse@arm.com" <james.morse@arm.com>,
+        "jintack@cs.columbia.edu" <jintack@cs.columbia.edu>,
+        "julien.thierry.kdev@gmail.com" <julien.thierry.kdev@gmail.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>,
+        "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
+        Anil Kumar Reddy H <areddy3@marvell.com>,
+        Ganapatrao Kulkarni <gkulkarni@marvell.com>,
+        George Cherian <gcherian@marvell.com>
+Subject: Re: [PATCH v2 00/94] KVM: arm64: ARMv8.3/8.4 Nested Virtualization
+ support
+Thread-Topic: Re: [PATCH v2 00/94] KVM: arm64: ARMv8.3/8.4 Nested
+ Virtualization support
+Thread-Index: AdYJhvrCKEKaxySRQua1lfr4U9NN2g==
+Date:   Fri, 3 Apr 2020 07:27:21 +0000
+Message-ID: <MN2PR18MB26869A6CA4E67558324F655CC5C70@MN2PR18MB2686.namprd18.prod.outlook.com>
+Accept-Language: en-IN, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [49.207.55.211]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 941a9fea-da64-41fb-d89d-08d7d7a072af
+x-ms-traffictypediagnostic: MN2PR18MB3103:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <MN2PR18MB310388849AFE980FAA17FA0BC5C70@MN2PR18MB3103.namprd18.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:9508;
+x-forefront-prvs: 0362BF9FDB
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR18MB2686.namprd18.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(10009020)(4636009)(366004)(346002)(136003)(376002)(39860400002)(396003)(966005)(53546011)(6506007)(52536014)(55236004)(66946007)(54906003)(478600001)(6916009)(86362001)(2906002)(7696005)(7416002)(66476007)(66556008)(64756008)(66446008)(316002)(76116006)(107886003)(55016002)(26005)(81166006)(5660300002)(4326008)(9686003)(71200400001)(186003)(8936002)(33656002)(8676002)(81156014)(30864003);DIR:OUT;SFP:1101;
+received-spf: None (protection.outlook.com: marvell.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: cd9r+X9ykwQ8LIbtnvA8VgURN/J/gZNLPTt3cSaL1QNTJWTm80DGwLelE+4GaO6P187fp8XV1hDWErKSnVCPKTui/iQPa1NQ1xs+mxtafJt8if9M7oxld+y+KqoaP363xE6JWF/HqKmHEJv1Z5WMLuDf3+874taQzdX9cftyHCSeYkztntPS/wnSrm5OUF9NJXBTWMhgkjLvDKK8FY1fxmNZQmAsnS0cAannXjdqev5zfBFY64o9wyWl40sgbz2zilbHXBesx6OtDUiXUMRjlZkyPL/6J+n1h25VNqEhX0vrKL+PboOgeeeVZFwrIEgwiPJJ88HuODiOCv/GqSci7yvRlKoFssB4/O4XoYzY892RgayTL9OIT0fcQsmqyadxKRu0X3XyNWd4WzAPq9WtxLoDw6vtqwldFrXhV1DrCQaoLjXgJ1Y3Y72aihxzBH4NIf01PFSLyyVvJiPawOK3IOfyOirOTYdfvTkiPz6HgarBkyJQfz/ZpaT4Duo2mSpkzKHG9cuBYzel0tR0coQ+wg==
+x-ms-exchange-antispam-messagedata: BVbZwjT8Kk7omJGca4LwnlwfYIyh1zXjAzrViAIJpVJ5bJmV0wNiXnZCao3y6NSPKbitIDIYxqWXEhE59NJCSf1Dzg/a/eM1nGCXFumv039XZU+Fx+i93HKsBMv7YGiLozfXWGTPN0wwadkLDSKtWw==
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-In-Reply-To: <20200402154441.13063-1-borntraeger@de.ibm.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="iH5I0SO8A39Q1pMrgtbdAHx89p1ImXqJH"
-X-TM-AS-GCONF: 00
-x-cbid: 20040307-0012-0000-0000-0000039D5FC9
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20040307-0013-0000-0000-000021DA7610
-Message-Id: <f8323c1e-9dd9-58ab-35d3-4ddc0a43926f@linux.ibm.com>
+X-MS-Exchange-CrossTenant-Network-Message-Id: 941a9fea-da64-41fb-d89d-08d7d7a072af
+X-MS-Exchange-CrossTenant-originalarrivaltime: 03 Apr 2020 07:27:21.3261
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 70e1fb47-1155-421d-87fc-2e58f638b6e0
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: iEUR1DMiO2KmMX5yWIzPqGR2RbYaN0X0ytORD7zGD8KMAGexETLHvzJc6Np5UIIS2pMAOaGtZuwHUuCAqzmS3w==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR18MB3103
+X-OriginatorOrg: marvell.com
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.676
- definitions=2020-04-03_04:2020-04-02,2020-04-03 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- spamscore=0 malwarescore=0 mlxlogscore=999 impostorscore=0 clxscore=1015
- phishscore=0 adultscore=0 lowpriorityscore=0 bulkscore=0 mlxscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2004030054
+ definitions=2020-04-03_05:2020-04-02,2020-04-03 signatures=0
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---iH5I0SO8A39Q1pMrgtbdAHx89p1ImXqJH
-Content-Type: multipart/mixed; boundary="TDHZDmBDkzJqFaYRNRZKQbep5vr2l9SWt"
+Hi Marc,
 
---TDHZDmBDkzJqFaYRNRZKQbep5vr2l9SWt
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+On 2/11/20 9:48 AM, Marc Zyngier wrote:
+> This is a major rework of the NV series that I posted over 6 months
+> ago[1], and a lot has changed since then:
+>
+> - Early ARMv8.4-NV support
+> - ARMv8.4-TTL support in host and guest
+> - ARMv8.5-GTG support in host and guest
+> - Lots of comments addressed after the review
+> - Rebased on v5.6-rc1
+> - Way too many patches
+>
+> In my defence, the whole of the NV code is still smaller that the
+> 32bit KVM/arm code I'm about to remove, so I feel less bad inflicting
+> this on everyone! ;-)
+>
+> >From a functionality perspective, you can expect a L2 guest to work,
+> but don't even think of L3, as we only partially emulate the
+> ARMv8.{3,4}-NV extensions themselves. Same thing for vgic, debug, PMU,
+> as well as anything that would require a Stage-1 PTW. What we want to
+> achieve is that with NV disabled, there is no performance overhead and
+> no regression.
+>
+> The series is roughly divided in 5 parts: exception handling, memory
+> virtualization, interrupts and timers for ARMv8.3, followed by the
+> ARMv8.4 support. There are of course some dependencies, but you'll
+> hopefully get the gist of it.
+>
+> For the most courageous of you, I've put out a branch[2]. Of course,
+> you'll need some userspace. Andre maintains a hacked version of
+> kvmtool[3] that takes a --nested option, allowing the guest to be
+> started at EL2. You can run the whole stack in the Foundation
+> model. Don't be in a hurry ;-).
+>
+The full series was tested on both Foundation model as well as Marvell Thun=
+derX3
+Emulation Platform.
+Basic boot testing done for Guest Hypervisor and Guest Guest.
 
-On 4/2/20 5:44 PM, Christian Borntraeger wrote:
-> Two minimal tests:
-> - our own CPU should be running when we check ourselves
-> - a CPU should at least have some times with a not running
-> indication. To speed things up we stop CPU1
->=20
-> Also rename smp_cpu_running to smp_sense_running_status.
+Tested-by:  George Cherian <george.cherian@marvell.com>
 
-Thanks for fixing this, one nit below.
+> [1] https://lore.kernel.org/r/20190621093843.220980-1-marc.zyngier@arm.co=
+m
+> [2] git://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git k=
+vm-arm64/nv-5.6-rc1
+> [3] git://linux-arm.org/kvmtool.git nv/nv-wip-5.2-rc5
+>
+> Andre Przywara (3):
+>   KVM: arm64: nv: Save/Restore vEL2 sysregs
+>   KVM: arm64: nv: Handle traps for timer _EL02 and _EL2 sysregs
+>     accessors
+>   KVM: arm64: nv: vgic: Allow userland to set VGIC maintenance IRQ
+>
+> Christoffer Dall (17):
+>   KVM: arm64: nv: Introduce nested virtualization VCPU feature
+>   KVM: arm64: nv: Reset VCPU to EL2 registers if VCPU nested virt is set
+>   KVM: arm64: nv: Allow userspace to set PSR_MODE_EL2x
+>   KVM: arm64: nv: Add nested virt VCPU primitives for vEL2 VCPU state
+>   KVM: arm64: nv: Handle trapped ERET from virtual EL2
+>   KVM: arm64: nv: Emulate PSTATE.M for a guest hypervisor
+>   KVM: arm64: nv: Trap EL1 VM register accesses in virtual EL2
+>   KVM: arm64: nv: Only toggle cache for virtual EL2 when SCTLR_EL2
+>     changes
+>   KVM: arm/arm64: nv: Factor out stage 2 page table data from struct kvm
+>   KVM: arm64: nv: Implement nested Stage-2 page table walk logic
+>   KVM: arm64: nv: Handle shadow stage 2 page faults
+>   KVM: arm64: nv: Unmap/flush shadow stage 2 page tables
+>   KVM: arm64: nv: arch_timer: Support hyp timer emulation
+>   KVM: arm64: nv: vgic-v3: Take cpu_if pointer directly instead of vcpu
+>   KVM: arm64: nv: vgic: Emulate the HW bit in software
+>   KVM: arm64: nv: Add nested GICv3 tracepoints
+>   KVM: arm64: nv: Sync nested timer state with ARMv8.4
+>
+> Jintack Lim (19):
+>   arm64: Add ARM64_HAS_NESTED_VIRT cpufeature
+>   KVM: arm64: nv: Add EL2 system registers to vcpu context
+>   KVM: arm64: nv: Support virtual EL2 exceptions
+>   KVM: arm64: nv: Inject HVC exceptions to the virtual EL2
+>   KVM: arm64: nv: Trap SPSR_EL1, ELR_EL1 and VBAR_EL1 from virtual EL2
+>   KVM: arm64: nv: Trap CPACR_EL1 access in virtual EL2
+>   KVM: arm64: nv: Handle PSCI call via smc from the guest
+>   KVM: arm64: nv: Respect virtual HCR_EL2.TWX setting
+>   KVM: arm64: nv: Respect virtual CPTR_EL2.{TFP,FPEN} settings
+>   KVM: arm64: nv: Respect the virtual HCR_EL2.NV bit setting
+>   KVM: arm64: nv: Respect virtual HCR_EL2.TVM and TRVM settings
+>   KVM: arm64: nv: Respect the virtual HCR_EL2.NV1 bit setting
+>   KVM: arm64: nv: Emulate EL12 register accesses from the virtual EL2
+>   KVM: arm64: nv: Configure HCR_EL2 for nested virtualization
+>   KVM: arm64: nv: Introduce sys_reg_desc.forward_trap
+>   KVM: arm64: nv: Set a handler for the system instruction traps
+>   KVM: arm64: nv: Trap and emulate AT instructions from virtual EL2
+>   KVM: arm64: nv: Trap and emulate TLBI instructions from virtual EL2
+>   KVM: arm64: nv: Nested GICv3 Support
+>
+> Marc Zyngier (55):
+>   KVM: arm64: Move __load_guest_stage2 to kvm_mmu.h
+>   KVM: arm64: nv: Reset VMPIDR_EL2 and VPIDR_EL2 to sane values
+>   KVM: arm64: nv: Add EL2->EL1 translation helpers
+>   KVM: arm64: nv: Refactor vcpu_{read,write}_sys_reg
+>   KVM: arm64: nv: Handle virtual EL2 registers in
+>     vcpu_read/write_sys_reg()
+>   KVM: arm64: nv: Handle SPSR_EL2 specially
+>   KVM: arm64: nv: Handle HCR_EL2.E2H specially
+>   KVM: arm64: nv: Forward debug traps to the nested guest
+>   KVM: arm64: nv: Filter out unsupported features from ID regs
+>   KVM: arm64: nv: Hide RAS from nested guests
+>   KVM: arm64: nv: Use ARMv8.5-GTG to advertise supported Stage-2 page
+>     sizes
+>   KVM: arm64: Check advertised Stage-2 page size capability
+>   KVM: arm64: nv: Support multiple nested Stage-2 mmu structures
+>   KVM: arm64: nv: Move last_vcpu_ran to be per s2 mmu
+>   KVM: arm64: nv: Fold guest's HCR_EL2 configuration into the host's
+>   KVM: arm64: nv: Propagate CNTVOFF_EL2 to the virtual EL1 timer
+>   KVM: arm64: nv: Load timer before the GIC
+>   KVM: arm64: nv: Implement maintenance interrupt forwarding
+>   arm64: KVM: nv: Add handling of EL2-specific timer registers
+>   arm64: KVM: nv: Honor SCTLR_EL2.SPAN on entering vEL2
+>   arm64: KVM: nv: Handle SCTLR_EL2 RES0/RES1 bits
+>   arm64: KVM: nv: Restrict S2 RD/WR permissions to match the guest's
+>   arm64: KVM: nv: Allow userspace to request KVM_ARM_VCPU_NESTED_VIRT
+>   arm64: Detect the ARMv8.4 TTL feature
+>   arm64: KVM: nv: Add handling of ARMv8.4-TTL TLB invalidation
+>   arm64: KVM: nv: Invalidate TLBs based on shadow S2 TTL-like
+>     information
+>   arm64: KVM: nv: Tag shadow S2 entries with nested level
+>   arm64: Add SW reserved PTE/PMD bits
+>   arm64: Add level-hinted TLB invalidation helper
+>   arm64: KVM: Add a level hint to __kvm_tlb_flush_vmid_ipa
+>   arm64: KVM: Use TTL hint in when invalidating stage-2 translations
+>   arm64: KVM: nv: Add include containing the VNCR_EL2 offsets
+>   KVM: arm64: Introduce accessor for ctxt->sys_reg
+>   KVM: arm64: sysreg: Use ctxt_sys_reg() instead of raw sys_regs access
+>   KVM: arm64: sve: Use __vcpu_sys_reg() instead of raw sys_regs access
+>   KVM: arm64: pauth: Use ctxt_sys_reg() instead of raw sys_regs access
+>   KVM: arm64: debug: Use ctxt_sys_reg() instead of raw sys_regs access
+>   KVM: arm64: Add missing reset handlers for PMU emulation
+>   KVM: arm64: nv: Move sysreg reset check to boot time
+>   KVM: arm64: Map VNCR-capable registers to a separate page
+>   KVM: arm64: nv: Move nested vgic state into the sysreg file
+>   KVM: arm64: Use accessors for timer ctl/cval/offset
+>   KVM: arm64: Add VNCR-capable timer accessors for arm64
+>   KVM: arm64: Make struct kvm_regs userspace-only
+>   KVM: arm64: VNCR-ize ELR_EL1
+>   KVM: arm64: VNCR-ize SP_EL1
+>   KVM: arm64: Disintegrate SPSR array
+>   KVM: arm64: aarch32: Use __vcpu_sys_reg() instead of raw sys_regs
+>     access
+>   KVM: arm64: VNCR-ize SPSR_EL1
+>   KVM: arm64: Add ARMv8.4 Enhanced Nested Virt cpufeature
+>   KVM: arm64: nv: Synchronize PSTATE early on exit
+>   KVM: arm64: nv: Allocate VNCR page when required
+>   KVM: arm64: nv: Enable ARMv8.4-NV support
+>   KVM: arm64: nv: Fast-track 'InHost' exception returns
+>   KVM: arm64: nv: Fast-track EL1 TLBIs for VHE guests
+>
+>  .../admin-guide/kernel-parameters.txt         |    4 +
+>  .../virt/kvm/devices/arm-vgic-v3.txt          |    8 +
+>  arch/arm/include/asm/kvm_asm.h                |    6 +-
+>  arch/arm/include/asm/kvm_emulate.h            |    3 +
+>  arch/arm/include/asm/kvm_host.h               |   32 +-
+>  arch/arm/include/asm/kvm_hyp.h                |   12 +-
+>  arch/arm/include/asm/kvm_mmu.h                |   90 +-
+>  arch/arm/include/asm/kvm_nested.h             |   11 +
+>  arch/arm/include/asm/stage2_pgtable.h         |    9 +
+>  arch/arm/include/uapi/asm/kvm.h               |    1 +
+>  arch/arm/kvm/hyp/switch.c                     |   11 +-
+>  arch/arm/kvm/hyp/tlb.c                        |   18 +-
+>  arch/arm64/include/asm/cpucaps.h              |    5 +-
+>  arch/arm64/include/asm/esr.h                  |    6 +
+>  arch/arm64/include/asm/kvm_arm.h              |   28 +-
+>  arch/arm64/include/asm/kvm_asm.h              |   10 +-
+>  arch/arm64/include/asm/kvm_coproc.h           |    2 +-
+>  arch/arm64/include/asm/kvm_emulate.h          |  181 +-
+>  arch/arm64/include/asm/kvm_host.h             |  212 ++-
+>  arch/arm64/include/asm/kvm_hyp.h              |   32 +-
+>  arch/arm64/include/asm/kvm_mmu.h              |   62 +-
+>  arch/arm64/include/asm/kvm_nested.h           |   94 +
+>  arch/arm64/include/asm/pgtable-hwdef.h        |    2 +
+>  arch/arm64/include/asm/stage2_pgtable.h       |    9 +
+>  arch/arm64/include/asm/sysreg.h               |  126 +-
+>  arch/arm64/include/asm/tlbflush.h             |   30 +
+>  arch/arm64/include/asm/vncr_mapping.h         |   73 +
+>  arch/arm64/include/uapi/asm/kvm.h             |    2 +
+>  arch/arm64/kernel/asm-offsets.c               |    3 +-
+>  arch/arm64/kernel/cpufeature.c                |   55 +
+>  arch/arm64/kvm/Makefile                       |    5 +
+>  arch/arm64/kvm/emulate-nested.c               |  205 +++
+>  arch/arm64/kvm/fpsimd.c                       |    6 +-
+>  arch/arm64/kvm/guest.c                        |   85 +-
+>  arch/arm64/kvm/handle_exit.c                  |   98 +-
+>  arch/arm64/kvm/hyp/Makefile                   |    1 +
+>  arch/arm64/kvm/hyp/at.c                       |  231 +++
+>  arch/arm64/kvm/hyp/debug-sr.c                 |   18 +-
+>  arch/arm64/kvm/hyp/entry.S                    |    3 +-
+>  arch/arm64/kvm/hyp/switch.c                   |  241 ++-
+>  arch/arm64/kvm/hyp/sysreg-sr.c                |  338 +++-
+>  arch/arm64/kvm/hyp/tlb.c                      |  134 +-
+>  arch/arm64/kvm/inject_fault.c                 |   12 -
+>  arch/arm64/kvm/nested.c                       |  899 ++++++++++
+>  arch/arm64/kvm/regmap.c                       |   37 +-
+>  arch/arm64/kvm/reset.c                        |   72 +-
+>  arch/arm64/kvm/sys_regs.c                     | 1523 +++++++++++++++--
+>  arch/arm64/kvm/sys_regs.h                     |    6 +
+>  arch/arm64/kvm/trace.h                        |   56 +
+>  include/kvm/arm_arch_timer.h                  |    9 +-
+>  include/kvm/arm_vgic.h                        |   21 +-
+>  virt/kvm/arm/arch_timer.c                     |  271 ++-
+>  virt/kvm/arm/arch_timer_nested.c              |   95 +
+>  virt/kvm/arm/arm.c                            |   72 +-
+>  virt/kvm/arm/hyp/vgic-v3-sr.c                 |   35 +-
+>  virt/kvm/arm/mmio.c                           |   14 +-
+>  virt/kvm/arm/mmu.c                            |  458 +++--
+>  virt/kvm/arm/trace.h                          |    6 +-
+>  virt/kvm/arm/vgic/vgic-init.c                 |   30 +
+>  virt/kvm/arm/vgic/vgic-kvm-device.c           |   22 +
+>  virt/kvm/arm/vgic/vgic-nested-trace.h         |  137 ++
+>  virt/kvm/arm/vgic/vgic-v2.c                   |   10 +-
+>  virt/kvm/arm/vgic/vgic-v3-nested.c            |  240 +++
+>  virt/kvm/arm/vgic/vgic-v3.c                   |   51 +-
+>  virt/kvm/arm/vgic/vgic.c                      |   74 +-
+>  virt/kvm/arm/vgic/vgic.h                      |   10 +
+>  66 files changed, 5925 insertions(+), 737 deletions(-)
+>  create mode 100644 arch/arm/include/asm/kvm_nested.h
+>  create mode 100644 arch/arm64/include/asm/kvm_nested.h
+>  create mode 100644 arch/arm64/include/asm/vncr_mapping.h
+>  create mode 100644 arch/arm64/kvm/emulate-nested.c
+>  create mode 100644 arch/arm64/kvm/hyp/at.c
+>  create mode 100644 arch/arm64/kvm/nested.c
+>  create mode 100644 virt/kvm/arm/arch_timer_nested.c
+>  create mode 100644 virt/kvm/arm/vgic/vgic-nested-trace.h
+>  create mode 100644 virt/kvm/arm/vgic/vgic-v3-nested.c
+>
 
-Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
-
-
->=20
-> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> ---
->  lib/s390x/smp.c |  2 +-
->  lib/s390x/smp.h |  2 +-
->  s390x/smp.c     | 15 +++++++++++++++
->  3 files changed, 17 insertions(+), 2 deletions(-)
->=20
-> diff --git a/lib/s390x/smp.c b/lib/s390x/smp.c
-> index 5ed8b7b..492cb05 100644
-> --- a/lib/s390x/smp.c
-> +++ b/lib/s390x/smp.c
-> @@ -58,7 +58,7 @@ bool smp_cpu_stopped(uint16_t addr)
->  	return !!(status & (SIGP_STATUS_CHECK_STOP|SIGP_STATUS_STOPPED));
->  }
-> =20
-> -bool smp_cpu_running(uint16_t addr)
-> +bool smp_sense_running_status(uint16_t addr)
->  {
->  	if (sigp(addr, SIGP_SENSE_RUNNING, 0, NULL) !=3D SIGP_CC_STATUS_STORE=
-D)
->  		return true;
-> diff --git a/lib/s390x/smp.h b/lib/s390x/smp.h
-> index a8b98c0..639ec92 100644
-> --- a/lib/s390x/smp.h
-> +++ b/lib/s390x/smp.h
-> @@ -40,7 +40,7 @@ struct cpu_status {
->  int smp_query_num_cpus(void);
->  struct cpu *smp_cpu_from_addr(uint16_t addr);
->  bool smp_cpu_stopped(uint16_t addr);
-> -bool smp_cpu_running(uint16_t addr);
-> +bool smp_sense_running_status(uint16_t addr);
->  int smp_cpu_restart(uint16_t addr);
->  int smp_cpu_start(uint16_t addr, struct psw psw);
->  int smp_cpu_stop(uint16_t addr);
-> diff --git a/s390x/smp.c b/s390x/smp.c
-> index 79cdc1f..4450aff 100644
-> --- a/s390x/smp.c
-> +++ b/s390x/smp.c
-> @@ -210,6 +210,20 @@ static void test_emcall(void)
->  	report_prefix_pop();
->  }
-> =20
-> +static void test_sense_running(void)
-> +{
-> +	report_prefix_push("sense_running");
-> +	/* we are running */
-> +	report(smp_sense_running_status(0), "CPU0 sense claims running");
-> +	/* make sure CPU is stopped to speed up the not running case */
-> +	smp_cpu_stop(1);
-> +	/* Make sure to have at least one time with a not running indication =
-*/
-> +	while(smp_sense_running_status(1));
-> +	report(true, "CPU1 sense claims not running");
-> +	report_prefix_pop();
-> +}
-> +
-> +
-
-One \n should be enough
-
->  /* Used to dirty registers of cpu #1 before it is reset */
->  static void test_func_initial(void)
->  {
-> @@ -319,6 +333,7 @@ int main(void)
->  	test_store_status();
->  	test_ecall();
->  	test_emcall();
-> +	test_sense_running();
->  	test_reset();
->  	test_reset_initial();
->  	smp_cpu_destroy(1);
->=20
-
-
-
---TDHZDmBDkzJqFaYRNRZKQbep5vr2l9SWt--
-
---iH5I0SO8A39Q1pMrgtbdAHx89p1ImXqJH
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl6G4uEACgkQ41TmuOI4
-ufgj+Q/+PXZMa5qwKj6koN2U2pCAzEOg1CJwNkSNRAYHAOeTRDCdeqg1AXpcCXU8
-8oo4hx90z8rGC+M/7OW8tDkcMrSYJenv1COlpIDeXQPf06RLlLMSbJQxuNRZ00sF
-uPv9avI4B5WK/EdpXR3gAA3m24dFb8ejgcYkdFd8d4k+A9tsecrSuxRONc2cH2mm
-xInTJX3rQfV3qRx6MNhAXx1mQZHjVqlpJWjE8vV4RHRO3KVKahNliqlxfzXx1xZL
-Em57VTWCB2mVg8qDywsqqGBipzzRsrwgEnjrWqIAlVptEyLTjiQsvdKA5SefzL9n
-+SzEbNkwT15oa93+RhPtYkDYYdNZpH9mT7GKHGL85uSt9bUVAqVbNxIQrAls+MAB
-HlnRSRXCcvwn16oOIYWY478gDI+O0wZ9YXWFAGr91V/RlADSkfkF/WrpcCMT3+Ij
-VU+v+dnfV1qbi1UgSf8Ba+YkhzFVEsGbzfEunoCJaVUFL+w4abWG0zQ+A+YbaqEH
-L6YSjAFL4D2ZPU9tX1XTxMsaSiDy/uGQG2hUmNASF3mHHKTMyGwbrwGFWFCgMhM9
-xSQ2YFaeIY2XJLfydZtPaui/aGRzztKAJYTUuM70ohjgXPVe2yN/w8HPJgnf0gYO
-BIJu6T3yq0z+nlj6OIZSJlipVQjmuLjPQRhNrxS8w0KW1F+tE9w=
-=U+vp
------END PGP SIGNATURE-----
-
---iH5I0SO8A39Q1pMrgtbdAHx89p1ImXqJH--
-
+-George
