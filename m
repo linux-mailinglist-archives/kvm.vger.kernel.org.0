@@ -2,105 +2,197 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3F9C419D5B6
-	for <lists+kvm@lfdr.de>; Fri,  3 Apr 2020 13:20:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0F6DC19D5F3
+	for <lists+kvm@lfdr.de>; Fri,  3 Apr 2020 13:42:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2403778AbgDCLUa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 Apr 2020 07:20:30 -0400
-Received: from mail.kernel.org ([198.145.29.99]:58084 "EHLO mail.kernel.org"
+        id S2390632AbgDCLmX convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Fri, 3 Apr 2020 07:42:23 -0400
+Received: from mga09.intel.com ([134.134.136.24]:41173 "EHLO mga09.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728022AbgDCLU3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 3 Apr 2020 07:20:29 -0400
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id A994520737;
-        Fri,  3 Apr 2020 11:20:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1585912828;
-        bh=VkbijjM+51iknoUD0yZ0gT3cXkNqrNfBcoLbQJeIJAM=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=Il47vERBim2JDy7oDA2LDIWqFNH+EnkbYyI8P8YBHlsP657q8CEuD0Rb2ZRtfQ04+
-         WhbBrw/kMlQnXm+0hHylvFuMd/H7bTbcOB3JpCxiw2tl/EBZw8rDUYV1wcrqV5q8+H
-         MU9H1dEB+kPMAyzG6CIW/FnWNe+APKgHh6Ss7+AA=
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why)
-        by disco-boy.misterjones.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <maz@kernel.org>)
-        id 1jKKN9-000U4Y-0m; Fri, 03 Apr 2020 12:20:27 +0100
-Date:   Fri, 3 Apr 2020 12:20:24 +0100
-From:   Marc Zyngier <maz@kernel.org>
-To:     Alexandru Elisei <alexandru.elisei@arm.com>
-Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, Christoffer Dall <Christoffer.Dall@arm.com>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: Re: [PATCH 0/2] KVM: arm64: PSCI fixes
-Message-ID: <20200403122024.60dcec10@why>
-In-Reply-To: <23107386-bbad-6ee1-c1cc-03dd70868905@arm.com>
-References: <20200401165816.530281-1-maz@kernel.org>
-        <23107386-bbad-6ee1-c1cc-03dd70868905@arm.com>
-Organization: Approximate
-X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+        id S1728012AbgDCLmX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 3 Apr 2020 07:42:23 -0400
+IronPort-SDR: byMFnovWTl17pjB2Ri7QGxOgZztKq0xF/KJyIGsRE5K6MlhMjmL6e4qS6nm7XANOFz4f1cJGzF
+ x1lINNN0U8Pw==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Apr 2020 04:42:22 -0700
+IronPort-SDR: 5iVGo26cmCIRFwKXXhqP8A2IymaOmPdiicCUqS/9qwaAtYkT4XqcFUOPP/Sw0EvfuMNejj/VNk
+ unDdqrxXK2pA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.72,339,1580803200"; 
+   d="scan'208";a="242792637"
+Received: from fmsmsx103.amr.corp.intel.com ([10.18.124.201])
+  by fmsmga008.fm.intel.com with ESMTP; 03 Apr 2020 04:42:22 -0700
+Received: from fmsmsx115.amr.corp.intel.com (10.18.116.19) by
+ FMSMSX103.amr.corp.intel.com (10.18.124.201) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Fri, 3 Apr 2020 04:42:22 -0700
+Received: from shsmsx106.ccr.corp.intel.com (10.239.4.159) by
+ fmsmsx115.amr.corp.intel.com (10.18.116.19) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Fri, 3 Apr 2020 04:42:21 -0700
+Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.225]) by
+ SHSMSX106.ccr.corp.intel.com ([169.254.10.89]) with mapi id 14.03.0439.000;
+ Fri, 3 Apr 2020 19:42:18 +0800
+From:   "Liu, Yi L" <yi.l.liu@intel.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+CC:     "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "Tian, Jun J" <jun.j.tian@intel.com>,
+        "Sun, Yi Y" <yi.y.sun@intel.com>,
+        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Wu, Hao" <hao.wu@intel.com>
+Subject: RE: [PATCH v1 2/2] vfio/pci: Emulate PASID/PRI capability for VFs
+Thread-Topic: [PATCH v1 2/2] vfio/pci: Emulate PASID/PRI capability for VFs
+Thread-Index: AQHWAEVGuXHNl3uJkkGgSITNIYV006hl/jEAgAFHqvA=
+Date:   Fri, 3 Apr 2020 11:42:17 +0000
+Message-ID: <A2975661238FB949B60364EF0F2C25743A220988@SHSMSX104.ccr.corp.intel.com>
+References: <1584880394-11184-1-git-send-email-yi.l.liu@intel.com>
+        <1584880394-11184-3-git-send-email-yi.l.liu@intel.com>
+ <20200402165954.48d941ee@w520.home>
+In-Reply-To: <20200402165954.48d941ee@w520.home>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Christoffer.Dall@arm.com, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Alexandru,
+Hi Alex,
 
-On Fri, 3 Apr 2020 11:35:00 +0100
-Alexandru Elisei <alexandru.elisei@arm.com> wrote:
-
-> Hi,
+> From: Alex Williamson <alex.williamson@redhat.com>
+> Sent: Friday, April 3, 2020 7:00 AM
+> To: Liu, Yi L <yi.l.liu@intel.com>
+> Subject: Re: [PATCH v1 2/2] vfio/pci: Emulate PASID/PRI capability for VFs
 > 
-> On 4/1/20 5:58 PM, Marc Zyngier wrote:
-> > Christoffer recently pointed out that we don't narrow the arguments to
-> > SMC32 PSCI functions called by a 64bit guest. This could result in a
-> > guest failing to boot its secondary CPUs if it had junk in the upper
-> > 32bits. Yes, this is silly, but the guest is allowed to do that. Duh.
-> >
-> > Whist I was looking at this, it became apparent that we allow a 32bit
-> > guest to call 64bit functions, which the spec explicitly forbids. Oh
-> > well, another patch.
-> >
-> > This has been lightly tested, but I feel that we could do with a new
-> > set of PSCI corner cases in KVM-unit-tests (hint, nudge... ;-).  
+> On Sun, 22 Mar 2020 05:33:14 -0700
+> "Liu, Yi L" <yi.l.liu@intel.com> wrote:
 > 
-> Good idea. I was already planning to add new PSCI and timer tests, I'm waiting for
-> Paolo to merge the pull request from Drew, which contains some fixes for the
-> current tests.
+> > From: Liu Yi L <yi.l.liu@intel.com>
+> >
+> > Per PCIe r5.0, sec 9.3.7.14, if a PF implements the PASID Capability, the
+> > PF PASID configuration is shared by its VFs.  VFs must not implement their
+> > own PASID Capability.
+> >
+> > Per PCIe r5.0, sec 9.3.7.11, VFs must not implement the PRI Capability. If
+> > the PF implements PRI, it is shared by the VFs.
+> >
+> > On bare metal, it has been fixed by below efforts.
+> > to PASID/PRI are
+> > https://lkml.org/lkml/2019/9/5/996
+> > https://lkml.org/lkml/2019/9/5/995
+> >
+> > This patch adds emulated PASID/PRI capabilities for VFs when assigned to
+> > VMs via vfio-pci driver. This is required for enabling vSVA on pass-through
+> > VFs as VFs have no PASID/PRI capability structure in its configure space.
+> >
+> > Cc: Kevin Tian <kevin.tian@intel.com>
+> > CC: Jacob Pan <jacob.jun.pan@linux.intel.com>
+> > Cc: Alex Williamson <alex.williamson@redhat.com>
+> > Cc: Eric Auger <eric.auger@redhat.com>
+> > Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>
+> > Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
+> > ---
+> >  drivers/vfio/pci/vfio_pci_config.c | 325
+> ++++++++++++++++++++++++++++++++++++-
+> >  1 file changed, 323 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/drivers/vfio/pci/vfio_pci_config.c b/drivers/vfio/pci/vfio_pci_config.c
+> > index 4b9af99..84b4ea0 100644
+> > --- a/drivers/vfio/pci/vfio_pci_config.c
+> > +++ b/drivers/vfio/pci/vfio_pci_config.c
+> > @@ -1509,11 +1509,304 @@ static int vfio_cap_init(struct vfio_pci_device *vdev)
+> >  	return 0;
+> >  }
+> >
+> > +static int vfio_fill_custom_vconfig_bytes(struct vfio_pci_device *vdev,
+> > +					int offset, uint8_t *data, int size)
+> > +{
+> > +	int ret = 0, data_offset = 0;
+> > +
+> > +	while (size) {
+> > +		int filled;
+> > +
+> > +		if (size >= 4 && !(offset % 4)) {
+> > +			__le32 *dwordp = (__le32 *)&vdev->vconfig[offset];
+> > +			u32 dword;
+> > +
+> > +			memcpy(&dword, data + data_offset, 4);
+> > +			*dwordp = cpu_to_le32(dword);
 > 
-> >
-> > Marc Zyngier (2):
-> >   KVM: arm64: PSCI: Narrow input registers when using 32bit functions
-> >   KVM: arm64: PSCI: Forbid 64bit functions for 32bit guests
-> >
-> >  virt/kvm/arm/psci.c | 40 ++++++++++++++++++++++++++++++++++++++++
-> >  1 file changed, 40 insertions(+)
-> >  
-> I started reviewing the patches and I have a question. I'm probably missing
-> something, but why make the changes to the PSCI code instead of making them in the
-> kvm_hvc_call_handler function? From my understanding of the code, making the
-> changes there would benefit all firmware interface that use SMCCC as the
-> communication protocol, not just PSCI.
+> Why wouldn't we do:
+> 
+> *dwordp = cpu_to_le32(*(u32 *)(data + data_offset));
+> 
+> or better yet, increment data on each iteration for:
+> 
+> *dwordp = cpu_to_le32(*(u32 *)data);
+> 
+> vfio_fill_vconfig_bytes() does almost this same thing, getting the data
+> from config space rather than a buffer, so please figure out how to
+> avoid duplicating the logic.
 
-The problem is that it is not obvious whether other functions have
-similar requirements. For example, the old PSCI 0.1 functions are
-completely outside of the SMCCC scope (there is no split between 32 and
-64bit functions, for example), and there is no generic way to discover
-the number of arguments that you would want to narrow.
+Got another alternative. I may use the vfio_fill_vconfig_bytes()
+to fill the cap data from PF's config space into VF's vconfig.
+And after that, I can further modify the data in vconfig. e.g.
+zero the control reg of pasid cap. would it make more sense?
 
-Thanks,
+> > +			filled = 4;
+> > +		} else if (size >= 2 && !(offset % 2)) {
+> > +			__le16 *wordp = (__le16 *)&vdev->vconfig[offset];
+> > +			u16 word;
+> > +
+> > +			memcpy(&word, data + data_offset, 2);
+> > +			*wordp = cpu_to_le16(word);
+> > +			filled = 2;
+> > +		} else {
+> > +			u8 *byte = &vdev->vconfig[offset];
+> > +
+> > +			memcpy(byte, data + data_offset, 1);
+[...]
+> 
+> > +
+> > +	memset(map + epos, vpasid_cap.id, len);
+> 
+> See below.
+> 
+> > +	ret = vfio_fill_custom_vconfig_bytes(vdev, epos,
+> > +					(u8 *)&vpasid_cap, len);
+> > +	if (!ret) {
+> > +		/*
+> > +		 * Successfully filled in PASID cap, update
+> > +		 * the next offset in previous cap header,
+> > +		 * and also update caller about the offset
+> > +		 * of next cap if any.
+> > +		 */
+> > +		u32 val = epos;
+> > +		**prevp &= cpu_to_le32(~(0xffcU << 20));
+> > +		**prevp |= cpu_to_le32(val << 20);
+> > +		*prevp = (__le32 *)&vdev->vconfig[epos];
+> > +		*next = epos + len;
+> 
+> Could we make this any more complicated?
 
-	M.
--- 
-Jazz is not dead. It just smells funny...
+I'm not sure if adding comments addressed this comment. After adding
+new cap in vconfig, it needs to update the cap.next field of prior cap.
+And in case of further add other cap, this function needs to update the
+prevp pointer to the address of the newly added cap.
+
+Regards,
+Yi Liu
+
