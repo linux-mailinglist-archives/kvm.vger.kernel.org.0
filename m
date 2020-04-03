@@ -2,97 +2,86 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8403619CDB1
-	for <lists+kvm@lfdr.de>; Fri,  3 Apr 2020 01:57:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2983919CDB7
+	for <lists+kvm@lfdr.de>; Fri,  3 Apr 2020 02:01:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390297AbgDBX5K (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Apr 2020 19:57:10 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:43900 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2390235AbgDBX5J (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Apr 2020 19:57:09 -0400
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 032NrkxL177890;
-        Thu, 2 Apr 2020 23:56:42 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2020-01-29;
- bh=Lkjj8e4/gu85bLAPJaAJv8bq0O6ffAUvmzCSEpub7TI=;
- b=uUlpho8Cfd/ew+XXDJslFYIcoK5eAGAq8UMvpGl7Yk7T3Gf6Q9poazK7dvDBmpMZfljg
- qLsZTd99vUD5pgSzsyNzzEQ3dnsY48NKksVRc6WRqjkmQdSQK1Cxp8mWKTl5hwqkpFh4
- /zEZ5R5J31I9fK2AfAU7GbLerNSQReZkVVoTiKuwiPeD3fKnX91eWpKJN5urENyTlWSD
- +F/D3qb/Q1sfrba3L/jLKtMOMy4UP9S59FT/yXK2TyxhMBcGJ0uw0/Z69cp5nHcLuBYV
- pnpi1Zrd3hx4IuVfFzK0lr/BGP88ycN5z8wwpx0y7+KS3e4IRYifz90CLTdRnPCo3Lka CA== 
+        id S2390313AbgDCAAz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Apr 2020 20:00:55 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:51756 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2390235AbgDCAAy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Apr 2020 20:00:54 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 032NvZwk091736;
+        Fri, 3 Apr 2020 00:00:31 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : references : mime-version : content-type :
+ content-transfer-encoding : in-reply-to; s=corp-2020-01-29;
+ bh=x53Ml8cyQklcI9PJUMJawCXgLBW3DQoGqYUbTzujAw0=;
+ b=ntC1dBAnVnvlVwTk+NkzqnMnm51HAT/qShIH2UOoZF4zLCbVyqJZni5MCqSKhtpw1IsX
+ 83n/w0USEM8QZ+2/gT/ElqJWTbf8V0K8Padk++ELbxbn3DfyP6BW5be/wxAH8XKHSknN
+ bItgimVtZx4AounPGx/k1QbBlqRSzpCymOac6mbu5zTmXLefqSKUT97X5ILEJM/jBuKa
+ ICo4sUg7B3Rgva/aTMAlT3kpTloCq05/chG0vpDnJOucSrJherPkQOLW0QX7bKiQ6ZX+
+ RcoDlP2NYm2vdb1M+F7ZAnl4l/SoyeCh37Cw2FCLuGsKxBLO+FtvvRep2TRutEEwIPDt 4A== 
 Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by aserp2120.oracle.com with ESMTP id 303yungyje-1
+        by userp2130.oracle.com with ESMTP id 303ceved45-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 02 Apr 2020 23:56:42 +0000
+        Fri, 03 Apr 2020 00:00:31 +0000
 Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 032NqMrW079109;
-        Thu, 2 Apr 2020 23:54:42 GMT
+        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 032NwLOq144927;
+        Fri, 3 Apr 2020 00:00:30 GMT
 Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by aserp3030.oracle.com with ESMTP id 302g4wcye0-1
+        by aserp3030.oracle.com with ESMTP id 302g4wd72k-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 02 Apr 2020 23:54:41 +0000
-Received: from abhmp0017.oracle.com (abhmp0017.oracle.com [141.146.116.23])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 032NscTl008584;
-        Thu, 2 Apr 2020 23:54:39 GMT
-Received: from localhost.localdomain (/10.159.142.52)
+        Fri, 03 Apr 2020 00:00:30 +0000
+Received: from abhmp0010.oracle.com (abhmp0010.oracle.com [141.146.116.16])
+        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 03300S9i010672;
+        Fri, 3 Apr 2020 00:00:28 GMT
+Received: from vbusired-dt (/10.154.166.66)
         by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Thu, 02 Apr 2020 16:54:38 -0700
-Subject: Re: [PATCH v6 07/14] KVM: x86: Add AMD SEV specific Hypercall3
-To:     Ashish Kalra <Ashish.Kalra@amd.com>, pbonzini@redhat.com
-Cc:     tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
-        joro@8bytes.org, bp@suse.de, thomas.lendacky@amd.com,
-        x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        rientjes@google.com, srutherford@google.com, luto@kernel.org,
-        brijesh.singh@amd.com
+        with ESMTP ; Thu, 02 Apr 2020 17:00:28 -0700
+Date:   Thu, 2 Apr 2020 19:00:23 -0500
+From:   Venu Busireddy <venu.busireddy@oracle.com>
+To:     Ashish Kalra <Ashish.Kalra@amd.com>
+Cc:     pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com,
+        hpa@zytor.com, joro@8bytes.org, bp@suse.de,
+        thomas.lendacky@amd.com, x86@kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, rientjes@google.com,
+        srutherford@google.com, luto@kernel.org, brijesh.singh@amd.com
+Subject: Re: [PATCH v6 08/14] KVM: X86: Introduce KVM_HC_PAGE_ENC_STATUS
+ hypercall
+Message-ID: <20200403000023.GA660621@vbusired-dt>
 References: <cover.1585548051.git.ashish.kalra@amd.com>
- <6dda7016ab64490ac3d8e74f461f9f3d0ee3fc88.1585548051.git.ashish.kalra@amd.com>
-From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Message-ID: <9d1f29da-2d63-dfed-228f-b82b3cc2b777@oracle.com>
-Date:   Thu, 2 Apr 2020 16:54:35 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ <265ef8a0ab75f01bc673cce6ddcf7988c7623943.1585548051.git.ashish.kalra@amd.com>
 MIME-Version: 1.0
-In-Reply-To: <6dda7016ab64490ac3d8e74f461f9f3d0ee3fc88.1585548051.git.ashish.kalra@amd.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Content-Language: en-US
+In-Reply-To: <265ef8a0ab75f01bc673cce6ddcf7988c7623943.1585548051.git.ashish.kalra@amd.com>
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9579 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 bulkscore=0 suspectscore=0
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 bulkscore=0 suspectscore=5
  mlxscore=0 spamscore=0 malwarescore=0 mlxlogscore=999 phishscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
- definitions=main-2004020176
+ definitions=main-2004020177
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9579 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 lowpriorityscore=0
- malwarescore=0 adultscore=0 priorityscore=1501 mlxlogscore=999 bulkscore=0
- suspectscore=0 mlxscore=0 spamscore=0 impostorscore=0 clxscore=1015
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 adultscore=0
+ clxscore=1015 phishscore=0 lowpriorityscore=0 spamscore=0 malwarescore=0
+ suspectscore=5 mlxscore=0 impostorscore=0 mlxlogscore=999 bulkscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
- definitions=main-2004020176
+ definitions=main-2004020177
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-On 3/29/20 11:21 PM, Ashish Kalra wrote:
+On 2020-03-30 06:22:07 +0000, Ashish Kalra wrote:
 > From: Brijesh Singh <Brijesh.Singh@amd.com>
->
-> KVM hypercall framework relies on alternative framework to patch the
-> VMCALL -> VMMCALL on AMD platform. If a hypercall is made before
-> apply_alternative()
-
-s/apply_alternative/apply_alternatives/
-> is called then it defaults to VMCALL. The approach
-> works fine on non SEV guest. A VMCALL would causes #UD, and hypervisor
-> will be able to decode the instruction and do the right things. But
-> when SEV is active, guest memory is encrypted with guest key and
-> hypervisor will not be able to decode the instruction bytes.
->
-> Add SEV specific hypercall3, it unconditionally uses VMMCALL. The hypercall
-> will be used by the SEV guest to notify encrypted pages to the hypervisor.
->
+> 
+> This hypercall is used by the SEV guest to notify a change in the page
+> encryption status to the hypervisor. The hypercall should be invoked
+> only when the encryption attribute is changed from encrypted -> decrypted
+> and vice versa. By default all guest pages are considered encrypted.
+> 
 > Cc: Thomas Gleixner <tglx@linutronix.de>
 > Cc: Ingo Molnar <mingo@redhat.com>
 > Cc: "H. Peter Anvin" <hpa@zytor.com>
@@ -106,31 +95,222 @@ s/apply_alternative/apply_alternatives/
 > Cc: linux-kernel@vger.kernel.org
 > Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 > Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+
+Reviewed-by: Venu Busireddy <venu.busireddy@oracle.com>
+
 > ---
->   arch/x86/include/asm/kvm_para.h | 12 ++++++++++++
->   1 file changed, 12 insertions(+)
->
-> diff --git a/arch/x86/include/asm/kvm_para.h b/arch/x86/include/asm/kvm_para.h
-> index 9b4df6eaa11a..6c09255633a4 100644
-> --- a/arch/x86/include/asm/kvm_para.h
-> +++ b/arch/x86/include/asm/kvm_para.h
-> @@ -84,6 +84,18 @@ static inline long kvm_hypercall4(unsigned int nr, unsigned long p1,
->   	return ret;
->   }
->   
-> +static inline long kvm_sev_hypercall3(unsigned int nr, unsigned long p1,
-> +				      unsigned long p2, unsigned long p3)
-> +{
-> +	long ret;
+>  Documentation/virt/kvm/hypercalls.rst | 15 +++++
+>  arch/x86/include/asm/kvm_host.h       |  2 +
+>  arch/x86/kvm/svm.c                    | 95 +++++++++++++++++++++++++++
+>  arch/x86/kvm/vmx/vmx.c                |  1 +
+>  arch/x86/kvm/x86.c                    |  6 ++
+>  include/uapi/linux/kvm_para.h         |  1 +
+>  6 files changed, 120 insertions(+)
+> 
+> diff --git a/Documentation/virt/kvm/hypercalls.rst b/Documentation/virt/kvm/hypercalls.rst
+> index dbaf207e560d..ff5287e68e81 100644
+> --- a/Documentation/virt/kvm/hypercalls.rst
+> +++ b/Documentation/virt/kvm/hypercalls.rst
+> @@ -169,3 +169,18 @@ a0: destination APIC ID
+>  
+>  :Usage example: When sending a call-function IPI-many to vCPUs, yield if
+>  	        any of the IPI target vCPUs was preempted.
 > +
-> +	asm volatile("vmmcall"
-> +		     : "=a"(ret)
-> +		     : "a"(nr), "b"(p1), "c"(p2), "d"(p3)
-> +		     : "memory");
+> +
+> +8. KVM_HC_PAGE_ENC_STATUS
+> +-------------------------
+> +:Architecture: x86
+> +:Status: active
+> +:Purpose: Notify the encryption status changes in guest page table (SEV guest)
+> +
+> +a0: the guest physical address of the start page
+> +a1: the number of pages
+> +a2: encryption attribute
+> +
+> +   Where:
+> +	* 1: Encryption attribute is set
+> +	* 0: Encryption attribute is cleared
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 98959e8cd448..90718fa3db47 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -1267,6 +1267,8 @@ struct kvm_x86_ops {
+>  
+>  	bool (*apic_init_signal_blocked)(struct kvm_vcpu *vcpu);
+>  	int (*enable_direct_tlbflush)(struct kvm_vcpu *vcpu);
+> +	int (*page_enc_status_hc)(struct kvm *kvm, unsigned long gpa,
+> +				  unsigned long sz, unsigned long mode);
+>  };
+>  
+>  struct kvm_arch_async_pf {
+> diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
+> index 7c2721e18b06..1d8beaf1bceb 100644
+> --- a/arch/x86/kvm/svm.c
+> +++ b/arch/x86/kvm/svm.c
+> @@ -136,6 +136,8 @@ struct kvm_sev_info {
+>  	int fd;			/* SEV device fd */
+>  	unsigned long pages_locked; /* Number of pages locked */
+>  	struct list_head regions_list;  /* List of registered regions */
+> +	unsigned long *page_enc_bmap;
+> +	unsigned long page_enc_bmap_size;
+>  };
+>  
+>  struct kvm_svm {
+> @@ -1991,6 +1993,9 @@ static void sev_vm_destroy(struct kvm *kvm)
+>  
+>  	sev_unbind_asid(kvm, sev->handle);
+>  	sev_asid_free(sev->asid);
+> +
+> +	kvfree(sev->page_enc_bmap);
+> +	sev->page_enc_bmap = NULL;
+>  }
+>  
+>  static void avic_vm_destroy(struct kvm *kvm)
+> @@ -7593,6 +7598,94 @@ static int sev_receive_finish(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>  	return ret;
+>  }
+>  
+> +static int sev_resize_page_enc_bitmap(struct kvm *kvm, unsigned long new_size)
+> +{
+> +	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+> +	unsigned long *map;
+> +	unsigned long sz;
+> +
+> +	if (sev->page_enc_bmap_size >= new_size)
+> +		return 0;
+> +
+> +	sz = ALIGN(new_size, BITS_PER_LONG) / 8;
+> +
+> +	map = vmalloc(sz);
+> +	if (!map) {
+> +		pr_err_once("Failed to allocate encrypted bitmap size %lx\n",
+> +				sz);
+> +		return -ENOMEM;
+> +	}
+> +
+> +	/* mark the page encrypted (by default) */
+> +	memset(map, 0xff, sz);
+> +
+> +	bitmap_copy(map, sev->page_enc_bmap, sev->page_enc_bmap_size);
+> +	kvfree(sev->page_enc_bmap);
+> +
+> +	sev->page_enc_bmap = map;
+> +	sev->page_enc_bmap_size = new_size;
+> +
+> +	return 0;
+> +}
+> +
+> +static int svm_page_enc_status_hc(struct kvm *kvm, unsigned long gpa,
+> +				  unsigned long npages, unsigned long enc)
+> +{
+> +	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+> +	kvm_pfn_t pfn_start, pfn_end;
+> +	gfn_t gfn_start, gfn_end;
+> +	int ret;
+> +
+> +	if (!sev_guest(kvm))
+> +		return -EINVAL;
+> +
+> +	if (!npages)
+> +		return 0;
+> +
+> +	gfn_start = gpa_to_gfn(gpa);
+> +	gfn_end = gfn_start + npages;
+> +
+> +	/* out of bound access error check */
+> +	if (gfn_end <= gfn_start)
+> +		return -EINVAL;
+> +
+> +	/* lets make sure that gpa exist in our memslot */
+> +	pfn_start = gfn_to_pfn(kvm, gfn_start);
+> +	pfn_end = gfn_to_pfn(kvm, gfn_end);
+> +
+> +	if (is_error_noslot_pfn(pfn_start) && !is_noslot_pfn(pfn_start)) {
+> +		/*
+> +		 * Allow guest MMIO range(s) to be added
+> +		 * to the page encryption bitmap.
+> +		 */
+> +		return -EINVAL;
+> +	}
+> +
+> +	if (is_error_noslot_pfn(pfn_end) && !is_noslot_pfn(pfn_end)) {
+> +		/*
+> +		 * Allow guest MMIO range(s) to be added
+> +		 * to the page encryption bitmap.
+> +		 */
+> +		return -EINVAL;
+> +	}
+> +
+> +	mutex_lock(&kvm->lock);
+> +	ret = sev_resize_page_enc_bitmap(kvm, gfn_end);
+> +	if (ret)
+> +		goto unlock;
+> +
+> +	if (enc)
+> +		__bitmap_set(sev->page_enc_bmap, gfn_start,
+> +				gfn_end - gfn_start);
+> +	else
+> +		__bitmap_clear(sev->page_enc_bmap, gfn_start,
+> +				gfn_end - gfn_start);
+> +
+> +unlock:
+> +	mutex_unlock(&kvm->lock);
 > +	return ret;
 > +}
 > +
->   #ifdef CONFIG_KVM_GUEST
->   bool kvm_para_available(void);
->   unsigned int kvm_arch_para_features(void);
-Reviewed-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
+>  static int svm_mem_enc_op(struct kvm *kvm, void __user *argp)
+>  {
+>  	struct kvm_sev_cmd sev_cmd;
+> @@ -7995,6 +8088,8 @@ static struct kvm_x86_ops svm_x86_ops __ro_after_init = {
+>  	.need_emulation_on_page_fault = svm_need_emulation_on_page_fault,
+>  
+>  	.apic_init_signal_blocked = svm_apic_init_signal_blocked,
+> +
+> +	.page_enc_status_hc = svm_page_enc_status_hc,
+>  };
+>  
+>  static int __init svm_init(void)
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 079d9fbf278e..f68e76ee7f9c 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -8001,6 +8001,7 @@ static struct kvm_x86_ops vmx_x86_ops __ro_after_init = {
+>  	.nested_get_evmcs_version = NULL,
+>  	.need_emulation_on_page_fault = vmx_need_emulation_on_page_fault,
+>  	.apic_init_signal_blocked = vmx_apic_init_signal_blocked,
+> +	.page_enc_status_hc = NULL,
+>  };
+>  
+>  static void vmx_cleanup_l1d_flush(void)
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index cf95c36cb4f4..68428eef2dde 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -7564,6 +7564,12 @@ int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
+>  		kvm_sched_yield(vcpu->kvm, a0);
+>  		ret = 0;
+>  		break;
+> +	case KVM_HC_PAGE_ENC_STATUS:
+> +		ret = -KVM_ENOSYS;
+> +		if (kvm_x86_ops->page_enc_status_hc)
+> +			ret = kvm_x86_ops->page_enc_status_hc(vcpu->kvm,
+> +					a0, a1, a2);
+> +		break;
+>  	default:
+>  		ret = -KVM_ENOSYS;
+>  		break;
+> diff --git a/include/uapi/linux/kvm_para.h b/include/uapi/linux/kvm_para.h
+> index 8b86609849b9..847b83b75dc8 100644
+> --- a/include/uapi/linux/kvm_para.h
+> +++ b/include/uapi/linux/kvm_para.h
+> @@ -29,6 +29,7 @@
+>  #define KVM_HC_CLOCK_PAIRING		9
+>  #define KVM_HC_SEND_IPI		10
+>  #define KVM_HC_SCHED_YIELD		11
+> +#define KVM_HC_PAGE_ENC_STATUS		12
+>  
+>  /*
+>   * hypercalls use architecture specific
+> -- 
+> 2.17.1
+> 
