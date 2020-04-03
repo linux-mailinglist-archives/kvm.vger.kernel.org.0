@@ -2,34 +2,43 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id DB8D019DA0D
-	for <lists+kvm@lfdr.de>; Fri,  3 Apr 2020 17:26:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CFA0A19DA42
+	for <lists+kvm@lfdr.de>; Fri,  3 Apr 2020 17:34:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404167AbgDCPZ6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 Apr 2020 11:25:58 -0400
-Received: from mga12.intel.com ([192.55.52.136]:61051 "EHLO mga12.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2404011AbgDCPZ5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 3 Apr 2020 11:25:57 -0400
-IronPort-SDR: d1VUqaIwfHLBsc0115thncTDgdYDwdfluM+xMBX6Nn+Kvm719cZZQ3jN1Hcoicb9X0EXQYFVI2
- i8CTYfXljFCQ==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Apr 2020 08:25:57 -0700
-IronPort-SDR: Kz9Xn8SJxTKmlvLgOVwgF5jI27PjXyHYua/KTyfsaNgp7UaJwTPpO4T6SpIItCjULt3DA9tXZf
- t4KOiEnnNfAA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.72,340,1580803200"; 
-   d="scan'208";a="423560866"
-Received: from jacob-builder.jf.intel.com (HELO jacob-builder) ([10.7.199.155])
-  by orsmga005.jf.intel.com with ESMTP; 03 Apr 2020 08:25:56 -0700
-Date:   Fri, 3 Apr 2020 08:31:45 -0700
-From:   Jacob Pan <jacob.jun.pan@linux.intel.com>
+        id S2404319AbgDCPez (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 Apr 2020 11:34:55 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:24276 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S2404257AbgDCPez (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 3 Apr 2020 11:34:55 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1585928094;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=fgNAe0kFX8jwOB1IGnADdVWTUeU+aOcqCkGioFUGvME=;
+        b=SvGMPv+8idHBbsM5WrX5tYgZroJqGik6Qm32npxoWZtufqyuVVhzBM+Ky+I9Vhy25M46wT
+        slKxqo8bLdlyW502k0wmXY/P+P2ydWqJmzU/IcJx1EgaJffIelTE78kQ/viaKjRDjx7p7b
+        0ucfHMt/rzjdnLx0KnNOGhOnOpnSEQ0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-330-uzZvj-nxM0uyMHF_EGtW_Q-1; Fri, 03 Apr 2020 11:34:44 -0400
+X-MC-Unique: uzZvj-nxM0uyMHF_EGtW_Q-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E9E90800D50;
+        Fri,  3 Apr 2020 15:34:42 +0000 (UTC)
+Received: from w520.home (ovpn-112-162.phx2.redhat.com [10.3.112.162])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 92087A0A7B;
+        Fri,  3 Apr 2020 15:34:36 +0000 (UTC)
+Date:   Fri, 3 Apr 2020 09:34:36 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
 To:     "Tian, Kevin" <kevin.tian@intel.com>
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>,
+Cc:     "Liu, Yi L" <yi.l.liu@intel.com>,
         "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
         "joro@8bytes.org" <joro@8bytes.org>,
         "Raj, Ashok" <ashok.raj@intel.com>,
         "Tian, Jun J" <jun.j.tian@intel.com>,
@@ -39,19 +48,18 @@ Cc:     Alex Williamson <alex.williamson@redhat.com>,
         "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Wu, Hao" <hao.wu@intel.com>, jacob.jun.pan@linux.intel.com
+        "Wu, Hao" <hao.wu@intel.com>
 Subject: Re: [PATCH v1 7/8] vfio/type1: Add VFIO_IOMMU_CACHE_INVALIDATE
-Message-ID: <20200403083145.5097d346@jacob-builder>
+Message-ID: <20200403093436.094b1928@w520.home>
 In-Reply-To: <AADFC41AFE54684AB9EE6CBC0274A5D19D807C4A@SHSMSX104.ccr.corp.intel.com>
 References: <1584880325-10561-1-git-send-email-yi.l.liu@intel.com>
         <1584880325-10561-8-git-send-email-yi.l.liu@intel.com>
         <20200402142428.2901432e@w520.home>
         <AADFC41AFE54684AB9EE6CBC0274A5D19D807C4A@SHSMSX104.ccr.corp.intel.com>
-Organization: OTC
-X-Mailer: Claws Mail 3.13.2 (GTK+ 2.24.30; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
@@ -70,20 +78,18 @@ On Fri, 3 Apr 2020 06:39:22 +0000
 > > >
 > > > For VFIO IOMMUs with the type VFIO_TYPE1_NESTING_IOMMU, guest  
 > > "owns" the  
-> > > first-level/stage-1 translation structures, the host IOMMU driver
-> > > has no knowledge of first-level/stage-1 structure cache updates
-> > > unless the guest invalidation requests are trapped and propagated
-> > > to the host.
+> > > first-level/stage-1 translation structures, the host IOMMU driver has no
+> > > knowledge of first-level/stage-1 structure cache updates unless the guest
+> > > invalidation requests are trapped and propagated to the host.
 > > >
 > > > This patch adds a new IOCTL VFIO_IOMMU_CACHE_INVALIDATE to  
 > > propagate guest  
-> > > first-level/stage-1 IOMMU cache invalidations to host to ensure
-> > > IOMMU  
+> > > first-level/stage-1 IOMMU cache invalidations to host to ensure IOMMU  
 > > cache  
 > > > correctness.
 > > >
-> > > With this patch, vSVA (Virtual Shared Virtual Addressing) can be
-> > > used safely as the host IOMMU iotlb correctness are ensured.
+> > > With this patch, vSVA (Virtual Shared Virtual Addressing) can be used safely
+> > > as the host IOMMU iotlb correctness are ensured.
 > > >
 > > > Cc: Kevin Tian <kevin.tian@intel.com>
 > > > CC: Jacob Pan <jacob.jun.pan@linux.intel.com>
@@ -111,25 +117,23 @@ On Fri, 3 Apr 2020 06:39:22 +0000
 > > >
 > > > +static int vfio_cache_inv_fn(struct device *dev, void *data)
 > > > +{
-> > > +	struct domain_capsule *dc = (struct domain_capsule
-> > > *)data;
+> > > +	struct domain_capsule *dc = (struct domain_capsule *)data;
 > > > +	struct iommu_cache_invalidate_info *cache_inv_info =
 > > > +		(struct iommu_cache_invalidate_info *) dc->data;
 > > > +
-> > > +	return iommu_cache_invalidate(dc->domain, dev,
-> > > cache_inv_info); +}
+> > > +	return iommu_cache_invalidate(dc->domain, dev, cache_inv_info);
+> > > +}
 > > > +
 > > >  static long vfio_iommu_type1_ioctl(void *iommu_data,
-> > >  				   unsigned int cmd, unsigned
-> > > long arg) {
+> > >  				   unsigned int cmd, unsigned long arg)
+> > >  {
 > > > @@ -2629,6 +2638,46 @@ static long vfio_iommu_type1_ioctl(void  
 > > *iommu_data,  
 > > >  		}
 > > >  		kfree(gbind_data);
 > > >  		return ret;
 > > > +	} else if (cmd == VFIO_IOMMU_CACHE_INVALIDATE) {
-> > > +		struct vfio_iommu_type1_cache_invalidate
-> > > cache_inv;
+> > > +		struct vfio_iommu_type1_cache_invalidate cache_inv;
 > > > +		u32 version;
 > > > +		int info_size;
 > > > +		void *cache_info;
@@ -149,29 +153,20 @@ On Fri, 3 Apr 2020 06:39:22 +0000
 > some discussions, we need your guidance how to move forward.
 > Jacob summarized available options below:
 > 	https://lkml.org/lkml/2020/4/2/876
-> 
-For this particular case, I don't quite get the difference between
-minsz=flags and minsz=version. Our IOMMU version scheme will only
-change size at the end where the variable union is used for vendor
-specific extensions. Version bump does not change size (only re-purpose
-padding) from the start of the UAPI structure to the union, i.e. version
-will __always__ be after struct vfio_iommu_type1_cache_invalidate.flags.
 
+Ok
 
 > >   
 > > > +
-> > > +		if (copy_from_user(&cache_inv, (void __user
-> > > *)arg, minsz))
+> > > +		if (copy_from_user(&cache_inv, (void __user *)arg, minsz))
 > > > +			return -EFAULT;
 > > > +
 > > > +		if (cache_inv.argsz < minsz || cache_inv.flags)
 > > > +			return -EINVAL;
 > > > +
-> > > +		/* Get the version of struct
-> > > iommu_cache_invalidate_info */
+> > > +		/* Get the version of struct iommu_cache_invalidate_info */
 > > > +		if (copy_from_user(&version,
-> > > +			(void __user *) (arg + minsz),
-> > > sizeof(version)))
+> > > +			(void __user *) (arg + minsz), sizeof(version)))
 > > > +			return -EFAULT;
 > > > +
 > > > +		info_size = iommu_uapi_get_data_size(
@@ -183,27 +178,27 @@ will __always__ be after struct vfio_iommu_type1_cache_invalidate.flags.
 > > > +			return -ENOMEM;
 > > > +
 > > > +		if (copy_from_user(cache_info,
-> > > +			(void __user *) (arg + minsz),
-> > > info_size)) {
+> > > +			(void __user *) (arg + minsz), info_size)) {
 > > > +			kfree(cache_info);
 > > > +			return -EFAULT;
 > > > +		}
 > > > +
 > > > +		mutex_lock(&iommu->lock);
-> > > +		ret = vfio_iommu_for_each_dev(iommu,
-> > > vfio_cache_inv_fn,
+> > > +		ret = vfio_iommu_for_each_dev(iommu, vfio_cache_inv_fn,
 > > > +					    cache_info);  
 > > 
-> > How does a user respond when their cache invalidate fails?  Isn't
-> > this also another case where our for_each_dev can fail at an
-> > arbitrary point leaving us with no idea whether each device even
-> > had the opportunity to perform the invalidation request.  I don't
-> > see how we have any chance to maintain coherency after this
-> > faults.  
+> > How does a user respond when their cache invalidate fails?  Isn't this
+> > also another case where our for_each_dev can fail at an arbitrary point
+> > leaving us with no idea whether each device even had the opportunity to
+> > perform the invalidation request.  I don't see how we have any chance
+> > to maintain coherency after this faults.  
 > 
 > Then can we make it simple to support singleton group only? 
-> 
-> >   
+
+Are you suggesting a single group per container or a single device per
+group?  Unless we have both, aren't we always going to have this issue.
+OTOH, why should a cache invalidate fail?
+
 > > > +		mutex_unlock(&iommu->lock);
 > > > +		kfree(cache_info);
 > > > +		return ret;
@@ -216,31 +211,24 @@ will __always__ be after struct vfio_iommu_type1_cache_invalidate.flags.
 > > > +++ b/include/uapi/linux/vfio.h
 > > > @@ -899,6 +899,28 @@ struct vfio_iommu_type1_bind {
 > > >   */
-> > >  #define VFIO_IOMMU_BIND		_IO(VFIO_TYPE, VFIO_BASE
-> > > + 23)
+> > >  #define VFIO_IOMMU_BIND		_IO(VFIO_TYPE, VFIO_BASE + 23)
 > > >
 > > > +/**
 > > > + * VFIO_IOMMU_CACHE_INVALIDATE - _IOW(VFIO_TYPE, VFIO_BASE + 24,
-> > > + *			struct
-> > > vfio_iommu_type1_cache_invalidate)
+> > > + *			struct vfio_iommu_type1_cache_invalidate)
 > > > + *
-> > > + * Propagate guest IOMMU cache invalidation to the host. The
-> > > cache
-> > > + * invalidation information is conveyed by @cache_info, the
-> > > content
+> > > + * Propagate guest IOMMU cache invalidation to the host. The cache
+> > > + * invalidation information is conveyed by @cache_info, the content
 > > > + * format would be structures defined in uapi/linux/iommu.h. User
-> > > + * should be aware of that the struct
-> > > iommu_cache_invalidate_info
-> > > + * has a @version field, vfio needs to parse this field before
-> > > getting
+> > > + * should be aware of that the struct  iommu_cache_invalidate_info
+> > > + * has a @version field, vfio needs to parse this field before getting
 > > > + * data from userspace.
 > > > + *
 > > > + * Availability of this IOCTL is after VFIO_SET_IOMMU.  
 > > 
 > > Is this a necessary qualifier?  A user can try to call this ioctl at
-> > any point, it only makes sense in certain configurations, but it
-> > should always "do the right thing" relative to the container iommu
-> > config.
+> > any point, it only makes sense in certain configurations, but it should
+> > always "do the right thing" relative to the container iommu config.
 > > 
 > > Also, I don't see anything in these last few patches testing the
 > > operating IOMMU model, what happens when a user calls them when not
@@ -251,10 +239,6 @@ will __always__ be after struct vfio_iommu_type1_cache_invalidate.flags.
 > 
 > I think so. We should add the nesting check in those new ioctls.
 > 
-I also added nesting domain attribute check in IOMMU driver, so bind
-guest PASID will fail if nesting mode is not supported. There will be
-no invalidation w/o bind.
-
 > >   
 > > > + *
 > > > + * returns: 0 on success, -errno on failure.
@@ -264,56 +248,28 @@ no invalidation w/o bind.
 > > > +	__u32   flags;
 > > > +	struct	iommu_cache_invalidate_info cache_info;
 > > > +};
-> > > +#define VFIO_IOMMU_CACHE_INVALIDATE      _IO(VFIO_TYPE,
-> > > VFIO_BASE  
+> > > +#define VFIO_IOMMU_CACHE_INVALIDATE      _IO(VFIO_TYPE, VFIO_BASE  
 > > + 24)
 > > 
-> > The future extension capabilities of this ioctl worry me, I wonder
-> > if we should do another data[] with flag defining that data as
-> > CACHE_INFO.  
+> > The future extension capabilities of this ioctl worry me, I wonder if
+> > we should do another data[] with flag defining that data as CACHE_INFO.  
 > 
 > Can you elaborate? Does it mean with this way we don't rely on iommu
 > driver to provide version_to_size conversion and instead we just pass
 > data[] to iommu driver for further audit?
-> 
-I guess Alex meant we do something similar to:
-struct vfio_irq_set {
-	__u32	argsz;
-	__u32	flags;
-#define VFIO_IRQ_SET_DATA_NONE		(1 << 0) /* Data not present */
-#define VFIO_IRQ_SET_DATA_BOOL		(1 << 1) /* Data is bool (u8) */
-#define VFIO_IRQ_SET_DATA_EVENTFD	(1 << 2) /* Data is eventfd (s32) */
-#define VFIO_IRQ_SET_ACTION_MASK	(1 << 3) /* Mask interrupt */
-#define VFIO_IRQ_SET_ACTION_UNMASK	(1 << 4) /* Unmask interrupt */
-#define VFIO_IRQ_SET_ACTION_TRIGGER	(1 << 5) /* Trigger interrupt */
-	__u32	index;
-	__u32	start;
-	__u32	count;
-	__u8	data[];
-};
 
-So we could do:
-struct vfio_iommu_type1_cache_invalidate {
-	__u32   argsz;
-#define VFIO_INVL_DATA_NONE
-#define VFIO_INVL_DATA_CACHE_INFO		(1 << 1)
-	__u32   flags;
-	__u8	data[];
-}
+No, my concern is that this ioctl has a single function, strictly tied
+to the iommu uapi.  If we replace cache_info with data[] then we can
+define a flag to specify that data[] is struct
+iommu_cache_invalidate_info, and if we need to, a different flag to
+identify data[] as something else.  For example if we get stuck
+expanding cache_info to meet new demands and develop a new uapi to
+solve that, how would we expand this ioctl to support it rather than
+also create a new ioctl?  There's also a trade-off in making the ioctl
+usage more difficult for the user.  I'd still expect the vfio layer to
+check the flag and interpret data[] as indicated by the flag rather
+than just passing a blob of opaque data to the iommu layer though.
+Thanks,
 
-We still need version_to_size version, but under
-if (flag & VFIO_INVL_DATA_CACHE_INFO)
-	get_size_from_version();
+Alex
 
-> >   
-> > > +
-> > >  /* -------- Additional API for SPAPR TCE (Server POWERPC) IOMMU
-> > > --------  
-> > */  
-> > >
-> > >  /*  
-> 
-> Thanks
-> Kevin
-
-[Jacob Pan]
