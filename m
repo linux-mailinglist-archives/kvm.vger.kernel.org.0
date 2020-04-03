@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D41BD19DA21
-	for <lists+kvm@lfdr.de>; Fri,  3 Apr 2020 17:31:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1355B19DA2A
+	for <lists+kvm@lfdr.de>; Fri,  3 Apr 2020 17:31:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404302AbgDCPbJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 Apr 2020 11:31:09 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:51166 "EHLO
+        id S2404345AbgDCPb2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 Apr 2020 11:31:28 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:60103 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S2404294AbgDCPbI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 3 Apr 2020 11:31:08 -0400
+        with ESMTP id S2404293AbgDCPbK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 3 Apr 2020 11:31:10 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1585927867;
+        s=mimecast20190719; t=1585927869;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=CD7baw1Qg+npMYnPmj7hxrzhNyYIW5i9m/6usTzXTDc=;
-        b=cwqJEDsXUcuIEETxvUreLUlMinpydsnzhUIw3k+NvDOiaIi10P/WqGEQv/JD7qo9SuvjZ+
-        cK2ZALLY98lGdQFxqJq0nEM5miLn4wUh+B89X6HFmUN9yWR5DK+tNXuTv5xbFo6gHS6JCR
-        BPSh1+hy6k7N9Yw+QWmMHvIT7UniVkU=
+        bh=5Mna+DLBALS7Nv4a/6CqV2AmkqQOOKpm1xodEo/O7Gc=;
+        b=MsT0cfMpBjOopiQKCAqXD9aXdwmFiWMzdqYPyEYzyOjoLik8SM/EgHmS1Dtaq2vLmMPDMx
+        Aw6ZJ4pG0IXiqywCjvNCZrjkvL2nxTaR/vV3Ljj1g91uEYG12lfchdsUveTRrKo0d6AQIC
+        ILXqcnDPceuGZH54ttOhlBvJ2DwJZSE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-279-E-MBlT1wM_yzRbhycaQEoQ-1; Fri, 03 Apr 2020 11:31:05 -0400
-X-MC-Unique: E-MBlT1wM_yzRbhycaQEoQ-1
+ us-mta-390-3_BoqKm6MkSVwTpjGmDjAA-1; Fri, 03 Apr 2020 11:31:08 -0400
+X-MC-Unique: 3_BoqKm6MkSVwTpjGmDjAA-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 51C9B1005516;
-        Fri,  3 Apr 2020 15:31:04 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8BBD2800D50;
+        Fri,  3 Apr 2020 15:31:06 +0000 (UTC)
 Received: from t480s.redhat.com (ovpn-112-213.ams2.redhat.com [10.36.112.213])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 66B0D26DC4;
-        Fri,  3 Apr 2020 15:31:02 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 9D8D626DD1;
+        Fri,  3 Apr 2020 15:31:04 +0000 (UTC)
 From:   David Hildenbrand <david@redhat.com>
 To:     kvm@vger.kernel.org
 Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
@@ -42,9 +42,9 @@ Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
         Janosch Frank <frankja@linux.ibm.com>,
         Christian Borntraeger <borntraeger@de.ibm.com>,
         David Hildenbrand <david@redhat.com>
-Subject: [PATCH v2 3/5] KVM: s390: vsie: Fix possible race when shadowing region 3 tables
-Date:   Fri,  3 Apr 2020 17:30:48 +0200
-Message-Id: <20200403153050.20569-4-david@redhat.com>
+Subject: [PATCH v2 4/5] KVM: s390: vsie: Move conditional reschedule
+Date:   Fri,  3 Apr 2020 17:30:49 +0200
+Message-Id: <20200403153050.20569-5-david@redhat.com>
 In-Reply-To: <20200403153050.20569-1-david@redhat.com>
 References: <20200403153050.20569-1-david@redhat.com>
 MIME-Version: 1.0
@@ -55,45 +55,38 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-We have to properly retry again by returning -EINVAL immediately in case
-somebody else instantiated the table concurrently. We missed to add the
-goto in this function only. The code now matches the other, similar
-shadowing functions.
+Let's move it to the outer loop, in case we ever run again into long
+loops, trying to map the prefix. While at it, convert it to cond_resched(=
+).
 
-We are overwriting an existing region 2 table entry. All allocated pages
-are added to the crst_list to be freed later, so they are not lost
-forever. However, when unshadowing the region 2 table, we wouldn't trigge=
-r
-unshadowing of the original shadowed region 3 table that we replaced. It
-would get unshadowed when the original region 3 table is modified. As it'=
-s
-not connected to the page table hierarchy anymore, it's not going to get
-used anymore. However, for a limited time, this page table will stick
-around, so it's in some sense a temporary memory leak.
-
-Identified by manual code inspection. I don't think this classifies as
-stable material.
-
-Fixes: 998f637cc4b9 ("s390/mm: avoid races on region/segment/page table s=
-hadowing")
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- arch/s390/mm/gmap.c | 1 +
- 1 file changed, 1 insertion(+)
+ arch/s390/kvm/vsie.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/arch/s390/mm/gmap.c b/arch/s390/mm/gmap.c
-index b93dd54b234a..24ef30fb0833 100644
---- a/arch/s390/mm/gmap.c
-+++ b/arch/s390/mm/gmap.c
-@@ -1844,6 +1844,7 @@ int gmap_shadow_r3t(struct gmap *sg, unsigned long =
-saddr, unsigned long r3t,
- 		goto out_free;
- 	} else if (*table & _REGION_ENTRY_ORIGIN) {
- 		rc =3D -EAGAIN;		/* Race with shadow */
-+		goto out_free;
+diff --git a/arch/s390/kvm/vsie.c b/arch/s390/kvm/vsie.c
+index 4f6c22d72072..ef05b4e167fb 100644
+--- a/arch/s390/kvm/vsie.c
++++ b/arch/s390/kvm/vsie.c
+@@ -1000,8 +1000,6 @@ static int do_vsie_run(struct kvm_vcpu *vcpu, struc=
+t vsie_page *vsie_page)
+=20
+ 	handle_last_fault(vcpu, vsie_page);
+=20
+-	if (need_resched())
+-		schedule();
+ 	if (test_cpu_flag(CIF_MCCK_PENDING))
+ 		s390_handle_mcck();
+=20
+@@ -1185,6 +1183,7 @@ static int vsie_run(struct kvm_vcpu *vcpu, struct v=
+sie_page *vsie_page)
+ 		    kvm_s390_vcpu_has_irq(vcpu, 0) ||
+ 		    kvm_s390_vcpu_sie_inhibited(vcpu))
+ 			break;
++		cond_resched();
  	}
- 	crst_table_init(s_r3t, _REGION3_ENTRY_EMPTY);
- 	/* mark as invalid as long as the parent table is not protected */
+=20
+ 	if (rc =3D=3D -EFAULT) {
 --=20
 2.25.1
 
