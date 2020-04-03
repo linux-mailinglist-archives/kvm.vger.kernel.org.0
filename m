@@ -2,134 +2,172 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 50B3B19D212
-	for <lists+kvm@lfdr.de>; Fri,  3 Apr 2020 10:23:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9A27719D219
+	for <lists+kvm@lfdr.de>; Fri,  3 Apr 2020 10:24:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390545AbgDCIXP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 Apr 2020 04:23:15 -0400
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:40760 "EHLO
-        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2390500AbgDCIXP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 3 Apr 2020 04:23:15 -0400
-Received: by mail-wm1-f65.google.com with SMTP id a81so6673228wmf.5
-        for <kvm@vger.kernel.org>; Fri, 03 Apr 2020 01:23:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=U598O76U1plvyjaapeO4Tf0HbIirnZODFv/NpOBhzfU=;
-        b=sS+v7CNSHWE4356b1WV3iEELGpmmrK+V8Z9u/2DN2ksjjpwVQ0i70e/y9PrqolZTvR
-         YgWGO5Z9s9oRyQ2O0oVNsV/IyvUKbUJxrvv6V/ITs0YV9P/0pLpm2PRplRyP2Bqt5z3B
-         D8Y4bDSIXNqWHJHKtTtvteUgo5s3BhtamspGDsGtxlS0wKdGT15tCOZ1F6kpCZshKX34
-         iuNHKvFVBXCnURhwDeh/Vv4p8xgOveUyiJJURsvP1oWALPnLGusrqaDt0Zs11FAyUrHm
-         f/msg2cCxBvecHpZxSQUibB5xrMts67F1WVonZhQUcmlQkKR12fTa/KWY+WwA1Iug4Md
-         IrTg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=U598O76U1plvyjaapeO4Tf0HbIirnZODFv/NpOBhzfU=;
-        b=h4TSQd+Hu7h7w4Sg2vn+0VJhNUn1AG1lRfjombNG/9eVCRWKxwiH+Zw5es5ymoNQlE
-         CUTOO7c2TQD+oVPocF8d3XFe1Kn+lfsXTGGrNEULAmSDxhRCWrCjtPKCwzb+dEeGe64V
-         EcuAPpDpLBfzxHfFT9yhX1qldYhifCnivMfh1C+6XnPMQ/RvgI9KDWZxteJ69MfisPPJ
-         tXV4OkghyCTw3AoMg8g4xTLbwKXdPeomJVkhKzgLQnLSzzHjJdaUWDqm2aCSURPBFQHT
-         xET2z+qtpu9UxQlpxAVEZpZAnHs9GmOa8w/n9Y5UDNb9IDdDyaX+npXKGaVc5QRuDXtb
-         WOAw==
-X-Gm-Message-State: AGi0PuadYZVUIEnOyJHXaDFu4qsPaAILYt7QDTmdV3C4vy78FA7SsPeY
-        fWvmHxvqpuIo9vOKdkIAmQI6tA==
-X-Google-Smtp-Source: APiQypJFlMG5cTB5/W9HLf5ZU0jVXEpq09c6jxtlvF0HcbDaR76403IdBh5WlxRSt57X9GXZ1B+fIw==
-X-Received: by 2002:a1c:4486:: with SMTP id r128mr7726787wma.32.1585902192918;
-        Fri, 03 Apr 2020 01:23:12 -0700 (PDT)
-Received: from myrica ([2001:171b:226b:54a0:116c:c27a:3e7f:5eaf])
-        by smtp.gmail.com with ESMTPSA id e8sm3163413wrw.40.2020.04.03.01.23.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 03 Apr 2020 01:23:12 -0700 (PDT)
-Date:   Fri, 3 Apr 2020 10:23:05 +0200
-From:   Jean-Philippe Brucker <jean-philippe@linaro.org>
-To:     Auger Eric <eric.auger@redhat.com>
-Cc:     "Liu, Yi L" <yi.l.liu@intel.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "Tian, Jun J" <jun.j.tian@intel.com>,
-        "Sun, Yi Y" <yi.y.sun@intel.com>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Wu, Hao" <hao.wu@intel.com>
-Subject: Re: [PATCH v1 5/8] vfio/type1: Report 1st-level/stage-1 format to
- userspace
-Message-ID: <20200403082305.GA1269501@myrica>
-References: <1584880325-10561-1-git-send-email-yi.l.liu@intel.com>
- <1584880325-10561-6-git-send-email-yi.l.liu@intel.com>
- <cb68e9ab-77b0-7e97-a661-4836962041d9@redhat.com>
- <A2975661238FB949B60364EF0F2C25743A21DB4E@SHSMSX104.ccr.corp.intel.com>
- <b47891b1-ece6-c263-9c07-07c09c7d3752@redhat.com>
+        id S2390553AbgDCIYD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 Apr 2020 04:24:03 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:27549 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S2390500AbgDCIYA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 3 Apr 2020 04:24:00 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1585902239;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=NTncJUoNdeKHAO92tzeCBJ8GvfQ7t10bHlzh4JiTrfM=;
+        b=Vqiw/iFewuoDzv5J5SjgNqxPlp0mSf4WUtSCVdZZg3WacQz4ol+rFbTZekx9zjdVNy3TY9
+        N1WO/GObPrFb5ubKkDmKWP6QqRRxA4V60mYkkVKjh1Ml3udbAjGC5fRZLGg1T+tALWmIin
+        xQVEI6osV/2QhH5x9XsEx7pG6S809Gs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-152-o0skrVGVN0GWSitMPoWZCA-1; Fri, 03 Apr 2020 04:23:55 -0400
+X-MC-Unique: o0skrVGVN0GWSitMPoWZCA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2A5DD8017CE;
+        Fri,  3 Apr 2020 08:23:54 +0000 (UTC)
+Received: from [10.36.112.58] (ovpn-112-58.ams2.redhat.com [10.36.112.58])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id E75C05C1D6;
+        Fri,  3 Apr 2020 08:23:50 +0000 (UTC)
+Subject: Re: [PATCH kvm-unit-tests] fixup! arm/arm64: ITS: pending table
+ migration test
+To:     Andrew Jones <drjones@redhat.com>
+Cc:     eric.auger.pro@gmail.com, maz@kernel.org,
+        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        qemu-devel@nongnu.org, qemu-arm@nongnu.org, yuzenghui@huawei.com,
+        peter.maydell@linaro.org, thuth@redhat.com,
+        alexandru.elisei@arm.com, andre.przywara@arm.com
+References: <20200402145227.20109-1-eric.auger@redhat.com>
+ <20200402180148.490026-1-drjones@redhat.com>
+ <a13e00e8-b699-103a-af6c-7807b67f8c70@redhat.com>
+ <20200403073754.6q6njhh25s2zutic@kamzik.brq.redhat.com>
+From:   Auger Eric <eric.auger@redhat.com>
+Message-ID: <84973989-d751-2f33-8de5-c83b0f71065d@redhat.com>
+Date:   Fri, 3 Apr 2020 10:23:49 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b47891b1-ece6-c263-9c07-07c09c7d3752@redhat.com>
+In-Reply-To: <20200403073754.6q6njhh25s2zutic@kamzik.brq.redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Apr 01, 2020 at 03:01:12PM +0200, Auger Eric wrote:
-> >>>  	header = vfio_info_cap_add(caps, sizeof(*nesting_cap),
-> >>>  				   VFIO_IOMMU_TYPE1_INFO_CAP_NESTING, 1);
-> >>> @@ -2254,6 +2309,7 @@ static int vfio_iommu_info_add_nesting_cap(struct
-> >> vfio_iommu *iommu,
-> >>>  		/* nesting iommu type supports PASID requests (alloc/free) */
-> >>>  		nesting_cap->nesting_capabilities |= VFIO_IOMMU_PASID_REQS;
-> >> What is the meaning for ARM?
-> > 
-> > I think it's just a software capability exposed to userspace, on
-> > userspace side, it has a choice to use it or not. :-) The reason
-> > define it and report it in cap nesting is that I'd like to make
-> > the pasid alloc/free be available just for IOMMU with type
-> > VFIO_IOMMU_TYPE1_NESTING. Please feel free tell me if it is not
-> > good for ARM. We can find a proper way to report the availability.
+Hi Drew,
+On 4/3/20 9:37 AM, Andrew Jones wrote:
+> On Fri, Apr 03, 2020 at 07:07:10AM +0200, Auger Eric wrote:
+>> Hi Drew,
+>>
+>> On 4/2/20 8:01 PM, Andrew Jones wrote:
+>>> [ Without the fix this test would hang, as timeouts don't work with
+>>>   the migration scripts (yet). Use errata to skip instead of hang. ]
+>>> Signed-off-by: Andrew Jones <drjones@redhat.com>
+>>> ---
+>>>  arm/gic.c  | 18 ++++++++++++++++--
+>>>  errata.txt |  1 +
+>>>  2 files changed, 17 insertions(+), 2 deletions(-)
+>>>
+>>> diff --git a/arm/gic.c b/arm/gic.c
+>>> index ddf0f9d09b14..c0781f8c2c80 100644
+>>> --- a/arm/gic.c
+>>> +++ b/arm/gic.c
+>>> @@ -12,6 +12,7 @@
+>>>   * This work is licensed under the terms of the GNU LGPL, version 2.
+>>>   */
+>>>  #include <libcflat.h>
+>>> +#include <errata.h>
+>>>  #include <asm/setup.h>
+>>>  #include <asm/processor.h>
+>>>  #include <asm/delay.h>
+>>> @@ -812,13 +813,23 @@ static void test_its_migration(void)
+>>>  	check_lpi_stats("dev7/eventid=255 triggers LPI 8196 on PE #2 after migration");
+>>>  }
+>>>  
+>>> +#define ERRATA_UNMAPPED_COLLECTIONS "ERRATA_8c58be34494b"
+>>> +
+>>>  static void test_migrate_unmapped_collection(void)
+>>>  {
+>>> -	struct its_collection *col;
+>>> -	struct its_device *dev2, *dev7;
+>>> +	struct its_collection *col = NULL;
+>>> +	struct its_device *dev2 = NULL, *dev7 = NULL;
+>>> +	bool test_skipped = false;
+>>>  	int pe0 = 0;
+>>>  	u8 config;
+>>>  
+>>> +	if (!errata(ERRATA_UNMAPPED_COLLECTIONS)) {
+>>> +		report_skip("Skipping test, as this test hangs without the fix. "
+>>> +			    "Set %s=y to enable.", ERRATA_UNMAPPED_COLLECTIONS);
+>>> +		test_skipped = true;
+>>> +		goto do_migrate;
+>> out of curiosity why do you still do the migration and not directly return.
 > 
-> Well it is more a question for jean-Philippe. Do we have a system wide
-> PASID allocation on ARM?
+> That won't work for the same reason the migration failure doesn't work.
+> The problem is with the migration scripts not completing when a migration
+> test doesn't successfully migrate. I plan to fix that when I get a bit of
+> time, and when I do, I'll post a patch removing this errata as well, as
+> it will no longer be needed to avoid test hangs. Anybody testing on a
+> kernel without the kernel fix after the migration scripts are fixed will
+> just get an appropriate FAIL instead.
 
-We don't, the PASID spaces are per-VM on Arm, so this function should
-consult the IOMMU driver before setting flags. As you said on patch 3,
-nested doesn't necessarily imply PASID support. The SMMUv2 does not
-support PASID but does support nesting stages 1 and 2 for the IOVA space.
-SMMUv3 support of PASID depends on HW capabilities. So I think this needs
-to be finer grained:
+OK Got it
 
-Does the container support:
-* VFIO_IOMMU_PASID_REQUEST?
-  -> Yes for VT-d 3
-  -> No for Arm SMMU
-* VFIO_IOMMU_{,UN}BIND_GUEST_PGTBL?
-  -> Yes for VT-d 3
-  -> Sometimes for SMMUv2
-  -> No for SMMUv3 (if we go with BIND_PASID_TABLE, which is simpler due to
-     PASID tables being in GPA space.)
-* VFIO_IOMMU_BIND_PASID_TABLE?
-  -> No for VT-d
-  -> Sometimes for SMMUv3
+Thanks
 
-Any bind support implies VFIO_IOMMU_CACHE_INVALIDATE support.
+Eric
+> 
+> Thanks,
+> drew
+> 
+>>
+>> Besides, what caused the migration to fail without 8c58be34494b is
+>> bypassed so:
+>>
+>> Reviewed-by: Eric Auger <eric.auger@redhat.com>
+>> Tested-by: Eric Auger <eric.auger@redhat.com>
+>>
+>> Thank you for the fixup
+>>
+>> Eric
+>>
+>>> +	}
+>>> +
+>>>  	if (its_setup1())
+>>>  		return;
+>>>  
+>>> @@ -830,9 +841,12 @@ static void test_migrate_unmapped_collection(void)
+>>>  	its_send_mapti(dev2, 8192, 0, col);
+>>>  	gicv3_lpi_set_config(8192, LPI_PROP_DEFAULT);
+>>>  
+>>> +do_migrate:
+>>>  	puts("Now migrate the VM, then press a key to continue...\n");
+>>>  	(void)getchar();
+>>>  	report_info("Migration complete");
+>>> +	if (test_skipped)
+>>> +		return;
+>>>  
+>>>  	/* on the destination, map the collection */
+>>>  	its_send_mapc(col, true);
+>>> diff --git a/errata.txt b/errata.txt
+>>> index 7d6abc2a7bf6..b66afaa9c079 100644
+>>> --- a/errata.txt
+>>> +++ b/errata.txt
+>>> @@ -5,4 +5,5 @@
+>>>  9e3f7a296940    : 4.9                           : arm64: KVM: pmu: Fix AArch32 cycle counter access
+>>>  7b6b46311a85    : 4.11                          : KVM: arm/arm64: Emulate the EL1 phys timer registers
+>>>  6c7a5dce22b3    : 4.12                          : KVM: arm/arm64: fix races in kvm_psci_vcpu_on
+>>> +8c58be34494b    : 5.6                           : KVM: arm/arm64: vgic-its: Fix restoration of unmapped collections
+>>>  #---------------:-------------------------------:---------------------------------------------------
+>>>
+>>
+>>
+> 
 
-
-> >>> +	nesting_cap->stage1_formats = formats;
-> >> as spotted by Kevin, since a single format is supported, rename
-> > 
-> > ok, I was believing it may be possible on ARM or so. :-) will
-> > rename it.
-
-Yes I don't think an u32 is going to cut it for Arm :( We need to describe
-all sorts of capabilities for page and PASID tables (granules, GPA size,
-ASID/PASID size, HW access/dirty, etc etc.) Just saying "Arm stage-1
-format" wouldn't mean much. I guess we could have a secondary vendor
-capability for these?
-
-Thanks,
-Jean
