@@ -2,173 +2,217 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 083F719D246
-	for <lists+kvm@lfdr.de>; Fri,  3 Apr 2020 10:31:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 684F519D3CC
+	for <lists+kvm@lfdr.de>; Fri,  3 Apr 2020 11:36:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390442AbgDCIbl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 Apr 2020 04:31:41 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:54928 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2389781AbgDCIbl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 3 Apr 2020 04:31:41 -0400
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0338OGmp055614;
-        Fri, 3 Apr 2020 08:30:44 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2020-01-29;
- bh=+eYpj3cHN7M9X5gjvpZpB28S2rfw41z8Hx4eWOPQmqc=;
- b=obY0/wpIduQrTs47sSo/eluXnEofW8KcMUwyYVc+JNZ8h06vI2YAxjQZDANz0qjW4Jzm
- tg3w+rvrKG8Fx5Y0nYfSe4eODjuWrQ5ZBKzaMCrl+YlVL17II4mgc1sFxd7cTNE/TabD
- 2fDQd4ggtzsk75a0JDt4+MgVBJrbT4hiAINiRiP7b+UIhdddZKtu12RRhh2j/xHOuuGA
- j3eUizifKl16HobLqjbscQPvS/mBQYS2rvHPasb0SK3XSGQn3HuaMLDLjpeOuIFndNhK
- l0Wp1fcBSs/2q9f5YGroyPougj4toKBsXLESH1HNn892AcnrVkT6luDxZU/dp33g7LFT Yg== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by aserp2120.oracle.com with ESMTP id 303yunj9k3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 03 Apr 2020 08:30:44 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0338MNp8180292;
-        Fri, 3 Apr 2020 08:30:43 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
-        by aserp3030.oracle.com with ESMTP id 302g4x1xj9-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 03 Apr 2020 08:30:43 +0000
-Received: from abhmp0015.oracle.com (abhmp0015.oracle.com [141.146.116.21])
-        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 0338UeKT004493;
-        Fri, 3 Apr 2020 08:30:40 GMT
-Received: from linux-1.home (/92.157.90.160)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Fri, 03 Apr 2020 01:30:39 -0700
-Subject: Re: [RESEND][patch V3 05/23] tracing: Provide lockdep less
- trace_hardirqs_on/off() variants
-To:     Thomas Gleixner <tglx@linutronix.de>,
-        LKML <linux-kernel@vger.kernel.org>
-Cc:     x86@kernel.org, Paul McKenney <paulmck@kernel.org>,
-        Josh Poimboeuf <jpoimboe@redhat.com>,
-        "Joel Fernandes (Google)" <joel@joelfernandes.org>,
-        "Steven Rostedt (VMware)" <rostedt@goodmis.org>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Alexei Starovoitov <ast@kernel.org>,
-        Frederic Weisbecker <frederic@kernel.org>,
-        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-        Brian Gerst <brgerst@gmail.com>,
-        Juergen Gross <jgross@suse.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-References: <20200320175956.033706968@linutronix.de>
- <20200320180032.895128936@linutronix.de>
-From:   Alexandre Chartre <alexandre.chartre@oracle.com>
-Message-ID: <322ac9e0-9567-8e7c-e2af-e9e1107717bf@oracle.com>
-Date:   Fri, 3 Apr 2020 10:34:56 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
-MIME-Version: 1.0
-In-Reply-To: <20200320180032.895128936@linutronix.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
+        id S1727835AbgDCJgx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 Apr 2020 05:36:53 -0400
+Received: from mx0b-0016f401.pphosted.com ([67.231.156.173]:56962 "EHLO
+        mx0b-0016f401.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727431AbgDCJgw (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 3 Apr 2020 05:36:52 -0400
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+        by mx0b-0016f401.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0339ZdgJ017561;
+        Fri, 3 Apr 2020 02:36:35 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
+ subject : date : message-id : content-type : content-transfer-encoding :
+ mime-version; s=pfpt0818; bh=cGb2wBmouhCx17lC8Fm43gboLcl8wrnu1Xh2z0Nn1Us=;
+ b=l1nKasdlXk3QQiRdnljUEuDr+7qs2TNRwkBmngKxG9iTisHyeuttmkdNAaHb4JSD93TL
+ RUMqKkC/zHeFzjEAl2pO660rGKfAS4dV3AZ3bdoxz0Vt7lSws6m5HgJjOMmvbCmGZZeS
+ qjr9RRvT/MhaimtmxjysOvfHbpZk5Nl8SHlFiFNtfTd0pdL1klmjWl6bGO9nlwm8GI+Z
+ QxlnbCkKUxFyyw8jkubuNQL6o44gaVXklliXKvBeGa6mD4GWN9mVkAewA+AcDTwfPLK5
+ olWQ7Nmalp8o+tKKTLtgZZbFYvR4ss+eM6u4yi0Z5alFqJkeWaBOT9alaoI6WyXdj+hG xQ== 
+Received: from sc-exch03.marvell.com ([199.233.58.183])
+        by mx0b-0016f401.pphosted.com with ESMTP id 3046h66b02-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+        Fri, 03 Apr 2020 02:36:35 -0700
+Received: from SC-EXCH04.marvell.com (10.93.176.84) by SC-EXCH03.marvell.com
+ (10.93.176.83) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Fri, 3 Apr
+ 2020 02:36:33 -0700
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.100)
+ by SC-EXCH04.marvell.com (10.93.176.84) with Microsoft SMTP Server (TLS) id
+ 15.0.1497.2 via Frontend Transport; Fri, 3 Apr 2020 02:36:33 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=hTuVhLEaKdMmQ8eDdpqO9nYuUpUfug1efkRk6OBhf+BBhkgRUEMWU71VJFKAsmKyJQQIeszwK6ZzEBhvfYHL7wLVLBi6pYigjpPiwtVNGsZDoXdoFTyMPk1uuqQ0Mbz20h/UHgp5JhnCJ2/GITvFaVrHMmM3h+iPLl3w/LBf2Wl/L6G7dtNhy8/s/G4Y4Ff0teZokEN33BbqKcV2uENG4Ega3NRz5eqPlqUWbKnpPJdUB4+dD+bkKELWt6NinLJfyzZaCQnLay88THOsbi+8wceDEgVvZ4x6T2+qd6QWNXF8nfrFN4MG9gmMqJs/wB28RbKpyuwkovJtrA+VfHLTEw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=cGb2wBmouhCx17lC8Fm43gboLcl8wrnu1Xh2z0Nn1Us=;
+ b=APbDrB4sUFKfrUxZLCb+n0iu3VWT5dd/TNHCZQk/nLaCEOHLsLhvQ4aL9WZjwx1MT3b6xvZICYpIVzuMJ+6WEDHsQrVUGQ9YSocJogvWlrb8mva55ox/xMtn3UarEW5z3IB9N6eWknZ5mQw1g8zbFaoJDL9uUmv98cZcwEygtS4nvdxGbE8qqvsmu9Pv8isy4xlwQZqODeZCdGS8MLtLs0XMGfZ+domXju1mKFFXEbcMSwkWoGwYvvtU1NnYENWbnyIy3bliCZx0wAMVX6K5pI1XMjgyBBUtcpRDA9PAYlwP1QBJz5II7JZJV9tj+khxDLqvtHizeQhjiurEewc9gA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=marvell.com; dmarc=pass action=none header.from=marvell.com;
+ dkim=pass header.d=marvell.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=marvell.onmicrosoft.com; s=selector1-marvell-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=cGb2wBmouhCx17lC8Fm43gboLcl8wrnu1Xh2z0Nn1Us=;
+ b=lBoO/pF6N8NtsLHDl4v0cj9wwLZvRjFqzoGC8CHYvXIn3NUduPPXN+cT3IW08tKWxeAiY+uQ/7Ta1tX8n4l6Gfq1Oss8uWlpolusVU8+fvyhRLxOzpA5GkgflHY7qa0nH+3Dk+WXliWC1TO8WsKJl15TSV3CjWn2ZAr2AR36HO8=
+Received: from MN2PR18MB2686.namprd18.prod.outlook.com (2603:10b6:208:ad::30)
+ by MN2PR18MB2477.namprd18.prod.outlook.com (2603:10b6:208:ae::24) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2878.19; Fri, 3 Apr
+ 2020 09:36:32 +0000
+Received: from MN2PR18MB2686.namprd18.prod.outlook.com
+ ([fe80::f9b3:90dc:bbf:4ebc]) by MN2PR18MB2686.namprd18.prod.outlook.com
+ ([fe80::f9b3:90dc:bbf:4ebc%3]) with mapi id 15.20.2878.018; Fri, 3 Apr 2020
+ 09:36:32 +0000
+From:   George Cherian <gcherian@marvell.com>
+To:     "maz@kernel.org" <maz@kernel.org>
+CC:     "Dave.Martin@arm.com" <Dave.Martin@arm.com>,
+        "alexandru.elisei@arm.com" <alexandru.elisei@arm.com>,
+        "andre.przywara@arm.com" <andre.przywara@arm.com>,
+        "christoffer.dall@arm.com" <christoffer.dall@arm.com>,
+        "james.morse@arm.com" <james.morse@arm.com>,
+        "jintack@cs.columbia.edu" <jintack@cs.columbia.edu>,
+        "julien.thierry.kdev@gmail.com" <julien.thierry.kdev@gmail.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>,
+        "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
+        Anil Kumar Reddy H <areddy3@marvell.com>,
+        Ganapatrao Kulkarni <gkulkarni@marvell.com>
+Subject: Re: Re: [PATCH v2 00/94] KVM: arm64: ARMv8.3/8.4 Nested
+ Virtualization support
+Thread-Topic: Re: [PATCH v2 00/94] KVM: arm64: ARMv8.3/8.4 Nested
+ Virtualization support
+Thread-Index: AdYJlBK1rICkZx4zTsKsIvAk2jZ4Fw==
+Date:   Fri, 3 Apr 2020 09:36:31 +0000
+Message-ID: <MN2PR18MB2686F84659A6A994ECDF8031C5C70@MN2PR18MB2686.namprd18.prod.outlook.com>
+Accept-Language: en-IN, en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9579 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 bulkscore=0 suspectscore=0
- mlxscore=0 spamscore=0 malwarescore=0 mlxlogscore=999 phishscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
- definitions=main-2004030071
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9579 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 lowpriorityscore=0
- malwarescore=0 adultscore=0 priorityscore=1501 mlxlogscore=999 bulkscore=0
- suspectscore=0 mlxscore=0 spamscore=0 impostorscore=0 clxscore=1015
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
- definitions=main-2004030071
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [49.207.55.211]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 7cab9660-af7f-4cd3-4799-08d7d7b27e73
+x-ms-traffictypediagnostic: MN2PR18MB2477:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <MN2PR18MB247786A820201E4B93D85BB2C5C70@MN2PR18MB2477.namprd18.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:8882;
+x-forefront-prvs: 0362BF9FDB
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR18MB2686.namprd18.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(10009020)(4636009)(39840400004)(396003)(136003)(376002)(346002)(366004)(316002)(54906003)(81156014)(8936002)(8676002)(81166006)(66446008)(64756008)(66556008)(66946007)(76116006)(52536014)(66476007)(53546011)(26005)(186003)(55016002)(7416002)(7696005)(9686003)(107886003)(6506007)(2906002)(5660300002)(4326008)(55236004)(6916009)(33656002)(478600001)(86362001)(71200400001);DIR:OUT;SFP:1101;
+received-spf: None (protection.outlook.com: marvell.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 2wf7UwOvguMSo8jsU9dFbm4YXBf6IBefn8/fY1mROqrQQ4PJArb9W6R6eHo32YRxvEx85xxhN6Be89PTBrKGAcgvvT7S/Zbkj7OCU0BBQibJjF+Ff6QUhQqvz4keoj3/SHWwhItuiLxudIK5K3LvGF01uquDAvUOuZF2LhGjEniiOzjHqic0DMvn7reUpdJANUkqTTs5Nc6bVCzci9lMLv5DtAA/A862xXmQj59WCCRy2Funl3hDf/llFW1rCT1x02Shhx0U2FX8vHvRlcfWhakNld1lMOrHzo2a3RagAW2eEeSHx2vlhPt4KPmhDEkQZOE3DyZkfVytKExtUOVPPGu2IFtT8qZYuURGHsZXzCzUtI/EG+4xA2eytZhsdF4bkb0ywGYt5AiO5kiJzAMhDK1o58jIsJwPEkLQrl2LEmqipfkz8pQEtDUi17WADH2g
+x-ms-exchange-antispam-messagedata: SOaU/lVQcHjn/6MPu2Xo6xGKbGOR4/bmpLgo0fruJWzNKJTNPtnmvM3KwvLeFnC6IcOHqVZMlXbTNNHuBYrl7neqDxl7fPxMvxNsr1XOg+3S4MgepcUqyWiQA/ivR2LhqS/0q8mAZ0w176eHoASC0Q==
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7cab9660-af7f-4cd3-4799-08d7d7b27e73
+X-MS-Exchange-CrossTenant-originalarrivaltime: 03 Apr 2020 09:36:32.1309
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 70e1fb47-1155-421d-87fc-2e58f638b6e0
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: mhuqdYxB8ItfKM12uKTcQ39U+CmRQynjoFotId7w7IQ23lo/N9ZRLGY9+8zR2o60FsRTPzV1Swlknqej8XvB5Q==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR18MB2477
+X-OriginatorOrg: marvell.com
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.676
+ definitions=2020-04-03_06:2020-04-02,2020-04-03 signatures=0
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
-On 3/20/20 7:00 PM, Thomas Gleixner wrote:
-> trace_hardirqs_on/off() is only partially safe vs. RCU idle. The tracer
-> core itself is safe, but the resulting tracepoints can be utilized by
-> e.g. BPF which is unsafe.
-> 
-> Provide variants which do not contain the lockdep invocation so the lockdep
-> and tracer invocations can be split at the call site and placed properly.
-> 
-> The new variants also do not use rcuidle as they are going to be called
-> from entry code after/before context tracking.
-> 
-> Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
-> ---
-> V2: New patch
-> ---
->   include/linux/irqflags.h        |    4 ++++
->   kernel/trace/trace_preemptirq.c |   23 +++++++++++++++++++++++
->   2 files changed, 27 insertions(+)
-> 
-> --- a/include/linux/irqflags.h
-> +++ b/include/linux/irqflags.h
-> @@ -29,6 +29,8 @@
->   #endif
->   
->   #ifdef CONFIG_TRACE_IRQFLAGS
-> +  extern void __trace_hardirqs_on(void);
-> +  extern void __trace_hardirqs_off(void);
->     extern void trace_hardirqs_on(void);
->     extern void trace_hardirqs_off(void);
->   # define trace_hardirq_context(p)	((p)->hardirq_context)
-> @@ -52,6 +54,8 @@ do {						\
->   	current->softirq_context--;		\
->   } while (0)
->   #else
-> +# define __trace_hardirqs_on()		do { } while (0)
-> +# define __trace_hardirqs_off()		do { } while (0)
->   # define trace_hardirqs_on()		do { } while (0)
->   # define trace_hardirqs_off()		do { } while (0)
->   # define trace_hardirq_context(p)	0
-> --- a/kernel/trace/trace_preemptirq.c
-> +++ b/kernel/trace/trace_preemptirq.c
-> @@ -19,6 +19,17 @@
->   /* Per-cpu variable to prevent redundant calls when IRQs already off */
->   static DEFINE_PER_CPU(int, tracing_irq_cpu);
->   
-> +void __trace_hardirqs_on(void)
-> +{
-> +	if (this_cpu_read(tracing_irq_cpu)) {
-> +		if (!in_nmi())
-> +			trace_irq_enable(CALLER_ADDR0, CALLER_ADDR1);
-> +		tracer_hardirqs_on(CALLER_ADDR0, CALLER_ADDR1);
-> +		this_cpu_write(tracing_irq_cpu, 0);
-> +	}
-> +}
-> +NOKPROBE_SYMBOL(__trace_hardirqs_on);
-> +
 
-It would be good to have a comment which highlights the difference between
-__trace_hardirqs_on/off and trace_hardirqs_on/off because the code difference
-is not obvious and the function names are so similar.
+> -----Original Message-----
+> From: Marc Zyngier <maz@kernel.org>
+> Sent: Friday, April 3, 2020 1:32 PM
+> To: George Cherian <gcherian@marvell.com>
+> Cc: Dave.Martin@arm.com; alexandru.elisei@arm.com;
+> andre.przywara@arm.com; christoffer.dall@arm.com;
+> james.morse@arm.com; jintack@cs.columbia.edu;
+> julien.thierry.kdev@gmail.com; kvm@vger.kernel.org;
+> kvmarm@lists.cs.columbia.edu; linux-arm-kernel@lists.infradead.org;
+> suzuki.poulose@arm.com; Anil Kumar Reddy H <areddy3@marvell.com>;
+> Ganapatrao Kulkarni <gkulkarni@marvell.com>
+> Subject: Re: [PATCH v2 00/94] KVM: arm64: ARMv8.3/8.4 Nested
+> Virtualization support
+>=20
+>=20
+> ----------------------------------------------------------------------
+> Hi George,
+>=20
+> On 2020-04-03 08:27, George Cherian wrote:
+> > Hi Marc,
+> >
+> > On 2/11/20 9:48 AM, Marc Zyngier wrote:
+> >> This is a major rework of the NV series that I posted over 6 months
+> >> ago[1], and a lot has changed since then:
+> >>
+> >> - Early ARMv8.4-NV support
+> >> - ARMv8.4-TTL support in host and guest
+> >> - ARMv8.5-GTG support in host and guest
+> >> - Lots of comments addressed after the review
+> >> - Rebased on v5.6-rc1
+> >> - Way too many patches
+> >>
+> >> In my defence, the whole of the NV code is still smaller that the
+> >> 32bit KVM/arm code I'm about to remove, so I feel less bad inflicting
+> >> this on everyone! ;-)
+> >>
+> >> >From a functionality perspective, you can expect a L2 guest to work,
+> >> but don't even think of L3, as we only partially emulate the
+> >> ARMv8.{3,4}-NV extensions themselves. Same thing for vgic, debug,
+> >> PMU, as well as anything that would require a Stage-1 PTW. What we
+> >> want to achieve is that with NV disabled, there is no performance
+> >> overhead and no regression.
+> >>
+> >> The series is roughly divided in 5 parts: exception handling, memory
+> >> virtualization, interrupts and timers for ARMv8.3, followed by the
+> >> ARMv8.4 support. There are of course some dependencies, but you'll
+> >> hopefully get the gist of it.
+> >>
+> >> For the most courageous of you, I've put out a branch[2]. Of course,
+> >> you'll need some userspace. Andre maintains a hacked version of
+> >> kvmtool[3] that takes a --nested option, allowing the guest to be
+> >> started at EL2. You can run the whole stack in the Foundation model.
+> >> Don't be in a hurry ;-).
+> >>
+> > The full series was tested on both Foundation model as well as Marvell
+> > ThunderX3
+> > Emulation Platform.
+> > Basic boot testing done for Guest Hypervisor and Guest Guest.
+> >
+> > Tested-by:  George Cherian <george.cherian@marvell.com>
+>=20
+> Thanks for having given this a go.
+>=20
+> However, without more details, it is pretty hard to find out what you hav=
+e
+> tested.
+> What sort of guest have you booted, with what configuration, what
+> workloads did you run in the L2 guests and what are the architectural
+> features that TX3 implements?
+>=20
 
-alex.
+We have tried the following configurations and tests (GH - Guest Hypervisor=
+ GG- Guest Guest).
+1 - configuration: Host:8cpus/4GB Mem, GH:4vcpus/3GB, GG: 2vcpus/2GB
+Ran hackbench and Large Malloc tests (1GB allocations) across HOST,GH and G=
+G.=20
 
->   void trace_hardirqs_on(void)
->   {
->   	if (this_cpu_read(tracing_irq_cpu)) {
-> @@ -33,6 +44,18 @@ void trace_hardirqs_on(void)
->   EXPORT_SYMBOL(trace_hardirqs_on);
->   NOKPROBE_SYMBOL(trace_hardirqs_on);
->   
-> +void __trace_hardirqs_off(void)
-> +{
-> +	if (!this_cpu_read(tracing_irq_cpu)) {
-> +		this_cpu_write(tracing_irq_cpu, 1);
-> +		tracer_hardirqs_off(CALLER_ADDR0, CALLER_ADDR1);
-> +		if (!in_nmi())
-> +			trace_irq_disable(CALLER_ADDR0, CALLER_ADDR1);
-> +	}
-> +
-> +}
-> +NOKPROBE_SYMBOL(__trace_hardirqs_off);
-> +
->   void trace_hardirqs_off(void)
->   {
->   	if (!this_cpu_read(tracing_irq_cpu)) {
-> 
+2 - configuration: Host:8cpus/4GB Mem, GH:1vcpu/3GB, GG: 1vcpu/2GB
+Ran hackbench and Large Malloc tests across HOST,GH and GG. Host:
+
+We used QEMU for all these testing.=20
+
+TX3 implements v8.4 Enhanced Nested Virtualization Support.
+
+> The last point is specially important, as the NV architecture spans two m=
+ajor
+> revisions of the architecture and affects tons of other extensions that a=
+re
+> themselves optional. Without any detail on that front, I have no idea wha=
+t
+> the coverage of your testing is.
+>=20
+> Thanks,
+>=20
+>          M.
+> --
+> Jazz is not dead. It just smells funny...
