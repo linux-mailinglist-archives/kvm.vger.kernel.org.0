@@ -2,44 +2,44 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 89E2819E5C7
-	for <lists+kvm@lfdr.de>; Sat,  4 Apr 2020 16:38:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7E1D219E5CA
+	for <lists+kvm@lfdr.de>; Sat,  4 Apr 2020 16:38:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726599AbgDDOip (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 4 Apr 2020 10:38:45 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:23457 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726605AbgDDOip (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 4 Apr 2020 10:38:45 -0400
+        id S1726634AbgDDOit (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 4 Apr 2020 10:38:49 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:41388 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726485AbgDDOis (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sat, 4 Apr 2020 10:38:48 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1586011124;
+        s=mimecast20190719; t=1586011127;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=1LCVI6Q4/Ny0Rm6fGm4deZaX1vxgVnpBC6xTC+/9SMI=;
-        b=E7UDU0aXO7PC8iQxb8nnWLg/j2NRgex0QZt4yW/6/05E8xzV21S/4JLFsePeNvx2DMdA0k
-        IXQCEGxCQMetD3lkPQCYTEy9Uibyf0o+2nw1kn1juJUkNvrToObZv/4wFCewvB2v0qY68Q
-        KXatm4XmH+8hiyttY3Vx7Zfe1ujDNJ0=
+        bh=o/HtE4kD9Ya8MkHXVocYcKIgEQVisPRhIPUyZlQYN94=;
+        b=Lzs9e61XzaoZFe3xpXSFLPpm3G9id16dKyw+C4qHPJ9FGnUnpTP9Z5aMFPSZ64aWpTt861
+        JZM0OCcYbjINvBko6u/XTlpHTdIKdId4scY9mbfy3CJa0ShOOcN7BSOmFUxczPGx3HNF5b
+        J+lxG04j7YvnSiJAfSVkhAYc1CaNO3U=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-26-ps8eJ8gOO--NCAUGHPGUAA-1; Sat, 04 Apr 2020 10:38:42 -0400
-X-MC-Unique: ps8eJ8gOO--NCAUGHPGUAA-1
+ us-mta-395-Dqa0rjBvOBe8HVdERkn99Q-1; Sat, 04 Apr 2020 10:38:44 -0400
+X-MC-Unique: Dqa0rjBvOBe8HVdERkn99Q-1
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6187E1005513;
-        Sat,  4 Apr 2020 14:38:41 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BEC2E107ACC7;
+        Sat,  4 Apr 2020 14:38:43 +0000 (UTC)
 Received: from kamzik.brq.redhat.com (unknown [10.40.192.30])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9C2D79B912;
-        Sat,  4 Apr 2020 14:38:39 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id DB9079B912;
+        Sat,  4 Apr 2020 14:38:41 +0000 (UTC)
 From:   Andrew Jones <drjones@redhat.com>
 To:     pbonzini@redhat.com
 Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
         Eric Auger <eric.auger@redhat.com>
-Subject: [PULL kvm-unit-tests 25/39] arm: gic: Introduce gic_irq_set_clr_enable() helper
-Date:   Sat,  4 Apr 2020 16:37:17 +0200
-Message-Id: <20200404143731.208138-26-drjones@redhat.com>
+Subject: [PULL kvm-unit-tests 26/39] arm: pmu: Test overflow interrupts
+Date:   Sat,  4 Apr 2020 16:37:18 +0200
+Message-Id: <20200404143731.208138-27-drjones@redhat.com>
 In-Reply-To: <20200404143731.208138-1-drjones@redhat.com>
 References: <20200404143731.208138-1-drjones@redhat.com>
 MIME-Version: 1.0
@@ -52,76 +52,224 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Eric Auger <eric.auger@redhat.com>
 
-Allows to set or clear the enable state of a PPI/SGI/SPI.
+Test overflows for MEM_ACCESS and SW_INCR events. Also tests
+overflows with 64-bit events.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 Signed-off-by: Andrew Jones <drjones@redhat.com>
 ---
- lib/arm/asm/gic.h |  4 ++++
- lib/arm/gic.c     | 31 +++++++++++++++++++++++++++++++
- 2 files changed, 35 insertions(+)
+ arm/pmu.c         | 139 ++++++++++++++++++++++++++++++++++++++++++++++
+ arm/unittests.cfg |   6 ++
+ 2 files changed, 145 insertions(+)
 
-diff --git a/lib/arm/asm/gic.h b/lib/arm/asm/gic.h
-index 922cbe95750c..afb33096078d 100644
---- a/lib/arm/asm/gic.h
-+++ b/lib/arm/asm/gic.h
-@@ -82,5 +82,9 @@ extern void gic_ipi_send_single(int irq, int cpu);
- extern void gic_ipi_send_mask(int irq, const cpumask_t *dest);
- extern enum gic_irq_state gic_irq_state(int irq);
+diff --git a/arm/pmu.c b/arm/pmu.c
+index 9602e70f4185..cece53ef6431 100644
+--- a/arm/pmu.c
++++ b/arm/pmu.c
+@@ -59,12 +59,20 @@
+ #define PRE_OVERFLOW		0xFFFFFFF0
+ #define PRE_OVERFLOW2		0xFFFFFFDC
 =20
-+void gic_irq_set_clr_enable(int irq, bool enable);
-+#define gic_enable_irq(irq) gic_irq_set_clr_enable(irq, true)
-+#define gic_disable_irq(irq) gic_irq_set_clr_enable(irq, false)
++#define PMU_PPI			23
 +
- #endif /* !__ASSEMBLY__ */
- #endif /* _ASMARM_GIC_H_ */
-diff --git a/lib/arm/gic.c b/lib/arm/gic.c
-index c3c5f6bc5b0e..8a1a8c84bf29 100644
---- a/lib/arm/gic.c
-+++ b/lib/arm/gic.c
-@@ -147,6 +147,36 @@ void gic_ipi_send_mask(int irq, const cpumask_t *des=
-t)
- 	gic_common_ops->ipi_send_mask(irq, dest);
+ struct pmu {
+ 	unsigned int version;
+ 	unsigned int nb_implemented_counters;
+ 	uint32_t pmcr_ro;
+ };
+=20
++struct pmu_stats {
++	unsigned long bitmap;
++	uint32_t interrupts[32];
++	bool unexpected;
++};
++
+ static struct pmu pmu;
+=20
+ #if defined(__arm__)
+@@ -146,6 +154,7 @@ static void test_sw_incr(void) {}
+ static void test_chained_counters(void) {}
+ static void test_chained_sw_incr(void) {}
+ static void test_chain_promotion(void) {}
++static void test_overflow_interrupt(void) {}
+=20
+ #elif defined(__aarch64__)
+ #define ID_AA64DFR0_PERFMON_SHIFT 8
+@@ -276,6 +285,43 @@ asm volatile(
+ 	: "x9", "x10", "cc");
  }
 =20
-+void gic_irq_set_clr_enable(int irq, bool enable)
++static struct pmu_stats pmu_stats;
++
++static void irq_handler(struct pt_regs *regs)
 +{
-+	u32 offset, split =3D 32, shift =3D (irq % 32);
-+	u32 reg, mask =3D BIT(shift);
-+	void *base;
++	uint32_t irqstat, irqnr;
 +
-+	assert(irq < 1020);
++	irqstat =3D gic_read_iar();
++	irqnr =3D gic_iar_irqnr(irqstat);
 +
-+	switch (gic_version()) {
-+	case 2:
-+		offset =3D enable ? GICD_ISENABLER : GICD_ICENABLER;
-+		base =3D gicv2_dist_base();
-+		break;
-+	case 3:
-+		if (irq < 32) {
-+			offset =3D enable ? GICR_ISENABLER0 : GICR_ICENABLER0;
-+			base =3D gicv3_sgi_base();
-+		} else {
-+			offset =3D enable ? GICD_ISENABLER : GICD_ICENABLER;
-+			base =3D gicv3_dist_base();
++	if (irqnr =3D=3D PMU_PPI) {
++		unsigned long overflows =3D read_sysreg(pmovsclr_el0);
++		int i;
++
++		for (i =3D 0; i < 32; i++) {
++			if (test_and_clear_bit(i, &overflows)) {
++				pmu_stats.interrupts[i]++;
++				pmu_stats.bitmap |=3D 1 << i;
++			}
 +		}
-+		break;
-+	default:
-+		assert(0);
++		write_sysreg(ALL_SET, pmovsclr_el0);
++	} else {
++		pmu_stats.unexpected =3D true;
 +	}
-+	base +=3D offset + (irq / split) * 4;
-+	reg =3D readl(base);
-+	writel(reg | mask, base);
++	gic_write_eoir(irqstat);
 +}
 +
- enum gic_irq_state gic_irq_state(int irq)
- {
- 	enum gic_irq_state state;
-@@ -191,3 +221,4 @@ enum gic_irq_state gic_irq_state(int irq)
-=20
- 	return state;
- }
++static void pmu_reset_stats(void)
++{
++	int i;
 +
++	for (i =3D 0; i < 32; i++)
++		pmu_stats.interrupts[i] =3D 0;
++
++	pmu_stats.bitmap =3D 0;
++	pmu_stats.unexpected =3D false;
++}
++
+ static void pmu_reset(void)
+ {
+ 	/* reset all counters, counting disabled at PMCR level*/
+@@ -286,6 +332,7 @@ static void pmu_reset(void)
+ 	write_sysreg(ALL_SET, pmovsclr_el0);
+ 	/* disable overflow interrupts on all counters */
+ 	write_sysreg(ALL_SET, pmintenclr_el1);
++	pmu_reset_stats();
+ 	isb();
+ }
+=20
+@@ -728,6 +775,94 @@ static void test_chain_promotion(void)
+ 			read_sysreg(pmovsclr_el0));
+ }
+=20
++static bool expect_interrupts(uint32_t bitmap)
++{
++	int i;
++
++	if (pmu_stats.bitmap ^ bitmap || pmu_stats.unexpected)
++		return false;
++
++	for (i =3D 0; i < 32; i++) {
++		if (test_and_clear_bit(i, &pmu_stats.bitmap))
++			if (pmu_stats.interrupts[i] !=3D 1)
++				return false;
++	}
++	return true;
++}
++
++static void test_overflow_interrupt(void)
++{
++	uint32_t events[] =3D {MEM_ACCESS, SW_INCR};
++	void *addr =3D malloc(PAGE_SIZE);
++	int i;
++
++	if (!satisfy_prerequisites(events, ARRAY_SIZE(events)))
++		return;
++
++	gic_enable_defaults();
++	install_irq_handler(EL1H_IRQ, irq_handler);
++	local_irq_enable();
++	gic_enable_irq(23);
++
++	pmu_reset();
++
++	write_regn_el0(pmevtyper, 0, MEM_ACCESS | PMEVTYPER_EXCLUDE_EL0);
++	write_regn_el0(pmevtyper, 1, SW_INCR | PMEVTYPER_EXCLUDE_EL0);
++	write_sysreg_s(0x3, PMCNTENSET_EL0);
++	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
++	write_regn_el0(pmevcntr, 1, PRE_OVERFLOW);
++	isb();
++
++	/* interrupts are disabled */
++
++	mem_access_loop(addr, 200, pmu.pmcr_ro | PMU_PMCR_E);
++	report(expect_interrupts(0), "no overflow interrupt after preset");
++
++	set_pmcr(pmu.pmcr_ro | PMU_PMCR_E);
++	for (i =3D 0; i < 100; i++)
++		write_sysreg(0x2, pmswinc_el0);
++
++	set_pmcr(pmu.pmcr_ro);
++	report(expect_interrupts(0), "no overflow interrupt after counting");
++
++	/* enable interrupts */
++
++	pmu_reset_stats();
++
++	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
++	write_regn_el0(pmevcntr, 1, PRE_OVERFLOW);
++	write_sysreg(ALL_SET, pmintenset_el1);
++	isb();
++
++	mem_access_loop(addr, 200, pmu.pmcr_ro | PMU_PMCR_E);
++	for (i =3D 0; i < 100; i++)
++		write_sysreg(0x3, pmswinc_el0);
++
++	mem_access_loop(addr, 200, pmu.pmcr_ro);
++	report_info("overflow=3D0x%lx", read_sysreg(pmovsclr_el0));
++	report(expect_interrupts(0x3),
++		"overflow interrupts expected on #0 and #1");
++
++	/* promote to 64-b */
++
++	pmu_reset_stats();
++
++	write_regn_el0(pmevtyper, 1, CHAIN | PMEVTYPER_EXCLUDE_EL0);
++	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
++	isb();
++	mem_access_loop(addr, 200, pmu.pmcr_ro | PMU_PMCR_E);
++	report(expect_interrupts(0),
++		"no overflow interrupt expected on 32b boundary");
++
++	/* overflow on odd counter */
++	pmu_reset_stats();
++	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
++	write_regn_el0(pmevcntr, 1, ALL_SET);
++	isb();
++	mem_access_loop(addr, 400, pmu.pmcr_ro | PMU_PMCR_E);
++	report(expect_interrupts(0x2),
++		"expect overflow interrupt on odd counter");
++}
+ #endif
+=20
+ /*
+@@ -930,6 +1065,10 @@ int main(int argc, char *argv[])
+ 		report_prefix_push(argv[1]);
+ 		test_chain_promotion();
+ 		report_prefix_pop();
++	} else if (strcmp(argv[1], "pmu-overflow-interrupt") =3D=3D 0) {
++		report_prefix_push(argv[1]);
++		test_overflow_interrupt();
++		report_prefix_pop();
+ 	} else {
+ 		report_abort("Unknown sub-test '%s'", argv[1]);
+ 	}
+diff --git a/arm/unittests.cfg b/arm/unittests.cfg
+index 1b0c8c8c7eef..455fd10d63c9 100644
+--- a/arm/unittests.cfg
++++ b/arm/unittests.cfg
+@@ -114,6 +114,12 @@ groups =3D pmu
+ arch =3D arm64
+ extra_params =3D -append 'pmu-chain-promotion'
+=20
++[pmu-overflow-interrupt]
++file =3D pmu.flat
++groups =3D pmu
++arch =3D arm64
++extra_params =3D -append 'pmu-overflow-interrupt'
++
+ # Test PMU support (TCG) with -icount IPC=3D1
+ #[pmu-tcg-icount-1]
+ #file =3D pmu.flat
 --=20
 2.25.1
 
