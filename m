@@ -2,45 +2,45 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A93BE19E5D8
-	for <lists+kvm@lfdr.de>; Sat,  4 Apr 2020 16:39:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B83B119E5DB
+	for <lists+kvm@lfdr.de>; Sat,  4 Apr 2020 16:39:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726679AbgDDOjU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 4 Apr 2020 10:39:20 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:21905 "EHLO
+        id S1726691AbgDDOj0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 4 Apr 2020 10:39:26 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:41584 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726397AbgDDOjU (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sat, 4 Apr 2020 10:39:20 -0400
+        by vger.kernel.org with ESMTP id S1726684AbgDDOj0 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sat, 4 Apr 2020 10:39:26 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1586011159;
+        s=mimecast20190719; t=1586011165;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=3WNP/h3pvTehY/zddj/d3JMMeG0kwDSFb6yKr4zYYro=;
-        b=bDm5UL7t5IZ5xuAVkhhPCNV6gWTZ9C+zgsNwnJteXhPnEvOZ9sZjlbSx2cIKHUSH4S3SxA
-        pqqBovJKd/HS5L+tH4TjlnNQ7iHmESfeYKg23hckQFKq9QL3ymxgmkNJ+evCnV/4esirFM
-        BXc+6inA3YhlSHF2kJInJIETeYqrzH8=
+        bh=AEz5troQ6ynHVc5o8x3G+52JS9FvzhU5HuoUMu7WhdU=;
+        b=MR3ADrAtK+xXqqFHZ2F3X4OuohkvUdDFRAS6f8emX6u7/LRmqfXqmW+dk5JEeE2X4aF+Nn
+        ckBpG4oMFwK7RjJPZOwSphnqq2FtSEpoYLrFg2y/6nvDkdVKwZOHF8UQWS3ukANgzKYTfr
+        f6FevnqYCX2S6kgOZ6LtUR/9sKNQ13E=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-59-ZLf5PJFaOuG71inIxMaDaw-1; Sat, 04 Apr 2020 10:39:17 -0400
-X-MC-Unique: ZLf5PJFaOuG71inIxMaDaw-1
+ us-mta-74-YhXihnf-PdCSPhTOdbv3gA-1; Sat, 04 Apr 2020 10:39:22 -0400
+X-MC-Unique: YhXihnf-PdCSPhTOdbv3gA-1
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B086B8017CE;
-        Sat,  4 Apr 2020 14:39:16 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D54AF18AB2C5;
+        Sat,  4 Apr 2020 14:39:21 +0000 (UTC)
 Received: from kamzik.brq.redhat.com (unknown [10.40.192.30])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A22971147D3;
-        Sat,  4 Apr 2020 14:39:12 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 356C99B912;
+        Sat,  4 Apr 2020 14:39:17 +0000 (UTC)
 From:   Andrew Jones <drjones@redhat.com>
 To:     pbonzini@redhat.com
 Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
         Eric Auger <eric.auger@redhat.com>,
         Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PULL kvm-unit-tests 33/39] arm/arm64: ITS: its_enable_defaults
-Date:   Sat,  4 Apr 2020 16:37:25 +0200
-Message-Id: <20200404143731.208138-34-drjones@redhat.com>
+Subject: [PULL kvm-unit-tests 34/39] arm/arm64: ITS: Device and collection Initialization
+Date:   Sat,  4 Apr 2020 16:37:26 +0200
+Message-Id: <20200404143731.208138-35-drjones@redhat.com>
 In-Reply-To: <20200404143731.208138-1-drjones@redhat.com>
 References: <20200404143731.208138-1-drjones@redhat.com>
 MIME-Version: 1.0
@@ -53,113 +53,111 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Eric Auger <eric.auger@redhat.com>
 
-its_enable_defaults() enable LPIs at redistributor level
-and ITS level.
+Introduce an helper functions to register
+- a new device, characterized by its device id and the
+  max number of event IDs that dimension its ITT (Interrupt
+  Translation Table).  The function allocates the ITT.
 
-gicv3_enable_defaults must be called before.
+- a new collection, characterized by its ID and the
+  target processing engine (PE).
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 Reviewed-by: Zenghui Yu <yuzenghui@huawei.com>
 Signed-off-by: Andrew Jones <drjones@redhat.com>
 ---
- lib/arm/asm/gic-v3.h       |  6 ++++++
- lib/arm/gic-v3.c           | 25 +++++++++++++++++++++++++
- lib/arm64/asm/gic-v3-its.h |  1 +
- lib/arm64/gic-v3-its.c     | 13 +++++++++++++
- 4 files changed, 45 insertions(+)
+ lib/arm64/asm/gic-v3-its.h | 19 +++++++++++++++++++
+ lib/arm64/gic-v3-its.c     | 38 ++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 57 insertions(+)
 
-diff --git a/lib/arm/asm/gic-v3.h b/lib/arm/asm/gic-v3.h
-index fedffa8e0843..cb72922662be 100644
---- a/lib/arm/asm/gic-v3.h
-+++ b/lib/arm/asm/gic-v3.h
-@@ -57,6 +57,10 @@
- #define LPI_PROP_DEFAULT_PRIO		0xa0
- #define LPI_PROP_DEFAULT		(LPI_PROP_DEFAULT_PRIO | LPI_PROP_GROUP1 | LPI=
-_PROP_ENABLED)
-=20
-+#define LPI_ID_BASE			8192
-+#define LPI(lpi)			((lpi) + LPI_ID_BASE)
-+#define LPI_OFFSET(intid)		((intid) - LPI_ID_BASE)
-+
- #include <asm/arch_gicv3.h>
-=20
- #ifndef __ASSEMBLY__
-@@ -93,6 +97,8 @@ extern void gicv3_ipi_send_mask(int irq, const cpumask_=
-t *dest);
- extern void gicv3_set_redist_base(size_t stride);
- extern void gicv3_lpi_set_clr_pending(int rdist, int n, bool set);
- extern void gicv3_lpi_alloc_tables(void);
-+extern void gicv3_lpi_rdist_enable(int redist);
-+extern void gicv3_lpi_rdist_disable(int redist);
-=20
- static inline void gicv3_do_wait_for_rwp(void *base)
- {
-diff --git a/lib/arm/gic-v3.c b/lib/arm/gic-v3.c
-index 6cf1d1d27340..a7e2cb819746 100644
---- a/lib/arm/gic-v3.c
-+++ b/lib/arm/gic-v3.c
-@@ -199,4 +199,29 @@ void gicv3_lpi_set_clr_pending(int rdist, int n, boo=
-l set)
- 		byte &=3D ~mask;
- 	*ptr =3D byte;
- }
-+
-+static void gicv3_lpi_rdist_ctrl(u32 redist, bool set)
-+{
-+	void *ptr;
-+	u64 val;
-+
-+	assert(redist < nr_cpus);
-+
-+	ptr =3D gicv3_data.redist_base[redist];
-+	val =3D readl(ptr + GICR_CTLR);
-+	if (set)
-+		val |=3D GICR_CTLR_ENABLE_LPIS;
-+	else
-+		val &=3D ~GICR_CTLR_ENABLE_LPIS;
-+	writel(val,  ptr + GICR_CTLR);
-+}
-+
-+void gicv3_lpi_rdist_enable(int redist)
-+{
-+	gicv3_lpi_rdist_ctrl(redist, true);
-+}
-+void gicv3_lpi_rdist_disable(int redist)
-+{
-+	gicv3_lpi_rdist_ctrl(redist, false);
-+}
- #endif /* __aarch64__ */
 diff --git a/lib/arm64/asm/gic-v3-its.h b/lib/arm64/asm/gic-v3-its.h
-index c0bd58c6d0f5..7e03e4ce2b17 100644
+index 7e03e4ce2b17..628eedf9f8ed 100644
 --- a/lib/arm64/asm/gic-v3-its.h
 +++ b/lib/arm64/asm/gic-v3-its.h
-@@ -92,5 +92,6 @@ extern struct its_data its_data;
- extern void its_parse_typer(void);
+@@ -31,6 +31,19 @@ struct its_baser {
+ };
+=20
+ #define GITS_BASER_NR_REGS		8
++#define GITS_MAX_DEVICES		8
++#define GITS_MAX_COLLECTIONS		8
++
++struct its_device {
++	u32 device_id;	/* device ID */
++	u32 nr_ites;	/* Max Interrupt Translation Entries */
++	void *itt;	/* Interrupt Translation Table GVA */
++};
++
++struct its_collection {
++	u64 target_address;
++	u16 col_id;
++};
+=20
+ struct its_data {
+ 	void *base;
+@@ -39,6 +52,10 @@ struct its_data {
+ 	struct its_baser coll_baser;
+ 	struct its_cmd_block *cmd_base;
+ 	struct its_cmd_block *cmd_write;
++	struct its_device devices[GITS_MAX_DEVICES];
++	u32 nr_devices;		/* Allocated Devices */
++	struct its_collection collections[GITS_MAX_COLLECTIONS];
++	u16 nr_collections;	/* Allocated Collections */
+ };
+=20
+ extern struct its_data its_data;
+@@ -93,5 +110,7 @@ extern void its_parse_typer(void);
  extern void its_init(void);
  extern int its_baser_lookup(int i, struct its_baser *baser);
-+extern void its_enable_defaults(void);
+ extern void its_enable_defaults(void);
++extern struct its_device *its_create_device(u32 dev_id, int nr_ites);
++extern struct its_collection *its_create_collection(u16 col_id, u32 targ=
+et_pe);
 =20
  #endif /* _ASMARM64_GIC_V3_ITS_H_ */
 diff --git a/lib/arm64/gic-v3-its.c b/lib/arm64/gic-v3-its.c
-index 04dde9774c5d..cf176b74a277 100644
+index cf176b74a277..ca91c3dd1108 100644
 --- a/lib/arm64/gic-v3-its.c
 +++ b/lib/arm64/gic-v3-its.c
-@@ -96,3 +96,16 @@ void its_init(void)
- 	its_cmd_queue_init();
- }
+@@ -109,3 +109,41 @@ void its_enable_defaults(void)
 =20
-+/* must be called after gicv3_enable_defaults */
-+void its_enable_defaults(void)
+ 	writel(GITS_CTLR_ENABLE, its_data.base + GITS_CTLR);
+ }
++
++struct its_device *its_create_device(u32 device_id, int nr_ites)
 +{
-+	int cpu;
++	struct its_device *new;
++	unsigned long n;
 +
-+	/* Allocate LPI config and pending tables */
-+	gicv3_lpi_alloc_tables();
++	assert(its_data.nr_devices < GITS_MAX_DEVICES);
 +
-+	for_each_present_cpu(cpu)
-+		gicv3_lpi_rdist_enable(cpu);
++	new =3D &its_data.devices[its_data.nr_devices];
 +
-+	writel(GITS_CTLR_ENABLE, its_data.base + GITS_CTLR);
++	new->device_id =3D device_id;
++	new->nr_ites =3D nr_ites;
++
++	n =3D (its_data.typer.ite_size * nr_ites) >> PAGE_SHIFT;
++	new->itt =3D alloc_pages(get_order(n));
++
++	its_data.nr_devices++;
++	return new;
++}
++
++struct its_collection *its_create_collection(u16 col_id, u32 pe)
++{
++	struct its_collection *new;
++
++	assert(its_data.nr_collections < GITS_MAX_COLLECTIONS);
++
++	new =3D &its_data.collections[its_data.nr_collections];
++
++	new->col_id =3D col_id;
++
++	if (its_data.typer.pta)
++		new->target_address =3D (u64)gicv3_data.redist_base[pe];
++	else
++		new->target_address =3D pe << 16;
++
++	its_data.nr_collections++;
++	return new;
 +}
 --=20
 2.25.1
