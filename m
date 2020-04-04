@@ -2,227 +2,435 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 623F119E359
-	for <lists+kvm@lfdr.de>; Sat,  4 Apr 2020 09:32:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2A8F419E486
+	for <lists+kvm@lfdr.de>; Sat,  4 Apr 2020 12:29:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726197AbgDDHc4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 4 Apr 2020 03:32:56 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:60287 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1725928AbgDDHcz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 4 Apr 2020 03:32:55 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1585985573;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=7YAMrGdQexN/Gg5886FbARfwLJ9MAuFJH3zQs6MAaA8=;
-        b=hB+XHkoZpSMQqnwJxo5xiURguDJNZFKr/gCVEBkuvnRfFkLuP4SKQdGTf9ni0P+Fl4tjtj
-        fa6EMGb8WxQX9DBY+dkuoTSpxrcnQEeEnq6cicvVjcHyIdetnJh4BelsY1P5jh+jQm5Gel
-        QOkgkcrGJqujlXgHBW+468Xo3udi2z0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-259-4IwZExKVPZ2oJBRvVtB9Vw-1; Sat, 04 Apr 2020 03:32:51 -0400
-X-MC-Unique: 4IwZExKVPZ2oJBRvVtB9Vw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D275D1005509;
-        Sat,  4 Apr 2020 07:32:50 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.40.192.30])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 31DD8114819;
-        Sat,  4 Apr 2020 07:32:43 +0000 (UTC)
-Date:   Sat, 4 Apr 2020 09:32:40 +0200
-From:   Andrew Jones <drjones@redhat.com>
-To:     Wainer dos Santos Moschetta <wainersm@redhat.com>
-Cc:     pbonzini@redhat.com, kvm@vger.kernel.org, david@redhat.com,
-        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH v2 2/2] selftests: kvm: Add mem_slot_test test
-Message-ID: <20200404073240.grcsylznemd3pmxz@kamzik.brq.redhat.com>
-References: <20200403172428.15574-1-wainersm@redhat.com>
- <20200403172428.15574-3-wainersm@redhat.com>
+        id S1726312AbgDDK2u convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Sat, 4 Apr 2020 06:28:50 -0400
+Received: from mga07.intel.com ([134.134.136.100]:35457 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725962AbgDDK2u (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 4 Apr 2020 06:28:50 -0400
+IronPort-SDR: jQMtKztGTpBDjSGWJuT+rD3PaLdxA4W6f98RV/AP+GFYiN3O+yeXjxWpV88aTOiIJWuVPDV3+g
+ NaY6d2kvSVaw==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Apr 2020 03:28:49 -0700
+IronPort-SDR: 19cvV8px8JJsq+8aa/+SGRQQsDpoQa4C7GS8O30HIH7jr0h5hKGtqqFUUfh5HczznM2ZfSjavV
+ a73ZZ9sAgMQg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.72,343,1580803200"; 
+   d="scan'208";a="329406013"
+Received: from fmsmsx106.amr.corp.intel.com ([10.18.124.204])
+  by orsmga001.jf.intel.com with ESMTP; 04 Apr 2020 03:28:48 -0700
+Received: from shsmsx108.ccr.corp.intel.com (10.239.4.97) by
+ FMSMSX106.amr.corp.intel.com (10.18.124.204) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Sat, 4 Apr 2020 03:28:48 -0700
+Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.225]) by
+ SHSMSX108.ccr.corp.intel.com ([169.254.8.7]) with mapi id 14.03.0439.000;
+ Sat, 4 Apr 2020 18:28:44 +0800
+From:   "Liu, Yi L" <yi.l.liu@intel.com>
+To:     Alex Williamson <alex.williamson@redhat.com>,
+        "jean-philippe@linaro.org" <jean-philippe@linaro.org>
+CC:     "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "Tian, Jun J" <jun.j.tian@intel.com>,
+        "Sun, Yi Y" <yi.y.sun@intel.com>,
+        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Wu, Hao" <hao.wu@intel.com>
+Subject: RE: [PATCH v1 6/8] vfio/type1: Bind guest page tables to host
+Thread-Topic: [PATCH v1 6/8] vfio/type1: Bind guest page tables to host
+Thread-Index: AQHWAEUdkW8K+/kg/06c7098DvJyv6hlyxcAgAGjcgD//9FIAIABfkVA
+Date:   Sat, 4 Apr 2020 10:28:43 +0000
+Message-ID: <A2975661238FB949B60364EF0F2C25743A221B05@SHSMSX104.ccr.corp.intel.com>
+References: <1584880325-10561-1-git-send-email-yi.l.liu@intel.com>
+        <1584880325-10561-7-git-send-email-yi.l.liu@intel.com>
+        <20200402135700.0da30021@w520.home>
+        <A2975661238FB949B60364EF0F2C25743A220BA4@SHSMSX104.ccr.corp.intel.com>
+ <20200403121102.255f069c@w520.home>
+In-Reply-To: <20200403121102.255f069c@w520.home>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200403172428.15574-3-wainersm@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Apr 03, 2020 at 02:24:28PM -0300, Wainer dos Santos Moschetta wrote:
-> This patch introduces the mem_slot_test test which checks
-> an VM can have added memory slots up to the limit defined in
-> KVM_CAP_NR_MEMSLOTS. Then attempt to add one more slot to
-> verify it fails as expected.
+Hi Alex,
+
+> From: Alex Williamson <alex.williamson@redhat.com>
+> Sent: Saturday, April 4, 2020 2:11 AM
+> To: Liu, Yi L <yi.l.liu@intel.com>
+> Subject: Re: [PATCH v1 6/8] vfio/type1: Bind guest page tables to host
 > 
-> Signed-off-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
-> ---
->  tools/testing/selftests/kvm/.gitignore      |  1 +
->  tools/testing/selftests/kvm/Makefile        |  3 +
->  tools/testing/selftests/kvm/mem_slot_test.c | 85 +++++++++++++++++++++
->  3 files changed, 89 insertions(+)
->  create mode 100644 tools/testing/selftests/kvm/mem_slot_test.c
+> On Fri, 3 Apr 2020 13:30:49 +0000
+> "Liu, Yi L" <yi.l.liu@intel.com> wrote:
 > 
-> diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
-> index 16877c3daabf..232f24d6931a 100644
-> --- a/tools/testing/selftests/kvm/.gitignore
-> +++ b/tools/testing/selftests/kvm/.gitignore
-> @@ -22,3 +22,4 @@
->  /dirty_log_test
->  /kvm_create_max_vcpus
->  /steal_time
-> +/mem_slot_test
-> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-> index 712a2ddd2a27..69b44178f48b 100644
-> --- a/tools/testing/selftests/kvm/Makefile
-> +++ b/tools/testing/selftests/kvm/Makefile
-> @@ -33,12 +33,14 @@ TEST_GEN_PROGS_x86_64 += demand_paging_test
->  TEST_GEN_PROGS_x86_64 += dirty_log_test
->  TEST_GEN_PROGS_x86_64 += kvm_create_max_vcpus
->  TEST_GEN_PROGS_x86_64 += steal_time
-> +TEST_GEN_PROGS_x86_64 += mem_slot_test
->  
->  TEST_GEN_PROGS_aarch64 += clear_dirty_log_test
->  TEST_GEN_PROGS_aarch64 += demand_paging_test
->  TEST_GEN_PROGS_aarch64 += dirty_log_test
->  TEST_GEN_PROGS_aarch64 += kvm_create_max_vcpus
->  TEST_GEN_PROGS_aarch64 += steal_time
-> +TEST_GEN_PROGS_aarch64 += mem_slot_test
->  
+> > Hi Alex,
+> >
+> > > From: Alex Williamson <alex.williamson@redhat.com>
+> > > Sent: Friday, April 3, 2020 3:57 AM
+> > > To: Liu, Yi L <yi.l.liu@intel.com>
+> > >
+> > > On Sun, 22 Mar 2020 05:32:03 -0700
+> > > "Liu, Yi L" <yi.l.liu@intel.com> wrote:
+> > >
+> > > > From: Liu Yi L <yi.l.liu@intel.com>
+> > > >
+> > > > VFIO_TYPE1_NESTING_IOMMU is an IOMMU type which is backed by
+> > > > hardware IOMMUs that have nesting DMA translation (a.k.a dual
+> > > > stage address translation). For such hardware IOMMUs, there are
+> > > > two stages/levels of address translation, and software may let
+> > > > userspace/VM to own the first-
+> > > > level/stage-1 translation structures. Example of such usage is
+> > > > vSVA ( virtual Shared Virtual Addressing). VM owns the
+> > > > first-level/stage-1 translation structures and bind the structures
+> > > > to host, then hardware IOMMU would utilize nesting translation
+> > > > when doing DMA translation fo the devices behind such hardware IOMMU.
+> > > >
+> > > > This patch adds vfio support for binding guest translation (a.k.a
+> > > > stage 1) structure to host iommu. And for
+> > > > VFIO_TYPE1_NESTING_IOMMU, not only bind guest page table is
+> > > > needed, it also requires to expose interface to guest for iommu
+> > > > cache invalidation when guest modified the first-level/stage-1
+> > > > translation structures since hardware needs to be notified to flush stale iotlbs.
+> This would be introduced in next patch.
+> > > >
+> > > > In this patch, guest page table bind and unbind are done by using
+> > > > flags VFIO_IOMMU_BIND_GUEST_PGTBL and
+> > > > VFIO_IOMMU_UNBIND_GUEST_PGTBL
+> > > under IOCTL
+> > > > VFIO_IOMMU_BIND, the bind/unbind data are conveyed by struct
+> > > > iommu_gpasid_bind_data. Before binding guest page table to host,
+> > > > VM should have got a PASID allocated by host via
+> VFIO_IOMMU_PASID_REQUEST.
+> > > >
+> > > > Bind guest translation structures (here is guest page table) to
+> > > > host are the first step to setup vSVA (Virtual Shared Virtual Addressing).
+> > > >
+> > > > Cc: Kevin Tian <kevin.tian@intel.com>
+> > > > CC: Jacob Pan <jacob.jun.pan@linux.intel.com>
+> > > > Cc: Alex Williamson <alex.williamson@redhat.com>
+> > > > Cc: Eric Auger <eric.auger@redhat.com>
+> > > > Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>
+> > > > Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.com>
+> > > > Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
+> > > > Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
+> > > > ---
+> > > >  drivers/vfio/vfio_iommu_type1.c | 158
+> > > ++++++++++++++++++++++++++++++++++++++++
+> > > >  include/uapi/linux/vfio.h       |  46 ++++++++++++
+> > > >  2 files changed, 204 insertions(+)
+> > > >
+> > > > diff --git a/drivers/vfio/vfio_iommu_type1.c
+> > > > b/drivers/vfio/vfio_iommu_type1.c index 82a9e0b..a877747 100644
+> > > > --- a/drivers/vfio/vfio_iommu_type1.c
+> > > > +++ b/drivers/vfio/vfio_iommu_type1.c
+> > > > @@ -130,6 +130,33 @@ struct vfio_regions {
+> > > >  #define IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu)	\
+> > > >  					(!list_empty(&iommu->domain_list))
+> > > >
+> > > > +struct domain_capsule {
+> > > > +	struct iommu_domain *domain;
+> > > > +	void *data;
+> > > > +};
+> > > > +
+> > > > +/* iommu->lock must be held */
+> > > > +static int vfio_iommu_for_each_dev(struct vfio_iommu *iommu,
+> > > > +		      int (*fn)(struct device *dev, void *data),
+> > > > +		      void *data)
+> > > > +{
+> > > > +	struct domain_capsule dc = {.data = data};
+> > > > +	struct vfio_domain *d;
+> > > > +	struct vfio_group *g;
+> > > > +	int ret = 0;
+> > > > +
+> > > > +	list_for_each_entry(d, &iommu->domain_list, next) {
+> > > > +		dc.domain = d->domain;
+> > > > +		list_for_each_entry(g, &d->group_list, next) {
+> > > > +			ret = iommu_group_for_each_dev(g->iommu_group,
+> > > > +						       &dc, fn);
+> > > > +			if (ret)
+> > > > +				break;
+> > > > +		}
+> > > > +	}
+> > > > +	return ret;
+> > > > +}
+> > > > +
+> > > >  static int put_pfn(unsigned long pfn, int prot);
+> > > >
+> > > >  /*
+> > > > @@ -2314,6 +2341,88 @@ static int
+> > > > vfio_iommu_info_add_nesting_cap(struct
+> > > vfio_iommu *iommu,
+> > > >  	return 0;
+> > > >  }
+> > > >
+> > > > +static int vfio_bind_gpasid_fn(struct device *dev, void *data) {
+> > > > +	struct domain_capsule *dc = (struct domain_capsule *)data;
+> > > > +	struct iommu_gpasid_bind_data *gbind_data =
+> > > > +		(struct iommu_gpasid_bind_data *) dc->data;
+> > > > +
+> > > > +	return iommu_sva_bind_gpasid(dc->domain, dev, gbind_data); }
+> > > > +
+> > > > +static int vfio_unbind_gpasid_fn(struct device *dev, void *data)
+> > > > +{
+> > > > +	struct domain_capsule *dc = (struct domain_capsule *)data;
+> > > > +	struct iommu_gpasid_bind_data *gbind_data =
+> > > > +		(struct iommu_gpasid_bind_data *) dc->data;
+> > > > +
+> > > > +	return iommu_sva_unbind_gpasid(dc->domain, dev,
+> > > > +					gbind_data->hpasid);
+> > > > +}
+> > > > +
+> > > > +/**
+> > > > + * Unbind specific gpasid, caller of this function requires hold
+> > > > + * vfio_iommu->lock
+> > > > + */
+> > > > +static long vfio_iommu_type1_do_guest_unbind(struct vfio_iommu *iommu,
+> > > > +				struct iommu_gpasid_bind_data *gbind_data) {
+> > > > +	return vfio_iommu_for_each_dev(iommu,
+> > > > +				vfio_unbind_gpasid_fn, gbind_data); }
+> > > > +
+> > > > +static long vfio_iommu_type1_bind_gpasid(struct vfio_iommu *iommu,
+> > > > +				struct iommu_gpasid_bind_data *gbind_data) {
+> > > > +	int ret = 0;
+> > > > +
+> > > > +	mutex_lock(&iommu->lock);
+> > > > +	if (!IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu)) {
+> > > > +		ret = -EINVAL;
+> > > > +		goto out_unlock;
+> > > > +	}
+> > > > +
+> > > > +	ret = vfio_iommu_for_each_dev(iommu,
+> > > > +			vfio_bind_gpasid_fn, gbind_data);
+> > > > +	/*
+> > > > +	 * If bind failed, it may not be a total failure. Some devices
+> > > > +	 * within the iommu group may have bind successfully. Although
+> > > > +	 * we don't enable pasid capability for non-singletion iommu
+> > > > +	 * groups, a unbind operation would be helpful to ensure no
+> > > > +	 * partial binding for an iommu group.
+> > >
+> > > Where was the non-singleton group restriction done, I missed that.
+> >
+> > Hmm, it's missed. thanks for spotting it. How about adding this check
+> > in the vfio_iommu_for_each_dev()? If looped a non-singleton group,
+> > just skip it. It applies to the cache_inv path all the same.
+> 
+> I don't really understand the singleton issue, which is why I was surprised to see this
+> since I didn't see a discussion previously.
+> Skipping a singleton group seems like unpredictable behavior to the user though.
 
-kvm selftests has a bad case of OCD when it comes to lists of tests. In
-the .gitignore and the Makefile we keep our tests in alphabetical order.
-Maybe we should stop, because it's a bit annoying to maintain, but my
-personal OCD won't allow it to be on my watch. Please fix the above
-three lists.
+There is a discussion on the SVA availability in the below link. There
+was a conclusion to only support SVA for singleton group. I think bind
+guest page table also needs to apply this rule.
+https://patchwork.kernel.org/patch/10213877/
 
->  TEST_GEN_PROGS_s390x = s390x/memop
->  TEST_GEN_PROGS_s390x += s390x/resets
-> @@ -46,6 +48,7 @@ TEST_GEN_PROGS_s390x += s390x/sync_regs_test
->  TEST_GEN_PROGS_s390x += demand_paging_test
->  TEST_GEN_PROGS_s390x += dirty_log_test
->  TEST_GEN_PROGS_s390x += kvm_create_max_vcpus
-> +TEST_GEN_PROGS_s390x += mem_slot_test
->  
->  TEST_GEN_PROGS += $(TEST_GEN_PROGS_$(UNAME_M))
->  LIBKVM += $(LIBKVM_$(UNAME_M))
-> diff --git a/tools/testing/selftests/kvm/mem_slot_test.c b/tools/testing/selftests/kvm/mem_slot_test.c
-> new file mode 100644
-> index 000000000000..eef6f506f41d
-> --- /dev/null
-> +++ b/tools/testing/selftests/kvm/mem_slot_test.c
-> @@ -0,0 +1,85 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +/*
-> + * mem_slot_test
-> + *
-> + * Copyright (C) 2020, Red Hat, Inc.
-> + *
-> + * Test suite for memory region operations.
-> + */
-> +#define _GNU_SOURCE /* for program_invocation_short_name */
-> +#include <linux/kvm.h>
-> +#include <sys/mman.h>
-> +
-> +#include "test_util.h"
-> +#include "kvm_util.h"
-> +
-> +/*
-> + * Test it can be added memory slots up to KVM_CAP_NR_MEMSLOTS, then any
-> + * tentative to add further slots should fail.
-> + */
-> +static void test_add_max_slots(void)
-> +{
-> +	struct kvm_vm *vm;
-> +	uint32_t max_mem_slots;
-> +	uint32_t slot;
-> +	uint64_t mem_reg_npages;
-> +	uint64_t mem_reg_size;
-> +	uint32_t mem_reg_flags;
-> +	uint64_t guest_addr;
-> +	int ret;
-> +
-> +	max_mem_slots = kvm_check_cap(KVM_CAP_NR_MEMSLOTS);
-> +	TEST_ASSERT(max_mem_slots > 0,
-> +		    "KVM_CAP_NR_MEMSLOTS should be greater than 0");
-> +	pr_info("Allowed number of memory slots: %i\n", max_mem_slots);
-> +
-> +	vm = vm_create(VM_MODE_DEFAULT, 0, O_RDWR);
-> +
-> +	/*
-> +	 * Uses 1MB sized/aligned memory region since this is the minimal
-> +	 * required on s390x.
-> +	 */
-> +	mem_reg_size = 0x100000;
-> +	mem_reg_npages = vm_calc_num_guest_pages(VM_MODE_DEFAULT, mem_reg_size);
-> +
-> +	mem_reg_flags = kvm_check_cap(KVM_CAP_READONLY_MEM) ? KVM_MEM_READONLY :
-> +		KVM_MEM_LOG_DIRTY_PAGES;
+> > > > +	 */
+> > > > +	if (ret)
+> > > > +		/*
+> > > > +		 * Undo all binds that already succeeded, no need to
+> > > > +		 * check the return value here since some device within
+> > > > +		 * the group has no successful bind when coming to this
+> > > > +		 * place switch.
+> > > > +		 */
+> > > > +		vfio_iommu_type1_do_guest_unbind(iommu, gbind_data);
+> > >
+> > > However, the for_each_dev function stops when the callback function
+> > > returns error, are we just assuming we stop at the same device as we
+> > > faulted on the first time and that we traverse the same set of
+> > > devices the second time?  It seems strange to me that unbind should
+> > > be able to fail.
+> >
+> > unbind can fail if a user attempts to unbind a pasid which is not
+> > belonged to it or a pasid which hasn't ever been bound. Otherwise, I
+> > didn't see a reason to fail.
+> 
+> Even if so, this doesn't address the first part of the question. 
+> If our for_each_dev()
+> callback returns error then the loop stops and we can't be sure we've
+> triggered it
+> everywhere that it needs to be triggered. 
 
-I still don't see why we're setting a flag at all, and now we're setting
-different flags depending on what's available, so the test isn't the
-same for every environment. I would just have mem->flags = 0 for this
-test.
+Hmm, let me pull back a little. Back to the code, in the attempt to
+do bind, the code uses for_each_dev() to loop devices. If failed then
+uses for_each_dev() again to do unbind. Your question is can the second
+for_each_dev() be able to undo the bind correctly as the second
+for_each_dev() call has no idea where it failed in the bind phase. is it?
+Actually, this is why I added the comment that no need to check the return
+value of vfio_iommu_type1_do_guest_unbind().
 
-> +
-> +	guest_addr = 0x0;
-> +
-> +	/* Check it can be added memory slots up to the maximum allowed */
-> +	pr_info("Adding slots 0..%i, each memory region with %ldK size\n",
-> +		(max_mem_slots - 1), mem_reg_size >> 10);
-> +	for (slot = 0; slot < max_mem_slots; slot++) {
-> +		vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS,
-> +					    guest_addr, slot, mem_reg_npages,
-> +					    mem_reg_flags);
-> +		guest_addr += mem_reg_size;
-> +	}
-> +
-> +	/* Check it cannot be added memory slots beyond the limit */
-> +	void *mem = mmap(NULL, mem_reg_size, PROT_READ | PROT_WRITE,
-> +			 MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-> +	TEST_ASSERT(mem != NULL, "Failed to mmap() host");
+> There are also aspects of whether it's an
+> error to unbind something that is not bound because the result is still
+> that the pasid
+> is unbound, right?
 
-This should be testing mem != MAP_FAILED
+agreed, as you mentioned in the below comment, no need to fail unbind
+unless user is trying to unbind a pasid which doesn't belong to it.
 
-> +
-> +	struct kvm_userspace_memory_region kvm_region = {
-> +		.slot = slot,
-> +		.flags = mem_reg_flags,
-> +		.guest_phys_addr = guest_addr,
-> +		.memory_size = mem_reg_size,
-> +		.userspace_addr = (uint64_t) mem,
-> +	};
+> > > > +
+> > > > +out_unlock:
+> > > > +	mutex_unlock(&iommu->lock);
+> > > > +	return ret;
+> > > > +}
+> > > > +
+> > > > +static long vfio_iommu_type1_unbind_gpasid(struct vfio_iommu *iommu,
+> > > > +				struct iommu_gpasid_bind_data *gbind_data) {
+> > > > +	int ret = 0;
+> > > > +
+> > > > +	mutex_lock(&iommu->lock);
+> > > > +	if (!IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu)) {
+> > > > +		ret = -EINVAL;
+> > > > +		goto out_unlock;
+> > > > +	}
+> > > > +
+> > > > +	ret = vfio_iommu_type1_do_guest_unbind(iommu, gbind_data);
+> > >
+> > > How is a user supposed to respond to their unbind failing?
+> >
+> > If it's a malicious unbind (e.g. unbind a not yet bound pasid or
+> > unbind a pasid which doesn't belong to current user).
+> 
+> And if it's not a malicious unbind?  To me this is similar semantics to
+> free() failing.  Is there any remedy other than to abort?  Thanks,
 
-Declaring kvm_region in the middle of the block. I don't really care
-myself, but it's inconsistent with all the other variables which are
-declared at the top.
+got it. so if user is trying to unbind a pasid which doesn't belong to
+it, should kernel return error to user or just abort it?
 
-> +
-> +	ret = ioctl(vm_get_fd(vm), KVM_SET_USER_MEMORY_REGION, &kvm_region);
-> +	TEST_ASSERT(ret == -1, "Adding one more memory slot should fail");
-> +	TEST_ASSERT(errno == EINVAL, "Should return EINVAL errno");
+Regards,
+Yi Liu
 
-Please make the second assert message more specific. Or better would be
-to combine the asserts
-
-  TEST_ASSERT(ret == -1 && errno == EINVAL, "Adding one more memory slot should fail with EINVAL");
-
-> +
-> +	munmap(mem, mem_reg_size);
-> +	kvm_vm_free(vm);
-> +}
-> +
-> +int main(int argc, char *argv[])
-> +{
-> +	test_add_max_slots();
-> +	return 0;
-> +}
-> -- 
-> 2.17.2
->
-
-Thanks,
-drew
+> Alex
+> 
+> > > > +
+> > > > +out_unlock:
+> > > > +	mutex_unlock(&iommu->lock);
+> > > > +	return ret;
+> > > > +}
+> > > > +
+> > > >  static long vfio_iommu_type1_ioctl(void *iommu_data,
+> > > >  				   unsigned int cmd, unsigned long arg)  { @@ -
+> 2471,6
+> > > > +2580,55 @@ static long vfio_iommu_type1_ioctl(void
+> > > *iommu_data,
+> > > >  		default:
+> > > >  			return -EINVAL;
+> > > >  		}
+> > > > +
+> > > > +	} else if (cmd == VFIO_IOMMU_BIND) {
+> > > > +		struct vfio_iommu_type1_bind bind;
+> > > > +		u32 version;
+> > > > +		int data_size;
+> > > > +		void *gbind_data;
+> > > > +		int ret;
+> > > > +
+> > > > +		minsz = offsetofend(struct vfio_iommu_type1_bind, flags);
+> > > > +
+> > > > +		if (copy_from_user(&bind, (void __user *)arg, minsz))
+> > > > +			return -EFAULT;
+> > > > +
+> > > > +		if (bind.argsz < minsz)
+> > > > +			return -EINVAL;
+> > > > +
+> > > > +		/* Get the version of struct iommu_gpasid_bind_data */
+> > > > +		if (copy_from_user(&version,
+> > > > +			(void __user *) (arg + minsz),
+> > > > +					sizeof(version)))
+> > > > +			return -EFAULT;
+> > >
+> > > Why are we coping things from beyond the size we've validated that
+> > > the user has provided again?
+> >
+> > let me wait for the result in Jacob's thread below. looks like need to
+> > have a decision from you and Joreg. If using argsze is good, then I
+> > guess we don't need the version-to-size mapping. right? Actually, the
+> > version-to-size mapping is added to ensure vfio copy data correctly.
+> > https://lkml.org/lkml/2020/4/2/876
+> >
+> > > > +
+> > > > +		data_size = iommu_uapi_get_data_size(
+> > > > +				IOMMU_UAPI_BIND_GPASID, version);
+> > > > +		gbind_data = kzalloc(data_size, GFP_KERNEL);
+> > > > +		if (!gbind_data)
+> > > > +			return -ENOMEM;
+> > > > +
+> > > > +		if (copy_from_user(gbind_data,
+> > > > +			 (void __user *) (arg + minsz), data_size)) {
+> > > > +			kfree(gbind_data);
+> > > > +			return -EFAULT;
+> > > > +		}
+> > >
+> > > And again.  argsz isn't just for minsz.
+> > >
+> > > > +
+> > > > +		switch (bind.flags & VFIO_IOMMU_BIND_MASK) {
+> > > > +		case VFIO_IOMMU_BIND_GUEST_PGTBL:
+> > > > +			ret = vfio_iommu_type1_bind_gpasid(iommu,
+> > > > +							   gbind_data);
+> > > > +			break;
+> > > > +		case VFIO_IOMMU_UNBIND_GUEST_PGTBL:
+> > > > +			ret = vfio_iommu_type1_unbind_gpasid(iommu,
+> > > > +							     gbind_data);
+> > > > +			break;
+> > > > +		default:
+> > > > +			ret = -EINVAL;
+> > > > +			break;
+> > > > +		}
+> > > > +		kfree(gbind_data);
+> > > > +		return ret;
+> > > >  	}
+> > > >
+> > > >  	return -ENOTTY;
+> > > > diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+> > > > index ebeaf3e..2235bc6 100644
+> > > > --- a/include/uapi/linux/vfio.h
+> > > > +++ b/include/uapi/linux/vfio.h
+> > > > @@ -14,6 +14,7 @@
+> > > >
+> > > >  #include <linux/types.h>
+> > > >  #include <linux/ioctl.h>
+> > > > +#include <linux/iommu.h>
+> > > >
+> > > >  #define VFIO_API_VERSION	0
+> > > >
+> > > > @@ -853,6 +854,51 @@ struct vfio_iommu_type1_pasid_request {
+> > > >   */
+> > > >  #define VFIO_IOMMU_PASID_REQUEST	_IO(VFIO_TYPE, VFIO_BASE + 22)
+> > > >
+> > > > +/**
+> > > > + * Supported flags:
+> > > > + *	- VFIO_IOMMU_BIND_GUEST_PGTBL: bind guest page tables to
+> host for
+> > > > + *			nesting type IOMMUs. In @data field It takes struct
+> > > > + *			iommu_gpasid_bind_data.
+> > > > + *	- VFIO_IOMMU_UNBIND_GUEST_PGTBL: undo a bind guest page
+> table
+> > > operation
+> > > > + *			invoked by VFIO_IOMMU_BIND_GUEST_PGTBL.
+> > >
+> > > This must require iommu_gpasid_bind_data in the data field as well,
+> > > right?
+> >
+> > yes.
+> >
+> > Regards,
+> > Yi Liu
+> >
 
