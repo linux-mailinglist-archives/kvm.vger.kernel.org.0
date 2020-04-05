@@ -2,90 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7AF6219EC3C
-	for <lists+kvm@lfdr.de>; Sun,  5 Apr 2020 16:55:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C227C19EC56
+	for <lists+kvm@lfdr.de>; Sun,  5 Apr 2020 17:30:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727461AbgDEOzO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 5 Apr 2020 10:55:14 -0400
-Received: from mail-io1-f69.google.com ([209.85.166.69]:36759 "EHLO
-        mail-io1-f69.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726910AbgDEOzO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 5 Apr 2020 10:55:14 -0400
-Received: by mail-io1-f69.google.com with SMTP id s66so10953603iod.3
-        for <kvm@vger.kernel.org>; Sun, 05 Apr 2020 07:55:13 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=t0QGEA/iH/o9fVkzIV8JLJ4OWazCZ63P3kwBKE4Z9Eg=;
-        b=CgEL5p/N71v1vHqOGRcbCwvtGBsrJRxFyutd9GhXm2JepRSJPmrYe8vAleAooMykow
-         cGiLi4ROkbPFjhmcPWpB9YqkWXCbhabPsj+qZC/FIQncxNmBMQJI6PPLfqwagGRHQG5o
-         qvOhTiTr+99C4aEgbYRv1hIvZDjzvIl0gh3GQ/Jaku2FOK/CRfY1eEcRvpHrWlrDqsq+
-         Jby319r7syGzR2LjBGxLe5UDAiGa6sCI2YVjScQDgkLOIc1UWfoVbMLgB/FhFZRGDlyp
-         ftzqxhU21KeECEMtnNASewJVgEQgzeBwiu+CO+x3azYWLN7DPcszsIYL+o77TCwJUit7
-         EbrA==
-X-Gm-Message-State: AGi0PubMGla33rQ+f8hKBP0fCbxr933Xm6ASqC443hHkNyDPY+KOWeYP
-        m6CUG3MDARIgs0MEJ1/BIIlPDJ8hIRz63gWZCJXeFhtParh/
-X-Google-Smtp-Source: APiQypJjDnivtGjrXVVXX6qPLRwtG90L59xknFkl/xI2XrfEyOqYveejmrftzszBBpCWE8S4yvakjolrCifCExy1O5OMJ/ddCS4k
-MIME-Version: 1.0
-X-Received: by 2002:a92:bbd8:: with SMTP id x85mr17736262ilk.40.1586098513205;
- Sun, 05 Apr 2020 07:55:13 -0700 (PDT)
-Date:   Sun, 05 Apr 2020 07:55:13 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000075615505a28c569e@google.com>
-Subject: WARNING: can't dereference registers at ADDR for ip interrupt_entry
-From:   syzbot <syzbot+be0c7be873b78b57c065@syzkaller.appspotmail.com>
-To:     bp@alien8.de, hpa@zytor.com, jmattson@google.com, joro@8bytes.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        mingo@redhat.com, netdev@vger.kernel.org, pbonzini@redhat.com,
-        sean.j.christopherson@intel.com, suravee.suthikulpanit@amd.com,
-        syzkaller-bugs@googlegroups.com, tglx@linutronix.de,
-        vkuznets@redhat.com, wanpengli@tencent.com, x86@kernel.org
-Content-Type: text/plain; charset="UTF-8"
+        id S1727009AbgDEP3z (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 5 Apr 2020 11:29:55 -0400
+Received: from out30-57.freemail.mail.aliyun.com ([115.124.30.57]:37769 "EHLO
+        out30-57.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726452AbgDEP3z (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sun, 5 Apr 2020 11:29:55 -0400
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R501e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04357;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=5;SR=0;TI=SMTPD_---0Tufld8x_1586100583;
+Received: from localhost(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0Tufld8x_1586100583)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Sun, 05 Apr 2020 23:29:43 +0800
+From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+To:     pbonzini@redhat.com, shuah@kernel.org
+Cc:     kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH] KVM: selftests: Fix parameter order error in kvm_create_max_vcpus
+Date:   Sun,  5 Apr 2020 23:29:42 +0800
+Message-Id: <20200405152942.95052-1-tianjia.zhang@linux.alibaba.com>
+X-Mailer: git-send-email 2.17.1
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello,
+The parameter order of test_vcpu_creation() call is reversed here,
+this patch is adjusted to the correct order.
 
-syzbot found the following crash on:
-
-HEAD commit:    a0ba26f3 Merge git://git.kernel.org/pub/scm/linux/kernel/g..
-git tree:       bpf
-console output: https://syzkaller.appspot.com/x/log.txt?x=1669fcb7e00000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=27392dd2975fd692
-dashboard link: https://syzkaller.appspot.com/bug?extid=be0c7be873b78b57c065
-compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=17ab1edbe00000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=150eb063e00000
-
-The bug was bisected to:
-
-commit 24bbf74c0c36bfbaa276c9921b55b844018b241e
-Author: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
-Date:   Thu Nov 14 20:15:07 2019 +0000
-
-    kvm: x86: Add APICv (de)activate request trace points
-
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=12f1dadbe00000
-final crash:    https://syzkaller.appspot.com/x/report.txt?x=11f1dadbe00000
-console output: https://syzkaller.appspot.com/x/log.txt?x=16f1dadbe00000
-
-IMPORTANT: if you fix the bug, please add the following tag to the commit:
-Reported-by: syzbot+be0c7be873b78b57c065@syzkaller.appspotmail.com
-Fixes: 24bbf74c0c36 ("kvm: x86: Add APICv (de)activate request trace points")
-
-WARNING: can't dereference registers at 00000000ebf55915 for ip interrupt_entry+0xb8/0xc0 arch/x86/entry/entry_64.S:579
-
-
+Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
 ---
-This bug is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+ tools/testing/selftests/kvm/kvm_create_max_vcpus.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-syzbot will keep track of this bug report. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
-syzbot can test patches for this bug, for details see:
-https://goo.gl/tpsmEJ#testing-patches
+diff --git a/tools/testing/selftests/kvm/kvm_create_max_vcpus.c b/tools/testing/selftests/kvm/kvm_create_max_vcpus.c
+index 6f38c3dc0d56..a7f3120b4409 100644
+--- a/tools/testing/selftests/kvm/kvm_create_max_vcpus.c
++++ b/tools/testing/selftests/kvm/kvm_create_max_vcpus.c
+@@ -60,7 +60,7 @@ int main(int argc, char *argv[])
+ 
+ 	if (kvm_max_vcpu_id > kvm_max_vcpus)
+ 		test_vcpu_creation(
+-			kvm_max_vcpu_id - kvm_max_vcpus, kvm_max_vcpus);
++			kvm_max_vcpus, kvm_max_vcpu_id - kvm_max_vcpus);
+ 
+ 	return 0;
+ }
+-- 
+2.17.1
+
