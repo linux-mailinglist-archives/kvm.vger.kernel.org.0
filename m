@@ -2,53 +2,274 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C227C19EC56
-	for <lists+kvm@lfdr.de>; Sun,  5 Apr 2020 17:30:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C943119EC88
+	for <lists+kvm@lfdr.de>; Sun,  5 Apr 2020 18:17:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727009AbgDEP3z (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 5 Apr 2020 11:29:55 -0400
-Received: from out30-57.freemail.mail.aliyun.com ([115.124.30.57]:37769 "EHLO
-        out30-57.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726452AbgDEP3z (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sun, 5 Apr 2020 11:29:55 -0400
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R501e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04357;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=5;SR=0;TI=SMTPD_---0Tufld8x_1586100583;
-Received: from localhost(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0Tufld8x_1586100583)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Sun, 05 Apr 2020 23:29:43 +0800
-From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-To:     pbonzini@redhat.com, shuah@kernel.org
-Cc:     kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH] KVM: selftests: Fix parameter order error in kvm_create_max_vcpus
-Date:   Sun,  5 Apr 2020 23:29:42 +0800
-Message-Id: <20200405152942.95052-1-tianjia.zhang@linux.alibaba.com>
-X-Mailer: git-send-email 2.17.1
+        id S1727254AbgDEQRT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 5 Apr 2020 12:17:19 -0400
+Received: from mail-pl1-f195.google.com ([209.85.214.195]:33325 "EHLO
+        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726921AbgDEQRS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 5 Apr 2020 12:17:18 -0400
+Received: by mail-pl1-f195.google.com with SMTP id ay1so4926914plb.0
+        for <kvm@vger.kernel.org>; Sun, 05 Apr 2020 09:17:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=kMPrOJrptqa6ersWxHE93MMDA++1RsqQDHkHmUg7IaM=;
+        b=TIUGIRzkS/7e8ZfSJzfqhMSEP/3N3s08GQQZXDKAqH2Lcgb/XtePkRkPQLc0Z5ji5w
+         VKfq4veNO9zu5g0a+QG+IRFeBnSbosj7CuVpqoyKFVgoNLLHhOLorCeydjbK0KYTUvO9
+         ZKFLXNfzi5NK5eNOzU3oYiwJbtBqfq2qoaEVc=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=kMPrOJrptqa6ersWxHE93MMDA++1RsqQDHkHmUg7IaM=;
+        b=Pt/hSwL/6BMQht9pLbUJE67VJlFvDvR2q20S2XUfCGS/TpqYdfi8oFvz0jeIlBJAhF
+         8VyxfN2DnzyRJiFe8a8Dl9ZOo0D7plpVtOXNk6zSER1HZWQOmpmoFgi6Jjsm2sun3HEp
+         nF75vVJeYfsf/WcxQGSPxiDbw2vnO4rSZhyzh92Bh/9U7hNt3pICYvtM3XbtkXI4obcv
+         LIT7N9uVq4UngxT//4BLOreOzScXRftDC6NhUNSzn1fiXNzGpJf2dRArkkc92mtFBB3/
+         9l0I8Ebw56OjPmA5ikrGd6ka/zqZgJ98sqyAeEA6EP0d9eHIKpRrykaGpcBUG5w85Iex
+         auFw==
+X-Gm-Message-State: AGi0PuZVAsO6RWNQZ5BZOSijc5lj9TDR9b+TR1BE7vnloSNE5xMVsu+t
+        ZkVO9BCAgWQRtWnzRtHJ3FduqQ==
+X-Google-Smtp-Source: APiQypLTHP0XN1nFJK4aJmPKkt8gcKrwuklgdNwtx5WVMi6d4RpqFjAqsu/nzn6WE/pu/1IVGRgHZg==
+X-Received: by 2002:a17:90a:2dc2:: with SMTP id q2mr21382647pjm.146.1586103435877;
+        Sun, 05 Apr 2020 09:17:15 -0700 (PDT)
+Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
+        by smtp.gmail.com with ESMTPSA id b25sm9754948pfp.201.2020.04.05.09.17.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 05 Apr 2020 09:17:14 -0700 (PDT)
+Date:   Sun, 5 Apr 2020 09:17:13 -0700
+From:   Kees Cook <keescook@chromium.org>
+To:     Yan Zhao <yan.y.zhao@intel.com>
+Cc:     intel-gvt-dev@lists.freedesktop.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, alex.williamson@redhat.com,
+        zhenyuw@linux.intel.com, pbonzini@redhat.com, kevin.tian@intel.com,
+        peterx@redhat.com
+Subject: Re: [PATCH v4 2/7] vfio: introduce vfio_dma_rw to read/write a range
+ of IOVAs
+Message-ID: <202004050916.E52CA610@keescook>
+References: <20200313030548.7705-1-yan.y.zhao@intel.com>
+ <20200313030901.7830-1-yan.y.zhao@intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200313030901.7830-1-yan.y.zhao@intel.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The parameter order of test_vcpu_creation() call is reversed here,
-this patch is adjusted to the correct order.
+On Thu, Mar 12, 2020 at 11:09:01PM -0400, Yan Zhao wrote:
+> vfio_dma_rw will read/write a range of user space memory pointed to by
+> IOVA into/from a kernel buffer without enforcing pinning the user space
+> memory.
+> 
+> TODO: mark the IOVAs to user space memory dirty if they are written in
+> vfio_dma_rw().
+> 
+> Cc: Kevin Tian <kevin.tian@intel.com>
+> Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
+> ---
+>  drivers/vfio/vfio.c             | 49 +++++++++++++++++++++
+>  drivers/vfio/vfio_iommu_type1.c | 76 +++++++++++++++++++++++++++++++++
+>  include/linux/vfio.h            |  5 +++
+>  3 files changed, 130 insertions(+)
+> 
+> diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
+> index 97b972bfb735..6997f711b925 100644
+> --- a/drivers/vfio/vfio.c
+> +++ b/drivers/vfio/vfio.c
+> @@ -1999,6 +1999,55 @@ int vfio_unpin_pages(struct device *dev, unsigned long *user_pfn, int npage)
+>  }
+>  EXPORT_SYMBOL(vfio_unpin_pages);
+>  
+> +
+> +/*
+> + * This interface allows the CPUs to perform some sort of virtual DMA on
+> + * behalf of the device.
+> + *
+> + * CPUs read/write from/into a range of IOVAs pointing to user space memory
+> + * into/from a kernel buffer.
+> + *
+> + * As the read/write of user space memory is conducted via the CPUs and is
+> + * not a real device DMA, it is not necessary to pin the user space memory.
+> + *
+> + * The caller needs to call vfio_group_get_external_user() or
+> + * vfio_group_get_external_user_from_dev() prior to calling this interface,
+> + * so as to prevent the VFIO group from disposal in the middle of the call.
+> + * But it can keep the reference to the VFIO group for several calls into
+> + * this interface.
+> + * After finishing using of the VFIO group, the caller needs to release the
+> + * VFIO group by calling vfio_group_put_external_user().
+> + *
+> + * @group [in]		: VFIO group
+> + * @user_iova [in]	: base IOVA of a user space buffer
+> + * @data [in]		: pointer to kernel buffer
+> + * @len [in]		: kernel buffer length
+> + * @write		: indicate read or write
+> + * Return error code on failure or 0 on success.
+> + */
+> +int vfio_dma_rw(struct vfio_group *group, dma_addr_t user_iova,
+> +		void *data, size_t len, bool write)
+> +{
+> +	struct vfio_container *container;
+> +	struct vfio_iommu_driver *driver;
+> +	int ret = 0;
+> +
+> +	if (!group || !data || len <= 0)
+> +		return -EINVAL;
+> +
+> +	container = group->container;
+> +	driver = container->iommu_driver;
+> +
+> +	if (likely(driver && driver->ops->dma_rw))
+> +		ret = driver->ops->dma_rw(container->iommu_data,
+> +					  user_iova, data, len, write);
+> +	else
+> +		ret = -ENOTTY;
+> +
+> +	return ret;
+> +}
+> +EXPORT_SYMBOL(vfio_dma_rw);
+> +
+>  static int vfio_register_iommu_notifier(struct vfio_group *group,
+>  					unsigned long *events,
+>  					struct notifier_block *nb)
+> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+> index a177bf2c6683..9fdfae1cb17a 100644
+> --- a/drivers/vfio/vfio_iommu_type1.c
+> +++ b/drivers/vfio/vfio_iommu_type1.c
+> @@ -27,6 +27,7 @@
+>  #include <linux/iommu.h>
+>  #include <linux/module.h>
+>  #include <linux/mm.h>
+> +#include <linux/mmu_context.h>
+>  #include <linux/rbtree.h>
+>  #include <linux/sched/signal.h>
+>  #include <linux/sched/mm.h>
+> @@ -2305,6 +2306,80 @@ static int vfio_iommu_type1_unregister_notifier(void *iommu_data,
+>  	return blocking_notifier_chain_unregister(&iommu->notifier, nb);
+>  }
+>  
+> +static int vfio_iommu_type1_dma_rw_chunk(struct vfio_iommu *iommu,
+> +					 dma_addr_t user_iova, void *data,
+> +					 size_t count, bool write,
+> +					 size_t *copied)
+> +{
+> +	struct mm_struct *mm;
+> +	unsigned long vaddr;
+> +	struct vfio_dma *dma;
+> +	bool kthread = current->mm == NULL;
+> +	size_t offset;
+> +
+> +	*copied = 0;
+> +
+> +	dma = vfio_find_dma(iommu, user_iova, 1);
+> +	if (!dma)
+> +		return -EINVAL;
+> +
+> +	if ((write && !(dma->prot & IOMMU_WRITE)) ||
+> +			!(dma->prot & IOMMU_READ))
+> +		return -EPERM;
+> +
+> +	mm = get_task_mm(dma->task);
+> +
+> +	if (!mm)
+> +		return -EPERM;
+> +
+> +	if (kthread)
+> +		use_mm(mm);
+> +	else if (current->mm != mm)
+> +		goto out;
+> +
+> +	offset = user_iova - dma->iova;
+> +
+> +	if (count > dma->size - offset)
+> +		count = dma->size - offset;
+> +
+> +	vaddr = dma->vaddr + offset;
+> +
+> +	if (write)
+> +		*copied = __copy_to_user((void __user *)vaddr, data,
+> +					 count) ? 0 : count;
+> +	else
+> +		*copied = __copy_from_user(data, (void __user *)vaddr,
+> +					   count) ? 0 : count;
 
-Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
----
- tools/testing/selftests/kvm/kvm_create_max_vcpus.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Why are these using __copy_*_user()? Where are the access_ok() checks?
 
-diff --git a/tools/testing/selftests/kvm/kvm_create_max_vcpus.c b/tools/testing/selftests/kvm/kvm_create_max_vcpus.c
-index 6f38c3dc0d56..a7f3120b4409 100644
---- a/tools/testing/selftests/kvm/kvm_create_max_vcpus.c
-+++ b/tools/testing/selftests/kvm/kvm_create_max_vcpus.c
-@@ -60,7 +60,7 @@ int main(int argc, char *argv[])
- 
- 	if (kvm_max_vcpu_id > kvm_max_vcpus)
- 		test_vcpu_creation(
--			kvm_max_vcpu_id - kvm_max_vcpus, kvm_max_vcpus);
-+			kvm_max_vcpus, kvm_max_vcpu_id - kvm_max_vcpus);
- 
- 	return 0;
- }
+-Kees
+
+> +	if (kthread)
+> +		unuse_mm(mm);
+> +out:
+> +	mmput(mm);
+> +	return *copied ? 0 : -EFAULT;
+> +}
+> +
+> +static int vfio_iommu_type1_dma_rw(void *iommu_data, dma_addr_t user_iova,
+> +				   void *data, size_t count, bool write)
+> +{
+> +	struct vfio_iommu *iommu = iommu_data;
+> +	int ret = 0;
+> +	size_t done;
+> +
+> +	mutex_lock(&iommu->lock);
+> +	while (count > 0) {
+> +		ret = vfio_iommu_type1_dma_rw_chunk(iommu, user_iova, data,
+> +						    count, write, &done);
+> +		if (ret)
+> +			break;
+> +
+> +		count -= done;
+> +		data += done;
+> +		user_iova += done;
+> +	}
+> +
+> +	mutex_unlock(&iommu->lock);
+> +	return ret;
+> +}
+> +
+>  static const struct vfio_iommu_driver_ops vfio_iommu_driver_ops_type1 = {
+>  	.name			= "vfio-iommu-type1",
+>  	.owner			= THIS_MODULE,
+> @@ -2317,6 +2392,7 @@ static const struct vfio_iommu_driver_ops vfio_iommu_driver_ops_type1 = {
+>  	.unpin_pages		= vfio_iommu_type1_unpin_pages,
+>  	.register_notifier	= vfio_iommu_type1_register_notifier,
+>  	.unregister_notifier	= vfio_iommu_type1_unregister_notifier,
+> +	.dma_rw			= vfio_iommu_type1_dma_rw,
+>  };
+>  
+>  static int __init vfio_iommu_type1_init(void)
+> diff --git a/include/linux/vfio.h b/include/linux/vfio.h
+> index fb71e0ac0e76..34b2fdf4de6e 100644
+> --- a/include/linux/vfio.h
+> +++ b/include/linux/vfio.h
+> @@ -82,6 +82,8 @@ struct vfio_iommu_driver_ops {
+>  					     struct notifier_block *nb);
+>  	int		(*unregister_notifier)(void *iommu_data,
+>  					       struct notifier_block *nb);
+> +	int		(*dma_rw)(void *iommu_data, dma_addr_t user_iova,
+> +				  void *data, size_t count, bool write);
+>  };
+>  
+>  extern int vfio_register_iommu_driver(const struct vfio_iommu_driver_ops *ops);
+> @@ -109,6 +111,9 @@ extern int vfio_pin_pages(struct device *dev, unsigned long *user_pfn,
+>  extern int vfio_unpin_pages(struct device *dev, unsigned long *user_pfn,
+>  			    int npage);
+>  
+> +extern int vfio_dma_rw(struct vfio_group *group, dma_addr_t user_iova,
+> +		       void *data, size_t len, bool write);
+> +
+>  /* each type has independent events */
+>  enum vfio_notify_type {
+>  	VFIO_IOMMU_NOTIFY = 0,
+> -- 
+> 2.17.1
+> 
+
 -- 
-2.17.1
-
+Kees Cook
