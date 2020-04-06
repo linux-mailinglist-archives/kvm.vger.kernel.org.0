@@ -2,147 +2,349 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 950241A0122
-	for <lists+kvm@lfdr.de>; Tue,  7 Apr 2020 00:27:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 388C81A0127
+	for <lists+kvm@lfdr.de>; Tue,  7 Apr 2020 00:28:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726687AbgDFW1N (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Apr 2020 18:27:13 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:33446 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726130AbgDFW0r (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 6 Apr 2020 18:26:47 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1586212007;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=b+P99eoGOE59dzJri6nDdYTRF/iHp1rUM821OiEBSWI=;
-        b=U/vFF5VpXdmJuvhGVtoAcxNjDn8Yk87a3t6GmWVVKJW6gY9fo+Ei6MevQc/8I0qh4LitRW
-        /zglA5B++K0mdu5RAIDy8DsuK6jbwy+qzP/Astl6XkayEHxVRHXn8SOwCTRO+UCtJwehfB
-        YFxDE5HwoaAnl6IzJEPcXMQ2g8a+rGg=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-165-lKOMMDdFMCmSjOxjQhxSVQ-1; Mon, 06 Apr 2020 18:26:43 -0400
-X-MC-Unique: lKOMMDdFMCmSjOxjQhxSVQ-1
-Received: by mail-wm1-f69.google.com with SMTP id d134so317047wmd.0
-        for <kvm@vger.kernel.org>; Mon, 06 Apr 2020 15:26:43 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=b+P99eoGOE59dzJri6nDdYTRF/iHp1rUM821OiEBSWI=;
-        b=R3dMc8xPkT10pW+4/SeNIwD7e9E3nkci2XqcIBa68B3H+PAHcNMSuzoV36msVDcvqO
-         4NRO6v+XfbeQb02d8Rflsi6IE7LK/O6Cci7iv/Sgv0YXlRZh0RrC+5GBChniMPVIXqPu
-         g9l7qk66pt+tjmmv4+bJ/7Ibq0/yPw+uFImSWN60FLa+q90NZGCmBkBisJV3qOgGdDkC
-         stqSgwJBSeTbYo5ATg3r/qD1FHG3qGBfYewV5uVvqmM1vnQjOZFvjcic8WPvbgZDvO2Z
-         m5x+4wyHrfyWsxYH+tOQlVW/44b4O1DvjBb/v4TjZprBaY3iQF3ZnDPBjfCJRzZn+3Vg
-         65mw==
-X-Gm-Message-State: AGi0PubA7deBXQhETwAQu3H12oLQJSan0QA/rTG+4do7F/OQrPzTSFGC
-        KjZhWpmMC3vRQEkW48MG1+aCxa8gibBBqI/hItKc+qo6v6H0fvzmWf6X3+JXeK8xBOUst8PKyKi
-        BXw5HuoQ6c8wP
-X-Received: by 2002:a7b:ca47:: with SMTP id m7mr1618541wml.55.1586212002445;
-        Mon, 06 Apr 2020 15:26:42 -0700 (PDT)
-X-Google-Smtp-Source: APiQypJbM6FeH7VkbvEqYuHfim8CWxiQKaSSyipP1ZEG1ds7M2SyHjKH/nl5jukff0ySxHyaH4YMVA==
-X-Received: by 2002:a7b:ca47:: with SMTP id m7mr1618523wml.55.1586212002230;
-        Mon, 06 Apr 2020 15:26:42 -0700 (PDT)
-Received: from redhat.com (bzq-79-176-51-222.red.bezeqint.net. [79.176.51.222])
-        by smtp.gmail.com with ESMTPSA id h2sm1186449wmb.16.2020.04.06.15.26.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 Apr 2020 15:26:41 -0700 (PDT)
-Date:   Mon, 6 Apr 2020 18:26:40 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     linux-kernel@vger.kernel.org
-Cc:     Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
-Subject: [PATCH v6 06/12] vhost: force spec specified alignment on types
-Message-ID: <20200406222507.281867-7-mst@redhat.com>
-References: <20200406222507.281867-1-mst@redhat.com>
+        id S1726705AbgDFW1f (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Apr 2020 18:27:35 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:54934 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726312AbgDFW1f (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 Apr 2020 18:27:35 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 036MMt5x108035;
+        Mon, 6 Apr 2020 22:27:13 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2020-01-29;
+ bh=hatYsnMsoLP49Dkz3Xe01FIPGrFSbV6v6CCCS0dvdgA=;
+ b=LE5hfzFI/xAFqKt8BOcF0wUJNQ2ND3hG5A++Z92PuYbYgcNGzAVqcL9qnEXTChQpLd4Q
+ 3j96YJgJ2o4Hhx20O5rQhVZ37h4uv/k6c6VqAjWT6NZGWFBT/lsIJUefXPqWdEF9vk9n
+ CuArbaQiKVyDngT/xfOhY6KfRJlXc0DahWnwa8NTnnvmKlrTsjwAqnHHgVJaeSMdOvF8
+ tKXFMuvH9hj9OVYMOTORwepvhEIHcC88pA7SGIv3Ofwqy2HGXQmqyBrsfil6lSWnQ1aa
+ ZmGJ847Q/Qxn4cbI0QCscF5xIXGB4WOZ+iybDXQcBEqeBvpIpi3RsK7AIt3YUgv7jhvm KA== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by userp2120.oracle.com with ESMTP id 306jvn1hyc-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 06 Apr 2020 22:27:13 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 036MMQvT186515;
+        Mon, 6 Apr 2020 22:27:12 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by userp3020.oracle.com with ESMTP id 30839rb43e-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 06 Apr 2020 22:27:12 +0000
+Received: from abhmp0020.oracle.com (abhmp0020.oracle.com [141.146.116.26])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 036MRAd9006224;
+        Mon, 6 Apr 2020 22:27:10 GMT
+Received: from localhost.localdomain (/10.159.148.184)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Mon, 06 Apr 2020 15:27:10 -0700
+Subject: Re: [PATCH v6 08/14] KVM: X86: Introduce KVM_HC_PAGE_ENC_STATUS
+ hypercall
+To:     Ashish Kalra <ashish.kalra@amd.com>
+Cc:     pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com,
+        hpa@zytor.com, joro@8bytes.org, bp@suse.de,
+        thomas.lendacky@amd.com, x86@kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, rientjes@google.com,
+        srutherford@google.com, luto@kernel.org, brijesh.singh@amd.com
+References: <cover.1585548051.git.ashish.kalra@amd.com>
+ <265ef8a0ab75f01bc673cce6ddcf7988c7623943.1585548051.git.ashish.kalra@amd.com>
+ <8d1baef8-c5ea-e8ac-0a9c-097aa20ea7aa@oracle.com>
+ <20200403015748.GA26677@ashkalra_ubuntu_server>
+ <20200403025846.GA27066@ashkalra_ubuntu_server>
+From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Message-ID: <2d710143-0e28-5534-7858-81eb296d3445@oracle.com>
+Date:   Mon, 6 Apr 2020 15:27:08 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200406222507.281867-1-mst@redhat.com>
-X-Mailer: git-send-email 2.24.1.751.gd10ce2899c
-X-Mutt-Fcc: =sent
+In-Reply-To: <20200403025846.GA27066@ashkalra_ubuntu_server>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9583 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 spamscore=0 malwarescore=0
+ mlxscore=0 mlxlogscore=999 bulkscore=0 suspectscore=2 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
+ definitions=main-2004060169
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9583 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 suspectscore=2
+ mlxlogscore=999 mlxscore=0 bulkscore=0 adultscore=0 priorityscore=1501
+ lowpriorityscore=0 clxscore=1015 malwarescore=0 impostorscore=0
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2004060169
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The ring element addresses are passed between components with different
-alignments assumptions. Thus, if guest/userspace selects a pointer and
-host then gets and dereferences it, we might need to decrease the
-compiler-selected alignment to prevent compiler on the host from
-assuming pointer is aligned.
 
-This actually triggers on ARM with -mabi=apcs-gnu - which is a
-deprecated configuration, but it seems safer to handle this
-generally.
+On 4/2/20 7:58 PM, Ashish Kalra wrote:
+> On Fri, Apr 03, 2020 at 01:57:48AM +0000, Ashish Kalra wrote:
+>> On Thu, Apr 02, 2020 at 06:31:54PM -0700, Krish Sadhukhan wrote:
+>>> On 3/29/20 11:22 PM, Ashish Kalra wrote:
+>>>> From: Brijesh Singh <Brijesh.Singh@amd.com>
+>>>>
+>>>> This hypercall is used by the SEV guest to notify a change in the page
+>>>> encryption status to the hypervisor. The hypercall should be invoked
+>>>> only when the encryption attribute is changed from encrypted -> decrypted
+>>>> and vice versa. By default all guest pages are considered encrypted.
+>>>>
+>>>> Cc: Thomas Gleixner <tglx@linutronix.de>
+>>>> Cc: Ingo Molnar <mingo@redhat.com>
+>>>> Cc: "H. Peter Anvin" <hpa@zytor.com>
+>>>> Cc: Paolo Bonzini <pbonzini@redhat.com>
+>>>> Cc: "Radim Krčmář" <rkrcmar@redhat.com>
+>>>> Cc: Joerg Roedel <joro@8bytes.org>
+>>>> Cc: Borislav Petkov <bp@suse.de>
+>>>> Cc: Tom Lendacky <thomas.lendacky@amd.com>
+>>>> Cc: x86@kernel.org
+>>>> Cc: kvm@vger.kernel.org
+>>>> Cc: linux-kernel@vger.kernel.org
+>>>> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+>>>> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+>>>> ---
+>>>>    Documentation/virt/kvm/hypercalls.rst | 15 +++++
+>>>>    arch/x86/include/asm/kvm_host.h       |  2 +
+>>>>    arch/x86/kvm/svm.c                    | 95 +++++++++++++++++++++++++++
+>>>>    arch/x86/kvm/vmx/vmx.c                |  1 +
+>>>>    arch/x86/kvm/x86.c                    |  6 ++
+>>>>    include/uapi/linux/kvm_para.h         |  1 +
+>>>>    6 files changed, 120 insertions(+)
+>>>>
+>>>> diff --git a/Documentation/virt/kvm/hypercalls.rst b/Documentation/virt/kvm/hypercalls.rst
+>>>> index dbaf207e560d..ff5287e68e81 100644
+>>>> --- a/Documentation/virt/kvm/hypercalls.rst
+>>>> +++ b/Documentation/virt/kvm/hypercalls.rst
+>>>> @@ -169,3 +169,18 @@ a0: destination APIC ID
+>>>>    :Usage example: When sending a call-function IPI-many to vCPUs, yield if
+>>>>    	        any of the IPI target vCPUs was preempted.
+>>>> +
+>>>> +
+>>>> +8. KVM_HC_PAGE_ENC_STATUS
+>>>> +-------------------------
+>>>> +:Architecture: x86
+>>>> +:Status: active
+>>>> +:Purpose: Notify the encryption status changes in guest page table (SEV guest)
+>>>> +
+>>>> +a0: the guest physical address of the start page
+>>>> +a1: the number of pages
+>>>> +a2: encryption attribute
+>>>> +
+>>>> +   Where:
+>>>> +	* 1: Encryption attribute is set
+>>>> +	* 0: Encryption attribute is cleared
+>>>> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+>>>> index 98959e8cd448..90718fa3db47 100644
+>>>> --- a/arch/x86/include/asm/kvm_host.h
+>>>> +++ b/arch/x86/include/asm/kvm_host.h
+>>>> @@ -1267,6 +1267,8 @@ struct kvm_x86_ops {
+>>>>    	bool (*apic_init_signal_blocked)(struct kvm_vcpu *vcpu);
+>>>>    	int (*enable_direct_tlbflush)(struct kvm_vcpu *vcpu);
+>>>> +	int (*page_enc_status_hc)(struct kvm *kvm, unsigned long gpa,
+>>>> +				  unsigned long sz, unsigned long mode);
+>>>>    };
+>>>>    struct kvm_arch_async_pf {
+>>>> diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
+>>>> index 7c2721e18b06..1d8beaf1bceb 100644
+>>>> --- a/arch/x86/kvm/svm.c
+>>>> +++ b/arch/x86/kvm/svm.c
+>>>> @@ -136,6 +136,8 @@ struct kvm_sev_info {
+>>>>    	int fd;			/* SEV device fd */
+>>>>    	unsigned long pages_locked; /* Number of pages locked */
+>>>>    	struct list_head regions_list;  /* List of registered regions */
+>>>> +	unsigned long *page_enc_bmap;
+>>>> +	unsigned long page_enc_bmap_size;
+>>>>    };
+>>>>    struct kvm_svm {
+>>>> @@ -1991,6 +1993,9 @@ static void sev_vm_destroy(struct kvm *kvm)
+>>>>    	sev_unbind_asid(kvm, sev->handle);
+>>>>    	sev_asid_free(sev->asid);
+>>>> +
+>>>> +	kvfree(sev->page_enc_bmap);
+>>>> +	sev->page_enc_bmap = NULL;
+>>>>    }
+>>>>    static void avic_vm_destroy(struct kvm *kvm)
+>>>> @@ -7593,6 +7598,94 @@ static int sev_receive_finish(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>>>>    	return ret;
+>>>>    }
+>>>> +static int sev_resize_page_enc_bitmap(struct kvm *kvm, unsigned long new_size)
+>>>> +{
+>>>> +	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+>>>> +	unsigned long *map;
+>>>> +	unsigned long sz;
+>>>> +
+>>>> +	if (sev->page_enc_bmap_size >= new_size)
+>>>> +		return 0;
+>>>> +
+>>>> +	sz = ALIGN(new_size, BITS_PER_LONG) / 8;
+>>>> +
+>>>> +	map = vmalloc(sz);
+>>>
+>>> Just wondering why we can't directly modify sev->page_enc_bmap.
+>>>
+>> Because the page_enc_bitmap needs to be re-sized here, it needs to be
+>> expanded here.
 
-I verified that the produced binary is exactly identical on x86.
 
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
----
- drivers/vhost/vhost.h       |  6 +++---
- include/linux/virtio_ring.h | 24 +++++++++++++++++++++---
- 2 files changed, 24 insertions(+), 6 deletions(-)
+OK.
 
-diff --git a/drivers/vhost/vhost.h b/drivers/vhost/vhost.h
-index f8403bd46b85..60cab4c78229 100644
---- a/drivers/vhost/vhost.h
-+++ b/drivers/vhost/vhost.h
-@@ -67,9 +67,9 @@ struct vhost_virtqueue {
- 	/* The actual ring of buffers. */
- 	struct mutex mutex;
- 	unsigned int num;
--	struct vring_desc __user *desc;
--	struct vring_avail __user *avail;
--	struct vring_used __user *used;
-+	vring_desc_t __user *desc;
-+	vring_avail_t __user *avail;
-+	vring_used_t __user *used;
- 	const struct vhost_iotlb_map *meta_iotlb[VHOST_NUM_ADDRS];
- 	struct file *kick;
- 	struct eventfd_ctx *call_ctx;
-diff --git a/include/linux/virtio_ring.h b/include/linux/virtio_ring.h
-index 11680e74761a..c3f9ca054250 100644
---- a/include/linux/virtio_ring.h
-+++ b/include/linux/virtio_ring.h
-@@ -60,14 +60,32 @@ static inline void virtio_store_mb(bool weak_barriers,
- struct virtio_device;
- struct virtqueue;
- 
-+/*
-+ * The ring element addresses are passed between components with different
-+ * alignments assumptions. Thus, we might need to decrease the compiler-selected
-+ * alignment, and so must use a typedef to make sure the __aligned attribute
-+ * actually takes hold:
-+ *
-+ * https://gcc.gnu.org/onlinedocs//gcc/Common-Type-Attributes.html#Common-Type-Attributes
-+ *
-+ * When used on a struct, or struct member, the aligned attribute can only
-+ * increase the alignment; in order to decrease it, the packed attribute must
-+ * be specified as well. When used as part of a typedef, the aligned attribute
-+ * can both increase and decrease alignment, and specifying the packed
-+ * attribute generates a warning.
-+ */
-+typedef struct vring_desc __aligned(VRING_DESC_ALIGN_SIZE) vring_desc_t;
-+typedef struct vring_avail __aligned(VRING_AVAIL_ALIGN_SIZE) vring_avail_t;
-+typedef struct vring_used __aligned(VRING_USED_ALIGN_SIZE) vring_used_t;
-+
- struct vring {
- 	unsigned int num;
- 
--	struct vring_desc *desc;
-+	vring_desc_t *desc;
- 
--	struct vring_avail *avail;
-+	vring_avail_t *avail;
- 
--	struct vring_used *used;
-+	vring_used_t *used;
- };
- 
- /*
--- 
-MST
+> I don't believe there is anything is like a realloc() kind of equivalent
+> for the kmalloc() interfaces.
+>
+> Thanks,
+> Ashish
+>
+>>>> +	if (!map) {
+>>>> +		pr_err_once("Failed to allocate encrypted bitmap size %lx\n",
+>>>> +				sz);
+>>>> +		return -ENOMEM;
+>>>> +	}
+>>>> +
+>>>> +	/* mark the page encrypted (by default) */
+>>>> +	memset(map, 0xff, sz);
+>>>> +
+>>>> +	bitmap_copy(map, sev->page_enc_bmap, sev->page_enc_bmap_size);
+>>>> +	kvfree(sev->page_enc_bmap);
+>>>> +
+>>>> +	sev->page_enc_bmap = map;
+>>>> +	sev->page_enc_bmap_size = new_size;
+>>>> +
+>>>> +	return 0;
+>>>> +}
+>>>> +
+>>>> +static int svm_page_enc_status_hc(struct kvm *kvm, unsigned long gpa,
+>>>> +				  unsigned long npages, unsigned long enc)
+>>>> +{
+>>>> +	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+>>>> +	kvm_pfn_t pfn_start, pfn_end;
+>>>> +	gfn_t gfn_start, gfn_end;
+>>>> +	int ret;
+>>>> +
+>>>> +	if (!sev_guest(kvm))
+>>>> +		return -EINVAL;
+>>>> +
+>>>> +	if (!npages)
+>>>> +		return 0;
+>>>> +
+>>>> +	gfn_start = gpa_to_gfn(gpa);
+>>>> +	gfn_end = gfn_start + npages;
+>>>> +
+>>>> +	/* out of bound access error check */
+>>>> +	if (gfn_end <= gfn_start)
+>>>> +		return -EINVAL;
+>>>> +
+>>>> +	/* lets make sure that gpa exist in our memslot */
+>>>> +	pfn_start = gfn_to_pfn(kvm, gfn_start);
+>>>> +	pfn_end = gfn_to_pfn(kvm, gfn_end);
+>>>> +
+>>>> +	if (is_error_noslot_pfn(pfn_start) && !is_noslot_pfn(pfn_start)) {
+>>>> +		/*
+>>>> +		 * Allow guest MMIO range(s) to be added
+>>>> +		 * to the page encryption bitmap.
+>>>> +		 */
+>>>> +		return -EINVAL;
+>>>> +	}
+>>>> +
+>>>> +	if (is_error_noslot_pfn(pfn_end) && !is_noslot_pfn(pfn_end)) {
+>>>> +		/*
+>>>> +		 * Allow guest MMIO range(s) to be added
+>>>> +		 * to the page encryption bitmap.
+>>>> +		 */
+>>>> +		return -EINVAL;
+>>>> +	}
+>>>
+>>> It seems is_error_noslot_pfn() covers both cases - i) gfn slot is absent,
+>>> ii) failure to translate to pfn. So do we still need is_noslot_pfn() ?
+>>>
+>> We do need to check for !is_noslot_pfn(..) additionally as the MMIO ranges will not
+>> be having a slot allocated.
 
+
+The comments above is_error_noslot_pfn() seem to indicate that it covers 
+both cases, "not in slot" and "failure to translate"...
+
+
+Reviewed-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
+
+>>
+>> Thanks,
+>> Ashish
+>>
+>>>> +
+>>>> +	mutex_lock(&kvm->lock);
+>>>> +	ret = sev_resize_page_enc_bitmap(kvm, gfn_end);
+>>>> +	if (ret)
+>>>> +		goto unlock;
+>>>> +
+>>>> +	if (enc)
+>>>> +		__bitmap_set(sev->page_enc_bmap, gfn_start,
+>>>> +				gfn_end - gfn_start);
+>>>> +	else
+>>>> +		__bitmap_clear(sev->page_enc_bmap, gfn_start,
+>>>> +				gfn_end - gfn_start);
+>>>> +
+>>>> +unlock:
+>>>> +	mutex_unlock(&kvm->lock);
+>>>> +	return ret;
+>>>> +}
+>>>> +
+>>>>    static int svm_mem_enc_op(struct kvm *kvm, void __user *argp)
+>>>>    {
+>>>>    	struct kvm_sev_cmd sev_cmd;
+>>>> @@ -7995,6 +8088,8 @@ static struct kvm_x86_ops svm_x86_ops __ro_after_init = {
+>>>>    	.need_emulation_on_page_fault = svm_need_emulation_on_page_fault,
+>>>>    	.apic_init_signal_blocked = svm_apic_init_signal_blocked,
+>>>> +
+>>>> +	.page_enc_status_hc = svm_page_enc_status_hc,
+>>>
+>>> Why not place it where other encryption ops are located ?
+>>>
+>>>          ...
+>>>
+>>>          .mem_enc_unreg_region
+>>>
+>>> +      .page_enc_status_hc = svm_page_enc_status_hc
+>>>
+>>>>    };
+>>>>    static int __init svm_init(void)
+>>>> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+>>>> index 079d9fbf278e..f68e76ee7f9c 100644
+>>>> --- a/arch/x86/kvm/vmx/vmx.c
+>>>> +++ b/arch/x86/kvm/vmx/vmx.c
+>>>> @@ -8001,6 +8001,7 @@ static struct kvm_x86_ops vmx_x86_ops __ro_after_init = {
+>>>>    	.nested_get_evmcs_version = NULL,
+>>>>    	.need_emulation_on_page_fault = vmx_need_emulation_on_page_fault,
+>>>>    	.apic_init_signal_blocked = vmx_apic_init_signal_blocked,
+>>>> +	.page_enc_status_hc = NULL,
+>>>>    };
+>>>>    static void vmx_cleanup_l1d_flush(void)
+>>>> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+>>>> index cf95c36cb4f4..68428eef2dde 100644
+>>>> --- a/arch/x86/kvm/x86.c
+>>>> +++ b/arch/x86/kvm/x86.c
+>>>> @@ -7564,6 +7564,12 @@ int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
+>>>>    		kvm_sched_yield(vcpu->kvm, a0);
+>>>>    		ret = 0;
+>>>>    		break;
+>>>> +	case KVM_HC_PAGE_ENC_STATUS:
+>>>> +		ret = -KVM_ENOSYS;
+>>>> +		if (kvm_x86_ops->page_enc_status_hc)
+>>>> +			ret = kvm_x86_ops->page_enc_status_hc(vcpu->kvm,
+>>>> +					a0, a1, a2);
+>>>> +		break;
+>>>>    	default:
+>>>>    		ret = -KVM_ENOSYS;
+>>>>    		break;
+>>>> diff --git a/include/uapi/linux/kvm_para.h b/include/uapi/linux/kvm_para.h
+>>>> index 8b86609849b9..847b83b75dc8 100644
+>>>> --- a/include/uapi/linux/kvm_para.h
+>>>> +++ b/include/uapi/linux/kvm_para.h
+>>>> @@ -29,6 +29,7 @@
+>>>>    #define KVM_HC_CLOCK_PAIRING		9
+>>>>    #define KVM_HC_SEND_IPI		10
+>>>>    #define KVM_HC_SCHED_YIELD		11
+>>>> +#define KVM_HC_PAGE_ENC_STATUS		12
+>>>>    /*
+>>>>     * hypercalls use architecture specific
