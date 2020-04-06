@@ -2,76 +2,195 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3A51319F5F2
-	for <lists+kvm@lfdr.de>; Mon,  6 Apr 2020 14:41:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 37F3A19F602
+	for <lists+kvm@lfdr.de>; Mon,  6 Apr 2020 14:45:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728021AbgDFMl3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Apr 2020 08:41:29 -0400
-Received: from mail.skyhub.de ([5.9.137.197]:34944 "EHLO mail.skyhub.de"
+        id S1728106AbgDFMp0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Apr 2020 08:45:26 -0400
+Received: from mail.kernel.org ([198.145.29.99]:45870 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728005AbgDFMl3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 Apr 2020 08:41:29 -0400
-Received: from zn.tnic (p200300EC2F04F600C571FE02886A814C.dip0.t-ipconnect.de [IPv6:2003:ec:2f04:f600:c571:fe02:886a:814c])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        id S1728062AbgDFMp0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 Apr 2020 08:45:26 -0400
+Received: from mail-io1-f41.google.com (mail-io1-f41.google.com [209.85.166.41])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 89F001EC0C97;
-        Mon,  6 Apr 2020 14:41:27 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1586176887;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=PbaBekgCD+MeWyYk1vRkkQPU2yAt2/j+9avcpCI88LE=;
-        b=UEY77Gv5ArFCMO1FwtAfGHdXL/PbVEHaPP5I4lJUZvrVz9+QQCPvHfTkWcEzm503GpFgue
-        piAeGh2vlK1frRBdUfv6oqzgi1QgaCwpAEO+RIkfrXF6K6j6NVV4reEqzxS58IswwexQrJ
-        LY4CL2BMrwv2smovKGngto6QUgLDOtU=
-Date:   Mon, 6 Apr 2020 14:41:24 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Joerg Roedel <joro@8bytes.org>
-Cc:     x86@kernel.org, hpa@zytor.com, Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Thomas Hellstrom <thellstrom@vmware.com>,
-        Jiri Slaby <jslaby@suse.cz>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Juergen Gross <jgross@suse.com>,
-        Kees Cook <keescook@chromium.org>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        Joerg Roedel <jroedel@suse.de>
-Subject: Re: [PATCH 18/70] x86/boot/compressed/64: Add stage1 #VC handler
-Message-ID: <20200406124123.GE2520@zn.tnic>
-References: <20200319091407.1481-1-joro@8bytes.org>
- <20200319091407.1481-19-joro@8bytes.org>
+        by mail.kernel.org (Postfix) with ESMTPSA id 6EFF022203;
+        Mon,  6 Apr 2020 12:45:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1586177125;
+        bh=tiN2oTj1i0XyvRhRfdLBlfrbeamD1vChWpja08uq09w=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=Q7O72xtV3LBHX177tBgE4k8duWbcQLkAnOvu2i0oWsmlEVrgMpKM3Q1K8phxJkiLN
+         C1GBx8jR/l4WGDlFSPD7ZybDU8FJfT2WzYUMEWgVcI4vd98Lj7j6VgsSlrnwVtFd0A
+         xlZFWEjxBmW5054XDH0fJTY5IycORF0oShPo291Y=
+Received: by mail-io1-f41.google.com with SMTP id y17so13492899iow.9;
+        Mon, 06 Apr 2020 05:45:25 -0700 (PDT)
+X-Gm-Message-State: AGi0PuZif1Sw85yrW2W2Vu5AjLHPakcbTLZ5OT9i5CoTU60GU8W2/Dx5
+        Qr1jeEM8RhOEAuOgbx1YwUG/c6Uu4/iAvgBgEvY=
+X-Google-Smtp-Source: APiQypJR/I5FJdjjJ5dWxK8nEozXVMsHluDJKpsrloyjYgJrmslBzZKSVlpcnCxFRDiK8soBbZ4QBOO/IENvSOEHHp4=
+X-Received: by 2002:a6b:f413:: with SMTP id i19mr19532257iog.203.1586177124713;
+ Mon, 06 Apr 2020 05:45:24 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20200319091407.1481-19-joro@8bytes.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+References: <20200406121233.109889-1-mst@redhat.com> <20200406121233.109889-3-mst@redhat.com>
+In-Reply-To: <20200406121233.109889-3-mst@redhat.com>
+From:   Ard Biesheuvel <ardb@kernel.org>
+Date:   Mon, 6 Apr 2020 14:45:13 +0200
+X-Gmail-Original-Message-ID: <CAMj1kXFNeuZU66swwf_Cx7PrQJV34C0VJ7Rte5aga2Jx4S-yHw@mail.gmail.com>
+Message-ID: <CAMj1kXFNeuZU66swwf_Cx7PrQJV34C0VJ7Rte5aga2Jx4S-yHw@mail.gmail.com>
+Subject: Re: [PATCH v2 2/2] vhost: disable for OABI
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        kbuild test robot <lkp@intel.com>,
+        "daniel.santos@pobox.com" <daniel.santos@pobox.com>,
+        Jason Wang <jasowang@redhat.com>,
+        "kbuild-all@lists.01.org" <kbuild-all@lists.01.org>,
+        Russell King <rmk+kernel@armlinux.org.uk>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        Sudeep Dutt <sudeep.dutt@intel.com>,
+        Ashutosh Dixit <ashutosh.dixit@intel.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        "David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 19, 2020 at 10:13:15AM +0100, Joerg Roedel wrote:
-> diff --git a/arch/x86/boot/compressed/idt_handlers_64.S b/arch/x86/boot/compressed/idt_handlers_64.S
-> index bfb3fc5aa144..67ddafab2943 100644
-> --- a/arch/x86/boot/compressed/idt_handlers_64.S
-> +++ b/arch/x86/boot/compressed/idt_handlers_64.S
-> @@ -75,3 +75,7 @@ SYM_FUNC_END(\name)
->  	.code64
->  
->  EXCEPTION_HANDLER	boot_pf_handler do_boot_page_fault error_code=1
+On Mon, 6 Apr 2020 at 14:12, Michael S. Tsirkin <mst@redhat.com> wrote:
+>
+> vhost is currently broken on the default ARM config.
+>
+
+Where did you get this idea? The report from the robot was using a
+randconfig build, and in general, AEABI is required to run anything on
+any modern ARM system .
+
+
+> The reason is that that uses apcs-gnu which is the ancient OABI that is been
+> deprecated for a long time.
+>
+> Given that virtio support on such ancient systems is not needed in the
+> first place, let's just add something along the lines of
+>
+>         depends on !ARM || AEABI
+>
+> to the virtio Kconfig declaration, and add a comment that it has to do
+> with struct member alignment.
+>
+> Note: we can't make VHOST and VHOST_RING themselves have
+> a dependency since these are selected. Add a new symbol for that.
+>
+> Suggested-by: Ard Biesheuvel <ardb@kernel.org>
+> Siggested-by: Richard Earnshaw <Richard.Earnshaw@arm.com>
+
+typo ^^^
+
+
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> ---
+>  drivers/misc/mic/Kconfig |  2 +-
+>  drivers/net/caif/Kconfig |  2 +-
+>  drivers/vdpa/Kconfig     |  2 +-
+>  drivers/vhost/Kconfig    | 17 +++++++++++++----
+>  4 files changed, 16 insertions(+), 7 deletions(-)
+>
+> diff --git a/drivers/misc/mic/Kconfig b/drivers/misc/mic/Kconfig
+> index 8f201d019f5a..3bfe72c59864 100644
+> --- a/drivers/misc/mic/Kconfig
+> +++ b/drivers/misc/mic/Kconfig
+> @@ -116,7 +116,7 @@ config MIC_COSM
+>
+>  config VOP
+>         tristate "VOP Driver"
+> -       depends on VOP_BUS
+> +       depends on VOP_BUS && VHOST_DPN
+>         select VHOST_RING
+>         select VIRTIO
+>         help
+> diff --git a/drivers/net/caif/Kconfig b/drivers/net/caif/Kconfig
+> index 9db0570c5beb..661c25eb1c46 100644
+> --- a/drivers/net/caif/Kconfig
+> +++ b/drivers/net/caif/Kconfig
+> @@ -50,7 +50,7 @@ config CAIF_HSI
+>
+>  config CAIF_VIRTIO
+>         tristate "CAIF virtio transport driver"
+> -       depends on CAIF && HAS_DMA
+> +       depends on CAIF && HAS_DMA && VHOST_DPN
+>         select VHOST_RING
+>         select VIRTIO
+>         select GENERIC_ALLOCATOR
+> diff --git a/drivers/vdpa/Kconfig b/drivers/vdpa/Kconfig
+> index d0cb0e583a5d..aee28def466b 100644
+> --- a/drivers/vdpa/Kconfig
+> +++ b/drivers/vdpa/Kconfig
+> @@ -14,7 +14,7 @@ if VDPA_MENU
+>
+>  config VDPA_SIM
+>         tristate "vDPA device simulator"
+> -       depends on RUNTIME_TESTING_MENU && HAS_DMA
+> +       depends on RUNTIME_TESTING_MENU && HAS_DMA && VHOST_DPN
+>         select VDPA
+>         select VHOST_RING
+>         select VHOST_IOTLB
+> diff --git a/drivers/vhost/Kconfig b/drivers/vhost/Kconfig
+> index cb6b17323eb2..b3486e218f62 100644
+> --- a/drivers/vhost/Kconfig
+> +++ b/drivers/vhost/Kconfig
+> @@ -12,6 +12,15 @@ config VHOST_RING
+>           This option is selected by any driver which needs to access
+>           the host side of a virtio ring.
+>
+> +config VHOST_DPN
+> +       bool "VHOST dependencies"
+> +       depends on !ARM || AEABI
+> +       default y
+> +       help
+> +         Anything selecting VHOST or VHOST_RING must depend on VHOST_DPN.
+> +         This excludes the deprecated ARM ABI since that forces a 4 byte
+> +         alignment on all structs - incompatible with virtio spec requirements.
 > +
-> +#ifdef CONFIG_AMD_MEM_ENCRYPT
-> +EXCEPTION_HANDLER	boot_stage1_vc_handler vc_no_ghcb_handler error_code=1
-
-Like the others
-			boot_stage1_vc	do_boot_stage1_vc ...
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+>  config VHOST
+>         tristate
+>         select VHOST_IOTLB
+> @@ -27,7 +36,7 @@ if VHOST_MENU
+>
+>  config VHOST_NET
+>         tristate "Host kernel accelerator for virtio net"
+> -       depends on NET && EVENTFD && (TUN || !TUN) && (TAP || !TAP)
+> +       depends on NET && EVENTFD && (TUN || !TUN) && (TAP || !TAP) && VHOST_DPN
+>         select VHOST
+>         ---help---
+>           This kernel module can be loaded in host kernel to accelerate
+> @@ -39,7 +48,7 @@ config VHOST_NET
+>
+>  config VHOST_SCSI
+>         tristate "VHOST_SCSI TCM fabric driver"
+> -       depends on TARGET_CORE && EVENTFD
+> +       depends on TARGET_CORE && EVENTFD && VHOST_DPN
+>         select VHOST
+>         default n
+>         ---help---
+> @@ -48,7 +57,7 @@ config VHOST_SCSI
+>
+>  config VHOST_VSOCK
+>         tristate "vhost virtio-vsock driver"
+> -       depends on VSOCKETS && EVENTFD
+> +       depends on VSOCKETS && EVENTFD && VHOST_DPN
+>         select VHOST
+>         select VIRTIO_VSOCKETS_COMMON
+>         default n
+> @@ -62,7 +71,7 @@ config VHOST_VSOCK
+>
+>  config VHOST_VDPA
+>         tristate "Vhost driver for vDPA-based backend"
+> -       depends on EVENTFD
+> +       depends on EVENTFD && VHOST_DPN
+>         select VHOST
+>         select VDPA
+>         help
+> --
+> MST
+>
