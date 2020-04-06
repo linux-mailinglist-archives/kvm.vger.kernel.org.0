@@ -2,100 +2,147 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id AD3A71A0028
-	for <lists+kvm@lfdr.de>; Mon,  6 Apr 2020 23:32:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F000B1A0044
+	for <lists+kvm@lfdr.de>; Mon,  6 Apr 2020 23:35:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726272AbgDFVci (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Apr 2020 17:32:38 -0400
-Received: from Galois.linutronix.de ([193.142.43.55]:45743 "EHLO
-        Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725895AbgDFVch (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 Apr 2020 17:32:37 -0400
-Received: from p5de0bf0b.dip0.t-ipconnect.de ([93.224.191.11] helo=nanos.tec.linutronix.de)
-        by Galois.linutronix.de with esmtpsa (TLS1.2:DHE_RSA_AES_256_CBC_SHA256:256)
-        (Exim 4.80)
-        (envelope-from <tglx@linutronix.de>)
-        id 1jLZM7-0001C1-U3; Mon, 06 Apr 2020 23:32:32 +0200
-Received: by nanos.tec.linutronix.de (Postfix, from userid 1000)
-        id 5FC34100C47; Mon,  6 Apr 2020 23:32:31 +0200 (CEST)
-From:   Thomas Gleixner <tglx@linutronix.de>
-To:     Vivek Goyal <vgoyal@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>
-Cc:     Andy Lutomirski <luto@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        LKML <linux-kernel@vger.kernel.org>, X86 ML <x86@kernel.org>,
-        kvm list <kvm@vger.kernel.org>, stable <stable@vger.kernel.org>
-Subject: Re: [PATCH v2] x86/kvm: Disable KVM_ASYNC_PF_SEND_ALWAYS
-In-Reply-To: <20200406190951.GA19259@redhat.com>
-References: <87ftek9ngq.fsf@nanos.tec.linutronix.de> <CALCETrVsc-t=tDRPbCg5dWHDY0NFv2zjz12ahD-vnGPn8T+RXA@mail.gmail.com> <87a74s9ehb.fsf@nanos.tec.linutronix.de> <87wo7v8g4j.fsf@nanos.tec.linutronix.de> <877dzu8178.fsf@nanos.tec.linutronix.de> <37440ade-1657-648b-bf72-2b8ca4ac21ce@redhat.com> <871rq199oz.fsf@nanos.tec.linutronix.de> <CALCETrUHwd8pNr_ZdFqY8vMjJeMdNyw2C+FL6uOUM98SEE9rNQ@mail.gmail.com> <87d09l73ip.fsf@nanos.tec.linutronix.de> <20200309202215.GM12561@hirez.programming.kicks-ass.net> <20200406190951.GA19259@redhat.com>
-Date:   Mon, 06 Apr 2020 23:32:31 +0200
-Message-ID: <87wo6sjo5s.fsf@nanos.tec.linutronix.de>
+        id S1726443AbgDFVep (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Apr 2020 17:34:45 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:51792 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726546AbgDFVep (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 Apr 2020 17:34:45 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1586208884;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=b+P99eoGOE59dzJri6nDdYTRF/iHp1rUM821OiEBSWI=;
+        b=Z7amTvX4E8a/BsieLgf9KNnVc3e3g/OJSc4czDKiqHROckdje2WEV9RbRep8GmmBWna4Pl
+        9sv4BugdujiMjM/t3oHaFhKtG6X7cxVDzsQhDMA7u7q+xf5kxgbrSltrL6TObsj5uk6YBF
+        IntsugIb4kUrEWOUzOIg2XbCz0juVDs=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-32-fRqlDMYkMQ22IewW0Hx-MA-1; Mon, 06 Apr 2020 17:34:40 -0400
+X-MC-Unique: fRqlDMYkMQ22IewW0Hx-MA-1
+Received: by mail-wr1-f71.google.com with SMTP id 91so587512wro.1
+        for <kvm@vger.kernel.org>; Mon, 06 Apr 2020 14:34:40 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=b+P99eoGOE59dzJri6nDdYTRF/iHp1rUM821OiEBSWI=;
+        b=GuBd19TqmdN69mwhifh4cB1MQUfTkAkKt/efR4K+xUyWn2QF7f0KGT4Pex3kUsyhJk
+         OWqym1jNwW0WK+doS39Fiu3T5XXrvFgTwnjd/swaY0NnnFLh2fPMLmQPwBmH+VG9sAOC
+         5eXS4G5HD4j2ODBU/+CSDWSDB7DR1fE8+1mc5x1g0mGYERLwYwjhyz6uKu054OWcL0tn
+         ehQ3dNLMepubwsHIctYM8PE+zOYQs2/bQvYZYJJNBAOf/DApodSfKVA06HEXlcNMFxGk
+         2VxURfqmHDYsMs1Pkt35EPJ/aRUYKsalrO27d7K7Eh01QLBwpC3dnIuAkT7+A+gfa0HJ
+         N1wg==
+X-Gm-Message-State: AGi0PuaSGom5GvXSe9tlND4qV0UNiSxvqq3/QEr6qYvB8epeTwR0Th+T
+        iLYz6STxa0BUNAfLbECS564ciff3s1T4taVG6SOay8Edw66hdF0qQhZNHqI/RRffM5bfFzSEX+F
+        MsMY2KaehvwKW
+X-Received: by 2002:a1c:2d95:: with SMTP id t143mr1048133wmt.89.1586208879544;
+        Mon, 06 Apr 2020 14:34:39 -0700 (PDT)
+X-Google-Smtp-Source: APiQypIDfEOd292CqNqE70r5arC2C5jNItEbGfr741TbN6Hn4hfA1uTh0Srcc3LesXCK0n49qBd6Cw==
+X-Received: by 2002:a1c:2d95:: with SMTP id t143mr1048122wmt.89.1586208879332;
+        Mon, 06 Apr 2020 14:34:39 -0700 (PDT)
+Received: from redhat.com (bzq-79-176-51-222.red.bezeqint.net. [79.176.51.222])
+        by smtp.gmail.com with ESMTPSA id b85sm1103452wmb.21.2020.04.06.14.34.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 06 Apr 2020 14:34:38 -0700 (PDT)
+Date:   Mon, 6 Apr 2020 17:34:37 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     linux-kernel@vger.kernel.org
+Cc:     Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
+Subject: [PATCH v4 06/12] vhost: force spec specified alignment on types
+Message-ID: <20200406210108.148131-7-mst@redhat.com>
+References: <20200406210108.148131-1-mst@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Linutronix-Spam-Score: -1.0
-X-Linutronix-Spam-Level: -
-X-Linutronix-Spam-Status: No , -1.0 points, 5.0 required,  ALL_TRUSTED=-1,SHORTCIRCUIT=-0.0001
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200406210108.148131-1-mst@redhat.com>
+X-Mailer: git-send-email 2.24.1.751.gd10ce2899c
+X-Mutt-Fcc: =sent
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Vivek Goyal <vgoyal@redhat.com> writes:
-> On Mon, Mar 09, 2020 at 09:22:15PM +0100, Peter Zijlstra wrote:
->> On Mon, Mar 09, 2020 at 08:05:18PM +0100, Thomas Gleixner wrote:
->> > Andy Lutomirski <luto@kernel.org> writes:
->> 
->> > > I'm okay with the save/restore dance, I guess.  It's just yet more
->> > > entry crud to deal with architecture nastiness, except that this
->> > > nastiness is 100% software and isn't Intel/AMD's fault.
->> > 
->> > And we can do it in C and don't have to fiddle with it in the ASM
->> > maze.
->> 
->> Right; I'd still love to kill KVM_ASYNC_PF_SEND_ALWAYS though, even if
->> we do the save/restore in do_nmi(). That is some wild brain melt. Also,
->> AFAIK none of the distros are actually shipping a PREEMPT=y kernel
->> anyway, so killing it shouldn't matter much.
->
-> It will be nice if we can retain KVM_ASYNC_PF_SEND_ALWAYS. I have another
-> use case outside CONFIG_PREEMPT.
->
-> I am trying to extend async pf interface to also report page fault errors
-> to the guest.
->
-> https://lore.kernel.org/kvm/20200331194011.24834-1-vgoyal@redhat.com/
->
-> Right now async page fault interface assumes that host will always be
-> able to successfully resolve the page fault and sooner or later PAGE_READY
-> event will be sent to guest. And there is no mechnaism to report the
-> errors back to guest.
->
-> I am trying to add enhance virtiofs to directly map host page cache in guest.
->
-> https://lore.kernel.org/linux-fsdevel/20200304165845.3081-1-vgoyal@redhat.com/
->
-> There it is possible that a file page on host is mapped in guest and file
-> got truncated and page is not there anymore. Guest tries to access it,
-> and it generates async page fault. On host we will get -EFAULT and I 
-> need to propagate it back to guest so that guest can either send SIGBUS
-> to process which caused this. Or if kernel was trying to do memcpy(),
-> then be able to use execpetion table error handling and be able to
-> return with error.  (memcpy_mcflush()).
->
-> For the second case to work, I will need async pf events to come in
-> even if guest is in kernel and CONFIG_PREEMPT=n.
+The ring element addresses are passed between components with different
+alignments assumptions. Thus, if guest/userspace selects a pointer and
+host then gets and dereferences it, we might need to decrease the
+compiler-selected alignment to prevent compiler on the host from
+assuming pointer is aligned.
 
-What?
+This actually triggers on ARM with -mabi=apcs-gnu - which is a
+deprecated configuration, but it seems safer to handle this
+generally.
 
-> So it would be nice if we can keep KVM_ASYNC_PF_SEND_ALWAYS around.
+I verified that the produced binary is exactly identical on x86.
 
-No. If you want this stuff to be actually useful and correct, then
-please redesign it from scratch w/o abusing #PF. It want's to be a
-separate vector and then the pagefault resulting from your example above
-becomes a real #PF without any bells and whistels.
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+---
+ drivers/vhost/vhost.h       |  6 +++---
+ include/linux/virtio_ring.h | 24 +++++++++++++++++++++---
+ 2 files changed, 24 insertions(+), 6 deletions(-)
 
-Thanks,
-
-        tglx
-
+diff --git a/drivers/vhost/vhost.h b/drivers/vhost/vhost.h
+index f8403bd46b85..60cab4c78229 100644
+--- a/drivers/vhost/vhost.h
++++ b/drivers/vhost/vhost.h
+@@ -67,9 +67,9 @@ struct vhost_virtqueue {
+ 	/* The actual ring of buffers. */
+ 	struct mutex mutex;
+ 	unsigned int num;
+-	struct vring_desc __user *desc;
+-	struct vring_avail __user *avail;
+-	struct vring_used __user *used;
++	vring_desc_t __user *desc;
++	vring_avail_t __user *avail;
++	vring_used_t __user *used;
+ 	const struct vhost_iotlb_map *meta_iotlb[VHOST_NUM_ADDRS];
+ 	struct file *kick;
+ 	struct eventfd_ctx *call_ctx;
+diff --git a/include/linux/virtio_ring.h b/include/linux/virtio_ring.h
+index 11680e74761a..c3f9ca054250 100644
+--- a/include/linux/virtio_ring.h
++++ b/include/linux/virtio_ring.h
+@@ -60,14 +60,32 @@ static inline void virtio_store_mb(bool weak_barriers,
+ struct virtio_device;
+ struct virtqueue;
+ 
++/*
++ * The ring element addresses are passed between components with different
++ * alignments assumptions. Thus, we might need to decrease the compiler-selected
++ * alignment, and so must use a typedef to make sure the __aligned attribute
++ * actually takes hold:
++ *
++ * https://gcc.gnu.org/onlinedocs//gcc/Common-Type-Attributes.html#Common-Type-Attributes
++ *
++ * When used on a struct, or struct member, the aligned attribute can only
++ * increase the alignment; in order to decrease it, the packed attribute must
++ * be specified as well. When used as part of a typedef, the aligned attribute
++ * can both increase and decrease alignment, and specifying the packed
++ * attribute generates a warning.
++ */
++typedef struct vring_desc __aligned(VRING_DESC_ALIGN_SIZE) vring_desc_t;
++typedef struct vring_avail __aligned(VRING_AVAIL_ALIGN_SIZE) vring_avail_t;
++typedef struct vring_used __aligned(VRING_USED_ALIGN_SIZE) vring_used_t;
++
+ struct vring {
+ 	unsigned int num;
+ 
+-	struct vring_desc *desc;
++	vring_desc_t *desc;
+ 
+-	struct vring_avail *avail;
++	vring_avail_t *avail;
+ 
+-	struct vring_used *used;
++	vring_used_t *used;
+ };
+ 
+ /*
+-- 
+MST
 
