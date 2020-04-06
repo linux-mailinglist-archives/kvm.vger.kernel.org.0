@@ -2,189 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5FF6919FFF9
-	for <lists+kvm@lfdr.de>; Mon,  6 Apr 2020 23:11:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AD3A71A0028
+	for <lists+kvm@lfdr.de>; Mon,  6 Apr 2020 23:32:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726443AbgDFVLg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Apr 2020 17:11:36 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:49788 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1725995AbgDFVLe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 Apr 2020 17:11:34 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1586207492;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-        bh=xw2IXbDc6erg5HETD8kiXgNsbIOvz2N8DW0E+Bc8mD0=;
-        b=eAkvWhAth+RA3ykrJ1nFGrJ+pRtdvyMChDLzNJ6MD0bPnZb4Exmdlnh9JAIKhNJ6Vltbte
-        r0XqWRjyOtdTPrkB8AF84QYS2JZ6WSj9JCZ3Y8fTsGqnSHnB2SpNx331J5HU1sQi+qqJKm
-        PFN9YlSUF3UktIbIW+mvFHai51V5554=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-31-BAlqOarUPcKJU5atqs2ntQ-1; Mon, 06 Apr 2020 17:11:29 -0400
-X-MC-Unique: BAlqOarUPcKJU5atqs2ntQ-1
-Received: by mail-wm1-f69.google.com with SMTP id n127so384379wme.4
-        for <kvm@vger.kernel.org>; Mon, 06 Apr 2020 14:11:29 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
-         :content-disposition;
-        bh=xw2IXbDc6erg5HETD8kiXgNsbIOvz2N8DW0E+Bc8mD0=;
-        b=fkGp3mq1pEYEYynSE1TWxBsFJAl5eazssKpznU/hesK4gyzIG9OtM90vwT2TqeuPX+
-         i9VnY0dX+4BftL0T6gGZlbyNztw31XO87/V9zuGvuryMyX5nC4Hc9Wf1TW2rIAvu88jb
-         ITj0QSpaTBuzH461Y/soP1pEYiLg5gZmtQjp7zzojz+mRaRtOoNpI1i9nsW6od/maUf4
-         mitHQ8JjR6JAfdq5/0lviLiK9NxqTB+CvE+Cxjxp9tHNkm+yzMV08eQ1U0aaDfLdUoLt
-         HE7n/P8EOxtAwrggF6kCwG2AZPhrowsFYywcuwRJmClYA+b6jg1HuGCCD4DZ7wKPEriX
-         2dxw==
-X-Gm-Message-State: AGi0PuZMVthCRYLTweQELMBm+eckPwrVx0MK4tBUqHPMAHB+r4xZhfQ0
-        cAVncNW6NYMfDXhXj1LzXqWUmHCj2b/mtWBoSYe+ZUoDImVVt6Bp6cAEKtUrgooOpbHE/eW0O2M
-        RFjHtxHAQMlYs
-X-Received: by 2002:a05:600c:2a52:: with SMTP id x18mr932496wme.37.1586207488355;
-        Mon, 06 Apr 2020 14:11:28 -0700 (PDT)
-X-Google-Smtp-Source: APiQypIuopl4ajbdC3ug75t4KceTRePheaHXToSHTTSi41utVfsJr0uYqtKb8e7/TbxvYzk23Hg23w==
-X-Received: by 2002:a05:600c:2a52:: with SMTP id x18mr932473wme.37.1586207488125;
-        Mon, 06 Apr 2020 14:11:28 -0700 (PDT)
-Received: from redhat.com (bzq-79-176-51-222.red.bezeqint.net. [79.176.51.222])
-        by smtp.gmail.com with ESMTPSA id d7sm27508603wrr.77.2020.04.06.14.11.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 Apr 2020 14:11:27 -0700 (PDT)
-Date:   Mon, 6 Apr 2020 17:11:24 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        alexander.h.duyck@linux.intel.com, david@redhat.com,
-        eperezma@redhat.com, jasowang@redhat.com, lingshan.zhu@intel.com,
-        mhocko@kernel.org, mst@redhat.com, namit@vmware.com,
-        rdunlap@infradead.org, rientjes@google.com, tiwei.bie@intel.com,
-        tysand@google.com, wei.w.wang@intel.com, xiao.w.wang@intel.com,
-        yuri.benditovich@daynix.com
-Subject: [GIT PULL] vhost: fixes, vdpa
-Message-ID: <20200406171124-mutt-send-email-mst@kernel.org>
+        id S1726272AbgDFVci (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Apr 2020 17:32:38 -0400
+Received: from Galois.linutronix.de ([193.142.43.55]:45743 "EHLO
+        Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725895AbgDFVch (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 Apr 2020 17:32:37 -0400
+Received: from p5de0bf0b.dip0.t-ipconnect.de ([93.224.191.11] helo=nanos.tec.linutronix.de)
+        by Galois.linutronix.de with esmtpsa (TLS1.2:DHE_RSA_AES_256_CBC_SHA256:256)
+        (Exim 4.80)
+        (envelope-from <tglx@linutronix.de>)
+        id 1jLZM7-0001C1-U3; Mon, 06 Apr 2020 23:32:32 +0200
+Received: by nanos.tec.linutronix.de (Postfix, from userid 1000)
+        id 5FC34100C47; Mon,  6 Apr 2020 23:32:31 +0200 (CEST)
+From:   Thomas Gleixner <tglx@linutronix.de>
+To:     Vivek Goyal <vgoyal@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>
+Cc:     Andy Lutomirski <luto@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        LKML <linux-kernel@vger.kernel.org>, X86 ML <x86@kernel.org>,
+        kvm list <kvm@vger.kernel.org>, stable <stable@vger.kernel.org>
+Subject: Re: [PATCH v2] x86/kvm: Disable KVM_ASYNC_PF_SEND_ALWAYS
+In-Reply-To: <20200406190951.GA19259@redhat.com>
+References: <87ftek9ngq.fsf@nanos.tec.linutronix.de> <CALCETrVsc-t=tDRPbCg5dWHDY0NFv2zjz12ahD-vnGPn8T+RXA@mail.gmail.com> <87a74s9ehb.fsf@nanos.tec.linutronix.de> <87wo7v8g4j.fsf@nanos.tec.linutronix.de> <877dzu8178.fsf@nanos.tec.linutronix.de> <37440ade-1657-648b-bf72-2b8ca4ac21ce@redhat.com> <871rq199oz.fsf@nanos.tec.linutronix.de> <CALCETrUHwd8pNr_ZdFqY8vMjJeMdNyw2C+FL6uOUM98SEE9rNQ@mail.gmail.com> <87d09l73ip.fsf@nanos.tec.linutronix.de> <20200309202215.GM12561@hirez.programming.kicks-ass.net> <20200406190951.GA19259@redhat.com>
+Date:   Mon, 06 Apr 2020 23:32:31 +0200
+Message-ID: <87wo6sjo5s.fsf@nanos.tec.linutronix.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Mutt-Fcc: =sent
+Content-Type: text/plain
+X-Linutronix-Spam-Score: -1.0
+X-Linutronix-Spam-Level: -
+X-Linutronix-Spam-Status: No , -1.0 points, 5.0 required,  ALL_TRUSTED=-1,SHORTCIRCUIT=-0.0001
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Now that many more architectures build vhost, a couple of these (um, and
-arm with deprecated oabi) have reported build failures with randconfig,
-however fixes for that need a bit more discussion/testing and will be
-merged separately.
+Vivek Goyal <vgoyal@redhat.com> writes:
+> On Mon, Mar 09, 2020 at 09:22:15PM +0100, Peter Zijlstra wrote:
+>> On Mon, Mar 09, 2020 at 08:05:18PM +0100, Thomas Gleixner wrote:
+>> > Andy Lutomirski <luto@kernel.org> writes:
+>> 
+>> > > I'm okay with the save/restore dance, I guess.  It's just yet more
+>> > > entry crud to deal with architecture nastiness, except that this
+>> > > nastiness is 100% software and isn't Intel/AMD's fault.
+>> > 
+>> > And we can do it in C and don't have to fiddle with it in the ASM
+>> > maze.
+>> 
+>> Right; I'd still love to kill KVM_ASYNC_PF_SEND_ALWAYS though, even if
+>> we do the save/restore in do_nmi(). That is some wild brain melt. Also,
+>> AFAIK none of the distros are actually shipping a PREEMPT=y kernel
+>> anyway, so killing it shouldn't matter much.
+>
+> It will be nice if we can retain KVM_ASYNC_PF_SEND_ALWAYS. I have another
+> use case outside CONFIG_PREEMPT.
+>
+> I am trying to extend async pf interface to also report page fault errors
+> to the guest.
+>
+> https://lore.kernel.org/kvm/20200331194011.24834-1-vgoyal@redhat.com/
+>
+> Right now async page fault interface assumes that host will always be
+> able to successfully resolve the page fault and sooner or later PAGE_READY
+> event will be sent to guest. And there is no mechnaism to report the
+> errors back to guest.
+>
+> I am trying to add enhance virtiofs to directly map host page cache in guest.
+>
+> https://lore.kernel.org/linux-fsdevel/20200304165845.3081-1-vgoyal@redhat.com/
+>
+> There it is possible that a file page on host is mapped in guest and file
+> got truncated and page is not there anymore. Guest tries to access it,
+> and it generates async page fault. On host we will get -EFAULT and I 
+> need to propagate it back to guest so that guest can either send SIGBUS
+> to process which caused this. Or if kernel was trying to do memcpy(),
+> then be able to use execpetion table error handling and be able to
+> return with error.  (memcpy_mcflush()).
+>
+> For the second case to work, I will need async pf events to come in
+> even if guest is in kernel and CONFIG_PREEMPT=n.
 
-Not a regression - these previously simply didn't have vhost at all.
-Also, there's some DMA API code in the vdpa simulator is hacky - if no
-solution surfaces soon we can always disable it before release:
-it's not a big deal either way as it's just test code.
+What?
 
-The following changes since commit 16fbf79b0f83bc752cee8589279f1ebfe57b3b6e:
+> So it would be nice if we can keep KVM_ASYNC_PF_SEND_ALWAYS around.
 
-  Linux 5.6-rc7 (2020-03-22 18:31:56 -0700)
+No. If you want this stuff to be actually useful and correct, then
+please redesign it from scratch w/o abusing #PF. It want's to be a
+separate vector and then the pagefault resulting from your example above
+becomes a real #PF without any bells and whistels.
 
-are available in the Git repository at:
+Thanks,
 
-  https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
+        tglx
 
-for you to fetch changes up to c9b9f5f8c0f3cdb893cb86c168cdaa3aa5ed7278:
-
-  vdpa: move to drivers/vdpa (2020-04-02 10:41:40 -0400)
-
-----------------------------------------------------------------
-virtio: fixes, vdpa
-
-Some bug fixes.
-Balloon reverted to use the OOM handler again.
-The new vdpa subsystem with two first drivers.
-
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-
-----------------------------------------------------------------
-David Hildenbrand (1):
-      virtio-balloon: Switch back to OOM handler for VIRTIO_BALLOON_F_DEFLATE_ON_OOM
-
-Jason Wang (7):
-      vhost: refine vhost and vringh kconfig
-      vhost: allow per device message handler
-      vhost: factor out IOTLB
-      vringh: IOTLB support
-      vDPA: introduce vDPA bus
-      virtio: introduce a vDPA based transport
-      vdpasim: vDPA device simulator
-
-Michael S. Tsirkin (2):
-      tools/virtio: option to build an out of tree module
-      vdpa: move to drivers/vdpa
-
-Tiwei Bie (1):
-      vhost: introduce vDPA-based backend
-
-Yuri Benditovich (3):
-      virtio-net: Introduce extended RSC feature
-      virtio-net: Introduce RSS receive steering feature
-      virtio-net: Introduce hash report feature
-
-Zhu Lingshan (1):
-      virtio: Intel IFC VF driver for VDPA
-
- MAINTAINERS                      |   3 +
- arch/arm/kvm/Kconfig             |   2 -
- arch/arm64/kvm/Kconfig           |   2 -
- arch/mips/kvm/Kconfig            |   2 -
- arch/powerpc/kvm/Kconfig         |   2 -
- arch/s390/kvm/Kconfig            |   4 -
- arch/x86/kvm/Kconfig             |   4 -
- drivers/Kconfig                  |   4 +
- drivers/Makefile                 |   1 +
- drivers/misc/mic/Kconfig         |   4 -
- drivers/net/caif/Kconfig         |   4 -
- drivers/vdpa/Kconfig             |  37 ++
- drivers/vdpa/Makefile            |   4 +
- drivers/vdpa/ifcvf/Makefile      |   3 +
- drivers/vdpa/ifcvf/ifcvf_base.c  | 389 +++++++++++++++++
- drivers/vdpa/ifcvf/ifcvf_base.h  | 118 ++++++
- drivers/vdpa/ifcvf/ifcvf_main.c  | 435 +++++++++++++++++++
- drivers/vdpa/vdpa.c              | 180 ++++++++
- drivers/vdpa/vdpa_sim/Makefile   |   2 +
- drivers/vdpa/vdpa_sim/vdpa_sim.c | 629 ++++++++++++++++++++++++++++
- drivers/vhost/Kconfig            |  45 +-
- drivers/vhost/Kconfig.vringh     |   6 -
- drivers/vhost/Makefile           |   6 +
- drivers/vhost/iotlb.c            | 177 ++++++++
- drivers/vhost/net.c              |   5 +-
- drivers/vhost/scsi.c             |   2 +-
- drivers/vhost/vdpa.c             | 883 +++++++++++++++++++++++++++++++++++++++
- drivers/vhost/vhost.c            | 233 ++++-------
- drivers/vhost/vhost.h            |  45 +-
- drivers/vhost/vringh.c           | 421 ++++++++++++++++++-
- drivers/vhost/vsock.c            |   2 +-
- drivers/virtio/Kconfig           |  13 +
- drivers/virtio/Makefile          |   1 +
- drivers/virtio/virtio_balloon.c  | 107 ++---
- drivers/virtio/virtio_vdpa.c     | 396 ++++++++++++++++++
- include/linux/vdpa.h             | 253 +++++++++++
- include/linux/vhost_iotlb.h      |  47 +++
- include/linux/vringh.h           |  36 ++
- include/uapi/linux/vhost.h       |  24 ++
- include/uapi/linux/vhost_types.h |   8 +
- include/uapi/linux/virtio_net.h  | 102 ++++-
- tools/virtio/Makefile            |  27 +-
- 42 files changed, 4354 insertions(+), 314 deletions(-)
- create mode 100644 drivers/vdpa/Kconfig
- create mode 100644 drivers/vdpa/Makefile
- create mode 100644 drivers/vdpa/ifcvf/Makefile
- create mode 100644 drivers/vdpa/ifcvf/ifcvf_base.c
- create mode 100644 drivers/vdpa/ifcvf/ifcvf_base.h
- create mode 100644 drivers/vdpa/ifcvf/ifcvf_main.c
- create mode 100644 drivers/vdpa/vdpa.c
- create mode 100644 drivers/vdpa/vdpa_sim/Makefile
- create mode 100644 drivers/vdpa/vdpa_sim/vdpa_sim.c
- delete mode 100644 drivers/vhost/Kconfig.vringh
- create mode 100644 drivers/vhost/iotlb.c
- create mode 100644 drivers/vhost/vdpa.c
- create mode 100644 drivers/virtio/virtio_vdpa.c
- create mode 100644 include/linux/vdpa.h
- create mode 100644 include/linux/vhost_iotlb.h
 
