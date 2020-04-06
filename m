@@ -2,144 +2,251 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3F4DD19FAE9
-	for <lists+kvm@lfdr.de>; Mon,  6 Apr 2020 19:01:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6FA3F19FB0E
+	for <lists+kvm@lfdr.de>; Mon,  6 Apr 2020 19:11:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729755AbgDFRBd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Apr 2020 13:01:33 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:34775 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728896AbgDFRBc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 Apr 2020 13:01:32 -0400
+        id S1729732AbgDFRLJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Apr 2020 13:11:09 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:35610 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726669AbgDFRLI (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 6 Apr 2020 13:11:08 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1586192491;
+        s=mimecast20190719; t=1586193067;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=jtw2TIktCycnx07MzJphFzTbVdDjm4yPkRs4bkh4/WM=;
-        b=FyO1JsuObFf8Wkmmgvi85U9gDtfsHx+xsejgZPusXb4HZM4mbfDHt2ryE91Yy4PFvmPsuc
-        xjE56B7Ce/UqX1aBXB+lh+cjpHC6oqabbBQ5HxxYVM6cnj+GfOQtOJQemm5s18dCTQgTAN
-        MAVMAuCzlcL/lva3Ulo+I9lrDI8nlmg=
+         in-reply-to:in-reply-to:references:references;
+        bh=+sqWo/TjFzm8Hn0zNEDNsba3wfUK+bDLDnQzQjnVZQE=;
+        b=ExAVZU/wkZBUqWGFc2nAKCDmOvJq/7vzAGjkRMnWzFfz5eH68gu6GY7MLr6BV6i+W19peq
+        V9ju8J/TS8w6YII2ezJl4EzswPVX1BaaWKseHRQAeh/DYuAaKi2KaF978uMl38i6XqvCV7
+        W8W8hVSwbKIW8JrLNMJhXleSbwhdXSk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-504-KEfRoI8ANBWBw8AYLxinng-1; Mon, 06 Apr 2020 13:01:29 -0400
-X-MC-Unique: KEfRoI8ANBWBw8AYLxinng-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+ us-mta-106-J9HE1_lmO-O1xrwmkUOtSg-1; Mon, 06 Apr 2020 13:11:03 -0400
+X-MC-Unique: J9HE1_lmO-O1xrwmkUOtSg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 90942190D348;
-        Mon,  6 Apr 2020 17:01:28 +0000 (UTC)
-Received: from [10.10.115.55] (ovpn-115-55.rdu2.redhat.com [10.10.115.55])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 408DF1001DF0;
-        Mon,  6 Apr 2020 17:01:26 +0000 (UTC)
-Subject: Re: ata driver loading hang on qemu/kvm intel
-To:     Suresh Gumpula <suresh.gumpula@nutanix.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-References: <7C92AFF4-D479-4F80-8BED-6E9B226DFB72@nutanix.com>
- <56486177-b629-081e-2785-b6e2ca626e88@redhat.com>
- <D7D964C2-DD4B-4F17-BA3D-C45C992A4B15@nutanix.com>
-From:   John Snow <jsnow@redhat.com>
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
- mQINBFTKefwBEAChvwqYC6saTzawbih87LqBYq0d5A8jXYXaiFMV/EvMSDqqY4EY6whXliNO
- IYzhgrPEe7ZmPxbCSe4iMykjhwMh5byIHDoPGDU+FsQty2KXuoxto+ZdrP9gymAgmyqdk3aV
- vzzmCa3cOppcqKvA0Kqr10UeX/z4OMVV390V+DVWUvzXpda45/Sxup57pk+hyY52wxxjIqef
- rj8u5BN93s5uCVTus0oiVA6W+iXYzTvVDStMFVqnTxSxlpZoH5RGKvmoWV3uutByQyBPHW2U
- 1Y6n6iEZ9MlP3hcDqlo0S8jeP03HaD4gOqCuqLceWF5+2WyHzNfylpNMFVi+Hp0H/nSDtCvQ
- ua7j+6Pt7q5rvqgHvRipkDDVsjqwasuNc3wyoHexrBeLU/iJBuDld5iLy+dHXoYMB3HmjMxj
- 3K5/8XhGrDx6BDFeO3HIpi3u2z1jniB7RtyVEtdupED6lqsDj0oSz9NxaOFZrS3Jf6z/kHIf
- h42mM9Sx7+s4c07N2LieUxcfqhFTaa/voRibF4cmkBVUhOD1AKXNfhEsTvmcz9NbUchCkcvA
- T9119CrsxfVsE7bXiGvdXnzyGLXdsoosjzwacKdOrVaDmN3Uy+SHiQXo6TlkSdV0XH2PUxTM
- LsBFIO9qXO43Ai6J6iPAP/01l8fuZfpJE0/L/c25yyaND7xA3wARAQABtCpKb2huIFNub3cg
- KEpvaG4gSHVzdG9uKSA8anNub3dAcmVkaGF0LmNvbT6JAlQEEwECAD4CGwMCHgECF4AFCwkI
- BwMFFQoJCAsFFgIDAQAWIQT665cRoSz0dYEvGPKIqQZNGDVh6wUCXF392gUJC1Xq3gAKCRCI
- qQZNGDVh6558D/9pM4pu4njX5aT6uUW3vAmbWLF1jfPxiTQgSHAnm9EBMZED/fsvkzj97clo
- LN7JKmbYZNgJmR01A7flG45V4iOR/249qAfaVuD+ZzZi1R4jFzr13WS+IEdn0hYp9ITndb7R
- ezW+HGu6/rP2PnfmDnNowgJu6Dp6IUEabq8SXXwGHXZPuMIrsXJxUdKJdGnh1o2u7271yNO7
- J9PEMuMDsgjsdnaGtv7aQ9CECtXvBleAc06pLW2HU10r5wQyBMZGITemJdBhhdzGmbHAL0M6
- vKi/bafHRWqfMqOAdDkv3Jg4arl2NCG/uNateR1z5e529+UlB4XVAQT+f5T/YyI65DFTY940
- il3aZhA8u788jZEPMXmt94u7uPZbEYp7V0jt68SrTaOgO7NaXsboXFjwEa42Ug5lB5d5/Qdp
- 1AITUv0NJ51kKwhHL1dEagGeloIsGVQILmpS0MLdtitBHqZLsnJkRvtMaxo47giyBlv2ewmq
- tIGTlVLxHx9xkc9aVepOuiGlZaZB72c9AvZs9rKaAjgU2UfJHlB/Hr4uSk/1EY0IgMv4vnsG
- 1sA5gvS7A4T4euu0PqHtn2sZEWDrk5RDbw0yIb53JYdXboLFmFXKzVASfKh2ZVeXRBlQQSJi
- 3PBR1GzzqORlfryby7mkY857xzCI2NkIkD2eq+HhzFTfFOTdGrkCDQRUynn8ARAAwbhP45BE
- d/zAMBPV2dk2WwIwKRSKULElP3kXpcuiDWYQob3UODUUqClO+3aXVRndaNmZX9WbzGYexVo3
- 5j+CVBCGr3DlU8AL9pp3KQ3SJihWcDed1LSmUf8tS+10d6mdGxDqgnd/OWU214isvhgWZtZG
- MM/Xj7cx5pERIiP+jqu7PT1cibcfcEKhPjYdyV1QnLtKNGrTg/UMKaL+qkWBUI/8uBoa0HLs
- NH63bXsRtNAG8w6qG7iiueYZUIXKc4IHINUguqYQJVdSe+u8b2N5XNhDSEUhdlqFYraJvX6d
- TjxMTW5lzVG2KjztfErRNSUmu2gezbw1/CV0ztniOKDA7mkQi6UIUDRh4LxRm5mflfKiCyDQ
- L6P/jxHBxFv+sIgjuLrfNhIC1p3z9rvCh+idAVJgtHtYl8p6GAVrF+4xQV2zZH45tgmHo2+S
- JsLPjXZtWVsWANpepXnesyabWtNAV4qQB7/SfC77zZwsVX0OOY2Qc+iohmXo8U7DgXVDgl/R
- /5Qgfnlv0/3rOdMt6ZPy5LJr8D9LJmcP0RvX98jyoBOf06Q9QtEwJsNLCOCo2LKNL71DNjZr
- nXEwjUH66CXiRXDbDKprt71BiSTitkFhGGU88XCtrp8R9yArXPf4MN+wNYBjfT7K29gWTzxt
- 9DYQIvEf69oZD5Z5qHYGp031E90AEQEAAYkCPAQYAQIAJgIbDBYhBPrrlxGhLPR1gS8Y8oip
- Bk0YNWHrBQJcXf3JBQkLVerNAAoJEIipBk0YNWHrU1AP/1FOK2SBGbyhHa5vDHuf47fgLipC
- e0/h1E0vdSonzlhPxuZoQ47FjzG9uOhqqQG6/PqtWs/FJIyz8aGG4aV+pSA/9Ko3/2ND8MSY
- ZflWs7Y8Peg08Ro01GTHFITjEUgHpTpHiT6TNcZB5aZNJ8jqCtW5UlqvXXbVeSTmO70ZiVtc
- vUJbpvSxYmzhFfZWaXIPcNcKWL1rnmnzs67lDhMLdkYVf91aml/XtyMUlfB8Iaejzud9Ht3r
- C0pA9MG57pLblX7okEshxAC0+tUdY2vANWFeX0mgqRt1GSuG9XM9H/cKP1czfUV/FgaWo/Ya
- fM4eMhUAlL/y+/AJxxumPhBXftM4yuiktp2JMezoIMJI9fmhjfWDw7+2jVrx9ze1joLakFD1
- rVAoHxVJ7ORfQ4Ni/qWbQm3T6qQkSMt4N/scNsMczibdTPxU7qtwQwIeFOOc3wEwmJ9Qe3ox
- TODQ0agXiWVj0OXYCHJ6MxTDswtyTGQW+nUHpKBgHGwUaR6d1kr/LK9+5LpOfRlK9VRfEu7D
- PGNiRkr8Abp8jHsrBqQWfUS1bAf62bq6XUel0kUCtb7qCq024aOczXYWPFpJFX+nhp4d7NeH
- Edq+wlC13sBSiSHC7T5yssJ+7JPa2ATLlSKhEvBsLe2TsSTTtFlA0nBclqhfJXzimiuge9qU
- E40lvMWBuQINBFTKimUBEADDbJ+pQ5M4QBMWkaWImRj7c598xIZ37oKM6rGaSnuB1SVb7YCr
- Ci2MTwQcrQscA2jm80O8VFqWk+/XsEp62dty47GVwSfdGje/3zv3VTH2KhOCKOq3oPP5ZXWY
- rz2d2WnTvx++o6lU7HLHDEC3NGLYNLkL1lyVxLhnhvcMxkf1EGA1DboEcMgnJrNB1pGP27ww
- cSfvdyPGseV+qZZa8kuViDga1oxmnYDxFKMGLxrClqHrRt8geQL1Wj5KFM5hFtGTK4da5lPn
- wGNd6/CINMeCT2AWZY5ySz7/tSZe5F22vPvVZGoPgQicYWdNc3ap7+7IKP86JNjmec/9RJcz
- jvrYjJdiqBVldXou72CtDydKVLVSKv8c2wBDJghYZitfYIaL8cTvQfUHRYTfo0n5KKSec8Vo
- vjDuxmdbOUBA+SkRxqmneP5OxGoZ92VusrwWCjry8HRsNdR+2T+ClDCO6Wpihu4V3CPkQwTy
- eCuMHPAT0ka5paTwLrnZIxsdfnjUa96T10vzmQgAxpbbiaLvgKJ8+76OPdDnhddyxd2ldYfw
- RkF5PEGg3mqZnYKNNBtwjvX49SAvgETQvLzQ8IKVgZS0m4z9qHHvtc1BsQnFfe+LJOFjzZr7
- CrDNJMqk1JTHYsSi2JcN3vY32WMezXSQ0TzeMK4kdnclSQyp/h23GWod5QARAQABiQRbBBgB
- AgAmAhsCFiEE+uuXEaEs9HWBLxjyiKkGTRg1YesFAlxd/coFCQtV2mQCKcFdIAQZAQIABgUC
- VMqKZQAKCRB974EGqvw5DiJoEACLmuiRq9ifvOh5DyBFwRS7gvA14DsGQngmC57EzV0EFcfM
- XVi1jX5OtwUyUe0Az5r6lHyyHDsDsIpLKBlWrYCeLpUhRR3oy181T7UNxvujGFeTkzvLAOo6
- Hs3b8Wv9ARg+7acRYkQRNY7k0GIJ6YZz149tRyRKAy/vSjsaB9Lt0NOd1wf2EQMKwRVELwJD
- y0AazGn+0PRP7Bua2YbtxaBmhBBDb2tPpwn8U9xdckB4Vlft9lcWNsC/18Gi9bpjd9FSbdH/
- sOUI+3ToWYENeoT4IP09wn6EkgWaJS3nAUN/MOycNej2i4Yhy2wDDSKyTAnVkSSSoXk+tK91
- HfqtokbDanB8daP+K5LgoiWHzjfWzsxA2jKisI4YCGjrYQzTyGOT6P6u6SEeoEx10865B/zc
- 8/vN50kncdjYz2naacIDEKQNZlnGLsGkpCbfmfdi3Zg4vuWKNdWr0wGUzDUcpqW0y/lUXna+
- 6uyQShX5e4JD2UPuf9WAQ9HtgSAkaDd4O1I2J41sleePzZOVB3DmYgy+ECRJJ5nw3ihdxpgc
- y/v3lfcJaqiyCv0PF+K/gSOvwhH7CbVqARmptT7yhhxqFdaYWo2Z2ksuKyoKSRMFCXQY5oac
- uTmyPIT4STFyUQFeqSCWDum/NFNoSKhmItw2Td+4VSJHShRVbg39KNFPZ7mXYAkQiKkGTRg1
- YesWJA/+PV3qDUtPNEGwjVvjQqHSbrBy94tu6gJvPHgGPtRDYvxnCaJsmgiC0pGB2KFRsnfl
- 2zBNBEWF/XwsI081jQE5UO60GKmHTputChLXpVobyuc+lroG2YhknXRBAV969SLnZR4BS/1s
- Gi046gOXfaKYatve8BiZr5it5Foq3FMPDNgZMit1H9Dk8rkKFfDMRf8EGS/Z+TmyEsIf99H7
- TH3n7lco8qO81fSFwkh4pvo2kWRFYTC5vsIVQ+GqVUp+W1DZJHxX8LwWuF1AzUt4MUTtNAvy
- TXl5EgsmoY9mpNNL7ZnW65oG63nEP5KNiybvuQJzXVxR8eqzOh2Mod4nHg3PE7UCd3DvLNsn
- GXFRo44WyT/G2lArBtjpkut7bDm0i1nENABy2UgS+1QvdmgNu6aEZxdNthwRjUhuuvCCDMA4
- rCDQYyakH2tJNQgkXkeLodBKF4bHiBbuwj0E39S9wmGgg+q4OTnAO/yhQGknle7a7G5xHBwE
- i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
- RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
- glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <b48ef18c-fb70-9d6f-c925-09227058a9cf@redhat.com>
-Date:   Mon, 6 Apr 2020 13:01:25 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 24DA6107ACC7;
+        Mon,  6 Apr 2020 17:11:02 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-116-15.gru2.redhat.com [10.97.116.15])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id B362E60BE0;
+        Mon,  6 Apr 2020 17:10:55 +0000 (UTC)
+Subject: Re: [PATCH v2 2/2] selftests: kvm: Add mem_slot_test test
+To:     Andrew Jones <drjones@redhat.com>
+Cc:     pbonzini@redhat.com, kvm@vger.kernel.org, david@redhat.com,
+        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+References: <20200403172428.15574-1-wainersm@redhat.com>
+ <20200403172428.15574-3-wainersm@redhat.com>
+ <20200404073240.grcsylznemd3pmxz@kamzik.brq.redhat.com>
+From:   Wainer dos Santos Moschetta <wainersm@redhat.com>
+Message-ID: <64a47faa-74f5-60ad-9b74-8c295072c719@redhat.com>
+Date:   Mon, 6 Apr 2020 14:10:53 -0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-In-Reply-To: <D7D964C2-DD4B-4F17-BA3D-C45C992A4B15@nutanix.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+In-Reply-To: <20200404073240.grcsylznemd3pmxz@kamzik.brq.redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
+On 4/4/20 4:32 AM, Andrew Jones wrote:
+> On Fri, Apr 03, 2020 at 02:24:28PM -0300, Wainer dos Santos Moschetta wrote:
+>> This patch introduces the mem_slot_test test which checks
+>> an VM can have added memory slots up to the limit defined in
+>> KVM_CAP_NR_MEMSLOTS. Then attempt to add one more slot to
+>> verify it fails as expected.
+>>
+>> Signed-off-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
+>> ---
+>>   tools/testing/selftests/kvm/.gitignore      |  1 +
+>>   tools/testing/selftests/kvm/Makefile        |  3 +
+>>   tools/testing/selftests/kvm/mem_slot_test.c | 85 +++++++++++++++++++++
+>>   3 files changed, 89 insertions(+)
+>>   create mode 100644 tools/testing/selftests/kvm/mem_slot_test.c
+>>
+>> diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
+>> index 16877c3daabf..232f24d6931a 100644
+>> --- a/tools/testing/selftests/kvm/.gitignore
+>> +++ b/tools/testing/selftests/kvm/.gitignore
+>> @@ -22,3 +22,4 @@
+>>   /dirty_log_test
+>>   /kvm_create_max_vcpus
+>>   /steal_time
+>> +/mem_slot_test
+>> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+>> index 712a2ddd2a27..69b44178f48b 100644
+>> --- a/tools/testing/selftests/kvm/Makefile
+>> +++ b/tools/testing/selftests/kvm/Makefile
+>> @@ -33,12 +33,14 @@ TEST_GEN_PROGS_x86_64 += demand_paging_test
+>>   TEST_GEN_PROGS_x86_64 += dirty_log_test
+>>   TEST_GEN_PROGS_x86_64 += kvm_create_max_vcpus
+>>   TEST_GEN_PROGS_x86_64 += steal_time
+>> +TEST_GEN_PROGS_x86_64 += mem_slot_test
+>>   
+>>   TEST_GEN_PROGS_aarch64 += clear_dirty_log_test
+>>   TEST_GEN_PROGS_aarch64 += demand_paging_test
+>>   TEST_GEN_PROGS_aarch64 += dirty_log_test
+>>   TEST_GEN_PROGS_aarch64 += kvm_create_max_vcpus
+>>   TEST_GEN_PROGS_aarch64 += steal_time
+>> +TEST_GEN_PROGS_aarch64 += mem_slot_test
+>>   
+> kvm selftests has a bad case of OCD when it comes to lists of tests. In
+> the .gitignore and the Makefile we keep our tests in alphabetical order.
+> Maybe we should stop, because it's a bit annoying to maintain, but my
+> personal OCD won't allow it to be on my watch. Please fix the above
+> three lists.
 
-On 4/6/20 11:30 AM, Suresh Gumpula wrote:
-> The guest kernel(not a nested guest) boot iso. i.e its regular VM on a host is hanging with following errors.
-> Its consistently reproducible with some load on the host.
+I will fix it on v3.
 
-Hi, IDE maintainer from QEMU ... it's quite likely. Do you have the
-option of trying a modern QEMU version to see if it's a bug we've
-already fixed?
+Kind of related... has ever been discussed a naming convention for kvm 
+selftests? It would allow the use of regex on both .gitignore and 
+Makefile...and bye-bye those sorted lists.
 
---js
+
+>
+>>   TEST_GEN_PROGS_s390x = s390x/memop
+>>   TEST_GEN_PROGS_s390x += s390x/resets
+>> @@ -46,6 +48,7 @@ TEST_GEN_PROGS_s390x += s390x/sync_regs_test
+>>   TEST_GEN_PROGS_s390x += demand_paging_test
+>>   TEST_GEN_PROGS_s390x += dirty_log_test
+>>   TEST_GEN_PROGS_s390x += kvm_create_max_vcpus
+>> +TEST_GEN_PROGS_s390x += mem_slot_test
+>>   
+>>   TEST_GEN_PROGS += $(TEST_GEN_PROGS_$(UNAME_M))
+>>   LIBKVM += $(LIBKVM_$(UNAME_M))
+>> diff --git a/tools/testing/selftests/kvm/mem_slot_test.c b/tools/testing/selftests/kvm/mem_slot_test.c
+>> new file mode 100644
+>> index 000000000000..eef6f506f41d
+>> --- /dev/null
+>> +++ b/tools/testing/selftests/kvm/mem_slot_test.c
+>> @@ -0,0 +1,85 @@
+>> +// SPDX-License-Identifier: GPL-2.0-only
+>> +/*
+>> + * mem_slot_test
+>> + *
+>> + * Copyright (C) 2020, Red Hat, Inc.
+>> + *
+>> + * Test suite for memory region operations.
+>> + */
+>> +#define _GNU_SOURCE /* for program_invocation_short_name */
+>> +#include <linux/kvm.h>
+>> +#include <sys/mman.h>
+>> +
+>> +#include "test_util.h"
+>> +#include "kvm_util.h"
+>> +
+>> +/*
+>> + * Test it can be added memory slots up to KVM_CAP_NR_MEMSLOTS, then any
+>> + * tentative to add further slots should fail.
+>> + */
+>> +static void test_add_max_slots(void)
+>> +{
+>> +	struct kvm_vm *vm;
+>> +	uint32_t max_mem_slots;
+>> +	uint32_t slot;
+>> +	uint64_t mem_reg_npages;
+>> +	uint64_t mem_reg_size;
+>> +	uint32_t mem_reg_flags;
+>> +	uint64_t guest_addr;
+>> +	int ret;
+>> +
+>> +	max_mem_slots = kvm_check_cap(KVM_CAP_NR_MEMSLOTS);
+>> +	TEST_ASSERT(max_mem_slots > 0,
+>> +		    "KVM_CAP_NR_MEMSLOTS should be greater than 0");
+>> +	pr_info("Allowed number of memory slots: %i\n", max_mem_slots);
+>> +
+>> +	vm = vm_create(VM_MODE_DEFAULT, 0, O_RDWR);
+>> +
+>> +	/*
+>> +	 * Uses 1MB sized/aligned memory region since this is the minimal
+>> +	 * required on s390x.
+>> +	 */
+>> +	mem_reg_size = 0x100000;
+>> +	mem_reg_npages = vm_calc_num_guest_pages(VM_MODE_DEFAULT, mem_reg_size);
+>> +
+>> +	mem_reg_flags = kvm_check_cap(KVM_CAP_READONLY_MEM) ? KVM_MEM_READONLY :
+>> +		KVM_MEM_LOG_DIRTY_PAGES;
+> I still don't see why we're setting a flag at all, and now we're setting
+> different flags depending on what's available, so the test isn't the
+> same for every environment. I would just have mem->flags = 0 for this
+> test.
+I thought I had to set a memory flag always. If mem->flags = 0 works 
+across the arches, then I change this on v3.
+>
+>> +
+>> +	guest_addr = 0x0;
+>> +
+>> +	/* Check it can be added memory slots up to the maximum allowed */
+>> +	pr_info("Adding slots 0..%i, each memory region with %ldK size\n",
+>> +		(max_mem_slots - 1), mem_reg_size >> 10);
+>> +	for (slot = 0; slot < max_mem_slots; slot++) {
+>> +		vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS,
+>> +					    guest_addr, slot, mem_reg_npages,
+>> +					    mem_reg_flags);
+>> +		guest_addr += mem_reg_size;
+>> +	}
+>> +
+>> +	/* Check it cannot be added memory slots beyond the limit */
+>> +	void *mem = mmap(NULL, mem_reg_size, PROT_READ | PROT_WRITE,
+>> +			 MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+>> +	TEST_ASSERT(mem != NULL, "Failed to mmap() host");
+> This should be testing mem != MAP_FAILED
+
+Ok.
+
+>
+>> +
+>> +	struct kvm_userspace_memory_region kvm_region = {
+>> +		.slot = slot,
+>> +		.flags = mem_reg_flags,
+>> +		.guest_phys_addr = guest_addr,
+>> +		.memory_size = mem_reg_size,
+>> +		.userspace_addr = (uint64_t) mem,
+>> +	};
+> Declaring kvm_region in the middle of the block. I don't really care
+> myself, but it's inconsistent with all the other variables which are
+> declared at the top.
+
+Makes sense.
+
+>
+>> +
+>> +	ret = ioctl(vm_get_fd(vm), KVM_SET_USER_MEMORY_REGION, &kvm_region);
+>> +	TEST_ASSERT(ret == -1, "Adding one more memory slot should fail");
+>> +	TEST_ASSERT(errno == EINVAL, "Should return EINVAL errno");
+> Please make the second assert message more specific. Or better would be
+> to combine the asserts
+>
+>    TEST_ASSERT(ret == -1 && errno == EINVAL, "Adding one more memory slot should fail with EINVAL");
+
+Yeah, I was unsure about and'ing the checks. I will change it on v3.
+
+Thanks!
+
+Wainer
+
+>
+>> +
+>> +	munmap(mem, mem_reg_size);
+>> +	kvm_vm_free(vm);
+>> +}
+>> +
+>> +int main(int argc, char *argv[])
+>> +{
+>> +	test_add_max_slots();
+>> +	return 0;
+>> +}
+>> -- 
+>> 2.17.2
+>>
+> Thanks,
+> drew
 
