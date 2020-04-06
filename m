@@ -2,349 +2,223 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 388C81A0127
-	for <lists+kvm@lfdr.de>; Tue,  7 Apr 2020 00:28:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 997A71A0150
+	for <lists+kvm@lfdr.de>; Tue,  7 Apr 2020 00:55:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726705AbgDFW1f (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Apr 2020 18:27:35 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:54934 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726312AbgDFW1f (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 Apr 2020 18:27:35 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 036MMt5x108035;
-        Mon, 6 Apr 2020 22:27:13 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2020-01-29;
- bh=hatYsnMsoLP49Dkz3Xe01FIPGrFSbV6v6CCCS0dvdgA=;
- b=LE5hfzFI/xAFqKt8BOcF0wUJNQ2ND3hG5A++Z92PuYbYgcNGzAVqcL9qnEXTChQpLd4Q
- 3j96YJgJ2o4Hhx20O5rQhVZ37h4uv/k6c6VqAjWT6NZGWFBT/lsIJUefXPqWdEF9vk9n
- CuArbaQiKVyDngT/xfOhY6KfRJlXc0DahWnwa8NTnnvmKlrTsjwAqnHHgVJaeSMdOvF8
- tKXFMuvH9hj9OVYMOTORwepvhEIHcC88pA7SGIv3Ofwqy2HGXQmqyBrsfil6lSWnQ1aa
- ZmGJ847Q/Qxn4cbI0QCscF5xIXGB4WOZ+iybDXQcBEqeBvpIpi3RsK7AIt3YUgv7jhvm KA== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
-        by userp2120.oracle.com with ESMTP id 306jvn1hyc-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 06 Apr 2020 22:27:13 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
-        by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 036MMQvT186515;
-        Mon, 6 Apr 2020 22:27:12 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
-        by userp3020.oracle.com with ESMTP id 30839rb43e-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 06 Apr 2020 22:27:12 +0000
-Received: from abhmp0020.oracle.com (abhmp0020.oracle.com [141.146.116.26])
-        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 036MRAd9006224;
-        Mon, 6 Apr 2020 22:27:10 GMT
-Received: from localhost.localdomain (/10.159.148.184)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Mon, 06 Apr 2020 15:27:10 -0700
-Subject: Re: [PATCH v6 08/14] KVM: X86: Introduce KVM_HC_PAGE_ENC_STATUS
- hypercall
-To:     Ashish Kalra <ashish.kalra@amd.com>
-Cc:     pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com,
-        hpa@zytor.com, joro@8bytes.org, bp@suse.de,
-        thomas.lendacky@amd.com, x86@kernel.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, rientjes@google.com,
-        srutherford@google.com, luto@kernel.org, brijesh.singh@amd.com
-References: <cover.1585548051.git.ashish.kalra@amd.com>
- <265ef8a0ab75f01bc673cce6ddcf7988c7623943.1585548051.git.ashish.kalra@amd.com>
- <8d1baef8-c5ea-e8ac-0a9c-097aa20ea7aa@oracle.com>
- <20200403015748.GA26677@ashkalra_ubuntu_server>
- <20200403025846.GA27066@ashkalra_ubuntu_server>
-From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Message-ID: <2d710143-0e28-5534-7858-81eb296d3445@oracle.com>
-Date:   Mon, 6 Apr 2020 15:27:08 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
-MIME-Version: 1.0
-In-Reply-To: <20200403025846.GA27066@ashkalra_ubuntu_server>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9583 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 spamscore=0 malwarescore=0
- mlxscore=0 mlxlogscore=999 bulkscore=0 suspectscore=2 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
- definitions=main-2004060169
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9583 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 suspectscore=2
- mlxlogscore=999 mlxscore=0 bulkscore=0 adultscore=0 priorityscore=1501
- lowpriorityscore=0 clxscore=1015 malwarescore=0 impostorscore=0
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2004060169
+        id S1726272AbgDFWz5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Apr 2020 18:55:57 -0400
+Received: from mail-pg1-f202.google.com ([209.85.215.202]:45434 "EHLO
+        mail-pg1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725933AbgDFWz5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 Apr 2020 18:55:57 -0400
+Received: by mail-pg1-f202.google.com with SMTP id v29so848919pgo.12
+        for <kvm@vger.kernel.org>; Mon, 06 Apr 2020 15:55:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=HchK6g06mh8s+da573UNFqQlTVJHJhRQ30qDIQLe3NY=;
+        b=JPpPHVKt1DFMxGmMCV0mDxSNU898AhK4KlDkAKc1nm+EwhmjCpOV/AFvD6PARezFZJ
+         dfX37IbAdLorbILAD38uU0X7yk47n5aSzxrwTsEpZGSHevtSfQ00qGyY6DvFDYNIpzED
+         dG0hWbvaQWoVmv9t2X/o/fLB3YJbC+jn3DAaFEhPDY4ts0oS8a9Qt4uYK4oq64RjUiTi
+         p/DnvewQHbUwflpJZx4NGP+pFOHPQQBNIRXOZ+tRWf1KBTTqS6k+IeHESVcEWQH00857
+         sWLJpZb7DPFVdKzzwyTOlD9h8KnFRKzlHJ3b4fiKycNfFrbZVRpKoVaYFTPWpG685tVI
+         8hmA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=HchK6g06mh8s+da573UNFqQlTVJHJhRQ30qDIQLe3NY=;
+        b=S9D5mGxItTd0hylbsNgvbDQl9qlCZ3pG/8jvg1k/uPFVfGwNO9D1cz1bTwxJe4EftX
+         l/sXrPNFT6RMVPfag4GWJ6eDILkk0U8rwLjfs3mVQJLzQLkP/X2FqKGRla9d9mHtxQg0
+         jt5c9DPvO3Utuf22xx9Aje0Nr9z24pA+6OOUxm7JXBA+A10rKkZrj2hIfFjlOcFhz61w
+         3vzJDnUhm93/I7VkM8LIx81F71ka4lN2HxW3XH2xiFDzU2GHsM2lQjZBeXAWb+4d0w3U
+         bHhPPRpPvJt9VlHht21nYFnsu2NwpbvDgN+F+NO3iT/vlMaYvd+CYlPeaLKmnuQk/6Hf
+         3RWA==
+X-Gm-Message-State: AGi0PuYIfrGC2DTq6Nos+P3iiEVzxn69TcHhmsB0xJ/nDpFghPKPCCkJ
+        L1DLm7obZuccOlnWqJEKHDQuSLoAWcyQBgDUjH1ks7/PnLpvDc/+YT8RBBr1yFW91hgwC1DqODj
+        ndfI6BWzQdTBG8ZtQ9cp9/WwFsb0k4x6a1hXdV5hKmiGGRSnDl9n6owfhncZ15UHZ14xA4yo=
+X-Google-Smtp-Source: APiQypLjhDonwTcguvQhyOxamfNR3JEmdQEgUJRrbdsrSzknHC9S1ze1is2UrwHUkkD+SjFsf9RvTjQzApeLXm5hPQ==
+X-Received: by 2002:a17:90a:f00b:: with SMTP id bt11mr1710191pjb.71.1586213753919;
+ Mon, 06 Apr 2020 15:55:53 -0700 (PDT)
+Date:   Mon,  6 Apr 2020 15:55:37 -0700
+Message-Id: <20200406225537.48082-1-brigidsmith@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.26.0.292.g33ef6b2f38-goog
+Subject: [kvm-unit-tests PATCH] x86: gtests: add new test for vmread/vmwrite
+ flags preservation
+From:   Simon Smith <brigidsmith@google.com>
+To:     kvm@vger.kernel.org
+Cc:     Simon Smith <brigidsmith@google.com>,
+        Jim Mattson <jmattson@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+This commit adds new unit tests for commit a4d956b93904 ("KVM: nVMX:
+vmread should not set rflags to specify success in case of #PF")
 
-On 4/2/20 7:58 PM, Ashish Kalra wrote:
-> On Fri, Apr 03, 2020 at 01:57:48AM +0000, Ashish Kalra wrote:
->> On Thu, Apr 02, 2020 at 06:31:54PM -0700, Krish Sadhukhan wrote:
->>> On 3/29/20 11:22 PM, Ashish Kalra wrote:
->>>> From: Brijesh Singh <Brijesh.Singh@amd.com>
->>>>
->>>> This hypercall is used by the SEV guest to notify a change in the page
->>>> encryption status to the hypervisor. The hypercall should be invoked
->>>> only when the encryption attribute is changed from encrypted -> decrypted
->>>> and vice versa. By default all guest pages are considered encrypted.
->>>>
->>>> Cc: Thomas Gleixner <tglx@linutronix.de>
->>>> Cc: Ingo Molnar <mingo@redhat.com>
->>>> Cc: "H. Peter Anvin" <hpa@zytor.com>
->>>> Cc: Paolo Bonzini <pbonzini@redhat.com>
->>>> Cc: "Radim Krčmář" <rkrcmar@redhat.com>
->>>> Cc: Joerg Roedel <joro@8bytes.org>
->>>> Cc: Borislav Petkov <bp@suse.de>
->>>> Cc: Tom Lendacky <thomas.lendacky@amd.com>
->>>> Cc: x86@kernel.org
->>>> Cc: kvm@vger.kernel.org
->>>> Cc: linux-kernel@vger.kernel.org
->>>> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
->>>> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
->>>> ---
->>>>    Documentation/virt/kvm/hypercalls.rst | 15 +++++
->>>>    arch/x86/include/asm/kvm_host.h       |  2 +
->>>>    arch/x86/kvm/svm.c                    | 95 +++++++++++++++++++++++++++
->>>>    arch/x86/kvm/vmx/vmx.c                |  1 +
->>>>    arch/x86/kvm/x86.c                    |  6 ++
->>>>    include/uapi/linux/kvm_para.h         |  1 +
->>>>    6 files changed, 120 insertions(+)
->>>>
->>>> diff --git a/Documentation/virt/kvm/hypercalls.rst b/Documentation/virt/kvm/hypercalls.rst
->>>> index dbaf207e560d..ff5287e68e81 100644
->>>> --- a/Documentation/virt/kvm/hypercalls.rst
->>>> +++ b/Documentation/virt/kvm/hypercalls.rst
->>>> @@ -169,3 +169,18 @@ a0: destination APIC ID
->>>>    :Usage example: When sending a call-function IPI-many to vCPUs, yield if
->>>>    	        any of the IPI target vCPUs was preempted.
->>>> +
->>>> +
->>>> +8. KVM_HC_PAGE_ENC_STATUS
->>>> +-------------------------
->>>> +:Architecture: x86
->>>> +:Status: active
->>>> +:Purpose: Notify the encryption status changes in guest page table (SEV guest)
->>>> +
->>>> +a0: the guest physical address of the start page
->>>> +a1: the number of pages
->>>> +a2: encryption attribute
->>>> +
->>>> +   Where:
->>>> +	* 1: Encryption attribute is set
->>>> +	* 0: Encryption attribute is cleared
->>>> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
->>>> index 98959e8cd448..90718fa3db47 100644
->>>> --- a/arch/x86/include/asm/kvm_host.h
->>>> +++ b/arch/x86/include/asm/kvm_host.h
->>>> @@ -1267,6 +1267,8 @@ struct kvm_x86_ops {
->>>>    	bool (*apic_init_signal_blocked)(struct kvm_vcpu *vcpu);
->>>>    	int (*enable_direct_tlbflush)(struct kvm_vcpu *vcpu);
->>>> +	int (*page_enc_status_hc)(struct kvm *kvm, unsigned long gpa,
->>>> +				  unsigned long sz, unsigned long mode);
->>>>    };
->>>>    struct kvm_arch_async_pf {
->>>> diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
->>>> index 7c2721e18b06..1d8beaf1bceb 100644
->>>> --- a/arch/x86/kvm/svm.c
->>>> +++ b/arch/x86/kvm/svm.c
->>>> @@ -136,6 +136,8 @@ struct kvm_sev_info {
->>>>    	int fd;			/* SEV device fd */
->>>>    	unsigned long pages_locked; /* Number of pages locked */
->>>>    	struct list_head regions_list;  /* List of registered regions */
->>>> +	unsigned long *page_enc_bmap;
->>>> +	unsigned long page_enc_bmap_size;
->>>>    };
->>>>    struct kvm_svm {
->>>> @@ -1991,6 +1993,9 @@ static void sev_vm_destroy(struct kvm *kvm)
->>>>    	sev_unbind_asid(kvm, sev->handle);
->>>>    	sev_asid_free(sev->asid);
->>>> +
->>>> +	kvfree(sev->page_enc_bmap);
->>>> +	sev->page_enc_bmap = NULL;
->>>>    }
->>>>    static void avic_vm_destroy(struct kvm *kvm)
->>>> @@ -7593,6 +7598,94 @@ static int sev_receive_finish(struct kvm *kvm, struct kvm_sev_cmd *argp)
->>>>    	return ret;
->>>>    }
->>>> +static int sev_resize_page_enc_bitmap(struct kvm *kvm, unsigned long new_size)
->>>> +{
->>>> +	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
->>>> +	unsigned long *map;
->>>> +	unsigned long sz;
->>>> +
->>>> +	if (sev->page_enc_bmap_size >= new_size)
->>>> +		return 0;
->>>> +
->>>> +	sz = ALIGN(new_size, BITS_PER_LONG) / 8;
->>>> +
->>>> +	map = vmalloc(sz);
->>>
->>> Just wondering why we can't directly modify sev->page_enc_bmap.
->>>
->> Because the page_enc_bitmap needs to be re-sized here, it needs to be
->> expanded here.
+The two new tests force a vmread and a vmwrite on an unmapped
+address to cause a #PF and verify that the low byte of %rflags is
+preserved and that %rip is not advanced.  The cherry-pick fixed a
+bug in vmread, but we include a test for vmwrite as well for
+completeness.
 
+Before the aforementioned commit, the ALU flags would be incorrectly
+cleared and %rip would be advanced (for vmread).
 
-OK.
+Reviewed-by: Jim Mattson <jmattson@google.com>
+Signed-off-by: Simon Smith <brigidsmith@google.com>
+---
+ x86/vmx.c | 121 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 121 insertions(+)
 
-> I don't believe there is anything is like a realloc() kind of equivalent
-> for the kmalloc() interfaces.
->
-> Thanks,
-> Ashish
->
->>>> +	if (!map) {
->>>> +		pr_err_once("Failed to allocate encrypted bitmap size %lx\n",
->>>> +				sz);
->>>> +		return -ENOMEM;
->>>> +	}
->>>> +
->>>> +	/* mark the page encrypted (by default) */
->>>> +	memset(map, 0xff, sz);
->>>> +
->>>> +	bitmap_copy(map, sev->page_enc_bmap, sev->page_enc_bmap_size);
->>>> +	kvfree(sev->page_enc_bmap);
->>>> +
->>>> +	sev->page_enc_bmap = map;
->>>> +	sev->page_enc_bmap_size = new_size;
->>>> +
->>>> +	return 0;
->>>> +}
->>>> +
->>>> +static int svm_page_enc_status_hc(struct kvm *kvm, unsigned long gpa,
->>>> +				  unsigned long npages, unsigned long enc)
->>>> +{
->>>> +	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
->>>> +	kvm_pfn_t pfn_start, pfn_end;
->>>> +	gfn_t gfn_start, gfn_end;
->>>> +	int ret;
->>>> +
->>>> +	if (!sev_guest(kvm))
->>>> +		return -EINVAL;
->>>> +
->>>> +	if (!npages)
->>>> +		return 0;
->>>> +
->>>> +	gfn_start = gpa_to_gfn(gpa);
->>>> +	gfn_end = gfn_start + npages;
->>>> +
->>>> +	/* out of bound access error check */
->>>> +	if (gfn_end <= gfn_start)
->>>> +		return -EINVAL;
->>>> +
->>>> +	/* lets make sure that gpa exist in our memslot */
->>>> +	pfn_start = gfn_to_pfn(kvm, gfn_start);
->>>> +	pfn_end = gfn_to_pfn(kvm, gfn_end);
->>>> +
->>>> +	if (is_error_noslot_pfn(pfn_start) && !is_noslot_pfn(pfn_start)) {
->>>> +		/*
->>>> +		 * Allow guest MMIO range(s) to be added
->>>> +		 * to the page encryption bitmap.
->>>> +		 */
->>>> +		return -EINVAL;
->>>> +	}
->>>> +
->>>> +	if (is_error_noslot_pfn(pfn_end) && !is_noslot_pfn(pfn_end)) {
->>>> +		/*
->>>> +		 * Allow guest MMIO range(s) to be added
->>>> +		 * to the page encryption bitmap.
->>>> +		 */
->>>> +		return -EINVAL;
->>>> +	}
->>>
->>> It seems is_error_noslot_pfn() covers both cases - i) gfn slot is absent,
->>> ii) failure to translate to pfn. So do we still need is_noslot_pfn() ?
->>>
->> We do need to check for !is_noslot_pfn(..) additionally as the MMIO ranges will not
->> be having a slot allocated.
+diff --git a/x86/vmx.c b/x86/vmx.c
+index 647ab49408876..e9235ec4fcad9 100644
+--- a/x86/vmx.c
++++ b/x86/vmx.c
+@@ -32,6 +32,7 @@
+ #include "processor.h"
+ #include "alloc_page.h"
+ #include "vm.h"
++#include "vmalloc.h"
+ #include "desc.h"
+ #include "vmx.h"
+ #include "msr.h"
+@@ -368,6 +369,122 @@ static void test_vmwrite_vmread(void)
+ 	free_page(vmcs);
+ }
+ 
++ulong finish_fault;
++u8 sentinel;
++bool handler_called;
++static void pf_handler(struct ex_regs *regs)
++{
++	// check that RIP was not improperly advanced and that the
++	// flags value was preserved.
++	report("RIP has not been advanced!",
++		regs->rip < finish_fault);
++	report("The low byte of RFLAGS was preserved!",
++		((u8)regs->rflags == ((sentinel | 2) & 0xd7)));
++
++	regs->rip = finish_fault;
++	handler_called = true;
++
++}
++
++static void prep_flags_test_env(void **vpage, struct vmcs **vmcs, handler *old)
++{
++	// get an unbacked address that will cause a #PF
++	*vpage = alloc_vpage();
++
++	// set up VMCS so we have something to read from
++	*vmcs = alloc_page();
++
++	memset(*vmcs, 0, PAGE_SIZE);
++	(*vmcs)->hdr.revision_id = basic.revision;
++	assert(!vmcs_clear(*vmcs));
++	assert(!make_vmcs_current(*vmcs));
++
++	*old = handle_exception(PF_VECTOR, &pf_handler);
++}
++
++static void test_read_sentinel(void)
++{
++	void *vpage;
++	struct vmcs *vmcs;
++	handler old;
++
++	prep_flags_test_env(&vpage, &vmcs, &old);
++
++	// set the proper label
++	extern char finish_read_fault;
++
++	finish_fault = (ulong)&finish_read_fault;
++
++	// execute the vmread instruction that will cause a #PF
++	handler_called = false;
++	asm volatile ("movb %[byte], %%ah\n\t"
++		      "sahf\n\t"
++		      "vmread %[enc], %[val]; finish_read_fault:"
++		      : [val] "=m" (*(u64 *)vpage)
++		      : [byte] "Krm" (sentinel),
++		      [enc] "r" ((u64)GUEST_SEL_SS)
++		      : "cc", "ah"
++		      );
++	report("The #PF handler was invoked", handler_called);
++
++	// restore old #PF handler
++	handle_exception(PF_VECTOR, old);
++}
++
++static void test_vmread_flags_touch(void)
++{
++	// set up the sentinel value in the flags register. we
++	// choose these two values because they candy-stripe
++	// the 5 flags that sahf sets.
++	sentinel = 0x91;
++	test_read_sentinel();
++
++	sentinel = 0x45;
++	test_read_sentinel();
++}
++
++static void test_write_sentinel(void)
++{
++	void *vpage;
++	struct vmcs *vmcs;
++	handler old;
++
++	prep_flags_test_env(&vpage, &vmcs, &old);
++
++	// set the proper label
++	extern char finish_write_fault;
++
++	finish_fault = (ulong)&finish_write_fault;
++
++	// execute the vmwrite instruction that will cause a #PF
++	handler_called = false;
++	asm volatile ("movb %[byte], %%ah\n\t"
++		      "sahf\n\t"
++		      "vmwrite %[val], %[enc]; finish_write_fault:"
++		      : [val] "=m" (*(u64 *)vpage)
++		      : [byte] "Krm" (sentinel),
++		      [enc] "r" ((u64)GUEST_SEL_SS)
++		      : "cc", "ah"
++		      );
++	report("The #PF handler was invoked", handler_called);
++
++	// restore old #PF handler
++	handle_exception(PF_VECTOR, old);
++}
++
++static void test_vmwrite_flags_touch(void)
++{
++	// set up the sentinel value in the flags register. we
++	// choose these two values because they candy-stripe
++	// the 5 flags that sahf sets.
++	sentinel = 0x91;
++	test_write_sentinel();
++
++	sentinel = 0x45;
++	test_write_sentinel();
++}
++
++
+ static void test_vmcs_high(void)
+ {
+ 	struct vmcs *vmcs = alloc_page();
+@@ -1994,6 +2111,10 @@ int main(int argc, const char *argv[])
+ 		test_vmcs_lifecycle();
+ 	if (test_wanted("test_vmx_caps", argv, argc))
+ 		test_vmx_caps();
++	if (test_wanted("test_vmread_flags_touch", argv, argc))
++		test_vmread_flags_touch();
++	if (test_wanted("test_vmwrite_flags_touch", argv, argc))
++		test_vmwrite_flags_touch();
+ 
+ 	/* Balance vmxon from test_vmxon. */
+ 	vmx_off();
+-- 
+2.26.0.292.g33ef6b2f38-goog
 
-
-The comments above is_error_noslot_pfn() seem to indicate that it covers 
-both cases, "not in slot" and "failure to translate"...
-
-
-Reviewed-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
-
->>
->> Thanks,
->> Ashish
->>
->>>> +
->>>> +	mutex_lock(&kvm->lock);
->>>> +	ret = sev_resize_page_enc_bitmap(kvm, gfn_end);
->>>> +	if (ret)
->>>> +		goto unlock;
->>>> +
->>>> +	if (enc)
->>>> +		__bitmap_set(sev->page_enc_bmap, gfn_start,
->>>> +				gfn_end - gfn_start);
->>>> +	else
->>>> +		__bitmap_clear(sev->page_enc_bmap, gfn_start,
->>>> +				gfn_end - gfn_start);
->>>> +
->>>> +unlock:
->>>> +	mutex_unlock(&kvm->lock);
->>>> +	return ret;
->>>> +}
->>>> +
->>>>    static int svm_mem_enc_op(struct kvm *kvm, void __user *argp)
->>>>    {
->>>>    	struct kvm_sev_cmd sev_cmd;
->>>> @@ -7995,6 +8088,8 @@ static struct kvm_x86_ops svm_x86_ops __ro_after_init = {
->>>>    	.need_emulation_on_page_fault = svm_need_emulation_on_page_fault,
->>>>    	.apic_init_signal_blocked = svm_apic_init_signal_blocked,
->>>> +
->>>> +	.page_enc_status_hc = svm_page_enc_status_hc,
->>>
->>> Why not place it where other encryption ops are located ?
->>>
->>>          ...
->>>
->>>          .mem_enc_unreg_region
->>>
->>> +      .page_enc_status_hc = svm_page_enc_status_hc
->>>
->>>>    };
->>>>    static int __init svm_init(void)
->>>> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
->>>> index 079d9fbf278e..f68e76ee7f9c 100644
->>>> --- a/arch/x86/kvm/vmx/vmx.c
->>>> +++ b/arch/x86/kvm/vmx/vmx.c
->>>> @@ -8001,6 +8001,7 @@ static struct kvm_x86_ops vmx_x86_ops __ro_after_init = {
->>>>    	.nested_get_evmcs_version = NULL,
->>>>    	.need_emulation_on_page_fault = vmx_need_emulation_on_page_fault,
->>>>    	.apic_init_signal_blocked = vmx_apic_init_signal_blocked,
->>>> +	.page_enc_status_hc = NULL,
->>>>    };
->>>>    static void vmx_cleanup_l1d_flush(void)
->>>> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
->>>> index cf95c36cb4f4..68428eef2dde 100644
->>>> --- a/arch/x86/kvm/x86.c
->>>> +++ b/arch/x86/kvm/x86.c
->>>> @@ -7564,6 +7564,12 @@ int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
->>>>    		kvm_sched_yield(vcpu->kvm, a0);
->>>>    		ret = 0;
->>>>    		break;
->>>> +	case KVM_HC_PAGE_ENC_STATUS:
->>>> +		ret = -KVM_ENOSYS;
->>>> +		if (kvm_x86_ops->page_enc_status_hc)
->>>> +			ret = kvm_x86_ops->page_enc_status_hc(vcpu->kvm,
->>>> +					a0, a1, a2);
->>>> +		break;
->>>>    	default:
->>>>    		ret = -KVM_ENOSYS;
->>>>    		break;
->>>> diff --git a/include/uapi/linux/kvm_para.h b/include/uapi/linux/kvm_para.h
->>>> index 8b86609849b9..847b83b75dc8 100644
->>>> --- a/include/uapi/linux/kvm_para.h
->>>> +++ b/include/uapi/linux/kvm_para.h
->>>> @@ -29,6 +29,7 @@
->>>>    #define KVM_HC_CLOCK_PAIRING		9
->>>>    #define KVM_HC_SEND_IPI		10
->>>>    #define KVM_HC_SCHED_YIELD		11
->>>> +#define KVM_HC_PAGE_ENC_STATUS		12
->>>>    /*
->>>>     * hypercalls use architecture specific
