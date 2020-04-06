@@ -2,114 +2,212 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1A29119FDE0
-	for <lists+kvm@lfdr.de>; Mon,  6 Apr 2020 21:10:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3634C19FE6F
+	for <lists+kvm@lfdr.de>; Mon,  6 Apr 2020 21:49:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726307AbgDFTJ7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Apr 2020 15:09:59 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:25167 "EHLO
+        id S1726417AbgDFTtU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Apr 2020 15:49:20 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:48217 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725928AbgDFTJ7 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 6 Apr 2020 15:09:59 -0400
+        by vger.kernel.org with ESMTP id S1726084AbgDFTtU (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 6 Apr 2020 15:49:20 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1586200198;
+        s=mimecast20190719; t=1586202559;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=2WntavKAAILKmUl5tuzVQBGYOFdZ1K83H/b52IOT1/E=;
-        b=IyE1aGX9HxVWx3vq3ZyAK7zyAsb2SGCUlI26rcnpUGjPOj8TMaxvaLeHO7OS/mpcEAcVY4
-        /ZcLmAdsa72Krkke05MD7Xq71MwxNcb11cUANPDnMQzq2UTPE1x2m0/sTtdsjZkZI0o5rF
-        aGWlVXBoDJivsxEWM9g12nhjTEdzb6I=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-347-bU9l9M8MMvWWter2viivmA-1; Mon, 06 Apr 2020 15:09:54 -0400
-X-MC-Unique: bU9l9M8MMvWWter2viivmA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 694FC8018A8;
-        Mon,  6 Apr 2020 19:09:52 +0000 (UTC)
-Received: from horse.redhat.com (ovpn-115-173.rdu2.redhat.com [10.10.115.173])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 331809D36D;
-        Mon,  6 Apr 2020 19:09:52 +0000 (UTC)
-Received: by horse.redhat.com (Postfix, from userid 10451)
-        id A9577220515; Mon,  6 Apr 2020 15:09:51 -0400 (EDT)
-Date:   Mon, 6 Apr 2020 15:09:51 -0400
-From:   Vivek Goyal <vgoyal@redhat.com>
-To:     Peter Zijlstra <peterz@infradead.org>
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        Andy Lutomirski <luto@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        LKML <linux-kernel@vger.kernel.org>, X86 ML <x86@kernel.org>,
-        kvm list <kvm@vger.kernel.org>, stable <stable@vger.kernel.org>
-Subject: Re: [PATCH v2] x86/kvm: Disable KVM_ASYNC_PF_SEND_ALWAYS
-Message-ID: <20200406190951.GA19259@redhat.com>
-References: <87ftek9ngq.fsf@nanos.tec.linutronix.de>
- <CALCETrVsc-t=tDRPbCg5dWHDY0NFv2zjz12ahD-vnGPn8T+RXA@mail.gmail.com>
- <87a74s9ehb.fsf@nanos.tec.linutronix.de>
- <87wo7v8g4j.fsf@nanos.tec.linutronix.de>
- <877dzu8178.fsf@nanos.tec.linutronix.de>
- <37440ade-1657-648b-bf72-2b8ca4ac21ce@redhat.com>
- <871rq199oz.fsf@nanos.tec.linutronix.de>
- <CALCETrUHwd8pNr_ZdFqY8vMjJeMdNyw2C+FL6uOUM98SEE9rNQ@mail.gmail.com>
- <87d09l73ip.fsf@nanos.tec.linutronix.de>
- <20200309202215.GM12561@hirez.programming.kicks-ass.net>
+        bh=3SAc7/INURO0fUmTRoJHT56cMjNB24w7zVKVwcxLIzw=;
+        b=Fccr3BnkqEikL0xhcfc5OIJ75fALu1Sxs9FaCxiJ6yY3vfUAO4/+lzVV2lHaxEy/q+0tUC
+        PXbrlCmqTLvBqPvhPbUVpiW3FKrdXxKKDEvVB8woCCLlb6Fb2FzK2rMgmzKr2jtYzJFGRY
+        WwP8EGa4MZR2vZWl6HNbgpaIvJ2T8xY=
+Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
+ [209.85.160.197]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-456-GsFmSVi7MSySav0pKS9sSg-1; Mon, 06 Apr 2020 15:49:16 -0400
+X-MC-Unique: GsFmSVi7MSySav0pKS9sSg-1
+Received: by mail-qt1-f197.google.com with SMTP id v16so927889qtj.1
+        for <kvm@vger.kernel.org>; Mon, 06 Apr 2020 12:49:15 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=3SAc7/INURO0fUmTRoJHT56cMjNB24w7zVKVwcxLIzw=;
+        b=dQCmMl8boCWPbn8bhax3TUNCyIuoAhktDECxesc48j6+BUdoZt+of/lYqvvU34PUui
+         CXeKzdF0sBm2h9UaqGe5sdLdTaDsVroa86w0pHY8QobIZsFg8c3u7tCfPZUxD3SJC18K
+         sRjbEjD3re4QuJQ8lSE2u0ZswqmOKocuI+UhRI18PokZZf4ysAd7WEwSJ3z0NNeuVNiU
+         DpdkPeHxEwtqb64Lei1c66nPJME7DifakKqDx2qmf9st83fs0xwQ+dwiA7rmfkfH2SRW
+         ugUbPQ3pbmEC+THbHwAysTa4yhOjT7xs3Rhux47XgFMdOHBo/MRCso7L/58emhMoAJ0r
+         WJSg==
+X-Gm-Message-State: AGi0Pubg1DZmMvDgfwiTreMCm5piRNgJGd9m5RDTSVwt3Y9gLjwz40Qg
+        oC8TlTsu0rU+l089e04XVZIStBbvQuj/7JN2iSnLlY5qDcXK3iZfOZtcy0MuTAP0QbsTadoQ+ET
+        gf35Dgnybz34T
+X-Received: by 2002:ac8:8d0:: with SMTP id y16mr1270777qth.340.1586202555448;
+        Mon, 06 Apr 2020 12:49:15 -0700 (PDT)
+X-Google-Smtp-Source: APiQypIsQ+naX+Z38cNb4BpPpyftxPdr6Pz+MXwVkluFeAVGofZZPwR4AZcFrqU7Egyx3/QvySVzMQ==
+X-Received: by 2002:ac8:8d0:: with SMTP id y16mr1270746qth.340.1586202555194;
+        Mon, 06 Apr 2020 12:49:15 -0700 (PDT)
+Received: from xz-x1 ([2607:9880:19c0:32::3])
+        by smtp.gmail.com with ESMTPSA id f138sm2635656qke.105.2020.04.06.12.49.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 06 Apr 2020 12:49:14 -0700 (PDT)
+Date:   Mon, 6 Apr 2020 15:48:40 -0400
+From:   Peter Xu <peterx@redhat.com>
+To:     "Liu, Yi L" <yi.l.liu@intel.com>
+Cc:     "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "mst@redhat.com" <mst@redhat.com>,
+        "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "Tian, Jun J" <jun.j.tian@intel.com>,
+        "Sun, Yi Y" <yi.y.sun@intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "Wu, Hao" <hao.wu@intel.com>,
+        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
+        Jacob Pan <jacob.jun.pan@linux.intel.com>,
+        Yi Sun <yi.y.sun@linux.intel.com>,
+        Richard Henderson <rth@twiddle.net>,
+        Eduardo Habkost <ehabkost@redhat.com>
+Subject: Re: [PATCH v2 16/22] intel_iommu: replay pasid binds after context
+ cache invalidation
+Message-ID: <20200406194840.GS103677@xz-x1>
+References: <1585542301-84087-1-git-send-email-yi.l.liu@intel.com>
+ <1585542301-84087-17-git-send-email-yi.l.liu@intel.com>
+ <20200403144548.GK103677@xz-x1>
+ <A2975661238FB949B60364EF0F2C25743A220E44@SHSMSX104.ccr.corp.intel.com>
+ <20200403161120.GN103677@xz-x1>
+ <A2975661238FB949B60364EF0F2C25743A221BD4@SHSMSX104.ccr.corp.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20200309202215.GM12561@hirez.programming.kicks-ass.net>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <A2975661238FB949B60364EF0F2C25743A221BD4@SHSMSX104.ccr.corp.intel.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Mar 09, 2020 at 09:22:15PM +0100, Peter Zijlstra wrote:
-> On Mon, Mar 09, 2020 at 08:05:18PM +0100, Thomas Gleixner wrote:
-> > Andy Lutomirski <luto@kernel.org> writes:
+On Sat, Apr 04, 2020 at 12:00:12PM +0000, Liu, Yi L wrote:
+> Hi Peter,
 > 
-> > > I'm okay with the save/restore dance, I guess.  It's just yet more
-> > > entry crud to deal with architecture nastiness, except that this
-> > > nastiness is 100% software and isn't Intel/AMD's fault.
+> > From: Peter Xu <peterx@redhat.com>
+> > Sent: Saturday, April 4, 2020 12:11 AM
+> > To: Liu, Yi L <yi.l.liu@intel.com>
+> > Subject: Re: [PATCH v2 16/22] intel_iommu: replay pasid binds after context cache
+> > invalidation
 > > 
-> > And we can do it in C and don't have to fiddle with it in the ASM
-> > maze.
+> > On Fri, Apr 03, 2020 at 03:21:10PM +0000, Liu, Yi L wrote:
+> > > > From: Peter Xu <peterx@redhat.com>
+> > > > Sent: Friday, April 3, 2020 10:46 PM
+> > > > To: Liu, Yi L <yi.l.liu@intel.com>
+> > > > Subject: Re: [PATCH v2 16/22] intel_iommu: replay pasid binds after context
+> > cache
+> > > > invalidation
+> > > >
+> > > > On Sun, Mar 29, 2020 at 09:24:55PM -0700, Liu Yi L wrote:
+> > > > > This patch replays guest pasid bindings after context cache
+> > > > > invalidation. This is a behavior to ensure safety. Actually,
+> > > > > programmer should issue pasid cache invalidation with proper
+> > > > > granularity after issuing a context cache invalidation.
+> > > > >
+> > > > > Cc: Kevin Tian <kevin.tian@intel.com>
+> > > > > Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
+> > > > > Cc: Peter Xu <peterx@redhat.com>
+> > > > > Cc: Yi Sun <yi.y.sun@linux.intel.com>
+> > > > > Cc: Paolo Bonzini <pbonzini@redhat.com>
+> > > > > Cc: Richard Henderson <rth@twiddle.net>
+> > > > > Cc: Eduardo Habkost <ehabkost@redhat.com>
+> > > > > Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
+> > > > > ---
+> > > > >  hw/i386/intel_iommu.c          | 51
+> > > > ++++++++++++++++++++++++++++++++++++++++++
+> > > > >  hw/i386/intel_iommu_internal.h |  6 ++++-
+> > > > >  hw/i386/trace-events           |  1 +
+> > > > >  3 files changed, 57 insertions(+), 1 deletion(-)
+> > > > >
+> > > > > diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+> > > > > index d87f608..883aeac 100644
+> > > > > --- a/hw/i386/intel_iommu.c
+> > > > > +++ b/hw/i386/intel_iommu.c
+> > > > > @@ -68,6 +68,10 @@ static void
+> > > > vtd_address_space_refresh_all(IntelIOMMUState *s);
+> > > > >  static void vtd_address_space_unmap(VTDAddressSpace *as, IOMMUNotifier
+> > *n);
+> > > > >
+> > > > >  static void vtd_pasid_cache_reset(IntelIOMMUState *s);
+> > > > > +static void vtd_pasid_cache_sync(IntelIOMMUState *s,
+> > > > > +                                 VTDPASIDCacheInfo *pc_info);
+> > > > > +static void vtd_pasid_cache_devsi(IntelIOMMUState *s,
+> > > > > +                                  VTDBus *vtd_bus, uint16_t devfn);
+> > > > >
+> > > > >  static void vtd_panic_require_caching_mode(void)
+> > > > >  {
+> > > > > @@ -1853,7 +1857,10 @@ static void
+> > vtd_iommu_replay_all(IntelIOMMUState
+> > > > *s)
+> > > > >
+> > > > >  static void vtd_context_global_invalidate(IntelIOMMUState *s)
+> > > > >  {
+> > > > > +    VTDPASIDCacheInfo pc_info;
+> > > > > +
+> > > > >      trace_vtd_inv_desc_cc_global();
+> > > > > +
+> > > > >      /* Protects context cache */
+> > > > >      vtd_iommu_lock(s);
+> > > > >      s->context_cache_gen++;
+> > > > > @@ -1870,6 +1877,9 @@ static void
+> > > > vtd_context_global_invalidate(IntelIOMMUState *s)
+> > > > >       * VT-d emulation codes.
+> > > > >       */
+> > > > >      vtd_iommu_replay_all(s);
+> > > > > +
+> > > > > +    pc_info.flags = VTD_PASID_CACHE_GLOBAL;
+> > > > > +    vtd_pasid_cache_sync(s, &pc_info);
+> > > > >  }
+> > > > >
+> > > > >  /**
+> > > > > @@ -2005,6 +2015,22 @@ static void
+> > > > vtd_context_device_invalidate(IntelIOMMUState *s,
+> > > > >                   * happened.
+> > > > >                   */
+> > > > >                  vtd_sync_shadow_page_table(vtd_as);
+> > > > > +                /*
+> > > > > +                 * Per spec, context flush should also
+> > > > > followed with PASID
+> > > > > +                 * cache and iotlb flush. Regards to
+> > > > > a device selective
+> > > > > +                 * context cache invalidation:
+> > > >
+> > > > If context entry flush should also follow another pasid cache flush,
+> > > > then this is still needed?  Shouldn't the pasid flush do the same
+> > > > thing again?
+> > >
+> > > yes, but how about guest software failed to follow it? It will do
+> > > the same thing when pasid cache flush comes. But this only happens
+> > > for the rid2pasid case (the IOVA page table).
+> > 
+> > Do you mean it will not happen when nested page table is used (so it's
+> > required for nested tables)?
 > 
-> Right; I'd still love to kill KVM_ASYNC_PF_SEND_ALWAYS though, even if
-> we do the save/restore in do_nmi(). That is some wild brain melt. Also,
-> AFAIK none of the distros are actually shipping a PREEMPT=y kernel
-> anyway, so killing it shouldn't matter much.
+> no, by the IOVA page table case, I just want to confirm the duplicate
+> replay is true. But it is not "only" case. :-) my bad. any scalable mode
+> context entry modification will result in duplicate replay as this patch
+> enforces a pasid replay after context cache invalidation. But for normal
+> guest SVM usage, it won't have such duplicate work as it only modifies
+> pasid entry.
+> 
+> > Yeah we can keep them for safe no matter what; at least I'm fine with
+> > it (I believe most of the code we're discussing is not fast path).
+> > Just want to be sure of it since if it's definitely duplicated then we
+> > can instead drop it.
+> 
+> yes, it is not fast path. BTW. I guess the iova shadow sync applies
+> the same notion. right?
 
-It will be nice if we can retain KVM_ASYNC_PF_SEND_ALWAYS. I have another
-use case outside CONFIG_PREEMPT.
+Yes I rem we have similar things, but the same to that - if we can
+confirm that it'll be duplicated then I think we should remove that
+too.  But feel free to ignore this question for now and keep it.  The
+comment explaining that would be helpful, as you already did.  Thanks,
 
-I am trying to extend async pf interface to also report page fault errors
-to the guest.
-
-https://lore.kernel.org/kvm/20200331194011.24834-1-vgoyal@redhat.com/
-
-Right now async page fault interface assumes that host will always be
-able to successfully resolve the page fault and sooner or later PAGE_READY
-event will be sent to guest. And there is no mechnaism to report the
-errors back to guest.
-
-I am trying to add enhance virtiofs to directly map host page cache in guest.
-
-https://lore.kernel.org/linux-fsdevel/20200304165845.3081-1-vgoyal@redhat.com/
-
-There it is possible that a file page on host is mapped in guest and file
-got truncated and page is not there anymore. Guest tries to access it,
-and it generates async page fault. On host we will get -EFAULT and I 
-need to propagate it back to guest so that guest can either send SIGBUS
-to process which caused this. Or if kernel was trying to do memcpy(),
-then be able to use execpetion table error handling and be able to
-return with error.  (memcpy_mcflush()).
-
-For the second case to work, I will need async pf events to come in
-even if guest is in kernel and CONFIG_PREEMPT=n.
-
-So it would be nice if we can keep KVM_ASYNC_PF_SEND_ALWAYS around.
-
-Thanks
-Vivek
+-- 
+Peter Xu
 
