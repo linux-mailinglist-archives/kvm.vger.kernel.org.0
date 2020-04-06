@@ -2,75 +2,207 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3371219F543
-	for <lists+kvm@lfdr.de>; Mon,  6 Apr 2020 13:57:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 80D4E19F59E
+	for <lists+kvm@lfdr.de>; Mon,  6 Apr 2020 14:13:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727728AbgDFL5E (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Apr 2020 07:57:04 -0400
-Received: from mail.skyhub.de ([5.9.137.197]:56768 "EHLO mail.skyhub.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727703AbgDFL5E (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 Apr 2020 07:57:04 -0400
-Received: from zn.tnic (p200300EC2F04F600C571FE02886A814C.dip0.t-ipconnect.de [IPv6:2003:ec:2f04:f600:c571:fe02:886a:814c])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id E7D3D1EC05D6;
-        Mon,  6 Apr 2020 13:57:02 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1586174223;
+        id S1727968AbgDFMMy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Apr 2020 08:12:54 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:36671 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727931AbgDFMMw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 Apr 2020 08:12:52 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1586175170;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=6mkdJTICOEGUmg5Sf3oUN1anrQ+rTmVREXUkf1ARKJE=;
-        b=VpNMhbNpDvCpH+/+qc/IbAFhZgdcKcDPIv/3B+xtociH+gmByxjgr8ZIS1cyqpzEo/hLxo
-        BnNbctTh99zUhG3w9BT1hjF7Pwe3F5rqrzQnxfkrH4Ry50KxU+imvuvl55NhxW0Dm9raTc
-        3ccjkXu8dg6Ngh1tCvTKYVw8unLL30w=
-Date:   Mon, 6 Apr 2020 13:56:59 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Joerg Roedel <joro@8bytes.org>
-Cc:     x86@kernel.org, hpa@zytor.com, Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Thomas Hellstrom <thellstrom@vmware.com>,
-        Jiri Slaby <jslaby@suse.cz>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Juergen Gross <jgross@suse.com>,
-        Kees Cook <keescook@chromium.org>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        Joerg Roedel <jroedel@suse.de>
-Subject: Re: [PATCH 15/70] x86/boot/compressed/64: Always switch to own
- page-table
-Message-ID: <20200406115659.GD2520@zn.tnic>
-References: <20200319091407.1481-1-joro@8bytes.org>
- <20200319091407.1481-16-joro@8bytes.org>
+         in-reply-to:in-reply-to:references:references;
+        bh=dQAEJjJ23njMAMzpYV3TzkQNiOgjGmbglBN46bPRZ/k=;
+        b=FL/Hz1sYb5fZql6/Fw1IbPDUj7GjcUk7wl/0uMI2lk4fOixhHzpKkZK0i5ieH4xOiRtKBD
+        gWUrnf6ZODujrN0nUvj/XI1mbagBckJ6MEzSTpk3t5OvMFZ8gSTReAruTMljcPYAr5pKoj
+        mgBhuh41G9opgLqiFR5EQRpVqfu9YWY=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-504-CAmUjOQcOLS9IGvvteZaAA-1; Mon, 06 Apr 2020 08:12:49 -0400
+X-MC-Unique: CAmUjOQcOLS9IGvvteZaAA-1
+Received: by mail-wr1-f69.google.com with SMTP id v14so8271276wrq.13
+        for <kvm@vger.kernel.org>; Mon, 06 Apr 2020 05:12:48 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=dQAEJjJ23njMAMzpYV3TzkQNiOgjGmbglBN46bPRZ/k=;
+        b=ZwrEAOqRT8Ga1zrjN/Z2YONLMh4mn2mpxFPCRVLvEER+UC3OiTj8XsKX/MJqnespEy
+         1//TndlEo3xWeZFsU862Ikv3a8siZEyihLp5VeabpVVg5ZsEzFW6guEw03hulAAOIZLM
+         TCW4a6nrT8hlbX8E16UOSYc/BgqX6IAKy01eeWrCp+FD0xmmxWmxfoiRYnxUbfCD6Q6S
+         iFogV+0xKOh4jUIYV/F+kEr/iUe7MOnF2uuKY/U92Bt2tIPsmZ0MEZ8LWmei0fnZKygi
+         PwEdUIttxYi6CjGhvRuAHh75Zw/ZLH4T0zyOBSuv5frJOCQXZVjR20+TB080yYBiMWbZ
+         5NlA==
+X-Gm-Message-State: AGi0PuZy9cBQcNAuEpcrfPr7PUazdlXZdMYjLd4W3fgjcGgaFzXFbF7z
+        K8MklpFjIeWY6F4jAklshmQ6Odxaa/MI66vXfDaKVMujBfJ/QsRY4FAoHr2jz3d+YKcQsK9rySD
+        xiKufAwaskow6
+X-Received: by 2002:adf:bc12:: with SMTP id s18mr25165005wrg.220.1586175167830;
+        Mon, 06 Apr 2020 05:12:47 -0700 (PDT)
+X-Google-Smtp-Source: APiQypLwgTks29i/561QCQdpKOflCqiUKEhbZa/gBiQmA5aq0hS0WhmnIdFdpGtSrxr+GiRrPLsSEg==
+X-Received: by 2002:adf:bc12:: with SMTP id s18mr25164995wrg.220.1586175167620;
+        Mon, 06 Apr 2020 05:12:47 -0700 (PDT)
+Received: from redhat.com (bzq-79-176-51-222.red.bezeqint.net. [79.176.51.222])
+        by smtp.gmail.com with ESMTPSA id c20sm11334886wmd.36.2020.04.06.05.12.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 06 Apr 2020 05:12:47 -0700 (PDT)
+Date:   Mon, 6 Apr 2020 08:12:44 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     linux-kernel@vger.kernel.org
+Cc:     Ard Biesheuvel <ardb@kernel.org>,
+        "richard.henderson@linaro.org" <richard.henderson@linaro.org>,
+        "christophe.lyon@st.com" <christophe.lyon@st.com>,
+        kbuild test robot <lkp@intel.com>,
+        "daniel.santos@pobox.com" <daniel.santos@pobox.com>,
+        Jason Wang <jasowang@redhat.com>,
+        "kbuild-all@lists.01.org" <kbuild-all@lists.01.org>,
+        Russell King <rmk+kernel@armlinux.org.uk>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        Richard Earnshaw <Richard.Earnshaw@arm.com>,
+        Sudeep Dutt <sudeep.dutt@intel.com>,
+        Ashutosh Dixit <ashutosh.dixit@intel.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        "David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org
+Subject: [PATCH v2 2/2] vhost: disable for OABI
+Message-ID: <20200406121233.109889-3-mst@redhat.com>
+References: <20200406121233.109889-1-mst@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200319091407.1481-16-joro@8bytes.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20200406121233.109889-1-mst@redhat.com>
+X-Mailer: git-send-email 2.24.1.751.gd10ce2899c
+X-Mutt-Fcc: =sent
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 19, 2020 at 10:13:12AM +0100, Joerg Roedel wrote:
-> From: Joerg Roedel <jroedel@suse.de>
-> 
-> When booted through startup_64 the kernel keeps running on the EFI
-> page-table until the KASLR code sets up its own page-table. Without
-> KASLR the pre-decompression boot code never switches off the EFI
-> page-table. Change that by unconditionally switching to our own
-> page-table once the kernel is relocated.
-> 
-> This makes sure we can make changes to the mapping when necessary, for
+vhost is currently broken on the default ARM config.
 
-Pls use passive voice in your commit message: no "we" or "I", etc, and
-describe your changes in imperative mood.
+The reason is that that uses apcs-gnu which is the ancient OABI that is been
+deprecated for a long time.
 
+Given that virtio support on such ancient systems is not needed in the
+first place, let's just add something along the lines of
+
+	depends on !ARM || AEABI
+
+to the virtio Kconfig declaration, and add a comment that it has to do
+with struct member alignment.
+
+Note: we can't make VHOST and VHOST_RING themselves have
+a dependency since these are selected. Add a new symbol for that.
+
+Suggested-by: Ard Biesheuvel <ardb@kernel.org>
+Siggested-by: Richard Earnshaw <Richard.Earnshaw@arm.com>
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+---
+ drivers/misc/mic/Kconfig |  2 +-
+ drivers/net/caif/Kconfig |  2 +-
+ drivers/vdpa/Kconfig     |  2 +-
+ drivers/vhost/Kconfig    | 17 +++++++++++++----
+ 4 files changed, 16 insertions(+), 7 deletions(-)
+
+diff --git a/drivers/misc/mic/Kconfig b/drivers/misc/mic/Kconfig
+index 8f201d019f5a..3bfe72c59864 100644
+--- a/drivers/misc/mic/Kconfig
++++ b/drivers/misc/mic/Kconfig
+@@ -116,7 +116,7 @@ config MIC_COSM
+ 
+ config VOP
+ 	tristate "VOP Driver"
+-	depends on VOP_BUS
++	depends on VOP_BUS && VHOST_DPN
+ 	select VHOST_RING
+ 	select VIRTIO
+ 	help
+diff --git a/drivers/net/caif/Kconfig b/drivers/net/caif/Kconfig
+index 9db0570c5beb..661c25eb1c46 100644
+--- a/drivers/net/caif/Kconfig
++++ b/drivers/net/caif/Kconfig
+@@ -50,7 +50,7 @@ config CAIF_HSI
+ 
+ config CAIF_VIRTIO
+ 	tristate "CAIF virtio transport driver"
+-	depends on CAIF && HAS_DMA
++	depends on CAIF && HAS_DMA && VHOST_DPN
+ 	select VHOST_RING
+ 	select VIRTIO
+ 	select GENERIC_ALLOCATOR
+diff --git a/drivers/vdpa/Kconfig b/drivers/vdpa/Kconfig
+index d0cb0e583a5d..aee28def466b 100644
+--- a/drivers/vdpa/Kconfig
++++ b/drivers/vdpa/Kconfig
+@@ -14,7 +14,7 @@ if VDPA_MENU
+ 
+ config VDPA_SIM
+ 	tristate "vDPA device simulator"
+-	depends on RUNTIME_TESTING_MENU && HAS_DMA
++	depends on RUNTIME_TESTING_MENU && HAS_DMA && VHOST_DPN
+ 	select VDPA
+ 	select VHOST_RING
+ 	select VHOST_IOTLB
+diff --git a/drivers/vhost/Kconfig b/drivers/vhost/Kconfig
+index cb6b17323eb2..b3486e218f62 100644
+--- a/drivers/vhost/Kconfig
++++ b/drivers/vhost/Kconfig
+@@ -12,6 +12,15 @@ config VHOST_RING
+ 	  This option is selected by any driver which needs to access
+ 	  the host side of a virtio ring.
+ 
++config VHOST_DPN
++	bool "VHOST dependencies"
++	depends on !ARM || AEABI
++	default y
++	help
++	  Anything selecting VHOST or VHOST_RING must depend on VHOST_DPN.
++	  This excludes the deprecated ARM ABI since that forces a 4 byte
++	  alignment on all structs - incompatible with virtio spec requirements.
++
+ config VHOST
+ 	tristate
+ 	select VHOST_IOTLB
+@@ -27,7 +36,7 @@ if VHOST_MENU
+ 
+ config VHOST_NET
+ 	tristate "Host kernel accelerator for virtio net"
+-	depends on NET && EVENTFD && (TUN || !TUN) && (TAP || !TAP)
++	depends on NET && EVENTFD && (TUN || !TUN) && (TAP || !TAP) && VHOST_DPN
+ 	select VHOST
+ 	---help---
+ 	  This kernel module can be loaded in host kernel to accelerate
+@@ -39,7 +48,7 @@ config VHOST_NET
+ 
+ config VHOST_SCSI
+ 	tristate "VHOST_SCSI TCM fabric driver"
+-	depends on TARGET_CORE && EVENTFD
++	depends on TARGET_CORE && EVENTFD && VHOST_DPN
+ 	select VHOST
+ 	default n
+ 	---help---
+@@ -48,7 +57,7 @@ config VHOST_SCSI
+ 
+ config VHOST_VSOCK
+ 	tristate "vhost virtio-vsock driver"
+-	depends on VSOCKETS && EVENTFD
++	depends on VSOCKETS && EVENTFD && VHOST_DPN
+ 	select VHOST
+ 	select VIRTIO_VSOCKETS_COMMON
+ 	default n
+@@ -62,7 +71,7 @@ config VHOST_VSOCK
+ 
+ config VHOST_VDPA
+ 	tristate "Vhost driver for vDPA-based backend"
+-	depends on EVENTFD
++	depends on EVENTFD && VHOST_DPN
+ 	select VHOST
+ 	select VDPA
+ 	help
 -- 
-Regards/Gruss,
-    Boris.
+MST
 
-https://people.kernel.org/tglx/notes-about-netiquette
