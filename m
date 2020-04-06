@@ -2,227 +2,185 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id EBDB619F73B
-	for <lists+kvm@lfdr.de>; Mon,  6 Apr 2020 15:53:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 834D619F751
+	for <lists+kvm@lfdr.de>; Mon,  6 Apr 2020 15:55:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728435AbgDFNxF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Apr 2020 09:53:05 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:56559 "EHLO
+        id S1728519AbgDFNze (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Apr 2020 09:55:34 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:46854 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726910AbgDFNxF (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 6 Apr 2020 09:53:05 -0400
+        by vger.kernel.org with ESMTP id S1728271AbgDFNzd (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 6 Apr 2020 09:55:33 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1586181184;
+        s=mimecast20190719; t=1586181331;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=yKKr8qTGdHhz4Tkke8VXol1oo8WYWzltyaOXhCA4Ji4=;
-        b=NEmcJr9NREHxFnkP4bHJaSYJho3Q+eolXXrPQk0VYyXPUjTHHAJHdHAG2HukcU1YIPcNQu
-        Lk8yKS90o0gtgSf4zIq4qbqULwRoh2S2BdoVjNjXopjq3STH+3XF77szCN5/7t8EPrtQPm
-        QCcL7RI00JC1tRPdpP70cO4b00RUedQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-273-eK_2ZfYfN4ys-ourygtS3A-1; Mon, 06 Apr 2020 09:53:00 -0400
-X-MC-Unique: eK_2ZfYfN4ys-ourygtS3A-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5559D800D6C;
-        Mon,  6 Apr 2020 13:52:59 +0000 (UTC)
-Received: from gondolin (ovpn-113-129.ams2.redhat.com [10.36.113.129])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D07FF19C6A;
-        Mon,  6 Apr 2020 13:52:57 +0000 (UTC)
-Date:   Mon, 6 Apr 2020 15:52:55 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Eric Farman <farman@linux.ibm.com>
-Cc:     Halil Pasic <pasic@linux.ibm.com>,
-        Jason Herne <jjherne@linux.ibm.com>,
-        Jared Rossi <jrossi@linux.ibm.com>, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org
-Subject: Re: [RFC PATCH v2 7/9] vfio-ccw: Wire up the CRW irq and CRW region
-Message-ID: <20200406155255.3c8f06e5.cohuck@redhat.com>
-In-Reply-To: <20200206213825.11444-8-farman@linux.ibm.com>
-References: <20200206213825.11444-1-farman@linux.ibm.com>
-        <20200206213825.11444-8-farman@linux.ibm.com>
-Organization: Red Hat GmbH
+        bh=4JbffD6uHYn0Xws8gEnJhH/ASm7vL5TTpW7bpIjfQF0=;
+        b=FKO6nZ4/z3L/WVcnS5lXJgx77phqfkvab8uAbXMvYjU3DVbE/MwnF0N19jcAifVEBqXINj
+        vGG0q7tuJBoK2OJJI2lN43I3m+RT1954LciLKCh8YWu4mmb4N2Hw/768QPgf7EUnMq2iRp
+        Cs0raJx4VO5f6zzOrT/af1K4tRQhWwk=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-391-5QgsfsuWOu-iCsTi4XSSpA-1; Mon, 06 Apr 2020 09:55:30 -0400
+X-MC-Unique: 5QgsfsuWOu-iCsTi4XSSpA-1
+Received: by mail-wr1-f71.google.com with SMTP id t13so4002689wru.3
+        for <kvm@vger.kernel.org>; Mon, 06 Apr 2020 06:55:30 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=4JbffD6uHYn0Xws8gEnJhH/ASm7vL5TTpW7bpIjfQF0=;
+        b=skLuAFNRygeGbBHCM3ggEN7+kKaScrRNMySxSYhek2ONZx2TDkU2MAnUe9hzxu6swp
+         Hm2ec0KTbQ2cbi6NkqJMyZq8Ey9D/I4q2WsNA0QZMXc3BVA3Ax29LMWic9maeWCbbvzN
+         TzrT4s+Mgwv2IeNaaPhXFv0c70TsqMOXfQtxavRg/lQtHEks63+Nl0lUTweoPx9f0d0o
+         O1ud/qOrbvgXnt+cwLvpzxVD2JQbT0K+5Mz9ATui9Cydy/IkN3svT1AB/ucLWtJ7ONdp
+         QSnDKWU15W2yChRtK6Ul9mZZe8tMexl3md/8ovvadDFTipOmx/+Hktc+bSMNn57qk9NO
+         5/DQ==
+X-Gm-Message-State: AGi0PuZ5/4QtpkbgoX77sV/vmSi+NLlGa89SRVGm+xgJ94JaQsg/xh7S
+        hH04oIW58iCnoCUqE29gbCrBDCY8mLHeGiVz3G7/mTUxr/iEsaAPJew6Ner2dhpRDep6pujTuz0
+        Wh4vuM833edh2
+X-Received: by 2002:a5d:4d09:: with SMTP id z9mr602257wrt.292.1586181328771;
+        Mon, 06 Apr 2020 06:55:28 -0700 (PDT)
+X-Google-Smtp-Source: APiQypJMOX8DPPm6vlwNHfWsSuz0mrVkzWpGk7TU+nZhYELINvwWAIdcv57+eCeK2DYp6J7Z3YNU5w==
+X-Received: by 2002:a5d:4d09:: with SMTP id z9mr602237wrt.292.1586181328553;
+        Mon, 06 Apr 2020 06:55:28 -0700 (PDT)
+Received: from redhat.com (bzq-79-176-51-222.red.bezeqint.net. [79.176.51.222])
+        by smtp.gmail.com with ESMTPSA id w204sm25954947wma.1.2020.04.06.06.55.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 06 Apr 2020 06:55:28 -0700 (PDT)
+Date:   Mon, 6 Apr 2020 09:55:25 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
+Subject: Re: [PATCH] vhost: force spec specified alignment on types
+Message-ID: <20200406095424-mutt-send-email-mst@kernel.org>
+References: <20200406124931.120768-1-mst@redhat.com>
+ <045c84ed-151e-a850-9c72-5079bd2775e6@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <045c84ed-151e-a850-9c72-5079bd2775e6@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu,  6 Feb 2020 22:38:23 +0100
-Eric Farman <farman@linux.ibm.com> wrote:
-
-> From: Farhan Ali <alifm@linux.ibm.com>
+On Mon, Apr 06, 2020 at 09:34:00PM +0800, Jason Wang wrote:
 > 
-> Use an IRQ to notify userspace that there is a CRW
-> pending in the region, related to path-availability
-> changes on the passthrough subchannel.
+> On 2020/4/6 下午8:50, Michael S. Tsirkin wrote:
+> > The ring element addresses are passed between components with different
+> > alignments assumptions. Thus, if guest/userspace selects a pointer and
+> > host then gets and dereferences it, we might need to decrease the
+> > compiler-selected alignment to prevent compiler on the host from
+> > assuming pointer is aligned.
+> > 
+> > This actually triggers on ARM with -mabi=apcs-gnu - which is a
+> > deprecated configuration, but it seems safer to handle this
+> > generally.
+> > 
+> > I verified that the produced binary is exactly identical on x86.
+> > 
+> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> > ---
+> > 
+> > This is my preferred way to handle the ARM incompatibility issues
+> > (in preference to kconfig hacks).
+> > I will push this into next now.
+> > Comments?
 > 
-> Signed-off-by: Farhan Ali <alifm@linux.ibm.com>
-> Signed-off-by: Eric Farman <farman@linux.ibm.com>
-> ---
 > 
-> Notes:
->     v1->v2:
->      - Remove extraneous 0x0 in crw.rsid assignment [CH]
->      - Refactor the building/queueing of a crw into its own routine [EF]
->     
->     v0->v1: [EF]
->      - Place the non-refactoring changes from the previous patch here
->      - Clean up checkpatch (whitespace) errors
->      - s/chp_crw/crw/
->      - Move acquire/release of io_mutex in vfio_ccw_crw_region_read()
->        into patch that introduces that region
->      - Remove duplicate include from vfio_ccw_drv.c
->      - Reorder include in vfio_ccw_private.h
+> I'm not sure if it's too late to fix. It would still be still problematic
+> for the userspace that is using old uapi headers?
 > 
->  drivers/s390/cio/vfio_ccw_chp.c     |  5 ++
->  drivers/s390/cio/vfio_ccw_drv.c     | 73 +++++++++++++++++++++++++++++
->  drivers/s390/cio/vfio_ccw_ops.c     |  4 ++
->  drivers/s390/cio/vfio_ccw_private.h |  9 ++++
->  include/uapi/linux/vfio.h           |  1 +
->  5 files changed, 92 insertions(+)
+> Thanks
 
-[I may have gotten all muddled up from staring at this, but please bear
-with me...]
+It's not a problem in userspace. The problem is when
+userspace/guest uses 2 byte alignment and passes it to kernel
+assuming 8 byte alignment. The fix is for host not to
+make these assumptions.
 
-> diff --git a/drivers/s390/cio/vfio_ccw_chp.c b/drivers/s390/cio/vfio_ccw_chp.c
-> index 8fde94552149..328b4e1d1972 100644
-> --- a/drivers/s390/cio/vfio_ccw_chp.c
-> +++ b/drivers/s390/cio/vfio_ccw_chp.c
-> @@ -98,6 +98,11 @@ static ssize_t vfio_ccw_crw_region_read(struct vfio_ccw_private *private,
->  		ret = count;
->  
->  	mutex_unlock(&private->io_mutex);
-> +
-> +	/* Notify the guest if more CRWs are on our queue */
-> +	if (!list_empty(&private->crw) && private->crw_trigger)
-> +		eventfd_signal(private->crw_trigger, 1);
-
-Here we possibly arm the eventfd again, but don't do anything regarding
-queued crws and the region.
-
-> +
->  	return ret;
->  }
->  
-> diff --git a/drivers/s390/cio/vfio_ccw_drv.c b/drivers/s390/cio/vfio_ccw_drv.c
-> index 1e1360af1b34..c48c260a129d 100644
-> --- a/drivers/s390/cio/vfio_ccw_drv.c
-> +++ b/drivers/s390/cio/vfio_ccw_drv.c
-> @@ -108,6 +108,31 @@ static void vfio_ccw_sch_io_todo(struct work_struct *work)
->  		eventfd_signal(private->io_trigger, 1);
->  }
->  
-> +static void vfio_ccw_crw_todo(struct work_struct *work)
-> +{
-> +	struct vfio_ccw_private *private;
-> +	struct vfio_ccw_crw *crw;
-> +
-> +	private = container_of(work, struct vfio_ccw_private, crw_work);
-> +
-> +	/* FIXME Ugh, need better control of this list */
-> +	crw = list_first_entry_or_null(&private->crw,
-> +				       struct vfio_ccw_crw, next);
-> +
-> +	if (crw) {
-> +		list_del(&crw->next);
-> +
-> +		mutex_lock(&private->io_mutex);
-> +		memcpy(&private->crw_region->crw0, crw->crw, sizeof(*crw->crw));
-> +		mutex_unlock(&private->io_mutex);
-> +
-> +		kfree(crw);
-> +
-> +		if (private->crw_trigger)
-> +			eventfd_signal(private->crw_trigger, 1);
-> +	}
-> +}
-
-This function copies one outstanding crw and arms the eventfd.
-
-> +
->  /*
->   * Css driver callbacks
->   */
-
-(...)
-
-> @@ -276,6 +309,44 @@ static int vfio_ccw_sch_event(struct subchannel *sch, int process)
->  	return rc;
->  }
->  
-> +static void vfio_ccw_alloc_crw(struct vfio_ccw_private *private,
-> +			       struct chp_link *link,
-> +			       unsigned int erc)
-> +{
-> +	struct vfio_ccw_crw *vc_crw;
-> +	struct crw *crw;
-> +
-> +	/*
-> +	 * If unable to allocate a CRW, just drop the event and
-> +	 * carry on.  The guest will either see a later one or
-> +	 * learn when it issues its own store subchannel.
-> +	 */
-> +	vc_crw = kzalloc(sizeof(*vc_crw), GFP_ATOMIC);
-> +	if (!vc_crw)
-> +		return;
-> +
-> +	/*
-> +	 * Build in the first CRW space, but don't chain anything
-> +	 * into the second one even though the space exists.
-> +	 */
-> +	crw = &vc_crw->crw[0];
-> +
-> +	/*
-> +	 * Presume every CRW we handle is reported by a channel-path.
-> +	 * Maybe not future-proof, but good for what we're doing now.
-> +	 *
-> +	 * FIXME Sort of a lie, since we're converting a CRW
-> +	 * reported by a channel-path into one issued to each
-> +	 * subchannel, but still saying it's coming from the path.
-> +	 */
-> +	crw->rsc = CRW_RSC_CPATH;
-> +	crw->rsid = (link->chpid.cssid << 8) | link->chpid.id;
-> +	crw->erc = erc;
-> +
-> +	list_add_tail(&vc_crw->next, &private->crw);
-> +	queue_work(vfio_ccw_work_q, &private->crw_work);
-
-This function allocates a new crw and queues it. After that, it
-triggers the function doing the copy-to-region-and-notify stuff.
-
-> +}
-> +
->  static int vfio_ccw_chp_event(struct subchannel *sch,
->  			      struct chp_link *link, int event)
->  {
-> @@ -303,6 +374,7 @@ static int vfio_ccw_chp_event(struct subchannel *sch,
->  	case CHP_OFFLINE:
->  		/* Path is gone */
->  		cio_cancel_halt_clear(sch, &retry);
-> +		vfio_ccw_alloc_crw(private, link, CRW_ERC_PERRN);
->  		break;
->  	case CHP_VARY_ON:
->  		/* Path logically turned on */
-> @@ -312,6 +384,7 @@ static int vfio_ccw_chp_event(struct subchannel *sch,
->  	case CHP_ONLINE:
->  		/* Path became available */
->  		sch->lpm |= mask & sch->opm;
-> +		vfio_ccw_alloc_crw(private, link, CRW_ERC_INIT);
->  		break;
->  	}
->  
-
-These two (path online/offline handling) are the only code paths
-triggering an update to the queued crws.
-
-Aren't we missing copying in a new queued crw after userspace had done
-a read?
+> 
+> > 
+> >   drivers/vhost/vhost.h            |  6 ++---
+> >   include/uapi/linux/virtio_ring.h | 41 ++++++++++++++++++++++++--------
+> >   2 files changed, 34 insertions(+), 13 deletions(-)
+> > 
+> > diff --git a/drivers/vhost/vhost.h b/drivers/vhost/vhost.h
+> > index cc82918158d2..a67bda9792ec 100644
+> > --- a/drivers/vhost/vhost.h
+> > +++ b/drivers/vhost/vhost.h
+> > @@ -74,9 +74,9 @@ struct vhost_virtqueue {
+> >   	/* The actual ring of buffers. */
+> >   	struct mutex mutex;
+> >   	unsigned int num;
+> > -	struct vring_desc __user *desc;
+> > -	struct vring_avail __user *avail;
+> > -	struct vring_used __user *used;
+> > +	vring_desc_t __user *desc;
+> > +	vring_avail_t __user *avail;
+> > +	vring_used_t __user *used;
+> >   	const struct vhost_iotlb_map *meta_iotlb[VHOST_NUM_ADDRS];
+> >   	struct vhost_desc *descs;
+> > diff --git a/include/uapi/linux/virtio_ring.h b/include/uapi/linux/virtio_ring.h
+> > index 559f42e73315..cd6e0b2eaf2f 100644
+> > --- a/include/uapi/linux/virtio_ring.h
+> > +++ b/include/uapi/linux/virtio_ring.h
+> > @@ -118,16 +118,6 @@ struct vring_used {
+> >   	struct vring_used_elem ring[];
+> >   };
+> > -struct vring {
+> > -	unsigned int num;
+> > -
+> > -	struct vring_desc *desc;
+> > -
+> > -	struct vring_avail *avail;
+> > -
+> > -	struct vring_used *used;
+> > -};
+> > -
+> >   /* Alignment requirements for vring elements.
+> >    * When using pre-virtio 1.0 layout, these fall out naturally.
+> >    */
+> > @@ -164,6 +154,37 @@ struct vring {
+> >   #define vring_used_event(vr) ((vr)->avail->ring[(vr)->num])
+> >   #define vring_avail_event(vr) (*(__virtio16 *)&(vr)->used->ring[(vr)->num])
+> > +/*
+> > + * The ring element addresses are passed between components with different
+> > + * alignments assumptions. Thus, we might need to decrease the compiler-selected
+> > + * alignment, and so must use a typedef to make sure the __aligned attribute
+> > + * actually takes hold:
+> > + *
+> > + * https://gcc.gnu.org/onlinedocs//gcc/Common-Type-Attributes.html#Common-Type-Attributes
+> > + *
+> > + * When used on a struct, or struct member, the aligned attribute can only
+> > + * increase the alignment; in order to decrease it, the packed attribute must
+> > + * be specified as well. When used as part of a typedef, the aligned attribute
+> > + * can both increase and decrease alignment, and specifying the packed
+> > + * attribute generates a warning.
+> > + */
+> > +typedef struct vring_desc __attribute__((aligned(VRING_DESC_ALIGN_SIZE)))
+> > +	vring_desc_t;
+> > +typedef struct vring_avail __attribute__((aligned(VRING_AVAIL_ALIGN_SIZE)))
+> > +	vring_avail_t;
+> > +typedef struct vring_used __attribute__((aligned(VRING_USED_ALIGN_SIZE)))
+> > +	vring_used_t;
+> > +
+> > +struct vring {
+> > +	unsigned int num;
+> > +
+> > +	vring_desc_t *desc;
+> > +
+> > +	vring_avail_t *avail;
+> > +
+> > +	vring_used_t *used;
+> > +};
+> > +
+> >   static inline void vring_init(struct vring *vr, unsigned int num, void *p,
+> >   			      unsigned long align)
+> >   {
 
