@@ -2,180 +2,145 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2CAD919F701
-	for <lists+kvm@lfdr.de>; Mon,  6 Apr 2020 15:34:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8B31319F723
+	for <lists+kvm@lfdr.de>; Mon,  6 Apr 2020 15:41:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728477AbgDFNeR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Apr 2020 09:34:17 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:22118 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728318AbgDFNeN (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 6 Apr 2020 09:34:13 -0400
+        id S1728530AbgDFNlF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Apr 2020 09:41:05 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:54540 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1728451AbgDFNlF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 Apr 2020 09:41:05 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1586180051;
+        s=mimecast20190719; t=1586180464;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=8Vgo7PmY6XRwUGwyUrdIW6ngf/mYRofULc4TfPkTyZY=;
-        b=BvPejWvF62X0MSz4WOnQPwDCcuOdqhbs17F7VAiAlgvk+sl+hntau1izK/X+iXgXT63dDQ
-        JQ72OCE8HVjs2mmWWlWCHhZfONUFW0GctMevBxMWGs26leDam6C0XSx3BQYZhI2U8hnmCX
-        cLUbsdHzt13NLPucFe+sAChNF4Dry4s=
+        bh=wkBwjrpCjR3og6QqVOMFFCdjKG5q5BhmOV9cILj3x2A=;
+        b=iftP0kxsO6afrHNogdS/Arn6VTTk83Qd6f1e0TSK6uMDzlz7cf85Vi0+qnxbL1ypHA6wt5
+        5yCioEA/92zoFz5cNvoqibgeFhKvF3KJqtxQliL5jOnO36zkvMftSVV48FPccBqMl/FIG6
+        IZwUuwTv4T+tBEZvUznlRsQFCchr/+c=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-57-OOOB-UXuOJGo5RROJLVUvg-1; Mon, 06 Apr 2020 09:34:07 -0400
-X-MC-Unique: OOOB-UXuOJGo5RROJLVUvg-1
+ us-mta-435-plSxiEDHO3qmzkyTNbIwOQ-1; Mon, 06 Apr 2020 09:41:02 -0400
+X-MC-Unique: plSxiEDHO3qmzkyTNbIwOQ-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6C015801E5C;
-        Mon,  6 Apr 2020 13:34:06 +0000 (UTC)
-Received: from [10.72.12.191] (ovpn-12-191.pek2.redhat.com [10.72.12.191])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id AD718B19CB;
-        Mon,  6 Apr 2020 13:34:01 +0000 (UTC)
-Subject: Re: [PATCH] vhost: force spec specified alignment on types
-To:     "Michael S. Tsirkin" <mst@redhat.com>, linux-kernel@vger.kernel.org
-Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org
-References: <20200406124931.120768-1-mst@redhat.com>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <045c84ed-151e-a850-9c72-5079bd2775e6@redhat.com>
-Date:   Mon, 6 Apr 2020 21:34:00 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 421FE1137843;
+        Mon,  6 Apr 2020 13:41:01 +0000 (UTC)
+Received: from gondolin (ovpn-113-129.ams2.redhat.com [10.36.113.129])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id C529FC0D81;
+        Mon,  6 Apr 2020 13:40:59 +0000 (UTC)
+Date:   Mon, 6 Apr 2020 15:40:57 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Eric Farman <farman@linux.ibm.com>
+Cc:     Halil Pasic <pasic@linux.ibm.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        Jared Rossi <jrossi@linux.ibm.com>, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org
+Subject: Re: [RFC PATCH v2 5/9] vfio-ccw: Introduce a new CRW region
+Message-ID: <20200406154057.6016c4a7.cohuck@redhat.com>
+In-Reply-To: <20200206213825.11444-6-farman@linux.ibm.com>
+References: <20200206213825.11444-1-farman@linux.ibm.com>
+        <20200206213825.11444-6-farman@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-In-Reply-To: <20200406124931.120768-1-mst@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Thu,  6 Feb 2020 22:38:21 +0100
+Eric Farman <farman@linux.ibm.com> wrote:
 
-On 2020/4/6 =E4=B8=8B=E5=8D=888:50, Michael S. Tsirkin wrote:
-> The ring element addresses are passed between components with different
-> alignments assumptions. Thus, if guest/userspace selects a pointer and
-> host then gets and dereferences it, we might need to decrease the
-> compiler-selected alignment to prevent compiler on the host from
-> assuming pointer is aligned.
->
-> This actually triggers on ARM with -mabi=3Dapcs-gnu - which is a
-> deprecated configuration, but it seems safer to handle this
-> generally.
->
-> I verified that the produced binary is exactly identical on x86.
->
-> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> From: Farhan Ali <alifm@linux.ibm.com>
+> 
+> This region provides a mechanism to pass Channel Report Word(s)
+> that affect vfio-ccw devices, and need to be passed to the guest
+> for its awareness and/or processing.
+> 
+> The base driver (see crw_collect_info()) provides space for two
+> CRWs, as a subchannel event may have two CRWs chained together
+> (one for the ssid, one for the subcahnnel).  All other CRWs will
+> only occupy the first one.  Even though this support will also
+> only utilize the first one, we'll provide space for two also.
+> 
+> Signed-off-by: Farhan Ali <alifm@linux.ibm.com>
+> Signed-off-by: Eric Farman <farman@linux.ibm.com>
 > ---
->
-> This is my preferred way to handle the ARM incompatibility issues
-> (in preference to kconfig hacks).
-> I will push this into next now.
-> Comments?
+> 
+> Notes:
+>     v1-v2:
+>      - Add new region info to Documentation/s390/vfio-ccw.rst [CH]
+>      - Add a block comment to struct ccw_crw_region [CH]
+>     
+>     v0->v1: [EF]
+>      - Clean up checkpatch (whitespace) errors
+>      - Add ret=-ENOMEM in error path for new region
+>      - Add io_mutex for region read (originally in last patch)
+>      - Change crw1/crw2 to crw0/crw1
+>      - Reorder cleanup of regions
+> 
+>  Documentation/s390/vfio-ccw.rst     | 15 ++++++++
+>  drivers/s390/cio/vfio_ccw_chp.c     | 56 +++++++++++++++++++++++++++++
+>  drivers/s390/cio/vfio_ccw_drv.c     | 20 +++++++++++
+>  drivers/s390/cio/vfio_ccw_ops.c     |  4 +++
+>  drivers/s390/cio/vfio_ccw_private.h |  3 ++
+>  include/uapi/linux/vfio.h           |  1 +
+>  include/uapi/linux/vfio_ccw.h       |  9 +++++
+>  7 files changed, 108 insertions(+)
+> 
 
+(...)
 
-I'm not sure if it's too late to fix. It would still be still=20
-problematic for the userspace that is using old uapi headers?
+> diff --git a/drivers/s390/cio/vfio_ccw_chp.c b/drivers/s390/cio/vfio_ccw_chp.c
+> index 826d08379fe3..8fde94552149 100644
+> --- a/drivers/s390/cio/vfio_ccw_chp.c
+> +++ b/drivers/s390/cio/vfio_ccw_chp.c
+> @@ -73,3 +73,59 @@ int vfio_ccw_register_schib_dev_regions(struct vfio_ccw_private *private)
+>  					    VFIO_REGION_INFO_FLAG_READ,
+>  					    private->schib_region);
+>  }
+> +
+> +static ssize_t vfio_ccw_crw_region_read(struct vfio_ccw_private *private,
+> +					char __user *buf, size_t count,
+> +					loff_t *ppos)
+> +{
+> +	unsigned int i = VFIO_CCW_OFFSET_TO_INDEX(*ppos) - VFIO_CCW_NUM_REGIONS;
+> +	loff_t pos = *ppos & VFIO_CCW_OFFSET_MASK;
+> +	struct ccw_crw_region *region;
+> +	int ret;
+> +
+> +	if (pos + count > sizeof(*region))
+> +		return -EINVAL;
+> +
+> +	if (list_empty(&private->crw))
+> +		return 0;
+> +
+> +	mutex_lock(&private->io_mutex);
+> +	region = private->region[i].data;
+> +
+> +	if (copy_to_user(buf, (void *)region + pos, count))
+> +		ret = -EFAULT;
+> +	else
+> +		ret = count;
+> +
+> +	mutex_unlock(&private->io_mutex);
+> +	return ret;
+> +}
 
-Thanks
+Would it make sense to clear out the crw after it has been read by
+userspace?
 
+In patch 7, you add a notification for a new crw via eventfd, but
+nothing is preventing userspace from reading this even if not
+triggered. I also don't see the region being updated there until a new
+crw is posted.
 
->
->   drivers/vhost/vhost.h            |  6 ++---
->   include/uapi/linux/virtio_ring.h | 41 ++++++++++++++++++++++++-------=
--
->   2 files changed, 34 insertions(+), 13 deletions(-)
->
-> diff --git a/drivers/vhost/vhost.h b/drivers/vhost/vhost.h
-> index cc82918158d2..a67bda9792ec 100644
-> --- a/drivers/vhost/vhost.h
-> +++ b/drivers/vhost/vhost.h
-> @@ -74,9 +74,9 @@ struct vhost_virtqueue {
->   	/* The actual ring of buffers. */
->   	struct mutex mutex;
->   	unsigned int num;
-> -	struct vring_desc __user *desc;
-> -	struct vring_avail __user *avail;
-> -	struct vring_used __user *used;
-> +	vring_desc_t __user *desc;
-> +	vring_avail_t __user *avail;
-> +	vring_used_t __user *used;
->   	const struct vhost_iotlb_map *meta_iotlb[VHOST_NUM_ADDRS];
->  =20
->   	struct vhost_desc *descs;
-> diff --git a/include/uapi/linux/virtio_ring.h b/include/uapi/linux/virt=
-io_ring.h
-> index 559f42e73315..cd6e0b2eaf2f 100644
-> --- a/include/uapi/linux/virtio_ring.h
-> +++ b/include/uapi/linux/virtio_ring.h
-> @@ -118,16 +118,6 @@ struct vring_used {
->   	struct vring_used_elem ring[];
->   };
->  =20
-> -struct vring {
-> -	unsigned int num;
-> -
-> -	struct vring_desc *desc;
-> -
-> -	struct vring_avail *avail;
-> -
-> -	struct vring_used *used;
-> -};
-> -
->   /* Alignment requirements for vring elements.
->    * When using pre-virtio 1.0 layout, these fall out naturally.
->    */
-> @@ -164,6 +154,37 @@ struct vring {
->   #define vring_used_event(vr) ((vr)->avail->ring[(vr)->num])
->   #define vring_avail_event(vr) (*(__virtio16 *)&(vr)->used->ring[(vr)-=
->num])
->  =20
-> +/*
-> + * The ring element addresses are passed between components with diffe=
-rent
-> + * alignments assumptions. Thus, we might need to decrease the compile=
-r-selected
-> + * alignment, and so must use a typedef to make sure the __aligned att=
-ribute
-> + * actually takes hold:
-> + *
-> + * https://gcc.gnu.org/onlinedocs//gcc/Common-Type-Attributes.html#Com=
-mon-Type-Attributes
-> + *
-> + * When used on a struct, or struct member, the aligned attribute can =
-only
-> + * increase the alignment; in order to decrease it, the packed attribu=
-te must
-> + * be specified as well. When used as part of a typedef, the aligned a=
-ttribute
-> + * can both increase and decrease alignment, and specifying the packed
-> + * attribute generates a warning.
-> + */
-> +typedef struct vring_desc __attribute__((aligned(VRING_DESC_ALIGN_SIZE=
-)))
-> +	vring_desc_t;
-> +typedef struct vring_avail __attribute__((aligned(VRING_AVAIL_ALIGN_SI=
-ZE)))
-> +	vring_avail_t;
-> +typedef struct vring_used __attribute__((aligned(VRING_USED_ALIGN_SIZE=
-)))
-> +	vring_used_t;
-> +
-> +struct vring {
-> +	unsigned int num;
-> +
-> +	vring_desc_t *desc;
-> +
-> +	vring_avail_t *avail;
-> +
-> +	vring_used_t *used;
-> +};
-> +
->   static inline void vring_init(struct vring *vr, unsigned int num, voi=
-d *p,
->   			      unsigned long align)
->   {
+Or am I missing something?
 
