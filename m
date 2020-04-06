@@ -2,163 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 507A319F6B3
-	for <lists+kvm@lfdr.de>; Mon,  6 Apr 2020 15:18:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C310819F6C5
+	for <lists+kvm@lfdr.de>; Mon,  6 Apr 2020 15:21:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728456AbgDFNSH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Apr 2020 09:18:07 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:59016 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728452AbgDFNSG (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 6 Apr 2020 09:18:06 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 036DHqdB120760
-        for <kvm@vger.kernel.org>; Mon, 6 Apr 2020 09:18:05 -0400
-Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 306kuvee0n-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Mon, 06 Apr 2020 09:18:05 -0400
-Received: from localhost
-        by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
-        Mon, 6 Apr 2020 14:17:46 +0100
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
-        by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Mon, 6 Apr 2020 14:17:42 +0100
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 036DHw7T53346440
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 6 Apr 2020 13:17:58 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 35579A4054;
-        Mon,  6 Apr 2020 13:17:58 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A5AFDA405F;
-        Mon,  6 Apr 2020 13:17:57 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.145.23.63])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon,  6 Apr 2020 13:17:57 +0000 (GMT)
-Subject: Re: [PATCH v1 2/5] KVM: s390: vsie: Fix delivery of addressing
- exceptions
-To:     David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Heiko Carstens <heiko.carstens@de.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>, stable@vger.kernel.org
-References: <20200402184819.34215-1-david@redhat.com>
- <20200402184819.34215-3-david@redhat.com>
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
-Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
- 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
- nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Date:   Mon, 6 Apr 2020 15:17:57 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+        id S1728390AbgDFNVX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Apr 2020 09:21:23 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:28435 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1728308AbgDFNVU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 Apr 2020 09:21:20 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1586179279;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Dt00ToAjgq6odVjJUr2HynAfwKXr6ghEKV21ZUG8JdU=;
+        b=hY0rOC0QrIzGeqgzbZYVXIVPqHhozD+4+nGJ79s+3yiNTiRYe5gMkD7FpotYG37r5gQ4gM
+        oXIW4vC00ld2oGs83hyoiLVuoJr4dfX1YIOxludLs7TS9atheVC1MYbBHYxxVj03pyD6ka
+        tr+1XnzbD+4rGFB7VtDwMOHilQDxaHI=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-282-eLehHpuXMxuXk0nbw6P3sg-1; Mon, 06 Apr 2020 09:21:15 -0400
+X-MC-Unique: eLehHpuXMxuXk0nbw6P3sg-1
+Received: by mail-wr1-f70.google.com with SMTP id q9so1241680wrw.22
+        for <kvm@vger.kernel.org>; Mon, 06 Apr 2020 06:21:15 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=Dt00ToAjgq6odVjJUr2HynAfwKXr6ghEKV21ZUG8JdU=;
+        b=TKwJ28qYWQa+K3pmQ9tKzQY/cH55G3w6RP7qlpMXTDrFoWFY98JVaC0wOFK8wGDelV
+         mrX1jft+eSc8Av3Bdb/HN8Eg8x5SdYzpX2Bc+NIFWP4YrU5GB6hCcNNwvLwm7nLyUVhZ
+         FdR8iFqMk48Y+KxIQFzPCG1duwecEJE7Gmodc57wqTMsGb3vzoKuJ4r5RgDjwPC3bM5R
+         xYoWvXqy1mD+YqOAVJeSMUWsGtPMDhJrJ9qIJfzEkT9skmHqS41XBs1zNs942Ml8PWPr
+         9hpv73Z2QfrebfozsXNdpnKH2ylboO3BQdj9nA749A5SJ9jf1MdlYufXwJ6RDrrqdWSx
+         I4QA==
+X-Gm-Message-State: AGi0Puav33iLYtzJNFNoBywm58e7JQilNJcymf4f2wbSgjM97jy8mG8i
+        skRWnPt0qwywPeCMN3HAGalOENb/WldX4uADVQkE8jLPktD8zvEqI3QH72jVT/L+bO0YQvBR7lG
+        QjwDPOWsiHYSt
+X-Received: by 2002:a5d:42c1:: with SMTP id t1mr11428318wrr.215.1586179274432;
+        Mon, 06 Apr 2020 06:21:14 -0700 (PDT)
+X-Google-Smtp-Source: APiQypLTm0wN4Ob+KU8r6bjP+vUj5Sc5r+ElDJG7FGW/nVL32K8rRyDddIp810vWUMYetH05ffupWw==
+X-Received: by 2002:a5d:42c1:: with SMTP id t1mr11428298wrr.215.1586179274273;
+        Mon, 06 Apr 2020 06:21:14 -0700 (PDT)
+Received: from redhat.com (bzq-79-176-51-222.red.bezeqint.net. [79.176.51.222])
+        by smtp.gmail.com with ESMTPSA id z11sm11162174wrv.58.2020.04.06.06.21.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 06 Apr 2020 06:21:13 -0700 (PDT)
+Date:   Mon, 6 Apr 2020 09:21:10 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Arnd Bergmann <arnd@arndb.de>
+Cc:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        "richard.henderson@linaro.org" <richard.henderson@linaro.org>,
+        "christophe.lyon@st.com" <christophe.lyon@st.com>,
+        kbuild test robot <lkp@intel.com>,
+        "daniel.santos@pobox.com" <daniel.santos@pobox.com>,
+        Jason Wang <jasowang@redhat.com>,
+        "kbuild-all@lists.01.org" <kbuild-all@lists.01.org>,
+        Russell King <rmk+kernel@armlinux.org.uk>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        Richard Earnshaw <Richard.Earnshaw@arm.com>,
+        Sudeep Dutt <sudeep.dutt@intel.com>,
+        Ashutosh Dixit <ashutosh.dixit@intel.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Networking <netdev@vger.kernel.org>,
+        virtualization@lists.linux-foundation.org,
+        kvm list <kvm@vger.kernel.org>
+Subject: Re: [PATCH v2 2/2] vhost: disable for OABI
+Message-ID: <20200406092056-mutt-send-email-mst@kernel.org>
+References: <20200406121233.109889-1-mst@redhat.com>
+ <20200406121233.109889-3-mst@redhat.com>
+ <CAK8P3a1nce31itwMKbmXoNZh-Y68m3GX_WwzNiaBuk280VFh-Q@mail.gmail.com>
+ <20200406085707-mutt-send-email-mst@kernel.org>
+ <CAK8P3a1=-rhiMyAh6=6EwhxSmNnYaXR9NWhh+ZGh4Hh=U_gEuA@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20200402184819.34215-3-david@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 20040613-0008-0000-0000-0000036B84DE
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20040613-0009-0000-0000-00004A8D1B0F
-Message-Id: <0cd2822e-8486-d386-6c00-faadaa573e5e@de.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.676
- definitions=2020-04-06_07:2020-04-06,2020-04-06 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 adultscore=0
- malwarescore=0 priorityscore=1501 impostorscore=0 suspectscore=0
- phishscore=0 mlxlogscore=999 clxscore=1015 spamscore=0 lowpriorityscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2004060109
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAK8P3a1=-rhiMyAh6=6EwhxSmNnYaXR9NWhh+ZGh4Hh=U_gEuA@mail.gmail.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 02.04.20 20:48, David Hildenbrand wrote:
-> Whenever we get an -EFAULT, we failed to read in guest 2 physical
-> address space. Such addressing exceptions are reported via a program
-> intercept to the nested hypervisor.
+On Mon, Apr 06, 2020 at 03:15:20PM +0200, Arnd Bergmann wrote:
+> On Mon, Apr 6, 2020 at 3:02 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+> >
+> > On Mon, Apr 06, 2020 at 02:50:32PM +0200, Arnd Bergmann wrote:
+> > > On Mon, Apr 6, 2020 at 2:12 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+> > >
+> > > >
+> > > > +config VHOST_DPN
+> > > > +       bool "VHOST dependencies"
+> > > > +       depends on !ARM || AEABI
+> > > > +       default y
+> > > > +       help
+> > > > +         Anything selecting VHOST or VHOST_RING must depend on VHOST_DPN.
+> > > > +         This excludes the deprecated ARM ABI since that forces a 4 byte
+> > > > +         alignment on all structs - incompatible with virtio spec requirements.
+> > > > +
+> > >
+> > > This should not be a user-visible option, so just make this 'def_bool
+> > > !ARM || AEABI'
+> > >
+> >
+> > I like keeping some kind of hint around for when one tries to understand
+> > why is a specific symbol visible.
 > 
-> We faked the intercept, we have to return to guest 2. Instead, right
-> now we would be returning -EFAULT from the intercept handler, eventually
-> crashing the VM.
+> I meant you should remove the "VHOST dependencies" prompt, not the
+> help text, which is certainly useful here. You can also use the three lines
 > 
-> Addressing exceptions can only happen if the g2->g3 page tables
-> reference invalid g2 addresses (say, either a table or the final page is
-> not accessible - so something that basically never happens in sane
-> environments.
+>      bool
+>      depends on !ARM || AEABI
+>      default y
 > 
-> Identified by manual code inspection.
+> in front of the help text, but those are equivalent to the one-line version
+> I suggested.
 > 
-> Fixes: a3508fbe9dc6 ("KVM: s390: vsie: initial support for nested virtualization")
-> Cc: <stable@vger.kernel.org> # v4.8+
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->  arch/s390/kvm/vsie.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/arch/s390/kvm/vsie.c b/arch/s390/kvm/vsie.c
-> index 076090f9e666..4f6c22d72072 100644
-> --- a/arch/s390/kvm/vsie.c
-> +++ b/arch/s390/kvm/vsie.c
-> @@ -1202,6 +1202,7 @@ static int vsie_run(struct kvm_vcpu *vcpu, struct vsie_page *vsie_page)
->  		scb_s->iprcc = PGM_ADDRESSING;
->  		scb_s->pgmilc = 4;
->  		scb_s->gpsw.addr = __rewind_psw(scb_s->gpsw, 4);
-> +		rc = 1;
+>      Arnd
 
+Oh right. Good point. Thanks!
 
-kvm_s390_handle_vsie has 
-
- return rc < 0 ? rc : 0;
-
-
-so rc = 0 would result in the same behaviour, correct?
-Since we DO handle everything as we should, why rc = 1 ?
+-- 
+MST
 
