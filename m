@@ -2,44 +2,44 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8920819F9AF
-	for <lists+kvm@lfdr.de>; Mon,  6 Apr 2020 18:06:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EEB4619F9B5
+	for <lists+kvm@lfdr.de>; Mon,  6 Apr 2020 18:06:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729372AbgDFQGP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Apr 2020 12:06:15 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:24848 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728878AbgDFQGP (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 6 Apr 2020 12:06:15 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 036G3xau096807
-        for <kvm@vger.kernel.org>; Mon, 6 Apr 2020 12:06:14 -0400
+        id S1729303AbgDFQGt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Apr 2020 12:06:49 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:15254 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728881AbgDFQGt (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 6 Apr 2020 12:06:49 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 036G46kT130933
+        for <kvm@vger.kernel.org>; Mon, 6 Apr 2020 12:06:48 -0400
 Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 306kuvkyr4-1
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3082k2241e-1
         (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Mon, 06 Apr 2020 12:06:13 -0400
+        for <kvm@vger.kernel.org>; Mon, 06 Apr 2020 12:06:48 -0400
 Received: from localhost
         by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
         for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
-        Mon, 6 Apr 2020 17:05:46 +0100
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
+        Mon, 6 Apr 2020 17:06:20 +0100
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
         by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
         (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Mon, 6 Apr 2020 17:05:44 +0100
+        Mon, 6 Apr 2020 17:06:17 +0100
 Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 036G68p213238324
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 036G6fkA1179908
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 6 Apr 2020 16:06:08 GMT
+        Mon, 6 Apr 2020 16:06:41 GMT
 Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2A55BA4054;
-        Mon,  6 Apr 2020 16:06:08 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id C4595A4054;
+        Mon,  6 Apr 2020 16:06:41 +0000 (GMT)
 Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id BD1EEA4060;
-        Mon,  6 Apr 2020 16:06:07 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 4F7F3A405C;
+        Mon,  6 Apr 2020 16:06:41 +0000 (GMT)
 Received: from oc7455500831.ibm.com (unknown [9.145.23.63])
         by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon,  6 Apr 2020 16:06:07 +0000 (GMT)
-Subject: Re: [PATCH v2 5/5] KVM: s390: vsie: gmap_table_walk() simplifications
+        Mon,  6 Apr 2020 16:06:41 +0000 (GMT)
+Subject: Re: [PATCH v2 0/5] KVM: s390: vsie: fixes and cleanups
 To:     David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org
 Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
         Vasily Gorbik <gor@linux.ibm.com>,
@@ -47,7 +47,6 @@ Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
         Cornelia Huck <cohuck@redhat.com>,
         Janosch Frank <frankja@linux.ibm.com>
 References: <20200403153050.20569-1-david@redhat.com>
- <20200403153050.20569-6-david@redhat.com>
 From:   Christian Borntraeger <borntraeger@de.ibm.com>
 Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
  xsFNBE6cPPgBEAC2VpALY0UJjGmgAmavkL/iAdqul2/F9ONz42K6NrwmT+SI9CylKHIX+fdf
@@ -92,73 +91,69 @@ Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
  jaqYefx7yQ7FJXXETd2uVURiDeNEFhVZWb5CiBJM5c6qQMhmkS4VyT7/+raaEGgkEKEgHOWf
  ZDP8BHfXtszHqI3Fo1F4IKFo/AP8GOFFxMRgbvlAs8z/+rEEaQYjxYJqj08raw6P4LFBqozr
  nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Date:   Mon, 6 Apr 2020 18:06:07 +0200
+Date:   Mon, 6 Apr 2020 18:06:41 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200403153050.20569-6-david@redhat.com>
+In-Reply-To: <20200403153050.20569-1-david@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-x-cbid: 20040616-0020-0000-0000-000003C2BC54
+x-cbid: 20040616-0020-0000-0000-000003C2BC64
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20040616-0021-0000-0000-0000221B764B
-Message-Id: <408c6d94-0753-7ccb-a9d8-5018a84499ee@de.ibm.com>
+x-cbparentid: 20040616-0021-0000-0000-0000221B765B
+Message-Id: <d2d2fe98-bfc5-a43e-a8a8-a3da7f765b56@de.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.676
  definitions=2020-04-06_08:2020-04-06,2020-04-06 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 adultscore=0
- malwarescore=0 priorityscore=1501 impostorscore=0 suspectscore=0
- phishscore=0 mlxlogscore=999 clxscore=1015 spamscore=0 lowpriorityscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ suspectscore=0 adultscore=0 priorityscore=1501 impostorscore=0
+ malwarescore=0 clxscore=1015 mlxscore=0 phishscore=0 mlxlogscore=879
+ spamscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2003020000 definitions=main-2004060128
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Series applied. thanks. 
+I will schedule the first 3 for master, 4 and 5 for next.
 
 
 On 03.04.20 17:30, David Hildenbrand wrote:
-> Let's use asce_type where applicable. Also, simplify our sanity check for
-> valid table levels and convert it into a WARN_ON_ONCE(). Check if we even
-> have a valid gmap shadow as the very first step.
+> Some vsie/gmap fixes and two cleanups/improvements.
 > 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-
-Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> ---
->  arch/s390/mm/gmap.c | 10 +++++-----
->  1 file changed, 5 insertions(+), 5 deletions(-)
+> Patch #1 fixes an issue reported by Janosch. It was never observed so far,
+> because KVM usually doesn't use a region 1 table for it's guest (unless
+> memory would be exceeding something like 16 EB, which isn't even supported
+> by the HW). Older QEMU+KVM or other hypervisors can trigger this.
 > 
-> diff --git a/arch/s390/mm/gmap.c b/arch/s390/mm/gmap.c
-> index 24ef30fb0833..a2bd8d7792e9 100644
-> --- a/arch/s390/mm/gmap.c
-> +++ b/arch/s390/mm/gmap.c
-> @@ -788,19 +788,19 @@ static inline unsigned long *gmap_table_walk(struct gmap *gmap,
->  					     unsigned long gaddr, int level)
->  {
->  	const int asce_type = gmap->asce & _ASCE_TYPE_MASK;
-> -	unsigned long *table;
-> +	unsigned long *table = gmap->table;
->  
-> -	if ((gmap->asce & _ASCE_TYPE_MASK) + 4 < (level * 4))
-> -		return NULL;
->  	if (gmap_is_shadow(gmap) && gmap->removed)
->  		return NULL;
->  
-> +	if (WARN_ON_ONCE(level > (asce_type >> 2) + 1))
-> +		return NULL;
-> +
->  	if (WARN_ON_ONCE(asce_type != _ASCE_TYPE_REGION1 &&
->  			 gaddr & (-1UL << (31 + (asce_type >> 2) * 11))))
->  		return NULL;
->  
-> -	table = gmap->table;
-> -	switch (gmap->asce & _ASCE_TYPE_MASK) {
-> +	switch (asce_type) {
->  	case _ASCE_TYPE_REGION1:
->  		table += (gaddr & _REGION1_INDEX) >> _REGION1_SHIFT;
->  		if (level == 4)
+> Patch #2 fixes a code path that probably was never taken and will most
+> probably not be taken very often in the future - unless somebody really
+> messes up the page tables for a guest (or writes a test for it). At some
+> point, a test case for this would be nice.
+> 
+> Patch #3 fixes a rare possible race. Don't think this is stable material.
+> 
+> Gave it some testing with my limited access to somewhat-fast s390x
+> machines. Booted a Linux kernel, supplying all possible number of
+> page table hiearchies.
+> 
+> v1 -> v2:
+> - "KVM: s390: vsie: Fix region 1 ASCE sanity shadow address checks"
+> -- Fix WARN_ON_ONCE
+> - "gmap_table_walk() simplifications"
+> -- Also init "table" directly
+> 
+> David Hildenbrand (5):
+>   KVM: s390: vsie: Fix region 1 ASCE sanity shadow address checks
+>   KVM: s390: vsie: Fix delivery of addressing exceptions
+>   KVM: s390: vsie: Fix possible race when shadowing region 3 tables
+>   KVM: s390: vsie: Move conditional reschedule
+>   KVM: s390: vsie: gmap_table_walk() simplifications
+> 
+>  arch/s390/kvm/vsie.c |  4 ++--
+>  arch/s390/mm/gmap.c  | 17 +++++++++++------
+>  2 files changed, 13 insertions(+), 8 deletions(-)
 > 
 
