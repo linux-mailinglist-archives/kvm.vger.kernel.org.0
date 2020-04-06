@@ -2,67 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 990BA19F157
-	for <lists+kvm@lfdr.de>; Mon,  6 Apr 2020 10:13:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3839B19F15D
+	for <lists+kvm@lfdr.de>; Mon,  6 Apr 2020 10:14:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726610AbgDFINH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Apr 2020 04:13:07 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:42952 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726491AbgDFINH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 Apr 2020 04:13:07 -0400
+        id S1726641AbgDFIOJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Apr 2020 04:14:09 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:48359 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726491AbgDFIOJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 Apr 2020 04:14:09 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1586160785;
+        s=mimecast20190719; t=1586160847;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Ii26BGJpPDfR08ITd9Ut/Tbr0X9A7oSKJHxrZlNNO0k=;
-        b=V9FBHzUDD46leEA+OZVip4GgbOEXtZ2Ybu7dpcyr3gEUiBXD7K/JHoYdN7LFwxqMPb+sUC
-        NwTcEZQxD2gSHT5XIBYO9K5L0gXwVJQopRK9zo3LL+3hsm29x+O4F1JVWf+oyyHjpWP9Z2
-        Zxffkady8mxdGRmsMhaA2JoTFur7+4s=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-13-khQiHPRKO9ChHVXkkvrkJw-1; Mon, 06 Apr 2020 04:13:04 -0400
-X-MC-Unique: khQiHPRKO9ChHVXkkvrkJw-1
-Received: by mail-wm1-f70.google.com with SMTP id p18so4599267wmk.9
-        for <kvm@vger.kernel.org>; Mon, 06 Apr 2020 01:13:03 -0700 (PDT)
+        bh=r6MlahNDA6YdiNH2kfwRp2fNrq9jvaChBzjvW2e+WXM=;
+        b=GvgzYIjnYBW3N6IGM9HLYyuZRHvotYteMfl7HJNCukivabM4IEZRLbrbu5WOs0KbwwAp3V
+        l7r08ieUXhE7u9jsKXlb4C3y92EEhXGyA9jQfXe7gNK4TXdltuDDmGdAykU2A9S8CcTW3L
+        YLMK04M2UKIlH/tAMlUsXfFkCz07WAo=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-336-VhmeMKoDMYOPzVwFKTYz0Q-1; Mon, 06 Apr 2020 04:14:05 -0400
+X-MC-Unique: VhmeMKoDMYOPzVwFKTYz0Q-1
+Received: by mail-wr1-f72.google.com with SMTP id y1so7965756wrn.10
+        for <kvm@vger.kernel.org>; Mon, 06 Apr 2020 01:14:05 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=Ii26BGJpPDfR08ITd9Ut/Tbr0X9A7oSKJHxrZlNNO0k=;
-        b=pmQEq7XUhSLB1WebdMSnX0JK0Xewp0TvDzty+kyu7576u6BXglwpEv6yTF/QT7UF5W
-         Z6SoKAZqK1TPOz79k/zif97S4TL2sMEg+7NZVycVYWvxcQf0l4FBwy68lHHU4qiAyXbL
-         oMt9rEiCngIeippJYuSDD2vrNpmZCNMsVr+CeHUe7NquIfOsMXp/5RMceWmhlYiJ8Kf/
-         x/8jrO/o1c8l74x+OhrvJQs3/kWUpl5wi9cBjxpxJCY4NT4hteH1C2CdRa/e6UElz8Qj
-         Je+AtONxDv9mH7amBB/VMj8LEpulf5M2KdLCLACotivH7IAZveNjOunv/Cq6eweTQqYT
-         Kr2Q==
-X-Gm-Message-State: AGi0Pub5VeA16FQ9Wb7fLT0WKXoODhYY5TFACaWj/3rpRCUKByzxvT05
-        F0EkhPaIkl9ILq/Ck1u5VUPXpaAkwLZVBftAhHdD2hb2n+uu1HVtdghvJr3ZN5aTey0Zq69xy6k
-        mkJRf7hBihmtM
-X-Received: by 2002:a7b:c450:: with SMTP id l16mr5741885wmi.123.1586160782942;
-        Mon, 06 Apr 2020 01:13:02 -0700 (PDT)
-X-Google-Smtp-Source: APiQypKPBBB4LWKtb+olcVrK+i/vs3mSagwriQBtGODlhja7He2RQMneGMb/WFbmwZkety2M04lL2A==
-X-Received: by 2002:a7b:c450:: with SMTP id l16mr5741865wmi.123.1586160782633;
-        Mon, 06 Apr 2020 01:13:02 -0700 (PDT)
+        bh=r6MlahNDA6YdiNH2kfwRp2fNrq9jvaChBzjvW2e+WXM=;
+        b=WCzwUnBNeZNcXkUar80GgIC6FK7ElpRidYfg7GRVGSV3nBQYSklcKfOxUNP+XXiMOC
+         Hjl6+OY04BNHz7XYPbXn9GBW1loG1ecwH9M3ePING9a10gejTss5XmzdqM3L8cbzZPK4
+         a2IyCJoCoJq2IgY6H+2ktytfC9fYHqhgUsFuuoRFWVlUZvzmAojStFdWbpaA7rIufokq
+         yCALIhurz67KeLOVXmZ4uNgA7ks/ifyavnLvvt3X8APXh+gvsjR2EKNGGkM3vXnwsBCp
+         VWiYN0wWXHsZFwwVW7+zNnBG3toq/eNaGzxqry6PGNkKHx730tIRqKzebAEc6Wyw3eQd
+         83VQ==
+X-Gm-Message-State: AGi0PuYverzjp4g/NdesJyfbHah6snJCA6j44TkpyZ+DdBhND443GNjB
+        FPkS77AaoeAknsHw1bMvpJurydUByA2n3wTPNY1GwejjIpnd45A5xCO//p0aRlV6CajpaN81XRp
+        GpBNDXKbB5kEK
+X-Received: by 2002:a1c:4e06:: with SMTP id g6mr12297711wmh.186.1586160843953;
+        Mon, 06 Apr 2020 01:14:03 -0700 (PDT)
+X-Google-Smtp-Source: APiQypKwMBLFNnx06Xg7R33lZRsYDWD174vo2cYUGnvooyZuYiXm04Mj41WanhVq8wulVZiL7LOPQg==
+X-Received: by 2002:a1c:4e06:: with SMTP id g6mr12297690wmh.186.1586160843757;
+        Mon, 06 Apr 2020 01:14:03 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:80e8:806f:a5f9:88dc? ([2001:b07:6468:f312:80e8:806f:a5f9:88dc])
-        by smtp.gmail.com with ESMTPSA id c17sm19979917wrp.28.2020.04.06.01.13.01
+        by smtp.gmail.com with ESMTPSA id a2sm16642088wra.71.2020.04.06.01.14.03
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 06 Apr 2020 01:13:02 -0700 (PDT)
-Subject: Re: ata driver loading hang on qemu/kvm intel
+        Mon, 06 Apr 2020 01:14:03 -0700 (PDT)
+Subject: Re: ata driver loading hang on qemu/kvm
 To:     Suresh Gumpula <suresh.gumpula@nutanix.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-References: <7C92AFF4-D479-4F80-8BED-6E9B226DFB72@nutanix.com>
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+References: <D02A294C-2823-4137-BD1B-9A0F76270D2B@nutanix.com>
+ <3752A519-BE1A-478F-920F-75F101807694@nutanix.com>
+ <CFD00AFB-8B52-475E-8CB6-FCB7967E0316@nutanix.com>
+ <1A6AC1FC-AED9-476C-9178-BE293E981E56@nutanix.com>
+ <FF9D9722-4FA8-4630-AB3A-1D077D7D0991@nutanix.com>
+ <34B5C17E-3022-419A-BCB2-5B938FF5E44D@nutanix.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <56486177-b629-081e-2785-b6e2ca626e88@redhat.com>
-Date:   Mon, 6 Apr 2020 10:13:03 +0200
+Message-ID: <727709f7-ae9a-8614-d4ab-d53678f667f9@redhat.com>
+Date:   Mon, 6 Apr 2020 10:14:05 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <7C92AFF4-D479-4F80-8BED-6E9B226DFB72@nutanix.com>
+In-Reply-To: <34B5C17E-3022-419A-BCB2-5B938FF5E44D@nutanix.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -71,32 +75,29 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 05/04/20 01:36, Suresh Gumpula wrote:
-> Hi,
+On 05/04/20 22:46, Suresh Gumpula wrote:
 > 
-> I am seeing this old problem with qemu 2.12/kernel 4.19.84(intel kvm
-> with nesting enabled) and guest kernel 4.10
 > 
-> https://bugzilla.redhat.com/show_bug.cgi?id=1345964
+> From: Suresh Gumpula <suresh.gumpula@nutanix.com>
+> Date: Sunday, April 5, 2020 at 1:40 PM
+> To: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>
+> Subject: Re: ata driver loading hang on qemu/kvm
 > 
-> Could you please advise me on this?  I am seeing the exact same problem
-> where the ata driver load was stuck.
-> 
-> Really appreciate if you could give some pointers?
-> 
-> Is it a known issue with nesting? Or is this bug fixed in latest kvm module?
+> The guest kernel(not a nested guest) boot iso is hanging with following errors.
+> [    1.414035] Write protecting the kernel read-only data: 6144k
+> [    1.418006] Freeing unused kernel memory: 1080K
+> [    1.423033] Freeing unused kernel memory: 1004K
+> [    1.466783] scsi host0: ata_piix
+> [    1.469539] scsi host1: ata_piix
+> [    1.472039] ata1: PATA max MWDMA2 cmd 0x1f0 ctl 0x3f6 bmdma 0xc300 irq 14
+> [    1.475740] ata2: PATA max MWDMA2 cmd 0x170 ctl 0x376 bmdma 0xc308 irq 15
+>  
+>  
+> We have enabled nested host, but not running any nested guests.  So it’s a regular guest VM on a host.
+> Can someone please guide me what could be wrong here.  Is it a known issue in the kvm module or qemu emulation of IDE/CDROM controller?
 
-Hi, that bug was specific to running under Ravello, not on bare metal.
-I have not received any other reports.
-
-To clarify you have:
-
-- QEMU 2.12 and kernel 4.19.x on the host
-
-- kernel 4.10.x on the guest
-
-What QEMU version is running in the guest and what kernel version in the
-nested guest?
+No, it's the first time I see this reported.  Please try with a newer
+QEMU version.
 
 Paolo
 
