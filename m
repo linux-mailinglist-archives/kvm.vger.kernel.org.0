@@ -2,147 +2,184 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0BE0A1A005A
-	for <lists+kvm@lfdr.de>; Mon,  6 Apr 2020 23:36:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F28091A006E
+	for <lists+kvm@lfdr.de>; Mon,  6 Apr 2020 23:43:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726775AbgDFVfM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Apr 2020 17:35:12 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:29104 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726663AbgDFVfL (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 6 Apr 2020 17:35:11 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1586208910;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=b+P99eoGOE59dzJri6nDdYTRF/iHp1rUM821OiEBSWI=;
-        b=Mg8Vj/gSwdhlNbgAr3FwEyVtVnfFe74j6FkXKNpo6Y2sjrAryV6/F4irQ13Be0WTFVUAhv
-        lWcVu+JJxAZgM6Ytf0vWZCow0mw15mJVmY0l3o0WS4bjLspxtR6Rxqjmas6Eo61scFXvbV
-        qAeX7jQ7RqgwNwLXI3x0f4r/Dl0WfrI=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-321-pEr8hmp-O3ObqRi-FAJurQ-1; Mon, 06 Apr 2020 17:35:08 -0400
-X-MC-Unique: pEr8hmp-O3ObqRi-FAJurQ-1
-Received: by mail-wm1-f69.google.com with SMTP id l13so62378wme.7
-        for <kvm@vger.kernel.org>; Mon, 06 Apr 2020 14:35:08 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=b+P99eoGOE59dzJri6nDdYTRF/iHp1rUM821OiEBSWI=;
-        b=MhguJwP/d36k57R8j5s5fZdFAqbvvg9eFK3nzdM3IL3m6cFPc5ijgJIz4K8nsl8dEj
-         gkP8Mhnno1XVsA9u+yhlr/G3vMCR32GR2Vckr3eBBcdnuTd/9QmMJj7L7VixE1Ho1eWY
-         aJ5MdWzJqJBfLpOu+EvBJ2Z4uZf742m49LLVSKHqj+VrpJtk/fyFkPMWvZMOh6y2B8H8
-         x4/2wgrsdWHw3SG9HbXb1Er4KDzNe1X1sfgIPQUxMB+rceW63cfFwDNqSSKwO3I9/SzL
-         LTMjV/4cVR7s5SseTCIK6LIDqND+ldFI8qGl6zlCl2VptXwokyrYVf89+XoVeobD1QCF
-         uklA==
-X-Gm-Message-State: AGi0PuapxIahLTbJa+ds7IsOCzEwT6pEoQ8vWVkZPVUzwNakxNlI8vqo
-        2tAKZb5mX2t6ctH11UX4YR5PN/p0i75O9xhnn1auz4iK6/R0y0NUtmsv+vOwrtqETFH0Qt2+Osv
-        /viyg7kYJpX7t
-X-Received: by 2002:a5d:4c87:: with SMTP id z7mr1417297wrs.39.1586208907584;
-        Mon, 06 Apr 2020 14:35:07 -0700 (PDT)
-X-Google-Smtp-Source: APiQypKcIiWn1HPwA+vMFpmabnpjQIkpeHu9tKG3iwnUgYRQLaqvdB7lSYnAh68ff+ai34FiHnYBKA==
-X-Received: by 2002:a5d:4c87:: with SMTP id z7mr1417269wrs.39.1586208907340;
-        Mon, 06 Apr 2020 14:35:07 -0700 (PDT)
-Received: from redhat.com (bzq-79-176-51-222.red.bezeqint.net. [79.176.51.222])
-        by smtp.gmail.com with ESMTPSA id u22sm1003113wmu.43.2020.04.06.14.35.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 Apr 2020 14:35:06 -0700 (PDT)
-Date:   Mon, 6 Apr 2020 17:35:04 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     linux-kernel@vger.kernel.org
-Cc:     Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
-Subject: [PATCH v5 06/12] vhost: force spec specified alignment on types
-Message-ID: <20200406213314.248038-7-mst@redhat.com>
-References: <20200406213314.248038-1-mst@redhat.com>
+        id S1726272AbgDFVnr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Apr 2020 17:43:47 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:31192 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725933AbgDFVnq (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 6 Apr 2020 17:43:46 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 036LX4Ki052818;
+        Mon, 6 Apr 2020 17:43:45 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3082j83ctp-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 06 Apr 2020 17:43:45 -0400
+Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 036LY1od055374;
+        Mon, 6 Apr 2020 17:43:45 -0400
+Received: from ppma05wdc.us.ibm.com (1b.90.2fa9.ip4.static.sl-reverse.com [169.47.144.27])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3082j83ct6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 06 Apr 2020 17:43:45 -0400
+Received: from pps.filterd (ppma05wdc.us.ibm.com [127.0.0.1])
+        by ppma05wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 036LeHT5025407;
+        Mon, 6 Apr 2020 21:43:44 GMT
+Received: from b01cxnp22035.gho.pok.ibm.com (b01cxnp22035.gho.pok.ibm.com [9.57.198.25])
+        by ppma05wdc.us.ibm.com with ESMTP id 306hv6b7w6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 06 Apr 2020 21:43:44 +0000
+Received: from b01ledav002.gho.pok.ibm.com (b01ledav002.gho.pok.ibm.com [9.57.199.107])
+        by b01cxnp22035.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 036LhhPF53150038
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 6 Apr 2020 21:43:43 GMT
+Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B6F00124055;
+        Mon,  6 Apr 2020 21:43:43 +0000 (GMT)
+Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 39AE4124052;
+        Mon,  6 Apr 2020 21:43:43 +0000 (GMT)
+Received: from [9.160.96.56] (unknown [9.160.96.56])
+        by b01ledav002.gho.pok.ibm.com (Postfix) with ESMTP;
+        Mon,  6 Apr 2020 21:43:43 +0000 (GMT)
+Subject: Re: [RFC PATCH v2 5/9] vfio-ccw: Introduce a new CRW region
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     Halil Pasic <pasic@linux.ibm.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        Jared Rossi <jrossi@linux.ibm.com>, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org
+References: <20200206213825.11444-1-farman@linux.ibm.com>
+ <20200206213825.11444-6-farman@linux.ibm.com>
+ <20200406154057.6016c4a7.cohuck@redhat.com>
+From:   Eric Farman <farman@linux.ibm.com>
+Message-ID: <db43381a-6769-07f1-7d4d-9c6c680bde4e@linux.ibm.com>
+Date:   Mon, 6 Apr 2020 17:43:42 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200406213314.248038-1-mst@redhat.com>
-X-Mailer: git-send-email 2.24.1.751.gd10ce2899c
-X-Mutt-Fcc: =sent
+In-Reply-To: <20200406154057.6016c4a7.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.676
+ definitions=2020-04-06_10:2020-04-06,2020-04-06 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501 mlxscore=0
+ malwarescore=0 suspectscore=0 impostorscore=0 bulkscore=0
+ lowpriorityscore=0 phishscore=0 spamscore=0 mlxlogscore=999 adultscore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2004060162
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The ring element addresses are passed between components with different
-alignments assumptions. Thus, if guest/userspace selects a pointer and
-host then gets and dereferences it, we might need to decrease the
-compiler-selected alignment to prevent compiler on the host from
-assuming pointer is aligned.
+(Ah, didn't see this come in earlier.)
 
-This actually triggers on ARM with -mabi=apcs-gnu - which is a
-deprecated configuration, but it seems safer to handle this
-generally.
+On 4/6/20 9:40 AM, Cornelia Huck wrote:
+> On Thu,  6 Feb 2020 22:38:21 +0100
+> Eric Farman <farman@linux.ibm.com> wrote:
+> 
+>> From: Farhan Ali <alifm@linux.ibm.com>
+>>
+>> This region provides a mechanism to pass Channel Report Word(s)
+>> that affect vfio-ccw devices, and need to be passed to the guest
+>> for its awareness and/or processing.
+>>
+>> The base driver (see crw_collect_info()) provides space for two
+>> CRWs, as a subchannel event may have two CRWs chained together
+>> (one for the ssid, one for the subcahnnel).  All other CRWs will
+>> only occupy the first one.  Even though this support will also
+>> only utilize the first one, we'll provide space for two also.
+>>
+>> Signed-off-by: Farhan Ali <alifm@linux.ibm.com>
+>> Signed-off-by: Eric Farman <farman@linux.ibm.com>
+>> ---
+>>
+>> Notes:
+>>     v1-v2:
+>>      - Add new region info to Documentation/s390/vfio-ccw.rst [CH]
+>>      - Add a block comment to struct ccw_crw_region [CH]
+>>     
+>>     v0->v1: [EF]
+>>      - Clean up checkpatch (whitespace) errors
+>>      - Add ret=-ENOMEM in error path for new region
+>>      - Add io_mutex for region read (originally in last patch)
+>>      - Change crw1/crw2 to crw0/crw1
+>>      - Reorder cleanup of regions
+>>
+>>  Documentation/s390/vfio-ccw.rst     | 15 ++++++++
+>>  drivers/s390/cio/vfio_ccw_chp.c     | 56 +++++++++++++++++++++++++++++
+>>  drivers/s390/cio/vfio_ccw_drv.c     | 20 +++++++++++
+>>  drivers/s390/cio/vfio_ccw_ops.c     |  4 +++
+>>  drivers/s390/cio/vfio_ccw_private.h |  3 ++
+>>  include/uapi/linux/vfio.h           |  1 +
+>>  include/uapi/linux/vfio_ccw.h       |  9 +++++
+>>  7 files changed, 108 insertions(+)
+>>
+> 
+> (...)
+> 
+>> diff --git a/drivers/s390/cio/vfio_ccw_chp.c b/drivers/s390/cio/vfio_ccw_chp.c
+>> index 826d08379fe3..8fde94552149 100644
+>> --- a/drivers/s390/cio/vfio_ccw_chp.c
+>> +++ b/drivers/s390/cio/vfio_ccw_chp.c
+>> @@ -73,3 +73,59 @@ int vfio_ccw_register_schib_dev_regions(struct vfio_ccw_private *private)
+>>  					    VFIO_REGION_INFO_FLAG_READ,
+>>  					    private->schib_region);
+>>  }
+>> +
+>> +static ssize_t vfio_ccw_crw_region_read(struct vfio_ccw_private *private,
+>> +					char __user *buf, size_t count,
+>> +					loff_t *ppos)
+>> +{
+>> +	unsigned int i = VFIO_CCW_OFFSET_TO_INDEX(*ppos) - VFIO_CCW_NUM_REGIONS;
+>> +	loff_t pos = *ppos & VFIO_CCW_OFFSET_MASK;
+>> +	struct ccw_crw_region *region;
+>> +	int ret;
+>> +
+>> +	if (pos + count > sizeof(*region))
+>> +		return -EINVAL;
+>> +
+>> +	if (list_empty(&private->crw))
+>> +		return 0;
 
-I verified that the produced binary is exactly identical on x86.
+This is actually nonsense, because the list isn't introduced for a
+couple of patches.
 
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
----
- drivers/vhost/vhost.h       |  6 +++---
- include/linux/virtio_ring.h | 24 +++++++++++++++++++++---
- 2 files changed, 24 insertions(+), 6 deletions(-)
+>> +
+>> +	mutex_lock(&private->io_mutex);
+>> +	region = private->region[i].data;
+>> +
+>> +	if (copy_to_user(buf, (void *)region + pos, count))
+>> +		ret = -EFAULT;
+>> +	else
+>> +		ret = count;
+>> +
+>> +	mutex_unlock(&private->io_mutex);
+>> +	return ret;
+>> +}
+> 
+> Would it make sense to clear out the crw after it has been read by
+> userspace?
 
-diff --git a/drivers/vhost/vhost.h b/drivers/vhost/vhost.h
-index f8403bd46b85..60cab4c78229 100644
---- a/drivers/vhost/vhost.h
-+++ b/drivers/vhost/vhost.h
-@@ -67,9 +67,9 @@ struct vhost_virtqueue {
- 	/* The actual ring of buffers. */
- 	struct mutex mutex;
- 	unsigned int num;
--	struct vring_desc __user *desc;
--	struct vring_avail __user *avail;
--	struct vring_used __user *used;
-+	vring_desc_t __user *desc;
-+	vring_avail_t __user *avail;
-+	vring_used_t __user *used;
- 	const struct vhost_iotlb_map *meta_iotlb[VHOST_NUM_ADDRS];
- 	struct file *kick;
- 	struct eventfd_ctx *call_ctx;
-diff --git a/include/linux/virtio_ring.h b/include/linux/virtio_ring.h
-index 11680e74761a..c3f9ca054250 100644
---- a/include/linux/virtio_ring.h
-+++ b/include/linux/virtio_ring.h
-@@ -60,14 +60,32 @@ static inline void virtio_store_mb(bool weak_barriers,
- struct virtio_device;
- struct virtqueue;
- 
-+/*
-+ * The ring element addresses are passed between components with different
-+ * alignments assumptions. Thus, we might need to decrease the compiler-selected
-+ * alignment, and so must use a typedef to make sure the __aligned attribute
-+ * actually takes hold:
-+ *
-+ * https://gcc.gnu.org/onlinedocs//gcc/Common-Type-Attributes.html#Common-Type-Attributes
-+ *
-+ * When used on a struct, or struct member, the aligned attribute can only
-+ * increase the alignment; in order to decrease it, the packed attribute must
-+ * be specified as well. When used as part of a typedef, the aligned attribute
-+ * can both increase and decrease alignment, and specifying the packed
-+ * attribute generates a warning.
-+ */
-+typedef struct vring_desc __aligned(VRING_DESC_ALIGN_SIZE) vring_desc_t;
-+typedef struct vring_avail __aligned(VRING_AVAIL_ALIGN_SIZE) vring_avail_t;
-+typedef struct vring_used __aligned(VRING_USED_ALIGN_SIZE) vring_used_t;
-+
- struct vring {
- 	unsigned int num;
- 
--	struct vring_desc *desc;
-+	vring_desc_t *desc;
- 
--	struct vring_avail *avail;
-+	vring_avail_t *avail;
- 
--	struct vring_used *used;
-+	vring_used_t *used;
- };
- 
- /*
--- 
-MST
+Yes, I fixed this up in my in-progress v3 last week.  Sorry to waste
+some time, I should have mentioned it when I changed my branch locally.
+
+I changed the list_empty() check above to bail out if the region is
+already zero, which I guess is why the userspace check looks for both.
+But if we only look at the contents of the region, then checking both is
+unnecessary.  Just do the copy and be done with it.
+
+> 
+> In patch 7, you add a notification for a new crw via eventfd, but
+> nothing is preventing userspace from reading this even if not
+> triggered. I also don't see the region being updated there until a new
+> crw is posted.
+> 
+> Or am I missing something?
+> 
 
