@@ -2,251 +2,154 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6FA3F19FB0E
-	for <lists+kvm@lfdr.de>; Mon,  6 Apr 2020 19:11:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D4F0219FD51
+	for <lists+kvm@lfdr.de>; Mon,  6 Apr 2020 20:38:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729732AbgDFRLJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Apr 2020 13:11:09 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:35610 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726669AbgDFRLI (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 6 Apr 2020 13:11:08 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1586193067;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=+sqWo/TjFzm8Hn0zNEDNsba3wfUK+bDLDnQzQjnVZQE=;
-        b=ExAVZU/wkZBUqWGFc2nAKCDmOvJq/7vzAGjkRMnWzFfz5eH68gu6GY7MLr6BV6i+W19peq
-        V9ju8J/TS8w6YII2ezJl4EzswPVX1BaaWKseHRQAeh/DYuAaKi2KaF978uMl38i6XqvCV7
-        W8W8hVSwbKIW8JrLNMJhXleSbwhdXSk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-106-J9HE1_lmO-O1xrwmkUOtSg-1; Mon, 06 Apr 2020 13:11:03 -0400
-X-MC-Unique: J9HE1_lmO-O1xrwmkUOtSg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 24DA6107ACC7;
-        Mon,  6 Apr 2020 17:11:02 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-116-15.gru2.redhat.com [10.97.116.15])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id B362E60BE0;
-        Mon,  6 Apr 2020 17:10:55 +0000 (UTC)
-Subject: Re: [PATCH v2 2/2] selftests: kvm: Add mem_slot_test test
-To:     Andrew Jones <drjones@redhat.com>
-Cc:     pbonzini@redhat.com, kvm@vger.kernel.org, david@redhat.com,
-        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
-References: <20200403172428.15574-1-wainersm@redhat.com>
- <20200403172428.15574-3-wainersm@redhat.com>
- <20200404073240.grcsylznemd3pmxz@kamzik.brq.redhat.com>
-From:   Wainer dos Santos Moschetta <wainersm@redhat.com>
-Message-ID: <64a47faa-74f5-60ad-9b74-8c295072c719@redhat.com>
-Date:   Mon, 6 Apr 2020 14:10:53 -0300
+        id S1725995AbgDFSiU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Apr 2020 14:38:20 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:33798 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725787AbgDFSiU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 Apr 2020 14:38:20 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 036IXhuq008182;
+        Mon, 6 Apr 2020 18:37:55 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2020-01-29;
+ bh=x7jn857T6+XVh/cUUNt5yuCqvNHZ55iH/LHch72QhQY=;
+ b=GVSDdydPTYMLD1Hytn0OvUzmaqgrr4pgN35tAcAQQABYSEts0E0lDc5tYke+l2g5RaHX
+ 8UwXJxSjYEDrD4dd9m/5S61klBEOuqHoEuV2p8rUP24976wtmBw/3x1umBWXy1hjasq4
+ 6w9E8AHhyLxmTGREDKhSeM/YoDBIXfdobUYHtPGO58xgx2pw+U3Jw4yHjEfz6hH4Ar28
+ ULtpVa6+bYaMlAAZ0dksVSfwxugLEe8LaXG2QfVaeymJJybgHEXlKD6fZ4HQzhORzRn5
+ Uf/A1Ltnic2ONcEeFRbIhieW8jiqlKsy32LLCzz2YYKGoV+bRTsLUnlpOJO1h8dIyoJd 7Q== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by aserp2120.oracle.com with ESMTP id 306j6m8myn-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 06 Apr 2020 18:37:55 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 036IWdsc041373;
+        Mon, 6 Apr 2020 18:37:54 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by aserp3030.oracle.com with ESMTP id 3073sqedu9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 06 Apr 2020 18:37:54 +0000
+Received: from abhmp0010.oracle.com (abhmp0010.oracle.com [141.146.116.16])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 036Ibo4I009211;
+        Mon, 6 Apr 2020 18:37:50 GMT
+Received: from localhost.localdomain (/10.159.148.184)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Mon, 06 Apr 2020 11:37:49 -0700
+Subject: Re: [PATCH v6 14/14] KVM: x86: Add kexec support for SEV Live
+ Migration.
+To:     Ashish Kalra <ashish.kalra@amd.com>
+Cc:     pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com,
+        hpa@zytor.com, joro@8bytes.org, bp@suse.de,
+        thomas.lendacky@amd.com, x86@kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, rientjes@google.com,
+        srutherford@google.com, luto@kernel.org, brijesh.singh@amd.com
+References: <cover.1585548051.git.ashish.kalra@amd.com>
+ <0caf809845d2fdb1a1ec17955826df9777f502fb.1585548051.git.ashish.kalra@amd.com>
+ <c5977ca2-2fbd-8c71-54dc-b978da05a16e@oracle.com>
+ <20200404215741.GA29918@ashkalra_ubuntu_server>
+From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Message-ID: <07da6b9a-29c5-59cc-518c-0356126f2181@oracle.com>
+Date:   Mon, 6 Apr 2020 11:37:42 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <20200404073240.grcsylznemd3pmxz@kamzik.brq.redhat.com>
+In-Reply-To: <20200404215741.GA29918@ashkalra_ubuntu_server>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9583 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 phishscore=0 spamscore=0
+ malwarescore=0 suspectscore=0 adultscore=0 bulkscore=0 mlxlogscore=999
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
+ definitions=main-2004060145
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9583 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 mlxlogscore=999 spamscore=0
+ priorityscore=1501 suspectscore=0 lowpriorityscore=0 malwarescore=0
+ impostorscore=0 mlxscore=0 phishscore=0 adultscore=0 clxscore=1015
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
+ definitions=main-2004060145
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
-On 4/4/20 4:32 AM, Andrew Jones wrote:
-> On Fri, Apr 03, 2020 at 02:24:28PM -0300, Wainer dos Santos Moschetta wrote:
->> This patch introduces the mem_slot_test test which checks
->> an VM can have added memory slots up to the limit defined in
->> KVM_CAP_NR_MEMSLOTS. Then attempt to add one more slot to
->> verify it fails as expected.
+On 4/4/20 2:57 PM, Ashish Kalra wrote:
+> The host's page encryption bitmap is maintained for the guest to keep the encrypted/decrypted state
+> of the guest pages, therefore we need to explicitly mark all shared pages as encrypted again before
+> rebooting into the new guest kernel.
+>
+> On Fri, Apr 03, 2020 at 05:55:52PM -0700, Krish Sadhukhan wrote:
+>> On 3/29/20 11:23 PM, Ashish Kalra wrote:
+>>> From: Ashish Kalra <ashish.kalra@amd.com>
+>>>
+>>> Reset the host's page encryption bitmap related to kernel
+>>> specific page encryption status settings before we load a
+>>> new kernel by kexec. We cannot reset the complete
+>>> page encryption bitmap here as we need to retain the
+>>> UEFI/OVMF firmware specific settings.
 >>
->> Signed-off-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
->> ---
->>   tools/testing/selftests/kvm/.gitignore      |  1 +
->>   tools/testing/selftests/kvm/Makefile        |  3 +
->>   tools/testing/selftests/kvm/mem_slot_test.c | 85 +++++++++++++++++++++
->>   3 files changed, 89 insertions(+)
->>   create mode 100644 tools/testing/selftests/kvm/mem_slot_test.c
+>> Can the commit message mention why host page encryption needs to be reset ?
+>> Since the theme of these patches is guest migration in-SEV context, it might
+>> be useful to mention why the host context comes in here.
 >>
->> diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
->> index 16877c3daabf..232f24d6931a 100644
->> --- a/tools/testing/selftests/kvm/.gitignore
->> +++ b/tools/testing/selftests/kvm/.gitignore
->> @@ -22,3 +22,4 @@
->>   /dirty_log_test
->>   /kvm_create_max_vcpus
->>   /steal_time
->> +/mem_slot_test
->> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
->> index 712a2ddd2a27..69b44178f48b 100644
->> --- a/tools/testing/selftests/kvm/Makefile
->> +++ b/tools/testing/selftests/kvm/Makefile
->> @@ -33,12 +33,14 @@ TEST_GEN_PROGS_x86_64 += demand_paging_test
->>   TEST_GEN_PROGS_x86_64 += dirty_log_test
->>   TEST_GEN_PROGS_x86_64 += kvm_create_max_vcpus
->>   TEST_GEN_PROGS_x86_64 += steal_time
->> +TEST_GEN_PROGS_x86_64 += mem_slot_test
->>   
->>   TEST_GEN_PROGS_aarch64 += clear_dirty_log_test
->>   TEST_GEN_PROGS_aarch64 += demand_paging_test
->>   TEST_GEN_PROGS_aarch64 += dirty_log_test
->>   TEST_GEN_PROGS_aarch64 += kvm_create_max_vcpus
->>   TEST_GEN_PROGS_aarch64 += steal_time
->> +TEST_GEN_PROGS_aarch64 += mem_slot_test
->>   
-> kvm selftests has a bad case of OCD when it comes to lists of tests. In
-> the .gitignore and the Makefile we keep our tests in alphabetical order.
-> Maybe we should stop, because it's a bit annoying to maintain, but my
-> personal OCD won't allow it to be on my watch. Please fix the above
-> three lists.
+>>> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+>>> ---
+>>>    arch/x86/kernel/kvm.c | 28 ++++++++++++++++++++++++++++
+>>>    1 file changed, 28 insertions(+)
+>>>
+>>> diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
+>>> index 8fcee0b45231..ba6cce3c84af 100644
+>>> --- a/arch/x86/kernel/kvm.c
+>>> +++ b/arch/x86/kernel/kvm.c
+>>> @@ -34,6 +34,7 @@
+>>>    #include <asm/hypervisor.h>
+>>>    #include <asm/tlb.h>
+>>>    #include <asm/cpuidle_haltpoll.h>
+>>> +#include <asm/e820/api.h>
+>>>    static int kvmapf = 1;
+>>> @@ -357,6 +358,33 @@ static void kvm_pv_guest_cpu_reboot(void *unused)
+>>>    	 */
+>>>    	if (kvm_para_has_feature(KVM_FEATURE_PV_EOI))
+>>>    		wrmsrl(MSR_KVM_PV_EOI_EN, 0);
+>>> +	/*
+>>> +	 * Reset the host's page encryption bitmap related to kernel
+>>> +	 * specific page encryption status settings before we load a
+>>> +	 * new kernel by kexec. NOTE: We cannot reset the complete
+>>> +	 * page encryption bitmap here as we need to retain the
+>>> +	 * UEFI/OVMF firmware specific settings.
+>>> +	 */
+>>> +	if (kvm_para_has_feature(KVM_FEATURE_SEV_LIVE_MIGRATION) &&
+>>> +		(smp_processor_id() == 0)) {
+>>> +		unsigned long nr_pages;
+>>> +		int i;
+>>> +
+>>> +		for (i = 0; i < e820_table->nr_entries; i++) {
+>>> +			struct e820_entry *entry = &e820_table->entries[i];
+>>> +			unsigned long start_pfn, end_pfn;
+>>> +
+>>> +			if (entry->type != E820_TYPE_RAM)
+>>> +				continue;
+>>> +
+>>> +			start_pfn = entry->addr >> PAGE_SHIFT;
+>>> +			end_pfn = (entry->addr + entry->size) >> PAGE_SHIFT;
+>>> +			nr_pages = DIV_ROUND_UP(entry->size, PAGE_SIZE);
+>>> +
+>>> +			kvm_sev_hypercall3(KVM_HC_PAGE_ENC_STATUS,
+>>> +				entry->addr, nr_pages, 1);
+>>> +		}
+>>> +	}
+>>>    	kvm_pv_disable_apf();
+>>>    	kvm_disable_steal_time();
+>>>    }
 
-I will fix it on v3.
+Thanks for the explanation. It will certainly help one understand the 
+context better if you add it to the commit message.
 
-Kind of related... has ever been discussed a naming convention for kvm 
-selftests? It would allow the use of regex on both .gitignore and 
-Makefile...and bye-bye those sorted lists.
-
-
->
->>   TEST_GEN_PROGS_s390x = s390x/memop
->>   TEST_GEN_PROGS_s390x += s390x/resets
->> @@ -46,6 +48,7 @@ TEST_GEN_PROGS_s390x += s390x/sync_regs_test
->>   TEST_GEN_PROGS_s390x += demand_paging_test
->>   TEST_GEN_PROGS_s390x += dirty_log_test
->>   TEST_GEN_PROGS_s390x += kvm_create_max_vcpus
->> +TEST_GEN_PROGS_s390x += mem_slot_test
->>   
->>   TEST_GEN_PROGS += $(TEST_GEN_PROGS_$(UNAME_M))
->>   LIBKVM += $(LIBKVM_$(UNAME_M))
->> diff --git a/tools/testing/selftests/kvm/mem_slot_test.c b/tools/testing/selftests/kvm/mem_slot_test.c
->> new file mode 100644
->> index 000000000000..eef6f506f41d
->> --- /dev/null
->> +++ b/tools/testing/selftests/kvm/mem_slot_test.c
->> @@ -0,0 +1,85 @@
->> +// SPDX-License-Identifier: GPL-2.0-only
->> +/*
->> + * mem_slot_test
->> + *
->> + * Copyright (C) 2020, Red Hat, Inc.
->> + *
->> + * Test suite for memory region operations.
->> + */
->> +#define _GNU_SOURCE /* for program_invocation_short_name */
->> +#include <linux/kvm.h>
->> +#include <sys/mman.h>
->> +
->> +#include "test_util.h"
->> +#include "kvm_util.h"
->> +
->> +/*
->> + * Test it can be added memory slots up to KVM_CAP_NR_MEMSLOTS, then any
->> + * tentative to add further slots should fail.
->> + */
->> +static void test_add_max_slots(void)
->> +{
->> +	struct kvm_vm *vm;
->> +	uint32_t max_mem_slots;
->> +	uint32_t slot;
->> +	uint64_t mem_reg_npages;
->> +	uint64_t mem_reg_size;
->> +	uint32_t mem_reg_flags;
->> +	uint64_t guest_addr;
->> +	int ret;
->> +
->> +	max_mem_slots = kvm_check_cap(KVM_CAP_NR_MEMSLOTS);
->> +	TEST_ASSERT(max_mem_slots > 0,
->> +		    "KVM_CAP_NR_MEMSLOTS should be greater than 0");
->> +	pr_info("Allowed number of memory slots: %i\n", max_mem_slots);
->> +
->> +	vm = vm_create(VM_MODE_DEFAULT, 0, O_RDWR);
->> +
->> +	/*
->> +	 * Uses 1MB sized/aligned memory region since this is the minimal
->> +	 * required on s390x.
->> +	 */
->> +	mem_reg_size = 0x100000;
->> +	mem_reg_npages = vm_calc_num_guest_pages(VM_MODE_DEFAULT, mem_reg_size);
->> +
->> +	mem_reg_flags = kvm_check_cap(KVM_CAP_READONLY_MEM) ? KVM_MEM_READONLY :
->> +		KVM_MEM_LOG_DIRTY_PAGES;
-> I still don't see why we're setting a flag at all, and now we're setting
-> different flags depending on what's available, so the test isn't the
-> same for every environment. I would just have mem->flags = 0 for this
-> test.
-I thought I had to set a memory flag always. If mem->flags = 0 works 
-across the arches, then I change this on v3.
->
->> +
->> +	guest_addr = 0x0;
->> +
->> +	/* Check it can be added memory slots up to the maximum allowed */
->> +	pr_info("Adding slots 0..%i, each memory region with %ldK size\n",
->> +		(max_mem_slots - 1), mem_reg_size >> 10);
->> +	for (slot = 0; slot < max_mem_slots; slot++) {
->> +		vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS,
->> +					    guest_addr, slot, mem_reg_npages,
->> +					    mem_reg_flags);
->> +		guest_addr += mem_reg_size;
->> +	}
->> +
->> +	/* Check it cannot be added memory slots beyond the limit */
->> +	void *mem = mmap(NULL, mem_reg_size, PROT_READ | PROT_WRITE,
->> +			 MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
->> +	TEST_ASSERT(mem != NULL, "Failed to mmap() host");
-> This should be testing mem != MAP_FAILED
-
-Ok.
-
->
->> +
->> +	struct kvm_userspace_memory_region kvm_region = {
->> +		.slot = slot,
->> +		.flags = mem_reg_flags,
->> +		.guest_phys_addr = guest_addr,
->> +		.memory_size = mem_reg_size,
->> +		.userspace_addr = (uint64_t) mem,
->> +	};
-> Declaring kvm_region in the middle of the block. I don't really care
-> myself, but it's inconsistent with all the other variables which are
-> declared at the top.
-
-Makes sense.
-
->
->> +
->> +	ret = ioctl(vm_get_fd(vm), KVM_SET_USER_MEMORY_REGION, &kvm_region);
->> +	TEST_ASSERT(ret == -1, "Adding one more memory slot should fail");
->> +	TEST_ASSERT(errno == EINVAL, "Should return EINVAL errno");
-> Please make the second assert message more specific. Or better would be
-> to combine the asserts
->
->    TEST_ASSERT(ret == -1 && errno == EINVAL, "Adding one more memory slot should fail with EINVAL");
-
-Yeah, I was unsure about and'ing the checks. I will change it on v3.
-
-Thanks!
-
-Wainer
-
->
->> +
->> +	munmap(mem, mem_reg_size);
->> +	kvm_vm_free(vm);
->> +}
->> +
->> +int main(int argc, char *argv[])
->> +{
->> +	test_add_max_slots();
->> +	return 0;
->> +}
->> -- 
->> 2.17.2
->>
-> Thanks,
-> drew
+Reviewed-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
 
