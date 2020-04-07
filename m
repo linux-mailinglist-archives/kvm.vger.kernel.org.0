@@ -2,59 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B18DD1A15D1
-	for <lists+kvm@lfdr.de>; Tue,  7 Apr 2020 21:21:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A2A9E1A15C8
+	for <lists+kvm@lfdr.de>; Tue,  7 Apr 2020 21:21:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727881AbgDGTVK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Apr 2020 15:21:10 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:57604 "EHLO
+        id S1727817AbgDGTVA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Apr 2020 15:21:00 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:63668 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727192AbgDGTUm (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 7 Apr 2020 15:20:42 -0400
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 037J3WpH137021;
-        Tue, 7 Apr 2020 15:20:41 -0400
+        by vger.kernel.org with ESMTP id S1727435AbgDGTUn (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 7 Apr 2020 15:20:43 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 037J50C3000740;
+        Tue, 7 Apr 2020 15:20:42 -0400
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3082hxuv3j-1
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3082pes0ku-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 07 Apr 2020 15:20:42 -0400
+Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 037J5A4R002062;
+        Tue, 7 Apr 2020 15:20:41 -0400
+Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.10])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3082pes0kf-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Tue, 07 Apr 2020 15:20:41 -0400
-Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 037J3cNx137786;
-        Tue, 7 Apr 2020 15:20:41 -0400
-Received: from ppma03wdc.us.ibm.com (ba.79.3fa9.ip4.static.sl-reverse.com [169.63.121.186])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3082hxuv30-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 07 Apr 2020 15:20:40 -0400
-Received: from pps.filterd (ppma03wdc.us.ibm.com [127.0.0.1])
-        by ppma03wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 037JKDl9027655;
-        Tue, 7 Apr 2020 19:20:39 GMT
+Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
+        by ppma02dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 037JKaWc027396;
+        Tue, 7 Apr 2020 19:20:40 GMT
 Received: from b01cxnp23034.gho.pok.ibm.com (b01cxnp23034.gho.pok.ibm.com [9.57.198.29])
-        by ppma03wdc.us.ibm.com with ESMTP id 306hv6ae5d-1
+        by ppma02dal.us.ibm.com with ESMTP id 306hv71392-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 07 Apr 2020 19:20:39 +0000
+        Tue, 07 Apr 2020 19:20:40 +0000
 Received: from b01ledav001.gho.pok.ibm.com (b01ledav001.gho.pok.ibm.com [9.57.199.106])
-        by b01cxnp23034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 037JKciS53149974
+        by b01cxnp23034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 037JKcfU53936562
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
         Tue, 7 Apr 2020 19:20:38 GMT
 Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0A4852806A;
+        by IMSVA (Postfix) with ESMTP id D3A972805A;
         Tue,  7 Apr 2020 19:20:38 +0000 (GMT)
 Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6346728059;
-        Tue,  7 Apr 2020 19:20:37 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 28FE628058;
+        Tue,  7 Apr 2020 19:20:38 +0000 (GMT)
 Received: from cpe-172-100-173-215.stny.res.rr.com.com (unknown [9.85.207.206])
         by b01ledav001.gho.pok.ibm.com (Postfix) with ESMTP;
-        Tue,  7 Apr 2020 19:20:37 +0000 (GMT)
+        Tue,  7 Apr 2020 19:20:38 +0000 (GMT)
 From:   Tony Krowiak <akrowiak@linux.ibm.com>
 To:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
         kvm@vger.kernel.org
 Cc:     freude@linux.ibm.com, borntraeger@de.ibm.com, cohuck@redhat.com,
         mjrosato@linux.ibm.com, pmorel@linux.ibm.com, pasic@linux.ibm.com,
         alex.williamson@redhat.com, kwankhede@nvidia.com,
-        jjherne@linux.ibm.com, fiuczy@linux.ibm.com
-Subject: [PATCH v7 12/15] s390/zcrypt: Notify driver on config changed and scan complete callbacks
-Date:   Tue,  7 Apr 2020 15:20:12 -0400
-Message-Id: <20200407192015.19887-13-akrowiak@linux.ibm.com>
+        jjherne@linux.ibm.com, fiuczy@linux.ibm.com,
+        Tony Krowiak <akrowiak@linux.ibm.com>
+Subject: [PATCH v7 13/15] s390/vfio-ap: handle host AP config change notification
+Date:   Tue,  7 Apr 2020 15:20:13 -0400
+Message-Id: <20200407192015.19887-14-akrowiak@linux.ibm.com>
 X-Mailer: git-send-email 2.21.1
 In-Reply-To: <20200407192015.19887-1-akrowiak@linux.ibm.com>
 References: <20200407192015.19887-1-akrowiak@linux.ibm.com>
@@ -63,377 +64,254 @@ Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.676
  definitions=2020-04-07_08:2020-04-07,2020-04-07 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 impostorscore=0
- malwarescore=0 phishscore=0 mlxlogscore=999 spamscore=0 clxscore=1015
- adultscore=0 bulkscore=0 priorityscore=1501 suspectscore=3
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2004070153
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 mlxscore=0
+ clxscore=1015 spamscore=0 lowpriorityscore=0 malwarescore=0 phishscore=0
+ adultscore=0 mlxlogscore=999 suspectscore=3 bulkscore=0 priorityscore=1501
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
+ definitions=main-2004070151
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Harald Freudenberger <freude@linux.ibm.com>
+Implements the driver callback invoked by the AP bus when the host
+AP configuration has changed. Since this callback is invoked prior to
+unbinding a device from its device driver, the vfio_ap driver will
+respond by unplugging the AP adapters, domains and control domains
+removed from the host's AP configuration from the guests using them.
 
-This patch intruduces an extension to the ap bus to notify drivers
-on crypto config changed and bus scan complete events.
-Two new callbacks are introduced for ap_drivers:
-
-  void (*on_config_changed)(struct ap_config_info *new_config_info,
-                            struct ap_config_info *old_config_info);
-  void (*on_scan_complete)(struct ap_config_info *new_config_info,
-                            struct ap_config_info *old_config_info);
-
-Both callbacks are optional. Both callbacks are only triggered
-when QCI information is available (facility bit 12):
-
-* The on_config_changed callback is invoked at the start of the AP bus scan
-  function when it determines that the host AP configuration information
-  has changed since the previous scan. This is done by storing
-  an old and current QCI info struct and comparing them. If there is any
-  difference, the callback is invoked.
-
-  Note that when the AP bus scan detects that AP adapters or domains have
-  been removed from the host's AP configuration, it will remove the
-  associated devices from the AP bus subsystem's device model. This
-  callback gives the device driver a chance to respond to the removal
-  of the AP devices in bulk rather than one at a time as its remove
-  callback is invoked. It will also allow the device driver to do any
-  any cleanup prior to giving control back to the bus piecemeal. This is
-  particularly important for the vfio_ap driver because there may be
-  guests using the queues at the time.
-
-* The on_scan_complete callback is invoked after the ap bus scan is
-  complete if the host AP configuration data has changed.
-
-  Note that when the AP bus scan detects that adapters or domains have
-  been added to the host's configuration, it will create new devices in
-  the AP bus subsystem's device model. This callback also allows the driver
-  to process all of the new devices in bulk.
-
-Please note that changes to the apmask and aqmask do not trigger
-these two callbacks since the bus scan function is not invoked by changes
-to those masks.
-
-Signed-off-by: Harald Freudenberger <freude@linux.ibm.com>
+Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
 ---
- drivers/s390/crypto/ap_bus.c | 157 +++++++++++++++++++++++++++--------
- drivers/s390/crypto/ap_bus.h |  13 +++
- 2 files changed, 134 insertions(+), 36 deletions(-)
+ drivers/s390/crypto/vfio_ap_drv.c     |   5 +-
+ drivers/s390/crypto/vfio_ap_ops.c     | 136 ++++++++++++++++++++++++--
+ drivers/s390/crypto/vfio_ap_private.h |   7 +-
+ 3 files changed, 140 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/s390/crypto/ap_bus.c b/drivers/s390/crypto/ap_bus.c
-index af15c095e76a..9b3fc4ea9c4d 100644
---- a/drivers/s390/crypto/ap_bus.c
-+++ b/drivers/s390/crypto/ap_bus.c
-@@ -71,8 +71,12 @@ struct ap_perms ap_perms;
- EXPORT_SYMBOL(ap_perms);
- DEFINE_MUTEX(ap_perms_mutex);
- EXPORT_SYMBOL(ap_perms_mutex);
-+DEFINE_MUTEX(ap_config_lock);
-+
-+/* current and old qci info structs */
-+static struct ap_config_info *ap_config_info;
-+static struct ap_config_info *ap_old_config_info;
+diff --git a/drivers/s390/crypto/vfio_ap_drv.c b/drivers/s390/crypto/vfio_ap_drv.c
+index 5197a1fe14d4..9f6c5d82dfb5 100644
+--- a/drivers/s390/crypto/vfio_ap_drv.c
++++ b/drivers/s390/crypto/vfio_ap_drv.c
+@@ -113,9 +113,11 @@ static int vfio_ap_matrix_dev_create(void)
  
--static struct ap_config_info *ap_configuration;
- static bool initialised;
- 
- /*
-@@ -188,8 +192,8 @@ static int ap_apft_available(void)
-  */
- static inline int ap_qact_available(void)
- {
--	if (ap_configuration)
--		return ap_configuration->qact;
-+	if (ap_config_info)
-+		return ap_config_info->qact;
- 	return 0;
- }
- 
-@@ -218,13 +222,15 @@ static void ap_init_configuration(void)
- 	if (!ap_configuration_available())
- 		return;
- 
--	ap_configuration = kzalloc(sizeof(*ap_configuration), GFP_KERNEL);
--	if (!ap_configuration)
--		return;
--	if (ap_query_configuration(ap_configuration) != 0) {
--		kfree(ap_configuration);
--		ap_configuration = NULL;
-+	/* allocate current qci info struct */
-+	ap_config_info = kzalloc(sizeof(*ap_config_info), GFP_KERNEL);
-+	if (!ap_config_info)
- 		return;
-+
-+	/* fetch qci info into the current qci info struct */
-+	if (ap_query_configuration(ap_config_info)) {
-+		kfree(ap_config_info);
-+		ap_config_info = NULL;
+ 	/* Fill in config info via PQAP(QCI), if available */
+ 	if (test_facility(12)) {
+-		ret = ap_qci(&matrix_dev->info);
++		ret = ap_qci(&matrix_dev->config_info);
+ 		if (ret)
+ 			goto matrix_alloc_err;
++		memcpy(&matrix_dev->config_info_prev, &matrix_dev->config_info,
++		       sizeof(struct ap_config_info));
  	}
- }
  
-@@ -247,10 +253,10 @@ static inline int ap_test_config(unsigned int *field, unsigned int nr)
-  */
- static inline int ap_test_config_card_id(unsigned int id)
+ 	mutex_init(&matrix_dev->lock);
+@@ -176,6 +178,7 @@ static int __init vfio_ap_init(void)
+ 	vfio_ap_drv.remove = vfio_ap_queue_dev_remove;
+ 	vfio_ap_drv.in_use = vfio_ap_mdev_resource_in_use;
+ 	vfio_ap_drv.ids = ap_queue_ids;
++	vfio_ap_drv.on_config_changed = vfio_ap_on_cfg_changed;
+ 
+ 	ret = ap_driver_register(&vfio_ap_drv, THIS_MODULE, VFIO_AP_DRV_NAME);
+ 	if (ret) {
+diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
+index 88a4aef5193f..f1dd77729dd9 100644
+--- a/drivers/s390/crypto/vfio_ap_ops.c
++++ b/drivers/s390/crypto/vfio_ap_ops.c
+@@ -336,8 +336,9 @@ static int vfio_ap_mdev_create(struct kobject *kobj, struct mdev_device *mdev)
+ 	}
+ 
+ 	matrix_mdev->mdev = mdev;
+-	vfio_ap_matrix_init(&matrix_dev->info, &matrix_mdev->matrix);
+-	vfio_ap_matrix_init(&matrix_dev->info, &matrix_mdev->shadow_crycb);
++	vfio_ap_matrix_init(&matrix_dev->config_info, &matrix_mdev->matrix);
++	vfio_ap_matrix_init(&matrix_dev->config_info,
++			    &matrix_mdev->shadow_crycb);
+ 	hash_init(matrix_mdev->qtable);
+ 	mdev_set_drvdata(mdev, matrix_mdev);
+ 	matrix_mdev->pqap_hook.hook = handle_pqap;
+@@ -485,8 +486,8 @@ static int vfio_ap_mdev_filter_matrix(struct ap_matrix_mdev *matrix_mdev,
+ 		 * If the APID is not assigned to the host AP configuration,
+ 		 * we can not assign it to the guest's AP configuration
+ 		 */
+-		if (!test_bit_inv(apid,
+-				  (unsigned long *)matrix_dev->info.apm)) {
++		if (!test_bit_inv(apid, (unsigned long *)
++				  matrix_dev->config_info.apm)) {
+ 			clear_bit_inv(apid, shadow_crycb->apm);
+ 			continue;
+ 		}
+@@ -499,7 +500,7 @@ static int vfio_ap_mdev_filter_matrix(struct ap_matrix_mdev *matrix_mdev,
+ 			 * guest's AP configuration
+ 			 */
+ 			if (!test_bit_inv(apqi, (unsigned long *)
+-					  matrix_dev->info.aqm)) {
++					  matrix_dev->config_info.aqm)) {
+ 				clear_bit_inv(apqi, shadow_crycb->aqm);
+ 				continue;
+ 			}
+@@ -1617,7 +1618,7 @@ int vfio_ap_mdev_probe_queue(struct ap_queue *queue)
+ void vfio_ap_mdev_remove_queue(struct ap_queue *queue)
  {
--	if (!ap_configuration)	/* QCI not supported */
--		/* only ids 0...3F may be probed */
-+	if (!ap_config_info)
-+		/* QCI not available, only ids 0...3F may be probed */
- 		return id < 0x40 ? 1 : 0;
--	return ap_test_config(ap_configuration->apm, id);
-+	return ap_test_config(ap_config_info->apm, id);
+ 	struct vfio_ap_queue *q;
+-	int apid, apqi;
++	unsigned long apid, apqi;
+ 
+ 	mutex_lock(&matrix_dev->lock);
+ 	q = dev_get_drvdata(&queue->ap_dev.device);
+@@ -1643,3 +1644,126 @@ bool vfio_ap_mdev_resource_in_use(unsigned long *apm, unsigned long *aqm)
+ 
+ 	return in_use;
  }
- 
- /*
-@@ -264,9 +270,9 @@ static inline int ap_test_config_card_id(unsigned int id)
-  */
- int ap_test_config_usage_domain(unsigned int domain)
- {
--	if (!ap_configuration)	/* QCI not supported */
-+	if (!ap_config_info)  /* QCI not supported */
- 		return domain < 16;
--	return ap_test_config(ap_configuration->aqm, domain);
-+	return ap_test_config(ap_config_info->aqm, domain);
- }
- EXPORT_SYMBOL(ap_test_config_usage_domain);
- 
-@@ -280,9 +286,9 @@ EXPORT_SYMBOL(ap_test_config_usage_domain);
-  */
- int ap_test_config_ctrl_domain(unsigned int domain)
- {
--	if (!ap_configuration)	/* QCI not supported */
-+	if (!ap_config_info)  /* QCI not supported */
- 		return 0;
--	return ap_test_config(ap_configuration->adm, domain);
-+	return ap_test_config(ap_config_info->adm, domain);
- }
- EXPORT_SYMBOL(ap_test_config_ctrl_domain);
- 
-@@ -1052,45 +1058,45 @@ static BUS_ATTR_RW(ap_domain);
- 
- static ssize_t ap_control_domain_mask_show(struct bus_type *bus, char *buf)
- {
--	if (!ap_configuration)	/* QCI not supported */
-+	if (!ap_config_info)  /* QCI not supported */
- 		return snprintf(buf, PAGE_SIZE, "not supported\n");
- 
- 	return snprintf(buf, PAGE_SIZE,
- 			"0x%08x%08x%08x%08x%08x%08x%08x%08x\n",
--			ap_configuration->adm[0], ap_configuration->adm[1],
--			ap_configuration->adm[2], ap_configuration->adm[3],
--			ap_configuration->adm[4], ap_configuration->adm[5],
--			ap_configuration->adm[6], ap_configuration->adm[7]);
-+			ap_config_info->adm[0], ap_config_info->adm[1],
-+			ap_config_info->adm[2], ap_config_info->adm[3],
-+			ap_config_info->adm[4], ap_config_info->adm[5],
-+			ap_config_info->adm[6], ap_config_info->adm[7]);
- }
- 
- static BUS_ATTR_RO(ap_control_domain_mask);
- 
- static ssize_t ap_usage_domain_mask_show(struct bus_type *bus, char *buf)
- {
--	if (!ap_configuration)	/* QCI not supported */
-+	if (!ap_config_info)  /* QCI not supported */
- 		return snprintf(buf, PAGE_SIZE, "not supported\n");
- 
- 	return snprintf(buf, PAGE_SIZE,
- 			"0x%08x%08x%08x%08x%08x%08x%08x%08x\n",
--			ap_configuration->aqm[0], ap_configuration->aqm[1],
--			ap_configuration->aqm[2], ap_configuration->aqm[3],
--			ap_configuration->aqm[4], ap_configuration->aqm[5],
--			ap_configuration->aqm[6], ap_configuration->aqm[7]);
-+			ap_config_info->aqm[0], ap_config_info->aqm[1],
-+			ap_config_info->aqm[2], ap_config_info->aqm[3],
-+			ap_config_info->aqm[4], ap_config_info->aqm[5],
-+			ap_config_info->aqm[6], ap_config_info->aqm[7]);
- }
- 
- static BUS_ATTR_RO(ap_usage_domain_mask);
- 
- static ssize_t ap_adapter_mask_show(struct bus_type *bus, char *buf)
- {
--	if (!ap_configuration)	/* QCI not supported */
-+	if (!ap_config_info)  /* QCI not supported */
- 		return snprintf(buf, PAGE_SIZE, "not supported\n");
- 
- 	return snprintf(buf, PAGE_SIZE,
- 			"0x%08x%08x%08x%08x%08x%08x%08x%08x\n",
--			ap_configuration->apm[0], ap_configuration->apm[1],
--			ap_configuration->apm[2], ap_configuration->apm[3],
--			ap_configuration->apm[4], ap_configuration->apm[5],
--			ap_configuration->apm[6], ap_configuration->apm[7]);
-+			ap_config_info->apm[0], ap_config_info->apm[1],
-+			ap_config_info->apm[2], ap_config_info->apm[3],
-+			ap_config_info->apm[4], ap_config_info->apm[5],
-+			ap_config_info->apm[6], ap_config_info->apm[7]);
- }
- 
- static BUS_ATTR_RO(ap_adapter_mask);
-@@ -1178,7 +1184,7 @@ static ssize_t ap_max_domain_id_show(struct bus_type *bus, char *buf)
- {
- 	int max_domain_id;
- 
--	if (ap_configuration)
-+	if (ap_config_info)
- 		max_domain_id = ap_max_domain_id ? : -1;
- 	else
- 		max_domain_id = 15;
-@@ -1481,6 +1487,50 @@ static int ap_get_compatible_type(ap_qid_t qid, int rawtype, unsigned int func)
- 	return comp_type;
- }
- 
-+/* Helper function for notify_config_changed */
-+static int __drv_notify_config_changed(struct device_driver *drv, void *data)
++
++/**
++ * vfio_ap_mdev_unassign_apids
++ *
++ * @matrix_mdev: The matrix mediated device
++ *
++ * @aqm: A bitmap with 256 bits. Each bit in the map represents an APID from 0
++ *	 to 255 (with the leftmost bit corresponding to APID 0).
++ *
++ * Unassigns each APID specified in @aqm that is assigned to the shadow CRYCB
++ * of @matrix_mdev. Returns true if at least one APID is unassigned; otherwise,
++ * returns false.
++ */
++bool vfio_ap_mdev_unassign_apids(struct ap_matrix_mdev *matrix_mdev,
++				 unsigned long *apm_unassign)
 +{
-+	struct ap_driver *ap_drv = to_ap_drv(drv);
-+
-+	if (try_module_get(drv->owner)) {
-+		if (ap_drv->on_config_changed)
-+			ap_drv->on_config_changed(ap_config_info,
-+						  ap_old_config_info);
-+		module_put(drv->owner);
-+	}
-+
-+	return 0;
-+}
-+
-+/* Notify all drivers about an qci config change */
-+static inline void notify_config_changed(void)
-+{
-+	bus_for_each_drv(&ap_bus_type, NULL, NULL,
-+			 __drv_notify_config_changed);
-+}
-+
-+/* Helper function for notify_scan_complete */
-+static int __drv_notify_scan_complete(struct device_driver *drv, void *data)
-+{
-+	struct ap_driver *ap_drv = to_ap_drv(drv);
-+
-+	if (try_module_get(drv->owner)) {
-+		if (ap_drv->on_scan_complete)
-+			ap_drv->on_scan_complete(ap_config_info,
-+						 ap_old_config_info);
-+		module_put(drv->owner);
-+	}
-+
-+	return 0;
-+}
-+
-+/* Notify all drivers about bus scan complete */
-+static inline void notify_scan_complete(void)
-+{
-+	bus_for_each_drv(&ap_bus_type, NULL, NULL,
-+			 __drv_notify_scan_complete);
-+}
-+
- /*
-  * Helper function to be used with bus_find_dev
-  * matches for the card device with the given id
-@@ -1663,23 +1713,57 @@ static void _ap_scan_bus_adapter(int id)
- 		put_device(&ac->ap_dev.device);
- }
- 
-+static int ap_config_changed(void)
-+{
-+	int cfg_chg = 0;
-+
-+	if (ap_config_info) {
-+		if (!ap_old_config_info) {
-+			ap_old_config_info = kzalloc(
-+				sizeof(*ap_old_config_info), GFP_KERNEL);
-+			if (!ap_old_config_info)
-+				return 0;
-+		} else {
-+			memcpy(ap_old_config_info, ap_config_info,
-+			       sizeof(struct ap_config_info));
-+		}
-+		ap_query_configuration(ap_config_info);
-+		cfg_chg = memcmp(ap_config_info,
-+				 ap_old_config_info,
-+				 sizeof(struct ap_config_info)) != 0;
-+	}
-+
-+	return cfg_chg;
-+}
-+
- /**
-  * ap_scan_bus(): Scan the AP bus for new devices
-  * Runs periodically, workqueue timer (ap_config_time)
-  */
- static void ap_scan_bus(struct work_struct *unused)
- {
--	int id;
-+	int id, config_changed = 0;
- 
- 	AP_DBF(DBF_DEBUG, "%s running\n", __func__);
- 
--	ap_query_configuration(ap_configuration);
-+	mutex_lock(&ap_config_lock);
-+
-+	/* config change notify */
-+	config_changed = ap_config_changed();
-+	if (config_changed)
-+		notify_config_changed();
- 	ap_select_domain();
- 
- 	/* loop over all possible adapters */
- 	for (id = 0; id < AP_DEVICES; id++)
- 		_ap_scan_bus_adapter(id);
- 
-+	/* scan complete notify */
-+	if (config_changed)
-+		notify_scan_complete();
-+
-+	mutex_unlock(&ap_config_lock);
-+
- 	/* check if there is at least one queue available with default domain */
- 	if (ap_domain_index >= 0) {
- 		struct device *dev =
-@@ -1761,7 +1845,7 @@ static int __init ap_module_init(void)
- 	/* Get AP configuration data if available */
- 	ap_init_configuration();
- 
--	if (ap_configuration)
-+	if (ap_config_info)
- 		max_domain_id =
- 			ap_max_domain_id ? ap_max_domain_id : AP_DOMAINS - 1;
- 	else
-@@ -1841,7 +1925,8 @@ static int __init ap_module_init(void)
- out:
- 	if (ap_using_interrupts())
- 		unregister_adapter_interrupt(&ap_airq);
--	kfree(ap_configuration);
-+	kfree(ap_config_info);
-+	kfree(ap_old_config_info);
- 	return rc;
- }
- device_initcall(ap_module_init);
-diff --git a/drivers/s390/crypto/ap_bus.h b/drivers/s390/crypto/ap_bus.h
-index 86bf5e224ba4..c94c97c6ea09 100644
---- a/drivers/s390/crypto/ap_bus.h
-+++ b/drivers/s390/crypto/ap_bus.h
-@@ -139,6 +139,19 @@ struct ap_driver {
- 	void (*suspend)(struct ap_device *);
- 	void (*resume)(struct ap_device *);
- 	bool (*in_use)(unsigned long *apm, unsigned long *aqm);
++	unsigned long apid;
++	bool unassigned = false;
 +
 +	/*
-+	 * Called at the start of the ap bus scan function when
-+	 * the crypto config information (qci) has changed.
++	 * If the matrix mdev is not in use by a KVM guest, return indicating
++	 * that no APIDs have been unassigned.
 +	 */
-+	void (*on_config_changed)(struct ap_config_info *new_config_info,
-+				  struct ap_config_info *old_config_info);
++	if (!vfio_ap_mdev_has_crycb(matrix_mdev))
++		return false;
++
++	for_each_set_bit_inv(apid, apm_unassign, AP_DEVICES) {
++		unassigned |= vfio_ap_mdev_unassign_guest_apid(matrix_mdev,
++							       apid);
++	}
++
++	return unassigned;
++}
++
++/**
++ * vfio_ap_mdev_unassign_apqis
++ *
++ * @matrix_mdev: The matrix mediated device
++ *
++ * @aqm: A bitmap with 256 bits. Each bit in the map represents an APQI from 0
++ *	 to 255 (with the leftmost bit corresponding to APQI 0).
++ *
++ * Unassigns each APQI specified in @aqm that is assigned to the shadow CRYCB
++ * of @matrix_mdev. Returns true if at least one APQI is unassigned; otherwise,
++ * returns false.
++ */
++bool vfio_ap_mdev_unassign_apqis(struct ap_matrix_mdev *matrix_mdev,
++				 unsigned long *aqm_unassign)
++{
++	unsigned long apqi;
++	bool unassigned = false;
++
 +	/*
-+	 * Called at the end of the ap bus scan function when
-+	 * the crypto config information (qci) has changed.
++	 * If the matrix mdev is not in use by a KVM guest, return indicating
++	 * that no APQIs have been unassigned.
 +	 */
-+	void (*on_scan_complete)(struct ap_config_info *new_config_info,
-+				 struct ap_config_info *old_config_info);
++	if (!vfio_ap_mdev_has_crycb(matrix_mdev))
++		return false;
++
++	for_each_set_bit_inv(apqi, aqm_unassign, AP_DOMAINS) {
++		unassigned |= vfio_ap_mdev_unassign_guest_apqi(matrix_mdev,
++							       apqi);
++	}
++
++	return unassigned;
++}
++
++void vfio_ap_on_cfg_changed(struct ap_config_info *new_config_info,
++			    struct ap_config_info *old_config_info)
++{
++	bool unassigned;
++	int ap_remove, aq_remove;
++	struct ap_matrix_mdev *matrix_mdev;
++	DECLARE_BITMAP(apm_unassign, AP_DEVICES);
++	DECLARE_BITMAP(aqm_unassign, AP_DOMAINS);
++
++	unsigned long *cur_apm, *cur_aqm, *prev_apm, *prev_aqm;
++
++	if (matrix_dev->flags & AP_MATRIX_CFG_CHG) {
++		WARN_ONCE(1, "AP host configuration change already reported");
++		return;
++	}
++
++	memcpy(&matrix_dev->config_info, new_config_info,
++	       sizeof(struct ap_config_info));
++	memcpy(&matrix_dev->config_info_prev, old_config_info,
++	       sizeof(struct ap_config_info));
++
++	cur_apm = (unsigned long *)matrix_dev->config_info.apm;
++	cur_aqm = (unsigned long *)matrix_dev->config_info.aqm;
++	prev_apm = (unsigned long *)matrix_dev->config_info_prev.apm;
++	prev_aqm = (unsigned long *)matrix_dev->config_info_prev.aqm;
++
++	ap_remove = bitmap_andnot(apm_unassign, prev_apm, cur_apm, AP_DEVICES);
++	aq_remove = bitmap_andnot(aqm_unassign, prev_aqm, cur_aqm, AP_DOMAINS);
++
++	mutex_lock(&matrix_dev->lock);
++	matrix_dev->flags |= AP_MATRIX_CFG_CHG;
++
++	list_for_each_entry(matrix_mdev, &matrix_dev->mdev_list, node) {
++		if (!vfio_ap_mdev_has_crycb(matrix_mdev))
++			continue;
++
++		unassigned = false;
++
++		if (ap_remove)
++			if (bitmap_intersects(matrix_mdev->shadow_crycb.apm,
++					      apm_unassign, AP_DEVICES))
++				if (vfio_ap_mdev_unassign_apids(matrix_mdev,
++								apm_unassign))
++					unassigned = true;
++		if (aq_remove)
++			if (bitmap_intersects(matrix_mdev->shadow_crycb.aqm,
++					      aqm_unassign, AP_DOMAINS))
++				if (vfio_ap_mdev_unassign_apqis(matrix_mdev,
++								aqm_unassign))
++					unassigned = true;
++
++		if (unassigned)
++			vfio_ap_mdev_commit_crycb(matrix_mdev);
++	}
++	mutex_unlock(&matrix_dev->lock);
++}
+diff --git a/drivers/s390/crypto/vfio_ap_private.h b/drivers/s390/crypto/vfio_ap_private.h
+index 794c60a767d2..82abbf03781f 100644
+--- a/drivers/s390/crypto/vfio_ap_private.h
++++ b/drivers/s390/crypto/vfio_ap_private.h
+@@ -40,11 +40,14 @@
+ struct ap_matrix_dev {
+ 	struct device device;
+ 	atomic_t available_instances;
+-	struct ap_config_info info;
++	struct ap_config_info config_info;
++	struct ap_config_info config_info_prev;
+ 	struct list_head mdev_list;
+ 	struct mutex lock;
+ 	struct ap_driver  *vfio_ap_drv;
+ 	DECLARE_HASHTABLE(qtable, 8);
++	#define AP_MATRIX_CFG_CHG (1UL << 0)
++	unsigned long flags;
  };
  
- #define to_ap_drv(x) container_of((x), struct ap_driver, driver)
+ extern struct ap_matrix_dev *matrix_dev;
+@@ -109,5 +112,7 @@ int vfio_ap_mdev_probe_queue(struct ap_queue *queue);
+ void vfio_ap_mdev_remove_queue(struct ap_queue *queue);
+ 
+ bool vfio_ap_mdev_resource_in_use(unsigned long *apm, unsigned long *aqm);
++void vfio_ap_on_cfg_changed(struct ap_config_info *new_config_info,
++			    struct ap_config_info *old_config_info);
+ 
+ #endif /* _VFIO_AP_PRIVATE_H_ */
 -- 
 2.21.1
 
