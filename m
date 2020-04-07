@@ -2,67 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0D3B81A093C
-	for <lists+kvm@lfdr.de>; Tue,  7 Apr 2020 10:21:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 440D21A093E
+	for <lists+kvm@lfdr.de>; Tue,  7 Apr 2020 10:21:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727384AbgDGIVl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Apr 2020 04:21:41 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:33589 "EHLO
+        id S1727883AbgDGIVx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Apr 2020 04:21:53 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:48750 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725883AbgDGIVl (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 7 Apr 2020 04:21:41 -0400
+        by vger.kernel.org with ESMTP id S1727800AbgDGIVw (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 7 Apr 2020 04:21:52 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1586247698;
+        s=mimecast20190719; t=1586247711;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         to:to:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=KGjexata8cgoUC9UiyFJjrVjQvLuNHhkxnZiiQMvC7E=;
-        b=Im5yTjy/MEABPhHS1qLRjdNU/8dWk7Iut3cT3Ft6lZneNDwQX0/UA0UZNoU1TyzeeI2sFa
-        3Ug6FuR9DrnHXsOJbkiSYv9hGMHp/BTXdXPRnJTaWmO+hpIQYahUpaU6a+npR/eYzoQHIZ
-        cWWPftvP99XPEf3ZgKxrp2IBPQ9oj8M=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-462-C-lcOv-PPaKx-AxVcHAUFg-1; Tue, 07 Apr 2020 04:21:36 -0400
-X-MC-Unique: C-lcOv-PPaKx-AxVcHAUFg-1
-Received: by mail-wm1-f70.google.com with SMTP id i15so2002wmb.1
-        for <kvm@vger.kernel.org>; Tue, 07 Apr 2020 01:21:36 -0700 (PDT)
+        bh=K15spboYUeYf/bjn+WnbKry7UBlqA+ppBvnlRgm50mY=;
+        b=Eb5QURn7lRqvmMfp/i6nR69AJbyJtGeq1QnyYFQTxSCRg4VzQZm9l+qw2066Zi+0o/I9lH
+        /RC6gI7R5/Szaiq1OucsxuqE3syfRpZSYji7ud7NLQYYct9lZMAch3fNvgLshRtXTvynq+
+        /fmfic00E3/sYtP0nSFiPI4oYz+s3oQ=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-402-ymXkWuKVO-2gkd7DWcWzKQ-1; Tue, 07 Apr 2020 04:21:49 -0400
+X-MC-Unique: ymXkWuKVO-2gkd7DWcWzKQ-1
+Received: by mail-wm1-f69.google.com with SMTP id z24so388766wml.9
+        for <kvm@vger.kernel.org>; Tue, 07 Apr 2020 01:21:49 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+        h=x-gm-message-state:subject:to:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=KGjexata8cgoUC9UiyFJjrVjQvLuNHhkxnZiiQMvC7E=;
-        b=YpUkWlvePqi4acJJmmihcc4saj6KMhU1oBjlWYTLjzYFH/2ebiVbMJZHpw+AdWYJzs
-         sMMjFSyGwWtReCfxiPd1pMLuKCKgVCxgmMRjK51DpA5zQxxtgkAV5JpbJbsH2acH30YZ
-         pk4oZu58Y3yYuEL6h12xE81xvxrdCJ7EW9MzCvIaLkD8lXvs+oR4u/0FKjqgg+vEjVqw
-         wqjRH1OqmjUbaKbbupFKP7FT49DwBItxrI9YcfljZGx8acXFxXI0XyI41vU61P+6oq49
-         9NRMszkxu5d8KOtU1HjEOrXJHcgFgzyqlfht732idVY9MNc+oriuxkA9O/xDTlxlC/P3
-         C7RA==
-X-Gm-Message-State: AGi0PuZ20YDnmW+VDS0S7dperBNPsl9bJ7kv5mgvWoWx0q3M2tRgwPg9
-        XjHmuKj2j+uSFk04wxA5ny3MirA6rvnFgl09COQryVSgyYZOD/vH53NtPj8K0gmwPa0tDOl9/1E
-        xw0KCf0LN8Mnh
-X-Received: by 2002:a1c:2cc6:: with SMTP id s189mr1203981wms.137.1586247695593;
-        Tue, 07 Apr 2020 01:21:35 -0700 (PDT)
-X-Google-Smtp-Source: APiQypIA9Q+eC0RiW5iVlbpMeMyuZpUveBHNLb62+NerZ2oMFQU0aIPg1yHbLtf4Lfj7TZlv8rslhA==
-X-Received: by 2002:a1c:2cc6:: with SMTP id s189mr1203962wms.137.1586247695328;
-        Tue, 07 Apr 2020 01:21:35 -0700 (PDT)
+        bh=K15spboYUeYf/bjn+WnbKry7UBlqA+ppBvnlRgm50mY=;
+        b=A6Fauuf9p/rS+m5TDs1JprnemiFa/30QUVEYZpAoArOzbFIl/mu9Je8CMTSvm7UfXC
+         77N4Q2gRz7GxYVIvLQWytPtlviOOeXPuKz3ps7LhE+FcBh80MrVqOVSCPvZ69sOVP0U0
+         UdXv9eJSzPWf0465ngcsmg++ptxiNMYIJUMIz36k1LZFQsDn29qR6jO3ygOjxVYJ7XuS
+         ZRty+HE4mi2So/1vxsOySBjcT2cjISz1aC1bh/hGADRnboEhA46k2v7lS8KQrzO74zna
+         4LAcsSGA+L1Mgi1ov+iTl5yBljHtkk75z/AWAYCIyFjltsb78DcAXS0pj7namQyLPESG
+         MPhw==
+X-Gm-Message-State: AGi0PubJHuX0F5SBL/aynGA1pbb/f24h5rKrZZ65ZvlYoUYV3Sv8b9Ah
+        RBJGsAtjGT5GT85zxld/n8JyhcBVIiXoe4s5l+FHReg0xsh7uGbTBnCBJazF+MOQVmFr1Dp2f5R
+        D+NeZo1AISCnS
+X-Received: by 2002:adf:a448:: with SMTP id e8mr1362981wra.238.1586247708021;
+        Tue, 07 Apr 2020 01:21:48 -0700 (PDT)
+X-Google-Smtp-Source: APiQypL7oxoG+5qTFvSOQ7tJJy8npe9AKnp7V/bjHcxO1D8kR5OQp0szKSt9DFNY2rRfqhTgy8iD9g==
+X-Received: by 2002:adf:a448:: with SMTP id e8mr1362951wra.238.1586247707721;
+        Tue, 07 Apr 2020 01:21:47 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:98c9:e86f:5fe7:54a5? ([2001:b07:6468:f312:98c9:e86f:5fe7:54a5])
-        by smtp.gmail.com with ESMTPSA id f62sm1295295wmf.44.2020.04.07.01.21.34
+        by smtp.gmail.com with ESMTPSA id a15sm1335558wme.17.2020.04.07.01.21.47
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 07 Apr 2020 01:21:34 -0700 (PDT)
-Subject: Re: [PATCH v2] KVM: VMX: Remove unnecessary exception trampoline in
- vmx_vmenter
-To:     Uros Bizjak <ubizjak@gmail.com>, kvm@vger.kernel.org
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>
-References: <20200406202108.74300-1-ubizjak@gmail.com>
+        Tue, 07 Apr 2020 01:21:47 -0700 (PDT)
+Subject: Re: [PATCH] KVM: nVMX: don't clear mtf_pending when nested events are
+ blocked
+To:     Oliver Upton <oupton@google.com>, kvm@vger.kernel.org
+References: <20200406201237.178725-1-oupton@google.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <ae555942-b2a1-be6c-e695-5c02bff554bd@redhat.com>
-Date:   Tue, 7 Apr 2020 10:21:34 +0200
+Message-ID: <f7688790-02bc-e634-eff6-e58d25da31a4@redhat.com>
+Date:   Tue, 7 Apr 2020 10:21:46 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200406202108.74300-1-ubizjak@gmail.com>
+In-Reply-To: <20200406201237.178725-1-oupton@google.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -71,40 +70,30 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 06/04/20 22:21, Uros Bizjak wrote:
-> The exception trampoline in .fixup section is not needed, the exception
-> handling code can jump directly to the label in the .text section.
+On 06/04/20 22:12, Oliver Upton wrote:
+> If nested events are blocked, don't clear the mtf_pending flag to avoid
+> missing later delivery of the MTF VM-exit.
 > 
-> Changes since v1:
-> - Fix commit message.
-> 
-> Cc: Sean Christopherson <sean.j.christopherson@intel.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Reviewed-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> Signed-off-by: Uros Bizjak <ubizjak@gmail.com>
+> Fixes: 5ef8acbdd687c ("KVM: nVMX: Emulate MTF when performing instruction emulation")
+> Signed-off-by: Oliver Upton <oupton@google.com>
 > ---
->  arch/x86/kvm/vmx/vmenter.S | 8 ++------
->  1 file changed, 2 insertions(+), 6 deletions(-)
+>  arch/x86/kvm/vmx/nested.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
 > 
-> diff --git a/arch/x86/kvm/vmx/vmenter.S b/arch/x86/kvm/vmx/vmenter.S
-> index 81ada2ce99e7..56d701db8734 100644
-> --- a/arch/x86/kvm/vmx/vmenter.S
-> +++ b/arch/x86/kvm/vmx/vmenter.S
-> @@ -58,12 +58,8 @@ SYM_FUNC_START(vmx_vmenter)
->  	ret
->  4:	ud2
+> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> index de232306561a0..cbc9ea2de28f9 100644
+> --- a/arch/x86/kvm/vmx/nested.c
+> +++ b/arch/x86/kvm/vmx/nested.c
+> @@ -3645,7 +3645,8 @@ static int vmx_check_nested_events(struct kvm_vcpu *vcpu)
+>  	 * Clear the MTF state. If a higher priority VM-exit is delivered first,
+>  	 * this state is discarded.
+>  	 */
+> -	vmx->nested.mtf_pending = false;
+> +	if (!block_nested_events)
+> +		vmx->nested.mtf_pending = false;
 >  
-> -	.pushsection .fixup, "ax"
-> -5:	jmp 3b
-> -	.popsection
-> -
-> -	_ASM_EXTABLE(1b, 5b)
-> -	_ASM_EXTABLE(2b, 5b)
-> +	_ASM_EXTABLE(1b, 3b)
-> +	_ASM_EXTABLE(2b, 3b)
->  
->  SYM_FUNC_END(vmx_vmenter)
->  
+>  	if (lapic_in_kernel(vcpu) &&
+>  		test_bit(KVM_APIC_INIT, &apic->pending_events)) {
 > 
 
 Queued, thanks.
