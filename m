@@ -2,352 +2,193 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 31A5B1A107F
-	for <lists+kvm@lfdr.de>; Tue,  7 Apr 2020 17:46:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 58CC41A10CE
+	for <lists+kvm@lfdr.de>; Tue,  7 Apr 2020 17:58:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726806AbgDGPqD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Apr 2020 11:46:03 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:31756 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726637AbgDGPqD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Apr 2020 11:46:03 -0400
+        id S1727512AbgDGP6S (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Apr 2020 11:58:18 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:33159 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726930AbgDGP6S (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 7 Apr 2020 11:58:18 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1586274362;
+        s=mimecast20190719; t=1586275096;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=cjZxTnYiiQOiGbCeQOJMkwdfCCa6o8kDSXhq/4N/Y40=;
-        b=gPSYfOX4Yi2xEnsUqOWmMU7MxKua+DWqXGISe9RzPGKsBk2HNpU5haXC6khd3/4SsPFQuC
-        VYUofKCh1osN5zg5PZmIX9JCYarwzHxHThDTGMD7nnUv010+UMNEmeiZvo0CM8RSeBahLd
-        ZvnNgw3RQwifTqyx4GSdwN6pN3Aml3Y=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-310-4B0QzFpmNBmJV75PdjRGLw-1; Tue, 07 Apr 2020 11:45:59 -0400
-X-MC-Unique: 4B0QzFpmNBmJV75PdjRGLw-1
-Received: by mail-wr1-f72.google.com with SMTP id 91so2179321wro.1
-        for <kvm@vger.kernel.org>; Tue, 07 Apr 2020 08:45:59 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=cjZxTnYiiQOiGbCeQOJMkwdfCCa6o8kDSXhq/4N/Y40=;
-        b=GpFWCjxPr8TL6/aZp45Aa8xwNRgJec3eZ7RL9FQXkC5EzoNNdOcl3s6HM/ixpdL9V/
-         ie0h4/Ww+8ny6Fw/3kXmGTTCK+fc81JIB/RYY0wG7s4zSGG11hPcwqNJr4IVtFNmp8eS
-         2VmQt2Or7RLqH/iRZKehE9twumNzwNKnPgPZDsmJBYklnv5DNl9CDO4rdWcUQFUNn3Zs
-         nhDDNocoiX5A+yE5VN219byaPRa38KFrxTsieEmNjyEGp2GY4dma5LVknOtc9ohFiX1y
-         8K31+yCIBWvZr6MDvh/AfDpdpOabUchTLbx2rzVlLgZvMMfTHNNZZylVrwL86evq2WCk
-         2+bA==
-X-Gm-Message-State: AGi0PuYxYVYDC5G9ozYndJqIojgVgEHcvdOmtkLhftU31iMrZNpEuIXG
-        iTAKf1m1rX/0moIH9X2x6Om9mTX1GPU+8ihN1HjIXhfMiduxJt8Pw0owvqWLcB+hoMvyyl/t31Y
-        hFO+Ww8rQl9F6
-X-Received: by 2002:a1c:741a:: with SMTP id p26mr2787408wmc.104.1586274358014;
-        Tue, 07 Apr 2020 08:45:58 -0700 (PDT)
-X-Google-Smtp-Source: APiQypKESKYRIxOxNwNLbOzKtQVyp0wJ110m669FoTW85m3Hkw1+G3BjPPoxewjP5oIKFsLQEugm1A==
-X-Received: by 2002:a1c:741a:: with SMTP id p26mr2787389wmc.104.1586274357706;
-        Tue, 07 Apr 2020 08:45:57 -0700 (PDT)
-Received: from [192.168.10.150] ([93.56.170.5])
-        by smtp.gmail.com with ESMTPSA id n131sm2861031wmf.35.2020.04.07.08.45.56
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 07 Apr 2020 08:45:57 -0700 (PDT)
-Subject: Re: [PATCH kvm-unit-tests v2] arch-run: Add reserved variables to the
- default environ
-To:     Andrew Jones <drjones@redhat.com>, kvm@vger.kernel.org
-Cc:     lvivier@redhat.com, thuth@redhat.com, david@redhat.com,
-        frankja@linux.ibm.com
-References: <20200407113312.65587-1-drjones@redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <ea6a1988-c718-f0a4-7428-e01ecffe00dd@redhat.com>
-Date:   Tue, 7 Apr 2020 17:45:56 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+        bh=yUYJ5bzo+BJgODaE1JfQ2ZwXtILNlfRLeWjodd722hM=;
+        b=QXKT36HqNxAknme6knr7Ko2ovswjbg6yzzWZ4zja+w+P4raeSR1UmhAQElcibhNZQaepQ5
+        tSm9mabjC1jh5OMgj3HMJxpxYvsyT/X2fDMSgWp5ij3U6fJYqjxYzWWZrEn60UhzkykB1t
+        tLHcx5c2R7paQORdBaQR78CiT547RGw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-87-dKrGDez7O2ilzpapPbNMew-1; Tue, 07 Apr 2020 11:58:12 -0400
+X-MC-Unique: dKrGDez7O2ilzpapPbNMew-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E9A78DB61;
+        Tue,  7 Apr 2020 15:58:10 +0000 (UTC)
+Received: from w520.home (ovpn-112-162.phx2.redhat.com [10.3.112.162])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 7EC4560BEC;
+        Tue,  7 Apr 2020 15:58:02 +0000 (UTC)
+Date:   Tue, 7 Apr 2020 09:58:01 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     "Tian, Kevin" <kevin.tian@intel.com>
+Cc:     "Liu, Yi L" <yi.l.liu@intel.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "Tian, Jun J" <jun.j.tian@intel.com>,
+        "Sun, Yi Y" <yi.y.sun@intel.com>,
+        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Wu, Hao" <hao.wu@intel.com>
+Subject: Re: [PATCH v1 2/2] vfio/pci: Emulate PASID/PRI capability for VFs
+Message-ID: <20200407095801.648b1371@w520.home>
+In-Reply-To: <AADFC41AFE54684AB9EE6CBC0274A5D19D80E13D@SHSMSX104.ccr.corp.intel.com>
+References: <1584880394-11184-1-git-send-email-yi.l.liu@intel.com>
+        <1584880394-11184-3-git-send-email-yi.l.liu@intel.com>
+        <20200402165954.48d941ee@w520.home>
+        <A2975661238FB949B60364EF0F2C25743A2204FE@SHSMSX104.ccr.corp.intel.com>
+        <20200403112545.6c115ba3@w520.home>
+        <AADFC41AFE54684AB9EE6CBC0274A5D19D80E13D@SHSMSX104.ccr.corp.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20200407113312.65587-1-drjones@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 07/04/20 13:33, Andrew Jones wrote:
-> Add the already reserved (see README) variables to the default
-> environ. To do so neatly we rework the environ creation a bit too.
-> mkstandalone also learns to honor config.mak as to whether or not
-> to make environs, and we allow the $ERRATATXT file to be selected
-> at configure time.
-> 
-> Signed-off-by: Andrew Jones <drjones@redhat.com>
-> ---
-> 
-> v2: Improve error handling of missing erratatxt files.
-> 
->  configure               |  13 ++++-
->  scripts/arch-run.bash   | 125 +++++++++++++++++++++++++---------------
->  scripts/mkstandalone.sh |   9 ++-
->  3 files changed, 97 insertions(+), 50 deletions(-)
-> 
-> diff --git a/configure b/configure
-> index 579765165fdf..5d2cd90cd180 100755
-> --- a/configure
-> +++ b/configure
-> @@ -17,6 +17,7 @@ environ_default=yes
->  u32_long=
->  vmm="qemu"
->  errata_force=0
-> +erratatxt="errata.txt"
->  
->  usage() {
->      cat <<-EOF
-> @@ -37,6 +38,8 @@ usage() {
->  	    --[enable|disable]-default-environ
->  	                           enable or disable the generation of a default environ when
->  	                           no environ is provided by the user (enabled by default)
-> +	    --erratatxt=FILE       specify a file to use instead of errata.txt. Use
-> +	                           '--erratatxt=' to ensure no file is used.
->  EOF
->      exit 1
->  }
-> @@ -85,6 +88,9 @@ while [[ "$1" = -* ]]; do
->  	--disable-default-environ)
->  	    environ_default=no
->  	    ;;
-> +	--erratatxt)
-> +	    erratatxt="$arg"
-> +	    ;;
->  	--help)
->  	    usage
->  	    ;;
-> @@ -94,6 +100,11 @@ while [[ "$1" = -* ]]; do
->      esac
->  done
->  
-> +if [ "$erratatxt" ] && [ ! -f "$erratatxt" ]; then
-> +    echo "erratatxt: $erratatxt does not exist or is not a regular file"
-> +    exit 1
-> +fi
-> +
->  arch_name=$arch
->  [ "$arch" = "aarch64" ] && arch="arm64"
->  [ "$arch_name" = "arm64" ] && arch_name="aarch64"
-> @@ -194,7 +205,7 @@ FIRMWARE=$firmware
->  ENDIAN=$endian
->  PRETTY_PRINT_STACKS=$pretty_print_stacks
->  ENVIRON_DEFAULT=$environ_default
-> -ERRATATXT=errata.txt
-> +ERRATATXT=$erratatxt
->  U32_LONG_FMT=$u32_long
->  EOF
->  
-> diff --git a/scripts/arch-run.bash b/scripts/arch-run.bash
-> index da1a9d7871e5..8348761d86ff 100644
-> --- a/scripts/arch-run.bash
-> +++ b/scripts/arch-run.bash
-> @@ -28,9 +28,9 @@ run_qemu ()
->  {
->  	local stdout errors ret sig
->  
-> +	initrd_create || return $?
->  	echo -n "$@"
-> -	initrd_create &&
-> -		echo -n " #"
-> +	[ "$ENVIRON_DEFAULT" = "yes" ] && echo -n " #"
->  	echo " $INITRD"
->  
->  	# stdout to {stdout}, stderr to $errors and stderr
-> @@ -195,60 +195,91 @@ search_qemu_binary ()
->  
->  initrd_create ()
->  {
-> -	local ret
-> -
-> -	env_add_errata
-> -	ret=$?
-> +	if [ "$ENVIRON_DEFAULT" = "yes" ]; then
-> +		trap_exit_push 'rm -f $KVM_UNIT_TESTS_ENV; [ "$KVM_UNIT_TESTS_ENV_OLD" ] && export KVM_UNIT_TESTS_ENV="$KVM_UNIT_TESTS_ENV_OLD" || unset KVM_UNIT_TESTS_ENV; unset KVM_UNIT_TESTS_ENV_OLD'
-> +		[ -f "$KVM_UNIT_TESTS_ENV" ] && export KVM_UNIT_TESTS_ENV_OLD="$KVM_UNIT_TESTS_ENV"
-> +		export KVM_UNIT_TESTS_ENV=$(mktemp)
-> +		env_params
-> +		env_file
-> +		env_errata || return $?
-> +	fi
->  
->  	unset INITRD
->  	[ -f "$KVM_UNIT_TESTS_ENV" ] && INITRD="-initrd $KVM_UNIT_TESTS_ENV"
->  
-> -	return $ret
-> +	return 0
->  }
->  
-> -env_add_errata ()
-> +env_add_params ()
->  {
-> -	local line errata ret=1
-> +	local p
->  
-> -	if [ -f "$KVM_UNIT_TESTS_ENV" ] && grep -q '^ERRATA_' <(env); then
-> -		for line in $(grep '^ERRATA_' "$KVM_UNIT_TESTS_ENV"); do
-> -			errata=${line%%=*}
-> -			[ -n "${!errata}" ] && continue
-> +	for p in "$@"; do
-> +		if eval test -v $p; then
-> +			eval export "$p"
-> +		else
-> +			eval export "$p="
-> +		fi
-> +		grep "^$p=" <(env) >>$KVM_UNIT_TESTS_ENV
-> +	done
-> +}
-> +
-> +env_params ()
-> +{
-> +	local qemu have_qemu
-> +	local _ rest
-> +
-> +	qemu=$(search_qemu_binary) && have_qemu=1
-> +
-> +	if [ "$have_qemu" ]; then
-> +		if [ -n "$ACCEL" ] || [ -n "$QEMU_ACCEL" ]; then
-> +			[ -n "$ACCEL" ] && QEMU_ACCEL=$ACCEL
-> +		fi
-> +		QEMU_VERSION_STRING="$($qemu -h | head -1)"
-> +		IFS='[ .]' read -r _ _ _ QEMU_MAJOR QEMU_MINOR QEMU_MICRO rest <<<"$QEMU_VERSION_STRING"
-> +	fi
-> +	env_add_params QEMU_ACCEL QEMU_VERSION_STRING QEMU_MAJOR QEMU_MINOR QEMU_MICRO
-> +
-> +	KERNEL_VERSION_STRING=$(uname -r)
-> +	IFS=. read -r KERNEL_VERSION KERNEL_PATCHLEVEL rest <<<"$KERNEL_VERSION_STRING"
-> +	IFS=- read -r KERNEL_SUBLEVEL KERNEL_EXTRAVERSION <<<"$rest"
-> +	KERNEL_SUBLEVEL=${KERNEL_SUBLEVEL%%[!0-9]*}
-> +	KERNEL_EXTRAVERSION=${KERNEL_EXTRAVERSION%%[!0-9]*}
-> +	! [[ $KERNEL_SUBLEVEL =~ ^[0-9]+$ ]] && unset $KERNEL_SUBLEVEL
-> +	! [[ $KERNEL_EXTRAVERSION =~ ^[0-9]+$ ]] && unset $KERNEL_EXTRAVERSION
-> +	env_add_params KERNEL_VERSION_STRING KERNEL_VERSION KERNEL_PATCHLEVEL KERNEL_SUBLEVEL KERNEL_EXTRAVERSION
-> +}
-> +
-> +env_file ()
-> +{
-> +	local line var
-> +
-> +	[ ! -f "$KVM_UNIT_TESTS_ENV_OLD" ] && return
-> +
-> +	for line in $(grep -E '^[[:blank:]]*[[:alpha:]_][[:alnum:]_]*=' "$KVM_UNIT_TESTS_ENV_OLD"); do
-> +		var=${line%%=*}
-> +		if ! grep -q "^$var=" $KVM_UNIT_TESTS_ENV; then
->  			eval export "$line"
-> -		done
-> -	elif [ ! -f "$KVM_UNIT_TESTS_ENV" ]; then
-> +			grep "^$var=" <(env) >>$KVM_UNIT_TESTS_ENV
-> +		fi
-> +	done
-> +}
-> +
-> +env_errata ()
-> +{
-> +	if [ "$ERRATATXT" ] && [ ! -f "$ERRATATXT" ]; then
-> +		echo "$ERRATATXT not found. (ERRATATXT=$ERRATATXT)" >&2
-> +		return 2
-> +	elif [ "$ERRATATXT" ]; then
->  		env_generate_errata
->  	fi
-> -
-> -	if grep -q '^ERRATA_' <(env); then
-> -		export KVM_UNIT_TESTS_ENV_OLD="$KVM_UNIT_TESTS_ENV"
-> -		export KVM_UNIT_TESTS_ENV=$(mktemp)
-> -		trap_exit_push 'rm -f $KVM_UNIT_TESTS_ENV; [ "$KVM_UNIT_TESTS_ENV_OLD" ] && export KVM_UNIT_TESTS_ENV="$KVM_UNIT_TESTS_ENV_OLD" || unset KVM_UNIT_TESTS_ENV; unset KVM_UNIT_TESTS_ENV_OLD'
-> -		[ -f "$KVM_UNIT_TESTS_ENV_OLD" ] && grep -v '^ERRATA_' "$KVM_UNIT_TESTS_ENV_OLD" > $KVM_UNIT_TESTS_ENV
-> -		grep '^ERRATA_' <(env) >> $KVM_UNIT_TESTS_ENV
-> -		ret=0
-> -	fi
-> -
-> -	return $ret
-> +	sort <(env | grep '^ERRATA_') <(grep '^ERRATA_' $KVM_UNIT_TESTS_ENV) | uniq -u >>$KVM_UNIT_TESTS_ENV
->  }
->  
->  env_generate_errata ()
->  {
-> -	local kernel_version_string=$(uname -r)
-> -	local kernel_version kernel_patchlevel kernel_sublevel kernel_extraversion
->  	local line commit minver errata rest v p s x have
->  
-> -	IFS=. read -r kernel_version kernel_patchlevel rest <<<"$kernel_version_string"
-> -	IFS=- read -r kernel_sublevel kernel_extraversion <<<"$rest"
-> -	kernel_sublevel=${kernel_sublevel%%[!0-9]*}
-> -	kernel_extraversion=${kernel_extraversion%%[!0-9]*}
-> -
-> -	! [[ $kernel_sublevel =~ ^[0-9]+$ ]] && unset $kernel_sublevel
-> -	! [[ $kernel_extraversion =~ ^[0-9]+$ ]] && unset $kernel_extraversion
-> -
-> -	[ "$ENVIRON_DEFAULT" != "yes" ] && return
-> -	[ ! -f "$ERRATATXT" ] && return
-> -
->  	for line in $(grep -v '^#' "$ERRATATXT" | tr -d '[:blank:]' | cut -d: -f1,2); do
->  		commit=${line%:*}
->  		minver=${line#*:}
-> @@ -269,16 +300,16 @@ env_generate_errata ()
->  		! [[ $s =~ ^[0-9]+$ ]] && unset $s
->  		! [[ $x =~ ^[0-9]+$ ]] && unset $x
->  
-> -		if (( $kernel_version > $v ||
-> -		      ($kernel_version == $v && $kernel_patchlevel > $p) )); then
-> +		if (( $KERNEL_VERSION > $v ||
-> +		      ($KERNEL_VERSION == $v && $KERNEL_PATCHLEVEL > $p) )); then
->  			have=y
-> -		elif (( $kernel_version == $v && $kernel_patchlevel == $p )); then
-> -			if [ "$kernel_sublevel" ] && [ "$s" ]; then
-> -				if (( $kernel_sublevel > $s )); then
-> +		elif (( $KERNEL_VERSION == $v && $KERNEL_PATCHLEVEL == $p )); then
-> +			if [ "$KERNEL_SUBLEVEL" ] && [ "$s" ]; then
-> +				if (( $KERNEL_SUBLEVEL > $s )); then
->  					have=y
-> -				elif (( $kernel_sublevel == $s )); then
-> -					if [ "$kernel_extraversion" ] && [ "$x" ]; then
-> -						if (( $kernel_extraversion >= $x )); then
-> +				elif (( $KERNEL_SUBLEVEL == $s )); then
-> +					if [ "$KERNEL_EXTRAVERSION" ] && [ "$x" ]; then
-> +						if (( $KERNEL_EXTRAVERSION >= $x )); then
->  							have=y
->  						else
->  							have=n
-> diff --git a/scripts/mkstandalone.sh b/scripts/mkstandalone.sh
-> index c1ecb7f99cdc..9d506cc95072 100755
-> --- a/scripts/mkstandalone.sh
-> +++ b/scripts/mkstandalone.sh
-> @@ -36,7 +36,7 @@ generate_test ()
->  
->  	echo "#!/usr/bin/env bash"
->  	echo "export STANDALONE=yes"
-> -	echo "export ENVIRON_DEFAULT=yes"
-> +	echo "export ENVIRON_DEFAULT=$ENVIRON_DEFAULT"
->  	echo "export HOST=\$(uname -m | sed -e 's/i.86/i386/;s/arm.*/arm/;s/ppc64.*/ppc64/')"
->  	echo "export PRETTY_PRINT_STACKS=no"
->  
-> @@ -59,7 +59,7 @@ generate_test ()
->  		echo 'export FIRMWARE'
->  	fi
->  
-> -	if [ "$ERRATATXT" ]; then
-> +	if [ "$ENVIRON_DEFAULT" = "yes" ] && [ "$ERRATATXT" ]; then
->  		temp_file ERRATATXT "$ERRATATXT"
->  		echo 'export ERRATATXT'
->  	fi
-> @@ -99,6 +99,11 @@ function mkstandalone()
->  	echo Written $standalone.
->  }
->  
-> +if [ "$ENVIRON_DEFAULT" = "yes" ] && [ "$ERRATATXT" ] && [ ! -f "$ERRATATXT" ]; then
-> +	echo "$ERRATATXT not found. (ERRATATXT=$ERRATATXT)" >&2
-> +	exit 2
-> +fi
-> +
->  trap 'rm -f $cfg' EXIT
->  cfg=$(mktemp)
->  
-> 
+On Tue, 7 Apr 2020 04:26:23 +0000
+"Tian, Kevin" <kevin.tian@intel.com> wrote:
 
-Queued, thanks.
+> > From: Alex Williamson <alex.williamson@redhat.com>
+> > Sent: Saturday, April 4, 2020 1:26 AM  
+> [...]
+> > > > > +	if (!pasid_cap.control_reg.paside) {
+> > > > > +		pr_debug("%s: its PF's PASID capability is not enabled\n",
+> > > > > +			dev_name(&vdev->pdev->dev));
+> > > > > +		ret = 0;
+> > > > > +		goto out;
+> > > > > +	}  
+> > > >
+> > > > What happens if the PF's PASID gets disabled while we're using it??  
+> > >
+> > > This is actually the open I highlighted in cover letter. Per the reply
+> > > from Baolu, this seems to be an open for bare-metal all the same.
+> > > https://lkml.org/lkml/2020/3/31/95  
+> > 
+> > Seems that needs to get sorted out before we can expose this.  Maybe
+> > some sort of registration with the PF driver that PASID is being used
+> > by a VF so it cannot be disabled?  
+> 
+> I guess we may do vSVA for PF first, and then adding VF vSVA later
+> given above additional need. It's not necessarily to enable both
+> in one step.
+> 
+> [...]
+> > > > > @@ -1604,6 +1901,18 @@ static int vfio_ecap_init(struct  
+> > vfio_pci_device *vdev)  
+> > > > >  	if (!ecaps)
+> > > > >  		*(u32 *)&vdev->vconfig[PCI_CFG_SPACE_SIZE] = 0;
+> > > > >
+> > > > > +#ifdef CONFIG_PCI_ATS
+> > > > > +	if (pdev->is_virtfn) {
+> > > > > +		struct pci_dev *physfn = pdev->physfn;
+> > > > > +
+> > > > > +		ret = vfio_pci_add_emulated_cap_for_vf(vdev,
+> > > > > +					physfn, epos_max, prev);
+> > > > > +		if (ret)
+> > > > > +			pr_info("%s, failed to add special caps for VF %s\n",
+> > > > > +				__func__, dev_name(&vdev->pdev->dev));
+> > > > > +	}
+> > > > > +#endif  
+> > > >
+> > > > I can only imagine that we should place the caps at the same location
+> > > > they exist on the PF, we don't know what hidden registers might be
+> > > > hiding in config space.  
+> 
+> Is there vendor guarantee that hidden registers will locate at the
+> same offset between PF and VF config space? 
 
-Paolo
+I'm not sure if the spec really precludes hidden registers, but the
+fact that these registers are explicitly outside of the capability
+chain implies they're only intended for device specific use, so I'd say
+there are no guarantees about anything related to these registers.
+
+FWIW, vfio started out being more strict about restricting config space
+access to defined capabilities, until...
+
+commit a7d1ea1c11b33bda2691f3294b4d735ed635535a
+Author: Alex Williamson <alex.williamson@redhat.com>
+Date:   Mon Apr 1 09:04:12 2013 -0600
+
+    vfio-pci: Enable raw access to unassigned config space
+    
+    Devices like be2net hide registers between the gaps in capabilities
+    and architected regions of PCI config space.  Our choices to support
+    such devices is to either build an ever growing and unmanageable white
+    list or rely on hardware isolation to protect us.  These registers are
+    really no different than MMIO or I/O port space registers, which we
+    don't attempt to regulate, so treat PCI config space in the same way.
+
+> > > but we are not sure whether the same location is available on VF. In
+> > > this patch, it actually places the emulated cap physically behind the
+> > > cap which lays farthest (its offset is largest) within VF's config space
+> > > as the PCIe caps are linked in a chain.  
+> > 
+> > But, as we've found on Broadcom NICs (iirc), hardware developers have a
+> > nasty habit of hiding random registers in PCI config space, outside of
+> > defined capabilities.  I feel like IGD might even do this too, is that
+> > true?  So I don't think we can guarantee that just because a section of
+> > config space isn't part of a defined capability that its unused.  It
+> > only means that it's unused by common code, but it might have device
+> > specific purposes.  So of the PCIe spec indicates that VFs cannot
+> > include these capabilities and virtialization software needs to
+> > emulate them, we need somewhere safe to place them in config space, and
+> > simply placing them off the end of known capabilities doesn't give me
+> > any confidence.  Also, hardware has no requirement to make compact use
+> > of extended config space.  The first capability must be at 0x100, the
+> > very next capability could consume all the way to the last byte of the
+> > 4K extended range, and the next link in the chain could be somewhere in
+> > the middle.  Thanks,
+> >   
+> 
+> Then what would be a viable option? Vendor nasty habit implies
+> no standard, thus I don't see how VFIO can find a safe location
+> by itself. Also curious how those hidden registers are identified
+> by VFIO and employed with proper r/w policy today. If sort of quirks
+> are used, then could such quirk way be extended to also carry
+> the information about vendor specific safe location? When no
+> such quirk info is provided (the majority case), VFIO then finds
+> out a free location to carry the new cap.
+
+See above commit, rather than quirks we allow raw access to any config
+space outside of the capability chain.  My preference for trying to
+place virtual capabilities at the same offset as the capability exists
+on the PF is my impression that the PF config space is often a template
+for the VF config space.  The PF and VF are clearly not independent
+devices, they share design aspects, and sometimes drivers.  Therefore
+if I was a lazy engineer trying to find a place to hide a register in
+config space (and ignoring vendor capabilities*), I'd probably put it
+in the same place on both devices.  Thus if we maintain the same
+capability footprint as the PF, we have a better chance of avoiding
+them.  It's a gamble and maybe we're overthinking it, but this has
+always been a concern when adding virtual capabilities to a physical
+device.  We can always fail over to an approach where we simply find
+free space.  Thanks,
+
+Alex
+
+* ISTR the Broadcom device implemented the hidden register in standard
+  config space, which was otherwise entirely packed, ie. there was no
+  room for the register to be implemented as a vendor cap.
 
