@@ -2,170 +2,147 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 570291A03E8
-	for <lists+kvm@lfdr.de>; Tue,  7 Apr 2020 02:58:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EE5421A0404
+	for <lists+kvm@lfdr.de>; Tue,  7 Apr 2020 03:08:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726396AbgDGA6e (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Apr 2020 20:58:34 -0400
-Received: from mail-lj1-f193.google.com ([209.85.208.193]:35287 "EHLO
-        mail-lj1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726329AbgDGA6e (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 Apr 2020 20:58:34 -0400
-Received: by mail-lj1-f193.google.com with SMTP id k21so1818743ljh.2
-        for <kvm@vger.kernel.org>; Mon, 06 Apr 2020 17:58:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=TDz9BFmZ8zQpqNsWCTptx0CrsbNAsUuC7AsThVhGJVY=;
-        b=bmS1u9FMz/4hyaxFYbha1NI2AnffokqKUEnhj0wBpgyduvbsFD1n+97WD4U75p+1ob
-         EnZaumrGvgNO5ochV/LIMm/bYhgMXfD4ViALib44ySCVTBIE7hRrGzgfnQGFvJKVH4Tm
-         9wJXGyAAVbsTUiaPiPJaKA0QtBuvojNec0BT6DUp1VwTYUWUUQPiLXHTxTZTIuRs2j9g
-         AVAZhVv0QaVNJCJVzLbPNrJQaeInwCs5j5lWTCGIcBd0kX09NR+NmU0MY16u07v/p4K9
-         bMzmb9zMEWyWTREvKXMA4vbsKfTw3q6vuHRRVFerVwNjGiwI+fU7frloTaX1suC7w10o
-         nhmA==
+        id S1726679AbgDGBH4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Apr 2020 21:07:56 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:29702 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726659AbgDGBHz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 Apr 2020 21:07:55 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1586221674;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=b+P99eoGOE59dzJri6nDdYTRF/iHp1rUM821OiEBSWI=;
+        b=FoIXAgI5OWoA2jtao11ABKn7i0yKHhLWShNWQidugju9gptmfDJxOgQuxG7GoF8Uw99NWi
+        3NrEIjJwI9EMVTpRKt+jfiK8Na2Q5Z4/PUEXpIHif0/qmyIOiUpOIq6obboECVIAJeQwdA
+        mcz1p8bM7T5bk/xcbFGciGK4MIQSLLI=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-46-BLxZWCsaPZSa0tmgwk5y8g-1; Mon, 06 Apr 2020 21:07:50 -0400
+X-MC-Unique: BLxZWCsaPZSa0tmgwk5y8g-1
+Received: by mail-wr1-f70.google.com with SMTP id 91so864874wro.1
+        for <kvm@vger.kernel.org>; Mon, 06 Apr 2020 18:07:50 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=TDz9BFmZ8zQpqNsWCTptx0CrsbNAsUuC7AsThVhGJVY=;
-        b=D5EMOQrrw61ggJ6LutHOQA0t1YFsMJuqyXdlaGJa48qX+VcO2pI+b6YtPFGwJgQ+0b
-         M1GiZNEiDTBj/0uOlqhWyuvFXWCv6BuK258co2ornZ274snALHqoXRFWNHD1dfYe+SCD
-         +0RZQaOLbJE4w4Oyd/ixKGh/HvmWHCeKep1mmb+VcW6bVn6yvY1BuEWcbafx6QgiAm83
-         pON6hgLpvh6yAe9WZ6loQFIxEb0RYg2Hl9PPo26Lv5BUGtbW0o8fWoIHTS9R8w73gcxI
-         lTI+z8R5xlEtwe+dMDTYfYeRr4r+rHwExQ3tz7D4k5ZwatdGZAnuvpXyxoIg+kJtBE0E
-         JPBg==
-X-Gm-Message-State: AGi0PuYN7wcADI0zqO9YjnaNgF19lmRD6LVFJyz8fvP6umijmlVYy1Lt
-        7oR1RmpMW817wuxoavNzbYE4ugEnmWu2rUdfFxe6FQ==
-X-Google-Smtp-Source: APiQypJPjEm7jIn9z+xThhRqVGjzF4hWCD7RLXMMIVBq9BZWIjtWy7Q+lJWVYtgK52U74tJQzmDlc9Ni7zpWkWW3eWA=
-X-Received: by 2002:a2e:894e:: with SMTP id b14mr3817ljk.103.1586221111082;
- Mon, 06 Apr 2020 17:58:31 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=b+P99eoGOE59dzJri6nDdYTRF/iHp1rUM821OiEBSWI=;
+        b=AI0wjgAFO1rFAjFQERpfdWO4InUieslzYRdn/4YBb4NuVlqZd80rhxXqJWYI8Tn3zr
+         ZHTI8mupt+cryqrMXZ7uXwwe4NkI+gKWxXI5GgNp+uXAsV35UlL4DrUHntEKpztw0vsI
+         /7dutoremu9XihvGhOIahQRn1zaDOxdnhe61QLChF4dNkwYfw+aJ2BCcite8/dq+Ne5I
+         gmUOGpnR0omg9mEezAUfEtKFkXwOhHHUG10HXBT5V8ENHWxhTe5F3oLNEueR1c0b6oii
+         UtG0Bp5SUhzew3E7beMi+bgbUbOdkhLWcZZax5nXd/hysJ+WvRpHGO1iGARv4NI7Hpwy
+         jJAg==
+X-Gm-Message-State: AGi0PuY8VJolNDHNuzNiLzvz1obiYGC/VsHvjnulZ4yD8nfhsx7Yg51F
+        LbQGizI5V3SEEhJmP/w0qyVsVQCeL7oYwplQFI5C9kuK4uHya+f/WUkV+2TV0jHLevnJrZkTfgT
+        1kUW9NsO8YGL3
+X-Received: by 2002:adf:f98b:: with SMTP id f11mr1998832wrr.259.1586221669692;
+        Mon, 06 Apr 2020 18:07:49 -0700 (PDT)
+X-Google-Smtp-Source: APiQypJ7vAsHxvjmiu+bo7NHbyExOgBSbxXMZd7IkvuAC9tnfoRSEzkPJmWDYEX8+2JgtuNqELnN8w==
+X-Received: by 2002:adf:f98b:: with SMTP id f11mr1998816wrr.259.1586221669436;
+        Mon, 06 Apr 2020 18:07:49 -0700 (PDT)
+Received: from redhat.com (bzq-79-176-51-222.red.bezeqint.net. [79.176.51.222])
+        by smtp.gmail.com with ESMTPSA id j11sm28630487wrt.14.2020.04.06.18.07.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 06 Apr 2020 18:07:48 -0700 (PDT)
+Date:   Mon, 6 Apr 2020 21:07:47 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     linux-kernel@vger.kernel.org
+Cc:     Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
+Subject: [PATCH v7 10/19] vhost: force spec specified alignment on types
+Message-ID: <20200407010700.446571-11-mst@redhat.com>
+References: <20200407010700.446571-1-mst@redhat.com>
 MIME-Version: 1.0
-References: <cover.1585548051.git.ashish.kalra@amd.com> <0f8a2125c7acb7b38fc51a044a8088e8baa45e3d.1585548051.git.ashish.kalra@amd.com>
- <8694381f-2083-e477-bea1-04fb572519d0@oracle.com>
-In-Reply-To: <8694381f-2083-e477-bea1-04fb572519d0@oracle.com>
-From:   Steve Rutherford <srutherford@google.com>
-Date:   Mon, 6 Apr 2020 17:57:54 -0700
-Message-ID: <CABayD+dvb7iYOJrrBRwKw2qp1MDLWucp3yds_YG+vLTzaV6DTA@mail.gmail.com>
-Subject: Re: [PATCH v6 06/14] KVM: SVM: Add KVM_SEV_RECEIVE_FINISH command
-To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Cc:     Ashish Kalra <Ashish.Kalra@amd.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Joerg Roedel <joro@8bytes.org>,
-        Borislav Petkov <bp@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        X86 ML <x86@kernel.org>, KVM list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        David Rientjes <rientjes@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Brijesh Singh <brijesh.singh@amd.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200407010700.446571-1-mst@redhat.com>
+X-Mailer: git-send-email 2.24.1.751.gd10ce2899c
+X-Mutt-Fcc: =sent
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Apr 2, 2020 at 3:27 PM Krish Sadhukhan
-<krish.sadhukhan@oracle.com> wrote:
->
->
-> On 3/29/20 11:21 PM, Ashish Kalra wrote:
-> > From: Brijesh Singh <Brijesh.Singh@amd.com>
-> >
-> > The command finalize the guest receiving process and make the SEV guest
-> > ready for the execution.
-> >
-> > Cc: Thomas Gleixner <tglx@linutronix.de>
-> > Cc: Ingo Molnar <mingo@redhat.com>
-> > Cc: "H. Peter Anvin" <hpa@zytor.com>
-> > Cc: Paolo Bonzini <pbonzini@redhat.com>
-> > Cc: "Radim Kr=C4=8Dm=C3=A1=C5=99" <rkrcmar@redhat.com>
-> > Cc: Joerg Roedel <joro@8bytes.org>
-> > Cc: Borislav Petkov <bp@suse.de>
-> > Cc: Tom Lendacky <thomas.lendacky@amd.com>
-> > Cc: x86@kernel.org
-> > Cc: kvm@vger.kernel.org
-> > Cc: linux-kernel@vger.kernel.org
-> > Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> > Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
-> > ---
-> >   .../virt/kvm/amd-memory-encryption.rst        |  8 +++++++
-> >   arch/x86/kvm/svm.c                            | 23 ++++++++++++++++++=
-+
-> >   2 files changed, 31 insertions(+)
-> >
-> > diff --git a/Documentation/virt/kvm/amd-memory-encryption.rst b/Documen=
-tation/virt/kvm/amd-memory-encryption.rst
-> > index 554aa33a99cc..93cd95d9a6c0 100644
-> > --- a/Documentation/virt/kvm/amd-memory-encryption.rst
-> > +++ b/Documentation/virt/kvm/amd-memory-encryption.rst
-> > @@ -375,6 +375,14 @@ Returns: 0 on success, -negative on error
-> >                   __u32 trans_len;
-> >           };
-> >
-> > +15. KVM_SEV_RECEIVE_FINISH
-> > +------------------------
-> > +
-> > +After completion of the migration flow, the KVM_SEV_RECEIVE_FINISH com=
-mand can be
-> > +issued by the hypervisor to make the guest ready for execution.
-> > +
-> > +Returns: 0 on success, -negative on error
-> > +
-> >   References
-> >   =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> >
-> > diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
-> > index 5fc5355536d7..7c2721e18b06 100644
-> > --- a/arch/x86/kvm/svm.c
-> > +++ b/arch/x86/kvm/svm.c
-> > @@ -7573,6 +7573,26 @@ static int sev_receive_update_data(struct kvm *k=
-vm, struct kvm_sev_cmd *argp)
-> >       return ret;
-> >   }
-> >
-> > +static int sev_receive_finish(struct kvm *kvm, struct kvm_sev_cmd *arg=
-p)
-> > +{
-> > +     struct kvm_sev_info *sev =3D &to_kvm_svm(kvm)->sev_info;
-> > +     struct sev_data_receive_finish *data;
-> > +     int ret;
-> > +
-> > +     if (!sev_guest(kvm))
-> > +             return -ENOTTY;
-> > +
-> > +     data =3D kzalloc(sizeof(*data), GFP_KERNEL);
-> > +     if (!data)
-> > +             return -ENOMEM;
-> > +
-> > +     data->handle =3D sev->handle;
-> > +     ret =3D sev_issue_cmd(kvm, SEV_CMD_RECEIVE_FINISH, data, &argp->e=
-rror);
-> > +
-> > +     kfree(data);
-> > +     return ret;
-> > +}
-> > +
-> >   static int svm_mem_enc_op(struct kvm *kvm, void __user *argp)
-> >   {
-> >       struct kvm_sev_cmd sev_cmd;
-> > @@ -7632,6 +7652,9 @@ static int svm_mem_enc_op(struct kvm *kvm, void _=
-_user *argp)
-> >       case KVM_SEV_RECEIVE_UPDATE_DATA:
-> >               r =3D sev_receive_update_data(kvm, &sev_cmd);
-> >               break;
-> > +     case KVM_SEV_RECEIVE_FINISH:
-> > +             r =3D sev_receive_finish(kvm, &sev_cmd);
-> > +             break;
-> >       default:
-> >               r =3D -EINVAL;
-> >               goto out;
-> Reviewed-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
+The ring element addresses are passed between components with different
+alignments assumptions. Thus, if guest/userspace selects a pointer and
+host then gets and dereferences it, we might need to decrease the
+compiler-selected alignment to prevent compiler on the host from
+assuming pointer is aligned.
 
-As to ENOTTY, man page for ioctl translates it as "The specified
-request does not apply to the kind of object that the file descriptor
-fd references", which seems appropriate here.
-Reviewed-by: Steve Rutherford <srutherford@google.com>
+This actually triggers on ARM with -mabi=apcs-gnu - which is a
+deprecated configuration, but it seems safer to handle this
+generally.
+
+I verified that the produced binary is exactly identical on x86.
+
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+---
+ drivers/vhost/vhost.h       |  6 +++---
+ include/linux/virtio_ring.h | 24 +++++++++++++++++++++---
+ 2 files changed, 24 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/vhost/vhost.h b/drivers/vhost/vhost.h
+index f8403bd46b85..60cab4c78229 100644
+--- a/drivers/vhost/vhost.h
++++ b/drivers/vhost/vhost.h
+@@ -67,9 +67,9 @@ struct vhost_virtqueue {
+ 	/* The actual ring of buffers. */
+ 	struct mutex mutex;
+ 	unsigned int num;
+-	struct vring_desc __user *desc;
+-	struct vring_avail __user *avail;
+-	struct vring_used __user *used;
++	vring_desc_t __user *desc;
++	vring_avail_t __user *avail;
++	vring_used_t __user *used;
+ 	const struct vhost_iotlb_map *meta_iotlb[VHOST_NUM_ADDRS];
+ 	struct file *kick;
+ 	struct eventfd_ctx *call_ctx;
+diff --git a/include/linux/virtio_ring.h b/include/linux/virtio_ring.h
+index 11680e74761a..c3f9ca054250 100644
+--- a/include/linux/virtio_ring.h
++++ b/include/linux/virtio_ring.h
+@@ -60,14 +60,32 @@ static inline void virtio_store_mb(bool weak_barriers,
+ struct virtio_device;
+ struct virtqueue;
+ 
++/*
++ * The ring element addresses are passed between components with different
++ * alignments assumptions. Thus, we might need to decrease the compiler-selected
++ * alignment, and so must use a typedef to make sure the __aligned attribute
++ * actually takes hold:
++ *
++ * https://gcc.gnu.org/onlinedocs//gcc/Common-Type-Attributes.html#Common-Type-Attributes
++ *
++ * When used on a struct, or struct member, the aligned attribute can only
++ * increase the alignment; in order to decrease it, the packed attribute must
++ * be specified as well. When used as part of a typedef, the aligned attribute
++ * can both increase and decrease alignment, and specifying the packed
++ * attribute generates a warning.
++ */
++typedef struct vring_desc __aligned(VRING_DESC_ALIGN_SIZE) vring_desc_t;
++typedef struct vring_avail __aligned(VRING_AVAIL_ALIGN_SIZE) vring_avail_t;
++typedef struct vring_used __aligned(VRING_USED_ALIGN_SIZE) vring_used_t;
++
+ struct vring {
+ 	unsigned int num;
+ 
+-	struct vring_desc *desc;
++	vring_desc_t *desc;
+ 
+-	struct vring_avail *avail;
++	vring_avail_t *avail;
+ 
+-	struct vring_used *used;
++	vring_used_t *used;
+ };
+ 
+ /*
+-- 
+MST
+
