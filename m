@@ -2,179 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id EE88A1A12CE
-	for <lists+kvm@lfdr.de>; Tue,  7 Apr 2020 19:39:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 415431A137C
+	for <lists+kvm@lfdr.de>; Tue,  7 Apr 2020 20:21:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726421AbgDGRjA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Apr 2020 13:39:00 -0400
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:46736 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726365AbgDGRi7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Apr 2020 13:38:59 -0400
-Received: by mail-pf1-f194.google.com with SMTP id q3so1108165pff.13
-        for <kvm@vger.kernel.org>; Tue, 07 Apr 2020 10:38:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=amacapital-net.20150623.gappssmtp.com; s=20150623;
-        h=content-transfer-encoding:from:mime-version:subject:date:message-id
-         :references:cc:in-reply-to:to;
-        bh=3XwUwp3pgBvnG5QKAIgM6nYkdjDyX8ty4EUjxeeITl0=;
-        b=IgLldp2IUD3AdT94teIH7R1Kzox4JrBZHD772J7XFCfK6waEJ3JFkTil1KpzxcOlWQ
-         gfcfeoc5pCwTiRNzpfINnp1UadH5RtYVkEgcSGRPHlRPKCvhWUi/a0Xiqdh0aezldxJV
-         Nx33uTzY7sXmwbChwCEmNc3xWhFzi0e6Ql2RPdMHpHBWfZh2x1/kOG1zPXW4xVexqCkC
-         uEmNzdfsbLptTo3hhxrcxf/clfAk1JcVQBjmHzhcpgd5APZzu/sEl2sAMA67Cd1a1OkH
-         wqtAzm2kcYdLN7fD7XkqFD5kLmo3dUR5nXqe+4SwilYTX/uQlPkGVSOoTFSf8rtNwD3W
-         +LVw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:content-transfer-encoding:from:mime-version
-         :subject:date:message-id:references:cc:in-reply-to:to;
-        bh=3XwUwp3pgBvnG5QKAIgM6nYkdjDyX8ty4EUjxeeITl0=;
-        b=Esp1a1DUm17cfNczcgERWMdFiHRoo8yD3gqwoTSTe+RYCPBcGyB2WfyeRT5aWlNcTv
-         /L1gQGrGIrTDfsPISATemGXW9nfjqW+v76yqgFZ32zm9ru+vkfH6NbAaiDicREXodDPm
-         D0xE/cZ71GybUpwuLYTzVy8SqFWEY+Ooi99KMLUM/lsc73L2lvjHCPG3IkZVZbaBbtB7
-         JHOvIypT+9xt8+Z6SnyiTGSfgd9alpWBpGPWU0TbN1yvaXr1GVWEKhkcKCVnAHOxrYZr
-         /O3a+6ML3+WCjgI7uHtRT9QRnIb96fZcN8OV3Z/Ja3IEFxnDeTCS9bk85J4oOFZRlYTf
-         GqAA==
-X-Gm-Message-State: AGi0PuavI/0L5Z0tQ6ohNukW/sTVYd7MbxGKXKTp4PyHylnnTuFoTCO5
-        4tAsZIBkyx6EYdNXEko9EpSBaQ==
-X-Google-Smtp-Source: APiQypLDYPRvMovGL1rJQVdThBVbfZDDoVoxcUf0z+PonCSH/EJgmmJmJq91Pm2pjpHoY26oOZd1LA==
-X-Received: by 2002:a62:1a03:: with SMTP id a3mr3590436pfa.171.1586281138748;
-        Tue, 07 Apr 2020 10:38:58 -0700 (PDT)
-Received: from ?IPv6:2601:646:c200:1ef2:648b:efdd:7224:327? ([2601:646:c200:1ef2:648b:efdd:7224:327])
-        by smtp.gmail.com with ESMTPSA id nu13sm2329780pjb.22.2020.04.07.10.38.57
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 07 Apr 2020 10:38:58 -0700 (PDT)
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-From:   Andy Lutomirski <luto@amacapital.net>
-Mime-Version: 1.0 (1.0)
-Subject: Re: [PATCH v2] x86/kvm: Disable KVM_ASYNC_PF_SEND_ALWAYS
-Date:   Tue, 7 Apr 2020 10:38:56 -0700
-Message-Id: <772A564B-3268-49F4-9AEA-CDA648F6131F@amacapital.net>
-References: <20200407172140.GB64635@redhat.com>
-Cc:     Peter Zijlstra <peterz@infradead.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Andy Lutomirski <luto@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        LKML <linux-kernel@vger.kernel.org>, X86 ML <x86@kernel.org>,
-        kvm list <kvm@vger.kernel.org>, stable <stable@vger.kernel.org>
-In-Reply-To: <20200407172140.GB64635@redhat.com>
-To:     Vivek Goyal <vgoyal@redhat.com>
-X-Mailer: iPhone Mail (17E255)
+        id S1726699AbgDGSVS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Apr 2020 14:21:18 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:21585 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726605AbgDGSVR (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 7 Apr 2020 14:21:17 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1586283676;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc; bh=IbMheVXmF0VacTTe2Hnfg/Xyo9y1cU/Y6NYWIzzzerg=;
+        b=SkEJ3mbfIILtm+Xu6JDgBON0cQdguIZmsKGEEXMxK/R709hBhYcWaNGf+ft/HN3MnYRb6E
+        9djHFZnfZ7FMmNpWcWk2+txYCZ2aBdiakYirTbmCnINjPUrKjJguCcClNbqPAuTVjCU4+q
+        JK1LIm3xMyUiRudVMYlGQ7st8UdEj9I=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-70-1XmFQbKJOvOaa9FylQnhcw-1; Tue, 07 Apr 2020 14:21:13 -0400
+X-MC-Unique: 1XmFQbKJOvOaa9FylQnhcw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 333C08017FE;
+        Tue,  7 Apr 2020 18:21:12 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 9DF2360BEC;
+        Tue,  7 Apr 2020 18:21:11 +0000 (UTC)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     torvalds@linux-foundation.org
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: [GIT PULL] Second batch of KVM changes for Linux 5.7
+Date:   Tue,  7 Apr 2020 14:21:11 -0400
+Message-Id: <20200407182111.23659-1-pbonzini@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Linus,
 
+The following changes since commit 8c1b724ddb218f221612d4c649bc9c7819d8d7a6:
 
-> On Apr 7, 2020, at 10:21 AM, Vivek Goyal <vgoyal@redhat.com> wrote:
->=20
-> =EF=BB=BFOn Mon, Apr 06, 2020 at 01:42:28PM -0700, Andy Lutomirski wrote:
->>=20
->>>> On Apr 6, 2020, at 1:32 PM, Andy Lutomirski <luto@amacapital.net> wrote=
-:
->>>=20
->>> =EF=BB=BF
->>>> On Apr 6, 2020, at 1:25 PM, Peter Zijlstra <peterz@infradead.org> wrote=
-:
->>>>=20
->>>> =EF=BB=BFOn Mon, Apr 06, 2020 at 03:09:51PM -0400, Vivek Goyal wrote:
->>>>>> On Mon, Mar 09, 2020 at 09:22:15PM +0100, Peter Zijlstra wrote:
->>>>>>> On Mon, Mar 09, 2020 at 08:05:18PM +0100, Thomas Gleixner wrote:
->>>>>>>> Andy Lutomirski <luto@kernel.org> writes:
->>>>>>>=20
->>>>>>>>> I'm okay with the save/restore dance, I guess.  It's just yet more=
+  Merge tag 'for-linus' of git://git.kernel.org/pub/scm/virt/kvm/kvm (2020-04-02 15:13:15 -0700)
 
->>>>>>>>> entry crud to deal with architecture nastiness, except that this
->>>>>>>>> nastiness is 100% software and isn't Intel/AMD's fault.
->>>>>>>>=20
->>>>>>>> And we can do it in C and don't have to fiddle with it in the ASM
->>>>>>>> maze.
->>>>>>>=20
->>>>>>> Right; I'd still love to kill KVM_ASYNC_PF_SEND_ALWAYS though, even i=
-f
->>>>>>> we do the save/restore in do_nmi(). That is some wild brain melt. Al=
-so,
->>>>>>> AFAIK none of the distros are actually shipping a PREEMPT=3Dy kernel=
+are available in the Git repository at:
 
->>>>>>> anyway, so killing it shouldn't matter much.
->>>>>=20
->>>>> It will be nice if we can retain KVM_ASYNC_PF_SEND_ALWAYS. I have anot=
-her
->>>>> use case outside CONFIG_PREEMPT.
->>>>>=20
->>>>> I am trying to extend async pf interface to also report page fault err=
-ors
->>>>> to the guest.
->>>>=20
->>>> Then please start over and design a sane ParaVirt Fault interface. The
->>>> current one is utter crap.
->>>=20
->>> Agreed. Don=E2=80=99t extend the current mechanism. Replace it.
->>>=20
->>> I would be happy to review a replacement. I=E2=80=99m not really excited=
- to review an extension of the current mess.  The current thing is barely, i=
-f at all, correct.
->>=20
->> I read your patch. It cannot possibly be correct.  You need to decide wha=
-t happens if you get a memory failure when guest interrupts are off. If this=
- happens, you can=E2=80=99t send #PF, but you also can=E2=80=99t just swallo=
-w the error. The existing APF code is so messy that it=E2=80=99s not at all o=
-bvious what your code ends up doing, but I=E2=80=99m pretty sure it doesn=E2=
-=80=99t do anything sensible, especially since the ABI doesn=E2=80=99t have a=
- sensible option.
->=20
-> Hi Andy,
->=20
-> I am not familiar with this KVM code and trying to understand it. I think
-> error exception gets queued and gets delivered at some point of time, even=
+  https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
 
-> if interrupts are disabled at the time of exception. Most likely at the ti=
-me
-> of next VM entry.
+for you to fetch changes up to dbef2808af6c594922fe32833b30f55f35e9da6d:
 
-I=E2=80=99ve read the code three or four times and I barely understand it. I=
-=E2=80=99m not convinced the author understood it.  It=E2=80=99s spaghetti.
+  KVM: VMX: fix crash cleanup when KVM wasn't used (2020-04-07 08:35:36 -0400)
 
->=20
-> Whether interrupts are enabled or not check only happens before we decide
-> if async pf protocol should be followed or not. Once we decide to
-> send PAGE_NOT_PRESENT, later notification PAGE_READY does not check
-> if interrupts are enabled or not. And it kind of makes sense otherwise
-> guest process will wait infinitely to receive PAGE_READY.
->=20
-> I modified the code a bit to disable interrupt and wait 10 seconds (after
-> getting PAGE_NOT_PRESENT message). And I noticed that error async pf
-> got delivered after 10 seconds after enabling interrupts. So error
-> async pf was not lost because interrupts were disabled.
->=20
-> Havind said that, I thought disabling interrupts does not mask exceptions.=
+----------------------------------------------------------------
+s390:
+* nested virtualization fixes
 
-> So page fault exception should have been delivered even with interrupts
-> disabled. Is that correct? May be there was no vm exit/entry during
-> those 10 seconds and that's why.
+x86:
+* split svm.c
+* miscellaneous fixes
 
-My point is that the entire async pf is nonsense. There are two types of eve=
-nts right now:
+----------------------------------------------------------------
+David Hildenbrand (3):
+      KVM: s390: vsie: Fix region 1 ASCE sanity shadow address checks
+      KVM: s390: vsie: Fix delivery of addressing exceptions
+      KVM: s390: vsie: Fix possible race when shadowing region 3 tables
 
-=E2=80=9CPage not ready=E2=80=9D:  normally this isn=E2=80=99t even visible t=
-o the guest =E2=80=94 the guest just waits. With async pf, the idea is to tr=
-y to tell the guest that a particular instruction would block and the guest s=
-hould do something else instead. Sending a normal exception is a poor design=
-, though: the guest may not expect this instruction to cause an exception. I=
- think KVM should try to deliver an *interrupt* and, if it can=E2=80=99t, th=
-en just block the guest.
+Joerg Roedel (4):
+      kVM SVM: Move SVM related files to own sub-directory
+      KVM: SVM: Move Nested SVM Implementation to nested.c
+      KVM: SVM: Move AVIC code to separate file
+      KVM: SVM: Move SEV code to separate file
 
-=E2=80=9CPage ready=E2=80=9D: this is a regular asynchronous notification ju=
-st like, say, a virtio completion. It should be an ordinary interrupt.  Some=
- in memory data structure should indicate which pages are ready.
+Oliver Upton (1):
+      KVM: nVMX: don't clear mtf_pending when nested events are blocked
 
-=E2=80=9CPage is malfunctioning=E2=80=9D is tricky because you *must* delive=
-r the event. x86=E2=80=99s #MC is not exactly a masterpiece, but it does kin=
-d of work.
+Paolo Bonzini (1):
+      Merge tag 'kvm-s390-master-5.7-1' of git://git.kernel.org/.../kvms390/linux into HEAD
 
->=20
-> Thanks
-> Vivek
->=20
+Uros Bizjak (2):
+      KVM: SVM: Split svm_vcpu_run inline assembly to separate file
+      KVM: VMX: Remove unnecessary exception trampoline in vmx_vmenter
+
+Vitaly Kuznetsov (1):
+      KVM: VMX: fix crash cleanup when KVM wasn't used
+
+Wanpeng Li (1):
+      KVM: X86: Filter out the broadcast dest for IPI fastpath
+
+ arch/s390/kvm/vsie.c                  |    1 +
+ arch/s390/mm/gmap.c                   |    7 +-
+ arch/x86/kvm/Makefile                 |    2 +-
+ arch/x86/kvm/lapic.c                  |    3 -
+ arch/x86/kvm/lapic.h                  |    3 +
+ arch/x86/kvm/svm/avic.c               | 1027 ++++++
+ arch/x86/kvm/svm/nested.c             |  823 +++++
+ arch/x86/kvm/{pmu_amd.c => svm/pmu.c} |    0
+ arch/x86/kvm/svm/sev.c                | 1187 ++++++
+ arch/x86/kvm/{ => svm}/svm.c          | 6476 ++++++++-------------------------
+ arch/x86/kvm/svm/svm.h                |  491 +++
+ arch/x86/kvm/svm/vmenter.S            |  162 +
+ arch/x86/kvm/vmx/nested.c             |    3 +-
+ arch/x86/kvm/vmx/vmenter.S            |    8 +-
+ arch/x86/kvm/vmx/vmx.c                |   12 +-
+ arch/x86/kvm/x86.c                    |    3 +-
+ 16 files changed, 5219 insertions(+), 4989 deletions(-)
+ create mode 100644 arch/x86/kvm/svm/avic.c
+ create mode 100644 arch/x86/kvm/svm/nested.c
+ rename arch/x86/kvm/{pmu_amd.c => svm/pmu.c} (100%)
+ create mode 100644 arch/x86/kvm/svm/sev.c
+ rename arch/x86/kvm/{ => svm}/svm.c (54%)
+ create mode 100644 arch/x86/kvm/svm/svm.h
+ create mode 100644 arch/x86/kvm/svm/vmenter.S
+
