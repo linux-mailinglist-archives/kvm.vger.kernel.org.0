@@ -2,69 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 274AA1A041B
-	for <lists+kvm@lfdr.de>; Tue,  7 Apr 2020 03:09:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 181021A044F
+	for <lists+kvm@lfdr.de>; Tue,  7 Apr 2020 03:17:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726909AbgDGBIZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Apr 2020 21:08:25 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:46157 "EHLO
+        id S1726709AbgDGBQz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Apr 2020 21:16:55 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:48234 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726841AbgDGBIT (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 6 Apr 2020 21:08:19 -0400
+        by vger.kernel.org with ESMTP id S1726692AbgDGBQx (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 6 Apr 2020 21:16:53 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1586221698;
+        s=mimecast20190719; t=1586222213;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=L4yUJTneo14gmnV6yvCsrtosUccNNJJsj0HwyG8nxy8=;
-        b=T6oXOIBo7XvYJa/9UWCfTjIKd9QoVDCQZmzyE49SelC5SrQC0/5Ew6O75JvYRe+ZDxbFCD
-        z3URrq6hrJkkR1EDDDsGLjG4SZ876+q6ldX68gdGiVi2Ct9Fn3RmpTIOBaJEQgTyDhZJvr
-        ESrhtlVmuaBB7khZoWy/5C8HkM5hur4=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-468-RERv3eXKNrKz4M5etTV7LA-1; Mon, 06 Apr 2020 21:08:14 -0400
-X-MC-Unique: RERv3eXKNrKz4M5etTV7LA-1
-Received: by mail-wr1-f70.google.com with SMTP id d4so854268wrq.10
-        for <kvm@vger.kernel.org>; Mon, 06 Apr 2020 18:08:14 -0700 (PDT)
+        bh=b+P99eoGOE59dzJri6nDdYTRF/iHp1rUM821OiEBSWI=;
+        b=FL5cL9jB/jv3Cw8c0R7qvL4Fr6L6684qHMIGeLvRn49FmU0NAjyiVhOH2dTCfHtVcwNLTT
+        /fKTvnPA8fBXt1d1mTRvRISYxbpwz2TZ3uzW9C1r2QkluBXsCQt8fjbqw8CNvpeNm1trai
+        9qnn1PPCSS8PgevWzuuC3b3MAZBt08o=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-297-7fDUsodKMdCg6RvFQ31-8w-1; Mon, 06 Apr 2020 21:16:51 -0400
+X-MC-Unique: 7fDUsodKMdCg6RvFQ31-8w-1
+Received: by mail-wm1-f70.google.com with SMTP id 2so17613wmf.1
+        for <kvm@vger.kernel.org>; Mon, 06 Apr 2020 18:16:51 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=L4yUJTneo14gmnV6yvCsrtosUccNNJJsj0HwyG8nxy8=;
-        b=kn8+M7nyY+pgcrh620Nd99Wzy/0VJt24WEn/nX/SHJk1zqC5pz28UYOEkq7DFr3AH3
-         A4jc/NXrsqhFzg6t9c+MF54eaqpw7eROqq3SUea/PxIbOtzTZnQwLqIhEEUk52ulHJf7
-         A9rvbWvhJ7XRF8wI5tRmbhX3oMjocZXogAp9BugCQOvb/TjeACrP5hgej9QvGHujsaN0
-         xebA7bYRhx4d1m8Sjtvpb0rvEeFsrPJ2PZp68ORBneb9s9W+fSk8aCHaPKF1WW4Y7/UH
-         o+GWgG++4MKWyW5P+WP5d7Gb1kWoDD7R5HlJgnel16RdHpXzyFVbaDGRqU8OLJAmybDR
-         S2Sw==
-X-Gm-Message-State: AGi0PuY6PdrKLQhG25Bdzb5u/ayBplX+q02Cu1FY0wt+KTV1/XAP8Whq
-        JyjB2ySed3j/fiEzs30u4Fyqog54WygrWmNLjdcIVBA1dlbgKCN/xIvEp/niBGskUXbYHJ4QcoZ
-        jbtm7EjLlgtcv
-X-Received: by 2002:a5d:4ac2:: with SMTP id y2mr2231410wrs.340.1586221692865;
-        Mon, 06 Apr 2020 18:08:12 -0700 (PDT)
-X-Google-Smtp-Source: APiQypJRyp/ZpJacQiZ3k9H+aTIpbKPM4w8UFFPSIqcFT0rwHZZkPHnvafzAm6P2M2/gPs/IswWSoA==
-X-Received: by 2002:a5d:4ac2:: with SMTP id y2mr2231387wrs.340.1586221692600;
-        Mon, 06 Apr 2020 18:08:12 -0700 (PDT)
+         :mime-version:content-disposition:in-reply-to;
+        bh=b+P99eoGOE59dzJri6nDdYTRF/iHp1rUM821OiEBSWI=;
+        b=dJ4hzESvI+LAWh/3vXLYlF2O8Ubyk3uW21DFGrj65EL23ZmgmC+IoI5JywBGOug25R
+         3F+2iMEFkQguvCdMFxMcdTtb+CxdlpjHPUStV9huGv87vQqJaLGShOhByOJBCnKKrhqK
+         hlrjiB9Ce2oPOXwElf/ypEoG+sGsf6yBc9cy6+52eKWzEM+rVOJJ/FLP/mI1ZRqmE6zh
+         t2audoFB2KkixlX25/QPygarkYV8PDG2ADlREKsvs7oZrdmQouqNuWXndYk4jjfWCe2P
+         RTmoRjOxEfX9YxqTPIwXviyAu4goxoLQ9UmrEbHvowJjPc2WJrG5W3cNLU/hR3ozyk8W
+         T5Lg==
+X-Gm-Message-State: AGi0PubDTsfCssdTZdRGWrtwohVL3UiCWZM466e/g0Ydv3mpGT22Q1F4
+        P7g8nDW59ymahb8JP5gmBCS3/iXzwJdjhJAbbTuBklANh4SUfgDobDaIyX4NKuf/QXacA0sKrAs
+        mzzSeYa/Kcbgm
+X-Received: by 2002:adf:fe52:: with SMTP id m18mr2041300wrs.162.1586222210550;
+        Mon, 06 Apr 2020 18:16:50 -0700 (PDT)
+X-Google-Smtp-Source: APiQypJn5DjBcjpMzTbrTEAm6PtADPd35uHLc30DK0aLGHH0mu1pODoic12Kr5dEmc3NA5QUWXhA1A==
+X-Received: by 2002:adf:fe52:: with SMTP id m18mr2041286wrs.162.1586222210287;
+        Mon, 06 Apr 2020 18:16:50 -0700 (PDT)
 Received: from redhat.com (bzq-79-176-51-222.red.bezeqint.net. [79.176.51.222])
-        by smtp.gmail.com with ESMTPSA id c17sm23267693wrp.28.2020.04.06.18.08.11
+        by smtp.gmail.com with ESMTPSA id u13sm30079813wru.88.2020.04.06.18.16.49
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 Apr 2020 18:08:12 -0700 (PDT)
-Date:   Mon, 6 Apr 2020 21:08:10 -0400
+        Mon, 06 Apr 2020 18:16:49 -0700 (PDT)
+Date:   Mon, 6 Apr 2020 21:16:48 -0400
 From:   "Michael S. Tsirkin" <mst@redhat.com>
 To:     linux-kernel@vger.kernel.org
-Cc:     Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>,
-        Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org,
+Cc:     Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org,
         virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
-Subject: [PATCH v7 19/19] vhost: batching fetches
-Message-ID: <20200407010700.446571-20-mst@redhat.com>
-References: <20200407010700.446571-1-mst@redhat.com>
+Subject: [PATCH v8 10/19] vhost: force spec specified alignment on types
+Message-ID: <20200407011612.478226-11-mst@redhat.com>
+References: <20200407011612.478226-1-mst@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20200407010700.446571-1-mst@redhat.com>
+In-Reply-To: <20200407011612.478226-1-mst@redhat.com>
 X-Mailer: git-send-email 2.24.1.751.gd10ce2899c
 X-Mutt-Fcc: =sent
 Sender: kvm-owner@vger.kernel.org
@@ -72,185 +68,81 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-With this patch applied, new and old code perform identically.
+The ring element addresses are passed between components with different
+alignments assumptions. Thus, if guest/userspace selects a pointer and
+host then gets and dereferences it, we might need to decrease the
+compiler-selected alignment to prevent compiler on the host from
+assuming pointer is aligned.
 
-Lots of extra optimizations are now possible, e.g.
-we can fetch multiple heads with copy_from/to_user now.
-We can get rid of maintaining the log array.  Etc etc.
+This actually triggers on ARM with -mabi=apcs-gnu - which is a
+deprecated configuration, but it seems safer to handle this
+generally.
 
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-Signed-off-by: Eugenio Pérez <eperezma@redhat.com>
-Link: https://lore.kernel.org/r/20200401183118.8334-4-eperezma@redhat.com
+I verified that the produced binary is exactly identical on x86.
+
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- drivers/vhost/test.c  |  2 +-
- drivers/vhost/vhost.c | 47 ++++++++++++++++++++++++++++++++++++++-----
- drivers/vhost/vhost.h |  5 ++++-
- 3 files changed, 47 insertions(+), 7 deletions(-)
+ drivers/vhost/vhost.h       |  6 +++---
+ include/linux/virtio_ring.h | 24 +++++++++++++++++++++---
+ 2 files changed, 24 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/vhost/test.c b/drivers/vhost/test.c
-index b06680833f03..251ca723ac3f 100644
---- a/drivers/vhost/test.c
-+++ b/drivers/vhost/test.c
-@@ -119,7 +119,7 @@ static int vhost_test_open(struct inode *inode, struct file *f)
- 	dev = &n->dev;
- 	vqs[VHOST_TEST_VQ] = &n->vqs[VHOST_TEST_VQ];
- 	n->vqs[VHOST_TEST_VQ].handle_kick = handle_vq_kick;
--	vhost_dev_init(dev, vqs, VHOST_TEST_VQ_MAX, UIO_MAXIOV,
-+	vhost_dev_init(dev, vqs, VHOST_TEST_VQ_MAX, UIO_MAXIOV + 64,
- 		       VHOST_TEST_PKT_WEIGHT, VHOST_TEST_WEIGHT, NULL);
- 
- 	f->private_data = n;
-diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
-index 6ca658c21e15..0395229486a9 100644
---- a/drivers/vhost/vhost.c
-+++ b/drivers/vhost/vhost.c
-@@ -299,6 +299,7 @@ static void vhost_vq_reset(struct vhost_dev *dev,
- {
- 	vq->num = 1;
- 	vq->ndescs = 0;
-+	vq->first_desc = 0;
- 	vq->desc = NULL;
- 	vq->avail = NULL;
- 	vq->used = NULL;
-@@ -367,6 +368,11 @@ static int vhost_worker(void *data)
- 	return 0;
- }
- 
-+static int vhost_vq_num_batch_descs(struct vhost_virtqueue *vq)
-+{
-+	return vq->max_descs - UIO_MAXIOV;
-+}
-+
- static void vhost_vq_free_iovecs(struct vhost_virtqueue *vq)
- {
- 	kfree(vq->descs);
-@@ -389,6 +395,9 @@ static long vhost_dev_alloc_iovecs(struct vhost_dev *dev)
- 	for (i = 0; i < dev->nvqs; ++i) {
- 		vq = dev->vqs[i];
- 		vq->max_descs = dev->iov_limit;
-+		if (vhost_vq_num_batch_descs(vq) < 0) {
-+			return -EINVAL;
-+		}
- 		vq->descs = kmalloc_array(vq->max_descs,
- 					  sizeof(*vq->descs),
- 					  GFP_KERNEL);
-@@ -1570,6 +1579,7 @@ long vhost_vring_ioctl(struct vhost_dev *d, unsigned int ioctl, void __user *arg
- 		vq->last_avail_idx = s.num;
- 		/* Forget the cached index value. */
- 		vq->avail_idx = vq->last_avail_idx;
-+		vq->ndescs = vq->first_desc = 0;
- 		break;
- 	case VHOST_GET_VRING_BASE:
- 		s.index = idx;
-@@ -2136,7 +2146,7 @@ static int fetch_indirect_descs(struct vhost_virtqueue *vq,
- 	return 0;
- }
- 
--static int fetch_descs(struct vhost_virtqueue *vq)
-+static int fetch_buf(struct vhost_virtqueue *vq)
- {
- 	unsigned int i, head, found = 0;
- 	struct vhost_desc *last;
-@@ -2149,7 +2159,11 @@ static int fetch_descs(struct vhost_virtqueue *vq)
- 	/* Check it isn't doing very strange things with descriptor numbers. */
- 	last_avail_idx = vq->last_avail_idx;
- 
--	if (vq->avail_idx == vq->last_avail_idx) {
-+	if (unlikely(vq->avail_idx == vq->last_avail_idx)) {
-+		/* If we already have work to do, don't bother re-checking. */
-+		if (likely(vq->ndescs))
-+			return vq->num;
-+
- 		if (unlikely(vhost_get_avail_idx(vq, &avail_idx))) {
- 			vq_err(vq, "Failed to access avail idx at %p\n",
- 				&vq->avail->idx);
-@@ -2240,6 +2254,24 @@ static int fetch_descs(struct vhost_virtqueue *vq)
- 	return 0;
- }
- 
-+static int fetch_descs(struct vhost_virtqueue *vq)
-+{
-+	int ret = 0;
-+
-+	if (unlikely(vq->first_desc >= vq->ndescs)) {
-+		vq->first_desc = 0;
-+		vq->ndescs = 0;
-+	}
-+
-+	if (vq->ndescs)
-+		return 0;
-+
-+	while (!ret && vq->ndescs <= vhost_vq_num_batch_descs(vq))
-+		ret = fetch_buf(vq);
-+
-+	return vq->ndescs ? 0 : ret;
-+}
-+
- /* This looks in the virtqueue and for the first available buffer, and converts
-  * it to an iovec for convenient access.  Since descriptors consist of some
-  * number of output then some number of input descriptors, it's actually two
-@@ -2265,7 +2297,7 @@ int vhost_get_vq_desc(struct vhost_virtqueue *vq,
- 	if (unlikely(log))
- 		*log_num = 0;
- 
--	for (i = 0; i < vq->ndescs; ++i) {
-+	for (i = vq->first_desc; i < vq->ndescs; ++i) {
- 		unsigned iov_count = *in_num + *out_num;
- 		struct vhost_desc *desc = &vq->descs[i];
- 		int access;
-@@ -2311,14 +2343,19 @@ int vhost_get_vq_desc(struct vhost_virtqueue *vq,
- 		}
- 
- 		ret = desc->id;
-+
-+		if (!(desc->flags & VRING_DESC_F_NEXT))
-+			break;
- 	}
- 
--	vq->ndescs = 0;
-+	vq->first_desc = i + 1;
- 
- 	return ret;
- 
- err:
--	vhost_discard_vq_desc(vq, 1);
-+	for (i = vq->first_desc; i < vq->ndescs; ++i)
-+		if (!(vq->descs[i].flags & VRING_DESC_F_NEXT))
-+			vhost_discard_vq_desc(vq, 1);
- 	vq->ndescs = 0;
- 
- 	return ret;
 diff --git a/drivers/vhost/vhost.h b/drivers/vhost/vhost.h
-index 76356edee8e5..a67bda9792ec 100644
+index f8403bd46b85..60cab4c78229 100644
 --- a/drivers/vhost/vhost.h
 +++ b/drivers/vhost/vhost.h
-@@ -81,6 +81,7 @@ struct vhost_virtqueue {
- 
- 	struct vhost_desc *descs;
- 	int ndescs;
-+	int first_desc;
- 	int max_descs;
- 
+@@ -67,9 +67,9 @@ struct vhost_virtqueue {
+ 	/* The actual ring of buffers. */
+ 	struct mutex mutex;
+ 	unsigned int num;
+-	struct vring_desc __user *desc;
+-	struct vring_avail __user *avail;
+-	struct vring_used __user *used;
++	vring_desc_t __user *desc;
++	vring_avail_t __user *avail;
++	vring_used_t __user *used;
+ 	const struct vhost_iotlb_map *meta_iotlb[VHOST_NUM_ADDRS];
  	struct file *kick;
-@@ -229,7 +230,7 @@ void vhost_iotlb_map_free(struct vhost_iotlb *iotlb,
- 			  struct vhost_iotlb_map *map);
+ 	struct eventfd_ctx *call_ctx;
+diff --git a/include/linux/virtio_ring.h b/include/linux/virtio_ring.h
+index 11680e74761a..c3f9ca054250 100644
+--- a/include/linux/virtio_ring.h
++++ b/include/linux/virtio_ring.h
+@@ -60,14 +60,32 @@ static inline void virtio_store_mb(bool weak_barriers,
+ struct virtio_device;
+ struct virtqueue;
  
- #define vq_err(vq, fmt, ...) do {                                  \
--		pr_debug(pr_fmt(fmt), ##__VA_ARGS__);       \
-+		pr_err(pr_fmt(fmt), ##__VA_ARGS__);       \
- 		if ((vq)->error_ctx)                               \
- 				eventfd_signal((vq)->error_ctx, 1);\
- 	} while (0)
-@@ -255,6 +256,8 @@ static inline void vhost_vq_set_backend(struct vhost_virtqueue *vq,
- 					void *private_data)
- {
- 	vq->private_data = private_data;
-+	vq->ndescs = 0;
-+	vq->first_desc = 0;
- }
++/*
++ * The ring element addresses are passed between components with different
++ * alignments assumptions. Thus, we might need to decrease the compiler-selected
++ * alignment, and so must use a typedef to make sure the __aligned attribute
++ * actually takes hold:
++ *
++ * https://gcc.gnu.org/onlinedocs//gcc/Common-Type-Attributes.html#Common-Type-Attributes
++ *
++ * When used on a struct, or struct member, the aligned attribute can only
++ * increase the alignment; in order to decrease it, the packed attribute must
++ * be specified as well. When used as part of a typedef, the aligned attribute
++ * can both increase and decrease alignment, and specifying the packed
++ * attribute generates a warning.
++ */
++typedef struct vring_desc __aligned(VRING_DESC_ALIGN_SIZE) vring_desc_t;
++typedef struct vring_avail __aligned(VRING_AVAIL_ALIGN_SIZE) vring_avail_t;
++typedef struct vring_used __aligned(VRING_USED_ALIGN_SIZE) vring_used_t;
++
+ struct vring {
+ 	unsigned int num;
  
- /**
+-	struct vring_desc *desc;
++	vring_desc_t *desc;
+ 
+-	struct vring_avail *avail;
++	vring_avail_t *avail;
+ 
+-	struct vring_used *used;
++	vring_used_t *used;
+ };
+ 
+ /*
 -- 
 MST
 
