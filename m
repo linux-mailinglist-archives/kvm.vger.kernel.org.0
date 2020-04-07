@@ -2,193 +2,148 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 58CC41A10CE
-	for <lists+kvm@lfdr.de>; Tue,  7 Apr 2020 17:58:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5B62E1A1290
+	for <lists+kvm@lfdr.de>; Tue,  7 Apr 2020 19:21:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727512AbgDGP6S (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Apr 2020 11:58:18 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:33159 "EHLO
+        id S1726528AbgDGRVq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Apr 2020 13:21:46 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:38738 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726930AbgDGP6S (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 7 Apr 2020 11:58:18 -0400
+        by vger.kernel.org with ESMTP id S1726329AbgDGRVq (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 7 Apr 2020 13:21:46 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1586275096;
+        s=mimecast20190719; t=1586280104;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=yUYJ5bzo+BJgODaE1JfQ2ZwXtILNlfRLeWjodd722hM=;
-        b=QXKT36HqNxAknme6knr7Ko2ovswjbg6yzzWZ4zja+w+P4raeSR1UmhAQElcibhNZQaepQ5
-        tSm9mabjC1jh5OMgj3HMJxpxYvsyT/X2fDMSgWp5ij3U6fJYqjxYzWWZrEn60UhzkykB1t
-        tLHcx5c2R7paQORdBaQR78CiT547RGw=
+        bh=Ucz9SaukjNH3KUxwG/Jha1WYhwEEYPbGhMm7KfE+q1I=;
+        b=ijEEfrwZZy1EKrsIXNBa28URouY2YagDhpOab19jfaQU7d2OzSx75soxG848DTDE5Ruifb
+        49dOxxfHAqUtnfld/YXgTNWplCoH8sg7EWw5TYMT6KkKvex+1KhWpXwZucCKyvrfaSTf6+
+        /twzfV852ceSRRwBEKGWegGM1fJajyA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-87-dKrGDez7O2ilzpapPbNMew-1; Tue, 07 Apr 2020 11:58:12 -0400
-X-MC-Unique: dKrGDez7O2ilzpapPbNMew-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+ us-mta-98-ADR7zu3nM5GZthsQxUQV7w-1; Tue, 07 Apr 2020 13:21:43 -0400
+X-MC-Unique: ADR7zu3nM5GZthsQxUQV7w-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E9A78DB61;
-        Tue,  7 Apr 2020 15:58:10 +0000 (UTC)
-Received: from w520.home (ovpn-112-162.phx2.redhat.com [10.3.112.162])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 7EC4560BEC;
-        Tue,  7 Apr 2020 15:58:02 +0000 (UTC)
-Date:   Tue, 7 Apr 2020 09:58:01 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     "Tian, Kevin" <kevin.tian@intel.com>
-Cc:     "Liu, Yi L" <yi.l.liu@intel.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "Tian, Jun J" <jun.j.tian@intel.com>,
-        "Sun, Yi Y" <yi.y.sun@intel.com>,
-        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Wu, Hao" <hao.wu@intel.com>
-Subject: Re: [PATCH v1 2/2] vfio/pci: Emulate PASID/PRI capability for VFs
-Message-ID: <20200407095801.648b1371@w520.home>
-In-Reply-To: <AADFC41AFE54684AB9EE6CBC0274A5D19D80E13D@SHSMSX104.ccr.corp.intel.com>
-References: <1584880394-11184-1-git-send-email-yi.l.liu@intel.com>
-        <1584880394-11184-3-git-send-email-yi.l.liu@intel.com>
-        <20200402165954.48d941ee@w520.home>
-        <A2975661238FB949B60364EF0F2C25743A2204FE@SHSMSX104.ccr.corp.intel.com>
-        <20200403112545.6c115ba3@w520.home>
-        <AADFC41AFE54684AB9EE6CBC0274A5D19D80E13D@SHSMSX104.ccr.corp.intel.com>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ABC8D107ACCD;
+        Tue,  7 Apr 2020 17:21:41 +0000 (UTC)
+Received: from horse.redhat.com (ovpn-115-142.rdu2.redhat.com [10.10.115.142])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 8800D5DA60;
+        Tue,  7 Apr 2020 17:21:41 +0000 (UTC)
+Received: by horse.redhat.com (Postfix, from userid 10451)
+        id 0A9B6220604; Tue,  7 Apr 2020 13:21:41 -0400 (EDT)
+Date:   Tue, 7 Apr 2020 13:21:40 -0400
+From:   Vivek Goyal <vgoyal@redhat.com>
+To:     Andy Lutomirski <luto@amacapital.net>
+Cc:     Peter Zijlstra <peterz@infradead.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Andy Lutomirski <luto@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        LKML <linux-kernel@vger.kernel.org>, X86 ML <x86@kernel.org>,
+        kvm list <kvm@vger.kernel.org>, stable <stable@vger.kernel.org>
+Subject: Re: [PATCH v2] x86/kvm: Disable KVM_ASYNC_PF_SEND_ALWAYS
+Message-ID: <20200407172140.GB64635@redhat.com>
+References: <6875DD55-2408-4216-B32A-9487A4FDEFD8@amacapital.net>
+ <FFD7EE84-05FB-46E4-8CA5-18DD49081B5B@amacapital.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <FFD7EE84-05FB-46E4-8CA5-18DD49081B5B@amacapital.net>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 7 Apr 2020 04:26:23 +0000
-"Tian, Kevin" <kevin.tian@intel.com> wrote:
+On Mon, Apr 06, 2020 at 01:42:28PM -0700, Andy Lutomirski wrote:
+>=20
+> > On Apr 6, 2020, at 1:32 PM, Andy Lutomirski <luto@amacapital.net> wro=
+te:
+> >=20
+> > =EF=BB=BF
+> >> On Apr 6, 2020, at 1:25 PM, Peter Zijlstra <peterz@infradead.org> wr=
+ote:
+> >>=20
+> >> =EF=BB=BFOn Mon, Apr 06, 2020 at 03:09:51PM -0400, Vivek Goyal wrote=
+:
+> >>>> On Mon, Mar 09, 2020 at 09:22:15PM +0100, Peter Zijlstra wrote:
+> >>>>> On Mon, Mar 09, 2020 at 08:05:18PM +0100, Thomas Gleixner wrote:
+> >>>>>> Andy Lutomirski <luto@kernel.org> writes:
+> >>>>>=20
+> >>>>>>> I'm okay with the save/restore dance, I guess.  It's just yet m=
+ore
+> >>>>>>> entry crud to deal with architecture nastiness, except that thi=
+s
+> >>>>>>> nastiness is 100% software and isn't Intel/AMD's fault.
+> >>>>>>=20
+> >>>>>> And we can do it in C and don't have to fiddle with it in the AS=
+M
+> >>>>>> maze.
+> >>>>>=20
+> >>>>> Right; I'd still love to kill KVM_ASYNC_PF_SEND_ALWAYS though, ev=
+en if
+> >>>>> we do the save/restore in do_nmi(). That is some wild brain melt.=
+ Also,
+> >>>>> AFAIK none of the distros are actually shipping a PREEMPT=3Dy ker=
+nel
+> >>>>> anyway, so killing it shouldn't matter much.
+> >>>=20
+> >>> It will be nice if we can retain KVM_ASYNC_PF_SEND_ALWAYS. I have a=
+nother
+> >>> use case outside CONFIG_PREEMPT.
+> >>>=20
+> >>> I am trying to extend async pf interface to also report page fault =
+errors
+> >>> to the guest.
+> >>=20
+> >> Then please start over and design a sane ParaVirt Fault interface. T=
+he
+> >> current one is utter crap.
+> >=20
+> > Agreed. Don=E2=80=99t extend the current mechanism. Replace it.
+> >=20
+> > I would be happy to review a replacement. I=E2=80=99m not really exci=
+ted to review an extension of the current mess.  The current thing is bar=
+ely, if at all, correct.
+>=20
+> I read your patch. It cannot possibly be correct.  You need to decide w=
+hat happens if you get a memory failure when guest interrupts are off. If=
+ this happens, you can=E2=80=99t send #PF, but you also can=E2=80=99t jus=
+t swallow the error. The existing APF code is so messy that it=E2=80=99s =
+not at all obvious what your code ends up doing, but I=E2=80=99m pretty s=
+ure it doesn=E2=80=99t do anything sensible, especially since the ABI doe=
+sn=E2=80=99t have a sensible option.
 
-> > From: Alex Williamson <alex.williamson@redhat.com>
-> > Sent: Saturday, April 4, 2020 1:26 AM  
-> [...]
-> > > > > +	if (!pasid_cap.control_reg.paside) {
-> > > > > +		pr_debug("%s: its PF's PASID capability is not enabled\n",
-> > > > > +			dev_name(&vdev->pdev->dev));
-> > > > > +		ret = 0;
-> > > > > +		goto out;
-> > > > > +	}  
-> > > >
-> > > > What happens if the PF's PASID gets disabled while we're using it??  
-> > >
-> > > This is actually the open I highlighted in cover letter. Per the reply
-> > > from Baolu, this seems to be an open for bare-metal all the same.
-> > > https://lkml.org/lkml/2020/3/31/95  
-> > 
-> > Seems that needs to get sorted out before we can expose this.  Maybe
-> > some sort of registration with the PF driver that PASID is being used
-> > by a VF so it cannot be disabled?  
-> 
-> I guess we may do vSVA for PF first, and then adding VF vSVA later
-> given above additional need. It's not necessarily to enable both
-> in one step.
-> 
-> [...]
-> > > > > @@ -1604,6 +1901,18 @@ static int vfio_ecap_init(struct  
-> > vfio_pci_device *vdev)  
-> > > > >  	if (!ecaps)
-> > > > >  		*(u32 *)&vdev->vconfig[PCI_CFG_SPACE_SIZE] = 0;
-> > > > >
-> > > > > +#ifdef CONFIG_PCI_ATS
-> > > > > +	if (pdev->is_virtfn) {
-> > > > > +		struct pci_dev *physfn = pdev->physfn;
-> > > > > +
-> > > > > +		ret = vfio_pci_add_emulated_cap_for_vf(vdev,
-> > > > > +					physfn, epos_max, prev);
-> > > > > +		if (ret)
-> > > > > +			pr_info("%s, failed to add special caps for VF %s\n",
-> > > > > +				__func__, dev_name(&vdev->pdev->dev));
-> > > > > +	}
-> > > > > +#endif  
-> > > >
-> > > > I can only imagine that we should place the caps at the same location
-> > > > they exist on the PF, we don't know what hidden registers might be
-> > > > hiding in config space.  
-> 
-> Is there vendor guarantee that hidden registers will locate at the
-> same offset between PF and VF config space? 
+Hi Andy,
 
-I'm not sure if the spec really precludes hidden registers, but the
-fact that these registers are explicitly outside of the capability
-chain implies they're only intended for device specific use, so I'd say
-there are no guarantees about anything related to these registers.
+I am not familiar with this KVM code and trying to understand it. I think
+error exception gets queued and gets delivered at some point of time, eve=
+n
+if interrupts are disabled at the time of exception. Most likely at the t=
+ime
+of next VM entry.
 
-FWIW, vfio started out being more strict about restricting config space
-access to defined capabilities, until...
+Whether interrupts are enabled or not check only happens before we decide
+if async pf protocol should be followed or not. Once we decide to
+send PAGE_NOT_PRESENT, later notification PAGE_READY does not check
+if interrupts are enabled or not. And it kind of makes sense otherwise
+guest process will wait infinitely to receive PAGE_READY.
 
-commit a7d1ea1c11b33bda2691f3294b4d735ed635535a
-Author: Alex Williamson <alex.williamson@redhat.com>
-Date:   Mon Apr 1 09:04:12 2013 -0600
+I modified the code a bit to disable interrupt and wait 10 seconds (after
+getting PAGE_NOT_PRESENT message). And I noticed that error async pf
+got delivered after 10 seconds after enabling interrupts. So error
+async pf was not lost because interrupts were disabled.
 
-    vfio-pci: Enable raw access to unassigned config space
-    
-    Devices like be2net hide registers between the gaps in capabilities
-    and architected regions of PCI config space.  Our choices to support
-    such devices is to either build an ever growing and unmanageable white
-    list or rely on hardware isolation to protect us.  These registers are
-    really no different than MMIO or I/O port space registers, which we
-    don't attempt to regulate, so treat PCI config space in the same way.
+Havind said that, I thought disabling interrupts does not mask exceptions=
+.
+So page fault exception should have been delivered even with interrupts
+disabled. Is that correct? May be there was no vm exit/entry during
+those 10 seconds and that's why.
 
-> > > but we are not sure whether the same location is available on VF. In
-> > > this patch, it actually places the emulated cap physically behind the
-> > > cap which lays farthest (its offset is largest) within VF's config space
-> > > as the PCIe caps are linked in a chain.  
-> > 
-> > But, as we've found on Broadcom NICs (iirc), hardware developers have a
-> > nasty habit of hiding random registers in PCI config space, outside of
-> > defined capabilities.  I feel like IGD might even do this too, is that
-> > true?  So I don't think we can guarantee that just because a section of
-> > config space isn't part of a defined capability that its unused.  It
-> > only means that it's unused by common code, but it might have device
-> > specific purposes.  So of the PCIe spec indicates that VFs cannot
-> > include these capabilities and virtialization software needs to
-> > emulate them, we need somewhere safe to place them in config space, and
-> > simply placing them off the end of known capabilities doesn't give me
-> > any confidence.  Also, hardware has no requirement to make compact use
-> > of extended config space.  The first capability must be at 0x100, the
-> > very next capability could consume all the way to the last byte of the
-> > 4K extended range, and the next link in the chain could be somewhere in
-> > the middle.  Thanks,
-> >   
-> 
-> Then what would be a viable option? Vendor nasty habit implies
-> no standard, thus I don't see how VFIO can find a safe location
-> by itself. Also curious how those hidden registers are identified
-> by VFIO and employed with proper r/w policy today. If sort of quirks
-> are used, then could such quirk way be extended to also carry
-> the information about vendor specific safe location? When no
-> such quirk info is provided (the majority case), VFIO then finds
-> out a free location to carry the new cap.
-
-See above commit, rather than quirks we allow raw access to any config
-space outside of the capability chain.  My preference for trying to
-place virtual capabilities at the same offset as the capability exists
-on the PF is my impression that the PF config space is often a template
-for the VF config space.  The PF and VF are clearly not independent
-devices, they share design aspects, and sometimes drivers.  Therefore
-if I was a lazy engineer trying to find a place to hide a register in
-config space (and ignoring vendor capabilities*), I'd probably put it
-in the same place on both devices.  Thus if we maintain the same
-capability footprint as the PF, we have a better chance of avoiding
-them.  It's a gamble and maybe we're overthinking it, but this has
-always been a concern when adding virtual capabilities to a physical
-device.  We can always fail over to an approach where we simply find
-free space.  Thanks,
-
-Alex
-
-* ISTR the Broadcom device implemented the hidden register in standard
-  config space, which was otherwise entirely packed, ie. there was no
-  room for the register to be implemented as a vendor cap.
+Thanks
+Vivek
 
