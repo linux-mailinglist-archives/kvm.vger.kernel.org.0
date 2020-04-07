@@ -2,191 +2,352 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id DD4B11A1059
-	for <lists+kvm@lfdr.de>; Tue,  7 Apr 2020 17:37:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 31A5B1A107F
+	for <lists+kvm@lfdr.de>; Tue,  7 Apr 2020 17:46:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729462AbgDGPh5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Apr 2020 11:37:57 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:38031 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1729461AbgDGPh4 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 7 Apr 2020 11:37:56 -0400
+        id S1726806AbgDGPqD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Apr 2020 11:46:03 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:31756 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726637AbgDGPqD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Apr 2020 11:46:03 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1586273875;
+        s=mimecast20190719; t=1586274362;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:in-reply-to:in-reply-to:references:references;
-        bh=yh9o+3NPEgTaI9xXEwkz3z8Y3AmGExFLZ61QmDFzc9s=;
-        b=eb4cAQCXvji3IF9MICc39sav2bZ8bnyPSB/29XYzmcHGWq5vFG84CUXbcVVo5GlXGsWeOZ
-        1DgcWmOSBDwtfost8ZUUqDSbjQeaDq99F4rD4+PjM2qo41DhowYF5Kg/6HR+UWzGYj7zny
-        D2RLvGaFUjhzoQGgwn3Uk8PYQhkmtNA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-159-2ApU4bQ_PBmi4w5zeRuZMQ-1; Tue, 07 Apr 2020 11:37:49 -0400
-X-MC-Unique: 2ApU4bQ_PBmi4w5zeRuZMQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8EB81107ACC9;
-        Tue,  7 Apr 2020 15:37:48 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-116-15.gru2.redhat.com [10.97.116.15])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 72245272A5;
-        Tue,  7 Apr 2020 15:37:44 +0000 (UTC)
-From:   Wainer dos Santos Moschetta <wainersm@redhat.com>
-To:     pbonzini@redhat.com, kvm@vger.kernel.org
-Cc:     drjones@redhat.com, david@redhat.com, linux-kernel@vger.kernel.org,
-        linux-kselftest@vger.kernel.org
-Subject: [PATCH v3 2/2] selftests: kvm: Add mem_slot_test test
-Date:   Tue,  7 Apr 2020 12:37:31 -0300
-Message-Id: <20200407153731.3236-3-wainersm@redhat.com>
-In-Reply-To: <20200407153731.3236-1-wainersm@redhat.com>
-References: <20200407153731.3236-1-wainersm@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=cjZxTnYiiQOiGbCeQOJMkwdfCCa6o8kDSXhq/4N/Y40=;
+        b=gPSYfOX4Yi2xEnsUqOWmMU7MxKua+DWqXGISe9RzPGKsBk2HNpU5haXC6khd3/4SsPFQuC
+        VYUofKCh1osN5zg5PZmIX9JCYarwzHxHThDTGMD7nnUv010+UMNEmeiZvo0CM8RSeBahLd
+        ZvnNgw3RQwifTqyx4GSdwN6pN3Aml3Y=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-310-4B0QzFpmNBmJV75PdjRGLw-1; Tue, 07 Apr 2020 11:45:59 -0400
+X-MC-Unique: 4B0QzFpmNBmJV75PdjRGLw-1
+Received: by mail-wr1-f72.google.com with SMTP id 91so2179321wro.1
+        for <kvm@vger.kernel.org>; Tue, 07 Apr 2020 08:45:59 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=cjZxTnYiiQOiGbCeQOJMkwdfCCa6o8kDSXhq/4N/Y40=;
+        b=GpFWCjxPr8TL6/aZp45Aa8xwNRgJec3eZ7RL9FQXkC5EzoNNdOcl3s6HM/ixpdL9V/
+         ie0h4/Ww+8ny6Fw/3kXmGTTCK+fc81JIB/RYY0wG7s4zSGG11hPcwqNJr4IVtFNmp8eS
+         2VmQt2Or7RLqH/iRZKehE9twumNzwNKnPgPZDsmJBYklnv5DNl9CDO4rdWcUQFUNn3Zs
+         nhDDNocoiX5A+yE5VN219byaPRa38KFrxTsieEmNjyEGp2GY4dma5LVknOtc9ohFiX1y
+         8K31+yCIBWvZr6MDvh/AfDpdpOabUchTLbx2rzVlLgZvMMfTHNNZZylVrwL86evq2WCk
+         2+bA==
+X-Gm-Message-State: AGi0PuYxYVYDC5G9ozYndJqIojgVgEHcvdOmtkLhftU31iMrZNpEuIXG
+        iTAKf1m1rX/0moIH9X2x6Om9mTX1GPU+8ihN1HjIXhfMiduxJt8Pw0owvqWLcB+hoMvyyl/t31Y
+        hFO+Ww8rQl9F6
+X-Received: by 2002:a1c:741a:: with SMTP id p26mr2787408wmc.104.1586274358014;
+        Tue, 07 Apr 2020 08:45:58 -0700 (PDT)
+X-Google-Smtp-Source: APiQypKESKYRIxOxNwNLbOzKtQVyp0wJ110m669FoTW85m3Hkw1+G3BjPPoxewjP5oIKFsLQEugm1A==
+X-Received: by 2002:a1c:741a:: with SMTP id p26mr2787389wmc.104.1586274357706;
+        Tue, 07 Apr 2020 08:45:57 -0700 (PDT)
+Received: from [192.168.10.150] ([93.56.170.5])
+        by smtp.gmail.com with ESMTPSA id n131sm2861031wmf.35.2020.04.07.08.45.56
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 07 Apr 2020 08:45:57 -0700 (PDT)
+Subject: Re: [PATCH kvm-unit-tests v2] arch-run: Add reserved variables to the
+ default environ
+To:     Andrew Jones <drjones@redhat.com>, kvm@vger.kernel.org
+Cc:     lvivier@redhat.com, thuth@redhat.com, david@redhat.com,
+        frankja@linux.ibm.com
+References: <20200407113312.65587-1-drjones@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <ea6a1988-c718-f0a4-7428-e01ecffe00dd@redhat.com>
+Date:   Tue, 7 Apr 2020 17:45:56 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
+MIME-Version: 1.0
+In-Reply-To: <20200407113312.65587-1-drjones@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This patch introduces the mem_slot_test test which checks
-an VM can have added memory slots up to the limit defined in
-KVM_CAP_NR_MEMSLOTS. Then attempt to add one more slot to
-verify it fails as expected.
+On 07/04/20 13:33, Andrew Jones wrote:
+> Add the already reserved (see README) variables to the default
+> environ. To do so neatly we rework the environ creation a bit too.
+> mkstandalone also learns to honor config.mak as to whether or not
+> to make environs, and we allow the $ERRATATXT file to be selected
+> at configure time.
+> 
+> Signed-off-by: Andrew Jones <drjones@redhat.com>
+> ---
+> 
+> v2: Improve error handling of missing erratatxt files.
+> 
+>  configure               |  13 ++++-
+>  scripts/arch-run.bash   | 125 +++++++++++++++++++++++++---------------
+>  scripts/mkstandalone.sh |   9 ++-
+>  3 files changed, 97 insertions(+), 50 deletions(-)
+> 
+> diff --git a/configure b/configure
+> index 579765165fdf..5d2cd90cd180 100755
+> --- a/configure
+> +++ b/configure
+> @@ -17,6 +17,7 @@ environ_default=yes
+>  u32_long=
+>  vmm="qemu"
+>  errata_force=0
+> +erratatxt="errata.txt"
+>  
+>  usage() {
+>      cat <<-EOF
+> @@ -37,6 +38,8 @@ usage() {
+>  	    --[enable|disable]-default-environ
+>  	                           enable or disable the generation of a default environ when
+>  	                           no environ is provided by the user (enabled by default)
+> +	    --erratatxt=FILE       specify a file to use instead of errata.txt. Use
+> +	                           '--erratatxt=' to ensure no file is used.
+>  EOF
+>      exit 1
+>  }
+> @@ -85,6 +88,9 @@ while [[ "$1" = -* ]]; do
+>  	--disable-default-environ)
+>  	    environ_default=no
+>  	    ;;
+> +	--erratatxt)
+> +	    erratatxt="$arg"
+> +	    ;;
+>  	--help)
+>  	    usage
+>  	    ;;
+> @@ -94,6 +100,11 @@ while [[ "$1" = -* ]]; do
+>      esac
+>  done
+>  
+> +if [ "$erratatxt" ] && [ ! -f "$erratatxt" ]; then
+> +    echo "erratatxt: $erratatxt does not exist or is not a regular file"
+> +    exit 1
+> +fi
+> +
+>  arch_name=$arch
+>  [ "$arch" = "aarch64" ] && arch="arm64"
+>  [ "$arch_name" = "arm64" ] && arch_name="aarch64"
+> @@ -194,7 +205,7 @@ FIRMWARE=$firmware
+>  ENDIAN=$endian
+>  PRETTY_PRINT_STACKS=$pretty_print_stacks
+>  ENVIRON_DEFAULT=$environ_default
+> -ERRATATXT=errata.txt
+> +ERRATATXT=$erratatxt
+>  U32_LONG_FMT=$u32_long
+>  EOF
+>  
+> diff --git a/scripts/arch-run.bash b/scripts/arch-run.bash
+> index da1a9d7871e5..8348761d86ff 100644
+> --- a/scripts/arch-run.bash
+> +++ b/scripts/arch-run.bash
+> @@ -28,9 +28,9 @@ run_qemu ()
+>  {
+>  	local stdout errors ret sig
+>  
+> +	initrd_create || return $?
+>  	echo -n "$@"
+> -	initrd_create &&
+> -		echo -n " #"
+> +	[ "$ENVIRON_DEFAULT" = "yes" ] && echo -n " #"
+>  	echo " $INITRD"
+>  
+>  	# stdout to {stdout}, stderr to $errors and stderr
+> @@ -195,60 +195,91 @@ search_qemu_binary ()
+>  
+>  initrd_create ()
+>  {
+> -	local ret
+> -
+> -	env_add_errata
+> -	ret=$?
+> +	if [ "$ENVIRON_DEFAULT" = "yes" ]; then
+> +		trap_exit_push 'rm -f $KVM_UNIT_TESTS_ENV; [ "$KVM_UNIT_TESTS_ENV_OLD" ] && export KVM_UNIT_TESTS_ENV="$KVM_UNIT_TESTS_ENV_OLD" || unset KVM_UNIT_TESTS_ENV; unset KVM_UNIT_TESTS_ENV_OLD'
+> +		[ -f "$KVM_UNIT_TESTS_ENV" ] && export KVM_UNIT_TESTS_ENV_OLD="$KVM_UNIT_TESTS_ENV"
+> +		export KVM_UNIT_TESTS_ENV=$(mktemp)
+> +		env_params
+> +		env_file
+> +		env_errata || return $?
+> +	fi
+>  
+>  	unset INITRD
+>  	[ -f "$KVM_UNIT_TESTS_ENV" ] && INITRD="-initrd $KVM_UNIT_TESTS_ENV"
+>  
+> -	return $ret
+> +	return 0
+>  }
+>  
+> -env_add_errata ()
+> +env_add_params ()
+>  {
+> -	local line errata ret=1
+> +	local p
+>  
+> -	if [ -f "$KVM_UNIT_TESTS_ENV" ] && grep -q '^ERRATA_' <(env); then
+> -		for line in $(grep '^ERRATA_' "$KVM_UNIT_TESTS_ENV"); do
+> -			errata=${line%%=*}
+> -			[ -n "${!errata}" ] && continue
+> +	for p in "$@"; do
+> +		if eval test -v $p; then
+> +			eval export "$p"
+> +		else
+> +			eval export "$p="
+> +		fi
+> +		grep "^$p=" <(env) >>$KVM_UNIT_TESTS_ENV
+> +	done
+> +}
+> +
+> +env_params ()
+> +{
+> +	local qemu have_qemu
+> +	local _ rest
+> +
+> +	qemu=$(search_qemu_binary) && have_qemu=1
+> +
+> +	if [ "$have_qemu" ]; then
+> +		if [ -n "$ACCEL" ] || [ -n "$QEMU_ACCEL" ]; then
+> +			[ -n "$ACCEL" ] && QEMU_ACCEL=$ACCEL
+> +		fi
+> +		QEMU_VERSION_STRING="$($qemu -h | head -1)"
+> +		IFS='[ .]' read -r _ _ _ QEMU_MAJOR QEMU_MINOR QEMU_MICRO rest <<<"$QEMU_VERSION_STRING"
+> +	fi
+> +	env_add_params QEMU_ACCEL QEMU_VERSION_STRING QEMU_MAJOR QEMU_MINOR QEMU_MICRO
+> +
+> +	KERNEL_VERSION_STRING=$(uname -r)
+> +	IFS=. read -r KERNEL_VERSION KERNEL_PATCHLEVEL rest <<<"$KERNEL_VERSION_STRING"
+> +	IFS=- read -r KERNEL_SUBLEVEL KERNEL_EXTRAVERSION <<<"$rest"
+> +	KERNEL_SUBLEVEL=${KERNEL_SUBLEVEL%%[!0-9]*}
+> +	KERNEL_EXTRAVERSION=${KERNEL_EXTRAVERSION%%[!0-9]*}
+> +	! [[ $KERNEL_SUBLEVEL =~ ^[0-9]+$ ]] && unset $KERNEL_SUBLEVEL
+> +	! [[ $KERNEL_EXTRAVERSION =~ ^[0-9]+$ ]] && unset $KERNEL_EXTRAVERSION
+> +	env_add_params KERNEL_VERSION_STRING KERNEL_VERSION KERNEL_PATCHLEVEL KERNEL_SUBLEVEL KERNEL_EXTRAVERSION
+> +}
+> +
+> +env_file ()
+> +{
+> +	local line var
+> +
+> +	[ ! -f "$KVM_UNIT_TESTS_ENV_OLD" ] && return
+> +
+> +	for line in $(grep -E '^[[:blank:]]*[[:alpha:]_][[:alnum:]_]*=' "$KVM_UNIT_TESTS_ENV_OLD"); do
+> +		var=${line%%=*}
+> +		if ! grep -q "^$var=" $KVM_UNIT_TESTS_ENV; then
+>  			eval export "$line"
+> -		done
+> -	elif [ ! -f "$KVM_UNIT_TESTS_ENV" ]; then
+> +			grep "^$var=" <(env) >>$KVM_UNIT_TESTS_ENV
+> +		fi
+> +	done
+> +}
+> +
+> +env_errata ()
+> +{
+> +	if [ "$ERRATATXT" ] && [ ! -f "$ERRATATXT" ]; then
+> +		echo "$ERRATATXT not found. (ERRATATXT=$ERRATATXT)" >&2
+> +		return 2
+> +	elif [ "$ERRATATXT" ]; then
+>  		env_generate_errata
+>  	fi
+> -
+> -	if grep -q '^ERRATA_' <(env); then
+> -		export KVM_UNIT_TESTS_ENV_OLD="$KVM_UNIT_TESTS_ENV"
+> -		export KVM_UNIT_TESTS_ENV=$(mktemp)
+> -		trap_exit_push 'rm -f $KVM_UNIT_TESTS_ENV; [ "$KVM_UNIT_TESTS_ENV_OLD" ] && export KVM_UNIT_TESTS_ENV="$KVM_UNIT_TESTS_ENV_OLD" || unset KVM_UNIT_TESTS_ENV; unset KVM_UNIT_TESTS_ENV_OLD'
+> -		[ -f "$KVM_UNIT_TESTS_ENV_OLD" ] && grep -v '^ERRATA_' "$KVM_UNIT_TESTS_ENV_OLD" > $KVM_UNIT_TESTS_ENV
+> -		grep '^ERRATA_' <(env) >> $KVM_UNIT_TESTS_ENV
+> -		ret=0
+> -	fi
+> -
+> -	return $ret
+> +	sort <(env | grep '^ERRATA_') <(grep '^ERRATA_' $KVM_UNIT_TESTS_ENV) | uniq -u >>$KVM_UNIT_TESTS_ENV
+>  }
+>  
+>  env_generate_errata ()
+>  {
+> -	local kernel_version_string=$(uname -r)
+> -	local kernel_version kernel_patchlevel kernel_sublevel kernel_extraversion
+>  	local line commit minver errata rest v p s x have
+>  
+> -	IFS=. read -r kernel_version kernel_patchlevel rest <<<"$kernel_version_string"
+> -	IFS=- read -r kernel_sublevel kernel_extraversion <<<"$rest"
+> -	kernel_sublevel=${kernel_sublevel%%[!0-9]*}
+> -	kernel_extraversion=${kernel_extraversion%%[!0-9]*}
+> -
+> -	! [[ $kernel_sublevel =~ ^[0-9]+$ ]] && unset $kernel_sublevel
+> -	! [[ $kernel_extraversion =~ ^[0-9]+$ ]] && unset $kernel_extraversion
+> -
+> -	[ "$ENVIRON_DEFAULT" != "yes" ] && return
+> -	[ ! -f "$ERRATATXT" ] && return
+> -
+>  	for line in $(grep -v '^#' "$ERRATATXT" | tr -d '[:blank:]' | cut -d: -f1,2); do
+>  		commit=${line%:*}
+>  		minver=${line#*:}
+> @@ -269,16 +300,16 @@ env_generate_errata ()
+>  		! [[ $s =~ ^[0-9]+$ ]] && unset $s
+>  		! [[ $x =~ ^[0-9]+$ ]] && unset $x
+>  
+> -		if (( $kernel_version > $v ||
+> -		      ($kernel_version == $v && $kernel_patchlevel > $p) )); then
+> +		if (( $KERNEL_VERSION > $v ||
+> +		      ($KERNEL_VERSION == $v && $KERNEL_PATCHLEVEL > $p) )); then
+>  			have=y
+> -		elif (( $kernel_version == $v && $kernel_patchlevel == $p )); then
+> -			if [ "$kernel_sublevel" ] && [ "$s" ]; then
+> -				if (( $kernel_sublevel > $s )); then
+> +		elif (( $KERNEL_VERSION == $v && $KERNEL_PATCHLEVEL == $p )); then
+> +			if [ "$KERNEL_SUBLEVEL" ] && [ "$s" ]; then
+> +				if (( $KERNEL_SUBLEVEL > $s )); then
+>  					have=y
+> -				elif (( $kernel_sublevel == $s )); then
+> -					if [ "$kernel_extraversion" ] && [ "$x" ]; then
+> -						if (( $kernel_extraversion >= $x )); then
+> +				elif (( $KERNEL_SUBLEVEL == $s )); then
+> +					if [ "$KERNEL_EXTRAVERSION" ] && [ "$x" ]; then
+> +						if (( $KERNEL_EXTRAVERSION >= $x )); then
+>  							have=y
+>  						else
+>  							have=n
+> diff --git a/scripts/mkstandalone.sh b/scripts/mkstandalone.sh
+> index c1ecb7f99cdc..9d506cc95072 100755
+> --- a/scripts/mkstandalone.sh
+> +++ b/scripts/mkstandalone.sh
+> @@ -36,7 +36,7 @@ generate_test ()
+>  
+>  	echo "#!/usr/bin/env bash"
+>  	echo "export STANDALONE=yes"
+> -	echo "export ENVIRON_DEFAULT=yes"
+> +	echo "export ENVIRON_DEFAULT=$ENVIRON_DEFAULT"
+>  	echo "export HOST=\$(uname -m | sed -e 's/i.86/i386/;s/arm.*/arm/;s/ppc64.*/ppc64/')"
+>  	echo "export PRETTY_PRINT_STACKS=no"
+>  
+> @@ -59,7 +59,7 @@ generate_test ()
+>  		echo 'export FIRMWARE'
+>  	fi
+>  
+> -	if [ "$ERRATATXT" ]; then
+> +	if [ "$ENVIRON_DEFAULT" = "yes" ] && [ "$ERRATATXT" ]; then
+>  		temp_file ERRATATXT "$ERRATATXT"
+>  		echo 'export ERRATATXT'
+>  	fi
+> @@ -99,6 +99,11 @@ function mkstandalone()
+>  	echo Written $standalone.
+>  }
+>  
+> +if [ "$ENVIRON_DEFAULT" = "yes" ] && [ "$ERRATATXT" ] && [ ! -f "$ERRATATXT" ]; then
+> +	echo "$ERRATATXT not found. (ERRATATXT=$ERRATATXT)" >&2
+> +	exit 2
+> +fi
+> +
+>  trap 'rm -f $cfg' EXIT
+>  cfg=$(mktemp)
+>  
+> 
 
-Signed-off-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
----
- tools/testing/selftests/kvm/.gitignore      |  1 +
- tools/testing/selftests/kvm/Makefile        |  3 +
- tools/testing/selftests/kvm/mem_slot_test.c | 85 +++++++++++++++++++++
- 3 files changed, 89 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/mem_slot_test.c
+Queued, thanks.
 
-diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
-index 16877c3daabf..127d27188427 100644
---- a/tools/testing/selftests/kvm/.gitignore
-+++ b/tools/testing/selftests/kvm/.gitignore
-@@ -21,4 +21,5 @@
- /demand_paging_test
- /dirty_log_test
- /kvm_create_max_vcpus
-+/mem_slot_test
- /steal_time
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index 712a2ddd2a27..338b6cdce1a0 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -32,12 +32,14 @@ TEST_GEN_PROGS_x86_64 += clear_dirty_log_test
- TEST_GEN_PROGS_x86_64 += demand_paging_test
- TEST_GEN_PROGS_x86_64 += dirty_log_test
- TEST_GEN_PROGS_x86_64 += kvm_create_max_vcpus
-+TEST_GEN_PROGS_x86_64 += mem_slot_test
- TEST_GEN_PROGS_x86_64 += steal_time
- 
- TEST_GEN_PROGS_aarch64 += clear_dirty_log_test
- TEST_GEN_PROGS_aarch64 += demand_paging_test
- TEST_GEN_PROGS_aarch64 += dirty_log_test
- TEST_GEN_PROGS_aarch64 += kvm_create_max_vcpus
-+TEST_GEN_PROGS_aarch64 += mem_slot_test
- TEST_GEN_PROGS_aarch64 += steal_time
- 
- TEST_GEN_PROGS_s390x = s390x/memop
-@@ -46,6 +48,7 @@ TEST_GEN_PROGS_s390x += s390x/sync_regs_test
- TEST_GEN_PROGS_s390x += demand_paging_test
- TEST_GEN_PROGS_s390x += dirty_log_test
- TEST_GEN_PROGS_s390x += kvm_create_max_vcpus
-+TEST_GEN_PROGS_s390x += mem_slot_test
- 
- TEST_GEN_PROGS += $(TEST_GEN_PROGS_$(UNAME_M))
- LIBKVM += $(LIBKVM_$(UNAME_M))
-diff --git a/tools/testing/selftests/kvm/mem_slot_test.c b/tools/testing/selftests/kvm/mem_slot_test.c
-new file mode 100644
-index 000000000000..0588dc2e8e01
---- /dev/null
-+++ b/tools/testing/selftests/kvm/mem_slot_test.c
-@@ -0,0 +1,85 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * mem_slot_test
-+ *
-+ * Copyright (C) 2020, Red Hat, Inc.
-+ *
-+ * Test suite for memory region operations.
-+ */
-+#define _GNU_SOURCE /* for program_invocation_short_name */
-+#include <linux/kvm.h>
-+#include <sys/mman.h>
-+
-+#include "test_util.h"
-+#include "kvm_util.h"
-+
-+/*
-+ * Test it can be added memory slots up to KVM_CAP_NR_MEMSLOTS, then any
-+ * tentative to add further slots should fail.
-+ */
-+static void test_add_max_slots(void)
-+{
-+	int ret;
-+	struct kvm_userspace_memory_region *kvm_region;
-+	struct kvm_vm *vm;
-+	uint32_t max_mem_slots;
-+	uint32_t mem_reg_flags;
-+	uint32_t slot;
-+	uint64_t guest_addr;
-+	uint64_t mem_reg_npages;
-+	uint64_t mem_reg_size;
-+
-+	max_mem_slots = kvm_check_cap(KVM_CAP_NR_MEMSLOTS);
-+	TEST_ASSERT(max_mem_slots > 0,
-+		    "KVM_CAP_NR_MEMSLOTS should be greater than 0");
-+	pr_info("Allowed number of memory slots: %i\n", max_mem_slots);
-+
-+	vm = vm_create(VM_MODE_DEFAULT, 0, O_RDWR);
-+
-+	/*
-+	 * Uses 1MB sized/aligned memory region since this is the minimal
-+	 * required on s390x.
-+	 */
-+	mem_reg_size = 0x100000;
-+	mem_reg_npages = vm_calc_num_guest_pages(VM_MODE_DEFAULT, mem_reg_size);
-+	mem_reg_flags = 0;
-+
-+	guest_addr = 0x0;
-+
-+	/* Check it can be added memory slots up to the maximum allowed */
-+	pr_info("Adding slots 0..%i, each memory region with %ldK size\n",
-+		(max_mem_slots - 1), mem_reg_size >> 10);
-+	for (slot = 0; slot < max_mem_slots; slot++) {
-+		vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS,
-+					    guest_addr, slot, mem_reg_npages,
-+					    mem_reg_flags);
-+		guest_addr += mem_reg_size;
-+	}
-+
-+	/* Check it cannot be added memory slots beyond the limit */
-+	void *mem = mmap(NULL, mem_reg_size, PROT_READ | PROT_WRITE,
-+			 MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-+	TEST_ASSERT(mem != MAP_FAILED, "Failed to mmap() host");
-+
-+	kvm_region = malloc(sizeof(struct kvm_userspace_memory_region));
-+	TEST_ASSERT(kvm_region,
-+		    "Failed to malloc() kvm_userspace_memory_region");
-+	kvm_region->slot = slot;
-+	kvm_region->flags = mem_reg_flags;
-+	kvm_region->guest_phys_addr = guest_addr;
-+	kvm_region->userspace_addr = (uint64_t) mem;
-+
-+	ret = ioctl(vm_get_fd(vm), KVM_SET_USER_MEMORY_REGION, kvm_region);
-+	TEST_ASSERT(ret == -1 && errno == EINVAL,
-+		    "Adding one more memory slot should fail with EINVAL");
-+
-+	munmap(mem, mem_reg_size);
-+	free(kvm_region);
-+	kvm_vm_free(vm);
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	test_add_max_slots();
-+	return 0;
-+}
--- 
-2.17.2
+Paolo
 
