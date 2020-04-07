@@ -2,54 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id CAB7C1A17C9
-	for <lists+kvm@lfdr.de>; Wed,  8 Apr 2020 00:09:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A893B1A181F
+	for <lists+kvm@lfdr.de>; Wed,  8 Apr 2020 00:29:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726621AbgDGWJE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Apr 2020 18:09:04 -0400
-Received: from bombadil.infradead.org ([198.137.202.133]:51950 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726416AbgDGWJE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Apr 2020 18:09:04 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=VJbgJAe6SzFkTbL5NsrOiwu1YrOSYf9AuTvbCQyh2as=; b=iCObDzZc2zb180nZviio0/UZ4M
-        XbD2xLkOJKVKFtTzRB3pQtU1xuFg/mRiketYbkyo95gNuUZu/RYpMLGMLEtNjHEFf7IUJiQjLva9c
-        V/6o4/8pp8afW0q+98Mhf3vK/KJizovWUEE6NotVQG8QCQGNKuhMUZ45DKyoYSldfD7oC2X5h7/JN
-        CcmVAAc5VuOI5b6glfDC6QslCfsjxmkUvhTZuNtXXJTL+qcGOdPgkiJaUwOLm8srO7XhUGKeHVoGQ
-        o39NivE5EyBKfTdB71zGmQ+TxBYN2hahpWqCc2+9EelwrMbdoyfaQuFR6rMMvbPHE08JvTkYr4wX4
-        sFty8Y8g==;
-Received: from willy by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jLwOx-0002CD-HJ; Tue, 07 Apr 2020 22:08:59 +0000
-Date:   Tue, 7 Apr 2020 15:08:59 -0700
-From:   Matthew Wilcox <willy@infradead.org>
-To:     syzbot <syzbot+516667c144d77aa5ba3c@syzkaller.appspotmail.com>
-Cc:     alex.shi@linux.alibaba.com, armijn@tjaldur.nl,
-        gregkh@linuxfoundation.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, pbonzini@redhat.com,
-        rfontana@redhat.com, syzkaller-bugs@googlegroups.com,
-        tglx@linutronix.de
-Subject: Re: KASAN: slab-out-of-bounds Read in __kvm_map_gfn
-Message-ID: <20200407220859.GL21484@bombadil.infradead.org>
-References: <00000000000001be5205a2b90e71@google.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <00000000000001be5205a2b90e71@google.com>
+        id S1726421AbgDGW31 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Apr 2020 18:29:27 -0400
+Received: from mail-pf1-f196.google.com ([209.85.210.196]:47023 "EHLO
+        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726393AbgDGW31 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Apr 2020 18:29:27 -0400
+Received: by mail-pf1-f196.google.com with SMTP id q3so1446575pff.13
+        for <kvm@vger.kernel.org>; Tue, 07 Apr 2020 15:29:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=amacapital-net.20150623.gappssmtp.com; s=20150623;
+        h=content-transfer-encoding:from:mime-version:subject:date:message-id
+         :references:cc:in-reply-to:to;
+        bh=0b3dFf0p0sEoGF0Po8/4RVUQz4bKJvzm999agcgzdpU=;
+        b=EQpvnLI3qdHriVGWpEZsLWrrSkgiUZscH4WitoZYNAbPTAuIy5zCe1/gzAVYEhzsSo
+         gyeCWEZ30o8V21hIvD+Nau1RCjUarV/PuJgnKk+LCrW0Kp8BIRughSTKhw4m6ZxXbMj4
+         a/lOoc8R2uAxqc2alLD1vx/eleE5BX8FM4dM2VlQnl+mPkb0dPUq3VvpXW5WOPCJi64R
+         ICrKr1VkkmiMSk1OYSa9NEfq947hsvmsnc3wZWJt4lLPRXckXP700lJm5vO4Q77Maevy
+         byFgSyVP/1nkE+BFIDoy8HAH/iW14sViiyDOx8JIf0n17JkFNnvUcGGgs4gW88EIhn2I
+         yT1A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:content-transfer-encoding:from:mime-version
+         :subject:date:message-id:references:cc:in-reply-to:to;
+        bh=0b3dFf0p0sEoGF0Po8/4RVUQz4bKJvzm999agcgzdpU=;
+        b=ZrpXEiMtrTx0JHfF7FUKK11KYg5aWftSHQNyY+lh1zG9I5WdeUJ8zM4JWVjKLln1AU
+         6hE2hsiVjk0kYTPknCQ6bef/YRjhxK9fYR1rtK1FtfHSCzNaQKehOyU039aNQ5aj3fM1
+         nzirWXdcM4xAHuCO9HObT38Oku0zKVCSl+0So7dwPvUyIrUsuDFKTgXRv3EWFSC3nwFR
+         0f62uCqRiKroFaaSqoJvo9dB3xRq52pMbNdOC+oUB5l/JGL+FcKYqS9LEAFoOGR9MK16
+         gB3+VkkTq/XqDfjU1+jMX6WfCsziGCvl7xTBiZ2cO4z+aP0i/Ao7WqvvmJsJsP/5WUDl
+         LoJw==
+X-Gm-Message-State: AGi0PuZGZofSaQ5T3HGy2l8zlRJ2JapfQUXO//7rti56Vt5fcn74aNsR
+        3mEC4K3D87DlL3ljlFC1mxSpmQ==
+X-Google-Smtp-Source: APiQypLOSfylfRkaCMr+boM7KCCzYJdOgLLQiUSxo5CgBZ3zkEGs2IB/5ZBvo6C+PhF1ZW4hfF5pMQ==
+X-Received: by 2002:a62:5e86:: with SMTP id s128mr4791040pfb.157.1586298566299;
+        Tue, 07 Apr 2020 15:29:26 -0700 (PDT)
+Received: from ?IPv6:2601:646:c200:1ef2:a143:7d95:91a:a0ae? ([2601:646:c200:1ef2:a143:7d95:91a:a0ae])
+        by smtp.gmail.com with ESMTPSA id o15sm13938279pgj.60.2020.04.07.15.29.25
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 07 Apr 2020 15:29:25 -0700 (PDT)
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+From:   Andy Lutomirski <luto@amacapital.net>
+Mime-Version: 1.0 (1.0)
+Subject: Re: [PATCH v2] x86/kvm: Disable KVM_ASYNC_PF_SEND_ALWAYS
+Date:   Tue, 7 Apr 2020 15:29:23 -0700
+Message-Id: <0255CF03-D45D-45E0-BC61-79159B94ED44@amacapital.net>
+References: <2776fced-54c2-40eb-7921-1c68236c7f70@redhat.com>
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        Vivek Goyal <vgoyal@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Andy Lutomirski <luto@kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>, X86 ML <x86@kernel.org>,
+        kvm list <kvm@vger.kernel.org>, stable <stable@vger.kernel.org>
+In-Reply-To: <2776fced-54c2-40eb-7921-1c68236c7f70@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+X-Mailer: iPhone Mail (17E255)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Apr 07, 2020 at 01:16:11PM -0700, syzbot wrote:
-> The bug was bisected to:
-> 
-> commit 3a00e7c47c382b30524e78b36ab047c16b8fcfef
-> Author: Alex Shi <alex.shi@linux.alibaba.com>
-> Date:   Tue Jan 21 08:34:05 2020 +0000
-> 
->     ida: remove abandoned macros
 
-Definitely a bad bisect.
+
+> On Apr 7, 2020, at 3:07 PM, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>=20
+> =EF=BB=BFOn 07/04/20 23:41, Andy Lutomirski wrote:
+>> 2. Access to bad memory results in #MC.  Sure, #MC is a turd, but
+>> it=E2=80=99s an *architectural* turd. By all means, have a nice simple PV=
+
+>> mechanism to tell the #MC code exactly what went wrong, but keep the
+>> overall flow the same as in the native case.
+>>=20
+>> I think I like #2 much better. It has another nice effect: a good
+>> implementation will serve as a way to exercise the #MC code without
+>> needing to muck with EINJ or with whatever magic Tony uses. The
+>> average kernel developer does not have access to a box with testable
+>> memory failure reporting.
+>=20
+> I prefer #VE, but I can see how #MC has some appeal.  However, #VE has a
+> mechanism to avoid reentrancy, unlike #MC.  How would that be better
+> than the current mess with an NMI happening in the first few
+> instructions of the #PF handler?
+>=20
+>=20
+
+It has to be an IST vector due to the possibility of hitting a memory failur=
+e right after SYSCALL.  I imagine that making #VE use IST would be unfortuna=
+te.
+
+I think #MC has a mechanism to prevent reentrancy to a limited extent. How d=
+oes #VE avoid reentrancy?=
