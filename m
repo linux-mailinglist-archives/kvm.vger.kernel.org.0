@@ -2,150 +2,200 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id BAAAC1A0A58
-	for <lists+kvm@lfdr.de>; Tue,  7 Apr 2020 11:43:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E79731A0A75
+	for <lists+kvm@lfdr.de>; Tue,  7 Apr 2020 11:50:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728090AbgDGJn2 convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Tue, 7 Apr 2020 05:43:28 -0400
-Received: from mga05.intel.com ([192.55.52.43]:50872 "EHLO mga05.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725883AbgDGJn2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Apr 2020 05:43:28 -0400
-IronPort-SDR: TzGuwU94LtPmKKr66QzMDb8rgkKgSz/9UxMVVIDJB9NMNB55kI48e5ooG6UuH4ztf1YCO1eXvm
- MTx4BV9cxiFw==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Apr 2020 02:43:27 -0700
-IronPort-SDR: ADIj2PgCc549wdNYUg0B2hduccfdQAeDAlMT8s+6H2FSVKNI7E7kVIrh8I1malMuHVE0dlhJV0
- +pqscB6WzwhA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.72,353,1580803200"; 
-   d="scan'208";a="361487857"
-Received: from fmsmsx103.amr.corp.intel.com ([10.18.124.201])
-  by fmsmga001.fm.intel.com with ESMTP; 07 Apr 2020 02:43:27 -0700
-Received: from fmsmsx125.amr.corp.intel.com (10.18.125.40) by
- FMSMSX103.amr.corp.intel.com (10.18.124.201) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Tue, 7 Apr 2020 02:43:27 -0700
-Received: from shsmsx151.ccr.corp.intel.com (10.239.6.50) by
- FMSMSX125.amr.corp.intel.com (10.18.125.40) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Tue, 7 Apr 2020 02:43:27 -0700
-Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.225]) by
- SHSMSX151.ccr.corp.intel.com ([169.254.3.22]) with mapi id 14.03.0439.000;
- Tue, 7 Apr 2020 17:43:23 +0800
-From:   "Liu, Yi L" <yi.l.liu@intel.com>
-To:     Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        Auger Eric <eric.auger@redhat.com>
-CC:     "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "Tian, Jun J" <jun.j.tian@intel.com>,
-        "Sun, Yi Y" <yi.y.sun@intel.com>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Wu, Hao" <hao.wu@intel.com>
-Subject: RE: [PATCH v1 5/8] vfio/type1: Report 1st-level/stage-1 format to
- userspace
-Thread-Topic: [PATCH v1 5/8] vfio/type1: Report 1st-level/stage-1 format to
- userspace
-Thread-Index: AQHWAEUcqZEEdiOKbEGofjWp2Yic+6hjfq+AgAC/vLD//4YrAIAC1vWAgAbjh1A=
-Date:   Tue, 7 Apr 2020 09:43:23 +0000
-Message-ID: <A2975661238FB949B60364EF0F2C25743A2249DF@SHSMSX104.ccr.corp.intel.com>
-References: <1584880325-10561-1-git-send-email-yi.l.liu@intel.com>
- <1584880325-10561-6-git-send-email-yi.l.liu@intel.com>
- <cb68e9ab-77b0-7e97-a661-4836962041d9@redhat.com>
- <A2975661238FB949B60364EF0F2C25743A21DB4E@SHSMSX104.ccr.corp.intel.com>
- <b47891b1-ece6-c263-9c07-07c09c7d3752@redhat.com>
- <20200403082305.GA1269501@myrica>
-In-Reply-To: <20200403082305.GA1269501@myrica>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-version: 11.2.0.6
-dlp-reaction: no-action
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+        id S1728151AbgDGJuq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Apr 2020 05:50:46 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:39837 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726720AbgDGJum (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 7 Apr 2020 05:50:42 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1586253040;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=0sVBPEE0xzucWIbbsT162YE9B5hG9SIrPw6ALlMaDJs=;
+        b=YpMeAIjWHHfk0cA0K6FzC3QW5OxLn8UMVnOUC7kviT1wDCOvIbePTaNOz2e+r7U0JWuOdB
+        2qumAjnYpOjN8agtsCEdWmyiUzVnuvBK6TZmVF+nqcZGmczOIR8QPpeRQtYS2GryBMC8uc
+        bbooeIO2hzegv5JurGMdTk1jK9x3NS4=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-194-Xrkv_S0wNBaGRLaeqhl9lQ-1; Tue, 07 Apr 2020 05:50:37 -0400
+X-MC-Unique: Xrkv_S0wNBaGRLaeqhl9lQ-1
+Received: by mail-wm1-f72.google.com with SMTP id e16so487765wmh.5
+        for <kvm@vger.kernel.org>; Tue, 07 Apr 2020 02:50:37 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=0sVBPEE0xzucWIbbsT162YE9B5hG9SIrPw6ALlMaDJs=;
+        b=FITOO63+zdAluK/MkuoaPyTeaBeJRvQCG2ez4S2qNUMt5JVVfFgKLlmWtlm3gyqBFv
+         l8k0sAdRx6xBvGG4rkiuS0Zk6wKuRonjv4slrFK/YYxbizRecGsL6YL7WwvkAd5LQzMJ
+         z/BtKzsriUd1nI+85+gOT8WOIyOO0RjP0QYUeN3ctdr3JKPl3ZAccqPtUbpK5qDyaIb+
+         hLhF8tuqV+pJViWowqw0e39h2MsknRL/SHeSJmYE9khtStTZzSWtnJJqYJEjqnR+z0BZ
+         UPl8X2DPHObVfKybnP/cgmcrSCYjdHJpH+BVJK8qHvNechNzcc3qYz/SXrCou8R2vCiL
+         LD8g==
+X-Gm-Message-State: AGi0PuZjRgn4j9UhroNzqWcSQsqR6H+vPzPJT1HZrar/4j7ZLeeStZHv
+        Z51O5SHFUmuOk1c5ZdsC2EMG661NRxBYoAb1USNBWFQGJ1M3E7cOxQVOH0E0JI43QciSyZul1s/
+        EaXrsz4/9q+bu
+X-Received: by 2002:a1c:6a14:: with SMTP id f20mr1431088wmc.125.1586253035881;
+        Tue, 07 Apr 2020 02:50:35 -0700 (PDT)
+X-Google-Smtp-Source: APiQypJfdSbEhEAnnavsksjAg2GryZUBfh45QLjmuphCxXIBX+5BhJi3IGriZs1rxxuFBrWFBIg72Q==
+X-Received: by 2002:a1c:6a14:: with SMTP id f20mr1431058wmc.125.1586253035663;
+        Tue, 07 Apr 2020 02:50:35 -0700 (PDT)
+Received: from redhat.com (bzq-79-176-51-222.red.bezeqint.net. [79.176.51.222])
+        by smtp.gmail.com with ESMTPSA id y15sm6107385wro.68.2020.04.07.02.50.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 07 Apr 2020 02:50:35 -0700 (PDT)
+Date:   Tue, 7 Apr 2020 05:50:31 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        alexander.h.duyck@linux.intel.com, david@redhat.com,
+        eperezma@redhat.com, jasowang@redhat.com, lingshan.zhu@intel.com,
+        mhocko@kernel.org, namit@vmware.com, rdunlap@infradead.org,
+        rientjes@google.com, tiwei.bie@intel.com, tysand@google.com,
+        wei.w.wang@intel.com, xiao.w.wang@intel.com,
+        yuri.benditovich@daynix.com
+Subject: Re: [GIT PULL] vhost: fixes, vdpa
+Message-ID: <20200407054752-mutt-send-email-mst@kernel.org>
+References: <20200406171124-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200406171124-mutt-send-email-mst@kernel.org>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Jean,
+On Mon, Apr 06, 2020 at 05:11:28PM -0400, Michael S. Tsirkin wrote:
+> Now that many more architectures build vhost, a couple of these (um, and
+> arm with deprecated oabi) have reported build failures with randconfig,
+> however fixes for that need a bit more discussion/testing and will be
+> merged separately.
+> 
+> Not a regression - these previously simply didn't have vhost at all.
+> Also, there's some DMA API code in the vdpa simulator is hacky - if no
+> solution surfaces soon we can always disable it before release:
+> it's not a big deal either way as it's just test code.
+> 
+> The following changes since commit 16fbf79b0f83bc752cee8589279f1ebfe57b3b6e:
+> 
+>   Linux 5.6-rc7 (2020-03-22 18:31:56 -0700)
+> 
+> are available in the Git repository at:
+> 
+>   https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
+> 
+> for you to fetch changes up to c9b9f5f8c0f3cdb893cb86c168cdaa3aa5ed7278:
+> 
+>   vdpa: move to drivers/vdpa (2020-04-02 10:41:40 -0400)
+> 
+> ----------------------------------------------------------------
+> virtio: fixes, vdpa
+> 
+> Some bug fixes.
+> Balloon reverted to use the OOM handler again.
+> The new vdpa subsystem with two first drivers.
+> 
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 
-> From: Jean-Philippe Brucker <jean-philippe@linaro.org>
-> Sent: Friday, April 3, 2020 4:23 PM
-> To: Auger Eric <eric.auger@redhat.com>
-> userspace
-> 
-> On Wed, Apr 01, 2020 at 03:01:12PM +0200, Auger Eric wrote:
-> > >>>  	header = vfio_info_cap_add(caps, sizeof(*nesting_cap),
-> > >>>  				   VFIO_IOMMU_TYPE1_INFO_CAP_NESTING, 1);
-> @@ -2254,6 +2309,7
-> > >>> @@ static int vfio_iommu_info_add_nesting_cap(struct
-> > >> vfio_iommu *iommu,
-> > >>>  		/* nesting iommu type supports PASID requests (alloc/free) */
-> > >>>  		nesting_cap->nesting_capabilities |= VFIO_IOMMU_PASID_REQS;
-> > >> What is the meaning for ARM?
-> > >
-> > > I think it's just a software capability exposed to userspace, on
-> > > userspace side, it has a choice to use it or not. :-) The reason
-> > > define it and report it in cap nesting is that I'd like to make the
-> > > pasid alloc/free be available just for IOMMU with type
-> > > VFIO_IOMMU_TYPE1_NESTING. Please feel free tell me if it is not good
-> > > for ARM. We can find a proper way to report the availability.
-> >
-> > Well it is more a question for jean-Philippe. Do we have a system wide
-> > PASID allocation on ARM?
-> 
-> We don't, the PASID spaces are per-VM on Arm, so this function should consult the
-> IOMMU driver before setting flags. As you said on patch 3, nested doesn't
-> necessarily imply PASID support. The SMMUv2 does not support PASID but does
-> support nesting stages 1 and 2 for the IOVA space.
-> SMMUv3 support of PASID depends on HW capabilities. So I think this needs to be
-> finer grained:
-> 
-> Does the container support:
-> * VFIO_IOMMU_PASID_REQUEST?
->   -> Yes for VT-d 3
->   -> No for Arm SMMU
-> * VFIO_IOMMU_{,UN}BIND_GUEST_PGTBL?
->   -> Yes for VT-d 3
->   -> Sometimes for SMMUv2
->   -> No for SMMUv3 (if we go with BIND_PASID_TABLE, which is simpler due to
->      PASID tables being in GPA space.)
-> * VFIO_IOMMU_BIND_PASID_TABLE?
->   -> No for VT-d
->   -> Sometimes for SMMUv3
-> 
-> Any bind support implies VFIO_IOMMU_CACHE_INVALIDATE support.
+OK this was conflicting with akpm tree, turns out Stephen
+was reverting the OOM handler change since akpm tree has its own
+variant.
 
-good summary. do you expect to see any 
+So I pushed the revert in my tree to make it easier for you.
+I'll send PULL v2 just to make things clear.
 
+
+> ----------------------------------------------------------------
+> David Hildenbrand (1):
+>       virtio-balloon: Switch back to OOM handler for VIRTIO_BALLOON_F_DEFLATE_ON_OOM
 > 
-> > >>> +	nesting_cap->stage1_formats = formats;
-> > >> as spotted by Kevin, since a single format is supported, rename
-> > >
-> > > ok, I was believing it may be possible on ARM or so. :-) will rename
-> > > it.
+> Jason Wang (7):
+>       vhost: refine vhost and vringh kconfig
+>       vhost: allow per device message handler
+>       vhost: factor out IOTLB
+>       vringh: IOTLB support
+>       vDPA: introduce vDPA bus
+>       virtio: introduce a vDPA based transport
+>       vdpasim: vDPA device simulator
 > 
-> Yes I don't think an u32 is going to cut it for Arm :( We need to describe all sorts of
-> capabilities for page and PASID tables (granules, GPA size, ASID/PASID size, HW
-> access/dirty, etc etc.) Just saying "Arm stage-1 format" wouldn't mean much. I
-> guess we could have a secondary vendor capability for these?
-
-Actually, I'm wondering if we can define some formats to stands for a set of
-capabilities. e.g. VTD_STAGE1_FORMAT_V1 which may indicates the 1st level
-page table related caps (aw, a/d, SRE, EA and etc.). And vIOMMU can parse
-the capabilities.
-
-Regards,
-Yi Liu
+> Michael S. Tsirkin (2):
+>       tools/virtio: option to build an out of tree module
+>       vdpa: move to drivers/vdpa
+> 
+> Tiwei Bie (1):
+>       vhost: introduce vDPA-based backend
+> 
+> Yuri Benditovich (3):
+>       virtio-net: Introduce extended RSC feature
+>       virtio-net: Introduce RSS receive steering feature
+>       virtio-net: Introduce hash report feature
+> 
+> Zhu Lingshan (1):
+>       virtio: Intel IFC VF driver for VDPA
+> 
+>  MAINTAINERS                      |   3 +
+>  arch/arm/kvm/Kconfig             |   2 -
+>  arch/arm64/kvm/Kconfig           |   2 -
+>  arch/mips/kvm/Kconfig            |   2 -
+>  arch/powerpc/kvm/Kconfig         |   2 -
+>  arch/s390/kvm/Kconfig            |   4 -
+>  arch/x86/kvm/Kconfig             |   4 -
+>  drivers/Kconfig                  |   4 +
+>  drivers/Makefile                 |   1 +
+>  drivers/misc/mic/Kconfig         |   4 -
+>  drivers/net/caif/Kconfig         |   4 -
+>  drivers/vdpa/Kconfig             |  37 ++
+>  drivers/vdpa/Makefile            |   4 +
+>  drivers/vdpa/ifcvf/Makefile      |   3 +
+>  drivers/vdpa/ifcvf/ifcvf_base.c  | 389 +++++++++++++++++
+>  drivers/vdpa/ifcvf/ifcvf_base.h  | 118 ++++++
+>  drivers/vdpa/ifcvf/ifcvf_main.c  | 435 +++++++++++++++++++
+>  drivers/vdpa/vdpa.c              | 180 ++++++++
+>  drivers/vdpa/vdpa_sim/Makefile   |   2 +
+>  drivers/vdpa/vdpa_sim/vdpa_sim.c | 629 ++++++++++++++++++++++++++++
+>  drivers/vhost/Kconfig            |  45 +-
+>  drivers/vhost/Kconfig.vringh     |   6 -
+>  drivers/vhost/Makefile           |   6 +
+>  drivers/vhost/iotlb.c            | 177 ++++++++
+>  drivers/vhost/net.c              |   5 +-
+>  drivers/vhost/scsi.c             |   2 +-
+>  drivers/vhost/vdpa.c             | 883 +++++++++++++++++++++++++++++++++++++++
+>  drivers/vhost/vhost.c            | 233 ++++-------
+>  drivers/vhost/vhost.h            |  45 +-
+>  drivers/vhost/vringh.c           | 421 ++++++++++++++++++-
+>  drivers/vhost/vsock.c            |   2 +-
+>  drivers/virtio/Kconfig           |  13 +
+>  drivers/virtio/Makefile          |   1 +
+>  drivers/virtio/virtio_balloon.c  | 107 ++---
+>  drivers/virtio/virtio_vdpa.c     | 396 ++++++++++++++++++
+>  include/linux/vdpa.h             | 253 +++++++++++
+>  include/linux/vhost_iotlb.h      |  47 +++
+>  include/linux/vringh.h           |  36 ++
+>  include/uapi/linux/vhost.h       |  24 ++
+>  include/uapi/linux/vhost_types.h |   8 +
+>  include/uapi/linux/virtio_net.h  | 102 ++++-
+>  tools/virtio/Makefile            |  27 +-
+>  42 files changed, 4354 insertions(+), 314 deletions(-)
+>  create mode 100644 drivers/vdpa/Kconfig
+>  create mode 100644 drivers/vdpa/Makefile
+>  create mode 100644 drivers/vdpa/ifcvf/Makefile
+>  create mode 100644 drivers/vdpa/ifcvf/ifcvf_base.c
+>  create mode 100644 drivers/vdpa/ifcvf/ifcvf_base.h
+>  create mode 100644 drivers/vdpa/ifcvf/ifcvf_main.c
+>  create mode 100644 drivers/vdpa/vdpa.c
+>  create mode 100644 drivers/vdpa/vdpa_sim/Makefile
+>  create mode 100644 drivers/vdpa/vdpa_sim/vdpa_sim.c
+>  delete mode 100644 drivers/vhost/Kconfig.vringh
+>  create mode 100644 drivers/vhost/iotlb.c
+>  create mode 100644 drivers/vhost/vdpa.c
+>  create mode 100644 drivers/virtio/virtio_vdpa.c
+>  create mode 100644 include/linux/vdpa.h
+>  create mode 100644 include/linux/vhost_iotlb.h
 
