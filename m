@@ -2,131 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 03CC21A0AD1
-	for <lists+kvm@lfdr.de>; Tue,  7 Apr 2020 12:09:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1E9641A0BFF
+	for <lists+kvm@lfdr.de>; Tue,  7 Apr 2020 12:35:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728289AbgDGKJA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Apr 2020 06:09:00 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:30539 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728250AbgDGKI6 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 7 Apr 2020 06:08:58 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1586254137;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Z+d4Qx7H0BkaQ6jx/a91Q5D/w2sYbHgdntEiY9YRCI4=;
-        b=QQzxlYeoIXLIC8aflNX1h/t/R+R3f3xXGUnyX44KKk/YoyhzY55ltr1tUgnJckE6crShQS
-        gPpgeI2x6DwTjfabOJDcPYusPylWjNusHw903JGUujckyoY7JcxNRs/47/p+XJOnhfqXQd
-        /8S9onyxxeHRdrc/XEIhOsrwoSU6usc=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-226-JmRx757aOWGS6o192-T8mA-1; Tue, 07 Apr 2020 06:08:55 -0400
-X-MC-Unique: JmRx757aOWGS6o192-T8mA-1
-Received: by mail-wr1-f70.google.com with SMTP id u16so1501427wrp.14
-        for <kvm@vger.kernel.org>; Tue, 07 Apr 2020 03:08:55 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=Z+d4Qx7H0BkaQ6jx/a91Q5D/w2sYbHgdntEiY9YRCI4=;
-        b=bkq9+34Ij1ZemQrMM7Ws+3UhgtXA+f7yu2vQtzkcFbIlqHiV5Zq3J+H+PCRqlDzWtV
-         i+KrhxNhEmIeBgULWcoXXgpMPqKLhTFnolnEG45rZbsTQRG7zLNTsv3kS8dxusbgdirf
-         OOyySt8Oc2h2z4SIWHPImbZnyr2MBXU+D49Lh3/I6N7pCmhMAlwb1gopSPx5TLj1fQ1Q
-         Ado1PJUjTmqjinq+LI7hf2U5gEXGFe3sFiNN75T3l1jKDBisuHCtOXcpleH4RcsKfFBs
-         qpaWu6b87/RUP89EVm8eqA4Sh4hIXBayNDP6KiDwlN6YObW7YkE3+DUSiWkbKz7NhJqb
-         tBCQ==
-X-Gm-Message-State: AGi0PuZKCUet0WtxihQowob5rl/E+Lv6aDwQ1Tvgl728ryaPu22Xp5rl
-        GMh7o/UjZbYE9P7ThyrOwypvxra9fWhgidmNuj2Q+VA1PNUlG8+MUnta8heV7pAUMpZc3U8JzYn
-        UeNtVS4ZUukqw
-X-Received: by 2002:a05:600c:2c47:: with SMTP id r7mr1583540wmg.50.1586254134335;
-        Tue, 07 Apr 2020 03:08:54 -0700 (PDT)
-X-Google-Smtp-Source: APiQypJjB2szx0xQgD9OibxDJRFX1Jm7Z1KhFoXl8BhDzxrbWSAltbqVX49bIubsJYfEtbHFRe8h+g==
-X-Received: by 2002:a05:600c:2c47:: with SMTP id r7mr1583516wmg.50.1586254134095;
-        Tue, 07 Apr 2020 03:08:54 -0700 (PDT)
-Received: from redhat.com (bzq-79-176-51-222.red.bezeqint.net. [79.176.51.222])
-        by smtp.gmail.com with ESMTPSA id n64sm1571755wme.45.2020.04.07.03.08.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 Apr 2020 03:08:53 -0700 (PDT)
-Date:   Tue, 7 Apr 2020 06:08:43 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     David Hildenbrand <david@redhat.com>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        alexander.h.duyck@linux.intel.com, eperezma@redhat.com,
-        jasowang@redhat.com, lingshan.zhu@intel.com, mhocko@kernel.org,
-        namit@vmware.com, rdunlap@infradead.org, rientjes@google.com,
-        tiwei.bie@intel.com, tysand@google.com, wei.w.wang@intel.com,
-        xiao.w.wang@intel.com, yuri.benditovich@daynix.com
-Subject: Re: [GIT PULL v2] vhost: cleanups and fixes
-Message-ID: <20200407060741-mutt-send-email-mst@kernel.org>
-References: <20200407055334-mutt-send-email-mst@kernel.org>
- <00a7ce5f-8fb4-8c3e-7113-9a422682abdf@redhat.com>
+        id S1728274AbgDGKda convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Tue, 7 Apr 2020 06:33:30 -0400
+Received: from mga01.intel.com ([192.55.52.88]:13947 "EHLO mga01.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726399AbgDGKd3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Apr 2020 06:33:29 -0400
+IronPort-SDR: FPFM3prjgIG1IJDrOPG1N/h4i3Na8ugc+3Gdw15sfP7Cd23WgOWP+b3ndHprKZp3Dfm/FB/LH9
+ Qh665Az/REQA==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Apr 2020 03:33:29 -0700
+IronPort-SDR: XpZt+O2iUSCoEK9yUeNSh7sumO7vG9vjSw8ex36zPLiZlE9N5cc8i5pG7TOakd9BQpVM6bly1l
+ me/a5kPTscGw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.72,353,1580803200"; 
+   d="scan'208";a="361496130"
+Received: from fmsmsx107.amr.corp.intel.com ([10.18.124.205])
+  by fmsmga001.fm.intel.com with ESMTP; 07 Apr 2020 03:33:29 -0700
+Received: from fmsmsx608.amr.corp.intel.com (10.18.126.88) by
+ fmsmsx107.amr.corp.intel.com (10.18.124.205) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Tue, 7 Apr 2020 03:33:28 -0700
+Received: from fmsmsx608.amr.corp.intel.com (10.18.126.88) by
+ fmsmsx608.amr.corp.intel.com (10.18.126.88) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1713.5; Tue, 7 Apr 2020 03:33:28 -0700
+Received: from shsmsx108.ccr.corp.intel.com (10.239.4.97) by
+ fmsmsx608.amr.corp.intel.com (10.18.126.88) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id 15.1.1713.5
+ via Frontend Transport; Tue, 7 Apr 2020 03:33:28 -0700
+Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.225]) by
+ SHSMSX108.ccr.corp.intel.com ([169.254.8.7]) with mapi id 14.03.0439.000;
+ Tue, 7 Apr 2020 18:33:25 +0800
+From:   "Liu, Yi L" <yi.l.liu@intel.com>
+To:     Jean-Philippe Brucker <jean-philippe@linaro.org>
+CC:     "Tian, Kevin" <kevin.tian@intel.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "Tian, Jun J" <jun.j.tian@intel.com>,
+        "Sun, Yi Y" <yi.y.sun@intel.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Wu, Hao" <hao.wu@intel.com>
+Subject: RE: [PATCH v1 6/8] vfio/type1: Bind guest page tables to host
+Thread-Topic: [PATCH v1 6/8] vfio/type1: Bind guest page tables to host
+Thread-Index: AQHWAEUdkW8K+/kg/06c7098DvJyv6hgm8wAgANYlCCAAK00AIAA6IawgAEUvACABu4SMA==
+Date:   Tue, 7 Apr 2020 10:33:25 +0000
+Message-ID: <A2975661238FB949B60364EF0F2C25743A224C8F@SHSMSX104.ccr.corp.intel.com>
+References: <1584880325-10561-1-git-send-email-yi.l.liu@intel.com>
+ <1584880325-10561-7-git-send-email-yi.l.liu@intel.com>
+ <AADFC41AFE54684AB9EE6CBC0274A5D19D7FF98F@SHSMSX104.ccr.corp.intel.com>
+ <A2975661238FB949B60364EF0F2C25743A21D8C6@SHSMSX104.ccr.corp.intel.com>
+ <AADFC41AFE54684AB9EE6CBC0274A5D19D805F75@SHSMSX104.ccr.corp.intel.com>
+ <A2975661238FB949B60364EF0F2C25743A21ED01@SHSMSX104.ccr.corp.intel.com>
+ <20200403083407.GB1269501@myrica>
+In-Reply-To: <20200403083407.GB1269501@myrica>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <00a7ce5f-8fb4-8c3e-7113-9a422682abdf@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Apr 07, 2020 at 11:56:59AM +0200, David Hildenbrand wrote:
-> On 07.04.20 11:53, Michael S. Tsirkin wrote:
-> > Changes from PULL v1:
-> > 	reverted a commit that was also in Andrew Morton's tree,
-> > 	to resolve a merge conflict:
-> > 	this is what Stephen Rothwell was doing to resolve it
-> > 	in linux-next.
-> > 
-> > 
-> > Now that many more architectures build vhost, a couple of these (um, and
-> > arm with deprecated oabi) have reported build failures with randconfig,
-> > however fixes for that need a bit more discussion/testing and will be
-> > merged separately.
-> > 
-> > Not a regression - these previously simply didn't have vhost at all.
-> > Also, there's some DMA API code in the vdpa simulator is hacky - if no
-> > solution surfaces soon we can always disable it before release:
-> > it's not a big deal either way as it's just test code.
-> > 
-> > 
-> > The following changes since commit 16fbf79b0f83bc752cee8589279f1ebfe57b3b6e:
-> > 
-> >   Linux 5.6-rc7 (2020-03-22 18:31:56 -0700)
-> > 
-> > are available in the Git repository at:
-> > 
-> >   https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
-> > 
-> > for you to fetch changes up to 835a6a649d0dd1b1f46759eb60fff2f63ed253a7:
-> > 
-> >   virtio-balloon: Revert "virtio-balloon: Switch back to OOM handler for VIRTIO_BALLOON_F_DEFLATE_ON_OOM" (2020-04-07 05:44:57 -0400)
-> > 
-> > ----------------------------------------------------------------
-> > virtio: fixes, vdpa
-> > 
-> > Some bug fixes.
-> > The new vdpa subsystem with two first drivers.
-> > 
-> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> > 
-> > ----------------------------------------------------------------
-> > David Hildenbrand (1):
-> >       virtio-balloon: Switch back to OOM handler for VIRTIO_BALLOON_F_DEFLATE_ON_OOM
-> 
-> ^ stale leftover in this message only I assume
+Hi Jean,
 
-No - I did not rebase since I did not want to invalidate all the testing
-people did, just tacked a revert on top.  So this commit is there
-together with its revert.
-
-
+> From: Jean-Philippe Brucker < jean-philippe@linaro.org >
+> Sent: Friday, April 3, 2020 4:35 PM
+> Subject: Re: [PATCH v1 6/8] vfio/type1: Bind guest page tables to host
 > 
-> -- 
-> Thanks,
+> On Thu, Apr 02, 2020 at 08:05:29AM +0000, Liu, Yi L wrote:
+> > > > > > static long vfio_iommu_type1_ioctl(void *iommu_data,
+> > > > > >  		default:
+> > > > > >  			return -EINVAL;
+> > > > > >  		}
+> > > > > > +
+> > > > > > +	} else if (cmd == VFIO_IOMMU_BIND) {
+> > > > >
+> > > > > BIND what? VFIO_IOMMU_BIND_PASID sounds clearer to me.
+> > > >
+> > > > Emm, it's up to the flags to indicate bind what. It was proposed to
+> > > > cover the three cases below:
+> > > > a) BIND/UNBIND_GPASID
+> > > > b) BIND/UNBIND_GPASID_TABLE
+> > > > c) BIND/UNBIND_PROCESS
+> > > > <only a) is covered in this patch>
+> > > > So it's called VFIO_IOMMU_BIND.
+> > >
+> > > but aren't they all about PASID related binding?
+> >
+> > yeah, I can rename it. :-)
 > 
-> David / dhildenb
+> I don't know if anyone intends to implement it, but SMMUv2 supports
+> nesting translation without any PASID support. For that case the name
+> VFIO_IOMMU_BIND_GUEST_PGTBL without "PASID" anywhere makes more sense.
+> Ideally we'd also use a neutral name for the IOMMU API instead of
+> bind_gpasid(), but that's easier to change later.
+
+I agree VFIO_IOMMU_BIND is somehow not straight-forward. Especially, it may
+cause confusion when thinking about VFIO_SET_IOMMU. How about using
+VFIO_NESTING_IOMMU_BIND_STAGE1 to cover a) and b)? And has another
+VFIO_BIND_PROCESS in future for the SVA bind case.
+
+Regards,
+Yi Liu
 
