@@ -2,113 +2,155 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 851461A05E4
-	for <lists+kvm@lfdr.de>; Tue,  7 Apr 2020 06:43:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 932461A05F7
+	for <lists+kvm@lfdr.de>; Tue,  7 Apr 2020 06:52:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726730AbgDGEnP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Apr 2020 00:43:15 -0400
-Received: from mx0a-002c1b01.pphosted.com ([148.163.151.68]:30900 "EHLO
-        mx0a-002c1b01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726714AbgDGEnP (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 7 Apr 2020 00:43:15 -0400
-Received: from pps.filterd (m0127837.ppops.net [127.0.0.1])
-        by mx0a-002c1b01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0374gblp022062;
-        Mon, 6 Apr 2020 21:43:12 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nutanix.com; h=from : to : subject
- : date : message-id : references : in-reply-to : content-type : content-id
- : content-transfer-encoding : mime-version; s=proofpoint20171006;
- bh=HMZIF16ygR3CZ1WelwGz6PeUiFcUlO8wZoyCcuZ/u4Y=;
- b=fbWHF1FjkqVmGQ7SC5iXb9rwX5ICT/ywfLTwgCyn74YhNgMdWbqhADmtuc5bEjkzRGZV
- ak36HaVZQLEGpIzigxoazcF7HrE26qht0dczgi2NHBqDtGuW9kashU7ocWk9j8hUL4yv
- S4il9uyGytrSDeyfRzLNjtrla7++vfatByUUbeDHhUzCNcVIrViBK6RrYaf/zlkfBu6f
- TZvuBDv86uz0oFyHh9fOh5vDdvfdOXpiF8rO0zXLxHaNRCS7QF2Ryqb3tZY7d3y/no51
- iin3mFFEaKA9THrM6JrYevZCjwL5SkWlJtK2bTEgKLHE8RYqdodCrD0zS+pUGkcjC16g BA== 
-Received: from nam12-mw2-obe.outbound.protection.outlook.com (mail-mw2nam12lp2043.outbound.protection.outlook.com [104.47.66.43])
-        by mx0a-002c1b01.pphosted.com with ESMTP id 306p5adcae-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 06 Apr 2020 21:43:12 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=kScPml7PbAqBfJM9WZ8iPSQjU5BGmwkBQObZsRC4kJr8F1nVjuqGFWfytkWBQM0ezB2HDW+V8mGUMYScloXx4IrW86o4sYT5VpcRjNjzQJ146B1hkj3vCRNzgYVgfPrDLWiOrNg6z5p0FA7UiAk1o10sp3aKsVyCQ7uq9pEHRjwyJ96jPGR2po95MwUp7I79tonydqEJ/7S7kdop0I/93XTD8DNeR8EKbnct+Ggjvu2Ie5ePVv0BqeGsJBNESZn+SQqfeXlJHGeqak+bBTvxkNqG5fu5qyl2seUJcExDn+m+oaM66SCQAJPi0OOK57nHAvLJ7DL+aYCoYUBVinFq0A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=HMZIF16ygR3CZ1WelwGz6PeUiFcUlO8wZoyCcuZ/u4Y=;
- b=PWffN2Vp+ranSZ4SU529kYV0sWlB5Mcmgwg+jBGMXS+75dnHwcQv+V0ujDq0zuKi83L/lP9G7A6wZRkS/c/AY/QrsFg8vmjihh1J4gqPWI2xKQcFMfnkyDluF2/SeylQ39TPlekRg9FzJSoh80wm8gSO3n7bQumtxQFOzwaIbNHIc+ys1kr50y1P0Jet+Or1q3zJMl/aAfSMXqVxWyRzQ122R5DmKVvrYfyl3F/5AkCzUw7F6z6nJV+xAMPHHGQTMQbj/vCaTQSwv6dSH5zjYHds3rd9fZGAyQsckBKGz+maJ2hxdGyecNJkFl9T8DUCodylFkNP0YwyMfI19/2jIA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nutanix.com; dmarc=pass action=none header.from=nutanix.com;
- dkim=pass header.d=nutanix.com; arc=none
-Received: from BYAPR02MB4293.namprd02.prod.outlook.com (2603:10b6:a03:56::10)
- by BYAPR02MB4104.namprd02.prod.outlook.com (2603:10b6:a02:f1::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2878.16; Tue, 7 Apr
- 2020 04:43:09 +0000
-Received: from BYAPR02MB4293.namprd02.prod.outlook.com
- ([fe80::9128:c9f2:ce5d:ffb1]) by BYAPR02MB4293.namprd02.prod.outlook.com
- ([fe80::9128:c9f2:ce5d:ffb1%6]) with mapi id 15.20.2878.021; Tue, 7 Apr 2020
- 04:43:09 +0000
-From:   Suresh Gumpula <suresh.gumpula@nutanix.com>
-To:     John Snow <jsnow@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+        id S1726603AbgDGEw0 convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Tue, 7 Apr 2020 00:52:26 -0400
+Received: from mga12.intel.com ([192.55.52.136]:50047 "EHLO mga12.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725802AbgDGEw0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Apr 2020 00:52:26 -0400
+IronPort-SDR: 722cifAgA0tgTBfTdLBExAjKFHHYGJVaGFFV/q9Cfc6YF/EqrSku2WT2F8nHlt2lSthW1AypxS
+ yH3QMxLGHoYg==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Apr 2020 21:52:25 -0700
+IronPort-SDR: FTxUwEUs3eOU6i7RBbl/xIx6wFG834NqWr7HAU1exjUF7hwWbXMMlKhcgnr2ClgxUW4nv3ou2w
+ Ptp0dN70hD2A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.72,353,1580803200"; 
+   d="scan'208";a="451087974"
+Received: from fmsmsx103.amr.corp.intel.com ([10.18.124.201])
+  by fmsmga005.fm.intel.com with ESMTP; 06 Apr 2020 21:52:25 -0700
+Received: from fmsmsx116.amr.corp.intel.com (10.18.116.20) by
+ FMSMSX103.amr.corp.intel.com (10.18.124.201) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Mon, 6 Apr 2020 21:52:25 -0700
+Received: from shsmsx154.ccr.corp.intel.com (10.239.6.54) by
+ fmsmsx116.amr.corp.intel.com (10.18.116.20) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Mon, 6 Apr 2020 21:52:25 -0700
+Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.225]) by
+ SHSMSX154.ccr.corp.intel.com ([169.254.7.214]) with mapi id 14.03.0439.000;
+ Tue, 7 Apr 2020 12:52:22 +0800
+From:   "Tian, Kevin" <kevin.tian@intel.com>
+To:     Alex Williamson <alex.williamson@redhat.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>
+CC:     "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: ata driver loading hang on qemu/kvm intel
-Thread-Topic: ata driver loading hang on qemu/kvm intel
-Thread-Index: AQHWCtnRdUw08txLJ0GRwS5YdMwr1KhrwK+AgAAE5wCAAI65gIAATreA
-Date:   Tue, 7 Apr 2020 04:43:09 +0000
-Message-ID: <EFBCC9BF-F686-4631-A249-8CA9AB407285@nutanix.com>
-References: <7C92AFF4-D479-4F80-8BED-6E9B226DFB72@nutanix.com>
- <56486177-b629-081e-2785-b6e2ca626e88@redhat.com>
- <D7D964C2-DD4B-4F17-BA3D-C45C992A4B15@nutanix.com>
- <b48ef18c-fb70-9d6f-c925-09227058a9cf@redhat.com>
-In-Reply-To: <b48ef18c-fb70-9d6f-c925-09227058a9cf@redhat.com>
+        "Tian, Jun J" <jun.j.tian@intel.com>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Sun, Yi Y" <yi.y.sun@intel.com>, "Wu, Hao" <hao.wu@intel.com>
+Subject: RE: [PATCH v1 1/8] vfio: Add VFIO_IOMMU_PASID_REQUEST(alloc/free)
+Thread-Topic: [PATCH v1 1/8] vfio: Add VFIO_IOMMU_PASID_REQUEST(alloc/free)
+Thread-Index: AQHWAEUbvuzF5+3jpEaYhihTFzMRG6hlp7CAgAFE0ACAAE19gIAF9Qaw
+Date:   Tue, 7 Apr 2020 04:52:21 +0000
+Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D19D80E1DA@SHSMSX104.ccr.corp.intel.com>
+References: <1584880325-10561-1-git-send-email-yi.l.liu@intel.com>
+ <1584880325-10561-2-git-send-email-yi.l.liu@intel.com>
+ <20200402115017.0a0f55e2@w520.home>
+ <A2975661238FB949B60364EF0F2C25743A220B62@SHSMSX104.ccr.corp.intel.com>
+ <20200403115011.4aba8ff3@w520.home>
+In-Reply-To: <20200403115011.4aba8ff3@w520.home>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
 X-MS-TNEF-Correlator: 
-x-originating-ip: [2601:647:4502:bdd0:3d6b:3:57bc:29d8]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 16b5982a-9bc6-4497-0b84-08d7daae2c30
-x-ms-traffictypediagnostic: BYAPR02MB4104:
-x-microsoft-antispam-prvs: <BYAPR02MB4104EC784F40BC66A167B4B497C30@BYAPR02MB4104.namprd02.prod.outlook.com>
-x-proofpoint-crosstenant: true
-x-ms-oob-tlc-oobclassifiers: OLM:2887;
-x-forefront-prvs: 036614DD9C
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR02MB4293.namprd02.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(10019020)(39850400004)(396003)(136003)(376002)(366004)(346002)(4744005)(6506007)(316002)(8936002)(2906002)(86362001)(71200400001)(81166006)(5660300002)(110136005)(53546011)(33656002)(36756003)(76116006)(66476007)(8676002)(66556008)(2616005)(64756008)(66446008)(6486002)(6512007)(186003)(81156014)(44832011)(66946007)(478600001);DIR:OUT;SFP:1102;
-received-spf: None (protection.outlook.com: nutanix.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: PLDGcn68rVmdE9e6XOWq2AlTrhQi3xvUyTjvSCQUWESvKCw90Q5+Uxlof1Nm8BWCXd6jzGrAbjCS+jmLMyPYteypfqroOO3Ky6xS4BCibq6/QBirBKo7a/wo6UcCG/+5ygZKps7W2uS/A7kZCvFYt9ESVcwbodyTdMX1vjk49hx/PDOoKKdH58bPLiloFGnKDytcAJeDSr2K+ZFYqEqZeOmXpZv3uSydUEdyR+GA+oLb91EfyrUVY2EAHlal8TujDE7RntwMeJ9ws0H+/ACoEepr7z3FoimNH07/nOTKvLGU/hTpgPmDnVePzAEYKAXOtfmwvcMof+cpw/a13cKsHRPp4mFDIrxJDwGr3CylXG3ft3IUzovuQabwQz17UNeg39O++WaNmdJu45RKIniOEzh9dIwVxSWiq91ED/uoYO2CIR4ExE5DZ1m38FpaP9gM
-x-ms-exchange-antispam-messagedata: hTtKGbjB+OKojxJGPWmOKxrFO6KYTU7mGokuwHsG5zzV1zY8MVYtMT1uG18KAp48JJyQ+VofhI0pa5GfNjYGfD/CRFZyaelQVkTw1I+L+uGJ23PvT1oPMoL/djHqMZDjN9F4bZy+SX35Kr2a8pBtdI5h1EF0mscMSx1FkH5LNng47Ltfmein6GzNLKwmTkSay+Ppe37ApvYQELnR8QJepg==
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <758708EDD165C9469A4CCDC863B5AE4E@namprd02.prod.outlook.com>
-Content-Transfer-Encoding: base64
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-X-OriginatorOrg: nutanix.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 16b5982a-9bc6-4497-0b84-08d7daae2c30
-X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Apr 2020 04:43:09.5645
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: bb047546-786f-4de1-bd75-24e5b6f79043
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: iVZKzHaIQZ6N3UR2LLizRumNHvphFhW1eAMKz8E0ZCbI1xT5Jnq8931F4DBQY/tci5IuIH8vmzOdzcNP7djVaybKMTSPAWXfx9fWDKQqzm0=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR02MB4104
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.676
- definitions=2020-04-07_01:2020-04-07,2020-04-06 signatures=0
-X-Proofpoint-Spam-Reason: safe
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-U3VyZS4gTGV0IG1lIHRyeSwgdGhlIGxhdGVyIHZlcnNpb24gdGhhbiAyLjEyLg0KDQpUaGFua3Mg
-bXVjaCENClN1cmVzaA0KDQoNCu+7v09uIDQvNi8yMCwgMTA6MDEgQU0sICJKb2huIFNub3ciIDxq
-c25vd0ByZWRoYXQuY29tPiB3cm90ZToNCg0KICAgIA0KICAgIA0KICAgIE9uIDQvNi8yMCAxMToz
-MCBBTSwgU3VyZXNoIEd1bXB1bGEgd3JvdGU6DQogICAgPiBUaGUgZ3Vlc3Qga2VybmVsKG5vdCBh
-IG5lc3RlZCBndWVzdCkgYm9vdCBpc28uIGkuZSBpdHMgcmVndWxhciBWTSBvbiBhIGhvc3QgaXMg
-aGFuZ2luZyB3aXRoIGZvbGxvd2luZyBlcnJvcnMuDQogICAgPiBJdHMgY29uc2lzdGVudGx5IHJl
-cHJvZHVjaWJsZSB3aXRoIHNvbWUgbG9hZCBvbiB0aGUgaG9zdC4NCiAgICANCiAgICBIaSwgSURF
-IG1haW50YWluZXIgZnJvbSBRRU1VIC4uLiBpdCdzIHF1aXRlIGxpa2VseS4gRG8geW91IGhhdmUg
-dGhlDQogICAgb3B0aW9uIG9mIHRyeWluZyBhIG1vZGVybiBRRU1VIHZlcnNpb24gdG8gc2VlIGlm
-IGl0J3MgYSBidWcgd2UndmUNCiAgICBhbHJlYWR5IGZpeGVkPw0KICAgIA0KICAgIC0tanMNCiAg
-ICANCiAgICANCg0K
+> From: Alex Williamson
+> Sent: Saturday, April 4, 2020 1:50 AM
+[...]
+> > > > diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+> > > > index 9e843a1..298ac80 100644
+> > > > --- a/include/uapi/linux/vfio.h
+> > > > +++ b/include/uapi/linux/vfio.h
+> > > > @@ -794,6 +794,47 @@ struct vfio_iommu_type1_dma_unmap {
+> > > >  #define VFIO_IOMMU_ENABLE	_IO(VFIO_TYPE, VFIO_BASE + 15)
+> > > >  #define VFIO_IOMMU_DISABLE	_IO(VFIO_TYPE, VFIO_BASE + 16)
+> > > >
+> > > > +/*
+> > > > + * PASID (Process Address Space ID) is a PCIe concept which
+> > > > + * has been extended to support DMA isolation in fine-grain.
+> > > > + * With device assigned to user space (e.g. VMs), PASID alloc
+> > > > + * and free need to be system wide. This structure defines
+> > > > + * the info for pasid alloc/free between user space and kernel
+> > > > + * space.
+> > > > + *
+> > > > + * @flag=VFIO_IOMMU_PASID_ALLOC, refer to the @alloc_pasid
+> > > > + * @flag=VFIO_IOMMU_PASID_FREE, refer to @free_pasid
+> > > > + */
+> > > > +struct vfio_iommu_type1_pasid_request {
+> > > > +	__u32	argsz;
+> > > > +#define VFIO_IOMMU_PASID_ALLOC	(1 << 0)
+> > > > +#define VFIO_IOMMU_PASID_FREE	(1 << 1)
+> > > > +	__u32	flags;
+> > > > +	union {
+> > > > +		struct {
+> > > > +			__u32 min;
+> > > > +			__u32 max;
+> > > > +			__u32 result;
+> > > > +		} alloc_pasid;
+> > > > +		__u32 free_pasid;
+> > > > +	};
+> > >
+> > > We seem to be using __u8 data[] lately where the struct at data is
+> > > defined by the flags.  should we do that here?
+> >
+> > yeah, I can do that. BTW. Do you want to let the structure in the
+> > lately patch share the same structure with this one? As I can foresee,
+> > the two structures would look like similar as both of them include
+> > argsz, flags and data[] fields. The difference is the definition of
+> > flags. what about your opinion?
+> >
+> > struct vfio_iommu_type1_pasid_request {
+> > 	__u32	argsz;
+> > #define VFIO_IOMMU_PASID_ALLOC	(1 << 0)
+> > #define VFIO_IOMMU_PASID_FREE	(1 << 1)
+> > 	__u32	flags;
+> > 	__u8	data[];
+> > };
+> >
+> > struct vfio_iommu_type1_bind {
+> >         __u32           argsz;
+> >         __u32           flags;
+> > #define VFIO_IOMMU_BIND_GUEST_PGTBL     (1 << 0)
+> > #define VFIO_IOMMU_UNBIND_GUEST_PGTBL   (1 << 1)
+> >         __u8            data[];
+> > };
+> 
+> 
+> Yes, I was even wondering the same for the cache invalidate ioctl, or
+> whether this is going too far for a general purpose "everything related
+> to PASIDs" ioctl.  We need to factor usability into the equation too.
+> I'd be interested in opinions from others here too.  Clearly I don't
+> like single use, throw-away ioctls, but I can find myself on either
+> side of the argument that allocation, binding, and invalidating are all
+> within the domain of PASIDs and could fall within a single ioctl or
+> they each represent different facets of managing PASIDs and should have
+> separate ioctls.  Thanks,
+> 
+
+Looking at uapi/linux/iommu.h:
+
+* Invalidations by %IOMMU_INV_GRANU_DOMAIN don't take any argument other than
+ * @version and @cache.
+
+Although intel-iommu handles only PASID-related invalidation now, I
+suppose other vendors (or future usages?) may allow non-pasid
+based invalidation too based on above comment. 
+
+Thanks
+Kevin
