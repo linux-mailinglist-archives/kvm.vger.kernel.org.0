@@ -2,210 +2,172 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 66CD71A15BF
-	for <lists+kvm@lfdr.de>; Tue,  7 Apr 2020 21:20:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 393181A1672
+	for <lists+kvm@lfdr.de>; Tue,  7 Apr 2020 22:06:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727302AbgDGTUs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Apr 2020 15:20:48 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:12518 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727611AbgDGTUr (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 7 Apr 2020 15:20:47 -0400
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 037J4SMi117309;
-        Tue, 7 Apr 2020 15:20:43 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 306n25knud-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 07 Apr 2020 15:20:43 -0400
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 037J4YB8117562;
-        Tue, 7 Apr 2020 15:20:43 -0400
-Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.11])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 306n25knu0-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 07 Apr 2020 15:20:43 -0400
-Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
-        by ppma03dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 037JKV8m011500;
-        Tue, 7 Apr 2020 19:20:42 GMT
-Received: from b01cxnp22035.gho.pok.ibm.com (b01cxnp22035.gho.pok.ibm.com [9.57.198.25])
-        by ppma03dal.us.ibm.com with ESMTP id 306hv6s2dw-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 07 Apr 2020 19:20:42 +0000
-Received: from b01ledav001.gho.pok.ibm.com (b01ledav001.gho.pok.ibm.com [9.57.199.106])
-        by b01cxnp22035.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 037JKe5S54460704
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 7 Apr 2020 19:20:40 GMT
-Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 753312805A;
-        Tue,  7 Apr 2020 19:20:40 +0000 (GMT)
-Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id BA15728058;
-        Tue,  7 Apr 2020 19:20:39 +0000 (GMT)
-Received: from cpe-172-100-173-215.stny.res.rr.com.com (unknown [9.85.207.206])
-        by b01ledav001.gho.pok.ibm.com (Postfix) with ESMTP;
-        Tue,  7 Apr 2020 19:20:39 +0000 (GMT)
-From:   Tony Krowiak <akrowiak@linux.ibm.com>
-To:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     freude@linux.ibm.com, borntraeger@de.ibm.com, cohuck@redhat.com,
-        mjrosato@linux.ibm.com, pmorel@linux.ibm.com, pasic@linux.ibm.com,
-        alex.williamson@redhat.com, kwankhede@nvidia.com,
-        jjherne@linux.ibm.com, fiuczy@linux.ibm.com,
-        Tony Krowiak <akrowiak@linux.ibm.com>
-Subject: [PATCH v7 15/15] s390/vfio-ap: handle probe/remove not due to host AP config changes
-Date:   Tue,  7 Apr 2020 15:20:15 -0400
-Message-Id: <20200407192015.19887-16-akrowiak@linux.ibm.com>
-X-Mailer: git-send-email 2.21.1
-In-Reply-To: <20200407192015.19887-1-akrowiak@linux.ibm.com>
-References: <20200407192015.19887-1-akrowiak@linux.ibm.com>
+        id S1727009AbgDGUGM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Apr 2020 16:06:12 -0400
+Received: from mail-il1-f199.google.com ([209.85.166.199]:39842 "EHLO
+        mail-il1-f199.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726712AbgDGUGM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Apr 2020 16:06:12 -0400
+Received: by mail-il1-f199.google.com with SMTP id w76so4425134ila.6
+        for <kvm@vger.kernel.org>; Tue, 07 Apr 2020 13:06:11 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
+        bh=bgYEBWfmH0kA57XYSEf+AoBhSDVD5mph5XsDaoG/2ag=;
+        b=BMSpOO11p0D3DbYKmV3Rk8YcS6iYGvDhdRfUxr/2Uq7b5AHc8YdffQrjvNOwZRYhUm
+         dq/4RmAtzEvWwf5n7zMbCrK9IcjkhPzK6Y+U4M9zsnTCL23d31JJGU3Ps4jQYBGIPWT+
+         sRNyTcwCtB7hTZ04ZL8PQFpgErpfybvfxxSOmuThNtExgYWCnPHs9ndx3615gdzPL/a9
+         cl2IP8DmNXnifjpbUQq1G68t9AlEDhqHowaprkDOe6YF2tumRQSzchlFHAyXF7lC3XFm
+         Pk/8OTAf9xxJrwt69IVeayWrdT571phLkLPt6Lhp29iFLJ7iF0IeuqWrAuU+TDDA5I6p
+         4opQ==
+X-Gm-Message-State: AGi0PuYzFIK/0xFNeusUUJ1OCHZPWThG+vzkFhq8kPQ7c9CYzeOOgsxw
+        8lJoh30ekkkgXPDgjcyPfaiW3DhjqHtrVy0bDUiX0gTQDD+A
+X-Google-Smtp-Source: APiQypLrPyHpHLeoiQVAu7FCQGkgnrsgtbq02ZLWew3J4VM6mLjbOANR9AVW1FvnMzzCkHaW3IBDpeKhYqlOxsKLswCoxHbKwYlz
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.676
- definitions=2020-04-07_08:2020-04-07,2020-04-07 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 mlxlogscore=999
- priorityscore=1501 malwarescore=0 bulkscore=0 impostorscore=0
- suspectscore=3 lowpriorityscore=0 adultscore=0 mlxscore=0 spamscore=0
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2004070151
+X-Received: by 2002:a92:869b:: with SMTP id l27mr4172910ilh.184.1586289970974;
+ Tue, 07 Apr 2020 13:06:10 -0700 (PDT)
+Date:   Tue, 07 Apr 2020 13:06:10 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000003b14e805a2b8eaca@google.com>
+Subject: KASAN: slab-out-of-bounds Read in __kvm_gfn_to_hva_cache_init
+From:   syzbot <syzbot+d889b59b2bb87d4047a2@syzkaller.appspotmail.com>
+To:     christoffer.dall@arm.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, maz@kernel.org, pbonzini@redhat.com,
+        peterx@redhat.com, sean.j.christopherson@intel.com,
+        syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-AP queue devices are probed or removed for reasons other than changes
-to the host AP configuration:
+Hello,
 
-* Each queue device associated with a card device will get created and
-  probed when the state of the AP adapter represented by the card device
-  dynamically changes from standby to online.
+syzbot found the following crash on:
 
-* Each queue device associated with a card device will get removed
-  when the state of the AP adapter to which the queue represented by the
-  queue device dynamically changes from online to standby.
+HEAD commit:    bef7b2a7 Merge tag 'devicetree-for-5.7' of git://git.kerne..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=179dec43e00000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=91b674b8f0368e69
+dashboard link: https://syzkaller.appspot.com/bug?extid=d889b59b2bb87d4047a2
+compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=105c8733e00000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1446a72fe00000
 
-* Each queue device associated with a card device will get removed
-  when the type of the AP adapter to which the queue represented by the
-  queue device dynamically changes.
+The bug was bisected to:
 
-* Each queue device associated with a card device will get removed
-  when the status of the queue represented by the queue device changes
-  from operating to check stop.
+commit 36947254e5f981aeeedab1c7dfa35fc34d330e80
+Author: Sean Christopherson <sean.j.christopherson@intel.com>
+Date:   Tue Feb 18 21:07:32 2020 +0000
 
-* AP queue devices can be manually bound to or unbound from the vfio_ap
-  device driver by a root user via the sysfs bind/unbind attributes of the
-  driver.
+    KVM: Dynamically size memslot array based on number of used slots
 
-In response to a queue device probe or remove that is not the result of a
-change to the host's AP configuration, if a KVM guest is using the matrix
-mdev to which the APQN of the queue device is assigned, the vfio_ap device
-driver must respond accordingly. In an ideal world, the queue corresponding
-to the queue device being probed would be hot plugged into the guest.
-Likewise, the queue corresponding to the queue device being removed would
-be hot unplugged from the guest. Unfortunately, the AP architecture
-precludes plugging or unplugging individual queues, so let's handle
-the probe or remove of an AP queue device as follows:
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=14972c5de00000
+final crash:    https://syzkaller.appspot.com/x/report.txt?x=16972c5de00000
+console output: https://syzkaller.appspot.com/x/log.txt?x=12972c5de00000
 
-Handling Probe
---------------
-There are two requirements that must be met in order to give a
-guest access to the queue corresponding to the queue device being probed:
+IMPORTANT: if you fix the bug, please add the following tag to the commit:
+Reported-by: syzbot+d889b59b2bb87d4047a2@syzkaller.appspotmail.com
+Fixes: 36947254e5f9 ("KVM: Dynamically size memslot array based on number of used slots")
 
-* Each APQN derived from the APID of the queue device and the APQIs of the
-  domains already assigned to the guest's AP configuration must reference
-  a queue device bound to the vfio_ap device driver.
+L1TF CPU bug present and SMT on, data leak possible. See CVE-2018-3646 and https://www.kernel.org/doc/html/latest/admin-guide/hw-vuln/l1tf.html for details.
+==================================================================
+BUG: KASAN: slab-out-of-bounds in search_memslots include/linux/kvm_host.h:1051 [inline]
+BUG: KASAN: slab-out-of-bounds in __gfn_to_memslot include/linux/kvm_host.h:1063 [inline]
+BUG: KASAN: slab-out-of-bounds in __kvm_gfn_to_hva_cache_init+0x5fb/0x670 arch/x86/kvm/../../../virt/kvm/kvm_main.c:2443
+Read of size 8 at addr ffff8880a70b1468 by task syz-executor080/7028
 
-* Each APQN derived from the APQI of the queue device and the APIDs of the
-  adapters assigned to the guest's AP configuration must reference a queue
-  device bound to the vfio_ap device driver.
+CPU: 1 PID: 7028 Comm: syz-executor080 Not tainted 5.6.0-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+Call Trace:
+ __dump_stack lib/dump_stack.c:77 [inline]
+ dump_stack+0x188/0x20d lib/dump_stack.c:118
+ print_address_description.constprop.0.cold+0xd3/0x315 mm/kasan/report.c:374
+ __kasan_report.cold+0x35/0x4d mm/kasan/report.c:503
+ kasan_report+0x33/0x50 mm/kasan/common.c:648
+ search_memslots include/linux/kvm_host.h:1051 [inline]
+ __gfn_to_memslot include/linux/kvm_host.h:1063 [inline]
+ __kvm_gfn_to_hva_cache_init+0x5fb/0x670 arch/x86/kvm/../../../virt/kvm/kvm_main.c:2443
+ kvm_lapic_set_vapic_addr+0x88/0x180 arch/x86/kvm/lapic.c:2665
+ kvm_arch_vcpu_ioctl+0xf0d/0x2c20 arch/x86/kvm/x86.c:4385
+ kvm_vcpu_ioctl+0x866/0xe60 arch/x86/kvm/../../../virt/kvm/kvm_main.c:3291
+ vfs_ioctl fs/ioctl.c:47 [inline]
+ ksys_ioctl+0x11a/0x180 fs/ioctl.c:763
+ __do_sys_ioctl fs/ioctl.c:772 [inline]
+ __se_sys_ioctl fs/ioctl.c:770 [inline]
+ __x64_sys_ioctl+0x6f/0xb0 fs/ioctl.c:770
+ do_syscall_64+0xf6/0x7d0 arch/x86/entry/common.c:295
+ entry_SYSCALL_64_after_hwframe+0x49/0xb3
+RIP: 0033:0x4401c9
+Code: 18 89 d0 c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 0f 83 fb 13 fc ff c3 66 2e 0f 1f 84 00 00 00 00
+RSP: 002b:00007ffc2295e068 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 00000000004002c8 RCX: 00000000004401c9
+RDX: 0000000020000000 RSI: 000000004008ae93 RDI: 0000000000000005
+RBP: 00000000006ca018 R08: 00000000004002c8 R09: 00000000004002c8
+R10: 00000000004002c8 R11: 0000000000000246 R12: 0000000000401a50
+R13: 0000000000401ae0 R14: 0000000000000000 R15: 0000000000000000
 
-If the above conditions are met, the APQN will be assigned to the guest's
-AP configuration and the guest will be given access to the queue.
+Allocated by task 7028:
+ save_stack+0x1b/0x80 mm/kasan/common.c:72
+ set_track mm/kasan/common.c:80 [inline]
+ __kasan_kmalloc mm/kasan/common.c:518 [inline]
+ __kasan_kmalloc.constprop.0+0xbf/0xd0 mm/kasan/common.c:491
+ kmalloc_node include/linux/slab.h:578 [inline]
+ kvmalloc_node+0x61/0xf0 mm/util.c:574
+ kvmalloc include/linux/mm.h:733 [inline]
+ kvzalloc include/linux/mm.h:741 [inline]
+ kvm_dup_memslots arch/x86/kvm/../../../virt/kvm/kvm_main.c:1101 [inline]
+ kvm_set_memslot+0x115/0x1530 arch/x86/kvm/../../../virt/kvm/kvm_main.c:1118
+ __kvm_set_memory_region+0xcf7/0x1320 arch/x86/kvm/../../../virt/kvm/kvm_main.c:1300
+ __x86_set_memory_region+0x2a3/0x5a0 arch/x86/kvm/x86.c:9845
+ alloc_apic_access_page arch/x86/kvm/vmx/vmx.c:3544 [inline]
+ vmx_create_vcpu+0x2107/0x2b40 arch/x86/kvm/vmx/vmx.c:6772
+ kvm_arch_vcpu_create+0x6ef/0xb80 arch/x86/kvm/x86.c:9365
+ kvm_vm_ioctl_create_vcpu arch/x86/kvm/../../../virt/kvm/kvm_main.c:3030 [inline]
+ kvm_vm_ioctl+0x15f7/0x23e0 arch/x86/kvm/../../../virt/kvm/kvm_main.c:3585
+ vfs_ioctl fs/ioctl.c:47 [inline]
+ ksys_ioctl+0x11a/0x180 fs/ioctl.c:763
+ __do_sys_ioctl fs/ioctl.c:772 [inline]
+ __se_sys_ioctl fs/ioctl.c:770 [inline]
+ __x64_sys_ioctl+0x6f/0xb0 fs/ioctl.c:770
+ do_syscall_64+0xf6/0x7d0 arch/x86/entry/common.c:295
+ entry_SYSCALL_64_after_hwframe+0x49/0xb3
 
-Handling Remove
----------------
-Since the AP architecture precludes us from taking access to an individual
-queue from a guest, we are left with the choice of taking access away from
-either the adapter or the domain to which the queue is connected. Access to
-the adapter will be taken away because it is likely that most of the time,
-the remove callback will be invoked because the adapter state has
-transitioned from online to standby. In such a case, no queue connected
-to the adapter will be available to access.
+Freed by task 0:
+(stack is not available)
 
-Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
+The buggy address belongs to the object at ffff8880a70b1000
+ which belongs to the cache kmalloc-2k of size 2048
+The buggy address is located 1128 bytes inside of
+ 2048-byte region [ffff8880a70b1000, ffff8880a70b1800)
+The buggy address belongs to the page:
+page:ffffea00029c2c40 refcount:1 mapcount:0 mapping:0000000069244dce index:0x0
+flags: 0xfffe0000000200(slab)
+raw: 00fffe0000000200 ffffea00024d90c8 ffffea00027c0ec8 ffff8880aa000e00
+raw: 0000000000000000 ffff8880a70b1000 0000000100000001 0000000000000000
+page dumped because: kasan: bad access detected
+
+Memory state around the buggy address:
+ ffff8880a70b1300: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+ ffff8880a70b1380: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+>ffff8880a70b1400: 00 00 00 00 00 00 00 00 00 00 00 00 00 fc fc fc
+                                                          ^
+ ffff8880a70b1480: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+ ffff8880a70b1500: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+==================================================================
+
+
 ---
- drivers/s390/crypto/vfio_ap_ops.c | 38 +++++++++++++++++++++++++++++++
- 1 file changed, 38 insertions(+)
+This bug is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
-index ccc58daf82f6..918b735d5d56 100644
---- a/drivers/s390/crypto/vfio_ap_ops.c
-+++ b/drivers/s390/crypto/vfio_ap_ops.c
-@@ -1601,6 +1601,15 @@ static void vfio_ap_mdev_for_queue(struct vfio_ap_queue *q)
- 	}
- }
- 
-+void vfio_ap_mdev_hot_plug_queue(struct vfio_ap_queue *q)
-+{
-+	if ((q->matrix_mdev == NULL) || !vfio_ap_mdev_has_crycb(q->matrix_mdev))
-+		return;
-+
-+	if (vfio_ap_mdev_configure_crycb(q->matrix_mdev))
-+		vfio_ap_mdev_commit_crycb(q->matrix_mdev);
-+}
-+
- int vfio_ap_mdev_probe_queue(struct ap_queue *queue)
- {
- 	struct vfio_ap_queue *q;
-@@ -1615,11 +1624,35 @@ int vfio_ap_mdev_probe_queue(struct ap_queue *queue)
- 	q->saved_isc = VFIO_AP_ISC_INVALID;
- 	vfio_ap_mdev_for_queue(q);
- 	hash_add(matrix_dev->qtable, &q->qnode, q->apqn);
-+	/* Make sure we're not in the middle of an AP configuration change. */
-+	if (!(matrix_dev->flags & AP_MATRIX_CFG_CHG))
-+		vfio_ap_mdev_hot_plug_queue(q);
- 	mutex_unlock(&matrix_dev->lock);
- 
- 	return 0;
- }
- 
-+void vfio_ap_mdev_hot_unplug_queue(struct vfio_ap_queue *q)
-+{
-+	unsigned long apid = AP_QID_CARD(q->apqn);
-+	unsigned long apqi = AP_QID_QUEUE(q->apqn);
-+
-+	if ((q->matrix_mdev == NULL) || !vfio_ap_mdev_has_crycb(q->matrix_mdev))
-+		return;
-+
-+	/*
-+	 * If the APQN is assigned to the guest, then let's
-+	 * go ahead and unplug the adapter since the
-+	 * architecture does not provide a means to unplug
-+	 * an individual queue.
-+	 */
-+	if (test_bit_inv(apid, q->matrix_mdev->shadow_crycb.apm) &&
-+	    test_bit_inv(apqi, q->matrix_mdev->shadow_crycb.aqm)) {
-+		if (vfio_ap_mdev_unassign_guest_apid(q->matrix_mdev, apid))
-+			vfio_ap_mdev_commit_crycb(q->matrix_mdev);
-+	}
-+}
-+
- void vfio_ap_mdev_remove_queue(struct ap_queue *queue)
- {
- 	struct vfio_ap_queue *q;
-@@ -1627,6 +1660,11 @@ void vfio_ap_mdev_remove_queue(struct ap_queue *queue)
- 
- 	mutex_lock(&matrix_dev->lock);
- 	q = dev_get_drvdata(&queue->ap_dev.device);
-+
-+	/* Make sure we're not in the middle of an AP configuration change. */
-+	if (!(matrix_dev->flags & AP_MATRIX_CFG_CHG))
-+		vfio_ap_mdev_hot_unplug_queue(q);
-+
- 	dev_set_drvdata(&queue->ap_dev.device, NULL);
- 	apid = AP_QID_CARD(q->apqn);
- 	apqi = AP_QID_QUEUE(q->apqn);
--- 
-2.21.1
-
+syzbot will keep track of this bug report. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+syzbot can test patches for this bug, for details see:
+https://goo.gl/tpsmEJ#testing-patches
