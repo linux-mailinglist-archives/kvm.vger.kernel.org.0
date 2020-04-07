@@ -2,120 +2,142 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 84CFC1A0C98
-	for <lists+kvm@lfdr.de>; Tue,  7 Apr 2020 13:11:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 30F981A0CB0
+	for <lists+kvm@lfdr.de>; Tue,  7 Apr 2020 13:16:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728534AbgDGLLQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Apr 2020 07:11:16 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:39930 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728075AbgDGLKt (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 7 Apr 2020 07:10:49 -0400
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 037B3TbP129964
-        for <kvm@vger.kernel.org>; Tue, 7 Apr 2020 07:10:48 -0400
-Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3082hxd3fb-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Tue, 07 Apr 2020 07:10:48 -0400
-Received: from localhost
-        by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <imbrenda@linux.ibm.com>;
-        Tue, 7 Apr 2020 12:10:28 +0100
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
-        by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Tue, 7 Apr 2020 12:10:24 +0100
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 037BAek565339494
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 7 Apr 2020 11:10:41 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E4FC4A405F;
-        Tue,  7 Apr 2020 11:10:40 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 34948A4054;
-        Tue,  7 Apr 2020 11:10:40 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.145.8.150])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue,  7 Apr 2020 11:10:40 +0000 (GMT)
-Date:   Tue, 7 Apr 2020 13:10:17 +0200
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     David Hildenbrand <david@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Vasily Gorbik <gor@linux.ibm.com>,
-        Heiko Carstens <heiko.carstens@de.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>
-Subject: Re: [PATCH v2 5/5] KVM: s390: vsie: gmap_table_walk()
- simplifications
-In-Reply-To: <20200403153050.20569-6-david@redhat.com>
-References: <20200403153050.20569-1-david@redhat.com>
-        <20200403153050.20569-6-david@redhat.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+        id S1728290AbgDGLQP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Apr 2020 07:16:15 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:21069 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1725883AbgDGLQP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Apr 2020 07:16:15 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1586258173;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=3du99pETZoLILFx0f95jymvWmustW+PUAhmPmiIjcqo=;
+        b=F+yalRsD096JlStHI9519bR9va9nWYI4RcfogVbepHuN4fPdwb0O6fEpBPC+LSihrMlzIO
+        hRipGSfIDPg/J8u5Otb1mYbbnNQ5Drn/4Jj7TPbXh2OkDIaB86w1sUdyhKO7+dGBG6NjaL
+        WRb+PALPc2N/mMRjWfCqAZT1q5eLHNg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-182-nWnCS009Pn2sk1k5pxSguQ-1; Tue, 07 Apr 2020 07:16:11 -0400
+X-MC-Unique: nWnCS009Pn2sk1k5pxSguQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4C516100DFC3;
+        Tue,  7 Apr 2020 11:16:09 +0000 (UTC)
+Received: from localhost (ovpn-112-38.ams2.redhat.com [10.36.112.38])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id DD9C260BEC;
+        Tue,  7 Apr 2020 11:16:08 +0000 (UTC)
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Eric Farman <farman@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>
+Cc:     linux-s390@vger.kernel.org, kvm@vger.kernel.org,
+        Cornelia Huck <cohuck@redhat.com>
+Subject: [PATCH] vfio-ccw: document possible errors
+Date:   Tue,  7 Apr 2020 13:16:05 +0200
+Message-Id: <20200407111605.1795-1-cohuck@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 20040711-0008-0000-0000-0000036C1B68
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20040711-0009-0000-0000-00004A8DB4B4
-Message-Id: <20200407131017.471d2ca4@p-imbrenda>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.676
- definitions=2020-04-07_03:2020-04-07,2020-04-07 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 impostorscore=0
- malwarescore=0 phishscore=0 mlxlogscore=999 spamscore=0 clxscore=1011
- adultscore=0 bulkscore=0 priorityscore=1501 suspectscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2004070095
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri,  3 Apr 2020 17:30:50 +0200
-David Hildenbrand <david@redhat.com> wrote:
+Interacting with the I/O and the async regions can yield a number
+of errors, which had been undocumented so far. These are part of
+the api, so remedy that.
 
-> Let's use asce_type where applicable. Also, simplify our sanity check
-> for valid table levels and convert it into a WARN_ON_ONCE(). Check if
-> we even have a valid gmap shadow as the very first step.
-> 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->  arch/s390/mm/gmap.c | 10 +++++-----
->  1 file changed, 5 insertions(+), 5 deletions(-)
-> 
-> diff --git a/arch/s390/mm/gmap.c b/arch/s390/mm/gmap.c
-> index 24ef30fb0833..a2bd8d7792e9 100644
-> --- a/arch/s390/mm/gmap.c
-> +++ b/arch/s390/mm/gmap.c
-> @@ -788,19 +788,19 @@ static inline unsigned long
-> *gmap_table_walk(struct gmap *gmap, unsigned long gaddr, int level)
->  {
->  	const int asce_type = gmap->asce & _ASCE_TYPE_MASK;
-> -	unsigned long *table;
-> +	unsigned long *table = gmap->table;
->  
-> -	if ((gmap->asce & _ASCE_TYPE_MASK) + 4 < (level * 4))
-> -		return NULL;
->  	if (gmap_is_shadow(gmap) && gmap->removed)
->  		return NULL;
->  
-> +	if (WARN_ON_ONCE(level > (asce_type >> 2) + 1))
-> +		return NULL;
-> +
->  	if (WARN_ON_ONCE(asce_type != _ASCE_TYPE_REGION1 &&
->  			 gaddr & (-1UL << (31 + (asce_type >> 2) *
-> 11)))) return NULL;
->  
-> -	table = gmap->table;
-> -	switch (gmap->asce & _ASCE_TYPE_MASK) {
-> +	switch (asce_type) {
->  	case _ASCE_TYPE_REGION1:
->  		table += (gaddr & _REGION1_INDEX) >> _REGION1_SHIFT;
->  		if (level == 4)
+Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+---
+ Documentation/s390/vfio-ccw.rst | 54 ++++++++++++++++++++++++++++++++-
+ 1 file changed, 53 insertions(+), 1 deletion(-)
 
-Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+diff --git a/Documentation/s390/vfio-ccw.rst b/Documentation/s390/vfio-cc=
+w.rst
+index fca9c4f5bd9c..4538215a362c 100644
+--- a/Documentation/s390/vfio-ccw.rst
++++ b/Documentation/s390/vfio-ccw.rst
+@@ -210,7 +210,36 @@ Subchannel.
+=20
+ irb_area stores the I/O result.
+=20
+-ret_code stores a return code for each access of the region.
++ret_code stores a return code for each access of the region. The followi=
+ng
++values may occur:
++
++``0``
++  The operation was successful.
++
++``-EOPNOTSUPP``
++  The orb specified transport mode or an unidentified IDAW format, did n=
+ot
++  specify prefetch mode, or the scsw specified a function other than the
++  start function.
++
++``-EIO``
++  A request was issued while the device was not in a state ready to acce=
+pt
++  requests, or an internal error occurred.
++
++``-EBUSY``
++  The subchannel was status pending or busy, or a request is already act=
+ive.
++
++``-EAGAIN``
++  A request was being processed, and the caller should retry.
++
++``-EACCES``
++  The channel path(s) used for the I/O were found to be not operational.
++
++``-ENODEV``
++  The device was found to be not operational.
++
++``-EINVAL``
++  The orb specified a chain longer than 255 ccws, or an internal error
++  occurred.
+=20
+ This region is always available.
+=20
+@@ -231,6 +260,29 @@ This region is exposed via region type VFIO_REGION_S=
+UBTYPE_CCW_ASYNC_CMD.
+=20
+ Currently, CLEAR SUBCHANNEL and HALT SUBCHANNEL use this region.
+=20
++command specifies the command to be issued; ret_code stores a return cod=
+e
++for each access of the region. The following values may occur:
++
++``0``
++  The operation was successful.
++
++``-ENODEV``
++  The device was found to be not operational.
++
++``-EINVAL``
++  A command other than halt or clear was specified.
++
++``-EIO``
++  A request was issued while the device was not in a state ready to acce=
+pt
++  requests.
++
++``-EAGAIN``
++  A request was being processed, and the caller should retry.
++
++``-EBUSY``
++  The subchannel was status pending or busy while processing a halt requ=
+est.
++
++
+ vfio-ccw operation details
+ --------------------------
+=20
+--=20
+2.21.1
 
