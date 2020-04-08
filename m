@@ -2,182 +2,239 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3DD011A2BBE
-	for <lists+kvm@lfdr.de>; Thu,  9 Apr 2020 00:08:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2D5841A2C1A
+	for <lists+kvm@lfdr.de>; Thu,  9 Apr 2020 01:07:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726607AbgDHWIp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Apr 2020 18:08:45 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:27488 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726603AbgDHWIp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Apr 2020 18:08:45 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1586383724;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:in-reply-to:in-reply-to:references:references;
-        bh=8UNHkInVgf+jLgtV1TWWmBeRTEdVdzCdwdVmjjBMaOw=;
-        b=XArFbrF5AELmbG+9SGmh/Kajr49ikInCTHjG2ysoUYm/0YTSPkEdxNEEQcbTaQvbKdXCh8
-        riUfzhuFa3rYhp1PX0HDJxq6MxZNQsi1TdVX67NC+mpIRxfms/dcXfWHadA+jGt9kDbrDc
-        nuTeG7PguG3DoGyKBQ3WkdTrNbDSKRA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-222-2vvx3nPrMGay6sIIhy3Qjw-1; Wed, 08 Apr 2020 18:08:40 -0400
-X-MC-Unique: 2vvx3nPrMGay6sIIhy3Qjw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 399DB18AB2C2;
-        Wed,  8 Apr 2020 22:08:39 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-116-15.gru2.redhat.com [10.97.116.15])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 7B38E119593;
-        Wed,  8 Apr 2020 22:08:33 +0000 (UTC)
-From:   Wainer dos Santos Moschetta <wainersm@redhat.com>
-To:     pbonzini@redhat.com, kvm@vger.kernel.org
-Cc:     drjones@redhat.com, david@redhat.com, linux-kernel@vger.kernel.org,
-        linux-kselftest@vger.kernel.org
-Subject: [PATCH v4 2/2] selftests: kvm: Add mem_slot_test test
-Date:   Wed,  8 Apr 2020 19:08:18 -0300
-Message-Id: <20200408220818.4306-3-wainersm@redhat.com>
-In-Reply-To: <20200408220818.4306-1-wainersm@redhat.com>
-References: <20200408220818.4306-1-wainersm@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+        id S1726521AbgDHXHB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Apr 2020 19:07:01 -0400
+Received: from Galois.linutronix.de ([193.142.43.55]:50951 "EHLO
+        Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726467AbgDHXHA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Apr 2020 19:07:00 -0400
+Received: from p5de0bf0b.dip0.t-ipconnect.de ([93.224.191.11] helo=nanos.tec.linutronix.de)
+        by Galois.linutronix.de with esmtpsa (TLS1.2:DHE_RSA_AES_256_CBC_SHA256:256)
+        (Exim 4.80)
+        (envelope-from <tglx@linutronix.de>)
+        id 1jMJmV-0005lr-S9; Thu, 09 Apr 2020 01:06:52 +0200
+Received: by nanos.tec.linutronix.de (Postfix, from userid 1000)
+        id 4E299101150; Thu,  9 Apr 2020 01:06:51 +0200 (CEST)
+From:   Thomas Gleixner <tglx@linutronix.de>
+To:     Vivek Goyal <vgoyal@redhat.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Andy Lutomirski <luto@amacapital.net>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Andy Lutomirski <luto@kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>, X86 ML <x86@kernel.org>,
+        kvm list <kvm@vger.kernel.org>, stable <stable@vger.kernel.org>
+Subject: Re: [PATCH v2] x86/kvm: Disable KVM_ASYNC_PF_SEND_ALWAYS
+In-Reply-To: <20200408203425.GD93547@redhat.com>
+Date:   Thu, 09 Apr 2020 01:06:51 +0200
+Message-ID: <875ze9r304.fsf@nanos.tec.linutronix.de>
+MIME-Version: 1.0
+Content-Type: text/plain
+X-Linutronix-Spam-Score: -1.0
+X-Linutronix-Spam-Level: -
+X-Linutronix-Spam-Status: No , -1.0 points, 5.0 required,  ALL_TRUSTED=-1,SHORTCIRCUIT=-0.0001
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This patch introduces the mem_slot_test test which checks
-an VM can have added memory slots up to the limit defined in
-KVM_CAP_NR_MEMSLOTS. Then attempt to add one more slot to
-verify it fails as expected.
+Vivek Goyal <vgoyal@redhat.com> writes:
+> On Wed, Apr 08, 2020 at 08:01:36PM +0200, Thomas Gleixner wrote:
+>> Forget the current pf async semantics (or the lack of). You really want
+>> to start from scratch and igore the whole thing.
+>> 
+>> The charm of #VE is that the hardware can inject it and it's not nesting
+>> until the guest cleared the second word in the VE information area. If
+>> that word is not 0 then you get a regular vmexit where you suspend the
+>> vcpu until the nested problem is solved.
+>
+> So IIUC, only one process on a vcpu could affort to relinquish cpu to
+> another task. If next task also triggers EPT violation, that will result
+> in VM exit (as previous #VE is not complete yet) and vcpu will be
+> halted.
 
-Signed-off-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
----
- tools/testing/selftests/kvm/.gitignore      |  1 +
- tools/testing/selftests/kvm/Makefile        |  3 +
- tools/testing/selftests/kvm/mem_slot_test.c | 76 +++++++++++++++++++++
- 3 files changed, 80 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/mem_slot_test.c
+No. The guest #VE handler reads VE information, stores it into a PV page
+which is used to communicate with the host, invokes the hypercall and
+clears word1 so a consecutive #VE can be handled.
 
-diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
-index 16877c3daabf..127d27188427 100644
---- a/tools/testing/selftests/kvm/.gitignore
-+++ b/tools/testing/selftests/kvm/.gitignore
-@@ -21,4 +21,5 @@
- /demand_paging_test
- /dirty_log_test
- /kvm_create_max_vcpus
-+/mem_slot_test
- /steal_time
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index 712a2ddd2a27..338b6cdce1a0 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -32,12 +32,14 @@ TEST_GEN_PROGS_x86_64 += clear_dirty_log_test
- TEST_GEN_PROGS_x86_64 += demand_paging_test
- TEST_GEN_PROGS_x86_64 += dirty_log_test
- TEST_GEN_PROGS_x86_64 += kvm_create_max_vcpus
-+TEST_GEN_PROGS_x86_64 += mem_slot_test
- TEST_GEN_PROGS_x86_64 += steal_time
- 
- TEST_GEN_PROGS_aarch64 += clear_dirty_log_test
- TEST_GEN_PROGS_aarch64 += demand_paging_test
- TEST_GEN_PROGS_aarch64 += dirty_log_test
- TEST_GEN_PROGS_aarch64 += kvm_create_max_vcpus
-+TEST_GEN_PROGS_aarch64 += mem_slot_test
- TEST_GEN_PROGS_aarch64 += steal_time
- 
- TEST_GEN_PROGS_s390x = s390x/memop
-@@ -46,6 +48,7 @@ TEST_GEN_PROGS_s390x += s390x/sync_regs_test
- TEST_GEN_PROGS_s390x += demand_paging_test
- TEST_GEN_PROGS_s390x += dirty_log_test
- TEST_GEN_PROGS_s390x += kvm_create_max_vcpus
-+TEST_GEN_PROGS_s390x += mem_slot_test
- 
- TEST_GEN_PROGS += $(TEST_GEN_PROGS_$(UNAME_M))
- LIBKVM += $(LIBKVM_$(UNAME_M))
-diff --git a/tools/testing/selftests/kvm/mem_slot_test.c b/tools/testing/selftests/kvm/mem_slot_test.c
-new file mode 100644
-index 000000000000..7c1009f0bc07
---- /dev/null
-+++ b/tools/testing/selftests/kvm/mem_slot_test.c
-@@ -0,0 +1,76 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * mem_slot_test
-+ *
-+ * Copyright (C) 2020, Red Hat, Inc.
-+ *
-+ * Test suite for memory region operations.
-+ */
-+#define _GNU_SOURCE /* for program_invocation_short_name */
-+#include <linux/kvm.h>
-+#include <sys/mman.h>
-+
-+#include "test_util.h"
-+#include "kvm_util.h"
-+
-+/*
-+ * Test it can be added memory slots up to KVM_CAP_NR_MEMSLOTS, then any
-+ * tentative to add further slots should fail.
-+ */
-+static void test_add_max_slots(void)
-+{
-+	int ret;
-+	struct kvm_vm *vm;
-+	uint32_t max_mem_slots;
-+	uint32_t slot;
-+	uint64_t guest_addr;
-+	uint64_t mem_reg_npages;
-+	uint64_t mem_reg_size;
-+	void *mem;
-+
-+	max_mem_slots = kvm_check_cap(KVM_CAP_NR_MEMSLOTS);
-+	TEST_ASSERT(max_mem_slots > 0,
-+		    "KVM_CAP_NR_MEMSLOTS should be greater than 0");
-+	pr_info("Allowed number of memory slots: %i\n", max_mem_slots);
-+
-+	vm = vm_create(VM_MODE_DEFAULT, 0, O_RDWR);
-+
-+	/*
-+	 * Uses 1MB sized/aligned memory region since this is the minimal
-+	 * required on s390x.
-+	 */
-+	mem_reg_size = 0x100000;
-+	mem_reg_npages = vm_calc_num_guest_pages(VM_MODE_DEFAULT, mem_reg_size);
-+
-+	guest_addr = 0x0;
-+
-+	/* Check it can be added memory slots up to the maximum allowed */
-+	pr_info("Adding slots 0..%i, each memory region with %ldK size\n",
-+		(max_mem_slots - 1), mem_reg_size >> 10);
-+	for (slot = 0; slot < max_mem_slots; slot++) {
-+		vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS,
-+					    guest_addr, slot, mem_reg_npages,
-+					    0);
-+		guest_addr += mem_reg_size;
-+	}
-+
-+	/* Check it cannot be added memory slots beyond the limit */
-+	mem = mmap(NULL, mem_reg_size, PROT_READ | PROT_WRITE,
-+		   MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-+	TEST_ASSERT(mem != MAP_FAILED, "Failed to mmap() host");
-+
-+	ret = ioctl(vm_get_fd(vm), KVM_SET_USER_MEMORY_REGION,
-+		    &(struct kvm_userspace_memory_region) {slot, 0, guest_addr,
-+		    mem_reg_size, (uint64_t) mem});
-+	TEST_ASSERT(ret == -1 && errno == EINVAL,
-+		    "Adding one more memory slot should fail with EINVAL");
-+
-+	munmap(mem, mem_reg_size);
-+	kvm_vm_free(vm);
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	test_add_max_slots();
-+	return 0;
-+}
--- 
-2.17.2
+If the hypercall is telling the host to suspend the guest (e.g. because
+the exception hit an interrupt or preemption disabled region where
+scheduling is not possible) then the host suspends the vCPU until the
+EPT issue is fixed. Before that hypercall returns the state of the
+recursion prevention word is irrelevant as the vCPU is not running, so
+it's fine to clear it afterwards.
 
+If the hypercall is telling the host that it can schedule and do
+something else, then the word is cleared after the hypercall
+returns. This makes sure that the host has gathered the information
+before another VE can be injected.
+
+TBH, I really was positively surprised that this HW mechanism actually
+makes sense. It prevents the following situation:
+
+  1) Guest triggers a EPT fail
+
+  2) HW injects #VE sets VE info
+
+  3) Guest handles #VE and before being able to gather the VE info data
+     it triggers another EPT fail
+
+  4) HW injects #VE sets VE info -> FAIL
+
+So if we clear the reentrancy protection after saving the info in the
+PV page and after the hypercall returns, it's guaranteed that the above
+results in:
+
+  1) Guest triggers a EPT fail
+
+  2) HW injects #VE sets VE info
+
+  3) Guest handles #VE and before being able to gather the VE info data
+     and clearing the reentrancy protection it triggers another EPT fail
+
+  4) VMEXIT which needs to be handled by suspending the vCPU, solving
+     the issue and resuming it, which allows it to handle the original
+     fail #1
+
+>> So you really don't worry about the guest CPU state at all. The guest
+>> side #VE handler has to decide what it wants from the host depending on
+>> it's internal state:
+>> 
+>>      - Suspend me and resume once the EPT fail is solved
+>> 
+>>      - Let me park the failing task and tell me once you resolved the
+>>        problem.
+>> 
+>> That's pretty straight forward and avoids the whole nonsense which the
+>> current mess contains. It completely avoids the allocation stuff as well
+>> as you need to use a PV page where the guest copies the VE information
+>> to.
+>> 
+>> The notification that a problem has been resolved needs to go through a
+>> separate vector which still has the IF=1 requirement obviously.
+>
+> How is this vector decided between guest and host.
+
+That's either a fixed vector which then becomes ABI or the guest tells
+the host via some PV/hypercall interface that it can handle #VE and that
+the vector for notification is number X.
+
+> Failure to fault in page will be communicated through same
+> vector?
+
+The PV page which communicates the current and eventually pending EPT
+fails to the host is also the communication mechanism for the outcome.
+
+Lets assume that the PV page contains an array of guest/host
+communication data structures:
+
+struct ve_info {
+	struct ve_hw_info	hw_info;
+        unsigned long		state;
+        struct rcu_wait         wait;
+);
+
+The PV page looks like this:
+
+struct ve_page {
+	struct ve_info		info[N_ENTRIES];
+        unsigned int		guest_current;
+        unsigned int		host_current;
+        unsigned long		active[BITS_TO_LONGS(N_ENTRIES)];
+};
+
+The #VE handler does:
+
+        struct ve_page *vp = this_cpu_ptr(&ve_page);
+        struct ve_info *info;
+        bool can_continue;
+
+        idx = find_first_zero_bit(vp->active, N_ENTRIES);
+        BUG_ON(idx >= N_ENTRIES);
+        set_bit(idx, vp->active);
+        info = vp->info + idx;
+
+        copy_ve_info(&info->hw_info, ve_hwinfo);
+        vp->guest_current = idx;
+
+        if (test_and_set_thread_flag(TIF_IN_VE) || bitmap_full(vp->active, N_ENTRIES))
+                can_continue = false;
+        else
+                can_continue = user_mode(regs) || preemptible();
+
+        if (can_continue) {
+                info->state = CAN_CONTINUE;
+        	hypercall_ve();
+                ve_hwinfo.reentrancy_protect = 0;
+                rcuwait_wait_event(&info->wait, info->state != CAN_CONTINUE, TASK_IDLE);
+        } else {        
+                info->state = SUSPEND_ME;
+        	hypercall_ve();
+                ve_hwinfo.reentrancy_protect = 0;
+	}
+
+	state = info->state;
+        info->state = NONE;
+        clear_bit(idx, vp->active);
+
+        switch (state) {
+        case RESOLVED:
+        	break;
+
+        case FAIL:
+        	if (user_mode(regs))
+                	send_signal(.....);
+                else if (!fixup_exception())
+                	panic("I'm toast");
+                break;
+
+        default:
+        	panic("Confused");
+        }
+        
+        clear_thread_flag(TIF_IN_VE);
+        
+Now the host completion does:
+
+        struct ve_page *vp = vcpu->ve_page;
+        struct ve_info *info = vp->info + idx;
+
+        state = info->state;
+        info->state = resolved_state;
+
+        switch (state) {
+        case SUSPEND_ME:
+        	resume_vcpu(vcpu);
+                break;
+        case CAN_CONTINUE:
+        	queue_completion(vcpu, idx);
+                break;
+        default:
+                kill_guest();
+        }
+
+and the host completion injection which handles the queued completion
+when guest IF=0 does:
+
+        struct ve_page *vp = vcpu->ve_page;
+
+        vp->host_current = idx;
+        inject_ve_complete(vcpu);
+
+The guest completion does:
+
+        struct ve_page *vp = this_cpu_ptr(&ve_page);
+        struct ve_info *info;
+
+        info = vp->info + vp->host_current;
+        rcuwait_wake_up(&info->wait);
+
+There are a bunch of life time issues to think about (not rocket
+science), but you get the idea.
+
+Thanks,
+
+        tglx
