@@ -2,102 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 091551A1DE3
-	for <lists+kvm@lfdr.de>; Wed,  8 Apr 2020 11:08:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5C9741A1E0C
+	for <lists+kvm@lfdr.de>; Wed,  8 Apr 2020 11:32:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727049AbgDHJIw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Apr 2020 05:08:52 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:44392 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726965AbgDHJIv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Apr 2020 05:08:51 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1586336930;
+        id S1727856AbgDHJcl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Apr 2020 05:32:41 -0400
+Received: from mail.skyhub.de ([5.9.137.197]:35764 "EHLO mail.skyhub.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726605AbgDHJcl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Apr 2020 05:32:41 -0400
+Received: from zn.tnic (p200300EC2F0A9300FDE94558DB0629D0.dip0.t-ipconnect.de [IPv6:2003:ec:2f0a:9300:fde9:4558:db06:29d0])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id BCABF1EC0C89;
+        Wed,  8 Apr 2020 11:32:38 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1586338358;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=rUQ0HsWwrnHe34YtREcTfNzNUJOF3IAdDb38I5AaKxE=;
-        b=itEESRTj8Om5ZYwi/41vWFHLEJ0IARFjEfitxIG5rJdBJ71HmmlSGlX4hx8/yjrZbfaVxc
-        wr9AOJpCsPMPVttoDJHAS96xJeWO/8ldj3sH0mBQJLchuydSE2jOI+GAoAbN6WCP3tk1Zb
-        v2M2kDyNQ/ZtN8I2IOzV/uo+pm8Q7QY=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-470-xYrrIhXxNJWEYiSQqvgQHA-1; Wed, 08 Apr 2020 05:08:49 -0400
-X-MC-Unique: xYrrIhXxNJWEYiSQqvgQHA-1
-Received: by mail-wm1-f69.google.com with SMTP id f81so2091372wmf.2
-        for <kvm@vger.kernel.org>; Wed, 08 Apr 2020 02:08:49 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=rUQ0HsWwrnHe34YtREcTfNzNUJOF3IAdDb38I5AaKxE=;
-        b=Ag4ep0t1tH639EISYj0efbGF+ORbHAOLSAMpykNGD8wCcgaE0NCstHPWYstV1Xz/ei
-         LkgAT01LDF9NLjUvOAhbxTDOELEPAMlYYRmUAlAV+ffzxhvSBZXiZmv6AZGgMTNw2S3w
-         qKFclGuzxX9UFGm95VLZ8EhGUGXpG6w30UlTwsXpyP5bMOlS1VNnSaYvmgseo3Imli6z
-         RPbd5ucAG1ylSW0pmAfGXX4F9KBXOD1N69kpz7fctcxTmF2FJLKRW5K6Ps0/5V4X+L5h
-         yrLu+Te6isuZL6aZRXPZ3026Zmwf13VAdqjIa7l7RGJtvtAegpsHYvfKsUBkkfbLoIQ3
-         9OQA==
-X-Gm-Message-State: AGi0PubNyrTjaGucFmu/h7i25mWwMnD4zE6FuksdmCcpYf5GUTOlSqKj
-        e9nDRdl8I/lr3YFAC29TexIXwCAPCpc0W13PuysotdlykUCK+RbutsX4SyGb+FbI6jA4DVTBbxr
-        zA+3wTwWz53sM
-X-Received: by 2002:a7b:cd89:: with SMTP id y9mr3752574wmj.102.1586336928252;
-        Wed, 08 Apr 2020 02:08:48 -0700 (PDT)
-X-Google-Smtp-Source: APiQypLe1s1nvra2eXvOVyXKoy+DeFW86EqO9pdanw+EMwQcEuocAwsAGqIDuWH/3Mfnb2xLGbG1mA==
-X-Received: by 2002:a7b:cd89:: with SMTP id y9mr3752550wmj.102.1586336928006;
-        Wed, 08 Apr 2020 02:08:48 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:bd61:914:5c2f:2580? ([2001:b07:6468:f312:bd61:914:5c2f:2580])
-        by smtp.gmail.com with ESMTPSA id s6sm5804360wmh.17.2020.04.08.02.08.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 08 Apr 2020 02:08:47 -0700 (PDT)
-Subject: Re: [PATCH 2/2] KVM: s390: Return last valid slot if approx index is
- out-of-bounds
-To:     Cornelia Huck <cohuck@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        syzbot+d889b59b2bb87d4047a2@syzkaller.appspotmail.com
-References: <20200408064059.8957-1-sean.j.christopherson@intel.com>
- <20200408064059.8957-3-sean.j.christopherson@intel.com>
- <20200408091024.14a0d096.cohuck@redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <2701fd49-4cf8-2b2d-daa8-96945ea4f233@redhat.com>
-Date:   Wed, 8 Apr 2020 11:08:44 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+        bh=iPiVn5HowtJr85j+TBk0a/GUa/dBFzq/G2s+PBaU0UM=;
+        b=i2+/LJpzUTxmAF6wtYN+zAH1EbcY0+wvaJ8uqCEqmQUqo7MiaWnH1wPSPmdVFgmWHgBsq+
+        6zfY44nvZjY2KVzGmNAOLoYSH53Ib6Wd05eJvn6ohvs4XFNYDk4Pn9hzxRxOYl+LsYKlIh
+        L9x3m87CrvfeT5rmxFSr1Uv2a0HT0HU=
+Date:   Wed, 8 Apr 2020 11:32:35 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Andy Lutomirski <luto@amacapital.net>
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        Vivek Goyal <vgoyal@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Andy Lutomirski <luto@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        LKML <linux-kernel@vger.kernel.org>, X86 ML <x86@kernel.org>,
+        kvm list <kvm@vger.kernel.org>, stable <stable@vger.kernel.org>
+Subject: Re: [PATCH v2] x86/kvm: Disable KVM_ASYNC_PF_SEND_ALWAYS
+Message-ID: <20200408093235.GB24663@zn.tnic>
+References: <877dyqkj3h.fsf@nanos.tec.linutronix.de>
+ <F2BD5266-A9E5-41C8-AC64-CC33EB401B37@amacapital.net>
 MIME-Version: 1.0
-In-Reply-To: <20200408091024.14a0d096.cohuck@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <F2BD5266-A9E5-41C8-AC64-CC33EB401B37@amacapital.net>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 08/04/20 09:10, Cornelia Huck wrote:
-> On Tue,  7 Apr 2020 23:40:59 -0700
-> Sean Christopherson <sean.j.christopherson@intel.com> wrote:
-> 
->> Return the index of the last valid slot from gfn_to_memslot_approx() if
->> its binary search loop yielded an out-of-bounds index.  The index can
->> be out-of-bounds if the specified gfn is less than the base of the
->> lowest memslot (which is also the last valid memslot).
->>
->> Note, the sole caller, kvm_s390_get_cmma(), ensures used_slots is
->> non-zero.
->>
-> This also should be cc:stable, with the dependency expressed as
-> mentioned by Christian.
-> 
+On Tue, Apr 07, 2020 at 09:48:02PM -0700, Andy Lutomirski wrote:
+> I’m fine with the flow being different. do_machine_check() could
+> have entirely different logic to decide the error in PV.
 
-So,
+Nope, do_machine_check() is already as ugly as it gets. I don't want any
+more crap in it.
 
-Cc: stable@vger.kernel.org # 4.19.x: 0774a964ef56: KVM: Fix out of range accesses to memslots
-Cc: stable@vger.kernel.org # 4.19.x
+> But I think we should reuse the overall flow: kernel gets #MC with
+> RIP pointing to the offending instruction. If there’s an extable
+> entry that can handle memory failure, handle it. If it’s a user
+> access, handle it. If it’s an unrecoverable error because it was a
+> non-extable kernel access, oops or panic.
+>
+> The actual PV part could be extremely simple: the host just needs to
+> tell the guest “this #MC is due to memory failure at this guest
+> physical address”. No banks, no DIMM slot, no rendezvous crap
+> (LMCE), no other nonsense. It would be nifty if the host also told the
+> guest what the guest virtual address was if the host knows it.
 
-Paolo
+It better be a whole different path and a whole different vector. If you
+wanna keep it simple and apart from all of the other nonsense, then you
+can just as well use a completely different vector.
 
+Thx.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
