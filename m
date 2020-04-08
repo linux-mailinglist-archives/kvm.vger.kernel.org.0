@@ -2,152 +2,87 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 81D6A1A23BB
-	for <lists+kvm@lfdr.de>; Wed,  8 Apr 2020 16:04:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E12931A23D1
+	for <lists+kvm@lfdr.de>; Wed,  8 Apr 2020 16:13:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728040AbgDHOEj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Apr 2020 10:04:39 -0400
-Received: from mga12.intel.com ([192.55.52.136]:63159 "EHLO mga12.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727226AbgDHOEj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Apr 2020 10:04:39 -0400
-IronPort-SDR: ecllaeKuKeJ5Wf5oNQbl+rUibCNEJTI3Hcc1hY7kyeDqs94SHx1TMry0AmAAsfPhkAAoGx/P87
- rRLq0OBS9IdQ==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Apr 2020 07:04:38 -0700
-IronPort-SDR: F5PeZg8HmvVGsgLU55iJsKW/mN7EmYTPufY+rj4qeCcpWRhxqG+2eO0o5VKnDLfDWPG82JUlVD
- Yy/UOTi1h4sQ==
-X-IronPort-AV: E=Sophos;i="5.72,358,1580803200"; 
-   d="scan'208";a="425144596"
-Received: from likexu-mobl1.ccr.corp.intel.com (HELO [10.249.174.149]) ([10.249.174.149])
-  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Apr 2020 07:04:36 -0700
-Subject: Re: [PATCH v2] KVM: x86/pmu: Reduce counter period change overhead
- and delay the effective time
-From:   Like Xu <like.xu@linux.intel.com>
-To:     pbonzini@redhat.com
-Cc:     ehankland@google.com, jmattson@google.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, wanpengli@tencent.com
-References: <20200317075315.70933-1-like.xu@linux.intel.com>
- <20200317081458.88714-1-like.xu@linux.intel.com>
- <1528e1b4-3dee-161b-9463-57471263b5a8@linux.intel.com>
-Organization: Intel OTC
-Message-ID: <6a57b701-99a2-3917-3879-bc8141dca9d4@linux.intel.com>
-Date:   Wed, 8 Apr 2020 22:04:34 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+        id S1727967AbgDHONT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Apr 2020 10:13:19 -0400
+Received: from Galois.linutronix.de ([193.142.43.55]:49924 "EHLO
+        Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726550AbgDHONT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Apr 2020 10:13:19 -0400
+Received: from p5de0bf0b.dip0.t-ipconnect.de ([93.224.191.11] helo=nanos.tec.linutronix.de)
+        by Galois.linutronix.de with esmtpsa (TLS1.2:DHE_RSA_AES_256_CBC_SHA256:256)
+        (Exim 4.80)
+        (envelope-from <tglx@linutronix.de>)
+        id 1jMBRr-0007Ob-HA; Wed, 08 Apr 2020 16:12:59 +0200
+Received: by nanos.tec.linutronix.de (Postfix, from userid 1000)
+        id A83CE10069D; Wed,  8 Apr 2020 16:12:58 +0200 (CEST)
+From:   Thomas Gleixner <tglx@linutronix.de>
+To:     Ankur Arora <ankur.a.arora@oracle.com>,
+        linux-kernel@vger.kernel.org, x86@kernel.org
+Cc:     peterz@infradead.org, hpa@zytor.com, jpoimboe@redhat.com,
+        namit@vmware.com, mhiramat@kernel.org, jgross@suse.com,
+        bp@alien8.de, vkuznets@redhat.com, pbonzini@redhat.com,
+        boris.ostrovsky@oracle.com, mihai.carabas@oracle.com,
+        kvm@vger.kernel.org, xen-devel@lists.xenproject.org,
+        virtualization@lists.linux-foundation.org,
+        Ankur Arora <ankur.a.arora@oracle.com>
+Subject: Re: [RFC PATCH 00/26] Runtime paravirt patching
+In-Reply-To: <20200408050323.4237-1-ankur.a.arora@oracle.com>
+References: <20200408050323.4237-1-ankur.a.arora@oracle.com>
+Date:   Wed, 08 Apr 2020 16:12:58 +0200
+Message-ID: <87k12qawwl.fsf@nanos.tec.linutronix.de>
 MIME-Version: 1.0
-In-Reply-To: <1528e1b4-3dee-161b-9463-57471263b5a8@linux.intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Linutronix-Spam-Score: -1.0
+X-Linutronix-Spam-Level: -
+X-Linutronix-Spam-Status: No , -1.0 points, 5.0 required,  ALL_TRUSTED=-1,SHORTCIRCUIT=-0.0001
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Paolo,
+Ankur Arora <ankur.a.arora@oracle.com> writes:
+> A KVM host (or another hypervisor) might advertise paravirtualized
+> features and optimization hints (ex KVM_HINTS_REALTIME) which might
+> become stale over the lifetime of the guest. For instance, the
+> host might go from being undersubscribed to being oversubscribed
+> (or the other way round) and it would make sense for the guest
+> switch pv-ops based on that.
 
-Could you please take a look at this patch?
-If there is anything needs to be improved, please let me know.
+If your host changes his advertised behaviour then you want to fix the
+host setup or find a competent admin.
+
+> This lockorture splat that I saw on the guest while testing this is
+> indicative of the problem:
+>
+>   [ 1136.461522] watchdog: BUG: soft lockup - CPU#8 stuck for 22s! [lock_torture_wr:12865]
+>   [ 1136.461542] CPU: 8 PID: 12865 Comm: lock_torture_wr Tainted: G W L 5.4.0-rc7+ #77
+>   [ 1136.461546] RIP: 0010:native_queued_spin_lock_slowpath+0x15/0x220
+>
+> (Caused by an oversubscribed host but using mismatched native pv_lock_ops
+> on the gues.)
+
+And this illustrates what? The fact that you used a misconfigured setup.
+
+> This series addresses the problem by doing paravirt switching at
+> runtime.
+
+You're not addressing the problem. Your fixing the symptom, which is
+wrong to begin with.
+
+> The alternative use-case is a runtime version of apply_alternatives()
+> (not posted with this patch-set) that can be used for some safe subset
+> of X86_FEATUREs. This could be useful in conjunction with the ongoing
+> late microcode loading work that Mihai Carabas and others have been
+> working on.
+
+This has been discussed to death before and there is no safe subset as
+long as this hasn't been resolved:
+
+  https://lore.kernel.org/lkml/alpine.DEB.2.21.1909062237580.1902@nanos.tec.linutronix.de/
 
 Thanks,
-Like Xu
 
-On 2020/3/26 20:47, Like Xu wrote:
-> Anyone to help review this change?
-> 
-> Thanks,
-> Like Xu
-> 
-> On 2020/3/17 16:14, Like Xu wrote:
->> The cost of perf_event_period() is unstable, and when the guest samples
->> multiple events, the overhead increases dramatically (5378 ns on E5-2699).
->>
->> For a non-running counter, the effective time of the new period is when
->> its corresponding enable bit is enabled. Calling perf_event_period()
->> in advance is superfluous. For a running counter, it's safe to delay the
->> effective time until the KVM_REQ_PMU event is handled. If there are
->> multiple perf_event_period() calls before handling KVM_REQ_PMU,
->> it helps to reduce the total cost.
->>
->> Signed-off-by: Like Xu <like.xu@linux.intel.com>
->> ---
->>   arch/x86/kvm/pmu.c           | 11 -----------
->>   arch/x86/kvm/pmu.h           | 11 +++++++++++
->>   arch/x86/kvm/vmx/pmu_intel.c | 10 ++++------
->>   3 files changed, 15 insertions(+), 17 deletions(-)
->>
->> diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
->> index d1f8ca57d354..527a8bb85080 100644
->> --- a/arch/x86/kvm/pmu.c
->> +++ b/arch/x86/kvm/pmu.c
->> @@ -437,17 +437,6 @@ void kvm_pmu_init(struct kvm_vcpu *vcpu)
->>       kvm_pmu_refresh(vcpu);
->>   }
->> -static inline bool pmc_speculative_in_use(struct kvm_pmc *pmc)
->> -{
->> -    struct kvm_pmu *pmu = pmc_to_pmu(pmc);
->> -
->> -    if (pmc_is_fixed(pmc))
->> -        return fixed_ctrl_field(pmu->fixed_ctr_ctrl,
->> -            pmc->idx - INTEL_PMC_IDX_FIXED) & 0x3;
->> -
->> -    return pmc->eventsel & ARCH_PERFMON_EVENTSEL_ENABLE;
->> -}
->> -
->>   /* Release perf_events for vPMCs that have been unused for a full time 
->> slice.  */
->>   void kvm_pmu_cleanup(struct kvm_vcpu *vcpu)
->>   {
->> diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
->> index d7da2b9e0755..cd112e825d2c 100644
->> --- a/arch/x86/kvm/pmu.h
->> +++ b/arch/x86/kvm/pmu.h
->> @@ -138,6 +138,17 @@ static inline u64 get_sample_period(struct kvm_pmc 
->> *pmc, u64 counter_value)
->>       return sample_period;
->>   }
->> +static inline bool pmc_speculative_in_use(struct kvm_pmc *pmc)
->> +{
->> +    struct kvm_pmu *pmu = pmc_to_pmu(pmc);
->> +
->> +    if (pmc_is_fixed(pmc))
->> +        return fixed_ctrl_field(pmu->fixed_ctr_ctrl,
->> +            pmc->idx - INTEL_PMC_IDX_FIXED) & 0x3;
->> +
->> +    return pmc->eventsel & ARCH_PERFMON_EVENTSEL_ENABLE;
->> +}
->> +
->>   void reprogram_gp_counter(struct kvm_pmc *pmc, u64 eventsel);
->>   void reprogram_fixed_counter(struct kvm_pmc *pmc, u8 ctrl, int fixed_idx);
->>   void reprogram_counter(struct kvm_pmu *pmu, int pmc_idx);
->> diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
->> index 7c857737b438..20f654a0c09b 100644
->> --- a/arch/x86/kvm/vmx/pmu_intel.c
->> +++ b/arch/x86/kvm/vmx/pmu_intel.c
->> @@ -263,15 +263,13 @@ static int intel_pmu_set_msr(struct kvm_vcpu *vcpu, 
->> struct msr_data *msr_info)
->>               if (!msr_info->host_initiated)
->>                   data = (s64)(s32)data;
->>               pmc->counter += data - pmc_read_counter(pmc);
->> -            if (pmc->perf_event)
->> -                perf_event_period(pmc->perf_event,
->> -                          get_sample_period(pmc, data));
->> +            if (pmc_speculative_in_use(pmc))
->> +                kvm_make_request(KVM_REQ_PMU, vcpu);
->>               return 0;
->>           } else if ((pmc = get_fixed_pmc(pmu, msr))) {
->>               pmc->counter += data - pmc_read_counter(pmc);
->> -            if (pmc->perf_event)
->> -                perf_event_period(pmc->perf_event,
->> -                          get_sample_period(pmc, data));
->> +            if (pmc_speculative_in_use(pmc))
->> +                kvm_make_request(KVM_REQ_PMU, vcpu);
->>               return 0;
->>           } else if ((pmc = get_gp_pmc(pmu, msr, MSR_P6_EVNTSEL0))) {
->>               if (data == pmc->eventsel)
->>
-> 
-
+        tglx
