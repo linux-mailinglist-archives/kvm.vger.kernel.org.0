@@ -2,89 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 50B8D1A2B18
-	for <lists+kvm@lfdr.de>; Wed,  8 Apr 2020 23:29:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 68A511A2BB8
+	for <lists+kvm@lfdr.de>; Thu,  9 Apr 2020 00:08:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730393AbgDHV3V (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Apr 2020 17:29:21 -0400
-Received: from mail-qv1-f67.google.com ([209.85.219.67]:44641 "EHLO
-        mail-qv1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729222AbgDHV3U (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Apr 2020 17:29:20 -0400
-Received: by mail-qv1-f67.google.com with SMTP id ef12so4470920qvb.11
-        for <kvm@vger.kernel.org>; Wed, 08 Apr 2020 14:29:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=lca.pw; s=google;
-        h=mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=SVDtsGi6neGFRwikvRHYLrFbo8bPwU6BhE0B4MocRjo=;
-        b=BWwwyhWdP4bCAjyoQRTv8OV8mtlXVPHwPlIm8qddLZj7iC674KnBH0wZ5gmU6DqS70
-         C1/zjPys7SA2QSBdBBh/Vp7z8tP4MoDCZ3J7yPaCEb3aWrDPLZrEzEc/s5uDb6B3B/Zz
-         Q/D2iUPkb1UdcJAn2P997ms7im6hGVN1AKeVtc8UTksahOiOgwZP7W4x2aRAkYxmqdzU
-         iRMjGNH23UhxVno00at7cV4XSlx7ataddhOqFfxmG3KosI9iQ69ciGaSMtVokdO2MFwz
-         mouuM4fw0+U2UEJVYG186lPlYQdy+/QTmGdmwSkRbzlnh2r3DVGyLygwJLFIOmeGB5Hs
-         PMWw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=SVDtsGi6neGFRwikvRHYLrFbo8bPwU6BhE0B4MocRjo=;
-        b=ZEVs3cU/Da6nnTdgD0Fyuqk+Mh5RqxNzdEFdRPwrMbz3KlArH59EXn7lhCmLn24fZX
-         djtBEJTvyeZ0Poee9H1cUMs33a4RBDZZxOClgbueTET0NzzKVsBKVWJULRetj53AWdhN
-         a+W2t+y+cVLovvErOgS0vv1PcU0qhI7GhxrWq7pVIMurmUyBjBOTFxw8P+LueVxDGR7A
-         Jf20jA3mr8qX3pLieXDvPNnmLOm0G2ciwwHo6vuv5Wb44beIWpFZXYKBaT7u5BLnUFxh
-         s3YvZ9mHFbWKhS7/qNaIOju/HXYMlnAI/RhkuBbbsmqDu2xSEMzwI6l/5MdSEknFIYUn
-         FIOA==
-X-Gm-Message-State: AGi0PuYqsfxTLCxqWM1EidwTyy0KCbHvMlXqjaCYveehpVjTaD5Wrq0H
-        ogowsmPj2kgEQrwB6DUhhRUi1g==
-X-Google-Smtp-Source: APiQypIAPF83IDbnxE4npOa8BA/v00NSOs87AvIVV9hoWH5sYbQDJUSaLOrsAy9lYhzUtsirbdBiqw==
-X-Received: by 2002:a05:6214:b21:: with SMTP id w1mr9649854qvj.69.1586381359791;
-        Wed, 08 Apr 2020 14:29:19 -0700 (PDT)
-Received: from [192.168.1.153] (pool-71-184-117-43.bstnma.fios.verizon.net. [71.184.117.43])
-        by smtp.gmail.com with ESMTPSA id i13sm12975162qtj.37.2020.04.08.14.29.18
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 08 Apr 2020 14:29:18 -0700 (PDT)
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
-Subject: Re: KCSAN + KVM = host reset
-From:   Qian Cai <cai@lca.pw>
-In-Reply-To: <fb39d3d2-063e-b828-af1c-01f91d9be31c@redhat.com>
-Date:   Wed, 8 Apr 2020 17:29:18 -0400
-Cc:     Elver Marco <elver@google.com>,
-        "paul E. McKenney" <paulmck@kernel.org>,
-        kasan-dev <kasan-dev@googlegroups.com>,
-        LKML <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <017E692B-4791-46AD-B9ED-25B887ECB56B@lca.pw>
-References: <E180B225-BF1E-4153-B399-1DBF8C577A82@lca.pw>
- <fb39d3d2-063e-b828-af1c-01f91d9be31c@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-X-Mailer: Apple Mail (2.3608.80.23.2.2)
+        id S1726508AbgDHWId (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Apr 2020 18:08:33 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:48020 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726483AbgDHWId (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 8 Apr 2020 18:08:33 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1586383711;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc; bh=+07ZF0vhV+iDgSNtpgYgvjiDt2fwmsqUI3y1zso6lMk=;
+        b=M7RCowO640PAUAZOwEyt7EN2lQXhgPazDNP0Ly2Qd714oJSzIyZIfgy2aYbr2akYABjZrC
+        YwdLRhLuVLy2+jJmWZTDwayZmUfXeaMgK38147A5keOeX/rNZCdqNuLgdiQXt23cymsKex
+        XDXNhC/DfcZBMa4/42TkLxpGYkwZZbI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-472-fWbpv2IoNLOtV8qPfljB5g-1; Wed, 08 Apr 2020 18:08:27 -0400
+X-MC-Unique: fWbpv2IoNLOtV8qPfljB5g-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 893811007280;
+        Wed,  8 Apr 2020 22:08:26 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-116-15.gru2.redhat.com [10.97.116.15])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id F0666118F4A;
+        Wed,  8 Apr 2020 22:08:20 +0000 (UTC)
+From:   Wainer dos Santos Moschetta <wainersm@redhat.com>
+To:     pbonzini@redhat.com, kvm@vger.kernel.org
+Cc:     drjones@redhat.com, david@redhat.com, linux-kernel@vger.kernel.org,
+        linux-kselftest@vger.kernel.org
+Subject: [PATCH v4 0/2] selftests: kvm: Introduce the mem_slot_test test
+Date:   Wed,  8 Apr 2020 19:08:16 -0300
+Message-Id: <20200408220818.4306-1-wainersm@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+This series introduces a new KVM selftest (mem_slot_test) that goal
+is to verify memory slots can be added up to the maximum allowed. An
+extra slot is attempted which should occur on error.
 
+The patch 01 is needed so that the VM fd can be accessed from the
+test code (for the ioctl call attempting to add an extra slot).
 
-> On Apr 8, 2020, at 5:25 PM, Paolo Bonzini <pbonzini@redhat.com> wrote:
->=20
-> On 08/04/20 22:59, Qian Cai wrote:
->> Running a simple thing on this AMD host would trigger a reset right =
-away.
->> Unselect KCSAN kconfig makes everything work fine (the host would =
-also
->> reset If only "echo off > /sys/kernel/debug/kcsan=E2=80=9D before =
-running qemu-kvm).
->=20
-> Is this a regression or something you've just started to play with?  =
-(If
-> anything, the assembly language conversion of the AMD world switch =
-that
-> is in linux-next could have reduced the likelihood of such a failure,
-> not increased it).
+I ran the test successfully on x86_64, aarch64, and s390x.  This
+is why it is enabled to build on those arches.
 
-I don=E2=80=99t remember I had tried this combination before, so don=E2=80=
-=99t know if it is a
-regression or not.=
+- Changelog -
+
+v3 -> v4:
+ - Discarded mem_reg_flags variable. Simply using 0 instead [drjones]
+ - Discarded kvm_region pointer. Instead passing a compound literal in
+   the ioctl [drjones]
+ - All variables are declared on the declaration block [drjones]
+
+v2 -> v3:
+ - Keep alphabetical order of .gitignore and Makefile [drjones]
+ - Use memory region flags equals to zero [drjones]
+ - Changed mmap() assert from 'mem != NULL' to 'mem != MAP_FAILED' [drjones]
+ - kvm_region is declared along side other variables and malloc()'ed
+   later [drjones]
+ - Combined two asserts into a single 'ret == -1 && errno == EINVAL'
+   [drjones]
+
+v1 -> v2:
+ - Rebased to queue
+ - vm_get_fd() returns int instead of unsigned int (patch 01) [drjones]
+ - Removed MEM_REG_FLAGS and GUEST_VM_MODE defines [drjones]
+ - Replaced DEBUG() with pr_info() [drjones]
+ - Calculate number of guest pages with vm_calc_num_guest_pages()
+   [drjones]
+ - Using memory region of 1 MB sized (matches mininum needed
+   for s390x)
+ - Removed the increment of guest_addr after the loop [drjones]
+ - Added assert for the errno when adding a slot beyond-the-limit [drjones]
+ - Prefer KVM_MEM_READONLY flag but on s390x it switch to KVM_MEM_LOG_DIRTY_PAGES,
+   so ensure the coverage of both flags. Also somewhat tests the KVM_CAP_READONLY_MEM capability check [drjones]
+ - Moved the test logic to test_add_max_slots(), this allows to more easily add new cases in the "suite".
+
+v1: https://lore.kernel.org/kvm/20200330204310.21736-1-wainersm@redhat.com
+
+Wainer dos Santos Moschetta (2):
+  selftests: kvm: Add vm_get_fd() in kvm_util
+  selftests: kvm: Add mem_slot_test test
+
+ tools/testing/selftests/kvm/.gitignore        |  1 +
+ tools/testing/selftests/kvm/Makefile          |  3 +
+ .../testing/selftests/kvm/include/kvm_util.h  |  1 +
+ tools/testing/selftests/kvm/lib/kvm_util.c    |  5 ++
+ tools/testing/selftests/kvm/mem_slot_test.c   | 76 +++++++++++++++++++
+ 5 files changed, 86 insertions(+)
+ create mode 100644 tools/testing/selftests/kvm/mem_slot_test.c
+
+-- 
+2.17.2
+
