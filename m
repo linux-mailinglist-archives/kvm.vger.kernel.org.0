@@ -2,38 +2,38 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1CAF31A1C3F
-	for <lists+kvm@lfdr.de>; Wed,  8 Apr 2020 09:04:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1E8291A1C5B
+	for <lists+kvm@lfdr.de>; Wed,  8 Apr 2020 09:10:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726634AbgDHHEs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Apr 2020 03:04:48 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:23232 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726550AbgDHHEs (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 8 Apr 2020 03:04:48 -0400
+        id S1726773AbgDHHKg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Apr 2020 03:10:36 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:38870 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1725763AbgDHHKg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Apr 2020 03:10:36 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1586329486;
+        s=mimecast20190719; t=1586329835;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=PL5NL12CLrgF4s0JIXllKLCGUD/J5TZTVhR34cXuYOE=;
-        b=WWqAWRvCJ+2+mc5i275Asd/0iOpLGzYGUcXiehptXU55UKe1dsX1yBvl8y2wINmtB228Um
-        YESj1y8XMAebWxf/E8xYPu5TXdb5RbmDSsVkYLnBE1cMRKGO4l+1QdxUvLY34nKaIWjuie
-        4Q/1XjSfXRqh2T1nKRelpbMvb9dOzKs=
+        bh=OJEdDfDhxqWIuQHGi6+YXk/eEkMKJUcybOhiZu3aaes=;
+        b=DzdDKZ2TicmmI7ttkkOUSMfI8J+DZfNt4uUQ0YVx+DDbrv3bhW/UKFZyZXFV6iMg+Icyc+
+        5AG1XXt2aQDOa+y6mByYpxX1FsO3NMMw21zwX5HzT/v0pdF2eFaZPta3wgHnZmHHpElOlH
+        By2dCBt4bdYLftjkdQE0dLAjVLmf2Ko=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-309-xXQiYdcaPGOk9HzBCfDvfQ-1; Wed, 08 Apr 2020 03:04:44 -0400
-X-MC-Unique: xXQiYdcaPGOk9HzBCfDvfQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+ us-mta-92-OCdvW6INMP6v5AQCkPEiRA-1; Wed, 08 Apr 2020 03:10:33 -0400
+X-MC-Unique: OCdvW6INMP6v5AQCkPEiRA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 40E1E7A28B;
-        Wed,  8 Apr 2020 07:04:43 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 82FF98024D0;
+        Wed,  8 Apr 2020 07:10:32 +0000 (UTC)
 Received: from gondolin (ovpn-113-103.ams2.redhat.com [10.36.113.103])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E4F1B5DA60;
-        Wed,  8 Apr 2020 07:04:38 +0000 (UTC)
-Date:   Wed, 8 Apr 2020 09:04:36 +0200
+        by smtp.corp.redhat.com (Postfix) with ESMTP id F0F931001DD8;
+        Wed,  8 Apr 2020 07:10:27 +0000 (UTC)
+Date:   Wed, 8 Apr 2020 09:10:24 +0200
 From:   Cornelia Huck <cohuck@redhat.com>
 To:     Sean Christopherson <sean.j.christopherson@intel.com>
 Cc:     Christian Borntraeger <borntraeger@de.ibm.com>,
@@ -42,61 +42,57 @@ Cc:     Christian Borntraeger <borntraeger@de.ibm.com>,
         David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org,
         syzbot+d889b59b2bb87d4047a2@syzkaller.appspotmail.com
-Subject: Re: [PATCH 1/2] KVM: Check validity of resolved slot when searching
- memslots
-Message-ID: <20200408090436.2bd1f303.cohuck@redhat.com>
-In-Reply-To: <20200408064059.8957-2-sean.j.christopherson@intel.com>
+Subject: Re: [PATCH 2/2] KVM: s390: Return last valid slot if approx index
+ is out-of-bounds
+Message-ID: <20200408091024.14a0d096.cohuck@redhat.com>
+In-Reply-To: <20200408064059.8957-3-sean.j.christopherson@intel.com>
 References: <20200408064059.8957-1-sean.j.christopherson@intel.com>
-        <20200408064059.8957-2-sean.j.christopherson@intel.com>
+        <20200408064059.8957-3-sean.j.christopherson@intel.com>
 Organization: Red Hat GmbH
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue,  7 Apr 2020 23:40:58 -0700
+On Tue,  7 Apr 2020 23:40:59 -0700
 Sean Christopherson <sean.j.christopherson@intel.com> wrote:
 
-> Check that the resolved slot (somewhat confusingly named 'start') is a
-> valid/allocated slot before doing the final comparison to see if the
-> specified gfn resides in the associated slot.  The resolved slot can be
-> invalid if the binary search loop terminated because the search index
-> was incremented beyond the number of used slots.
+> Return the index of the last valid slot from gfn_to_memslot_approx() if
+> its binary search loop yielded an out-of-bounds index.  The index can
+> be out-of-bounds if the specified gfn is less than the base of the
+> lowest memslot (which is also the last valid memslot).
 > 
-> This bug has existed since the binary search algorithm was introduced,
-> but went unnoticed because KVM statically allocated memory for the max
-> number of slots, i.e. the access would only be truly out-of-bounds if
-> all possible slots were allocated and the specified gfn was less than
-> the base of the lowest memslot.  Commit 36947254e5f98 ("KVM: Dynamically
-> size memslot array based on number of used slots") eliminated the "all
-> possible slots allocated" condition and made the bug embarrasingly easy
-> to hit.
+> Note, the sole caller, kvm_s390_get_cmma(), ensures used_slots is
+> non-zero.
 > 
-> Fixes: 9c1a5d38780e6 ("kvm: optimize GFN to memslot lookup with large slots amount")
-> Reported-by: syzbot+d889b59b2bb87d4047a2@syzkaller.appspotmail.com
-> Cc: stable@vger.kernel.org
+
+This also should be cc:stable, with the dependency expressed as
+mentioned by Christian.
+
+> Fixes: afdad61615cc3 ("KVM: s390: Fix storage attributes migration with memory slots")
 > Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 > ---
->  include/linux/kvm_host.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  arch/s390/kvm/kvm-s390.c | 3 +++
+>  1 file changed, 3 insertions(+)
 > 
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index 6d58beb65454..01276e3d01b9 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -1048,7 +1048,7 @@ search_memslots(struct kvm_memslots *slots, gfn_t gfn)
+> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> index 19a81024fe16..5dcf9ff12828 100644
+> --- a/arch/s390/kvm/kvm-s390.c
+> +++ b/arch/s390/kvm/kvm-s390.c
+> @@ -1939,6 +1939,9 @@ static int gfn_to_memslot_approx(struct kvm_memslots *slots, gfn_t gfn)
 >  			start = slot + 1;
 >  	}
 >  
-> -	if (gfn >= memslots[start].base_gfn &&
-> +	if (start < slots->used_slots && gfn >= memslots[start].base_gfn &&
+> +	if (start >= slots->used_slots)
+> +		return slots->used_slots - 1;
+> +
+>  	if (gfn >= memslots[start].base_gfn &&
 >  	    gfn < memslots[start].base_gfn + memslots[start].npages) {
 >  		atomic_set(&slots->lru_slot, start);
->  		return &memslots[start];
 
 Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 
