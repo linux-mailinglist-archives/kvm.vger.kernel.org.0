@@ -2,87 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E12931A23D1
-	for <lists+kvm@lfdr.de>; Wed,  8 Apr 2020 16:13:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0D3281A23FC
+	for <lists+kvm@lfdr.de>; Wed,  8 Apr 2020 16:23:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727967AbgDHONT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Apr 2020 10:13:19 -0400
-Received: from Galois.linutronix.de ([193.142.43.55]:49924 "EHLO
-        Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726550AbgDHONT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Apr 2020 10:13:19 -0400
-Received: from p5de0bf0b.dip0.t-ipconnect.de ([93.224.191.11] helo=nanos.tec.linutronix.de)
-        by Galois.linutronix.de with esmtpsa (TLS1.2:DHE_RSA_AES_256_CBC_SHA256:256)
-        (Exim 4.80)
-        (envelope-from <tglx@linutronix.de>)
-        id 1jMBRr-0007Ob-HA; Wed, 08 Apr 2020 16:12:59 +0200
-Received: by nanos.tec.linutronix.de (Postfix, from userid 1000)
-        id A83CE10069D; Wed,  8 Apr 2020 16:12:58 +0200 (CEST)
-From:   Thomas Gleixner <tglx@linutronix.de>
-To:     Ankur Arora <ankur.a.arora@oracle.com>,
-        linux-kernel@vger.kernel.org, x86@kernel.org
-Cc:     peterz@infradead.org, hpa@zytor.com, jpoimboe@redhat.com,
-        namit@vmware.com, mhiramat@kernel.org, jgross@suse.com,
-        bp@alien8.de, vkuznets@redhat.com, pbonzini@redhat.com,
-        boris.ostrovsky@oracle.com, mihai.carabas@oracle.com,
-        kvm@vger.kernel.org, xen-devel@lists.xenproject.org,
-        virtualization@lists.linux-foundation.org,
-        Ankur Arora <ankur.a.arora@oracle.com>
-Subject: Re: [RFC PATCH 00/26] Runtime paravirt patching
-In-Reply-To: <20200408050323.4237-1-ankur.a.arora@oracle.com>
-References: <20200408050323.4237-1-ankur.a.arora@oracle.com>
-Date:   Wed, 08 Apr 2020 16:12:58 +0200
-Message-ID: <87k12qawwl.fsf@nanos.tec.linutronix.de>
+        id S1728647AbgDHOXE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Apr 2020 10:23:04 -0400
+Received: from mga02.intel.com ([134.134.136.20]:54100 "EHLO mga02.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727070AbgDHOXE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Apr 2020 10:23:04 -0400
+IronPort-SDR: Q4sVnB1sQy9KaF9tayZOi3WKKRmPcXowFhyF41/+7sVrSdF0qTcx2Hjv1i6mBQi1Ku0puN409R
+ BXNye8j/Tm/w==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Apr 2020 07:23:03 -0700
+IronPort-SDR: Gb5W0BceH43BnnIx0UpCQ+0biYB59F70/Vo0XMDBC4kjsoGC5ieJuiRODEtezmcSZtiQ+dFyHR
+ +S3krWP8JVXQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.72,358,1580803200"; 
+   d="scan'208";a="275457576"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
+  by fmsmga004.fm.intel.com with ESMTP; 08 Apr 2020 07:23:03 -0700
+Date:   Wed, 8 Apr 2020 07:23:03 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        syzbot+d889b59b2bb87d4047a2@syzkaller.appspotmail.com
+Subject: Re: [PATCH 0/2] KVM: Fix out-of-bounds memslot access
+Message-ID: <20200408142302.GA10686@linux.intel.com>
+References: <20200408064059.8957-1-sean.j.christopherson@intel.com>
+ <526247ac-4201-8b3d-0f15-d93b12a530b8@de.ibm.com>
+ <20200408101004.09b1f56d.cohuck@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Linutronix-Spam-Score: -1.0
-X-Linutronix-Spam-Level: -
-X-Linutronix-Spam-Status: No , -1.0 points, 5.0 required,  ALL_TRUSTED=-1,SHORTCIRCUIT=-0.0001
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200408101004.09b1f56d.cohuck@redhat.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Ankur Arora <ankur.a.arora@oracle.com> writes:
-> A KVM host (or another hypervisor) might advertise paravirtualized
-> features and optimization hints (ex KVM_HINTS_REALTIME) which might
-> become stale over the lifetime of the guest. For instance, the
-> host might go from being undersubscribed to being oversubscribed
-> (or the other way round) and it would make sense for the guest
-> switch pv-ops based on that.
+On Wed, Apr 08, 2020 at 10:10:04AM +0200, Cornelia Huck wrote:
+> On Wed, 8 Apr 2020 09:24:27 +0200
+> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+> 
+> > On 08.04.20 08:40, Sean Christopherson wrote:
+> > > Two fixes for what are effectively the same bug.  The binary search used
+> > > for memslot lookup doesn't check the resolved index and can access memory
+> > > beyond the end of the memslot array.
+> > > 
+> > > I split the s390 specific change to a separate patch because it's subtly
+> > > different, and to simplify backporting.  The KVM wide fix can be applied
+> > > to stable trees as is, but AFAICT the s390 change would need to be paired
+> > > with the !used_slots check from commit 774a964ef56 ("KVM: Fix out of range  
+> > 
+> > I cannot find the commit id 774a964ef56
+> > 
+> 
+> It's 0774a964ef561b7170d8d1b1bfe6f88002b6d219 in my tree.
 
-If your host changes his advertised behaviour then you want to fix the
-host setup or find a competent admin.
-
-> This lockorture splat that I saw on the guest while testing this is
-> indicative of the problem:
->
->   [ 1136.461522] watchdog: BUG: soft lockup - CPU#8 stuck for 22s! [lock_torture_wr:12865]
->   [ 1136.461542] CPU: 8 PID: 12865 Comm: lock_torture_wr Tainted: G W L 5.4.0-rc7+ #77
->   [ 1136.461546] RIP: 0010:native_queued_spin_lock_slowpath+0x15/0x220
->
-> (Caused by an oversubscribed host but using mismatched native pv_lock_ops
-> on the gues.)
-
-And this illustrates what? The fact that you used a misconfigured setup.
-
-> This series addresses the problem by doing paravirt switching at
-> runtime.
-
-You're not addressing the problem. Your fixing the symptom, which is
-wrong to begin with.
-
-> The alternative use-case is a runtime version of apply_alternatives()
-> (not posted with this patch-set) that can be used for some safe subset
-> of X86_FEATUREs. This could be useful in conjunction with the ongoing
-> late microcode loading work that Mihai Carabas and others have been
-> working on.
-
-This has been discussed to death before and there is no safe subset as
-long as this hasn't been resolved:
-
-  https://lore.kernel.org/lkml/alpine.DEB.2.21.1909062237580.1902@nanos.tec.linutronix.de/
-
-Thanks,
-
-        tglx
+Argh, I botched the copy.  Thanks for hunting it down!
