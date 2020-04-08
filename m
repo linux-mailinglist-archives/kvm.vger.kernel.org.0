@@ -2,85 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3525D1A2B10
-	for <lists+kvm@lfdr.de>; Wed,  8 Apr 2020 23:25:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 50B8D1A2B18
+	for <lists+kvm@lfdr.de>; Wed,  8 Apr 2020 23:29:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728733AbgDHVZw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Apr 2020 17:25:52 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:51730 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728158AbgDHVZw (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 8 Apr 2020 17:25:52 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1586381151;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=UJBpmrLVUaj5bFLbNbY74eKb6lWRZxALhzam3N9grC8=;
-        b=ZoXf2i3fP1ci9z4jzb2lv1oi33tvwPOImsAWKFa+622VF2T/VlywwTsHIxB+EmMaVDSFMI
-        gCrf9r4qDK5xWoPVPEYED3mH4yI8dHVGag3fA1io2P0szhabBACPkkMVxXH4fm9jPs7lgD
-        1IZXJHn4muj+aXtinRdyYGrKA4Rjocw=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-324-L0aDgA1lOfCTwlljVonNpQ-1; Wed, 08 Apr 2020 17:25:49 -0400
-X-MC-Unique: L0aDgA1lOfCTwlljVonNpQ-1
-Received: by mail-wm1-f72.google.com with SMTP id p18so1072722wmk.9
-        for <kvm@vger.kernel.org>; Wed, 08 Apr 2020 14:25:49 -0700 (PDT)
+        id S1730393AbgDHV3V (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Apr 2020 17:29:21 -0400
+Received: from mail-qv1-f67.google.com ([209.85.219.67]:44641 "EHLO
+        mail-qv1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729222AbgDHV3U (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Apr 2020 17:29:20 -0400
+Received: by mail-qv1-f67.google.com with SMTP id ef12so4470920qvb.11
+        for <kvm@vger.kernel.org>; Wed, 08 Apr 2020 14:29:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=lca.pw; s=google;
+        h=mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=SVDtsGi6neGFRwikvRHYLrFbo8bPwU6BhE0B4MocRjo=;
+        b=BWwwyhWdP4bCAjyoQRTv8OV8mtlXVPHwPlIm8qddLZj7iC674KnBH0wZ5gmU6DqS70
+         C1/zjPys7SA2QSBdBBh/Vp7z8tP4MoDCZ3J7yPaCEb3aWrDPLZrEzEc/s5uDb6B3B/Zz
+         Q/D2iUPkb1UdcJAn2P997ms7im6hGVN1AKeVtc8UTksahOiOgwZP7W4x2aRAkYxmqdzU
+         iRMjGNH23UhxVno00at7cV4XSlx7ataddhOqFfxmG3KosI9iQ69ciGaSMtVokdO2MFwz
+         mouuM4fw0+U2UEJVYG186lPlYQdy+/QTmGdmwSkRbzlnh2r3DVGyLygwJLFIOmeGB5Hs
+         PMWw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=UJBpmrLVUaj5bFLbNbY74eKb6lWRZxALhzam3N9grC8=;
-        b=NHIBtE3umEmiK9XzmlTGwfbUo3Q1HpSpWWC6l7DRk2S9b0mBhFVdaNeZaOyn4JD6RC
-         42BO873mpscG4w6otNRXuTHe1BgvzzYx4gc3r3PjdbaFl8l0Yr3LbmDiYGgSzWAnHYbh
-         Xdvhv0zWlid1PCSDtpzOg1jMycJEdkIf3oBVk0Qml/jISyuZ7Zfpy7AW27GQizqqyrMH
-         NZFkxxXTHoXYxIDq3+U38M0lcpdJMzm1HSw4GDQ1/Rb3V8smgBF8K143BsDYvhFnKPSC
-         VEEMcQQre7pStU/wfOnEjBfvXQaNe4cF3HlfcdeQLU1ZDajBai7KRNmpuRpVUF1xADun
-         O7Pw==
-X-Gm-Message-State: AGi0PuZ68oy/cXcaPxQ3X94L1ULLBn222YQrCDrsHBePtFSnP5SGtntU
-        TeQUcosZlFlNoBWk6oTFK93FJQ/JLnnorSCMKfxYHl5OBSlrdRr3qy8s7W4o9jAIZjhB3vci8zX
-        IExTnm+AzL90P
-X-Received: by 2002:a1c:2705:: with SMTP id n5mr6375970wmn.94.1586381148143;
-        Wed, 08 Apr 2020 14:25:48 -0700 (PDT)
-X-Google-Smtp-Source: APiQypIEypWtp8IszcU/gyunBrcO7Rg/owcCayhmUqap5hxAkVPpXeNBGcvzCuxiSUBSePrEqghURw==
-X-Received: by 2002:a1c:2705:: with SMTP id n5mr6375955wmn.94.1586381147897;
-        Wed, 08 Apr 2020 14:25:47 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:9c71:ae6b:ee1c:2d9e? ([2001:b07:6468:f312:9c71:ae6b:ee1c:2d9e])
-        by smtp.gmail.com with ESMTPSA id t17sm32671085wrv.53.2020.04.08.14.25.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 08 Apr 2020 14:25:47 -0700 (PDT)
+        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=SVDtsGi6neGFRwikvRHYLrFbo8bPwU6BhE0B4MocRjo=;
+        b=ZEVs3cU/Da6nnTdgD0Fyuqk+Mh5RqxNzdEFdRPwrMbz3KlArH59EXn7lhCmLn24fZX
+         djtBEJTvyeZ0Poee9H1cUMs33a4RBDZZxOClgbueTET0NzzKVsBKVWJULRetj53AWdhN
+         a+W2t+y+cVLovvErOgS0vv1PcU0qhI7GhxrWq7pVIMurmUyBjBOTFxw8P+LueVxDGR7A
+         Jf20jA3mr8qX3pLieXDvPNnmLOm0G2ciwwHo6vuv5Wb44beIWpFZXYKBaT7u5BLnUFxh
+         s3YvZ9mHFbWKhS7/qNaIOju/HXYMlnAI/RhkuBbbsmqDu2xSEMzwI6l/5MdSEknFIYUn
+         FIOA==
+X-Gm-Message-State: AGi0PuYqsfxTLCxqWM1EidwTyy0KCbHvMlXqjaCYveehpVjTaD5Wrq0H
+        ogowsmPj2kgEQrwB6DUhhRUi1g==
+X-Google-Smtp-Source: APiQypIAPF83IDbnxE4npOa8BA/v00NSOs87AvIVV9hoWH5sYbQDJUSaLOrsAy9lYhzUtsirbdBiqw==
+X-Received: by 2002:a05:6214:b21:: with SMTP id w1mr9649854qvj.69.1586381359791;
+        Wed, 08 Apr 2020 14:29:19 -0700 (PDT)
+Received: from [192.168.1.153] (pool-71-184-117-43.bstnma.fios.verizon.net. [71.184.117.43])
+        by smtp.gmail.com with ESMTPSA id i13sm12975162qtj.37.2020.04.08.14.29.18
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 08 Apr 2020 14:29:18 -0700 (PDT)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
 Subject: Re: KCSAN + KVM = host reset
-To:     Qian Cai <cai@lca.pw>, Elver Marco <elver@google.com>
-Cc:     "paul E. McKenney" <paulmck@kernel.org>,
+From:   Qian Cai <cai@lca.pw>
+In-Reply-To: <fb39d3d2-063e-b828-af1c-01f91d9be31c@redhat.com>
+Date:   Wed, 8 Apr 2020 17:29:18 -0400
+Cc:     Elver Marco <elver@google.com>,
+        "paul E. McKenney" <paulmck@kernel.org>,
         kasan-dev <kasan-dev@googlegroups.com>,
         LKML <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <017E692B-4791-46AD-B9ED-25B887ECB56B@lca.pw>
 References: <E180B225-BF1E-4153-B399-1DBF8C577A82@lca.pw>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <fb39d3d2-063e-b828-af1c-01f91d9be31c@redhat.com>
-Date:   Wed, 8 Apr 2020 23:25:45 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
-MIME-Version: 1.0
-In-Reply-To: <E180B225-BF1E-4153-B399-1DBF8C577A82@lca.pw>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+ <fb39d3d2-063e-b828-af1c-01f91d9be31c@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+X-Mailer: Apple Mail (2.3608.80.23.2.2)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 08/04/20 22:59, Qian Cai wrote:
-> Running a simple thing on this AMD host would trigger a reset right away.
-> Unselect KCSAN kconfig makes everything work fine (the host would also
-> reset If only "echo off > /sys/kernel/debug/kcsan” before running qemu-kvm).
 
-Is this a regression or something you've just started to play with?  (If
-anything, the assembly language conversion of the AMD world switch that
-is in linux-next could have reduced the likelihood of such a failure,
-not increased it).
 
-Paolo
+> On Apr 8, 2020, at 5:25 PM, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>=20
+> On 08/04/20 22:59, Qian Cai wrote:
+>> Running a simple thing on this AMD host would trigger a reset right =
+away.
+>> Unselect KCSAN kconfig makes everything work fine (the host would =
+also
+>> reset If only "echo off > /sys/kernel/debug/kcsan=E2=80=9D before =
+running qemu-kvm).
+>=20
+> Is this a regression or something you've just started to play with?  =
+(If
+> anything, the assembly language conversion of the AMD world switch =
+that
+> is in linux-next could have reduced the likelihood of such a failure,
+> not increased it).
 
+I don=E2=80=99t remember I had tried this combination before, so don=E2=80=
+=99t know if it is a
+regression or not.=
