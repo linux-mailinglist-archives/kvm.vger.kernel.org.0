@@ -2,241 +2,317 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id AD2121A1B1C
-	for <lists+kvm@lfdr.de>; Wed,  8 Apr 2020 06:48:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DCF401A1B5F
+	for <lists+kvm@lfdr.de>; Wed,  8 Apr 2020 07:07:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726467AbgDHEsH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Apr 2020 00:48:07 -0400
-Received: from mail-pj1-f68.google.com ([209.85.216.68]:52178 "EHLO
-        mail-pj1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726089AbgDHEsG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Apr 2020 00:48:06 -0400
-Received: by mail-pj1-f68.google.com with SMTP id n4so681035pjp.1
-        for <kvm@vger.kernel.org>; Tue, 07 Apr 2020 21:48:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=amacapital-net.20150623.gappssmtp.com; s=20150623;
-        h=content-transfer-encoding:from:mime-version:subject:date:message-id
-         :references:cc:in-reply-to:to;
-        bh=LNVg5m10VqZbbFRrPe9mpgbCJKEcA3bVJTN2uVjXg1E=;
-        b=DKTO2RpQlW/8y03oge+NQ98bY6waLeTaENz6932XlNe9FxydKB3+Z0m17yGgmxM3rm
-         VuRB+qGv3gdGsj23ps4sxEtIkrM/rAAVLP4nSWFvMZrHoGUPcvtA0PuK9Y8DZUMWwplg
-         xi3prmGWa12I/OBkqqPIRSD6zgbPZX7Q9WZWZOyUrcCz76u+eVcNKi3C7N2pY8iGneZv
-         +KUppHnpUaQZ10/pZqwHKM9I+vctjGbfAprZp6Zs7RXyjOEln7Dpx/bpVtIACdFF0ZNm
-         rd/78Ye1uke7WDp4cTuhN2QodAgcM4fx0fKPcIWyalTTBdykT2uzH/v59Rpv0D5ZeM57
-         Uitg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:content-transfer-encoding:from:mime-version
-         :subject:date:message-id:references:cc:in-reply-to:to;
-        bh=LNVg5m10VqZbbFRrPe9mpgbCJKEcA3bVJTN2uVjXg1E=;
-        b=Y9lc9QTYjEtlSINM8qJTDmpZCBeRjybDDtHBDPmyB7sFz+el/KRy6AbYVZk4xd+8Pj
-         F7Z4/cXvK1hC3glaLrLZCsiO3WK1mtgTJ9OBPE7C7baG5kGMdRTax/P199Dj/U6XrkRn
-         eKmhOygXD2KEk696LjfIZB+vMesF/PLwV4/BilmTAbRHaHF6ASLMwBjwTqNC4Fo7FJIR
-         ZrySB9lv+DnIA8zBeZ8LJxfP2BPJf9rficDYLbqxaRDPa738pCnTcZQdW+ZwBCyF7Ram
-         r9WfVZ5G1Z2oXw8vvN1IC4BJqHsuOjNpMKb2J61abL0ZlFQ1mCCVpp7Hqc5kyqn0KG+P
-         feqQ==
-X-Gm-Message-State: AGi0PuZf4cnWrZFuHkjeonFH7jCJf/plVCXeNEagZuD5uvVIpWpHvxF4
-        0Y0iFoBZUTaZD65wI330qeHYLqyr728=
-X-Google-Smtp-Source: APiQypIrYppvn1ChEtZU1SFpF+11GN6510TtJ/Gon8Z6n6h7NMI38x5WfZoT6nlIxTrs2tXk1gye2g==
-X-Received: by 2002:a17:902:850a:: with SMTP id bj10mr5491258plb.28.1586321285510;
-        Tue, 07 Apr 2020 21:48:05 -0700 (PDT)
-Received: from ?IPv6:2601:646:c200:1ef2:d169:f16:4607:98d6? ([2601:646:c200:1ef2:d169:f16:4607:98d6])
-        by smtp.gmail.com with ESMTPSA id b2sm8116809pgg.77.2020.04.07.21.48.04
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 07 Apr 2020 21:48:04 -0700 (PDT)
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-From:   Andy Lutomirski <luto@amacapital.net>
-Mime-Version: 1.0 (1.0)
-Subject: Re: [PATCH v2] x86/kvm: Disable KVM_ASYNC_PF_SEND_ALWAYS
-Date:   Tue, 7 Apr 2020 21:48:02 -0700
-Message-Id: <F2BD5266-A9E5-41C8-AC64-CC33EB401B37@amacapital.net>
-References: <877dyqkj3h.fsf@nanos.tec.linutronix.de>
-Cc:     Vivek Goyal <vgoyal@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Andy Lutomirski <luto@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        LKML <linux-kernel@vger.kernel.org>, X86 ML <x86@kernel.org>,
-        kvm list <kvm@vger.kernel.org>, stable <stable@vger.kernel.org>
-In-Reply-To: <877dyqkj3h.fsf@nanos.tec.linutronix.de>
-To:     Thomas Gleixner <tglx@linutronix.de>
-X-Mailer: iPhone Mail (17E255)
+        id S1726566AbgDHFF3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Apr 2020 01:05:29 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:38456 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725932AbgDHFF3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Apr 2020 01:05:29 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 03853tXb191207;
+        Wed, 8 Apr 2020 05:04:59 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding;
+ s=corp-2020-01-29; bh=gEHA9nx+P2Ept/nnZJ17DEilIouWJcKCIoMOvLrgo7U=;
+ b=dwADO76B6vyzwqtdoXeIlwaxqVZQMSnNBam+TctIiRToIoKUqiF9ff/rdW4nswrnoVXf
+ LqtZc8ZIJwHi4WqQ1PtdUff0JHwT9kQYFrXeCqYTa1rT8hMAWktj0PlnQeX6fOYag+Vd
+ pBe27mf8+o64sXWgrZAq8BnD3+13rAIDHPmp0MgUwnSNQsmWXbBv4i3lHAH1A3rg7HaO
+ l6joM8aTubnbQd5fjWdUG1Wg0tBf58rERzrpIZmG7BWOWgmGRd4sTk/FUa1mGSZ4cdUh
+ njagTvBUGP5DSwstjTEk6O80pHwZ2XAc1e9qsO9U8L5UoIYMhU87qlaORuwqdRFDatA/ Zw== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by aserp2120.oracle.com with ESMTP id 3091m0s0r9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 08 Apr 2020 05:04:59 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 03851Xb2100769;
+        Wed, 8 Apr 2020 05:04:58 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+        by aserp3020.oracle.com with ESMTP id 3091m2hu00-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 08 Apr 2020 05:04:58 +0000
+Received: from abhmp0012.oracle.com (abhmp0012.oracle.com [141.146.116.18])
+        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 03854oaP015085;
+        Wed, 8 Apr 2020 05:04:53 GMT
+Received: from monad.ca.oracle.com (/10.156.75.81)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Tue, 07 Apr 2020 22:04:50 -0700
+From:   Ankur Arora <ankur.a.arora@oracle.com>
+To:     linux-kernel@vger.kernel.org, x86@kernel.org
+Cc:     peterz@infradead.org, hpa@zytor.com, jpoimboe@redhat.com,
+        namit@vmware.com, mhiramat@kernel.org, jgross@suse.com,
+        bp@alien8.de, vkuznets@redhat.com, pbonzini@redhat.com,
+        boris.ostrovsky@oracle.com, mihai.carabas@oracle.com,
+        kvm@vger.kernel.org, xen-devel@lists.xenproject.org,
+        virtualization@lists.linux-foundation.org,
+        Ankur Arora <ankur.a.arora@oracle.com>
+Subject: [RFC PATCH 00/26] Runtime paravirt patching
+Date:   Tue,  7 Apr 2020 22:02:57 -0700
+Message-Id: <20200408050323.4237-1-ankur.a.arora@oracle.com>
+X-Mailer: git-send-email 2.20.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9584 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 bulkscore=0 mlxscore=0
+ malwarescore=0 spamscore=0 adultscore=0 suspectscore=0 mlxlogscore=999
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
+ definitions=main-2004080037
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9584 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 mlxlogscore=999 mlxscore=0
+ priorityscore=1501 phishscore=0 suspectscore=0 bulkscore=0
+ lowpriorityscore=0 impostorscore=0 malwarescore=0 clxscore=1011
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2004080037
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+A KVM host (or another hypervisor) might advertise paravirtualized
+features and optimization hints (ex KVM_HINTS_REALTIME) which might
+become stale over the lifetime of the guest. For instance, the
+host might go from being undersubscribed to being oversubscribed
+(or the other way round) and it would make sense for the guest
+switch pv-ops based on that.
 
+This lockorture splat that I saw on the guest while testing this is
+indicative of the problem:
 
-> On Apr 7, 2020, at 3:48 PM, Thomas Gleixner <tglx@linutronix.de> wrote:
->=20
-> =EF=BB=BFAndy Lutomirski <luto@amacapital.net> writes:
->>>> On Apr 7, 2020, at 1:20 PM, Thomas Gleixner <tglx@linutronix.de> wrote:=
+  [ 1136.461522] watchdog: BUG: soft lockup - CPU#8 stuck for 22s! [lock_torture_wr:12865]
+  [ 1136.461542] CPU: 8 PID: 12865 Comm: lock_torture_wr Tainted: G W L 5.4.0-rc7+ #77
+  [ 1136.461546] RIP: 0010:native_queued_spin_lock_slowpath+0x15/0x220
 
->>> =EF=BB=BFAndy Lutomirski <luto@amacapital.net> writes:
->>>> =E2=80=9CPage is malfunctioning=E2=80=9D is tricky because you *must* d=
-eliver the
->>>> event. x86=E2=80=99s #MC is not exactly a masterpiece, but it does kind=
- of
->>>> work.
->>>=20
->>> Nooooo. This does not need #MC at all. Don't even think about it.
->>=20
->> Yessssssssssss.  Please do think about it. :)
->=20
-> I stared too much into that code recently that even thinking about it
-> hurts. :)
->=20
->>> The point is that the access to such a page is either happening in user
->>> space or in kernel space with a proper exception table fixup.
->>>=20
->>> That means a real #PF is perfectly fine. That can be injected any time
->>> and does not have the interrupt semantics of async PF.
->>=20
->> The hypervisor has no way to distinguish between
->> MOV-and-has-valid-stack-and-extable-entry and
->> MOV-definitely-can=E2=80=99t-fault-here.  Or, for that matter,
->> MOV-in-do_page_fault()-will-recurve-if-it-faults.
->=20
-> The mechanism which Vivek wants to support has a well defined usage
-> scenario, i.e. either user space or kernel-valid-stack+extable-entry.
->=20
-> So why do you want to route that through #MC?=20
+(Caused by an oversubscribed host but using mismatched native pv_lock_ops
+on the gues.)
 
-To be clear, I hate #MC as much as the next person.  But I think it needs to=
- be an IST vector, and the #MC *vector* isn=E2=80=99t so terrible.  (The fac=
-t that we can=E2=80=99t atomically return from #MC and re-enable CR4.MCE in a=
- single instruction is problematic but not the end of the world.). But see b=
-elow =E2=80=94 I don=E2=80=99t think my suggestion should work quite the way=
- you interpreted it.
+This series addresses the problem by doing paravirt switching at runtime.
 
->>>=20
->>>=20
->>>  guest -> #PF runs and either sends signal to user space or runs
->>>           the exception table fixup for a kernel fault.
->>=20
->> Or guest blows up because the fault could not be recovered using #PF.
->=20
-> Not for the use case at hand. And for that you really want to use
-> regular #PF.
->=20
-> The scenario I showed above is perfectly legit:
->=20
->   guest:
->        copy_to_user()          <- Has extable
->           -> FAULT
->=20
-> host:
->   Oh, page is not there, give me some time to figure it out.
->=20
->   inject async fault
->=20
->   guest:
->        handles async fault interrupt, enables interrupts, blocks
->=20
-> host:
->   Situation resolved, shared file was truncated. Tell guest
+We keep an interesting subset of pv-ops (pv_lock_ops only for now,
+but PV-TLB ops are also good candidates) in .parainstructions.runtime,
+while discarding the .parainstructions as usual at init. This is then
+used for switching back and forth between native and paravirt mode.
+([1] lists some representative numbers of the increased memory
+footprint.)
 
-All good so far.
+Mechanism: the patching itself is done using stop_machine(). That is
+not ideal -- text_poke_stop_machine() was replaced with INT3+emulation
+via text_poke_bp(), but I'm using this to address two issues:
+ 1) emulation in text_poke() can only easily handle a small set
+ of instructions and this is problematic for inlined pv-ops (and see
+ a possible alternatives use-case below.)
+ 2) paravirt patching might have inter-dependendent ops (ex.
+ lock.queued_lock_slowpath, lock.queued_lock_unlock are paired and
+ need to be updated atomically.)
 
->=20
->   Inject #MC
+The alternative use-case is a runtime version of apply_alternatives()
+(not posted with this patch-set) that can be used for some safe subset
+of X86_FEATUREs. This could be useful in conjunction with the ongoing
+late microcode loading work that Mihai Carabas and others have been
+working on.
 
-No, not what I meant. Host has two sane choices here IMO:
+Also, there are points of similarity with the ongoing static_call work
+which does rewriting of indirect calls. The difference here is that
+we need to switch a group of calls atomically and given that
+some of them can be inlined, need to handle a wider variety of opcodes.
 
-1. Tell the guest that the page is gone as part of the wakeup. No #PF or #MC=
-.
+To patch safely we need to satisfy these constraints:
 
-2. Tell guest that it=E2=80=99s resolved and inject #MC when the guest retri=
-es.  The #MC is a real fault, RIP points to the right place, etc.
+ - No references to insn sequences under replacement on any kernel stack
+   once replacement is in progress. Without this constraint we might end
+   up returning to an address that is in the middle of an instruction.
 
->=20
->  =20
->>=20
->>=20
->> 1. Access to bad memory results in an async-page-not-present, except
->> that, it=E2=80=99s not deliverable, the guest is killed.
->=20
-> That's incorrect. The proper reaction is a real #PF. Simply because this
-> is part of the contract of sharing some file backed stuff between host
-> and guest in a well defined "virtio" scenario and not a random access to
-> memory which might be there or not.
+ - handle inter-dependent ops: as above, lock.queued_lock_unlock(),
+   lock.queued_lock_slowpath() and the rest of the pv_lock_ops are
+   a good example.
 
-The problem is that the host doesn=E2=80=99t know when #PF is safe. It=E2=80=
-=99s sort of the same problem that async pf has now.  The guest kernel could=
- access the problematic page in the middle of an NMI, under pagefault_disabl=
-e(), etc =E2=80=94 getting #PF as a result of CPL0 access to a page with a v=
-alid guest PTE is simply not part of the x86 architecture.
+ - handle a broader set of insns than CALL and JMP: some pv-ops end up
+   getting inlined. Alternatives can contain arbitrary instructions.
 
->=20
-> Look at it from the point where async whatever does not exist at all:
->=20
->   guest:
->        copy_to_user()          <- Has extable
->           -> FAULT
->=20
-> host:
->        suspend guest and resolve situation
->=20
->        if (page swapped in)
->           resume_guest();
->        else
->           inject_pf();
->=20
-> And this inject_pf() does not care whether it kills the guest or makes
-> it double/triple fault or whatever.
->=20
-> The 'tell the guest to do something else while host tries to sort it'
-> opportunistic thingy turns this into:
->=20
->   guest:
->        copy_to_user()          <- Has extable
->           -> FAULT
->=20
-> host:
->        tell guest to do something else, i.e. guest suspends task
->=20
->        if (page swapped in)
->           tell guest to resume suspended task
->        else
->           tell guest to resume suspended task
->=20
->   guest resumes and faults again
->=20
-> host:
->           inject_pf();
->=20
-> which is pretty much equivalent.
+ - locking operations can be called from interrupt handlers which means
+   we cannot trivially use IPIs for flushing.
 
-Replace copy_to_user() with some access to a gup-ed mapping with no extable h=
-andler and it doesn=E2=80=99t look so good any more.
+Handling these, necessitates that target pv-ops not be preemptible.
+Once that is a given (for safety these need to be explicitly whitelisted
+in runtime_patch()), use a state-machine with the primary CPU doing the
+patching and secondary CPUs in a sync_core() loop. 
 
-Of course, the guest will oops if this happens, but the guest needs to be ab=
-le to oops cleanly. #PF is too fragile for this because it=E2=80=99s not IST=
-, and #PF is the wrong thing anyway =E2=80=94 #PF is all about guest-virtual=
--to-guest-physical mappings.  Heck, what would CR2 be?  The host might not e=
-ven know the guest virtual address.
+In case we hit an INT3/BP (in NMI or thread-context) we makes forward
+progress by continuing the patching instead of emulating.
 
->=20
->> 2. Access to bad memory results in #MC.  Sure, #MC is a turd, but it=E2=80=
-=99s
->> an *architectural* turd. By all means, have a nice simple PV mechanism
->> to tell the #MC code exactly what went wrong, but keep the overall
->> flow the same as in the native case.
->=20
-> It's a completely different flow as you evaluate PV turd instead of
-> analysing the MCE banks and the other error reporting facilities.
+One remaining issue is inter-dependent pv-ops which are also executed in
+the NMI handler -- patching can potentially deadlock in case of multiple
+NMIs. Handle these by pushing some of this work in the NMI handler where
+we know it will be uninterrupted.
 
-I=E2=80=99m fine with the flow being different. do_machine_check() could hav=
-e entirely different logic to decide the error in PV.  But I think we should=
- reuse the overall flow: kernel gets #MC with RIP pointing to the offending i=
-nstruction. If there=E2=80=99s an extable entry that can handle memory failu=
-re, handle it. If it=E2=80=99s a user access, handle it.  If it=E2=80=99s an=
- unrecoverable error because it was a non-extable kernel access, oops or pan=
-ic.
+There are four main sets of patches in this series:
 
-The actual PV part could be extremely simple: the host just needs to tell th=
-e guest =E2=80=9Cthis #MC is due to memory failure at this guest physical ad=
-dress=E2=80=9D.  No banks, no DIMM slot, no rendezvous crap (LMCE), no other=
- nonsense.  It would be nifty if the host also told the guest what the guest=
- virtual address was if the host knows it.
+ 1. PV-ops management (patches 1-10, 20): mostly infrastructure and
+ refactoring pieces to make paravirt patching usable at runtime. For the
+ most part scoped under CONFIG_PARAVIRT_RUNTIME.
+
+ Patches 1-7, to persist part of parainstructions in memory:
+  "x86/paravirt: Specify subsection in PVOP macros"
+  "x86/paravirt: Allow paravirt patching post-init"
+  "x86/paravirt: PVRTOP macros for PARAVIRT_RUNTIME"
+  "x86/alternatives: Refactor alternatives_smp_module*
+  "x86/alternatives: Rename alternatives_smp*, smp_alt_module
+  "x86/alternatives: Remove stale symbols
+  "x86/paravirt: Persist .parainstructions.runtime"
+
+ Patches 8-10, develop the inerfaces to safely switch pv-ops:
+  "x86/paravirt: Stash native pv-ops"
+  "x86/paravirt: Add runtime_patch()"
+  "x86/paravirt: Add primitives to stage pv-ops"
+
+ Patch 20 enables switching of pv_lock_ops:
+  "x86/paravirt: Enable pv-spinlocks in runtime_patch()"
+
+ 2. Non-emulated text poking (patches 11-19)
+
+ Patches 11-13 are mostly refactoring to split __text_poke() into map,
+ unmap and poke/memcpy phases with the poke portion being re-entrant
+  "x86/alternatives: Remove return value of text_poke*()"
+  "x86/alternatives: Use __get_unlocked_pte() in text_poke()"
+  "x86/alternatives: Split __text_poke()"
+
+ Patches 15, 17 add the actual poking state-machine:
+  "x86/alternatives: Non-emulated text poking"
+  "x86/alternatives: Add patching logic in text_poke_site()"
+
+ with patches 14 and 18 containing the pieces for BP handling:
+  "x86/alternatives: Handle native insns in text_poke_loc*()"
+  "x86/alternatives: Handle BP in non-emulated text poking"
+
+ and patch 19 provides the ability to use the state-machine above in an
+ NMI context (fixes some potential deadlocks when handling inter-
+ dependent operations and multiple NMIs):
+  "x86/alternatives: NMI safe runtime patching".
+
+ Patch 16 provides the interface (paravirt_runtime_patch()) to use the
+ poking mechanism developed above and patch 21 adds a selftest:
+  "x86/alternatives: Add paravirt patching at runtime"
+  "x86/alternatives: Paravirt runtime selftest"
+
+ 3. KVM guest changes to be able to use this (patches 22-23,25-26):
+  "kvm/paravirt: Encapsulate KVM pv switching logic"
+  "x86/kvm: Add worker to trigger runtime patching"
+  "x86/kvm: Guest support for dynamic hints"
+  "x86/kvm: Add hint change notifier for KVM_HINT_REALTIME".
+
+ 4. KVM host changes to notify the guest of a change (patch 24):
+  "x86/kvm: Support dynamic CPUID hints"
+
+Testing:
+With paravirt patching, the code is mostly stable on Intel and AMD
+systems under kernbench and locktorture with paravirt toggling (with,
+without synthetic NMIs) in the background.
+
+Queued spinlock performance for locktorture is also on expected lines:
+ [ 1533.221563] Writes:  Total: 1048759000  Max/Min: 0/0   Fail: 0 
+ # toggle PV spinlocks
+
+ [ 1594.713699] Writes:  Total: 1111660545  Max/Min: 0/0   Fail: 0 
+ # PV spinlocks (in ~60 seconds) = 62,901,545
+
+ # toggle native spinlocks
+ [ 1656.117175] Writes:  Total: 1113888840  Max/Min: 0/0   Fail: 0 
+  # native spinlocks (in ~60 seconds) = 2,228,295
+
+The alternatives testing is more limited with it being used to rewrite
+mostly harmless X86_FEATUREs with load in the background.
+
+Patches also at:
+
+ssh://git@github.com/terminus/linux.git alternatives-rfc-upstream-v1
+
+Please review.
+
+Thanks
+Ankur
+
+[1] The precise change in memory footprint depends on config options
+but the following example inlines queued_spin_unlock() (which forms
+the bulk of the added state). The added footprint is the size of the
+.parainstructions.runtime section:
+
+ $ objdump -h vmlinux|grep .parainstructions
+ Idx Name              		Size      VMA               
+ 	LMA                File-off  Algn
+  27 .parainstructions 		0001013c  ffffffff82895000
+  	0000000002895000   01c95000  2**3
+  28 .parainstructions.runtime  0000cd2c  ffffffff828a5140
+  	00000000028a5140   01ca5140  2**3
+
+  $ size vmlinux                                         
+  text       data       bss        dec      hex       filename
+  13726196   12302814   14094336   40123346 2643bd2   vmlinux
+
+Ankur Arora (26):
+  x86/paravirt: Specify subsection in PVOP macros
+  x86/paravirt: Allow paravirt patching post-init
+  x86/paravirt: PVRTOP macros for PARAVIRT_RUNTIME
+  x86/alternatives: Refactor alternatives_smp_module*
+  x86/alternatives: Rename alternatives_smp*, smp_alt_module
+  x86/alternatives: Remove stale symbols
+  x86/paravirt: Persist .parainstructions.runtime
+  x86/paravirt: Stash native pv-ops
+  x86/paravirt: Add runtime_patch()
+  x86/paravirt: Add primitives to stage pv-ops
+  x86/alternatives: Remove return value of text_poke*()
+  x86/alternatives: Use __get_unlocked_pte() in text_poke()
+  x86/alternatives: Split __text_poke()
+  x86/alternatives: Handle native insns in text_poke_loc*()
+  x86/alternatives: Non-emulated text poking
+  x86/alternatives: Add paravirt patching at runtime
+  x86/alternatives: Add patching logic in text_poke_site()
+  x86/alternatives: Handle BP in non-emulated text poking
+  x86/alternatives: NMI safe runtime patching
+  x86/paravirt: Enable pv-spinlocks in runtime_patch()
+  x86/alternatives: Paravirt runtime selftest
+  kvm/paravirt: Encapsulate KVM pv switching logic
+  x86/kvm: Add worker to trigger runtime patching
+  x86/kvm: Support dynamic CPUID hints
+  x86/kvm: Guest support for dynamic hints
+  x86/kvm: Add hint change notifier for KVM_HINT_REALTIME
+
+ Documentation/virt/kvm/api.rst        |  17 +
+ Documentation/virt/kvm/cpuid.rst      |   9 +-
+ arch/x86/Kconfig                      |  14 +
+ arch/x86/Kconfig.debug                |  13 +
+ arch/x86/entry/entry_64.S             |   5 +
+ arch/x86/include/asm/alternative.h    |  20 +-
+ arch/x86/include/asm/kvm_host.h       |   6 +
+ arch/x86/include/asm/kvm_para.h       |  17 +
+ arch/x86/include/asm/paravirt.h       |  10 +-
+ arch/x86/include/asm/paravirt_types.h | 230 ++++--
+ arch/x86/include/asm/text-patching.h  |  18 +-
+ arch/x86/include/uapi/asm/kvm_para.h  |   2 +
+ arch/x86/kernel/Makefile              |   1 +
+ arch/x86/kernel/alternative.c         | 987 +++++++++++++++++++++++---
+ arch/x86/kernel/kvm.c                 | 191 ++++-
+ arch/x86/kernel/module.c              |  42 +-
+ arch/x86/kernel/paravirt.c            |  16 +-
+ arch/x86/kernel/paravirt_patch.c      |  61 ++
+ arch/x86/kernel/pv_selftest.c         | 264 +++++++
+ arch/x86/kernel/pv_selftest.h         |  15 +
+ arch/x86/kernel/setup.c               |   2 +
+ arch/x86/kernel/vmlinux.lds.S         |  16 +
+ arch/x86/kvm/cpuid.c                  |   3 +-
+ arch/x86/kvm/x86.c                    |  39 +
+ include/asm-generic/kvm_para.h        |  12 +
+ include/asm-generic/vmlinux.lds.h     |   8 +
+ include/linux/kvm_para.h              |   5 +
+ include/linux/mm.h                    |  16 +-
+ include/linux/preempt.h               |  17 +
+ include/uapi/linux/kvm.h              |   4 +
+ kernel/locking/lock_events.c          |   2 +-
+ mm/memory.c                           |   9 +-
+ 32 files changed, 1850 insertions(+), 221 deletions(-)
+ create mode 100644 arch/x86/kernel/pv_selftest.c
+ create mode 100644 arch/x86/kernel/pv_selftest.h
+
+-- 
+2.20.1
+
