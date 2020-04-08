@@ -2,43 +2,44 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id DCF401A1B5F
-	for <lists+kvm@lfdr.de>; Wed,  8 Apr 2020 07:07:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2633E1A1B58
+	for <lists+kvm@lfdr.de>; Wed,  8 Apr 2020 07:06:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726566AbgDHFF3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Apr 2020 01:05:29 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:38456 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725932AbgDHFF3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Apr 2020 01:05:29 -0400
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 03853tXb191207;
+        id S1726690AbgDHFFe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Apr 2020 01:05:34 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:52624 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726637AbgDHFFe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Apr 2020 01:05:34 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 03854BNo012923;
         Wed, 8 Apr 2020 05:04:59 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : mime-version : content-transfer-encoding;
- s=corp-2020-01-29; bh=gEHA9nx+P2Ept/nnZJ17DEilIouWJcKCIoMOvLrgo7U=;
- b=dwADO76B6vyzwqtdoXeIlwaxqVZQMSnNBam+TctIiRToIoKUqiF9ff/rdW4nswrnoVXf
- LqtZc8ZIJwHi4WqQ1PtdUff0JHwT9kQYFrXeCqYTa1rT8hMAWktj0PlnQeX6fOYag+Vd
- pBe27mf8+o64sXWgrZAq8BnD3+13rAIDHPmp0MgUwnSNQsmWXbBv4i3lHAH1A3rg7HaO
- l6joM8aTubnbQd5fjWdUG1Wg0tBf58rERzrpIZmG7BWOWgmGRd4sTk/FUa1mGSZ4cdUh
- njagTvBUGP5DSwstjTEk6O80pHwZ2XAc1e9qsO9U8L5UoIYMhU87qlaORuwqdRFDatA/ Zw== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by aserp2120.oracle.com with ESMTP id 3091m0s0r9-1
+ subject : date : message-id : in-reply-to : references : mime-version :
+ content-transfer-encoding; s=corp-2020-01-29;
+ bh=skSK5dc4HZd1ygvZWCZ0mvu5/IDpVFbzIohZL2fpedY=;
+ b=p4M4l8mnkF/etgUggs6AvVrpqtHrBab+6kS2BRdp7uKb7mxGmfZxSjdhraVPNVIOBqW1
+ 9SsaF2ylBowJOGLHnPtacyQU8Iu1M2C729hNOxufFVU93m1m+cPlYGbixXwwcAptu91a
+ Dn7Ljb7dgX5WW5iaPA9CEvwfhOV/51yb4VF9MJYDR7G5sIw8yzijv+pZP4rdMgdHm+uE
+ Ul8vqHxMUpyE+BWirc2G54VFigebcGKqdiqjiSB/OQraTshP5IDeg1J9KANEDdF7e95c
+ rQTAkrvuRgoaIPmCw1NiQKZoAdBT2OYIgd96D8d+7Iya26gRJrIFVYatZXQuwbpqUWnH dA== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by userp2130.oracle.com with ESMTP id 3091m390vy-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
         Wed, 08 Apr 2020 05:04:59 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 03851Xb2100769;
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 03852glC148201;
         Wed, 8 Apr 2020 05:04:58 GMT
 Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by aserp3020.oracle.com with ESMTP id 3091m2hu00-1
+        by aserp3030.oracle.com with ESMTP id 3091kgj6ng-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
         Wed, 08 Apr 2020 05:04:58 +0000
 Received: from abhmp0012.oracle.com (abhmp0012.oracle.com [141.146.116.18])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 03854oaP015085;
-        Wed, 8 Apr 2020 05:04:53 GMT
+        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 03854tSP015092;
+        Wed, 8 Apr 2020 05:04:56 GMT
 Received: from monad.ca.oracle.com (/10.156.75.81)
         by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Tue, 07 Apr 2020 22:04:50 -0700
+        with ESMTP ; Tue, 07 Apr 2020 22:04:55 -0700
 From:   Ankur Arora <ankur.a.arora@oracle.com>
 To:     linux-kernel@vger.kernel.org, x86@kernel.org
 Cc:     peterz@infradead.org, hpa@zytor.com, jpoimboe@redhat.com,
@@ -48,271 +49,319 @@ Cc:     peterz@infradead.org, hpa@zytor.com, jpoimboe@redhat.com,
         kvm@vger.kernel.org, xen-devel@lists.xenproject.org,
         virtualization@lists.linux-foundation.org,
         Ankur Arora <ankur.a.arora@oracle.com>
-Subject: [RFC PATCH 00/26] Runtime paravirt patching
-Date:   Tue,  7 Apr 2020 22:02:57 -0700
-Message-Id: <20200408050323.4237-1-ankur.a.arora@oracle.com>
+Subject: [RFC PATCH 01/26] x86/paravirt: Specify subsection in PVOP macros
+Date:   Tue,  7 Apr 2020 22:02:58 -0700
+Message-Id: <20200408050323.4237-2-ankur.a.arora@oracle.com>
 X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200408050323.4237-1-ankur.a.arora@oracle.com>
+References: <20200408050323.4237-1-ankur.a.arora@oracle.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9584 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 bulkscore=0 mlxscore=0
- malwarescore=0 spamscore=0 adultscore=0 suspectscore=0 mlxlogscore=999
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 bulkscore=0 suspectscore=0
+ spamscore=0 malwarescore=0 adultscore=0 phishscore=0 mlxlogscore=999
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
  definitions=main-2004080037
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9584 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 mlxlogscore=999 mlxscore=0
- priorityscore=1501 phishscore=0 suspectscore=0 bulkscore=0
- lowpriorityscore=0 impostorscore=0 malwarescore=0 clxscore=1011
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 adultscore=0
+ impostorscore=0 malwarescore=0 lowpriorityscore=0 mlxlogscore=999
+ priorityscore=1501 clxscore=1015 bulkscore=0 phishscore=0 mlxscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2003020000 definitions=main-2004080037
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-A KVM host (or another hypervisor) might advertise paravirtualized
-features and optimization hints (ex KVM_HINTS_REALTIME) which might
-become stale over the lifetime of the guest. For instance, the
-host might go from being undersubscribed to being oversubscribed
-(or the other way round) and it would make sense for the guest
-switch pv-ops based on that.
+Allow PVOP macros to specify a subsection such that _paravirt_alt() can
+optionally put sites in .parainstructions.*.
 
-This lockorture splat that I saw on the guest while testing this is
-indicative of the problem:
+Signed-off-by: Ankur Arora <ankur.a.arora@oracle.com>
+---
+ arch/x86/include/asm/paravirt_types.h | 158 +++++++++++++++++---------
+ 1 file changed, 102 insertions(+), 56 deletions(-)
 
-  [ 1136.461522] watchdog: BUG: soft lockup - CPU#8 stuck for 22s! [lock_torture_wr:12865]
-  [ 1136.461542] CPU: 8 PID: 12865 Comm: lock_torture_wr Tainted: G W L 5.4.0-rc7+ #77
-  [ 1136.461546] RIP: 0010:native_queued_spin_lock_slowpath+0x15/0x220
-
-(Caused by an oversubscribed host but using mismatched native pv_lock_ops
-on the gues.)
-
-This series addresses the problem by doing paravirt switching at runtime.
-
-We keep an interesting subset of pv-ops (pv_lock_ops only for now,
-but PV-TLB ops are also good candidates) in .parainstructions.runtime,
-while discarding the .parainstructions as usual at init. This is then
-used for switching back and forth between native and paravirt mode.
-([1] lists some representative numbers of the increased memory
-footprint.)
-
-Mechanism: the patching itself is done using stop_machine(). That is
-not ideal -- text_poke_stop_machine() was replaced with INT3+emulation
-via text_poke_bp(), but I'm using this to address two issues:
- 1) emulation in text_poke() can only easily handle a small set
- of instructions and this is problematic for inlined pv-ops (and see
- a possible alternatives use-case below.)
- 2) paravirt patching might have inter-dependendent ops (ex.
- lock.queued_lock_slowpath, lock.queued_lock_unlock are paired and
- need to be updated atomically.)
-
-The alternative use-case is a runtime version of apply_alternatives()
-(not posted with this patch-set) that can be used for some safe subset
-of X86_FEATUREs. This could be useful in conjunction with the ongoing
-late microcode loading work that Mihai Carabas and others have been
-working on.
-
-Also, there are points of similarity with the ongoing static_call work
-which does rewriting of indirect calls. The difference here is that
-we need to switch a group of calls atomically and given that
-some of them can be inlined, need to handle a wider variety of opcodes.
-
-To patch safely we need to satisfy these constraints:
-
- - No references to insn sequences under replacement on any kernel stack
-   once replacement is in progress. Without this constraint we might end
-   up returning to an address that is in the middle of an instruction.
-
- - handle inter-dependent ops: as above, lock.queued_lock_unlock(),
-   lock.queued_lock_slowpath() and the rest of the pv_lock_ops are
-   a good example.
-
- - handle a broader set of insns than CALL and JMP: some pv-ops end up
-   getting inlined. Alternatives can contain arbitrary instructions.
-
- - locking operations can be called from interrupt handlers which means
-   we cannot trivially use IPIs for flushing.
-
-Handling these, necessitates that target pv-ops not be preemptible.
-Once that is a given (for safety these need to be explicitly whitelisted
-in runtime_patch()), use a state-machine with the primary CPU doing the
-patching and secondary CPUs in a sync_core() loop. 
-
-In case we hit an INT3/BP (in NMI or thread-context) we makes forward
-progress by continuing the patching instead of emulating.
-
-One remaining issue is inter-dependent pv-ops which are also executed in
-the NMI handler -- patching can potentially deadlock in case of multiple
-NMIs. Handle these by pushing some of this work in the NMI handler where
-we know it will be uninterrupted.
-
-There are four main sets of patches in this series:
-
- 1. PV-ops management (patches 1-10, 20): mostly infrastructure and
- refactoring pieces to make paravirt patching usable at runtime. For the
- most part scoped under CONFIG_PARAVIRT_RUNTIME.
-
- Patches 1-7, to persist part of parainstructions in memory:
-  "x86/paravirt: Specify subsection in PVOP macros"
-  "x86/paravirt: Allow paravirt patching post-init"
-  "x86/paravirt: PVRTOP macros for PARAVIRT_RUNTIME"
-  "x86/alternatives: Refactor alternatives_smp_module*
-  "x86/alternatives: Rename alternatives_smp*, smp_alt_module
-  "x86/alternatives: Remove stale symbols
-  "x86/paravirt: Persist .parainstructions.runtime"
-
- Patches 8-10, develop the inerfaces to safely switch pv-ops:
-  "x86/paravirt: Stash native pv-ops"
-  "x86/paravirt: Add runtime_patch()"
-  "x86/paravirt: Add primitives to stage pv-ops"
-
- Patch 20 enables switching of pv_lock_ops:
-  "x86/paravirt: Enable pv-spinlocks in runtime_patch()"
-
- 2. Non-emulated text poking (patches 11-19)
-
- Patches 11-13 are mostly refactoring to split __text_poke() into map,
- unmap and poke/memcpy phases with the poke portion being re-entrant
-  "x86/alternatives: Remove return value of text_poke*()"
-  "x86/alternatives: Use __get_unlocked_pte() in text_poke()"
-  "x86/alternatives: Split __text_poke()"
-
- Patches 15, 17 add the actual poking state-machine:
-  "x86/alternatives: Non-emulated text poking"
-  "x86/alternatives: Add patching logic in text_poke_site()"
-
- with patches 14 and 18 containing the pieces for BP handling:
-  "x86/alternatives: Handle native insns in text_poke_loc*()"
-  "x86/alternatives: Handle BP in non-emulated text poking"
-
- and patch 19 provides the ability to use the state-machine above in an
- NMI context (fixes some potential deadlocks when handling inter-
- dependent operations and multiple NMIs):
-  "x86/alternatives: NMI safe runtime patching".
-
- Patch 16 provides the interface (paravirt_runtime_patch()) to use the
- poking mechanism developed above and patch 21 adds a selftest:
-  "x86/alternatives: Add paravirt patching at runtime"
-  "x86/alternatives: Paravirt runtime selftest"
-
- 3. KVM guest changes to be able to use this (patches 22-23,25-26):
-  "kvm/paravirt: Encapsulate KVM pv switching logic"
-  "x86/kvm: Add worker to trigger runtime patching"
-  "x86/kvm: Guest support for dynamic hints"
-  "x86/kvm: Add hint change notifier for KVM_HINT_REALTIME".
-
- 4. KVM host changes to notify the guest of a change (patch 24):
-  "x86/kvm: Support dynamic CPUID hints"
-
-Testing:
-With paravirt patching, the code is mostly stable on Intel and AMD
-systems under kernbench and locktorture with paravirt toggling (with,
-without synthetic NMIs) in the background.
-
-Queued spinlock performance for locktorture is also on expected lines:
- [ 1533.221563] Writes:  Total: 1048759000  Max/Min: 0/0   Fail: 0 
- # toggle PV spinlocks
-
- [ 1594.713699] Writes:  Total: 1111660545  Max/Min: 0/0   Fail: 0 
- # PV spinlocks (in ~60 seconds) = 62,901,545
-
- # toggle native spinlocks
- [ 1656.117175] Writes:  Total: 1113888840  Max/Min: 0/0   Fail: 0 
-  # native spinlocks (in ~60 seconds) = 2,228,295
-
-The alternatives testing is more limited with it being used to rewrite
-mostly harmless X86_FEATUREs with load in the background.
-
-Patches also at:
-
-ssh://git@github.com/terminus/linux.git alternatives-rfc-upstream-v1
-
-Please review.
-
-Thanks
-Ankur
-
-[1] The precise change in memory footprint depends on config options
-but the following example inlines queued_spin_unlock() (which forms
-the bulk of the added state). The added footprint is the size of the
-.parainstructions.runtime section:
-
- $ objdump -h vmlinux|grep .parainstructions
- Idx Name              		Size      VMA               
- 	LMA                File-off  Algn
-  27 .parainstructions 		0001013c  ffffffff82895000
-  	0000000002895000   01c95000  2**3
-  28 .parainstructions.runtime  0000cd2c  ffffffff828a5140
-  	00000000028a5140   01ca5140  2**3
-
-  $ size vmlinux                                         
-  text       data       bss        dec      hex       filename
-  13726196   12302814   14094336   40123346 2643bd2   vmlinux
-
-Ankur Arora (26):
-  x86/paravirt: Specify subsection in PVOP macros
-  x86/paravirt: Allow paravirt patching post-init
-  x86/paravirt: PVRTOP macros for PARAVIRT_RUNTIME
-  x86/alternatives: Refactor alternatives_smp_module*
-  x86/alternatives: Rename alternatives_smp*, smp_alt_module
-  x86/alternatives: Remove stale symbols
-  x86/paravirt: Persist .parainstructions.runtime
-  x86/paravirt: Stash native pv-ops
-  x86/paravirt: Add runtime_patch()
-  x86/paravirt: Add primitives to stage pv-ops
-  x86/alternatives: Remove return value of text_poke*()
-  x86/alternatives: Use __get_unlocked_pte() in text_poke()
-  x86/alternatives: Split __text_poke()
-  x86/alternatives: Handle native insns in text_poke_loc*()
-  x86/alternatives: Non-emulated text poking
-  x86/alternatives: Add paravirt patching at runtime
-  x86/alternatives: Add patching logic in text_poke_site()
-  x86/alternatives: Handle BP in non-emulated text poking
-  x86/alternatives: NMI safe runtime patching
-  x86/paravirt: Enable pv-spinlocks in runtime_patch()
-  x86/alternatives: Paravirt runtime selftest
-  kvm/paravirt: Encapsulate KVM pv switching logic
-  x86/kvm: Add worker to trigger runtime patching
-  x86/kvm: Support dynamic CPUID hints
-  x86/kvm: Guest support for dynamic hints
-  x86/kvm: Add hint change notifier for KVM_HINT_REALTIME
-
- Documentation/virt/kvm/api.rst        |  17 +
- Documentation/virt/kvm/cpuid.rst      |   9 +-
- arch/x86/Kconfig                      |  14 +
- arch/x86/Kconfig.debug                |  13 +
- arch/x86/entry/entry_64.S             |   5 +
- arch/x86/include/asm/alternative.h    |  20 +-
- arch/x86/include/asm/kvm_host.h       |   6 +
- arch/x86/include/asm/kvm_para.h       |  17 +
- arch/x86/include/asm/paravirt.h       |  10 +-
- arch/x86/include/asm/paravirt_types.h | 230 ++++--
- arch/x86/include/asm/text-patching.h  |  18 +-
- arch/x86/include/uapi/asm/kvm_para.h  |   2 +
- arch/x86/kernel/Makefile              |   1 +
- arch/x86/kernel/alternative.c         | 987 +++++++++++++++++++++++---
- arch/x86/kernel/kvm.c                 | 191 ++++-
- arch/x86/kernel/module.c              |  42 +-
- arch/x86/kernel/paravirt.c            |  16 +-
- arch/x86/kernel/paravirt_patch.c      |  61 ++
- arch/x86/kernel/pv_selftest.c         | 264 +++++++
- arch/x86/kernel/pv_selftest.h         |  15 +
- arch/x86/kernel/setup.c               |   2 +
- arch/x86/kernel/vmlinux.lds.S         |  16 +
- arch/x86/kvm/cpuid.c                  |   3 +-
- arch/x86/kvm/x86.c                    |  39 +
- include/asm-generic/kvm_para.h        |  12 +
- include/asm-generic/vmlinux.lds.h     |   8 +
- include/linux/kvm_para.h              |   5 +
- include/linux/mm.h                    |  16 +-
- include/linux/preempt.h               |  17 +
- include/uapi/linux/kvm.h              |   4 +
- kernel/locking/lock_events.c          |   2 +-
- mm/memory.c                           |   9 +-
- 32 files changed, 1850 insertions(+), 221 deletions(-)
- create mode 100644 arch/x86/kernel/pv_selftest.c
- create mode 100644 arch/x86/kernel/pv_selftest.h
-
+diff --git a/arch/x86/include/asm/paravirt_types.h b/arch/x86/include/asm/paravirt_types.h
+index 732f62e04ddb..37e8f27a3b9d 100644
+--- a/arch/x86/include/asm/paravirt_types.h
++++ b/arch/x86/include/asm/paravirt_types.h
+@@ -337,6 +337,9 @@ struct paravirt_patch_template {
+ extern struct pv_info pv_info;
+ extern struct paravirt_patch_template pv_ops;
+ 
++/* Sub-section for .parainstructions */
++#define PV_SUFFIX ""
++
+ #define PARAVIRT_PATCH(x)					\
+ 	(offsetof(struct paravirt_patch_template, x) / sizeof(void *))
+ 
+@@ -350,9 +353,9 @@ extern struct paravirt_patch_template pv_ops;
+  * Generate some code, and mark it as patchable by the
+  * apply_paravirt() alternate instruction patcher.
+  */
+-#define _paravirt_alt(insn_string, type, clobber)	\
++#define _paravirt_alt(sec, insn_string, type, clobber)	\
+ 	"771:\n\t" insn_string "\n" "772:\n"		\
+-	".pushsection .parainstructions,\"a\"\n"	\
++	".pushsection .parainstructions" sec ",\"a\"\n"	\
+ 	_ASM_ALIGN "\n"					\
+ 	_ASM_PTR " 771b\n"				\
+ 	"  .byte " type "\n"				\
+@@ -361,8 +364,9 @@ extern struct paravirt_patch_template pv_ops;
+ 	".popsection\n"
+ 
+ /* Generate patchable code, with the default asm parameters. */
+-#define paravirt_alt(insn_string)					\
+-	_paravirt_alt(insn_string, "%c[paravirt_typenum]", "%c[paravirt_clobber]")
++#define paravirt_alt(sec, insn_string)					\
++	_paravirt_alt(sec, insn_string, "%c[paravirt_typenum]",		\
++		      "%c[paravirt_clobber]")
+ 
+ /* Simple instruction patching code. */
+ #define NATIVE_LABEL(a,x,b) "\n\t.globl " a #x "_" #b "\n" a #x "_" #b ":\n\t"
+@@ -414,7 +418,7 @@ int paravirt_disable_iospace(void);
+  * unfortunately, are quite a bit (r8 - r11)
+  *
+  * The call instruction itself is marked by placing its start address
+- * and size into the .parainstructions section, so that
++ * and size into the .parainstructions* sections, so that
+  * apply_paravirt() in arch/i386/kernel/alternative.c can do the
+  * appropriate patching under the control of the backend pv_init_ops
+  * implementation.
+@@ -512,7 +516,7 @@ int paravirt_disable_iospace(void);
+ 	})
+ 
+ 
+-#define ____PVOP_CALL(rettype, op, clbr, call_clbr, extra_clbr,		\
++#define ____PVOP_CALL(sec, rettype, op, clbr, call_clbr, extra_clbr,	\
+ 		      pre, post, ...)					\
+ 	({								\
+ 		rettype __ret;						\
+@@ -522,7 +526,7 @@ int paravirt_disable_iospace(void);
+ 		/* since this condition will never hold */		\
+ 		if (sizeof(rettype) > sizeof(unsigned long)) {		\
+ 			asm volatile(pre				\
+-				     paravirt_alt(PARAVIRT_CALL)	\
++				     paravirt_alt(sec, PARAVIRT_CALL)	\
+ 				     post				\
+ 				     : call_clbr, ASM_CALL_CONSTRAINT	\
+ 				     : paravirt_type(op),		\
+@@ -532,7 +536,7 @@ int paravirt_disable_iospace(void);
+ 			__ret = (rettype)((((u64)__edx) << 32) | __eax); \
+ 		} else {						\
+ 			asm volatile(pre				\
+-				     paravirt_alt(PARAVIRT_CALL)	\
++				     paravirt_alt(sec, PARAVIRT_CALL)	\
+ 				     post				\
+ 				     : call_clbr, ASM_CALL_CONSTRAINT	\
+ 				     : paravirt_type(op),		\
+@@ -544,22 +548,22 @@ int paravirt_disable_iospace(void);
+ 		__ret;							\
+ 	})
+ 
+-#define __PVOP_CALL(rettype, op, pre, post, ...)			\
+-	____PVOP_CALL(rettype, op, CLBR_ANY, PVOP_CALL_CLOBBERS,	\
++#define __PVOP_CALL(sec, rettype, op, pre, post, ...)			\
++	____PVOP_CALL(sec, rettype, op, CLBR_ANY, PVOP_CALL_CLOBBERS,	\
+ 		      EXTRA_CLOBBERS, pre, post, ##__VA_ARGS__)
+ 
+-#define __PVOP_CALLEESAVE(rettype, op, pre, post, ...)			\
+-	____PVOP_CALL(rettype, op.func, CLBR_RET_REG,			\
++#define __PVOP_CALLEESAVE(sec, rettype, op, pre, post, ...)		\
++	____PVOP_CALL(sec, rettype, op.func, CLBR_RET_REG,		\
+ 		      PVOP_CALLEE_CLOBBERS, ,				\
+ 		      pre, post, ##__VA_ARGS__)
+ 
+ 
+-#define ____PVOP_VCALL(op, clbr, call_clbr, extra_clbr, pre, post, ...)	\
++#define ____PVOP_VCALL(sec, op, clbr, call_clbr, extra_clbr, pre, post, ...)	\
+ 	({								\
+ 		PVOP_VCALL_ARGS;					\
+ 		PVOP_TEST_NULL(op);					\
+ 		asm volatile(pre					\
+-			     paravirt_alt(PARAVIRT_CALL)		\
++			     paravirt_alt(sec, PARAVIRT_CALL)		\
+ 			     post					\
+ 			     : call_clbr, ASM_CALL_CONSTRAINT		\
+ 			     : paravirt_type(op),			\
+@@ -568,85 +572,127 @@ int paravirt_disable_iospace(void);
+ 			     : "memory", "cc" extra_clbr);		\
+ 	})
+ 
+-#define __PVOP_VCALL(op, pre, post, ...)				\
+-	____PVOP_VCALL(op, CLBR_ANY, PVOP_VCALL_CLOBBERS,		\
++#define __PVOP_VCALL(sec, op, pre, post, ...)				\
++	____PVOP_VCALL(sec, op, CLBR_ANY, PVOP_VCALL_CLOBBERS,		\
+ 		       VEXTRA_CLOBBERS,					\
+ 		       pre, post, ##__VA_ARGS__)
+ 
+-#define __PVOP_VCALLEESAVE(op, pre, post, ...)				\
+-	____PVOP_VCALL(op.func, CLBR_RET_REG,				\
++#define __PVOP_VCALLEESAVE(sec, op, pre, post, ...)			\
++	____PVOP_VCALL(sec, op.func, CLBR_RET_REG,			\
+ 		      PVOP_VCALLEE_CLOBBERS, ,				\
+ 		      pre, post, ##__VA_ARGS__)
+ 
+ 
+ 
+-#define PVOP_CALL0(rettype, op)						\
+-	__PVOP_CALL(rettype, op, "", "")
+-#define PVOP_VCALL0(op)							\
+-	__PVOP_VCALL(op, "", "")
++#define _PVOP_CALL0(sec, rettype, op)					\
++	__PVOP_CALL(sec, rettype, op, "", "")
++#define _PVOP_VCALL0(sec, op)						\
++	__PVOP_VCALL(sec, op, "", "")
+ 
+-#define PVOP_CALLEE0(rettype, op)					\
+-	__PVOP_CALLEESAVE(rettype, op, "", "")
+-#define PVOP_VCALLEE0(op)						\
+-	__PVOP_VCALLEESAVE(op, "", "")
++#define _PVOP_CALLEE0(sec, rettype, op)					\
++	__PVOP_CALLEESAVE(sec, rettype, op, "", "")
++#define _PVOP_VCALLEE0(sec, op)						\
++	__PVOP_VCALLEESAVE(sec, op, "", "")
+ 
+ 
+-#define PVOP_CALL1(rettype, op, arg1)					\
+-	__PVOP_CALL(rettype, op, "", "", PVOP_CALL_ARG1(arg1))
+-#define PVOP_VCALL1(op, arg1)						\
+-	__PVOP_VCALL(op, "", "", PVOP_CALL_ARG1(arg1))
++#define _PVOP_CALL1(sec, rettype, op, arg1)				\
++	__PVOP_CALL(sec, rettype, op, "", "", PVOP_CALL_ARG1(arg1))
++#define _PVOP_VCALL1(sec, op, arg1)					\
++	__PVOP_VCALL(sec, op, "", "", PVOP_CALL_ARG1(arg1))
+ 
+-#define PVOP_CALLEE1(rettype, op, arg1)					\
+-	__PVOP_CALLEESAVE(rettype, op, "", "", PVOP_CALL_ARG1(arg1))
+-#define PVOP_VCALLEE1(op, arg1)						\
+-	__PVOP_VCALLEESAVE(op, "", "", PVOP_CALL_ARG1(arg1))
++#define _PVOP_CALLEE1(sec, rettype, op, arg1)				\
++	__PVOP_CALLEESAVE(sec, rettype, op, "", "", PVOP_CALL_ARG1(arg1))
++#define _PVOP_VCALLEE1(sec, op, arg1)					\
++	__PVOP_VCALLEESAVE(sec, op, "", "", PVOP_CALL_ARG1(arg1))
+ 
+-
+-#define PVOP_CALL2(rettype, op, arg1, arg2)				\
+-	__PVOP_CALL(rettype, op, "", "", PVOP_CALL_ARG1(arg1),		\
++#define _PVOP_CALL2(sec, rettype, op, arg1, arg2)			\
++	__PVOP_CALL(sec, rettype, op, "", "", PVOP_CALL_ARG1(arg1),	\
+ 		    PVOP_CALL_ARG2(arg2))
+-#define PVOP_VCALL2(op, arg1, arg2)					\
+-	__PVOP_VCALL(op, "", "", PVOP_CALL_ARG1(arg1),			\
++#define _PVOP_VCALL2(sec, op, arg1, arg2)				\
++	__PVOP_VCALL(sec, op, "", "", PVOP_CALL_ARG1(arg1),		\
+ 		     PVOP_CALL_ARG2(arg2))
+ 
+-#define PVOP_CALLEE2(rettype, op, arg1, arg2)				\
+-	__PVOP_CALLEESAVE(rettype, op, "", "", PVOP_CALL_ARG1(arg1),	\
++#define _PVOP_CALLEE2(sec, rettype, op, arg1, arg2)			\
++	__PVOP_CALLEESAVE(sec, rettype, op, "", "", PVOP_CALL_ARG1(arg1), \
+ 			  PVOP_CALL_ARG2(arg2))
+-#define PVOP_VCALLEE2(op, arg1, arg2)					\
+-	__PVOP_VCALLEESAVE(op, "", "", PVOP_CALL_ARG1(arg1),		\
++#define _PVOP_VCALLEE2(sec, op, arg1, arg2)				\
++	__PVOP_VCALLEESAVE(sec, op, "", "", PVOP_CALL_ARG1(arg1),	\
+ 			   PVOP_CALL_ARG2(arg2))
+ 
+ 
+-#define PVOP_CALL3(rettype, op, arg1, arg2, arg3)			\
+-	__PVOP_CALL(rettype, op, "", "", PVOP_CALL_ARG1(arg1),		\
++#define _PVOP_CALL3(sec, rettype, op, arg1, arg2, arg3)			\
++	__PVOP_CALL(sec, rettype, op, "", "", PVOP_CALL_ARG1(arg1),	\
+ 		    PVOP_CALL_ARG2(arg2), PVOP_CALL_ARG3(arg3))
+-#define PVOP_VCALL3(op, arg1, arg2, arg3)				\
+-	__PVOP_VCALL(op, "", "", PVOP_CALL_ARG1(arg1),			\
++#define _PVOP_VCALL3(sec, op, arg1, arg2, arg3)				\
++	__PVOP_VCALL(sec, op, "", "", PVOP_CALL_ARG1(arg1),		\
+ 		     PVOP_CALL_ARG2(arg2), PVOP_CALL_ARG3(arg3))
+ 
+ /* This is the only difference in x86_64. We can make it much simpler */
+ #ifdef CONFIG_X86_32
+-#define PVOP_CALL4(rettype, op, arg1, arg2, arg3, arg4)			\
+-	__PVOP_CALL(rettype, op,					\
++#define _PVOP_CALL4(sec, rettype, op, arg1, arg2, arg3, arg4)		\
++	__PVOP_CALL(sec, rettype, op,					\
+ 		    "push %[_arg4];", "lea 4(%%esp),%%esp;",		\
+ 		    PVOP_CALL_ARG1(arg1), PVOP_CALL_ARG2(arg2),		\
+ 		    PVOP_CALL_ARG3(arg3), [_arg4] "mr" ((u32)(arg4)))
+-#define PVOP_VCALL4(op, arg1, arg2, arg3, arg4)				\
+-	__PVOP_VCALL(op,						\
++#define _PVOP_VCALL4(sec, op, arg1, arg2, arg3, arg4)			\
++	__PVOP_VCALL(sec, op,						\
+ 		    "push %[_arg4];", "lea 4(%%esp),%%esp;",		\
+ 		    "0" ((u32)(arg1)), "1" ((u32)(arg2)),		\
+ 		    "2" ((u32)(arg3)), [_arg4] "mr" ((u32)(arg4)))
+ #else
+-#define PVOP_CALL4(rettype, op, arg1, arg2, arg3, arg4)			\
+-	__PVOP_CALL(rettype, op, "", "",				\
++#define _PVOP_CALL4(sec, rettype, op, arg1, arg2, arg3, arg4)		\
++	__PVOP_CALL(sec, rettype, op, "", "",				\
+ 		    PVOP_CALL_ARG1(arg1), PVOP_CALL_ARG2(arg2),		\
+ 		    PVOP_CALL_ARG3(arg3), PVOP_CALL_ARG4(arg4))
+-#define PVOP_VCALL4(op, arg1, arg2, arg3, arg4)				\
+-	__PVOP_VCALL(op, "", "",					\
++#define _PVOP_VCALL4(sec, op, arg1, arg2, arg3, arg4)			\
++	__PVOP_VCALL(sec, op, "", "",					\
+ 		     PVOP_CALL_ARG1(arg1), PVOP_CALL_ARG2(arg2),	\
+ 		     PVOP_CALL_ARG3(arg3), PVOP_CALL_ARG4(arg4))
+ #endif
+ 
++/*
++ * PVOP macros for .parainstructions
++ */
++#define PVOP_CALL0(rettype, op)						\
++	_PVOP_CALL0(PV_SUFFIX, rettype, op)
++#define PVOP_VCALL0(op)							\
++	_PVOP_VCALL0(PV_SUFFIX, op)
++
++#define PVOP_CALLEE0(rettype, op)					\
++	_PVOP_CALLEE0(PV_SUFFIX, rettype, op)
++#define PVOP_VCALLEE0(op)						\
++	_PVOP_VCALLEE0(PV_SUFFIX, op)
++
++#define PVOP_CALL1(rettype, op, arg1)					\
++	_PVOP_CALL1(PV_SUFFIX, rettype, op, arg1)
++#define PVOP_VCALL1(op, arg1)						\
++	_PVOP_VCALL1(PV_SUFFIX, op, arg1)
++
++#define PVOP_CALLEE1(rettype, op, arg1)					\
++	_PVOP_CALLEE1(PV_SUFFIX, rettype, op, arg1)
++#define PVOP_VCALLEE1(op, arg1)						\
++	_PVOP_VCALLEE1(PV_SUFFIX, op, arg1)
++
++#define PVOP_CALL2(rettype, op, arg1, arg2)				\
++	_PVOP_CALL2(PV_SUFFIX, rettype, op, arg1, arg2)
++#define PVOP_VCALL2(op, arg1, arg2)					\
++	_PVOP_VCALL2(PV_SUFFIX, op, arg1, arg2)
++
++#define PVOP_CALLEE2(rettype, op, arg1, arg2)				\
++	_PVOP_CALLEE2(PV_SUFFIX, rettype, op, arg1, arg2)
++#define PVOP_VCALLEE2(op, arg1, arg2)					\
++	_PVOP_VCALLEE2(PV_SUFFIX, op, arg1, arg2)
++
++#define PVOP_CALL3(rettype, op, arg1, arg2, arg3)			\
++	_PVOP_CALL3(PV_SUFFIX, rettype, op, arg1, arg2, arg3)
++#define PVOP_VCALL3(op, arg1, arg2, arg3)				\
++	_PVOP_VCALL3(PV_SUFFIX, op, arg1, arg2, arg3)
++
++#define PVOP_CALL4(rettype, op, arg1, arg2, arg3, arg4)			\
++	_PVOP_CALL4(PV_SUFFIX, rettype, op, arg1, arg2, arg3, arg4)
++#define PVOP_VCALL4(op, arg1, arg2, arg3, arg4)				\
++	_PVOP_VCALL4(PV_SUFFIX, op, arg1, arg2, arg3, arg4)
++
+ /* Lazy mode for batching updates / context switch */
+ enum paravirt_lazy_mode {
+ 	PARAVIRT_LAZY_NONE,
+@@ -667,7 +713,7 @@ u64 _paravirt_ident_64(u64);
+ 
+ #define paravirt_nop	((void *)_paravirt_nop)
+ 
+-/* These all sit in the .parainstructions section to tell us what to patch. */
++/* These all sit in .parainstructions* sections to tell us what to patch. */
+ struct paravirt_patch_site {
+ 	u8 *instr;		/* original instructions */
+ 	u8 type;		/* type of this instruction */
 -- 
 2.20.1
 
