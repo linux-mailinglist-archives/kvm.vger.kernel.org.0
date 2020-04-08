@@ -2,102 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 645061A27A0
-	for <lists+kvm@lfdr.de>; Wed,  8 Apr 2020 18:59:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C533F1A2832
+	for <lists+kvm@lfdr.de>; Wed,  8 Apr 2020 20:01:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730483AbgDHQ7u (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Apr 2020 12:59:50 -0400
-Received: from mail-pg1-f195.google.com ([209.85.215.195]:37498 "EHLO
-        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729453AbgDHQ7t (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Apr 2020 12:59:49 -0400
-Received: by mail-pg1-f195.google.com with SMTP id r4so3583863pgg.4
-        for <kvm@vger.kernel.org>; Wed, 08 Apr 2020 09:59:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=iazuwtOmYpAvBrdVj8TEytSBmpAo+XIqBVbhsQf9qWM=;
-        b=GShUeMzLckvv1Tmg/eAf8t2/jmGL2cG48LI9uDJAFRP21EjcCDQiSiVBJ+ufSQw2X+
-         zL3weCklxHnyTNA/snfQcDCUMSk26gYSWAy6MWK2OB5pnBbGPUaXkSO8yZD5WO11PdF2
-         7SNL4pPJ+c1FzVG0s72ZaI3wsEdVbtmkhh8eQ=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=iazuwtOmYpAvBrdVj8TEytSBmpAo+XIqBVbhsQf9qWM=;
-        b=suG+SlMIG8r+pW4khMS3DsLttIuY4keI/cGx8x8aDLwz7j7YlJKsf+2/5ER0pLDfhS
-         Ndfyq4jVhlD1l5V4F31/UAEoJLBn04WLAe3iJqeBwet5BdDsxv2EBdXyC6l8J6GrilWv
-         zXj2MLKRbYGSC6ffoJDKQqblkGsWK2tCVJGAujD4zrP/Ed8uMRwNMOxLm/UPE8ksT97b
-         BWAIq4Mes5ymbVEJQf4zUuM3fJewuACk5FjA5rqFtnGKSsIH2DrSCsCsf4bZ/1xVzEKJ
-         Av2s9ynQzVuvZMZA7+5eCQ+No2Ja0TPg/HOp8KknqXVNPMtkJJ0WGuf7V+AV0BDrpAnF
-         FYEg==
-X-Gm-Message-State: AGi0PuaU6rtw3lT76TQmvQ6sVa+HKhvK3aHhe1/Oyd+ccyojgRpmn/2P
-        WupkWuQpKYPgHZfqVar0RPSO0Q==
-X-Google-Smtp-Source: APiQypLbXC98cOz1Gk+AUmoZ9LfVbVf3dMcxa3rqqbc4bIsPb4a7998lvJd5neuYRjqaKOSq7JvUbQ==
-X-Received: by 2002:a63:f658:: with SMTP id u24mr836796pgj.357.1586365186839;
-        Wed, 08 Apr 2020 09:59:46 -0700 (PDT)
-Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id h34sm60200pjb.47.2020.04.08.09.59.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 Apr 2020 09:59:45 -0700 (PDT)
-Date:   Wed, 8 Apr 2020 09:59:44 -0700
-From:   Kees Cook <keescook@chromium.org>
-To:     Yan Zhao <yan.y.zhao@intel.com>
-Cc:     alex.williamson@redhat.com, cohuck@redhat.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] vfio: checking of validity of user vaddr in vfio_dma_rw
-Message-ID: <202004080959.8C71F8DF7@keescook>
-References: <20200408071121.25645-1-yan.y.zhao@intel.com>
+        id S1729693AbgDHSBu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Apr 2020 14:01:50 -0400
+Received: from Galois.linutronix.de ([193.142.43.55]:50275 "EHLO
+        Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726780AbgDHSBu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Apr 2020 14:01:50 -0400
+Received: from p5de0bf0b.dip0.t-ipconnect.de ([93.224.191.11] helo=nanos.tec.linutronix.de)
+        by Galois.linutronix.de with esmtpsa (TLS1.2:DHE_RSA_AES_256_CBC_SHA256:256)
+        (Exim 4.80)
+        (envelope-from <tglx@linutronix.de>)
+        id 1jMF17-0002Uv-PU; Wed, 08 Apr 2020 20:01:38 +0200
+Received: by nanos.tec.linutronix.de (Postfix, from userid 1000)
+        id EE86010069D; Wed,  8 Apr 2020 20:01:36 +0200 (CEST)
+From:   Thomas Gleixner <tglx@linutronix.de>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Andy Lutomirski <luto@amacapital.net>,
+        Vivek Goyal <vgoyal@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Andy Lutomirski <luto@kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>, X86 ML <x86@kernel.org>,
+        kvm list <kvm@vger.kernel.org>, stable <stable@vger.kernel.org>
+Subject: Re: [PATCH v2] x86/kvm: Disable KVM_ASYNC_PF_SEND_ALWAYS
+In-Reply-To: <ce28e893-2ed0-ea6f-6c36-b08bb0d814f2@redhat.com>
+References: <20200407172140.GB64635@redhat.com> <772A564B-3268-49F4-9AEA-CDA648F6131F@amacapital.net> <87eeszjbe6.fsf@nanos.tec.linutronix.de> <ce81c95f-8674-4012-f307-8f32d0e386c2@redhat.com> <874ktukhku.fsf@nanos.tec.linutronix.de> <274f3d14-08ac-e5cc-0b23-e6e0274796c8@redhat.com> <20200408153413.GA11322@linux.intel.com> <ce28e893-2ed0-ea6f-6c36-b08bb0d814f2@redhat.com>
+Date:   Wed, 08 Apr 2020 20:01:36 +0200
+Message-ID: <87d08hc0vz.fsf@nanos.tec.linutronix.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200408071121.25645-1-yan.y.zhao@intel.com>
+Content-Type: text/plain
+X-Linutronix-Spam-Score: -1.0
+X-Linutronix-Spam-Level: -
+X-Linutronix-Spam-Status: No , -1.0 points, 5.0 required,  ALL_TRUSTED=-1,SHORTCIRCUIT=-0.0001
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Apr 08, 2020 at 03:11:21AM -0400, Yan Zhao wrote:
-> instead of calling __copy_to/from_user(), use copy_to_from_user() to
-> ensure vaddr range is a valid user address range before accessing them.
-> 
-> Cc: Kees Cook <keescook@chromium.org>
-> 
-> Fixes: 8d46c0cca5f4 ("vfio: introduce vfio_dma_rw to read/write a range of IOVAs")
-> Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
+Paolo Bonzini <pbonzini@redhat.com> writes:
+> On 08/04/20 17:34, Sean Christopherson wrote:
+>> On Wed, Apr 08, 2020 at 10:23:58AM +0200, Paolo Bonzini wrote:
+>>> Page-not-present async page faults are almost a perfect match for the
+>>> hardware use of #VE (and it might even be possible to let the processor
+>>> deliver the exceptions).
+>> 
+>> My "async" page fault knowledge is limited, but if the desired behavior is
+>> to reflect a fault into the guest for select EPT Violations, then yes,
+>> enabling EPT Violation #VEs in hardware is doable.  The big gotcha is that
+>> KVM needs to set the suppress #VE bit for all EPTEs when allocating a new
+>> MMU page, otherwise not-present faults on zero-initialized EPTEs will get
+>> reflected.
+>> 
+>> Attached a patch that does the prep work in the MMU.  The VMX usage would be:
+>> 
+>> 	kvm_mmu_set_spte_init_value(VMX_EPT_SUPPRESS_VE_BIT);
+>> 
+>> when EPT Violation #VEs are enabled.  It's 64-bit only as it uses stosq to
+>> initialize EPTEs.  32-bit could also be supported by doing memcpy() from
+>> a static page.
+>
+> The complication is that (at least according to the current ABI) we
+> would not want #VE to kick if the guest currently has IF=0 (and possibly
+> CPL=0).  But the ABI is not set in stone, and anyway the #VE protocol is
+> a decent one and worth using as a base for whatever PV protocol we design.
 
-Thanks!
+Forget the current pf async semantics (or the lack of). You really want
+to start from scratch and igore the whole thing.
 
-Reported-by: Kees Cook <keescook@chromium.org>
-Reviewed-by: Kees Cook <keescook@chromium.org>
+The charm of #VE is that the hardware can inject it and it's not nesting
+until the guest cleared the second word in the VE information area. If
+that word is not 0 then you get a regular vmexit where you suspend the
+vcpu until the nested problem is solved.
 
--Kees
+So you really don't worry about the guest CPU state at all. The guest
+side #VE handler has to decide what it wants from the host depending on
+it's internal state:
 
-> ---
->  drivers/vfio/vfio_iommu_type1.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> index 3aefcc8e2933..fbc58284b333 100644
-> --- a/drivers/vfio/vfio_iommu_type1.c
-> +++ b/drivers/vfio/vfio_iommu_type1.c
-> @@ -2345,10 +2345,10 @@ static int vfio_iommu_type1_dma_rw_chunk(struct vfio_iommu *iommu,
->  	vaddr = dma->vaddr + offset;
->  
->  	if (write)
-> -		*copied = __copy_to_user((void __user *)vaddr, data,
-> +		*copied = copy_to_user((void __user *)vaddr, data,
->  					 count) ? 0 : count;
->  	else
-> -		*copied = __copy_from_user(data, (void __user *)vaddr,
-> +		*copied = copy_from_user(data, (void __user *)vaddr,
->  					   count) ? 0 : count;
->  	if (kthread)
->  		unuse_mm(mm);
-> -- 
-> 2.17.1
-> 
+     - Suspend me and resume once the EPT fail is solved
 
--- 
-Kees Cook
+     - Let me park the failing task and tell me once you resolved the
+       problem.
+
+That's pretty straight forward and avoids the whole nonsense which the
+current mess contains. It completely avoids the allocation stuff as well
+as you need to use a PV page where the guest copies the VE information
+to.
+
+The notification that a problem has been resolved needs to go through a
+separate vector which still has the IF=1 requirement obviously.
+
+Thanks,
+
+        tglx
