@@ -2,142 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 17FDC1A2279
-	for <lists+kvm@lfdr.de>; Wed,  8 Apr 2020 15:02:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BE1151A2317
+	for <lists+kvm@lfdr.de>; Wed,  8 Apr 2020 15:34:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728832AbgDHNCF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Apr 2020 09:02:05 -0400
-Received: from Galois.linutronix.de ([193.142.43.55]:49787 "EHLO
-        Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727896AbgDHNCF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Apr 2020 09:02:05 -0400
-Received: from p5de0bf0b.dip0.t-ipconnect.de ([93.224.191.11] helo=nanos.tec.linutronix.de)
-        by Galois.linutronix.de with esmtpsa (TLS1.2:DHE_RSA_AES_256_CBC_SHA256:256)
-        (Exim 4.80)
-        (envelope-from <tglx@linutronix.de>)
-        id 1jMALA-0006b0-1S; Wed, 08 Apr 2020 15:02:00 +0200
-Received: by nanos.tec.linutronix.de (Postfix, from userid 1000)
-        id 077EB10069D; Wed,  8 Apr 2020 15:01:58 +0200 (CEST)
-From:   Thomas Gleixner <tglx@linutronix.de>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Andy Lutomirski <luto@amacapital.net>,
-        Vivek Goyal <vgoyal@redhat.com>
-Cc:     Peter Zijlstra <peterz@infradead.org>,
-        Andy Lutomirski <luto@kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>, X86 ML <x86@kernel.org>,
-        kvm list <kvm@vger.kernel.org>, stable <stable@vger.kernel.org>
-Subject: Re: [PATCH v2] x86/kvm: Disable KVM_ASYNC_PF_SEND_ALWAYS
-In-Reply-To: <274f3d14-08ac-e5cc-0b23-e6e0274796c8@redhat.com>
-References: <20200407172140.GB64635@redhat.com> <772A564B-3268-49F4-9AEA-CDA648F6131F@amacapital.net> <87eeszjbe6.fsf@nanos.tec.linutronix.de> <ce81c95f-8674-4012-f307-8f32d0e386c2@redhat.com> <874ktukhku.fsf@nanos.tec.linutronix.de> <274f3d14-08ac-e5cc-0b23-e6e0274796c8@redhat.com>
-Date:   Wed, 08 Apr 2020 15:01:58 +0200
-Message-ID: <87pncib06x.fsf@nanos.tec.linutronix.de>
+        id S1729191AbgDHNd4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Apr 2020 09:33:56 -0400
+Received: from mx2.suse.de ([195.135.220.15]:57164 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728594AbgDHNd4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Apr 2020 09:33:56 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx2.suse.de (Postfix) with ESMTP id 2B99FAE59;
+        Wed,  8 Apr 2020 13:33:53 +0000 (UTC)
+Subject: Re: [RFC PATCH 00/26] Runtime paravirt patching
+To:     Peter Zijlstra <peterz@infradead.org>,
+        Ankur Arora <ankur.a.arora@oracle.com>
+Cc:     linux-kernel@vger.kernel.org, x86@kernel.org, hpa@zytor.com,
+        jpoimboe@redhat.com, namit@vmware.com, mhiramat@kernel.org,
+        bp@alien8.de, vkuznets@redhat.com, pbonzini@redhat.com,
+        boris.ostrovsky@oracle.com, mihai.carabas@oracle.com,
+        kvm@vger.kernel.org, xen-devel@lists.xenproject.org,
+        virtualization@lists.linux-foundation.org
+References: <20200408050323.4237-1-ankur.a.arora@oracle.com>
+ <20200408120856.GY20713@hirez.programming.kicks-ass.net>
+From:   =?UTF-8?B?SsO8cmdlbiBHcm/Dnw==?= <jgross@suse.com>
+Message-ID: <bcf8206d-5a41-4e6b-1832-75ba1d6367e4@suse.com>
+Date:   Wed, 8 Apr 2020 15:33:52 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Linutronix-Spam-Score: -1.0
-X-Linutronix-Spam-Level: -
-X-Linutronix-Spam-Status: No , -1.0 points, 5.0 required,  ALL_TRUSTED=-1,SHORTCIRCUIT=-0.0001
+In-Reply-To: <20200408120856.GY20713@hirez.programming.kicks-ass.net>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
-> On 08/04/20 01:21, Thomas Gleixner wrote:
->>>> No. Async PF is not a real exception. It has interrupt semantics and it
->>>> can only be injected when the guest has interrupts enabled. It's bad
->>>> design.
->>>
->>> Page-ready async PF has interrupt semantics.
->>>
->>> Page-not-present async PF however does not have interrupt semantics, it
->>> has to be injected immediately or not at all (falling back to host page
->>> fault in the latter case).
->> 
->> If interrupts are disabled in the guest then it is NOT injected and the
->> guest is suspended. So it HAS interrupt semantics. Conditional ones,
->> i.e. if interrupts are disabled, bail, if not then inject it.
->
-> Interrupts can be delayed by TPR or STI/MOV SS interrupt window, async
-> page faults cannot (again, not the page-ready kind).
+On 08.04.20 14:08, Peter Zijlstra wrote:
+> On Tue, Apr 07, 2020 at 10:02:57PM -0700, Ankur Arora wrote:
+>> Mechanism: the patching itself is done using stop_machine(). That is
+>> not ideal -- text_poke_stop_machine() was replaced with INT3+emulation
+>> via text_poke_bp(), but I'm using this to address two issues:
+>>   1) emulation in text_poke() can only easily handle a small set
+>>   of instructions and this is problematic for inlined pv-ops (and see
+>>   a possible alternatives use-case below.)
+>>   2) paravirt patching might have inter-dependendent ops (ex.
+>>   lock.queued_lock_slowpath, lock.queued_lock_unlock are paired and
+>>   need to be updated atomically.)
+> 
+> And then you hope that the spinlock state transfers.. That is that both
+> implementations agree what an unlocked spinlock looks like.
+> 
+> Suppose the native one was a ticket spinlock, where unlocked means 'head
+> == tail' while the paravirt one is a test-and-set spinlock, where
+> unlocked means 'val == 0'.
+> 
+> That just happens to not be the case now, but it was for a fair while.
 
-Can we pretty please stop using the term async page fault? It's just
-wrong and causes more confusion than anything else.
+Sure? This would mean that before spinlock-pvops are being set no lock
+is allowed to be used in the kernel, because this would block the boot
+time transition of the lock variant to use.
 
-What this does is really what I called Opportunistic Make Guest Do Other
-Stuff. And it has neither true exception nor true interrupt semantics.
+Another problem I'm seeing is that runtime pvops patching would rely on
+the fact that stop_machine() isn't guarded by a spinlock.
 
-It's a software event which is injected into the guest to let the guest
-do something else than waiting for the actual #PF cause to be
-resolved. It's part of a software protocol between host and guest.
 
-And it comes with restrictions:
-
-    The Do Other Stuff event can only be delivered when guest IF=1.
-
-    If guest IF=0 then the host has to suspend the guest until the
-    situation is resolved.
-
-    The 'Situation resolved' event must also wait for a guest IF=1 slot.
-
-> Page-not-present async page faults are almost a perfect match for the
-> hardware use of #VE (and it might even be possible to let the
-> processor deliver the exceptions).  There are other advantages:
->
-> - the only real problem with using #PF (with or without
-> KVM_ASYNC_PF_SEND_ALWAYS) seems to be the NMI reentrancy issue, which
-> would not be there for #VE.
->
-> - #VE are combined the right way with other exceptions (the
-> benign/contributory/pagefault stuff)
->
-> - adjusting KVM and Linux to use #VE instead of #PF would be less than
-> 100 lines of code.
-
-If you just want to solve Viveks problem, then its good enough. I.e. the
-file truncation turns the EPT entries into #VE convertible entries and
-the guest #VE handler can figure it out. This one can be injected
-directly by the hardware, i.e. you don't need a VMEXIT.
-
-If you want the opportunistic do other stuff mechanism, then #VE has
-exactly the same problems as the existing async "PF". It's not magicaly
-making that go away.
-
-One possible solution might be to make all recoverable EPT entries
-convertible and let the HW inject #VE for those.
-
-So the #VE handler in the guest would have to do:
-
-       if (!recoverable()) {
-       		if (user_mode)
-                	send_signal();
-                else if (!fixup_exception())
-                	die_hard();
-                goto done;  
-       }                 
-
-       store_ve_info_in_pv_page();
-
-       if (!user_mode(regs) || !preemptible()) {
-       		hypercall_resolve_ept(can_continue = false);
-       } else {
-                init_completion();
-       		hypercall_resolve_ept(can_continue = true);
-                wait_for_completion();
-       }
-
-or something like that.
-
-The hypercall to resolve the EPT fail on the host acts on the
-can_continue argument.
-
-If false, it suspends the guest vCPU and only returns when done.
-
-If true it kicks the resolve process and returns to the guest which
-suspends the task and tries to do something else.
-
-The wakeup side needs to be a regular interrupt and cannot go through
-#VE.
-
-Thanks,
-
-        tglx
+Juergen
