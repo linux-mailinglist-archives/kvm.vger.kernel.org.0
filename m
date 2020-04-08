@@ -2,69 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0D3281A23FC
-	for <lists+kvm@lfdr.de>; Wed,  8 Apr 2020 16:23:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 338BF1A241D
+	for <lists+kvm@lfdr.de>; Wed,  8 Apr 2020 16:32:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728647AbgDHOXE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Apr 2020 10:23:04 -0400
-Received: from mga02.intel.com ([134.134.136.20]:54100 "EHLO mga02.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727070AbgDHOXE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Apr 2020 10:23:04 -0400
-IronPort-SDR: Q4sVnB1sQy9KaF9tayZOi3WKKRmPcXowFhyF41/+7sVrSdF0qTcx2Hjv1i6mBQi1Ku0puN409R
- BXNye8j/Tm/w==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Apr 2020 07:23:03 -0700
-IronPort-SDR: Gb5W0BceH43BnnIx0UpCQ+0biYB59F70/Vo0XMDBC4kjsoGC5ieJuiRODEtezmcSZtiQ+dFyHR
- +S3krWP8JVXQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.72,358,1580803200"; 
-   d="scan'208";a="275457576"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
-  by fmsmga004.fm.intel.com with ESMTP; 08 Apr 2020 07:23:03 -0700
-Date:   Wed, 8 Apr 2020 07:23:03 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        syzbot+d889b59b2bb87d4047a2@syzkaller.appspotmail.com
-Subject: Re: [PATCH 0/2] KVM: Fix out-of-bounds memslot access
-Message-ID: <20200408142302.GA10686@linux.intel.com>
-References: <20200408064059.8957-1-sean.j.christopherson@intel.com>
- <526247ac-4201-8b3d-0f15-d93b12a530b8@de.ibm.com>
- <20200408101004.09b1f56d.cohuck@redhat.com>
+        id S1727724AbgDHOcY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Apr 2020 10:32:24 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:29656 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726605AbgDHOcY (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 8 Apr 2020 10:32:24 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 038E33Gx134967
+        for <kvm@vger.kernel.org>; Wed, 8 Apr 2020 10:32:24 -0400
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 309205f6f0-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Wed, 08 Apr 2020 10:32:23 -0400
+Received: from localhost
+        by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <raspl@linux.ibm.com>;
+        Wed, 8 Apr 2020 15:32:02 +0100
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
+        by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Wed, 8 Apr 2020 15:32:00 +0100
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 038EWIB452691184
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 8 Apr 2020 14:32:18 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 37C2CA4065;
+        Wed,  8 Apr 2020 14:32:18 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 14E1EA4054;
+        Wed,  8 Apr 2020 14:32:18 +0000 (GMT)
+Received: from [9.145.70.147] (unknown [9.145.70.147])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed,  8 Apr 2020 14:32:18 +0000 (GMT)
+Subject: Re: [PATCH v2 0/3] tools/kvm_stat: add logfile support
+From:   Stefan Raspl <raspl@linux.ibm.com>
+To:     kvm@vger.kernel.org
+Cc:     pbonzini@redhat.com
+References: <20200402085705.61155-1-raspl@linux.ibm.com>
+Date:   Wed, 8 Apr 2020 16:32:17 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200408101004.09b1f56d.cohuck@redhat.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <20200402085705.61155-1-raspl@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 20040814-0008-0000-0000-0000036CE82D
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20040814-0009-0000-0000-00004A8E85E6
+Message-Id: <c6cd27e3-3af2-faa1-a375-f97490a9e078@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.676
+ definitions=2020-04-07_10:2020-04-07,2020-04-07 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ priorityscore=1501 phishscore=0 bulkscore=0 clxscore=1015 impostorscore=0
+ malwarescore=0 mlxscore=0 spamscore=0 suspectscore=1 adultscore=0
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2004080117
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Apr 08, 2020 at 10:10:04AM +0200, Cornelia Huck wrote:
-> On Wed, 8 Apr 2020 09:24:27 +0200
-> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+On 2020-04-02 10:57, Stefan Raspl wrote:
+> Next attempt to come up with support for logfiles that can be combined
+> with a solution for rotating logs.
+> Adding another patch to skip records with all zeros to preserve space.
 > 
-> > On 08.04.20 08:40, Sean Christopherson wrote:
-> > > Two fixes for what are effectively the same bug.  The binary search used
-> > > for memslot lookup doesn't check the resolved index and can access memory
-> > > beyond the end of the memslot array.
-> > > 
-> > > I split the s390 specific change to a separate patch because it's subtly
-> > > different, and to simplify backporting.  The KVM wide fix can be applied
-> > > to stable trees as is, but AFAICT the s390 change would need to be paired
-> > > with the !used_slots check from commit 774a964ef56 ("KVM: Fix out of range  
-> > 
-> > I cannot find the commit id 774a964ef56
-> > 
+> Changes in v2:
+> - Addressed feedback from patch review
+> - Beefed up man page descriptions of --csv and --log-to-file (fixing
+>   a glitch in the former)
+> - Use a metavar for -L in the --help output
 > 
-> It's 0774a964ef561b7170d8d1b1bfe6f88002b6d219 in my tree.
+> 
+> Stefan Raspl (3):
+>   tools/kvm_stat: add command line switch '-z' to skip zero records
+>   tools/kvm_stat: Add command line switch '-L' to log to file
+>   tools/kvm_stat: add sample systemd unit file
+> 
+>  tools/kvm/kvm_stat/kvm_stat         | 84 ++++++++++++++++++++++++-----
+>  tools/kvm/kvm_stat/kvm_stat.service | 16 ++++++
+>  tools/kvm/kvm_stat/kvm_stat.txt     | 15 +++++-
+>  3 files changed, 101 insertions(+), 14 deletions(-)
+>  create mode 100644 tools/kvm/kvm_stat/kvm_stat.service
 
-Argh, I botched the copy.  Thanks for hunting it down!
+*ping*
+
