@@ -2,460 +2,426 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9588D1A1978
-	for <lists+kvm@lfdr.de>; Wed,  8 Apr 2020 03:20:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9DD661A1974
+	for <lists+kvm@lfdr.de>; Wed,  8 Apr 2020 03:17:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726484AbgDHBUQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Apr 2020 21:20:16 -0400
-Received: from mga03.intel.com ([134.134.136.65]:26472 "EHLO mga03.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726407AbgDHBUQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Apr 2020 21:20:16 -0400
-IronPort-SDR: euZ0gpBJHEHeZWreHW4ZXpwxWbanrAIMhC3JBZVAC+LwYQPmPY/moQ1lpPwv3MJO0XC2dQ9IX/
- ZLqd5UpAqfgQ==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Apr 2020 18:20:13 -0700
-IronPort-SDR: z0eV4ksl3aVmPsXeemkwuosKrRiVzixYNMHU0bDHphQ8aceffYaY5q09twGF16XHcrl96H/vPj
- +UfQn3ZD5HdA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.72,357,1580803200"; 
-   d="scan'208";a="275288917"
-Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040) ([10.239.13.16])
-  by fmsmga004.fm.intel.com with ESMTP; 07 Apr 2020 18:20:09 -0700
-Date:   Tue, 7 Apr 2020 21:10:33 -0400
-From:   Yan Zhao <yan.y.zhao@intel.com>
-To:     Kirti Wankhede <kwankhede@nvidia.com>
-Cc:     alex.williamson@redhat.com, cjia@nvidia.com, kevin.tian@intel.com,
-        ziye.yang@intel.com, changpeng.liu@intel.com, yi.l.liu@intel.com,
-        mlevitsk@redhat.com, eskultet@redhat.com, cohuck@redhat.com,
-        dgilbert@redhat.com, jonathan.davies@nutanix.com,
-        eauger@redhat.com, aik@ozlabs.ru, pasic@linux.ibm.com,
-        felipe@nutanix.com, Zhengxiao.zx@Alibaba-inc.com,
-        shuangtai.tst@alibaba-inc.com, Ken.Xue@amd.com,
-        zhi.a.wang@intel.com, qemu-devel@nongnu.org, kvm@vger.kernel.org
-Subject: Re: [PATCH v17 Kernel 4/7] vfio iommu: Implementation of ioctl for
- dirty pages tracking.
-Message-ID: <20200408011033.GD10586@joy-OptiPlex-7040>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-References: <1585587044-2408-1-git-send-email-kwankhede@nvidia.com>
- <1585587044-2408-5-git-send-email-kwankhede@nvidia.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+        id S1726481AbgDHBRi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Apr 2020 21:17:38 -0400
+Received: from mail-dm6nam12on2086.outbound.protection.outlook.com ([40.107.243.86]:6080
+        "EHLO NAM12-DM6-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726406AbgDHBRi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Apr 2020 21:17:38 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ks2A8Wv6noAiHnQrI6rFYUuGrnGtU/efunUfL4Vqk3tsfQYwcq6mni8Gglq+mxZu2VngYfr+SxlWjOoCemxYLv7Njw3kZQlL7PMB0Y+JLnQ+1k3SQb+q2Wa8dwDmRwypNcYstB4GbURJUKgjggqvDNJ10FxYoMz6FnDMSXA+XxUvJ5wjbRuaajVQVSatNPTNpMArTm8GKDnzR+hloxTbJv0LglshTpTj6AMBx41owds11rA0inF3d5vaoegwhcJe6E9RZhA8FZCzj36vzSSr+kSmcIN53kjUIhzUiXy0BhX9eJpTvohh3w1+oEMEqUPARYEgUnPQS6gLVjJn0tup4Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=hKSWjJjyLoM5DQhyxp3SBQ9XygQIEW4ygs1Jn9NHA+M=;
+ b=IR1Hp5ROcBqRGORTSojal5dymzzy6jOR1u1vSR1gBakwLPMC3GdlyIvfBw+wYjgu+1OIQXvyd2BK8JPebcTuWq7kyKiPOjCtTOFFyzcSDqrN+w9gWmbIAJY/LgA3V/Th2vZVSyWOTkAHfuhJkAEBWwv9Zk0wcHG3lBbY9A/lw6yV8a8komf8KnUJjld2V0dEA2acgatah1FfrGe+4GbdOUrrPLHLmaoD4vWlm913/eVQkCbl5RIzEtcHuvEM0d5tQqxiT0nY8cV7PF08Hu/ZyASVXGBTRY0mOigFSr1Z6LH5BgRsbHmCdyxuMSScOYKYvt6V519u+mT0V4VQUuGohg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=hKSWjJjyLoM5DQhyxp3SBQ9XygQIEW4ygs1Jn9NHA+M=;
+ b=FrT5X1QzpaK7o/MIgMEU5TfzoORNXwky+LTYAqWrMhZLMgi7Tl1L1BJVTK3/KVcTiePsZmxz8eL2ejD/kieHS6Wtawk2veZALqs7NWqwQOhF8fR58+MdJa8d1i/0FmNJASEyIIh6gfyq2BU4O03LqDLomL3eZonWrNZJxj+aJLg=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=Ashish.Kalra@amd.com; 
+Received: from DM5PR12MB1386.namprd12.prod.outlook.com (2603:10b6:3:77::9) by
+ DM5PR12MB2568.namprd12.prod.outlook.com (2603:10b6:4:b5::35) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2878.15; Wed, 8 Apr 2020 01:17:33 +0000
+Received: from DM5PR12MB1386.namprd12.prod.outlook.com
+ ([fe80::969:3d4e:6f37:c33c]) by DM5PR12MB1386.namprd12.prod.outlook.com
+ ([fe80::969:3d4e:6f37:c33c%12]) with mapi id 15.20.2878.022; Wed, 8 Apr 2020
+ 01:17:32 +0000
+Date:   Wed, 8 Apr 2020 01:17:26 +0000
+From:   Ashish Kalra <ashish.kalra@amd.com>
+To:     Steve Rutherford <srutherford@google.com>
+Cc:     Brijesh Singh <brijesh.singh@amd.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Joerg Roedel <joro@8bytes.org>,
+        Borislav Petkov <bp@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        X86 ML <x86@kernel.org>, KVM list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        David Rientjes <rientjes@google.com>,
+        Andy Lutomirski <luto@kernel.org>
+Subject: Re: [PATCH v6 08/14] KVM: X86: Introduce KVM_HC_PAGE_ENC_STATUS
+ hypercall
+Message-ID: <20200408011726.GA3684@ashkalra_ubuntu_server>
+References: <cover.1585548051.git.ashish.kalra@amd.com>
+ <265ef8a0ab75f01bc673cce6ddcf7988c7623943.1585548051.git.ashish.kalra@amd.com>
+ <CABayD+ekEYAS4z=L2r1q+8xaEzqKmJuzuYQhsWX3X=htgTvL5w@mail.gmail.com>
+ <20200407052740.GA31821@ashkalra_ubuntu_server>
+ <CABayD+cNdEJxoSHee3s0toy6-nO6Bm4-OsrbBdS8mCWoMBSqLQ@mail.gmail.com>
+ <d67a104e-6a01-a766-63b2-3f8b6026ca4c@amd.com>
+ <CABayD+ehZZabp2tA8K-ViB0BXPyjpz-XpXPXoD7MUH0OLz_Z-g@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <1585587044-2408-5-git-send-email-kwankhede@nvidia.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CABayD+ehZZabp2tA8K-ViB0BXPyjpz-XpXPXoD7MUH0OLz_Z-g@mail.gmail.com>
 User-Agent: Mutt/1.9.4 (2018-02-28)
+X-ClientProxiedBy: SN6PR05CA0017.namprd05.prod.outlook.com
+ (2603:10b6:805:de::30) To DM5PR12MB1386.namprd12.prod.outlook.com
+ (2603:10b6:3:77::9)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from ashkalra_ubuntu_server (165.204.77.1) by SN6PR05CA0017.namprd05.prod.outlook.com (2603:10b6:805:de::30) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2900.11 via Frontend Transport; Wed, 8 Apr 2020 01:17:31 +0000
+X-Originating-IP: [165.204.77.1]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: b9fd4b48-dd41-4879-1a11-08d7db5a9d06
+X-MS-TrafficTypeDiagnostic: DM5PR12MB2568:|DM5PR12MB2568:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <DM5PR12MB256876D5F51ACF15D99EA90F8EC00@DM5PR12MB2568.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
+X-Forefront-PRVS: 0367A50BB1
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM5PR12MB1386.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(10009020)(4636009)(396003)(376002)(136003)(346002)(366004)(39860400002)(52116002)(6496006)(54906003)(956004)(7416002)(2906002)(26005)(186003)(5660300002)(6916009)(86362001)(478600001)(66476007)(66946007)(66556008)(30864003)(33716001)(316002)(55016002)(16526019)(33656002)(4326008)(44832011)(8676002)(1076003)(53546011)(66574012)(81156014)(81166006)(9686003)(6666004)(8936002);DIR:OUT;SFP:1101;
+Received-SPF: None (protection.outlook.com: amd.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 2dub6D7xQGcSID5bdvJhSqsFww13wVtMx7RHVLvSbA1k9tIo9qPWgy70sUOcBjds6g286Ro8UaLJGX3DJdvRgYFNJiEkZgih/w1P+tZT4jfEb/DaRIIHsjesrpOTxc7GfSpBcRffdghzZvGHC7Rmx+JN8vsvss9l87x3L66Qe6y2KCMOL1x0NvGcB+N30+lE5/bW/zjOgTPMds3b9jgVdEN9trTCyMAtMqE153m8XbuPT6ESYvqQ0G2AdgMIJuJ3VvKElWGCORzikKAhIWKB81JtmIP6cCkS25AW6WeidJwl9qgFBonm4vWF15LGGAkoQb8v5Bqu6xNo0Gfci/sxuIp1nRVMPrEhGb3+mG6ATWWpUKL1ZkCJfl4qfydxx31gPOHHzj3inUEZut5fVeab+2ETXGBK6k1HthBJaNQeWAxGCnbCnbE0mQAsTyPXFXGS
+X-MS-Exchange-AntiSpam-MessageData: qms/u25Ne3eRPzq2Hw/q3dTLx2uK0KAkbvKXRPs4KdVfHg2fOZvBWXAize2wr7LbihgcmmnHtxd9NSQezuBjxjLpLwXvKyUIZW6uNA2J6EE89ADzwz4iLeUlkzFkZSovRgSANHSi7OPKVKcW2Q+KXw==
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b9fd4b48-dd41-4879-1a11-08d7db5a9d06
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Apr 2020 01:17:32.6645
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: BUa725BajYG7c88ASlGoeIz5Xpz6E0Te0EY500i519EuWCwdZ14vLS0JKq+L9AlBnZ4HpFOeNb9s9NcL/ZQZEw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR12MB2568
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Mar 30, 2020 at 10:20:41PM +0530, Kirti Wankhede wrote:
-> VFIO_IOMMU_DIRTY_PAGES ioctl performs three operations:
-> - Start dirty pages tracking while migration is active
-> - Stop dirty pages tracking.
-> - Get dirty pages bitmap. Its user space application's responsibility to
->   copy content of dirty pages from source to destination during migration.
-> 
-> To prevent DoS attack, memory for bitmap is allocated per vfio_dma
-> structure. Bitmap size is calculated considering smallest supported page
-> size. Bitmap is allocated for all vfio_dmas when dirty logging is enabled
-> 
-> Bitmap is populated for already pinned pages when bitmap is allocated for
-> a vfio_dma with the smallest supported page size. Update bitmap from
-> pinning functions when tracking is enabled. When user application queries
-> bitmap, check if requested page size is same as page size used to
-> populated bitmap. If it is equal, copy bitmap, but if not equal, return
-> error.
-> 
-> Fixed below error by changing pgsize type from uint64_t to size_t.
-> Reported-by: kbuild test robot <lkp@intel.com>
-> 
-> All errors:
-> drivers/vfio/vfio_iommu_type1.c:197: undefined reference to `__udivdi3'
-> 
-> drivers/vfio/vfio_iommu_type1.c:225: undefined reference to `__udivdi3'
-> 
-> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-> Reviewed-by: Neo Jia <cjia@nvidia.com>
-> ---
->  drivers/vfio/vfio_iommu_type1.c | 266 +++++++++++++++++++++++++++++++++++++++-
->  1 file changed, 260 insertions(+), 6 deletions(-)
-> 
-> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> index 70aeab921d0f..5efebc2b60e1 100644
-> --- a/drivers/vfio/vfio_iommu_type1.c
-> +++ b/drivers/vfio/vfio_iommu_type1.c
-> @@ -71,6 +71,7 @@ struct vfio_iommu {
->  	unsigned int		dma_avail;
->  	bool			v2;
->  	bool			nesting;
-> +	bool			dirty_page_tracking;
->  };
->  
->  struct vfio_domain {
-> @@ -91,6 +92,7 @@ struct vfio_dma {
->  	bool			lock_cap;	/* capable(CAP_IPC_LOCK) */
->  	struct task_struct	*task;
->  	struct rb_root		pfn_list;	/* Ex-user pinned pfn list */
-> +	unsigned long		*bitmap;
->  };
->  
->  struct vfio_group {
-> @@ -125,7 +127,21 @@ struct vfio_regions {
->  #define IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu)	\
->  					(!list_empty(&iommu->domain_list))
->  
-> +#define DIRTY_BITMAP_BYTES(n)	(ALIGN(n, BITS_PER_TYPE(u64)) / BITS_PER_BYTE)
-> +
-> +/*
-> + * Input argument of number of bits to bitmap_set() is unsigned integer, which
-> + * further casts to signed integer for unaligned multi-bit operation,
-> + * __bitmap_set().
-> + * Then maximum bitmap size supported is 2^31 bits divided by 2^3 bits/byte,
-> + * that is 2^28 (256 MB) which maps to 2^31 * 2^12 = 2^43 (8TB) on 4K page
-> + * system.
-> + */
-> +#define DIRTY_BITMAP_PAGES_MAX	(uint64_t)(INT_MAX - 1)
-> +#define DIRTY_BITMAP_SIZE_MAX	 DIRTY_BITMAP_BYTES(DIRTY_BITMAP_PAGES_MAX)
-> +
->  static int put_pfn(unsigned long pfn, int prot);
-> +static unsigned long vfio_pgsize_bitmap(struct vfio_iommu *iommu);
->  
->  /*
->   * This code handles mapping and unmapping of user data buffers
-> @@ -175,6 +191,77 @@ static void vfio_unlink_dma(struct vfio_iommu *iommu, struct vfio_dma *old)
->  	rb_erase(&old->node, &iommu->dma_list);
->  }
->  
-> +
-> +static int vfio_dma_bitmap_alloc(struct vfio_dma *dma, size_t pgsize)
-> +{
-> +	uint64_t npages = dma->size / pgsize;
-> +
-> +	if (npages > DIRTY_BITMAP_PAGES_MAX)
-> +		return -EINVAL;
-> +
-> +	dma->bitmap = kvzalloc(DIRTY_BITMAP_BYTES(npages), GFP_KERNEL);
-> +	if (!dma->bitmap)
-> +		return -ENOMEM;
-> +
-> +	return 0;
-> +}
-> +
-> +static void vfio_dma_bitmap_free(struct vfio_dma *dma)
-> +{
-> +	kfree(dma->bitmap);
-> +	dma->bitmap = NULL;
-> +}
-> +
-> +static void vfio_dma_populate_bitmap(struct vfio_dma *dma, size_t pgsize)
-> +{
-> +	struct rb_node *p;
-> +
-> +	if (RB_EMPTY_ROOT(&dma->pfn_list))
-> +		return;
-> +
-> +	for (p = rb_first(&dma->pfn_list); p; p = rb_next(p)) {
-> +		struct vfio_pfn *vpfn = rb_entry(p, struct vfio_pfn, node);
-> +
-> +		bitmap_set(dma->bitmap, (vpfn->iova - dma->iova) / pgsize, 1);
-> +	}
-> +}
-> +
-> +static int vfio_dma_bitmap_alloc_all(struct vfio_iommu *iommu, size_t pgsize)
-> +{
-> +	struct rb_node *n = rb_first(&iommu->dma_list);
-> +
-> +	for (; n; n = rb_next(n)) {
-> +		struct vfio_dma *dma = rb_entry(n, struct vfio_dma, node);
-> +		int ret;
-> +
-> +		ret = vfio_dma_bitmap_alloc(dma, pgsize);
-> +		if (ret) {
-> +			struct rb_node *p = rb_prev(n);
-> +
-> +			for (; p; p = rb_prev(p)) {
-> +				struct vfio_dma *dma = rb_entry(n,
-> +							struct vfio_dma, node);
-> +
-> +				vfio_dma_bitmap_free(dma);
-> +			}
-> +			return ret;
-> +		}
-> +		vfio_dma_populate_bitmap(dma, pgsize);
-> +	}
-> +	return 0;
-> +}
-> +
-> +static void vfio_dma_bitmap_free_all(struct vfio_iommu *iommu)
-> +{
-> +	struct rb_node *n = rb_first(&iommu->dma_list);
-> +
-> +	for (; n; n = rb_next(n)) {
-> +		struct vfio_dma *dma = rb_entry(n, struct vfio_dma, node);
-> +
-> +		vfio_dma_bitmap_free(dma);
-> +	}
-> +}
-> +
->  /*
->   * Helper Functions for host iova-pfn list
->   */
-> @@ -567,6 +654,18 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
->  			vfio_unpin_page_external(dma, iova, do_accounting);
->  			goto pin_unwind;
->  		}
-> +
-> +		if (iommu->dirty_page_tracking) {
-> +			unsigned long pgshift =
-> +					 __ffs(vfio_pgsize_bitmap(iommu));
-> +
+Hello Steve, Brijesh,
 
-as there's a mutex_lock(&iommu->lock) in the beginning of this
-vfio_iommu_type1_pin_pages(),the mutex_lock(&iommu->lock) in
-vfio_pgsize_bitmap(iommu) would cause deadlock once vfio_pin_pages() is
-called for dirty page tracking during live migration.
-
-Thanks
-Yan
-
-> +			/*
-> +			 * Bitmap populated with the smallest supported page
-> +			 * size
-> +			 */
-> +			bitmap_set(dma->bitmap,
-> +				   (vpfn->iova - dma->iova) >> pgshift, 1);
-> +		}
->  	}
->  
->  	ret = i;
-> @@ -801,6 +900,7 @@ static void vfio_remove_dma(struct vfio_iommu *iommu, struct vfio_dma *dma)
->  	vfio_unmap_unpin(iommu, dma, true);
->  	vfio_unlink_dma(iommu, dma);
->  	put_task_struct(dma->task);
-> +	vfio_dma_bitmap_free(dma);
->  	kfree(dma);
->  	iommu->dma_avail++;
->  }
-> @@ -831,6 +931,57 @@ static unsigned long vfio_pgsize_bitmap(struct vfio_iommu *iommu)
->  	return bitmap;
->  }
->  
-> +static int vfio_iova_dirty_bitmap(struct vfio_iommu *iommu, dma_addr_t iova,
-> +				  size_t size, size_t pgsize,
-> +				  u64 __user *bitmap)
-> +{
-> +	struct vfio_dma *dma;
-> +	unsigned long pgshift = __ffs(pgsize);
-> +	unsigned int npages, bitmap_size;
-> +
-> +	dma = vfio_find_dma(iommu, iova, 1);
-> +
-> +	if (!dma)
-> +		return -EINVAL;
-> +
-> +	if (dma->iova != iova || dma->size != size)
-> +		return -EINVAL;
-> +
-> +	npages = dma->size >> pgshift;
-> +	bitmap_size = DIRTY_BITMAP_BYTES(npages);
-> +
-> +	/* mark all pages dirty if all pages are pinned and mapped. */
-> +	if (dma->iommu_mapped)
-> +		bitmap_set(dma->bitmap, 0, npages);
-> +
-> +	if (copy_to_user((void __user *)bitmap, dma->bitmap, bitmap_size))
-> +		return -EFAULT;
-> +
-> +	/*
-> +	 * Re-populate bitmap to include all pinned pages which are considered
-> +	 * as dirty but exclude pages which are unpinned and pages which are
-> +	 * marked dirty by vfio_dma_rw()
-> +	 */
-> +	bitmap_clear(dma->bitmap, 0, npages);
-> +	vfio_dma_populate_bitmap(dma, pgsize);
-> +	return 0;
-> +}
-> +
-> +static int verify_bitmap_size(uint64_t npages, uint64_t bitmap_size)
-> +{
-> +	uint64_t bsize;
-> +
-> +	if (!npages || !bitmap_size || (bitmap_size > DIRTY_BITMAP_SIZE_MAX))
-> +		return -EINVAL;
-> +
-> +	bsize = DIRTY_BITMAP_BYTES(npages);
-> +
-> +	if (bitmap_size < bsize)
-> +		return -EINVAL;
-> +
-> +	return 0;
-> +}
-> +
->  static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
->  			     struct vfio_iommu_type1_dma_unmap *unmap)
->  {
-> @@ -1038,16 +1189,16 @@ static int vfio_dma_do_map(struct vfio_iommu *iommu,
->  	unsigned long vaddr = map->vaddr;
->  	size_t size = map->size;
->  	int ret = 0, prot = 0;
-> -	uint64_t mask;
-> +	size_t pgsize;
->  	struct vfio_dma *dma;
->  
->  	/* Verify that none of our __u64 fields overflow */
->  	if (map->size != size || map->vaddr != vaddr || map->iova != iova)
->  		return -EINVAL;
->  
-> -	mask = ((uint64_t)1 << __ffs(vfio_pgsize_bitmap(iommu))) - 1;
-> +	pgsize = (size_t)1 << __ffs(vfio_pgsize_bitmap(iommu));
->  
-> -	WARN_ON(mask & PAGE_MASK);
-> +	WARN_ON((pgsize - 1) & PAGE_MASK);
->  
->  	/* READ/WRITE from device perspective */
->  	if (map->flags & VFIO_DMA_MAP_FLAG_WRITE)
-> @@ -1055,7 +1206,7 @@ static int vfio_dma_do_map(struct vfio_iommu *iommu,
->  	if (map->flags & VFIO_DMA_MAP_FLAG_READ)
->  		prot |= IOMMU_READ;
->  
-> -	if (!prot || !size || (size | iova | vaddr) & mask)
-> +	if (!prot || !size || (size | iova | vaddr) & (pgsize - 1))
->  		return -EINVAL;
->  
->  	/* Don't allow IOVA or virtual address wrap */
-> @@ -1130,6 +1281,12 @@ static int vfio_dma_do_map(struct vfio_iommu *iommu,
->  	else
->  		ret = vfio_pin_map_dma(iommu, dma, size);
->  
-> +	if (!ret && iommu->dirty_page_tracking) {
-> +		ret = vfio_dma_bitmap_alloc(dma, pgsize);
-> +		if (ret)
-> +			vfio_remove_dma(iommu, dma);
-> +	}
-> +
->  out_unlock:
->  	mutex_unlock(&iommu->lock);
->  	return ret;
-> @@ -2278,6 +2435,93 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
->  
->  		return copy_to_user((void __user *)arg, &unmap, minsz) ?
->  			-EFAULT : 0;
-> +	} else if (cmd == VFIO_IOMMU_DIRTY_PAGES) {
-> +		struct vfio_iommu_type1_dirty_bitmap dirty;
-> +		uint32_t mask = VFIO_IOMMU_DIRTY_PAGES_FLAG_START |
-> +				VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP |
-> +				VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP;
-> +		int ret = 0;
-> +
-> +		if (!iommu->v2)
-> +			return -EACCES;
-> +
-> +		minsz = offsetofend(struct vfio_iommu_type1_dirty_bitmap,
-> +				    flags);
-> +
-> +		if (copy_from_user(&dirty, (void __user *)arg, minsz))
-> +			return -EFAULT;
-> +
-> +		if (dirty.argsz < minsz || dirty.flags & ~mask)
-> +			return -EINVAL;
-> +
-> +		/* only one flag should be set at a time */
-> +		if (__ffs(dirty.flags) != __fls(dirty.flags))
-> +			return -EINVAL;
-> +
-> +		if (dirty.flags & VFIO_IOMMU_DIRTY_PAGES_FLAG_START) {
-> +			size_t pgsize = 1 << __ffs(vfio_pgsize_bitmap(iommu));
-> +
-> +			mutex_lock(&iommu->lock);
-> +			if (!iommu->dirty_page_tracking) {
-> +				ret = vfio_dma_bitmap_alloc_all(iommu, pgsize);
-> +				if (!ret)
-> +					iommu->dirty_page_tracking = true;
-> +			}
-> +			mutex_unlock(&iommu->lock);
-> +			return ret;
-> +		} else if (dirty.flags & VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP) {
-> +			mutex_lock(&iommu->lock);
-> +			if (iommu->dirty_page_tracking) {
-> +				iommu->dirty_page_tracking = false;
-> +				vfio_dma_bitmap_free_all(iommu);
-> +			}
-> +			mutex_unlock(&iommu->lock);
-> +			return 0;
-> +		} else if (dirty.flags &
-> +				 VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP) {
-> +			struct vfio_iommu_type1_dirty_bitmap_get range;
-> +			unsigned long pgshift;
-> +			size_t data_size = dirty.argsz - minsz;
-> +			size_t iommu_pgsize =
-> +				 (size_t)1 << __ffs(vfio_pgsize_bitmap(iommu));
-> +
-> +			if (!data_size || data_size < sizeof(range))
-> +				return -EINVAL;
-> +
-> +			if (copy_from_user(&range, (void __user *)(arg + minsz),
-> +					   sizeof(range)))
-> +				return -EFAULT;
-> +
-> +			/* allow only smallest supported pgsize */
-> +			if (range.bitmap.pgsize != iommu_pgsize)
-> +				return -EINVAL;
-> +			if (range.iova & (iommu_pgsize - 1))
-> +				return -EINVAL;
-> +			if (!range.size || range.size & (iommu_pgsize - 1))
-> +				return -EINVAL;
-> +			if (range.iova + range.size < range.iova)
-> +				return -EINVAL;
-> +			if (!access_ok((void __user *)range.bitmap.data,
-> +				       range.bitmap.size))
-> +				return -EINVAL;
-> +
-> +			pgshift = __ffs(range.bitmap.pgsize);
-> +			ret = verify_bitmap_size(range.size >> pgshift,
-> +						 range.bitmap.size);
-> +			if (ret)
-> +				return ret;
-> +
-> +			mutex_lock(&iommu->lock);
-> +			if (iommu->dirty_page_tracking)
-> +				ret = vfio_iova_dirty_bitmap(iommu, range.iova,
-> +						range.size, range.bitmap.pgsize,
-> +						range.bitmap.data);
-> +			else
-> +				ret = -EINVAL;
-> +			mutex_unlock(&iommu->lock);
-> +
-> +			return ret;
-> +		}
->  	}
->  
->  	return -ENOTTY;
-> @@ -2345,10 +2589,20 @@ static int vfio_iommu_type1_dma_rw_chunk(struct vfio_iommu *iommu,
->  
->  	vaddr = dma->vaddr + offset;
->  
-> -	if (write)
-> +	if (write) {
->  		*copied = __copy_to_user((void __user *)vaddr, data,
->  					 count) ? 0 : count;
-> -	else
-> +		if (*copied && iommu->dirty_page_tracking) {
-> +			unsigned long pgshift =
-> +				__ffs(vfio_pgsize_bitmap(iommu));
-> +			/*
-> +			 * Bitmap populated with the smallest supported page
-> +			 * size
-> +			 */
-> +			bitmap_set(dma->bitmap, offset >> pgshift,
-> +				   *copied >> pgshift);
-> +		}
-> +	} else
->  		*copied = __copy_from_user(data, (void __user *)vaddr,
->  					   count) ? 0 : count;
->  	if (kthread)
-> -- 
-> 2.7.0
+On Tue, Apr 07, 2020 at 05:35:57PM -0700, Steve Rutherford wrote:
+> On Tue, Apr 7, 2020 at 5:29 PM Brijesh Singh <brijesh.singh@amd.com> wrote:
+> >
+> >
+> > On 4/7/20 7:01 PM, Steve Rutherford wrote:
+> > > On Mon, Apr 6, 2020 at 10:27 PM Ashish Kalra <ashish.kalra@amd.com> wrote:
+> > >> Hello Steve,
+> > >>
+> > >> On Mon, Apr 06, 2020 at 07:17:37PM -0700, Steve Rutherford wrote:
+> > >>> On Sun, Mar 29, 2020 at 11:22 PM Ashish Kalra <Ashish.Kalra@amd.com> wrote:
+> > >>>> From: Brijesh Singh <Brijesh.Singh@amd.com>
+> > >>>>
+> > >>>> This hypercall is used by the SEV guest to notify a change in the page
+> > >>>> encryption status to the hypervisor. The hypercall should be invoked
+> > >>>> only when the encryption attribute is changed from encrypted -> decrypted
+> > >>>> and vice versa. By default all guest pages are considered encrypted.
+> > >>>>
+> > >>>> Cc: Thomas Gleixner <tglx@linutronix.de>
+> > >>>> Cc: Ingo Molnar <mingo@redhat.com>
+> > >>>> Cc: "H. Peter Anvin" <hpa@zytor.com>
+> > >>>> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> > >>>> Cc: "Radim Krčmář" <rkrcmar@redhat.com>
+> > >>>> Cc: Joerg Roedel <joro@8bytes.org>
+> > >>>> Cc: Borislav Petkov <bp@suse.de>
+> > >>>> Cc: Tom Lendacky <thomas.lendacky@amd.com>
+> > >>>> Cc: x86@kernel.org
+> > >>>> Cc: kvm@vger.kernel.org
+> > >>>> Cc: linux-kernel@vger.kernel.org
+> > >>>> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> > >>>> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+> > >>>> ---
+> > >>>>  Documentation/virt/kvm/hypercalls.rst | 15 +++++
+> > >>>>  arch/x86/include/asm/kvm_host.h       |  2 +
+> > >>>>  arch/x86/kvm/svm.c                    | 95 +++++++++++++++++++++++++++
+> > >>>>  arch/x86/kvm/vmx/vmx.c                |  1 +
+> > >>>>  arch/x86/kvm/x86.c                    |  6 ++
+> > >>>>  include/uapi/linux/kvm_para.h         |  1 +
+> > >>>>  6 files changed, 120 insertions(+)
+> > >>>>
+> > >>>> diff --git a/Documentation/virt/kvm/hypercalls.rst b/Documentation/virt/kvm/hypercalls.rst
+> > >>>> index dbaf207e560d..ff5287e68e81 100644
+> > >>>> --- a/Documentation/virt/kvm/hypercalls.rst
+> > >>>> +++ b/Documentation/virt/kvm/hypercalls.rst
+> > >>>> @@ -169,3 +169,18 @@ a0: destination APIC ID
+> > >>>>
+> > >>>>  :Usage example: When sending a call-function IPI-many to vCPUs, yield if
+> > >>>>                 any of the IPI target vCPUs was preempted.
+> > >>>> +
+> > >>>> +
+> > >>>> +8. KVM_HC_PAGE_ENC_STATUS
+> > >>>> +-------------------------
+> > >>>> +:Architecture: x86
+> > >>>> +:Status: active
+> > >>>> +:Purpose: Notify the encryption status changes in guest page table (SEV guest)
+> > >>>> +
+> > >>>> +a0: the guest physical address of the start page
+> > >>>> +a1: the number of pages
+> > >>>> +a2: encryption attribute
+> > >>>> +
+> > >>>> +   Where:
+> > >>>> +       * 1: Encryption attribute is set
+> > >>>> +       * 0: Encryption attribute is cleared
+> > >>>> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> > >>>> index 98959e8cd448..90718fa3db47 100644
+> > >>>> --- a/arch/x86/include/asm/kvm_host.h
+> > >>>> +++ b/arch/x86/include/asm/kvm_host.h
+> > >>>> @@ -1267,6 +1267,8 @@ struct kvm_x86_ops {
+> > >>>>
+> > >>>>         bool (*apic_init_signal_blocked)(struct kvm_vcpu *vcpu);
+> > >>>>         int (*enable_direct_tlbflush)(struct kvm_vcpu *vcpu);
+> > >>>> +       int (*page_enc_status_hc)(struct kvm *kvm, unsigned long gpa,
+> > >>>> +                                 unsigned long sz, unsigned long mode);
+> > >>> Nit: spell out size instead of sz.
+> > >>>>  };
+> > >>>>
+> > >>>>  struct kvm_arch_async_pf {
+> > >>>> diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
+> > >>>> index 7c2721e18b06..1d8beaf1bceb 100644
+> > >>>> --- a/arch/x86/kvm/svm.c
+> > >>>> +++ b/arch/x86/kvm/svm.c
+> > >>>> @@ -136,6 +136,8 @@ struct kvm_sev_info {
+> > >>>>         int fd;                 /* SEV device fd */
+> > >>>>         unsigned long pages_locked; /* Number of pages locked */
+> > >>>>         struct list_head regions_list;  /* List of registered regions */
+> > >>>> +       unsigned long *page_enc_bmap;
+> > >>>> +       unsigned long page_enc_bmap_size;
+> > >>>>  };
+> > >>>>
+> > >>>>  struct kvm_svm {
+> > >>>> @@ -1991,6 +1993,9 @@ static void sev_vm_destroy(struct kvm *kvm)
+> > >>>>
+> > >>>>         sev_unbind_asid(kvm, sev->handle);
+> > >>>>         sev_asid_free(sev->asid);
+> > >>>> +
+> > >>>> +       kvfree(sev->page_enc_bmap);
+> > >>>> +       sev->page_enc_bmap = NULL;
+> > >>>>  }
+> > >>>>
+> > >>>>  static void avic_vm_destroy(struct kvm *kvm)
+> > >>>> @@ -7593,6 +7598,94 @@ static int sev_receive_finish(struct kvm *kvm, struct kvm_sev_cmd *argp)
+> > >>>>         return ret;
+> > >>>>  }
+> > >>>>
+> > >>>> +static int sev_resize_page_enc_bitmap(struct kvm *kvm, unsigned long new_size)
+> > >>>> +{
+> > >>>> +       struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+> > >>>> +       unsigned long *map;
+> > >>>> +       unsigned long sz;
+> > >>>> +
+> > >>>> +       if (sev->page_enc_bmap_size >= new_size)
+> > >>>> +               return 0;
+> > >>>> +
+> > >>>> +       sz = ALIGN(new_size, BITS_PER_LONG) / 8;
+> > >>>> +
+> > >>>> +       map = vmalloc(sz);
+> > >>>> +       if (!map) {
+> > >>>> +               pr_err_once("Failed to allocate encrypted bitmap size %lx\n",
+> > >>>> +                               sz);
+> > >>>> +               return -ENOMEM;
+> > >>>> +       }
+> > >>>> +
+> > >>>> +       /* mark the page encrypted (by default) */
+> > >>>> +       memset(map, 0xff, sz);
+> > >>>> +
+> > >>>> +       bitmap_copy(map, sev->page_enc_bmap, sev->page_enc_bmap_size);
+> > >>>> +       kvfree(sev->page_enc_bmap);
+> > >>>> +
+> > >>>> +       sev->page_enc_bmap = map;
+> > >>>> +       sev->page_enc_bmap_size = new_size;
+> > >>>> +
+> > >>>> +       return 0;
+> > >>>> +}
+> > >>>> +
+> > >>>> +static int svm_page_enc_status_hc(struct kvm *kvm, unsigned long gpa,
+> > >>>> +                                 unsigned long npages, unsigned long enc)
+> > >>>> +{
+> > >>>> +       struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+> > >>>> +       kvm_pfn_t pfn_start, pfn_end;
+> > >>>> +       gfn_t gfn_start, gfn_end;
+> > >>>> +       int ret;
+> > >>>> +
+> > >>>> +       if (!sev_guest(kvm))
+> > >>>> +               return -EINVAL;
+> > >>>> +
+> > >>>> +       if (!npages)
+> > >>>> +               return 0;
+> > >>>> +
+> > >>>> +       gfn_start = gpa_to_gfn(gpa);
+> > >>>> +       gfn_end = gfn_start + npages;
+> > >>>> +
+> > >>>> +       /* out of bound access error check */
+> > >>>> +       if (gfn_end <= gfn_start)
+> > >>>> +               return -EINVAL;
+> > >>>> +
+> > >>>> +       /* lets make sure that gpa exist in our memslot */
+> > >>>> +       pfn_start = gfn_to_pfn(kvm, gfn_start);
+> > >>>> +       pfn_end = gfn_to_pfn(kvm, gfn_end);
+> > >>>> +
+> > >>>> +       if (is_error_noslot_pfn(pfn_start) && !is_noslot_pfn(pfn_start)) {
+> > >>>> +               /*
+> > >>>> +                * Allow guest MMIO range(s) to be added
+> > >>>> +                * to the page encryption bitmap.
+> > >>>> +                */
+> > >>>> +               return -EINVAL;
+> > >>>> +       }
+> > >>>> +
+> > >>>> +       if (is_error_noslot_pfn(pfn_end) && !is_noslot_pfn(pfn_end)) {
+> > >>>> +               /*
+> > >>>> +                * Allow guest MMIO range(s) to be added
+> > >>>> +                * to the page encryption bitmap.
+> > >>>> +                */
+> > >>>> +               return -EINVAL;
+> > >>>> +       }
+> > >>>> +
+> > >>>> +       mutex_lock(&kvm->lock);
+> > >>>> +       ret = sev_resize_page_enc_bitmap(kvm, gfn_end);
+> > >>>> +       if (ret)
+> > >>>> +               goto unlock;
+> > >>>> +
+> > >>>> +       if (enc)
+> > >>>> +               __bitmap_set(sev->page_enc_bmap, gfn_start,
+> > >>>> +                               gfn_end - gfn_start);
+> > >>>> +       else
+> > >>>> +               __bitmap_clear(sev->page_enc_bmap, gfn_start,
+> > >>>> +                               gfn_end - gfn_start);
+> > >>>> +
+> > >>>> +unlock:
+> > >>>> +       mutex_unlock(&kvm->lock);
+> > >>>> +       return ret;
+> > >>>> +}
+> > >>>> +
+> > >>>>  static int svm_mem_enc_op(struct kvm *kvm, void __user *argp)
+> > >>>>  {
+> > >>>>         struct kvm_sev_cmd sev_cmd;
+> > >>>> @@ -7995,6 +8088,8 @@ static struct kvm_x86_ops svm_x86_ops __ro_after_init = {
+> > >>>>         .need_emulation_on_page_fault = svm_need_emulation_on_page_fault,
+> > >>>>
+> > >>>>         .apic_init_signal_blocked = svm_apic_init_signal_blocked,
+> > >>>> +
+> > >>>> +       .page_enc_status_hc = svm_page_enc_status_hc,
+> > >>>>  };
+> > >>>>
+> > >>>>  static int __init svm_init(void)
+> > >>>> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> > >>>> index 079d9fbf278e..f68e76ee7f9c 100644
+> > >>>> --- a/arch/x86/kvm/vmx/vmx.c
+> > >>>> +++ b/arch/x86/kvm/vmx/vmx.c
+> > >>>> @@ -8001,6 +8001,7 @@ static struct kvm_x86_ops vmx_x86_ops __ro_after_init = {
+> > >>>>         .nested_get_evmcs_version = NULL,
+> > >>>>         .need_emulation_on_page_fault = vmx_need_emulation_on_page_fault,
+> > >>>>         .apic_init_signal_blocked = vmx_apic_init_signal_blocked,
+> > >>>> +       .page_enc_status_hc = NULL,
+> > >>>>  };
+> > >>>>
+> > >>>>  static void vmx_cleanup_l1d_flush(void)
+> > >>>> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> > >>>> index cf95c36cb4f4..68428eef2dde 100644
+> > >>>> --- a/arch/x86/kvm/x86.c
+> > >>>> +++ b/arch/x86/kvm/x86.c
+> > >>>> @@ -7564,6 +7564,12 @@ int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
+> > >>>>                 kvm_sched_yield(vcpu->kvm, a0);
+> > >>>>                 ret = 0;
+> > >>>>                 break;
+> > >>>> +       case KVM_HC_PAGE_ENC_STATUS:
+> > >>>> +               ret = -KVM_ENOSYS;
+> > >>>> +               if (kvm_x86_ops->page_enc_status_hc)
+> > >>>> +                       ret = kvm_x86_ops->page_enc_status_hc(vcpu->kvm,
+> > >>>> +                                       a0, a1, a2);
+> > >>>> +               break;
+> > >>>>         default:
+> > >>>>                 ret = -KVM_ENOSYS;
+> > >>>>                 break;
+> > >>>> diff --git a/include/uapi/linux/kvm_para.h b/include/uapi/linux/kvm_para.h
+> > >>>> index 8b86609849b9..847b83b75dc8 100644
+> > >>>> --- a/include/uapi/linux/kvm_para.h
+> > >>>> +++ b/include/uapi/linux/kvm_para.h
+> > >>>> @@ -29,6 +29,7 @@
+> > >>>>  #define KVM_HC_CLOCK_PAIRING           9
+> > >>>>  #define KVM_HC_SEND_IPI                10
+> > >>>>  #define KVM_HC_SCHED_YIELD             11
+> > >>>> +#define KVM_HC_PAGE_ENC_STATUS         12
+> > >>>>
+> > >>>>  /*
+> > >>>>   * hypercalls use architecture specific
+> > >>>> --
+> > >>>> 2.17.1
+> > >>>>
+> > >>> I'm still not excited by the dynamic resizing. I believe the guest
+> > >>> hypercall can be called in atomic contexts, which makes me
+> > >>> particularly unexcited to see a potentially large vmalloc on the host
+> > >>> followed by filling the buffer. Particularly when the buffer might be
+> > >>> non-trivial in size (~1MB per 32GB, per some back of the envelope
+> > >>> math).
+> > >>>
+> > >> I think looking at more practical situations, most hypercalls will
+> > >> happen during the boot stage, when device specific initializations are
+> > >> happening, so typically the maximum page encryption bitmap size would
+> > >> be allocated early enough.
+> > >>
+> > >> In fact, initial hypercalls made by OVMF will probably allocate the
+> > >> maximum page bitmap size even before the kernel comes up, especially
+> > >> as they will be setting up page enc/dec status for MMIO, ROM, ACPI
+> > >> regions, PCI device memory, etc., and most importantly for
+> > >> "non-existent" high memory range (which will probably be the
+> > >> maximum size page encryption bitmap allocated/resized).
+> > >>
+> > >> Let me know if you have different thoughts on this ?
+> > > Hi Ashish,
+> > >
+> > > If this is not an issue in practice, we can just move past this. If we
+> > > are basically guaranteed that OVMF will trigger hypercalls that expand
+> > > the bitmap beyond the top of memory, then, yes, that should work. That
+> > > leaves me slightly nervous that OVMF might regress since it's not
+> > > obvious that calling a hypercall beyond the top of memory would be
+> > > "required" for avoiding a somewhat indirectly related issue in guest
+> > > kernels.
+> >
+> >
+> > If possible then we should try to avoid growing/shrinking the bitmap .
+> > Today OVMF may not be accessing beyond memory but a malicious guest
+> > could send a hypercall down which can trigger a huge memory allocation
+> > on the host side and may eventually cause denial of service for other.
+> Nice catch! Was just writing up an email about this.
+> > I am in favor if we can find some solution to handle this case. How
+> > about Steve's suggestion about VMM making a call down to the kernel to
+> > tell how big the bitmap should be? Initially it should be equal to the
+> > guest RAM and if VMM ever did the memory expansion then it can send down
+> > another notification to increase the bitmap ?
+> >
+> > Optionally, instead of adding a new ioctl, I was wondering if we can
+> > extend the kvm_arch_prepare_memory_region() to make svm specific x86_ops
+> > which can take read the userspace provided memory region and calculate
+> > the amount of guest RAM managed by the KVM and grow/shrink the bitmap
+> > based on that information. I have not looked deep enough to see if its
+> > doable but if it can work then we can avoid adding yet another ioctl.
+> We also have the set bitmap ioctl in a later patch in this series. We
+> could also use the set ioctl for initialization (it's a little
+> excessive for initialization since there will be an additional
+> ephemeral allocation and a few additional buffer copies, but that's
+> probably fine). An enable_cap has the added benefit of probably being
+> necessary anyway so usermode can disable the migration feature flag.
 > 
+> In general, userspace is going to have to be in direct control of the
+> buffer and its size.
+
+My only practical concern about setting a static bitmap size based on guest
+memory is about the hypercalls being made initially by OVMF to set page
+enc/dec status for ROM, ACPI regions and especially the non-existent
+high memory range. The new ioctl will statically setup bitmap size to 
+whatever guest RAM is specified, say 4G, 8G, etc., but the OVMF
+hypercall for non-existent memory will try to do a hypercall for guest
+physical memory range like ~6G->64G (for 4G guest RAM setup), this
+hypercall will basically have to just return doing nothing, because
+the allocated bitmap won't have this guest physical range available ?
+
+Also, hypercalls for ROM, ACPI, device regions and any memory holes within
+the static bitmap setup as per guest RAM config will work, but what
+about hypercalls for any device regions beyond the guest RAM config ?
+
+Thanks,
+Ashish
