@@ -2,118 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3281E1A1E97
-	for <lists+kvm@lfdr.de>; Wed,  8 Apr 2020 12:12:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 03A381A1EAF
+	for <lists+kvm@lfdr.de>; Wed,  8 Apr 2020 12:21:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727928AbgDHKMN convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Wed, 8 Apr 2020 06:12:13 -0400
-Received: from Galois.linutronix.de ([193.142.43.55]:49398 "EHLO
-        Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726632AbgDHKMN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Apr 2020 06:12:13 -0400
-Received: from p5de0bf0b.dip0.t-ipconnect.de ([93.224.191.11] helo=nanos.tec.linutronix.de)
-        by Galois.linutronix.de with esmtpsa (TLS1.2:DHE_RSA_AES_256_CBC_SHA256:256)
-        (Exim 4.80)
-        (envelope-from <tglx@linutronix.de>)
-        id 1jM7gj-0004in-9o; Wed, 08 Apr 2020 12:12:05 +0200
-Received: by nanos.tec.linutronix.de (Postfix, from userid 1000)
-        id B495C10069D; Wed,  8 Apr 2020 12:12:04 +0200 (CEST)
-From:   Thomas Gleixner <tglx@linutronix.de>
-To:     Andy Lutomirski <luto@amacapital.net>
-Cc:     Vivek Goyal <vgoyal@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Andy Lutomirski <luto@kernel.org>,
+        id S1728154AbgDHKVs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Apr 2020 06:21:48 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:27000 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726846AbgDHKVs (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 8 Apr 2020 06:21:48 -0400
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 038A4Psw071640
+        for <kvm@vger.kernel.org>; Wed, 8 Apr 2020 06:21:47 -0400
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 30920sqeqx-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Wed, 08 Apr 2020 06:21:46 -0400
+Received: from localhost
+        by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <imbrenda@linux.ibm.com>;
+        Wed, 8 Apr 2020 11:21:26 +0100
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
+        by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Wed, 8 Apr 2020 11:21:23 +0100
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 038ALfe254132826
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 8 Apr 2020 10:21:41 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id EA6DBA4051;
+        Wed,  8 Apr 2020 10:21:40 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 7A9D5A404D;
+        Wed,  8 Apr 2020 10:21:40 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.145.10.183])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed,  8 Apr 2020 10:21:40 +0000 (GMT)
+Date:   Wed, 8 Apr 2020 12:21:38 +0200
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        LKML <linux-kernel@vger.kernel.org>, X86 ML <x86@kernel.org>,
-        kvm list <kvm@vger.kernel.org>, stable <stable@vger.kernel.org>
-Subject: Re: [PATCH v2] x86/kvm: Disable KVM_ASYNC_PF_SEND_ALWAYS
-In-Reply-To: <F2BD5266-A9E5-41C8-AC64-CC33EB401B37@amacapital.net>
-References: <877dyqkj3h.fsf@nanos.tec.linutronix.de> <F2BD5266-A9E5-41C8-AC64-CC33EB401B37@amacapital.net>
-Date:   Wed, 08 Apr 2020 12:12:04 +0200
-Message-ID: <87v9mab823.fsf@nanos.tec.linutronix.de>
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        syzbot+d889b59b2bb87d4047a2@syzkaller.appspotmail.com
+Subject: Re: [PATCH 2/2] KVM: s390: Return last valid slot if approx index
+ is out-of-bounds
+In-Reply-To: <20200408064059.8957-3-sean.j.christopherson@intel.com>
+References: <20200408064059.8957-1-sean.j.christopherson@intel.com>
+        <20200408064059.8957-3-sean.j.christopherson@intel.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8BIT
-X-Linutronix-Spam-Score: -1.0
-X-Linutronix-Spam-Level: -
-X-Linutronix-Spam-Status: No , -1.0 points, 5.0 required,  ALL_TRUSTED=-1,SHORTCIRCUIT=-0.0001
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 20040810-0008-0000-0000-0000036CC612
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20040810-0009-0000-0000-00004A8E6302
+Message-Id: <20200408122138.71493308@p-imbrenda>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.676
+ definitions=2020-04-07_10:2020-04-07,2020-04-07 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
+ impostorscore=0 mlxscore=0 malwarescore=0 phishscore=0 priorityscore=1501
+ adultscore=0 lowpriorityscore=0 spamscore=0 bulkscore=0 clxscore=1015
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2004080079
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Andy Lutomirski <luto@amacapital.net> writes:
->> On Apr 7, 2020, at 3:48 PM, Thomas Gleixner <tglx@linutronix.de> wrote:
->>   Inject #MC
->
-> No, not what I meant. Host has two sane choices here IMO:
->
-> 1. Tell the guest that the page is gone as part of the wakeup. No #PF or #MC.
->
-> 2. Tell guest that it’s resolved and inject #MC when the guest
-> retries.  The #MC is a real fault, RIP points to the right place, etc.
+On Tue,  7 Apr 2020 23:40:59 -0700
+Sean Christopherson <sean.j.christopherson@intel.com> wrote:
 
-Ok, that makes sense.
+> Return the index of the last valid slot from gfn_to_memslot_approx()
+> if its binary search loop yielded an out-of-bounds index.  The index
+> can be out-of-bounds if the specified gfn is less than the base of the
+> lowest memslot (which is also the last valid memslot).
+> 
+> Note, the sole caller, kvm_s390_get_cmma(), ensures used_slots is
+> non-zero.
+> 
+> Fixes: afdad61615cc3 ("KVM: s390: Fix storage attributes migration
+> with memory slots") Signed-off-by: Sean Christopherson
+> <sean.j.christopherson@intel.com> ---
+>  arch/s390/kvm/kvm-s390.c | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> index 19a81024fe16..5dcf9ff12828 100644
+> --- a/arch/s390/kvm/kvm-s390.c
+> +++ b/arch/s390/kvm/kvm-s390.c
+> @@ -1939,6 +1939,9 @@ static int gfn_to_memslot_approx(struct
+> kvm_memslots *slots, gfn_t gfn) start = slot + 1;
+>  	}
+>  
+> +	if (start >= slots->used_slots)
+> +		return slots->used_slots - 1;
+> +
+>  	if (gfn >= memslots[start].base_gfn &&
+>  	    gfn < memslots[start].base_gfn + memslots[start].npages)
+> { atomic_set(&slots->lru_slot, start);
 
->>> 1. Access to bad memory results in an async-page-not-present, except
->>> that, it’s not deliverable, the guest is killed.
->> 
->> That's incorrect. The proper reaction is a real #PF. Simply because this
->> is part of the contract of sharing some file backed stuff between host
->> and guest in a well defined "virtio" scenario and not a random access to
->> memory which might be there or not.
->
-> The problem is that the host doesn’t know when #PF is safe. It’s sort
-> of the same problem that async pf has now.  The guest kernel could
-> access the problematic page in the middle of an NMI, under
-> pagefault_disable(), etc — getting #PF as a result of CPL0 access to a
-> page with a valid guest PTE is simply not part of the x86
-> architecture.
+on s390 memory always starts at 0; you can't even boot a system missing
+the first pages of physical memory, so this means this situation would
+never happen in practice. 
 
-Fair enough. 
+of course, a malicious userspace program could create an (unbootable) VM
+and trigger this bug, so the patch itself makes sense.
 
-> Replace copy_to_user() with some access to a gup-ed mapping with no
-> extable handler and it doesn’t look so good any more.
+Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
 
-In this case the guest needs to die.
-
-> Of course, the guest will oops if this happens, but the guest needs to
-> be able to oops cleanly. #PF is too fragile for this because it’s not
-> IST, and #PF is the wrong thing anyway — #PF is all about
-> guest-virtual-to-guest-physical mappings.  Heck, what would CR2 be?
-> The host might not even know the guest virtual address.
-
-It knows, but I can see your point.
-
->>> 2. Access to bad memory results in #MC.  Sure, #MC is a turd, but it’s
->>> an *architectural* turd. By all means, have a nice simple PV mechanism
->>> to tell the #MC code exactly what went wrong, but keep the overall
->>> flow the same as in the native case.
->> 
->> It's a completely different flow as you evaluate PV turd instead of
->> analysing the MCE banks and the other error reporting facilities.
->
-> I’m fine with the flow being different. do_machine_check() could have
-> entirely different logic to decide the error in PV.  But I think we
-> should reuse the overall flow: kernel gets #MC with RIP pointing to
-> the offending instruction. If there’s an extable entry that can handle
-> memory failure, handle it. If it’s a user access, handle it.  If it’s
-> an unrecoverable error because it was a non-extable kernel access,
-> oops or panic.
->
-> The actual PV part could be extremely simple: the host just needs to
-> tell the guest “this #MC is due to memory failure at this guest
-> physical address”.  No banks, no DIMM slot, no rendezvous crap (LMCE),
-> no other nonsense.  It would be nifty if the host also told the guest
-> what the guest virtual address was if the host knows it.
-
-It does. The EPT violations store:
-
-  - guest-linear address
-  - guest-physical address
-
-That's also part of the #VE exception to which Paolo was referring.
-
-Thanks,
-
-        tglx
