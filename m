@@ -2,76 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id EBCB41A1D57
-	for <lists+kvm@lfdr.de>; Wed,  8 Apr 2020 10:24:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 091551A1DE3
+	for <lists+kvm@lfdr.de>; Wed,  8 Apr 2020 11:08:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726792AbgDHIYI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Apr 2020 04:24:08 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:55328 "EHLO
+        id S1727049AbgDHJIw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Apr 2020 05:08:52 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:44392 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726663AbgDHIYH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Apr 2020 04:24:07 -0400
+        with ESMTP id S1726965AbgDHJIv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Apr 2020 05:08:51 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1586334244;
+        s=mimecast20190719; t=1586336930;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=V8GBvWJYx/17VO9qjtI+ZZsm46USQUPFYArvzlSyCX0=;
-        b=K74f9AF8YPsR8X1ACUhg8+0qaL4PwbUbt6f6pZudYbGyvaQyRgS/ZOAVV9N2/Pv4JZCOHV
-        t3XOlxE4iCCy6uFFchHazaI+4svgxU+twgzFQHI1OzQtRjp2ntFYQ+B5+0E1S7uZSVo7hQ
-        z9Shl/1fZU3W8vyJkEentrUlCfzqcqc=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-196-R3va4jjIMmCsA1eLkZigxg-1; Wed, 08 Apr 2020 04:24:03 -0400
-X-MC-Unique: R3va4jjIMmCsA1eLkZigxg-1
-Received: by mail-wr1-f72.google.com with SMTP id h95so3584983wrh.11
-        for <kvm@vger.kernel.org>; Wed, 08 Apr 2020 01:24:03 -0700 (PDT)
+        bh=rUQ0HsWwrnHe34YtREcTfNzNUJOF3IAdDb38I5AaKxE=;
+        b=itEESRTj8Om5ZYwi/41vWFHLEJ0IARFjEfitxIG5rJdBJ71HmmlSGlX4hx8/yjrZbfaVxc
+        wr9AOJpCsPMPVttoDJHAS96xJeWO/8ldj3sH0mBQJLchuydSE2jOI+GAoAbN6WCP3tk1Zb
+        v2M2kDyNQ/ZtN8I2IOzV/uo+pm8Q7QY=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-470-xYrrIhXxNJWEYiSQqvgQHA-1; Wed, 08 Apr 2020 05:08:49 -0400
+X-MC-Unique: xYrrIhXxNJWEYiSQqvgQHA-1
+Received: by mail-wm1-f69.google.com with SMTP id f81so2091372wmf.2
+        for <kvm@vger.kernel.org>; Wed, 08 Apr 2020 02:08:49 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=V8GBvWJYx/17VO9qjtI+ZZsm46USQUPFYArvzlSyCX0=;
-        b=frk+SUiu8BJyqSl0xGmveIeV5J7+dsu3qu2JFSc8VKHjvZXgoCvYEeDs13nQzxJJL5
-         dTlJZL86nvES4tXHa2AkUvwn4vpGt2RxgxTp2xfSXQZDfjaulR2RX4Y89EOx8307JBbE
-         4SW3Tm+6CHcDtMgYx27XgovTz6uYoGaTd5p48uYZ7eXdJYfXYUFNvKJXGNSOXYdAa6jk
-         C/xAXfjoB7ueIJW/Vjc0oFkOgqPCz53n/x+0679UFh77oXfsTWSFXWElwFAaIb9THx8l
-         j0vntGPCbB5a36ODdr2beEDqz+xdg9KUNC246QJ0RoHTiW+nhbjcIUUOYCRHSaow5F7D
-         4LCg==
-X-Gm-Message-State: AGi0PuaD20yC9rpGu+6MIFKSejnZrDP9nzyr6uhZOJ54NVQ6s3A9IqDU
-        X3nvzRDN2epSG60OAHFWNGk51yMXcp1N5+NFRFZgGmGgqCCDpgyvioAGBAvt6gvWzZetNvZVQoD
-        KEFqK5oSWnEcq
-X-Received: by 2002:a1c:7301:: with SMTP id d1mr3651740wmb.26.1586334242037;
-        Wed, 08 Apr 2020 01:24:02 -0700 (PDT)
-X-Google-Smtp-Source: APiQypLRHkZKamZXG95b7dvVdIZL49HfD4EV4KT2DnjNBTmCibYNUX8cjaACuR1soo87T9jeXOkUzA==
-X-Received: by 2002:a1c:7301:: with SMTP id d1mr3651721wmb.26.1586334241722;
-        Wed, 08 Apr 2020 01:24:01 -0700 (PDT)
-Received: from [192.168.10.150] ([93.56.170.5])
-        by smtp.gmail.com with ESMTPSA id f14sm5818101wmb.3.2020.04.08.01.24.00
+        bh=rUQ0HsWwrnHe34YtREcTfNzNUJOF3IAdDb38I5AaKxE=;
+        b=Ag4ep0t1tH639EISYj0efbGF+ORbHAOLSAMpykNGD8wCcgaE0NCstHPWYstV1Xz/ei
+         LkgAT01LDF9NLjUvOAhbxTDOELEPAMlYYRmUAlAV+ffzxhvSBZXiZmv6AZGgMTNw2S3w
+         qKFclGuzxX9UFGm95VLZ8EhGUGXpG6w30UlTwsXpyP5bMOlS1VNnSaYvmgseo3Imli6z
+         RPbd5ucAG1ylSW0pmAfGXX4F9KBXOD1N69kpz7fctcxTmF2FJLKRW5K6Ps0/5V4X+L5h
+         yrLu+Te6isuZL6aZRXPZ3026Zmwf13VAdqjIa7l7RGJtvtAegpsHYvfKsUBkkfbLoIQ3
+         9OQA==
+X-Gm-Message-State: AGi0PubNyrTjaGucFmu/h7i25mWwMnD4zE6FuksdmCcpYf5GUTOlSqKj
+        e9nDRdl8I/lr3YFAC29TexIXwCAPCpc0W13PuysotdlykUCK+RbutsX4SyGb+FbI6jA4DVTBbxr
+        zA+3wTwWz53sM
+X-Received: by 2002:a7b:cd89:: with SMTP id y9mr3752574wmj.102.1586336928252;
+        Wed, 08 Apr 2020 02:08:48 -0700 (PDT)
+X-Google-Smtp-Source: APiQypLe1s1nvra2eXvOVyXKoy+DeFW86EqO9pdanw+EMwQcEuocAwsAGqIDuWH/3Mfnb2xLGbG1mA==
+X-Received: by 2002:a7b:cd89:: with SMTP id y9mr3752550wmj.102.1586336928006;
+        Wed, 08 Apr 2020 02:08:48 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:bd61:914:5c2f:2580? ([2001:b07:6468:f312:bd61:914:5c2f:2580])
+        by smtp.gmail.com with ESMTPSA id s6sm5804360wmh.17.2020.04.08.02.08.47
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 08 Apr 2020 01:24:01 -0700 (PDT)
-Subject: Re: [PATCH v2] x86/kvm: Disable KVM_ASYNC_PF_SEND_ALWAYS
-To:     Thomas Gleixner <tglx@linutronix.de>,
-        Andy Lutomirski <luto@amacapital.net>,
-        Vivek Goyal <vgoyal@redhat.com>
-Cc:     Peter Zijlstra <peterz@infradead.org>,
-        Andy Lutomirski <luto@kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>, X86 ML <x86@kernel.org>,
-        kvm list <kvm@vger.kernel.org>, stable <stable@vger.kernel.org>
-References: <20200407172140.GB64635@redhat.com>
- <772A564B-3268-49F4-9AEA-CDA648F6131F@amacapital.net>
- <87eeszjbe6.fsf@nanos.tec.linutronix.de>
- <ce81c95f-8674-4012-f307-8f32d0e386c2@redhat.com>
- <874ktukhku.fsf@nanos.tec.linutronix.de>
+        Wed, 08 Apr 2020 02:08:47 -0700 (PDT)
+Subject: Re: [PATCH 2/2] KVM: s390: Return last valid slot if approx index is
+ out-of-bounds
+To:     Cornelia Huck <cohuck@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        syzbot+d889b59b2bb87d4047a2@syzkaller.appspotmail.com
+References: <20200408064059.8957-1-sean.j.christopherson@intel.com>
+ <20200408064059.8957-3-sean.j.christopherson@intel.com>
+ <20200408091024.14a0d096.cohuck@redhat.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <274f3d14-08ac-e5cc-0b23-e6e0274796c8@redhat.com>
-Date:   Wed, 8 Apr 2020 10:23:58 +0200
+Message-ID: <2701fd49-4cf8-2b2d-daa8-96945ea4f233@redhat.com>
+Date:   Wed, 8 Apr 2020 11:08:44 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <874ktukhku.fsf@nanos.tec.linutronix.de>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <20200408091024.14a0d096.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
@@ -79,85 +78,26 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 08/04/20 01:21, Thomas Gleixner wrote:
-> Paolo Bonzini <pbonzini@redhat.com> writes:
+On 08/04/20 09:10, Cornelia Huck wrote:
+> On Tue,  7 Apr 2020 23:40:59 -0700
+> Sean Christopherson <sean.j.christopherson@intel.com> wrote:
 > 
->> On 07/04/20 22:20, Thomas Gleixner wrote:
->>>>> Havind said that, I thought disabling interrupts does not mask exceptions.
->>>>> So page fault exception should have been delivered even with interrupts
->>>>> disabled. Is that correct? May be there was no vm exit/entry during
->>>>> those 10 seconds and that's why.
->>> No. Async PF is not a real exception. It has interrupt semantics and it
->>> can only be injected when the guest has interrupts enabled. It's bad
->>> design.
+>> Return the index of the last valid slot from gfn_to_memslot_approx() if
+>> its binary search loop yielded an out-of-bounds index.  The index can
+>> be out-of-bounds if the specified gfn is less than the base of the
+>> lowest memslot (which is also the last valid memslot).
 >>
->> Page-ready async PF has interrupt semantics.
+>> Note, the sole caller, kvm_s390_get_cmma(), ensures used_slots is
+>> non-zero.
 >>
->> Page-not-present async PF however does not have interrupt semantics, it
->> has to be injected immediately or not at all (falling back to host page
->> fault in the latter case).
+> This also should be cc:stable, with the dependency expressed as
+> mentioned by Christian.
 > 
-> If interrupts are disabled in the guest then it is NOT injected and the
-> guest is suspended. So it HAS interrupt semantics. Conditional ones,
-> i.e. if interrupts are disabled, bail, if not then inject it.
 
-Interrupts can be delayed by TPR or STI/MOV SS interrupt window, async
-page faults cannot (again, not the page-ready kind).  Page-not-present
-async page faults are almost a perfect match for the hardware use of #VE
-(and it might even be possible to let the processor deliver the
-exceptions).  There are other advantages:
+So,
 
-- the only real problem with using #PF (with or without
-KVM_ASYNC_PF_SEND_ALWAYS) seems to be the NMI reentrancy issue, which
-would not be there for #VE.
-
-- #VE are combined the right way with other exceptions (the
-benign/contributory/pagefault stuff)
-
-- adjusting KVM and Linux to use #VE instead of #PF would be less than
-100 lines of code.
+Cc: stable@vger.kernel.org # 4.19.x: 0774a964ef56: KVM: Fix out of range accesses to memslots
+Cc: stable@vger.kernel.org # 4.19.x
 
 Paolo
-
-> But that does not make it an exception by any means.
-> 
-> It never should have been hooked to #PF in the first place and it never
-> should have been named that way. The functionality is to opportunisticly
-> tell the guest to do some other stuff.
-> 
-> So the proper name for this seperate interrupt vector would be:
-> 
->    VECTOR_OMG_DOS - Opportunisticly Make Guest Do Other Stuff
-> 
-> and the counter part
-> 
->    VECTOR_STOP_DOS - Stop Doing Other Stuff 
-> 
->> So page-not-present async PF definitely needs to be an exception, this
->> is independent of whether it can be injected when IF=0.
-> 
-> That wants to be a straight #PF. See my reply to Andy.
-> 
->> Hypervisors do not have any reserved exception vector, and must use
->> vectors up to 31, which is why I believe #PF was used in the first place
->> (though that predates my involvement in KVM by a few years).
-> 
-> No. That was just bad taste or something worse. It has nothing to do
-> with exceptions, see above. Stop proliferating the confusion.
-> 
->> These days, #VE would be a much better exception to use instead (and
->> it also has a defined mechanism to avoid reentrancy).
-> 
-> #VE is not going to solve anything.
-> 
-> The idea of OMG_DOS is to (opportunisticly) avoid that the guest (and
-> perhaps host) sit idle waiting for I/O until the fault has been
-> resolved. That makes sense as there might be enough other stuff to do
-> which does not depend on that particular page. If not then fine, the
-> guest will go idle.
-> 
-> Thanks,
-> 
->         tglx
-> 
 
