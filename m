@@ -2,176 +2,171 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 79D881A3C3D
-	for <lists+kvm@lfdr.de>; Fri, 10 Apr 2020 00:09:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B42E01A3CA7
+	for <lists+kvm@lfdr.de>; Fri, 10 Apr 2020 01:00:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727018AbgDIWJ0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Apr 2020 18:09:26 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:59139 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727014AbgDIWJ0 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 9 Apr 2020 18:09:26 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1586470166;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:in-reply-to:in-reply-to:references:references;
-        bh=2/vT38a92CxMDV5AySIIMoRmqL/zw+wuSd/gBRwuZNI=;
-        b=HysT26o22kYZmbhSvUdKjg5gN38/iwvsPdTmK+EnwTxCiNSBM8DbhVqalFvJmaRY/iCCuE
-        RTqvT3AoTlHh2u5+/b5nLqD0ANpkHpZBBD3AFO4U0G7dixmVigtSEpwy6zvOQmhhQ0Cz17
-        XxTPbq5ahAxoeVWC6REe8Nzp4xwwSEA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-277-hT0rB7c6MXSRdmznRLPhhA-1; Thu, 09 Apr 2020 18:09:24 -0400
-X-MC-Unique: hT0rB7c6MXSRdmznRLPhhA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 126988017F5;
-        Thu,  9 Apr 2020 22:09:23 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-116-15.gru2.redhat.com [10.97.116.15])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 77FD19D348;
-        Thu,  9 Apr 2020 22:09:19 +0000 (UTC)
-From:   Wainer dos Santos Moschetta <wainersm@redhat.com>
-To:     pbonzini@redhat.com, kvm@vger.kernel.org
-Cc:     drjones@redhat.com, david@redhat.com, linux-kernel@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, krish.sadhukhan@oracle.com
-Subject: [PATCH v5 2/2] selftests: kvm: Add mem_slot_test test
-Date:   Thu,  9 Apr 2020 19:09:05 -0300
-Message-Id: <20200409220905.26573-3-wainersm@redhat.com>
-In-Reply-To: <20200409220905.26573-1-wainersm@redhat.com>
-References: <20200409220905.26573-1-wainersm@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+        id S1726858AbgDIXAg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Apr 2020 19:00:36 -0400
+Received: from mail-qt1-f196.google.com ([209.85.160.196]:42365 "EHLO
+        mail-qt1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726722AbgDIXAf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Apr 2020 19:00:35 -0400
+Received: by mail-qt1-f196.google.com with SMTP id b10so214132qtt.9
+        for <kvm@vger.kernel.org>; Thu, 09 Apr 2020 16:00:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=lca.pw; s=google;
+        h=mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=9za1cgL5saDGUL4ncdk/vOmVKH89NTfUqWctXJV+wKg=;
+        b=E55hQkfn3hQcBkJrMLs3sEnbbLpotAAeVJqDeDykwBSnbW0eLW6xgjXoIWc2skM5lr
+         qGc8uv0RURI88S2jAw6upuDwEtQI09MviDMZR9fIR8NjL8PTWvnrUJOgvGIyLBYS2cR1
+         f+NHmTKB9MgRErhKbEdkCHgyJ0gBiVSS1SPM1Xbkrjes67HLpXSIa8Oo1w6rdrjEYUFX
+         0Z+NQhrLstrEmFjchg9kT+TcmmUewZIPmh8J79bIN7Pgv/8IH4ZCYBhoTi9o0alszVmm
+         LhOgV+yhdrMnO01IN9AJVrQKMs9kQsMDh2WItUR55E3y99PWT7e1YM2WTSQCRP/UOuc7
+         4Iow==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=9za1cgL5saDGUL4ncdk/vOmVKH89NTfUqWctXJV+wKg=;
+        b=tAxF+IFS/flfJ3BoJQ7+EVC3WcEduuJ1fk8hqt08XclirX55mYNDzx+q10rpNNmZh+
+         cd6Saacn9og4RZUDv0yx3hIWZVmtYTmB9nX4ZEcL/oNDEXkdWac8ZfOWbpgrqYP+S3SW
+         dcCpRUs63Jd/ohwWrdaWilLE9Sgiv+JWpmN6WmAxqvZjHkZ2AxltaaabrUKPNJbW0Q/1
+         Iorb1nG0yusOXWMXvgtw9zPcRetoCG4auak3tN1hNBWF9N+pMTjLUoBKOCjBc8AQ501B
+         4MKnphaagrMGV4YC5eW56Vd71xE9SJW8w/l7xHW1X/U+bBqfx1Vbqr6Z4pXkrowQZE5b
+         2fSw==
+X-Gm-Message-State: AGi0PuYjIGLXcSOb7pIuj7LsHy5WA7zgkZ5Gm2mW6g1QGRZnQ12gBvqA
+        b8u5UOOzSp/smt5UvDmgX0bASQ==
+X-Google-Smtp-Source: APiQypJdEEO70ZVe9KDCzZVVqzsacezTot/Ht3b6zFQgwbRkUwZNwI5Z7LJvvFZfXqg9UKnMME8f3g==
+X-Received: by 2002:ac8:7286:: with SMTP id v6mr1775597qto.299.1586473233327;
+        Thu, 09 Apr 2020 16:00:33 -0700 (PDT)
+Received: from [192.168.1.153] (pool-71-184-117-43.bstnma.fios.verizon.net. [71.184.117.43])
+        by smtp.gmail.com with ESMTPSA id 69sm226385qki.131.2020.04.09.16.00.32
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 09 Apr 2020 16:00:32 -0700 (PDT)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
+Subject: Re: KCSAN + KVM = host reset
+From:   Qian Cai <cai@lca.pw>
+In-Reply-To: <B5F0F530-911E-4B75-886A-9D8C54FF49C8@lca.pw>
+Date:   Thu, 9 Apr 2020 19:00:31 -0400
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        "paul E. McKenney" <paulmck@kernel.org>,
+        kasan-dev <kasan-dev@googlegroups.com>,
+        LKML <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <DF45D739-59F3-407C-BE8C-2B1E164B493B@lca.pw>
+References: <E180B225-BF1E-4153-B399-1DBF8C577A82@lca.pw>
+ <fb39d3d2-063e-b828-af1c-01f91d9be31c@redhat.com>
+ <017E692B-4791-46AD-B9ED-25B887ECB56B@lca.pw>
+ <CANpmjNMiHNVh3BVxZUqNo4jW3DPjoQPrn-KEmAJRtSYORuryEA@mail.gmail.com>
+ <B7F7F73E-EE27-48F4-A5D0-EBB29292913E@lca.pw>
+ <CANpmjNMEgc=+bLU472jy37hYPYo5_c+Kbyti8-mubPsEGBrm3A@mail.gmail.com>
+ <2730C0CC-B8B5-4A65-A4ED-9DFAAE158AA6@lca.pw>
+ <CANpmjNNUn9_Q30CSeqbU_TNvaYrMqwXkKCA23xO4ZLr2zO0w9Q@mail.gmail.com>
+ <B5F0F530-911E-4B75-886A-9D8C54FF49C8@lca.pw>
+To:     Marco Elver <elver@google.com>
+X-Mailer: Apple Mail (2.3608.80.23.2.2)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This patch introduces the mem_slot_test test which checks
-an VM can have added memory slots up to the limit defined in
-KVM_CAP_NR_MEMSLOTS. Then attempt to add one more slot to
-verify it fails as expected.
 
-Signed-off-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
-Reviewed-by: Andrew Jones <drjones@redhat.com>
----
- tools/testing/selftests/kvm/.gitignore      |  1 +
- tools/testing/selftests/kvm/Makefile        |  3 +
- tools/testing/selftests/kvm/mem_slot_test.c | 69 +++++++++++++++++++++
- 3 files changed, 73 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/mem_slot_test.c
 
-diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
-index 16877c3daabf..127d27188427 100644
---- a/tools/testing/selftests/kvm/.gitignore
-+++ b/tools/testing/selftests/kvm/.gitignore
-@@ -21,4 +21,5 @@
- /demand_paging_test
- /dirty_log_test
- /kvm_create_max_vcpus
-+/mem_slot_test
- /steal_time
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index 712a2ddd2a27..338b6cdce1a0 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -32,12 +32,14 @@ TEST_GEN_PROGS_x86_64 += clear_dirty_log_test
- TEST_GEN_PROGS_x86_64 += demand_paging_test
- TEST_GEN_PROGS_x86_64 += dirty_log_test
- TEST_GEN_PROGS_x86_64 += kvm_create_max_vcpus
-+TEST_GEN_PROGS_x86_64 += mem_slot_test
- TEST_GEN_PROGS_x86_64 += steal_time
- 
- TEST_GEN_PROGS_aarch64 += clear_dirty_log_test
- TEST_GEN_PROGS_aarch64 += demand_paging_test
- TEST_GEN_PROGS_aarch64 += dirty_log_test
- TEST_GEN_PROGS_aarch64 += kvm_create_max_vcpus
-+TEST_GEN_PROGS_aarch64 += mem_slot_test
- TEST_GEN_PROGS_aarch64 += steal_time
- 
- TEST_GEN_PROGS_s390x = s390x/memop
-@@ -46,6 +48,7 @@ TEST_GEN_PROGS_s390x += s390x/sync_regs_test
- TEST_GEN_PROGS_s390x += demand_paging_test
- TEST_GEN_PROGS_s390x += dirty_log_test
- TEST_GEN_PROGS_s390x += kvm_create_max_vcpus
-+TEST_GEN_PROGS_s390x += mem_slot_test
- 
- TEST_GEN_PROGS += $(TEST_GEN_PROGS_$(UNAME_M))
- LIBKVM += $(LIBKVM_$(UNAME_M))
-diff --git a/tools/testing/selftests/kvm/mem_slot_test.c b/tools/testing/selftests/kvm/mem_slot_test.c
-new file mode 100644
-index 000000000000..3cab22fa6bd6
---- /dev/null
-+++ b/tools/testing/selftests/kvm/mem_slot_test.c
-@@ -0,0 +1,69 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * mem_slot_test
-+ *
-+ * Copyright (C) 2020, Red Hat, Inc.
-+ *
-+ * Test suite for memory region operations.
-+ */
-+#define _GNU_SOURCE /* for program_invocation_short_name */
-+#include <linux/kvm.h>
-+#include <sys/mman.h>
-+
-+#include "test_util.h"
-+#include "kvm_util.h"
-+
-+/*
-+ * Test it can be added memory slots up to KVM_CAP_NR_MEMSLOTS, then any
-+ * tentative to add further slots should fail.
-+ */
-+static void test_add_max_slots(void)
-+{
-+	int ret;
-+	struct kvm_vm *vm;
-+	uint32_t max_mem_slots;
-+	uint32_t slot;
-+	uint64_t guest_addr = 0x0;
-+	uint64_t mem_reg_npages;
-+	uint64_t mem_reg_size = 0x100000; /* Aligned 1MB is needed for s390x */
-+	void *mem;
-+
-+	max_mem_slots = kvm_check_cap(KVM_CAP_NR_MEMSLOTS);
-+	TEST_ASSERT(max_mem_slots > 0,
-+		    "KVM_CAP_NR_MEMSLOTS should be greater than 0");
-+	pr_info("Allowed number of memory slots: %i\n", max_mem_slots);
-+
-+	vm = vm_create(VM_MODE_DEFAULT, 0, O_RDWR);
-+
-+	mem_reg_npages = vm_calc_num_guest_pages(VM_MODE_DEFAULT, mem_reg_size);
-+
-+	/* Check it can be added memory slots up to the maximum allowed */
-+	pr_info("Adding slots 0..%i, each memory region with %ldK size\n",
-+		(max_mem_slots - 1), mem_reg_size >> 10);
-+	for (slot = 0; slot < max_mem_slots; slot++) {
-+		vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS,
-+					    guest_addr, slot, mem_reg_npages,
-+					    0);
-+		guest_addr += mem_reg_size;
-+	}
-+
-+	/* Check it cannot be added memory slots beyond the limit */
-+	mem = mmap(NULL, mem_reg_size, PROT_READ | PROT_WRITE,
-+		   MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-+	TEST_ASSERT(mem != MAP_FAILED, "Failed to mmap() host");
-+
-+	ret = ioctl(vm_get_fd(vm), KVM_SET_USER_MEMORY_REGION,
-+		    &(struct kvm_userspace_memory_region) {slot, 0, guest_addr,
-+		    mem_reg_size, (uint64_t) mem});
-+	TEST_ASSERT(ret == -1 && errno == EINVAL,
-+		    "Adding one more memory slot should fail with EINVAL");
-+
-+	munmap(mem, mem_reg_size);
-+	kvm_vm_free(vm);
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	test_add_max_slots();
-+	return 0;
-+}
--- 
-2.17.2
+> On Apr 9, 2020, at 5:28 PM, Qian Cai <cai@lca.pw> wrote:
+>=20
+>=20
+>=20
+>> On Apr 9, 2020, at 12:03 PM, Marco Elver <elver@google.com> wrote:
+>>=20
+>> On Thu, 9 Apr 2020 at 17:30, Qian Cai <cai@lca.pw> wrote:
+>>>=20
+>>>=20
+>>>=20
+>>>> On Apr 9, 2020, at 11:22 AM, Marco Elver <elver@google.com> wrote:
+>>>>=20
+>>>> On Thu, 9 Apr 2020 at 17:10, Qian Cai <cai@lca.pw> wrote:
+>>>>>=20
+>>>>>=20
+>>>>>=20
+>>>>>> On Apr 9, 2020, at 3:03 AM, Marco Elver <elver@google.com> wrote:
+>>>>>>=20
+>>>>>> On Wed, 8 Apr 2020 at 23:29, Qian Cai <cai@lca.pw> wrote:
+>>>>>>>=20
+>>>>>>>=20
+>>>>>>>=20
+>>>>>>>> On Apr 8, 2020, at 5:25 PM, Paolo Bonzini <pbonzini@redhat.com> =
+wrote:
+>>>>>>>>=20
+>>>>>>>> On 08/04/20 22:59, Qian Cai wrote:
+>>>>>>>>> Running a simple thing on this AMD host would trigger a reset =
+right away.
+>>>>>>>>> Unselect KCSAN kconfig makes everything work fine (the host =
+would also
+>>>>>>>>> reset If only "echo off > /sys/kernel/debug/kcsan=E2=80=9D =
+before running qemu-kvm).
+>>>>>>>>=20
+>>>>>>>> Is this a regression or something you've just started to play =
+with?  (If
+>>>>>>>> anything, the assembly language conversion of the AMD world =
+switch that
+>>>>>>>> is in linux-next could have reduced the likelihood of such a =
+failure,
+>>>>>>>> not increased it).
+>>>>>>>=20
+>>>>>>> I don=E2=80=99t remember I had tried this combination before, so =
+don=E2=80=99t know if it is a
+>>>>>>> regression or not.
+>>>>>>=20
+>>>>>> What happens with KASAN? My guess is that, since it also happens =
+with
+>>>>>> "off", something that should not be instrumented is being
+>>>>>> instrumented.
+>>>>>=20
+>>>>> No, KASAN + KVM works fine.
+>>>>>=20
+>>>>>>=20
+>>>>>> What happens if you put a 'KCSAN_SANITIZE :=3D n' into
+>>>>>> arch/x86/kvm/Makefile? Since it's hard for me to reproduce on =
+this
+>>>>>=20
+>>>>> Yes, that works, but this below alone does not work,
+>>>>>=20
+>>>>> KCSAN_SANITIZE_kvm-amd.o :=3D n
+>>>>=20
+>>>> There are some other files as well, that you could try until you =
+hit
+>>>> the right one.
+>>>>=20
+>>>> But since this is in arch, 'KCSAN_SANITIZE :=3D n' wouldn't be too =
+bad
+>>>> for now. If you can't narrow it down further, do you want to send a
+>>>> patch?
+>>>=20
+>>> No, that would be pretty bad because it will disable KCSAN for Intel
+>>> KVM as well which is working perfectly fine right now. It is only =
+AMD
+>>> is broken.
+>>=20
+>> Interesting. Unfortunately I don't have access to an AMD machine =
+right now.
+>>=20
+>> Actually I think it should be:
+>>=20
+>> KCSAN_SANITIZE_svm.o :=3D n
+>> KCSAN_SANITIZE_pmu_amd.o :=3D n
+>>=20
+>> If you want to disable KCSAN for kvm-amd.
+>=20
+> KCSAN_SANITIZE_svm.o :=3D n
+>=20
+> That alone works fine. I am wondering which functions there could =
+trigger
+> perhaps some kind of recursing with KCSAN?
 
+Another data point is set CONFIG_KCSAN_INTERRUPT_WATCHER=3Dn alone
+also fixed the issue. I saw quite a few interrupt related function in =
+svm.c, so
+some interrupt-related recursion going on?=
