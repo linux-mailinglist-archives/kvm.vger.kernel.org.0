@@ -2,158 +2,141 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 731B81A3179
-	for <lists+kvm@lfdr.de>; Thu,  9 Apr 2020 11:03:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 074141A319D
+	for <lists+kvm@lfdr.de>; Thu,  9 Apr 2020 11:15:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726582AbgDIJDz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Apr 2020 05:03:55 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:57248 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1725828AbgDIJDz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Apr 2020 05:03:55 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1586423034;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=8kQ7lBIYRxVIllP8WU3yr1RLlp3Ki4sY9tIMcm8NLXo=;
-        b=IVNcAyufctBLzc53jkAutcUvY2tu2GD0XxJwmWuZEKz1ujU+Ius/XKI0SpLX5nKI+6+Tc1
-        P0fTsVR9sCSfLPG0ffySnfeA5mIW3sen/T3iDzPl23Ntl7omZ1BFx4jPHoVtIXFk4b+cLe
-        b11CIjVlPGb+nWxHIyHYl+pdHgqnqRI=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-162-wD_fSL0HPfOsZ9Fg-KveGg-1; Thu, 09 Apr 2020 05:03:53 -0400
-X-MC-Unique: wD_fSL0HPfOsZ9Fg-KveGg-1
-Received: by mail-wr1-f72.google.com with SMTP id d4so6027676wrq.10
-        for <kvm@vger.kernel.org>; Thu, 09 Apr 2020 02:03:53 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=8kQ7lBIYRxVIllP8WU3yr1RLlp3Ki4sY9tIMcm8NLXo=;
-        b=scr1P4q+Ka5yVgsHGzJsoQyDQU5drmcS+yvq3ifsuipgtDuA2Wnfi0cyXb8eU6YFrE
-         1YLYhW9U+QvzQOX5f2lctCiFNxPDrmM8BxEIzFPmC0QUGTSB7n8YgjBlhLvgVc2o2uKA
-         aYTAg0yG/f8pTW9alKxIoFPBu8IGiGBZWC82yuLsZd2jVVptUp861pdqQX93N61v6lSX
-         jhsGpCSp+uYG0xS2zTLylqSLALqUVOL9uYjnVhGHG154+AwsIqql9GY3LyC31XPTZUBm
-         PlHYuJzmcpaJLGshHRv11x4mpzmVwv0hmaYEN+86S09QI6YC7j5TLSrhdMd0w0TP9u/i
-         N+Pg==
-X-Gm-Message-State: AGi0PuapaqLFy26OJO4qaxP8PIB23I3qbgkfKhohFC+Y8p6bXdE0kKw+
-        FKrPvM1GMGUQMT2DASrRpBrPBwSuuOYnS+kbCPEzT+Z4/GsrMNqT6rcRZygFwrd25jjoZFrESjk
-        lyOnC6HOQzmkb
-X-Received: by 2002:adf:b1c6:: with SMTP id r6mr12632481wra.49.1586423032030;
-        Thu, 09 Apr 2020 02:03:52 -0700 (PDT)
-X-Google-Smtp-Source: APiQypLF16jQY0MQeLOoeWEjDvj99XBLM/QjgSY70WD35IL8kqp+4bpmhm1qfLNT2fbzdEIEC3sYEw==
-X-Received: by 2002:adf:b1c6:: with SMTP id r6mr12632450wra.49.1586423031690;
-        Thu, 09 Apr 2020 02:03:51 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:bddb:697c:bea8:abc? ([2001:b07:6468:f312:bddb:697c:bea8:abc])
-        by smtp.gmail.com with ESMTPSA id t8sm300999wrq.88.2020.04.09.02.03.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 09 Apr 2020 02:03:51 -0700 (PDT)
-Subject: Re: [PATCH v2] x86/kvm: Disable KVM_ASYNC_PF_SEND_ALWAYS
-To:     Thomas Gleixner <tglx@linutronix.de>,
-        Andy Lutomirski <luto@amacapital.net>,
-        Vivek Goyal <vgoyal@redhat.com>
-Cc:     Peter Zijlstra <peterz@infradead.org>,
-        Andy Lutomirski <luto@kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>, X86 ML <x86@kernel.org>,
-        kvm list <kvm@vger.kernel.org>, stable <stable@vger.kernel.org>
-References: <20200407172140.GB64635@redhat.com>
- <772A564B-3268-49F4-9AEA-CDA648F6131F@amacapital.net>
- <87eeszjbe6.fsf@nanos.tec.linutronix.de>
- <ce81c95f-8674-4012-f307-8f32d0e386c2@redhat.com>
- <874ktukhku.fsf@nanos.tec.linutronix.de>
- <274f3d14-08ac-e5cc-0b23-e6e0274796c8@redhat.com>
- <87pncib06x.fsf@nanos.tec.linutronix.de>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <92ea7036-0b77-20da-34ac-f425e6f233c2@redhat.com>
-Date:   Thu, 9 Apr 2020 11:03:50 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
-MIME-Version: 1.0
-In-Reply-To: <87pncib06x.fsf@nanos.tec.linutronix.de>
-Content-Type: text/plain; charset=windows-1252
+        id S1726559AbgDIJPg convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Thu, 9 Apr 2020 05:15:36 -0400
+Received: from mga05.intel.com ([192.55.52.43]:2570 "EHLO mga05.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725783AbgDIJPg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Apr 2020 05:15:36 -0400
+IronPort-SDR: YE+BXvrsLWuYVgaf4Gu4roxVU1q/OOKvm/V9Af2Q/X3Cln6wMKJQSr34u2D9dUBz8+2X1/hUff
+ wcPAacJBbuNg==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Apr 2020 02:15:35 -0700
+IronPort-SDR: LKI2mMlF5gRpfCpUQKmtzZ9HxbE2ZCqbs8lOz4VEi0+4c9z2xO8vzNilg/v2NJuYCA6ZkGE25f
+ Tbc1DvUcnVCA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.72,362,1580803200"; 
+   d="scan'208";a="270024062"
+Received: from fmsmsx107.amr.corp.intel.com ([10.18.124.205])
+  by orsmga002.jf.intel.com with ESMTP; 09 Apr 2020 02:15:35 -0700
+Received: from fmsmsx111.amr.corp.intel.com (10.18.116.5) by
+ fmsmsx107.amr.corp.intel.com (10.18.124.205) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Thu, 9 Apr 2020 02:15:34 -0700
+Received: from shsmsx107.ccr.corp.intel.com (10.239.4.96) by
+ fmsmsx111.amr.corp.intel.com (10.18.116.5) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Thu, 9 Apr 2020 02:15:33 -0700
+Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.225]) by
+ SHSMSX107.ccr.corp.intel.com ([169.254.9.191]) with mapi id 14.03.0439.000;
+ Thu, 9 Apr 2020 17:15:30 +0800
+From:   "Liu, Yi L" <yi.l.liu@intel.com>
+To:     Jean-Philippe Brucker <jean-philippe@linaro.org>
+CC:     "Tian, Kevin" <kevin.tian@intel.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "Tian, Jun J" <jun.j.tian@intel.com>,
+        "Sun, Yi Y" <yi.y.sun@intel.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Wu, Hao" <hao.wu@intel.com>
+Subject: RE: [PATCH v1 6/8] vfio/type1: Bind guest page tables to host
+Thread-Topic: [PATCH v1 6/8] vfio/type1: Bind guest page tables to host
+Thread-Index: AQHWAEUdkW8K+/kg/06c7098DvJyv6hgm8wAgANYlCCAAK00AIAA6IawgAEUvACABu4SMIACfjcAgACRzFA=
+Date:   Thu, 9 Apr 2020 09:15:29 +0000
+Message-ID: <A2975661238FB949B60364EF0F2C25743A228CCA@SHSMSX104.ccr.corp.intel.com>
+References: <1584880325-10561-1-git-send-email-yi.l.liu@intel.com>
+ <1584880325-10561-7-git-send-email-yi.l.liu@intel.com>
+ <AADFC41AFE54684AB9EE6CBC0274A5D19D7FF98F@SHSMSX104.ccr.corp.intel.com>
+ <A2975661238FB949B60364EF0F2C25743A21D8C6@SHSMSX104.ccr.corp.intel.com>
+ <AADFC41AFE54684AB9EE6CBC0274A5D19D805F75@SHSMSX104.ccr.corp.intel.com>
+ <A2975661238FB949B60364EF0F2C25743A21ED01@SHSMSX104.ccr.corp.intel.com>
+ <20200403083407.GB1269501@myrica>
+ <A2975661238FB949B60364EF0F2C25743A224C8F@SHSMSX104.ccr.corp.intel.com>
+ <20200409082846.GE2435@myrica>
+In-Reply-To: <20200409082846.GE2435@myrica>
+Accept-Language: en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
+MIME-Version: 1.0
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 08/04/20 15:01, Thomas Gleixner wrote:
+> From: Jean-Philippe Brucker <jean-philippe@linaro.org>
+> Sent: Thursday, April 9, 2020 4:29 PM
+> To: Liu, Yi L <yi.l.liu@intel.com>
 > 
-> And it comes with restrictions:
+> On Tue, Apr 07, 2020 at 10:33:25AM +0000, Liu, Yi L wrote:
+> > Hi Jean,
+> >
+> > > From: Jean-Philippe Brucker < jean-philippe@linaro.org >
+> > > Sent: Friday, April 3, 2020 4:35 PM
+> > > Subject: Re: [PATCH v1 6/8] vfio/type1: Bind guest page tables to host
+> > >
+> > > On Thu, Apr 02, 2020 at 08:05:29AM +0000, Liu, Yi L wrote:
+> > > > > > > > static long vfio_iommu_type1_ioctl(void *iommu_data,
+> > > > > > > >  		default:
+> > > > > > > >  			return -EINVAL;
+> > > > > > > >  		}
+> > > > > > > > +
+> > > > > > > > +	} else if (cmd == VFIO_IOMMU_BIND) {
+> > > > > > >
+> > > > > > > BIND what? VFIO_IOMMU_BIND_PASID sounds clearer to me.
+> > > > > >
+> > > > > > Emm, it's up to the flags to indicate bind what. It was proposed to
+> > > > > > cover the three cases below:
+> > > > > > a) BIND/UNBIND_GPASID
+> > > > > > b) BIND/UNBIND_GPASID_TABLE
+> > > > > > c) BIND/UNBIND_PROCESS
+> > > > > > <only a) is covered in this patch>
+> > > > > > So it's called VFIO_IOMMU_BIND.
+> > > > >
+> > > > > but aren't they all about PASID related binding?
+> > > >
+> > > > yeah, I can rename it. :-)
+> > >
+> > > I don't know if anyone intends to implement it, but SMMUv2 supports
+> > > nesting translation without any PASID support. For that case the name
+> > > VFIO_IOMMU_BIND_GUEST_PGTBL without "PASID" anywhere makes more
+> sense.
+> > > Ideally we'd also use a neutral name for the IOMMU API instead of
+> > > bind_gpasid(), but that's easier to change later.
+> >
+> > I agree VFIO_IOMMU_BIND is somehow not straight-forward. Especially, it may
+> > cause confusion when thinking about VFIO_SET_IOMMU. How about using
+> > VFIO_NESTING_IOMMU_BIND_STAGE1 to cover a) and b)? And has another
+> > VFIO_BIND_PROCESS in future for the SVA bind case.
 > 
->     The Do Other Stuff event can only be delivered when guest IF=1.
-> 
->     If guest IF=0 then the host has to suspend the guest until the
->     situation is resolved.
-> 
->     The 'Situation resolved' event must also wait for a guest IF=1 slot.
+> I think minimizing the number of ioctls is more important than finding the
+> ideal name. VFIO_IOMMU_BIND was fine to me, but if it's too vague then
+> rename it to VFIO_IOMMU_BIND_PASID and we'll just piggy-back on it for
+> non-PASID things (they should be rare enough).
+maybe we can start with VFIO_IOMMU_BIND_PASID. Actually, there is
+also a discussion on reusing the same ioctl and vfio structure for
+pasid_alloc/free, bind/unbind_gpasid. and cache_inv. how about your
+opinion?
 
-Additionally:
+https://lkml.org/lkml/2020/4/3/833
 
-- the do other stuff event must be delivered to the same CPU that is
-causing the host-side page fault
+Regards,
+Yi Liu
 
-- the do other stuff event provides a token that identifies the cause
-and the situation resolved event provides a matching token
 
-This stuff is why I think the do other stuff event looks very much like
-a #VE.  But I think we're in violent agreement after all.
-
-> If you just want to solve Viveks problem, then its good enough. I.e. the
-> file truncation turns the EPT entries into #VE convertible entries and
-> the guest #VE handler can figure it out. This one can be injected
-> directly by the hardware, i.e. you don't need a VMEXIT.
-> 
-> If you want the opportunistic do other stuff mechanism, then #VE has
-> exactly the same problems as the existing async "PF". It's not magicaly
-> making that go away.
-
-You can inject #VE from the hypervisor too, with PV magic to distinguish
-the two.  However that's not necessarily a good idea because it makes it
-harder to switch to hardware delivery in the future.
-
-> One possible solution might be to make all recoverable EPT entries
-> convertible and let the HW inject #VE for those.
-> 
-> So the #VE handler in the guest would have to do:
-> 
->        if (!recoverable()) {
->        	if (user_mode)
->                 	send_signal();
->                 else if (!fixup_exception())
->                 	die_hard();
->                 goto done;  
->        }                 
-> 
->        store_ve_info_in_pv_page();
-> 
->        if (!user_mode(regs) || !preemptible()) {
->        	hypercall_resolve_ept(can_continue = false);
->        } else {
->               init_completion();
->        	hypercall_resolve_ept(can_continue = true);
->               wait_for_completion();
->        }
-> 
-> or something like that.
-
-Yes, pretty much.  The VE info can also be passed down to the hypercall
-as arguments.
-
-Paolo
-
-> The hypercall to resolve the EPT fail on the host acts on the
-> can_continue argument.
-> 
-> If false, it suspends the guest vCPU and only returns when done.
-> 
-> If true it kicks the resolve process and returns to the guest which
-> suspends the task and tries to do something else.
-> 
-> The wakeup side needs to be a regular interrupt and cannot go through
-> #VE.
 
