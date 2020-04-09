@@ -2,55 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A70111A3389
-	for <lists+kvm@lfdr.de>; Thu,  9 Apr 2020 13:49:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EE0DB1A33BA
+	for <lists+kvm@lfdr.de>; Thu,  9 Apr 2020 14:04:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726718AbgDILtp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Apr 2020 07:49:45 -0400
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:53497 "EHLO
-        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725971AbgDILtp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Apr 2020 07:49:45 -0400
-Received: by mail-wm1-f66.google.com with SMTP id d77so3596769wmd.3
-        for <kvm@vger.kernel.org>; Thu, 09 Apr 2020 04:49:44 -0700 (PDT)
+        id S1726687AbgDIMEu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Apr 2020 08:04:50 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:37498 "EHLO
+        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725971AbgDIMEt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Apr 2020 08:04:49 -0400
+Received: by mail-wr1-f67.google.com with SMTP id w10so11639989wrm.4
+        for <kvm@vger.kernel.org>; Thu, 09 Apr 2020 05:04:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=NhCGDxyUnA14N2Q0P5fdjbo3qgE+I/ZWPpei6zT7QB8=;
-        b=Wt/Hzy5jCHDeFSq6vISCyUT5iHJxSK17PQZZqlsUzoUhExC1Fwuj+ApvIcIogFgHpL
-         ZtkhOUbflz/ISVh4fK/c0C/VQ2uwJD5YoFirHWxK5LVQbvwXCwSaCx/DTkB0l8yfI322
-         J+6V/GTYl6ydXOqCcY4Jhh0AVlBEE7qjkyuM4Gd3s8ukJnXfmmh1i0BlNLtTJw0qD1Kv
-         VCK97okxwa9Ii/6qReDouys5Otcvpid993rvMk+3d6cuNAcJjiKRSwiPF7bLiQMmZ0dH
-         j2BnLWw5YBPnUyfuhAwIchy/awVZqD5u6Ur65P93e2u9PaXioxDpN3DbtDAMH1VgOl09
-         7/Ug==
+        bh=lCmPfTqm1cRtMIpvXq734SPUvTONQxpqo1sItgL7b4o=;
+        b=LyKE1uLASPzUYs4GBcNp6r5h5YHAV2+DPhgSp5owG1mKLASYAvj0K/6/XGLWYj+ueC
+         bPzhcZV40BHD59DIOki8xpnTLkDbNmVQkdl8zVyRD8SNO8TB69lfArzq/xpdDWxrkJTl
+         kv+sArnR3jUnnLxlq01av6GlHGLZ5Uhe/Axq6Sfc3zVc5aUvkwis9errWskiyTwH0nha
+         Sq0ZeUR4foe5hvgURdApv6TtaJV9ObwqlOceRyhgHfdaWKT414QUxjK5jfTt8UGofQTX
+         tDWASp/CacC8RIPtD3Pa/kX8JIVEzBmCzL8fbDFDYmrtqiIHtPr2WiFFe6dNwnxBrGQu
+         tbKA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=NhCGDxyUnA14N2Q0P5fdjbo3qgE+I/ZWPpei6zT7QB8=;
-        b=O3mh3pRGtNCxkpMCOWbauP9LqfdYYEDLGHTZqzilq5093IJRrTfBOaVOCEL9u/9dV2
-         Q+YkzQFNw2eTy9eqs1GHfcueqb+62z2LMo+aoY7WEOjB1Fz7PfmzGlq1IZAQb7AhuLS8
-         n65NCKQpUfaSjeN/AFHzfF7mvepTady6THAr0wRj4FQ13Of2MTDczzMjDHZxgZAZMRZ/
-         PMEX7iBFjsurAMvNEhGUSLddNN2S8f5mIXdDChrZEemwSfkA1cR3AOHhyvl46o/Pk+uH
-         bpuWOwnUe4YJcL6e9fJFCjBFtkMsBd+xGUEwR8PQo1J4YKGbGi9+vp4+w5lKO14A2FJP
-         mYlQ==
-X-Gm-Message-State: AGi0PuYOCBpcP2KhChQQ/NcMmtrQptezlnaxSxHplAAPM9ks3LNgtvvu
-        BJhVYSLqt22cdiLuqa0Kedc412EGfTo=
-X-Google-Smtp-Source: APiQypKJ8z1OULVyZ3EW0TYT0OeWR4FPQQ5SvOB/2bf8DqgA1qZabS+lbTNx7l/55WwXFC7y5q4Fpg==
-X-Received: by 2002:a1c:2b43:: with SMTP id r64mr10009732wmr.77.1586432983984;
-        Thu, 09 Apr 2020 04:49:43 -0700 (PDT)
+        bh=lCmPfTqm1cRtMIpvXq734SPUvTONQxpqo1sItgL7b4o=;
+        b=jywSNMpyWrTbhRi16h2C26yzP3c8yF4LBNy+FeqVptEFDaHA3Qvlj3tN9iFnt+9wXU
+         iVjaRcHXdr40lWFyF0PpgrppmykfPrTSmFoY9T2pkoRUXKIK2nzXQw0yEERZH03dN7tZ
+         dJ3uoi9zOKFUrLGBOVbShtBTP5PP3aeF3pO3AGCNhGS3NhueUUmX01hS2iH8Dc/T9vrx
+         aiWI6633ccTNAgaI6P+xQ/WnicMFFQdUuUQK73fA/wfMaKnsT3gber6dSoBGyfa49NKw
+         ozp7rnRj421Utl9Patktb8BOKUduKlR0e6D4oYcn62UHK3N++Bc76xWq+wkqtG4tFdJi
+         zHBw==
+X-Gm-Message-State: AGi0PuZZUnWedOHe/WBkt4sDKzqrCSbMSreoddPUADCBxVOAiudorsVc
+        /PMirJGwzYkXNvRbolB/mQSBxvRYC2k=
+X-Google-Smtp-Source: APiQypKOdYcsZ7tQmIT9Bg2GAIpd7YZFeplUbWXhnfvRK6Cb62GWg59W4mb0M2Hr44hx5k4YjxMJ9w==
+X-Received: by 2002:adf:f8cd:: with SMTP id f13mr13466696wrq.119.1586433886815;
+        Thu, 09 Apr 2020 05:04:46 -0700 (PDT)
 Received: from localhost.localdomain (93-103-18-160.static.t-2.net. [93.103.18.160])
-        by smtp.gmail.com with ESMTPSA id e23sm29884251wra.43.2020.04.09.04.49.42
+        by smtp.gmail.com with ESMTPSA id e5sm41110117wru.92.2020.04.09.05.04.45
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Apr 2020 04:49:43 -0700 (PDT)
+        Thu, 09 Apr 2020 05:04:46 -0700 (PDT)
 From:   Uros Bizjak <ubizjak@gmail.com>
 To:     kvm@vger.kernel.org
 Cc:     Uros Bizjak <ubizjak@gmail.com>,
         Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH] KVM: SVM: Fix __svm_vcpu_run declaration.
-Date:   Thu,  9 Apr 2020 13:49:26 +0200
-Message-Id: <20200409114926.1407442-1-ubizjak@gmail.com>
+Subject: [PATCH] KVM: SVM: Do not setup frame pointer in __svm_vcpu_run
+Date:   Thu,  9 Apr 2020 14:04:40 +0200
+Message-Id: <20200409120440.1427215-1-ubizjak@gmail.com>
 X-Mailer: git-send-email 2.25.2
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -59,28 +59,28 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The function returns no value.
+__svm_vcpu_run is a leaf function and does not need
+a frame pointer.  %rbp is also destroyed a few instructions
+later when guest registers are loaded.
 
 Cc: Paolo Bonzini <pbonzini@redhat.com>
-Fixes: 199cd1d7b534 ("KVM: SVM: Split svm_vcpu_run inline assembly to separate file")
 Signed-off-by: Uros Bizjak <ubizjak@gmail.com>
 ---
- arch/x86/kvm/svm/svm.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ arch/x86/kvm/svm/vmenter.S | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 2be5bbae3a40..061d19e69c73 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -3276,7 +3276,7 @@ static void svm_cancel_injection(struct kvm_vcpu *vcpu)
- 	svm_complete_interrupts(svm);
- }
- 
--bool __svm_vcpu_run(unsigned long vmcb_pa, unsigned long *regs);
-+void __svm_vcpu_run(unsigned long vmcb_pa, unsigned long *regs);
- 
- static void svm_vcpu_run(struct kvm_vcpu *vcpu)
- {
+diff --git a/arch/x86/kvm/svm/vmenter.S b/arch/x86/kvm/svm/vmenter.S
+index fa1af90067e9..c87119a7a0c9 100644
+--- a/arch/x86/kvm/svm/vmenter.S
++++ b/arch/x86/kvm/svm/vmenter.S
+@@ -35,7 +35,6 @@
+  */
+ SYM_FUNC_START(__svm_vcpu_run)
+ 	push %_ASM_BP
+-	mov  %_ASM_SP, %_ASM_BP
+ #ifdef CONFIG_X86_64
+ 	push %r15
+ 	push %r14
 -- 
 2.25.2
 
