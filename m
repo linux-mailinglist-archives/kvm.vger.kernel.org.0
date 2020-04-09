@@ -2,92 +2,162 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D42FE1A3717
-	for <lists+kvm@lfdr.de>; Thu,  9 Apr 2020 17:28:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C0DB61A371D
+	for <lists+kvm@lfdr.de>; Thu,  9 Apr 2020 17:28:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728294AbgDIP2C (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Apr 2020 11:28:02 -0400
-Received: from mail-io1-f65.google.com ([209.85.166.65]:33246 "EHLO
-        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728061AbgDIP2B (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Apr 2020 11:28:01 -0400
-Received: by mail-io1-f65.google.com with SMTP id o127so7467iof.0
-        for <kvm@vger.kernel.org>; Thu, 09 Apr 2020 08:28:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=tDujFRTI+FZL6HeDsvCOHzCg7LFMG75v0U0c7h/snhI=;
-        b=PLsn0m7o7d65MnraYJPNDSRxosIuTPb+QpNG8WkFsEGuI1N5cJ8yDJoKAhx7qrc/X/
-         iwoMZu/9u4mR1u/aAhYQKeECm4hSUDB5e380eBa5KMdOpKQNYVz8PH+/4s8dztIqWveK
-         mBG5Qgq2kb8q7EwGDS269ptrZu/r6fVxK4hN6TfkfZ8aKOjuC+4Ty0V2+NDglfwhLsns
-         Qwl1j9wDx0FKo2zUvrdZJtz7YO0zYVGvQLJXBzBkH5YsJX5pfSDcApak2YNSPI9BPI4W
-         2CzmArCf5RyXI8UEtBwYuBLVX6fdac+tno7nZBiIlV/RTRBBYzjnZCbwPa18iT+OCjZE
-         6NQQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=tDujFRTI+FZL6HeDsvCOHzCg7LFMG75v0U0c7h/snhI=;
-        b=Xm8IjfwV3ZczVpvrUkVrBfwLvxQCYjAmS8yOhAtwmwr3mSahVme7qCOBXnz7W2qnIh
-         qzrQA7NhXWkcta/ZlW93ncwvzgXNaEB3e8qj3XlsBVnHeWmnD3S5e2S+zGny1M5h4hi0
-         4/RtP56a9qQlp8fEAtDWgWWB6eROwXdEecrUX11+MmetQQV9XTNnYt1DiI9aL6WwxcoG
-         lfZzvhIg2yK+9QZdvPkp2Uq6cKDEIQwti39H+xM0CXBuspLpYZYNh/yUb4V3QDqBAzEN
-         y+0yj7y2kdQIOmrUzTatWKndBW2KkOzYNzOBTOgqZzAhPPdcP/g1ujuqg0KqrFlwmpSA
-         I+qA==
-X-Gm-Message-State: AGi0PuZrusdox+tU64ZZ/bLz82Bk5UWZdqceoNyXV8gNeoeUI4OUntIc
-        zzElgoJp7Q/GBJ9rRsfSxPsMJ+vRKZ1nTbrHnQY=
-X-Google-Smtp-Source: APiQypKkIEeLFICs4j79pf2PRDNfcvCoDivDC6eYSTddq85ZWwXa5S7TbzqnhpK6vohaz7yma+lPSYJNkg1Il0wy5yA=
-X-Received: by 2002:a02:90c1:: with SMTP id c1mr3280813jag.69.1586446081369;
- Thu, 09 Apr 2020 08:28:01 -0700 (PDT)
+        id S1728224AbgDIP24 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Apr 2020 11:28:56 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:42115 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1728191AbgDIP24 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Apr 2020 11:28:56 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1586446135;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=FVUPLOZX5xr5YRaXLAPd3Mgvd0RbL/KcfmZ9/KPlJrk=;
+        b=NgToxMWoDxquJtCt9ZqGYLIL++6Wf6zj/mN5RfELLUDfhfsQmzD/jEoTXkoQta+Tq20Bvv
+        kUyqWKqAYdp0eF9AZ6TuipwUOTp4pTYnZRl+qJ59UXic0gA70GYm+ReDjYZsmoPPFI9W8P
+        nZeuqlZgmOCP1sIljXtzeymeC2MRNPM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-46-PwF-f56YN3S6QN6_21pWOg-1; Thu, 09 Apr 2020 11:28:50 -0400
+X-MC-Unique: PwF-f56YN3S6QN6_21pWOg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 46B93107ACC4
+        for <kvm@vger.kernel.org>; Thu,  9 Apr 2020 15:28:49 +0000 (UTC)
+Received: from localhost.localdomain.com (ovpn-113-69.rdu2.redhat.com [10.10.113.69])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id CED735D9CA;
+        Thu,  9 Apr 2020 15:28:48 +0000 (UTC)
+From:   Cathy Avery <cavery@redhat.com>
+To:     kvm@vger.kernel.org, pbonzini@redhat.com
+Subject: [PATCH kvm-unit-tests v2 1/2] svm: Add test cases around NMI injection
+Date:   Thu,  9 Apr 2020 11:28:48 -0400
+Message-Id: <20200409152848.17762-1-cavery@redhat.com>
 MIME-Version: 1.0
-References: <20200409114926.1407442-1-ubizjak@gmail.com> <0ee54833-bbed-4263-7c7e-4091ab956168@intel.com>
-In-Reply-To: <0ee54833-bbed-4263-7c7e-4091ab956168@intel.com>
-From:   Uros Bizjak <ubizjak@gmail.com>
-Date:   Thu, 9 Apr 2020 17:27:49 +0200
-Message-ID: <CAFULd4awe3Y1xXW+umWsjE69i2Fv0R5=0V0SveqnxjVQ2ijY1g@mail.gmail.com>
-Subject: Re: [PATCH] KVM: SVM: Fix __svm_vcpu_run declaration.
-To:     like.xu@intel.com
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Apr 9, 2020 at 5:11 PM Xu, Like <like.xu@intel.com> wrote:
->
-> Hi Bizjak,
->
-> On 2020/4/9 19:49, Uros Bizjak wrote:
-> > The function returns no value.
-> >
-> > Cc: Paolo Bonzini <pbonzini@redhat.com>
-> > Fixes: 199cd1d7b534 ("KVM: SVM: Split svm_vcpu_run inline assembly to separate file")
-> > Signed-off-by: Uros Bizjak <ubizjak@gmail.com>
-> > ---
-> >   arch/x86/kvm/svm/svm.c | 2 +-
-> >   1 file changed, 1 insertion(+), 1 deletion(-)
-> >
-> > diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> > index 2be5bbae3a40..061d19e69c73 100644
-> > --- a/arch/x86/kvm/svm/svm.c
-> > +++ b/arch/x86/kvm/svm/svm.c
-> > @@ -3276,7 +3276,7 @@ static void svm_cancel_injection(struct kvm_vcpu *vcpu)
-> >       svm_complete_interrupts(svm);
-> >   }
-> >
-> > -bool __svm_vcpu_run(unsigned long vmcb_pa, unsigned long *regs);
-> Just curious if __svm_vcpu_run() will fail to enter SVM guest mode,
-> and a return value could indicate that nothing went wrong rather than
-> blindly keeping silent.
+This test checks for NMI delivery to L2 and
+intercepted NMI (VMEXIT_NMI) delivery to L1.
 
-vmload, vmrun and vmsave do not return anything in flags or registers,
-so we can't detect anything at this point, modulo exception that is
-handled below the respective instruction.
+Signed-off-by: Cathy Avery <cavery@redhat.com>
+---
+v2: Remove redundant NMI_VECTOR
+---
+ x86/svm_tests.c | 82 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 82 insertions(+)
 
-BTW: the change by itself does not change the generated code, the fake
-return value from __svm_vcpu_run is already ignored. So, the change is
-mostly cosmetic.
+diff --git a/x86/svm_tests.c b/x86/svm_tests.c
+index 16b9dfd..b6c0106 100644
+--- a/x86/svm_tests.c
++++ b/x86/svm_tests.c
+@@ -1340,6 +1340,85 @@ static bool interrupt_check(struct svm_test *test)
+     return get_test_stage(test) =3D=3D 5;
+ }
+=20
++static volatile bool nmi_fired;
++
++static void nmi_handler(isr_regs_t *regs)
++{
++    nmi_fired =3D true;
++    apic_write(APIC_EOI, 0);
++}
++
++static void nmi_prepare(struct svm_test *test)
++{
++    default_prepare(test);
++    nmi_fired =3D false;
++    handle_irq(NMI_VECTOR, nmi_handler);
++    set_test_stage(test, 0);
++}
++
++static void nmi_test(struct svm_test *test)
++{
++    apic_icr_write(APIC_DEST_SELF | APIC_DEST_PHYSICAL | APIC_DM_NMI | A=
+PIC_INT_ASSERT, 0);
++
++    report(nmi_fired, "direct NMI while running guest");
++
++    if (!nmi_fired)
++        set_test_stage(test, -1);
++
++    vmmcall();
++
++    nmi_fired =3D false;
++
++    apic_icr_write(APIC_DEST_SELF | APIC_DEST_PHYSICAL | APIC_DM_NMI | A=
+PIC_INT_ASSERT, 0);
++
++    if (!nmi_fired) {
++        report(nmi_fired, "intercepted pending NMI not dispatched");
++        set_test_stage(test, -1);
++    }
++
++}
++
++static bool nmi_finished(struct svm_test *test)
++{
++    switch (get_test_stage(test)) {
++    case 0:
++        if (vmcb->control.exit_code !=3D SVM_EXIT_VMMCALL) {
++            report(false, "VMEXIT not due to vmmcall. Exit reason 0x%x",
++                   vmcb->control.exit_code);
++            return true;
++        }
++        vmcb->save.rip +=3D 3;
++
++        vmcb->control.intercept |=3D (1ULL << INTERCEPT_NMI);
++        break;
++
++    case 1:
++        if (vmcb->control.exit_code !=3D SVM_EXIT_NMI) {
++            report(false, "VMEXIT not due to NMI intercept. Exit reason =
+0x%x",
++                   vmcb->control.exit_code);
++            return true;
++        }
++
++        report(true, "NMI intercept while running guest");
++        break;
++
++    case 2:
++        break;
++
++    default:
++        return true;
++    }
++
++    inc_test_stage(test);
++
++    return get_test_stage(test) =3D=3D 3;
++}
++
++static bool nmi_check(struct svm_test *test)
++{
++    return get_test_stage(test) =3D=3D 3;
++}
++
+ #define TEST(name) { #name, .v2 =3D name }
+=20
+ /*
+@@ -1446,6 +1525,9 @@ struct svm_test svm_tests[] =3D {
+     { "interrupt", default_supported, interrupt_prepare,
+       default_prepare_gif_clear, interrupt_test,
+       interrupt_finished, interrupt_check },
++    { "nmi", default_supported, nmi_prepare,
++      default_prepare_gif_clear, nmi_test,
++      nmi_finished, nmi_check },
+     TEST(svm_guest_state_test),
+     { NULL, NULL, NULL, NULL, NULL, NULL, NULL }
+ };
+--=20
+2.20.1
 
-Uros.
