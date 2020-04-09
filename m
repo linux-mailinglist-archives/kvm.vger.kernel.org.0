@@ -2,83 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 62A831A3521
-	for <lists+kvm@lfdr.de>; Thu,  9 Apr 2020 15:49:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0237D1A358B
+	for <lists+kvm@lfdr.de>; Thu,  9 Apr 2020 16:13:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726552AbgDINtg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Apr 2020 09:49:36 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:34101 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726641AbgDINtf (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 9 Apr 2020 09:49:35 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1586440174;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=CDKoKGqtj/GJWfQ/EvttCrfHTdSN6Oe2CdcIahqhpRs=;
-        b=HgFX0gq6UlmsYMkYWb1tIS/auu9phT9GlF2ZOTe0cbzNOgOvhV/AKJyM3O7pOoYp4qWJs0
-        P0SEr27hDt4FPq55p5z13rJQ7CdNjhAByjcMSy9iTBK9raqFwNztwlQKDGYwc/AUJVCDkZ
-        Z2ppyjqnl56BKOdg4rYgOIy+8rsk3Eo=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-233-XxZ9I1AGMu2ur7P2ypysag-1; Thu, 09 Apr 2020 09:49:32 -0400
-X-MC-Unique: XxZ9I1AGMu2ur7P2ypysag-1
-Received: by mail-wm1-f72.google.com with SMTP id 72so2019490wmb.1
-        for <kvm@vger.kernel.org>; Thu, 09 Apr 2020 06:49:32 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=CDKoKGqtj/GJWfQ/EvttCrfHTdSN6Oe2CdcIahqhpRs=;
-        b=HQdHknZj1g768RHA7Hc4S3XH6pkF0QbV/hkaHUY9hTLnkmFxqgWgDGeM1nmQsBC73d
-         YOetIwXA7CnHDCK3Hf1UWboWHUWM+w8W4/ERsLto2Do2emt0Mj4k94uScm6xqnFCxYr5
-         GIEjv+04O43BEhBe4FliTCB6N6nZZ4CsXBferlK0QPbZ9gwCx+unmB5xtrbA9rsQrjJ0
-         RHDk86+B3SvxnqQyOwlUFTNJEc00eS8GR6EIICflgGso8uwNkdgyevawYzz4B4iPiDH8
-         GP4fZV9xMsCJlcSZdK04xNpP7x8AkoyQvhPhLWRSpQgO/oLop+N1xei6Wnh9GxkiPGyC
-         8Gcg==
-X-Gm-Message-State: AGi0PuZ+0mweB6yxdE3Z2kRQhATai1heqJs5zsLzBPGDWti6EVj9WB84
-        eDzS45YiigtuHn6IkODL9tmf21I1N5v7GRVBCOVSxjX4SH6bG/50wEpAD4SKEFiB6pfu0N0itqr
-        Ba7PO/8KbopZj
-X-Received: by 2002:a1c:1bcb:: with SMTP id b194mr30259wmb.4.1586440171094;
-        Thu, 09 Apr 2020 06:49:31 -0700 (PDT)
-X-Google-Smtp-Source: APiQypI5EoaxnA5Xi/N+v0a+YCFP7Zq1V6hMieVImatAChiIFdmoCLeWMhkhOrhDfnM86eMUh9YUNQ==
-X-Received: by 2002:a1c:1bcb:: with SMTP id b194mr30251wmb.4.1586440170920;
-        Thu, 09 Apr 2020 06:49:30 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:e8a3:73c:c711:b995? ([2001:b07:6468:f312:e8a3:73c:c711:b995])
-        by smtp.gmail.com with ESMTPSA id b82sm4076909wmh.1.2020.04.09.06.49.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 09 Apr 2020 06:49:30 -0700 (PDT)
-Subject: Re: [PATCH kvm-unit-tests 1/2] svm: Add test cases around NMI
- injection
-To:     Cathy Avery <cavery@redhat.com>, kvm@vger.kernel.org
-References: <20200409133247.16653-1-cavery@redhat.com>
- <20200409133247.16653-2-cavery@redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <16401e25-f484-a96e-2f49-53b5a7470754@redhat.com>
-Date:   Thu, 9 Apr 2020 15:49:29 +0200
+        id S1727181AbgDIONu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Apr 2020 10:13:50 -0400
+Received: from esa4.hc3370-68.iphmx.com ([216.71.155.144]:39704 "EHLO
+        esa4.hc3370-68.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726977AbgDIONu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Apr 2020 10:13:50 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=citrix.com; s=securemail; t=1586441629;
+  h=subject:to:cc:references:from:message-id:date:
+   mime-version:in-reply-to:content-transfer-encoding;
+  bh=yrdagwIUFtKwt9MOyKCVl5M6aNY/cfIdCXlLoDli1mo=;
+  b=RmW0ycWECRy2O+5SUYHNrhL4uNdjFn65RoMiOZ3DjJAg0EgtIiXhyveJ
+   NIKJkEa46Axn+/0qoQBSeOgZgnFB/jWSDyMfslGq1qdLDfHXvHiWoQR/N
+   WkeE1tTIB381HV22INysfWtTXzN4TaytnuUfqdCBlXmcazt9vEh5tBGCU
+   s=;
+Authentication-Results: esa4.hc3370-68.iphmx.com; dkim=none (message not signed) header.i=none; spf=None smtp.pra=andrew.cooper3@citrix.com; spf=Pass smtp.mailfrom=Andrew.Cooper3@citrix.com; spf=None smtp.helo=postmaster@mail.citrix.com
+Received-SPF: None (esa4.hc3370-68.iphmx.com: no sender
+  authenticity information available from domain of
+  andrew.cooper3@citrix.com) identity=pra;
+  client-ip=162.221.158.21; receiver=esa4.hc3370-68.iphmx.com;
+  envelope-from="Andrew.Cooper3@citrix.com";
+  x-sender="andrew.cooper3@citrix.com";
+  x-conformance=sidf_compatible
+Received-SPF: Pass (esa4.hc3370-68.iphmx.com: domain of
+  Andrew.Cooper3@citrix.com designates 162.221.158.21 as
+  permitted sender) identity=mailfrom;
+  client-ip=162.221.158.21; receiver=esa4.hc3370-68.iphmx.com;
+  envelope-from="Andrew.Cooper3@citrix.com";
+  x-sender="Andrew.Cooper3@citrix.com";
+  x-conformance=sidf_compatible; x-record-type="v=spf1";
+  x-record-text="v=spf1 ip4:209.167.231.154 ip4:178.63.86.133
+  ip4:195.66.111.40/30 ip4:85.115.9.32/28 ip4:199.102.83.4
+  ip4:192.28.146.160 ip4:192.28.146.107 ip4:216.52.6.88
+  ip4:216.52.6.188 ip4:162.221.158.21 ip4:162.221.156.83
+  ip4:168.245.78.127 ~all"
+Received-SPF: None (esa4.hc3370-68.iphmx.com: no sender
+  authenticity information available from domain of
+  postmaster@mail.citrix.com) identity=helo;
+  client-ip=162.221.158.21; receiver=esa4.hc3370-68.iphmx.com;
+  envelope-from="Andrew.Cooper3@citrix.com";
+  x-sender="postmaster@mail.citrix.com";
+  x-conformance=sidf_compatible
+IronPort-SDR: zMk+TKhFbvmlTvoCJdMSK9a1ddjz6WkQv7BWesBz+ogcJU8kOEJKQncyCsihklOwhLbAH9bieq
+ ovx75BttbXMGRC2n5IP1+jzMc8rPHC+15aAyeMUUkyRwD/b57GZTH+wszLrtZxgm2PQymMTvUf
+ r1tL6PHFTbL/fTQvDQyVbUu9dJe5o+bSJqST5Q1Wx1gv8RB4xP5wa3GM9jIooKST7vc4ARc7pC
+ jnaUgAs9TAetgBX8EMdc5lphvZLvvA9lcVd9Fgyd2zEJ1wu7ewwYQ8pGs52v/Z9aM1g8DrATom
+ c9k=
+X-SBRS: 2.7
+X-MesageID: 16107785
+X-Ironport-Server: esa4.hc3370-68.iphmx.com
+X-Remote-IP: 162.221.158.21
+X-Policy: $RELAYED
+X-IronPort-AV: E=Sophos;i="5.72,363,1580792400"; 
+   d="scan'208";a="16107785"
+Subject: Re: [PATCH v2] x86/kvm: Disable KVM_ASYNC_PF_SEND_ALWAYS
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>
+CC:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vivek Goyal <vgoyal@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        LKML <linux-kernel@vger.kernel.org>, X86 ML <x86@kernel.org>,
+        kvm list <kvm@vger.kernel.org>, stable <stable@vger.kernel.org>
+References: <20200407172140.GB64635@redhat.com>
+ <772A564B-3268-49F4-9AEA-CDA648F6131F@amacapital.net>
+ <87eeszjbe6.fsf@nanos.tec.linutronix.de>
+ <ce81c95f-8674-4012-f307-8f32d0e386c2@redhat.com>
+ <874ktukhku.fsf@nanos.tec.linutronix.de>
+ <274f3d14-08ac-e5cc-0b23-e6e0274796c8@redhat.com>
+ <20200408153413.GA11322@linux.intel.com>
+ <ce28e893-2ed0-ea6f-6c36-b08bb0d814f2@redhat.com>
+ <87d08hc0vz.fsf@nanos.tec.linutronix.de>
+ <CALCETrWG2Y4SPmVkugqgjZcMfpQiq=YgsYBmWBm1hj_qx3JNVQ@mail.gmail.com>
+ <04aca08a-cfce-b4db-559a-23aee0a0b7aa@redhat.com>
+From:   Andrew Cooper <andrew.cooper3@citrix.com>
+Message-ID: <0b632fb1-b662-89bf-2b95-6888bd64b3a9@citrix.com>
+Date:   Thu, 9 Apr 2020 15:13:41 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200409133247.16653-2-cavery@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <04aca08a-cfce-b4db-559a-23aee0a0b7aa@redhat.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Content-Language: en-GB
+X-ClientProxiedBy: AMSPEX02CAS02.citrite.net (10.69.22.113) To
+ AMSPEX02CL02.citrite.net (10.69.22.126)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 09/04/20 15:32, Cathy Avery wrote:
-> +static volatile bool nmi_fired;
-> +
-> +#define NMI_VECTOR    2
-> +
+On 09/04/2020 13:47, Paolo Bonzini wrote:
+> On 09/04/20 06:50, Andy Lutomirski wrote:
+>> The small
+>> (or maybe small) one is that any fancy protocol where the guest
+>> returns from an exception by doing, logically:
+>>
+>> Hey I'm done;  /* MOV somewhere, hypercall, MOV to CR4, whatever */
+>> IRET;
+>>
+>> is fundamentally racy.  After we say we're done and before IRET, we
+>> can be recursively reentered.  Hi, NMI!
+> That's possible in theory.  In practice there would be only two levels
+> of nesting, one for the original page being loaded and one for the tail
+> of the #VE handler.  The nested #VE would see IF=0, resolve the EPT
+> violation synchronously and both handlers would finish.  For the tail
+> page to be swapped out again, leading to more nesting, the host's LRU
+> must be seriously messed up.
+>
+> With IST it would be much messier, and I haven't quite understood why
+> you believe the #VE handler should have an IST.
 
-This one is already defined, so it is not necessary to include the
-#define here.
+Any interrupt/exception which can possibly occur between a SYSCALL and
+re-establishing a kernel stack (several instructions), must be IST to
+avoid taking said exception on a user stack and being a trivial
+privilege escalation.
 
-Paolo
+In terms of using #VE in its architecturally-expected way, this can
+occur in general before the kernel stack is established, so must be IST
+for safety.
 
+Therefore, it doesn't really matter if KVM's paravirt use of #VE does
+respect the interrupt flag.  It is not sensible to build a paravirt
+interface using #VE who's safety depends on never turning on
+hardware-induced #VE's.
+
+~Andrew
