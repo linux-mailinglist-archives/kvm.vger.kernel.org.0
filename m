@@ -2,138 +2,150 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 627A91A38EF
-	for <lists+kvm@lfdr.de>; Thu,  9 Apr 2020 19:32:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 72D491A3970
+	for <lists+kvm@lfdr.de>; Thu,  9 Apr 2020 19:57:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726684AbgDIRcy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Apr 2020 13:32:54 -0400
-Received: from mail.kernel.org ([198.145.29.99]:56368 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726632AbgDIRcy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Apr 2020 13:32:54 -0400
-Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 558AD2087E
-        for <kvm@vger.kernel.org>; Thu,  9 Apr 2020 17:32:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1586453573;
-        bh=IBuZEgijyAZREsl+G4BQjvkNizxCg7cks8fO++AV2XA=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=kFEzwXHDig+6mpRJP27Lvw+9no7VIbkjMrVguBlJqMoPADnJXy15cQD67IadXBR5u
-         fxXeDn5OkQ/p+8cSUhhW+LeX5Dh3Jgzhnb+ybqMccG8bSjw1lgwgksU/TZz20gZ/64
-         xInCI3KMBKixQaZsTEqS33BJKp2UqR6jeIxy3QGk=
-Received: by mail-wr1-f48.google.com with SMTP id f13so6253443wrm.13
-        for <kvm@vger.kernel.org>; Thu, 09 Apr 2020 10:32:53 -0700 (PDT)
-X-Gm-Message-State: AGi0PuZ9qbmTyYq1US69NnsiY7BGb1xnJrgG/+b2UgdNrrDAlNoG+pqu
-        ICzkHCMR8+w2fwAbHgziUh3XQYZ4rJgkmPIrVFLPJA==
-X-Google-Smtp-Source: APiQypLEiHQsMq8szXbLnpQbM1VupAPJctZFhnFSSXM3V5XoGXOx1XbOz0uCtxrbjmBSCYE2gAQxGXqRHjzPLG1/z74=
-X-Received: by 2002:adf:aad7:: with SMTP id i23mr254511wrc.184.1586453571673;
- Thu, 09 Apr 2020 10:32:51 -0700 (PDT)
+        id S1726632AbgDIR5d (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Apr 2020 13:57:33 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:57176 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725970AbgDIR5c (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Apr 2020 13:57:32 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 039HsSOG035049;
+        Thu, 9 Apr 2020 17:57:28 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2020-01-29;
+ bh=Pg2OcDUKrQfVlPFmsJbhzB5QRTvU/ra77BrxPivOjCk=;
+ b=aJOV2O28pGHnYxaGUOpq3gEQsm+KBTq0ovFCGerImenOU3OlEUNBR1kidQYxOuUrIigS
+ NMttosRIXkYqgyqF8GVCFsxlRMl+7QiIZjmfR+oR0irLWSp8w5FOhRPQhgWN5L/1wslr
+ +zAYnCciAIoK6EKu4IQf+9vVNIADnVJUNlU0p+eUkqSilbbhX9r3Sy9hqf5mfc+F8leZ
+ DlmmxISYAy+Yyx+6EGIfcp3BCYOFI7f1lAjpI93e80Wkl1T+SedRlRqsTPylDqwozqu/
+ SgKvoZe+UuDNvMwQp4QDUrg1mODBfnDd3pqX5AvBx/fpNKHMOFvRNrBLMVgYGFZjJ3kD Dg== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by userp2130.oracle.com with ESMTP id 3091m3k0cb-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 09 Apr 2020 17:57:28 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 039HucHx048444;
+        Thu, 9 Apr 2020 17:57:28 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+        by userp3020.oracle.com with ESMTP id 309gdcchrf-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 09 Apr 2020 17:57:27 +0000
+Received: from abhmp0004.oracle.com (abhmp0004.oracle.com [141.146.116.10])
+        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 039HvQpw031931;
+        Thu, 9 Apr 2020 17:57:27 GMT
+Received: from localhost.localdomain (/10.159.147.179)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Thu, 09 Apr 2020 10:57:26 -0700
+Subject: Re: [PATCH v4 1/2] selftests: kvm: Add vm_get_fd() in kvm_util
+To:     Wainer dos Santos Moschetta <wainersm@redhat.com>,
+        pbonzini@redhat.com, kvm@vger.kernel.org
+Cc:     drjones@redhat.com, david@redhat.com, linux-kernel@vger.kernel.org,
+        linux-kselftest@vger.kernel.org
+References: <20200408220818.4306-1-wainersm@redhat.com>
+ <20200408220818.4306-2-wainersm@redhat.com>
+ <734ebc46-ff31-708b-5a2f-8bda248cd290@oracle.com>
+ <a21f3ae5-fb4e-1b9d-c8e7-ac4628c763c2@redhat.com>
+From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Message-ID: <aed511d0-a51e-bc4c-a265-d9ede82e18f2@oracle.com>
+Date:   Thu, 9 Apr 2020 10:57:19 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-References: <c09dd91f-c280-85a6-c2a2-d44a0d378bbc@redhat.com>
- <4EB5D96F-F322-45BB-9169-6BF932D413D4@amacapital.net> <931f6e6d-ac17-05f9-0605-ac8f89f40b2b@redhat.com>
-In-Reply-To: <931f6e6d-ac17-05f9-0605-ac8f89f40b2b@redhat.com>
-From:   Andy Lutomirski <luto@kernel.org>
-Date:   Thu, 9 Apr 2020 10:32:39 -0700
-X-Gmail-Original-Message-ID: <CALCETrUpWBKHHyfMoqD2ZT3CnDdguNnK=KoZiTmN5PnbnD_k0A@mail.gmail.com>
-Message-ID: <CALCETrUpWBKHHyfMoqD2ZT3CnDdguNnK=KoZiTmN5PnbnD_k0A@mail.gmail.com>
-Subject: Re: [PATCH v2] x86/kvm: Disable KVM_ASYNC_PF_SEND_ALWAYS
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Tony Luck <tony.luck@intel.com>
-Cc:     Andrew Cooper <andrew.cooper3@citrix.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vivek Goyal <vgoyal@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        LKML <linux-kernel@vger.kernel.org>, X86 ML <x86@kernel.org>,
-        kvm list <kvm@vger.kernel.org>, stable <stable@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <a21f3ae5-fb4e-1b9d-c8e7-ac4628c763c2@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9586 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 malwarescore=0
+ adultscore=0 mlxscore=0 spamscore=0 bulkscore=0 phishscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2004090130
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9586 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 adultscore=0
+ impostorscore=0 malwarescore=0 lowpriorityscore=0 mlxlogscore=999
+ priorityscore=1501 clxscore=1015 bulkscore=0 phishscore=0 mlxscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2004090129
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi, Tony.  I'm adding you because, despite the fact that everyone in
-this thread is allergic to #MC, this seems to be one of your favorite
-topics :)
 
-> On Apr 9, 2020, at 8:17 AM, Paolo Bonzini <pbonzini@redhat.com> wrote:
+On 4/8/20 7:45 PM, Wainer dos Santos Moschetta wrote:
 >
-> =EF=BB=BFOn 09/04/20 17:03, Andy Lutomirski wrote:
->>> No, I think we wouldn't use a paravirt #VE at this point, we would
->>> use the real thing if available.
+> On 4/8/20 10:25 PM, Krish Sadhukhan wrote:
+>>
+>> On 4/8/20 3:08 PM, Wainer dos Santos Moschetta wrote:
+>>> Introduces the vm_get_fd() function in kvm_util which returns
+>>> the VM file descriptor.
 >>>
->>> It would still be possible to switch from the IST to the main
->>> kernel stack before writing 0 to the reentrancy word.
+>>> Reviewed-by: Andrew Jones <drjones@redhat.com>
+>>> Signed-off-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
+>>> ---
+>>>   tools/testing/selftests/kvm/include/kvm_util.h | 1 +
+>>>   tools/testing/selftests/kvm/lib/kvm_util.c     | 5 +++++
+>>>   2 files changed, 6 insertions(+)
+>>>
+>>> diff --git a/tools/testing/selftests/kvm/include/kvm_util.h 
+>>> b/tools/testing/selftests/kvm/include/kvm_util.h
+>>> index a99b875f50d2..4e122819ee24 100644
+>>> --- a/tools/testing/selftests/kvm/include/kvm_util.h
+>>> +++ b/tools/testing/selftests/kvm/include/kvm_util.h
+>>> @@ -254,6 +254,7 @@ bool vm_is_unrestricted_guest(struct kvm_vm *vm);
+>>>   unsigned int vm_get_page_size(struct kvm_vm *vm);
+>>>   unsigned int vm_get_page_shift(struct kvm_vm *vm);
+>>>   unsigned int vm_get_max_gfn(struct kvm_vm *vm);
+>>> +int vm_get_fd(struct kvm_vm *vm);
+>>>     unsigned int vm_calc_num_guest_pages(enum vm_guest_mode mode, 
+>>> size_t size);
+>>>   unsigned int vm_num_host_pages(enum vm_guest_mode mode, unsigned 
+>>> int num_guest_pages);
+>>> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c 
+>>> b/tools/testing/selftests/kvm/lib/kvm_util.c
+>>> index 8a3523d4434f..3e36a1eb8771 100644
+>>> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
+>>> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+>>> @@ -1734,6 +1734,11 @@ unsigned int vm_get_max_gfn(struct kvm_vm *vm)
+>>>       return vm->max_gfn;
+>>>   }
+>>>   +int vm_get_fd(struct kvm_vm *vm)
+>>> +{
+>>> +        return vm->fd;
+>>> +}
+>>> +
 >>
->> Almost but not quite. We do this for NMI-from-usermode, and it=E2=80=99s
->> ugly. But we can=E2=80=99t do this for NMI-from-kernel or #VE-from-kerne=
-l
->> because there might not be a kernel stack.  Trying to hack around
->> this won=E2=80=99t be pretty.
 >>
->> Frankly, I think that we shouldn=E2=80=99t even try to report memory fai=
-lure
->> to the guest if it happens with interrupts off. Just kill the guest
->> cleanly and keep it simple. Or inject an intentionally unrecoverable
->> IST exception.
->
-> But it would be nice to use #VE for all host-side page faults, not just
-> for memory failure.
->
-> So the solution would be the same as for NMIs, duplicating the stack
-> frame and patching the outer handler's stack from the recursive #VE
-> (https://lwn.net/Articles/484932/).  It's ugly but it's a known ugliness.
+>> I am just trying to understand why we need a separate function when 
+>> the 'vm' variable is all local within the same file. There are a 
+>> number of places in kvm_util.c where it is used directly.
 >
 >
+> The problem is to access of kvm_vm attributes outside of kvm_utils.c. 
+> For example, if I try to vm->fd in my test I get the compiler error:
+>
+> mem_slot_test.c: In function ‘test_add_max_slots’:
+> mem_slot_test.c:62:16: error: dereferencing pointer to incomplete type 
+> ‘struct kvm_vm’
+>   ret = ioctl(vm->fd, KVM_SET_USER_MEMORY_REGION,
+>                 ^~
 
-Believe me, I know all about how ugly it is, since I=E2=80=99m the one who
-fixed most of the bugs in the first few implementations.  And, before
-I wrote or ack any such thing for #VE, I want to know why.  What,
-exactly, is a sufficiently strong motivation for using #VE *at all*
-that Linux should implement a #VE handler?
 
-As I see it, #VE has several downsides:
+My bad !  I missed the fact that the structure is defined in 
+kvm_util_internal.h and not in kvm_util.h.
 
-1. Intel only.
 
-2. Depending on precisely what it's used for, literally any memory
-access in the kernel can trigger it as a fault.  This means that it
-joins NMI and #MC (and, to a limited extent, #DB) in the horrible
-super-atomic-happens-in-bad-contexts camp.  IST is mandatory, and IST
-is not so great.
+Reviewed-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
 
-3. Just like NMI and MCE, it comes with a fundamentally broken
-don't-recurse-me mechanism.
-
-If we do support #VE, I would suggest we do it roughly like this.  The
-#VE handler is a regular IST entry -- there's a single IST stack, and
-#VE from userspace stack-switches to the regular kernel stack.  The C
-handler (do_virtualization_exception?) is permitted to panic if
-something is horribly wrong, but is *not* permitted to clear the word
-at byte 4 to re-enable #VE.  Instead, it does something to trigger a
-deferred re-enable.  For example, it sends IPI to self and the IPI
-handler clears the magic re-enable flag.
-
-There are definitely horrible corner cases here.  For example, suppose
-user code mmaps() some kind of failable memory (due to NVDIMM hardware
-failures, truncation, whatever).  Then user code points RBP at it and
-we get a perf NMI.  Now the perf code tries to copy_from_user_nmi()
-the user stack and hits the failure.  It gets #MC or #VE or some
-paravirt thing.  Now we're in a situation where we got an IST
-exception in the middle of NMI processing and we're expected to do
-something intelligent about it.  Sure, we can invoke the extable
-handler, but it's not really clear how to recover if we somehow hit
-the same type of failure again in the same NMI.
-
-A model that could actually work, perhaps for #VE and #MC, is to have
-the extable code do the re-enabling.  So ex_handler_uaccess() and
-ex_handler_mcsafe() will call something like rearm_memory_failure(),
-and that will do whatever is needed to re-arm the specific memory
-failure reporting mechanism in use.
-
-But, before I touch that with a ten-foot pole, I want to know *why*.
-What's the benefit?  Why do we want convertible EPT violations?
+>
+>>
+>>
+>>>   static unsigned int vm_calc_num_pages(unsigned int num_pages,
+>>>                         unsigned int page_shift,
+>>>                         unsigned int new_page_shift,
+>>
+>
