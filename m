@@ -2,132 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7AFF11A329E
-	for <lists+kvm@lfdr.de>; Thu,  9 Apr 2020 12:41:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5E4B01A32FC
+	for <lists+kvm@lfdr.de>; Thu,  9 Apr 2020 13:14:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726647AbgDIKld (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Apr 2020 06:41:33 -0400
-Received: from mout.kundenserver.de ([217.72.192.75]:34085 "EHLO
-        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725828AbgDIKlc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Apr 2020 06:41:32 -0400
-Received: from mail-qk1-f180.google.com ([209.85.222.180]) by
- mrelayeu.kundenserver.de (mreue107 [212.227.15.145]) with ESMTPSA (Nemesis)
- id 1M3UIe-1jLwOP22ni-000bUu; Thu, 09 Apr 2020 12:41:31 +0200
-Received: by mail-qk1-f180.google.com with SMTP id z15so3395725qki.7;
-        Thu, 09 Apr 2020 03:41:31 -0700 (PDT)
-X-Gm-Message-State: AGi0PuYB6P8o0aFEzfWoQU5AHd+quTzHr9uwJhbuRns7IN2hGas/tBj9
-        CPbMV3pCx+IvNRBQcqtrfu/63O9yGEyDmHLSGRg=
-X-Google-Smtp-Source: APiQypJ+MZNDx1nAeHQJUrsxI3ccDEBo8kCLAwyqI5SJ9WAba6/XBRqyHYyNfPORCxMsxCe8/yMMMt7xih71qKreb4o=
-X-Received: by 2002:a37:a52:: with SMTP id 79mr11506167qkk.3.1586428890169;
- Thu, 09 Apr 2020 03:41:30 -0700 (PDT)
+        id S1726689AbgDILOW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Apr 2020 07:14:22 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:34122 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725972AbgDILOV (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 9 Apr 2020 07:14:21 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1586430861;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=eVe7IfDc6Eg1zSotYzISNC1XY4K3ye5o8p4mKeTvCRU=;
+        b=AuqI9N3BBoS1NgKa6tShcc4zCDYCUbFqZwliqBDcdTNC+fE4V6+NtI+KUpNlMtiYQKRtRr
+        AplFdj07kkIsFt8wZLT4kUPCHaPd2sAS2epVwvrwM9TbDChQxB6If3/pyAUTqCVuISfoCQ
+        89diyoLRHe4mAQCzCRY1dR5kzL7we4w=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-207-tPY8mMGaO1C4kcWqZxbH0g-1; Thu, 09 Apr 2020 07:14:17 -0400
+X-MC-Unique: tPY8mMGaO1C4kcWqZxbH0g-1
+Received: by mail-wr1-f72.google.com with SMTP id j12so6145459wrr.18
+        for <kvm@vger.kernel.org>; Thu, 09 Apr 2020 04:14:17 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=eVe7IfDc6Eg1zSotYzISNC1XY4K3ye5o8p4mKeTvCRU=;
+        b=XlplFhw5CWvDrheQcDT8XcnO/e75PkORqco6gFXhKjMBjvZMyGyeHr79HKX0/yShTt
+         eG8WQs4azBrcSZq5D4niubXHTwhw974sAow2/USVvJ3Ke2sHQ4MHeQksyc9aAhxF4kkT
+         qqEhifsY4wE/9dlNQpzjbKd0SeNxdV6Jv2xECZskZp3BtsWhsOITKiuz5/a+tRI7TiMv
+         Y2xGCNpwfjedD9xTcTkCqyhrB9xowSkQFUiIstMvN9fFm+81ov4poh2rbbbBfEkTADzE
+         U6xTh4OStmyFYpYOelriQMqTimIXooAbOWKoifU9f5xDKWw3nGM9vJHvBVASc3oSAJTm
+         eq3A==
+X-Gm-Message-State: AGi0PubopfyuzQROcugpvVWU8Ib0H3RTovbKv+WhjLnKIVoDg6usjt0j
+        z1alQFh/kf3S8vp1bKfcALj2Dywx5vpLiiHC2yj+7Eyt8mq1dGejZYvHdRk/zhUAF4JMU271l0b
+        ZtQ2ngIpPX34P
+X-Received: by 2002:adf:aad7:: with SMTP id i23mr13446979wrc.184.1586430856639;
+        Thu, 09 Apr 2020 04:14:16 -0700 (PDT)
+X-Google-Smtp-Source: APiQypJrJJvOfBtCg0nF+bFCAwjKhMQCswXXApj7bVfJMGmrNUaRyCwySn1n7/vsqTWSUHcBZMCe9Q==
+X-Received: by 2002:adf:aad7:: with SMTP id i23mr13446952wrc.184.1586430856377;
+        Thu, 09 Apr 2020 04:14:16 -0700 (PDT)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id c20sm3387575wmd.36.2020.04.09.04.14.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 09 Apr 2020 04:14:15 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Baoquan He <bhe@redhat.com>
+Cc:     Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kexec@lists.infradead.org,
+        dzickus@redhat.com, dyoung@redhat.com,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Subject: Re: [PATCH v2 0/3] KVM: VMX: Fix for kexec VMCLEAR and VMXON cleanup
+In-Reply-To: <20200409012002.GT2402@MiWiFi-R3L-srv>
+References: <20200321193751.24985-1-sean.j.christopherson@intel.com> <20200407110115.GA14381@MiWiFi-R3L-srv> <87r1wzlcwn.fsf@vitty.brq.redhat.com> <20200408151808.GS2402@MiWiFi-R3L-srv> <87mu7l2256.fsf@vitty.brq.redhat.com> <20200409012002.GT2402@MiWiFi-R3L-srv>
+Date:   Thu, 09 Apr 2020 13:14:14 +0200
+Message-ID: <87imi829o9.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-References: <20200326140125.19794-1-jasowang@redhat.com> <20200326140125.19794-10-jasowang@redhat.com>
-In-Reply-To: <20200326140125.19794-10-jasowang@redhat.com>
-From:   Arnd Bergmann <arnd@arndb.de>
-Date:   Thu, 9 Apr 2020 12:41:13 +0200
-X-Gmail-Original-Message-ID: <CAK8P3a1RXUXs5oYjB=Jq5cpvG11eTnmJ+vc18_-0fzgTH6envA@mail.gmail.com>
-Message-ID: <CAK8P3a1RXUXs5oYjB=Jq5cpvG11eTnmJ+vc18_-0fzgTH6envA@mail.gmail.com>
-Subject: Re: [PATCH V9 9/9] virtio: Intel IFC VF driver for VDPA
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        kvm list <kvm@vger.kernel.org>,
-        virtualization@lists.linux-foundation.org,
-        Networking <netdev@vger.kernel.org>,
-        Jason Gunthorpe <jgg@mellanox.com>, maxime.coquelin@redhat.com,
-        cunming.liang@intel.com, zhihong.wang@intel.com,
-        rob.miller@broadcom.com, xiao.w.wang@intel.com,
-        lingshan.zhu@intel.com, eperezma@redhat.com, lulu@redhat.com,
-        Parav Pandit <parav@mellanox.com>, kevin.tian@intel.com,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Christoph Hellwig <hch@infradead.org>, aadam@redhat.com,
-        Jiri Pirko <jiri@mellanox.com>, shahafs@mellanox.com,
-        hanand@xilinx.com, mhabets@solarflare.com, gdawar@xilinx.com,
-        saugatm@xilinx.com, vmireyno@marvell.com,
-        zhangweining@ruijie.com.cn, Bie Tiwei <tiwei.bie@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Provags-ID: V03:K1:HWzbXodPWtj3796KNdOWac9tTnFw3sd83DCpZ4tYyN9oV/qgGKH
- fh9QCRbNS0utuTU9EQtqCO6ZMTIIvNcRuhL2cqr0k4HKzZhz+uiywiNmgaemhac/AwdFKEV
- 9zFmQgVG0n0f9ah0sZX3TABPeCExNtqJrKy6wBA2cT8/U8m02VlfUZ1IzMekJGmjApBy+WU
- WL7xd2t0u6StYdxj92ELg==
-X-Spam-Flag: NO
-X-UI-Out-Filterresults: notjunk:1;V03:K0:FZrkDyo0urk=:LiTF4Hf9cz8JtqwzdwOHlC
- 7V9TCsJOYLCqqVJJo13Ie7d9LKCh8bV8SMM0SbMkYXJXKODaxUystJK7yjQuM5uEUTTDQLbt0
- 9A/e85+4X+QBIjN5zUkuVYPWJ2nZnFxYSDF+q/NpjUy515HKltJpmp5MF/che+ULTrLkLPrcq
- BxhrLOWxOlAb3R9PnzS8L/Nluk14VLNct3esVTMrAQfNS8Ri2DQNxcPhRMuBv737PXft0lsyQ
- D8RM1RHeGD4mTulcdYlppnNSLdcP3QkV6OakdtmVuvQdjuRHhITfoRTOna1S6DpttfhCLB3cM
- CCpf3k4qCPV7FJKVBkufBknimkXZIuiK72E2UQI8d5d9HJL7xH/7ASbhFD1f06oWednWvpmho
- FBma/1vv093R3IkpLh2May4rzttJnU5+XAYw2gigCHM26BgVJvnVU2xAggtliBp7v3YbEcK7I
- Xf/XHW+46yEV+yOJPUQGhKo+j5YJicEJk/DkBOfelTJFiaeF58EjmlAF9GCM6xbVv6kJPCm5p
- oB373GuFH9jSVGSTt6eSaUZ9dHvmDpnvwCitcdVPyFTUrLxq1dboPbDhnhUGJmZalPJarfTqH
- EGmnoInmTHXWexZY0PWxsvd9HXDgvkAAD8YxPl7/oQOLePUhEwqiAK9aGdkMnIa7oVIjF6Xls
- iVErHfLgKp8u2ZiWES7n61SzCHeb9JHudAhT9muDYsUSUzGnvVf1DI1wR3MLskPvF/M45CD8r
- cWQv9vKhv13MmdFpynWXOXFmL9mczotZpUKCUT7PxwBdnjh74LFYFIvG/LH9V3/Xq/Dyd+a4o
- x0fI0zggrorIi9rD7hqdDXISbeyaZ52nUZt+IRgXsFanzIjhu0=
+Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 26, 2020 at 3:08 PM Jason Wang <jasowang@redhat.com> wrote:
+Baoquan He <bhe@redhat.com> writes:
+
 >
-> From: Zhu Lingshan <lingshan.zhu@intel.com>
+> While I would suggest adding kexec@lists.infradead.org when code changes
+> are related to kexec/kdump since we usually watch this mailing list.
+> LKML contains too many mails, we may miss this kind of change, have to
+> debug and test again.
 >
-> This commit introduced two layers to drive IFC VF:
->
-> (1) ifcvf_base layer, which handles IFC VF NIC hardware operations and
->     configurations.
->
-> (2) ifcvf_main layer, which complies to VDPA bus framework,
->     implemented device operations for VDPA bus, handles device probe,
->     bus attaching, vring operations, etc.
->
-> Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
-> Signed-off-by: Bie Tiwei <tiwei.bie@intel.com>
-> Signed-off-by: Wang Xiao <xiao.w.wang@intel.com>
-> Signed-off-by: Jason Wang <jasowang@redhat.com>
 
-> +
-> +#define IFCVF_QUEUE_ALIGNMENT  PAGE_SIZE
-> +#define IFCVF_QUEUE_MAX                32768
-> +static u16 ifcvf_vdpa_get_vq_align(struct vdpa_device *vdpa_dev)
-> +{
-> +       return IFCVF_QUEUE_ALIGNMENT;
-> +}
+Definitely makes sense and I'll try my best to remember doing this
+myself next time but the problem is that scripts/checkpatch.pl is not
+smart enough, kexec related bits are scattered all over kernel and
+drivers so I'm afraid you're missing a lot in kexec@ :-(
 
-This fails to build on arm64 with 64kb page size (found in linux-next):
+-- 
+Vitaly
 
-/drivers/vdpa/ifcvf/ifcvf_main.c: In function 'ifcvf_vdpa_get_vq_align':
-arch/arm64/include/asm/page-def.h:17:20: error: conversion from 'long
-unsigned int' to 'u16' {aka 'short unsigned int'} changes value from
-'65536' to '0' [-Werror=overflow]
-   17 | #define PAGE_SIZE  (_AC(1, UL) << PAGE_SHIFT)
-      |                    ^
-drivers/vdpa/ifcvf/ifcvf_base.h:37:31: note: in expansion of macro 'PAGE_SIZE'
-   37 | #define IFCVF_QUEUE_ALIGNMENT PAGE_SIZE
-      |                               ^~~~~~~~~
-drivers/vdpa/ifcvf/ifcvf_main.c:231:9: note: in expansion of macro
-'IFCVF_QUEUE_ALIGNMENT'
-  231 |  return IFCVF_QUEUE_ALIGNMENT;
-      |         ^~~~~~~~~~~~~~~~~~~~~
-
-It's probably good enough to just not allow the driver to be built in that
-configuration as it's fairly rare but unfortunately there is no simple Kconfig
-symbol for it.
-
-In a similar driver, we did
-
-config VMXNET3
-        tristate "VMware VMXNET3 ethernet driver"
-        depends on PCI && INET
-        depends on !(PAGE_SIZE_64KB || ARM64_64K_PAGES || \
-                     IA64_PAGE_SIZE_64KB || MICROBLAZE_64K_PAGES || \
-                     PARISC_PAGE_SIZE_64KB || PPC_64K_PAGES)
-
-I think we should probably make PAGE_SIZE_64KB a global symbol
-in arch/Kconfig and have it selected by the other symbols so drivers
-like yours can add a dependency for it.
-
-         Arnd
