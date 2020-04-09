@@ -2,195 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3B5AD1A3691
-	for <lists+kvm@lfdr.de>; Thu,  9 Apr 2020 17:06:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2D1A11A36A0
+	for <lists+kvm@lfdr.de>; Thu,  9 Apr 2020 17:10:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727939AbgDIPGP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Apr 2020 11:06:15 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:52371 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727327AbgDIPGP (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 9 Apr 2020 11:06:15 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1586444774;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=W2Ev3/S1C/3a4puTtGn9OVdridbzmbjLhCuT5UsL+Ig=;
-        b=CKdJb1t3LnnRPHDNTRBk4phS9C8GhmG9itnBMho8bIpggRYrevydxBG44mm9GtBnpA2m9Q
-        p3RQnW9xiEBsnDDUsY9QC92WDjxMkZqdq6I2N+e4HHPMmc7I98JeibZt/RuHRh3K5XweQ8
-        VYc994utB+QIhZBW0gwbheJyJwFjlNo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-296-VSi-y48XO9igghdtVzCRuw-1; Thu, 09 Apr 2020 11:06:12 -0400
-X-MC-Unique: VSi-y48XO9igghdtVzCRuw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 490928017F5;
-        Thu,  9 Apr 2020 15:06:10 +0000 (UTC)
-Received: from gondolin (ovpn-112-54.ams2.redhat.com [10.36.112.54])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 0246C19757;
-        Thu,  9 Apr 2020 15:06:04 +0000 (UTC)
-Date:   Thu, 9 Apr 2020 17:06:02 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Tony Krowiak <akrowiak@linux.ibm.com>
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, freude@linux.ibm.com, borntraeger@de.ibm.com,
-        mjrosato@linux.ibm.com, pmorel@linux.ibm.com, pasic@linux.ibm.com,
-        alex.williamson@redhat.com, kwankhede@nvidia.com,
-        jjherne@linux.ibm.com, fiuczy@linux.ibm.com
-Subject: Re: [PATCH v7 02/15] s390/vfio-ap: manage link between queue struct
- and matrix mdev
-Message-ID: <20200409170602.4440be0f.cohuck@redhat.com>
-In-Reply-To: <20200407192015.19887-3-akrowiak@linux.ibm.com>
-References: <20200407192015.19887-1-akrowiak@linux.ibm.com>
-        <20200407192015.19887-3-akrowiak@linux.ibm.com>
-Organization: Red Hat GmbH
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+        id S1728020AbgDIPKb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Apr 2020 11:10:31 -0400
+Received: from mail-qk1-f194.google.com ([209.85.222.194]:37770 "EHLO
+        mail-qk1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727771AbgDIPKa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Apr 2020 11:10:30 -0400
+Received: by mail-qk1-f194.google.com with SMTP id 130so4251975qke.4
+        for <kvm@vger.kernel.org>; Thu, 09 Apr 2020 08:10:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=lca.pw; s=google;
+        h=mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=DIocbXZ/GrySYJM2qjlB0aVfLDG/I+8RC+5beeuDqKQ=;
+        b=rropwxWiFn2w4WZ/eqv8MdbJFi26bRLRbgBUG9wGB+0VCTjauS8nU81/N8kxvdyVnD
+         R4UvF4evvwf2RWu7qI44owvQYpgghZYQE7g2936Uc0Wamem2nJTvqwbKYpWxXMfBN+Td
+         ybZn1+3VDLyLj6y12q5q52UK0I+8kWOaMfyk1Y1+cZBFcK7KxU3yUcdtkJLu5puQIvp2
+         UMSRjN0cbdDNmQBCpno7rcnePcplHvCOKqxA3OuMF0VHiHnJaB2h0aZwVYX4sqrUAlpl
+         MD52i3KsjWHxtvJNSvCQrHlfU0D6H11iF7PJHSf3JJhA3QpS8Oq7MXAFkFIlltUtKJb6
+         1bTQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=DIocbXZ/GrySYJM2qjlB0aVfLDG/I+8RC+5beeuDqKQ=;
+        b=p5P0Hn5DogbnpL8MWOtuWngg0bi2lpDv66nykLqT6ooJMQmVg/U/zu15uCf00Y6G/X
+         NiG5HwUYOb/vaUm9xq4QPy/hIPaAUo+9YZqfS6/0GS7x2rujheks4Gze8A45SsvEvWyt
+         lleXfWZDQWbzMrXbCxXV7NvLu8odH8S4vyVEzwRjLTEBhxWUp3LjY12MjyotKuojiVr1
+         aO5Aa+q2Or/Qrvup1GAO7lZbxX9i7S7o+R36CjaWrvHRLIH60UBUIrGceb/rxc4qzta+
+         ZKE8PU4mmqR7E+7RO33meN4viiafXzSDEneh7VfDBhSVwxamcnK5HjAPWU5e1+RWSIvg
+         EmvA==
+X-Gm-Message-State: AGi0PuZ/kj936vUL48VtHRQzQa5o7A5lm6H7txbDT1UaHYoN8GorKyes
+        g9+kmjzrIylHvsxlR3pxiiXlMw==
+X-Google-Smtp-Source: APiQypLqKqGGiP1/sf/taBiiQNFrD+V9RPMvEkZHZME7janiP8RehwEHD0O/256zPiMPw8/rVadCwg==
+X-Received: by 2002:a05:620a:12fa:: with SMTP id f26mr282331qkl.374.1586445030295;
+        Thu, 09 Apr 2020 08:10:30 -0700 (PDT)
+Received: from [192.168.1.153] (pool-71-184-117-43.bstnma.fios.verizon.net. [71.184.117.43])
+        by smtp.gmail.com with ESMTPSA id y21sm21347011qka.37.2020.04.09.08.10.29
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 09 Apr 2020 08:10:29 -0700 (PDT)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
+Subject: Re: KCSAN + KVM = host reset
+From:   Qian Cai <cai@lca.pw>
+In-Reply-To: <CANpmjNMiHNVh3BVxZUqNo4jW3DPjoQPrn-KEmAJRtSYORuryEA@mail.gmail.com>
+Date:   Thu, 9 Apr 2020 11:10:28 -0400
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        "paul E. McKenney" <paulmck@kernel.org>,
+        kasan-dev <kasan-dev@googlegroups.com>,
+        LKML <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <B7F7F73E-EE27-48F4-A5D0-EBB29292913E@lca.pw>
+References: <E180B225-BF1E-4153-B399-1DBF8C577A82@lca.pw>
+ <fb39d3d2-063e-b828-af1c-01f91d9be31c@redhat.com>
+ <017E692B-4791-46AD-B9ED-25B887ECB56B@lca.pw>
+ <CANpmjNMiHNVh3BVxZUqNo4jW3DPjoQPrn-KEmAJRtSYORuryEA@mail.gmail.com>
+To:     Marco Elver <elver@google.com>
+X-Mailer: Apple Mail (2.3608.80.23.2.2)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue,  7 Apr 2020 15:20:02 -0400
-Tony Krowiak <akrowiak@linux.ibm.com> wrote:
 
-> A vfio_ap_queue structure is created for each queue device probed. To
-> ensure that the matrix mdev to which a queue's APQN is assigned is linked
-> to the queue structure as long as the queue device is bound to the vfio_ap
-> device driver, let's go ahead and manage these links when the queue device
-> is probed and removed as well as whenever an adapter or domain is assigned
-> to or unassigned from the matrix mdev.
-> 
-> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
-> ---
->  drivers/s390/crypto/vfio_ap_ops.c | 75 ++++++++++++++++++++++++++++---
->  1 file changed, 70 insertions(+), 5 deletions(-)
 
-(...)
+> On Apr 9, 2020, at 3:03 AM, Marco Elver <elver@google.com> wrote:
+>=20
+> On Wed, 8 Apr 2020 at 23:29, Qian Cai <cai@lca.pw> wrote:
+>>=20
+>>=20
+>>=20
+>>> On Apr 8, 2020, at 5:25 PM, Paolo Bonzini <pbonzini@redhat.com> =
+wrote:
+>>>=20
+>>> On 08/04/20 22:59, Qian Cai wrote:
+>>>> Running a simple thing on this AMD host would trigger a reset right =
+away.
+>>>> Unselect KCSAN kconfig makes everything work fine (the host would =
+also
+>>>> reset If only "echo off > /sys/kernel/debug/kcsan=E2=80=9D before =
+running qemu-kvm).
+>>>=20
+>>> Is this a regression or something you've just started to play with?  =
+(If
+>>> anything, the assembly language conversion of the AMD world switch =
+that
+>>> is in linux-next could have reduced the likelihood of such a =
+failure,
+>>> not increased it).
+>>=20
+>> I don=E2=80=99t remember I had tried this combination before, so =
+don=E2=80=99t know if it is a
+>> regression or not.
+>=20
+> What happens with KASAN? My guess is that, since it also happens with
+> "off", something that should not be instrumented is being
+> instrumented.
 
-> @@ -536,6 +531,31 @@ static int vfio_ap_mdev_verify_no_sharing(struct ap_matrix_mdev *matrix_mdev)
->  	return 0;
->  }
->  
-> +/**
-> + * vfio_ap_mdev_qlinks_for_apid
+No, KASAN + KVM works fine.
 
-Hm... maybe the function name should express that there's some actual
-(un)linking going on?
+>=20
+> What happens if you put a 'KCSAN_SANITIZE :=3D n' into
+> arch/x86/kvm/Makefile? Since it's hard for me to reproduce on this
 
-vfio_ap_mdev_link_by_apid?
+Yes, that works, but this below alone does not work,
 
-Or make this vfio_ap_mdev_link_queues() and pass in an indicator whether
-the passed value is an apid or an aqid? Both function names look so
-very similar to be easily confused (at least to me).
+KCSAN_SANITIZE_kvm-amd.o :=3D n
 
-> + *
-> + * @matrix_mdev: a matrix mediated device
-> + * @apqi:	 the APID of one or more APQNs assigned to @matrix_mdev
-> + *
-> + * Set the link to @matrix_mdev for each queue device bound to the vfio_ap
-> + * device driver with an APQN assigned to @matrix_mdev with the specified @apid.
-> + *
-> + * Note: If @matrix_mdev is NULL, the link to @matrix_mdev will be severed.
-> + */
-> +static void vfio_ap_mdev_qlinks_for_apid(struct ap_matrix_mdev *matrix_mdev,
-> +					 unsigned long apid)
-> +{
-> +	unsigned long apqi;
-> +	struct vfio_ap_queue *q;
-> +
-> +	for_each_set_bit_inv(apqi, matrix_mdev->matrix.aqm,
-> +			     matrix_mdev->matrix.aqm_max + 1) {
-> +		q = vfio_ap_get_queue(AP_MKQID(apid, apqi));
-> +		if (q)
-> +			q->matrix_mdev = matrix_mdev;
-> +	}
-> +}
-> +
->  /**
->   * assign_adapter_store
->   *
+I have been able to reproduce this on a few AMD hosts.
 
-(...)
-
-> @@ -682,6 +704,31 @@ vfio_ap_mdev_verify_queues_reserved_for_apqi(struct ap_matrix_mdev *matrix_mdev,
->  	return 0;
->  }
->  
-> +/**
-> + * vfio_ap_mdev_qlinks_for_apqi
-
-See my comment above.
-
-> + *
-> + * @matrix_mdev: a matrix mediated device
-> + * @apqi:	 the APQI of one or more APQNs assigned to @matrix_mdev
-> + *
-> + * Set the link to @matrix_mdev for each queue device bound to the vfio_ap
-> + * device driver with an APQN assigned to @matrix_mdev with the specified @apqi.
-> + *
-> + * Note: If @matrix_mdev is NULL, the link to @matrix_mdev will be severed.
-> + */
-> +static void vfio_ap_mdev_qlinks_for_apqi(struct ap_matrix_mdev *matrix_mdev,
-> +					 unsigned long apqi)
-> +{
-> +	unsigned long apid;
-> +	struct vfio_ap_queue *q;
-> +
-> +	for_each_set_bit_inv(apid, matrix_mdev->matrix.apm,
-> +			     matrix_mdev->matrix.apm_max + 1) {
-> +		q = vfio_ap_get_queue(AP_MKQID(apid, apqi));
-> +		if (q)
-> +			q->matrix_mdev = matrix_mdev;
-> +	}
-> +}
-> +
->  /**
->   * assign_domain_store
->   *
-
-(...)
-
-> @@ -1270,6 +1319,21 @@ void vfio_ap_mdev_unregister(void)
->  	mdev_unregister_device(&matrix_dev->device);
->  }
->  
-> +static void vfio_ap_mdev_for_queue(struct vfio_ap_queue *q)
-
-vfio_ap_queue_link_mdev()? It is the other direction from the linking
-above.
-
-> +{
-> +	unsigned long apid = AP_QID_CARD(q->apqn);
-> +	unsigned long apqi = AP_QID_QUEUE(q->apqn);
-> +	struct ap_matrix_mdev *matrix_mdev;
-> +
-> +	list_for_each_entry(matrix_mdev, &matrix_dev->mdev_list, node) {
-> +		if (test_bit_inv(apid, matrix_mdev->matrix.apm) &&
-> +		    test_bit_inv(apqi, matrix_mdev->matrix.aqm)) {
-> +			q->matrix_mdev = matrix_mdev;
-> +			break;
-> +		}
-> +	}
-> +}
-> +
->  int vfio_ap_mdev_probe_queue(struct ap_queue *queue)
->  {
->  	struct vfio_ap_queue *q;
-> @@ -1282,6 +1346,7 @@ int vfio_ap_mdev_probe_queue(struct ap_queue *queue)
->  	dev_set_drvdata(&queue->ap_dev.device, q);
->  	q->apqn = queue->qid;
->  	q->saved_isc = VFIO_AP_ISC_INVALID;
-> +	vfio_ap_mdev_for_queue(q);
->  	hash_add(matrix_dev->qtable, &q->qnode, q->apqn);
->  	mutex_unlock(&matrix_dev->lock);
->  
-
-In general, looks sane.
+> exact system, I'd ask you to narrow it down by placing 'KCSAN_SANITIZE
+> :=3D n' into suspect subsystems' Makefiles. Once you get it to work =
+with
+> that, we can refine the solution.
+>=20
+> Thanks,
+> -- Marco
 
