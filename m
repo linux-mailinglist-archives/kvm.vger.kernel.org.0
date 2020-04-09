@@ -2,107 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D206B1A3462
-	for <lists+kvm@lfdr.de>; Thu,  9 Apr 2020 14:51:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9EF0E1A3471
+	for <lists+kvm@lfdr.de>; Thu,  9 Apr 2020 14:57:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726691AbgDIMvm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Apr 2020 08:51:42 -0400
-Received: from mail-io1-f68.google.com ([209.85.166.68]:46985 "EHLO
-        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725971AbgDIMvm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Apr 2020 08:51:42 -0400
-Received: by mail-io1-f68.google.com with SMTP id i3so3634736ioo.13
-        for <kvm@vger.kernel.org>; Thu, 09 Apr 2020 05:51:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=xYyPzQ2DdU2lh/qLxAHvZYhZyn/lM7nZI3e/W68srRA=;
-        b=VsXhMKKJnEpmcCy78hzjn5QwU09l+fVVKr+Rso4MVFIe2DXAIutoWgL3Tvp+S7wH4r
-         EgTHucTamZVVTjftiIIfR6TSGrPYPdcg96rhWiZmsDeX259yu914M3pzbeLeQ8JPLcoh
-         v/CTjjXsLZ1NrNy+NhzjRDRcQdClRnHFHPhcWOl4QQQ8AgsTi6shNXCf+dFBmDm3QbiY
-         +/ZJ3G9wffp76wSnWR3MS2l+rMWZ2O486YH2PcK8+Pk2qCsAMLuPohT6SCvxCO9gtPMZ
-         gi8/HRYu8RiwctZKbb7KzL23Rn8l14X6zd0omIYawf8Kny2WVgOFOWVsZMMeTcM8YPwM
-         wRjg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=xYyPzQ2DdU2lh/qLxAHvZYhZyn/lM7nZI3e/W68srRA=;
-        b=otbuZx3wIK+7hv+eTdi/mBYopc58MmfEMJywvyMSo33t4vsEROMl2bsgn49OtP4toF
-         vi+3duE7R+3vvhUx8ZWRpd+oLgceiA3+0uPrFM/QO2m4oI+k1Q7fC+KeanJGqipIXsnM
-         JWtXSwMBtdcdTQj3+ErvY5KAD6dVJCII2FvPZzYe90iUy6YWcBU58BFYPjSnIWiOCEeq
-         NIPcdyvCm326rx5QaxCFlJL5o7I4hCnBzVL4EHeOjpG/Lo1WEqw5w/qaARH4NOUXHQNi
-         nlSejfe2+csBw6Gc85l71hwF3iiduJGtXTCdMoumfMDrQbW8UUjCmSmrEiJF6E1Rp02y
-         WAYg==
-X-Gm-Message-State: AGi0PuZdkNawWRpTYZ7Zoak2xocSHkZ4HO5xRhKYIuDNxMH9prpvCnhZ
-        4bUmVFqK5YXWX7l61En2W9SPwXU2a67d1Ryo0Us=
-X-Google-Smtp-Source: APiQypJ1XPzeIoo11Ygog9vSoABGEzQUpgJCB2tA/jWpFL3zf6qS71jLITOxGdfhSAYALwi30zIaz/pUi4lO5Lg4X4A=
-X-Received: by 2002:a6b:f002:: with SMTP id w2mr4655866ioc.48.1586436702074;
- Thu, 09 Apr 2020 05:51:42 -0700 (PDT)
+        id S1726759AbgDIM5c (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Apr 2020 08:57:32 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:50976 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726609AbgDIM5c (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 9 Apr 2020 08:57:32 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1586437051;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=O2CLuS3FEdpoO51mMdiV5dcccG5OKJkGsbzDxdCTFJc=;
+        b=S/Xi80WEpWmwWIAtuePSpP00yDxQZDtiEd8wZPUgE0yEn1Y8n/KwxygjtrE37gaP8yRi7Y
+        pscJqULCxQmsjIsfx9/5XjPtLwXxmqDMZ8VnvbLa9NxcDl8igjoG8x3toS4SV7+aeULF6D
+        FKOAvPPDl5cOtGCN48GMiV+xseW3Ejo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-451-aCVDYKQlOD2fSBBkaINFYA-1; Thu, 09 Apr 2020 08:57:29 -0400
+X-MC-Unique: aCVDYKQlOD2fSBBkaINFYA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 09FF0801E5E;
+        Thu,  9 Apr 2020 12:57:28 +0000 (UTC)
+Received: from localhost (ovpn-12-133.pek2.redhat.com [10.72.12.133])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id E19905C64E;
+        Thu,  9 Apr 2020 12:57:21 +0000 (UTC)
+Date:   Thu, 9 Apr 2020 20:57:19 +0800
+From:   Baoquan He <bhe@redhat.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kexec@lists.infradead.org,
+        dzickus@redhat.com, dyoung@redhat.com,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Subject: Re: [PATCH v2 0/3] KVM: VMX: Fix for kexec VMCLEAR and VMXON cleanup
+Message-ID: <20200409125719.GV2402@MiWiFi-R3L-srv>
+References: <20200321193751.24985-1-sean.j.christopherson@intel.com>
+ <20200407110115.GA14381@MiWiFi-R3L-srv>
+ <87r1wzlcwn.fsf@vitty.brq.redhat.com>
+ <20200408151808.GS2402@MiWiFi-R3L-srv>
+ <87mu7l2256.fsf@vitty.brq.redhat.com>
+ <20200409012002.GT2402@MiWiFi-R3L-srv>
+ <87imi829o9.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-References: <CAFULd4adXFX+y6eCV0tVhg-iHZe+tAchJkuHMXe3ZWktzGk7Sw@mail.gmail.com>
- <a2187cc0-cab6-78db-3e2d-6edaf647c882@redhat.com>
-In-Reply-To: <a2187cc0-cab6-78db-3e2d-6edaf647c882@redhat.com>
-From:   Uros Bizjak <ubizjak@gmail.com>
-Date:   Thu, 9 Apr 2020 14:51:30 +0200
-Message-ID: <CAFULd4YG1Df_1HvjDUYCyW+VTLO3-xk8CU4Lwsv2Lq=G-wP+cQ@mail.gmail.com>
-Subject: Re: Current mainline kernel FTBFS in KVM SEV
-To:     Paolo Bonzini <pbonzini@redhat.com>, like.xu@intel.com
-Cc:     kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87imi829o9.fsf@vitty.brq.redhat.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Apr 9, 2020 at 10:33 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 09/04/20 10:20, Uros Bizjak wrote:
-> > Current mainline kernel fails to build (on Fedora 31) with:
+On 04/09/20 at 01:14pm, Vitaly Kuznetsov wrote:
+> Baoquan He <bhe@redhat.com> writes:
+> 
 > >
-> >   GEN     .version
-> >   CHK     include/generated/compile.h
-> >   LD      vmlinux.o
-> >   MODPOST vmlinux.o
-> >   MODINFO modules.builtin.modinfo
-> >   GEN     modules.builtin
-> >   LD      .tmp_vmlinux.btf
-> > ld: arch/x86/kvm/svm/sev.o: in function `sev_flush_asids':
-> > /hdd/uros/git/linux/arch/x86/kvm/svm/sev.c:48: undefined reference to
-> > `sev_guest_df_flush'
-> > ld: arch/x86/kvm/svm/sev.o: in function `sev_hardware_setup':
-> > /hdd/uros/git/linux/arch/x86/kvm/svm/sev.c:1146: undefined reference
-> > to `sev_platform_status'
-> >   BTF     .btf.vmlinux.bin.o
->
-> Strange, the functions are defined and exported with
-> CONFIG_CRYPTO_DEV_SP_PSP, which is "y" in your config.
+> > While I would suggest adding kexec@lists.infradead.org when code changes
+> > are related to kexec/kdump since we usually watch this mailing list.
+> > LKML contains too many mails, we may miss this kind of change, have to
+> > debug and test again.
+> >
+> 
+> Definitely makes sense and I'll try my best to remember doing this
+> myself next time but the problem is that scripts/checkpatch.pl is not
+> smart enough, kexec related bits are scattered all over kernel and
+> drivers so I'm afraid you're missing a lot in kexec@ :-(
 
-The problem is with
+Yeah, understand, thanks.
 
-CONFIG_CRYPTO_DEV_CCP_DD=m
-
-in combination with
-
-CONFIG_KVM_AMD=y
-
-in arch/x86/kvmKconfig, there is:
-
---cut here--
-config KVM_AMD_SEV
-    def_bool y
-    bool "AMD Secure Encrypted Virtualization (SEV) support"
-    depends on KVM_AMD && X86_64
-    depends on CRYPTO_DEV_SP_PSP && !(KVM_AMD=y && CRYPTO_DEV_CCP_DD=m)
-    ---help---
-    Provides support for launching Encrypted VMs on AMD processors.
---cut here--
-
-which doesn't disable the compilation of sev.o. The missing functions
-are actually in ccp.o *module*, called from built-in functions of
-sev.o
-
-Enabling CRYPTO_DEV_CCP_DD=y as a built-in instead of a module fixes the build.
-
-Uros.
