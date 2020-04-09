@@ -2,85 +2,146 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id EE0DB1A33BA
-	for <lists+kvm@lfdr.de>; Thu,  9 Apr 2020 14:04:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 25A221A344E
+	for <lists+kvm@lfdr.de>; Thu,  9 Apr 2020 14:44:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726687AbgDIMEu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Apr 2020 08:04:50 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:37498 "EHLO
-        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725971AbgDIMEt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Apr 2020 08:04:49 -0400
-Received: by mail-wr1-f67.google.com with SMTP id w10so11639989wrm.4
-        for <kvm@vger.kernel.org>; Thu, 09 Apr 2020 05:04:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=lCmPfTqm1cRtMIpvXq734SPUvTONQxpqo1sItgL7b4o=;
-        b=LyKE1uLASPzUYs4GBcNp6r5h5YHAV2+DPhgSp5owG1mKLASYAvj0K/6/XGLWYj+ueC
-         bPzhcZV40BHD59DIOki8xpnTLkDbNmVQkdl8zVyRD8SNO8TB69lfArzq/xpdDWxrkJTl
-         kv+sArnR3jUnnLxlq01av6GlHGLZ5Uhe/Axq6Sfc3zVc5aUvkwis9errWskiyTwH0nha
-         Sq0ZeUR4foe5hvgURdApv6TtaJV9ObwqlOceRyhgHfdaWKT414QUxjK5jfTt8UGofQTX
-         tDWASp/CacC8RIPtD3Pa/kX8JIVEzBmCzL8fbDFDYmrtqiIHtPr2WiFFe6dNwnxBrGQu
-         tbKA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=lCmPfTqm1cRtMIpvXq734SPUvTONQxpqo1sItgL7b4o=;
-        b=jywSNMpyWrTbhRi16h2C26yzP3c8yF4LBNy+FeqVptEFDaHA3Qvlj3tN9iFnt+9wXU
-         iVjaRcHXdr40lWFyF0PpgrppmykfPrTSmFoY9T2pkoRUXKIK2nzXQw0yEERZH03dN7tZ
-         dJ3uoi9zOKFUrLGBOVbShtBTP5PP3aeF3pO3AGCNhGS3NhueUUmX01hS2iH8Dc/T9vrx
-         aiWI6633ccTNAgaI6P+xQ/WnicMFFQdUuUQK73fA/wfMaKnsT3gber6dSoBGyfa49NKw
-         ozp7rnRj421Utl9Patktb8BOKUduKlR0e6D4oYcn62UHK3N++Bc76xWq+wkqtG4tFdJi
-         zHBw==
-X-Gm-Message-State: AGi0PuZZUnWedOHe/WBkt4sDKzqrCSbMSreoddPUADCBxVOAiudorsVc
-        /PMirJGwzYkXNvRbolB/mQSBxvRYC2k=
-X-Google-Smtp-Source: APiQypKOdYcsZ7tQmIT9Bg2GAIpd7YZFeplUbWXhnfvRK6Cb62GWg59W4mb0M2Hr44hx5k4YjxMJ9w==
-X-Received: by 2002:adf:f8cd:: with SMTP id f13mr13466696wrq.119.1586433886815;
-        Thu, 09 Apr 2020 05:04:46 -0700 (PDT)
-Received: from localhost.localdomain (93-103-18-160.static.t-2.net. [93.103.18.160])
-        by smtp.gmail.com with ESMTPSA id e5sm41110117wru.92.2020.04.09.05.04.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Apr 2020 05:04:46 -0700 (PDT)
-From:   Uros Bizjak <ubizjak@gmail.com>
-To:     kvm@vger.kernel.org
-Cc:     Uros Bizjak <ubizjak@gmail.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH] KVM: SVM: Do not setup frame pointer in __svm_vcpu_run
-Date:   Thu,  9 Apr 2020 14:04:40 +0200
-Message-Id: <20200409120440.1427215-1-ubizjak@gmail.com>
-X-Mailer: git-send-email 2.25.2
+        id S1726651AbgDIMoN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Apr 2020 08:44:13 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:45742 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726574AbgDIMoN (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 9 Apr 2020 08:44:13 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1586436253;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=hCTyTHNIoa/f4FCOf5RUI76bLbl3BtD2rSWLrU8gW5Y=;
+        b=bZMAYl4QAGFPMpKROtpxLo8b7l2P34mC1ROPge8ll/H1nHUfZ7dhTbhygw/wO2lwrmmQBG
+        D5G1lAcvFuM2HkWdk+Vp1mB1XTjXnhtsDAqOA4CsY2mpiDr6RYMg830QfV94kGPGd+Xw+5
+        ZkN7oAN6tCSKyNMlF7xTYCuHy92DLI0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-312-zWT1uXBlOtKpx36KjtI44w-1; Thu, 09 Apr 2020 08:44:11 -0400
+X-MC-Unique: zWT1uXBlOtKpx36KjtI44w-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 41F51DB61;
+        Thu,  9 Apr 2020 12:44:08 +0000 (UTC)
+Received: from [10.72.12.130] (ovpn-12-130.pek2.redhat.com [10.72.12.130])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 07E9119756;
+        Thu,  9 Apr 2020 12:43:50 +0000 (UTC)
+Subject: Re: [PATCH V9 9/9] virtio: Intel IFC VF driver for VDPA
+To:     Arnd Bergmann <arnd@arndb.de>, lingshan.zhu@intel.com
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        kvm list <kvm@vger.kernel.org>,
+        virtualization@lists.linux-foundation.org,
+        Networking <netdev@vger.kernel.org>,
+        Jason Gunthorpe <jgg@mellanox.com>, maxime.coquelin@redhat.com,
+        cunming.liang@intel.com, zhihong.wang@intel.com,
+        rob.miller@broadcom.com, xiao.w.wang@intel.com,
+        eperezma@redhat.com, lulu@redhat.com,
+        Parav Pandit <parav@mellanox.com>, kevin.tian@intel.com,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Christoph Hellwig <hch@infradead.org>, aadam@redhat.com,
+        Jiri Pirko <jiri@mellanox.com>, shahafs@mellanox.com,
+        hanand@xilinx.com, mhabets@solarflare.com, gdawar@xilinx.com,
+        saugatm@xilinx.com, vmireyno@marvell.com,
+        zhangweining@ruijie.com.cn, Bie Tiwei <tiwei.bie@intel.com>
+References: <20200326140125.19794-1-jasowang@redhat.com>
+ <20200326140125.19794-10-jasowang@redhat.com>
+ <CAK8P3a1RXUXs5oYjB=Jq5cpvG11eTnmJ+vc18_-0fzgTH6envA@mail.gmail.com>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <ffc4c788-2319-efda-508c-275b9f7efb95@redhat.com>
+Date:   Thu, 9 Apr 2020 20:43:49 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAK8P3a1RXUXs5oYjB=Jq5cpvG11eTnmJ+vc18_-0fzgTH6envA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-__svm_vcpu_run is a leaf function and does not need
-a frame pointer.  %rbp is also destroyed a few instructions
-later when guest registers are loaded.
 
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Uros Bizjak <ubizjak@gmail.com>
----
- arch/x86/kvm/svm/vmenter.S | 1 -
- 1 file changed, 1 deletion(-)
+On 2020/4/9 =E4=B8=8B=E5=8D=886:41, Arnd Bergmann wrote:
+> On Thu, Mar 26, 2020 at 3:08 PM Jason Wang <jasowang@redhat.com> wrote:
+>> From: Zhu Lingshan <lingshan.zhu@intel.com>
+>>
+>> This commit introduced two layers to drive IFC VF:
+>>
+>> (1) ifcvf_base layer, which handles IFC VF NIC hardware operations and
+>>      configurations.
+>>
+>> (2) ifcvf_main layer, which complies to VDPA bus framework,
+>>      implemented device operations for VDPA bus, handles device probe,
+>>      bus attaching, vring operations, etc.
+>>
+>> Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
+>> Signed-off-by: Bie Tiwei <tiwei.bie@intel.com>
+>> Signed-off-by: Wang Xiao <xiao.w.wang@intel.com>
+>> Signed-off-by: Jason Wang <jasowang@redhat.com>
+>> +
+>> +#define IFCVF_QUEUE_ALIGNMENT  PAGE_SIZE
+>> +#define IFCVF_QUEUE_MAX                32768
+>> +static u16 ifcvf_vdpa_get_vq_align(struct vdpa_device *vdpa_dev)
+>> +{
+>> +       return IFCVF_QUEUE_ALIGNMENT;
+>> +}
+> This fails to build on arm64 with 64kb page size (found in linux-next):
+>
+> /drivers/vdpa/ifcvf/ifcvf_main.c: In function 'ifcvf_vdpa_get_vq_align'=
+:
+> arch/arm64/include/asm/page-def.h:17:20: error: conversion from 'long
+> unsigned int' to 'u16' {aka 'short unsigned int'} changes value from
+> '65536' to '0' [-Werror=3Doverflow]
+>     17 | #define PAGE_SIZE  (_AC(1, UL) << PAGE_SHIFT)
+>        |                    ^
+> drivers/vdpa/ifcvf/ifcvf_base.h:37:31: note: in expansion of macro 'PAG=
+E_SIZE'
+>     37 | #define IFCVF_QUEUE_ALIGNMENT PAGE_SIZE
+>        |                               ^~~~~~~~~
+> drivers/vdpa/ifcvf/ifcvf_main.c:231:9: note: in expansion of macro
+> 'IFCVF_QUEUE_ALIGNMENT'
+>    231 |  return IFCVF_QUEUE_ALIGNMENT;
+>        |         ^~~~~~~~~~~~~~~~~~~~~
+>
+> It's probably good enough to just not allow the driver to be built in t=
+hat
+> configuration as it's fairly rare but unfortunately there is no simple =
+Kconfig
+> symbol for it.
 
-diff --git a/arch/x86/kvm/svm/vmenter.S b/arch/x86/kvm/svm/vmenter.S
-index fa1af90067e9..c87119a7a0c9 100644
---- a/arch/x86/kvm/svm/vmenter.S
-+++ b/arch/x86/kvm/svm/vmenter.S
-@@ -35,7 +35,6 @@
-  */
- SYM_FUNC_START(__svm_vcpu_run)
- 	push %_ASM_BP
--	mov  %_ASM_SP, %_ASM_BP
- #ifdef CONFIG_X86_64
- 	push %r15
- 	push %r14
--- 
-2.25.2
+
+Or I think the 64KB alignment is probably more than enough.
+
+Ling Shan, can we use smaller value here?
+
+Thanks
+
+
+>
+> In a similar driver, we did
+>
+> config VMXNET3
+>          tristate "VMware VMXNET3 ethernet driver"
+>          depends on PCI && INET
+>          depends on !(PAGE_SIZE_64KB || ARM64_64K_PAGES || \
+>                       IA64_PAGE_SIZE_64KB || MICROBLAZE_64K_PAGES || \
+>                       PARISC_PAGE_SIZE_64KB || PPC_64K_PAGES)
+>
+> I think we should probably make PAGE_SIZE_64KB a global symbol
+> in arch/Kconfig and have it selected by the other symbols so drivers
+> like yours can add a dependency for it.
+>
+>           Arnd
+>
 
