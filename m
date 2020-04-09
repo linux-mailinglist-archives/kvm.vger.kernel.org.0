@@ -2,129 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 715751A2D4A
-	for <lists+kvm@lfdr.de>; Thu,  9 Apr 2020 03:22:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C66C61A2D52
+	for <lists+kvm@lfdr.de>; Thu,  9 Apr 2020 03:25:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726627AbgDIBWX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Apr 2020 21:22:23 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:25945 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726539AbgDIBWX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Apr 2020 21:22:23 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1586395342;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=S6zaZRnflWlRwMkihtjBYFyGTc78AtlkI9xkR9S+YcM=;
-        b=gk2kFmFPNLqsVmtagTAXb5aw+eHUgq5CVWsVCCAJk8DcHjlVcfXXq+kbU3213Tkn6fo4YI
-        sEI/ypsCjsRNYuHIauP1gV0PchF3p+9JmiOjwPfFFxGvGMqPebhjZqJjoyPaDlrcKc+jY8
-        qbOmlkB7f5Q67xN7XRC1nj/Gf3gLhEU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-410-4AEZWP3WPPqwU9YNqXMFhA-1; Wed, 08 Apr 2020 21:22:18 -0400
-X-MC-Unique: 4AEZWP3WPPqwU9YNqXMFhA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7CF9E13FA;
-        Thu,  9 Apr 2020 01:22:17 +0000 (UTC)
-Received: from localhost (ovpn-12-133.pek2.redhat.com [10.72.12.133])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id D461660BFB;
-        Thu,  9 Apr 2020 01:22:16 +0000 (UTC)
-Date:   Thu, 9 Apr 2020 09:22:14 +0800
-From:   Baoquan He <bhe@redhat.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>, kexec@lists.infradead.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Jim Mattson <jmattson@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: VMX: fix crash cleanup when KVM wasn't used
-Message-ID: <20200409012214.GB14381@MiWiFi-R3L-srv>
-References: <20200401081348.1345307-1-vkuznets@redhat.com>
+        id S1726648AbgDIBZx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Apr 2020 21:25:53 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:39588 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726539AbgDIBZx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Apr 2020 21:25:53 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0391Do6r152904;
+        Thu, 9 Apr 2020 01:25:50 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2020-01-29;
+ bh=ojvWGTH16FqGalLxUHiUu7u1GemaC0gdhKfWhTg68f0=;
+ b=JiM67cz8h5VnilGB4K6xUuzTNv002U18cMZdIGxzylwgK5PtRIGSwXGtSOoiQwnIO1xW
+ Xu/S40UOac+gelZenkgFK+Pje+QuA0JdjIIqsHYYvkIQuDMNpS5WW4v7KrOT25PtMF/L
+ i7rRCY8d9HJA/Y+V8r31M7crNoZ/+RWTVb+d8B2cvW/w0Gg8NTHoIqWlNgNQlUwMS17I
+ 7EDYXtHRbhNJEXsfccHBL1CSjzKvfp9bd1rwtBZ32BhiXjWKB+64BMbVEgHcHUMa76/v
+ RPXD8olYyH+GVNDGsMvvbAXkORYO5MXGnNJgo83OZ1Sw277M18Mu14CTEVcmKEnajk4w hw== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by aserp2120.oracle.com with ESMTP id 3091m0xr27-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 09 Apr 2020 01:25:50 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0391BZY8039144;
+        Thu, 9 Apr 2020 01:25:49 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by aserp3020.oracle.com with ESMTP id 3091m60k08-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 09 Apr 2020 01:25:49 +0000
+Received: from abhmp0008.oracle.com (abhmp0008.oracle.com [141.146.116.14])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 0391PnnR027694;
+        Thu, 9 Apr 2020 01:25:49 GMT
+Received: from localhost.localdomain (/10.159.148.185)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Wed, 08 Apr 2020 18:25:48 -0700
+Subject: Re: [PATCH v4 1/2] selftests: kvm: Add vm_get_fd() in kvm_util
+To:     Wainer dos Santos Moschetta <wainersm@redhat.com>,
+        pbonzini@redhat.com, kvm@vger.kernel.org
+Cc:     drjones@redhat.com, david@redhat.com, linux-kernel@vger.kernel.org,
+        linux-kselftest@vger.kernel.org
+References: <20200408220818.4306-1-wainersm@redhat.com>
+ <20200408220818.4306-2-wainersm@redhat.com>
+From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Message-ID: <734ebc46-ff31-708b-5a2f-8bda248cd290@oracle.com>
+Date:   Wed, 8 Apr 2020 18:25:41 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200401081348.1345307-1-vkuznets@redhat.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+In-Reply-To: <20200408220818.4306-2-wainersm@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9585 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 bulkscore=0 mlxscore=0
+ malwarescore=0 spamscore=0 adultscore=0 suspectscore=0 mlxlogscore=999
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
+ definitions=main-2004090006
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9585 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 mlxlogscore=999 mlxscore=0
+ priorityscore=1501 phishscore=0 suspectscore=0 bulkscore=0
+ lowpriorityscore=0 impostorscore=0 malwarescore=0 clxscore=1011
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2004090006
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 04/01/20 at 10:13am, Vitaly Kuznetsov wrote:
-> If KVM wasn't used at all before we crash the cleanup procedure fails with
->  BUG: unable to handle page fault for address: ffffffffffffffc8
->  #PF: supervisor read access in kernel mode
->  #PF: error_code(0x0000) - not-present page
->  PGD 23215067 P4D 23215067 PUD 23217067 PMD 0
->  Oops: 0000 [#8] SMP PTI
->  CPU: 0 PID: 3542 Comm: bash Kdump: loaded Tainted: G      D           5.6.0-rc2+ #823
->  RIP: 0010:crash_vmclear_local_loaded_vmcss.cold+0x19/0x51 [kvm_intel]
-> 
-> The root cause is that loaded_vmcss_on_cpu list is not yet initialized,
-> we initialize it in hardware_enable() but this only happens when we start
-> a VM.
-> 
-> Previously, we used to have a bitmap with enabled CPUs and that was
-> preventing [masking] the issue.
-> 
-> Initialized loaded_vmcss_on_cpu list earlier, right before we assign
-> crash_vmclear_loaded_vmcss pointer. blocked_vcpu_on_cpu list and
-> blocked_vcpu_on_cpu_lock are moved altogether for consistency.
-> 
-> Fixes: 31603d4fc2bb ("KVM: VMX: Always VMCLEAR in-use VMCSes during crash with kexec support")
-> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 
-Kdump kernel hang can be reproduced on a bare metal machine of Intel always,
-issue disappeared with this patch applied. Feel free to add:
-
-Tested-by: Baoquan He <bhe@redhat.com>
-
+On 4/8/20 3:08 PM, Wainer dos Santos Moschetta wrote:
+> Introduces the vm_get_fd() function in kvm_util which returns
+> the VM file descriptor.
+>
+> Reviewed-by: Andrew Jones <drjones@redhat.com>
+> Signed-off-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
 > ---
->  arch/x86/kvm/vmx/vmx.c | 12 +++++++-----
->  1 file changed, 7 insertions(+), 5 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 3aba51d782e2..39a5dde12b79 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -2257,10 +2257,6 @@ static int hardware_enable(void)
->  	    !hv_get_vp_assist_page(cpu))
->  		return -EFAULT;
->  
-> -	INIT_LIST_HEAD(&per_cpu(loaded_vmcss_on_cpu, cpu));
-> -	INIT_LIST_HEAD(&per_cpu(blocked_vcpu_on_cpu, cpu));
-> -	spin_lock_init(&per_cpu(blocked_vcpu_on_cpu_lock, cpu));
-> -
->  	r = kvm_cpu_vmxon(phys_addr);
->  	if (r)
->  		return r;
-> @@ -8006,7 +8002,7 @@ module_exit(vmx_exit);
->  
->  static int __init vmx_init(void)
->  {
-> -	int r;
-> +	int r, cpu;
->  
->  #if IS_ENABLED(CONFIG_HYPERV)
->  	/*
-> @@ -8060,6 +8056,12 @@ static int __init vmx_init(void)
->  		return r;
->  	}
->  
-> +	for_each_possible_cpu(cpu) {
-> +		INIT_LIST_HEAD(&per_cpu(loaded_vmcss_on_cpu, cpu));
-> +		INIT_LIST_HEAD(&per_cpu(blocked_vcpu_on_cpu, cpu));
-> +		spin_lock_init(&per_cpu(blocked_vcpu_on_cpu_lock, cpu));
-> +	}
+>   tools/testing/selftests/kvm/include/kvm_util.h | 1 +
+>   tools/testing/selftests/kvm/lib/kvm_util.c     | 5 +++++
+>   2 files changed, 6 insertions(+)
+>
+> diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
+> index a99b875f50d2..4e122819ee24 100644
+> --- a/tools/testing/selftests/kvm/include/kvm_util.h
+> +++ b/tools/testing/selftests/kvm/include/kvm_util.h
+> @@ -254,6 +254,7 @@ bool vm_is_unrestricted_guest(struct kvm_vm *vm);
+>   unsigned int vm_get_page_size(struct kvm_vm *vm);
+>   unsigned int vm_get_page_shift(struct kvm_vm *vm);
+>   unsigned int vm_get_max_gfn(struct kvm_vm *vm);
+> +int vm_get_fd(struct kvm_vm *vm);
+>   
+>   unsigned int vm_calc_num_guest_pages(enum vm_guest_mode mode, size_t size);
+>   unsigned int vm_num_host_pages(enum vm_guest_mode mode, unsigned int num_guest_pages);
+> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+> index 8a3523d4434f..3e36a1eb8771 100644
+> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
+> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+> @@ -1734,6 +1734,11 @@ unsigned int vm_get_max_gfn(struct kvm_vm *vm)
+>   	return vm->max_gfn;
+>   }
+>   
+> +int vm_get_fd(struct kvm_vm *vm)
+> +{
+> +        return vm->fd;
+> +}
 > +
->  #ifdef CONFIG_KEXEC_CORE
->  	rcu_assign_pointer(crash_vmclear_loaded_vmcss,
->  			   crash_vmclear_local_loaded_vmcss);
-> -- 
-> 2.25.1
-> 
 
+
+I am just trying to understand why we need a separate function when the 
+'vm' variable is all local within the same file. There are a number of 
+places in kvm_util.c where it is used directly.
+
+>   static unsigned int vm_calc_num_pages(unsigned int num_pages,
+>   				      unsigned int page_shift,
+>   				      unsigned int new_page_shift,
