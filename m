@@ -2,102 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8B0281A320B
-	for <lists+kvm@lfdr.de>; Thu,  9 Apr 2020 11:43:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7AFF11A329E
+	for <lists+kvm@lfdr.de>; Thu,  9 Apr 2020 12:41:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726791AbgDIJnf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Apr 2020 05:43:35 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:27251 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726773AbgDIJnf (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 9 Apr 2020 05:43:35 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1586425415;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=nIzy0tnj6FqxJz87TqjmoYX4nTo+jUF+UzNkvXq35po=;
-        b=SWVeLr8Mw9d+Vf7DX+yL47ZVmVs7ldLf3IR5TJvD3tWW6DwLTBcSDy8Z+sbENUr8kf4L5F
-        qP4fpbim5cqZR1roBqpLZ2UXWnorGBnv1p8iH279YzYOYr6GvZM+te5jip8JR0lhAt6yc7
-        XEaKFKKHoYTxBqJmbMWk4zxgMgemuew=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-360-QtzPjVMDN2OU8_bs4P_d9A-1; Thu, 09 Apr 2020 05:43:33 -0400
-X-MC-Unique: QtzPjVMDN2OU8_bs4P_d9A-1
-Received: by mail-wr1-f70.google.com with SMTP id t8so151254wrq.22
-        for <kvm@vger.kernel.org>; Thu, 09 Apr 2020 02:43:33 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=nIzy0tnj6FqxJz87TqjmoYX4nTo+jUF+UzNkvXq35po=;
-        b=ZPdXgAb4Nx3d38wfj27xtb6eR5cmNnTYomEU3j3bd4pxVC+n5kYJPUblr5vAn9Sun2
-         NJiH12q77S/Rnuz6iEekdlYaZRWMtslmDTr1Dr0hjhK/i5N8VvRa/FduOK3mtrlG3Y3d
-         19golR6/udq+KB768HMLZtNsiuM3qv4Pjf+IlmXxn2zUxHp8kOCYV1irbgUgw6JvuXyL
-         G9u2VobkrABPniBzZNQownQ0Ls2VgEy120amREYgsmkQ1BCihYh/EXaGUJjKEbAVdDAd
-         fC3ViITSsAEU+Y00pGqH+h3HAkdGtDHGxc+nWISBg3K5K8os4mudk4jVOjKln1Q7UkW0
-         S6eQ==
-X-Gm-Message-State: AGi0PuZLzdg6RYhf5innOZOJsOiq+kY2RDn92sv4Bk0p0nsDLYG8mNhV
-        PloDKVrHjQg2tOZl5grOd1Ni0Kh+CuKqoKvmqIcX0bh+rd6OHyeeD2+uWv5miQCiql7Y5sqRc8F
-        Jew5nodnidXkO
-X-Received: by 2002:a1c:a7d7:: with SMTP id q206mr5695586wme.45.1586425411855;
-        Thu, 09 Apr 2020 02:43:31 -0700 (PDT)
-X-Google-Smtp-Source: APiQypJgQiZCrWZvCGiHqYLqjts+lmOUoOTw70VVOHDzOH/wMxfRJcVDU494OZ3lliAXWnRamte4kQ==
-X-Received: by 2002:a1c:a7d7:: with SMTP id q206mr5695574wme.45.1586425411623;
-        Thu, 09 Apr 2020 02:43:31 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:bddb:697c:bea8:abc? ([2001:b07:6468:f312:bddb:697c:bea8:abc])
-        by smtp.gmail.com with ESMTPSA id g3sm25430861wrw.47.2020.04.09.02.43.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 09 Apr 2020 02:43:31 -0700 (PDT)
-Subject: Re: [PATCH v2] x86/kvm: Disable KVM_ASYNC_PF_SEND_ALWAYS
-To:     Andy Lutomirski <luto@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Andrew Cooper <andrew.cooper3@citrix.com>
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vivek Goyal <vgoyal@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        LKML <linux-kernel@vger.kernel.org>, X86 ML <x86@kernel.org>,
-        kvm list <kvm@vger.kernel.org>, stable <stable@vger.kernel.org>
-References: <20200407172140.GB64635@redhat.com>
- <772A564B-3268-49F4-9AEA-CDA648F6131F@amacapital.net>
- <87eeszjbe6.fsf@nanos.tec.linutronix.de>
- <ce81c95f-8674-4012-f307-8f32d0e386c2@redhat.com>
- <874ktukhku.fsf@nanos.tec.linutronix.de>
- <274f3d14-08ac-e5cc-0b23-e6e0274796c8@redhat.com>
- <20200408153413.GA11322@linux.intel.com>
- <ce28e893-2ed0-ea6f-6c36-b08bb0d814f2@redhat.com>
- <87d08hc0vz.fsf@nanos.tec.linutronix.de>
- <CALCETrWG2Y4SPmVkugqgjZcMfpQiq=YgsYBmWBm1hj_qx3JNVQ@mail.gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <47a7593e-e035-1b48-c6d7-cd6f78a2f6e2@redhat.com>
-Date:   Thu, 9 Apr 2020 11:43:29 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+        id S1726647AbgDIKld (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Apr 2020 06:41:33 -0400
+Received: from mout.kundenserver.de ([217.72.192.75]:34085 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725828AbgDIKlc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Apr 2020 06:41:32 -0400
+Received: from mail-qk1-f180.google.com ([209.85.222.180]) by
+ mrelayeu.kundenserver.de (mreue107 [212.227.15.145]) with ESMTPSA (Nemesis)
+ id 1M3UIe-1jLwOP22ni-000bUu; Thu, 09 Apr 2020 12:41:31 +0200
+Received: by mail-qk1-f180.google.com with SMTP id z15so3395725qki.7;
+        Thu, 09 Apr 2020 03:41:31 -0700 (PDT)
+X-Gm-Message-State: AGi0PuYB6P8o0aFEzfWoQU5AHd+quTzHr9uwJhbuRns7IN2hGas/tBj9
+        CPbMV3pCx+IvNRBQcqtrfu/63O9yGEyDmHLSGRg=
+X-Google-Smtp-Source: APiQypJ+MZNDx1nAeHQJUrsxI3ccDEBo8kCLAwyqI5SJ9WAba6/XBRqyHYyNfPORCxMsxCe8/yMMMt7xih71qKreb4o=
+X-Received: by 2002:a37:a52:: with SMTP id 79mr11506167qkk.3.1586428890169;
+ Thu, 09 Apr 2020 03:41:30 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CALCETrWG2Y4SPmVkugqgjZcMfpQiq=YgsYBmWBm1hj_qx3JNVQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20200326140125.19794-1-jasowang@redhat.com> <20200326140125.19794-10-jasowang@redhat.com>
+In-Reply-To: <20200326140125.19794-10-jasowang@redhat.com>
+From:   Arnd Bergmann <arnd@arndb.de>
+Date:   Thu, 9 Apr 2020 12:41:13 +0200
+X-Gmail-Original-Message-ID: <CAK8P3a1RXUXs5oYjB=Jq5cpvG11eTnmJ+vc18_-0fzgTH6envA@mail.gmail.com>
+Message-ID: <CAK8P3a1RXUXs5oYjB=Jq5cpvG11eTnmJ+vc18_-0fzgTH6envA@mail.gmail.com>
+Subject: Re: [PATCH V9 9/9] virtio: Intel IFC VF driver for VDPA
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        kvm list <kvm@vger.kernel.org>,
+        virtualization@lists.linux-foundation.org,
+        Networking <netdev@vger.kernel.org>,
+        Jason Gunthorpe <jgg@mellanox.com>, maxime.coquelin@redhat.com,
+        cunming.liang@intel.com, zhihong.wang@intel.com,
+        rob.miller@broadcom.com, xiao.w.wang@intel.com,
+        lingshan.zhu@intel.com, eperezma@redhat.com, lulu@redhat.com,
+        Parav Pandit <parav@mellanox.com>, kevin.tian@intel.com,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Christoph Hellwig <hch@infradead.org>, aadam@redhat.com,
+        Jiri Pirko <jiri@mellanox.com>, shahafs@mellanox.com,
+        hanand@xilinx.com, mhabets@solarflare.com, gdawar@xilinx.com,
+        saugatm@xilinx.com, vmireyno@marvell.com,
+        zhangweining@ruijie.com.cn, Bie Tiwei <tiwei.bie@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Provags-ID: V03:K1:HWzbXodPWtj3796KNdOWac9tTnFw3sd83DCpZ4tYyN9oV/qgGKH
+ fh9QCRbNS0utuTU9EQtqCO6ZMTIIvNcRuhL2cqr0k4HKzZhz+uiywiNmgaemhac/AwdFKEV
+ 9zFmQgVG0n0f9ah0sZX3TABPeCExNtqJrKy6wBA2cT8/U8m02VlfUZ1IzMekJGmjApBy+WU
+ WL7xd2t0u6StYdxj92ELg==
+X-Spam-Flag: NO
+X-UI-Out-Filterresults: notjunk:1;V03:K0:FZrkDyo0urk=:LiTF4Hf9cz8JtqwzdwOHlC
+ 7V9TCsJOYLCqqVJJo13Ie7d9LKCh8bV8SMM0SbMkYXJXKODaxUystJK7yjQuM5uEUTTDQLbt0
+ 9A/e85+4X+QBIjN5zUkuVYPWJ2nZnFxYSDF+q/NpjUy515HKltJpmp5MF/che+ULTrLkLPrcq
+ BxhrLOWxOlAb3R9PnzS8L/Nluk14VLNct3esVTMrAQfNS8Ri2DQNxcPhRMuBv737PXft0lsyQ
+ D8RM1RHeGD4mTulcdYlppnNSLdcP3QkV6OakdtmVuvQdjuRHhITfoRTOna1S6DpttfhCLB3cM
+ CCpf3k4qCPV7FJKVBkufBknimkXZIuiK72E2UQI8d5d9HJL7xH/7ASbhFD1f06oWednWvpmho
+ FBma/1vv093R3IkpLh2May4rzttJnU5+XAYw2gigCHM26BgVJvnVU2xAggtliBp7v3YbEcK7I
+ Xf/XHW+46yEV+yOJPUQGhKo+j5YJicEJk/DkBOfelTJFiaeF58EjmlAF9GCM6xbVv6kJPCm5p
+ oB373GuFH9jSVGSTt6eSaUZ9dHvmDpnvwCitcdVPyFTUrLxq1dboPbDhnhUGJmZalPJarfTqH
+ EGmnoInmTHXWexZY0PWxsvd9HXDgvkAAD8YxPl7/oQOLePUhEwqiAK9aGdkMnIa7oVIjF6Xls
+ iVErHfLgKp8u2ZiWES7n61SzCHeb9JHudAhT9muDYsUSUzGnvVf1DI1wR3MLskPvF/M45CD8r
+ cWQv9vKhv13MmdFpynWXOXFmL9mczotZpUKCUT7PxwBdnjh74LFYFIvG/LH9V3/Xq/Dyd+a4o
+ x0fI0zggrorIi9rD7hqdDXISbeyaZ52nUZt+IRgXsFanzIjhu0=
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 09/04/20 06:50, Andy Lutomirski wrote:
-> The big problem is that #VE doesn't exist on AMD, and I really think
-> that any fancy protocol we design should work on AMD.  I have no
-> problem with #VE being a nifty optimization to the protocol on Intel,
-> but it should *work* without #VE.
+On Thu, Mar 26, 2020 at 3:08 PM Jason Wang <jasowang@redhat.com> wrote:
+>
+> From: Zhu Lingshan <lingshan.zhu@intel.com>
+>
+> This commit introduced two layers to drive IFC VF:
+>
+> (1) ifcvf_base layer, which handles IFC VF NIC hardware operations and
+>     configurations.
+>
+> (2) ifcvf_main layer, which complies to VDPA bus framework,
+>     implemented device operations for VDPA bus, handles device probe,
+>     bus attaching, vring operations, etc.
+>
+> Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
+> Signed-off-by: Bie Tiwei <tiwei.bie@intel.com>
+> Signed-off-by: Wang Xiao <xiao.w.wang@intel.com>
+> Signed-off-by: Jason Wang <jasowang@redhat.com>
 
-Yes and unfortunately AMD does not like to inject a non-existing
-exception.  Intel only requires the vector to be <=31, but AMD wants the
-vector to correspond to an exception.
+> +
+> +#define IFCVF_QUEUE_ALIGNMENT  PAGE_SIZE
+> +#define IFCVF_QUEUE_MAX                32768
+> +static u16 ifcvf_vdpa_get_vq_align(struct vdpa_device *vdpa_dev)
+> +{
+> +       return IFCVF_QUEUE_ALIGNMENT;
+> +}
 
-However, software injection is always possible and AMD even suggests
-that you use software injection for ICEBP and, on older processors, the
-INT instruction.
+This fails to build on arm64 with 64kb page size (found in linux-next):
 
-Paolo
+/drivers/vdpa/ifcvf/ifcvf_main.c: In function 'ifcvf_vdpa_get_vq_align':
+arch/arm64/include/asm/page-def.h:17:20: error: conversion from 'long
+unsigned int' to 'u16' {aka 'short unsigned int'} changes value from
+'65536' to '0' [-Werror=overflow]
+   17 | #define PAGE_SIZE  (_AC(1, UL) << PAGE_SHIFT)
+      |                    ^
+drivers/vdpa/ifcvf/ifcvf_base.h:37:31: note: in expansion of macro 'PAGE_SIZE'
+   37 | #define IFCVF_QUEUE_ALIGNMENT PAGE_SIZE
+      |                               ^~~~~~~~~
+drivers/vdpa/ifcvf/ifcvf_main.c:231:9: note: in expansion of macro
+'IFCVF_QUEUE_ALIGNMENT'
+  231 |  return IFCVF_QUEUE_ALIGNMENT;
+      |         ^~~~~~~~~~~~~~~~~~~~~
 
+It's probably good enough to just not allow the driver to be built in that
+configuration as it's fairly rare but unfortunately there is no simple Kconfig
+symbol for it.
+
+In a similar driver, we did
+
+config VMXNET3
+        tristate "VMware VMXNET3 ethernet driver"
+        depends on PCI && INET
+        depends on !(PAGE_SIZE_64KB || ARM64_64K_PAGES || \
+                     IA64_PAGE_SIZE_64KB || MICROBLAZE_64K_PAGES || \
+                     PARISC_PAGE_SIZE_64KB || PPC_64K_PAGES)
+
+I think we should probably make PAGE_SIZE_64KB a global symbol
+in arch/Kconfig and have it selected by the other symbols so drivers
+like yours can add a dependency for it.
+
+         Arnd
