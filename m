@@ -2,144 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 091EF1A345C
-	for <lists+kvm@lfdr.de>; Thu,  9 Apr 2020 14:49:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D206B1A3462
+	for <lists+kvm@lfdr.de>; Thu,  9 Apr 2020 14:51:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726657AbgDIMty (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Apr 2020 08:49:54 -0400
-Received: from mga07.intel.com ([134.134.136.100]:41653 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726470AbgDIMty (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Apr 2020 08:49:54 -0400
-IronPort-SDR: Pb6bj8f5yrXrVPTT+TA3ZgKRaHkb8pxTbBMrkIB39iJFOaNgh5QTecRwL2JGIqTXR+V8Ea0ziB
- XHHeNZ84bH6A==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Apr 2020 05:49:53 -0700
-IronPort-SDR: N5VXaRe48B8SAxKxfo5v5QMlhj9Pa+/OO0FWcuPh8ngN915uUgU5EGRTHFbRorl/pt6equ/xjd
- lJeakK0NqPNQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.72,362,1580803200"; 
-   d="scan'208";a="255137124"
-Received: from jieren-mobl.ccr.corp.intel.com (HELO [10.249.174.27]) ([10.249.174.27])
-  by orsmga006.jf.intel.com with ESMTP; 09 Apr 2020 05:49:46 -0700
-Subject: Re: [PATCH V9 9/9] virtio: Intel IFC VF driver for VDPA
-To:     Jason Wang <jasowang@redhat.com>, Arnd Bergmann <arnd@arndb.de>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        kvm list <kvm@vger.kernel.org>,
-        virtualization@lists.linux-foundation.org,
-        Networking <netdev@vger.kernel.org>,
-        Jason Gunthorpe <jgg@mellanox.com>, maxime.coquelin@redhat.com,
-        cunming.liang@intel.com, zhihong.wang@intel.com,
-        rob.miller@broadcom.com, xiao.w.wang@intel.com,
-        eperezma@redhat.com, lulu@redhat.com,
-        Parav Pandit <parav@mellanox.com>, kevin.tian@intel.com,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Christoph Hellwig <hch@infradead.org>, aadam@redhat.com,
-        Jiri Pirko <jiri@mellanox.com>, shahafs@mellanox.com,
-        hanand@xilinx.com, mhabets@solarflare.com, gdawar@xilinx.com,
-        saugatm@xilinx.com, vmireyno@marvell.com,
-        zhangweining@ruijie.com.cn, Bie Tiwei <tiwei.bie@intel.com>
-References: <20200326140125.19794-1-jasowang@redhat.com>
- <20200326140125.19794-10-jasowang@redhat.com>
- <CAK8P3a1RXUXs5oYjB=Jq5cpvG11eTnmJ+vc18_-0fzgTH6envA@mail.gmail.com>
- <ffc4c788-2319-efda-508c-275b9f7efb95@redhat.com>
-From:   "Zhu, Lingshan" <lingshan.zhu@intel.com>
-Message-ID: <4bd16fa9-5436-4cd4-a565-89e11b9f6f92@intel.com>
-Date:   Thu, 9 Apr 2020 20:49:44 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+        id S1726691AbgDIMvm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Apr 2020 08:51:42 -0400
+Received: from mail-io1-f68.google.com ([209.85.166.68]:46985 "EHLO
+        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725971AbgDIMvm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Apr 2020 08:51:42 -0400
+Received: by mail-io1-f68.google.com with SMTP id i3so3634736ioo.13
+        for <kvm@vger.kernel.org>; Thu, 09 Apr 2020 05:51:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=xYyPzQ2DdU2lh/qLxAHvZYhZyn/lM7nZI3e/W68srRA=;
+        b=VsXhMKKJnEpmcCy78hzjn5QwU09l+fVVKr+Rso4MVFIe2DXAIutoWgL3Tvp+S7wH4r
+         EgTHucTamZVVTjftiIIfR6TSGrPYPdcg96rhWiZmsDeX259yu914M3pzbeLeQ8JPLcoh
+         v/CTjjXsLZ1NrNy+NhzjRDRcQdClRnHFHPhcWOl4QQQ8AgsTi6shNXCf+dFBmDm3QbiY
+         +/ZJ3G9wffp76wSnWR3MS2l+rMWZ2O486YH2PcK8+Pk2qCsAMLuPohT6SCvxCO9gtPMZ
+         gi8/HRYu8RiwctZKbb7KzL23Rn8l14X6zd0omIYawf8Kny2WVgOFOWVsZMMeTcM8YPwM
+         wRjg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=xYyPzQ2DdU2lh/qLxAHvZYhZyn/lM7nZI3e/W68srRA=;
+        b=otbuZx3wIK+7hv+eTdi/mBYopc58MmfEMJywvyMSo33t4vsEROMl2bsgn49OtP4toF
+         vi+3duE7R+3vvhUx8ZWRpd+oLgceiA3+0uPrFM/QO2m4oI+k1Q7fC+KeanJGqipIXsnM
+         JWtXSwMBtdcdTQj3+ErvY5KAD6dVJCII2FvPZzYe90iUy6YWcBU58BFYPjSnIWiOCEeq
+         NIPcdyvCm326rx5QaxCFlJL5o7I4hCnBzVL4EHeOjpG/Lo1WEqw5w/qaARH4NOUXHQNi
+         nlSejfe2+csBw6Gc85l71hwF3iiduJGtXTCdMoumfMDrQbW8UUjCmSmrEiJF6E1Rp02y
+         WAYg==
+X-Gm-Message-State: AGi0PuZdkNawWRpTYZ7Zoak2xocSHkZ4HO5xRhKYIuDNxMH9prpvCnhZ
+        4bUmVFqK5YXWX7l61En2W9SPwXU2a67d1Ryo0Us=
+X-Google-Smtp-Source: APiQypJ1XPzeIoo11Ygog9vSoABGEzQUpgJCB2tA/jWpFL3zf6qS71jLITOxGdfhSAYALwi30zIaz/pUi4lO5Lg4X4A=
+X-Received: by 2002:a6b:f002:: with SMTP id w2mr4655866ioc.48.1586436702074;
+ Thu, 09 Apr 2020 05:51:42 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <ffc4c788-2319-efda-508c-275b9f7efb95@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
+References: <CAFULd4adXFX+y6eCV0tVhg-iHZe+tAchJkuHMXe3ZWktzGk7Sw@mail.gmail.com>
+ <a2187cc0-cab6-78db-3e2d-6edaf647c882@redhat.com>
+In-Reply-To: <a2187cc0-cab6-78db-3e2d-6edaf647c882@redhat.com>
+From:   Uros Bizjak <ubizjak@gmail.com>
+Date:   Thu, 9 Apr 2020 14:51:30 +0200
+Message-ID: <CAFULd4YG1Df_1HvjDUYCyW+VTLO3-xk8CU4Lwsv2Lq=G-wP+cQ@mail.gmail.com>
+Subject: Re: Current mainline kernel FTBFS in KVM SEV
+To:     Paolo Bonzini <pbonzini@redhat.com>, like.xu@intel.com
+Cc:     kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Thu, Apr 9, 2020 at 10:33 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 09/04/20 10:20, Uros Bizjak wrote:
+> > Current mainline kernel fails to build (on Fedora 31) with:
+> >
+> >   GEN     .version
+> >   CHK     include/generated/compile.h
+> >   LD      vmlinux.o
+> >   MODPOST vmlinux.o
+> >   MODINFO modules.builtin.modinfo
+> >   GEN     modules.builtin
+> >   LD      .tmp_vmlinux.btf
+> > ld: arch/x86/kvm/svm/sev.o: in function `sev_flush_asids':
+> > /hdd/uros/git/linux/arch/x86/kvm/svm/sev.c:48: undefined reference to
+> > `sev_guest_df_flush'
+> > ld: arch/x86/kvm/svm/sev.o: in function `sev_hardware_setup':
+> > /hdd/uros/git/linux/arch/x86/kvm/svm/sev.c:1146: undefined reference
+> > to `sev_platform_status'
+> >   BTF     .btf.vmlinux.bin.o
+>
+> Strange, the functions are defined and exported with
+> CONFIG_CRYPTO_DEV_SP_PSP, which is "y" in your config.
 
-On 4/9/2020 8:43 PM, Jason Wang wrote:
->
-> On 2020/4/9 下午6:41, Arnd Bergmann wrote:
->> On Thu, Mar 26, 2020 at 3:08 PM Jason Wang <jasowang@redhat.com> wrote:
->>> From: Zhu Lingshan <lingshan.zhu@intel.com>
->>>
->>> This commit introduced two layers to drive IFC VF:
->>>
->>> (1) ifcvf_base layer, which handles IFC VF NIC hardware operations and
->>>      configurations.
->>>
->>> (2) ifcvf_main layer, which complies to VDPA bus framework,
->>>      implemented device operations for VDPA bus, handles device probe,
->>>      bus attaching, vring operations, etc.
->>>
->>> Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
->>> Signed-off-by: Bie Tiwei <tiwei.bie@intel.com>
->>> Signed-off-by: Wang Xiao <xiao.w.wang@intel.com>
->>> Signed-off-by: Jason Wang <jasowang@redhat.com>
->>> +
->>> +#define IFCVF_QUEUE_ALIGNMENT  PAGE_SIZE
->>> +#define IFCVF_QUEUE_MAX                32768
->>> +static u16 ifcvf_vdpa_get_vq_align(struct vdpa_device *vdpa_dev)
->>> +{
->>> +       return IFCVF_QUEUE_ALIGNMENT;
->>> +}
->> This fails to build on arm64 with 64kb page size (found in linux-next):
->>
->> /drivers/vdpa/ifcvf/ifcvf_main.c: In function 'ifcvf_vdpa_get_vq_align':
->> arch/arm64/include/asm/page-def.h:17:20: error: conversion from 'long
->> unsigned int' to 'u16' {aka 'short unsigned int'} changes value from
->> '65536' to '0' [-Werror=overflow]
->>     17 | #define PAGE_SIZE  (_AC(1, UL) << PAGE_SHIFT)
->>        |                    ^
->> drivers/vdpa/ifcvf/ifcvf_base.h:37:31: note: in expansion of macro 
->> 'PAGE_SIZE'
->>     37 | #define IFCVF_QUEUE_ALIGNMENT PAGE_SIZE
->>        |                               ^~~~~~~~~
->> drivers/vdpa/ifcvf/ifcvf_main.c:231:9: note: in expansion of macro
->> 'IFCVF_QUEUE_ALIGNMENT'
->>    231 |  return IFCVF_QUEUE_ALIGNMENT;
->>        |         ^~~~~~~~~~~~~~~~~~~~~
->>
->> It's probably good enough to just not allow the driver to be built in 
->> that
->> configuration as it's fairly rare but unfortunately there is no 
->> simple Kconfig
->> symbol for it.
->
->
-> Or I think the 64KB alignment is probably more than enough.
->
-> Ling Shan, can we use smaller value here?
->
-> Thanks
+The problem is with
 
-sure, we just need it page aligned, this value is only used in 
-get_vq_align(). I will try to find a arm64 machine and debug on this issue
+CONFIG_CRYPTO_DEV_CCP_DD=m
 
-Thanks!
+in combination with
 
->
->
->>
->> In a similar driver, we did
->>
->> config VMXNET3
->>          tristate "VMware VMXNET3 ethernet driver"
->>          depends on PCI && INET
->>          depends on !(PAGE_SIZE_64KB || ARM64_64K_PAGES || \
->>                       IA64_PAGE_SIZE_64KB || MICROBLAZE_64K_PAGES || \
->>                       PARISC_PAGE_SIZE_64KB || PPC_64K_PAGES)
->>
->> I think we should probably make PAGE_SIZE_64KB a global symbol
->> in arch/Kconfig and have it selected by the other symbols so drivers
->> like yours can add a dependency for it.
->>
->>           Arnd
->>
->
+CONFIG_KVM_AMD=y
+
+in arch/x86/kvmKconfig, there is:
+
+--cut here--
+config KVM_AMD_SEV
+    def_bool y
+    bool "AMD Secure Encrypted Virtualization (SEV) support"
+    depends on KVM_AMD && X86_64
+    depends on CRYPTO_DEV_SP_PSP && !(KVM_AMD=y && CRYPTO_DEV_CCP_DD=m)
+    ---help---
+    Provides support for launching Encrypted VMs on AMD processors.
+--cut here--
+
+which doesn't disable the compilation of sev.o. The missing functions
+are actually in ccp.o *module*, called from built-in functions of
+sev.o
+
+Enabling CRYPTO_DEV_CCP_DD=y as a built-in instead of a module fixes the build.
+
+Uros.
