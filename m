@@ -2,197 +2,158 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2B67A1A3171
-	for <lists+kvm@lfdr.de>; Thu,  9 Apr 2020 11:01:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 731B81A3179
+	for <lists+kvm@lfdr.de>; Thu,  9 Apr 2020 11:03:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725987AbgDIJBk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Apr 2020 05:01:40 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:55259 "EHLO
+        id S1726582AbgDIJDz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Apr 2020 05:03:55 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:57248 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1725997AbgDIJBk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Apr 2020 05:01:40 -0400
+        with ESMTP id S1725828AbgDIJDz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Apr 2020 05:03:55 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1586422899;
+        s=mimecast20190719; t=1586423034;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=msTkXhnouvwVtlF7/78TkiH9nVYNya7vCxTaw1gbKMk=;
-        b=Mn4dIaBiUGlkQQvGjJ50BEnVgvcmpzeZ/NjCnn7/pz8HCIjuWyQqx3OorYHtIUp6fIo2/n
-        Y3cCnd9rnOIqULb85bfdjbG1gRoYx3W+u4mSDQC11Q/p98WY5CQ81ueCLBZ75FsCwDJhWI
-        DexeS/qkuigD+QaBdx5ollJOwMN8Nno=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-20-4d7R36GENiiwKgaxvAcgYQ-1; Thu, 09 Apr 2020 05:01:37 -0400
-X-MC-Unique: 4d7R36GENiiwKgaxvAcgYQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 88F18107ACCA;
-        Thu,  9 Apr 2020 09:01:35 +0000 (UTC)
-Received: from [10.36.115.53] (ovpn-115-53.ams2.redhat.com [10.36.115.53])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 8122AA63D6;
-        Thu,  9 Apr 2020 09:01:26 +0000 (UTC)
-Subject: Re: [PATCH v1 5/8] vfio/type1: Report 1st-level/stage-1 format to
- userspace
-To:     Jean-Philippe Brucker <jean-philippe@linaro.org>
-Cc:     "Liu, Yi L" <yi.l.liu@intel.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "Tian, Jun J" <jun.j.tian@intel.com>,
-        "Sun, Yi Y" <yi.y.sun@intel.com>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Wu, Hao" <hao.wu@intel.com>
-References: <1584880325-10561-1-git-send-email-yi.l.liu@intel.com>
- <1584880325-10561-6-git-send-email-yi.l.liu@intel.com>
- <cb68e9ab-77b0-7e97-a661-4836962041d9@redhat.com>
- <A2975661238FB949B60364EF0F2C25743A21DB4E@SHSMSX104.ccr.corp.intel.com>
- <b47891b1-ece6-c263-9c07-07c09c7d3752@redhat.com>
- <20200403082305.GA1269501@myrica>
- <A2975661238FB949B60364EF0F2C25743A2249DF@SHSMSX104.ccr.corp.intel.com>
- <acf8c809-8d29-92d6-2445-3a94fc8b82fd@redhat.com>
- <20200409081442.GD2435@myrica>
-From:   Auger Eric <eric.auger@redhat.com>
-Message-ID: <f9ed6639-35f2-af32-2d2c-78929d52b763@redhat.com>
-Date:   Thu, 9 Apr 2020 11:01:24 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+        bh=8kQ7lBIYRxVIllP8WU3yr1RLlp3Ki4sY9tIMcm8NLXo=;
+        b=IVNcAyufctBLzc53jkAutcUvY2tu2GD0XxJwmWuZEKz1ujU+Ius/XKI0SpLX5nKI+6+Tc1
+        P0fTsVR9sCSfLPG0ffySnfeA5mIW3sen/T3iDzPl23Ntl7omZ1BFx4jPHoVtIXFk4b+cLe
+        b11CIjVlPGb+nWxHIyHYl+pdHgqnqRI=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-162-wD_fSL0HPfOsZ9Fg-KveGg-1; Thu, 09 Apr 2020 05:03:53 -0400
+X-MC-Unique: wD_fSL0HPfOsZ9Fg-KveGg-1
+Received: by mail-wr1-f72.google.com with SMTP id d4so6027676wrq.10
+        for <kvm@vger.kernel.org>; Thu, 09 Apr 2020 02:03:53 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=8kQ7lBIYRxVIllP8WU3yr1RLlp3Ki4sY9tIMcm8NLXo=;
+        b=scr1P4q+Ka5yVgsHGzJsoQyDQU5drmcS+yvq3ifsuipgtDuA2Wnfi0cyXb8eU6YFrE
+         1YLYhW9U+QvzQOX5f2lctCiFNxPDrmM8BxEIzFPmC0QUGTSB7n8YgjBlhLvgVc2o2uKA
+         aYTAg0yG/f8pTW9alKxIoFPBu8IGiGBZWC82yuLsZd2jVVptUp861pdqQX93N61v6lSX
+         jhsGpCSp+uYG0xS2zTLylqSLALqUVOL9uYjnVhGHG154+AwsIqql9GY3LyC31XPTZUBm
+         PlHYuJzmcpaJLGshHRv11x4mpzmVwv0hmaYEN+86S09QI6YC7j5TLSrhdMd0w0TP9u/i
+         N+Pg==
+X-Gm-Message-State: AGi0PuapaqLFy26OJO4qaxP8PIB23I3qbgkfKhohFC+Y8p6bXdE0kKw+
+        FKrPvM1GMGUQMT2DASrRpBrPBwSuuOYnS+kbCPEzT+Z4/GsrMNqT6rcRZygFwrd25jjoZFrESjk
+        lyOnC6HOQzmkb
+X-Received: by 2002:adf:b1c6:: with SMTP id r6mr12632481wra.49.1586423032030;
+        Thu, 09 Apr 2020 02:03:52 -0700 (PDT)
+X-Google-Smtp-Source: APiQypLF16jQY0MQeLOoeWEjDvj99XBLM/QjgSY70WD35IL8kqp+4bpmhm1qfLNT2fbzdEIEC3sYEw==
+X-Received: by 2002:adf:b1c6:: with SMTP id r6mr12632450wra.49.1586423031690;
+        Thu, 09 Apr 2020 02:03:51 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:bddb:697c:bea8:abc? ([2001:b07:6468:f312:bddb:697c:bea8:abc])
+        by smtp.gmail.com with ESMTPSA id t8sm300999wrq.88.2020.04.09.02.03.50
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 09 Apr 2020 02:03:51 -0700 (PDT)
+Subject: Re: [PATCH v2] x86/kvm: Disable KVM_ASYNC_PF_SEND_ALWAYS
+To:     Thomas Gleixner <tglx@linutronix.de>,
+        Andy Lutomirski <luto@amacapital.net>,
+        Vivek Goyal <vgoyal@redhat.com>
+Cc:     Peter Zijlstra <peterz@infradead.org>,
+        Andy Lutomirski <luto@kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>, X86 ML <x86@kernel.org>,
+        kvm list <kvm@vger.kernel.org>, stable <stable@vger.kernel.org>
+References: <20200407172140.GB64635@redhat.com>
+ <772A564B-3268-49F4-9AEA-CDA648F6131F@amacapital.net>
+ <87eeszjbe6.fsf@nanos.tec.linutronix.de>
+ <ce81c95f-8674-4012-f307-8f32d0e386c2@redhat.com>
+ <874ktukhku.fsf@nanos.tec.linutronix.de>
+ <274f3d14-08ac-e5cc-0b23-e6e0274796c8@redhat.com>
+ <87pncib06x.fsf@nanos.tec.linutronix.de>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <92ea7036-0b77-20da-34ac-f425e6f233c2@redhat.com>
+Date:   Thu, 9 Apr 2020 11:03:50 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200409081442.GD2435@myrica>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <87pncib06x.fsf@nanos.tec.linutronix.de>
+Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Jean,
+On 08/04/20 15:01, Thomas Gleixner wrote:
+> 
+> And it comes with restrictions:
+> 
+>     The Do Other Stuff event can only be delivered when guest IF=1.
+> 
+>     If guest IF=0 then the host has to suspend the guest until the
+>     situation is resolved.
+> 
+>     The 'Situation resolved' event must also wait for a guest IF=1 slot.
 
-On 4/9/20 10:14 AM, Jean-Philippe Brucker wrote:
-> On Wed, Apr 08, 2020 at 12:27:58PM +0200, Auger Eric wrote:
->> Hi Yi,
->>
->> On 4/7/20 11:43 AM, Liu, Yi L wrote:
->>> Hi Jean,
->>>
->>>> From: Jean-Philippe Brucker <jean-philippe@linaro.org>
->>>> Sent: Friday, April 3, 2020 4:23 PM
->>>> To: Auger Eric <eric.auger@redhat.com>
->>>> userspace
->>>>
->>>> On Wed, Apr 01, 2020 at 03:01:12PM +0200, Auger Eric wrote:
->>>>>>>>  	header = vfio_info_cap_add(caps, sizeof(*nesting_cap),
->>>>>>>>  				   VFIO_IOMMU_TYPE1_INFO_CAP_NESTING, 1);
->>>> @@ -2254,6 +2309,7
->>>>>>>> @@ static int vfio_iommu_info_add_nesting_cap(struct
->>>>>>> vfio_iommu *iommu,
->>>>>>>>  		/* nesting iommu type supports PASID requests (alloc/free) */
->>>>>>>>  		nesting_cap->nesting_capabilities |= VFIO_IOMMU_PASID_REQS;
->>>>>>> What is the meaning for ARM?
->>>>>>
->>>>>> I think it's just a software capability exposed to userspace, on
->>>>>> userspace side, it has a choice to use it or not. :-) The reason
->>>>>> define it and report it in cap nesting is that I'd like to make the
->>>>>> pasid alloc/free be available just for IOMMU with type
->>>>>> VFIO_IOMMU_TYPE1_NESTING. Please feel free tell me if it is not good
->>>>>> for ARM. We can find a proper way to report the availability.
->>>>>
->>>>> Well it is more a question for jean-Philippe. Do we have a system wide
->>>>> PASID allocation on ARM?
->>>>
->>>> We don't, the PASID spaces are per-VM on Arm, so this function should consult the
->>>> IOMMU driver before setting flags. As you said on patch 3, nested doesn't
->>>> necessarily imply PASID support. The SMMUv2 does not support PASID but does
->>>> support nesting stages 1 and 2 for the IOVA space.
->>>> SMMUv3 support of PASID depends on HW capabilities. So I think this needs to be
->>>> finer grained:
->>>>
->>>> Does the container support:
->>>> * VFIO_IOMMU_PASID_REQUEST?
->>>>   -> Yes for VT-d 3
->>>>   -> No for Arm SMMU
->>>> * VFIO_IOMMU_{,UN}BIND_GUEST_PGTBL?
->>>>   -> Yes for VT-d 3
->>>>   -> Sometimes for SMMUv2
->>>>   -> No for SMMUv3 (if we go with BIND_PASID_TABLE, which is simpler due to
->>>>      PASID tables being in GPA space.)
->>>> * VFIO_IOMMU_BIND_PASID_TABLE?
->>>>   -> No for VT-d
->>>>   -> Sometimes for SMMUv3
->>>>
->>>> Any bind support implies VFIO_IOMMU_CACHE_INVALIDATE support.
->>>
->>> good summary. do you expect to see any 
->>>
->>>>
->>>>>>>> +	nesting_cap->stage1_formats = formats;
->>>>>>> as spotted by Kevin, since a single format is supported, rename
->>>>>>
->>>>>> ok, I was believing it may be possible on ARM or so. :-) will rename
->>>>>> it.
->>>>
->>>> Yes I don't think an u32 is going to cut it for Arm :( We need to describe all sorts of
->>>> capabilities for page and PASID tables (granules, GPA size, ASID/PASID size, HW
->>>> access/dirty, etc etc.) Just saying "Arm stage-1 format" wouldn't mean much. I
->>>> guess we could have a secondary vendor capability for these?
->>>
->>> Actually, I'm wondering if we can define some formats to stands for a set of
->>> capabilities. e.g. VTD_STAGE1_FORMAT_V1 which may indicates the 1st level
->>> page table related caps (aw, a/d, SRE, EA and etc.). And vIOMMU can parse
->>> the capabilities.
->>
->> But eventually do we really need all those capability getters? I mean
->> can't we simply rely on the actual call to VFIO_IOMMU_BIND_GUEST_PGTBL()
->> to detect any mismatch? Definitively the error handling may be heavier
->> on userspace but can't we manage.
-> 
-> I think we need to present these capabilities at boot time, long before
-> the guest triggers a bind(). For example if the host SMMU doesn't support
-> 16-bit ASID, we need to communicate that to the guest using vSMMU ID
-> registers or PROBE properties. Otherwise a bind() will succeed, but if the
-> guest uses 16-bit ASIDs in its CD, DMA will result in C_BAD_CD events
-> which we'll inject into the guest, for no apparent reason from their
-> perspective.
-OK I understand this case as in this situation we may be able to change
-the way to iommu is exposed to the guest.
-> 
-> In addition some VMMs may have fallbacks if shared page tables are not
-> available. They could fall back to a MAP/UNMAP interface, or simply not
-> present a vIOMMU to the guest.
-fair enough, there is a need for such capability checker in the mid
-term. But this patch introduces the capability to check whether system
-wide PASID alloc is supported and this may not be requested at that
-stage for the whole vSVM integration?
+Additionally:
 
-Thanks
+- the do other stuff event must be delivered to the same CPU that is
+causing the host-side page fault
 
-Eric
+- the do other stuff event provides a token that identifies the cause
+and the situation resolved event provides a matching token
+
+This stuff is why I think the do other stuff event looks very much like
+a #VE.  But I think we're in violent agreement after all.
+
+> If you just want to solve Viveks problem, then its good enough. I.e. the
+> file truncation turns the EPT entries into #VE convertible entries and
+> the guest #VE handler can figure it out. This one can be injected
+> directly by the hardware, i.e. you don't need a VMEXIT.
 > 
-> Thanks,
-> Jean
+> If you want the opportunistic do other stuff mechanism, then #VE has
+> exactly the same problems as the existing async "PF". It's not magicaly
+> making that go away.
+
+You can inject #VE from the hypervisor too, with PV magic to distinguish
+the two.  However that's not necessarily a good idea because it makes it
+harder to switch to hardware delivery in the future.
+
+> One possible solution might be to make all recoverable EPT entries
+> convertible and let the HW inject #VE for those.
 > 
->> My fear is we end up with an overly
->> complex series. This capability getter may be interesting if we can
->> switch to a fallback implementation but here I guess we don't have any
->> fallback. With smmuv3 nested stage we don't have any fallback solution
->> either. For the versions, it is different because the userspace shall be
->> able to adapt (or not) to the max version supported by the kernel.
->>
->> Thanks
->>
->> Eric
->>>
->>> Regards,
->>> Yi Liu
->>>
->>
+> So the #VE handler in the guest would have to do:
 > 
+>        if (!recoverable()) {
+>        	if (user_mode)
+>                 	send_signal();
+>                 else if (!fixup_exception())
+>                 	die_hard();
+>                 goto done;  
+>        }                 
+> 
+>        store_ve_info_in_pv_page();
+> 
+>        if (!user_mode(regs) || !preemptible()) {
+>        	hypercall_resolve_ept(can_continue = false);
+>        } else {
+>               init_completion();
+>        	hypercall_resolve_ept(can_continue = true);
+>               wait_for_completion();
+>        }
+> 
+> or something like that.
+
+Yes, pretty much.  The VE info can also be passed down to the hypercall
+as arguments.
+
+Paolo
+
+> The hypercall to resolve the EPT fail on the host acts on the
+> can_continue argument.
+> 
+> If false, it suspends the guest vCPU and only returns when done.
+> 
+> If true it kicks the resolve process and returns to the guest which
+> suspends the task and tries to do something else.
+> 
+> The wakeup side needs to be a regular interrupt and cannot go through
+> #VE.
 
