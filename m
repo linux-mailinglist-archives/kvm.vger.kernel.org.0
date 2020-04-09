@@ -2,118 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2EF761A3836
-	for <lists+kvm@lfdr.de>; Thu,  9 Apr 2020 18:46:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 627A91A38EF
+	for <lists+kvm@lfdr.de>; Thu,  9 Apr 2020 19:32:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726880AbgDIQqC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Apr 2020 12:46:02 -0400
-Received: from merlin.infradead.org ([205.233.59.134]:44838 "EHLO
-        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726583AbgDIQqC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Apr 2020 12:46:02 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=merlin.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=JF8YIk2xFNHVFU1BBr/GqiO+G+p4hUPmEi3VXvq3m8w=; b=zGwzrwVZUwkq0Ox8InOnz/dj9j
-        1H28pKr6QAnD702oNub4/F3RpPbM7V1b0EqQFnDOXKFXpjYnLRHM8X89fugBhBjb1azQf/FgggwkF
-        k1r1KPBnjLcfH12NgxGYlEHF4jyUxD1khm6MJ59YSi28ygiNk7K2LCttumYJJFEtEJkWep+QjZE8q
-        +mnhR9oLBp1Gz92FBPWaYBkaGL4miUM3sKtWdrkNYx3ZrLV7lm+tRPi1+bKAcKm7dOCvRDmYVlRNP
-        DxItH7vdamlQJ1FWaEl/m4D6S2WLJ8UbtymNZlecI3EOkExp4pI1ibMGmWSawygb73iWR8DV+w3Vi
-        Y07OXveQ==;
-Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
-        by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jMaJG-0004Bi-SA; Thu, 09 Apr 2020 16:45:47 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 43F9A300478;
-        Thu,  9 Apr 2020 18:45:45 +0200 (CEST)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id 3678F2BA1D829; Thu,  9 Apr 2020 18:45:45 +0200 (CEST)
-Date:   Thu, 9 Apr 2020 18:45:45 +0200
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Like Xu <like.xu@linux.intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        Andi Kleen <ak@linux.intel.com>,
-        Jim Mattson <jmattson@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Liran Alon <liran.alon@oracle.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Liang Kan <kan.liang@linux.intel.com>,
-        Wei Wang <wei.w.wang@intel.com>, linux-kernel@vger.kernel.org,
-        Ingo Molnar <mingo@kernel.org>
-Subject: Re: [PATCH v9 04/10] perf/x86: Keep LBR stack unchanged on the host
- for guest LBR event
-Message-ID: <20200409164545.GE20713@hirez.programming.kicks-ass.net>
-References: <20200313021616.112322-1-like.xu@linux.intel.com>
- <20200313021616.112322-5-like.xu@linux.intel.com>
+        id S1726684AbgDIRcy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Apr 2020 13:32:54 -0400
+Received: from mail.kernel.org ([198.145.29.99]:56368 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726632AbgDIRcy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Apr 2020 13:32:54 -0400
+Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 558AD2087E
+        for <kvm@vger.kernel.org>; Thu,  9 Apr 2020 17:32:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1586453573;
+        bh=IBuZEgijyAZREsl+G4BQjvkNizxCg7cks8fO++AV2XA=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=kFEzwXHDig+6mpRJP27Lvw+9no7VIbkjMrVguBlJqMoPADnJXy15cQD67IadXBR5u
+         fxXeDn5OkQ/p+8cSUhhW+LeX5Dh3Jgzhnb+ybqMccG8bSjw1lgwgksU/TZz20gZ/64
+         xInCI3KMBKixQaZsTEqS33BJKp2UqR6jeIxy3QGk=
+Received: by mail-wr1-f48.google.com with SMTP id f13so6253443wrm.13
+        for <kvm@vger.kernel.org>; Thu, 09 Apr 2020 10:32:53 -0700 (PDT)
+X-Gm-Message-State: AGi0PuZ9qbmTyYq1US69NnsiY7BGb1xnJrgG/+b2UgdNrrDAlNoG+pqu
+        ICzkHCMR8+w2fwAbHgziUh3XQYZ4rJgkmPIrVFLPJA==
+X-Google-Smtp-Source: APiQypLEiHQsMq8szXbLnpQbM1VupAPJctZFhnFSSXM3V5XoGXOx1XbOz0uCtxrbjmBSCYE2gAQxGXqRHjzPLG1/z74=
+X-Received: by 2002:adf:aad7:: with SMTP id i23mr254511wrc.184.1586453571673;
+ Thu, 09 Apr 2020 10:32:51 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200313021616.112322-5-like.xu@linux.intel.com>
+References: <c09dd91f-c280-85a6-c2a2-d44a0d378bbc@redhat.com>
+ <4EB5D96F-F322-45BB-9169-6BF932D413D4@amacapital.net> <931f6e6d-ac17-05f9-0605-ac8f89f40b2b@redhat.com>
+In-Reply-To: <931f6e6d-ac17-05f9-0605-ac8f89f40b2b@redhat.com>
+From:   Andy Lutomirski <luto@kernel.org>
+Date:   Thu, 9 Apr 2020 10:32:39 -0700
+X-Gmail-Original-Message-ID: <CALCETrUpWBKHHyfMoqD2ZT3CnDdguNnK=KoZiTmN5PnbnD_k0A@mail.gmail.com>
+Message-ID: <CALCETrUpWBKHHyfMoqD2ZT3CnDdguNnK=KoZiTmN5PnbnD_k0A@mail.gmail.com>
+Subject: Re: [PATCH v2] x86/kvm: Disable KVM_ASYNC_PF_SEND_ALWAYS
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Tony Luck <tony.luck@intel.com>
+Cc:     Andrew Cooper <andrew.cooper3@citrix.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vivek Goyal <vgoyal@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        LKML <linux-kernel@vger.kernel.org>, X86 ML <x86@kernel.org>,
+        kvm list <kvm@vger.kernel.org>, stable <stable@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Mar 13, 2020 at 10:16:10AM +0800, Like Xu wrote:
-> When a guest wants to use the LBR stack, its hypervisor creates a guest
-> LBR event and let host perf schedules it. A new 'int guest_lbr_enabled'
-> field in the "struct cpu_hw_events", is marked as true when perf adds
-> a guest LBR event and false on deletion.
-> 
-> The LBR stack msrs are accessible to the guest when its guest LBR event
-> is scheduled in by the perf subsystem. Before scheduling out the event,
-> we should avoid host changes on IA32_DEBUGCTLMSR or LBR_SELECT. Otherwise,
-> some unexpected branch operations may interfere with guest behavior,
-> pollute LBR records, and even cause host branch data leakage. In addition,
-> the intel_pmu_lbr_read() on the host is also avoidable for guest usage.
-> 
-> On v4 PMU or later, the LBR stack are frozen on the overflowed condition
-> if Freeze_LBR_On_PMI is true and resume recording via acking LBRS_FROZEN
-> to global status msr instead of re-enabling IA32_DEBUGCTL.LBR. So when a
-> guest LBR event is running, the host PMI handler has to keep LBRS_FROZEN
-> bit set (thus LBR being frozen) until the guest enables it. Otherwise,
-> when the guest enters non-root mode, the LBR will start recording and
-> the guest PMI handler code will also pollute the LBR stack.
-> 
-> To ensure that guest LBR records are not lost during the context switch,
-> the BRANCH_CALL_STACK flag should be configured in the 'branch_sample_type'
-> for a guest LBR event because a callstack event could save/restore guest
-> unread records with the help of intel_pmu_lbr_sched_task() naturally.
-> 
-> However, the regular host LBR perf event doesn't save/restore LBR_SELECT,
-> because it's configured in the LBR_enable() based on branch_sample_type.
-> So when a guest LBR is running, the guest LBR_SELECT may changes for its
-> own use and we have to add the LBR_SELECT save/restore to ensure what the
-> guest LBR_SELECT value doesn't get lost during the context switching.
+Hi, Tony.  I'm adding you because, despite the fact that everyone in
+this thread is allergic to #MC, this seems to be one of your favorite
+topics :)
 
-I had to read the patch before that made sense; I think it's mostly
-there, but it can use a little help.
+> On Apr 9, 2020, at 8:17 AM, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> =EF=BB=BFOn 09/04/20 17:03, Andy Lutomirski wrote:
+>>> No, I think we wouldn't use a paravirt #VE at this point, we would
+>>> use the real thing if available.
+>>>
+>>> It would still be possible to switch from the IST to the main
+>>> kernel stack before writing 0 to the reentrancy word.
+>>
+>> Almost but not quite. We do this for NMI-from-usermode, and it=E2=80=99s
+>> ugly. But we can=E2=80=99t do this for NMI-from-kernel or #VE-from-kerne=
+l
+>> because there might not be a kernel stack.  Trying to hack around
+>> this won=E2=80=99t be pretty.
+>>
+>> Frankly, I think that we shouldn=E2=80=99t even try to report memory fai=
+lure
+>> to the guest if it happens with interrupts off. Just kill the guest
+>> cleanly and keep it simple. Or inject an intentionally unrecoverable
+>> IST exception.
+>
+> But it would be nice to use #VE for all host-side page faults, not just
+> for memory failure.
+>
+> So the solution would be the same as for NMIs, duplicating the stack
+> frame and patching the outer handler's stack from the recursive #VE
+> (https://lwn.net/Articles/484932/).  It's ugly but it's a known ugliness.
+>
+>
 
+Believe me, I know all about how ugly it is, since I=E2=80=99m the one who
+fixed most of the bugs in the first few implementations.  And, before
+I wrote or ack any such thing for #VE, I want to know why.  What,
+exactly, is a sufficiently strong motivation for using #VE *at all*
+that Linux should implement a #VE handler?
 
-> @@ -691,8 +714,12 @@ void intel_pmu_lbr_read(void)
->  	 *
->  	 * This could be smarter and actually check the event,
->  	 * but this simple approach seems to work for now.
-> +	 *
-> +	 * And there is no need to read lbr here if a guest LBR event
+As I see it, #VE has several downsides:
 
-There's 'lbr' and 'LBR' in the same sentence
+1. Intel only.
 
-> +	 * is using it, because the guest will read them on its own.
->  	 */
-> -	if (!cpuc->lbr_users || cpuc->lbr_users == cpuc->lbr_pebs_users)
-> +	if (!cpuc->lbr_users || cpuc->guest_lbr_enabled ||
-> +		cpuc->lbr_users == cpuc->lbr_pebs_users)
+2. Depending on precisely what it's used for, literally any memory
+access in the kernel can trigger it as a fault.  This means that it
+joins NMI and #MC (and, to a limited extent, #DB) in the horrible
+super-atomic-happens-in-bad-contexts camp.  IST is mandatory, and IST
+is not so great.
 
-indent fail
+3. Just like NMI and MCE, it comes with a fundamentally broken
+don't-recurse-me mechanism.
 
->  		return;
->  
->  	if (x86_pmu.intel_cap.lbr_format == LBR_FORMAT_32)
+If we do support #VE, I would suggest we do it roughly like this.  The
+#VE handler is a regular IST entry -- there's a single IST stack, and
+#VE from userspace stack-switches to the regular kernel stack.  The C
+handler (do_virtualization_exception?) is permitted to panic if
+something is horribly wrong, but is *not* permitted to clear the word
+at byte 4 to re-enable #VE.  Instead, it does something to trigger a
+deferred re-enable.  For example, it sends IPI to self and the IPI
+handler clears the magic re-enable flag.
+
+There are definitely horrible corner cases here.  For example, suppose
+user code mmaps() some kind of failable memory (due to NVDIMM hardware
+failures, truncation, whatever).  Then user code points RBP at it and
+we get a perf NMI.  Now the perf code tries to copy_from_user_nmi()
+the user stack and hits the failure.  It gets #MC or #VE or some
+paravirt thing.  Now we're in a situation where we got an IST
+exception in the middle of NMI processing and we're expected to do
+something intelligent about it.  Sure, we can invoke the extable
+handler, but it's not really clear how to recover if we somehow hit
+the same type of failure again in the same NMI.
+
+A model that could actually work, perhaps for #VE and #MC, is to have
+the extable code do the re-enabling.  So ex_handler_uaccess() and
+ex_handler_mcsafe() will call something like rearm_memory_failure(),
+and that will do whatever is needed to re-arm the specific memory
+failure reporting mechanism in use.
+
+But, before I touch that with a ten-foot pole, I want to know *why*.
+What's the benefit?  Why do we want convertible EPT violations?
