@@ -2,119 +2,197 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A11A61A3122
-	for <lists+kvm@lfdr.de>; Thu,  9 Apr 2020 10:46:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2B67A1A3171
+	for <lists+kvm@lfdr.de>; Thu,  9 Apr 2020 11:01:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725972AbgDIIqY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Apr 2020 04:46:24 -0400
-Received: from mail-il1-f195.google.com ([209.85.166.195]:39795 "EHLO
-        mail-il1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725783AbgDIIqY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Apr 2020 04:46:24 -0400
-Received: by mail-il1-f195.google.com with SMTP id r5so9501484ilq.6
-        for <kvm@vger.kernel.org>; Thu, 09 Apr 2020 01:46:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=GEYEchC93kprcsaItYbNcU2jdynXG/AgD+PfcM6lGis=;
-        b=FW/oVxMb4Hjl5s7npqCzWP2OUcRSZ9PHGTaYZM/QsUN+0LRV2jXcLfM+rvp2xDxOyk
-         k0QPv6Iy9HjMJMDYwzXGYI02YxnBZZc01/w6GuLmhlLbBI3ntd/95ctxm8zEaVuP6Dk/
-         +MSHOCaMaCjUIwD/IEjM2P+mpWHJHKmFtWw057PkfNdqA8PplNhxYqVTH9XdbmaBxlfW
-         ZYmeEnhQo7AzZqIVIGU1tvrxY13FSgVhbp65fWi7FIVO/bdRPaBxw88AaYeU+W1FiGYk
-         +OuXMouh0IctviLj06cdMQWeArbimoVuD352tTEKAZBA6Fl5qHvQCGg+BDQv/FpvN7s0
-         9b9A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=GEYEchC93kprcsaItYbNcU2jdynXG/AgD+PfcM6lGis=;
-        b=DUsvm0NHgogF4181ax/CwtCRaDki8UGGhpDXmuRuhqAKFzbR8P6LQctkzjfvC8Pi1g
-         jUW+60C7LBxN7vamcqWmMXrf/xI5ImDE1D0+ZCvDienYd0dJ2kfwHk6ONt3hFVyuHHUv
-         cOtkfMxQqjSbcqZoCktddFHCaIaYe/zXEu5IBht0Re3YN0orpzQYv36kJ80bx92UhRwg
-         CphMNDmHPXAmaEQV3p1bcxLQPB+R44PuB2j/JNUTZiEz4NKkWncFByGcDO2QQx7xnB/Y
-         UuF2R4cq+RJ9ntdJ8D8Hig+kHUacc2TOO+T0/zlxylbSwqEJQjqKP1kTMPRyYmKT1T45
-         9j/A==
-X-Gm-Message-State: AGi0PuYeqVfXgyIIz81CCjkqXz3Rd1QkAOCs7gYNePluTWKCms6NBwMA
-        nPbrijkMQwxsjEcwFrEKLvSfXMtw6tjPP5sYe7SUvQcpepY=
-X-Google-Smtp-Source: APiQypKo0+ZtHtPbv+vI37gqLhu0KY9PDsZYRKVbRO68XArF79OfRxzU/Zl9bIMw/9gS1JoB97xqv06L4/yO/ENwu5g=
-X-Received: by 2002:a92:8f53:: with SMTP id j80mr12594438ild.171.1586421983807;
- Thu, 09 Apr 2020 01:46:23 -0700 (PDT)
+        id S1725987AbgDIJBk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Apr 2020 05:01:40 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:55259 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1725997AbgDIJBk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Apr 2020 05:01:40 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1586422899;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=msTkXhnouvwVtlF7/78TkiH9nVYNya7vCxTaw1gbKMk=;
+        b=Mn4dIaBiUGlkQQvGjJ50BEnVgvcmpzeZ/NjCnn7/pz8HCIjuWyQqx3OorYHtIUp6fIo2/n
+        Y3cCnd9rnOIqULb85bfdjbG1gRoYx3W+u4mSDQC11Q/p98WY5CQ81ueCLBZ75FsCwDJhWI
+        DexeS/qkuigD+QaBdx5ollJOwMN8Nno=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-20-4d7R36GENiiwKgaxvAcgYQ-1; Thu, 09 Apr 2020 05:01:37 -0400
+X-MC-Unique: 4d7R36GENiiwKgaxvAcgYQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 88F18107ACCA;
+        Thu,  9 Apr 2020 09:01:35 +0000 (UTC)
+Received: from [10.36.115.53] (ovpn-115-53.ams2.redhat.com [10.36.115.53])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 8122AA63D6;
+        Thu,  9 Apr 2020 09:01:26 +0000 (UTC)
+Subject: Re: [PATCH v1 5/8] vfio/type1: Report 1st-level/stage-1 format to
+ userspace
+To:     Jean-Philippe Brucker <jean-philippe@linaro.org>
+Cc:     "Liu, Yi L" <yi.l.liu@intel.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "Tian, Jun J" <jun.j.tian@intel.com>,
+        "Sun, Yi Y" <yi.y.sun@intel.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Wu, Hao" <hao.wu@intel.com>
+References: <1584880325-10561-1-git-send-email-yi.l.liu@intel.com>
+ <1584880325-10561-6-git-send-email-yi.l.liu@intel.com>
+ <cb68e9ab-77b0-7e97-a661-4836962041d9@redhat.com>
+ <A2975661238FB949B60364EF0F2C25743A21DB4E@SHSMSX104.ccr.corp.intel.com>
+ <b47891b1-ece6-c263-9c07-07c09c7d3752@redhat.com>
+ <20200403082305.GA1269501@myrica>
+ <A2975661238FB949B60364EF0F2C25743A2249DF@SHSMSX104.ccr.corp.intel.com>
+ <acf8c809-8d29-92d6-2445-3a94fc8b82fd@redhat.com>
+ <20200409081442.GD2435@myrica>
+From:   Auger Eric <eric.auger@redhat.com>
+Message-ID: <f9ed6639-35f2-af32-2d2c-78929d52b763@redhat.com>
+Date:   Thu, 9 Apr 2020 11:01:24 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-References: <CAFULd4adXFX+y6eCV0tVhg-iHZe+tAchJkuHMXe3ZWktzGk7Sw@mail.gmail.com>
- <a2187cc0-cab6-78db-3e2d-6edaf647c882@redhat.com>
-In-Reply-To: <a2187cc0-cab6-78db-3e2d-6edaf647c882@redhat.com>
-From:   Uros Bizjak <ubizjak@gmail.com>
-Date:   Thu, 9 Apr 2020 10:46:12 +0200
-Message-ID: <CAFULd4Y8Z0t2QUoMnscbJf-JqRyy=KYRZXyswH3PRwsZer4yyg@mail.gmail.com>
-Subject: Re: Current mainline kernel FTBFS in KVM SEV
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20200409081442.GD2435@myrica>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Apr 9, 2020 at 10:33 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 09/04/20 10:20, Uros Bizjak wrote:
-> > Current mainline kernel fails to build (on Fedora 31) with:
-> >
-> >   GEN     .version
-> >   CHK     include/generated/compile.h
-> >   LD      vmlinux.o
-> >   MODPOST vmlinux.o
-> >   MODINFO modules.builtin.modinfo
-> >   GEN     modules.builtin
-> >   LD      .tmp_vmlinux.btf
-> > ld: arch/x86/kvm/svm/sev.o: in function `sev_flush_asids':
-> > /hdd/uros/git/linux/arch/x86/kvm/svm/sev.c:48: undefined reference to
-> > `sev_guest_df_flush'
-> > ld: arch/x86/kvm/svm/sev.o: in function `sev_hardware_setup':
-> > /hdd/uros/git/linux/arch/x86/kvm/svm/sev.c:1146: undefined reference
-> > to `sev_platform_status'
-> >   BTF     .btf.vmlinux.bin.o
->
-> Strange, the functions are defined and exported with
-> CONFIG_CRYPTO_DEV_SP_PSP, which is "y" in your config.
+Hi Jean,
 
-I tried to continue with a single make job (if there is something
-wrong with dependencies). Still fails to build, but I can post the
-continuation of errors from this single job:
+On 4/9/20 10:14 AM, Jean-Philippe Brucker wrote:
+> On Wed, Apr 08, 2020 at 12:27:58PM +0200, Auger Eric wrote:
+>> Hi Yi,
+>>
+>> On 4/7/20 11:43 AM, Liu, Yi L wrote:
+>>> Hi Jean,
+>>>
+>>>> From: Jean-Philippe Brucker <jean-philippe@linaro.org>
+>>>> Sent: Friday, April 3, 2020 4:23 PM
+>>>> To: Auger Eric <eric.auger@redhat.com>
+>>>> userspace
+>>>>
+>>>> On Wed, Apr 01, 2020 at 03:01:12PM +0200, Auger Eric wrote:
+>>>>>>>>  	header = vfio_info_cap_add(caps, sizeof(*nesting_cap),
+>>>>>>>>  				   VFIO_IOMMU_TYPE1_INFO_CAP_NESTING, 1);
+>>>> @@ -2254,6 +2309,7
+>>>>>>>> @@ static int vfio_iommu_info_add_nesting_cap(struct
+>>>>>>> vfio_iommu *iommu,
+>>>>>>>>  		/* nesting iommu type supports PASID requests (alloc/free) */
+>>>>>>>>  		nesting_cap->nesting_capabilities |= VFIO_IOMMU_PASID_REQS;
+>>>>>>> What is the meaning for ARM?
+>>>>>>
+>>>>>> I think it's just a software capability exposed to userspace, on
+>>>>>> userspace side, it has a choice to use it or not. :-) The reason
+>>>>>> define it and report it in cap nesting is that I'd like to make the
+>>>>>> pasid alloc/free be available just for IOMMU with type
+>>>>>> VFIO_IOMMU_TYPE1_NESTING. Please feel free tell me if it is not good
+>>>>>> for ARM. We can find a proper way to report the availability.
+>>>>>
+>>>>> Well it is more a question for jean-Philippe. Do we have a system wide
+>>>>> PASID allocation on ARM?
+>>>>
+>>>> We don't, the PASID spaces are per-VM on Arm, so this function should consult the
+>>>> IOMMU driver before setting flags. As you said on patch 3, nested doesn't
+>>>> necessarily imply PASID support. The SMMUv2 does not support PASID but does
+>>>> support nesting stages 1 and 2 for the IOVA space.
+>>>> SMMUv3 support of PASID depends on HW capabilities. So I think this needs to be
+>>>> finer grained:
+>>>>
+>>>> Does the container support:
+>>>> * VFIO_IOMMU_PASID_REQUEST?
+>>>>   -> Yes for VT-d 3
+>>>>   -> No for Arm SMMU
+>>>> * VFIO_IOMMU_{,UN}BIND_GUEST_PGTBL?
+>>>>   -> Yes for VT-d 3
+>>>>   -> Sometimes for SMMUv2
+>>>>   -> No for SMMUv3 (if we go with BIND_PASID_TABLE, which is simpler due to
+>>>>      PASID tables being in GPA space.)
+>>>> * VFIO_IOMMU_BIND_PASID_TABLE?
+>>>>   -> No for VT-d
+>>>>   -> Sometimes for SMMUv3
+>>>>
+>>>> Any bind support implies VFIO_IOMMU_CACHE_INVALIDATE support.
+>>>
+>>> good summary. do you expect to see any 
+>>>
+>>>>
+>>>>>>>> +	nesting_cap->stage1_formats = formats;
+>>>>>>> as spotted by Kevin, since a single format is supported, rename
+>>>>>>
+>>>>>> ok, I was believing it may be possible on ARM or so. :-) will rename
+>>>>>> it.
+>>>>
+>>>> Yes I don't think an u32 is going to cut it for Arm :( We need to describe all sorts of
+>>>> capabilities for page and PASID tables (granules, GPA size, ASID/PASID size, HW
+>>>> access/dirty, etc etc.) Just saying "Arm stage-1 format" wouldn't mean much. I
+>>>> guess we could have a secondary vendor capability for these?
+>>>
+>>> Actually, I'm wondering if we can define some formats to stands for a set of
+>>> capabilities. e.g. VTD_STAGE1_FORMAT_V1 which may indicates the 1st level
+>>> page table related caps (aw, a/d, SRE, EA and etc.). And vIOMMU can parse
+>>> the capabilities.
+>>
+>> But eventually do we really need all those capability getters? I mean
+>> can't we simply rely on the actual call to VFIO_IOMMU_BIND_GUEST_PGTBL()
+>> to detect any mismatch? Definitively the error handling may be heavier
+>> on userspace but can't we manage.
+> 
+> I think we need to present these capabilities at boot time, long before
+> the guest triggers a bind(). For example if the host SMMU doesn't support
+> 16-bit ASID, we need to communicate that to the guest using vSMMU ID
+> registers or PROBE properties. Otherwise a bind() will succeed, but if the
+> guest uses 16-bit ASIDs in its CD, DMA will result in C_BAD_CD events
+> which we'll inject into the guest, for no apparent reason from their
+> perspective.
+OK I understand this case as in this situation we may be able to change
+the way to iommu is exposed to the guest.
+> 
+> In addition some VMMs may have fallbacks if shared page tables are not
+> available. They could fall back to a MAP/UNMAP interface, or simply not
+> present a vIOMMU to the guest.
+fair enough, there is a need for such capability checker in the mid
+term. But this patch introduces the capability to check whether system
+wide PASID alloc is supported and this may not be requested at that
+stage for the whole vSVM integration?
 
-[uros@localhost linux]$ make
-  CALL    scripts/checksyscalls.sh
-  CALL    scripts/atomic/check-atomics.sh
-  DESCEND  objtool
-  CHK     include/generated/compile.h
-  CHK     kernel/kheaders_data.tar.xz
-  GEN     .version
-  CHK     include/generated/compile.h
-  UPD     include/generated/compile.h
-  CC      init/version.o
-  AR      init/built-in.a
-  LD      vmlinux.o
-  MODPOST vmlinux.o
-  MODINFO modules.builtin.modinfo
-  GEN     modules.builtin
-  LD      .tmp_vmlinux.btf
-ld: arch/x86/kvm/svm/sev.o: in function `sev_flush_asids':
-/hdd/uros/git/linux/arch/x86/kvm/svm/sev.c:48: undefined reference to
-`sev_guest_df_flush'
-ld: arch/x86/kvm/svm/sev.o: in function `sev_hardware_setup':
-/hdd/uros/git/linux/arch/x86/kvm/svm/sev.c:1146: undefined reference
-to `sev_platform_status'
-  BTF     .btf.vmlinux.bin.o
-tag__check_id_drift: subroutine_type id drift, core_id: 1644,
-btf_type_id: 1642, type_id_off: 0
-libbpf: Unsupported BTF_KIND:0
-btf_elf__encode: btf__new failed!
-free(): double free detected in tcache 2
-scripts/link-vmlinux.sh: vrstica 114: 725221 Aborted
-(izpis jedra) LLVM_OBJCOPY=${OBJCOPY} ${PAHOLE} -J ${1}
-  LD      .tmp_vmlinux.kallsyms1
-.btf.vmlinux.bin.o: file not recognized: file format not recognized
-make: *** [Makefile:1086: vmlinux] Error 1
+Thanks
 
-Uros.
+Eric
+> 
+> Thanks,
+> Jean
+> 
+>> My fear is we end up with an overly
+>> complex series. This capability getter may be interesting if we can
+>> switch to a fallback implementation but here I guess we don't have any
+>> fallback. With smmuv3 nested stage we don't have any fallback solution
+>> either. For the versions, it is different because the userspace shall be
+>> able to adapt (or not) to the max version supported by the kernel.
+>>
+>> Thanks
+>>
+>> Eric
+>>>
+>>> Regards,
+>>> Yi Liu
+>>>
+>>
+> 
+
