@@ -2,41 +2,44 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 557891A34EA
-	for <lists+kvm@lfdr.de>; Thu,  9 Apr 2020 15:32:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0C1731A34EB
+	for <lists+kvm@lfdr.de>; Thu,  9 Apr 2020 15:33:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726597AbgDINcw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Apr 2020 09:32:52 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:44460 "EHLO
+        id S1726872AbgDINc7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Apr 2020 09:32:59 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:36514 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726552AbgDINcw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Apr 2020 09:32:52 -0400
+        with ESMTP id S1726641AbgDINc7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Apr 2020 09:32:59 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1586439172;
+        s=mimecast20190719; t=1586439178;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=1rsPbNYR0vQvYBWNFefGkmqQV/ZkHcmo1vgmZC2vNyk=;
-        b=VokTll+qLK31CtWc91+0MNBXBvaes3IK+Q8NbWei76/4q9S69WO6FH6cp761+ppBstIhmi
-        jjYtpqluICe3KyuueoPJ0KJlKlyno15cXhTFLGDRLiM4uWLCYeur9uLIbd7ZNgOBrgh8oi
-        K3Gyd75MN1NcXPltEst0dHu5q224wx8=
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=woDbbnutdla08US4iOa0Wjr9OpIuMoISMvO6V9wkEkM=;
+        b=aXmWZf5Ss2u8RAwLIQLDaUuc+mzQlXIbzlpmIU3w26vIu5Gzlm3/E7Z9oAzCDnV9Me9x1e
+        Hh3NSloOMKGD3J/mL+N336uozt3Tzygtx/PD3zRZLUxSg7nzk8C3s7Kn571+mnrw9Ta/CK
+        sE7ksVYoCP8yewER+wZZFLQRLwuqjbQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-431-MCxFUsmWO2u2PovlGx0EFw-1; Thu, 09 Apr 2020 09:32:49 -0400
-X-MC-Unique: MCxFUsmWO2u2PovlGx0EFw-1
+ us-mta-479-ZWniwjOnMzK2rhNlAHaVIQ-1; Thu, 09 Apr 2020 09:32:50 -0400
+X-MC-Unique: ZWniwjOnMzK2rhNlAHaVIQ-1
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E81698017F6
-        for <kvm@vger.kernel.org>; Thu,  9 Apr 2020 13:32:48 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8EBC618FF661
+        for <kvm@vger.kernel.org>; Thu,  9 Apr 2020 13:32:49 +0000 (UTC)
 Received: from localhost.localdomain.com (ovpn-113-69.rdu2.redhat.com [10.10.113.69])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 7317110027AC;
-        Thu,  9 Apr 2020 13:32:48 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 18F4F10027AC;
+        Thu,  9 Apr 2020 13:32:49 +0000 (UTC)
 From:   Cathy Avery <cavery@redhat.com>
 To:     kvm@vger.kernel.org, pbonzini@redhat.com
-Subject: [PATCH kvm-unit-tests 0/2] svm: NMI injection and HLT tests
-Date:   Thu,  9 Apr 2020 09:32:45 -0400
-Message-Id: <20200409133247.16653-1-cavery@redhat.com>
+Subject: [PATCH kvm-unit-tests 1/2] svm: Add test cases around NMI injection
+Date:   Thu,  9 Apr 2020 09:32:46 -0400
+Message-Id: <20200409133247.16653-2-cavery@redhat.com>
+In-Reply-To: <20200409133247.16653-1-cavery@redhat.com>
+References: <20200409133247.16653-1-cavery@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Content-Transfer-Encoding: quoted-printable
@@ -45,17 +48,119 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Patch 1 is NMI injection and intercept. Patch 2 is the same test with gue=
-st in
-HLT.
+This test checks for NMI delivery to L2 and
+intercepted NMI (VMEXIT_NMI) delivery to L1.
 
-Cathy Avery (2):
-  svm: Add test cases around NMI injection
-  svm: Add test cases around NMI injection with HLT
+Signed-off-by: Cathy Avery <cavery@redhat.com>
+---
+ x86/svm_tests.c | 84 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 84 insertions(+)
 
- x86/svm_tests.c | 187 ++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 187 insertions(+)
-
+diff --git a/x86/svm_tests.c b/x86/svm_tests.c
+index 16b9dfd..d1dbdef 100644
+--- a/x86/svm_tests.c
++++ b/x86/svm_tests.c
+@@ -1340,6 +1340,87 @@ static bool interrupt_check(struct svm_test *test)
+     return get_test_stage(test) =3D=3D 5;
+ }
+=20
++static volatile bool nmi_fired;
++
++#define NMI_VECTOR    2
++
++static void nmi_handler(isr_regs_t *regs)
++{
++    nmi_fired =3D true;
++    apic_write(APIC_EOI, 0);
++}
++
++static void nmi_prepare(struct svm_test *test)
++{
++    default_prepare(test);
++    nmi_fired =3D false;
++    handle_irq(NMI_VECTOR, nmi_handler);
++    set_test_stage(test, 0);
++}
++
++static void nmi_test(struct svm_test *test)
++{
++    apic_icr_write(APIC_DEST_SELF | APIC_DEST_PHYSICAL | APIC_DM_NMI | A=
+PIC_INT_ASSERT, 0);
++
++    report(nmi_fired, "direct NMI while running guest");
++
++    if (!nmi_fired)
++        set_test_stage(test, -1);
++
++    vmmcall();
++
++    nmi_fired =3D false;
++
++    apic_icr_write(APIC_DEST_SELF | APIC_DEST_PHYSICAL | APIC_DM_NMI | A=
+PIC_INT_ASSERT, 0);
++
++    if (!nmi_fired) {
++        report(nmi_fired, "intercepted pending NMI not dispatched");
++        set_test_stage(test, -1);
++    }
++
++}
++
++static bool nmi_finished(struct svm_test *test)
++{
++    switch (get_test_stage(test)) {
++    case 0:
++        if (vmcb->control.exit_code !=3D SVM_EXIT_VMMCALL) {
++            report(false, "VMEXIT not due to vmmcall. Exit reason 0x%x",
++                   vmcb->control.exit_code);
++            return true;
++        }
++        vmcb->save.rip +=3D 3;
++
++        vmcb->control.intercept |=3D (1ULL << INTERCEPT_NMI);
++        break;
++
++    case 1:
++        if (vmcb->control.exit_code !=3D SVM_EXIT_NMI) {
++            report(false, "VMEXIT not due to NMI intercept. Exit reason =
+0x%x",
++                   vmcb->control.exit_code);
++            return true;
++        }
++
++        report(true, "NMI intercept while running guest");
++        break;
++
++    case 2:
++        break;
++
++    default:
++        return true;
++    }
++
++    inc_test_stage(test);
++
++    return get_test_stage(test) =3D=3D 3;
++}
++
++static bool nmi_check(struct svm_test *test)
++{
++    return get_test_stage(test) =3D=3D 3;
++}
++
+ #define TEST(name) { #name, .v2 =3D name }
+=20
+ /*
+@@ -1446,6 +1527,9 @@ struct svm_test svm_tests[] =3D {
+     { "interrupt", default_supported, interrupt_prepare,
+       default_prepare_gif_clear, interrupt_test,
+       interrupt_finished, interrupt_check },
++    { "nmi", default_supported, nmi_prepare,
++      default_prepare_gif_clear, nmi_test,
++      nmi_finished, nmi_check },
+     TEST(svm_guest_state_test),
+     { NULL, NULL, NULL, NULL, NULL, NULL, NULL }
+ };
 --=20
 2.20.1
 
