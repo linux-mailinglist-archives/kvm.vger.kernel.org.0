@@ -2,88 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5E4B01A32FC
-	for <lists+kvm@lfdr.de>; Thu,  9 Apr 2020 13:14:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B2BD01A3323
+	for <lists+kvm@lfdr.de>; Thu,  9 Apr 2020 13:24:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726689AbgDILOW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Apr 2020 07:14:22 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:34122 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725972AbgDILOV (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 9 Apr 2020 07:14:21 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1586430861;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=eVe7IfDc6Eg1zSotYzISNC1XY4K3ye5o8p4mKeTvCRU=;
-        b=AuqI9N3BBoS1NgKa6tShcc4zCDYCUbFqZwliqBDcdTNC+fE4V6+NtI+KUpNlMtiYQKRtRr
-        AplFdj07kkIsFt8wZLT4kUPCHaPd2sAS2epVwvrwM9TbDChQxB6If3/pyAUTqCVuISfoCQ
-        89diyoLRHe4mAQCzCRY1dR5kzL7we4w=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-207-tPY8mMGaO1C4kcWqZxbH0g-1; Thu, 09 Apr 2020 07:14:17 -0400
-X-MC-Unique: tPY8mMGaO1C4kcWqZxbH0g-1
-Received: by mail-wr1-f72.google.com with SMTP id j12so6145459wrr.18
-        for <kvm@vger.kernel.org>; Thu, 09 Apr 2020 04:14:17 -0700 (PDT)
+        id S1726621AbgDILYu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Apr 2020 07:24:50 -0400
+Received: from mail-io1-f68.google.com ([209.85.166.68]:45858 "EHLO
+        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725987AbgDILYu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Apr 2020 07:24:50 -0400
+Received: by mail-io1-f68.google.com with SMTP id i19so3416718ioh.12
+        for <kvm@vger.kernel.org>; Thu, 09 Apr 2020 04:24:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=RRjJJW6qKikQw1uT9zffeLo51gT+qFo1k0SsUp6S/3Q=;
+        b=m7gAuMsTZVgpMlIZ3AGfBPT6Vs8UwSiV/949AmtSbdbmOqslX7QYtKtXSdcfUVe+in
+         QaZg/gi1eBGViFzb60n27umu1J/5l0SPYBQbPvrUOyPQYDd0IEw+9S7/+oN/j2YARK64
+         ///WmhB5t7+L2qVYIwfNcqLXBdKDFxmsHZmK9dZJJqwdDz4FJptpogx24wP+Ae4/uNqL
+         wGUISG7Vhl4jRO+2YPyAXSV+OGfGFOgM2UVmIV7pnBPahLPsMvpv/iqbFXpiQ3zbB7NY
+         uCEpsJxlcvSgDgsGFshijXZVyHgmqL73CW3NaNy1ensxcg6TYdLWsSzuM+ALs9g3DE5Q
+         ArpQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=eVe7IfDc6Eg1zSotYzISNC1XY4K3ye5o8p4mKeTvCRU=;
-        b=XlplFhw5CWvDrheQcDT8XcnO/e75PkORqco6gFXhKjMBjvZMyGyeHr79HKX0/yShTt
-         eG8WQs4azBrcSZq5D4niubXHTwhw974sAow2/USVvJ3Ke2sHQ4MHeQksyc9aAhxF4kkT
-         qqEhifsY4wE/9dlNQpzjbKd0SeNxdV6Jv2xECZskZp3BtsWhsOITKiuz5/a+tRI7TiMv
-         Y2xGCNpwfjedD9xTcTkCqyhrB9xowSkQFUiIstMvN9fFm+81ov4poh2rbbbBfEkTADzE
-         U6xTh4OStmyFYpYOelriQMqTimIXooAbOWKoifU9f5xDKWw3nGM9vJHvBVASc3oSAJTm
-         eq3A==
-X-Gm-Message-State: AGi0PubopfyuzQROcugpvVWU8Ib0H3RTovbKv+WhjLnKIVoDg6usjt0j
-        z1alQFh/kf3S8vp1bKfcALj2Dywx5vpLiiHC2yj+7Eyt8mq1dGejZYvHdRk/zhUAF4JMU271l0b
-        ZtQ2ngIpPX34P
-X-Received: by 2002:adf:aad7:: with SMTP id i23mr13446979wrc.184.1586430856639;
-        Thu, 09 Apr 2020 04:14:16 -0700 (PDT)
-X-Google-Smtp-Source: APiQypJrJJvOfBtCg0nF+bFCAwjKhMQCswXXApj7bVfJMGmrNUaRyCwySn1n7/vsqTWSUHcBZMCe9Q==
-X-Received: by 2002:adf:aad7:: with SMTP id i23mr13446952wrc.184.1586430856377;
-        Thu, 09 Apr 2020 04:14:16 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id c20sm3387575wmd.36.2020.04.09.04.14.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Apr 2020 04:14:15 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Baoquan He <bhe@redhat.com>
-Cc:     Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kexec@lists.infradead.org,
-        dzickus@redhat.com, dyoung@redhat.com,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-Subject: Re: [PATCH v2 0/3] KVM: VMX: Fix for kexec VMCLEAR and VMXON cleanup
-In-Reply-To: <20200409012002.GT2402@MiWiFi-R3L-srv>
-References: <20200321193751.24985-1-sean.j.christopherson@intel.com> <20200407110115.GA14381@MiWiFi-R3L-srv> <87r1wzlcwn.fsf@vitty.brq.redhat.com> <20200408151808.GS2402@MiWiFi-R3L-srv> <87mu7l2256.fsf@vitty.brq.redhat.com> <20200409012002.GT2402@MiWiFi-R3L-srv>
-Date:   Thu, 09 Apr 2020 13:14:14 +0200
-Message-ID: <87imi829o9.fsf@vitty.brq.redhat.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=RRjJJW6qKikQw1uT9zffeLo51gT+qFo1k0SsUp6S/3Q=;
+        b=QNv+ReiDw4H/ODzet/W+ORvhxFaR+59gK4A5Vcbtxj4FIbltSvSk0NXscuYz3SXQNA
+         fee4S1CsBWTwEmVIn2tPQZvGCdiNTgFTUKxshzgBZNtnAPwdHsStxMz/X0/W4IQmeWFZ
+         vytJhecfuFftxZ49en8lFr7VWl/lFJHCh5B0u292EBnKMC4M+4tu44AoFHP4RV2ENAcR
+         uQLBawgn0aWwydIEZom4GmbduzfUxMWgYOc+FOOxz2gAAVq6mJT8OO6dCuKv2Gk0IgTG
+         HzdZ7M2yw+VHXFv4I78mTVdfaagDCpo3yXeUGt80/+YKPaCM0GxAdzHBQi4cbApcAFdR
+         4oCg==
+X-Gm-Message-State: AGi0Pubklhbc4KH47ibEDpceaS9k4ZkETRe/UEsqc4ntRTMfmQpJHDXp
+        65hHqWLf9VRR3vxdQI1b21BCCgQA6cR9//T+79G/zJo6
+X-Google-Smtp-Source: APiQypK+sXsuX5veA6Ber9LepWF/pkBeRcRoXBIy/QdXMwqErFI7rNCzKGk9AG3/VIPmzXGHn4H3yNvC8cQ4R9o7wxU=
+X-Received: by 2002:a5d:891a:: with SMTP id b26mr11625899ion.194.1586431488940;
+ Thu, 09 Apr 2020 04:24:48 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
+References: <CAFULd4adXFX+y6eCV0tVhg-iHZe+tAchJkuHMXe3ZWktzGk7Sw@mail.gmail.com>
+ <8079b118-1ff4-74a8-7010-0601d211a221@intel.com>
+In-Reply-To: <8079b118-1ff4-74a8-7010-0601d211a221@intel.com>
+From:   Uros Bizjak <ubizjak@gmail.com>
+Date:   Thu, 9 Apr 2020 13:24:37 +0200
+Message-ID: <CAFULd4b7-sqSHWzanQYrOoCYd7xZ+Qn0-ZHctPtvvo5TbZVOMw@mail.gmail.com>
+Subject: Re: Current mainline kernel FTBFS in KVM SEV
+To:     like.xu@intel.com
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Baoquan He <bhe@redhat.com> writes:
-
+On Thu, Apr 9, 2020 at 10:31 AM Xu, Like <like.xu@intel.com> wrote:
 >
-> While I would suggest adding kexec@lists.infradead.org when code changes
-> are related to kexec/kdump since we usually watch this mailing list.
-> LKML contains too many mails, we may miss this kind of change, have to
-> debug and test again.
+> Hi Bizjak,
 >
+> would you mind telling us the top commit ID in your kernel tree ?
+> Or you may try the queue branch of
+> https://git.kernel.org/pub/scm/virt/kvm/kvm.git
+> and check if this "undefined reference" issue gets fixed.
 
-Definitely makes sense and I'll try my best to remember doing this
-myself next time but the problem is that scripts/checkpatch.pl is not
-smart enough, kexec related bits are scattered all over kernel and
-drivers so I'm afraid you're missing a lot in kexec@ :-(
+Unfortunately no, the build breaks in the same way.
 
--- 
-Vitaly
+Uros.
 
+> Thanks,
+> Like Xu
+>
+> On 2020/4/9 16:20, Uros Bizjak wrote:
+> > Current mainline kernel fails to build (on Fedora 31) with:
+> >
+> >    GEN     .version
+> >    CHK     include/generated/compile.h
+> >    LD      vmlinux.o
+> >    MODPOST vmlinux.o
+> >    MODINFO modules.builtin.modinfo
+> >    GEN     modules.builtin
+> >    LD      .tmp_vmlinux.btf
+> > ld: arch/x86/kvm/svm/sev.o: in function `sev_flush_asids':
+> > /hdd/uros/git/linux/arch/x86/kvm/svm/sev.c:48: undefined reference to
+> > `sev_guest_df_flush'
+> > ld: arch/x86/kvm/svm/sev.o: in function `sev_hardware_setup':
+> > /hdd/uros/git/linux/arch/x86/kvm/svm/sev.c:1146: undefined reference
+> > to `sev_platform_status'
+> >    BTF     .btf.vmlinux.bin.o
+> >
+> > .config is attached.
+> >
+> > Uros.
+>
