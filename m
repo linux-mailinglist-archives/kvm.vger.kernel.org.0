@@ -2,98 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 34EE01A39D9
-	for <lists+kvm@lfdr.de>; Thu,  9 Apr 2020 20:33:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6EF0F1A39DB
+	for <lists+kvm@lfdr.de>; Thu,  9 Apr 2020 20:34:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726582AbgDISdq convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Thu, 9 Apr 2020 14:33:46 -0400
-Received: from mail.kernel.org ([198.145.29.99]:46514 "EHLO mail.kernel.org"
+        id S1726646AbgDISea (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Apr 2020 14:34:30 -0400
+Received: from mga11.intel.com ([192.55.52.93]:23441 "EHLO mga11.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726470AbgDISdp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Apr 2020 14:33:45 -0400
-From:   bugzilla-daemon@bugzilla.kernel.org
-Authentication-Results: mail.kernel.org; dkim=permerror (bad message/signature format)
-To:     kvm@vger.kernel.org
-Subject: [Bug 207177] New: KVM nested VMM direct MTF event injection fails
-Date:   Thu, 09 Apr 2020 18:33:45 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: new
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: dpreed@deepplum.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_id short_desc product version
- cf_kernel_version rep_platform op_sys cf_tree bug_status bug_severity
- priority component assigned_to reporter cf_regression
-Message-ID: <bug-207177-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        id S1725987AbgDISe3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Apr 2020 14:34:29 -0400
+IronPort-SDR: sOVKgnjaZM2QywELzJE6Xp5QY/Fl+TLrl8+VJh+oKgM4j+CF8DpByLuA17bQg6zBrfyCj2les3
+ gXfIA3+580lw==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Apr 2020 11:34:29 -0700
+IronPort-SDR: TXiQILKrvdolDKooLN9c/56KVHIEqAB+3FOJVk0Pm8gC6Cuodb9ZMB8c7oO0p3xyw7/Wf3Del6
+ S0hoHcbVYIdw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.72,363,1580803200"; 
+   d="scan'208";a="453259274"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
+  by fmsmga006.fm.intel.com with ESMTP; 09 Apr 2020 11:34:29 -0700
+Date:   Thu, 9 Apr 2020 11:34:29 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     "Kang, Luwei" <luwei.kang@intel.com>
+Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        "wanpengli@tencent.com" <wanpengli@tencent.com>,
+        "jmattson@google.com" <jmattson@google.com>,
+        "joro@8bytes.org" <joro@8bytes.org>
+Subject: Re: [PATCH] KVM: VMX: Disable Intel PT before VM-entry
+Message-ID: <20200409183429.GA8919@linux.intel.com>
+References: <1584503298-18731-1-git-send-email-luwei.kang@intel.com>
+ <20200318154826.GC24357@linux.intel.com>
+ <82D7661F83C1A047AF7DC287873BF1E1738A9724@SHSMSX104.ccr.corp.intel.com>
+ <20200330172152.GE24988@linux.intel.com>
+ <82D7661F83C1A047AF7DC287873BF1E1738B1A1C@SHSMSX104.ccr.corp.intel.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <82D7661F83C1A047AF7DC287873BF1E1738B1A1C@SHSMSX104.ccr.corp.intel.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=207177
+On Mon, Mar 30, 2020 at 08:29:26PM -0700, Kang, Luwei wrote:
+> > > > On Wed, Mar 18, 2020 at 11:48:18AM +0800, Luwei Kang wrote:
+> > Ah, right.  What about enhancing intel_pt_handle_vmx() and 'struct pt' to
+> > replace vmx_on with a field that incorporates the KVM mode?
+> 
+> Some history is the host perf didn't fully agree with introducing HOST_GUEST
+> mode for PT in KVM. Because the KVM will disable the host trace before
+> VM-entry in HOST_GUEST mode and KVM guest will win in this case. e.g. Intel
+> PT has been enabled in KVM guest and the host wants to start system-wide
+> trace(collect all the trace on this system) at this time, the trace produced
+> by the Guest OS will be saved in guest PT buffer and host buffer can't get
+> this. So I prefer don't introduce the KVM PT mode to host perf framework. The
+> similar problem happens on PEBS virtualization via DS as well.
 
-            Bug ID: 207177
-           Summary: KVM nested VMM direct MTF event injection fails
-           Product: Virtualization
-           Version: unspecified
-    Kernel Version: 5.5.11
-          Hardware: x86-64
-                OS: Linux
-              Tree: Mainline
-            Status: NEW
-          Severity: normal
-          Priority: P1
-         Component: kvm
-          Assignee: virtualization_kvm@kernel-bugs.osdl.org
-          Reporter: dpreed@deepplum.com
-        Regression: No
-
-I'm writing a specialized VMM and debugging it under KVM (that is, a KVM
-guest).
-Both L0 host and its guest are running Fedora 31 kernel 5.5.11-200, FYI.
-
-The VMM creates a VMCS and vmlaunch's it. If bit 27 of primary processor
-controls is set, the first VMEXIT is indeed Exit Reason 37 (monitor trap
-fault), as would be expected. No problem here.
-
-However, in the Intel SDM volume 3C, Chapter 26.6.2,  there is another
-documented way to *inject* a "one-time" MTF exit. To wit, "If the interruption
-type in the VM-entry interruption-information field is 7 (other event) and the
-vector field is 0, VM entry cases an MTF VM exit to be pending on the
-instruction boundary following VM entry. See section 25.5.2 for the treatment
-of pending MTF exits."
-
-So repeat the experiment, but with the VMCS having bit 27 of the primary
-processor controls clear, but with the entry interruption information field set
-to 0x80000700, per the manual.
-No VMEXIT happens, though other VMEXITS subsequent do happen. In other words,
-the "injection method" fails.
-
-I have tried the same identical binary on the same system as the guest Fedora
-31, running on bare metal on the same hardware. The behavior is precisely as
-documented in the Intel SDM section above.
-
-So clearly the nested KVM mechanics do not properly handle the injection of an
-MTF via the VM-entry interruption information field.
-
-This is a useful feature, so I hope the bug will be fixed, allowing me to debug
-my code under KVM.
-Thanks.
-
--- 
-You are receiving this mail because:
-You are watching the assignee of the bug.
+A maintainer's distaste for a feature isn't a good reason to put a hack
+into KVM.  Perf burying its head in the sand won't change the fact that
+"pt->vmx_on" is poorly named and misleading.  Disagreement over features
+is fine, but things will go sideways quick if perf and KVM are outright
+hostile towards each other.
