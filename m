@@ -2,110 +2,191 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C2BE31A3100
-	for <lists+kvm@lfdr.de>; Thu,  9 Apr 2020 10:34:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 113A41A311E
+	for <lists+kvm@lfdr.de>; Thu,  9 Apr 2020 10:44:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726082AbgDIIej (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Apr 2020 04:34:39 -0400
-Received: from mail-io1-f67.google.com ([209.85.166.67]:41987 "EHLO
-        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725862AbgDIIei (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Apr 2020 04:34:38 -0400
-Received: by mail-io1-f67.google.com with SMTP id y17so2997017iow.9
-        for <kvm@vger.kernel.org>; Thu, 09 Apr 2020 01:34:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=K1E0J5vxo102jBUCjnqCrXjn1UT0fbZexcGRihASQcs=;
-        b=tlnmgIw9Z+kX338M03W1kAb/YjGv17SuGIxWUlBTxzb2FGoapCLrrsynRlX5++4GyS
-         9ZzqtHQcgOyzkYp2e6miemwuP4EDrzle8RUBFHPRsC+hKy6Z7CMwj6PAhrtCD0fpNI9l
-         jC9Lv+tfJ1knnPFHkn2+6eEHDMcWIdT2zF/cN58S1TSvexy2Z5/oaBrt3UJ7Kn5e1oro
-         QeO24AlZNOrwbuDcPG9uBWSRVPpZLbL5Do0xrtSMTakJZCtmm1k0qi+2myyLEWj5fmo7
-         cy7LLxZxbbGRMIWuZj13wX7pjiPBlks7dnNk6iuMfiBva7O31O3UT0FQyC1RT4UsWfWr
-         +LYA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=K1E0J5vxo102jBUCjnqCrXjn1UT0fbZexcGRihASQcs=;
-        b=a/Bbus06Y9yLs1IOUqBXD5286Q1EXP8oMDk+xUHIdlAgSsPcfUP8aiTz5B1OdPS79P
-         LBZVsN5dZeGn1oeZ1jjrPjnrA4polnnWT4vOBKKw8Wyz0KiqKSERBl1JeDXEA8Bf8MEG
-         tYalvM5DxRq9J1G0RXsH+5Pu6LevHOwoBSd971uh4l1ADFyMg/3t5NSnld98TFZkaIyG
-         Vl0T9mJP4TDYtJd/4Q1wN1rMSWyu8TryQRsqgs3TprlZB8iU9ULngLMGZ8Ul+579riQA
-         SElqEV7N5091CPl8YCAgnNWQ3UjT4cIRfEylGtzUHbcgkNkvOO//mzjcvAvNz/QKobSs
-         ucmg==
-X-Gm-Message-State: AGi0PubX1pMp5lslcu/JofkwjgAWR4qawMqtCdh3GPB7dWne/HDBEDMR
-        vJYGPfzLx/M6pm6cB5npDdFRsUruhFZRDhGMPbQ=
-X-Google-Smtp-Source: APiQypKcSxiOpPv9M0K/92K1Fmght2SYfnVHk9qZpjo8VsclOTgZQAYBWZP/PpPLtrGD/1yTLC+w2whia1CFclZEzCI=
-X-Received: by 2002:a02:1482:: with SMTP id 124mr1602518jag.4.1586421278070;
- Thu, 09 Apr 2020 01:34:38 -0700 (PDT)
+        id S1726646AbgDIIoE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Apr 2020 04:44:04 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:58150 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1725987AbgDIIoC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Apr 2020 04:44:02 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1586421842;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=uQKpffnCoC6BT0R2gqVX5COY810824MTw4KX1Q4Nozs=;
+        b=VxRdrVTB7It40w94UO4dG39fHZtM4N7VYjGJJz/nJKJ6m1mm34mQ82DznhpR1XIVb/ONDc
+        XkTI+yb1jRGqwqG4WCKGa4jsKrejrhQNvsAZKc7W9kKftqab6jaKqt/rYa2R3APGaMndCp
+        JvbcQQ7q6W/5Qk37XNRmcNr93KU+9ac=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-197-3mGfnDCcNgKxAe1hYT61mg-1; Thu, 09 Apr 2020 04:43:58 -0400
+X-MC-Unique: 3mGfnDCcNgKxAe1hYT61mg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6FDA685EE6B;
+        Thu,  9 Apr 2020 08:43:57 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.40.194.9])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id F1F5D5E037;
+        Thu,  9 Apr 2020 08:43:50 +0000 (UTC)
+Date:   Thu, 9 Apr 2020 10:43:47 +0200
+From:   Andrew Jones <drjones@redhat.com>
+To:     Wainer dos Santos Moschetta <wainersm@redhat.com>
+Cc:     pbonzini@redhat.com, kvm@vger.kernel.org, david@redhat.com,
+        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH v4 2/2] selftests: kvm: Add mem_slot_test test
+Message-ID: <20200409084347.267pvadbgjmh4wyk@kamzik.brq.redhat.com>
+References: <20200408220818.4306-1-wainersm@redhat.com>
+ <20200408220818.4306-3-wainersm@redhat.com>
 MIME-Version: 1.0
-References: <CAFULd4adXFX+y6eCV0tVhg-iHZe+tAchJkuHMXe3ZWktzGk7Sw@mail.gmail.com>
- <8079b118-1ff4-74a8-7010-0601d211a221@intel.com>
-In-Reply-To: <8079b118-1ff4-74a8-7010-0601d211a221@intel.com>
-From:   Uros Bizjak <ubizjak@gmail.com>
-Date:   Thu, 9 Apr 2020 10:34:26 +0200
-Message-ID: <CAFULd4a5QJUSg8RDZjsiZc85SQ5MywQ5j5_SP2NEmyCKRFdWxA@mail.gmail.com>
-Subject: Re: Current mainline kernel FTBFS in KVM SEV
-To:     like.xu@intel.com
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200408220818.4306-3-wainersm@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Apr 9, 2020 at 10:31 AM Xu, Like <like.xu@intel.com> wrote:
+On Wed, Apr 08, 2020 at 07:08:18PM -0300, Wainer dos Santos Moschetta wrote:
+> This patch introduces the mem_slot_test test which checks
+> an VM can have added memory slots up to the limit defined in
+> KVM_CAP_NR_MEMSLOTS. Then attempt to add one more slot to
+> verify it fails as expected.
+> 
+> Signed-off-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
+> ---
+>  tools/testing/selftests/kvm/.gitignore      |  1 +
+>  tools/testing/selftests/kvm/Makefile        |  3 +
+>  tools/testing/selftests/kvm/mem_slot_test.c | 76 +++++++++++++++++++++
+>  3 files changed, 80 insertions(+)
+>  create mode 100644 tools/testing/selftests/kvm/mem_slot_test.c
+> 
+> diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
+> index 16877c3daabf..127d27188427 100644
+> --- a/tools/testing/selftests/kvm/.gitignore
+> +++ b/tools/testing/selftests/kvm/.gitignore
+> @@ -21,4 +21,5 @@
+>  /demand_paging_test
+>  /dirty_log_test
+>  /kvm_create_max_vcpus
+> +/mem_slot_test
+>  /steal_time
+> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+> index 712a2ddd2a27..338b6cdce1a0 100644
+> --- a/tools/testing/selftests/kvm/Makefile
+> +++ b/tools/testing/selftests/kvm/Makefile
+> @@ -32,12 +32,14 @@ TEST_GEN_PROGS_x86_64 += clear_dirty_log_test
+>  TEST_GEN_PROGS_x86_64 += demand_paging_test
+>  TEST_GEN_PROGS_x86_64 += dirty_log_test
+>  TEST_GEN_PROGS_x86_64 += kvm_create_max_vcpus
+> +TEST_GEN_PROGS_x86_64 += mem_slot_test
+>  TEST_GEN_PROGS_x86_64 += steal_time
+>  
+>  TEST_GEN_PROGS_aarch64 += clear_dirty_log_test
+>  TEST_GEN_PROGS_aarch64 += demand_paging_test
+>  TEST_GEN_PROGS_aarch64 += dirty_log_test
+>  TEST_GEN_PROGS_aarch64 += kvm_create_max_vcpus
+> +TEST_GEN_PROGS_aarch64 += mem_slot_test
+>  TEST_GEN_PROGS_aarch64 += steal_time
+>  
+>  TEST_GEN_PROGS_s390x = s390x/memop
+> @@ -46,6 +48,7 @@ TEST_GEN_PROGS_s390x += s390x/sync_regs_test
+>  TEST_GEN_PROGS_s390x += demand_paging_test
+>  TEST_GEN_PROGS_s390x += dirty_log_test
+>  TEST_GEN_PROGS_s390x += kvm_create_max_vcpus
+> +TEST_GEN_PROGS_s390x += mem_slot_test
+>  
+>  TEST_GEN_PROGS += $(TEST_GEN_PROGS_$(UNAME_M))
+>  LIBKVM += $(LIBKVM_$(UNAME_M))
+> diff --git a/tools/testing/selftests/kvm/mem_slot_test.c b/tools/testing/selftests/kvm/mem_slot_test.c
+> new file mode 100644
+> index 000000000000..7c1009f0bc07
+> --- /dev/null
+> +++ b/tools/testing/selftests/kvm/mem_slot_test.c
+> @@ -0,0 +1,76 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + * mem_slot_test
+> + *
+> + * Copyright (C) 2020, Red Hat, Inc.
+> + *
+> + * Test suite for memory region operations.
+> + */
+> +#define _GNU_SOURCE /* for program_invocation_short_name */
+> +#include <linux/kvm.h>
+> +#include <sys/mman.h>
+> +
+> +#include "test_util.h"
+> +#include "kvm_util.h"
+> +
+> +/*
+> + * Test it can be added memory slots up to KVM_CAP_NR_MEMSLOTS, then any
+> + * tentative to add further slots should fail.
+> + */
+> +static void test_add_max_slots(void)
+> +{
+> +	int ret;
+> +	struct kvm_vm *vm;
+> +	uint32_t max_mem_slots;
+> +	uint32_t slot;
+> +	uint64_t guest_addr;
+> +	uint64_t mem_reg_npages;
+> +	uint64_t mem_reg_size;
+> +	void *mem;
+> +
+> +	max_mem_slots = kvm_check_cap(KVM_CAP_NR_MEMSLOTS);
+> +	TEST_ASSERT(max_mem_slots > 0,
+> +		    "KVM_CAP_NR_MEMSLOTS should be greater than 0");
+> +	pr_info("Allowed number of memory slots: %i\n", max_mem_slots);
+> +
+> +	vm = vm_create(VM_MODE_DEFAULT, 0, O_RDWR);
+> +
+> +	/*
+> +	 * Uses 1MB sized/aligned memory region since this is the minimal
+> +	 * required on s390x.
+> +	 */
+> +	mem_reg_size = 0x100000;
+> +	mem_reg_npages = vm_calc_num_guest_pages(VM_MODE_DEFAULT, mem_reg_size);
+> +
+> +	guest_addr = 0x0;
+> +
+> +	/* Check it can be added memory slots up to the maximum allowed */
+> +	pr_info("Adding slots 0..%i, each memory region with %ldK size\n",
+> +		(max_mem_slots - 1), mem_reg_size >> 10);
+> +	for (slot = 0; slot < max_mem_slots; slot++) {
+> +		vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS,
+> +					    guest_addr, slot, mem_reg_npages,
+> +					    0);
+> +		guest_addr += mem_reg_size;
+> +	}
+> +
+> +	/* Check it cannot be added memory slots beyond the limit */
+> +	mem = mmap(NULL, mem_reg_size, PROT_READ | PROT_WRITE,
+> +		   MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+> +	TEST_ASSERT(mem != MAP_FAILED, "Failed to mmap() host");
+> +
+> +	ret = ioctl(vm_get_fd(vm), KVM_SET_USER_MEMORY_REGION,
+> +		    &(struct kvm_userspace_memory_region) {slot, 0, guest_addr,
+> +		    mem_reg_size, (uint64_t) mem});
+> +	TEST_ASSERT(ret == -1 && errno == EINVAL,
+> +		    "Adding one more memory slot should fail with EINVAL");
+> +
+> +	munmap(mem, mem_reg_size);
+> +	kvm_vm_free(vm);
+> +}
+> +
+> +int main(int argc, char *argv[])
+> +{
+> +	test_add_max_slots();
+> +	return 0;
+> +}
+> -- 
+> 2.17.2
 >
-> Hi Bizjak,
->
-> would you mind telling us the top commit ID in your kernel tree ?
-> Or you may try the queue branch of
-> https://git.kernel.org/pub/scm/virt/kvm/kvm.git
-> and check if this "undefined reference" issue gets fixed.
 
-Top of tree is at:
+Reviewed-by: Andrew Jones <drjones@redhat.com>
 
-commit 5d30bcacd91af6874481129797af364a53cd9b46 (HEAD -> master,
-origin/master, origin/HEAD)
-Merge: fcc95f06403c c6f141412d24
-Author: Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Wed Apr 8 21:51:14 2020 -0700
-
-    Merge tag '9p-for-5.7-2' of git://github.com/martinetd/linux
-
-    Pull 9p documentation update from Dominique Martinet:
-     "Document the new O_NONBLOCK short read behavior"
-
-    * tag '9p-for-5.7-2' of git://github.com/martinetd/linux:
-      9p: document short read behaviour with O_NONBLOCK
-
-BR,
-Uros.
-
-> Thanks,
-> Like Xu
->
-> On 2020/4/9 16:20, Uros Bizjak wrote:
-> > Current mainline kernel fails to build (on Fedora 31) with:
-> >
-> >    GEN     .version
-> >    CHK     include/generated/compile.h
-> >    LD      vmlinux.o
-> >    MODPOST vmlinux.o
-> >    MODINFO modules.builtin.modinfo
-> >    GEN     modules.builtin
-> >    LD      .tmp_vmlinux.btf
-> > ld: arch/x86/kvm/svm/sev.o: in function `sev_flush_asids':
-> > /hdd/uros/git/linux/arch/x86/kvm/svm/sev.c:48: undefined reference to
-> > `sev_guest_df_flush'
-> > ld: arch/x86/kvm/svm/sev.o: in function `sev_hardware_setup':
-> > /hdd/uros/git/linux/arch/x86/kvm/svm/sev.c:1146: undefined reference
-> > to `sev_platform_status'
-> >    BTF     .btf.vmlinux.bin.o
-> >
-> > .config is attached.
-> >
-> > Uros.
->
