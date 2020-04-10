@@ -2,253 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 440271A420F
-	for <lists+kvm@lfdr.de>; Fri, 10 Apr 2020 06:39:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3C2281A4216
+	for <lists+kvm@lfdr.de>; Fri, 10 Apr 2020 06:43:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725844AbgDJEjJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Apr 2020 00:39:09 -0400
-Received: from mga03.intel.com ([134.134.136.65]:30517 "EHLO mga03.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725816AbgDJEjJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Apr 2020 00:39:09 -0400
-IronPort-SDR: 2BJ+npPKlQq6zmJk0s+5XiJqXGTsEFsKE36dKcewe+xXvj5qn8VJkFKmV7KYyGippxSd0S04z2
- tctqwxVNqvrw==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Apr 2020 21:39:08 -0700
-IronPort-SDR: Jex1LB4E6zchpFErZFN8+QynTiqL4KPnMsJWsneV7BzINT8v7kXR7vUkJw5FqYxQ48Z3rzUN3D
- u/k47D0ACMjg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.72,364,1580803200"; 
-   d="scan'208";a="276067089"
-Received: from xiaoyaol-mobl.ccr.corp.intel.com (HELO [10.255.28.169]) ([10.255.28.169])
-  by fmsmga004.fm.intel.com with ESMTP; 09 Apr 2020 21:39:04 -0700
-Subject: Re: [PATCH 2/3] x86/split_lock: Refactor and export
- handle_user_split_lock() for KVM
-To:     Thomas Gleixner <tglx@linutronix.de>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     x86@kernel.org, "Kenneth R . Crudup" <kenny@panix.com>,
-        Fenghua Yu <fenghua.yu@intel.com>,
-        Nadav Amit <namit@vmware.com>,
-        Thomas Hellstrom <thellstrom@vmware.com>,
-        Tony Luck <tony.luck@intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Jessica Yu <jeyu@kernel.org>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20200402124205.334622628@linutronix.de>
- <20200402155554.27705-1-sean.j.christopherson@intel.com>
- <20200402155554.27705-3-sean.j.christopherson@intel.com>
- <87v9mhn7nf.fsf@nanos.tec.linutronix.de>
- <20200402171946.GH13879@linux.intel.com>
- <87mu7tn1w8.fsf@nanos.tec.linutronix.de>
-From:   Xiaoyao Li <xiaoyao.li@intel.com>
-Message-ID: <716f5824-8d47-24cc-4935-c2dd32ed4629@intel.com>
-Date:   Fri, 10 Apr 2020 12:39:03 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+        id S1725839AbgDJEnr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Apr 2020 00:43:47 -0400
+Received: from mail-pf1-f194.google.com ([209.85.210.194]:34196 "EHLO
+        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725208AbgDJEnr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Apr 2020 00:43:47 -0400
+Received: by mail-pf1-f194.google.com with SMTP id v23so598793pfm.1
+        for <kvm@vger.kernel.org>; Thu, 09 Apr 2020 21:43:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=rRpbgDANI8vDrTtjTJENSHjACfupvu/DpiY4PQxKbDI=;
+        b=nIpqgyHbvMAMKy2VqyXmbM4uLzHVz6C/g9PZ9c1m/tpwLKwNlJb3ega6O39WQRQdK9
+         pAWpux6ra2ePXgTVk9g67BthOpd9jgnA8+9mrG/lMIq1KkFEtM5uNeMnZlGDj/WWWP1m
+         g1IvF9u5qL1fFaZokOOB/RFk92NAH64nxg906PqfXBPBjv5W+3OMZMhoDEZ1ScHCE0Ah
+         NS+lH2lXeSLvQKjNjPgLUwrFW0iwIXGkvaLhYtXOLm1vYjaGGW1R/ZSbtVuXQZtjDaWx
+         e1E9byWCc8FIyQ4SIcouIS0Sr/6WA/aC3oMRo5Sd9ObBa5vSDyQ4vgr8A41xf7n+tPOO
+         IRGQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=rRpbgDANI8vDrTtjTJENSHjACfupvu/DpiY4PQxKbDI=;
+        b=bDff5Sb5dmgWYLzoUWN0Fy5GXrkEmORzDmGChUA5CyEydA8AenTef7aEApxBYItiWa
+         9ZS9Re9itjou7XY+hAcGA/uZ2jZYBq1aRhivOSB8+jQjw6iErcTNZNZ/cO1lXKkGVaIW
+         ov0MU0rudVTyDVPj2WxoBMFJLnOqsML7mqQAi2MEdxHF+wc4G+VqhuzUri+41AGsqW4C
+         XtMzFv89bcAlOv8h0xzxMz9IOnuaod0Uukn8wLPhW2kWtBiJsZl19S7F3S01f5OBRqIh
+         GT3waLDFSZca+Tanz+jM2PmLGeFhynz/mYuaGY+Un435cvwINRrWp6edvgQ4TkE/9IZ0
+         /kOA==
+X-Gm-Message-State: AGi0PubBrtKL+W6yOBYyuHszycaFAjNeDhJaSnp+TRojwYgm7Yg5fwDf
+        ParO/KQaYxcLnTt9qmQk87b9rLwIIoCPZWKlI0Q=
+X-Google-Smtp-Source: APiQypKnPTbJEfArWAgzMfDQYIpR0U8LgpeRAwObfBfYM1F9/inERKEjnh80fZP3e7G857uo1syih/ToxJUnuVb7UVs=
+X-Received: by 2002:a62:648f:: with SMTP id y137mr3358952pfb.199.1586493826879;
+ Thu, 09 Apr 2020 21:43:46 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <87mu7tn1w8.fsf@nanos.tec.linutronix.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <CAEX+82KTJecx_aSHAPN9ZkS_YDiDfyEM9b6ji4wabmSZ6O516Q@mail.gmail.com>
+ <c86002a6-d613-c0be-a672-cca8e9c83e1c@intel.com>
+In-Reply-To: <c86002a6-d613-c0be-a672-cca8e9c83e1c@intel.com>
+From:   Javier Romero <xavinux@gmail.com>
+Date:   Fri, 10 Apr 2020 01:43:35 -0300
+Message-ID: <CAEX+82J+xRA1B10ApcviZ04=ZZ+YNth83p428bHgOHmaV1iTuA@mail.gmail.com>
+Subject: Re: Contribution to KVM.
+To:     like.xu@intel.com
+Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 4/3/2020 3:06 AM, Thomas Gleixner wrote:
-> Sean Christopherson <sean.j.christopherson@intel.com> writes:
->> On Thu, Apr 02, 2020 at 07:01:56PM +0200, Thomas Gleixner wrote:
->>>>   static inline void __init cpu_set_core_cap_bits(struct cpuinfo_x86 *c) {}
->>>>   static inline void switch_to_sld(unsigned long tifn) {}
->>>> -static inline bool handle_user_split_lock(struct pt_regs *regs, long error_code)
->>>> +static inline bool handle_user_split_lock(unsigned long ip)
->>>
->>> This is necessary because VMX can be compiled without CPU_SUP_INTEL?
->>
->> Ya, it came about when cleaning up the IA32_FEATURE_CONTROL MSR handling
->> to consolidate duplicate code.
->>
->> config KVM_INTEL
->>          tristate "KVM for Intel (and compatible) processors support"
->>          depends on KVM && IA32_FEAT_CTL
->>
->> config IA32_FEAT_CTL
->>          def_bool y
->>          depends on CPU_SUP_INTEL || CPU_SUP_CENTAUR || CPU_SUP_ZHAOXIN
-> 
-> Ah, indeed. So something like the below would make sense. Hmm?
-> 
-> Of course that can be mangled into Xiaoyao's patches, I'm not worried
-> about my patch count :)
-> 
+Hi Like Xu,
 
-I don't mind using yours in my next version.
+Thank you for your time to answer.
 
-Hi Paolo,
+Of course I can also test KVM on an Intel Platform if this can be
+useful, have a Pixelbook laptop with a Core i7 processor and 16 GB of
+RAM at disposal :D
 
-Are you OK with the kvm part below?
+Thanks for your attention.
 
-If no objection, I can spin the next version using tglx's.
+Regards,
 
-> 
-> 8<----------------
-> --- a/arch/x86/include/asm/cpu.h
-> +++ b/arch/x86/include/asm/cpu.h
-> @@ -43,14 +43,14 @@ unsigned int x86_stepping(unsigned int s
->   #ifdef CONFIG_CPU_SUP_INTEL
->   extern void __init cpu_set_core_cap_bits(struct cpuinfo_x86 *c);
->   extern void switch_to_sld(unsigned long tifn);
-> -extern bool handle_user_split_lock(struct pt_regs *regs, long error_code);
-> +extern int handle_ac_split_lock(unsigned long ip);
->   extern void split_lock_validate_module_text(struct module *me, void *text, void *text_end);
->   #else
->   static inline void __init cpu_set_core_cap_bits(struct cpuinfo_x86 *c) {}
->   static inline void switch_to_sld(unsigned long tifn) {}
-> -static inline bool handle_user_split_lock(struct pt_regs *regs, long error_code)
-> +static int handle_ac_split_lock(unsigned long ip)
->   {
-> -	return false;
-> +	return -ENOSYS;
->   }
->   static inline void split_lock_validate_module_text(struct module *me, void *text, void *text_end) {}
->   #endif
-> 
-> --- a/arch/x86/kernel/cpu/intel.c
-> +++ b/arch/x86/kernel/cpu/intel.c
-> @@ -1102,13 +1102,20 @@ static void split_lock_init(void)
->   	split_lock_verify_msr(sld_state != sld_off);
->   }
->   
-> -bool handle_user_split_lock(struct pt_regs *regs, long error_code)
-> +int handle_ac_split_lock(unsigned long ip)
->   {
-> -	if ((regs->flags & X86_EFLAGS_AC) || sld_state == sld_fatal)
-> -		return false;
-> +	switch (sld_state) {
-> +	case sld_warn:
-> +		break;
-> +	case sld_off:
-> +		pr_warn_once("#AC: Spurious trap at address: 0x%lx\n", ip);
-> +		return -ENOSYS;
-> +	case sld_fatal:
-> +		return -EFAULT;
-> +	}
->   
->   	pr_warn_ratelimited("#AC: %s/%d took a split_lock trap at address: 0x%lx\n",
-> -			    current->comm, current->pid, regs->ip);
-> +			    current->comm, current->pid, ip);
->   
->   	/*
->   	 * Disable the split lock detection for this task so it can make
-> @@ -1117,8 +1124,9 @@ bool handle_user_split_lock(struct pt_re
->   	 */
->   	sld_update_msr(false);
->   	set_tsk_thread_flag(current, TIF_SLD);
-> -	return true;
-> +	return 0;
->   }
-> +EXPORT_SYMBOL_GPL(handle_ac_split_lock);
->   
->   /*
->    * This function is called only when switching between tasks with
-> --- a/arch/x86/kernel/traps.c
-> +++ b/arch/x86/kernel/traps.c
-> @@ -304,7 +304,7 @@ dotraplinkage void do_alignment_check(st
->   
->   	local_irq_enable();
->   
-> -	if (handle_user_split_lock(regs, error_code))
-> +	if (!(regs->flags & X86_EFLAGS_AC) && !handle_ac_split_lock(regs->ip))
->   		return;
->   
->   	do_trap(X86_TRAP_AC, SIGBUS, "alignment check", regs,
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -65,6 +65,7 @@
->   
->   MODULE_AUTHOR("Qumranet");
->   MODULE_LICENSE("GPL");
-> +MODULE_INFO(sld_safe, "Y");
->   
->   #ifdef MODULE
->   static const struct x86_cpu_id vmx_cpu_id[] = {
-> @@ -4623,6 +4624,22 @@ static int handle_machine_check(struct k
->   	return 1;
->   }
->   
-> +static bool guest_handles_ac(struct kvm_vcpu *vcpu)
-> +{
-> +	/*
-> +	 * If guest has alignment checking enabled in CR0 and activated in
-> +	 * eflags, then the #AC originated from CPL3 and the guest is able
-> +	 * to handle it. It does not matter whether this is a regular or
-> +	 * a split lock operation induced #AC.
-> +	 */
-> +	if (vmx_get_cpl(vcpu) == 3 && kvm_read_cr0_bits(vcpu, X86_CR0_AM) &&
-> +	    kvm_get_rflags(vcpu) & X86_EFLAGS_AC)
-> +		return true;
-> +
-> +	/* Add guest SLD handling checks here once it's supported */
-> +	return false;
-> +}
-> +
->   static int handle_exception_nmi(struct kvm_vcpu *vcpu)
->   {
->   	struct vcpu_vmx *vmx = to_vmx(vcpu);
-> @@ -4630,6 +4647,7 @@ static int handle_exception_nmi(struct k
->   	u32 intr_info, ex_no, error_code;
->   	unsigned long cr2, rip, dr6;
->   	u32 vect_info;
-> +	int err;
->   
->   	vect_info = vmx->idt_vectoring_info;
->   	intr_info = vmx->exit_intr_info;
-> @@ -4688,9 +4706,6 @@ static int handle_exception_nmi(struct k
->   		return handle_rmode_exception(vcpu, ex_no, error_code);
->   
->   	switch (ex_no) {
-> -	case AC_VECTOR:
-> -		kvm_queue_exception_e(vcpu, AC_VECTOR, error_code);
-> -		return 1;
->   	case DB_VECTOR:
->   		dr6 = vmcs_readl(EXIT_QUALIFICATION);
->   		if (!(vcpu->guest_debug &
-> @@ -4719,6 +4734,29 @@ static int handle_exception_nmi(struct k
->   		kvm_run->debug.arch.pc = vmcs_readl(GUEST_CS_BASE) + rip;
->   		kvm_run->debug.arch.exception = ex_no;
->   		break;
-> +	case AC_VECTOR:
-> +		if (guest_handles_ac(vcpu)) {
-> +			kvm_queue_exception_e(vcpu, AC_VECTOR, error_code);
-> +			return 1;
-> +		}
-> +		/*
-> +		 * Handle #AC caused by split lock detection. If the host
-> +		 * mode is sld_warn, then it warns, marks current with
-> +		 * TIF_SLD and disables split lock detection. So the guest
-> +		 * can just continue.
-> +		 *
-> +		 * If the host mode is fatal, the handling code warned. Let
-> +		 * qemu kill itself.
-> +		 *
-> +		 * If the host mode is off, then this #AC is bonkers and
-> +		 * something is badly wrong. Let it fail as well.
-> +		 */
-> +		err = handle_ac_split_lock(kvm_rip_read(vcpu));
-> +		if (!err)
-> +			return 1;
-> +		/* Propagate the error type to user space */
-> +		error_code = err == -EFAULT ? 0x100 : 0x200;
-> +		fallthrough;
->   	default:
->   		kvm_run->exit_reason = KVM_EXIT_EXCEPTION;
->   		kvm_run->ex.exception = ex_no;
-> 
 
+Javier Romero
+
+
+El vie., 10 abr. 2020 a las 0:34, Xu, Like (<like.xu@intel.com>) escribi=C3=
+=B3:
+>
+> On 2020/4/10 5:29, Javier Romero wrote:
+> > Hello,
+> >
+> >   My name is Javier, live in Argentina and work as a cloud engineer.
+> >
+> > Have been working with Linux servers for the last 10 years in an
+> > Internet Service Provider and I'm interested in contributing to KVM
+> Welcome, I'm a newbie as well.
+> > maybe with testing as a start point.
+> You may try the http://git.kernel.org/pub/scm/virt/kvm/kvm-unit-tests.git
+> and tools/testing/selftests/kvm in the kernel tree.
+> >
+> > If it can be useful to test KVM on ARM, I have a Raspberry PI 3 at disp=
+osal.
+> If you test KVM on Intel platforms, you will definitely get support from =
+me :D.
+>
+> Thanks,
+> Like Xu
+> >
+> > Thanks for your kind attention.
+> >
+> > Best Regards,
+> >
+> >
+> >
+> > Javier Romero
+>
