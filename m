@@ -2,129 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5F76C1A44CA
-	for <lists+kvm@lfdr.de>; Fri, 10 Apr 2020 11:56:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 220B81A451B
+	for <lists+kvm@lfdr.de>; Fri, 10 Apr 2020 12:20:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726007AbgDJJ4O (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Apr 2020 05:56:14 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:58150 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725861AbgDJJ4O (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Apr 2020 05:56:14 -0400
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 03A9m0PQ019162;
-        Fri, 10 Apr 2020 09:55:52 GMT
+        id S1725993AbgDJKUO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Apr 2020 06:20:14 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:51428 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725930AbgDJKUN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Apr 2020 06:20:13 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 03AAJ9uQ119046;
+        Fri, 10 Apr 2020 10:20:09 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
  references : from : message-id : date : mime-version : in-reply-to :
  content-type : content-transfer-encoding; s=corp-2020-01-29;
- bh=+j4nVnTBKtnC+KblRX66YHb6IlYtAvRa7OKedO6wFUY=;
- b=n8k8BwVyAZaoxrwteX4mhvLojvFE9ZUqvKNwt1zMTctsor5jugQOkAF/PAA7/PCslOxS
- tf6cRkWb6gaq2FV5AvZqP8gFwqJOReXtF2iU3KTj2fkXtUodavq9RkBpEJdgZfNVor6r
- JfY14be72Wg73Wd2wD7WzNdxINLOcPvCuRIjKQWGclWcqZHSn0OMzldzQLLeA7Mi59uz
- yh/6F+/Sly9WC3OleFcyHPoCP9Ov9+gOtVLHkGQPQ8ICh6NUaAzEDb/whgNlfxv4tZNO
- IMm4zfXsxfCXj+ige65H4YUBDBcP/0T35gmrjTjzOIJhfcu14/l0F9VWEdPQmouPx4SQ NQ== 
+ bh=0G0SXSp0q/0L37C/DIXgGFdVawxsFUeBphgmgshcH20=;
+ b=dRu2yvzr9ImMxm/HezfSd47lhuWROUTjEHynGyR9DBy7nO7bmMkoLmhuAJWwJON6FeTU
+ hqE1oAJdHElx7hx7WYUGlG396cFo1Anke7DS6SKEWEpx5o1bDW6JLIJstAGKX/jM/AtZ
+ KCyNOBtNt9falHzZOYrq78goxfzlGBrB7m9ZKJ+hk5fSZO1l6A2ZIsNxFzKWdwtLnh3j
+ fCr2WRife1z/QU5/BTdn0qi9sqR2o0EtBdxbpIO2mVsyTA4vYcYUGk+tRk5qwLahwGEz
+ N0kasfuYXdPzfIx6X9lisMIYlkdJoQwm6NAJylIMphHdujLrqzTeaelXFUcfMzAfu4SL qg== 
 Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
-        by aserp2120.oracle.com with ESMTP id 3091m15t4a-1
+        by userp2120.oracle.com with ESMTP id 309gw4hr7u-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 10 Apr 2020 09:55:52 +0000
+        Fri, 10 Apr 2020 10:20:09 +0000
 Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
-        by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 03A9lUh6037240;
-        Fri, 10 Apr 2020 09:55:52 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by userp3030.oracle.com with ESMTP id 3091m6y7tp-1
+        by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 03AAHWhC105800;
+        Fri, 10 Apr 2020 10:20:09 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by userp3030.oracle.com with ESMTP id 3091m714hy-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 10 Apr 2020 09:55:51 +0000
-Received: from abhmp0015.oracle.com (abhmp0015.oracle.com [141.146.116.21])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 03A9tmBN032589;
-        Fri, 10 Apr 2020 09:55:48 GMT
-Received: from [10.159.147.187] (/10.159.147.187)
+        Fri, 10 Apr 2020 10:20:09 +0000
+Received: from abhmp0012.oracle.com (abhmp0012.oracle.com [141.146.116.18])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 03AAK7NV008352;
+        Fri, 10 Apr 2020 10:20:07 GMT
+Received: from [192.168.14.112] (/79.180.216.197)
         by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Fri, 10 Apr 2020 02:55:47 -0700
-Subject: Re: [RFC PATCH 00/26] Runtime paravirt patching
-To:     Thomas Gleixner <tglx@linutronix.de>, linux-kernel@vger.kernel.org,
-        x86@kernel.org
-Cc:     peterz@infradead.org, hpa@zytor.com, jpoimboe@redhat.com,
-        namit@vmware.com, mhiramat@kernel.org, jgross@suse.com,
-        bp@alien8.de, vkuznets@redhat.com, pbonzini@redhat.com,
-        boris.ostrovsky@oracle.com, mihai.carabas@oracle.com,
-        kvm@vger.kernel.org, xen-devel@lists.xenproject.org,
-        virtualization@lists.linux-foundation.org
-References: <20200408050323.4237-1-ankur.a.arora@oracle.com>
- <87k12qawwl.fsf@nanos.tec.linutronix.de>
-From:   Ankur Arora <ankur.a.arora@oracle.com>
-Message-ID: <c13ce409-790d-18dd-d941-673e9bb797c3@oracle.com>
-Date:   Fri, 10 Apr 2020 02:55:44 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+        with ESMTP ; Fri, 10 Apr 2020 03:20:07 -0700
+Subject: Re: Contribution to KVM.
+To:     Nadav Amit <nadav.amit@gmail.com>,
+        Javier Romero <xavinux@gmail.com>
+Cc:     kvm <kvm@vger.kernel.org>, kvmarm@lists.cs.columbia.edu,
+        like.xu@intel.com
+References: <CAEX+82KTJecx_aSHAPN9ZkS_YDiDfyEM9b6ji4wabmSZ6O516Q@mail.gmail.com>
+ <c86002a6-d613-c0be-a672-cca8e9c83e1c@intel.com>
+ <2E118FCA-7AB1-480F-8F49-3EFD77CC2992@gmail.com>
+From:   Liran Alon <liran.alon@oracle.com>
+Message-ID: <9d46406f-c483-746b-058f-cceda22f1029@oracle.com>
+Date:   Fri, 10 Apr 2020 13:20:03 +0300
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.13; rv:68.0)
+ Gecko/20100101 Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <87k12qawwl.fsf@nanos.tec.linutronix.de>
+In-Reply-To: <2E118FCA-7AB1-480F-8F49-3EFD77CC2992@gmail.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9586 signatures=668685
 X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 malwarescore=0
  mlxlogscore=999 phishscore=0 spamscore=0 adultscore=0 suspectscore=0
  mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2004100081
+ engine=8.12.0-2003020000 definitions=main-2004100085
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9586 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 mlxlogscore=999 mlxscore=0
- priorityscore=1501 phishscore=0 suspectscore=0 bulkscore=0
- lowpriorityscore=0 impostorscore=0 malwarescore=0 clxscore=1015
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2004100081
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 bulkscore=0
+ phishscore=0 lowpriorityscore=0 impostorscore=0 clxscore=1011
+ suspectscore=0 malwarescore=0 spamscore=0 mlxlogscore=999 mlxscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2004100085
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2020-04-08 7:12 a.m., Thomas Gleixner wrote:
-> Ankur Arora <ankur.a.arora@oracle.com> writes:
->> A KVM host (or another hypervisor) might advertise paravirtualized
->> features and optimization hints (ex KVM_HINTS_REALTIME) which might
->> become stale over the lifetime of the guest. For instance, the
->> host might go from being undersubscribed to being oversubscribed
->> (or the other way round) and it would make sense for the guest
->> switch pv-ops based on that.
-> 
-> If your host changes his advertised behaviour then you want to fix the
-> host setup or find a competent admin.
-> 
->> This lockorture splat that I saw on the guest while testing this is
->> indicative of the problem:
->>
->>    [ 1136.461522] watchdog: BUG: soft lockup - CPU#8 stuck for 22s! [lock_torture_wr:12865]
->>    [ 1136.461542] CPU: 8 PID: 12865 Comm: lock_torture_wr Tainted: G W L 5.4.0-rc7+ #77
->>    [ 1136.461546] RIP: 0010:native_queued_spin_lock_slowpath+0x15/0x220
->>
->> (Caused by an oversubscribed host but using mismatched native pv_lock_ops
->> on the gues.)
-> 
-> And this illustrates what? The fact that you used a misconfigured setup.
-> 
->> This series addresses the problem by doing paravirt switching at
->> runtime.
-> 
-> You're not addressing the problem. Your fixing the symptom, which is
-> wrong to begin with.
-> 
->> The alternative use-case is a runtime version of apply_alternatives()
->> (not posted with this patch-set) that can be used for some safe subset
->> of X86_FEATUREs. This could be useful in conjunction with the ongoing
->> late microcode loading work that Mihai Carabas and others have been
->> working on.
-> 
-> This has been discussed to death before and there is no safe subset as
-> long as this hasn't been resolved:
-> 
->    https://lore.kernel.org/lkml/alpine.DEB.2.21.1909062237580.1902@nanos.tec.linutronix.de/
-Thanks. I was thinking of fairly limited subset: ex re-evaluate
-X86_FEATURE_ALWAYS to make sure static_cpu_has() reflects reality
-but I guess that has second order effects here.
 
-Ankur
+On 10/04/2020 6:52, Nadav Amit wrote:
+> 2. Try to run the tests with more than 4GB of memory. The last time I tried
+>     (actually by running the test on bare metal), the INIT test that Liran
+>     wrote failed.
+>
+Wasn't this test failure fixed with kvm-unit-test commit fc47ccc19612 
+("x86: vmx: Verify pending LAPIC INIT event consume when exit on VMX_INIT")?
+If not, can you provide the details of this new failure? As I thought 
+this commit address the previous issue you have reported when running 
+this test
+on bare-metal.
 
-> 
-> Thanks,
-> 
->          tglx
-> 
+Thanks,
+-Liran
+
