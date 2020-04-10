@@ -2,80 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id CB7C61A4836
-	for <lists+kvm@lfdr.de>; Fri, 10 Apr 2020 18:05:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8F6831A4839
+	for <lists+kvm@lfdr.de>; Fri, 10 Apr 2020 18:06:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726695AbgDJQFC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Apr 2020 12:05:02 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:53156 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726177AbgDJQFB (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 10 Apr 2020 12:05:01 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1586534700;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=cxOJV+PXw0OWe981JdPu+MdBwKVnkcb6yaLM9gtV+Uw=;
-        b=MjBNN0auNnRkDbZjJOecf0fIrHxDe53aHwR1DwLJGVd8ynGAVKun1ieeyaUdWvyGFbfw2e
-        KBc9hDt5MLulc+hEO5PhGmHlPbH09O9VmSTC/8NlPPaY8q4wZBqcHpm2BgO9Fbx+DS+bhy
-        ujuVx1bRau7X6Thh7UgliFDseGUmu4A=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-501-IJpC3aRJNwOr-orlU8ccbQ-1; Fri, 10 Apr 2020 12:04:57 -0400
-X-MC-Unique: IJpC3aRJNwOr-orlU8ccbQ-1
-Received: by mail-wr1-f71.google.com with SMTP id n7so1421545wru.9
-        for <kvm@vger.kernel.org>; Fri, 10 Apr 2020 09:04:57 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=cxOJV+PXw0OWe981JdPu+MdBwKVnkcb6yaLM9gtV+Uw=;
-        b=VgD48keKr0DLuFYIKTI3MN1dbey54bPnwkW3dyDQ2gqs7VpLjFyJqkWPORGPSYns5y
-         /OOQRnirkMDEB9h3NcnofY2RvOT1vGix3uJtN6bfOafahSG3Z7OpSdbNZYOlg7/EGjmG
-         FtrD36H8g9wV0DjQjhTivWzsYFAIZzGD3lSDJlZj1GDvAE0JzepbtR1nSjQClGKSD71X
-         0ZUGyyCLsS46n7asT0eF7L87Gs3BedL2uWEBmJ0jP0MykKcHdrEkF517d97ucqHHJWyJ
-         nq006hQami3oPiYZuarXeNvqRFi4wYBaVk8EyXJuVHke5BXSXtLiIvwpz8/SXHqh7XKd
-         gNgg==
-X-Gm-Message-State: AGi0Pubgq8iNvUYmnnapSfMjjl5aZxm0rqpUYRtjcmyGoPJukxobZ2l/
-        UFmxsIUYhh7c1C5DEli8ggGqZ32L3HPxp1w6LRdx9GSR8D+qUk50Fx/vQjy+Oxbw4GYJIY8eOC/
-        0DDfV27s0rCgv
-X-Received: by 2002:a1c:6545:: with SMTP id z66mr5590631wmb.81.1586534695912;
-        Fri, 10 Apr 2020 09:04:55 -0700 (PDT)
-X-Google-Smtp-Source: APiQypIUoTNzgT8EHUupmSiQmqAgjl7+0TQSoQpIjhsdXJ4SNG1cJk937+fQ4caZS5evjdxQhgMaNA==
-X-Received: by 2002:a1c:6545:: with SMTP id z66mr5590603wmb.81.1586534695605;
-        Fri, 10 Apr 2020 09:04:55 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:f4b7:b34c:3ace:efb6? ([2001:b07:6468:f312:f4b7:b34c:3ace:efb6])
-        by smtp.gmail.com with ESMTPSA id j10sm3249165wru.85.2020.04.10.09.04.54
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 10 Apr 2020 09:04:54 -0700 (PDT)
-Subject: Re: KCSAN + KVM = host reset
-To:     Qian Cai <cai@lca.pw>, Marco Elver <elver@google.com>
-Cc:     "paul E. McKenney" <paulmck@kernel.org>,
+        id S1726638AbgDJQGH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Apr 2020 12:06:07 -0400
+Received: from mga01.intel.com ([192.55.52.88]:27566 "EHLO mga01.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726080AbgDJQGH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Apr 2020 12:06:07 -0400
+IronPort-SDR: hd27Y7dd2DtFYzy+rFSI1ZJdQrkAwfw4MKR09HmrE05cm1qZ8jedt1VOuRUrxDjJO/XmiEnlhT
+ MiHHVuXB+7CA==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Apr 2020 09:06:06 -0700
+IronPort-SDR: UXgOZj+U3clpDcQU5p6QTyNhf6cHt/ZwzHIo5iFymGE6zkF/k8LClS30Dk01YkWYhdSuoOBJwe
+ osPP7YL93gZg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.72,367,1580803200"; 
+   d="scan'208";a="252237989"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
+  by orsmga003.jf.intel.com with ESMTP; 10 Apr 2020 09:06:04 -0700
+Date:   Fri, 10 Apr 2020 09:06:04 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Qian Cai <cai@lca.pw>
+Cc:     Marco Elver <elver@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "paul E. McKenney" <paulmck@kernel.org>,
         kasan-dev <kasan-dev@googlegroups.com>,
         LKML <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org
+Subject: Re: KCSAN + KVM = host reset
+Message-ID: <20200410160603.GA23354@linux.intel.com>
 References: <CANpmjNMR4BgfCxL9qXn0sQrJtQJbEPKxJ5_HEa2VXWi6UY4wig@mail.gmail.com>
  <AC8A5393-B817-4868-AA85-B3019A1086F9@lca.pw>
  <CANpmjNPqQHKUjqAzcFym5G8kHX0mjProOpGu8e4rBmuGRykAUg@mail.gmail.com>
  <B798749E-F2F0-4A14-AFE3-F386AB632AEB@lca.pw>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <1d6db024-82d1-5530-2e78-478ee333173e@redhat.com>
-Date:   Fri, 10 Apr 2020 18:04:54 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 In-Reply-To: <B798749E-F2F0-4A14-AFE3-F386AB632AEB@lca.pw>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/04/20 17:50, Qian Cai wrote:
+On Fri, Apr 10, 2020 at 11:50:10AM -0400, Qian Cai wrote:
+> 
 > This works,
 > 
 > --- a/arch/x86/kvm/svm/svm.c
@@ -89,60 +63,18 @@ On 10/04/20 17:50, Qian Cai wrote:
 >  {
 >         struct vcpu_svm *svm = to_svm(vcpu);
 > 
-> Does anyone has any idea why svm_vcpu_run() would be a problem for KCSAN_INTERRUPT_WATCHER=y?
+> Does anyone has any idea why svm_vcpu_run() would be a problem for
+> KCSAN_INTERRUPT_WATCHER=y?
+> 
+> I can only see there are a bunch of assembly code in __svm_vcpu_run() that
+> might be related?
 
-All of svm_vcpu_run() has interrupts disabled anyway, but perhaps KCSAN
-checks the interrupt flag?  That could be a problem because
-svm_vcpu_run() disables the interrupts with GIF not IF (and in fact
-IF=1).
+svm_vcpu_run() does all kinds of interrupt toggling, e.g. the sequence is:
 
-You can try this patch which moves the problematic section inside
-the assembly language trampoline:
-
- 
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 27f4684a4c20..6ffa07d42e5e 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -3337,8 +3337,6 @@ static void svm_vcpu_run(struct kvm_vcpu *vcpu)
- 	 */
- 	x86_spec_ctrl_set_guest(svm->spec_ctrl, svm->virt_spec_ctrl);
- 
--	local_irq_enable();
--
- 	__svm_vcpu_run(svm->vmcb_pa, (unsigned long *)&svm->vcpu.arch.regs);
- 
-	/* Eliminate branch target predictions from guest mode */
-@@ -3373,8 +3368,6 @@ static void svm_vcpu_run(struct kvm_vcpu *vcpu)
- 
- 	reload_tss(vcpu);
- 
--	local_irq_disable();
--
- 	x86_spec_ctrl_restore_host(svm->spec_ctrl, svm->virt_spec_ctrl);
- 
- 	vcpu->arch.cr2 = svm->vmcb->save.cr2;
-diff --git a/arch/x86/kvm/svm/vmenter.S b/arch/x86/kvm/svm/vmenter.S
-index fa1af90067e9..a2608ede0975 100644
---- a/arch/x86/kvm/svm/vmenter.S
-+++ b/arch/x86/kvm/svm/vmenter.S
-@@ -78,6 +78,7 @@ SYM_FUNC_START(__svm_vcpu_run)
- 	pop %_ASM_AX
- 
- 	/* Enter guest mode */
-+	sti
- 1:	vmload %_ASM_AX
- 	jmp 3f
- 2:	cmpb $0, kvm_rebooting
-@@ -99,6 +100,8 @@ SYM_FUNC_START(__svm_vcpu_run)
- 	ud2
- 	_ASM_EXTABLE(5b, 6b)
- 7:
-+	cli
-+
- 	/* "POP" @regs to RAX. */
- 	pop %_ASM_AX
- 
-
-Paolo
-
+  1. EFLAGS.IF == 0, from caller
+  2. clgi()
+  3. EFLAGS.IF <= 1
+  4. __svm_vcpu_run(), i.e. enter guest
+  5. EFLAGS == 0, from VM-Exit
+  6. EFLAGS.IF <= 1
+  7. stgi()
