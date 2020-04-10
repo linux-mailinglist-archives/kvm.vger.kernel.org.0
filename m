@@ -2,245 +2,251 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9D08B1A3D97
-	for <lists+kvm@lfdr.de>; Fri, 10 Apr 2020 03:03:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EB8411A3DB9
+	for <lists+kvm@lfdr.de>; Fri, 10 Apr 2020 03:23:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726620AbgDJBDq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Apr 2020 21:03:46 -0400
-Received: from mail-pj1-f67.google.com ([209.85.216.67]:50892 "EHLO
-        mail-pj1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725970AbgDJBDq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Apr 2020 21:03:46 -0400
-Received: by mail-pj1-f67.google.com with SMTP id b7so214809pju.0;
-        Thu, 09 Apr 2020 18:03:44 -0700 (PDT)
+        id S1726538AbgDJBXx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Apr 2020 21:23:53 -0400
+Received: from mail-co1nam11on2075.outbound.protection.outlook.com ([40.107.220.75]:8483
+        "EHLO NAM11-CO1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725970AbgDJBXx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Apr 2020 21:23:53 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=hCNJr1/x/RHrJlAfquJd57sNGqLbst15kNTlfqEsUv48LS0QDeb6jKOHBISoPNUy4LVh5ABTxivyN1d/6kDDlQ1bhqAx4nQWtqUpdnLE8tgtdUZuciqiNdzZTEVClCz8Qwn73R1iGk6TJ5ZGwvNW109giOZU15BwVwK87xm6EwiWR3C6o1b5DkagjCAYjSikuqhYXR1fZiwR+bCmi/x6kxvt27Sj0ViwRuiBc8+A9mWPvn1PHaNSN06c1MTKBQhqAoxb7kn3uBwZTq3oRUw0vnXslD+75ZayFSIxhdiUweyfs4uF0fENOlHtnMrV2wY9wQP3tUHpRpQEbBqQTnPIrg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=gxnAxCy0q9N/L77RqvW39ee4E5U03mInhjrSyHSjgDs=;
+ b=j+V8Y+ZoODGd9XwN+yJPS2Bx7yw/6MjbcjWX58EVGjd8esm2jRtDW3bZqr7a7DqdAMrGawJM7ulBKOmek0XkqIVfXq0fJ7ZIZqGf801Mqd3+MCJtRMjBl72WomCYG+VX5eBB9Pq0zy04KlGEvO+PAUvZutSf27tLZJLAfagLzP5zSm8Pw+DTngs6l9XxoYAdtB471yG5DTx7hsvlZfcT2DaTb/dJGZuuHIlVJApLle2LrvtV8JQAqGWgA1r+zlMmez8+ix+2Diuezw1M2RlEojXNKTUhzMjUbuIJtTYGAs0OJOzI5sgeEzUSYpa+mK/U0AMrDW8SlmN1zLLcjzQEUA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id;
-        bh=EeQYxbvTeKI2BVQRT2aOOtI1jSNcFNNz19lVdiuGtjo=;
-        b=NR3LliSb0NmRvkwkX6K7wUezSIjOzKfP7gJGADD/PBV/nI5KDnJYcAIAn2XL1yimeg
-         DJaM77X2BS0toCZ8slmx4/orYPp4iS0+CIIRJnYw6FA/ZtkoV1GSPKYTJCximgbVfhTf
-         y8Uf1kpG5VfxMTWRIm/tnHlP7y4wGmapdGxA+WhlksBEaDQ6Db2NBG7pAXkiOPi/zP3q
-         vp2tHa3wBKrWwdFNN+24kJfUsjEMdweQSzH29Ran940zdyuWlGzOzfoSDQPm3i2RFPp6
-         H0kVBCb6acocj11RZuyWNvRzZMoLvYo3vh7QatbSEFV98mha1e3TKMQnUtnSPwtQxYx1
-         xDWw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=EeQYxbvTeKI2BVQRT2aOOtI1jSNcFNNz19lVdiuGtjo=;
-        b=GEp2Sma4LqiGuDUNz3FqzE8CtpT+18SHbrUdO1xi82CCQ3QVFHiwBjyD8yMlVXsH4t
-         bvF1n9agkBQ+9uisCFVXnt1oWt0yaKsABDNguqUDjfeq3/ZXeTOiWo9DoUvmsFafOQhq
-         LTnOeAoIoLiBYsILnllwxNs5aAev2uMOpo1YPdP0VCIkKXMlbweXb+DlcXfi4JvQr3AA
-         pRyXbo5jYkHJcybZC4Pql0KNQKZKHp0dz68i6al+0XM6CwpcZQchOnIoHTp4NzWGTrJc
-         B2H7Ps/cBMrs/Cc8sv5qEXtxepw6tvFizoJJG3j4dPDZMW8AX7C2iVQ4Y4rnNxK+r6OB
-         Tg4A==
-X-Gm-Message-State: AGi0PuZ5yptaxeMu67/8yIqe0C4JmLrDPdktrGwAJ9YhIIQaYA+i270X
-        QYlD2athGdEaS3MIiGAYW/y8rW+7
-X-Google-Smtp-Source: APiQypKyQITZWkM0GCWB3H4MhFYc7wViYWzg3JhzUfyPnV03ktUpOCaa3XqWUdNpP9cVbSVU9INOaw==
-X-Received: by 2002:a17:902:968a:: with SMTP id n10mr2292044plp.74.1586480623007;
-        Thu, 09 Apr 2020 18:03:43 -0700 (PDT)
-Received: from localhost.localdomain ([103.7.29.6])
-        by smtp.googlemail.com with ESMTPSA id y3sm311180pfy.6.2020.04.09.18.03.40
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 09 Apr 2020 18:03:42 -0700 (PDT)
-From:   Wanpeng Li <kernellwp@gmail.com>
-X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+ d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=gxnAxCy0q9N/L77RqvW39ee4E5U03mInhjrSyHSjgDs=;
+ b=Exhwxq3Dz7hQf+Ky2NvQW+T1XZFG0LXFoAHVkZkKBvj6agTy9sWB7CajUDEYESlPfoM9XFe590ouz9U1f+Pfa0MaVUEsi4qhyKcZLDJiLv/yMumka6YrSanhMyvXY46LnEBv7QMNuiybHuq4J7n9884zNJBq2p8PwjkWmS9Hj+U=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=Ashish.Kalra@amd.com; 
+Received: from DM5PR12MB1386.namprd12.prod.outlook.com (2603:10b6:3:77::9) by
+ DM5PR12MB1947.namprd12.prod.outlook.com (2603:10b6:3:111::23) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2878.20; Fri, 10 Apr 2020 01:23:50 +0000
+Received: from DM5PR12MB1386.namprd12.prod.outlook.com
+ ([fe80::969:3d4e:6f37:c33c]) by DM5PR12MB1386.namprd12.prod.outlook.com
+ ([fe80::969:3d4e:6f37:c33c%12]) with mapi id 15.20.2878.022; Fri, 10 Apr 2020
+ 01:23:50 +0000
+Date:   Fri, 10 Apr 2020 01:23:44 +0000
+From:   Ashish Kalra <ashish.kalra@amd.com>
+To:     Steve Rutherford <srutherford@google.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Haiwei Li <lihaiwei@tencent.com>
-Subject: [PATCH v2] KVM: X86: Ultra fast single target IPI fastpath
-Date:   Fri, 10 Apr 2020 09:03:27 +0800
-Message-Id: <1586480607-5408-1-git-send-email-wanpengli@tencent.com>
-X-Mailer: git-send-email 2.7.4
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Joerg Roedel <joro@8bytes.org>,
+        Borislav Petkov <bp@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        X86 ML <x86@kernel.org>, KVM list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        David Rientjes <rientjes@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Brijesh Singh <brijesh.singh@amd.com>
+Subject: Re: [PATCH v6 11/14] KVM: x86: Introduce KVM_SET_PAGE_ENC_BITMAP
+ ioctl
+Message-ID: <20200410012344.GA19168@ashkalra_ubuntu_server>
+References: <cover.1585548051.git.ashish.kalra@amd.com>
+ <4d4fbe2b9acda82c04834682900acf782182ec23.1585548051.git.ashish.kalra@amd.com>
+ <CABayD+eOCpTGjvxwhtP85j98BKvCxtG8QDBYSC0E08GnaA12jw@mail.gmail.com>
+ <20200408014852.GA27608@ashkalra_ubuntu_server>
+ <CABayD+eaeLZ++Hh8RC=5gWehgJs+tN3Ad39Nx7bF4foEido7jw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CABayD+eaeLZ++Hh8RC=5gWehgJs+tN3Ad39Nx7bF4foEido7jw@mail.gmail.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-ClientProxiedBy: DM6PR17CA0024.namprd17.prod.outlook.com
+ (2603:10b6:5:1b3::37) To DM5PR12MB1386.namprd12.prod.outlook.com
+ (2603:10b6:3:77::9)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from ashkalra_ubuntu_server (165.204.77.1) by DM6PR17CA0024.namprd17.prod.outlook.com (2603:10b6:5:1b3::37) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2900.15 via Frontend Transport; Fri, 10 Apr 2020 01:23:49 +0000
+X-Originating-IP: [165.204.77.1]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: f1eca525-1701-43c2-b342-08d7dcedd2e1
+X-MS-TrafficTypeDiagnostic: DM5PR12MB1947:|DM5PR12MB1947:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <DM5PR12MB19476DACA23CA5F6C1B9E64C8EDE0@DM5PR12MB1947.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
+X-Forefront-PRVS: 0369E8196C
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM5PR12MB1386.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(10009020)(4636009)(346002)(39860400002)(136003)(376002)(396003)(366004)(54906003)(81156014)(9686003)(6916009)(478600001)(316002)(5660300002)(52116002)(4326008)(2906002)(8676002)(53546011)(26005)(7416002)(33656002)(86362001)(44832011)(956004)(186003)(6496006)(8936002)(81166007)(16526019)(66476007)(55016002)(1076003)(6666004)(66556008)(66946007)(33716001)(66574012);DIR:OUT;SFP:1101;
+Received-SPF: None (protection.outlook.com: amd.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: YWO+SC+AEcb1o54U+NK11SmVLvB47v6uhTRsXlpQLmJZjFbtG+Pom/XfWBkp76Dej/V7kjZSq3GXBlVX03x2UB/VX7bnrrLrOe6XCONmeKryS47sRflQrtExYTmR2bz9qDXdBlZpJGFpepQTdyLDSXBlysQxhLbxXSwknR746RfxqfHpzYUb6Gqsh8BUAT4tFH1zuDe/G0BvNxddRfBGSNBIrCQaCvQosIrrgromlef8pf27drZTeN9dj6XjTAern3PIdhYIuej//CDTT2ZVVSKviFXaU3fNqD/kUgZHnaXfJ550WQzDabD0cYOgHOX5EzvvYqU6c8YF9XNljz5sj/1p/CSu+u6oWrPaXVfRJd34tY8frj2F4JDV57H1LnENXPNve4SSmeXqVolH+bbCmGuczFpUQMSYZ4Ytqeyboy2ZzfKpFTvRKtd4zwQUuPGz
+X-MS-Exchange-AntiSpam-MessageData: io+l+ZnR3Rpgwl+z937eLSbmcm3XNSI3Rn0mDBxyfYqMm4yPALWNuYzOyQ3e9WIC9JfpLHDwbGpMtrt1hLGYbSW8Bjpa/w+GGs+zezaVq8pxe+fORHg2c1SunFgDxZI/uCyrLomKWllMz6c+jApQXA==
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f1eca525-1701-43c2-b342-08d7dcedd2e1
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Apr 2020 01:23:50.1490
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: yuhdF3OQjQh8s4wqBiCMVxza6kGJ3VZLIlIM9YcKYW8luIc8M+WXqEP+HFaabElX5NVYBVTACiQpFyWE83Srow==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR12MB1947
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Wanpeng Li <wanpengli@tencent.com>
+Hello Steve,
 
-IPI and Timer cause the main MSRs write vmexits in cloud environment 
-observation, let's optimize virtual IPI latency more aggressively to 
-inject target IPI as soon as possible.
+On Thu, Apr 09, 2020 at 05:06:21PM -0700, Steve Rutherford wrote:
+> On Tue, Apr 7, 2020 at 6:49 PM Ashish Kalra <ashish.kalra@amd.com> wrote:
+> >
+> > Hello Steve,
+> >
+> > On Tue, Apr 07, 2020 at 05:26:33PM -0700, Steve Rutherford wrote:
+> > > On Sun, Mar 29, 2020 at 11:23 PM Ashish Kalra <Ashish.Kalra@amd.com> wrote:
+> > > >
+> > > > From: Brijesh Singh <Brijesh.Singh@amd.com>
+> > > >
+> > > > The ioctl can be used to set page encryption bitmap for an
+> > > > incoming guest.
+> > > >
+> > > > Cc: Thomas Gleixner <tglx@linutronix.de>
+> > > > Cc: Ingo Molnar <mingo@redhat.com>
+> > > > Cc: "H. Peter Anvin" <hpa@zytor.com>
+> > > > Cc: Paolo Bonzini <pbonzini@redhat.com>
+> > > > Cc: "Radim Krčmář" <rkrcmar@redhat.com>
+> > > > Cc: Joerg Roedel <joro@8bytes.org>
+> > > > Cc: Borislav Petkov <bp@suse.de>
+> > > > Cc: Tom Lendacky <thomas.lendacky@amd.com>
+> > > > Cc: x86@kernel.org
+> > > > Cc: kvm@vger.kernel.org
+> > > > Cc: linux-kernel@vger.kernel.org
+> > > > Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> > > > Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+> > > > ---
+> > > >  Documentation/virt/kvm/api.rst  | 22 +++++++++++++++++
+> > > >  arch/x86/include/asm/kvm_host.h |  2 ++
+> > > >  arch/x86/kvm/svm.c              | 42 +++++++++++++++++++++++++++++++++
+> > > >  arch/x86/kvm/x86.c              | 12 ++++++++++
+> > > >  include/uapi/linux/kvm.h        |  1 +
+> > > >  5 files changed, 79 insertions(+)
+> > > >
+> > > > diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> > > > index 8ad800ebb54f..4d1004a154f6 100644
+> > > > --- a/Documentation/virt/kvm/api.rst
+> > > > +++ b/Documentation/virt/kvm/api.rst
+> > > > @@ -4675,6 +4675,28 @@ or shared. The bitmap can be used during the guest migration, if the page
+> > > >  is private then userspace need to use SEV migration commands to transmit
+> > > >  the page.
+> > > >
+> > > > +4.126 KVM_SET_PAGE_ENC_BITMAP (vm ioctl)
+> > > > +---------------------------------------
+> > > > +
+> > > > +:Capability: basic
+> > > > +:Architectures: x86
+> > > > +:Type: vm ioctl
+> > > > +:Parameters: struct kvm_page_enc_bitmap (in/out)
+> > > > +:Returns: 0 on success, -1 on error
+> > > > +
+> > > > +/* for KVM_SET_PAGE_ENC_BITMAP */
+> > > > +struct kvm_page_enc_bitmap {
+> > > > +       __u64 start_gfn;
+> > > > +       __u64 num_pages;
+> > > > +       union {
+> > > > +               void __user *enc_bitmap; /* one bit per page */
+> > > > +               __u64 padding2;
+> > > > +       };
+> > > > +};
+> > > > +
+> > > > +During the guest live migration the outgoing guest exports its page encryption
+> > > > +bitmap, the KVM_SET_PAGE_ENC_BITMAP can be used to build the page encryption
+> > > > +bitmap for an incoming guest.
+> > > >
+> > > >  5. The kvm_run structure
+> > > >  ========================
+> > > > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> > > > index 27e43e3ec9d8..d30f770aaaea 100644
+> > > > --- a/arch/x86/include/asm/kvm_host.h
+> > > > +++ b/arch/x86/include/asm/kvm_host.h
+> > > > @@ -1271,6 +1271,8 @@ struct kvm_x86_ops {
+> > > >                                   unsigned long sz, unsigned long mode);
+> > > >         int (*get_page_enc_bitmap)(struct kvm *kvm,
+> > > >                                 struct kvm_page_enc_bitmap *bmap);
+> > > > +       int (*set_page_enc_bitmap)(struct kvm *kvm,
+> > > > +                               struct kvm_page_enc_bitmap *bmap);
+> > > >  };
+> > > >
+> > > >  struct kvm_arch_async_pf {
+> > > > diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
+> > > > index bae783cd396a..313343a43045 100644
+> > > > --- a/arch/x86/kvm/svm.c
+> > > > +++ b/arch/x86/kvm/svm.c
+> > > > @@ -7756,6 +7756,47 @@ static int svm_get_page_enc_bitmap(struct kvm *kvm,
+> > > >         return ret;
+> > > >  }
+> > > >
+> > > > +static int svm_set_page_enc_bitmap(struct kvm *kvm,
+> > > > +                                  struct kvm_page_enc_bitmap *bmap)
+> > > > +{
+> > > > +       struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+> > > > +       unsigned long gfn_start, gfn_end;
+> > > > +       unsigned long *bitmap;
+> > > > +       unsigned long sz, i;
+> > > > +       int ret;
+> > > > +
+> > > > +       if (!sev_guest(kvm))
+> > > > +               return -ENOTTY;
+> > > > +
+> > > > +       gfn_start = bmap->start_gfn;
+> > > > +       gfn_end = gfn_start + bmap->num_pages;
+> > > > +
+> > > > +       sz = ALIGN(bmap->num_pages, BITS_PER_LONG) / 8;
+> > > > +       bitmap = kmalloc(sz, GFP_KERNEL);
+> > > > +       if (!bitmap)
+> > > > +               return -ENOMEM;
+> > > > +
+> > > > +       ret = -EFAULT;
+> > > > +       if (copy_from_user(bitmap, bmap->enc_bitmap, sz))
+> > > > +               goto out;
+> > > > +
+> > > > +       mutex_lock(&kvm->lock);
+> > > > +       ret = sev_resize_page_enc_bitmap(kvm, gfn_end);
+> > > I realize now that usermode could use this for initializing the
+> > > minimum size of the enc bitmap, which probably solves my issue from
+> > > the other thread.
+> > > > +       if (ret)
+> > > > +               goto unlock;
+> > > > +
+> > > > +       i = gfn_start;
+> > > > +       for_each_clear_bit_from(i, bitmap, (gfn_end - gfn_start))
+> > > > +               clear_bit(i + gfn_start, sev->page_enc_bmap);
+> > > This API seems a bit strange, since it can only clear bits. I would
+> > > expect "set" to force the values to match the values passed down,
+> > > instead of only ensuring that cleared bits in the input are also
+> > > cleared in the kernel.
+> > >
+> >
+> > The sev_resize_page_enc_bitmap() will allocate a new bitmap and
+> > set it to all 0xFF's, therefore, the code here simply clears the bits
+> > in the bitmap as per the cleared bits in the input.
+> 
+> If I'm not mistaken, resize only reinitializes the newly extended part
+> of the buffer, and copies the old values for the rest.
+> With the API you proposed you could probably reimplement a normal set
+> call by calling get, then reset, and then set, but this feels
+> cumbersome.
+> 
 
-Running kvm-unit-tests/vmexit.flat IPI testing on SKX server, disable 
-adaptive advance lapic timer and adaptive halt-polling to avoid the 
-interference, this patch can give another 7% improvement.
+As i mentioned earlier, the set api is basically meant for the incoming
+VM, the resize will initialize the incoming VM's bitmap to all 0xFF's
+and as there won't be any bitmap allocated initially on the incoming VM,
+therefore, the bitmap copy will not do anything and the clear_bit later
+will clear the incoming VM's bits as per the input.
 
-w/o fastpath -> fastpath            4238 -> 3543  16.4%
-fastpath     -> ultra fastpath      3543 -> 3293     7%
-w/o fastpath -> ultra fastpath      4238 -> 3293  22.3% 
-
-This also revises the performance data in commit 1e9e2622a1 (KVM: VMX: 
-FIXED+PHYSICAL mode single target IPI fastpath), that testing adds
---overcommit cpu-pm=on to kvm-unit-tests guest which is unnecessary.
-
-Tested-by: Haiwei Li <lihaiwei@tencent.com>
-Cc: Haiwei Li <lihaiwei@tencent.com>
-Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
----
-v1 -> v2:
- * rebase on latest kvm/queue
- * update patch description
-
- arch/x86/include/asm/kvm_host.h |  6 +++---
- arch/x86/kvm/svm/svm.c          | 21 ++++++++++++++-------
- arch/x86/kvm/vmx/vmx.c          | 19 +++++++++++++------
- arch/x86/kvm/x86.c              |  4 ++--
- 4 files changed, 32 insertions(+), 18 deletions(-)
-
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index c7da23a..e667cf3 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1124,7 +1124,8 @@ struct kvm_x86_ops {
- 	 */
- 	void (*tlb_flush_guest)(struct kvm_vcpu *vcpu);
- 
--	void (*run)(struct kvm_vcpu *vcpu);
-+	void (*run)(struct kvm_vcpu *vcpu,
-+		enum exit_fastpath_completion *exit_fastpath);
- 	int (*handle_exit)(struct kvm_vcpu *vcpu,
- 		enum exit_fastpath_completion exit_fastpath);
- 	int (*skip_emulated_instruction)(struct kvm_vcpu *vcpu);
-@@ -1174,8 +1175,7 @@ struct kvm_x86_ops {
- 			       struct x86_instruction_info *info,
- 			       enum x86_intercept_stage stage,
- 			       struct x86_exception *exception);
--	void (*handle_exit_irqoff)(struct kvm_vcpu *vcpu,
--		enum exit_fastpath_completion *exit_fastpath);
-+	void (*handle_exit_irqoff)(struct kvm_vcpu *vcpu);
- 
- 	int (*check_nested_events)(struct kvm_vcpu *vcpu);
- 	void (*request_immediate_exit)(struct kvm_vcpu *vcpu);
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 27f4684..c019332 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -3283,9 +3283,20 @@ static void svm_cancel_injection(struct kvm_vcpu *vcpu)
- 	svm_complete_interrupts(svm);
- }
- 
-+static enum exit_fastpath_completion svm_exit_handlers_fastpath(struct kvm_vcpu *vcpu)
-+{
-+	if (!is_guest_mode(vcpu) &&
-+	    to_svm(vcpu)->vmcb->control.exit_code == SVM_EXIT_MSR &&
-+	    to_svm(vcpu)->vmcb->control.exit_info_1)
-+		return handle_fastpath_set_msr_irqoff(vcpu);
-+
-+	return EXIT_FASTPATH_NONE;
-+}
-+
- bool __svm_vcpu_run(unsigned long vmcb_pa, unsigned long *regs);
- 
--static void svm_vcpu_run(struct kvm_vcpu *vcpu)
-+static void svm_vcpu_run(struct kvm_vcpu *vcpu,
-+	enum exit_fastpath_completion *exit_fastpath)
- {
- 	struct vcpu_svm *svm = to_svm(vcpu);
- 
-@@ -3388,6 +3399,7 @@ static void svm_vcpu_run(struct kvm_vcpu *vcpu)
- 	kvm_load_host_xsave_state(vcpu);
- 	stgi();
- 
-+	*exit_fastpath = svm_exit_handlers_fastpath(vcpu);
- 	/* Any pending NMI will happen here */
- 
- 	if (unlikely(svm->vmcb->control.exit_code == SVM_EXIT_NMI))
-@@ -3719,13 +3731,8 @@ static int svm_check_intercept(struct kvm_vcpu *vcpu,
- 	return ret;
- }
- 
--static void svm_handle_exit_irqoff(struct kvm_vcpu *vcpu,
--	enum exit_fastpath_completion *exit_fastpath)
-+static void svm_handle_exit_irqoff(struct kvm_vcpu *vcpu)
- {
--	if (!is_guest_mode(vcpu) &&
--	    to_svm(vcpu)->vmcb->control.exit_code == SVM_EXIT_MSR &&
--	    to_svm(vcpu)->vmcb->control.exit_info_1)
--		*exit_fastpath = handle_fastpath_set_msr_irqoff(vcpu);
- }
- 
- static void svm_sched_in(struct kvm_vcpu *vcpu, int cpu)
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 1d2bb57..61a1725 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -6354,8 +6354,7 @@ static void handle_external_interrupt_irqoff(struct kvm_vcpu *vcpu)
- }
- STACK_FRAME_NON_STANDARD(handle_external_interrupt_irqoff);
- 
--static void vmx_handle_exit_irqoff(struct kvm_vcpu *vcpu,
--	enum exit_fastpath_completion *exit_fastpath)
-+static void vmx_handle_exit_irqoff(struct kvm_vcpu *vcpu)
- {
- 	struct vcpu_vmx *vmx = to_vmx(vcpu);
- 
-@@ -6363,9 +6362,6 @@ static void vmx_handle_exit_irqoff(struct kvm_vcpu *vcpu,
- 		handle_external_interrupt_irqoff(vcpu);
- 	else if (vmx->exit_reason == EXIT_REASON_EXCEPTION_NMI)
- 		handle_exception_nmi_irqoff(vmx);
--	else if (!is_guest_mode(vcpu) &&
--		vmx->exit_reason == EXIT_REASON_MSR_WRITE)
--		*exit_fastpath = handle_fastpath_set_msr_irqoff(vcpu);
- }
- 
- static bool vmx_has_emulated_msr(int index)
-@@ -6570,9 +6566,19 @@ void vmx_update_host_rsp(struct vcpu_vmx *vmx, unsigned long host_rsp)
- 	}
- }
- 
-+static enum exit_fastpath_completion vmx_exit_handlers_fastpath(struct kvm_vcpu *vcpu)
-+{
-+	if (!is_guest_mode(vcpu) &&
-+		to_vmx(vcpu)->exit_reason == EXIT_REASON_MSR_WRITE)
-+		return handle_fastpath_set_msr_irqoff(vcpu);
-+
-+	return EXIT_FASTPATH_NONE;
-+}
-+
- bool __vmx_vcpu_run(struct vcpu_vmx *vmx, unsigned long *regs, bool launched);
- 
--static void vmx_vcpu_run(struct kvm_vcpu *vcpu)
-+static void vmx_vcpu_run(struct kvm_vcpu *vcpu,
-+	enum exit_fastpath_completion *exit_fastpath)
- {
- 	struct vcpu_vmx *vmx = to_vmx(vcpu);
- 	unsigned long cr3, cr4;
-@@ -6737,6 +6743,7 @@ static void vmx_vcpu_run(struct kvm_vcpu *vcpu)
- 	vmx->idt_vectoring_info = 0;
- 
- 	vmx->exit_reason = vmx->fail ? 0xdead : vmcs_read32(VM_EXIT_REASON);
-+	*exit_fastpath = vmx_exit_handlers_fastpath(vcpu);
- 	if ((u16)vmx->exit_reason == EXIT_REASON_MCE_DURING_VMENTRY)
- 		kvm_machine_check();
- 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 3089aa4..eed31e2 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -8409,7 +8409,7 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
- 		vcpu->arch.switch_db_regs &= ~KVM_DEBUGREG_RELOAD;
- 	}
- 
--	kvm_x86_ops.run(vcpu);
-+	kvm_x86_ops.run(vcpu, &exit_fastpath);
- 
- 	/*
- 	 * Do this here before restoring debug registers on the host.  And
-@@ -8441,7 +8441,7 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
- 	vcpu->mode = OUTSIDE_GUEST_MODE;
- 	smp_wmb();
- 
--	kvm_x86_ops.handle_exit_irqoff(vcpu, &exit_fastpath);
-+	kvm_x86_ops.handle_exit_irqoff(vcpu);
- 
- 	/*
- 	 * Consume any pending interrupts, including the possible source of
--- 
-2.7.4
-
+Thanks,
+Ashish
