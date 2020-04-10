@@ -2,91 +2,159 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 220B81A451B
-	for <lists+kvm@lfdr.de>; Fri, 10 Apr 2020 12:20:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C385F1A4525
+	for <lists+kvm@lfdr.de>; Fri, 10 Apr 2020 12:22:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725993AbgDJKUO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Apr 2020 06:20:14 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:51428 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725930AbgDJKUN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Apr 2020 06:20:13 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 03AAJ9uQ119046;
-        Fri, 10 Apr 2020 10:20:09 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2020-01-29;
- bh=0G0SXSp0q/0L37C/DIXgGFdVawxsFUeBphgmgshcH20=;
- b=dRu2yvzr9ImMxm/HezfSd47lhuWROUTjEHynGyR9DBy7nO7bmMkoLmhuAJWwJON6FeTU
- hqE1oAJdHElx7hx7WYUGlG396cFo1Anke7DS6SKEWEpx5o1bDW6JLIJstAGKX/jM/AtZ
- KCyNOBtNt9falHzZOYrq78goxfzlGBrB7m9ZKJ+hk5fSZO1l6A2ZIsNxFzKWdwtLnh3j
- fCr2WRife1z/QU5/BTdn0qi9sqR2o0EtBdxbpIO2mVsyTA4vYcYUGk+tRk5qwLahwGEz
- N0kasfuYXdPzfIx6X9lisMIYlkdJoQwm6NAJylIMphHdujLrqzTeaelXFUcfMzAfu4SL qg== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
-        by userp2120.oracle.com with ESMTP id 309gw4hr7u-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 10 Apr 2020 10:20:09 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
-        by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 03AAHWhC105800;
-        Fri, 10 Apr 2020 10:20:09 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
-        by userp3030.oracle.com with ESMTP id 3091m714hy-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 10 Apr 2020 10:20:09 +0000
-Received: from abhmp0012.oracle.com (abhmp0012.oracle.com [141.146.116.18])
-        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 03AAK7NV008352;
-        Fri, 10 Apr 2020 10:20:07 GMT
-Received: from [192.168.14.112] (/79.180.216.197)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Fri, 10 Apr 2020 03:20:07 -0700
-Subject: Re: Contribution to KVM.
-To:     Nadav Amit <nadav.amit@gmail.com>,
-        Javier Romero <xavinux@gmail.com>
-Cc:     kvm <kvm@vger.kernel.org>, kvmarm@lists.cs.columbia.edu,
-        like.xu@intel.com
-References: <CAEX+82KTJecx_aSHAPN9ZkS_YDiDfyEM9b6ji4wabmSZ6O516Q@mail.gmail.com>
- <c86002a6-d613-c0be-a672-cca8e9c83e1c@intel.com>
- <2E118FCA-7AB1-480F-8F49-3EFD77CC2992@gmail.com>
-From:   Liran Alon <liran.alon@oracle.com>
-Message-ID: <9d46406f-c483-746b-058f-cceda22f1029@oracle.com>
-Date:   Fri, 10 Apr 2020 13:20:03 +0300
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.13; rv:68.0)
- Gecko/20100101 Thunderbird/68.7.0
+        id S1726179AbgDJKWP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Apr 2020 06:22:15 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:55276 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725912AbgDJKWP (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 10 Apr 2020 06:22:15 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1586514134;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=myq4A86h+72R4CEen1ctYlXgwxnk1bi4qAeKXQag11M=;
+        b=WUKp0uE4WwhNern0DcF/dJ4nR5d47zJb8kDcqxRwvjzUPb95kG/yCREFesbujiAXnOL0X8
+        mMWc1++nm7g4pkQTfXmlWAieKWkqpESvL1e5DVZJa8TKQBBPVIA6VvtRYkL1mzr42kTjy0
+        ZlWHz8HjD0ZCHRVWmIfmlqcxAdFpy64=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-388-Bxz2VyNgPsq1R0G2oY4DBg-1; Fri, 10 Apr 2020 06:22:11 -0400
+X-MC-Unique: Bxz2VyNgPsq1R0G2oY4DBg-1
+Received: by mail-wr1-f70.google.com with SMTP id w12so899225wrl.23
+        for <kvm@vger.kernel.org>; Fri, 10 Apr 2020 03:22:11 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=myq4A86h+72R4CEen1ctYlXgwxnk1bi4qAeKXQag11M=;
+        b=h75hxUGO4qJvIrjOwYahJ7sJsak4/zFNPi93lld49x5LNBfMBaDVQmrywOPgeiBUbA
+         n6L2xw295lRk166tQ9x0IXPeHtr92lM3Csr2brkPQRJBKXcju5SQLgP168TqGw/3rmBp
+         nCrKv/FFU15HSM71Ot3hIWKX/vEl5ZdwxUhtAQ56hRntChIR5/mfRgirvs4O1/9bROkM
+         ke+X2V1fOBUts7nGDrfTDtlC9CwhszDkVdp7835F2ZEVaLp5IDI9XYbGM9SRSlcbm+R+
+         ooFL6o9SCcRqJch91lvWPIAK3shS5AcXfjh2C+2hlDsc2fxRTbaD+9VUh/Y/eQ75Tdnq
+         CL5Q==
+X-Gm-Message-State: AGi0Pub68D5xKDWVhxkanz7K95e9nwW6BPPJ8TSbpAnsCD+raJurcB3Y
+        xnpJP0R8xuzIMHzOFtSbeovyc/TyUGmCn8TPy9z7EDgTP0psua/K4y45EIXtssLeXNCQRg4ob1E
+        aMs4DuunhrTFH
+X-Received: by 2002:a5d:53ca:: with SMTP id a10mr3542880wrw.388.1586514130022;
+        Fri, 10 Apr 2020 03:22:10 -0700 (PDT)
+X-Google-Smtp-Source: APiQypJnXEjma3SKgBTV5y3pd6mdJeWcBhmmfkn0ZTkl5TBS8W40HyiVAny9dCityJ0DdFx1CQ8z+g==
+X-Received: by 2002:a5d:53ca:: with SMTP id a10mr3541020wrw.388.1586514099906;
+        Fri, 10 Apr 2020 03:21:39 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:e8a3:73c:c711:b995? ([2001:b07:6468:f312:e8a3:73c:c711:b995])
+        by smtp.gmail.com with ESMTPSA id b199sm2443439wme.23.2020.04.10.03.21.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 10 Apr 2020 03:21:39 -0700 (PDT)
+Subject: Re: [PATCH 2/3] x86/split_lock: Refactor and export
+ handle_user_split_lock() for KVM
+To:     Xiaoyao Li <xiaoyao.li@intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     x86@kernel.org, "Kenneth R . Crudup" <kenny@panix.com>,
+        Fenghua Yu <fenghua.yu@intel.com>,
+        Nadav Amit <namit@vmware.com>,
+        Thomas Hellstrom <thellstrom@vmware.com>,
+        Tony Luck <tony.luck@intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Jessica Yu <jeyu@kernel.org>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20200402124205.334622628@linutronix.de>
+ <20200402155554.27705-1-sean.j.christopherson@intel.com>
+ <20200402155554.27705-3-sean.j.christopherson@intel.com>
+ <87v9mhn7nf.fsf@nanos.tec.linutronix.de>
+ <20200402171946.GH13879@linux.intel.com>
+ <87mu7tn1w8.fsf@nanos.tec.linutronix.de>
+ <716f5824-8d47-24cc-4935-c2dd32ed4629@intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <283c549a-423f-a85e-c208-8a80d682ef77@redhat.com>
+Date:   Fri, 10 Apr 2020 12:21:36 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <2E118FCA-7AB1-480F-8F49-3EFD77CC2992@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <716f5824-8d47-24cc-4935-c2dd32ed4629@intel.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9586 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 malwarescore=0
- mlxlogscore=999 phishscore=0 spamscore=0 adultscore=0 suspectscore=0
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2004100085
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9586 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 bulkscore=0
- phishscore=0 lowpriorityscore=0 impostorscore=0 clxscore=1011
- suspectscore=0 malwarescore=0 spamscore=0 mlxlogscore=999 mlxscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2004100085
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 10/04/20 06:39, Xiaoyao Li wrote:
+> 
+>   +static bool guest_handles_ac(struct kvm_vcpu *vcpu)
+> +{
+> +    /*
+> +     * If guest has alignment checking enabled in CR0 and activated in
+> +     * eflags, then the #AC originated from CPL3 and the guest is able
+> +     * to handle it. It does not matter whether this is a regular or
+> +     * a split lock operation induced #AC.
+> +     */
+> +    if (vmx_get_cpl(vcpu) == 3 && kvm_read_cr0_bits(vcpu, X86_CR0_AM) &&
+> +        kvm_get_rflags(vcpu) & X86_EFLAGS_AC)
+> +        return true;
+> +
+> +    /* Add guest SLD handling checks here once it's supported */
+> +    return false;
+> +}
+> +
+>   static int handle_exception_nmi(struct kvm_vcpu *vcpu)
+>   {
+>       struct vcpu_vmx *vmx = to_vmx(vcpu);
+> @@ -4630,6 +4647,7 @@ static int handle_exception_nmi(struct k
+>       u32 intr_info, ex_no, error_code;
+>       unsigned long cr2, rip, dr6;
+>       u32 vect_info;
+> +    int err;
+>         vect_info = vmx->idt_vectoring_info;
+>       intr_info = vmx->exit_intr_info;
+> @@ -4688,9 +4706,6 @@ static int handle_exception_nmi(struct k
+>           return handle_rmode_exception(vcpu, ex_no, error_code);
+>         switch (ex_no) {
+> -    case AC_VECTOR:
+> -        kvm_queue_exception_e(vcpu, AC_VECTOR, error_code);
+> -        return 1;
+>       case DB_VECTOR:
+>           dr6 = vmcs_readl(EXIT_QUALIFICATION);
+>           if (!(vcpu->guest_debug &
+> @@ -4719,6 +4734,29 @@ static int handle_exception_nmi(struct k
+>           kvm_run->debug.arch.pc = vmcs_readl(GUEST_CS_BASE) + rip;
+>           kvm_run->debug.arch.exception = ex_no;
+>           break;
+> +    case AC_VECTOR:
+> +        if (guest_handles_ac(vcpu)) {
+> +            kvm_queue_exception_e(vcpu, AC_VECTOR, error_code);
+> +            return 1;
+> +        }
+> +        /*
+> +         * Handle #AC caused by split lock detection. If the host
+> +         * mode is sld_warn, then it warns, marks current with
+> +         * TIF_SLD and disables split lock detection. So the guest
+> +         * can just continue.
+> +         *
+> +         * If the host mode is fatal, the handling code warned. Let
+> +         * qemu kill itself.
+> +         *
+> +         * If the host mode is off, then this #AC is bonkers and
+> +         * something is badly wrong. Let it fail as well.
+> +         */
+> +        err = handle_ac_split_lock(kvm_rip_read(vcpu));
+> +        if (!err)
+> +            return 1;
+> +        /* Propagate the error type to user space */
+> +        error_code = err == -EFAULT ? 0x100 : 0x200;
+> +        fallthrough;
 
-On 10/04/2020 6:52, Nadav Amit wrote:
-> 2. Try to run the tests with more than 4GB of memory. The last time I tried
->     (actually by running the test on bare metal), the INIT test that Liran
->     wrote failed.
->
-Wasn't this test failure fixed with kvm-unit-test commit fc47ccc19612 
-("x86: vmx: Verify pending LAPIC INIT event consume when exit on VMX_INIT")?
-If not, can you provide the details of this new failure? As I thought 
-this commit address the previous issue you have reported when running 
-this test
-on bare-metal.
 
-Thanks,
--Liran
+Acked-by: Paolo Bonzini <pbonzini@redhat.com>
 
