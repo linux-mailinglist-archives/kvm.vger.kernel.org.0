@@ -2,209 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 131471A40D3
-	for <lists+kvm@lfdr.de>; Fri, 10 Apr 2020 05:58:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9BF321A4025
+	for <lists+kvm@lfdr.de>; Fri, 10 Apr 2020 05:56:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728655AbgDJD55 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Apr 2020 23:57:57 -0400
-Received: from mga17.intel.com ([192.55.52.151]:5030 "EHLO mga17.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728408AbgDJDs6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Apr 2020 23:48:58 -0400
-IronPort-SDR: XNx1GpO2L9lxGagdJXXiqYj3WeLtPDwNu6KEceVUrON+8VZTuKuRDYQKSQRj7n9bh7Na/8l/9j
- 593OG0gWYorw==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Apr 2020 20:48:58 -0700
-IronPort-SDR: PMJlktvkLL+qA2z9GAk5PCuStScGWDR9cIT7sYx6Dmxj1zZGJjhOW3OqpZuvIpOJFcUpN9/ede
- FtRAMdL+l5rg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.72,364,1580803200"; 
-   d="scan'208";a="331068532"
-Received: from fmsmsx103.amr.corp.intel.com ([10.18.124.201])
-  by orsmga001.jf.intel.com with ESMTP; 09 Apr 2020 20:48:57 -0700
-Received: from fmsmsx111.amr.corp.intel.com (10.18.116.5) by
- FMSMSX103.amr.corp.intel.com (10.18.124.201) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Thu, 9 Apr 2020 20:48:57 -0700
-Received: from shsmsx151.ccr.corp.intel.com (10.239.6.50) by
- fmsmsx111.amr.corp.intel.com (10.18.116.5) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Thu, 9 Apr 2020 20:48:57 -0700
-Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.225]) by
- SHSMSX151.ccr.corp.intel.com ([169.254.3.22]) with mapi id 14.03.0439.000;
- Fri, 10 Apr 2020 11:48:53 +0800
-From:   "Liu, Yi L" <yi.l.liu@intel.com>
-To:     Auger Eric <eric.auger@redhat.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>
-CC:     "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "Tian, Jun J" <jun.j.tian@intel.com>,
-        "Sun, Yi Y" <yi.y.sun@intel.com>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Wu, Hao" <hao.wu@intel.com>
-Subject: RE: [PATCH v1 5/8] vfio/type1: Report 1st-level/stage-1 format to
- userspace
-Thread-Topic: [PATCH v1 5/8] vfio/type1: Report 1st-level/stage-1 format to
- userspace
-Thread-Index: AQHWAEUcqZEEdiOKbEGofjWp2Yic+6hjfq+AgAC/vLD//4YrAIAC1vWAgAbjh1CAARsGAIABbRkAgADQzoCAAHFwgIAAhnyw
-Date:   Fri, 10 Apr 2020 03:48:52 +0000
-Message-ID: <A2975661238FB949B60364EF0F2C25743A229ABC@SHSMSX104.ccr.corp.intel.com>
-References: <1584880325-10561-1-git-send-email-yi.l.liu@intel.com>
- <1584880325-10561-6-git-send-email-yi.l.liu@intel.com>
- <cb68e9ab-77b0-7e97-a661-4836962041d9@redhat.com>
- <A2975661238FB949B60364EF0F2C25743A21DB4E@SHSMSX104.ccr.corp.intel.com>
- <b47891b1-ece6-c263-9c07-07c09c7d3752@redhat.com>
- <20200403082305.GA1269501@myrica>
- <A2975661238FB949B60364EF0F2C25743A2249DF@SHSMSX104.ccr.corp.intel.com>
- <acf8c809-8d29-92d6-2445-3a94fc8b82fd@redhat.com>
- <20200409081442.GD2435@myrica>
- <A2975661238FB949B60364EF0F2C25743A229013@SHSMSX104.ccr.corp.intel.com>
- <194923cd-666c-2244-bfc6-95a1c61d4d99@redhat.com>
-In-Reply-To: <194923cd-666c-2244-bfc6-95a1c61d4d99@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-version: 11.2.0.6
-dlp-reaction: no-action
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
+        id S1729051AbgDJDxC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Apr 2020 23:53:02 -0400
+Received: from mail-pg1-f193.google.com ([209.85.215.193]:35472 "EHLO
+        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729279AbgDJDxC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Apr 2020 23:53:02 -0400
+Received: by mail-pg1-f193.google.com with SMTP id k5so486088pga.2
+        for <kvm@vger.kernel.org>; Thu, 09 Apr 2020 20:53:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=vSIPEPOc5ZIkDepQBj4MVQxNI/hKIwhnPMzWb3j2cdg=;
+        b=mOOFt0UftnQV7EQlLU/Z0Ws7IhdatJylqfsoCmwhaBgUZWrsNA6/RJ0YUzROT0KiVL
+         vdG9y4QVZ1Rl8giDRDcZMulEKGaFFQsydDGGKc4ARLVcPxDxStAiHkBvtD2+jeK01+uT
+         1GVs7W/T71S8PY9ewZMfiIaI4lFRnegc1qhwagu3hj+uG0QydUzrlPLTmTjCeFwjO9YQ
+         KcVlUlV6lbKQXZ0Oz5GU1/tLDDkRhQHClHOTGOJnN8kafIHAfeF1TsUuElWWsKz76dop
+         mky8pwdExPPlHT4HvPnKJLaQDljxBlF+uOgxWfUsmpuYyFZ/NXPT6CO9xlbAGRfKCgpS
+         b/TA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=vSIPEPOc5ZIkDepQBj4MVQxNI/hKIwhnPMzWb3j2cdg=;
+        b=ohOqHRFroaHam7dLdmNn8+8iY3s3OfhbhgMXKaocmsTcOMx5CpWHq1G5B4CFvtRdic
+         EfXPtpGvSqZqxYOK+hlUBo+CzLl9/zBFpJioSq1B4oWQDQPqWb0oqMeC6LGhhYGpR80D
+         ZOsv0DkBXadx+2WeL3Gsb4EeDlQP27Fdc6njJ0uv18nqpSSvjeG53f1oPC8zAzSMsmyO
+         UwihglIHojTmDf54ZsKnoKmFRLQnXT+oto7X2oM8GbaEln4Y9mAFUW3RaPuY4xCPZ88+
+         nj9YotJIX4A8K0w5VgybY/9CcEMuy3CwnHwm12u6uolrup43AwOgFbSEpdPOvELtCHkH
+         Daiw==
+X-Gm-Message-State: AGi0PuZsaxyv+p7dcYi/rWdK+T4F5ULA2qzp3+M5vPBcv2Y1R6cr93oz
+        +wMt3c0FcUQ29QIaSZxa52c=
+X-Google-Smtp-Source: APiQypJgEoPdhrJZvgMTrP0qIAy3rcKbJUAcjDjl3RwOCMwNaIkRgzs/3XW0Ty2wP8MV6mYBuLqHfw==
+X-Received: by 2002:a63:cf50:: with SMTP id b16mr2600005pgj.189.1586490779975;
+        Thu, 09 Apr 2020 20:52:59 -0700 (PDT)
+Received: from ?IPv6:2601:647:4700:9b2:d8e9:9b3c:bb20:8b56? ([2601:647:4700:9b2:d8e9:9b3c:bb20:8b56])
+        by smtp.gmail.com with ESMTPSA id w2sm521868pff.195.2020.04.09.20.52.58
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 09 Apr 2020 20:52:58 -0700 (PDT)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
+Subject: Re: Contribution to KVM.
+From:   Nadav Amit <nadav.amit@gmail.com>
+In-Reply-To: <c86002a6-d613-c0be-a672-cca8e9c83e1c@intel.com>
+Date:   Thu, 9 Apr 2020 20:52:57 -0700
+Cc:     kvm <kvm@vger.kernel.org>, kvmarm@lists.cs.columbia.edu,
+        Liran Alon <liran.alon@oracle.com>, like.xu@intel.com
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <2E118FCA-7AB1-480F-8F49-3EFD77CC2992@gmail.com>
+References: <CAEX+82KTJecx_aSHAPN9ZkS_YDiDfyEM9b6ji4wabmSZ6O516Q@mail.gmail.com>
+ <c86002a6-d613-c0be-a672-cca8e9c83e1c@intel.com>
+To:     Javier Romero <xavinux@gmail.com>
+X-Mailer: Apple Mail (2.3608.80.23.2.2)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-SGkgRXJpYywNCg0KPiBGcm9tOiBBdWdlciBFcmljIDxlcmljLmF1Z2VyQHJlZGhhdC5jb20+DQo+
-IFNlbnQ6IEZyaWRheSwgQXByaWwgMTAsIDIwMjAgMTE6MjggQU0NCj4gVG86IExpdSwgWWkgTCA8
-eWkubC5saXVAaW50ZWwuY29tPjsgSmVhbi1QaGlsaXBwZSBCcnVja2VyIDxqZWFuLQ0KPiBTdWJq
-ZWN0OiBSZTogW1BBVENIIHYxIDUvOF0gdmZpby90eXBlMTogUmVwb3J0IDFzdC1sZXZlbC9zdGFn
-ZS0xIGZvcm1hdCB0bw0KPiB1c2Vyc3BhY2UNCj4gDQo+IEhpIFlpLA0KPiANCj4gT24gNC85LzIw
-IDI6NDcgUE0sIExpdSwgWWkgTCB3cm90ZToNCj4gPiBIaSBKZWFuLA0KPiA+DQo+ID4+IEZyb206
-IEplYW4tUGhpbGlwcGUgQnJ1Y2tlciA8amVhbi1waGlsaXBwZUBsaW5hcm8ub3JnPg0KPiA+PiBT
-ZW50OiBUaHVyc2RheSwgQXByaWwgOSwgMjAyMCA0OjE1IFBNDQo+ID4+IFN1YmplY3Q6IFJlOiBb
-UEFUQ0ggdjEgNS84XSB2ZmlvL3R5cGUxOiBSZXBvcnQgMXN0LWxldmVsL3N0YWdlLTENCj4gPj4g
-Zm9ybWF0IHRvIHVzZXJzcGFjZQ0KPiA+Pg0KPiA+PiBPbiBXZWQsIEFwciAwOCwgMjAyMCBhdCAx
-MjoyNzo1OFBNICswMjAwLCBBdWdlciBFcmljIHdyb3RlOg0KPiA+Pj4gSGkgWWksDQo+ID4+Pg0K
-PiA+Pj4gT24gNC83LzIwIDExOjQzIEFNLCBMaXUsIFlpIEwgd3JvdGU6DQo+ID4+Pj4gSGkgSmVh
-biwNCj4gPj4+Pg0KPiA+Pj4+PiBGcm9tOiBKZWFuLVBoaWxpcHBlIEJydWNrZXIgPGplYW4tcGhp
-bGlwcGVAbGluYXJvLm9yZz4NCj4gPj4+Pj4gU2VudDogRnJpZGF5LCBBcHJpbCAzLCAyMDIwIDQ6
-MjMgUE0NCj4gPj4+Pj4gVG86IEF1Z2VyIEVyaWMgPGVyaWMuYXVnZXJAcmVkaGF0LmNvbT4gdXNl
-cnNwYWNlDQo+ID4+Pj4+DQo+ID4+Pj4+IE9uIFdlZCwgQXByIDAxLCAyMDIwIGF0IDAzOjAxOjEy
-UE0gKzAyMDAsIEF1Z2VyIEVyaWMgd3JvdGU6DQo+ID4+Pj4+Pj4+PiAgCWhlYWRlciA9IHZmaW9f
-aW5mb19jYXBfYWRkKGNhcHMsIHNpemVvZigqbmVzdGluZ19jYXApLA0KPiA+Pj4+Pj4+Pj4NCj4g
-Pj4gVkZJT19JT01NVV9UWVBFMV9JTkZPX0NBUF9ORVNUSU5HLCAxKTsNCj4gPj4+Pj4gQEAgLTIy
-NTQsNiArMjMwOSw3DQo+ID4+Pj4+Pj4+PiBAQCBzdGF0aWMgaW50IHZmaW9faW9tbXVfaW5mb19h
-ZGRfbmVzdGluZ19jYXAoc3RydWN0DQo+ID4+Pj4+Pj4+IHZmaW9faW9tbXUgKmlvbW11LA0KPiA+
-Pj4+Pj4+Pj4gIAkJLyogbmVzdGluZyBpb21tdSB0eXBlIHN1cHBvcnRzIFBBU0lEIHJlcXVlc3Rz
-DQo+IChhbGxvYy9mcmVlKQ0KPiA+PiAqLw0KPiA+Pj4+Pj4+Pj4gIAkJbmVzdGluZ19jYXAtPm5l
-c3RpbmdfY2FwYWJpbGl0aWVzIHw9DQo+ID4+IFZGSU9fSU9NTVVfUEFTSURfUkVRUzsNCj4gPj4+
-Pj4+Pj4gV2hhdCBpcyB0aGUgbWVhbmluZyBmb3IgQVJNPw0KPiA+Pj4+Pj4+DQo+ID4+Pj4+Pj4g
-SSB0aGluayBpdCdzIGp1c3QgYSBzb2Z0d2FyZSBjYXBhYmlsaXR5IGV4cG9zZWQgdG8gdXNlcnNw
-YWNlLCBvbg0KPiA+Pj4+Pj4+IHVzZXJzcGFjZSBzaWRlLCBpdCBoYXMgYSBjaG9pY2UgdG8gdXNl
-IGl0IG9yIG5vdC4gOi0pIFRoZSByZWFzb24NCj4gPj4+Pj4+PiBkZWZpbmUgaXQgYW5kIHJlcG9y
-dCBpdCBpbiBjYXAgbmVzdGluZyBpcyB0aGF0IEknZCBsaWtlIHRvIG1ha2UNCj4gPj4+Pj4+PiB0
-aGUgcGFzaWQgYWxsb2MvZnJlZSBiZSBhdmFpbGFibGUganVzdCBmb3IgSU9NTVUgd2l0aCB0eXBl
-DQo+ID4+Pj4+Pj4gVkZJT19JT01NVV9UWVBFMV9ORVNUSU5HLiBQbGVhc2UgZmVlbCBmcmVlIHRl
-bGwgbWUgaWYgaXQgaXMgbm90DQo+ID4+Pj4+Pj4gZ29vZCBmb3IgQVJNLiBXZSBjYW4gZmluZCBh
-IHByb3BlciB3YXkgdG8gcmVwb3J0IHRoZSBhdmFpbGFiaWxpdHkuDQo+ID4+Pj4+Pg0KPiA+Pj4+
-Pj4gV2VsbCBpdCBpcyBtb3JlIGEgcXVlc3Rpb24gZm9yIGplYW4tUGhpbGlwcGUuIERvIHdlIGhh
-dmUgYSBzeXN0ZW0NCj4gPj4+Pj4+IHdpZGUgUEFTSUQgYWxsb2NhdGlvbiBvbiBBUk0/DQo+ID4+
-Pj4+DQo+ID4+Pj4+IFdlIGRvbid0LCB0aGUgUEFTSUQgc3BhY2VzIGFyZSBwZXItVk0gb24gQXJt
-LCBzbyB0aGlzIGZ1bmN0aW9uDQo+ID4+Pj4+IHNob3VsZCBjb25zdWx0DQo+ID4+IHRoZQ0KPiA+
-Pj4+PiBJT01NVSBkcml2ZXIgYmVmb3JlIHNldHRpbmcgZmxhZ3MuIEFzIHlvdSBzYWlkIG9uIHBh
-dGNoIDMsIG5lc3RlZA0KPiA+Pj4+PiBkb2Vzbid0IG5lY2Vzc2FyaWx5IGltcGx5IFBBU0lEIHN1
-cHBvcnQuIFRoZSBTTU1VdjIgZG9lcyBub3QNCj4gPj4+Pj4gc3VwcG9ydCBQQVNJRCBidXQgZG9l
-cyBzdXBwb3J0IG5lc3Rpbmcgc3RhZ2VzIDEgYW5kIDIgZm9yIHRoZSBJT1ZBIHNwYWNlLg0KPiA+
-Pj4+PiBTTU1VdjMgc3VwcG9ydCBvZiBQQVNJRCBkZXBlbmRzIG9uIEhXIGNhcGFiaWxpdGllcy4g
-U28gSSB0aGluaw0KPiA+Pj4+PiB0aGlzIG5lZWRzIHRvDQo+ID4+IGJlDQo+ID4+Pj4+IGZpbmVy
-IGdyYWluZWQ6DQo+ID4+Pj4+DQo+ID4+Pj4+IERvZXMgdGhlIGNvbnRhaW5lciBzdXBwb3J0Og0K
-PiA+Pj4+PiAqIFZGSU9fSU9NTVVfUEFTSURfUkVRVUVTVD8NCj4gPj4+Pj4gICAtPiBZZXMgZm9y
-IFZULWQgMw0KPiA+Pj4+PiAgIC0+IE5vIGZvciBBcm0gU01NVQ0KPiA+Pj4+PiAqIFZGSU9fSU9N
-TVVfeyxVTn1CSU5EX0dVRVNUX1BHVEJMPw0KPiA+Pj4+PiAgIC0+IFllcyBmb3IgVlQtZCAzDQo+
-ID4+Pj4+ICAgLT4gU29tZXRpbWVzIGZvciBTTU1VdjINCj4gPj4+Pj4gICAtPiBObyBmb3IgU01N
-VXYzIChpZiB3ZSBnbyB3aXRoIEJJTkRfUEFTSURfVEFCTEUsIHdoaWNoIGlzIHNpbXBsZXINCj4g
-ZHVlIHRvDQo+ID4+Pj4+ICAgICAgUEFTSUQgdGFibGVzIGJlaW5nIGluIEdQQSBzcGFjZS4pDQo+
-ID4+Pj4+ICogVkZJT19JT01NVV9CSU5EX1BBU0lEX1RBQkxFPw0KPiA+Pj4+PiAgIC0+IE5vIGZv
-ciBWVC1kDQo+ID4+Pj4+ICAgLT4gU29tZXRpbWVzIGZvciBTTU1VdjMNCj4gPj4+Pj4NCj4gPj4+
-Pj4gQW55IGJpbmQgc3VwcG9ydCBpbXBsaWVzIFZGSU9fSU9NTVVfQ0FDSEVfSU5WQUxJREFURSBz
-dXBwb3J0Lg0KPiA+Pj4+DQo+ID4+Pj4gZ29vZCBzdW1tYXJ5LiBkbyB5b3UgZXhwZWN0IHRvIHNl
-ZSBhbnkNCj4gPj4+Pg0KPiA+Pj4+Pg0KPiA+Pj4+Pj4+Pj4gKwluZXN0aW5nX2NhcC0+c3RhZ2Ux
-X2Zvcm1hdHMgPSBmb3JtYXRzOw0KPiA+Pj4+Pj4+PiBhcyBzcG90dGVkIGJ5IEtldmluLCBzaW5j
-ZSBhIHNpbmdsZSBmb3JtYXQgaXMgc3VwcG9ydGVkLCByZW5hbWUNCj4gPj4+Pj4+Pg0KPiA+Pj4+
-Pj4+IG9rLCBJIHdhcyBiZWxpZXZpbmcgaXQgbWF5IGJlIHBvc3NpYmxlIG9uIEFSTSBvciBzby4g
-Oi0pIHdpbGwNCj4gPj4+Pj4+PiByZW5hbWUgaXQuDQo+ID4+Pj4+DQo+ID4+Pj4+IFllcyBJIGRv
-bid0IHRoaW5rIGFuIHUzMiBpcyBnb2luZyB0byBjdXQgaXQgZm9yIEFybSA6KCBXZSBuZWVkIHRv
-DQo+ID4+Pj4+IGRlc2NyaWJlIGFsbCBzb3J0cw0KPiA+PiBvZg0KPiA+Pj4+PiBjYXBhYmlsaXRp
-ZXMgZm9yIHBhZ2UgYW5kIFBBU0lEIHRhYmxlcyAoZ3JhbnVsZXMsIEdQQSBzaXplLA0KPiA+Pj4+
-PiBBU0lEL1BBU0lEIHNpemUsIEhXIGFjY2Vzcy9kaXJ0eSwgZXRjIGV0Yy4pIEp1c3Qgc2F5aW5n
-ICJBcm0NCj4gPj4+Pj4gc3RhZ2UtMSBmb3JtYXQiIHdvdWxkbid0IG1lYW4gbXVjaC4gSSBndWVz
-cyB3ZSBjb3VsZCBoYXZlIGEgc2Vjb25kYXJ5DQo+IHZlbmRvciBjYXBhYmlsaXR5IGZvciB0aGVz
-ZT8NCj4gPj4+Pg0KPiA+Pj4+IEFjdHVhbGx5LCBJJ20gd29uZGVyaW5nIGlmIHdlIGNhbiBkZWZp
-bmUgc29tZSBmb3JtYXRzIHRvIHN0YW5kcyBmb3INCj4gPj4+PiBhIHNldCBvZiBjYXBhYmlsaXRp
-ZXMuIGUuZy4gVlREX1NUQUdFMV9GT1JNQVRfVjEgd2hpY2ggbWF5DQo+ID4+Pj4gaW5kaWNhdGVz
-IHRoZSAxc3QgbGV2ZWwgcGFnZSB0YWJsZSByZWxhdGVkIGNhcHMgKGF3LCBhL2QsIFNSRSwgRUEN
-Cj4gPj4+PiBhbmQgZXRjLikuIEFuZCB2SU9NTVUgY2FuIHBhcnNlIHRoZSBjYXBhYmlsaXRpZXMu
-DQo+ID4+Pg0KPiA+Pj4gQnV0IGV2ZW50dWFsbHkgZG8gd2UgcmVhbGx5IG5lZWQgYWxsIHRob3Nl
-IGNhcGFiaWxpdHkgZ2V0dGVycz8gSQ0KPiA+Pj4gbWVhbiBjYW4ndCB3ZSBzaW1wbHkgcmVseSBv
-biB0aGUgYWN0dWFsIGNhbGwgdG8NCj4gPj4+IFZGSU9fSU9NTVVfQklORF9HVUVTVF9QR1RCTCgp
-IHRvIGRldGVjdCBhbnkgbWlzbWF0Y2g/IERlZmluaXRpdmVseQ0KPiA+Pj4gdGhlIGVycm9yIGhh
-bmRsaW5nIG1heSBiZSBoZWF2aWVyIG9uIHVzZXJzcGFjZSBidXQgY2FuJ3Qgd2UgbWFuYWdlLg0K
-PiA+Pg0KPiA+PiBJIHRoaW5rIHdlIG5lZWQgdG8gcHJlc2VudCB0aGVzZSBjYXBhYmlsaXRpZXMg
-YXQgYm9vdCB0aW1lLCBsb25nDQo+ID4+IGJlZm9yZSB0aGUgZ3Vlc3QgdHJpZ2dlcnMgYSBiaW5k
-KCkuIEZvciBleGFtcGxlIGlmIHRoZSBob3N0IFNNTVUNCj4gPj4gZG9lc24ndCBzdXBwb3J0IDE2
-LWJpdCBBU0lELCB3ZSBuZWVkIHRvIGNvbW11bmljYXRlIHRoYXQgdG8gdGhlIGd1ZXN0DQo+ID4+
-IHVzaW5nIHZTTU1VIElEIHJlZ2lzdGVycyBvciBQUk9CRSBwcm9wZXJ0aWVzLiBPdGhlcndpc2Ug
-YSBiaW5kKCkgd2lsbA0KPiA+PiBzdWNjZWVkLCBidXQgaWYgdGhlIGd1ZXN0IHVzZXMgMTYtYml0
-IEFTSURzIGluIGl0cyBDRCwgRE1BIHdpbGwNCj4gPj4gcmVzdWx0IGluIENfQkFEX0NEIGV2ZW50
-cyB3aGljaCB3ZSdsbCBpbmplY3QgaW50byB0aGUgZ3Vlc3QsIGZvciBubw0KPiA+PiBhcHBhcmVu
-dCByZWFzb24gZnJvbSB0aGVpciBwZXJzcGVjdGl2ZS4NCj4gPj4NCj4gPj4gSW4gYWRkaXRpb24g
-c29tZSBWTU1zIG1heSBoYXZlIGZhbGxiYWNrcyBpZiBzaGFyZWQgcGFnZSB0YWJsZXMgYXJlDQo+
-ID4+IG5vdCBhdmFpbGFibGUuIFRoZXkgY291bGQgZmFsbCBiYWNrIHRvIGEgTUFQL1VOTUFQIGlu
-dGVyZmFjZSwgb3INCj4gPj4gc2ltcGx5IG5vdCBwcmVzZW50IGEgdklPTU1VIHRvIHRoZSBndWVz
-dC4NCj4gPj4NCj4gPg0KPiA+IEJhc2VkIG9uIHRoZSBjb21tZW50cywgSSB0aGluayBpdCB3b3Vs
-ZCBiZSBhIG5lZWQgdG8gcmVwb3J0IGlvbW11IGNhcHMNCj4gPiBpbiBkZXRhaWwuIFNvIEkgZ3Vl
-c3MgaW9tbXUgdWFwaSBuZWVkcyB0byBwcm92aWRlIHNvbWV0aGluZyBhbGlrZSB2ZmlvDQo+ID4g
-Y2FwIGNoYWluIGluIGlvbW11IHVhcGkuIFBsZWFzZSBmZWVsIGZyZWUgbGV0IG1lIGtub3cgeW91
-ciB0aG91Z2h0cy4NCj4gPiA6LSkNCj4gDQo+IFllcyB0byBtZSBpdCBzb3VuZHMgc2Vuc2libGUu
-DQo+ID4NCj4gPiBJbiB2ZmlvLCB3ZSBjYW4gZGVmaW5lIGEgY2FwIGFzIGJlbG93Og0KPiA+DQo+
-ID4gc3RydWN0IHZmaW9faW9tbXVfdHlwZTFfaW5mb19jYXBfbmVzdGluZyB7DQo+ID4gCXN0cnVj
-dCAgdmZpb19pbmZvX2NhcF9oZWFkZXIgaGVhZGVyOw0KPiA+IAlfX3U2NAlpb21tdV9tb2RlbDsN
-Cj4gPiAjZGVmaW5lIFZGSU9fSU9NTVVfUEFTSURfUkVRUwkJKDEgPDwgMCkNCj4gSSBzdGlsbCB0
-aGluayB0aGUgbmFtZSBzaGFsbCBiZSBjaGFuZ2VkDQoNCnllcywgSSdsbCByZW5hbWUgaXQgcGVy
-IHlvdXIgc3VnZ2VzdGlvbi46LSkNCg0KPiA+ICNkZWZpbmUgVkZJT19JT01NVV9CSU5EX0dQQVNJ
-RAkJKDEgPDwgMSkNCj4gPiAjZGVmaW5lIFZGSU9fSU9NTVVfQ0FDSEVfSU5WCQkoMSA8PCAyKQ0K
-PiB0aGlzIG9wZXJhdGlvbiBzZWVtcyBtYW5kYXRlZCBhcyBzb29uIGFzIHdlIGhhdmUgYSBuZXN0
-ZWQgcGFnaW5nIGJhc2VkDQo+IGltcGxlbWVudGF0aW9uPw0KDQpvaCwgeWVzLCBzaG91bGQgYmUu
-IHdpbGwgcmVtb3ZlIGl0IGFuZCBjb21tZW50IGluIHRoZSBjb2RlLg0KDQpSZWdhcmRzLA0KWWkg
-TGl1DQoNCj4gPiAJX191MzIJbmVzdGluZ19jYXBhYmlsaXRpZXM7DQo+ID4gCV9fdTMyCXBhc2lk
-X2JpdHM7DQo+ID4gI2RlZmluZSBWRklPX0lPTU1VX1ZFTkRPUl9TVUJfQ0FQCSgxIDw8IDMpDQo+
-ID4gCV9fdTMyCWZsYWdzOw0KPiA+IAlfX3UzMglkYXRhX3NpemU7DQo+ID4gCV9fdTgJZGF0YVtd
-OyAgLyppb21tdSBpbmZvIGNhcHMgZGVmaW5lZCBieSBpb21tdSB1YXBpICovDQo+ID4gfTsNCj4g
-Pg0KPiA+IFZGSU8gbmVlZHMgbmV3IGlvbW11IEFQSXMgdG8gYXNrIGlvbW11IGRyaXZlciB3aGV0
-aGVyDQo+ID4gUEFTSUQvYmluZF9ncGFzaWQvIGNhY2hlX2ludi9iaW5kX2dwYXNpZF90YWJsZSBp
-cyBhdmFpbGFibGUgb3Igbm90IGFuZA0KPiA+IGFsc28gdGhlIHBhc2lkIGJpdHMuIEFmdGVyIHRo
-YXQgVkZJTyB3aWxsIGFzayBpb21tdSBkcml2ZXIgYWJvdXQgdGhlDQo+ID4gaW9tbXVfY2FwX2lu
-Zm8gYW5kIGZpbGwgaW4gdGhlIEBkYXRhW10gZmllbGQuDQo+ID4NCj4gPiBpb21tdSB1YXBpOg0K
-PiA+IHN0cnVjdCBpb21tdV9pbmZvX2NhcF9oZWFkZXIgew0KPiA+IAlfX3UxNglpZDsJCS8qIElk
-ZW50aWZpZXMgY2FwYWJpbGl0eSAqLw0KPiA+IAlfX3UxNgl2ZXJzaW9uOwkJLyogVmVyc2lvbiBz
-cGVjaWZpYyB0byB0aGUgY2FwYWJpbGl0eSBJRCAqLw0KPiA+IAlfX3UzMgluZXh0OwkJLyogT2Zm
-c2V0IG9mIG5leHQgY2FwYWJpbGl0eSAqLw0KPiA+IH07DQo+ID4NCj4gPiAjZGVmaW5lIElPTU1V
-X0lORk9fQ0FQX0lOVEVMX1ZURCAxDQo+ID4gc3RydWN0IGlvbW11X2luZm9fY2FwX2ludGVsX3Z0
-ZCB7DQo+ID4gCXN0cnVjdAlpb21tdV9pbmZvX2NhcF9oZWFkZXIgaGVhZGVyOw0KPiA+IAlfX3Uz
-MiAgIHZhZGRyX3dpZHRoOyAgIC8qIFZBIGFkZHJfd2lkdGgqLw0KPiA+IAlfX3UzMiAgIGlwYWRk
-cl93aWR0aDsgLyogSVBBIGFkZHJfd2lkdGgsIGlucHV0IG9mIFNMIHBhZ2UgdGFibGUgKi8NCj4g
-PiAJLyogc2FtZSBkZWZpbml0aW9uIHdpdGggQGZsYWdzIGluc3RydWN0IGlvbW11X2dwYXNpZF9i
-aW5kX2RhdGFfdnRkICovDQo+ID4gCV9fdTY0CWZsYWdzOw0KPiA+IH07DQo+ID4NCj4gPiAjZGVm
-aW5lIElPTU1VX0lORk9fQ0FQX0FSTV9TTU1VdjMgMg0KPiA+IHN0cnVjdCBpb21tdV9pbmZvX2Nh
-cF9hcm1fc21tdXYzIHsNCj4gPiAJc3RydWN0CWlvbW11X2luZm9fY2FwX2hlYWRlciBoZWFkZXI7
-DQo+ID4gCS4uLg0KPiA+IH07DQo+IA0KPiBUaGFua3MNCj4gDQo+IEVyaWMNCj4gPg0KPiA+IFJl
-Z2FyZHMsDQo+ID4gWWkgTGl1DQo+ID4NCg0K
+> On Apr 9, 2020, at 8:34 PM, Xu, Like <like.xu@intel.com> wrote:
+>=20
+> On 2020/4/10 5:29, Javier Romero wrote:
+>> Hello,
+>>=20
+>>  My name is Javier, live in Argentina and work as a cloud engineer.
+>>=20
+>> Have been working with Linux servers for the last 10 years in an
+>> Internet Service Provider and I'm interested in contributing to KVM
+> Welcome, I'm a newbie as well.
+>> maybe with testing as a start point.
+> You may try the =
+http://git.kernel.org/pub/scm/virt/kvm/kvm-unit-tests.git
+> and tools/testing/selftests/kvm in the kernel tree.
+>> If it can be useful to test KVM on ARM, I have a Raspberry PI 3 at =
+disposal.
+> If you test KVM on Intel platforms, you will definitely get support =
+from me :D.
+
+If you are looking for something specific, here are two issues with
+relatively limited scope, which AFAIK were not resolved:
+
+1. Shadow VMCS bug, which is also a test bug [1]. You can start by =
+fixing
+   the test and then fix KVM.
+
+2. Try to run the tests with more than 4GB of memory. The last time I =
+tried
+   (actually by running the test on bare metal), the INIT test that =
+Liran
+   wrote failed.
+
+Regards,
+Nadav
+
+[1] =
+https://lore.kernel.org/kvm/3235DBB0-0DC0-418C-BC45-A4B78612E273@gmail.com=
+/T/#u=
