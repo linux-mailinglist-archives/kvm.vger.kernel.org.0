@@ -2,68 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7B77D1A4379
-	for <lists+kvm@lfdr.de>; Fri, 10 Apr 2020 10:24:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A58971A438C
+	for <lists+kvm@lfdr.de>; Fri, 10 Apr 2020 10:33:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726181AbgDJIYL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Apr 2020 04:24:11 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:50461 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1725993AbgDJIYL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Apr 2020 04:24:11 -0400
+        id S1725912AbgDJIdP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Apr 2020 04:33:15 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:52495 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725858AbgDJIdP (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 10 Apr 2020 04:33:15 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1586507050;
+        s=mimecast20190719; t=1586507594;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=jhbDWM/COmRzn52zE0cD200v2Q1E5S+PCb8ygVpftN0=;
-        b=SbPFVbLgc7HgyREdbYOlM4AxdxFZCYuJxMhftIJVC+gPzcKpYfJ7KHhGVBWkbRKSzDMxdu
-        7SYakwNFWh8gl0e2UIDXs9mk/Mp7H0DLwq1KKGlAG4nn5qXI0vcDOaX8lk07p6Cbe6zici
-        aEvCK7ZaTz8nN3nLAFxtaLd1v/8mFoY=
+        bh=tgngn9BuGL/zJPxWxLHGSpP5ErqyA3e9IEzjGvABwSY=;
+        b=EZzgjKRDOBnYxDiz7IS59TOE+H3ecyo/Q9J6CqE5vxNwaL3Tt0ynyEJiBuo5CG3v/r6ZeO
+        xryTxk6kbO4t0vRtqO+mHAlVxeytcS7806EPSfPF7O4P1Ir17ffsjG06pzmYOFUk1oUsjb
+        A6KrKw8jVa9Fzm8CvDbSgnCX76PeAhI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-402-jQWAT0sWMkGl3PDpjBe6gA-1; Fri, 10 Apr 2020 04:24:05 -0400
-X-MC-Unique: jQWAT0sWMkGl3PDpjBe6gA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+ us-mta-364-mTxGTSp4NpS6RmU_ltFrAg-1; Fri, 10 Apr 2020 04:33:09 -0400
+X-MC-Unique: mTxGTSp4NpS6RmU_ltFrAg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B4DD6DB60;
-        Fri, 10 Apr 2020 08:24:02 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F1CF2107ACC7;
+        Fri, 10 Apr 2020 08:33:07 +0000 (UTC)
 Received: from [10.72.12.205] (ovpn-12-205.pek2.redhat.com [10.72.12.205])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id CB11760BFB;
-        Fri, 10 Apr 2020 08:23:40 +0000 (UTC)
-Subject: Re: [PATCH V9 8/9] vdpasim: vDPA device simulator
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 2B44F5C1BB;
+        Fri, 10 Apr 2020 08:33:02 +0000 (UTC)
+Subject: Re: vhost: refine vhost and vringh kconfig
 To:     Geert Uytterhoeven <geert@linux-m68k.org>
 Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
         KVM list <kvm@vger.kernel.org>,
-        virtualization@lists.linux-foundation.org,
-        netdev <netdev@vger.kernel.org>,
-        Jason Gunthorpe <jgg@mellanox.com>, maxime.coquelin@redhat.com,
-        cunming.liang@intel.com, zhihong.wang@intel.com,
-        rob.miller@broadcom.com, xiao.w.wang@intel.com,
-        lingshan.zhu@intel.com, eperezma@redhat.com, lulu@redhat.com,
-        parav@mellanox.com, kevin.tian@intel.com, stefanha@redhat.com,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Christoph Hellwig <hch@infradead.org>, aadam@redhat.com,
-        Jiri Pirko <jiri@mellanox.com>, shahafs@mellanox.com,
-        hanand@xilinx.com, Martin Habets <mhabets@solarflare.com>,
-        gdawar@xilinx.com, saugatm@xilinx.com, vmireyno@marvell.com,
-        zhangweining@ruijie.com.cn
-References: <20200326140125.19794-1-jasowang@redhat.com>
- <20200326140125.19794-9-jasowang@redhat.com>
- <CAMuHMdUis3O_mJKOb2s=_=Zs61iHus5Aq74N3-xs7kmjN+egoQ@mail.gmail.com>
+        virtualization@lists.linux-foundation.org
+References: <git-mailbomb-linux-master-20c384f1ea1a0bc7320bc445c72dd02d2970d594@kernel.org>
+ <CAMuHMdUkff8XUrbHa90nGxa8Kj3HO9b2CRO57s3YZrSFPM51pg@mail.gmail.com>
 From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <108f65dd-f1b1-54ec-ae26-49842f3686b6@redhat.com>
-Date:   Fri, 10 Apr 2020 16:23:38 +0800
+Message-ID: <f7fc96d4-de8e-cdce-bd98-242cdade2843@redhat.com>
+Date:   Fri, 10 Apr 2020 16:33:01 +0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <CAMuHMdUis3O_mJKOb2s=_=Zs61iHus5Aq74N3-xs7kmjN+egoQ@mail.gmail.com>
+In-Reply-To: <CAMuHMdUkff8XUrbHa90nGxa8Kj3HO9b2CRO57s3YZrSFPM51pg@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
@@ -71,66 +57,98 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
-On 2020/4/10 =E4=B8=8B=E5=8D=883:45, Geert Uytterhoeven wrote:
+On 2020/4/10 =E4=B8=8B=E5=8D=883:53, Geert Uytterhoeven wrote:
 > Hi Jason,
 >
-> On Thu, Mar 26, 2020 at 3:07 PM Jason Wang <jasowang@redhat.com> wrote:
->> This patch implements a software vDPA networking device. The datapath
->> is implemented through vringh and workqueue. The device has an on-chip
->> IOMMU which translates IOVA to PA. For kernel virtio drivers, vDPA
->> simulator driver provides dma_ops. For vhost driers, set_map() methods
->> of vdpa_config_ops is implemented to accept mappings from vhost.
+> On Thu, Apr 9, 2020 at 6:04 AM Linux Kernel Mailing List
+> <linux-kernel@vger.kernel.org> wrote:
+>> Commit:     20c384f1ea1a0bc7320bc445c72dd02d2970d594
+>> Parent:     5a6b4cc5b7a1892a8d7f63d6cbac6e0ae2a9d031
+>> Refname:    refs/heads/master
+>> Web:        https://git.kernel.org/torvalds/c/20c384f1ea1a0bc7320bc445=
+c72dd02d2970d594
+>> Author:     Jason Wang <jasowang@redhat.com>
+>> AuthorDate: Thu Mar 26 22:01:17 2020 +0800
+>> Committer:  Michael S. Tsirkin <mst@redhat.com>
+>> CommitDate: Wed Apr 1 12:06:26 2020 -0400
 >>
->> Currently, vDPA device simulator will loopback TX traffic to RX. So
->> the main use case for the device is vDPA feature testing, prototyping
->> and development.
+>>      vhost: refine vhost and vringh kconfig
 >>
->> Note, there's no management API implemented, a vDPA device will be
->> registered once the module is probed. We need to handle this in the
->> future development.
+>>      Currently, CONFIG_VHOST depends on CONFIG_VIRTUALIZATION. But vho=
+st is
+>>      not necessarily for VM since it's a generic userspace and kernel
+>>      communication protocol. Such dependency may prevent archs without
+>>      virtualization support from using vhost.
 >>
->> Signed-off-by: Jason Wang <jasowang@redhat.com>
-> This is now commit 2c53d0f64c06f458 ("vdpasim: vDPA device simulator").
->
->> --- a/drivers/virtio/vdpa/Kconfig
->> +++ b/drivers/virtio/vdpa/Kconfig
->> @@ -5,3 +5,22 @@ config VDPA
->>            Enable this module to support vDPA device that uses a
->>            datapath which complies with virtio specifications with
->>            vendor specific control path.
+>>      To solve this, a dedicated vhost menu is created under drivers so
+>>      CONIFG_VHOST can be decoupled out of CONFIG_VIRTUALIZATION.
+>>
+>>      While at it, also squash Kconfig.vringh into vhost Kconfig file. =
+This
+>>      avoids the trick of conditional inclusion from VOP or CAIF. Then =
+it
+>>      will be easier to introduce new vringh users and common dependenc=
+y for
+>>      both vringh and vhost.
+>>
+>>      Signed-off-by: Jason Wang <jasowang@redhat.com>
+>>      Link: https://lore.kernel.org/r/20200326140125.19794-2-jasowang@r=
+edhat.com
+>>      Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+>> ---
+>>   arch/arm/kvm/Kconfig         |  2 --
+>>   arch/arm64/kvm/Kconfig       |  2 --
+>>   arch/mips/kvm/Kconfig        |  2 --
+>>   arch/powerpc/kvm/Kconfig     |  2 --
+>>   arch/s390/kvm/Kconfig        |  4 ----
+>>   arch/x86/kvm/Kconfig         |  4 ----
+>>   drivers/Kconfig              |  2 ++
+>>   drivers/misc/mic/Kconfig     |  4 ----
+>>   drivers/net/caif/Kconfig     |  4 ----
+>>   drivers/vhost/Kconfig        | 28 +++++++++++++++++++++-------
+>>   drivers/vhost/Kconfig.vringh |  6 ------
+>>   11 files changed, 23 insertions(+), 37 deletions(-)
+>> --- a/drivers/vhost/Kconfig
+>> +++ b/drivers/vhost/Kconfig
+>> @@ -1,4 +1,23 @@
+>>   # SPDX-License-Identifier: GPL-2.0-only
+>> +config VHOST_RING
+>> +       tristate
+>> +       help
+>> +         This option is selected by any driver which needs to access
+>> +         the host side of a virtio ring.
 >> +
->> +menuconfig VDPA_MENU
->> +       bool "VDPA drivers"
->> +       default n
->      *
->      * VDPA drivers
->      *
->      VDPA drivers (VDPA_MENU) [N/y/?] (NEW) ?
+>> +config VHOST
+>> +       tristate
+>> +       select VHOST_IOTLB
+>> +       help
+>> +         This option is selected by any driver which needs to access
+>> +         the core of vhost.
+>> +
+>> +menuconfig VHOST_MENU
+>> +       bool "VHOST drivers"
+>> +       default y
+> Please do not use default y. Your subsystem is not special.
+
+
+This is because before this patch VHOST depends on VIRTUALIZATION. So=20
+the archs whose defconfig that has VIRTUALIZATION can just enable e.g=20
+VHOST_NET without caring about VHOST_MENU.
+
+If this is not preferable, we can:
+
+1) modify the defconfig and enable VHOST_MENU there
+2) switch to use default y if $(all_archs_that_has_VIRTUALIZATION)
+
+
 >
->      There is no help available for this option.
->      Symbol: VDPA_MENU [=3Dn]
->      Type  : bool
->      Defined at drivers/vdpa/Kconfig:9
->       Prompt: VDPA drivers
->       Location:
->         -> Device Drivers
->
+>> +
 > I think this deserves a help text, so users know if they want to enable=
  this
 > option or not.
 
 
-Will add a help text for this.
-
-
->
-> I had a quick look, but couldn't find the meaning of "vdpa" in the whol=
-e kernel
-> source tree.
-
-
-The meaning was explained in the commit log of=20
-961e9c84077f6c8579d7a628cbe94a675cb67ae4 and help text for CONFIG_VDPA.
+Will add one.
 
 Thanks
 
@@ -138,23 +156,24 @@ Thanks
 >
 > Thanks!
 >
+>> +if VHOST_MENU
 >> +
->> +if VDPA_MENU
->> +
->> +config VDPA_SIM
->> +       tristate "vDPA device simulator"
->> +       depends on RUNTIME_TESTING_MENU
->> +       select VDPA
->> +       select VHOST_RING
->> +       default n
->> +       help
->> +         vDPA networking device simulator which loop TX traffic back
->> +         to RX. This device is used for testing, prototyping and
->> +         development of vDPA.
->> +
->> +endif # VDPA_MENU
+>>   config VHOST_NET
+>>          tristate "Host kernel accelerator for virtio net"
+>>          depends on NET && EVENTFD && (TUN || !TUN) && (TAP || !TAP)
 > Gr{oetje,eeting}s,
 >
 >                          Geert
+>
+>
+> --
+> Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-=
+m68k.org
+>
+> In personal conversations with technical people, I call myself a hacker=
+. But
+> when I'm talking to journalists I just say "programmer" or something li=
+ke that.
+>                                  -- Linus Torvalds
 >
 
