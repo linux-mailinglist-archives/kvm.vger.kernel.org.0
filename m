@@ -2,110 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 407F41A421B
-	for <lists+kvm@lfdr.de>; Fri, 10 Apr 2020 06:49:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 75E8C1A4323
+	for <lists+kvm@lfdr.de>; Fri, 10 Apr 2020 09:45:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725880AbgDJEtY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Apr 2020 00:49:24 -0400
-Received: from mail-pg1-f194.google.com ([209.85.215.194]:35786 "EHLO
-        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725839AbgDJEtY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Apr 2020 00:49:24 -0400
-Received: by mail-pg1-f194.google.com with SMTP id k5so536329pga.2
-        for <kvm@vger.kernel.org>; Thu, 09 Apr 2020 21:49:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=mgQP5fmEp3MLJlgjlz6jaeSibt5vSyFPfuJ0XoZcVIE=;
-        b=YTCccdodR7/n1FEyARWl3Q04RpXd2xuQdfe6IsTM12uKGt3usSyb2eI5D/mUXyhg+C
-         xuGZYqPVKMhumQ92IfZVyl92N4kyqYQfGA3a91Wg3UaISaKEKqMCoZeKJjDY9wRafAE6
-         PkbaMayND2HOLKolooArZg6Mq2xIo0mfnSbXvwYLzgzPN9IiFqgjfjT8foeD2QzjbX5Y
-         v2lrgetZH/0qCp+TuiaFSKpAowRrruA7Te0oBpmMf1XmmJsLb9m98HA+h5hnguqYbzgR
-         xCI0zpEBq2WE4tNV8g/dhJpyIFjCOeENUnGHlWUuXCRLYK3FxdG7SaPXHQg+C4swiXuU
-         Muqw==
+        id S1726682AbgDJHpV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Apr 2020 03:45:21 -0400
+Received: from mail-ot1-f65.google.com ([209.85.210.65]:46017 "EHLO
+        mail-ot1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725776AbgDJHpV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Apr 2020 03:45:21 -0400
+Received: by mail-ot1-f65.google.com with SMTP id 60so1105941otl.12;
+        Fri, 10 Apr 2020 00:45:21 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=mgQP5fmEp3MLJlgjlz6jaeSibt5vSyFPfuJ0XoZcVIE=;
-        b=WZ8nQ7u9iaocUnsPHAUBYtYPtZX7EEKQqXmKvxk+loVvtoEtSlpM5Ed36O1n+VeNnA
-         8JYdIhuK2CUmgcfFLiXQH2Z8yun8MXhyVoOe/AU68CQxR3YQQrX1TM0qj1HInxwfG3kO
-         chHI5lFQW9NQ1hhEML5ngpM7LaNoVRXRQjpDv421LRIsEX6ZCnJ5EhBiBHzx+w1SZ6NR
-         QdWm+hS3K9jSMowQvgi5KkHN4+7c3CxIvw1XwJYvsBru7wx1Rn18j/QWVPFMCy/buU/f
-         aLrx8A0LCaM79bHmGE09I6mEGH7EHzHL2leX97VvQTVdtYARiLyOmb1vkdGJsQrJL5Dh
-         sYTw==
-X-Gm-Message-State: AGi0Pubkc7/jzgGT6j3IEBdByRnHhDJdazY0nBxm9mXkRASuSh2eNRrh
-        bNGZVzWuA/gfxaxTpOx9XNMLfgrw0l5egUrybQg=
-X-Google-Smtp-Source: APiQypLgdOSROqVPX4hxkv96w6ogMSeFmpGa0LlYofDEikdwsEdgCSZlL+LUYeyIdfrENnWxg8/peU7nWNBv4uzIIm0=
-X-Received: by 2002:a63:8e44:: with SMTP id k65mr2728717pge.452.1586494161789;
- Thu, 09 Apr 2020 21:49:21 -0700 (PDT)
+         :message-id:subject:to:cc;
+        bh=c9BJA5kwXSY009wyyInjyYUXASRt/6Rey8B6iWb2SF0=;
+        b=hW3niZuHTfO6f6EDkTivYaptI/J0x5mqwSBzCcEclX3WduKkyX5pQp6MS7O6Stn6o/
+         e0QKRXi80+ZS14K+vVt5AX3u33JuKyG+jKM2WUoQo2aGJwqPr1eumsnP6Gq527WpFcPc
+         6AvCDk6kfQd6VlmApXEfQuuYJ3+4CpIpWb/xexzMoZL5miH3Lscvz9Nzjc5h1hT3Re7i
+         9rqnfur30Hv6M5X/CrYQjptJzKIZ0pkMuju9TRA7uXTMTSWY4zYNEkInBV/sOwq8Q/bt
+         FL+cUbWOkQDJytMnZ8G4y/i6gdulwstdiOS9CzNrVjjDqi8ESLcj/ICt5SYOTMltAaDy
+         YUqw==
+X-Gm-Message-State: AGi0PuZdNC4bppeNJs9Y4PFsLMDziRyKvqvpYeL6EQW4ldX8WcufIdVj
+        q0D0+TgJMROTI0JiAR6+uTtJTp1IrCTmWlx7lTs=
+X-Google-Smtp-Source: APiQypKISMwlaDr4vBs+Tumqx8h8r7SK5oimoKVzWxc+LbQ7UeKu9R+aW/E1Uql3e3RFjK7nUu4xiGQ99QHzWy0fNR8=
+X-Received: by 2002:a05:6830:1e0e:: with SMTP id s14mr3093072otr.107.1586504720818;
+ Fri, 10 Apr 2020 00:45:20 -0700 (PDT)
 MIME-Version: 1.0
-References: <CAEX+82KTJecx_aSHAPN9ZkS_YDiDfyEM9b6ji4wabmSZ6O516Q@mail.gmail.com>
- <c86002a6-d613-c0be-a672-cca8e9c83e1c@intel.com> <2E118FCA-7AB1-480F-8F49-3EFD77CC2992@gmail.com>
-In-Reply-To: <2E118FCA-7AB1-480F-8F49-3EFD77CC2992@gmail.com>
-From:   Javier Romero <xavinux@gmail.com>
-Date:   Fri, 10 Apr 2020 01:49:10 -0300
-Message-ID: <CAEX+82L-Kc6W1KOgPGo3JTxvjnOGsjDWm0Z3-c59EDdL4jO+Yw@mail.gmail.com>
-Subject: Re: Contribution to KVM.
-To:     Nadav Amit <nadav.amit@gmail.com>
-Cc:     kvm <kvm@vger.kernel.org>, kvmarm@lists.cs.columbia.edu,
-        Liran Alon <liran.alon@oracle.com>, like.xu@intel.com
+References: <20200326140125.19794-1-jasowang@redhat.com> <20200326140125.19794-9-jasowang@redhat.com>
+In-Reply-To: <20200326140125.19794-9-jasowang@redhat.com>
+From:   Geert Uytterhoeven <geert@linux-m68k.org>
+Date:   Fri, 10 Apr 2020 09:45:09 +0200
+Message-ID: <CAMuHMdUis3O_mJKOb2s=_=Zs61iHus5Aq74N3-xs7kmjN+egoQ@mail.gmail.com>
+Subject: Re: [PATCH V9 8/9] vdpasim: vDPA device simulator
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        KVM list <kvm@vger.kernel.org>,
+        virtualization@lists.linux-foundation.org,
+        netdev <netdev@vger.kernel.org>,
+        Jason Gunthorpe <jgg@mellanox.com>, maxime.coquelin@redhat.com,
+        cunming.liang@intel.com, zhihong.wang@intel.com,
+        rob.miller@broadcom.com, xiao.w.wang@intel.com,
+        lingshan.zhu@intel.com, eperezma@redhat.com, lulu@redhat.com,
+        parav@mellanox.com, kevin.tian@intel.com, stefanha@redhat.com,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Christoph Hellwig <hch@infradead.org>, aadam@redhat.com,
+        Jiri Pirko <jiri@mellanox.com>, shahafs@mellanox.com,
+        hanand@xilinx.com, Martin Habets <mhabets@solarflare.com>,
+        gdawar@xilinx.com, saugatm@xilinx.com, vmireyno@marvell.com,
+        zhangweining@ruijie.com.cn
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Nadav,
+Hi Jason,
 
-Thank you for your answer,
-
-Will also take a look at the test bug you suggested.
-
-Regards,
-
-
-Javier Romero
-
-
-
-El vie., 10 abr. 2020 a las 0:53, Nadav Amit (<nadav.amit@gmail.com>) escri=
-bi=C3=B3:
+On Thu, Mar 26, 2020 at 3:07 PM Jason Wang <jasowang@redhat.com> wrote:
+> This patch implements a software vDPA networking device. The datapath
+> is implemented through vringh and workqueue. The device has an on-chip
+> IOMMU which translates IOVA to PA. For kernel virtio drivers, vDPA
+> simulator driver provides dma_ops. For vhost driers, set_map() methods
+> of vdpa_config_ops is implemented to accept mappings from vhost.
 >
-> > On Apr 9, 2020, at 8:34 PM, Xu, Like <like.xu@intel.com> wrote:
-> >
-> > On 2020/4/10 5:29, Javier Romero wrote:
-> >> Hello,
-> >>
-> >>  My name is Javier, live in Argentina and work as a cloud engineer.
-> >>
-> >> Have been working with Linux servers for the last 10 years in an
-> >> Internet Service Provider and I'm interested in contributing to KVM
-> > Welcome, I'm a newbie as well.
-> >> maybe with testing as a start point.
-> > You may try the http://git.kernel.org/pub/scm/virt/kvm/kvm-unit-tests.g=
-it
-> > and tools/testing/selftests/kvm in the kernel tree.
-> >> If it can be useful to test KVM on ARM, I have a Raspberry PI 3 at dis=
-posal.
-> > If you test KVM on Intel platforms, you will definitely get support fro=
-m me :D.
+> Currently, vDPA device simulator will loopback TX traffic to RX. So
+> the main use case for the device is vDPA feature testing, prototyping
+> and development.
 >
-> If you are looking for something specific, here are two issues with
-> relatively limited scope, which AFAIK were not resolved:
+> Note, there's no management API implemented, a vDPA device will be
+> registered once the module is probed. We need to handle this in the
+> future development.
 >
-> 1. Shadow VMCS bug, which is also a test bug [1]. You can start by fixing
->    the test and then fix KVM.
->
-> 2. Try to run the tests with more than 4GB of memory. The last time I tri=
-ed
->    (actually by running the test on bare metal), the INIT test that Liran
->    wrote failed.
->
-> Regards,
-> Nadav
->
-> [1] https://lore.kernel.org/kvm/3235DBB0-0DC0-418C-BC45-A4B78612E273@gmai=
-l.com/T/#u
+> Signed-off-by: Jason Wang <jasowang@redhat.com>
+
+This is now commit 2c53d0f64c06f458 ("vdpasim: vDPA device simulator").
+
+> --- a/drivers/virtio/vdpa/Kconfig
+> +++ b/drivers/virtio/vdpa/Kconfig
+> @@ -5,3 +5,22 @@ config VDPA
+>           Enable this module to support vDPA device that uses a
+>           datapath which complies with virtio specifications with
+>           vendor specific control path.
+> +
+> +menuconfig VDPA_MENU
+> +       bool "VDPA drivers"
+> +       default n
+
+    *
+    * VDPA drivers
+    *
+    VDPA drivers (VDPA_MENU) [N/y/?] (NEW) ?
+
+    There is no help available for this option.
+    Symbol: VDPA_MENU [=n]
+    Type  : bool
+    Defined at drivers/vdpa/Kconfig:9
+     Prompt: VDPA drivers
+     Location:
+       -> Device Drivers
+
+I think this deserves a help text, so users know if they want to enable this
+option or not.
+
+I had a quick look, but couldn't find the meaning of "vdpa" in the whole kernel
+source tree.
+
+Thanks!
+
+> +
+> +if VDPA_MENU
+> +
+> +config VDPA_SIM
+> +       tristate "vDPA device simulator"
+> +       depends on RUNTIME_TESTING_MENU
+> +       select VDPA
+> +       select VHOST_RING
+> +       default n
+> +       help
+> +         vDPA networking device simulator which loop TX traffic back
+> +         to RX. This device is used for testing, prototyping and
+> +         development of vDPA.
+> +
+> +endif # VDPA_MENU
+
+Gr{oetje,eeting}s,
+
+                        Geert
+
+-- 
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
