@@ -2,28 +2,28 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 51D951A4C8D
-	for <lists+kvm@lfdr.de>; Sat, 11 Apr 2020 01:17:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A52CD1A4C8A
+	for <lists+kvm@lfdr.de>; Sat, 11 Apr 2020 01:17:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726882AbgDJXR3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Apr 2020 19:17:29 -0400
+        id S1726865AbgDJXRX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Apr 2020 19:17:23 -0400
 Received: from mga02.intel.com ([134.134.136.20]:20816 "EHLO mga02.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726821AbgDJXRN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S1726832AbgDJXRN (ORCPT <rfc822;kvm@vger.kernel.org>);
         Fri, 10 Apr 2020 19:17:13 -0400
-IronPort-SDR: R5aoyWtH1y/suQtyCQbi5/7yapfl1w+WP/UybIJ6SGvSrHxsqvGQhn1/tocWF75OL63/GGB8C3
- HjaceFAw1BnQ==
+IronPort-SDR: RO2yQBpYIN6MucWmw10fWEH4mTuHtf6D4wuY5DIF/p4PLOdUq22NfoHfq1Vx7eEEEZHWfJV54S
+ KyDeQLxYjObA==
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga005.fm.intel.com ([10.253.24.32])
   by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Apr 2020 16:17:13 -0700
-IronPort-SDR: ikwq143VSWmYHHh6IAwovH9GlLVjgvSTOHYgfvdMlRY08Nb1My+2USJkmo9XigehpCYXpNSeZb
- IYEslCwrI52w==
+IronPort-SDR: QT+kpRQhbqvgKW1eisSsS9c1ktxCZOJx2y/GvV787IdmprlyMFxnU4e+Its1dQgeHPOF3GL23s
+ MwuG7bXa09WQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.72,368,1580803200"; 
-   d="scan'208";a="452542251"
+   d="scan'208";a="452542254"
 Received: from sjchrist-coffee.jf.intel.com ([10.54.74.202])
-  by fmsmga005.fm.intel.com with ESMTP; 10 Apr 2020 16:17:12 -0700
+  by fmsmga005.fm.intel.com with ESMTP; 10 Apr 2020 16:17:13 -0700
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         Christian Borntraeger <borntraeger@de.ibm.com>,
@@ -35,9 +35,9 @@ Cc:     David Hildenbrand <david@redhat.com>,
         Peter Xu <peterx@redhat.com>,
         Andrew Jones <drjones@redhat.com>,
         Wainer dos Santos Moschetta <wainersm@redhat.com>
-Subject: [PATCH 09/10] KVM: selftests: Make set_memory_region_test common to all architectures
-Date:   Fri, 10 Apr 2020 16:17:06 -0700
-Message-Id: <20200410231707.7128-10-sean.j.christopherson@intel.com>
+Subject: [PATCH 10/10] selftests: kvm: Add testcase for creating max number of memslots
+Date:   Fri, 10 Apr 2020 16:17:07 -0700
+Message-Id: <20200410231707.7128-11-sean.j.christopherson@intel.com>
 X-Mailer: git-send-email 2.26.0
 In-Reply-To: <20200410231707.7128-1-sean.j.christopherson@intel.com>
 References: <20200410231707.7128-1-sean.j.christopherson@intel.com>
@@ -48,141 +48,120 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Make set_memory_region_test available on all architectures by wrapping
-the bits that are x86-specific in ifdefs.  All architectures can do
-no-harm testing of running with zero memslots, and a future testcase
-to create the maximum number of memslots will also be architecture
-agnostic.
+From: Wainer dos Santos Moschetta <wainersm@redhat.com>
 
+This patch introduces test_add_max_memory_regions(), which checks
+that a VM can have added memory slots up to the limit defined in
+KVM_CAP_NR_MEMSLOTS. Then attempt to add one more slot to
+verify it fails as expected.
+
+Signed-off-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
+Reviewed-by: Andrew Jones <drjones@redhat.com>
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 ---
- tools/testing/selftests/kvm/.gitignore              |  2 +-
- tools/testing/selftests/kvm/Makefile                |  4 +++-
- .../kvm/{x86_64 => }/set_memory_region_test.c       | 13 ++++++++++++-
- 3 files changed, 16 insertions(+), 3 deletions(-)
- rename tools/testing/selftests/kvm/{x86_64 => }/set_memory_region_test.c (97%)
+ .../selftests/kvm/set_memory_region_test.c    | 65 +++++++++++++++++--
+ 1 file changed, 60 insertions(+), 5 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
-index 16877c3daabf..5947cc119abc 100644
---- a/tools/testing/selftests/kvm/.gitignore
-+++ b/tools/testing/selftests/kvm/.gitignore
-@@ -6,7 +6,6 @@
- /x86_64/hyperv_cpuid
- /x86_64/mmio_warning_test
- /x86_64/platform_info_test
--/x86_64/set_memory_region_test
- /x86_64/set_sregs_test
- /x86_64/smm_test
- /x86_64/state_test
-@@ -21,4 +20,5 @@
- /demand_paging_test
- /dirty_log_test
- /kvm_create_max_vcpus
-+/set_memory_region_test
- /steal_time
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index 712a2ddd2a27..7af62030c12f 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -17,7 +17,6 @@ TEST_GEN_PROGS_x86_64 += x86_64/evmcs_test
- TEST_GEN_PROGS_x86_64 += x86_64/hyperv_cpuid
- TEST_GEN_PROGS_x86_64 += x86_64/mmio_warning_test
- TEST_GEN_PROGS_x86_64 += x86_64/platform_info_test
--TEST_GEN_PROGS_x86_64 += x86_64/set_memory_region_test
- TEST_GEN_PROGS_x86_64 += x86_64/set_sregs_test
- TEST_GEN_PROGS_x86_64 += x86_64/smm_test
- TEST_GEN_PROGS_x86_64 += x86_64/state_test
-@@ -32,12 +31,14 @@ TEST_GEN_PROGS_x86_64 += clear_dirty_log_test
- TEST_GEN_PROGS_x86_64 += demand_paging_test
- TEST_GEN_PROGS_x86_64 += dirty_log_test
- TEST_GEN_PROGS_x86_64 += kvm_create_max_vcpus
-+TEST_GEN_PROGS_x86_64 += set_memory_region_test
- TEST_GEN_PROGS_x86_64 += steal_time
- 
- TEST_GEN_PROGS_aarch64 += clear_dirty_log_test
- TEST_GEN_PROGS_aarch64 += demand_paging_test
- TEST_GEN_PROGS_aarch64 += dirty_log_test
- TEST_GEN_PROGS_aarch64 += kvm_create_max_vcpus
-+TEST_GEN_PROGS_aarch64 += set_memory_region_test
- TEST_GEN_PROGS_aarch64 += steal_time
- 
- TEST_GEN_PROGS_s390x = s390x/memop
-@@ -46,6 +47,7 @@ TEST_GEN_PROGS_s390x += s390x/sync_regs_test
- TEST_GEN_PROGS_s390x += demand_paging_test
- TEST_GEN_PROGS_s390x += dirty_log_test
- TEST_GEN_PROGS_s390x += kvm_create_max_vcpus
-+TEST_GEN_PROGS_s390x += set_memory_region_test
- 
- TEST_GEN_PROGS += $(TEST_GEN_PROGS_$(UNAME_M))
- LIBKVM += $(LIBKVM_$(UNAME_M))
-diff --git a/tools/testing/selftests/kvm/x86_64/set_memory_region_test.c b/tools/testing/selftests/kvm/set_memory_region_test.c
-similarity index 97%
-rename from tools/testing/selftests/kvm/x86_64/set_memory_region_test.c
-rename to tools/testing/selftests/kvm/set_memory_region_test.c
-index c274ce6b4ba2..0f36941ebb96 100644
---- a/tools/testing/selftests/kvm/x86_64/set_memory_region_test.c
+diff --git a/tools/testing/selftests/kvm/set_memory_region_test.c b/tools/testing/selftests/kvm/set_memory_region_test.c
+index 0f36941ebb96..cdf5024b2452 100644
+--- a/tools/testing/selftests/kvm/set_memory_region_test.c
 +++ b/tools/testing/selftests/kvm/set_memory_region_test.c
-@@ -18,6 +18,7 @@
+@@ -9,6 +9,7 @@
+ #include <stdlib.h>
+ #include <string.h>
+ #include <sys/ioctl.h>
++#include <sys/mman.h>
+ 
+ #include <linux/compiler.h>
+ 
+@@ -18,14 +19,18 @@
  
  #define VCPU_ID 0
  
-+#ifdef __x86_64__
+-#ifdef __x86_64__
  /*
-  * Somewhat arbitrary location and slot, intended to not overlap anything.  The
-  * location and size are specifically 2mb sized/aligned so that the initial
-@@ -288,6 +289,7 @@ static void test_delete_memory_region(void)
+- * Somewhat arbitrary location and slot, intended to not overlap anything.  The
+- * location and size are specifically 2mb sized/aligned so that the initial
+- * region corresponds to exactly one large page.
++ * s390x needs at least 1MB alignment, and the x86_64 MOVE/DELETE tests need a
++ * 2MB sized and aligned region so that the initial region corresponds to
++ * exactly one large page.
+  */
+-#define MEM_REGION_GPA		0xc0000000
+ #define MEM_REGION_SIZE		0x200000
++
++#ifdef __x86_64__
++/*
++ * Somewhat arbitrary location and slot, intended to not overlap anything.
++ */
++#define MEM_REGION_GPA		0xc0000000
+ #define MEM_REGION_SLOT		10
  
+ static const uint64_t MMIO_VAL = 0xbeefull;
+@@ -318,6 +323,54 @@ static void test_zero_memory_regions(void)
  	kvm_vm_free(vm);
  }
-+#endif /* __x86_64__ */
  
- static void test_zero_memory_regions(void)
- {
-@@ -299,13 +301,18 @@ static void test_zero_memory_regions(void)
- 	vm = vm_create(VM_MODE_DEFAULT, 0, O_RDWR);
- 	vm_vcpu_add(vm, VCPU_ID);
- 
-+#ifdef __x86_64__
- 	TEST_ASSERT(!ioctl(vm_get_fd(vm), KVM_SET_NR_MMU_PAGES, 64),
- 		    "KVM_SET_NR_MMU_PAGES failed, errno = %d\n", errno);
--
-+#endif
- 	vcpu_run(vm, VCPU_ID);
- 
- 	run = vcpu_state(vm, VCPU_ID);
-+#ifdef __x86_64__
- 	TEST_ASSERT(run->exit_reason == KVM_EXIT_INTERNAL_ERROR,
-+#else
-+	TEST_ASSERT(run->exit_reason != KVM_EXIT_UNKNOWN,
-+#endif
- 		    "Unexpected exit_reason = %u\n", run->exit_reason);
- 
- 	kvm_vm_free(vm);
-@@ -313,13 +320,16 @@ static void test_zero_memory_regions(void)
- 
++/*
++ * Test it can be added memory slots up to KVM_CAP_NR_MEMSLOTS, then any
++ * tentative to add further slots should fail.
++ */
++static void test_add_max_memory_regions(void)
++{
++	int ret;
++	struct kvm_vm *vm;
++	uint32_t max_mem_slots;
++	uint32_t slot;
++	uint64_t guest_addr = 0x0;
++	uint64_t mem_reg_npages;
++	void *mem;
++
++	max_mem_slots = kvm_check_cap(KVM_CAP_NR_MEMSLOTS);
++	TEST_ASSERT(max_mem_slots > 0,
++		    "KVM_CAP_NR_MEMSLOTS should be greater than 0");
++	pr_info("Allowed number of memory slots: %i\n", max_mem_slots);
++
++	vm = vm_create(VM_MODE_DEFAULT, 0, O_RDWR);
++
++	mem_reg_npages = vm_calc_num_guest_pages(VM_MODE_DEFAULT, MEM_REGION_SIZE);
++
++	/* Check it can be added memory slots up to the maximum allowed */
++	pr_info("Adding slots 0..%i, each memory region with %dK size\n",
++		(max_mem_slots - 1), MEM_REGION_SIZE >> 10);
++	for (slot = 0; slot < max_mem_slots; slot++) {
++		vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS,
++					    guest_addr, slot, mem_reg_npages,
++					    0);
++		guest_addr += MEM_REGION_SIZE;
++	}
++
++	/* Check it cannot be added memory slots beyond the limit */
++	mem = mmap(NULL, MEM_REGION_SIZE, PROT_READ | PROT_WRITE,
++		   MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
++	TEST_ASSERT(mem != MAP_FAILED, "Failed to mmap() host");
++
++	ret = ioctl(vm_get_fd(vm), KVM_SET_USER_MEMORY_REGION,
++		    &(struct kvm_userspace_memory_region) {slot, 0, guest_addr,
++		    MEM_REGION_SIZE, (uint64_t) mem});
++	TEST_ASSERT(ret == -1 && errno == EINVAL,
++		    "Adding one more memory slot should fail with EINVAL");
++
++	munmap(mem, MEM_REGION_SIZE);
++	kvm_vm_free(vm);
++}
++
  int main(int argc, char *argv[])
  {
-+#ifdef __x86_64__
- 	int i, loops;
-+#endif
- 
- 	/* Tell stdout not to buffer its content */
- 	setbuf(stdout, NULL);
+ #ifdef __x86_64__
+@@ -329,6 +382,8 @@ int main(int argc, char *argv[])
  
  	test_zero_memory_regions();
  
-+#ifdef __x86_64__
++	test_add_max_memory_regions();
++
+ #ifdef __x86_64__
  	if (argc > 1)
  		loops = atoi(argv[1]);
- 	else
-@@ -332,6 +342,7 @@ int main(int argc, char *argv[])
- 	pr_info("Testing DELETE of in-use region, %d loops\n", loops);
- 	for (i = 0; i < loops; i++)
- 		test_delete_memory_region();
-+#endif
- 
- 	return 0;
- }
 -- 
 2.26.0
 
