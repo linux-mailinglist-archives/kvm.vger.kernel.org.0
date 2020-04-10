@@ -2,103 +2,166 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 76F101A4479
-	for <lists+kvm@lfdr.de>; Fri, 10 Apr 2020 11:33:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B14E91A44AD
+	for <lists+kvm@lfdr.de>; Fri, 10 Apr 2020 11:47:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726141AbgDJJcy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Apr 2020 05:32:54 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:55618 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725861AbgDJJcy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Apr 2020 05:32:54 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 03A9JBhs020013;
-        Fri, 10 Apr 2020 09:32:39 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2020-01-29;
- bh=Ums9rtORUoERTp+Sz6iCrEwniL6ascuI/F+Lp1A7/ic=;
- b=CZPq7nfVZcUVlHkIyoJG8scMCIvrBwYLJGNHvjq7v7oPL6CeT692fSrNnI3a4cf/2e2/
- nkiSWISFGfNfUKL1jJCEDin+hLjlnDcSskNlcamFKBCl3E3EJGlVIKWIEhv/4qsgwDtL
- j0SkHd0SRWkTW2Xr8PzQay6ZKoNzIOe/DhrEgcQSSlN4Ri9e0Ywr7iez/9bs1ZJ9yuWV
- jKMAq3d4a8bRDkcHjJYenh75w9qAjdW6WNPuABHlRvA4vmkyyopbQ6HjFngr6TmWNIT5
- F3HZC1+Rwh+W6OyNrHVRY97Gk7P+WeUmZenQutNR7hRUy4/u/W/+hZoa5pDcDvJCtHDn IA== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
-        by userp2120.oracle.com with ESMTP id 309gw4hmbq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 10 Apr 2020 09:32:39 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
-        by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 03A9HUTx162777;
-        Fri, 10 Apr 2020 09:32:39 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by userp3030.oracle.com with ESMTP id 3091m6wc8m-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 10 Apr 2020 09:32:39 +0000
-Received: from abhmp0020.oracle.com (abhmp0020.oracle.com [141.146.116.26])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 03A9WbL9024236;
-        Fri, 10 Apr 2020 09:32:37 GMT
-Received: from [10.159.147.187] (/10.159.147.187)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Fri, 10 Apr 2020 02:32:37 -0700
-Subject: Re: [RFC PATCH 00/26] Runtime paravirt patching
-To:     =?UTF-8?B?SsO8cmdlbiBHcm/Dnw==?= <jgross@suse.com>,
-        linux-kernel@vger.kernel.org, x86@kernel.org
-Cc:     peterz@infradead.org, hpa@zytor.com, jpoimboe@redhat.com,
-        namit@vmware.com, mhiramat@kernel.org, bp@alien8.de,
-        vkuznets@redhat.com, pbonzini@redhat.com,
-        boris.ostrovsky@oracle.com, mihai.carabas@oracle.com,
-        kvm@vger.kernel.org, xen-devel@lists.xenproject.org,
-        virtualization@lists.linux-foundation.org
-References: <20200408050323.4237-1-ankur.a.arora@oracle.com>
- <d7f8bff3-526a-6a84-2e81-677cfbac0111@suse.com>
-From:   Ankur Arora <ankur.a.arora@oracle.com>
-Message-ID: <37d755a7-8fc9-8cc8-5627-027a8479b6c7@oracle.com>
-Date:   Fri, 10 Apr 2020 02:32:35 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+        id S1726582AbgDJJrh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Apr 2020 05:47:37 -0400
+Received: from mail-oi1-f194.google.com ([209.85.167.194]:38409 "EHLO
+        mail-oi1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725913AbgDJJrh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Apr 2020 05:47:37 -0400
+Received: by mail-oi1-f194.google.com with SMTP id w2so996645oic.5
+        for <kvm@vger.kernel.org>; Fri, 10 Apr 2020 02:47:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=tzg1tHziELvZQ3o5qR7exMV835Cs9K0+FEoadxQ1B5o=;
+        b=Dr88S+VCT4svySlUrD2xr3WlASw5FYW271Zc+V8NWdDjPDbNtELUcibffqW7AJZPsV
+         D9QcU86PUYZrKepDD8qwREMkh0lfTO9V1glabOCkJ4gHM8rZabTRneDHzozmakayjeIq
+         s/kuOZWK9Qf4Yfhtp8jUirvJXpqk+Lhf+pBeqLfD21z0tV229EY+t//oYXx6GFyBCw6q
+         RKzJ512PSGdX8pdxiRxT5P9HOEN5Ytl/z0sWzx0/TFPEAeki6O0gzgGwhbEDHfLgq12V
+         vkI9o30irYVW0YiFPATG9o3mZBKQjB4sD2jiMAg5jgkzx9+9KB6iYORuAer2ZRq+eJWR
+         R1dA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=tzg1tHziELvZQ3o5qR7exMV835Cs9K0+FEoadxQ1B5o=;
+        b=or5VJGpFavsDIwUOKmLOuT5PE9E/w/eM/NhbytXP+GmUO+An3NU4PmnyBZautWZED0
+         wW8l02R4EPXuVs7m37oh2BuvMZs9n7PkKsyLvEMTuiK9LY6jkrRKS8ZnX7JL1xta9SlL
+         hpaW6sKtGBSL+VkbNOn+V8RjXrHgOECVWB1C+ZHObQNU/GJFoWBLbnqc132xRWxm0X1Y
+         0P6YL0AIHfbG02AP2w322X8PVv0Kjhuerzl+xc3XLFPs3CuTr04UMsBEJ6f3FMWH2GVO
+         tNke8V9Cjxt7jLT3f4X4dScIw3bPWzxUcWD+f6TyTsYo0HmatDIAAEI+k12fo8iVRDAy
+         cMUQ==
+X-Gm-Message-State: AGi0PuZf1QhBddTojHLKZvwIpGCjjchGqqMqbVhBE/u3iSJE6PMzZ5TF
+        SMojKE/iTWJFP7lYCU1PVUgDI6pCtpSG0BdzmdZ77w==
+X-Google-Smtp-Source: APiQypLbrI/BG5gn1gvEeXgPVufwP/l9HFf5GU/vBOyLLwt/UnWl0iuMUMgMJbixyKmMHJDBfVR1IVVsr0GDq6YtJfs=
+X-Received: by 2002:a54:481a:: with SMTP id j26mr2758242oij.172.1586512054759;
+ Fri, 10 Apr 2020 02:47:34 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <d7f8bff3-526a-6a84-2e81-677cfbac0111@suse.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9586 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 malwarescore=0
- mlxlogscore=999 phishscore=0 spamscore=0 adultscore=0 suspectscore=0
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2004100078
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9586 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 bulkscore=0
- phishscore=0 lowpriorityscore=0 impostorscore=0 clxscore=1015
- suspectscore=0 malwarescore=0 spamscore=0 mlxlogscore=999 mlxscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2004100078
+References: <E180B225-BF1E-4153-B399-1DBF8C577A82@lca.pw> <fb39d3d2-063e-b828-af1c-01f91d9be31c@redhat.com>
+ <017E692B-4791-46AD-B9ED-25B887ECB56B@lca.pw> <CANpmjNMiHNVh3BVxZUqNo4jW3DPjoQPrn-KEmAJRtSYORuryEA@mail.gmail.com>
+ <B7F7F73E-EE27-48F4-A5D0-EBB29292913E@lca.pw> <CANpmjNMEgc=+bLU472jy37hYPYo5_c+Kbyti8-mubPsEGBrm3A@mail.gmail.com>
+ <2730C0CC-B8B5-4A65-A4ED-9DFAAE158AA6@lca.pw> <CANpmjNNUn9_Q30CSeqbU_TNvaYrMqwXkKCA23xO4ZLr2zO0w9Q@mail.gmail.com>
+ <B5F0F530-911E-4B75-886A-9D8C54FF49C8@lca.pw> <DF45D739-59F3-407C-BE8C-2B1E164B493B@lca.pw>
+In-Reply-To: <DF45D739-59F3-407C-BE8C-2B1E164B493B@lca.pw>
+From:   Marco Elver <elver@google.com>
+Date:   Fri, 10 Apr 2020 11:47:23 +0200
+Message-ID: <CANpmjNMR4BgfCxL9qXn0sQrJtQJbEPKxJ5_HEa2VXWi6UY4wig@mail.gmail.com>
+Subject: Re: KCSAN + KVM = host reset
+To:     Qian Cai <cai@lca.pw>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        "paul E. McKenney" <paulmck@kernel.org>,
+        kasan-dev <kasan-dev@googlegroups.com>,
+        LKML <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2020-04-08 5:28 a.m., Jürgen Groß wrote:
-> On 08.04.20 07:02, Ankur Arora wrote:
-[ snip ]
-> 
-> Quite a lot of code churn and hacks for a problem which should not
-> occur on a well administrated machine.
-Yeah, I agree the patch set is pretty large and clearly the NMI or
-the stop_machine() are completely out. That said, as I wrote in my
-other mail I think the problem is still worth solving.
+On Fri, 10 Apr 2020 at 01:00, Qian Cai <cai@lca.pw> wrote:
+>
+>
+>
+> > On Apr 9, 2020, at 5:28 PM, Qian Cai <cai@lca.pw> wrote:
+> >
+> >
+> >
+> >> On Apr 9, 2020, at 12:03 PM, Marco Elver <elver@google.com> wrote:
+> >>
+> >> On Thu, 9 Apr 2020 at 17:30, Qian Cai <cai@lca.pw> wrote:
+> >>>
+> >>>
+> >>>
+> >>>> On Apr 9, 2020, at 11:22 AM, Marco Elver <elver@google.com> wrote:
+> >>>>
+> >>>> On Thu, 9 Apr 2020 at 17:10, Qian Cai <cai@lca.pw> wrote:
+> >>>>>
+> >>>>>
+> >>>>>
+> >>>>>> On Apr 9, 2020, at 3:03 AM, Marco Elver <elver@google.com> wrote:
+> >>>>>>
+> >>>>>> On Wed, 8 Apr 2020 at 23:29, Qian Cai <cai@lca.pw> wrote:
+> >>>>>>>
+> >>>>>>>
+> >>>>>>>
+> >>>>>>>> On Apr 8, 2020, at 5:25 PM, Paolo Bonzini <pbonzini@redhat.com> =
+wrote:
+> >>>>>>>>
+> >>>>>>>> On 08/04/20 22:59, Qian Cai wrote:
+> >>>>>>>>> Running a simple thing on this AMD host would trigger a reset r=
+ight away.
+> >>>>>>>>> Unselect KCSAN kconfig makes everything work fine (the host wou=
+ld also
+> >>>>>>>>> reset If only "echo off > /sys/kernel/debug/kcsan=E2=80=9D befo=
+re running qemu-kvm).
+> >>>>>>>>
+> >>>>>>>> Is this a regression or something you've just started to play wi=
+th?  (If
+> >>>>>>>> anything, the assembly language conversion of the AMD world swit=
+ch that
+> >>>>>>>> is in linux-next could have reduced the likelihood of such a fai=
+lure,
+> >>>>>>>> not increased it).
+> >>>>>>>
+> >>>>>>> I don=E2=80=99t remember I had tried this combination before, so =
+don=E2=80=99t know if it is a
+> >>>>>>> regression or not.
+> >>>>>>
+> >>>>>> What happens with KASAN? My guess is that, since it also happens w=
+ith
+> >>>>>> "off", something that should not be instrumented is being
+> >>>>>> instrumented.
+> >>>>>
+> >>>>> No, KASAN + KVM works fine.
+> >>>>>
+> >>>>>>
+> >>>>>> What happens if you put a 'KCSAN_SANITIZE :=3D n' into
+> >>>>>> arch/x86/kvm/Makefile? Since it's hard for me to reproduce on this
+> >>>>>
+> >>>>> Yes, that works, but this below alone does not work,
+> >>>>>
+> >>>>> KCSAN_SANITIZE_kvm-amd.o :=3D n
+> >>>>
+> >>>> There are some other files as well, that you could try until you hit
+> >>>> the right one.
+> >>>>
+> >>>> But since this is in arch, 'KCSAN_SANITIZE :=3D n' wouldn't be too b=
+ad
+> >>>> for now. If you can't narrow it down further, do you want to send a
+> >>>> patch?
+> >>>
+> >>> No, that would be pretty bad because it will disable KCSAN for Intel
+> >>> KVM as well which is working perfectly fine right now. It is only AMD
+> >>> is broken.
+> >>
+> >> Interesting. Unfortunately I don't have access to an AMD machine right=
+ now.
+> >>
+> >> Actually I think it should be:
+> >>
+> >> KCSAN_SANITIZE_svm.o :=3D n
+> >> KCSAN_SANITIZE_pmu_amd.o :=3D n
+> >>
+> >> If you want to disable KCSAN for kvm-amd.
+> >
+> > KCSAN_SANITIZE_svm.o :=3D n
+> >
+> > That alone works fine. I am wondering which functions there could trigg=
+er
+> > perhaps some kind of recursing with KCSAN?
+>
+> Another data point is set CONFIG_KCSAN_INTERRUPT_WATCHER=3Dn alone
+> also fixed the issue. I saw quite a few interrupt related function in svm=
+.c, so
+> some interrupt-related recursion going on?
 
-> Especially the NMI dependencies make me not wanting to Ack this series.
-The NMI solution did turn out to be pretty ugly.
+That would contradict what you said about it working if KCSAN is
+"off". What kernel are you attempting to use in the VM?
 
-I was using it to solve two problems: avoid a deadlock where an NMI handler
-could use a lock while the stop_machine() thread is trying to rewrite the
-corresponding call-sites. And, needed to ensure that we don't lock
-and unlock using mismatched primitives.
-
-
-Thanks
-Ankur
-
-> 
-> 
-> Juergen
+Thanks,
+-- Marco
