@@ -2,122 +2,189 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 221B81A3E98
-	for <lists+kvm@lfdr.de>; Fri, 10 Apr 2020 05:10:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BDE881A3EA5
+	for <lists+kvm@lfdr.de>; Fri, 10 Apr 2020 05:16:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726646AbgDJDKo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Apr 2020 23:10:44 -0400
-Received: from mga17.intel.com ([192.55.52.151]:3010 "EHLO mga17.intel.com"
+        id S1726650AbgDJDQD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Apr 2020 23:16:03 -0400
+Received: from mga07.intel.com ([134.134.136.100]:30990 "EHLO mga07.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726594AbgDJDKo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Apr 2020 23:10:44 -0400
-IronPort-SDR: ZcahRtawOFDT6eFMABk0RReiRug2Yq0kp88YdayXVAa9NYDSWnrWi7qm3Bot3M+UmMA0Yic6cT
- bA+jZlaX8osw==
-X-Amp-Result: SKIPPED(no attachment in message)
+        id S1726594AbgDJDQC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Apr 2020 23:16:02 -0400
+IronPort-SDR: PN9ikPB35N86S1TxQ1Y7iKKmRLqWdbur6JDEZcHDVGINu8KlteSPrVQybc7+IEkQzrpg8MBNWS
+ E4L/unrmXNmQ==
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
 X-Amp-File-Uploaded: False
 Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Apr 2020 20:10:44 -0700
-IronPort-SDR: HXq/IUet9O+rMRtfb71iu/Z5PWBJGwtw0CRzb5s1veEmdOt3EU6LBZS6yZixcyw8nrJgJPodv1
- heD13yhYH3AA==
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Apr 2020 20:16:02 -0700
+IronPort-SDR: mwdWbfioCrT9VIiCeFwnyiAwXxTS540MpfN+bFY47xMSgBGlLgy6waCrSFIv8sRAwtyPeKw0RS
+ G9XpNPegE/pA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.72,364,1580803200"; 
-   d="scan'208";a="270283308"
-Received: from likexu-mobl1.ccr.corp.intel.com (HELO [10.238.4.236]) ([10.238.4.236])
-  by orsmga002.jf.intel.com with ESMTP; 09 Apr 2020 20:10:39 -0700
-Reply-To: like.xu@intel.com
-Subject: Re: [PATCH v9 04/10] perf/x86: Keep LBR stack unchanged on the host
- for guest LBR event
-To:     Peter Zijlstra <peterz@infradead.org>,
-        Like Xu <like.xu@linux.intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        Andi Kleen <ak@linux.intel.com>,
-        Jim Mattson <jmattson@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Liran Alon <liran.alon@oracle.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Liang Kan <kan.liang@linux.intel.com>,
-        Wei Wang <wei.w.wang@intel.com>, linux-kernel@vger.kernel.org,
-        Ingo Molnar <mingo@kernel.org>
-References: <20200313021616.112322-1-like.xu@linux.intel.com>
- <20200313021616.112322-5-like.xu@linux.intel.com>
- <20200409164545.GE20713@hirez.programming.kicks-ass.net>
-From:   "Xu, Like" <like.xu@intel.com>
-Organization: Intel OTC
-Message-ID: <97059994-cf3c-2991-a0e2-02d02c344f1f@intel.com>
-Date:   Fri, 10 Apr 2020 11:10:38 +0800
+   d="scan'208,223";a="270284078"
+Received: from lingshan-mobl5.ccr.corp.intel.com (HELO [10.255.31.39]) ([10.255.31.39])
+  by orsmga002.jf.intel.com with ESMTP; 09 Apr 2020 20:15:54 -0700
+Subject: Re: [PATCH V9 9/9] virtio: Intel IFC VF driver for VDPA
+To:     "Michael S. Tsirkin" <mst@redhat.com>,
+        Arnd Bergmann <arnd@arndb.de>
+Cc:     Jason Wang <jasowang@redhat.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        kvm list <kvm@vger.kernel.org>,
+        virtualization@lists.linux-foundation.org,
+        Networking <netdev@vger.kernel.org>,
+        Jason Gunthorpe <jgg@mellanox.com>, maxime.coquelin@redhat.com,
+        cunming.liang@intel.com, zhihong.wang@intel.com,
+        rob.miller@broadcom.com, xiao.w.wang@intel.com,
+        eperezma@redhat.com, lulu@redhat.com,
+        Parav Pandit <parav@mellanox.com>, kevin.tian@intel.com,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Christoph Hellwig <hch@infradead.org>, aadam@redhat.com,
+        Jiri Pirko <jiri@mellanox.com>, shahafs@mellanox.com,
+        hanand@xilinx.com, mhabets@solarflare.com, gdawar@xilinx.com,
+        saugatm@xilinx.com, vmireyno@marvell.com,
+        zhangweining@ruijie.com.cn, Bie Tiwei <tiwei.bie@intel.com>
+References: <20200326140125.19794-1-jasowang@redhat.com>
+ <20200326140125.19794-10-jasowang@redhat.com>
+ <CAK8P3a1RXUXs5oYjB=Jq5cpvG11eTnmJ+vc18_-0fzgTH6envA@mail.gmail.com>
+ <20200409162427-mutt-send-email-mst@kernel.org>
+From:   "Zhu, Lingshan" <lingshan.zhu@intel.com>
+Message-ID: <77962da1-b9ec-2eaf-21d0-9790e7f0366d@intel.com>
+Date:   Fri, 10 Apr 2020 11:15:53 +0800
 User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200409164545.GE20713@hirez.programming.kicks-ass.net>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20200409162427-mutt-send-email-mst@kernel.org>
+Content-Type: multipart/mixed;
+ boundary="------------6E5E274523B4D96E25AC383C"
 Content-Language: en-US
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2020/4/10 0:45, Peter Zijlstra wrote:
-> On Fri, Mar 13, 2020 at 10:16:10AM +0800, Like Xu wrote:
->> When a guest wants to use the LBR stack, its hypervisor creates a guest
->> LBR event and let host perf schedules it. A new 'int guest_lbr_enabled'
->> field in the "struct cpu_hw_events", is marked as true when perf adds
->> a guest LBR event and false on deletion.
->>
->> The LBR stack msrs are accessible to the guest when its guest LBR event
->> is scheduled in by the perf subsystem. Before scheduling out the event,
->> we should avoid host changes on IA32_DEBUGCTLMSR or LBR_SELECT. Otherwise,
->> some unexpected branch operations may interfere with guest behavior,
->> pollute LBR records, and even cause host branch data leakage. In addition,
->> the intel_pmu_lbr_read() on the host is also avoidable for guest usage.
->>
->> On v4 PMU or later, the LBR stack are frozen on the overflowed condition
->> if Freeze_LBR_On_PMI is true and resume recording via acking LBRS_FROZEN
->> to global status msr instead of re-enabling IA32_DEBUGCTL.LBR. So when a
->> guest LBR event is running, the host PMI handler has to keep LBRS_FROZEN
->> bit set (thus LBR being frozen) until the guest enables it. Otherwise,
->> when the guest enters non-root mode, the LBR will start recording and
->> the guest PMI handler code will also pollute the LBR stack.
->>
->> To ensure that guest LBR records are not lost during the context switch,
->> the BRANCH_CALL_STACK flag should be configured in the 'branch_sample_type'
->> for a guest LBR event because a callstack event could save/restore guest
->> unread records with the help of intel_pmu_lbr_sched_task() naturally.
->>
->> However, the regular host LBR perf event doesn't save/restore LBR_SELECT,
->> because it's configured in the LBR_enable() based on branch_sample_type.
->> So when a guest LBR is running, the guest LBR_SELECT may changes for its
->> own use and we have to add the LBR_SELECT save/restore to ensure what the
->> guest LBR_SELECT value doesn't get lost during the context switching.
-> I had to read the patch before that made sense; I think it's mostly
-> there, but it can use a little help.
-Ah, thanks for your patient. This is good news for me that
-you did read the main part of the proposal changes in this version.
+This is a multi-part message in MIME format.
+--------------6E5E274523B4D96E25AC383C
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
->
->
->> @@ -691,8 +714,12 @@ void intel_pmu_lbr_read(void)
->>   	 *
->>   	 * This could be smarter and actually check the event,
->>   	 * but this simple approach seems to work for now.
->> +	 *
->> +	 * And there is no need to read lbr here if a guest LBR event
-> There's 'lbr' and 'LBR' in the same sentence
-Yes, l'll fix it.
->
->> +	 * is using it, because the guest will read them on its own.
->>   	 */
->> -	if (!cpuc->lbr_users || cpuc->lbr_users == cpuc->lbr_pebs_users)
->> +	if (!cpuc->lbr_users || cpuc->guest_lbr_enabled ||
->> +		cpuc->lbr_users == cpuc->lbr_pebs_users)
-> indent fail
-Yes, l'll fix it.
->
->>   		return;
->>   
->>   	if (x86_pmu.intel_cap.lbr_format == LBR_FORMAT_32)
 
+On 4/10/2020 4:25 AM, Michael S. Tsirkin wrote:
+> On Thu, Apr 09, 2020 at 12:41:13PM +0200, Arnd Bergmann wrote:
+>> On Thu, Mar 26, 2020 at 3:08 PM Jason Wang <jasowang@redhat.com> wrote:
+>>> From: Zhu Lingshan <lingshan.zhu@intel.com>
+>>>
+>>> This commit introduced two layers to drive IFC VF:
+>>>
+>>> (1) ifcvf_base layer, which handles IFC VF NIC hardware operations and
+>>>      configurations.
+>>>
+>>> (2) ifcvf_main layer, which complies to VDPA bus framework,
+>>>      implemented device operations for VDPA bus, handles device probe,
+>>>      bus attaching, vring operations, etc.
+>>>
+>>> Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
+>>> Signed-off-by: Bie Tiwei <tiwei.bie@intel.com>
+>>> Signed-off-by: Wang Xiao <xiao.w.wang@intel.com>
+>>> Signed-off-by: Jason Wang <jasowang@redhat.com>
+>>> +
+>>> +#define IFCVF_QUEUE_ALIGNMENT  PAGE_SIZE
+>>> +#define IFCVF_QUEUE_MAX                32768
+>>> +static u16 ifcvf_vdpa_get_vq_align(struct vdpa_device *vdpa_dev)
+>>> +{
+>>> +       return IFCVF_QUEUE_ALIGNMENT;
+>>> +}
+>> This fails to build on arm64 with 64kb page size (found in linux-next):
+>>
+>> /drivers/vdpa/ifcvf/ifcvf_main.c: In function 'ifcvf_vdpa_get_vq_align':
+>> arch/arm64/include/asm/page-def.h:17:20: error: conversion from 'long
+>> unsigned int' to 'u16' {aka 'short unsigned int'} changes value from
+>> '65536' to '0' [-Werror=overflow]
+>>     17 | #define PAGE_SIZE  (_AC(1, UL) << PAGE_SHIFT)
+>>        |                    ^
+>> drivers/vdpa/ifcvf/ifcvf_base.h:37:31: note: in expansion of macro 'PAGE_SIZE'
+>>     37 | #define IFCVF_QUEUE_ALIGNMENT PAGE_SIZE
+>>        |                               ^~~~~~~~~
+>> drivers/vdpa/ifcvf/ifcvf_main.c:231:9: note: in expansion of macro
+>> 'IFCVF_QUEUE_ALIGNMENT'
+>>    231 |  return IFCVF_QUEUE_ALIGNMENT;
+>>        |         ^~~~~~~~~~~~~~~~~~~~~
+>>
+>> It's probably good enough to just not allow the driver to be built in that
+>> configuration as it's fairly rare but unfortunately there is no simple Kconfig
+>> symbol for it.
+>>
+>> In a similar driver, we did
+>>
+>> config VMXNET3
+>>          tristate "VMware VMXNET3 ethernet driver"
+>>          depends on PCI && INET
+>>          depends on !(PAGE_SIZE_64KB || ARM64_64K_PAGES || \
+>>                       IA64_PAGE_SIZE_64KB || MICROBLAZE_64K_PAGES || \
+>>                       PARISC_PAGE_SIZE_64KB || PPC_64K_PAGES)
+>>
+>> I think we should probably make PAGE_SIZE_64KB a global symbol
+>> in arch/Kconfig and have it selected by the other symbols so drivers
+>> like yours can add a dependency for it.
+>>
+>>           Arnd
+> It's probably easier to make the alignment u32 - I don't really know why it's
+> u16, all callers seem to assign the result to a u32 value.
+
+Thanks Michael!
+
+@ Arnd, would you please kindly have a try on the attached patch? I 
+failed to find an armv8 or above platform for now.
+
+Thanks
+BR
+Zhu Lingshan
+
+--------------6E5E274523B4D96E25AC383C
+Content-Type: text/plain; charset=UTF-8;
+ name="0001-vdpa-change-get_vq_align-to-u32-alignment.patch"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment;
+ filename="0001-vdpa-change-get_vq_align-to-u32-alignment.patch"
+
+RnJvbSBiYjIwMTlmMDYyMDYwOWZiYmRjNjg1NGJjY2M1ZmVmZGI1M2YzZDlkIE1vbiBTZXAg
+MTcgMDA6MDA6MDAgMjAwMQpGcm9tOiBaaHUgTGluZ3NoYW4gPGxpbmdzaGFuLnpodUBpbnRl
+bC5jb20+CkRhdGU6IEZyaSwgMTAgQXByIDIwMjAgMTE6MDQ6MzggKzA4MDAKU3ViamVjdDog
+W1BBVENIXSB2ZHBhOiBjaGFuZ2UgZ2V0X3ZxX2FsaWduKCkgdG8gdTMyIGFsaWdubWVudAoK
+VGhpcyBjb21taXQgY2hhbmdlIHRoZSByZXR1cm4gdmFsdWUgb2YgZ2V0X3ZxX2FsaWduKCkg
+dG8gdTMyLiB0aGlzCmNhbiBoZWxwIHJlc29sdmUgYSBidWlsZCBpc3N1ZSBvZiBhcm02NCBw
+bGF0Zm9ybSwgYW5kIGFkYXB0aW5nIHRvCnRoZSBjYWxsZXJzLgoKU2lnbmVkLW9mZi1ieTog
+Wmh1IExpbmdzaGFuIDxsaW5nc2hhbi56aHVAaW50ZWwuY29tPgotLS0KIGRyaXZlcnMvdmRw
+YS9pZmN2Zi9pZmN2Zl9tYWluLmMgIHwgMiArLQogZHJpdmVycy92ZHBhL3ZkcGFfc2ltL3Zk
+cGFfc2ltLmMgfCAyICstCiBpbmNsdWRlL2xpbnV4L3ZkcGEuaCAgICAgICAgICAgICB8IDIg
+Ky0KIDMgZmlsZXMgY2hhbmdlZCwgMyBpbnNlcnRpb25zKCspLCAzIGRlbGV0aW9ucygtKQoK
+ZGlmZiAtLWdpdCBhL2RyaXZlcnMvdmRwYS9pZmN2Zi9pZmN2Zl9tYWluLmMgYi9kcml2ZXJz
+L3ZkcGEvaWZjdmYvaWZjdmZfbWFpbi5jCmluZGV4IDhkNTRkYzUuLjk3MDg5NWMgMTAwNjQ0
+Ci0tLSBhL2RyaXZlcnMvdmRwYS9pZmN2Zi9pZmN2Zl9tYWluLmMKKysrIGIvZHJpdmVycy92
+ZHBhL2lmY3ZmL2lmY3ZmX21haW4uYwpAQCAtMjI4LDcgKzIyOCw3IEBAIHN0YXRpYyB1MzIg
+aWZjdmZfdmRwYV9nZXRfdmVuZG9yX2lkKHN0cnVjdCB2ZHBhX2RldmljZSAqdmRwYV9kZXYp
+CiAJcmV0dXJuIElGQ1ZGX1NVQlNZU19WRU5ET1JfSUQ7CiB9CiAKLXN0YXRpYyB1MTYgaWZj
+dmZfdmRwYV9nZXRfdnFfYWxpZ24oc3RydWN0IHZkcGFfZGV2aWNlICp2ZHBhX2RldikKK3N0
+YXRpYyB1MzIgaWZjdmZfdmRwYV9nZXRfdnFfYWxpZ24oc3RydWN0IHZkcGFfZGV2aWNlICp2
+ZHBhX2RldikKIHsKIAlyZXR1cm4gSUZDVkZfUVVFVUVfQUxJR05NRU5UOwogfQpkaWZmIC0t
+Z2l0IGEvZHJpdmVycy92ZHBhL3ZkcGFfc2ltL3ZkcGFfc2ltLmMgYi9kcml2ZXJzL3ZkcGEv
+dmRwYV9zaW0vdmRwYV9zaW0uYwppbmRleCA2ZThhMGNmLi5hNGIzZjBkIDEwMDY0NAotLS0g
+YS9kcml2ZXJzL3ZkcGEvdmRwYV9zaW0vdmRwYV9zaW0uYworKysgYi9kcml2ZXJzL3ZkcGEv
+dmRwYV9zaW0vdmRwYV9zaW0uYwpAQCAtNDM1LDcgKzQzNSw3IEBAIHN0YXRpYyB1NjQgdmRw
+YXNpbV9nZXRfdnFfc3RhdGUoc3RydWN0IHZkcGFfZGV2aWNlICp2ZHBhLCB1MTYgaWR4KQog
+CXJldHVybiB2cmgtPmxhc3RfYXZhaWxfaWR4OwogfQogCi1zdGF0aWMgdTE2IHZkcGFzaW1f
+Z2V0X3ZxX2FsaWduKHN0cnVjdCB2ZHBhX2RldmljZSAqdmRwYSkKK3N0YXRpYyB1MzIgdmRw
+YXNpbV9nZXRfdnFfYWxpZ24oc3RydWN0IHZkcGFfZGV2aWNlICp2ZHBhKQogewogCXJldHVy
+biBWRFBBU0lNX1FVRVVFX0FMSUdOOwogfQpkaWZmIC0tZ2l0IGEvaW5jbHVkZS9saW51eC92
+ZHBhLmggYi9pbmNsdWRlL2xpbnV4L3ZkcGEuaAppbmRleCA3MzNhY2ZiLi41NDUzYWY4IDEw
+MDY0NAotLS0gYS9pbmNsdWRlL2xpbnV4L3ZkcGEuaAorKysgYi9pbmNsdWRlL2xpbnV4L3Zk
+cGEuaApAQCAtMTY0LDcgKzE2NCw3IEBAIHN0cnVjdCB2ZHBhX2NvbmZpZ19vcHMgewogCXU2
+NCAoKmdldF92cV9zdGF0ZSkoc3RydWN0IHZkcGFfZGV2aWNlICp2ZGV2LCB1MTYgaWR4KTsK
+IAogCS8qIERldmljZSBvcHMgKi8KLQl1MTYgKCpnZXRfdnFfYWxpZ24pKHN0cnVjdCB2ZHBh
+X2RldmljZSAqdmRldik7CisJdTMyICgqZ2V0X3ZxX2FsaWduKShzdHJ1Y3QgdmRwYV9kZXZp
+Y2UgKnZkZXYpOwogCXU2NCAoKmdldF9mZWF0dXJlcykoc3RydWN0IHZkcGFfZGV2aWNlICp2
+ZGV2KTsKIAlpbnQgKCpzZXRfZmVhdHVyZXMpKHN0cnVjdCB2ZHBhX2RldmljZSAqdmRldiwg
+dTY0IGZlYXR1cmVzKTsKIAl2b2lkICgqc2V0X2NvbmZpZ19jYikoc3RydWN0IHZkcGFfZGV2
+aWNlICp2ZGV2LAotLSAKMS44LjMuMQoK
+--------------6E5E274523B4D96E25AC383C--
