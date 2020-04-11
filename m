@@ -2,182 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 345C91A4E44
-	for <lists+kvm@lfdr.de>; Sat, 11 Apr 2020 07:52:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C34611A4F1C
+	for <lists+kvm@lfdr.de>; Sat, 11 Apr 2020 11:24:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725901AbgDKFwe convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Sat, 11 Apr 2020 01:52:34 -0400
-Received: from mga06.intel.com ([134.134.136.31]:40189 "EHLO mga06.intel.com"
+        id S1725935AbgDKJX7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 11 Apr 2020 05:23:59 -0400
+Received: from mail.kernel.org ([198.145.29.99]:56056 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725855AbgDKFwd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 11 Apr 2020 01:52:33 -0400
-IronPort-SDR: 9/8Mo6zMwPxfP7Yb9gkWxCoo8wOK2dYosR+1YYnvIp6cH4NYl0jOM5xH8NQ0YTjd8hKP2gJ+dD
- J2DpDL1Li8ww==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Apr 2020 22:52:33 -0700
-IronPort-SDR: D9S4NmhTY9He0vCHWlIIHDwfxarPdFygWdKBlgYxYMAyjMca3hoZdN6fUp+96mF+lgTf32YNKh
- C3aiBL+vOCkQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.72,368,1580803200"; 
-   d="scan'208";a="287382593"
-Received: from fmsmsx103.amr.corp.intel.com ([10.18.124.201])
-  by fmsmga002.fm.intel.com with ESMTP; 10 Apr 2020 22:52:33 -0700
-Received: from fmsmsx115.amr.corp.intel.com (10.18.116.19) by
- FMSMSX103.amr.corp.intel.com (10.18.124.201) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Fri, 10 Apr 2020 22:52:33 -0700
-Received: from shsmsx101.ccr.corp.intel.com (10.239.4.153) by
- fmsmsx115.amr.corp.intel.com (10.18.116.19) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Fri, 10 Apr 2020 22:52:32 -0700
-Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.225]) by
- SHSMSX101.ccr.corp.intel.com ([169.254.1.129]) with mapi id 14.03.0439.000;
- Sat, 11 Apr 2020 13:52:23 +0800
-From:   "Liu, Yi L" <yi.l.liu@intel.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-CC:     "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "Tian, Jun J" <jun.j.tian@intel.com>,
-        "Sun, Yi Y" <yi.y.sun@intel.com>,
-        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        id S1725905AbgDKJX7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 11 Apr 2020 05:23:59 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 64B6B20857;
+        Sat, 11 Apr 2020 09:23:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1586597039;
+        bh=K90rgXY4TWpAkIW5KZCWi0jhW+x/kY4ZiXFZIllEs2M=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=UiRa/RX4NHEViHO5ccU94Pb69h0ReC90LoUClRg83c7t3C5hRykS+47XYO75Io4iL
+         QowIYv6pUSwZ5qUkJdmhOPyV1IDkAsBcy5+insjLhJ28goWRSy0QiJvnhrG/UROtyv
+         vKHPVASCOiu14AB3sTGI3i0R3Kc7Zvyi/OZT4fZg=
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=big-swifty.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <maz@kernel.org>)
+        id 1jNCMn-002LiR-Nk; Sat, 11 Apr 2020 10:23:57 +0100
+Date:   Sat, 11 Apr 2020 10:23:56 +0100
+Message-ID: <86r1wus7df.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     "Zengtao (B)" <prime.zeng@hisilicon.com>
+Cc:     George Cherian <gcherian@marvell.com>,
+        "Dave.Martin@arm.com" <Dave.Martin@arm.com>,
+        "alexandru.elisei@arm.com" <alexandru.elisei@arm.com>,
+        "andre.przywara@arm.com" <andre.przywara@arm.com>,
+        "christoffer.dall@arm.com" <christoffer.dall@arm.com>,
+        "james.morse@arm.com" <james.morse@arm.com>,
+        "jintack@cs.columbia.edu" <jintack@cs.columbia.edu>,
+        "julien.thierry.kdev@gmail.com" <julien.thierry.kdev@gmail.com>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Wu, Hao" <hao.wu@intel.com>
-Subject: RE: [PATCH v1 6/8] vfio/type1: Bind guest page tables to host
-Thread-Topic: [PATCH v1 6/8] vfio/type1: Bind guest page tables to host
-Thread-Index: AQHWAEUdkW8K+/kg/06c7098DvJyv6hlyxcAgA2TZEA=
-Date:   Sat, 11 Apr 2020 05:52:22 +0000
-Message-ID: <A2975661238FB949B60364EF0F2C25743A22AD8E@SHSMSX104.ccr.corp.intel.com>
-References: <1584880325-10561-1-git-send-email-yi.l.liu@intel.com>
-        <1584880325-10561-7-git-send-email-yi.l.liu@intel.com>
- <20200402135700.0da30021@w520.home>
-In-Reply-To: <20200402135700.0da30021@w520.home>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-version: 11.2.0.6
-dlp-reaction: no-action
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
-MIME-Version: 1.0
+        "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>,
+        "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
+        Anil Kumar Reddy H <areddy3@marvell.com>,
+        Ganapatrao Kulkarni <gkulkarni@marvell.com>
+Subject: Re: [PATCH v2 00/94] KVM: arm64: ARMv8.3/8.4 Nested Virtualization support
+In-Reply-To: <678F3D1BB717D949B966B68EAEB446ED342E29B9@dggemm526-mbx.china.huawei.com>
+References: <MN2PR18MB26869A6CA4E67558324F655CC5C70@MN2PR18MB2686.namprd18.prod.outlook.com>
+        <06d08f904f003160a48eac3c5ab3c7ff@kernel.org>
+        <678F3D1BB717D949B966B68EAEB446ED342E29B9@dggemm526-mbx.china.huawei.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL/10.8 EasyPG/1.0.0 Emacs/26
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: prime.zeng@hisilicon.com, gcherian@marvell.com, Dave.Martin@arm.com, alexandru.elisei@arm.com, andre.przywara@arm.com, christoffer.dall@arm.com, james.morse@arm.com, jintack@cs.columbia.edu, julien.thierry.kdev@gmail.com, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, suzuki.poulose@arm.com, areddy3@marvell.com, gkulkarni@marvell.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Alex,
+Hi Zengtao,
 
-> From: Alex Williamson <alex.williamson@redhat.com>
-> Sent: Friday, April 3, 2020 3:57 AM
-> To: Liu, Yi L <yi.l.liu@intel.com>
-> Subject: Re: [PATCH v1 6/8] vfio/type1: Bind guest page tables to host
+On Sat, 11 Apr 2020 05:10:05 +0100,
+"Zengtao (B)" <prime.zeng@hisilicon.com> wrote:
 > 
-> On Sun, 22 Mar 2020 05:32:03 -0700
-> "Liu, Yi L" <yi.l.liu@intel.com> wrote:
+> Hi Marc:
 > 
-> > From: Liu Yi L <yi.l.liu@intel.com>
-> >
-> > VFIO_TYPE1_NESTING_IOMMU is an IOMMU type which is backed by
-[...]
-> > +/**
-> > + * Unbind specific gpasid, caller of this function requires hold
-> > + * vfio_iommu->lock
-> > + */
-> > +static long vfio_iommu_type1_do_guest_unbind(struct vfio_iommu *iommu,
-> > +				struct iommu_gpasid_bind_data *gbind_data)
-> > +{
-> > +	return vfio_iommu_for_each_dev(iommu,
-> > +				vfio_unbind_gpasid_fn, gbind_data);
-> > +}
-> > +
-> > +static long vfio_iommu_type1_bind_gpasid(struct vfio_iommu *iommu,
-> > +				struct iommu_gpasid_bind_data *gbind_data)
-> > +{
-> > +	int ret = 0;
-> > +
-> > +	mutex_lock(&iommu->lock);
-> > +	if (!IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu)) {
-> > +		ret = -EINVAL;
-> > +		goto out_unlock;
-> > +	}
-> > +
-> > +	ret = vfio_iommu_for_each_dev(iommu,
-> > +			vfio_bind_gpasid_fn, gbind_data);
-> > +	/*
-> > +	 * If bind failed, it may not be a total failure. Some devices
-> > +	 * within the iommu group may have bind successfully. Although
-> > +	 * we don't enable pasid capability for non-singletion iommu
-> > +	 * groups, a unbind operation would be helpful to ensure no
-> > +	 * partial binding for an iommu group.
-> 
-> Where was the non-singleton group restriction done, I missed that.
-> 
-> > +	 */
-> > +	if (ret)
-> > +		/*
-> > +		 * Undo all binds that already succeeded, no need to
-> > +		 * check the return value here since some device within
-> > +		 * the group has no successful bind when coming to this
-> > +		 * place switch.
-> > +		 */
-> > +		vfio_iommu_type1_do_guest_unbind(iommu, gbind_data);
-> 
-> However, the for_each_dev function stops when the callback function
-> returns error, are we just assuming we stop at the same device as we
-> faulted on the first time and that we traverse the same set of devices
-> the second time?  It seems strange to me that unbind should be able to
-> fail.
+> Since it's a very large patch series, I want to test it on my platform
+>  which don't support nv, and want to make sure if this patch series
+> affects the existed virtualization functions or not.
+>  
+> Any suggestion about the test focus?
 
-I think the code needs enhancement. Although one group per container
-and one device per group is the most typical and desired case, but
-the code here loops domains, groups, devices. It should be able to
-unwind prior bind when the loop failed for a device. So I plan to do
-below change for bind path.
+Not really. Given that the NV patches affect absolutely every
+architectural parts of KVM/arm64, everything needs careful
+testing. But more than testing, it needs reviewing.
 
-list_for_each_entry(domain, &iommu->domain_list, next) {
-	list_for_each_entry(group, &domain->group_list, next) {
-		/*
-		  * if bind failed on a certain device, should unbind prior successful
-		  * bind iommu_group_for_each_dev() should be modified to take two
-		  * callbacks, one for forward loop and one for reverse loop when failure
-		  * happened. "return_upon_failure" indicates whether return upon failure
-		  * during forward loop or not. If yes, iommu_group_for_each_dev() should
-		  * unwind the prior bind in this iommu group before return.
-		  */
-		ret = iommu_group_for_each_dev(iommu_group, bind_gpasid_fn,
-					unbind_gpasid_fn, data, return_upon_failure);
-		if (ret)
-			break;
-	}
-	if (ret) {
-		/* unwind bindings with prior groups */
-		list_for_each_entry_continue_reverse(group,
-							&domain->group_list, next) {
-			iommu_group_for_each_dev(iommu_group, unbind_gpasid_fn,
-						NULL, data, ignore_intermediate_failure);
-		}
-		break;
-	}
-}
+Thanks,
 
-if (ret) {
-	/* unwind bindings with prior domains */
-	list_for_each_entry_continue_reverse(domain, &iommu->domain_list, next) {
-		iommu_group_for_each_dev(iommu_group, unbind_gpasid_fn,
-						NULL, data, ignore_intermediate_failure);
-		}
-	}
-}
+	M.
 
-return ret;
-
-Regards,
-Yi Liu
+-- 
+Jazz is not dead, it just smells funny.
