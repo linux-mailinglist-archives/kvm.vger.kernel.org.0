@@ -2,76 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 65FB71A52D4
-	for <lists+kvm@lfdr.de>; Sat, 11 Apr 2020 18:09:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0514D1A52ED
+	for <lists+kvm@lfdr.de>; Sat, 11 Apr 2020 18:44:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726256AbgDKQJf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 11 Apr 2020 12:09:35 -0400
-Received: from mail.skyhub.de ([5.9.137.197]:51454 "EHLO mail.skyhub.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726094AbgDKQJf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 11 Apr 2020 12:09:35 -0400
-Received: from zn.tnic (p200300EC2F1EE2004DDA4FC6A7F1C076.dip0.t-ipconnect.de [IPv6:2003:ec:2f1e:e200:4dda:4fc6:a7f1:c076])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 28E3A1EC06D9;
-        Sat, 11 Apr 2020 18:09:34 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1586621374;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:in-reply-to:
-         references; bh=qm/3nlJuwIj0hv0o26e3JxUbSvRk5X7to6T2hRUsu40=;
-        b=g0u24ShjV8WWPtOwQlGtrSaDFCRYf0GizwjbmZJfgZ4U3tlLwZ6zEMO/Nnxh+rrPjK/ld5
-        BE6MU4b7eOAHxBu5al4Pu6H3fjoJYfLoKqpWMw18zAIptu6gysAvg66yuVM0nm000yYjux
-        B4YfdpKtjJxHsio+6BV3lYurrsOTWrM=
-From:   Borislav Petkov <bp@alien8.de>
-To:     Joerg Roedel <joro@8bytes.org>, Paolo Bonzini <pbonzini@redhat.com>
-Cc:     KVM <kvm@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
-Subject: [PATCH] KVM: SVM: Fix build error due to missing release_pages() include
-Date:   Sat, 11 Apr 2020 18:09:27 +0200
-Message-Id: <20200411160927.27954-1-bp@alien8.de>
-X-Mailer: git-send-email 2.21.0
+        id S1726107AbgDKQoc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 11 Apr 2020 12:44:32 -0400
+Received: from mail-ed1-f67.google.com ([209.85.208.67]:34868 "EHLO
+        mail-ed1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726070AbgDKQob (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 11 Apr 2020 12:44:31 -0400
+Received: by mail-ed1-f67.google.com with SMTP id c7so6207519edl.2
+        for <kvm@vger.kernel.org>; Sat, 11 Apr 2020 09:44:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linux-foundation.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=HHjNiAPiJ1Oz2tFcDWgKOCe+L+oTgqAXQPJRZQ/4hzk=;
+        b=fURPhmhZDafu3/qkIgLMIEfe4A4py1LqcCqCeBR+aVwJ7drlaVanUhZYjyx5KCUiZx
+         KGDD6HlS++yVH8L88Y7vc/HiMTfe8JLWu5zgSXu8r7QLGa8LZ7tfbZa2cOHm/M603dUP
+         wu/c+M9wGg8Em1o8TiiYeR2NppvuUZeOBDKjA=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=HHjNiAPiJ1Oz2tFcDWgKOCe+L+oTgqAXQPJRZQ/4hzk=;
+        b=Rdbo+rSXxovqOrGHvR7siV0wStEjZ9pjBICrXxpAaQ++Li3iUGFzjUhzp0vwdZPPfV
+         N6shP04DiST+coAUhGjYJvN8Ewhe5nfWFD685OKwg9Rh83Dqxx6FwuRAfK2G5/+Vukzb
+         EXow2Zf4M63cfJOsSXXB1Dm+ny5NJEvFA78l1h/qj+rrMd9JCqybeOZ1UA+1pOsijXKe
+         rsOmp3/ctiG/1V73vfu7huQgaqNf+SuZwShUrWWU5ie3tBVHshaIrvq13Ho+zob50Qux
+         bs56rLDHtgqDiG2+yQU4kubhCl+1w5hH8Z+VZSNp1CA++qaMyNCoBeuU9pHGG1v0UzmK
+         trgw==
+X-Gm-Message-State: AGi0PuZRyWm/8qxXdMtYXdKh9t4qyOzkFpuKx1251RZp0lkRv7U36nUu
+        VAyWPjv3bbDnfvNFJObpamRZPvitqlY=
+X-Google-Smtp-Source: APiQypKUny/ipRJtPaRMFkHfcFwjHRErU92mDbsEu4vdMcTm2d8urxIFzu6DbmbHmu2aaSeszuNJ9w==
+X-Received: by 2002:a17:907:b17:: with SMTP id h23mr8820246ejl.40.1586623468362;
+        Sat, 11 Apr 2020 09:44:28 -0700 (PDT)
+Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com. [209.85.208.45])
+        by smtp.gmail.com with ESMTPSA id b5sm580920edk.72.2020.04.11.09.44.28
+        for <kvm@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 11 Apr 2020 09:44:28 -0700 (PDT)
+Received: by mail-ed1-f45.google.com with SMTP id p6so6176417edu.10
+        for <kvm@vger.kernel.org>; Sat, 11 Apr 2020 09:44:28 -0700 (PDT)
+X-Received: by 2002:a2e:8652:: with SMTP id i18mr6327984ljj.265.1586623101184;
+ Sat, 11 Apr 2020 09:38:21 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20200406171124-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20200406171124-mutt-send-email-mst@kernel.org>
+From:   Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Sat, 11 Apr 2020 09:38:05 -0700
+X-Gmail-Original-Message-ID: <CAHk-=wg7sMywb2V8gifhpUDE=DWQTvg1wDieKVc0UoOSsOrynw@mail.gmail.com>
+Message-ID: <CAHk-=wg7sMywb2V8gifhpUDE=DWQTvg1wDieKVc0UoOSsOrynw@mail.gmail.com>
+Subject: Re: [GIT PULL] vhost: fixes, vdpa
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     KVM list <kvm@vger.kernel.org>,
+        virtualization@lists.linux-foundation.org,
+        Netdev <netdev@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Alexander Duyck <alexander.h.duyck@linux.intel.com>,
+        David Hildenbrand <david@redhat.com>, eperezma@redhat.com,
+        "Cc: stable@vger.kernel.org, david@redhat.com, dverkamp@chromium.org,
+        hch@lst.de, jasowang@redhat.com, liang.z.li@intel.com, mst@redhat.com,
+        tiny.windzz@gmail.com," <jasowang@redhat.com>,
+        lingshan.zhu@intel.com, Michal Hocko <mhocko@kernel.org>,
+        Nadav Amit <namit@vmware.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        David Rientjes <rientjes@google.com>, tiwei.bie@intel.com,
+        tysand@google.com,
+        "Cc: stable@vger.kernel.org, david@redhat.com, dverkamp@chromium.org,
+        hch@lst.de, jasowang@redhat.com, liang.z.li@intel.com, mst@redhat.com,
+        tiny.windzz@gmail.com," <wei.w.wang@intel.com>,
+        xiao.w.wang@intel.com, yuri.benditovich@daynix.com
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Borislav Petkov <bp@suse.de>
+On Mon, Apr 6, 2020 at 2:11 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+>
+> The new vdpa subsystem with two first drivers.
 
-Fix:
+So this one is really annoying to configure.
 
-  arch/x86/kvm/svm/sev.c: In function ‘sev_pin_memory’:
-  arch/x86/kvm/svm/sev.c:360:3: error: implicit declaration of function ‘release_pages’;\
-	  did you mean ‘reclaim_pages’? [-Werror=implicit-function-declaration]
-    360 |   release_pages(pages, npinned);
-        |   ^~~~~~~~~~~~~
-        |   reclaim_pages
+First it asks for vDPA driver for virtio devices (VIRTIO_VDPA) support.
 
-because svm.c includes pagemap.h but the carved out sev.c needs it too.
-Triggered by a randconfig build.
+If you say 'n', it then asks *again* for VDPA drivers (VDPA_MENU).
 
-Fixes: eaf78265a4ab ("KVM: SVM: Move SEV code to separate file")
-Signed-off-by: Borislav Petkov <bp@suse.de>
----
- arch/x86/kvm/svm/sev.c | 1 +
- 1 file changed, 1 insertion(+)
+And then when you say 'n' to *that* it asks you for Vhost driver for
+vDPA-based backend (VHOST_VDPA).
 
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 0e3fc311d7da..0208ab2179d5 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -12,6 +12,7 @@
- #include <linux/kernel.h>
- #include <linux/highmem.h>
- #include <linux/psp-sev.h>
-+#include <linux/pagemap.h>
- #include <linux/swap.h>
- 
- #include "x86.h"
--- 
-2.21.0
+This kind of crazy needs to stop.
 
+Doing kernel configuration is not supposed to be like some truly
+horrendously boring Colossal Cave Adventure game where you have to
+search for a way out of maze of twisty little passages, all alike.
+
+                Linus
