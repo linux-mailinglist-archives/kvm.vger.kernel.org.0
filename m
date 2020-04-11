@@ -2,100 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0514D1A52ED
-	for <lists+kvm@lfdr.de>; Sat, 11 Apr 2020 18:44:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B9D941A5AA5
+	for <lists+kvm@lfdr.de>; Sun, 12 Apr 2020 01:44:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726107AbgDKQoc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 11 Apr 2020 12:44:32 -0400
-Received: from mail-ed1-f67.google.com ([209.85.208.67]:34868 "EHLO
-        mail-ed1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726070AbgDKQob (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 11 Apr 2020 12:44:31 -0400
-Received: by mail-ed1-f67.google.com with SMTP id c7so6207519edl.2
-        for <kvm@vger.kernel.org>; Sat, 11 Apr 2020 09:44:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=HHjNiAPiJ1Oz2tFcDWgKOCe+L+oTgqAXQPJRZQ/4hzk=;
-        b=fURPhmhZDafu3/qkIgLMIEfe4A4py1LqcCqCeBR+aVwJ7drlaVanUhZYjyx5KCUiZx
-         KGDD6HlS++yVH8L88Y7vc/HiMTfe8JLWu5zgSXu8r7QLGa8LZ7tfbZa2cOHm/M603dUP
-         wu/c+M9wGg8Em1o8TiiYeR2NppvuUZeOBDKjA=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=HHjNiAPiJ1Oz2tFcDWgKOCe+L+oTgqAXQPJRZQ/4hzk=;
-        b=Rdbo+rSXxovqOrGHvR7siV0wStEjZ9pjBICrXxpAaQ++Li3iUGFzjUhzp0vwdZPPfV
-         N6shP04DiST+coAUhGjYJvN8Ewhe5nfWFD685OKwg9Rh83Dqxx6FwuRAfK2G5/+Vukzb
-         EXow2Zf4M63cfJOsSXXB1Dm+ny5NJEvFA78l1h/qj+rrMd9JCqybeOZ1UA+1pOsijXKe
-         rsOmp3/ctiG/1V73vfu7huQgaqNf+SuZwShUrWWU5ie3tBVHshaIrvq13Ho+zob50Qux
-         bs56rLDHtgqDiG2+yQU4kubhCl+1w5hH8Z+VZSNp1CA++qaMyNCoBeuU9pHGG1v0UzmK
-         trgw==
-X-Gm-Message-State: AGi0PuZRyWm/8qxXdMtYXdKh9t4qyOzkFpuKx1251RZp0lkRv7U36nUu
-        VAyWPjv3bbDnfvNFJObpamRZPvitqlY=
-X-Google-Smtp-Source: APiQypKUny/ipRJtPaRMFkHfcFwjHRErU92mDbsEu4vdMcTm2d8urxIFzu6DbmbHmu2aaSeszuNJ9w==
-X-Received: by 2002:a17:907:b17:: with SMTP id h23mr8820246ejl.40.1586623468362;
-        Sat, 11 Apr 2020 09:44:28 -0700 (PDT)
-Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com. [209.85.208.45])
-        by smtp.gmail.com with ESMTPSA id b5sm580920edk.72.2020.04.11.09.44.28
-        for <kvm@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 11 Apr 2020 09:44:28 -0700 (PDT)
-Received: by mail-ed1-f45.google.com with SMTP id p6so6176417edu.10
-        for <kvm@vger.kernel.org>; Sat, 11 Apr 2020 09:44:28 -0700 (PDT)
-X-Received: by 2002:a2e:8652:: with SMTP id i18mr6327984ljj.265.1586623101184;
- Sat, 11 Apr 2020 09:38:21 -0700 (PDT)
+        id S1728196AbgDKXF6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 11 Apr 2020 19:05:58 -0400
+Received: from mail.kernel.org ([198.145.29.99]:40678 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728180AbgDKXFz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 11 Apr 2020 19:05:55 -0400
+Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 091FC20787;
+        Sat, 11 Apr 2020 23:05:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1586646355;
+        bh=ymIorrYieqsCNqFIdMm/hvn6WBU04UNSBOfIym/fxmI=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=1Sgn1oSNzA7FCZRYo2YPSv5qJVu8XW6qWA8j91cRbt4DAnaNhNy84aORcvNZFap7u
+         +Iymi4p1dAj3/U/ijP+twemvU7er2yZQYsAiLZ6Zn60keneJzQ2T9yqdIg9MZG6qjR
+         nugSof5I3it8nYRhbF3YdBPJQ9UiQg7Zi5mmqZfE=
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org,
+        linux-kselftest@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.6 102/149] selftests: KVM: s390: fix early guest crash
+Date:   Sat, 11 Apr 2020 19:02:59 -0400
+Message-Id: <20200411230347.22371-102-sashal@kernel.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200411230347.22371-1-sashal@kernel.org>
+References: <20200411230347.22371-1-sashal@kernel.org>
 MIME-Version: 1.0
-References: <20200406171124-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20200406171124-mutt-send-email-mst@kernel.org>
-From:   Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Sat, 11 Apr 2020 09:38:05 -0700
-X-Gmail-Original-Message-ID: <CAHk-=wg7sMywb2V8gifhpUDE=DWQTvg1wDieKVc0UoOSsOrynw@mail.gmail.com>
-Message-ID: <CAHk-=wg7sMywb2V8gifhpUDE=DWQTvg1wDieKVc0UoOSsOrynw@mail.gmail.com>
-Subject: Re: [GIT PULL] vhost: fixes, vdpa
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     KVM list <kvm@vger.kernel.org>,
-        virtualization@lists.linux-foundation.org,
-        Netdev <netdev@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Alexander Duyck <alexander.h.duyck@linux.intel.com>,
-        David Hildenbrand <david@redhat.com>, eperezma@redhat.com,
-        "Cc: stable@vger.kernel.org, david@redhat.com, dverkamp@chromium.org,
-        hch@lst.de, jasowang@redhat.com, liang.z.li@intel.com, mst@redhat.com,
-        tiny.windzz@gmail.com," <jasowang@redhat.com>,
-        lingshan.zhu@intel.com, Michal Hocko <mhocko@kernel.org>,
-        Nadav Amit <namit@vmware.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        David Rientjes <rientjes@google.com>, tiwei.bie@intel.com,
-        tysand@google.com,
-        "Cc: stable@vger.kernel.org, david@redhat.com, dverkamp@chromium.org,
-        hch@lst.de, jasowang@redhat.com, liang.z.li@intel.com, mst@redhat.com,
-        tiny.windzz@gmail.com," <wei.w.wang@intel.com>,
-        xiao.w.wang@intel.com, yuri.benditovich@daynix.com
-Content-Type: text/plain; charset="UTF-8"
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Apr 6, 2020 at 2:11 PM Michael S. Tsirkin <mst@redhat.com> wrote:
->
-> The new vdpa subsystem with two first drivers.
+From: Christian Borntraeger <borntraeger@de.ibm.com>
 
-So this one is really annoying to configure.
+[ Upstream commit 41cbed5b07b5f6ca4ae567059ae7f0ffad1fd454 ]
 
-First it asks for vDPA driver for virtio devices (VIRTIO_VDPA) support.
+The guest crashes very early due to changes in the control registers
+used by dynamic address translation. Let us use different registers
+that will not crash the guest.
 
-If you say 'n', it then asks *again* for VDPA drivers (VDPA_MENU).
+Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ tools/testing/selftests/kvm/s390x/resets.c | 27 +++++++++++-----------
+ 1 file changed, 13 insertions(+), 14 deletions(-)
 
-And then when you say 'n' to *that* it asks you for Vhost driver for
-vDPA-based backend (VHOST_VDPA).
+diff --git a/tools/testing/selftests/kvm/s390x/resets.c b/tools/testing/selftests/kvm/s390x/resets.c
+index 1485bc6c8999f..cbb343ad5d424 100644
+--- a/tools/testing/selftests/kvm/s390x/resets.c
++++ b/tools/testing/selftests/kvm/s390x/resets.c
+@@ -23,25 +23,24 @@ struct kvm_run *run;
+ struct kvm_sync_regs *regs;
+ static uint64_t regs_null[16];
+ 
+-static uint64_t crs[16] = { 0x40000ULL,
+-			    0x42000ULL,
+-			    0, 0, 0, 0, 0,
+-			    0x43000ULL,
+-			    0, 0, 0, 0, 0,
+-			    0x44000ULL,
+-			    0, 0
+-};
+-
+ static void guest_code_initial(void)
+ {
+-	/* Round toward 0 */
+-	uint32_t fpc = 0x11;
++	/* set several CRs to "safe" value */
++	unsigned long cr2_59 = 0x10;	/* enable guarded storage */
++	unsigned long cr8_63 = 0x1;	/* monitor mask = 1 */
++	unsigned long cr10 = 1;		/* PER START */
++	unsigned long cr11 = -1;	/* PER END */
++
+ 
+ 	/* Dirty registers */
+ 	asm volatile (
+-		"	lctlg	0,15,%0\n"
+-		"	sfpc	%1\n"
+-		: : "Q" (crs), "d" (fpc));
++		"	lghi	2,0x11\n"	/* Round toward 0 */
++		"	sfpc	2\n"		/* set fpc to !=0 */
++		"	lctlg	2,2,%0\n"
++		"	lctlg	8,8,%1\n"
++		"	lctlg	10,10,%2\n"
++		"	lctlg	11,11,%3\n"
++		: : "m" (cr2_59), "m" (cr8_63), "m" (cr10), "m" (cr11) : "2");
+ 	GUEST_SYNC(0);
+ }
+ 
+-- 
+2.20.1
 
-This kind of crazy needs to stop.
-
-Doing kernel configuration is not supposed to be like some truly
-horrendously boring Colossal Cave Adventure game where you have to
-search for a way out of maze of twisty little passages, all alike.
-
-                Linus
