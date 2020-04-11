@@ -2,198 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id CE08B1A4CE8
-	for <lists+kvm@lfdr.de>; Sat, 11 Apr 2020 02:26:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E1EB51A4CF4
+	for <lists+kvm@lfdr.de>; Sat, 11 Apr 2020 02:35:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726671AbgDKA0Y (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Apr 2020 20:26:24 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:44334 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726651AbgDKA0Y (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Apr 2020 20:26:24 -0400
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 03B0Id75044794;
-        Sat, 11 Apr 2020 00:26:21 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2020-01-29;
- bh=P2dJot6RTN60BQgKEvHeKmpJ5KSDhuPSPD/967w/gt0=;
- b=HdWFM6fxfXRhGyr4oOmZtUe8hwkvvx9mEX2jJVwJ57gcLHwkMiAlZdIAgygnxq6lUBvo
- CLu0dBg7bN5AlBYA9pNlp/dk7Hzc0eVgI182b0WGt27gc6Lbl7isCVsp7O10pYMMFWeZ
- 7ZrfJHCSVQ+UjVR+x3crPOy6HVL01Jn7s0m8o9FIZYB5AwsjSCHibMfcMQm1UBXVMW1B
- JjWnmQ7OSm9nIUWA9hS/B5A8NpcUsTmRd3lgjSCeXnfIKuRcG/ZsC2C6qtVLc4AL2PVP
- pExiJ5yqS8lgR6i0OVGnc6BmIOaGW/xWfYmGkpAftt1jGOr33rAfS3j1S/ceCoQu+NiY Bg== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by userp2130.oracle.com with ESMTP id 3091m3rcq1-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Sat, 11 Apr 2020 00:26:20 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 03B0HwrQ071327;
-        Sat, 11 Apr 2020 00:24:20 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
-        by aserp3020.oracle.com with ESMTP id 3091mejmvt-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Sat, 11 Apr 2020 00:24:20 +0000
-Received: from abhmp0011.oracle.com (abhmp0011.oracle.com [141.146.116.17])
-        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 03B0OIac029780;
-        Sat, 11 Apr 2020 00:24:19 GMT
-Received: from localhost.localdomain (/10.159.146.114)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Fri, 10 Apr 2020 17:24:18 -0700
-Subject: Re: [PATCH kvm-unit-tests] svm: add a test for exception injection
-To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-References: <20200409094303.949992-1-pbonzini@redhat.com>
-From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Message-ID: <801ca90e-dc5f-37ab-2138-8cbd0950b4f7@oracle.com>
-Date:   Fri, 10 Apr 2020 17:24:10 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+        id S1726654AbgDKAee (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Apr 2020 20:34:34 -0400
+Received: from mail-oi1-f193.google.com ([209.85.167.193]:39668 "EHLO
+        mail-oi1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726641AbgDKAee (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Apr 2020 20:34:34 -0400
+Received: by mail-oi1-f193.google.com with SMTP id d63so2775536oig.6;
+        Fri, 10 Apr 2020 17:34:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=E6YUmBjR0fBCGslDkJmyTLVbD+8lR5N1hTG4sjgnQoE=;
+        b=dKs229QfLA7CAqV6V5toDFM43RPvaz00wOWhrNBV15mlsM2PG2qz8Fst+xdRXAvpyz
+         59KP6GtG6sB0Wt4600u/i+O7CBcugtcNzTn9d9VkqQiF6nobl/dJP5YWhhKlgR6/N/AT
+         qv5DfMOKFOHnhm+NQ6ra5fj6LiUKlBmQHQNSk9M9Uvg8veeCYIsiVb6mj7j/00Mhtif4
+         jmc4pzj8ghUyOvjTKw6OACZNy8JmG3jIsl1zJt03HPI6UrFfB456IFXd8VIwcep2YfKO
+         X3bz4rK7Zgeq3agyeJApaQboQyq4ibjcBp4vT6pso+qbwCAJVEg/De7BK6vUwMazIyhw
+         s39A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=E6YUmBjR0fBCGslDkJmyTLVbD+8lR5N1hTG4sjgnQoE=;
+        b=fmIXEtOAbtKqQzvpJHzaTLq4a/LZFLxXLxMXjhPa9dG8/+FoHkYc60zwc5d6oqH7hl
+         PMFhJ5xk4o2BlyGb0wx72+kfPR4vjPRnrF2gcTs8cNHaH4V21wxDZyrmwHlVBSKI8/Of
+         968pRmontCxAF4xUy4BrKqGtYM8Z+WPJiJxsk8r8YYJTVdkFk7u1/TMVH7uJmYEWRQcl
+         VuJZPqn4N8Bgjh0BRvYpv4HhoVsecDSM4YMIDYjCrYzOv5ssFufTfou+O7iDMT1ZBHvl
+         00zmkCDtugTz6URk30QqfoeOX86r48dxflDdQR4bogQLDaJhXJbft9UPiobD4l7Yuma+
+         lwKg==
+X-Gm-Message-State: AGi0PuaxVyOPiFvlRr3V+mFlndhqkh3WMLrVyjqt5H2wUU8+z7j/aqw3
+        v8JKpsdKY13FQnRRWux9focRs3RLgm08MVBprZs=
+X-Google-Smtp-Source: APiQypKvqud4Yvx31Wo0W69/niUj0pF19DTfdpIMyMQw5kDzIbAVnP9BWDb/JtzDbOJZbgclzCOlObUAqhNpRDIfYtQ=
+X-Received: by 2002:aca:f1c6:: with SMTP id p189mr3509209oih.5.1586565273774;
+ Fri, 10 Apr 2020 17:34:33 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200409094303.949992-1-pbonzini@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9587 signatures=668686
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 bulkscore=0 mlxscore=0
- malwarescore=0 spamscore=0 adultscore=0 suspectscore=0 mlxlogscore=999
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
- definitions=main-2004110000
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9587 signatures=668686
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 adultscore=0
- impostorscore=0 malwarescore=0 lowpriorityscore=0 mlxlogscore=999
- priorityscore=1501 clxscore=1015 bulkscore=0 phishscore=0 mlxscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2004110000
+References: <f51251cc-885e-2f7a-b18d-faa76db15b87@redhat.com> <20200410174703.1138-1-sean.j.christopherson@intel.com>
+In-Reply-To: <20200410174703.1138-1-sean.j.christopherson@intel.com>
+From:   Wanpeng Li <kernellwp@gmail.com>
+Date:   Sat, 11 Apr 2020 08:34:22 +0800
+Message-ID: <CANRm+CxGsBTeVy6-2-DhMYhB3J64jstaDgotEem01bpeiCY-7g@mail.gmail.com>
+Subject: Re: [PATCH v2] KVM: X86: Ultra fast single target IPI fastpath
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Haiwei Li <lihaiwei@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-On 4/9/20 2:43 AM, Paolo Bonzini wrote:
-> Cover VMRUN's testing whether EVENTINJ.TYPE = 3 (exception) has been specified with
-> a vector that does not correspond to an exception.
+On Sat, 11 Apr 2020 at 01:47, Sean Christopherson
+<sean.j.christopherson@intel.com> wrote:
 >
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->   x86/svm.h       |  7 +++++
->   x86/svm_tests.c | 70 +++++++++++++++++++++++++++++++++++++++++++++++++
->   2 files changed, 77 insertions(+)
+> On Fri, Apr 10, 2020 at 05:50:35PM +0200, Paolo Bonzini wrote:
+> > On 10/04/20 17:35, Sean Christopherson wrote:
+> > > IMO, this should come at the very end of vmx_vcpu_run().  At a minimum, it
+> > > needs to be moved below the #MC handling and below
+> > >
+> > >     if (vmx->fail || (vmx->exit_reason & VMX_EXIT_REASONS_FAILED_VMENTRY))
+> > >             return;
+> >
+> > Why?  It cannot run in any of those cases, since the vmx->exit_reason
+> > won't match.
 >
-> diff --git a/x86/svm.h b/x86/svm.h
-> index 645deb7..bb5c552 100644
-> --- a/x86/svm.h
-> +++ b/x86/svm.h
-> @@ -324,6 +324,13 @@ struct __attribute__ ((__packed__)) vmcb {
->   
->   #define SVM_CR0_SELECTIVE_MASK (X86_CR0_TS | X86_CR0_MP)
->   
-> +#define SVM_EVENT_INJ_HWINT	(0 << 8)
-> +#define SVM_EVENT_INJ_NMI	(2 << 8)
-> +#define SVM_EVENT_INJ_EXC	(3 << 8)
-> +#define SVM_EVENT_INJ_SWINT	(4 << 8)
-> +#define SVM_EVENT_INJ_ERRCODE	(1 << 11)
-> +#define SVM_EVENT_INJ_VALID	(1 << 31)
+> #MC and consistency checks should have "priority" over everything else.
+> That there isn't actually a conflict is irrelevant IMO.  And it's something
+> that will likely confuse newbies (to VMX and/or KVM) as it won't be obvious
+> that the motivation was to shave a few cycles, e.g. versus some corner case
+> where the fastpath handling does something meaningful even on failure.
+>
+> > > KVM more or less assumes vmx->idt_vectoring_info is always valid, and it's
+> > > not obvious that a generic fastpath call can safely run before
+> > > vmx_complete_interrupts(), e.g. the kvm_clear_interrupt_queue() call.
+> >
+> > Not KVM, rather vmx.c.  You're right about a generic fastpath, but in
+> > this case kvm_irq_delivery_to_apic_fast is not touching VMX state; even
+> > if you have a self-IPI, the modification of vCPU state is only scheduled
+> > here and will happen later via either kvm_x86_ops.sync_pir_to_irr or
+> > KVM_REQ_EVENT.
+>
+> I think what I don't like is that the fast-IPI code is buried in a helper
+> that masquerades as a generic fastpath handler.  If that's open-coded in
+> vmx_vcpu_run(), I'm ok with doing the fast-IPI handler immediately after
+> the failure checks.
+>
+> And fast-IPI aside, the code could use a bit of optimization to prioritize
+> successful VM-Enter, which would slot in nicely as a prep patch.  Patches
+> (should be) following.
 
+Thanks for v3. :)
 
-I see existing #defines in svm.h:
-
-     #define SVM_EVTINJ_TYPE_INTR (0 << SVM_EVTINJ_TYPE_SHIFT)
-     #define SVM_EVTINJ_TYPE_NMI (2 << SVM_EVTINJ_TYPE_SHIFT)
-     #define SVM_EVTINJ_TYPE_EXEPT (3 << SVM_EVTINJ_TYPE_SHIFT)
-     #define SVM_EVTINJ_TYPE_SOFT (4 << SVM_EVTINJ_TYPE_SHIFT)
-     #define SVM_EVTINJ_VALID (1 << 31)
-     #define SVM_EVTINJ_VALID_ERR (1 << 11)
-
-> +
->   #define MSR_BITMAP_SIZE 8192
->   
->   struct svm_test {
-> diff --git a/x86/svm_tests.c b/x86/svm_tests.c
-> index 16b9dfd..6292e68 100644
-> --- a/x86/svm_tests.c
-> +++ b/x86/svm_tests.c
-> @@ -1340,6 +1340,73 @@ static bool interrupt_check(struct svm_test *test)
->       return get_test_stage(test) == 5;
->   }
->   
-> +static volatile int count_exc = 0;
-> +
-> +static void my_isr(struct ex_regs *r)
-> +{
-> +        count_exc++;
-> +}
-> +
-> +static void exc_inject_prepare(struct svm_test *test)
-> +{
-> +	handle_exception(DE_VECTOR, my_isr);
-> +	handle_exception(NMI_VECTOR, my_isr);
-> +}
-> +
-> +
-> +static void exc_inject_test(struct svm_test *test)
-> +{
-> +    asm volatile ("vmmcall\n\tvmmcall\n\t");
-> +}
-> +
-> +static bool exc_inject_finished(struct svm_test *test)
-> +{
-> +    vmcb->save.rip += 3;
-> +
-> +    switch (get_test_stage(test)) {
-> +    case 0:
-> +        if (vmcb->control.exit_code != SVM_EXIT_VMMCALL) {
-> +            report(false, "VMEXIT not due to vmmcall. Exit reason 0x%x",
-> +                   vmcb->control.exit_code);
-> +            return true;
-> +        }
-> +        vmcb->control.event_inj = NMI_VECTOR | SVM_EVENT_INJ_EXC | SVM_EVENT_INJ_VALID;
-> +        break;
-> +
-> +    case 1:
-> +        if (vmcb->control.exit_code != SVM_EXIT_ERR) {
-> +            report(false, "VMEXIT not due to error. Exit reason 0x%x",
-> +                   vmcb->control.exit_code);
-> +            return true;
-> +        }
-> +        report(count_exc == 0, "exception with vector 2 not injected");
-> +        vmcb->control.event_inj = DE_VECTOR | SVM_EVENT_INJ_EXC | SVM_EVENT_INJ_VALID;
-> +	break;
-> +
-> +    case 2:
-> +        if (vmcb->control.exit_code != SVM_EXIT_VMMCALL) {
-> +            report(false, "VMEXIT not due to vmmcall. Exit reason 0x%x",
-> +                   vmcb->control.exit_code);
-> +            return true;
-> +        }
-> +        report(count_exc == 1, "divide overflow exception injected");
-> +	report(!(vmcb->control.event_inj & SVM_EVENT_INJ_VALID), "eventinj.VALID cleared");
-> +        break;
-> +
-> +    default:
-> +        return true;
-> +    }
-> +
-> +    inc_test_stage(test);
-> +
-> +    return get_test_stage(test) == 3;
-> +}
-> +
-> +static bool exc_inject_check(struct svm_test *test)
-> +{
-> +    return count_exc == 1 && get_test_stage(test) == 3;
-> +}
-> +
->   #define TEST(name) { #name, .v2 = name }
->   
->   /*
-> @@ -1446,6 +1513,9 @@ struct svm_test svm_tests[] = {
->       { "interrupt", default_supported, interrupt_prepare,
->         default_prepare_gif_clear, interrupt_test,
->         interrupt_finished, interrupt_check },
-> +    { "exc_inject", default_supported, exc_inject_prepare,
-> +      default_prepare_gif_clear, exc_inject_test,
-> +      exc_inject_finished, exc_inject_check },
->       TEST(svm_guest_state_test),
->       { NULL, NULL, NULL, NULL, NULL, NULL, NULL }
->   };
+>
+> IMO, this is more logically correct:
+>
+>         vmx->exit_reason = vmcs_read32(VM_EXIT_REASON);
+>         if (unlikely((u16)vmx->exit_reason == EXIT_REASON_MCE_DURING_VMENTRY))
+>                 kvm_machine_check();
+>
+>         if (unlikely(vmx->exit_reason & VMX_EXIT_REASONS_FAILED_VMENTRY))
+>                 return EXIT_FASTPATH_NONE;
+>
+>         if (!is_guest_mode(vcpu) && vmx->exit_reason == EXIT_REASON_MSR_WRITE)
+>                 exit_fastpath = handle_fastpath_set_msr_irqoff(vcpu);
+>         else
+>                 exit_fastpath = EXIT_FASTPATH_NONE;
+>
+> And on my system, the compiler hoists fast-IPI above the #MC, e.g. moving
+> the fast-IPI down only adds a single macrofused uop, testb+jne for
+> FAILED_VMENTERY, to the code path.
+>
+>    0xffffffff81067d1d <+701>:   vmread %rax,%rax
+>    0xffffffff81067d20 <+704>:   ja,pt  0xffffffff81067d2d <vmx_vcpu_run+717>
+>    0xffffffff81067d23 <+707>:   pushq  $0x0
+>    0xffffffff81067d25 <+709>:   push   %rax
+>    0xffffffff81067d26 <+710>:   callq  0xffffffff81071790 <vmread_error_trampoline>
+>    0xffffffff81067d2b <+715>:   pop    %rax
+>    0xffffffff81067d2c <+716>:   pop    %rax
+>    0xffffffff81067d2d <+717>:   test   %eax,%eax
+>    0xffffffff81067d2f <+719>:   mov    %eax,0x32b0(%rbp)
+>    0xffffffff81067d35 <+725>:   js     0xffffffff81067d5a <vmx_vcpu_run+762>
+>    0xffffffff81067d37 <+727>:   testb  $0x20,0x2dc(%rbp)
+>    0xffffffff81067d3e <+734>:   jne    0xffffffff81067d49 <vmx_vcpu_run+745>
+>    0xffffffff81067d40 <+736>:   cmp    $0x20,%eax
+>    0xffffffff81067d43 <+739>:   je     0xffffffff810686d4 <vmx_vcpu_run+3188> <-- fastpath handler
+>    0xffffffff81067d49 <+745>:   xor    %ebx,%ebx
+>    0xffffffff81067d4b <+747>:   jmpq   0xffffffff81067e65 <vmx_vcpu_run+1029>
