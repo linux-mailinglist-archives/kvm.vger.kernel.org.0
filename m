@@ -2,121 +2,324 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D54451A6583
-	for <lists+kvm@lfdr.de>; Mon, 13 Apr 2020 13:13:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7F96E1A6597
+	for <lists+kvm@lfdr.de>; Mon, 13 Apr 2020 13:23:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728914AbgDMLNf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Apr 2020 07:13:35 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:45977 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728241AbgDMLNd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Apr 2020 07:13:33 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1586776412;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=RyXK4jTSyCrBgQI/g3NhhWf4Cadu8DGaHr+KG4J9oBY=;
-        b=FfB09rE4aFIT3F2UcjT4Mr9hdQQGroNN6gEa1ui79HonEd5MJy58q4zAjekVZPDeHOrpA+
-        2fQ6HkyWtxGX3giejkwWQcxAEAWR2hkumowY/4nX7AqhWRsKffxN7Hdz9Bw4NL3n0++SaU
-        EsC/0u/OJVmYX0LVK3fLZIE0lCiFnbo=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-225-jsM2vuUePRuGAtri7Z9Irw-1; Mon, 13 Apr 2020 07:13:28 -0400
-X-MC-Unique: jsM2vuUePRuGAtri7Z9Irw-1
-Received: by mail-wr1-f71.google.com with SMTP id y1so6535748wrp.5
-        for <kvm@vger.kernel.org>; Mon, 13 Apr 2020 04:13:28 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=RyXK4jTSyCrBgQI/g3NhhWf4Cadu8DGaHr+KG4J9oBY=;
-        b=dexwIbxU5I1W75pMRSB2myGIeHb6cfW4OIpqNNUyzKHW9DdJqs+zQkXsDpvUCAtcE6
-         +CGF2e/qvGWfn2kZ0/4CvaDiR01rhkHbyiqb4XbOsivMVoFB9/GewjIED0P2z60pNcDF
-         mJUiOZFjAQ5Xo4OJQytaiA/TXd9H3Mm7KmPIHEK0FvI2VfA/ARgcFhH7srx9vKneG0Q7
-         OxOjqaECtGt+5QC0B9TNdNwCIiLyDf5L8Gyf9DZpunHadhxg+n6w35gv0SwXqqP4EFqk
-         rj4IyvhUGSYdwyTJ9B1izNVXd2pFjNtzk/Bci8xWDWS+g6Cx1PA1YSqKNExGhrCpLKPl
-         g20g==
-X-Gm-Message-State: AGi0PuacIVKAHeM+UY1cn412liMGuwBKxNbztYc7JWzUz3UXIkvzdPHz
-        Sq8ckTsf5lQRmWIcuEEuH8aHF+Xhtlc0YiKqkf2ydaIcefnvxNi/00eNV0Vz49FYGqtRQP5nEJ+
-        tB03iyFriC2Ok
-X-Received: by 2002:a5d:4442:: with SMTP id x2mr181628wrr.101.1586776407149;
-        Mon, 13 Apr 2020 04:13:27 -0700 (PDT)
-X-Google-Smtp-Source: APiQypJm7VAiU/q6lVzMdgLKKb2HWEjxDtZshQBgoe1KapbTIJWgwwS+QMx+dIDjpKr+0KXFEhxl+g==
-X-Received: by 2002:a5d:4442:: with SMTP id x2mr181605wrr.101.1586776406923;
-        Mon, 13 Apr 2020 04:13:26 -0700 (PDT)
-Received: from redhat.com ([185.107.45.41])
-        by smtp.gmail.com with ESMTPSA id b82sm15257603wme.25.2020.04.13.04.13.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 Apr 2020 04:13:26 -0700 (PDT)
-Date:   Mon, 13 Apr 2020 07:13:23 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>
-Cc:     kvm list <kvm@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>,
-        Stephen Rothwell <sfr@canb.auug.org.au>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>
-Subject: Re: [PATCH 0/8] tools/vhost: Reset virtqueue on tests
-Message-ID: <20200413071044-mutt-send-email-mst@kernel.org>
-References: <20200403165119.5030-1-eperezma@redhat.com>
+        id S1728958AbgDMLTb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Apr 2020 07:19:31 -0400
+Received: from vultr.net.flygoat.com ([149.28.68.211]:58484 "EHLO
+        vultr.net.flygoat.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728826AbgDMLTa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Apr 2020 07:19:30 -0400
+Received: from flygoat-x1e (unknown [IPv6:240e:390:49e:92c0::d68])
+        by vultr.net.flygoat.com (Postfix) with ESMTPSA id 88A9020CF7;
+        Mon, 13 Apr 2020 11:19:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=flygoat.com; s=vultr;
+        t=1586776769; bh=UXhLwWCtxUcz+mKOYtgex60WB9mqNaOsxhp6uoAkwDQ=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=nI9oLpWikjHYtk1zNWU+DAzDzaMZA5aGVQ5Y+oRg9DRD1x6X3g0D3C+3rJeKzCnDY
+         0LiOvuPyh3RbzyG96fPZrV6B9+gDU6G9gwzcjPtHW2OP9CJCknU8JbxFESB8MPItu4
+         Tdqs8cdoy0aihdmxQsH6kDVITEUyE7DTdYVP2uSLmWuPIucmzFnSW2/vmg2jkw1cfP
+         5ycXxy570mDfm9CY0u/GM9PONSQGylnb3PLtSvHp1/k+dx06VG1GoIiZONVyIzWgyh
+         owu3dZOIlrVo5Upn01hkd5VLu09QdGgHOeww2BzGnnOMJZ6XB3alzQrUHS3ob1gd5W
+         pbhH302tpwGBw==
+Date:   Mon, 13 Apr 2020 19:19:09 +0800
+From:   Jiaxun Yang <jiaxun.yang@flygoat.com>
+To:     Huacai Chen <chenhc@lemote.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        kvm@vger.kernel.org, qemu-devel@nongnu.org,
+        linux-mips@vger.kernel.org, Fuxin Zhang <zhangfx@lemote.com>,
+        Huacai Chen <chenhuacai@gmail.com>
+Subject: Re: [PATCH 13/15] KVM: MIPS: Add CONFIG6 and DIAG registers
+ emulation
+Message-ID: <20200413191909.4e776272@flygoat-x1e>
+In-Reply-To: <1586763024-12197-14-git-send-email-chenhc@lemote.com>
+References: <1586763024-12197-1-git-send-email-chenhc@lemote.com>
+        <1586763024-12197-14-git-send-email-chenhc@lemote.com>
+X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20200403165119.5030-1-eperezma@redhat.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Apr 03, 2020 at 06:51:11PM +0200, Eugenio Pérez wrote:
-> This series add the tests used to validate the "vhost: Reset batched
-> descriptors on SET_VRING_BASE call" series, with a small change on the
-> reset code (delete an extra unneded reset on VHOST_SET_VRING_BASE).
-> 
-> They are based on the tests sent back them, the ones that were not
-> included (reasons in that thread). This series changes:
-> 
-> * Delete need to export the ugly function in virtio_ring, now all the
-> code is added in tools/virtio (except the one line fix).
-> * Add forgotten uses of vhost_vq_set_backend. Fix bad usage order in
-> vhost_test_set_backend.
-> * Drop random reset, not really needed.
-> * Minor changes updating tests code.
-> 
-> This serie is meant to be applied on top of
-> 5de4e0b7068337cf0d4ca48a4011746410115aae in
-> git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git.
+On Mon, 13 Apr 2020 15:30:22 +0800
+Huacai Chen <chenhc@lemote.com> wrote:
 
-Is this still needed? The patches lack Signed-off-by and
-commit log descriptions, reference commit Ids without subject.
-See Documentation/process/submitting-patches.rst
+> Loongson-3 has CONFIG6 and DIAG registers which need to be emulate.
+> CONFIG6 is mostly used to enable/disable FTLB and SFB, while DIAG is
+> mostly used to flush BTB, ITLB, DTLB, VTLB and FTLB.
+> 
+> Signed-off-by: Huacai Chen <chenhc@lemote.com>
+> Co-developed-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
 
-> Eugenio Pérez (8):
->   tools/virtio: fix virtio_test.c indentation
->   vhost: Not cleaning batched descs in VHOST_SET_VRING_BASE ioctl
->   vhost: Replace vq->private_data access by backend accesors
->   vhost: Fix bad order in vhost_test_set_backend at enable
->   tools/virtio: Use __vring_new_virtqueue in virtio_test.c
->   tools/virtio: Extract virtqueue initialization in vq_reset
->   tools/virtio: Reset index in virtio_test --reset.
->   tools/virtio: Use tools/include/list.h instead of stubs
+It should be guarded by CONFIG_CPU_LOONGSON64 as well.
+
+Thanks.
+
+> ---
+>  arch/mips/include/asm/kvm_host.h |  5 ++++
+>  arch/mips/include/asm/mipsregs.h |  7 +++++
+>  arch/mips/kvm/tlb.c              | 39 +++++++++++++++++++++++++++
+>  arch/mips/kvm/vz.c               | 58
+> +++++++++++++++++++++++++++++++++++++++- 4 files changed, 108
+> insertions(+), 1 deletion(-)
 > 
->  drivers/vhost/test.c        |  8 ++---
->  drivers/vhost/vhost.c       |  1 -
->  tools/virtio/linux/kernel.h |  7 +----
->  tools/virtio/linux/virtio.h |  5 ++--
->  tools/virtio/virtio_test.c  | 58 +++++++++++++++++++++++++++----------
->  tools/virtio/vringh_test.c  |  2 ++
->  6 files changed, 51 insertions(+), 30 deletions(-)
-> 
-> -- 
-> 2.18.1
+> diff --git a/arch/mips/include/asm/kvm_host.h
+> b/arch/mips/include/asm/kvm_host.h index c291767..3ef6ca8 100644
+> --- a/arch/mips/include/asm/kvm_host.h
+> +++ b/arch/mips/include/asm/kvm_host.h
+> @@ -68,9 +68,11 @@
+>  #define KVM_REG_MIPS_CP0_CONFIG3	MIPS_CP0_32(16, 3)
+>  #define KVM_REG_MIPS_CP0_CONFIG4	MIPS_CP0_32(16, 4)
+>  #define KVM_REG_MIPS_CP0_CONFIG5	MIPS_CP0_32(16, 5)
+> +#define KVM_REG_MIPS_CP0_CONFIG6	MIPS_CP0_32(16, 6)
+>  #define KVM_REG_MIPS_CP0_CONFIG7	MIPS_CP0_32(16, 7)
+>  #define KVM_REG_MIPS_CP0_MAARI		MIPS_CP0_64(17, 2)
+>  #define KVM_REG_MIPS_CP0_XCONTEXT	MIPS_CP0_64(20, 0)
+> +#define KVM_REG_MIPS_CP0_DIAG		MIPS_CP0_32(22, 0)
+>  #define KVM_REG_MIPS_CP0_ERROREPC	MIPS_CP0_64(30, 0)
+>  #define KVM_REG_MIPS_CP0_KSCRATCH1	MIPS_CP0_64(31, 2)
+>  #define KVM_REG_MIPS_CP0_KSCRATCH2	MIPS_CP0_64(31, 3)
+> @@ -256,6 +258,7 @@ struct mips_coproc {
+>  #define MIPS_CP0_WATCH_LO	18
+>  #define MIPS_CP0_WATCH_HI	19
+>  #define MIPS_CP0_TLB_XCONTEXT	20
+> +#define MIPS_CP0_DIAG		22
+>  #define MIPS_CP0_ECC		26
+>  #define MIPS_CP0_CACHE_ERR	27
+>  #define MIPS_CP0_TAG_LO		28
+> @@ -927,6 +930,8 @@ void kvm_vz_save_guesttlb(struct kvm_mips_tlb
+> *buf, unsigned int index, unsigned int count);
+>  void kvm_vz_load_guesttlb(const struct kvm_mips_tlb *buf, unsigned
+> int index, unsigned int count);
+> +void kvm_loongson_clear_guest_vtlb(void);
+> +void kvm_loongson_clear_guest_ftlb(void);
+>  #endif
+>  
+>  void kvm_mips_suspend_mm(int cpu);
+> diff --git a/arch/mips/include/asm/mipsregs.h
+> b/arch/mips/include/asm/mipsregs.h index 796fe47..ce40fbf 100644
+> --- a/arch/mips/include/asm/mipsregs.h
+> +++ b/arch/mips/include/asm/mipsregs.h
+> @@ -674,6 +674,9 @@
+>  #define MIPS_CONF5_CV		(_ULCAST_(1) << 29)
+>  #define MIPS_CONF5_K		(_ULCAST_(1) << 30)
+>  
+> +#define MIPS_CONF6_INTIMER	(_ULCAST_(1) << 6)
+> +#define MIPS_CONF6_EXTIMER	(_ULCAST_(1) << 7)
+> +#define MIPS_CONF6_SFBEN	(_ULCAST_(1) << 8)
+>  #define MIPS_CONF6_SYND		(_ULCAST_(1) << 13)
+>  /* proAptiv FTLB on/off bit */
+>  #define MIPS_CONF6_FTLBEN	(_ULCAST_(1) << 15)
+> @@ -993,6 +996,8 @@
+>  /* Disable Branch Return Cache */
+>  #define R10K_DIAG_D_BRC		(_ULCAST_(1) << 22)
+>  
+> +/* Flush BTB */
+> +#define LOONGSON_DIAG_BTB	(_ULCAST_(1) << 1)
+>  /* Flush ITLB */
+>  #define LOONGSON_DIAG_ITLB	(_ULCAST_(1) << 2)
+>  /* Flush DTLB */
+> @@ -2825,7 +2830,9 @@ __BUILD_SET_C0(status)
+>  __BUILD_SET_C0(cause)
+>  __BUILD_SET_C0(config)
+>  __BUILD_SET_C0(config5)
+> +__BUILD_SET_C0(config6)
+>  __BUILD_SET_C0(config7)
+> +__BUILD_SET_C0(diag)
+>  __BUILD_SET_C0(intcontrol)
+>  __BUILD_SET_C0(intctl)
+>  __BUILD_SET_C0(srsmap)
+> diff --git a/arch/mips/kvm/tlb.c b/arch/mips/kvm/tlb.c
+> index 7cd9216..1efb9a0 100644
+> --- a/arch/mips/kvm/tlb.c
+> +++ b/arch/mips/kvm/tlb.c
+> @@ -20,6 +20,7 @@
+>  
+>  #include <asm/cpu.h>
+>  #include <asm/bootinfo.h>
+> +#include <asm/mipsregs.h>
+>  #include <asm/mmu_context.h>
+>  #include <asm/pgtable.h>
+>  #include <asm/cacheflush.h>
+> @@ -622,6 +623,44 @@ void kvm_vz_load_guesttlb(const struct
+> kvm_mips_tlb *buf, unsigned int index, }
+>  EXPORT_SYMBOL_GPL(kvm_vz_load_guesttlb);
+>  
+> +void kvm_loongson_clear_guest_vtlb(void)
+> +{
+> +	int idx = read_gc0_index();
+> +
+> +	/* Set root GuestID for root probe and write of guest TLB
+> entry */
+> +	set_root_gid_to_guest_gid();
+> +
+> +	write_gc0_index(0);
+> +	guest_tlbinvf();
+> +	write_gc0_index(idx);
+> +
+> +	clear_root_gid();
+> +	set_c0_diag(LOONGSON_DIAG_ITLB | LOONGSON_DIAG_DTLB);
+> +}
+> +EXPORT_SYMBOL_GPL(kvm_loongson_clear_guest_vtlb);
+> +
+> +void kvm_loongson_clear_guest_ftlb(void)
+> +{
+> +	int i;
+> +	int idx = read_gc0_index();
+> +
+> +	/* Set root GuestID for root probe and write of guest TLB
+> entry */
+> +	set_root_gid_to_guest_gid();
+> +
+> +	for (i = current_cpu_data.tlbsizevtlb;
+> +	     i < (current_cpu_data.tlbsizevtlb +
+> +		     current_cpu_data.tlbsizeftlbsets);
+> +	     i++) {
+> +		write_gc0_index(i);
+> +		guest_tlbinvf();
+> +	}
+> +	write_gc0_index(idx);
+> +
+> +	clear_root_gid();
+> +	set_c0_diag(LOONGSON_DIAG_ITLB | LOONGSON_DIAG_DTLB);
+> +}
+> +EXPORT_SYMBOL_GPL(kvm_loongson_clear_guest_ftlb);
+> +
+>  #endif
+>  
+>  /**
+> diff --git a/arch/mips/kvm/vz.c b/arch/mips/kvm/vz.c
+> index 0772565..2ea1f13 100644
+> --- a/arch/mips/kvm/vz.c
+> +++ b/arch/mips/kvm/vz.c
+> @@ -127,6 +127,11 @@ static inline unsigned int
+> kvm_vz_config5_guest_wrmask(struct kvm_vcpu *vcpu) return mask;
+>  }
+>  
+> +static inline unsigned int kvm_vz_config6_guest_wrmask(struct
+> kvm_vcpu *vcpu) +{
+> +	return MIPS_CONF6_INTIMER | MIPS_CONF6_EXTIMER |
+> MIPS_CONF6_SYND; +}
+> +
+>  /*
+>   * VZ optionally allows these additional Config bits to be written
+> by root:
+>   * Config:	M, [MT]
+> @@ -181,6 +186,12 @@ static inline unsigned int
+> kvm_vz_config5_user_wrmask(struct kvm_vcpu *vcpu) return
+> kvm_vz_config5_guest_wrmask(vcpu) | MIPS_CONF5_MRP; }
+>  
+> +static inline unsigned int kvm_vz_config6_user_wrmask(struct
+> kvm_vcpu *vcpu) +{
+> +	return kvm_vz_config6_guest_wrmask(vcpu) |
+> +		MIPS_CONF6_SFBEN | MIPS_CONF6_FTLBEN |
+> MIPS_CONF6_FTLBDIS; +}
+> +
+>  static gpa_t kvm_vz_gva_to_gpa_cb(gva_t gva)
+>  {
+>  	/* VZ guest has already converted gva to gpa */
+> @@ -930,7 +941,8 @@ static enum emulation_result
+> kvm_vz_gpsi_cop0(union mips_instruction inst, (sel == 2 ||	/*
+> SRSCtl */ sel == 3)) ||	/* SRSMap */
+>  				   (rd == MIPS_CP0_CONFIG &&
+> -				    (sel == 7)) ||	/* Config7
+> */
+> +				    (sel == 6 ||	/* Config6 */
+> +				     sel == 7)) ||	/* Config7
+> */ (rd == MIPS_CP0_LLADDR &&
+>  				    (sel == 2) &&	/* MAARI */
+>  				    cpu_guest_has_maar &&
+> @@ -938,6 +950,9 @@ static enum emulation_result
+> kvm_vz_gpsi_cop0(union mips_instruction inst, (rd == MIPS_CP0_ERRCTL
+> && (sel == 0))) {	/* ErrCtl */
+>  				val = cop0->reg[rd][sel];
+> +			} else if (rd == MIPS_CP0_DIAG &&
+> +				   (sel == 0)) {	/* Diag */
+> +				val = cop0->reg[rd][sel];
+>  			} else {
+>  				val = 0;
+>  				er = EMULATE_FAIL;
+> @@ -1000,9 +1015,38 @@ static enum emulation_result
+> kvm_vz_gpsi_cop0(union mips_instruction inst, cpu_guest_has_maar &&
+>  				   !cpu_guest_has_dyn_maar) {
+>  				kvm_write_maari(vcpu, val);
+> +			} else if (rd == MIPS_CP0_CONFIG &&
+> +				   (sel == 6)) {
+> +				cop0->reg[rd][sel] = (int)val;
+>  			} else if (rd == MIPS_CP0_ERRCTL &&
+>  				   (sel == 0)) {	/* ErrCtl */
+>  				/* ignore the written value */
+> +			} else if (rd == MIPS_CP0_DIAG &&
+> +				   (sel == 0)) {	/* Diag */
+> +				unsigned long flags;
+> +
+> +				local_irq_save(flags);
+> +				if (val & LOONGSON_DIAG_BTB) {
+> +					/* Flush BTB */
+> +
+> set_c0_diag(LOONGSON_DIAG_BTB);
+> +				}
+> +				if (val & LOONGSON_DIAG_ITLB) {
+> +					/* Flush ITLB */
+> +
+> set_c0_diag(LOONGSON_DIAG_ITLB);
+> +				}
+> +				if (val & LOONGSON_DIAG_DTLB) {
+> +					/* Flush DTLB */
+> +
+> set_c0_diag(LOONGSON_DIAG_DTLB);
+> +				}
+> +				if (val & LOONGSON_DIAG_VTLB) {
+> +					/* Flush VTLB */
+> +
+> kvm_loongson_clear_guest_vtlb();
+> +				}
+> +				if (val & LOONGSON_DIAG_FTLB) {
+> +					/* Flush FTLB */
+> +
+> kvm_loongson_clear_guest_ftlb();
+> +				}
+> +				local_irq_restore(flags);
+>  			} else {
+>  				er = EMULATE_FAIL;
+>  			}
+> @@ -1665,6 +1709,7 @@ static u64 kvm_vz_get_one_regs[] = {
+>  	KVM_REG_MIPS_CP0_CONFIG3,
+>  	KVM_REG_MIPS_CP0_CONFIG4,
+>  	KVM_REG_MIPS_CP0_CONFIG5,
+> +	KVM_REG_MIPS_CP0_CONFIG6,
+>  #ifdef CONFIG_64BIT
+>  	KVM_REG_MIPS_CP0_XCONTEXT,
+>  #endif
+> @@ -1992,6 +2037,9 @@ static int kvm_vz_get_one_reg(struct kvm_vcpu
+> *vcpu, return -EINVAL;
+>  		*v = read_gc0_config5();
+>  		break;
+> +	case KVM_REG_MIPS_CP0_CONFIG6:
+> +		*v = kvm_read_sw_gc0_config6(cop0);
+> +		break;
+>  	case KVM_REG_MIPS_CP0_MAAR(0) ...
+> KVM_REG_MIPS_CP0_MAAR(0x3f): if (!cpu_guest_has_maar ||
+> cpu_guest_has_dyn_maar) return -EINVAL;
+> @@ -2261,6 +2309,14 @@ static int kvm_vz_set_one_reg(struct kvm_vcpu
+> *vcpu, write_gc0_config5(v);
+>  		}
+>  		break;
+> +	case KVM_REG_MIPS_CP0_CONFIG6:
+> +		cur = kvm_read_sw_gc0_config6(cop0);
+> +		change = (cur ^ v) &
+> kvm_vz_config6_user_wrmask(vcpu);
+> +		if (change) {
+> +			v = cur ^ change;
+> +			kvm_write_sw_gc0_config6(cop0, (int)v);
+> +		}
+> +		break;
+>  	case KVM_REG_MIPS_CP0_MAAR(0) ...
+> KVM_REG_MIPS_CP0_MAAR(0x3f): if (!cpu_guest_has_maar ||
+> cpu_guest_has_dyn_maar) return -EINVAL;
 
