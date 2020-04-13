@@ -2,70 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2AA081A6FDF
-	for <lists+kvm@lfdr.de>; Tue, 14 Apr 2020 01:41:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EF70D1A6FE3
+	for <lists+kvm@lfdr.de>; Tue, 14 Apr 2020 01:50:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728474AbgDMXll convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Mon, 13 Apr 2020 19:41:41 -0400
-Received: from mail.kernel.org ([198.145.29.99]:45476 "EHLO mail.kernel.org"
+        id S2390149AbgDMXul (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Apr 2020 19:50:41 -0400
+Received: from mga07.intel.com ([134.134.136.100]:21895 "EHLO mga07.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727804AbgDMXll (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Apr 2020 19:41:41 -0400
-From:   bugzilla-daemon@bugzilla.kernel.org
-Authentication-Results: mail.kernel.org; dkim=permerror (bad message/signature format)
-To:     kvm@vger.kernel.org
-Subject: =?UTF-8?B?W0J1ZyAyMDcxNzNdIGt2bSBjb21waWxpbmcgcHJvYmxlbSA1LjYu?=
- =?UTF-8?B?eCBrdm1fbWFpbi5jOjIyMzY6NDI6IGVycm9yOiDigJhucl9wYWdlc19hdmFp?=
- =?UTF-8?B?bOKAmSBtYXkgYmUgdXNlZCB1bmluaXRpYWxpemVkIGluIHRoaXMgZnVuY3Rp?=
- =?UTF-8?B?b24=?=
-Date:   Mon, 13 Apr 2020 23:41:40 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: blocking
-X-Bugzilla-Who: sean.j.christopherson@intel.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-207173-28872-5puqqdHYcc@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-207173-28872@https.bugzilla.kernel.org/>
-References: <bug-207173-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        id S2390145AbgDMXuk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Apr 2020 19:50:40 -0400
+IronPort-SDR: 1a4raQk3w0rBwWnPAVINA59kewlrFeYQO7LG4gMk4N795WnI9dfV3VybJxuG/vA/fHJ6nu/Fi6
+ Jk9+FEbQv0fQ==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Apr 2020 16:50:39 -0700
+IronPort-SDR: yr40BAEAu0ZNwfRCZG4d5GNwNtVoD2eDvF9HgUxdXrTg/v9Y4+k+DOV2SPquFAIZDPBj+df+RA
+ QpXk1LXeMIsw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.72,380,1580803200"; 
+   d="scan'208";a="268580960"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
+  by orsmga008.jf.intel.com with ESMTP; 13 Apr 2020 16:50:39 -0700
+Date:   Mon, 13 Apr 2020 16:50:39 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Simon Smith <brigidsmith@google.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com,
+        Jim Mattson <jmattson@google.com>,
+        Peter Shier <pshier@google.com>,
+        Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Subject: Re: [kvm-unit-tests RESEND PATCH] x86: gtests: add new test for
+ vmread/vmwrite flags preservation
+Message-ID: <20200413235039.GK21204@linux.intel.com>
+References: <20200413172432.70180-1-brigidsmith@google.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200413172432.70180-1-brigidsmith@google.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=207173
+s/gtest/nVMX for the shortlog.  I thought this was somehow related to the
+Google Test framework, especially coming from a @google.com address.
 
-Sean Christopherson (sean.j.christopherson@intel.com) changed:
+On Mon, Apr 13, 2020 at 10:24:32AM -0700, Simon Smith wrote:
+> This commit adds new unit tests for commit a4d956b93904 ("KVM: nVMX:
+> vmread should not set rflags to specify success in case of #PF")
+> 
+> The two new tests force a vmread and a vmwrite on an unmapped
+> address to cause a #PF and verify that the low byte of %rflags is
+> preserved and that %rip is not advanced.  The cherry-pick fixed a
+> bug in vmread, but we include a test for vmwrite as well for
+> completeness.
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |sean.j.christopherson@intel
-                   |                            |.com
+I think some of Google's process is bleeding into kvm-unit-tests, I'm pretty
+sure the aforementioned commit wasn't cherry-picked into Paolo's tree.  :-D
 
---- Comment #2 from Sean Christopherson (sean.j.christopherson@intel.com) ---
-Is this reproducible on all 5.6.x releases?  Just want to double check that
-something didn't change between 5.6 and 5.6.3 that somehow broke things.
-
-Can you attach your config?  This has been reported before[*], but only with a
-proprietary compiler.  Maybe the issue is dependent on the config more so than
-the compiler.
-
-https://lkml.kernel.org/r/20200218184756.242904-1-oupton@google.com
-
--- 
-You are receiving this mail because:
-You are watching the assignee of the bug.
+> Before the aforementioned commit, the ALU flags would be incorrectly
+> cleared and %rip would be advanced (for vmread).
