@@ -2,165 +2,146 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9AC5D1A6486
-	for <lists+kvm@lfdr.de>; Mon, 13 Apr 2020 11:15:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 75A461A6432
+	for <lists+kvm@lfdr.de>; Mon, 13 Apr 2020 10:36:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727840AbgDMIhc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Apr 2020 04:37:32 -0400
-Received: from vultr.net.flygoat.com ([149.28.68.211]:58466 "EHLO
-        vultr.net.flygoat.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727802AbgDMIhb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Apr 2020 04:37:31 -0400
-X-Greylist: delayed 601 seconds by postgrey-1.27 at vger.kernel.org; Mon, 13 Apr 2020 04:37:31 EDT
-Received: from flygoat-x1e (unknown [IPv6:240e:390:49e:92c0::d68])
-        by vultr.net.flygoat.com (Postfix) with ESMTPSA id 1680920CF2;
-        Mon, 13 Apr 2020 08:19:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=flygoat.com; s=vultr;
-        t=1586765960; bh=4oWYtlgTtO0X4LB3G6OgFIKhhJH7k9TnuQnTQzRB24o=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=vgL/gYJXeBGHG1mziH4t6cGyVwTKL3Fd8sATYRT5Y5Y5qLRFdPZrkpLT0ZzvJ2FoZ
-         hzL398788Qe1tgyx1pfiaUWRRX+05cKSO7N5e1EK+AOqtstAvz1povGiZy39PSbqbq
-         bx3SpCHz3hzJQjG0fV7jh7g5MbeK0iF1Mf2Z+zRD5jeRt6DMHbBv2L7L61+OKfrR75
-         5iaPJljwdBn3NfBzqzNBByprnt29vTlWqcf9Pj6FpAoEqTEc10hDRaO4GEIJhE0D68
-         +rb+cCjt7Zx/Goas7c4nUaPQBsm2HSwn3obSkn2fzM8qkIMSNNCWXOc4ay5NXf9lmr
-         TgbZYXUbC1fgQ==
-Date:   Mon, 13 Apr 2020 16:18:42 +0800
-From:   Jiaxun Yang <jiaxun.yang@flygoat.com>
-To:     Huacai Chen <chenhc@lemote.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        kvm@vger.kernel.org, qemu-devel@nongnu.org,
-        linux-mips@vger.kernel.org, Fuxin Zhang <zhangfx@lemote.com>,
-        Huacai Chen <chenhuacai@gmail.com>,
-        aleksandar.qemu.devel@gmail.com
-Subject: Re: [PATCH 0/15] KVM: MIPS: Add Loongson-3 support (Host Side)
-Message-ID: <20200413161842.57ad8be4@flygoat-x1e>
-In-Reply-To: <1586763024-12197-1-git-send-email-chenhc@lemote.com>
-References: <1586763024-12197-1-git-send-email-chenhc@lemote.com>
-X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+        id S1728212AbgDMIfy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Apr 2020 04:35:54 -0400
+Received: from mail-ot1-f67.google.com ([209.85.210.67]:40200 "EHLO
+        mail-ot1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727795AbgDMIfv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Apr 2020 04:35:51 -0400
+Received: by mail-ot1-f67.google.com with SMTP id i27so5490892ota.7
+        for <kvm@vger.kernel.org>; Mon, 13 Apr 2020 01:35:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=AvGw2BENomW5mAjLN7te1eswf7XokhztvBZamCcaYj0=;
+        b=uD8A8qgO9EqAhRj5jnTHJFUY7v3Kp1X0ZbRX5+kzzkRJbOVFzZMvIiC0vrd8AEbXu6
+         j4U+LKqu1BGr1U7Iyv+gVYNLgnS1VGVayNBYCS2IHfvT2MLP6CobSya5jv/iUGy3TLgI
+         nm1wc59YKGg1s266n/VVhr39Z0sn1jSlMGTUPUvRSslX08GMWK3H9oihKMZDUGRoCDcD
+         xIAoJTdKpJInqVJYXUnt5AxEf7Yhxw6+V3EFPF7Fd1q8HNMdrOnUyEE4AQi1AgQodiaM
+         2vFiaW3n8RvkIVFYrU1b0b3Z7ncEW4wNV2ia112RomwbVmIeuZQ8f08i5g2dGbk/dqaj
+         Tb2g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=AvGw2BENomW5mAjLN7te1eswf7XokhztvBZamCcaYj0=;
+        b=CSU/TlPpp0YG2CkrHXm6zpbpdx6g/GZO7XeCoQRpRm4fGBrJICssEhLHy1DzF90q77
+         zwWKoN+9AZ35rBt3HYfK4MClALFjsVgGaxIOfrqRGF5PghThtO6JdLHM5ETljoF7MNAt
+         /a8jjPOHtwIdn/SNJBYlkkkZM6HbmZdpFciPaxCPPWy5u3EE7rn92tr9kRd1Z238w9MV
+         mg6mAFu9PW8DqmysnrMyD89r7MPzSL+HSIA7T2lG1gUtXISCdogPzWHwOKeo6vNDRoQg
+         n3t6ph+aPuxVpiGwSPo/BTfUBWIJIuqrdsRqYpv8NOZSTR7LHKg5BLFQaxXxAW886i5b
+         HJ9Q==
+X-Gm-Message-State: AGi0Pub0G6ah8N6bx2OC608kcVXN/keINzdMOlzqFsYmb66n+m3ROzZg
+        NgNmJ/Xu/AqPdpIqKx4S+sr96b3M+Ub4REXXUnJxuA==
+X-Google-Smtp-Source: APiQypLGyU2+5UH8I4pQFfkdm4IeQucZnCldFkCGft+bJP32qprqeDoFkHg65jEskDU5xzjopyRhE7fXAcHOLPADm9w=
+X-Received: by 2002:a9d:4b84:: with SMTP id k4mr3987928otf.233.1586766950301;
+ Mon, 13 Apr 2020 01:35:50 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <CANpmjNMR4BgfCxL9qXn0sQrJtQJbEPKxJ5_HEa2VXWi6UY4wig@mail.gmail.com>
+ <AC8A5393-B817-4868-AA85-B3019A1086F9@lca.pw> <CANpmjNPqQHKUjqAzcFym5G8kHX0mjProOpGu8e4rBmuGRykAUg@mail.gmail.com>
+ <C4FED226-E3DE-44AE-BBED-2B56B9F5B12F@lca.pw>
+In-Reply-To: <C4FED226-E3DE-44AE-BBED-2B56B9F5B12F@lca.pw>
+From:   Marco Elver <elver@google.com>
+Date:   Mon, 13 Apr 2020 10:35:38 +0200
+Message-ID: <CANpmjNPSLkiEer3xQHHxJm_4o5Em0i3bvM7TMmNO46Vzv2cwWQ@mail.gmail.com>
+Subject: Re: KCSAN + KVM = host reset
+To:     Qian Cai <cai@lca.pw>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        "paul E. McKenney" <paulmck@kernel.org>,
+        kasan-dev <kasan-dev@googlegroups.com>,
+        LKML <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 13 Apr 2020 15:30:09 +0800
-Huacai Chen <chenhc@lemote.com> wrote:
+On Fri, 10 Apr 2020 at 21:57, Qian Cai <cai@lca.pw> wrote:
+>
+>
+>
+> > On Apr 10, 2020, at 7:35 AM, Marco Elver <elver@google.com> wrote:
+> >
+> > On Fri, 10 Apr 2020 at 13:25, Qian Cai <cai@lca.pw> wrote:
+> >>
+> >>
+> >>
+> >>> On Apr 10, 2020, at 5:47 AM, Marco Elver <elver@google.com> wrote:
+> >>>
+> >>> That would contradict what you said about it working if KCSAN is
+> >>> "off". What kernel are you attempting to use in the VM?
+> >
+> > Ah, sorry this was a typo,
+> >  s/working if KCSAN/not working if KCSAN/
+> >
+> >> Well, I said set KCSAN debugfs to =E2=80=9Coff=E2=80=9D did not help, =
+i.e., it will reset the host running kvm.sh. It is the vanilla ubuntu 18.04=
+ kernel in VM.
+> >>
+> >> github.com/cailca/linux-mm/blob/master/kvm.sh
+> >
+> > So, if you say that CONFIG_KCSAN_INTERRUPT_WATCHER=3Dn works, that
+> > contradicts it not working when KCSAN is "off". Because if KCSAN is
+> > off, it never sets up any watchpoints, and whether or not
+> > KCSAN_INTERRUPT_WATCHER is selected or not shouldn't matter. Does that
+> > make more sense?
+>
+> Yes, you are right. CONFIG_KCSAN_INTERRUPT_WATCHER=3Dn does not
+> make it work. It was a mistake when I tested it because there was a stale=
+ svm.o
+> leftover from the previous run, and then it will not trigger a rebuild (a=
+ bug?) when
+> only modify the Makefile to remove KCSAN_SANITIZE :=3D n. Sorry for the m=
+isleading
+> information. I should be checking if svm.o was really recompiled in the f=
+irst place.
+>
+> Anyway, I=E2=80=99ll send a patch to add __no_kcsan for svm_vcpu_run() be=
+cause I tried
+> to narrow down more with a kcsan_[disable|enable]_current() pair, but it =
+does NOT
+> work even by enclosing the almost whole function below until Marcro has m=
+ore ideas?
 
-> We are preparing to add KVM support for Loongson-3. VZ extension is
-> fully supported in Loongson-3A R4+, and we will not care about old
-> CPUs (at least now). We already have a full functional Linux kernel
-> (based on Linux-5.4.x LTS) and QEMU (based on 5.0.0-rc2) and their git
-> repositories are here:
-> 
-> QEMU: https://github.com/chenhuacai/qemu
-> Kernel: https://github.com/chenhuacai/linux
-> 
-> Of course these two repositories need to be rework and not suitable
-> for upstream (especially the commits need to be splitted). We show
-> them here is just to tell others what we have done, and how
-> KVM/Loongson will look like.
-> 
-> Our plan is make the KVM host side be upstream first, and after that,
-> we will make the KVM guest side and QEMU emulator be upstream.
+This is expected. Instrumentation is not removed if you add
+kcsan_{disable,enable}_current() (it has the same effect as a
+localized "off"). Since it seems just the instrumentation and
+associated calls before every memory access is enough, this won't
+work. The attribute __no_kcsan removes instrumentation entirely from
+the function. If the non-instrumented code should be reduced, it is
+conceivable to take the problematic portion of code and factor it into
+a function that has attribute '__no_kcsan_or_inline'.
 
-+ Aleksandar as QEMU/MIPS mainatiner
+Thanks,
+-- Marco
 
-I was involved in KVM/Loongson development a bit and also intend to
-help with mainline these works.
-
-After dealing with basic LS7A PCH kernel support, I'm going to
-cooperate with Huacai and anyone who interested in to deal with
-following stuff:
-
-- Basic QEMU/TCG support for Loongson64 instructions.
-	Well, it seems unrelated with KVM, but that would make
-	development easier with cross ISA emulation. I'm not going to
-	implement all the features like Loongson's page table fast walk
-	extension and binary translation extension but I'll ensure any
-	binary compiled with march=loongson3a can run flawlessly on
-	TCG.
-
-- Design of Loongson-VIRT QEMU machine
-	It is nearly impossible to bring a real Loongson system into
-	QEMU. Both RS780E and LS7A PCH have tons of unreasonable design
-	that would make the emulation extremely complex, Loongson
-	company's KVM implementation[1] has already proofed that,
-	thay're now in the hell. So we all agreed that we should build
-	a machine from draft. I think we should reuse existing infra as
-	far as possible to reduce our work load. I'm planing to use
-	pci-host-cam-generic together with VIRTIO PCI devices and a
-	a strip down version of loongson,liointc-1.0a to build a pure
-	PCI based system. But if any one have better idea please just
-	tell us, I'm still considering how to implement SMP-IPI and ACPI
-	stuff.
-
-- BIOS in VM
-	This has a lower priority. But BIOS is required to make a
-	emulated machine looks like a real machine. Loongson have their
-	open-sourced PMON and close-sourced UEFI(Based on tianocore).
-	I'd really with Loongson or Lemote will open-source their UEFI
-	but PMON is also a option.
-
-Any kind of feedback is appreciated.
-
-Thanks.
-
-Wish you good health :-)
-
-
-[1]: http://cgit.loongnix.org/cgit/linux-3.10/ &
-http://cgit.loongnix.org/cgit/qemu-2.7.0/
-
-Btw: I think Cc qemu-devel for the whole series is a little bit
-disturb, probably we should only Cc qemu-devel for the cover letter.
-
-> 
-> Mike Rapoport(1):
->  mips: define pud_index() regardless of page table folding
-> 
-> Xing Li(2):
->  KVM: MIPS: Define KVM_ENTRYHI_ASID to cpu_asid_mask(&boot_cpu_data)
->  KVM: MIPS: Fix VPN2_MASK definition for variable cpu_vmbits
-> 
-> Huacai Chen(12):
->  KVM: MIPS: Increase KVM_MAX_VCPUS and KVM_USER_MEM_SLOTS to 16
->  KVM: MIPS: Add EVENTFD support which is needed by VHOST
->  KVM: MIPS: Use lddir/ldpte instructions to lookup gpa_mm.pgd
->  KVM: MIPS: Introduce and use cpu_guest_has_ldpte
->  KVM: MIPS: Use root tlb to control guest's CCA for Loongson-3
->  KVM: MIPS: Let indexed cacheops cause guest exit on Loongson-3
->  KVM: MIPS: Add more types of virtual interrupts
->  KVM: MIPS: Add Loongson-3 Virtual IPI interrupt support
->  KVM: MIPS: Add CPUCFG emulation for Loongson-3
->  KVM: MIPS: Add CONFIG6 and DIAG registers emulation
->  KVM: MIPS: Add more MMIO load/store instructions emulation
->  KVM: MIPS: Enable KVM support for Loongson-3
-> 
-> Signed-off-by: Huacai Chen <chenhc@lemote.com>
-> ---
->  arch/mips/Kconfig                    |   1 +
->  arch/mips/include/asm/cpu-features.h |   3 +
->  arch/mips/include/asm/kvm_host.h     |  50 +++-
->  arch/mips/include/asm/mipsregs.h     |   7 +
->  arch/mips/include/asm/pgtable-64.h   |   4 +-
->  arch/mips/include/uapi/asm/inst.h    |  11 +
->  arch/mips/kernel/cpu-probe.c         |   2 +
->  arch/mips/kvm/Kconfig                |   1 +
->  arch/mips/kvm/Makefile               |   5 +-
->  arch/mips/kvm/emulate.c              | 461
-> ++++++++++++++++++++++++++++++++++- arch/mips/kvm/entry.c
->    |  19 +- arch/mips/kvm/interrupt.c            |  93 +------
->  arch/mips/kvm/interrupt.h            |  14 +-
->  arch/mips/kvm/loongson_ipi.c         | 215 ++++++++++++++++
->  arch/mips/kvm/mips.c                 |  49 +++-
->  arch/mips/kvm/tlb.c                  |  39 +++
->  arch/mips/kvm/trap_emul.c            |   3 +
->  arch/mips/kvm/vz.c                   | 204 +++++++++++-----
->  18 files changed, 1013 insertions(+), 168 deletions(-)
->  create mode 100644 arch/mips/kvm/loongson_ipi.c
-> --
-> 2.7.0
-
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index 2be5bbae3a40..e58b2d5a575c 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -3286,6 +3286,7 @@ static void svm_vcpu_run(struct kvm_vcpu *vcpu)
+>         svm->vmcb->save.rsp =3D vcpu->arch.regs[VCPU_REGS_RSP];
+>         svm->vmcb->save.rip =3D vcpu->arch.regs[VCPU_REGS_RIP];
+>
+> +       kcsan_disable_current();
+>         /*
+>          * A vmexit emulation is required before the vcpu can be executed
+>          * again.
+> @@ -3410,6 +3411,7 @@ static void svm_vcpu_run(struct kvm_vcpu *vcpu)
+>                 svm_handle_mce(svm);
+>
+>         mark_all_clean(svm->vmcb);
+> +       kcsan_enable_current();
+>  }
+>  STACK_FRAME_NON_STANDARD(svm_vcpu_run);
+>
+>
+>
+>
+>
+>
