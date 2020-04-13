@@ -2,238 +2,147 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6DEC31A6428
-	for <lists+kvm@lfdr.de>; Mon, 13 Apr 2020 10:35:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C15E81A6435
+	for <lists+kvm@lfdr.de>; Mon, 13 Apr 2020 10:37:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727910AbgDMIf0 convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Mon, 13 Apr 2020 04:35:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.18]:40890 "EHLO
+        id S1728026AbgDMIf1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Apr 2020 04:35:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.18]:41040 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729270AbgDMIK5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Apr 2020 04:10:57 -0400
-Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C46C1C008614;
-        Mon, 13 Apr 2020 01:05:41 -0700 (PDT)
-IronPort-SDR: ha4EJ32RX904sG6UZcb/TKC/t7FXcD/RHkwXSEvnyeAMJWvTZoQvL2VupYozyzFtfx9h+3WFrG
- dvgxMtdZ4sEQ==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Apr 2020 01:05:41 -0700
-IronPort-SDR: Zrv3vmGuHm3eVd7+E73kIdPVJuY98wnKxI2PNWS7zhNYGZiZWxiEd7FpvamAYsWAmgUyW4j2DH
- 9iF03aO0xusw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.72,378,1580803200"; 
-   d="scan'208";a="331770783"
-Received: from fmsmsx103.amr.corp.intel.com ([10.18.124.201])
-  by orsmga001.jf.intel.com with ESMTP; 13 Apr 2020 01:05:40 -0700
-Received: from fmsmsx608.amr.corp.intel.com (10.18.126.88) by
- FMSMSX103.amr.corp.intel.com (10.18.124.201) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Mon, 13 Apr 2020 01:05:38 -0700
-Received: from fmsmsx608.amr.corp.intel.com (10.18.126.88) by
- fmsmsx608.amr.corp.intel.com (10.18.126.88) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1713.5; Mon, 13 Apr 2020 01:05:38 -0700
-Received: from shsmsx103.ccr.corp.intel.com (10.239.4.69) by
- fmsmsx608.amr.corp.intel.com (10.18.126.88) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id 15.1.1713.5
- via Frontend Transport; Mon, 13 Apr 2020 01:05:37 -0700
-Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.225]) by
- SHSMSX103.ccr.corp.intel.com ([169.254.4.146]) with mapi id 14.03.0439.000;
- Mon, 13 Apr 2020 16:05:35 +0800
-From:   "Tian, Kevin" <kevin.tian@intel.com>
-To:     "Raj, Ashok" <ashok.raj@linux.intel.com>,
-        Alex Williamson <alex.williamson@redhat.com>
-CC:     "Raj, Ashok" <ashok.raj@intel.com>,
-        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Tian, Jun J" <jun.j.tian@intel.com>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Sun, Yi Y" <yi.y.sun@intel.com>,
-        "Bjorn Helgaas" <bhelgaas@google.com>,
-        "Wu, Hao" <hao.wu@intel.com>, Don Dutile <ddutile@redhat.com>
-Subject: RE: [PATCH v1 2/2] vfio/pci: Emulate PASID/PRI capability for VFs
-Thread-Topic: [PATCH v1 2/2] vfio/pci: Emulate PASID/PRI capability for VFs
-Thread-Index: AQHWAEVGCz5QQWvL/U+nYnlD7MiZ7Khl/jEAgACVNICAAJ/EgIAF8c6ggAA/A4CAAMnRgIAAzpAAgAb/OoCAAMrPQIAAC1kA
-Date:   Mon, 13 Apr 2020 08:05:33 +0000
-Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D19D81A31F@SHSMSX104.ccr.corp.intel.com>
-References: <1584880394-11184-1-git-send-email-yi.l.liu@intel.com>
- <1584880394-11184-3-git-send-email-yi.l.liu@intel.com>
- <20200402165954.48d941ee@w520.home>
- <A2975661238FB949B60364EF0F2C25743A2204FE@SHSMSX104.ccr.corp.intel.com>
- <20200403112545.6c115ba3@w520.home>
- <AADFC41AFE54684AB9EE6CBC0274A5D19D80E13D@SHSMSX104.ccr.corp.intel.com>
- <20200407095801.648b1371@w520.home> <20200408040021.GS67127@otc-nc-03>
- <20200408101940.3459943d@w520.home>
- <20200413031043.GA18183@araj-mobl1.jf.intel.com> 
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-version: 11.2.0.6
-dlp-reaction: no-action
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+        with ESMTP id S1727979AbgDMILM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Apr 2020 04:11:12 -0400
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE5CBC008612
+        for <kvm@vger.kernel.org>; Mon, 13 Apr 2020 01:11:10 -0700 (PDT)
+Received: by mail-io1-f70.google.com with SMTP id c26so4477929ioa.4
+        for <kvm@vger.kernel.org>; Mon, 13 Apr 2020 01:11:10 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
+        bh=jkRD3ZLCGbnan/OLqHZy5Z7Id1+L0JF7pFHOJuXWPhg=;
+        b=dW3xTAGMm4vsKkntA18F8oBV+MzlCboWUzmrCZHoQk1RW8WWn/Vq44Pck5iHsNcskB
+         WAYY1WZ4r4KruSHcYDCd4ajX+ArBn7OMLxrBGJUc8V20VFHxT7jpstDpJ0GSIBdxhYYr
+         7LD9T/TpPIrKPM0rJt3LaySHI62m8WM0kVKhDrSmbFupuYhmRYNGwywOCSGu5bD4WNb9
+         foQp3yAZ4Hr0DpruZM/+/EauoZG2+AhXBpUyINJuAtqR3lC31gQ7iN8bsxXAN4iULPID
+         noLFaWkhRxtQ5JnRquQY8nXFfsvpizDKkbwkPpCnJj0FSm68O+F+B7BGBy3WNjgZlrSX
+         Nrbw==
+X-Gm-Message-State: AGi0Pubzu3Y60ahtZn4PhU/fkes/aq5TPf8E9CABp6u2vedrb6Dl6HFi
+        ShQxknLFp8GuFDStsid20l0xKrbTET7loiblGv0PAFPj4Ypw
+X-Google-Smtp-Source: APiQypLfmW8Gz/2+IzV0DfXYXUiT489hPKS6/y+oTe8VDMFmIXSrDsXgDJxH6AcKDUigDQQJjQezYrJchYMOc4VL4SS0+3V/qR0M
 MIME-Version: 1.0
+X-Received: by 2002:a6b:650f:: with SMTP id z15mr4529166iob.162.1586765470304;
+ Mon, 13 Apr 2020 01:11:10 -0700 (PDT)
+Date:   Mon, 13 Apr 2020 01:11:10 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000003311fd05a327a060@google.com>
+Subject: KASAN: slab-out-of-bounds Read in gfn_to_memslot
+From:   syzbot <syzbot+2e0179e5185bcd5b9440@syzkaller.appspotmail.com>
+To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        pbonzini@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> From: Tian, Kevin
-> Sent: Monday, April 13, 2020 3:55 PM
-> 
-> > From: Raj, Ashok <ashok.raj@linux.intel.com>
-> > Sent: Monday, April 13, 2020 11:11 AM
-> >
-> > On Wed, Apr 08, 2020 at 10:19:40AM -0600, Alex Williamson wrote:
-> > > On Tue, 7 Apr 2020 21:00:21 -0700
-> > > "Raj, Ashok" <ashok.raj@intel.com> wrote:
-> > >
-> > > > Hi Alex
-> > > >
-> > > > + Bjorn
-> > >
-> > >  + Don
-> > >
-> > > > FWIW I can't understand why PCI SIG went different ways with ATS,
-> > > > where its enumerated on PF and VF. But for PASID and PRI its only
-> > > > in PF.
-> > > >
-> > > > I'm checking with our internal SIG reps to followup on that.
-> > > >
-> > > > On Tue, Apr 07, 2020 at 09:58:01AM -0600, Alex Williamson wrote:
-> > > > > > Is there vendor guarantee that hidden registers will locate at the
-> > > > > > same offset between PF and VF config space?
-> > > > >
-> > > > > I'm not sure if the spec really precludes hidden registers, but the
-> > > > > fact that these registers are explicitly outside of the capability
-> > > > > chain implies they're only intended for device specific use, so I'd say
-> > > > > there are no guarantees about anything related to these registers.
-> > > >
-> > > > As you had suggested in the other thread, we could consider
-> > > > using the same offset as in PF, but even that's a better guess
-> > > > still not reliable.
-> > > >
-> > > > The other option is to maybe extend driver ops in the PF to expose
-> > > > where the offsets should be. Sort of adding the quirk in the
-> > > > implementation.
-> > > >
-> > > > I'm not sure how prevalent are PASID and PRI in VF devices. If SIG is
-> > resisting
-> > > > making VF's first class citizen, we might ask them to add some verbiage
-> > > > to suggest leave the same offsets as PF open to help emulation software.
-> > >
-> > > Even if we know where to expose these capabilities on the VF, it's not
-> > > clear to me how we can actually virtualize the capability itself.  If
-> > > the spec defines, for example, an enable bit as r/w then software that
-> > > interacts with that register expects the bit is settable.  There's no
-> > > protocol for "try to set the bit and re-read it to see if the hardware
-> > > accepted it".  Therefore a capability with a fixed enable bit
-> > > representing the state of the PF, not settable by the VF, is
-> > > disingenuous to the spec.
-> >
-> > I think we are all in violent agreement. A lot of times the pci spec gets
-> > defined several years ahead of real products and no one remembers
-> > the justification on why they restricted things the way they did.
-> >
-> > Maybe someone early product wasn't quite exposing these features to the
-> > VF
-> > and hence the spec is bug compatible :-)
-> >
-> > >
-> > > If what we're trying to do is expose that PASID and PRI are enabled on
-> > > the PF to a VF driver, maybe duplicating the PF capabilities on the VF
-> > > without the ability to control it is not the right approach.  Maybe we
-> >
-> > As long as the capability enable is only provided when the PF has enabled
-> > the feature. Then it seems the hardware seems to do the right thing.
-> >
-> > Assume we expose PASID/PRI only when PF has enabled it. It will be the
-> > case since the PF driver needs to exist, and IOMMU would have set the
-> > PASID/PRI/ATS on PF.
-> >
-> > If the emulation is purely spoofing the capability. Once vIOMMU driver
-> > enables PASID, the context entries for the VF are completely independent
-> > from the PF context entries.
-> >
-> > vIOMMU would enable PASID, and we just spoof the PASID capability.
-> >
-> > If vIOMMU or guest for some reason does disable_pasid(), then the
-> > vIOMMU driver can disaable PASID on the VF context entries. So the VF
-> > although the capability is blanket enabled on PF, IOMMU gaurantees the
-> > transactions are blocked.
-> >
-> >
-> > In the interim, it seems like the intent of the virtual capability
-> > can be honored via help from the IOMMU for the controlling aspect..
-> >
-> > Did i miss anything?
-> 
-> Above works for emulating the enable bit (under the assumption that
-> PF driver won't disable pasid when vf is assigned). However, there are
-> also "Execute permission enable" and "Privileged mode enable" bits in
-> PASID control registers. I don't know how those bits could be cleanly
-> emulated when the guest writes a value different from PF's...
+Hello,
 
-sent too quick. the IOMMU also includes control bits for allowing/
-blocking execute requests and supervisor requests. We can rely on 
-IOMMU to block those requests to emulate the disabled cases of
-all three control bits in the pasid cap.
+syzbot found the following crash on:
 
-Thanks
-Kevin
+HEAD commit:    4f8a3cc1 Merge tag 'x86-urgent-2020-04-12' of git://git.ke..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=104b9407e00000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=3bfbde87e8e65624
+dashboard link: https://syzkaller.appspot.com/bug?extid=2e0179e5185bcd5b9440
+compiler:       clang version 10.0.0 (https://github.com/llvm/llvm-project/ c2443155a0fb245c8f17f2c1c72b6ea391e86e81)
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=13e78c7de00000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=14cf613fe00000
 
-> 
-> Similar problem also exists when talking about PRI emulation, e.g.
-> to enable PRI the software usually waits until the 'stopped' bit
-> is set (indicating all previously issued requests have completed). How
-> to emulate this bit accurately when one guest toggles the enable bit
-> while the PF and other VFs are actively issuing page requests through
-> the shared page request interface? from pcie spec I didn't find a way
-> to catch when all previously-issued requests from a specific VF have
-> completed. Can a conservative big-enough timeout value help here?
-> I don't know... similar puzzle also exists for emulating the 'reset'
-> control bit which is supposed to clear the pending request state for
-> the whole page request interface.
-> 
-> I feel the main problem in pcie spec is that, while they invent SR-IOV
-> to address I/O virtualization requirement (where strict isolation is
-> required), they blurred the boundary by leaving some shared resource
-> cross PF and VFs which imply sort of cooperation between PF and VF
-> drivers. On bare metal such cooperation is easy to build, by enabling/
-> disabling a capability en mass, by using the same set of setting, etc.
-> However it doesn't consider the virtualization case where a VF is
-> assigned to the guest which considers the VF as a standard PCI/PCIe
-> endpoint thus such cooperation is missing. A vendor capability could
-> help fix the gap here but making it adopted by major guest OSes will
-> take time. But honestly speaking I don't know other good alternative
-> now... :/
-> 
-> >
-> > > need new capabilities exposing these as slave features that cannot be
-> > > controlled?  We could define our own vendor capability for this, but of
-> > > course we have both the where to put it in config space issue, as well
-> > > as the issue of trying to push an ad-hoc standard.  vfio could expose
-> > > these as device features rather than emulating capabilities, but that
-> > > still leaves a big gap between vfio in the hypervisor and the driver in
-> > > the guest VM.  That might still help push the responsibility and policy
-> > > for how to expose it to the VM as a userspace problem though.
-> >
-> > I think this is a good long term solution, but if the vIOMMU implenentations
-> > can carry us for the time being, we can probably defer them unless
-> > we are stuck.
-> >
-> > >
-> > > I agree though, I don't know why the SIG would preclude implementing
-> > > per VF control of these features.  Thanks,
-> > >
-> >
-> > Cheers,
-> > Ashok
-> 
-> Thanks
-> Kevin
+IMPORTANT: if you fix the bug, please add the following tag to the commit:
+Reported-by: syzbot+2e0179e5185bcd5b9440@syzkaller.appspotmail.com
+
+==================================================================
+BUG: KASAN: slab-out-of-bounds in search_memslots include/linux/kvm_host.h:1051 [inline]
+BUG: KASAN: slab-out-of-bounds in __gfn_to_memslot include/linux/kvm_host.h:1063 [inline]
+BUG: KASAN: slab-out-of-bounds in gfn_to_memslot+0x275/0x470 arch/x86/kvm/../../../virt/kvm/kvm_main.c:1597
+Read of size 8 at addr ffff888097b31468 by task syz-executor165/9960
+
+CPU: 0 PID: 9960 Comm: syz-executor165 Not tainted 5.6.0-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+Call Trace:
+ __dump_stack lib/dump_stack.c:77 [inline]
+ dump_stack+0x1e9/0x30e lib/dump_stack.c:118
+ print_address_description+0x74/0x5c0 mm/kasan/report.c:382
+ __kasan_report+0x103/0x1a0 mm/kasan/report.c:511
+ kasan_report+0x4d/0x80 mm/kasan/common.c:625
+
+Allocated by task 9966:
+ save_stack mm/kasan/common.c:49 [inline]
+ set_track mm/kasan/common.c:57 [inline]
+ __kasan_kmalloc+0x114/0x160 mm/kasan/common.c:495
+ kmalloc_node include/linux/slab.h:578 [inline]
+ kvmalloc_node+0x81/0x100 mm/util.c:574
+ kvmalloc include/linux/mm.h:757 [inline]
+ kvzalloc include/linux/mm.h:765 [inline]
+ kvm_dup_memslots arch/x86/kvm/../../../virt/kvm/kvm_main.c:1101 [inline]
+ kvm_set_memslot+0x124/0x15b0 arch/x86/kvm/../../../virt/kvm/kvm_main.c:1118
+ __kvm_set_memory_region+0x1388/0x16c0 arch/x86/kvm/../../../virt/kvm/kvm_main.c:1300
+ kvm_set_memory_region arch/x86/kvm/../../../virt/kvm/kvm_main.c:1321 [inline]
+ kvm_vm_ioctl_set_memory_region arch/x86/kvm/../../../virt/kvm/kvm_main.c:1333 [inline]
+ kvm_vm_ioctl+0x930/0x2530 arch/x86/kvm/../../../virt/kvm/kvm_main.c:3604
+ vfs_ioctl fs/ioctl.c:47 [inline]
+ ksys_ioctl fs/ioctl.c:763 [inline]
+ __do_sys_ioctl fs/ioctl.c:772 [inline]
+ __se_sys_ioctl+0xf9/0x160 fs/ioctl.c:770
+ do_syscall_64+0xf3/0x1b0 arch/x86/entry/common.c:295
+ entry_SYSCALL_64_after_hwframe+0x49/0xb3
+
+Freed by task 8700:
+ save_stack mm/kasan/common.c:49 [inline]
+ set_track mm/kasan/common.c:57 [inline]
+ kasan_set_free_info mm/kasan/common.c:317 [inline]
+ __kasan_slab_free+0x125/0x190 mm/kasan/common.c:456
+ __cache_free mm/slab.c:3426 [inline]
+ kfree+0x10a/0x220 mm/slab.c:3757
+ kvm_free_memslots arch/x86/kvm/../../../virt/kvm/kvm_main.c:601 [inline]
+ kvm_destroy_vm arch/x86/kvm/../../../virt/kvm/kvm_main.c:810 [inline]
+ kvm_put_kvm+0xa8d/0xcb0 arch/x86/kvm/../../../virt/kvm/kvm_main.c:828
+ kvm_vm_release+0x42/0x50 arch/x86/kvm/../../../virt/kvm/kvm_main.c:851
+ __fput+0x2ed/0x750 fs/file_table.c:280
+ task_work_run+0x147/0x1d0 kernel/task_work.c:123
+ tracehook_notify_resume include/linux/tracehook.h:188 [inline]
+ exit_to_usermode_loop arch/x86/entry/common.c:165 [inline]
+ prepare_exit_to_usermode+0x48e/0x600 arch/x86/entry/common.c:196
+ entry_SYSCALL_64_after_hwframe+0x49/0xb3
+
+The buggy address belongs to the object at ffff888097b31000
+ which belongs to the cache kmalloc-2k of size 2048
+The buggy address is located 1128 bytes inside of
+ 2048-byte region [ffff888097b31000, ffff888097b31800)
+The buggy address belongs to the page:
+page:ffffea00025ecc40 refcount:1 mapcount:0 mapping:00000000499db978 index:0x0
+flags: 0xfffe0000000200(slab)
+raw: 00fffe0000000200 ffffea00029ef288 ffffea0002a34408 ffff8880aa400e00
+raw: 0000000000000000 ffff888097b31000 0000000100000001 0000000000000000
+page dumped because: kasan: bad access detected
+
+Memory state around the buggy address:
+ ffff888097b31300: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+ ffff888097b31380: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+>ffff888097b31400: 00 00 00 00 00 00 00 00 00 00 00 00 00 fc fc fc
+                                                          ^
+ ffff888097b31480: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+ ffff888097b31500: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+==================================================================
+
+
+---
+This bug is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this bug report. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+syzbot can test patches for this bug, for details see:
+https://goo.gl/tpsmEJ#testing-patches
