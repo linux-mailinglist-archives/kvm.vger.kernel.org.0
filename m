@@ -2,39 +2,38 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 389B61A6C0B
-	for <lists+kvm@lfdr.de>; Mon, 13 Apr 2020 20:27:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6514D1A6C3D
+	for <lists+kvm@lfdr.de>; Mon, 13 Apr 2020 20:52:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387721AbgDMS1N (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Apr 2020 14:27:13 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:37480 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387716AbgDMS1N (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Apr 2020 14:27:13 -0400
+        id S1733126AbgDMSwr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Apr 2020 14:52:47 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:24511 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1733112AbgDMSwo (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 13 Apr 2020 14:52:44 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1586802432;
+        s=mimecast20190719; t=1586803963;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=LE4Q5pv4+ttMd6fa4HJ5hzCrYdDEL+fHTEMdK/F84bA=;
-        b=eMkHGOpOi+jRBi687vaWtkk0VKX11yeZU3dbIYmVj+KXs5r/9hyhfE1RzQFGcu0T4d05VY
-        fyz2aPgLIy/y6GqtdsxRJOe1jK/GFbTMn6J/ucnkJvOtC2KBlh3JxaIiLNyCqiEa+rgVgi
-        w4OB462i7P3R9r9AA9tF6XNsMWZgQ3s=
+        bh=VEsVmmOO6axAzAyQkoOiM6SYAejl43B4iZY1NJSfZ0s=;
+        b=MRCIOLmgVoK8Wpr1nLZ6aoqxQcWmUKtrHOLtHTRx0JUN01RKyPTjug2MhlMe0YtPDWHiF+
+        jqb8QBnUWKZpdmQNUx4pYXxSYoNeNNuSK1VncHUIOVIqdM9W20xFnCFJWDmF8J3IXsE6tr
+        m6ZrIS1+BMkS27R7ORKioviWb2tIbzw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-12-fywtPCKvPym3A9psr-clxg-1; Mon, 13 Apr 2020 14:27:09 -0400
-X-MC-Unique: fywtPCKvPym3A9psr-clxg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+ us-mta-378-oP2NfmJ9OTKgGCR2_NkE1A-1; Mon, 13 Apr 2020 14:52:41 -0400
+X-MC-Unique: oP2NfmJ9OTKgGCR2_NkE1A-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EE9EF18FE861;
-        Mon, 13 Apr 2020 18:27:07 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3D7A5107ACCA;
+        Mon, 13 Apr 2020 18:52:40 +0000 (UTC)
 Received: from localhost.localdomain (ovpn-116-15.gru2.redhat.com [10.97.116.15])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id CD0CA5D9CD;
-        Mon, 13 Apr 2020 18:26:57 +0000 (UTC)
-Subject: Re: [PATCH 01/10] KVM: selftests: Take vcpu pointer instead of id in
- vm_vcpu_rm()
+        by smtp.corp.redhat.com (Postfix) with ESMTP id B36129F99A;
+        Mon, 13 Apr 2020 18:52:29 +0000 (UTC)
+Subject: Re: [PATCH 03/10] KVM: selftests: Add util to delete memory region
 To:     Sean Christopherson <sean.j.christopherson@intel.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Christian Borntraeger <borntraeger@de.ibm.com>,
@@ -44,74 +43,134 @@ Cc:     David Hildenbrand <david@redhat.com>,
         linux-kernel@vger.kernel.org, Peter Xu <peterx@redhat.com>,
         Andrew Jones <drjones@redhat.com>
 References: <20200410231707.7128-1-sean.j.christopherson@intel.com>
- <20200410231707.7128-2-sean.j.christopherson@intel.com>
+ <20200410231707.7128-4-sean.j.christopherson@intel.com>
 From:   Wainer dos Santos Moschetta <wainersm@redhat.com>
-Message-ID: <b696c5b9-2507-8849-e196-37c83806cfdf@redhat.com>
-Date:   Mon, 13 Apr 2020 15:26:55 -0300
+Message-ID: <cf3c04ac-f4f2-e1f0-4fd7-c30c28dd3563@redhat.com>
+Date:   Mon, 13 Apr 2020 15:52:27 -0300
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.4.0
 MIME-Version: 1.0
-In-Reply-To: <20200410231707.7128-2-sean.j.christopherson@intel.com>
+In-Reply-To: <20200410231707.7128-4-sean.j.christopherson@intel.com>
 Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
-On 4/10/20 8:16 PM, Sean Christopherson wrote:
-> The sole caller of vm_vcpu_rm() already has the vcpu pointer, take it
-> directly instead of doing an extra lookup.
-
-
-Most of (if not all) vcpu related functions in kvm_util.c receives an 
-id, so this change creates an inconsistency.
-
-Disregarding the above comment, the changes look good to me. So:
-
-Reviewed-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
-
-
+On 4/10/20 8:17 PM, Sean Christopherson wrote:
+> Add a utility to delete a memory region, it will be used by x86's
+> set_memory_region_test.
 >
 > Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 > ---
->   tools/testing/selftests/kvm/lib/kvm_util.c | 7 +++----
->   1 file changed, 3 insertions(+), 4 deletions(-)
+>   .../testing/selftests/kvm/include/kvm_util.h  |  1 +
+>   tools/testing/selftests/kvm/lib/kvm_util.c    | 56 +++++++++++++------
+>   2 files changed, 40 insertions(+), 17 deletions(-)
+
+LGTM.
+
+Reviewed-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
+
 >
+> diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
+> index 2f329e785c58..d4c3e4d9cd92 100644
+> --- a/tools/testing/selftests/kvm/include/kvm_util.h
+> +++ b/tools/testing/selftests/kvm/include/kvm_util.h
+> @@ -114,6 +114,7 @@ int _vcpu_ioctl(struct kvm_vm *vm, uint32_t vcpuid, unsigned long ioctl,
+>   void vm_ioctl(struct kvm_vm *vm, unsigned long ioctl, void *arg);
+>   void vm_mem_region_set_flags(struct kvm_vm *vm, uint32_t slot, uint32_t flags);
+>   void vm_mem_region_move(struct kvm_vm *vm, uint32_t slot, uint64_t new_gpa);
+> +void vm_mem_region_delete(struct kvm_vm *vm, uint32_t slot);
+>   void vm_vcpu_add(struct kvm_vm *vm, uint32_t vcpuid);
+>   vm_vaddr_t vm_vaddr_alloc(struct kvm_vm *vm, size_t sz, vm_vaddr_t vaddr_min,
+>   			  uint32_t data_memslot, uint32_t pgd_memslot);
 > diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-> index 8a3523d4434f..9a783c20dd26 100644
+> index 105ee9bc09f0..ab5b7ea60f4b 100644
 > --- a/tools/testing/selftests/kvm/lib/kvm_util.c
 > +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-> @@ -393,7 +393,7 @@ struct vcpu *vcpu_find(struct kvm_vm *vm, uint32_t vcpuid)
->    *
->    * Input Args:
->    *   vm - Virtual Machine
-> - *   vcpuid - VCPU ID
-> + *   vcpu - VCPU to remove
->    *
->    * Output Args: None
->    *
-> @@ -401,9 +401,8 @@ struct vcpu *vcpu_find(struct kvm_vm *vm, uint32_t vcpuid)
->    *
->    * Within the VM specified by vm, removes the VCPU given by vcpuid.
+> @@ -433,34 +433,38 @@ void kvm_vm_release(struct kvm_vm *vmp)
+>   		"  vmp->kvm_fd: %i rc: %i errno: %i", vmp->kvm_fd, ret, errno);
+>   }
+>   
+> +static void __vm_mem_region_delete(struct kvm_vm *vm,
+> +				   struct userspace_mem_region *region)
+> +{
+> +	int ret;
+> +
+> +	list_del(&region->list);
+> +
+> +	region->region.memory_size = 0;
+> +	ret = ioctl(vm->fd, KVM_SET_USER_MEMORY_REGION, &region->region);
+> +	TEST_ASSERT(ret == 0, "KVM_SET_USER_MEMORY_REGION IOCTL failed, "
+> +		    "rc: %i errno: %i", ret, errno);
+> +
+> +	sparsebit_free(&region->unused_phy_pages);
+> +	ret = munmap(region->mmap_start, region->mmap_size);
+> +	TEST_ASSERT(ret == 0, "munmap failed, rc: %i errno: %i", ret, errno);
+> +
+> +	free(region);
+> +}
+> +
+>   /*
+>    * Destroys and frees the VM pointed to by vmp.
 >    */
-> -static void vm_vcpu_rm(struct kvm_vm *vm, uint32_t vcpuid)
-> +static void vm_vcpu_rm(struct kvm_vm *vm, struct vcpu *vcpu)
+>   void kvm_vm_free(struct kvm_vm *vmp)
 >   {
-> -	struct vcpu *vcpu = vcpu_find(vm, vcpuid);
->   	int ret;
+>   	struct userspace_mem_region *region, *tmp;
+> -	int ret;
 >   
->   	ret = munmap(vcpu->state, sizeof(*vcpu->state));
-> @@ -427,7 +426,7 @@ void kvm_vm_release(struct kvm_vm *vmp)
->   	int ret;
+>   	if (vmp == NULL)
+>   		return;
 >   
->   	while (vmp->vcpu_head)
-> -		vm_vcpu_rm(vmp, vmp->vcpu_head->id);
-> +		vm_vcpu_rm(vmp, vmp->vcpu_head);
+>   	/* Free userspace_mem_regions. */
+> -	list_for_each_entry_safe(region, tmp, &vmp->userspace_mem_regions, list) {
+> -		list_del(&region->list);
+> -
+> -		region->region.memory_size = 0;
+> -		ret = ioctl(vmp->fd, KVM_SET_USER_MEMORY_REGION,
+> -			&region->region);
+> -		TEST_ASSERT(ret == 0, "KVM_SET_USER_MEMORY_REGION IOCTL failed, "
+> -			"rc: %i errno: %i", ret, errno);
+> -
+> -		sparsebit_free(&region->unused_phy_pages);
+> -		ret = munmap(region->mmap_start, region->mmap_size);
+> -		TEST_ASSERT(ret == 0, "munmap failed, rc: %i errno: %i",
+> -			    ret, errno);
+> -
+> -		free(region);
+> -	}
+> +	list_for_each_entry_safe(region, tmp, &vmp->userspace_mem_regions, list)
+> +		__vm_mem_region_delete(vmp, region);
 >   
->   	ret = close(vmp->fd);
->   	TEST_ASSERT(ret == 0, "Close of vm fd failed,\n"
+>   	/* Free sparsebit arrays. */
+>   	sparsebit_free(&vmp->vpages_valid);
+> @@ -775,6 +779,24 @@ void vm_mem_region_move(struct kvm_vm *vm, uint32_t slot, uint64_t new_gpa)
+>   		    ret, errno, slot, new_gpa);
+>   }
+>   
+> +/*
+> + * VM Memory Region Delete
+> + *
+> + * Input Args:
+> + *   vm - Virtual Machine
+> + *   slot - Slot of the memory region to delete
+> + *
+> + * Output Args: None
+> + *
+> + * Return: None
+> + *
+> + * Delete a memory region.
+> + */
+> +void vm_mem_region_delete(struct kvm_vm *vm, uint32_t slot)
+> +{
+> +	__vm_mem_region_delete(vm, memslot2region(vm, slot));
+> +}
+> +
+>   /*
+>    * VCPU mmap Size
+>    *
 
