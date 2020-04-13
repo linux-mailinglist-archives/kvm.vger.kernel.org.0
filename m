@@ -2,185 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 676991A66E1
-	for <lists+kvm@lfdr.de>; Mon, 13 Apr 2020 15:23:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 88C6F1A66F8
+	for <lists+kvm@lfdr.de>; Mon, 13 Apr 2020 15:30:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729810AbgDMNXE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Apr 2020 09:23:04 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:37761 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728135AbgDMNXD (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 13 Apr 2020 09:23:03 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1586784181;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=EBYP0E/9LflU1vJkdddl+wmzzsAGwHYVvotwoO+EIpA=;
-        b=iLgqq1tTdVJZ5aXyt5nDANj7DKnsnDMuruTEVoByhb/stbJBK3Boh3Zodc1YbQgicDO1WY
-        s5wEuXEb43vwoGEiE5nOSaKfa91VmttU0QDj3TQm4Qbi+G6p7fX/op6eWd+iaSj21UCGNG
-        Q0rFkIrpMit6HYRLfEKMOZojzSSYAy0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-325-n-oKRo39OEKW3SiF2cqIRg-1; Mon, 13 Apr 2020 09:22:59 -0400
-X-MC-Unique: n-oKRo39OEKW3SiF2cqIRg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 92BFC8017F3;
-        Mon, 13 Apr 2020 13:22:57 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-116-15.gru2.redhat.com [10.97.116.15])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 361FB60BE1;
-        Mon, 13 Apr 2020 13:22:42 +0000 (UTC)
-Subject: Re: [PATCH 10/10] selftests: kvm: Add testcase for creating max
- number of memslots
-To:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>
-Cc:     David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Peter Xu <peterx@redhat.com>,
-        Andrew Jones <drjones@redhat.com>
-References: <20200410231707.7128-1-sean.j.christopherson@intel.com>
- <20200410231707.7128-11-sean.j.christopherson@intel.com>
-From:   Wainer dos Santos Moschetta <wainersm@redhat.com>
-Message-ID: <eef06021-9613-dc1e-419e-2547d8c0ce79@redhat.com>
-Date:   Mon, 13 Apr 2020 10:22:40 -0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+        id S1729868AbgDMNab (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Apr 2020 09:30:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47440 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729861AbgDMNa3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Apr 2020 09:30:29 -0400
+Received: from mail-ot1-x343.google.com (mail-ot1-x343.google.com [IPv6:2607:f8b0:4864:20::343])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 537CAC008749
+        for <kvm@vger.kernel.org>; Mon, 13 Apr 2020 06:30:29 -0700 (PDT)
+Received: by mail-ot1-x343.google.com with SMTP id z17so1504645oto.4
+        for <kvm@vger.kernel.org>; Mon, 13 Apr 2020 06:30:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
+        bh=6jXC2UTWF/SUxZW/pWxyCF4hxNCly+ey/YhKERzLlbQ=;
+        b=iP/ULyy8lWG1nhEGn0gppspS4F2JhILJ4nTAtiYGhdrZL51cxqVWhs6D3Y9wyc2ADf
+         A2rwUCP45WAPoWNbSBZGTGVFxJmmDPHe19L3gxm7+w8E5f22GKJOLIMHoMQQI7v3c5XY
+         DlMUV5+ZlbBmFxdLOO2VDbc7W9ESDWYt4QtLLqRZFkEOi9gTP3STkSTcSJo+WdBU2ZMP
+         cbKcszDV9RPwFi/D+lHgC6golJOLYJdAkURkw7hbGoqznT8eWbtFkjjpTaIqirsxJh7L
+         wdqYlNLP395ub4iQIUl47edMIk3+i+NAk1eC0wEHnaBVffHHOQq3Dv9hRllCWWuEG7fQ
+         v+/w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to;
+        bh=6jXC2UTWF/SUxZW/pWxyCF4hxNCly+ey/YhKERzLlbQ=;
+        b=qi2svOQfguZWVjbGqXkgjgXEqpxslGvRfDubiN+B8COr7GNmu7NyLcX/s9Q5gTjnS1
+         MQdKNxMhPScDO81YOGfM83AXcp9kcZHZNikThu7OnTTK8gELhMZp0LMOvalCEpVle2c4
+         9vWqeiTXNHAb5V6YeBDr606tfVAR+qiKwf+5iwvjs4K1bD/8DIeKW+UFKVJjI5KYCMMb
+         Dfd3CruRpz47/NqBB3CBNuvAtl64DDuomPMIPnIJYENJYCovlzQ069vexWtvk0m4Pkql
+         ts3GqSRwR5pQwcJFGsrDe9n2xIeN7qslXROlpafUqH3xp/hU4+w7xUoRMD4N92zGVw99
+         c/8w==
+X-Gm-Message-State: AGi0PubwrLLQ8NLxxx3XafAVUH3xp3r4xodNqcRBVTQQKjVgcNTAYS/3
+        vJYekoVsszLRQ5czXoxb4OIXEkov2lrk6PI0X3lJIg==
+X-Google-Smtp-Source: APiQypLFU/9OTkw8I8yoSnsZBoCJl2kmbnPrqcYyRtFa4kS0eBylKtgliJY99Emg2IXzWabr7J0d9UY0bd1bcIemaS0=
+X-Received: by 2002:a4a:da55:: with SMTP id f21mr14363752oou.34.1586784627519;
+ Mon, 13 Apr 2020 06:30:27 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200410231707.7128-11-sean.j.christopherson@intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+References: <20200326200634.222009-1-dancol@google.com> <20200401213903.182112-1-dancol@google.com>
+In-Reply-To: <20200401213903.182112-1-dancol@google.com>
+From:   Daniel Colascione <dancol@google.com>
+Date:   Mon, 13 Apr 2020 06:29:50 -0700
+Message-ID: <CAKOZueuu=bGt4O0xjiV=9_PC_8Ey8pa3NjtJ7+O-nHCcYbLnEg@mail.gmail.com>
+Subject: Re: [PATCH v5 0/3] SELinux support for anonymous inodes and UFFD
+To:     Tim Murray <timmurray@google.com>,
+        SElinux list <selinux@vger.kernel.org>,
+        LSM List <linux-security-module@vger.kernel.org>,
+        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Paul Moore <paul@paul-moore.com>,
+        Nick Kralevich <nnk@google.com>,
+        Stephen Smalley <sds@tycho.nsa.gov>,
+        Lokesh Gidra <lokeshgidra@google.com>, jmorris@namei.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-On 4/10/20 8:17 PM, Sean Christopherson wrote:
-> From: Wainer dos Santos Moschetta <wainersm@redhat.com>
+On Wed, Apr 1, 2020 at 2:39 PM Daniel Colascione <dancol@google.com> wrote:
 >
-> This patch introduces test_add_max_memory_regions(), which checks
-> that a VM can have added memory slots up to the limit defined in
-> KVM_CAP_NR_MEMSLOTS. Then attempt to add one more slot to
-> verify it fails as expected.
->
-> Signed-off-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
-> Reviewed-by: Andrew Jones <drjones@redhat.com>
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> ---
->   .../selftests/kvm/set_memory_region_test.c    | 65 +++++++++++++++++--
->   1 file changed, 60 insertions(+), 5 deletions(-)
+> Changes from the fourth version of the patch:
 
-Putting the memory region related tests together into a single test file 
-makes sense to me.
 
-Acked-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
-
->
-> diff --git a/tools/testing/selftests/kvm/set_memory_region_test.c b/tools/testing/selftests/kvm/set_memory_region_test.c
-> index 0f36941ebb96..cdf5024b2452 100644
-> --- a/tools/testing/selftests/kvm/set_memory_region_test.c
-> +++ b/tools/testing/selftests/kvm/set_memory_region_test.c
-> @@ -9,6 +9,7 @@
->   #include <stdlib.h>
->   #include <string.h>
->   #include <sys/ioctl.h>
-> +#include <sys/mman.h>
->   
->   #include <linux/compiler.h>
->   
-> @@ -18,14 +19,18 @@
->   
->   #define VCPU_ID 0
->   
-> -#ifdef __x86_64__
->   /*
-> - * Somewhat arbitrary location and slot, intended to not overlap anything.  The
-> - * location and size are specifically 2mb sized/aligned so that the initial
-> - * region corresponds to exactly one large page.
-> + * s390x needs at least 1MB alignment, and the x86_64 MOVE/DELETE tests need a
-> + * 2MB sized and aligned region so that the initial region corresponds to
-> + * exactly one large page.
->    */
-> -#define MEM_REGION_GPA		0xc0000000
->   #define MEM_REGION_SIZE		0x200000
-> +
-> +#ifdef __x86_64__
-> +/*
-> + * Somewhat arbitrary location and slot, intended to not overlap anything.
-> + */
-> +#define MEM_REGION_GPA		0xc0000000
->   #define MEM_REGION_SLOT		10
->   
->   static const uint64_t MMIO_VAL = 0xbeefull;
-> @@ -318,6 +323,54 @@ static void test_zero_memory_regions(void)
->   	kvm_vm_free(vm);
->   }
->   
-> +/*
-> + * Test it can be added memory slots up to KVM_CAP_NR_MEMSLOTS, then any
-> + * tentative to add further slots should fail.
-> + */
-> +static void test_add_max_memory_regions(void)
-> +{
-> +	int ret;
-> +	struct kvm_vm *vm;
-> +	uint32_t max_mem_slots;
-> +	uint32_t slot;
-> +	uint64_t guest_addr = 0x0;
-> +	uint64_t mem_reg_npages;
-> +	void *mem;
-> +
-> +	max_mem_slots = kvm_check_cap(KVM_CAP_NR_MEMSLOTS);
-> +	TEST_ASSERT(max_mem_slots > 0,
-> +		    "KVM_CAP_NR_MEMSLOTS should be greater than 0");
-> +	pr_info("Allowed number of memory slots: %i\n", max_mem_slots);
-> +
-> +	vm = vm_create(VM_MODE_DEFAULT, 0, O_RDWR);
-> +
-> +	mem_reg_npages = vm_calc_num_guest_pages(VM_MODE_DEFAULT, MEM_REGION_SIZE);
-> +
-> +	/* Check it can be added memory slots up to the maximum allowed */
-> +	pr_info("Adding slots 0..%i, each memory region with %dK size\n",
-> +		(max_mem_slots - 1), MEM_REGION_SIZE >> 10);
-> +	for (slot = 0; slot < max_mem_slots; slot++) {
-> +		vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS,
-> +					    guest_addr, slot, mem_reg_npages,
-> +					    0);
-> +		guest_addr += MEM_REGION_SIZE;
-> +	}
-> +
-> +	/* Check it cannot be added memory slots beyond the limit */
-> +	mem = mmap(NULL, MEM_REGION_SIZE, PROT_READ | PROT_WRITE,
-> +		   MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-> +	TEST_ASSERT(mem != MAP_FAILED, "Failed to mmap() host");
-> +
-> +	ret = ioctl(vm_get_fd(vm), KVM_SET_USER_MEMORY_REGION,
-> +		    &(struct kvm_userspace_memory_region) {slot, 0, guest_addr,
-> +		    MEM_REGION_SIZE, (uint64_t) mem});
-> +	TEST_ASSERT(ret == -1 && errno == EINVAL,
-> +		    "Adding one more memory slot should fail with EINVAL");
-> +
-> +	munmap(mem, MEM_REGION_SIZE);
-> +	kvm_vm_free(vm);
-> +}
-> +
->   int main(int argc, char *argv[])
->   {
->   #ifdef __x86_64__
-> @@ -329,6 +382,8 @@ int main(int argc, char *argv[])
->   
->   	test_zero_memory_regions();
->   
-> +	test_add_max_memory_regions();
-> +
->   #ifdef __x86_64__
->   	if (argc > 1)
->   		loops = atoi(argv[1]);
-
+Is there anything else that needs to be done before merging this patch series?
