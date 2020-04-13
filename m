@@ -2,175 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6514D1A6C3D
-	for <lists+kvm@lfdr.de>; Mon, 13 Apr 2020 20:52:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A90F81A6C58
+	for <lists+kvm@lfdr.de>; Mon, 13 Apr 2020 21:10:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1733126AbgDMSwr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Apr 2020 14:52:47 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:24511 "EHLO
+        id S2387828AbgDMTKR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Apr 2020 15:10:17 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:56007 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1733112AbgDMSwo (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 13 Apr 2020 14:52:44 -0400
+        by vger.kernel.org with ESMTP id S2387810AbgDMTKR (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 13 Apr 2020 15:10:17 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1586803963;
+        s=mimecast20190719; t=1586805015;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=VEsVmmOO6axAzAyQkoOiM6SYAejl43B4iZY1NJSfZ0s=;
-        b=MRCIOLmgVoK8Wpr1nLZ6aoqxQcWmUKtrHOLtHTRx0JUN01RKyPTjug2MhlMe0YtPDWHiF+
-        jqb8QBnUWKZpdmQNUx4pYXxSYoNeNNuSK1VncHUIOVIqdM9W20xFnCFJWDmF8J3IXsE6tr
-        m6ZrIS1+BMkS27R7ORKioviWb2tIbzw=
+        bh=D2w0zTL2S2HNCke1rO2a892We/kRrnfinWwPLR7p/D8=;
+        b=D4QOMu0nBsCUPlF/qnKS+vTTJ57F3gIoej1j5gUBcMrNiELPtlr4BLbd9Z4hh25hTML1Yl
+        Szq/Fm5Hn1F3CmV/EZMmWZSXMhplrX+UNAmV9hQrwN3rEgEDWTFu+WH1iZiUfP1Kkgsa+0
+        GR/s3xkC7t8ZStWucA59D674XOnXRp4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-378-oP2NfmJ9OTKgGCR2_NkE1A-1; Mon, 13 Apr 2020 14:52:41 -0400
-X-MC-Unique: oP2NfmJ9OTKgGCR2_NkE1A-1
+ us-mta-51-LRRuLY3rMi27XnVi9zMzzg-1; Mon, 13 Apr 2020 15:10:11 -0400
+X-MC-Unique: LRRuLY3rMi27XnVi9zMzzg-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3D7A5107ACCA;
-        Mon, 13 Apr 2020 18:52:40 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-116-15.gru2.redhat.com [10.97.116.15])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id B36129F99A;
-        Mon, 13 Apr 2020 18:52:29 +0000 (UTC)
-Subject: Re: [PATCH 03/10] KVM: selftests: Add util to delete memory region
-To:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>
-Cc:     David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Peter Xu <peterx@redhat.com>,
-        Andrew Jones <drjones@redhat.com>
-References: <20200410231707.7128-1-sean.j.christopherson@intel.com>
- <20200410231707.7128-4-sean.j.christopherson@intel.com>
-From:   Wainer dos Santos Moschetta <wainersm@redhat.com>
-Message-ID: <cf3c04ac-f4f2-e1f0-4fd7-c30c28dd3563@redhat.com>
-Date:   Mon, 13 Apr 2020 15:52:27 -0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9E339107ACC4;
+        Mon, 13 Apr 2020 19:10:09 +0000 (UTC)
+Received: from w520.home (ovpn-112-162.phx2.redhat.com [10.3.112.162])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 973D799DEE;
+        Mon, 13 Apr 2020 19:10:08 +0000 (UTC)
+Date:   Mon, 13 Apr 2020 13:10:08 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     "Raj, Ashok" <ashok.raj@intel.com>
+Cc:     "Raj, Ashok" <ashok.raj@linux.intel.com>,
+        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "Tian, Jun J" <jun.j.tian@intel.com>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Sun, Yi Y" <yi.y.sun@intel.com>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        "Wu, Hao" <hao.wu@intel.com>
+Subject: Re: [PATCH v1 2/2] vfio/pci: Emulate PASID/PRI capability for VFs
+Message-ID: <20200413131008.2ae53cc3@w520.home>
+In-Reply-To: <20200413032930.GB18479@araj-mobl1.jf.intel.com>
+References: <1584880394-11184-1-git-send-email-yi.l.liu@intel.com>
+        <1584880394-11184-3-git-send-email-yi.l.liu@intel.com>
+        <20200402165954.48d941ee@w520.home>
+        <A2975661238FB949B60364EF0F2C25743A2204FE@SHSMSX104.ccr.corp.intel.com>
+        <20200403112545.6c115ba3@w520.home>
+        <AADFC41AFE54684AB9EE6CBC0274A5D19D80E13D@SHSMSX104.ccr.corp.intel.com>
+        <20200407095801.648b1371@w520.home>
+        <20200408040021.GS67127@otc-nc-03>
+        <20200408101940.3459943d@w520.home>
+        <20200413031043.GA18183@araj-mobl1.jf.intel.com>
+        <20200413032930.GB18479@araj-mobl1.jf.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20200410231707.7128-4-sean.j.christopherson@intel.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Content-Language: en-US
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Sun, 12 Apr 2020 20:29:31 -0700
+"Raj, Ashok" <ashok.raj@intel.com> wrote:
 
-On 4/10/20 8:17 PM, Sean Christopherson wrote:
-> Add a utility to delete a memory region, it will be used by x86's
-> set_memory_region_test.
->
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> ---
->   .../testing/selftests/kvm/include/kvm_util.h  |  1 +
->   tools/testing/selftests/kvm/lib/kvm_util.c    | 56 +++++++++++++------
->   2 files changed, 40 insertions(+), 17 deletions(-)
+> Hi Alex
+> 
+> Going through the PCIe Spec, there seems a lot of such capabilities
+> that are different between PF and VF. Some that make sense
+> and some don't.
+> 
+> 
+> On Sun, Apr 12, 2020 at 08:10:43PM -0700, Raj, Ashok wrote:
+> >   
+> > > 
+> > > I agree though, I don't know why the SIG would preclude implementing
+> > > per VF control of these features.  Thanks,
+> > >   
+> 
+> For e.g. 
+> 
+> VF doesn't have I/O and Mem space enables, but has BME
 
-LGTM.
+VFs don't have I/O, so I/O enable is irrelevant.  The memory enable bit
+is emulated, so it doesn't really do anything from the VM perspective.
+The hypervisor could provide more emulation around this, but it hasn't
+proven necessary.
 
-Reviewed-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
+> Interrupt Status
 
->
-> diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
-> index 2f329e785c58..d4c3e4d9cd92 100644
-> --- a/tools/testing/selftests/kvm/include/kvm_util.h
-> +++ b/tools/testing/selftests/kvm/include/kvm_util.h
-> @@ -114,6 +114,7 @@ int _vcpu_ioctl(struct kvm_vm *vm, uint32_t vcpuid, unsigned long ioctl,
->   void vm_ioctl(struct kvm_vm *vm, unsigned long ioctl, void *arg);
->   void vm_mem_region_set_flags(struct kvm_vm *vm, uint32_t slot, uint32_t flags);
->   void vm_mem_region_move(struct kvm_vm *vm, uint32_t slot, uint64_t new_gpa);
-> +void vm_mem_region_delete(struct kvm_vm *vm, uint32_t slot);
->   void vm_vcpu_add(struct kvm_vm *vm, uint32_t vcpuid);
->   vm_vaddr_t vm_vaddr_alloc(struct kvm_vm *vm, size_t sz, vm_vaddr_t vaddr_min,
->   			  uint32_t data_memslot, uint32_t pgd_memslot);
-> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-> index 105ee9bc09f0..ab5b7ea60f4b 100644
-> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
-> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-> @@ -433,34 +433,38 @@ void kvm_vm_release(struct kvm_vm *vmp)
->   		"  vmp->kvm_fd: %i rc: %i errno: %i", vmp->kvm_fd, ret, errno);
->   }
->   
-> +static void __vm_mem_region_delete(struct kvm_vm *vm,
-> +				   struct userspace_mem_region *region)
-> +{
-> +	int ret;
-> +
-> +	list_del(&region->list);
-> +
-> +	region->region.memory_size = 0;
-> +	ret = ioctl(vm->fd, KVM_SET_USER_MEMORY_REGION, &region->region);
-> +	TEST_ASSERT(ret == 0, "KVM_SET_USER_MEMORY_REGION IOCTL failed, "
-> +		    "rc: %i errno: %i", ret, errno);
-> +
-> +	sparsebit_free(&region->unused_phy_pages);
-> +	ret = munmap(region->mmap_start, region->mmap_size);
-> +	TEST_ASSERT(ret == 0, "munmap failed, rc: %i errno: %i", ret, errno);
-> +
-> +	free(region);
-> +}
-> +
->   /*
->    * Destroys and frees the VM pointed to by vmp.
->    */
->   void kvm_vm_free(struct kvm_vm *vmp)
->   {
->   	struct userspace_mem_region *region, *tmp;
-> -	int ret;
->   
->   	if (vmp == NULL)
->   		return;
->   
->   	/* Free userspace_mem_regions. */
-> -	list_for_each_entry_safe(region, tmp, &vmp->userspace_mem_regions, list) {
-> -		list_del(&region->list);
-> -
-> -		region->region.memory_size = 0;
-> -		ret = ioctl(vmp->fd, KVM_SET_USER_MEMORY_REGION,
-> -			&region->region);
-> -		TEST_ASSERT(ret == 0, "KVM_SET_USER_MEMORY_REGION IOCTL failed, "
-> -			"rc: %i errno: %i", ret, errno);
-> -
-> -		sparsebit_free(&region->unused_phy_pages);
-> -		ret = munmap(region->mmap_start, region->mmap_size);
-> -		TEST_ASSERT(ret == 0, "munmap failed, rc: %i errno: %i",
-> -			    ret, errno);
-> -
-> -		free(region);
-> -	}
-> +	list_for_each_entry_safe(region, tmp, &vmp->userspace_mem_regions, list)
-> +		__vm_mem_region_delete(vmp, region);
->   
->   	/* Free sparsebit arrays. */
->   	sparsebit_free(&vmp->vpages_valid);
-> @@ -775,6 +779,24 @@ void vm_mem_region_move(struct kvm_vm *vm, uint32_t slot, uint64_t new_gpa)
->   		    ret, errno, slot, new_gpa);
->   }
->   
-> +/*
-> + * VM Memory Region Delete
-> + *
-> + * Input Args:
-> + *   vm - Virtual Machine
-> + *   slot - Slot of the memory region to delete
-> + *
-> + * Output Args: None
-> + *
-> + * Return: None
-> + *
-> + * Delete a memory region.
-> + */
-> +void vm_mem_region_delete(struct kvm_vm *vm, uint32_t slot)
-> +{
-> +	__vm_mem_region_delete(vm, memslot2region(vm, slot));
-> +}
-> +
->   /*
->    * VCPU mmap Size
->    *
+VFs don't have INTx, so this is irrelevant.
+
+> Correctable Error Reporting
+> Almost all of Device Control Register.
+
+Are we doing anything to virtualize these for VFs?  I think we've
+addressed access control to these for PFs, but I don't see that we try
+to virtualize them for the VF.
+
+> So it seems like there is a ton of them we have to deal with today for 
+> VF's. How do we manage to emulate them without any support for them 
+> in VF's? 
+
+The memory enable bit is just access to the MMIO space of the device,
+the hypervisor could choose to do more, but currently emulating the bit
+itself is sufficient.  This doesn't really affect the device, just
+access to the device.  The device control registers, I don't think
+we've had a need to virtualize them yet and I think we'd run into many
+of the same questions.  If your point is that there exists gaps in the
+spec that make things difficult to virtualize, I won't argue with you
+there.  MPS is a nearby one that's difficult to virtualize on the PF
+since its setting needs to take entire communication channels into
+account.
+
+So far though we aren't inventing new capabilities to add to VF config
+space and pretending they work, we're just stumbling on what the VF
+exposes whether on bare metal or in a VM.  Thanks,
+
+Alex
 
