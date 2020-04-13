@@ -2,146 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 75A461A6432
-	for <lists+kvm@lfdr.de>; Mon, 13 Apr 2020 10:36:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A23C01A645C
+	for <lists+kvm@lfdr.de>; Mon, 13 Apr 2020 10:56:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728212AbgDMIfy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Apr 2020 04:35:54 -0400
-Received: from mail-ot1-f67.google.com ([209.85.210.67]:40200 "EHLO
-        mail-ot1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727795AbgDMIfv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Apr 2020 04:35:51 -0400
-Received: by mail-ot1-f67.google.com with SMTP id i27so5490892ota.7
-        for <kvm@vger.kernel.org>; Mon, 13 Apr 2020 01:35:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=AvGw2BENomW5mAjLN7te1eswf7XokhztvBZamCcaYj0=;
-        b=uD8A8qgO9EqAhRj5jnTHJFUY7v3Kp1X0ZbRX5+kzzkRJbOVFzZMvIiC0vrd8AEbXu6
-         j4U+LKqu1BGr1U7Iyv+gVYNLgnS1VGVayNBYCS2IHfvT2MLP6CobSya5jv/iUGy3TLgI
-         nm1wc59YKGg1s266n/VVhr39Z0sn1jSlMGTUPUvRSslX08GMWK3H9oihKMZDUGRoCDcD
-         xIAoJTdKpJInqVJYXUnt5AxEf7Yhxw6+V3EFPF7Fd1q8HNMdrOnUyEE4AQi1AgQodiaM
-         2vFiaW3n8RvkIVFYrU1b0b3Z7ncEW4wNV2ia112RomwbVmIeuZQ8f08i5g2dGbk/dqaj
-         Tb2g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=AvGw2BENomW5mAjLN7te1eswf7XokhztvBZamCcaYj0=;
-        b=CSU/TlPpp0YG2CkrHXm6zpbpdx6g/GZO7XeCoQRpRm4fGBrJICssEhLHy1DzF90q77
-         zwWKoN+9AZ35rBt3HYfK4MClALFjsVgGaxIOfrqRGF5PghThtO6JdLHM5ETljoF7MNAt
-         /a8jjPOHtwIdn/SNJBYlkkkZM6HbmZdpFciPaxCPPWy5u3EE7rn92tr9kRd1Z238w9MV
-         mg6mAFu9PW8DqmysnrMyD89r7MPzSL+HSIA7T2lG1gUtXISCdogPzWHwOKeo6vNDRoQg
-         n3t6ph+aPuxVpiGwSPo/BTfUBWIJIuqrdsRqYpv8NOZSTR7LHKg5BLFQaxXxAW886i5b
-         HJ9Q==
-X-Gm-Message-State: AGi0Pub0G6ah8N6bx2OC608kcVXN/keINzdMOlzqFsYmb66n+m3ROzZg
-        NgNmJ/Xu/AqPdpIqKx4S+sr96b3M+Ub4REXXUnJxuA==
-X-Google-Smtp-Source: APiQypLGyU2+5UH8I4pQFfkdm4IeQucZnCldFkCGft+bJP32qprqeDoFkHg65jEskDU5xzjopyRhE7fXAcHOLPADm9w=
-X-Received: by 2002:a9d:4b84:: with SMTP id k4mr3987928otf.233.1586766950301;
- Mon, 13 Apr 2020 01:35:50 -0700 (PDT)
+        id S1727918AbgDMI4V (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Apr 2020 04:56:21 -0400
+Received: from mail.kernel.org ([198.145.29.99]:55866 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727768AbgDMI4U (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Apr 2020 04:56:20 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 46B5920692;
+        Mon, 13 Apr 2020 08:56:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1586768179;
+        bh=GyaHe3+UWAOxENedBfck6FDz0o/OWfUlsXv987iJQNY=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=AqkvWJwnZMdH4yXR42mVJxFY/122uUYZTeh7KQvVG+ONwnyKmUxp9fytp/Gh8FWWT
+         AI4cBPOoNZVA6p9TtCZIWKf00hKXhEUZB/OdlcC0LTrjyfenJ6jTsMxmZad3EKR4Ht
+         PvT2YKdfwvlUky+dnidjFPIYDuwnuPS8JBFpAneI=
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+        by disco-boy.misterjones.org with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        (Exim 4.92)
+        (envelope-from <maz@kernel.org>)
+        id 1jNut7-002oec-J1; Mon, 13 Apr 2020 09:56:17 +0100
 MIME-Version: 1.0
-References: <CANpmjNMR4BgfCxL9qXn0sQrJtQJbEPKxJ5_HEa2VXWi6UY4wig@mail.gmail.com>
- <AC8A5393-B817-4868-AA85-B3019A1086F9@lca.pw> <CANpmjNPqQHKUjqAzcFym5G8kHX0mjProOpGu8e4rBmuGRykAUg@mail.gmail.com>
- <C4FED226-E3DE-44AE-BBED-2B56B9F5B12F@lca.pw>
-In-Reply-To: <C4FED226-E3DE-44AE-BBED-2B56B9F5B12F@lca.pw>
-From:   Marco Elver <elver@google.com>
-Date:   Mon, 13 Apr 2020 10:35:38 +0200
-Message-ID: <CANpmjNPSLkiEer3xQHHxJm_4o5Em0i3bvM7TMmNO46Vzv2cwWQ@mail.gmail.com>
-Subject: Re: KCSAN + KVM = host reset
-To:     Qian Cai <cai@lca.pw>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        "paul E. McKenney" <paulmck@kernel.org>,
-        kasan-dev <kasan-dev@googlegroups.com>,
-        LKML <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date:   Mon, 13 Apr 2020 09:56:17 +0100
+From:   Marc Zyngier <maz@kernel.org>
+To:     Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+Cc:     pbonzini@redhat.com, sean.j.christopherson@intel.com,
+        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+        joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, x86@kernel.org, hpa@zytor.com, james.morse@arm.com,
+        julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
+        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] KVM: Optimize kvm_arch_vcpu_ioctl_run function
+In-Reply-To: <20200413034523.110548-1-tianjia.zhang@linux.alibaba.com>
+References: <20200413034523.110548-1-tianjia.zhang@linux.alibaba.com>
+Message-ID: <17097df45c7fe76ee3c09ac180b844d2@kernel.org>
+X-Sender: maz@kernel.org
+User-Agent: Roundcube Webmail/1.3.10
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: tianjia.zhang@linux.alibaba.com, pbonzini@redhat.com, sean.j.christopherson@intel.com, vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, x86@kernel.org, hpa@zytor.com, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 10 Apr 2020 at 21:57, Qian Cai <cai@lca.pw> wrote:
->
->
->
-> > On Apr 10, 2020, at 7:35 AM, Marco Elver <elver@google.com> wrote:
-> >
-> > On Fri, 10 Apr 2020 at 13:25, Qian Cai <cai@lca.pw> wrote:
-> >>
-> >>
-> >>
-> >>> On Apr 10, 2020, at 5:47 AM, Marco Elver <elver@google.com> wrote:
-> >>>
-> >>> That would contradict what you said about it working if KCSAN is
-> >>> "off". What kernel are you attempting to use in the VM?
-> >
-> > Ah, sorry this was a typo,
-> >  s/working if KCSAN/not working if KCSAN/
-> >
-> >> Well, I said set KCSAN debugfs to =E2=80=9Coff=E2=80=9D did not help, =
-i.e., it will reset the host running kvm.sh. It is the vanilla ubuntu 18.04=
- kernel in VM.
-> >>
-> >> github.com/cailca/linux-mm/blob/master/kvm.sh
-> >
-> > So, if you say that CONFIG_KCSAN_INTERRUPT_WATCHER=3Dn works, that
-> > contradicts it not working when KCSAN is "off". Because if KCSAN is
-> > off, it never sets up any watchpoints, and whether or not
-> > KCSAN_INTERRUPT_WATCHER is selected or not shouldn't matter. Does that
-> > make more sense?
->
-> Yes, you are right. CONFIG_KCSAN_INTERRUPT_WATCHER=3Dn does not
-> make it work. It was a mistake when I tested it because there was a stale=
- svm.o
-> leftover from the previous run, and then it will not trigger a rebuild (a=
- bug?) when
-> only modify the Makefile to remove KCSAN_SANITIZE :=3D n. Sorry for the m=
-isleading
-> information. I should be checking if svm.o was really recompiled in the f=
-irst place.
->
-> Anyway, I=E2=80=99ll send a patch to add __no_kcsan for svm_vcpu_run() be=
-cause I tried
-> to narrow down more with a kcsan_[disable|enable]_current() pair, but it =
-does NOT
-> work even by enclosing the almost whole function below until Marcro has m=
-ore ideas?
+Tianjia,
 
-This is expected. Instrumentation is not removed if you add
-kcsan_{disable,enable}_current() (it has the same effect as a
-localized "off"). Since it seems just the instrumentation and
-associated calls before every memory access is enough, this won't
-work. The attribute __no_kcsan removes instrumentation entirely from
-the function. If the non-instrumented code should be reduced, it is
-conceivable to take the problematic portion of code and factor it into
-a function that has attribute '__no_kcsan_or_inline'.
+On 2020-04-13 04:45, Tianjia Zhang wrote:
+> kvm_arch_vcpu_ioctl_run() is only called in the file kvm_main.c,
+> where vcpu->run is the kvm_run parameter, so it has been replaced.
+> 
+> Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+> ---
+>  arch/x86/kvm/x86.c | 8 ++++----
+>  virt/kvm/arm/arm.c | 2 +-
+>  2 files changed, 5 insertions(+), 5 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 3bf2ecafd027..70e3f4abbd4d 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -8726,18 +8726,18 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu
+> *vcpu, struct kvm_run *kvm_run)
+>  		r = -EAGAIN;
+>  		if (signal_pending(current)) {
+>  			r = -EINTR;
+> -			vcpu->run->exit_reason = KVM_EXIT_INTR;
+> +			kvm_run->exit_reason = KVM_EXIT_INTR;
+>  			++vcpu->stat.signal_exits;
+>  		}
+>  		goto out;
+>  	}
+> 
+> -	if (vcpu->run->kvm_valid_regs & ~KVM_SYNC_X86_VALID_FIELDS) {
+> +	if (kvm_run->kvm_valid_regs & ~KVM_SYNC_X86_VALID_FIELDS) {
+>  		r = -EINVAL;
+>  		goto out;
+>  	}
+> 
+> -	if (vcpu->run->kvm_dirty_regs) {
+> +	if (kvm_run->kvm_dirty_regs) {
+>  		r = sync_regs(vcpu);
+>  		if (r != 0)
+>  			goto out;
+> @@ -8767,7 +8767,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu
+> *vcpu, struct kvm_run *kvm_run)
+> 
+>  out:
+>  	kvm_put_guest_fpu(vcpu);
+> -	if (vcpu->run->kvm_valid_regs)
+> +	if (kvm_run->kvm_valid_regs)
+>  		store_regs(vcpu);
+>  	post_kvm_run_save(vcpu);
+>  	kvm_sigset_deactivate(vcpu);
+> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+> index 48d0ec44ad77..ab9d7966a4c8 100644
+> --- a/virt/kvm/arm/arm.c
+> +++ b/virt/kvm/arm/arm.c
+> @@ -659,7 +659,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu,
+> struct kvm_run *run)
+>  		return ret;
+> 
+>  	if (run->exit_reason == KVM_EXIT_MMIO) {
+> -		ret = kvm_handle_mmio_return(vcpu, vcpu->run);
+> +		ret = kvm_handle_mmio_return(vcpu, run);
+>  		if (ret)
+>  			return ret;
+>  	}
+
+Do you have any number supporting the idea that you are optimizing 
+anything
+here? Performance, code size, register pressure or any other relevant 
+metric?
 
 Thanks,
--- Marco
 
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index 2be5bbae3a40..e58b2d5a575c 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -3286,6 +3286,7 @@ static void svm_vcpu_run(struct kvm_vcpu *vcpu)
->         svm->vmcb->save.rsp =3D vcpu->arch.regs[VCPU_REGS_RSP];
->         svm->vmcb->save.rip =3D vcpu->arch.regs[VCPU_REGS_RIP];
->
-> +       kcsan_disable_current();
->         /*
->          * A vmexit emulation is required before the vcpu can be executed
->          * again.
-> @@ -3410,6 +3411,7 @@ static void svm_vcpu_run(struct kvm_vcpu *vcpu)
->                 svm_handle_mce(svm);
->
->         mark_all_clean(svm->vmcb);
-> +       kcsan_enable_current();
->  }
->  STACK_FRAME_NON_STANDARD(svm_vcpu_run);
->
->
->
->
->
->
+         M.
+-- 
+Jazz is not dead. It just smells funny...
