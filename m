@@ -2,242 +2,232 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0AFC61A8650
-	for <lists+kvm@lfdr.de>; Tue, 14 Apr 2020 18:59:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C6B721A8822
+	for <lists+kvm@lfdr.de>; Tue, 14 Apr 2020 20:00:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391493AbgDNQ4C (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Apr 2020 12:56:02 -0400
-Received: from mail.kernel.org ([198.145.29.99]:55222 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2405576AbgDNQtH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Apr 2020 12:49:07 -0400
-Received: from mail.kernel.org (ip5f5ad4d8.dynamic.kabel-deutschland.de [95.90.212.216])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id A1EE5214D8;
-        Tue, 14 Apr 2020 16:49:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1586882942;
-        bh=p4BaOts5XwS9tdFV4i/p0/J5e6kWOeDWMFxv85StaUU=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=p9qGMRIzAkvFnHhlQeLCMA/c/N9w9OOjuBKNanQ/VsCxW1/TRGrDKQv10ecEiZHYB
-         janBLf1q+j2PSXdjOkI2q9dQ5TaT/BmqqA220JsuLo2qXKLrYmVfNaKv3Zn/lcmCCk
-         xSyrLA5uUgzxoY6zim1b8II8HRYy6zzM+njq386o=
-Received: from mchehab by mail.kernel.org with local (Exim 4.92.3)
-        (envelope-from <mchehab@kernel.org>)
-        id 1jOOk8-0068lh-RJ; Tue, 14 Apr 2020 18:49:00 +0200
-From:   Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-To:     Linux Doc Mailing List <linux-doc@vger.kernel.org>
-Cc:     Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
-        linux-kernel@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
+        id S2503163AbgDNSAY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Apr 2020 14:00:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43262 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1729303AbgDNSAT (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 14 Apr 2020 14:00:19 -0400
+Received: from mail-vk1-xa4a.google.com (mail-vk1-xa4a.google.com [IPv6:2607:f8b0:4864:20::a4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7A85C061A0C
+        for <kvm@vger.kernel.org>; Tue, 14 Apr 2020 11:00:17 -0700 (PDT)
+Received: by mail-vk1-xa4a.google.com with SMTP id n7so514641vkf.9
+        for <kvm@vger.kernel.org>; Tue, 14 Apr 2020 11:00:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=BMm6dGEKBlgf/q10PWtvycCciSc+yReyJKANE+LD6lA=;
+        b=syOsEm8sjMKq4GreRebqgo5TLOe1guPJYXFxYFqGNePu0y3H6SmX8eyu+/sXyJdaVG
+         MZ2mWII+HFMKLjZTtvnmo5UkF3JKtglPYWFGgMaW9cG2wrJ/Mk6Kk+gvaIpSvSiTLXAr
+         Cv1YibImDH53RXmajM9WmUPeYnMVv/88gaHtDmy0u1QuAoSE0dDUIELllA9US2bIvZlh
+         svGMX7C2wwQUjkpLkJW218wXHATrZPIb7t2m3b6KMRJNG/o8WrSpp8DAmBxIKc0kVli5
+         z1i6sKGf70rXMSdVoDfcqepSY/6qlzJGHIUIrzxpWDWJjQkVLxSiIFEUgIwJjRXukuwJ
+         gbRg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=BMm6dGEKBlgf/q10PWtvycCciSc+yReyJKANE+LD6lA=;
+        b=rgl+Ow3aK91/IUAVyQ06zCVuOyIokcmzvIxm+NteEzPA//4tiDVS34BC13i4U9mCEv
+         zWHCRF7Lq3MaLN4Wrc0Zru7wYtOJdCYbSJSAaGdPptFrAtBeShWG4XRs8CxteJpXgbno
+         jiUISeqIG+ZCUI/0Sks9f5ZSNrNei8YV8TE3UJPP8qfLIhzQ7asQFJaebVuKgXeRx+8d
+         HZeLE/FeB0YcAZpVwtzJAeWHh7zwkhQyUI4RByrgzgZapsD/bP5ZPc5yUsoPMPyO3t7l
+         QGHsY+CwqpKNJs2PgBIdZZyCvNbqOEobq5q7FK1HGZpXPbM0PX5+RPccobUAAirFPg/7
+         WLTw==
+X-Gm-Message-State: AGi0PubVfMDl4zeVTRKXaN+21LF4Ya0EFJG7m+M3wY37+3kuNMUhcYVJ
+        DAs1G8oC5nluexEKJQ/BF+pD9XvD+4LxhqbuMQY8zCwmlXaHCnbKGvydgOxExcnkTfN2kkNZ2V9
+        RKujuwhm4RAeo1Wo1oceAgdqbzoBnLoH+Z3p69MIB9eAH9fI1ZLvTEA3Ftbd8mFoZV09rDUI=
+X-Google-Smtp-Source: APiQypItApa9hKodEsxRQO9GhOePkUOBXgOCyS9b4W8kTBOrInCm/CWPUO555cqUWNMoOw7MdRXxPsHiWmcsi6Z2og==
+X-Received: by 2002:ac5:cd83:: with SMTP id i3mr15918224vka.58.1586887216395;
+ Tue, 14 Apr 2020 11:00:16 -0700 (PDT)
+Date:   Tue, 14 Apr 2020 10:59:59 -0700
+Message-Id: <20200414175959.184053-1-brigidsmith@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.26.0.110.g2183baf09c-goog
+Subject: [kvm-unit-tests PATCH] x86: nVMX: add new test for vmread/vmwrite
+ flags preservation
+From:   Simon Smith <brigidsmith@google.com>
+To:     kvm@vger.kernel.org
+Cc:     pbonzini@redhat.com, Simon Smith <brigidsmith@google.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
-        Corentin Labbe <clabbe.montjoie@gmail.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Maxime Ripard <mripard@kernel.org>,
-        Chen-Yu Tsai <wens@csie.org>, kvm@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Subject: [PATCH v2 10/33] docs: fix broken references for ReST files that moved around
-Date:   Tue, 14 Apr 2020 18:48:36 +0200
-Message-Id: <64773a12b4410aaf3e3be89e3ec7e34de2484eea.1586881715.git.mchehab+huawei@kernel.org>
-X-Mailer: git-send-email 2.25.2
-In-Reply-To: <cover.1586881715.git.mchehab+huawei@kernel.org>
-References: <cover.1586881715.git.mchehab+huawei@kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        Peter Shier <pshier@google.com>,
+        Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Some broken references happened due to shifting files around
-and ReST renames. Those can't be auto-fixed by the script,
-so let's fix them manually.
+This commit adds new unit tests for commit a4d956b93904 ("KVM: nVMX:
+vmread should not set rflags to specify success in case of #PF")
 
-Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+The two new tests force a vmread and a vmwrite on an unmapped
+address to cause a #PF and verify that the low byte of %rflags is
+preserved and that %rip is not advanced.  The commit fixed a
+bug in vmread, but we include a test for vmwrite as well for
+completeness.
+
+Before the aforementioned commit, the ALU flags would be incorrectly
+cleared and %rip would be advanced (for vmread).
+
+v1: https://www.spinics.net/lists/kvm/msg212817.html
+
+Reviewed-by: Jim Mattson <jmattson@google.com>
+Reviewed-by: Peter Shier <pshier@google.com>
+Reviewed-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Signed-off-by: Simon Smith <brigidsmith@google.com>
 ---
- Documentation/doc-guide/maintainer-profile.rst      | 2 +-
- Documentation/virt/kvm/mmu.rst                      | 2 +-
- Documentation/virt/kvm/review-checklist.rst         | 2 +-
- arch/x86/kvm/mmu/mmu.c                              | 2 +-
- drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c | 2 +-
- drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c   | 2 +-
- drivers/crypto/allwinner/sun8i-ss/sun8i-ss-cipher.c | 2 +-
- drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c   | 2 +-
- drivers/media/v4l2-core/v4l2-fwnode.c               | 2 +-
- include/uapi/linux/kvm.h                            | 4 ++--
- tools/include/uapi/linux/kvm.h                      | 4 ++--
- 11 files changed, 13 insertions(+), 13 deletions(-)
+ x86/vmx.c | 121 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 121 insertions(+)
 
-diff --git a/Documentation/doc-guide/maintainer-profile.rst b/Documentation/doc-guide/maintainer-profile.rst
-index 5afc0ddba40a..755d39f0d407 100644
---- a/Documentation/doc-guide/maintainer-profile.rst
-+++ b/Documentation/doc-guide/maintainer-profile.rst
-@@ -6,7 +6,7 @@ Documentation subsystem maintainer entry profile
- The documentation "subsystem" is the central coordinating point for the
- kernel's documentation and associated infrastructure.  It covers the
- hierarchy under Documentation/ (with the exception of
--Documentation/device-tree), various utilities under scripts/ and, at least
-+Documentation/devicetree), various utilities under scripts/ and, at least
- some of the time, LICENSES/.
+diff --git a/x86/vmx.c b/x86/vmx.c
+index 647ab49408876..e9235ec4fcad9 100644
+--- a/x86/vmx.c
++++ b/x86/vmx.c
+@@ -32,6 +32,7 @@
+ #include "processor.h"
+ #include "alloc_page.h"
+ #include "vm.h"
++#include "vmalloc.h"
+ #include "desc.h"
+ #include "vmx.h"
+ #include "msr.h"
+@@ -368,6 +369,122 @@ static void test_vmwrite_vmread(void)
+ 	free_page(vmcs);
+ }
  
- It's worth noting, though, that the boundaries of this subsystem are rather
-diff --git a/Documentation/virt/kvm/mmu.rst b/Documentation/virt/kvm/mmu.rst
-index 60981887d20b..46126ecc70f7 100644
---- a/Documentation/virt/kvm/mmu.rst
-+++ b/Documentation/virt/kvm/mmu.rst
-@@ -319,7 +319,7 @@ Handling a page fault is performed as follows:
++ulong finish_fault;
++u8 sentinel;
++bool handler_called;
++static void pf_handler(struct ex_regs *regs)
++{
++	// check that RIP was not improperly advanced and that the
++	// flags value was preserved.
++	report("RIP has not been advanced!",
++		regs->rip < finish_fault);
++	report("The low byte of RFLAGS was preserved!",
++		((u8)regs->rflags == ((sentinel | 2) & 0xd7)));
++
++	regs->rip = finish_fault;
++	handler_called = true;
++
++}
++
++static void prep_flags_test_env(void **vpage, struct vmcs **vmcs, handler *old)
++{
++	// get an unbacked address that will cause a #PF
++	*vpage = alloc_vpage();
++
++	// set up VMCS so we have something to read from
++	*vmcs = alloc_page();
++
++	memset(*vmcs, 0, PAGE_SIZE);
++	(*vmcs)->hdr.revision_id = basic.revision;
++	assert(!vmcs_clear(*vmcs));
++	assert(!make_vmcs_current(*vmcs));
++
++	*old = handle_exception(PF_VECTOR, &pf_handler);
++}
++
++static void test_read_sentinel(void)
++{
++	void *vpage;
++	struct vmcs *vmcs;
++	handler old;
++
++	prep_flags_test_env(&vpage, &vmcs, &old);
++
++	// set the proper label
++	extern char finish_read_fault;
++
++	finish_fault = (ulong)&finish_read_fault;
++
++	// execute the vmread instruction that will cause a #PF
++	handler_called = false;
++	asm volatile ("movb %[byte], %%ah\n\t"
++		      "sahf\n\t"
++		      "vmread %[enc], %[val]; finish_read_fault:"
++		      : [val] "=m" (*(u64 *)vpage)
++		      : [byte] "Krm" (sentinel),
++		      [enc] "r" ((u64)GUEST_SEL_SS)
++		      : "cc", "ah"
++		      );
++	report("The #PF handler was invoked", handler_called);
++
++	// restore old #PF handler
++	handle_exception(PF_VECTOR, old);
++}
++
++static void test_vmread_flags_touch(void)
++{
++	// set up the sentinel value in the flags register. we
++	// choose these two values because they candy-stripe
++	// the 5 flags that sahf sets.
++	sentinel = 0x91;
++	test_read_sentinel();
++
++	sentinel = 0x45;
++	test_read_sentinel();
++}
++
++static void test_write_sentinel(void)
++{
++	void *vpage;
++	struct vmcs *vmcs;
++	handler old;
++
++	prep_flags_test_env(&vpage, &vmcs, &old);
++
++	// set the proper label
++	extern char finish_write_fault;
++
++	finish_fault = (ulong)&finish_write_fault;
++
++	// execute the vmwrite instruction that will cause a #PF
++	handler_called = false;
++	asm volatile ("movb %[byte], %%ah\n\t"
++		      "sahf\n\t"
++		      "vmwrite %[val], %[enc]; finish_write_fault:"
++		      : [val] "=m" (*(u64 *)vpage)
++		      : [byte] "Krm" (sentinel),
++		      [enc] "r" ((u64)GUEST_SEL_SS)
++		      : "cc", "ah"
++		      );
++	report("The #PF handler was invoked", handler_called);
++
++	// restore old #PF handler
++	handle_exception(PF_VECTOR, old);
++}
++
++static void test_vmwrite_flags_touch(void)
++{
++	// set up the sentinel value in the flags register. we
++	// choose these two values because they candy-stripe
++	// the 5 flags that sahf sets.
++	sentinel = 0x91;
++	test_write_sentinel();
++
++	sentinel = 0x45;
++	test_write_sentinel();
++}
++
++
+ static void test_vmcs_high(void)
+ {
+ 	struct vmcs *vmcs = alloc_page();
+@@ -1994,6 +2111,10 @@ int main(int argc, const char *argv[])
+ 		test_vmcs_lifecycle();
+ 	if (test_wanted("test_vmx_caps", argv, argc))
+ 		test_vmx_caps();
++	if (test_wanted("test_vmread_flags_touch", argv, argc))
++		test_vmread_flags_touch();
++	if (test_wanted("test_vmwrite_flags_touch", argv, argc))
++		test_vmwrite_flags_touch();
  
-  - If both P bit and R/W bit of error code are set, this could possibly
-    be handled as a "fast page fault" (fixed without taking the MMU lock).  See
--   the description in Documentation/virt/kvm/locking.txt.
-+   the description in Documentation/virt/kvm/locking.rst.
- 
-  - if needed, walk the guest page tables to determine the guest translation
-    (gva->gpa or ngpa->gpa)
-diff --git a/Documentation/virt/kvm/review-checklist.rst b/Documentation/virt/kvm/review-checklist.rst
-index 1f86a9d3f705..dc01aea4057b 100644
---- a/Documentation/virt/kvm/review-checklist.rst
-+++ b/Documentation/virt/kvm/review-checklist.rst
-@@ -10,7 +10,7 @@ Review checklist for kvm patches
- 2.  Patches should be against kvm.git master branch.
- 
- 3.  If the patch introduces or modifies a new userspace API:
--    - the API must be documented in Documentation/virt/kvm/api.txt
-+    - the API must be documented in Documentation/virt/kvm/api.rst
-     - the API must be discoverable using KVM_CHECK_EXTENSION
- 
- 4.  New state must include support for save/restore.
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 8071952e9cf2..fd59fee84631 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -3586,7 +3586,7 @@ static bool fast_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
- 		/*
- 		 * Currently, fast page fault only works for direct mapping
- 		 * since the gfn is not stable for indirect shadow page. See
--		 * Documentation/virt/kvm/locking.txt to get more detail.
-+		 * Documentation/virt/kvm/locking.rst to get more detail.
- 		 */
- 		fault_handled = fast_pf_fix_direct_spte(vcpu, sp,
- 							iterator.sptep, spte,
-diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c
-index a5fd8975f3d3..a6abb701bfc6 100644
---- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c
-+++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c
-@@ -8,7 +8,7 @@
-  * This file add support for AES cipher with 128,192,256 bits keysize in
-  * CBC and ECB mode.
-  *
-- * You could find a link for the datasheet in Documentation/arm/sunxi/README
-+ * You could find a link for the datasheet in Documentation/arm/sunxi.rst
-  */
- 
- #include <linux/crypto.h>
-diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c
-index 3e4e4bbda34c..b957061424a1 100644
---- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c
-+++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c
-@@ -7,7 +7,7 @@
-  *
-  * Core file which registers crypto algorithms supported by the CryptoEngine.
-  *
-- * You could find a link for the datasheet in Documentation/arm/sunxi/README
-+ * You could find a link for the datasheet in Documentation/arm/sunxi.rst
-  */
- #include <linux/clk.h>
- #include <linux/crypto.h>
-diff --git a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-cipher.c b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-cipher.c
-index 84d52fc3a2da..c89cb2ee2496 100644
---- a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-cipher.c
-+++ b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-cipher.c
-@@ -8,7 +8,7 @@
-  * This file add support for AES cipher with 128,192,256 bits keysize in
-  * CBC and ECB mode.
-  *
-- * You could find a link for the datasheet in Documentation/arm/sunxi/README
-+ * You could find a link for the datasheet in Documentation/arm/sunxi.rst
-  */
- 
- #include <linux/crypto.h>
-diff --git a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c
-index 6b301afffd11..8ba4f9c81dac 100644
---- a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c
-+++ b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c
-@@ -7,7 +7,7 @@
-  *
-  * Core file which registers crypto algorithms supported by the SecuritySystem
-  *
-- * You could find a link for the datasheet in Documentation/arm/sunxi/README
-+ * You could find a link for the datasheet in Documentation/arm/sunxi.rst
-  */
- #include <linux/clk.h>
- #include <linux/crypto.h>
-diff --git a/drivers/media/v4l2-core/v4l2-fwnode.c b/drivers/media/v4l2-core/v4l2-fwnode.c
-index 97f0f8b23b5d..8a1e1b95b379 100644
---- a/drivers/media/v4l2-core/v4l2-fwnode.c
-+++ b/drivers/media/v4l2-core/v4l2-fwnode.c
-@@ -980,7 +980,7 @@ static int v4l2_fwnode_reference_parse(struct device *dev,
-  *
-  * THIS EXAMPLE EXISTS MERELY TO DOCUMENT THIS FUNCTION. DO NOT USE IT AS A
-  * REFERENCE IN HOW ACPI TABLES SHOULD BE WRITTEN!! See documentation under
-- * Documentation/acpi/dsd instead and especially graph.txt,
-+ * Documentation/firmware-guide/acpi/dsd/ instead and especially graph.txt,
-  * data-node-references.txt and leds.txt .
-  *
-  *	Scope (\_SB.PCI0.I2C2)
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index 428c7dde6b4b..fdd632c833b4 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -116,7 +116,7 @@ struct kvm_irq_level {
- 	 * ACPI gsi notion of irq.
- 	 * For IA-64 (APIC model) IOAPIC0: irq 0-23; IOAPIC1: irq 24-47..
- 	 * For X86 (standard AT mode) PIC0/1: irq 0-15. IOAPIC0: 0-23..
--	 * For ARM: See Documentation/virt/kvm/api.txt
-+	 * For ARM: See Documentation/virt/kvm/api.rst
- 	 */
- 	union {
- 		__u32 irq;
-@@ -1107,7 +1107,7 @@ struct kvm_xen_hvm_config {
-  *
-  * KVM_IRQFD_FLAG_RESAMPLE indicates resamplefd is valid and specifies
-  * the irqfd to operate in resampling mode for level triggered interrupt
-- * emulation.  See Documentation/virt/kvm/api.txt.
-+ * emulation.  See Documentation/virt/kvm/api.rst.
-  */
- #define KVM_IRQFD_FLAG_RESAMPLE (1 << 1)
- 
-diff --git a/tools/include/uapi/linux/kvm.h b/tools/include/uapi/linux/kvm.h
-index 4b95f9a31a2f..e5f32fcec68f 100644
---- a/tools/include/uapi/linux/kvm.h
-+++ b/tools/include/uapi/linux/kvm.h
-@@ -116,7 +116,7 @@ struct kvm_irq_level {
- 	 * ACPI gsi notion of irq.
- 	 * For IA-64 (APIC model) IOAPIC0: irq 0-23; IOAPIC1: irq 24-47..
- 	 * For X86 (standard AT mode) PIC0/1: irq 0-15. IOAPIC0: 0-23..
--	 * For ARM: See Documentation/virt/kvm/api.txt
-+	 * For ARM: See Documentation/virt/kvm/api.rst
- 	 */
- 	union {
- 		__u32 irq;
-@@ -1100,7 +1100,7 @@ struct kvm_xen_hvm_config {
-  *
-  * KVM_IRQFD_FLAG_RESAMPLE indicates resamplefd is valid and specifies
-  * the irqfd to operate in resampling mode for level triggered interrupt
-- * emulation.  See Documentation/virt/kvm/api.txt.
-+ * emulation.  See Documentation/virt/kvm/api.rst.
-  */
- #define KVM_IRQFD_FLAG_RESAMPLE (1 << 1)
- 
+ 	/* Balance vmxon from test_vmxon. */
+ 	vmx_off();
 -- 
-2.25.2
+2.26.0.110.g2183baf09c-goog
 
