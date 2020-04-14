@@ -2,104 +2,144 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 53A111A75D1
-	for <lists+kvm@lfdr.de>; Tue, 14 Apr 2020 10:22:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CAEA91A75FF
+	for <lists+kvm@lfdr.de>; Tue, 14 Apr 2020 10:26:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2436590AbgDNIWk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Apr 2020 04:22:40 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:26823 "EHLO
+        id S2436772AbgDNI01 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Apr 2020 04:26:27 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:30873 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S2436563AbgDNIWQ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 14 Apr 2020 04:22:16 -0400
+        by vger.kernel.org with ESMTP id S2436753AbgDNI0Q (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 14 Apr 2020 04:26:16 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1586852535;
+        s=mimecast20190719; t=1586852774;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=khsYuuaqf4bvQT/Yq3CGFsX0wY63XL0/uUheX8GkUqg=;
-        b=drXcEijJ2/p3wq9A5Vw1q4g9XjnLrcj+LOLQSBauLjtCKgNRJLbLs+EHwoWvy0j/WKPbLI
-        zKviyXJq89Hi+gFb/cQWGYe1XluCsAHNhdgcrKPsag7o/GKBFG+fFK1xDJfHkJF+B65W0X
-        e4OnGXUnWZJ58YgvpiqALdd6ld1ACiE=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-177-myAx_GFLMv6IM0c0NMTLdQ-1; Tue, 14 Apr 2020 04:22:13 -0400
-X-MC-Unique: myAx_GFLMv6IM0c0NMTLdQ-1
-Received: by mail-wr1-f71.google.com with SMTP id d17so7290230wrr.17
-        for <kvm@vger.kernel.org>; Tue, 14 Apr 2020 01:22:12 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=khsYuuaqf4bvQT/Yq3CGFsX0wY63XL0/uUheX8GkUqg=;
-        b=P26xgeKXbLWpU5vCzzjt5zfIfVrUAhyWYPqjbK4n69PfREb9xBZBb9m0AZDFXT5hSU
-         lnhEirnNBc9EodC3E7kVJ8KybmgYmqnkUnofTnsfHW/fiNzAtZnr3Qx3ZacbDixgjqNO
-         JxkhTPd/dooMTqhDqurl8vA1FQnmCA6mTiSEgO/QxOTWnbmO46zWteWCrx8v16l2bnGW
-         skGB2K4qR14kwT5vWdBy9xcp9J+q7bhbb7Zm4LvkfEalLFmaD/njGOhEm7OJOIULF0dg
-         VjZSoVsUc2Xw/vbNqcTpZ946K8rzkk2fwZ4b7XVyrISI3BA9TGbanV7LfBsG8yAie7gE
-         l8nA==
-X-Gm-Message-State: AGi0PuZ+Fi79G4x99bTRNg6iAnKDPW+vfXE3SuBJYC8FDR9M2kBR++/K
-        FLmaaFOSutZhQA8tnXdySjBWr1QeMpOxdOtekhelpmTuHTWad8bbfQ6LRRtVk5iVX1KCKEnaFXM
-        3uhpXGVwfMquS
-X-Received: by 2002:adf:f589:: with SMTP id f9mr21599303wro.383.1586852532069;
-        Tue, 14 Apr 2020 01:22:12 -0700 (PDT)
-X-Google-Smtp-Source: APiQypJXNvwyrDhlIZv6Lqrf27xeg9ssywvSfUWlGqAV2uY+TaUeX/Zn8tG1WxQsOeeksY9aUQ5+FQ==
-X-Received: by 2002:adf:f589:: with SMTP id f9mr21599289wro.383.1586852531851;
-        Tue, 14 Apr 2020 01:22:11 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:e159:eda1:c472:fcfa? ([2001:b07:6468:f312:e159:eda1:c472:fcfa])
-        by smtp.gmail.com with ESMTPSA id t67sm18954537wmg.40.2020.04.14.01.22.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 14 Apr 2020 01:22:11 -0700 (PDT)
-Subject: Re: [PATCH] KVM: VMX: Enable machine check support for 32bit targets
-To:     Uros Bizjak <ubizjak@gmail.com>, kvm@vger.kernel.org
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        stable@vger.kernel.org
-References: <20200414071414.45636-1-ubizjak@gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <a4b74196-703f-fbcb-2b1b-7432ed76301d@redhat.com>
-Date:   Tue, 14 Apr 2020 10:22:10 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+        bh=7XKy2uSMzlsVUHR3bvdi0/jwn8IqYuRkSqt7prdnHg0=;
+        b=OXslx5M1XGasPhUmOa4wSo9tWds0QXjTeyaYbaoEmL/qPlzvWVF4ExlDgyfcszXA+9mvrx
+        dhioFrKyzShGEx0m36tA573/d2nzKwB4Gsvq/yfjJltqdFrzkLQarX28Hq3DeO4Vj5MFHv
+        4hfRhKaaLd84vCgnBIktxnpIwnXOOzw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-68-DgTxY84wMJib1-rqSYAARQ-1; Tue, 14 Apr 2020 04:26:12 -0400
+X-MC-Unique: DgTxY84wMJib1-rqSYAARQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A7C94107ACCD;
+        Tue, 14 Apr 2020 08:26:11 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.40.195.188])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id A0D9510013A1;
+        Tue, 14 Apr 2020 08:25:59 +0000 (UTC)
+Date:   Tue, 14 Apr 2020 10:25:56 +0200
+From:   Andrew Jones <drjones@redhat.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Wainer dos Santos Moschetta <wainersm@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Peter Xu <peterx@redhat.com>
+Subject: Re: [PATCH 01/10] KVM: selftests: Take vcpu pointer instead of id in
+ vm_vcpu_rm()
+Message-ID: <20200414082556.nfdgec63kuqknpxc@kamzik.brq.redhat.com>
+References: <20200410231707.7128-1-sean.j.christopherson@intel.com>
+ <20200410231707.7128-2-sean.j.christopherson@intel.com>
+ <b696c5b9-2507-8849-e196-37c83806cfdf@redhat.com>
+ <20200413212659.GB21204@linux.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20200414071414.45636-1-ubizjak@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200413212659.GB21204@linux.intel.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 14/04/20 09:14, Uros Bizjak wrote:
-> There is no reason to limit the use of do_machine_check
-> to 64bit targets. MCE handling works for both target familes.
+On Mon, Apr 13, 2020 at 02:26:59PM -0700, Sean Christopherson wrote:
+> On Mon, Apr 13, 2020 at 03:26:55PM -0300, Wainer dos Santos Moschetta wrote:
+> > 
+> > On 4/10/20 8:16 PM, Sean Christopherson wrote:
+> > >The sole caller of vm_vcpu_rm() already has the vcpu pointer, take it
+> > >directly instead of doing an extra lookup.
+> > 
+> > 
+> > Most of (if not all) vcpu related functions in kvm_util.c receives an id, so
+> > this change creates an inconsistency.
 > 
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Sean Christopherson <sean.j.christopherson@intel.com>
-> Cc: stable@vger.kernel.org
-> Fixes: a0861c02a981 ("KVM: Add VT-x machine check support")
-> Signed-off-by: Uros Bizjak <ubizjak@gmail.com>
-> ---
->  arch/x86/kvm/vmx/vmx.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 8959514eaf0f..01330096ff3e 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -4572,7 +4572,7 @@ static int handle_rmode_exception(struct kvm_vcpu *vcpu,
->   */
->  static void kvm_machine_check(void)
->  {
-> -#if defined(CONFIG_X86_MCE) && defined(CONFIG_X86_64)
-> +#if defined(CONFIG_X86_MCE)
->  	struct pt_regs regs = {
->  		.cs = 3, /* Fake ring 3 no matter what the guest ran on */
->  		.flags = X86_EFLAGS_IF,
-> 
+> Ya, but taking the id is done out of "necessity", as everything is public
+> and for whatever reason the design of the selftest framework is to not
+> expose 'struct vcpu' outside of the utils.  vm_vcpu_rm() is internal only,
+> IMO pulling the id out of the vcpu just to lookup the same vcpu is a waste
+> of time.
 
-Queued, thanks.
+Agreed
 
-Paolo
+> 
+> FWIW, I think the whole vcpuid thing is a bad interface, almost all the
+> tests end up defining an arbitrary number for the sole VCPU_ID, i.e. the
+> vcpuid interface just adds a pointless layer of obfuscation.  I haven't
+> looked through all the tests, but returning the vcpu and making the struct
+> opaque, same as kvm_vm, seems like it would yield more readable code with
+> less overhead.
+
+Agreed
+
+> 
+> While I'm on a soapbox, hiding 'struct vcpu' and 'struct kvm_vm' also seems
+> rather silly, but at least that doesn't directly lead to funky code.
+
+Agreed. While the concept has been slowly growing on me, I think accessor
+functions for each of the structs members are growing even faster...
+
+Thanks,
+drew
+
+> 
+> > Disregarding the above comment, the changes look good to me. So:
+> > 
+> > Reviewed-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
+> > 
+> > 
+> > >
+> > >Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> > >---
+> > >  tools/testing/selftests/kvm/lib/kvm_util.c | 7 +++----
+> > >  1 file changed, 3 insertions(+), 4 deletions(-)
+> > >
+> > >diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+> > >index 8a3523d4434f..9a783c20dd26 100644
+> > >--- a/tools/testing/selftests/kvm/lib/kvm_util.c
+> > >+++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+> > >@@ -393,7 +393,7 @@ struct vcpu *vcpu_find(struct kvm_vm *vm, uint32_t vcpuid)
+> > >   *
+> > >   * Input Args:
+> > >   *   vm - Virtual Machine
+> > >- *   vcpuid - VCPU ID
+> > >+ *   vcpu - VCPU to remove
+> > >   *
+> > >   * Output Args: None
+> > >   *
+> > >@@ -401,9 +401,8 @@ struct vcpu *vcpu_find(struct kvm_vm *vm, uint32_t vcpuid)
+> > >   *
+> > >   * Within the VM specified by vm, removes the VCPU given by vcpuid.
+> > >   */
+> > >-static void vm_vcpu_rm(struct kvm_vm *vm, uint32_t vcpuid)
+> > >+static void vm_vcpu_rm(struct kvm_vm *vm, struct vcpu *vcpu)
+> > >  {
+> > >-	struct vcpu *vcpu = vcpu_find(vm, vcpuid);
+> > >  	int ret;
+> > >  	ret = munmap(vcpu->state, sizeof(*vcpu->state));
+> > >@@ -427,7 +426,7 @@ void kvm_vm_release(struct kvm_vm *vmp)
+> > >  	int ret;
+> > >  	while (vmp->vcpu_head)
+> > >-		vm_vcpu_rm(vmp, vmp->vcpu_head->id);
+> > >+		vm_vcpu_rm(vmp, vmp->vcpu_head);
+> > >  	ret = close(vmp->fd);
+> > >  	TEST_ASSERT(ret == 0, "Close of vm fd failed,\n"
+> > 
+> 
 
