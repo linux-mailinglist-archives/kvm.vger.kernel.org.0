@@ -2,82 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D63CC1A7376
-	for <lists+kvm@lfdr.de>; Tue, 14 Apr 2020 08:17:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3F2CB1A73DE
+	for <lists+kvm@lfdr.de>; Tue, 14 Apr 2020 08:50:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2405858AbgDNGRN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Apr 2020 02:17:13 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:46445 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S2405853AbgDNGRK (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 14 Apr 2020 02:17:10 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1586845028;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=DOrTl4YvBq5Mc/4tt5fmz7abkbkAWLtGCwVC/yQsB/U=;
-        b=Y8xBRZu61vNBDYt7Z85GnJGQP+edm7iqRtorj/oZD+4/xlU+PowomHUSxQJ2NJDXeHDO5y
-        71Ytca0SISz8PldeeQ2XnMYqnSNRvQe/YS9SNrv0TPZZD3Y4xJwfcJwT62zI/onrmnmqOG
-        t76jNLBsAgv7sVr4KpJZrHsAhePvbc0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-362-5IYuHBlQO_yDrdlI2Zhw9g-1; Tue, 14 Apr 2020 02:17:06 -0400
-X-MC-Unique: 5IYuHBlQO_yDrdlI2Zhw9g-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6CAFD800D5C;
-        Tue, 14 Apr 2020 06:17:05 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.40.193.1])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 247D65D9CD;
-        Tue, 14 Apr 2020 06:16:57 +0000 (UTC)
-Date:   Tue, 14 Apr 2020 08:16:54 +0200
-From:   Andrew Jones <drjones@redhat.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Wainer dos Santos Moschetta <wainersm@redhat.com>,
-        pbonzini@redhat.com, kvm@vger.kernel.org, david@redhat.com,
-        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        krish.sadhukhan@oracle.com
-Subject: Re: [PATCH v5 0/2] selftests: kvm: Introduce the mem_slot_test test
-Message-ID: <20200414061654.qhuo3hsslz32qwgc@kamzik.brq.redhat.com>
-References: <20200409220905.26573-1-wainersm@redhat.com>
- <20200410204509.GK22482@linux.intel.com>
+        id S2406108AbgDNGuU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Apr 2020 02:50:20 -0400
+Received: from mga03.intel.com ([134.134.136.65]:58687 "EHLO mga03.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728133AbgDNGuT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Apr 2020 02:50:19 -0400
+IronPort-SDR: OjmaLZZPHFzXUYE/kU+BQmnaIqwoO2JcFKOOOI+Lz5FuDhS08SlMtQRUHJABWsOCTMVuGZsN49
+ 3UCviNb4ac7w==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Apr 2020 23:50:18 -0700
+IronPort-SDR: wgRVshwsFChPpE0xUr6eMwqj/GGvkxPTReoUOG0k+ja+18dP5qIgyYiK100cEjZX5dAyGM1L+m
+ J88BRrCVCLzw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.72,381,1580803200"; 
+   d="scan'208";a="277158309"
+Received: from lxy-clx-4s.sh.intel.com ([10.239.43.132])
+  by fmsmga004.fm.intel.com with ESMTP; 13 Apr 2020 23:50:13 -0700
+From:   Xiaoyao Li <xiaoyao.li@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>
+Cc:     linux-kernel@vger.kernel.org, x86@kernel.org,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Andy Lutomirski <luto@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Arvind Sankar <nivedita@alum.mit.edu>,
+        Xiaoyao Li <xiaoyao.li@intel.com>
+Subject: [PATCH v8 0/4] KVM: Add virtualization support of split lock detection
+Date:   Tue, 14 Apr 2020 14:31:25 +0800
+Message-Id: <20200414063129.133630-1-xiaoyao.li@intel.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200410204509.GK22482@linux.intel.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Apr 10, 2020 at 01:45:09PM -0700, Sean Christopherson wrote:
-> On Thu, Apr 09, 2020 at 07:09:03PM -0300, Wainer dos Santos Moschetta wrote:
-> > This series introduces a new KVM selftest (mem_slot_test) that goal
-> > is to verify memory slots can be added up to the maximum allowed. An
-> > extra slot is attempted which should occur on error.
-> > 
-> > The patch 01 is needed so that the VM fd can be accessed from the
-> > test code (for the ioctl call attempting to add an extra slot).
-> > 
-> > I ran the test successfully on x86_64, aarch64, and s390x.  This
-> > is why it is enabled to build on those arches.
-> 
-> Any objection to folding these patches into a series I have to clean up
-> set_memory_region_test (which was mentioned in a prior version) and add
-> this as a testcase to set_memory_region_test instead of creating a whole
-> new test?
-> 
-> A large chunk of set_memory_region_test will still be x86_64 only, but
-> having the test reside in common code will hopefully make it easier to
-> extend to other architectures.
->
+This series aims to add the virtualization of split lock detection in
+KVM.
 
-Yes, that would be my preference as well. Eventually I decided it could be
-done later, but I still prefer it being done from the beginning.
+Due to the fact MSR TEST_CTRL is per-core scope, feature split lock
+detection can be exposed to guest only when SMT is disabled/unsupported.
 
-Thanks,
-drew 
+Changes in v8:
+ - rebase to v5.7-rc1.
+ - basic enabling of split lock detection already merged.
+ - When host is sld_warn and nosmt, load guest's sld bit when in KVM
+   context, i.e., between vmx_prepare_switch_to_guest() and before
+   vmx_prepare_switch_to_host(), KVM uses guest sld setting.  
+
+Changes in v7:
+https://lkml.kernel.org/r/20200325030924.132881-1-xiaoyao.li@intel.com
+ - only pick patch 1 and patch 2, and hold all the left.
+ - Update SLD bit on each processor based on sld_state.
+
+Changes in v6:
+https://lkml.kernel.org/r/20200324151859.31068-1-xiaoyao.li@intel.com
+ - Drop the sld_not_exist flag and use X86_FEATURE_SPLIT_LOCK_DETECT to
+   check whether need to init split lock detection. [tglx]
+ - Use tglx's method to verify the existence of split lock detectoin.
+ - small optimization of sld_update_msr() that the default value of
+   msr_test_ctrl_cache has split_lock_detect bit cleared.
+ - Drop the patch3 in v5 that introducing kvm_only option. [tglx]
+ - Rebase patch4-8 to kvm/queue.
+ - use the new kvm-cpu-cap to expose X86_FEATURE_CORE_CAPABILITIES in
+   Patch 6.
+
+Changes in v5:
+https://lkml.kernel.org/r/20200315050517.127446-1-xiaoyao.li@intel.com
+ - Use X86_FEATURE_SPLIT_LOCK_DETECT flag in kvm to ensure split lock
+   detection is really supported.
+ - Add and export sld related helper functions in their related usecase 
+   kvm patches.
+
+Xiaoyao Li (4):
+  kvm: x86: Emulate MSR IA32_CORE_CAPABILITIES
+  kvm: vmx: Enable MSR TEST_CTRL for guest
+  x86/split_lock: Export sld_update_msr() and sld_state
+  kvm: vmx: virtualize split lock detection
+
+ arch/x86/include/asm/cpu.h      | 12 +++++
+ arch/x86/include/asm/kvm_host.h |  1 +
+ arch/x86/kernel/cpu/intel.c     | 13 ++----
+ arch/x86/kvm/cpuid.c            |  3 +-
+ arch/x86/kvm/vmx/vmx.c          | 83 ++++++++++++++++++++++++++++++---
+ arch/x86/kvm/vmx/vmx.h          |  2 +
+ arch/x86/kvm/x86.c              | 35 +++++++++++++-
+ 7 files changed, 132 insertions(+), 17 deletions(-)
+
+-- 
+2.20.1
 
