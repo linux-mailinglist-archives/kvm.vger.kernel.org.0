@@ -2,232 +2,183 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C6B721A8822
-	for <lists+kvm@lfdr.de>; Tue, 14 Apr 2020 20:00:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 909081A89D4
+	for <lists+kvm@lfdr.de>; Tue, 14 Apr 2020 20:40:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2503163AbgDNSAY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Apr 2020 14:00:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43262 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1729303AbgDNSAT (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 14 Apr 2020 14:00:19 -0400
-Received: from mail-vk1-xa4a.google.com (mail-vk1-xa4a.google.com [IPv6:2607:f8b0:4864:20::a4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7A85C061A0C
-        for <kvm@vger.kernel.org>; Tue, 14 Apr 2020 11:00:17 -0700 (PDT)
-Received: by mail-vk1-xa4a.google.com with SMTP id n7so514641vkf.9
-        for <kvm@vger.kernel.org>; Tue, 14 Apr 2020 11:00:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=BMm6dGEKBlgf/q10PWtvycCciSc+yReyJKANE+LD6lA=;
-        b=syOsEm8sjMKq4GreRebqgo5TLOe1guPJYXFxYFqGNePu0y3H6SmX8eyu+/sXyJdaVG
-         MZ2mWII+HFMKLjZTtvnmo5UkF3JKtglPYWFGgMaW9cG2wrJ/Mk6Kk+gvaIpSvSiTLXAr
-         Cv1YibImDH53RXmajM9WmUPeYnMVv/88gaHtDmy0u1QuAoSE0dDUIELllA9US2bIvZlh
-         svGMX7C2wwQUjkpLkJW218wXHATrZPIb7t2m3b6KMRJNG/o8WrSpp8DAmBxIKc0kVli5
-         z1i6sKGf70rXMSdVoDfcqepSY/6qlzJGHIUIrzxpWDWJjQkVLxSiIFEUgIwJjRXukuwJ
-         gbRg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=BMm6dGEKBlgf/q10PWtvycCciSc+yReyJKANE+LD6lA=;
-        b=rgl+Ow3aK91/IUAVyQ06zCVuOyIokcmzvIxm+NteEzPA//4tiDVS34BC13i4U9mCEv
-         zWHCRF7Lq3MaLN4Wrc0Zru7wYtOJdCYbSJSAaGdPptFrAtBeShWG4XRs8CxteJpXgbno
-         jiUISeqIG+ZCUI/0Sks9f5ZSNrNei8YV8TE3UJPP8qfLIhzQ7asQFJaebVuKgXeRx+8d
-         HZeLE/FeB0YcAZpVwtzJAeWHh7zwkhQyUI4RByrgzgZapsD/bP5ZPc5yUsoPMPyO3t7l
-         QGHsY+CwqpKNJs2PgBIdZZyCvNbqOEobq5q7FK1HGZpXPbM0PX5+RPccobUAAirFPg/7
-         WLTw==
-X-Gm-Message-State: AGi0PubVfMDl4zeVTRKXaN+21LF4Ya0EFJG7m+M3wY37+3kuNMUhcYVJ
-        DAs1G8oC5nluexEKJQ/BF+pD9XvD+4LxhqbuMQY8zCwmlXaHCnbKGvydgOxExcnkTfN2kkNZ2V9
-        RKujuwhm4RAeo1Wo1oceAgdqbzoBnLoH+Z3p69MIB9eAH9fI1ZLvTEA3Ftbd8mFoZV09rDUI=
-X-Google-Smtp-Source: APiQypItApa9hKodEsxRQO9GhOePkUOBXgOCyS9b4W8kTBOrInCm/CWPUO555cqUWNMoOw7MdRXxPsHiWmcsi6Z2og==
-X-Received: by 2002:ac5:cd83:: with SMTP id i3mr15918224vka.58.1586887216395;
- Tue, 14 Apr 2020 11:00:16 -0700 (PDT)
-Date:   Tue, 14 Apr 2020 10:59:59 -0700
-Message-Id: <20200414175959.184053-1-brigidsmith@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.26.0.110.g2183baf09c-goog
-Subject: [kvm-unit-tests PATCH] x86: nVMX: add new test for vmread/vmwrite
- flags preservation
-From:   Simon Smith <brigidsmith@google.com>
-To:     kvm@vger.kernel.org
-Cc:     pbonzini@redhat.com, Simon Smith <brigidsmith@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        Peter Shier <pshier@google.com>,
-        Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Content-Type: text/plain; charset="UTF-8"
+        id S2504135AbgDNSkB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Apr 2020 14:40:01 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:52649 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S2504130AbgDNSj4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Apr 2020 14:39:56 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1586889594;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+        bh=+Cj0ZgPzOaN4hCJWMzFwXfxpwQsNMlaKJGQT+M6uQCY=;
+        b=aWUmc0y/+tzZdtBThgU4BKwwXiaitzfegcaZ2lCY7WVDFIYPzNvzbXEMP5Kfpl44W69bxd
+        ZHyIj5KrqVS9fcEAHUus6C0biuY63bd8j7YYnI2sXpN52/ETJzcFLKK5p1axcZVnAx3x0/
+        FydoSuABKkkim2G2d9dtDILnwkdHrG8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-81-RceiZkfbMOKyDjsd_U1aAg-1; Tue, 14 Apr 2020 14:39:50 -0400
+X-MC-Unique: RceiZkfbMOKyDjsd_U1aAg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 15AC21005509;
+        Tue, 14 Apr 2020 18:39:46 +0000 (UTC)
+Received: from [10.36.113.201] (ovpn-113-201.ams2.redhat.com [10.36.113.201])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 9D1C09F9AC;
+        Tue, 14 Apr 2020 18:39:26 +0000 (UTC)
+Subject: Re: [PATCH v2 00/10] virtio-mem: paravirtualized memory
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        virtio-dev@lists.oasis-open.org,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        Michal Hocko <mhocko@kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Sebastien Boeuf <sebastien.boeuf@intel.com>,
+        Samuel Ortiz <samuel.ortiz@intel.com>,
+        Robert Bradford <robert.bradford@intel.com>,
+        Luiz Capitulino <lcapitulino@redhat.com>,
+        Pankaj Gupta <pankaj.gupta.linux@gmail.com>,
+        teawater <teawaterz@linux.alibaba.com>,
+        Igor Mammedov <imammedo@redhat.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        Alexander Duyck <alexander.h.duyck@linux.intel.com>,
+        Alexander Potapenko <glider@google.com>,
+        Anshuman Khandual <anshuman.khandual@arm.com>,
+        Anthony Yznaga <anthony.yznaga@oracle.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Dave Young <dyoung@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Juergen Gross <jgross@suse.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        Len Brown <lenb@kernel.org>,
+        Mel Gorman <mgorman@techsingularity.net>,
+        Michal Hocko <mhocko@suse.com>,
+        Mike Rapoport <rppt@linux.ibm.com>,
+        Oscar Salvador <osalvador@suse.com>,
+        Oscar Salvador <osalvador@suse.de>,
+        Pavel Tatashin <pasha.tatashin@soleen.com>,
+        Pavel Tatashin <pavel.tatashin@microsoft.com>,
+        Pingfan Liu <kernelfans@gmail.com>, Qian Cai <cai@lca.pw>,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Wei Yang <richard.weiyang@gmail.com>
+References: <20200311171422.10484-1-david@redhat.com>
+ <20200329084128-mutt-send-email-mst@kernel.org>
+ <b9984195-bb48-e2a6-887d-0905692a7524@redhat.com>
+ <20200414122716-mutt-send-email-mst@kernel.org>
+From:   David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat GmbH
+Message-ID: <758aa88e-7bd1-ea77-6ee3-9a015a0f8b0e@redhat.com>
+Date:   Tue, 14 Apr 2020 20:39:25 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
+MIME-Version: 1.0
+In-Reply-To: <20200414122716-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This commit adds new unit tests for commit a4d956b93904 ("KVM: nVMX:
-vmread should not set rflags to specify success in case of #PF")
+On 14.04.20 18:28, Michael S. Tsirkin wrote:
+> On Tue, Apr 14, 2020 at 11:15:18AM +0200, David Hildenbrand wrote:
+>> On 29.03.20 14:42, Michael S. Tsirkin wrote:
+>>> On Wed, Mar 11, 2020 at 06:14:12PM +0100, David Hildenbrand wrote:
+>>>> This series is based on latest linux-next. The patches are located at:
+>>>>     https://github.com/davidhildenbrand/linux.git virtio-mem-v2
+>>>>
+>>>> I now have acks for all !virtio-mem changes. I'll be happy to get review
+>>>> feedback, testing reports, etc. for the virtio-mem changes. If there are
+>>>> no further comments, I guess this is good to go as a v1 soon.
+>>>
+>>> I'd like to queue it for merge after the release. If you feel it's ready
+>>> please ping me after the release to help make sure it didn't get
+>>> dropped.  I see there were some reports about people having trouble
+>>> using this, pls keep working on this meanwhile.
+>>
+>> Hi Michael,
+>>
+>> I think this is ready to go as a first version. There are a couple of
+>> future work items related to kexec/kdump:
+>> - Teach kexec-tools/kexec_file_load() to not place the kexec
+>>   kernel/initrd onto virtio-mem added memory.
+>> - Teach kexec-tools/kdump to consider a bigger number of memory
+>>   resources for dumping.
+>>
+>> In general, as virtio-mem adds a lot of memory resources, we might want
+>> to tweak performance in that area as well. Future stuff.
+>>
+>> So I suggest queuing this. If you need a resend, please let me know.
+>>
+>> Cheers!
+> 
+> Thanks!
+> I'll queue it for merge after the release. If possible please ping me
+> after the release to help make sure it didn't get dropped.
 
-The two new tests force a vmread and a vmwrite on an unmapped
-address to cause a #PF and verify that the low byte of %rflags is
-preserved and that %rip is not advanced.  The commit fixed a
-bug in vmread, but we include a test for vmwrite as well for
-completeness.
+If we could get this into 5.8, that would be great (IOW, have it in
+-next for a while before the 5.8 merge window opens).
 
-Before the aforementioned commit, the ALU flags would be incorrectly
-cleared and %rip would be advanced (for vmread).
+Thanks!
 
-v1: https://www.spinics.net/lists/kvm/msg212817.html
-
-Reviewed-by: Jim Mattson <jmattson@google.com>
-Reviewed-by: Peter Shier <pshier@google.com>
-Reviewed-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Signed-off-by: Simon Smith <brigidsmith@google.com>
----
- x86/vmx.c | 121 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 121 insertions(+)
-
-diff --git a/x86/vmx.c b/x86/vmx.c
-index 647ab49408876..e9235ec4fcad9 100644
---- a/x86/vmx.c
-+++ b/x86/vmx.c
-@@ -32,6 +32,7 @@
- #include "processor.h"
- #include "alloc_page.h"
- #include "vm.h"
-+#include "vmalloc.h"
- #include "desc.h"
- #include "vmx.h"
- #include "msr.h"
-@@ -368,6 +369,122 @@ static void test_vmwrite_vmread(void)
- 	free_page(vmcs);
- }
- 
-+ulong finish_fault;
-+u8 sentinel;
-+bool handler_called;
-+static void pf_handler(struct ex_regs *regs)
-+{
-+	// check that RIP was not improperly advanced and that the
-+	// flags value was preserved.
-+	report("RIP has not been advanced!",
-+		regs->rip < finish_fault);
-+	report("The low byte of RFLAGS was preserved!",
-+		((u8)regs->rflags == ((sentinel | 2) & 0xd7)));
-+
-+	regs->rip = finish_fault;
-+	handler_called = true;
-+
-+}
-+
-+static void prep_flags_test_env(void **vpage, struct vmcs **vmcs, handler *old)
-+{
-+	// get an unbacked address that will cause a #PF
-+	*vpage = alloc_vpage();
-+
-+	// set up VMCS so we have something to read from
-+	*vmcs = alloc_page();
-+
-+	memset(*vmcs, 0, PAGE_SIZE);
-+	(*vmcs)->hdr.revision_id = basic.revision;
-+	assert(!vmcs_clear(*vmcs));
-+	assert(!make_vmcs_current(*vmcs));
-+
-+	*old = handle_exception(PF_VECTOR, &pf_handler);
-+}
-+
-+static void test_read_sentinel(void)
-+{
-+	void *vpage;
-+	struct vmcs *vmcs;
-+	handler old;
-+
-+	prep_flags_test_env(&vpage, &vmcs, &old);
-+
-+	// set the proper label
-+	extern char finish_read_fault;
-+
-+	finish_fault = (ulong)&finish_read_fault;
-+
-+	// execute the vmread instruction that will cause a #PF
-+	handler_called = false;
-+	asm volatile ("movb %[byte], %%ah\n\t"
-+		      "sahf\n\t"
-+		      "vmread %[enc], %[val]; finish_read_fault:"
-+		      : [val] "=m" (*(u64 *)vpage)
-+		      : [byte] "Krm" (sentinel),
-+		      [enc] "r" ((u64)GUEST_SEL_SS)
-+		      : "cc", "ah"
-+		      );
-+	report("The #PF handler was invoked", handler_called);
-+
-+	// restore old #PF handler
-+	handle_exception(PF_VECTOR, old);
-+}
-+
-+static void test_vmread_flags_touch(void)
-+{
-+	// set up the sentinel value in the flags register. we
-+	// choose these two values because they candy-stripe
-+	// the 5 flags that sahf sets.
-+	sentinel = 0x91;
-+	test_read_sentinel();
-+
-+	sentinel = 0x45;
-+	test_read_sentinel();
-+}
-+
-+static void test_write_sentinel(void)
-+{
-+	void *vpage;
-+	struct vmcs *vmcs;
-+	handler old;
-+
-+	prep_flags_test_env(&vpage, &vmcs, &old);
-+
-+	// set the proper label
-+	extern char finish_write_fault;
-+
-+	finish_fault = (ulong)&finish_write_fault;
-+
-+	// execute the vmwrite instruction that will cause a #PF
-+	handler_called = false;
-+	asm volatile ("movb %[byte], %%ah\n\t"
-+		      "sahf\n\t"
-+		      "vmwrite %[val], %[enc]; finish_write_fault:"
-+		      : [val] "=m" (*(u64 *)vpage)
-+		      : [byte] "Krm" (sentinel),
-+		      [enc] "r" ((u64)GUEST_SEL_SS)
-+		      : "cc", "ah"
-+		      );
-+	report("The #PF handler was invoked", handler_called);
-+
-+	// restore old #PF handler
-+	handle_exception(PF_VECTOR, old);
-+}
-+
-+static void test_vmwrite_flags_touch(void)
-+{
-+	// set up the sentinel value in the flags register. we
-+	// choose these two values because they candy-stripe
-+	// the 5 flags that sahf sets.
-+	sentinel = 0x91;
-+	test_write_sentinel();
-+
-+	sentinel = 0x45;
-+	test_write_sentinel();
-+}
-+
-+
- static void test_vmcs_high(void)
- {
- 	struct vmcs *vmcs = alloc_page();
-@@ -1994,6 +2111,10 @@ int main(int argc, const char *argv[])
- 		test_vmcs_lifecycle();
- 	if (test_wanted("test_vmx_caps", argv, argc))
- 		test_vmx_caps();
-+	if (test_wanted("test_vmread_flags_touch", argv, argc))
-+		test_vmread_flags_touch();
-+	if (test_wanted("test_vmwrite_flags_touch", argv, argc))
-+		test_vmwrite_flags_touch();
- 
- 	/* Balance vmxon from test_vmxon. */
- 	vmx_off();
 -- 
-2.26.0.110.g2183baf09c-goog
+Thanks,
+
+David / dhildenb
 
