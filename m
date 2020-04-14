@@ -2,117 +2,253 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8BFB61A859B
-	for <lists+kvm@lfdr.de>; Tue, 14 Apr 2020 18:48:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7240F1A863D
+	for <lists+kvm@lfdr.de>; Tue, 14 Apr 2020 18:59:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2440261AbgDNQsL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Apr 2020 12:48:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60198 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S2440012AbgDNQsI (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 14 Apr 2020 12:48:08 -0400
-Received: from mail-io1-xd43.google.com (mail-io1-xd43.google.com [IPv6:2607:f8b0:4864:20::d43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2B80C061A0E
-        for <kvm@vger.kernel.org>; Tue, 14 Apr 2020 09:48:05 -0700 (PDT)
-Received: by mail-io1-xd43.google.com with SMTP id s18so10576962ioe.10
-        for <kvm@vger.kernel.org>; Tue, 14 Apr 2020 09:48:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=q8Ck4hl4OJdZJ207CgwIdwKLJA2rve9JgZyBndXCjLk=;
-        b=C6lKtFXa+3PZ4mDEkiHdFhUuIfhw9kBaURBl6+ldjScXgWUtgTexfOUxUj4Vp3dNaK
-         DNQO/ieqjGTsbca2qb6xHDzgshsdlSaC6DYYXNGoehkEMErpQK7XIGBfLoxS/3oYWMEZ
-         LRFz9yAfGf+3Xudg/nJpPnXnx7e57/cW9beH7h6lc+GCXWq8Unw45Ey8DO4DtaOLwmI9
-         4WsFsQtCdpk2kCeVgQP8Qx13V2UlU3p72e2uoF+fj0sRFuwsg/LrEntwAzqfWGrlkjgQ
-         Yx/hrspJ2kR0/kpuPfOnDsjabe/4AYNt0UixUz7gtDxDV0PUMIDJUIz3IwPtOpbNtRld
-         +9Qw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=q8Ck4hl4OJdZJ207CgwIdwKLJA2rve9JgZyBndXCjLk=;
-        b=M0Da339nTDt0OyN5oR3KiOY2/ELMmgI2WBqzynNzPCmQQPKdUbE5hl7wpICFaMG3T6
-         Ex/XdTCQ7fEr8ZZ2QmzNGCQj3CfN8ri9tgpdSLS9hQINbKsyOxYQ/P4S2jP4hRSi71vI
-         REWoAV4CXYdHUodR3j4T2ss9iZhqHy6KoonqOLXLuUMG3Y3Ntix9XJOLqrY036eNwNSZ
-         t6NGWxXbSSqIRepq23XuxOptmtMhbot7GnQdaW8xU7mQYF0xVlV6YmD5kF+MKA3ypaCE
-         inbiLNe2FT7waaC8xvme+oflxnfL9YjKX8gXWgxcShB0L39QDyko8tRoe13Tm1t3kgqj
-         MlrQ==
-X-Gm-Message-State: AGi0PuZVuz1lDllELiMCvduTOgXDijLyB7TLyIfE5jdy1TLJi61vlBeC
-        IMQdHQDrdTDXZLtitC8X5PBsHb4Yqe2nBjKz3twOmA==
-X-Google-Smtp-Source: APiQypIjnaHRApNsTxubTGGk0T6gKisYDbZgSJJIhICT6gonlgzeyY79bVIQtRn88c4jx1bwupS44CP8pzkQo+lQN9U=
-X-Received: by 2002:a6b:91d4:: with SMTP id t203mr4164472iod.70.1586882884120;
- Tue, 14 Apr 2020 09:48:04 -0700 (PDT)
+        id S2391913AbgDNQz0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Apr 2020 12:55:26 -0400
+Received: from mail.kernel.org ([198.145.29.99]:55194 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2440299AbgDNQtI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Apr 2020 12:49:08 -0400
+Received: from mail.kernel.org (ip5f5ad4d8.dynamic.kabel-deutschland.de [95.90.212.216])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 64BDD20787;
+        Tue, 14 Apr 2020 16:49:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1586882942;
+        bh=hpU3ilpDhIBh1EkpHoT8CRglKxDNGuySrswIRHuRmXU=;
+        h=From:To:Cc:Subject:Date:From;
+        b=qP/fh2JuBrTWMBDU0Po9QgHcYacrRlFhnHwEY8en7h953JH1K2J6xRWgtWi+ouXIY
+         3gGiDenojv2rrUzJ4Wxk3whARW64aaikv0MOeHbofi1sPuRVe5IZT8BpzPaRPNxcO+
+         07Ps8XSWU9UmRtIfijlblMPlQG+5+iBYwuA7KjAY=
+Received: from mchehab by mail.kernel.org with local (Exim 4.92.3)
+        (envelope-from <mchehab@kernel.org>)
+        id 1jOOk8-0068kv-FR; Tue, 14 Apr 2020 18:49:00 +0200
+From:   Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+To:     Linux Doc Mailing List <linux-doc@vger.kernel.org>
+Cc:     Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
+        linux-kernel@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
+        Rob Herring <robh@kernel.org>,
+        Maxime Ripard <maxime@cerno.tech>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Sudeep Holla <sudeep.holla@arm.com>,
+        Kishon Vijay Abraham I <kishon@ti.com>,
+        Yuti Amonkar <yamonkar@cadence.com>,
+        devicetree@vger.kernel.org, linux-arch@vger.kernel.org,
+        kvm@vger.kernel.org, kvm-ppc@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, dri-devel@lists.freedesktop.org,
+        linux-arm-kernel@lists.infradead.org,
+        linux-fsdevel@vger.kernel.org, linux-unionfs@vger.kernel.org,
+        linux-mm@kvack.org, linux-rdma@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu, linux-crypto@vger.kernel.org,
+        linux-media@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+        freedreno@lists.freedesktop.org, linux-afs@lists.infradead.org,
+        ecryptfs@vger.kernel.org, linux-ntfs-dev@lists.sourceforge.net,
+        ocfs2-devel@oss.oracle.com, linux-pci@vger.kernel.org,
+        linux-edac@vger.kernel.org, linux-spi@vger.kernel.org,
+        Sandeep Maheswaram <sanm@codeaurora.org>,
+        Stephen Boyd <swboyd@chromium.org>,
+        Matthias Kaehlcke <mka@chromium.org>,
+        linux-usb@vger.kernel.org,
+        Geert Uytterhoeven <geert+renesas@glider.be>,
+        Matthias Brugger <mbrugger@suse.com>, netdev@vger.kernel.org,
+        linux-i2c@vger.kernel.org, linux-rockchip@lists.infradead.org,
+        linux-ide@vger.kernel.org, linux1394-devel@lists.sourceforge.net
+Subject: [PATCH v2 00/33] Documentation fixes for Kernel 5.8
+Date:   Tue, 14 Apr 2020 18:48:26 +0200
+Message-Id: <cover.1586881715.git.mchehab+huawei@kernel.org>
+X-Mailer: git-send-email 2.25.2
 MIME-Version: 1.0
-References: <20200414000946.47396-1-jmattson@google.com> <20200414000946.47396-2-jmattson@google.com>
- <20200414031705.GP21204@linux.intel.com>
-In-Reply-To: <20200414031705.GP21204@linux.intel.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Tue, 14 Apr 2020 09:47:53 -0700
-Message-ID: <CALMp9eT23AUTU3m_oADKw3O_NMpuX3crx7eqSB8Rbgh3k0s_Jw@mail.gmail.com>
-Subject: Re: [PATCH 2/2] kvm: nVMX: Single-step traps trump expired
- VMX-preemption timer
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     kvm list <kvm@vger.kernel.org>, Oliver Upton <oupton@google.com>,
-        Peter Shier <pshier@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Apr 13, 2020 at 8:17 PM Sean Christopherson
-<sean.j.christopherson@intel.com> wrote:
->
-> On Mon, Apr 13, 2020 at 05:09:46PM -0700, Jim Mattson wrote:
-> > Previously, if the hrtimer for the nested VMX-preemption timer fired
-> > while L0 was emulating an L2 instruction with RFLAGS.TF set, the
-> > synthesized single-step trap would be unceremoniously dropped when
-> > synthesizing the "VMX-preemption timer expired" VM-exit from L2 to L1.
-> >
-> > To fix this, don't synthesize a "VMX-preemption timer expired" VM-exit
-> > from L2 to L1 when there is a pending debug trap, such as a
-> > single-step trap.
-> >
-> > Fixes: f4124500c2c13 ("KVM: nVMX: Fully emulate preemption timer")
-> > Signed-off-by: Jim Mattson <jmattson@google.com>
-> > Reviewed-by: Oliver Upton <oupton@google.com>
-> > Reviewed-by: Peter Shier <pshier@google.com>
-> > ---
-> >  arch/x86/kvm/vmx/nested.c | 4 +++-
-> >  1 file changed, 3 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> > index cbc9ea2de28f..6ab974debd44 100644
-> > --- a/arch/x86/kvm/vmx/nested.c
-> > +++ b/arch/x86/kvm/vmx/nested.c
-> > @@ -3690,7 +3690,9 @@ static int vmx_check_nested_events(struct kvm_vcpu *vcpu)
-> >           vmx->nested.preemption_timer_expired) {
-> >               if (block_nested_events)
-> >                       return -EBUSY;
-> > -             nested_vmx_vmexit(vcpu, EXIT_REASON_PREEMPTION_TIMER, 0, 0);
-> > +             if (!vmx_pending_dbg_trap(vcpu))
->
-> IMO this one warrants a comment.  It's not immediately obvious that this
-> only applies to #DBs that are being injected into L2, and that returning
-> -EBUSY will do the wrong thing.
+Patches 1 to 5 contain changes to the documentation toolset:
 
-Regarding -EBUSY, I'm in complete agreement. However, I'm not sure
-what the potential confusion is regarding the event. Are you
-suggesting that one might think that we have a #DB to deliver to L1
-while we're in guest mode? IIRC, that can happen under SVM, but I
-don't believe it can happen under VMX.
+- The first 3 patches help to reduce a lot the number of reported
+  kernel-doc issues, by making the tool more smart.
 
-> > +                     nested_vmx_vmexit(vcpu, EXIT_REASON_PREEMPTION_TIMER,
-> > +                                       0, 0);
->
-> I'd just let the "0, 0);" poke out past 80 chars.
+- Patches 4 and 5 are meant to partially address the PDF
+  build, with now requires Sphinx version 2.4 or upper.
 
-Oh, you rascal, you!
+The remaining patches fix broken references detected by
+this tool:
 
-> >               return 0;
-> >       }
-> >
-> > --
-> > 2.26.0.110.g2183baf09c-goog
-> >
+        ./scripts/documentation-file-ref-check
+
+and address other random errors due to tags being mis-interpreted
+or mis-used.
+
+They are independent each other, but some may depend on
+the kernel-doc improvements.
+
+PS.: Due to the large number of C/C, I opted to keep a smaller
+set of C/C at this first e-mail (only e-mails with "L:" tag from
+MAINTAINERS file).
+
+Jon,
+
+Those patches should apply cleanly at docs-next, once you
+pull from v5.7-rc1.
+
+
+-
+
+v2:
+
+- patches re-ordered;
+- added reviewed/acked-by tags;
+- rebased on the top of docs-next + v5.7-rc1.
+
+
+Mauro Carvalho Chehab (33):
+  scripts: kernel-doc: proper handle @foo->bar()
+  scripts: kernel-doc: accept negation like !@var
+  scripts: kernel-doc: accept blank lines on parameter description
+  docs: update recommended Sphinx version to 2.4.4
+  docs: LaTeX/PDF: drop list of documents
+  MAINTAINERS: dt: update display/allwinner file entry
+  MAINTAINERS: dt: fix pointers for ARM Integrator, Versatile and
+    RealView
+  docs: dt: fix broken reference to phy-cadence-torrent.yaml
+  docs: fix broken references to text files
+  docs: fix broken references for ReST files that moved around
+  docs: filesystems: fix renamed references
+  docs: amu: supress some Sphinx warnings
+  docs: arm64: booting.rst: get rid of some warnings
+  docs: pci: boot-interrupts.rst: improve html output
+  docs: ras: get rid of some warnings
+  docs: ras: don't need to repeat twice the same thing
+  docs: infiniband: verbs.c: fix some documentation warnings
+  docs: spi: spi.h: fix a doc building warning
+  docs: drivers: fix some warnings at base/platform.c when building docs
+  docs: mm: userfaultfd.rst: use ``foo`` for literals
+  docs: mm: userfaultfd.rst: use a cross-reference for a section
+  docs: vm: index.rst: add an orphan doc to the building system
+  docs: dt: qcom,dwc3.txt: fix cross-reference for a converted file
+  docs: dt: fix a broken reference for a file converted to json
+  docs: powerpc: cxl.rst: mark two section titles as such
+  docs: i2c: rename i2c.svg to i2c_bus.svg
+  docs: Makefile: place final pdf docs on a separate dir
+  docs: dt: rockchip,dwc3.txt: fix a pointer to a renamed file
+  ata: libata-core: fix a doc warning
+  firewire: firewire-cdev.hL get rid of a docs warning
+  fs: inode.c: get rid of docs warnings
+  futex: get rid of a kernel-docs build warning
+  lib: bitmap.c: get rid of some doc warnings
+
+ Documentation/ABI/stable/sysfs-devices-node   |   2 +-
+ Documentation/ABI/testing/procfs-smaps_rollup |   2 +-
+ Documentation/Makefile                        |   6 +-
+ Documentation/PCI/boot-interrupts.rst         |  34 +--
+ Documentation/admin-guide/cpu-load.rst        |   2 +-
+ Documentation/admin-guide/mm/userfaultfd.rst  | 209 +++++++++---------
+ Documentation/admin-guide/nfs/nfsroot.rst     |   2 +-
+ Documentation/admin-guide/ras.rst             |  18 +-
+ Documentation/arm64/amu.rst                   |   5 +
+ Documentation/arm64/booting.rst               |  36 +--
+ Documentation/conf.py                         |  38 ----
+ .../bindings/net/qualcomm-bluetooth.txt       |   2 +-
+ .../bindings/phy/ti,phy-j721e-wiz.yaml        |   2 +-
+ .../devicetree/bindings/usb/qcom,dwc3.txt     |   4 +-
+ .../devicetree/bindings/usb/rockchip,dwc3.txt |   2 +-
+ .../doc-guide/maintainer-profile.rst          |   2 +-
+ .../driver-api/driver-model/device.rst        |   4 +-
+ .../driver-api/driver-model/overview.rst      |   2 +-
+ Documentation/filesystems/dax.txt             |   2 +-
+ Documentation/filesystems/dnotify.txt         |   2 +-
+ .../filesystems/ramfs-rootfs-initramfs.rst    |   2 +-
+ Documentation/filesystems/sysfs.rst           |   2 +-
+ Documentation/i2c/{i2c.svg => i2c_bus.svg}    |   2 +-
+ Documentation/i2c/summary.rst                 |   2 +-
+ Documentation/memory-barriers.txt             |   2 +-
+ Documentation/powerpc/cxl.rst                 |   2 +
+ .../powerpc/firmware-assisted-dump.rst        |   2 +-
+ Documentation/process/adding-syscalls.rst     |   2 +-
+ Documentation/process/submit-checklist.rst    |   2 +-
+ Documentation/sphinx/requirements.txt         |   2 +-
+ .../it_IT/process/adding-syscalls.rst         |   2 +-
+ .../it_IT/process/submit-checklist.rst        |   2 +-
+ .../translations/ko_KR/memory-barriers.txt    |   2 +-
+ .../translations/zh_CN/filesystems/sysfs.txt  |   8 +-
+ .../zh_CN/process/submit-checklist.rst        |   2 +-
+ Documentation/virt/kvm/arm/pvtime.rst         |   2 +-
+ Documentation/virt/kvm/devices/vcpu.rst       |   2 +-
+ Documentation/virt/kvm/hypercalls.rst         |   4 +-
+ Documentation/virt/kvm/mmu.rst                |   2 +-
+ Documentation/virt/kvm/review-checklist.rst   |   2 +-
+ Documentation/vm/index.rst                    |   1 +
+ MAINTAINERS                                   |   7 +-
+ arch/powerpc/include/uapi/asm/kvm_para.h      |   2 +-
+ arch/x86/kvm/mmu/mmu.c                        |   2 +-
+ drivers/ata/libata-core.c                     |   2 +-
+ drivers/base/core.c                           |   2 +-
+ drivers/base/platform.c                       |   6 +-
+ .../allwinner/sun8i-ce/sun8i-ce-cipher.c      |   2 +-
+ .../crypto/allwinner/sun8i-ce/sun8i-ce-core.c |   2 +-
+ .../allwinner/sun8i-ss/sun8i-ss-cipher.c      |   2 +-
+ .../crypto/allwinner/sun8i-ss/sun8i-ss-core.c |   2 +-
+ drivers/gpu/drm/Kconfig                       |   2 +-
+ drivers/gpu/drm/drm_ioctl.c                   |   2 +-
+ drivers/gpu/drm/msm/disp/dpu1/dpu_kms.h       |   2 +-
+ drivers/hwtracing/coresight/Kconfig           |   2 +-
+ drivers/infiniband/core/verbs.c               |   7 +-
+ drivers/media/v4l2-core/v4l2-fwnode.c         |   2 +-
+ fs/Kconfig                                    |   2 +-
+ fs/Kconfig.binfmt                             |   2 +-
+ fs/adfs/Kconfig                               |   2 +-
+ fs/affs/Kconfig                               |   2 +-
+ fs/afs/Kconfig                                |   6 +-
+ fs/bfs/Kconfig                                |   2 +-
+ fs/cramfs/Kconfig                             |   2 +-
+ fs/ecryptfs/Kconfig                           |   2 +-
+ fs/fat/Kconfig                                |   8 +-
+ fs/fuse/Kconfig                               |   2 +-
+ fs/fuse/dev.c                                 |   2 +-
+ fs/hfs/Kconfig                                |   2 +-
+ fs/hpfs/Kconfig                               |   2 +-
+ fs/inode.c                                    |   6 +-
+ fs/isofs/Kconfig                              |   2 +-
+ fs/namespace.c                                |   2 +-
+ fs/notify/inotify/Kconfig                     |   2 +-
+ fs/ntfs/Kconfig                               |   2 +-
+ fs/ocfs2/Kconfig                              |   2 +-
+ fs/overlayfs/Kconfig                          |   6 +-
+ fs/proc/Kconfig                               |   4 +-
+ fs/romfs/Kconfig                              |   2 +-
+ fs/sysfs/dir.c                                |   2 +-
+ fs/sysfs/file.c                               |   2 +-
+ fs/sysfs/mount.c                              |   2 +-
+ fs/sysfs/symlink.c                            |   2 +-
+ fs/sysv/Kconfig                               |   2 +-
+ fs/udf/Kconfig                                |   2 +-
+ include/linux/kobject.h                       |   2 +-
+ include/linux/kobject_ns.h                    |   2 +-
+ include/linux/mm.h                            |   4 +-
+ include/linux/relay.h                         |   2 +-
+ include/linux/spi/spi.h                       |   1 +
+ include/linux/sysfs.h                         |   2 +-
+ include/uapi/linux/ethtool_netlink.h          |   2 +-
+ include/uapi/linux/firewire-cdev.h            |   2 +-
+ include/uapi/linux/kvm.h                      |   4 +-
+ include/uapi/rdma/rdma_user_ioctl_cmds.h      |   2 +-
+ kernel/futex.c                                |   3 +
+ kernel/relay.c                                |   2 +-
+ lib/bitmap.c                                  |  27 +--
+ lib/kobject.c                                 |   4 +-
+ mm/gup.c                                      |  12 +-
+ scripts/kernel-doc                            |  41 ++--
+ tools/include/uapi/linux/kvm.h                |   4 +-
+ virt/kvm/arm/vgic/vgic-mmio-v3.c              |   2 +-
+ virt/kvm/arm/vgic/vgic.h                      |   4 +-
+ 104 files changed, 343 insertions(+), 326 deletions(-)
+ rename Documentation/i2c/{i2c.svg => i2c_bus.svg} (99%)
+
+-- 
+2.25.2
+
+
