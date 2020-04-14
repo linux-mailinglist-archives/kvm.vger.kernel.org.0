@@ -2,44 +2,44 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7835A1A8C00
-	for <lists+kvm@lfdr.de>; Tue, 14 Apr 2020 22:15:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0E7EB1A8C06
+	for <lists+kvm@lfdr.de>; Tue, 14 Apr 2020 22:15:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2632747AbgDNULg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Apr 2020 16:11:36 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:47260 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S2632740AbgDNULR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Apr 2020 16:11:17 -0400
+        id S2632773AbgDNUNI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Apr 2020 16:13:08 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:52376 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S2632742AbgDNULR (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 14 Apr 2020 16:11:17 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1586895075;
+        s=mimecast20190719; t=1586895076;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=t7aLyIzVIv8UgnZXzETONCOSTJxW/XfBuHyqu3EQW8M=;
-        b=iEh+MOz5ExLjTeb4Bj9lorap/hZAUQkcNY6bgMjEWyYorWQJ2D1v6ewDVIB2d2JP/FOvl2
-        OJYgbqVRmmg8j1dmPPCXBhLMR1Hyv6rYpo4UTRTo4yAPZ49YHN8bdtq23Ut/+xV+flsiMp
-        2OCf5OSyAH1FaIbj1lnHgfQ3n/TWQYs=
+        bh=TBfymaLjeSq2rO2oeC+ZflWOK6IYAgATphCSjLeriTw=;
+        b=DoOl7nvWDREeBOkGnOSKiNyTKS4Xh6L3F1ltNJgAkqBWPx+ly1k5PElSM4W3PJo6KGPVss
+        id4c9kQJdqdDYUFC71i4pxk1q0sICrnY+iFHzA9UQ1cXlpNN0EDWpCopA/FNXWMxgwBKdv
+        Gcd0y5s8HOa0Yahq+t/wAv2H8f5/TLA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-303-T-VB9X6nO8ODzdUku_1Fng-1; Tue, 14 Apr 2020 16:11:13 -0400
-X-MC-Unique: T-VB9X6nO8ODzdUku_1Fng-1
+ us-mta-341-__B1P1llPCeFq6HN7ExM9g-1; Tue, 14 Apr 2020 16:11:14 -0400
+X-MC-Unique: __B1P1llPCeFq6HN7ExM9g-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4E5221088398;
-        Tue, 14 Apr 2020 20:11:12 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3959280269D;
+        Tue, 14 Apr 2020 20:11:13 +0000 (UTC)
 Received: from localhost.localdomain.com (ovpn-113-69.rdu2.redhat.com [10.10.113.69])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 883765DA66;
-        Tue, 14 Apr 2020 20:11:11 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 728C55D9CD;
+        Tue, 14 Apr 2020 20:11:12 +0000 (UTC)
 From:   Cathy Avery <cavery@redhat.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         pbonzini@redhat.com
 Cc:     vkuznets@redhat.com, wei.huang2@amd.com
-Subject: [PATCH 1/2] KVM: SVM: Implement check_nested_events for NMI
-Date:   Tue, 14 Apr 2020 16:11:06 -0400
-Message-Id: <20200414201107.22952-2-cavery@redhat.com>
+Subject: [PATCH 2/2] KVM: x86: check_nested_events if there is an injectable NMI
+Date:   Tue, 14 Apr 2020 16:11:07 -0400
+Message-Id: <20200414201107.22952-3-cavery@redhat.com>
 In-Reply-To: <20200414201107.22952-1-cavery@redhat.com>
 References: <20200414201107.22952-1-cavery@redhat.com>
 MIME-Version: 1.0
@@ -50,95 +50,45 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Migrate nested guest NMI intercept processing
-to new check_nested_events.
+With NMI intercept moved to check_nested_events there is a race
+condition where vcpu->arch.nmi_pending is set late causing
+the execution of check_nested_events to not setup correctly
+for nested.exit_required. A second call to check_nested_events
+allows the injectable nmi to be detected in time in order to
+require immediate exit from L2 to L1.
 
 Signed-off-by: Cathy Avery <cavery@redhat.com>
 ---
- arch/x86/kvm/svm/nested.c | 21 +++++++++++++++++++++
- arch/x86/kvm/svm/svm.c    |  2 +-
- arch/x86/kvm/svm/svm.h    | 15 ---------------
- 3 files changed, 22 insertions(+), 16 deletions(-)
+ arch/x86/kvm/x86.c | 15 +++++++++++----
+ 1 file changed, 11 insertions(+), 4 deletions(-)
 
-diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-index 90a1ca939627..1ba8ef46b0b5 100644
---- a/arch/x86/kvm/svm/nested.c
-+++ b/arch/x86/kvm/svm/nested.c
-@@ -764,6 +764,20 @@ int nested_svm_check_exception(struct vcpu_svm *svm,=
- unsigned nr,
- 	return vmexit;
- }
-=20
-+static bool nested_exit_on_nmi(struct vcpu_svm *svm)
-+{
-+	return (svm->nested.intercept & (1ULL << INTERCEPT_NMI));
-+}
-+
-+static void nested_svm_nmi(struct vcpu_svm *svm)
-+{
-+	svm->vmcb->control.exit_code =3D SVM_EXIT_NMI;
-+	svm->vmcb->control.exit_info_1 =3D 0;
-+	svm->vmcb->control.exit_info_2 =3D 0;
-+
-+	svm->nested.exit_required =3D true;
-+}
-+
- static void nested_svm_intr(struct vcpu_svm *svm)
- {
- 	svm->vmcb->control.exit_code   =3D SVM_EXIT_INTR;
-@@ -793,6 +807,13 @@ int svm_check_nested_events(struct kvm_vcpu *vcpu)
- 		return 0;
- 	}
-=20
-+	if (vcpu->arch.nmi_pending && nested_exit_on_nmi(svm)) {
-+		if (block_nested_events)
-+			return -EBUSY;
-+		nested_svm_nmi(svm);
-+		return 0;
-+	}
-+
- 	return 0;
- }
-=20
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 2be5bbae3a40..84c338c55348 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -3053,7 +3053,7 @@ static int svm_nmi_allowed(struct kvm_vcpu *vcpu)
- 	int ret;
- 	ret =3D !(vmcb->control.int_state & SVM_INTERRUPT_SHADOW_MASK) &&
- 	      !(svm->vcpu.arch.hflags & HF_NMI_MASK);
--	ret =3D ret && gif_set(svm) && nested_svm_nmi(svm);
-+	ret =3D ret && gif_set(svm);
-=20
- 	return ret;
- }
-diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index df3474f4fb02..9be2b890ff3c 100644
---- a/arch/x86/kvm/svm/svm.h
-+++ b/arch/x86/kvm/svm/svm.h
-@@ -369,21 +369,6 @@ void disable_nmi_singlestep(struct vcpu_svm *svm);
- #define NESTED_EXIT_DONE	1	/* Exit caused nested vmexit  */
- #define NESTED_EXIT_CONTINUE	2	/* Further checks needed      */
-=20
--/* This function returns true if it is save to enable the nmi window */
--static inline bool nested_svm_nmi(struct vcpu_svm *svm)
--{
--	if (!is_guest_mode(&svm->vcpu))
--		return true;
--
--	if (!(svm->nested.intercept & (1ULL << INTERCEPT_NMI)))
--		return true;
--
--	svm->vmcb->control.exit_code =3D SVM_EXIT_NMI;
--	svm->nested.exit_required =3D true;
--
--	return false;
--}
--
- static inline bool svm_nested_virtualize_tpr(struct kvm_vcpu *vcpu)
- {
- 	return is_guest_mode(vcpu) && (vcpu->arch.hflags & HF_VINTR_MASK);
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 027dfd278a97..ecfafcd93536 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -7734,10 +7734,17 @@ static int inject_pending_event(struct kvm_vcpu *=
+vcpu)
+ 		vcpu->arch.smi_pending =3D false;
+ 		++vcpu->arch.smi_count;
+ 		enter_smm(vcpu);
+-	} else if (vcpu->arch.nmi_pending && kvm_x86_ops.nmi_allowed(vcpu)) {
+-		--vcpu->arch.nmi_pending;
+-		vcpu->arch.nmi_injected =3D true;
+-		kvm_x86_ops.set_nmi(vcpu);
++	} else if (vcpu->arch.nmi_pending) {
++		if (is_guest_mode(vcpu) && kvm_x86_ops.check_nested_events) {
++			r =3D kvm_x86_ops.check_nested_events(vcpu);
++			if (r !=3D 0)
++				return r;
++		}
++		if (kvm_x86_ops.nmi_allowed(vcpu)) {
++			--vcpu->arch.nmi_pending;
++			vcpu->arch.nmi_injected =3D true;
++			kvm_x86_ops.set_nmi(vcpu);
++		}
+ 	} else if (kvm_cpu_has_injectable_intr(vcpu)) {
+ 		/*
+ 		 * Because interrupts can be injected asynchronously, we are
 --=20
 2.20.1
 
