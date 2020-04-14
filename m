@@ -2,29 +2,29 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CF6AD1A8016
-	for <lists+kvm@lfdr.de>; Tue, 14 Apr 2020 16:44:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1EBAE1A801F
+	for <lists+kvm@lfdr.de>; Tue, 14 Apr 2020 16:44:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391060AbgDNOkI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Apr 2020 10:40:08 -0400
-Received: from foss.arm.com ([217.140.110.172]:57110 "EHLO foss.arm.com"
+        id S2404316AbgDNOoP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Apr 2020 10:44:15 -0400
+Received: from foss.arm.com ([217.140.110.172]:57116 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2391035AbgDNOkA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Apr 2020 10:40:00 -0400
+        id S2391037AbgDNOkB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Apr 2020 10:40:01 -0400
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C2DEDC14;
-        Tue, 14 Apr 2020 07:39:59 -0700 (PDT)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 05DAB30E;
+        Tue, 14 Apr 2020 07:40:01 -0700 (PDT)
 Received: from e123195-lin.cambridge.arm.com (e123195-lin.cambridge.arm.com [10.1.196.63])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id DACC93F73D;
-        Tue, 14 Apr 2020 07:39:58 -0700 (PDT)
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 0413F3F73D;
+        Tue, 14 Apr 2020 07:39:59 -0700 (PDT)
 From:   Alexandru Elisei <alexandru.elisei@arm.com>
 To:     kvm@vger.kernel.org
 Cc:     will@kernel.org, julien.thierry.kdev@gmail.com,
         andre.przywara@arm.com, sami.mujawar@arm.com,
-        lorenzo.pieralisi@arm.com
-Subject: [PATCH kvmtool 02/18] hw/i8042: Compile only for x86
-Date:   Tue, 14 Apr 2020 15:39:30 +0100
-Message-Id: <20200414143946.1521-3-alexandru.elisei@arm.com>
+        lorenzo.pieralisi@arm.com, Julien Thierry <julien.thierry@arm.com>
+Subject: [PATCH kvmtool 03/18] pci: Fix BAR resource sizing arbitration
+Date:   Tue, 14 Apr 2020 15:39:31 +0100
+Message-Id: <20200414143946.1521-4-alexandru.elisei@arm.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200414143946.1521-1-alexandru.elisei@arm.com>
 References: <20200414143946.1521-1-alexandru.elisei@arm.com>
@@ -35,53 +35,103 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The initialization function for the i8042 emulated device does exactly
-nothing for all architectures, except for x86. As a result, the device
-is usable only for x86, so let's make the file an architecture specific
-object file.
+From: Sami Mujawar <sami.mujawar@arm.com>
+
+According to the 'PCI Local Bus Specification, Revision 3.0,
+February 3, 2004, Section 6.2.5.1, Implementation Notes, page 227'
+
+    "Software saves the original value of the Base Address register,
+    writes 0 FFFF FFFFh to the register, then reads it back. Size
+    calculation can be done from the 32-bit value read by first
+    clearing encoding information bits (bit 0 for I/O, bits 0-3 for
+    memory), inverting all 32 bits (logical NOT), then incrementing
+    by 1. The resultant 32-bit value is the memory/I/O range size
+    decoded by the register. Note that the upper 16 bits of the result
+    is ignored if the Base Address register is for I/O and bits 16-31
+    returned zero upon read."
+
+kvmtool was returning the actual BAR resource size which would be
+incorrect as the software software drivers would invert all 32 bits
+(logical NOT), then incrementing by 1. This ends up with a very large
+resource size (in some cases more than 4GB) due to which drivers
+assert/fail to work.
+
+e.g if the BAR resource size was 0x1000, kvmtool would return 0x1000
+instead of 0xFFFFF00x.
+
+Fixed pci__config_wr() to return the size of the BAR in accordance with
+the PCI Local Bus specification, Implementation Notes.
 
 Reviewed-by: Andre Przywara <andre.przywara@arm.com>
+Signed-off-by: Sami Mujawar <sami.mujawar@arm.com>
+Signed-off-by: Julien Thierry <julien.thierry@arm.com>
+[Reworked algorithm, removed power-of-two check]
 Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 ---
- Makefile   | 2 +-
- hw/i8042.c | 4 ----
- 2 files changed, 1 insertion(+), 5 deletions(-)
+ pci.c | 42 ++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 36 insertions(+), 6 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index f72f163101c3..9dfb21b56c41 100644
---- a/Makefile
-+++ b/Makefile
-@@ -103,7 +103,6 @@ OBJS	+= hw/pci-shmem.o
- OBJS	+= kvm-ipc.o
- OBJS	+= builtin-sandbox.o
- OBJS	+= virtio/mmio.o
--OBJS	+= hw/i8042.o
+diff --git a/pci.c b/pci.c
+index 689869cb79a3..3198732935eb 100644
+--- a/pci.c
++++ b/pci.c
+@@ -149,6 +149,8 @@ void pci__config_wr(struct kvm *kvm, union pci_config_address addr, void *data,
+ 	u8 bar, offset;
+ 	struct pci_device_header *pci_hdr;
+ 	u8 dev_num = addr.device_number;
++	u32 value = 0;
++	u32 mask;
  
- # Translate uname -m into ARCH string
- ARCH ?= $(shell uname -m | sed -e s/i.86/i386/ -e s/ppc.*/powerpc/ \
-@@ -124,6 +123,7 @@ endif
- #x86
- ifeq ($(ARCH),x86)
- 	DEFINES += -DCONFIG_X86
-+	OBJS	+= hw/i8042.o
- 	OBJS	+= x86/boot.o
- 	OBJS	+= x86/cpuid.o
- 	OBJS	+= x86/interrupt.o
-diff --git a/hw/i8042.c b/hw/i8042.c
-index 288b7d1108ac..2d8c96e9c7e6 100644
---- a/hw/i8042.c
-+++ b/hw/i8042.c
-@@ -349,10 +349,6 @@ static struct ioport_operations kbd_ops = {
+ 	if (!pci_device_exists(addr.bus_number, dev_num, 0))
+ 		return;
+@@ -169,13 +171,41 @@ void pci__config_wr(struct kvm *kvm, union pci_config_address addr, void *data,
+ 	bar = (offset - PCI_BAR_OFFSET(0)) / sizeof(u32);
  
- int kbd__init(struct kvm *kvm)
- {
--#ifndef CONFIG_X86
--	return 0;
--#endif
--
- 	kbd_reset();
- 	state.kvm = kvm;
- 	ioport__register(kvm, I8042_DATA_REG, &kbd_ops, 2, NULL);
+ 	/*
+-	 * If the kernel masks the BAR it would expect to find the size of the
+-	 * BAR there next time it reads from it. When the kernel got the size it
+-	 * would write the address back.
++	 * If the kernel masks the BAR, it will expect to find the size of the
++	 * BAR there next time it reads from it. After the kernel reads the
++	 * size, it will write the address back.
+ 	 */
+-	if (bar < 6 && ioport__read32(data) == 0xFFFFFFFF) {
+-		u32 sz = pci_hdr->bar_size[bar];
+-		memcpy(base + offset, &sz, sizeof(sz));
++	if (bar < 6) {
++		if (pci_hdr->bar[bar] & PCI_BASE_ADDRESS_SPACE_IO)
++			mask = (u32)PCI_BASE_ADDRESS_IO_MASK;
++		else
++			mask = (u32)PCI_BASE_ADDRESS_MEM_MASK;
++		/*
++		 * According to the PCI local bus specification REV 3.0:
++		 * The number of upper bits that a device actually implements
++		 * depends on how much of the address space the device will
++		 * respond to. A device that wants a 1 MB memory address space
++		 * (using a 32-bit base address register) would build the top
++		 * 12 bits of the address register, hardwiring the other bits
++		 * to 0.
++		 *
++		 * Furthermore, software can determine how much address space
++		 * the device requires by writing a value of all 1's to the
++		 * register and then reading the value back. The device will
++		 * return 0's in all don't-care address bits, effectively
++		 * specifying the address space required.
++		 *
++		 * Software computes the size of the address space with the
++		 * formula S = ~B + 1, where S is the memory size and B is the
++		 * value read from the BAR. This means that the BAR value that
++		 * kvmtool should return is B = ~(S - 1).
++		 */
++		memcpy(&value, data, size);
++		if (value == 0xffffffff)
++			value = ~(pci_hdr->bar_size[bar] - 1);
++		/* Preserve the special bits. */
++		value = (value & mask) | (pci_hdr->bar[bar] & ~mask);
++		memcpy(base + offset, &value, size);
+ 	} else {
+ 		memcpy(base + offset, data, size);
+ 	}
 -- 
 2.20.1
 
