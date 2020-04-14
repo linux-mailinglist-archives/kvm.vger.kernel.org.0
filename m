@@ -2,317 +2,247 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4A2F11A81A6
-	for <lists+kvm@lfdr.de>; Tue, 14 Apr 2020 17:12:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8C4CA1A81CA
+	for <lists+kvm@lfdr.de>; Tue, 14 Apr 2020 17:15:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2440277AbgDNPLL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Apr 2020 11:11:11 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:43059 "EHLO
+        id S2437696AbgDNPOu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Apr 2020 11:14:50 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:43842 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S2440250AbgDNPIT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Apr 2020 11:08:19 -0400
+        with ESMTP id S2437681AbgDNPOm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Apr 2020 11:14:42 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1586876896;
+        s=mimecast20190719; t=1586877279;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=VxcBTGlqgzjevq8NhkzCB5DW7eAoO7h5wHmB04g7cm8=;
-        b=ViE0HZJMLd1Wc7gsUy4+JH7BGzWDjdc49/sqOaCSjS4rk9zhcUjI3+Hmp/dnJvTnMsOTda
-        dwDjsFVriBDazYFlsliO74b79pUIpL4uBvT6UMkxSDmsrtqFuZaz0IKiELK9Aau8vkST4i
-        tsC/DJ11CMJvHqRb9VtQnsW4QUn4ZT0=
+         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+        bh=ZKlkclfXRZAeObBHEvSM9yom3LW16VfIP/N9NjHmJdY=;
+        b=LvdHmtaXp3aR5GBM02GODV0AW2U6U1t/QWO6Y0V6ZOj+ttimYzaNHaqsCE1J5FJ3tm96fQ
+        j4nAo1SOpL1QgreJ/CBdaV0J6NOARRrazVRqKQDh/BSA8pKmoZdLjbzeVo+vcKAKTjkElj
+        ulcbyd2RXrUQf36P6WWoyMZV9mT5jZg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-353-pUjo3fJ-M_-jMrTBuUYVHg-1; Tue, 14 Apr 2020 11:08:13 -0400
-X-MC-Unique: pUjo3fJ-M_-jMrTBuUYVHg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+ us-mta-319-iDrwLLNpOLy1BM9ba3CkOQ-1; Tue, 14 Apr 2020 11:14:38 -0400
+X-MC-Unique: iDrwLLNpOLy1BM9ba3CkOQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5F5371800D6B;
-        Tue, 14 Apr 2020 15:08:10 +0000 (UTC)
-Received: from laptop.redhat.com (ovpn-115-53.ams2.redhat.com [10.36.115.53])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id AE64119C69;
-        Tue, 14 Apr 2020 15:08:05 +0000 (UTC)
-From:   Eric Auger <eric.auger@redhat.com>
-To:     eric.auger.pro@gmail.com, eric.auger@redhat.com,
-        iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, will@kernel.org,
-        joro@8bytes.org, maz@kernel.org, robin.murphy@arm.com
-Cc:     jean-philippe@linaro.org, zhangfei.gao@linaro.org,
-        shameerali.kolothum.thodi@huawei.com, alex.williamson@redhat.com,
-        jacob.jun.pan@linux.intel.com, yi.l.liu@intel.com,
-        peter.maydell@linaro.org, zhangfei.gao@gmail.com, tn@semihalf.com,
-        zhangfei.gao@foxmail.com, bbhushan2@marvell.com
-Subject: [PATCH v11 13/13] iommu/smmuv3: Report non recoverable faults
-Date:   Tue, 14 Apr 2020 17:06:07 +0200
-Message-Id: <20200414150607.28488-14-eric.auger@redhat.com>
-In-Reply-To: <20200414150607.28488-1-eric.auger@redhat.com>
-References: <20200414150607.28488-1-eric.auger@redhat.com>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4B43E8018A5
+        for <kvm@vger.kernel.org>; Tue, 14 Apr 2020 15:14:37 +0000 (UTC)
+Received: from [10.10.113.228] (ovpn-113-228.rdu2.redhat.com [10.10.113.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 0416B60BE1;
+        Tue, 14 Apr 2020 15:14:35 +0000 (UTC)
+Subject: Re: [Patch v1] x86: Fix the logical destination mode test
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
+        pbonzini@redhat.com
+Cc:     Marcelo Tosatti <mtosatti@redhat.com>, thuth@redhat.com,
+        nilal@redhat.com
+References: <1583795750-33197-1-git-send-email-nitesh@redhat.com>
+ <20200310140323.GA7132@fuller.cnet>
+ <4993e419-5eef-46ba-5dd0-e35c7103190b@redhat.com>
+ <878siyyxng.fsf@vitty.brq.redhat.com>
+From:   Nitesh Narayan Lal <nitesh@redhat.com>
+Autocrypt: addr=nitesh@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+ VujM7c/b4pps
+Organization: Red Hat Inc,
+Message-ID: <b0482ffb-a1e0-7d00-8883-53936487b955@redhat.com>
+Date:   Tue, 14 Apr 2020 11:14:34 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+In-Reply-To: <878siyyxng.fsf@vitty.brq.redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When a stage 1 related fault event is read from the event queue,
-let's propagate it to potential external fault listeners, ie. users
-who registered a fault handler.
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
+On 4/14/20 10:01 AM, Vitaly Kuznetsov wrote:
+> Nitesh Narayan Lal <nitesh@redhat.com> writes:
+>
+>> On 3/10/20 10:03 AM, Marcelo Tosatti wrote:
+>>> On Mon, Mar 09, 2020 at 07:15:50PM -0400, Nitesh Narayan Lal wrote:
+>>>> There are following issues with the ioapic logical destination mode =
+test:
+>>>>
+>>>> - A race condition that is triggered when the interrupt handler
+>>>> =C2=A0 ioapic_isr_86() is called at the same time by multiple vCPUs.=
+ Due to this
+>>>>   the g_isr_86 is not correctly incremented. To prevent this a spinl=
+ock is
+>>>>   added around =E2=80=98g_isr_86++=E2=80=99.
+>>>>
+>>>> - On older QEMU versions initial x2APIC ID is not set, that is why
+>>>> =C2=A0 the local APIC IDs of each vCPUs are not configured. Hence th=
+e logical
+>>>> =C2=A0 destination mode test fails/hangs. Adding =E2=80=98+x2apic=E2=
+=80=99 to the qemu -cpu params
+>>>> =C2=A0 ensures that the local APICs are configured every time, irres=
+pective of the
+>>>> =C2=A0 QEMU version.
+>>>>
+>>>> - With =E2=80=98-machine kernel_irqchip=3Dsplit=E2=80=99 included in=
+ the ioapic test
+>>>> =C2=A0 test_ioapic_self_reconfigure() always fails and somehow leads=
+ to a state where
+>>>> =C2=A0 after submitting IOAPIC fixed delivery - logical destination =
+mode request we
+>>>> =C2=A0 never receive an interrupt back. For now, the physical and lo=
+gical destination
+>>>> =C2=A0 mode tests are moved above test_ioapic_self_reconfigure().
+>>>>
+>>>> Fixes: b2a1ee7e ("kvm-unit-test: x86: ioapic: Test physical and logi=
+cal destination mode")
+>>>> Signed-off-by: Nitesh Narayan Lal <nitesh@redhat.com>
+>>> Looks good to me.
+>> Hi,
+>>
+>> I just wanted to follow up and see if there are any more suggestions f=
+or me to
+>> improve this patch before it can be merged.
+>>
+>>
+>>>> ---
+>>>>  x86/ioapic.c      | 11 +++++++----
+>>>>  x86/unittests.cfg |  2 +-
+>>>>  2 files changed, 8 insertions(+), 5 deletions(-)
+>>>>
+>>>> diff --git a/x86/ioapic.c b/x86/ioapic.c
+>>>> index 742c711..3106531 100644
+>>>> --- a/x86/ioapic.c
+>>>> +++ b/x86/ioapic.c
+>>>> @@ -432,10 +432,13 @@ static void test_ioapic_physical_destination_m=
+ode(void)
+>>>>  }
+>>>> =20
+>>>>  static volatile int g_isr_86;
+>>>> +struct spinlock ioapic_lock;
+>>>> =20
+>>>>  static void ioapic_isr_86(isr_regs_t *regs)
+>>>>  {
+>>>> +	spin_lock(&ioapic_lock);
+>>>>  	++g_isr_86;
+>>>> +	spin_unlock(&ioapic_lock);
+>>>>  	set_irq_line(0x0e, 0);
+>>>>  	eoi();
+>>>>  }
+>>>> @@ -501,6 +504,10 @@ int main(void)
+>>>>  	test_ioapic_level_tmr(true);
+>>>>  	test_ioapic_edge_tmr(true);
+>>>> =20
+>>>> +	test_ioapic_physical_destination_mode();
+> I just found out that this particular change causes 'ioapic-split' test=
 
----
-v8 -> v9:
-- adapt to the removal of IOMMU_FAULT_UNRECOV_PERM_VALID:
-  only look at IOMMU_FAULT_UNRECOV_ADDR_VALID which comes with
-  perm
-- do not advertise IOMMU_FAULT_UNRECOV_PASID_VALID faults for
-  translation faults
-- trace errors if !master
-- test nested before calling iommu_report_device_fault
-- call the fault handler unconditionnally in non nested mode
+> to hang reliably:=20
+>
+> # ./run_tests.sh ioapic-split
+> FAIL ioapic-split (timeout; duration=3D90s)
+> PASS ioapic (26 tests)
+>
+> unlike 'ioapic' test we run it with '-smp 1' and
+> 'test_ioapic_physical_destination_mode' requires > 1 CPU to work AFAICT=
+=2E
 
-v4 -> v5:
-- s/IOMMU_FAULT_PERM_INST/IOMMU_FAULT_PERM_EXEC
----
- drivers/iommu/arm-smmu-v3.c | 182 +++++++++++++++++++++++++++++++++---
- 1 file changed, 171 insertions(+), 11 deletions(-)
+Yes, that is correct.
+It's my bad as I didn't realize that I introduced this bug while submitti=
+ng this
+patch.
 
-diff --git a/drivers/iommu/arm-smmu-v3.c b/drivers/iommu/arm-smmu-v3.c
-index 253f96e97c11..ebf0cafe9fd5 100644
---- a/drivers/iommu/arm-smmu-v3.c
-+++ b/drivers/iommu/arm-smmu-v3.c
-@@ -171,6 +171,26 @@
- #define ARM_SMMU_PRIQ_IRQ_CFG1		0xd8
- #define ARM_SMMU_PRIQ_IRQ_CFG2		0xdc
-=20
-+/* Events */
-+#define ARM_SMMU_EVT_F_UUT		0x01
-+#define ARM_SMMU_EVT_C_BAD_STREAMID	0x02
-+#define ARM_SMMU_EVT_F_STE_FETCH	0x03
-+#define ARM_SMMU_EVT_C_BAD_STE		0x04
-+#define ARM_SMMU_EVT_F_BAD_ATS_TREQ	0x05
-+#define ARM_SMMU_EVT_F_STREAM_DISABLED	0x06
-+#define ARM_SMMU_EVT_F_TRANSL_FORBIDDEN	0x07
-+#define ARM_SMMU_EVT_C_BAD_SUBSTREAMID	0x08
-+#define ARM_SMMU_EVT_F_CD_FETCH		0x09
-+#define ARM_SMMU_EVT_C_BAD_CD		0x0a
-+#define ARM_SMMU_EVT_F_WALK_EABT	0x0b
-+#define ARM_SMMU_EVT_F_TRANSLATION	0x10
-+#define ARM_SMMU_EVT_F_ADDR_SIZE	0x11
-+#define ARM_SMMU_EVT_F_ACCESS		0x12
-+#define ARM_SMMU_EVT_F_PERMISSION	0x13
-+#define ARM_SMMU_EVT_F_TLB_CONFLICT	0x20
-+#define ARM_SMMU_EVT_F_CFG_CONFLICT	0x21
-+#define ARM_SMMU_EVT_E_PAGE_REQUEST	0x24
-+
- /* Common MSI config fields */
- #define MSI_CFG0_ADDR_MASK		GENMASK_ULL(51, 2)
- #define MSI_CFG2_SH			GENMASK(5, 4)
-@@ -387,6 +407,15 @@
- #define EVTQ_MAX_SZ_SHIFT		(Q_MAX_SZ_SHIFT - EVTQ_ENT_SZ_SHIFT)
-=20
- #define EVTQ_0_ID			GENMASK_ULL(7, 0)
-+#define EVTQ_0_SSV			GENMASK_ULL(11, 11)
-+#define EVTQ_0_SUBSTREAMID		GENMASK_ULL(31, 12)
-+#define EVTQ_0_STREAMID			GENMASK_ULL(63, 32)
-+#define EVTQ_1_PNU			GENMASK_ULL(33, 33)
-+#define EVTQ_1_IND			GENMASK_ULL(34, 34)
-+#define EVTQ_1_RNW			GENMASK_ULL(35, 35)
-+#define EVTQ_1_S2			GENMASK_ULL(39, 39)
-+#define EVTQ_1_CLASS			GENMASK_ULL(40, 41)
-+#define EVTQ_3_FETCH_ADDR		GENMASK_ULL(51, 3)
-=20
- /* PRI queue */
- #define PRIQ_ENT_SZ_SHIFT		4
-@@ -730,6 +759,57 @@ struct arm_smmu_domain {
- 	spinlock_t			devices_lock;
- };
-=20
-+/* fault propagation */
-+struct arm_smmu_fault_propagation_data {
-+	enum iommu_fault_reason reason;
-+	bool s1_check;
-+	u32 fields; /* IOMMU_FAULT_UNRECOV_*_VALID bits */
-+};
-+
-+/*
-+ * Describes how SMMU faults translate into generic IOMMU faults
-+ * and if they need to be reported externally
-+ */
-+static const struct arm_smmu_fault_propagation_data fault_propagation[] =
-=3D {
-+[ARM_SMMU_EVT_F_UUT]			=3D { },
-+[ARM_SMMU_EVT_C_BAD_STREAMID]		=3D { },
-+[ARM_SMMU_EVT_F_STE_FETCH]		=3D { },
-+[ARM_SMMU_EVT_C_BAD_STE]		=3D { },
-+[ARM_SMMU_EVT_F_BAD_ATS_TREQ]		=3D { },
-+[ARM_SMMU_EVT_F_STREAM_DISABLED]	=3D { },
-+[ARM_SMMU_EVT_F_TRANSL_FORBIDDEN]	=3D { },
-+[ARM_SMMU_EVT_C_BAD_SUBSTREAMID]	=3D {IOMMU_FAULT_REASON_PASID_INVALID,
-+					   false,
-+					   IOMMU_FAULT_UNRECOV_PASID_VALID
-+					  },
-+[ARM_SMMU_EVT_F_CD_FETCH]		=3D {IOMMU_FAULT_REASON_PASID_FETCH,
-+					   false,
-+					   IOMMU_FAULT_UNRECOV_FETCH_ADDR_VALID
-+					  },
-+[ARM_SMMU_EVT_C_BAD_CD]			=3D {IOMMU_FAULT_REASON_BAD_PASID_ENTRY,
-+					   false,
-+					  },
-+[ARM_SMMU_EVT_F_WALK_EABT]		=3D {IOMMU_FAULT_REASON_WALK_EABT, true,
-+					   IOMMU_FAULT_UNRECOV_ADDR_VALID |
-+					   IOMMU_FAULT_UNRECOV_FETCH_ADDR_VALID
-+					  },
-+[ARM_SMMU_EVT_F_TRANSLATION]		=3D {IOMMU_FAULT_REASON_PTE_FETCH, true,
-+					   IOMMU_FAULT_UNRECOV_ADDR_VALID
-+					  },
-+[ARM_SMMU_EVT_F_ADDR_SIZE]		=3D {IOMMU_FAULT_REASON_OOR_ADDRESS, true,
-+					   IOMMU_FAULT_UNRECOV_ADDR_VALID
-+					  },
-+[ARM_SMMU_EVT_F_ACCESS]			=3D {IOMMU_FAULT_REASON_ACCESS, true,
-+					   IOMMU_FAULT_UNRECOV_ADDR_VALID
-+					  },
-+[ARM_SMMU_EVT_F_PERMISSION]		=3D {IOMMU_FAULT_REASON_PERMISSION, true,
-+					   IOMMU_FAULT_UNRECOV_ADDR_VALID
-+					  },
-+[ARM_SMMU_EVT_F_TLB_CONFLICT]		=3D { },
-+[ARM_SMMU_EVT_F_CFG_CONFLICT]		=3D { },
-+[ARM_SMMU_EVT_E_PAGE_REQUEST]		=3D { },
-+};
-+
- struct arm_smmu_option_prop {
- 	u32 opt;
- 	const char *prop;
-@@ -2007,7 +2087,6 @@ static int arm_smmu_init_l2_strtab(struct arm_smmu_=
-device *smmu, u32 sid)
- 	return 0;
- }
-=20
--__maybe_unused
- static struct arm_smmu_master *
- arm_smmu_find_master(struct arm_smmu_device *smmu, u32 sid)
- {
-@@ -2033,25 +2112,106 @@ arm_smmu_find_master(struct arm_smmu_device *smm=
-u, u32 sid)
- 	return master;
- }
-=20
-+/* Populates the record fields according to the input SMMU event */
-+static bool arm_smmu_transcode_fault(u64 *evt, u8 type,
-+				     struct iommu_fault_unrecoverable *record)
-+{
-+	const struct arm_smmu_fault_propagation_data *data;
-+	u32 fields;
-+
-+	if (type >=3D ARRAY_SIZE(fault_propagation))
-+		return false;
-+
-+	data =3D &fault_propagation[type];
-+	if (!data->reason)
-+		return false;
-+
-+	fields =3D data->fields;
-+
-+	if (data->s1_check & FIELD_GET(EVTQ_1_S2, evt[1]))
-+		return false; /* S2 related fault, don't propagate */
-+
-+	if (fields & IOMMU_FAULT_UNRECOV_PASID_VALID)
-+		record->pasid =3D FIELD_GET(EVTQ_0_SUBSTREAMID, evt[0]);
-+	else {
-+		/* all other transcoded errors have SSV */
-+		if (FIELD_GET(EVTQ_0_SSV, evt[0])) {
-+			record->pasid =3D FIELD_GET(EVTQ_0_SUBSTREAMID, evt[0]);
-+			fields |=3D IOMMU_FAULT_UNRECOV_PASID_VALID;
-+		}
-+	}
-+
-+	if (fields & IOMMU_FAULT_UNRECOV_ADDR_VALID) {
-+		if (FIELD_GET(EVTQ_1_RNW, evt[1]))
-+			record->perm =3D IOMMU_FAULT_PERM_READ;
-+		else
-+			record->perm =3D IOMMU_FAULT_PERM_WRITE;
-+		if (FIELD_GET(EVTQ_1_PNU, evt[1]))
-+			record->perm |=3D IOMMU_FAULT_PERM_PRIV;
-+		if (FIELD_GET(EVTQ_1_IND, evt[1]))
-+			record->perm |=3D IOMMU_FAULT_PERM_EXEC;
-+		record->addr =3D evt[2];
-+	}
-+
-+	if (fields & IOMMU_FAULT_UNRECOV_FETCH_ADDR_VALID)
-+		record->fetch_addr =3D FIELD_GET(EVTQ_3_FETCH_ADDR, evt[3]);
-+
-+	record->flags =3D fields;
-+	record->reason =3D data->reason;
-+	return true;
-+}
-+
-+static void arm_smmu_report_event(struct arm_smmu_device *smmu, u64 *evt=
-)
-+{
-+	u32 sid =3D FIELD_GET(EVTQ_0_STREAMID, evt[0]);
-+	u8 type =3D FIELD_GET(EVTQ_0_ID, evt[0]);
-+	struct arm_smmu_master *master;
-+	struct iommu_fault_event event =3D {};
-+	bool nested;
-+	int i;
-+
-+	master =3D arm_smmu_find_master(smmu, sid);
-+	if (!master || !master->domain)
-+		goto out;
-+
-+	event.fault.type =3D IOMMU_FAULT_DMA_UNRECOV;
-+
-+	nested =3D (master->domain->stage =3D=3D ARM_SMMU_DOMAIN_NESTED);
-+
-+	if (nested) {
-+		if (arm_smmu_transcode_fault(evt, type, &event.fault.event)) {
-+			/*
-+			 * Only S1 related faults should be reported to the
-+			 * guest and must not flood the host log.
-+			 * Also a fault handler should have been registered
-+			 * to guarantee the full nested functionality
-+			 */
-+			WARN_ON_ONCE(iommu_report_device_fault(master->dev,
-+							       &event));
-+			return;
-+		}
-+	} else {
-+		iommu_report_device_fault(master->dev, &event);
-+	}
-+out:
-+	dev_info(smmu->dev, "event 0x%02x received:\n", type);
-+	for (i =3D 0; i < EVTQ_ENT_DWORDS; ++i) {
-+		dev_info(smmu->dev, "\t0x%016llx\n",
-+			 (unsigned long long)evt[i]);
-+	}
-+}
-+
- /* IRQ and event handlers */
- static irqreturn_t arm_smmu_evtq_thread(int irq, void *dev)
- {
--	int i;
- 	struct arm_smmu_device *smmu =3D dev;
- 	struct arm_smmu_queue *q =3D &smmu->evtq.q;
- 	struct arm_smmu_ll_queue *llq =3D &q->llq;
- 	u64 evt[EVTQ_ENT_DWORDS];
-=20
- 	do {
--		while (!queue_remove_raw(q, evt)) {
--			u8 id =3D FIELD_GET(EVTQ_0_ID, evt[0]);
--
--			dev_info(smmu->dev, "event 0x%02x received:\n", id);
--			for (i =3D 0; i < ARRAY_SIZE(evt); ++i)
--				dev_info(smmu->dev, "\t0x%016llx\n",
--					 (unsigned long long)evt[i]);
--
--		}
-+		while (!queue_remove_raw(q, evt))
-+			arm_smmu_report_event(smmu, evt);
-=20
- 		/*
- 		 * Not much we can do on overflow, so scream and pretend we're
+>
+> Why do we move it from under 'if (cpu_count() > 1)' ?
+
+I should have just moved it above test_ioapic_self_reconfigure().
+
+>
+> Also, this patch could've been split.
+
+I can divide it 2 parts:
+1. support for logical destination mode.
+2. support for physical destination mode. I can also fix=C2=A0 the above =
+issue in
+this patch itself.
+Does that make sense?
+
+>
+>>>> +	if (cpu_count() > 3)
+>>>> +		test_ioapic_logical_destination_mode();
+>>>> +
+>>>>  	if (cpu_count() > 1) {
+>>>>  		test_ioapic_edge_tmr_smp(false);
+>>>>  		test_ioapic_level_tmr_smp(false);
+>>>> @@ -508,11 +515,7 @@ int main(void)
+>>>>  		test_ioapic_edge_tmr_smp(true);
+>>>> =20
+>>>>  		test_ioapic_self_reconfigure();
+>>>> -		test_ioapic_physical_destination_mode();
+>>>>  	}
+>>>> =20
+>>>> -	if (cpu_count() > 3)
+>>>> -		test_ioapic_logical_destination_mode();
+>>>> -
+>>>>  	return report_summary();
+>>>>  }
+>>>> diff --git a/x86/unittests.cfg b/x86/unittests.cfg
+>>>> index f2401eb..d658bc8 100644
+>>>> --- a/x86/unittests.cfg
+>>>> +++ b/x86/unittests.cfg
+>>>> @@ -46,7 +46,7 @@ timeout =3D 30
+>>>>  [ioapic]
+>>>>  file =3D ioapic.flat
+>>>>  smp =3D 4
+>>>> -extra_params =3D -cpu qemu64
+>>>> +extra_params =3D -cpu qemu64,+x2apic
+>>>>  arch =3D x86_64
+>>>> =20
+>>>>  [cmpxchg8b]
+>>>> --=20
+>>>> 1.8.3.1
 --=20
-2.20.1
+Nitesh
 
