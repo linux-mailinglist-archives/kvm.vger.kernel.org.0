@@ -2,55 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5AABD1A6FEE
-	for <lists+kvm@lfdr.de>; Tue, 14 Apr 2020 02:09:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 54E051A6FF0
+	for <lists+kvm@lfdr.de>; Tue, 14 Apr 2020 02:10:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390367AbgDNAJ4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Apr 2020 20:09:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44682 "EHLO
+        id S1728588AbgDNAKc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Apr 2020 20:10:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44784 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727878AbgDNAJy (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 13 Apr 2020 20:09:54 -0400
-Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2132C0A3BDC
-        for <kvm@vger.kernel.org>; Mon, 13 Apr 2020 17:09:53 -0700 (PDT)
-Received: by mail-pg1-x549.google.com with SMTP id e22so9947261pgm.22
-        for <kvm@vger.kernel.org>; Mon, 13 Apr 2020 17:09:53 -0700 (PDT)
+        by vger.kernel.org with ESMTP id S1727878AbgDNAKb (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 13 Apr 2020 20:10:31 -0400
+Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0ACE7C0A3BDC
+        for <kvm@vger.kernel.org>; Mon, 13 Apr 2020 17:10:31 -0700 (PDT)
+Received: by mail-pf1-x449.google.com with SMTP id i128so1908086pfc.4
+        for <kvm@vger.kernel.org>; Mon, 13 Apr 2020 17:10:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=TB3th6I+XkdOIx1ebBel5qlm5SBKsAmVepxQYdzaNw4=;
-        b=MWXa4WfyJWvaR/P15uWGhFniHKPqDgqRJX0AeehyuQDYRcVZ7iZBRAl7zhE78lyI/z
-         inFDe+Iz/QQ/+2ZzNqE3bS4dLK+SLYAerXUXz8c9dPhN632LpHlVlMF0tM05OXsryPAV
-         xflX6nv56hx2feSrb0pSGaGY1HMgHqqu+Q/BGruFbCWI8yMmGeNOZt3xTNHAHHBE1Lkc
-         rx+JhWKlpVsQRXKgMML79IXZ0e2qjciT2nXVkcZoM3xMCzcewn8gTqWHFP5Wo1QZr3JY
-         pTF8Qmy/SA6I4ebnex9C8v1Ke3ZfJ3X7Aa+K5sOdPnpajfvnPK18gOV593pZPB23rHq1
-         +1hg==
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=YRE0bl+MbOZJemQI6/3rM1uBjjYWT+ZjbHxoUQ9wtoQ=;
+        b=Dxqwa6hO3h2eMm0jA1G2oQJUpnCnCahrkI6Ohz7isGPExDLuwqXl4Qbt2nov2HzIio
+         Pgh+u05iOAzol3TPtEsyKN59KeO6weSaIT0RQmiepTS79N6Qxp/CmXJU+1/mDxtQoMNZ
+         8+hvBluchnkRkiBH3tdpoMrGHOg45+QInV2QXElQDLpiq860HePTu/kIihECKGpeNSLq
+         PfWtAoavfZR4u9H5rRw3U7lVsPoKUHe83788sF8OfrwSJ2RkItNQgj5jOawBDk2j3WYN
+         TNPzk59tEJ8QVY/MLePa/dheKw8Nd7vrBI1kLtrwcAymc8d7gGAppLjFbO/iEFLECcEq
+         0gPA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=TB3th6I+XkdOIx1ebBel5qlm5SBKsAmVepxQYdzaNw4=;
-        b=hp++H5yB/I54stdTJzl0dnE6zUxf6P6UjU1Iv70mt/d9BrMG/LtRajedvQ1GcLUwXO
-         UWZUQ6H/3f+srQv7ukFszLAyu5VLM1H3z7lHA0yhVfWY/+h4fWf8sZHI+8B3oep2rThB
-         mBar7/MD8y925GOvtCdHcDuOhzOpKvA7cdG5EYpJmFBJRQRGb3H33bgETAVayfDhTaRi
-         WBDQRKK/gPxqGoJDNReliV3ZeX9KPygQey/6gRcVm5D75aXLid0VsDTJVeKPTsYClyBM
-         DR6dWDxwNkrgtbfG2WYck43RF0elly4TaATnS0THrdRCXeAgitdiC6oo9JWpT84wcWI9
-         Fr0w==
-X-Gm-Message-State: AGi0PuaZewkB7Nmh8emQX4MqarQgz747V5Z8daaQRkM71GKbio+btVUg
-        0Xlbbh578qepUZoSJJacNChGuLZI0TrTtayLoV7GkBmMMvP1rXYrQxq3CrFTivSSg5ExzQXLj50
-        2VQ3xbSlVJmoEq/DNMyJX9Z0111Q4RhFXfq1VLGFI4tbkHxaYitissNlqrL6BlbY=
-X-Google-Smtp-Source: APiQypLQ7zRZisIGqR/m/NLS6Aq5tQl8Fh8g7ZA2pL8fT0nwxtL0cfByU7sbebLEh1FdpWEJkxwozu9bRdBJQg==
-X-Received: by 2002:a17:90a:c78b:: with SMTP id gn11mr24122032pjb.147.1586822993391;
- Mon, 13 Apr 2020 17:09:53 -0700 (PDT)
-Date:   Mon, 13 Apr 2020 17:09:46 -0700
-In-Reply-To: <20200414000946.47396-1-jmattson@google.com>
-Message-Id: <20200414000946.47396-2-jmattson@google.com>
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=YRE0bl+MbOZJemQI6/3rM1uBjjYWT+ZjbHxoUQ9wtoQ=;
+        b=bldqcfAby/TwcFs+kldBc5mGYgg88Hxxbiu/AVoVG2/+kw1yKPp5tqdsj6ftac8+kx
+         kFasignQUptzdhJYllbL7ulo2v9Wq1DIL4JtA6v/2UaGctR0kpBWbY3TsRtI2oxuWFVa
+         wmt6B0QBXMn6PQJ62kT3QEzYy8iWe5DKgLZ1jPK9SXTMAoiZswtDeBdDezQZPHT8S+xr
+         kr+UDHW/8uEqooBKU4PdoJSd2x9/q1o2uCFrppjn9+0ze45kM/btxlou3U6Ic0HE+bUk
+         P3vriV5354yRxV89y74HYZKkDHopq513qa9kH48MgZhB8sWirCIO3SObGZ0dQT/vrCGq
+         ZTOw==
+X-Gm-Message-State: AGi0PubmSBUmN9wQ5FbAZg7nVwRy4nvOG6L0XheHLsMxgNKHNovn9rQO
+        6M6Whp2wdg+Fl390u1GVrc5eLelq+jqi2VmXX6rWNIgNcuH38Qwqh6ocZmHQ2caicemd89gy7XE
+        2Zi0rtyONTdJzE+aNDFAy6q/CkhLAFjpze2vvYcpomvg8gmRlapLKj8vTxtwR66w=
+X-Google-Smtp-Source: APiQypIDqlhIhVNgUbLZcXUU/8Q+TWQqbZIrN4XOzNxTArCp/mwyWyTlRLEQ1TYSQ2+eeTztkiWuDxFDI/mHsQ==
+X-Received: by 2002:a17:90a:46cf:: with SMTP id x15mr24370313pjg.77.1586823030511;
+ Mon, 13 Apr 2020 17:10:30 -0700 (PDT)
+Date:   Mon, 13 Apr 2020 17:10:25 -0700
+Message-Id: <20200414001026.50051-1-jmattson@google.com>
 Mime-Version: 1.0
-References: <20200414000946.47396-1-jmattson@google.com>
 X-Mailer: git-send-email 2.26.0.110.g2183baf09c-goog
-Subject: [PATCH 2/2] kvm: nVMX: Single-step traps trump expired VMX-preemption timer
+Subject: [kvm-unit-tests PATCH 1/2] x86: nVMX: Add some corner-case
+ VMX-preemption timer tests
 From:   Jim Mattson <jmattson@google.com>
 To:     kvm@vger.kernel.org
 Cc:     Jim Mattson <jmattson@google.com>,
@@ -62,38 +59,155 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Previously, if the hrtimer for the nested VMX-preemption timer fired
-while L0 was emulating an L2 instruction with RFLAGS.TF set, the
-synthesized single-step trap would be unceremoniously dropped when
-synthesizing the "VMX-preemption timer expired" VM-exit from L2 to L1.
+Verify that both injected events and debug traps that result from
+pending debug exceptions take precedence over a "VMX-preemption timer
+expired" VM-exit resulting from a zero-valued VMX-preemption timer.
 
-To fix this, don't synthesize a "VMX-preemption timer expired" VM-exit
-from L2 to L1 when there is a pending debug trap, such as a
-single-step trap.
-
-Fixes: f4124500c2c13 ("KVM: nVMX: Fully emulate preemption timer")
 Signed-off-by: Jim Mattson <jmattson@google.com>
 Reviewed-by: Oliver Upton <oupton@google.com>
 Reviewed-by: Peter Shier <pshier@google.com>
 ---
- arch/x86/kvm/vmx/nested.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ x86/vmx_tests.c | 120 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 120 insertions(+)
 
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index cbc9ea2de28f..6ab974debd44 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -3690,7 +3690,9 @@ static int vmx_check_nested_events(struct kvm_vcpu *vcpu)
- 	    vmx->nested.preemption_timer_expired) {
- 		if (block_nested_events)
- 			return -EBUSY;
--		nested_vmx_vmexit(vcpu, EXIT_REASON_PREEMPTION_TIMER, 0, 0);
-+		if (!vmx_pending_dbg_trap(vcpu))
-+			nested_vmx_vmexit(vcpu, EXIT_REASON_PREEMPTION_TIMER,
-+					  0, 0);
- 		return 0;
- 	}
+diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
+index 1f97fe3..fccb27f 100644
+--- a/x86/vmx_tests.c
++++ b/x86/vmx_tests.c
+@@ -8319,6 +8319,125 @@ static void vmx_store_tsc_test(void)
+ 	       msr_entry.value, low, high);
+ }
  
++static void vmx_preemption_timer_zero_test_db_handler(struct ex_regs *regs)
++{
++}
++
++static void vmx_preemption_timer_zero_test_guest(void)
++{
++	while (vmx_get_test_stage() < 3)
++		vmcall();
++}
++
++static void vmx_preemption_timer_zero_activate_preemption_timer(void)
++{
++	vmcs_set_bits(PIN_CONTROLS, PIN_PREEMPT);
++	vmcs_write(PREEMPT_TIMER_VALUE, 0);
++}
++
++static void vmx_preemption_timer_zero_advance_past_vmcall(void)
++{
++	vmcs_clear_bits(PIN_CONTROLS, PIN_PREEMPT);
++	enter_guest();
++	skip_exit_vmcall();
++}
++
++static void vmx_preemption_timer_zero_inject_db(bool intercept_db)
++{
++	vmx_preemption_timer_zero_activate_preemption_timer();
++	vmcs_write(ENT_INTR_INFO, INTR_INFO_VALID_MASK |
++		   INTR_TYPE_HARD_EXCEPTION | DB_VECTOR);
++	vmcs_write(EXC_BITMAP, intercept_db ? 1 << DB_VECTOR : 0);
++	enter_guest();
++}
++
++static void vmx_preemption_timer_zero_set_pending_dbg(u32 exception_bitmap)
++{
++	vmx_preemption_timer_zero_activate_preemption_timer();
++	vmcs_write(GUEST_PENDING_DEBUG, BIT(12) | DR_TRAP1);
++	vmcs_write(EXC_BITMAP, exception_bitmap);
++	enter_guest();
++}
++
++static void vmx_preemption_timer_zero_expect_preempt_at_rip(u64 expected_rip)
++{
++	u32 reason = (u32)vmcs_read(EXI_REASON);
++	u64 guest_rip = vmcs_read(GUEST_RIP);
++
++	report(reason == VMX_PREEMPT && guest_rip == expected_rip,
++	       "Exit reason is 0x%x (expected 0x%x) and guest RIP is %lx (0x%lx expected).",
++	       reason, VMX_PREEMPT, guest_rip, expected_rip);
++}
++
++/*
++ * This test ensures that when the VMX preemption timer is zero at
++ * VM-entry, a VM-exit occurs after any event injection and after any
++ * pending debug exceptions are raised, but before execution of any
++ * guest instructions.
++ */
++static void vmx_preemption_timer_zero_test(void)
++{
++	u64 db_fault_address = (u64)get_idt_addr(&boot_idt[DB_VECTOR]);
++	handler old_db;
++	u32 reason;
++
++	if (!(ctrl_pin_rev.clr & PIN_PREEMPT)) {
++		report_skip("'Activate VMX-preemption timer' not supported");
++		return;
++	}
++
++	/*
++	 * Install a custom #DB handler that doesn't abort.
++	 */
++	old_db = handle_exception(DB_VECTOR,
++				  vmx_preemption_timer_zero_test_db_handler);
++
++	test_set_guest(vmx_preemption_timer_zero_test_guest);
++
++	/*
++	 * VMX-preemption timer should fire after event injection.
++	 */
++	vmx_set_test_stage(0);
++	vmx_preemption_timer_zero_inject_db(0);
++	vmx_preemption_timer_zero_expect_preempt_at_rip(db_fault_address);
++	vmx_preemption_timer_zero_advance_past_vmcall();
++
++	/*
++	 * VMX-preemption timer should fire after event injection.
++	 * Exception bitmap is irrelevant, since you can't intercept
++	 * an event that you injected.
++	 */
++	vmx_set_test_stage(1);
++	vmx_preemption_timer_zero_inject_db(1 << DB_VECTOR);
++	vmx_preemption_timer_zero_expect_preempt_at_rip(db_fault_address);
++	vmx_preemption_timer_zero_advance_past_vmcall();
++
++	/*
++	 * VMX-preemption timer should fire after pending debug exceptions
++	 * have delivered a #DB trap.
++	 */
++	vmx_set_test_stage(2);
++	vmx_preemption_timer_zero_set_pending_dbg(0);
++	vmx_preemption_timer_zero_expect_preempt_at_rip(db_fault_address);
++	vmx_preemption_timer_zero_advance_past_vmcall();
++
++	/*
++	 * VMX-preemption timer would fire after pending debug exceptions
++	 * have delivered a #DB trap, but in this case, the #DB trap is
++	 * intercepted.
++	 */
++	vmx_set_test_stage(3);
++	vmx_preemption_timer_zero_set_pending_dbg(1 << DB_VECTOR);
++	reason = (u32)vmcs_read(EXI_REASON);
++	report(reason == VMX_EXC_NMI, "Exit reason is 0x%x (expected 0x%x)",
++	       reason, VMX_EXC_NMI);
++
++	vmcs_clear_bits(PIN_CONTROLS, PIN_PREEMPT);
++	enter_guest();
++
++	handle_exception(DB_VECTOR, old_db);
++}
++
+ static void vmx_db_test_guest(void)
+ {
+ 	/*
+@@ -9623,6 +9742,7 @@ struct vmx_test vmx_tests[] = {
+ 	TEST(vmx_pending_event_test),
+ 	TEST(vmx_pending_event_hlt_test),
+ 	TEST(vmx_store_tsc_test),
++	TEST(vmx_preemption_timer_zero_test),
+ 	/* EPT access tests. */
+ 	TEST(ept_access_test_not_present),
+ 	TEST(ept_access_test_read_only),
 -- 
 2.26.0.110.g2183baf09c-goog
 
