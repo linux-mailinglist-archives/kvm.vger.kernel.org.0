@@ -2,31 +2,45 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 409F71A8C2F
-	for <lists+kvm@lfdr.de>; Tue, 14 Apr 2020 22:22:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 48DF41A8C44
+	for <lists+kvm@lfdr.de>; Tue, 14 Apr 2020 22:22:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731100AbgDNUNE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Apr 2020 16:13:04 -0400
-Received: from mga03.intel.com ([134.134.136.65]:48523 "EHLO mga03.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2632767AbgDNUM6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Apr 2020 16:12:58 -0400
-IronPort-SDR: b5LshcM2KrzJ+dmrA5ZhyXc2l3MwwsV0DGzU4Pvw1CMGf+tdqglZWEI+sngfZmkNY/Qu4mBjQQ
- FxW9ctahNP6A==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Apr 2020 13:12:57 -0700
-IronPort-SDR: MngE0Iy3A1/Q7x/LI2d6Jd1Kng614rwKZ0ZfSnbRpP2+GWOE5Gir+NKeDz+1I8rS2GG5u0dtZd
- Ks0HI/7NSl4A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.72,384,1580803200"; 
-   d="scan'208";a="256628458"
-Received: from nkadakia-mobl1.amr.corp.intel.com (HELO [10.251.28.160]) ([10.251.28.160])
-  by orsmga006.jf.intel.com with ESMTP; 14 Apr 2020 13:12:55 -0700
+        id S2632942AbgDNURM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Apr 2020 16:17:12 -0400
+Received: from mail-dm6nam11on2049.outbound.protection.outlook.com ([40.107.223.49]:9152
+        "EHLO NAM11-DM6-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S2632807AbgDNUQZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Apr 2020 16:16:25 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Qs7RM8XH2pCPuJGKo2c3eM1rxaQDHbDfsMoQ5ZBaDAVki7NShby7NDDbe6egkD9Lr8Hx/p5uX7wnP4ZKUw2KsLkfo5WnRfJhEaIPtAmYmH0TPYst2gXMbUeLNC6ZtsBRMpyZHMcCjh3qx/yR/Efx40di9OhjoO3FJ3inQ88yYQ8BZW9mZU8uiiPjFFBS0+vObLt7HTBBrtfVOjObluLe6wi5d7OhIwyLbY1QEAWNSYvJQnlwHYKBtr//aiB6i3sgAaIl3bURRsc3A1ZmUvSR8g9P8YelZfY+TXge+NVn4ZJ6YK64n2Jn3UgZoSlgkbEs44OE79PTfdca89XdXK6tAw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=7q/zZafQIeSjE5jy8JC2RW/iCuT2Ac7Rbg00PGi6+3Y=;
+ b=fIIJO9VdqV5xaFE3e6QHEaFMo0quffCnm3Jcp0gYmUzRGevv85Zvkd9J1qijG4j3v66Ktt7uxILFU5/patH6MRcWonbq1GIF6mABCzeTj449gRy09VmoSizsRM0EFNNlGLWSE1745InR8qfneomh/ZOmRdCKIhjzMcqW5poUSWXjDG/A7n9qUwOIMYMcQ+fUIGJs78wXe54YRUgrT6fwbbeFXIdsCBMUroM70hp1kZ1ed3tTl53BjQ2w6UwcVq/zk4yie2yXCcLt+cGNouTLvstUvJr4pawVSq7nvUJ8ph1q/B6HwvPGWo/KCqtMfIRM89huV2PjBahkicoUNlYamA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=7q/zZafQIeSjE5jy8JC2RW/iCuT2Ac7Rbg00PGi6+3Y=;
+ b=3OzN6qi8KTSHTI5A52Ag6gROdNQ3W1kMlu/ZTgxOthR6plLaAaazhikmFdnOnD3CkoEAdRFD3Wy0xItGZaHCtS+ZuyerCrlGlntAhp3hVf23ETGid1JJ5rhnv728EG582l+LmzQ+fziXwYLQDrgZX3EKrm7DTyeKewWFhj5X7z8=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=Thomas.Lendacky@amd.com; 
+Received: from DM6PR12MB3163.namprd12.prod.outlook.com (2603:10b6:5:15e::26)
+ by DM6PR12MB3369.namprd12.prod.outlook.com (2603:10b6:5:117::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2900.26; Tue, 14 Apr
+ 2020 20:16:21 +0000
+Received: from DM6PR12MB3163.namprd12.prod.outlook.com
+ ([fe80::f0f9:a88f:f840:2733]) by DM6PR12MB3163.namprd12.prod.outlook.com
+ ([fe80::f0f9:a88f:f840:2733%7]) with mapi id 15.20.2900.028; Tue, 14 Apr 2020
+ 20:16:21 +0000
 Subject: Re: [PATCH 40/70] x86/sev-es: Setup per-cpu GHCBs for the runtime
  handler
-To:     Tom Lendacky <thomas.lendacky@amd.com>,
+To:     Dave Hansen <dave.hansen@intel.com>,
         Mike Stunes <mstunes@vmware.com>,
         Joerg Roedel <joro@8bytes.org>
 Cc:     "x86@kernel.org" <x86@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>,
@@ -47,74 +61,71 @@ References: <20200319091407.1481-1-joro@8bytes.org>
  <20200319091407.1481-41-joro@8bytes.org>
  <A7DF63B4-6589-4386-9302-6B7F8BE0D9BA@vmware.com>
  <09757a84-1d81-74d5-c425-cff241f02ab9@amd.com>
-From:   Dave Hansen <dave.hansen@intel.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- mQINBE6HMP0BEADIMA3XYkQfF3dwHlj58Yjsc4E5y5G67cfbt8dvaUq2fx1lR0K9h1bOI6fC
- oAiUXvGAOxPDsB/P6UEOISPpLl5IuYsSwAeZGkdQ5g6m1xq7AlDJQZddhr/1DC/nMVa/2BoY
- 2UnKuZuSBu7lgOE193+7Uks3416N2hTkyKUSNkduyoZ9F5twiBhxPJwPtn/wnch6n5RsoXsb
- ygOEDxLEsSk/7eyFycjE+btUtAWZtx+HseyaGfqkZK0Z9bT1lsaHecmB203xShwCPT49Blxz
- VOab8668QpaEOdLGhtvrVYVK7x4skyT3nGWcgDCl5/Vp3TWA4K+IofwvXzX2ON/Mj7aQwf5W
- iC+3nWC7q0uxKwwsddJ0Nu+dpA/UORQWa1NiAftEoSpk5+nUUi0WE+5DRm0H+TXKBWMGNCFn
- c6+EKg5zQaa8KqymHcOrSXNPmzJuXvDQ8uj2J8XuzCZfK4uy1+YdIr0yyEMI7mdh4KX50LO1
- pmowEqDh7dLShTOif/7UtQYrzYq9cPnjU2ZW4qd5Qz2joSGTG9eCXLz5PRe5SqHxv6ljk8mb
- ApNuY7bOXO/A7T2j5RwXIlcmssqIjBcxsRRoIbpCwWWGjkYjzYCjgsNFL6rt4OL11OUF37wL
- QcTl7fbCGv53KfKPdYD5hcbguLKi/aCccJK18ZwNjFhqr4MliQARAQABtEVEYXZpZCBDaHJp
- c3RvcGhlciBIYW5zZW4gKEludGVsIFdvcmsgQWRkcmVzcykgPGRhdmUuaGFuc2VuQGludGVs
- LmNvbT6JAjgEEwECACIFAlQ+9J0CGwMGCwkIBwMCBhUIAgkKCwQWAgMBAh4BAheAAAoJEGg1
- lTBwyZKwLZUP/0dnbhDc229u2u6WtK1s1cSd9WsflGXGagkR6liJ4um3XCfYWDHvIdkHYC1t
- MNcVHFBwmQkawxsYvgO8kXT3SaFZe4ISfB4K4CL2qp4JO+nJdlFUbZI7cz/Td9z8nHjMcWYF
- IQuTsWOLs/LBMTs+ANumibtw6UkiGVD3dfHJAOPNApjVr+M0P/lVmTeP8w0uVcd2syiaU5jB
- aht9CYATn+ytFGWZnBEEQFnqcibIaOrmoBLu2b3fKJEd8Jp7NHDSIdrvrMjYynmc6sZKUqH2
- I1qOevaa8jUg7wlLJAWGfIqnu85kkqrVOkbNbk4TPub7VOqA6qG5GCNEIv6ZY7HLYd/vAkVY
- E8Plzq/NwLAuOWxvGrOl7OPuwVeR4hBDfcrNb990MFPpjGgACzAZyjdmYoMu8j3/MAEW4P0z
- F5+EYJAOZ+z212y1pchNNauehORXgjrNKsZwxwKpPY9qb84E3O9KYpwfATsqOoQ6tTgr+1BR
- CCwP712H+E9U5HJ0iibN/CDZFVPL1bRerHziuwuQuvE0qWg0+0SChFe9oq0KAwEkVs6ZDMB2
- P16MieEEQ6StQRlvy2YBv80L1TMl3T90Bo1UUn6ARXEpcbFE0/aORH/jEXcRteb+vuik5UGY
- 5TsyLYdPur3TXm7XDBdmmyQVJjnJKYK9AQxj95KlXLVO38lcuQINBFRjzmoBEACyAxbvUEhd
- GDGNg0JhDdezyTdN8C9BFsdxyTLnSH31NRiyp1QtuxvcqGZjb2trDVuCbIzRrgMZLVgo3upr
- MIOx1CXEgmn23Zhh0EpdVHM8IKx9Z7V0r+rrpRWFE8/wQZngKYVi49PGoZj50ZEifEJ5qn/H
- Nsp2+Y+bTUjDdgWMATg9DiFMyv8fvoqgNsNyrrZTnSgoLzdxr89FGHZCoSoAK8gfgFHuO54B
- lI8QOfPDG9WDPJ66HCodjTlBEr/Cwq6GruxS5i2Y33YVqxvFvDa1tUtl+iJ2SWKS9kCai2DR
- 3BwVONJEYSDQaven/EHMlY1q8Vln3lGPsS11vSUK3QcNJjmrgYxH5KsVsf6PNRj9mp8Z1kIG
- qjRx08+nnyStWC0gZH6NrYyS9rpqH3j+hA2WcI7De51L4Rv9pFwzp161mvtc6eC/GxaiUGuH
- BNAVP0PY0fqvIC68p3rLIAW3f97uv4ce2RSQ7LbsPsimOeCo/5vgS6YQsj83E+AipPr09Caj
- 0hloj+hFoqiticNpmsxdWKoOsV0PftcQvBCCYuhKbZV9s5hjt9qn8CE86A5g5KqDf83Fxqm/
- vXKgHNFHE5zgXGZnrmaf6resQzbvJHO0Fb0CcIohzrpPaL3YepcLDoCCgElGMGQjdCcSQ+Ci
- FCRl0Bvyj1YZUql+ZkptgGjikQARAQABiQIfBBgBAgAJBQJUY85qAhsMAAoJEGg1lTBwyZKw
- l4IQAIKHs/9po4spZDFyfDjunimEhVHqlUt7ggR1Hsl/tkvTSze8pI1P6dGp2XW6AnH1iayn
- yRcoyT0ZJ+Zmm4xAH1zqKjWplzqdb/dO28qk0bPso8+1oPO8oDhLm1+tY+cOvufXkBTm+whm
- +AyNTjaCRt6aSMnA/QHVGSJ8grrTJCoACVNhnXg/R0g90g8iV8Q+IBZyDkG0tBThaDdw1B2l
- asInUTeb9EiVfL/Zjdg5VWiF9LL7iS+9hTeVdR09vThQ/DhVbCNxVk+DtyBHsjOKifrVsYep
- WpRGBIAu3bK8eXtyvrw1igWTNs2wazJ71+0z2jMzbclKAyRHKU9JdN6Hkkgr2nPb561yjcB8
- sIq1pFXKyO+nKy6SZYxOvHxCcjk2fkw6UmPU6/j/nQlj2lfOAgNVKuDLothIxzi8pndB8Jju
- KktE5HJqUUMXePkAYIxEQ0mMc8Po7tuXdejgPMwgP7x65xtfEqI0RuzbUioFltsp1jUaRwQZ
- MTsCeQDdjpgHsj+P2ZDeEKCbma4m6Ez/YWs4+zDm1X8uZDkZcfQlD9NldbKDJEXLIjYWo1PH
- hYepSffIWPyvBMBTW2W5FRjJ4vLRrJSUoEfJuPQ3vW9Y73foyo/qFoURHO48AinGPZ7PC7TF
- vUaNOTjKedrqHkaOcqB185ahG2had0xnFsDPlx5y
-Message-ID: <fbc91dfc-7851-c7d8-ccdb-16c014526801@intel.com>
-Date:   Tue, 14 Apr 2020 13:12:56 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.1
-MIME-Version: 1.0
-In-Reply-To: <09757a84-1d81-74d5-c425-cff241f02ab9@amd.com>
-Content-Type: text/plain; charset=utf-8
+ <fbc91dfc-7851-c7d8-ccdb-16c014526801@intel.com>
+From:   Tom Lendacky <thomas.lendacky@amd.com>
+Message-ID: <27da7cf5-5ff4-a10c-a506-de77aeff8dd6@amd.com>
+Date:   Tue, 14 Apr 2020 15:16:18 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
+In-Reply-To: <fbc91dfc-7851-c7d8-ccdb-16c014526801@intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SN6PR16CA0037.namprd16.prod.outlook.com
+ (2603:10b6:805:ca::14) To DM6PR12MB3163.namprd12.prod.outlook.com
+ (2603:10b6:5:15e::26)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from office-linux.texastahm.com (67.79.209.213) by SN6PR16CA0037.namprd16.prod.outlook.com (2603:10b6:805:ca::14) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2921.25 via Frontend Transport; Tue, 14 Apr 2020 20:16:20 +0000
+X-Originating-IP: [67.79.209.213]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: dadc1b45-f405-47c6-9439-08d7e0b0b2a6
+X-MS-TrafficTypeDiagnostic: DM6PR12MB3369:
+X-Microsoft-Antispam-PRVS: <DM6PR12MB3369688DA65190233F88100AECDA0@DM6PR12MB3369.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
+X-Forefront-PRVS: 0373D94D15
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB3163.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(10009020)(4636009)(136003)(366004)(346002)(376002)(396003)(39860400002)(31696002)(8936002)(2616005)(81156014)(31686004)(8676002)(6486002)(478600001)(186003)(86362001)(16526019)(26005)(4744005)(7416002)(6512007)(54906003)(53546011)(956004)(6506007)(66476007)(316002)(5660300002)(2906002)(52116002)(36756003)(4326008)(66946007)(110136005)(66556008);DIR:OUT;SFP:1101;
+Received-SPF: None (protection.outlook.com: amd.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: JoBerQMKKbTBV5NobaiBwxq0OOKw6nPxlEx30JavU+cyFMr5rVhxIbvDRxx0Z9QW9+V36wJKkqiOSMnawuWu3sb9mqjd8ZlvBgcN8VbblxKmVX6jWzD3T97DVYvAOmLdul5+GRp7WJYxsjbeRlWlqRbXuukRiim/re0tYwlIPpTGSbRCEYx4L9zJ8MDdG1blio7wo9uqD9ARbLRhANnLBD08wK1G2FWy6ko+mYVPD1Mhp+85yVCPDVZxeSm2EQxOZCj2At0q3k5lOEkfxdOqi08BecOijnG75W3TMOgqKqM4tGVM2nFY6SZeLtje6GmsN2H19iR09iGfgMRWzPf49wEAWRYTeGtUGJagLgn5EUp6mOc24y/ZOozJLMt9FFmZ6IefTCmG2aJrcz8TNczeRgEODcsvedv2O4toC1mHfetYHTxg1ui8KnSfixzsl3wa
+X-MS-Exchange-AntiSpam-MessageData: dc6IlbC2jonLSLcI7lBuGfYazMaRI9izIacvM9HJ7eLhuigXBAuf2PIZLML6XU0xktPDua7HoL3gQpmrDL7lY79lhPZjWkOLJOVsdciXOnivEsJ1uINH0ELb/sn0NjtoqCf/ixatMAo6zJ9DWJPpZw==
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: dadc1b45-f405-47c6-9439-08d7e0b0b2a6
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Apr 2020 20:16:21.4260
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 1DgKajX5jBVAMZuLEou1JohC8/3X2+Ebmh20JHR/dyh/eH48KHQ52RUBxtT3z3GSp29+8hMTpsvPnkizV+6lOw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB3369
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 4/14/20 1:04 PM, Tom Lendacky wrote:
->> set_memory_decrypted needs to check the return value. I see it
->> consistently return ENOMEM. I've traced that back to split_large_page
->> in arch/x86/mm/pat/set_memory.c.
-> 
-> At that point the guest won't be able to communicate with the
-> hypervisor, too. Maybe we should BUG() here to terminate further
-> processing?
 
-Escalating an -ENOMEM into a crashed kernel seems a bit extreme.
-Granted, the guest may be in an unrecoverable state, but the host
-doesn't need to be too.
+
+On 4/14/20 3:12 PM, Dave Hansen wrote:
+> On 4/14/20 1:04 PM, Tom Lendacky wrote:
+>>> set_memory_decrypted needs to check the return value. I see it
+>>> consistently return ENOMEM. I've traced that back to split_large_page
+>>> in arch/x86/mm/pat/set_memory.c.
+>>
+>> At that point the guest won't be able to communicate with the
+>> hypervisor, too. Maybe we should BUG() here to terminate further
+>> processing?
+> 
+> Escalating an -ENOMEM into a crashed kernel seems a bit extreme.
+> Granted, the guest may be in an unrecoverable state, but the host
+> doesn't need to be too.
+> 
+
+The host wouldn't be. This only happens in a guest, so it would be just 
+causing the guest kernel to panic early in the boot.
+
+Thanks,
+Tom
+
