@@ -2,102 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8B7A81A779F
-	for <lists+kvm@lfdr.de>; Tue, 14 Apr 2020 11:48:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 24E261A7882
+	for <lists+kvm@lfdr.de>; Tue, 14 Apr 2020 12:35:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2437781AbgDNJsW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Apr 2020 05:48:22 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:52282 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S2437751AbgDNJsU (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 14 Apr 2020 05:48:20 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1586857699;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=RCUnMVTMhiXmQTIRtH4ig9vejIyMaafXsJBXVyt/T0o=;
-        b=b7/7gdgq6fyPuZocF6zFox9d9RKmTixAci4HI4X9dV7lqRi7pYWCm4E9tNKxjcOj7BqsLQ
-        FR8Ot39mD3Zg/ipNrup0azP1lZ8xQsdd3y/GW/g7n/d/iB3DM1SvuRK2EDSYr6dndxTgoC
-        o1ZaT9uGCCLuPc9ppQqgR/4uIBmnnAA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-295-qE1gTkkzPsijc6xmZp2iOg-1; Tue, 14 Apr 2020 05:48:17 -0400
-X-MC-Unique: qE1gTkkzPsijc6xmZp2iOg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AF2DE800D53;
-        Tue, 14 Apr 2020 09:48:13 +0000 (UTC)
-Received: from [10.72.13.119] (ovpn-13-119.pek2.redhat.com [10.72.13.119])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 7602F1001920;
-        Tue, 14 Apr 2020 09:48:05 +0000 (UTC)
-Subject: Re: [PATCH] vhost: do not enable VHOST_MENU by default
-To:     Christian Borntraeger <borntraeger@de.ibm.com>, mst@redhat.com
-Cc:     linux-mips@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, geert@linux-m68k.org,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Paul Mackerras <paulus@samba.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Heiko Carstens <heiko.carstens@de.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>
-References: <20200414024438.19103-1-jasowang@redhat.com>
- <375181ee-08ec-77a6-2dfc-f3c9c26705a1@de.ibm.com>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <802e6da9-4827-a9a4-b409-f08a5de4e750@redhat.com>
-Date:   Tue, 14 Apr 2020 17:48:04 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        id S2438449AbgDNKff (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Apr 2020 06:35:35 -0400
+Received: from foss.arm.com ([217.140.110.172]:52704 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2438411AbgDNKe2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Apr 2020 06:34:28 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 934D41FB;
+        Tue, 14 Apr 2020 03:26:51 -0700 (PDT)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C394B3F6C4;
+        Tue, 14 Apr 2020 03:26:50 -0700 (PDT)
+Subject: Re: [PATCH v3 kvmtool 14/32] virtio: Don't ignore initialization
+ failures
+To:     =?UTF-8?Q?Andr=c3=a9_Przywara?= <andre.przywara@arm.com>,
+        kvm@vger.kernel.org
+Cc:     will@kernel.org, julien.thierry.kdev@gmail.com,
+        sami.mujawar@arm.com, lorenzo.pieralisi@arm.com
+References: <20200326152438.6218-1-alexandru.elisei@arm.com>
+ <20200326152438.6218-15-alexandru.elisei@arm.com>
+ <9cb9e14b-ab07-48ec-819f-11fe727c88b1@arm.com>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <7a7a8443-4122-4f35-bdb1-cf1326aa2ac7@arm.com>
+Date:   Tue, 14 Apr 2020 11:27:17 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <375181ee-08ec-77a6-2dfc-f3c9c26705a1@de.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <9cb9e14b-ab07-48ec-819f-11fe727c88b1@arm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi,
 
-On 2020/4/14 =E4=B8=8B=E5=8D=883:26, Christian Borntraeger wrote:
-> On 14.04.20 04:44, Jason Wang wrote:
->> We try to keep the defconfig untouched after decoupling CONFIG_VHOST
->> out of CONFIG_VIRTUALIZATION in commit 20c384f1ea1a
->> ("vhost: refine vhost and vringh kconfig") by enabling VHOST_MENU by
->> default. Then the defconfigs can keep enabling CONFIG_VHOST_NET
->> without the caring of CONFIG_VHOST.
+On 3/30/20 10:30 AM, André Przywara wrote:
+> Hi,
+>
+> On 26/03/2020 15:24, Alexandru Elisei wrote:
+>> Don't ignore an error in the bus specific initialization function in
+>> virtio_init; don't ignore the result of virtio_init; and don't return 0
+>> in virtio_blk__init and virtio_scsi__init when we encounter an error.
+>> Hopefully this will save some developer's time debugging faulty virtio
+>> devices in a guest.
 >>
->> But this will leave a "CONFIG_VHOST_MENU=3Dy" in all defconfigs and ev=
-en
->> for the ones that doesn't want vhost. So it actually shifts the
->> burdens to the maintainers of all other to add "CONFIG_VHOST_MENU is
->> not set". So this patch tries to enable CONFIG_VHOST explicitly in
->> defconfigs that enables CONFIG_VHOST_NET and CONFIG_VHOST_VSOCK.
+>> To take advantage of the cleanup function virtio_blk__exit, we have
+>> moved appending the new device to the list before the call to
+>> virtio_init.
 >>
->> Cc: Thomas Bogendoerfer<tsbogend@alpha.franken.de>
->> Cc: Benjamin Herrenschmidt<benh@kernel.crashing.org>
->> Cc: Paul Mackerras<paulus@samba.org>
->> Cc: Michael Ellerman<mpe@ellerman.id.au>
->> Cc: Heiko Carstens<heiko.carstens@de.ibm.com>
->> Cc: Vasily Gorbik<gor@linux.ibm.com>
->> Cc: Christian Borntraeger<borntraeger@de.ibm.com>
-> Fine with me.
-> s390 part
+>> To safeguard against this in the future, virtio_init has been annoted
+>> with the compiler attribute warn_unused_result.
+> This is a good idea, but actually triggers an unrelated, long standing
+> bug in vesa.c (on x86):
+> hw/vesa.c: In function ‘vesa__init’:
+> hw/vesa.c:77:3: error: ignoring return value of ‘ERR_PTR’, declared with
+> attribute warn_unused_result [-Werror=unused-result]
+>    ERR_PTR(-errno);
+>    ^
+> cc1: all warnings being treated as errors
 >
-> Acked-by: Christian Borntraeger<borntraeger@de.ibm.com>
->
->   That was my first approach to get things fixed before I reported
-> this to you.
+> So could you add the missing "return" statement in that line, to fix
+> that bug?
+> I see that this gets rectified two patches later, but for the sake of
+> bisect-ability it would be good to keep this compilable all the way through.
 
-
-Exactly.
-
-Thanks
+You're right, I'll fix it here.
 
 >
+>> diff --git a/virtio/net.c b/virtio/net.c
+>> index 091406912a24..425c13ba1136 100644
+>> --- a/virtio/net.c
+>> +++ b/virtio/net.c
+>> @@ -910,7 +910,7 @@ done:
+>>  
+>>  static int virtio_net__init_one(struct virtio_net_params *params)
+>>  {
+>> -	int i, err;
+>> +	int i, r;
+>>  	struct net_dev *ndev;
+>>  	struct virtio_ops *ops;
+>>  	enum virtio_trans trans = VIRTIO_DEFAULT_TRANS(params->kvm);
+>> @@ -920,10 +920,8 @@ static int virtio_net__init_one(struct virtio_net_params *params)
+>>  		return -ENOMEM;
+>>  
+>>  	ops = malloc(sizeof(*ops));
+>> -	if (ops == NULL) {
+>> -		err = -ENOMEM;
+>> -		goto err_free_ndev;
+>> -	}
+>> +	if (ops == NULL)
+>> +		return -ENOMEM;
+>>  
+>>  	list_add_tail(&ndev->list, &ndevs);
+> As mentioned in the reply to the v2 version, I think this is still
+> leaking memory here.
 
+Yes, the leak is there. I didn't realize that virtio_net__exit doesn't do any
+free'ing at all.
+
+I find it a bit strange that we copy net_dev_virtio_ops for each device instance.
+I suspect that passing the pointer to the static struct to virtio_init would have
+been enough (this is what blk does), but I might be missing something. I don't
+want to introduce a regression, so I'll keep the memory allocation and free it on
+error.
+
+Thanks,
+Alex
