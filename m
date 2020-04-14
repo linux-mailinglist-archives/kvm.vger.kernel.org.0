@@ -2,150 +2,190 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B669A1A7BA2
-	for <lists+kvm@lfdr.de>; Tue, 14 Apr 2020 15:02:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0EAD71A7EA7
+	for <lists+kvm@lfdr.de>; Tue, 14 Apr 2020 15:43:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2502495AbgDNNCm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Apr 2020 09:02:42 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:58827 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S2502486AbgDNNC1 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 14 Apr 2020 09:02:27 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1586869345;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=8KYrjFdKV0F0kc/rQUca0FTze+6bSQcKKl07Ya/wHr0=;
-        b=hDLGuK38yVtcUBvM/ohTt4iK5EfqEQWi95kkyNyAg5Y2Yi+31Cd7DfMar0Mm9UCmpaRI0H
-        /QkMjRojuzzxmEamNvBixkLztFlw4EwPFe9jj5RtTcYgbycD1faTKX6bCIy+zAna2pg64d
-        ZbPAOyWXVyWtnY5N0veCaN0wlZrSDJc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-481-lQWz2TjjPiOvng-9rirdaw-1; Tue, 14 Apr 2020 09:02:23 -0400
-X-MC-Unique: lQWz2TjjPiOvng-9rirdaw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S2387948AbgDNNn1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Apr 2020 09:43:27 -0400
+Received: from mail.kernel.org ([198.145.29.99]:55338 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1732736AbgDNNnR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Apr 2020 09:43:17 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0566D18C35A2;
-        Tue, 14 Apr 2020 13:02:22 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-116-15.gru2.redhat.com [10.97.116.15])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D1F1060C88;
-        Tue, 14 Apr 2020 13:02:10 +0000 (UTC)
-Subject: Re: [PATCH 01/10] KVM: selftests: Take vcpu pointer instead of id in
- vm_vcpu_rm()
-To:     Andrew Jones <drjones@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Peter Xu <peterx@redhat.com>
-References: <20200410231707.7128-1-sean.j.christopherson@intel.com>
- <20200410231707.7128-2-sean.j.christopherson@intel.com>
- <b696c5b9-2507-8849-e196-37c83806cfdf@redhat.com>
- <20200413212659.GB21204@linux.intel.com>
- <20200414082556.nfdgec63kuqknpxc@kamzik.brq.redhat.com>
-From:   Wainer dos Santos Moschetta <wainersm@redhat.com>
-Message-ID: <023b0cb2-50d7-9145-d065-32436d429806@redhat.com>
-Date:   Tue, 14 Apr 2020 10:02:08 -0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+        by mail.kernel.org (Postfix) with ESMTPSA id 61A3320644;
+        Tue, 14 Apr 2020 13:43:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1586871796;
+        bh=3koUbGe2LBHalbakeLDQom7EXe+LBTn/mZU+H8wy818=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=wvTuJ2KvMEs7RpYKRjMqdZ7Noxqbzu3FUz84V073BNWMVq4DecOZ7bcI5eY7Vk3os
+         UeYuUradQiVbk4CiVsGslmtxQBXxWNaJ74F/n0jD7EObUMUgymqHhHdC2jwmmnxKuS
+         Bd8vCxQYxboemoA0+5ye6cxU6zTkDdzw7K0EVOAA=
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why)
+        by disco-boy.misterjones.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <maz@kernel.org>)
+        id 1jOLqM-003Abw-Jl; Tue, 14 Apr 2020 14:43:14 +0100
+Date:   Tue, 14 Apr 2020 14:43:13 +0100
+From:   Marc Zyngier <maz@kernel.org>
+To:     =?UTF-8?Q?Andr=C3=A9?= Przywara <andre.przywara@arm.com>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, Zenghui Yu <yuzenghui@huawei.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Julien Grall <julien@xen.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>
+Subject: Re: [PATCH 1/3] KVM: arm: vgic: Synchronize the whole guest on
+ GIC{D,R}_I{S,C}ACTIVER read
+Message-ID: <20200414144313.1f9645cd@why>
+In-Reply-To: <fddef0b7-3db7-89aa-5aac-4f08380ed00d@arm.com>
+References: <20200414103517.2824071-1-maz@kernel.org>
+        <20200414103517.2824071-2-maz@kernel.org>
+        <fddef0b7-3db7-89aa-5aac-4f08380ed00d@arm.com>
+Organization: Approximate
+X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <20200414082556.nfdgec63kuqknpxc@kamzik.brq.redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: andre.przywara@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, yuzenghui@huawei.com, eric.auger@redhat.com, julien@xen.org, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Tue, 14 Apr 2020 12:16:27 +0100
+Andr=C3=A9 Przywara <andre.przywara@arm.com> wrote:
 
-On 4/14/20 5:25 AM, Andrew Jones wrote:
-> On Mon, Apr 13, 2020 at 02:26:59PM -0700, Sean Christopherson wrote:
->> On Mon, Apr 13, 2020 at 03:26:55PM -0300, Wainer dos Santos Moschetta wrote:
->>> On 4/10/20 8:16 PM, Sean Christopherson wrote:
->>>> The sole caller of vm_vcpu_rm() already has the vcpu pointer, take it
->>>> directly instead of doing an extra lookup.
->>>
->>> Most of (if not all) vcpu related functions in kvm_util.c receives an id, so
->>> this change creates an inconsistency.
->> Ya, but taking the id is done out of "necessity", as everything is public
->> and for whatever reason the design of the selftest framework is to not
->> expose 'struct vcpu' outside of the utils.  vm_vcpu_rm() is internal only,
->> IMO pulling the id out of the vcpu just to lookup the same vcpu is a waste
->> of time.
-> Agreed
+> On 14/04/2020 11:35, Marc Zyngier wrote:
+> > When a guest tries to read the active state of its interrupts,
+> > we currently just return whatever state we have in memory. This
+> > means that if such an interrupt lives in a List Register on another
+> > CPU, we fail to obsertve the latest active state for this interrupt. =20
+>=20
+>                   ^^^^^^^^
+>=20
+> > In order to remedy this, stop all the other vcpus so that they exit
+> > and we can observe the most recent value for the state. =20
+>=20
+> Maybe worth mentioning that this copies the approach we already deal
+> with write accesses (split userland and guess accessors). This is in the
+> cover letter, but until I found it there it took me a while to grasp
+> what this patch really does.
 
+Fair enough.
 
-Thanks Sean and Andrew for your comments. I'm not in position to 
-change/propose any design of kvm selftests but even though I aimed to 
-foster this discussion.
+>=20
+> >=20
+> > Reported-by: Julien Grall <julien@xen.org>
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  virt/kvm/arm/vgic/vgic-mmio-v2.c |   4 +-
+> >  virt/kvm/arm/vgic/vgic-mmio-v3.c |   4 +-
+> >  virt/kvm/arm/vgic/vgic-mmio.c    | 100 ++++++++++++++++++++-----------
+> >  virt/kvm/arm/vgic/vgic-mmio.h    |   3 +
+> >  4 files changed, 71 insertions(+), 40 deletions(-)
+> >=20
+> > diff --git a/virt/kvm/arm/vgic/vgic-mmio-v2.c b/virt/kvm/arm/vgic/vgic-=
+mmio-v2.c
+> > index 5945f062d749..d63881f60e1a 100644
+> > --- a/virt/kvm/arm/vgic/vgic-mmio-v2.c
+> > +++ b/virt/kvm/arm/vgic/vgic-mmio-v2.c
+> > @@ -422,11 +422,11 @@ static const struct vgic_register_region vgic_v2_=
+dist_registers[] =3D {
+> >  		VGIC_ACCESS_32bit),
+> >  	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_ACTIVE_SET,
+> >  		vgic_mmio_read_active, vgic_mmio_write_sactive,
+> > -		NULL, vgic_mmio_uaccess_write_sactive, 1,
+> > +		vgic_uaccess_read_active, vgic_mmio_uaccess_write_sactive, 1,
+> >  		VGIC_ACCESS_32bit),
+> >  	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_ACTIVE_CLEAR,
+> >  		vgic_mmio_read_active, vgic_mmio_write_cactive,
+> > -		NULL, vgic_mmio_uaccess_write_cactive, 1,
+> > +		vgic_uaccess_read_active, vgic_mmio_uaccess_write_cactive, 1,
+> >  		VGIC_ACCESS_32bit),
+> >  	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_PRI,
+> >  		vgic_mmio_read_priority, vgic_mmio_write_priority, NULL, NULL,
+> > diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-=
+mmio-v3.c
+> > index e72dcc454247..77c8ba1a2535 100644
+> > --- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
+> > +++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+> > @@ -553,11 +553,11 @@ static const struct vgic_register_region vgic_v3_=
+dist_registers[] =3D {
+> >  		VGIC_ACCESS_32bit),
+> >  	REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_ISACTIVER,
+> >  		vgic_mmio_read_active, vgic_mmio_write_sactive,
+> > -		NULL, vgic_mmio_uaccess_write_sactive, 1,
+> > +		vgic_uaccess_read_active, vgic_mmio_uaccess_write_sactive, 1,
+> >  		VGIC_ACCESS_32bit),
+> >  	REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_ICACTIVER,
+> >  		vgic_mmio_read_active, vgic_mmio_write_cactive,
+> > -		NULL, vgic_mmio_uaccess_write_cactive,
+> > +		vgic_uaccess_read_active, vgic_mmio_uaccess_write_cactive,
+> >  		1, VGIC_ACCESS_32bit),
+> >  	REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_IPRIORITYR,
+> >  		vgic_mmio_read_priority, vgic_mmio_write_priority, NULL, NULL,
+> > diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmi=
+o.c
+> > index 2199302597fa..4012cd68ac93 100644
+> > --- a/virt/kvm/arm/vgic/vgic-mmio.c
+> > +++ b/virt/kvm/arm/vgic/vgic-mmio.c
+> > @@ -348,8 +348,39 @@ void vgic_mmio_write_cpending(struct kvm_vcpu *vcp=
+u,
+> >  	}
+> >  }
+> > =20
+> > -unsigned long vgic_mmio_read_active(struct kvm_vcpu *vcpu,
+> > -				    gpa_t addr, unsigned int len)
+> > +
+> > +/*
+> > + * If we are fiddling with an IRQ's active state, we have to make sure=
+ the IRQ
+> > + * is not queued on some running VCPU's LRs, because then the change t=
+o the
+> > + * active state can be overwritten when the VCPU's state is synced com=
+ing back
+> > + * from the guest.
+> > + *
+> > + * For shared interrupts as well as GICv3 private interrupts, we have =
+to
+> > + * stop all the VCPUs because interrupts can be migrated while we don'=
+t hold
+> > + * the IRQ locks and we don't want to be chasing moving targets.
+> > + *
+> > + * For GICv2 private interrupts we don't have to do anything because
+> > + * userspace accesses to the VGIC state already require all VCPUs to be
+> > + * stopped, and only the VCPU itself can modify its private interrupts
+> > + * active state, which guarantees that the VCPU is not running.
+> > + */
+> > +static void vgic_access_active_prepare(struct kvm_vcpu *vcpu, u32 inti=
+d)
+> > +{
+> > +	if (vcpu->kvm->arch.vgic.vgic_model =3D=3D KVM_DEV_TYPE_ARM_VGIC_V3 ||
+> > +	    intid > VGIC_NR_PRIVATE_IRQS) =20
+>=20
+> I understand that this is just moved from existing code below, but
+> shouldn't that either read "intid >=3D VGIC_NR_PRIVATE_IRQS" or
+> "intid > VGIC_MAX_PRIVATE"?
 
-So, please, consider my Reviewed-by...
+Nice catch. This was introduced in abd7229626b93 ("KVM: arm/arm64:
+Simplify active_change_prepare and plug race"), while we had the
+opposite condition before that.
 
-- Wainer
+This means that on GICv2, GICD_I[CS]ACTIVER writes are unreliable for
+intids 32-63 (we may fail to clear an active bit if it is set in
+another vcpu's LRs, for example).
 
+I'll add an extra patch for this.
 
->
->> FWIW, I think the whole vcpuid thing is a bad interface, almost all the
->> tests end up defining an arbitrary number for the sole VCPU_ID, i.e. the
->> vcpuid interface just adds a pointless layer of obfuscation.  I haven't
->> looked through all the tests, but returning the vcpu and making the struct
->> opaque, same as kvm_vm, seems like it would yield more readable code with
->> less overhead.
-> Agreed
->
->> While I'm on a soapbox, hiding 'struct vcpu' and 'struct kvm_vm' also seems
->> rather silly, but at least that doesn't directly lead to funky code.
-> Agreed. While the concept has been slowly growing on me, I think accessor
-> functions for each of the structs members are growing even faster...
->
-> Thanks,
-> drew
->
->>> Disregarding the above comment, the changes look good to me. So:
->>>
->>> Reviewed-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
->>>
->>>
->>>> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
->>>> ---
->>>>   tools/testing/selftests/kvm/lib/kvm_util.c | 7 +++----
->>>>   1 file changed, 3 insertions(+), 4 deletions(-)
->>>>
->>>> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
->>>> index 8a3523d4434f..9a783c20dd26 100644
->>>> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
->>>> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
->>>> @@ -393,7 +393,7 @@ struct vcpu *vcpu_find(struct kvm_vm *vm, uint32_t vcpuid)
->>>>    *
->>>>    * Input Args:
->>>>    *   vm - Virtual Machine
->>>> - *   vcpuid - VCPU ID
->>>> + *   vcpu - VCPU to remove
->>>>    *
->>>>    * Output Args: None
->>>>    *
->>>> @@ -401,9 +401,8 @@ struct vcpu *vcpu_find(struct kvm_vm *vm, uint32_t vcpuid)
->>>>    *
->>>>    * Within the VM specified by vm, removes the VCPU given by vcpuid.
->>>>    */
->>>> -static void vm_vcpu_rm(struct kvm_vm *vm, uint32_t vcpuid)
->>>> +static void vm_vcpu_rm(struct kvm_vm *vm, struct vcpu *vcpu)
->>>>   {
->>>> -	struct vcpu *vcpu = vcpu_find(vm, vcpuid);
->>>>   	int ret;
->>>>   	ret = munmap(vcpu->state, sizeof(*vcpu->state));
->>>> @@ -427,7 +426,7 @@ void kvm_vm_release(struct kvm_vm *vmp)
->>>>   	int ret;
->>>>   	while (vmp->vcpu_head)
->>>> -		vm_vcpu_rm(vmp, vmp->vcpu_head->id);
->>>> +		vm_vcpu_rm(vmp, vmp->vcpu_head);
->>>>   	ret = close(vmp->fd);
->>>>   	TEST_ASSERT(ret == 0, "Close of vm fd failed,\n"
+Thanks,
 
+	M.
+--=20
+Jazz is not dead. It just smells funny...
