@@ -2,89 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2FBF31A718F
-	for <lists+kvm@lfdr.de>; Tue, 14 Apr 2020 05:17:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7782E1A71B1
+	for <lists+kvm@lfdr.de>; Tue, 14 Apr 2020 05:20:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404478AbgDNDRG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Apr 2020 23:17:06 -0400
-Received: from mga07.intel.com ([134.134.136.100]:34432 "EHLO mga07.intel.com"
+        id S2404623AbgDNDUN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Apr 2020 23:20:13 -0400
+Received: from mga18.intel.com ([134.134.136.126]:59129 "EHLO mga18.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2404224AbgDNDRG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Apr 2020 23:17:06 -0400
-IronPort-SDR: aj35rMfAx9Do4msL0WheGA4nZ/9PUEG/vKhIU7ubZ1ueLGPjxWq8hWf4cO4tHveYuuFr53FUCD
- L23rGsBxIVdg==
+        id S2404573AbgDNDUN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Apr 2020 23:20:13 -0400
+IronPort-SDR: BcYFW3kiW4MvyYThOXamxTT1yBmPcpUV9IJwXBvRVCqN3PQ2nrUllMSghtoKnASsd1iGT0Lifh
+ z+ONkwhCrdRw==
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Apr 2020 20:17:05 -0700
-IronPort-SDR: jbQ5Enq0qSTQzPnYBmWwoqoqrc8JdZRkWuGPvSipYdPFwpSeJ2f8PZCRjGEcZGNvGv5eTtLokg
- rMq1+Xb9kQ9w==
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Apr 2020 20:20:12 -0700
+IronPort-SDR: fmJBGYP5nFgZE0zLQisEHNdMws0RK21VQDcq5j06o1LekTyDfUix97xcWF6JOIa0HHKTdB0/58
+ pX3iqfT+Ykqg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.72,381,1580803200"; 
-   d="scan'208";a="399817495"
+   d="scan'208";a="253069800"
 Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
-  by orsmga004.jf.intel.com with ESMTP; 13 Apr 2020 20:17:05 -0700
-Date:   Mon, 13 Apr 2020 20:17:05 -0700
+  by orsmga003.jf.intel.com with ESMTP; 13 Apr 2020 20:20:12 -0700
+Date:   Mon, 13 Apr 2020 20:20:12 -0700
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Jim Mattson <jmattson@google.com>
-Cc:     kvm@vger.kernel.org, Oliver Upton <oupton@google.com>,
-        Peter Shier <pshier@google.com>
-Subject: Re: [PATCH 2/2] kvm: nVMX: Single-step traps trump expired
- VMX-preemption timer
-Message-ID: <20200414031705.GP21204@linux.intel.com>
-References: <20200414000946.47396-1-jmattson@google.com>
- <20200414000946.47396-2-jmattson@google.com>
+To:     syzbot <syzbot+2e0179e5185bcd5b9440@syzkaller.appspotmail.com>
+Cc:     christoffer.dall@arm.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, maz@kernel.org, pbonzini@redhat.com,
+        peterx@redhat.com, syzkaller-bugs@googlegroups.com
+Subject: Re: KASAN: slab-out-of-bounds Read in gfn_to_memslot
+Message-ID: <20200414032011.GQ21204@linux.intel.com>
+References: <0000000000003311fd05a327a060@google.com>
+ <000000000000f6ae4905a32a0633@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200414000946.47396-2-jmattson@google.com>
+In-Reply-To: <000000000000f6ae4905a32a0633@google.com>
 User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Apr 13, 2020 at 05:09:46PM -0700, Jim Mattson wrote:
-> Previously, if the hrtimer for the nested VMX-preemption timer fired
-> while L0 was emulating an L2 instruction with RFLAGS.TF set, the
-> synthesized single-step trap would be unceremoniously dropped when
-> synthesizing the "VMX-preemption timer expired" VM-exit from L2 to L1.
+On Mon, Apr 13, 2020 at 04:03:04AM -0700, syzbot wrote:
+> syzbot has bisected this bug to:
 > 
-> To fix this, don't synthesize a "VMX-preemption timer expired" VM-exit
-> from L2 to L1 when there is a pending debug trap, such as a
-> single-step trap.
+> commit 36947254e5f981aeeedab1c7dfa35fc34d330e80
+> Author: Sean Christopherson <sean.j.christopherson@intel.com>
+> Date:   Tue Feb 18 21:07:32 2020 +0000
 > 
-> Fixes: f4124500c2c13 ("KVM: nVMX: Fully emulate preemption timer")
-> Signed-off-by: Jim Mattson <jmattson@google.com>
-> Reviewed-by: Oliver Upton <oupton@google.com>
-> Reviewed-by: Peter Shier <pshier@google.com>
-> ---
->  arch/x86/kvm/vmx/nested.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
+>     KVM: Dynamically size memslot array based on number of used slots
 > 
-> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> index cbc9ea2de28f..6ab974debd44 100644
-> --- a/arch/x86/kvm/vmx/nested.c
-> +++ b/arch/x86/kvm/vmx/nested.c
-> @@ -3690,7 +3690,9 @@ static int vmx_check_nested_events(struct kvm_vcpu *vcpu)
->  	    vmx->nested.preemption_timer_expired) {
->  		if (block_nested_events)
->  			return -EBUSY;
-> -		nested_vmx_vmexit(vcpu, EXIT_REASON_PREEMPTION_TIMER, 0, 0);
-> +		if (!vmx_pending_dbg_trap(vcpu))
-
-IMO this one warrants a comment.  It's not immediately obvious that this
-only applies to #DBs that are being injected into L2, and that returning
--EBUSY will do the wrong thing.
-
-> +			nested_vmx_vmexit(vcpu, EXIT_REASON_PREEMPTION_TIMER,
-> +					  0, 0);
-
-I'd just let the "0, 0);" poke out past 80 chars.
-
->  		return 0;
->  	}
->  
-> -- 
-> 2.26.0.110.g2183baf09c-goog
+> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=1099775de00000
+> start commit:   4f8a3cc1 Merge tag 'x86-urgent-2020-04-12' of git://git.ke..
+> git tree:       upstream
+> final crash:    https://syzkaller.appspot.com/x/report.txt?x=1299775de00000
+> console output: https://syzkaller.appspot.com/x/log.txt?x=1499775de00000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=3bfbde87e8e65624
+> dashboard link: https://syzkaller.appspot.com/bug?extid=2e0179e5185bcd5b9440
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=13e78c7de00000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=14cf613fe00000
 > 
+> Reported-by: syzbot+2e0179e5185bcd5b9440@syzkaller.appspotmail.com
+> Fixes: 36947254e5f9 ("KVM: Dynamically size memslot array based on number of used slots")
+> 
+> For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+
+#syz dup: KASAN: slab-out-of-bounds Read in __kvm_gfn_to_hva_cache_init
