@@ -2,258 +2,152 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9B8BC1A71FE
-	for <lists+kvm@lfdr.de>; Tue, 14 Apr 2020 05:42:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7B4211A72BF
+	for <lists+kvm@lfdr.de>; Tue, 14 Apr 2020 06:45:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404925AbgDNDmu convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Mon, 13 Apr 2020 23:42:50 -0400
-Received: from mga07.intel.com ([134.134.136.100]:35950 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2404915AbgDNDmt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Apr 2020 23:42:49 -0400
-IronPort-SDR: CnfOvdBl986AbO9xzCpcowEFVEDVTyhy5PQ/B3vpFE0L0fleQPvUtc1P1EWj7ZTwZ4Kyh4JRjI
- enx49CUBzMNw==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Apr 2020 20:42:46 -0700
-IronPort-SDR: d9j3MmmA4Jht/b14Ew/aXJfiPNKYxtbNgb3ULfqEuQ//K+IUSYOR4XmrulUzBuWDwlw6K8922Z
- m3nLgaOaCq0w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.72,381,1580803200"; 
-   d="scan'208";a="454428212"
-Received: from fmsmsx106.amr.corp.intel.com ([10.18.124.204])
-  by fmsmga006.fm.intel.com with ESMTP; 13 Apr 2020 20:42:46 -0700
-Received: from fmsmsx112.amr.corp.intel.com (10.18.116.6) by
- FMSMSX106.amr.corp.intel.com (10.18.124.204) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Mon, 13 Apr 2020 20:42:46 -0700
-Received: from shsmsx101.ccr.corp.intel.com (10.239.4.153) by
- FMSMSX112.amr.corp.intel.com (10.18.116.6) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Mon, 13 Apr 2020 20:42:45 -0700
-Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.225]) by
- SHSMSX101.ccr.corp.intel.com ([169.254.1.129]) with mapi id 14.03.0439.000;
- Tue, 14 Apr 2020 11:42:42 +0800
-From:   "Tian, Kevin" <kevin.tian@intel.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-CC:     "Raj, Ashok" <ashok.raj@linux.intel.com>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Tian, Jun J" <jun.j.tian@intel.com>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Sun, Yi Y" <yi.y.sun@intel.com>,
-        "Bjorn Helgaas" <bhelgaas@google.com>,
-        "Wu, Hao" <hao.wu@intel.com>, Don Dutile <ddutile@redhat.com>
-Subject: RE: [PATCH v1 2/2] vfio/pci: Emulate PASID/PRI capability for VFs
-Thread-Topic: [PATCH v1 2/2] vfio/pci: Emulate PASID/PRI capability for VFs
-Thread-Index: AQHWAEVGCz5QQWvL/U+nYnlD7MiZ7Khl/jEAgACVNICAAJ/EgIAF8c6ggAA/A4CAAMnRgIAAzpAAgAb/OoCAAMrPQIAAC1kAgAA5CgCAAPxYkP//i8oAgACGwnA=
-Date:   Tue, 14 Apr 2020 03:42:42 +0000
-Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D19D81D456@SHSMSX104.ccr.corp.intel.com>
-References: <1584880394-11184-1-git-send-email-yi.l.liu@intel.com>
-        <1584880394-11184-3-git-send-email-yi.l.liu@intel.com>
-        <20200402165954.48d941ee@w520.home>
-        <A2975661238FB949B60364EF0F2C25743A2204FE@SHSMSX104.ccr.corp.intel.com>
-        <20200403112545.6c115ba3@w520.home>
-        <AADFC41AFE54684AB9EE6CBC0274A5D19D80E13D@SHSMSX104.ccr.corp.intel.com>
-        <20200407095801.648b1371@w520.home>     <20200408040021.GS67127@otc-nc-03>
-        <20200408101940.3459943d@w520.home>
-        <20200413031043.GA18183@araj-mobl1.jf.intel.com>
-        <AADFC41AFE54684AB9EE6CBC0274A5D19D81A31F@SHSMSX104.ccr.corp.intel.com>
-        <20200413132122.46825849@w520.home>
-        <AADFC41AFE54684AB9EE6CBC0274A5D19D81D376@SHSMSX104.ccr.corp.intel.com>
- <20200413212836.117b4c86@x1.home>
-In-Reply-To: <20200413212836.117b4c86@x1.home>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-version: 11.2.0.6
-dlp-reaction: no-action
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+        id S2405371AbgDNEpQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Apr 2020 00:45:16 -0400
+Received: from vultr.net.flygoat.com ([149.28.68.211]:58552 "EHLO
+        vultr.net.flygoat.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2405367AbgDNEpP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Apr 2020 00:45:15 -0400
+Received: from flygoat-x1e (unknown [IPv6:240e:390:49e:92c0::d68])
+        by vultr.net.flygoat.com (Postfix) with ESMTPSA id C3D3E20C23;
+        Tue, 14 Apr 2020 04:45:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=flygoat.com; s=vultr;
+        t=1586839514; bh=fiBXmk7zQ1jWSQ3x6kAoQtu9VO+WgvkkjUzmqBTQUYE=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=KrrJvxQ6GJ/L9QJCz9Dw8SY8+mtDwUMtxRfi3VnNkQFE4K8OiQK0dPRHWtSCny+cA
+         AS3l+bzOrUlHXZ5YrAKkFANdGA+hh9cXGknajEk8v4o+cbUv7qKjUg+C57Ewit9wSC
+         4VZi2WIP9ZySxzCaFnLBbe4y1CfnnXWw/5sXXVdjBivnzpc3dmp+njG/nqDNmQn2WH
+         xfcJHb9GesmmN2o3j6lMPd3Y/a9QeLsFYVFPuXySOk947xfp9CzpiOvoWJjAPWrV+R
+         JZs1gMYKEpBYEibIW+cj/PKQGJPehLPbj00tRau4oCj9nOaDWnfwjm8TdVqZCv+H63
+         JcZy+OuK0X1Mw==
+Date:   Tue, 14 Apr 2020 12:44:58 +0800
+From:   Jiaxun Yang <jiaxun.yang@flygoat.com>
+To:     maobibo <maobibo@loongson.cn>
+Cc:     Huacai Chen <chenhc@lemote.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        kvm@vger.kernel.org, qemu-devel@nongnu.org,
+        linux-mips@vger.kernel.org, Fuxin Zhang <zhangfx@lemote.com>,
+        Huacai Chen <chenhuacai@gmail.com>,
+        aleksandar.qemu.devel@gmail.com, lixing@loongson.cn
+Subject: Re: [PATCH 0/15] KVM: MIPS: Add Loongson-3 support (Host Side)
+Message-ID: <20200414124458.4675125b@flygoat-x1e>
+In-Reply-To: <bbbeb507-5692-5969-c320-57d04823edc7@loongson.cn>
+References: <1586763024-12197-1-git-send-email-chenhc@lemote.com>
+        <20200413161842.57ad8be4@flygoat-x1e>
+        <bbbeb507-5692-5969-c320-57d04823edc7@loongson.cn>
+X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> From: Alex Williamson <alex.williamson@redhat.com>
-> Sent: Tuesday, April 14, 2020 11:29 AM
-> 
-> On Tue, 14 Apr 2020 02:40:58 +0000
-> "Tian, Kevin" <kevin.tian@intel.com> wrote:
-> 
-> > > From: Alex Williamson <alex.williamson@redhat.com>
-> > > Sent: Tuesday, April 14, 2020 3:21 AM
-> > >
-> > > On Mon, 13 Apr 2020 08:05:33 +0000
-> > > "Tian, Kevin" <kevin.tian@intel.com> wrote:
-> > >
-> > > > > From: Tian, Kevin
-> > > > > Sent: Monday, April 13, 2020 3:55 PM
-> > > > >
-> > > > > > From: Raj, Ashok <ashok.raj@linux.intel.com>
-> > > > > > Sent: Monday, April 13, 2020 11:11 AM
-> > > > > >
-> > > > > > On Wed, Apr 08, 2020 at 10:19:40AM -0600, Alex Williamson wrote:
-> > > > > > > On Tue, 7 Apr 2020 21:00:21 -0700
-> > > > > > > "Raj, Ashok" <ashok.raj@intel.com> wrote:
-> > > > > > >
-> > > > > > > > Hi Alex
-> > > > > > > >
-> > > > > > > > + Bjorn
-> > > > > > >
-> > > > > > >  + Don
-> > > > > > >
-> > > > > > > > FWIW I can't understand why PCI SIG went different ways with
-> ATS,
-> > > > > > > > where its enumerated on PF and VF. But for PASID and PRI its
-> only
-> > > > > > > > in PF.
-> > > > > > > >
-> > > > > > > > I'm checking with our internal SIG reps to followup on that.
-> > > > > > > >
-> > > > > > > > On Tue, Apr 07, 2020 at 09:58:01AM -0600, Alex Williamson
-> wrote:
-> > > > > > > > > > Is there vendor guarantee that hidden registers will locate at
-> the
-> > > > > > > > > > same offset between PF and VF config space?
-> > > > > > > > >
-> > > > > > > > > I'm not sure if the spec really precludes hidden registers, but
-> the
-> > > > > > > > > fact that these registers are explicitly outside of the capability
-> > > > > > > > > chain implies they're only intended for device specific use, so
-> I'd
-> > > say
-> > > > > > > > > there are no guarantees about anything related to these
-> registers.
-> > > > > > > >
-> > > > > > > > As you had suggested in the other thread, we could consider
-> > > > > > > > using the same offset as in PF, but even that's a better guess
-> > > > > > > > still not reliable.
-> > > > > > > >
-> > > > > > > > The other option is to maybe extend driver ops in the PF to
-> expose
-> > > > > > > > where the offsets should be. Sort of adding the quirk in the
-> > > > > > > > implementation.
-> > > > > > > >
-> > > > > > > > I'm not sure how prevalent are PASID and PRI in VF devices. If
-> SIG is
-> > > > > > resisting
-> > > > > > > > making VF's first class citizen, we might ask them to add some
-> > > verbiage
-> > > > > > > > to suggest leave the same offsets as PF open to help emulation
-> > > software.
-> > > > > > >
-> > > > > > > Even if we know where to expose these capabilities on the VF, it's
-> not
-> > > > > > > clear to me how we can actually virtualize the capability itself.  If
-> > > > > > > the spec defines, for example, an enable bit as r/w then software
-> that
-> > > > > > > interacts with that register expects the bit is settable.  There's no
-> > > > > > > protocol for "try to set the bit and re-read it to see if the hardware
-> > > > > > > accepted it".  Therefore a capability with a fixed enable bit
-> > > > > > > representing the state of the PF, not settable by the VF, is
-> > > > > > > disingenuous to the spec.
-> > > > > >
-> > > > > > I think we are all in violent agreement. A lot of times the pci spec
-> gets
-> > > > > > defined several years ahead of real products and no one
-> remembers
-> > > > > > the justification on why they restricted things the way they did.
-> > > > > >
-> > > > > > Maybe someone early product wasn't quite exposing these features
-> to
-> > > the
-> > > > > > VF
-> > > > > > and hence the spec is bug compatible :-)
-> > > > > >
-> > > > > > >
-> > > > > > > If what we're trying to do is expose that PASID and PRI are enabled
-> on
-> > > > > > > the PF to a VF driver, maybe duplicating the PF capabilities on the
-> VF
-> > > > > > > without the ability to control it is not the right approach.  Maybe
-> we
-> > > > > >
-> > > > > > As long as the capability enable is only provided when the PF has
-> > > enabled
-> > > > > > the feature. Then it seems the hardware seems to do the right thing.
-> > > > > >
-> > > > > > Assume we expose PASID/PRI only when PF has enabled it. It will be
-> the
-> > > > > > case since the PF driver needs to exist, and IOMMU would have set
-> the
-> > > > > > PASID/PRI/ATS on PF.
-> > > > > >
-> > > > > > If the emulation is purely spoofing the capability. Once vIOMMU
-> driver
-> > > > > > enables PASID, the context entries for the VF are completely
-> > > independent
-> > > > > > from the PF context entries.
-> > > > > >
-> > > > > > vIOMMU would enable PASID, and we just spoof the PASID
-> capability.
-> > > > > >
-> > > > > > If vIOMMU or guest for some reason does disable_pasid(), then the
-> > > > > > vIOMMU driver can disaable PASID on the VF context entries. So the
-> VF
-> > > > > > although the capability is blanket enabled on PF, IOMMU gaurantees
-> > > the
-> > > > > > transactions are blocked.
-> > > > > >
-> > > > > >
-> > > > > > In the interim, it seems like the intent of the virtual capability
-> > > > > > can be honored via help from the IOMMU for the controlling aspect..
-> > > > > >
-> > > > > > Did i miss anything?
-> > > > >
-> > > > > Above works for emulating the enable bit (under the assumption that
-> > > > > PF driver won't disable pasid when vf is assigned). However, there are
-> > > > > also "Execute permission enable" and "Privileged mode enable" bits in
-> > > > > PASID control registers. I don't know how those bits could be cleanly
-> > > > > emulated when the guest writes a value different from PF's...
-> > > >
-> > > > sent too quick. the IOMMU also includes control bits for allowing/
-> > > > blocking execute requests and supervisor requests. We can rely on
-> > > > IOMMU to block those requests to emulate the disabled cases of
-> > > > all three control bits in the pasid cap.
-> > >
-> > >
-> > > So if the emulation of the PASID capability takes into account the
-> > > IOMMU configuration to back that emulation, shouldn't we do that
-> > > emulation in the hypervisor, ie. QEMU, rather than the kernel vfio
-> > > layer?  Thanks,
-> > >
-> > > Alex
-> >
-> > We need enforce it in physical IOMMU, to ensure that even the
-> > VF may send requests which violate the guest expectation those
-> > requests are always blocked by IOMMU. Kernel vfio identifies
-> > such need when emulating the pasid cap and then forward the
-> > request to host iommu driver.
-> 
-> Implementing this in the kernel would be necessary if we needed to
-> protect from the guest device doing something bad to the host or
-> other devices.  Making sure the physical IOMMU is configured to meet
-> guest expectations doesn't sound like it necessarily falls into that
-> category.  We do that on a regular basis to program the DMA mappings.
-> Tell me more about why the hypervisor can't handle this piece of
-> guest/host synchronization on top of all the other things it
-> synchronizes to make a VM.  Thanks,
-> 
+On Tue, 14 Apr 2020 09:40:26 +0800
+maobibo <maobibo@loongson.cn> wrote:
 
-I care more about "execution permission" and "privileged mode".
-It might be dangerous when the guest disallows the VF from sending
-DMA requests which have the execute or privileged bit set while the VF
-can still do so w/o proper protection in the IOMMU. This is all about
-vSVA for vfio devices, where the guest page table is directly linked in 
-IOMMU and vfio doesn't participate in the specific DMA mappings. if
-an emulated device includes a pasid cap, Qemu vIOMMU will handle 
-it for sure.
+> On 04/13/2020 04:18 PM, Jiaxun Yang wrote:
+> > On Mon, 13 Apr 2020 15:30:09 +0800
+> > Huacai Chen <chenhc@lemote.com> wrote:
+> >   
+> >> We are preparing to add KVM support for Loongson-3. VZ extension is
+> >> fully supported in Loongson-3A R4+, and we will not care about old
+> >> CPUs (at least now). We already have a full functional Linux kernel
+> >> (based on Linux-5.4.x LTS) and QEMU (based on 5.0.0-rc2) and their
+> >> git repositories are here:
+> >>
+> >> QEMU: https://github.com/chenhuacai/qemu
+> >> Kernel: https://github.com/chenhuacai/linux
+> >>
+> >> Of course these two repositories need to be rework and not suitable
+> >> for upstream (especially the commits need to be splitted). We show
+> >> them here is just to tell others what we have done, and how
+> >> KVM/Loongson will look like.
+> >>
+> >> Our plan is make the KVM host side be upstream first, and after
+> >> that, we will make the KVM guest side and QEMU emulator be
+> >> upstream.  
+> > 
+> > + Aleksandar as QEMU/MIPS mainatiner
+> > 
+> > I was involved in KVM/Loongson development a bit and also intend to
+> > help with mainline these works.
+> > 
+> > After dealing with basic LS7A PCH kernel support, I'm going to
+> > cooperate with Huacai and anyone who interested in to deal with
+> > following stuff:
+> > 
+> > - Basic QEMU/TCG support for Loongson64 instructions.
+> > 	Well, it seems unrelated with KVM, but that would make
+> > 	development easier with cross ISA emulation. I'm not going
+> > to implement all the features like Loongson's page table fast walk
+> > 	extension and binary translation extension but I'll ensure
+> > any binary compiled with march=loongson3a can run flawlessly on
+> > 	TCG.
+> > 
+> > - Design of Loongson-VIRT QEMU machine
+> > 	It is nearly impossible to bring a real Loongson system into
+> > 	QEMU. Both RS780E and LS7A PCH have tons of unreasonable
+> > design that would make the emulation extremely complex, Loongson
+> > 	company's KVM implementation[1] has already proofed that,
+> > 	thay're now in the hell. So we all agreed that we should
+> > build a machine from draft. I think we should reuse existing infra
+> > as far as possible to reduce our work load. I'm planing to use
+> > 	pci-host-cam-generic together with VIRTIO PCI devices and a
+> > 	a strip down version of loongson,liointc-1.0a to build a
+> > pure PCI based system. But if any one have better idea please just
+> > 	tell us, I'm still considering how to implement SMP-IPI and
+> > ACPI stuff.  
 
-Thanks
-Kevin
+Hi Bibo,
+Thanks for your response.
+
++ Xing Li as I heard he is in charge of KVM from Loongson's news post.
+
+> It is a good job to add kvm virtualization support on loongson64
+> platform. I agree that we should define common virt machine hardware
+> system, however the compiled kernel binary should be the same with
+> host system, else it will bring out trouble for customers to
+> differentiate them between guest system and host system.
+
+I'm planing to use DeviceTree to pass device information between QEMU
+and guest kernel. So we can upgrade VM design at any moment without
+breaking Host Guest kernel compatibility.
+
+ 
+> For pci host bridge emulation, I suggest that gpex pcie host bridge
+> should be used, since it supports pcie hotplug and arm/riscv uses
+> this pcie host bridge.
+
+
+gpex is basically a pci-host-cam-generic at kernel point of view. I'm
+planing to reuse it too.
+
+> 
+> For virtual interrupt controller, it should support MSI/MSIX
+> interrupt, irqchip in kernel, IRQFD, vhost/vfio etc. I have no idea
+> how to define virtual interrupt controller now.
+
+Yes, APIC from x86 and GIC from Arm are all bonded closely with their
+architecture so we can't reuse them. Probably what we need is a
+modified version of EXTIOI from Loongson-3A4000.
+
+Does Loongson have a plan to implement hardware virtual irqchip? If so
+we must align with it's design.
+
+My plan is we can firstly implement a very simple IRQCHIP instead of
+complex one which only handle UART and PCI INTx. That is enough to make
+the system work. After that we can sit and discuss how to implement a
+complicated version to archive more features.
+
+> 
+> 
+> regards
+> bibo,mao
+> 
+[...]
