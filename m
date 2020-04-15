@@ -2,115 +2,79 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9A88F1A9981
-	for <lists+kvm@lfdr.de>; Wed, 15 Apr 2020 11:51:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2D0011A9AB8
+	for <lists+kvm@lfdr.de>; Wed, 15 Apr 2020 12:36:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2895998AbgDOJvl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Apr 2020 05:51:41 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:54830 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S2895874AbgDOJti (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Apr 2020 05:49:38 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1586944176;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=qaGXYPrjx6asVnwUlRwgPZ9xv0d8gA5/xd4DP6F32Eg=;
-        b=f+XE5fH3w+CTeU7C/7DW0Rh5upeav7Dq8MYzb5UOOVQChq7gj+eSinhy0HBhwUHmYR2EVJ
-        L7jsnziyvb2oXbp/SQJ5zjM7NGYnYBzt9thN0HW8U9LbH8o2veIbnC0Ss6pLvg3BX8XgwN
-        pVTaoNQPlHdOoLU2/Jx57q4ZepS00Qo=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-316-zuQkAaVWNDSyFX0f3eWziQ-1; Wed, 15 Apr 2020 05:49:28 -0400
-X-MC-Unique: zuQkAaVWNDSyFX0f3eWziQ-1
-Received: by mail-wm1-f71.google.com with SMTP id q5so3647541wmc.9
-        for <kvm@vger.kernel.org>; Wed, 15 Apr 2020 02:49:28 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=qaGXYPrjx6asVnwUlRwgPZ9xv0d8gA5/xd4DP6F32Eg=;
-        b=sHWtBQlszF3VTcg9vcWAwDjliTzL73PCvYwfCiC+6YJLr/m1zCvaNgAOmbnMV6emJR
-         +3ISLN04hGHAW2cpxX3dDvWRgL3ONr/+47hOhMJz4yIXkhvSxGllzfrt5lWKeOBdcwzx
-         wt7HOK4YO5ek44FMvV5EWP9C2wOKnjGQOZPrQZYY/y31wY0IZ8+xWAhrywVMn2dwscO3
-         b+QgdrA8bynYE8RMVxL+wN/FJ7RSL5Vq//+CxkczY5K4Xk64Q7QZuEEHo4nMva3FCkkl
-         kiYKEeQDcp0KtKZEuEmtc5wfHtwvGiFzcq6TVLPz/45fXqT+RvYiSXpxMLqX8T13/AVe
-         6CWQ==
-X-Gm-Message-State: AGi0Pube+Fw8REPdrHa2q3YnUx0aX+uqCwNCf8+2OZiwUiUV1O6PbPeT
-        npKVi24jvZmQ5PZfoXajd431uUpwR5i/VuYUkUpsu6U6hDPq7ucDdCsgzn0KnTwrS2lBFqQoZi1
-        KQV2R+M0R3WUy
-X-Received: by 2002:a05:6000:1008:: with SMTP id a8mr22513582wrx.189.1586944166845;
-        Wed, 15 Apr 2020 02:49:26 -0700 (PDT)
-X-Google-Smtp-Source: APiQypK6iom3TxtitcFG3fEyEhV0IQri7rGaW4po1K8ddZ+k0gAwKo+5fXC8PqAQAruae6CWSJ1r4g==
-X-Received: by 2002:a05:6000:1008:: with SMTP id a8mr22513570wrx.189.1586944166653;
-        Wed, 15 Apr 2020 02:49:26 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id l15sm21578535wmi.48.2020.04.15.02.49.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Apr 2020 02:49:26 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Cathy Avery <cavery@redhat.com>, pbonzini@redhat.com
-Cc:     wei.huang2@amd.com, Jim Mattson <jmattson@google.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH 0/2] KVM: SVM: Implement check_nested_events for NMI
-In-Reply-To: <20200414201107.22952-1-cavery@redhat.com>
-References: <20200414201107.22952-1-cavery@redhat.com>
-Date:   Wed, 15 Apr 2020 11:49:25 +0200
-Message-ID: <87zhbdw02i.fsf@vitty.brq.redhat.com>
+        id S2408747AbgDOKfS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Apr 2020 06:35:18 -0400
+Received: from foss.arm.com ([217.140.110.172]:41906 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2408738AbgDOKfM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Apr 2020 06:35:12 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9A8B11063;
+        Wed, 15 Apr 2020 03:35:11 -0700 (PDT)
+Received: from [192.168.2.22] (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C2C603F68F;
+        Wed, 15 Apr 2020 03:35:10 -0700 (PDT)
+Subject: Re: [PATCH kvmtool 14/18] virtio: Don't ignore initialization
+ failures
+To:     Alexandru Elisei <alexandru.elisei@arm.com>, kvm@vger.kernel.org
+Cc:     will@kernel.org, julien.thierry.kdev@gmail.com,
+        sami.mujawar@arm.com, lorenzo.pieralisi@arm.com
+References: <20200414143946.1521-1-alexandru.elisei@arm.com>
+ <20200414143946.1521-15-alexandru.elisei@arm.com>
+From:   =?UTF-8?Q?Andr=c3=a9_Przywara?= <andre.przywara@arm.com>
+Organization: ARM Ltd.
+Message-ID: <11851801-10bf-a906-beff-726107794788@arm.com>
+Date:   Wed, 15 Apr 2020 11:34:35 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <20200414143946.1521-15-alexandru.elisei@arm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Cathy Avery <cavery@redhat.com> writes:
+On 14/04/2020 15:39, Alexandru Elisei wrote:
+> Don't ignore an error in the bus specific initialization function in
+> virtio_init; don't ignore the result of virtio_init; and don't return 0
+> in virtio_blk__init and virtio_scsi__init when we encounter an error.
+> Hopefully this will save some developer's time debugging faulty virtio
+> devices in a guest.
+> 
+> To take advantage of the cleanup function virtio_blk__exit, move appending
+> the new device to the list before the call to virtio_init. Change
+> virtio_net__exit to free all allocated net_dev devices on exit, and
+> matching what virtio_blk__exit does.
+> 
+> To safeguard against this in the future, virtio_init has been annoted
+> with the compiler attribute warn_unused_result.
 
-> Moved nested NMI exit to new check_nested_events.
-> The second patch fixes the NMI pending race condition that now occurs.
->
-> Cathy Avery (2):
->   KVM: SVM: Implement check_nested_events for NMI
->   KVM: x86: check_nested_events if there is an injectable NMI
->
+Many thanks for doing those changes!
 
-Not directly related to this series but I just noticed that we have the
-following comment in inject_pending_event():
+> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 
-	/* try to inject new event if pending */
-	if (vcpu->arch.exception.pending) {
-                ...
-		if (vcpu->arch.exception.nr == DB_VECTOR) {
-			/*
-			 * This code assumes that nSVM doesn't use
-			 * check_nested_events(). If it does, the
-			 * DR6/DR7 changes should happen before L1
-			 * gets a #VMEXIT for an intercepted #DB in
-			 * L2.  (Under VMX, on the other hand, the
-			 * DR6/DR7 changes should not happen in the
-			 * event of a VM-exit to L1 for an intercepted
-			 * #DB in L2.)
-			 */
-			kvm_deliver_exception_payload(vcpu);
-			if (vcpu->arch.dr7 & DR7_GD) {
-				vcpu->arch.dr7 &= ~DR7_GD;
-				kvm_update_dr7(vcpu);
-			}
-		}
+Reviewed-by: Andre Przywara <andre.przywara@arm.com>
 
-		kvm_x86_ops.queue_exception(vcpu);
-	}
+Cheers,
+Andre
 
-As we already implement check_nested_events() on SVM, do we need to do
-anything here? CC: Jim who added the guardian (f10c729ff9652).
-
->  arch/x86/kvm/svm/nested.c | 21 +++++++++++++++++++++
->  arch/x86/kvm/svm/svm.c    |  2 +-
->  arch/x86/kvm/svm/svm.h    | 15 ---------------
->  arch/x86/kvm/x86.c        | 15 +++++++++++----
->  4 files changed, 33 insertions(+), 20 deletions(-)
-
--- 
-Vitaly
-
+> ---
+>  hw/vesa.c                |  2 +-
+>  include/kvm/kvm.h        |  1 +
+>  include/kvm/virtio.h     |  7 ++++---
+>  include/linux/compiler.h |  2 +-
+>  virtio/9p.c              |  9 +++++---
+>  virtio/balloon.c         | 10 ++++++---
+>  virtio/blk.c             | 14 ++++++++-----
+>  virtio/console.c         | 11 +++++++---
+>  virtio/core.c            |  9 ++++----
+>  virtio/net.c             | 45 ++++++++++++++++++++++++----------------
+>  virtio/scsi.c            | 14 ++++++++-----
+>  11 files changed, 78 insertions(+), 46 deletions(-)
+> 
