@@ -2,214 +2,169 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3F34B1AAEB4
-	for <lists+kvm@lfdr.de>; Wed, 15 Apr 2020 18:50:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 84DC21AAF25
+	for <lists+kvm@lfdr.de>; Wed, 15 Apr 2020 19:12:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2410429AbgDOQtT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Apr 2020 12:49:19 -0400
-Received: from mail.kernel.org ([198.145.29.99]:51074 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2404333AbgDOQtQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Apr 2020 12:49:16 -0400
-Received: from mail-io1-f46.google.com (mail-io1-f46.google.com [209.85.166.46])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 0353E20936
-        for <kvm@vger.kernel.org>; Wed, 15 Apr 2020 16:49:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1586969355;
-        bh=F9GmaurKbAsn0X4HPrA0BeOP+nd3evkoARWIjfwwJ94=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=DQV6LM0c01hMnRto0Mkcfdcl6xZX19i1ZkoL8UTdUGBuSTb04GWl2ocPQsaNbOTtb
-         C/bR7uu/aqhsOzrQqucI4yCSJwTkKlSwqKW2Ggk6tEQq5hkRhKsLO7mcLRV52syMj6
-         vbUaNmBWCNUw6a6iilr8R9WyLNT1KEozy7FBpvv4=
-Received: by mail-io1-f46.google.com with SMTP id f19so17828558iog.5
-        for <kvm@vger.kernel.org>; Wed, 15 Apr 2020 09:49:14 -0700 (PDT)
-X-Gm-Message-State: AGi0PuZ5OyNCvv4ErYqTPuJXr6R5qHVSr/YOEL/WcRIDDjaXUinTAEMJ
-        PbKZjrUEUasvHSKkXtCjbfmUKNKwGJFBB+jCjNA=
-X-Google-Smtp-Source: APiQypJWGMRiNduUYPB9oJ7u8KNJwMs3LO6HUvUASLH07gImZaYwmVp66Og1pCmupdLk+f0b5w/3jrmg4Ku7V8LKgKI=
-X-Received: by 2002:a5e:8b47:: with SMTP id z7mr26739930iom.16.1586969354138;
- Wed, 15 Apr 2020 09:49:14 -0700 (PDT)
+        id S2410687AbgDORKX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Apr 2020 13:10:23 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:53974 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S2406230AbgDORKW (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 15 Apr 2020 13:10:22 -0400
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 03FH31Nu070056;
+        Wed, 15 Apr 2020 13:10:17 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 30dnmutvcb-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 15 Apr 2020 13:10:17 -0400
+Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 03FH36iB070295;
+        Wed, 15 Apr 2020 13:10:16 -0400
+Received: from ppma04wdc.us.ibm.com (1a.90.2fa9.ip4.static.sl-reverse.com [169.47.144.26])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 30dnmutvby-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 15 Apr 2020 13:10:16 -0400
+Received: from pps.filterd (ppma04wdc.us.ibm.com [127.0.0.1])
+        by ppma04wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 03FH7uBv019345;
+        Wed, 15 Apr 2020 17:10:15 GMT
+Received: from b03cxnp07029.gho.boulder.ibm.com (b03cxnp07029.gho.boulder.ibm.com [9.17.130.16])
+        by ppma04wdc.us.ibm.com with ESMTP id 30b5h6ueq3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 15 Apr 2020 17:10:15 +0000
+Received: from b03ledav005.gho.boulder.ibm.com (b03ledav005.gho.boulder.ibm.com [9.17.130.236])
+        by b03cxnp07029.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 03FHACnI61473156
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 15 Apr 2020 17:10:12 GMT
+Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 4C225BE05F;
+        Wed, 15 Apr 2020 17:10:12 +0000 (GMT)
+Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2C7DCBE051;
+        Wed, 15 Apr 2020 17:10:11 +0000 (GMT)
+Received: from cpe-172-100-172-46.stny.res.rr.com (unknown [9.85.131.104])
+        by b03ledav005.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Wed, 15 Apr 2020 17:10:10 +0000 (GMT)
+From:   Tony Krowiak <akrowiak@linux.ibm.com>
+Subject: Re: [PATCH v7 03/15] s390/zcrypt: driver callback to indicate
+ resource in use
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, freude@linux.ibm.com, borntraeger@de.ibm.com,
+        mjrosato@linux.ibm.com, pmorel@linux.ibm.com, pasic@linux.ibm.com,
+        alex.williamson@redhat.com, kwankhede@nvidia.com,
+        jjherne@linux.ibm.com, fiuczy@linux.ibm.com
+References: <20200407192015.19887-1-akrowiak@linux.ibm.com>
+ <20200407192015.19887-4-akrowiak@linux.ibm.com>
+ <20200414145851.562867ae.cohuck@redhat.com>
+Message-ID: <35d8c3cb-78bb-8f84-41d8-c6e59d201ba0@linux.ibm.com>
+Date:   Wed, 15 Apr 2020 13:10:10 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-References: <20200221165532.90618-1-andre.przywara@arm.com>
- <2d3bad43-10a5-3ee1-72e7-e1da1d6c65dd@arm.com> <CAMj1kXGUiCLvmJUwrxCc8aHdE30WWfa95ou-tEM8Kv0nj2GdDA@mail.gmail.com>
- <CAMj1kXF6iw47MM_tg5izB9KC-N2zrnQbhwT2TVPOuKdpOBX=ow@mail.gmail.com>
- <d9ae6d29-c2c5-6aa7-15b6-6549fc89c043@arm.com> <CAMj1kXHKOBbCKsgYOYuLU+vOALBUbNRysVfVRpKXkh00GvTtEA@mail.gmail.com>
- <32355204-30b1-4615-0d08-b484f0340e82@arm.com>
-In-Reply-To: <32355204-30b1-4615-0d08-b484f0340e82@arm.com>
-From:   Ard Biesheuvel <ardb@kernel.org>
-Date:   Wed, 15 Apr 2020 18:49:02 +0200
-X-Gmail-Original-Message-ID: <CAMj1kXG5aE9AjpKG28Ftsta6hOrP3aHMMYLvmVNUkRYsSeBfGg@mail.gmail.com>
-Message-ID: <CAMj1kXG5aE9AjpKG28Ftsta6hOrP3aHMMYLvmVNUkRYsSeBfGg@mail.gmail.com>
-Subject: Re: [PATCH kvmtool v3] Add emulation for CFI compatible flash memory
-To:     =?UTF-8?Q?Andr=C3=A9_Przywara?= <andre.przywara@arm.com>
-Cc:     Alexandru Elisei <alexandru.elisei@arm.com>, sami.mujawar@arm.com,
-        Will Deacon <will@kernel.org>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        kvm@vger.kernel.org, Raphael Gault <raphael.gault@arm.com>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        kvmarm <kvmarm@lists.cs.columbia.edu>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20200414145851.562867ae.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.676
+ definitions=2020-04-15_06:2020-04-14,2020-04-15 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ clxscore=1015 impostorscore=0 suspectscore=3 bulkscore=0 malwarescore=0
+ phishscore=0 lowpriorityscore=0 mlxlogscore=999 spamscore=0 mlxscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2004150124
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 15 Apr 2020 at 18:36, Andr=C3=A9 Przywara <andre.przywara@arm.com> =
-wrote:
->
-> On 15/04/2020 17:20, Ard Biesheuvel wrote:
-> > On Wed, 15 Apr 2020 at 18:11, Andr=C3=A9 Przywara <andre.przywara@arm.c=
-om> wrote:
-> >>
-> >> On 15/04/2020 16:55, Ard Biesheuvel wrote:
-> >>> On Wed, 15 Apr 2020 at 17:43, Ard Biesheuvel <ardb@kernel.org> wrote:
-> >>>>
-> >>>> On Tue, 7 Apr 2020 at 17:15, Alexandru Elisei <alexandru.elisei@arm.=
-com> wrote:
-> >>>>>
-> >>>>> Hi,
-> >>>>>
-> >>>>> I've tested this patch by running badblocks and fio on a flash devi=
-ce inside a
-> >>>>> guest, everything worked as expected.
-> >>>>>
-> >>>>> I've also looked at the flowcharts for device operation from Intel =
-Application
-> >>>>> Note 646, pages 12-21, and they seem implemented correctly.
-> >>>>>
-> >>>>> A few minor issues below.
-> >>>>>
-> >>>>> On 2/21/20 4:55 PM, Andre Przywara wrote:
-> >>>>>> From: Raphael Gault <raphael.gault@arm.com>
-> >>>>>>
-> >>>>>> The EDK II UEFI firmware implementation requires some storage for =
-the EFI
-> >>>>>> variables, which is typically some flash storage.
-> >>>>>> Since this is already supported on the EDK II side, we add a CFI f=
-lash
-> >>>>>> emulation to kvmtool.
-> >>>>>> This is backed by a file, specified via the --flash or -F command =
-line
-> >>>>>> option. Any flash writes done by the guest will immediately be ref=
-lected
-> >>>>>> into this file (kvmtool mmap's the file).
-> >>>>>> The flash will be limited to the nearest power-of-2 size, so only =
-the
-> >>>>>> first 2 MB of a 3 MB file will be used.
-> >>>>>>
-> >>>>>> This implements a CFI flash using the "Intel/Sharp extended comman=
-d
-> >>>>>> set", as specified in:
-> >>>>>> - JEDEC JESD68.01
-> >>>>>> - JEDEC JEP137B
-> >>>>>> - Intel Application Note 646
-> >>>>>> Some gaps in those specs have been filled by looking at real devic=
-es and
-> >>>>>> other implementations (QEMU, Linux kernel driver).
-> >>>>>>
-> >>>>>> At the moment this relies on DT to advertise the base address of t=
-he
-> >>>>>> flash memory (mapped into the MMIO address space) and is only enab=
-led
-> >>>>>> for ARM/ARM64. The emulation itself is architecture agnostic, thou=
-gh.
-> >>>>>>
-> >>>>>> This is one missing piece toward a working UEFI boot with kvmtool =
-on
-> >>>>>> ARM guests, the other is to provide writable PCI BARs, which is WI=
-P.
-> >>>>>>
-> >>>>
-> >>>> I have given this a spin with UEFI built for kvmtool, and it appears
-> >>>> to be working correctly. However, I noticed that it is intolerably
-> >>>> slow, which seems to be caused by the fact that both array mode and
-> >>>> command mode (or whatever it is called in the CFI spec) are fully
-> >>>> emulated, whereas in the QEMU implementation (for instance), the
-> >>>> region is actually exposed to the guest using a read-only KVM memslo=
-t
-> >>>> in array mode, and so the read accesses are made natively.
-> >>>>
-> >>>> It is also causing problems in the UEFI implementation, as we can no
-> >>>> longer use unaligned accesses to read from the region, which is
-> >>>> something the code currently relies on (and which works fine on actu=
-al
-> >>>> hardware as long as you use normal non-cacheable mappings)
-> >>>>
-> >>>
-> >>> Actually, the issue is not alignment. The issue is with instructions
-> >>> with multiple outputs, which means you cannot do an ordinary memcpy()
-> >>> from the NOR region using ldp instructions, aligned or not.
-> >>
-> >> Yes, we traced that down to an "ldrb with post-inc", in the memcpy cod=
-e.
-> >> My suggestion was to provide a version of memcpy_{from,to}_io(), as
-> >> Linux does, which only uses MMIO accessors to avoid "fancy" instructio=
-ns.
-> >>
-> >
-> > That is possible, and the impact on the code is manageable, given the
-> > modular nature of EDK2.
-> >
-> >> Back at this point I was challenging the idea of accessing a flash
-> >> device with a normal memory mapping, because of it failing when being =
-in
-> >> some query mode. Do you know of any best practices for flash mappings?
-> >> Are two mappings common?
-> >>
-> >
-> > In the QEMU port of EDK2, we use normal non-cacheable for the first
-> > flash device, which contains the executable image, and is not
-> > updatable by the guest. The second flash bank is used for the variable
-> > store, and is actually mapped as a device all the time.
-> >
-> > Another thing I just realized is that you cannot fetch instructions
-> > from an emulated flash device either, so to execute from NOR flash,
-> > you will need a true memory mapping as well.
->
-> Wait, did you put the whole of EDK-2 image in the flash?
 
-No, my point is that you cannot actually do that, since I don't think
-you can fetch instructions using MMIO emulation.
 
-> My assumption
-> (and testing) was to use
+On 4/14/20 8:58 AM, Cornelia Huck wrote:
+> On Tue,  7 Apr 2020 15:20:03 -0400
+> Tony Krowiak <akrowiak@linux.ibm.com> wrote:
 >
-> $ lkvm run -f KVMTOOL_EFI.fd --flash just_the_variables.img
+>> Introduces a new driver callback to prevent a root user from unbinding
+>> an AP queue from its device driver if the queue is in use. The intent of
+>> this callback is to provide a driver with the means to prevent a root user
+>> from inadvertently taking a queue away from a guest and giving it to the
+>> host while the guest is still using it. The callback will
+>> be invoked whenever a change to the AP bus's sysfs apmask or aqmask
+>> attributes would result in one or more AP queues being removed from its
+>> driver. If the callback responds in the affirmative for any driver
+>> queried, the change to the apmask or aqmask will be rejected with a device
+>> in use error.
+>>
+>> For this patch, only non-default drivers will be queried. Currently,
+>> there is only one non-default driver, the vfio_ap device driver. The
+>> vfio_ap device driver manages AP queues passed through to one or more
+>> guests and we don't want to unexpectedly take AP resources away from
+>> guests which are most likely independently administered.
+>>
+>> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
+>> ---
+>>   drivers/s390/crypto/ap_bus.c | 144 +++++++++++++++++++++++++++++++++--
+>>   drivers/s390/crypto/ap_bus.h |   4 +
+>>   2 files changed, 142 insertions(+), 6 deletions(-)
+> (...)
 >
-> Hence my ignorance about performance, because it would just be a few
-> bytes written/read. -f loads the firmware image into guest RAM.
+>> @@ -1196,12 +1202,75 @@ static ssize_t apmask_show(struct bus_type *bus, char *buf)
+>>   	return rc;
+>>   }
+>>   
+>> +int __verify_card_reservations(struct device_driver *drv, void *data)
+>> +{
+>> +	int rc = 0;
+>> +	struct ap_driver *ap_drv = to_ap_drv(drv);
+>> +	unsigned long *newapm = (unsigned long *)data;
+>> +
+>> +	/*
+>> +	 * If the reserved bits do not identify cards reserved for use by the
+>> +	 * non-default driver, there is no need to verify the driver is using
+>> +	 * the queues.
+> I had to read that one several times... what about
+> "No need to verify whether the driver is using the queues if it is the
+> default driver."
+>
+> ?
+
+Sure, that's better.
+
+>
+>> +	 */
+>> +	if (ap_drv->flags & AP_DRIVER_FLAG_DEFAULT)
+>> +		return 0;
+>> +
+>> +	/* The non-default driver's module must be loaded */
+>> +	if (!try_module_get(drv->owner))
+>> +		return 0;
+> Is that really needed? I would have thought that the driver core's
+> klist usage would make sure that the callback would not be invoked for
+> drivers that are not registered anymore. Or am I missing a window?
+>
+>> +
+>> +	if (ap_drv->in_use)
+>> +		if (ap_drv->in_use(newapm, ap_perms.aqm))
+> Can we log the offending apm somewhere, preferably with additional info
+> that allows the admin to figure out why an error was returned?
+
+One of the things on my TODO list is to add logging to the vfio_ap
+module which will track all significant activity within the device
+driver. I plan to do that with a patch or set of patches specifically
+put together for that purpose. Having said that, the best place to
+log this would be in the in_use callback in the vfio_ap device driver
+(see next patch) where the APQNs that are in use can be identified.
+For now, I will log a message to the dmesg log indicating which
+APQNs are in use by the matrix mdev.
+
+>
+>> +			rc = -EADDRINUSE;
+>> +
+>> +	module_put(drv->owner);
+>> +
+>> +	return rc;
+>> +}
+> (Same comments for the other changes further along in this patch.)
 >
 
-No, the performance impact is due to the numerous variable accesses
-done by UEFI during boot.
-
-> > So in summary, I think the mode switch is needed to be generally
-> > useful, even if the current approach is sufficient for (slow)
-> > read/write using special memory accessors.
->
-> Well,in hindsight I regret pursuing this whole flash emulation approach
-> in kvmtool in the first place. Just some magic "this memory region is
-> persistent" (mmapping a file and presenting as a memslot) would be
-> *much* easier on the kvmtool side. It just seems that there wasn't any
-> good DT binding or existing device class for this (to my surprise), or
-> at least not one without issues. And then EDK-2 had this CFI flash
-> support already, so we figured this should be the way to go. We just
-> need some emulation code ... months later ...
->
-> So do you know of some persistent storage device we could use? This
-> would come at the cost of adding support to EDK-2, but I guess it should
-> be straight-forward given the simple semantic?
->
-
-I think emulating CFI is still the right approach, since it gives us
-parity with QEMU and actual hardware. Alternatively, we could explore
-paravirtualization of the secure UEFI variable store implementation
-using the standalone MM stack (which runs at S-EL0 but could easily
-run at NS-EL0 as well) and an implementation of the secure partition
-manager interface inside kvmtool. This would actually give us an
-implementation of UEFI secure boot that actually makes sense, since
-the guest would not be able to manipulate the backing store directly.
-
-But this is a whole other project ...
