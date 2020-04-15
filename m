@@ -2,319 +2,164 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7C8031A8F69
-	for <lists+kvm@lfdr.de>; Wed, 15 Apr 2020 02:00:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 61F7F1A8F93
+	for <lists+kvm@lfdr.de>; Wed, 15 Apr 2020 02:13:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2634513AbgDNX5v convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Tue, 14 Apr 2020 19:57:51 -0400
-Received: from mga12.intel.com ([192.55.52.136]:12062 "EHLO mga12.intel.com"
+        id S2392298AbgDOAMT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Apr 2020 20:12:19 -0400
+Received: from mga07.intel.com ([134.134.136.100]:31764 "EHLO mga07.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1732131AbgDNX5m (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Apr 2020 19:57:42 -0400
-IronPort-SDR: UU4GOJYsdsEUhlcjA/U1Sn1TWeFnxslnDYcAAx+bzQuEsbKpFtUwLxjuRJtisjuQNEr3Y1hcMG
- UqNfAWe1Q2jQ==
+        id S2392296AbgDOAMN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Apr 2020 20:12:13 -0400
+IronPort-SDR: 0P2lk6TSsjQPUtcNP9Z7nuW9xKGBYan9+w17XBvJG6lpCOS/sItrc1pvdibLagZkspJJxHHDt/
+ lcyR1iZrI1Bw==
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Apr 2020 16:57:38 -0700
-IronPort-SDR: Pwjf1VDhFVZLSwGmMYvye6Nz/aHWw/j6AN8eCIzW7qqmiXwulZ/w2GxpB3X/8Ulf4U56bpac0T
- T6CL8FruPd7A==
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Apr 2020 17:12:12 -0700
+IronPort-SDR: xGb94qhVVOvjF/eCAyfOfm6GXKVJ0Wh3L7nFb6d44n+RwWNf7Rg5+zXixY8ZwWkTCHdj85IQVa
+ j//9p59GQBLw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.72,384,1580803200"; 
-   d="scan'208";a="277437693"
-Received: from fmsmsx106.amr.corp.intel.com ([10.18.124.204])
-  by fmsmga004.fm.intel.com with ESMTP; 14 Apr 2020 16:57:38 -0700
-Received: from fmsmsx120.amr.corp.intel.com (10.18.124.208) by
- FMSMSX106.amr.corp.intel.com (10.18.124.204) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Tue, 14 Apr 2020 16:57:38 -0700
-Received: from shsmsx152.ccr.corp.intel.com (10.239.6.52) by
- fmsmsx120.amr.corp.intel.com (10.18.124.208) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Tue, 14 Apr 2020 16:57:37 -0700
-Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.225]) by
- SHSMSX152.ccr.corp.intel.com ([169.254.6.209]) with mapi id 14.03.0439.000;
- Wed, 15 Apr 2020 07:57:34 +0800
-From:   "Tian, Kevin" <kevin.tian@intel.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-CC:     "Raj, Ashok" <ashok.raj@linux.intel.com>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Tian, Jun J" <jun.j.tian@intel.com>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Sun, Yi Y" <yi.y.sun@intel.com>,
-        "Bjorn Helgaas" <bhelgaas@google.com>,
-        "Wu, Hao" <hao.wu@intel.com>, Don Dutile <ddutile@redhat.com>
-Subject: RE: [PATCH v1 2/2] vfio/pci: Emulate PASID/PRI capability for VFs
-Thread-Topic: [PATCH v1 2/2] vfio/pci: Emulate PASID/PRI capability for VFs
-Thread-Index: AQHWAEVGCz5QQWvL/U+nYnlD7MiZ7Khl/jEAgACVNICAAJ/EgIAF8c6ggAA/A4CAAMnRgIAAzpAAgAb/OoCAAMrPQIAAC1kAgAA5CgCAAPxYkP//i8oAgACGwnCAAEEggIABEuCg
-Date:   Tue, 14 Apr 2020 23:57:33 +0000
-Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D19D81F946@SHSMSX104.ccr.corp.intel.com>
-References: <1584880394-11184-1-git-send-email-yi.l.liu@intel.com>
-        <1584880394-11184-3-git-send-email-yi.l.liu@intel.com>
-        <20200402165954.48d941ee@w520.home>
-        <A2975661238FB949B60364EF0F2C25743A2204FE@SHSMSX104.ccr.corp.intel.com>
-        <20200403112545.6c115ba3@w520.home>
-        <AADFC41AFE54684AB9EE6CBC0274A5D19D80E13D@SHSMSX104.ccr.corp.intel.com>
-        <20200407095801.648b1371@w520.home>     <20200408040021.GS67127@otc-nc-03>
-        <20200408101940.3459943d@w520.home>
-        <20200413031043.GA18183@araj-mobl1.jf.intel.com>
-        <AADFC41AFE54684AB9EE6CBC0274A5D19D81A31F@SHSMSX104.ccr.corp.intel.com>
-        <20200413132122.46825849@w520.home>
-        <AADFC41AFE54684AB9EE6CBC0274A5D19D81D376@SHSMSX104.ccr.corp.intel.com>
-        <20200413212836.117b4c86@x1.home>
-        <AADFC41AFE54684AB9EE6CBC0274A5D19D81D456@SHSMSX104.ccr.corp.intel.com>
- <20200414092401.039edef6@w520.home>
-In-Reply-To: <20200414092401.039edef6@w520.home>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-version: 11.2.0.6
-dlp-reaction: no-action
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+   d="scan'208";a="400126101"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
+  by orsmga004.jf.intel.com with ESMTP; 14 Apr 2020 17:12:12 -0700
+Date:   Tue, 14 Apr 2020 17:12:12 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Jim Mattson <jmattson@google.com>
+Cc:     kvm list <kvm@vger.kernel.org>, Oliver Upton <oupton@google.com>,
+        Peter Shier <pshier@google.com>
+Subject: Re: [PATCH 2/2] kvm: nVMX: Single-step traps trump expired
+ VMX-preemption timer
+Message-ID: <20200415001212.GA12547@linux.intel.com>
+References: <20200414000946.47396-1-jmattson@google.com>
+ <20200414000946.47396-2-jmattson@google.com>
+ <20200414031705.GP21204@linux.intel.com>
+ <CALMp9eT23AUTU3m_oADKw3O_NMpuX3crx7eqSB8Rbgh3k0s_Jw@mail.gmail.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CALMp9eT23AUTU3m_oADKw3O_NMpuX3crx7eqSB8Rbgh3k0s_Jw@mail.gmail.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> From: Alex Williamson <alex.williamson@redhat.com>
-> Sent: Tuesday, April 14, 2020 11:24 PM
-> 
-> On Tue, 14 Apr 2020 03:42:42 +0000
-> "Tian, Kevin" <kevin.tian@intel.com> wrote:
-> 
-> > > From: Alex Williamson <alex.williamson@redhat.com>
-> > > Sent: Tuesday, April 14, 2020 11:29 AM
-> > >
-> > > On Tue, 14 Apr 2020 02:40:58 +0000
-> > > "Tian, Kevin" <kevin.tian@intel.com> wrote:
-> > >
-> > > > > From: Alex Williamson <alex.williamson@redhat.com>
-> > > > > Sent: Tuesday, April 14, 2020 3:21 AM
-> > > > >
-> > > > > On Mon, 13 Apr 2020 08:05:33 +0000
-> > > > > "Tian, Kevin" <kevin.tian@intel.com> wrote:
-> > > > >
-> > > > > > > From: Tian, Kevin
-> > > > > > > Sent: Monday, April 13, 2020 3:55 PM
-> > > > > > >
-> > > > > > > > From: Raj, Ashok <ashok.raj@linux.intel.com>
-> > > > > > > > Sent: Monday, April 13, 2020 11:11 AM
-> > > > > > > >
-> > > > > > > > On Wed, Apr 08, 2020 at 10:19:40AM -0600, Alex Williamson
-> wrote:
-> > > > > > > > > On Tue, 7 Apr 2020 21:00:21 -0700
-> > > > > > > > > "Raj, Ashok" <ashok.raj@intel.com> wrote:
-> > > > > > > > >
-> > > > > > > > > > Hi Alex
-> > > > > > > > > >
-> > > > > > > > > > + Bjorn
-> > > > > > > > >
-> > > > > > > > >  + Don
-> > > > > > > > >
-> > > > > > > > > > FWIW I can't understand why PCI SIG went different ways
-> with
-> > > ATS,
-> > > > > > > > > > where its enumerated on PF and VF. But for PASID and PRI its
-> > > only
-> > > > > > > > > > in PF.
-> > > > > > > > > >
-> > > > > > > > > > I'm checking with our internal SIG reps to followup on that.
-> > > > > > > > > >
-> > > > > > > > > > On Tue, Apr 07, 2020 at 09:58:01AM -0600, Alex Williamson
-> > > wrote:
-> > > > > > > > > > > > Is there vendor guarantee that hidden registers will locate
-> at
-> > > the
-> > > > > > > > > > > > same offset between PF and VF config space?
-> > > > > > > > > > >
-> > > > > > > > > > > I'm not sure if the spec really precludes hidden registers,
-> but
-> > > the
-> > > > > > > > > > > fact that these registers are explicitly outside of the
-> capability
-> > > > > > > > > > > chain implies they're only intended for device specific use,
-> so
-> > > I'd
-> > > > > say
-> > > > > > > > > > > there are no guarantees about anything related to these
-> > > registers.
-> > > > > > > > > >
-> > > > > > > > > > As you had suggested in the other thread, we could consider
-> > > > > > > > > > using the same offset as in PF, but even that's a better guess
-> > > > > > > > > > still not reliable.
-> > > > > > > > > >
-> > > > > > > > > > The other option is to maybe extend driver ops in the PF to
-> > > expose
-> > > > > > > > > > where the offsets should be. Sort of adding the quirk in the
-> > > > > > > > > > implementation.
-> > > > > > > > > >
-> > > > > > > > > > I'm not sure how prevalent are PASID and PRI in VF devices. If
-> > > SIG is
-> > > > > > > > resisting
-> > > > > > > > > > making VF's first class citizen, we might ask them to add
-> some
-> > > > > verbiage
-> > > > > > > > > > to suggest leave the same offsets as PF open to help
-> emulation
-> > > > > software.
-> > > > > > > > >
-> > > > > > > > > Even if we know where to expose these capabilities on the VF,
-> it's
-> > > not
-> > > > > > > > > clear to me how we can actually virtualize the capability itself.
-> If
-> > > > > > > > > the spec defines, for example, an enable bit as r/w then
-> software
-> > > that
-> > > > > > > > > interacts with that register expects the bit is settable.  There's
-> no
-> > > > > > > > > protocol for "try to set the bit and re-read it to see if the
-> hardware
-> > > > > > > > > accepted it".  Therefore a capability with a fixed enable bit
-> > > > > > > > > representing the state of the PF, not settable by the VF, is
-> > > > > > > > > disingenuous to the spec.
-> > > > > > > >
-> > > > > > > > I think we are all in violent agreement. A lot of times the pci spec
-> > > gets
-> > > > > > > > defined several years ahead of real products and no one
-> > > remembers
-> > > > > > > > the justification on why they restricted things the way they did.
-> > > > > > > >
-> > > > > > > > Maybe someone early product wasn't quite exposing these
-> features
-> > > to
-> > > > > the
-> > > > > > > > VF
-> > > > > > > > and hence the spec is bug compatible :-)
-> > > > > > > >
-> > > > > > > > >
-> > > > > > > > > If what we're trying to do is expose that PASID and PRI are
-> enabled
-> > > on
-> > > > > > > > > the PF to a VF driver, maybe duplicating the PF capabilities on
-> the
-> > > VF
-> > > > > > > > > without the ability to control it is not the right approach.
-> Maybe
-> > > we
-> > > > > > > >
-> > > > > > > > As long as the capability enable is only provided when the PF has
-> > > > > enabled
-> > > > > > > > the feature. Then it seems the hardware seems to do the right
-> thing.
-> > > > > > > >
-> > > > > > > > Assume we expose PASID/PRI only when PF has enabled it. It will
-> be
-> > > the
-> > > > > > > > case since the PF driver needs to exist, and IOMMU would have
-> set
-> > > the
-> > > > > > > > PASID/PRI/ATS on PF.
-> > > > > > > >
-> > > > > > > > If the emulation is purely spoofing the capability. Once vIOMMU
-> > > driver
-> > > > > > > > enables PASID, the context entries for the VF are completely
-> > > > > independent
-> > > > > > > > from the PF context entries.
-> > > > > > > >
-> > > > > > > > vIOMMU would enable PASID, and we just spoof the PASID
-> > > capability.
-> > > > > > > >
-> > > > > > > > If vIOMMU or guest for some reason does disable_pasid(), then
-> the
-> > > > > > > > vIOMMU driver can disaable PASID on the VF context entries. So
-> the
-> > > VF
-> > > > > > > > although the capability is blanket enabled on PF, IOMMU
-> gaurantees
-> > > > > the
-> > > > > > > > transactions are blocked.
-> > > > > > > >
-> > > > > > > >
-> > > > > > > > In the interim, it seems like the intent of the virtual capability
-> > > > > > > > can be honored via help from the IOMMU for the controlling
-> aspect..
-> > > > > > > >
-> > > > > > > > Did i miss anything?
-> > > > > > >
-> > > > > > > Above works for emulating the enable bit (under the assumption
-> that
-> > > > > > > PF driver won't disable pasid when vf is assigned). However, there
-> are
-> > > > > > > also "Execute permission enable" and "Privileged mode enable"
-> bits in
-> > > > > > > PASID control registers. I don't know how those bits could be
-> cleanly
-> > > > > > > emulated when the guest writes a value different from PF's...
-> > > > > >
-> > > > > > sent too quick. the IOMMU also includes control bits for allowing/
-> > > > > > blocking execute requests and supervisor requests. We can rely on
-> > > > > > IOMMU to block those requests to emulate the disabled cases of
-> > > > > > all three control bits in the pasid cap.
-> > > > >
-> > > > >
-> > > > > So if the emulation of the PASID capability takes into account the
-> > > > > IOMMU configuration to back that emulation, shouldn't we do that
-> > > > > emulation in the hypervisor, ie. QEMU, rather than the kernel vfio
-> > > > > layer?  Thanks,
-> > > > >
-> > > > > Alex
-> > > >
-> > > > We need enforce it in physical IOMMU, to ensure that even the
-> > > > VF may send requests which violate the guest expectation those
-> > > > requests are always blocked by IOMMU. Kernel vfio identifies
-> > > > such need when emulating the pasid cap and then forward the
-> > > > request to host iommu driver.
-> > >
-> > > Implementing this in the kernel would be necessary if we needed to
-> > > protect from the guest device doing something bad to the host or
-> > > other devices.  Making sure the physical IOMMU is configured to meet
-> > > guest expectations doesn't sound like it necessarily falls into that
-> > > category.  We do that on a regular basis to program the DMA mappings.
-> > > Tell me more about why the hypervisor can't handle this piece of
-> > > guest/host synchronization on top of all the other things it
-> > > synchronizes to make a VM.  Thanks,
-> > >
+On Tue, Apr 14, 2020 at 09:47:53AM -0700, Jim Mattson wrote:
+> On Mon, Apr 13, 2020 at 8:17 PM Sean Christopherson
+> <sean.j.christopherson@intel.com> wrote:
 > >
-> > I care more about "execution permission" and "privileged mode".
-> > It might be dangerous when the guest disallows the VF from sending
-> 
-> "Dangerous" how?  We're generally ok with the user managing their own
-> consistency, it's when the user can affect other users/devices that we
-> require vfio in the kernel to actively manage something.  There's a very
-> different scope to the vfio-pci kernel module implementing a fake
-> capability and trying to make it behave indistinguishably from the real
-> capability versus a userspace driver piecing together an emulation
-> that's good enough for their purposes.  Thanks,
->
-
-How could emulation fix this gap when the VF DMAs don't go through
-the vIOMMU? What you explained all makes sense before talking about
-the emulation of PASID capability, i.e. vfio only cares about isolation 
-between assigned devices. However now vfio exposes a capability 
-which is shared by PF/VF while pure software emulation may break 
-the guest expectation, and now the only viable mitigation is to get 
-the help from physical IOMMU. then why cannot vfio include such 
-mitigation in its emulation of the PASID capability? 
-
-Thanks
-Kevin
-
-> 
-> > DMA requests which have the execute or privileged bit set while the VF
-> > can still do so w/o proper protection in the IOMMU. This is all about
-> > vSVA for vfio devices, where the guest page table is directly linked in
-> > IOMMU and vfio doesn't participate in the specific DMA mappings. if
-> > an emulated device includes a pasid cap, Qemu vIOMMU will handle
-> > it for sure.
+> > On Mon, Apr 13, 2020 at 05:09:46PM -0700, Jim Mattson wrote:
+> > > Previously, if the hrtimer for the nested VMX-preemption timer fired
+> > > while L0 was emulating an L2 instruction with RFLAGS.TF set, the
+> > > synthesized single-step trap would be unceremoniously dropped when
+> > > synthesizing the "VMX-preemption timer expired" VM-exit from L2 to L1.
+> > >
+> > > To fix this, don't synthesize a "VMX-preemption timer expired" VM-exit
+> > > from L2 to L1 when there is a pending debug trap, such as a
+> > > single-step trap.
+> > >
+> > > Fixes: f4124500c2c13 ("KVM: nVMX: Fully emulate preemption timer")
+> > > Signed-off-by: Jim Mattson <jmattson@google.com>
+> > > Reviewed-by: Oliver Upton <oupton@google.com>
+> > > Reviewed-by: Peter Shier <pshier@google.com>
+> > > ---
+> > >  arch/x86/kvm/vmx/nested.c | 4 +++-
+> > >  1 file changed, 3 insertions(+), 1 deletion(-)
+> > >
+> > > diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> > > index cbc9ea2de28f..6ab974debd44 100644
+> > > --- a/arch/x86/kvm/vmx/nested.c
+> > > +++ b/arch/x86/kvm/vmx/nested.c
+> > > @@ -3690,7 +3690,9 @@ static int vmx_check_nested_events(struct kvm_vcpu *vcpu)
+> > >           vmx->nested.preemption_timer_expired) {
+> > >               if (block_nested_events)
+> > >                       return -EBUSY;
+> > > -             nested_vmx_vmexit(vcpu, EXIT_REASON_PREEMPTION_TIMER, 0, 0);
+> > > +             if (!vmx_pending_dbg_trap(vcpu))
 > >
-> > Thanks
-> > Kevin
-> >
+> > IMO this one warrants a comment.  It's not immediately obvious that this
+> > only applies to #DBs that are being injected into L2, and that returning
+> > -EBUSY will do the wrong thing.
+> 
+> Regarding -EBUSY, I'm in complete agreement. However, I'm not sure
+> what the potential confusion is regarding the event. Are you
+> suggesting that one might think that we have a #DB to deliver to L1
+> while we're in guest mode? IIRC, that can happen under SVM, but I
+> don't believe it can happen under VMX.
+
+The potential confusion is that vcpu->arch.exception.pending was already
+checked, twice.  It makes one wonder why it needs to be checked a third
+time.  And actually, I think that's probably a good indicator that singling
+out single-step #DB isn't the correct fix, it just happens to be the only
+case that's been encountered thus far, e.g. a #PF when fetching the instr
+for emulation should also get priority over the preemption timer.  On real
+hardware, expiration of the preemption timer while vectoring a #PF wouldn't
+wouldn't get recognized until the next instruction boundary, i.e. at the
+start of the first instruction of the #PF handler.  Dropping the #PF isn't
+a problem in most cases, because unlike the single-step #DB, it will be
+re-encountered when L1 resumes L2.  But, dropping the #PF is still wrong.
+
+In general, interception of an event doesn't change the priority of events,
+e.g. INTR shouldn't get priority over NMI just because if L1 wants to
+intercept INTR but not NMI.
+
+TL;DR: I think the fix should instead be:
+
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index c868c64770e0..042d7a9037be 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -3724,9 +3724,10 @@ static int vmx_check_nested_events(struct kvm_vcpu *vcpu)
+        /*
+         * Process any exceptions that are not debug traps before MTF.
+         */
+-       if (vcpu->arch.exception.pending &&
+-           !vmx_pending_dbg_trap(vcpu) &&
+-           nested_vmx_check_exception(vcpu, &exit_qual)) {
++       if (vcpu->arch.exception.pending && !vmx_pending_dbg_trap(vcpu))
++               if (!nested_vmx_check_exception(vcpu, &exit_qual))
++                       return 0;
++
+                if (block_nested_events)
+                        return -EBUSY;
+                nested_vmx_inject_exception_vmexit(vcpu, exit_qual);
+@@ -3741,8 +3742,10 @@ static int vmx_check_nested_events(struct kvm_vcpu *vcpu)
+                return 0;
+        }
+
+-       if (vcpu->arch.exception.pending &&
+-           nested_vmx_check_exception(vcpu, &exit_qual)) {
++       if (vcpu->arch.exception.pending) {
++               if (!nested_vmx_check_exception(vcpu, &exit_qual))
++                       return 0;
++
+                if (block_nested_events)
+                        return -EBUSY;
+                nested_vmx_inject_exception_vmexit(vcpu, exit_qual);
+@@ -3757,7 +3760,10 @@ static int vmx_check_nested_events(struct kvm_vcpu *vcpu)
+                return 0;
+        }
+
+-       if (vcpu->arch.nmi_pending && nested_exit_on_nmi(vcpu)) {
++       if (vcpu->arch.nmi_pending) {
++               if (!nested_exit_on_nmi(vcpu))
++                       return 0;
++
+                if (block_nested_events)
+                        return -EBUSY;
+                nested_vmx_vmexit(vcpu, EXIT_REASON_EXCEPTION_NMI,
+@@ -3772,7 +3778,10 @@ static int vmx_check_nested_events(struct kvm_vcpu *vcpu)
+                return 0;
+        }
+
+-       if (kvm_cpu_has_interrupt(vcpu) && nested_exit_on_intr(vcpu)) {
++       if (kvm_cpu_has_interrupt(vcpu) {
++               if (!nested_exit_on_intr(vcpu))
++                       return 0;
++
+                if (block_nested_events)
+                        return -EBUSY;
+                nested_vmx_vmexit(vcpu, EXIT_REASON_EXTERNAL_INTERRUPT, 0, 0);
 
