@@ -2,179 +2,277 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EC7551A94C7
-	for <lists+kvm@lfdr.de>; Wed, 15 Apr 2020 09:42:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4AB631A94FC
+	for <lists+kvm@lfdr.de>; Wed, 15 Apr 2020 09:43:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2635236AbgDOHm3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Apr 2020 03:42:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60116 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2635175AbgDOHmV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Apr 2020 03:42:21 -0400
-Received: from mail-wr1-x442.google.com (mail-wr1-x442.google.com [IPv6:2a00:1450:4864:20::442])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F0D4C061A0C;
-        Wed, 15 Apr 2020 00:42:21 -0700 (PDT)
-Received: by mail-wr1-x442.google.com with SMTP id u13so17386247wrp.3;
-        Wed, 15 Apr 2020 00:42:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=NtXbCZDs7ibkcelB6jYoQjEYDWqEbd8VasJpaRXeEtw=;
-        b=ixuMqDNX+IoOhekTl1hWbPoOxx64db5GS2yOpkq13nssQ2oKhz4zBTwuSQc2VrtG6q
-         FRzkGS1LY6x9nmcWU4wN/1wrc/ulzJ7/7aylISrwfJikQ0huarxRRgqL5TCTo/g2fLhP
-         q9YVlkGzU/9QUowv859Gjx59ZxNCIBTY4gjZvG8OMAIl9xkPwD/m6XGEjpcksFQe2wd/
-         yxtNSX/gx9WNwt0VOYglCcpa9TWqhepgvNIiaaoVVh/YrXsPc4NjaImNS33+aOhWAWcG
-         12YcOOW1c0Dy3LrrUegvVjgyGgzGxJsRYOrZKXBo3qZZcy2MqxJJTqP4JeJmPHtTtQAv
-         Gcww==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=NtXbCZDs7ibkcelB6jYoQjEYDWqEbd8VasJpaRXeEtw=;
-        b=uacYOJYpJCFRR9o5yn9fasXhrYBqCO3vDHgKUZUWnkpoYg0dgRBoGZnVb1csjw/GOd
-         SKaOn8d/qYGBrkjI3GGbZtMsqBQfqA4A1f0bK5zSzIq3vmGacbcwX6+OTi+kN2WQNZ2u
-         SLwtH1KaWQOVvCFb6/L9T7KbvxRe+PahEfDmGw3OI6CnV8EwAIEmFkZkVaPi2Demszue
-         Am98CaKDsifWVvnJQlEbY/IJTzCcM3RbgFwK1R65ZVVNc08G7y4b+Z88DqmSNjdiOFny
-         u/2wBzwFSWVYk9Mf5EV4ef2TqN/9lXvg1fxdJpwsZ+gwj6faHBHMZ6XvQZPp4tVkHT+v
-         Mz1A==
-X-Gm-Message-State: AGi0PuaAFaVHtA3/hfO3U6P+iAwMNxKNWsp/qNB+IshT52+eDxt45cfC
-        TrAq3f4jJt8Kua9bCcGc9WU5rOMYiWObkU5rUIo=
-X-Google-Smtp-Source: APiQypLdNC089W+BRnfSD6BJAuS9Fq32ncyasRH+4xBCau93mDuIW3Mqg/0mjusEJ42V63dCpLPpL5YV+LYfdUXuDCs=
-X-Received: by 2002:a5d:4d8f:: with SMTP id b15mr6609450wru.107.1586936539667;
- Wed, 15 Apr 2020 00:42:19 -0700 (PDT)
+        id S2635255AbgDOHna (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Apr 2020 03:43:30 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:48347 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S2635245AbgDOHnX (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 15 Apr 2020 03:43:23 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1586936601;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=1OHfgn9pPaDAsC+K8et0tvkSEtEL5Qfqe8kjye9uA/o=;
+        b=BD+JWslc2xokOS+582PkwkI+6wM2nq/8fetaFbxuluDPhyEYYjjyT+Z0S/nYjxW5aBWRKP
+        xYyLHvzln4VlPXI962yjSUCar/D2iUD0QA3rDBBRWOUj2GAfXFozdb90SeTUTC1DJYmI1m
+        A1yz/YUVKCvppbw68eYgbEY68drGPgw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-463-XK4FppVTPWSD-eyzXPObBg-1; Wed, 15 Apr 2020 03:43:17 -0400
+X-MC-Unique: XK4FppVTPWSD-eyzXPObBg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4D3DD8017F5;
+        Wed, 15 Apr 2020 07:43:14 +0000 (UTC)
+Received: from sturgeon (unknown [10.40.192.200])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id A0F761000337;
+        Wed, 15 Apr 2020 07:43:00 +0000 (UTC)
+Date:   Wed, 15 Apr 2020 09:42:58 +0200
+From:   Erik Skultety <eskultet@redhat.com>
+To:     Yan Zhao <yan.y.zhao@intel.com>
+Cc:     intel-gvt-dev@lists.freedesktop.org, cjia@nvidia.com,
+        kvm@vger.kernel.org, linux-doc@vger.kernel.org,
+        libvir-list@redhat.com, Zhengxiao.zx@alibaba-inc.com,
+        shuangtai.tst@alibaba-inc.com, qemu-devel@nongnu.org,
+        kwankhede@nvidia.com, eauger@redhat.com, corbet@lwn.net,
+        yi.l.liu@intel.com, ziye.yang@intel.com, mlevitsk@redhat.com,
+        pasic@linux.ibm.com, aik@ozlabs.ru, felipe@nutanix.com,
+        Ken.Xue@amd.com, kevin.tian@intel.com, xin.zeng@intel.com,
+        dgilbert@redhat.com, zhenyuw@linux.intel.com, dinechin@redhat.com,
+        changpeng.liu@intel.com, cohuck@redhat.com,
+        linux-kernel@vger.kernel.org, zhi.a.wang@intel.com,
+        jonathan.davies@nutanix.com, shaopeng.he@intel.com
+Subject: Re: [PATCH v5 3/4] vfio/mdev: add migration_version attribute for
+ mdev (under mdev device node)
+Message-ID: <20200415074258.GK269314@sturgeon>
+References: <20200413055201.27053-1-yan.y.zhao@intel.com>
+ <20200413055504.27311-1-yan.y.zhao@intel.com>
 MIME-Version: 1.0
-References: <20200311171422.10484-1-david@redhat.com> <20200311171422.10484-9-david@redhat.com>
-In-Reply-To: <20200311171422.10484-9-david@redhat.com>
-From:   Pankaj Gupta <pankaj.gupta.linux@gmail.com>
-Date:   Wed, 15 Apr 2020 09:42:08 +0200
-Message-ID: <CAM9Jb+iuZ4hzP1ik+RUib3Vi1ymc9y5++8_EX50=MCTBsC+1fQ@mail.gmail.com>
-Subject: Re: [PATCH v2 08/10] virtio-mem: Offline and remove completely
- unplugged memory blocks
-To:     David Hildenbrand <david@redhat.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>, Linux MM <linux-mm@kvack.org>,
-        virtio-dev@lists.oasis-open.org,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        Michal Hocko <mhocko@kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Oscar Salvador <osalvador@suse.de>,
-        Igor Mammedov <imammedo@redhat.com>,
-        Dave Young <dyoung@redhat.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Pavel Tatashin <pasha.tatashin@soleen.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Vlastimil Babka <vbabka@suse.cz>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20200413055504.27311-1-yan.y.zhao@intel.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> Let's offline+remove memory blocks once all subblocks are unplugged. We
-> can use the new Linux MM interface for that. As no memory is in use
-> anymore, this shouldn't take a long time and shouldn't fail. There might
-> be corner cases where the offlining could still fail (especially, if
-> another notifier NACKs the offlining request).
+On Mon, Apr 13, 2020 at 01:55:04AM -0400, Yan Zhao wrote:
+> migration_version attribute is used to check migration compatibility
+> between two mdev devices of the same mdev type.
+> The key is that it's rw and its data is opaque to userspace.
 >
-> Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> Cc: Jason Wang <jasowang@redhat.com>
-> Cc: Oscar Salvador <osalvador@suse.de>
-> Cc: Michal Hocko <mhocko@kernel.org>
-> Cc: Igor Mammedov <imammedo@redhat.com>
-> Cc: Dave Young <dyoung@redhat.com>
-> Cc: Andrew Morton <akpm@linux-foundation.org>
-> Cc: Dan Williams <dan.j.williams@intel.com>
-> Cc: Pavel Tatashin <pasha.tatashin@soleen.com>
-> Cc: Stefan Hajnoczi <stefanha@redhat.com>
-> Cc: Vlastimil Babka <vbabka@suse.cz>
-> Signed-off-by: David Hildenbrand <david@redhat.com>
+> Userspace reads migration_version of mdev device at source side and
+> writes the value to migration_version attribute of mdev device at targe=
+t
+> side. It judges migration compatibility according to whether the read
+> and write operations succeed or fail.
+>
+> Currently, it is able to read/write migration_version attribute under t=
+wo
+> places:
+>
+> (1) under mdev_type node
+> userspace is able to know whether two mdev devices are compatible befor=
+e
+> a mdev device is created.
+>
+> userspace also needs to check whether the two mdev devices are of the s=
+ame
+> mdev type before checking the migration_version attribute. It also need=
+s
+> to check device creation parameters if aggregation is supported in futu=
+re.
+>
+> (2) under mdev device node
+> userspace is able to know whether two mdev devices are compatible after
+> they are all created. But it does not need to check mdev type and devic=
+e
+> creation parameter for aggregation as device vendor driver would have
+> incorporated those information into the migration_version attribute.
+>
+>              __    userspace
+>               /\              \
+>              /                 \write
+>             / read              \
+>    ________/__________       ___\|/_____________
+>   | migration_version |     | migration_version |-->check migration
+>   ---------------------     ---------------------   compatibility
+>     mdev device A               mdev device B
+>
+> This patch is for mdev documentation about the second place (under
+> mdev device node)
+>
+> Cc: Alex Williamson <alex.williamson@redhat.com>
+> Cc: Erik Skultety <eskultet@redhat.com>
+> Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> Cc: Cornelia Huck <cohuck@redhat.com>
+> Cc: "Tian, Kevin" <kevin.tian@intel.com>
+> Cc: Zhenyu Wang <zhenyuw@linux.intel.com>
+> Cc: "Wang, Zhi A" <zhi.a.wang@intel.com>
+> Cc: Neo Jia <cjia@nvidia.com>
+> Cc: Kirti Wankhede <kwankhede@nvidia.com>
+> Cc: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> Cc: Christophe de Dinechin <dinechin@redhat.com>
+>
+> Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
 > ---
->  drivers/virtio/virtio_mem.c | 47 +++++++++++++++++++++++++++++++++----
->  1 file changed, 43 insertions(+), 4 deletions(-)
+>  .../driver-api/vfio-mediated-device.rst       | 70 +++++++++++++++++++
+>  1 file changed, 70 insertions(+)
 >
-> diff --git a/drivers/virtio/virtio_mem.c b/drivers/virtio/virtio_mem.c
-> index 35f20232770c..aa322e7732a4 100644
-> --- a/drivers/virtio/virtio_mem.c
-> +++ b/drivers/virtio/virtio_mem.c
-> @@ -443,6 +443,28 @@ static int virtio_mem_mb_remove(struct virtio_mem *vm, unsigned long mb_id)
->         return remove_memory(nid, addr, memory_block_size_bytes());
->  }
+> diff --git a/Documentation/driver-api/vfio-mediated-device.rst b/Docume=
+ntation/driver-api/vfio-mediated-device.rst
+> index 2d1f3c0f3c8f..efbadfd51b7e 100644
+> --- a/Documentation/driver-api/vfio-mediated-device.rst
+> +++ b/Documentation/driver-api/vfio-mediated-device.rst
+> @@ -383,6 +383,7 @@ Directories and Files Under the sysfs for Each mdev=
+ Device
+>           |--- remove
+>           |--- mdev_type {link to its type}
+>           |--- vendor-specific-attributes [optional]
+> +         |--- migration_verion [optional]
 >
-> +/*
-> + * Try to offline and remove a memory block from Linux.
-> + *
-> + * Must not be called with the vm->hotplug_mutex held (possible deadlock with
-> + * onlining code).
-> + *
-> + * Will not modify the state of the memory block.
-> + */
-> +static int virtio_mem_mb_offline_and_remove(struct virtio_mem *vm,
-> +                                           unsigned long mb_id)
-> +{
-> +       const uint64_t addr = virtio_mem_mb_id_to_phys(mb_id);
-> +       int nid = vm->nid;
-> +
-> +       if (nid == NUMA_NO_NODE)
-> +               nid = memory_add_physaddr_to_nid(addr);
-> +
-> +       dev_dbg(&vm->vdev->dev, "offlining and removing memory block: %lu\n",
-> +               mb_id);
-> +       return offline_and_remove_memory(nid, addr, memory_block_size_bytes());
-> +}
-> +
->  /*
->   * Trigger the workqueue so the device can perform its magic.
->   */
-> @@ -535,7 +557,13 @@ static void virtio_mem_notify_offline(struct virtio_mem *vm,
->                 break;
->         }
+>  * remove (write only)
 >
-> -       /* trigger the workqueue, maybe we can now unplug memory. */
-> +       /*
-> +        * Trigger the workqueue, maybe we can now unplug memory. Also,
-> +        * when we offline and remove a memory block, this will re-trigger
-> +        * us immediately - which is often nice because the removal of
-> +        * the memory block (e.g., memmap) might have freed up memory
-> +        * on other memory blocks we manage.
-> +        */
->         virtio_mem_retry(vm);
->  }
+> @@ -394,6 +395,75 @@ Example::
 >
-> @@ -1282,7 +1310,8 @@ static int virtio_mem_mb_unplug_any_sb_offline(struct virtio_mem *vm,
->   * Unplug the desired number of plugged subblocks of an online memory block.
->   * Will skip subblock that are busy.
->   *
-> - * Will modify the state of the memory block.
-> + * Will modify the state of the memory block. Might temporarily drop the
-> + * hotplug_mutex.
->   *
->   * Note: Can fail after some subblocks were successfully unplugged. Can
->   *       return 0 even if subblocks were busy and could not get unplugged.
-> @@ -1338,9 +1367,19 @@ static int virtio_mem_mb_unplug_any_sb_online(struct virtio_mem *vm,
->         }
+>  	# echo 1 > /sys/bus/mdev/devices/$mdev_UUID/remove
 >
->         /*
-> -        * TODO: Once all subblocks of a memory block were unplugged, we want
-> -        * to offline the memory block and remove it.
-> +        * Once all subblocks of a memory block were unplugged, offline and
-> +        * remove it. This will usually not fail, as no memory is in use
-> +        * anymore - however some other notifiers might NACK the request.
->          */
-> +       if (virtio_mem_mb_test_sb_unplugged(vm, mb_id, 0, vm->nb_sb_per_mb)) {
-> +               mutex_unlock(&vm->hotplug_mutex);
-> +               rc = virtio_mem_mb_offline_and_remove(vm, mb_id);
-> +               mutex_lock(&vm->hotplug_mutex);
-> +               if (!rc)
-> +                       virtio_mem_mb_set_state(vm, mb_id,
-> +                                               VIRTIO_MEM_MB_STATE_UNUSED);
-> +       }
-> +
->         return 0;
->  }
->
+> +* migration_version (rw, optional)
 
-Acked-by: Pankaj Gupta <pankaj.gupta.linux@gmail.com>
+Hmm, ^this is not consistent with how patch 1/5 reports this information,=
+ but
+looking at the existing docs we're not doing very well in terms of consis=
+tency
+there either.
 
-> --
+I suggest we go with "(read-write)" in both patch 1/5 and here and then s=
+tart
+the paragraph with "This is an optional attribute."
+
+> +  It is used to check migration compatibility between two mdev devices=
+.
+> +  Absence of this attribute means the mdev device does not support mig=
+ration.
+> +
+> +  This attribute provides a way to check migration compatibility betwe=
+en two
+> +  mdev devices from userspace after device created. The intended usage=
+ is
+
+after the target device has been created.
+
+side note: maybe add something like "(see the migration_version attribute=
+ of
+the device node if the target device already exists)" in the same section=
+ in
+patch 1/5.
+
+> +  for userspace to read the migration_version attribute from one mdev =
+device and
+> +  then writing that value to the migration_version attribute of the ot=
+her mdev
+> +  device. The second mdev device indicates compatibility via the retur=
+n code of
+> +  the write operation. This makes compatibility between mdev devices c=
+ompletely
+> +  vendor-defined and opaque to userspace. Userspace should do nothing =
+more
+> +  than use the migration_version attribute to confirm source to target
+> +  compatibility.
+
+...
+
+> +
+> +  Reading/Writing Attribute Data:
+> +  read(2) will fail if a mdev device does not support migration and ot=
+herwise
+> +        succeed and return migration_version string of the mdev device=
+.
+> +
+> +        This migration_version string is vendor defined and opaque to =
+the
+> +        userspace. Vendor is free to include whatever they feel is rel=
+evant.
+> +        e.g. <pciid of parent device>-<software version>.
+> +
+> +        Restrictions on this migration_version string:
+> +            1. It should only contain ascii characters
+> +            2. MAX Length is PATH_MAX (4096)
+> +
+> +  write(2) expects migration_version string of source mdev device, and=
+ will
+> +         succeed if it is determined to be compatible and otherwise fa=
+il with
+> +         vendor specific errno.
+> +
+> +  Errno:
+> +  -An errno on read(2) indicates the mdev devicedoes not support migra=
+tion;
+
+s/devicedoes/device does/
+
+> +  -An errno on write(2) indicates the mdev devices are incompatible or=
+ the
+> +   target doesn't support migration.
+> +  Vendor driver is free to define specific errno and is suggested to
+> +  print detailed error in syslog for diagnose purpose.
+> +
+> +  Userspace should treat ANY of below conditions as two mdev devices n=
+ot
+> +  compatible:
+> +  (1) any one of the two mdev devices does not have a migration_versio=
+n
+> +  attribute
+> +  (2) error when reading from migration_version attribute of one mdev =
+device
+> +  (3) error when writing migration_version string of one mdev device t=
+o
+> +  migration_version attribute of the other mdev device
+> +
+> +  Userspace should regard two mdev devices compatible when ALL of belo=
+w
+> +  conditions are met:
+> +  (1) success when reading from migration_version attribute of one mde=
+v device.
+> +  (2) success when writing migration_version string of one mdev device=
+ to
+> +  migration_version attribute of the other mdev device.
+> +
+> +  Example Usage:
+> +  (1) Retrieve the mdev source migration_version:
+> +
+> +  # cat /sys/bus/mdev/devices/$mdev_UUID1/migration_version
+> +
+> +  If reading the source migration_version generates an error, migratio=
+n is not
+> +  possible.
+> +
+> +  (2) Test source migration_version at target:
+> +
+> +  Given a migration_version as outlined above, its compatibility to an
+> +  instantiated device of the same mdev type can be tested as:
+> +  # echo $VERSION > /sys/bus/mdev/devices/$mdev_UUID2/migration_versio=
+n
+> +
+> +  If this write fails, the source and target migration versions are no=
+t
+> +  compatible or the target does not support migration.
+> +
+> +
+>  Mediated device Hot plug
+>  ------------------------
+
+Overall, the same comments as in 1/5 apply text-wise.
+
+Regards,
+--
+Erik Skultety
+
