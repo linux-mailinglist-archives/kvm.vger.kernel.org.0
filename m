@@ -2,68 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0EA651AAADA
+	by mail.lfdr.de (Postfix) with ESMTP id 7A7341AAADB
 	for <lists+kvm@lfdr.de>; Wed, 15 Apr 2020 16:52:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2636845AbgDOOug (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Apr 2020 10:50:36 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:54000 "EHLO
+        id S370986AbgDOOuv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Apr 2020 10:50:51 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:38883 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S370969AbgDOOub (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 15 Apr 2020 10:50:31 -0400
+        by vger.kernel.org with ESMTP id S370969AbgDOOut (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 15 Apr 2020 10:50:49 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1586962230;
+        s=mimecast20190719; t=1586962248;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         to:to:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=JmRIH3xrhcbgQHMVx8VHgH6IzBuKHV31f9pg/cYCgHk=;
-        b=VqF8wf2eTZlQ4Jl5b3n6AK8R61QoFi9fIGOYXIYg6V+OqopJ0CVnhsx6AEaNkPehFB9zr3
-        9OoZRKXqf+sl1AcV0mDIrtJRbHsH0I2yYj05/6S1a4HZGU2vOMNbqbwjqggI4CsPGTAlU2
-        cAWt9om0xKSY6hhqOBe/rTAYPktzxMk=
+        bh=CfwnmYMAxkw+iuYFdVJw7VR5RUUAeLW4OT5nezamaG4=;
+        b=jLv1mHc4Fy306hfpvsVmWtzjbj98ZcCYaBkjwaQ2YMSVl91LlF0BMQbZd66ZUPw9zl/zzy
+        nXN5wePL+zqkz3VwI3GnBQzUDYbnWsp+khCBtdMW34aLOSseK18cPGLAlZUUhP69z/CQME
+        BOemE19yJCiQv1p5AdxmaLPgGymUN+M=
 Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
  [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-97-Y8qd1rLUOzGWeMgwijKnWA-1; Wed, 15 Apr 2020 10:50:28 -0400
-X-MC-Unique: Y8qd1rLUOzGWeMgwijKnWA-1
-Received: by mail-wm1-f71.google.com with SMTP id h184so2300292wmf.5
-        for <kvm@vger.kernel.org>; Wed, 15 Apr 2020 07:50:28 -0700 (PDT)
+ us-mta-465-dbLWtQGUPwaFeLlWv88BXg-1; Wed, 15 Apr 2020 10:50:46 -0400
+X-MC-Unique: dbLWtQGUPwaFeLlWv88BXg-1
+Received: by mail-wm1-f71.google.com with SMTP id o26so5055505wmh.1
+        for <kvm@vger.kernel.org>; Wed, 15 Apr 2020 07:50:46 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+        h=x-gm-message-state:subject:to:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=JmRIH3xrhcbgQHMVx8VHgH6IzBuKHV31f9pg/cYCgHk=;
-        b=t9Dg4qbL0rPPALWS0EV/c/GfqtnWjIOowbY2L4xPL53suHz5TiEvTykyGKcSH5znBS
-         FDCneKuzj8RAQEAJRBq3M6bdfmD7Z7xUGwdg5KzNRZb9HR+yCBgxT7g28/PIqHkCLjNY
-         iyaOcxxC5mMP6dPeKba3IpFJuoeUtIVBEXM3m4IIO0w3IqAqAY4LmFq8PCIYnJCzpx1q
-         aComcbsnCUclHkgXuZWYtJR4YNggVuu4CpVBFt7TFie0u0VrmnHZBgRJpDIFjTP1eOrE
-         9onTJxF6wyHg1xgxaFiL/P9pGp0YIEGeLCaor5LlHPxYYSLt204dhDFBxFQA7aYvHBFR
-         Lzzg==
-X-Gm-Message-State: AGi0PuYg2QDwT8EPMM0fU3deBSkeZaH5bI3FJ1Dw2vvVEh1+3OFo/J7y
-        TBSycIYv+2J31eTOIO/2taDhYJ90NWmmn4zl0totXh//99O3PN4rJEmOwvzxGLTjK9YXmGySXfi
-        uMy9+zNfd98gz
-X-Received: by 2002:a1c:f306:: with SMTP id q6mr5540439wmq.169.1586962227547;
-        Wed, 15 Apr 2020 07:50:27 -0700 (PDT)
-X-Google-Smtp-Source: APiQypLcjHfqk25Aa2S/DDiPyO8G1mcE4MUuSHr0Ty2vQ+VKX2bmv150yUNUV66lay4PAfxpJjPUrg==
-X-Received: by 2002:a1c:f306:: with SMTP id q6mr5540410wmq.169.1586962227207;
-        Wed, 15 Apr 2020 07:50:27 -0700 (PDT)
+        bh=CfwnmYMAxkw+iuYFdVJw7VR5RUUAeLW4OT5nezamaG4=;
+        b=tiSix89GWC1p8RdAZuI0/FZAZOQqxExxrzEI6o/lfh4xB0wcBRC98nVlZv75sOQeuw
+         YQ0wA5Jr9LRCtMQKtliLVjS0vbAZrb4TgNO/lr+1yU7/wrH7NoLTnzeqKfFUte0WQyB7
+         UYGPa6bIeZ6QO0QEXAk0GeSiJnA7KV6VCSWkegSVX680CJ9Z3xlgfUaRbfadoQh9YIMi
+         Tw3kMaEx5s/rBbYrtrAhxL2DGqilLfur4GSN2K9zB3bMjly6KjbQPxshR2lHVC0aSQ/X
+         IwWBTfJslwCJaZuDe+Bmzqy+Kw81qwKZC3qaeKMj6awdcyVpDhEnx4X+zhBAHJe5W/ZV
+         aT8A==
+X-Gm-Message-State: AGi0PuYB5xKDawULoyKKbQXjCIGpSsLhqFbjgVugaAwF2QL6dC1GRw64
+        M29NVMZ5ow2yZsYsa7+6pFP64DoD26zakS6fLECCUSp/rvYroc/NT4AIvxIGE3y2wEOiI5PGqMO
+        vUOC8/BMT+amZ
+X-Received: by 2002:adf:fe45:: with SMTP id m5mr22009056wrs.124.1586962245485;
+        Wed, 15 Apr 2020 07:50:45 -0700 (PDT)
+X-Google-Smtp-Source: APiQypLhQzuCWazAs6mIGiC2s+Dl6hNNJt7KyyH3w6YOkolQg6Vkyis/lFpNj02WU/berwThyTIAIw==
+X-Received: by 2002:adf:fe45:: with SMTP id m5mr22009040wrs.124.1586962245265;
+        Wed, 15 Apr 2020 07:50:45 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:9066:4f2:9fbd:f90e? ([2001:b07:6468:f312:9066:4f2:9fbd:f90e])
-        by smtp.gmail.com with ESMTPSA id f83sm23262658wmf.42.2020.04.15.07.50.26
+        by smtp.gmail.com with ESMTPSA id c20sm24342426wmd.36.2020.04.15.07.50.44
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 15 Apr 2020 07:50:26 -0700 (PDT)
-Subject: Re: [PATCH v2] kvm: nVMX: reflect MTF VM-exits if injected by L1
+        Wed, 15 Apr 2020 07:50:44 -0700 (PDT)
+Subject: Re: [PATCH] kvm: nVMX: match comment with return type for
+ nested_vmx_exit_reflected
 To:     Oliver Upton <oupton@google.com>, kvm@vger.kernel.org
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Peter Shier <pshier@google.com>,
-        Jim Mattson <jmattson@google.com>
-References: <20200414224746.240324-1-oupton@google.com>
+References: <20200414221241.134103-1-oupton@google.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <b57bad1d-d9ba-f380-94b6-a2c113dd6100@redhat.com>
-Date:   Wed, 15 Apr 2020 16:50:26 +0200
+Message-ID: <733cd06d-2e16-4f95-3ba9-776b5f0cf28d@redhat.com>
+Date:   Wed, 15 Apr 2020 16:50:44 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200414224746.240324-1-oupton@google.com>
+In-Reply-To: <20200414221241.134103-1-oupton@google.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -72,69 +70,28 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 15/04/20 00:47, Oliver Upton wrote:
-> According to SDM 26.6.2, it is possible to inject an MTF VM-exit via the
-> VM-entry interruption-information field regardless of the 'monitor trap
-> flag' VM-execution control. KVM appropriately copies the VM-entry
-> interruption-information field from vmcs12 to vmcs02. However, if L1
-> has not set the 'monitor trap flag' VM-execution control, KVM fails to
-> reflect the subsequent MTF VM-exit into L1.
+On 15/04/20 00:12, Oliver Upton wrote:
+> nested_vmx_exit_reflected() returns a bool, not int. As such, refer to
+> the return values as true/false in the comment instead of 1/0.
 > 
-> Fix this by consulting the VM-entry interruption-information field of
-> vmcs12 to determine if L1 has injected the MTF VM-exit. If so, reflect
-> the exit, regardless of the 'monitor trap flag' VM-execution control.
-> 
-> Fixes: 5f3d45e7f282 ("kvm/x86: add support for MONITOR_TRAP_FLAG")
 > Signed-off-by: Oliver Upton <oupton@google.com>
-> Reviewed-by: Peter Shier <pshier@google.com>
-> Reviewed-by: Jim Mattson <jmattson@google.com>
 > ---
->  Parent commit: dbef2808af6c5 ("KVM: VMX: fix crash cleanup when KVM wasn't used")
-> 
->  v1 => v2:
->  - removed unused 'struct kvm_vcpu *vcpu' from the signature of helper
->    function
-> 
->  arch/x86/kvm/vmx/nested.c | 19 ++++++++++++++++++-
->  1 file changed, 18 insertions(+), 1 deletion(-)
+>  arch/x86/kvm/vmx/nested.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
 > diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> index cbc9ea2de28f9..0d1400fa1e224 100644
+> index cbc9ea2de28f9..2ca53dc362731 100644
 > --- a/arch/x86/kvm/vmx/nested.c
 > +++ b/arch/x86/kvm/vmx/nested.c
-> @@ -5533,6 +5533,23 @@ static bool nested_vmx_exit_handled_vmcs_access(struct kvm_vcpu *vcpu,
->  	return 1 & (b >> (field & 7));
+> @@ -5534,7 +5534,7 @@ static bool nested_vmx_exit_handled_vmcs_access(struct kvm_vcpu *vcpu,
 >  }
 >  
-> +static bool nested_vmx_exit_handled_mtf(struct vmcs12 *vmcs12)
-> +{
-> +	u32 entry_intr_info = vmcs12->vm_entry_intr_info_field;
-> +
-> +	if (nested_cpu_has_mtf(vmcs12))
-> +		return true;
-> +
-> +	/*
-> +	 * An MTF VM-exit may be injected into the guest by setting the
-> +	 * interruption-type to 7 (other event) and the vector field to 0. Such
-> +	 * is the case regardless of the 'monitor trap flag' VM-execution
-> +	 * control.
-> +	 */
-> +	return entry_intr_info == (INTR_INFO_VALID_MASK
-> +				   | INTR_TYPE_OTHER_EVENT);
-> +}
-> +
 >  /*
->   * Return 1 if we should exit from L2 to L1 to handle an exit, or 0 if we
+> - * Return 1 if we should exit from L2 to L1 to handle an exit, or 0 if we
+> + * Return true if we should exit from L2 to L1 to handle an exit, or false if we
 >   * should handle it ourselves in L0 (and then continue L2). Only call this
-> @@ -5633,7 +5650,7 @@ bool nested_vmx_exit_reflected(struct kvm_vcpu *vcpu, u32 exit_reason)
->  	case EXIT_REASON_MWAIT_INSTRUCTION:
->  		return nested_cpu_has(vmcs12, CPU_BASED_MWAIT_EXITING);
->  	case EXIT_REASON_MONITOR_TRAP_FLAG:
-> -		return nested_cpu_has_mtf(vmcs12);
-> +		return nested_vmx_exit_handled_mtf(vmcs12);
->  	case EXIT_REASON_MONITOR_INSTRUCTION:
->  		return nested_cpu_has(vmcs12, CPU_BASED_MONITOR_EXITING);
->  	case EXIT_REASON_PAUSE_INSTRUCTION:
+>   * when in is_guest_mode (L2).
+>   */
 > 
 
 Queued, thanks.
