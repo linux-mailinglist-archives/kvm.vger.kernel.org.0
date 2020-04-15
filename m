@@ -2,67 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 166711A97FC
-	for <lists+kvm@lfdr.de>; Wed, 15 Apr 2020 11:08:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9A88F1A9981
+	for <lists+kvm@lfdr.de>; Wed, 15 Apr 2020 11:51:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2408288AbgDOJII (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Apr 2020 05:08:08 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:59722 "EHLO
+        id S2895998AbgDOJvl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Apr 2020 05:51:41 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:54830 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S2408279AbgDOJIB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Apr 2020 05:08:01 -0400
+        with ESMTP id S2895874AbgDOJti (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Apr 2020 05:49:38 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1586941679;
+        s=mimecast20190719; t=1586944176;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=lisOMIPYzGEOUKW/w9q538cTmyUuHd07/Sojgyr8MlQ=;
-        b=Jx2FDyTWiVDSj+TGOWOlb6Tpt+VTUEEy0yd9fpRMKl7rQKOY871ngDkQGOjhAC8N+d7SY0
-        Bs4Q8EQdCr8SzcYu4yqzOh5h22g90k72oCAFQQ0KvtupPEZo/SY0pBdzJTkbeMQmNX+mlb
-        qi4WIYZbc8j89wpMCMzWuylFT++B45o=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-260-kb8Q2WltPg69z_XDMoEMhA-1; Wed, 15 Apr 2020 05:07:57 -0400
-X-MC-Unique: kb8Q2WltPg69z_XDMoEMhA-1
-Received: by mail-wm1-f72.google.com with SMTP id h22so3970351wml.1
-        for <kvm@vger.kernel.org>; Wed, 15 Apr 2020 02:07:57 -0700 (PDT)
+        bh=qaGXYPrjx6asVnwUlRwgPZ9xv0d8gA5/xd4DP6F32Eg=;
+        b=f+XE5fH3w+CTeU7C/7DW0Rh5upeav7Dq8MYzb5UOOVQChq7gj+eSinhy0HBhwUHmYR2EVJ
+        L7jsnziyvb2oXbp/SQJ5zjM7NGYnYBzt9thN0HW8U9LbH8o2veIbnC0Ss6pLvg3BX8XgwN
+        pVTaoNQPlHdOoLU2/Jx57q4ZepS00Qo=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-316-zuQkAaVWNDSyFX0f3eWziQ-1; Wed, 15 Apr 2020 05:49:28 -0400
+X-MC-Unique: zuQkAaVWNDSyFX0f3eWziQ-1
+Received: by mail-wm1-f71.google.com with SMTP id q5so3647541wmc.9
+        for <kvm@vger.kernel.org>; Wed, 15 Apr 2020 02:49:28 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
          :message-id:mime-version;
-        bh=lisOMIPYzGEOUKW/w9q538cTmyUuHd07/Sojgyr8MlQ=;
-        b=C+0EpUAsGHRfoYKb/A4nCju7tuWEzaiAFkIPa8CQ4Yz3XXc1sdPbhn82mg20siLO22
-         lpt9pSwusDPkg8S2puc9bRihuCqpLVi4JiJ7refAgHgoE5VBvQ+usWMwYYh7r18vGSr4
-         Dj4+9eNcbYqvf5B+Xumt1Da3ZL2evGAwMWLhbGoPCH1U6RjWSrBKHorxW8SfvYBhmKpv
-         RGsi7LJuLWskeE4GSuh+mdRR1M6ki1olFJD90+zg6IrHfnG8iXq9y0m7+fzSKK5IfvZD
-         fKtH/LDD/X6YXXr3nVSmWD7OMg6o/uInrZj6sDMU2qNl1cQIYuDFgJ5xcpF6ZSDl5J4u
-         dRmw==
-X-Gm-Message-State: AGi0PuYan6VqrB3P5j07P/G++0afBfMOINLnTzagnwnReygm485t9eCm
-        77LwbRVDEyJBn9U1zdYMhj7+4VrebV1A7QgahwC86WhlmRjSHiqnRmyOgIOXTYhlYiXFNfBDzA6
-        xy7rXUZDbYX7U
-X-Received: by 2002:a5d:6841:: with SMTP id o1mr27977379wrw.412.1586941676331;
-        Wed, 15 Apr 2020 02:07:56 -0700 (PDT)
-X-Google-Smtp-Source: APiQypIXD/p9LNlXg20pn+U/yQCcvvORh177d5YZbgu7SsoqIprQYNJ2FhjSis/HsfEJeQMW+4tCHg==
-X-Received: by 2002:a5d:6841:: with SMTP id o1mr27977353wrw.412.1586941676047;
-        Wed, 15 Apr 2020 02:07:56 -0700 (PDT)
+        bh=qaGXYPrjx6asVnwUlRwgPZ9xv0d8gA5/xd4DP6F32Eg=;
+        b=sHWtBQlszF3VTcg9vcWAwDjliTzL73PCvYwfCiC+6YJLr/m1zCvaNgAOmbnMV6emJR
+         +3ISLN04hGHAW2cpxX3dDvWRgL3ONr/+47hOhMJz4yIXkhvSxGllzfrt5lWKeOBdcwzx
+         wt7HOK4YO5ek44FMvV5EWP9C2wOKnjGQOZPrQZYY/y31wY0IZ8+xWAhrywVMn2dwscO3
+         b+QgdrA8bynYE8RMVxL+wN/FJ7RSL5Vq//+CxkczY5K4Xk64Q7QZuEEHo4nMva3FCkkl
+         kiYKEeQDcp0KtKZEuEmtc5wfHtwvGiFzcq6TVLPz/45fXqT+RvYiSXpxMLqX8T13/AVe
+         6CWQ==
+X-Gm-Message-State: AGi0Pube+Fw8REPdrHa2q3YnUx0aX+uqCwNCf8+2OZiwUiUV1O6PbPeT
+        npKVi24jvZmQ5PZfoXajd431uUpwR5i/VuYUkUpsu6U6hDPq7ucDdCsgzn0KnTwrS2lBFqQoZi1
+        KQV2R+M0R3WUy
+X-Received: by 2002:a05:6000:1008:: with SMTP id a8mr22513582wrx.189.1586944166845;
+        Wed, 15 Apr 2020 02:49:26 -0700 (PDT)
+X-Google-Smtp-Source: APiQypK6iom3TxtitcFG3fEyEhV0IQri7rGaW4po1K8ddZ+k0gAwKo+5fXC8PqAQAruae6CWSJ1r4g==
+X-Received: by 2002:a05:6000:1008:: with SMTP id a8mr22513570wrx.189.1586944166653;
+        Wed, 15 Apr 2020 02:49:26 -0700 (PDT)
 Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id e5sm23214697wru.92.2020.04.15.02.07.54
+        by smtp.gmail.com with ESMTPSA id l15sm21578535wmi.48.2020.04.15.02.49.25
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Apr 2020 02:07:55 -0700 (PDT)
+        Wed, 15 Apr 2020 02:49:26 -0700 (PDT)
 From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-Cc:     kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org,
-        pbonzini@redhat.com, sean.j.christopherson@intel.com,
-        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, x86@kernel.org,
-        hpa@zytor.com, maz@kernel.org, james.morse@arm.com,
-        julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com
-Subject: Re: [PATCH] KVM: Optimize kvm_arch_vcpu_ioctl_run function
-In-Reply-To: <cc29ce22-4c70-87d1-d7aa-9d38438ba8a5@linux.alibaba.com>
-References: <20200413034523.110548-1-tianjia.zhang@linux.alibaba.com> <875ze2ywhy.fsf@vitty.brq.redhat.com> <cc29ce22-4c70-87d1-d7aa-9d38438ba8a5@linux.alibaba.com>
-Date:   Wed, 15 Apr 2020 11:07:53 +0200
-Message-ID: <87a73dxgk6.fsf@vitty.brq.redhat.com>
+To:     Cathy Avery <cavery@redhat.com>, pbonzini@redhat.com
+Cc:     wei.huang2@amd.com, Jim Mattson <jmattson@google.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH 0/2] KVM: SVM: Implement check_nested_events for NMI
+In-Reply-To: <20200414201107.22952-1-cavery@redhat.com>
+References: <20200414201107.22952-1-cavery@redhat.com>
+Date:   Wed, 15 Apr 2020 11:49:25 +0200
+Message-ID: <87zhbdw02i.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
@@ -70,46 +65,51 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Tianjia Zhang <tianjia.zhang@linux.alibaba.com> writes:
+Cathy Avery <cavery@redhat.com> writes:
 
-> On 2020/4/14 22:26, Vitaly Kuznetsov wrote:
->> Tianjia Zhang <tianjia.zhang@linux.alibaba.com> writes:
->> 
->>> kvm_arch_vcpu_ioctl_run() is only called in the file kvm_main.c,
->>> where vcpu->run is the kvm_run parameter, so it has been replaced.
->>>
->>> Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
->>> ---
->>>   arch/x86/kvm/x86.c | 8 ++++----
->>>   virt/kvm/arm/arm.c | 2 +-
->>>   2 files changed, 5 insertions(+), 5 deletions(-)
->>>
->>> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
->>> index 3bf2ecafd027..70e3f4abbd4d 100644
->>> --- a/arch/x86/kvm/x86.c
->>> +++ b/arch/x86/kvm/x86.c
->>> @@ -8726,18 +8726,18 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *kvm_run)
->>>   		r = -EAGAIN;
->>>   		if (signal_pending(current)) {
->>>   			r = -EINTR;
->>> -			vcpu->run->exit_reason = KVM_EXIT_INTR;
->>> +			kvm_run->exit_reason = KVM_EXIT_INTR;
->> 
->> I have a more generic question: why do we need to pass 'kvm_run' to
->> kvm_arch_vcpu_ioctl_run() if it can be extracted from 'struct kvm_vcpu'?
->> The only call site looks like
->> 
->> virt/kvm/kvm_main.c:            r = kvm_arch_vcpu_ioctl_run(vcpu, vcpu->run);
->> 
+> Moved nested NMI exit to new check_nested_events.
+> The second patch fixes the NMI pending race condition that now occurs.
 >
-> In the earlier version, kvm_run is used to pass parameters with user 
-> mode and is not included in the vcpu structure, so it has been retained 
-> until now.
+> Cathy Avery (2):
+>   KVM: SVM: Implement check_nested_events for NMI
+>   KVM: x86: check_nested_events if there is an injectable NMI
 >
 
-In case this is no longer needed I'd suggest we drop 'kvm_run' parameter
-and extract it from 'struct kvm_vcpu' when needed. This looks like a
-natural add-on to your cleanup patch.
+Not directly related to this series but I just noticed that we have the
+following comment in inject_pending_event():
+
+	/* try to inject new event if pending */
+	if (vcpu->arch.exception.pending) {
+                ...
+		if (vcpu->arch.exception.nr == DB_VECTOR) {
+			/*
+			 * This code assumes that nSVM doesn't use
+			 * check_nested_events(). If it does, the
+			 * DR6/DR7 changes should happen before L1
+			 * gets a #VMEXIT for an intercepted #DB in
+			 * L2.  (Under VMX, on the other hand, the
+			 * DR6/DR7 changes should not happen in the
+			 * event of a VM-exit to L1 for an intercepted
+			 * #DB in L2.)
+			 */
+			kvm_deliver_exception_payload(vcpu);
+			if (vcpu->arch.dr7 & DR7_GD) {
+				vcpu->arch.dr7 &= ~DR7_GD;
+				kvm_update_dr7(vcpu);
+			}
+		}
+
+		kvm_x86_ops.queue_exception(vcpu);
+	}
+
+As we already implement check_nested_events() on SVM, do we need to do
+anything here? CC: Jim who added the guardian (f10c729ff9652).
+
+>  arch/x86/kvm/svm/nested.c | 21 +++++++++++++++++++++
+>  arch/x86/kvm/svm/svm.c    |  2 +-
+>  arch/x86/kvm/svm/svm.h    | 15 ---------------
+>  arch/x86/kvm/x86.c        | 15 +++++++++++----
+>  4 files changed, 33 insertions(+), 20 deletions(-)
 
 -- 
 Vitaly
