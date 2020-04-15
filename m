@@ -2,165 +2,157 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4BF921AAD7F
-	for <lists+kvm@lfdr.de>; Wed, 15 Apr 2020 18:31:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 687621AADBE
+	for <lists+kvm@lfdr.de>; Wed, 15 Apr 2020 18:32:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1415387AbgDOQOJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Apr 2020 12:14:09 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:28122 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1415382AbgDOQOD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Apr 2020 12:14:03 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1586967241;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=RJeTo/zRnrqHhvOgPTgaHSH4vrzTtRuXcGPzKEfUHnY=;
-        b=IrQXpc172A/c9nxpXNbRKtBrk+hkcC8cFUwgnwZ34ymZhfUa9PDCBush1BA/fEZ9lg9yRt
-        7sXjZBhgpdSj/0zkzIiEhVCwrVsTKSTAcgV0r2xX6QGzqEsRaOwzhpz9Js76Jj0LEq8sN+
-        /u55g3Req4bhCfTo59X82c8OiMKL714=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-458-3NwBz7QSOWCiwF86G-MtlA-1; Wed, 15 Apr 2020 12:13:59 -0400
-X-MC-Unique: 3NwBz7QSOWCiwF86G-MtlA-1
-Received: by mail-wm1-f71.google.com with SMTP id o26so62698wmh.1
-        for <kvm@vger.kernel.org>; Wed, 15 Apr 2020 09:13:59 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=RJeTo/zRnrqHhvOgPTgaHSH4vrzTtRuXcGPzKEfUHnY=;
-        b=IvGkjrlnM0EGQsr0CUIDmDJ6Yt8ri4IU0gHqRdGsKOr77SQ0d6SBaKDQTWEQnI18LC
-         wXqS/wb6uWMnj4QKBjU7wqev8C3jBb2JnExJU9wnMfP7LxbkPBQUu9Onfq1u8ovSLmPE
-         zR2eREXBfoWLAzLM5lSptRw6sPWOxzG3hf5vxAr8f8Ri7SP8zwtcXhzp4jlSpvs0Uzmj
-         rSz3eSjjFmfO2glPpQ/xVFxQvy297TysweZA/XuJPIi746DWmILM5gIYdtRq/5CkotS6
-         xyw7T/C/1InDZrMNRhVNMU+XQ36BdtbB4l7F9dYFS9EYBz042c8fg2allfgKrjprR9of
-         Dgiw==
-X-Gm-Message-State: AGi0PuZuT7tfbPfLF30abMOGovZRADIFl0pcRo0RxRY+uIJ2hb+RLfJW
-        h8DEnGmkyYd5olSnB6Vcv00ZCnBVwn6SUgBFLWnL8hWRztT4CJM1c6PmJwyyLHEbt676aZiOTCJ
-        W5F8lNhAg/GHb
-X-Received: by 2002:adf:ff82:: with SMTP id j2mr18428718wrr.96.1586967238410;
-        Wed, 15 Apr 2020 09:13:58 -0700 (PDT)
-X-Google-Smtp-Source: APiQypIDz/OV9eeQuwJYvgc7hCdaj4l2fEwtDfmedhtg4jVMeo+Svh1HHKzk8lWg60lun+SjucTPTg==
-X-Received: by 2002:adf:ff82:: with SMTP id j2mr18428685wrr.96.1586967238108;
-        Wed, 15 Apr 2020 09:13:58 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:9066:4f2:9fbd:f90e? ([2001:b07:6468:f312:9066:4f2:9fbd:f90e])
-        by smtp.gmail.com with ESMTPSA id p7sm24315229wrf.31.2020.04.15.09.13.56
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 15 Apr 2020 09:13:57 -0700 (PDT)
-Subject: Re: [PATCH v2] KVM/arm64: Support enabling dirty log gradually in
- small chunks
-To:     Keqian Zhu <zhukeqian1@huawei.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.cs.columbia.edu
-Cc:     Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Will Deacon <will@kernel.org>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Jay Zhou <jianjay.zhou@huawei.com>, wanghaibin.wang@huawei.com
-References: <20200413122023.52583-1-zhukeqian1@huawei.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <be45ec89-2bdb-454b-d20a-c08898e26024@redhat.com>
-Date:   Wed, 15 Apr 2020 18:13:56 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+        id S1415567AbgDOQUp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Apr 2020 12:20:45 -0400
+Received: from mail.kernel.org ([198.145.29.99]:35520 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1415555AbgDOQUi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Apr 2020 12:20:38 -0400
+Received: from mail-io1-f50.google.com (mail-io1-f50.google.com [209.85.166.50])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id B5012208FE
+        for <kvm@vger.kernel.org>; Wed, 15 Apr 2020 16:20:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1586967637;
+        bh=xiWRRWSIiNJkZgzN/gsKBCqoW4ucuqZrzCPF+0y0s3Y=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=lVfxioqDtBIDtVZe6p4owl9oThM2453JiNHQbwWgv5H2Ku3OmoNzoaCU7Llce8caI
+         Iq3sIzpUGf33c90jVVyF6LgwZBQz+Piuxk4ujkuuj3qsmCR7EEe0Pf1TcghTMTbl6j
+         2YyERQYlRv0hXfx0ndDZPXN+coDC0EX9BoUi2pGc=
+Received: by mail-io1-f50.google.com with SMTP id w20so17731698iob.2
+        for <kvm@vger.kernel.org>; Wed, 15 Apr 2020 09:20:37 -0700 (PDT)
+X-Gm-Message-State: AGi0PuZnmu3OH3ZYFGSNcUOr6JmqujXXTEPwftx/xdVOXC7rzJgvBJ+6
+        tpFqtsY2jmieKf2v46cl2WsknzpIRJx70L4nR+A=
+X-Google-Smtp-Source: APiQypLgOSRPv1bC/QOZQLEX3sYcp6ObUrfMGehj4hFMujnG8x8tCvW9SfKpInZF6hOzPUdOrer1k5rTNzt4nm6uAo8=
+X-Received: by 2002:a02:6a1e:: with SMTP id l30mr25608981jac.98.1586967636895;
+ Wed, 15 Apr 2020 09:20:36 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200413122023.52583-1-zhukeqian1@huawei.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20200221165532.90618-1-andre.przywara@arm.com>
+ <2d3bad43-10a5-3ee1-72e7-e1da1d6c65dd@arm.com> <CAMj1kXGUiCLvmJUwrxCc8aHdE30WWfa95ou-tEM8Kv0nj2GdDA@mail.gmail.com>
+ <CAMj1kXF6iw47MM_tg5izB9KC-N2zrnQbhwT2TVPOuKdpOBX=ow@mail.gmail.com> <d9ae6d29-c2c5-6aa7-15b6-6549fc89c043@arm.com>
+In-Reply-To: <d9ae6d29-c2c5-6aa7-15b6-6549fc89c043@arm.com>
+From:   Ard Biesheuvel <ardb@kernel.org>
+Date:   Wed, 15 Apr 2020 18:20:25 +0200
+X-Gmail-Original-Message-ID: <CAMj1kXHKOBbCKsgYOYuLU+vOALBUbNRysVfVRpKXkh00GvTtEA@mail.gmail.com>
+Message-ID: <CAMj1kXHKOBbCKsgYOYuLU+vOALBUbNRysVfVRpKXkh00GvTtEA@mail.gmail.com>
+Subject: Re: [PATCH kvmtool v3] Add emulation for CFI compatible flash memory
+To:     =?UTF-8?Q?Andr=C3=A9_Przywara?= <andre.przywara@arm.com>
+Cc:     Alexandru Elisei <alexandru.elisei@arm.com>, sami.mujawar@arm.com,
+        Will Deacon <will@kernel.org>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        kvm@vger.kernel.org, Raphael Gault <raphael.gault@arm.com>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        kvmarm <kvmarm@lists.cs.columbia.edu>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 13/04/20 14:20, Keqian Zhu wrote:
-> There is already support of enabling dirty log graually in small chunks
-> for x86 in commit 3c9bd4006bfc ("KVM: x86: enable dirty log gradually in
-> small chunks"). This adds support for arm64.
-> 
-> x86 still writes protect all huge pages when DIRTY_LOG_INITIALLY_ALL_SET
-> is eanbled. However, for arm64, both huge pages and normal pages can be
-> write protected gradually by userspace.
-> 
-> Under the Huawei Kunpeng 920 2.6GHz platform, I did some tests on 128G
-> Linux VMs with different page size. The memory pressure is 127G in each
-> case. The time taken of memory_global_dirty_log_start in QEMU is listed
-> below:
-> 
-> Page Size      Before    After Optimization
->   4K            650ms         1.8ms
->   2M             4ms          1.8ms
->   1G             2ms          1.8ms
-> 
-> Besides the time reduction, the biggest income is that we will minimize
-> the performance side effect (because of dissloving huge pages and marking
-> memslots dirty) on guest after enabling dirty log.
-> 
-> Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
-> ---
->  Documentation/virt/kvm/api.rst    |  2 +-
->  arch/arm64/include/asm/kvm_host.h |  3 +++
->  virt/kvm/arm/mmu.c                | 12 ++++++++++--
->  3 files changed, 14 insertions(+), 3 deletions(-)
-> 
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index efbbe570aa9b..0017f63fa44f 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -5777,7 +5777,7 @@ will be initialized to 1 when created.  This also improves performance because
->  dirty logging can be enabled gradually in small chunks on the first call
->  to KVM_CLEAR_DIRTY_LOG.  KVM_DIRTY_LOG_INITIALLY_SET depends on
->  KVM_DIRTY_LOG_MANUAL_PROTECT_ENABLE (it is also only available on
-> -x86 for now).
-> +x86 and arm64 for now).
->  
->  KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2 was previously available under the name
->  KVM_CAP_MANUAL_DIRTY_LOG_PROTECT, but the implementation had bugs that make
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 32c8a675e5a4..a723f84fab83 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -46,6 +46,9 @@
->  #define KVM_REQ_RECORD_STEAL	KVM_ARCH_REQ(3)
->  #define KVM_REQ_RELOAD_GICv4	KVM_ARCH_REQ(4)
->  
-> +#define KVM_DIRTY_LOG_MANUAL_CAPS   (KVM_DIRTY_LOG_MANUAL_PROTECT_ENABLE | \
-> +				     KVM_DIRTY_LOG_INITIALLY_SET)
-> +
->  DECLARE_STATIC_KEY_FALSE(userspace_irqchip_in_use);
->  
->  extern unsigned int kvm_sve_max_vl;
-> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-> index e3b9ee268823..1077f653a611 100644
-> --- a/virt/kvm/arm/mmu.c
-> +++ b/virt/kvm/arm/mmu.c
-> @@ -2265,8 +2265,16 @@ void kvm_arch_commit_memory_region(struct kvm *kvm,
->  	 * allocated dirty_bitmap[], dirty pages will be be tracked while the
->  	 * memory slot is write protected.
->  	 */
-> -	if (change != KVM_MR_DELETE && mem->flags & KVM_MEM_LOG_DIRTY_PAGES)
-> -		kvm_mmu_wp_memory_region(kvm, mem->slot);
-> +	if (change != KVM_MR_DELETE && mem->flags & KVM_MEM_LOG_DIRTY_PAGES) {
-> +		/*
-> +		 * If we're with initial-all-set, we don't need to write
-> +		 * protect any pages because they're all reported as dirty.
-> +		 * Huge pages and normal pages will be write protect gradually.
-> +		 */
-> +		if (!kvm_dirty_log_manual_protect_and_init_set(kvm)) {
-> +			kvm_mmu_wp_memory_region(kvm, mem->slot);
-> +		}
-> +	}
->  }
->  
->  int kvm_arch_prepare_memory_region(struct kvm *kvm,
-> 
+On Wed, 15 Apr 2020 at 18:11, Andr=C3=A9 Przywara <andre.przywara@arm.com> =
+wrote:
+>
+> On 15/04/2020 16:55, Ard Biesheuvel wrote:
+> > On Wed, 15 Apr 2020 at 17:43, Ard Biesheuvel <ardb@kernel.org> wrote:
+> >>
+> >> On Tue, 7 Apr 2020 at 17:15, Alexandru Elisei <alexandru.elisei@arm.co=
+m> wrote:
+> >>>
+> >>> Hi,
+> >>>
+> >>> I've tested this patch by running badblocks and fio on a flash device=
+ inside a
+> >>> guest, everything worked as expected.
+> >>>
+> >>> I've also looked at the flowcharts for device operation from Intel Ap=
+plication
+> >>> Note 646, pages 12-21, and they seem implemented correctly.
+> >>>
+> >>> A few minor issues below.
+> >>>
+> >>> On 2/21/20 4:55 PM, Andre Przywara wrote:
+> >>>> From: Raphael Gault <raphael.gault@arm.com>
+> >>>>
+> >>>> The EDK II UEFI firmware implementation requires some storage for th=
+e EFI
+> >>>> variables, which is typically some flash storage.
+> >>>> Since this is already supported on the EDK II side, we add a CFI fla=
+sh
+> >>>> emulation to kvmtool.
+> >>>> This is backed by a file, specified via the --flash or -F command li=
+ne
+> >>>> option. Any flash writes done by the guest will immediately be refle=
+cted
+> >>>> into this file (kvmtool mmap's the file).
+> >>>> The flash will be limited to the nearest power-of-2 size, so only th=
+e
+> >>>> first 2 MB of a 3 MB file will be used.
+> >>>>
+> >>>> This implements a CFI flash using the "Intel/Sharp extended command
+> >>>> set", as specified in:
+> >>>> - JEDEC JESD68.01
+> >>>> - JEDEC JEP137B
+> >>>> - Intel Application Note 646
+> >>>> Some gaps in those specs have been filled by looking at real devices=
+ and
+> >>>> other implementations (QEMU, Linux kernel driver).
+> >>>>
+> >>>> At the moment this relies on DT to advertise the base address of the
+> >>>> flash memory (mapped into the MMIO address space) and is only enable=
+d
+> >>>> for ARM/ARM64. The emulation itself is architecture agnostic, though=
+.
+> >>>>
+> >>>> This is one missing piece toward a working UEFI boot with kvmtool on
+> >>>> ARM guests, the other is to provide writable PCI BARs, which is WIP.
+> >>>>
+> >>
+> >> I have given this a spin with UEFI built for kvmtool, and it appears
+> >> to be working correctly. However, I noticed that it is intolerably
+> >> slow, which seems to be caused by the fact that both array mode and
+> >> command mode (or whatever it is called in the CFI spec) are fully
+> >> emulated, whereas in the QEMU implementation (for instance), the
+> >> region is actually exposed to the guest using a read-only KVM memslot
+> >> in array mode, and so the read accesses are made natively.
+> >>
+> >> It is also causing problems in the UEFI implementation, as we can no
+> >> longer use unaligned accesses to read from the region, which is
+> >> something the code currently relies on (and which works fine on actual
+> >> hardware as long as you use normal non-cacheable mappings)
+> >>
+> >
+> > Actually, the issue is not alignment. The issue is with instructions
+> > with multiple outputs, which means you cannot do an ordinary memcpy()
+> > from the NOR region using ldp instructions, aligned or not.
+>
+> Yes, we traced that down to an "ldrb with post-inc", in the memcpy code.
+> My suggestion was to provide a version of memcpy_{from,to}_io(), as
+> Linux does, which only uses MMIO accessors to avoid "fancy" instructions.
+>
 
-Marc, what is the status of this patch?
+That is possible, and the impact on the code is manageable, given the
+modular nature of EDK2.
 
-Paolo
+> Back at this point I was challenging the idea of accessing a flash
+> device with a normal memory mapping, because of it failing when being in
+> some query mode. Do you know of any best practices for flash mappings?
+> Are two mappings common?
+>
 
+In the QEMU port of EDK2, we use normal non-cacheable for the first
+flash device, which contains the executable image, and is not
+updatable by the guest. The second flash bank is used for the variable
+store, and is actually mapped as a device all the time.
+
+Another thing I just realized is that you cannot fetch instructions
+from an emulated flash device either, so to execute from NOR flash,
+you will need a true memory mapping as well.
+
+So in summary, I think the mode switch is needed to be generally
+useful, even if the current approach is sufficient for (slow)
+read/write using special memory accessors.
