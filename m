@@ -2,93 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5C1701A9DEC
-	for <lists+kvm@lfdr.de>; Wed, 15 Apr 2020 13:50:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 061051A9F71
+	for <lists+kvm@lfdr.de>; Wed, 15 Apr 2020 14:14:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2409434AbgDOLsL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Apr 2020 07:48:11 -0400
-Received: from mail.kernel.org ([198.145.29.99]:43790 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2409419AbgDOLsG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Apr 2020 07:48:06 -0400
-Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 2475C2137B;
-        Wed, 15 Apr 2020 11:48:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1586951286;
-        bh=QfbcyYDaBWmJRjjiORon6lz8/Yn4d3ZYAl2wpL+C0Is=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=lXeCK76ZSBgxTknjGz1yGf2GW5zizX0q5R9fbZo1HtTqrTRn5/VpeYiI/9BdFhM+P
-         1pLV+tUG4yaydIvkS+mDPFOxaYKxE3Z5mm50IhTKhFGR7MDFVLukeY06rzEf0hFPCa
-         CDHLn2rOAMbK77rqcIlQSKvyTCSgepzHlggkOaK8=
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     David Hildenbrand <david@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.9 14/21] KVM: s390: vsie: Fix possible race when shadowing region 3 tables
-Date:   Wed, 15 Apr 2020 07:47:41 -0400
-Message-Id: <20200415114748.15713-14-sashal@kernel.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200415114748.15713-1-sashal@kernel.org>
-References: <20200415114748.15713-1-sashal@kernel.org>
+        id S368615AbgDOMMB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Apr 2020 08:12:01 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:43149 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S368582AbgDOMLm (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 15 Apr 2020 08:11:42 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1586952701;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=3g8pOUWTOZg7Xu60Mt7A1x/Ov3i7r+YKQXs6UW5HczM=;
+        b=RGQ9ReOxUD6zJxpTpcJyovIWYbtUkeED3xFLICuYpGDlGl/rd+rqnNoCERJwPU+rJtxclB
+        kzwoRxnLECElXSIlg1wGMaDqEmFbNwD+NqUGlqpurC/cuS6hFxs7UIIZr1SOGDyLOJPkzc
+        fwwsB7SR1oicULgzTA8mT74GS8uEOPk=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-151-ytUYPQlgNeeyFU0MXnF5pg-1; Wed, 15 Apr 2020 08:11:39 -0400
+X-MC-Unique: ytUYPQlgNeeyFU0MXnF5pg-1
+Received: by mail-wm1-f71.google.com with SMTP id h22so4161423wml.1
+        for <kvm@vger.kernel.org>; Wed, 15 Apr 2020 05:11:39 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=3g8pOUWTOZg7Xu60Mt7A1x/Ov3i7r+YKQXs6UW5HczM=;
+        b=HBMw+Ud72lQ+W8tIF7/pcQE5nLNLs07z5STg/DwPBpl3CE7sPmiKgJ8c1dQc2Mdp2w
+         cxZccJWuO/stJb/9k6SA4KSC7zbMjUhQwq0q+QXL0j999mBjXliFBDuE0rkJ5DsuX3ln
+         wv74idKYq3Q4TybYesAqoeecrzPSD8YT+exakmQzNPCs1jHC9bIFDa/Q/KB1J8Cjv3dk
+         d6gGkM/OdlUmpFWazs6C2OybByCRXxmHMZLaRNnC/gCqC623i0sjp0fwQXxkv4r8tOTI
+         GhkZfkEsintAXN2wEJ9IwIX7oCcut6+Tzc9o9ptOby1jJ916fEaaHGk9R68MAwlhzeAP
+         XJVw==
+X-Gm-Message-State: AGi0PuaaHqknoywe0dYwoi4F/srZfk842gz6q3JqS4L/gVrcF/zq4JPa
+        0dDQKmTkRqzp7eCznSQhqPrYPOnIL7AApHq1Eedy6aEYWf78/FRTv/J9lyFPj5OwYoHAf1Niy9C
+        eZhDRJiIGw7CG
+X-Received: by 2002:a5d:688f:: with SMTP id h15mr29234452wru.352.1586952698402;
+        Wed, 15 Apr 2020 05:11:38 -0700 (PDT)
+X-Google-Smtp-Source: APiQypKdWpo7ENEPbDqHP93vSXvdpZwuSMQZ1BbP1xfwyNZcod/63Icpez1n6CuR5oR+nIQbYmcMPw==
+X-Received: by 2002:a5d:688f:: with SMTP id h15mr29234435wru.352.1586952698180;
+        Wed, 15 Apr 2020 05:11:38 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:9066:4f2:9fbd:f90e? ([2001:b07:6468:f312:9066:4f2:9fbd:f90e])
+        by smtp.gmail.com with ESMTPSA id q8sm22064722wmg.22.2020.04.15.05.11.36
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 15 Apr 2020 05:11:37 -0700 (PDT)
+Subject: Re: [PATCH 3/4] kvm: Replace vcpu->swait with rcuwait
+To:     Davidlohr Bueso <dave@stgolabs.net>
+Cc:     tglx@linutronix.de, bigeasy@linutronix.de, peterz@infradead.org,
+        rostedt@goodmis.org, torvalds@linux-foundation.org,
+        will@kernel.org, joel@joelfernandes.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Paul Mackerras <paulus@ozlabs.org>,
+        kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org,
+        Davidlohr Bueso <dbueso@suse.de>
+References: <20200324044453.15733-1-dave@stgolabs.net>
+ <20200324044453.15733-4-dave@stgolabs.net>
+ <a6b23828-aa50-bea0-1d2d-03e2871239d4@redhat.com>
+ <20200414211243.7vehybdrvbzmbduu@linux-p48b>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <b2f87633-8eef-4f84-5e65-a80523ca34f8@redhat.com>
+Date:   Wed, 15 Apr 2020 14:11:36 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
+In-Reply-To: <20200414211243.7vehybdrvbzmbduu@linux-p48b>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: David Hildenbrand <david@redhat.com>
+On 14/04/20 23:12, Davidlohr Bueso wrote:
+> On Wed, 25 Mar 2020, Paolo Bonzini wrote:
+> 
+>> On 24/03/20 05:44, Davidlohr Bueso wrote:
+>>> diff --git a/arch/mips/kvm/mips.c b/arch/mips/kvm/mips.c
+>>> index 71244bf87c3a..e049fcb3dffb 100644
+>>> --- a/arch/mips/kvm/mips.c
+>>> +++ b/arch/mips/kvm/mips.c
+>>> @@ -290,8 +290,7 @@ static enum hrtimer_restart
+>>> kvm_mips_comparecount_wakeup(struct hrtimer *timer)
+>>>     kvm_mips_callbacks->queue_timer_int(vcpu);
+>>>
+>>>     vcpu->arch.wait = 0;
+>>> -    if (swq_has_sleeper(&vcpu->wq))
+>>> -        swake_up_one(&vcpu->wq);
+>>> +    rcuwait_wake_up(&vcpu->wait)
+>>
+>> This is missing a semicolon.  (KVM MIPS is known not to compile and will
+>> be changed to "depends on BROKEN" in 5.7).
+> 
+> Do you want me to send another version with this fix or do you prefer
+> fixing it when/if picked up?
 
-[ Upstream commit 1493e0f944f3c319d11e067c185c904d01c17ae5 ]
+It's up to the TIP tree people, but sending a fixed version is probably
+the best way to get their attention. :)
 
-We have to properly retry again by returning -EINVAL immediately in case
-somebody else instantiated the table concurrently. We missed to add the
-goto in this function only. The code now matches the other, similar
-shadowing functions.
+I can also queue it myself (for 5.7 even) if I get an Acked-by from
+Peter though.
 
-We are overwriting an existing region 2 table entry. All allocated pages
-are added to the crst_list to be freed later, so they are not lost
-forever. However, when unshadowing the region 2 table, we wouldn't trigger
-unshadowing of the original shadowed region 3 table that we replaced. It
-would get unshadowed when the original region 3 table is modified. As it's
-not connected to the page table hierarchy anymore, it's not going to get
-used anymore. However, for a limited time, this page table will stick
-around, so it's in some sense a temporary memory leak.
-
-Identified by manual code inspection. I don't think this classifies as
-stable material.
-
-Fixes: 998f637cc4b9 ("s390/mm: avoid races on region/segment/page table shadowing")
-Signed-off-by: David Hildenbrand <david@redhat.com>
-Link: https://lore.kernel.org/r/20200403153050.20569-4-david@redhat.com
-Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
-Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- arch/s390/mm/gmap.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/arch/s390/mm/gmap.c b/arch/s390/mm/gmap.c
-index b6c85b760305d..099db32ed104a 100644
---- a/arch/s390/mm/gmap.c
-+++ b/arch/s390/mm/gmap.c
-@@ -1680,6 +1680,7 @@ int gmap_shadow_r3t(struct gmap *sg, unsigned long saddr, unsigned long r3t,
- 		goto out_free;
- 	} else if (*table & _REGION_ENTRY_ORIGIN) {
- 		rc = -EAGAIN;		/* Race with shadow */
-+		goto out_free;
- 	}
- 	crst_table_init(s_r3t, _REGION3_ENTRY_EMPTY);
- 	/* mark as invalid as long as the parent table is not protected */
--- 
-2.20.1
+Paolo
 
