@@ -2,168 +2,144 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 55ACD1AAF29
-	for <lists+kvm@lfdr.de>; Wed, 15 Apr 2020 19:12:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AAF9A1AAF9E
+	for <lists+kvm@lfdr.de>; Wed, 15 Apr 2020 19:35:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2410703AbgDORK1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Apr 2020 13:10:27 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:42318 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S2410692AbgDORK0 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 15 Apr 2020 13:10:26 -0400
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 03FH5xa7132493;
-        Wed, 15 Apr 2020 13:10:23 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 30dnmsmntr-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 15 Apr 2020 13:10:23 -0400
-Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 03FH65f9133091;
-        Wed, 15 Apr 2020 13:10:23 -0400
-Received: from ppma05wdc.us.ibm.com (1b.90.2fa9.ip4.static.sl-reverse.com [169.47.144.27])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 30dnmsmntc-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 15 Apr 2020 13:10:23 -0400
-Received: from pps.filterd (ppma05wdc.us.ibm.com [127.0.0.1])
-        by ppma05wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 03FH5wIj007778;
-        Wed, 15 Apr 2020 17:10:22 GMT
-Received: from b03cxnp08025.gho.boulder.ibm.com (b03cxnp08025.gho.boulder.ibm.com [9.17.130.17])
-        by ppma05wdc.us.ibm.com with ESMTP id 30b5h73d6j-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 15 Apr 2020 17:10:22 +0000
-Received: from b03ledav005.gho.boulder.ibm.com (b03ledav005.gho.boulder.ibm.com [9.17.130.236])
-        by b03cxnp08025.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 03FHAJFm44695848
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 15 Apr 2020 17:10:19 GMT
-Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 8FBF7BE053;
-        Wed, 15 Apr 2020 17:10:19 +0000 (GMT)
-Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 72E99BE051;
-        Wed, 15 Apr 2020 17:10:18 +0000 (GMT)
-Received: from cpe-172-100-172-46.stny.res.rr.com (unknown [9.85.131.104])
-        by b03ledav005.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Wed, 15 Apr 2020 17:10:18 +0000 (GMT)
-From:   Tony Krowiak <akrowiak@linux.ibm.com>
-Subject: Re: [PATCH v7 03/15] s390/zcrypt: driver callback to indicate
- resource in use
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, freude@linux.ibm.com, borntraeger@de.ibm.com,
-        mjrosato@linux.ibm.com, pmorel@linux.ibm.com, pasic@linux.ibm.com,
-        alex.williamson@redhat.com, kwankhede@nvidia.com,
-        jjherne@linux.ibm.com, fiuczy@linux.ibm.com
-References: <20200407192015.19887-1-akrowiak@linux.ibm.com>
- <20200407192015.19887-4-akrowiak@linux.ibm.com>
- <20200414140838.54f777b8.cohuck@redhat.com>
-Message-ID: <0f193571-1ff6-08f3-d02d-b4f40d2930c8@linux.ibm.com>
-Date:   Wed, 15 Apr 2020 13:10:18 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+        id S2411005AbgDOR1l (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Apr 2020 13:27:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38434 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2410992AbgDOR1g (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Apr 2020 13:27:36 -0400
+Received: from mail-io1-xd43.google.com (mail-io1-xd43.google.com [IPv6:2607:f8b0:4864:20::d43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23006C061A0C
+        for <kvm@vger.kernel.org>; Wed, 15 Apr 2020 10:27:35 -0700 (PDT)
+Received: by mail-io1-xd43.google.com with SMTP id 19so2101914ioz.10
+        for <kvm@vger.kernel.org>; Wed, 15 Apr 2020 10:27:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=4aWqk5/j/HVgM5+Uxpcn41+0bfk/7nkK2qOIYF53Lug=;
+        b=um6fO4ICFHnTmDxpxj4g8omamITG4Or1AS4OSK5B4sRHUERm7W6RtMHovrOQY9NWO3
+         s6Gvu6XKFJW1HXgXoIxxEHJGk8d64F6mmmfi7MCIEg1HD+XWJdTJu3Bg9t3CnBN+LJGH
+         lt/aWp81rCdC4JtMEqxtZPoPRhMkRqqSYCqh8Wh2a3p6SxQ5m/nitQkYecD2QcSpzgaH
+         U7xG1nJijRiotZhcZ3ZSJwY1Il/MhiqdfDeleZcV+5vaALmqnUalQH40IIvjzTG7WQgG
+         xbQOFyBJpd4CVHVRGAPSmqO/Cu1D/EDVpmgX5wHZ9vnnoIKQ6CtV6l9WjlNmI2DaYcgY
+         usfA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=4aWqk5/j/HVgM5+Uxpcn41+0bfk/7nkK2qOIYF53Lug=;
+        b=PhTZmIcR+ybvEikR+feVXAQHoJAZ0W7Vk+4AS1Zx9q4UJw0KNA9hxg1tHCgYBIgM2z
+         XGPCrik5LFa5VE0R44MzVhAsA+itCQTK74SXXk4x+rhZMJw7MvP+j8JK0dGp6o7R+m2m
+         Gvftx3jtW3CnRxNZoQ7329f2FJoYk1l7FSAvOEI7cD9IiLaWOs/8uqobPafFyW9gQvEP
+         +ovZNYanBbVdlCx3K0IglRL9/of2k4BZ4Le7PUdB74n3/47/huewekymP1/pJXgZvoJh
+         CxCQ+tqscr0RW5/EyLj6bBixuHmK/AdVyUpa4KvVhj9YeYzc/F8l7AU5Gg9C5iwki5l3
+         dbkA==
+X-Gm-Message-State: AGi0Pua7k5kiF45wolRPjwJHhFFjHFhNs56oGeabJ7lfBcnMxwwKveFr
+        KriNU1q5F6xrdZG0Cnuh97dxhXlaYzFldnEKgZQHjw==
+X-Google-Smtp-Source: APiQypJFfAOIZLYxuanxeQwSwWbZbhF6g2d7/UWqFOVUVmkbVr4YQyfPCjXeu6IZ+UJGJnOHg/Ylh6hZ2M2icEmj0iU=
+X-Received: by 2002:a6b:9346:: with SMTP id v67mr16861359iod.154.1586971654121;
+ Wed, 15 Apr 2020 10:27:34 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200414140838.54f777b8.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.676
- definitions=2020-04-15_06:2020-04-14,2020-04-15 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 mlxscore=0
- adultscore=0 priorityscore=1501 mlxlogscore=999 bulkscore=0 clxscore=1015
- spamscore=0 lowpriorityscore=0 malwarescore=0 phishscore=0 suspectscore=3
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
- definitions=main-2004150120
+References: <20200415012320.236065-1-jcargill@google.com> <20200415023726.GD12547@linux.intel.com>
+ <20200415025105.GE12547@linux.intel.com>
+In-Reply-To: <20200415025105.GE12547@linux.intel.com>
+From:   Jon Cargille <jcargill@google.com>
+Date:   Wed, 15 Apr 2020 10:27:21 -0700
+Message-ID: <CANxmayggcRWE994FVVgHFxBk4pv0Zf6a7AWT7psyOJuFs0VaVg@mail.gmail.com>
+Subject: Re: [PATCH 1/1] KVM: pass through CPUID(0x80000006)
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Eric Northup <digitaleric@gmail.com>,
+        Eric Northup <digitaleric@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+> I assume you want to say something like:
 
+That's a much better commit message--thank you, Sean!
 
-On 4/14/20 8:08 AM, Cornelia Huck wrote:
-> On Tue,  7 Apr 2020 15:20:03 -0400
-> Tony Krowiak <akrowiak@linux.ibm.com> wrote:
+> Jim's tag is unnecessary, unless he was a middleman between Eric and Jon,
+
+I appreciate the feedback; I was trying to capture that Jim "was in
+the patch's delivery path."
+(per submitting-patches.rst), but it sounds like that is intended for
+a more explicit middle-man
+relationship than I had understood. Jim reviewed it internally before
+sending, which sounds
+like it should be expressed as an "Acked-by" instead; is that accurate?
+
+>> Only one of Eric's signoffs is needed (the one that matches the From: tag,
+> Ah, Eric's @google.com mail bounced.  Maybe do:
 >
->> Introduces a new driver callback to prevent a root user from unbinding
->> an AP queue from its device driver if the queue is in use. The intent of
->> this callback is to provide a driver with the means to prevent a root user
->> from inadvertently taking a queue away from a guest and giving it to the
->> host while the guest is still using it. The callback will
->> be invoked whenever a change to the AP bus's sysfs apmask or aqmask
->> attributes would result in one or more AP queues being removed from its
->> driver. If the callback responds in the affirmative for any driver
->> queried, the change to the apmask or aqmask will be rejected with a device
->> in use error.
->>
->> For this patch, only non-default drivers will be queried. Currently,
->> there is only one non-default driver, the vfio_ap device driver. The
->> vfio_ap device driver manages AP queues passed through to one or more
->> guests and we don't want to unexpectedly take AP resources away from
->> guests which are most likely independently administered.
->>
->> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
->> ---
->>   drivers/s390/crypto/ap_bus.c | 144 +++++++++++++++++++++++++++++++++--
->>   drivers/s390/crypto/ap_bus.h |   4 +
->>   2 files changed, 142 insertions(+), 6 deletions(-)
->>
->> diff --git a/drivers/s390/crypto/ap_bus.c b/drivers/s390/crypto/ap_bus.c
->> index 5256e3ce84e5..af15c095e76a 100644
->> --- a/drivers/s390/crypto/ap_bus.c
->> +++ b/drivers/s390/crypto/ap_bus.c
->> @@ -35,6 +35,7 @@
->>   #include <linux/mod_devicetable.h>
->>   #include <linux/debugfs.h>
->>   #include <linux/ctype.h>
->> +#include <linux/module.h>
->>   
->>   #include "ap_bus.h"
->>   #include "ap_debug.h"
->> @@ -995,9 +996,11 @@ int ap_parse_mask_str(const char *str,
->>   	newmap = kmalloc(size, GFP_KERNEL);
->>   	if (!newmap)
->>   		return -ENOMEM;
->> -	if (mutex_lock_interruptible(lock)) {
->> -		kfree(newmap);
->> -		return -ERESTARTSYS;
->> +	if (lock) {
->> +		if (mutex_lock_interruptible(lock)) {
->> +			kfree(newmap);
->> +			return -ERESTARTSYS;
->> +		}
-> This whole function is a bit odd. It seems all masks we want to
-> manipulate are always guarded by the ap_perms_mutex, and the need for
-> allowing lock == NULL comes from wanting to call this function with the
-> ap_perms_mutex already held.
+>   Signed-off-by: Eric Northup (Google) <digitaleric@gmail.com>
+
+Gotcha, thanks. Yes, when I conferred with Eric on submitting his
+commits, he had wanted to
+acknowledge that the work was done while he was at Google (e.g. his
+old Google email addr),
+and  I wanted to include current contact information for him as well.
+
+Your suggestion to combine into a single Signed-off-by is a good one,
+and I'll use that form
+in the future.
+
+Thanks much,
+
+Jon
+
+On Tue, Apr 14, 2020 at 7:51 PM Sean Christopherson
+<sean.j.christopherson@intel.com> wrote:
 >
-> That would argue for a locked/unlocked version of this function... but
-> looking at it, why do we lock the way we do? The one thing this
-> function (prior to this patch) does outside of the holding of the mutex
-> is the allocation and freeing of newmap. But with this patch, we do the
-> allocation and freeing of newmap while holding the mutex. Something
-> seems a bit weird here.
-
-Note that the ap_parse_mask function copies the newmap
-to the bitmap passed in as a parameter to the function.
-Prior to the introduction of this patch, the calling functions - i.e.,
-apmask_store(), aqmask_store() and ap_perms_init() - passed
-in the actual bitmap (i.e., ap_perms.apm or ap_perms aqm),
-so the ap_perms were changed directly by this function.
-
-With this patch, the apmask_store() and aqmask_store()
-functions now pass in a copy of those bitmaps. This is so
-we can verify that any APQNs being removed are not
-in use by the vfio_ap device driver before committing the
-change to ap_perms. Consequently, it is now necessary
-to take the lock for the until the changes are committed.
-
-Having explained that, you make a valid argument that
-this calls for a locked/unlocked version of this function, so
-I will modify this patch to that effect.
-
+> On Tue, Apr 14, 2020 at 07:37:26PM -0700, Sean Christopherson wrote:
+> > On Tue, Apr 14, 2020 at 06:23:20PM -0700, Jon Cargille wrote:
+> > > From: Eric Northup <digitaleric@gmail.com>
+> > >
+> > > Return L2 cache and TLB information to guests.
+> > > They could have been set before, but the defaults that KVM returns will be
+> > > necessary for usermode that doesn't supply their own CPUID tables.
+> >
+> > I don't follow the changelog.  The code makes sense, but I don't understand
+> > the justification.  This only affects KVM_GET_SUPPORTED_CPUID, i.e. what's
+> > advertised to userspace, it doesn't directly change CPUID emulation in any
+> > way.  The "They could have been set before" blurb is especially confusing.
+> >
+> > I assume you want to say something like:
+> >
+> >   Return the host's L2 cache and TLB information for CPUID.0x80000006
+> >   instead of zeroing out the entry as part of KVM_GET_SUPPORTED_CPUID.
+> >   This allows a userspace VMM to feed KVM_GET_SUPPORTED_CPUID's output
+> >   directly into KVM_SET_CPUID2 (without breaking the guest).
+> >
+> > > Signed-off-by: Eric Northup <digitaleric@google.com>
+> > > Signed-off-by: Eric Northup <digitaleric@gmail.com>
+> > > Signed-off-by: Jon Cargille <jcargill@google.com>
+> > > Signed-off-by: Jim Mattson <jmattson@google.com>
+> >
+> > Jim's tag is unnecessary, unless he was a middleman between Eric and Jon,
+> > in which case Jim's tag should also come between Eric's and Jon's.
+> >
+> > Only one of Eric's signoffs is needed (the one that matches the From: tag,
+> > i.e. is the official author).  I'm guessing Google would prefer the author
+> > to be the @google.com address.
 >
->>   	}
->>   
->>   	if (*str == '+' || *str == '-') {
-
+> Ah, Eric's @google.com mail bounced.  Maybe do:
+>
+>   Signed-off-by: Eric Northup (Google) <digitaleric@gmail.com>
+>
+> to clarify the work was done for Google without having a double signoff
+> and/or a dead email.
