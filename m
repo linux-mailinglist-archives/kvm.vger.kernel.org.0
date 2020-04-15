@@ -2,134 +2,233 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BC9DB1AB109
-	for <lists+kvm@lfdr.de>; Wed, 15 Apr 2020 21:10:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BFC191AB176
+	for <lists+kvm@lfdr.de>; Wed, 15 Apr 2020 21:21:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2411734AbgDOTIf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Apr 2020 15:08:35 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:39942 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S371248AbgDOTEJ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 15 Apr 2020 15:04:09 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 03FJ2mf5033761
-        for <kvm@vger.kernel.org>; Wed, 15 Apr 2020 15:04:07 -0400
-Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 30dnmtqcvc-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Wed, 15 Apr 2020 15:04:07 -0400
-Received: from localhost
-        by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <farman@linux.ibm.com>;
-        Wed, 15 Apr 2020 20:03:30 +0100
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
-        by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Wed, 15 Apr 2020 20:03:27 +0100
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 03FJ41bo57802806
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 15 Apr 2020 19:04:01 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id EC6854C058;
-        Wed, 15 Apr 2020 19:04:00 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id DA8B34C04A;
-        Wed, 15 Apr 2020 19:04:00 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
-        Wed, 15 Apr 2020 19:04:00 +0000 (GMT)
-Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 4958)
-        id 737F1E027F; Wed, 15 Apr 2020 21:03:55 +0200 (CEST)
-From:   Eric Farman <farman@linux.ibm.com>
-To:     kvm@vger.kernel.org, linux-s390@vger.kernel.org
-Cc:     Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Michael Mueller <mimu@linux.ibm.com>,
-        Heiko Carstens <heiko.carstens@de.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Thomas Huth <thuth@redhat.com>,
-        Eric Farman <farman@linux.ibm.com>
-Subject: [PATCH] KVM: s390: Fix PV check in deliverable_irqs()
-Date:   Wed, 15 Apr 2020 21:03:53 +0200
-X-Mailer: git-send-email 2.17.1
-X-TM-AS-GCONF: 00
-x-cbid: 20041519-4275-0000-0000-000003C0792E
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20041519-4276-0000-0000-000038D5F14C
-Message-Id: <20200415190353.63625-1-farman@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.676
- definitions=2020-04-15_06:2020-04-14,2020-04-15 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- bulkscore=0 clxscore=1015 impostorscore=0 phishscore=0 spamscore=0
- malwarescore=0 suspectscore=0 mlxscore=0 priorityscore=1501
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2003020000 definitions=main-2004150140
+        id S2506460AbgDOTSW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Apr 2020 15:18:22 -0400
+Received: from mga07.intel.com ([134.134.136.100]:7923 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2438103AbgDOTSE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Apr 2020 15:18:04 -0400
+IronPort-SDR: a1P065WqdNqs/eX3NiZKAqqULT0LqoQt35JQxDTV/kBhZysAiO6ImUpvhqvmznwIytwbxaR7B+
+ xhWJiJEHLSzg==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Apr 2020 12:18:03 -0700
+IronPort-SDR: SEHqItrkjZXOQP0jipLmEroMtPCrnvseS05ClLvhsLuO2XMAAd+N4nafCDISRgbQ9E0V6Qq+0P
+ yQHvJHunYdgw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.72,388,1580803200"; 
+   d="scan'208";a="455009326"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
+  by fmsmga006.fm.intel.com with ESMTP; 15 Apr 2020 12:18:02 -0700
+Date:   Wed, 15 Apr 2020 12:18:02 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Thomas Gleixner <tglx@linutronix.de>
+Cc:     Xiaoyao Li <xiaoyao.li@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, x86@kernel.org,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Andy Lutomirski <luto@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Arvind Sankar <nivedita@alum.mit.edu>
+Subject: Re: [PATCH v8 4/4] kvm: vmx: virtualize split lock detection
+Message-ID: <20200415191802.GE30627@linux.intel.com>
+References: <20200414063129.133630-5-xiaoyao.li@intel.com>
+ <871rooodad.fsf@nanos.tec.linutronix.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <871rooodad.fsf@nanos.tec.linutronix.de>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The diag 0x44 handler, which handles a directed yield, goes into a
-a codepath that does a kvm_for_each_vcpu() and ultimately
-deliverable_irqs().  The new check for kvm_s390_pv_cpu_is_protected()
-contains an assertion that the vcpu->mutex is held, which isn't going
-to be the case in this scenario.
+On Wed, Apr 15, 2020 at 07:43:22PM +0200, Thomas Gleixner wrote:
+> Xiaoyao Li <xiaoyao.li@intel.com> writes:
+> > +/*
+> > + * Note: for guest, feature split lock detection can only be enumerated through
+> > + * MSR_IA32_CORE_CAPABILITIES bit. The FMS enumeration is unsupported.
+> 
+> That comment is confusing at best.
+> 
+> > + */
+> > +static inline bool guest_cpu_has_feature_sld(struct kvm_vcpu *vcpu)
+> > +{
+> > +	return vcpu->arch.core_capabilities &
+> > +	       MSR_IA32_CORE_CAPS_SPLIT_LOCK_DETECT;
+> > +}
+> > +
+> > +static inline bool guest_cpu_sld_on(struct vcpu_vmx *vmx)
+> > +{
+> > +	return vmx->msr_test_ctrl & MSR_TEST_CTRL_SPLIT_LOCK_DETECT;
+> > +}
+> > +
+> > +static inline void vmx_update_sld(struct kvm_vcpu *vcpu, bool on)
+> > +{
+> > +	/*
+> > +	 * Toggle SLD if the guest wants it enabled but its been disabled for
+> > +	 * the userspace VMM, and vice versa.  Note, TIF_SLD is true if SLD has
+> > +	 * been turned off.  Yes, it's a terrible name.
+> 
+> Instead of writing that useless blurb you could have written a patch
+> which changes TIF_SLD to TIF_SLD_OFF to make it clear.
 
-The result is a plethora of these messages if the lock debugging
-is enabled, and thus an implication that we have a problem.
+Hah, that's my comment, though I must admit I didn't fully intend for the
+editorial at the end to get submitted upstream.
 
-  WARNING: CPU: 9 PID: 16167 at arch/s390/kvm/kvm-s390.h:239 deliverable_irqs+0x1c6/0x1d0 [kvm]
-  ...snip...
-  Call Trace:
-   [<000003ff80429bf2>] deliverable_irqs+0x1ca/0x1d0 [kvm]
-  ([<000003ff80429b34>] deliverable_irqs+0x10c/0x1d0 [kvm])
-   [<000003ff8042ba82>] kvm_s390_vcpu_has_irq+0x2a/0xa8 [kvm]
-   [<000003ff804101e2>] kvm_arch_dy_runnable+0x22/0x38 [kvm]
-   [<000003ff80410284>] kvm_vcpu_on_spin+0x8c/0x1d0 [kvm]
-   [<000003ff80436888>] kvm_s390_handle_diag+0x3b0/0x768 [kvm]
-   [<000003ff80425af4>] kvm_handle_sie_intercept+0x1cc/0xcd0 [kvm]
-   [<000003ff80422bb0>] __vcpu_run+0x7b8/0xfd0 [kvm]
-   [<000003ff80423de6>] kvm_arch_vcpu_ioctl_run+0xee/0x3e0 [kvm]
-   [<000003ff8040ccd8>] kvm_vcpu_ioctl+0x2c8/0x8d0 [kvm]
-   [<00000001504ced06>] ksys_ioctl+0xae/0xe8
-   [<00000001504cedaa>] __s390x_sys_ioctl+0x2a/0x38
-   [<0000000150cb9034>] system_call+0xd8/0x2d8
-  2 locks held by CPU 2/KVM/16167:
-   #0: 00000001951980c0 (&vcpu->mutex){+.+.}, at: kvm_vcpu_ioctl+0x90/0x8d0 [kvm]
-   #1: 000000019599c0f0 (&kvm->srcu){....}, at: __vcpu_run+0x4bc/0xfd0 [kvm]
-  Last Breaking-Event-Address:
-   [<000003ff80429b34>] deliverable_irqs+0x10c/0x1d0 [kvm]
-  irq event stamp: 11967
-  hardirqs last  enabled at (11975): [<00000001502992f2>] console_unlock+0x4ca/0x650
-  hardirqs last disabled at (11982): [<0000000150298ee8>] console_unlock+0xc0/0x650
-  softirqs last  enabled at (7940): [<0000000150cba6ca>] __do_softirq+0x422/0x4d8
-  softirqs last disabled at (7929): [<00000001501cd688>] do_softirq_own_stack+0x70/0x80
+Anyways, I _did_ point out that TIF_SLD is a terrible name[1][2], and my
+feedback got ignored/overlooked.  I'd be more than happy to write a patch,
+I didn't do so because I assumed that people wanted TIF_SLD as the name for
+whatever reason.
 
-Considering what's being done here, let's fix this by removing the
-mutex assertion rather than acquiring the mutex for every other vcpu.
+[1] https://lkml.kernel.org/r/20191122184457.GA31235@linux.intel.com
+[2] https://lkml.kernel.org/r/20200115225724.GA18268@linux.intel.com
 
-Fixes: 201ae986ead7 ("KVM: s390: protvirt: Implement interrupt injection")
-Signed-off-by: Eric Farman <farman@linux.ibm.com>
----
- arch/s390/kvm/interrupt.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+> > +	 */
+> > +	if (sld_state == sld_warn && guest_cpu_has_feature_sld(vcpu) &&
+> > +	    on == test_thread_flag(TIF_SLD)) {
+> > +		    sld_update_msr(on);
+> > +		    update_thread_flag(TIF_SLD, !on);
+> 
+> Of course you completely fail to explain why TIF_SLD needs to be fiddled
+> with.
 
-diff --git a/arch/s390/kvm/interrupt.c b/arch/s390/kvm/interrupt.c
-index 8191106bf7b9..bfb481134994 100644
---- a/arch/s390/kvm/interrupt.c
-+++ b/arch/s390/kvm/interrupt.c
-@@ -393,7 +393,7 @@ static unsigned long deliverable_irqs(struct kvm_vcpu *vcpu)
- 	if (psw_mchk_disabled(vcpu))
- 		active_mask &= ~IRQ_PEND_MCHK_MASK;
- 	/* PV guest cpus can have a single interruption injected at a time. */
--	if (kvm_s390_pv_cpu_is_protected(vcpu) &&
-+	if (kvm_s390_pv_cpu_get_handle(vcpu) &&
- 	    vcpu->arch.sie_block->iictl != IICTL_CODE_NONE)
- 		active_mask &= ~(IRQ_PEND_EXT_II_MASK |
- 				 IRQ_PEND_IO_MASK |
--- 
-2.17.1
+Ya, that comment should be something like:
 
+	* Toggle SLD if the guest wants it enabled but its been disabled for
+	* the userspace VMM, and vice versa, so that the flag and MSR state
+	* are consistent, i.e. its handling during task switches naturally does
+	* the right thing if KVM is preempted with guest state loaded.
+
+> > @@ -1188,6 +1217,10 @@ void vmx_prepare_switch_to_guest(struct kvm_vcpu *vcpu)
+> >  #endif
+> >
+> > 	vmx_set_host_fs_gs(host_state, fs_sel, gs_sel, fs_base, gs_base);
+> > +
+> > +	vmx->host_sld_on = !test_thread_flag(TIF_SLD);
+> 
+> This inverted storage is non-intuitive. What's wrong with simply
+> reflecting the TIF_SLD state?
+
+So that the guest/host tracking use the same polairy, and IMO it makes
+the restoration code more intuitive, e.g.:
+
+	vmx_update_sld(&vmx->vcpu, vmx->host_sld_on);
+vs
+	vmx_update_sld(&vmx->vcpu, !vmx->host_tif_sld);
+
+I.e. the inversion needs to happen somewhere.
+
+> > +	vmx_update_sld(vcpu, guest_cpu_sld_on(vmx));
+> > +
+> >	vmx->guest_state_loaded = true;
+> > }
+> >
+> > @@ -1226,6 +1259,9 @@ static void vmx_prepare_switch_to_host(struct vcpu_vmx *vmx)
+> > 	wrmsrl(MSR_KERNEL_GS_BASE, vmx->msr_host_kernel_gs_base);
+> >  #endif
+> > 	load_fixmap_gdt(raw_smp_processor_id());
+> > +
+> > +	vmx_update_sld(&vmx->vcpu, vmx->host_sld_on);
+> > +
+> 
+> vmx_prepare_switch_to_guest() is called via:
+> 
+> kvm_arch_vcpu_ioctl_run()
+>   vcpu_run()
+>     vcpu_enter_guest()
+>       preempt_disable();
+>       kvm_x86_ops.prepare_guest_switch(vcpu);
+> 
+> but vmx_prepare_switch_to_host() is invoked at the very end of:
+> 
+> kvm_arch_vcpu_ioctl_run()
+>   .....
+>   vcpu_run()
+>   .....
+>   vcpu_put()
+>     vmx_vcpu_put()
+>       vmx_prepare_switch_to_host();
+> 
+> That asymmetry does not make any sense without an explanation.
+
+Deferring the "switch to host" until the vCPU is put allows KVM to keep
+certain guest state loaded when staying in the vCPU run loop, e.g.
+MSR_KERNEL_GS_BASE can be exposed to the guest without having to save and
+restore it on every VM-Enter/VM-Exit.
+
+I agree that all of KVM's state save/load trickerly lacks documentation,
+I'll put that on my todo list.
+ 
+> What's even worse is that vmx_prepare_switch_to_host() is invoked with
+> preemption enabled, so MSR state and TIF_SLD state can get out of sync
+> on preemption/migration.
+
+It shouldn't be (called with preempation enabled):
+
+void vcpu_put(struct kvm_vcpu *vcpu)
+{
+	preempt_disable();
+	kvm_arch_vcpu_put(vcpu); <-- leads to vmx_prepare_switch_to_host()
+	preempt_notifier_unregister(&vcpu->preempt_notifier);
+	__this_cpu_write(kvm_running_vcpu, NULL);
+	preempt_enable();
+}
+
+> > @@ -1946,9 +1992,15 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+> > 
+> > 	switch (msr_index) {
+> > 	case MSR_TEST_CTRL:
+> > -		if (data)
+> > +		if (data & ~vmx_msr_test_ctrl_valid_bits(vcpu))
+> > 			return 1;
+> > 
+> > +		vmx->msr_test_ctrl = data;
+> > +
+> > +		preempt_disable();
+> 
+> This preempt_disable/enable() lacks explanation as well.
+
+Is an explanation still needed if it's made clear (somewhere) that
+interacting with guest_state_loaded needs to be done with preemption
+disabled?
+ 
+> > +		if (vmx->guest_state_loaded)
+> > +			vmx_update_sld(vcpu, guest_cpu_sld_on(vmx));
+> > +		preempt_enable();
+> 
+> How is updating msr_test_ctrl valid if this is invoked from the IOCTL,
+> i.e. host_initiated == true?
+
+Not sure I understand the underlying question.  The host is always allowed
+to manipulate guest state, including MSRs.
+
+I'm pretty sure guest_state_loaded should always be false if host_initiated
+is true, e.g. we could technically do a WARN on guest_state_loaded and
+host_initiated, but the ioctl() is obviously not a hot path and nothing
+will break if the assumption doesn't hold.
+
+> That said, I also hate the fact that you export both the low level MSR
+> function _and_ the state variable. Having all these details including the
+> TIF mangling in the VMX code is just wrong.
+
+I'm not a fan of exporting the low level state either, but IIRC trying to
+hide the low level details while achieving the same resulting functionality
+was even messier.
+
+I don't see any way to avoid having KVM differentiate between sld_warn and
+sld_fatal.  Even if KVM is able to virtualize SLD in sld_fatal mode, e.g.
+by telling the guest it must not try to disable SLD, KVM would still need
+to know the kernel is sld_fatal so that it can forward that information to
+the guest.
+
+It'd be possible to avoid mucking with TIF or exporting the MSR helper, but
+that would require KVM to manually save/restore the MSR when KVM is
+preempted with guest state loaded.  That probably wouldn't actually affect
+performance for most use cases, but IMO it's not worth the extra headache
+just to avoid exporting a helper.
