@@ -2,66 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7A7341AAADB
+	by mail.lfdr.de (Postfix) with ESMTP id E5ECD1AAADD
 	for <lists+kvm@lfdr.de>; Wed, 15 Apr 2020 16:52:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S370986AbgDOOuv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Apr 2020 10:50:51 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:38883 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S370969AbgDOOut (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 15 Apr 2020 10:50:49 -0400
+        id S370997AbgDOOv1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Apr 2020 10:51:27 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:25917 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S371005AbgDOOvX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Apr 2020 10:51:23 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1586962248;
+        s=mimecast20190719; t=1586962282;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=CfwnmYMAxkw+iuYFdVJw7VR5RUUAeLW4OT5nezamaG4=;
-        b=jLv1mHc4Fy306hfpvsVmWtzjbj98ZcCYaBkjwaQ2YMSVl91LlF0BMQbZd66ZUPw9zl/zzy
-        nXN5wePL+zqkz3VwI3GnBQzUDYbnWsp+khCBtdMW34aLOSseK18cPGLAlZUUhP69z/CQME
-        BOemE19yJCiQv1p5AdxmaLPgGymUN+M=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-465-dbLWtQGUPwaFeLlWv88BXg-1; Wed, 15 Apr 2020 10:50:46 -0400
-X-MC-Unique: dbLWtQGUPwaFeLlWv88BXg-1
-Received: by mail-wm1-f71.google.com with SMTP id o26so5055505wmh.1
-        for <kvm@vger.kernel.org>; Wed, 15 Apr 2020 07:50:46 -0700 (PDT)
+        bh=leZSjE43uAL/Ie9a6Mr56ke5RJoF9DAfX4lyVbbPA7o=;
+        b=GXaY8z+Y5mVKVlXaS1OWOZQVuW7O1HBQlHXNUYzDjjyVy93r4lGQHaMaZS+F6iP1v3pO30
+        muXBx3ZPSmLztTGJfFzs5ZfKuW7Pacfgs9s+guF7P6MYGBGJm6J6LKg25L3M6c6pB3P37A
+        3ty0jqYcsY6CkryknguoaZ0Ym8qzW1M=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-353-SOC3e4duNEC5RNNANoQXiQ-1; Wed, 15 Apr 2020 10:51:20 -0400
+X-MC-Unique: SOC3e4duNEC5RNNANoQXiQ-1
+Received: by mail-wr1-f70.google.com with SMTP id s11so35258wru.6
+        for <kvm@vger.kernel.org>; Wed, 15 Apr 2020 07:51:20 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=CfwnmYMAxkw+iuYFdVJw7VR5RUUAeLW4OT5nezamaG4=;
-        b=tiSix89GWC1p8RdAZuI0/FZAZOQqxExxrzEI6o/lfh4xB0wcBRC98nVlZv75sOQeuw
-         YQ0wA5Jr9LRCtMQKtliLVjS0vbAZrb4TgNO/lr+1yU7/wrH7NoLTnzeqKfFUte0WQyB7
-         UYGPa6bIeZ6QO0QEXAk0GeSiJnA7KV6VCSWkegSVX680CJ9Z3xlgfUaRbfadoQh9YIMi
-         Tw3kMaEx5s/rBbYrtrAhxL2DGqilLfur4GSN2K9zB3bMjly6KjbQPxshR2lHVC0aSQ/X
-         IwWBTfJslwCJaZuDe+Bmzqy+Kw81qwKZC3qaeKMj6awdcyVpDhEnx4X+zhBAHJe5W/ZV
-         aT8A==
-X-Gm-Message-State: AGi0PuYB5xKDawULoyKKbQXjCIGpSsLhqFbjgVugaAwF2QL6dC1GRw64
-        M29NVMZ5ow2yZsYsa7+6pFP64DoD26zakS6fLECCUSp/rvYroc/NT4AIvxIGE3y2wEOiI5PGqMO
-        vUOC8/BMT+amZ
-X-Received: by 2002:adf:fe45:: with SMTP id m5mr22009056wrs.124.1586962245485;
-        Wed, 15 Apr 2020 07:50:45 -0700 (PDT)
-X-Google-Smtp-Source: APiQypLhQzuCWazAs6mIGiC2s+Dl6hNNJt7KyyH3w6YOkolQg6Vkyis/lFpNj02WU/berwThyTIAIw==
-X-Received: by 2002:adf:fe45:: with SMTP id m5mr22009040wrs.124.1586962245265;
-        Wed, 15 Apr 2020 07:50:45 -0700 (PDT)
+        bh=leZSjE43uAL/Ie9a6Mr56ke5RJoF9DAfX4lyVbbPA7o=;
+        b=o0Tf7AKZQSGXKWhcGSYLJWvSnDS6TW2aU5pHWOepGS9MCWVolZ5wqa6c0FryvcJgTm
+         232nfrJWFlQyL2o907fW/adDz6YVsdXQMEHrQT3jAu4jrVupeuYEdvyZKBFNEbnoR+er
+         u6OkPBu1hbjkPUByTirHAo4ZZqlyHgaIqtQfdsABRCIbITAaRnG6LSUP8IP1s3UYByNK
+         0/wRwttBLmdIXDtBkBszc6EqZhGaCnpcs1bmDRcR9n3nvsV/WZ6cLrfqO5w+lQrIHKr2
+         XSOGEHnxHzEGLdr7kqOlK3XxGThZ9mBHYb1bM/B8MsroudQ3Qui3jh2KbVq0aTR3uWcJ
+         T/Eg==
+X-Gm-Message-State: AGi0PuaCwwxXcavpQYC39XXwB1Emf1m5n8NzKXg7mFg6zNiSEhs9VIx4
+        sW93r1dc2eohCxDbZoByrYK+FZ6zozVIBFt9EofNICsP/MigP2ZGJU+U/lcXyOOiEVOOjTeJYXS
+        +ejJZvhMGPB92
+X-Received: by 2002:a05:600c:2210:: with SMTP id z16mr5809362wml.151.1586962279613;
+        Wed, 15 Apr 2020 07:51:19 -0700 (PDT)
+X-Google-Smtp-Source: APiQypLqi6exgMIjPz9xAvUDGG95jM80TJKbHiIMU+SVZ5FaaWnrTlZ0fNKxib6hxZ4HXThXRokDwA==
+X-Received: by 2002:a05:600c:2210:: with SMTP id z16mr5809344wml.151.1586962279391;
+        Wed, 15 Apr 2020 07:51:19 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:9066:4f2:9fbd:f90e? ([2001:b07:6468:f312:9066:4f2:9fbd:f90e])
-        by smtp.gmail.com with ESMTPSA id c20sm24342426wmd.36.2020.04.15.07.50.44
+        by smtp.gmail.com with ESMTPSA id r2sm23461261wmg.2.2020.04.15.07.51.18
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 15 Apr 2020 07:50:44 -0700 (PDT)
-Subject: Re: [PATCH] kvm: nVMX: match comment with return type for
- nested_vmx_exit_reflected
-To:     Oliver Upton <oupton@google.com>, kvm@vger.kernel.org
-References: <20200414221241.134103-1-oupton@google.com>
+        Wed, 15 Apr 2020 07:51:19 -0700 (PDT)
+Subject: Re: [PATCH] KVM: SVM: Do not mark svm_vcpu_run with
+ STACK_FRAME_NON_STANDARD
+To:     Uros Bizjak <ubizjak@gmail.com>, kvm@vger.kernel.org
+References: <20200414113612.104501-1-ubizjak@gmail.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <733cd06d-2e16-4f95-3ba9-776b5f0cf28d@redhat.com>
-Date:   Wed, 15 Apr 2020 16:50:44 +0200
+Message-ID: <1e91fe27-bdf9-2fd6-3136-3f276d4a3c21@redhat.com>
+Date:   Wed, 15 Apr 2020 16:51:18 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200414221241.134103-1-oupton@google.com>
+In-Reply-To: <20200414113612.104501-1-ubizjak@gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -70,28 +70,27 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 15/04/20 00:12, Oliver Upton wrote:
-> nested_vmx_exit_reflected() returns a bool, not int. As such, refer to
-> the return values as true/false in the comment instead of 1/0.
+On 14/04/20 13:36, Uros Bizjak wrote:
+> svm_vcpu_run does not change stack or frame pointer anymore.
 > 
-> Signed-off-by: Oliver Upton <oupton@google.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Uros Bizjak <ubizjak@gmail.com>
 > ---
->  arch/x86/kvm/vmx/nested.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  arch/x86/kvm/svm/svm.c | 1 -
+>  1 file changed, 1 deletion(-)
 > 
-> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> index cbc9ea2de28f9..2ca53dc362731 100644
-> --- a/arch/x86/kvm/vmx/nested.c
-> +++ b/arch/x86/kvm/vmx/nested.c
-> @@ -5534,7 +5534,7 @@ static bool nested_vmx_exit_handled_vmcs_access(struct kvm_vcpu *vcpu,
->  }
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index cd773f6261e3..200962c83b82 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -3427,7 +3427,6 @@ static void svm_vcpu_run(struct kvm_vcpu *vcpu)
 >  
->  /*
-> - * Return 1 if we should exit from L2 to L1 to handle an exit, or 0 if we
-> + * Return true if we should exit from L2 to L1 to handle an exit, or false if we
->   * should handle it ourselves in L0 (and then continue L2). Only call this
->   * when in is_guest_mode (L2).
->   */
+>  	mark_all_clean(svm->vmcb);
+>  }
+> -STACK_FRAME_NON_STANDARD(svm_vcpu_run);
+>  
+>  static void svm_load_mmu_pgd(struct kvm_vcpu *vcpu, unsigned long root)
+>  {
 > 
 
 Queued, thanks.
