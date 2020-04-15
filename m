@@ -2,142 +2,430 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 371F41A936C
-	for <lists+kvm@lfdr.de>; Wed, 15 Apr 2020 08:43:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E66991A944B
+	for <lists+kvm@lfdr.de>; Wed, 15 Apr 2020 09:31:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2634919AbgDOGnY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Apr 2020 02:43:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50958 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2393583AbgDOGnW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Apr 2020 02:43:22 -0400
-Received: from mail-ed1-x541.google.com (mail-ed1-x541.google.com [IPv6:2a00:1450:4864:20::541])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59798C061A0C;
-        Tue, 14 Apr 2020 23:43:22 -0700 (PDT)
-Received: by mail-ed1-x541.google.com with SMTP id a43so3257426edf.6;
-        Tue, 14 Apr 2020 23:43:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:subject:to:cc:references:from:autocrypt:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=KS5I1xey5qWdWCCxHOW9gisVgPOdfTeYMV2x/9+Flfo=;
-        b=sN8HRF3ni60qScLQ9lgBgPcjgKEQZKT2fjDSm8aJfJdr+SFMRPjaid7ryokZOT2IFK
-         Qs4HdYjSoQc9EVuFOfqOgibHurpls5jIAfKatHH3z/u5sOwYNexiAqfCBGklOQEFhiH5
-         3123YGWrI+BCKP9KdzKodHL3UhT/3G2sI65K5LQV4+0Eaj4UIJEkbt8p3GlAFkqqECAp
-         MM9pBT+etucFvdgZrmIHiAvkWg8pfTPIsrZXYhgz0GqDWjWYAe1W2Jg4hQrZxnGR7J7I
-         DXKpR35gVGby2BlRAqWjElUFFHt8h/+38Vn7ClyRw3dhSqIqYmgtQ86wI+2gtP97/f2u
-         6+PA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:subject:to:cc:references:from:autocrypt
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-language:content-transfer-encoding;
-        bh=KS5I1xey5qWdWCCxHOW9gisVgPOdfTeYMV2x/9+Flfo=;
-        b=ADuMkPXQYbVNcibi5njvAI3pJc6xj8GvJPM3TniJJdr9Fzp4D+ihpmXkB6JJ4Eoj16
-         /1uRoIJfPMl2OpDK838+Fof5tx4uy9toH8llgzi3HZ5bYSV7N5tm8s6g4KYQtgubBJ7C
-         niPbrbnaqit4kcMvWLLSbPGvpdXWljtioNEzSqKMwENIto9TrKCNaNn66YqznpMNufXx
-         sVzZK+OPGvyOdzU1ytVOGSN4dXe8HrcpTBh/7xc/rsTqjEHGe1qgr8qabRjhjuFUKS+5
-         pYrWlhqJMelMfLYOrM0dOrtA12XYc8xsoyo9KVb9LbgfZVFiHwFyYPr7H9hiqCBz87Iw
-         tboA==
-X-Gm-Message-State: AGi0PubOUKSkxv/5D+AgRTezkuAN/B2behnSisJuJbjGcbF5l7PC4Ulj
-        raEATwAh6ruY1acbWGxdHgc=
-X-Google-Smtp-Source: APiQypLoBpg3FM2Ci5vp77S7a/Ww05Hwpd/ejUHk1DghI5OsILOLJoHG7cpRnKlxWnMFatnnEsZE0Q==
-X-Received: by 2002:a17:906:3085:: with SMTP id 5mr3595386ejv.381.1586933001111;
-        Tue, 14 Apr 2020 23:43:21 -0700 (PDT)
-Received: from [192.168.1.39] (116.red-83-42-57.dynamicip.rima-tde.net. [83.42.57.116])
-        by smtp.gmail.com with ESMTPSA id z13sm2032486edj.0.2020.04.14.23.43.19
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 14 Apr 2020 23:43:20 -0700 (PDT)
-Subject: Re: [PATCH] mips: define pud_index() regardless of page table folding
-To:     Mike Rapoport <rppt@kernel.org>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>,
-        maobibo <maobibo@loongson.cn>,
-        Sergei Shtylyov <sergei.shtylyov@cogentembedded.com>,
-        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Mike Rapoport <rppt@linux.ibm.com>
-References: <20200402081614.5696-1-rppt@kernel.org>
-From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Autocrypt: addr=f4bug@amsat.org; keydata=
- mQINBDU8rLoBEADb5b5dyglKgWF9uDbIjFXU4gDtcwiga9wJ/wX6xdhBqU8tlQ4BroH7AeRl
- u4zXP0QnBDAG7EetxlQzcfYbPmxFISWjckDBFvDbFsojrZmwF2/LkFSzlvKiN5KLghzzJhLO
- HhjGlF8deEZz/d/G8qzO9mIw8GIBS8uuWh6SIcG/qq7+y+2+aifaj92EdwU79apZepT/U3vN
- YrfcAuo1Ycy7/u0hJ7rlaFUn2Fu5KIgV2O++hHYtCCQfdPBg/+ujTL+U+sCDawCyq+9M5+LJ
- ojCzP9rViLZDd/gS6jX8T48hhidtbtsFRj/e9QpdZgDZfowRMVsRx+TB9yzjFdMO0YaYybXp
- dg/wCUepX5xmDBrle6cZ8VEe00+UQCAU1TY5Hs7QFfBbjgR3k9pgJzVXNUKcJ9DYQP0OBH9P
- ZbZvM0Ut2Bk6bLBO5iCVDOco0alrPkX7iJul2QWBy3Iy9j02GnA5jZ1Xtjr9kpCqQT+sRXso
- Vpm5TPGWaWljIeLWy/qL8drX1eyJzwTB3A36Ck4r3YmjMjfmvltSZB1uAdo1elHTlFEULpU/
- HiwvvqXQ9koB15U154VCuguvx/Qnboz8GFb9Uw8VyawzVxYVNME7xw7CQF8FYxzj6eI7rBf2
- Dj/II6wxWPgDEy3oUzuNOxTB7sT3b/Ym76yOJzWX5BylXQIJ5wARAQABtDFQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoRjRCVUcpIDxmNGJ1Z0BhbXNhdC5vcmc+iQJVBBMBCAA/AhsPBgsJ
- CAcDAgYVCAIJCgsEFgIDAQIeAQIXgBYhBPqr514SkXIh3P1rsuPjLCzercDeBQJd660aBQks
- klzgAAoJEOPjLCzercDe2iMP+gMG2dUf+qHz2uG8nTBGMjgK0aEJrKVPodFA+iedQ5Kp3BMo
- jrTg3/DG1HMYdcvQu/NFLYwamUfUasyor1k+3dB23hY09O4xOsYJBWdilkBGsJTKErUmkUO2
- 3J/kawosvYtJJSHUpw3N6mwz/iWnjkT8BPp7fFXSujV63aZWZINueTbK7Y8skFHI0zpype9s
- loU8xc4JBrieGccy3n4E/kogGrTG5jcMTNHZ106DsQkhFnjhWETp6g9xOKrzZQbETeRBOe4P
- sRsY9YSG2Sj+ZqmZePvO8LyzGRjYU7T6Z80S1xV0lH6KTMvq7vvz5rd92f3pL4YrXq+e//HZ
- JsiLen8LH/FRhTsWRgBtNYkOsd5F9NvfJtSM0qbX32cSXMAStDVnS4U+H2vCVCWnfNug2TdY
- 7v4NtdpaCi4CBBa3ZtqYVOU05IoLnlx0miKTBMqmI05kpgX98pi2QUPJBYi/+yNu3fjjcuS9
- K5WmpNFTNi6yiBbNjJA5E2qUKbIT/RwQFQvhrxBUcRCuK4x/5uOZrysjFvhtR8YGm08h+8vS
- n0JCnJD5aBhiVdkohEFAz7e5YNrAg6kOA5IVRHB44lTBOatLqz7ntwdGD0rteKuHaUuXpTYy
- CRqCVAKqFJtxhvJvaX0vLS1Z2dwtDwhjfIdgPiKEGOgCNGH7R8l+aaM4OPOd
-Message-ID: <191a4b86-3921-e72c-998d-c490de3ee6e0@amsat.org>
-Date:   Wed, 15 Apr 2020 08:43:18 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+        id S2404461AbgDOHbN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Apr 2020 03:31:13 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:53277 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1729180AbgDOHbE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Apr 2020 03:31:04 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1586935861;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=wq4PnsZgQ2G24Tjq97vpI5F2ndNze8Wd6Dp4iuNzDEg=;
+        b=dfgOfpc++lyNXEhbk3ykqr4siNU09Z/NaHKSz09uNZOq70pmPw3pP+YRfAUUNXEueBaUXr
+        InVWTcMoIOP7JdfqYxWp7ZVEPl9kW9DZ2LuTOA4GkMaTzxDwuZ7YYj8VQ5pl7E+k2eRVk3
+        zcaDmvzECq96DiChXNG8k5hCui8EgKs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-505-G5cDUwQsPCGDTDJeZalDaw-1; Wed, 15 Apr 2020 03:29:10 -0400
+X-MC-Unique: G5cDUwQsPCGDTDJeZalDaw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D786718CA250;
+        Wed, 15 Apr 2020 07:29:06 +0000 (UTC)
+Received: from sturgeon (unknown [10.40.192.200])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 9DF311001281;
+        Wed, 15 Apr 2020 07:28:53 +0000 (UTC)
+Date:   Wed, 15 Apr 2020 09:28:51 +0200
+From:   Erik Skultety <eskultet@redhat.com>
+To:     Yan Zhao <yan.y.zhao@intel.com>
+Cc:     intel-gvt-dev@lists.freedesktop.org, cjia@nvidia.com,
+        kvm@vger.kernel.org, linux-doc@vger.kernel.org,
+        libvir-list@redhat.com, Zhengxiao.zx@alibaba-inc.com,
+        shuangtai.tst@alibaba-inc.com, qemu-devel@nongnu.org,
+        kwankhede@nvidia.com, eauger@redhat.com, corbet@lwn.net,
+        yi.l.liu@intel.com, ziye.yang@intel.com, mlevitsk@redhat.com,
+        pasic@linux.ibm.com, aik@ozlabs.ru, felipe@nutanix.com,
+        Ken.Xue@amd.com, kevin.tian@intel.com, xin.zeng@intel.com,
+        dgilbert@redhat.com, zhenyuw@linux.intel.com, dinechin@redhat.com,
+        changpeng.liu@intel.com, cohuck@redhat.com,
+        linux-kernel@vger.kernel.org, zhi.a.wang@intel.com,
+        jonathan.davies@nutanix.com, shaopeng.he@intel.com
+Subject: Re: [PATCH v5 1/4] vfio/mdev: add migration_version attribute for
+ mdev (under mdev_type node)
+Message-ID: <20200415072851.GJ269314@sturgeon>
+References: <20200413055201.27053-1-yan.y.zhao@intel.com>
+ <20200413055403.27203-1-yan.y.zhao@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20200402081614.5696-1-rppt@kernel.org>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Disposition: inline
+In-Reply-To: <20200413055403.27203-1-yan.y.zhao@intel.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 4/2/20 10:16 AM, Mike Rapoport wrote:
-> From: Mike Rapoport <rppt@linux.ibm.com>
-> 
-> Commit 31168f033e37 ("mips: drop __pXd_offset() macros that duplicate
-> pXd_index() ones") is correct that pud_index() & __pud_offset() are the
-> same when pud_index() is actually provided, however it does not take into
-> account the __PAGETABLE_PUD_FOLDED case. This has broken MIPS KVM
-> compilation because it relied on availability of pud_index().
-> 
-> Define pud_index() regardless of page table folded. It will evaluate to
-> actual index for 4-level pagetables and to 0 for folded PUD level.
-> 
-> Link: https://lore.kernel.org/lkml/20200331154749.5457-1-pbonzini@redhat.com
-> Reported-by: Paolo Bonzini <pbonzini@redhat.com>
-> Signed-off-by: Mike Rapoport <rppt@linux.ibm.com>
-
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
+On Mon, Apr 13, 2020 at 01:54:03AM -0400, Yan Zhao wrote:
+> migration_version attribute is used to check migration compatibility
+> between two mdev devices of the same mdev type.
+> The key is that it's rw and its data is opaque to userspace.
+>
+> Userspace reads migration_version of mdev device at source side and
+> writes the value to migration_version attribute of mdev device at targe=
+t
+> side. It judges migration compatibility according to whether the read
+> and write operations succeed or fail.
+>
+> Currently, it is able to read/write migration_version attribute under t=
+wo
+> places:
+>
+> (1) under mdev_type node
+> userspace is able to know whether two mdev devices are compatible befor=
+e
+> a mdev device is created.
+>
+> userspace also needs to check whether the two mdev devices are of the s=
+ame
+> mdev type before checking the migration_version attribute. It also need=
+s
+> to check device creation parameters if aggregation is supported in futu=
+re.
+>
+> (2) under mdev device node
+> userspace is able to know whether two mdev devices are compatible after
+> they are all created. But it does not need to check mdev type and devic=
+e
+> creation parameter for aggregation as device vendor driver would have
+> incorporated those information into the migration_version attribute.
+>
+>              __    userspace
+>               /\              \
+>              /                 \write
+>             / read              \
+>    ________/__________       ___\|/_____________
+>   | migration_version |     | migration_version |-->check migration
+>   ---------------------     ---------------------   compatibility
+>     mdev device A               mdev device B
+>
+> This patch is for mdev documentation about the first place (under
+> mdev_type node)
+>
+> Cc: Alex Williamson <alex.williamson@redhat.com>
+> Cc: Erik Skultety <eskultet@redhat.com>
+> Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> Cc: Cornelia Huck <cohuck@redhat.com>
+> Cc: "Tian, Kevin" <kevin.tian@intel.com>
+> Cc: Zhenyu Wang <zhenyuw@linux.intel.com>
+> Cc: "Wang, Zhi A" <zhi.a.wang@intel.com>
+> Cc: Neo Jia <cjia@nvidia.com>
+> Cc: Kirti Wankhede <kwankhede@nvidia.com>
+> Cc: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> Cc: Christophe de Dinechin <dinechin@redhat.com>
+>
+> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+> Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
+>
 > ---
->  arch/mips/include/asm/pgtable-64.h | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/mips/include/asm/pgtable-64.h b/arch/mips/include/asm/pgtable-64.h
-> index f92716cfa4f4..ee5dc0c145b9 100644
-> --- a/arch/mips/include/asm/pgtable-64.h
-> +++ b/arch/mips/include/asm/pgtable-64.h
-> @@ -172,6 +172,8 @@
->  
->  extern pte_t invalid_pte_table[PTRS_PER_PTE];
->  
-> +#define pud_index(address)	(((address) >> PUD_SHIFT) & (PTRS_PER_PUD - 1))
+> v5:
+> updated commit message a little to indicate this patch is for
+> migration_version attribute under mdev_type node
+>
+> v4:
+> fixed a typo. (Cornelia Huck)
+>
+> v3:
+> 1. renamed version to migration_version
+> (Christophe de Dinechin, Cornelia Huck, Alex Williamson)
+> 2. let errno to be freely defined by vendor driver
+> (Alex Williamson, Erik Skultety, Cornelia Huck, Dr. David Alan Gilbert)
+> 3. let checking mdev_type be prerequisite of migration compatibility
+> check. (Alex Williamson)
+> 4. reworded example usage section.
+> (most of this section came from Alex Williamson)
+> 5. reworded attribute intention section (Cornelia Huck)
+>
+> v2:
+> 1. added detailed intent and usage
+> 2. made definition of version string completely private to vendor drive=
+r
+>    (Alex Williamson)
+> 3. abandoned changes to sample mdev drivers (Alex Williamson)
+> 4. mandatory --> optional (Cornelia Huck)
+> 5. added description for errno (Cornelia Huck)
+> ---
+>  .../driver-api/vfio-mediated-device.rst       | 113 ++++++++++++++++++
+>  1 file changed, 113 insertions(+)
+>
+> diff --git a/Documentation/driver-api/vfio-mediated-device.rst b/Docume=
+ntation/driver-api/vfio-mediated-device.rst
+> index 25eb7d5b834b..2d1f3c0f3c8f 100644
+> --- a/Documentation/driver-api/vfio-mediated-device.rst
+> +++ b/Documentation/driver-api/vfio-mediated-device.rst
+> @@ -202,6 +202,7 @@ Directories and files under the sysfs for Each Phys=
+ical Device
+>    |     |   |--- available_instances
+>    |     |   |--- device_api
+>    |     |   |--- description
+> +  |     |   |--- migration_version
+>    |     |   |--- [devices]
+>    |     |--- [<type-id>]
+>    |     |   |--- create
+> @@ -209,6 +210,7 @@ Directories and files under the sysfs for Each Phys=
+ical Device
+>    |     |   |--- available_instances
+>    |     |   |--- device_api
+>    |     |   |--- description
+> +  |     |   |--- migration_version
+>    |     |   |--- [devices]
+>    |     |--- [<type-id>]
+>    |          |--- create
+> @@ -216,6 +218,7 @@ Directories and files under the sysfs for Each Phys=
+ical Device
+>    |          |--- available_instances
+>    |          |--- device_api
+>    |          |--- description
+> +  |          |--- migration_version
+>    |          |--- [devices]
+>
+>  * [mdev_supported_types]
+> @@ -246,6 +249,116 @@ Directories and files under the sysfs for Each Ph=
+ysical Device
+>    This attribute should show the number of devices of type <type-id> t=
+hat can be
+>    created.
+
+I've got only a few suggestions to improve to wording in the documentatio=
+n
+(feel free to disagree):
+
+>
+> +* migration_version
 > +
->  #ifndef __PAGETABLE_PUD_FOLDED
->  /*
->   * For 4-level pagetables we defines these ourselves, for 3-level the
-> @@ -210,8 +212,6 @@ static inline void p4d_clear(p4d_t *p4dp)
->  	p4d_val(*p4dp) = (unsigned long)invalid_pud_table;
->  }
->  
-> -#define pud_index(address)	(((address) >> PUD_SHIFT) & (PTRS_PER_PUD - 1))
-> -
->  static inline unsigned long p4d_page_vaddr(p4d_t p4d)
->  {
->  	return p4d_val(p4d);
-> 
+> +  This attribute is rw, and is optional.
+
+IMO better wording: "This is an optional, RW attribute."
+
+> +  It is used to check migration compatibility between two mdev devices=
+ of the
+> +  same mdev type. Absence of this attribute means the device of type <=
+type-id>
+> +  does not support migration.
+> +  This attribute provides a way to check migration compatibility betwe=
+en two
+> +  mdev devices from userspace even before device creation. The intende=
+d usage is
+
+^This sentence essentially duplicates the information from the first sent=
+ence,
+can we condense it into something like:
+
+"It is used to check the migration compatibility between two mdev devices=
+ of the
+same mdev type. Typically, the target device has not been created yet at =
+the
+time of userspace using this attribute to check the migration compatibili=
+ty."
+
+> +  for userspace to read the migration_version attribute from one mdev =
+device and
+> +  then writing that value to the migration_version attribute of the ot=
+her mdev
+> +  device. The second mdev device indicates compatibility via the retur=
+n code of
+> +  the write operation. This makes compatibility between mdev devices c=
+ompletely
+> +  vendor-defined and opaque to userspace. Userspace should do nothing =
+more
+> +  than verify the mdev types match and then use the migration_version =
+attribute
+> +  to confirm source to target compatibility.
+
+I'd rephrase the ^last sentence differently:
+"Therefore, userspace is only expected to verify that the mdev types of t=
+he
+respective devices match and then use the migration_version attribute to
+confirm migration compatibility between the source and target mdev device=
+s."
+
+> +
+> +  Reading/Writing Attribute Data:
+> +  read(2) will fail if device of type <type-id> does not support migra=
+tion and
+> +          otherwise succeed and return migration_version string of the=
+ device of
+
+"returns a migration_version string of the device on success, fails with =
+an
+errno if the device doesn't support migration"
+
+> +          type <type-id>.
+> +
+> +          This migration_version string is vendor defined and opaque t=
+o the
+> +          userspace. Vendor is free to include whatever they feel is r=
+elevant.
+> +          e.g. <pciid of parent device>-<software version>.
+> +
+> +          Restrictions on this migration_version string:
+> +            1. It should only contain ascii characters
+> +            2. MAX Length is PATH_MAX (4096)
+> +
+> +  write(2) expects migration_version string of source mdev device, and=
+ will
+> +          succeed if it is determined to be compatible and otherwise f=
+ail with
+> +          vendor specific errno.
+
+"expects a migration_version string of the source mdev device, succeeds i=
+f the
+two mdev devices are migration compatible, otherwise fails with and errno=
+"
+
+> +
+> +  Errno:
+> +  -An errno on read(2) indicates the device of type <type-id> does not=
+ support
+> +  migration;
+> +  -An errno on write(2) indicates the devices are incompatible or the =
+target
+> +  doesn't support migration.
+> +  Vendor driver is free to define specific errno and is suggested to
+> +  print detailed error in syslog for diagnose purpose.
+> +
+> +  Userspace should treat ANY of below conditions as two mdev devices n=
+ot
+
+Userspace should treat any of the below conditions as an indication of mi=
+gration
+incompatibility between two mdev devices.
+
+> +  compatible:
+> +  (0) The mdev devices are not of the same type
+> +  (1) any one of the two mdev devices does not have a migration_versio=
+n
+> +  attribute
+
+any of the two mdev devices is missing the migration_version attribute
+
+> +  (2) error when reading from migration_version attribute of one mdev =
+device
+
+when reading the source mdev's migration_version attribute
+
+> +  (3) error when writing migration_version string of one mdev device t=
+o
+> +  migration_version attribute of the other mdev device
+
+when writing the source mdev migration_version string to the target mdev
+device's migration_version attribute
+
+> +
+> +  Userspace should regard two mdev devices compatible when ALL of belo=
+w
+> +  conditions are met:
+
+Userspace can consider the two mdev devices to be compatible when all of =
+the
+below conditions are met:
+
+> +  (0) The mdev devices are of the same type
+> +  (1) success when reading from migration_version attribute of one mde=
+v device.
+
+reading the migration_version attribute of the source succeeds
+
+> +  (2) success when writing migration_version string of one mdev device=
+ to
+> +  migration_version attribute of the other mdev device.
+
+writing the migration_version string to the target mdev's migration_versi=
+on
+attribute succeeds
+
+> +
+> +  Example Usage:
+> +  (1) Compare mdev types:
+
+Comparing two mdev types:
+
+> +
+> +  The mdev type of an instantiated device can be read from the mdev_ty=
+pe link
+> +  within the device instance in sysfs, for example:
+> +
+> +  # basename $(readlink -f /sys/bus/mdev/devices/$MDEV_UUID/mdev_type/=
+)
+> +
+> +  The mdev types available on a given host system can also be found th=
+rough
+> +  /sys/class/mdev_bus, for example:
+> +
+> +  # ls /sys/class/mdev_bus/*/mdev_supported_types/
+> +
+> +  Migration is only possible between devices of the same mdev type.
+> +
+> +  (2) Retrieve the mdev source migration_version:
+> +
+> +  The migration_version information can either be read from the mdev_t=
+ype link
+> +  on an instantiated device:
+
+s/information/string
+
+> +
+> +  # cat /sys/bus/mdev/devices/$UUID1/mdev_type/migration_version
+> +
+> +  Or it can be read from the mdev type definition, for example:
+> +
+> +  # cat /sys/class/mdev_bus/*/mdev_supported_types/$MDEV_TYPE/migratio=
+n_version
+> +
+> +  If reading the source migration_version generates an error, migratio=
+n is not
+> +  possible.
+> +  NB, there might be several parent devices for a given mdev type on a=
+ host
+> +  system, each may support or expose different migration_versions.
+> +  Matching the specific mdev type to a parent may become important in =
+such
+> +  configurations.
+> +
+> +  (3) Test source migration_version at target:
+> +
+> +  Given a migration_version as outlined above, its compatibility to an
+> +  instantiated device of the same mdev type can be tested as:
+> +  # echo $VERSION > /sys/bus/mdev/devices/$UUID2/mdev_type/migration_v=
+ersion
+> +
+> +  If this write fails, the source and target migration versions are no=
+t
+> +  compatible or the target does not support migration.
+> +
+> +  Compatibility can also be tested prior to target device creation usi=
+ng the
+
+prior to creation of the target device
+
+> +  mdev type definition for a parent device with a previously found mat=
+ching mdev
+> +  type, for example:
+
+using the migration_version attribute present inside a specific mdev type
+directory for a given physical parent device.
+
+> +
+> +  # echo $VERSION > \
+> +  /sys/class/mdev_bus/$PARENT/mdev_supported_types/$MDEV_TYPE/migratio=
+n_version
+> +
+> +  Again, an error writing the migration_version indicates that an inst=
+ance of
+> +  this mdev type would not support a migration from the provided migra=
+tion
+> +  version.
+
+would not support migration from the source.
+
+--
+Erik Skultety
+
