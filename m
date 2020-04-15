@@ -2,27 +2,27 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9A57D1AA043
-	for <lists+kvm@lfdr.de>; Wed, 15 Apr 2020 14:32:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4D3011A9F67
+	for <lists+kvm@lfdr.de>; Wed, 15 Apr 2020 14:14:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S369193AbgDOMYW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Apr 2020 08:24:22 -0400
-Received: from mail.kernel.org ([198.145.29.99]:40064 "EHLO mail.kernel.org"
+        id S368546AbgDOMKg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Apr 2020 08:10:36 -0400
+Received: from mail.kernel.org ([198.145.29.99]:41876 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2409217AbgDOLpr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Apr 2020 07:45:47 -0400
+        id S2897485AbgDOLqw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Apr 2020 07:46:52 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id C84AC20732;
-        Wed, 15 Apr 2020 11:45:45 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 644212168B;
+        Wed, 15 Apr 2020 11:46:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1586951146;
-        bh=1pQapq9m3603xrXiSN4BF3wGZPcBk5uTiJAJZ3h1E+A=;
+        s=default; t=1586951212;
+        bh=Vmaa9Wy7Y6nNBD+Df2+E06G8y9s2D5mYbsUi7aBJcbE=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=U5GcmezyxhaURnOou54lKjvcPquMfqZ9LxXKNyDB+zZOUhH/xNiClNEG9nEpanlta
-         WzzfSqywbkVCYezkwD5lx7X9p7q5o08hhjzeNLK5IVZsEXNeTLmjH8MFrJe7xNHAC3
-         tctxb/xNkmG2RPzzia8YkYcGlv7wuGUBVDiPqL4U=
+        b=aPTzg5/HAEkxJQRJEx9zCEhhFobIFu59OXv4lB8U9NM7SMuCeiOuIVxWLpbeU59RK
+         iXJldhgHKG4VxXixPa6gWpYCU+vdN8pSZTUEpb8BdUl1UNkEqAL7cvAwy3RjLRkFVC
+         2k5KOTgVpBsK1WKTf6G4Ltr0LnqS8BHEh5+1iwwI=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     David Hildenbrand <david@redhat.com>,
@@ -30,12 +30,12 @@ Cc:     David Hildenbrand <david@redhat.com>,
         Christian Borntraeger <borntraeger@de.ibm.com>,
         Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org,
         linux-s390@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.4 54/84] KVM: s390: vsie: Fix possible race when shadowing region 3 tables
-Date:   Wed, 15 Apr 2020 07:44:11 -0400
-Message-Id: <20200415114442.14166-54-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.19 24/40] KVM: s390: vsie: Fix possible race when shadowing region 3 tables
+Date:   Wed, 15 Apr 2020 07:46:07 -0400
+Message-Id: <20200415114623.14972-24-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200415114442.14166-1-sashal@kernel.org>
-References: <20200415114442.14166-1-sashal@kernel.org>
+In-Reply-To: <20200415114623.14972-1-sashal@kernel.org>
+References: <20200415114623.14972-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -78,10 +78,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 1 insertion(+)
 
 diff --git a/arch/s390/mm/gmap.c b/arch/s390/mm/gmap.c
-index edcdca97e85ee..06d602c5ec7b7 100644
+index 911c7ded35f15..fd67684a305d4 100644
 --- a/arch/s390/mm/gmap.c
 +++ b/arch/s390/mm/gmap.c
-@@ -1840,6 +1840,7 @@ int gmap_shadow_r3t(struct gmap *sg, unsigned long saddr, unsigned long r3t,
+@@ -1834,6 +1834,7 @@ int gmap_shadow_r3t(struct gmap *sg, unsigned long saddr, unsigned long r3t,
  		goto out_free;
  	} else if (*table & _REGION_ENTRY_ORIGIN) {
  		rc = -EAGAIN;		/* Race with shadow */
