@@ -2,205 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EC4681AAB19
-	for <lists+kvm@lfdr.de>; Wed, 15 Apr 2020 17:01:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D252D1AAB1B
+	for <lists+kvm@lfdr.de>; Wed, 15 Apr 2020 17:01:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S371190AbgDOO4z (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Apr 2020 10:56:55 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:55881 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S371091AbgDOO4b (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Apr 2020 10:56:31 -0400
+        id S371195AbgDOO45 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Apr 2020 10:56:57 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:29083 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S371184AbgDOO4w (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 15 Apr 2020 10:56:52 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1586962588;
+        s=mimecast20190719; t=1586962611;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=HIaiPNRpjXdJUwZ/Wes1WnHqY3RuQjDIrcgY5yBGayg=;
-        b=K1X4+qlGgwbVQt7viMnFwE10JdqZ71hChhVPH9cK9T3GGFGfNMKeJoYt/WTPtdg25Py/3t
-        te7wPuEfWPcnPr9hnER5CT6etPENxuTiugxgTso7VgXnIsO7ZrrwlC0781VVTR/UduW1ZI
-        G6fNFvM0Xn45MQEmEGfH1FtEzqwak8E=
+        bh=4LhKDhow9t4woo07RzJCC9BA6orwImyFYcMaIKVNQYo=;
+        b=TzqRs97VvVnPF1S/AUh13ioMLeQ+2iWNapgWA/qMtVTQogIHTWlYRMayXL1P/Azjqrc+z9
+        bkLB6JVbNaFo7UEdw7jpC9/n071MGzLyBd6/4FwsOhf186JuOlQ9AAUv34oDfvvehTTE0k
+        b/UvUI3cmZWVbpRHPbDoRA+RwaawNZI=
 Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
  [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-349-98b5AAejPK-F_0cy_TbDpw-1; Wed, 15 Apr 2020 10:56:24 -0400
-X-MC-Unique: 98b5AAejPK-F_0cy_TbDpw-1
-Received: by mail-wr1-f72.google.com with SMTP id d17so24740wrr.17
-        for <kvm@vger.kernel.org>; Wed, 15 Apr 2020 07:56:24 -0700 (PDT)
+ us-mta-229-z2JEMy0tP_OgzcxcSlsrcA-1; Wed, 15 Apr 2020 10:56:49 -0400
+X-MC-Unique: z2JEMy0tP_OgzcxcSlsrcA-1
+Received: by mail-wr1-f72.google.com with SMTP id m15so52259wrb.0
+        for <kvm@vger.kernel.org>; Wed, 15 Apr 2020 07:56:48 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:references:from:message-id:date
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=HIaiPNRpjXdJUwZ/Wes1WnHqY3RuQjDIrcgY5yBGayg=;
-        b=B/Ag6U1+edIry5XSIbY+PYkEokTNNtHPb8XSDI6rt4vqlledxFPUF+3x6D9jVE83jj
-         /ERoCaYd1BBWBYkmh+OMR8KZmsNTiBQMdnXwBIrh6cm/234seypszzy0fkCUSf0vIMAz
-         5TVJsnwC693Rt2dvhb7uoBl2dTO3MRbxsAFNW622HXiDF5Ta45sStsz5QDyG8YvjBoPq
-         8NuSaCcsaeMwXM3uhDDen77a6rMtiQ4mY4e6Q8tOLBdMZYsgxDK5IPqrLxwMYBjoj0H5
-         ZWW5YmqRhN2Lvm+R8XDWGYuyC8rYPYZymE/pG6SM8E3FUEnXWXjdaiLMjuM53HYurJbW
-         AjAw==
-X-Gm-Message-State: AGi0PuYm4l7IebClXtjC0kgf2eaKrSK9/z1STj3JBZxydfRXr1YYWy3l
-        3XrXJifG+l/HrrDUMliGbikMBRX3otQY3zxppWPQZMrj3m0PtmUj0BeOK/z9lK595QjCy/HFyJT
-        sZqkvNCN/nbLT
-X-Received: by 2002:a1c:48c:: with SMTP id 134mr4761606wme.47.1586962583467;
-        Wed, 15 Apr 2020 07:56:23 -0700 (PDT)
-X-Google-Smtp-Source: APiQypL1t3gwkdztYXfM5YsgHJcd2dkz/LSK8oZ3Cn5Xg1piA2o3ntblkhJcixch9oMoL9nrh7UFig==
-X-Received: by 2002:a1c:48c:: with SMTP id 134mr4761580wme.47.1586962583140;
-        Wed, 15 Apr 2020 07:56:23 -0700 (PDT)
+        bh=4LhKDhow9t4woo07RzJCC9BA6orwImyFYcMaIKVNQYo=;
+        b=tCg4xGEkPHl9kAYjaGAo8Yxhg/dVSoqwx99vud/RwtYJclk+/9N+THYFdy2nsIWiXL
+         LKHARsCBRDAeevS1QkguThEj/0fdpFuXK8RGNSkgFggmb5Fq0f8hK6VO0fZTVTC0n0K1
+         83esSMww7GaWobmI3dnIC7vQgngubhCNZ7guGGl2zwtbjFGh1AYyWO9ZR3BtQku9MobJ
+         oaytzA/5lCRkKBt0jIGva07IYsOQrPErJAt7uMywVKX+AXhGU2eHA/FHShUim5XIQtVU
+         u7pKsc4t08t8W/tb06Lh7OG/GCE31FFSnhGX7b+lOfI+Pf72f5ItU6S2i9DzzNjq1nyn
+         jLLA==
+X-Gm-Message-State: AGi0Pubiu0K40A2w5QeQKl0bdLeyVAVQ8I20yeF2OjHbkBPl7vfWQQIS
+        BS/mTZpdTir4uH2o7vkJeXrHBS4CLe1iqZzbFZ0lgsvkh1IHmy62N2ePAnzyzH3jzS2xnC0qIAz
+        1wDuYjrFAFq5u
+X-Received: by 2002:a1c:3281:: with SMTP id y123mr5590631wmy.30.1586962608040;
+        Wed, 15 Apr 2020 07:56:48 -0700 (PDT)
+X-Google-Smtp-Source: APiQypJjilpHVeNKifN5eFrDuYwLsxn/vAfdpiQUm+CsSSmPNw/ELDy1FSOfPgEWE/zxFxJRvEgZQg==
+X-Received: by 2002:a1c:3281:: with SMTP id y123mr5590604wmy.30.1586962607784;
+        Wed, 15 Apr 2020 07:56:47 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:9066:4f2:9fbd:f90e? ([2001:b07:6468:f312:9066:4f2:9fbd:f90e])
-        by smtp.gmail.com with ESMTPSA id d133sm24709709wmc.27.2020.04.15.07.56.22
+        by smtp.gmail.com with ESMTPSA id n124sm23657617wma.11.2020.04.15.07.56.47
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 15 Apr 2020 07:56:22 -0700 (PDT)
-Subject: Re: [PATCH kvm-unit-tests] svm: add a test for exception injection
-To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>, kvm@vger.kernel.org
-References: <20200409094303.949992-1-pbonzini@redhat.com>
- <801ca90e-dc5f-37ab-2138-8cbd0950b4f7@oracle.com>
+        Wed, 15 Apr 2020 07:56:47 -0700 (PDT)
+Subject: Re: [PATCH] KVM: remove redundant assignment to variable r
+To:     Colin King <colin.king@canonical.com>, kvm@vger.kernel.org
+Cc:     kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20200410113526.13822-1-colin.king@canonical.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <8dde8698-839b-ed69-8448-b40ac02c8a72@redhat.com>
-Date:   Wed, 15 Apr 2020 16:56:22 +0200
+Message-ID: <6d66cb24-b517-1bc3-15c3-9b302215febf@redhat.com>
+Date:   Wed, 15 Apr 2020 16:56:46 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <801ca90e-dc5f-37ab-2138-8cbd0950b4f7@oracle.com>
+In-Reply-To: <20200410113526.13822-1-colin.king@canonical.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/04/20 02:24, Krish Sadhukhan wrote:
+On 10/04/20 13:35, Colin King wrote:
+> From: Colin Ian King <colin.king@canonical.com>
 > 
-> On 4/9/20 2:43 AM, Paolo Bonzini wrote:
->> Cover VMRUN's testing whether EVENTINJ.TYPE = 3 (exception) has been
->> specified with
->> a vector that does not correspond to an exception.
->>
->> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
->> ---
->>   x86/svm.h       |  7 +++++
->>   x86/svm_tests.c | 70 +++++++++++++++++++++++++++++++++++++++++++++++++
->>   2 files changed, 77 insertions(+)
->>
->> diff --git a/x86/svm.h b/x86/svm.h
->> index 645deb7..bb5c552 100644
->> --- a/x86/svm.h
->> +++ b/x86/svm.h
->> @@ -324,6 +324,13 @@ struct __attribute__ ((__packed__)) vmcb {
->>     #define SVM_CR0_SELECTIVE_MASK (X86_CR0_TS | X86_CR0_MP)
->>   +#define SVM_EVENT_INJ_HWINT    (0 << 8)
->> +#define SVM_EVENT_INJ_NMI    (2 << 8)
->> +#define SVM_EVENT_INJ_EXC    (3 << 8)
->> +#define SVM_EVENT_INJ_SWINT    (4 << 8)
->> +#define SVM_EVENT_INJ_ERRCODE    (1 << 11)
->> +#define SVM_EVENT_INJ_VALID    (1 << 31)
+> The variable r is being assigned  with a value that is never read
+> and it is being updated later with a new value.  The initialization is
+> redundant and can be removed.
 > 
+> Addresses-Coverity: ("Unused value")
+> Signed-off-by: Colin Ian King <colin.king@canonical.com>
+> ---
+>  virt/kvm/kvm_main.c | 1 -
+>  1 file changed, 1 deletion(-)
 > 
-> I see existing #defines in svm.h:
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 74bdb7bf3295..03571f6acaa8 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -3160,7 +3160,6 @@ static long kvm_vcpu_ioctl(struct file *filp,
+>  	case KVM_SET_REGS: {
+>  		struct kvm_regs *kvm_regs;
+>  
+> -		r = -ENOMEM;
+>  		kvm_regs = memdup_user(argp, sizeof(*kvm_regs));
+>  		if (IS_ERR(kvm_regs)) {
+>  			r = PTR_ERR(kvm_regs);
 > 
->     #define SVM_EVTINJ_TYPE_INTR (0 << SVM_EVTINJ_TYPE_SHIFT)
->     #define SVM_EVTINJ_TYPE_NMI (2 << SVM_EVTINJ_TYPE_SHIFT)
->     #define SVM_EVTINJ_TYPE_EXEPT (3 << SVM_EVTINJ_TYPE_SHIFT)
->     #define SVM_EVTINJ_TYPE_SOFT (4 << SVM_EVTINJ_TYPE_SHIFT)
->     #define SVM_EVTINJ_VALID (1 << 31)
->     #define SVM_EVTINJ_VALID_ERR (1 << 11)
 
-Indeed.  I queued the patch with these defines instead.
+Queued, thanks.
 
 Paolo
-
->> +
->>   #define MSR_BITMAP_SIZE 8192
->>     struct svm_test {
->> diff --git a/x86/svm_tests.c b/x86/svm_tests.c
->> index 16b9dfd..6292e68 100644
->> --- a/x86/svm_tests.c
->> +++ b/x86/svm_tests.c
->> @@ -1340,6 +1340,73 @@ static bool interrupt_check(struct svm_test *test)
->>       return get_test_stage(test) == 5;
->>   }
->>   +static volatile int count_exc = 0;
->> +
->> +static void my_isr(struct ex_regs *r)
->> +{
->> +        count_exc++;
->> +}
->> +
->> +static void exc_inject_prepare(struct svm_test *test)
->> +{
->> +    handle_exception(DE_VECTOR, my_isr);
->> +    handle_exception(NMI_VECTOR, my_isr);
->> +}
->> +
->> +
->> +static void exc_inject_test(struct svm_test *test)
->> +{
->> +    asm volatile ("vmmcall\n\tvmmcall\n\t");
->> +}
->> +
->> +static bool exc_inject_finished(struct svm_test *test)
->> +{
->> +    vmcb->save.rip += 3;
->> +
->> +    switch (get_test_stage(test)) {
->> +    case 0:
->> +        if (vmcb->control.exit_code != SVM_EXIT_VMMCALL) {
->> +            report(false, "VMEXIT not due to vmmcall. Exit reason 0x%x",
->> +                   vmcb->control.exit_code);
->> +            return true;
->> +        }
->> +        vmcb->control.event_inj = NMI_VECTOR | SVM_EVENT_INJ_EXC |
->> SVM_EVENT_INJ_VALID;
->> +        break;
->> +
->> +    case 1:
->> +        if (vmcb->control.exit_code != SVM_EXIT_ERR) {
->> +            report(false, "VMEXIT not due to error. Exit reason 0x%x",
->> +                   vmcb->control.exit_code);
->> +            return true;
->> +        }
->> +        report(count_exc == 0, "exception with vector 2 not injected");
->> +        vmcb->control.event_inj = DE_VECTOR | SVM_EVENT_INJ_EXC |
->> SVM_EVENT_INJ_VALID;
->> +    break;
->> +
->> +    case 2:
->> +        if (vmcb->control.exit_code != SVM_EXIT_VMMCALL) {
->> +            report(false, "VMEXIT not due to vmmcall. Exit reason 0x%x",
->> +                   vmcb->control.exit_code);
->> +            return true;
->> +        }
->> +        report(count_exc == 1, "divide overflow exception injected");
->> +    report(!(vmcb->control.event_inj & SVM_EVENT_INJ_VALID),
->> "eventinj.VALID cleared");
->> +        break;
->> +
->> +    default:
->> +        return true;
->> +    }
->> +
->> +    inc_test_stage(test);
->> +
->> +    return get_test_stage(test) == 3;
->> +}
->> +
->> +static bool exc_inject_check(struct svm_test *test)
->> +{
->> +    return count_exc == 1 && get_test_stage(test) == 3;
->> +}
->> +
->>   #define TEST(name) { #name, .v2 = name }
->>     /*
->> @@ -1446,6 +1513,9 @@ struct svm_test svm_tests[] = {
->>       { "interrupt", default_supported, interrupt_prepare,
->>         default_prepare_gif_clear, interrupt_test,
->>         interrupt_finished, interrupt_check },
->> +    { "exc_inject", default_supported, exc_inject_prepare,
->> +      default_prepare_gif_clear, exc_inject_test,
->> +      exc_inject_finished, exc_inject_check },
->>       TEST(svm_guest_state_test),
->>       { NULL, NULL, NULL, NULL, NULL, NULL, NULL }
->>   };
-> 
 
