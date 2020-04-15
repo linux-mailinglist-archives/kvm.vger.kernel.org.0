@@ -2,69 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 47F621AAAD6
-	for <lists+kvm@lfdr.de>; Wed, 15 Apr 2020 16:52:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0EA651AAADA
+	for <lists+kvm@lfdr.de>; Wed, 15 Apr 2020 16:52:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2392460AbgDOOuX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Apr 2020 10:50:23 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:51146 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S2392410AbgDOOuQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Apr 2020 10:50:16 -0400
+        id S2636845AbgDOOug (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Apr 2020 10:50:36 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:54000 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S370969AbgDOOub (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 15 Apr 2020 10:50:31 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1586962213;
+        s=mimecast20190719; t=1586962230;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=qpQqiPTUBuQrThGzBWHY/3GIKSsGUjMINyQOadxscTg=;
-        b=abAd+IGEWOD1oEtHDC5K5A6iQjdAD7oAOOE22rDEC0DG2syXXm6sJ8F/rejUlGcgseWgvG
-        U3od8yfpxCzjm4k27Af9tayKy+Fi42E3oQ8jmLQqx7CeJk6A0fdnseU4RxCPhRTkWS7Zbj
-        CSvyKh+d1T/u2G5XAwZpe+x6nciIS5k=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-221-F4QgG4fZMzygQsH7waLe6A-1; Wed, 15 Apr 2020 10:50:06 -0400
-X-MC-Unique: F4QgG4fZMzygQsH7waLe6A-1
-Received: by mail-wr1-f70.google.com with SMTP id o10so30535wrj.7
-        for <kvm@vger.kernel.org>; Wed, 15 Apr 2020 07:50:06 -0700 (PDT)
+        bh=JmRIH3xrhcbgQHMVx8VHgH6IzBuKHV31f9pg/cYCgHk=;
+        b=VqF8wf2eTZlQ4Jl5b3n6AK8R61QoFi9fIGOYXIYg6V+OqopJ0CVnhsx6AEaNkPehFB9zr3
+        9OoZRKXqf+sl1AcV0mDIrtJRbHsH0I2yYj05/6S1a4HZGU2vOMNbqbwjqggI4CsPGTAlU2
+        cAWt9om0xKSY6hhqOBe/rTAYPktzxMk=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-97-Y8qd1rLUOzGWeMgwijKnWA-1; Wed, 15 Apr 2020 10:50:28 -0400
+X-MC-Unique: Y8qd1rLUOzGWeMgwijKnWA-1
+Received: by mail-wm1-f71.google.com with SMTP id h184so2300292wmf.5
+        for <kvm@vger.kernel.org>; Wed, 15 Apr 2020 07:50:28 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=qpQqiPTUBuQrThGzBWHY/3GIKSsGUjMINyQOadxscTg=;
-        b=QLWwJARpDuHQr8lDtKKzdPpqyMMReMXGgemdU/wBYclt8t5WwREznzFwGumvamdfW+
-         e/7nXkR/CBsdWXztWdoCGy2YORLK/9sisMSDLpq/lF0Z+beoQ0RIgPpn8Ab4wbS1BVQC
-         bvChlWaTmxMWfOLSfw+XCvSr5+K+foV6XpJmoX3BDo+MxFs6KZBXpR6GtAGAz3Jo2VXh
-         u/9X/WJchtLFJeqPj1O7EmX7LtEQQtpVWFFLEKnUxQ3yicgm3qVhkYzhBj5IVggQS0tu
-         ZlGaHzadAsGFuTzQw0E+CUVLtaYDicMGfSMSq2Ka5YU78iN9SQjpV2kUNikTq3GOM7Ta
-         TUeg==
-X-Gm-Message-State: AGi0Puaq6MwJgNSR1aN3/lDIv5Wy8sanIwU7u257UJA4DVEkiXNT2lGP
-        NZahy+gMc8LfXBObM8tUSIUvBjiCDJfUdB4AQDl2FgPS7t+nk0azGC1OcGKWeWnw/TZs+iSkGzX
-        3rRGehByUlOzm
-X-Received: by 2002:adf:8563:: with SMTP id 90mr11550163wrh.202.1586962203915;
-        Wed, 15 Apr 2020 07:50:03 -0700 (PDT)
-X-Google-Smtp-Source: APiQypIY6SmJfBFhqZ4l23qMixhzMzFZ9BMgkJmcwYVR5NfdB0Y1M9hX5zDpA6En9ld9tv+7uvYjlQ==
-X-Received: by 2002:adf:8563:: with SMTP id 90mr11550139wrh.202.1586962203541;
-        Wed, 15 Apr 2020 07:50:03 -0700 (PDT)
+        bh=JmRIH3xrhcbgQHMVx8VHgH6IzBuKHV31f9pg/cYCgHk=;
+        b=t9Dg4qbL0rPPALWS0EV/c/GfqtnWjIOowbY2L4xPL53suHz5TiEvTykyGKcSH5znBS
+         FDCneKuzj8RAQEAJRBq3M6bdfmD7Z7xUGwdg5KzNRZb9HR+yCBgxT7g28/PIqHkCLjNY
+         iyaOcxxC5mMP6dPeKba3IpFJuoeUtIVBEXM3m4IIO0w3IqAqAY4LmFq8PCIYnJCzpx1q
+         aComcbsnCUclHkgXuZWYtJR4YNggVuu4CpVBFt7TFie0u0VrmnHZBgRJpDIFjTP1eOrE
+         9onTJxF6wyHg1xgxaFiL/P9pGp0YIEGeLCaor5LlHPxYYSLt204dhDFBxFQA7aYvHBFR
+         Lzzg==
+X-Gm-Message-State: AGi0PuYg2QDwT8EPMM0fU3deBSkeZaH5bI3FJ1Dw2vvVEh1+3OFo/J7y
+        TBSycIYv+2J31eTOIO/2taDhYJ90NWmmn4zl0totXh//99O3PN4rJEmOwvzxGLTjK9YXmGySXfi
+        uMy9+zNfd98gz
+X-Received: by 2002:a1c:f306:: with SMTP id q6mr5540439wmq.169.1586962227547;
+        Wed, 15 Apr 2020 07:50:27 -0700 (PDT)
+X-Google-Smtp-Source: APiQypLcjHfqk25Aa2S/DDiPyO8G1mcE4MUuSHr0Ty2vQ+VKX2bmv150yUNUV66lay4PAfxpJjPUrg==
+X-Received: by 2002:a1c:f306:: with SMTP id q6mr5540410wmq.169.1586962227207;
+        Wed, 15 Apr 2020 07:50:27 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:9066:4f2:9fbd:f90e? ([2001:b07:6468:f312:9066:4f2:9fbd:f90e])
-        by smtp.gmail.com with ESMTPSA id s24sm22189364wmj.28.2020.04.15.07.50.02
+        by smtp.gmail.com with ESMTPSA id f83sm23262658wmf.42.2020.04.15.07.50.26
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 15 Apr 2020 07:50:02 -0700 (PDT)
-Subject: Re: [PATCH 1/1] KVM: x86: Return updated timer current count register
- from KVM_GET_LAPIC
-To:     Jim Mattson <jmattson@google.com>, Wanpeng Li <kernellwp@gmail.com>
-Cc:     Peter Shier <pshier@google.com>, kvm <kvm@vger.kernel.org>
-References: <20181010225653.238911-1-pshier@google.com>
- <CANRm+Cwq7foDTcD_jbASzV+YCiQwWuNXGjXH8Ew7a+h_ze_VEA@mail.gmail.com>
- <CALMp9eQajZRaZJ=PD-1T4JfiBqje-G1OtXEgcrwLjan3j-BC0w@mail.gmail.com>
+        Wed, 15 Apr 2020 07:50:26 -0700 (PDT)
+Subject: Re: [PATCH v2] kvm: nVMX: reflect MTF VM-exits if injected by L1
+To:     Oliver Upton <oupton@google.com>, kvm@vger.kernel.org
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Peter Shier <pshier@google.com>,
+        Jim Mattson <jmattson@google.com>
+References: <20200414224746.240324-1-oupton@google.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <39988979-9f65-20ce-6726-2caae82dd903@redhat.com>
-Date:   Wed, 15 Apr 2020 16:50:02 +0200
+Message-ID: <b57bad1d-d9ba-f380-94b6-a2c113dd6100@redhat.com>
+Date:   Wed, 15 Apr 2020 16:50:26 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <CALMp9eQajZRaZJ=PD-1T4JfiBqje-G1OtXEgcrwLjan3j-BC0w@mail.gmail.com>
+In-Reply-To: <20200414224746.240324-1-oupton@google.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -73,204 +72,72 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 15/04/20 01:43, Jim Mattson wrote:
-> On Tue, Oct 16, 2018 at 12:53 AM Wanpeng Li <kernellwp@gmail.com> wrote:
->>
->> On Thu, 11 Oct 2018 at 06:59, Peter Shier <pshier@google.com> wrote:
->>>
->>> kvm_vcpu_ioctl_get_lapic (implements KVM_GET_LAPIC ioctl) does a bulk copy
->>> of the LAPIC registers but must take into account that the one-shot and
->>> periodic timer current count register is computed upon reads and is not
->>> present in register state. When restoring LAPIC state (e.g. after
->>> migration), restart timers from their their current count values at time of
->>> save.
->>>
->>> Note: When a one-shot timer expires, the code in arch/x86/kvm/lapic.c does
->>> not zero the value of the LAPIC initial count register (emulating HW
->>> behavior). If no other timer is run and pending prior to a subsequent
->>> KVM_GET_LAPIC call, the returned register set will include the expired
->>> one-shot initial count. On a subsequent KVM_SET_LAPIC call the code will
->>> see a non-zero initial count and start a new one-shot timer using the
->>> expired timer's count. This is a prior existing bug and will be addressed
->>> in a separate patch. Thanks to jmattson@google.com for this find.
->>>
->>> Signed-off-by: Peter Shier <pshier@google.com>
->>> Reviewed-by: Jim Mattson <jmattson@google.com>
->>
->> Reviewed-by: Wanpeng Li <wanpengli@tencent.com>
->>
->>> ---
->>>  arch/x86/kvm/lapic.c | 64 +++++++++++++++++++++++++++++++++++---------
->>>  arch/x86/kvm/lapic.h |  7 ++++-
->>>  2 files changed, 58 insertions(+), 13 deletions(-)
->>>
->>> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
->>> index fbb0e6df121b2..8e7f3cf552871 100644
->>> --- a/arch/x86/kvm/lapic.c
->>> +++ b/arch/x86/kvm/lapic.c
->>> @@ -1524,13 +1524,18 @@ static void start_sw_tscdeadline(struct kvm_lapic *apic)
->>>         local_irq_restore(flags);
->>>  }
->>>
->>> +static inline u64 tmict_to_ns(struct kvm_lapic *apic, u32 tmict)
->>> +{
->>> +       return (u64)tmict * APIC_BUS_CYCLE_NS * (u64)apic->divide_count;
->>> +}
->>> +
->>>  static void update_target_expiration(struct kvm_lapic *apic, uint32_t old_divisor)
->>>  {
->>>         ktime_t now, remaining;
->>>         u64 ns_remaining_old, ns_remaining_new;
->>>
->>> -       apic->lapic_timer.period = (u64)kvm_lapic_get_reg(apic, APIC_TMICT)
->>> -               * APIC_BUS_CYCLE_NS * apic->divide_count;
->>> +       apic->lapic_timer.period =
->>> +                       tmict_to_ns(apic, kvm_lapic_get_reg(apic, APIC_TMICT));
->>>         limit_periodic_timer_frequency(apic);
->>>
->>>         now = ktime_get();
->>> @@ -1548,14 +1553,15 @@ static void update_target_expiration(struct kvm_lapic *apic, uint32_t old_diviso
->>>         apic->lapic_timer.target_expiration = ktime_add_ns(now, ns_remaining_new);
->>>  }
->>>
->>> -static bool set_target_expiration(struct kvm_lapic *apic)
->>> +static bool set_target_expiration(struct kvm_lapic *apic, u32 count_reg)
->>>  {
->>>         ktime_t now;
->>>         u64 tscl = rdtsc();
->>> +       s64 deadline;
->>>
->>>         now = ktime_get();
->>> -       apic->lapic_timer.period = (u64)kvm_lapic_get_reg(apic, APIC_TMICT)
->>> -               * APIC_BUS_CYCLE_NS * apic->divide_count;
->>> +       apic->lapic_timer.period =
->>> +                       tmict_to_ns(apic, kvm_lapic_get_reg(apic, APIC_TMICT));
->>>
->>>         if (!apic->lapic_timer.period) {
->>>                 apic->lapic_timer.tscdeadline = 0;
->>> @@ -1563,6 +1569,28 @@ static bool set_target_expiration(struct kvm_lapic *apic)
->>>         }
->>>
->>>         limit_periodic_timer_frequency(apic);
->>> +       deadline = apic->lapic_timer.period;
->>> +
->>> +       if (apic_lvtt_period(apic) || apic_lvtt_oneshot(apic)) {
->>> +               if (unlikely(count_reg != APIC_TMICT)) {
->>> +                       deadline = tmict_to_ns(apic,
->>> +                                    kvm_lapic_get_reg(apic, count_reg));
->>> +                       if (unlikely(deadline <= 0))
->>> +                               deadline = apic->lapic_timer.period;
->>> +                       else if (unlikely(deadline > apic->lapic_timer.period)) {
->>> +                               pr_info_ratelimited(
->>> +                                   "kvm: vcpu %i: requested lapic timer restore with "
->>> +                                   "starting count register %#x=%u (%lld ns) > initial count (%lld ns). "
->>> +                                   "Using initial count to start timer.\n",
->>> +                                   apic->vcpu->vcpu_id,
->>> +                                   count_reg,
->>> +                                   kvm_lapic_get_reg(apic, count_reg),
->>> +                                   deadline, apic->lapic_timer.period);
->>> +                               kvm_lapic_set_reg(apic, count_reg, 0);
->>> +                               deadline = apic->lapic_timer.period;
->>> +                       }
->>> +               }
->>> +       }
->>>
->>>         apic_debug("%s: bus cycle is %" PRId64 "ns, now 0x%016"
->>>                    PRIx64 ", "
->>> @@ -1571,12 +1599,11 @@ static bool set_target_expiration(struct kvm_lapic *apic)
->>>                    APIC_BUS_CYCLE_NS, ktime_to_ns(now),
->>>                    kvm_lapic_get_reg(apic, APIC_TMICT),
->>>                    apic->lapic_timer.period,
->>> -                  ktime_to_ns(ktime_add_ns(now,
->>> -                               apic->lapic_timer.period)));
->>> +                  ktime_to_ns(ktime_add_ns(now, deadline)));
->>>
->>>         apic->lapic_timer.tscdeadline = kvm_read_l1_tsc(apic->vcpu, tscl) +
->>> -               nsec_to_cycles(apic->vcpu, apic->lapic_timer.period);
->>> -       apic->lapic_timer.target_expiration = ktime_add_ns(now, apic->lapic_timer.period);
->>> +               nsec_to_cycles(apic->vcpu, deadline);
->>> +       apic->lapic_timer.target_expiration = ktime_add_ns(now, deadline);
->>>
->>>         return true;
->>>  }
->>> @@ -1748,17 +1775,22 @@ void kvm_lapic_restart_hv_timer(struct kvm_vcpu *vcpu)
->>>         restart_apic_timer(apic);
->>>  }
->>>
->>> -static void start_apic_timer(struct kvm_lapic *apic)
->>> +static void __start_apic_timer(struct kvm_lapic *apic, u32 count_reg)
->>>  {
->>>         atomic_set(&apic->lapic_timer.pending, 0);
->>>
->>>         if ((apic_lvtt_period(apic) || apic_lvtt_oneshot(apic))
->>> -           && !set_target_expiration(apic))
->>> +           && !set_target_expiration(apic, count_reg))
->>>                 return;
->>>
->>>         restart_apic_timer(apic);
->>>  }
->>>
->>> +static void start_apic_timer(struct kvm_lapic *apic)
->>> +{
->>> +       __start_apic_timer(apic, APIC_TMICT);
->>> +}
->>> +
->>>  static void apic_manage_nmi_watchdog(struct kvm_lapic *apic, u32 lvt0_val)
->>>  {
->>>         bool lvt0_in_nmi_mode = apic_lvt_nmi_mode(lvt0_val);
->>> @@ -2370,6 +2402,14 @@ static int kvm_apic_state_fixup(struct kvm_vcpu *vcpu,
->>>  int kvm_apic_get_state(struct kvm_vcpu *vcpu, struct kvm_lapic_state *s)
->>>  {
->>>         memcpy(s->regs, vcpu->arch.apic->regs, sizeof(*s));
->>> +
->>> +       /*
->>> +        * Get calculated timer current count for remaining timer period (if
->>> +        * any) and store it in the returned register set.
->>> +        */
->>> +       __kvm_lapic_set_reg(s->regs, APIC_TMCCT,
->>> +                      __apic_read(vcpu->arch.apic, APIC_TMCCT));
->>> +
->>>         return kvm_apic_state_fixup(vcpu, s, false);
->>>  }
->>>
->>> @@ -2396,7 +2436,7 @@ int kvm_apic_set_state(struct kvm_vcpu *vcpu, struct kvm_lapic_state *s)
->>>         apic_update_lvtt(apic);
->>>         apic_manage_nmi_watchdog(apic, kvm_lapic_get_reg(apic, APIC_LVT0));
->>>         update_divide_count(apic);
->>> -       start_apic_timer(apic);
->>> +       __start_apic_timer(apic, APIC_TMCCT);
->>>         apic->irr_pending = true;
->>>         apic->isr_count = vcpu->arch.apicv_active ?
->>>                                 1 : count_vectors(apic->regs + APIC_ISR);
->>> diff --git a/arch/x86/kvm/lapic.h b/arch/x86/kvm/lapic.h
->>> index ed0ed39abd369..fadefa1a9d678 100644
->>> --- a/arch/x86/kvm/lapic.h
->>> +++ b/arch/x86/kvm/lapic.h
->>> @@ -147,9 +147,14 @@ static inline u32 kvm_lapic_get_reg(struct kvm_lapic *apic, int reg_off)
->>>         return *((u32 *) (apic->regs + reg_off));
->>>  }
->>>
->>> +static inline void __kvm_lapic_set_reg(char *regs, int reg_off, u32 val)
->>> +{
->>> +       *((u32 *) (regs + reg_off)) = val;
->>> +}
->>> +
->>>  static inline void kvm_lapic_set_reg(struct kvm_lapic *apic, int reg_off, u32 val)
->>>  {
->>> -       *((u32 *) (apic->regs + reg_off)) = val;
->>> +       __kvm_lapic_set_reg(apic->regs, reg_off, val);
->>>  }
->>>
->>>  extern struct static_key kvm_no_apic_vcpu;
->>> --
->>> 2.19.0.605.g01d371f741-goog
->>>
+On 15/04/20 00:47, Oliver Upton wrote:
+> According to SDM 26.6.2, it is possible to inject an MTF VM-exit via the
+> VM-entry interruption-information field regardless of the 'monitor trap
+> flag' VM-execution control. KVM appropriately copies the VM-entry
+> interruption-information field from vmcs12 to vmcs02. However, if L1
+> has not set the 'monitor trap flag' VM-execution control, KVM fails to
+> reflect the subsequent MTF VM-exit into L1.
 > 
-> Ping?
+> Fix this by consulting the VM-entry interruption-information field of
+> vmcs12 to determine if L1 has injected the MTF VM-exit. If so, reflect
+> the exit, regardless of the 'monitor trap flag' VM-execution control.
+> 
+> Fixes: 5f3d45e7f282 ("kvm/x86: add support for MONITOR_TRAP_FLAG")
+> Signed-off-by: Oliver Upton <oupton@google.com>
+> Reviewed-by: Peter Shier <pshier@google.com>
+> Reviewed-by: Jim Mattson <jmattson@google.com>
+> ---
+>  Parent commit: dbef2808af6c5 ("KVM: VMX: fix crash cleanup when KVM wasn't used")
+> 
+>  v1 => v2:
+>  - removed unused 'struct kvm_vcpu *vcpu' from the signature of helper
+>    function
+> 
+>  arch/x86/kvm/vmx/nested.c | 19 ++++++++++++++++++-
+>  1 file changed, 18 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> index cbc9ea2de28f9..0d1400fa1e224 100644
+> --- a/arch/x86/kvm/vmx/nested.c
+> +++ b/arch/x86/kvm/vmx/nested.c
+> @@ -5533,6 +5533,23 @@ static bool nested_vmx_exit_handled_vmcs_access(struct kvm_vcpu *vcpu,
+>  	return 1 & (b >> (field & 7));
+>  }
+>  
+> +static bool nested_vmx_exit_handled_mtf(struct vmcs12 *vmcs12)
+> +{
+> +	u32 entry_intr_info = vmcs12->vm_entry_intr_info_field;
+> +
+> +	if (nested_cpu_has_mtf(vmcs12))
+> +		return true;
+> +
+> +	/*
+> +	 * An MTF VM-exit may be injected into the guest by setting the
+> +	 * interruption-type to 7 (other event) and the vector field to 0. Such
+> +	 * is the case regardless of the 'monitor trap flag' VM-execution
+> +	 * control.
+> +	 */
+> +	return entry_intr_info == (INTR_INFO_VALID_MASK
+> +				   | INTR_TYPE_OTHER_EVENT);
+> +}
+> +
+>  /*
+>   * Return 1 if we should exit from L2 to L1 to handle an exit, or 0 if we
+>   * should handle it ourselves in L0 (and then continue L2). Only call this
+> @@ -5633,7 +5650,7 @@ bool nested_vmx_exit_reflected(struct kvm_vcpu *vcpu, u32 exit_reason)
+>  	case EXIT_REASON_MWAIT_INSTRUCTION:
+>  		return nested_cpu_has(vmcs12, CPU_BASED_MWAIT_EXITING);
+>  	case EXIT_REASON_MONITOR_TRAP_FLAG:
+> -		return nested_cpu_has_mtf(vmcs12);
+> +		return nested_vmx_exit_handled_mtf(vmcs12);
+>  	case EXIT_REASON_MONITOR_INSTRUCTION:
+>  		return nested_cpu_has(vmcs12, CPU_BASED_MONITOR_EXITING);
+>  	case EXIT_REASON_PAUSE_INSTRUCTION:
 > 
 
-It's been only a year and a half, but it still applies with only minimal
-conflicts so I queued it.  Thanks!
+Queued, thanks.
 
 Paolo
 
