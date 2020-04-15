@@ -2,133 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 396671AA476
-	for <lists+kvm@lfdr.de>; Wed, 15 Apr 2020 15:30:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 20EB81AAA88
+	for <lists+kvm@lfdr.de>; Wed, 15 Apr 2020 16:52:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2633195AbgDON13 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Apr 2020 09:27:29 -0400
-Received: from mail.kernel.org ([198.145.29.99]:60024 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2633128AbgDON1Y (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Apr 2020 09:27:24 -0400
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 4123120575;
-        Wed, 15 Apr 2020 13:27:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1586957243;
-        bh=nu0zhwK3O3WL827GPYiUQRD9DU9/FqJbgDVCwstEBdU=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=yOPu9FhTgupWBGSfd2gsYbyj9oQOwVK/uGMgIR/2NuiD7gmneRJUM5ZEkmRkpYzQX
-         58Bc1zMC1IBIwLacgGc2H2bX4DsrLS1m7y1j7Fljz5gjn888++E7BJdpqvqicjkQBL
-         cCJaqrwtTO5b1pzjPB5atE1SomNqDS1y4f9E/X20=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
-        by disco-boy.misterjones.org with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.92)
-        (envelope-from <maz@kernel.org>)
-        id 1jOi4X-003Xfd-JJ; Wed, 15 Apr 2020 14:27:21 +0100
+        id S2636749AbgDOOms (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Apr 2020 10:42:48 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:44035 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S2636613AbgDOOmf (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 15 Apr 2020 10:42:35 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1586961751;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=jcswj4fMIzy1VSkpe0j3kCHXPaYoyRFwnxHUU0e019I=;
+        b=X/VB/KtIlPs8RqKvLkqQYahNrzV16JhtmeJ1N037/IwNDMekMuzIvmYShQlgwGbBj1Yx+d
+        j5AprWri9WbEf9UdvBoVRRtGrMwkqSf8RkadhSi/MqjeX7Nz0VBu9xU2DxGLOHJTXuyaPT
+        YON+/iJQe1STB9nSPqNq6CXVbChqNho=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-168-jm1NhmyLOWmDv2yC-hLSfw-1; Wed, 15 Apr 2020 10:42:30 -0400
+X-MC-Unique: jm1NhmyLOWmDv2yC-hLSfw-1
+Received: by mail-wr1-f69.google.com with SMTP id f2so14951wrm.9
+        for <kvm@vger.kernel.org>; Wed, 15 Apr 2020 07:42:29 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=jcswj4fMIzy1VSkpe0j3kCHXPaYoyRFwnxHUU0e019I=;
+        b=nfsYfn4omdLmJsyB+SKsOWtcBFBlbjFZ1XQfkzCQFYbroMyBWvJXhxUFzJVw9wc3ev
+         EfzLRIB4KOYTHd6sSqilnaB2YZGD5V2j5yXTIGrZ6ay6l6e7xPv+ldKD5LpGjoMFzyGL
+         629DLMDXpmSsCArqH3fB02mI6IsvbR5loMbFB+a8OsRCsDkrOdhoD1v2qVxuD1y26CHd
+         /hRXqnSCgpfHpM+aN/XPBbEEzyhNJLaJkmBfJKBFzBlZkuKtgjtRNFbD+kNMWcXdPN3A
+         1yBX54Mrm8qe4O99cnjHVlBMtKPWIStZ9jGxhz00oDCRWVbNZPMtQUf0hgaBJJWf3Wnj
+         C/Iw==
+X-Gm-Message-State: AGi0Pub69sIoRM9dyVVOTXf0Uhwgsnejz8l7l/f79HcqomUOqW94bwqL
+        GosMl2+GH/gen5tYkEcHGoRJuu0sC+ww7RlVatrSh/gfUasb+Bgki5CaWcX5NtRRXM1r7QpATpa
+        zZiDAdrS+M0BT
+X-Received: by 2002:a5d:51c6:: with SMTP id n6mr23228101wrv.314.1586961748851;
+        Wed, 15 Apr 2020 07:42:28 -0700 (PDT)
+X-Google-Smtp-Source: APiQypLhnFTufVnEV7mvMNC3KmCyW/b8aBHad2cdYj8UeBTDu5XbSSHNUq+WhQ9qWV0NLZkASnsJHg==
+X-Received: by 2002:a5d:51c6:: with SMTP id n6mr23228081wrv.314.1586961748565;
+        Wed, 15 Apr 2020 07:42:28 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:9066:4f2:9fbd:f90e? ([2001:b07:6468:f312:9066:4f2:9fbd:f90e])
+        by smtp.gmail.com with ESMTPSA id j11sm2090904wrr.62.2020.04.15.07.42.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 15 Apr 2020 07:42:27 -0700 (PDT)
+Subject: Re: [PATCH] x86/kvm: make steal_time static
+To:     Jason Yan <yanaijie@huawei.com>, sean.j.christopherson@intel.com,
+        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+        joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, x86@kernel.org, hpa@zytor.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     Hulk Robot <hulkci@huawei.com>
+References: <20200415084939.6367-1-yanaijie@huawei.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <d1700173-29c1-2e7c-46bd-471876d96762@redhat.com>
+Date:   Wed, 15 Apr 2020 16:42:26 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
+In-Reply-To: <20200415084939.6367-1-yanaijie@huawei.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Date:   Wed, 15 Apr 2020 14:27:21 +0100
-From:   Marc Zyngier <maz@kernel.org>
-To:     Zenghui Yu <yuzenghui@huawei.com>
-Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, Eric Auger <eric.auger@redhat.com>,
-        Andre Przywara <Andre.Przywara@arm.com>,
-        Julien Grall <julien@xen.org>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: Re: [PATCH 1/3] KVM: arm: vgic: Synchronize the whole guest on
- GIC{D,R}_I{S,C}ACTIVER read
-In-Reply-To: <190b57e6-0ac5-63bb-57d8-5bab2aea0b2c@huawei.com>
-References: <20200414103517.2824071-1-maz@kernel.org>
- <20200414103517.2824071-2-maz@kernel.org>
- <190b57e6-0ac5-63bb-57d8-5bab2aea0b2c@huawei.com>
-Message-ID: <de0b9e06fe77238f18ffd8f1bf2f870e@kernel.org>
-X-Sender: maz@kernel.org
-User-Agent: Roundcube Webmail/1.3.10
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, eric.auger@redhat.com, Andre.Przywara@arm.com, julien@xen.org, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Zenghui,
-
-On 2020-04-15 14:15, Zenghui Yu wrote:
-> Hi Marc,
+On 15/04/20 10:49, Jason Yan wrote:
+> Fix the following sparse warning:
 > 
-> On 2020/4/14 18:35, Marc Zyngier wrote:
->> When a guest tries to read the active state of its interrupts,
->> we currently just return whatever state we have in memory. This
->> means that if such an interrupt lives in a List Register on another
->> CPU, we fail to obsertve the latest active state for this interrupt.
->> 
->> In order to remedy this, stop all the other vcpus so that they exit
->> and we can observe the most recent value for the state.
->> 
->> Reported-by: Julien Grall <julien@xen.org>
->> Signed-off-by: Marc Zyngier <maz@kernel.org>
->> ---
->>   virt/kvm/arm/vgic/vgic-mmio-v2.c |   4 +-
->>   virt/kvm/arm/vgic/vgic-mmio-v3.c |   4 +-
->>   virt/kvm/arm/vgic/vgic-mmio.c    | 100 
->> ++++++++++++++++++++-----------
->>   virt/kvm/arm/vgic/vgic-mmio.h    |   3 +
->>   4 files changed, 71 insertions(+), 40 deletions(-)
->> 
->> diff --git a/virt/kvm/arm/vgic/vgic-mmio-v2.c 
->> b/virt/kvm/arm/vgic/vgic-mmio-v2.c
->> index 5945f062d749..d63881f60e1a 100644
->> --- a/virt/kvm/arm/vgic/vgic-mmio-v2.c
->> +++ b/virt/kvm/arm/vgic/vgic-mmio-v2.c
->> @@ -422,11 +422,11 @@ static const struct vgic_register_region 
->> vgic_v2_dist_registers[] = {
->>   		VGIC_ACCESS_32bit),
->>   	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_ACTIVE_SET,
->>   		vgic_mmio_read_active, vgic_mmio_write_sactive,
->> -		NULL, vgic_mmio_uaccess_write_sactive, 1,
->> +		vgic_uaccess_read_active, vgic_mmio_uaccess_write_sactive, 1,
->>   		VGIC_ACCESS_32bit),
->>   	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_ACTIVE_CLEAR,
->>   		vgic_mmio_read_active, vgic_mmio_write_cactive,
->> -		NULL, vgic_mmio_uaccess_write_cactive, 1,
->> +		vgic_uaccess_read_active, vgic_mmio_uaccess_write_cactive, 1,
->>   		VGIC_ACCESS_32bit),
->>   	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_PRI,
->>   		vgic_mmio_read_priority, vgic_mmio_write_priority, NULL, NULL,
->> diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c 
->> b/virt/kvm/arm/vgic/vgic-mmio-v3.c
->> index e72dcc454247..77c8ba1a2535 100644
->> --- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
->> +++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
->> @@ -553,11 +553,11 @@ static const struct vgic_register_region 
->> vgic_v3_dist_registers[] = {
->>   		VGIC_ACCESS_32bit),
->>   	REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_ISACTIVER,
->>   		vgic_mmio_read_active, vgic_mmio_write_sactive,
->> -		NULL, vgic_mmio_uaccess_write_sactive, 1,
->> +		vgic_uaccess_read_active, vgic_mmio_uaccess_write_sactive, 1,
->>   		VGIC_ACCESS_32bit),
->>   	REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_ICACTIVER,
->>   		vgic_mmio_read_active, vgic_mmio_write_cactive,
->> -		NULL, vgic_mmio_uaccess_write_cactive,
->> +		vgic_uaccess_read_active, vgic_mmio_uaccess_write_cactive,
->>   		1, VGIC_ACCESS_32bit),
->>   	REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_IPRIORITYR,
->>   		vgic_mmio_read_priority, vgic_mmio_write_priority, NULL, NULL,
+> arch/x86/kernel/kvm.c:58:1: warning: symbol '__pcpu_scope_steal_time'
+> was not declared. Should it be static?
 > 
-> Shouldn't we also set this uaccess_read cb for GICR_I{S,C}ACTIVER0?
+> Reported-by: Hulk Robot <hulkci@huawei.com>
+> Signed-off-by: Jason Yan <yanaijie@huawei.com>
+> ---
+>  arch/x86/kernel/kvm.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
+> index 6efe0410fb72..f75010cde5d5 100644
+> --- a/arch/x86/kernel/kvm.c
+> +++ b/arch/x86/kernel/kvm.c
+> @@ -55,7 +55,7 @@ static int __init parse_no_stealacc(char *arg)
+>  early_param("no-steal-acc", parse_no_stealacc);
+>  
+>  static DEFINE_PER_CPU_DECRYPTED(struct kvm_vcpu_pv_apf_data, apf_reason) __aligned(64);
+> -DEFINE_PER_CPU_DECRYPTED(struct kvm_steal_time, steal_time) __aligned(64) __visible;
+> +static DEFINE_PER_CPU_DECRYPTED(struct kvm_steal_time, steal_time) __aligned(64) __visible;
+>  static int has_steal_clock = 0;
+>  
+>  /*
+> 
 
-Duh. Yes, of course...
+Queued, thanks.
 
-         M.
--- 
-Jazz is not dead. It just smells funny...
+Paolo
+
