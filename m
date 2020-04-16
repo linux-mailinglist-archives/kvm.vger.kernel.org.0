@@ -2,73 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5E53E1ACF8A
-	for <lists+kvm@lfdr.de>; Thu, 16 Apr 2020 20:24:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 36F3D1ACFE0
+	for <lists+kvm@lfdr.de>; Thu, 16 Apr 2020 20:45:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388403AbgDPSW7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Apr 2020 14:22:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45484 "EHLO
+        id S1733198AbgDPSnT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Apr 2020 14:43:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48614 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729376AbgDPSW5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Apr 2020 14:22:57 -0400
-Received: from mail-lj1-x244.google.com (mail-lj1-x244.google.com [IPv6:2a00:1450:4864:20::244])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A39BC061A0C
-        for <kvm@vger.kernel.org>; Thu, 16 Apr 2020 11:22:57 -0700 (PDT)
-Received: by mail-lj1-x244.google.com with SMTP id q22so8951018ljg.0
-        for <kvm@vger.kernel.org>; Thu, 16 Apr 2020 11:22:57 -0700 (PDT)
+        with ESMTP id S1728815AbgDPSnS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Apr 2020 14:43:18 -0400
+Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9D3FC061A0C
+        for <kvm@vger.kernel.org>; Thu, 16 Apr 2020 11:43:16 -0700 (PDT)
+Received: by mail-pf1-x449.google.com with SMTP id 20so3870292pfw.10
+        for <kvm@vger.kernel.org>; Thu, 16 Apr 2020 11:43:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=2AJXNXiAB6W7rFrZCbALmh4q22OnU6lxgAbw+PmwEgQ=;
-        b=hUFtTadKXcXXZANsLiCgBHmKbBdeVv8Xd/U9RCsajjI7V6EJuCjOtn+CbPJdjc/xva
-         6h2/j8V9Ae0HPsio/JBZ2eGra2qcUlfJ4xdOWGb50zuB1xHwCxKLoRoeq8tYwlcejLsp
-         NqMnkJTgH8tAQTGld18HhnzEdvJvVwDKM4XTXIiFKzr7vNwXg0uxNghgii7A/oHHaRF1
-         LNJ/gtsy1Lpkiv36b131vRDt0BNtBrBhicBvdHkCQwNCyUksmvsxaKGHg+m44jGh09rV
-         RiplMj5St9ZxaoldEOZtjr/WQiFs6MSy5H8HU2DcrSnURL3Ro5jzdWE382JXs1RlSerS
-         5e/w==
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=mC/qr0j7HUgGt77fxIftKjS5qqz0qPQen02hUmh1Dh8=;
+        b=CFPLLGPX4ctg78piDhgn3JbQBZ4NUQ5XOGuQiN/7vBRQR685triRRUALfmerg6W9xb
+         j17+dKXQTA3N2V71skyu4zTFuVB/4OZSOXSyyskfOa5GZcQt4xpXMOQ5n5GE5MlQPCkQ
+         1ZT3ut6wPZWf8D1dz63sAtr4+ZZSe1wtluo7mS5hgEVFNheTwFlMBnRW1WwxEpYbZ7ua
+         XDKaJoHGbdm/AHYIKimMrLcSP6KvyLTT43OvDxyfMe60DGjgycAsTONaibnbQmuRB/82
+         56FsiaOolzNptFQmMpl3CS8QBl6GBmGxjoAOyseLH1OgPbkueAOjEA0utBJPCWW3wD5F
+         nYEw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=2AJXNXiAB6W7rFrZCbALmh4q22OnU6lxgAbw+PmwEgQ=;
-        b=FIUCP1RI+HAfDp5ghWbx2F2bVEBJCsouV9MMk65SoT1SSzq/Dd4qSzAss08vkuKMOI
-         GaF51XDoqIc+ddur/gb2rpCFKNSxu6ZFtihUfWNSh1cT7E+ygCu0qQ8bbDG7vEf78zcl
-         mqaQV+mKlQCk/l78jrMc5HEos/GcdFWQ+vUx8A2cIo7GpT0c9ggZCwluQHvEmai5q9dL
-         MlsxmimYJBpZNE1gOK4dpX/lmRAto7IzrnRjkFvwZ8SFoSYjOJGUJJuDnwGZjm5fs7pD
-         Gjq4EhlNJg1CIEVrkQTz3hszOcKP4ItXd7bziUWeCx5LSMR2tdPafVXiPP7ctwXtbnB+
-         3qkA==
-X-Gm-Message-State: AGi0Pua/jFiwps4QCH1t4j2PruaUIywyzJAU4HZjuebTCvKGxv+VA397
-        1KFzutpqFJZo/VikT4f6IZ5Lp0sQYlzqSA3rrbJvnA==
-X-Google-Smtp-Source: APiQypK0MEj34nx4Jc/G+PCSOsEFrhP4zYZGsPQoecMSH5BAWsCiXKq7EajCs66JATef7G02EdUM6SBth3c8rR/1fgg=
-X-Received: by 2002:a05:651c:200c:: with SMTP id s12mr6736693ljo.30.1587061375466;
- Thu, 16 Apr 2020 11:22:55 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200414214634.126508-1-oupton@google.com> <20200414214634.126508-2-oupton@google.com>
- <CACwOFJTzdCAq1hVfPLfTFzH3QAEJSXKJxEy6yf7ku9GqxB-=0w@mail.gmail.com>
-In-Reply-To: <CACwOFJTzdCAq1hVfPLfTFzH3QAEJSXKJxEy6yf7ku9GqxB-=0w@mail.gmail.com>
-From:   Oliver Upton <oupton@google.com>
-Date:   Thu, 16 Apr 2020 13:22:44 -0500
-Message-ID: <CAOQ_QsgQSf_KPMJOiu+NZZf0KmgwDADXy36mqLhBB_Lbke3JXg@mail.gmail.com>
-Subject: Re: [kvm-unit-tests PATCH] x86: VMX: test MTF VM-exit event injection
-To:     Peter Shier <pshier@google.com>
-Cc:     kvm list <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=mC/qr0j7HUgGt77fxIftKjS5qqz0qPQen02hUmh1Dh8=;
+        b=UgWlByuBwbj7qz7zElj+GPe+mi+GylCoYSqB+Nio+Y4PIpXs7MWFnj4fUHQVHFI6Sc
+         EuOSjkhgKKxkjbvyjniDwXGfahbRAc0Kuy00FX5hpGDRCeE+QgLaDedzO3B/KcdPgDcL
+         reHQG606DDtLO7ywfT5C85X3njy9RPFjxJWVjM212yiqsWzcYSUpcAFqWTzdGojVMKR+
+         ifQceFkCn0qIDAiRXeieQIjhHAmus8WLq2kWEUT9Gvuyuy3qkNvQm0jomlK0aiDWZ/s6
+         l42Alf2a+zMa0skrf83Lzo8FdQfi4RAErCAnNyeVJmfNKyT4V/bnKTHH3GfVd/An8fpL
+         WHuQ==
+X-Gm-Message-State: AGi0PuapXyMpQMIvN8KharD5Q33/HUakUihXS7s6xS7BEp0JvDPge8B0
+        M9MGcRgo1w+yTqDL7AfMeazwBqrldT3n+A==
+X-Google-Smtp-Source: APiQypKhTjvNBou9iWL+ZmFqhZSk6QlvKSXplfrNIv5dwwZO5la9jHmS99O/mXPKRy/qIQIJHfkgNvE17bDG8Q==
+X-Received: by 2002:a17:90a:65c8:: with SMTP id i8mr6679174pjs.156.1587062596155;
+ Thu, 16 Apr 2020 11:43:16 -0700 (PDT)
+Date:   Thu, 16 Apr 2020 11:42:54 -0700
+Message-Id: <20200416184254.248374-1-jcargill@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.26.1.301.g55bc3eb7cb9-goog
+Subject: [PATCH] kvm: Handle reads of SandyBridge RAPL PMU MSRs rather than
+ injecting #GP
+From:   Jon Cargille <jcargill@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <sean.j.christopherson@intel.com>,
-        Jim Mattson <jmattson@google.com>
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     Venkatesh Srinivas <venkateshs@google.com>,
+        Jon Cargille <jcargill@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Apr 14, 2020 at 5:05 PM Peter Shier <pshier@google.com> wrote:
->
-> Reviewed-by: Peter Shier<pshier@google.com>
+From: Venkatesh Srinivas <venkateshs@google.com>
 
-Gentle ping :) Paolo, I believe you've already taken the associated
-kernel commit for this test.
+Linux 3.14 unconditionally reads the RAPL PMU MSRs on boot, without handling
+General Protection Faults on reading those MSRs. Rather than injecting a #GP,
+which prevents boot, handle the MSRs by returning 0 for their data. Zero was
+checked to be safe by code review of the RAPL PMU driver and in discussion
+with the original driver author (eranian@google.com).
 
---
-Thanks,
-Oliver
+Signed-off-by: Venkatesh Srinivas <venkateshs@google.com>
+Signed-off-by: Jon Cargille <jcargill@google.com>
+Reviewed-by: Jim Mattson <jmattson@google.com>
+---
+ arch/x86/kvm/x86.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 3cc3f673785c8..4f9b7dd687e3c 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -3060,6 +3060,17 @@ int kvm_get_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 	case MSR_IA32_PERF_CTL:
+ 	case MSR_AMD64_DC_CFG:
+ 	case MSR_F15H_EX_CFG:
++	/*
++	 * Intel Sandy Bridge CPUs must support the RAPL (running average power
++	 * limit) MSRs. Just return 0, as we do not want to expose the host
++	 * data here. Do not conditionalize this on CPUID, as KVM does not do
++	 * so for existing CPU-specific MSRs.
++	 */
++	case MSR_RAPL_POWER_UNIT:
++	case MSR_PP0_ENERGY_STATUS:	/* Power plane 0 (core) */
++	case MSR_PP1_ENERGY_STATUS:	/* Power plane 1 (graphics uncore) */
++	case MSR_PKG_ENERGY_STATUS:	/* Total package */
++	case MSR_DRAM_ENERGY_STATUS:	/* DRAM controller */
+ 		msr_info->data = 0;
+ 		break;
+ 	case MSR_F15H_PERF_CTL0 ... MSR_F15H_PERF_CTR5:
+-- 
+2.26.0.110.g2183baf09c-goog
+
