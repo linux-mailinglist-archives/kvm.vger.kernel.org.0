@@ -2,192 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DEB251AD2E3
-	for <lists+kvm@lfdr.de>; Fri, 17 Apr 2020 00:34:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2932E1AD2F3
+	for <lists+kvm@lfdr.de>; Fri, 17 Apr 2020 00:51:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729229AbgDPWeK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Apr 2020 18:34:10 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:44237 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725768AbgDPWeJ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 16 Apr 2020 18:34:09 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1587076447;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=A1bma2gluq3HGOu3CaCHez8AlHNyzwOb99nKMYoTBrs=;
-        b=TK12xLQWP67Pn5vksjYhoT/eqqfWtPYWXqOLmxzz6QQ60AE6iR0Zz7taPRd3ZS3nizHX/6
-        7DvLBS6ubf/Dx/xI6QsxNjP0qvZedeQNP09zVttCEma8eQu4Y91iB93cVN6TTzAi6fOEUD
-        WAe6gNTvQxLCktMwNeOx+WfDVCU3Xv0=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-448-kCIybJ8HMAOLLFjsYC3EzA-1; Thu, 16 Apr 2020 18:34:04 -0400
-X-MC-Unique: kCIybJ8HMAOLLFjsYC3EzA-1
-Received: by mail-wr1-f70.google.com with SMTP id p16so2480560wro.16
-        for <kvm@vger.kernel.org>; Thu, 16 Apr 2020 15:34:03 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=A1bma2gluq3HGOu3CaCHez8AlHNyzwOb99nKMYoTBrs=;
-        b=cu+ZY9tB7VFO5r7uuK1KAISxpLmH2PusfDurxHEXqSSk7X342v5kluoToGO0f0seXC
-         ESDmGWsUj+jmjjgy89bha0QZeo2mVLy1IuT26UXcgCqzcflhjU2gmfKUs7TCZE3k4vkN
-         azrdwWfgcm5S+9+qwAkoASPEFx6b+gFyDKK+x8DKGC2Swj+xRMBEJPz46G/5hsulI9fj
-         36yIjbCs8Un0NEN+wgs/lNWbN/mVn8wp3p35Vw6H1mS3kb3n8KWW4muX73AuXyS6tfl1
-         Z5i4UFLoC5pguyvhW161FhpTZfdxpka/EpD+lU6nvfDtuXtIooFwROrko8wgVHS2+WOM
-         cEjQ==
-X-Gm-Message-State: AGi0PuamLrap4HtawKdGIFv+DMh0H9cCf63zBriOfblMQ7o9PWJbGj8v
-        5dFRfS0g2ITLZDHcIeUwLHtKE9Pgcfm4i6yFElIsDh+Y5CXo8z7z4Wrb7Pa35ABebZgxZYVye31
-        LvjTc6UX1rjWd
-X-Received: by 2002:a1c:4346:: with SMTP id q67mr98423wma.162.1587076442804;
-        Thu, 16 Apr 2020 15:34:02 -0700 (PDT)
-X-Google-Smtp-Source: APiQypKXN83gnjbKOoJt6yPtsWQIwZwD4bOGlfUuqfOI5ajKzWnkQM8hnZuZwWeeXGxrvKUUk0sKdg==
-X-Received: by 2002:a1c:4346:: with SMTP id q67mr98410wma.162.1587076442597;
-        Thu, 16 Apr 2020 15:34:02 -0700 (PDT)
-Received: from redhat.com (bzq-79-183-51-3.red.bezeqint.net. [79.183.51.3])
-        by smtp.gmail.com with ESMTPSA id m15sm5010453wmc.35.2020.04.16.15.34.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Apr 2020 15:34:02 -0700 (PDT)
-Date:   Thu, 16 Apr 2020 18:33:59 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>
-Cc:     Stephen Rothwell <sfr@canb.auug.org.au>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>,
-        kvm list <kvm@vger.kernel.org>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v2 7/8] tools/virtio: Reset index in virtio_test --reset.
-Message-ID: <20200416183324-mutt-send-email-mst@kernel.org>
-References: <20200416075643.27330-1-eperezma@redhat.com>
- <20200416075643.27330-8-eperezma@redhat.com>
+        id S1729078AbgDPWvB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Apr 2020 18:51:01 -0400
+Received: from mga17.intel.com ([192.55.52.151]:49373 "EHLO mga17.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726441AbgDPWvB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Apr 2020 18:51:01 -0400
+IronPort-SDR: aRe8YSExJc6b+NOKf+/LcTTbrawLHr5zB4eJ1UT3n4uakgnSmWH0Rl48V/SyO4ibo4xEvhapRO
+ rolR3tuBKltg==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Apr 2020 15:51:00 -0700
+IronPort-SDR: 3SWrEXltK0cnP2E2h1Fyod1t7tbH4FXYJ+dEFSp2J6FRqQBb7wyTtq7UxRHsZy1fHUWpLWiP3N
+ HAuEvO4RzINA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.72,392,1580803200"; 
+   d="scan'208";a="278029698"
+Received: from sjchrist-coffee.jf.intel.com ([10.54.74.202])
+  by orsmga008.jf.intel.com with ESMTP; 16 Apr 2020 15:50:59 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Subject: [PATCH] vfio/type1: Fix VA->PA translation for PFNMAP VMAs in vaddr_get_pfn()
+Date:   Thu, 16 Apr 2020 15:50:57 -0700
+Message-Id: <20200416225057.8449-1-sean.j.christopherson@intel.com>
+X-Mailer: git-send-email 2.26.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20200416075643.27330-8-eperezma@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Apr 16, 2020 at 09:56:42AM +0200, Eugenio Pérez wrote:
-> This way behavior for vhost is more like a VM.
-> 
-> Signed-off-by: Eugenio Pérez <eperezma@redhat.com>
+Use follow_pfn() to get the PFN of a PFNMAP VMA instead of assuming that
+vma->vm_pgoff holds the base PFN of the VMA.  This fixes a bug where
+attempting to do VFIO_IOMMU_MAP_DMA on an arbitrary PFNMAP'd region of
+memory calculates garbage for the PFN.
 
-I dropped --reset from 5.7 since Linus felt it's unappropriate.
-I guess I should squash this in with --reset?
+Hilariously, this only got detected because the first "PFN" calculated
+by vaddr_get_pfn() is PFN 0 (vma->vm_pgoff==0), and iommu_iova_to_phys()
+uses PA==0 as an error, which triggers a WARN in vfio_unmap_unpin()
+because the translation "failed".  PFN 0 is now unconditionally reserved
+on x86 in order to mitigate L1TF, which causes is_invalid_reserved_pfn()
+to return true and in turns results in vaddr_get_pfn() returning success
+for PFN 0.  Eventually the bogus calculation runs into PFNs that aren't
+reserved and leads to failure in vfio_pin_map_dma().  The subsequent
+call to vfio_remove_dma() attempts to unmap PFN 0 and WARNs.
 
-> ---
->  tools/virtio/virtio_test.c | 33 ++++++++++++++++++++++++++-------
->  1 file changed, 26 insertions(+), 7 deletions(-)
-> 
-> diff --git a/tools/virtio/virtio_test.c b/tools/virtio/virtio_test.c
-> index 18d5347003eb..dca64d36a882 100644
-> --- a/tools/virtio/virtio_test.c
-> +++ b/tools/virtio/virtio_test.c
-> @@ -20,7 +20,6 @@
->  #include "../../drivers/vhost/test.h"
->  
->  #define RANDOM_BATCH -1
-> -#define RANDOM_RESET -1
->  
->  /* Unused */
->  void *__kmalloc_fake, *__kfree_ignore_start, *__kfree_ignore_end;
-> @@ -49,6 +48,7 @@ struct vdev_info {
->  
->  static const struct vhost_vring_file no_backend = { .fd = -1 },
->  				     backend = { .fd = 1 };
-> +static const struct vhost_vring_state null_state = {};
->  
->  bool vq_notify(struct virtqueue *vq)
->  {
-> @@ -174,14 +174,19 @@ static void run_test(struct vdev_info *dev, struct vq_info *vq,
->  	unsigned len;
->  	long long spurious = 0;
->  	const bool random_batch = batch == RANDOM_BATCH;
-> +
->  	r = ioctl(dev->control, VHOST_TEST_RUN, &test);
->  	assert(r >= 0);
-> +	if (!reset_n) {
-> +		next_reset = INT_MAX;
-> +	}
-> +
->  	for (;;) {
->  		virtqueue_disable_cb(vq->vq);
->  		completed_before = completed;
->  		started_before = started;
->  		do {
-> -			const bool reset = reset_n && completed > next_reset;
-> +			const bool reset = completed > next_reset;
->  			if (random_batch)
->  				batch = (random() % vq->vring.num) + 1;
->  
-> @@ -224,10 +229,24 @@ static void run_test(struct vdev_info *dev, struct vq_info *vq,
->  			}
->  
->  			if (reset) {
-> +				struct vhost_vring_state s = { .index = 0 };
-> +
-> +				vq_reset(vq, vq->vring.num, &dev->vdev);
-> +
-> +				r = ioctl(dev->control, VHOST_GET_VRING_BASE,
-> +					  &s);
-> +				assert(!r);
-> +
-> +				s.num = 0;
-> +				r = ioctl(dev->control, VHOST_SET_VRING_BASE,
-> +					  &null_state);
-> +				assert(!r);
-> +
->  				r = ioctl(dev->control, VHOST_TEST_SET_BACKEND,
->  					  &backend);
->  				assert(!r);
->  
-> +				started = completed;
->  				while (completed > next_reset)
->  					next_reset += completed;
->  			}
-> @@ -249,7 +268,9 @@ static void run_test(struct vdev_info *dev, struct vq_info *vq,
->  	test = 0;
->  	r = ioctl(dev->control, VHOST_TEST_RUN, &test);
->  	assert(r >= 0);
-> -	fprintf(stderr, "spurious wakeups: 0x%llx\n", spurious);
-> +	fprintf(stderr,
-> +		"spurious wakeups: 0x%llx started=0x%lx completed=0x%lx\n",
-> +		spurious, started, completed);
->  }
->  
->  const char optstring[] = "h";
-> @@ -312,7 +333,7 @@ static void help(void)
->  		" [--no-virtio-1]"
->  		" [--delayed-interrupt]"
->  		" [--batch=random/N]"
-> -		" [--reset=random/N]"
-> +		" [--reset=N]"
->  		"\n");
->  }
->  
-> @@ -360,11 +381,9 @@ int main(int argc, char **argv)
->  		case 'r':
->  			if (!optarg) {
->  				reset = 1;
-> -			} else if (0 == strcmp(optarg, "random")) {
-> -				reset = RANDOM_RESET;
->  			} else {
->  				reset = strtol(optarg, NULL, 10);
-> -				assert(reset >= 0);
-> +				assert(reset > 0);
->  				assert(reset < (long)INT_MAX + 1);
->  			}
->  			break;
-> -- 
-> 2.18.1
+  WARNING: CPU: 8 PID: 5130 at drivers/vfio/vfio_iommu_type1.c:750 vfio_unmap_unpin+0x2e1/0x310 [vfio_iommu_type1]
+  Modules linked in: vfio_pci vfio_virqfd vfio_iommu_type1 vfio ...
+  CPU: 8 PID: 5130 Comm: sgx Tainted: G        W         5.6.0-rc5-705d787c7fee-vfio+ #3
+  Hardware name: Intel Corporation Mehlow UP Server Platform/Moss Beach Server, BIOS CNLSE2R1.D00.X119.B49.1803010910 03/01/2018
+  RIP: 0010:vfio_unmap_unpin+0x2e1/0x310 [vfio_iommu_type1]
+  Code: <0f> 0b 49 81 c5 00 10 00 00 e9 c5 fe ff ff bb 00 10 00 00 e9 3d fe
+  RSP: 0018:ffffbeb5039ebda8 EFLAGS: 00010246
+  RAX: 0000000000000000 RBX: ffff9a55cbf8d480 RCX: 0000000000000000
+  RDX: 0000000000000000 RSI: 0000000000000001 RDI: ffff9a52b771c200
+  RBP: 0000000000000000 R08: 0000000000000040 R09: 00000000fffffff2
+  R10: 0000000000000001 R11: ffff9a51fa896000 R12: 0000000184010000
+  R13: 0000000184000000 R14: 0000000000010000 R15: ffff9a55cb66ea08
+  FS:  00007f15d3830b40(0000) GS:ffff9a55d5600000(0000) knlGS:0000000000000000
+  CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+  CR2: 0000561cf39429e0 CR3: 000000084f75f005 CR4: 00000000003626e0
+  DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+  DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+  Call Trace:
+   vfio_remove_dma+0x17/0x70 [vfio_iommu_type1]
+   vfio_iommu_type1_ioctl+0x9e3/0xa7b [vfio_iommu_type1]
+   ksys_ioctl+0x92/0xb0
+   __x64_sys_ioctl+0x16/0x20
+   do_syscall_64+0x4c/0x180
+   entry_SYSCALL_64_after_hwframe+0x44/0xa9
+  RIP: 0033:0x7f15d04c75d7
+  Code: <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d 81 48 2d 00 f7 d8 64 89 01 48
+
+Fixes: 73fa0d10d077 ("vfio: Type1 IOMMU implementation")
+Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+---
+
+I'm mostly confident this is correct from the standpoint that it generates
+the correct VA->PA.  I'm far less confident the end result is what VFIO
+wants, there appears to be a fair bit of magic going on that I don't fully
+understand, e.g. I'm a bit mystified as to how this ever worked in any
+capacity.
+
+Mapping PFNMAP VMAs into the IOMMU without using a mmu_notifier also seems
+dangerous, e.g. if the subsystem associated with the VMA unmaps/remaps the
+VMA then the IOMMU will end up with stale translations.
+
+Last thought, using PA==0 for the error seems unnecessarily risky, e.g.
+why not use something similar to KVM_PFN_ERR_* or an explicit return code?
+
+ drivers/vfio/vfio_iommu_type1.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+index 85b32c325282..c2ada190c5cb 100644
+--- a/drivers/vfio/vfio_iommu_type1.c
++++ b/drivers/vfio/vfio_iommu_type1.c
+@@ -342,8 +342,8 @@ static int vaddr_get_pfn(struct mm_struct *mm, unsigned long vaddr,
+ 	vma = find_vma_intersection(mm, vaddr, vaddr + 1);
+ 
+ 	if (vma && vma->vm_flags & VM_PFNMAP) {
+-		*pfn = ((vaddr - vma->vm_start) >> PAGE_SHIFT) + vma->vm_pgoff;
+-		if (is_invalid_reserved_pfn(*pfn))
++		if (!follow_pfn(vma, vaddr, pfn) &&
++		    is_invalid_reserved_pfn(*pfn))
+ 			ret = 0;
+ 	}
+ done:
+-- 
+2.26.0
 
