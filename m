@@ -2,135 +2,175 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 69CCB1ACBFF
-	for <lists+kvm@lfdr.de>; Thu, 16 Apr 2020 17:56:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9E08C1ACC27
+	for <lists+kvm@lfdr.de>; Thu, 16 Apr 2020 17:57:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2896666AbgDPPxc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Apr 2020 11:53:32 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:59442 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S2896636AbgDPPx2 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 16 Apr 2020 11:53:28 -0400
+        id S2442823AbgDPP4I (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Apr 2020 11:56:08 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:35346 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S2395535AbgDPP4E (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Apr 2020 11:56:04 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1587052407;
+        s=mimecast20190719; t=1587052563;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=EN/H+dURYVmdO4EXHtSzJA+fcODs32+NBiRjW8BRIZw=;
-        b=EmBTdn7IVbQYFhdvaK/2Lv8m3DLb18LNhjgbq8X4DF+IhLK338wnQnEy+T9/iCqI3BJZ00
-        5pG3CJfuxM7pqb3Fu4gOAL4ljT52pYB7UsVbfiTvVX34v/oWRyn1KhvmJJfgmJP5PCfMpC
-        +kF8inTxpzxKZgBO7+CSszyMfqF/Srk=
-Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
- [209.85.160.200]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-62-uDWLXXCBP6yrAfyK2WVB9A-1; Thu, 16 Apr 2020 11:53:25 -0400
-X-MC-Unique: uDWLXXCBP6yrAfyK2WVB9A-1
-Received: by mail-qt1-f200.google.com with SMTP id g23so19038668qto.0
-        for <kvm@vger.kernel.org>; Thu, 16 Apr 2020 08:53:25 -0700 (PDT)
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=nvu+MW6oZUAc4Rt+d0KHMjWiSPVqXx7NpVhFclBCSuA=;
+        b=cWTdZTT/wSgVfwxdCnQ/LyBwV2oTxRKfaZ+qZXJC5lxzfVNOfb3xwitlBRc2nyZos3azlm
+        nwEImmj60cUWDNX7ApG9JYwMw4Xi0eEXH9JD0or1sqH2Jbd6k2y9cE3XG/L9caste5pSEP
+        ingyOUQp8btoM9vldp4og+jV6YTK+lU=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-105-mTRHQEqFOSaCjDSz5pt7Qw-1; Thu, 16 Apr 2020 11:55:59 -0400
+X-MC-Unique: mTRHQEqFOSaCjDSz5pt7Qw-1
+Received: by mail-wr1-f70.google.com with SMTP id q10so1933713wrv.10
+        for <kvm@vger.kernel.org>; Thu, 16 Apr 2020 08:55:59 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=EN/H+dURYVmdO4EXHtSzJA+fcODs32+NBiRjW8BRIZw=;
-        b=lV3QqdZzawXUa0H02rk1tGaLnl1BSvEglJ0fU9afEaszGUmYeyewGZfFmM2Lj4gjAX
-         ODi1LsOGnH7Zkxsy4p73pF5YYoJR70QSEBH9uFrPPWGLQiW0FSV6WBdMZ5RUmGhWnA5K
-         crvfPadBV/0kzmumaflu1py9cypB6D+DFYFTwwLMcsIG7MArJqum0VYJDEEHCpi33Drs
-         Ypprsd60dME/L2vl4u/z5Rjo/hCSguhbyonlTiJ2dfmRGC0HL0dHjMfgYkrc4Uy83DNm
-         bMAaimXtYTjUCJOomgVpVwsqpGNtP7luGeMVU8sQDYfMnkJYYVv7dVV670PnAWbqmrRr
-         hHyg==
-X-Gm-Message-State: AGi0PuaBTjLCQXClo+el2QF549xwlWAyxFpbt0idB8yTlS2ccZl1RqXj
-        VKZ6LhiFevrTxfsu2EPdw/+Jp//pJvTZ37vsj6z4JgOS4BaZ1Gy3/fMiotPsjcXhDqSwQ4yiAYZ
-        9GT9NO3SydFai
-X-Received: by 2002:a05:620a:5f1:: with SMTP id z17mr27807341qkg.21.1587052404965;
-        Thu, 16 Apr 2020 08:53:24 -0700 (PDT)
-X-Google-Smtp-Source: APiQypJm5c/jIx1xNo1oON6lK6lrZ3qH3lLjFF0849VMtJ79LLl88AVumVItnDw+zIip+iHJEbsSeg==
-X-Received: by 2002:a05:620a:5f1:: with SMTP id z17mr27807317qkg.21.1587052404735;
-        Thu, 16 Apr 2020 08:53:24 -0700 (PDT)
-Received: from xz-x1.redhat.com ([2607:9880:19c0:32::2])
-        by smtp.gmail.com with ESMTPSA id j2sm11449124qtp.5.2020.04.16.08.53.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Apr 2020 08:53:24 -0700 (PDT)
-From:   Peter Xu <peterx@redhat.com>
-To:     kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        bh=nvu+MW6oZUAc4Rt+d0KHMjWiSPVqXx7NpVhFclBCSuA=;
+        b=Q1/NButVeWSI79eacBoVVJ+HmUp+BCPlTPLoKE/dkSb/Ys1vmhF2aP0Mbl3HZZew4S
+         AdCEM3wFZfYcBwX9qIaft/iv1u42qGnrWd6vmqAHtq1S+TEQ1tqu9oxf2TejSd21eNlY
+         24ETwir2Y/oGAQg8l1boHJa0PpW59R5TvIFgHVvlhaocDrIiRu90+n+GY4Ayn9xFD0rw
+         m6m6GiEqUNNODcO8pHc0K4gu4LSS1ie1M9X95uTBD5/Z9h3w0JqMfxwnzzbDgDgoRrUN
+         WNC5P3istkvgKWUt/u9qoMaM3tnEblIeQSQG8yd66gq5JV0YJEGSbpoWwfCGBfFaK4eH
+         GByA==
+X-Gm-Message-State: AGi0PuYC8aZ54hD8D6AkucYD7PyXv3Ik4HyRYXKF8ZOwvsG2JQmnywod
+        WsCP88/p+q76NiSSd/7LLzfPUJejEw+RebqBbO2FnRw6PWQcYes44ksxkWQGb0+2MxzJbcvwX0f
+        ZhAfz6u/Ewghf
+X-Received: by 2002:a5d:4442:: with SMTP id x2mr18151637wrr.101.1587052558412;
+        Thu, 16 Apr 2020 08:55:58 -0700 (PDT)
+X-Google-Smtp-Source: APiQypIL1Ng21KPZXq7/mqYvYnYksD3lb24Jyd1BsaIZ28zHv5VGpa6h6z5Fa+Khf5lPYqGvRQv9/g==
+X-Received: by 2002:a5d:4442:: with SMTP id x2mr18151609wrr.101.1587052558056;
+        Thu, 16 Apr 2020 08:55:58 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:399d:3ef7:647c:b12d? ([2001:b07:6468:f312:399d:3ef7:647c:b12d])
+        by smtp.gmail.com with ESMTPSA id 5sm4231405wmg.34.2020.04.16.08.55.56
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 16 Apr 2020 08:55:57 -0700 (PDT)
+Subject: Re: [PATCH v2] KVM/arm64: Support enabling dirty log gradually in
+ small chunks
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     Keqian Zhu <zhukeqian1@huawei.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kvmarm@lists.cs.columbia.edu, James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Will Deacon <will@kernel.org>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
         Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>, peterx@redhat.com
-Subject: [PATCH 1/5] KVM: X86: Force ASYNC_PF_PER_VCPU to be power of two
-Date:   Thu, 16 Apr 2020 11:53:22 -0400
-Message-Id: <20200416155322.266709-1-peterx@redhat.com>
-X-Mailer: git-send-email 2.24.1
+        Jay Zhou <jianjay.zhou@huawei.com>, wanghaibin.wang@huawei.com
+References: <20200413122023.52583-1-zhukeqian1@huawei.com>
+ <be45ec89-2bdb-454b-d20a-c08898e26024@redhat.com>
+ <20200416160939.7e9c1621@why>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <442f288e-2934-120c-4994-5357e3e9216b@redhat.com>
+Date:   Thu, 16 Apr 2020 17:55:55 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200416160939.7e9c1621@why>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Forcing the ASYNC_PF_PER_VCPU to be power of two is much easier to be
-used rather than calling roundup_pow_of_two() from time to time.  Do
-this by adding a BUILD_BUG_ON() inside the hash function.
+On 16/04/20 17:09, Marc Zyngier wrote:
+> On Wed, 15 Apr 2020 18:13:56 +0200
+> Paolo Bonzini <pbonzini@redhat.com> wrote:
+> 
+>> On 13/04/20 14:20, Keqian Zhu wrote:
+>>> There is already support of enabling dirty log graually in small chunks
+>>> for x86 in commit 3c9bd4006bfc ("KVM: x86: enable dirty log gradually in
+>>> small chunks"). This adds support for arm64.
+>>>
+>>> x86 still writes protect all huge pages when DIRTY_LOG_INITIALLY_ALL_SET
+>>> is eanbled. However, for arm64, both huge pages and normal pages can be
+>>> write protected gradually by userspace.
+>>>
+>>> Under the Huawei Kunpeng 920 2.6GHz platform, I did some tests on 128G
+>>> Linux VMs with different page size. The memory pressure is 127G in each
+>>> case. The time taken of memory_global_dirty_log_start in QEMU is listed
+>>> below:
+>>>
+>>> Page Size      Before    After Optimization
+>>>   4K            650ms         1.8ms
+>>>   2M             4ms          1.8ms
+>>>   1G             2ms          1.8ms
+>>>
+>>> Besides the time reduction, the biggest income is that we will minimize
+>>> the performance side effect (because of dissloving huge pages and marking
+>>> memslots dirty) on guest after enabling dirty log.
+>>>
+>>> Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
+>>> ---
+>>>  Documentation/virt/kvm/api.rst    |  2 +-
+>>>  arch/arm64/include/asm/kvm_host.h |  3 +++
+>>>  virt/kvm/arm/mmu.c                | 12 ++++++++++--
+>>>  3 files changed, 14 insertions(+), 3 deletions(-)
+>>>
+>>> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+>>> index efbbe570aa9b..0017f63fa44f 100644
+>>> --- a/Documentation/virt/kvm/api.rst
+>>> +++ b/Documentation/virt/kvm/api.rst
+>>> @@ -5777,7 +5777,7 @@ will be initialized to 1 when created.  This also improves performance because
+>>>  dirty logging can be enabled gradually in small chunks on the first call
+>>>  to KVM_CLEAR_DIRTY_LOG.  KVM_DIRTY_LOG_INITIALLY_SET depends on
+>>>  KVM_DIRTY_LOG_MANUAL_PROTECT_ENABLE (it is also only available on
+>>> -x86 for now).
+>>> +x86 and arm64 for now).
+>>>  
+>>>  KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2 was previously available under the name
+>>>  KVM_CAP_MANUAL_DIRTY_LOG_PROTECT, but the implementation had bugs that make
+>>> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+>>> index 32c8a675e5a4..a723f84fab83 100644
+>>> --- a/arch/arm64/include/asm/kvm_host.h
+>>> +++ b/arch/arm64/include/asm/kvm_host.h
+>>> @@ -46,6 +46,9 @@
+>>>  #define KVM_REQ_RECORD_STEAL	KVM_ARCH_REQ(3)
+>>>  #define KVM_REQ_RELOAD_GICv4	KVM_ARCH_REQ(4)
+>>>  
+>>> +#define KVM_DIRTY_LOG_MANUAL_CAPS   (KVM_DIRTY_LOG_MANUAL_PROTECT_ENABLE | \
+>>> +				     KVM_DIRTY_LOG_INITIALLY_SET)
+>>> +
+>>>  DECLARE_STATIC_KEY_FALSE(userspace_irqchip_in_use);
+>>>  
+>>>  extern unsigned int kvm_sve_max_vl;
+>>> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+>>> index e3b9ee268823..1077f653a611 100644
+>>> --- a/virt/kvm/arm/mmu.c
+>>> +++ b/virt/kvm/arm/mmu.c
+>>> @@ -2265,8 +2265,16 @@ void kvm_arch_commit_memory_region(struct kvm *kvm,
+>>>  	 * allocated dirty_bitmap[], dirty pages will be be tracked while the
+>>>  	 * memory slot is write protected.
+>>>  	 */
+>>> -	if (change != KVM_MR_DELETE && mem->flags & KVM_MEM_LOG_DIRTY_PAGES)
+>>> -		kvm_mmu_wp_memory_region(kvm, mem->slot);
+>>> +	if (change != KVM_MR_DELETE && mem->flags & KVM_MEM_LOG_DIRTY_PAGES) {
+>>> +		/*
+>>> +		 * If we're with initial-all-set, we don't need to write
+>>> +		 * protect any pages because they're all reported as dirty.
+>>> +		 * Huge pages and normal pages will be write protect gradually.
+>>> +		 */
+>>> +		if (!kvm_dirty_log_manual_protect_and_init_set(kvm)) {
+>>> +			kvm_mmu_wp_memory_region(kvm, mem->slot);
+>>> +		}
+>>> +	}
+>>>  }
+>>>  
+>>>  int kvm_arch_prepare_memory_region(struct kvm *kvm,
+>>>   
+>>
+>> Marc, what is the status of this patch?
+> 
+> I just had a look at it. Is there any urgency for merging it?
 
-Another point is that generally async pf does not allow concurrency
-over ASYNC_PF_PER_VCPU after all (see kvm_setup_async_pf()), so it
-does not make much sense either to have it not a power of two or some
-of the entries will definitely be wasted.
+No, I thought I was still replying to the v1.
 
-Signed-off-by: Peter Xu <peterx@redhat.com>
----
- arch/x86/include/asm/kvm_host.h | 2 +-
- arch/x86/kvm/x86.c              | 8 +++++---
- 2 files changed, 6 insertions(+), 4 deletions(-)
-
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 42a2d0d3984a..9f0fdaacdfa5 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -761,7 +761,7 @@ struct kvm_vcpu_arch {
- 
- 	struct {
- 		bool halted;
--		gfn_t gfns[roundup_pow_of_two(ASYNC_PF_PER_VCPU)];
-+		gfn_t gfns[ASYNC_PF_PER_VCPU];
- 		struct gfn_to_hva_cache data;
- 		u64 msr_val;
- 		u32 id;
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index b8124b562dea..fc74dafa72ff 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -261,7 +261,7 @@ static int emulator_fix_hypercall(struct x86_emulate_ctxt *ctxt);
- static inline void kvm_async_pf_hash_reset(struct kvm_vcpu *vcpu)
- {
- 	int i;
--	for (i = 0; i < roundup_pow_of_two(ASYNC_PF_PER_VCPU); i++)
-+	for (i = 0; i < ASYNC_PF_PER_VCPU; i++)
- 		vcpu->arch.apf.gfns[i] = ~0;
- }
- 
-@@ -10265,12 +10265,14 @@ void kvm_arch_async_page_ready(struct kvm_vcpu *vcpu, struct kvm_async_pf *work)
- 
- static inline u32 kvm_async_pf_hash_fn(gfn_t gfn)
- {
-+	BUILD_BUG_ON(!is_power_of_2(ASYNC_PF_PER_VCPU));
-+
- 	return hash_32(gfn & 0xffffffff, order_base_2(ASYNC_PF_PER_VCPU));
- }
- 
- static inline u32 kvm_async_pf_next_probe(u32 key)
- {
--	return (key + 1) & (roundup_pow_of_two(ASYNC_PF_PER_VCPU) - 1);
-+	return (key + 1) & (ASYNC_PF_PER_VCPU - 1);
- }
- 
- static void kvm_add_async_pf_gfn(struct kvm_vcpu *vcpu, gfn_t gfn)
-@@ -10288,7 +10290,7 @@ static u32 kvm_async_pf_gfn_slot(struct kvm_vcpu *vcpu, gfn_t gfn)
- 	int i;
- 	u32 key = kvm_async_pf_hash_fn(gfn);
- 
--	for (i = 0; i < roundup_pow_of_two(ASYNC_PF_PER_VCPU) &&
-+	for (i = 0; i < ASYNC_PF_PER_VCPU &&
- 		     (vcpu->arch.apf.gfns[key] != gfn &&
- 		      vcpu->arch.apf.gfns[key] != ~0); i++)
- 		key = kvm_async_pf_next_probe(key);
--- 
-2.24.1
+Paolo
 
