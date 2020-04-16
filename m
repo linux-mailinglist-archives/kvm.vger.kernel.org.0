@@ -2,73 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 41A131ACCAA
-	for <lists+kvm@lfdr.de>; Thu, 16 Apr 2020 18:04:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 50A5B1ACD64
+	for <lists+kvm@lfdr.de>; Thu, 16 Apr 2020 18:16:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728142AbgDPQDm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Apr 2020 12:03:42 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:37984 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2895292AbgDPQDf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Apr 2020 12:03:35 -0400
+        id S2410760AbgDPQQJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Apr 2020 12:16:09 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:40125 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S2388603AbgDPQOD (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 16 Apr 2020 12:14:03 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1587053014;
+        s=mimecast20190719; t=1587053642;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=+KzySCLznsUiKaMg7tKSU0vPU/bYkMXagzGokChYVbc=;
-        b=UWK4z+vVinrm6gYbJrDkO8ttObNW1aHPdj7deeGhsNgrx5PEI1PhxTpYSPPEKC39UFiA+t
-        wfZ3Mi14NvPx2luEAvP8L1O9ioKKuosFHZts143TCytH+8WrwCbfuSqhoFeAWxYRdtf/P4
-        hIU3MbBRmXEFzcDer54Rm9920xpYI08=
-Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
- [209.85.219.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-15-yn7sr3EcNEGorlePZrcOcQ-1; Thu, 16 Apr 2020 12:03:32 -0400
-X-MC-Unique: yn7sr3EcNEGorlePZrcOcQ-1
-Received: by mail-qv1-f72.google.com with SMTP id p6so3726903qvo.18
-        for <kvm@vger.kernel.org>; Thu, 16 Apr 2020 09:03:32 -0700 (PDT)
+        bh=OKFPJKDrwMxxZMkSgpW+lREO9oEC/Q2oH5KaLd5HI80=;
+        b=ftVaZBsYpSA0amitXhN4QUevQOeGxlyxVSjXVHhQi4Z8QDdTkaYWkHZTJRClHktD/ABUPY
+        2s6pT5AVtzb8zc18PrIfgrq4O0airaeu56wz6wxOhFP9mxneAHUk2WMi8fY3+xxKCVMM3O
+        bVBD6VvZKofTJe1JF1Qe7+xwutTJY5U=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-40-7WFMK5N4MgOp1EFFq5MTHg-1; Thu, 16 Apr 2020 12:14:00 -0400
+X-MC-Unique: 7WFMK5N4MgOp1EFFq5MTHg-1
+Received: by mail-wm1-f69.google.com with SMTP id v185so653545wmg.0
+        for <kvm@vger.kernel.org>; Thu, 16 Apr 2020 09:14:00 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=+KzySCLznsUiKaMg7tKSU0vPU/bYkMXagzGokChYVbc=;
-        b=s3WBiLlC2Ix/8SYHBaOiIhhoqwtH9XBDb+GoqtP2nsst1FixB5XKyC8KeGRd208Kb5
-         lMMoZBUNWwkikyYrVNdrjzS3rNxEAfIclRGt7FL/IrN+iAxoORkfssH2imxbxGrHpQpE
-         qRwifVIfQuxt/NaKAJdY+ZdlnXc3Agbi3uwjrBhA6/hezy4Hwb1eWMvPCnaIv9hLMnnO
-         BHo+TgsS53RLGp+sfBKh4vWOiSX25dcFWrsNiZtBtse+WHidx0l1193d+XZlD0bIhco+
-         MPjb05ZFMq9iXmm21jKP9v1NiosD5ynjuUOCz3tpr+CaAVoyTRgsADffS0j6JSMoEI8t
-         Xykg==
-X-Gm-Message-State: AGi0PuZOoPrrrv0O5Q6cM4x+WQqRW4otNNY1Dlw9e8FLd6dy1tyPE80b
-        P78KV4gd8AFpGMD18BYJIMrU+u9DW0ck8jZGmRBp2cGCau39HRbukyEJkhSvKqwCLW8CxJPX9sO
-        pEE9G+kLBan0q
-X-Received: by 2002:a05:6214:1705:: with SMTP id db5mr10678718qvb.74.1587053011932;
-        Thu, 16 Apr 2020 09:03:31 -0700 (PDT)
-X-Google-Smtp-Source: APiQypKQopMPgf13GnimCkR4RHu+62g6/IrGnLDV3YVJDrO3HO8uuQDh2hG3cl9YrOkrkpVRQY5y3w==
-X-Received: by 2002:a05:6214:1705:: with SMTP id db5mr10678689qvb.74.1587053011668;
-        Thu, 16 Apr 2020 09:03:31 -0700 (PDT)
-Received: from xz-x1 ([2607:9880:19c0:32::2])
-        by smtp.gmail.com with ESMTPSA id 28sm4886245qkp.10.2020.04.16.09.03.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Apr 2020 09:03:30 -0700 (PDT)
-Date:   Thu, 16 Apr 2020 12:03:28 -0400
-From:   Peter Xu <peterx@redhat.com>
-To:     kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=OKFPJKDrwMxxZMkSgpW+lREO9oEC/Q2oH5KaLd5HI80=;
+        b=e2IHnWTwGqDRqRHxC2r+XkR/bwEQgA549vpMQhfCj+r8GXXl4A3kpGtTD9gnI8u4/q
+         JVByKIt4xjQUIvvT8VZWzemYcOTKWAloPBmxt733bPOhOWQ391Fs4f5SsMxVXrejc3Pk
+         vUYL8v8oR1jQK1zkKwsRIxUWJ5fp2idwF/SarGU9dqd6Bnsx84t3dtoPbzdyW+HxYiXe
+         2NSF06GueIKRm4vSuoK+kL7jNq3C2soLwTbWHh7dtKR43WDQylTTLp+FqyGezcLbIOT9
+         KB0O84akO+Q9kjU7dCAHH1Tk5M9G2dZHmJoAcH7MhabvDCZyFEazbwCdTjq1zZ4uWaRS
+         /IRA==
+X-Gm-Message-State: AGi0PuZ8JVM0MD/YaB/wTsVaagHosmpVhwOeLlsbdCA90TR6ywwNcTZX
+        nOLprTuXEtCAu6d33SJSGdGVLzOvu/Fib+WXFmZFfUAAO7BfV5SbzUzcHO4RowHxqMOUAIErlss
+        i/nzFYnvuO4Oo
+X-Received: by 2002:a1c:3c87:: with SMTP id j129mr5448724wma.157.1587053639123;
+        Thu, 16 Apr 2020 09:13:59 -0700 (PDT)
+X-Google-Smtp-Source: APiQypLVD0YkhLXYDXAiRXOPwWtPmpI2Nv3hFjWcnfOySET6aVt92wHyVi3nCwJ97+O/lVbgF5c6Ww==
+X-Received: by 2002:a1c:3c87:: with SMTP id j129mr5448709wma.157.1587053638870;
+        Thu, 16 Apr 2020 09:13:58 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:399d:3ef7:647c:b12d? ([2001:b07:6468:f312:399d:3ef7:647c:b12d])
+        by smtp.gmail.com with ESMTPSA id c190sm4232376wme.10.2020.04.16.09.13.58
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 16 Apr 2020 09:13:58 -0700 (PDT)
+Subject: Re: [PATCH] KVM: Remove async parameter for hva_to_pfn_remapped()
+To:     Peter Xu <peterx@redhat.com>, kvm@vger.kernel.org
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>
-Subject: Re: [PATCH 1/5] KVM: X86: Force ASYNC_PF_PER_VCPU to be power of two
-Message-ID: <20200416160328.GA266621@xz-x1>
-References: <20200416155322.266709-1-peterx@redhat.com>
+References: <20200416155903.267414-1-peterx@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <7f576843-6b64-6561-05ee-730326249409@redhat.com>
+Date:   Thu, 16 Apr 2020 18:13:57 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
+In-Reply-To: <20200416155903.267414-1-peterx@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20200416155322.266709-1-peterx@redhat.com>
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sorry, please ignore this one.
+On 16/04/20 17:59, Peter Xu wrote:
+> We always do synchronous fault in for those pages.
+> 
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> ---
+> 
+> Or, does it make sense to allow async pf for PFNMAP|IO too?  I just
+> didn't figure out why not...
+> ---
 
--- 
-Peter Xu
+I think async pf would use FAULT_FLAG_ALLOW_RETRY |
+FAULT_FLAG_RETRY_NOWAIT.  On failure you would set *async = true.
+
+In practice I don't think fixup_user_fault is likely to do anything
+asynchronously.
+
+Paolo
 
