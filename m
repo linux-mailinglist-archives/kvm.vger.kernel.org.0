@@ -2,175 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B340E1AC0C8
-	for <lists+kvm@lfdr.de>; Thu, 16 Apr 2020 14:10:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A1A921AC115
+	for <lists+kvm@lfdr.de>; Thu, 16 Apr 2020 14:22:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2635070AbgDPMJq convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Thu, 16 Apr 2020 08:09:46 -0400
-Received: from mga06.intel.com ([134.134.136.31]:62062 "EHLO mga06.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2634901AbgDPMJd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Apr 2020 08:09:33 -0400
-IronPort-SDR: 9UgL5jWQLPSKZp0vmiHPvjuIREB90tx3CcWpBi0KuU3ny2EPlI7p7j/LYJQ+yMVY8Hq6Q7SL2H
- OroywUm8NZwg==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Apr 2020 05:09:30 -0700
-IronPort-SDR: 7/ajiPgfD/BuSBclgpGNfPwHnIMKHqpR58/pw/L7zRnXqSjCRTatWo3VkclArs9/eogSwWzkF+
- L4fqzsXpsUIQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.72,390,1580803200"; 
-   d="scan'208";a="272049486"
-Received: from fmsmsx103.amr.corp.intel.com ([10.18.124.201])
-  by orsmga002.jf.intel.com with ESMTP; 16 Apr 2020 05:09:29 -0700
-Received: from shsmsx152.ccr.corp.intel.com (10.239.6.52) by
- FMSMSX103.amr.corp.intel.com (10.18.124.201) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Thu, 16 Apr 2020 05:09:29 -0700
-Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.225]) by
- SHSMSX152.ccr.corp.intel.com ([169.254.6.209]) with mapi id 14.03.0439.000;
- Thu, 16 Apr 2020 20:09:26 +0800
-From:   "Tian, Kevin" <kevin.tian@intel.com>
-To:     "Liu, Yi L" <yi.l.liu@intel.com>,
-        Alex Williamson <alex.williamson@redhat.com>
-CC:     "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "Tian, Jun J" <jun.j.tian@intel.com>,
-        "Sun, Yi Y" <yi.y.sun@intel.com>,
-        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Wu, Hao" <hao.wu@intel.com>
-Subject: RE: [PATCH v1 7/8] vfio/type1: Add VFIO_IOMMU_CACHE_INVALIDATE
-Thread-Topic: [PATCH v1 7/8] vfio/type1: Add VFIO_IOMMU_CACHE_INVALIDATE
-Thread-Index: AQHWAEUdbUtKvEWiiEiZu1SnRvWegKhl0sQAgAEuFaCAABNDAIAUHAOAgACdTsA=
-Date:   Thu, 16 Apr 2020 12:09:25 +0000
-Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D19D82336C@SHSMSX104.ccr.corp.intel.com>
-References: <1584880325-10561-1-git-send-email-yi.l.liu@intel.com>
-        <1584880325-10561-8-git-send-email-yi.l.liu@intel.com>
-        <20200402142428.2901432e@w520.home>
-        <AADFC41AFE54684AB9EE6CBC0274A5D19D807C4A@SHSMSX104.ccr.corp.intel.com>
- <20200403093436.094b1928@w520.home>
- <A2975661238FB949B60364EF0F2C25743A231BAA@SHSMSX104.ccr.corp.intel.com>
-In-Reply-To: <A2975661238FB949B60364EF0F2C25743A231BAA@SHSMSX104.ccr.corp.intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-version: 11.2.0.6
-dlp-reaction: no-action
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+        id S2635523AbgDPMVp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Apr 2020 08:21:45 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:54048 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S2635291AbgDPMU6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Apr 2020 08:20:58 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1587039654;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=N//aUi9ilfSYZbtt9uubNhdLlMHa9VPzC/9aWc7u2N4=;
+        b=TV6CBrEOpmWjIdSjNFIyBBxbVxnW1vZwBpM+nEFbziHjfTD1lMafWgBfFgYEMhlzSjVvFP
+        43eL+wswiT81sTOO5cNMAWYDWpvy8gHKTWn7Rx39eLEUeTPBr3z7rAaoWYThPYk4OzPtGO
+        LrBlUIsyBa20ny3ZniiYZ4eAt6gWVnI=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-279-RMAMSWb_P7ChQCwK3LtPag-1; Thu, 16 Apr 2020 08:20:52 -0400
+X-MC-Unique: RMAMSWb_P7ChQCwK3LtPag-1
+Received: by mail-wr1-f72.google.com with SMTP id m5so1603765wru.15
+        for <kvm@vger.kernel.org>; Thu, 16 Apr 2020 05:20:49 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=N//aUi9ilfSYZbtt9uubNhdLlMHa9VPzC/9aWc7u2N4=;
+        b=P8tAkdLAfyJwin1ibdg/BjH+p9dbBW9H2194tn8+jhWQkSM1TAIB9zLc+biserbsCx
+         zmOBHgYAMebjgX8J3ZZxkPNa216k9MVVkfEUEXlSxc71vd9RlabnwqYoAFtgqu7a7JWD
+         p/bdh+ot+VOIjlccZwhNlnH1WOmbYoGRWM1P/ypv6MK1zbkV6dqS7s2Nxyhi9fRELN67
+         eMBF5Dm8Zku15sTibAjOhcmnbqPkgD227wCH6eQVMvCtGO2r+fWvlE7NIFRdlJ8Wn5yN
+         2i7XKqdXdXEOxUXaaFlr1j2EoQ+M73LkZm4jJghPO871D51X32tlIEcwQgVi+q8Vg+62
+         aGdg==
+X-Gm-Message-State: AGi0PuY7JxbTdqbby+3QlmY5KvEviLvUGb96AY5x62od6t3tmA6jAQzR
+        9oKXMazhw8G98gYFZBiNV4YxprCvFAHBZxxn5+EQeZ1d7cZ8Ga4ozZVEZmMscXfMo6NSxWI9EK5
+        VWnDcNcm7JUPu
+X-Received: by 2002:a1c:a344:: with SMTP id m65mr4634833wme.20.1587039648640;
+        Thu, 16 Apr 2020 05:20:48 -0700 (PDT)
+X-Google-Smtp-Source: APiQypL7Zr1AmadDiZcqsAC7y2lchYjfJabub1W1Nve6Z9EGEGzkMDXcyVU803uWBITr/U3dkRDooA==
+X-Received: by 2002:a1c:a344:: with SMTP id m65mr4634814wme.20.1587039648429;
+        Thu, 16 Apr 2020 05:20:48 -0700 (PDT)
+Received: from redhat.com (bzq-79-183-51-3.red.bezeqint.net. [79.183.51.3])
+        by smtp.gmail.com with ESMTPSA id a67sm3645719wmc.30.2020.04.16.05.20.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 16 Apr 2020 05:20:47 -0700 (PDT)
+Date:   Thu, 16 Apr 2020 08:20:44 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     KVM list <kvm@vger.kernel.org>,
+        virtualization@lists.linux-foundation.org,
+        Netdev <netdev@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Andy Shevchenko <andy.shevchenko@gmail.com>,
+        Arnd Bergmann <arnd@arndb.de>, ashutosh.dixit@intel.com,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Markus Elfring <elfring@users.sourceforge.net>,
+        eli@mellanox.com, eperezma@redhat.com,
+        "Gustavo A. R. Silva" <gustavo@embeddedor.com>, hulkci@huawei.com,
+        "Cc: stable@vger.kernel.org, david@redhat.com, dverkamp@chromium.org,
+        hch@lst.de, jasowang@redhat.com, liang.z.li@intel.com, mst@redhat.com,
+        tiny.windzz@gmail.com," <jasowang@redhat.com>,
+        matej.genci@nutanix.com, Stephen Rothwell <sfr@canb.auug.org.au>,
+        yanaijie@huawei.com, YueHaibing <yuehaibing@huawei.com>
+Subject: Re: [GIT PULL] vhost: cleanups and fixes
+Message-ID: <20200416081330-mutt-send-email-mst@kernel.org>
+References: <20200414123606-mutt-send-email-mst@kernel.org>
+ <CAHk-=wgVQcD=JJVmowEorHHQSVmSw+vG+Ddc4FATZoTp9mfUmw@mail.gmail.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAHk-=wgVQcD=JJVmowEorHHQSVmSw+vG+Ddc4FATZoTp9mfUmw@mail.gmail.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> From: Liu, Yi L <yi.l.liu@intel.com>
-> Sent: Thursday, April 16, 2020 6:40 PM
-> 
-> Hi Alex,
-> Still have a direction question with you. Better get agreement with you
-> before heading forward.
-> 
-> > From: Alex Williamson <alex.williamson@redhat.com>
-> > Sent: Friday, April 3, 2020 11:35 PM
-> [...]
-> > > > > + *
-> > > > > + * returns: 0 on success, -errno on failure.
-> > > > > + */
-> > > > > +struct vfio_iommu_type1_cache_invalidate {
-> > > > > +	__u32   argsz;
-> > > > > +	__u32   flags;
-> > > > > +	struct	iommu_cache_invalidate_info cache_info;
-> > > > > +};
-> > > > > +#define VFIO_IOMMU_CACHE_INVALIDATE      _IO(VFIO_TYPE,
-> > VFIO_BASE
-> > > > + 24)
-> > > >
-> > > > The future extension capabilities of this ioctl worry me, I wonder if
-> > > > we should do another data[] with flag defining that data as
-> CACHE_INFO.
-> > >
-> > > Can you elaborate? Does it mean with this way we don't rely on iommu
-> > > driver to provide version_to_size conversion and instead we just pass
-> > > data[] to iommu driver for further audit?
+On Wed, Apr 15, 2020 at 05:46:33PM -0700, Linus Torvalds wrote:
+> On Tue, Apr 14, 2020 at 9:36 AM Michael S. Tsirkin <mst@redhat.com> wrote:
 > >
-> > No, my concern is that this ioctl has a single function, strictly tied
-> > to the iommu uapi.  If we replace cache_info with data[] then we can
-> > define a flag to specify that data[] is struct
-> > iommu_cache_invalidate_info, and if we need to, a different flag to
-> > identify data[] as something else.  For example if we get stuck
-> > expanding cache_info to meet new demands and develop a new uapi to
-> > solve that, how would we expand this ioctl to support it rather than
-> > also create a new ioctl?  There's also a trade-off in making the ioctl
-> > usage more difficult for the user.  I'd still expect the vfio layer to
-> > check the flag and interpret data[] as indicated by the flag rather
-> > than just passing a blob of opaque data to the iommu layer though.
-> > Thanks,
+> > virtio: fixes, cleanups
 > 
-> Based on your comments about defining a single ioctl and a unified
-> vfio structure (with a @data[] field) for pasid_alloc/free, bind/
-> unbind_gpasid, cache_inv. After some offline trying, I think it would
-> be good for bind/unbind_gpasid and cache_inv as both of them use the
-> iommu uapi definition. While the pasid alloc/free operation doesn't.
-> It would be weird to put all of them together. So pasid alloc/free
-> may have a separate ioctl. It would look as below. Does this direction
-> look good per your opinion?
+> Looking at this, about 75% of it looks like it should have come in
+> during the merge window, not now.
 > 
-> ioctl #22: VFIO_IOMMU_PASID_REQUEST
-> /**
->   * @pasid: used to return the pasid alloc result when flags == ALLOC_PASID
->   *         specify a pasid to be freed when flags == FREE_PASID
->   * @range: specify the allocation range when flags == ALLOC_PASID
->   */
-> struct vfio_iommu_pasid_request {
-> 	__u32	argsz;
-> #define VFIO_IOMMU_ALLOC_PASID	(1 << 0)
-> #define VFIO_IOMMU_FREE_PASID	(1 << 1)
-> 	__u32	flags;
-> 	__u32	pasid;
-> 	struct {
-> 		__u32	min;
-> 		__u32	max;
-> 	} range;
-> };
-> 
-> ioctl #23: VFIO_IOMMU_NESTING_OP
-> struct vfio_iommu_type1_nesting_op {
-> 	__u32	argsz;
-> 	__u32	flags;
-> 	__u32	op;
-> 	__u8	data[];
-> };
-> 
-> /* Nesting Ops */
-> #define VFIO_IOMMU_NESTING_OP_BIND_PGTBL        0
-> #define VFIO_IOMMU_NESTING_OP_UNBIND_PGTBL      1
-> #define VFIO_IOMMU_NESTING_OP_CACHE_INVLD       2
-> 
+>               Linus
 
-Then why cannot we just put PASID into the header since the
-majority of nested usage is associated with a pasid? 
+Well it's all just fallout from
 
-ioctl #23: VFIO_IOMMU_NESTING_OP
-struct vfio_iommu_type1_nesting_op {
-	__u32	argsz;
-	__u32	flags;
-	__u32	op;
-	__u32   pasid;
-	__u8	data[];
-};
+	commit 61b89f23f854f458b8e23719978df58260f051ed
+	Author: Michael S. Tsirkin <mst@redhat.com>
+	Date:   Mon Apr 6 08:42:55 2020 -0400
 
-In case of SMMUv2 which supports nested w/o PASID, this field can
-be ignored for that specific case.
+	    vhost: force spec specified alignment on types
 
-Thanks
-Kevin
+which I didn't know we need until things landed upstream and
+people started testing with weird configs.
+
+That forced changes to a header file and the rest followed.
+
+We could just ignore -mabi=apcs-gnu build being broken for this release -
+is that preferable? Pls let me know.
+
+-- 
+MST
+
