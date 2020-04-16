@@ -2,90 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 373221ACC61
-	for <lists+kvm@lfdr.de>; Thu, 16 Apr 2020 18:00:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 41A131ACCAA
+	for <lists+kvm@lfdr.de>; Thu, 16 Apr 2020 18:04:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2409097AbgDPP7Z (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Apr 2020 11:59:25 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:35812 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S2897266AbgDPP7S (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 16 Apr 2020 11:59:18 -0400
+        id S1728142AbgDPQDm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Apr 2020 12:03:42 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:37984 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2895292AbgDPQDf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Apr 2020 12:03:35 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1587052757;
+        s=mimecast20190719; t=1587053014;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=JPDoCdd6Mz59gLMUCJpo/feFNXBVnhyS3Hu+/K7Ll1U=;
-        b=LCyd/RWndwnvee4TIChxTMW99flEu5b1sPnTViC8n2VP4gKIx/fyB2t/0w7KqR/jE9jKUA
-        ccoZW3AoHviIvmX+rMPpslHb3mDNXbFrmuKCpc8fylMO/vK+PzpveP216CzIHc2k4judb0
-        g4Bv30LtbORuLaG6kIiuWOhRUPyaSeQ=
-Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
- [209.85.222.197]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-251-yWAsYfmxMnGf3UJc5L98BA-1; Thu, 16 Apr 2020 11:59:16 -0400
-X-MC-Unique: yWAsYfmxMnGf3UJc5L98BA-1
-Received: by mail-qk1-f197.google.com with SMTP id k13so2563285qkg.2
-        for <kvm@vger.kernel.org>; Thu, 16 Apr 2020 08:59:16 -0700 (PDT)
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=+KzySCLznsUiKaMg7tKSU0vPU/bYkMXagzGokChYVbc=;
+        b=UWK4z+vVinrm6gYbJrDkO8ttObNW1aHPdj7deeGhsNgrx5PEI1PhxTpYSPPEKC39UFiA+t
+        wfZ3Mi14NvPx2luEAvP8L1O9ioKKuosFHZts143TCytH+8WrwCbfuSqhoFeAWxYRdtf/P4
+        hIU3MbBRmXEFzcDer54Rm9920xpYI08=
+Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
+ [209.85.219.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-15-yn7sr3EcNEGorlePZrcOcQ-1; Thu, 16 Apr 2020 12:03:32 -0400
+X-MC-Unique: yn7sr3EcNEGorlePZrcOcQ-1
+Received: by mail-qv1-f72.google.com with SMTP id p6so3726903qvo.18
+        for <kvm@vger.kernel.org>; Thu, 16 Apr 2020 09:03:32 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=JPDoCdd6Mz59gLMUCJpo/feFNXBVnhyS3Hu+/K7Ll1U=;
-        b=Pq/eTLXVx77P0EPa0ta4W8vW6DKhVOAjeByvtWwjIPdH9zfwzIq9V4heEo0Wgw03R9
-         dxQjatwyFCkU98ENt4/pJQQdjIT6qSfSTaOXZyWk5i3DDYEM9HTWVGYftyCFYdEaOcul
-         AYkDTwdLJ0G3K/ZDKCr7+Q1fFWpSV99sbTDBPmP1Xw83mtkpxEsDQwsR0vy+g+Oc2I9H
-         LC8oVxIegVTXwK65XvnMu4TV6j8KrAZ+cDgZAgAcMKEIjOzpRg+439T+dt416bMfcjo/
-         gpZOjH69nbccP/YgMEBy45svNg7LZIkn8U24Nu/zahGBfmf4gnjcCmJgU+qzTtfqdyyf
-         JRGA==
-X-Gm-Message-State: AGi0PuYFXaWS/zif96uTmIoc0sizWE6ZXK8krMbCpjYfbTdWED2xPhZJ
-        61AdyaBIRN5xFFCVE/VSkGrq9081o8NhQPiK+3/0dhosuuOcMX1aIks5eneT5zH4jVMF5PAfQlQ
-        V2lSzuOn0KPjw
-X-Received: by 2002:a0c:9e2f:: with SMTP id p47mr9997820qve.211.1587052755355;
-        Thu, 16 Apr 2020 08:59:15 -0700 (PDT)
-X-Google-Smtp-Source: APiQypK+7QOzQNp7II51CKMz7W9yt//0mr5pcpNxTmnKALRjFnlpuLVkr+q9GhnPW+9sTClwrKTJRw==
-X-Received: by 2002:a0c:9e2f:: with SMTP id p47mr9997807qve.211.1587052755176;
-        Thu, 16 Apr 2020 08:59:15 -0700 (PDT)
-Received: from xz-x1.redhat.com ([2607:9880:19c0:32::2])
-        by smtp.gmail.com with ESMTPSA id c41sm12164124qta.96.2020.04.16.08.59.14
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=+KzySCLznsUiKaMg7tKSU0vPU/bYkMXagzGokChYVbc=;
+        b=s3WBiLlC2Ix/8SYHBaOiIhhoqwtH9XBDb+GoqtP2nsst1FixB5XKyC8KeGRd208Kb5
+         lMMoZBUNWwkikyYrVNdrjzS3rNxEAfIclRGt7FL/IrN+iAxoORkfssH2imxbxGrHpQpE
+         qRwifVIfQuxt/NaKAJdY+ZdlnXc3Agbi3uwjrBhA6/hezy4Hwb1eWMvPCnaIv9hLMnnO
+         BHo+TgsS53RLGp+sfBKh4vWOiSX25dcFWrsNiZtBtse+WHidx0l1193d+XZlD0bIhco+
+         MPjb05ZFMq9iXmm21jKP9v1NiosD5ynjuUOCz3tpr+CaAVoyTRgsADffS0j6JSMoEI8t
+         Xykg==
+X-Gm-Message-State: AGi0PuZOoPrrrv0O5Q6cM4x+WQqRW4otNNY1Dlw9e8FLd6dy1tyPE80b
+        P78KV4gd8AFpGMD18BYJIMrU+u9DW0ck8jZGmRBp2cGCau39HRbukyEJkhSvKqwCLW8CxJPX9sO
+        pEE9G+kLBan0q
+X-Received: by 2002:a05:6214:1705:: with SMTP id db5mr10678718qvb.74.1587053011932;
+        Thu, 16 Apr 2020 09:03:31 -0700 (PDT)
+X-Google-Smtp-Source: APiQypKQopMPgf13GnimCkR4RHu+62g6/IrGnLDV3YVJDrO3HO8uuQDh2hG3cl9YrOkrkpVRQY5y3w==
+X-Received: by 2002:a05:6214:1705:: with SMTP id db5mr10678689qvb.74.1587053011668;
+        Thu, 16 Apr 2020 09:03:31 -0700 (PDT)
+Received: from xz-x1 ([2607:9880:19c0:32::2])
+        by smtp.gmail.com with ESMTPSA id 28sm4886245qkp.10.2020.04.16.09.03.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Apr 2020 08:59:14 -0700 (PDT)
+        Thu, 16 Apr 2020 09:03:30 -0700 (PDT)
+Date:   Thu, 16 Apr 2020 12:03:28 -0400
 From:   Peter Xu <peterx@redhat.com>
 To:     kvm@vger.kernel.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>, peterx@redhat.com
-Subject: [PATCH] KVM: Documentation: Fix up cpuid page
-Date:   Thu, 16 Apr 2020 11:59:13 -0400
-Message-Id: <20200416155913.267562-1-peterx@redhat.com>
-X-Mailer: git-send-email 2.24.1
+        Vitaly Kuznetsov <vkuznets@redhat.com>
+Subject: Re: [PATCH 1/5] KVM: X86: Force ASYNC_PF_PER_VCPU to be power of two
+Message-ID: <20200416160328.GA266621@xz-x1>
+References: <20200416155322.266709-1-peterx@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20200416155322.266709-1-peterx@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-0x4b564d00 and 0x4b564d01 belong to KVM_FEATURE_CLOCKSOURCE2.
+Sorry, please ignore this one.
 
-Signed-off-by: Peter Xu <peterx@redhat.com>
----
- Documentation/virt/kvm/cpuid.rst | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/Documentation/virt/kvm/cpuid.rst b/Documentation/virt/kvm/cpuid.rst
-index 01b081f6e7ea..f721c89327ec 100644
---- a/Documentation/virt/kvm/cpuid.rst
-+++ b/Documentation/virt/kvm/cpuid.rst
-@@ -50,8 +50,8 @@ KVM_FEATURE_NOP_IO_DELAY          1           not necessary to perform delays
- KVM_FEATURE_MMU_OP                2           deprecated
- 
- KVM_FEATURE_CLOCKSOURCE2          3           kvmclock available at msrs
--
-                                               0x4b564d00 and 0x4b564d01
-+
- KVM_FEATURE_ASYNC_PF              4           async pf can be enabled by
-                                               writing to msr 0x4b564d02
- 
 -- 
-2.24.1
+Peter Xu
 
