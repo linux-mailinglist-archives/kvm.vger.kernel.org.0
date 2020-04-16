@@ -2,106 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 56D731ABB49
-	for <lists+kvm@lfdr.de>; Thu, 16 Apr 2020 10:32:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5A6641ABC3A
+	for <lists+kvm@lfdr.de>; Thu, 16 Apr 2020 11:11:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2440760AbgDPIb6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Apr 2020 04:31:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37524 "EHLO
+        id S2441438AbgDPIj2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Apr 2020 04:39:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38818 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2502242AbgDPIbY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Apr 2020 04:31:24 -0400
-Received: from mail-wm1-x341.google.com (mail-wm1-x341.google.com [IPv6:2a00:1450:4864:20::341])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 355CAC03C1AB;
-        Thu, 16 Apr 2020 01:31:08 -0700 (PDT)
-Received: by mail-wm1-x341.google.com with SMTP id a81so3813139wmf.5;
-        Thu, 16 Apr 2020 01:31:08 -0700 (PDT)
+        with ESMTP id S2502679AbgDPIjE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Apr 2020 04:39:04 -0400
+Received: from mail-wr1-x434.google.com (mail-wr1-x434.google.com [IPv6:2a00:1450:4864:20::434])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05FA8C061A0C;
+        Thu, 16 Apr 2020 01:39:03 -0700 (PDT)
+Received: by mail-wr1-x434.google.com with SMTP id i10so3772092wrv.10;
+        Thu, 16 Apr 2020 01:39:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=jfrt17q5M4S5SAVVkdakw83Rj5cTfkomq3bpc03Lu9E=;
-        b=CFbFjllOBhKoFmAVsXkBQzBuRQAfDrmhFAfVIGB11rbD3zAjEQppK74PC9fnxFnMrl
-         sp2/EeMkEMZEPkJaKAPezTCzWxvNVCQxytUa+QkC+1t59d7i5I3Ft4/ciYIUyoPgOMmx
-         UiPK1SyxvMiF5/fQuHdgpj6dJ/kxBF7pqlJnwenUbEeoXzoXQDDOkD79QMrnqwADC91X
-         mAbhAkAD8NXfaYxauQUMXrLjqT8CjpZdwFVOxMjLk33tqqc1vixpmPBfeaEJadSe1cYi
-         RAtQlg/x50nnmchxxtr0K+qNEsQkfkEUxgrnt/DkUknFzWr3iZARx7zlhyFNK0Y/EZyB
-         KDIg==
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=xegz48JzyIZNPeJysw6oCGlOeYewFYMA4DWiAxaVcX4=;
+        b=cnL1v6V0mAiUrW3HpV/SNZErA9/hfXwlD6+LKjoWASSYdeTwTi/CGEpGw8e2apDmlO
+         oEDJUPBw2+uM2K/99VhpJc79CfeQMHrtOmGlYRiWXRPVfBwvqNlClQs+Q+wbnnu8qAXu
+         rzMC8RFe+twveUeDz8NmhVh+wYhQAxEkqEpXPXNtdGsei+jze9RsCXNc9WFUCgKphDsq
+         PJj2QbuXNtIhNt/KON/nyJCdxHUmUaDwEn3Vf9eUoh4cjDbqgBqbm6TPCmtwHkXWna86
+         9PcqOyjXAxsd4YlCSklklOoDIQXRNf7fw67OX+h8BDVqchZUERYp7zr7GfysoDrbNZdh
+         uGqA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=jfrt17q5M4S5SAVVkdakw83Rj5cTfkomq3bpc03Lu9E=;
-        b=TMKknxl0MUt8yAzI4Yj7SWsQOBt2760gCbZx3zime8sxteJ7ta+PVKDfFXgC6SSx0A
-         ihRY+rw5SrL7dtp7j7oLMhqDE6ZXQGTRExcXpXdBp/Zp6vh4LMZ4GAO3MgIqyVco8EhV
-         a0RpMrhAU0oQEzQ5pc/HPT4HXsuBP9sJF+tOWc36jQxyw8NRSfAclqG2IP+IskWyGgNk
-         kt+//SgoMkqpo9en2dxKjN35woWRIwRSS3IYx1tMQyYJZ3MzfHch+NYQKWezOCpY53tj
-         KKBFlzdH5Br8j4zTKbXH12h0BZQIMD+b+TMebzZB8UIPvJ1wj+CQX3y7GUxG8FS68gRm
-         JAIw==
-X-Gm-Message-State: AGi0PubsfTdJN36ve3YLYFf9dh7Enk0Sw4z3zitBVPpXHzCYG4+nYyFE
-        cdyFgvrKGj8kYeBdlZgw+4o=
-X-Google-Smtp-Source: APiQypKSKsq45oAa/3mvfDvpWfY2V+jAcrUeSZODmwOpRthGJy4sv8r2h7IKlE30zB7Jtv03++ti6Q==
-X-Received: by 2002:a05:600c:24cf:: with SMTP id 15mr3541839wmu.94.1587025866950;
-        Thu, 16 Apr 2020 01:31:06 -0700 (PDT)
-Received: from Red ([2a01:cb1d:3d5:a100:2e56:dcff:fed2:c6d6])
-        by smtp.googlemail.com with ESMTPSA id a9sm2611917wmm.38.2020.04.16.01.31.05
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=xegz48JzyIZNPeJysw6oCGlOeYewFYMA4DWiAxaVcX4=;
+        b=aRhGSliBGcPp0/DjfuMMDJxBZxoV6Kw+lH2+ztq++o6z9e1nKUohfW0HuG9bMWL36z
+         vg2Qk0sx55ESftFni6lS3fXKU6fOSAKYhf8IrYDQevnGk01v+WRdJUvkODQXXROXvZYP
+         tULucNQ7W77XcNWN6oiBg1NX/5VCUuo48HH/EqHuDpCLl689JhdLVvoTPIY+kL5Ch3aH
+         2fZMRccggGtKXX+lGB8oCOLoInuPSpf6UkrgxpjabcuhImSldkQ6WjVvzCxVqGE505m+
+         Lq2fiBapLjsCAddR3lS8/HlUzN3M/bqkB1qRbakguv+5UKlYsuNZHYDupyZ5LbRDW6qp
+         7eLQ==
+X-Gm-Message-State: AGi0PuZXS2lqFmKWkFcY7nv/mrIUQBYSPd4nmskZvHSnwNBdId84uiio
+        RN4yhGCzY61LBKM1uXgW/NGs2Xz/nt63Jg==
+X-Google-Smtp-Source: APiQypLNCMBfbdp2NLlh1g2+MzQBltmBi7dDmCaJL/0QYAlJCtVNonYnhR5WDlSvOO7xFCPNcdWqbA==
+X-Received: by 2002:adf:8563:: with SMTP id 90mr15614387wrh.202.1587026341881;
+        Thu, 16 Apr 2020 01:39:01 -0700 (PDT)
+Received: from jondnuc.lan (IGLD-84-229-155-55.inter.net.il. [84.229.155.55])
+        by smtp.gmail.com with ESMTPSA id s12sm1256358wmc.7.2020.04.16.01.39.00
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Apr 2020 01:31:06 -0700 (PDT)
-Date:   Thu, 16 Apr 2020 10:31:04 +0200
-From:   Corentin Labbe <clabbe.montjoie@gmail.com>
-To:     Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-Cc:     Linux Doc Mailing List <linux-doc@vger.kernel.org>,
-        linux-kernel@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Maxime Ripard <mripard@kernel.org>,
-        Chen-Yu Tsai <wens@csie.org>, kvm@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH v2 10/33] docs: fix broken references for ReST files that
- moved around
-Message-ID: <20200416083104.GA29148@Red>
-References: <cover.1586881715.git.mchehab+huawei@kernel.org>
- <64773a12b4410aaf3e3be89e3ec7e34de2484eea.1586881715.git.mchehab+huawei@kernel.org>
+        Thu, 16 Apr 2020 01:39:01 -0700 (PDT)
+From:   Jon Doron <arilou@gmail.com>
+To:     kvm@vger.kernel.org, linux-hyperv@vger.kernel.org
+Cc:     vkuznets@redhat.com, rvkagan@yandex-team.ru,
+        Jon Doron <arilou@gmail.com>
+Subject: [PATCH v2 0/1] x86/kvm/hyper-v: Add support to SYNIC exit on EOM
+Date:   Thu, 16 Apr 2020 11:38:46 +0300
+Message-Id: <20200416083847.1776387-1-arilou@gmail.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <64773a12b4410aaf3e3be89e3ec7e34de2484eea.1586881715.git.mchehab+huawei@kernel.org>
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Apr 14, 2020 at 06:48:36PM +0200, Mauro Carvalho Chehab wrote:
-> Some broken references happened due to shifting files around
-> and ReST renames. Those can't be auto-fixed by the script,
-> so let's fix them manually.
-> 
-> Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-> ---
->  Documentation/doc-guide/maintainer-profile.rst      | 2 +-
->  Documentation/virt/kvm/mmu.rst                      | 2 +-
->  Documentation/virt/kvm/review-checklist.rst         | 2 +-
->  arch/x86/kvm/mmu/mmu.c                              | 2 +-
->  drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c | 2 +-
->  drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c   | 2 +-
->  drivers/crypto/allwinner/sun8i-ss/sun8i-ss-cipher.c | 2 +-
->  drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c   | 2 +-
->  drivers/media/v4l2-core/v4l2-fwnode.c               | 2 +-
->  include/uapi/linux/kvm.h                            | 4 ++--
->  tools/include/uapi/linux/kvm.h                      | 4 ++--
->  11 files changed, 13 insertions(+), 13 deletions(-)
-> 
+According to the TLFS:
+"A write to the end of message (EOM) register by the guest causes the
+hypervisor to scan the internal message buffer queue(s) associated with
+the virtual processor.
 
-For sun8i-ce
-Acked-by: Corentin Labbe <clabbe.montjoie@gmail.com>
+If a message buffer queue contains a queued message buffer, the hypervisor
+attempts to deliver the message.
 
-Thanks
+Message delivery succeeds if the SIM page is enabled and the message slot
+corresponding to the SINTx is empty (that is, the message type in the
+header is set to HvMessageTypeNone).
+If a message is successfully delivered, its corresponding internal message
+buffer is dequeued and marked free.
+If the corresponding SINTx is not masked, an edge-triggered interrupt is
+delivered (that is, the corresponding bit in the IRR is set).
+
+This register can be used by guests to poll for messages. It can also be
+used as a way to drain the message queue for a SINTx that has
+been disabled (that is, masked)."
+
+So basically this means that we need to exit on EOM so the hypervisor
+will have a chance to send all the pending messages regardless of the
+SCONTROL mechnaisim.
+
+v2:
+Minor fixes from code review
+
+Jon Doron (1):
+  x86/kvm/hyper-v: Add support to SYNIC exit on EOM
+
+ arch/x86/include/asm/kvm_host.h |  1 +
+ arch/x86/kvm/hyperv.c           | 67 +++++++++++++++++++++++++++++----
+ arch/x86/kvm/hyperv.h           |  1 +
+ arch/x86/kvm/x86.c              |  5 +++
+ include/uapi/linux/kvm.h        |  1 +
+ 5 files changed, 67 insertions(+), 8 deletions(-)
+
+-- 
+2.24.1
+
