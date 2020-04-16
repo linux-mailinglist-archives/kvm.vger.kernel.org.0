@@ -2,139 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D01AC1AB638
-	for <lists+kvm@lfdr.de>; Thu, 16 Apr 2020 05:28:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 97DF81AB6C4
+	for <lists+kvm@lfdr.de>; Thu, 16 Apr 2020 06:25:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390942AbgDPD2T (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Apr 2020 23:28:19 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:2336 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S2390005AbgDPD2Q (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Apr 2020 23:28:16 -0400
-Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.58])
-        by Forcepoint Email with ESMTP id 0020A7D09D55C0CCF71F;
-        Thu, 16 Apr 2020 11:28:09 +0800 (CST)
-Received: from [127.0.0.1] (10.173.221.230) by DGGEMS413-HUB.china.huawei.com
- (10.3.19.213) with Microsoft SMTP Server id 14.3.487.0; Thu, 16 Apr 2020
- 11:27:59 +0800
-Subject: Re: [PATCH v2] KVM/arm64: Support enabling dirty log gradually in
- small chunks
-To:     <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <kvmarm@lists.cs.columbia.edu>
-References: <20200413122023.52583-1-zhukeqian1@huawei.com>
-CC:     Marc Zyngier <maz@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
-        "James Morse" <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Will Deacon <will@kernel.org>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Jay Zhou <jianjay.zhou@huawei.com>,
-        <wanghaibin.wang@huawei.com>
-From:   zhukeqian <zhukeqian1@huawei.com>
-Message-ID: <e93e85b3-cdab-d293-6c68-c563fab46d94@huawei.com>
-Date:   Thu, 16 Apr 2020 11:27:57 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
- Thunderbird/45.7.1
+        id S2404026AbgDPEZu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Apr 2020 00:25:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55846 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2403916AbgDPEZs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Apr 2020 00:25:48 -0400
+Received: from mail-pl1-x641.google.com (mail-pl1-x641.google.com [IPv6:2607:f8b0:4864:20::641])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29927C061A0F
+        for <kvm@vger.kernel.org>; Wed, 15 Apr 2020 21:25:48 -0700 (PDT)
+Received: by mail-pl1-x641.google.com with SMTP id y12so908796pll.2
+        for <kvm@vger.kernel.org>; Wed, 15 Apr 2020 21:25:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-transfer-encoding:content-language;
+        bh=rKdwxJq97I01y7ryQhSihbE5DvwLxtqugoVKkJX3ixQ=;
+        b=wydQ1wV/OhVMd3QRFRKKNzkbsnXsrk7VwwEFQLbqM5ghK2myZ3rUwtN43+86ag5Yt2
+         TOVAOmy3v83wlL5xBTadZIUPf+hW0tBsAuWepalWfrbGXhvYreeXUsNypMLEaIpgpwvr
+         PdXGZjbSqpgXelubvmrELN3048hxl5mUCg3NnN2b4krIxxmP0EodZKg13/EFYF9wHYZu
+         th6OcVEd1GYkAlpaK0/CDS+PavGH/YJhb9gM6FMd2Hn30UAhBpPttl/yVOnQckXFs1+9
+         ByjKBlDgOAaMd4fSyIWUuB3lXPe1GalgZBYhX0Jk2ev8iAwwfXtj7rBzBsG2jmmx/old
+         tBew==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-transfer-encoding
+         :content-language;
+        bh=rKdwxJq97I01y7ryQhSihbE5DvwLxtqugoVKkJX3ixQ=;
+        b=AA8jFgVfEbglRBslyAqZVkEsnnosYlUrLsNeSFInSFtZXUAEzqAhRZZ12CqFQ2wuAb
+         BuDW+fOGQvE+J/hs8a5YldANzcRd+pPwXulAwwPjPr0OkT2Ij4LXLf8QnjVm4vtNeOuu
+         jvGJ52frpLjQfAXheqVya2q6GZRrgGwbMCh8NtZzOO4m7dcdgI12qi4XESHGqBkSUTC0
+         0p2MNzIaRQFFI2nFgxfJ/h/oKKB1EGZXbKqPLmrYvaAYGHUt0KxBpMgRnkRZg4y4S2gc
+         nJEIYu0gD7Y8xLIt9K5YhRCUm46Wj/XDyu2HEDCg/mlS3p+cLFC4KJkPCxD9N4kb7Hki
+         8NSQ==
+X-Gm-Message-State: AGi0PuaPkx72C3oJnwDqm7HhLGxC4PhM2tCYN+57cpnxlXZJOq9FLCOB
+        a9+/5NZrHZO1FyvcuiBNb0Pt2A==
+X-Google-Smtp-Source: APiQypIcBT/ktZ74DASZLCa7QPuT/QUI+4S8qRnrlE/V9pcUl97OuPwTBQpFJ7Cl/s+5dnZ05jLWvw==
+X-Received: by 2002:a17:90b:3547:: with SMTP id lt7mr2650982pjb.96.1587011147553;
+        Wed, 15 Apr 2020 21:25:47 -0700 (PDT)
+Received: from [10.129.0.126] ([45.135.186.84])
+        by smtp.gmail.com with ESMTPSA id e29sm10568241pgn.57.2020.04.15.21.25.38
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 15 Apr 2020 21:25:47 -0700 (PDT)
+Subject: Re: [PATCH v11 00/13] SMMUv3 Nested Stage Setup (IOMMU part)
+To:     Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com,
+        iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, will@kernel.org,
+        joro@8bytes.org, maz@kernel.org, robin.murphy@arm.com
+Cc:     jean-philippe@linaro.org, shameerali.kolothum.thodi@huawei.com,
+        alex.williamson@redhat.com, jacob.jun.pan@linux.intel.com,
+        yi.l.liu@intel.com, peter.maydell@linaro.org, tn@semihalf.com,
+        bbhushan2@marvell.com
+References: <20200414150607.28488-1-eric.auger@redhat.com>
+From:   Zhangfei Gao <zhangfei.gao@linaro.org>
+Message-ID: <eb27f625-ad7a-fcb5-2185-5471e4666f09@linaro.org>
+Date:   Thu, 16 Apr 2020 12:25:35 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <20200413122023.52583-1-zhukeqian1@huawei.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.173.221.230]
-X-CFilter-Loop: Reflected
+In-Reply-To: <20200414150607.28488-1-eric.auger@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
 
-In RFC patch, I still write protect huge pages when DIRTY_LOG_INITIALLY_ALL_SET
-is enabled by userspace. I find that both huge pages and normal pages can be
-write protected during log clear. So this formal patch is pretty simple now.
 
-Thanks,
-Keqian
+On 2020/4/14 下午11:05, Eric Auger wrote:
+> This version fixes an issue observed by Shameer on an SMMU 3.2,
+> when moving from dual stage config to stage 1 only config.
+> The 2 high 64b of the STE now get reset. Otherwise, leaving the
+> S2TTB set may cause a C_BAD_STE error.
+>
+> This series can be found at:
+> https://github.com/eauger/linux/tree/v5.6-2stage-v11_10.1
+> (including the VFIO part)
+> The QEMU fellow series still can be found at:
+> https://github.com/eauger/qemu/tree/v4.2.0-2stage-rfcv6
+>
+> Users have expressed interest in that work and tested v9/v10:
+> - https://patchwork.kernel.org/cover/11039995/#23012381
+> - https://patchwork.kernel.org/cover/11039995/#23197235
+>
+> Background:
+>
+> This series brings the IOMMU part of HW nested paging support
+> in the SMMUv3. The VFIO part is submitted separately.
+>
+> The IOMMU API is extended to support 2 new API functionalities:
+> 1) pass the guest stage 1 configuration
+> 2) pass stage 1 MSI bindings
+>
+> Then those capabilities gets implemented in the SMMUv3 driver.
+>
+> The virtualizer passes information through the VFIO user API
+> which cascades them to the iommu subsystem. This allows the guest
+> to own stage 1 tables and context descriptors (so-called PASID
+> table) while the host owns stage 2 tables and main configuration
+> structures (STE).
+>
+>
 
-On 2020/4/13 20:20, Keqian Zhu wrote:
-> There is already support of enabling dirty log graually in small chunks
-> for x86 in commit 3c9bd4006bfc ("KVM: x86: enable dirty log gradually in
-> small chunks"). This adds support for arm64.
-> 
-> x86 still writes protect all huge pages when DIRTY_LOG_INITIALLY_ALL_SET
-> is eanbled. However, for arm64, both huge pages and normal pages can be
-> write protected gradually by userspace.
-> 
-> Under the Huawei Kunpeng 920 2.6GHz platform, I did some tests on 128G
-> Linux VMs with different page size. The memory pressure is 127G in each
-> case. The time taken of memory_global_dirty_log_start in QEMU is listed
-> below:
-> 
-> Page Size      Before    After Optimization
->   4K            650ms         1.8ms
->   2M             4ms          1.8ms
->   1G             2ms          1.8ms
-> 
-> Besides the time reduction, the biggest income is that we will minimize
-> the performance side effect (because of dissloving huge pages and marking
-> memslots dirty) on guest after enabling dirty log.
-> 
-> Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
-> ---
->  Documentation/virt/kvm/api.rst    |  2 +-
->  arch/arm64/include/asm/kvm_host.h |  3 +++
->  virt/kvm/arm/mmu.c                | 12 ++++++++++--
->  3 files changed, 14 insertions(+), 3 deletions(-)
-> 
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index efbbe570aa9b..0017f63fa44f 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -5777,7 +5777,7 @@ will be initialized to 1 when created.  This also improves performance because
->  dirty logging can be enabled gradually in small chunks on the first call
->  to KVM_CLEAR_DIRTY_LOG.  KVM_DIRTY_LOG_INITIALLY_SET depends on
->  KVM_DIRTY_LOG_MANUAL_PROTECT_ENABLE (it is also only available on
-> -x86 for now).
-> +x86 and arm64 for now).
->  
->  KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2 was previously available under the name
->  KVM_CAP_MANUAL_DIRTY_LOG_PROTECT, but the implementation had bugs that make
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 32c8a675e5a4..a723f84fab83 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -46,6 +46,9 @@
->  #define KVM_REQ_RECORD_STEAL	KVM_ARCH_REQ(3)
->  #define KVM_REQ_RELOAD_GICv4	KVM_ARCH_REQ(4)
->  
-> +#define KVM_DIRTY_LOG_MANUAL_CAPS   (KVM_DIRTY_LOG_MANUAL_PROTECT_ENABLE | \
-> +				     KVM_DIRTY_LOG_INITIALLY_SET)
-> +
->  DECLARE_STATIC_KEY_FALSE(userspace_irqchip_in_use);
->  
->  extern unsigned int kvm_sve_max_vl;
-> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-> index e3b9ee268823..1077f653a611 100644
-> --- a/virt/kvm/arm/mmu.c
-> +++ b/virt/kvm/arm/mmu.c
-> @@ -2265,8 +2265,16 @@ void kvm_arch_commit_memory_region(struct kvm *kvm,
->  	 * allocated dirty_bitmap[], dirty pages will be be tracked while the
->  	 * memory slot is write protected.
->  	 */
-> -	if (change != KVM_MR_DELETE && mem->flags & KVM_MEM_LOG_DIRTY_PAGES)
-> -		kvm_mmu_wp_memory_region(kvm, mem->slot);
-> +	if (change != KVM_MR_DELETE && mem->flags & KVM_MEM_LOG_DIRTY_PAGES) {
-> +		/*
-> +		 * If we're with initial-all-set, we don't need to write
-> +		 * protect any pages because they're all reported as dirty.
-> +		 * Huge pages and normal pages will be write protect gradually.
-> +		 */
-> +		if (!kvm_dirty_log_manual_protect_and_init_set(kvm)) {
-> +			kvm_mmu_wp_memory_region(kvm, mem->slot);
-> +		}
-> +	}
->  }
->  
->  int kvm_arch_prepare_memory_region(struct kvm *kvm,
-> 
+Thanks Eric
 
+Tested v11 on Hisilicon kunpeng920 board via hardware zip accelerator.
+1. no-sva works, where guest app directly use physical address via ioctl.
+2. vSVA still not work, same as v10,
+3.  the v10 issue reported by Shameer has been solved,  first start qemu 
+with  iommu=smmuv3, then start qemu without  iommu=smmuv3
+4. no-sva also works without  iommu=smmuv3
+
+Test details in https://docs.qq.com/doc/DRU5oR1NtUERseFNL
+
+Thanks
