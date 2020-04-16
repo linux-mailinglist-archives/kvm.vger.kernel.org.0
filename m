@@ -2,121 +2,253 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2932E1AD2F3
-	for <lists+kvm@lfdr.de>; Fri, 17 Apr 2020 00:51:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CC0971AD2F7
+	for <lists+kvm@lfdr.de>; Fri, 17 Apr 2020 00:55:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729078AbgDPWvB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Apr 2020 18:51:01 -0400
-Received: from mga17.intel.com ([192.55.52.151]:49373 "EHLO mga17.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726441AbgDPWvB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Apr 2020 18:51:01 -0400
-IronPort-SDR: aRe8YSExJc6b+NOKf+/LcTTbrawLHr5zB4eJ1UT3n4uakgnSmWH0Rl48V/SyO4ibo4xEvhapRO
- rolR3tuBKltg==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Apr 2020 15:51:00 -0700
-IronPort-SDR: 3SWrEXltK0cnP2E2h1Fyod1t7tbH4FXYJ+dEFSp2J6FRqQBb7wyTtq7UxRHsZy1fHUWpLWiP3N
- HAuEvO4RzINA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.72,392,1580803200"; 
-   d="scan'208";a="278029698"
-Received: from sjchrist-coffee.jf.intel.com ([10.54.74.202])
-  by orsmga008.jf.intel.com with ESMTP; 16 Apr 2020 15:50:59 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-Subject: [PATCH] vfio/type1: Fix VA->PA translation for PFNMAP VMAs in vaddr_get_pfn()
-Date:   Thu, 16 Apr 2020 15:50:57 -0700
-Message-Id: <20200416225057.8449-1-sean.j.christopherson@intel.com>
-X-Mailer: git-send-email 2.26.0
+        id S1728404AbgDPWzV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Apr 2020 18:55:21 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:37396 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726111AbgDPWzU (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 16 Apr 2020 18:55:20 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1587077718;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=9lsbeDYugkp9ahth1JLAh0S0ZCsR0PhUH/EAQX/EDRo=;
+        b=JpKuMHIQhgioPDJIIkcK1TB6JdDnB4JfzJ2D90v96nyQDVWybsiqVbZnOud6G4X4IX3xhT
+        RZTQNUa9HaNi7CzzDE1siFlz2ZO8VI6ratm9uKaftimmyYbnXMto5l4QJmKDXWdBoNAsQ6
+        K30iCrUxkOc6naQxVJDtYKUgFtabBF8=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-39-dtDP2LhAMJCOqYv4PIhktw-1; Thu, 16 Apr 2020 18:55:16 -0400
+X-MC-Unique: dtDP2LhAMJCOqYv4PIhktw-1
+Received: by mail-wm1-f72.google.com with SMTP id f81so109706wmf.2
+        for <kvm@vger.kernel.org>; Thu, 16 Apr 2020 15:55:16 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=9lsbeDYugkp9ahth1JLAh0S0ZCsR0PhUH/EAQX/EDRo=;
+        b=qs/zZC+VKZTgua1naCvvsG1RHGMLTori6QzGpul3E+3bC3JgMK+n3afOb2zgKaf5mC
+         YYKsRbVrsb3LFz2B58YycoND9ACFPdQP+iQORSjuNmloxG2aI3JcQzawJzF21yZ+KXe8
+         uHrvn/+W3F21LtYH8hJnamlaGnC7YA6EpV2WX5vGcDYpkRAeNkEMwUftXTO8abgssXTl
+         nDc52upZ9ALECTv8Wv1R9o3BiinVRogxRML4XVsRdXFBWqTQm+Dyn7ktGzccIzChge4u
+         u+hfd+ZbP5xhKZZiVgtoFmPS8LBnLPWKW0p96t53lX29gAzpUNnGuxIOFL0KSFVzROWq
+         2qcw==
+X-Gm-Message-State: AGi0PuaNT+pcw5zdQhT0BfTujoXg8Cj2Fx2nJbSuq0CKFK0LQVx5Dt0t
+        LRUgxtFUTeTzDaOeBe206ngBX9C15KeIqecIf++LzyiJurzBEF7Ho2cF8esn74d9oDcYkcvei3E
+        TBerwyYFqJ8Nb
+X-Received: by 2002:adf:9d83:: with SMTP id p3mr610159wre.142.1587077715593;
+        Thu, 16 Apr 2020 15:55:15 -0700 (PDT)
+X-Google-Smtp-Source: APiQypKqqEBtScGXpogtjB81/FXXZd5Rlg+Ab1dKWQPXOFKpcRMvC/kGOOlvzZHP/qvFjygZmEu/KA==
+X-Received: by 2002:adf:9d83:: with SMTP id p3mr610136wre.142.1587077715334;
+        Thu, 16 Apr 2020 15:55:15 -0700 (PDT)
+Received: from redhat.com (bzq-79-183-51-3.red.bezeqint.net. [79.183.51.3])
+        by smtp.gmail.com with ESMTPSA id 138sm5885051wmb.14.2020.04.16.15.55.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 16 Apr 2020 15:55:14 -0700 (PDT)
+Date:   Thu, 16 Apr 2020 18:55:11 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     linux-mips@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, geert@linux-m68k.org,
+        tsbogend@alpha.franken.de, benh@kernel.crashing.org,
+        paulus@samba.org, heiko.carstens@de.ibm.com, gor@linux.ibm.com,
+        borntraeger@de.ibm.com, Michael Ellerman <mpe@ellerman.id.au>
+Subject: Re: [PATCH V2] vhost: do not enable VHOST_MENU by default
+Message-ID: <20200416185426-mutt-send-email-mst@kernel.org>
+References: <20200415024356.23751-1-jasowang@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200415024356.23751-1-jasowang@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Use follow_pfn() to get the PFN of a PFNMAP VMA instead of assuming that
-vma->vm_pgoff holds the base PFN of the VMA.  This fixes a bug where
-attempting to do VFIO_IOMMU_MAP_DMA on an arbitrary PFNMAP'd region of
-memory calculates garbage for the PFN.
+On Wed, Apr 15, 2020 at 10:43:56AM +0800, Jason Wang wrote:
+> We try to keep the defconfig untouched after decoupling CONFIG_VHOST
+> out of CONFIG_VIRTUALIZATION in commit 20c384f1ea1a
+> ("vhost: refine vhost and vringh kconfig") by enabling VHOST_MENU by
+> default. Then the defconfigs can keep enabling CONFIG_VHOST_NET
+> without the caring of CONFIG_VHOST.
+> 
+> But this will leave a "CONFIG_VHOST_MENU=y" in all defconfigs and even
+> for the ones that doesn't want vhost. So it actually shifts the
+> burdens to the maintainers of all other to add "CONFIG_VHOST_MENU is
+> not set". So this patch tries to enable CONFIG_VHOST explicitly in
+> defconfigs that enables CONFIG_VHOST_NET and CONFIG_VHOST_VSOCK.
+> 
+> Acked-by: Christian Borntraeger <borntraeger@de.ibm.com> (s390)
+> Acked-by: Michael Ellerman <mpe@ellerman.id.au> (powerpc)
+> Cc: Thomas Bogendoerfer <tsbogend@alpha.franken.de>
+> Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+> Cc: Paul Mackerras <paulus@samba.org>
+> Cc: Michael Ellerman <mpe@ellerman.id.au>
+> Cc: Heiko Carstens <heiko.carstens@de.ibm.com>
+> Cc: Vasily Gorbik <gor@linux.ibm.com>
+> Cc: Christian Borntraeger <borntraeger@de.ibm.com>
+> Reported-by: Geert Uytterhoeven <geert@linux-m68k.org>
+> Signed-off-by: Jason Wang <jasowang@redhat.com>
 
-Hilariously, this only got detected because the first "PFN" calculated
-by vaddr_get_pfn() is PFN 0 (vma->vm_pgoff==0), and iommu_iova_to_phys()
-uses PA==0 as an error, which triggers a WARN in vfio_unmap_unpin()
-because the translation "failed".  PFN 0 is now unconditionally reserved
-on x86 in order to mitigate L1TF, which causes is_invalid_reserved_pfn()
-to return true and in turns results in vaddr_get_pfn() returning success
-for PFN 0.  Eventually the bogus calculation runs into PFNs that aren't
-reserved and leads to failure in vfio_pin_map_dma().  The subsequent
-call to vfio_remove_dma() attempts to unmap PFN 0 and WARNs.
+I rebased this on top of OABI fix since that
+seems more orgent to fix.
+Pushed to my vhost branch pls take a look and
+if possible test.
+Thanks!
 
-  WARNING: CPU: 8 PID: 5130 at drivers/vfio/vfio_iommu_type1.c:750 vfio_unmap_unpin+0x2e1/0x310 [vfio_iommu_type1]
-  Modules linked in: vfio_pci vfio_virqfd vfio_iommu_type1 vfio ...
-  CPU: 8 PID: 5130 Comm: sgx Tainted: G        W         5.6.0-rc5-705d787c7fee-vfio+ #3
-  Hardware name: Intel Corporation Mehlow UP Server Platform/Moss Beach Server, BIOS CNLSE2R1.D00.X119.B49.1803010910 03/01/2018
-  RIP: 0010:vfio_unmap_unpin+0x2e1/0x310 [vfio_iommu_type1]
-  Code: <0f> 0b 49 81 c5 00 10 00 00 e9 c5 fe ff ff bb 00 10 00 00 e9 3d fe
-  RSP: 0018:ffffbeb5039ebda8 EFLAGS: 00010246
-  RAX: 0000000000000000 RBX: ffff9a55cbf8d480 RCX: 0000000000000000
-  RDX: 0000000000000000 RSI: 0000000000000001 RDI: ffff9a52b771c200
-  RBP: 0000000000000000 R08: 0000000000000040 R09: 00000000fffffff2
-  R10: 0000000000000001 R11: ffff9a51fa896000 R12: 0000000184010000
-  R13: 0000000184000000 R14: 0000000000010000 R15: ffff9a55cb66ea08
-  FS:  00007f15d3830b40(0000) GS:ffff9a55d5600000(0000) knlGS:0000000000000000
-  CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-  CR2: 0000561cf39429e0 CR3: 000000084f75f005 CR4: 00000000003626e0
-  DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-  DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-  Call Trace:
-   vfio_remove_dma+0x17/0x70 [vfio_iommu_type1]
-   vfio_iommu_type1_ioctl+0x9e3/0xa7b [vfio_iommu_type1]
-   ksys_ioctl+0x92/0xb0
-   __x64_sys_ioctl+0x16/0x20
-   do_syscall_64+0x4c/0x180
-   entry_SYSCALL_64_after_hwframe+0x44/0xa9
-  RIP: 0033:0x7f15d04c75d7
-  Code: <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d 81 48 2d 00 f7 d8 64 89 01 48
-
-Fixes: 73fa0d10d077 ("vfio: Type1 IOMMU implementation")
-Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
----
-
-I'm mostly confident this is correct from the standpoint that it generates
-the correct VA->PA.  I'm far less confident the end result is what VFIO
-wants, there appears to be a fair bit of magic going on that I don't fully
-understand, e.g. I'm a bit mystified as to how this ever worked in any
-capacity.
-
-Mapping PFNMAP VMAs into the IOMMU without using a mmu_notifier also seems
-dangerous, e.g. if the subsystem associated with the VMA unmaps/remaps the
-VMA then the IOMMU will end up with stale translations.
-
-Last thought, using PA==0 for the error seems unnecessarily risky, e.g.
-why not use something similar to KVM_PFN_ERR_* or an explicit return code?
-
- drivers/vfio/vfio_iommu_type1.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-index 85b32c325282..c2ada190c5cb 100644
---- a/drivers/vfio/vfio_iommu_type1.c
-+++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -342,8 +342,8 @@ static int vaddr_get_pfn(struct mm_struct *mm, unsigned long vaddr,
- 	vma = find_vma_intersection(mm, vaddr, vaddr + 1);
- 
- 	if (vma && vma->vm_flags & VM_PFNMAP) {
--		*pfn = ((vaddr - vma->vm_start) >> PAGE_SHIFT) + vma->vm_pgoff;
--		if (is_invalid_reserved_pfn(*pfn))
-+		if (!follow_pfn(vma, vaddr, pfn) &&
-+		    is_invalid_reserved_pfn(*pfn))
- 			ret = 0;
- 	}
- done:
--- 
-2.26.0
+> ---
+> Change since V1:
+> - depends on EVENTFD for VHOST
+> ---
+>  arch/mips/configs/malta_kvm_defconfig  |  1 +
+>  arch/powerpc/configs/powernv_defconfig |  1 +
+>  arch/powerpc/configs/ppc64_defconfig   |  1 +
+>  arch/powerpc/configs/pseries_defconfig |  1 +
+>  arch/s390/configs/debug_defconfig      |  1 +
+>  arch/s390/configs/defconfig            |  1 +
+>  drivers/vhost/Kconfig                  | 26 +++++++++-----------------
+>  7 files changed, 15 insertions(+), 17 deletions(-)
+> 
+> diff --git a/arch/mips/configs/malta_kvm_defconfig b/arch/mips/configs/malta_kvm_defconfig
+> index 8ef612552a19..06f0c7a0ca87 100644
+> --- a/arch/mips/configs/malta_kvm_defconfig
+> +++ b/arch/mips/configs/malta_kvm_defconfig
+> @@ -18,6 +18,7 @@ CONFIG_PCI=y
+>  CONFIG_VIRTUALIZATION=y
+>  CONFIG_KVM=m
+>  CONFIG_KVM_MIPS_DEBUG_COP0_COUNTERS=y
+> +CONFIG_VHOST=m
+>  CONFIG_VHOST_NET=m
+>  CONFIG_MODULES=y
+>  CONFIG_MODULE_UNLOAD=y
+> diff --git a/arch/powerpc/configs/powernv_defconfig b/arch/powerpc/configs/powernv_defconfig
+> index 71749377d164..404245b4594d 100644
+> --- a/arch/powerpc/configs/powernv_defconfig
+> +++ b/arch/powerpc/configs/powernv_defconfig
+> @@ -346,5 +346,6 @@ CONFIG_CRYPTO_DEV_VMX=y
+>  CONFIG_VIRTUALIZATION=y
+>  CONFIG_KVM_BOOK3S_64=m
+>  CONFIG_KVM_BOOK3S_64_HV=m
+> +CONFIG_VHOST=m
+>  CONFIG_VHOST_NET=m
+>  CONFIG_PRINTK_TIME=y
+> diff --git a/arch/powerpc/configs/ppc64_defconfig b/arch/powerpc/configs/ppc64_defconfig
+> index 7e68cb222c7b..4599fc7be285 100644
+> --- a/arch/powerpc/configs/ppc64_defconfig
+> +++ b/arch/powerpc/configs/ppc64_defconfig
+> @@ -61,6 +61,7 @@ CONFIG_ELECTRA_CF=y
+>  CONFIG_VIRTUALIZATION=y
+>  CONFIG_KVM_BOOK3S_64=m
+>  CONFIG_KVM_BOOK3S_64_HV=m
+> +CONFIG_VHOST=m
+>  CONFIG_VHOST_NET=m
+>  CONFIG_OPROFILE=m
+>  CONFIG_KPROBES=y
+> diff --git a/arch/powerpc/configs/pseries_defconfig b/arch/powerpc/configs/pseries_defconfig
+> index 6b68109e248f..4cad3901b5de 100644
+> --- a/arch/powerpc/configs/pseries_defconfig
+> +++ b/arch/powerpc/configs/pseries_defconfig
+> @@ -321,5 +321,6 @@ CONFIG_CRYPTO_DEV_VMX=y
+>  CONFIG_VIRTUALIZATION=y
+>  CONFIG_KVM_BOOK3S_64=m
+>  CONFIG_KVM_BOOK3S_64_HV=m
+> +CONFIG_VHOST=m
+>  CONFIG_VHOST_NET=m
+>  CONFIG_PRINTK_TIME=y
+> diff --git a/arch/s390/configs/debug_defconfig b/arch/s390/configs/debug_defconfig
+> index 0c86ba19fa2b..6ec6e69630d1 100644
+> --- a/arch/s390/configs/debug_defconfig
+> +++ b/arch/s390/configs/debug_defconfig
+> @@ -57,6 +57,7 @@ CONFIG_PROTECTED_VIRTUALIZATION_GUEST=y
+>  CONFIG_CMM=m
+>  CONFIG_APPLDATA_BASE=y
+>  CONFIG_KVM=m
+> +CONFIG_VHOST=m
+>  CONFIG_VHOST_NET=m
+>  CONFIG_VHOST_VSOCK=m
+>  CONFIG_OPROFILE=m
+> diff --git a/arch/s390/configs/defconfig b/arch/s390/configs/defconfig
+> index 6b27d861a9a3..d1b3bf83d687 100644
+> --- a/arch/s390/configs/defconfig
+> +++ b/arch/s390/configs/defconfig
+> @@ -57,6 +57,7 @@ CONFIG_PROTECTED_VIRTUALIZATION_GUEST=y
+>  CONFIG_CMM=m
+>  CONFIG_APPLDATA_BASE=y
+>  CONFIG_KVM=m
+> +CONFIG_VHOST=m
+>  CONFIG_VHOST_NET=m
+>  CONFIG_VHOST_VSOCK=m
+>  CONFIG_OPROFILE=m
+> diff --git a/drivers/vhost/Kconfig b/drivers/vhost/Kconfig
+> index e79cbbdfea45..29f171a53d8a 100644
+> --- a/drivers/vhost/Kconfig
+> +++ b/drivers/vhost/Kconfig
+> @@ -12,23 +12,19 @@ config VHOST_RING
+>  	  This option is selected by any driver which needs to access
+>  	  the host side of a virtio ring.
+>  
+> -config VHOST
+> -	tristate
+> +menuconfig VHOST
+> +	tristate "Vhost Devices"
+> +	depends on EVENTFD
+>  	select VHOST_IOTLB
+>  	help
+> -	  This option is selected by any driver which needs to access
+> -	  the core of vhost.
+> +	  Enable option to support host kernel or hardware accelerator
+> +	  for virtio device.
+>  
+> -menuconfig VHOST_MENU
+> -	bool "VHOST drivers"
+> -	default y
+> -
+> -if VHOST_MENU
+> +if VHOST
+>  
+>  config VHOST_NET
+>  	tristate "Host kernel accelerator for virtio net"
+> -	depends on NET && EVENTFD && (TUN || !TUN) && (TAP || !TAP)
+> -	select VHOST
+> +	depends on NET && (TUN || !TUN) && (TAP || !TAP)
+>  	---help---
+>  	  This kernel module can be loaded in host kernel to accelerate
+>  	  guest networking with virtio_net. Not to be confused with virtio_net
+> @@ -39,8 +35,7 @@ config VHOST_NET
+>  
+>  config VHOST_SCSI
+>  	tristate "VHOST_SCSI TCM fabric driver"
+> -	depends on TARGET_CORE && EVENTFD
+> -	select VHOST
+> +	depends on TARGET_CORE
+>  	default n
+>  	---help---
+>  	Say M here to enable the vhost_scsi TCM fabric module
+> @@ -48,8 +43,7 @@ config VHOST_SCSI
+>  
+>  config VHOST_VSOCK
+>  	tristate "vhost virtio-vsock driver"
+> -	depends on VSOCKETS && EVENTFD
+> -	select VHOST
+> +	depends on VSOCKETS
+>  	select VIRTIO_VSOCKETS_COMMON
+>  	default n
+>  	---help---
+> @@ -62,8 +56,6 @@ config VHOST_VSOCK
+>  
+>  config VHOST_VDPA
+>  	tristate "Vhost driver for vDPA-based backend"
+> -	depends on EVENTFD
+> -	select VHOST
+>  	depends on VDPA
+>  	help
+>  	  This kernel module can be loaded in host kernel to accelerate
+> -- 
+> 2.20.1
 
