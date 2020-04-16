@@ -2,168 +2,225 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4FFEE1AC682
-	for <lists+kvm@lfdr.de>; Thu, 16 Apr 2020 16:41:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D6F211AC681
+	for <lists+kvm@lfdr.de>; Thu, 16 Apr 2020 16:41:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2394433AbgDPOkq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Apr 2020 10:40:46 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:39398 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S2394427AbgDPOkn (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 16 Apr 2020 10:40:43 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1587048042;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=80aHjGWongnpeQZzKC1CPTA8jUpzqlKutXIbnyqQU+g=;
-        b=XUDIJ2lAQAeiRSxu+ZVH/HmvTO58ygJ+a0KpR2audKl//2CqOWyrISSOJ97AX0XhZqB2+m
-        kOvveuq5AmCM21NllwNWEnwtUHtkp1bqpub+T6tr5Bu1RmFlsPj79/hvtavaHfLBxNOWfc
-        iuJTR2GbSSUpiDtK6qQqHRlsCw+zJAI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-357--hdoMGM2MUCQI3EYGcbQRg-1; Thu, 16 Apr 2020 10:40:41 -0400
-X-MC-Unique: -hdoMGM2MUCQI3EYGcbQRg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 16E2E107B267;
-        Thu, 16 Apr 2020 14:40:39 +0000 (UTC)
-Received: from w520.home (ovpn-112-162.phx2.redhat.com [10.3.112.162])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id EFC4B116D95;
-        Thu, 16 Apr 2020 14:40:31 +0000 (UTC)
-Date:   Thu, 16 Apr 2020 08:40:31 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     "Liu, Yi L" <yi.l.liu@intel.com>
-Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "Tian, Jun J" <jun.j.tian@intel.com>,
-        "Sun, Yi Y" <yi.y.sun@intel.com>,
-        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Wu, Hao" <hao.wu@intel.com>
-Subject: Re: [PATCH v1 7/8] vfio/type1: Add VFIO_IOMMU_CACHE_INVALIDATE
-Message-ID: <20200416084031.7266ad40@w520.home>
-In-Reply-To: <A2975661238FB949B60364EF0F2C25743A231BAA@SHSMSX104.ccr.corp.intel.com>
-References: <1584880325-10561-1-git-send-email-yi.l.liu@intel.com>
-        <1584880325-10561-8-git-send-email-yi.l.liu@intel.com>
-        <20200402142428.2901432e@w520.home>
-        <AADFC41AFE54684AB9EE6CBC0274A5D19D807C4A@SHSMSX104.ccr.corp.intel.com>
-        <20200403093436.094b1928@w520.home>
-        <A2975661238FB949B60364EF0F2C25743A231BAA@SHSMSX104.ccr.corp.intel.com>
+        id S2394398AbgDPOkl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Apr 2020 10:40:41 -0400
+Received: from mga03.intel.com ([134.134.136.65]:50382 "EHLO mga03.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2394351AbgDPOkj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Apr 2020 10:40:39 -0400
+IronPort-SDR: 5ZwiseOLGGV7W6Xrx/u+UqMxZwFgbKjo5HnNoIVwhjMp7fqEC+ve2VW5D6CfPNTRqoxSUthA/h
+ boBs2gur9zAg==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Apr 2020 07:40:38 -0700
+IronPort-SDR: JlyUbcayvN+Dj+yHk3BwZbC7Z2ryIM8yYu4rP6QhWbWfaF5YBMD2Lr5znLtlb70WzbL61zGkdr
+ /V2Q4Gh+5E+w==
+X-IronPort-AV: E=Sophos;i="5.72,391,1580803200"; 
+   d="scan'208";a="427852526"
+Received: from likexu-mobl1.ccr.corp.intel.com (HELO [10.249.170.42]) ([10.249.170.42])
+  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Apr 2020 07:40:36 -0700
+Subject: Re: [PATCH] KVM: x86/pmu: Support full width counting
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Andi Kleen <ak@linux.intel.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20200408135325.3160-1-like.xu@linux.intel.com>
+From:   Like Xu <like.xu@linux.intel.com>
+Organization: Intel OTC
+Message-ID: <89f5464e-3bff-898f-f407-28dbba36aa60@linux.intel.com>
+Date:   Thu, 16 Apr 2020 22:40:34 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20200408135325.3160-1-like.xu@linux.intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 16 Apr 2020 10:40:03 +0000
-"Liu, Yi L" <yi.l.liu@intel.com> wrote:
+Hi Paolo,
 
-> Hi Alex,
-> Still have a direction question with you. Better get agreement with you
-> before heading forward.
+If there is anything needs to be improved for this patch,
+please let me know.
+
+Thanks,
+Like Xu
+
+On 2020/4/8 21:53, Like Xu wrote:
+> Intel CPUs have a new alternative MSR range (starting from MSR_IA32_PMC0)
+> for GP counters that allows writing the full counter width. Enable this
+> range from a new capability bit (IA32_PERF_CAPABILITIES.FW_WRITE[bit 13]).
 > 
-> > From: Alex Williamson <alex.williamson@redhat.com>
-> > Sent: Friday, April 3, 2020 11:35 PM  
-> [...]
-> > > > > + *
-> > > > > + * returns: 0 on success, -errno on failure.
-> > > > > + */
-> > > > > +struct vfio_iommu_type1_cache_invalidate {
-> > > > > +	__u32   argsz;
-> > > > > +	__u32   flags;
-> > > > > +	struct	iommu_cache_invalidate_info cache_info;
-> > > > > +};
-> > > > > +#define VFIO_IOMMU_CACHE_INVALIDATE      _IO(VFIO_TYPE,  
-> > VFIO_BASE  
-> > > > + 24)
-> > > >
-> > > > The future extension capabilities of this ioctl worry me, I wonder if
-> > > > we should do another data[] with flag defining that data as CACHE_INFO.  
-> > >
-> > > Can you elaborate? Does it mean with this way we don't rely on iommu
-> > > driver to provide version_to_size conversion and instead we just pass
-> > > data[] to iommu driver for further audit?  
-> > 
-> > No, my concern is that this ioctl has a single function, strictly tied
-> > to the iommu uapi.  If we replace cache_info with data[] then we can
-> > define a flag to specify that data[] is struct
-> > iommu_cache_invalidate_info, and if we need to, a different flag to
-> > identify data[] as something else.  For example if we get stuck
-> > expanding cache_info to meet new demands and develop a new uapi to
-> > solve that, how would we expand this ioctl to support it rather than
-> > also create a new ioctl?  There's also a trade-off in making the ioctl
-> > usage more difficult for the user.  I'd still expect the vfio layer to
-> > check the flag and interpret data[] as indicated by the flag rather
-> > than just passing a blob of opaque data to the iommu layer though.
-> > Thanks,  
+> The perf driver queries CPUID to get the counter width, and sign extends
+> the counter values as needed. The traditional MSRs always limit to 32bit,
+> even though the counter internally is larger (usually 48 bits).
 > 
-> Based on your comments about defining a single ioctl and a unified
-> vfio structure (with a @data[] field) for pasid_alloc/free, bind/
-> unbind_gpasid, cache_inv. After some offline trying, I think it would
-> be good for bind/unbind_gpasid and cache_inv as both of them use the
-> iommu uapi definition. While the pasid alloc/free operation doesn't.
-> It would be weird to put all of them together. So pasid alloc/free
-> may have a separate ioctl. It would look as below. Does this direction
-> look good per your opinion?
+> When the new capability is set, use the alternative range which do not
+> have these restrictions. This lowers the overhead of perf stat slightly
+> because it has to do less interrupts to accumulate the counter value.
 > 
-> ioctl #22: VFIO_IOMMU_PASID_REQUEST
-> /**
->   * @pasid: used to return the pasid alloc result when flags == ALLOC_PASID
->   *         specify a pasid to be freed when flags == FREE_PASID
->   * @range: specify the allocation range when flags == ALLOC_PASID
->   */
-> struct vfio_iommu_pasid_request {
-> 	__u32	argsz;
-> #define VFIO_IOMMU_ALLOC_PASID	(1 << 0)
-> #define VFIO_IOMMU_FREE_PASID	(1 << 1)
-> 	__u32	flags;
-> 	__u32	pasid;
-> 	struct {
-> 		__u32	min;
-> 		__u32	max;
-> 	} range;
-> };
-
-Can't the ioctl return the pasid valid on alloc (like GET_DEVICE_FD)?
-Would it be useful to support freeing a range of pasids?  If so then we
-could simply use range for both, ie. allocate a pasid from this range
-and return it, or free all pasids in this range?  vfio already needs to
-track pasids to free them on release, so presumably this is something
-we could support easily.
- 
-> ioctl #23: VFIO_IOMMU_NESTING_OP
-> struct vfio_iommu_type1_nesting_op {
-> 	__u32	argsz;
-> 	__u32	flags;
-> 	__u32	op;
-> 	__u8	data[];
-> };
-
-data only has 4-byte alignment, I think we really want it at an 8-byte
-alignment.  This is why I embedded the "op" into the flag for
-DEVICE_FEATURE.  Thanks,
-
-Alex
-
+> Signed-off-by: Like Xu <like.xu@linux.intel.com>
+> ---
+>   arch/x86/include/asm/kvm_host.h |  1 +
+>   arch/x86/kvm/vmx/capabilities.h | 15 +++++++++++++
+>   arch/x86/kvm/vmx/pmu_intel.c    | 38 +++++++++++++++++++++++++++------
+>   arch/x86/kvm/vmx/vmx.c          |  2 ++
+>   4 files changed, 50 insertions(+), 6 deletions(-)
 > 
-> /* Nesting Ops */
-> #define VFIO_IOMMU_NESTING_OP_BIND_PGTBL        0
-> #define VFIO_IOMMU_NESTING_OP_UNBIND_PGTBL      1
-> #define VFIO_IOMMU_NESTING_OP_CACHE_INVLD       2
->  
-> Thanks,
-> Yi Liu
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 42a2d0d3984a..1c2e3e79490b 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -481,6 +481,7 @@ struct kvm_pmu {
+>   	u64 counter_bitmask[2];
+>   	u64 global_ctrl_mask;
+>   	u64 global_ovf_ctrl_mask;
+> +	u64 perf_capabilities;
+>   	u64 reserved_bits;
+>   	u8 version;
+>   	struct kvm_pmc gp_counters[INTEL_PMC_MAX_GENERIC];
+> diff --git a/arch/x86/kvm/vmx/capabilities.h b/arch/x86/kvm/vmx/capabilities.h
+> index 8903475f751e..3624568633bd 100644
+> --- a/arch/x86/kvm/vmx/capabilities.h
+> +++ b/arch/x86/kvm/vmx/capabilities.h
+> @@ -367,4 +367,19 @@ static inline bool vmx_pt_mode_is_host_guest(void)
+>   	return pt_mode == PT_MODE_HOST_GUEST;
+>   }
+>   
+> +#define PMU_CAP_FW_WRITE	(1ULL << 13)
+> +
+> +static inline u64 vmx_supported_perf_capabilities(void)
+> +{
+> +	u64 perf_cap = 0;
+> +
+> +	if (boot_cpu_has(X86_FEATURE_PDCM))
+> +		rdmsrl(MSR_IA32_PERF_CAPABILITIES, perf_cap);
+> +
+> +	/* Currently, KVM only support Full-Width Writes. */
+> +	perf_cap &= PMU_CAP_FW_WRITE;
+> +
+> +	return perf_cap;
+> +}
+> +
+>   #endif /* __KVM_X86_VMX_CAPS_H */
+> diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
+> index 7c857737b438..99563d1ec854 100644
+> --- a/arch/x86/kvm/vmx/pmu_intel.c
+> +++ b/arch/x86/kvm/vmx/pmu_intel.c
+> @@ -150,6 +150,12 @@ static struct kvm_pmc *intel_rdpmc_ecx_to_pmc(struct kvm_vcpu *vcpu,
+>   	return &counters[array_index_nospec(idx, num_counters)];
+>   }
+>   
+> +static inline bool full_width_writes_is_enabled(struct kvm_pmu *pmu)
+> +{
+> +	return (vmx_supported_perf_capabilities() & PMU_CAP_FW_WRITE) &&
+> +		(pmu->perf_capabilities & PMU_CAP_FW_WRITE);
+> +}
+> +
+>   static bool intel_is_valid_msr(struct kvm_vcpu *vcpu, u32 msr)
+>   {
+>   	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
+> @@ -162,10 +168,15 @@ static bool intel_is_valid_msr(struct kvm_vcpu *vcpu, u32 msr)
+>   	case MSR_CORE_PERF_GLOBAL_OVF_CTRL:
+>   		ret = pmu->version > 1;
+>   		break;
+> +	case MSR_IA32_PERF_CAPABILITIES:
+> +		ret = guest_cpuid_has(vcpu, X86_FEATURE_PDCM);
+> +		break;
+>   	default:
+>   		ret = get_gp_pmc(pmu, msr, MSR_IA32_PERFCTR0) ||
+>   			get_gp_pmc(pmu, msr, MSR_P6_EVNTSEL0) ||
+> -			get_fixed_pmc(pmu, msr);
+> +			get_fixed_pmc(pmu, msr) ||
+> +			(get_gp_pmc(pmu, msr, MSR_IA32_PMC0) &&
+> +				full_width_writes_is_enabled(pmu));
+>   		break;
+>   	}
+>   
+> @@ -202,8 +213,12 @@ static int intel_pmu_get_msr(struct kvm_vcpu *vcpu, u32 msr, u64 *data)
+>   	case MSR_CORE_PERF_GLOBAL_OVF_CTRL:
+>   		*data = pmu->global_ovf_ctrl;
+>   		return 0;
+> +	case MSR_IA32_PERF_CAPABILITIES:
+> +		*data = pmu->perf_capabilities;
+> +		return 0;
+>   	default:
+> -		if ((pmc = get_gp_pmc(pmu, msr, MSR_IA32_PERFCTR0))) {
+> +		if ((pmc = get_gp_pmc(pmu, msr, MSR_IA32_PERFCTR0))
+> +			|| (pmc = get_gp_pmc(pmu, msr, MSR_IA32_PMC0))) {
+>   			u64 val = pmc_read_counter(pmc);
+>   			*data = val & pmu->counter_bitmask[KVM_PMC_GP];
+>   			return 0;
+> @@ -258,9 +273,13 @@ static int intel_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>   			return 0;
+>   		}
+>   		break;
+> +	case MSR_IA32_PERF_CAPABILITIES:
+> +		return 1; /* RO MSR */
+>   	default:
+> -		if ((pmc = get_gp_pmc(pmu, msr, MSR_IA32_PERFCTR0))) {
+> -			if (!msr_info->host_initiated)
+> +		if ((pmc = get_gp_pmc(pmu, msr, MSR_IA32_PERFCTR0))
+> +			|| (pmc = get_gp_pmc(pmu, msr, MSR_IA32_PMC0))) {
+> +			if (!msr_info->host_initiated &&
+> +				!full_width_writes_is_enabled(pmu))
+>   				data = (s64)(s32)data;
+>   			pmc->counter += data - pmc_read_counter(pmc);
+>   			if (pmc->perf_event)
+> @@ -303,15 +322,18 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
+>   
+>   	entry = kvm_find_cpuid_entry(vcpu, 0xa, 0);
+>   	if (!entry)
+> -		return;
+> +		goto end;
+>   	eax.full = entry->eax;
+>   	edx.full = entry->edx;
+>   
+>   	pmu->version = eax.split.version_id;
+>   	if (!pmu->version)
+> -		return;
+> +		goto end;
+>   
+>   	perf_get_x86_pmu_capability(&x86_pmu);
+> +	pmu->perf_capabilities = vmx_supported_perf_capabilities();
+> +	if (!pmu->perf_capabilities)
+> +		guest_cpuid_clear(vcpu, X86_FEATURE_PDCM);
+>   
+>   	pmu->nr_arch_gp_counters = min_t(int, eax.split.num_counters,
+>   					 x86_pmu.num_counters_gp);
+> @@ -351,6 +373,10 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
+>   		INTEL_PMC_MAX_GENERIC, pmu->nr_arch_fixed_counters);
+>   
+>   	nested_vmx_pmu_entry_exit_ctls_update(vcpu);
+> +	return;
+> +
+> +end:
+> +	guest_cpuid_clear(vcpu, X86_FEATURE_PDCM);
+>   }
+>   
+>   static void intel_pmu_init(struct kvm_vcpu *vcpu)
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 4f844257a72d..abc0f15a4de5 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -7112,6 +7112,8 @@ static __init void vmx_set_cpu_caps(void)
+>   		kvm_cpu_cap_check_and_set(X86_FEATURE_INVPCID);
+>   	if (vmx_pt_mode_is_host_guest())
+>   		kvm_cpu_cap_check_and_set(X86_FEATURE_INTEL_PT);
+> +	if (vmx_supported_perf_capabilities())
+> +		kvm_cpu_cap_check_and_set(X86_FEATURE_PDCM);
+>   
+>   	/* PKU is not yet implemented for shadow paging. */
+>   	if (enable_ept && boot_cpu_has(X86_FEATURE_OSPKE))
 > 
 
