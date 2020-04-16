@@ -2,166 +2,168 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 501691AC63C
-	for <lists+kvm@lfdr.de>; Thu, 16 Apr 2020 16:37:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4FFEE1AC682
+	for <lists+kvm@lfdr.de>; Thu, 16 Apr 2020 16:41:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731814AbgDPOgT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Apr 2020 10:36:19 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:41976 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728386AbgDPOgN (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 16 Apr 2020 10:36:13 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 03GEY9Ow119503;
-        Thu, 16 Apr 2020 10:35:51 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 30er1uat0n-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 16 Apr 2020 10:35:51 -0400
-Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 03GEYInN120080;
-        Thu, 16 Apr 2020 10:35:51 -0400
-Received: from ppma03wdc.us.ibm.com (ba.79.3fa9.ip4.static.sl-reverse.com [169.63.121.186])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 30er1uat09-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 16 Apr 2020 10:35:51 -0400
-Received: from pps.filterd (ppma03wdc.us.ibm.com [127.0.0.1])
-        by ppma03wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 03GEZ9R6014158;
-        Thu, 16 Apr 2020 14:35:50 GMT
-Received: from b01cxnp23034.gho.pok.ibm.com (b01cxnp23034.gho.pok.ibm.com [9.57.198.29])
-        by ppma03wdc.us.ibm.com with ESMTP id 30b5h6tv09-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 16 Apr 2020 14:35:50 +0000
-Received: from b01ledav004.gho.pok.ibm.com (b01ledav004.gho.pok.ibm.com [9.57.199.109])
-        by b01cxnp23034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 03GEZniB44827120
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 16 Apr 2020 14:35:49 GMT
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 506E6112061;
-        Thu, 16 Apr 2020 14:35:48 +0000 (GMT)
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id DBF8A112062;
-        Thu, 16 Apr 2020 14:35:47 +0000 (GMT)
-Received: from cpe-172-100-172-46.stny.res.rr.com (unknown [9.85.128.208])
-        by b01ledav004.gho.pok.ibm.com (Postfix) with ESMTP;
-        Thu, 16 Apr 2020 14:35:47 +0000 (GMT)
-Subject: Re: [PATCH v7 03/15] s390/zcrypt: driver callback to indicate
- resource in use
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, freude@linux.ibm.com, borntraeger@de.ibm.com,
-        mjrosato@linux.ibm.com, pmorel@linux.ibm.com, pasic@linux.ibm.com,
-        alex.williamson@redhat.com, kwankhede@nvidia.com,
-        jjherne@linux.ibm.com, fiuczy@linux.ibm.com
-References: <20200407192015.19887-1-akrowiak@linux.ibm.com>
- <20200407192015.19887-4-akrowiak@linux.ibm.com>
- <20200414140838.54f777b8.cohuck@redhat.com>
- <0f193571-1ff6-08f3-d02d-b4f40d2930c8@linux.ibm.com>
- <20200416120544.053b38d8.cohuck@redhat.com>
-From:   Tony Krowiak <akrowiak@linux.ibm.com>
-Message-ID: <78116a88-7571-1ac9-40e1-6c1081c81467@linux.ibm.com>
-Date:   Thu, 16 Apr 2020 10:35:48 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+        id S2394433AbgDPOkq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Apr 2020 10:40:46 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:39398 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S2394427AbgDPOkn (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 16 Apr 2020 10:40:43 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1587048042;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=80aHjGWongnpeQZzKC1CPTA8jUpzqlKutXIbnyqQU+g=;
+        b=XUDIJ2lAQAeiRSxu+ZVH/HmvTO58ygJ+a0KpR2audKl//2CqOWyrISSOJ97AX0XhZqB2+m
+        kOvveuq5AmCM21NllwNWEnwtUHtkp1bqpub+T6tr5Bu1RmFlsPj79/hvtavaHfLBxNOWfc
+        iuJTR2GbSSUpiDtK6qQqHRlsCw+zJAI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-357--hdoMGM2MUCQI3EYGcbQRg-1; Thu, 16 Apr 2020 10:40:41 -0400
+X-MC-Unique: -hdoMGM2MUCQI3EYGcbQRg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 16E2E107B267;
+        Thu, 16 Apr 2020 14:40:39 +0000 (UTC)
+Received: from w520.home (ovpn-112-162.phx2.redhat.com [10.3.112.162])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id EFC4B116D95;
+        Thu, 16 Apr 2020 14:40:31 +0000 (UTC)
+Date:   Thu, 16 Apr 2020 08:40:31 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     "Liu, Yi L" <yi.l.liu@intel.com>
+Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "Tian, Jun J" <jun.j.tian@intel.com>,
+        "Sun, Yi Y" <yi.y.sun@intel.com>,
+        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Wu, Hao" <hao.wu@intel.com>
+Subject: Re: [PATCH v1 7/8] vfio/type1: Add VFIO_IOMMU_CACHE_INVALIDATE
+Message-ID: <20200416084031.7266ad40@w520.home>
+In-Reply-To: <A2975661238FB949B60364EF0F2C25743A231BAA@SHSMSX104.ccr.corp.intel.com>
+References: <1584880325-10561-1-git-send-email-yi.l.liu@intel.com>
+        <1584880325-10561-8-git-send-email-yi.l.liu@intel.com>
+        <20200402142428.2901432e@w520.home>
+        <AADFC41AFE54684AB9EE6CBC0274A5D19D807C4A@SHSMSX104.ccr.corp.intel.com>
+        <20200403093436.094b1928@w520.home>
+        <A2975661238FB949B60364EF0F2C25743A231BAA@SHSMSX104.ccr.corp.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20200416120544.053b38d8.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.676
- definitions=2020-04-16_05:2020-04-14,2020-04-16 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 phishscore=0
- suspectscore=11 spamscore=0 mlxlogscore=999 impostorscore=0 adultscore=0
- bulkscore=0 priorityscore=1501 lowpriorityscore=0 mlxscore=0 clxscore=1015
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
- definitions=main-2004160101
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Thu, 16 Apr 2020 10:40:03 +0000
+"Liu, Yi L" <yi.l.liu@intel.com> wrote:
 
+> Hi Alex,
+> Still have a direction question with you. Better get agreement with you
+> before heading forward.
+> 
+> > From: Alex Williamson <alex.williamson@redhat.com>
+> > Sent: Friday, April 3, 2020 11:35 PM  
+> [...]
+> > > > > + *
+> > > > > + * returns: 0 on success, -errno on failure.
+> > > > > + */
+> > > > > +struct vfio_iommu_type1_cache_invalidate {
+> > > > > +	__u32   argsz;
+> > > > > +	__u32   flags;
+> > > > > +	struct	iommu_cache_invalidate_info cache_info;
+> > > > > +};
+> > > > > +#define VFIO_IOMMU_CACHE_INVALIDATE      _IO(VFIO_TYPE,  
+> > VFIO_BASE  
+> > > > + 24)
+> > > >
+> > > > The future extension capabilities of this ioctl worry me, I wonder if
+> > > > we should do another data[] with flag defining that data as CACHE_INFO.  
+> > >
+> > > Can you elaborate? Does it mean with this way we don't rely on iommu
+> > > driver to provide version_to_size conversion and instead we just pass
+> > > data[] to iommu driver for further audit?  
+> > 
+> > No, my concern is that this ioctl has a single function, strictly tied
+> > to the iommu uapi.  If we replace cache_info with data[] then we can
+> > define a flag to specify that data[] is struct
+> > iommu_cache_invalidate_info, and if we need to, a different flag to
+> > identify data[] as something else.  For example if we get stuck
+> > expanding cache_info to meet new demands and develop a new uapi to
+> > solve that, how would we expand this ioctl to support it rather than
+> > also create a new ioctl?  There's also a trade-off in making the ioctl
+> > usage more difficult for the user.  I'd still expect the vfio layer to
+> > check the flag and interpret data[] as indicated by the flag rather
+> > than just passing a blob of opaque data to the iommu layer though.
+> > Thanks,  
+> 
+> Based on your comments about defining a single ioctl and a unified
+> vfio structure (with a @data[] field) for pasid_alloc/free, bind/
+> unbind_gpasid, cache_inv. After some offline trying, I think it would
+> be good for bind/unbind_gpasid and cache_inv as both of them use the
+> iommu uapi definition. While the pasid alloc/free operation doesn't.
+> It would be weird to put all of them together. So pasid alloc/free
+> may have a separate ioctl. It would look as below. Does this direction
+> look good per your opinion?
+> 
+> ioctl #22: VFIO_IOMMU_PASID_REQUEST
+> /**
+>   * @pasid: used to return the pasid alloc result when flags == ALLOC_PASID
+>   *         specify a pasid to be freed when flags == FREE_PASID
+>   * @range: specify the allocation range when flags == ALLOC_PASID
+>   */
+> struct vfio_iommu_pasid_request {
+> 	__u32	argsz;
+> #define VFIO_IOMMU_ALLOC_PASID	(1 << 0)
+> #define VFIO_IOMMU_FREE_PASID	(1 << 1)
+> 	__u32	flags;
+> 	__u32	pasid;
+> 	struct {
+> 		__u32	min;
+> 		__u32	max;
+> 	} range;
+> };
 
-On 4/16/20 6:05 AM, Cornelia Huck wrote:
-> On Wed, 15 Apr 2020 13:10:18 -0400
-> Tony Krowiak <akrowiak@linux.ibm.com> wrote:
->
->> On 4/14/20 8:08 AM, Cornelia Huck wrote:
->>> On Tue,  7 Apr 2020 15:20:03 -0400
->>> Tony Krowiak <akrowiak@linux.ibm.com> wrote:
->>>> @@ -995,9 +996,11 @@ int ap_parse_mask_str(const char *str,
->>>>    	newmap = kmalloc(size, GFP_KERNEL);
->>>>    	if (!newmap)
->>>>    		return -ENOMEM;
->>>> -	if (mutex_lock_interruptible(lock)) {
->>>> -		kfree(newmap);
->>>> -		return -ERESTARTSYS;
->>>> +	if (lock) {
->>>> +		if (mutex_lock_interruptible(lock)) {
->>>> +			kfree(newmap);
->>>> +			return -ERESTARTSYS;
->>>> +		}
->>> This whole function is a bit odd. It seems all masks we want to
->>> manipulate are always guarded by the ap_perms_mutex, and the need for
->>> allowing lock == NULL comes from wanting to call this function with the
->>> ap_perms_mutex already held.
->>>
->>> That would argue for a locked/unlocked version of this function... but
->>> looking at it, why do we lock the way we do? The one thing this
->>> function (prior to this patch) does outside of the holding of the mutex
->>> is the allocation and freeing of newmap. But with this patch, we do the
->>> allocation and freeing of newmap while holding the mutex. Something
->>> seems a bit weird here.
->> Note that the ap_parse_mask function copies the newmap
->> to the bitmap passed in as a parameter to the function.
->> Prior to the introduction of this patch, the calling functions - i.e.,
->> apmask_store(), aqmask_store() and ap_perms_init() - passed
->> in the actual bitmap (i.e., ap_perms.apm or ap_perms aqm),
->> so the ap_perms were changed directly by this function.
->>
->> With this patch, the apmask_store() and aqmask_store()
->> functions now pass in a copy of those bitmaps. This is so
->> we can verify that any APQNs being removed are not
->> in use by the vfio_ap device driver before committing the
->> change to ap_perms. Consequently, it is now necessary
->> to take the lock for the until the changes are committed.
-> Yes, but every caller actually takes the mutex before calling this
-> function already :)
+Can't the ioctl return the pasid valid on alloc (like GET_DEVICE_FD)?
+Would it be useful to support freeing a range of pasids?  If so then we
+could simply use range for both, ie. allocate a pasid from this range
+and return it, or free all pasids in this range?  vfio already needs to
+track pasids to free them on release, so presumably this is something
+we could support easily.
+ 
+> ioctl #23: VFIO_IOMMU_NESTING_OP
+> struct vfio_iommu_type1_nesting_op {
+> 	__u32	argsz;
+> 	__u32	flags;
+> 	__u32	op;
+> 	__u8	data[];
+> };
 
-That is not a true statement, the ap_perms_init() function
-does not take the mutex prior to calling this function. Keep in
-mind, the ap_parse_mask function is not static and is exported,
-I was precluded from removing the lock parameter from the function
-definition.
+data only has 4-byte alignment, I think we really want it at an 8-byte
+alignment.  This is why I embedded the "op" into the flag for
+DEVICE_FEATURE.  Thanks,
 
->
->> Having explained that, you make a valid argument that
->> this calls for a locked/unlocked version of this function, so
->> I will modify this patch to that effect.
-> Ok.
->
-> The other thing I found weird is that the function does
-> alloc newmap -> grab mutex -> do manipulation -> release mutex -> free newmap
-> while the new callers do
-> (mutex already held) -> alloc newmap
->
-> so why grab/release the mutex the way the function does now? IOW, why
-> not have an unlocked __ap_parse_mask_string() and do
+Alex
 
-In my last comment above, I agreed to create an unlocked version
-of this function. Your example below is similar to what I
-implemented after responding to your comment yesterday.
-
->
-> int ap_parse_mask_string(...)
-> {
-> 	int rc;
->
-> 	if (mutex_lock_interruptible(&ap_perms_mutex))
-> 		return -ERESTARTSYS;
-> 	rc = __ap_parse_mask_string(...);
->          mutex_unlock(&ap_perms_mutex);
-> 	return rc;
-> }
+> 
+> /* Nesting Ops */
+> #define VFIO_IOMMU_NESTING_OP_BIND_PGTBL        0
+> #define VFIO_IOMMU_NESTING_OP_UNBIND_PGTBL      1
+> #define VFIO_IOMMU_NESTING_OP_CACHE_INVLD       2
+>  
+> Thanks,
+> Yi Liu
+> 
 
