@@ -2,93 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B75651AB5C8
-	for <lists+kvm@lfdr.de>; Thu, 16 Apr 2020 04:16:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8150D1AB5E8
+	for <lists+kvm@lfdr.de>; Thu, 16 Apr 2020 04:34:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731562AbgDPCQW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Apr 2020 22:16:22 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:2335 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728397AbgDPCQU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Apr 2020 22:16:20 -0400
-Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id 39A5686E337A8F2A7A88;
-        Thu, 16 Apr 2020 10:16:10 +0800 (CST)
-Received: from [127.0.0.1] (10.166.213.7) by DGGEMS412-HUB.china.huawei.com
- (10.3.19.212) with Microsoft SMTP Server id 14.3.487.0; Thu, 16 Apr 2020
- 10:15:59 +0800
-Subject: Re: [PATCH] x86/kvm: make steal_time static
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        <sean.j.christopherson@intel.com>, <vkuznets@redhat.com>,
-        <wanpengli@tencent.com>, <jmattson@google.com>, <joro@8bytes.org>,
-        <tglx@linutronix.de>, <mingo@redhat.com>, <bp@alien8.de>,
-        <x86@kernel.org>, <hpa@zytor.com>, <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-CC:     Hulk Robot <hulkci@huawei.com>
-References: <20200415084939.6367-1-yanaijie@huawei.com>
- <d1700173-29c1-2e7c-46bd-471876d96762@redhat.com>
-From:   Jason Yan <yanaijie@huawei.com>
-Message-ID: <35c3890e-0c45-0dac-e9f0-f2a9446a387d@huawei.com>
-Date:   Thu, 16 Apr 2020 10:15:58 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.2
+        id S2387984AbgDPCeW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Apr 2020 22:34:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38600 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1732144AbgDPCeR (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 15 Apr 2020 22:34:17 -0400
+Received: from mail-io1-xd43.google.com (mail-io1-xd43.google.com [IPv6:2607:f8b0:4864:20::d43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 444D0C061A0C;
+        Wed, 15 Apr 2020 19:34:17 -0700 (PDT)
+Received: by mail-io1-xd43.google.com with SMTP id h6so19399006iok.11;
+        Wed, 15 Apr 2020 19:34:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=itmXKVVHyhLg4W1YbKAR76og2TJJfG4RTgXOFdOAIfs=;
+        b=AKvcIeylaJL4mM38i15Et+R3ijXRnPl6dbtXgWWUNoKE0vNTmaRSqugqfWcTiTv+0+
+         /qEqY9utKcuBty9HFel7Hi4tuAN5IvwSP7L+MFKC/VSD9oJO55sT3jNry9EBGV8RSCZV
+         fGs/VnbMS8uvOvYY0vB5PSO3qRgkp39khpesAubvBb3DZ+wzFJgkv0Idh6C9eApyd+Qj
+         uyRe6UM0URWaoOQ6P6r7SxdyHGwKz/ZG/2NGVXDbS4LIKjG/dbfzBmtsahXrMWmYr2L3
+         yWC7GRe3k1aV8M88ZmsdItgmh4GiGGUPNFKdnbM8WNA73VgSd5wtDNKJw0QvvipHkgh9
+         Zc1w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=itmXKVVHyhLg4W1YbKAR76og2TJJfG4RTgXOFdOAIfs=;
+        b=TopH933RFutb/W6ByfMpou7pGqpzlIukZbIe15Fx7Hq4mbAJ9FHJP71jlzlMLZoACY
+         heU84eukIRTm+wEPqgfZJ6BUBfOI1HpVbwGP74etc09usw2X5Tl/LN0QZUWM1GoJ44ac
+         UZWCNV6LWG64DNIxPP3KOAN5QnuqC5lalXM+l4XnNGBIg8XbItH207eDZoUb3JvoouoW
+         M++7KUG/+BJkyo+ZxDBir33BIAi64Hx9TZDHcPVPfcHjll9aRd1rbxcw7NYC34Oqty26
+         BrRlwSzc7fT2+OqGXjX+eczFEB593PFETAn0Qhzoi9EpwUq4B59FJDrGsw95Ti5mFlK+
+         iXqA==
+X-Gm-Message-State: AGi0PuYJx6VplMFn9w/R6D2hHO/B/9Opd4jLLPEQfGJTKVrwn3vD5aMJ
+        jaEG5/L/hDGkj19yjjMXuiVNRxqP5Tro+ac7jDgjiTeg
+X-Google-Smtp-Source: APiQypKUzKRz1ojShZLzll6LlFHpm4yH8NN5p1XpJRJ2u8XiXVRaiRkeYPaOeK2Zy3/dI8zwAu/ZQ4tDDcBpbKHkUDU=
+X-Received: by 2002:a05:6602:22c3:: with SMTP id e3mr29157327ioe.75.1587004456483;
+ Wed, 15 Apr 2020 19:34:16 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <d1700173-29c1-2e7c-46bd-471876d96762@redhat.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.166.213.7]
-X-CFilter-Loop: Reflected
+References: <20200323075354.93825-1-aik@ozlabs.ru> <b512ac5e-dca5-4c08-8ea1-a636b887c0d0@ozlabs.ru>
+ <d5cac37a-8b32-cabf-e247-10e64f0110ab@ozlabs.ru>
+In-Reply-To: <d5cac37a-8b32-cabf-e247-10e64f0110ab@ozlabs.ru>
+From:   "Oliver O'Halloran" <oohall@gmail.com>
+Date:   Thu, 16 Apr 2020 12:34:04 +1000
+Message-ID: <CAOSf1CGfjX9LGQ1GDSmxrzjnaWOM3mUvBu9_xe-L2umin9n66w@mail.gmail.com>
+Subject: Re: [PATCH kernel v2 0/7] powerpc/powenv/ioda: Allow huge DMA window
+ at 4GB
+To:     Alexey Kardashevskiy <aik@ozlabs.ru>
+Cc:     linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        kvm-ppc@vger.kernel.org, KVM list <kvm@vger.kernel.org>,
+        Alistair Popple <alistair@popple.id.au>,
+        Fabiano Rosas <farosas@linux.ibm.com>,
+        Michael Ellerman <mpe@ellerman.id.au>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Thu, Apr 16, 2020 at 11:27 AM Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
+>
+> Anyone? Is it totally useless or wrong approach? Thanks,
 
+I wouldn't say it's either, but I still hate it.
 
-在 2020/4/15 22:42, Paolo Bonzini 写道:
-> On 15/04/20 10:49, Jason Yan wrote:
->> Fix the following sparse warning:
->>
->> arch/x86/kernel/kvm.c:58:1: warning: symbol '__pcpu_scope_steal_time'
->> was not declared. Should it be static?
->>
->> Reported-by: Hulk Robot <hulkci@huawei.com>
->> Signed-off-by: Jason Yan <yanaijie@huawei.com>
->> ---
->>   arch/x86/kernel/kvm.c | 2 +-
->>   1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
->> index 6efe0410fb72..f75010cde5d5 100644
->> --- a/arch/x86/kernel/kvm.c
->> +++ b/arch/x86/kernel/kvm.c
->> @@ -55,7 +55,7 @@ static int __init parse_no_stealacc(char *arg)
->>   early_param("no-steal-acc", parse_no_stealacc);
->>   
->>   static DEFINE_PER_CPU_DECRYPTED(struct kvm_vcpu_pv_apf_data, apf_reason) __aligned(64);
->> -DEFINE_PER_CPU_DECRYPTED(struct kvm_steal_time, steal_time) __aligned(64) __visible;
->> +static DEFINE_PER_CPU_DECRYPTED(struct kvm_steal_time, steal_time) __aligned(64) __visible;
->>   static int has_steal_clock = 0;
->>   
->>   /*
->>
-> 
-> Queued, thanks.
-> 
+The 4GB mode being per-PHB makes it difficult to use unless we force
+that mode on 100% of the time which I'd prefer not to do. Ideally
+devices that actually support 64bit addressing (which is most of them)
+should be able to use no-translate mode when possible since a) It's
+faster, and b) It frees up room in the TCE cache devices that actually
+need them. I know you've done some testing with 100G NICs and found
+the overhead was fine, but IMO that's a bad test since it's pretty
+much the best-case scenario since all the devices on the PHB are in
+the same PE. The PHB's TCE cache only hits when the TCE matches the
+DMA bus address and the PE number for the device so in a multi-PE
+environment there's a lot of potential for TCE cache trashing. If
+there was one or two PEs under that PHB it's probably not going to
+matter, but if you have an NVMe rack with 20 drives it starts to look
+a bit ugly.
 
-Sorry that I found 14e581c381b9 ("x86/kvm: Make steal_time visible")
-said that it is used by assembler code but I didn't find where.
-Please drop this patch if it's true.
+That all said, it might be worth doing this anyway since we probably
+want the software infrastructure in place to take advantage of it.
+Maybe expand the command line parameters to allow it to be enabled on
+a per-PHB basis rather than globally.
 
-Sorry to make this trouble again.
-
-Thanks,
-
-Jason
-
-> Paolo
-> 
-> 
-> .
-> 
-
+Oliver
