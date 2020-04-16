@@ -2,93 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CAF151ACE3E
-	for <lists+kvm@lfdr.de>; Thu, 16 Apr 2020 19:03:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6F3B61ACF88
+	for <lists+kvm@lfdr.de>; Thu, 16 Apr 2020 20:24:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390454AbgDPRCM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Apr 2020 13:02:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32784 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S2387757AbgDPRCK (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 16 Apr 2020 13:02:10 -0400
-Received: from mail-lj1-x241.google.com (mail-lj1-x241.google.com [IPv6:2a00:1450:4864:20::241])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 874BAC061A0F
-        for <kvm@vger.kernel.org>; Thu, 16 Apr 2020 10:02:10 -0700 (PDT)
-Received: by mail-lj1-x241.google.com with SMTP id r7so8558985ljg.13
-        for <kvm@vger.kernel.org>; Thu, 16 Apr 2020 10:02:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=dDes2+uYwqdDpp6u8TFEa/zLM2coaSYzbk9Klu5JF50=;
-        b=d4bGcI6r9EXx896lm5psS0z1tGPVAD1Aq/Ppvu5hGlzAbh+Zf/1v3KrwUBex7wJOqX
-         fdBbg7Y0d06giLFwxcJ/M+yzoOCnSc92Ma3Vx8FQSeIFEJ9t0tWAkPjyb2FW9WP2SOBk
-         +rtsc0ysltydTupDTjzTBovmcsnwzBPYrog24=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=dDes2+uYwqdDpp6u8TFEa/zLM2coaSYzbk9Klu5JF50=;
-        b=Ln6oujm2hQTbjXhdsUTfSDw+12lolGO+nVanhcVNijZBHOTVjg+oYZq9vzIIHrHO5m
-         c+2daaB4Xz6t0jojvgPJIx+krpA3ZQV96IMd2uPx9cHmy+TVAyEh57ypmX7pgunuIppQ
-         w4zkwcwh2xllaoMj3oia3XheotJ69sR8v8f0ZIRuHmJVfj6VXFx6AeFueDFFWATCwDbA
-         rJEuORIbdoltjRJrZ/6QZ6p9URpLv/Rsb8XMUlyI6ZXgmtYPoQCQFY7ozhPRvoY88NPr
-         kWInXyhBJoC89o23aJWJTrnMMWDTlzXJQ+ZvxlLJrscGRofVtjiPtCNfvdXAtbandUWi
-         889Q==
-X-Gm-Message-State: AGi0Puaat5A8xBOXaj8xEn4VM9VRlrJQSqtlXIY/kUZYVDmxA67Rz/0l
-        a8IbPswJYdhZ1WiZmkGn6MexFHd1PFs=
-X-Google-Smtp-Source: APiQypJ58uspzGAIr73jblarzj0LwVSIUR1ceS+LFSM/2s+ScAmhWVKSpyg9gZaSx/y03PXYWP5AGg==
-X-Received: by 2002:a2e:b0ee:: with SMTP id h14mr7228977ljl.35.1587056529044;
-        Thu, 16 Apr 2020 10:02:09 -0700 (PDT)
-Received: from mail-lj1-f173.google.com (mail-lj1-f173.google.com. [209.85.208.173])
-        by smtp.gmail.com with ESMTPSA id x29sm15840392lfn.64.2020.04.16.10.02.08
-        for <kvm@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 16 Apr 2020 10:02:08 -0700 (PDT)
-Received: by mail-lj1-f173.google.com with SMTP id u15so8642869ljd.3
-        for <kvm@vger.kernel.org>; Thu, 16 Apr 2020 10:02:08 -0700 (PDT)
-X-Received: by 2002:a2e:7c1a:: with SMTP id x26mr6539997ljc.209.1587056528034;
- Thu, 16 Apr 2020 10:02:08 -0700 (PDT)
+        id S1728938AbgDPSWZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Apr 2020 14:22:25 -0400
+Received: from mail.kernel.org ([198.145.29.99]:51062 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728301AbgDPSWY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Apr 2020 14:22:24 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id D55042222D;
+        Thu, 16 Apr 2020 18:22:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1587061344;
+        bh=6zrtXU9CGPRKE5NSlsMwz1LYWf6+ZBpckIQKGAKC7K8=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=HiRIy1z1b/9U9K+HKP8HUDXGPoNL44r3nyxvBq85trtY+XWWj6ob8+0lfJFRnW0H3
+         xfrIzxGX3t37kXQ5lYZE/Dqk9a5OD4UMRUfqJoTwM5pf/dVoOf37Zft4sSvRmAP3Yz
+         uAPsq677yjr3o4m7tOWUz+zx5md6spR3xPjkCFqk=
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+        by disco-boy.misterjones.org with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        (Exim 4.92)
+        (envelope-from <maz@kernel.org>)
+        id 1jP99a-003xpV-12; Thu, 16 Apr 2020 19:22:22 +0100
 MIME-Version: 1.0
-References: <20200414123606-mutt-send-email-mst@kernel.org>
- <CAHk-=wgVQcD=JJVmowEorHHQSVmSw+vG+Ddc4FATZoTp9mfUmw@mail.gmail.com> <20200416081330-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20200416081330-mutt-send-email-mst@kernel.org>
-From:   Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Thu, 16 Apr 2020 10:01:51 -0700
-X-Gmail-Original-Message-ID: <CAHk-=wjduPCAE-sr_XLUdExupiL0bOU5GBfpMd32cqMC-VVxeg@mail.gmail.com>
-Message-ID: <CAHk-=wjduPCAE-sr_XLUdExupiL0bOU5GBfpMd32cqMC-VVxeg@mail.gmail.com>
-Subject: Re: [GIT PULL] vhost: cleanups and fixes
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     KVM list <kvm@vger.kernel.org>,
-        virtualization@lists.linux-foundation.org,
-        Netdev <netdev@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Andy Shevchenko <andy.shevchenko@gmail.com>,
-        Arnd Bergmann <arnd@arndb.de>, ashutosh.dixit@intel.com,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Markus Elfring <elfring@users.sourceforge.net>,
-        eli@mellanox.com, eperezma@redhat.com,
-        "Gustavo A. R. Silva" <gustavo@embeddedor.com>, hulkci@huawei.com,
-        "Cc: stable@vger.kernel.org, david@redhat.com, dverkamp@chromium.org,
-        hch@lst.de, jasowang@redhat.com, liang.z.li@intel.com, mst@redhat.com,
-        tiny.windzz@gmail.com," <jasowang@redhat.com>,
-        matej.genci@nutanix.com, Stephen Rothwell <sfr@canb.auug.org.au>,
-        yanaijie@huawei.com, YueHaibing <yuehaibing@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date:   Thu, 16 Apr 2020 19:22:21 +0100
+From:   Marc Zyngier <maz@kernel.org>
+To:     "Zengtao (B)" <prime.zeng@hisilicon.com>
+Cc:     George Cherian <gcherian@marvell.com>, Dave.Martin@arm.com,
+        alexandru.elisei@arm.com, andre.przywara@arm.com,
+        christoffer.dall@arm.com, james.morse@arm.com,
+        jintack@cs.columbia.edu, julien.thierry.kdev@gmail.com,
+        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        linux-arm-kernel@lists.infradead.org, suzuki.poulose@arm.com,
+        Anil Kumar Reddy H <areddy3@marvell.com>,
+        Ganapatrao Kulkarni <gkulkarni@marvell.com>
+Subject: Re: [PATCH v2 00/94] KVM: arm64: ARMv8.3/8.4 Nested Virtualization
+ support
+In-Reply-To: <678F3D1BB717D949B966B68EAEB446ED3A535FCF@DGGEMM506-MBX.china.huawei.com>
+References: <MN2PR18MB26869A6CA4E67558324F655CC5C70@MN2PR18MB2686.namprd18.prod.outlook.com>
+ <06d08f904f003160a48eac3c5ab3c7ff@kernel.org>
+ <678F3D1BB717D949B966B68EAEB446ED342E29B9@dggemm526-mbx.china.huawei.com>
+ <86r1wus7df.wl-maz@kernel.org>
+ <678F3D1BB717D949B966B68EAEB446ED3A535FCF@DGGEMM506-MBX.china.huawei.com>
+Message-ID: <3e84aaf8b757bc5a7685a291e54c232b@kernel.org>
+X-Sender: maz@kernel.org
+User-Agent: Roundcube Webmail/1.3.10
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: prime.zeng@hisilicon.com, gcherian@marvell.com, Dave.Martin@arm.com, alexandru.elisei@arm.com, andre.przywara@arm.com, christoffer.dall@arm.com, james.morse@arm.com, jintack@cs.columbia.edu, julien.thierry.kdev@gmail.com, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, suzuki.poulose@arm.com, areddy3@marvell.com, gkulkarni@marvell.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Apr 16, 2020 at 5:20 AM Michael S. Tsirkin <mst@redhat.com> wrote:
-> Well it's all just fallout from
+Hi Zengtao,
 
-What? No. Half of it seems to be the moving of "struct vring" around
-to other headers and stuff.
+On 2020-04-16 02:38, Zengtao (B) wrote:
+> Hi Marc:
+> 
+> Got it.
+> Really a bit patch set :)
 
-And then that is done very confusingly too, using two different
-structures both called "struct vring".
+Well, yeah... ;-)
 
-No way can I pull that kind of craziness as a "fix".
+> 
+> BTW, I have done a basic kvm unit test
+> git://git.kernel.org/pub/scm/virt/kvm/kvm-unit-tests.git
+> And I find that after apply the patch KVM: arm64: VNCR-ize ELR_EL1,
+> The psci test failed for some reason, I can't understand why, this
+> is only the test result.(find the patch by git bisect + kvm test)
 
-                Linus
+That it is that mechanical, we should be able to quickly nail that one.
+
+> My platform: Hisilicon D06 board.
+> Linux kernel: Linux 5.6-rc6 + nv patches(some rebases)
+> Could you help to take a look?
+
+I'll have a look tomorrow. I'm in the middle of refactoring the series
+for 5.7, and things have changed quite a bit. Hopefully this isn't a VHE
+vs non-VHE issue.
+
+Thanks,
+
+         M.
+-- 
+Jazz is not dead. It just smells funny...
