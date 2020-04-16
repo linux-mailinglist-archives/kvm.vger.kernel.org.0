@@ -2,64 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CD1251AB5B8
-	for <lists+kvm@lfdr.de>; Thu, 16 Apr 2020 04:01:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E0C501AB5C5
+	for <lists+kvm@lfdr.de>; Thu, 16 Apr 2020 04:13:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730628AbgDPCBC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Apr 2020 22:01:02 -0400
-Received: from out30-54.freemail.mail.aliyun.com ([115.124.30.54]:60307 "EHLO
-        out30-54.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729707AbgDPCAw (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 15 Apr 2020 22:00:52 -0400
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R851e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e07488;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=19;SR=0;TI=SMTPD_---0Tveg8zr_1587002446;
-Received: from 30.27.118.45(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0Tveg8zr_1587002446)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Thu, 16 Apr 2020 10:00:47 +0800
-Subject: Re: [PATCH] KVM: Optimize kvm_arch_vcpu_ioctl_run function
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org,
-        sean.j.christopherson@intel.com, wanpengli@tencent.com,
-        jmattson@google.com, joro@8bytes.org, tglx@linutronix.de,
-        mingo@redhat.com, bp@alien8.de, x86@kernel.org, hpa@zytor.com,
-        maz@kernel.org, james.morse@arm.com, julien.thierry.kdev@gmail.com,
-        suzuki.poulose@arm.com
-References: <20200413034523.110548-1-tianjia.zhang@linux.alibaba.com>
- <875ze2ywhy.fsf@vitty.brq.redhat.com>
- <cc29ce22-4c70-87d1-d7aa-9d38438ba8a5@linux.alibaba.com>
- <87a73dxgk6.fsf@vitty.brq.redhat.com>
- <9e122372-249d-3d93-99ed-a670fff33936@redhat.com>
-From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-Message-ID: <4843f690-7071-aa4f-cc9d-d9cc2321e669@linux.alibaba.com>
-Date:   Thu, 16 Apr 2020 10:00:46 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:68.0) Gecko/20100101
+        id S1731492AbgDPCMd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Apr 2020 22:12:33 -0400
+Received: from mga01.intel.com ([192.55.52.88]:20682 "EHLO mga01.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1731407AbgDPCMa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Apr 2020 22:12:30 -0400
+IronPort-SDR: 8mGLUT/4SaB8AsMc5GOv+brypk4a3x6EP57p0QeW/E9ip031U3o0DWYfebj4mV70OInmgaJ7wW
+ 0KTy96t5yyHw==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Apr 2020 19:12:30 -0700
+IronPort-SDR: q3hLULqDtfpxH+QDcFiAQ6zuroNMCHhoiahSIbgbXUV1+hEpmQWFpazK47KGvDPv8pY/9OXoHv
+ LngJ5mHV+QHA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.72,388,1580803200"; 
+   d="scan'208";a="271922934"
+Received: from xiaoyaol-mobl.ccr.corp.intel.com (HELO [10.255.29.241]) ([10.255.29.241])
+  by orsmga002.jf.intel.com with ESMTP; 15 Apr 2020 19:12:27 -0700
+Subject: Re: [PATCH v8 4/4] kvm: vmx: virtualize split lock detection
+To:     Thomas Gleixner <tglx@linutronix.de>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     linux-kernel@vger.kernel.org, x86@kernel.org,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Andy Lutomirski <luto@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Arvind Sankar <nivedita@alum.mit.edu>
+References: <20200414063129.133630-1-xiaoyao.li@intel.com>
+ <20200414063129.133630-5-xiaoyao.li@intel.com>
+ <87y2qwmszt.fsf@nanos.tec.linutronix.de>
+From:   Xiaoyao Li <xiaoyao.li@intel.com>
+Message-ID: <906dd919-3ae5-5279-b706-168e509ce953@intel.com>
+Date:   Thu, 16 Apr 2020 10:12:26 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
  Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <9e122372-249d-3d93-99ed-a670fff33936@redhat.com>
+In-Reply-To: <87y2qwmszt.fsf@nanos.tec.linutronix.de>
 Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 2020/4/15 22:53, Paolo Bonzini wrote:
-> On 15/04/20 11:07, Vitaly Kuznetsov wrote:
->> In case this is no longer needed I'd suggest we drop 'kvm_run' parameter
->> and extract it from 'struct kvm_vcpu' when needed. This looks like a
->> natural add-on to your cleanup patch.
+On 4/16/2020 3:47 AM, Thomas Gleixner wrote:
+> Xiaoyao Li <xiaoyao.li@intel.com> writes:
 > 
-> I agree, though I think it should be _instead_ of Tianjia's patch rather
-> than on top.
+>> Due to the fact that TEST_CTRL MSR is per-core scope, i.e., the sibling
+>> threads in the same physical CPU core share the same MSR, only
+>> advertising feature split lock detection to guest when SMT is disabled
+>> or unsupported, for simplicitly.
 > 
-> Paolo
+> That's not for simplicity. It's for correctness because you cannot
+> provide consistent state to a guest.
 > 
 
-Thank you very much for the comments of Vitaly and Paolo, I will make a 
-v2 patch.
+I'll correct it.
 
-Thanks and best,
-Tianjia
+Thanks!
+-Xiaoyao
+
