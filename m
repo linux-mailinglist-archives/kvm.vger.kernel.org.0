@@ -2,62 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0BE3D1AB8DA
-	for <lists+kvm@lfdr.de>; Thu, 16 Apr 2020 08:58:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D986E1AB947
+	for <lists+kvm@lfdr.de>; Thu, 16 Apr 2020 09:04:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2436746AbgDPG5w (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Apr 2020 02:57:52 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:21591 "EHLO
+        id S2438227AbgDPHEA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Apr 2020 03:04:00 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:33164 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S2437733AbgDPG5s (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Apr 2020 02:57:48 -0400
+        with ESMTP id S2438191AbgDPHD4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Apr 2020 03:03:56 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1587020265;
+        s=mimecast20190719; t=1587020634;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=+jIfsQLzFAdFaLNbfCoGQ8zkTgNktZzjgnJVMtvlPM4=;
-        b=RNMNlLK0M8ly8sw0Qa4jfWtKwNA6ZGVd5618T1/fxTogOPSt2Uxq1hUGu6iotl04Fw6+gs
-        oOW0WpDMin1Dz3oB85TdeNblQW43ckgVGgdShk2YGkQshvnIYhaXMCNqXi674f76XoQ6cL
-        448ihi8zFBjAi6Enx/i0A3TYE2Y2aiY=
+        bh=u8Fe4HRBZIpxRs2mIcqmv3RiTnssjCSY9lhZeXvdF9I=;
+        b=Y6W1E0B+Tb2OwSZEYOtbu9su6T+sc+Yc4JFuzDMZE1i3AYcGTbdmxLR+wtkTHg36fximfx
+        L8Ytx2cMi0lX+vsVcrQhZkS+VYH63wZXLbedrc2pei2YuiIoiQvslReXtCDTqTZJIxrgXa
+        za0tI/4GT7AYyBCCvpEeuY3jmijbF+Q=
 Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
  [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-39-EmFB8le8N462wwN1iUT5Ww-1; Thu, 16 Apr 2020 02:57:43 -0400
-X-MC-Unique: EmFB8le8N462wwN1iUT5Ww-1
-Received: by mail-wr1-f71.google.com with SMTP id a3so1243052wro.1
-        for <kvm@vger.kernel.org>; Wed, 15 Apr 2020 23:57:42 -0700 (PDT)
+ us-mta-222-k9uOZU7UMaKm0gu2EXKsHg-1; Thu, 16 Apr 2020 03:03:52 -0400
+X-MC-Unique: k9uOZU7UMaKm0gu2EXKsHg-1
+Received: by mail-wr1-f71.google.com with SMTP id o10so1235253wrj.7
+        for <kvm@vger.kernel.org>; Thu, 16 Apr 2020 00:03:52 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
          :message-id:mime-version;
-        bh=+jIfsQLzFAdFaLNbfCoGQ8zkTgNktZzjgnJVMtvlPM4=;
-        b=WrKUUbJ9E2YWrQKSk4D1VI2vgzchkOcs2R3zKo0F1Paod53WiDjiPr7JsMKdmWRh+n
-         1maY+eaApvtOnEjKzvPigyhgfLuxad8YNo7lsT4g6Ljkot1lBiEb6xznC5e1trVFwKwY
-         cwY30F7rglJFQZGW6N7nn169hz2oUdvj1FLgva3MSxajztwD97fQyxzGmtbrvQZNyX5f
-         sQ9blvc5UVgyxPKYtAOWR5xgMhVpM2yTNdxKcK/U/xxb2awg4jY5P267TQxBxfmk/LFG
-         NM2fed8KU2oZHfA5pOrc9ekiJX9H6MGJd0lAh73dK7FNuEWjggmaATprAcm73XYDbnF7
-         1gaQ==
-X-Gm-Message-State: AGi0PuaAJWovFR/ElrNfFRrHytMzvDJPequZoPwuFyBHGY6lLSEEnC2J
-        BK5ft8hCTojzOD1yNH8DIOlb8rbwPHCT5YSmGq0wq94hj3G74hEJFp61L+BVgynM0TKWcd76Mnp
-        bKwH/9EhgjMXD
-X-Received: by 2002:a7b:c38e:: with SMTP id s14mr3054041wmj.12.1587020261873;
-        Wed, 15 Apr 2020 23:57:41 -0700 (PDT)
-X-Google-Smtp-Source: APiQypLcX3QC2WncwF4NGEdkVuDQGtURORK48xnIkC+nAChhunufhb36n/EIPEUsxuE3fYlqHZD3/Q==
-X-Received: by 2002:a7b:c38e:: with SMTP id s14mr3054020wmj.12.1587020261568;
-        Wed, 15 Apr 2020 23:57:41 -0700 (PDT)
+        bh=u8Fe4HRBZIpxRs2mIcqmv3RiTnssjCSY9lhZeXvdF9I=;
+        b=nLEhcG85j82TUqDMOuOgkybpgN33GIi1suAnNR3flLf76YHkeWRpSj205vBRUMi+1J
+         /RwMOmBYnqZ4pLUqAWXJt2CTZpOnZTVVDqVlcOrL4+cdKYg9rWczQTcc5ylQCOb/Fpvl
+         uXKu+cTl12KLqCeadbuWQVqeASqpEai/8W6li6dnodvyQyIPDnPuPovY+3oQXRD2ZPPm
+         EvFUMTMHp4ijOoy3txqJFa2DI6nQPXJE1zVhYosNHmL41XaIEhYJAXpEyuI+d7dXcwiD
+         q/q1p9L2FJlzWJlQng0NeVYyNrU77OZmYc5ceQt+Ac1hhc8yonlkfRbUmHlKcT/BINxF
+         8zkA==
+X-Gm-Message-State: AGi0Puat+R31Z/XX5WlrnS3NiPOKY+2QHLbzwyBf7xs5XTG3V4v5LPl2
+        zHsLsT6sEAB5cvQbPSu0bvKzglFLbt1gTjrIVkhVoAMEyZ4psSpCOdHzOcSJ5ecLY6iRWaG9n27
+        n1qou1OIgR4+k
+X-Received: by 2002:a5d:4005:: with SMTP id n5mr7830140wrp.242.1587020631092;
+        Thu, 16 Apr 2020 00:03:51 -0700 (PDT)
+X-Google-Smtp-Source: APiQypKzVfRYkQQjXNmPRmmEuweWR0AsvTUy66VIOLHRJ9IcCVXdD+fbCSvkQnkvtw8EzDw2iMvttg==
+X-Received: by 2002:a5d:4005:: with SMTP id n5mr7830094wrp.242.1587020630785;
+        Thu, 16 Apr 2020 00:03:50 -0700 (PDT)
 Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id m1sm21075803wro.64.2020.04.15.23.57.40
+        by smtp.gmail.com with ESMTPSA id o16sm26785055wrs.44.2020.04.16.00.03.48
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Apr 2020 23:57:40 -0700 (PDT)
+        Thu, 16 Apr 2020 00:03:49 -0700 (PDT)
 From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Jon Doron <arilou@gmail.com>
-Cc:     Jon Doron <arilou@gmail.com>, Roman Kagan <rvkagan@yandex-team.ru>,
-        kvm@vger.kernel.org, linux-hyperv@vger.kernel.org
-Subject: Re: [PATCH v1 1/1] x86/kvm/hyper-v: Add support to SYNIC exit on EOM
-In-Reply-To: <20200409163745.573547-2-arilou@gmail.com>
-References: <20200409163745.573547-1-arilou@gmail.com> <20200409163745.573547-2-arilou@gmail.com>
-Date:   Thu, 16 Apr 2020 08:57:39 +0200
-Message-ID: <87d087x6ho.fsf@vitty.brq.redhat.com>
+To:     Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+Cc:     kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        tianjia.zhang@linux.alibaba.com, pbonzini@redhat.com,
+        tsbogend@alpha.franken.de, paulus@ozlabs.org, mpe@ellerman.id.au,
+        benh@kernel.crashing.org, borntraeger@de.ibm.com,
+        frankja@linux.ibm.com, david@redhat.com, cohuck@redhat.com,
+        heiko.carstens@de.ibm.com, gor@linux.ibm.com,
+        sean.j.christopherson@intel.com, wanpengli@tencent.com,
+        jmattson@google.com, joro@8bytes.org, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, x86@kernel.org, hpa@zytor.com,
+        maz@kernel.org, james.morse@arm.com, julien.thierry.kdev@gmail.com,
+        suzuki.poulose@arm.com, christoffer.dall@arm.com,
+        peterx@redhat.com, thuth@redhat.com
+Subject: Re: [PATCH v2] KVM: Optimize kvm_arch_vcpu_ioctl_run function
+In-Reply-To: <20200416051057.26526-1-tianjia.zhang@linux.alibaba.com>
+References: <20200416051057.26526-1-tianjia.zhang@linux.alibaba.com>
+Date:   Thu, 16 Apr 2020 09:03:47 +0200
+Message-ID: <878sivx67g.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
@@ -65,215 +78,191 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Jon Doron <arilou@gmail.com> writes:
+Tianjia Zhang <tianjia.zhang@linux.alibaba.com> writes:
 
-> According to the TLFS a write to the EOM register by the guest
-> causes the hypervisor to scan for any pending messages and if there
-> are any it will try to deliver them.
+> In earlier versions of kvm, 'kvm_run' is an independent structure
+> and is not included in the vcpu structure. At present, 'kvm_run'
+> is already included in the vcpu structure, so the parameter
+> 'kvm_run' is redundant.
 >
-> To do this we must exit so any pending messages can be written.
+> This patch simplify the function definition, removes the extra
+> 'kvm_run' parameter, and extract it from the 'kvm_vcpu' structure
+> if necessary.
 >
-> Signed-off-by: Jon Doron <arilou@gmail.com>
-
-Roman says he's still with us so let's Cc: him.
-
+> Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
 > ---
->  arch/x86/include/asm/kvm_host.h |  1 +
->  arch/x86/kvm/hyperv.c           | 65 +++++++++++++++++++++++++++++----
->  arch/x86/kvm/hyperv.h           |  1 +
->  arch/x86/kvm/x86.c              |  5 +++
->  include/uapi/linux/kvm.h        |  1 +
->  5 files changed, 65 insertions(+), 8 deletions(-)
 >
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 42a2d0d3984a..048a1db488e2 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -548,6 +548,7 @@ struct kvm_vcpu_hv_synic {
->  	DECLARE_BITMAP(vec_bitmap, 256);
->  	bool active;
->  	bool dont_zero_synic_pages;
-> +	bool enable_eom_exit;
->  };
->  
->  /* Hyper-V per vcpu emulation context */
-> diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
-> index bcefa9d4e57e..7432f67b2746 100644
-> --- a/arch/x86/kvm/hyperv.c
-> +++ b/arch/x86/kvm/hyperv.c
-> @@ -186,6 +186,49 @@ static void kvm_hv_notify_acked_sint(struct kvm_vcpu *vcpu, u32 sint)
->  	srcu_read_unlock(&kvm->irq_srcu, idx);
+> v2 change:
+>   remove 'kvm_run' parameter and extract it from 'kvm_vcpu'
+>
+>  arch/mips/kvm/mips.c       |  3 ++-
+>  arch/powerpc/kvm/powerpc.c |  3 ++-
+>  arch/s390/kvm/kvm-s390.c   |  3 ++-
+>  arch/x86/kvm/x86.c         | 11 ++++++-----
+>  include/linux/kvm_host.h   |  2 +-
+>  virt/kvm/arm/arm.c         |  6 +++---
+>  virt/kvm/kvm_main.c        |  2 +-
+>  7 files changed, 17 insertions(+), 13 deletions(-)
+>
+> diff --git a/arch/mips/kvm/mips.c b/arch/mips/kvm/mips.c
+> index 8f05dd0a0f4e..ec24adf4857e 100644
+> --- a/arch/mips/kvm/mips.c
+> +++ b/arch/mips/kvm/mips.c
+> @@ -439,8 +439,9 @@ int kvm_arch_vcpu_ioctl_set_guest_debug(struct kvm_vcpu *vcpu,
+>  	return -ENOIOCTLCMD;
 >  }
 >  
-> +static int synic_read_msg(struct kvm_vcpu_hv_synic *synic, u32 sint,
-> +			  struct hv_message_header *msg)
-
-I'd suggest to rename this to 'synic_read_msg_hdr()' as we don't
-actually read the message here, just the header.
-
-> +{
-> +	struct kvm_vcpu *vcpu = synic_to_vcpu(synic);
-> +	int msg_off = offsetof(struct hv_message_page, sint_message[sint]);
-> +	gfn_t msg_page_gfn;
-> +	int r;
-> +
-> +	if (!(synic->msg_page & HV_SYNIC_SIMP_ENABLE))
-> +		return -ENOENT;
-> +
-> +	msg_page_gfn = synic->msg_page >> PAGE_SHIFT;
-> +
-> +	r = kvm_vcpu_read_guest_page(vcpu, msg_page_gfn, msg, msg_off,
-> +				     sizeof(*msg));
-> +	if (r < 0)
-> +		return r;
-> +
-> +	return 0;
-> +}
-> +
-> +static bool synic_should_exit_for_eom(struct kvm_vcpu_hv_synic *synic)
-
-'for_eom' or 'on_eom'?
-
-> +{
-> +	int i;
-> +
-> +	if (!synic->enable_eom_exit)
-> +		return false;
-> +
-> +	for (i = 0; i < ARRAY_SIZE(synic->sint); i++) {
-> +		struct hv_message_header hv_hdr;
-> +		/* If we failed to read from the msg slot then we treat this
-> +		 * msg slot as free */
-
-Coding style: multi-line comments should look like
-  /*
-   * line1
-   * line2
-   * ...
-   */
-
-> +		if (synic_read_msg(synic, i, &hv_hdr) < 0)
-> +			continue;
-> +
-> +		/* See if this msg slot has a pending message */
-> +		if (hv_hdr.message_flags.msg_pending == 1)
-> +			return true;
-> +	}
-> +
-> +	return false;
-> +}
-> +
->  static void synic_exit(struct kvm_vcpu_hv_synic *synic, u32 msr)
+> -int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
+> +int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
 >  {
->  	struct kvm_vcpu *vcpu = synic_to_vcpu(synic);
-> @@ -254,6 +297,9 @@ static int synic_set_msr(struct kvm_vcpu_hv_synic *synic,
+> +	struct kvm_run *run = vcpu->run;
+>  	int r = -EINTR;
 >  
->  		for (i = 0; i < ARRAY_SIZE(synic->sint); i++)
->  			kvm_hv_notify_acked_sint(vcpu, i);
-> +
-> +		if (!host && synic_should_exit_for_eom(synic))
-> +			synic_exit(synic, msr);
-
-Generally, message communication is not performance critical, however,
-we have synthetic timers and in case the new KVM_CAP_HYPERV_SYNIC_EOM
-cap is enabled we will be exiting to userspace for every timer
-expiration. This will measurably slow down the guest I'm afraid.
-
-Would it be possible to come up with an interface for userspace to tell
-KVM that it has a pending message for the guest and only exit to
-userspace in this case? Or maybe we need to queue all messages from
-userspace in KVM and deliver them when we get a chance and not exit to
-userspace at all?
-
->  		break;
->  	}
->  	case HV_X64_MSR_SINT0 ... HV_X64_MSR_SINT15:
-> @@ -571,8 +617,9 @@ static int synic_deliver_msg(struct kvm_vcpu_hv_synic *synic, u32 sint,
->  	struct hv_message_header hv_hdr;
+>  	vcpu_load(vcpu);
+> diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
+> index e15166b0a16d..7e24691e138a 100644
+> --- a/arch/powerpc/kvm/powerpc.c
+> +++ b/arch/powerpc/kvm/powerpc.c
+> @@ -1764,8 +1764,9 @@ int kvm_vcpu_ioctl_set_one_reg(struct kvm_vcpu *vcpu, struct kvm_one_reg *reg)
+>  	return r;
+>  }
+>  
+> -int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
+> +int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+>  {
+> +	struct kvm_run *run = vcpu->run;
 >  	int r;
 >  
-> -	if (!(synic->msg_page & HV_SYNIC_SIMP_ENABLE))
-> -		return -ENOENT;
-> +	r = synic_read_msg(synic, sint, &hv_hdr);
-> +	if (r < 0)
-> +		return r;
->  
->  	msg_page_gfn = synic->msg_page >> PAGE_SHIFT;
->  
-> @@ -582,12 +629,6 @@ static int synic_deliver_msg(struct kvm_vcpu_hv_synic *synic, u32 sint,
->  	 * is only called in vcpu context so the entire update is atomic from
->  	 * guest POV and thus the exact order here doesn't matter.
->  	 */
-> -	r = kvm_vcpu_read_guest_page(vcpu, msg_page_gfn, &hv_hdr.message_type,
-> -				     msg_off + offsetof(struct hv_message,
-> -							header.message_type),
-> -				     sizeof(hv_hdr.message_type));
-> -	if (r < 0)
-> -		return r;
->  
->  	if (hv_hdr.message_type != HVMSG_NONE) {
->  		if (no_retry)
-> @@ -785,6 +826,14 @@ int kvm_hv_activate_synic(struct kvm_vcpu *vcpu, bool dont_zero_synic_pages)
->  	return 0;
+>  	vcpu_load(vcpu);
+> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> index 19a81024fe16..443af3ead739 100644
+> --- a/arch/s390/kvm/kvm-s390.c
+> +++ b/arch/s390/kvm/kvm-s390.c
+> @@ -4333,8 +4333,9 @@ static void store_regs(struct kvm_vcpu *vcpu, struct kvm_run *kvm_run)
+>  		store_regs_fmt2(vcpu, kvm_run);
 >  }
 >  
-> +int kvm_hv_synic_enable_eom(struct kvm_vcpu *vcpu)
-> +{
-> +	struct kvm_vcpu_hv_synic *synic = vcpu_to_synic(vcpu);
-> +
-> +	synic->enable_eom_exit = true;
-> +	return 0;
-> +}
-> +
->  static bool kvm_hv_msr_partition_wide(u32 msr)
+> -int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *kvm_run)
+> +int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
 >  {
->  	bool r = false;
-> diff --git a/arch/x86/kvm/hyperv.h b/arch/x86/kvm/hyperv.h
-> index 757cb578101c..ff89f0ff103c 100644
-> --- a/arch/x86/kvm/hyperv.h
-> +++ b/arch/x86/kvm/hyperv.h
-> @@ -56,6 +56,7 @@ void kvm_hv_irq_routing_update(struct kvm *kvm);
->  int kvm_hv_synic_set_irq(struct kvm *kvm, u32 vcpu_id, u32 sint);
->  void kvm_hv_synic_send_eoi(struct kvm_vcpu *vcpu, int vector);
->  int kvm_hv_activate_synic(struct kvm_vcpu *vcpu, bool dont_zero_synic_pages);
-> +int kvm_hv_synic_enable_eom(struct kvm_vcpu *vcpu);
+> +	struct kvm_run *kvm_run = vcpu->run;
+>  	int rc;
 >  
->  void kvm_hv_vcpu_init(struct kvm_vcpu *vcpu);
->  void kvm_hv_vcpu_postcreate(struct kvm_vcpu *vcpu);
+>  	if (kvm_run->immediate_exit)
 > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 027dfd278a97..0def4ab31dc1 100644
+> index 3bf2ecafd027..a0338e86c90f 100644
 > --- a/arch/x86/kvm/x86.c
 > +++ b/arch/x86/kvm/x86.c
-> @@ -3350,6 +3350,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->  	case KVM_CAP_HYPERV_SPIN:
->  	case KVM_CAP_HYPERV_SYNIC:
->  	case KVM_CAP_HYPERV_SYNIC2:
-> +	case KVM_CAP_HYPERV_SYNIC_EOM:
->  	case KVM_CAP_HYPERV_VP_INDEX:
->  	case KVM_CAP_HYPERV_EVENTFD:
->  	case KVM_CAP_HYPERV_TLBFLUSH:
-> @@ -4209,6 +4210,10 @@ static int kvm_vcpu_ioctl_enable_cap(struct kvm_vcpu *vcpu,
->  		return -EINVAL;
+> @@ -8707,8 +8707,9 @@ static void kvm_put_guest_fpu(struct kvm_vcpu *vcpu)
+>  	trace_kvm_fpu(0);
+>  }
 >  
->  	switch (cap->cap) {
-> +	case KVM_CAP_HYPERV_SYNIC_EOM:
-> +		kvm_hv_synic_enable_eom(vcpu);
-> +		return 0;
-> +
->  	case KVM_CAP_HYPERV_SYNIC2:
->  		if (cap->args[0])
->  			return -EINVAL;
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index 428c7dde6b4b..78172ad156d8 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -1017,6 +1017,7 @@ struct kvm_ppc_resize_hpt {
->  #define KVM_CAP_S390_VCPU_RESETS 179
->  #define KVM_CAP_S390_PROTECTED 180
->  #define KVM_CAP_PPC_SECURE_GUEST 181
-> +#define KVM_CAP_HYPERV_SYNIC_EOM 182
+> -int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *kvm_run)
+> +int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+>  {
+> +	struct kvm_run *kvm_run = vcpu->run;
+>  	int r;
 >  
->  #ifdef KVM_CAP_IRQ_ROUTING
+>  	vcpu_load(vcpu);
+> @@ -8726,18 +8727,18 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *kvm_run)
+>  		r = -EAGAIN;
+>  		if (signal_pending(current)) {
+>  			r = -EINTR;
+> -			vcpu->run->exit_reason = KVM_EXIT_INTR;
+> +			kvm_run->exit_reason = KVM_EXIT_INTR;
+>  			++vcpu->stat.signal_exits;
+>  		}
+>  		goto out;
+>  	}
+>  
+> -	if (vcpu->run->kvm_valid_regs & ~KVM_SYNC_X86_VALID_FIELDS) {
+> +	if (kvm_run->kvm_valid_regs & ~KVM_SYNC_X86_VALID_FIELDS) {
+>  		r = -EINVAL;
+>  		goto out;
+>  	}
+>  
+> -	if (vcpu->run->kvm_dirty_regs) {
+> +	if (kvm_run->kvm_dirty_regs) {
+>  		r = sync_regs(vcpu);
+>  		if (r != 0)
+>  			goto out;
+> @@ -8767,7 +8768,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *kvm_run)
+>  
+>  out:
+>  	kvm_put_guest_fpu(vcpu);
+> -	if (vcpu->run->kvm_valid_regs)
+> +	if (kvm_run->kvm_valid_regs)
+>  		store_regs(vcpu);
+>  	post_kvm_run_save(vcpu);
+>  	kvm_sigset_deactivate(vcpu);
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index 6d58beb65454..1e17ef719595 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -866,7 +866,7 @@ int kvm_arch_vcpu_ioctl_set_mpstate(struct kvm_vcpu *vcpu,
+>  				    struct kvm_mp_state *mp_state);
+>  int kvm_arch_vcpu_ioctl_set_guest_debug(struct kvm_vcpu *vcpu,
+>  					struct kvm_guest_debug *dbg);
+> -int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *kvm_run);
+> +int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu);
+>  
+>  int kvm_arch_init(void *opaque);
+>  void kvm_arch_exit(void);
+> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+> index 48d0ec44ad77..f5390ac2165b 100644
+> --- a/virt/kvm/arm/arm.c
+> +++ b/virt/kvm/arm/arm.c
+> @@ -639,7 +639,6 @@ static void check_vcpu_requests(struct kvm_vcpu *vcpu)
+>  /**
+>   * kvm_arch_vcpu_ioctl_run - the main VCPU run function to execute guest code
+>   * @vcpu:	The VCPU pointer
+> - * @run:	The kvm_run structure pointer used for userspace state exchange
+>   *
+>   * This function is called through the VCPU_RUN ioctl called from user space. It
+>   * will execute VM code in a loop until the time slice for the process is used
+> @@ -647,8 +646,9 @@ static void check_vcpu_requests(struct kvm_vcpu *vcpu)
+>   * return with return value 0 and with the kvm_run structure filled in with the
+>   * required data for the requested emulation.
+>   */
+> -int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
+> +int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+>  {
+> +	struct kvm_run *run = vcpu->run;
+>  	int ret;
+>  
+>  	if (unlikely(!kvm_vcpu_initialized(vcpu)))
+> @@ -659,7 +659,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
+>  		return ret;
+>  
+>  	if (run->exit_reason == KVM_EXIT_MMIO) {
+> -		ret = kvm_handle_mmio_return(vcpu, vcpu->run);
+> +		ret = kvm_handle_mmio_return(vcpu, run);
+
+I don't know much about ARM but this also seems redundant,
+kvm_handle_mmio_return() is also able to extruct 'struct kvm_run' from'
+'struct kvm_vcpu'. This likely deserves it's own patch though.
+
+>  		if (ret)
+>  			return ret;
+>  	}
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 74bdb7bf3295..e18faea89146 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -3135,7 +3135,7 @@ static long kvm_vcpu_ioctl(struct file *filp,
+>  				synchronize_rcu();
+>  			put_pid(oldpid);
+>  		}
+> -		r = kvm_arch_vcpu_ioctl_run(vcpu, vcpu->run);
+> +		r = kvm_arch_vcpu_ioctl_run(vcpu);
+>  		trace_kvm_userspace_exit(vcpu->run->exit_reason, r);
+>  		break;
+>  	}
+
+Looked at non-x86 arches just briefly but there seems to be no
+controversy here, so
+
+Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 
 -- 
 Vitaly
