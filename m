@@ -2,129 +2,176 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 13AEB1AC6DE
-	for <lists+kvm@lfdr.de>; Thu, 16 Apr 2020 16:46:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 72FF11AC70F
+	for <lists+kvm@lfdr.de>; Thu, 16 Apr 2020 16:48:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2394637AbgDPOpx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Apr 2020 10:45:53 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:58340 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729317AbgDPOp1 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 16 Apr 2020 10:45:27 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 03GEX89v008445;
-        Thu, 16 Apr 2020 10:45:25 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 30es39gpfb-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 16 Apr 2020 10:45:24 -0400
-Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 03GEZPSe016131;
-        Thu, 16 Apr 2020 10:45:24 -0400
-Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.11])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 30es39gpew-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 16 Apr 2020 10:45:24 -0400
-Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
-        by ppma03dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 03GEeRs4003771;
-        Thu, 16 Apr 2020 14:45:23 GMT
-Received: from b01cxnp23032.gho.pok.ibm.com (b01cxnp23032.gho.pok.ibm.com [9.57.198.27])
-        by ppma03dal.us.ibm.com with ESMTP id 30b5h7dqmd-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 16 Apr 2020 14:45:23 +0000
-Received: from b01ledav004.gho.pok.ibm.com (b01ledav004.gho.pok.ibm.com [9.57.199.109])
-        by b01cxnp23032.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 03GEjLJW52101412
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 16 Apr 2020 14:45:21 GMT
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C64C4112061;
-        Thu, 16 Apr 2020 14:45:20 +0000 (GMT)
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 57650112070;
-        Thu, 16 Apr 2020 14:45:20 +0000 (GMT)
-Received: from cpe-172-100-172-46.stny.res.rr.com (unknown [9.85.128.208])
-        by b01ledav004.gho.pok.ibm.com (Postfix) with ESMTP;
-        Thu, 16 Apr 2020 14:45:20 +0000 (GMT)
-Subject: Re: [PATCH v7 04/15] s390/vfio-ap: implement in-use callback for
- vfio_ap driver
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, freude@linux.ibm.com, borntraeger@de.ibm.com,
-        mjrosato@linux.ibm.com, pmorel@linux.ibm.com, pasic@linux.ibm.com,
-        alex.williamson@redhat.com, kwankhede@nvidia.com,
-        jjherne@linux.ibm.com, fiuczy@linux.ibm.com
-References: <20200407192015.19887-1-akrowiak@linux.ibm.com>
- <20200407192015.19887-5-akrowiak@linux.ibm.com>
- <20200416131845.3ef6b3b5.cohuck@redhat.com>
-From:   Tony Krowiak <akrowiak@linux.ibm.com>
-Message-ID: <5cf7d611-e30c-226d-0d3d-d37170f117f4@linux.ibm.com>
-Date:   Thu, 16 Apr 2020 10:45:20 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+        id S2394701AbgDPOs5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Apr 2020 10:48:57 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:48026 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S2394731AbgDPOsg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Apr 2020 10:48:36 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1587048514;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=mMOcvd8rqB/SDYGbEUATBrqiayoKdChDgtyzI2z56+k=;
+        b=UVJx2OR+meyOb/Ig6XgRKZ+1G3olHpQdZEzuKPGNKMmKu+XiwcyapyhpCcdAus0Ubg310U
+        kP/m9ebgHY8BFQ2kMNeQAMkFZob/VXU2NZI2Do8K/C3xPtsR8lIIUTQ4uBsr+x9V+zMgA4
+        mjmRdTNah+cKwyFmNyxb6ZhzKC/tvs0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-458-Le46VK3hP4KmFRFu2epPvQ-1; Thu, 16 Apr 2020 10:48:29 -0400
+X-MC-Unique: Le46VK3hP4KmFRFu2epPvQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5360E85EE81;
+        Thu, 16 Apr 2020 14:48:12 +0000 (UTC)
+Received: from w520.home (ovpn-112-162.phx2.redhat.com [10.3.112.162])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 9CDFE5C1C5;
+        Thu, 16 Apr 2020 14:48:11 +0000 (UTC)
+Date:   Thu, 16 Apr 2020 08:48:11 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     "Liu, Yi L" <yi.l.liu@intel.com>
+Cc:     "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "Tian, Jun J" <jun.j.tian@intel.com>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Sun, Yi Y" <yi.y.sun@intel.com>, "Wu, Hao" <hao.wu@intel.com>
+Subject: Re: [PATCH v1 7/8] vfio/type1: Add VFIO_IOMMU_CACHE_INVALIDATE
+Message-ID: <20200416084811.5acf4424@w520.home>
+In-Reply-To: <20200416084031.7266ad40@w520.home>
+References: <1584880325-10561-1-git-send-email-yi.l.liu@intel.com>
+        <1584880325-10561-8-git-send-email-yi.l.liu@intel.com>
+        <20200402142428.2901432e@w520.home>
+        <AADFC41AFE54684AB9EE6CBC0274A5D19D807C4A@SHSMSX104.ccr.corp.intel.com>
+        <20200403093436.094b1928@w520.home>
+        <A2975661238FB949B60364EF0F2C25743A231BAA@SHSMSX104.ccr.corp.intel.com>
+        <20200416084031.7266ad40@w520.home>
 MIME-Version: 1.0
-In-Reply-To: <20200416131845.3ef6b3b5.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.676
- definitions=2020-04-16_05:2020-04-14,2020-04-16 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 spamscore=0
- priorityscore=1501 mlxscore=0 bulkscore=0 phishscore=0 impostorscore=0
- lowpriorityscore=0 clxscore=1015 suspectscore=3 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2004160105
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Thu, 16 Apr 2020 08:40:31 -0600
+Alex Williamson <alex.williamson@redhat.com> wrote:
 
+> On Thu, 16 Apr 2020 10:40:03 +0000
+> "Liu, Yi L" <yi.l.liu@intel.com> wrote:
+> 
+> > Hi Alex,
+> > Still have a direction question with you. Better get agreement with you
+> > before heading forward.
+> >   
+> > > From: Alex Williamson <alex.williamson@redhat.com>
+> > > Sent: Friday, April 3, 2020 11:35 PM    
+> > [...]  
+> > > > > > + *
+> > > > > > + * returns: 0 on success, -errno on failure.
+> > > > > > + */
+> > > > > > +struct vfio_iommu_type1_cache_invalidate {
+> > > > > > +	__u32   argsz;
+> > > > > > +	__u32   flags;
+> > > > > > +	struct	iommu_cache_invalidate_info cache_info;
+> > > > > > +};
+> > > > > > +#define VFIO_IOMMU_CACHE_INVALIDATE      _IO(VFIO_TYPE,    
+> > > VFIO_BASE    
+> > > > > + 24)
+> > > > >
+> > > > > The future extension capabilities of this ioctl worry me, I wonder if
+> > > > > we should do another data[] with flag defining that data as CACHE_INFO.    
+> > > >
+> > > > Can you elaborate? Does it mean with this way we don't rely on iommu
+> > > > driver to provide version_to_size conversion and instead we just pass
+> > > > data[] to iommu driver for further audit?    
+> > > 
+> > > No, my concern is that this ioctl has a single function, strictly tied
+> > > to the iommu uapi.  If we replace cache_info with data[] then we can
+> > > define a flag to specify that data[] is struct
+> > > iommu_cache_invalidate_info, and if we need to, a different flag to
+> > > identify data[] as something else.  For example if we get stuck
+> > > expanding cache_info to meet new demands and develop a new uapi to
+> > > solve that, how would we expand this ioctl to support it rather than
+> > > also create a new ioctl?  There's also a trade-off in making the ioctl
+> > > usage more difficult for the user.  I'd still expect the vfio layer to
+> > > check the flag and interpret data[] as indicated by the flag rather
+> > > than just passing a blob of opaque data to the iommu layer though.
+> > > Thanks,    
+> > 
+> > Based on your comments about defining a single ioctl and a unified
+> > vfio structure (with a @data[] field) for pasid_alloc/free, bind/
+> > unbind_gpasid, cache_inv. After some offline trying, I think it would
+> > be good for bind/unbind_gpasid and cache_inv as both of them use the
+> > iommu uapi definition. While the pasid alloc/free operation doesn't.
+> > It would be weird to put all of them together. So pasid alloc/free
+> > may have a separate ioctl. It would look as below. Does this direction
+> > look good per your opinion?
+> > 
+> > ioctl #22: VFIO_IOMMU_PASID_REQUEST
+> > /**
+> >   * @pasid: used to return the pasid alloc result when flags == ALLOC_PASID
+> >   *         specify a pasid to be freed when flags == FREE_PASID
+> >   * @range: specify the allocation range when flags == ALLOC_PASID
+> >   */
+> > struct vfio_iommu_pasid_request {
+> > 	__u32	argsz;
+> > #define VFIO_IOMMU_ALLOC_PASID	(1 << 0)
+> > #define VFIO_IOMMU_FREE_PASID	(1 << 1)
+> > 	__u32	flags;
+> > 	__u32	pasid;
+> > 	struct {
+> > 		__u32	min;
+> > 		__u32	max;
+> > 	} range;
+> > };  
+> 
+> Can't the ioctl return the pasid valid on alloc (like GET_DEVICE_FD)?
 
-On 4/16/20 7:18 AM, Cornelia Huck wrote:
-> On Tue,  7 Apr 2020 15:20:04 -0400
-> Tony Krowiak <akrowiak@linux.ibm.com> wrote:
->
->> Let's implement the callback to indicate when an APQN
->> is in use by the vfio_ap device driver. The callback is
->> invoked whenever a change to the apmask or aqmask would
->> result in one or more queue devices being removed from the driver. The
->> vfio_ap device driver will indicate a resource is in use
->> if the APQN of any of the queue devices to be removed are assigned to
->> any of the matrix mdevs under the driver's control.
->>
->> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
->> ---
->>   drivers/s390/crypto/vfio_ap_drv.c     |  1 +
->>   drivers/s390/crypto/vfio_ap_ops.c     | 47 +++++++++++++++++----------
->>   drivers/s390/crypto/vfio_ap_private.h |  2 ++
->>   3 files changed, 33 insertions(+), 17 deletions(-)
->> @@ -1369,3 +1371,14 @@ void vfio_ap_mdev_remove_queue(struct ap_queue *queue)
->>   	kfree(q);
->>   	mutex_unlock(&matrix_dev->lock);
->>   }
->> +
->> +bool vfio_ap_mdev_resource_in_use(unsigned long *apm, unsigned long *aqm)
->> +{
->> +	bool in_use;
->> +
->> +	mutex_lock(&matrix_dev->lock);
->> +	in_use = vfio_ap_mdev_verify_no_sharing(NULL, apm, aqm) ? true : false;
-> Maybe
->
-> in_use = !!vfio_ap_mdev_verify_no_sharing(NULL, apm, aqm);
->
-> ?
+s/valid/value/
 
-To be honest, I find the !! expression very confusing. Every time I see 
-it, I have
-to spend time thinking about what the result of !! is going to be. I think
-the statement should be left as-is because it more clearly expresses
-the intent.
-
->
->> +	mutex_unlock(&matrix_dev->lock);
->> +
->> +	return in_use;
->> +}
+> Would it be useful to support freeing a range of pasids?  If so then we
+> could simply use range for both, ie. allocate a pasid from this range
+> and return it, or free all pasids in this range?  vfio already needs to
+> track pasids to free them on release, so presumably this is something
+> we could support easily.
+>  
+> > ioctl #23: VFIO_IOMMU_NESTING_OP
+> > struct vfio_iommu_type1_nesting_op {
+> > 	__u32	argsz;
+> > 	__u32	flags;
+> > 	__u32	op;
+> > 	__u8	data[];
+> > };  
+> 
+> data only has 4-byte alignment, I think we really want it at an 8-byte
+> alignment.  This is why I embedded the "op" into the flag for
+> DEVICE_FEATURE.  Thanks,
+> 
+> Alex
+> 
+> > 
+> > /* Nesting Ops */
+> > #define VFIO_IOMMU_NESTING_OP_BIND_PGTBL        0
+> > #define VFIO_IOMMU_NESTING_OP_UNBIND_PGTBL      1
+> > #define VFIO_IOMMU_NESTING_OP_CACHE_INVLD       2
+> >  
+> > Thanks,
+> > Yi Liu
+> >   
+> 
+> _______________________________________________
+> iommu mailing list
+> iommu@lists.linux-foundation.org
+> https://lists.linuxfoundation.org/mailman/listinfo/iommu
+> 
 
