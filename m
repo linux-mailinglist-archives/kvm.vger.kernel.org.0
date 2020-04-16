@@ -2,58 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 858491AD1CF
-	for <lists+kvm@lfdr.de>; Thu, 16 Apr 2020 23:17:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B0E711AD1EE
+	for <lists+kvm@lfdr.de>; Thu, 16 Apr 2020 23:34:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729228AbgDPVR4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Apr 2020 17:17:56 -0400
-Received: from mail.dsns.gov.ua ([194.0.148.99]:50024 "EHLO mail.dsns.gov.ua"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725779AbgDPVRz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Apr 2020 17:17:55 -0400
-X-Greylist: delayed 1434 seconds by postgrey-1.27 at vger.kernel.org; Thu, 16 Apr 2020 17:17:53 EDT
-Received: from localhost (localhost [127.0.0.1])
-        by mail.dsns.gov.ua (Postfix) with ESMTP id CF8B91EC7FDD;
-        Thu, 16 Apr 2020 23:34:17 +0300 (EEST)
-Received: from mail.dsns.gov.ua ([127.0.0.1])
-        by localhost (mail.dsns.gov.ua [127.0.0.1]) (amavisd-new, port 10032)
-        with ESMTP id us4gpon-4vOO; Thu, 16 Apr 2020 23:34:17 +0300 (EEST)
-Received: from localhost (localhost [127.0.0.1])
-        by mail.dsns.gov.ua (Postfix) with ESMTP id 868A11EC7FC4;
-        Thu, 16 Apr 2020 23:34:13 +0300 (EEST)
-DKIM-Filter: OpenDKIM Filter v2.10.3 mail.dsns.gov.ua 868A11EC7FC4
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dsns.gov.ua;
-        s=1E60DAC0-2607-11E9-81E6-7A77C2B36653; t=1587069253;
-        bh=47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=;
-        h=Date:From:Message-ID:MIME-Version;
-        b=ymI4MgA3qk8RLjWbWBrmtSVxWRGW3PosSezQUTFBTNhA7a6p49oIlOoxNpJ+fSIdo
-         V4INCbgzoWl8xkq8WWctdQfhYMQE6dHAqZH8TkrvB82ZFNckrP9V/1nTkCN+v/V77h
-         FhP6XmKEgaUx79nKKdVRG3nu6TsgcB1nLu6sYm9IpEWkwHG11iOt+U5VVl462BtXWk
-         HLGO3Sut3qWExT1Nr7hp8oJnIKKTOZ4VoQiL2TYq2FVETJHW6Zgg0WeRD011jkotJe
-         M2EqEeyXkdNFnc4COWAGa6yx3vvzz8WKi+Ve5cw7AKIYGTyHZV7oHtqniwplj3jrB+
-         zctOMMQdBIXKQ==
-X-Virus-Scanned: amavisd-new at dsns.gov.ua
-Received: from mail.dsns.gov.ua ([127.0.0.1])
-        by localhost (mail.dsns.gov.ua [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id PpudWXtJH1m9; Thu, 16 Apr 2020 23:34:13 +0300 (EEST)
-Received: from mail.dsns.gov.ua (localhost [127.0.0.1])
-        by mail.dsns.gov.ua (Postfix) with ESMTP id 674721EC7F5D;
-        Thu, 16 Apr 2020 23:34:05 +0300 (EEST)
-Date:   Thu, 16 Apr 2020 23:34:05 +0300 (EEST)
-From:   Saleem Netanyahu <duchenko@dsns.gov.ua>
-Reply-To: Saleem Netanyahu <saleemnetu@gmail.com>
-Message-ID: <1765291695.717827.1587069245331.JavaMail.zimbra@dsns.gov.ua>
-Subject: Hey, how are u, can we talk?
+        id S1727937AbgDPVeI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Apr 2020 17:34:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46886 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725843AbgDPVeG (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 16 Apr 2020 17:34:06 -0400
+Received: from mail-io1-xd41.google.com (mail-io1-xd41.google.com [IPv6:2607:f8b0:4864:20::d41])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2EFCC061A0C
+        for <kvm@vger.kernel.org>; Thu, 16 Apr 2020 14:34:06 -0700 (PDT)
+Received: by mail-io1-xd41.google.com with SMTP id f3so83049ioj.1
+        for <kvm@vger.kernel.org>; Thu, 16 Apr 2020 14:34:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=+TPezPECUKOwAGB1jeVzVXF9iCR+5ADFws6BKwwbizc=;
+        b=L8ZHdAigb7rztBqPmzv1Wr3oBMfKTeVUJzOlwoAqCki5iP/+Ph2qQ9QmvsqjiI78wr
+         b8mcyDA7M5AEGBxKnri7090GioBy7YcYX+/fA7E8SbfvXVQMBoOGei6QFiNFV6pbmGhx
+         URtmXYhIyBHa9vnqaQF+WHenD3KJBKa+ltxSijIDFsvwdkylsah1fiJgbM52NL0AiUsn
+         91ccjFMOSucVrljfbPpVeflKDDCJ7EeMKO7ZPYpfa+ZkG0iHLbI0Eevud4VnJcGtvv7b
+         +eI0hi9/OPbZjUsChCJSiQTCK0g0OPdCoPNbNExx4hSnpad/bK2lAdbQ62l5z/g4qAvb
+         P9gQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=+TPezPECUKOwAGB1jeVzVXF9iCR+5ADFws6BKwwbizc=;
+        b=Gm8H6l3GpsqUhAQG+qjghNtZnvRCrinGLABJ94w7hypIwR83UcUvA1xzFnOwavxOBl
+         /b1GqIpJFaaAxfIG+aztZwReZq3FGrL6CRkLgfldMtO27/dr7dJpnKYlviH7sNCx4bNK
+         TnAChumT5XZM3yvvjW2AyiSoI8uvnN24vY0JJEVkG19QJanIYRntGUMhHUV3JKYysGdv
+         OOx+BcenQaAEObcXyjgCz4hUmNS3s+/ewN/rQtw+5jSNJpl9Yil2AUJ28sGfQkZpDZkY
+         bxfHoWTpmcYXrNUfukhIkkidt/uUClIyyntIFlVG38sYfNKX0uR4IGxG+XOKxXUVQhjO
+         W/DQ==
+X-Gm-Message-State: AGi0PuYPFVTd7ziNIzN6OfiQIY2fdPkm3pBz2Z/+eCgip/OAc1En2VUX
+        Mmta5Usbq1xgqGgN7C1eQWJtrvCKIfDIouZ0hG+rQqEyfpY=
+X-Google-Smtp-Source: APiQypLrnL64Nsr0s40zEsJnABAfQ/0uJW+UGGpZoZyX9B3baRbF2EyT+Oszief9+BiZgV4RwH5jr0uQTlTp/BL11Ow=
+X-Received: by 2002:a5e:a610:: with SMTP id q16mr590633ioi.75.1587072845762;
+ Thu, 16 Apr 2020 14:34:05 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [45.82.223.36, 172.69.54.54]
-X-Mailer: Zimbra 8.8.15_GA_3918 (zclient/8.8.15_GA_3918)
-Thread-Index: KwarH8JSzy20mIHPGimLdYGnC/mIwA==
-Thread-Topic: Hey, how are u, can we talk?
-To:     unlisted-recipients:; (no To-header on input)
+References: <20200415214414.10194-1-sean.j.christopherson@intel.com> <20200415214414.10194-2-sean.j.christopherson@intel.com>
+In-Reply-To: <20200415214414.10194-2-sean.j.christopherson@intel.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Thu, 16 Apr 2020 14:33:54 -0700
+Message-ID: <CALMp9eTaLwj7kXgvACFQ_42+F7pnOvaAd02_2o4tG2fX5+JQaQ@mail.gmail.com>
+Subject: Re: [PATCH 1/2] KVM: x86/mmu: Set @writable to false for non-visible
+ accesses by L2
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Rick Edgecombe <rick.p.edgecombe@intel.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Wed, Apr 15, 2020 at 2:44 PM Sean Christopherson
+<sean.j.christopherson@intel.com> wrote:
+>
+> Explicitly set @writable to false in try_async_pf() if the GFN->PFN
+> translation is short-circuited due to the requested GFN not being
+> visible to L2.
+>
+> Leaving @writable ('map_writable' in the callers) uninitialized is ok
+> in that it's never actually consumed, but one has to track it all the
+> way through set_spte() being short-circuited by set_mmio_spte() to
+> understand that the uninitialized variable is benign, and relying on
+> @writable being ignored is an unnecessary risk.  Explicitly setting
+> @writable also aligns try_async_pf() with __gfn_to_pfn_memslot().
+>
+> Jim Mattson <jmattson@google.com>
+Go ahead and preface the above with Reviewed-by:
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> ---
+>  arch/x86/kvm/mmu/mmu.c | 1 +
+>  1 file changed, 1 insertion(+)
+>
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index c6ea6032c222..6d6cb9416179 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -4090,6 +4090,7 @@ static bool try_async_pf(struct kvm_vcpu *vcpu, bool prefault, gfn_t gfn,
+>          */
+>         if (is_guest_mode(vcpu) && !kvm_is_visible_gfn(vcpu->kvm, gfn)) {
+>                 *pfn = KVM_PFN_NOSLOT;
+> +               *writable = false;
+>                 return false;
+>         }
+>
+> --
+> 2.26.0
+>
