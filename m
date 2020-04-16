@@ -2,107 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9EB5E1ABC33
-	for <lists+kvm@lfdr.de>; Thu, 16 Apr 2020 11:09:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 03D191ABCAB
+	for <lists+kvm@lfdr.de>; Thu, 16 Apr 2020 11:21:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2503462AbgDPJJN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Apr 2020 05:09:13 -0400
-Received: from out30-44.freemail.mail.aliyun.com ([115.124.30.44]:48118 "EHLO
-        out30-44.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2503327AbgDPJJA (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 16 Apr 2020 05:09:00 -0400
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R101e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04394;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=36;SR=0;TI=SMTPD_---0TvhGIdK_1587028131;
-Received: from 30.27.118.45(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0TvhGIdK_1587028131)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Thu, 16 Apr 2020 17:08:53 +0800
-Subject: Re: [PATCH v2] KVM: Optimize kvm_arch_vcpu_ioctl_run function
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     Marc Zyngier <maz@kernel.org>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-mips@vger.kernel.org, kvm-ppc@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, pbonzini@redhat.com,
-        tsbogend@alpha.franken.de, paulus@ozlabs.org, mpe@ellerman.id.au,
-        benh@kernel.crashing.org, borntraeger@de.ibm.com,
-        frankja@linux.ibm.com, david@redhat.com, heiko.carstens@de.ibm.com,
-        gor@linux.ibm.com, sean.j.christopherson@intel.com,
-        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, x86@kernel.org,
-        hpa@zytor.com, james.morse@arm.com, julien.thierry.kdev@gmail.com,
-        suzuki.poulose@arm.com, christoffer.dall@arm.com,
-        peterx@redhat.com, thuth@redhat.com
-References: <20200416051057.26526-1-tianjia.zhang@linux.alibaba.com>
- <878sivx67g.fsf@vitty.brq.redhat.com>
- <1000159f971a6fa3b5bd9e5871ce4d82@kernel.org>
- <8b92fb5b-5138-0695-fb90-6c36b8dfad00@linux.alibaba.com>
- <20200416105019.51191d79.cohuck@redhat.com>
-From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-Message-ID: <668a12b9-eda5-2d42-95f9-8d5e2990a465@linux.alibaba.com>
-Date:   Thu, 16 Apr 2020 17:08:51 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+        id S2440174AbgDPJTN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Apr 2020 05:19:13 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:32107 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S2392129AbgDPJTD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Apr 2020 05:19:03 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1587028740;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=3UAzo5xnlnsk6DxsjAuNLPe6hkLDWjM29CuriEr8TxM=;
+        b=GgsIIWwn5GUZzy9z6d+Lx7yNaNeDleIOwU5uiThjw8pthsNjyBY52L1uVANQg5oXCXyJnZ
+        pe+I7ssZmdyjY4BQZBZWVOna7cS2nNz0G4PM/JLIYdfEOJTPHqDgw2jB/AobyP6ASq8jEV
+        d1DCejxlZD+QIXij4Lt7SFvFzGPzE78=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-353-YwbvOtKLPtSWrds54_KMkA-1; Thu, 16 Apr 2020 05:18:59 -0400
+X-MC-Unique: YwbvOtKLPtSWrds54_KMkA-1
+Received: by mail-wr1-f69.google.com with SMTP id p16so1391112wro.16
+        for <kvm@vger.kernel.org>; Thu, 16 Apr 2020 02:18:59 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=3UAzo5xnlnsk6DxsjAuNLPe6hkLDWjM29CuriEr8TxM=;
+        b=oF/weFJVPFUt3Rh+P5xF0xOVE4oy4Xkt1PTgEmIAAvPSjZ3eLflovG3PT9IpWLQaPQ
+         dqbs7nrC6/eEwo/T4wKInToxQXgNW2dI5l/zkgYHNyyuicvqqS2u8nfD/Mgo+A8avhDQ
+         VJnZsnmLRJGgJQpLE1PAspObJbdn2cJq2lyP7pzNlLeIPmGM8omYaYMXPv3KbNJmgZiz
+         7roIFxQ8WOVTuQasMJz5y9XQvJGY2Vf1M8h5Lj+NnTLKoNgk3IeF9w5vDrEKFmKFIKf/
+         Mx/8YIlcgSKxzkj74h30Jq6oIKJVRjOfgHvBxUnKkfQoF5URQflDFBQ2OptnJXOExuKG
+         3BXg==
+X-Gm-Message-State: AGi0PuakzFR0n+H7wBiAllC1R8L4yqIuVrZHTtlajsXOFXjZsbrhq2GJ
+        8/pPCygar8efty0LWPjPsEGgqrrImFGh1hIPxCnsof5XTR8JVpih0STR51RDstCcWElRmut3Ta/
+        wT2ae+7y7qFRo
+X-Received: by 2002:a7b:ce89:: with SMTP id q9mr4064110wmj.185.1587028737978;
+        Thu, 16 Apr 2020 02:18:57 -0700 (PDT)
+X-Google-Smtp-Source: APiQypIR7cq4Cm2xEbsMV0hmO9J2nFWh0TGC7aQmaeO8Hr5HV65EJtjAjDDgoXPF/yvpV+luAHpdew==
+X-Received: by 2002:a7b:ce89:: with SMTP id q9mr4064089wmj.185.1587028737767;
+        Thu, 16 Apr 2020 02:18:57 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:59f3:e385:f957:c478? ([2001:b07:6468:f312:59f3:e385:f957:c478])
+        by smtp.gmail.com with ESMTPSA id s14sm2803325wmh.18.2020.04.16.02.18.56
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 16 Apr 2020 02:18:57 -0700 (PDT)
+Subject: Re: [PATCH 1/2 v2] KVM: nVMX: KVM needs to unset "unrestricted guest"
+ VM-execution control in vmcs02 if vmcs12 doesn't set it
+To:     Jim Mattson <jmattson@google.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Krish Sadhukhan <krish.sadhukhan@oracle.com>,
+        kvm list <kvm@vger.kernel.org>
+References: <20200415183047.11493-1-krish.sadhukhan@oracle.com>
+ <20200415183047.11493-2-krish.sadhukhan@oracle.com>
+ <20200415193016.GF30627@linux.intel.com>
+ <CALMp9eRvZEzi3Ug0fL=ekMS_Weni6npwW+bXrJZjU8iLrppwEg@mail.gmail.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <0b8bd238-e60f-b392-e793-0d88fb876224@redhat.com>
+Date:   Thu, 16 Apr 2020 11:18:57 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200416105019.51191d79.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <CALMp9eRvZEzi3Ug0fL=ekMS_Weni6npwW+bXrJZjU8iLrppwEg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 15/04/20 22:18, Jim Mattson wrote:
+>> Has anyone worked through all the flows to verify this won't break any
+>> assumptions with respect to enable_unrestricted_guest?  I would be
+>> (pleasantly) surprised if this was sufficient to run L2 without
+>> unrestricted guest when it's enabled for L1, e.g. vmx_set_cr0() looks
+>> suspect.
+> 
+> I think you're right to be concerned.
 
+Thirded, but it shouldn't be too hard.  Basically,
+enable_unrestricted_guest must be moved into loaded_vmcs for this to
+work.  It may be more work to write the test cases for L2 real mode <->
+protected mode switch, which do not entirely fit into the vmx_tests.c
+framework (but with the v2 tests it should not be hard to adapt).
 
-On 2020/4/16 16:50, Cornelia Huck wrote:
-> On Thu, 16 Apr 2020 16:45:33 +0800
-> Tianjia Zhang <tianjia.zhang@linux.alibaba.com> wrote:
-> 
->> On 2020/4/16 16:28, Marc Zyngier wrote:
->>> On 2020-04-16 08:03, Vitaly Kuznetsov wrote:
->>>> Tianjia Zhang <tianjia.zhang@linux.alibaba.com> writes:
->>>>   
->>>>> In earlier versions of kvm, 'kvm_run' is an independent structure
->>>>> and is not included in the vcpu structure. At present, 'kvm_run'
->>>>> is already included in the vcpu structure, so the parameter
->>>>> 'kvm_run' is redundant.
->>>>>
->>>>> This patch simplify the function definition, removes the extra
->>>>> 'kvm_run' parameter, and extract it from the 'kvm_vcpu' structure
->>>>> if necessary.
->>>>>
->>>>> Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
->>>>> ---
->>>>>
->>>>> v2 change:
->>>>>    remove 'kvm_run' parameter and extract it from 'kvm_vcpu'
->>>>>
->>>>>   arch/mips/kvm/mips.c       |  3 ++-
->>>>>   arch/powerpc/kvm/powerpc.c |  3 ++-
->>>>>   arch/s390/kvm/kvm-s390.c   |  3 ++-
->>>>>   arch/x86/kvm/x86.c         | 11 ++++++-----
->>>>>   include/linux/kvm_host.h   |  2 +-
->>>>>   virt/kvm/arm/arm.c         |  6 +++---
->>>>>   virt/kvm/kvm_main.c        |  2 +-
->>>>>   7 files changed, 17 insertions(+), 13 deletions(-)
-> 
->>> Overall, there is a large set of cleanups to be done when both the vcpu
->>> and the run
->>> structures are passed as parameters at the same time. Just grepping the
->>> tree for
->>> kvm_run is pretty instructive.
->>>
->>>           M.
->>
->> Sorry, it's my mistake, I only compiled the x86 platform, I will submit
->> patch again.
-> 
-> I think it's completely fine (and even preferable) to do cleanups like
-> that on top.
-> 
-> [FWIW, I compiled s390 here.]
-> 
+Paolo
 
-Very good, I will do a comprehensive cleanup of this type of code.
-
-Thanks,
-Tianjia
