@@ -2,120 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9202E1AD02C
-	for <lists+kvm@lfdr.de>; Thu, 16 Apr 2020 21:12:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 858491AD1CF
+	for <lists+kvm@lfdr.de>; Thu, 16 Apr 2020 23:17:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730199AbgDPTMW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Apr 2020 15:12:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53112 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727926AbgDPTMS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Apr 2020 15:12:18 -0400
-Received: from mail-qt1-x84a.google.com (mail-qt1-x84a.google.com [IPv6:2607:f8b0:4864:20::84a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CAD74C061A0C
-        for <kvm@vger.kernel.org>; Thu, 16 Apr 2020 12:12:18 -0700 (PDT)
-Received: by mail-qt1-x84a.google.com with SMTP id g55so20184328qtk.14
-        for <kvm@vger.kernel.org>; Thu, 16 Apr 2020 12:12:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=akfUqnFcHbR4ypUK0waDS6vSsDmt70xk58DkBEhixQg=;
-        b=do1iupJTFmsxaH3hlHdr4r/sVdtkohH+o2zKk5OnjDlNtdtq3IgMnNQa8oe9bE9tZk
-         T7mxam+uL1lKWTS8eclSdD7tNmxvzRuDzLNZvuzmBY2aoNC1RfGeZKXD/EBeuzFzfWIr
-         WJZHHWVuGV/SQF4RzrES/bJXAM4lLssSGx4Ijqqa7pY431PrVSte603yTzBazwmOOy53
-         Dg9NPpvOUyl+7bSOHXZSLJKN9qN0YpEVLIZrVCuHHAipr+4tm5tVqHqFuiUbpTofL1cE
-         +92D4EfDi2Egn+PC7ABAi7lUqTDDkEKceV3jg+kju8Mw+tV08GZ10XV89Fi9XWU7/tHb
-         prQA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=akfUqnFcHbR4ypUK0waDS6vSsDmt70xk58DkBEhixQg=;
-        b=Jz1TZ8yf/kCRlxDDsAFQe4PaaWWTCiS87U+NeIMk2T/l/bI1I5zahrtxMtOkouOQ26
-         WcQbi4+nrhla+NkoXEZDrIY8NESN5v0Kv4LPAjrspkvb3UzyX7xB9GVg+b02pjo1d3+A
-         lgXnTF3dAD6Ds9Ond6Mhp7yWNomiQVW+i8X4esjIx5wVbBJuKKnGllMmeqsm7BUan4YT
-         wC/iOF8PI5n38yIngTEUwMUtAgNQj5r5yTi/IkgRBgscaAbNCUTkL6LxumVgEQqf832q
-         2lwkimSKkDtGtoJsJ4Q5j8elFH8xYeSZkZaUGRrnr62YuEWztJHp4mIDt+h5q8OanrLD
-         nsNQ==
-X-Gm-Message-State: AGi0Pub3aJ0JEtaBsbAU9TGDpGx33FWogaDfG7tF3k0AF31+JTp97qZB
-        te6Y4QciXzZCVFlPwzY9J8HiFrz9xqMTVQ==
-X-Google-Smtp-Source: APiQypLttKT3SWY83gbGGp6Kj1Y4LsKg53UpN8WjCnn4NxYVGBQ/lOGRM1gn8dXlfLwC/TTmCRtAPeP7DJHcuw==
-X-Received: by 2002:ad4:5546:: with SMTP id v6mr12063970qvy.11.1587064337976;
- Thu, 16 Apr 2020 12:12:17 -0700 (PDT)
-Date:   Thu, 16 Apr 2020 12:11:52 -0700
-Message-Id: <20200416191152.259434-1-jcargill@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.26.1.301.g55bc3eb7cb9-goog
-Subject: [PATCH] KVM: Remove CREATE_IRQCHIP/SET_PIT2 race
-From:   Jon Cargille <jcargill@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     Steve Rutherford <srutherford@google.com>,
-        Jon Cargille <jcargill@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        id S1729228AbgDPVR4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Apr 2020 17:17:56 -0400
+Received: from mail.dsns.gov.ua ([194.0.148.99]:50024 "EHLO mail.dsns.gov.ua"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725779AbgDPVRz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Apr 2020 17:17:55 -0400
+X-Greylist: delayed 1434 seconds by postgrey-1.27 at vger.kernel.org; Thu, 16 Apr 2020 17:17:53 EDT
+Received: from localhost (localhost [127.0.0.1])
+        by mail.dsns.gov.ua (Postfix) with ESMTP id CF8B91EC7FDD;
+        Thu, 16 Apr 2020 23:34:17 +0300 (EEST)
+Received: from mail.dsns.gov.ua ([127.0.0.1])
+        by localhost (mail.dsns.gov.ua [127.0.0.1]) (amavisd-new, port 10032)
+        with ESMTP id us4gpon-4vOO; Thu, 16 Apr 2020 23:34:17 +0300 (EEST)
+Received: from localhost (localhost [127.0.0.1])
+        by mail.dsns.gov.ua (Postfix) with ESMTP id 868A11EC7FC4;
+        Thu, 16 Apr 2020 23:34:13 +0300 (EEST)
+DKIM-Filter: OpenDKIM Filter v2.10.3 mail.dsns.gov.ua 868A11EC7FC4
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dsns.gov.ua;
+        s=1E60DAC0-2607-11E9-81E6-7A77C2B36653; t=1587069253;
+        bh=47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=;
+        h=Date:From:Message-ID:MIME-Version;
+        b=ymI4MgA3qk8RLjWbWBrmtSVxWRGW3PosSezQUTFBTNhA7a6p49oIlOoxNpJ+fSIdo
+         V4INCbgzoWl8xkq8WWctdQfhYMQE6dHAqZH8TkrvB82ZFNckrP9V/1nTkCN+v/V77h
+         FhP6XmKEgaUx79nKKdVRG3nu6TsgcB1nLu6sYm9IpEWkwHG11iOt+U5VVl462BtXWk
+         HLGO3Sut3qWExT1Nr7hp8oJnIKKTOZ4VoQiL2TYq2FVETJHW6Zgg0WeRD011jkotJe
+         M2EqEeyXkdNFnc4COWAGa6yx3vvzz8WKi+Ve5cw7AKIYGTyHZV7oHtqniwplj3jrB+
+         zctOMMQdBIXKQ==
+X-Virus-Scanned: amavisd-new at dsns.gov.ua
+Received: from mail.dsns.gov.ua ([127.0.0.1])
+        by localhost (mail.dsns.gov.ua [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id PpudWXtJH1m9; Thu, 16 Apr 2020 23:34:13 +0300 (EEST)
+Received: from mail.dsns.gov.ua (localhost [127.0.0.1])
+        by mail.dsns.gov.ua (Postfix) with ESMTP id 674721EC7F5D;
+        Thu, 16 Apr 2020 23:34:05 +0300 (EEST)
+Date:   Thu, 16 Apr 2020 23:34:05 +0300 (EEST)
+From:   Saleem Netanyahu <duchenko@dsns.gov.ua>
+Reply-To: Saleem Netanyahu <saleemnetu@gmail.com>
+Message-ID: <1765291695.717827.1587069245331.JavaMail.zimbra@dsns.gov.ua>
+Subject: Hey, how are u, can we talk?
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [45.82.223.36, 172.69.54.54]
+X-Mailer: Zimbra 8.8.15_GA_3918 (zclient/8.8.15_GA_3918)
+Thread-Index: KwarH8JSzy20mIHPGimLdYGnC/mIwA==
+Thread-Topic: Hey, how are u, can we talk?
+To:     unlisted-recipients:; (no To-header on input)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
-
-From: Steve Rutherford <srutherford@google.com>
-
-Fixes a NULL pointer dereference, caused by the PIT firing an interrupt
-before the interrupt table has been initialized.
-
-SET_PIT2 can race with the creation of the IRQchip. In particular,
-if SET_PIT2 is called with a low PIT timer period (after the creation of
-the IOAPIC, but before the instantiation of the irq routes), the PIT can
-fire an interrupt at an uninitialized table.
-
-Signed-off-by: Steve Rutherford <srutherford@google.com>
-Signed-off-by: Jon Cargille <jcargill@google.com>
-Reviewed-by: Jim Mattson <jmattson@google.com>
----
- arch/x86/kvm/x86.c | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
-
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 027dfd278a973..3cc3f673785c8 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -5049,10 +5049,13 @@ long kvm_arch_vm_ioctl(struct file *filp,
- 		r = -EFAULT;
- 		if (copy_from_user(&u.ps, argp, sizeof(u.ps)))
- 			goto out;
-+		mutex_lock(&kvm->lock);
- 		r = -ENXIO;
- 		if (!kvm->arch.vpit)
--			goto out;
-+			goto set_pit_out;
- 		r = kvm_vm_ioctl_set_pit(kvm, &u.ps);
-+set_pit_out:
-+		mutex_unlock(&kvm->lock);
- 		break;
- 	}
- 	case KVM_GET_PIT2: {
-@@ -5072,10 +5075,13 @@ long kvm_arch_vm_ioctl(struct file *filp,
- 		r = -EFAULT;
- 		if (copy_from_user(&u.ps2, argp, sizeof(u.ps2)))
- 			goto out;
-+		mutex_lock(&kvm->lock);
- 		r = -ENXIO;
- 		if (!kvm->arch.vpit)
--			goto out;
-+			goto set_pit2_out;
- 		r = kvm_vm_ioctl_set_pit2(kvm, &u.ps2);
-+set_pit2_out:
-+		mutex_unlock(&kvm->lock);
- 		break;
- 	}
- 	case KVM_REINJECT_CONTROL: {
--- 
-2.26.0.110.g2183baf09c-goog
 
