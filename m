@@ -2,204 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A9A1E1AD2C3
-	for <lists+kvm@lfdr.de>; Fri, 17 Apr 2020 00:20:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 023C71AD2D4
+	for <lists+kvm@lfdr.de>; Fri, 17 Apr 2020 00:33:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729044AbgDPWUi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Apr 2020 18:20:38 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:35729 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728817AbgDPWUh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Apr 2020 18:20:37 -0400
+        id S1729003AbgDPWdF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Apr 2020 18:33:05 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:44685 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728251AbgDPWdE (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 16 Apr 2020 18:33:04 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1587075636;
+        s=mimecast20190719; t=1587076383;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-        bh=LKcXo+p/uaeU/hsHRyKbdRNMgG4/p28XvmGbqiu1vto=;
-        b=RgeU1BKY/zuiMPVHB2Z5lLwz3iphXI6PQXbCfYUHzm/F2sUxh+kmK3RFbxHsrlbWD+XBte
-        mHCWrXsu1mAstv2Cik200wiTwC5c9hwyE8trqL4uUptXnaOTMv7LoLJ5rzWa2bmS7z6541
-        9lMxjYYLp+UOWYQvJsw/E+Itv0ccjgY=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-364-VMzsqttjMWq6OdaiSCkvTA-1; Thu, 16 Apr 2020 18:20:24 -0400
-X-MC-Unique: VMzsqttjMWq6OdaiSCkvTA-1
-Received: by mail-wr1-f71.google.com with SMTP id s11so2478954wru.6
-        for <kvm@vger.kernel.org>; Thu, 16 Apr 2020 15:20:24 -0700 (PDT)
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=qUf9DXimPD8UBiVLdfnQM98oUkmHdl6eiPE6mf0vIko=;
+        b=Sps5ULMq4ITIhAj/rLvb95C6Fp04EONH3OvrUE5JSk4+D6z3FivwwiNo2AqBQkSrgLJf2F
+        CzTaNbUZ/ExTmC94a7wvFhU0QW24k+p+0kRpIyD6NGAo9RwBt6QjOfSdbSVTNyiaeGqzC5
+        oFGeC3SD4d38HRyq63tF0KQP4t15RXQ=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-176-KrlR-wwlNtGu9F7gI_QQQg-1; Thu, 16 Apr 2020 18:33:01 -0400
+X-MC-Unique: KrlR-wwlNtGu9F7gI_QQQg-1
+Received: by mail-wr1-f69.google.com with SMTP id d17so2465545wrr.17
+        for <kvm@vger.kernel.org>; Thu, 16 Apr 2020 15:33:01 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
-         :content-disposition;
-        bh=LKcXo+p/uaeU/hsHRyKbdRNMgG4/p28XvmGbqiu1vto=;
-        b=XoWf/E0UGvDo/yqVuniYxdlx67/UFeSOo9QY90QbzyPVbkZOv6YORDYy5VZBcjqUpU
-         Xrv4nG4cx5iC2XvMm6PCvfqC8YxTAa35Ma+XoKf6XsjdnMn9Z4INxTU4Q2zNiX/xQ7O8
-         EbxcNuDjfoIdrscaKq06W4JUC3lX3DrmBU9V1rB/MRFQJUFR6LiCTA7htHtc/NObJoE1
-         ded72e8dlo3zwx5nMiK+/HN8k1Ser9fQ3gajV4AoB6AFfRqrkKcxyyukLryidlpJPsI3
-         ZXL968nrZ5lDZpRgT97TgFTiLM26kzpwZHZfCt+rErJsrCAzwFo2ifjrS2kyszcUGp5m
-         XRWA==
-X-Gm-Message-State: AGi0PuYThYtuStsbMRac545JT7/qtTVlVxMQ+DAxdmUEs4e//yfJzntY
-        9GIQk/prrber/5Kd99GcI26zMEgN1N2qefHxf3yssw6fArUyKJYKElbSgV3sc8AUCBrMlcZ63Hi
-        SKGBqB3k/3bYP
-X-Received: by 2002:a7b:c955:: with SMTP id i21mr43720wml.25.1587075622982;
-        Thu, 16 Apr 2020 15:20:22 -0700 (PDT)
-X-Google-Smtp-Source: APiQypLTMzBiCaoZdbA9StOEic7q7PuNDUniFaAXDS0fu05xLaJzs2UfTHwtFzY0cbIA235H0bagiw==
-X-Received: by 2002:a7b:c955:: with SMTP id i21mr43692wml.25.1587075622724;
-        Thu, 16 Apr 2020 15:20:22 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=qUf9DXimPD8UBiVLdfnQM98oUkmHdl6eiPE6mf0vIko=;
+        b=pzk7MDnjWbs3RD+2IC+l+t3BTyLl4NZC1l7485Fctr1gzAv8Sy0Jkz9I3CpAeVNOhf
+         Fz1LEF2ZfvNmOC3HVVlQT+5BTbboyz88mMQ+hLWbqnVCKl5yhZUNNRaY9BWy8FsID0yI
+         3SBSmTlwDOGVNmaXX1Sy65aYi8uRnlL0FA1fAVuMN1+Lkf12A8hSEjoPp0hBRGdhWKiF
+         cnqcB/I07SBEaV7Ho9YRqbvsjWOEOI7gN3a5lZbl6B1afOHeDJx7f44MWAa5DnhM3OfE
+         dtvUVMt/z7yzeZ2Ly2cnI8JcYxQLmhMKfiMdn7M1nOwFMLbPZ6fmVyMi//Y+lWxsOJs0
+         vcBw==
+X-Gm-Message-State: AGi0Puap3K78kNhks4Buqor+zDy0LZMOEznbds/4qSxyzh631b9p/+fy
+        KCRC9OKxUenke7xefGjWoJ5f2N81zY69wtNqAtad2W0aJAkpWcJRr+1wQ+AmG3+rNLtqsO5NF55
+        mVUk6SbdgWxw7
+X-Received: by 2002:a7b:ce81:: with SMTP id q1mr106315wmj.156.1587076380275;
+        Thu, 16 Apr 2020 15:33:00 -0700 (PDT)
+X-Google-Smtp-Source: APiQypIy+rWP6GLwQOV39yuKvCoJ5WM3R60eHJj8M3PsMQSHsFk9lyxG27YOo0I93W1RyqT/v7nwTQ==
+X-Received: by 2002:a7b:ce81:: with SMTP id q1mr106300wmj.156.1587076380092;
+        Thu, 16 Apr 2020 15:33:00 -0700 (PDT)
 Received: from redhat.com (bzq-79-183-51-3.red.bezeqint.net. [79.183.51.3])
-        by smtp.gmail.com with ESMTPSA id g186sm5712499wmg.36.2020.04.16.15.20.21
+        by smtp.gmail.com with ESMTPSA id h137sm6135220wme.0.2020.04.16.15.32.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Apr 2020 15:20:22 -0700 (PDT)
-Date:   Thu, 16 Apr 2020 18:20:20 -0400
+        Thu, 16 Apr 2020 15:32:59 -0700 (PDT)
+Date:   Thu, 16 Apr 2020 18:32:56 -0400
 From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     linux-kernel@vger.kernel.org
-Cc:     Ard Biesheuvel <ardb@kernel.org>,
-        Richard Earnshaw <Richard.Earnshaw@arm.com>,
-        Sudeep Dutt <sudeep.dutt@intel.com>,
-        Ashutosh Dixit <ashutosh.dixit@intel.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jason Wang <jasowang@redhat.com>, netdev@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org
-Subject: [PATCH v3] vhost: disable for OABI
-Message-ID: <20200416221902.5801-1-mst@redhat.com>
+To:     Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>
+Cc:     Stephen Rothwell <sfr@canb.auug.org.au>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>,
+        kvm list <kvm@vger.kernel.org>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v2 5/8] tools/virtio: Use __vring_new_virtqueue in
+ virtio_test.c
+Message-ID: <20200416183244-mutt-send-email-mst@kernel.org>
+References: <20200416075643.27330-1-eperezma@redhat.com>
+ <20200416075643.27330-6-eperezma@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-X-Mailer: git-send-email 2.24.1.751.gd10ce2899c
-X-Mutt-Fcc: =sent
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200416075643.27330-6-eperezma@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-vhost is currently broken on the some ARM configs.
+On Thu, Apr 16, 2020 at 09:56:40AM +0200, Eugenio Pérez wrote:
+> As updated in ("2a2d1382fe9d virtio: Add improved queue allocation API")
+> 
+> Signed-off-by: Eugenio Pérez <eperezma@redhat.com>
 
-The reason is that that uses apcs-gnu which is the ancient OABI that is been
-deprecated for a long time.
+Pls add motivation for these changes.
 
-Given that virtio support on such ancient systems is not needed in the
-first place, let's just add something along the lines of
-
-	depends on !ARM || AEABI
-
-to the virtio Kconfig declaration, and add a comment that it has to do
-with struct member alignment.
-
-Note: we can't make VHOST and VHOST_RING themselves have
-a dependency since these are selected. Add a new symbol for that.
-
-Link: https://lore.kernel.org/r/20200406121233.109889-3-mst@redhat.com
-Suggested-by: Ard Biesheuvel <ardb@kernel.org>
-Suggested-by: Richard Earnshaw <Richard.Earnshaw@arm.com>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
----
-
-Changes from v2:
-	- drop prompt from VHOST_DPN
-	- typo fix in commit log
-	- OABI is a possible ARM config but not the default one
-
- drivers/misc/mic/Kconfig |  2 +-
- drivers/net/caif/Kconfig |  2 +-
- drivers/vdpa/Kconfig     |  2 +-
- drivers/vhost/Kconfig    | 17 +++++++++++++----
- 4 files changed, 16 insertions(+), 7 deletions(-)
-
-diff --git a/drivers/misc/mic/Kconfig b/drivers/misc/mic/Kconfig
-index 8f201d019f5a..3bfe72c59864 100644
---- a/drivers/misc/mic/Kconfig
-+++ b/drivers/misc/mic/Kconfig
-@@ -116,7 +116,7 @@ config MIC_COSM
- 
- config VOP
- 	tristate "VOP Driver"
--	depends on VOP_BUS
-+	depends on VOP_BUS && VHOST_DPN
- 	select VHOST_RING
- 	select VIRTIO
- 	help
-diff --git a/drivers/net/caif/Kconfig b/drivers/net/caif/Kconfig
-index 9db0570c5beb..661c25eb1c46 100644
---- a/drivers/net/caif/Kconfig
-+++ b/drivers/net/caif/Kconfig
-@@ -50,7 +50,7 @@ config CAIF_HSI
- 
- config CAIF_VIRTIO
- 	tristate "CAIF virtio transport driver"
--	depends on CAIF && HAS_DMA
-+	depends on CAIF && HAS_DMA && VHOST_DPN
- 	select VHOST_RING
- 	select VIRTIO
- 	select GENERIC_ALLOCATOR
-diff --git a/drivers/vdpa/Kconfig b/drivers/vdpa/Kconfig
-index 71d9a64f2c7d..ee35f8261a88 100644
---- a/drivers/vdpa/Kconfig
-+++ b/drivers/vdpa/Kconfig
-@@ -10,7 +10,7 @@ if VDPA
- 
- config VDPA_SIM
- 	tristate "vDPA device simulator"
--	depends on RUNTIME_TESTING_MENU && HAS_DMA
-+	depends on RUNTIME_TESTING_MENU && HAS_DMA && VHOST_DPN
- 	select VHOST_RING
- 	select VHOST_IOTLB
- 	default n
-diff --git a/drivers/vhost/Kconfig b/drivers/vhost/Kconfig
-index e79cbbdfea45..d9b3a3ec765a 100644
---- a/drivers/vhost/Kconfig
-+++ b/drivers/vhost/Kconfig
-@@ -12,6 +12,15 @@ config VHOST_RING
- 	  This option is selected by any driver which needs to access
- 	  the host side of a virtio ring.
- 
-+config VHOST_DPN
-+	bool
-+	depends on !ARM || AEABI
-+	default y
-+	help
-+	  Anything selecting VHOST or VHOST_RING must depend on VHOST_DPN.
-+	  This excludes the deprecated ARM ABI since that forces a 4 byte
-+	  alignment on all structs - incompatible with virtio spec requirements.
-+
- config VHOST
- 	tristate
- 	select VHOST_IOTLB
-@@ -27,7 +36,7 @@ if VHOST_MENU
- 
- config VHOST_NET
- 	tristate "Host kernel accelerator for virtio net"
--	depends on NET && EVENTFD && (TUN || !TUN) && (TAP || !TAP)
-+	depends on NET && EVENTFD && (TUN || !TUN) && (TAP || !TAP) && VHOST_DPN
- 	select VHOST
- 	---help---
- 	  This kernel module can be loaded in host kernel to accelerate
-@@ -39,7 +48,7 @@ config VHOST_NET
- 
- config VHOST_SCSI
- 	tristate "VHOST_SCSI TCM fabric driver"
--	depends on TARGET_CORE && EVENTFD
-+	depends on TARGET_CORE && EVENTFD && VHOST_DPN
- 	select VHOST
- 	default n
- 	---help---
-@@ -48,7 +57,7 @@ config VHOST_SCSI
- 
- config VHOST_VSOCK
- 	tristate "vhost virtio-vsock driver"
--	depends on VSOCKETS && EVENTFD
-+	depends on VSOCKETS && EVENTFD && VHOST_DPN
- 	select VHOST
- 	select VIRTIO_VSOCKETS_COMMON
- 	default n
-@@ -62,7 +71,7 @@ config VHOST_VSOCK
- 
- config VHOST_VDPA
- 	tristate "Vhost driver for vDPA-based backend"
--	depends on EVENTFD
-+	depends on EVENTFD && VHOST_DPN
- 	select VHOST
- 	depends on VDPA
- 	help
--- 
-MST
+> ---
+>  tools/virtio/virtio_test.c | 7 +++----
+>  1 file changed, 3 insertions(+), 4 deletions(-)
+> 
+> diff --git a/tools/virtio/virtio_test.c b/tools/virtio/virtio_test.c
+> index 1d5144590df6..d9827b640c21 100644
+> --- a/tools/virtio/virtio_test.c
+> +++ b/tools/virtio/virtio_test.c
+> @@ -106,10 +106,9 @@ static void vq_info_add(struct vdev_info *dev, int num)
+>  	assert(r >= 0);
+>  	memset(info->ring, 0, vring_legacy_size(num, 4096));
+>  	vring_legacy_init(&info->vring, num, info->ring, 4096);
+> -	info->vq = vring_new_virtqueue(info->idx,
+> -				       info->vring.num, 4096, &dev->vdev,
+> -				       true, false, info->ring,
+> -				       vq_notify, vq_callback, "test");
+> +	info->vq =
+> +		__vring_new_virtqueue(info->idx, info->vring, &dev->vdev, true,
+> +				      false, vq_notify, vq_callback, "test");
+>  	assert(info->vq);
+>  	info->vq->priv = info;
+>  	vhost_vq_setup(dev, info);
+> -- 
+> 2.18.1
 
