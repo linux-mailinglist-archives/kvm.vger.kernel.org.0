@@ -2,94 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E15941ABEEE
-	for <lists+kvm@lfdr.de>; Thu, 16 Apr 2020 13:15:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 05FC41ABEFA
+	for <lists+kvm@lfdr.de>; Thu, 16 Apr 2020 13:19:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2632811AbgDPLPR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Apr 2020 07:15:17 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:48223 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S2632785AbgDPLOW (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 16 Apr 2020 07:14:22 -0400
+        id S2632900AbgDPLTi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Apr 2020 07:19:38 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:31052 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S2632869AbgDPLTU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Apr 2020 07:19:20 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1587035661;
+        s=mimecast20190719; t=1587035939;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=uMhEZOoHAJnjG/UJiypTrpHYCbpZgvJbU4bT3L0FKI4=;
-        b=Hh7rete3ARXQJJ6CQij9vn+QxSdXsHjWC8oi8jSs6rzA1Bo6BZ2ApYJOMUvKM+MbCg6zAJ
-        QM8pYpo2Yg35TtcxOUkWUsF7G9xOwLfcpSMCTOZfjxUP3Is/OwTYYk3fcJRQd6GHaApqkn
-        0+F3K8P2RGAKHX3TT/n9s8s9UEPpSAg=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-170-Vr-Zylq8OHilFh4vGW5Irw-1; Thu, 16 Apr 2020 07:14:19 -0400
-X-MC-Unique: Vr-Zylq8OHilFh4vGW5Irw-1
-Received: by mail-wm1-f69.google.com with SMTP id h22so1274375wml.1
-        for <kvm@vger.kernel.org>; Thu, 16 Apr 2020 04:14:19 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=uMhEZOoHAJnjG/UJiypTrpHYCbpZgvJbU4bT3L0FKI4=;
-        b=ifFijsLIRKdAIPMooyvgsa9doMZJzrBhPTOdpS+oNHCAuv96jVvMzb97JD7SZspq7r
-         tk7VddLShED11rtTYf10swb+okwPoLN6HxMe9nvSEbqkwaS/T23nXmB4jvuabpzmUT/j
-         j2GvhuQUS8u/ueA+wEUIpsMbPPU4RirXcRc7cfmDRu6x8yHUHonu/RcVoa57R60KMWIp
-         Xgc0kdaP2wxMvYYnWkXb0MA7mXXofyL38noly3Q3606pZC5MpL+EdYQ5ijP6UKFyMrDT
-         hOx+xOEskGSvyzHsv4ZeRJamu3XZEDZVFpJ8MMinR55CtB7zB3DDr0r0iCnbzuaFJK9p
-         W8pQ==
-X-Gm-Message-State: AGi0PuaCf8991FKPyL2vYNegpmLUTGR2T8nUGXoN6CiR4NBiYATyysAm
-        WpBtjWz3+5+GMAgWEPgiDK6JlgKVzxUIyF/m9JVNkTaT0rM7xX8iSagVNIkmwwhSSHk7wmV3FSb
-        e7+9t3hwMqfMT
-X-Received: by 2002:a5d:408a:: with SMTP id o10mr14651245wrp.163.1587035658169;
-        Thu, 16 Apr 2020 04:14:18 -0700 (PDT)
-X-Google-Smtp-Source: APiQypIhCbY4Z2dk2GyzeI5Yi3sRn1ddz4I0YHF5eNgOdzfpIeQMINfj7YSC5j77R84e3b7mkneo+w==
-X-Received: by 2002:a5d:408a:: with SMTP id o10mr14651234wrp.163.1587035657963;
-        Thu, 16 Apr 2020 04:14:17 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:399d:3ef7:647c:b12d? ([2001:b07:6468:f312:399d:3ef7:647c:b12d])
-        by smtp.gmail.com with ESMTPSA id h5sm8397012wrp.97.2020.04.16.04.14.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 16 Apr 2020 04:14:17 -0700 (PDT)
-Subject: Re: [PATCH] x86/kvm: make steal_time static
-To:     Jason Yan <yanaijie@huawei.com>, sean.j.christopherson@intel.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, x86@kernel.org, hpa@zytor.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc:     Hulk Robot <hulkci@huawei.com>
-References: <20200415084939.6367-1-yanaijie@huawei.com>
- <d1700173-29c1-2e7c-46bd-471876d96762@redhat.com>
- <35c3890e-0c45-0dac-e9f0-f2a9446a387d@huawei.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <bd77af4b-1e08-af7a-3167-eeb03dfbd1d6@redhat.com>
-Date:   Thu, 16 Apr 2020 13:14:17 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+        bh=/can4Mo5wcD8VxSmCD4glckN/kBnBrb4gDabEOaSwyw=;
+        b=eH2ppfHNwikK8p9wtPS0CfhoygOl3XuBCy5WHxc9K1dcK4rQTS9reV3tIC6YbJtAYioo75
+        +gJgXxuufZFRS7BbatwFhWcz3lWSgeq7gVJ4x3TYm7G9bHjRIOcyAe58rPUqZfMXEC8sMi
+        u8KeQQGidqb0+MtrZ0W57hPZbSE3N+8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-140-i6e1aPlgPd6TuQe7djFNRw-1; Thu, 16 Apr 2020 07:18:55 -0400
+X-MC-Unique: i6e1aPlgPd6TuQe7djFNRw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7FD0F149C3;
+        Thu, 16 Apr 2020 11:18:53 +0000 (UTC)
+Received: from gondolin (ovpn-112-234.ams2.redhat.com [10.36.112.234])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 3D7FD5D9E2;
+        Thu, 16 Apr 2020 11:18:48 +0000 (UTC)
+Date:   Thu, 16 Apr 2020 13:18:45 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Tony Krowiak <akrowiak@linux.ibm.com>
+Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, freude@linux.ibm.com, borntraeger@de.ibm.com,
+        mjrosato@linux.ibm.com, pmorel@linux.ibm.com, pasic@linux.ibm.com,
+        alex.williamson@redhat.com, kwankhede@nvidia.com,
+        jjherne@linux.ibm.com, fiuczy@linux.ibm.com
+Subject: Re: [PATCH v7 04/15] s390/vfio-ap: implement in-use callback for
+ vfio_ap driver
+Message-ID: <20200416131845.3ef6b3b5.cohuck@redhat.com>
+In-Reply-To: <20200407192015.19887-5-akrowiak@linux.ibm.com>
+References: <20200407192015.19887-1-akrowiak@linux.ibm.com>
+        <20200407192015.19887-5-akrowiak@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-In-Reply-To: <35c3890e-0c45-0dac-e9f0-f2a9446a387d@huawei.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 16/04/20 04:15, Jason Yan wrote:
->>
+On Tue,  7 Apr 2020 15:20:04 -0400
+Tony Krowiak <akrowiak@linux.ibm.com> wrote:
+
+> Let's implement the callback to indicate when an APQN
+> is in use by the vfio_ap device driver. The callback is
+> invoked whenever a change to the apmask or aqmask would
+> result in one or more queue devices being removed from the driver. The
+> vfio_ap device driver will indicate a resource is in use
+> if the APQN of any of the queue devices to be removed are assigned to
+> any of the matrix mdevs under the driver's control.
 > 
-> Sorry that I found 14e581c381b9 ("x86/kvm: Make steal_time visible")
-> said that it is used by assembler code but I didn't find where.
-> Please drop this patch if it's true.
-> 
-> Sorry to make this trouble again.
+> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
+> ---
+>  drivers/s390/crypto/vfio_ap_drv.c     |  1 +
+>  drivers/s390/crypto/vfio_ap_ops.c     | 47 +++++++++++++++++----------
+>  drivers/s390/crypto/vfio_ap_private.h |  2 ++
+>  3 files changed, 33 insertions(+), 17 deletions(-)
 
-Here:
+> @@ -1369,3 +1371,14 @@ void vfio_ap_mdev_remove_queue(struct ap_queue *queue)
+>  	kfree(q);
+>  	mutex_unlock(&matrix_dev->lock);
+>  }
+> +
+> +bool vfio_ap_mdev_resource_in_use(unsigned long *apm, unsigned long *aqm)
+> +{
+> +	bool in_use;
+> +
+> +	mutex_lock(&matrix_dev->lock);
+> +	in_use = vfio_ap_mdev_verify_no_sharing(NULL, apm, aqm) ? true : false;
 
-arch/x86/kernel/kvm.c:"cmpb	$0, " __stringify(KVM_STEAL_TIME_preempted) "+steal_time(%rax);"
+Maybe
 
-The __visible argument shouldn't be needed, __used should be enough.  I'll take a look.
+in_use = !!vfio_ap_mdev_verify_no_sharing(NULL, apm, aqm);
 
-Paolo
+?
+
+> +	mutex_unlock(&matrix_dev->lock);
+> +
+> +	return in_use;
+> +}
 
