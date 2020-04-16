@@ -2,101 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B0E711AD1EE
-	for <lists+kvm@lfdr.de>; Thu, 16 Apr 2020 23:34:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A12D71AD26A
+	for <lists+kvm@lfdr.de>; Thu, 16 Apr 2020 23:58:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727937AbgDPVeI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Apr 2020 17:34:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46886 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725843AbgDPVeG (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 16 Apr 2020 17:34:06 -0400
-Received: from mail-io1-xd41.google.com (mail-io1-xd41.google.com [IPv6:2607:f8b0:4864:20::d41])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2EFCC061A0C
-        for <kvm@vger.kernel.org>; Thu, 16 Apr 2020 14:34:06 -0700 (PDT)
-Received: by mail-io1-xd41.google.com with SMTP id f3so83049ioj.1
-        for <kvm@vger.kernel.org>; Thu, 16 Apr 2020 14:34:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=+TPezPECUKOwAGB1jeVzVXF9iCR+5ADFws6BKwwbizc=;
-        b=L8ZHdAigb7rztBqPmzv1Wr3oBMfKTeVUJzOlwoAqCki5iP/+Ph2qQ9QmvsqjiI78wr
-         b8mcyDA7M5AEGBxKnri7090GioBy7YcYX+/fA7E8SbfvXVQMBoOGei6QFiNFV6pbmGhx
-         URtmXYhIyBHa9vnqaQF+WHenD3KJBKa+ltxSijIDFsvwdkylsah1fiJgbM52NL0AiUsn
-         91ccjFMOSucVrljfbPpVeflKDDCJ7EeMKO7ZPYpfa+ZkG0iHLbI0Eevud4VnJcGtvv7b
-         +eI0hi9/OPbZjUsChCJSiQTCK0g0OPdCoPNbNExx4hSnpad/bK2lAdbQ62l5z/g4qAvb
-         P9gQ==
+        id S1728618AbgDPV6u (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Apr 2020 17:58:50 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:33152 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728333AbgDPV6u (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 16 Apr 2020 17:58:50 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1587074328;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=M6rrlZafhN6r+ubaAk51QbjlJxlyC5zfccAUUw8zuIQ=;
+        b=EjmCqUQUNepT3q3TW1CAHlKf2tMfLu4nMJKIy1zPpfGVeqUj+ElCpAo4zLQPZhwCXpBVu1
+        9Rp/DQbzQCdVt2o0QbZ/Q6GOS5dmqCyND45j3kuW1wwS50PuIchk4gxnv3LdCjT2AMUQei
+        22JbU079yHy5dxanIpDwXN6/Z7bLTWE=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-290-CqS6W9A1OMaABhRu5IsFDg-1; Thu, 16 Apr 2020 17:58:47 -0400
+X-MC-Unique: CqS6W9A1OMaABhRu5IsFDg-1
+Received: by mail-wm1-f69.google.com with SMTP id 72so1860354wmb.1
+        for <kvm@vger.kernel.org>; Thu, 16 Apr 2020 14:58:46 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=+TPezPECUKOwAGB1jeVzVXF9iCR+5ADFws6BKwwbizc=;
-        b=Gm8H6l3GpsqUhAQG+qjghNtZnvRCrinGLABJ94w7hypIwR83UcUvA1xzFnOwavxOBl
-         /b1GqIpJFaaAxfIG+aztZwReZq3FGrL6CRkLgfldMtO27/dr7dJpnKYlviH7sNCx4bNK
-         TnAChumT5XZM3yvvjW2AyiSoI8uvnN24vY0JJEVkG19QJanIYRntGUMhHUV3JKYysGdv
-         OOx+BcenQaAEObcXyjgCz4hUmNS3s+/ewN/rQtw+5jSNJpl9Yil2AUJ28sGfQkZpDZkY
-         bxfHoWTpmcYXrNUfukhIkkidt/uUClIyyntIFlVG38sYfNKX0uR4IGxG+XOKxXUVQhjO
-         W/DQ==
-X-Gm-Message-State: AGi0PuYPFVTd7ziNIzN6OfiQIY2fdPkm3pBz2Z/+eCgip/OAc1En2VUX
-        Mmta5Usbq1xgqGgN7C1eQWJtrvCKIfDIouZ0hG+rQqEyfpY=
-X-Google-Smtp-Source: APiQypLrnL64Nsr0s40zEsJnABAfQ/0uJW+UGGpZoZyX9B3baRbF2EyT+Oszief9+BiZgV4RwH5jr0uQTlTp/BL11Ow=
-X-Received: by 2002:a5e:a610:: with SMTP id q16mr590633ioi.75.1587072845762;
- Thu, 16 Apr 2020 14:34:05 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=M6rrlZafhN6r+ubaAk51QbjlJxlyC5zfccAUUw8zuIQ=;
+        b=EEq1JIZoChM9sveXTJf9snET8ZBY7LIVr5z62aFi2zFEy8PFBQLLqlmnv+tWKcArqj
+         F3amKhhyEmkXK1hnjVteIEQbsMuLjQcGgJnfoCTDFwWMRyzwZn0MR3l4llQ7vOZ7Izlc
+         VHUd/uWowq228SSIT4HM3Bi/jce0HrvHoAx3CPcux16NIjqnUqoqogLATKxPrcZcO5ze
+         CRT4GUIRHxkXmy6JYwDn6hpivF81vS2My1Vilna7k+vxDRg+243UoM3txXI5n2h3Va8g
+         j6emK8wZQVBaQXry7HZ+4GRMEiCU9zCO29s5kJtmI/dB5ARu8aFuYdg5c2TPOI3z5T3z
+         QgHg==
+X-Gm-Message-State: AGi0PuZ2fpcoNhx04MtbCuwGzvyn3qAS+Z9S3IlAopbR+vX5kwF4t+8L
+        HZxAsDbIwVoS/tUD3WCSiyjK0O7fqhwWbCtHYKE4xRxo2m6tWyYA6LyepiTt3fpLfF5IJwMrAfu
+        /lKNpw74nEQJI
+X-Received: by 2002:a05:600c:2f17:: with SMTP id r23mr6583327wmn.81.1587074325884;
+        Thu, 16 Apr 2020 14:58:45 -0700 (PDT)
+X-Google-Smtp-Source: APiQypJuACRXU/ZXNyriL39YVRQFFxgHb4YC1TCpFzp0oXAv3mKwmNTGsmU40akcPlLbxfOx28D8Wg==
+X-Received: by 2002:a05:600c:2f17:: with SMTP id r23mr6583297wmn.81.1587074325695;
+        Thu, 16 Apr 2020 14:58:45 -0700 (PDT)
+Received: from redhat.com (bzq-79-183-51-3.red.bezeqint.net. [79.183.51.3])
+        by smtp.gmail.com with ESMTPSA id f79sm5629022wme.32.2020.04.16.14.58.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 16 Apr 2020 14:58:45 -0700 (PDT)
+Date:   Thu, 16 Apr 2020 17:58:42 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     KVM list <kvm@vger.kernel.org>,
+        virtualization@lists.linux-foundation.org,
+        Netdev <netdev@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Andy Shevchenko <andy.shevchenko@gmail.com>,
+        Arnd Bergmann <arnd@arndb.de>, ashutosh.dixit@intel.com,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Markus Elfring <elfring@users.sourceforge.net>,
+        eli@mellanox.com, eperezma@redhat.com,
+        "Gustavo A. R. Silva" <gustavo@embeddedor.com>, hulkci@huawei.com,
+        "Cc: stable@vger.kernel.org, david@redhat.com, dverkamp@chromium.org,
+        hch@lst.de, jasowang@redhat.com, liang.z.li@intel.com, mst@redhat.com,
+        tiny.windzz@gmail.com," <jasowang@redhat.com>,
+        matej.genci@nutanix.com, Stephen Rothwell <sfr@canb.auug.org.au>,
+        yanaijie@huawei.com, YueHaibing <yuehaibing@huawei.com>
+Subject: Re: [GIT PULL] vhost: cleanups and fixes
+Message-ID: <20200416175644-mutt-send-email-mst@kernel.org>
+References: <20200414123606-mutt-send-email-mst@kernel.org>
+ <CAHk-=wgVQcD=JJVmowEorHHQSVmSw+vG+Ddc4FATZoTp9mfUmw@mail.gmail.com>
+ <20200416081330-mutt-send-email-mst@kernel.org>
+ <CAHk-=wjduPCAE-sr_XLUdExupiL0bOU5GBfpMd32cqMC-VVxeg@mail.gmail.com>
 MIME-Version: 1.0
-References: <20200415214414.10194-1-sean.j.christopherson@intel.com> <20200415214414.10194-2-sean.j.christopherson@intel.com>
-In-Reply-To: <20200415214414.10194-2-sean.j.christopherson@intel.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Thu, 16 Apr 2020 14:33:54 -0700
-Message-ID: <CALMp9eTaLwj7kXgvACFQ_42+F7pnOvaAd02_2o4tG2fX5+JQaQ@mail.gmail.com>
-Subject: Re: [PATCH 1/2] KVM: x86/mmu: Set @writable to false for non-visible
- accesses by L2
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Rick Edgecombe <rick.p.edgecombe@intel.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAHk-=wjduPCAE-sr_XLUdExupiL0bOU5GBfpMd32cqMC-VVxeg@mail.gmail.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Apr 15, 2020 at 2:44 PM Sean Christopherson
-<sean.j.christopherson@intel.com> wrote:
->
-> Explicitly set @writable to false in try_async_pf() if the GFN->PFN
-> translation is short-circuited due to the requested GFN not being
-> visible to L2.
->
-> Leaving @writable ('map_writable' in the callers) uninitialized is ok
-> in that it's never actually consumed, but one has to track it all the
-> way through set_spte() being short-circuited by set_mmio_spte() to
-> understand that the uninitialized variable is benign, and relying on
-> @writable being ignored is an unnecessary risk.  Explicitly setting
-> @writable also aligns try_async_pf() with __gfn_to_pfn_memslot().
->
-> Jim Mattson <jmattson@google.com>
-Go ahead and preface the above with Reviewed-by:
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> ---
->  arch/x86/kvm/mmu/mmu.c | 1 +
->  1 file changed, 1 insertion(+)
->
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index c6ea6032c222..6d6cb9416179 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -4090,6 +4090,7 @@ static bool try_async_pf(struct kvm_vcpu *vcpu, bool prefault, gfn_t gfn,
->          */
->         if (is_guest_mode(vcpu) && !kvm_is_visible_gfn(vcpu->kvm, gfn)) {
->                 *pfn = KVM_PFN_NOSLOT;
-> +               *writable = false;
->                 return false;
->         }
->
-> --
-> 2.26.0
->
+On Thu, Apr 16, 2020 at 10:01:51AM -0700, Linus Torvalds wrote:
+> On Thu, Apr 16, 2020 at 5:20 AM Michael S. Tsirkin <mst@redhat.com> wrote:
+> > Well it's all just fallout from
+> 
+> What? No. Half of it seems to be the moving of "struct vring" around
+> to other headers and stuff.
+> 
+> And then that is done very confusingly too, using two different
+> structures both called "struct vring".
+> 
+> No way can I pull that kind of craziness as a "fix".
+> 
+>                 Linus
+
+OK, I'll just disable vhost on that config for now - it was
+suggested previously. Thanks for the comment and sorry about geeting it
+wrong!
+
+
+-- 
+MST
+
