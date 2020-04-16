@@ -2,139 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7FCCC1AC750
-	for <lists+kvm@lfdr.de>; Thu, 16 Apr 2020 16:54:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 786591AC6CA
+	for <lists+kvm@lfdr.de>; Thu, 16 Apr 2020 16:45:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2394841AbgDPOxY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Apr 2020 10:53:24 -0400
-Received: from mail-bn8nam12on2083.outbound.protection.outlook.com ([40.107.237.83]:6051
-        "EHLO NAM12-BN8-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S2409263AbgDPN5J (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Apr 2020 09:57:09 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=kv8lRke9VMF+ZYQUNnYt4lPAd2IYWMSvInWxHVj1Tr6/i2V4zis325/rXZ2nbYcwgGV3Motcxu09MrEqWw94mBPEAhqnPcIlhDq6ALJjZ8RZq6DONZzivUdtNc53Komjxdg+GbbEAFA4S4C2X9u0in0IY6Ymj21DgBHriM6ffM6w358WEfZdYJ/+xQiAdABeTbPLOanR0Dccxs6ALFE1SKxijWdZXpKLLJFHkEZd/1erXU46VYzzLFQJQN71nT5ZOqDuePgPo0Ae6MGpk3PFIjdg4FfYADh1TW657fkpIpBCxBhwjTSEhq6oJkpmKkuR5Ig5TuuAZLTq1hqKWGXaBg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=+uxcJtdS18MDY1NC9DT6CVmBcNDt2kGXjY0DVaWNm88=;
- b=RZk7Y8C/PoMHqimMCEc6kbhYJcTojMpzV2yRUICvsKvLxvRQn9UB6oWCRqAjbUDzVSH6M2Jbd3BuZnh0I8erp7HEE8rFNH/MRwySGL4oAgTASt99JgPR9Axxe71e/N+4ZTuxNzp3HBQa8ye6FBU8s6bmU4LzLgaf98YFn8QvGPRKssGiwJ0dA2fyMWMjM/6IKlLRY3jxeIpEh5EI4rtiqFbttt99c6bctT3AGoh5QzZCmw2mW7us2UqIBbuTx67Wd/Sit6uMILpHEK0h94JdEYZI7DuHhZt/VaPM3O+JSHOSdTNTSLISaKSXLAPqCz0wcVT1nBRdu02bbXDvtuIVFA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=+uxcJtdS18MDY1NC9DT6CVmBcNDt2kGXjY0DVaWNm88=;
- b=CMDKQUmLRuAzU0z6b2zbGdcr4qjArUUadrBaOS/iHNK7qDC4ArxVbzHPerHh9NB58pP7KmcSUpPbL1P1wEmfpws79dYGYcbcQUqzHwrKMn/i9iRRlZBIDrbdwsi455Glh3yWrj3ybGagK9Hk71LJywF34J2hC1v9JvS+l9GM8aI=
-Authentication-Results: spf=none (sender IP is )
- smtp.mailfrom=Thomas.Lendacky@amd.com; 
-Received: from DM6PR12MB3163.namprd12.prod.outlook.com (2603:10b6:5:15e::26)
- by DM6PR12MB3930.namprd12.prod.outlook.com (2603:10b6:5:1c9::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2900.17; Thu, 16 Apr
- 2020 13:57:07 +0000
-Received: from DM6PR12MB3163.namprd12.prod.outlook.com
- ([fe80::f0f9:a88f:f840:2733]) by DM6PR12MB3163.namprd12.prod.outlook.com
- ([fe80::f0f9:a88f:f840:2733%7]) with mapi id 15.20.2900.028; Thu, 16 Apr 2020
- 13:57:07 +0000
-Subject: Re: [PATCH] KVM: SVM: fix compilation with modular PSP and
- non-modular KVM
-To:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     ubizjak@gmail.com
-References: <20200413075032.5546-1-pbonzini@redhat.com>
-From:   Tom Lendacky <thomas.lendacky@amd.com>
-Message-ID: <d8cab90f-8c9c-7f79-0913-ba0d8576206d@amd.com>
-Date:   Thu, 16 Apr 2020 08:57:05 -0500
+        id S2394576AbgDPOof (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Apr 2020 10:44:35 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:32817 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S2898885AbgDPN76 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 16 Apr 2020 09:59:58 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1587045597;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=+/DvZF3rLr6bk7dnDadPbpjMUW91IbsAARDUOjqrjNA=;
+        b=RkU3GFfFWF8XJvZlCfDfVLq14QEKcMMphg6Uy7aVpfftVmiEwBiJZe2ULAwiL0MrVXmvWg
+        I7Qx2mg1qX+pynX0E2z8jkSdjRCRfefDnvjhfcaR+wN6N9efVFW8aU/SmxWfkkghaFOgSE
+        kumS6kk09M8OuFr0YqccWRd6FzZz/Nw=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-392-j8EtdZkMMDSSr-HpXgApOA-1; Thu, 16 Apr 2020 09:59:52 -0400
+X-MC-Unique: j8EtdZkMMDSSr-HpXgApOA-1
+Received: by mail-wr1-f70.google.com with SMTP id j16so1733657wrw.20
+        for <kvm@vger.kernel.org>; Thu, 16 Apr 2020 06:59:52 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=+/DvZF3rLr6bk7dnDadPbpjMUW91IbsAARDUOjqrjNA=;
+        b=W4avN7WC2jpHhJ9NunaHJRnjNemzvB7HkDk9jQTOrGMlw4LbUuDmJb66fWg3pQ6Azp
+         65C+OlcyRNGDYe2Riw2QuvBQJ63z1IlTuHJjI5y1AEAnigaa6V8ZIcxi8+q3qM5EsGHq
+         JhptbPNP9158MRfWeHz1Mf6cg4cAZCikQvo4Si/zsIKqKVbgIQIonhcnzyxVgXkg2gjw
+         8LnHI4b8CPvu2p9FnBzcQN89H7jIq3Hsg4PVVc4wvy60hizNJlMkoza1L2YfXLnRqXBz
+         m9bPX/669l20o3HqZq+Wt90dexleM+guakc6cnNhuk6iza1d7OQ4aiwHc+LMMZ1B8To4
+         2m/w==
+X-Gm-Message-State: AGi0PuZHtyjC8iqwAeRw4SdLyf92SDHYSBRWkcpt+fpBw8ZVpxPaHMjl
+        V+sjoWhJKdzHyBecaf3CtvXAcUso1JoUsa12NU1TzNLdc5oSUjaSswz+rDVPuqfJYSHfy0jesoO
+        FDleVqN7Q2xCV
+X-Received: by 2002:adf:90c6:: with SMTP id i64mr33091343wri.88.1587045591307;
+        Thu, 16 Apr 2020 06:59:51 -0700 (PDT)
+X-Google-Smtp-Source: APiQypKO+4JKhvMwWnWuX+A/FR5dp8KXrF9TT/Ax/0t8NlaANIbgzsHktsM8akG0Yye+42CsXGdX1Q==
+X-Received: by 2002:adf:90c6:: with SMTP id i64mr33091327wri.88.1587045591046;
+        Thu, 16 Apr 2020 06:59:51 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:399d:3ef7:647c:b12d? ([2001:b07:6468:f312:399d:3ef7:647c:b12d])
+        by smtp.gmail.com with ESMTPSA id h26sm19131736wrb.25.2020.04.16.06.59.49
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 16 Apr 2020 06:59:50 -0700 (PDT)
+Subject: Re: [PATCH 0/3] KVM: nSVM: Check CR0.CD and CR0.NW on VMRUN of nested
+ guests
+To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>, kvm@vger.kernel.org
+References: <20200409205035.16830-1-krish.sadhukhan@oracle.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <b9259b5f-0233-2ed2-8e54-5345670d7411@redhat.com>
+Date:   Thu, 16 Apr 2020 15:59:49 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
-In-Reply-To: <20200413075032.5546-1-pbonzini@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+ Thunderbird/68.5.0
+MIME-Version: 1.0
+In-Reply-To: <20200409205035.16830-1-krish.sadhukhan@oracle.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SN2PR01CA0052.prod.exchangelabs.com (2603:10b6:800::20) To
- DM6PR12MB3163.namprd12.prod.outlook.com (2603:10b6:5:15e::26)
-MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from office-linux.texastahm.com (67.79.209.213) by SN2PR01CA0052.prod.exchangelabs.com (2603:10b6:800::20) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2921.27 via Frontend Transport; Thu, 16 Apr 2020 13:57:06 +0000
-X-Originating-IP: [67.79.209.213]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 9a38daea-571f-4620-85c1-08d7e20e0ce7
-X-MS-TrafficTypeDiagnostic: DM6PR12MB3930:
-X-Microsoft-Antispam-PRVS: <DM6PR12MB393031E0E01544C4F0AABAB9ECD80@DM6PR12MB3930.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
-X-Forefront-PRVS: 0375972289
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB3163.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(10009020)(4636009)(396003)(366004)(39860400002)(136003)(376002)(346002)(66476007)(5660300002)(31686004)(6486002)(8676002)(81156014)(2906002)(478600001)(66556008)(8936002)(66946007)(186003)(52116002)(36756003)(86362001)(6506007)(16526019)(6512007)(2616005)(26005)(4326008)(53546011)(31696002)(956004)(316002);DIR:OUT;SFP:1101;
-Received-SPF: None (protection.outlook.com: amd.com does not designate
- permitted sender hosts)
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 5R7J4sC3uJfPl3FiqnmxbeMRy7Xj2fGzAUBWG4+lOyv0PXs7wcntbCud4p79VBMl6J+TcnFqvc7EBnSEuyfLEPxS8GvkFCgqxJ2D6awpHYN1Y1jBBZPTuFvzkwT+i8cwvYSObeTFCUhcQjshi+9mFXw5bLTwXZzW+ZT5mTg2rIcazpM84o75vKANLgLzQ+SfJy3EG83gUNvHRh9Jq+IY7UaSVxuOwsjs91c0xX95ghRWrTcoOhqQKzosX9iBtOBLWRzMe0gHMLo2yXLeZvDQvdG1YPryX7eYsQ4kZEH9cBvEkK8mbXRWo8kISXfR+AUjNcwxSh6clVMYM31q/jrkIYYr2tphwQIwaVwfDRVIUmJXWWsVMG1axuMELPScSuVkj5l0hTA2AeG4eB3DYyP2eJvy6WxFwOdlwI1X25qC3u7+KLIRgVbKmx2SsPL5QHTf
-X-MS-Exchange-AntiSpam-MessageData: mNJER00r4xKmVEXq2twWvOz1J1d5pxH/3RJBTbPBfru5S6RA0x/P9YemXuLkuWEvjBFFJhetUnydnFNxnj0WGpk3GC9ivrnNcvKQnBypX7xbnw7jxH5cs7N/9T3Z+iY0OgSRGhhFOk2uLmlGP+1MbA==
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9a38daea-571f-4620-85c1-08d7e20e0ce7
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Apr 2020 13:57:07.4131
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: LmEMOgCJkNlO1swvVpH1PH14ZKpk1OiKWYdEwA+VpOnX+nCpJX3+0E5VPDAZAj8PpbD4vzMLS9qAAjPSt9KUEQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB3930
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 4/13/20 2:50 AM, Paolo Bonzini wrote:
-> Use svm_sev_enabled() in order to cull all calls to PSP code.  Otherwise,
-> compilation fails with undefined symbols if the PSP device driver is compiled
-> as a module and KVM is not.
-
-The Kconfig support will set CONFIG_KVM_AMD_SEV to "n" in this situation, 
-so it might be worth seeing if sev.o could be removed from the build at 
-that point. I'll try and look at that when I get a chance, but I'm 
-currently buried with a ton of other work.
-
+On 09/04/20 22:50, Krish Sadhukhan wrote:
+> Patch# 1: Adds the KVM check.
+> Patch# 2: Adds the required #defines for the two CR0 bits.
+> Patch# 3: Adds the kvm-unit-test
 > 
-> Reported-by: Uros Bizjak <ubizjak@gmail.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->   arch/x86/kvm/svm/sev.c | 5 ++++-
->   1 file changed, 4 insertions(+), 1 deletion(-)
+> [PATCH 1/3] KVM: nSVM: Check for CR0.CD and CR0.NW on VMRUN of nested guests
+> [PATCH 2/3] kvm-unit-tests: SVM: Add #defines for CR0.CD and CR0.NW
+> [PATCH 3/3] kvm-unit-tests: nSVM: Test CR0.CD and CR0.NW combination on VMRUN of
 > 
-> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> index 0e3fc311d7da..364ffe32139c 100644
-> --- a/arch/x86/kvm/svm/sev.c
-> +++ b/arch/x86/kvm/svm/sev.c
-> @@ -1117,7 +1117,7 @@ int __init sev_hardware_setup(void)
->   	/* Maximum number of encrypted guests supported simultaneously */
->   	max_sev_asid = cpuid_ecx(0x8000001F);
->   
-> -	if (!max_sev_asid)
-> +        if (!svm_sev_enabled())
-
-It looks like these are spaces instead of tabs, could just be my email 
-veiwer, though.
-
->   		return 1;
->   
->   	/* Minimum ASID value that should be used for SEV guest */
-> @@ -1156,6 +1156,9 @@ int __init sev_hardware_setup(void)
->   
->   void sev_hardware_teardown(void)
->   {
-> +        if (!svm_sev_enabled())
-> +                return;
-> +
-
-Ditto on the spaces/tabs thing, here.
-
-Thanks,
-Tom
-
->   	bitmap_free(sev_asid_bitmap);
->   	bitmap_free(sev_reclaim_asid_bitmap);
->   
+>  arch/x86/kvm/svm/nested.c | 4 ++++
+>  1 file changed, 4 insertions(+)
 > 
+> Krish Sadhukhan (1):
+>       nSVM: Check for CR0.CD and CR0.NW on VMRUN of nested guests
+> 
+>  lib/x86/processor.h |  2 ++
+>  x86/svm_tests.c     | 28 +++++++++++++++++++++++++++-
+>  2 files changed, 29 insertions(+), 1 deletion(-)
+> 
+> Krish Sadhukhan (2):
+>       SVM: Add #defines for CR0.CD and CR0.NW
+>       nSVM: Test CR0.CD and CR0.NW combination on VMRUN of nested guests
+> 
+
+Queued, thanks.
+
+Paolo
+
