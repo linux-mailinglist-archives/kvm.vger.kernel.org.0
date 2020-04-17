@@ -2,138 +2,301 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 78DE11AE158
-	for <lists+kvm@lfdr.de>; Fri, 17 Apr 2020 17:40:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7E6391AE243
+	for <lists+kvm@lfdr.de>; Fri, 17 Apr 2020 18:29:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729046AbgDQPjw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Apr 2020 11:39:52 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:21646 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1729008AbgDQPjw (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 17 Apr 2020 11:39:52 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 03HFYWbo167059
-        for <kvm@vger.kernel.org>; Fri, 17 Apr 2020 11:39:50 -0400
-Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 30ff0pgm4k-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Fri, 17 Apr 2020 11:39:50 -0400
-Received: from localhost
-        by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
-        Fri, 17 Apr 2020 16:39:28 +0100
-Received: from b06avi18626390.portsmouth.uk.ibm.com (9.149.26.192)
-        by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Fri, 17 Apr 2020 16:39:26 +0100
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 03HFccY750659722
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 17 Apr 2020 15:38:38 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3126211C04C;
-        Fri, 17 Apr 2020 15:39:45 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id BD71311C050;
-        Fri, 17 Apr 2020 15:39:44 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.145.56.19])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri, 17 Apr 2020 15:39:44 +0000 (GMT)
-Subject: Re: [PATCH v1 1/1] MAINTAINERS: add a reviewer for KVM/s390
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>, frankja@linux.ibm.com
-Cc:     pbonzini@redhat.com, cohuck@redhat.com, david@redhat.com,
-        kvm@vger.kernel.org, linux-s390@vger.kernel.org
-References: <20200417152936.772256-1-imbrenda@linux.ibm.com>
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
-Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
- 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
- nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Date:   Fri, 17 Apr 2020 17:39:44 +0200
+        id S1726009AbgDQQ1c (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Apr 2020 12:27:32 -0400
+Received: from foss.arm.com ([217.140.110.172]:53574 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725877AbgDQQ1b (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 Apr 2020 12:27:31 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A159AC14;
+        Fri, 17 Apr 2020 09:27:29 -0700 (PDT)
+Received: from [192.168.2.22] (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4B55C3F73D;
+        Fri, 17 Apr 2020 09:27:28 -0700 (PDT)
+Subject: Re: [PATCH v2 2/6] KVM: arm: vgic: Synchronize the whole guest on
+ GIC{D,R}_I{S,C}ACTIVER read
+To:     Marc Zyngier <maz@kernel.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org
+Cc:     Zenghui Yu <yuzenghui@huawei.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Julien Grall <julien@xen.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>
+References: <20200417083319.3066217-1-maz@kernel.org>
+ <20200417083319.3066217-3-maz@kernel.org>
+From:   =?UTF-8?Q?Andr=c3=a9_Przywara?= <andre.przywara@arm.com>
+Organization: ARM Ltd.
+Message-ID: <321c946b-7ca1-e422-2c86-3ab121633549@arm.com>
+Date:   Fri, 17 Apr 2020 17:26:51 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20200417152936.772256-1-imbrenda@linux.ibm.com>
+In-Reply-To: <20200417083319.3066217-3-maz@kernel.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 20041715-0012-0000-0000-000003A63E5A
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20041715-0013-0000-0000-000021E382AB
-Message-Id: <5e0efa79-940e-6a43-fc71-532210e2d2e3@de.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.676
- definitions=2020-04-17_06:2020-04-17,2020-04-17 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 impostorscore=0
- suspectscore=0 phishscore=0 mlxscore=0 spamscore=0 malwarescore=0
- mlxlogscore=999 bulkscore=0 adultscore=0 priorityscore=1501
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2004170123
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 17/04/2020 09:33, Marc Zyngier wrote:
+> When a guest tries to read the active state of its interrupts,
+> we currently just return whatever state we have in memory. This
+> means that if such an interrupt lives in a List Register on another
+> CPU, we fail to obsertve the latest active state for this interrupt.
+> 
+> In order to remedy this, stop all the other vcpus so that they exit
+> and we can observe the most recent value for the state. This is
+> similar to what we are doing for the write side of the same
+> registers, and results in new MMIO handlers for userspace (which
+> do not need to stop the guest, as it is supposed to be stopped
+> already).
 
-On 17.04.20 17:29, Claudio Imbrenda wrote:
-> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+Thanks for the changes! Checked for other users of VGIC_NR_PRIVATE_IRQS,
+also for not missing other ACTIVE bit register handlers.
+Looks good to me!
+
+> 
+> Reported-by: Julien Grall <julien@xen.org>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+
+Reviewed-by: Andre Przywara <andre.przywara@arm.com>
+
+Cheers,
+Andre
+
 > ---
->  MAINTAINERS | 1 +
->  1 file changed, 1 insertion(+)
+>  virt/kvm/arm/vgic/vgic-mmio-v2.c |   4 +-
+>  virt/kvm/arm/vgic/vgic-mmio-v3.c |  12 ++--
+>  virt/kvm/arm/vgic/vgic-mmio.c    | 100 ++++++++++++++++++++-----------
+>  virt/kvm/arm/vgic/vgic-mmio.h    |   3 +
+>  4 files changed, 75 insertions(+), 44 deletions(-)
 > 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 6851ef7cf1bd..48e0147f9dd8 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -9326,6 +9326,7 @@ M:	Christian Borntraeger <borntraeger@de.ibm.com>
->  M:	Janosch Frank <frankja@linux.ibm.com>
->  R:	David Hildenbrand <david@redhat.com>
->  R:	Cornelia Huck <cohuck@redhat.com>
-> +R:	Claudio Imbrenda <imbrenda@linux.ibm.com>
->  L:	kvm@vger.kernel.org
->  S:	Supported
->  W:	http://www.ibm.com/developerworks/linux/linux390/
+> diff --git a/virt/kvm/arm/vgic/vgic-mmio-v2.c b/virt/kvm/arm/vgic/vgic-mmio-v2.c
+> index 5945f062d749..d63881f60e1a 100644
+> --- a/virt/kvm/arm/vgic/vgic-mmio-v2.c
+> +++ b/virt/kvm/arm/vgic/vgic-mmio-v2.c
+> @@ -422,11 +422,11 @@ static const struct vgic_register_region vgic_v2_dist_registers[] = {
+>  		VGIC_ACCESS_32bit),
+>  	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_ACTIVE_SET,
+>  		vgic_mmio_read_active, vgic_mmio_write_sactive,
+> -		NULL, vgic_mmio_uaccess_write_sactive, 1,
+> +		vgic_uaccess_read_active, vgic_mmio_uaccess_write_sactive, 1,
+>  		VGIC_ACCESS_32bit),
+>  	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_ACTIVE_CLEAR,
+>  		vgic_mmio_read_active, vgic_mmio_write_cactive,
+> -		NULL, vgic_mmio_uaccess_write_cactive, 1,
+> +		vgic_uaccess_read_active, vgic_mmio_uaccess_write_cactive, 1,
+>  		VGIC_ACCESS_32bit),
+>  	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_PRI,
+>  		vgic_mmio_read_priority, vgic_mmio_write_priority, NULL, NULL,
+> diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+> index e72dcc454247..f2b37a081f26 100644
+> --- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
+> +++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+> @@ -553,11 +553,11 @@ static const struct vgic_register_region vgic_v3_dist_registers[] = {
+>  		VGIC_ACCESS_32bit),
+>  	REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_ISACTIVER,
+>  		vgic_mmio_read_active, vgic_mmio_write_sactive,
+> -		NULL, vgic_mmio_uaccess_write_sactive, 1,
+> +		vgic_uaccess_read_active, vgic_mmio_uaccess_write_sactive, 1,
+>  		VGIC_ACCESS_32bit),
+>  	REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_ICACTIVER,
+>  		vgic_mmio_read_active, vgic_mmio_write_cactive,
+> -		NULL, vgic_mmio_uaccess_write_cactive,
+> +		vgic_uaccess_read_active, vgic_mmio_uaccess_write_cactive,
+>  		1, VGIC_ACCESS_32bit),
+>  	REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_IPRIORITYR,
+>  		vgic_mmio_read_priority, vgic_mmio_write_priority, NULL, NULL,
+> @@ -625,12 +625,12 @@ static const struct vgic_register_region vgic_v3_rd_registers[] = {
+>  		VGIC_ACCESS_32bit),
+>  	REGISTER_DESC_WITH_LENGTH_UACCESS(SZ_64K + GICR_ISACTIVER0,
+>  		vgic_mmio_read_active, vgic_mmio_write_sactive,
+> -		NULL, vgic_mmio_uaccess_write_sactive,
+> -		4, VGIC_ACCESS_32bit),
+> +		vgic_uaccess_read_active, vgic_mmio_uaccess_write_sactive, 4,
+> +		VGIC_ACCESS_32bit),
+>  	REGISTER_DESC_WITH_LENGTH_UACCESS(SZ_64K + GICR_ICACTIVER0,
+>  		vgic_mmio_read_active, vgic_mmio_write_cactive,
+> -		NULL, vgic_mmio_uaccess_write_cactive,
+> -		4, VGIC_ACCESS_32bit),
+> +		vgic_uaccess_read_active, vgic_mmio_uaccess_write_cactive, 4,
+> +		VGIC_ACCESS_32bit),
+>  	REGISTER_DESC_WITH_LENGTH(SZ_64K + GICR_IPRIORITYR0,
+>  		vgic_mmio_read_priority, vgic_mmio_write_priority, 32,
+>  		VGIC_ACCESS_32bit | VGIC_ACCESS_8bit),
+> diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
+> index d085e047953f..b38e94e8f74a 100644
+> --- a/virt/kvm/arm/vgic/vgic-mmio.c
+> +++ b/virt/kvm/arm/vgic/vgic-mmio.c
+> @@ -348,8 +348,39 @@ void vgic_mmio_write_cpending(struct kvm_vcpu *vcpu,
+>  	}
+>  }
+>  
+> -unsigned long vgic_mmio_read_active(struct kvm_vcpu *vcpu,
+> -				    gpa_t addr, unsigned int len)
+> +
+> +/*
+> + * If we are fiddling with an IRQ's active state, we have to make sure the IRQ
+> + * is not queued on some running VCPU's LRs, because then the change to the
+> + * active state can be overwritten when the VCPU's state is synced coming back
+> + * from the guest.
+> + *
+> + * For shared interrupts as well as GICv3 private interrupts, we have to
+> + * stop all the VCPUs because interrupts can be migrated while we don't hold
+> + * the IRQ locks and we don't want to be chasing moving targets.
+> + *
+> + * For GICv2 private interrupts we don't have to do anything because
+> + * userspace accesses to the VGIC state already require all VCPUs to be
+> + * stopped, and only the VCPU itself can modify its private interrupts
+> + * active state, which guarantees that the VCPU is not running.
+> + */
+> +static void vgic_access_active_prepare(struct kvm_vcpu *vcpu, u32 intid)
+> +{
+> +	if (vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3 ||
+> +	    intid >= VGIC_NR_PRIVATE_IRQS)
+> +		kvm_arm_halt_guest(vcpu->kvm);
+> +}
+> +
+> +/* See vgic_access_active_prepare */
+> +static void vgic_access_active_finish(struct kvm_vcpu *vcpu, u32 intid)
+> +{
+> +	if (vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3 ||
+> +	    intid >= VGIC_NR_PRIVATE_IRQS)
+> +		kvm_arm_resume_guest(vcpu->kvm);
+> +}
+> +
+> +static unsigned long __vgic_mmio_read_active(struct kvm_vcpu *vcpu,
+> +					     gpa_t addr, unsigned int len)
+>  {
+>  	u32 intid = VGIC_ADDR_TO_INTID(addr, 1);
+>  	u32 value = 0;
+> @@ -359,6 +390,10 @@ unsigned long vgic_mmio_read_active(struct kvm_vcpu *vcpu,
+>  	for (i = 0; i < len * 8; i++) {
+>  		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
+>  
+> +		/*
+> +		 * Even for HW interrupts, don't evaluate the HW state as
+> +		 * all the guest is interested in is the virtual state.
+> +		 */
+>  		if (irq->active)
+>  			value |= (1U << i);
+>  
+> @@ -368,6 +403,29 @@ unsigned long vgic_mmio_read_active(struct kvm_vcpu *vcpu,
+>  	return value;
+>  }
+>  
+> +unsigned long vgic_mmio_read_active(struct kvm_vcpu *vcpu,
+> +				    gpa_t addr, unsigned int len)
+> +{
+> +	u32 intid = VGIC_ADDR_TO_INTID(addr, 1);
+> +	u32 val;
+> +
+> +	mutex_lock(&vcpu->kvm->lock);
+> +	vgic_access_active_prepare(vcpu, intid);
+> +
+> +	val = __vgic_mmio_read_active(vcpu, addr, len);
+> +
+> +	vgic_access_active_finish(vcpu, intid);
+> +	mutex_unlock(&vcpu->kvm->lock);
+> +
+> +	return val;
+> +}
+> +
+> +unsigned long vgic_uaccess_read_active(struct kvm_vcpu *vcpu,
+> +				    gpa_t addr, unsigned int len)
+> +{
+> +	return __vgic_mmio_read_active(vcpu, addr, len);
+> +}
+> +
+>  /* Must be called with irq->irq_lock held */
+>  static void vgic_hw_irq_change_active(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
+>  				      bool active, bool is_uaccess)
+> @@ -426,36 +484,6 @@ static void vgic_mmio_change_active(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
+>  		raw_spin_unlock_irqrestore(&irq->irq_lock, flags);
+>  }
+>  
+> -/*
+> - * If we are fiddling with an IRQ's active state, we have to make sure the IRQ
+> - * is not queued on some running VCPU's LRs, because then the change to the
+> - * active state can be overwritten when the VCPU's state is synced coming back
+> - * from the guest.
+> - *
+> - * For shared interrupts, we have to stop all the VCPUs because interrupts can
+> - * be migrated while we don't hold the IRQ locks and we don't want to be
+> - * chasing moving targets.
+> - *
+> - * For private interrupts we don't have to do anything because userspace
+> - * accesses to the VGIC state already require all VCPUs to be stopped, and
+> - * only the VCPU itself can modify its private interrupts active state, which
+> - * guarantees that the VCPU is not running.
+> - */
+> -static void vgic_change_active_prepare(struct kvm_vcpu *vcpu, u32 intid)
+> -{
+> -	if (vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3 ||
+> -	    intid >= VGIC_NR_PRIVATE_IRQS)
+> -		kvm_arm_halt_guest(vcpu->kvm);
+> -}
+> -
+> -/* See vgic_change_active_prepare */
+> -static void vgic_change_active_finish(struct kvm_vcpu *vcpu, u32 intid)
+> -{
+> -	if (vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3 ||
+> -	    intid >= VGIC_NR_PRIVATE_IRQS)
+> -		kvm_arm_resume_guest(vcpu->kvm);
+> -}
+> -
+>  static void __vgic_mmio_write_cactive(struct kvm_vcpu *vcpu,
+>  				      gpa_t addr, unsigned int len,
+>  				      unsigned long val)
+> @@ -477,11 +505,11 @@ void vgic_mmio_write_cactive(struct kvm_vcpu *vcpu,
+>  	u32 intid = VGIC_ADDR_TO_INTID(addr, 1);
+>  
+>  	mutex_lock(&vcpu->kvm->lock);
+> -	vgic_change_active_prepare(vcpu, intid);
+> +	vgic_access_active_prepare(vcpu, intid);
+>  
+>  	__vgic_mmio_write_cactive(vcpu, addr, len, val);
+>  
+> -	vgic_change_active_finish(vcpu, intid);
+> +	vgic_access_active_finish(vcpu, intid);
+>  	mutex_unlock(&vcpu->kvm->lock);
+>  }
+>  
+> @@ -514,11 +542,11 @@ void vgic_mmio_write_sactive(struct kvm_vcpu *vcpu,
+>  	u32 intid = VGIC_ADDR_TO_INTID(addr, 1);
+>  
+>  	mutex_lock(&vcpu->kvm->lock);
+> -	vgic_change_active_prepare(vcpu, intid);
+> +	vgic_access_active_prepare(vcpu, intid);
+>  
+>  	__vgic_mmio_write_sactive(vcpu, addr, len, val);
+>  
+> -	vgic_change_active_finish(vcpu, intid);
+> +	vgic_access_active_finish(vcpu, intid);
+>  	mutex_unlock(&vcpu->kvm->lock);
+>  }
+>  
+> diff --git a/virt/kvm/arm/vgic/vgic-mmio.h b/virt/kvm/arm/vgic/vgic-mmio.h
+> index 5af2aefad435..30713a44e3fa 100644
+> --- a/virt/kvm/arm/vgic/vgic-mmio.h
+> +++ b/virt/kvm/arm/vgic/vgic-mmio.h
+> @@ -152,6 +152,9 @@ void vgic_mmio_write_cpending(struct kvm_vcpu *vcpu,
+>  unsigned long vgic_mmio_read_active(struct kvm_vcpu *vcpu,
+>  				    gpa_t addr, unsigned int len);
+>  
+> +unsigned long vgic_uaccess_read_active(struct kvm_vcpu *vcpu,
+> +				    gpa_t addr, unsigned int len);
+> +
+>  void vgic_mmio_write_cactive(struct kvm_vcpu *vcpu,
+>  			     gpa_t addr, unsigned int len,
+>  			     unsigned long val);
 > 
-
-You cant have enough of the "R:"s 
-Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
 
