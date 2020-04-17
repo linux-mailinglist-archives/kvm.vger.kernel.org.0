@@ -2,410 +2,205 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 446331AE270
-	for <lists+kvm@lfdr.de>; Fri, 17 Apr 2020 18:44:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E98651AE27C
+	for <lists+kvm@lfdr.de>; Fri, 17 Apr 2020 18:48:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726749AbgDQQog (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Apr 2020 12:44:36 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:35106 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726694AbgDQQo0 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 17 Apr 2020 12:44:26 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1587141864;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:in-reply-to:in-reply-to:references:references;
-        bh=iDnlDFp8LZAIQvaBjijyUwkyshz2bioFD+80EqCVbCk=;
-        b=OjkOWheh1VufMMQn6WeZPlntDCwEySYJwWuqexv3ZkvY40qC08t4YAoL3dEU+o2TCAavwV
-        +hAwFcv9UZ4bEQ1/D611xoTYKPxm6o+bNMKsm+rwdaiiouiihpChB/Du+xZzvOYOzYQ1gy
-        kkrmEt3cpoFBcp1zJ6JrvyKyyvVsovk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-179-I8LXUi5lO7iizlxPTUktYQ-1; Fri, 17 Apr 2020 12:44:20 -0400
-X-MC-Unique: I8LXUi5lO7iizlxPTUktYQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 111A0801A07;
-        Fri, 17 Apr 2020 16:44:19 +0000 (UTC)
-Received: from virtlab511.virt.lab.eng.bos.redhat.com (virtlab511.virt.lab.eng.bos.redhat.com [10.19.152.198])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 1E4461001920;
-        Fri, 17 Apr 2020 16:44:16 +0000 (UTC)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>
-Subject: [PATCH 3/3] KVM: x86: move nested-related kvm_x86_ops to a separate struct
-Date:   Fri, 17 Apr 2020 12:44:13 -0400
-Message-Id: <20200417164413.71885-4-pbonzini@redhat.com>
-In-Reply-To: <20200417164413.71885-1-pbonzini@redhat.com>
-References: <20200417164413.71885-1-pbonzini@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+        id S1726798AbgDQQsi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Apr 2020 12:48:38 -0400
+Received: from foss.arm.com ([217.140.110.172]:53764 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726429AbgDQQsi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 Apr 2020 12:48:38 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 64671C14;
+        Fri, 17 Apr 2020 09:48:37 -0700 (PDT)
+Received: from [192.168.0.14] (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0A5553F6C4;
+        Fri, 17 Apr 2020 09:48:35 -0700 (PDT)
+Subject: Re: [PATCH v2 4/6] KVM: arm: vgic-v2: Only use the virtual state when
+ userspace accesses pending bits
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, Zenghui Yu <yuzenghui@huawei.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Andre Przywara <Andre.Przywara@arm.com>,
+        Julien Grall <julien@xen.org>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>
+References: <20200417083319.3066217-1-maz@kernel.org>
+ <20200417083319.3066217-5-maz@kernel.org>
+ <4133d5f2-ed0e-9c4a-8a66-953fb6bf6e70@arm.com> <20200417134140.0a901749@why>
+From:   James Morse <james.morse@arm.com>
+Message-ID: <7b001ee4-0a8e-d79c-1be4-563dab4ca452@arm.com>
+Date:   Fri, 17 Apr 2020 17:48:34 +0100
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
+MIME-Version: 1.0
+In-Reply-To: <20200417134140.0a901749@why>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Clean up some of the patching of kvm_x86_ops, by moving kvm_x86_ops related to
-nested virtualization into a separate struct.
+Hi Marc,
 
-As a result, these ops will always be non-NULL on VMX.  This is not a problem:
+On 17/04/2020 13:41, Marc Zyngier wrote:
+> On Fri, 17 Apr 2020 12:22:10 +0100 James Morse <james.morse@arm.com> wrote:
+>> On 17/04/2020 09:33, Marc Zyngier wrote:
+>>> There is no point in accessing the HW when writing to any of the
+>>> ISPENDR/ICPENDR registers from userspace, as only the guest should
+>>> be allowed to change the HW state.
+>>>
+>>> Introduce new userspace-specific accessors that deal solely with
+>>> the virtual state. Note that the API differs from that of GICv3,
+>>> where userspace exclusively uses ISPENDR to set the state. Too
+>>> bad we can't reuse it.  
 
-* check_nested_events is only called if is_guest_mode(vcpu) returns true
+>>> diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
+>>> index 6e30034d1464..f1927ae02d2e 100644
+>>> --- a/virt/kvm/arm/vgic/vgic-mmio.c
+>>> +++ b/virt/kvm/arm/vgic/vgic-mmio.c
+>>> @@ -321,6 +321,27 @@ void vgic_mmio_write_spending(struct kvm_vcpu *vcpu,  
+>>
+>>> +int vgic_uaccess_write_spending(struct kvm_vcpu *vcpu,
+>>> +				gpa_t addr, unsigned int len,
+>>> +				unsigned long val)
+>>> +{
+>>> +	u32 intid = VGIC_ADDR_TO_INTID(addr, 1);
+>>> +	int i;
+>>> +	unsigned long flags;
+>>> +
+>>> +	for_each_set_bit(i, &val, len * 8) {
+>>> +		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);  
+>>
+>> vgic_mmio_write_spending() has:
+>> |	/* GICD_ISPENDR0 SGI bits are WI *
+>>
+>> and bales out early. Is GIC_DIST_PENDING_SET the same register?
+>> (If so, shouldn't that be true for PPI too?)
+> 
+> Hmmm. It's a bit more complicated (surprisingly).
+> 
+> Yes, the SGI pending bits are WI from the guest perspective (as
+> required by the spec).
 
-* get_nested_state treats VMXOFF state the same as nested being disabled
+> But we still need to be able to restore them
+> from userspace, and I bet 82e40f558de56 ("KVM: arm/arm64: vgic-v2:
+> Handle SGI bits in GICD_I{S,C}PENDR0 as WI") has broken migration with
+> GICv2 (if you migrated with a pending SGI, you cannot restore it...).
 
-* set_nested_state fails if you attempt to set nested state while
-  nesting is disabled
+Fun! It looks like the ioctl() would succeed, but nothing happened. Once you restart the
+guest one CPU may wait forever for the victim to respond.
 
-* nested_enable_evmcs could already be called on a CPU without VMX enabled
-  in CPUID.
 
-* nested_get_evmcs_version was fixed in the previous patch
+> Now, there is still a bug here, in the sense that we need to indicate
+> which vcpu is the source of the SGI (this is a GICv2-special).
+> Unfortunately, we don't have a way to communicate this architecturally.
+> The only option we have is to make it up (as a self-SGI, for example).
+> But this is pretty broken at the architectural level TBH.
+> On the other hand, PPIs are just fine.
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- arch/x86/include/asm/kvm_host.h | 29 ++++++++++++++++-------------
- arch/x86/kvm/hyperv.c           |  4 ++--
- arch/x86/kvm/svm/nested.c       |  6 +++++-
- arch/x86/kvm/svm/svm.c          | 13 +++++--------
- arch/x86/kvm/svm/svm.h          |  3 ++-
- arch/x86/kvm/vmx/nested.c       | 16 +++++++++-------
- arch/x86/kvm/vmx/nested.h       |  2 ++
- arch/x86/kvm/vmx/vmx.c          |  7 +------
- arch/x86/kvm/x86.c              | 28 ++++++++++++++--------------
- 9 files changed, 56 insertions(+), 52 deletions(-)
+Yup, wrong spec, I was looking at the same register in GICv3! It looks like the GICv3 text
+is there because those registers live in the redistributor instead... duh!
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index fc38d95e28a4..ca0d0f9b3f92 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1178,7 +1178,6 @@ struct kvm_x86_ops {
- 			       struct x86_exception *exception);
- 	void (*handle_exit_irqoff)(struct kvm_vcpu *vcpu);
- 
--	int (*check_nested_events)(struct kvm_vcpu *vcpu);
- 	void (*request_immediate_exit)(struct kvm_vcpu *vcpu);
- 
- 	void (*sched_in)(struct kvm_vcpu *kvm, int cpu);
-@@ -1211,6 +1210,7 @@ struct kvm_x86_ops {
- 
- 	/* pmu operations of sub-arch */
- 	const struct kvm_pmu_ops *pmu_ops;
-+	const struct kvm_x86_nested_ops *nested_ops;
- 
- 	/*
- 	 * Architecture specific hooks for vCPU blocking due to
-@@ -1238,14 +1238,6 @@ struct kvm_x86_ops {
- 
- 	void (*setup_mce)(struct kvm_vcpu *vcpu);
- 
--	int (*get_nested_state)(struct kvm_vcpu *vcpu,
--				struct kvm_nested_state __user *user_kvm_nested_state,
--				unsigned user_data_size);
--	int (*set_nested_state)(struct kvm_vcpu *vcpu,
--				struct kvm_nested_state __user *user_kvm_nested_state,
--				struct kvm_nested_state *kvm_state);
--	bool (*get_vmcs12_pages)(struct kvm_vcpu *vcpu);
--
- 	int (*smi_allowed)(struct kvm_vcpu *vcpu);
- 	int (*pre_enter_smm)(struct kvm_vcpu *vcpu, char *smstate);
- 	int (*pre_leave_smm)(struct kvm_vcpu *vcpu, const char *smstate);
-@@ -1257,16 +1249,27 @@ struct kvm_x86_ops {
- 
- 	int (*get_msr_feature)(struct kvm_msr_entry *entry);
- 
--	int (*nested_enable_evmcs)(struct kvm_vcpu *vcpu,
--				   uint16_t *vmcs_version);
--	uint16_t (*nested_get_evmcs_version)(struct kvm_vcpu *vcpu);
--
- 	bool (*need_emulation_on_page_fault)(struct kvm_vcpu *vcpu);
- 
- 	bool (*apic_init_signal_blocked)(struct kvm_vcpu *vcpu);
- 	int (*enable_direct_tlbflush)(struct kvm_vcpu *vcpu);
- };
- 
-+struct kvm_x86_nested_ops {
-+	int (*check_nested_events)(struct kvm_vcpu *vcpu);
-+	int (*get_nested_state)(struct kvm_vcpu *vcpu,
-+				struct kvm_nested_state __user *user_kvm_nested_state,
-+				unsigned user_data_size);
-+	int (*set_nested_state)(struct kvm_vcpu *vcpu,
-+				struct kvm_nested_state __user *user_kvm_nested_state,
-+				struct kvm_nested_state *kvm_state);
-+	bool (*get_vmcs12_pages)(struct kvm_vcpu *vcpu);
-+
-+	int (*nested_enable_evmcs)(struct kvm_vcpu *vcpu,
-+				   uint16_t *vmcs_version);
-+	uint16_t (*nested_get_evmcs_version)(struct kvm_vcpu *vcpu);
-+};
-+
- struct kvm_x86_init_ops {
- 	int (*cpu_has_kvm_support)(void);
- 	int (*disabled_by_bios)(void);
-diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
-index b850f676abe4..d1a0f9294d57 100644
---- a/arch/x86/kvm/hyperv.c
-+++ b/arch/x86/kvm/hyperv.c
-@@ -1799,8 +1799,8 @@ int kvm_vcpu_ioctl_get_hv_cpuid(struct kvm_vcpu *vcpu, struct kvm_cpuid2 *cpuid,
- 	};
- 	int i, nent = ARRAY_SIZE(cpuid_entries);
- 
--	if (kvm_x86_ops.nested_get_evmcs_version)
--		evmcs_ver = kvm_x86_ops.nested_get_evmcs_version(vcpu);
-+	if (kvm_x86_ops.nested_ops->nested_get_evmcs_version)
-+		evmcs_ver = kvm_x86_ops.nested_ops->nested_get_evmcs_version(vcpu);
- 
- 	/* Skip NESTED_FEATURES if eVMCS is not supported */
- 	if (!evmcs_ver)
-diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-index 3e5bd739a6f6..671b883fd14e 100644
---- a/arch/x86/kvm/svm/nested.c
-+++ b/arch/x86/kvm/svm/nested.c
-@@ -784,7 +784,7 @@ static bool nested_exit_on_intr(struct vcpu_svm *svm)
- 	return (svm->nested.intercept & 1ULL);
- }
- 
--int svm_check_nested_events(struct kvm_vcpu *vcpu)
-+static int svm_check_nested_events(struct kvm_vcpu *vcpu)
- {
- 	struct vcpu_svm *svm = to_svm(vcpu);
- 	bool block_nested_events =
-@@ -825,3 +825,7 @@ int nested_svm_exit_special(struct vcpu_svm *svm)
- 
- 	return NESTED_EXIT_CONTINUE;
- }
-+
-+struct kvm_x86_nested_ops svm_nested_ops = {
-+	.check_nested_events = svm_check_nested_events,
-+};
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index a6f4e1bdb045..a91e397d6750 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -3895,9 +3895,9 @@ static bool svm_apic_init_signal_blocked(struct kvm_vcpu *vcpu)
- 	/*
- 	 * TODO: Last condition latch INIT signals on vCPU when
- 	 * vCPU is in guest-mode and vmcb12 defines intercept on INIT.
--	 * To properly emulate the INIT intercept, SVM should implement
--	 * kvm_x86_ops.check_nested_events() and call nested_svm_vmexit()
--	 * there if an INIT signal is pending.
-+	 * To properly emulate the INIT intercept,
-+	 * svm_check_nested_events() should call nested_svm_vmexit()
-+	 * if an INIT signal is pending.
- 	 */
- 	return !gif_set(svm) ||
- 		   (svm->vmcb->control.intercept & (1ULL << INTERCEPT_INIT));
-@@ -4025,6 +4025,8 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
- 	.sched_in = svm_sched_in,
- 
- 	.pmu_ops = &amd_pmu_ops,
-+	.nested_ops = &svm_nested_ops,
-+
- 	.deliver_posted_interrupt = svm_deliver_avic_intr,
- 	.dy_apicv_has_pending_interrupt = svm_dy_apicv_has_pending_interrupt,
- 	.update_pi_irte = svm_update_pi_irte,
-@@ -4039,14 +4041,9 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
- 	.mem_enc_reg_region = svm_register_enc_region,
- 	.mem_enc_unreg_region = svm_unregister_enc_region,
- 
--	.nested_enable_evmcs = NULL,
--	.nested_get_evmcs_version = NULL,
--
- 	.need_emulation_on_page_fault = svm_need_emulation_on_page_fault,
- 
- 	.apic_init_signal_blocked = svm_apic_init_signal_blocked,
--
--	.check_nested_events = svm_check_nested_events,
- };
- 
- static struct kvm_x86_init_ops svm_init_ops __initdata = {
-diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index ca95204f9dde..98c2890d561d 100644
---- a/arch/x86/kvm/svm/svm.h
-+++ b/arch/x86/kvm/svm/svm.h
-@@ -398,9 +398,10 @@ int nested_svm_exit_handled(struct vcpu_svm *svm);
- int nested_svm_check_permissions(struct vcpu_svm *svm);
- int nested_svm_check_exception(struct vcpu_svm *svm, unsigned nr,
- 			       bool has_error_code, u32 error_code);
--int svm_check_nested_events(struct kvm_vcpu *vcpu);
- int nested_svm_exit_special(struct vcpu_svm *svm);
- 
-+extern struct kvm_x86_nested_ops svm_nested_ops;
-+
- /* avic.c */
- 
- #define AVIC_LOGICAL_ID_ENTRY_GUEST_PHYSICAL_ID_MASK	(0xFF)
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index f228339cd0a0..8597141bd1c7 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -6440,12 +6440,14 @@ __init int nested_vmx_hardware_setup(struct kvm_x86_ops *ops,
- 	exit_handlers[EXIT_REASON_INVVPID]	= handle_invvpid;
- 	exit_handlers[EXIT_REASON_VMFUNC]	= handle_vmfunc;
- 
--	ops->check_nested_events = vmx_check_nested_events;
--	ops->get_nested_state = vmx_get_nested_state;
--	ops->set_nested_state = vmx_set_nested_state;
--	ops->get_vmcs12_pages = nested_get_vmcs12_pages;
--	ops->nested_enable_evmcs = nested_enable_evmcs;
--	ops->nested_get_evmcs_version = nested_get_evmcs_version;
--
- 	return 0;
- }
-+
-+struct kvm_x86_nested_ops vmx_nested_ops = {
-+	.check_nested_events = vmx_check_nested_events,
-+	.get_nested_state = vmx_get_nested_state,
-+	.set_nested_state = vmx_set_nested_state,
-+	.get_vmcs12_pages = nested_get_vmcs12_pages,
-+	.nested_enable_evmcs = nested_enable_evmcs,
-+	.nested_get_evmcs_version = nested_get_evmcs_version,
-+};
-diff --git a/arch/x86/kvm/vmx/nested.h b/arch/x86/kvm/vmx/nested.h
-index 1514ff4db77f..7ce9572c3d3a 100644
---- a/arch/x86/kvm/vmx/nested.h
-+++ b/arch/x86/kvm/vmx/nested.h
-@@ -278,4 +278,6 @@ static inline bool nested_cr4_valid(struct kvm_vcpu *vcpu, unsigned long val)
- #define nested_guest_cr4_valid	nested_cr4_valid
- #define nested_host_cr4_valid	nested_cr4_valid
- 
-+extern struct kvm_x86_nested_ops vmx_nested_ops;
-+
- #endif /* __KVM_X86_VMX_NESTED_H */
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 766303b31949..455cd2c8dbce 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -7862,6 +7862,7 @@ static struct kvm_x86_ops vmx_x86_ops __initdata = {
- 	.post_block = vmx_post_block,
- 
- 	.pmu_ops = &intel_pmu_ops,
-+	.nested_ops = &vmx_nested_ops,
- 
- 	.update_pi_irte = vmx_update_pi_irte,
- 
-@@ -7877,12 +7878,6 @@ static struct kvm_x86_ops vmx_x86_ops __initdata = {
- 	.pre_leave_smm = vmx_pre_leave_smm,
- 	.enable_smi_window = enable_smi_window,
- 
--	.check_nested_events = NULL,
--	.get_nested_state = NULL,
--	.set_nested_state = NULL,
--	.get_vmcs12_pages = NULL,
--	.nested_enable_evmcs = NULL,
--	.nested_get_evmcs_version = NULL,
- 	.need_emulation_on_page_fault = vmx_need_emulation_on_page_fault,
- 	.apic_init_signal_blocked = vmx_apic_init_signal_blocked,
- };
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 0492baeb78ab..5bcb4569196a 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -3442,14 +3442,14 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 		r = KVM_X2APIC_API_VALID_FLAGS;
- 		break;
- 	case KVM_CAP_NESTED_STATE:
--		r = kvm_x86_ops.get_nested_state ?
--			kvm_x86_ops.get_nested_state(NULL, NULL, 0) : 0;
-+		r = kvm_x86_ops.nested_ops->get_nested_state ?
-+			kvm_x86_ops.nested_ops->get_nested_state(NULL, NULL, 0) : 0;
- 		break;
- 	case KVM_CAP_HYPERV_DIRECT_TLBFLUSH:
- 		r = kvm_x86_ops.enable_direct_tlbflush != NULL;
- 		break;
- 	case KVM_CAP_HYPERV_ENLIGHTENED_VMCS:
--		r = kvm_x86_ops.nested_enable_evmcs != NULL;
-+		r = kvm_x86_ops.nested_ops->nested_enable_evmcs != NULL;
- 		break;
- 	default:
- 		break;
-@@ -4235,9 +4235,9 @@ static int kvm_vcpu_ioctl_enable_cap(struct kvm_vcpu *vcpu,
- 		return kvm_hv_activate_synic(vcpu, cap->cap ==
- 					     KVM_CAP_HYPERV_SYNIC2);
- 	case KVM_CAP_HYPERV_ENLIGHTENED_VMCS:
--		if (!kvm_x86_ops.nested_enable_evmcs)
-+		if (!kvm_x86_ops.nested_ops->nested_enable_evmcs)
- 			return -ENOTTY;
--		r = kvm_x86_ops.nested_enable_evmcs(vcpu, &vmcs_version);
-+		r = kvm_x86_ops.nested_ops->nested_enable_evmcs(vcpu, &vmcs_version);
- 		if (!r) {
- 			user_ptr = (void __user *)(uintptr_t)cap->args[0];
- 			if (copy_to_user(user_ptr, &vmcs_version,
-@@ -4552,7 +4552,7 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
- 		u32 user_data_size;
- 
- 		r = -EINVAL;
--		if (!kvm_x86_ops.get_nested_state)
-+		if (!kvm_x86_ops.nested_ops->get_nested_state)
- 			break;
- 
- 		BUILD_BUG_ON(sizeof(user_data_size) != sizeof(user_kvm_nested_state->size));
-@@ -4560,8 +4560,8 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
- 		if (get_user(user_data_size, &user_kvm_nested_state->size))
- 			break;
- 
--		r = kvm_x86_ops.get_nested_state(vcpu, user_kvm_nested_state,
--						  user_data_size);
-+		r = kvm_x86_ops.nested_ops->get_nested_state(vcpu, user_kvm_nested_state,
-+							     user_data_size);
- 		if (r < 0)
- 			break;
- 
-@@ -4582,7 +4582,7 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
- 		int idx;
- 
- 		r = -EINVAL;
--		if (!kvm_x86_ops.set_nested_state)
-+		if (!kvm_x86_ops.nested_ops->set_nested_state)
- 			break;
- 
- 		r = -EFAULT;
-@@ -4604,7 +4604,7 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
- 			break;
- 
- 		idx = srcu_read_lock(&vcpu->kvm->srcu);
--		r = kvm_x86_ops.set_nested_state(vcpu, user_kvm_nested_state, &kvm_state);
-+		r = kvm_x86_ops.nested_ops->set_nested_state(vcpu, user_kvm_nested_state, &kvm_state);
- 		srcu_read_unlock(&vcpu->kvm->srcu, idx);
- 		break;
- 	}
-@@ -7700,7 +7700,7 @@ static int inject_pending_event(struct kvm_vcpu *vcpu)
- 	 * from L2 to L1.
- 	 */
- 	if (is_guest_mode(vcpu)) {
--		r = kvm_x86_ops.check_nested_events(vcpu);
-+		r = kvm_x86_ops.nested_ops->check_nested_events(vcpu);
- 		if (r != 0)
- 			return r;
- 	}
-@@ -7762,7 +7762,7 @@ static int inject_pending_event(struct kvm_vcpu *vcpu)
- 		 * KVM_REQ_EVENT only on certain events and not unconditionally?
- 		 */
- 		if (is_guest_mode(vcpu)) {
--			r = kvm_x86_ops.check_nested_events(vcpu);
-+			r = kvm_x86_ops.nested_ops->check_nested_events(vcpu);
- 			if (r != 0)
- 				return r;
- 		}
-@@ -8185,7 +8185,7 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
- 
- 	if (kvm_request_pending(vcpu)) {
- 		if (kvm_check_request(KVM_REQ_GET_VMCS12_PAGES, vcpu)) {
--			if (unlikely(!kvm_x86_ops.get_vmcs12_pages(vcpu))) {
-+			if (unlikely(!kvm_x86_ops.nested_ops->get_vmcs12_pages(vcpu))) {
- 				r = 0;
- 				goto out;
- 			}
-@@ -8528,7 +8528,7 @@ static inline int vcpu_block(struct kvm *kvm, struct kvm_vcpu *vcpu)
- static inline bool kvm_vcpu_running(struct kvm_vcpu *vcpu)
- {
- 	if (is_guest_mode(vcpu))
--		kvm_x86_ops.check_nested_events(vcpu);
-+		kvm_x86_ops.nested_ops->check_nested_events(vcpu);
- 
- 	return (vcpu->arch.mp_state == KVM_MP_STATE_RUNNABLE &&
- 		!vcpu->arch.apf.halted);
--- 
-2.18.2
 
+>>> @@ -390,6 +411,26 @@ void vgic_mmio_write_cpending(struct kvm_vcpu *vcpu,  
+>>
+>>> +int vgic_uaccess_write_cpending(struct kvm_vcpu *vcpu,
+>>> +				gpa_t addr, unsigned int len,
+>>> +				unsigned long val)
+>>> +{
+>>> +	u32 intid = VGIC_ADDR_TO_INTID(addr, 1);
+>>> +	int i;
+>>> +	unsigned long flags;
+>>> +
+>>> +	for_each_set_bit(i, &val, len * 8) {
+>>> +		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);  
+>>
+>> Same dumb question about GICD_ICPENDR0!?
+> 
+> Not dumb at all! Given that we previously allowed this to be accessed
+> from userspace (well, before we broke it again), it should be able to
+> clear *something*. If we adopt the self-SGI behaviour as above, we will
+> get away with it.
+> 
+> Here's what I'm proposing to add to this patch, together with a
+> Fixes: 82e40f558de56 ("KVM: arm/arm64: vgic-v2: Handle SGI bits in GICD_I{S,C}PENDR0 as WI")
+> 
+> Nobody is using GICv2, obviously... :-/
+
+> diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
+> index f1927ae02d2e..974cdcf2f232 100644
+> --- a/virt/kvm/arm/vgic/vgic-mmio.c
+> +++ b/virt/kvm/arm/vgic/vgic-mmio.c
+
+> @@ -334,6 +322,15 @@ int vgic_uaccess_write_spending(struct kvm_vcpu *vcpu,
+>  
+>  		raw_spin_lock_irqsave(&irq->irq_lock, flags);
+>  		irq->pending_latch = true;
+> +
+> +		/*
+> +		 * GICv2 SGIs are terribly broken. We can't restore
+> +		 * the source of the interrupt, so just pick the vcpu
+> +		 * itself as the source...
+
+Makes sense, this way you can't have an SGI coming from an offline CPU!
+
+
+> +		 */
+> +		if (is_vgic_v2_sgi(vcpu, irq))
+> +			irq->source |= BIT(vcpu->vcpu_id);
+> +
+>  		vgic_queue_irq_unlock(vcpu->kvm, irq, flags);
+>  
+>  		vgic_put_irq(vcpu->kvm, irq);
+
+> @@ -423,7 +415,22 @@ int vgic_uaccess_write_cpending(struct kvm_vcpu *vcpu,
+>  		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
+>  
+>  		raw_spin_lock_irqsave(&irq->irq_lock, flags);
+> -		irq->pending_latch = false;
+> +		/*
+> +		 * More fun with GICv2 SGIs! If we're clearing one of them
+> +		 * from userspace, which source vcpu to clear?  Let's pick
+> +		 * the target vcpu itself (consistent whith the way we
+> +		 * populate them on the ISPENDR side), and only clear the
+> +		 * pending state if no sources are left (insert expletive
+> +		 * here).
+
+But I'm not so sure about this. Doesn't this mean that user-space can't clear pending-SGI?
+Only if its pending due to self-SGI. I'm not sure when user-space would want to do this,
+so it may not matter.
+
+Using ffs() you could clear the lowest pending source, I assume if its pending, there is
+likely only one source. If not, user-space can eventually clear pending SGI with at most
+nr-vcpu calls ... and ffs() could double up as the missing expletive!
+
+(but if user-space never actually does this, then we should do the simplest thing)
+
+
+> +		 */
+> +		if (is_vgic_v2_sgi(vcpu, irq)) {
+> +			irq->source &= ~BIT(vcpu->vcpu_id);
+> +			if (!irq->source)
+> +				irq->pending_latch = false;
+> +		} else {
+> +			irq->pending_latch = false;
+> +		}
+> +
+>  		raw_spin_unlock_irqrestore(&irq->irq_lock, flags);
+>  
+>  		vgic_put_irq(vcpu->kvm, irq);
+
+Otherwise looks good to me,
+
+
+Thanks,
+
+James
+
+[0]
+https://static.docs.arm.com/ihi0069/f/IHI0069F_gic_architecture_specification_v3_and_v4.1.pdf
