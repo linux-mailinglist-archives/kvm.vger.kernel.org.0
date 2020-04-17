@@ -2,157 +2,166 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C9FC01ADC18
-	for <lists+kvm@lfdr.de>; Fri, 17 Apr 2020 13:24:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CF0001ADC22
+	for <lists+kvm@lfdr.de>; Fri, 17 Apr 2020 13:28:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730265AbgDQLXL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Apr 2020 07:23:11 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:19928 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1729962AbgDQLXK (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 17 Apr 2020 07:23:10 -0400
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 03HB7cP6146451
-        for <kvm@vger.kernel.org>; Fri, 17 Apr 2020 07:23:10 -0400
-Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 30fb0x0u1p-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Fri, 17 Apr 2020 07:23:09 -0400
-Received: from localhost
-        by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <pmorel@linux.ibm.com>;
-        Fri, 17 Apr 2020 12:23:03 +0100
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
-        by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Fri, 17 Apr 2020 12:23:01 +0100
-Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 03HBN4Ej49348674
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 17 Apr 2020 11:23:04 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3BD7042045;
-        Fri, 17 Apr 2020 11:23:04 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A244D42042;
-        Fri, 17 Apr 2020 11:23:03 +0000 (GMT)
-Received: from oc3016276355.ibm.com (unknown [9.145.1.50])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri, 17 Apr 2020 11:23:03 +0000 (GMT)
-Subject: Re: [PATCH v7 04/15] s390/vfio-ap: implement in-use callback for
- vfio_ap driver
-To:     Tony Krowiak <akrowiak@linux.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, freude@linux.ibm.com, borntraeger@de.ibm.com,
-        mjrosato@linux.ibm.com, pasic@linux.ibm.com,
-        alex.williamson@redhat.com, kwankhede@nvidia.com,
-        jjherne@linux.ibm.com, fiuczy@linux.ibm.com
-References: <20200407192015.19887-1-akrowiak@linux.ibm.com>
- <20200407192015.19887-5-akrowiak@linux.ibm.com>
- <20200416131845.3ef6b3b5.cohuck@redhat.com>
- <5cf7d611-e30c-226d-0d3d-d37170f117f4@linux.ibm.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-Date:   Fri, 17 Apr 2020 13:23:03 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+        id S1730318AbgDQL10 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Apr 2020 07:27:26 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:20916 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1730246AbgDQL1Z (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 17 Apr 2020 07:27:25 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1587122843;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Vr7BOIbO9qakvttMKiL/rWtwPVentFYT4peua3moyXg=;
+        b=FGtXg/BfIeVUcUgJm7b4x1m+EyvkxAEy0Ybg6O7O7cujyo5jDZg7ZgHJEGU5B5YeWmAwhe
+        h5wX/4CVtEtoOjHorOJgrMWADX5nKe3hseRhazYPaUDLOfsZbRPX38lsrwV4sqN7mGFnL1
+        MBDy0UeGPxgQ4j29J931fc6z1LITVSM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-359-fiee8RQFNc2mMhyoQXOhVA-1; Fri, 17 Apr 2020 07:27:19 -0400
+X-MC-Unique: fiee8RQFNc2mMhyoQXOhVA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A3B72107ACCA;
+        Fri, 17 Apr 2020 11:27:16 +0000 (UTC)
+Received: from gondolin (ovpn-112-200.ams2.redhat.com [10.36.112.200])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 330F75C1C5;
+        Fri, 17 Apr 2020 11:27:02 +0000 (UTC)
+Date:   Fri, 17 Apr 2020 13:24:57 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Yan Zhao <yan.y.zhao@intel.com>
+Cc:     "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        "libvir-list@redhat.com" <libvir-list@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "aik@ozlabs.ru" <aik@ozlabs.ru>,
+        "Zhengxiao.zx@alibaba-inc.com" <Zhengxiao.zx@alibaba-inc.com>,
+        "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
+        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+        "eauger@redhat.com" <eauger@redhat.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>, "Zeng, Xin" <xin.zeng@intel.com>,
+        "Yang, Ziye" <ziye.yang@intel.com>,
+        "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
+        "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
+        "felipe@nutanix.com" <felipe@nutanix.com>,
+        "Liu, Changpeng" <changpeng.liu@intel.com>,
+        "Ken.Xue@amd.com" <Ken.Xue@amd.com>,
+        "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>,
+        "He, Shaopeng" <shaopeng.he@intel.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "eskultet@redhat.com" <eskultet@redhat.com>,
+        "dgilbert@redhat.com" <dgilbert@redhat.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
+        "Wang, Zhi A" <zhi.a.wang@intel.com>,
+        "cjia@nvidia.com" <cjia@nvidia.com>,
+        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
+        "berrange@redhat.com" <berrange@redhat.com>,
+        "dinechin@redhat.com" <dinechin@redhat.com>,
+        "corbet@lwn.net" <corbet@lwn.net>
+Subject: Re: [PATCH v5 0/4] introduction of migration_version attribute for
+ VFIO live migration
+Message-ID: <20200417132457.45d91fe3.cohuck@redhat.com>
+In-Reply-To: <20200417095202.GD16688@joy-OptiPlex-7040>
+References: <20200413055201.27053-1-yan.y.zhao@intel.com>
+        <20200417104450.2d2f2fa9.cohuck@redhat.com>
+        <20200417095202.GD16688@joy-OptiPlex-7040>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-In-Reply-To: <5cf7d611-e30c-226d-0d3d-d37170f117f4@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-x-cbid: 20041711-0028-0000-0000-000003F9DD10
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20041711-0029-0000-0000-000024BF967F
-Message-Id: <458e4bfe-6736-42b5-a510-21a4594df0e1@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.676
- definitions=2020-04-17_03:2020-04-17,2020-04-17 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 mlxlogscore=999
- suspectscore=0 malwarescore=0 priorityscore=1501 spamscore=0
- impostorscore=0 adultscore=0 phishscore=0 mlxscore=0 lowpriorityscore=0
- clxscore=1011 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2004170083
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Fri, 17 Apr 2020 05:52:02 -0400
+Yan Zhao <yan.y.zhao@intel.com> wrote:
 
-
-On 2020-04-16 16:45, Tony Krowiak wrote:
+> On Fri, Apr 17, 2020 at 04:44:50PM +0800, Cornelia Huck wrote:
+> > On Mon, 13 Apr 2020 01:52:01 -0400
+> > Yan Zhao <yan.y.zhao@intel.com> wrote:
+> >   
+> > > This patchset introduces a migration_version attribute under sysfs of VFIO
+> > > Mediated devices.
+> > > 
+> > > This migration_version attribute is used to check migration compatibility
+> > > between two mdev devices.
+> > > 
+> > > Currently, it has two locations:
+> > > (1) under mdev_type node,
+> > >     which can be used even before device creation, but only for mdev
+> > >     devices of the same mdev type.
+> > > (2) under mdev device node,
+> > >     which can only be used after the mdev devices are created, but the src
+> > >     and target mdev devices are not necessarily be of the same mdev type
+> > > (The second location is newly added in v5, in order to keep consistent
+> > > with the migration_version node for migratable pass-though devices)  
+> > 
+> > What is the relationship between those two attributes?
+> >   
+> (1) is for mdev devices specifically, and (2) is provided to keep the same
+> sysfs interface as with non-mdev cases. so (2) is for both mdev devices and
+> non-mdev devices.
 > 
-> 
-> On 4/16/20 7:18 AM, Cornelia Huck wrote:
->> On Tue,  7 Apr 2020 15:20:04 -0400
->> Tony Krowiak <akrowiak@linux.ibm.com> wrote:
->>
->>> Let's implement the callback to indicate when an APQN
->>> is in use by the vfio_ap device driver. The callback is
->>> invoked whenever a change to the apmask or aqmask would
->>> result in one or more queue devices being removed from the driver. The
->>> vfio_ap device driver will indicate a resource is in use
->>> if the APQN of any of the queue devices to be removed are assigned to
->>> any of the matrix mdevs under the driver's control.
->>>
->>> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
->>> ---
->>>   drivers/s390/crypto/vfio_ap_drv.c     |  1 +
->>>   drivers/s390/crypto/vfio_ap_ops.c     | 47 +++++++++++++++++----------
->>>   drivers/s390/crypto/vfio_ap_private.h |  2 ++
->>>   3 files changed, 33 insertions(+), 17 deletions(-)
->>> @@ -1369,3 +1371,14 @@ void vfio_ap_mdev_remove_queue(struct ap_queue 
->>> *queue)
->>>       kfree(q);
->>>       mutex_unlock(&matrix_dev->lock);
->>>   }
->>> +
->>> +bool vfio_ap_mdev_resource_in_use(unsigned long *apm, unsigned long 
->>> *aqm)
->>> +{
->>> +    bool in_use;
->>> +
->>> +    mutex_lock(&matrix_dev->lock);
->>> +    in_use = vfio_ap_mdev_verify_no_sharing(NULL, apm, aqm) ? true : 
->>> false;
->> Maybe
->>
->> in_use = !!vfio_ap_mdev_verify_no_sharing(NULL, apm, aqm);
->>
->> ?
-> 
-> To be honest, I find the !! expression very confusing. Every time I see 
-> it, I have
-> to spend time thinking about what the result of !! is going to be. I think
-> the statement should be left as-is because it more clearly expresses
-> the intent.
+> in future, if we enable vfio-pci vendor ops, (i.e. a non-mdev device
+> is binding to vfio-pci, but is able to register migration region and do
+> migration transactions from a vendor provided affiliate driver),
+> the vendor driver would export (2) directly, under device node.
+> It is not able to provide (1) as there're no mdev devices involved.
 
-
-
-In other places you use
-"
-         ret = vfio_ap_mdev_verify_no_sharing(matrix_mdev);
-         if (ret)
-                 goto share_err;
-"
-then why use a boolean here?
-
-If you want to return a boolean and you do not want to use !! you can do:
-
-  ...
-   ret = vfio_ap_mdev_verify_no_sharing(NULL, apm, aqm);
-...
-   return (ret) ? false : true;
+Ok, creating an alternate attribute for non-mdev devices makes sense.
+However, wouldn't that rather be a case (3)? The change here only
+refers to mdev devices.
 
 > 
->>
->>> +    mutex_unlock(&matrix_dev->lock);
->>> +
->>> +    return in_use;
->>> +}
-> 
+> > Is existence (and compatibility) of (1) a pre-req for possible
+> > existence (and compatibility) of (2)?
+> >  
+> no. (2) does not reply on (1).
 
--- 
-Pierre Morel
-IBM Lab Boeblingen
+Hm. Non-existence of (1) seems to imply "this type does not support
+migration". If an mdev created for such a type suddenly does support
+migration, it feels a bit odd.
+
+(It obviously cannot be a prereq for what I called (3) above.)
+
+> 
+> > Does userspace need to check (1) or can it completely rely on (2), if
+> > it so chooses?
+> >  
+> I think it can completely reply on (2) if compatibility check before
+> mdev creation is not required.
+> 
+> > If devices with a different mdev type are indeed compatible, it seems
+> > userspace can only find out after the devices have actually been
+> > created, as (1) does not apply?  
+> yes, I think so. 
+
+How useful would it be for userspace to even look at (1) in that case?
+It only knows if things have a chance of working if it actually goes
+ahead and creates devices.
+
+> 
+> > One of my worries is that the existence of an attribute with the same
+> > name in two similar locations might lead to confusion. But maybe it
+> > isn't a problem.
+> >  
+> Yes, I have the same feeling. but as (2) is for sysfs interface
+> consistency, to make it transparent to userspace tools like libvirt,
+> I guess the same name is necessary?
+
+What do we actually need here, I wonder? (1) and (2) seem to serve
+slightly different purposes, while (2) and what I called (3) have the
+same purpose. Is it important to userspace that (1) and (2) have the
+same name?
 
