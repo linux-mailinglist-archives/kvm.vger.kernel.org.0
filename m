@@ -2,100 +2,148 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9F0FF1AD8A2
-	for <lists+kvm@lfdr.de>; Fri, 17 Apr 2020 10:33:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BCA8E1AD8CA
+	for <lists+kvm@lfdr.de>; Fri, 17 Apr 2020 10:40:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729795AbgDQIdn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Apr 2020 04:33:43 -0400
-Received: from mail.kernel.org ([198.145.29.99]:59550 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729789AbgDQIdm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 Apr 2020 04:33:42 -0400
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        id S1729878AbgDQIkH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Apr 2020 04:40:07 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:57340 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1729826AbgDQIkH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 Apr 2020 04:40:07 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1587112805;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=0FUsH4tufAJaMC98c0oFTGbfyRpyKw0gpf2wi60SU+8=;
+        b=JpYAGBWMOBKA7ScThz0V9X4NcKKxgpodgzzWm62AJcrTFFt8PJ7QzKKVoX7yDxmjWK4LnX
+        Ya5IoHvtfKpNZd4YpVIZcXwqgzwmoXR2QUCKGlrXme8+4B97Owkx7ZpYvx7qb+6W+/3HJF
+        /bJ3BHXIP1LQuy5FmGAkO0pbO9MT8CA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-159-wDRv0H_YMDq_MOxphoyW1g-1; Fri, 17 Apr 2020 04:40:01 -0400
+X-MC-Unique: wDRv0H_YMDq_MOxphoyW1g-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 5A85D2137B;
-        Fri, 17 Apr 2020 08:33:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1587112421;
-        bh=wgbDGjmWkcsUiNz9bIZL+0Ltlz6/FJw3k/MWaB3fMrw=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=nYEmalLQ7vuYovMPorqzw96rlzSnYudaUqANjXjx68SdGftqYQt8fiYwblSWJdawR
-         0W9I1tRLm+2leFgm+iNFW2Gai1IU0H9wgVM4HGlASes23lCw1jx91JMQH00g/c+nzB
-         OILt+OybDeYlTrDR/lYWez7fHI9vQj+B+i3FGb3c=
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
-        by disco-boy.misterjones.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <maz@kernel.org>)
-        id 1jPMRP-00473f-NV; Fri, 17 Apr 2020 09:33:39 +0100
-From:   Marc Zyngier <maz@kernel.org>
-To:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org
-Cc:     Zenghui Yu <yuzenghui@huawei.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Andre Przywara <Andre.Przywara@arm.com>,
-        Julien Grall <julien@xen.org>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [PATCH v2 6/6] KVM: arm64: vgic-its: Fix memory leak on the error path of vgic_add_lpi()
-Date:   Fri, 17 Apr 2020 09:33:19 +0100
-Message-Id: <20200417083319.3066217-7-maz@kernel.org>
-X-Mailer: git-send-email 2.26.1
-In-Reply-To: <20200417083319.3066217-1-maz@kernel.org>
-References: <20200417083319.3066217-1-maz@kernel.org>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4B23A107ACC4;
+        Fri, 17 Apr 2020 08:39:59 +0000 (UTC)
+Received: from [10.72.13.202] (ovpn-13-202.pek2.redhat.com [10.72.13.202])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 54BCA8D57F;
+        Fri, 17 Apr 2020 08:39:50 +0000 (UTC)
+Subject: Re: [PATCH V2] vhost: do not enable VHOST_MENU by default
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     linux-mips@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, geert@linux-m68k.org,
+        tsbogend@alpha.franken.de, benh@kernel.crashing.org,
+        paulus@samba.org, heiko.carstens@de.ibm.com, gor@linux.ibm.com,
+        borntraeger@de.ibm.com, Michael Ellerman <mpe@ellerman.id.au>
+References: <20200415024356.23751-1-jasowang@redhat.com>
+ <20200416185426-mutt-send-email-mst@kernel.org>
+ <b7e2deb7-cb64-b625-aeb4-760c7b28c0c8@redhat.com>
+ <20200417022929-mutt-send-email-mst@kernel.org>
+ <4274625d-6feb-81b6-5b0a-695229e7c33d@redhat.com>
+ <20200417042912-mutt-send-email-mst@kernel.org>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <fdb555a6-4b8d-15b6-0849-3fe0e0786038@redhat.com>
+Date:   Fri, 17 Apr 2020 16:39:49 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, yuzenghui@huawei.com, eric.auger@redhat.com, Andre.Przywara@arm.com, julien@xen.org, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+In-Reply-To: <20200417042912-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Zenghui Yu <yuzenghui@huawei.com>
 
-If we're going to fail out the vgic_add_lpi(), let's make sure the
-allocated vgic_irq memory is also freed. Though it seems that both
-cases are unlikely to fail.
+On 2020/4/17 =E4=B8=8B=E5=8D=884:29, Michael S. Tsirkin wrote:
+> On Fri, Apr 17, 2020 at 03:36:52PM +0800, Jason Wang wrote:
+>> On 2020/4/17 =E4=B8=8B=E5=8D=882:33, Michael S. Tsirkin wrote:
+>>> On Fri, Apr 17, 2020 at 11:12:14AM +0800, Jason Wang wrote:
+>>>> On 2020/4/17 =E4=B8=8A=E5=8D=886:55, Michael S. Tsirkin wrote:
+>>>>> On Wed, Apr 15, 2020 at 10:43:56AM +0800, Jason Wang wrote:
+>>>>>> We try to keep the defconfig untouched after decoupling CONFIG_VHO=
+ST
+>>>>>> out of CONFIG_VIRTUALIZATION in commit 20c384f1ea1a
+>>>>>> ("vhost: refine vhost and vringh kconfig") by enabling VHOST_MENU =
+by
+>>>>>> default. Then the defconfigs can keep enabling CONFIG_VHOST_NET
+>>>>>> without the caring of CONFIG_VHOST.
+>>>>>>
+>>>>>> But this will leave a "CONFIG_VHOST_MENU=3Dy" in all defconfigs an=
+d even
+>>>>>> for the ones that doesn't want vhost. So it actually shifts the
+>>>>>> burdens to the maintainers of all other to add "CONFIG_VHOST_MENU =
+is
+>>>>>> not set". So this patch tries to enable CONFIG_VHOST explicitly in
+>>>>>> defconfigs that enables CONFIG_VHOST_NET and CONFIG_VHOST_VSOCK.
+>>>>>>
+>>>>>> Acked-by: Christian Borntraeger<borntraeger@de.ibm.com>  (s390)
+>>>>>> Acked-by: Michael Ellerman<mpe@ellerman.id.au>  (powerpc)
+>>>>>> Cc: Thomas Bogendoerfer<tsbogend@alpha.franken.de>
+>>>>>> Cc: Benjamin Herrenschmidt<benh@kernel.crashing.org>
+>>>>>> Cc: Paul Mackerras<paulus@samba.org>
+>>>>>> Cc: Michael Ellerman<mpe@ellerman.id.au>
+>>>>>> Cc: Heiko Carstens<heiko.carstens@de.ibm.com>
+>>>>>> Cc: Vasily Gorbik<gor@linux.ibm.com>
+>>>>>> Cc: Christian Borntraeger<borntraeger@de.ibm.com>
+>>>>>> Reported-by: Geert Uytterhoeven<geert@linux-m68k.org>
+>>>>>> Signed-off-by: Jason Wang<jasowang@redhat.com>
+>>>>> I rebased this on top of OABI fix since that
+>>>>> seems more orgent to fix.
+>>>>> Pushed to my vhost branch pls take a look and
+>>>>> if possible test.
+>>>>> Thanks!
+>>>> I test this patch by generating the defconfigs that wants vhost_net =
+or
+>>>> vhost_vsock. All looks fine.
+>>>>
+>>>> But having CONFIG_VHOST_DPN=3Dy may end up with the similar situatio=
+n that
+>>>> this patch want to address.
+>>>> Maybe we can let CONFIG_VHOST depends on !ARM || AEABI then add anot=
+her
+>>>> menuconfig for VHOST_RING and do something similar?
+>>>>
+>>>> Thanks
+>>> Sorry I don't understand. After this patch CONFIG_VHOST_DPN is just
+>>> an internal variable for the OABI fix. I kept it separate
+>>> so it's easy to revert for 5.8. Yes we could squash it into
+>>> VHOST directly but I don't see how that changes logic at all.
+>>
+>> Sorry for being unclear.
+>>
+>> I meant since it was enabled by default, "CONFIG_VHOST_DPN=3Dy" will b=
+e left
+>> in the defconfigs.
+> But who cares?
 
-Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
-Signed-off-by: Marc Zyngier <maz@kernel.org>
-Link: https://lore.kernel.org/r/20200414030349.625-3-yuzenghui@huawei.com
----
- virt/kvm/arm/vgic/vgic-its.c | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
 
-diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-index d53d34a33e35..c012a52b19f5 100644
---- a/virt/kvm/arm/vgic/vgic-its.c
-+++ b/virt/kvm/arm/vgic/vgic-its.c
-@@ -96,14 +96,21 @@ static struct vgic_irq *vgic_add_lpi(struct kvm *kvm, u32 intid,
- 	 * We "cache" the configuration table entries in our struct vgic_irq's.
- 	 * However we only have those structs for mapped IRQs, so we read in
- 	 * the respective config data from memory here upon mapping the LPI.
-+	 *
-+	 * Should any of these fail, behave as if we couldn't create the LPI
-+	 * by dropping the refcount and returning the error.
- 	 */
- 	ret = update_lpi_config(kvm, irq, NULL, false);
--	if (ret)
-+	if (ret) {
-+		vgic_put_irq(kvm, irq);
- 		return ERR_PTR(ret);
-+	}
- 
- 	ret = vgic_v3_lpi_sync_pending_status(kvm, irq);
--	if (ret)
-+	if (ret) {
-+		vgic_put_irq(kvm, irq);
- 		return ERR_PTR(ret);
-+	}
- 
- 	return irq;
- }
--- 
-2.26.1
+FYI, please see https://www.spinics.net/lists/kvm/msg212685.html
+
+
+> That does not add any code, does it?
+
+
+It doesn't.
+
+Thanks
+
+
+>
+>> This requires the arch maintainers to add
+>> "CONFIG_VHOST_VDPN is not set". (Geert complains about this)
+>>
+>> Thanks
+>>
+>>
 
