@@ -2,203 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4AD3B1AD5EA
-	for <lists+kvm@lfdr.de>; Fri, 17 Apr 2020 08:03:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B6DAF1AD626
+	for <lists+kvm@lfdr.de>; Fri, 17 Apr 2020 08:33:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727121AbgDQGDl convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Fri, 17 Apr 2020 02:03:41 -0400
-Received: from mga07.intel.com ([134.134.136.100]:14496 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726065AbgDQGDk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 Apr 2020 02:03:40 -0400
-IronPort-SDR: WlHDknisBJA7/Icnj0vVNBF2i0rbvIfoEGwAe4h6Qt1ds5XJQdnHhTJ3aJKD51HoCIp3QTLVEp
- 2onnj4S5XlzA==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Apr 2020 23:03:39 -0700
-IronPort-SDR: 3oJfBPD8w2SHu5GVkVWmPFJc87vuY35yXLmk5rjAhOJzer339y32ZGQGwFzeV1X5e+Kd9OhRYN
- 3y0MS1cieVfQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.72,393,1580803200"; 
-   d="scan'208";a="242903975"
-Received: from fmsmsx108.amr.corp.intel.com ([10.18.124.206])
-  by orsmga007.jf.intel.com with ESMTP; 16 Apr 2020 23:03:39 -0700
-Received: from fmsmsx608.amr.corp.intel.com (10.18.126.88) by
- FMSMSX108.amr.corp.intel.com (10.18.124.206) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Thu, 16 Apr 2020 23:03:39 -0700
-Received: from fmsmsx608.amr.corp.intel.com (10.18.126.88) by
- fmsmsx608.amr.corp.intel.com (10.18.126.88) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1713.5; Thu, 16 Apr 2020 23:03:38 -0700
-Received: from shsmsx153.ccr.corp.intel.com (10.239.6.53) by
- fmsmsx608.amr.corp.intel.com (10.18.126.88) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id 15.1.1713.5
- via Frontend Transport; Thu, 16 Apr 2020 23:03:38 -0700
-Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.225]) by
- SHSMSX153.ccr.corp.intel.com ([169.254.12.89]) with mapi id 14.03.0439.000;
- Fri, 17 Apr 2020 14:03:35 +0800
-From:   "Liu, Yi L" <yi.l.liu@intel.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-CC:     "Tian, Kevin" <kevin.tian@intel.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "Tian, Jun J" <jun.j.tian@intel.com>,
-        "Sun, Yi Y" <yi.y.sun@intel.com>,
-        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Wu, Hao" <hao.wu@intel.com>
-Subject: RE: [PATCH v1 7/8] vfio/type1: Add VFIO_IOMMU_CACHE_INVALIDATE
-Thread-Topic: [PATCH v1 7/8] vfio/type1: Add VFIO_IOMMU_CACHE_INVALIDATE
-Thread-Index: AQHWAEUdcc1u01skwUmp6uBHREsZ66hl0sQAgACrzQCAAJWLAIAUkGLA///O0ICAAV9r0A==
-Date:   Fri, 17 Apr 2020 06:03:35 +0000
-Message-ID: <A2975661238FB949B60364EF0F2C25743A249BF6@SHSMSX104.ccr.corp.intel.com>
-References: <1584880325-10561-1-git-send-email-yi.l.liu@intel.com>
-        <1584880325-10561-8-git-send-email-yi.l.liu@intel.com>
-        <20200402142428.2901432e@w520.home>
-        <AADFC41AFE54684AB9EE6CBC0274A5D19D807C4A@SHSMSX104.ccr.corp.intel.com>
-        <20200403093436.094b1928@w520.home>
-        <A2975661238FB949B60364EF0F2C25743A231BAA@SHSMSX104.ccr.corp.intel.com>
- <20200416084031.7266ad40@w520.home>
-In-Reply-To: <20200416084031.7266ad40@w520.home>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-version: 11.2.0.6
-dlp-reaction: no-action
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+        id S1727978AbgDQGdx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Apr 2020 02:33:53 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:46892 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727818AbgDQGdw (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 17 Apr 2020 02:33:52 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1587105230;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=aRp3vqzXNggkBlbb5TjXuZYOr8GevPVbWARU6hChYxw=;
+        b=a5gzAXzJIrV0XgpXiIwM454VPvFtu3tbmICqq68YzQBOoEqCgtJiWyrE64HVk8/vNQJmR6
+        JgBoCNmvbaDvijkLc6KpYvHR7N+Fs9HWObAKPmwaQuRKYawNmvRIXz5iWbdcFbv+zDiYWQ
+        lyL51RdZuF6rgP1R+5ruoDKcPnUg7w4=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-130-qscJBbE1PcqcYV5F4EDVwg-1; Fri, 17 Apr 2020 02:33:48 -0400
+X-MC-Unique: qscJBbE1PcqcYV5F4EDVwg-1
+Received: by mail-wr1-f69.google.com with SMTP id 11so524104wrc.3
+        for <kvm@vger.kernel.org>; Thu, 16 Apr 2020 23:33:48 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=aRp3vqzXNggkBlbb5TjXuZYOr8GevPVbWARU6hChYxw=;
+        b=Z9+60+fe45QYnLK5XpemJXWqcORnA3YTVHN9CxlGw1BZ5N9uDQ8PTYT3Vi8zvd19GH
+         Yly+MCBtRX33MLKOUhek1NDzmI/A+ubrIyCkbD07ZUpFXWBLGAirUsgANzCuickkRbt+
+         lmFrUdnxPImOm29jc7gAAXIE3HWz+T+1N2wDgBUh73pL0UJ1i13BakqIfIlLrx1gtdLt
+         tf2UazJw+ONKarVYgv4IgLjQ+xB15f5/Vm6cMA2TWDnqGY1QF881sN8KxsbPMgVKOVrb
+         0W0tvI9RgOBiVRbGHwrA/AzMmugDUmxXnID+HZLhHYTaNnKy+HYlMlI4C2jpbMGW13o9
+         7Q7w==
+X-Gm-Message-State: AGi0PuaTLXOPbopv5dVxj0oPnugZ43qwRcOeUFc2feqJCHjXpvl6klCM
+        4DgWy9GRch1mD417H1ySfMcCMtdHs7x33Vla0+yf3AHQ8Kw115m6Qh3zeyycmxgCJfx9kCv9uwY
+        TUAf+iZAfqK/a
+X-Received: by 2002:a1c:5a06:: with SMTP id o6mr1725644wmb.34.1587105227203;
+        Thu, 16 Apr 2020 23:33:47 -0700 (PDT)
+X-Google-Smtp-Source: APiQypLC+56jzTsL7mtJ8WJVomZZD1bGAAbZ16bTvi8qD3oQHVUMVTlOszcQ+jGs26hCvKjQJ7zNyQ==
+X-Received: by 2002:a1c:5a06:: with SMTP id o6mr1725618wmb.34.1587105226999;
+        Thu, 16 Apr 2020 23:33:46 -0700 (PDT)
+Received: from redhat.com (bzq-79-183-51-3.red.bezeqint.net. [79.183.51.3])
+        by smtp.gmail.com with ESMTPSA id k184sm6461323wmf.9.2020.04.16.23.33.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 16 Apr 2020 23:33:46 -0700 (PDT)
+Date:   Fri, 17 Apr 2020 02:33:43 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     linux-mips@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, geert@linux-m68k.org,
+        tsbogend@alpha.franken.de, benh@kernel.crashing.org,
+        paulus@samba.org, heiko.carstens@de.ibm.com, gor@linux.ibm.com,
+        borntraeger@de.ibm.com, Michael Ellerman <mpe@ellerman.id.au>
+Subject: Re: [PATCH V2] vhost: do not enable VHOST_MENU by default
+Message-ID: <20200417022929-mutt-send-email-mst@kernel.org>
+References: <20200415024356.23751-1-jasowang@redhat.com>
+ <20200416185426-mutt-send-email-mst@kernel.org>
+ <b7e2deb7-cb64-b625-aeb4-760c7b28c0c8@redhat.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <b7e2deb7-cb64-b625-aeb4-760c7b28c0c8@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Alex,
-> From: Alex Williamson <alex.williamson@redhat.com>
-> Sent: Thursday, April 16, 2020 10:41 PM
-> To: Liu, Yi L <yi.l.liu@intel.com>
-> Subject: Re: [PATCH v1 7/8] vfio/type1: Add VFIO_IOMMU_CACHE_INVALIDATE
+On Fri, Apr 17, 2020 at 11:12:14AM +0800, Jason Wang wrote:
 > 
-> On Thu, 16 Apr 2020 10:40:03 +0000
-> "Liu, Yi L" <yi.l.liu@intel.com> wrote:
+> On 2020/4/17 上午6:55, Michael S. Tsirkin wrote:
+> > On Wed, Apr 15, 2020 at 10:43:56AM +0800, Jason Wang wrote:
+> > > We try to keep the defconfig untouched after decoupling CONFIG_VHOST
+> > > out of CONFIG_VIRTUALIZATION in commit 20c384f1ea1a
+> > > ("vhost: refine vhost and vringh kconfig") by enabling VHOST_MENU by
+> > > default. Then the defconfigs can keep enabling CONFIG_VHOST_NET
+> > > without the caring of CONFIG_VHOST.
+> > > 
+> > > But this will leave a "CONFIG_VHOST_MENU=y" in all defconfigs and even
+> > > for the ones that doesn't want vhost. So it actually shifts the
+> > > burdens to the maintainers of all other to add "CONFIG_VHOST_MENU is
+> > > not set". So this patch tries to enable CONFIG_VHOST explicitly in
+> > > defconfigs that enables CONFIG_VHOST_NET and CONFIG_VHOST_VSOCK.
+> > > 
+> > > Acked-by: Christian Borntraeger<borntraeger@de.ibm.com>  (s390)
+> > > Acked-by: Michael Ellerman<mpe@ellerman.id.au>  (powerpc)
+> > > Cc: Thomas Bogendoerfer<tsbogend@alpha.franken.de>
+> > > Cc: Benjamin Herrenschmidt<benh@kernel.crashing.org>
+> > > Cc: Paul Mackerras<paulus@samba.org>
+> > > Cc: Michael Ellerman<mpe@ellerman.id.au>
+> > > Cc: Heiko Carstens<heiko.carstens@de.ibm.com>
+> > > Cc: Vasily Gorbik<gor@linux.ibm.com>
+> > > Cc: Christian Borntraeger<borntraeger@de.ibm.com>
+> > > Reported-by: Geert Uytterhoeven<geert@linux-m68k.org>
+> > > Signed-off-by: Jason Wang<jasowang@redhat.com>
+> > I rebased this on top of OABI fix since that
+> > seems more orgent to fix.
+> > Pushed to my vhost branch pls take a look and
+> > if possible test.
+> > Thanks!
 > 
-> > Hi Alex,
-> > Still have a direction question with you. Better get agreement with you
-> > before heading forward.
-> >
-> > > From: Alex Williamson <alex.williamson@redhat.com>
-> > > Sent: Friday, April 3, 2020 11:35 PM
-> > [...]
-> > > > > > + *
-> > > > > > + * returns: 0 on success, -errno on failure.
-> > > > > > + */
-> > > > > > +struct vfio_iommu_type1_cache_invalidate {
-> > > > > > +	__u32   argsz;
-> > > > > > +	__u32   flags;
-> > > > > > +	struct	iommu_cache_invalidate_info cache_info;
-> > > > > > +};
-> > > > > > +#define VFIO_IOMMU_CACHE_INVALIDATE      _IO(VFIO_TYPE,
-> > > VFIO_BASE
-> > > > > + 24)
-> > > > >
-> > > > > The future extension capabilities of this ioctl worry me, I wonder if
-> > > > > we should do another data[] with flag defining that data as CACHE_INFO.
-> > > >
-> > > > Can you elaborate? Does it mean with this way we don't rely on iommu
-> > > > driver to provide version_to_size conversion and instead we just pass
-> > > > data[] to iommu driver for further audit?
-> > >
-> > > No, my concern is that this ioctl has a single function, strictly tied
-> > > to the iommu uapi.  If we replace cache_info with data[] then we can
-> > > define a flag to specify that data[] is struct
-> > > iommu_cache_invalidate_info, and if we need to, a different flag to
-> > > identify data[] as something else.  For example if we get stuck
-> > > expanding cache_info to meet new demands and develop a new uapi to
-> > > solve that, how would we expand this ioctl to support it rather than
-> > > also create a new ioctl?  There's also a trade-off in making the ioctl
-> > > usage more difficult for the user.  I'd still expect the vfio layer to
-> > > check the flag and interpret data[] as indicated by the flag rather
-> > > than just passing a blob of opaque data to the iommu layer though.
-> > > Thanks,
-> >
-> > Based on your comments about defining a single ioctl and a unified
-> > vfio structure (with a @data[] field) for pasid_alloc/free, bind/
-> > unbind_gpasid, cache_inv. After some offline trying, I think it would
-> > be good for bind/unbind_gpasid and cache_inv as both of them use the
-> > iommu uapi definition. While the pasid alloc/free operation doesn't.
-> > It would be weird to put all of them together. So pasid alloc/free
-> > may have a separate ioctl. It would look as below. Does this direction
-> > look good per your opinion?
-> >
-> > ioctl #22: VFIO_IOMMU_PASID_REQUEST
-> > /**
-> >   * @pasid: used to return the pasid alloc result when flags == ALLOC_PASID
-> >   *         specify a pasid to be freed when flags == FREE_PASID
-> >   * @range: specify the allocation range when flags == ALLOC_PASID
-> >   */
-> > struct vfio_iommu_pasid_request {
-> > 	__u32	argsz;
-> > #define VFIO_IOMMU_ALLOC_PASID	(1 << 0)
-> > #define VFIO_IOMMU_FREE_PASID	(1 << 1)
-> > 	__u32	flags;
-> > 	__u32	pasid;
-> > 	struct {
-> > 		__u32	min;
-> > 		__u32	max;
-> > 	} range;
-> > };
 > 
-> Can't the ioctl return the pasid valid on alloc (like GET_DEVICE_FD)?
-
-Yep, I think you mentioned before. At that time, I believed it would be
-better to return the result via a __u32 buffer so that make full use of
-the 32 bits. But looks like it doesn't make much difference. I'll follow
-your suggestion.
-
-> Would it be useful to support freeing a range of pasids?  If so then we
-> could simply use range for both, ie. allocate a pasid from this range
-> and return it, or free all pasids in this range?  vfio already needs to
-> track pasids to free them on release, so presumably this is something
-> we could support easily.
-
-yes, I think it is a nice thing. then I can remove the @pasid field.
-will do it.
-
-> > ioctl #23: VFIO_IOMMU_NESTING_OP
-> > struct vfio_iommu_type1_nesting_op {
-> > 	__u32	argsz;
-> > 	__u32	flags;
-> > 	__u32	op;
-> > 	__u8	data[];
-> > };
+> I test this patch by generating the defconfigs that wants vhost_net or
+> vhost_vsock. All looks fine.
 > 
-> data only has 4-byte alignment, I think we really want it at an 8-byte
-> alignment.  This is why I embedded the "op" into the flag for
-> DEVICE_FEATURE.  Thanks,
-
-got it. I may also merge the op into flags (maybe the lower 16 bits for
-op).
-
-Thanks,
-Yi Liu
-> Alex
+> But having CONFIG_VHOST_DPN=y may end up with the similar situation that
+> this patch want to address.
+> Maybe we can let CONFIG_VHOST depends on !ARM || AEABI then add another
+> menuconfig for VHOST_RING and do something similar?
 > 
-> >
-> > /* Nesting Ops */
-> > #define VFIO_IOMMU_NESTING_OP_BIND_PGTBL        0
-> > #define VFIO_IOMMU_NESTING_OP_UNBIND_PGTBL      1
-> > #define VFIO_IOMMU_NESTING_OP_CACHE_INVLD       2
-> >
-> > Thanks,
-> > Yi Liu
-> >
+> Thanks
+
+Sorry I don't understand. After this patch CONFIG_VHOST_DPN is just
+an internal variable for the OABI fix. I kept it separate
+so it's easy to revert for 5.8. Yes we could squash it into
+VHOST directly but I don't see how that changes logic at all.
+
+-- 
+MST
 
