@@ -2,155 +2,160 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2CAD71AD958
-	for <lists+kvm@lfdr.de>; Fri, 17 Apr 2020 11:01:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 58E191AD986
+	for <lists+kvm@lfdr.de>; Fri, 17 Apr 2020 11:10:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729987AbgDQJBX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Apr 2020 05:01:23 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:39607 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1730026AbgDQJBW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 Apr 2020 05:01:22 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1587114080;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=+LYdr3kSxXBMDicQAv0M7nkPT5YyAgLG/RWsjILE6Rk=;
-        b=dCeJxIQ3mkjtD9bwvPhSkJecKXOSnr8/RwDJB4Nl6IXCco0s/11pIy5So6pYFoqE4K+O1U
-        sSqecPQCDYVgHW98hMFlSqXfzWrbfPR0coKizjNN0xYorh2gthNVVqhxnjBGJqYwXFwMNg
-        EkjKPqgyYlc655//L9MTpoEeKKSX3z0=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-349-08po8gE5OOeRWc_d4Kqcwg-1; Fri, 17 Apr 2020 05:01:18 -0400
-X-MC-Unique: 08po8gE5OOeRWc_d4Kqcwg-1
-Received: by mail-wr1-f71.google.com with SMTP id o10so666196wrj.7
-        for <kvm@vger.kernel.org>; Fri, 17 Apr 2020 02:01:18 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=+LYdr3kSxXBMDicQAv0M7nkPT5YyAgLG/RWsjILE6Rk=;
-        b=uaRcGInnR0KVhPyNdVh2qciaBY5Ast9C2iHGsJl6MsX/OP3SakPEBjN6NkTljnF4uO
-         RzRD4/DNGmMlT/DdkZVXsN6/7lOdL/MCFG6cQVApyvbntl27XPITFwLqJUAAxk5pu/uG
-         I1XKQXpXdBG9kaQINbVUWFo5tZm4plLD43V9CFhl6Pbitwc7sDMbZtRiG7ysumW3ZKyL
-         UI3/ZH4lcfywlLQcJCHFWwEk/Bg9CmyIEITW81JEcmEiUzUYf74AgfihYoFmbv2vMdJs
-         d3Bc7wCTCO6DsPhGT6RuXlGp+wWexdNWNs32pm1K8kHoVkHZ4uoyusFgkHZCHqFR7JLj
-         wZgw==
-X-Gm-Message-State: AGi0PuYUoBdyGEJiZ73weF2VMjlLKFbTQX4SrCbDZmtIhsc6Sz/dynqR
-        BV1puUSgo46728BZ+arF++gLopQZjrRBG7oKHcKiXS+qnbMrkkBkGBPMSLnd0xuauF53T7Ufcm6
-        ypbmR5zWL/fVH
-X-Received: by 2002:a1c:7c18:: with SMTP id x24mr2155044wmc.146.1587114077425;
-        Fri, 17 Apr 2020 02:01:17 -0700 (PDT)
-X-Google-Smtp-Source: APiQypK2vbW1OnmBJFQVh7bub7YEhkI6cUby2dGaO6wz+YQlB7a8+Q2NUcfxoXyc58GWwBIeKSXJyQ==
-X-Received: by 2002:a1c:7c18:: with SMTP id x24mr2155008wmc.146.1587114077204;
-        Fri, 17 Apr 2020 02:01:17 -0700 (PDT)
-Received: from redhat.com (bzq-79-183-51-3.red.bezeqint.net. [79.183.51.3])
-        by smtp.gmail.com with ESMTPSA id c20sm7408863wmd.36.2020.04.17.02.01.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 17 Apr 2020 02:01:16 -0700 (PDT)
-Date:   Fri, 17 Apr 2020 05:01:13 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     linux-mips@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, geert@linux-m68k.org,
-        tsbogend@alpha.franken.de, benh@kernel.crashing.org,
-        paulus@samba.org, heiko.carstens@de.ibm.com, gor@linux.ibm.com,
-        borntraeger@de.ibm.com, Michael Ellerman <mpe@ellerman.id.au>
-Subject: Re: [PATCH V2] vhost: do not enable VHOST_MENU by default
-Message-ID: <20200417050029-mutt-send-email-mst@kernel.org>
-References: <20200415024356.23751-1-jasowang@redhat.com>
- <20200416185426-mutt-send-email-mst@kernel.org>
- <b7e2deb7-cb64-b625-aeb4-760c7b28c0c8@redhat.com>
- <20200417022929-mutt-send-email-mst@kernel.org>
- <4274625d-6feb-81b6-5b0a-695229e7c33d@redhat.com>
- <20200417042912-mutt-send-email-mst@kernel.org>
- <fdb555a6-4b8d-15b6-0849-3fe0e0786038@redhat.com>
- <20200417044230-mutt-send-email-mst@kernel.org>
- <73843240-3040-655d-baa9-683341ed4786@redhat.com>
+        id S1730114AbgDQJKS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Apr 2020 05:10:18 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:2397 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1729987AbgDQJKR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 Apr 2020 05:10:17 -0400
+Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.60])
+        by Forcepoint Email with ESMTP id 2063C4944C6BE347FA91;
+        Fri, 17 Apr 2020 17:10:15 +0800 (CST)
+Received: from [127.0.0.1] (10.173.221.230) by DGGEMS409-HUB.china.huawei.com
+ (10.3.19.209) with Microsoft SMTP Server id 14.3.487.0; Fri, 17 Apr 2020
+ 17:10:07 +0800
+Subject: Re: [PATCH v2] KVM/arm64: Support enabling dirty log gradually in
+ small chunks
+To:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>
+References: <20200413122023.52583-1-zhukeqian1@huawei.com>
+ <be45ec89-2bdb-454b-d20a-c08898e26024@redhat.com>
+ <20200416160939.7e9c1621@why>
+ <442f288e-2934-120c-4994-5357e3e9216b@redhat.com>
+CC:     <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <kvmarm@lists.cs.columbia.edu>,
+        "James Morse" <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Will Deacon <will@kernel.org>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Jay Zhou <jianjay.zhou@huawei.com>,
+        <wanghaibin.wang@huawei.com>
+From:   zhukeqian <zhukeqian1@huawei.com>
+Message-ID: <3e3ce7dd-af13-6daa-9ccf-747405d448cc@huawei.com>
+Date:   Fri, 17 Apr 2020 17:10:05 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.7.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <73843240-3040-655d-baa9-683341ed4786@redhat.com>
+In-Reply-To: <442f288e-2934-120c-4994-5357e3e9216b@redhat.com>
+Content-Type: text/plain; charset="windows-1252"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.173.221.230]
+X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Apr 17, 2020 at 04:51:19PM +0800, Jason Wang wrote:
-> 
-> On 2020/4/17 下午4:46, Michael S. Tsirkin wrote:
-> > On Fri, Apr 17, 2020 at 04:39:49PM +0800, Jason Wang wrote:
-> > > On 2020/4/17 下午4:29, Michael S. Tsirkin wrote:
-> > > > On Fri, Apr 17, 2020 at 03:36:52PM +0800, Jason Wang wrote:
-> > > > > On 2020/4/17 下午2:33, Michael S. Tsirkin wrote:
-> > > > > > On Fri, Apr 17, 2020 at 11:12:14AM +0800, Jason Wang wrote:
-> > > > > > > On 2020/4/17 上午6:55, Michael S. Tsirkin wrote:
-> > > > > > > > On Wed, Apr 15, 2020 at 10:43:56AM +0800, Jason Wang wrote:
-> > > > > > > > > We try to keep the defconfig untouched after decoupling CONFIG_VHOST
-> > > > > > > > > out of CONFIG_VIRTUALIZATION in commit 20c384f1ea1a
-> > > > > > > > > ("vhost: refine vhost and vringh kconfig") by enabling VHOST_MENU by
-> > > > > > > > > default. Then the defconfigs can keep enabling CONFIG_VHOST_NET
-> > > > > > > > > without the caring of CONFIG_VHOST.
-> > > > > > > > > 
-> > > > > > > > > But this will leave a "CONFIG_VHOST_MENU=y" in all defconfigs and even
-> > > > > > > > > for the ones that doesn't want vhost. So it actually shifts the
-> > > > > > > > > burdens to the maintainers of all other to add "CONFIG_VHOST_MENU is
-> > > > > > > > > not set". So this patch tries to enable CONFIG_VHOST explicitly in
-> > > > > > > > > defconfigs that enables CONFIG_VHOST_NET and CONFIG_VHOST_VSOCK.
-> > > > > > > > > 
-> > > > > > > > > Acked-by: Christian Borntraeger<borntraeger@de.ibm.com>   (s390)
-> > > > > > > > > Acked-by: Michael Ellerman<mpe@ellerman.id.au>   (powerpc)
-> > > > > > > > > Cc: Thomas Bogendoerfer<tsbogend@alpha.franken.de>
-> > > > > > > > > Cc: Benjamin Herrenschmidt<benh@kernel.crashing.org>
-> > > > > > > > > Cc: Paul Mackerras<paulus@samba.org>
-> > > > > > > > > Cc: Michael Ellerman<mpe@ellerman.id.au>
-> > > > > > > > > Cc: Heiko Carstens<heiko.carstens@de.ibm.com>
-> > > > > > > > > Cc: Vasily Gorbik<gor@linux.ibm.com>
-> > > > > > > > > Cc: Christian Borntraeger<borntraeger@de.ibm.com>
-> > > > > > > > > Reported-by: Geert Uytterhoeven<geert@linux-m68k.org>
-> > > > > > > > > Signed-off-by: Jason Wang<jasowang@redhat.com>
-> > > > > > > > I rebased this on top of OABI fix since that
-> > > > > > > > seems more orgent to fix.
-> > > > > > > > Pushed to my vhost branch pls take a look and
-> > > > > > > > if possible test.
-> > > > > > > > Thanks!
-> > > > > > > I test this patch by generating the defconfigs that wants vhost_net or
-> > > > > > > vhost_vsock. All looks fine.
-> > > > > > > 
-> > > > > > > But having CONFIG_VHOST_DPN=y may end up with the similar situation that
-> > > > > > > this patch want to address.
-> > > > > > > Maybe we can let CONFIG_VHOST depends on !ARM || AEABI then add another
-> > > > > > > menuconfig for VHOST_RING and do something similar?
-> > > > > > > 
-> > > > > > > Thanks
-> > > > > > Sorry I don't understand. After this patch CONFIG_VHOST_DPN is just
-> > > > > > an internal variable for the OABI fix. I kept it separate
-> > > > > > so it's easy to revert for 5.8. Yes we could squash it into
-> > > > > > VHOST directly but I don't see how that changes logic at all.
-> > > > > Sorry for being unclear.
-> > > > > 
-> > > > > I meant since it was enabled by default, "CONFIG_VHOST_DPN=y" will be left
-> > > > > in the defconfigs.
-> > > > But who cares?
-> > > FYI, please seehttps://www.spinics.net/lists/kvm/msg212685.html
-> > The complaint was not about the symbol IIUC.  It was that we caused
-> > everyone to build vhost unless they manually disabled it.
-> 
-> 
-> There could be some misunderstanding here. I thought it's somehow similar: a
-> CONFIG_VHOST_MENU=y will be left in the defconfigs even if CONFIG_VHOST is
-> not set.
-> 
-> Thanks
-> 
+Hi Paolo,
 
-BTW do entries with no prompt actually appear in defconfig?
+On 2020/4/16 23:55, Paolo Bonzini wrote:
+> On 16/04/20 17:09, Marc Zyngier wrote:
+>> On Wed, 15 Apr 2020 18:13:56 +0200
+>> Paolo Bonzini <pbonzini@redhat.com> wrote:
+>>
+>>> On 13/04/20 14:20, Keqian Zhu wrote:
+>>>> There is already support of enabling dirty log graually in small chunks
+>>>> for x86 in commit 3c9bd4006bfc ("KVM: x86: enable dirty log gradually in
+>>>> small chunks"). This adds support for arm64.
+>>>>
+>>>> x86 still writes protect all huge pages when DIRTY_LOG_INITIALLY_ALL_SET
+>>>> is eanbled. However, for arm64, both huge pages and normal pages can be
+>>>> write protected gradually by userspace.
+>>>>
+>>>> Under the Huawei Kunpeng 920 2.6GHz platform, I did some tests on 128G
+>>>> Linux VMs with different page size. The memory pressure is 127G in each
+>>>> case. The time taken of memory_global_dirty_log_start in QEMU is listed
+>>>> below:
+>>>>
+>>>> Page Size      Before    After Optimization
+>>>>   4K            650ms         1.8ms
+>>>>   2M             4ms          1.8ms
+>>>>   1G             2ms          1.8ms
+>>>>
+>>>> Besides the time reduction, the biggest income is that we will minimize
+>>>> the performance side effect (because of dissloving huge pages and marking
+>>>> memslots dirty) on guest after enabling dirty log.
+>>>>
+>>>> Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
+>>>> ---
+>>>>  Documentation/virt/kvm/api.rst    |  2 +-
+>>>>  arch/arm64/include/asm/kvm_host.h |  3 +++
+>>>>  virt/kvm/arm/mmu.c                | 12 ++++++++++--
+>>>>  3 files changed, 14 insertions(+), 3 deletions(-)
+>>>>
+>>>> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+>>>> index efbbe570aa9b..0017f63fa44f 100644
+>>>> --- a/Documentation/virt/kvm/api.rst
+>>>> +++ b/Documentation/virt/kvm/api.rst
+>>>> @@ -5777,7 +5777,7 @@ will be initialized to 1 when created.  This also improves performance because
+>>>>  dirty logging can be enabled gradually in small chunks on the first call
+>>>>  to KVM_CLEAR_DIRTY_LOG.  KVM_DIRTY_LOG_INITIALLY_SET depends on
+>>>>  KVM_DIRTY_LOG_MANUAL_PROTECT_ENABLE (it is also only available on
+>>>> -x86 for now).
+>>>> +x86 and arm64 for now).
+>>>>  
+>>>>  KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2 was previously available under the name
+>>>>  KVM_CAP_MANUAL_DIRTY_LOG_PROTECT, but the implementation had bugs that make
+>>>> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+>>>> index 32c8a675e5a4..a723f84fab83 100644
+>>>> --- a/arch/arm64/include/asm/kvm_host.h
+>>>> +++ b/arch/arm64/include/asm/kvm_host.h
+>>>> @@ -46,6 +46,9 @@
+>>>>  #define KVM_REQ_RECORD_STEAL	KVM_ARCH_REQ(3)
+>>>>  #define KVM_REQ_RELOAD_GICv4	KVM_ARCH_REQ(4)
+>>>>  
+>>>> +#define KVM_DIRTY_LOG_MANUAL_CAPS   (KVM_DIRTY_LOG_MANUAL_PROTECT_ENABLE | \
+>>>> +				     KVM_DIRTY_LOG_INITIALLY_SET)
+>>>> +
+>>>>  DECLARE_STATIC_KEY_FALSE(userspace_irqchip_in_use);
+>>>>  
+>>>>  extern unsigned int kvm_sve_max_vl;
+>>>> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+>>>> index e3b9ee268823..1077f653a611 100644
+>>>> --- a/virt/kvm/arm/mmu.c
+>>>> +++ b/virt/kvm/arm/mmu.c
+>>>> @@ -2265,8 +2265,16 @@ void kvm_arch_commit_memory_region(struct kvm *kvm,
+>>>>  	 * allocated dirty_bitmap[], dirty pages will be be tracked while the
+>>>>  	 * memory slot is write protected.
+>>>>  	 */
+>>>> -	if (change != KVM_MR_DELETE && mem->flags & KVM_MEM_LOG_DIRTY_PAGES)
+>>>> -		kvm_mmu_wp_memory_region(kvm, mem->slot);
+>>>> +	if (change != KVM_MR_DELETE && mem->flags & KVM_MEM_LOG_DIRTY_PAGES) {
+>>>> +		/*
+>>>> +		 * If we're with initial-all-set, we don't need to write
+>>>> +		 * protect any pages because they're all reported as dirty.
+>>>> +		 * Huge pages and normal pages will be write protect gradually.
+>>>> +		 */
+>>>> +		if (!kvm_dirty_log_manual_protect_and_init_set(kvm)) {
+>>>> +			kvm_mmu_wp_memory_region(kvm, mem->slot);
+>>>> +		}
+>>>> +	}
+>>>>  }
+>>>>  
+>>>>  int kvm_arch_prepare_memory_region(struct kvm *kvm,
+>>>>   
+>>>
+>>> Marc, what is the status of this patch?
+>>
+>> I just had a look at it. Is there any urgency for merging it?
+> 
+> No, I thought I was still replying to the v1.
+Sorry that patch v1 is dropped. Because I realized that stage2 page tables
+will be unmapped during VM reboot, or they are not established soon after
+migration, so stage2 page tables can not be used to decide whether a page
+is needed to migrate.
 
-> > 
+Thanks,
+Keqian
+
+> 
+> Paolo
+> 
+> 
+> .
+> 
 
