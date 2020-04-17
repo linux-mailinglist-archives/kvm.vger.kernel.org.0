@@ -2,108 +2,174 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1E43E1AD4BE
-	for <lists+kvm@lfdr.de>; Fri, 17 Apr 2020 05:12:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 39CFA1AD4CF
+	for <lists+kvm@lfdr.de>; Fri, 17 Apr 2020 05:21:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729491AbgDQDMe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Apr 2020 23:12:34 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:22774 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1729482AbgDQDMd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Apr 2020 23:12:33 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1587093151;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=9kod4sBVNZl13j111ZtiqdMeSXjTm/Tfeat7xy/R1z0=;
-        b=UmkpulOEhPVyx1Nhm0K6LXPQr5R/7TvL960h1wlck/vdXIXgiokkHbrNSs5mvkpk+1LUhp
-        9zSQKUjShkBE/FmNn/mg5pEHsdgoaa7+1O0qamfIA2KhxhE4v7q4UJcPPy3Iw0mG1IraWa
-        tjcvTRemqXlhdCAnQiPHxf3Yd4UR2m4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-92-IdiGn_JcMJi4EAOTBKuGeg-1; Thu, 16 Apr 2020 23:12:26 -0400
-X-MC-Unique: IdiGn_JcMJi4EAOTBKuGeg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1D22E8017F3;
-        Fri, 17 Apr 2020 03:12:24 +0000 (UTC)
-Received: from [10.72.13.254] (ovpn-13-254.pek2.redhat.com [10.72.13.254])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id F061027BD7;
-        Fri, 17 Apr 2020 03:12:15 +0000 (UTC)
-Subject: Re: [PATCH V2] vhost: do not enable VHOST_MENU by default
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     linux-mips@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, geert@linux-m68k.org,
-        tsbogend@alpha.franken.de, benh@kernel.crashing.org,
-        paulus@samba.org, heiko.carstens@de.ibm.com, gor@linux.ibm.com,
-        borntraeger@de.ibm.com, Michael Ellerman <mpe@ellerman.id.au>
-References: <20200415024356.23751-1-jasowang@redhat.com>
- <20200416185426-mutt-send-email-mst@kernel.org>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <b7e2deb7-cb64-b625-aeb4-760c7b28c0c8@redhat.com>
-Date:   Fri, 17 Apr 2020 11:12:14 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        id S1728312AbgDQDVu convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Thu, 16 Apr 2020 23:21:50 -0400
+Received: from mail.kernel.org ([198.145.29.99]:47718 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726563AbgDQDVu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Apr 2020 23:21:50 -0400
+From:   bugzilla-daemon@bugzilla.kernel.org
+Authentication-Results: mail.kernel.org; dkim=permerror (bad message/signature format)
+To:     kvm@vger.kernel.org
+Subject: [Bug 207315] New: Out of bounds access in search_memslots() in
+ include/linux/kvm_host.h
+Date:   Fri, 17 Apr 2020 03:21:48 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: new
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: sunhaoyl@outlook.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_id short_desc product version
+ cf_kernel_version rep_platform op_sys cf_tree bug_status bug_severity
+ priority component assigned_to reporter cf_regression attachments.created
+Message-ID: <bug-207315-28872@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-In-Reply-To: <20200416185426-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+https://bugzilla.kernel.org/show_bug.cgi?id=207315
 
-On 2020/4/17 =E4=B8=8A=E5=8D=886:55, Michael S. Tsirkin wrote:
-> On Wed, Apr 15, 2020 at 10:43:56AM +0800, Jason Wang wrote:
->> We try to keep the defconfig untouched after decoupling CONFIG_VHOST
->> out of CONFIG_VIRTUALIZATION in commit 20c384f1ea1a
->> ("vhost: refine vhost and vringh kconfig") by enabling VHOST_MENU by
->> default. Then the defconfigs can keep enabling CONFIG_VHOST_NET
->> without the caring of CONFIG_VHOST.
->>
->> But this will leave a "CONFIG_VHOST_MENU=3Dy" in all defconfigs and ev=
-en
->> for the ones that doesn't want vhost. So it actually shifts the
->> burdens to the maintainers of all other to add "CONFIG_VHOST_MENU is
->> not set". So this patch tries to enable CONFIG_VHOST explicitly in
->> defconfigs that enables CONFIG_VHOST_NET and CONFIG_VHOST_VSOCK.
->>
->> Acked-by: Christian Borntraeger<borntraeger@de.ibm.com>  (s390)
->> Acked-by: Michael Ellerman<mpe@ellerman.id.au>  (powerpc)
->> Cc: Thomas Bogendoerfer<tsbogend@alpha.franken.de>
->> Cc: Benjamin Herrenschmidt<benh@kernel.crashing.org>
->> Cc: Paul Mackerras<paulus@samba.org>
->> Cc: Michael Ellerman<mpe@ellerman.id.au>
->> Cc: Heiko Carstens<heiko.carstens@de.ibm.com>
->> Cc: Vasily Gorbik<gor@linux.ibm.com>
->> Cc: Christian Borntraeger<borntraeger@de.ibm.com>
->> Reported-by: Geert Uytterhoeven<geert@linux-m68k.org>
->> Signed-off-by: Jason Wang<jasowang@redhat.com>
-> I rebased this on top of OABI fix since that
-> seems more orgent to fix.
-> Pushed to my vhost branch pls take a look and
-> if possible test.
-> Thanks!
+            Bug ID: 207315
+           Summary: Out of bounds access in search_memslots() in
+                    include/linux/kvm_host.h
+           Product: Virtualization
+           Version: unspecified
+    Kernel Version: 5.7-rc1
+          Hardware: All
+                OS: Linux
+              Tree: Mainline
+            Status: NEW
+          Severity: normal
+          Priority: P1
+         Component: kvm
+          Assignee: virtualization_kvm@kernel-bugs.osdl.org
+          Reporter: sunhaoyl@outlook.com
+        Regression: No
+
+Created attachment 288543
+  --> https://bugzilla.kernel.org/attachment.cgi?id=288543&action=edit
+kernel config
+
+Description of problem:
+Possible out of bounds access exists in search_memslots() in
+include/linux/kvm_host.h.
+In search_memslots(struct kvm_memslots *slots, gfn_t gfn),  a binary search is
+used  for slot searching,  as following code shows:
+
+        while (start < end) {
+                slot = start + (end - start) / 2;
+
+                if (gfn >= memslots[slot].base_gfn)
+                        end = slot;
+                else
+                        start = slot + 1;
+        }
+
+        if (gfn >= memslots[start].base_gfn &&
+            gfn < memslots[start].base_gfn + memslots[start].npages) {
+                atomic_set(&slots->lru_slot, start);
+                return &memslots[start];
+        }
+
+However, *start* may equal to *slots->used_slots*  when *gfn* is smaller than
+every *base_gfn*, which causes out of bound access in if-condition. 
 
 
-I test this patch by generating the defconfigs that wants vhost_net or=20
-vhost_vsock. All looks fine.
+Version-Release number of selected component (if applicable):
+linux-v5.7-rc1
 
-But having CONFIG_VHOST_DPN=3Dy may end up with the similar situation tha=
-t=20
-this patch want to address.
+How reproducible:
+Easy.
 
-Maybe we can let CONFIG_VHOST depends on !ARM || AEABI then add another=20
-menuconfig for VHOST_RING and do something similar?
+Steps to Reproduce:
+1.  Compile kernel with config in the attachment.
+2.  Compile and run following code
 
-Thanks
+#include <stdint.h>
+#include <unistd.h>
+#include <linux/kvm.h>
+#include <asm/kvm.h>
+#include <sys/ioctl.h>
+#include <fcntl.h>
+
+int main(int argc, char **agrv){
+
+        struct kvm_userspace_memory_region kvm_userspace_memory_region_0 = {
+                .slot = 4098152658,
+                .flags = 1653871800,
+                .guest_phys_addr = 9228163640593578308,
+                .memory_size = 13154652985641659684,
+                .userspace_addr = 2934507574655831761
+        };
+        char *s_0 = "/dev/kvm";
+        struct kvm_vapic_addr kvm_vapic_addr_1 = {
+                .vapic_addr=4096
+        };
+
+        int32_t r0 = open(s_0,0,0);
+        int32_t r1 = ioctl(r0,44545,0);
+        ioctl(r1,44640);
+        ioctl(r1,1075883590,&kvm_userspace_memory_region_0);
+        int32_t r2 = ioctl(r1,44609,0);
+        ioctl(r2,44672,0);
+        ioctl(r2,1074310803,&kvm_vapic_addr_1);
+        return 0;
+}
 
 
+Actual results:
+Kernel panic as following:
+
+[ 46.550820][ T6635] BUG: KASAN: slab-out-of-bounds in
+__kvm_gfn_to_hva_cache_init+0x30b/0x710
+[ 46.551811][ T6635] Read of size 8 at addr ffff8880268e1468 by task
+executor/6635
+[ 46.552658][ T6635] 
+[ 46.552922][ T6635] CPU: 0 PID: 6635 Comm: executor Not tainted 5.6.0+ #65
+[ 46.553690][ T6635] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996),
+BIOS rel-1.12.0-59-gc9ba5276e321-prebuilt.qemu.org 04/01/2014
+[ 46.555034][ T6635] Call Trace:
+[ 46.555410][ T6635] dump_stack+0x1e9/0x30e
+[ 46.555890][ T6635] print_address_description+0x74/0x5c0
+[ 46.556525][ T6635] ? printk+0x62/0x83
+[ 46.556978][ T6635] ? vprintk_emit+0x32e/0x3b0
+[ 46.557493][ T6635] __kasan_report+0x103/0x1a0
+[ 46.558008][ T6635] ? __kvm_gfn_to_hva_cache_init+0x30b/0x710
+[ 46.558662][ T6635] ? __kvm_gfn_to_hva_cache_init+0x30b/0x710
+[ 46.559321][ T6635] kasan_report+0x4d/0x80
+[ 46.559799][ T6635] ? __kvm_gfn_to_hva_cache_init+0x30b/0x710
+[ 46.560460][ T6635] ? kvm_lapic_set_vapic_addr+0x7d/0x130
+[ 46.561095][ T6635] ? kvm_arch_vcpu_ioctl+0x15e7/0x3eb0
+[ 46.561724][ T6635] ? kvm_vcpu_ioctl+0xff/0xa80
+[ 46.562259][ T6635] ? kvm_vcpu_ioctl+0x550/0xa80
+[ 46.562796][ T6635] ? kvm_vm_ioctl_get_dirty_log+0x650/0x650
+[ 46.563442][ T6635] ? __se_sys_ioctl+0xf9/0x160
+[ 46.563967][ T6635] ? do_syscall_64+0xf3/0x1b0
+[ 46.564483][ T6635] ? entry_SYSCALL_64_after_hwframe+0x49/0xb3
+[ 46.565150][ T6635] 
+/* ... */
+
+Expected results:
+normal exit
+
+-- 
+You are receiving this mail because:
+You are watching the assignee of the bug.
