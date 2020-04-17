@@ -2,180 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9F68F1ADA56
-	for <lists+kvm@lfdr.de>; Fri, 17 Apr 2020 11:47:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EE3A41ADA5A
+	for <lists+kvm@lfdr.de>; Fri, 17 Apr 2020 11:48:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726648AbgDQJrO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Apr 2020 05:47:14 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:2348 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725830AbgDQJrN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 Apr 2020 05:47:13 -0400
-Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id D82F383C57B3FD2E2153;
-        Fri, 17 Apr 2020 17:47:10 +0800 (CST)
-Received: from [127.0.0.1] (10.173.221.230) by DGGEMS409-HUB.china.huawei.com
- (10.3.19.209) with Microsoft SMTP Server id 14.3.487.0; Fri, 17 Apr 2020
- 17:47:00 +0800
-Subject: Re: [PATCH v2] KVM/arm64: Support enabling dirty log gradually in
- small chunks
-To:     Marc Zyngier <maz@kernel.org>
-References: <20200413122023.52583-1-zhukeqian1@huawei.com>
- <20200416160833.728017e9@why>
-CC:     <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <kvmarm@lists.cs.columbia.edu>,
-        "Paolo Bonzini" <pbonzini@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        "Julien Thierry" <julien.thierry.kdev@gmail.com>,
-        Will Deacon <will@kernel.org>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Jay Zhou <jianjay.zhou@huawei.com>,
-        <wanghaibin.wang@huawei.com>
-From:   zhukeqian <zhukeqian1@huawei.com>
-Message-ID: <44ce4553-5215-2290-5956-2e6c577d030b@huawei.com>
-Date:   Fri, 17 Apr 2020 17:46:59 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
- Thunderbird/45.7.1
+        id S1726722AbgDQJsi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Apr 2020 05:48:38 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:50138 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725830AbgDQJsi (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 17 Apr 2020 05:48:38 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1587116917;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=EH1XZETTMUkBMVwE0SvYImZx8kDPUe6xlEK01XCSGX4=;
+        b=J1qgaVQ+WnGAkUAX8KTuAbi475JIT+cnvXkEtEcN4ybMl7949fkTVDRNmx6QLtP+wCQqqH
+        sK6rPIpdVvgtVkT1G5uJAZO6tF+l9mpizEPS8cQtkDbwPCpZjql9abNxDGEwsPTfbFIEoB
+        gVs6X2SoJ34nZbsLwH1+U36LoCt3EVg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-199-MzTmX318NzqE3LOEWqBCMw-1; Fri, 17 Apr 2020 05:48:35 -0400
+X-MC-Unique: MzTmX318NzqE3LOEWqBCMw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B26A51005509;
+        Fri, 17 Apr 2020 09:48:31 +0000 (UTC)
+Received: from [10.72.13.157] (ovpn-13-157.pek2.redhat.com [10.72.13.157])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 73F3611A088;
+        Fri, 17 Apr 2020 09:48:22 +0000 (UTC)
+Subject: Re: [PATCH V2] vhost: do not enable VHOST_MENU by default
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     linux-mips@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, geert@linux-m68k.org,
+        tsbogend@alpha.franken.de, benh@kernel.crashing.org,
+        paulus@samba.org, heiko.carstens@de.ibm.com, gor@linux.ibm.com,
+        borntraeger@de.ibm.com, Michael Ellerman <mpe@ellerman.id.au>
+References: <20200416185426-mutt-send-email-mst@kernel.org>
+ <b7e2deb7-cb64-b625-aeb4-760c7b28c0c8@redhat.com>
+ <20200417022929-mutt-send-email-mst@kernel.org>
+ <4274625d-6feb-81b6-5b0a-695229e7c33d@redhat.com>
+ <20200417042912-mutt-send-email-mst@kernel.org>
+ <fdb555a6-4b8d-15b6-0849-3fe0e0786038@redhat.com>
+ <20200417044230-mutt-send-email-mst@kernel.org>
+ <73843240-3040-655d-baa9-683341ed4786@redhat.com>
+ <20200417050029-mutt-send-email-mst@kernel.org>
+ <ce8a18e5-3c74-73cc-57c5-10c40af838a3@redhat.com>
+ <20200417053803-mutt-send-email-mst@kernel.org>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <71b98c3b-1a38-b9aa-149c-f48c92a77448@redhat.com>
+Date:   Fri, 17 Apr 2020 17:48:20 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <20200416160833.728017e9@why>
-Content-Type: text/plain; charset="windows-1252"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.173.221.230]
-X-CFilter-Loop: Reflected
+In-Reply-To: <20200417053803-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
 
-On 2020/4/16 23:08, Marc Zyngier wrote:
-> On Mon, 13 Apr 2020 20:20:23 +0800
-> Keqian Zhu <zhukeqian1@huawei.com> wrote:
-> 
->> There is already support of enabling dirty log graually in small chunks
-> 
-> gradually
-> 
->> for x86 in commit 3c9bd4006bfc ("KVM: x86: enable dirty log gradually in
->> small chunks"). This adds support for arm64.
->>
->> x86 still writes protect all huge pages when DIRTY_LOG_INITIALLY_ALL_SET
->> is eanbled. However, for arm64, both huge pages and normal pages can be
-> 
-> enabled
-> 
->> write protected gradually by userspace.
->>
->> Under the Huawei Kunpeng 920 2.6GHz platform, I did some tests on 128G
->> Linux VMs with different page size. The memory pressure is 127G in each
->> case. The time taken of memory_global_dirty_log_start in QEMU is listed
->> below:
->>
->> Page Size      Before    After Optimization
->>   4K            650ms         1.8ms
->>   2M             4ms          1.8ms
->>   1G             2ms          1.8ms
-> 
-> These numbers are different from what you have advertised before. What
-> changed?
-In patch RFC, the numbers is got when memory pressure is 100G, so the number
-is bigger here.
-> 
->>
->> Besides the time reduction, the biggest income is that we will minimize
-> 
-> s/income/improvement/
-> 
->> the performance side effect (because of dissloving huge pages and marking
-> 
-> dissolving
-embarrassed for these misspell :(
-> 
->> memslots dirty) on guest after enabling dirty log.
->>
->> Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
->> ---
->>  Documentation/virt/kvm/api.rst    |  2 +-
->>  arch/arm64/include/asm/kvm_host.h |  3 +++
->>  virt/kvm/arm/mmu.c                | 12 ++++++++++--
->>  3 files changed, 14 insertions(+), 3 deletions(-)
->>
->> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
->> index efbbe570aa9b..0017f63fa44f 100644
->> --- a/Documentation/virt/kvm/api.rst
->> +++ b/Documentation/virt/kvm/api.rst
->> @@ -5777,7 +5777,7 @@ will be initialized to 1 when created.  This also improves performance because
->>  dirty logging can be enabled gradually in small chunks on the first call
->>  to KVM_CLEAR_DIRTY_LOG.  KVM_DIRTY_LOG_INITIALLY_SET depends on
->>  KVM_DIRTY_LOG_MANUAL_PROTECT_ENABLE (it is also only available on
->> -x86 for now).
->> +x86 and arm64 for now).
->>  
->>  KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2 was previously available under the name
->>  KVM_CAP_MANUAL_DIRTY_LOG_PROTECT, but the implementation had bugs that make
->> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
->> index 32c8a675e5a4..a723f84fab83 100644
->> --- a/arch/arm64/include/asm/kvm_host.h
->> +++ b/arch/arm64/include/asm/kvm_host.h
->> @@ -46,6 +46,9 @@
->>  #define KVM_REQ_RECORD_STEAL	KVM_ARCH_REQ(3)
->>  #define KVM_REQ_RELOAD_GICv4	KVM_ARCH_REQ(4)
->>  
->> +#define KVM_DIRTY_LOG_MANUAL_CAPS   (KVM_DIRTY_LOG_MANUAL_PROTECT_ENABLE | \
->> +				     KVM_DIRTY_LOG_INITIALLY_SET)
->> +
->>  DECLARE_STATIC_KEY_FALSE(userspace_irqchip_in_use);
->>  
->>  extern unsigned int kvm_sve_max_vl;
->> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
->> index e3b9ee268823..1077f653a611 100644
->> --- a/virt/kvm/arm/mmu.c
->> +++ b/virt/kvm/arm/mmu.c
->> @@ -2265,8 +2265,16 @@ void kvm_arch_commit_memory_region(struct kvm *kvm,
->>  	 * allocated dirty_bitmap[], dirty pages will be be tracked while the
->>  	 * memory slot is write protected.
->>  	 */
->> -	if (change != KVM_MR_DELETE && mem->flags & KVM_MEM_LOG_DIRTY_PAGES)
->> -		kvm_mmu_wp_memory_region(kvm, mem->slot);
->> +	if (change != KVM_MR_DELETE && mem->flags & KVM_MEM_LOG_DIRTY_PAGES) {
->> +		/*
->> +		 * If we're with initial-all-set, we don't need to write
->> +		 * protect any pages because they're all reported as dirty.
->> +		 * Huge pages and normal pages will be write protect gradually.
->> +		 */
->> +		if (!kvm_dirty_log_manual_protect_and_init_set(kvm)) {
->> +			kvm_mmu_wp_memory_region(kvm, mem->slot);
->> +		}
->> +	}
->>  }
->>  
->>  int kvm_arch_prepare_memory_region(struct kvm *kvm,
-> 
-> As it is, it is pretty good. The one thing that isn't clear to me is
-> why we have a difference in behaviour between x86 and arm64. What
-> prevents x86 from having the same behaviour as arm64?
-I am also not very clear about the difference. Maybe there is historic reason.
+On 2020/4/17 =E4=B8=8B=E5=8D=885:38, Michael S. Tsirkin wrote:
+> On Fri, Apr 17, 2020 at 05:33:56PM +0800, Jason Wang wrote:
+>> On 2020/4/17 =E4=B8=8B=E5=8D=885:01, Michael S. Tsirkin wrote:
+>>>> There could be some misunderstanding here. I thought it's somehow si=
+milar: a
+>>>> CONFIG_VHOST_MENU=3Dy will be left in the defconfigs even if CONFIG_=
+VHOST is
+>>>> not set.
+>>>>
+>>>> Thanks
+>>>>
+>>> BTW do entries with no prompt actually appear in defconfig?
+>>>
+>> Yes. I can see CONFIG_VHOST_DPN=3Dy after make ARCH=3Dm68k defconfig
+> You see it in .config right? So that's harmless right?
 
-Before introducing DIRTY_LOG_INITIALLY_ALL_SET, all pages will be write
-protected when starting dirty log, but only normal pages are needed
-to be write protected again during dirty log sync, because huge pages will
-be dissolved to normal pages.
 
-For that x86 uses different routine to write protect huge pages and normal pages,
-and arm64 uses same routine to do this, so arm64 still write protect all
-pages again during dirty log sync, but x86 didn't.
+Yes.
 
-So I think that x86 can write protect huge pages gradually too, just need to add
-some code legs in dirty log sync.
-
-Thanks,
-Keqian
-> 
-> Thanks,
-> 
-> 	M.
-> 
+Thanks
 
