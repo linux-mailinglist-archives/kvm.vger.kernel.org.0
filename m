@@ -2,198 +2,160 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 656F21AD412
-	for <lists+kvm@lfdr.de>; Fri, 17 Apr 2020 03:23:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BAA4F1AD417
+	for <lists+kvm@lfdr.de>; Fri, 17 Apr 2020 03:26:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727807AbgDQBXR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Apr 2020 21:23:17 -0400
-Received: from mga05.intel.com ([192.55.52.43]:16242 "EHLO mga05.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725800AbgDQBXR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Apr 2020 21:23:17 -0400
-IronPort-SDR: Sxn9gjy38VnlPxzZLo43uYCJ8ajpD6x7FYRqhz9UBqH5s1Gj/+7oD9LUazaKSz8rDSoAMOahCL
- 4kzP1CV3U+Rg==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Apr 2020 18:23:16 -0700
-IronPort-SDR: IDHOVINWK/2xAPTMH/rZ0FJhm7X0L/cEaGzWEIyO71lnfnLZHczxQCFdLrd9ES1fHzJ22vRA8o
- 3po5nU1ibT9A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.72,393,1580803200"; 
-   d="scan'208";a="400870986"
-Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040) ([10.239.13.16])
-  by orsmga004.jf.intel.com with ESMTP; 16 Apr 2020 18:23:13 -0700
-Date:   Thu, 16 Apr 2020 21:13:34 -0400
-From:   Yan Zhao <yan.y.zhao@intel.com>
-To:     "Raj, Ashok" <ashok.raj@intel.com>
-Cc:     "Lu, Baolu" <baolu.lu@intel.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "Tian, Jun J" <jun.j.tian@intel.com>,
-        "Sun, Yi Y" <yi.y.sun@intel.com>,
-        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Wu, Hao" <hao.wu@intel.com>
-Subject: Re: [PATCH v1 0/2] vfio/pci: expose device's PASID capability to VMs
-Message-ID: <20200417011334.GB16688@joy-OptiPlex-7040>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-References: <1584880394-11184-1-git-send-email-yi.l.liu@intel.com>
- <AADFC41AFE54684AB9EE6CBC0274A5D19D801252@SHSMSX104.ccr.corp.intel.com>
- <ce615f64-a19b-a365-8f8e-ca29f69cc6c0@intel.com>
- <20200416221224.GA16688@joy-OptiPlex-7040>
- <20200416223353.GC45480@otc-nc-03>
+        id S1727852AbgDQB0m (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Apr 2020 21:26:42 -0400
+Received: from wout1-smtp.messagingengine.com ([64.147.123.24]:47567 "EHLO
+        wout1-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725800AbgDQB0j (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 16 Apr 2020 21:26:39 -0400
+Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
+        by mailout.west.internal (Postfix) with ESMTP id D2C71633;
+        Thu, 16 Apr 2020 21:26:37 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute4.internal (MEProxy); Thu, 16 Apr 2020 21:26:38 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=russell.cc; h=
+        message-id:subject:from:to:cc:date:in-reply-to:references
+        :content-type:mime-version:content-transfer-encoding; s=fm1; bh=
+        YyORb9IBz9K3VedEbvxpxVFCoWtwyIDeBemcaew2SnU=; b=Id68iYAVxAhC3coY
+        VdtHQgoFriBjyW4wVW56qMkMgkYSM1mw3SDr4r5DmF8s8lOhUdFf0Gkr/cK3ONX4
+        kqcienVRMGlRGm3NH6HblGnRXtXMSJ7JyNOD0bnjbReRR1wR9jgeWrUilw9Y6i6b
+        tA4ButdTiQoVi6md8q1B9LvIvjOCIT6EOHIorlc5bKdyRJTEmFtF8Em38BzDJm8X
+        ETTivZvmHNo2lwYPt8mmi1ymZgxYoVs48CzKo0xZ35EDtRl+4JXKR3HfHkQFBFX/
+        hhIJnwAFuJ3+Al6srLFg3tDebVKW4gBh8rJjE9dw/1hOMbswDJq9ZREmWx2US8lz
+        BHbZqQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:content-transfer-encoding:content-type
+        :date:from:in-reply-to:message-id:mime-version:references
+        :subject:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+        :x-sasl-enc; s=fm2; bh=YyORb9IBz9K3VedEbvxpxVFCoWtwyIDeBemcaew2S
+        nU=; b=mV8cjKDW6RhLjEOPebTmT39Dl9Mg3O4EhabORpccjfCDrdrM49p5cuxAC
+        zZ1xjAQpYqUZoBixz+uGVOyQfxA+/2FObY0MT1qNFX/g3d9+sKATmHNmYIBLh8fK
+        qYetxwL3NEp9Jxqz0X/vnZYOEE+Zh2Hqjm4mM6R8yXN0XxQYxGcmdVaPPSCi+qE8
+        d7HLtgQLf1EAitBwDUsMHIkAWvT/Wrno2hOMuwcpr8ORKroumbTCKW76xftqEJZs
+        M7nZp6+3UGhJrtwhSV7OfF8uO/762IV7ptCaOfazA4Uok3Jbm9+wALRVfgSTGMa3
+        g+pci2c0UNfbSuFDTXTh5qrMmzcOA==
+X-ME-Sender: <xms:yQWZXj0gSzRxSOrhZTntNlZjNbdjHf-Y7L6ADvwoKGj5rkxqGMXG6Q>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduhedrfeeigdegiecutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenfg
+    hrlhcuvffnffculddutddmnecujfgurhepkffuhffvffgjfhgtfggggfesthejredttder
+    jeenucfhrhhomheptfhushhsvghllhcuvehurhhrvgihuceorhhushgtuhhrsehruhhssh
+    gvlhhlrdgttgeqnecukfhppeduvddurdeghedrvdduvddrvdefleenucevlhhushhtvghr
+    ufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehruhhstghurhesrhhushhsvg
+    hllhdrtggt
+X-ME-Proxy: <xmx:yQWZXnmnzqv6SYcVncDUsZk_eivJIGcqHZNP_Cdteu9DxKtBssuOZw>
+    <xmx:yQWZXsObGoUoJvBQ5zO6ErWhcPLFKSLldA9S9jhPuoqF1swANxgy5Q>
+    <xmx:yQWZXm5DwOGA6U1B8hQfI_LEXHdCsh0S6w8EQHvIQKEV-9OQZzJRRg>
+    <xmx:zQWZXs4lJlw96-_bXcryEAL7CzWaE-HfFSwLB6ZfMDrefDRCTUU7jw>
+Received: from crackle.ozlabs.ibm.com (ppp121-45-212-239.bras1.cbr2.internode.on.net [121.45.212.239])
+        by mail.messagingengine.com (Postfix) with ESMTPA id 65539328005E;
+        Thu, 16 Apr 2020 21:26:30 -0400 (EDT)
+Message-ID: <b0b361092d2d7e38f753edee6dcd9222b4e388ce.camel@russell.cc>
+Subject: Re: [PATCH kernel v2 0/7] powerpc/powenv/ioda: Allow huge DMA
+ window at 4GB
+From:   Russell Currey <ruscur@russell.cc>
+To:     Oliver O'Halloran <oohall@gmail.com>,
+        Alexey Kardashevskiy <aik@ozlabs.ru>
+Cc:     linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        kvm-ppc@vger.kernel.org, KVM list <kvm@vger.kernel.org>,
+        Alistair Popple <alistair@popple.id.au>,
+        Fabiano Rosas <farosas@linux.ibm.com>,
+        Michael Ellerman <mpe@ellerman.id.au>
+Date:   Fri, 17 Apr 2020 11:26:27 +1000
+In-Reply-To: <CAOSf1CHgUsJ7jGokg6QD6cEDr4-o5hnyyyjRZ=YijsRY3T1sYA@mail.gmail.com>
+References: <20200323075354.93825-1-aik@ozlabs.ru>
+         <b512ac5e-dca5-4c08-8ea1-a636b887c0d0@ozlabs.ru>
+         <d5cac37a-8b32-cabf-e247-10e64f0110ab@ozlabs.ru>
+         <CAOSf1CGfjX9LGQ1GDSmxrzjnaWOM3mUvBu9_xe-L2umin9n66w@mail.gmail.com>
+         <CAOSf1CHgUsJ7jGokg6QD6cEDr4-o5hnyyyjRZ=YijsRY3T1sYA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.1 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200416223353.GC45480@otc-nc-03>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Apr 17, 2020 at 06:33:54AM +0800, Raj, Ashok wrote:
-> Hi Zhao
-> 
-> 
-> On Thu, Apr 16, 2020 at 06:12:26PM -0400, Yan Zhao wrote:
-> > On Tue, Mar 31, 2020 at 03:08:25PM +0800, Lu, Baolu wrote:
-> > > On 2020/3/31 14:35, Tian, Kevin wrote:
-> > > >> From: Liu, Yi L<yi.l.liu@intel.com>
-> > > >> Sent: Sunday, March 22, 2020 8:33 PM
-> > > >>
-> > > >> From: Liu Yi L<yi.l.liu@intel.com>
-> > > >>
-> > > >> Shared Virtual Addressing (SVA), a.k.a, Shared Virtual Memory (SVM) on
-> > > >> Intel platforms allows address space sharing between device DMA and
-> > > >> applications. SVA can reduce programming complexity and enhance security.
-> > > >>
-> > > >> To enable SVA, device needs to have PASID capability, which is a key
-> > > >> capability for SVA. This patchset exposes the device's PASID capability
-> > > >> to guest instead of hiding it from guest.
-> > > >>
-> > > >> The second patch emulates PASID capability for VFs (Virtual Function) since
-> > > >> VFs don't implement such capability per PCIe spec. This patch emulates such
-> > > >> capability and expose to VM if the capability is enabled in PF (Physical
-> > > >> Function).
-> > > >>
-> > > >> However, there is an open for PASID emulation. If PF driver disables PASID
-> > > >> capability at runtime, then it may be an issue. e.g. PF should not disable
-> > > >> PASID capability if there is guest using this capability on any VF related
-> > > >> to this PF. To solve it, may need to introduce a generic communication
-> > > >> framework between vfio-pci driver and PF drivers. Please feel free to give
-> > > >> your suggestions on it.
-> > > > I'm not sure how this is addressed on bate metal today, i.e. between normal
-> > > > kernel PF and VF drivers. I look at pasid enable/disable code in intel-iommu.c.
-> > > > There is no check on PF/VF dependency so far. The cap is toggled when
-> > > > attaching/detaching the PF to its domain. Let's see how IOMMU guys
-> > > > respond, and if there is a way for VF driver to block PF driver from disabling
-> > > > the pasid cap when it's being actively used by VF driver, then we may
-> > > > leverage the same trick in VFIO when emulation is provided to guest.
-> > > 
-> > > IOMMU subsystem doesn't expose any APIs for pasid enabling/disabling.
-> > > The PCI subsystem does. It handles VF/PF like below.
-> > > 
-> > > /**
-> > >   * pci_enable_pasid - Enable the PASID capability
-> > >   * @pdev: PCI device structure
-> > >   * @features: Features to enable
-> > >   *
-> > >   * Returns 0 on success, negative value on error. This function checks
-> > >   * whether the features are actually supported by the device and returns
-> > >   * an error if not.
-> > >   */
-> > > int pci_enable_pasid(struct pci_dev *pdev, int features)
-> > > {
-> > >          u16 control, supported;
-> > >          int pasid = pdev->pasid_cap;
-> > > 
-> > >          /*
-> > >           * VFs must not implement the PASID Capability, but if a PF
-> > >           * supports PASID, its VFs share the PF PASID configuration.
-> > >           */
-> > >          if (pdev->is_virtfn) {
-> > >                  if (pci_physfn(pdev)->pasid_enabled)
-> > >                          return 0;
-> > >                  return -EINVAL;
-> > >          }
-> > > 
-> > > /**
-> > >   * pci_disable_pasid - Disable the PASID capability
-> > >   * @pdev: PCI device structure
-> > >   */
-> > > void pci_disable_pasid(struct pci_dev *pdev)
-> > > {
-> > >          u16 control = 0;
-> > >          int pasid = pdev->pasid_cap;
-> > > 
-> > >          /* VFs share the PF PASID configuration */
-> > >          if (pdev->is_virtfn)
-> > >                  return;
-> > > 
-> > > 
-> > > It doesn't block disabling PASID on PF even VFs are possibly using it.
-> > >
-> > hi
-> > I'm not sure, but is it possible for pci_enable_pasid() and
-> > pci_disable_pasid() to do the same thing as pdev->driver->sriov_configure,
-> > e.g. pci_sriov_configure_simple() below.
+On Thu, 2020-04-16 at 12:53 +1000, Oliver O'Halloran wrote:
+> On Thu, Apr 16, 2020 at 12:34 PM Oliver O'Halloran <oohall@gmail.com>
+> wrote:
+> > On Thu, Apr 16, 2020 at 11:27 AM Alexey Kardashevskiy <
+> > aik@ozlabs.ru> wrote:
+> > > Anyone? Is it totally useless or wrong approach? Thanks,
 > > 
-> > It checks whether there are VFs are assigned in pci_vfs_assigned(dev).
-> > and we can set the VF in assigned status if vfio_pci_open() is performed
-> > on the VF.
+> > I wouldn't say it's either, but I still hate it.
+> > 
+> > The 4GB mode being per-PHB makes it difficult to use unless we
+> > force
+> > that mode on 100% of the time which I'd prefer not to do. Ideally
+> > devices that actually support 64bit addressing (which is most of
+> > them)
+> > should be able to use no-translate mode when possible since a) It's
+> > faster, and b) It frees up room in the TCE cache devices that
+> > actually
+> > need them. I know you've done some testing with 100G NICs and found
+> > the overhead was fine, but IMO that's a bad test since it's pretty
+> > much the best-case scenario since all the devices on the PHB are in
+> > the same PE. The PHB's TCE cache only hits when the TCE matches the
+> > DMA bus address and the PE number for the device so in a multi-PE
+> > environment there's a lot of potential for TCE cache trashing. If
+> > there was one or two PEs under that PHB it's probably not going to
+> > matter, but if you have an NVMe rack with 20 drives it starts to
+> > look
+> > a bit ugly.
+> > 
+> > That all said, it might be worth doing this anyway since we
+> > probably
+> > want the software infrastructure in place to take advantage of it.
+> > Maybe expand the command line parameters to allow it to be enabled
+> > on
+> > a per-PHB basis rather than globally.
 > 
-> But you can still unbind the PF driver that magically causes the VF's to be
-> removed from the guest image too correct? 
+> Since we're on the topic
 > 
-> Only the IOMMU mucks with pasid_enable/disable. And it doesn't look like
-> we have a path to disable without tearing down the PF binding. 
+> I've been thinking the real issue we have is that we're trying to
+> pick
+> an "optimal" IOMMU config at a point where we don't have enough
+> information to work out what's actually optimal. The IOMMU config is
+> done on a per-PE basis, but since PEs may contain devices with
+> different DMA masks (looking at you wierd AMD audio function) we're
+> always going to have to pick something conservative as the default
+> config for TVE#0 (64k, no bypass mapping) since the driver will tell
+> us what the device actually supports long after the IOMMU
+> configuation
+> is done. What we really want is to be able to have separate IOMMU
+> contexts for each device, or at the very least a separate context for
+> the crippled devices.
 > 
-> We originally had some refcounts and such and would do the real disable only
-> when the refcount drops to 0, but we found it wasn't actually necessary 
-> to protect these resources like that.
->
-right. now unbinding PF driver would cause VFs unplugged from guest.
-if we modify vfio_pci and set VFs to be assigned, then VFs could remain
-appearing in guest but it cannot function well as PF driver has been unbound.
+> We could allow a per-device IOMMU context by extending the Master /
+> Slave PE thing to cover DMA in addition to MMIO. Right now we only
+> use
+> slave PEs when a device's MMIO BARs extend over multiple m64
+> segments.
+> When that happens an MMIO error causes the PHB to freezes the PE
+> corresponding to one of those segments, but not any of the others. To
+> present a single "PE" to the EEH core we check the freeze status of
+> each of the slave PEs when the EEH core does a PE status check and if
+> any of them are frozen, we freeze the rest of them too. When a driver
+> sets a limited DMA mask we could move that device to a seperate slave
+> PE so that it has it's own IOMMU context taylored to its DMA
+> addressing limits.
+> 
+> Thoughts?
 
-thanks for explanation :)
+For what it's worth this sounds like a good idea to me, it just sounds
+tricky to implement.  You're adding another layer of complexity on top
+of EEH (well, making things look simple to the EEH core and doing your
+own freezing on top of it) in addition to the DMA handling.
 
-> > 
-> > 
-> > int pci_sriov_configure_simple(struct pci_dev *dev, int nr_virtfn)
-> > {
-> >         int rc;
-> > 
-> >         might_sleep();
-> > 
-> >         if (!dev->is_physfn)
-> >                 return -ENODEV;
-> > 
-> >         if (pci_vfs_assigned(dev)) {
-> >                 pci_warn(dev, "Cannot modify SR-IOV while VFs are assigned\n");
-> >                 return -EPERM;
-> >         }
-> > 
-> >         if (nr_virtfn == 0) {
-> >                 sriov_disable(dev);
-> >                 return 0;
-> >         }
-> > 
-> >         rc = sriov_enable(dev, nr_virtfn);
-> >         if (rc < 0)
-> >                 return rc;
-> > 
-> >         return nr_virtfn;
-> > }
-> > 
-> > Thanks
-> > Yan
+If it works then great, just has a high potential to become a new bug
+haven.
+
+> 
+> Oliver
+
