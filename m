@@ -2,129 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B6DAF1AD626
-	for <lists+kvm@lfdr.de>; Fri, 17 Apr 2020 08:33:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A80281AD6A0
+	for <lists+kvm@lfdr.de>; Fri, 17 Apr 2020 09:00:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727978AbgDQGdx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Apr 2020 02:33:53 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:46892 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727818AbgDQGdw (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 17 Apr 2020 02:33:52 -0400
+        id S1728075AbgDQHAs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Apr 2020 03:00:48 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:31127 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726261AbgDQHAr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 Apr 2020 03:00:47 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1587105230;
+        s=mimecast20190719; t=1587106845;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=aRp3vqzXNggkBlbb5TjXuZYOr8GevPVbWARU6hChYxw=;
-        b=a5gzAXzJIrV0XgpXiIwM454VPvFtu3tbmICqq68YzQBOoEqCgtJiWyrE64HVk8/vNQJmR6
-        JgBoCNmvbaDvijkLc6KpYvHR7N+Fs9HWObAKPmwaQuRKYawNmvRIXz5iWbdcFbv+zDiYWQ
-        lyL51RdZuF6rgP1R+5ruoDKcPnUg7w4=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-130-qscJBbE1PcqcYV5F4EDVwg-1; Fri, 17 Apr 2020 02:33:48 -0400
-X-MC-Unique: qscJBbE1PcqcYV5F4EDVwg-1
-Received: by mail-wr1-f69.google.com with SMTP id 11so524104wrc.3
-        for <kvm@vger.kernel.org>; Thu, 16 Apr 2020 23:33:48 -0700 (PDT)
+        bh=5HHXuJKrO3Zwa2hpy5yi+VWtyY5H3hj/QRMxFcZxvFA=;
+        b=C2R/JxqvUg2ZyEekbnFzbMtdpvXKtCu0VSS1ORca+Dh0zl2K8kJJ0cZCwpkqj1EczzT/9i
+        t15pAWeoLnEYSZcrOHb0uRe8vWFjdxptRczF4U9hRxcztaqUdBFsvVwx+gwivHMugX1qyD
+        zvCyj4rRUv49RjNvTDbCcXMLME8xtMo=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-251-YOLEoAtzMLSywjmjf8RXGQ-1; Fri, 17 Apr 2020 03:00:44 -0400
+X-MC-Unique: YOLEoAtzMLSywjmjf8RXGQ-1
+Received: by mail-wr1-f71.google.com with SMTP id f15so550924wrj.2
+        for <kvm@vger.kernel.org>; Fri, 17 Apr 2020 00:00:43 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=aRp3vqzXNggkBlbb5TjXuZYOr8GevPVbWARU6hChYxw=;
-        b=Z9+60+fe45QYnLK5XpemJXWqcORnA3YTVHN9CxlGw1BZ5N9uDQ8PTYT3Vi8zvd19GH
-         Yly+MCBtRX33MLKOUhek1NDzmI/A+ubrIyCkbD07ZUpFXWBLGAirUsgANzCuickkRbt+
-         lmFrUdnxPImOm29jc7gAAXIE3HWz+T+1N2wDgBUh73pL0UJ1i13BakqIfIlLrx1gtdLt
-         tf2UazJw+ONKarVYgv4IgLjQ+xB15f5/Vm6cMA2TWDnqGY1QF881sN8KxsbPMgVKOVrb
-         0W0tvI9RgOBiVRbGHwrA/AzMmugDUmxXnID+HZLhHYTaNnKy+HYlMlI4C2jpbMGW13o9
-         7Q7w==
-X-Gm-Message-State: AGi0PuaTLXOPbopv5dVxj0oPnugZ43qwRcOeUFc2feqJCHjXpvl6klCM
-        4DgWy9GRch1mD417H1ySfMcCMtdHs7x33Vla0+yf3AHQ8Kw115m6Qh3zeyycmxgCJfx9kCv9uwY
-        TUAf+iZAfqK/a
-X-Received: by 2002:a1c:5a06:: with SMTP id o6mr1725644wmb.34.1587105227203;
-        Thu, 16 Apr 2020 23:33:47 -0700 (PDT)
-X-Google-Smtp-Source: APiQypLC+56jzTsL7mtJ8WJVomZZD1bGAAbZ16bTvi8qD3oQHVUMVTlOszcQ+jGs26hCvKjQJ7zNyQ==
-X-Received: by 2002:a1c:5a06:: with SMTP id o6mr1725618wmb.34.1587105226999;
-        Thu, 16 Apr 2020 23:33:46 -0700 (PDT)
-Received: from redhat.com (bzq-79-183-51-3.red.bezeqint.net. [79.183.51.3])
-        by smtp.gmail.com with ESMTPSA id k184sm6461323wmf.9.2020.04.16.23.33.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Apr 2020 23:33:46 -0700 (PDT)
-Date:   Fri, 17 Apr 2020 02:33:43 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     linux-mips@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, geert@linux-m68k.org,
-        tsbogend@alpha.franken.de, benh@kernel.crashing.org,
-        paulus@samba.org, heiko.carstens@de.ibm.com, gor@linux.ibm.com,
-        borntraeger@de.ibm.com, Michael Ellerman <mpe@ellerman.id.au>
-Subject: Re: [PATCH V2] vhost: do not enable VHOST_MENU by default
-Message-ID: <20200417022929-mutt-send-email-mst@kernel.org>
-References: <20200415024356.23751-1-jasowang@redhat.com>
- <20200416185426-mutt-send-email-mst@kernel.org>
- <b7e2deb7-cb64-b625-aeb4-760c7b28c0c8@redhat.com>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=5HHXuJKrO3Zwa2hpy5yi+VWtyY5H3hj/QRMxFcZxvFA=;
+        b=gPqFV9bzp/74ME2EJmHiIv4K+dkfXL2Zd04wnVImQyveauxcVGN4TZTdEVTlqj0Di4
+         3JLn0eRqewArrHfocoKXHS7smrNuGoN1gaCJBgFmowvjLem9ReV2MDMGVtgTRP5vE6AH
+         JaK4RLNrSAgb7JhXwi/RhhMWbZmnrhkC1dzVRYrP6uxrbCcAfYUS8T7GVp2nJohmQKEd
+         VWrbhP8Rc6uUliSz62rKRmiNNgFaXRRM4qpxUF9jIJa+3mmVONsqraLYlO8KPHBzbxPI
+         YVVsFzxmMx786PDMWdHG1gCD7kGXooorpddDJ6+QDpOQDf/ntINcYTRTt6xLV8hOYuol
+         MRiA==
+X-Gm-Message-State: AGi0PuYe4fdOkH1jb1+RXB4FkBjoHgnC7TDWoOD1lC0qOsrrdV/ThIN8
+        84BlCSl/aWPCXY5k25Mz4iuKS02et+x1/yQreiaqzj6oe+WZin1xdUHCYur9Pl5yjuN4xP8w/Qf
+        X/B3o54l/4LpX
+X-Received: by 2002:a1c:f312:: with SMTP id q18mr1767779wmq.175.1587106842795;
+        Fri, 17 Apr 2020 00:00:42 -0700 (PDT)
+X-Google-Smtp-Source: APiQypLt/8N+o0sdg/xJTUyaIHOADyaOks4w6ey9O5y5Wd4Q0ZIqdrRJDc5bg5Kn+qb/YznsDj4RbA==
+X-Received: by 2002:a1c:f312:: with SMTP id q18mr1767758wmq.175.1587106842567;
+        Fri, 17 Apr 2020 00:00:42 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:399d:3ef7:647c:b12d? ([2001:b07:6468:f312:399d:3ef7:647c:b12d])
+        by smtp.gmail.com with ESMTPSA id l15sm6387727wmi.48.2020.04.17.00.00.41
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 17 Apr 2020 00:00:41 -0700 (PDT)
+Subject: Re: [kvm-unit-tests PATCH] nVMX: Add testcase to cover VMWRITE to
+ nonexistent CR3-target values
+To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     kvm@vger.kernel.org
+References: <20200416162814.32065-1-sean.j.christopherson@intel.com>
+ <d0423845-db40-b9ce-62b7-63bc36006a28@oracle.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <0b673c58-0440-883e-2a29-b06603e49aad@redhat.com>
+Date:   Fri, 17 Apr 2020 09:00:41 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
+In-Reply-To: <d0423845-db40-b9ce-62b7-63bc36006a28@oracle.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <b7e2deb7-cb64-b625-aeb4-760c7b28c0c8@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Apr 17, 2020 at 11:12:14AM +0800, Jason Wang wrote:
+On 17/04/20 03:35, Krish Sadhukhan wrote:
 > 
-> On 2020/4/17 上午6:55, Michael S. Tsirkin wrote:
-> > On Wed, Apr 15, 2020 at 10:43:56AM +0800, Jason Wang wrote:
-> > > We try to keep the defconfig untouched after decoupling CONFIG_VHOST
-> > > out of CONFIG_VIRTUALIZATION in commit 20c384f1ea1a
-> > > ("vhost: refine vhost and vringh kconfig") by enabling VHOST_MENU by
-> > > default. Then the defconfigs can keep enabling CONFIG_VHOST_NET
-> > > without the caring of CONFIG_VHOST.
-> > > 
-> > > But this will leave a "CONFIG_VHOST_MENU=y" in all defconfigs and even
-> > > for the ones that doesn't want vhost. So it actually shifts the
-> > > burdens to the maintainers of all other to add "CONFIG_VHOST_MENU is
-> > > not set". So this patch tries to enable CONFIG_VHOST explicitly in
-> > > defconfigs that enables CONFIG_VHOST_NET and CONFIG_VHOST_VSOCK.
-> > > 
-> > > Acked-by: Christian Borntraeger<borntraeger@de.ibm.com>  (s390)
-> > > Acked-by: Michael Ellerman<mpe@ellerman.id.au>  (powerpc)
-> > > Cc: Thomas Bogendoerfer<tsbogend@alpha.franken.de>
-> > > Cc: Benjamin Herrenschmidt<benh@kernel.crashing.org>
-> > > Cc: Paul Mackerras<paulus@samba.org>
-> > > Cc: Michael Ellerman<mpe@ellerman.id.au>
-> > > Cc: Heiko Carstens<heiko.carstens@de.ibm.com>
-> > > Cc: Vasily Gorbik<gor@linux.ibm.com>
-> > > Cc: Christian Borntraeger<borntraeger@de.ibm.com>
-> > > Reported-by: Geert Uytterhoeven<geert@linux-m68k.org>
-> > > Signed-off-by: Jason Wang<jasowang@redhat.com>
-> > I rebased this on top of OABI fix since that
-> > seems more orgent to fix.
-> > Pushed to my vhost branch pls take a look and
-> > if possible test.
-> > Thanks!
-> 
-> 
-> I test this patch by generating the defconfigs that wants vhost_net or
-> vhost_vsock. All looks fine.
-> 
-> But having CONFIG_VHOST_DPN=y may end up with the similar situation that
-> this patch want to address.
-> Maybe we can let CONFIG_VHOST depends on !ARM || AEABI then add another
-> menuconfig for VHOST_RING and do something similar?
-> 
-> Thanks
+> On 4/16/20 9:28 AM, Sean Christopherson wrote:
+>> Enhance test_cr3_targets() to verify that attempting to write CR3-target
+>> value fields beyond the reported number of supported targets fails.
+>>
+>> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+>> ---
+>>   x86/vmx_tests.c | 4 ++++
+>>   1 file changed, 4 insertions(+)
+>>
+>> diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
+>> index 1f97fe3..f5c72e6 100644
+>> --- a/x86/vmx_tests.c
+>> +++ b/x86/vmx_tests.c
+>> @@ -3570,6 +3570,10 @@ static void test_cr3_targets(void)
+>>       for (i = 0; i <= supported_targets + 1; i++)
+>>           try_cr3_target_count(i, supported_targets);
+>>       vmcs_write(CR3_TARGET_COUNT, cr3_targets);
+>> +
+>> +    /* VMWRITE to nonexistent target fields should fail. */
+>> +    for (i = supported_targets; i < 256; i++)
+>> +        TEST_ASSERT(vmcs_write(CR3_TARGET_0 + i*2, 0));
+>>   }
+>>     /*
+> We don't need VMREAD testing ?
 
-Sorry I don't understand. After this patch CONFIG_VHOST_DPN is just
-an internal variable for the OABI fix. I kept it separate
-so it's easy to revert for 5.8. Yes we could squash it into
-VHOST directly but I don't see how that changes logic at all.
+Patches are welcome. :D
 
--- 
-MST
+Paolo
 
