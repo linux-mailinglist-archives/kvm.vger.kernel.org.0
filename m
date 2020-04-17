@@ -2,153 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BC17C1ADE16
-	for <lists+kvm@lfdr.de>; Fri, 17 Apr 2020 15:15:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 23A081ADE2B
+	for <lists+kvm@lfdr.de>; Fri, 17 Apr 2020 15:22:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730322AbgDQNPq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Apr 2020 09:15:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51934 "EHLO
+        id S1730217AbgDQNWE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Apr 2020 09:22:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52912 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1729760AbgDQNPp (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 17 Apr 2020 09:15:45 -0400
-Received: from mail-ot1-x341.google.com (mail-ot1-x341.google.com [IPv6:2607:f8b0:4864:20::341])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3924C061A0C
-        for <kvm@vger.kernel.org>; Fri, 17 Apr 2020 06:15:45 -0700 (PDT)
-Received: by mail-ot1-x341.google.com with SMTP id i22so1342627otp.12
-        for <kvm@vger.kernel.org>; Fri, 17 Apr 2020 06:15:45 -0700 (PDT)
+        by vger.kernel.org with ESMTP id S1729760AbgDQNWD (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 17 Apr 2020 09:22:03 -0400
+Received: from mail-qt1-x844.google.com (mail-qt1-x844.google.com [IPv6:2607:f8b0:4864:20::844])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0030FC061A0C
+        for <kvm@vger.kernel.org>; Fri, 17 Apr 2020 06:22:02 -0700 (PDT)
+Received: by mail-qt1-x844.google.com with SMTP id z90so1828812qtd.10
+        for <kvm@vger.kernel.org>; Fri, 17 Apr 2020 06:22:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=TboapKpbscmz855YSAFg2nIeGN97zkquFhVh21atq0U=;
-        b=aNmEuET4pqkT1KkeKmgk6Cq9vBqgNu/ROxL2C7ezmo+e7TvlW/pt7eEDU2mGbKJOYa
-         pd2IUEcQqcu4qx19uoBru9MI0rbUtrwjwrkXUi0Ao+bT9k5etlzBouSiftkQ6eyDLiCI
-         kfDwLc5+qmzQPd+i133nQVievrA8CLz5BR0nFhlw01DpsQ3cus95k3U8AP+INw0F7ats
-         tpVmUE1/T6IyhGtSyuHv5532KsG61E7Qyxpy4pOswNmwijgv3AE0FsuSUsoUL7C0gaet
-         qpwFeJgOjQ532CXC3K6ADBOAEqxmh0qPU9rKOp7PwwVEFLHUzPx1/4TIDAXx3R/9a3pW
-         GHjg==
+        d=lca.pw; s=google;
+        h=mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=Hprasaok50MZK/a/feo2e2oclDOFVapOraKUc6PEaaw=;
+        b=Cy4c1ZQe4G9SMrIOkfvW/lXRdE7J7My+efjCR36dpGMsNWVjE2WF0RjP/1LyW0EE9V
+         jLhFL2HqJbxsByPjW/xGuaB6H6DHwIQD3vnU5KqfqaUl4DpVTu6oCF82+AJTCKoZzA9b
+         eu1wuX9DIqmpGHx2mbpbKznE3HXjwCGDmt4dE5QrzkJVZVj2rpXlqnURyx4Nr0o5muN0
+         mIMyTNlbP2Ihpcvo93Z54eXzBKQQ6yvBCGjhHBY7fKT7pfp42Ac7OVhgA3rjiG+O6pej
+         WQlV44x9fx+V/4JTeeIrXd9P6rcUuL27qT16PaaKso5mO9s0mK+noBJW2bCVEvN/41Tm
+         e73A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=TboapKpbscmz855YSAFg2nIeGN97zkquFhVh21atq0U=;
-        b=Wdokz2IvGYwg94oZoMcBHhqzHoXlkLswd1khTWT12McOzgMwSDY15xo6oT87M9+dfj
-         nqHJVHLwjr34n5wysV5yofI6SrigL6enWWtuuHZiJ4l+KtHwd4rNfXVUZesJ9wodr69K
-         WW/HyHh5rWPeMo/xPO62XiYffUwyOj4Mu3wB89B74RmvaAP4QZvqzpLsfyu3YQTKRycc
-         BEzhfhTrOl8cAX2VYPhwzqbZE9KbygOMLl8Ai+9oW7Micx/8tG57RobJqSy0wJqxSFHl
-         HuxkxYTfLAZku9XhReajTOmKHMU/HGejV9HGh4600l+jTSb82BvMK6JFv1adgwIYKp6z
-         l79w==
-X-Gm-Message-State: AGi0PuZjCUqKoVl7hIOjvfUV3ZpJGDW849qfVGMnZcsYYCfWH2rBKOV/
-        Y/r81H79oJyJf8pUhwyn3RNfOb615xwiJ5r9gc/wgA==
-X-Google-Smtp-Source: APiQypJVaXiKK+fekesrRmbkfJcK99mF8Dr0rTE3xJsFEyEaAUaA62DI5BSqDrUkQBtY4+41nUKVJE9aSQIFgr7kBl8=
-X-Received: by 2002:a05:6830:1e4e:: with SMTP id e14mr2432927otj.91.1587129345185;
- Fri, 17 Apr 2020 06:15:45 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200410114639.32844-1-gengdongjiu@huawei.com> <20200410114639.32844-2-gengdongjiu@huawei.com>
-In-Reply-To: <20200410114639.32844-2-gengdongjiu@huawei.com>
-From:   Peter Maydell <peter.maydell@linaro.org>
-Date:   Fri, 17 Apr 2020 14:15:33 +0100
-Message-ID: <CAFEAcA_vqtFuoaLhczs-5ZXyjBWH4j4rF+5SUHMxVt_qTLyR5Q@mail.gmail.com>
-Subject: Re: [PATCH v25 01/10] acpi: nvdimm: change NVDIMM_UUID_LE to a common macro
-To:     Dongjiu Geng <gengdongjiu@huawei.com>
-Cc:     Igor Mammedov <imammedo@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
-        Shannon Zhao <shannon.zhaosl@gmail.com>,
-        Fam Zheng <fam@euphon.net>,
-        Richard Henderson <rth@twiddle.net>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        QEMU Developers <qemu-devel@nongnu.org>,
-        kvm-devel <kvm@vger.kernel.org>, qemu-arm <qemu-arm@nongnu.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Zheng Xiang <zhengxiang9@huawei.com>,
-        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-        Linuxarm <linuxarm@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
+        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=Hprasaok50MZK/a/feo2e2oclDOFVapOraKUc6PEaaw=;
+        b=dKTwq8LI9YZ/ZBy8CU113cwIJyJtkMqfpR5HtacFTNAvWoEouurACnJHgBIyZZ7CGi
+         8JWQkdyjTt2U4LP0V62IOglLP84Hz2niegQozkRowbokHFyXje+NjAoqsKRwdNz3KqwM
+         RFvNqdkhCG5PoCAdetxtK/UbkdsIPQo6vpxFWg4VI4UiBcK6sW3295E47/XpBDIBHNhf
+         V67XUKuKH+cGsj3Parykmtt9j93KDc6qdhhuD3c5MJU+YiGfP2Nv4wmaFhphfTT8iGFA
+         MSZMSzW3RB2FUfItTxKCGYCuTGdKVjKZg047vqreL1hl3Wn6p17ZDVRSaaFeLGxWzBUD
+         lRLA==
+X-Gm-Message-State: AGi0PuZqgzP/kvyXg7UO0Wh6wKk5Nv6UmsOmTX9E+/XnvbQdzoCgj9ye
+        9qPqRdqAOFPNUmkfhA/Au6idEg==
+X-Google-Smtp-Source: APiQypLINBcGF72yF2OOfhsB7LCEXiY/71TAZiQ84OPjbI8O9xMYQgnMX9Pqn8PJ85t59l4ixc587Q==
+X-Received: by 2002:ac8:46d8:: with SMTP id h24mr2932189qto.352.1587129722173;
+        Fri, 17 Apr 2020 06:22:02 -0700 (PDT)
+Received: from [192.168.1.153] (pool-71-184-117-43.bstnma.fios.verizon.net. [71.184.117.43])
+        by smtp.gmail.com with ESMTPSA id v76sm17479205qka.32.2020.04.17.06.22.01
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 17 Apr 2020 06:22:01 -0700 (PDT)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
+Subject: Re: [PATCH -next] kvm/svm: disable KCSAN for svm_vcpu_run()
+From:   Qian Cai <cai@lca.pw>
+In-Reply-To: <f02ca9b9-f0a6-dfb5-1ca0-32a12d4f56fb@redhat.com>
+Date:   Fri, 17 Apr 2020 09:21:59 -0400
+Cc:     Elver Marco <elver@google.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        kasan-dev <kasan-dev@googlegroups.com>, kvm@vger.kernel.org,
+        LKML <linux-kernel@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <1F15D565-D34D-41F5-B1C5-B9A04626EE97@lca.pw>
+References: <20200415153709.1559-1-cai@lca.pw>
+ <f02ca9b9-f0a6-dfb5-1ca0-32a12d4f56fb@redhat.com>
+To:     "paul E. McKenney" <paulmck@kernel.org>
+X-Mailer: Apple Mail (2.3608.80.23.2.2)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 10 Apr 2020 at 12:45, Dongjiu Geng <gengdongjiu@huawei.com> wrote:
->
-> The little end UUID is used in many places, so make
-> NVDIMM_UUID_LE to a common macro to convert the UUID
-> to a little end array.
->
-> Reviewed-by: Xiang Zheng <zhengxiang9@huawei.com>
-> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
-> ---
->  hw/acpi/nvdimm.c    | 10 +++-------
->  include/qemu/uuid.h |  9 +++++++++
->  2 files changed, 12 insertions(+), 7 deletions(-)
->
-> diff --git a/hw/acpi/nvdimm.c b/hw/acpi/nvdimm.c
-> index eb6a37b..a747c63 100644
-> --- a/hw/acpi/nvdimm.c
-> +++ b/hw/acpi/nvdimm.c
-> @@ -27,6 +27,7 @@
->   */
->
->  #include "qemu/osdep.h"
-> +#include "qemu/uuid.h"
->  #include "hw/acpi/acpi.h"
->  #include "hw/acpi/aml-build.h"
->  #include "hw/acpi/bios-linker-loader.h"
-> @@ -34,18 +35,13 @@
->  #include "hw/mem/nvdimm.h"
->  #include "qemu/nvdimm-utils.h"
->
-> -#define NVDIMM_UUID_LE(a, b, c, d0, d1, d2, d3, d4, d5, d6, d7)             \
-> -   { (a) & 0xff, ((a) >> 8) & 0xff, ((a) >> 16) & 0xff, ((a) >> 24) & 0xff, \
-> -     (b) & 0xff, ((b) >> 8) & 0xff, (c) & 0xff, ((c) >> 8) & 0xff,          \
-> -     (d0), (d1), (d2), (d3), (d4), (d5), (d6), (d7) }
-> -
->  /*
->   * define Byte Addressable Persistent Memory (PM) Region according to
->   * ACPI 6.0: 5.2.25.1 System Physical Address Range Structure.
->   */
->  static const uint8_t nvdimm_nfit_spa_uuid[] =
-> -      NVDIMM_UUID_LE(0x66f0d379, 0xb4f3, 0x4074, 0xac, 0x43, 0x0d, 0x33,
-> -                     0x18, 0xb7, 0x8c, 0xdb);
-> +      UUID_LE(0x66f0d379, 0xb4f3, 0x4074, 0xac, 0x43, 0x0d, 0x33,
-> +              0x18, 0xb7, 0x8c, 0xdb);
->
->  /*
->   * NVDIMM Firmware Interface Table
-> diff --git a/include/qemu/uuid.h b/include/qemu/uuid.h
-> index 129c45f..c55541b 100644
-> --- a/include/qemu/uuid.h
-> +++ b/include/qemu/uuid.h
-> @@ -34,6 +34,15 @@ typedef struct {
->      };
->  } QemuUUID;
->
-> +/**
-> + * convert UUID to little-endian array
-> + * The input parameter is the member of  UUID
-> + */
 
-This isn't in the right form to be a proper doc-comment comment,
-and it's too brief to really help somebody who doesn't already
-know what the macro does.
 
-The parameter names to the macro are still terrible, and
-"member of UUID" doesn't help -- assuming you mean "members
-of the QemuUUID struct, those are named 'time_low' , 'time_mid',
-and so on, not this random selection of alphabetic and d0..d7.
+> On Apr 15, 2020, at 11:57 AM, Paolo Bonzini <pbonzini@redhat.com> =
+wrote:
+>=20
+> On 15/04/20 17:37, Qian Cai wrote:
+>> For some reasons, running a simple qemu-kvm command with KCSAN will
+>> reset AMD hosts. It turns out svm_vcpu_run() could not be =
+instrumented.
+>> Disable it for now.
+>>=20
+>> # /usr/libexec/qemu-kvm -name ubuntu-18.04-server-cloudimg -cpu host
+>> 	-smp 2 -m 2G -hda ubuntu-18.04-server-cloudimg.qcow2
+>>=20
+>> =3D=3D=3D console output =3D=3D=3D
+>> Kernel 5.6.0-next-20200408+ on an x86_64
+>>=20
+>> hp-dl385g10-05 login:
+>>=20
+>> <...host reset...>
+>>=20
+>> HPE ProLiant System BIOS A40 v1.20 (03/09/2018)
+>> (C) Copyright 1982-2018 Hewlett Packard Enterprise Development LP
+>> Early system initialization, please wait...
+>>=20
+>> Signed-off-by: Qian Cai <cai@lca.pw>
+>> ---
+>> arch/x86/kvm/svm/svm.c | 2 +-
+>> 1 file changed, 1 insertion(+), 1 deletion(-)
+>>=20
+>> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+>> index 2be5bbae3a40..1fdb300e9337 100644
+>> --- a/arch/x86/kvm/svm/svm.c
+>> +++ b/arch/x86/kvm/svm/svm.c
+>> @@ -3278,7 +3278,7 @@ static void svm_cancel_injection(struct =
+kvm_vcpu *vcpu)
+>>=20
+>> bool __svm_vcpu_run(unsigned long vmcb_pa, unsigned long *regs);
+>>=20
+>> -static void svm_vcpu_run(struct kvm_vcpu *vcpu)
+>> +static __no_kcsan void svm_vcpu_run(struct kvm_vcpu *vcpu)
+>> {
+>> 	struct vcpu_svm *svm =3D to_svm(vcpu);
+>>=20
+>>=20
+>=20
+> I suppose you tested the patch to move cli/sti into the .S file.  =
+Anyway:
+>=20
+> Acked-by: Paolo Bonzini <pbonzini@redhat.com>
 
-> +#define UUID_LE(a, b, c, d0, d1, d2, d3, d4, d5, d6, d7)             \
-> +  { (a) & 0xff, ((a) >> 8) & 0xff, ((a) >> 16) & 0xff, ((a) >> 24) & 0xff, \
-> +     (b) & 0xff, ((b) >> 8) & 0xff, (c) & 0xff, ((c) >> 8) & 0xff,          \
-> +     (d0), (d1), (d2), (d3), (d4), (d5), (d6), (d7) }
-> +
->  #define UUID_FMT "%02hhx%02hhx%02hhx%02hhx-" \
->                   "%02hhx%02hhx-%02hhx%02hhx-" \
->                   "%02hhx%02hhx-" \
-> --
-> 1.8.3.1
+Paul, can you pick this up along with other KCSAN fixes?
 
-thanks
--- PMM
