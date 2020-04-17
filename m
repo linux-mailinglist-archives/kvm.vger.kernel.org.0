@@ -2,103 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 39F4F1AE4DD
-	for <lists+kvm@lfdr.de>; Fri, 17 Apr 2020 20:35:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5F2AF1AE56D
+	for <lists+kvm@lfdr.de>; Fri, 17 Apr 2020 21:06:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729258AbgDQSfX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Apr 2020 14:35:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45336 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1729225AbgDQSfX (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 17 Apr 2020 14:35:23 -0400
-Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E436EC061A0C
-        for <kvm@vger.kernel.org>; Fri, 17 Apr 2020 11:35:21 -0700 (PDT)
-Received: by mail-pf1-x44a.google.com with SMTP id y84so2714384pfb.7
-        for <kvm@vger.kernel.org>; Fri, 17 Apr 2020 11:35:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=0BuEBmYr75xPa7gC0bHFq8M7UvE4BnddAP9FXUAyrP8=;
-        b=hTs2M2BNhqgtQKaBeJOV5n9UftZfpYuSTX/yiN0ir6+uVoD60NNqi5gCevO8wE7RPG
-         Mv+6O64IUQhulKIPibo51rZa1v98jPldySHxthXe3khQbN6ZaNep+OaygNLFFlR7gNGc
-         gahuKxWAZJaEDfI/GKvNmfKrvT6+A/0VMm7zMcANirW8oppepciiQkWJ9iv9zxk4ycBX
-         Nl5aK6gQnNnmpOa+y6YNG6fCEHhwAse4S9l0O0ezA2Qe7GbFg8bseJ9waexJb9saU46z
-         6B8P3cMR8ygsGhQrHFGu80Dk25sXfa1TcjP7dWv55VkvO9+wdiKa/vrkr3Tv6hHkPPM1
-         MPhA==
+        id S1728881AbgDQTF7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Apr 2020 15:05:59 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:44299 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727775AbgDQTF7 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 17 Apr 2020 15:05:59 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1587150358;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=aexqVQ7wQQYqij2tXK706tjApKpXd1pq/NygCDJJnFw=;
+        b=CjH6Xkpp8diOEF+g4dDjcgQWbypn+TixbqYbwxLjeUbSQcKPW51ElkA2UGuqUqkWfqocxp
+        +ATSw7hlvPqhayt53nQdO0km7/01dJlrq1YR3KG+67EEk4dsokUBJ9+9OV8FZnh8VNUpZW
+        ltovXvMUMonMnrLEvi1tHDfzaFKLff0=
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
+ [209.85.222.198]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-145-whr1BzM-NMisrO54zjRqBg-1; Fri, 17 Apr 2020 15:05:56 -0400
+X-MC-Unique: whr1BzM-NMisrO54zjRqBg-1
+Received: by mail-qk1-f198.google.com with SMTP id f11so2903409qkk.16
+        for <kvm@vger.kernel.org>; Fri, 17 Apr 2020 12:05:56 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=0BuEBmYr75xPa7gC0bHFq8M7UvE4BnddAP9FXUAyrP8=;
-        b=mHxb6gPSELz2wAllaVW57wjue9Aw9GN8TGNTzAuTsXho/YBF+5PmK0TQ+tY2AaQl9V
-         wQH8gjaojKYu2C7Wzjjc/z4EHl6MAYQ/HK4WA/hA5lJmgpzbCOuiMMc+0daI9wrWPdUQ
-         otSRInEt//BQJuyKsRU9PXwUlqjyHTALwW75B0o8Hw8oaS4VgBJNq1mnSyFRG1mGrk0d
-         K8PVA+EcnMkC21v9hoI1qReDKgAklSVKQk61Q+14r+CsgD+qUFshIUWpHrrlFeFeTNai
-         Qkjy7ozE7NeeoCPcAnPQBal3PJjaUWyfYwqKZhVfV1fupjWIq4z7SiVME8DcaxSw75PM
-         9spg==
-X-Gm-Message-State: AGi0PuY+pxjnNyA3S7HTUMI8PQ82GjUtZ80OHYnUFsDerKlaedkliyHu
-        yGl9PcGLZtrSwa60kW7TnjkyL+HvLMCZ+RtWcWoZrNe8j2xadHFePcoIfWyjYYRGXZ9LZG/z827
-        stkT0APW7eeEC54mcxlshJ7Ri3THeAe/wzeeDUZtvpFZueS6hr4jLiFw3nNsptrJCz8LP0XV8lH
-        xZoYk=
-X-Google-Smtp-Source: APiQypI0GYEEOW/Pk0W5Es7Sv1ul1duA5DR5/mIxLf8HukWp0LOQAjUsKV0Iy7U1r+3hmf9k8VGtYu0oh30r7v2qLdD1uA==
-X-Received: by 2002:a17:90a:d98e:: with SMTP id d14mr5899339pjv.178.1587148521417;
- Fri, 17 Apr 2020 11:35:21 -0700 (PDT)
-Date:   Fri, 17 Apr 2020 11:34:52 -0700
-In-Reply-To: <20200417183452.115762-1-makarandsonare@google.com>
-Message-Id: <20200417183452.115762-3-makarandsonare@google.com>
-Mime-Version: 1.0
-References: <20200417183452.115762-1-makarandsonare@google.com>
-X-Mailer: git-send-email 2.26.1.301.g55bc3eb7cb9-goog
-Subject: [kvm PATCH 2/2] KVM: nVMX: Don't clobber preemption timer in the
- VMCS12 before L2 ran
-From:   Makarand Sonare <makarandsonare@google.com>
-To:     kvm@vger.kernel.org, pshier@google.com, jmattson@google.com
-Cc:     Makarand Sonare <makarandsonare@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=aexqVQ7wQQYqij2tXK706tjApKpXd1pq/NygCDJJnFw=;
+        b=mxgzExilapTU2cQHo4WKUMHBWgBGSVx/CP+b1/NaZLL/W6yBh+4Q2KhTPr6tT5jzjD
+         hQ4Zy/tPC5ZIU1gMUjsLb/Jvm6NWo7ZJrAy+Y8t9XLzNnYj2Vie3kt93LLRt6GEFrAqO
+         Eq1GHmxzG8WwAqBZ898r5b1UDHfShY87IVLXvlIThDAGW4ZmuUHKJQVLRi5X2SaqHKWj
+         gjzxnSZ/8Y709XDk9+jLxfD1WDYEvSmHfYzxnRr3153vPKaC54ZRaevceUFvhDI+Ycos
+         TQU43OiMFN4a/WrHRaTtl8cnrTzjs3537lhXMvfc5SS1Rss2eKE43w05pw5fZcLSAmV5
+         tu2g==
+X-Gm-Message-State: AGi0PuZOGW7o0dSqNijrm3a9i7KEguFt8k9LVUyuaCd0GsgCgm9J25Ec
+        10SPOdEyxh1JNUEIR83DyxHq7TdAYN1171xQCZo1tCGRstc50LBAyJP/ZQUcfz+KAy+7W3Ln/y8
+        ps1YSijVNMrB6
+X-Received: by 2002:ac8:6642:: with SMTP id j2mr4466575qtp.311.1587150355608;
+        Fri, 17 Apr 2020 12:05:55 -0700 (PDT)
+X-Google-Smtp-Source: APiQypJK47cUAW8UhtqP+6vEGJNWgIFR2kpnvCsa+tpq1Wupmn2CfkAR46gEVGsdrfyTnQkPGXbbBw==
+X-Received: by 2002:ac8:6642:: with SMTP id j2mr4466545qtp.311.1587150355360;
+        Fri, 17 Apr 2020 12:05:55 -0700 (PDT)
+Received: from xz-x1 ([2607:9880:19c0:32::2])
+        by smtp.gmail.com with ESMTPSA id y21sm17199104qka.37.2020.04.17.12.05.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 17 Apr 2020 12:05:54 -0700 (PDT)
+Date:   Fri, 17 Apr 2020 15:05:53 -0400
+From:   Peter Xu <peterx@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>
+Subject: Re: [PATCH 0/3] KVM: x86: move nested-related kvm_x86_ops to a
+ separate struct
+Message-ID: <20200417190553.GI287932@xz-x1>
+References: <20200417164413.71885-1-pbonzini@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20200417164413.71885-1-pbonzini@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Don't clobber the VMX-preemption timer value in the VMCS12 during
-migration on the source while handling an L1 VMLAUNCH/VMRESUME but
-before L2 ran. In that case the VMCS12 preemption timer value
-should not be touched as it will be restarted on the target
-from its original value. This emulates migration occurring while L1
-awaits completion of its VMLAUNCH/VMRESUME instruction.
+On Fri, Apr 17, 2020 at 12:44:10PM -0400, Paolo Bonzini wrote:
+> While this reintroduces some pointer chasing that was removed in
+> afaf0b2f9b80 ("KVM: x86: Copy kvm_x86_ops by value to eliminate layer
+> of indirection", 2020-03-31), the cost is small compared to retpolines
+> and anyway most of the callbacks are not even remotely on a fastpath.
+> In fact, only check_nested_events should be called during normal VM
+> runtime.  When static calls are merged into Linux my plan is to use them
+> instead of callbacks, and that will finally make things fast again by
+> removing the retpolines.
 
-Signed-off-by: Makarand Sonare <makarandsonare@google.com>
-Signed-off-by: Peter Shier <pshier@google.com>
-Change-Id: I376d151585d4f1449319f7512151f11bbf08c5bf
----
- arch/x86/kvm/vmx/nested.c | 12 +++++++-----
- 1 file changed, 7 insertions(+), 5 deletions(-)
+Paolo,
 
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 5365d7e5921ea..66155e9114114 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -3897,11 +3897,13 @@ static void sync_vmcs02_to_vmcs12(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12)
- 		vmcs12->guest_activity_state = GUEST_ACTIVITY_ACTIVE;
- 
- 	if (nested_cpu_has_preemption_timer(vmcs12)) {
--		vmx->nested.preemption_timer_remaining =
--			vmx_get_preemption_timer_value(vcpu);
--		if (vmcs12->vm_exit_controls & VM_EXIT_SAVE_VMX_PREEMPTION_TIMER)
--			vmcs12->vmx_preemption_timer_value =
--				vmx->nested.preemption_timer_remaining;
-+		if (!vmx->nested.nested_run_pending) {
-+			vmx->nested.preemption_timer_remaining =
-+				vmx_get_preemption_timer_value(vcpu);
-+			if (vmcs12->vm_exit_controls & VM_EXIT_SAVE_VMX_PREEMPTION_TIMER)
-+				vmcs12->vmx_preemption_timer_value =
-+					vmx->nested.preemption_timer_remaining;
-+			}
- 	}
- 
- 	/*
+Just out of curiousity: is there an explicit reason to not copy the
+whole kvm_x86_nested_ops but use pointers (since after all we just
+reworked kvm_x86_ops)?
+
+Thanks,
+
 -- 
-2.26.1.301.g55bc3eb7cb9-goog
+Peter Xu
 
