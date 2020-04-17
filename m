@@ -2,124 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 23A081ADE2B
-	for <lists+kvm@lfdr.de>; Fri, 17 Apr 2020 15:22:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A109B1ADE3B
+	for <lists+kvm@lfdr.de>; Fri, 17 Apr 2020 15:24:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730217AbgDQNWE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Apr 2020 09:22:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52912 "EHLO
+        id S1730663AbgDQNYY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Apr 2020 09:24:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53272 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1729760AbgDQNWD (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 17 Apr 2020 09:22:03 -0400
-Received: from mail-qt1-x844.google.com (mail-qt1-x844.google.com [IPv6:2607:f8b0:4864:20::844])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0030FC061A0C
-        for <kvm@vger.kernel.org>; Fri, 17 Apr 2020 06:22:02 -0700 (PDT)
-Received: by mail-qt1-x844.google.com with SMTP id z90so1828812qtd.10
-        for <kvm@vger.kernel.org>; Fri, 17 Apr 2020 06:22:02 -0700 (PDT)
+        by vger.kernel.org with ESMTP id S1730370AbgDQNYY (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 17 Apr 2020 09:24:24 -0400
+Received: from mail-qv1-xf35.google.com (mail-qv1-xf35.google.com [IPv6:2607:f8b0:4864:20::f35])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB944C061A0C;
+        Fri, 17 Apr 2020 06:24:23 -0700 (PDT)
+Received: by mail-qv1-xf35.google.com with SMTP id 37so826449qvc.8;
+        Fri, 17 Apr 2020 06:24:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=lca.pw; s=google;
-        h=mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=Hprasaok50MZK/a/feo2e2oclDOFVapOraKUc6PEaaw=;
-        b=Cy4c1ZQe4G9SMrIOkfvW/lXRdE7J7My+efjCR36dpGMsNWVjE2WF0RjP/1LyW0EE9V
-         jLhFL2HqJbxsByPjW/xGuaB6H6DHwIQD3vnU5KqfqaUl4DpVTu6oCF82+AJTCKoZzA9b
-         eu1wuX9DIqmpGHx2mbpbKznE3HXjwCGDmt4dE5QrzkJVZVj2rpXlqnURyx4Nr0o5muN0
-         mIMyTNlbP2Ihpcvo93Z54eXzBKQQ6yvBCGjhHBY7fKT7pfp42Ac7OVhgA3rjiG+O6pej
-         WQlV44x9fx+V/4JTeeIrXd9P6rcUuL27qT16PaaKso5mO9s0mK+noBJW2bCVEvN/41Tm
-         e73A==
+        d=gmail.com; s=20161025;
+        h=mime-version:from:date:message-id:subject:to;
+        bh=LjM566RamS9cOGWi1oxYwh/ACQIKEmK0YYeGg7bBlg8=;
+        b=pRqHePFwms07Ep6/ib6PkjuPQOJQ3DvkMtRB9HOFtRu66Fsni+0tc4XkSdDe+I3gQB
+         YW82FpBCJTp0PJqMAtjhUBy8QTCWUylgnaNrzKJRdK1hFZ93rt/7A11PoU970JFMj7PL
+         oyvDFop46+tF8T50i45Ua+i0bkvVwLErgROVjyIc6j3SVnzCEjBLhRxMmBYD1w6BT8mM
+         c6W4yRI84puErJpG+0mYVwQzeQH2OsiZs4zwS8+s17ttqKwBfBnd+dNwxAXCS6dpKtAh
+         Vk+W/9KKlFKO0e9V/WrBY4bM8/Bd87N4lsqy3Ckwq8IuEwe8VGbztgU+rtND/Nv2anHq
+         6enA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=Hprasaok50MZK/a/feo2e2oclDOFVapOraKUc6PEaaw=;
-        b=dKTwq8LI9YZ/ZBy8CU113cwIJyJtkMqfpR5HtacFTNAvWoEouurACnJHgBIyZZ7CGi
-         8JWQkdyjTt2U4LP0V62IOglLP84Hz2niegQozkRowbokHFyXje+NjAoqsKRwdNz3KqwM
-         RFvNqdkhCG5PoCAdetxtK/UbkdsIPQo6vpxFWg4VI4UiBcK6sW3295E47/XpBDIBHNhf
-         V67XUKuKH+cGsj3Parykmtt9j93KDc6qdhhuD3c5MJU+YiGfP2Nv4wmaFhphfTT8iGFA
-         MSZMSzW3RB2FUfItTxKCGYCuTGdKVjKZg047vqreL1hl3Wn6p17ZDVRSaaFeLGxWzBUD
-         lRLA==
-X-Gm-Message-State: AGi0PuZqgzP/kvyXg7UO0Wh6wKk5Nv6UmsOmTX9E+/XnvbQdzoCgj9ye
-        9qPqRdqAOFPNUmkfhA/Au6idEg==
-X-Google-Smtp-Source: APiQypLINBcGF72yF2OOfhsB7LCEXiY/71TAZiQ84OPjbI8O9xMYQgnMX9Pqn8PJ85t59l4ixc587Q==
-X-Received: by 2002:ac8:46d8:: with SMTP id h24mr2932189qto.352.1587129722173;
-        Fri, 17 Apr 2020 06:22:02 -0700 (PDT)
-Received: from [192.168.1.153] (pool-71-184-117-43.bstnma.fios.verizon.net. [71.184.117.43])
-        by smtp.gmail.com with ESMTPSA id v76sm17479205qka.32.2020.04.17.06.22.01
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 17 Apr 2020 06:22:01 -0700 (PDT)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
-Subject: Re: [PATCH -next] kvm/svm: disable KCSAN for svm_vcpu_run()
-From:   Qian Cai <cai@lca.pw>
-In-Reply-To: <f02ca9b9-f0a6-dfb5-1ca0-32a12d4f56fb@redhat.com>
-Date:   Fri, 17 Apr 2020 09:21:59 -0400
-Cc:     Elver Marco <elver@google.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        kasan-dev <kasan-dev@googlegroups.com>, kvm@vger.kernel.org,
-        LKML <linux-kernel@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <1F15D565-D34D-41F5-B1C5-B9A04626EE97@lca.pw>
-References: <20200415153709.1559-1-cai@lca.pw>
- <f02ca9b9-f0a6-dfb5-1ca0-32a12d4f56fb@redhat.com>
-To:     "paul E. McKenney" <paulmck@kernel.org>
-X-Mailer: Apple Mail (2.3608.80.23.2.2)
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=LjM566RamS9cOGWi1oxYwh/ACQIKEmK0YYeGg7bBlg8=;
+        b=PLR2AFebcqUNff3sQstbzd4vBfsDwKOCBQbx7fGaXYK+elSIR67BOsD9qZVCT0NoQm
+         qY5+IwCwHrib6Dm/7rd+m17rEfKFYGeGoYte4rg8+XoaWxa9dw5RR/o3jvQUNgKZSLsL
+         v1R/Ws0P7KqjDp43jkPvti27/bNOTB+nJHox4fWnPk94NOyGSn/gEiKVg8nvZ672/idQ
+         BHITxrthX0XvmGsTU4oR0JrMvK5cPX7Ub00tM3abrlpGbvdBAwhHauFt61B+/nplwBvK
+         5Cy3DoNEaQg+92+hTMAzWQ/Goc0y4dI2IvNRRE30BbqwDlnFjVAg2ydQhLV+MdPpCn21
+         4Phw==
+X-Gm-Message-State: AGi0PuZmzbyo1RDdwN5ZxVlCfGPqhdBTHm0BIYV1ZoGTl+SyGn9qwsxb
+        QnE+nmuB2iZCl824dS+6tQGBSAj6lpvjfiFZwnI9vfl7pC3Xbw33
+X-Google-Smtp-Source: APiQypK7NQASCQne8gFxa3KTHf4eupDKh8C27Cw3rF9MoWW/Tz/bK0SO53B1iTUNow2rqHHHHKCTA+wlgmvoq9TH26E=
+X-Received: by 2002:a05:6214:16c8:: with SMTP id d8mr120336qvz.93.1587129861640;
+ Fri, 17 Apr 2020 06:24:21 -0700 (PDT)
+MIME-Version: 1.0
+From:   sam hao <ssesamhao@gmail.com>
+Date:   Fri, 17 Apr 2020 21:24:10 +0800
+Message-ID: <CANhq1J6AJvkXUVZtbYgZubepU8xL88Q56UrcDprmG_eDapmXtA@mail.gmail.com>
+Subject: Slab-of-out-bounds in search_memslots() in kvm_host.h
+To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        pbonzini@redhat.com
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi,
 
+I've found possible out of bounds access in search_memslots() in kvm_host.h.
+In search_memslots(struct kvm_memslots *slots, gfn_t gfn),  a binary
+search is used  for slot searching,  as following code shows
+        while (start < end) {
+                slot = start + (end - start) / 2;
 
-> On Apr 15, 2020, at 11:57 AM, Paolo Bonzini <pbonzini@redhat.com> =
-wrote:
->=20
-> On 15/04/20 17:37, Qian Cai wrote:
->> For some reasons, running a simple qemu-kvm command with KCSAN will
->> reset AMD hosts. It turns out svm_vcpu_run() could not be =
-instrumented.
->> Disable it for now.
->>=20
->> # /usr/libexec/qemu-kvm -name ubuntu-18.04-server-cloudimg -cpu host
->> 	-smp 2 -m 2G -hda ubuntu-18.04-server-cloudimg.qcow2
->>=20
->> =3D=3D=3D console output =3D=3D=3D
->> Kernel 5.6.0-next-20200408+ on an x86_64
->>=20
->> hp-dl385g10-05 login:
->>=20
->> <...host reset...>
->>=20
->> HPE ProLiant System BIOS A40 v1.20 (03/09/2018)
->> (C) Copyright 1982-2018 Hewlett Packard Enterprise Development LP
->> Early system initialization, please wait...
->>=20
->> Signed-off-by: Qian Cai <cai@lca.pw>
->> ---
->> arch/x86/kvm/svm/svm.c | 2 +-
->> 1 file changed, 1 insertion(+), 1 deletion(-)
->>=20
->> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
->> index 2be5bbae3a40..1fdb300e9337 100644
->> --- a/arch/x86/kvm/svm/svm.c
->> +++ b/arch/x86/kvm/svm/svm.c
->> @@ -3278,7 +3278,7 @@ static void svm_cancel_injection(struct =
-kvm_vcpu *vcpu)
->>=20
->> bool __svm_vcpu_run(unsigned long vmcb_pa, unsigned long *regs);
->>=20
->> -static void svm_vcpu_run(struct kvm_vcpu *vcpu)
->> +static __no_kcsan void svm_vcpu_run(struct kvm_vcpu *vcpu)
->> {
->> 	struct vcpu_svm *svm =3D to_svm(vcpu);
->>=20
->>=20
->=20
-> I suppose you tested the patch to move cli/sti into the .S file.  =
-Anyway:
->=20
-> Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+                if (gfn >= memslots[slot].base_gfn)
+                        end = slot;
+                else
+                        start = slot + 1;
+        }
 
-Paul, can you pick this up along with other KCSAN fixes?
+        if (gfn >= memslots[start].base_gfn &&
+            gfn < memslots[start].base_gfn + memslots[start].npages) {
+                atomic_set(&slots->lru_slot, start);
+                return &memslots[start];
+        }
 
+However, start may equal to slots->used_slots  when gfn is smaller
+than every base_gfn, which cause out of bound access in  if condition.
+Following code can trigger this bug:
+
+#include <stdint.h>
+#include <unistd.h>
+#include <linux/kvm.h>
+#include <asm/kvm.h>
+#include <sys/ioctl.h>
+#include <fcntl.h>
+
+int main(int argc, char **agrv){
+
+        struct kvm_userspace_memory_region kvm_userspace_memory_region_0 = {
+                .slot = 4098152658,
+                .flags = 1653871800,
+                .guest_phys_addr = 9228163640593578308,
+                .memory_size = 13154652985641659684,
+                .userspace_addr = 2934507574655831761
+        };
+        char *s_0 = "/dev/kvm";
+        struct kvm_vapic_addr kvm_vapic_addr_1 = {
+                .vapic_addr=4096
+        };
+
+        int32_t r0 = open(s_0,0,0);
+        int32_t r1 = ioctl(r0,44545,0);
+        ioctl(r1,44640);
+        ioctl(r1,1075883590,&kvm_userspace_memory_region_0);
+        int32_t r2 = ioctl(r1,44609,0);
+        ioctl(r2,44672,0);
+        ioctl(r2,1074310803,&kvm_vapic_addr_1);
+        return 0;
+}
+
+Consider adding a bound-check in if-condition as following code :
+
+if (start < slots->used_slots && gfn >= memslots[start].base_gfn &&
+            gfn < memslots[start].base_gfn + memslots[start].npages) {
+                atomic_set(&slots->lru_slot, start);
+                return &memslots[start];
+}
+
+-- 
+Hao Sun
