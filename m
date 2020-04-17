@@ -2,168 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9E84A1ADEB6
-	for <lists+kvm@lfdr.de>; Fri, 17 Apr 2020 15:51:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 277351ADEC9
+	for <lists+kvm@lfdr.de>; Fri, 17 Apr 2020 15:55:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730755AbgDQNtp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Apr 2020 09:49:45 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:50801 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1730731AbgDQNto (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 Apr 2020 09:49:44 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1587131382;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=5V7yavyfZ0HM3zUpT1F2jPJ2A6hFO+XG3RXrFUzY6h4=;
-        b=dX3pOeMsUwp1t3MjdByw1I4hgE9vG3eRED2fDp4TZ6bZA1nc8FxsLvvM6airpIYziHSzoD
-        hMmI4yC3faTXgM4ftZOxMd5D53hnQ1vx3Pt6YntxPs8dSZickbChSdEDNCrbjKZzbEClJg
-        2etq/HGo22kMpibbgdQm2YfMobXBVnI=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-389-5PT3xlqlP92CPnRjox0fCw-1; Fri, 17 Apr 2020 09:49:41 -0400
-X-MC-Unique: 5PT3xlqlP92CPnRjox0fCw-1
-Received: by mail-ed1-f71.google.com with SMTP id p6so760746edy.22
-        for <kvm@vger.kernel.org>; Fri, 17 Apr 2020 06:49:40 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=5V7yavyfZ0HM3zUpT1F2jPJ2A6hFO+XG3RXrFUzY6h4=;
-        b=c7OQTJQpqZYCd4X6LNhcL9EaTuSVogH0XZ985wx2EBNt2aHuXowrQeoW93se7K6INM
-         J165B/4DL5mqO0jG6fVVYDxgVA3VgXqhEp5SkMARQX3XdadYurMlRUAR5SnxBZvp6a8i
-         +Ivg0wYihmbovmDqosnCt8EqdwilhhkhHB+yXRMx37q6z6sTx/G/vmk8g87m1HLXmOB0
-         Ur1OA1kp9hiQx/u2r6kwWu1NkGBIRcTByNmD0gZc6e3JurObnrrB/lg9khDpUQUhXQPy
-         YGCUBr8HRtJwEofqeJLRDoXyRpO9ligYkgmJKy/tqlsvCLcne17qCmp+8zExbx1CWhDS
-         a4oA==
-X-Gm-Message-State: AGi0PuYa3NzaVKLzCjBXnw1iUxVaepKdADC5ch/a/yRSSBBxSgRHTR/O
-        NW5hz69YcqYGiiTMwwLIXGjCiqYGnk8pasuQzXfw4EwUhMjI5Olsj2y0yVS8kcNCrjEf/Ur+PP2
-        AV1FY/Lhaaew7
-X-Received: by 2002:a17:907:40f2:: with SMTP id no2mr3110754ejb.41.1587131379834;
-        Fri, 17 Apr 2020 06:49:39 -0700 (PDT)
-X-Google-Smtp-Source: APiQypIWJG5ihBce3BBaxEtVPybUKWhCIqZt7Zp8ZUwDutTUNVZeNIkgEyc74VK1iOZ6HN3OeNFGkg==
-X-Received: by 2002:a17:907:40f2:: with SMTP id no2mr3110739ejb.41.1587131379533;
-        Fri, 17 Apr 2020 06:49:39 -0700 (PDT)
-Received: from [192.168.1.39] (116.red-83-42-57.dynamicip.rima-tde.net. [83.42.57.116])
-        by smtp.gmail.com with ESMTPSA id q1sm3420124ejf.42.2020.04.17.06.49.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 17 Apr 2020 06:49:38 -0700 (PDT)
-Subject: Re: [PATCH v3 03/19] target/arm: Restrict DC-CVAP instruction to TCG
- accel
-To:     Peter Maydell <peter.maydell@linaro.org>,
-        Richard Henderson <richard.henderson@linaro.org>
-Cc:     QEMU Developers <qemu-devel@nongnu.org>,
-        =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
-        kvm-devel <kvm@vger.kernel.org>, Thomas Huth <thuth@redhat.com>,
-        qemu-arm <qemu-arm@nongnu.org>, Fam Zheng <fam@euphon.net>,
-        Paolo Bonzini <pbonzini@redhat.com>
-References: <20200316160634.3386-1-philmd@redhat.com>
- <20200316160634.3386-4-philmd@redhat.com>
- <f570579b-da9c-e89a-3430-08e82d9052c1@linaro.org>
- <CAFEAcA8K-njh=TyjS_4deD4wTjhqnc=t6SQB1DbKgWWS5rixSQ@mail.gmail.com>
-From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <5d9606c9-f812-f629-e03f-d72ddbce05ee@redhat.com>
-Date:   Fri, 17 Apr 2020 15:49:37 +0200
+        id S1730764AbgDQNyZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Apr 2020 09:54:25 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:5888 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1730731AbgDQNyZ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 17 Apr 2020 09:54:25 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 03HDYk3N023289
+        for <kvm@vger.kernel.org>; Fri, 17 Apr 2020 09:54:24 -0400
+Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 30fcsyj2mk-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Fri, 17 Apr 2020 09:54:24 -0400
+Received: from localhost
+        by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <freude@linux.ibm.com>;
+        Fri, 17 Apr 2020 14:53:43 +0100
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
+        by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Fri, 17 Apr 2020 14:53:40 +0100
+Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 03HDsGn148889986
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 17 Apr 2020 13:54:16 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 947EF4203F;
+        Fri, 17 Apr 2020 13:54:16 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C39DF42042;
+        Fri, 17 Apr 2020 13:54:15 +0000 (GMT)
+Received: from funtu.home (unknown [9.171.23.248])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri, 17 Apr 2020 13:54:15 +0000 (GMT)
+Subject: Re: [PATCH v7 03/15] s390/zcrypt: driver callback to indicate
+ resource in use
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     Tony Krowiak <akrowiak@linux.ibm.com>, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        borntraeger@de.ibm.com, mjrosato@linux.ibm.com,
+        pmorel@linux.ibm.com, pasic@linux.ibm.com,
+        alex.williamson@redhat.com, kwankhede@nvidia.com,
+        jjherne@linux.ibm.com, fiuczy@linux.ibm.com
+References: <20200407192015.19887-1-akrowiak@linux.ibm.com>
+ <20200407192015.19887-4-akrowiak@linux.ibm.com>
+ <20200414145851.562867ae.cohuck@redhat.com>
+ <82675d5c-4901-cbd8-9287-79133aa3ee68@linux.ibm.com>
+ <20200416113356.28fcef8c.cohuck@redhat.com>
+From:   Harald Freudenberger <freude@linux.ibm.com>
+Date:   Fri, 17 Apr 2020 15:54:15 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8K-njh=TyjS_4deD4wTjhqnc=t6SQB1DbKgWWS5rixSQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20200416113356.28fcef8c.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 20041713-4275-0000-0000-000003C18CFB
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20041713-4276-0000-0000-000038D70A5B
+Message-Id: <c0e3cca2-8683-7034-3b41-cd04fcdfa2ce@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.676
+ definitions=2020-04-17_03:2020-04-17,2020-04-17 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 spamscore=0
+ malwarescore=0 mlxscore=0 phishscore=0 priorityscore=1501 clxscore=1015
+ adultscore=0 lowpriorityscore=0 impostorscore=0 mlxlogscore=999
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2004170105
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 3/16/20 9:11 PM, Peter Maydell wrote:
-> On Mon, 16 Mar 2020 at 19:36, Richard Henderson
-> <richard.henderson@linaro.org> wrote:
->> I'm not 100% sure how the system regs function under kvm.
->>
->> If they are not used at all, then we should avoid them all en masse an not
->> piecemeal like this.
->>
->> If they are used for something, then we should keep them registered and change
->> the writefn like so:
->>
->> #ifdef CONFIG_TCG
->>      /* existing stuff */
->> #else
->>      /* Handled by hardware accelerator. */
->>      g_assert_not_reached();
->> #endif
+On 16.04.20 11:33, Cornelia Huck wrote:
+> On Wed, 15 Apr 2020 08:08:24 +0200
+> Harald Freudenberger <freude@linux.ibm.com> wrote:
+>
+>> On 14.04.20 14:58, Cornelia Huck wrote:
+>>> On Tue,  7 Apr 2020 15:20:03 -0400
+>>> Tony Krowiak <akrowiak@linux.ibm.com> wrote:
+>>>> +	/* The non-default driver's module must be loaded */
+>>>> +	if (!try_module_get(drv->owner))
+>>>> +		return 0;  
+>>> Is that really needed? I would have thought that the driver core's
+>>> klist usage would make sure that the callback would not be invoked for
+>>> drivers that are not registered anymore. Or am I missing a window?  
+>> The try_module_get() and module_put() is a result of review feedback from
+>> my side. The ap bus core is static in the kernel whereas the
+>> vfio dd is a kernel module. So there may be a race condition between
+>> calling the callback function and removal of the vfio dd module.
+>> There is similar code in zcrypt_api which does the same for the zcrypt
+>> device drivers before using some variables or functions from the modules.
+>> Help me, it this is outdated code and there is no need to adjust the
+>> module reference counter any more, then I would be happy to remove
+>> this code :-)
+> I think the driver core already should keep us safe. A built-in bus
+> calling a driver in a module is a very common pattern, and I think
+> ->owner was introduced exactly for that case.
+>
+> Unless I'm really missing something obvious?
+Hm. I tested a similar code (see zcrypt_api.c where try_module_get() and module_put()
+is called surrounding use of functions related to the implementing driver.
+The driver module has a reference count of 0 when not used and can get removed
+- because refcount is 0 - at any time when there is nothing related to the driver pending.
 
-I ended with that patch because dccvap_writefn() calls probe_read() 
-which is an inlined call to probe_access(), which itself is only defined 
-when using TCG. So with KVM either linking fails or I get:
+As soon as the driver is actually used the try_module_get(...driver.owner) increases
+the reference counter and makes it impossible to remove the module. After use the
+module_put() reduces the reference count.
+When I now remove the try_module_get() and module_put() calls and run this modified
+code I immediately face a crash when the module is removed during use.
 
-target/arm/helper.c: In function ‘dccvap_writefn’:
-target/arm/helper.c:6898:13: error: implicit declaration of function 
-‘probe_read’;
-      haddr = probe_read(env, vaddr, dline_size, mem_idx, GETPC());
-              ^~~~~~~~~~
+I see code in the kernel which does an initial try_module_get() on the driver to increase
+the reference count, for example when the driver registers. However, I see no clear
+way to remove such a driver module any more.
 
-I'll use your suggestion which works for me:
+I know I had a fight with a tester some years ago where he stated that it is a valid
+testcase to remove a device driver module 'during use of the driver'. So I'd like
+to have the try_module_get() and module_put() invokations in the ap bus code
+until you convince me there are other maybe better ways to make sure the
+driver and it's functions are available at the time of the call.
 
--- >8 --
---- a/include/exec/exec-all.h
-+++ b/include/exec/exec-all.h
-@@ -330,8 +330,20 @@ static inline void 
-tlb_flush_by_mmuidx_all_cpus_synced(CPUState *cpu,
-  {
-  }
-  #endif
-+
-+#ifdef CONFIG_TCG
-  void *probe_access(CPUArchState *env, target_ulong addr, int size,
-                     MMUAccessType access_type, int mmu_idx, uintptr_t 
-retaddr);
-+#else
-+static inline void *probe_access(CPUArchState *env,
-+                                 target_ulong addr, int size,
-+                                 MMUAccessType access_type,
-+                                 int mmu_idx, uintptr_t retaddr)
-+{
-+     /* Handled by hardware accelerator. */
-+     g_assert_not_reached();
-+}
-+#endif /* CONFIG_TCG */
-
-  static inline void *probe_write(CPUArchState *env, target_ulong addr, 
-int size,
-                                  int mmu_idx, uintptr_t retaddr)
----
-
-> 
-> (1) for those registers where we need to know the value within
-> QEMU code (notably anything involved in VA-to-PA translation,
-> as this is used by gdbstub accesses, etc, but sometimes we
-> want other register values too): the sysreg struct is
-> what lets us map from the KVM register to the field in the
-> CPU struct when we do a sync of data to/from the kernel.
-> 
-> (2) for other registers, the sync lets us make the register
-> visible as an r/o register in the gdbstub. (this is not
-> very important, but it's nice)
-> 
-> (3) Either way, the sync works via the raw_read/raw_write
-> accessors (this is a big part of what they're for), which are
-> supposed to just stuff the data into/out of the underlying
-> CPU struct field. (But watch out because we fall back to
-> using the non-raw read/writefn if there's no raw version
-> provided for a particular register.) If a regdef is marked
-> as NO_RAW then it means there is no raw access and we don't
-> sync the value.
-> 
-> (4) I think that in KVM mode we won't deliberately do
-> non-raw accesses, and a quick grep through of the places
-> that do 'readfn' accesses supports that.
-> 
-> thanks
-> -- PMM
-> 
+Maybe we can discuss this offline if you wish :-)
 
