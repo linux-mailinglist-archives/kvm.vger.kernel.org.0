@@ -2,32 +2,32 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 157D61AD89A
-	for <lists+kvm@lfdr.de>; Fri, 17 Apr 2020 10:33:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 009D51AD89C
+	for <lists+kvm@lfdr.de>; Fri, 17 Apr 2020 10:33:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729755AbgDQIdi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Apr 2020 04:33:38 -0400
-Received: from mail.kernel.org ([198.145.29.99]:59312 "EHLO mail.kernel.org"
+        id S1729779AbgDQIdj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Apr 2020 04:33:39 -0400
+Received: from mail.kernel.org ([198.145.29.99]:59346 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729166AbgDQIdh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 Apr 2020 04:33:37 -0400
+        id S1729166AbgDQIdi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 Apr 2020 04:33:38 -0400
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 03FC22137B;
+        by mail.kernel.org (Postfix) with ESMTPSA id ECB9921D95;
         Fri, 17 Apr 2020 08:33:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1587112417;
-        bh=ow4RCTCsHairYh31RKkXUJ67Orlffoz/KgRIiU9/xD0=;
-        h=From:To:Cc:Subject:Date:From;
-        b=AUYZg2TH0dZxNaOepILkxW+Ra012+kuvwrSXHloeyp4ALuW9GUq7t7hjc8bhCVi4c
-         WBWhdY5bBSg/xFSQJxvaF4KuGC1220VTm0NzW4sm3XRWzoAeoaYvbEs9+AG7w+/PCp
-         9cVVbvmAJlCdEIR34eUSduigKNatkMPUkXlFgHTc=
+        s=default; t=1587112418;
+        bh=exX30MBHh/JKazRWYTFyi87muy0zveZWPuO12yNLcOs=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=bsUphSa5EhVomRNPSzWZgVy1RjGUSl45SFjXYEHhDFIWXqPTt6YlJkc4p/mWHOEkK
+         GSzixvy9j3t1gEJqmjmB3W1l2gNB3aSZFKL9luPn0+2/6YkXdqPDnf7zAbCbupiutK
+         Y8D2fubSodxuCXjfgocWYeuF8r4Q61txv/traUWE=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
         by disco-boy.misterjones.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
         (Exim 4.92)
         (envelope-from <maz@kernel.org>)
-        id 1jPMRL-00473f-4u; Fri, 17 Apr 2020 09:33:35 +0100
+        id 1jPMRM-00473f-47; Fri, 17 Apr 2020 09:33:36 +0100
 From:   Marc Zyngier <maz@kernel.org>
 To:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         kvm@vger.kernel.org
@@ -37,16 +37,20 @@ Cc:     Zenghui Yu <yuzenghui@huawei.com>,
         Julien Grall <julien@xen.org>,
         James Morse <james.morse@arm.com>,
         Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [PATCH v2 0/6] KVM: arm: vgic fixes for 5.7
-Date:   Fri, 17 Apr 2020 09:33:13 +0100
-Message-Id: <20200417083319.3066217-1-maz@kernel.org>
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        stable@vger.kernel.org,
+        =?UTF-8?q?Andr=C3=A9=20Przywara?= <andre.przywara@arm.com>
+Subject: [PATCH v2 1/6] KVM: arm: vgic: Fix limit condition when writing to GICD_I[CS]ACTIVER
+Date:   Fri, 17 Apr 2020 09:33:14 +0100
+Message-Id: <20200417083319.3066217-2-maz@kernel.org>
 X-Mailer: git-send-email 2.26.1
+In-Reply-To: <20200417083319.3066217-1-maz@kernel.org>
+References: <20200417083319.3066217-1-maz@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, yuzenghui@huawei.com, eric.auger@redhat.com, Andre.Przywara@arm.com, julien@xen.org, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com
+X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, yuzenghui@huawei.com, eric.auger@redhat.com, Andre.Przywara@arm.com, julien@xen.org, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, stable@vger.kernel.org, andre.przywara@arm.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-owner@vger.kernel.org
@@ -54,50 +58,43 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Here's a few vgic fixes I've been piling on during the merge window,
-plus a couple that Zenghui contributed, and which I added to the mix.
+When deciding whether a guest has to be stopped we check whether this
+is a private interrupt or not. Unfortunately, there's an off-by-one bug
+here, and we fail to recognize a whole range of interrupts as being
+global (GICv2 SPIs 32-63).
 
-The first patch is a silly off-by-one bug in the ACTIVE handling code,
-where we miss fail to stop the guest if writing to the first set of
-GICv2 SPIs. Oopsie boo.
+Fix the condition from > to be >=.
 
-The second patch improves the handling of the ACTIVE registers, which
-we never synchronise on the read side (the distributor state can only
-be updated when the vcpu exits). Let's fix it the same way we do it on
-the write side (stop-the-world, read, restart). Yes, this is
-expensive.
+Cc: stable@vger.kernel.org
+Fixes: abd7229626b93 ("KVM: arm/arm64: Simplify active_change_prepare and plug race")
+Reported-by: André Przywara <andre.przywara@arm.com>
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ virt/kvm/arm/vgic/vgic-mmio.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-The following two patches deal with an issue where we consider the HW
-state of an interrupt when responding to a userspace access. We should
-never do this, as the guest shouldn't be running at this stage and if
-it is, it is absolutely fine to return random bits to userspace. It
-could also be that there is no active guest context at this stage, and
-you end up with an Oops, which nobody really enjoys.
-
-The last two patches fix a couple of memory leaks.
-
-Marc Zyngier (4):
-  KVM: arm: vgic: Fix limit condition when writing to GICD_I[CS]ACTIVER
-  KVM: arm: vgic: Synchronize the whole guest on GIC{D,R}_I{S,C}ACTIVER
-    read
-  KVM: arm: vgic: Only use the virtual state when userspace accesses
-    enable bits
-  KVM: arm: vgic-v2: Only use the virtual state when userspace accesses
-    pending bits
-
-Zenghui Yu (2):
-  KVM: arm64: vgic-v3: Retire all pending LPIs on vcpu destroy
-  KVM: arm64: vgic-its: Fix memory leak on the error path of
-    vgic_add_lpi()
-
- virt/kvm/arm/vgic/vgic-init.c    |   6 +
- virt/kvm/arm/vgic/vgic-its.c     |  11 +-
- virt/kvm/arm/vgic/vgic-mmio-v2.c |  16 ++-
- virt/kvm/arm/vgic/vgic-mmio-v3.c |  28 +++--
- virt/kvm/arm/vgic/vgic-mmio.c    | 183 +++++++++++++++++++++++++------
- virt/kvm/arm/vgic/vgic-mmio.h    |  19 ++++
- 6 files changed, 207 insertions(+), 56 deletions(-)
-
+diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
+index 2199302597fa..d085e047953f 100644
+--- a/virt/kvm/arm/vgic/vgic-mmio.c
++++ b/virt/kvm/arm/vgic/vgic-mmio.c
+@@ -444,7 +444,7 @@ static void vgic_mmio_change_active(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
+ static void vgic_change_active_prepare(struct kvm_vcpu *vcpu, u32 intid)
+ {
+ 	if (vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3 ||
+-	    intid > VGIC_NR_PRIVATE_IRQS)
++	    intid >= VGIC_NR_PRIVATE_IRQS)
+ 		kvm_arm_halt_guest(vcpu->kvm);
+ }
+ 
+@@ -452,7 +452,7 @@ static void vgic_change_active_prepare(struct kvm_vcpu *vcpu, u32 intid)
+ static void vgic_change_active_finish(struct kvm_vcpu *vcpu, u32 intid)
+ {
+ 	if (vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3 ||
+-	    intid > VGIC_NR_PRIVATE_IRQS)
++	    intid >= VGIC_NR_PRIVATE_IRQS)
+ 		kvm_arm_resume_guest(vcpu->kvm);
+ }
+ 
 -- 
 2.26.1
 
