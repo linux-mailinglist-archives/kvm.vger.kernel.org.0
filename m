@@ -2,293 +2,293 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B73031ADD89
-	for <lists+kvm@lfdr.de>; Fri, 17 Apr 2020 14:43:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 296931ADD8F
+	for <lists+kvm@lfdr.de>; Fri, 17 Apr 2020 14:45:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729526AbgDQMlp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Apr 2020 08:41:45 -0400
-Received: from mail.kernel.org ([198.145.29.99]:38006 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727877AbgDQMlp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 Apr 2020 08:41:45 -0400
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id E6F39208E4;
-        Fri, 17 Apr 2020 12:41:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1587127304;
-        bh=4T98gtPCSxGLgiWPtiulTPepHOmvOepN/1LoJ6yZug8=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=jOps9UDN7qbE9+Hg6CJf94Y1bYI84GEEXKq5hTSY2LodT7xMm/oZ+pRuGhzox8oZG
-         zkWaBUF7mDGhvDCs6MiOtnI/SWa05XgCilMueQtq7WhEBNBsWaxLIG+JJAk9XsyKLG
-         S1XuIsVYAltKRTz6A7v2wwEAXOL/BvcwQTzQxo/Q=
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why)
-        by disco-boy.misterjones.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <maz@kernel.org>)
-        id 1jPQJS-004BBh-80; Fri, 17 Apr 2020 13:41:42 +0100
-Date:   Fri, 17 Apr 2020 13:41:40 +0100
-From:   Marc Zyngier <maz@kernel.org>
-To:     James Morse <james.morse@arm.com>
-Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, Zenghui Yu <yuzenghui@huawei.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Andre Przywara <Andre.Przywara@arm.com>,
-        Julien Grall <julien@xen.org>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: Re: [PATCH v2 4/6] KVM: arm: vgic-v2: Only use the virtual state
- when userspace accesses pending bits
-Message-ID: <20200417134140.0a901749@why>
-In-Reply-To: <4133d5f2-ed0e-9c4a-8a66-953fb6bf6e70@arm.com>
-References: <20200417083319.3066217-1-maz@kernel.org>
-        <20200417083319.3066217-5-maz@kernel.org>
-        <4133d5f2-ed0e-9c4a-8a66-953fb6bf6e70@arm.com>
-Organization: Approximate
-X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+        id S1729799AbgDQMpr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Apr 2020 08:45:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47342 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1729176AbgDQMpp (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 17 Apr 2020 08:45:45 -0400
+Received: from mail-wr1-x444.google.com (mail-wr1-x444.google.com [IPv6:2a00:1450:4864:20::444])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26470C061A0F
+        for <kvm@vger.kernel.org>; Fri, 17 Apr 2020 05:45:45 -0700 (PDT)
+Received: by mail-wr1-x444.google.com with SMTP id k1so2906135wrx.4
+        for <kvm@vger.kernel.org>; Fri, 17 Apr 2020 05:45:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=brainfault-org.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=9on5+5lpNxJgwFWzLnkmkylDuiiGUxKSYSVr2bz7/yM=;
+        b=mOoRWKBdm67E3FAJ3DEX+Qw2+iErYIXvmILi/JWws25atSZul/HaIaONNDygW6Nx6a
+         3O0rOhlkGtrTy0C+OfusT1AvDWLgsQ7r5F2QR8wmS4HWV4pGaBDrFYN+Atk3Osfb0Iuq
+         vBV+STinzXMrFkzai/9gMYLTbxRSmDgkZ5kUo5bLqJ16bTtINxhLIklblGb70LELQxGN
+         Tqi4iPEslvcBJVrhd+kKeRFEUXFVCQCtHlkFeIFzaJo0NxTBH57koIa0kIR8gA5FNCVU
+         XmwrVtoWI277XCrI5uCEpJZMIGn/QZiGnLaosq3KS/ErAJV+FkLqTRuXXiU64fBNLwXK
+         ItZg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=9on5+5lpNxJgwFWzLnkmkylDuiiGUxKSYSVr2bz7/yM=;
+        b=qUIhvX9AQbEk+WgBX15CSw/sBiNplsCmSha0D3hPia2GXsT0bc4aBiYTYgIGNeF1S+
+         nqmNtIm3E4GKWMq+8kuvxg/1mzws1BtpPVLjMUZiPvRBKzLTUgsjPTu84NYpoyJ3DlJU
+         x+FgzfEpfZJ32on2PDc9LLqFpPtXxPTqlRrxfXXIv12gXHS5EIiE+OIJELl3ot3aWTBt
+         9qqiwgQVMrlgfsao867JxR6l96oxLaW1ImcS0cdXAsExhY6WIxQ4iRRAQp2faZX2i/zk
+         TQUJPcEGUbpcESaZZn5X9bxwy5xjuJE+Mq+VbCupQNmxi/Xuc/yH2n/lFgFEM3GLJUXw
+         F/mQ==
+X-Gm-Message-State: AGi0PubT4WhwnaXpIhPJs+O6R6uVdWCITgY/NvX82WmunEk5DtJbqUQX
+        LlGY/fDDeVIIzcxxrxLOTpUdM0jDxbDbvXJxFBnE8w==
+X-Google-Smtp-Source: APiQypI/D3p33lEkzA+kVo1mX/CMk5SXSOkQLZF9mmfVBGlpbkf+LZBTpQZGduaFqx4Dhur/Yxata1fWxhyYckSEk+s=
+X-Received: by 2002:adf:b35c:: with SMTP id k28mr3739709wrd.61.1587127543554;
+ Fri, 17 Apr 2020 05:45:43 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: james.morse@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, yuzenghui@huawei.com, eric.auger@redhat.com, Andre.Przywara@arm.com, julien@xen.org, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+References: <20200313075131.69837-1-anup.patel@wdc.com>
+In-Reply-To: <20200313075131.69837-1-anup.patel@wdc.com>
+From:   Anup Patel <anup@brainfault.org>
+Date:   Fri, 17 Apr 2020 18:15:31 +0530
+Message-ID: <CAAhSdy32E_aTPqij3Lgs3mekMWcHw0VfXSwFc=0K8j+GrC+Kug@mail.gmail.com>
+Subject: Re: [PATCH v11 00/20] KVM RISC-V Support
+To:     Palmer Dabbelt <palmer@dabbelt.com>,
+        Palmer Dabbelt <palmerdabbelt@google.com>
+Cc:     Paul Walmsley <paul.walmsley@sifive.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Radim K <rkrcmar@redhat.com>, Alexander Graf <graf@amazon.com>,
+        Atish Patra <atish.patra@wdc.com>,
+        Alistair Francis <Alistair.Francis@wdc.com>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        Christoph Hellwig <hch@lst.de>,
+        KVM General <kvm@vger.kernel.org>,
+        kvm-riscv@lists.infradead.org,
+        linux-riscv <linux-riscv@lists.infradead.org>,
+        "linux-kernel@vger.kernel.org List" <linux-kernel@vger.kernel.org>,
+        Anup Patel <anup.patel@wdc.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 17 Apr 2020 12:22:10 +0100
-James Morse <james.morse@arm.com> wrote:
+Hi Palmer,
 
-Hi James,
+On Fri, Mar 13, 2020 at 1:22 PM Anup Patel <anup.patel@wdc.com> wrote:
+>
+> This series adds initial KVM RISC-V support. Currently, we are able to boot
+> RISC-V 64bit Linux Guests with multiple VCPUs.
+>
+> Few key aspects of KVM RISC-V added by this series are:
+> 1. Minimal possible KVM world-switch which touches only GPRs and few CSRs.
+> 2. Full Guest/VM switch is done via vcpu_get/vcpu_put infrastructure.
+> 3. KVM ONE_REG interface for VCPU register access from user-space.
+> 4. PLIC emulation is done in user-space.
+> 5. Timer and IPI emuation is done in-kernel.
+> 6. MMU notifiers supported.
+> 7. FP lazy save/restore supported.
+> 8. SBI v0.1 emulation for KVM Guest available.
+> 9. Forward unhandled SBI calls to KVM userspace.
+> 10. Hugepage support for Guest/VM
+>
+> Here's a brief TODO list which we will work upon after this series:
+> 1. SBI v0.2 emulation in-kernel
+> 2. SBI v0.2 hart state management emulation in-kernel
+> 3. In-kernel PLIC emulation
+> 4. ..... and more .....
+>
+> This series can be found in riscv_kvm_v11 branch at:
+> https//github.com/avpatel/linux.git
+>
+> Our work-in-progress KVMTOOL RISC-V port can be found in riscv_v2 branch
+> at: https//github.com/avpatel/kvmtool.git
+>
+> The QEMU RISC-V hypervisor emulation is done by Alistair and is available
+> in mainline/anup/riscv-hyp-ext-v0.5.3 branch at:
+> https://github.com/kvm-riscv/qemu.git
+>
+> To play around with KVM RISC-V, refer KVM RISC-V wiki at:
+> https://github.com/kvm-riscv/howto/wiki
+> https://github.com/kvm-riscv/howto/wiki/KVM-RISCV64-on-QEMU
+>
+> Changes since v10:
+>  - Rebased patches on Linux-5.6-rc5
+>  - Reduce RISCV_ISA_EXT_MAX from 256 to 64
+>  - Separate PATCH for removing N-extension related defines
+>  - Added comments as requested by Palmer
+>  - Fixed HIDELEG CSR programming
+>
+> Changes since v9:
+>  - Squash PATCH19 and PATCH20 into PATCH5
+>  - Squash PATCH18 into PATCH11
+>  - Squash PATCH17 into PATCH16
+>  - Added ONE_REG interface for VCPU timer in PATCH13
+>  - Use HTIMEDELTA for VCPU timer in PATCH13
+>  - Updated KVM RISC-V mailing list in MAINTAINERS entry
+>  - Update KVM kconfig option to depend on RISCV_SBI and MMU
+>  - Check for SBI v0.2 and SBI v0.2 RFENCE extension at boot-time
+>  - Use SBI v0.2 RFENCE extension in VMID implementation
+>  - Use SBI v0.2 RFENCE extension in Stage2 MMU implementation
+>  - Use SBI v0.2 RFENCE extension in SBI implementation
+>  - Moved to RISC-V Hypervisor v0.5 draft spec
+>  - Updated Documentation/virt/kvm/api.txt for timer ONE_REG interface
+>  - Rebased patches on Linux-5.5-rc3
+>
+> Changes since v8:
+>  - Rebased series on Linux-5.4-rc3 and Atish's SBI v0.2 patches
+>  - Use HRTIMER_MODE_REL instead of HRTIMER_MODE_ABS in timer emulation
+>  - Fixed kvm_riscv_stage2_map() to handle hugepages
+>  - Added patch to forward unhandled SBI calls to user-space
+>  - Added patch for iterative/recursive stage2 page table programming
+>  - Added patch to remove per-CPU vsip_shadow variable
+>  - Added patch to fix race-condition in kvm_riscv_vcpu_sync_interrupts()
+>
+> Changes since v7:
+> - Rebased series on Linux-5.4-rc1 and Atish's SBI v0.2 patches
+> - Removed PATCH1, PATCH3, and PATCH20 because these already merged
+> - Use kernel doc style comments for ISA bitmap functions
+> - Don't parse X, Y, and Z extension in riscv_fill_hwcap() because it will
+>   be added in-future
+> - Mark KVM RISC-V kconfig option as EXPERIMENTAL
+> - Typo fix in commit description of PATCH6 of v7 series
+> - Use separate structs for CORE and CSR registers of ONE_REG interface
+> - Explicitly include asm/sbi.h in kvm/vcpu_sbi.c
+> - Removed implicit switch-case fall-through in kvm_riscv_vcpu_exit()
+> - No need to set VSSTATUS.MXR bit in kvm_riscv_vcpu_unpriv_read()
+> - Removed register for instruction length in kvm_riscv_vcpu_unpriv_read()
+> - Added defines for checking/decoding instruction length
+> - Added separate patch to forward unhandled SBI calls to userspace tool
+>
+> Changes since v6:
+> - Rebased patches on Linux-5.3-rc7
+> - Added "return_handled" in struct kvm_mmio_decode to ensure that
+>   kvm_riscv_vcpu_mmio_return() updates SEPC only once
+> - Removed trap_stval parameter from kvm_riscv_vcpu_unpriv_read()
+> - Updated git repo URL in MAINTAINERS entry
+>
+> Changes since v5:
+> - Renamed KVM_REG_RISCV_CONFIG_TIMEBASE register to
+>   KVM_REG_RISCV_CONFIG_TBFREQ register in ONE_REG interface
+> - Update SPEC in kvm_riscv_vcpu_mmio_return() for MMIO exits
+> - Use switch case instead of illegal instruction opcode table for simplicity
+> - Improve comments in stage2_remote_tlb_flush() for a potential remote TLB
+>   flush optimization
+> - Handle all unsupported SBI calls in default case of
+>   kvm_riscv_vcpu_sbi_ecall() function
+> - Fixed kvm_riscv_vcpu_sync_interrupts() for software interrupts
+> - Improved unprivilege reads to handle traps due to Guest stage1 page table
+> - Added separate patch to document RISC-V specific things in
+>   Documentation/virt/kvm/api.txt
+>
+> Changes since v4:
+> - Rebased patches on Linux-5.3-rc5
+> - Added Paolo's Acked-by and Reviewed-by
+> - Updated mailing list in MAINTAINERS entry
+>
+> Changes since v3:
+> - Moved patch for ISA bitmap from KVM prep series to this series
+> - Make vsip_shadow as run-time percpu variable instead of compile-time
+> - Flush Guest TLBs on all Host CPUs whenever we run-out of VMIDs
+>
+> Changes since v2:
+> - Removed references of KVM_REQ_IRQ_PENDING from all patches
+> - Use kvm->srcu within in-kernel KVM run loop
+> - Added percpu vsip_shadow to track last value programmed in VSIP CSR
+> - Added comments about irqs_pending and irqs_pending_mask
+> - Used kvm_arch_vcpu_runnable() in-place-of kvm_riscv_vcpu_has_interrupt()
+>   in system_opcode_insn()
+> - Removed unwanted smp_wmb() in kvm_riscv_stage2_vmid_update()
+> - Use kvm_flush_remote_tlbs() in kvm_riscv_stage2_vmid_update()
+> - Use READ_ONCE() in kvm_riscv_stage2_update_hgatp() for vmid
+>
+> Changes since v1:
+> - Fixed compile errors in building KVM RISC-V as module
+> - Removed unused kvm_riscv_halt_guest() and kvm_riscv_resume_guest()
+> - Set KVM_CAP_SYNC_MMU capability only after MMU notifiers are implemented
+> - Made vmid_version as unsigned long instead of atomic
+> - Renamed KVM_REQ_UPDATE_PGTBL to KVM_REQ_UPDATE_HGATP
+> - Renamed kvm_riscv_stage2_update_pgtbl() to kvm_riscv_stage2_update_hgatp()
+> - Configure HIDELEG and HEDELEG in kvm_arch_hardware_enable()
+> - Updated ONE_REG interface for CSR access to user-space
+> - Removed irqs_pending_lock and use atomic bitops instead
+> - Added separate patch for FP ONE_REG interface
+> - Added separate patch for updating MAINTAINERS file
+>
+> Anup Patel (16):
+>   RISC-V: Export riscv_cpuid_to_hartid_mask() API
+>   RISC-V: Add bitmap reprensenting ISA features common across CPUs
+>   RISC-V: Remove N-extension related defines
+>   RISC-V: Add hypervisor extension related CSR defines
+>   RISC-V: Add initial skeletal KVM support
+>   RISC-V: KVM: Implement VCPU create, init and destroy functions
+>   RISC-V: KVM: Implement VCPU interrupts and requests handling
+>   RISC-V: KVM: Implement KVM_GET_ONE_REG/KVM_SET_ONE_REG ioctls
+>   RISC-V: KVM: Implement VCPU world-switch
+>   RISC-V: KVM: Handle MMIO exits for VCPU
+>   RISC-V: KVM: Handle WFI exits for VCPU
+>   RISC-V: KVM: Implement VMID allocator
+>   RISC-V: KVM: Implement stage2 page table programming
+>   RISC-V: KVM: Implement MMU notifiers
+>   RISC-V: KVM: Document RISC-V specific parts of KVM API
+>   RISC-V: KVM: Add MAINTAINERS entry
+>
+> Atish Patra (4):
+>   RISC-V: KVM: Add timer functionality
+>   RISC-V: KVM: FP lazy save/restore
+>   RISC-V: KVM: Implement ONE REG interface for FP registers
+>   RISC-V: KVM: Add SBI v0.1 support
+>
+>  Documentation/virt/kvm/api.rst          | 193 ++++-
+>  MAINTAINERS                             |  11 +
+>  arch/riscv/Kconfig                      |   2 +
+>  arch/riscv/Makefile                     |   2 +
+>  arch/riscv/include/asm/csr.h            |  78 +-
+>  arch/riscv/include/asm/hwcap.h          |  22 +
+>  arch/riscv/include/asm/kvm_host.h       | 264 +++++++
+>  arch/riscv/include/asm/kvm_vcpu_timer.h |  44 ++
+>  arch/riscv/include/asm/pgtable-bits.h   |   1 +
+>  arch/riscv/include/uapi/asm/kvm.h       | 127 +++
+>  arch/riscv/kernel/asm-offsets.c         | 148 ++++
+>  arch/riscv/kernel/cpufeature.c          |  83 +-
+>  arch/riscv/kernel/smp.c                 |   2 +
+>  arch/riscv/kvm/Kconfig                  |  34 +
+>  arch/riscv/kvm/Makefile                 |  14 +
+>  arch/riscv/kvm/main.c                   |  97 +++
+>  arch/riscv/kvm/mmu.c                    | 762 ++++++++++++++++++
+>  arch/riscv/kvm/tlb.S                    |  43 +
+>  arch/riscv/kvm/vcpu.c                   | 997 ++++++++++++++++++++++++
+>  arch/riscv/kvm/vcpu_exit.c              | 639 +++++++++++++++
+>  arch/riscv/kvm/vcpu_sbi.c               | 171 ++++
+>  arch/riscv/kvm/vcpu_switch.S            | 382 +++++++++
+>  arch/riscv/kvm/vcpu_timer.c             | 225 ++++++
+>  arch/riscv/kvm/vm.c                     |  86 ++
+>  arch/riscv/kvm/vmid.c                   | 120 +++
+>  drivers/clocksource/timer-riscv.c       |   8 +
+>  include/clocksource/timer-riscv.h       |  16 +
+>  include/uapi/linux/kvm.h                |   8 +
+>  28 files changed, 4564 insertions(+), 15 deletions(-)
+>  create mode 100644 arch/riscv/include/asm/kvm_host.h
+>  create mode 100644 arch/riscv/include/asm/kvm_vcpu_timer.h
+>  create mode 100644 arch/riscv/include/uapi/asm/kvm.h
+>  create mode 100644 arch/riscv/kvm/Kconfig
+>  create mode 100644 arch/riscv/kvm/Makefile
+>  create mode 100644 arch/riscv/kvm/main.c
+>  create mode 100644 arch/riscv/kvm/mmu.c
+>  create mode 100644 arch/riscv/kvm/tlb.S
+>  create mode 100644 arch/riscv/kvm/vcpu.c
+>  create mode 100644 arch/riscv/kvm/vcpu_exit.c
+>  create mode 100644 arch/riscv/kvm/vcpu_sbi.c
+>  create mode 100644 arch/riscv/kvm/vcpu_switch.S
+>  create mode 100644 arch/riscv/kvm/vcpu_timer.c
+>  create mode 100644 arch/riscv/kvm/vm.c
+>  create mode 100644 arch/riscv/kvm/vmid.c
+>  create mode 100644 include/clocksource/timer-riscv.h
+>
+> --
+> 2.17.1
+>
 
-> Hi Marc,
-> 
-> On 17/04/2020 09:33, Marc Zyngier wrote:
-> > There is no point in accessing the HW when writing to any of the
-> > ISPENDR/ICPENDR registers from userspace, as only the guest should
-> > be allowed to change the HW state.
-> > 
-> > Introduce new userspace-specific accessors that deal solely with
-> > the virtual state. Note that the API differs from that of GICv3,
-> > where userspace exclusively uses ISPENDR to set the state. Too
-> > bad we can't reuse it.  
-> 
-> > diff --git a/virt/kvm/arm/vgic/vgic-mmio-v2.c b/virt/kvm/arm/vgic/vgic-mmio-v2.c
-> > index f51c6e939c76..a016f07adc28 100644
-> > --- a/virt/kvm/arm/vgic/vgic-mmio-v2.c
-> > +++ b/virt/kvm/arm/vgic/vgic-mmio-v2.c
-> > @@ -417,10 +417,12 @@ static const struct vgic_register_region vgic_v2_dist_registers[] = {
-> >  		NULL, vgic_uaccess_write_cenable, 1,
-> >  		VGIC_ACCESS_32bit),
-> >  	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_PENDING_SET,
-> > -		vgic_mmio_read_pending, vgic_mmio_write_spending, NULL, NULL, 1,
-> > +		vgic_mmio_read_pending, vgic_mmio_write_spending,
-> > +		NULL, vgic_uaccess_write_spending, 1,
-> >  		VGIC_ACCESS_32bit),  
-> 
-> vgic_mmio_write_spending() has some homebrew detection for is_uaccess, which causes
-> vgic_hw_irq_spending() to do nothing. Isn't that now dead-code with this change?
+Can you please consider PATCH1, PATCH2, and PATCH3 of
+this series for Linux-5.7-rcX ??
 
-Very good point, this deserves a cleanup.
-
-> > diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
-> > index 6e30034d1464..f1927ae02d2e 100644
-> > --- a/virt/kvm/arm/vgic/vgic-mmio.c
-> > +++ b/virt/kvm/arm/vgic/vgic-mmio.c
-> > @@ -321,6 +321,27 @@ void vgic_mmio_write_spending(struct kvm_vcpu *vcpu,  
-> 
-> > +int vgic_uaccess_write_spending(struct kvm_vcpu *vcpu,
-> > +				gpa_t addr, unsigned int len,
-> > +				unsigned long val)
-> > +{
-> > +	u32 intid = VGIC_ADDR_TO_INTID(addr, 1);
-> > +	int i;
-> > +	unsigned long flags;
-> > +
-> > +	for_each_set_bit(i, &val, len * 8) {
-> > +		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);  
-> 
-> vgic_mmio_write_spending() has:
-> |	/* GICD_ISPENDR0 SGI bits are WI *
-> 
-> and bales out early. Is GIC_DIST_PENDING_SET the same register?
-> (If so, shouldn't that be true for PPI too?)
-
-Hmmm. It's a bit more complicated (surprisingly).
-
-Yes, the SGI pending bits are WI from the guest perspective (as
-required by the spec). But we still need to be able to restore them
-from userspace, and I bet 82e40f558de56 ("KVM: arm/arm64: vgic-v2:
-Handle SGI bits in GICD_I{S,C}PENDR0 as WI") has broken migration with
-GICv2 (if you migrated with a pending SGI, you cannot restore it...).
-
-Now, there is still a bug here, in the sense that we need to indicate
-which vcpu is the source of the SGI (this is a GICv2-special).
-Unfortunately, we don't have a way to communicate this architecturally.
-The only option we have is to make it up (as a self-SGI, for example).
-But this is pretty broken at the architectural level TBH.
-
-On the other hand, PPIs are just fine.
-
-> 
-> 
-> > +		raw_spin_lock_irqsave(&irq->irq_lock, flags);
-> > +		irq->pending_latch = true;
-> > +		vgic_queue_irq_unlock(vcpu->kvm, irq, flags);
-> > +
-> > +		vgic_put_irq(vcpu->kvm, irq);
-> > +	}
-> > +
-> > +	return 0;
-> > +}  
-> 
-> > @@ -390,6 +411,26 @@ void vgic_mmio_write_cpending(struct kvm_vcpu *vcpu,  
-> 
-> > +int vgic_uaccess_write_cpending(struct kvm_vcpu *vcpu,
-> > +				gpa_t addr, unsigned int len,
-> > +				unsigned long val)
-> > +{
-> > +	u32 intid = VGIC_ADDR_TO_INTID(addr, 1);
-> > +	int i;
-> > +	unsigned long flags;
-> > +
-> > +	for_each_set_bit(i, &val, len * 8) {
-> > +		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);  
-> 
-> Same dumb question about GICD_ICPENDR0!?
-
-Not dumb at all! Given that we previously allowed this to be accessed
-from userspace (well, before we broke it again), it should be able to
-clear *something*. If we adopt the self-SGI behaviour as above, we will
-get away with it.
-
-Here's what I'm proposing to add to this patch, together with a
-Fixes: 82e40f558de56 ("KVM: arm/arm64: vgic-v2: Handle SGI bits in GICD_I{S,C}PENDR0 as WI")
-
-Nobody is using GICv2, obviously... :-/
-
-Thanks,
-
-	M.
-
-diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
-index f1927ae02d2e..974cdcf2f232 100644
---- a/virt/kvm/arm/vgic/vgic-mmio.c
-+++ b/virt/kvm/arm/vgic/vgic-mmio.c
-@@ -261,17 +261,6 @@ unsigned long vgic_mmio_read_pending(struct kvm_vcpu *vcpu,
- 	return value;
- }
- 
--/* Must be called with irq->irq_lock held */
--static void vgic_hw_irq_spending(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
--				 bool is_uaccess)
--{
--	if (is_uaccess)
--		return;
--
--	irq->pending_latch = true;
--	vgic_irq_set_phys_active(irq, true);
--}
--
- static bool is_vgic_v2_sgi(struct kvm_vcpu *vcpu, struct vgic_irq *irq)
- {
- 	return (vgic_irq_is_sgi(irq->intid) &&
-@@ -282,7 +271,6 @@ void vgic_mmio_write_spending(struct kvm_vcpu *vcpu,
- 			      gpa_t addr, unsigned int len,
- 			      unsigned long val)
- {
--	bool is_uaccess = !kvm_get_running_vcpu();
- 	u32 intid = VGIC_ADDR_TO_INTID(addr, 1);
- 	int i;
- 	unsigned long flags;
-@@ -312,10 +300,10 @@ void vgic_mmio_write_spending(struct kvm_vcpu *vcpu,
- 			continue;
- 		}
- 
-+		irq->pending_latch = true;
- 		if (irq->hw)
--			vgic_hw_irq_spending(vcpu, irq, is_uaccess);
--		else
--			irq->pending_latch = true;
-+			vgic_irq_set_phys_active(irq, true);
-+
- 		vgic_queue_irq_unlock(vcpu->kvm, irq, flags);
- 		vgic_put_irq(vcpu->kvm, irq);
- 	}
-@@ -334,6 +322,15 @@ int vgic_uaccess_write_spending(struct kvm_vcpu *vcpu,
- 
- 		raw_spin_lock_irqsave(&irq->irq_lock, flags);
- 		irq->pending_latch = true;
-+
-+		/*
-+		 * GICv2 SGIs are terribly broken. We can't restore
-+		 * the source of the interrupt, so just pick the vcpu
-+		 * itself as the source...
-+		 */
-+		if (is_vgic_v2_sgi(vcpu, irq))
-+			irq->source |= BIT(vcpu->vcpu_id);
-+
- 		vgic_queue_irq_unlock(vcpu->kvm, irq, flags);
- 
- 		vgic_put_irq(vcpu->kvm, irq);
-@@ -343,12 +340,8 @@ int vgic_uaccess_write_spending(struct kvm_vcpu *vcpu,
- }
- 
- /* Must be called with irq->irq_lock held */
--static void vgic_hw_irq_cpending(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
--				 bool is_uaccess)
-+static void vgic_hw_irq_cpending(struct kvm_vcpu *vcpu, struct vgic_irq *irq)
- {
--	if (is_uaccess)
--		return;
--
- 	irq->pending_latch = false;
- 
- 	/*
-@@ -371,7 +364,6 @@ void vgic_mmio_write_cpending(struct kvm_vcpu *vcpu,
- 			      gpa_t addr, unsigned int len,
- 			      unsigned long val)
- {
--	bool is_uaccess = !kvm_get_running_vcpu();
- 	u32 intid = VGIC_ADDR_TO_INTID(addr, 1);
- 	int i;
- 	unsigned long flags;
-@@ -402,7 +394,7 @@ void vgic_mmio_write_cpending(struct kvm_vcpu *vcpu,
- 		}
- 
- 		if (irq->hw)
--			vgic_hw_irq_cpending(vcpu, irq, is_uaccess);
-+			vgic_hw_irq_cpending(vcpu, irq);
- 		else
- 			irq->pending_latch = false;
- 
-@@ -423,7 +415,22 @@ int vgic_uaccess_write_cpending(struct kvm_vcpu *vcpu,
- 		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
- 
- 		raw_spin_lock_irqsave(&irq->irq_lock, flags);
--		irq->pending_latch = false;
-+		/*
-+		 * More fun with GICv2 SGIs! If we're clearing one of them
-+		 * from userspace, which source vcpu to clear?  Let's pick
-+		 * the target vcpu itself (consistent whith the way we
-+		 * populate them on the ISPENDR side), and only clear the
-+		 * pending state if no sources are left (insert expletive
-+		 * here).
-+		 */
-+		if (is_vgic_v2_sgi(vcpu, irq)) {
-+			irq->source &= ~BIT(vcpu->vcpu_id);
-+			if (!irq->source)
-+				irq->pending_latch = false;
-+		} else {
-+			irq->pending_latch = false;
-+		}
-+
- 		raw_spin_unlock_irqrestore(&irq->irq_lock, flags);
- 
- 		vgic_put_irq(vcpu->kvm, irq);
-
--- 
-Jazz is not dead. It just smells funny...
+Regards,
+Anup
