@@ -2,148 +2,305 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BCA8E1AD8CA
-	for <lists+kvm@lfdr.de>; Fri, 17 Apr 2020 10:40:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 133D71AD8CD
+	for <lists+kvm@lfdr.de>; Fri, 17 Apr 2020 10:40:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729878AbgDQIkH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Apr 2020 04:40:07 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:57340 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1729826AbgDQIkH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 Apr 2020 04:40:07 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1587112805;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=0FUsH4tufAJaMC98c0oFTGbfyRpyKw0gpf2wi60SU+8=;
-        b=JpYAGBWMOBKA7ScThz0V9X4NcKKxgpodgzzWm62AJcrTFFt8PJ7QzKKVoX7yDxmjWK4LnX
-        Ya5IoHvtfKpNZd4YpVIZcXwqgzwmoXR2QUCKGlrXme8+4B97Owkx7ZpYvx7qb+6W+/3HJF
-        /bJ3BHXIP1LQuy5FmGAkO0pbO9MT8CA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-159-wDRv0H_YMDq_MOxphoyW1g-1; Fri, 17 Apr 2020 04:40:01 -0400
-X-MC-Unique: wDRv0H_YMDq_MOxphoyW1g-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4B23A107ACC4;
-        Fri, 17 Apr 2020 08:39:59 +0000 (UTC)
-Received: from [10.72.13.202] (ovpn-13-202.pek2.redhat.com [10.72.13.202])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 54BCA8D57F;
-        Fri, 17 Apr 2020 08:39:50 +0000 (UTC)
-Subject: Re: [PATCH V2] vhost: do not enable VHOST_MENU by default
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     linux-mips@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, geert@linux-m68k.org,
-        tsbogend@alpha.franken.de, benh@kernel.crashing.org,
-        paulus@samba.org, heiko.carstens@de.ibm.com, gor@linux.ibm.com,
-        borntraeger@de.ibm.com, Michael Ellerman <mpe@ellerman.id.au>
-References: <20200415024356.23751-1-jasowang@redhat.com>
- <20200416185426-mutt-send-email-mst@kernel.org>
- <b7e2deb7-cb64-b625-aeb4-760c7b28c0c8@redhat.com>
- <20200417022929-mutt-send-email-mst@kernel.org>
- <4274625d-6feb-81b6-5b0a-695229e7c33d@redhat.com>
- <20200417042912-mutt-send-email-mst@kernel.org>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <fdb555a6-4b8d-15b6-0849-3fe0e0786038@redhat.com>
-Date:   Fri, 17 Apr 2020 16:39:49 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        id S1729886AbgDQIkQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Apr 2020 04:40:16 -0400
+Received: from mga03.intel.com ([134.134.136.65]:64716 "EHLO mga03.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729796AbgDQIkP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 Apr 2020 04:40:15 -0400
+IronPort-SDR: NbpRTZLCPYpktC/mUs7G+2qu3svogeO+H1RdLpTNp88BrqBsWmeLM+Q97PikQZ/QkmTOFxhCIv
+ Dz1H7M2pSgnA==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Apr 2020 01:40:15 -0700
+IronPort-SDR: Qw/6VtXAAp+Z178rQ5jifBekM2FbH8hLF3U16DemPpFbboc0ntAnVJiYH/FveK9KEZeMhJbaCW
+ 1yaWy2lCMPNg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.72,394,1580803200"; 
+   d="scan'208";a="454658961"
+Received: from likexu-mobl1.ccr.corp.intel.com (HELO [10.238.4.236]) ([10.238.4.236])
+  by fmsmga005.fm.intel.com with ESMTP; 17 Apr 2020 01:40:05 -0700
+Reply-To: like.xu@intel.com
+Subject: Re: [PATCH v9 03/10] perf/x86: Add constraint to create guest LBR
+ event without hw counter
+To:     Peter Zijlstra <peterz@infradead.org>,
+        Like Xu <like.xu@linux.intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        Andi Kleen <ak@linux.intel.com>,
+        Jim Mattson <jmattson@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Liran Alon <liran.alon@oracle.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Liang Kan <kan.liang@linux.intel.com>,
+        Wei Wang <wei.w.wang@intel.com>, linux-kernel@vger.kernel.org,
+        Ingo Molnar <mingo@kernel.org>
+References: <20200313021616.112322-1-like.xu@linux.intel.com>
+ <20200313021616.112322-4-like.xu@linux.intel.com>
+ <20200409163717.GD20713@hirez.programming.kicks-ass.net>
+ <0b89963d-33d8-3b0f-fc56-eff3ccce648d@intel.com>
+From:   "Xu, Like" <like.xu@intel.com>
+Organization: Intel OTC
+Message-ID: <afa1528f-9aa5-2300-3c84-dc20bf17a8cc@intel.com>
+Date:   Fri, 17 Apr 2020 16:40:04 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <20200417042912-mutt-send-email-mst@kernel.org>
+In-Reply-To: <0b89963d-33d8-3b0f-fc56-eff3ccce648d@intel.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi Peter,
 
-On 2020/4/17 =E4=B8=8B=E5=8D=884:29, Michael S. Tsirkin wrote:
-> On Fri, Apr 17, 2020 at 03:36:52PM +0800, Jason Wang wrote:
->> On 2020/4/17 =E4=B8=8B=E5=8D=882:33, Michael S. Tsirkin wrote:
->>> On Fri, Apr 17, 2020 at 11:12:14AM +0800, Jason Wang wrote:
->>>> On 2020/4/17 =E4=B8=8A=E5=8D=886:55, Michael S. Tsirkin wrote:
->>>>> On Wed, Apr 15, 2020 at 10:43:56AM +0800, Jason Wang wrote:
->>>>>> We try to keep the defconfig untouched after decoupling CONFIG_VHO=
-ST
->>>>>> out of CONFIG_VIRTUALIZATION in commit 20c384f1ea1a
->>>>>> ("vhost: refine vhost and vringh kconfig") by enabling VHOST_MENU =
-by
->>>>>> default. Then the defconfigs can keep enabling CONFIG_VHOST_NET
->>>>>> without the caring of CONFIG_VHOST.
->>>>>>
->>>>>> But this will leave a "CONFIG_VHOST_MENU=3Dy" in all defconfigs an=
-d even
->>>>>> for the ones that doesn't want vhost. So it actually shifts the
->>>>>> burdens to the maintainers of all other to add "CONFIG_VHOST_MENU =
-is
->>>>>> not set". So this patch tries to enable CONFIG_VHOST explicitly in
->>>>>> defconfigs that enables CONFIG_VHOST_NET and CONFIG_VHOST_VSOCK.
->>>>>>
->>>>>> Acked-by: Christian Borntraeger<borntraeger@de.ibm.com>  (s390)
->>>>>> Acked-by: Michael Ellerman<mpe@ellerman.id.au>  (powerpc)
->>>>>> Cc: Thomas Bogendoerfer<tsbogend@alpha.franken.de>
->>>>>> Cc: Benjamin Herrenschmidt<benh@kernel.crashing.org>
->>>>>> Cc: Paul Mackerras<paulus@samba.org>
->>>>>> Cc: Michael Ellerman<mpe@ellerman.id.au>
->>>>>> Cc: Heiko Carstens<heiko.carstens@de.ibm.com>
->>>>>> Cc: Vasily Gorbik<gor@linux.ibm.com>
->>>>>> Cc: Christian Borntraeger<borntraeger@de.ibm.com>
->>>>>> Reported-by: Geert Uytterhoeven<geert@linux-m68k.org>
->>>>>> Signed-off-by: Jason Wang<jasowang@redhat.com>
->>>>> I rebased this on top of OABI fix since that
->>>>> seems more orgent to fix.
->>>>> Pushed to my vhost branch pls take a look and
->>>>> if possible test.
->>>>> Thanks!
->>>> I test this patch by generating the defconfigs that wants vhost_net =
-or
->>>> vhost_vsock. All looks fine.
->>>>
->>>> But having CONFIG_VHOST_DPN=3Dy may end up with the similar situatio=
-n that
->>>> this patch want to address.
->>>> Maybe we can let CONFIG_VHOST depends on !ARM || AEABI then add anot=
-her
->>>> menuconfig for VHOST_RING and do something similar?
->>>>
->>>> Thanks
->>> Sorry I don't understand. After this patch CONFIG_VHOST_DPN is just
->>> an internal variable for the OABI fix. I kept it separate
->>> so it's easy to revert for 5.8. Yes we could squash it into
->>> VHOST directly but I don't see how that changes logic at all.
->>
->> Sorry for being unclear.
->>
->> I meant since it was enabled by default, "CONFIG_VHOST_DPN=3Dy" will b=
-e left
->> in the defconfigs.
-> But who cares?
-
-
-FYI, please see https://www.spinics.net/lists/kvm/msg212685.html
-
-
-> That does not add any code, does it?
-
-
-It doesn't.
-
-Thanks
-
-
+On 2020/4/10 11:03, Xu, Like wrote:
+> Hi Peter,
 >
->> This requires the arch maintainers to add
->> "CONFIG_VHOST_VDPN is not set". (Geert complains about this)
+> First of all, thanks for your comments!
+>
+> On 2020/4/10 0:37, Peter Zijlstra wrote:
+>>> diff --git a/arch/x86/events/core.c b/arch/x86/events/core.c
+>>> index 3bb738f5a472..e919187a0751 100644
+>>> --- a/arch/x86/events/core.c
+>>> +++ b/arch/x86/events/core.c
+>>> @@ -74,7 +74,8 @@ u64 x86_perf_event_update(struct perf_event *event)
+>>>       int idx = hwc->idx;
+>>>       u64 delta;
+>>>   -    if (idx == INTEL_PMC_IDX_FIXED_BTS)
+>>> +    if ((idx == INTEL_PMC_IDX_FIXED_BTS) ||
+>>> +        (idx == INTEL_PMC_IDX_FIXED_VLBR))
+>>>           return 0;
+>>>         /*
+>>> @@ -1102,7 +1103,8 @@ static inline void x86_assign_hw_event(struct 
+>>> perf_event *event,
+>>>       hwc->last_cpu = smp_processor_id();
+>>>       hwc->last_tag = ++cpuc->tags[i];
+>>>   -    if (hwc->idx == INTEL_PMC_IDX_FIXED_BTS) {
+>>> +    if ((hwc->idx == INTEL_PMC_IDX_FIXED_BTS) ||
+>>> +        (hwc->idx == INTEL_PMC_IDX_FIXED_VLBR)) {
+>>>           hwc->config_base = 0;
+>>>           hwc->event_base    = 0;
+>>>       } else if (hwc->idx >= INTEL_PMC_IDX_FIXED) {
+>>> @@ -1233,7 +1235,8 @@ int x86_perf_event_set_period(struct perf_event 
+>>> *event)
+>>>       s64 period = hwc->sample_period;
+>>>       int ret = 0, idx = hwc->idx;
+>>>   -    if (idx == INTEL_PMC_IDX_FIXED_BTS)
+>>> +    if ((idx == INTEL_PMC_IDX_FIXED_BTS) ||
+>>> +        (idx == INTEL_PMC_IDX_FIXED_VLBR))
+>>>           return 0;
+>>>         /*
+>> That seems unfortunate; can that be >= INTEL_PMC_IDX_FIXED_BTS ? If so,
+>> that probably wants a comment with the definitions.
 >>
->> Thanks
+>> Or otherwise check for !hwc->event_base. That should be 0 for both these
+>> things.
+> Yes, the !hwc->event_base looks good to me.
 >>
+>>> diff --git a/arch/x86/events/intel/core.c b/arch/x86/events/intel/core.c
+>>> index 3be51aa06e67..901c82032f4a 100644
+>>> --- a/arch/x86/events/intel/core.c
+>>> +++ b/arch/x86/events/intel/core.c
+>>> @@ -2157,6 +2157,9 @@ static void intel_pmu_disable_event(struct 
+>>> perf_event *event)
+>>>           return;
+>>>       }
+>>>   +    if (unlikely(hwc->idx == INTEL_PMC_IDX_FIXED_VLBR))
+>>> +        return;
+>>> +
+>> Please check code-gen to see if you can cut down on brancher here;
+>> there's 4 cases:
 >>
+>>   - vlbr
+>>   - bts
+>>   - fixed
+>>   - gp
+>>
+>> perhaps you can write it like so:
+>>
+>> (also see 
+>> https://lkml.kernel.org/r/20190828090217.GN2386@hirez.programming.kicks-ass.net 
+>> )
+>>
+>> static void intel_pmu_enable_event(struct perf_event *event)
+>> {
+>>     ...
+>>     int idx = hwx->idx;
+>>
+>>     if (idx < INTEL_PMC_IDX_FIXED) {
+>>         intel_set_masks(event, idx);
+>>         __x86_pmu_enable_event(hwc, ARCH_PERFMON_EVENTSEL_ENABLE);
+>>     } else if (idx < INTEL_PMC_IDX_FIXED_BTS) {
+>>         intel_set_masks(event, idx);
+>>         intel_pmu_enable_fixed(event);
+>>     } else if (idx == INTEL_PMC_IDX_FIXED_BTS) {
+>>         intel_pmu_enable_bts(hwc->config);
+>>     }
+>>
+>>     /* nothing for INTEL_PMC_IDX_FIXED_VLBR */
+>> }
+>>
+>> That should sort the branches in order of: gp,fixed,bts,vlbr
+>
+> Note the current order is: bts, pebs, fixed, gp.
+>
+> Sure, let me try to refactor it in this way.
+>>
+>>>       cpuc->intel_ctrl_guest_mask &= ~(1ull << hwc->idx);
+>>>       cpuc->intel_ctrl_host_mask &= ~(1ull << hwc->idx);
+>>>       cpuc->intel_cp_status &= ~(1ull << hwc->idx);
+>>> @@ -2241,6 +2244,9 @@ static void intel_pmu_enable_event(struct 
+>>> perf_event *event)
+>>>           return;
+>>>       }
+>>>   +    if (unlikely(hwc->idx == INTEL_PMC_IDX_FIXED_VLBR))
+>>> +        return;
+>>> +
+>>>       if (event->attr.exclude_host)
+>>>           cpuc->intel_ctrl_guest_mask |= (1ull << hwc->idx);
+>>>       if (event->attr.exclude_guest)
+>> idem.
+> idem.
+>>
+>>> @@ -2595,6 +2601,15 @@ intel_bts_constraints(struct perf_event *event)
+>>>       return NULL;
+>>>   }
+>>>   +static struct event_constraint *
+>>> +intel_guest_event_constraints(struct perf_event *event)
+>>> +{
+>>> +    if (unlikely(is_guest_lbr_event(event)))
+>>> +        return &guest_lbr_constraint;
+>>> +
+>>> +    return NULL;
+>>> +}
+>> This is a mis-nomer, it isn't just any guest_event
+>
+> Sure,  I'll rename it to intel_guest_lbr_event_constraints()
+> instead of using it as a unified interface to get all of guest event 
+> constraints.
+>
+>>
+>>> +
+>>>   static int intel_alt_er(int idx, u64 config)
+>>>   {
+>>>       int alt_idx = idx;
+>>> @@ -2785,6 +2800,10 @@ __intel_get_event_constraints(struct 
+>>> cpu_hw_events *cpuc, int idx,
+>>>   {
+>>>       struct event_constraint *c;
+>>>   +    c = intel_guest_event_constraints(event);
+>>> +    if (c)
+>>> +        return c;
+>>> +
+>>>       c = intel_bts_constraints(event);
+>>>       if (c)
+>>>           return c;
+>>> diff --git a/arch/x86/events/perf_event.h b/arch/x86/events/perf_event.h
+>>> index 1025bc6eb04f..9a62264a3068 100644
+>>> --- a/arch/x86/events/perf_event.h
+>>> +++ b/arch/x86/events/perf_event.h
+>>> @@ -969,6 +969,20 @@ static inline bool intel_pmu_has_bts(struct 
+>>> perf_event *event)
+>>>       return intel_pmu_has_bts_period(event, hwc->sample_period);
+>>>   }
+>>>   +static inline bool is_guest_event(struct perf_event *event)
+>>> +{
+>>> +    if (event->attr.exclude_host && is_kernel_event(event))
+>>> +        return true;
+>>> +    return false;
+>>> +}
+>> I don't like this one, what if another in-kernel users generates an
+>> event with exclude_host set ?
+> Thanks for the clear attitude.
+>
+> How about:
+> - remove the is_guest_event() to avoid potential misuse;
+> - move all checks into is_guest_lbr_event() and make it dedicated:
+>
+> static inline bool is_guest_lbr_event(struct perf_event *event)
+> {
+>     if (is_kernel_event(event) &&
+>         event->attr.exclude_host && needs_branch_stack(event))
+>         return true;
+>     return false;
+> }
+>
+> In this case, it's safe to generate an event with exclude_host set
+> and also use LBR to count guest or nothing for other in-kernel users
+> because the intel_guest_lbr_event_constraints() makes LBR exclusive.
+>
+> For this generic usage, I may rename:
+> - is_guest_lbr_event() to is_lbr_no_counter_event();
+> - intel_guest_lbr_event_constraints() to 
+> intel_lbr_no_counter_event_constraints();
+>
+> Is this acceptable to you？
+> If there is anything needs to be improved, please let me know.
+Do you have any preference for this ?
+
+If you have more comments for the general idea or code details, please let 
+me know.
+For example, you may take a look at the interface named 
+intel_pmu_create_lbr_event()
+in the "[PATCH v9 07/10] KVM: x86/pmu: Add LBR feature emulation via guest 
+LBR event".
+
+If not, I'll spin the next version based on your current feedback.
+
+Thanks,
+Like Xu
+>
+>>> @@ -989,6 +1003,7 @@ void release_ds_buffers(void);
+>>>   void reserve_ds_buffers(void);
+>>>     extern struct event_constraint bts_constraint;
+>>> +extern struct event_constraint guest_lbr_constraint;
+>>>     void intel_pmu_enable_bts(u64 config);
+>>>   diff --git a/arch/x86/include/asm/perf_event.h 
+>>> b/arch/x86/include/asm/perf_event.h
+>>> index e018a1cf604c..674130aca75a 100644
+>>> --- a/arch/x86/include/asm/perf_event.h
+>>> +++ b/arch/x86/include/asm/perf_event.h
+>>> @@ -181,9 +181,19 @@ struct x86_pmu_capability {
+>>>   #define GLOBAL_STATUS_UNC_OVF                BIT_ULL(61)
+>>>   #define GLOBAL_STATUS_ASIF                BIT_ULL(60)
+>>>   #define GLOBAL_STATUS_COUNTERS_FROZEN            BIT_ULL(59)
+>>> -#define GLOBAL_STATUS_LBRS_FROZEN            BIT_ULL(58)
+>>> +#define GLOBAL_STATUS_LBRS_FROZEN_BIT            58
+>>> +#define GLOBAL_STATUS_LBRS_FROZEN BIT_ULL(GLOBAL_STATUS_LBRS_FROZEN_BIT)
+>>>   #define GLOBAL_STATUS_TRACE_TOPAPMI            BIT_ULL(55)
+>>>   +/*
+>>> + * We model guest LBR event tracing as another fixed-mode PMC like BTS.
+>>> + *
+>>> + * We choose bit 58 (LBRS_FROZEN_BIT) which is used to indicate that 
+>>> the LBR
+>>> + * stack is frozen on a hardware PMI request in the PERF_GLOBAL_STATUS 
+>>> msr,
+>>> + * and the 59th PMC counter (if any) is not supposed to use it as well.
+>> Is this saying that STATUS.58 should never be set? I don't really
+>> understand the language.
+> My fault, and let me make it more clearly:
+>
+> We choose bit 58 because it's used to indicate LBR stack frozen state
+> not like other overflow conditions in the PERF_GLOBAL_STATUS msr,
+> and it will not be used for any actual fixed events.
+>
+>>
+>>> + */
+>>> +#define INTEL_PMC_IDX_FIXED_VLBR GLOBAL_STATUS_LBRS_FROZEN_BIT
+>>> +
+>>>   /*
+>>>    * Adaptive PEBS v4
+>>>    */
+>
 
