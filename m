@@ -2,147 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 17B591ADB13
-	for <lists+kvm@lfdr.de>; Fri, 17 Apr 2020 12:31:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8B1251ADB4C
+	for <lists+kvm@lfdr.de>; Fri, 17 Apr 2020 12:42:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729121AbgDQKas (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Apr 2020 06:30:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54656 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728830AbgDQKar (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 17 Apr 2020 06:30:47 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8DA77C061A0C;
-        Fri, 17 Apr 2020 03:30:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Transfer-Encoding
-        :Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
-        Sender:Reply-To:Content-ID:Content-Description;
-        bh=5T+iJux5AD2LbQoaV8j0BcNwC32G2ubqGpp3NLw7K2U=; b=OJJIIwujh1arTkzUU+hPFfANoY
-        NiFEfLxyk7MLGkT08KL5BncSK7vyJY5V1xcSdc9lu4nmdLJWsOOjLtcHiAFMxitLUHUhiDjpxfur5
-        re+nSC6fHG0QGIQepP+ceQyfoA498aJNGGkDr8wP1kTpcdo48Dbs7e5ih92O3nndERPXsTZSpJ9J5
-        eGj1sgLq1Zy0x0/y/NQh7uct6dhQwwEu+QZ88iicydfw2e/NkA1C05v7rJHyuUD+IfeLPpFKwD4WA
-        Jc2eMY70zCMsMSJgshZNIsYf8F/uwbsy+9V7UIrA79dxto2GrGLCaxDqW56X6o2O4Y0O0qZg4kN5G
-        KvHh6R6Q==;
-Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
-        by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jPOGL-0007BH-EK; Fri, 17 Apr 2020 10:30:21 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 1EEC53006E0;
-        Fri, 17 Apr 2020 12:30:17 +0200 (CEST)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id 075632B0DE450; Fri, 17 Apr 2020 12:30:17 +0200 (CEST)
-Date:   Fri, 17 Apr 2020 12:30:16 +0200
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     "Xu, Like" <like.xu@intel.com>
-Cc:     Like Xu <like.xu@linux.intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        Andi Kleen <ak@linux.intel.com>,
-        Jim Mattson <jmattson@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Liran Alon <liran.alon@oracle.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Liang Kan <kan.liang@linux.intel.com>,
-        Wei Wang <wei.w.wang@intel.com>, linux-kernel@vger.kernel.org,
-        Ingo Molnar <mingo@kernel.org>
-Subject: Re: [PATCH v9 03/10] perf/x86: Add constraint to create guest LBR
- event without hw counter
-Message-ID: <20200417103016.GV20730@hirez.programming.kicks-ass.net>
-References: <20200313021616.112322-1-like.xu@linux.intel.com>
- <20200313021616.112322-4-like.xu@linux.intel.com>
- <20200409163717.GD20713@hirez.programming.kicks-ass.net>
- <0b89963d-33d8-3b0f-fc56-eff3ccce648d@intel.com>
+        id S1729431AbgDQKm5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Apr 2020 06:42:57 -0400
+Received: from forwardcorp1j.mail.yandex.net ([5.45.199.163]:43130 "EHLO
+        forwardcorp1j.mail.yandex.net" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728868AbgDQKm4 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 17 Apr 2020 06:42:56 -0400
+Received: from mxbackcorp1j.mail.yandex.net (mxbackcorp1j.mail.yandex.net [IPv6:2a02:6b8:0:1619::162])
+        by forwardcorp1j.mail.yandex.net (Yandex) with ESMTP id C0A522E14C6;
+        Fri, 17 Apr 2020 13:42:53 +0300 (MSK)
+Received: from iva8-88b7aa9dc799.qloud-c.yandex.net (iva8-88b7aa9dc799.qloud-c.yandex.net [2a02:6b8:c0c:77a0:0:640:88b7:aa9d])
+        by mxbackcorp1j.mail.yandex.net (mxbackcorp/Yandex) with ESMTP id ZOHCWnLkUy-gqMaIPp5;
+        Fri, 17 Apr 2020 13:42:53 +0300
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru; s=default;
+        t=1587120173; bh=I3spl25KIZuGs6Q3DOXzL/L4Ol8/St09dJxXsFCnQ7s=;
+        h=In-Reply-To:Message-ID:Subject:To:From:References:Date:Cc;
+        b=Lx7QSXU54GcI5/49VTJMywp5xS0bBtUlAMmPzN3iTi9gfEgh+nAPHyAwm3/kw22DA
+         jehFCNheJkNdY+U0NHiaf0W5ewIFGzn01SAxLH8Xv3xZuSlEVnyDQuD2YkGJK5862D
+         I6BK5UEv9u5GixU1u9UZg50c9hsjvBr7+YCMpvAI=
+Authentication-Results: mxbackcorp1j.mail.yandex.net; dkim=pass header.i=@yandex-team.ru
+Received: from unknown (unknown [2a02:6b8:b080:9404::1:f])
+        by iva8-88b7aa9dc799.qloud-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id HIC3fwETCJ-gqWa0j4v;
+        Fri, 17 Apr 2020 13:42:52 +0300
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+        (Client certificate not present)
+Date:   Fri, 17 Apr 2020 13:42:51 +0300
+From:   Roman Kagan <rvkagan@yandex-team.ru>
+To:     Jon Doron <arilou@gmail.com>
+Cc:     kvm@vger.kernel.org, linux-hyperv@vger.kernel.org,
+        vkuznets@redhat.com
+Subject: Re: [PATCH v2 0/1] x86/kvm/hyper-v: Add support to SYNIC exit on EOM
+Message-ID: <20200417104251.GA3009@rvkaganb>
+Mail-Followup-To: Roman Kagan <rvkagan@yandex-team.ru>,
+        Jon Doron <arilou@gmail.com>, kvm@vger.kernel.org,
+        linux-hyperv@vger.kernel.org, vkuznets@redhat.com
+References: <20200416083847.1776387-1-arilou@gmail.com>
+ <20200416120040.GA3745197@rvkaganb>
+ <20200416125430.GL7606@jondnuc>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <0b89963d-33d8-3b0f-fc56-eff3ccce648d@intel.com>
+In-Reply-To: <20200416125430.GL7606@jondnuc>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Apr 10, 2020 at 11:03:33AM +0800, Xu, Like wrote:
-> On 2020/4/10 0:37, Peter Zijlstra wrote:
-
-> > That should sort the branches in order of: gp,fixed,bts,vlbr
+On Thu, Apr 16, 2020 at 03:54:30PM +0300, Jon Doron wrote:
+> On 16/04/2020, Roman Kagan wrote:
+> > On Thu, Apr 16, 2020 at 11:38:46AM +0300, Jon Doron wrote:
+> > > According to the TLFS:
+> > > "A write to the end of message (EOM) register by the guest causes the
+> > > hypervisor to scan the internal message buffer queue(s) associated with
+> > > the virtual processor.
+> > > 
+> > > If a message buffer queue contains a queued message buffer, the hypervisor
+> > > attempts to deliver the message.
+> > > 
+> > > Message delivery succeeds if the SIM page is enabled and the message slot
+> > > corresponding to the SINTx is empty (that is, the message type in the
+> > > header is set to HvMessageTypeNone).
+> > > If a message is successfully delivered, its corresponding internal message
+> > > buffer is dequeued and marked free.
+> > > If the corresponding SINTx is not masked, an edge-triggered interrupt is
+> > > delivered (that is, the corresponding bit in the IRR is set).
+> > > 
+> > > This register can be used by guests to poll for messages. It can also be
+> > > used as a way to drain the message queue for a SINTx that has
+> > > been disabled (that is, masked)."
+> > 
+> > Doesn't this work already?
+> > 
 > 
-> Note the current order is: bts, pebs, fixed, gp.
+> Well if you dont have SCONTROL and a GSI associated with the SINT then it
+> does not...
 
-Yeah, and that means that gp (which is I think the most common case) is
-the most expensive.
+Yes you do need both of these.
 
-> Sure, let me try to refactor it in this way.
-
-Thanks!
-
-> > > +static inline bool is_guest_event(struct perf_event *event)
-> > > +{
-> > > +	if (event->attr.exclude_host && is_kernel_event(event))
-> > > +		return true;
-> > > +	return false;
-> > > +}
-> > I don't like this one, what if another in-kernel users generates an
-> > event with exclude_host set ?
-> Thanks for the clear attitude.
+> > > So basically this means that we need to exit on EOM so the hypervisor
+> > > will have a chance to send all the pending messages regardless of the
+> > > SCONTROL mechnaisim.
+> > 
+> > I might be misinterpreting the spec, but my understanding is that
+> > SCONTROL {en,dis}ables the message queueing completely.  What the quoted
+> > part means is that a write to EOM should trigger the message source to
+> > push a new message into the slot, regardless of whether the SINT was
+> > masked or not.
+> > 
+> > And this (I think, haven't tested) should already work.  The userspace
+> > just keeps using the SINT route as it normally does, posting
+> > notifications to the corresponding irqfd when posting a message, and
+> > waiting on the resamplerfd for the message slot to become free.  If the
+> > SINT is masked KVM will skip injecting the interrupt, that's it.
+> > 
+> > Roman.
 > 
-> How about:
-> - remove the is_guest_event() to avoid potential misuse;
-> - move all checks into is_guest_lbr_event() and make it dedicated:
-> 
-> static inline bool is_guest_lbr_event(struct perf_event *event)
-> {
->     if (is_kernel_event(event) &&
->         event->attr.exclude_host && needs_branch_stack(event))
->         return true;
->     return false;
-> }
-> 
-> In this case, it's safe to generate an event with exclude_host set
-> and also use LBR to count guest or nothing for other in-kernel users
-> because the intel_guest_lbr_event_constraints() makes LBR exclusive.
-> 
-> For this generic usage, I may rename:
-> - is_guest_lbr_event() to is_lbr_no_counter_event();
-> - intel_guest_lbr_event_constraints() to
-> intel_lbr_no_counter_event_constraints();
-> 
-> Is this acceptable to you？
+> That's what I was thinking originally as well, but then i noticed KDNET as a
+> VMBus client (and it basically runs before anything else) is working in this
+> polling mode, where SCONTROL is disabled and it just loops, and if it saw
+> there is a PENDING message flag it will issue an EOM to indicate it has free
+> the slot.
 
-I suppose so, please put a comment on top of that function though, so we
-don't forget.
+Who sets up the message page then?  Doesn't it enabe SCONTROL as well?
 
-> > > @@ -181,9 +181,19 @@ struct x86_pmu_capability {
-> > >   #define GLOBAL_STATUS_UNC_OVF				BIT_ULL(61)
-> > >   #define GLOBAL_STATUS_ASIF				BIT_ULL(60)
-> > >   #define GLOBAL_STATUS_COUNTERS_FROZEN			BIT_ULL(59)
-> > > -#define GLOBAL_STATUS_LBRS_FROZEN			BIT_ULL(58)
-> > > +#define GLOBAL_STATUS_LBRS_FROZEN_BIT			58
-> > > +#define GLOBAL_STATUS_LBRS_FROZEN			BIT_ULL(GLOBAL_STATUS_LBRS_FROZEN_BIT)
-> > >   #define GLOBAL_STATUS_TRACE_TOPAPMI			BIT_ULL(55)
-> > > +/*
-> > > + * We model guest LBR event tracing as another fixed-mode PMC like BTS.
-> > > + *
-> > > + * We choose bit 58 (LBRS_FROZEN_BIT) which is used to indicate that the LBR
-> > > + * stack is frozen on a hardware PMI request in the PERF_GLOBAL_STATUS msr,
-> > > + * and the 59th PMC counter (if any) is not supposed to use it as well.
-> > Is this saying that STATUS.58 should never be set? I don't really
-> > understand the language.
-> My fault, and let me make it more clearly:
-> 
-> We choose bit 58 because it's used to indicate LBR stack frozen state
-> not like other overflow conditions in the PERF_GLOBAL_STATUS msr,
-> and it will not be used for any actual fixed events.
+Note that, even if you don't see it being enabled by Windows, it can be
+enabled by the firmware and/or by the bootloader.
 
-That's only with v4, also we unconditionally mask that bit in
-handle_pmi_common(), so it'll never be set in the overflow handling.
+Can you perhaps try with the SeaBIOS from
+https://src.openvz.org/projects/UP/repos/seabios branch hv-scsi?  It
+enables SCONTROL and leaves it that way.
 
-That's all fine, I suppose, all you want is means of programming the LBR
-registers, we don't actually do anything with then in the host context.
-Please write a more elaborate comment here.
+I'd also suggest tracing kvm_msr events (both reads and writes) for
+SCONTROL and SIMP msrs, to better understand the picture.
+
+So far the change you propose appears too heavy to work around the
+problem of disabled SCONTROL.  You seem to be better off just making
+sure it's enabled (either by the firmware or slighly violating the spec
+and initializing to enabled from the start), and sticking to the
+existing infrastructure for posting messages.
+
+> (There are a bunch of patches i sent on the QEMU mailing list as well  where
+> i CCed you, I will probably revise it a bit but was hoping to get  KVM
+> sorted out first).
+
+I'll look through the archive, should be there, thanks.
+
+Roman.
