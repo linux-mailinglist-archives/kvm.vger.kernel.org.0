@@ -2,138 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7D73A1AE06F
-	for <lists+kvm@lfdr.de>; Fri, 17 Apr 2020 17:06:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B76AF1AE0C0
+	for <lists+kvm@lfdr.de>; Fri, 17 Apr 2020 17:14:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728459AbgDQPGT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Apr 2020 11:06:19 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:48169 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728347AbgDQPGS (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 17 Apr 2020 11:06:18 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1587135977;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Bp+vURr2biqLIQDqjBK7OKDMnAtcGss9u7I1kEvxU7o=;
-        b=A4VkbwwiG7ebOzWEUEw3bnLJre4UUJGCRnH6W673/nsZ6VnY3CGEuUn2J5GIieB1k2h83u
-        LCxc4DiX498RwHMZB6jEv8QG0RapjxV9fTESjZFeMky9azHgX55IkDO87XaL7gjK9KjeoW
-        NeoI1XWRyzsfNtltwK6rcd1NxyrbBXA=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-486-E3dsEIAlPGeHJb27WfXc9A-1; Fri, 17 Apr 2020 11:06:14 -0400
-X-MC-Unique: E3dsEIAlPGeHJb27WfXc9A-1
-Received: by mail-wr1-f69.google.com with SMTP id p2so412904wrx.12
-        for <kvm@vger.kernel.org>; Fri, 17 Apr 2020 08:06:13 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=Bp+vURr2biqLIQDqjBK7OKDMnAtcGss9u7I1kEvxU7o=;
-        b=Urt1bwgm7W9+HAS8WuAo4qYLAqn7ZDJQ0BX8PBuAgfYi2WEwAYLyfDUf34yLcLwDF2
-         pGIZzfV3A851WGb1YxK2CybjQlOePJ3hBfVsvJUMdCY0nn1glrA59OYKF64VO+e6vJFH
-         26oiXMmvmhfKPxBRuOMITkYyulRusxzYraCRYGPomQTE/Zrg0+9MPMnZpcag0+9QRlp2
-         +MDaFGkBys9u1wL+Ar0j3ZhciQ0i8zybocEYCIDC1KEQcHgpzejO1G89U3mFkX/71vyL
-         ajLsWzmESVomOFh2WqrIappopdW14CnI3z8XZwfObIbZGh5Y1yRW4ejH9lg4pXQAEbdK
-         muMw==
-X-Gm-Message-State: AGi0Puai8tefKMpkTAY5XUn9cPrjQuK9WsdLcNXHA8xXZ4BDP7bdhbM4
-        v4Si7SYz09rzaqWfhvYAw4pgCboG6T1aRAeW4yRPluCmMVWAQ01oFRTUs7Zybbj7PRyC5d+Bsxx
-        fGojTyJ8iuUMp
-X-Received: by 2002:a1c:2842:: with SMTP id o63mr3814748wmo.73.1587135972739;
-        Fri, 17 Apr 2020 08:06:12 -0700 (PDT)
-X-Google-Smtp-Source: APiQypIybFDt/Q7QlgX//9mu4+TS1KJE72qr+HgPLt/Lgs3Djdgs7WyjOeORMFpznBkzJGOS8lshRw==
-X-Received: by 2002:a1c:2842:: with SMTP id o63mr3814705wmo.73.1587135972411;
-        Fri, 17 Apr 2020 08:06:12 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:56e1:adff:fed9:caf0? ([2001:b07:6468:f312:56e1:adff:fed9:caf0])
-        by smtp.gmail.com with ESMTPSA id g25sm8045149wmh.24.2020.04.17.08.06.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 17 Apr 2020 08:06:11 -0700 (PDT)
-Subject: Re: [PATCH] KVM: Remove CREATE_IRQCHIP/SET_PIT2 race
-To:     Jon Cargille <jcargill@google.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     Steve Rutherford <srutherford@google.com>
-References: <20200416191152.259434-1-jcargill@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <f7b8ca30-21fa-5268-7f17-889f10b90187@redhat.com>
-Date:   Fri, 17 Apr 2020 17:06:10 +0200
+        id S1728596AbgDQPLf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Apr 2020 11:11:35 -0400
+Received: from foss.arm.com ([217.140.110.172]:52610 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728114AbgDQPLa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 Apr 2020 11:11:30 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6A3C230E;
+        Fri, 17 Apr 2020 08:11:29 -0700 (PDT)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 935F53F73D;
+        Fri, 17 Apr 2020 08:11:27 -0700 (PDT)
+Subject: Re: [PATCH v2 00/94] KVM: arm64: ARMv8.3/8.4 Nested Virtualization
+ support
+To:     "Zengtao (B)" <prime.zeng@hisilicon.com>,
+        Marc Zyngier <maz@kernel.org>
+Cc:     George Cherian <gcherian@marvell.com>,
+        "Dave.Martin@arm.com" <Dave.Martin@arm.com>,
+        "andre.przywara@arm.com" <andre.przywara@arm.com>,
+        "christoffer.dall@arm.com" <christoffer.dall@arm.com>,
+        "james.morse@arm.com" <james.morse@arm.com>,
+        "jintack@cs.columbia.edu" <jintack@cs.columbia.edu>,
+        "julien.thierry.kdev@gmail.com" <julien.thierry.kdev@gmail.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>,
+        "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
+        Anil Kumar Reddy H <areddy3@marvell.com>,
+        Ganapatrao Kulkarni <gkulkarni@marvell.com>
+References: <MN2PR18MB26869A6CA4E67558324F655CC5C70@MN2PR18MB2686.namprd18.prod.outlook.com>
+ <06d08f904f003160a48eac3c5ab3c7ff@kernel.org>
+ <678F3D1BB717D949B966B68EAEB446ED342E29B9@dggemm526-mbx.china.huawei.com>
+ <86r1wus7df.wl-maz@kernel.org>
+ <678F3D1BB717D949B966B68EAEB446ED3A535FCF@DGGEMM506-MBX.china.huawei.com>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <f55386a9-8eaa-944f-453d-9c3c4abee5fb@arm.com>
+Date:   Fri, 17 Apr 2020 16:11:53 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <20200416191152.259434-1-jcargill@google.com>
+In-Reply-To: <678F3D1BB717D949B966B68EAEB446ED3A535FCF@DGGEMM506-MBX.china.huawei.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 16/04/20 21:11, Jon Cargille wrote:
-> From: Steve Rutherford <srutherford@google.com>
-> 
-> Fixes a NULL pointer dereference, caused by the PIT firing an interrupt
-> before the interrupt table has been initialized.
-> 
-> SET_PIT2 can race with the creation of the IRQchip. In particular,
-> if SET_PIT2 is called with a low PIT timer period (after the creation of
-> the IOAPIC, but before the instantiation of the irq routes), the PIT can
-> fire an interrupt at an uninitialized table.
-> 
-> Signed-off-by: Steve Rutherford <srutherford@google.com>
-> Signed-off-by: Jon Cargille <jcargill@google.com>
-> Reviewed-by: Jim Mattson <jmattson@google.com>
-> ---
->  arch/x86/kvm/x86.c | 10 ++++++++--
->  1 file changed, 8 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 027dfd278a973..3cc3f673785c8 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -5049,10 +5049,13 @@ long kvm_arch_vm_ioctl(struct file *filp,
->  		r = -EFAULT;
->  		if (copy_from_user(&u.ps, argp, sizeof(u.ps)))
->  			goto out;
-> +		mutex_lock(&kvm->lock);
->  		r = -ENXIO;
->  		if (!kvm->arch.vpit)
-> -			goto out;
-> +			goto set_pit_out;
->  		r = kvm_vm_ioctl_set_pit(kvm, &u.ps);
-> +set_pit_out:
-> +		mutex_unlock(&kvm->lock);
->  		break;
->  	}
->  	case KVM_GET_PIT2: {
-> @@ -5072,10 +5075,13 @@ long kvm_arch_vm_ioctl(struct file *filp,
->  		r = -EFAULT;
->  		if (copy_from_user(&u.ps2, argp, sizeof(u.ps2)))
->  			goto out;
-> +		mutex_lock(&kvm->lock);
->  		r = -ENXIO;
->  		if (!kvm->arch.vpit)
-> -			goto out;
-> +			goto set_pit2_out;
->  		r = kvm_vm_ioctl_set_pit2(kvm, &u.ps2);
-> +set_pit2_out:
-> +		mutex_unlock(&kvm->lock);
->  		break;
->  	}
->  	case KVM_REINJECT_CONTROL: {
-> 
+Hi,
 
-Queued, thanks.
+On 4/16/20 2:38 AM, Zengtao (B) wrote:
+> Hi Marc:
+>
+> Got it.
+> Really a bit patch set :)
+>
+> BTW, I have done a basic kvm unit test
+> git://git.kernel.org/pub/scm/virt/kvm/kvm-unit-tests.git
+> And I find that after apply the patch KVM: arm64: VNCR-ize ELR_EL1,
+> The psci test failed for some reason, I can't understand why, this
+> is only the test result.(find the patch by git bisect + kvm test)
 
-Paolo
+Just a heads-up, a couple of fixes to kvm-unit-tests were merged last week, and
+among them was one touching the psci code, e14e6ba56f6e ("arm/arm64: psci: Don't
+run C code without stack or vectors"). It might be worth checking that you have
+it, and if you don't, if applying it fixes the issue.
 
+Thanks,
+Alex
+>
+> My platform: Hisilicon D06 board.
+> Linux kernel: Linux 5.6-rc6 + nv patches(some rebases)
+> Could you help to take a look?
+>
+> Thanks 
+> Zengtao 
+>
+>> -----Original Message-----
+>> From: Marc Zyngier [mailto:maz@kernel.org]
+>> Sent: Saturday, April 11, 2020 5:24 PM
+>> To: Zengtao (B)
+>> Cc: George Cherian; Dave.Martin@arm.com; alexandru.elisei@arm.com;
+>> andre.przywara@arm.com; christoffer.dall@arm.com;
+>> james.morse@arm.com; jintack@cs.columbia.edu;
+>> julien.thierry.kdev@gmail.com; kvm@vger.kernel.org;
+>> kvmarm@lists.cs.columbia.edu; linux-arm-kernel@lists.infradead.org;
+>> suzuki.poulose@arm.com; Anil Kumar Reddy H; Ganapatrao Kulkarni
+>> Subject: Re: [PATCH v2 00/94] KVM: arm64: ARMv8.3/8.4 Nested
+>> Virtualization support
+>>
+>> Hi Zengtao,
+>>
+>> On Sat, 11 Apr 2020 05:10:05 +0100,
+>> "Zengtao (B)" <prime.zeng@hisilicon.com> wrote:
+>>> Hi Marc:
+>>>
+>>> Since it's a very large patch series, I want to test it on my platform
+>>>  which don't support nv, and want to make sure if this patch series
+>>> affects the existed virtualization functions or not.
+>>>
+>>> Any suggestion about the test focus?
+>> Not really. Given that the NV patches affect absolutely every
+>> architectural parts of KVM/arm64, everything needs careful
+>> testing. But more than testing, it needs reviewing.
+>>
+>> Thanks,
+>>
+>> 	M.
+>>
+>> --
+>> Jazz is not dead, it just smells funny.
