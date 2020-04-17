@@ -2,103 +2,86 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5A0541AE0E2
-	for <lists+kvm@lfdr.de>; Fri, 17 Apr 2020 17:19:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A63191AE121
+	for <lists+kvm@lfdr.de>; Fri, 17 Apr 2020 17:29:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728835AbgDQPRf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Apr 2020 11:17:35 -0400
-Received: from mail.kernel.org ([198.145.29.99]:46630 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728587AbgDQPRf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 Apr 2020 11:17:35 -0400
-Received: from paulmck-ThinkPad-P72.home (50-39-105-78.bvtn.or.frontiernet.net [50.39.105.78])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id DF4BF20936;
-        Fri, 17 Apr 2020 15:17:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1587136654;
-        bh=vQgeSTHLqbr1xYIfLpTqXiGzbSQwUSK/Dh+Du7ZzrJM=;
-        h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
-        b=dYtXIG1+vvN9Iy2/NkryyGIHTTGUWKdGSP2OTrBYd7dCxY0qcz733yrAeMG0CI+KC
-         fT6eMWMO2Gk76Cs5s83AJVUXA3xITdx3n6skgAHiaM5uDx85rHUCzOYIep4+/bmXFC
-         d5YVx5DFzKAPGOFGhx7j5WC+ZNklgnfGWv/GPk2M=
-Received: by paulmck-ThinkPad-P72.home (Postfix, from userid 1000)
-        id B63573523234; Fri, 17 Apr 2020 08:17:34 -0700 (PDT)
-Date:   Fri, 17 Apr 2020 08:17:34 -0700
-From:   "Paul E. McKenney" <paulmck@kernel.org>
-To:     Qian Cai <cai@lca.pw>
-Cc:     Elver Marco <elver@google.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        kasan-dev <kasan-dev@googlegroups.com>, kvm@vger.kernel.org,
-        LKML <linux-kernel@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH -next] kvm/svm: disable KCSAN for svm_vcpu_run()
-Message-ID: <20200417151734.GJ17661@paulmck-ThinkPad-P72>
-Reply-To: paulmck@kernel.org
-References: <20200415153709.1559-1-cai@lca.pw>
- <f02ca9b9-f0a6-dfb5-1ca0-32a12d4f56fb@redhat.com>
- <1F15D565-D34D-41F5-B1C5-B9A04626EE97@lca.pw>
+        id S1728542AbgDQP3p (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Apr 2020 11:29:45 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:48584 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1729038AbgDQP3p (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 17 Apr 2020 11:29:45 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 03HF3xOg133968
+        for <kvm@vger.kernel.org>; Fri, 17 Apr 2020 11:29:44 -0400
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 30fdpnb33b-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Fri, 17 Apr 2020 11:29:44 -0400
+Received: from localhost
+        by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <imbrenda@linux.ibm.com>;
+        Fri, 17 Apr 2020 16:29:37 +0100
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
+        by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Fri, 17 Apr 2020 16:29:34 +0100
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 03HFTbpi58916992
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 17 Apr 2020 15:29:37 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 78B7411C04A;
+        Fri, 17 Apr 2020 15:29:37 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 16A1711C050;
+        Fri, 17 Apr 2020 15:29:37 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.145.0.99])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri, 17 Apr 2020 15:29:37 +0000 (GMT)
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     borntraeger@de.ibm.com, frankja@linux.ibm.com
+Cc:     pbonzini@redhat.com, cohuck@redhat.com, david@redhat.com,
+        kvm@vger.kernel.org, linux-s390@vger.kernel.org
+Subject: [PATCH v1 1/1] MAINTAINERS: add a reviewer for KVM/s390
+Date:   Fri, 17 Apr 2020 17:29:36 +0200
+X-Mailer: git-send-email 2.25.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1F15D565-D34D-41F5-B1C5-B9A04626EE97@lca.pw>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 20041715-0028-0000-0000-000003F9F9AD
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20041715-0029-0000-0000-000024BFB3E9
+Message-Id: <20200417152936.772256-1-imbrenda@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.676
+ definitions=2020-04-17_06:2020-04-17,2020-04-17 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 clxscore=1015
+ malwarescore=0 phishscore=0 suspectscore=0 spamscore=0 bulkscore=0
+ mlxlogscore=756 impostorscore=0 adultscore=0 lowpriorityscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2004170118
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Apr 17, 2020 at 09:21:59AM -0400, Qian Cai wrote:
-> 
-> 
-> > On Apr 15, 2020, at 11:57 AM, Paolo Bonzini <pbonzini@redhat.com> wrote:
-> > 
-> > On 15/04/20 17:37, Qian Cai wrote:
-> >> For some reasons, running a simple qemu-kvm command with KCSAN will
-> >> reset AMD hosts. It turns out svm_vcpu_run() could not be instrumented.
-> >> Disable it for now.
-> >> 
-> >> # /usr/libexec/qemu-kvm -name ubuntu-18.04-server-cloudimg -cpu host
-> >> 	-smp 2 -m 2G -hda ubuntu-18.04-server-cloudimg.qcow2
-> >> 
-> >> === console output ===
-> >> Kernel 5.6.0-next-20200408+ on an x86_64
-> >> 
-> >> hp-dl385g10-05 login:
-> >> 
-> >> <...host reset...>
-> >> 
-> >> HPE ProLiant System BIOS A40 v1.20 (03/09/2018)
-> >> (C) Copyright 1982-2018 Hewlett Packard Enterprise Development LP
-> >> Early system initialization, please wait...
-> >> 
-> >> Signed-off-by: Qian Cai <cai@lca.pw>
-> >> ---
-> >> arch/x86/kvm/svm/svm.c | 2 +-
-> >> 1 file changed, 1 insertion(+), 1 deletion(-)
-> >> 
-> >> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> >> index 2be5bbae3a40..1fdb300e9337 100644
-> >> --- a/arch/x86/kvm/svm/svm.c
-> >> +++ b/arch/x86/kvm/svm/svm.c
-> >> @@ -3278,7 +3278,7 @@ static void svm_cancel_injection(struct kvm_vcpu *vcpu)
-> >> 
-> >> bool __svm_vcpu_run(unsigned long vmcb_pa, unsigned long *regs);
-> >> 
-> >> -static void svm_vcpu_run(struct kvm_vcpu *vcpu)
-> >> +static __no_kcsan void svm_vcpu_run(struct kvm_vcpu *vcpu)
-> >> {
-> >> 	struct vcpu_svm *svm = to_svm(vcpu);
-> >> 
-> >> 
-> > 
-> > I suppose you tested the patch to move cli/sti into the .S file.  Anyway:
-> > 
-> > Acked-by: Paolo Bonzini <pbonzini@redhat.com>
-> 
-> Paul, can you pick this up along with other KCSAN fixes?
+Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+---
+ MAINTAINERS | 1 +
+ 1 file changed, 1 insertion(+)
 
-Queued and pushed, thank you both!
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 6851ef7cf1bd..48e0147f9dd8 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -9326,6 +9326,7 @@ M:	Christian Borntraeger <borntraeger@de.ibm.com>
+ M:	Janosch Frank <frankja@linux.ibm.com>
+ R:	David Hildenbrand <david@redhat.com>
+ R:	Cornelia Huck <cohuck@redhat.com>
++R:	Claudio Imbrenda <imbrenda@linux.ibm.com>
+ L:	kvm@vger.kernel.org
+ S:	Supported
+ W:	http://www.ibm.com/developerworks/linux/linux390/
+-- 
+2.25.2
 
-							Thanx, Paul
