@@ -2,99 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CD0081AD42D
-	for <lists+kvm@lfdr.de>; Fri, 17 Apr 2020 03:36:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8639D1AD441
+	for <lists+kvm@lfdr.de>; Fri, 17 Apr 2020 03:50:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728373AbgDQBgF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Apr 2020 21:36:05 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:44288 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727854AbgDQBgE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Apr 2020 21:36:04 -0400
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 03H1SX9h036154;
-        Fri, 17 Apr 2020 01:36:01 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2020-01-29;
- bh=8ExsW9WPMHwTE4nxzzvDu2N5qKh0S3fAcynljMNDMAI=;
- b=xY+WrsPPLJ7V/TmWEQBf+MCk/H9sXvu2qP1UiDd+D+hcBS3DEQVjxJPb6HNDR1vnFiBX
- a12p//OcGt5/VRmRoUTUreiXNGRKWKa6evsoJ4s04JifXQ0jd1506mJyw8qs8cJaRpG0
- PSrpwOXamQ9yKBicWkMqSTEtOGj9P8lWKGGKURZZVYuBUHZ4VHHb4SLOjnbSw001w+8l
- CIKSxbzSgw8an40W5wOlNVieDCyq5YJasqjvSsErEJwxHoq62wjZ+sF0oSQ3Ih4LU96f
- WFP4Pkc0jSrXjjzmjrMRhrUtVga2up7KJAIaDHKCNGLN4L5iqVt7Zb6bl/XgNP21xC4N /w== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by aserp2120.oracle.com with ESMTP id 30dn95vmar-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 17 Apr 2020 01:36:01 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 03H1W9xR037603;
-        Fri, 17 Apr 2020 01:36:00 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
-        by aserp3020.oracle.com with ESMTP id 30dn9hbsc8-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 17 Apr 2020 01:36:00 +0000
-Received: from abhmp0006.oracle.com (abhmp0006.oracle.com [141.146.116.12])
-        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 03H1ZxRw008126;
-        Fri, 17 Apr 2020 01:35:59 GMT
-Received: from localhost.localdomain (/10.159.142.247)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Thu, 16 Apr 2020 18:35:59 -0700
-Subject: Re: [kvm-unit-tests PATCH] nVMX: Add testcase to cover VMWRITE to
- nonexistent CR3-target values
-To:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org
-References: <20200416162814.32065-1-sean.j.christopherson@intel.com>
-From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Message-ID: <d0423845-db40-b9ce-62b7-63bc36006a28@oracle.com>
-Date:   Thu, 16 Apr 2020 18:35:58 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
-MIME-Version: 1.0
-In-Reply-To: <20200416162814.32065-1-sean.j.christopherson@intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+        id S1728849AbgDQBuI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Apr 2020 21:50:08 -0400
+Received: from mga02.intel.com ([134.134.136.20]:26911 "EHLO mga02.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725800AbgDQBuI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Apr 2020 21:50:08 -0400
+IronPort-SDR: yIUzAxKlLKYfTyokKa0BP47k76q/ABHhxOD/8P56so6J+4/l7NpoLGbBMoRq+v7qxNfH0G+wHZ
+ p2yuzJoeT5eg==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Apr 2020 18:50:07 -0700
+IronPort-SDR: lFHVMXVUTwZb9ThjoVLW1LuW1/BT4ns7rMaTuOqQ6SOXXrf8f0dGULaa5H4h3AVvK3oxJcMr+u
+ +qvX71MQhmFA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.72,393,1580803200"; 
+   d="scan'208";a="257427278"
+Received: from fmsmsx107.amr.corp.intel.com ([10.18.124.205])
+  by orsmga006.jf.intel.com with ESMTP; 16 Apr 2020 18:50:07 -0700
+Received: from fmsmsx111.amr.corp.intel.com (10.18.116.5) by
+ fmsmsx107.amr.corp.intel.com (10.18.124.205) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Thu, 16 Apr 2020 18:50:00 -0700
+Received: from shsmsx106.ccr.corp.intel.com (10.239.4.159) by
+ fmsmsx111.amr.corp.intel.com (10.18.116.5) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Thu, 16 Apr 2020 18:49:59 -0700
+Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.225]) by
+ SHSMSX106.ccr.corp.intel.com ([169.254.10.89]) with mapi id 14.03.0439.000;
+ Fri, 17 Apr 2020 09:49:57 +0800
+From:   "Kang, Luwei" <luwei.kang@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        "Christopherson, Sean J" <sean.j.christopherson@intel.com>
+CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        "wanpengli@tencent.com" <wanpengli@tencent.com>,
+        "jmattson@google.com" <jmattson@google.com>,
+        "joro@8bytes.org" <joro@8bytes.org>
+Subject: RE: [PATCH] KVM: VMX: Disable Intel PT before VM-entry
+Thread-Topic: [PATCH] KVM: VMX: Disable Intel PT before VM-entry
+Thread-Index: AQHV/Nh9FI7fbfgIUkqDZ3DrcNQ1xKhN+YUAgAfwusCACwVbAIABLSawgBlWAwCAAUfHIA==
+Date:   Fri, 17 Apr 2020 01:49:57 +0000
+Message-ID: <82D7661F83C1A047AF7DC287873BF1E1738C13EE@SHSMSX104.ccr.corp.intel.com>
+References: <1584503298-18731-1-git-send-email-luwei.kang@intel.com>
+ <20200318154826.GC24357@linux.intel.com>
+ <82D7661F83C1A047AF7DC287873BF1E1738A9724@SHSMSX104.ccr.corp.intel.com>
+ <20200330172152.GE24988@linux.intel.com>
+ <82D7661F83C1A047AF7DC287873BF1E1738B1A1C@SHSMSX104.ccr.corp.intel.com>
+ <21fa3505-8198-5f32-9dfd-3c9d9cc5ef7e@redhat.com>
+In-Reply-To: <21fa3505-8198-5f32-9dfd-3c9d9cc5ef7e@redhat.com>
+Accept-Language: en-US
 Content-Language: en-US
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9593 signatures=668686
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 mlxscore=0 adultscore=0
- spamscore=0 phishscore=0 bulkscore=0 suspectscore=0 malwarescore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
- definitions=main-2004170010
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9593 signatures=668686
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 clxscore=1015
- malwarescore=0 bulkscore=0 priorityscore=1501 lowpriorityscore=0
- mlxscore=0 phishscore=0 spamscore=0 impostorscore=0 suspectscore=0
- mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2004170009
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-On 4/16/20 9:28 AM, Sean Christopherson wrote:
-> Enhance test_cr3_targets() to verify that attempting to write CR3-target
-> value fields beyond the reported number of supported targets fails.
->
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> ---
->   x86/vmx_tests.c | 4 ++++
->   1 file changed, 4 insertions(+)
->
-> diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
-> index 1f97fe3..f5c72e6 100644
-> --- a/x86/vmx_tests.c
-> +++ b/x86/vmx_tests.c
-> @@ -3570,6 +3570,10 @@ static void test_cr3_targets(void)
->   	for (i = 0; i <= supported_targets + 1; i++)
->   		try_cr3_target_count(i, supported_targets);
->   	vmcs_write(CR3_TARGET_COUNT, cr3_targets);
-> +
-> +	/* VMWRITE to nonexistent target fields should fail. */
-> +	for (i = supported_targets; i < 256; i++)
-> +		TEST_ASSERT(vmcs_write(CR3_TARGET_0 + i*2, 0));
->   }
->   
->   /*
-We don't need VMREAD testing ?
+PiA+PiBBaCwgcmlnaHQuICBXaGF0IGFib3V0IGVuaGFuY2luZyBpbnRlbF9wdF9oYW5kbGVfdm14
+KCkgYW5kICdzdHJ1Y3QNCj4gPj4gcHQnIHRvIHJlcGxhY2Ugdm14X29uIHdpdGggYSBmaWVsZCB0
+aGF0IGluY29ycG9yYXRlcyB0aGUgS1ZNIG1vZGU/DQo+ID4NCj4gPiBTb21lIGhpc3RvcnkgaXMg
+dGhlIGhvc3QgcGVyZiBkaWRuJ3QgZnVsbHkgYWdyZWUgd2l0aCBpbnRyb2R1Y2luZw0KPiA+IEhP
+U1RfR1VFU1QgbW9kZSBmb3IgUFQgaW4gS1ZNLg0KPiANCj4gSSBkb24ndCB0aGluayB0aGlzIGlz
+IGFjY3VyYXRlLiAgSUlSQyB0aGUgbWFpbnRhaW5lcnMgd2FudGVkIHBhY2tldHMgaW4gdGhlIGhv
+c3QtDQo+IHNpZGUgdHJhY2UgdG8gc2lnbmFsIHdoZXJlIHRoZSB0cmFjZSB3YXMgaW50ZXJydXB0
+ZWQuICBJbiB0aGUgZW5kIHdlIHNvbHZlZCB0aGUNCj4gaXNzdWUgYnkgMSkgZHJvcHBpbmcgaG9z
+dC1vbmx5IG1vZGUgc2luY2UgaXQgY2FuIGJlIGFjaGlldmVkIGluIHVzZXJzcGFjZSAyKQ0KPiBt
+YWtpbmcgaG9zdC1ndWVzdCBhbiBvcHQgaW4gZmVhdHVyZS4NCj4gDQo+IEkgdGhpbmsgaXQgd291
+bGQgbWFrZSBzZW5zZSB0byByZW5hbWUgdm14X29uIGludG8gdm14X3N0YXRlIGFuZCBtYWtlIGl0
+IGFuDQo+IA0KPiBlbnVtIHB0X3ZteF9zdGF0ZSB7DQo+IAlQVF9WTVhfT0ZGLA0KPiAJUFRfVk1Y
+X09OX0RJU0FCTEVELA0KPiAJUFRfVk1YX09OX1NZU1RFTSwNCj4gCVBUX1ZNWF9PTl9IT1NUX0dV
+RVNUDQo+IH07DQo+IA0KPiBLVk0gd291bGQgcGFzcyB0aGUgZW51bSB0byBpbnRlbF9wdF9oYW5k
+bGVfdm14IChvbmUgb2YgUFRfVk1YX09GRiwNCj4gUFRfVk1YX09OX1NZU1RFTSwgUFRfVk1YX09O
+X0hPU1RfR1VFU1QpLiAgSW5zaWRlDQo+IGludGVsX3B0X2hhbmRsZV92bXggeW91IGNhbiBkbw0K
+PiANCj4gCWlmIChwdF9wbXUudm14KSB7DQo+IAkJV1JJVEVfT05DRShwdC0+dm14X3N0YXRlLCBz
+dGF0ZSk7DQo+IAkJcmV0dXJuOw0KPiAJfQ0KPiANCj4gCWxvY2FsX2lycV9zYXZlKGZsYWdzKTsN
+Cj4gCVdSSVRFX09OQ0UocHQtPnZteF9zdGF0ZSwNCj4gCQkgICBzdGF0ZSA9PSBQVF9WTVhfT0ZG
+ID8gUFRfVk1YX09GRiA6DQo+IFBUX1ZNWF9PTl9ESVNBQkxFRCk7DQo+IAkuLi4NCj4gDQo+IGFu
+ZCBpbiBwdF9jb25maWdfc3RhcnQ6DQo+IA0KPiAJLi4uDQo+IAl2bXggPSBSRUFEX09OQ0UocHQt
+PnZteF9zdGFydCk7DQo+IAlpZiAodm14ID09IFBUX1ZNWF9PTl9ESVNBQkxFRCkNCj4gICAgICAg
+ICAgICAgICAgIHBlcmZfYXV4X291dHB1dF9mbGFnKCZwdC0+aGFuZGxlLCBQRVJGX0FVWF9GTEFH
+X1BBUlRJQUwpOw0KPiAgICAgICAgIGVsc2UgaWYgKHZteCA9PSBQVF9WTVhfT05fU1lTVEVNIHx8
+DQo+IAkJICEoY3VycmVudC0+ZmxhZ3MgJiBQRl9WQ1BVKSkNCj4gICAgICAgICAgICAgICAgIHdy
+bXNybChNU1JfSUEzMl9SVElUX0NUTCwgY3RsKTsNCj4gCS4uLg0KDQpJIHdpbGwgdHJ5IHRoaXMu
+IFRoYW5rcy4NCg0KTHV3ZWkgS2FuZw0KDQo+IA0KPiBUaGFua3MsDQo+IA0KPiBQYW9sbw0KDQo=
