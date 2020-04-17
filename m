@@ -2,301 +2,171 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7E6391AE243
-	for <lists+kvm@lfdr.de>; Fri, 17 Apr 2020 18:29:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8A3671AE254
+	for <lists+kvm@lfdr.de>; Fri, 17 Apr 2020 18:33:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726009AbgDQQ1c (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Apr 2020 12:27:32 -0400
-Received: from foss.arm.com ([217.140.110.172]:53574 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725877AbgDQQ1b (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 Apr 2020 12:27:31 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A159AC14;
-        Fri, 17 Apr 2020 09:27:29 -0700 (PDT)
-Received: from [192.168.2.22] (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4B55C3F73D;
-        Fri, 17 Apr 2020 09:27:28 -0700 (PDT)
-Subject: Re: [PATCH v2 2/6] KVM: arm: vgic: Synchronize the whole guest on
- GIC{D,R}_I{S,C}ACTIVER read
-To:     Marc Zyngier <maz@kernel.org>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org
-Cc:     Zenghui Yu <yuzenghui@huawei.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Julien Grall <julien@xen.org>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>
-References: <20200417083319.3066217-1-maz@kernel.org>
- <20200417083319.3066217-3-maz@kernel.org>
-From:   =?UTF-8?Q?Andr=c3=a9_Przywara?= <andre.przywara@arm.com>
-Organization: ARM Ltd.
-Message-ID: <321c946b-7ca1-e422-2c86-3ab121633549@arm.com>
-Date:   Fri, 17 Apr 2020 17:26:51 +0100
+        id S1726022AbgDQQdW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Apr 2020 12:33:22 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:23458 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725877AbgDQQdW (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 17 Apr 2020 12:33:22 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 03HGVmZJ096168;
+        Fri, 17 Apr 2020 12:33:21 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 30ff1u21fe-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 17 Apr 2020 12:33:21 -0400
+Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 03HGWY5T101876;
+        Fri, 17 Apr 2020 12:33:21 -0400
+Received: from ppma04wdc.us.ibm.com (1a.90.2fa9.ip4.static.sl-reverse.com [169.47.144.26])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 30ff1u21ew-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 17 Apr 2020 12:33:21 -0400
+Received: from pps.filterd (ppma04wdc.us.ibm.com [127.0.0.1])
+        by ppma04wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 03HGWUeL032582;
+        Fri, 17 Apr 2020 16:33:19 GMT
+Received: from b01cxnp22033.gho.pok.ibm.com (b01cxnp22033.gho.pok.ibm.com [9.57.198.23])
+        by ppma04wdc.us.ibm.com with ESMTP id 30b5h7bm5w-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 17 Apr 2020 16:33:19 +0000
+Received: from b01ledav002.gho.pok.ibm.com (b01ledav002.gho.pok.ibm.com [9.57.199.107])
+        by b01cxnp22033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 03HGXJOY47972690
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 17 Apr 2020 16:33:19 GMT
+Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5DEA2124055;
+        Fri, 17 Apr 2020 16:33:19 +0000 (GMT)
+Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C2DF2124054;
+        Fri, 17 Apr 2020 16:33:18 +0000 (GMT)
+Received: from [9.160.33.156] (unknown [9.160.33.156])
+        by b01ledav002.gho.pok.ibm.com (Postfix) with ESMTP;
+        Fri, 17 Apr 2020 16:33:18 +0000 (GMT)
+Subject: Re: [PATCH] vfio-ccw: document possible errors
+To:     Cornelia Huck <cohuck@redhat.com>,
+        Halil Pasic <pasic@linux.ibm.com>
+Cc:     linux-s390@vger.kernel.org, kvm@vger.kernel.org
+References: <20200407111605.1795-1-cohuck@redhat.com>
+From:   Eric Farman <farman@linux.ibm.com>
+Message-ID: <55932365-3d36-1629-5d65-06c71e8231f9@linux.ibm.com>
+Date:   Fri, 17 Apr 2020 12:33:18 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20200417083319.3066217-3-maz@kernel.org>
+In-Reply-To: <20200407111605.1795-1-cohuck@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.676
+ definitions=2020-04-17_07:2020-04-17,2020-04-17 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ priorityscore=1501 spamscore=0 impostorscore=0 bulkscore=0 phishscore=0
+ suspectscore=0 mlxlogscore=999 malwarescore=0 adultscore=0 clxscore=1015
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2004170128
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 17/04/2020 09:33, Marc Zyngier wrote:
-> When a guest tries to read the active state of its interrupts,
-> we currently just return whatever state we have in memory. This
-> means that if such an interrupt lives in a List Register on another
-> CPU, we fail to obsertve the latest active state for this interrupt.
-> 
-> In order to remedy this, stop all the other vcpus so that they exit
-> and we can observe the most recent value for the state. This is
-> similar to what we are doing for the write side of the same
-> registers, and results in new MMIO handlers for userspace (which
-> do not need to stop the guest, as it is supposed to be stopped
-> already).
 
-Thanks for the changes! Checked for other users of VGIC_NR_PRIVATE_IRQS,
-also for not missing other ACTIVE bit register handlers.
-Looks good to me!
+
+On 4/7/20 7:16 AM, Cornelia Huck wrote:
+> Interacting with the I/O and the async regions can yield a number
+> of errors, which had been undocumented so far. These are part of
+> the api, so remedy that.
+
+(Makes a note to myself, to do the same for the schib/crw regions we're
+adding for channel path handling.)
 
 > 
-> Reported-by: Julien Grall <julien@xen.org>
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-
-Reviewed-by: Andre Przywara <andre.przywara@arm.com>
-
-Cheers,
-Andre
-
+> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 > ---
->  virt/kvm/arm/vgic/vgic-mmio-v2.c |   4 +-
->  virt/kvm/arm/vgic/vgic-mmio-v3.c |  12 ++--
->  virt/kvm/arm/vgic/vgic-mmio.c    | 100 ++++++++++++++++++++-----------
->  virt/kvm/arm/vgic/vgic-mmio.h    |   3 +
->  4 files changed, 75 insertions(+), 44 deletions(-)
+>  Documentation/s390/vfio-ccw.rst | 54 ++++++++++++++++++++++++++++++++-
+>  1 file changed, 53 insertions(+), 1 deletion(-)
 > 
-> diff --git a/virt/kvm/arm/vgic/vgic-mmio-v2.c b/virt/kvm/arm/vgic/vgic-mmio-v2.c
-> index 5945f062d749..d63881f60e1a 100644
-> --- a/virt/kvm/arm/vgic/vgic-mmio-v2.c
-> +++ b/virt/kvm/arm/vgic/vgic-mmio-v2.c
-> @@ -422,11 +422,11 @@ static const struct vgic_register_region vgic_v2_dist_registers[] = {
->  		VGIC_ACCESS_32bit),
->  	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_ACTIVE_SET,
->  		vgic_mmio_read_active, vgic_mmio_write_sactive,
-> -		NULL, vgic_mmio_uaccess_write_sactive, 1,
-> +		vgic_uaccess_read_active, vgic_mmio_uaccess_write_sactive, 1,
->  		VGIC_ACCESS_32bit),
->  	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_ACTIVE_CLEAR,
->  		vgic_mmio_read_active, vgic_mmio_write_cactive,
-> -		NULL, vgic_mmio_uaccess_write_cactive, 1,
-> +		vgic_uaccess_read_active, vgic_mmio_uaccess_write_cactive, 1,
->  		VGIC_ACCESS_32bit),
->  	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_PRI,
->  		vgic_mmio_read_priority, vgic_mmio_write_priority, NULL, NULL,
-> diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-> index e72dcc454247..f2b37a081f26 100644
-> --- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
-> +++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-> @@ -553,11 +553,11 @@ static const struct vgic_register_region vgic_v3_dist_registers[] = {
->  		VGIC_ACCESS_32bit),
->  	REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_ISACTIVER,
->  		vgic_mmio_read_active, vgic_mmio_write_sactive,
-> -		NULL, vgic_mmio_uaccess_write_sactive, 1,
-> +		vgic_uaccess_read_active, vgic_mmio_uaccess_write_sactive, 1,
->  		VGIC_ACCESS_32bit),
->  	REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_ICACTIVER,
->  		vgic_mmio_read_active, vgic_mmio_write_cactive,
-> -		NULL, vgic_mmio_uaccess_write_cactive,
-> +		vgic_uaccess_read_active, vgic_mmio_uaccess_write_cactive,
->  		1, VGIC_ACCESS_32bit),
->  	REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_IPRIORITYR,
->  		vgic_mmio_read_priority, vgic_mmio_write_priority, NULL, NULL,
-> @@ -625,12 +625,12 @@ static const struct vgic_register_region vgic_v3_rd_registers[] = {
->  		VGIC_ACCESS_32bit),
->  	REGISTER_DESC_WITH_LENGTH_UACCESS(SZ_64K + GICR_ISACTIVER0,
->  		vgic_mmio_read_active, vgic_mmio_write_sactive,
-> -		NULL, vgic_mmio_uaccess_write_sactive,
-> -		4, VGIC_ACCESS_32bit),
-> +		vgic_uaccess_read_active, vgic_mmio_uaccess_write_sactive, 4,
-> +		VGIC_ACCESS_32bit),
->  	REGISTER_DESC_WITH_LENGTH_UACCESS(SZ_64K + GICR_ICACTIVER0,
->  		vgic_mmio_read_active, vgic_mmio_write_cactive,
-> -		NULL, vgic_mmio_uaccess_write_cactive,
-> -		4, VGIC_ACCESS_32bit),
-> +		vgic_uaccess_read_active, vgic_mmio_uaccess_write_cactive, 4,
-> +		VGIC_ACCESS_32bit),
->  	REGISTER_DESC_WITH_LENGTH(SZ_64K + GICR_IPRIORITYR0,
->  		vgic_mmio_read_priority, vgic_mmio_write_priority, 32,
->  		VGIC_ACCESS_32bit | VGIC_ACCESS_8bit),
-> diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
-> index d085e047953f..b38e94e8f74a 100644
-> --- a/virt/kvm/arm/vgic/vgic-mmio.c
-> +++ b/virt/kvm/arm/vgic/vgic-mmio.c
-> @@ -348,8 +348,39 @@ void vgic_mmio_write_cpending(struct kvm_vcpu *vcpu,
->  	}
->  }
+> diff --git a/Documentation/s390/vfio-ccw.rst b/Documentation/s390/vfio-ccw.rst
+> index fca9c4f5bd9c..4538215a362c 100644
+> --- a/Documentation/s390/vfio-ccw.rst
+> +++ b/Documentation/s390/vfio-ccw.rst
+> @@ -210,7 +210,36 @@ Subchannel.
 >  
-> -unsigned long vgic_mmio_read_active(struct kvm_vcpu *vcpu,
-> -				    gpa_t addr, unsigned int len)
+>  irb_area stores the I/O result.
+>  
+> -ret_code stores a return code for each access of the region.
+> +ret_code stores a return code for each access of the region. The following
+> +values may occur:
 > +
-> +/*
-> + * If we are fiddling with an IRQ's active state, we have to make sure the IRQ
-> + * is not queued on some running VCPU's LRs, because then the change to the
-> + * active state can be overwritten when the VCPU's state is synced coming back
-> + * from the guest.
-> + *
-> + * For shared interrupts as well as GICv3 private interrupts, we have to
-> + * stop all the VCPUs because interrupts can be migrated while we don't hold
-> + * the IRQ locks and we don't want to be chasing moving targets.
-> + *
-> + * For GICv2 private interrupts we don't have to do anything because
-> + * userspace accesses to the VGIC state already require all VCPUs to be
-> + * stopped, and only the VCPU itself can modify its private interrupts
-> + * active state, which guarantees that the VCPU is not running.
-> + */
-> +static void vgic_access_active_prepare(struct kvm_vcpu *vcpu, u32 intid)
-> +{
-> +	if (vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3 ||
-> +	    intid >= VGIC_NR_PRIVATE_IRQS)
-> +		kvm_arm_halt_guest(vcpu->kvm);
-> +}
+> +``0``
+> +  The operation was successful.
 > +
-> +/* See vgic_access_active_prepare */
-> +static void vgic_access_active_finish(struct kvm_vcpu *vcpu, u32 intid)
-> +{
-> +	if (vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3 ||
-> +	    intid >= VGIC_NR_PRIVATE_IRQS)
-> +		kvm_arm_resume_guest(vcpu->kvm);
-> +}
+> +``-EOPNOTSUPP``
+> +  The orb specified transport mode or an unidentified IDAW format, did not
+> +  specify prefetch mode, or the scsw specified a function other than the
+> +  start function.
 > +
-> +static unsigned long __vgic_mmio_read_active(struct kvm_vcpu *vcpu,
-> +					     gpa_t addr, unsigned int len)
->  {
->  	u32 intid = VGIC_ADDR_TO_INTID(addr, 1);
->  	u32 value = 0;
-> @@ -359,6 +390,10 @@ unsigned long vgic_mmio_read_active(struct kvm_vcpu *vcpu,
->  	for (i = 0; i < len * 8; i++) {
->  		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
->  
-> +		/*
-> +		 * Even for HW interrupts, don't evaluate the HW state as
-> +		 * all the guest is interested in is the virtual state.
-> +		 */
->  		if (irq->active)
->  			value |= (1U << i);
->  
-> @@ -368,6 +403,29 @@ unsigned long vgic_mmio_read_active(struct kvm_vcpu *vcpu,
->  	return value;
->  }
->  
-> +unsigned long vgic_mmio_read_active(struct kvm_vcpu *vcpu,
-> +				    gpa_t addr, unsigned int len)
-> +{
-> +	u32 intid = VGIC_ADDR_TO_INTID(addr, 1);
-> +	u32 val;
+> +``-EIO``
+> +  A request was issued while the device was not in a state ready to accept
+> +  requests, or an internal error occurred.
 > +
-> +	mutex_lock(&vcpu->kvm->lock);
-> +	vgic_access_active_prepare(vcpu, intid);
+> +``-EBUSY``
+> +  The subchannel was status pending or busy, or a request is already active.
 > +
-> +	val = __vgic_mmio_read_active(vcpu, addr, len);
+> +``-EAGAIN``
+> +  A request was being processed, and the caller should retry.
 > +
-> +	vgic_access_active_finish(vcpu, intid);
-> +	mutex_unlock(&vcpu->kvm->lock);
+> +``-EACCES``
+> +  The channel path(s) used for the I/O were found to be not operational.
 > +
-> +	return val;
-> +}
+> +``-ENODEV``
+> +  The device was found to be not operational.
 > +
-> +unsigned long vgic_uaccess_read_active(struct kvm_vcpu *vcpu,
-> +				    gpa_t addr, unsigned int len)
-> +{
-> +	return __vgic_mmio_read_active(vcpu, addr, len);
-> +}
-> +
->  /* Must be called with irq->irq_lock held */
->  static void vgic_hw_irq_change_active(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
->  				      bool active, bool is_uaccess)
-> @@ -426,36 +484,6 @@ static void vgic_mmio_change_active(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
->  		raw_spin_unlock_irqrestore(&irq->irq_lock, flags);
->  }
+> +``-EINVAL``
+> +  The orb specified a chain longer than 255 ccws, or an internal error
+> +  occurred.
 >  
-> -/*
-> - * If we are fiddling with an IRQ's active state, we have to make sure the IRQ
-> - * is not queued on some running VCPU's LRs, because then the change to the
-> - * active state can be overwritten when the VCPU's state is synced coming back
-> - * from the guest.
-> - *
-> - * For shared interrupts, we have to stop all the VCPUs because interrupts can
-> - * be migrated while we don't hold the IRQ locks and we don't want to be
-> - * chasing moving targets.
-> - *
-> - * For private interrupts we don't have to do anything because userspace
-> - * accesses to the VGIC state already require all VCPUs to be stopped, and
-> - * only the VCPU itself can modify its private interrupts active state, which
-> - * guarantees that the VCPU is not running.
-> - */
-> -static void vgic_change_active_prepare(struct kvm_vcpu *vcpu, u32 intid)
-> -{
-> -	if (vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3 ||
-> -	    intid >= VGIC_NR_PRIVATE_IRQS)
-> -		kvm_arm_halt_guest(vcpu->kvm);
-> -}
-> -
-> -/* See vgic_change_active_prepare */
-> -static void vgic_change_active_finish(struct kvm_vcpu *vcpu, u32 intid)
-> -{
-> -	if (vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3 ||
-> -	    intid >= VGIC_NR_PRIVATE_IRQS)
-> -		kvm_arm_resume_guest(vcpu->kvm);
-> -}
-> -
->  static void __vgic_mmio_write_cactive(struct kvm_vcpu *vcpu,
->  				      gpa_t addr, unsigned int len,
->  				      unsigned long val)
-> @@ -477,11 +505,11 @@ void vgic_mmio_write_cactive(struct kvm_vcpu *vcpu,
->  	u32 intid = VGIC_ADDR_TO_INTID(addr, 1);
->  
->  	mutex_lock(&vcpu->kvm->lock);
-> -	vgic_change_active_prepare(vcpu, intid);
-> +	vgic_access_active_prepare(vcpu, intid);
->  
->  	__vgic_mmio_write_cactive(vcpu, addr, len, val);
->  
-> -	vgic_change_active_finish(vcpu, intid);
-> +	vgic_access_active_finish(vcpu, intid);
->  	mutex_unlock(&vcpu->kvm->lock);
->  }
->  
-> @@ -514,11 +542,11 @@ void vgic_mmio_write_sactive(struct kvm_vcpu *vcpu,
->  	u32 intid = VGIC_ADDR_TO_INTID(addr, 1);
->  
->  	mutex_lock(&vcpu->kvm->lock);
-> -	vgic_change_active_prepare(vcpu, intid);
-> +	vgic_access_active_prepare(vcpu, intid);
->  
->  	__vgic_mmio_write_sactive(vcpu, addr, len, val);
->  
-> -	vgic_change_active_finish(vcpu, intid);
-> +	vgic_access_active_finish(vcpu, intid);
->  	mutex_unlock(&vcpu->kvm->lock);
->  }
->  
-> diff --git a/virt/kvm/arm/vgic/vgic-mmio.h b/virt/kvm/arm/vgic/vgic-mmio.h
-> index 5af2aefad435..30713a44e3fa 100644
-> --- a/virt/kvm/arm/vgic/vgic-mmio.h
-> +++ b/virt/kvm/arm/vgic/vgic-mmio.h
-> @@ -152,6 +152,9 @@ void vgic_mmio_write_cpending(struct kvm_vcpu *vcpu,
->  unsigned long vgic_mmio_read_active(struct kvm_vcpu *vcpu,
->  				    gpa_t addr, unsigned int len);
->  
-> +unsigned long vgic_uaccess_read_active(struct kvm_vcpu *vcpu,
-> +				    gpa_t addr, unsigned int len);
-> +
->  void vgic_mmio_write_cactive(struct kvm_vcpu *vcpu,
->  			     gpa_t addr, unsigned int len,
->  			     unsigned long val);
-> 
+>  This region is always available.
 
+Maybe move this little line up between the struct layout and "While
+starting an I/O request, orb_area ..." instead of being lost way down here?
+
+But other than that suggestion, everything looks fine.
+
+Reviewed-by: Eric Farman <farman@linux.ibm.com>
+
+>  
+> @@ -231,6 +260,29 @@ This region is exposed via region type VFIO_REGION_SUBTYPE_CCW_ASYNC_CMD.
+>  
+>  Currently, CLEAR SUBCHANNEL and HALT SUBCHANNEL use this region.
+>  
+> +command specifies the command to be issued; ret_code stores a return code
+> +for each access of the region. The following values may occur:
+> +
+> +``0``
+> +  The operation was successful.
+> +
+> +``-ENODEV``
+> +  The device was found to be not operational.
+> +
+> +``-EINVAL``
+> +  A command other than halt or clear was specified.
+> +
+> +``-EIO``
+> +  A request was issued while the device was not in a state ready to accept
+> +  requests.
+> +
+> +``-EAGAIN``
+> +  A request was being processed, and the caller should retry.
+> +
+> +``-EBUSY``
+> +  The subchannel was status pending or busy while processing a halt request.
+> +
+> +
+>  vfio-ccw operation details
+>  --------------------------
+>  
+> 
