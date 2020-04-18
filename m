@@ -2,105 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7D02C1AEB83
-	for <lists+kvm@lfdr.de>; Sat, 18 Apr 2020 11:56:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 78F591AEBAF
+	for <lists+kvm@lfdr.de>; Sat, 18 Apr 2020 12:23:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725891AbgDRJ4D (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 18 Apr 2020 05:56:03 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:56731 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1725857AbgDRJ4D (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 18 Apr 2020 05:56:03 -0400
+        id S1726117AbgDRKXf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 18 Apr 2020 06:23:35 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:28293 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725903AbgDRKWi (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sat, 18 Apr 2020 06:22:38 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1587203761;
+        s=mimecast20190719; t=1587205352;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=wTcRkdSTcnogmYKb1vyPZlIFr7BRZzMxTKvCBHcehjE=;
-        b=EqcBmgf0Ge4kIAAnwN/8jX52eNtHu/Cs2UUVZtgA0XKikaClwVhK1O9v5HmMcllv5a6q6b
-        GGEWqStR4oNM+TE84hzS0CdswCyM92GIvFhol6X5QOy/0S27KVoV535FCxUfISELblySuD
-        blVyFSBYz0s1ePzVUZXSut4NLIXVOdY=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-262-TiRftLzYPTeewKywJP4G5g-1; Sat, 18 Apr 2020 05:55:59 -0400
-X-MC-Unique: TiRftLzYPTeewKywJP4G5g-1
-Received: by mail-wr1-f69.google.com with SMTP id g7so1547881wrw.18
-        for <kvm@vger.kernel.org>; Sat, 18 Apr 2020 02:55:58 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=wTcRkdSTcnogmYKb1vyPZlIFr7BRZzMxTKvCBHcehjE=;
-        b=Bi5WiO18SFfpm/7rlWU0H3hekavS55DMCWlHp74JHcQGm0ut2IiPmrK9sCcxFmo+A9
-         KB4u0GQmR/xhwblznja3MDdZToHzuf3gdg+Do6xhp9sps3MV0hdoJrMGrOTFuKIIJcM4
-         IdwScNRk+btcEfeAAwXrkCr3fgV4v/+qVIpt15q8GURJ6oEwrbO9HZ9C9EN/tGtjvTaR
-         Kd0Khfu26rj6SNP0upP2gv6kK7qYrArl81stslYYPK1T8VNSUxXzQHYyH8GlEGCwZaJT
-         /N7YF6qemHdvm37yUQlo7d8F7qa0BOHBpo90pqBNw+JD5Gdtv3o5RrycvQztcekPK+BH
-         QH4w==
-X-Gm-Message-State: AGi0PuZ1kfDM0AsYiu4p02jTkdeCNefYN+K/0XyA/y/Q1vjqkm2Dv3I1
-        TLUTERUsFiQ464hTenhvxccMN2PVyIX3aGkVv957waMqRVG4WtkzupFIXZ+es0/cg4d1KWtusig
-        E2k9kHu1el2Dj
-X-Received: by 2002:a5d:5651:: with SMTP id j17mr8094494wrw.406.1587203757741;
-        Sat, 18 Apr 2020 02:55:57 -0700 (PDT)
-X-Google-Smtp-Source: APiQypKaFYVKYrHh6jgP/k8hU9lt1vzMRnvu1GNp+mZ/1QD5M7AdEyKXjR5tLK6F6ffWE/fvI94HJg==
-X-Received: by 2002:a5d:5651:: with SMTP id j17mr8094485wrw.406.1587203757516;
-        Sat, 18 Apr 2020 02:55:57 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:e04c:97cb:a127:17b6? ([2001:b07:6468:f312:e04c:97cb:a127:17b6])
-        by smtp.gmail.com with ESMTPSA id g15sm12971965wrp.96.2020.04.18.02.55.56
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 18 Apr 2020 02:55:57 -0700 (PDT)
-Subject: Re: [PATCH 0/3] KVM: x86: move nested-related kvm_x86_ops to a
- separate struct
-To:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Peter Xu <peterx@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Vitaly Kuznetsov <vkuznets@redhat.com>
-References: <20200417164413.71885-1-pbonzini@redhat.com>
- <20200417190553.GI287932@xz-x1> <20200417191159.GA14609@linux.intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <4c69d11e-40ab-fdb8-6f32-fdf7298d1277@redhat.com>
-Date:   Sat, 18 Apr 2020 11:55:56 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+         content-transfer-encoding:content-transfer-encoding;
+        bh=1YUNj0J7TkJiSbunnXUbMtu2GWAgY2j7p/Zlm7bbq2k=;
+        b=CE1Q/Z9Qv+jRm71HhrdWp1SfeALjhMN/yBtVANoo2dHinoqeegaC1CfZ6zCmwmA5uYZ6Nj
+        rTdSIMrEfiKhyogjRCF0duA2qLgTJLBkcKjSesM7m/W2mOtYvwZ06kAKYQ8XIoT07jFfK8
+        taFTaVmWCLwSuRz00WyHFkW43CCCnzE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-392-hFGc7cjiNHuGB6rKmK9-Hg-1; Sat, 18 Apr 2020 06:22:29 -0400
+X-MC-Unique: hFGc7cjiNHuGB6rKmK9-Hg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AD31418B9FC1;
+        Sat, 18 Apr 2020 10:22:26 +0000 (UTC)
+Received: from eperezma.remote.csb (ovpn-112-94.ams2.redhat.com [10.36.112.94])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 296401000325;
+        Sat, 18 Apr 2020 10:22:21 +0000 (UTC)
+From:   =?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        =?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        kvm list <kvm@vger.kernel.org>,
+        Stephen Rothwell <sfr@canb.auug.org.au>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>
+Subject: [PATCH v3 0/8] tools/vhost: Reset virtqueue on tests
+Date:   Sat, 18 Apr 2020 12:22:09 +0200
+Message-Id: <20200418102217.32327-1-eperezma@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200417191159.GA14609@linux.intel.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 17/04/20 21:11, Sean Christopherson wrote:
-> Ya, my vote would be to copy by value as well.
+This series add tests used to validate the "vhost: Reset batched
+descriptors on SET_VRING_BASE call" series, with a few minor updates of
+them.
 
-I'd rather avoid useless churn, because
+They are based on the tests sent back them, the ones that were not
+included (reasons in that thread). This series changes:
 
-	vmx_x86_ops.nested = vmx_nested_ops;
+* Delete need to export the ugly function in virtio_ring, now all the
+code is added in tools/virtio (except the one line fix).
+* Add forgotten uses of vhost_vq_set_backend. Fix bad usage order in
+vhost_test_set_backend.
+* Drop random reset, not really needed.
+* Minor changes.
 
-is much uglier than
+The first patch of this patchset ("vhost: Not cleaning batched descs in
+VHOST_SET_VRING_BASE ioctl") should be squashed with ("vhost: batching
+fetches") (currenlty, commit e7539c20a4a60b3a1bda3e7218c0d2a20669f357
+in mst repository vhost branch).
 
-	.nested = &vmx_nested_ops,
+Thanks!
 
-and with static calls the latter would not have any performance downside.
+Changes from v2:
+* Squashed commits with fixes.
+* Back to plain vring_*
 
-> I'd also be in favor of
-> dropping the _ops part, e.g.
-> 
->   struct kvm_x86_ops {
->         struct kvm_x86_nested_ops nested;
-> 
->         ...
->   };
-> 
-> and drop the "nested" parts from the ops, e.g.
-> 
->   check_nested_events() -> check_events()
+Changes from v1:
+* Different base, since branch was force-pushed.
+* Using new vring_legacy_*, as base uses them now.
 
-Agreed on both, I'll send v2 with these changes.
+This serie is meant to be applied on top of
+801f9bae9cf35b3192c3959d81a717e7985c64ed in
+git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git.
 
-Paolo
+Eugenio P=C3=A9rez (8):
+  vhost: Not cleaning batched descs in VHOST_SET_VRING_BASE ioctl
+  tools/virtio: Add --batch option
+  tools/virtio: Add --batch=3Drandom option
+  tools/virtio: Add --reset
+  tools/virtio: Use __vring_new_virtqueue in virtio_test.c
+  tools/virtio: Extract virtqueue initialization in vq_reset
+  tools/virtio: Reset index in virtio_test --reset.
+  tools/virtio: Use tools/include/list.h instead of stubs
+
+ drivers/vhost/test.c        |  57 +++++++++++++++
+ drivers/vhost/test.h        |   1 +
+ drivers/vhost/vhost.c       |   1 -
+ tools/virtio/linux/kernel.h |   7 +-
+ tools/virtio/linux/virtio.h |   5 +-
+ tools/virtio/virtio_test.c  | 139 ++++++++++++++++++++++++++++++------
+ tools/virtio/vringh_test.c  |   2 +
+ 7 files changed, 182 insertions(+), 30 deletions(-)
+
+--=20
+2.18.1
 
