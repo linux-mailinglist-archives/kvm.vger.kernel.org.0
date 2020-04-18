@@ -2,95 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8D6D01AEFF2
-	for <lists+kvm@lfdr.de>; Sat, 18 Apr 2020 16:48:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 54F771AF561
+	for <lists+kvm@lfdr.de>; Sun, 19 Apr 2020 00:28:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728993AbgDROqW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 18 Apr 2020 10:46:22 -0400
-Received: from mail.kernel.org ([198.145.29.99]:56402 "EHLO mail.kernel.org"
+        id S1728213AbgDRW2B convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Sat, 18 Apr 2020 18:28:01 -0400
+Received: from mail.kernel.org ([198.145.29.99]:33596 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728843AbgDROof (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 18 Apr 2020 10:44:35 -0400
-Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 5163821D7E;
-        Sat, 18 Apr 2020 14:44:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1587221075;
-        bh=92K4sYyJX2nuu/QY6lRNuW3Dtel+j8HTcWb8sapOPos=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=p4CRANnsKvO6UvoGP/xVSOsRCOLGlHrCeJK9yrSKupM+zVR5+R6SDA01QwHwmPt0U
-         pl6fxITlPebwXlX9xQBvymFMq/84D0d5dOlVkwRdS+yv8uykNRH/izJauHcZ6IupaD
-         wN0kn01k6bKr2P3ODFnQKxFLsJDUU33L2RYEGYmE=
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     David Hildenbrand <david@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.9 23/23] KVM: s390: vsie: Fix delivery of addressing exceptions
-Date:   Sat, 18 Apr 2020 10:44:05 -0400
-Message-Id: <20200418144405.10565-23-sashal@kernel.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200418144405.10565-1-sashal@kernel.org>
-References: <20200418144405.10565-1-sashal@kernel.org>
+        id S1726887AbgDRW2B (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 18 Apr 2020 18:28:01 -0400
+From:   bugzilla-daemon@bugzilla.kernel.org
+Authentication-Results: mail.kernel.org; dkim=permerror (bad message/signature format)
+To:     kvm@vger.kernel.org
+Subject: [Bug 206579] KVM with passthrough generates "BUG: kernel NULL
+ pointer dereference" and crashes
+Date:   Sat, 18 Apr 2020 22:28:00 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: anthonysanwo@googlemail.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-206579-28872-nMzCacfsoo@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-206579-28872@https.bugzilla.kernel.org/>
+References: <bug-206579-28872@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: David Hildenbrand <david@redhat.com>
+https://bugzilla.kernel.org/show_bug.cgi?id=206579
 
-[ Upstream commit 4d4cee96fb7a3cc53702a9be8299bf525be4ee98 ]
+--- Comment #59 from Anthony (anthonysanwo@googlemail.com) ---
+(In reply to muncrief from comment #57)
+> I just compiled and installed 5.7-rc1 and according to "perf kvm stat live"
+> AVIC is not working at all again. I wasn't able to apply the normal patches
+> because the code directory structure has changed, so this is just a raw
+> compile from git.
+> 
+> My VM hasn't changed from Comment 51. So are there new patches I'm supposed
+> to apply, or changes that need to be made to my XML? Or is AVIC in an
+> interim dysfunctional state in 5.7-rc1?
 
-Whenever we get an -EFAULT, we failed to read in guest 2 physical
-address space. Such addressing exceptions are reported via a program
-intercept to the nested hypervisor.
+Have you tried using perf top? I have found this to be the most reliable way to
+know AVIC is working as it shows the kernel functions being used. perf stat
+live only shows vmexits by default which isn't always easy to know for sure
+AVIC is activate. sudo perf stat -e 'kvm:*' -a -- sleep 1 helps to check if
+it's working optimally as it gives you counter of all kvm related vmexits that
+happen after 1 second.
 
-We faked the intercept, we have to return to guest 2. Instead, right
-now we would be returning -EFAULT from the intercept handler, eventually
-crashing the VM.
-the correct thing to do is to return 1 as rc == 1 is the internal
-representation of "we have to go back into g2".
+You can do so with the below command -
 
-Addressing exceptions can only happen if the g2->g3 page tables
-reference invalid g2 addresses (say, either a table or the final page is
-not accessible - so something that basically never happens in sane
-environments.
+sudo perf kvm --host top --kallsyms=/proc/kallsyms -gp `pidof
+qemu-system-x86_64`
 
-Identified by manual code inspection.
+It might not resolve the symbols the first time. Easy way to check is by
+searching for "svm" using "\". If you get no results exit with "Esc" or "Ctrl +
+C" and try again.The other reason might be your kernel doesn't have
+CONFIG_KALLSYMS enabled.
 
-Fixes: a3508fbe9dc6 ("KVM: s390: vsie: initial support for nested virtualization")
-Cc: <stable@vger.kernel.org> # v4.8+
-Signed-off-by: David Hildenbrand <david@redhat.com>
-Link: https://lore.kernel.org/r/20200403153050.20569-3-david@redhat.com
-Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
-[borntraeger@de.ibm.com: fix patch description]
-Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- arch/s390/kvm/vsie.c | 1 +
- 1 file changed, 1 insertion(+)
+You can use "h" to bring up the help menu for other commands.
 
-diff --git a/arch/s390/kvm/vsie.c b/arch/s390/kvm/vsie.c
-index da246d95b87c1..d3f046eca7db9 100644
---- a/arch/s390/kvm/vsie.c
-+++ b/arch/s390/kvm/vsie.c
-@@ -947,6 +947,7 @@ static int vsie_run(struct kvm_vcpu *vcpu, struct vsie_page *vsie_page)
- 		scb_s->iprcc = PGM_ADDRESSING;
- 		scb_s->pgmilc = 4;
- 		scb_s->gpsw.addr = __rewind_psw(scb_s->gpsw, 4);
-+		rc = 1;
- 	}
- 	return rc;
- }
+To see if SVM AVIC is working you want to search for it should return something
+like what I posted in comment 49/50.
+
+   0.61%  [kvm_amd]  [k] svm_deliver_avic_intr
+   0.05%  [kvm_amd]  [k] avic_vcpu_put.part.0
+   0.02%  [kvm_amd]  [k] avic_vcpu_load
+
+And for IOMMU AVIC -
+   2.83%  [kernel]  [k] iommu_completion_wait
+   0.87%  [kernel]  [k] __iommu_queue_command_sync
+   0.16%  [kernel]  [k] amd_iommu_update_ga
+   0.03%  [kernel]  [k] iommu_flush_irt
+
+As far as Linux 5.7-rc1 AVIC is working as described in comment 55 including
+when tested with the patch that fixes IOMMU AVIC on windows.
+
 -- 
-2.20.1
-
+You are receiving this mail because:
+You are watching the assignee of the bug.
