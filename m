@@ -2,148 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8A2A41AEBB4
-	for <lists+kvm@lfdr.de>; Sat, 18 Apr 2020 12:24:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AAF2E1AED74
+	for <lists+kvm@lfdr.de>; Sat, 18 Apr 2020 15:52:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726086AbgDRKXy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 18 Apr 2020 06:23:54 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:23898 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726083AbgDRKXC (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sat, 18 Apr 2020 06:23:02 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1587205381;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=yMmscrcPxrNtAuLRokAXM6YRXQcJoZNIY/bvDej50a4=;
-        b=UM/64TOBWv6n4kzr/K8GgKbLraMN0myoxwShKCZBy6v8AliA1n0NWVZfAlCtajvqBYpq6h
-        iTBQi0fBJ/MazNMIDQQGreSh11g1rzsnJDtSk4Ibu4ahoXODInyjGY29owqhipeoZjvoEs
-        I/YFERJvWExPPxR8s7WYddO7wKME18o=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-152-dY7kaFdrOMSwWQ2TvupALw-1; Sat, 18 Apr 2020 06:22:56 -0400
-X-MC-Unique: dY7kaFdrOMSwWQ2TvupALw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S1726726AbgDRNwH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 18 Apr 2020 09:52:07 -0400
+Received: from mail.kernel.org ([198.145.29.99]:55650 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726654AbgDRNs5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 18 Apr 2020 09:48:57 -0400
+Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8676F1005509;
-        Sat, 18 Apr 2020 10:22:55 +0000 (UTC)
-Received: from eperezma.remote.csb (ovpn-112-94.ams2.redhat.com [10.36.112.94])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 320621000325;
-        Sat, 18 Apr 2020 10:22:52 +0000 (UTC)
-From:   =?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        =?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
+        by mail.kernel.org (Postfix) with ESMTPSA id 5581421D7E;
+        Sat, 18 Apr 2020 13:48:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1587217737;
+        bh=1pQapq9m3603xrXiSN4BF3wGZPcBk5uTiJAJZ3h1E+A=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=TAwvHTQdJZG7qxmET/gQk+u6Ndlxn69kGa1ZtdgHZLBIp3GMSgL0S5gH5A/qepm9C
+         QLWB9LCR3NgVp/821f6rME4JRgTtz/6Kl3gYYlJcKwKdFFjbGZIteFpFZcb3hKua7I
+         O60QpjerqWHZ7XEV4T6NIU0Pe8el9mo1mXYH54vo=
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     David Hildenbrand <david@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
         Christian Borntraeger <borntraeger@de.ibm.com>,
-        kvm list <kvm@vger.kernel.org>,
-        Stephen Rothwell <sfr@canb.auug.org.au>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>
-Subject: [PATCH v3 8/8] tools/virtio: Use tools/include/list.h instead of stubs
-Date:   Sat, 18 Apr 2020 12:22:17 +0200
-Message-Id: <20200418102217.32327-9-eperezma@redhat.com>
-In-Reply-To: <20200418102217.32327-1-eperezma@redhat.com>
-References: <20200418102217.32327-1-eperezma@redhat.com>
+        Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.6 33/73] KVM: s390: vsie: Fix possible race when shadowing region 3 tables
+Date:   Sat, 18 Apr 2020 09:47:35 -0400
+Message-Id: <20200418134815.6519-33-sashal@kernel.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200418134815.6519-1-sashal@kernel.org>
+References: <20200418134815.6519-1-sashal@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Content-Transfer-Encoding: quoted-printable
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-It should not make any significant difference but reduce stub code.
+From: David Hildenbrand <david@redhat.com>
 
-Signed-off-by: Eugenio P=C3=A9rez <eperezma@redhat.com>
+[ Upstream commit 1493e0f944f3c319d11e067c185c904d01c17ae5 ]
+
+We have to properly retry again by returning -EINVAL immediately in case
+somebody else instantiated the table concurrently. We missed to add the
+goto in this function only. The code now matches the other, similar
+shadowing functions.
+
+We are overwriting an existing region 2 table entry. All allocated pages
+are added to the crst_list to be freed later, so they are not lost
+forever. However, when unshadowing the region 2 table, we wouldn't trigger
+unshadowing of the original shadowed region 3 table that we replaced. It
+would get unshadowed when the original region 3 table is modified. As it's
+not connected to the page table hierarchy anymore, it's not going to get
+used anymore. However, for a limited time, this page table will stick
+around, so it's in some sense a temporary memory leak.
+
+Identified by manual code inspection. I don't think this classifies as
+stable material.
+
+Fixes: 998f637cc4b9 ("s390/mm: avoid races on region/segment/page table shadowing")
+Signed-off-by: David Hildenbrand <david@redhat.com>
+Link: https://lore.kernel.org/r/20200403153050.20569-4-david@redhat.com
+Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
+Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- tools/virtio/linux/kernel.h | 7 +------
- tools/virtio/linux/virtio.h | 5 ++---
- tools/virtio/virtio_test.c  | 1 +
- tools/virtio/vringh_test.c  | 2 ++
- 4 files changed, 6 insertions(+), 9 deletions(-)
+ arch/s390/mm/gmap.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/tools/virtio/linux/kernel.h b/tools/virtio/linux/kernel.h
-index 6683b4a70b05..caab980211a6 100644
---- a/tools/virtio/linux/kernel.h
-+++ b/tools/virtio/linux/kernel.h
-@@ -11,6 +11,7 @@
-=20
- #include <linux/compiler.h>
- #include <linux/types.h>
-+#include <linux/list.h>
- #include <linux/printk.h>
- #include <linux/bug.h>
- #include <errno.h>
-@@ -135,10 +136,4 @@ static inline void free_page(unsigned long addr)
- 	(void) (&_min1 =3D=3D &_min2);		\
- 	_min1 < _min2 ? _min1 : _min2; })
-=20
--/* TODO: empty stubs for now. Broken but enough for virtio_ring.c */
--#define list_add_tail(a, b) do {} while (0)
--#define list_del(a) do {} while (0)
--#define list_for_each_entry(a, b, c) while (0)
--/* end of stubs */
--
- #endif /* KERNEL_H */
-diff --git a/tools/virtio/linux/virtio.h b/tools/virtio/linux/virtio.h
-index b751350d4ce8..5d90254ddae4 100644
---- a/tools/virtio/linux/virtio.h
-+++ b/tools/virtio/linux/virtio.h
-@@ -11,12 +11,11 @@ struct device {
- struct virtio_device {
- 	struct device dev;
- 	u64 features;
-+	struct list_head vqs;
- };
-=20
- struct virtqueue {
--	/* TODO: commented as list macros are empty stubs for now.
--	 * Broken but enough for virtio_ring.c
--	 * struct list_head list; */
-+	struct list_head list;
- 	void (*callback)(struct virtqueue *vq);
- 	const char *name;
- 	struct virtio_device *vdev;
-diff --git a/tools/virtio/virtio_test.c b/tools/virtio/virtio_test.c
-index 82902fc3ba2a..cb3f29c09aff 100644
---- a/tools/virtio/virtio_test.c
-+++ b/tools/virtio/virtio_test.c
-@@ -129,6 +129,7 @@ static void vdev_info_init(struct vdev_info* dev, uns=
-igned long long features)
- 	int r;
- 	memset(dev, 0, sizeof *dev);
- 	dev->vdev.features =3D features;
-+	INIT_LIST_HEAD(&dev->vdev.vqs);
- 	dev->buf_size =3D 1024;
- 	dev->buf =3D malloc(dev->buf_size);
- 	assert(dev->buf);
-diff --git a/tools/virtio/vringh_test.c b/tools/virtio/vringh_test.c
-index 293653463303..fa87b58bd5fa 100644
---- a/tools/virtio/vringh_test.c
-+++ b/tools/virtio/vringh_test.c
-@@ -307,6 +307,7 @@ static int parallel_test(u64 features,
- 		close(to_host[0]);
-=20
- 		gvdev.vdev.features =3D features;
-+		INIT_LIST_HEAD(&gvdev.vdev.vqs);
- 		gvdev.to_host_fd =3D to_host[1];
- 		gvdev.notifies =3D 0;
-=20
-@@ -453,6 +454,7 @@ int main(int argc, char *argv[])
-=20
- 	getrange =3D getrange_iov;
- 	vdev.features =3D 0;
-+	INIT_LIST_HEAD(&vdev.vqs);
-=20
- 	while (argv[1]) {
- 		if (strcmp(argv[1], "--indirect") =3D=3D 0)
---=20
-2.18.1
+diff --git a/arch/s390/mm/gmap.c b/arch/s390/mm/gmap.c
+index edcdca97e85ee..06d602c5ec7b7 100644
+--- a/arch/s390/mm/gmap.c
++++ b/arch/s390/mm/gmap.c
+@@ -1840,6 +1840,7 @@ int gmap_shadow_r3t(struct gmap *sg, unsigned long saddr, unsigned long r3t,
+ 		goto out_free;
+ 	} else if (*table & _REGION_ENTRY_ORIGIN) {
+ 		rc = -EAGAIN;		/* Race with shadow */
++		goto out_free;
+ 	}
+ 	crst_table_init(s_r3t, _REGION3_ENTRY_EMPTY);
+ 	/* mark as invalid as long as the parent table is not protected */
+-- 
+2.20.1
 
