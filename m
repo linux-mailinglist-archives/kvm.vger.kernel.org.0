@@ -2,27 +2,27 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 70A151AEE0D
-	for <lists+kvm@lfdr.de>; Sat, 18 Apr 2020 16:12:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 650091AF127
+	for <lists+kvm@lfdr.de>; Sat, 18 Apr 2020 16:55:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727806AbgDROK0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 18 Apr 2020 10:10:26 -0400
-Received: from mail.kernel.org ([198.145.29.99]:38522 "EHLO mail.kernel.org"
+        id S1728638AbgDROzC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 18 Apr 2020 10:55:02 -0400
+Received: from mail.kernel.org ([198.145.29.99]:50520 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727784AbgDROKZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 18 Apr 2020 10:10:25 -0400
+        id S1727941AbgDROlZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 18 Apr 2020 10:41:25 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 454A12220A;
-        Sat, 18 Apr 2020 14:10:24 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id D2F5022245;
+        Sat, 18 Apr 2020 14:41:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1587219025;
-        bh=Z7KdvEPwnuQWnkjL+BM3WAvJLHQISfNthr7UMBLVDas=;
+        s=default; t=1587220884;
+        bh=1pQapq9m3603xrXiSN4BF3wGZPcBk5uTiJAJZ3h1E+A=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=LPjHfaB6cbAYgyFxq46eK3590taEiut+Ul0PdN0HszhQAL5sbZEU09Aap1H6gupqF
-         yJVamQnH6cDO+/PvF5yL2BubSU3C+kDhtxDXDjoUskm51Vzd4fab6rp7AkuKmvh2Gc
-         vUcRFHPqCSwtX239jL1L5ePZWTJqvMEtTXB+GNdw=
+        b=0gZwiUwX+lnUePDlCUvK/58P+QNHuI8fpL+Peh5H7INT0o7NCqw3KMH26VSl2uJZi
+         KtU8rDLGjNwQrdeV1j50ifyxfxQ886gExMgZt14cUKuIoViyQCon8HcfJYrNicQ6JA
+         L5XL8viEoOkStdm+0XCvJYZwruhAyotpsJTbOmPY=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     David Hildenbrand <david@redhat.com>,
@@ -30,12 +30,12 @@ Cc:     David Hildenbrand <david@redhat.com>,
         Christian Borntraeger <borntraeger@de.ibm.com>,
         Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org,
         linux-s390@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.5 60/75] KVM: s390: vsie: Fix delivery of addressing exceptions
-Date:   Sat, 18 Apr 2020 10:08:55 -0400
-Message-Id: <20200418140910.8280-60-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.4 29/78] KVM: s390: vsie: Fix possible race when shadowing region 3 tables
+Date:   Sat, 18 Apr 2020 10:39:58 -0400
+Message-Id: <20200418144047.9013-29-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200418140910.8280-1-sashal@kernel.org>
-References: <20200418140910.8280-1-sashal@kernel.org>
+In-Reply-To: <20200418144047.9013-1-sashal@kernel.org>
+References: <20200418144047.9013-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -47,50 +47,48 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: David Hildenbrand <david@redhat.com>
 
-[ Upstream commit 4d4cee96fb7a3cc53702a9be8299bf525be4ee98 ]
+[ Upstream commit 1493e0f944f3c319d11e067c185c904d01c17ae5 ]
 
-Whenever we get an -EFAULT, we failed to read in guest 2 physical
-address space. Such addressing exceptions are reported via a program
-intercept to the nested hypervisor.
+We have to properly retry again by returning -EINVAL immediately in case
+somebody else instantiated the table concurrently. We missed to add the
+goto in this function only. The code now matches the other, similar
+shadowing functions.
 
-We faked the intercept, we have to return to guest 2. Instead, right
-now we would be returning -EFAULT from the intercept handler, eventually
-crashing the VM.
-the correct thing to do is to return 1 as rc == 1 is the internal
-representation of "we have to go back into g2".
+We are overwriting an existing region 2 table entry. All allocated pages
+are added to the crst_list to be freed later, so they are not lost
+forever. However, when unshadowing the region 2 table, we wouldn't trigger
+unshadowing of the original shadowed region 3 table that we replaced. It
+would get unshadowed when the original region 3 table is modified. As it's
+not connected to the page table hierarchy anymore, it's not going to get
+used anymore. However, for a limited time, this page table will stick
+around, so it's in some sense a temporary memory leak.
 
-Addressing exceptions can only happen if the g2->g3 page tables
-reference invalid g2 addresses (say, either a table or the final page is
-not accessible - so something that basically never happens in sane
-environments.
+Identified by manual code inspection. I don't think this classifies as
+stable material.
 
-Identified by manual code inspection.
-
-Fixes: a3508fbe9dc6 ("KVM: s390: vsie: initial support for nested virtualization")
-Cc: <stable@vger.kernel.org> # v4.8+
+Fixes: 998f637cc4b9 ("s390/mm: avoid races on region/segment/page table shadowing")
 Signed-off-by: David Hildenbrand <david@redhat.com>
-Link: https://lore.kernel.org/r/20200403153050.20569-3-david@redhat.com
+Link: https://lore.kernel.org/r/20200403153050.20569-4-david@redhat.com
 Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
 Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
-[borntraeger@de.ibm.com: fix patch description]
 Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- arch/s390/kvm/vsie.c | 1 +
+ arch/s390/mm/gmap.c | 1 +
  1 file changed, 1 insertion(+)
 
-diff --git a/arch/s390/kvm/vsie.c b/arch/s390/kvm/vsie.c
-index 076090f9e666c..4f6c22d72072a 100644
---- a/arch/s390/kvm/vsie.c
-+++ b/arch/s390/kvm/vsie.c
-@@ -1202,6 +1202,7 @@ static int vsie_run(struct kvm_vcpu *vcpu, struct vsie_page *vsie_page)
- 		scb_s->iprcc = PGM_ADDRESSING;
- 		scb_s->pgmilc = 4;
- 		scb_s->gpsw.addr = __rewind_psw(scb_s->gpsw, 4);
-+		rc = 1;
+diff --git a/arch/s390/mm/gmap.c b/arch/s390/mm/gmap.c
+index edcdca97e85ee..06d602c5ec7b7 100644
+--- a/arch/s390/mm/gmap.c
++++ b/arch/s390/mm/gmap.c
+@@ -1840,6 +1840,7 @@ int gmap_shadow_r3t(struct gmap *sg, unsigned long saddr, unsigned long r3t,
+ 		goto out_free;
+ 	} else if (*table & _REGION_ENTRY_ORIGIN) {
+ 		rc = -EAGAIN;		/* Race with shadow */
++		goto out_free;
  	}
- 	return rc;
- }
+ 	crst_table_init(s_r3t, _REGION3_ENTRY_EMPTY);
+ 	/* mark as invalid as long as the parent table is not protected */
 -- 
 2.20.1
 
