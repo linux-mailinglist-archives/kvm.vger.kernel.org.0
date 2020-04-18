@@ -2,102 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C166B1AE947
-	for <lists+kvm@lfdr.de>; Sat, 18 Apr 2020 03:55:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7A6AE1AE960
+	for <lists+kvm@lfdr.de>; Sat, 18 Apr 2020 04:40:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725950AbgDRBzq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Apr 2020 21:55:46 -0400
-Received: from mga09.intel.com ([134.134.136.24]:60054 "EHLO mga09.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725535AbgDRBzq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 Apr 2020 21:55:46 -0400
-IronPort-SDR: D7r7QJaUCvRYuXXGJHmKcGSt66XQeOCvr3QvV504thBZNVjfwOyWEtC1f/aa0LJ1ma10P6fySh
- CDKl1TYOhoyQ==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Apr 2020 18:55:45 -0700
-IronPort-SDR: 00eMWy04h6S1TpdECx7c4F30uq/Oc4xCz11NXp5J++AM0olc6MxpexxMEhYKYs+nEI3sNgyISp
- d+i2EsXaWJrg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.72,397,1580803200"; 
-   d="scan'208";a="254383854"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
-  by orsmga003.jf.intel.com with ESMTP; 17 Apr 2020 18:55:45 -0700
-Date:   Fri, 17 Apr 2020 18:55:45 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        kvm list <kvm@vger.kernel.org>
-Subject: Re: [PATCH 1/2 v2] KVM: nVMX: KVM needs to unset "unrestricted
- guest" VM-execution control in vmcs02 if vmcs12 doesn't set it
-Message-ID: <20200418015545.GB15609@linux.intel.com>
-References: <20200415183047.11493-1-krish.sadhukhan@oracle.com>
- <20200415183047.11493-2-krish.sadhukhan@oracle.com>
- <20200415193016.GF30627@linux.intel.com>
- <CALMp9eRvZEzi3Ug0fL=ekMS_Weni6npwW+bXrJZjU8iLrppwEg@mail.gmail.com>
- <0b8bd238-e60f-b392-e793-0d88fb876224@redhat.com>
- <d49ce960-92f9-85eb-4cfb-d533a956223e@oracle.com>
+        id S1725796AbgDRCkn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Apr 2020 22:40:43 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:2355 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725320AbgDRCkn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 Apr 2020 22:40:43 -0400
+Received: from DGGEMS407-HUB.china.huawei.com (unknown [172.30.72.59])
+        by Forcepoint Email with ESMTP id C3B6C5F4BE3AE59A650B;
+        Sat, 18 Apr 2020 10:40:39 +0800 (CST)
+Received: from [127.0.0.1] (10.142.68.147) by DGGEMS407-HUB.china.huawei.com
+ (10.3.19.207) with Microsoft SMTP Server id 14.3.487.0; Sat, 18 Apr 2020
+ 10:40:33 +0800
+Subject: Re: [PATCH v25 00/10] Add ARMv8 RAS virtualization support in QEMU
+To:     Peter Maydell <peter.maydell@linaro.org>
+CC:     Fam Zheng <fam@euphon.net>,
+        Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
+        kvm-devel <kvm@vger.kernel.org>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        QEMU Developers <qemu-devel@nongnu.org>,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        Linuxarm <linuxarm@huawei.com>,
+        Shannon Zhao <shannon.zhaosl@gmail.com>,
+        Zheng Xiang <zhengxiang9@huawei.com>,
+        qemu-arm <qemu-arm@nongnu.org>,
+        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "Igor Mammedov" <imammedo@redhat.com>,
+        Richard Henderson <rth@twiddle.net>
+References: <20200410114639.32844-1-gengdongjiu@huawei.com>
+ <CAFEAcA9oNuDf=bdSSE8mZWrB23+FegD5NeSAmu8dGWhB=adBQg@mail.gmail.com>
+From:   gengdongjiu <gengdongjiu@huawei.com>
+Message-ID: <e7812ab1-cfaa-de3e-3062-4576665dab54@huawei.com>
+Date:   Sat, 18 Apr 2020 10:40:31 +0800
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:52.0) Gecko/20100101
+ Thunderbird/52.3.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <d49ce960-92f9-85eb-4cfb-d533a956223e@oracle.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <CAFEAcA9oNuDf=bdSSE8mZWrB23+FegD5NeSAmu8dGWhB=adBQg@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.142.68.147]
+X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Apr 17, 2020 at 06:29:23PM -0700, Krish Sadhukhan wrote:
+
+
+On 2020/4/17 21:32, Peter Maydell wrote:
+> On Fri, 10 Apr 2020 at 12:46, Dongjiu Geng <gengdongjiu@huawei.com> wrote:
+>>
+>> In the ARMv8 platform, the CPU error types includes synchronous external abort(SEA)
+>> and SError Interrupt (SEI). If exception happens in guest, host does not know the detailed
+>> information of guest, so it is expected that guest can do the recovery. For example, if an
+>> exception happens in a guest user-space application, host does not know which application
+>> encounters errors, only guest knows it.
+>>
+>> For the ARMv8 SEA/SEI, KVM or host kernel delivers SIGBUS to notify userspace.
+>> After user space gets the notification, it will record the CPER into guest GHES
+>> buffer and inject an exception or IRQ to guest.
+>>
+>> In the current implementation, if the type of SIGBUS is BUS_MCEERR_AR, we will
+>> treat it as a synchronous exception, and notify guest with ARMv8 SEA
+>> notification type after recording CPER into guest.
 > 
-> On 4/16/20 2:18 AM, Paolo Bonzini wrote:
-> >On 15/04/20 22:18, Jim Mattson wrote:
-> >>>Has anyone worked through all the flows to verify this won't break any
-> >>>assumptions with respect to enable_unrestricted_guest?  I would be
-> >>>(pleasantly) surprised if this was sufficient to run L2 without
-> >>>unrestricted guest when it's enabled for L1, e.g. vmx_set_cr0() looks
-> >>>suspect.
-> >>I think you're right to be concerned.
-> >Thirded, but it shouldn't be too hard.  Basically,
-> >enable_unrestricted_guest must be moved into loaded_vmcs for this to
-> >work.  It may be more work to write the test cases for L2 real mode <->
-> >protected mode switch, which do not entirely fit into the vmx_tests.c
-> >framework (but with the v2 tests it should not be hard to adapt).
+> Hi. I left a comment on patch 1. The other 3 patches unreviewed
+> are 5, 6 and 8, which are all ACPI core code, so that's for
+> MST, Igor or Shannon to review.
+
+Hi MST, Igor or Shannon
+    when you have time, could you review 5, 6 and 8? thanks very much in advance.
+It seems this series of patches lasted a long time, hope they can be applied soon.
+
 > 
+> Once those have been reviewed, please ping me if you want this
+> to go via target-arm.next>
+> thanks
+> -- PMM
 > 
-> OK, I will move enable_unrestricted_guest  to loaded_vmcs.
-
-Hmm, enable_unrestricted_guest doesn't _need_ to be moved to loaded_vmcs,
-L1 can never diverge from enable_unrestricted_guest.  E.g. the main control
-variable can stay global, we just need a flag in nested_vmx to override the
-main control.  A simple wrapper can then take care of the check, e.g.
-
-  static inline bool is_unrestricted_guest(struct kvm_vcpu *vcpu)
-  {
-	return enable_unrestricted_guest && (!is_guest_mode(vcpu) ||
-	       to_vmx(vcpu)->nested.unrestricted_guest);
-  }
-
-Putting the flag in loaded_vmcs might be more performant?  My guess is it'd
-be in the noise, at which point I'd rather have it be clear the override is
-only possible/necessary for nested guests.
-
-> I also see that enable_ept controls the setting of
-> enable_unrestricted_guest. Perhaps both need to be moved to loaded_vmcs ?
-
-No, letting L1 disable EPT in L0 would be pure insanity, and the overall
-paging mode of L2 is already reflected in the MMU.
-
-The dependency on EPT is that VMX requires paging of some form and
-unrestricted guest allows entering non-root with CR0.PG=0, i.e. requires EPT
-be enabled.
-
-> About testing, I am thinking the test will first vmlaunch L2 in real mode or
-> in protected mode, then vmexit on vmcall and then vmresume in the other
-> mode. Is that how the test should flow ?
+> .
 > 
-> >
-> >Paolo
-> >
+
