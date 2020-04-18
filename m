@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A90291AED6D
-	for <lists+kvm@lfdr.de>; Sat, 18 Apr 2020 15:51:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 661471AED2F
+	for <lists+kvm@lfdr.de>; Sat, 18 Apr 2020 15:50:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726689AbgDRNtB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 18 Apr 2020 09:49:01 -0400
-Received: from mail.kernel.org ([198.145.29.99]:55744 "EHLO mail.kernel.org"
+        id S1727790AbgDRNuT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 18 Apr 2020 09:50:19 -0400
+Received: from mail.kernel.org ([198.145.29.99]:56740 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726671AbgDRNtA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 18 Apr 2020 09:49:00 -0400
+        id S1726836AbgDRNtg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 18 Apr 2020 09:49:36 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 6213422250;
-        Sat, 18 Apr 2020 13:48:59 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id C56F322202;
+        Sat, 18 Apr 2020 13:49:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1587217740;
-        bh=x+3uj04gfbt089WFQK1mEWtg4dmCnvjijoKeHZ4uEF4=;
+        s=default; t=1587217775;
+        bh=Z7KdvEPwnuQWnkjL+BM3WAvJLHQISfNthr7UMBLVDas=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=0bata/xkfEgJ8zrk2MkB6wCI8Bu/gLh3dBIqEZu3YkBYHTcPzZWmNE3R1BBAmOeLq
-         Tn5I2LxuEPewoKKMuCLkK0A88kdulqRG5mPFbcqx6Puh9fbrscPR7qcGDGdDS0stcs
-         FtVBfQqMfcgBmmSuME6gKOSEEt0P6mKh2VWOyM8Q=
+        b=wMjlKBZkMXzju6jBbs3MBdqzx0/iNcOASzszOZ7BvXFbZTXdPfhzhxt41AUH4fy3A
+         isMA8UQqz2UzbbJIZJV9aU7boCrhqITC6LlvOjb/1WuOb/h1DimLteaGCN/Nr7SSCa
+         /3qKxLGHSBscKMf2BYIejgR+4ojCi+77WE+FOy0I=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Cornelia Huck <cohuck@redhat.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Sasha Levin <sashal@kernel.org>, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.6 35/73] s390/cio: generate delayed uevent for vfio-ccw subchannels
-Date:   Sat, 18 Apr 2020 09:47:37 -0400
-Message-Id: <20200418134815.6519-35-sashal@kernel.org>
+Cc:     David Hildenbrand <david@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.6 64/73] KVM: s390: vsie: Fix delivery of addressing exceptions
+Date:   Sat, 18 Apr 2020 09:48:06 -0400
+Message-Id: <20200418134815.6519-64-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200418134815.6519-1-sashal@kernel.org>
 References: <20200418134815.6519-1-sashal@kernel.org>
@@ -45,46 +45,52 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Cornelia Huck <cohuck@redhat.com>
+From: David Hildenbrand <david@redhat.com>
 
-[ Upstream commit 2bc55eaeb88d30accfc1b6ac2708d4e4b81ca260 ]
+[ Upstream commit 4d4cee96fb7a3cc53702a9be8299bf525be4ee98 ]
 
-The common I/O layer delays the ADD uevent for subchannels and
-delegates generating this uevent to the individual subchannel
-drivers. The vfio-ccw I/O subchannel driver, however, did not
-do that, and will not generate an ADD uevent for subchannels
-that had not been bound to a different driver (or none at all,
-which also triggers the uevent).
+Whenever we get an -EFAULT, we failed to read in guest 2 physical
+address space. Such addressing exceptions are reported via a program
+intercept to the nested hypervisor.
 
-Generate the ADD uevent at the end of the probe function if
-uevents were still suppressed for the device.
+We faked the intercept, we have to return to guest 2. Instead, right
+now we would be returning -EFAULT from the intercept handler, eventually
+crashing the VM.
+the correct thing to do is to return 1 as rc == 1 is the internal
+representation of "we have to go back into g2".
 
-Message-Id: <20200327124503.9794-3-cohuck@redhat.com>
-Fixes: 63f1934d562d ("vfio: ccw: basic implementation for vfio_ccw driver")
-Reviewed-by: Eric Farman <farman@linux.ibm.com>
-Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-Signed-off-by: Vasily Gorbik <gor@linux.ibm.com>
+Addressing exceptions can only happen if the g2->g3 page tables
+reference invalid g2 addresses (say, either a table or the final page is
+not accessible - so something that basically never happens in sane
+environments.
+
+Identified by manual code inspection.
+
+Fixes: a3508fbe9dc6 ("KVM: s390: vsie: initial support for nested virtualization")
+Cc: <stable@vger.kernel.org> # v4.8+
+Signed-off-by: David Hildenbrand <david@redhat.com>
+Link: https://lore.kernel.org/r/20200403153050.20569-3-david@redhat.com
+Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
+[borntraeger@de.ibm.com: fix patch description]
+Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/s390/cio/vfio_ccw_drv.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ arch/s390/kvm/vsie.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/drivers/s390/cio/vfio_ccw_drv.c b/drivers/s390/cio/vfio_ccw_drv.c
-index e401a3d0aa570..339a6bc0339b0 100644
---- a/drivers/s390/cio/vfio_ccw_drv.c
-+++ b/drivers/s390/cio/vfio_ccw_drv.c
-@@ -167,6 +167,11 @@ static int vfio_ccw_sch_probe(struct subchannel *sch)
- 	if (ret)
- 		goto out_disable;
- 
-+	if (dev_get_uevent_suppress(&sch->dev)) {
-+		dev_set_uevent_suppress(&sch->dev, 0);
-+		kobject_uevent(&sch->dev.kobj, KOBJ_ADD);
-+	}
-+
- 	VFIO_CCW_MSG_EVENT(4, "bound to subchannel %x.%x.%04x\n",
- 			   sch->schid.cssid, sch->schid.ssid,
- 			   sch->schid.sch_no);
+diff --git a/arch/s390/kvm/vsie.c b/arch/s390/kvm/vsie.c
+index 076090f9e666c..4f6c22d72072a 100644
+--- a/arch/s390/kvm/vsie.c
++++ b/arch/s390/kvm/vsie.c
+@@ -1202,6 +1202,7 @@ static int vsie_run(struct kvm_vcpu *vcpu, struct vsie_page *vsie_page)
+ 		scb_s->iprcc = PGM_ADDRESSING;
+ 		scb_s->pgmilc = 4;
+ 		scb_s->gpsw.addr = __rewind_psw(scb_s->gpsw, 4);
++		rc = 1;
+ 	}
+ 	return rc;
+ }
 -- 
 2.20.1
 
