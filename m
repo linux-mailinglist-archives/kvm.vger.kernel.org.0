@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 650091AF127
-	for <lists+kvm@lfdr.de>; Sat, 18 Apr 2020 16:55:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4D6C71AEF32
+	for <lists+kvm@lfdr.de>; Sat, 18 Apr 2020 16:43:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728638AbgDROzC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 18 Apr 2020 10:55:02 -0400
-Received: from mail.kernel.org ([198.145.29.99]:50520 "EHLO mail.kernel.org"
+        id S1728008AbgDROl3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 18 Apr 2020 10:41:29 -0400
+Received: from mail.kernel.org ([198.145.29.99]:50576 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727941AbgDROlZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 18 Apr 2020 10:41:25 -0400
+        id S1727979AbgDROl2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 18 Apr 2020 10:41:28 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id D2F5022245;
-        Sat, 18 Apr 2020 14:41:23 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id C3C192224E;
+        Sat, 18 Apr 2020 14:41:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1587220884;
-        bh=1pQapq9m3603xrXiSN4BF3wGZPcBk5uTiJAJZ3h1E+A=;
+        s=default; t=1587220887;
+        bh=x+3uj04gfbt089WFQK1mEWtg4dmCnvjijoKeHZ4uEF4=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=0gZwiUwX+lnUePDlCUvK/58P+QNHuI8fpL+Peh5H7INT0o7NCqw3KMH26VSl2uJZi
-         KtU8rDLGjNwQrdeV1j50ifyxfxQ886gExMgZt14cUKuIoViyQCon8HcfJYrNicQ6JA
-         L5XL8viEoOkStdm+0XCvJYZwruhAyotpsJTbOmPY=
+        b=WosMcaPkvJLRgPnDytu+vgLAZp6kHD8MW3Nt+NQx5AjeHiP1Vh/sy9kQXXUPtb07q
+         7z/GzH042UNjukEYra7NKgGmLsyxb+1rD/zNptzkM8huBhji4SMqve5BkWn5W47AkO
+         yLIcAELI3OdaKfBgJiyltM5F42lpZ4PywE5vHnW8=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     David Hildenbrand <david@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.4 29/78] KVM: s390: vsie: Fix possible race when shadowing region 3 tables
-Date:   Sat, 18 Apr 2020 10:39:58 -0400
-Message-Id: <20200418144047.9013-29-sashal@kernel.org>
+Cc:     Cornelia Huck <cohuck@redhat.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Sasha Levin <sashal@kernel.org>, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.4 31/78] s390/cio: generate delayed uevent for vfio-ccw subchannels
+Date:   Sat, 18 Apr 2020 10:40:00 -0400
+Message-Id: <20200418144047.9013-31-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200418144047.9013-1-sashal@kernel.org>
 References: <20200418144047.9013-1-sashal@kernel.org>
@@ -45,50 +45,46 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: David Hildenbrand <david@redhat.com>
+From: Cornelia Huck <cohuck@redhat.com>
 
-[ Upstream commit 1493e0f944f3c319d11e067c185c904d01c17ae5 ]
+[ Upstream commit 2bc55eaeb88d30accfc1b6ac2708d4e4b81ca260 ]
 
-We have to properly retry again by returning -EINVAL immediately in case
-somebody else instantiated the table concurrently. We missed to add the
-goto in this function only. The code now matches the other, similar
-shadowing functions.
+The common I/O layer delays the ADD uevent for subchannels and
+delegates generating this uevent to the individual subchannel
+drivers. The vfio-ccw I/O subchannel driver, however, did not
+do that, and will not generate an ADD uevent for subchannels
+that had not been bound to a different driver (or none at all,
+which also triggers the uevent).
 
-We are overwriting an existing region 2 table entry. All allocated pages
-are added to the crst_list to be freed later, so they are not lost
-forever. However, when unshadowing the region 2 table, we wouldn't trigger
-unshadowing of the original shadowed region 3 table that we replaced. It
-would get unshadowed when the original region 3 table is modified. As it's
-not connected to the page table hierarchy anymore, it's not going to get
-used anymore. However, for a limited time, this page table will stick
-around, so it's in some sense a temporary memory leak.
+Generate the ADD uevent at the end of the probe function if
+uevents were still suppressed for the device.
 
-Identified by manual code inspection. I don't think this classifies as
-stable material.
-
-Fixes: 998f637cc4b9 ("s390/mm: avoid races on region/segment/page table shadowing")
-Signed-off-by: David Hildenbrand <david@redhat.com>
-Link: https://lore.kernel.org/r/20200403153050.20569-4-david@redhat.com
-Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
-Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+Message-Id: <20200327124503.9794-3-cohuck@redhat.com>
+Fixes: 63f1934d562d ("vfio: ccw: basic implementation for vfio_ccw driver")
+Reviewed-by: Eric Farman <farman@linux.ibm.com>
+Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+Signed-off-by: Vasily Gorbik <gor@linux.ibm.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- arch/s390/mm/gmap.c | 1 +
- 1 file changed, 1 insertion(+)
+ drivers/s390/cio/vfio_ccw_drv.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/arch/s390/mm/gmap.c b/arch/s390/mm/gmap.c
-index edcdca97e85ee..06d602c5ec7b7 100644
---- a/arch/s390/mm/gmap.c
-+++ b/arch/s390/mm/gmap.c
-@@ -1840,6 +1840,7 @@ int gmap_shadow_r3t(struct gmap *sg, unsigned long saddr, unsigned long r3t,
- 		goto out_free;
- 	} else if (*table & _REGION_ENTRY_ORIGIN) {
- 		rc = -EAGAIN;		/* Race with shadow */
-+		goto out_free;
- 	}
- 	crst_table_init(s_r3t, _REGION3_ENTRY_EMPTY);
- 	/* mark as invalid as long as the parent table is not protected */
+diff --git a/drivers/s390/cio/vfio_ccw_drv.c b/drivers/s390/cio/vfio_ccw_drv.c
+index e401a3d0aa570..339a6bc0339b0 100644
+--- a/drivers/s390/cio/vfio_ccw_drv.c
++++ b/drivers/s390/cio/vfio_ccw_drv.c
+@@ -167,6 +167,11 @@ static int vfio_ccw_sch_probe(struct subchannel *sch)
+ 	if (ret)
+ 		goto out_disable;
+ 
++	if (dev_get_uevent_suppress(&sch->dev)) {
++		dev_set_uevent_suppress(&sch->dev, 0);
++		kobject_uevent(&sch->dev.kobj, KOBJ_ADD);
++	}
++
+ 	VFIO_CCW_MSG_EVENT(4, "bound to subchannel %x.%x.%04x\n",
+ 			   sch->schid.cssid, sch->schid.ssid,
+ 			   sch->schid.sch_no);
 -- 
 2.20.1
 
