@@ -2,142 +2,153 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F13441AE969
-	for <lists+kvm@lfdr.de>; Sat, 18 Apr 2020 04:49:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E6FBC1AE9C5
+	for <lists+kvm@lfdr.de>; Sat, 18 Apr 2020 06:24:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725849AbgDRCt1 convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Fri, 17 Apr 2020 22:49:27 -0400
-Received: from szxga02-in.huawei.com ([45.249.212.188]:2060 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725320AbgDRCt1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 Apr 2020 22:49:27 -0400
-Received: from DGGEMM406-HUB.china.huawei.com (unknown [172.30.72.56])
-        by Forcepoint Email with ESMTP id 97116A319AD7B1B2AC2E;
-        Sat, 18 Apr 2020 10:49:25 +0800 (CST)
-Received: from DGGEMM526-MBX.china.huawei.com ([169.254.8.234]) by
- DGGEMM406-HUB.china.huawei.com ([10.3.20.214]) with mapi id 14.03.0487.000;
- Sat, 18 Apr 2020 10:49:24 +0800
-From:   "Zengtao (B)" <prime.zeng@hisilicon.com>
-To:     Marc Zyngier <maz@kernel.org>
-CC:     George Cherian <gcherian@marvell.com>,
-        "Dave.Martin@arm.com" <Dave.Martin@arm.com>,
-        "alexandru.elisei@arm.com" <alexandru.elisei@arm.com>,
-        "andre.przywara@arm.com" <andre.przywara@arm.com>,
-        "christoffer.dall@arm.com" <christoffer.dall@arm.com>,
-        "james.morse@arm.com" <james.morse@arm.com>,
-        "jintack@cs.columbia.edu" <jintack@cs.columbia.edu>,
-        "julien.thierry.kdev@gmail.com" <julien.thierry.kdev@gmail.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
-        "linux-arm-kernel@lists.infradead.org" 
-        <linux-arm-kernel@lists.infradead.org>,
-        "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
-        Anil Kumar Reddy H <areddy3@marvell.com>,
-        Ganapatrao Kulkarni <gkulkarni@marvell.com>
-Subject: RE: [PATCH v2 00/94] KVM: arm64: ARMv8.3/8.4 Nested Virtualization
- support
-Thread-Topic: [PATCH v2 00/94] KVM: arm64: ARMv8.3/8.4 Nested Virtualization
- support
-Thread-Index: AdYJhvrCKEKaxySRQua1lfr4U9NN2v//iESA//MqKcCAGX9aAP/4ImVggBBPsoCAAVt7AP/+wAyA
-Date:   Sat, 18 Apr 2020 02:49:23 +0000
-Message-ID: <678F3D1BB717D949B966B68EAEB446ED3A545C71@dggemm526-mbx.china.huawei.com>
-References: <MN2PR18MB26869A6CA4E67558324F655CC5C70@MN2PR18MB2686.namprd18.prod.outlook.com>
-        <06d08f904f003160a48eac3c5ab3c7ff@kernel.org>
-        <678F3D1BB717D949B966B68EAEB446ED342E29B9@dggemm526-mbx.china.huawei.com>
-        <86r1wus7df.wl-maz@kernel.org>
-        <678F3D1BB717D949B966B68EAEB446ED3A535FCF@DGGEMM506-MBX.china.huawei.com>
-        <3e84aaf8b757bc5a7685a291e54c232b@kernel.org> <20200417160602.26706917@why>
-In-Reply-To: <20200417160602.26706917@why>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.74.221.187]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+        id S1725796AbgDREVJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 18 Apr 2020 00:21:09 -0400
+Received: from mga09.intel.com ([134.134.136.24]:28927 "EHLO mga09.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725440AbgDREVJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 18 Apr 2020 00:21:09 -0400
+IronPort-SDR: CyjN/EZd1nSOUolKGpZkQsBAbPUZyVsIAKSIWCr6lc5vbW2up3TSy2Y3m85bhIlkPMPLTyc453
+ fhD81+TwI6Ug==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Apr 2020 21:21:08 -0700
+IronPort-SDR: EeDMeTxG/9QI+Cx3T0w0VnOhBXrELvbzxnj47ajg2x3hW7cF6VCQpeOBpfrAqFH3smV9hpU/fp
+ moUUP01Wus9Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.72,397,1580803200"; 
+   d="scan'208";a="257786037"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
+  by orsmga006.jf.intel.com with ESMTP; 17 Apr 2020 21:21:08 -0700
+Date:   Fri, 17 Apr 2020 21:21:08 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Jim Mattson <jmattson@google.com>
+Cc:     kvm list <kvm@vger.kernel.org>, Oliver Upton <oupton@google.com>,
+        Peter Shier <pshier@google.com>
+Subject: Re: [PATCH 2/2] kvm: nVMX: Single-step traps trump expired
+ VMX-preemption timer
+Message-ID: <20200418042108.GF15609@linux.intel.com>
+References: <20200414000946.47396-1-jmattson@google.com>
+ <20200414000946.47396-2-jmattson@google.com>
+ <20200414031705.GP21204@linux.intel.com>
+ <CALMp9eT23AUTU3m_oADKw3O_NMpuX3crx7eqSB8Rbgh3k0s_Jw@mail.gmail.com>
+ <20200415001212.GA12547@linux.intel.com>
+ <CALMp9eS-s5doptTzVkE2o9jDYuGU3T=5azMhm3fCqLJPcABAOg@mail.gmail.com>
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CALMp9eS-s5doptTzVkE2o9jDYuGU3T=5azMhm3fCqLJPcABAOg@mail.gmail.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
- -----Original Message-----
-> From: Marc Zyngier [mailto:maz@kernel.org]
-> Sent: Friday, April 17, 2020 11:06 PM
-> To: Zengtao (B)
-> Cc: George Cherian; Dave.Martin@arm.com; alexandru.elisei@arm.com;
-> andre.przywara@arm.com; christoffer.dall@arm.com;
-> james.morse@arm.com; jintack@cs.columbia.edu;
-> julien.thierry.kdev@gmail.com; kvm@vger.kernel.org;
-> kvmarm@lists.cs.columbia.edu; linux-arm-kernel@lists.infradead.org;
-> suzuki.poulose@arm.com; Anil Kumar Reddy H; Ganapatrao Kulkarni
-> Subject: Re: [PATCH v2 00/94] KVM: arm64: ARMv8.3/8.4 Nested
-> Virtualization support
+On Wed, Apr 15, 2020 at 04:33:31PM -0700, Jim Mattson wrote:
+> On Tue, Apr 14, 2020 at 5:12 PM Sean Christopherson
+> <sean.j.christopherson@intel.com> wrote:
+> >
+> > On Tue, Apr 14, 2020 at 09:47:53AM -0700, Jim Mattson wrote:
+> > > Regarding -EBUSY, I'm in complete agreement. However, I'm not sure
+> > > what the potential confusion is regarding the event. Are you
+> > > suggesting that one might think that we have a #DB to deliver to L1
+> > > while we're in guest mode? IIRC, that can happen under SVM, but I
+> > > don't believe it can happen under VMX.
+> >
+> > The potential confusion is that vcpu->arch.exception.pending was already
+> > checked, twice.  It makes one wonder why it needs to be checked a third
+> > time.  And actually, I think that's probably a good indicator that singling
+> > out single-step #DB isn't the correct fix, it just happens to be the only
+> > case that's been encountered thus far, e.g. a #PF when fetching the instr
+> > for emulation should also get priority over the preemption timer.  On real
+> > hardware, expiration of the preemption timer while vectoring a #PF wouldn't
+> > wouldn't get recognized until the next instruction boundary, i.e. at the
+> > start of the first instruction of the #PF handler.  Dropping the #PF isn't
+> > a problem in most cases, because unlike the single-step #DB, it will be
+> > re-encountered when L1 resumes L2.  But, dropping the #PF is still wrong.
 > 
-> On Thu, 16 Apr 2020 19:22:21 +0100
-> Marc Zyngier <maz@kernel.org> wrote:
-> 
-> > Hi Zengtao,
-> >
-> > On 2020-04-16 02:38, Zengtao (B) wrote:
-> > > Hi Marc:
-> > >
-> > > Got it.
-> > > Really a bit patch set :)
-> >
-> > Well, yeah... ;-)
-> >
-> > >
-> > > BTW, I have done a basic kvm unit test
-> > > git://git.kernel.org/pub/scm/virt/kvm/kvm-unit-tests.git
-> > > And I find that after apply the patch KVM: arm64: VNCR-ize ELR_EL1,
-> > > The psci test failed for some reason, I can't understand why, this
-> > > is only the test result.(find the patch by git bisect + kvm test)
-> >
-> > That it is that mechanical, we should be able to quickly nail that one.
-> >
-> > > My platform: Hisilicon D06 board.
-> > > Linux kernel: Linux 5.6-rc6 + nv patches(some rebases)
-> > > Could you help to take a look?
-> >
-> > I'll have a look tomorrow. I'm in the middle of refactoring the series
-> > for 5.7, and things have changed quite a bit. Hopefully this isn't a VHE
-> > vs non-VHE issue.
-> 
-> So I've repeatedly tried with the current state of the NV patches[1],
-> on both an ARMv8.0 system (Seattle) and an ARMv8.2 pile of putrid junk
-> (vim3l). PSCI is pretty happy, although I can only test with at most 8
-> vcpus (GICv2 gets in the way).
-> 
-> Can you please:
-> 
-> - post the detailed error by running the PSCI unit test on its own
-I tried to trace the error, and I found in kernel function kvm_mpidr_to_vcpu,
-casually, mpidr returns zero and we can't get the expected vcpu, and psci
- test failed due to this.
-And as I mentioned in my last before, the psci error is introduced by the
- patch KVM: arm64: VNCR-ize ELR_EL1.(Only test result)
-Maybe you have to try tens of times to reproduce. :)
-Deep into the patch itself, I don't find any connection between the patch
-and the issue.
+> Yes, it's wrong in the abstract, but with respect to faults and the
+> VMX-preemption timer expiration, is there any way for either L1 or L2
+> to *know* that the virtual CPU has done something wrong?
 
-> - test with the current state of the patches
-I test with your nv-5.7-rc1-WIP branch and latest kvm_unit_test, the 
-error still exist.
+I don't think so?  But how is that relevant, i.e. if we can fix KVM instead
+of fudging the result, why wouldn't we fix KVM?
 
-Thanks.
-zengtao
+> Isn't it generally true that if you have an exception queued when you
+> transition from L2 to L1, then you've done something wrong? I wonder
+> if the call to kvm_clear_exception_queue() in prepare_vmcs12() just
+> serves to sweep a whole collection of problems under the rug.
 
+More than likely, yes.
+
+> > In general, interception of an event doesn't change the priority of events,
+> > e.g. INTR shouldn't get priority over NMI just because if L1 wants to
+> > intercept INTR but not NMI.
 > 
+> Yes, but that's a different problem altogether.
 
+But isn't the fix the same?  Stop processing events if a higher priority
+event is pending, regardless of whether the event exits to L1.
 
-> Thanks,
-> 
-> 	M.
-> 
-> [1]
-> https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/l
-> og/?h=kvm-arm64/nv-5.7-rc1-WIP
-> --
-> Jazz is not dead. It just smells funny...
+> > TL;DR: I think the fix should instead be:
+> >
+> > diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> > index c868c64770e0..042d7a9037be 100644
+> > --- a/arch/x86/kvm/vmx/nested.c
+> > +++ b/arch/x86/kvm/vmx/nested.c
+> > @@ -3724,9 +3724,10 @@ static int vmx_check_nested_events(struct kvm_vcpu *vcpu)
+> >         /*
+> >          * Process any exceptions that are not debug traps before MTF.
+> >          */
+> > -       if (vcpu->arch.exception.pending &&
+> > -           !vmx_pending_dbg_trap(vcpu) &&
+> > -           nested_vmx_check_exception(vcpu, &exit_qual)) {
+> > +       if (vcpu->arch.exception.pending && !vmx_pending_dbg_trap(vcpu))
+> > +               if (!nested_vmx_check_exception(vcpu, &exit_qual))
+> > +                       return 0;
+> > +
+> >                 if (block_nested_events)
+> >                         return -EBUSY;
+> >                 nested_vmx_inject_exception_vmexit(vcpu, exit_qual);
+> > @@ -3741,8 +3742,10 @@ static int vmx_check_nested_events(struct kvm_vcpu *vcpu)
+> >                 return 0;
+> >         }
+> >
+> > -       if (vcpu->arch.exception.pending &&
+> > -           nested_vmx_check_exception(vcpu, &exit_qual)) {
+> > +       if (vcpu->arch.exception.pending) {
+> > +               if (!nested_vmx_check_exception(vcpu, &exit_qual))
+> > +                       return 0;
+> > +
+> >                 if (block_nested_events)
+> >                         return -EBUSY;
+> >                 nested_vmx_inject_exception_vmexit(vcpu, exit_qual);
+> > @@ -3757,7 +3760,10 @@ static int vmx_check_nested_events(struct kvm_vcpu *vcpu)
+> >                 return 0;
+> >         }
+> >
+> > -       if (vcpu->arch.nmi_pending && nested_exit_on_nmi(vcpu)) {
+> > +       if (vcpu->arch.nmi_pending) {
+> > +               if (!nested_exit_on_nmi(vcpu))
+> > +                       return 0;
+> > +
+> >                 if (block_nested_events)
+> >                         return -EBUSY;
+> >                 nested_vmx_vmexit(vcpu, EXIT_REASON_EXCEPTION_NMI,
+> > @@ -3772,7 +3778,10 @@ static int vmx_check_nested_events(struct kvm_vcpu *vcpu)
+> >                 return 0;
+> >         }
+> >
+> > -       if (kvm_cpu_has_interrupt(vcpu) && nested_exit_on_intr(vcpu)) {
+> > +       if (kvm_cpu_has_interrupt(vcpu) {
+> > +               if (!nested_exit_on_intr(vcpu))
+> > +                       return 0;
+> > +
+> >                 if (block_nested_events)
+> >                         return -EBUSY;
+> >                 nested_vmx_vmexit(vcpu, EXIT_REASON_EXTERNAL_INTERRUPT, 0, 0);
+> >
