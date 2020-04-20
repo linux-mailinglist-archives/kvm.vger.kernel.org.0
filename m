@@ -2,223 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 70ADE1B0E7A
-	for <lists+kvm@lfdr.de>; Mon, 20 Apr 2020 16:34:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CE51F1B0F8B
+	for <lists+kvm@lfdr.de>; Mon, 20 Apr 2020 17:12:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729910AbgDTOee (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Apr 2020 10:34:34 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:25523 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726895AbgDTOed (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 Apr 2020 10:34:33 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1587393270;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-        bh=QKgQlmHl/vlNhHGtLDszGPS70GFdJJv30q0eyxymYP8=;
-        b=TUAKkkcAPRD+FoHSsvNTrzV8G5iGoVXWH/ATz8QYO7UMUCPZ0bdTt8hj3xK3YI0rqVJTMj
-        ZGcq/Uz5VSkbtwfwJTW1GNHAT+Okc7tLaa/fqTrIMA1C5CJDnxG3grOGtexsLmPw4xd0km
-        amsroRdOFc+b9fi723Fa7Clle/vY/Mc=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-329-qvEFNmO8PG2JlRpbFAF20A-1; Mon, 20 Apr 2020 10:34:27 -0400
-X-MC-Unique: qvEFNmO8PG2JlRpbFAF20A-1
-Received: by mail-wm1-f70.google.com with SMTP id o26so3576765wmh.1
-        for <kvm@vger.kernel.org>; Mon, 20 Apr 2020 07:34:27 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
-         :content-disposition;
-        bh=QKgQlmHl/vlNhHGtLDszGPS70GFdJJv30q0eyxymYP8=;
-        b=RXJMTB1iv6HMn8iNJRXEIxYo/BxGmr3fydilj4xj1fOH2Fm6zKlRmQO95ZlZD1IWWw
-         VT1qSGn42ZAw04mqyMrrj8U9dr64oczqS0bUuJbRaIdbgdwM6npj1JLl8CnIhaehZdBC
-         1Qh7gjzutK9k0afMDVxCesf8wEVKsUjCcTaw01/wEXCgOturzAoqE3+LAkMHEiptshAX
-         e4v60+gXVYZOaalgwkCapT5bPj+c2ZBqX0Rn/uPvW7knfDcHBNnj/jtil1xHze2rw+XR
-         /j6g8Vd1ygvCKR0D0/XCafcwPOX93mijIpVmnDVbdUK4X7pxIIBrAHk4gqUvgz4cRO4q
-         tBGA==
-X-Gm-Message-State: AGi0PuYMiCg9e/WBWKjSEOXHRCd7tAjqJ0Lu1DJoNhtplrblWOnSz59x
-        fjOjvi1L4LijrW+htD3Jrt4oHYlauP3VPGkxEjBbBa/08oyDSNqE0kJkz8OpfmgUiRKvmh9DuPt
-        LzJ1LNHKvLFJ+
-X-Received: by 2002:a5d:4e02:: with SMTP id p2mr19097331wrt.302.1587393266214;
-        Mon, 20 Apr 2020 07:34:26 -0700 (PDT)
-X-Google-Smtp-Source: APiQypJPCB2aIBVyG+epiQn8wefNJaBqE0mL7KfjY5M7sLpr1ftDgKPHhXnntLSPOZw2XTiIctqPcQ==
-X-Received: by 2002:a5d:4e02:: with SMTP id p2mr19097299wrt.302.1587393265925;
-        Mon, 20 Apr 2020 07:34:25 -0700 (PDT)
-Received: from redhat.com (bzq-79-183-51-3.red.bezeqint.net. [79.183.51.3])
-        by smtp.gmail.com with ESMTPSA id u12sm1690368wmu.25.2020.04.20.07.34.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 20 Apr 2020 07:34:25 -0700 (PDT)
-Date:   Mon, 20 Apr 2020 10:34:23 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     linux-kernel@vger.kernel.org
-Cc:     Ard Biesheuvel <ardb@kernel.org>,
-        Richard Earnshaw <Richard.Earnshaw@arm.com>,
-        Sudeep Dutt <sudeep.dutt@intel.com>,
-        Ashutosh Dixit <ashutosh.dixit@intel.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jason Wang <jasowang@redhat.com>, netdev@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Subject: [PATCH v4] vhost: disable for OABI
-Message-ID: <20200420143229.245488-1-mst@redhat.com>
+        id S1730222AbgDTPMM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Apr 2020 11:12:12 -0400
+Received: from mga05.intel.com ([192.55.52.43]:20412 "EHLO mga05.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1730203AbgDTPMK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 Apr 2020 11:12:10 -0400
+IronPort-SDR: MVGG65zJ1AR37cZ8HD7xyoHDSHvFtYUIV37YQPBu848K3g/6E7Oucrz29eRfU8ysOocwevX/Z8
+ mnjIMHopHf5g==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Apr 2020 08:12:08 -0700
+IronPort-SDR: fjvusSzbVWPR/v4yhL4s1hcLQLK1iQ/5M+MxwRZQ5BRCWInNSb3yqeaSXk48+QZfB8UVUAELSL
+ 5cRdpBIBP0jQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.72,406,1580803200"; 
+   d="scan'208";a="258374088"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
+  by orsmga006.jf.intel.com with ESMTP; 20 Apr 2020 08:12:08 -0700
+Date:   Mon, 20 Apr 2020 08:12:08 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Krish Sadhukhan <krish.sadhukhan@oracle.com>,
+        Jim Mattson <jmattson@google.com>,
+        kvm list <kvm@vger.kernel.org>
+Subject: Re: [PATCH 1/2 v2] KVM: nVMX: KVM needs to unset "unrestricted
+ guest" VM-execution control in vmcs02 if vmcs12 doesn't set it
+Message-ID: <20200420151207.GB9279@linux.intel.com>
+References: <20200415183047.11493-1-krish.sadhukhan@oracle.com>
+ <20200415183047.11493-2-krish.sadhukhan@oracle.com>
+ <20200415193016.GF30627@linux.intel.com>
+ <CALMp9eRvZEzi3Ug0fL=ekMS_Weni6npwW+bXrJZjU8iLrppwEg@mail.gmail.com>
+ <0b8bd238-e60f-b392-e793-0d88fb876224@redhat.com>
+ <d49ce960-92f9-85eb-4cfb-d533a956223e@oracle.com>
+ <20200418015545.GB15609@linux.intel.com>
+ <c37b9429-0cb8-6514-44a7-65544873dba0@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-X-Mailer: git-send-email 2.24.1.751.gd10ce2899c
-X-Mutt-Fcc: =sent
+In-Reply-To: <c37b9429-0cb8-6514-44a7-65544873dba0@redhat.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-vhost is currently broken on the some ARM configs.
+On Sat, Apr 18, 2020 at 11:53:36AM +0200, Paolo Bonzini wrote:
+> On 18/04/20 03:55, Sean Christopherson wrote:
+> > 
+> >   static inline bool is_unrestricted_guest(struct kvm_vcpu *vcpu)
+> >   {
+> > 	return enable_unrestricted_guest && (!is_guest_mode(vcpu) ||
+> > 	       to_vmx(vcpu)->nested.unrestricted_guest);
+> >   }
+> >
+> > Putting the flag in loaded_vmcs might be more performant?  My guess is it'd
+> > be in the noise, at which point I'd rather have it be clear the override is
+> > only possible/necessary for nested guests.
+> 
+> Even better: you can use secondary_exec_controls_get, which does get the
+> flag from the loaded_vmcs :) but without actually having to add one.
 
-The reason is that the ring element addresses are passed between
-components with different alignments assumptions. Thus, if
-guest selects a pointer and host then gets and dereferences
-it, then alignment assumed by the host's compiler might be
-greater than the actual alignment of the pointer.
-compiler on the host from assuming pointer is aligned.
-
-This actually triggers on ARM with -mabi=apcs-gnu - which is a
-deprecated configuration. With this OABI, compiler assumes that
-all structures are 4 byte aligned - which is stronger than
-virtio guarantees for available and used rings, which are
-merely 2 bytes. Thus a guest without -mabi=apcs-gnu running
-on top of host with -mabi=apcs-gnu will be broken.
-
-The correct fix is to force alignment of structures - however
-that is an intrusive fix that's best deferred until the next release.
-
-We didn't previously support such ancient systems at all - this surfaced
-after vdpa support prompted removing dependency of vhost on
-VIRTULIZATION. So for now, let's just add something along the lines of
-
-	depends on !ARM || AEABI
-
-to the virtio Kconfig declaration, and add a comment that it has to do
-with struct member alignment.
-
-Note: we can't make VHOST and VHOST_RING themselves have
-a dependency since these are selected. Add a new symbol for that.
-
-We should be able to drop this dependency down the road.
-
-Fixes: 20c384f1ea1a0bc7 ("vhost: refine vhost and vringh kconfig")
-Suggested-by: Ard Biesheuvel <ardb@kernel.org>
-Suggested-by: Richard Earnshaw <Richard.Earnshaw@arm.com>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
----
-
-changes from v3:
-	update commit log clarifying the motivation and that
-	it's a temporary fix.
-
-	suggested by Christoph Hellwig
-
- drivers/misc/mic/Kconfig |  2 +-
- drivers/net/caif/Kconfig |  2 +-
- drivers/vdpa/Kconfig     |  2 +-
- drivers/vhost/Kconfig    | 17 +++++++++++++----
- 4 files changed, 16 insertions(+), 7 deletions(-)
-
-diff --git a/drivers/misc/mic/Kconfig b/drivers/misc/mic/Kconfig
-index 8f201d019f5a..3bfe72c59864 100644
---- a/drivers/misc/mic/Kconfig
-+++ b/drivers/misc/mic/Kconfig
-@@ -116,7 +116,7 @@ config MIC_COSM
- 
- config VOP
- 	tristate "VOP Driver"
--	depends on VOP_BUS
-+	depends on VOP_BUS && VHOST_DPN
- 	select VHOST_RING
- 	select VIRTIO
- 	help
-diff --git a/drivers/net/caif/Kconfig b/drivers/net/caif/Kconfig
-index 9db0570c5beb..661c25eb1c46 100644
---- a/drivers/net/caif/Kconfig
-+++ b/drivers/net/caif/Kconfig
-@@ -50,7 +50,7 @@ config CAIF_HSI
- 
- config CAIF_VIRTIO
- 	tristate "CAIF virtio transport driver"
--	depends on CAIF && HAS_DMA
-+	depends on CAIF && HAS_DMA && VHOST_DPN
- 	select VHOST_RING
- 	select VIRTIO
- 	select GENERIC_ALLOCATOR
-diff --git a/drivers/vdpa/Kconfig b/drivers/vdpa/Kconfig
-index 3e1ceb8e9f2b..e8140065c8a5 100644
---- a/drivers/vdpa/Kconfig
-+++ b/drivers/vdpa/Kconfig
-@@ -10,7 +10,7 @@ if VDPA
- 
- config VDPA_SIM
- 	tristate "vDPA device simulator"
--	depends on RUNTIME_TESTING_MENU && HAS_DMA
-+	depends on RUNTIME_TESTING_MENU && HAS_DMA && VHOST_DPN
- 	select VHOST_RING
- 	default n
- 	help
-diff --git a/drivers/vhost/Kconfig b/drivers/vhost/Kconfig
-index 2c75d164b827..c4f273793595 100644
---- a/drivers/vhost/Kconfig
-+++ b/drivers/vhost/Kconfig
-@@ -13,6 +13,15 @@ config VHOST_RING
- 	  This option is selected by any driver which needs to access
- 	  the host side of a virtio ring.
- 
-+config VHOST_DPN
-+	bool
-+	depends on !ARM || AEABI
-+	default y
-+	help
-+	  Anything selecting VHOST or VHOST_RING must depend on VHOST_DPN.
-+	  This excludes the deprecated ARM ABI since that forces a 4 byte
-+	  alignment on all structs - incompatible with virtio spec requirements.
-+
- config VHOST
- 	tristate
- 	select VHOST_IOTLB
-@@ -28,7 +37,7 @@ if VHOST_MENU
- 
- config VHOST_NET
- 	tristate "Host kernel accelerator for virtio net"
--	depends on NET && EVENTFD && (TUN || !TUN) && (TAP || !TAP)
-+	depends on NET && EVENTFD && (TUN || !TUN) && (TAP || !TAP) && VHOST_DPN
- 	select VHOST
- 	---help---
- 	  This kernel module can be loaded in host kernel to accelerate
-@@ -40,7 +49,7 @@ config VHOST_NET
- 
- config VHOST_SCSI
- 	tristate "VHOST_SCSI TCM fabric driver"
--	depends on TARGET_CORE && EVENTFD
-+	depends on TARGET_CORE && EVENTFD && VHOST_DPN
- 	select VHOST
- 	default n
- 	---help---
-@@ -49,7 +58,7 @@ config VHOST_SCSI
- 
- config VHOST_VSOCK
- 	tristate "vhost virtio-vsock driver"
--	depends on VSOCKETS && EVENTFD
-+	depends on VSOCKETS && EVENTFD && VHOST_DPN
- 	select VHOST
- 	select VIRTIO_VSOCKETS_COMMON
- 	default n
-@@ -63,7 +72,7 @@ config VHOST_VSOCK
- 
- config VHOST_VDPA
- 	tristate "Vhost driver for vDPA-based backend"
--	depends on EVENTFD
-+	depends on EVENTFD && VHOST_DPN
- 	select VHOST
- 	depends on VDPA
- 	help
--- 
-MST
-
+I keep forgetting we have those shadows.  Definitely the best solution.
