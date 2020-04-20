@@ -2,84 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8C6121B1148
-	for <lists+kvm@lfdr.de>; Mon, 20 Apr 2020 18:17:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CB7E51B1156
+	for <lists+kvm@lfdr.de>; Mon, 20 Apr 2020 18:19:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728287AbgDTQRu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Apr 2020 12:17:50 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:29563 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726061AbgDTQRu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 Apr 2020 12:17:50 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1587399467;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=aVmMlP4bgEOgyhPBBrYrGgIG5tzuNNZSz4+8vsE0HJo=;
-        b=HnLsVv5lsKBB1lu5s0gWnTn0S1z5AGyTKHoNbNRCDt0jgZPucd4D4QFySgkMPDxtgB7Xh4
-        yWcXj6/yndTR4sYJuo824bX53dbQ0oyAzndD3SGPOkIum33OQ9g4UjFI1pGrRlY8WNEhOq
-        c8Wm/r8upuEF3+70pZ82tcYpvvg8faY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-436-4C7849F1MoOjHETHB0DVtQ-1; Mon, 20 Apr 2020 12:17:45 -0400
-X-MC-Unique: 4C7849F1MoOjHETHB0DVtQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 33106190B2B3;
-        Mon, 20 Apr 2020 16:17:44 +0000 (UTC)
-Received: from treble.redhat.com (ovpn-116-8.rdu2.redhat.com [10.10.116.8])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id EA1295C64E;
-        Mon, 20 Apr 2020 16:17:41 +0000 (UTC)
-From:   Josh Poimboeuf <jpoimboe@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, Peter Zijlstra <peterz@infradead.org>,
-        Randy Dunlap <rdunlap@infradead.org>
-Subject: [PATCH] kvm: Disable objtool frame pointer checking for vmenter.S
-Date:   Mon, 20 Apr 2020 11:17:37 -0500
-Message-Id: <01fae42917bacad18be8d2cbc771353da6603473.1587398610.git.jpoimboe@redhat.com>
+        id S1728686AbgDTQTI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Apr 2020 12:19:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38442 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726036AbgDTQTH (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 20 Apr 2020 12:19:07 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A0B9C061A0C
+        for <kvm@vger.kernel.org>; Mon, 20 Apr 2020 09:19:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
+        Content-Type:In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:
+        Subject:Sender:Reply-To:Content-ID:Content-Description;
+        bh=o3r/9H1g4XVNttUz12GoHBi/9Qq29h3HAKyoLq5UF/U=; b=sBTQ54BbtwXNAtdG5APYhkaBDp
+        EiVjrwn7pGkTjG5p+xCltaOxOTvguxGKTw4786cBWW3W4tZ5oPuOx7WN0LYOgA6AKPIPCF2XLkq7E
+        E+f6vc2imOkli+zgkRWDSjWpbPYqSAhy1IqPIFRSKHajT7bV5rx02Os8U2DLH4xgbagED/zb2WLGh
+        WVEDU2Y0BG9TOJde68PeFvGuJgF47hv3OVMKb1ZPaY5hlpQB1uVC7doYQmZ8GzyWT/E8ANAkbSFA8
+        yQZpPFJ6KbCjhBG9BenG+GPeMDBDRUOplZMLB9YFQxMkWlE2y1tkeEZqpTuNqgwA3R/Cqxh819ZaP
+        G+DzgUnA==;
+Received: from [2601:1c0:6280:3f0::19c2]
+        by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1jQZ8U-00014x-Ta; Mon, 20 Apr 2020 16:19:07 +0000
+Subject: Re: [PATCH] kvm: Disable objtool frame pointer checking for vmenter.S
+To:     Josh Poimboeuf <jpoimboe@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, Peter Zijlstra <peterz@infradead.org>
+References: <01fae42917bacad18be8d2cbc771353da6603473.1587398610.git.jpoimboe@redhat.com>
+From:   Randy Dunlap <rdunlap@infradead.org>
+Message-ID: <3da1077d-c1b0-4fb0-693b-c124e8e4ca0f@infradead.org>
+Date:   Mon, 20 Apr 2020 09:19:04 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <01fae42917bacad18be8d2cbc771353da6603473.1587398610.git.jpoimboe@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Frame pointers are completely broken by vmenter.S because it clobbers
-RBP:
+On 4/20/20 9:17 AM, Josh Poimboeuf wrote:
+> Frame pointers are completely broken by vmenter.S because it clobbers
+> RBP:
+> 
+>   arch/x86/kvm/svm/vmenter.o: warning: objtool: __svm_vcpu_run()+0xe4: BP used as a scratch register
+> 
+> That's unavoidable, so just skip checking that file when frame pointers
+> are configured in.
+> 
+> On the other hand, ORC can handle that code just fine, so leave objtool
+> enabled in the !FRAME_POINTER case.
+> 
+> Reported-by: Randy Dunlap <rdunlap@infradead.org>
+> Signed-off-by: Josh Poimboeuf <jpoimboe@redhat.com>
 
-  arch/x86/kvm/svm/vmenter.o: warning: objtool: __svm_vcpu_run()+0xe4: BP=
- used as a scratch register
+Acked-by: Randy Dunlap <rdunlap@infradead.org> # build-tested
 
-That's unavoidable, so just skip checking that file when frame pointers
-are configured in.
+Thanks.
 
-On the other hand, ORC can handle that code just fine, so leave objtool
-enabled in the !FRAME_POINTER case.
+> ---
+>  arch/x86/kvm/Makefile | 4 ++++
+>  1 file changed, 4 insertions(+)
+> 
+> diff --git a/arch/x86/kvm/Makefile b/arch/x86/kvm/Makefile
+> index a789759b7261..4a3081e9f4b5 100644
+> --- a/arch/x86/kvm/Makefile
+> +++ b/arch/x86/kvm/Makefile
+> @@ -3,6 +3,10 @@
+>  ccflags-y += -Iarch/x86/kvm
+>  ccflags-$(CONFIG_KVM_WERROR) += -Werror
+>  
+> +ifeq ($(CONFIG_FRAME_POINTER),y)
+> +OBJECT_FILES_NON_STANDARD_vmenter.o := y
+> +endif
+> +
+>  KVM := ../../../virt/kvm
+>  
+>  kvm-y			+= $(KVM)/kvm_main.o $(KVM)/coalesced_mmio.o \
+> 
 
-Reported-by: Randy Dunlap <rdunlap@infradead.org>
-Signed-off-by: Josh Poimboeuf <jpoimboe@redhat.com>
----
- arch/x86/kvm/Makefile | 4 ++++
- 1 file changed, 4 insertions(+)
 
-diff --git a/arch/x86/kvm/Makefile b/arch/x86/kvm/Makefile
-index a789759b7261..4a3081e9f4b5 100644
---- a/arch/x86/kvm/Makefile
-+++ b/arch/x86/kvm/Makefile
-@@ -3,6 +3,10 @@
- ccflags-y +=3D -Iarch/x86/kvm
- ccflags-$(CONFIG_KVM_WERROR) +=3D -Werror
-=20
-+ifeq ($(CONFIG_FRAME_POINTER),y)
-+OBJECT_FILES_NON_STANDARD_vmenter.o :=3D y
-+endif
-+
- KVM :=3D ../../../virt/kvm
-=20
- kvm-y			+=3D $(KVM)/kvm_main.o $(KVM)/coalesced_mmio.o \
---=20
-2.21.1
-
+-- 
+~Randy
