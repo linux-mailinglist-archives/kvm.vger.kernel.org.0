@@ -2,81 +2,147 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 039F11B0D66
-	for <lists+kvm@lfdr.de>; Mon, 20 Apr 2020 15:51:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E6C381B0DAB
+	for <lists+kvm@lfdr.de>; Mon, 20 Apr 2020 16:03:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728463AbgDTNvy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Apr 2020 09:51:54 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:26178 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727046AbgDTNvy (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 20 Apr 2020 09:51:54 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1587390713;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=7gTi1IicJlsSKfDG5naKX5cqpPONHfHCE+Bv1EVj7p4=;
-        b=Ic+Retk4v9dNbeRFVufz/gDmZHLd1kSWJ4tkvbv3PeQ2KePa8iF5bjpZqKzXocrNJDGbB0
-        i0Db/t+RrHjfd/MyCEH2Gr0MxTUIIYjSXLyK6dMZ9C8mAePwwjxtfSioGRwTjDPMrfutyq
-        JILbKUEGvpTarWE9dPETxzpJX7GyPvg=
-Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
- [209.85.160.200]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-192-Xbsm0hWmP1OvHpFBaL0aqg-1; Mon, 20 Apr 2020 09:51:51 -0400
-X-MC-Unique: Xbsm0hWmP1OvHpFBaL0aqg-1
-Received: by mail-qt1-f200.google.com with SMTP id u13so11028719qtk.5
-        for <kvm@vger.kernel.org>; Mon, 20 Apr 2020 06:51:51 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=7gTi1IicJlsSKfDG5naKX5cqpPONHfHCE+Bv1EVj7p4=;
-        b=pMcC/RrMjDhfNuNmeKAN1GO7Pc4/4gC8wIjRybrDgO3dVUlty6sOvHxjn/A0wcwrbD
-         49oIw6lVsdvF3OwwmPnjLTLbj/IexQlHZVfNVCajObkb4ac8tQhGKgObCZ4C5+h51fMw
-         EORFmIWNxzRom8ldMyNvfPR+V3HXXvXhTwYvCe0o/z3Q1twRFj7ZeWZFYfQoTOillyqi
-         oNSdrl7ZRLPDhTrPDXwUI3XenAXv265xY8A7Hi5wk5DIjXQn9X6QgBGPjXPKBclwstcq
-         fqJwt5BbPZvrsSU3hF950obqVM3Yo7466dA7SF4MMBkN66napr1X2z7TRGWF/UZ8pZ5J
-         JXfw==
-X-Gm-Message-State: AGi0PubPS94EBUN97tIQwcgP5DIPfSHRKLqNw/6TM3Ao1z5fLMjEhndp
-        NZqhjzfSNuxxZHI1jM1Bl9UyR+7FP+G9r96lNofDLiQDMOQ8G3itbmNyhhL4Raon46A6cr0yD/z
-        kzEygsAv41XIc
-X-Received: by 2002:a05:620a:1009:: with SMTP id z9mr15818453qkj.270.1587390711068;
-        Mon, 20 Apr 2020 06:51:51 -0700 (PDT)
-X-Google-Smtp-Source: APiQypIL/5HvAE8uGB2QeYJcMl1quKM2t1afKsHoOGNm7ioq9h6iVSe8lTD2IPGc1eogwV5ywc6E9A==
-X-Received: by 2002:a05:620a:1009:: with SMTP id z9mr15818438qkj.270.1587390710884;
-        Mon, 20 Apr 2020 06:51:50 -0700 (PDT)
-Received: from xz-x1 (CPEf81d0fb19163-CMf81d0fb19160.cpe.net.fido.ca. [72.137.123.47])
-        by smtp.gmail.com with ESMTPSA id y9sm606038qkb.41.2020.04.20.06.51.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 20 Apr 2020 06:51:50 -0700 (PDT)
-Date:   Mon, 20 Apr 2020 09:51:48 -0400
-From:   Peter Xu <peterx@redhat.com>
-To:     Jason Yan <yanaijie@huawei.com>
-Cc:     pbonzini@redhat.com, tglx@linutronix.de, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] kvm/eventfd: remove unneeded conversion to bool
-Message-ID: <20200420135148.GK287932@xz-x1>
-References: <20200420123805.4494-1-yanaijie@huawei.com>
+        id S1729094AbgDTODX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Apr 2020 10:03:23 -0400
+Received: from mail.kernel.org ([198.145.29.99]:58298 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726871AbgDTODW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 Apr 2020 10:03:22 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 918E420722;
+        Mon, 20 Apr 2020 14:03:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1587391401;
+        bh=GPT20fEi2/FOGz+OkWS9srVMj+Rsxisj5E5BJqEY3UU=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=bQ8HBwamtxiv7Lhgcap7xcBV4Jlc9CX5VQNZlpTf0yVkbH9kEl5RE8gBvInvva93g
+         L4UulNBvuMdIJR8930Fx1dR/9O25nYqJSi1DKOPDBZoVX9F47jjaSRSr2uWm8H/mMg
+         Nsa/xcz6YHHICI8JzH58nRHy4kE+RfdMsNOcJ3ME=
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+        by disco-boy.misterjones.org with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        (Exim 4.92)
+        (envelope-from <maz@kernel.org>)
+        id 1jQX15-004ttw-TP; Mon, 20 Apr 2020 15:03:20 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20200420123805.4494-1-yanaijie@huawei.com>
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date:   Mon, 20 Apr 2020 15:03:19 +0100
+From:   Marc Zyngier <maz@kernel.org>
+To:     "Zengtao (B)" <prime.zeng@hisilicon.com>
+Cc:     George Cherian <gcherian@marvell.com>, Dave.Martin@arm.com,
+        alexandru.elisei@arm.com, andre.przywara@arm.com,
+        christoffer.dall@arm.com, james.morse@arm.com,
+        jintack@cs.columbia.edu, julien.thierry.kdev@gmail.com,
+        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        linux-arm-kernel@lists.infradead.org, suzuki.poulose@arm.com,
+        Anil Kumar Reddy H <areddy3@marvell.com>,
+        Ganapatrao Kulkarni <gkulkarni@marvell.com>
+Subject: Re: [PATCH v2 00/94] KVM: arm64: ARMv8.3/8.4 Nested Virtualization
+ support
+In-Reply-To: <678F3D1BB717D949B966B68EAEB446ED3A545C71@dggemm526-mbx.china.huawei.com>
+References: <MN2PR18MB26869A6CA4E67558324F655CC5C70@MN2PR18MB2686.namprd18.prod.outlook.com>
+ <06d08f904f003160a48eac3c5ab3c7ff@kernel.org>
+ <678F3D1BB717D949B966B68EAEB446ED342E29B9@dggemm526-mbx.china.huawei.com>
+ <86r1wus7df.wl-maz@kernel.org>
+ <678F3D1BB717D949B966B68EAEB446ED3A535FCF@DGGEMM506-MBX.china.huawei.com>
+ <3e84aaf8b757bc5a7685a291e54c232b@kernel.org> <20200417160602.26706917@why>
+ <678F3D1BB717D949B966B68EAEB446ED3A545C71@dggemm526-mbx.china.huawei.com>
+Message-ID: <dd1283e9b31fd01ac5c9f434aa00d34e@kernel.org>
+X-Sender: maz@kernel.org
+User-Agent: Roundcube Webmail/1.3.10
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: prime.zeng@hisilicon.com, gcherian@marvell.com, Dave.Martin@arm.com, alexandru.elisei@arm.com, andre.przywara@arm.com, christoffer.dall@arm.com, james.morse@arm.com, jintack@cs.columbia.edu, julien.thierry.kdev@gmail.com, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, suzuki.poulose@arm.com, areddy3@marvell.com, gkulkarni@marvell.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Apr 20, 2020 at 08:38:05PM +0800, Jason Yan wrote:
-> The '==' expression itself is bool, no need to convert it to bool again.
-> This fixes the following coccicheck warning:
-> 
-> virt/kvm/eventfd.c:724:38-43: WARNING: conversion to bool not needed
-> here
-> 
-> Signed-off-by: Jason Yan <yanaijie@huawei.com>
+On 2020-04-18 03:49, Zengtao (B) wrote:
+> -----Original Message-----
+>> From: Marc Zyngier [mailto:maz@kernel.org]
+>> Sent: Friday, April 17, 2020 11:06 PM
+>> To: Zengtao (B)
+>> Cc: George Cherian; Dave.Martin@arm.com; alexandru.elisei@arm.com;
+>> andre.przywara@arm.com; christoffer.dall@arm.com;
+>> james.morse@arm.com; jintack@cs.columbia.edu;
+>> julien.thierry.kdev@gmail.com; kvm@vger.kernel.org;
+>> kvmarm@lists.cs.columbia.edu; linux-arm-kernel@lists.infradead.org;
+>> suzuki.poulose@arm.com; Anil Kumar Reddy H; Ganapatrao Kulkarni
+>> Subject: Re: [PATCH v2 00/94] KVM: arm64: ARMv8.3/8.4 Nested
+>> Virtualization support
+>> 
+>> On Thu, 16 Apr 2020 19:22:21 +0100
+>> Marc Zyngier <maz@kernel.org> wrote:
+>> 
+>> > Hi Zengtao,
+>> >
+>> > On 2020-04-16 02:38, Zengtao (B) wrote:
+>> > > Hi Marc:
+>> > >
+>> > > Got it.
+>> > > Really a bit patch set :)
+>> >
+>> > Well, yeah... ;-)
+>> >
+>> > >
+>> > > BTW, I have done a basic kvm unit test
+>> > > git://git.kernel.org/pub/scm/virt/kvm/kvm-unit-tests.git
+>> > > And I find that after apply the patch KVM: arm64: VNCR-ize ELR_EL1,
+>> > > The psci test failed for some reason, I can't understand why, this
+>> > > is only the test result.(find the patch by git bisect + kvm test)
+>> >
+>> > That it is that mechanical, we should be able to quickly nail that one.
+>> >
+>> > > My platform: Hisilicon D06 board.
+>> > > Linux kernel: Linux 5.6-rc6 + nv patches(some rebases)
+>> > > Could you help to take a look?
+>> >
+>> > I'll have a look tomorrow. I'm in the middle of refactoring the series
+>> > for 5.7, and things have changed quite a bit. Hopefully this isn't a VHE
+>> > vs non-VHE issue.
+>> 
+>> So I've repeatedly tried with the current state of the NV patches[1],
+>> on both an ARMv8.0 system (Seattle) and an ARMv8.2 pile of putrid junk
+>> (vim3l). PSCI is pretty happy, although I can only test with at most 8
+>> vcpus (GICv2 gets in the way).
+>> 
+>> Can you please:
+>> 
+>> - post the detailed error by running the PSCI unit test on its own
+> I tried to trace the error, and I found in kernel function 
+> kvm_mpidr_to_vcpu,
+> casually, mpidr returns zero and we can't get the expected vcpu, and 
+> psci
+>  test failed due to this.
 
-Reviewed-by: Peter Xu <peterx@redhat.com>
+Can you post the exact error message from the unit test?
 
+> And as I mentioned in my last before, the psci error is introduced by 
+> the
+>  patch KVM: arm64: VNCR-ize ELR_EL1.(Only test result)
+> Maybe you have to try tens of times to reproduce. :)
+> Deep into the patch itself, I don't find any connection between the 
+> patch
+> and the issue.
+
+Me neither, and I haven't managed to reproduce your issue.
+
+>> - test with the current state of the patches
+> I test with your nv-5.7-rc1-WIP branch and latest kvm_unit_test, the
+> error still exist.
+
+How many vcpus do you create with this PSCI test?
+
+Thanks,
+
+         M.
 -- 
-Peter Xu
-
+Jazz is not dead. It just smells funny...
