@@ -2,91 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 830951B18A6
-	for <lists+kvm@lfdr.de>; Mon, 20 Apr 2020 23:43:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CFA801B18DC
+	for <lists+kvm@lfdr.de>; Mon, 20 Apr 2020 23:53:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727816AbgDTVnU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Apr 2020 17:43:20 -0400
-Received: from ms.lwn.net ([45.79.88.28]:53958 "EHLO ms.lwn.net"
+        id S1726494AbgDTVxp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Apr 2020 17:53:45 -0400
+Received: from mx2.suse.de ([195.135.220.15]:36894 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725989AbgDTVnT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 Apr 2020 17:43:19 -0400
-Received: from lwn.net (localhost [127.0.0.1])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ms.lwn.net (Postfix) with ESMTPSA id 632E4823;
-        Mon, 20 Apr 2020 21:43:17 +0000 (UTC)
-Date:   Mon, 20 Apr 2020 15:43:16 -0600
-From:   Jonathan Corbet <corbet@lwn.net>
-To:     Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-Cc:     Linux Doc Mailing List <linux-doc@vger.kernel.org>,
-        linux-kernel@vger.kernel.org, Rob Herring <robh@kernel.org>,
-        Maxime Ripard <maxime@cerno.tech>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Sudeep Holla <sudeep.holla@arm.com>,
-        Kishon Vijay Abraham I <kishon@ti.com>,
-        Yuti Amonkar <yamonkar@cadence.com>,
-        devicetree@vger.kernel.org, linux-arch@vger.kernel.org,
-        kvm@vger.kernel.org, kvm-ppc@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, dri-devel@lists.freedesktop.org,
-        linux-arm-kernel@lists.infradead.org,
-        linux-fsdevel@vger.kernel.org, linux-unionfs@vger.kernel.org,
-        linux-mm@kvack.org, linux-rdma@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu, linux-crypto@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-        freedreno@lists.freedesktop.org, linux-afs@lists.infradead.org,
-        ecryptfs@vger.kernel.org, linux-ntfs-dev@lists.sourceforge.net,
-        ocfs2-devel@oss.oracle.com, linux-pci@vger.kernel.org,
-        linux-edac@vger.kernel.org, linux-spi@vger.kernel.org,
-        Sandeep Maheswaram <sanm@codeaurora.org>,
-        Stephen Boyd <swboyd@chromium.org>,
-        Matthias Kaehlcke <mka@chromium.org>,
-        linux-usb@vger.kernel.org,
-        Geert Uytterhoeven <geert+renesas@glider.be>,
-        Matthias Brugger <mbrugger@suse.com>, netdev@vger.kernel.org,
-        linux-i2c@vger.kernel.org, linux-rockchip@lists.infradead.org,
-        linux-ide@vger.kernel.org, linux1394-devel@lists.sourceforge.net
-Subject: Re: [PATCH v2 00/33] Documentation fixes for Kernel 5.8
-Message-ID: <20200420154316.28e42905@lwn.net>
-In-Reply-To: <cover.1586881715.git.mchehab+huawei@kernel.org>
-References: <cover.1586881715.git.mchehab+huawei@kernel.org>
-Organization: LWN.net
+        id S1725989AbgDTVxp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 Apr 2020 17:53:45 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx2.suse.de (Postfix) with ESMTP id 0EE2CAE47;
+        Mon, 20 Apr 2020 21:53:41 +0000 (UTC)
+Date:   Mon, 20 Apr 2020 14:50:14 -0700
+From:   Davidlohr Bueso <dave@stgolabs.net>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Marc Zyngier <maz@kernel.org>, tglx@linutronix.de,
+        kvm@vger.kernel.org, Davidlohr Bueso <dbueso@suse.de>,
+        peterz@infradead.org, torvalds@linux-foundation.org,
+        bigeasy@linutronix.de, linux-kernel@vger.kernel.org,
+        rostedt@goodmis.org, linux-mips@vger.kernel.org,
+        Paul Mackerras <paulus@ozlabs.org>, joel@joelfernandes.org,
+        will@kernel.org, kvmarm@lists.cs.columbia.edu
+Subject: Re: [PATCH v2] kvm: Replace vcpu->swait with rcuwait
+Message-ID: <20200420215014.sarodevmhphnkkn7@linux-p48b>
+References: <20200324044453.15733-1-dave@stgolabs.net>
+ <20200324044453.15733-4-dave@stgolabs.net>
+ <20200420164132.tjzk5ebx35m66yce@linux-p48b>
+ <418acdb5001a9ae836095b7187338085@misterjones.org>
+ <20200420205641.6sgsllj6pmsnwrvp@linux-p48b>
+ <f7cc83fe-3e91-0057-9af2-26c201456689@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <f7cc83fe-3e91-0057-9af2-26c201456689@redhat.com>
+User-Agent: NeoMutt/20180716
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 14 Apr 2020 18:48:26 +0200
-Mauro Carvalho Chehab <mchehab+huawei@kernel.org> wrote:
+On Mon, 20 Apr 2020, Paolo Bonzini wrote:
 
-> Patches 1 to 5 contain changes to the documentation toolset:
-> 
-> - The first 3 patches help to reduce a lot the number of reported
->   kernel-doc issues, by making the tool more smart.
-> 
-> - Patches 4 and 5 are meant to partially address the PDF
->   build, with now requires Sphinx version 2.4 or upper.
-> 
-> The remaining patches fix broken references detected by
-> this tool:
-> 
->         ./scripts/documentation-file-ref-check
-> 
-> and address other random errors due to tags being mis-interpreted
-> or mis-used.
-> 
-> They are independent each other, but some may depend on
-> the kernel-doc improvements.
-> 
-> PS.: Due to the large number of C/C, I opted to keep a smaller
-> set of C/C at this first e-mail (only e-mails with "L:" tag from
-> MAINTAINERS file).
+>On 20/04/20 22:56, Davidlohr Bueso wrote:
+>> On Mon, 20 Apr 2020, Marc Zyngier wrote:
+>>
+>>> This looks like a change in the semantics of the tracepoint. Before this
+>>> change, 'waited' would have been true if the vcpu waited at all. Here,
+>>> you'd
+>>> have false if it has been interrupted by a signal, even if the vcpu
+>>> has waited
+>>> for a period of time.
+>>
+>> Hmm but sleeps are now uninterruptible as we're using TASK_IDLE.
+>
+>Hold on, does that mean that you can't anymore send a signal in order to
+>kick a thread out of KVM_RUN?  Or am I just misunderstanding?
 
-OK, I've applied this set, minus #17 which was applied elsewhere.
+Considering that the return value of the interruptible wait is not
+checked, I would not think this breaks KVM_RUN.
 
 Thanks,
-
-jon
+Davidlohr
