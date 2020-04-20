@@ -2,251 +2,147 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 401C51B13C5
-	for <lists+kvm@lfdr.de>; Mon, 20 Apr 2020 19:59:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 341111B14C3
+	for <lists+kvm@lfdr.de>; Mon, 20 Apr 2020 20:37:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727775AbgDTR7W (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Apr 2020 13:59:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54116 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726013AbgDTR7W (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 Apr 2020 13:59:22 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6A97C061A0C
-        for <kvm@vger.kernel.org>; Mon, 20 Apr 2020 10:59:20 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id y73so4717784ybe.22
-        for <kvm@vger.kernel.org>; Mon, 20 Apr 2020 10:59:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=FNiVif2OGs+DEb/0JGe/lmn9AvD2UyqpmhDBJ0M7DiI=;
-        b=BdBtj6dAXNTjrn5LHd5QUsXYKI5HfnUqrgXaaL6L1AzEhlw/0PANMnlRu1dQC7kCVb
-         wQxAYz3VcbwD4ehXOwkfzOBfqEMwNtE/1uSS06Mb4DfJ8K7PcmGcuWMDp2ClBKwm+62C
-         irTHKpGA7iUUtcgaarriZx4uHctZoY+8dsENgR0m536/NJZfHFN+5r2x4YC4JyI8MNzb
-         ldcxVZKpOuKsOZp2CVkFTxhhYv+r1b2qsPao4EDIZJ7DnOdNluAww1K8GILXNo3xXtWD
-         GQ3jjOWDoDGoPuGQUTgcdmUTxGp493zsxkkDbDimIjye0CaMm9C8NeAVL5GRyFHaR+nG
-         6/tg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=FNiVif2OGs+DEb/0JGe/lmn9AvD2UyqpmhDBJ0M7DiI=;
-        b=VMNwLk3S4f6CSUnByhfaHs9eh3cFjWuuDWoI5X0hYbXaX9p5T1/gJERYZfMNJuiSA9
-         Hw/BqPbA6E3/UU5CiL5p0NdblTLHnzRDWO6gosIpPytsxY4ZWMwhcARuab7p3Hi35jja
-         kZuvnnK7p74AHQFeskpy2FPVk/gqOiMw0El1j72HSD4P2ARqIyFxkCOMBUyDu8kxj5am
-         34ROBBJ9iRznEPGqSjJFbe9jS0EYOwEZ06pmqRRkArUvbKONI0Yz5aL0EpRQKzxkmPY4
-         nAQ54Mfi9zhD2UspqTx/A2vMFG6gnyhjvSB+tsSUlzKsGU0Kl14RlOWOao8OEdFZoVeN
-         TkMg==
-X-Gm-Message-State: AGi0Puaz10O4JVWlxoji8Ac6MW5SfLJybdbXGqIiaYNhFitEdRtUVNxk
-        8pgnh4U5a7ElMAoUu1wgySt1/NQggs8gUURFAM7MqtrC7RPl5fJGuZnFuVPaLNch+hOult4rPNg
-        Ut4jyTyxZL2gHOrWVUKfskqAY2Fr2qcEGGhdL8G8E5kcBsu2zO6SOKOTF7tmHYZ9w0bVW2p0=
-X-Google-Smtp-Source: APiQypJTSwql/zEgDxhAIO0C/xVMA0IBQfDwR9/++glCbi3BtIbmXdnSBP6nkiPrh1FdWrod08wMdfR5p1stG2PZ4Q==
-X-Received: by 2002:a25:5057:: with SMTP id e84mr19773139ybb.198.1587405560005;
- Mon, 20 Apr 2020 10:59:20 -0700 (PDT)
-Date:   Mon, 20 Apr 2020 10:58:34 -0700
-Message-Id: <20200420175834.258122-1-brigidsmith@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.26.1.301.g55bc3eb7cb9-goog
-Subject: [kvm-unit-tests PATCH v3] x86: nVMX: add new test for vmread/vmwrite
- flags preservation
-From:   Simon Smith <brigidsmith@google.com>
-To:     kvm@vger.kernel.org
-Cc:     Simon Smith <brigidsmith@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        Peter Shier <pshier@google.com>,
-        Krish Sadhukhan <krish.sadhukhan@oracle.com>,
-        Oliver Upton <oupton@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        id S1727969AbgDTSgi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Apr 2020 14:36:38 -0400
+Received: from pegase1.c-s.fr ([93.17.236.30]:61324 "EHLO pegase1.c-s.fr"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725613AbgDTSgh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 Apr 2020 14:36:37 -0400
+Received: from localhost (mailhub1-int [192.168.12.234])
+        by localhost (Postfix) with ESMTP id 495b4z3MXVz9v1w9;
+        Mon, 20 Apr 2020 20:36:35 +0200 (CEST)
+Authentication-Results: localhost; dkim=pass
+        reason="1024-bit key; insecure key"
+        header.d=c-s.fr header.i=@c-s.fr header.b=E+DWEZwJ; dkim-adsp=pass;
+        dkim-atps=neutral
+X-Virus-Scanned: Debian amavisd-new at c-s.fr
+Received: from pegase1.c-s.fr ([192.168.12.234])
+        by localhost (pegase1.c-s.fr [192.168.12.234]) (amavisd-new, port 10024)
+        with ESMTP id L4mwlUXAK_-i; Mon, 20 Apr 2020 20:36:35 +0200 (CEST)
+Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
+        by pegase1.c-s.fr (Postfix) with ESMTP id 495b4z2JLhz9v95f;
+        Mon, 20 Apr 2020 20:36:35 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=c-s.fr; s=mail;
+        t=1587407795; bh=0fa57ddsyHEgiUKKkj3rA4MemZZkyaFbgYjKejGShaM=;
+        h=From:Subject:To:Cc:Date:From;
+        b=E+DWEZwJhz6Y/xgde33hxmuD3rGUtiRxeI/8EM0ccVSx3KfiQ4f7G5tlyiclyZlTv
+         G3EZfX0BGGT6pW9WIfnMkWEKqCSDbnWxGkJCDbptk9jvRRwxinuBROxEoLLsiTAxU+
+         2fc5X+q61AH6lsZ6C9gAPrkXh1oIdYDt+A1N76WQ=
+Received: from localhost (localhost [127.0.0.1])
+        by messagerie.si.c-s.fr (Postfix) with ESMTP id 4F6AA8B78A;
+        Mon, 20 Apr 2020 20:36:35 +0200 (CEST)
+X-Virus-Scanned: amavisd-new at c-s.fr
+Received: from messagerie.si.c-s.fr ([127.0.0.1])
+        by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
+        with ESMTP id 7Voh0XE4aIU2; Mon, 20 Apr 2020 20:36:35 +0200 (CEST)
+Received: from pc16570vm.idsi0.si.c-s.fr (unknown [192.168.4.90])
+        by messagerie.si.c-s.fr (Postfix) with ESMTP id EFABD8B77E;
+        Mon, 20 Apr 2020 20:36:34 +0200 (CEST)
+Received: by pc16570vm.idsi0.si.c-s.fr (Postfix, from userid 0)
+        id B0D97657AE; Mon, 20 Apr 2020 18:36:34 +0000 (UTC)
+Message-Id: <a5945463f86c984151962a475a3ee56a2893e85d.1587407777.git.christophe.leroy@c-s.fr>
+From:   Christophe Leroy <christophe.leroy@c-s.fr>
+Subject: [PATCH 1/5] drivers/powerpc: Replace _ALIGN_UP() by ALIGN()
+To:     Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Paul Mackerras <paulus@samba.org>,
+        Michael Ellerman <mpe@ellerman.id.au>
+Cc:     linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        kvm@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        linux-fbdev@vger.kernel.org, alsa-devel@alsa-project.org
+Date:   Mon, 20 Apr 2020 18:36:34 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This commit adds new unit tests for commit a4d956b93904 ("KVM: nVMX:
-vmread should not set rflags to specify success in case of #PF")
+_ALIGN_UP() is specific to powerpc
+ALIGN() is generic and does the same
 
-The two new tests force a vmread and a vmwrite on an unmapped
-address to cause a #PF and verify that the low byte of %rflags is
-preserved and that %rip is not advanced.  The commit fixed a
-bug in vmread, but we include a test for vmwrite as well for
-completeness.
+Replace _ALIGN_UP() by ALIGN()
 
-Before the aforementioned commit, the ALU flags would be incorrectly
-cleared and %rip would be advanced (for vmread).
-
-Signed-off-by: Simon Smith <brigidsmith@google.com>
-Reviewed-by: Jim Mattson <jmattson@google.com>
-Reviewed-by: Peter Shier <pshier@google.com>
-Reviewed-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Reviewed-by: Oliver Upton <oupton@google.com>
+Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
 ---
- x86/vmx.c | 140 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 140 insertions(+)
+ drivers/ps3/ps3-lpm.c               | 6 +++---
+ drivers/vfio/pci/vfio_pci_nvlink2.c | 2 +-
+ drivers/video/fbdev/ps3fb.c         | 4 ++--
+ sound/ppc/snd_ps3.c                 | 2 +-
+ 4 files changed, 7 insertions(+), 7 deletions(-)
 
-diff --git a/x86/vmx.c b/x86/vmx.c
-index 4c47eec1a1597..cbe68761894d4 100644
---- a/x86/vmx.c
-+++ b/x86/vmx.c
-@@ -32,6 +32,7 @@
- #include "processor.h"
- #include "alloc_page.h"
- #include "vm.h"
-+#include "vmalloc.h"
- #include "desc.h"
- #include "vmx.h"
- #include "msr.h"
-@@ -387,6 +388,141 @@ static void test_vmwrite_vmread(void)
- 	free_page(vmcs);
- }
+diff --git a/drivers/ps3/ps3-lpm.c b/drivers/ps3/ps3-lpm.c
+index 83c45659bc9d..064b5884ba13 100644
+--- a/drivers/ps3/ps3-lpm.c
++++ b/drivers/ps3/ps3-lpm.c
+@@ -1096,8 +1096,8 @@ int ps3_lpm_open(enum ps3_lpm_tb_type tb_type, void *tb_cache,
+ 		lpm_priv->tb_cache_internal = NULL;
+ 		lpm_priv->tb_cache = NULL;
+ 	} else if (tb_cache) {
+-		if (tb_cache != (void *)_ALIGN_UP((unsigned long)tb_cache, 128)
+-			|| tb_cache_size != _ALIGN_UP(tb_cache_size, 128)) {
++		if (tb_cache != (void *)ALIGN((unsigned long)tb_cache, 128)
++			|| tb_cache_size != ALIGN(tb_cache_size, 128)) {
+ 			dev_err(sbd_core(), "%s:%u: unaligned tb_cache\n",
+ 				__func__, __LINE__);
+ 			result = -EINVAL;
+@@ -1116,7 +1116,7 @@ int ps3_lpm_open(enum ps3_lpm_tb_type tb_type, void *tb_cache,
+ 			result = -ENOMEM;
+ 			goto fail_malloc;
+ 		}
+-		lpm_priv->tb_cache = (void *)_ALIGN_UP(
++		lpm_priv->tb_cache = (void *)ALIGN(
+ 			(unsigned long)lpm_priv->tb_cache_internal, 128);
+ 	}
  
-+ulong finish_fault;
-+u8 sentinel;
-+bool handler_called;
-+
-+static void pf_handler(struct ex_regs *regs)
-+{
-+	/*
-+	 * check that RIP was not improperly advanced and that the
-+	 * flags value was preserved.
-+	 */
-+	report(regs->rip < finish_fault, "RIP has not been advanced!");
-+	report(((u8)regs->rflags == ((sentinel | 2) & 0xd7)),
-+	       "The low byte of RFLAGS was preserved!");
-+	regs->rip = finish_fault;
-+	handler_called = true;
-+
-+}
-+
-+static void prep_flags_test_env(void **vpage, struct vmcs **vmcs, handler *old)
-+{
-+	/*
-+	 * get an unbacked address that will cause a #PF
-+	 */
-+	*vpage = alloc_vpage();
-+
-+	/*
-+	 * set up VMCS so we have something to read from
-+	 */
-+	*vmcs = alloc_page();
-+
-+	memset(*vmcs, 0, PAGE_SIZE);
-+	(*vmcs)->hdr.revision_id = basic.revision;
-+	assert(!vmcs_clear(*vmcs));
-+	assert(!make_vmcs_current(*vmcs));
-+
-+	*old = handle_exception(PF_VECTOR, &pf_handler);
-+}
-+
-+static void test_read_sentinel(void)
-+{
-+	void *vpage;
-+	struct vmcs *vmcs;
-+	handler old;
-+
-+	prep_flags_test_env(&vpage, &vmcs, &old);
-+
-+	/*
-+	 * set the proper label
-+	 */
-+	extern char finish_read_fault;
-+
-+	finish_fault = (ulong)&finish_read_fault;
-+
-+	/*
-+	 * execute the vmread instruction that will cause a #PF
-+	 */
-+	handler_called = false;
-+	asm volatile ("movb %[byte], %%ah\n\t"
-+		      "sahf\n\t"
-+		      "vmread %[enc], %[val]; finish_read_fault:"
-+		      : [val] "=m" (*(u64 *)vpage)
-+		      : [byte] "Krm" (sentinel),
-+		      [enc] "r" ((u64)GUEST_SEL_SS)
-+		      : "cc", "ah");
-+	report(handler_called, "The #PF handler was invoked");
-+
-+	/*
-+	 * restore the old #PF handler
-+	 */
-+	handle_exception(PF_VECTOR, old);
-+}
-+
-+static void test_vmread_flags_touch(void)
-+{
-+	/*
-+	 * set up the sentinel value in the flags register. we
-+	 * choose these two values because they candy-stripe
-+	 * the 5 flags that sahf sets.
-+	 */
-+	sentinel = 0x91;
-+	test_read_sentinel();
-+
-+	sentinel = 0x45;
-+	test_read_sentinel();
-+}
-+
-+static void test_write_sentinel(void)
-+{
-+	void *vpage;
-+	struct vmcs *vmcs;
-+	handler old;
-+
-+	prep_flags_test_env(&vpage, &vmcs, &old);
-+
-+	/*
-+	 * set the proper label
-+	 */
-+	extern char finish_write_fault;
-+
-+	finish_fault = (ulong)&finish_write_fault;
-+
-+	/*
-+	 * execute the vmwrite instruction that will cause a #PF
-+	 */
-+	handler_called = false;
-+	asm volatile ("movb %[byte], %%ah\n\t"
-+		      "sahf\n\t"
-+		      "vmwrite %[val], %[enc]; finish_write_fault:"
-+		      : [val] "=m" (*(u64 *)vpage)
-+		      : [byte] "Krm" (sentinel),
-+		      [enc] "r" ((u64)GUEST_SEL_SS)
-+		      : "cc", "ah");
-+	report(handler_called, "The #PF handler was invoked");
-+
-+	/*
-+	 * restore the old #PF handler
-+	 */
-+	handle_exception(PF_VECTOR, old);
-+}
-+
-+static void test_vmwrite_flags_touch(void)
-+{
-+	/*
-+	 * set up the sentinel value in the flags register. we
-+	 * choose these two values because they candy-stripe
-+	 * the 5 flags that sahf sets.
-+	 */
-+	sentinel = 0x91;
-+	test_write_sentinel();
-+
-+	sentinel = 0x45;
-+	test_write_sentinel();
-+}
-+
-+
- static void test_vmcs_high(void)
- {
- 	struct vmcs *vmcs = alloc_page();
-@@ -1988,6 +2124,10 @@ int main(int argc, const char *argv[])
- 		test_vmcs_lifecycle();
- 	if (test_wanted("test_vmx_caps", argv, argc))
- 		test_vmx_caps();
-+	if (test_wanted("test_vmread_flags_touch", argv, argc))
-+		test_vmread_flags_touch();
-+	if (test_wanted("test_vmwrite_flags_touch", argv, argc))
-+		test_vmwrite_flags_touch();
+diff --git a/drivers/vfio/pci/vfio_pci_nvlink2.c b/drivers/vfio/pci/vfio_pci_nvlink2.c
+index ed20d73cc27c..65c61710c0e9 100644
+--- a/drivers/vfio/pci/vfio_pci_nvlink2.c
++++ b/drivers/vfio/pci/vfio_pci_nvlink2.c
+@@ -67,7 +67,7 @@ static size_t vfio_pci_nvgpu_rw(struct vfio_pci_device *vdev,
+ 	 *
+ 	 * This is not fast path anyway.
+ 	 */
+-	sizealigned = _ALIGN_UP(posoff + count, PAGE_SIZE);
++	sizealigned = ALIGN(posoff + count, PAGE_SIZE);
+ 	ptr = ioremap_cache(data->gpu_hpa + posaligned, sizealigned);
+ 	if (!ptr)
+ 		return -EFAULT;
+diff --git a/drivers/video/fbdev/ps3fb.c b/drivers/video/fbdev/ps3fb.c
+index 834f63edf700..9df78fb77267 100644
+--- a/drivers/video/fbdev/ps3fb.c
++++ b/drivers/video/fbdev/ps3fb.c
+@@ -44,7 +44,7 @@
+ #define GPU_CMD_BUF_SIZE			(2 * 1024 * 1024)
+ #define GPU_FB_START				(64 * 1024)
+ #define GPU_IOIF				(0x0d000000UL)
+-#define GPU_ALIGN_UP(x)				_ALIGN_UP((x), 64)
++#define GPU_ALIGN_UP(x)				ALIGN((x), 64)
+ #define GPU_MAX_LINE_LENGTH			(65536 - 64)
  
- 	/* Balance vmxon from test_vmxon. */
- 	vmx_off();
+ #define GPU_INTR_STATUS_VSYNC_0			0	/* vsync on head A */
+@@ -1015,7 +1015,7 @@ static int ps3fb_probe(struct ps3_system_bus_device *dev)
+ 	}
+ #endif
+ 
+-	max_ps3fb_size = _ALIGN_UP(GPU_IOIF, 256*1024*1024) - GPU_IOIF;
++	max_ps3fb_size = ALIGN(GPU_IOIF, 256*1024*1024) - GPU_IOIF;
+ 	if (ps3fb_videomemory.size > max_ps3fb_size) {
+ 		dev_info(&dev->core, "Limiting ps3fb mem size to %lu bytes\n",
+ 			 max_ps3fb_size);
+diff --git a/sound/ppc/snd_ps3.c b/sound/ppc/snd_ps3.c
+index 6d2a33b8faa0..b8161a08f2ca 100644
+--- a/sound/ppc/snd_ps3.c
++++ b/sound/ppc/snd_ps3.c
+@@ -926,7 +926,7 @@ static int snd_ps3_driver_probe(struct ps3_system_bus_device *dev)
+ 			    PAGE_SHIFT, /* use system page size */
+ 			    0, /* dma type; not used */
+ 			    NULL,
+-			    _ALIGN_UP(SND_PS3_DMA_REGION_SIZE, PAGE_SIZE));
++			    ALIGN(SND_PS3_DMA_REGION_SIZE, PAGE_SIZE));
+ 	dev->d_region->ioid = PS3_AUDIO_IOID;
+ 
+ 	ret = ps3_dma_region_create(dev->d_region);
 -- 
-2.26.1.301.g55bc3eb7cb9-goog
+2.25.0
 
