@@ -2,183 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 16CC11B12B3
-	for <lists+kvm@lfdr.de>; Mon, 20 Apr 2020 19:12:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8EB561B12D5
+	for <lists+kvm@lfdr.de>; Mon, 20 Apr 2020 19:18:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726232AbgDTRMW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Apr 2020 13:12:22 -0400
-Received: from mail.kernel.org ([198.145.29.99]:43604 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725774AbgDTRMW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 Apr 2020 13:12:22 -0400
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 53E89206D9;
-        Mon, 20 Apr 2020 17:12:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1587402741;
-        bh=/ZHsHp1usqr/RF1hK0tLM3DblWJABJZwOeUQ1Q3+dcg=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=QuJexw8mxsa6aipMVIAskHLERDvWC8yf7dQ5wFwoAQS0IDMAi1h0ee+ZqhAYOM+SC
-         Z6c50HQJWMTaRJdVfgSIxO1Jt39h6i4hcPo+S2hNTrbb2zAaN87VtpHsjqV3M+rVN5
-         svuEx2/DfNDpBJIppg/Nd/rIoCj9XD61yEc1et40=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
-        by disco-boy.misterjones.org with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.92)
-        (envelope-from <maz@kernel.org>)
-        id 1jQZxz-004x1G-Mq; Mon, 20 Apr 2020 18:12:19 +0100
+        id S1726806AbgDTRSz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Apr 2020 13:18:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47832 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726751AbgDTRSy (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 20 Apr 2020 13:18:54 -0400
+Received: from mail-io1-xd44.google.com (mail-io1-xd44.google.com [IPv6:2607:f8b0:4864:20::d44])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3882C061A0C
+        for <kvm@vger.kernel.org>; Mon, 20 Apr 2020 10:18:54 -0700 (PDT)
+Received: by mail-io1-xd44.google.com with SMTP id i3so11828956ioo.13
+        for <kvm@vger.kernel.org>; Mon, 20 Apr 2020 10:18:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=2yYQlajUgoPYm5+zy+bVD+SB8XFq0reLziiAJrB2J80=;
+        b=IH/7IBlQ5QXy6cBXip4X62wGccLAKcy35JGY955yj6MOVOLrHeFfDRCoAFGI8d8QMl
+         abFGr7CcGVvnNiNNXwxIjT7oZp05Jc0+ysl8ZalRfuA3it4+wZrfmXhz5Le8OL1eCZky
+         VpS7HHvNT+249MMF5CyMvk7g3/pcFRlw6D4KWP/5p2+W9F7pH8jJvuTucr4KrVyFhhIm
+         8v6et+hiAxBI/a5Fu4Wb3qnIDGNjeBdwIG/m8WwsriroVOpSMp1rm3H28mwmCA7KEpOR
+         1taDzuOWrKUI4XNsp4Z2KEwgwrCaABt81c9s8Ct+fNV91EBrz8hFuigRBbT1iRrDRmfv
+         I9ZA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=2yYQlajUgoPYm5+zy+bVD+SB8XFq0reLziiAJrB2J80=;
+        b=s5svYVFO2jR3fIs36m90YJLeBMm8MFqftZEPj7RAhiji1/767HGdMhmbOuOlVqOOVR
+         MtmXTA1t8O9Mmmg46CuZLaK6NIJyQeNLVYJVDiK0HOeHT+ET2GjCzQvachGSpW13N0pN
+         BWND/21VZF//77zDYNrP8GLJsxKwQf03y5V3E+4/Pr7spMT3s0BKCCF+zeuhhTL7yN5w
+         QomNXvX17lxRid2p3wn4jMjdfyVzYUKMdHH73qwknM8AekQA7CrjsGsj57Omjlgb7NST
+         PmIp4zBGUjj4v2sEQswvphMl/dK6Ku0HWCH+f5lLWmSzFTXALM9C0MrK2J3SN9JgLQUC
+         fP4Q==
+X-Gm-Message-State: AGi0Pua/nIoY9CAia6al/4ltwI5zePXBLRxV3rpgY+dHBy+0NCDfi9Cd
+        259+83IQwmLVqzK69H2poQV/7VLZgGbtCafhviEnfQ==
+X-Google-Smtp-Source: APiQypK6pmdlGaDyrlJblLJ+gLZRKYPdpGTkx3GZX1f6uqrpH17ziF/9To/AN9OJf2m3pYl/OK7DJruldv+HAW+66OU=
+X-Received: by 2002:a02:b09:: with SMTP id 9mr9355668jad.24.1587403133734;
+ Mon, 20 Apr 2020 10:18:53 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date:   Mon, 20 Apr 2020 18:12:19 +0100
-From:   Marc Zyngier <maz@kernel.org>
-To:     Davidlohr Bueso <dave@stgolabs.net>
-Cc:     tglx@linutronix.de, pbonzini@redhat.com, kvm@vger.kernel.org,
-        Davidlohr Bueso <dbueso@suse.de>, peterz@infradead.org,
-        torvalds@linux-foundation.org, bigeasy@linutronix.de,
-        linux-kernel@vger.kernel.org, rostedt@goodmis.org,
-        linux-mips@vger.kernel.org, Paul Mackerras <paulus@ozlabs.org>,
-        joel@joelfernandes.org, will@kernel.org,
-        kvmarm@lists.cs.columbia.edu
-Subject: Re: [PATCH v2] kvm: Replace vcpu->swait with rcuwait
-In-Reply-To: <20200420164132.tjzk5ebx35m66yce@linux-p48b>
-References: <20200324044453.15733-1-dave@stgolabs.net>
- <20200324044453.15733-4-dave@stgolabs.net>
- <20200420164132.tjzk5ebx35m66yce@linux-p48b>
-Message-ID: <418acdb5001a9ae836095b7187338085@misterjones.org>
-X-Sender: maz@kernel.org
-User-Agent: Roundcube Webmail/1.3.10
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: dave@stgolabs.net, tglx@linutronix.de, pbonzini@redhat.com, kvm@vger.kernel.org, dbueso@suse.de, peterz@infradead.org, torvalds@linux-foundation.org, bigeasy@linutronix.de, linux-kernel@vger.kernel.org, rostedt@goodmis.org, linux-mips@vger.kernel.org, paulus@ozlabs.org, joel@joelfernandes.org, will@kernel.org, kvmarm@lists.cs.columbia.edu
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+References: <20200414000946.47396-1-jmattson@google.com> <20200414000946.47396-2-jmattson@google.com>
+ <20200414031705.GP21204@linux.intel.com> <CALMp9eT23AUTU3m_oADKw3O_NMpuX3crx7eqSB8Rbgh3k0s_Jw@mail.gmail.com>
+ <20200415001212.GA12547@linux.intel.com> <CALMp9eS-s5doptTzVkE2o9jDYuGU3T=5azMhm3fCqLJPcABAOg@mail.gmail.com>
+ <20200418042108.GF15609@linux.intel.com>
+In-Reply-To: <20200418042108.GF15609@linux.intel.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Mon, 20 Apr 2020 10:18:42 -0700
+Message-ID: <CALMp9eQpwnhD7H3a9wC=TnL3=OKmvHAmVFj=r9OBaWiBEGhR4Q@mail.gmail.com>
+Subject: Re: [PATCH 2/2] kvm: nVMX: Single-step traps trump expired
+ VMX-preemption timer
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     kvm list <kvm@vger.kernel.org>, Oliver Upton <oupton@google.com>,
+        Peter Shier <pshier@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2020-04-20 17:41, Davidlohr Bueso wrote:
-> The use of any sort of waitqueue (simple or regular) for
-> wait/waking vcpus has always been an overkill and semantically
-> wrong. Because this is per-vcpu (which is blocked) there is
-> only ever a single waiting vcpu, thus no need for any sort of
-> queue.
-> 
-> As such, make use of the rcuwait primitive, with the following
-> considerations:
-> 
->  - rcuwait already provides the proper barriers that serialize
->  concurrent waiter and waker.
-> 
->  - Task wakeup is done in rcu read critical region, with a
->  stable task pointer.
-> 
->  - Because there is no concurrency among waiters, we need
->  not worry about rcuwait_wait_event() calls corrupting
->  the wait->task. As a consequence, this saves the locking
->  done in swait when modifying the queue. This also applies
->  to per-vcore wait for powerpc kvm-hv.
-> 
-> The x86-tscdeadline_latency test mentioned in 8577370fb0cb
-> ("KVM: Use simple waitqueue for vcpu->wq") shows that, on avg,
-> latency is reduced by around 15-20% with this change.
-> 
-> This patch also changes TASK_INTERRUPTIBLE for TASK_IDLE, as
-> kvm is (ab)using the former such that idle vcpus do no contribute
-> to the loadavg. Let use the correct semantics for this.
-> 
-> Cc: Paul Mackerras <paulus@ozlabs.org>
-> Cc: kvmarm@lists.cs.columbia.edu
-> Cc: linux-mips@vger.kernel.org
-> Signed-off-by: Davidlohr Bueso <dbueso@suse.de>
-> ---
-> v2: Added missing semicolon in mips change.
-> 
-> The rest of the patches in this series continues to apply on tip,
-> as such I am only sending a v2 for this particular patch.
-> 
-> arch/mips/kvm/mips.c                  |  6 ++----
-> arch/powerpc/include/asm/kvm_book3s.h |  2 +-
-> arch/powerpc/include/asm/kvm_host.h   |  2 +-
-> arch/powerpc/kvm/book3s_hv.c          | 22 ++++++++--------------
-> arch/powerpc/kvm/powerpc.c            |  2 +-
-> arch/x86/kvm/lapic.c                  |  2 +-
-> include/linux/kvm_host.h              | 10 +++++-----
-> virt/kvm/arm/arch_timer.c             |  2 +-
-> virt/kvm/arm/arm.c                    |  9 +++++----
-> virt/kvm/async_pf.c                   |  3 +--
-> virt/kvm/kvm_main.c                   | 31 
-> +++++++++++--------------------
-> 11 files changed, 37 insertions(+), 54 deletions(-)
+On Fri, Apr 17, 2020 at 9:21 PM Sean Christopherson
+<sean.j.christopherson@intel.com> wrote:
+>
+> On Wed, Apr 15, 2020 at 04:33:31PM -0700, Jim Mattson wrote:
+> > On Tue, Apr 14, 2020 at 5:12 PM Sean Christopherson
+> > <sean.j.christopherson@intel.com> wrote:
+> > >
+> > > On Tue, Apr 14, 2020 at 09:47:53AM -0700, Jim Mattson wrote:
+> > > > Regarding -EBUSY, I'm in complete agreement. However, I'm not sure
+> > > > what the potential confusion is regarding the event. Are you
+> > > > suggesting that one might think that we have a #DB to deliver to L1
+> > > > while we're in guest mode? IIRC, that can happen under SVM, but I
+> > > > don't believe it can happen under VMX.
+> > >
+> > > The potential confusion is that vcpu->arch.exception.pending was already
+> > > checked, twice.  It makes one wonder why it needs to be checked a third
+> > > time.  And actually, I think that's probably a good indicator that singling
+> > > out single-step #DB isn't the correct fix, it just happens to be the only
+> > > case that's been encountered thus far, e.g. a #PF when fetching the instr
+> > > for emulation should also get priority over the preemption timer.  On real
+> > > hardware, expiration of the preemption timer while vectoring a #PF wouldn't
+> > > wouldn't get recognized until the next instruction boundary, i.e. at the
+> > > start of the first instruction of the #PF handler.  Dropping the #PF isn't
+> > > a problem in most cases, because unlike the single-step #DB, it will be
+> > > re-encountered when L1 resumes L2.  But, dropping the #PF is still wrong.
+> >
+> > Yes, it's wrong in the abstract, but with respect to faults and the
+> > VMX-preemption timer expiration, is there any way for either L1 or L2
+> > to *know* that the virtual CPU has done something wrong?
+>
+> I don't think so?  But how is that relevant, i.e. if we can fix KVM instead
+> of fudging the result, why wouldn't we fix KVM?
 
-[...]
+I'm not sure that I can fix KVM. The missing #DB traps were relatively
+straightforward, but as for the rest of this mess...
 
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 70f03ce0e5c1..887efb39fb1a 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -343,7 +343,7 @@ static void kvm_vcpu_init(struct kvm_vcpu *vcpu,
-> struct kvm *kvm, unsigned id)
-> 	vcpu->kvm = kvm;
-> 	vcpu->vcpu_id = id;
-> 	vcpu->pid = NULL;
-> -	init_swait_queue_head(&vcpu->wq);
-> +	rcuwait_init(&vcpu->wait);
-> 	kvm_async_pf_vcpu_init(vcpu);
-> 
-> 	vcpu->pre_pcpu = -1;
-> @@ -2465,9 +2465,8 @@ static int kvm_vcpu_check_block(struct kvm_vcpu 
-> *vcpu)
-> void kvm_vcpu_block(struct kvm_vcpu *vcpu)
-> {
-> 	ktime_t start, cur;
-> -	DECLARE_SWAITQUEUE(wait);
-> -	bool waited = false;
-> 	u64 block_ns;
-> +	int block_check = -EINTR;
-> 
-> 	kvm_arch_vcpu_blocking(vcpu);
-> 
-> @@ -2491,17 +2490,9 @@ void kvm_vcpu_block(struct kvm_vcpu *vcpu)
-> 		} while (single_task_running() && ktime_before(cur, stop));
-> 	}
-> 
-> -	for (;;) {
-> -		prepare_to_swait_exclusive(&vcpu->wq, &wait, TASK_INTERRUPTIBLE);
-> -
-> -		if (kvm_vcpu_check_block(vcpu) < 0)
-> -			break;
-> -
-> -		waited = true;
-> -		schedule();
-> -	}
-> -
-> -	finish_swait(&vcpu->wq, &wait);
-> +	rcuwait_wait_event(&vcpu->wait,
-> +			   (block_check = kvm_vcpu_check_block(vcpu)) < 0,
-> +			   TASK_IDLE);
-> 	cur = ktime_get();
-> out:
-> 	kvm_arch_vcpu_unblocking(vcpu);
-> @@ -2525,18 +2516,17 @@ void kvm_vcpu_block(struct kvm_vcpu *vcpu)
-> 		}
-> 	}
-> 
-> -	trace_kvm_vcpu_wakeup(block_ns, waited, vcpu_valid_wakeup(vcpu));
-> +	trace_kvm_vcpu_wakeup(block_ns, !block_check, 
-> vcpu_valid_wakeup(vcpu));
+Since you seem to have a handle on what needs to be done, I will defer to you.
 
-This looks like a change in the semantics of the tracepoint. Before this
-change, 'waited' would have been true if the vcpu waited at all. Here, 
-you'd
-have false if it has been interrupted by a signal, even if the vcpu has 
-waited
-for a period of time.
+> > Isn't it generally true that if you have an exception queued when you
+> > transition from L2 to L1, then you've done something wrong? I wonder
+> > if the call to kvm_clear_exception_queue() in prepare_vmcs12() just
+> > serves to sweep a whole collection of problems under the rug.
+>
+> More than likely, yes.
+>
+> > > In general, interception of an event doesn't change the priority of events,
+> > > e.g. INTR shouldn't get priority over NMI just because if L1 wants to
+> > > intercept INTR but not NMI.
+> >
+> > Yes, but that's a different problem altogether.
+>
+> But isn't the fix the same?  Stop processing events if a higher priority
+> event is pending, regardless of whether the event exits to L1.
 
-Thanks,
-
-         M.
--- 
-Jazz is not dead. It just smells funny...
+That depends on how you see the scope of the problem. One could argue
+that the fix for everything that is wrong with KVM is actually the
+same: properly emulate the physical CPU.
