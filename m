@@ -2,225 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 87F6D1B19CF
-	for <lists+kvm@lfdr.de>; Tue, 21 Apr 2020 00:56:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 958631B1A33
+	for <lists+kvm@lfdr.de>; Tue, 21 Apr 2020 01:38:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726642AbgDTW4Y (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Apr 2020 18:56:24 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:26193 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726006AbgDTW4X (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 20 Apr 2020 18:56:23 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1587423381;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=+6rx/b7kvEOxDoffPYjKOUpjUAof+LX7RGvD23w8b8o=;
-        b=f0kOV4iULYQ7dTFtPtKufUhf3b27pMGhBimUY03roRfLpvCQAzKYbugathFQs+t/0B4+1y
-        9EqHJsWECaFoeFtRYMfa5VT1EVbgbA1IWAJp6SnHiD6sTPSgXXAClZW/SSJEWIQR28taBj
-        IIcg9fDiZmndWPyifvj/cxLSMQVFNx4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-33-vJCMrAUjOA-zQBEbwS3yOQ-1; Mon, 20 Apr 2020 18:56:19 -0400
-X-MC-Unique: vJCMrAUjOA-zQBEbwS3yOQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A529C8017F5;
-        Mon, 20 Apr 2020 22:56:14 +0000 (UTC)
-Received: from w520.home (ovpn-112-162.phx2.redhat.com [10.3.112.162])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 7990818A85;
-        Mon, 20 Apr 2020 22:56:01 +0000 (UTC)
-Date:   Mon, 20 Apr 2020 16:56:00 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Yan Zhao <yan.y.zhao@intel.com>
-Cc:     Cornelia Huck <cohuck@redhat.com>,
-        "intel-gvt-dev@lists.freedesktop.org" 
-        <intel-gvt-dev@lists.freedesktop.org>,
-        "libvir-list@redhat.com" <libvir-list@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "aik@ozlabs.ru" <aik@ozlabs.ru>,
-        "Zhengxiao.zx@alibaba-inc.com" <Zhengxiao.zx@alibaba-inc.com>,
-        "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
-        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-        "eauger@redhat.com" <eauger@redhat.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>, "Zeng, Xin" <xin.zeng@intel.com>,
-        "Yang, Ziye" <ziye.yang@intel.com>,
-        "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
-        "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
-        "felipe@nutanix.com" <felipe@nutanix.com>,
-        "Liu, Changpeng" <changpeng.liu@intel.com>,
-        "Ken.Xue@amd.com" <Ken.Xue@amd.com>,
-        "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>,
-        "He, Shaopeng" <shaopeng.he@intel.com>,
-        "eskultet@redhat.com" <eskultet@redhat.com>,
-        "dgilbert@redhat.com" <dgilbert@redhat.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
-        "Wang, Zhi A" <zhi.a.wang@intel.com>,
-        "cjia@nvidia.com" <cjia@nvidia.com>,
-        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-        "berrange@redhat.com" <berrange@redhat.com>,
-        "dinechin@redhat.com" <dinechin@redhat.com>,
-        "corbet@lwn.net" <corbet@lwn.net>
-Subject: Re: [PATCH v5 0/4] introduction of migration_version attribute for
- VFIO live migration
-Message-ID: <20200420165600.4951ae82@w520.home>
-In-Reply-To: <20200420012457.GE16688@joy-OptiPlex-7040>
-References: <20200413055201.27053-1-yan.y.zhao@intel.com>
-        <20200417104450.2d2f2fa9.cohuck@redhat.com>
-        <20200417095202.GD16688@joy-OptiPlex-7040>
-        <20200417132457.45d91fe3.cohuck@redhat.com>
-        <20200420012457.GE16688@joy-OptiPlex-7040>
+        id S1726183AbgDTXis (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Apr 2020 19:38:48 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:51544 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726006AbgDTXis (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 Apr 2020 19:38:48 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 03KNcjDn051778;
+        Mon, 20 Apr 2020 23:38:45 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding;
+ s=corp-2020-01-29; bh=3wO9u70OUyZRe9Ja0eXRb3YLTqwZ5kDwzuXJU59gmUw=;
+ b=j+x27+4Y1pNG6KqlEYUFXuHDG0alv8Su1vjlcDzSsoVsAwnkDCxwWcj5ifkC05f2pXjh
+ 4R4IgKAkp8jP55FrmPkkP96AFCqKJEFNNyNRFCpAAYH//94Q2CQ04NRVFhwBh+nNLKVx
+ K1miqs5Qfet7lHoBOa5y6BlvNyC711anrBLBF8o/f5z7hR5N+BdFkqw0L+EJCS7zxgiP
+ wLnCQV3VjYIvIYGTles3IG9fdjtZ8M8AXJJEKUm1db+bumXmLvUdTYCnMbrG5LkBmrkb
+ dec/aU+4tgFethS/1Cou98pBUaueU+niqJVAArgeY5t7M7PQ5KMve3Z0PLt8bqQL32fp Iw== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by aserp2120.oracle.com with ESMTP id 30fsgkt4mp-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 20 Apr 2020 23:38:45 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 03KNcWEs081632;
+        Mon, 20 Apr 2020 23:38:45 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by aserp3020.oracle.com with ESMTP id 30gbbbywy1-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 20 Apr 2020 23:38:44 +0000
+Received: from abhmp0009.oracle.com (abhmp0009.oracle.com [141.146.116.15])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 03KNchRT007330;
+        Mon, 20 Apr 2020 23:38:43 GMT
+Received: from ban25x6uut29.us.oracle.com (/10.153.73.29)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Mon, 20 Apr 2020 16:38:43 -0700
+From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
+To:     kvm@vger.kernel.org
+Cc:     pbonzini@redhat.com
+Subject: [PATCH] kvm-unit-test: nSVM: Test CR0[63:32] on VMRUN of nested guests
+Date:   Mon, 20 Apr 2020 18:58:24 -0400
+Message-Id: <20200420225825.3184-1-krish.sadhukhan@oracle.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9597 signatures=668686
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 malwarescore=0
+ suspectscore=13 mlxlogscore=674 adultscore=0 mlxscore=0 phishscore=0
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2004200183
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9597 signatures=668686
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 priorityscore=1501
+ lowpriorityscore=0 mlxlogscore=728 malwarescore=0 clxscore=1015
+ spamscore=0 bulkscore=0 phishscore=0 suspectscore=13 impostorscore=0
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2004200183
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, 19 Apr 2020 21:24:57 -0400
-Yan Zhao <yan.y.zhao@intel.com> wrote:
 
-> On Fri, Apr 17, 2020 at 07:24:57PM +0800, Cornelia Huck wrote:
-> > On Fri, 17 Apr 2020 05:52:02 -0400
-> > Yan Zhao <yan.y.zhao@intel.com> wrote:
-> >   
-> > > On Fri, Apr 17, 2020 at 04:44:50PM +0800, Cornelia Huck wrote:  
-> > > > On Mon, 13 Apr 2020 01:52:01 -0400
-> > > > Yan Zhao <yan.y.zhao@intel.com> wrote:
-> > > >     
-> > > > > This patchset introduces a migration_version attribute under sysfs of VFIO
-> > > > > Mediated devices.
-> > > > > 
-> > > > > This migration_version attribute is used to check migration compatibility
-> > > > > between two mdev devices.
-> > > > > 
-> > > > > Currently, it has two locations:
-> > > > > (1) under mdev_type node,
-> > > > >     which can be used even before device creation, but only for mdev
-> > > > >     devices of the same mdev type.
-> > > > > (2) under mdev device node,
-> > > > >     which can only be used after the mdev devices are created, but the src
-> > > > >     and target mdev devices are not necessarily be of the same mdev type
-> > > > > (The second location is newly added in v5, in order to keep consistent
-> > > > > with the migration_version node for migratable pass-though devices)    
-> > > > 
-> > > > What is the relationship between those two attributes?
-> > > >     
-> > > (1) is for mdev devices specifically, and (2) is provided to keep the same
-> > > sysfs interface as with non-mdev cases. so (2) is for both mdev devices and
-> > > non-mdev devices.
-> > > 
-> > > in future, if we enable vfio-pci vendor ops, (i.e. a non-mdev device
-> > > is binding to vfio-pci, but is able to register migration region and do
-> > > migration transactions from a vendor provided affiliate driver),
-> > > the vendor driver would export (2) directly, under device node.
-> > > It is not able to provide (1) as there're no mdev devices involved.  
-> > 
-> > Ok, creating an alternate attribute for non-mdev devices makes sense.
-> > However, wouldn't that rather be a case (3)? The change here only
-> > refers to mdev devices.
-> >  
-> as you pointed below, (3) and (2) serve the same purpose. 
-> and I think a possible usage is to migrate between a non-mdev device and
-> an mdev device. so I think it's better for them both to use (2) rather
-> than creating (3).
+[PATCH] kvm-unit-tests: nSVM: Test that CR0[63:32] are not set on VMRUN of nested
 
-An mdev type is meant to define a software compatible interface, so in
-the case of mdev->mdev migration, doesn't migrating to a different type
-fail the most basic of compatibility tests that we expect userspace to
-perform?  IOW, if two mdev types are migration compatible, it seems a
-prerequisite to that is that they provide the same software interface,
-which means they should be the same mdev type.
+ x86/svm_tests.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
-In the hybrid cases of mdev->phys or phys->mdev, how does a management
-tool begin to even guess what might be compatible?  Are we expecting
-libvirt to probe ever device with this attribute in the system?  Is
-there going to be a new class hierarchy created to enumerate all
-possible migrate-able devices?
-
-I agree that there was a gap in the previous proposal for non-mdev
-devices, but I think this bring a lot of questions that we need to
-puzzle through and libvirt will need to re-evaluate how they might
-decide to pick a migration target device.  For example, I'm sure
-libvirt would reject any policy decisions regarding picking a physical
-device versus an mdev device.  Had we previously left it that only a
-layer above libvirt would select a target device and libvirt only tests
-compatibility to that target device?
-
-We also need to consider that this expands the namespace.  If we no
-longer require matching types as the first level of comparison, then
-vendor migration strings can theoretically collide.  How do we
-coordinate that can't happen?  Thanks,
-
-Alex
-
-> > > > Is existence (and compatibility) of (1) a pre-req for possible
-> > > > existence (and compatibility) of (2)?
-> > > >    
-> > > no. (2) does not reply on (1).  
-> > 
-> > Hm. Non-existence of (1) seems to imply "this type does not support
-> > migration". If an mdev created for such a type suddenly does support
-> > migration, it feels a bit odd.
-> >   
-> yes. but I think if the condition happens, it should be reported a bug
-> to vendor driver.
-> should I add a line in the doc like "vendor driver should ensure that the
-> migration compatibility from migration_version under mdev_type should be
-> consistent with that from migration_version under device node" ?
-> 
-> > (It obviously cannot be a prereq for what I called (3) above.)
-> >   
-> > >   
-> > > > Does userspace need to check (1) or can it completely rely on (2), if
-> > > > it so chooses?
-> > > >    
-> > > I think it can completely reply on (2) if compatibility check before
-> > > mdev creation is not required.
-> > >   
-> > > > If devices with a different mdev type are indeed compatible, it seems
-> > > > userspace can only find out after the devices have actually been
-> > > > created, as (1) does not apply?    
-> > > yes, I think so.   
-> > 
-> > How useful would it be for userspace to even look at (1) in that case?
-> > It only knows if things have a chance of working if it actually goes
-> > ahead and creates devices.
-> >  
-> hmm, is it useful for userspace to test the migration_version under mdev
-> type before it knows what mdev device to generate ?
-> like when the userspace wants to migrate an mdev device in src vm,
-> but it has not created target vm and the target mdev device.
-> 
-> > >   
-> > > > One of my worries is that the existence of an attribute with the same
-> > > > name in two similar locations might lead to confusion. But maybe it
-> > > > isn't a problem.
-> > > >    
-> > > Yes, I have the same feeling. but as (2) is for sysfs interface
-> > > consistency, to make it transparent to userspace tools like libvirt,
-> > > I guess the same name is necessary?  
-> > 
-> > What do we actually need here, I wonder? (1) and (2) seem to serve
-> > slightly different purposes, while (2) and what I called (3) have the
-> > same purpose. Is it important to userspace that (1) and (2) have the
-> > same name?  
-> so change (1) to migration_type_version and (2) to
-> migration_instance_version?
-> But as they are under different locations, could that location imply
-> enough information?
-> 
-> 
-> Thanks
-> Yan
-> 
-> 
+Krish Sadhukhan (1):
+      nSVM: Test that CR0[63:32] are not set on VMRUN of nested guests
 
