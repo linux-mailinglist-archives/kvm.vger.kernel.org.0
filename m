@@ -2,222 +2,212 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 86D541B0627
-	for <lists+kvm@lfdr.de>; Mon, 20 Apr 2020 12:03:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9368E1B06AC
+	for <lists+kvm@lfdr.de>; Mon, 20 Apr 2020 12:35:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726054AbgDTKD4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Apr 2020 06:03:56 -0400
-Received: from mail.kernel.org ([198.145.29.99]:56214 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725773AbgDTKDz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 Apr 2020 06:03:55 -0400
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 73D1F20857;
-        Mon, 20 Apr 2020 10:03:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1587377034;
-        bh=T+IkyhCGWmGjFb1dkbRxqVNqlQocAwEx9c7HtptLrJQ=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=I2Q0vwOApagpSZa8aKZX6jIxWVVd//vWr1lsY6oqJu7WvRNttvnjyXCU52yI/HlO/
-         3fJNsnCAPSdBsdFE5Am5IsFfQ5F+vfavyJ4H75E9RWVIEckbZu8RBshUvb4qqvpzs9
-         AMSEgFyr/xJ5+t6rM272GwgMznGGkHGkBmg16dLw=
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why)
-        by disco-boy.misterjones.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <maz@kernel.org>)
-        id 1jQTHM-004pNG-EA; Mon, 20 Apr 2020 11:03:52 +0100
-Date:   Mon, 20 Apr 2020 11:03:50 +0100
-From:   Marc Zyngier <maz@kernel.org>
-To:     James Morse <james.morse@arm.com>
-Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, Zenghui Yu <yuzenghui@huawei.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Andre Przywara <Andre.Przywara@arm.com>,
-        Julien Grall <julien@xen.org>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: Re: [PATCH v2 4/6] KVM: arm: vgic-v2: Only use the virtual state
- when userspace accesses pending bits
-Message-ID: <20200420110350.675a3393@why>
-In-Reply-To: <7b001ee4-0a8e-d79c-1be4-563dab4ca452@arm.com>
-References: <20200417083319.3066217-1-maz@kernel.org>
-        <20200417083319.3066217-5-maz@kernel.org>
-        <4133d5f2-ed0e-9c4a-8a66-953fb6bf6e70@arm.com>
-        <20200417134140.0a901749@why>
-        <7b001ee4-0a8e-d79c-1be4-563dab4ca452@arm.com>
-Organization: Approximate
-X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+        id S1726063AbgDTKfA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Apr 2020 06:35:00 -0400
+Received: from mail.loongson.cn ([114.242.206.163]:35492 "EHLO loongson.cn"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725773AbgDTKfA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 Apr 2020 06:35:00 -0400
+Received: from [10.20.42.25] (unknown [10.20.42.25])
+        by mail.loongson.cn (Coremail) with SMTP id AQAAf9Dxj9xHep1eHB0qAA--.15S3;
+        Mon, 20 Apr 2020 18:32:40 +0800 (CST)
+Subject: Re: [PATCH 7/7] KVM: MIPS: clean up redundant kvm_run parameters in
+ assembly
+To:     Tianjia Zhang <tianjia.zhang@linux.alibaba.com>,
+        pbonzini@redhat.com, tsbogend@alpha.franken.de, paulus@ozlabs.org,
+        mpe@ellerman.id.au, benh@kernel.crashing.org,
+        borntraeger@de.ibm.com, frankja@linux.ibm.com, david@redhat.com,
+        cohuck@redhat.com, heiko.carstens@de.ibm.com, gor@linux.ibm.com,
+        sean.j.christopherson@intel.com, vkuznets@redhat.com,
+        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, x86@kernel.org,
+        hpa@zytor.com, maz@kernel.org, james.morse@arm.com,
+        julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
+        christoffer.dall@arm.com, peterx@redhat.com, thuth@redhat.com
+References: <20200419075106.16248-1-tianjia.zhang@linux.alibaba.com>
+ <20200419075106.16248-8-tianjia.zhang@linux.alibaba.com>
+Cc:     kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org
+From:   maobibo <maobibo@loongson.cn>
+Message-ID: <0b110e7f-9d08-496e-158e-8c3ff7307423@loongson.cn>
+Date:   Mon, 20 Apr 2020 18:32:39 +0800
+User-Agent: Mozilla/5.0 (X11; Linux mips64; rv:45.0) Gecko/20100101
+ Thunderbird/45.4.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20200419075106.16248-8-tianjia.zhang@linux.alibaba.com>
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: james.morse@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, yuzenghui@huawei.com, eric.auger@redhat.com, Andre.Przywara@arm.com, julien@xen.org, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-CM-TRANSID: AQAAf9Dxj9xHep1eHB0qAA--.15S3
+X-Coremail-Antispam: 1UD129KBjvJXoW3WrWrJr1kWw4ruF1kArW7twb_yoW7CFWUpF
+        n7C3WDua1IqrWUK34xArsY9F4aqrs8Kr17ua4UJFWYqw1YqF1rtFs2krZ8Ar98Cr1F93Wf
+        ZF9YqFn8Crs2ywUanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUU9jb7Iv0xC_Kw4lb4IE77IF4wAFF20E14v26rWj6s0DM7CY07I2
+        0VC2zVCF04k26cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rw
+        A2F7IY1VAKz4vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xII
+        jxv20xvEc7CjxVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26F4UJVW0owA2z4x0Y4
+        vEx4A2jsIEc7CjxVAFwI0_GcCE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xv
+        F2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r
+        4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwIxGrwACI402YVCY1x02628vn2kIc2xK
+        xwCYjI0SjxkI62AI1cAE67vIY487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r
+        1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CE
+        b7AF67AKxVWrXVW8Jr1lIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42
+        IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6rW3Jr0E3s1l
+        IxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvf
+        C2KfnxnUUI43ZEXa7IU56KZtUUUUU==
+X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 17 Apr 2020 17:48:34 +0100
-James Morse <james.morse@arm.com> wrote:
 
-Hi James,
 
-> Hi Marc,
+On 04/19/2020 03:51 PM, Tianjia Zhang wrote:
+> In the current kvm version, 'kvm_run' has been included in the 'kvm_vcpu'
+> structure. Earlier than historical reasons, many kvm-related function
+> parameters retain the 'kvm_run' and 'kvm_vcpu' parameters at the same time.
+> This patch does a unified cleanup of these remaining redundant parameters.
 > 
-> On 17/04/2020 13:41, Marc Zyngier wrote:
-> > On Fri, 17 Apr 2020 12:22:10 +0100 James Morse <james.morse@arm.com> wrote:  
-> >> On 17/04/2020 09:33, Marc Zyngier wrote:  
-> >>> There is no point in accessing the HW when writing to any of the
-> >>> ISPENDR/ICPENDR registers from userspace, as only the guest should
-> >>> be allowed to change the HW state.
-> >>>
-> >>> Introduce new userspace-specific accessors that deal solely with
-> >>> the virtual state. Note that the API differs from that of GICv3,
-> >>> where userspace exclusively uses ISPENDR to set the state. Too
-> >>> bad we can't reuse it.    
+> Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+> ---
+>  arch/mips/include/asm/kvm_host.h |  4 ++--
+>  arch/mips/kvm/entry.c            | 15 +++++----------
+>  arch/mips/kvm/mips.c             |  3 ++-
+>  arch/mips/kvm/trap_emul.c        |  2 +-
+>  arch/mips/kvm/vz.c               |  2 +-
+>  5 files changed, 11 insertions(+), 15 deletions(-)
 > 
-> >>> diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
-> >>> index 6e30034d1464..f1927ae02d2e 100644
-> >>> --- a/virt/kvm/arm/vgic/vgic-mmio.c
-> >>> +++ b/virt/kvm/arm/vgic/vgic-mmio.c
-> >>> @@ -321,6 +321,27 @@ void vgic_mmio_write_spending(struct kvm_vcpu *vcpu,    
-> >>  
-> >>> +int vgic_uaccess_write_spending(struct kvm_vcpu *vcpu,
-> >>> +				gpa_t addr, unsigned int len,
-> >>> +				unsigned long val)
-> >>> +{
-> >>> +	u32 intid = VGIC_ADDR_TO_INTID(addr, 1);
-> >>> +	int i;
-> >>> +	unsigned long flags;
-> >>> +
-> >>> +	for_each_set_bit(i, &val, len * 8) {
-> >>> +		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);    
-> >>
-> >> vgic_mmio_write_spending() has:
-> >> |	/* GICD_ISPENDR0 SGI bits are WI *
-> >>
-> >> and bales out early. Is GIC_DIST_PENDING_SET the same register?
-> >> (If so, shouldn't that be true for PPI too?)  
-> > 
-> > Hmmm. It's a bit more complicated (surprisingly).
-> > 
-> > Yes, the SGI pending bits are WI from the guest perspective (as
-> > required by the spec).  
-> 
-> > But we still need to be able to restore them
-> > from userspace, and I bet 82e40f558de56 ("KVM: arm/arm64: vgic-v2:
-> > Handle SGI bits in GICD_I{S,C}PENDR0 as WI") has broken migration with
-> > GICv2 (if you migrated with a pending SGI, you cannot restore it...).  
-> 
-> Fun! It looks like the ioctl() would succeed, but nothing happened. Once you restart the
-> guest one CPU may wait forever for the victim to respond.
+> diff --git a/arch/mips/include/asm/kvm_host.h b/arch/mips/include/asm/kvm_host.h
+> index 971439297cea..db915c55166d 100644
+> --- a/arch/mips/include/asm/kvm_host.h
+> +++ b/arch/mips/include/asm/kvm_host.h
+> @@ -310,7 +310,7 @@ struct kvm_mmu_memory_cache {
+>  #define KVM_MIPS_GUEST_TLB_SIZE	64
+>  struct kvm_vcpu_arch {
+>  	void *guest_ebase;
+> -	int (*vcpu_run)(struct kvm_run *run, struct kvm_vcpu *vcpu);
+> +	int (*vcpu_run)(struct kvm_vcpu *vcpu);
+>  
+>  	/* Host registers preserved across guest mode execution */
+>  	unsigned long host_stack;
+> @@ -821,7 +821,7 @@ int kvm_mips_emulation_init(struct kvm_mips_callbacks **install_callbacks);
+>  /* Debug: dump vcpu state */
+>  int kvm_arch_vcpu_dump_regs(struct kvm_vcpu *vcpu);
+>  
+> -extern int kvm_mips_handle_exit(struct kvm_run *run, struct kvm_vcpu *vcpu);
+> +extern int kvm_mips_handle_exit(struct kvm_vcpu *vcpu);
+>  
+>  /* Building of entry/exception code */
+>  int kvm_mips_entry_setup(void);
+> diff --git a/arch/mips/kvm/entry.c b/arch/mips/kvm/entry.c
+> index 16e1c93b484f..e3f29af3b6cd 100644
+> --- a/arch/mips/kvm/entry.c
+> +++ b/arch/mips/kvm/entry.c
+> @@ -204,7 +204,7 @@ static inline void build_set_exc_base(u32 **p, unsigned int reg)
+>   * Assemble the start of the vcpu_run function to run a guest VCPU. The function
+>   * conforms to the following prototype:
+>   *
+> - * int vcpu_run(struct kvm_run *run, struct kvm_vcpu *vcpu);
+> + * int vcpu_run(struct kvm_vcpu *vcpu);
+>   *
+>   * The exit from the guest and return to the caller is handled by the code
+>   * generated by kvm_mips_build_ret_to_host().
+> @@ -217,8 +217,7 @@ void *kvm_mips_build_vcpu_run(void *addr)
+>  	unsigned int i;
+>  
+>  	/*
+> -	 * A0: run
+> -	 * A1: vcpu
+> +	 * A0: vcpu
+>  	 */
+>  
+>  	/* k0/k1 not being used in host kernel context */
+> @@ -237,10 +236,10 @@ void *kvm_mips_build_vcpu_run(void *addr)
+>  	kvm_mips_build_save_scratch(&p, V1, K1);
+>  
+>  	/* VCPU scratch register has pointer to vcpu */
+> -	UASM_i_MTC0(&p, A1, scratch_vcpu[0], scratch_vcpu[1]);
+> +	UASM_i_MTC0(&p, A0, scratch_vcpu[0], scratch_vcpu[1]);
+>  
+>  	/* Offset into vcpu->arch */
+> -	UASM_i_ADDIU(&p, K1, A1, offsetof(struct kvm_vcpu, arch));
+> +	UASM_i_ADDIU(&p, K1, A0, offsetof(struct kvm_vcpu, arch));
+>  
+>  	/*
+>  	 * Save the host stack to VCPU, used for exception processing
+> @@ -628,10 +627,7 @@ void *kvm_mips_build_exit(void *addr)
+>  	/* Now that context has been saved, we can use other registers */
+>  
+>  	/* Restore vcpu */
+> -	UASM_i_MFC0(&p, S1, scratch_vcpu[0], scratch_vcpu[1]);
+> -
+> -	/* Restore run (vcpu->run) */
+> -	UASM_i_LW(&p, S0, offsetof(struct kvm_vcpu, run), S1);
+> +	UASM_i_MFC0(&p, S0, scratch_vcpu[0], scratch_vcpu[1]);
+>  
+>  	/*
+>  	 * Save Host level EPC, BadVaddr and Cause to VCPU, useful to process
+> @@ -793,7 +789,6 @@ void *kvm_mips_build_exit(void *addr)
+>  	 * with this in the kernel
+>  	 */
+>  	uasm_i_move(&p, A0, S0);
+> -	uasm_i_move(&p, A1, S1);
+>  	UASM_i_LA(&p, T9, (unsigned long)kvm_mips_handle_exit);
+>  	uasm_i_jalr(&p, RA, T9);
+>  	 UASM_i_ADDIU(&p, SP, SP, -CALLFRAME_SIZ);
 
-Yup. I can only see two reason for this not being reported: nobody
-tests live migration with GICv2 (most probable), or we're incredibly
-lucky by having never take a snapshot of a pending SGI. Either way,
-this needs fixing.
+I suggest keeping asm code untouched, the change for c code is much easier to understand, however I do not see obvious advantage to remove one redundant function parameter :) 
 
-> > Now, there is still a bug here, in the sense that we need to indicate
-> > which vcpu is the source of the SGI (this is a GICv2-special).
-> > Unfortunately, we don't have a way to communicate this architecturally.
-> > The only option we have is to make it up (as a self-SGI, for example).
-> > But this is pretty broken at the architectural level TBH.
-> > On the other hand, PPIs are just fine.  
-> 
-> Yup, wrong spec, I was looking at the same register in GICv3! It looks like the GICv3 text
-> is there because those registers live in the redistributor instead... duh!
-> 
-> 
-> >>> @@ -390,6 +411,26 @@ void vgic_mmio_write_cpending(struct kvm_vcpu *vcpu,    
-> >>  
-> >>> +int vgic_uaccess_write_cpending(struct kvm_vcpu *vcpu,
-> >>> +				gpa_t addr, unsigned int len,
-> >>> +				unsigned long val)
-> >>> +{
-> >>> +	u32 intid = VGIC_ADDR_TO_INTID(addr, 1);
-> >>> +	int i;
-> >>> +	unsigned long flags;
-> >>> +
-> >>> +	for_each_set_bit(i, &val, len * 8) {
-> >>> +		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);    
-> >>
-> >> Same dumb question about GICD_ICPENDR0!?  
-> > 
-> > Not dumb at all! Given that we previously allowed this to be accessed
-> > from userspace (well, before we broke it again), it should be able to
-> > clear *something*. If we adopt the self-SGI behaviour as above, we will
-> > get away with it.
-> > 
-> > Here's what I'm proposing to add to this patch, together with a
-> > Fixes: 82e40f558de56 ("KVM: arm/arm64: vgic-v2: Handle SGI bits in GICD_I{S,C}PENDR0 as WI")
-> > 
-> > Nobody is using GICv2, obviously... :-/  
-> 
-> > diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
-> > index f1927ae02d2e..974cdcf2f232 100644
-> > --- a/virt/kvm/arm/vgic/vgic-mmio.c
-> > +++ b/virt/kvm/arm/vgic/vgic-mmio.c  
-> 
-> > @@ -334,6 +322,15 @@ int vgic_uaccess_write_spending(struct kvm_vcpu *vcpu,
-> >  
-> >  		raw_spin_lock_irqsave(&irq->irq_lock, flags);
-> >  		irq->pending_latch = true;
-> > +
-> > +		/*
-> > +		 * GICv2 SGIs are terribly broken. We can't restore
-> > +		 * the source of the interrupt, so just pick the vcpu
-> > +		 * itself as the source...  
-> 
-> Makes sense, this way you can't have an SGI coming from an offline CPU!
-> 
-> 
-> > +		 */
-> > +		if (is_vgic_v2_sgi(vcpu, irq))
-> > +			irq->source |= BIT(vcpu->vcpu_id);
-> > +
-> >  		vgic_queue_irq_unlock(vcpu->kvm, irq, flags);
-> >  
-> >  		vgic_put_irq(vcpu->kvm, irq);  
-> 
-> > @@ -423,7 +415,22 @@ int vgic_uaccess_write_cpending(struct kvm_vcpu *vcpu,
-> >  		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
-> >  
-> >  		raw_spin_lock_irqsave(&irq->irq_lock, flags);
-> > -		irq->pending_latch = false;
-> > +		/*
-> > +		 * More fun with GICv2 SGIs! If we're clearing one of them
-> > +		 * from userspace, which source vcpu to clear?  Let's pick
-> > +		 * the target vcpu itself (consistent whith the way we
-> > +		 * populate them on the ISPENDR side), and only clear the
-> > +		 * pending state if no sources are left (insert expletive
-> > +		 * here).  
-> 
-> But I'm not so sure about this. Doesn't this mean that user-space can't clear pending-SGI?
-> Only if its pending due to self-SGI. I'm not sure when user-space would want to do this,
-> so it may not matter.
 
-In general, userspace just sets the pending bit, and doesn't bother
-clearing anything (because by default, there is nothing to clear).
+regards
+bibo,mao
 
-> Using ffs() you could clear the lowest pending source, I assume if its pending, there is
-> likely only one source. If not, user-space can eventually clear pending SGI with at most
-> nr-vcpu calls ... and ffs() could double up as the missing expletive!
 
-;-)
+> diff --git a/arch/mips/kvm/mips.c b/arch/mips/kvm/mips.c
+> index 9710477a9827..32850470c037 100644
+> --- a/arch/mips/kvm/mips.c
+> +++ b/arch/mips/kvm/mips.c
+> @@ -1186,8 +1186,9 @@ static void kvm_mips_set_c0_status(void)
+>  /*
+>   * Return value is in the form (errcode<<2 | RESUME_FLAG_HOST | RESUME_FLAG_NV)
+>   */
+> -int kvm_mips_handle_exit(struct kvm_run *run, struct kvm_vcpu *vcpu)
+> +int kvm_mips_handle_exit(struct kvm_vcpu *vcpu)
+>  {
+> +	struct kvm_run *run = vcpu->run;
+>  	u32 cause = vcpu->arch.host_cp0_cause;
+>  	u32 exccode = (cause >> CAUSEB_EXCCODE) & 0x1f;
+>  	u32 __user *opc = (u32 __user *) vcpu->arch.pc;
+> diff --git a/arch/mips/kvm/trap_emul.c b/arch/mips/kvm/trap_emul.c
+> index d822f3aee3dc..04c864cc356a 100644
+> --- a/arch/mips/kvm/trap_emul.c
+> +++ b/arch/mips/kvm/trap_emul.c
+> @@ -1238,7 +1238,7 @@ static int kvm_trap_emul_vcpu_run(struct kvm_vcpu *vcpu)
+>  	 */
+>  	kvm_mips_suspend_mm(cpu);
+>  
+> -	r = vcpu->arch.vcpu_run(vcpu->run, vcpu);
+> +	r = vcpu->arch.vcpu_run(vcpu);
+>  
+>  	/* We may have migrated while handling guest exits */
+>  	cpu = smp_processor_id();
+> diff --git a/arch/mips/kvm/vz.c b/arch/mips/kvm/vz.c
+> index 94f1d23828e3..c5878fa0636d 100644
+> --- a/arch/mips/kvm/vz.c
+> +++ b/arch/mips/kvm/vz.c
+> @@ -3152,7 +3152,7 @@ static int kvm_vz_vcpu_run(struct kvm_vcpu *vcpu)
+>  	kvm_vz_vcpu_load_tlb(vcpu, cpu);
+>  	kvm_vz_vcpu_load_wired(vcpu);
+>  
+> -	r = vcpu->arch.vcpu_run(vcpu->run, vcpu);
+> +	r = vcpu->arch.vcpu_run(vcpu);
+>  
+>  	kvm_vz_vcpu_save_wired(vcpu);
+>  
+> 
 
-> (but if user-space never actually does this, then we should do the simplest thing)
-
-A third way would be to align on what GICv3 does, which is that ISPENDR
-is used for both setting and clearing in one go. Given that the current
-state it broken (and has been for some time now), I'm tempted to adopt
-the same behaviour...
-
-What do you think?
-
-	M.
--- 
-Jazz is not dead. It just smells funny...
