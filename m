@@ -2,69 +2,84 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CE51F1B0F8B
-	for <lists+kvm@lfdr.de>; Mon, 20 Apr 2020 17:12:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8C6121B1148
+	for <lists+kvm@lfdr.de>; Mon, 20 Apr 2020 18:17:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730222AbgDTPMM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Apr 2020 11:12:12 -0400
-Received: from mga05.intel.com ([192.55.52.43]:20412 "EHLO mga05.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730203AbgDTPMK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 Apr 2020 11:12:10 -0400
-IronPort-SDR: MVGG65zJ1AR37cZ8HD7xyoHDSHvFtYUIV37YQPBu848K3g/6E7Oucrz29eRfU8ysOocwevX/Z8
- mnjIMHopHf5g==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Apr 2020 08:12:08 -0700
-IronPort-SDR: fjvusSzbVWPR/v4yhL4s1hcLQLK1iQ/5M+MxwRZQ5BRCWInNSb3yqeaSXk48+QZfB8UVUAELSL
- 5cRdpBIBP0jQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.72,406,1580803200"; 
-   d="scan'208";a="258374088"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
-  by orsmga006.jf.intel.com with ESMTP; 20 Apr 2020 08:12:08 -0700
-Date:   Mon, 20 Apr 2020 08:12:08 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
+        id S1728287AbgDTQRu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Apr 2020 12:17:50 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:29563 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726061AbgDTQRu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 Apr 2020 12:17:50 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1587399467;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=aVmMlP4bgEOgyhPBBrYrGgIG5tzuNNZSz4+8vsE0HJo=;
+        b=HnLsVv5lsKBB1lu5s0gWnTn0S1z5AGyTKHoNbNRCDt0jgZPucd4D4QFySgkMPDxtgB7Xh4
+        yWcXj6/yndTR4sYJuo824bX53dbQ0oyAzndD3SGPOkIum33OQ9g4UjFI1pGrRlY8WNEhOq
+        c8Wm/r8upuEF3+70pZ82tcYpvvg8faY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-436-4C7849F1MoOjHETHB0DVtQ-1; Mon, 20 Apr 2020 12:17:45 -0400
+X-MC-Unique: 4C7849F1MoOjHETHB0DVtQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 33106190B2B3;
+        Mon, 20 Apr 2020 16:17:44 +0000 (UTC)
+Received: from treble.redhat.com (ovpn-116-8.rdu2.redhat.com [10.10.116.8])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id EA1295C64E;
+        Mon, 20 Apr 2020 16:17:41 +0000 (UTC)
+From:   Josh Poimboeuf <jpoimboe@redhat.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Krish Sadhukhan <krish.sadhukhan@oracle.com>,
-        Jim Mattson <jmattson@google.com>,
-        kvm list <kvm@vger.kernel.org>
-Subject: Re: [PATCH 1/2 v2] KVM: nVMX: KVM needs to unset "unrestricted
- guest" VM-execution control in vmcs02 if vmcs12 doesn't set it
-Message-ID: <20200420151207.GB9279@linux.intel.com>
-References: <20200415183047.11493-1-krish.sadhukhan@oracle.com>
- <20200415183047.11493-2-krish.sadhukhan@oracle.com>
- <20200415193016.GF30627@linux.intel.com>
- <CALMp9eRvZEzi3Ug0fL=ekMS_Weni6npwW+bXrJZjU8iLrppwEg@mail.gmail.com>
- <0b8bd238-e60f-b392-e793-0d88fb876224@redhat.com>
- <d49ce960-92f9-85eb-4cfb-d533a956223e@oracle.com>
- <20200418015545.GB15609@linux.intel.com>
- <c37b9429-0cb8-6514-44a7-65544873dba0@redhat.com>
+Cc:     kvm@vger.kernel.org, Peter Zijlstra <peterz@infradead.org>,
+        Randy Dunlap <rdunlap@infradead.org>
+Subject: [PATCH] kvm: Disable objtool frame pointer checking for vmenter.S
+Date:   Mon, 20 Apr 2020 11:17:37 -0500
+Message-Id: <01fae42917bacad18be8d2cbc771353da6603473.1587398610.git.jpoimboe@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c37b9429-0cb8-6514-44a7-65544873dba0@redhat.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Apr 18, 2020 at 11:53:36AM +0200, Paolo Bonzini wrote:
-> On 18/04/20 03:55, Sean Christopherson wrote:
-> > 
-> >   static inline bool is_unrestricted_guest(struct kvm_vcpu *vcpu)
-> >   {
-> > 	return enable_unrestricted_guest && (!is_guest_mode(vcpu) ||
-> > 	       to_vmx(vcpu)->nested.unrestricted_guest);
-> >   }
-> >
-> > Putting the flag in loaded_vmcs might be more performant?  My guess is it'd
-> > be in the noise, at which point I'd rather have it be clear the override is
-> > only possible/necessary for nested guests.
-> 
-> Even better: you can use secondary_exec_controls_get, which does get the
-> flag from the loaded_vmcs :) but without actually having to add one.
+Frame pointers are completely broken by vmenter.S because it clobbers
+RBP:
 
-I keep forgetting we have those shadows.  Definitely the best solution.
+  arch/x86/kvm/svm/vmenter.o: warning: objtool: __svm_vcpu_run()+0xe4: BP=
+ used as a scratch register
+
+That's unavoidable, so just skip checking that file when frame pointers
+are configured in.
+
+On the other hand, ORC can handle that code just fine, so leave objtool
+enabled in the !FRAME_POINTER case.
+
+Reported-by: Randy Dunlap <rdunlap@infradead.org>
+Signed-off-by: Josh Poimboeuf <jpoimboe@redhat.com>
+---
+ arch/x86/kvm/Makefile | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/arch/x86/kvm/Makefile b/arch/x86/kvm/Makefile
+index a789759b7261..4a3081e9f4b5 100644
+--- a/arch/x86/kvm/Makefile
++++ b/arch/x86/kvm/Makefile
+@@ -3,6 +3,10 @@
+ ccflags-y +=3D -Iarch/x86/kvm
+ ccflags-$(CONFIG_KVM_WERROR) +=3D -Werror
+=20
++ifeq ($(CONFIG_FRAME_POINTER),y)
++OBJECT_FILES_NON_STANDARD_vmenter.o :=3D y
++endif
++
+ KVM :=3D ../../../virt/kvm
+=20
+ kvm-y			+=3D $(KVM)/kvm_main.o $(KVM)/coalesced_mmio.o \
+--=20
+2.21.1
+
