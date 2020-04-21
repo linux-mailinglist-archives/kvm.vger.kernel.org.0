@@ -2,29 +2,29 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id ADB8E1B3347
-	for <lists+kvm@lfdr.de>; Wed, 22 Apr 2020 01:34:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5AE781B334D
+	for <lists+kvm@lfdr.de>; Wed, 22 Apr 2020 01:34:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726510AbgDUXe1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Apr 2020 19:34:27 -0400
-Received: from mga05.intel.com ([192.55.52.43]:10128 "EHLO mga05.intel.com"
+        id S1726530AbgDUXee (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Apr 2020 19:34:34 -0400
+Received: from mga03.intel.com ([134.134.136.65]:32263 "EHLO mga03.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726501AbgDUXe0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Apr 2020 19:34:26 -0400
-IronPort-SDR: IaBF5dqT1TOrZzibrxbz5zeoww6iFNj8voSIdt+DCQ9qIcyVYK0mIAmSj56LIIQsnO0mfHIgDt
- dVeNmTJGmt8w==
+        id S1726523AbgDUXed (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Apr 2020 19:34:33 -0400
+IronPort-SDR: XKt8+CmwbvTeu8YVOgtiBR8DD53e4OzgN+fdN9Cs9ufwlCyu1p5qx+BVBN1nP1gvKIXkiRQ5iV
+ GLxkJD4UtHMw==
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Apr 2020 16:34:25 -0700
-IronPort-SDR: AwaYRlSuxOFxY46ppb2H+gAM1iWEA3fYWpl3hjCwgCOSgdSf8b2fA6i7FeamUksBxwR62OuXfv
- M86Ol0mkLVng==
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Apr 2020 16:34:31 -0700
+IronPort-SDR: LzDL2DAv1j0ko+h7VF5KExRDU0seEEepGKoH05bc3fs903vHwy6jPKea6VkgpiuFEy+/iBa+Ar
+ uypCG7CXjgoA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.72,411,1580803200"; 
-   d="scan'208";a="365505910"
+   d="scan'208";a="279818733"
 Received: from djiang5-desk3.ch.intel.com ([143.182.136.137])
-  by fmsmga001.fm.intel.com with ESMTP; 21 Apr 2020 16:34:24 -0700
-Subject: [PATCH RFC 06/15] ims-msi: Enable IMS interrupts
+  by fmsmga004.fm.intel.com with ESMTP; 21 Apr 2020 16:34:30 -0700
+Subject: [PATCH RFC 07/15] Documentation: Interrupt Message store
 From:   Dave Jiang <dave.jiang@intel.com>
 To:     vkoul@kernel.org, megha.dey@linux.intel.com, maz@kernel.org,
         bhelgaas@google.com, rafael@kernel.org, gregkh@linuxfoundation.org,
@@ -36,14 +36,14 @@ To:     vkoul@kernel.org, megha.dey@linux.intel.com, maz@kernel.org,
         eric.auger@redhat.com, parav@mellanox.com
 Cc:     dmaengine@vger.kernel.org, linux-kernel@vger.kernel.org,
         x86@kernel.org, linux-pci@vger.kernel.org, kvm@vger.kernel.org
-Date:   Tue, 21 Apr 2020 16:34:24 -0700
-Message-ID: <158751206394.36773.12409950149228811741.stgit@djiang5-desk3.ch.intel.com>
+Date:   Tue, 21 Apr 2020 16:34:30 -0700
+Message-ID: <158751207000.36773.18208950543781892.stgit@djiang5-desk3.ch.intel.com>
 In-Reply-To: <158751095889.36773.6009825070990637468.stgit@djiang5-desk3.ch.intel.com>
 References: <158751095889.36773.6009825070990637468.stgit@djiang5-desk3.ch.intel.com>
 User-Agent: StGit/unknown-version
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
@@ -51,332 +51,235 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Megha Dey <megha.dey@linux.intel.com>
 
-To enable IMS interrupts,
+Add documentation for interrupt message store. This documentation
+describes the basics of Interrupt Message Store (IMS), the need to
+introduce a new interrupt mechanism, implementation details in the
+kernel, driver changes required to support IMS and the general
+misconceptions and FAQs associated with IMS.
 
-1. create an IMS irqdomain (arch_create_ims_irq_domain()) associated
-with the interrupt remapping unit.
-
-2. Add 'IMS' to the enum platform_msi_type to differentiate between
-specific actions required for different types of platform-msi, currently
-generic platform-msi and IMS
+Currently the only consumer of the newly introduced IMS APIs is
+Intel's Data Streaming Accelerator.
 
 Signed-off-by: Megha Dey <megha.dey@linux.intel.com>
 ---
- arch/x86/include/asm/irq_remapping.h |    6 ++++
- drivers/base/ims-msi.c               |   15 ++++++++++
- drivers/base/platform-msi.c          |   51 +++++++++++++++++++++++++---------
- drivers/iommu/intel-iommu.c          |    2 +
- drivers/iommu/intel_irq_remapping.c  |   31 +++++++++++++++++++--
- include/linux/intel-iommu.h          |    3 ++
- include/linux/msi.h                  |    9 ++++++
- 7 files changed, 100 insertions(+), 17 deletions(-)
+ Documentation/ims-howto.rst |  210 +++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 210 insertions(+)
+ create mode 100644 Documentation/ims-howto.rst
 
-diff --git a/arch/x86/include/asm/irq_remapping.h b/arch/x86/include/asm/irq_remapping.h
-index 4bc985f1e2e4..575e48c31b78 100644
---- a/arch/x86/include/asm/irq_remapping.h
-+++ b/arch/x86/include/asm/irq_remapping.h
-@@ -53,6 +53,12 @@ irq_remapping_get_irq_domain(struct irq_alloc_info *info);
- extern struct irq_domain *
- arch_create_remap_msi_irq_domain(struct irq_domain *par, const char *n, int id);
- 
-+/* Create IMS irqdomain, use @parent as the parent irqdomain. */
-+#ifdef CONFIG_MSI_IMS
-+extern struct irq_domain *arch_create_ims_irq_domain(struct irq_domain *parent,
-+						     const char *name);
-+#endif
+diff --git a/Documentation/ims-howto.rst b/Documentation/ims-howto.rst
+new file mode 100644
+index 000000000000..a18de152b393
+--- /dev/null
++++ b/Documentation/ims-howto.rst
+@@ -0,0 +1,210 @@
++.. SPDX-License-Identifier: GPL-2.0
++.. include:: <isonum.txt>
 +
- /* Get parent irqdomain for interrupt remapping irqdomain */
- static inline struct irq_domain *arch_get_ir_parent_domain(void)
- {
-diff --git a/drivers/base/ims-msi.c b/drivers/base/ims-msi.c
-index 896a5a1b2252..ac21088bcb83 100644
---- a/drivers/base/ims-msi.c
-+++ b/drivers/base/ims-msi.c
-@@ -14,6 +14,7 @@
- #include <linux/mdev.h>
- #include <linux/msi.h>
- #include <linux/pci.h>
-+#include <asm/irq_remapping.h>
- 
- static u32 __dev_ims_desc_mask_irq(struct msi_desc *desc, u32 flag)
- {
-@@ -101,6 +102,20 @@ static void dev_ims_set_desc(msi_alloc_info_t *arg, struct msi_desc *desc)
- 	arg->ims_hwirq = platform_msi_calc_hwirq(desc);
- }
- 
-+struct irq_domain *dev_get_ims_domain(struct device *dev)
-+{
-+	struct irq_alloc_info info;
++==========================
++The IMS Driver Guide HOWTO
++==========================
 +
-+	if (dev_is_mdev(dev))
-+		dev = mdev_to_parent(dev);
++:Authors: Megha Dey
 +
-+	init_irq_alloc_info(&info, NULL);
-+	info.type = X86_IRQ_ALLOC_TYPE_IMS;
-+	info.dev = dev;
++:Copyright: 2020 Intel Corporation
 +
-+	return irq_remapping_get_irq_domain(&info);
-+}
++About this guide
++================
 +
- static struct msi_domain_ops dev_ims_domain_ops = {
- 	.get_hwirq	= dev_ims_get_hwirq,
- 	.msi_prepare	= dev_ims_prepare,
-diff --git a/drivers/base/platform-msi.c b/drivers/base/platform-msi.c
-index 6d8840db4a85..204ce8041c17 100644
---- a/drivers/base/platform-msi.c
-+++ b/drivers/base/platform-msi.c
-@@ -118,6 +118,8 @@ static void platform_msi_free_descs(struct device *dev, int base, int nvec,
- 			kfree(platform_msi_group);
- 		}
- 	}
++This guide describes the basics of Interrupt Message Store (IMS), the
++need to introduce a new interrupt mechanism, implementation details of
++IMS in the kernel, driver changes required to support IMS and the general
++misconceptions and FAQs associated with IMS.
 +
-+	dev->platform_msi_type = 0;
- }
- 
- static int platform_msi_alloc_descs_with_irq(struct device *dev, int virq,
-@@ -205,18 +207,22 @@ platform_msi_alloc_priv_data(struct device *dev, unsigned int nvec,
- 	 * accordingly (which would impact the max number of MSI
- 	 * capable devices).
- 	 */
--	if (!dev->msi_domain || !platform_ops->write_msg || !nvec ||
--	    nvec > MAX_DEV_MSIS)
-+	if (!platform_ops->write_msg || !nvec || nvec > MAX_DEV_MSIS)
- 		return ERR_PTR(-EINVAL);
- 
--	if (dev->msi_domain->bus_token != DOMAIN_BUS_PLATFORM_MSI) {
--		dev_err(dev, "Incompatible msi_domain, giving up\n");
--		return ERR_PTR(-EINVAL);
--	}
-+	if (dev->platform_msi_type == GEN_PLAT_MSI) {
-+		if (!dev->msi_domain)
-+			return ERR_PTR(-EINVAL);
++What is IMS?
++============
 +
-+		if (dev->msi_domain->bus_token != DOMAIN_BUS_PLATFORM_MSI) {
-+			dev_err(dev, "Incompatible msi_domain, giving up\n");
-+			return ERR_PTR(-EINVAL);
-+		}
- 
--	/* Already had a helping of MSI? Greed... */
--	if (!list_empty(platform_msi_current_group_entry_list(dev)))
--		return ERR_PTR(-EBUSY);
-+		/* Already had a helping of MSI? Greed... */
-+		if (!list_empty(platform_msi_current_group_entry_list(dev)))
-+			return ERR_PTR(-EBUSY);
-+	}
- 
- 	datap = kzalloc(sizeof(*datap), GFP_KERNEL);
- 	if (!datap)
-@@ -254,6 +260,7 @@ static void platform_msi_free_priv_data(struct platform_msi_priv_data *data)
- int platform_msi_domain_alloc_irqs(struct device *dev, unsigned int nvec,
- 				   const struct platform_msi_ops *platform_ops)
- {
-+	dev->platform_msi_type = GEN_PLAT_MSI;
- 	return platform_msi_domain_alloc_irqs_group(dev, nvec, platform_ops,
- 									NULL);
- }
-@@ -265,12 +272,18 @@ int platform_msi_domain_alloc_irqs_group(struct device *dev, unsigned int nvec,
- {
- 	struct platform_msi_group_entry *platform_msi_group;
- 	struct platform_msi_priv_data *priv_data;
-+	struct irq_domain *domain;
- 	int err;
- 
--	dev->platform_msi_type = GEN_PLAT_MSI;
--
--	if (group_id)
-+	if (!dev->platform_msi_type) {
- 		*group_id = ++dev->group_id;
-+		dev->platform_msi_type = IMS;
-+		domain = dev_get_ims_domain(dev);
-+		if (!domain)
-+			return -ENOSYS;
-+	} else {
-+		domain = dev->msi_domain;
-+	}
- 
- 	platform_msi_group = kzalloc(sizeof(*platform_msi_group), GFP_KERNEL);
- 	if (!platform_msi_group) {
-@@ -292,10 +305,11 @@ int platform_msi_domain_alloc_irqs_group(struct device *dev, unsigned int nvec,
- 	if (err)
- 		goto out_free_priv_data;
- 
--	err = msi_domain_alloc_irqs(dev->msi_domain, dev, nvec);
-+	err = msi_domain_alloc_irqs(domain, dev, nvec);
- 	if (err)
- 		goto out_free_desc;
- 
-+	dev->platform_msi_type = 0;
- 	return 0;
- 
- out_free_desc:
-@@ -314,6 +328,7 @@ EXPORT_SYMBOL_GPL(platform_msi_domain_alloc_irqs_group);
-  */
- void platform_msi_domain_free_irqs(struct device *dev)
- {
-+	dev->platform_msi_type = GEN_PLAT_MSI;
- 	platform_msi_domain_free_irqs_group(dev, 0);
- }
- EXPORT_SYMBOL_GPL(platform_msi_domain_free_irqs);
-@@ -321,6 +336,14 @@ EXPORT_SYMBOL_GPL(platform_msi_domain_free_irqs);
- void platform_msi_domain_free_irqs_group(struct device *dev, unsigned int group)
- {
- 	struct platform_msi_group_entry *platform_msi_group;
-+	struct irq_domain *domain;
++Intel has introduced the Scalable I/O virtualization (SIOV)[1] which
++provides a scalable and lightweight approach to hardware assisted I/O
++virtualization by overcoming many of the shortcomings of SR-IOV.
 +
-+	if (!dev->platform_msi_type) {
-+		dev->platform_msi_type = IMS;
-+		domain = dev_get_ims_domain(dev);
-+	} else {
-+		domain = dev->msi_domain;
-+	}
- 
- 	list_for_each_entry(platform_msi_group,
- 			    dev_to_platform_msi_group_list((dev)), group_list) {
-@@ -334,7 +357,7 @@ void platform_msi_domain_free_irqs_group(struct device *dev, unsigned int group)
- 			}
- 		}
- 	}
--	msi_domain_free_irqs_group(dev->msi_domain, dev, group);
-+	msi_domain_free_irqs_group(domain, dev, group);
- 	platform_msi_free_descs(dev, 0, MAX_DEV_MSIS, group);
- }
- EXPORT_SYMBOL_GPL(platform_msi_domain_free_irqs_group);
-diff --git a/drivers/iommu/intel-iommu.c b/drivers/iommu/intel-iommu.c
-index ef0a5246700e..99bb238caea6 100644
---- a/drivers/iommu/intel-iommu.c
-+++ b/drivers/iommu/intel-iommu.c
-@@ -794,7 +794,7 @@ is_downstream_to_pci_bridge(struct device *dev, struct device *bridge)
- 	return false;
- }
- 
--static struct intel_iommu *device_to_iommu(struct device *dev, u8 *bus, u8 *devfn)
-+struct intel_iommu *device_to_iommu(struct device *dev, u8 *bus, u8 *devfn)
- {
- 	struct dmar_drhd_unit *drhd = NULL;
- 	struct intel_iommu *iommu;
-diff --git a/drivers/iommu/intel_irq_remapping.c b/drivers/iommu/intel_irq_remapping.c
-index 81e43c1df7ec..1e470c9c3e7d 100644
---- a/drivers/iommu/intel_irq_remapping.c
-+++ b/drivers/iommu/intel_irq_remapping.c
-@@ -234,6 +234,18 @@ static struct intel_iommu *map_dev_to_ir(struct pci_dev *dev)
- 	return drhd->iommu;
- }
- 
-+static struct intel_iommu *map_gen_dev_to_ir(struct device *dev)
-+{
-+	struct intel_iommu *iommu;
-+	u8 bus, devfn;
++SIOV shares I/O devices at a much finer granularity, the minimal sharable
++resource being the 'Assignable Device Interface' or ADI. Each ADI can
++support multiple interrupt messages and thus, we need a matching scalable
++interrupt mechanism to process these ADI interrupts. Interrupt Message
++Store or IMS is a new interrupt mechanism to meet such a demand.
 +
-+	iommu = device_to_iommu(dev, &bus, &devfn);
-+	if (!iommu)
-+		return NULL;
++Why use IMS?
++============
 +
-+	return iommu;
-+}
++Until now, the maximum number of interrupts a device could support was 2048
++(using MSI-X). With IMS, there is no such restriction. A device can report
++support for SIOV(and hence IMS) to the kernel through the host device
++driver. Alternatively, if the kernel needs a generic way to discover these
++capabilities without host driver dependency, the PCIE Designated Vendor
++specific Extended capability(DVSEC) can be used. ([1]Section 3.7)
 +
- static int clear_entries(struct irq_2_iommu *irq_iommu)
- {
- 	struct irte *start, *entry, *end;
-@@ -572,6 +584,10 @@ static int intel_setup_irq_remapping(struct intel_iommu *iommu)
- 		arch_create_remap_msi_irq_domain(iommu->ir_domain,
- 						 "INTEL-IR-MSI",
- 						 iommu->seq_id);
-+#if IS_ENABLED(CONFIG_MSI_IMS)
-+	iommu->ir_ims_domain = arch_create_ims_irq_domain(iommu->ir_domain,
-+							  "INTEL-IR-IMS");
-+#endif
- 
- 	ir_table->base = page_address(pages);
- 	ir_table->bitmap = bitmap;
-@@ -637,6 +653,10 @@ static void intel_teardown_irq_remapping(struct intel_iommu *iommu)
- 			irq_domain_remove(iommu->ir_domain);
- 			iommu->ir_domain = NULL;
- 		}
-+		if (iommu->ir_ims_domain) {
-+			irq_domain_remove(iommu->ir_ims_domain);
-+			iommu->ir_ims_domain = NULL;
-+		}
- 		free_pages((unsigned long)iommu->ir_table->base,
- 			   INTR_REMAP_PAGE_ORDER);
- 		bitmap_free(iommu->ir_table->bitmap);
-@@ -1132,6 +1152,11 @@ static struct irq_domain *intel_get_irq_domain(struct irq_alloc_info *info)
- 		if (iommu)
- 			return iommu->ir_msi_domain;
- 		break;
-+	case X86_IRQ_ALLOC_TYPE_IMS:
-+		iommu = map_gen_dev_to_ir(info->dev);
-+		if (iommu)
-+			return iommu->ir_ims_domain;
-+		break;
- 	default:
- 		break;
- 	}
-@@ -1299,9 +1324,10 @@ static void intel_irq_remapping_prepare_irte(struct intel_ir_data *data,
- 	case X86_IRQ_ALLOC_TYPE_HPET:
- 	case X86_IRQ_ALLOC_TYPE_MSI:
- 	case X86_IRQ_ALLOC_TYPE_MSIX:
-+	case X86_IRQ_ALLOC_TYPE_IMS:
- 		if (info->type == X86_IRQ_ALLOC_TYPE_HPET)
- 			set_hpet_sid(irte, info->hpet_id);
--		else
-+		else if (info->type != X86_IRQ_ALLOC_TYPE_IMS)
- 			set_msi_sid(irte, info->msi_dev);
- 
- 		msg->address_hi = MSI_ADDR_BASE_HI;
-@@ -1354,7 +1380,8 @@ static int intel_irq_remapping_alloc(struct irq_domain *domain,
- 	if (!info || !iommu)
- 		return -EINVAL;
- 	if (nr_irqs > 1 && info->type != X86_IRQ_ALLOC_TYPE_MSI &&
--	    info->type != X86_IRQ_ALLOC_TYPE_MSIX)
-+	    info->type != X86_IRQ_ALLOC_TYPE_MSIX &&
-+	    info->type != X86_IRQ_ALLOC_TYPE_IMS)
- 		return -EINVAL;
- 
- 	/*
-diff --git a/include/linux/intel-iommu.h b/include/linux/intel-iommu.h
-index 980234ae0312..cdaab83001da 100644
---- a/include/linux/intel-iommu.h
-+++ b/include/linux/intel-iommu.h
-@@ -557,6 +557,7 @@ struct intel_iommu {
- 	struct ir_table *ir_table;	/* Interrupt remapping info */
- 	struct irq_domain *ir_domain;
- 	struct irq_domain *ir_msi_domain;
-+	struct irq_domain *ir_ims_domain;
- #endif
- 	struct iommu_device iommu;  /* IOMMU core code handle */
- 	int		node;
-@@ -701,6 +702,8 @@ extern struct intel_iommu *intel_svm_device_to_iommu(struct device *dev);
- static inline void intel_svm_check(struct intel_iommu *iommu) {}
- #endif
- 
-+extern struct intel_iommu *device_to_iommu(struct device *dev,
-+					   u8 *bus, u8 *devfn);
- #ifdef CONFIG_INTEL_IOMMU_DEBUGFS
- void intel_iommu_debugfs_init(void);
- #else
-diff --git a/include/linux/msi.h b/include/linux/msi.h
-index 8b5f24bf3c47..2f8fa1391333 100644
---- a/include/linux/msi.h
-+++ b/include/linux/msi.h
-@@ -135,6 +135,7 @@ struct msi_desc {
- enum platform_msi_type {
- 	NOT_PLAT_MSI = 0,
- 	GEN_PLAT_MSI = 1,
-+	IMS =	2,
- };
- 
- struct platform_msi_group_entry {
-@@ -454,4 +455,12 @@ static inline struct irq_domain *pci_msi_get_device_domain(struct pci_dev *pdev)
- }
- #endif /* CONFIG_PCI_MSI_IRQ_DOMAIN */
- 
-+#ifdef CONFIG_MSI_IMS
-+struct irq_domain *dev_get_ims_domain(struct device *dev);
-+#else
-+static inline struct irq_domain *dev_get_ims_domain(struct device *dev)
-+{
-+	return NULL;
-+}
-+#endif
- #endif /* LINUX_MSI_H */
++IMS is device-specific which means that the programming of the interrupt
++messages (address/data pairs) is done in some device specific way, and not
++by using a standard like PCI. Also, by using IMS, the device is free to
++choose where it wants to store the interrupt messages. This makes IMS
++highly flexible. Some devices may organise IMS as a table in device memory
++(like MSI-X) which can be accessed through one or more memory mapped system
++pages, some device implementations may organise it in a distributed/
++replicated fashion at each of the “engines” in the device (with future
++multi-tile devices) while context based devices (GPUs for instance),
++can have it stored/located in memory (as part of supervisory state of a
++command/context), that the hosting function can fetch and cache on demand
++at the device. Since the number of contexts cannot be determined at boot
++time, there cannot be a standard enumeration of the IMS size during boot.
++In any approach, devices may implement IMS as either one unified storage
++structure or de-centralized per ADI storage structures.
++
++Even though the IMS storage organisation is device-specific, IMS entries
++store and generate interrupts using the same interrupt message address and
++data format as the PCI Express MSI-X table entries, a DWORD size data
++payload and a 64-bit address. Interrupt messages are expected to be
++programmed only by the host driver. All the IMS interrupt messages are
++stored in the remappable format. Hence, if a driver enables IMS, interrupt
++remapping is also enabled by default.
++
++A device can support both MSI-X and IMS entries simultaneously, each being
++used for a different purpose. E.g., MSI-X can be used to report device level
++errors while IMS for software constructed devices created for native or
++guest use.
++
++Implementation of IMS in the kernel
++===================================
++
++The Linux kernel today already provides a generic mechanism to support
++non-PCI compliant MSI interrupts for platform devices (platform-msi.c).
++To support IMS interrupts, we create a new IMS IRQ domain and extend the
++existing infrastructure. Dynamic allocation of IMS vectors is a requirement
++for devices which support Scalable I/O Virtualization. A driver can allocate
++and free vectors not just once during probe (as was the case with MSI/MSI-X)
++but also in the post probe phase where actual demand is available. Thus, a
++new API, platform_msi_domain_alloc_irqs_group is introduced which drivers
++using IMS would be able to call multiple times. The vectors allocated each
++time this API is called are associated with a group ID. To free the vectors
++associated with a particular group, the platform_msi_domain_free_irqs_group
++API can be called. The existing drivers using platform-msi infrastructure
++will continue to use the existing alloc (platform_msi_domain_alloc_irqs)
++and free (platform_msi_domain_free_irqs) APIs and are assigned a default
++group ID of 0.
++
++Thus, platform-msi.c provides the generic methods which can be used by any
++non-pci MSI interrupt type while the newly created ims-msi.c provides IMS
++specific callbacks that can be used by drivers capable of generating IMS
++interrupts. Intel has introduced data streaming accelerator (DSA)[2] device
++which supports SIOV and thus supports IMS. Currently, only Intel's Data
++Accelerator (idxd) driver is a consumer of this feature.
++
++FAQs and general misconceptions:
++================================
++
++** There were some concerns raised by Thomas Gleixner and Marc Zyngier
++during Linux plumbers conference 2019:
++
++1. Enumeration of IMS needs to be done by PCI core code and not by
++   individual device drivers:
++
++   Currently, if the kernel needs a generic way to discover IMS capability
++   without host driver dependency, the PCIE Designated Vendor specific
++
++   However, we cannot have a standard way of enumerating the IMS size
++   because for context based devices, the interrupt message is part of
++   the context itself which is managed entirely by the driver. Since
++   context creation is done on demand, there is no way to tell during boot
++   time, the maximum number of contexts (and hence the number of interrupt
++   messages)that the device can support.
++
++   Also, this seems redundant (given only the driver will use this
++   information). Hence, we thought it may suffice to enumerate it as part
++   of driver callback interfaces. In the current linux code, even with
++   MSI-X, the size reported by MSI-X capability is used only to cross check
++   if the driver is asking more than that or not (and if so, fail the call).
++
++   Although, if you believe it would be useful, we can add the IMS size
++   enumeration to the SIOV DVSEC capability.
++
++   Perhaps there is a misunderstanding on what IMS serves. IMS is not a
++   system-wide interrupt solution which serves all devices; it is a
++   self-serving device level interrupt mechanism (other than using system
++   vector resources). Since both producer and consumer of IMS belong to
++   the same device driver, there wouldn't be any ordering problem. Whereas,
++   if IMS service is provided by one driver which serves multiple drivers,
++   there would be ordering problems to solve.
++
++Some other commonly asked questions about IMS are as follows:
++
++1. Does all SIOV devices support MSI-X (even if they have IMS)?
++
++   Yes, all SIOV hosting functions are expected to have MSI-X capability
++   (irrespective of whether it supports IMS or not). This is done for
++   compatibility reasons, because a SIOV hosting function can be used
++   without enabling any SIOV capabilities as a standard PCIe PF.
++
++2. Why is Intel designing a new interrupt mechanism rather than extending
++   MSI-X to address its limitations? Isn't 2048 device interrupts enough?
++
++   MSI-X has a rigid definition of one-table and on-device storage and does
++   not provide the full flexibility required for future multi-tile
++   accelerator designs.
++   IMS was envisioned to be used with large number of ADIs in devices where
++   each will need unique interrupt resources. For example, a DSA shared
++   work queue can support large number of clients where each client can
++   have its own interrupt. In future, with user interrupts, we expect the
++   demand for messages to increase further.
++
++3. Will there be devices which only support IMS in the future?
++
++   No. All Scalable IOV devices will support MSI-X. But the number of MSI-X
++   table entries may be limited compared to number of IMS entries. Device
++   designs can restrict the number of interrupt messages supported with
++   MSI-X (e.g., support only what is required for the base PF function
++   without SIOV), and offer the interrupt message scalability only through
++   IMS. For e.g., DSA supports only 9 messages with MSI-X and 2K messages
++   with IMS.
++
++Device Driver Changes:
++=====================
++
++1. platform_msi_domain_alloc_irqs_group (struct device *dev, unsigned int
++   nvec, const struct platform_msi_ops *platform_ops, int *group_id)
++   to allocate IMS interrupts, where:
++
++   dev: The device for which to allocate interrupts
++   nvec: The number of interrupts to allocate
++   platform_ops: Callbacks for platform MSI ops (to be provided by driver)
++   group_id: returned by the call, to be used to free IRQs of a certain type
++
++   eg: static struct platform_msi_ops ims_ops  = {
++        .irq_mask               = ims_irq_mask,
++        .irq_unmask             = ims_irq_unmask,
++        .write_msg              = ims_write_msg,
++        };
++
++        int group;
++        platform_msi_domain_alloc_irqs_group (dev, nvec, platform_ops, &group)
++
++   where, struct platform_msi_ops:
++   irq_mask:   mask an interrupt source
++   irq_unmask: unmask an interrupt source
++   irq_write_msi_msg: write message content
++
++   This API can be called multiple times. Every time a new group will be
++   associated with the allocated vectors. Group ID starts from 0.
++
++2. platform_msi_domain_free_irqs_group(struct device *dev, int group) to
++   free IMS interrupts from a particular group
++
++3. To traverse the msi_descs associated with a group:
++        struct device *device;
++        struct msi_desc *desc;
++        struct platform_msi_group_entry *platform_msi_group;
++        int group;
++
++        for_each_platform_msi_entry_in_group(desc, platform_msi_group, group, dev) {
++        }
++
++References:
++===========
++
++[1]https://software.intel.com/en-us/download/intel-scalable-io-virtualization-technical-specification
++[2]https://software.intel.com/en-us/download/intel-data-streaming-accelerator-preliminary-architecture-specification
 
