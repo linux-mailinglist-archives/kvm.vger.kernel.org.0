@@ -2,30 +2,30 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2C4A31B3365
-	for <lists+kvm@lfdr.de>; Wed, 22 Apr 2020 01:35:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 720FF1B3368
+	for <lists+kvm@lfdr.de>; Wed, 22 Apr 2020 01:35:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726654AbgDUXfS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Apr 2020 19:35:18 -0400
-Received: from mga04.intel.com ([192.55.52.120]:39205 "EHLO mga04.intel.com"
+        id S1726674AbgDUXfY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Apr 2020 19:35:24 -0400
+Received: from mga01.intel.com ([192.55.52.88]:36954 "EHLO mga01.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726487AbgDUXfR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Apr 2020 19:35:17 -0400
-IronPort-SDR: oWe5K7SBdwNh0+W1YYGoSMcsxrfr/ZBVR3DM96VBH47FlffjuDyP2EF5S1wTFPlD4bVJadP6ZW
- +0jgvWAIsZYg==
+        id S1726296AbgDUXfX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Apr 2020 19:35:23 -0400
+IronPort-SDR: CBv6vkLWbU8jfJ6IfHCADHQIASqxLNemeyhOlbla+m9YIM1MHlCL2GHHucxV3WvJo1a/oBjjeY
+ MCkvsDvGrhhg==
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Apr 2020 16:35:17 -0700
-IronPort-SDR: L7TUKFuOs0nA+TAwy+KcP+IKm9U25fgE1ivpraZI9cf7sTYIE5bXfqOUI9KapnOd2y84/lpQB4
- tirC60FDpeFw==
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Apr 2020 16:35:23 -0700
+IronPort-SDR: TsB3fO4zi2456JXzd/fClc/FbQU2+V4BCcehrJuXYFj1PwTrfCLGA17vHSN4OBM/Wg3XKgLR2W
+ YgqF215PAvbw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.72,411,1580803200"; 
-   d="scan'208";a="258876602"
+   d="scan'208";a="255449736"
 Received: from djiang5-desk3.ch.intel.com ([143.182.136.137])
-  by orsmga006.jf.intel.com with ESMTP; 21 Apr 2020 16:35:15 -0700
-Subject: [PATCH RFC 14/15] dmaengine: idxd: add error notification from host
- driver to mediated device
+  by orsmga003.jf.intel.com with ESMTP; 21 Apr 2020 16:35:22 -0700
+Subject: [PATCH RFC 15/15] dmaengine: idxd: add ABI documentation for
+ mediated device support
 From:   Dave Jiang <dave.jiang@intel.com>
 To:     vkoul@kernel.org, megha.dey@linux.intel.com, maz@kernel.org,
         bhelgaas@google.com, rafael@kernel.org, gregkh@linuxfoundation.org,
@@ -37,8 +37,8 @@ To:     vkoul@kernel.org, megha.dey@linux.intel.com, maz@kernel.org,
         eric.auger@redhat.com, parav@mellanox.com
 Cc:     dmaengine@vger.kernel.org, linux-kernel@vger.kernel.org,
         x86@kernel.org, linux-pci@vger.kernel.org, kvm@vger.kernel.org
-Date:   Tue, 21 Apr 2020 16:35:15 -0700
-Message-ID: <158751211522.36773.1692028393873153808.stgit@djiang5-desk3.ch.intel.com>
+Date:   Tue, 21 Apr 2020 16:35:21 -0700
+Message-ID: <158751212189.36773.8197911986164174637.stgit@djiang5-desk3.ch.intel.com>
 In-Reply-To: <158751095889.36773.6009825070990637468.stgit@djiang5-desk3.ch.intel.com>
 References: <158751095889.36773.6009825070990637468.stgit@djiang5-desk3.ch.intel.com>
 User-Agent: StGit/unknown-version
@@ -50,103 +50,51 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When a device error occurs, the mediated device need to be notified in
-order to notify the guest of device error. Add support to notify the
-specific mdev when an error is wq specific and broadcast errors to all mdev
-when it's a generic device error.
+From: Jing Lin <jing.lin@intel.com>
 
+Add the sysfs attribute bits in ABI/stable for mediated deivce and guest
+support.
+
+Signed-off-by: Jing Lin <jing.lin@intel.com>
 Signed-off-by: Dave Jiang <dave.jiang@intel.com>
 ---
- drivers/dma/idxd/idxd.h |    2 ++
- drivers/dma/idxd/irq.c  |    4 ++++
- drivers/dma/idxd/vdev.c |   33 +++++++++++++++++++++++++++++++++
- drivers/dma/idxd/vdev.h |    1 +
- 4 files changed, 40 insertions(+)
+ Documentation/ABI/stable/sysfs-driver-dma-idxd |   18 ++++++++++++++++--
+ 1 file changed, 16 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/dma/idxd/idxd.h b/drivers/dma/idxd/idxd.h
-index 92a9718daa15..651196514ad5 100644
---- a/drivers/dma/idxd/idxd.h
-+++ b/drivers/dma/idxd/idxd.h
-@@ -362,5 +362,7 @@ void idxd_wq_del_cdev(struct idxd_wq *wq);
- /* mdev */
- int idxd_mdev_host_init(struct idxd_device *idxd);
- void idxd_mdev_host_release(struct idxd_device *idxd);
-+void idxd_wq_vidxd_send_errors(struct idxd_wq *wq);
-+void idxd_vidxd_send_errors(struct idxd_device *idxd);
+diff --git a/Documentation/ABI/stable/sysfs-driver-dma-idxd b/Documentation/ABI/stable/sysfs-driver-dma-idxd
+index c1adddde23c2..b04cbc5a1827 100644
+--- a/Documentation/ABI/stable/sysfs-driver-dma-idxd
++++ b/Documentation/ABI/stable/sysfs-driver-dma-idxd
+@@ -76,6 +76,12 @@ Date:		Jan 30, 2020
+ KernelVersion:	5.7.0
+ Contact:	dmaengine@vger.kernel.org
+ Description:	To indicate if PASID (process address space identifier) is
++
++What:           sys/bus/dsa/devices/dsa<m>/ims_size
++Date:           Apr 13, 2020
++KernelVersion:  5.8.0
++Contact:        dmaengine@vger.kernel.org
++Description:	Number of entries in the interrupt message storage table.
+ 		enabled or not for this device.
  
- #endif
-diff --git a/drivers/dma/idxd/irq.c b/drivers/dma/idxd/irq.c
-index bc634dc4e485..256ef7d8a5c9 100644
---- a/drivers/dma/idxd/irq.c
-+++ b/drivers/dma/idxd/irq.c
-@@ -167,6 +167,8 @@ irqreturn_t idxd_misc_thread(int vec, void *data)
+ What:           sys/bus/dsa/devices/dsa<m>/state
+@@ -141,8 +147,16 @@ Date:           Oct 25, 2019
+ KernelVersion:  5.6.0
+ Contact:        dmaengine@vger.kernel.org
+ Description:    The type of this work queue, it can be "kernel" type for work
+-		queue usages in the kernel space or "user" type for work queue
+-		usages by applications in user space.
++		queue usages in the kernel space, "user" type for work queue
++		usages by applications in user space, or "mdev" type for
++		VFIO mediated devices.
++
++What:           sys/bus/dsa/devices/wq<m>.<n>/uuid
++Date:           Apr 13, 2020
++KernelVersion:  5.8.0
++Contact:        dmaengine@vger.kernel.org
++Description:    The uuid attached to this work queue when the mediated device is
++		created.
  
- 			if (wq->type == IDXD_WQT_USER)
- 				wake_up_interruptible(&wq->idxd_cdev.err_queue);
-+			else if (wq->type == IDXD_WQT_MDEV)
-+				idxd_wq_vidxd_send_errors(wq);
- 		} else {
- 			int i;
- 
-@@ -175,6 +177,8 @@ irqreturn_t idxd_misc_thread(int vec, void *data)
- 
- 				if (wq->type == IDXD_WQT_USER)
- 					wake_up_interruptible(&wq->idxd_cdev.err_queue);
-+				else if (wq->type == IDXD_WQT_MDEV)
-+					idxd_vidxd_send_errors(idxd);
- 			}
- 		}
- 
-diff --git a/drivers/dma/idxd/vdev.c b/drivers/dma/idxd/vdev.c
-index d2a15f1dae6a..83985f0a336e 100644
---- a/drivers/dma/idxd/vdev.c
-+++ b/drivers/dma/idxd/vdev.c
-@@ -568,3 +568,36 @@ int vidxd_free_ims_entry(struct vdcm_idxd *vidxd, int msix_idx)
- {
- 	return 0;
- }
-+
-+static void vidxd_send_errors(struct vdcm_idxd *vidxd)
-+{
-+	struct idxd_device *idxd = vidxd->idxd;
-+	struct vdcm_idxd_pci_bar0 *bar0 = &vidxd->bar0;
-+	u64 *swerr = (u64 *)&bar0->cap_ctrl_regs[IDXD_SWERR_OFFSET];
-+	int i;
-+
-+	for (i = 0; i < 4; i++) {
-+		*swerr = idxd->sw_err.bits[i];
-+		swerr++;
-+	}
-+	vidxd_send_interrupt(vidxd, 0);
-+}
-+
-+void idxd_wq_vidxd_send_errors(struct idxd_wq *wq)
-+{
-+	struct vdcm_idxd *vidxd;
-+
-+	list_for_each_entry(vidxd, &wq->vdcm_list, list)
-+		vidxd_send_errors(vidxd);
-+}
-+
-+void idxd_vidxd_send_errors(struct idxd_device *idxd)
-+{
-+	int i;
-+
-+	for (i = 0; i < idxd->max_wqs; i++) {
-+		struct idxd_wq *wq = &idxd->wqs[i];
-+
-+		idxd_wq_vidxd_send_errors(wq);
-+	}
-+}
-diff --git a/drivers/dma/idxd/vdev.h b/drivers/dma/idxd/vdev.h
-index 3dfff6d0f641..14c6631e670c 100644
---- a/drivers/dma/idxd/vdev.h
-+++ b/drivers/dma/idxd/vdev.h
-@@ -38,5 +38,6 @@ int vidxd_setup_ims_entry(struct vdcm_idxd *vidxd, int ims_idx, u32 val);
- int vidxd_send_interrupt(struct vdcm_idxd *vidxd, int msix_idx);
- void vidxd_do_command(struct vdcm_idxd *vidxd, u32 val);
- void vidxd_reset(struct vdcm_idxd *vidxd);
-+void idxd_wq_vidxd_send_errors(struct idxd_wq *wq);
- 
- #endif
+ What:           sys/bus/dsa/devices/wq<m>.<n>/cdev_minor
+ Date:           Oct 25, 2019
 
