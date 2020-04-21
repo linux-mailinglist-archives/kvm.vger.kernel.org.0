@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 184D71B2F59
-	for <lists+kvm@lfdr.de>; Tue, 21 Apr 2020 20:43:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 590061B2F5E
+	for <lists+kvm@lfdr.de>; Tue, 21 Apr 2020 20:43:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729552AbgDUSnK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Apr 2020 14:43:10 -0400
-Received: from smtp-fw-33001.amazon.com ([207.171.190.10]:62367 "EHLO
+        id S1729606AbgDUSnZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Apr 2020 14:43:25 -0400
+Received: from smtp-fw-33001.amazon.com ([207.171.190.10]:62396 "EHLO
         smtp-fw-33001.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729542AbgDUSnJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Apr 2020 14:43:09 -0400
+        with ESMTP id S1729540AbgDUSnQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Apr 2020 14:43:16 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1587494588; x=1619030588;
+  t=1587494597; x=1619030597;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=dnaTm1aF+1cLi/7DGn/IqxJTYcFCqrkiSr63xiWSCiw=;
-  b=g7G4nI2lIREJhnV7emZuBPoEw/KX/UDwbE9Uoqx2O7DLChbRKQO8X1F9
-   lgVDqE5/O6H/Osd3YX4WGWhgmBw1Occhq/+9P96ckM7r7BNhSiu+B6toB
-   /7NnBr/79CmMi97TogLZGqBDyUB91fu76K2BRyUFteUNKswsmV5lkRYwM
-   Y=;
-IronPort-SDR: QdqEgfSxVuT0T2BMhPVvqLkO1BJBGznv7qxXLC50KC3eSOnm1hiYsqM0GSlwiHQT7QRSEE5hqn
- wjZ9YR5e2J7Q==
+  bh=vsbWuzgjSRqPVgjOvuPHmqAcGQpcFjP8Gy0kRb8w6Sg=;
+  b=Wv3a2NFUSwqgumKKuvgYjN+Q4+hPCE7twqQv1ZHn6M+KyX+Qh4jibtah
+   ehg9eUBrJe36Nr9/UoccXkU9Rbtr15UWma/DzYnQsqXT8oLWlVTo6W/P9
+   T6IyIM80h0/ZrOdiEx1LxZsyRsf66DVOUCgMTHDudHYIbxKBA0VC1x9zc
+   I=;
+IronPort-SDR: PltIrDIistU/XYafnYcpmG7MXZt7LkYZ3U8tHqeItECEmLtdhAfmS0mSZfK+ROttI+pgmP4Hg0
+ n2vfmYCGWDRw==
 X-IronPort-AV: E=Sophos;i="5.72,411,1580774400"; 
-   d="scan'208";a="39978497"
-Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-2a-1c1b5cdd.us-west-2.amazon.com) ([10.47.23.38])
-  by smtp-border-fw-out-33001.sea14.amazon.com with ESMTP; 21 Apr 2020 18:43:08 +0000
+   d="scan'208";a="39978516"
+Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-2a-e7be2041.us-west-2.amazon.com) ([10.47.23.38])
+  by smtp-border-fw-out-33001.sea14.amazon.com with ESMTP; 21 Apr 2020 18:43:16 +0000
 Received: from EX13MTAUEA002.ant.amazon.com (pdx4-ws-svc-p6-lb7-vlan2.pdx.amazon.com [10.170.41.162])
-        by email-inbound-relay-2a-1c1b5cdd.us-west-2.amazon.com (Postfix) with ESMTPS id A704DA06EE;
-        Tue, 21 Apr 2020 18:43:07 +0000 (UTC)
+        by email-inbound-relay-2a-e7be2041.us-west-2.amazon.com (Postfix) with ESMTPS id B7613A22FD;
+        Tue, 21 Apr 2020 18:43:15 +0000 (UTC)
 Received: from EX13D16EUB003.ant.amazon.com (10.43.166.99) by
  EX13MTAUEA002.ant.amazon.com (10.43.61.77) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Tue, 21 Apr 2020 18:43:07 +0000
+ id 15.0.1497.2; Tue, 21 Apr 2020 18:43:15 +0000
 Received: from 38f9d34ed3b1.ant.amazon.com (10.43.160.90) by
  EX13D16EUB003.ant.amazon.com (10.43.166.99) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Tue, 21 Apr 2020 18:42:58 +0000
+ id 15.0.1497.2; Tue, 21 Apr 2020 18:43:06 +0000
 From:   Andra Paraschiv <andraprs@amazon.com>
 To:     <linux-kernel@vger.kernel.org>
 CC:     Anthony Liguori <aliguori@amazon.com>,
@@ -53,9 +53,9 @@ CC:     Anthony Liguori <aliguori@amazon.com>,
         Uwe Dannowski <uwed@amazon.de>, <kvm@vger.kernel.org>,
         <ne-devel-upstream@amazon.com>,
         Andra Paraschiv <andraprs@amazon.com>
-Subject: [PATCH v1 07/15] nitro_enclaves: Init misc device providing the ioctl interface
-Date:   Tue, 21 Apr 2020 21:41:42 +0300
-Message-ID: <20200421184150.68011-8-andraprs@amazon.com>
+Subject: [PATCH v1 08/15] nitro_enclaves: Add logic for enclave vm creation
+Date:   Tue, 21 Apr 2020 21:41:43 +0300
+Message-ID: <20200421184150.68011-9-andraprs@amazon.com>
 X-Mailer: git-send-email 2.20.1 (Apple Git-117)
 In-Reply-To: <20200421184150.68011-1-andraprs@amazon.com>
 References: <20200421184150.68011-1-andraprs@amazon.com>
@@ -70,96 +70,41 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The Nitro Enclaves driver provides an ioctl interface to the user space
-for enclave lifetime management e.g. enclave creation / termination and
-setting enclave resources such as memory and CPU.
+Add ioctl command logic for enclave VM creation. It triggers a slot
+allocation. The enclave resources will be associated with this slot and
+it will be used as an identifier for triggering enclave run.
 
-This ioctl interface is mapped to a Nitro Enclaves misc device.
+Return a file descriptor, namely enclave fd. This is further used by the
+associated user space enclave process to set enclave resources and
+trigger enclave termination.
 
+The poll function is implemented in order to notify the enclave process
+when an enclave exits without a specific enclave termination command
+trigger e.g. when an enclave crashes.
+
+Signed-off-by: Alexandru Vasile <lexnv@amazon.com>
 Signed-off-by: Andra Paraschiv <andraprs@amazon.com>
 ---
- .../virt/amazon/nitro_enclaves/ne_misc_dev.c  | 174 ++++++++++++++++++
- .../virt/amazon/nitro_enclaves/ne_pci_dev.c   |  13 ++
- 2 files changed, 187 insertions(+)
- create mode 100644 drivers/virt/amazon/nitro_enclaves/ne_misc_dev.c
+ .../virt/amazon/nitro_enclaves/ne_misc_dev.c  | 166 ++++++++++++++++++
+ 1 file changed, 166 insertions(+)
 
 diff --git a/drivers/virt/amazon/nitro_enclaves/ne_misc_dev.c b/drivers/virt/amazon/nitro_enclaves/ne_misc_dev.c
-new file mode 100644
-index 000000000000..d22a76ed07e5
---- /dev/null
+index d22a76ed07e5..abbebc7718c2 100644
+--- a/drivers/virt/amazon/nitro_enclaves/ne_misc_dev.c
 +++ b/drivers/virt/amazon/nitro_enclaves/ne_misc_dev.c
-@@ -0,0 +1,174 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-+ *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms and conditions of the GNU General Public License,
-+ * version 2, as published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+/**
-+ * Enclave lifetime management driver for Nitro Enclaves (NE).
-+ * Nitro is a hypervisor that has been developed by Amazon.
-+ */
-+
-+#include <linux/anon_inodes.h>
-+#include <linux/bug.h>
-+#include <linux/cpu.h>
-+#include <linux/device.h>
-+#include <linux/file.h>
-+#include <linux/hugetlb.h>
-+#include <linux/kvm_host.h>
-+#include <linux/list.h>
-+#include <linux/miscdevice.h>
-+#include <linux/mm.h>
-+#include <linux/mman.h>
-+#include <linux/module.h>
-+#include <linux/mutex.h>
-+#include <linux/nitro_enclaves.h>
-+#include <linux/pci.h>
-+#include <linux/poll.h>
-+#include <linux/slab.h>
-+#include <linux/types.h>
-+
-+#include "ne_misc_dev.h"
-+#include "ne_pci_dev.h"
-+
-+#define NE_DEV_NAME "nitro_enclaves"
-+
-+#define MIN_MEM_REGION_SIZE (2 * 1024UL * 1024UL)
-+
-+static char *ne_cpus;
-+module_param(ne_cpus, charp, 0644);
-+MODULE_PARM_DESC(ne_cpus, "<cpu-list> - CPU pool used for Nitro Enclaves");
-+
-+/* CPU pool used for Nitro Enclaves. */
-+struct ne_cpu_pool {
-+	/* Available CPUs in the pool. */
-+	cpumask_var_t avail;
-+};
-+
-+static struct ne_cpu_pool ne_cpu_pool;
-+
-+static struct mutex ne_cpu_pool_mutex;
-+
-+static int ne_open(struct inode *node, struct file *file)
+@@ -60,6 +60,145 @@ static struct ne_cpu_pool ne_cpu_pool;
+ 
+ static struct mutex ne_cpu_pool_mutex;
+ 
++static int ne_enclave_open(struct inode *node, struct file *file)
 +{
 +	return 0;
 +}
 +
-+static long ne_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
++static long ne_enclave_ioctl(struct file *file, unsigned int cmd,
++			     unsigned long arg)
 +{
 +	switch (cmd) {
-+
 +	default:
 +		return -ENOTTY;
 +	}
@@ -167,140 +112,167 @@ index 000000000000..d22a76ed07e5
 +	return 0;
 +}
 +
-+static int ne_release(struct inode *inode, struct file *file)
++static int ne_enclave_release(struct inode *inode, struct file *file)
 +{
 +	return 0;
 +}
 +
-+static const struct file_operations ne_fops = {
++static __poll_t ne_enclave_poll(struct file *file, poll_table *wait)
++{
++	__poll_t mask = 0;
++	struct ne_enclave *ne_enclave = file->private_data;
++
++	poll_wait(file, &ne_enclave->eventq, wait);
++
++	if (!ne_enclave->has_event)
++		return mask;
++
++	mask = POLLHUP;
++
++	return mask;
++}
++
++static const struct file_operations ne_enclave_fops = {
 +	.owner		= THIS_MODULE,
 +	.llseek		= noop_llseek,
-+	.unlocked_ioctl	= ne_ioctl,
-+	.open		= ne_open,
-+	.release	= ne_release,
++	.poll		= ne_enclave_poll,
++	.unlocked_ioctl	= ne_enclave_ioctl,
++	.open		= ne_enclave_open,
++	.release	= ne_enclave_release,
 +};
 +
-+struct miscdevice ne_miscdevice = {
-+	.minor	= MISC_DYNAMIC_MINOR,
-+	.name	= NE_DEV_NAME,
-+	.fops	= &ne_fops,
-+	.mode	= 0664,
-+};
-+
-+static int __init ne_init(void)
++/**
++ * ne_create_vm_ioctl - Alloc slot to be associated with an enclave. Create
++ * enclave file descriptor to be further used for enclave resources handling
++ * e.g. memory regions and CPUs.
++ *
++ * This function gets called with the ne_pci_dev enclave mutex held.
++ *
++ * @pdev: PCI device used for enclave lifetime management.
++ * @ne_pci_dev: private data associated with the PCI device.
++ * @type: type of the virtual machine to be created.
++ *
++ * @returns: enclave fd on success, negative return value on failure.
++ */
++static int ne_create_vm_ioctl(struct pci_dev *pdev,
++			      struct ne_pci_dev *ne_pci_dev, unsigned long type)
 +{
-+	unsigned int cpu = 0;
++	struct ne_pci_dev_cmd_reply cmd_reply = {};
++	int fd = 0;
++	struct file *file = NULL;
++	struct ne_enclave *ne_enclave = NULL;
 +	int rc = -EINVAL;
++	struct slot_alloc_req slot_alloc_req = {};
 +
-+	memset(&ne_cpu_pool, 0, sizeof(ne_cpu_pool));
++	BUG_ON(!pdev);
++	BUG_ON(!ne_pci_dev);
 +
-+	if (!zalloc_cpumask_var(&ne_cpu_pool.avail, GFP_KERNEL))
++	ne_enclave = kzalloc(sizeof(*ne_enclave), GFP_KERNEL);
++	if (!ne_enclave)
 +		return -ENOMEM;
 +
-+	mutex_init(&ne_cpu_pool_mutex);
++	if (!zalloc_cpumask_var(&ne_enclave->cpu_siblings, GFP_KERNEL)) {
++		kzfree(ne_enclave);
 +
-+	rc = cpulist_parse(ne_cpus, ne_cpu_pool.avail);
-+	if (rc < 0) {
-+		pr_err_ratelimited("Failure in cpulist parse [rc=%d]\n", rc);
-+
-+		goto err_cpulist_parse;
++		return -ENOMEM;
 +	}
 +
-+	for_each_cpu(cpu, ne_cpu_pool.avail) {
-+		rc = remove_cpu(cpu);
-+		if (rc != 0) {
-+			pr_err_ratelimited("Failure in cpu=%d remove [rc=%d]\n",
-+					   cpu, rc);
++	fd = get_unused_fd_flags(O_CLOEXEC);
++	if (fd < 0) {
++		rc = fd;
 +
-+			goto err_remove_cpu;
-+		}
-+	}
-+
-+	rc = pci_register_driver(&ne_pci_driver);
-+	if (rc < 0) {
-+		pr_err_ratelimited("Failure in pci register driver [rc=%d]\n",
++		pr_err_ratelimited("Failure in getting unused fd [rc=%d]\n",
 +				   rc);
 +
-+		goto err_pci_register_driver;
++		goto err_get_unused_fd;
 +	}
 +
-+	return 0;
++	file = anon_inode_getfile("ne-vm", &ne_enclave_fops, ne_enclave,
++				  O_RDWR);
++	if (IS_ERR(file)) {
++		rc = PTR_ERR(file);
 +
-+err_pci_register_driver:
-+err_remove_cpu:
-+	for_each_cpu(cpu, ne_cpu_pool.avail)
-+		add_cpu(cpu);
-+err_cpulist_parse:
-+	free_cpumask_var(ne_cpu_pool.avail);
++		pr_err_ratelimited("Failure in anon inode get file [rc=%d]\n",
++				   rc);
++
++		goto err_anon_inode_getfile;
++	}
++
++	ne_enclave->pdev = pdev;
++
++	rc = ne_do_request(ne_enclave->pdev, SLOT_ALLOC, &slot_alloc_req,
++			   sizeof(slot_alloc_req), &cmd_reply,
++			   sizeof(cmd_reply));
++	if (rc < 0) {
++		pr_err_ratelimited("Failure in slot alloc [rc=%d]\n", rc);
++
++		goto err_slot_alloc;
++	}
++
++	init_waitqueue_head(&ne_enclave->eventq);
++	ne_enclave->has_event = false;
++	mutex_init(&ne_enclave->enclave_info_mutex);
++	ne_enclave->max_mem_regions = cmd_reply.mem_regions;
++	INIT_LIST_HEAD(&ne_enclave->mem_regions_list);
++	ne_enclave->mm = current->mm;
++	ne_enclave->slot_uid = cmd_reply.slot_uid;
++	ne_enclave->state = NE_STATE_INIT;
++	INIT_LIST_HEAD(&ne_enclave->vcpu_ids_list);
++
++	list_add(&ne_enclave->enclave_list_entry, &ne_pci_dev->enclaves_list);
++
++	fd_install(fd, file);
++
++	return fd;
++
++err_slot_alloc:
++	fput(file);
++err_anon_inode_getfile:
++	put_unused_fd(fd);
++err_get_unused_fd:
++	free_cpumask_var(ne_enclave->cpu_siblings);
++	kzfree(ne_enclave);
 +	return rc;
 +}
 +
-+static void __exit ne_exit(void)
-+{
-+	unsigned int cpu = 0;
-+	int rc = -EINVAL;
-+
-+	pci_unregister_driver(&ne_pci_driver);
-+
-+	if (!ne_cpu_pool.avail)
-+		return;
-+
-+	for_each_cpu(cpu, ne_cpu_pool.avail) {
-+		rc = add_cpu(cpu);
-+		if (WARN_ON(rc != 0))
-+			pr_err_ratelimited("Failure in cpu=%d add [rc=%d]\n",
-+					   cpu, rc);
-+	}
-+
-+	free_cpumask_var(ne_cpu_pool.avail);
-+}
-+
-+/* TODO: Handle actions such as reboot, kexec. */
-+
-+module_init(ne_init);
-+module_exit(ne_exit);
-+
-+MODULE_AUTHOR("Amazon.com, Inc. or its affiliates");
-+MODULE_DESCRIPTION("Nitro Enclaves Driver");
-+MODULE_LICENSE("GPL v2");
-diff --git a/drivers/virt/amazon/nitro_enclaves/ne_pci_dev.c b/drivers/virt/amazon/nitro_enclaves/ne_pci_dev.c
-index 884acbb92305..19b3836b08f4 100644
---- a/drivers/virt/amazon/nitro_enclaves/ne_pci_dev.c
-+++ b/drivers/virt/amazon/nitro_enclaves/ne_pci_dev.c
-@@ -593,6 +593,15 @@ static int ne_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- 		goto err_ne_pci_dev_enable;
- 	}
- 
-+	rc = misc_register(&ne_miscdevice);
-+	if (rc < 0) {
-+		dev_err_ratelimited(&pdev->dev,
-+				    "Failure in misc dev register [rc=%d]\n",
-+				    rc);
-+
-+		goto err_misc_register;
-+	}
-+
- 	atomic_set(&ne_pci_dev->cmd_reply_avail, 0);
- 	init_waitqueue_head(&ne_pci_dev->cmd_reply_wait_q);
- 	INIT_LIST_HEAD(&ne_pci_dev->enclaves_list);
-@@ -603,6 +612,8 @@ static int ne_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- 
+ static int ne_open(struct inode *node, struct file *file)
+ {
  	return 0;
+@@ -67,7 +206,34 @@ static int ne_open(struct inode *node, struct file *file)
  
-+err_misc_register:
-+	ne_pci_dev_disable(pdev, ne_pci_dev);
- err_ne_pci_dev_enable:
- err_ne_pci_dev_disable:
- 	free_irq(pci_irq_vector(pdev, NE_VEC_EVENT), ne_pci_dev);
-@@ -627,6 +638,8 @@ static void ne_remove(struct pci_dev *pdev)
- 	if (!ne_pci_dev || !ne_pci_dev->iomem_base)
- 		return;
- 
-+	misc_deregister(&ne_miscdevice);
+ static long ne_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
+ {
++	struct ne_pci_dev *ne_pci_dev = NULL;
++	struct pci_dev *pdev = pci_get_device(PCI_VENDOR_ID_AMAZON,
++					      PCI_DEVICE_ID_NE, NULL);
 +
- 	ne_pci_dev_disable(pdev, ne_pci_dev);
++	BUG_ON(!pdev);
++
++	ne_pci_dev = pci_get_drvdata(pdev);
++	BUG_ON(!ne_pci_dev);
++
+ 	switch (cmd) {
++	case KVM_CREATE_VM: {
++		int rc = -EINVAL;
++		unsigned long type = 0;
++
++		if (copy_from_user(&type, (void *)arg, sizeof(type))) {
++			pr_err_ratelimited("Failure in copy from user\n");
++
++			return -EFAULT;
++		}
++
++		mutex_lock(&ne_pci_dev->enclaves_list_mutex);
++
++		rc = ne_create_vm_ioctl(pdev, ne_pci_dev, type);
++
++		mutex_unlock(&ne_pci_dev->enclaves_list_mutex);
++
++		return rc;
++	}
  
- 	pci_set_drvdata(pdev, NULL);
+ 	default:
+ 		return -ENOTTY;
 -- 
 2.20.1 (Apple Git-117)
 
