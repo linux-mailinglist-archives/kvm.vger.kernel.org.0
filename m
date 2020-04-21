@@ -2,113 +2,184 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6E5DB1B320D
-	for <lists+kvm@lfdr.de>; Tue, 21 Apr 2020 23:46:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 17EE11B332F
+	for <lists+kvm@lfdr.de>; Wed, 22 Apr 2020 01:33:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726377AbgDUVqq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Apr 2020 17:46:46 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:23265 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726055AbgDUVqp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Apr 2020 17:46:45 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1587505604;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=r6wLjzLOuj6c5+cLaZodMgIgcvGXF3pN8d/Rer3Rx78=;
-        b=Bk+SEIM/vgFqTBikjTQB1nB0xVqJXmXoJE+4bqSbUsLyVEqQI6UJCiBKOPJpSfzayfgxob
-        m/pWzg+zQnnlbvM2kmmHcfHLMq6wXTFJsZm2MSQ7ZmXmzvWYn1p3+ovp6C5EblLXzV98yE
-        N9hIBYCrgUG9ZUEQfYgwA25Jhs1yw10=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-94-LEM7nvuyNK2TfAYVLZQ4Og-1; Tue, 21 Apr 2020 17:46:42 -0400
-X-MC-Unique: LEM7nvuyNK2TfAYVLZQ4Og-1
-Received: by mail-wm1-f69.google.com with SMTP id j5so20192wmi.4
-        for <kvm@vger.kernel.org>; Tue, 21 Apr 2020 14:46:42 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=r6wLjzLOuj6c5+cLaZodMgIgcvGXF3pN8d/Rer3Rx78=;
-        b=PkiZhFw1qMoTrNoazqH4Scf7n+EHKNnoizBK1AleR113yHRkWNFsHgIbKYvt+wfY13
-         rFFV2cvfi08Lk2VzJWX9rCeMjfvHH0e6oGMa4woh+pkEoKg/g6Z8W6AhmUTnZFh+fkua
-         WMeCqMmsBzKn1mDmHAKz+nY01ST4z7CBzgRv8Vy1FCXBrxN+tnbfOzX1NI0dW98sriiJ
-         XV3JP4rsm79QQxxkJjMJxv593m8XNggmMozyUD7gC8+G1em4zPTdoPuFdI1gGdazyBFK
-         BPcvzCOoFLYe7PpmeyB6JskZUCirfIYccCeg6ZP0hUnegZ0YvjY//jMYa1bSOw2BKxoS
-         x1Aw==
-X-Gm-Message-State: AGi0PuakvlAi1mH1qjucfpbDNRaPMjYOZDdWwukQEOUh4LpBAzytEveW
-        b6w2zCIPEcd7oI4vReLuQPQPOPNJh5C8y7tbwj+VZmQJfrx1NGkFRU6Bmn0XNlEoNjr0jRwHzmn
-        e7NQi9S3Lr6O3
-X-Received: by 2002:a5d:49c7:: with SMTP id t7mr24817052wrs.22.1587505601034;
-        Tue, 21 Apr 2020 14:46:41 -0700 (PDT)
-X-Google-Smtp-Source: APiQypJuj94xnF2FaQAuHLXoLoDejHCjWzP12FOd9j0iSkP/LXHBmTsnLGv5NL3YplxjISyisn1r+g==
-X-Received: by 2002:a5d:49c7:: with SMTP id t7mr24817028wrs.22.1587505600785;
-        Tue, 21 Apr 2020 14:46:40 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:f43b:97b2:4c89:7446? ([2001:b07:6468:f312:f43b:97b2:4c89:7446])
-        by smtp.gmail.com with ESMTPSA id v1sm5314818wrv.19.2020.04.21.14.46.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 21 Apr 2020 14:46:40 -0700 (PDT)
-Subject: Re: [PATCH v1 00/15] Add support for Nitro Enclaves
-To:     Andra Paraschiv <andraprs@amazon.com>, linux-kernel@vger.kernel.org
-Cc:     Anthony Liguori <aliguori@amazon.com>,
-        Benjamin Herrenschmidt <benh@amazon.com>,
-        Colm MacCarthaigh <colmmacc@amazon.com>,
-        Bjoern Doebel <doebel@amazon.de>,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        Frank van der Linden <fllinden@amazon.com>,
-        Alexander Graf <graf@amazon.de>,
-        Martin Pohlack <mpohlack@amazon.de>,
-        Matt Wilson <msw@amazon.com>, Balbir Singh <sblbir@amazon.com>,
-        Stewart Smith <trawets@amazon.com>,
-        Uwe Dannowski <uwed@amazon.de>, kvm@vger.kernel.org,
-        ne-devel-upstream@amazon.com
-References: <20200421184150.68011-1-andraprs@amazon.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <18406322-dc58-9b59-3f94-88e6b638fe65@redhat.com>
-Date:   Tue, 21 Apr 2020 23:46:39 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+        id S1726337AbgDUXdt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Apr 2020 19:33:49 -0400
+Received: from mga06.intel.com ([134.134.136.31]:12570 "EHLO mga06.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725850AbgDUXdt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Apr 2020 19:33:49 -0400
+IronPort-SDR: BnUizFV1Bb5MgrFGJkXE2JakbMxcXvAsRaZcpD3LnhSxBUD+YVfegdEPn14Bx6GovMWwca38ho
+ Q7vBTNN3bxLw==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Apr 2020 16:33:48 -0700
+IronPort-SDR: METsKmv+7JvZXW9EjOtlyMWhI5GQcDjy+IpnybpdBWpF/zl7iEXxrPcBJc1dj48xetZLLeC0+3
+ P50ud4QdxgXQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.72,411,1580803200"; 
+   d="scan'208";a="300751608"
+Received: from djiang5-desk3.ch.intel.com ([143.182.136.137])
+  by FMSMGA003.fm.intel.com with ESMTP; 21 Apr 2020 16:33:47 -0700
+Subject: [PATCH RFC 00/15] Add VFIO mediated device support and IMS support
+ for the idxd driver.
+From:   Dave Jiang <dave.jiang@intel.com>
+To:     vkoul@kernel.org, megha.dey@linux.intel.com, maz@kernel.org,
+        bhelgaas@google.com, rafael@kernel.org, gregkh@linuxfoundation.org,
+        tglx@linutronix.de, hpa@zytor.com, alex.williamson@redhat.com,
+        jacob.jun.pan@intel.com, ashok.raj@intel.com, jgg@mellanox.com,
+        yi.l.liu@intel.com, baolu.lu@intel.com, kevin.tian@intel.com,
+        sanjay.k.kumar@intel.com, tony.luck@intel.com, jing.lin@intel.com,
+        dan.j.williams@intel.com, kwankhede@nvidia.com,
+        eric.auger@redhat.com, parav@mellanox.com
+Cc:     dmaengine@vger.kernel.org, linux-kernel@vger.kernel.org,
+        x86@kernel.org, linux-pci@vger.kernel.org, kvm@vger.kernel.org
+Date:   Tue, 21 Apr 2020 16:33:46 -0700
+Message-ID: <158751095889.36773.6009825070990637468.stgit@djiang5-desk3.ch.intel.com>
+User-Agent: StGit/unknown-version
 MIME-Version: 1.0
-In-Reply-To: <20200421184150.68011-1-andraprs@amazon.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 21/04/20 20:41, Andra Paraschiv wrote:
-> An enclave communicates with the primary VM via a local communication channel,
-> using virtio-vsock [2]. An enclave does not have a disk or a network device
-> attached.
+The actual code is independent of the stage 2 driver code submission that adds
+support for SVM, ENQCMD(S), PASID, and shared workqueues. This code series will
+support dedicated workqueue on a guest with no vIOMMU.
+  
+A new device type "mdev" is introduced for the idxd driver. This allows the wq
+to be dedicated to the usage of a VFIO mediated device (mdev). Once the work
+queue (wq) is enabled, an uuid generated by the user can be added to the wq
+through the uuid sysfs attribute for the wq.  After the association, a mdev can
+be created using this UUID. The mdev driver code will associate the uuid and
+setup the mdev on the driver side. When the create operation is successful, the
+uuid can be passed to qemu. When the guest boots up, it should discover a DSA
+device when doing PCI discovery.
 
-Is it possible to have a sample of this in the samples/ directory?
+For example:
+1. Enable wq with “mdev” wq type
+2. A user generated UUID is associated with a wq:
+echo $UUID > /sys/bus/dsa/devices/wq0.0/uuid
+3. The uuid is written to the mdev class sysfs path:
+echo $UUID > /sys/class/mdev_bus/0000\:00\:0a.0/mdev_supported_types/idxd-wq/create
+4. Pass the following parameter to qemu:
+"-device vfio-pci,sysfsdev=/sys/bus/pci/devices/0000:00:0a.0/$UUID"
+ 
+Since the mdev is an emulated device with a single wq, the guest will see a DSA
+device with a single wq. With no vIOMMU support, the behavior will be the same
+as the stage 1 driver running with no IOMMU turned on on the bare metal host. 
+The difference is that the wq exported through mdev will have the read only
+config bit set for configuration. This means that the device does not require
+the typical configuration. After enabling the device, the user must set the WQ
+type and name. That is all is necessary to enable the WQ and start using it.
+The single wq configuration is not the only way to create the mdev. Multi wq
+support for mdev will be in the future works.
+ 
+The mdev utilizes Interrupt Message Store or IMS[3] instead of MSIX for
+interrupts for the guest. This preserves MSIX for host usages and also allows a
+significantly larger number of interrupt vectors for guest usage.
 
-I am interested especially in:
+The idxd driver implements IMS as on-device memory mapped unified storage. Each
+interrupt message is stored as a DWORD size data payload and a 64-bit address
+(same as MSI-X). Access to the IMS is through the host idxd driver. All the IMS
+interrupt messages are stored in the remappable format. Hence, if the driver
+enables IMS, interrupt remapping is also enabled by default. 
+ 
+This patchset extends the existing platfrom-msi.c which already provides a
+generic mechanism to support non-PCI compliant MSI interrupts for platform
+devices to provide the IMS infrastructure. 
 
-- the initial CPU state: CPL0 vs. CPL3, initial program counter, etc.
+More details about IMS, its implementation in the the kernel, common
+misconceptions about IMS and the basic driver changes required to support IMS
+can be found under Documentations/interrupt_message_store.txt
 
-- the communication channel; does the enclave see the usual local APIC
-and IOAPIC interfaces in order to get interrupts from virtio-vsock, and
-where is the virtio-vsock device (virtio-mmio I suppose) placed in memory?
+[1]: https://lore.kernel.org/lkml/157965011794.73301.15960052071729101309.stgit@djiang5-desk3.ch.intel.com/
+[2]: https://software.intel.com/en-us/articles/intel-sdm
+[3]: https://software.intel.com/en-us/download/intel-scalable-io-virtualization-technical-specification
+[4]: https://software.intel.com/en-us/download/intel-data-streaming-accelerator-preliminary-architecture-specification
+[5]: https://01.org/blogs/2019/introducing-intel-data-streaming-accelerator
+[6]: https://intel.github.io/idxd/
+[7]: https://github.com/intel/idxd-driver idxd-stage3
 
-- what the enclave is allowed to do: can it change privilege levels,
-what happens if the enclave performs an access to nonexistent memory, etc.
+---
 
-- whether there are special hypercall interfaces for the enclave
+Dave Jiang (5):
+      dmaengine: idxd: add config support for readonly devices
+      dmaengine: idxd: add IMS support in base driver
+      dmaengine: idxd: add device support functions in prep for mdev
+      dmaengine: idxd: add support for VFIO mediated device
+      dmaengine: idxd: add error notification from host driver to mediated device
 
-> The proposed solution is following the KVM model and uses the KVM API to be able
-> to create and set resources for enclaves. An additional ioctl command, besides
-> the ones provided by KVM, is used to start an enclave and setup the addressing
-> for the communication channel and an enclave unique id.
+Jing Lin (1):
+      dmaengine: idxd: add ABI documentation for mediated device support
 
-Reusing some KVM ioctls is definitely a good idea, but I wouldn't really
-say it's the KVM API since the VCPU file descriptor is basically non
-functional (without KVM_RUN and mmap it's not really the KVM API).
+Lu Baolu (2):
+      vfio/mdev: Add a member for iommu domain in mdev_device
+      vfio/type1: Save domain when attach domain to mdev
 
-Paolo
+Megha Dey (7):
+      drivers/base: Introduce platform_msi_ops
+      drivers/base: Introduce a new platform-msi list
+      drivers/base: Allocate/free platform-msi interrupts by group
+      drivers/base: Add support for a new IMS irq domain
+      ims-msi: Add mask/unmask routines
+      ims-msi: Enable IMS interrupts
+      Documentation: Interrupt Message store
 
+
+ Documentation/ABI/stable/sysfs-driver-dma-idxd |   18 
+ Documentation/ims-howto.rst                    |  210 +++
+ arch/x86/include/asm/hw_irq.h                  |    7 
+ arch/x86/include/asm/irq_remapping.h           |    6 
+ drivers/base/Kconfig                           |    9 
+ drivers/base/Makefile                          |    1 
+ drivers/base/core.c                            |    1 
+ drivers/base/ims-msi.c                         |  162 ++
+ drivers/base/platform-msi.c                    |  202 ++-
+ drivers/dma/Kconfig                            |    4 
+ drivers/dma/idxd/Makefile                      |    2 
+ drivers/dma/idxd/cdev.c                        |    3 
+ drivers/dma/idxd/device.c                      |  325 ++++-
+ drivers/dma/idxd/dma.c                         |    9 
+ drivers/dma/idxd/idxd.h                        |   55 +
+ drivers/dma/idxd/init.c                        |   81 +
+ drivers/dma/idxd/irq.c                         |    6 
+ drivers/dma/idxd/mdev.c                        | 1727 ++++++++++++++++++++++++
+ drivers/dma/idxd/mdev.h                        |  105 +
+ drivers/dma/idxd/registers.h                   |   10 
+ drivers/dma/idxd/submit.c                      |   31 
+ drivers/dma/idxd/sysfs.c                       |  199 ++-
+ drivers/dma/idxd/vdev.c                        |  603 ++++++++
+ drivers/dma/idxd/vdev.h                        |   43 +
+ drivers/dma/mv_xor_v2.c                        |    6 
+ drivers/dma/qcom/hidma.c                       |    6 
+ drivers/iommu/arm-smmu-v3.c                    |    6 
+ drivers/iommu/intel-iommu.c                    |    2 
+ drivers/iommu/intel_irq_remapping.c            |   31 
+ drivers/irqchip/irq-mbigen.c                   |    8 
+ drivers/irqchip/irq-mvebu-icu.c                |    6 
+ drivers/mailbox/bcm-flexrm-mailbox.c           |    6 
+ drivers/perf/arm_smmuv3_pmu.c                  |    6 
+ drivers/vfio/mdev/mdev_core.c                  |   22 
+ drivers/vfio/mdev/mdev_private.h               |    2 
+ drivers/vfio/vfio_iommu_type1.c                |   52 +
+ include/linux/device.h                         |    3 
+ include/linux/intel-iommu.h                    |    3 
+ include/linux/list.h                           |   36 +
+ include/linux/mdev.h                           |   13 
+ include/linux/msi.h                            |   93 +
+ kernel/irq/msi.c                               |   43 -
+ 42 files changed, 4009 insertions(+), 154 deletions(-)
+ create mode 100644 Documentation/ims-howto.rst
+ create mode 100644 drivers/base/ims-msi.c
+ create mode 100644 drivers/dma/idxd/mdev.c
+ create mode 100644 drivers/dma/idxd/mdev.h
+ create mode 100644 drivers/dma/idxd/vdev.c
+ create mode 100644 drivers/dma/idxd/vdev.h
+
+--
