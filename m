@@ -2,219 +2,243 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 21C9A1B1BDE
-	for <lists+kvm@lfdr.de>; Tue, 21 Apr 2020 04:27:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D08DB1B1C24
+	for <lists+kvm@lfdr.de>; Tue, 21 Apr 2020 04:47:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726968AbgDUC1m (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Apr 2020 22:27:42 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:47325 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726413AbgDUC1m (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 Apr 2020 22:27:42 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1587436060;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=JIuPfMXVgjCpv9MlxvGB/R8vQTIoKax5wzQ+5UKEudw=;
-        b=dEuz6ydieXEVXKVBX3WWTaX3/srPn3dvZqzlmy1uPRXoT9oRHz6sPapBrt9dAMDGhT8h46
-        xI7jJ2YGnc8vVjco4q9nSeNZcCgEE9x0kXb+9dHWCYlG2gzN8Acia+7mqc70dVpqzAjJrn
-        S2jUBn667a6wIQBGgUtbzg0dtfZLyPk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-439-aWoUFW9gO0imRlDrPR6qbQ-1; Mon, 20 Apr 2020 22:27:38 -0400
-X-MC-Unique: aWoUFW9gO0imRlDrPR6qbQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9BE05107ACC4;
-        Tue, 21 Apr 2020 02:27:36 +0000 (UTC)
-Received: from [10.72.12.74] (ovpn-12-74.pek2.redhat.com [10.72.12.74])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9CBF85C1B2;
-        Tue, 21 Apr 2020 02:27:29 +0000 (UTC)
-Subject: Re: [PATCH v4] vhost: disable for OABI
-To:     "Michael S. Tsirkin" <mst@redhat.com>, linux-kernel@vger.kernel.org
-Cc:     Ard Biesheuvel <ardb@kernel.org>,
-        Richard Earnshaw <Richard.Earnshaw@arm.com>,
-        Sudeep Dutt <sudeep.dutt@intel.com>,
-        Ashutosh Dixit <ashutosh.dixit@intel.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-References: <20200420143229.245488-1-mst@redhat.com>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <9ccae969-17ec-787c-e6ac-a88222bd1759@redhat.com>
-Date:   Tue, 21 Apr 2020 10:27:27 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        id S1727771AbgDUCrI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Apr 2020 22:47:08 -0400
+Received: from mga18.intel.com ([134.134.136.126]:13060 "EHLO mga18.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725829AbgDUCrH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 Apr 2020 22:47:07 -0400
+IronPort-SDR: qylJSn4JJpyTme1byj+Lb/KCNQdGRMIo5HySCD6a61/JNzxh4G+Qyk0POezus+soQVfSLwIPd0
+ F4uuhqApxeOA==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Apr 2020 19:47:05 -0700
+IronPort-SDR: WP5a6nj6xJnEVl6WA5kdYckNG9hO3apk0/HSVypSAXzz/O+qEmu/5Om+1CgXcUIBycQs5Zk8tw
+ 1T0Us5MYSZkA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.72,408,1580803200"; 
+   d="scan'208";a="279462298"
+Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040) ([10.239.13.16])
+  by fmsmga004.fm.intel.com with ESMTP; 20 Apr 2020 19:46:58 -0700
+Date:   Mon, 20 Apr 2020 22:37:18 -0400
+From:   Yan Zhao <yan.y.zhao@intel.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     Cornelia Huck <cohuck@redhat.com>,
+        "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        "libvir-list@redhat.com" <libvir-list@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "aik@ozlabs.ru" <aik@ozlabs.ru>,
+        "Zhengxiao.zx@alibaba-inc.com" <Zhengxiao.zx@alibaba-inc.com>,
+        "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
+        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+        "eauger@redhat.com" <eauger@redhat.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>, "Zeng, Xin" <xin.zeng@intel.com>,
+        "Yang, Ziye" <ziye.yang@intel.com>,
+        "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
+        "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
+        "felipe@nutanix.com" <felipe@nutanix.com>,
+        "Liu, Changpeng" <changpeng.liu@intel.com>,
+        "Ken.Xue@amd.com" <Ken.Xue@amd.com>,
+        "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>,
+        "He, Shaopeng" <shaopeng.he@intel.com>,
+        "eskultet@redhat.com" <eskultet@redhat.com>,
+        "dgilbert@redhat.com" <dgilbert@redhat.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
+        "Wang, Zhi A" <zhi.a.wang@intel.com>,
+        "cjia@nvidia.com" <cjia@nvidia.com>,
+        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
+        "berrange@redhat.com" <berrange@redhat.com>,
+        "dinechin@redhat.com" <dinechin@redhat.com>,
+        "corbet@lwn.net" <corbet@lwn.net>
+Subject: Re: [PATCH v5 0/4] introduction of migration_version attribute for
+ VFIO live migration
+Message-ID: <20200421023718.GA12111@joy-OptiPlex-7040>
+Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+References: <20200413055201.27053-1-yan.y.zhao@intel.com>
+ <20200417104450.2d2f2fa9.cohuck@redhat.com>
+ <20200417095202.GD16688@joy-OptiPlex-7040>
+ <20200417132457.45d91fe3.cohuck@redhat.com>
+ <20200420012457.GE16688@joy-OptiPlex-7040>
+ <20200420165600.4951ae82@w520.home>
 MIME-Version: 1.0
-In-Reply-To: <20200420143229.245488-1-mst@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200420165600.4951ae82@w520.home>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Tue, Apr 21, 2020 at 06:56:00AM +0800, Alex Williamson wrote:
+> On Sun, 19 Apr 2020 21:24:57 -0400
+> Yan Zhao <yan.y.zhao@intel.com> wrote:
+> 
+> > On Fri, Apr 17, 2020 at 07:24:57PM +0800, Cornelia Huck wrote:
+> > > On Fri, 17 Apr 2020 05:52:02 -0400
+> > > Yan Zhao <yan.y.zhao@intel.com> wrote:
+> > >   
+> > > > On Fri, Apr 17, 2020 at 04:44:50PM +0800, Cornelia Huck wrote:  
+> > > > > On Mon, 13 Apr 2020 01:52:01 -0400
+> > > > > Yan Zhao <yan.y.zhao@intel.com> wrote:
+> > > > >     
+> > > > > > This patchset introduces a migration_version attribute under sysfs of VFIO
+> > > > > > Mediated devices.
+> > > > > > 
+> > > > > > This migration_version attribute is used to check migration compatibility
+> > > > > > between two mdev devices.
+> > > > > > 
+> > > > > > Currently, it has two locations:
+> > > > > > (1) under mdev_type node,
+> > > > > >     which can be used even before device creation, but only for mdev
+> > > > > >     devices of the same mdev type.
+> > > > > > (2) under mdev device node,
+> > > > > >     which can only be used after the mdev devices are created, but the src
+> > > > > >     and target mdev devices are not necessarily be of the same mdev type
+> > > > > > (The second location is newly added in v5, in order to keep consistent
+> > > > > > with the migration_version node for migratable pass-though devices)    
+> > > > > 
+> > > > > What is the relationship between those two attributes?
+> > > > >     
+> > > > (1) is for mdev devices specifically, and (2) is provided to keep the same
+> > > > sysfs interface as with non-mdev cases. so (2) is for both mdev devices and
+> > > > non-mdev devices.
+> > > > 
+> > > > in future, if we enable vfio-pci vendor ops, (i.e. a non-mdev device
+> > > > is binding to vfio-pci, but is able to register migration region and do
+> > > > migration transactions from a vendor provided affiliate driver),
+> > > > the vendor driver would export (2) directly, under device node.
+> > > > It is not able to provide (1) as there're no mdev devices involved.  
+> > > 
+> > > Ok, creating an alternate attribute for non-mdev devices makes sense.
+> > > However, wouldn't that rather be a case (3)? The change here only
+> > > refers to mdev devices.
+> > >  
+> > as you pointed below, (3) and (2) serve the same purpose. 
+> > and I think a possible usage is to migrate between a non-mdev device and
+> > an mdev device. so I think it's better for them both to use (2) rather
+> > than creating (3).
+> 
+> An mdev type is meant to define a software compatible interface, so in
+> the case of mdev->mdev migration, doesn't migrating to a different type
+> fail the most basic of compatibility tests that we expect userspace to
+> perform?  IOW, if two mdev types are migration compatible, it seems a
+> prerequisite to that is that they provide the same software interface,
+> which means they should be the same mdev type.
+> 
+> In the hybrid cases of mdev->phys or phys->mdev, how does a management
+> tool begin to even guess what might be compatible?  Are we expecting
+> libvirt to probe ever device with this attribute in the system?  Is
+> there going to be a new class hierarchy created to enumerate all
+> possible migrate-able devices?
+>
+yes, management tool needs to guess and test migration compatible
+between two devices. But I think it's not the problem only for
+mdev->phys or phys->mdev. even for mdev->mdev, management tool needs to
+first assume that the two mdevs have the same type of parent devices
+(e.g.their pciids are equal). otherwise, it's still enumerating
+possibilities.
 
-On 2020/4/20 =E4=B8=8B=E5=8D=8810:34, Michael S. Tsirkin wrote:
-> vhost is currently broken on the some ARM configs.
->
-> The reason is that the ring element addresses are passed between
-> components with different alignments assumptions. Thus, if
-> guest selects a pointer and host then gets and dereferences
-> it, then alignment assumed by the host's compiler might be
-> greater than the actual alignment of the pointer.
-> compiler on the host from assuming pointer is aligned.
->
-> This actually triggers on ARM with -mabi=3Dapcs-gnu - which is a
-> deprecated configuration. With this OABI, compiler assumes that
-> all structures are 4 byte aligned - which is stronger than
-> virtio guarantees for available and used rings, which are
-> merely 2 bytes. Thus a guest without -mabi=3Dapcs-gnu running
-> on top of host with -mabi=3Dapcs-gnu will be broken.
->
-> The correct fix is to force alignment of structures - however
-> that is an intrusive fix that's best deferred until the next release.
->
-> We didn't previously support such ancient systems at all - this surface=
-d
-> after vdpa support prompted removing dependency of vhost on
-> VIRTULIZATION. So for now, let's just add something along the lines of
->
-> 	depends on !ARM || AEABI
->
-> to the virtio Kconfig declaration, and add a comment that it has to do
-> with struct member alignment.
->
-> Note: we can't make VHOST and VHOST_RING themselves have
-> a dependency since these are selected. Add a new symbol for that.
->
-> We should be able to drop this dependency down the road.
->
-> Fixes: 20c384f1ea1a0bc7 ("vhost: refine vhost and vringh kconfig")
-> Suggested-by: Ard Biesheuvel <ardb@kernel.org>
-> Suggested-by: Richard Earnshaw <Richard.Earnshaw@arm.com>
-> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> ---
->
-> changes from v3:
-> 	update commit log clarifying the motivation and that
-> 	it's a temporary fix.
->
-> 	suggested by Christoph Hellwig
->
->   drivers/misc/mic/Kconfig |  2 +-
->   drivers/net/caif/Kconfig |  2 +-
->   drivers/vdpa/Kconfig     |  2 +-
->   drivers/vhost/Kconfig    | 17 +++++++++++++----
->   4 files changed, 16 insertions(+), 7 deletions(-)
->
-> diff --git a/drivers/misc/mic/Kconfig b/drivers/misc/mic/Kconfig
-> index 8f201d019f5a..3bfe72c59864 100644
-> --- a/drivers/misc/mic/Kconfig
-> +++ b/drivers/misc/mic/Kconfig
-> @@ -116,7 +116,7 @@ config MIC_COSM
->  =20
->   config VOP
->   	tristate "VOP Driver"
-> -	depends on VOP_BUS
-> +	depends on VOP_BUS && VHOST_DPN
->   	select VHOST_RING
->   	select VIRTIO
->   	help
-> diff --git a/drivers/net/caif/Kconfig b/drivers/net/caif/Kconfig
-> index 9db0570c5beb..661c25eb1c46 100644
-> --- a/drivers/net/caif/Kconfig
-> +++ b/drivers/net/caif/Kconfig
-> @@ -50,7 +50,7 @@ config CAIF_HSI
->  =20
->   config CAIF_VIRTIO
->   	tristate "CAIF virtio transport driver"
-> -	depends on CAIF && HAS_DMA
-> +	depends on CAIF && HAS_DMA && VHOST_DPN
->   	select VHOST_RING
->   	select VIRTIO
->   	select GENERIC_ALLOCATOR
-> diff --git a/drivers/vdpa/Kconfig b/drivers/vdpa/Kconfig
-> index 3e1ceb8e9f2b..e8140065c8a5 100644
-> --- a/drivers/vdpa/Kconfig
-> +++ b/drivers/vdpa/Kconfig
-> @@ -10,7 +10,7 @@ if VDPA
->  =20
->   config VDPA_SIM
->   	tristate "vDPA device simulator"
-> -	depends on RUNTIME_TESTING_MENU && HAS_DMA
-> +	depends on RUNTIME_TESTING_MENU && HAS_DMA && VHOST_DPN
->   	select VHOST_RING
->   	default n
->   	help
-> diff --git a/drivers/vhost/Kconfig b/drivers/vhost/Kconfig
-> index 2c75d164b827..c4f273793595 100644
-> --- a/drivers/vhost/Kconfig
-> +++ b/drivers/vhost/Kconfig
-> @@ -13,6 +13,15 @@ config VHOST_RING
->   	  This option is selected by any driver which needs to access
->   	  the host side of a virtio ring.
->  =20
-> +config VHOST_DPN
-> +	bool
-> +	depends on !ARM || AEABI
-> +	default y
-> +	help
-> +	  Anything selecting VHOST or VHOST_RING must depend on VHOST_DPN.
-> +	  This excludes the deprecated ARM ABI since that forces a 4 byte
-> +	  alignment on all structs - incompatible with virtio spec requiremen=
-ts.
-> +
->   config VHOST
->   	tristate
->   	select VHOST_IOTLB
-> @@ -28,7 +37,7 @@ if VHOST_MENU
->  =20
->   config VHOST_NET
->   	tristate "Host kernel accelerator for virtio net"
-> -	depends on NET && EVENTFD && (TUN || !TUN) && (TAP || !TAP)
-> +	depends on NET && EVENTFD && (TUN || !TUN) && (TAP || !TAP) && VHOST_=
-DPN
->   	select VHOST
->   	---help---
->   	  This kernel module can be loaded in host kernel to accelerate
-> @@ -40,7 +49,7 @@ config VHOST_NET
->  =20
->   config VHOST_SCSI
->   	tristate "VHOST_SCSI TCM fabric driver"
-> -	depends on TARGET_CORE && EVENTFD
-> +	depends on TARGET_CORE && EVENTFD && VHOST_DPN
->   	select VHOST
->   	default n
->   	---help---
-> @@ -49,7 +58,7 @@ config VHOST_SCSI
->  =20
->   config VHOST_VSOCK
->   	tristate "vhost virtio-vsock driver"
-> -	depends on VSOCKETS && EVENTFD
-> +	depends on VSOCKETS && EVENTFD && VHOST_DPN
->   	select VHOST
->   	select VIRTIO_VSOCKETS_COMMON
->   	default n
-> @@ -63,7 +72,7 @@ config VHOST_VSOCK
->  =20
->   config VHOST_VDPA
->   	tristate "Vhost driver for vDPA-based backend"
-> -	depends on EVENTFD
-> +	depends on EVENTFD && VHOST_DPN
->   	select VHOST
->   	depends on VDPA
->   	help
+on the other hand, for two mdevs,
+mdev1 from pdev1, its mdev_type is 1/2 of pdev1;
+mdev2 from pdev2, its mdev_type is 1/4 of pdev2;
+if pdev2 is exactly 2 times of pdev1, why not allow migration between
+mdev1 <-> mdev2.
 
 
-Acked-by: Jason Wang <jasowang@redhat.com>
+> I agree that there was a gap in the previous proposal for non-mdev
+> devices, but I think this bring a lot of questions that we need to
+> puzzle through and libvirt will need to re-evaluate how they might
+> decide to pick a migration target device.  For example, I'm sure
+> libvirt would reject any policy decisions regarding picking a physical
+> device versus an mdev device.  Had we previously left it that only a
+> layer above libvirt would select a target device and libvirt only tests
+> compatibility to that target device?
+I'm not sure if there's a layer above libvirt would select a target
+device. but if there is such a layer (even it's human), we need to
+provide an interface for them to know whether their decision is suitable
+for migration. The migration_version interface provides a potential to
+allow mdev->phys migration, even libvirt may currently reject it.
+
+
+> We also need to consider that this expands the namespace.  If we no
+> longer require matching types as the first level of comparison, then
+> vendor migration strings can theoretically collide.  How do we
+> coordinate that can't happen?  Thanks,
+yes, it's indeed a problem.
+could only allowing migration beteen devices from the same vendor be a good
+prerequisite?
 
 Thanks
-
+Yan
+> 
+> > > > > Is existence (and compatibility) of (1) a pre-req for possible
+> > > > > existence (and compatibility) of (2)?
+> > > > >    
+> > > > no. (2) does not reply on (1).  
+> > > 
+> > > Hm. Non-existence of (1) seems to imply "this type does not support
+> > > migration". If an mdev created for such a type suddenly does support
+> > > migration, it feels a bit odd.
+> > >   
+> > yes. but I think if the condition happens, it should be reported a bug
+> > to vendor driver.
+> > should I add a line in the doc like "vendor driver should ensure that the
+> > migration compatibility from migration_version under mdev_type should be
+> > consistent with that from migration_version under device node" ?
+> > 
+> > > (It obviously cannot be a prereq for what I called (3) above.)
+> > >   
+> > > >   
+> > > > > Does userspace need to check (1) or can it completely rely on (2), if
+> > > > > it so chooses?
+> > > > >    
+> > > > I think it can completely reply on (2) if compatibility check before
+> > > > mdev creation is not required.
+> > > >   
+> > > > > If devices with a different mdev type are indeed compatible, it seems
+> > > > > userspace can only find out after the devices have actually been
+> > > > > created, as (1) does not apply?    
+> > > > yes, I think so.   
+> > > 
+> > > How useful would it be for userspace to even look at (1) in that case?
+> > > It only knows if things have a chance of working if it actually goes
+> > > ahead and creates devices.
+> > >  
+> > hmm, is it useful for userspace to test the migration_version under mdev
+> > type before it knows what mdev device to generate ?
+> > like when the userspace wants to migrate an mdev device in src vm,
+> > but it has not created target vm and the target mdev device.
+> > 
+> > > >   
+> > > > > One of my worries is that the existence of an attribute with the same
+> > > > > name in two similar locations might lead to confusion. But maybe it
+> > > > > isn't a problem.
+> > > > >    
+> > > > Yes, I have the same feeling. but as (2) is for sysfs interface
+> > > > consistency, to make it transparent to userspace tools like libvirt,
+> > > > I guess the same name is necessary?  
+> > > 
+> > > What do we actually need here, I wonder? (1) and (2) seem to serve
+> > > slightly different purposes, while (2) and what I called (3) have the
+> > > same purpose. Is it important to userspace that (1) and (2) have the
+> > > same name?  
+> > so change (1) to migration_type_version and (2) to
+> > migration_instance_version?
+> > But as they are under different locations, could that location imply
+> > enough information?
+> > 
+> > 
+> > Thanks
+> > Yan
+> > 
+> > 
+> 
