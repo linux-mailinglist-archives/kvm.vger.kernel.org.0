@@ -2,106 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6F3671B24A2
-	for <lists+kvm@lfdr.de>; Tue, 21 Apr 2020 13:08:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 22F571B24BE
+	for <lists+kvm@lfdr.de>; Tue, 21 Apr 2020 13:16:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728413AbgDULIh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Apr 2020 07:08:37 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:23350 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726018AbgDULIh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Apr 2020 07:08:37 -0400
+        id S1728649AbgDULQs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Apr 2020 07:16:48 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:44643 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728391AbgDULQs (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 21 Apr 2020 07:16:48 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1587467316;
+        s=mimecast20190719; t=1587467806;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Jh8uyTBGRxMFMAmO4slkY+3mJJQCYZxrQVfVGSajF/Q=;
-        b=F1iuTGxfj4FLURMwHoXVadPYJN83gb+OC09cRq68heV46JjL7F9b3kpKjqSSYBPVk5MLug
-        5fGgIgr9XpLdg5BHA++H8k54a6PwcWJR0MbgZ5eFtSKPYrFUvnWY5YnPcIEe5ENA7oT4jB
-        33gXnxX22hB5fAYZ4f+fGu+wXQEz+3Y=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-386-YZXOwKxNO6KCkA5lj1ag9Q-1; Tue, 21 Apr 2020 07:08:34 -0400
-X-MC-Unique: YZXOwKxNO6KCkA5lj1ag9Q-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3919A1085925;
-        Tue, 21 Apr 2020 11:08:33 +0000 (UTC)
-Received: from gondolin (ovpn-112-226.ams2.redhat.com [10.36.112.226])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id C421E19C58;
-        Tue, 21 Apr 2020 11:08:31 +0000 (UTC)
-Date:   Tue, 21 Apr 2020 13:08:29 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Eric Farman <farman@linux.ibm.com>
-Cc:     linux-s390@vger.kernel.org, kvm@vger.kernel.org,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Jason Herne <jjherne@linux.ibm.com>,
-        Jared Rossi <jrossi@linux.ibm.com>
-Subject: Re: [PATCH v3 5/8] vfio-ccw: Introduce a new CRW region
-Message-ID: <20200421130829.49144c72.cohuck@redhat.com>
-In-Reply-To: <e24dfccc-d2b7-9a47-3cef-323c01797ee1@linux.ibm.com>
-References: <20200417023001.65006-1-farman@linux.ibm.com>
-        <20200417023001.65006-6-farman@linux.ibm.com>
-        <20200421114114.672f35a4.cohuck@redhat.com>
-        <e24dfccc-d2b7-9a47-3cef-323c01797ee1@linux.ibm.com>
-Organization: Red Hat GmbH
+        bh=97DLxg4Yjg3km/mFNl5Zacv6VSLE1VXtqLZ5V4giXi0=;
+        b=HlrVX0GsVKY+PNOhH8kTEyTdXU1qVbiJHKgccyIqX3DhE6pqXPhMEgn7owWA0C3bBOWVnf
+        T8eHCQPdf0JTtQ1kTLSllOrjsYfchMeq8RNEo8uoJBxNRx1hz0tBmFVCgt90lnTAqFz/ZM
+        rgo4EOYKmdzPYEx+hVdV4wjssYoW+Nk=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-506-OlETAWi4PQ2-JPhZ95-H9g-1; Tue, 21 Apr 2020 07:16:44 -0400
+X-MC-Unique: OlETAWi4PQ2-JPhZ95-H9g-1
+Received: by mail-wr1-f71.google.com with SMTP id h95so7302240wrh.11
+        for <kvm@vger.kernel.org>; Tue, 21 Apr 2020 04:16:44 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=97DLxg4Yjg3km/mFNl5Zacv6VSLE1VXtqLZ5V4giXi0=;
+        b=Lv+UJqUUESVdCu2sEMMW3l77gPb46J+clzv3cXmltvL2XOpAhJezzNJeQx11cET34M
+         ssnCGif0H3LUHVzI2fbMafLvOUi4Q4vfMKSnn7SNS6Nh4PjeRh1XgT9gAV09DBE+abI0
+         wTO50Y+5McHxhcAJz+1Rw+h4CT/24btK4QuTyK/h3QWTb+mI4jEuwlgKvy1mqAWC/kWv
+         m1vHuYsVrkG4fQxLn2yGLco9euaNAcLZDFNDxXFQwgGfxYAUm+ozzZWi5Oajm0HLEJ1W
+         ibSXT8hy9f5uf4bkso+Ujt1dUyMdR0Vpg5DZFhsyJ6nbmBqKfDqh6Gg5fw49YmBg/wR6
+         NYAQ==
+X-Gm-Message-State: AGi0PuaSSSJRWA20IonV3LK6UMJvE2sktuCK9OIWueiUnXDJzOa+hLEo
+        xwHzcSV5xDv2HgyuiRDfzGxma/vA5Sk3NLWX94RZ0HYYppIl7QIU34cU5I0S6tkH6ftb8zcN/oA
+        GfK9wcFmpf/o1
+X-Received: by 2002:a5d:5652:: with SMTP id j18mr6767443wrw.40.1587467803536;
+        Tue, 21 Apr 2020 04:16:43 -0700 (PDT)
+X-Google-Smtp-Source: APiQypIM+q3J6iSnskRnURVF3g9hh9MdKKvxJisuR8ZZlbkBs6sJqC1TWZ4HVghfB2r6qghAm3/t8A==
+X-Received: by 2002:a5d:5652:: with SMTP id j18mr6767417wrw.40.1587467803259;
+        Tue, 21 Apr 2020 04:16:43 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:f43b:97b2:4c89:7446? ([2001:b07:6468:f312:f43b:97b2:4c89:7446])
+        by smtp.gmail.com with ESMTPSA id t17sm3290485wro.2.2020.04.21.04.16.42
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 21 Apr 2020 04:16:42 -0700 (PDT)
+Subject: Re: [PATCH 1/4] KVM: x86: hyperv: Remove duplicate definitions of
+ Reference TSC Page
+To:     Wei Liu <wei.liu@kernel.org>,
+        Michael Kelley <mikelley@microsoft.com>
+Cc:     kys@microsoft.com, haiyangz@microsoft.com, sthemmin@microsoft.com,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, x86@kernel.org,
+        hpa@zytor.com, sean.j.christopherson@intel.com,
+        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+        joro@8bytes.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-hyperv@vger.kernel.org
+References: <20200420173838.24672-1-mikelley@microsoft.com>
+ <20200420173838.24672-2-mikelley@microsoft.com>
+ <20200421092925.rxb72yep4paruvi6@debian>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <6c2bae31-14a8-39cf-6e6d-139d84146477@redhat.com>
+Date:   Tue, 21 Apr 2020 13:16:42 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20200421092925.rxb72yep4paruvi6@debian>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 21 Apr 2020 07:02:03 -0400
-Eric Farman <farman@linux.ibm.com> wrote:
-
-> On 4/21/20 5:41 AM, Cornelia Huck wrote:
-> > On Fri, 17 Apr 2020 04:29:58 +0200
-> > Eric Farman <farman@linux.ibm.com> wrote:
-
-> >> diff --git a/Documentation/s390/vfio-ccw.rst b/Documentation/s390/vfio-ccw.rst
-> >> index 98832d95f395..3338551ef642 100644
-> >> --- a/Documentation/s390/vfio-ccw.rst
-> >> +++ b/Documentation/s390/vfio-ccw.rst
-> >> @@ -247,6 +247,22 @@ This region is exposed via region type VFIO_REGION_SUBTYPE_CCW_SCHIB.
-> >>  Reading this region triggers a STORE SUBCHANNEL to be issued to the
-> >>  associated hardware.
-> >>  
-> >> +vfio-ccw crw region
-> >> +---------------------
-> >> +
-> >> +The vfio-ccw crw region is used to return Channel Report Word (CRW)
-> >> +data to userspace::
-> >> +
-> >> +  struct ccw_crw_region {
-> >> +         __u32 crw;
-> >> +  } __packed;
-> >> +
-> >> +This region is exposed via region type VFIO_REGION_SUBTYPE_CCW_CRW.
-> >> +
-> >> +Currently, space is provided for a single CRW. Handling of chained
-> >> +CRWs (not implemented in vfio-ccw) can be accomplished by re-reading
-> >> +the region for additional CRW data.  
-> > 
-> > What about the following instead:
-> > 
-> > "Reading this region returns a CRW if one that is relevant for this
-> > subchannel (e.g. one reporting changes in channel path state) is
-> > pending, or all zeroes if not. If multiple CRWs are pending (including
-> > possibly chained CRWs), reading this region again will return the next
-> > one, until no more CRWs are pending and zeroes are returned. This is
-> > similar to how STORE CHANNEL REPORT WORD works."  
+On 21/04/20 11:29, Wei Liu wrote:
+> On Mon, Apr 20, 2020 at 10:38:35AM -0700, Michael Kelley wrote:
+>> The Hyper-V Reference TSC Page structure is defined twice. struct
+>> ms_hyperv_tsc_page has padding out to a full 4 Kbyte page size. But
+>> the padding is not needed because the declaration includes a union
+>> with HV_HYP_PAGE_SIZE.  KVM uses the second definition, which is
+>> struct _HV_REFERENCE_TSC_PAGE, because it does not have the padding.
+>>
+>> Fix the duplication by removing the padding from ms_hyperv_tsc_page.
+>> Fix up the KVM code to use it. Remove the no longer used struct
+>> _HV_REFERENCE_TSC_PAGE.
+>>
+>> There is no functional change.
+>>
+>> Signed-off-by: Michael Kelley <mikelley@microsoft.com>
+>> ---
+>>  arch/x86/include/asm/hyperv-tlfs.h | 8 --------
+>>  arch/x86/include/asm/kvm_host.h    | 2 +-
+>>  arch/x86/kvm/hyperv.c              | 4 ++--
 > 
-> Sounds good to me.
-> 
-> Hrm...  Maybe coffee hasn't hit yet.  Should I wire STCRW into this, or
-> just rely on the notification from the host to trigger the read?
+> Paolo, this patch touches KVM code. Let me know how you would like to
+> handle this.
 
-Userspace is supposed to use this to get crws to inject into the guest,
-no stcrw involved until the guest actually got the machine check for it.
+Just include it, I don't expect conflicts.
+
+Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+
+Paolo
 
