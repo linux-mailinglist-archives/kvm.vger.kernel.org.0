@@ -2,129 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BE0101B2C72
-	for <lists+kvm@lfdr.de>; Tue, 21 Apr 2020 18:19:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8C79A1B2C76
+	for <lists+kvm@lfdr.de>; Tue, 21 Apr 2020 18:19:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728453AbgDUQSS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Apr 2020 12:18:18 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:41003 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726398AbgDUQSS (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 21 Apr 2020 12:18:18 -0400
+        id S1726335AbgDUQTX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Apr 2020 12:19:23 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:20639 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1725963AbgDUQTW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Apr 2020 12:19:22 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1587485896;
+        s=mimecast20190719; t=1587485960;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=yAbJEFHA3CRnchvlzVGJP2d7LuHQYa5yV4aq8Y6QkI8=;
-        b=I3csI57MYgTx43fRoqbMXCd8mzdU3IAXBaKfepi72GpF9djOYJnfzgxvqqU5p7OYduWqm+
-        NMVCWwYJpySCii4CTFCJ6IFKabB+0G9N7suUCf55mCB3y4pNj/xRe3IzI+biLrL3n0vwYC
-        KZNsy96MXENYjd8VgLOQpQ0L6O1hLI0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-340-Qt12QYEONG6XM0wqzicioQ-1; Tue, 21 Apr 2020 12:18:12 -0400
-X-MC-Unique: Qt12QYEONG6XM0wqzicioQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 41A8B107ACCA;
-        Tue, 21 Apr 2020 16:18:11 +0000 (UTC)
-Received: from [10.36.113.245] (ovpn-113-245.ams2.redhat.com [10.36.113.245])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D55065C1B2;
-        Tue, 21 Apr 2020 16:18:09 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH v5 00/10] s390x: Testing the Channel
- Subsystem I/O
-To:     Pierre Morel <pmorel@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, frankja@linux.ibm.com,
-        thuth@redhat.com, cohuck@redhat.com
-References: <1582200043-21760-1-git-send-email-pmorel@linux.ibm.com>
- <028ece05-1429-7761-cf4e-6fabc34e6aa0@linux.ibm.com>
-From:   David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat GmbH
-Message-ID: <4a5f0636-cd73-164a-8c7a-ca5679f01e56@redhat.com>
-Date:   Tue, 21 Apr 2020 18:18:09 +0200
+         in-reply-to:in-reply-to:references:references;
+        bh=OMcMRkM6CTuHPozam45N2SC6f9ykAvtZFSzHRVou/uA=;
+        b=H/cW8PGhf+FTGhGTO5/B0VgW89TkUJeOjc6AgPUWZnyK6Cd1WU2JiLt1eo8HVRBWfyF+rq
+        t+CsbAhQt36JptkTynrEmChxs8JBNKYtw5feBtUk5C1vMhLQvBrEBIHvhEY3wf0mnQO7ub
+        p+B03EaBtL8uFiV6TKVK4BFWZfLNb/g=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-363-QhIG-xWUNZKWdl-MSiDypg-1; Tue, 21 Apr 2020 12:19:18 -0400
+X-MC-Unique: QhIG-xWUNZKWdl-MSiDypg-1
+Received: by mail-wr1-f70.google.com with SMTP id e5so7738324wrs.23
+        for <kvm@vger.kernel.org>; Tue, 21 Apr 2020 09:19:18 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=OMcMRkM6CTuHPozam45N2SC6f9ykAvtZFSzHRVou/uA=;
+        b=Zl+LzSzg+2yHAKcgI3SahzCF5ijbZCj2WhT7yTRN0JAtXbDpTnQ6DPhHMUH9tf/iu9
+         R0BSF4R5+z4z5848gVfyeQvrbDp0kRTnuExPFaYvqzjvE+iRHzWk6gwT0FN3NtbaSZJQ
+         U9K5nc2RgrRn5Mvx4FqmFF8QZL9LdkhJoBZ6lN1B9RYZvWQnwuLFRad7n0kbMvT7WdeC
+         maf70Ba8kL2PIdvInGnsr7dFgGAyR+qLUJ+FCi+hOkxQt1sRMO/icyp78lK8SRd8CHhs
+         riaCqa20If4dYRwj04gLGptAEsZWnweNTyi5YcMqeY6G8b/9XoZ7swzKG8SeWOPzmvnA
+         m/TA==
+X-Gm-Message-State: AGi0PuaFe/sVNL1Qm618aUPOkk8UCHz0xlHpUE4QZZ20PuWJvRfxCGBB
+        CkkfoOO1kVRtBQp9v0CDyMd0oARbObBWL2BN6uNXqrMT9r0z8UPuum/ZK4iIqIpktHEfIL9SI2m
+        FEVsWNIhzEPZo
+X-Received: by 2002:a5d:6504:: with SMTP id x4mr26598664wru.164.1587485957603;
+        Tue, 21 Apr 2020 09:19:17 -0700 (PDT)
+X-Google-Smtp-Source: APiQypLBExtm46kFG/q5uOgEqHEeaUuSrp481aTEfOfkh5uRE39whBLwSFtgA3GXRG/Qo3jvvfG+iQ==
+X-Received: by 2002:a5d:6504:: with SMTP id x4mr26598644wru.164.1587485957403;
+        Tue, 21 Apr 2020 09:19:17 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:f43b:97b2:4c89:7446? ([2001:b07:6468:f312:f43b:97b2:4c89:7446])
+        by smtp.gmail.com with ESMTPSA id s8sm4112831wru.38.2020.04.21.09.19.16
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 21 Apr 2020 09:19:16 -0700 (PDT)
+Subject: Re: [PATCH v3 0/2] KVM: VMX: Unionize vcpu_vmx.exit_reason
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>
+References: <20200421075328.14458-1-sean.j.christopherson@intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <bcf9cbba-6cce-f10b-da94-232403a3f7f6@redhat.com>
+Date:   Tue, 21 Apr 2020 18:19:15 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <028ece05-1429-7761-cf4e-6fabc34e6aa0@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20200421075328.14458-1-sean.j.christopherson@intel.com>
+Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 21.04.20 18:13, Pierre Morel wrote:
+On 21/04/20 09:53, Sean Christopherson wrote:
+> Minor fixup patch for a mishandled conflict between the vmcs.INTR_INFO
+> caching series and the union series, plus the actual unionization patch
+> rebased onto kvm/queue, commit 604e8bba0dc5 ("KVM: Remove redundant ...").
 > 
+> Sean Christopherson (2):
+>   KVM: nVMX: Drop a redundant call to vmx_get_intr_info()
+>   KVM: VMX: Convert vcpu_vmx.exit_reason to a union
 > 
-> On 2020-02-20 13:00, Pierre Morel wrote:
-> 
-> ...snip...
-> 
->>
->>
->> Pierre Morel (10):
->>    s390x: saving regs for interrupts
->>    s390x: Use PSW bits definitions in cstart
->>    s390x: cr0: adding AFP-register control bit
->>    s390x: export the clock get_clock_ms() utility
-> 
-> Please can you consider applying these 4 patches only.
-> I will send some changes I made for the patches on css tests.
+>  arch/x86/kvm/vmx/nested.c | 39 ++++++++++++++---------
+>  arch/x86/kvm/vmx/vmx.c    | 65 ++++++++++++++++++++-------------------
+>  arch/x86/kvm/vmx/vmx.h    | 25 ++++++++++++++-
+>  3 files changed, 83 insertions(+), 46 deletions(-)
 > 
 
-The first one requires a little more brain power - can anybody at IBM
-help reviewing that?
+Thanks, I queued patch 1.  I am not too enthusiastic about patch 2, but
+when SGX comes around it may be a better idea.
 
-
--- 
-Thanks,
-
-David / dhildenb
+Paolo
 
