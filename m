@@ -2,45 +2,49 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 345891B2EBF
-	for <lists+kvm@lfdr.de>; Tue, 21 Apr 2020 20:08:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A02CA1B2ECA
+	for <lists+kvm@lfdr.de>; Tue, 21 Apr 2020 20:11:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729278AbgDUSIF convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Tue, 21 Apr 2020 14:08:05 -0400
-Received: from mx2.suse.de ([195.135.220.15]:43840 "EHLO mx2.suse.de"
+        id S1729358AbgDUSLF convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Tue, 21 Apr 2020 14:11:05 -0400
+Received: from mx2.suse.de ([195.135.220.15]:44520 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726012AbgDUSIE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Apr 2020 14:08:04 -0400
+        id S1725870AbgDUSLE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Apr 2020 14:11:04 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx2.suse.de (Postfix) with ESMTP id EC77FAC6C;
-        Tue, 21 Apr 2020 18:08:01 +0000 (UTC)
-Date:   Tue, 21 Apr 2020 11:04:35 -0700
+        by mx2.suse.de (Postfix) with ESMTP id EB498ADDD;
+        Tue, 21 Apr 2020 18:11:01 +0000 (UTC)
+Date:   Tue, 21 Apr 2020 11:07:33 -0700
 From:   Davidlohr Bueso <dave@stgolabs.net>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Marc Zyngier <maz@kernel.org>, tglx@linutronix.de,
         kvm@vger.kernel.org, Davidlohr Bueso <dbueso@suse.de>,
-        peterz@infradead.org
-Message-ID: <20200421180435.2yyrdndkbqinjmb6@linux-p48b>
+        peterz@infradead.org, torvalds@linux-foundation.org,
+        bigeasy@linutronix.de, linux-kernel@vger.kernel.org,
+        rostedt@goodmis.org, linux-mips@vger.kernel.org,
+        Paul Mackerras <paulus@ozlabs.org>, joel@joelfernandes.org,
+        will@kernel.org, kvmarm@lists.cs.columbia.edu
+Subject: Re: [PATCH v2] kvm: Replace vcpu->swait with rcuwait
+Message-ID: <20200421180733.xrl5ta6cuo2weuva@linux-p48b>
+References: <20200324044453.15733-1-dave@stgolabs.net>
+ <20200324044453.15733-4-dave@stgolabs.net>
+ <20200420164132.tjzk5ebx35m66yce@linux-p48b>
+ <418acdb5001a9ae836095b7187338085@misterjones.org>
+ <20200420205641.6sgsllj6pmsnwrvp@linux-p48b>
+ <f7cc83fe-3e91-0057-9af2-26c201456689@redhat.com>
+ <20200420215014.sarodevmhphnkkn7@linux-p48b>
+ <02e1b00d-a8ea-a947-bbe6-0b1380aa7ec4@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1; format=flowed
 Content-Disposition: inline
 Content-Transfer-Encoding: 8BIT
+In-Reply-To: <02e1b00d-a8ea-a947-bbe6-0b1380aa7ec4@redhat.com>
 User-Agent: NeoMutt/20180716
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
-
-1;5002;0c	torvalds@linux-foundation.org, bigeasy@linutronix.de,
-	linux-kernel@vger.kernel.org, rostedt@goodmis.org,
-	linux-mips@vger.kernel.org, Paul Mackerras <paulus@ozlabs.org>,
-	joel@joelfernandes.org, will@kernel.org,
-	kvmarm@lists.cs.columbia.edu
-Bcc:
-Subject: Re: [PATCH v2] kvm: Replace vcpu->swait with rcuwait
-Reply-To:
-In-Reply-To: <02e1b00d-a8ea-a947-bbe6-0b1380aa7ec4@redhat.com>
 
 On Tue, 21 Apr 2020, Paolo Bonzini wrote:
 
