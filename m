@@ -2,104 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7444C1B1EDB
-	for <lists+kvm@lfdr.de>; Tue, 21 Apr 2020 08:35:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DF6651B1EDF
+	for <lists+kvm@lfdr.de>; Tue, 21 Apr 2020 08:35:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725902AbgDUGe6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Apr 2020 02:34:58 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:31676 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726370AbgDUGe5 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 21 Apr 2020 02:34:57 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 03L6VvLr054239
-        for <kvm@vger.kernel.org>; Tue, 21 Apr 2020 02:34:57 -0400
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 30gmvggw24-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Tue, 21 Apr 2020 02:34:57 -0400
-Received: from localhost
-        by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
-        Tue, 21 Apr 2020 07:34:09 +0100
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
-        by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Tue, 21 Apr 2020 07:34:06 +0100
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 03L6Yn7a57671688
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 21 Apr 2020 06:34:49 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D414011C058;
-        Tue, 21 Apr 2020 06:34:49 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C0FFC11C054;
-        Tue, 21 Apr 2020 06:34:49 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
-        Tue, 21 Apr 2020 06:34:49 +0000 (GMT)
-Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 25651)
-        id 82F5CE04AA; Tue, 21 Apr 2020 08:34:49 +0200 (CEST)
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     KVM <kvm@vger.kernel.org>,
-        Janosch Frank <frankja@linux.vnet.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>
-Subject: [GIT PULL 2/2] MAINTAINERS: add a reviewer for KVM/s390
-Date:   Tue, 21 Apr 2020 08:34:47 +0200
-X-Mailer: git-send-email 2.25.2
-In-Reply-To: <20200421063447.6814-1-borntraeger@de.ibm.com>
-References: <20200421063447.6814-1-borntraeger@de.ibm.com>
-X-TM-AS-GCONF: 00
-x-cbid: 20042106-0016-0000-0000-000003086BFA
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20042106-0017-0000-0000-0000336C8138
-Message-Id: <20200421063447.6814-3-borntraeger@de.ibm.com>
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+        id S1726742AbgDUGfR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Apr 2020 02:35:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60008 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726364AbgDUGfR (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 21 Apr 2020 02:35:17 -0400
+Received: from mail-il1-x143.google.com (mail-il1-x143.google.com [IPv6:2607:f8b0:4864:20::143])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF0F0C061A0F;
+        Mon, 20 Apr 2020 23:35:16 -0700 (PDT)
+Received: by mail-il1-x143.google.com with SMTP id e8so5241551ilm.7;
+        Mon, 20 Apr 2020 23:35:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=2GZ3FEJ4iPZ3+IRnrKx7fOdw1woztaKLuV+cLqPMCgY=;
+        b=QxMVyfDLq1hToJoggNoJE9N+v6mbWwed+u3yYFj/4mgX0rFsfe4Ip4Py9Dz0VTHclg
+         bqM/hQ5rFYOQQekWe+gAP6NTB3csVRytsir+sHfBjfeeIgCg30JjYsMcXuYLqshCa3bA
+         cK3NiW8ghX5rClE2iWcsA+vlfYQU7p2psMRScc7MHcYGKJbcth9mWYCKKxiXs6UOrlcK
+         QBSQxCd7tn5iQznHZnO+7lrzI30HYGB3FHg9wPyrH+kfLX/SdMCVQg5kgdz3cyHMUbQ8
+         6C49cuZzT3+hV2xB9xHikkzaG9j40Yi3bZX8/pJMpQeWAgtLQ/jSo7XctVH0Uxd/PA4F
+         FOqg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=2GZ3FEJ4iPZ3+IRnrKx7fOdw1woztaKLuV+cLqPMCgY=;
+        b=b4gfvENeSg3Sz8UmXhS2+z5DJOaBw9rfjb4YFbWsDRmLY8E6LLar/TNH5FdxHKdG4p
+         XMoQRCs39HBZv7gDcoIUv8EXqJ2vYYDpdTDJlwou28M9q0j26Xb/pKHQO1F2yP142LFN
+         ka37l2u64MVby4GCT7gKRpjiXCEcnVyvmacFuypfCCpx1Xmtizpo4daqu77/k34/+Z3D
+         4/o/B5d93KQpQkbkpUn3cXs/epbkXjMRL3MX6PQ5X/wKfG+LOna9p7ztQxyhfWQNv50j
+         1mzjAb0KMbG3ZXBiKyWh8xrKp6lt/1RBSMABFuxB0GEqTQW8xxOsVjvfdRff+DqTozW6
+         Fytg==
+X-Gm-Message-State: AGi0PuaJr/nKcZovVZkgLI9UHasgGnW2ehMx0rkyjpclWEswHOfjTw4X
+        AR0/l4ydYX2G/xE7iaALaZFbJqdtk7nHa2qdV8Q=
+X-Google-Smtp-Source: APiQypI0UjZj3RJkKhckLd67LZ5JWoeLzx1wDwHDSxBunlAoQ/EBiYhIkcP39F0zeF4gS3v76sDGDLlnUaj8mi5mmac=
+X-Received: by 2002:a92:7c01:: with SMTP id x1mr12131737ilc.122.1587450916283;
+ Mon, 20 Apr 2020 23:35:16 -0700 (PDT)
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.676
- definitions=2020-04-21_01:2020-04-20,2020-04-21 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- bulkscore=0 malwarescore=0 impostorscore=0 suspectscore=0 phishscore=0
- adultscore=0 mlxlogscore=967 clxscore=1015 mlxscore=0 spamscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2004210052
+References: <20200323075354.93825-1-aik@ozlabs.ru> <b512ac5e-dca5-4c08-8ea1-a636b887c0d0@ozlabs.ru>
+ <d5cac37a-8b32-cabf-e247-10e64f0110ab@ozlabs.ru> <CAOSf1CGfjX9LGQ1GDSmxrzjnaWOM3mUvBu9_xe-L2umin9n66w@mail.gmail.com>
+ <CAOSf1CHgUsJ7jGokg6QD6cEDr4-o5hnyyyjRZ=YijsRY3T1sYA@mail.gmail.com>
+ <b0b361092d2d7e38f753edee6dcd9222b4e388ce.camel@russell.cc>
+ <9893c4db-057d-8e42-52fe-8241d6d90b5f@ozlabs.ru> <76718d0c46f4638a57fd2deeeed031143599d12d.camel@gmail.com>
+ <8f317916-06be-ed25-4d9b-a8e2e993b112@ozlabs.ru>
+In-Reply-To: <8f317916-06be-ed25-4d9b-a8e2e993b112@ozlabs.ru>
+From:   "Oliver O'Halloran" <oohall@gmail.com>
+Date:   Tue, 21 Apr 2020 16:35:05 +1000
+Message-ID: <CAOSf1CG_qiR2HvSFVTbgTyqVmDt4+Oy60PNWY23K2ihHib1K7Q@mail.gmail.com>
+Subject: Re: [PATCH kernel v2 0/7] powerpc/powenv/ioda: Allow huge DMA window
+ at 4GB
+To:     Alexey Kardashevskiy <aik@ozlabs.ru>
+Cc:     Russell Currey <ruscur@russell.cc>,
+        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        kvm-ppc@vger.kernel.org, KVM list <kvm@vger.kernel.org>,
+        Alistair Popple <alistair@popple.id.au>,
+        Fabiano Rosas <farosas@linux.ibm.com>,
+        Michael Ellerman <mpe@ellerman.id.au>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Claudio Imbrenda <imbrenda@linux.ibm.com>
+On Tue, Apr 21, 2020 at 3:11 PM Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
+>
+> One example of a problem device is AMD GPU with 64bit video PCI function
+> and 32bit audio, no?
+>
+> What PEs will they get assigned to now? Where will audio's MMIO go? It
+> cannot be the same 64bit MMIO segment, right? If so, it is a separate PE
+> already. If not, then I do not understand "we're free to assign whatever
+> PE number we want.
 
-Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
-Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
-Acked-by: Cornelia Huck <cohuck@redhat.com>
-Acked-by: Janosch Frank <frankja@linux.ibm.com>
-Link: https://lore.kernel.org/r/20200417152936.772256-1-imbrenda@linux.ibm.com
----
- MAINTAINERS | 1 +
- 1 file changed, 1 insertion(+)
+The BARs stay in the same place and as far as MMIO is concerned
+nothing has changed. For MMIO the PHB uses the MMIO address to find a
+PE via the M64 BAR table, but for DMA it uses a *completely* different
+mechanism. Instead it takes the BDFN (included in the DMA packet
+header) and the Requester Translation Table (RTT) to map the BDFN to a
+PE. Normally you would configure the PHB so the same PE used for MMIO
+and DMA, but you don't have to.
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index b816a453b10e..de7eb50c8c81 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -9329,6 +9329,7 @@ M:	Christian Borntraeger <borntraeger@de.ibm.com>
- M:	Janosch Frank <frankja@linux.ibm.com>
- R:	David Hildenbrand <david@redhat.com>
- R:	Cornelia Huck <cohuck@redhat.com>
-+R:	Claudio Imbrenda <imbrenda@linux.ibm.com>
- L:	kvm@vger.kernel.org
- S:	Supported
- W:	http://www.ibm.com/developerworks/linux/linux390/
--- 
-2.25.2
+> > I think the key thing to realise is that we'd only be using the DMA-PE
+> > when a crippled DMA mask is set by the driver. In all other cases we
+> > can just use the "native PE" and when the driver unbinds we can de-
+> > allocate our DMA-PE and return the device to the PE containing it's
+> > MMIO BARs. I think we can keep things relatively sane that way and the
+> > real issue is detecting EEH events on the DMA-PE.
+>
+>
+> Oooor we could just have 1 DMA window (or, more precisely, a single
+> "TVE" as it is either window or bypass) per a PE and give every function
+> its own PE and create a window or a table when a device sets a DMA mask.
+> I feel I am missing something here though.
 
+Yes, we could do that, but do we want to?
+
+I was thinking we should try minimise the number of DMA-only PEs since
+it complicates the EEH freeze handling. When MMIO and DMA are mapped
+to the same PE an error on either will cause the hardware to stop
+both. When seperate PEs are used for DMA and MMIO you lose that
+atomicity. It's not a big deal if DMA is stopped and MMIO allowed
+since PAPR (sort-of) allows that, but having MMIO frozen with DMA
+unfrozen is a bit sketch.
+
+> >> For the time being, this patchset is good for:
+> >> 1. weird hardware which has limited DMA mask (this is why the patchset
+> >> was written in the first place)
+> >> 2. debug DMA by routing it via IOMMU (even when 4GB hack is not enabled).
+> >
+> > Sure, but it's still dependent on having firmware which supports the
+> > 4GB hack and I don't think that's in any offical firmware releases yet.
+>
+> It's been a while :-/
+
+There's been no official FW releases with a skiboot that supports the
+phb get/set option opal calls so the only systems that can actually
+take advantage of it are our lab systems. It might still be useful for
+future systems, but I'd rather something that doesn't depend on FW
+support.
+
+
+Oliver
