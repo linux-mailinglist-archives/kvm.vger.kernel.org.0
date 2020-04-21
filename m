@@ -2,100 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 88F131B22A0
-	for <lists+kvm@lfdr.de>; Tue, 21 Apr 2020 11:25:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0C6491B22C3
+	for <lists+kvm@lfdr.de>; Tue, 21 Apr 2020 11:29:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728453AbgDUJZj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Apr 2020 05:25:39 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:41652 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727120AbgDUJZj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Apr 2020 05:25:39 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1587461137;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=s6kZIJazKnfeWw9rqRwxCTiV7lo+E1jRmgFL7mG8v1w=;
-        b=PU/ARCnzbHoIRw+5duN7yCVlaG+rYGBTgq6xo5xCGcjPJGdPAfoI5Y/KFqgvNJuEh2cLdE
-        QEM63eIFH43krdmX1Pahv763B0cevLwlT1LGgCGnqZbdkvA4D/taptJdFz/qSszOibq9ep
-        xbqwtS7ZLK2sQVfapxH9e5eTDlDlcC4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-252-pZMfjWLMOayjYnBl4uIC7Q-1; Tue, 21 Apr 2020 05:25:36 -0400
-X-MC-Unique: pZMfjWLMOayjYnBl4uIC7Q-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CFCE48017F3;
-        Tue, 21 Apr 2020 09:25:34 +0000 (UTC)
-Received: from steredhat.redhat.com (ovpn-114-101.ams2.redhat.com [10.36.114.101])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A499A60C87;
-        Tue, 21 Apr 2020 09:25:28 +0000 (UTC)
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     davem@davemloft.net
-Cc:     virtualization@lists.linux-foundation.org,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-        kvm@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
-        Gerard Garcia <ggarcia@abra.uab.cat>
-Subject: [PATCH net] vsock/virtio: postpone packet delivery to monitoring devices
-Date:   Tue, 21 Apr 2020 11:25:27 +0200
-Message-Id: <20200421092527.41651-1-sgarzare@redhat.com>
+        id S1728504AbgDUJ3a (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Apr 2020 05:29:30 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:34144 "EHLO
+        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725920AbgDUJ3a (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Apr 2020 05:29:30 -0400
+Received: by mail-wr1-f66.google.com with SMTP id j1so10216169wrt.1;
+        Tue, 21 Apr 2020 02:29:28 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=D/tISfwZ2P2IUPEnX9Ik/x1A1mBudIbHpjoDQ3zbjbU=;
+        b=aLIpYqtp1056EycBKIvtLqPb1epUAERAHaUAT2DRgCXMRLARzXR90PZNEuwGnk7qzl
+         5o7Rn9B1BjNFqQruvBmrOjtzNoLZWY9PFg8Oy9oLUdQUSPpNhFeHQ7845+3QMLNSqZ8N
+         xZIWpxkWWLyq38IfdIbfSKSSCU++ApYSZg73ELd4IsO01Hfqym6iKvfCb6aqwfUUPH8I
+         NsDj1T0nypUe/chwjqeg/Gs1tVvZV/QEvoSocauhBCYqJ9hsbKqevo+UQ8CKivgluYK0
+         9yWBMk0X0VnN09lUVcDma1afaEEWBdvna3VRkCnuursNG+T0RN+wFdAndAWprqe0woxX
+         /qvg==
+X-Gm-Message-State: AGi0PuY2uKyr2rSze11p0UHc+I+vy/DuiWsIPU4+7G07qYibFpzw2Xyd
+        Bhfwrx4qdeweuPCWB+BHaSA=
+X-Google-Smtp-Source: APiQypIBBN/uGVX/DEWvjQAOpu65oajLoYZMjKknPf3JNM3a1RJdljdDjsSgYu4F31wtMTnmwqTd9A==
+X-Received: by 2002:a5d:4712:: with SMTP id y18mr23665401wrq.306.1587461368049;
+        Tue, 21 Apr 2020 02:29:28 -0700 (PDT)
+Received: from debian (44.142.6.51.dyn.plus.net. [51.6.142.44])
+        by smtp.gmail.com with ESMTPSA id s14sm2609467wmh.18.2020.04.21.02.29.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 21 Apr 2020 02:29:27 -0700 (PDT)
+Date:   Tue, 21 Apr 2020 10:29:25 +0100
+From:   Wei Liu <wei.liu@kernel.org>
+To:     Michael Kelley <mikelley@microsoft.com>
+Cc:     kys@microsoft.com, haiyangz@microsoft.com, sthemmin@microsoft.com,
+        wei.liu@kernel.org, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, x86@kernel.org, hpa@zytor.com, pbonzini@redhat.com,
+        sean.j.christopherson@intel.com, vkuznets@redhat.com,
+        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-hyperv@vger.kernel.org
+Subject: Re: [PATCH 1/4] KVM: x86: hyperv: Remove duplicate definitions of
+ Reference TSC Page
+Message-ID: <20200421092925.rxb72yep4paruvi6@debian>
+References: <20200420173838.24672-1-mikelley@microsoft.com>
+ <20200420173838.24672-2-mikelley@microsoft.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200420173838.24672-2-mikelley@microsoft.com>
+User-Agent: NeoMutt/20180716
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-We delivering packets to monitoring devices, before to check if
-the virtqueue has enough space.
+On Mon, Apr 20, 2020 at 10:38:35AM -0700, Michael Kelley wrote:
+> The Hyper-V Reference TSC Page structure is defined twice. struct
+> ms_hyperv_tsc_page has padding out to a full 4 Kbyte page size. But
+> the padding is not needed because the declaration includes a union
+> with HV_HYP_PAGE_SIZE.  KVM uses the second definition, which is
+> struct _HV_REFERENCE_TSC_PAGE, because it does not have the padding.
+> 
+> Fix the duplication by removing the padding from ms_hyperv_tsc_page.
+> Fix up the KVM code to use it. Remove the no longer used struct
+> _HV_REFERENCE_TSC_PAGE.
+> 
+> There is no functional change.
+> 
+> Signed-off-by: Michael Kelley <mikelley@microsoft.com>
+> ---
+>  arch/x86/include/asm/hyperv-tlfs.h | 8 --------
+>  arch/x86/include/asm/kvm_host.h    | 2 +-
+>  arch/x86/kvm/hyperv.c              | 4 ++--
 
-If the virtqueue is full, the transmitting packet is queued up
-and it will be sent in the next iteration. This causes the same
-packet to be delivered multiple times to monitoring devices.
+Paolo, this patch touches KVM code. Let me know how you would like to
+handle this.
 
-This patch fixes this issue, postponing the packet delivery
-to monitoring devices, only when it is properly queued in the
-virqueue.
-
-Fixes: 82dfb540aeb2 ("VSOCK: Add virtio vsock vsockmon hooks")
-Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
----
- net/vmw_vsock/virtio_transport.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
-
-diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_tran=
-sport.c
-index dfbaf6bd8b1c..d8db837a96fe 100644
---- a/net/vmw_vsock/virtio_transport.c
-+++ b/net/vmw_vsock/virtio_transport.c
-@@ -115,8 +115,6 @@ virtio_transport_send_pkt_work(struct work_struct *wo=
-rk)
- 		list_del_init(&pkt->list);
- 		spin_unlock_bh(&vsock->send_pkt_list_lock);
-=20
--		virtio_transport_deliver_tap_pkt(pkt);
--
- 		reply =3D pkt->reply;
-=20
- 		sg_init_one(&hdr, &pkt->hdr, sizeof(pkt->hdr));
-@@ -137,6 +135,11 @@ virtio_transport_send_pkt_work(struct work_struct *w=
-ork)
- 			break;
- 		}
-=20
-+		/* Deliver to monitoring devices all correctly transmitted
-+		 * packets.
-+		 */
-+		virtio_transport_deliver_tap_pkt(pkt);
-+
- 		if (reply) {
- 			struct virtqueue *rx_vq =3D vsock->vqs[VSOCK_VQ_RX];
- 			int val;
---=20
-2.25.3
-
+Wei.
