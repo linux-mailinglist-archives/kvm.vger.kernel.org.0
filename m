@@ -2,29 +2,30 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 715F01B333A
-	for <lists+kvm@lfdr.de>; Wed, 22 Apr 2020 01:34:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C19AB1B333D
+	for <lists+kvm@lfdr.de>; Wed, 22 Apr 2020 01:34:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726420AbgDUXeJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Apr 2020 19:34:09 -0400
-Received: from mga05.intel.com ([192.55.52.43]:10107 "EHLO mga05.intel.com"
+        id S1726441AbgDUXeM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Apr 2020 19:34:12 -0400
+Received: from mga03.intel.com ([134.134.136.65]:32238 "EHLO mga03.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726373AbgDUXeI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Apr 2020 19:34:08 -0400
-IronPort-SDR: gj/HV3+RyhDo1NzmEmmHSGrWoIlFF2YW4aQcwiGJS0XDXn4dLsfKnSXz170QIS6z87Vhfts4xH
- be6zQnHEziZg==
+        id S1726115AbgDUXeL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Apr 2020 19:34:11 -0400
+IronPort-SDR: HdzxX1T31gR/D7a1x9O9GOH5VEyvlXJtC2l/S/ccA1Mxxd4ggq3YJ2gPOqMbr0pqifyOSstv9D
+ vdF3ALZFct1Q==
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Apr 2020 16:34:00 -0700
-IronPort-SDR: iJ1MRYp5BPfCtqBEdZDaPFs2OEEnUSCFISx+8YUDKbWRQr5FhFLQ6m1Q5rW+zca6goptwqkxK4
- lUsXm58ZWXEQ==
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Apr 2020 16:34:07 -0700
+IronPort-SDR: xxjg9s1XUxfrlmxvbvMt8lEmGxmPguT8DMvlQE+tiLyPmeB+3RNRmwR9VkCnEy3csLXauG4JmA
+ q/YoOCgjOl8Q==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.72,411,1580803200"; 
-   d="scan'208";a="258876422"
+   d="scan'208";a="245816392"
 Received: from djiang5-desk3.ch.intel.com ([143.182.136.137])
-  by orsmga006.jf.intel.com with ESMTP; 21 Apr 2020 16:33:59 -0700
-Subject: [PATCH RFC 02/15] drivers/base: Introduce a new platform-msi list
+  by fmsmga007.fm.intel.com with ESMTP; 21 Apr 2020 16:34:05 -0700
+Subject: [PATCH RFC 03/15] drivers/base: Allocate/free platform-msi
+ interrupts by group
 From:   Dave Jiang <dave.jiang@intel.com>
 To:     vkoul@kernel.org, megha.dey@linux.intel.com, maz@kernel.org,
         bhelgaas@google.com, rafael@kernel.org, gregkh@linuxfoundation.org,
@@ -36,8 +37,8 @@ To:     vkoul@kernel.org, megha.dey@linux.intel.com, maz@kernel.org,
         eric.auger@redhat.com, parav@mellanox.com
 Cc:     dmaengine@vger.kernel.org, linux-kernel@vger.kernel.org,
         x86@kernel.org, linux-pci@vger.kernel.org, kvm@vger.kernel.org
-Date:   Tue, 21 Apr 2020 16:33:59 -0700
-Message-ID: <158751203902.36773.2662739280103265908.stgit@djiang5-desk3.ch.intel.com>
+Date:   Tue, 21 Apr 2020 16:34:05 -0700
+Message-ID: <158751204550.36773.459505651659406529.stgit@djiang5-desk3.ch.intel.com>
 In-Reply-To: <158751095889.36773.6009825070990637468.stgit@djiang5-desk3.ch.intel.com>
 References: <158751095889.36773.6009825070990637468.stgit@djiang5-desk3.ch.intel.com>
 User-Agent: StGit/unknown-version
@@ -53,238 +54,342 @@ From: Megha Dey <megha.dey@linux.intel.com>
 
 This is a preparatory patch to introduce Interrupt Message Store (IMS).
 
-The struct device has a linked list ('msi_list') of the MSI (msi/msi-x,
-platform-msi) descriptors of that device. This list holds only 1 type
-of descriptor since it is not possible for a device to support more
-than one of these descriptors concurrently.
+Dynamic allocation is IMS vectors is a requirement for devices which
+support Scalable I/o virtualization. A driver can allocate and free
+vectors not just once during probe (as was the case with the MSI/MSI-X)
+but also in the post probe phase where actual demand is available.
 
-However, with the introduction of IMS, a device can support IMS as well
-as MSI-X at the same time. Instead of sharing this list between IMS (a
-type of platform-msi) and MSI-X descriptors, introduce a new linked list,
-platform_msi_list, which will hold all the platform-msi descriptors.
+Thus, introduce an API, platform_msi_domain_alloc_irqs_group() which
+drivers using IMS would be able to call multiple times. The vectors
+allocated each time this API is called are associated with a group ID,
+starting from 1. To free the vectors associated with a particular group,
+platform_msi_domain_free_irqs_group() API can be called.
 
-Thus, msi_list will point to the MSI/MSIX descriptors of a device, while
-platform_msi_list will point to the platform-msi descriptors of a device.
+The existing drivers using platform-msi infrastructure will continue to
+use the existing alloc (platform_msi_domain_alloc_irqs) and free
+(platform_msi_domain_free_irqs) APIs and are assigned a default group 0.
 
 Signed-off-by: Megha Dey <megha.dey@linux.intel.com>
 ---
- drivers/base/core.c         |    1 +
- drivers/base/platform-msi.c |   19 +++++++++++--------
- include/linux/device.h      |    2 ++
- include/linux/list.h        |   36 ++++++++++++++++++++++++++++++++++++
- include/linux/msi.h         |   21 +++++++++++++++++++++
- kernel/irq/msi.c            |   16 ++++++++--------
- 6 files changed, 79 insertions(+), 16 deletions(-)
+ drivers/base/platform-msi.c |  131 ++++++++++++++++++++++++++++++++-----------
+ include/linux/device.h      |    1 
+ include/linux/msi.h         |   47 +++++++++++----
+ kernel/irq/msi.c            |   43 +++++++++++---
+ 4 files changed, 169 insertions(+), 53 deletions(-)
 
-diff --git a/drivers/base/core.c b/drivers/base/core.c
-index 139cdf7e7327..5a0116d1a8d0 100644
---- a/drivers/base/core.c
-+++ b/drivers/base/core.c
-@@ -1984,6 +1984,7 @@ void device_initialize(struct device *dev)
- 	set_dev_node(dev, -1);
- #ifdef CONFIG_GENERIC_MSI_IRQ
- 	INIT_LIST_HEAD(&dev->msi_list);
-+	INIT_LIST_HEAD(&dev->platform_msi_list);
- #endif
- 	INIT_LIST_HEAD(&dev->links.consumers);
- 	INIT_LIST_HEAD(&dev->links.suppliers);
 diff --git a/drivers/base/platform-msi.c b/drivers/base/platform-msi.c
-index 1a3af5f33802..b25c52f734dc 100644
+index b25c52f734dc..2696aa75983b 100644
 --- a/drivers/base/platform-msi.c
 +++ b/drivers/base/platform-msi.c
-@@ -110,7 +110,8 @@ static void platform_msi_free_descs(struct device *dev, int base, int nvec)
+@@ -106,16 +106,28 @@ static void platform_msi_update_chip_ops(struct msi_domain_info *info)
+ 		info->flags &= ~MSI_FLAG_LEVEL_CAPABLE;
+ }
+ 
+-static void platform_msi_free_descs(struct device *dev, int base, int nvec)
++static void platform_msi_free_descs(struct device *dev, int base, int nvec,
++				    unsigned int group)
  {
  	struct msi_desc *desc, *tmp;
- 
--	list_for_each_entry_safe(desc, tmp, dev_to_msi_list(dev), list) {
-+	list_for_each_entry_safe(desc, tmp, dev_to_platform_msi_list(dev),
-+				 list) {
- 		if (desc->platform.msi_index >= base &&
- 		    desc->platform.msi_index < (base + nvec)) {
- 			list_del(&desc->list);
-@@ -127,8 +128,8 @@ static int platform_msi_alloc_descs_with_irq(struct device *dev, int virq,
+-
+-	list_for_each_entry_safe(desc, tmp, dev_to_platform_msi_list(dev),
+-				 list) {
+-		if (desc->platform.msi_index >= base &&
+-		    desc->platform.msi_index < (base + nvec)) {
+-			list_del(&desc->list);
+-			free_msi_entry(desc);
++	struct platform_msi_group_entry *platform_msi_group,
++					*tmp_platform_msi_group;
++
++	list_for_each_entry_safe(platform_msi_group, tmp_platform_msi_group,
++				 dev_to_platform_msi_group_list(dev),
++				 group_list) {
++		if (platform_msi_group->group_id == group) {
++			list_for_each_entry_safe(desc, tmp,
++						&platform_msi_group->entry_list,
++						list) {
++				if (desc->platform.msi_index >= base &&
++				    desc->platform.msi_index < (base + nvec)) {
++					list_del(&desc->list);
++					free_msi_entry(desc);
++				}
++			}
++			list_del(&platform_msi_group->group_list);
++			kfree(platform_msi_group);
+ 		}
+ 	}
+ }
+@@ -128,8 +140,8 @@ static int platform_msi_alloc_descs_with_irq(struct device *dev, int virq,
  	struct msi_desc *desc;
  	int i, base = 0;
  
--	if (!list_empty(dev_to_msi_list(dev))) {
--		desc = list_last_entry(dev_to_msi_list(dev),
-+	if (!list_empty(dev_to_platform_msi_list(dev))) {
-+		desc = list_last_entry(dev_to_platform_msi_list(dev),
+-	if (!list_empty(dev_to_platform_msi_list(dev))) {
+-		desc = list_last_entry(dev_to_platform_msi_list(dev),
++	if (!list_empty(platform_msi_current_group_entry_list(dev))) {
++		desc = list_last_entry(platform_msi_current_group_entry_list(dev),
  				       struct msi_desc, list);
  		base = desc->platform.msi_index + 1;
  	}
-@@ -142,7 +143,7 @@ static int platform_msi_alloc_descs_with_irq(struct device *dev, int virq,
+@@ -143,12 +155,13 @@ static int platform_msi_alloc_descs_with_irq(struct device *dev, int virq,
  		desc->platform.msi_index = base + i;
  		desc->irq = virq ? virq + i : 0;
  
--		list_add_tail(&desc->list, dev_to_msi_list(dev));
-+		list_add_tail(&desc->list, dev_to_platform_msi_list(dev));
+-		list_add_tail(&desc->list, dev_to_platform_msi_list(dev));
++		list_add_tail(&desc->list,
++			      platform_msi_current_group_entry_list(dev));
  	}
  
  	if (i != nvec) {
-@@ -213,7 +214,7 @@ platform_msi_alloc_priv_data(struct device *dev, unsigned int nvec,
+ 		/* Clean up the mess */
+-		platform_msi_free_descs(dev, base, nvec);
++		platform_msi_free_descs(dev, base, nvec, dev->group_id);
+ 
+ 		return -ENOMEM;
+ 	}
+@@ -214,7 +227,7 @@ platform_msi_alloc_priv_data(struct device *dev, unsigned int nvec,
  	}
  
  	/* Already had a helping of MSI? Greed... */
--	if (!list_empty(dev_to_msi_list(dev)))
-+	if (!list_empty(dev_to_platform_msi_list(dev)))
+-	if (!list_empty(dev_to_platform_msi_list(dev)))
++	if (!list_empty(platform_msi_current_group_entry_list(dev)))
  		return ERR_PTR(-EBUSY);
  
  	datap = kzalloc(sizeof(*datap), GFP_KERNEL);
-@@ -255,6 +256,8 @@ int platform_msi_domain_alloc_irqs(struct device *dev, unsigned int nvec,
+@@ -253,11 +266,36 @@ static void platform_msi_free_priv_data(struct platform_msi_priv_data *data)
+ int platform_msi_domain_alloc_irqs(struct device *dev, unsigned int nvec,
+ 				   const struct platform_msi_ops *platform_ops)
+ {
++	return platform_msi_domain_alloc_irqs_group(dev, nvec, platform_ops,
++									NULL);
++}
++EXPORT_SYMBOL_GPL(platform_msi_domain_alloc_irqs);
++
++int platform_msi_domain_alloc_irqs_group(struct device *dev, unsigned int nvec,
++					 const struct platform_msi_ops *platform_ops,
++					 unsigned int *group_id)
++{
++	struct platform_msi_group_entry *platform_msi_group;
  	struct platform_msi_priv_data *priv_data;
  	int err;
  
-+	dev->platform_msi_type = GEN_PLAT_MSI;
+ 	dev->platform_msi_type = GEN_PLAT_MSI;
+ 
++	if (group_id)
++		*group_id = ++dev->group_id;
++
++	platform_msi_group = kzalloc(sizeof(*platform_msi_group), GFP_KERNEL);
++	if (!platform_msi_group) {
++		err = -ENOMEM;
++		goto out_platform_msi_group;
++	}
++
++	INIT_LIST_HEAD(&platform_msi_group->group_list);
++	INIT_LIST_HEAD(&platform_msi_group->entry_list);
++	platform_msi_group->group_id = dev->group_id;
++	list_add_tail(&platform_msi_group->group_list,
++		      dev_to_platform_msi_group_list(dev));
 +
  	priv_data = platform_msi_alloc_priv_data(dev, nvec, platform_ops);
  	if (IS_ERR(priv_data))
  		return PTR_ERR(priv_data);
-@@ -284,10 +287,10 @@ EXPORT_SYMBOL_GPL(platform_msi_domain_alloc_irqs);
+@@ -273,13 +311,14 @@ int platform_msi_domain_alloc_irqs(struct device *dev, unsigned int nvec,
+ 	return 0;
+ 
+ out_free_desc:
+-	platform_msi_free_descs(dev, 0, nvec);
++	platform_msi_free_descs(dev, 0, nvec, dev->group_id);
+ out_free_priv_data:
+ 	platform_msi_free_priv_data(priv_data);
+-
++out_platform_msi_group:
++	kfree(platform_msi_group);
+ 	return err;
+ }
+-EXPORT_SYMBOL_GPL(platform_msi_domain_alloc_irqs);
++EXPORT_SYMBOL_GPL(platform_msi_domain_alloc_irqs_group);
+ 
+ /**
+  * platform_msi_domain_free_irqs - Free MSI interrupts for @dev
+@@ -287,17 +326,30 @@ EXPORT_SYMBOL_GPL(platform_msi_domain_alloc_irqs);
   */
  void platform_msi_domain_free_irqs(struct device *dev)
  {
--	if (!list_empty(dev_to_msi_list(dev))) {
-+	if (!list_empty(dev_to_platform_msi_list(dev))) {
- 		struct msi_desc *desc;
+-	if (!list_empty(dev_to_platform_msi_list(dev))) {
+-		struct msi_desc *desc;
++	platform_msi_domain_free_irqs_group(dev, 0);
++}
++EXPORT_SYMBOL_GPL(platform_msi_domain_free_irqs);
  
--		desc = first_msi_entry(dev);
-+		desc = first_platform_msi_entry(dev);
- 		platform_msi_free_priv_data(desc->platform.msi_priv_data);
+-		desc = first_platform_msi_entry(dev);
+-		platform_msi_free_priv_data(desc->platform.msi_priv_data);
++void platform_msi_domain_free_irqs_group(struct device *dev, unsigned int group)
++{
++	struct platform_msi_group_entry *platform_msi_group;
++
++	list_for_each_entry(platform_msi_group,
++			    dev_to_platform_msi_group_list((dev)), group_list) {
++		if (platform_msi_group->group_id == group) {
++			if (!list_empty(&platform_msi_group->entry_list)) {
++				struct msi_desc *desc;
++
++				desc = list_first_entry(&(platform_msi_group)->entry_list,
++							struct msi_desc, list);
++				platform_msi_free_priv_data(desc->platform.msi_priv_data);
++			}
++		}
  	}
+-
+-	msi_domain_free_irqs(dev->msi_domain, dev);
+-	platform_msi_free_descs(dev, 0, MAX_DEV_MSIS);
++	msi_domain_free_irqs_group(dev->msi_domain, dev, group);
++	platform_msi_free_descs(dev, 0, MAX_DEV_MSIS, group);
+ }
+-EXPORT_SYMBOL_GPL(platform_msi_domain_free_irqs);
++EXPORT_SYMBOL_GPL(platform_msi_domain_free_irqs_group);
  
-@@ -370,7 +373,7 @@ void platform_msi_domain_free(struct irq_domain *domain, unsigned int virq,
+ /**
+  * platform_msi_get_host_data - Query the private data associated with
+@@ -373,15 +425,28 @@ void platform_msi_domain_free(struct irq_domain *domain, unsigned int virq,
  {
  	struct platform_msi_priv_data *data = domain->host_data;
  	struct msi_desc *desc, *tmp;
--	for_each_msi_entry_safe(desc, tmp, data->dev) {
-+	for_each_platform_msi_entry_safe(desc, tmp, data->dev) {
- 		if (WARN_ON(!desc->irq || desc->nvec_used != 1))
- 			return;
- 		if (!(desc->irq >= virq && desc->irq < (virq + nvec)))
+-	for_each_platform_msi_entry_safe(desc, tmp, data->dev) {
+-		if (WARN_ON(!desc->irq || desc->nvec_used != 1))
+-			return;
+-		if (!(desc->irq >= virq && desc->irq < (virq + nvec)))
+-			continue;
+-
+-		irq_domain_free_irqs_common(domain, desc->irq, 1);
+-		list_del(&desc->list);
+-		free_msi_entry(desc);
++	struct platform_msi_group_entry *platform_msi_group,
++					*tmp_platform_msi_group;
++
++	list_for_each_entry_safe(platform_msi_group, tmp_platform_msi_group,
++				 dev_to_platform_msi_group_list(data->dev),
++				 group_list) {
++		if (platform_msi_group->group_id == data->dev->group_id) {
++			list_for_each_entry_safe(desc, tmp,
++						&platform_msi_group->entry_list,
++						list) {
++				if (WARN_ON(!desc->irq || desc->nvec_used != 1))
++					return;
++				if (!(desc->irq >= virq && desc->irq < (virq + nvec)))
++					continue;
++
++				irq_domain_free_irqs_common(domain, desc->irq, 1);
++				list_del(&desc->list);
++				free_msi_entry(desc);
++			}
++			list_del(&platform_msi_group->group_list);
++			kfree(platform_msi_group);
++		}
+ 	}
+ }
+ 
 diff --git a/include/linux/device.h b/include/linux/device.h
-index ac8e37cd716a..cbcecb14584e 100644
+index cbcecb14584e..f6700b85eb95 100644
 --- a/include/linux/device.h
 +++ b/include/linux/device.h
-@@ -567,6 +567,8 @@ struct device {
+@@ -624,6 +624,7 @@ struct device {
+     defined(CONFIG_ARCH_HAS_SYNC_DMA_FOR_CPU_ALL)
+ 	bool			dma_coherent:1;
  #endif
- #ifdef CONFIG_GENERIC_MSI_IRQ
- 	struct list_head	msi_list;
-+	struct list_head	platform_msi_list;
-+	unsigned int		platform_msi_type;
- #endif
- 
- 	const struct dma_map_ops *dma_ops;
-diff --git a/include/linux/list.h b/include/linux/list.h
-index aff44d34f4e4..7a5ea40cb945 100644
---- a/include/linux/list.h
-+++ b/include/linux/list.h
-@@ -492,6 +492,18 @@ static inline void list_splice_tail_init(struct list_head *list,
- #define list_entry(ptr, type, member) \
- 	container_of(ptr, type, member)
- 
-+/**
-+ * list_entry_select - get the correct struct for this entry based on condition
-+ * @condition:	the condition to choose a particular &struct list head pointer
-+ * @ptr_a:      the &struct list_head pointer if @condition is not met.
-+ * @ptr_b:      the &struct list_head pointer if @condition is met.
-+ * @type:       the type of the struct this is embedded in.
-+ * @member:     the name of the list_head within the struct.
-+ */
-+#define list_entry_select(condition, ptr_a, ptr_b, type, member)\
-+	(condition) ? list_entry(ptr_a, type, member) :		\
-+		      list_entry(ptr_b, type, member)
-+
- /**
-  * list_first_entry - get the first element from a list
-  * @ptr:	the list head to take the element from.
-@@ -503,6 +515,17 @@ static inline void list_splice_tail_init(struct list_head *list,
- #define list_first_entry(ptr, type, member) \
- 	list_entry((ptr)->next, type, member)
- 
-+/**
-+ * list_first_entry_select - get the first element from list based on condition
-+ * @condition:  the condition to choose a particular &struct list head pointer
-+ * @ptr_a:      the &struct list_head pointer if @condition is not met.
-+ * @ptr_b:      the &struct list_head pointer if @condition is met.
-+ * @type:       the type of the struct this is embedded in.
-+ * @member:     the name of the list_head within the struct.
-+ */
-+#define list_first_entry_select(condition, ptr_a, ptr_b, type, member)  \
-+	list_entry_select((condition), (ptr_a)->next, (ptr_b)->next, type, member)
-+
- /**
-  * list_last_entry - get the last element from a list
-  * @ptr:	the list head to take the element from.
-@@ -602,6 +625,19 @@ static inline void list_splice_tail_init(struct list_head *list,
- 	     &pos->member != (head);					\
- 	     pos = list_next_entry(pos, member))
- 
-+/**
-+ * list_for_each_entry_select - iterate over list of given type based on condition
-+ * @condition:  the condition to choose a particular &struct list head pointer
-+ * @pos:        the type * to use as a loop cursor.
-+ * @head_a:     the head for your list if condition is met.
-+ * @head_b:     the head for your list if condition is not met.
-+ * @member:     the name of the list_head within the struct.
-+ */
-+#define list_for_each_entry_select(condition, pos, head_a, head_b, member)\
-+	for (pos = list_first_entry_select((condition), head_a, head_b, typeof(*pos), member);\
-+	     (condition) ? &pos->member != (head_a) : &pos->member != (head_b);\
-+	     pos = list_next_entry(pos, member))
-+
- /**
-  * list_for_each_entry_reverse - iterate backwards over list of given type.
-  * @pos:	the type * to use as a loop cursor.
-diff --git a/include/linux/msi.h b/include/linux/msi.h
-index 8e08907d70cb..9c15b7403694 100644
---- a/include/linux/msi.h
-+++ b/include/linux/msi.h
-@@ -130,6 +130,11 @@ struct msi_desc {
- 	};
++	unsigned int		group_id;
  };
  
-+enum platform_msi_type {
-+	NOT_PLAT_MSI = 0,
-+	GEN_PLAT_MSI = 1,
+ static inline struct device *kobj_to_dev(struct kobject *kobj)
+diff --git a/include/linux/msi.h b/include/linux/msi.h
+index 9c15b7403694..3890b143b04d 100644
+--- a/include/linux/msi.h
++++ b/include/linux/msi.h
+@@ -135,6 +135,12 @@ enum platform_msi_type {
+ 	GEN_PLAT_MSI = 1,
+ };
+ 
++struct platform_msi_group_entry {
++	unsigned int group_id;
++	struct list_head group_list;
++	struct list_head entry_list;
 +};
 +
  /* Helpers to hide struct msi_desc implementation details */
  #define msi_desc_to_dev(desc)		((desc)->dev)
  #define dev_to_msi_list(dev)		(&(dev)->msi_list)
-@@ -140,6 +145,22 @@ struct msi_desc {
+@@ -145,21 +151,31 @@ enum platform_msi_type {
  #define for_each_msi_entry_safe(desc, tmp, dev)	\
  	list_for_each_entry_safe((desc), (tmp), dev_to_msi_list((dev)), list)
  
-+#define dev_to_platform_msi_list(dev)	(&(dev)->platform_msi_list)
-+#define first_platform_msi_entry(dev)		\
-+	list_first_entry(dev_to_platform_msi_list((dev)), struct msi_desc, list)
-+#define for_each_platform_msi_entry(desc, dev)	\
-+	list_for_each_entry((desc), dev_to_platform_msi_list((dev)), list)
-+#define for_each_platform_msi_entry_safe(desc, tmp, dev)	\
-+	list_for_each_entry_safe((desc), (tmp), dev_to_platform_msi_list((dev)), list)
+-#define dev_to_platform_msi_list(dev)	(&(dev)->platform_msi_list)
+-#define first_platform_msi_entry(dev)		\
+-	list_first_entry(dev_to_platform_msi_list((dev)), struct msi_desc, list)
+-#define for_each_platform_msi_entry(desc, dev)	\
+-	list_for_each_entry((desc), dev_to_platform_msi_list((dev)), list)
+-#define for_each_platform_msi_entry_safe(desc, tmp, dev)	\
+-	list_for_each_entry_safe((desc), (tmp), dev_to_platform_msi_list((dev)), list)
++#define dev_to_platform_msi_group_list(dev)    (&(dev)->platform_msi_list)
 +
-+#define first_msi_entry_common(dev)	\
-+	list_first_entry_select((dev)->platform_msi_type, dev_to_platform_msi_list((dev)),	\
-+				dev_to_msi_list((dev)), struct msi_desc, list)
++#define first_platform_msi_group_entry(dev)				\
++	list_first_entry(dev_to_platform_msi_group_list((dev)),		\
++			 struct platform_msi_group_entry, group_list)
+ 
+-#define first_msi_entry_common(dev)	\
+-	list_first_entry_select((dev)->platform_msi_type, dev_to_platform_msi_list((dev)),	\
++#define platform_msi_current_group_entry_list(dev)			\
++	(&((list_last_entry(dev_to_platform_msi_group_list((dev)),	\
++			    struct platform_msi_group_entry,		\
++			    group_list))->entry_list))
 +
-+#define for_each_msi_entry_common(desc, dev)	\
-+	list_for_each_entry_select((dev)->platform_msi_type, desc, dev_to_platform_msi_list((dev)), \
-+				   dev_to_msi_list((dev)), list)	\
++#define first_msi_entry_current_group(dev)				\
++	list_first_entry_select((dev)->platform_msi_type,		\
++				platform_msi_current_group_entry_list((dev)),	\
+ 				dev_to_msi_list((dev)), struct msi_desc, list)
+ 
+-#define for_each_msi_entry_common(desc, dev)	\
+-	list_for_each_entry_select((dev)->platform_msi_type, desc, dev_to_platform_msi_list((dev)), \
+-				   dev_to_msi_list((dev)), list)	\
++#define for_each_msi_entry_current_group(desc, dev)			\
++	list_for_each_entry_select((dev)->platform_msi_type, desc,	\
++				   platform_msi_current_group_entry_list((dev)),\
++				   dev_to_msi_list((dev)), list)
 +
++#define for_each_platform_msi_entry_in_group(desc, platform_msi_group, group, dev)	\
++	list_for_each_entry((platform_msi_group), dev_to_platform_msi_group_list((dev)), group_list)	\
++		if (((platform_msi_group)->group_id) == (group))			\
++			list_for_each_entry((desc), (&(platform_msi_group)->entry_list), list)
+ 
  #ifdef CONFIG_IRQ_MSI_IOMMU
  static inline const void *msi_desc_get_iommu_cookie(struct msi_desc *desc)
- {
+@@ -363,6 +379,8 @@ struct irq_domain *msi_create_irq_domain(struct fwnode_handle *fwnode,
+ int msi_domain_alloc_irqs(struct irq_domain *domain, struct device *dev,
+ 			  int nvec);
+ void msi_domain_free_irqs(struct irq_domain *domain, struct device *dev);
++void msi_domain_free_irqs_group(struct irq_domain *domain,
++				struct device *dev, unsigned int group);
+ struct msi_domain_info *msi_get_domain_info(struct irq_domain *domain);
+ 
+ struct irq_domain *platform_msi_create_irq_domain(struct fwnode_handle *fwnode,
+@@ -371,6 +389,11 @@ struct irq_domain *platform_msi_create_irq_domain(struct fwnode_handle *fwnode,
+ int platform_msi_domain_alloc_irqs(struct device *dev, unsigned int nvec,
+ 				   const struct platform_msi_ops *platform_ops);
+ void platform_msi_domain_free_irqs(struct device *dev);
++int platform_msi_domain_alloc_irqs_group(struct device *dev, unsigned int nvec,
++					 const struct platform_msi_ops *platform_ops,
++					 unsigned int *group_id);
++void platform_msi_domain_free_irqs_group(struct device *dev,
++					 unsigned int group_id);
+ 
+ /* When an MSI domain is used as an intermediate domain */
+ int msi_domain_prepare_irqs(struct irq_domain *domain, struct device *dev,
 diff --git a/kernel/irq/msi.c b/kernel/irq/msi.c
-index eb95f6106a1e..bc5f9e32387f 100644
+index bc5f9e32387f..899ade394ec8 100644
 --- a/kernel/irq/msi.c
 +++ b/kernel/irq/msi.c
 @@ -320,7 +320,7 @@ int msi_domain_populate_irqs(struct irq_domain *domain, struct device *dev,
  	struct msi_desc *desc;
  	int ret = 0;
  
--	for_each_msi_entry(desc, dev) {
-+	for_each_msi_entry_common(desc, dev) {
+-	for_each_msi_entry_common(desc, dev) {
++	for_each_msi_entry_current_group(desc, dev) {
  		/* Don't even try the multi-MSI brain damage. */
  		if (WARN_ON(!desc->irq || desc->nvec_used != 1)) {
  			ret = -EINVAL;
@@ -292,8 +397,8 @@ index eb95f6106a1e..bc5f9e32387f 100644
  
  	if (ret) {
  		/* Mop up the damage */
--		for_each_msi_entry(desc, dev) {
-+		for_each_msi_entry_common(desc, dev) {
+-		for_each_msi_entry_common(desc, dev) {
++		for_each_msi_entry_current_group(desc, dev) {
  			if (!(desc->irq >= virq && desc->irq < (virq + nvec)))
  				continue;
  
@@ -301,8 +406,8 @@ index eb95f6106a1e..bc5f9e32387f 100644
  	 * Checking the first MSI descriptor is sufficient. MSIX supports
  	 * masking and MSI does so when the maskbit is set.
  	 */
--	desc = first_msi_entry(dev);
-+	desc = first_msi_entry_common(dev);
+-	desc = first_msi_entry_common(dev);
++	desc = first_msi_entry_current_group(dev);
  	return desc->msi_attrib.is_msix || desc->msi_attrib.maskbit;
  }
  
@@ -310,8 +415,8 @@ index eb95f6106a1e..bc5f9e32387f 100644
  	if (ret)
  		return ret;
  
--	for_each_msi_entry(desc, dev) {
-+	for_each_msi_entry_common(desc, dev) {
+-	for_each_msi_entry_common(desc, dev) {
++	for_each_msi_entry_current_group(desc, dev) {
  		ops->set_desc(&arg, desc);
  
  		virq = __irq_domain_alloc_irqs(domain, -1, desc->nvec_used,
@@ -319,8 +424,8 @@ index eb95f6106a1e..bc5f9e32387f 100644
  
  	can_reserve = msi_check_reservation_mode(domain, info, dev);
  
--	for_each_msi_entry(desc, dev) {
-+	for_each_msi_entry_common(desc, dev) {
+-	for_each_msi_entry_common(desc, dev) {
++	for_each_msi_entry_current_group(desc, dev) {
  		virq = desc->irq;
  		if (desc->nvec_used == 1)
  			dev_dbg(dev, "irq %d for MSI\n", virq);
@@ -328,8 +433,8 @@ index eb95f6106a1e..bc5f9e32387f 100644
  	 * so request_irq() will assign the final vector.
  	 */
  	if (can_reserve) {
--		for_each_msi_entry(desc, dev) {
-+		for_each_msi_entry_common(desc, dev) {
+-		for_each_msi_entry_common(desc, dev) {
++		for_each_msi_entry_current_group(desc, dev) {
  			irq_data = irq_domain_get_irq_data(domain, desc->irq);
  			irqd_clr_activated(irq_data);
  		}
@@ -337,17 +442,44 @@ index eb95f6106a1e..bc5f9e32387f 100644
  	return 0;
  
  cleanup:
--	for_each_msi_entry(desc, dev) {
-+	for_each_msi_entry_common(desc, dev) {
+-	for_each_msi_entry_common(desc, dev) {
++	for_each_msi_entry_current_group(desc, dev) {
  		struct irq_data *irqd;
  
  		if (desc->irq == virq)
-@@ -500,7 +500,7 @@ void msi_domain_free_irqs(struct irq_domain *domain, struct device *dev)
+@@ -500,7 +500,34 @@ void msi_domain_free_irqs(struct irq_domain *domain, struct device *dev)
  {
  	struct msi_desc *desc;
  
--	for_each_msi_entry(desc, dev) {
-+	for_each_msi_entry_common(desc, dev) {
+-	for_each_msi_entry_common(desc, dev) {
++	for_each_msi_entry_current_group(desc, dev) {
++		/*
++		 * We might have failed to allocate an MSI early
++		 * enough that there is no IRQ associated to this
++		 * entry. If that's the case, don't do anything.
++		 */
++		if (desc->irq) {
++			irq_domain_free_irqs(desc->irq, desc->nvec_used);
++			desc->irq = 0;
++		}
++	}
++}
++
++/**
++ * msi_domain_free_irqs_group - Free interrupts from a MSI interrupt @domain
++ * associated to @dev from a particular group
++ * @domain:	The domain to managing the interrupts
++ * @dev:	Pointer to device struct of the device for which the interrupts
++ *		are free
++ * @group:	group from which interrupts are to be freed
++ */
++void msi_domain_free_irqs_group(struct irq_domain *domain,
++				struct device *dev, unsigned int group)
++{
++	struct msi_desc *desc;
++	struct platform_msi_group_entry *platform_msi_group;
++
++	for_each_platform_msi_entry_in_group(desc, platform_msi_group, group, dev) {
  		/*
  		 * We might have failed to allocate an MSI early
  		 * enough that there is no IRQ associated to this
