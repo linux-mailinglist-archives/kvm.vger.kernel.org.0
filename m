@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2E4D51B2F68
-	for <lists+kvm@lfdr.de>; Tue, 21 Apr 2020 20:44:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B6B621B2F67
+	for <lists+kvm@lfdr.de>; Tue, 21 Apr 2020 20:44:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729682AbgDUSoB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Apr 2020 14:44:01 -0400
-Received: from smtp-fw-6001.amazon.com ([52.95.48.154]:44135 "EHLO
-        smtp-fw-6001.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729679AbgDUSoB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Apr 2020 14:44:01 -0400
+        id S1729666AbgDUSn4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Apr 2020 14:43:56 -0400
+Received: from smtp-fw-33001.amazon.com ([207.171.190.10]:62511 "EHLO
+        smtp-fw-33001.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725990AbgDUSn4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Apr 2020 14:43:56 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1587494640; x=1619030640;
+  t=1587494635; x=1619030635;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=tTIsnBjqE+u3ZnWQbEklQODug9U78pYyqe4mU4uBc4s=;
-  b=dEHSY03iRIklzqdLG50OhP3VrruByRRy7Wjeq1OA+o/p8QSJknN5cWzJ
-   Es/aXy6EjJGq+NJpmvO8PXvffO23F7gqDHLElc6B23D1Z3eM4cfExrwvn
-   f9ANVvcQxujTTSoBQv/uWrk0h21VjiBkBRMmyLkaZF88pjEJjBOmg9lMJ
-   Y=;
-IronPort-SDR: 1bfE/NL9nQ9wrCFDt9DoWxRX8LrzLfnEPlo1zt6gTs3ktQWjKCYzSxPuO4sTQK/UMHDp8d6JIH
- RnHSDQO0y6wQ==
+  bh=+uXZSd+rA8gs8cQcgD50Ns4MwYbbNyukGlXYfO8A2+0=;
+  b=IkTkgwEAlB2H1j8Oal6l8cNfW3i1YlzCnuOAyClEHnztsQw8KMYC4yMm
+   1NQryUZRftbKfY6vuPUB4g6cnMxoYKwwhQoOOVgNAvXRYZjqW2a6nxSpT
+   2F7yLxbLkGTOuILx1rY8PIblycos35SoegPtPAvU4I4BoYV5h/AeYuFuF
+   I=;
+IronPort-SDR: wSYXh4zgWBWEcWcU/2R6X/NlO+JoCVVnmS/45Lh7Gn8gH4vmX348CEiRh0ka1WQvyLVuw3EMUZ
+ Knn9mzpdl7BA==
 X-IronPort-AV: E=Sophos;i="5.72,411,1580774400"; 
-   d="scan'208";a="28051328"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-2b-a7fdc47a.us-west-2.amazon.com) ([10.43.8.6])
-  by smtp-border-fw-out-6001.iad6.amazon.com with ESMTP; 21 Apr 2020 18:43:47 +0000
+   d="scan'208";a="39978613"
+Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-2c-87a10be6.us-west-2.amazon.com) ([10.47.23.38])
+  by smtp-border-fw-out-33001.sea14.amazon.com with ESMTP; 21 Apr 2020 18:43:54 +0000
 Received: from EX13MTAUEA002.ant.amazon.com (pdx4-ws-svc-p6-lb7-vlan2.pdx.amazon.com [10.170.41.162])
-        by email-inbound-relay-2b-a7fdc47a.us-west-2.amazon.com (Postfix) with ESMTPS id 68F07C5B80;
-        Tue, 21 Apr 2020 18:43:46 +0000 (UTC)
+        by email-inbound-relay-2c-87a10be6.us-west-2.amazon.com (Postfix) with ESMTPS id 05C61A17AD;
+        Tue, 21 Apr 2020 18:43:53 +0000 (UTC)
 Received: from EX13D16EUB003.ant.amazon.com (10.43.166.99) by
  EX13MTAUEA002.ant.amazon.com (10.43.61.77) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Tue, 21 Apr 2020 18:43:45 +0000
+ id 15.0.1497.2; Tue, 21 Apr 2020 18:43:53 +0000
 Received: from 38f9d34ed3b1.ant.amazon.com (10.43.161.217) by
  EX13D16EUB003.ant.amazon.com (10.43.166.99) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Tue, 21 Apr 2020 18:43:37 +0000
+ id 15.0.1497.2; Tue, 21 Apr 2020 18:43:45 +0000
 From:   Andra Paraschiv <andraprs@amazon.com>
 To:     <linux-kernel@vger.kernel.org>
 CC:     Anthony Liguori <aliguori@amazon.com>,
@@ -53,9 +53,9 @@ CC:     Anthony Liguori <aliguori@amazon.com>,
         Uwe Dannowski <uwed@amazon.de>, <kvm@vger.kernel.org>,
         <ne-devel-upstream@amazon.com>,
         Andra Paraschiv <andraprs@amazon.com>
-Subject: [PATCH v1 11/15] nitro_enclaves: Add logic for enclave start
-Date:   Tue, 21 Apr 2020 21:41:46 +0300
-Message-ID: <20200421184150.68011-12-andraprs@amazon.com>
+Subject: [PATCH v1 12/15] nitro_enclaves: Add logic for enclave termination
+Date:   Tue, 21 Apr 2020 21:41:47 +0300
+Message-ID: <20200421184150.68011-13-andraprs@amazon.com>
 X-Mailer: git-send-email 2.20.1 (Apple Git-117)
 In-Reply-To: <20200421184150.68011-1-andraprs@amazon.com>
 References: <20200421184150.68011-1-andraprs@amazon.com>
@@ -70,122 +70,197 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-After all the enclave resources are set, the enclave is ready for
-beginning to run.
+An enclave is associated with an fd that is returned after the enclave
+creation logic is completed. This enclave fd is further used to setup
+enclave resources. Once the enclave needs to be terminated, the enclave
+fd is closed.
 
-Add ioctl command logic for starting an enclave after all its resources,
-memory regions and CPUs, have been set.
-
-The enclave start information includes the local channel addressing -
-vsock CID - and the flags associated with the enclave.
+Add logic for enclave termination, that is mapped to the enclave fd
+release callback. Free the internal enclave info used for bookkeeping.
 
 Signed-off-by: Alexandru Vasile <lexnv@amazon.com>
 Signed-off-by: Andra Paraschiv <andraprs@amazon.com>
 ---
- .../virt/amazon/nitro_enclaves/ne_misc_dev.c  | 83 +++++++++++++++++++
- 1 file changed, 83 insertions(+)
+ .../virt/amazon/nitro_enclaves/ne_misc_dev.c  | 164 ++++++++++++++++++
+ 1 file changed, 164 insertions(+)
 
 diff --git a/drivers/virt/amazon/nitro_enclaves/ne_misc_dev.c b/drivers/virt/amazon/nitro_enclaves/ne_misc_dev.c
-index 0bd283f73a87..f07eb46f7995 100644
+index f07eb46f7995..08ba8295d524 100644
 --- a/drivers/virt/amazon/nitro_enclaves/ne_misc_dev.c
 +++ b/drivers/virt/amazon/nitro_enclaves/ne_misc_dev.c
-@@ -455,6 +455,53 @@ static int ne_set_user_memory_region_ioctl(struct ne_enclave *ne_enclave,
- 	return rc;
+@@ -611,8 +611,172 @@ static long ne_enclave_ioctl(struct file *file, unsigned int cmd,
+ 	return 0;
  }
  
 +/**
-+ * ne_enclave_start_ioctl - Trigger enclave start after the enclave resources,
-+ * such as memory and CPU, have been set.
++ * ne_enclave_remove_all_mem_region_entries - Remove all memory region
++ * entries from the enclave data structure.
 + *
 + * This function gets called with the ne_enclave mutex held.
 + *
 + * @ne_enclave: private data associated with the current enclave.
-+ * @enclave_start_metadata: enclave metadata that includes enclave cid and
-+ *			    flags and the slot uid.
-+ *
-+ * @returns: 0 on success, negative return value on failure.
 + */
-+static int ne_enclave_start_ioctl(struct ne_enclave *ne_enclave,
-+	struct enclave_start_metadata *enclave_start_metadata)
++static void ne_enclave_remove_all_mem_region_entries(
++	struct ne_enclave *ne_enclave)
 +{
++	struct ne_mem_region *ne_mem_region = NULL;
++	struct ne_mem_region *ne_mem_region_tmp = NULL;
++
++	BUG_ON(!ne_enclave);
++
++	list_for_each_entry_safe(ne_mem_region, ne_mem_region_tmp,
++				 &ne_enclave->mem_regions_list,
++				 mem_region_list_entry) {
++		list_del(&ne_mem_region->mem_region_list_entry);
++
++		unpin_user_pages(ne_mem_region->pages,
++				 ne_mem_region->nr_pages);
++
++		kzfree(ne_mem_region->pages);
++
++		kzfree(ne_mem_region);
++	}
++}
++
++/**
++ * ne_enclave_remove_all_vcpu_id_entries - Remove all vCPU id entries
++ * from the enclave data structure.
++ *
++ * This function gets called with the ne_enclave mutex held.
++ *
++ * @ne_enclave: private data associated with the current enclave.
++ */
++static void ne_enclave_remove_all_vcpu_id_entries(struct ne_enclave *ne_enclave)
++{
++	unsigned int cpu = 0;
++	struct ne_vcpu_id *ne_vcpu_id = NULL;
++	struct ne_vcpu_id *ne_vcpu_id_tmp = NULL;
++
++	BUG_ON(!ne_enclave);
++
++	mutex_lock(&ne_cpu_pool_mutex);
++
++	list_for_each_entry_safe(ne_vcpu_id, ne_vcpu_id_tmp,
++				 &ne_enclave->vcpu_ids_list,
++				 vcpu_id_list_entry) {
++		list_del(&ne_vcpu_id->vcpu_id_list_entry);
++
++		/* Update the available CPU pool. */
++		cpumask_set_cpu(ne_vcpu_id->vcpu_id, ne_cpu_pool.avail);
++
++		kzfree(ne_vcpu_id);
++	}
++
++	/* If any siblings left in the enclave CPU pool, move to available. */
++	for_each_cpu(cpu, ne_enclave->cpu_siblings) {
++		cpumask_clear_cpu(cpu, ne_enclave->cpu_siblings);
++
++		cpumask_set_cpu(cpu, ne_cpu_pool.avail);
++	}
++
++	free_cpumask_var(ne_enclave->cpu_siblings);
++
++	mutex_unlock(&ne_cpu_pool_mutex);
++}
++
++/**
++ * ne_pci_dev_remove_enclave_entry - Remove enclave entry from the data
++ * structure that is part of the PCI device private data.
++ *
++ * This function gets called with the ne_pci_dev enclave mutex held.
++ *
++ * @ne_enclave: private data associated with the current enclave.
++ * @ne_pci_dev: private data associated with the PCI device.
++ */
++static void ne_pci_dev_remove_enclave_entry(struct ne_enclave *ne_enclave,
++					    struct ne_pci_dev *ne_pci_dev)
++{
++	struct ne_enclave *ne_enclave_entry = NULL;
++	struct ne_enclave *ne_enclave_entry_tmp = NULL;
++
++	BUG_ON(!ne_enclave);
++	BUG_ON(!ne_pci_dev);
++
++	list_for_each_entry_safe(ne_enclave_entry, ne_enclave_entry_tmp,
++				 &ne_pci_dev->enclaves_list,
++				 enclave_list_entry) {
++		if (ne_enclave_entry->slot_uid == ne_enclave->slot_uid) {
++			list_del(&ne_enclave_entry->enclave_list_entry);
++
++			break;
++		}
++	}
++}
++
+ static int ne_enclave_release(struct inode *inode, struct file *file)
+ {
 +	struct ne_pci_dev_cmd_reply cmd_reply = {};
-+	struct enclave_start_req enclave_start_req = {};
++	struct enclave_stop_req enclave_stop_request = {};
++	struct ne_enclave *ne_enclave = file->private_data;
++	struct ne_pci_dev *ne_pci_dev = NULL;
 +	int rc = -EINVAL;
++	struct slot_free_req slot_free_req = {};
 +
 +	BUG_ON(!ne_enclave);
 +	BUG_ON(!ne_enclave->pdev);
 +
-+	if (WARN_ON(!enclave_start_metadata))
-+		return -EINVAL;
++	ne_pci_dev = pci_get_drvdata(ne_enclave->pdev);
++	BUG_ON(!ne_pci_dev);
 +
-+	enclave_start_metadata->slot_uid = ne_enclave->slot_uid;
++	/*
++	 * Acquire the enclave list mutex before the enclave mutex
++	 * in order to avoid deadlocks with @ref ne_event_work_handler.
++	 */
++	mutex_lock(&ne_pci_dev->enclaves_list_mutex);
++	mutex_lock(&ne_enclave->enclave_info_mutex);
 +
-+	enclave_start_req.enclave_cid = enclave_start_metadata->enclave_cid;
-+	enclave_start_req.flags = enclave_start_metadata->flags;
-+	enclave_start_req.slot_uid = enclave_start_metadata->slot_uid;
++	if (ne_enclave->state != NE_STATE_INIT &&
++	    ne_enclave->state != NE_STATE_STOPPED) {
++		enclave_stop_request.slot_uid = ne_enclave->slot_uid;
 +
-+	rc = ne_do_request(ne_enclave->pdev, ENCLAVE_START, &enclave_start_req,
-+			   sizeof(enclave_start_req), &cmd_reply,
-+			   sizeof(cmd_reply));
-+	if (rc < 0) {
-+		pr_err_ratelimited("Failure in enclave start [rc=%d]\n", rc);
-+
-+		return rc;
-+	}
-+
-+	ne_enclave->state = NE_STATE_RUNNING;
-+
-+	enclave_start_metadata->enclave_cid = cmd_reply.enclave_cid;
-+
-+	return 0;
-+}
-+
- static int ne_enclave_open(struct inode *node, struct file *file)
- {
- 	return 0;
-@@ -521,6 +568,42 @@ static long ne_enclave_ioctl(struct file *file, unsigned int cmd,
- 		return rc;
- 	}
- 
-+	case NE_ENCLAVE_START: {
-+		struct enclave_start_metadata enclave_start_metadata = {};
-+		int rc = -EINVAL;
-+
-+		if (copy_from_user(&enclave_start_metadata, (void *)arg,
-+				   sizeof(enclave_start_metadata))) {
-+			pr_err_ratelimited("Failure in copy from user\n");
-+
-+			return -EFAULT;
-+		}
-+
-+		mutex_lock(&ne_enclave->enclave_info_mutex);
-+
-+		if (!cpumask_empty(ne_enclave->cpu_siblings)) {
-+			pr_err_ratelimited("Enclave has CPU siblings avail\n");
++		rc = ne_do_request(ne_enclave->pdev, ENCLAVE_STOP,
++				   &enclave_stop_request,
++				   sizeof(enclave_stop_request), &cmd_reply,
++				   sizeof(cmd_reply));
++		if (WARN_ON(rc < 0)) {
++			pr_err_ratelimited("Failure in enclave stop [rc=%d]\n",
++					   rc);
 +
 +			mutex_unlock(&ne_enclave->enclave_info_mutex);
++			mutex_unlock(&ne_pci_dev->enclaves_list_mutex);
 +
-+			return -EINVAL;
++			return rc;
 +		}
 +
-+		rc = ne_enclave_start_ioctl(ne_enclave,
-+					    &enclave_start_metadata);
++		memset(&cmd_reply, 0, sizeof(cmd_reply));
++	}
++
++	slot_free_req.slot_uid = ne_enclave->slot_uid;
++
++	rc = ne_do_request(ne_enclave->pdev, SLOT_FREE, &slot_free_req,
++			   sizeof(slot_free_req), &cmd_reply,
++			   sizeof(cmd_reply));
++	if (WARN_ON(rc < 0)) {
++		pr_err_ratelimited("Failure in slot free [rc=%d]\n", rc);
 +
 +		mutex_unlock(&ne_enclave->enclave_info_mutex);
-+
-+		if (copy_to_user((void *)arg, &enclave_start_metadata,
-+				 sizeof(enclave_start_metadata))) {
-+			pr_err_ratelimited("Failure in copy to user\n");
-+
-+			return -EFAULT;
-+		}
++		mutex_unlock(&ne_pci_dev->enclaves_list_mutex);
 +
 +		return rc;
 +	}
 +
- 	default:
- 		return -ENOTTY;
- 	}
++	ne_pci_dev_remove_enclave_entry(ne_enclave, ne_pci_dev);
++	ne_enclave_remove_all_mem_region_entries(ne_enclave);
++	ne_enclave_remove_all_vcpu_id_entries(ne_enclave);
++
++	mutex_unlock(&ne_enclave->enclave_info_mutex);
++	mutex_unlock(&ne_pci_dev->enclaves_list_mutex);
++
++	kzfree(ne_enclave);
++
+ 	return 0;
+ }
+ 
 -- 
 2.20.1 (Apple Git-117)
 
