@@ -2,43 +2,34 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8FF781B2F71
-	for <lists+kvm@lfdr.de>; Tue, 21 Apr 2020 20:44:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E02F71B2F88
+	for <lists+kvm@lfdr.de>; Tue, 21 Apr 2020 20:48:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729730AbgDUSoY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Apr 2020 14:44:24 -0400
-Received: from smtp-fw-33001.amazon.com ([207.171.190.10]:62594 "EHLO
-        smtp-fw-33001.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729704AbgDUSoX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Apr 2020 14:44:23 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1587494663; x=1619030663;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=x7e23kFiXkvUBqIe8e1beT+ixqa5FhXJH3ogwFK7OSU=;
-  b=vn/TA35TOdoOp+o/iwsowk/an8xoEc6JG1no/UuRS3QPLdcbHO63sW6t
-   sECpUucUJTm2x8rfcrz03MHfgjEYc++7mZa4kRkizUHQFWn4Z2Tt9Y8J9
-   Ww7LK0W14kzwrOhUZ/UfpoQYmFdPH+My0Fbxb9eJ+FNuadkPpYA+zls6/
-   Y=;
-IronPort-SDR: 6GB3xe8ItpdTWMUTW+vMRC6TZZZLRue50FgLVl+Eux87Zm7497NnDu+ILeFy356WlBd/pnb4dv
- tSyjFZ/rAolw==
-X-IronPort-AV: E=Sophos;i="5.72,411,1580774400"; 
-   d="scan'208";a="39978688"
-Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-2b-4ff6265a.us-west-2.amazon.com) ([10.47.23.38])
-  by smtp-border-fw-out-33001.sea14.amazon.com with ESMTP; 21 Apr 2020 18:44:23 +0000
-Received: from EX13MTAUEA002.ant.amazon.com (pdx4-ws-svc-p6-lb7-vlan3.pdx.amazon.com [10.170.41.166])
-        by email-inbound-relay-2b-4ff6265a.us-west-2.amazon.com (Postfix) with ESMTPS id 456D0A277D;
-        Tue, 21 Apr 2020 18:44:22 +0000 (UTC)
-Received: from EX13D16EUB003.ant.amazon.com (10.43.166.99) by
- EX13MTAUEA002.ant.amazon.com (10.43.61.77) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Tue, 21 Apr 2020 18:44:21 +0000
-Received: from 38f9d34ed3b1.ant.amazon.com (10.43.162.148) by
- EX13D16EUB003.ant.amazon.com (10.43.166.99) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Tue, 21 Apr 2020 18:44:13 +0000
-From:   Andra Paraschiv <andraprs@amazon.com>
-To:     <linux-kernel@vger.kernel.org>
-CC:     Anthony Liguori <aliguori@amazon.com>,
+        id S1726834AbgDUSr7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Apr 2020 14:47:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60502 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726012AbgDUSr6 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 21 Apr 2020 14:47:58 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9BC4C0610D5;
+        Tue, 21 Apr 2020 11:47:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
+        Content-Type:In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:
+        Subject:Sender:Reply-To:Content-ID:Content-Description;
+        bh=76M7+1Sr4SkV4k1jNKhJ5SiMeMdDXpYSUYbS88cAIiY=; b=ESaRYqCnMzn90s++UMzbJoGIdq
+        kOzlLzBzXljYc9c2vz8kRuhB2nCHJ8JQBakiMg+uqyl8sf58KN2DMyHTEYmSOGy4Wfn+BxKe5rIAr
+        wa/efYLiMhnnXg8NPALjtQJjS3bdy+/KvwCgPdZUitBY9OrvffP2ddMeLvsJsxNMlWnr7s5yN/fxr
+        jiqZT+jACsUqUQaGx4/cQwX1GQGbZzhKPUY7df4XAFFfjDj+XHXNTsQRsAmBfJQ6utni5ZAQ6gxg6
+        DK2zYvzEu07eLmt25cmKMsdZXlldDQGifRINMe9SQw5p5A4AGTpRv4XYh4I3uVunPz9ZJOQELktSx
+        WzDVOLWA==;
+Received: from [2601:1c0:6280:3f0::19c2]
+        by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1jQxw5-00071K-IU; Tue, 21 Apr 2020 18:47:57 +0000
+Subject: Re: [PATCH v1 01/15] nitro_enclaves: Add ioctl interface definition
+To:     Andra Paraschiv <andraprs@amazon.com>, linux-kernel@vger.kernel.org
+Cc:     Anthony Liguori <aliguori@amazon.com>,
         Benjamin Herrenschmidt <benh@amazon.com>,
         Colm MacCarthaigh <colmmacc@amazon.com>,
         Bjoern Doebel <doebel@amazon.de>,
@@ -50,58 +41,115 @@ CC:     Anthony Liguori <aliguori@amazon.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Balbir Singh <sblbir@amazon.com>,
         Stewart Smith <trawets@amazon.com>,
-        Uwe Dannowski <uwed@amazon.de>, <kvm@vger.kernel.org>,
-        <ne-devel-upstream@amazon.com>,
-        Andra Paraschiv <andraprs@amazon.com>
-Subject: [PATCH v1 15/15] MAINTAINERS: Add entry for the Nitro Enclaves driver
-Date:   Tue, 21 Apr 2020 21:41:50 +0300
-Message-ID: <20200421184150.68011-16-andraprs@amazon.com>
-X-Mailer: git-send-email 2.20.1 (Apple Git-117)
-In-Reply-To: <20200421184150.68011-1-andraprs@amazon.com>
+        Uwe Dannowski <uwed@amazon.de>, kvm@vger.kernel.org,
+        ne-devel-upstream@amazon.com
 References: <20200421184150.68011-1-andraprs@amazon.com>
+ <20200421184150.68011-2-andraprs@amazon.com>
+From:   Randy Dunlap <rdunlap@infradead.org>
+Message-ID: <7e0cb729-60ca-3b2e-909b-8883b24908a8@infradead.org>
+Date:   Tue, 21 Apr 2020 11:47:56 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-X-Originating-IP: [10.43.162.148]
-X-ClientProxiedBy: EX13D08UWB002.ant.amazon.com (10.43.161.168) To
- EX13D16EUB003.ant.amazon.com (10.43.166.99)
-Content-Type: text/plain; charset="us-ascii"
+In-Reply-To: <20200421184150.68011-2-andraprs@amazon.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Signed-off-by: Andra Paraschiv <andraprs@amazon.com>
----
- MAINTAINERS | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+Hi--
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index b816a453b10e..9625fadbd400 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -11956,6 +11956,17 @@ S:	Maintained
- T:	git git://git.kernel.org/pub/scm/linux/kernel/git/lftan/nios2.git
- F:	arch/nios2/
- 
-+NITRO ENCLAVES (NE)
-+M:	Andra Paraschiv <andraprs@amazon.com>
-+M:	Alexandru Vasile <lexnv@amazon.com>
-+M:	Alexandru Ciobotaru <alcioa@amazon.com>
-+L:	linux-kernel@vger.kernel.org
-+S:	Supported
-+W:	https://aws.amazon.com/ec2/nitro/nitro-enclaves/
-+F:	include/linux/nitro_enclaves.h
-+F:	include/uapi/linux/nitro_enclaves.h
-+F:	drivers/virt/amazon/nitro_enclaves/
-+
- NOHZ, DYNTICKS SUPPORT
- M:	Frederic Weisbecker <fweisbec@gmail.com>
- M:	Thomas Gleixner <tglx@linutronix.de>
+On 4/21/20 11:41 AM, Andra Paraschiv wrote:
+> The Nitro Enclaves driver handles the enclave lifetime management. This
+> includes enclave creation, termination and setting up its resources such
+> as memory and CPU.
+> 
+> An enclave runs alongside the VM that spawned it. It is abstracted as a
+> process running in the VM that launched it. The process interacts with
+> the NE driver, that exposes an ioctl interface for creating an enclave
+> and setting up its resources.
+> 
+> Include the KVM API as part of the provided ioctl interface, with an
+> additional ENCLAVE_START ioctl command that triggers the enclave run.
+> 
+> Signed-off-by: Alexandru Vasile <lexnv@amazon.com>
+> Signed-off-by: Andra Paraschiv <andraprs@amazon.com>
+> ---
+>  include/linux/nitro_enclaves.h      | 23 +++++++++++++
+>  include/uapi/linux/nitro_enclaves.h | 52 +++++++++++++++++++++++++++++
+>  2 files changed, 75 insertions(+)
+>  create mode 100644 include/linux/nitro_enclaves.h
+>  create mode 100644 include/uapi/linux/nitro_enclaves.h
+> 
+
+> diff --git a/include/uapi/linux/nitro_enclaves.h b/include/uapi/linux/nitro_enclaves.h
+> new file mode 100644
+> index 000000000000..b90dfcf6253a
+> --- /dev/null
+> +++ b/include/uapi/linux/nitro_enclaves.h
+> @@ -0,0 +1,52 @@
+> +/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+> +/*
+> + * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+> + *
+> + * This program is free software; you can redistribute it and/or modify it
+> + * under the terms and conditions of the GNU General Public License,
+> + * version 2, as published by the Free Software Foundation.
+> + *
+> + * This program is distributed in the hope that it will be useful,
+> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+> + * GNU General Public License for more details.
+> + *
+> + * You should have received a copy of the GNU General Public License
+> + * along with this program; if not, see <http://www.gnu.org/licenses/>.
+> + */
+> +
+> +#ifndef _UAPI_LINUX_NITRO_ENCLAVES_H_
+> +#define _UAPI_LINUX_NITRO_ENCLAVES_H_
+> +
+> +#include <linux/kvm.h>
+> +#include <linux/types.h>
+> +
+> +/* Nitro Enclaves (NE) Kernel Driver Interface */
+> +
+> +/**
+> + * The command is used to trigger enclave start after the enclave resources,
+> + * such as memory and CPU, have been set.
+> + *
+> + * The enclave start metadata is an in / out data structure. It includes
+> + * provided info by the caller - enclave cid and flags - and returns the
+> + * slot uid and the cid (if input cid is 0).
+> + */
+> +#define NE_ENCLAVE_START _IOWR('B', 0x1, struct enclave_start_metadata)
+
+Please document ioctl major ('B' in this case) and range used in
+Documentation/userspace-api/ioctl/ioctl-number.rst.
+
+> +
+> +/* Setup metadata necessary for enclave start. */
+> +struct enclave_start_metadata {
+> +	/* Flags for the enclave to start with (e.g. debug mode) (in). */
+> +	__u64 flags;
+> +
+> +	/**
+> +	 * Context ID (CID) for the enclave vsock device. If 0 as input, the
+> +	 * CID is autogenerated by the hypervisor and returned back as output
+> +	 * by the driver (in/out).
+> +	 */
+> +	__u64 enclave_cid;
+> +
+> +	/* Slot unique id mapped to the enclave to start (out). */
+> +	__u64 slot_uid;
+> +};
+> +
+> +#endif /* _UAPI_LINUX_NITRO_ENCLAVES_H_ */
+> 
+
+thanks.
 -- 
-2.20.1 (Apple Git-117)
-
-
-
-
-Amazon Development Center (Romania) S.R.L. registered office: 27A Sf. Lazar Street, UBC5, floor 2, Iasi, Iasi County, 700045, Romania. Registered in Romania. Registration number J22/2621/2005.
+~Randy
 
