@@ -2,166 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4445B1B2297
-	for <lists+kvm@lfdr.de>; Tue, 21 Apr 2020 11:24:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 88F131B22A0
+	for <lists+kvm@lfdr.de>; Tue, 21 Apr 2020 11:25:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728400AbgDUJYl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Apr 2020 05:24:41 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:25226 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726120AbgDUJYl (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 21 Apr 2020 05:24:41 -0400
+        id S1728453AbgDUJZj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Apr 2020 05:25:39 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:41652 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727120AbgDUJZj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Apr 2020 05:25:39 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1587461079;
+        s=mimecast20190719; t=1587461137;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=qO6ssvqEBM5SQj4OVLjUUnzTm6CbFu0uFAR4ov6Q/74=;
-        b=BDDFsOSTiaLD0oFf+gYGilXP6ruGgh6U8QHwkaFT51ieEW+malW0jcokIgY5mHfACJEk+5
-        mAjE/Xk5c9qjA9l+9qIn0+6IcUCFuqE+5NG87YgXxatknPvjm4TOCYoFGkhEErXwE+v6JQ
-        q5aXBpZTUf1cgPwl98XbDViQO0x4qoc=
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=s6kZIJazKnfeWw9rqRwxCTiV7lo+E1jRmgFL7mG8v1w=;
+        b=PU/ARCnzbHoIRw+5duN7yCVlaG+rYGBTgq6xo5xCGcjPJGdPAfoI5Y/KFqgvNJuEh2cLdE
+        QEM63eIFH43krdmX1Pahv763B0cevLwlT1LGgCGnqZbdkvA4D/taptJdFz/qSszOibq9ep
+        xbqwtS7ZLK2sQVfapxH9e5eTDlDlcC4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-350-YXjLnV3jO9m0jbJBQ0bi8g-1; Tue, 21 Apr 2020 05:24:37 -0400
-X-MC-Unique: YXjLnV3jO9m0jbJBQ0bi8g-1
+ us-mta-252-pZMfjWLMOayjYnBl4uIC7Q-1; Tue, 21 Apr 2020 05:25:36 -0400
+X-MC-Unique: pZMfjWLMOayjYnBl4uIC7Q-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DFAFA107ACC9;
-        Tue, 21 Apr 2020 09:24:35 +0000 (UTC)
-Received: from gondolin (ovpn-112-226.ams2.redhat.com [10.36.112.226])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 78ACA60C87;
-        Tue, 21 Apr 2020 09:24:34 +0000 (UTC)
-Date:   Tue, 21 Apr 2020 11:24:31 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Eric Farman <farman@linux.ibm.com>
-Cc:     linux-s390@vger.kernel.org, kvm@vger.kernel.org,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Jason Herne <jjherne@linux.ibm.com>,
-        Jared Rossi <jrossi@linux.ibm.com>
-Subject: Re: [PATCH v3 4/8] vfio-ccw: Introduce a new schib region
-Message-ID: <20200421112431.01440c58.cohuck@redhat.com>
-In-Reply-To: <20200417023001.65006-5-farman@linux.ibm.com>
-References: <20200417023001.65006-1-farman@linux.ibm.com>
-        <20200417023001.65006-5-farman@linux.ibm.com>
-Organization: Red Hat GmbH
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CFCE48017F3;
+        Tue, 21 Apr 2020 09:25:34 +0000 (UTC)
+Received: from steredhat.redhat.com (ovpn-114-101.ams2.redhat.com [10.36.114.101])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A499A60C87;
+        Tue, 21 Apr 2020 09:25:28 +0000 (UTC)
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     davem@davemloft.net
+Cc:     virtualization@lists.linux-foundation.org,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+        kvm@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
+        Gerard Garcia <ggarcia@abra.uab.cat>
+Subject: [PATCH net] vsock/virtio: postpone packet delivery to monitoring devices
+Date:   Tue, 21 Apr 2020 11:25:27 +0200
+Message-Id: <20200421092527.41651-1-sgarzare@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 17 Apr 2020 04:29:57 +0200
-Eric Farman <farman@linux.ibm.com> wrote:
+We delivering packets to monitoring devices, before to check if
+the virtqueue has enough space.
 
-> From: Farhan Ali <alifm@linux.ibm.com>
-> 
-> The schib region can be used by userspace to get the subchannel-
-> information block (SCHIB) for the passthrough subchannel.
-> This can be useful to get information such as channel path
-> information via the SCHIB.PMCW fields.
-> 
-> Signed-off-by: Farhan Ali <alifm@linux.ibm.com>
-> Signed-off-by: Eric Farman <farman@linux.ibm.com>
-> ---
-> 
-> Notes:
->     v2->v3:
->      - Updated Copyright year and Authors [CH]
->      - Mention that schib region triggers a STSCH [CH]
->     
->     v1->v2:
->      - Add new region info to Documentation/s390/vfio-ccw.rst [CH]
->      - Add a block comment to struct ccw_schib_region [CH]
->     
->     v0->v1: [EF]
->      - Clean up checkpatch (#include, whitespace) errors
->      - Remove unnecessary includes from vfio_ccw_chp.c
->      - Add ret=-ENOMEM in error path for new region
->      - Add call to vfio_ccw_unregister_dev_regions() during error exit
->        path of vfio_ccw_mdev_open()
->      - New info on the module prologue
->      - Reorder cleanup of regions
-> 
->  Documentation/s390/vfio-ccw.rst     | 19 +++++++-
->  drivers/s390/cio/Makefile           |  2 +-
->  drivers/s390/cio/vfio_ccw_chp.c     | 76 +++++++++++++++++++++++++++++
->  drivers/s390/cio/vfio_ccw_drv.c     | 20 ++++++++
->  drivers/s390/cio/vfio_ccw_ops.c     | 14 +++++-
->  drivers/s390/cio/vfio_ccw_private.h |  3 ++
->  include/uapi/linux/vfio.h           |  1 +
->  include/uapi/linux/vfio_ccw.h       | 10 ++++
->  8 files changed, 141 insertions(+), 4 deletions(-)
->  create mode 100644 drivers/s390/cio/vfio_ccw_chp.c
-> 
+If the virtqueue is full, the transmitting packet is queued up
+and it will be sent in the next iteration. This causes the same
+packet to be delivered multiple times to monitoring devices.
 
-(...)
+This patch fixes this issue, postponing the packet delivery
+to monitoring devices, only when it is properly queued in the
+virqueue.
 
-> +static ssize_t vfio_ccw_schib_region_read(struct vfio_ccw_private *private,
-> +					  char __user *buf, size_t count,
-> +					  loff_t *ppos)
-> +{
-> +	unsigned int i = VFIO_CCW_OFFSET_TO_INDEX(*ppos) - VFIO_CCW_NUM_REGIONS;
-> +	loff_t pos = *ppos & VFIO_CCW_OFFSET_MASK;
-> +	struct ccw_schib_region *region;
-> +	int ret;
-> +
-> +	if (pos + count > sizeof(*region))
-> +		return -EINVAL;
-> +
-> +	mutex_lock(&private->io_mutex);
-> +	region = private->region[i].data;
-> +
-> +	if (cio_update_schib(private->sch)) {
-> +		ret = -ENODEV;
-> +		goto out;
-> +	}
-> +
-> +	memcpy(region, &private->sch->schib, sizeof(*region));
-> +
-> +	if (copy_to_user(buf, (void *)region + pos, count)) {
-> +		ret = -EFAULT;
-> +		goto out;
-> +	}
-> +
-> +	ret = count;
-> +
-> +out:
-> +	mutex_unlock(&private->io_mutex);
-> +	return ret;
-> +}
-> +
-> +static ssize_t vfio_ccw_schib_region_write(struct vfio_ccw_private *private,
-> +					   const char __user *buf, size_t count,
-> +					   loff_t *ppos)
-> +{
-> +	return -EINVAL;
-> +}
+Fixes: 82dfb540aeb2 ("VSOCK: Add virtio vsock vsockmon hooks")
+Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+---
+ net/vmw_vsock/virtio_transport.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-I'm wondering if we should make this callback optional (not in this patch).
-
-> +
-> +
-> +static void vfio_ccw_schib_region_release(struct vfio_ccw_private *private,
-> +					  struct vfio_ccw_region *region)
-> +{
-> +
-> +}
-
-Same here.
-
-> +
-> +const struct vfio_ccw_regops vfio_ccw_schib_region_ops = {
-> +	.read = vfio_ccw_schib_region_read,
-> +	.write = vfio_ccw_schib_region_write,
-> +	.release = vfio_ccw_schib_region_release,
-> +};
-
-(...)
-
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_tran=
+sport.c
+index dfbaf6bd8b1c..d8db837a96fe 100644
+--- a/net/vmw_vsock/virtio_transport.c
++++ b/net/vmw_vsock/virtio_transport.c
+@@ -115,8 +115,6 @@ virtio_transport_send_pkt_work(struct work_struct *wo=
+rk)
+ 		list_del_init(&pkt->list);
+ 		spin_unlock_bh(&vsock->send_pkt_list_lock);
+=20
+-		virtio_transport_deliver_tap_pkt(pkt);
+-
+ 		reply =3D pkt->reply;
+=20
+ 		sg_init_one(&hdr, &pkt->hdr, sizeof(pkt->hdr));
+@@ -137,6 +135,11 @@ virtio_transport_send_pkt_work(struct work_struct *w=
+ork)
+ 			break;
+ 		}
+=20
++		/* Deliver to monitoring devices all correctly transmitted
++		 * packets.
++		 */
++		virtio_transport_deliver_tap_pkt(pkt);
++
+ 		if (reply) {
+ 			struct virtqueue *rx_vq =3D vsock->vqs[VSOCK_VQ_RX];
+ 			int val;
+--=20
+2.25.3
 
