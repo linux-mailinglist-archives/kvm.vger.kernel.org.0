@@ -2,79 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E05091B3077
-	for <lists+kvm@lfdr.de>; Tue, 21 Apr 2020 21:36:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EFDD71B3091
+	for <lists+kvm@lfdr.de>; Tue, 21 Apr 2020 21:40:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726234AbgDUTgD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Apr 2020 15:36:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39784 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725930AbgDUTgC (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 21 Apr 2020 15:36:02 -0400
-Received: from mail-lj1-x241.google.com (mail-lj1-x241.google.com [IPv6:2a00:1450:4864:20::241])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43596C0610D6
-        for <kvm@vger.kernel.org>; Tue, 21 Apr 2020 12:36:02 -0700 (PDT)
-Received: by mail-lj1-x241.google.com with SMTP id f18so9232682lja.13
-        for <kvm@vger.kernel.org>; Tue, 21 Apr 2020 12:36:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=soISMDc5vWhNYzK+GwCUX1p3xFLbvdhV8HpKz6VNPro=;
-        b=cWm26Mw32WNe1HlZTZP1780+TbW6oTXKHG8/Jk3ZsVNovz7AVAIUeJ7MlbzoLXHWC1
-         YavoHy/0AyrgjNdVf1YNA0w0DId/VE3w8ic/s/3ZmNo/liIm2sWDUAEsH4g197A8jpoQ
-         QPWMFJ1Qd+bipFsUJFsbEyTMK2eZKmQWkX6u8=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=soISMDc5vWhNYzK+GwCUX1p3xFLbvdhV8HpKz6VNPro=;
-        b=QYvTPf9sirFBEzXb/rLo1II2iSm39ZalFWzMKgOlvZfyIVV7jhGnM/5YaFMEMicQRY
-         9cv/izQoosdTLr4ahiOYTyAQYgXS/XD0xQigVC5tE3DkA+z00qwU/qikswG7cCKjshsW
-         jOM9ZgycU2wIf1rUm5F9e6kpHYKsBjsvoKAcQ/Uk4dmbmhr+NwlHMCK/PKeApi/v7lUM
-         kUFQqsrBCBsSUARS9AJ9i4Eqcoht3EM2Q8bAszWByG83Aa8cTdRdxaS+dNCsGxfAGj00
-         4flp72K2hNrU/4DuqHATmqrnUfh6QKKpNSAahTD21krDCpFEeX1XZ6BOYL5LO9XwkiAi
-         OVDA==
-X-Gm-Message-State: AGi0PuZHX6xr2/bqh615i0HTUtwEH2lDHWbREY9/qVzr04x5oRPgnQRx
-        hRkxpZvI5NBsNoHXPViJCfxhYTRlg3k=
-X-Google-Smtp-Source: APiQypInz6O7Q4IOF9JIZLhxWnkITZ/FXlUQxpyP4R/TFWmPjM6FTDk/OLzHIYysAuetnsSYO58atA==
-X-Received: by 2002:a2e:9490:: with SMTP id c16mr7247046ljh.110.1587497760187;
-        Tue, 21 Apr 2020 12:36:00 -0700 (PDT)
-Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com. [209.85.208.179])
-        by smtp.gmail.com with ESMTPSA id r206sm2765891lff.65.2020.04.21.12.35.58
-        for <kvm@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 21 Apr 2020 12:35:59 -0700 (PDT)
-Received: by mail-lj1-f179.google.com with SMTP id u6so15275381ljl.6
-        for <kvm@vger.kernel.org>; Tue, 21 Apr 2020 12:35:58 -0700 (PDT)
-X-Received: by 2002:a05:651c:319:: with SMTP id a25mr2085741ljp.209.1587497758653;
- Tue, 21 Apr 2020 12:35:58 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200421160651.19274-1-pbonzini@redhat.com>
-In-Reply-To: <20200421160651.19274-1-pbonzini@redhat.com>
-From:   Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Tue, 21 Apr 2020 12:35:42 -0700
-X-Gmail-Original-Message-ID: <CAHk-=whVo7CzzjEYp+G7+MjNSg4cURR4SeUTvQSYVBFn3o5TPw@mail.gmail.com>
-Message-ID: <CAHk-=whVo7CzzjEYp+G7+MjNSg4cURR4SeUTvQSYVBFn3o5TPw@mail.gmail.com>
-Subject: Re: [GIT PULL] KVM changes for Linux 5.7-rc3
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        KVM list <kvm@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        id S1726403AbgDUTkX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Apr 2020 15:40:23 -0400
+Received: from mail.kernel.org ([198.145.29.99]:39158 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726378AbgDUTkV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Apr 2020 15:40:21 -0400
+Subject: Re: [GIT PULL v2] vhost: cleanups and fixes
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1587498020;
+        bh=EdT/q7UFfZCJ31DJSxP12Wv8fYBVt6LXEKfaUOq3cKk=;
+        h=From:In-Reply-To:References:Date:To:Cc:From;
+        b=ksZauvLKnCWKE88mDN9PHb1ELnMSZjfAyUeR5AXARuo99zjbilN/ya1702AYdcM1l
+         WFr/a4K6IQ49UcRqh/Y+GLb/yRqOITIctLlddEepYymYB8mQCCjoeW4qspaTJIsd8e
+         6Q0kIG/VXukPYsyypOicpW6i97bM40fb+8l3dREU=
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <20200420160001-mutt-send-email-mst@kernel.org>
+References: <20200420160001-mutt-send-email-mst@kernel.org>
+X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
+X-PR-Tracked-Message-Id: <20200420160001-mutt-send-email-mst@kernel.org>
+X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
+X-PR-Tracked-Commit-Id: d085eb8ce727e581abf8145244eaa3339021be2f
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 189522da8b3a796d56d802e067d591d2ffff7f40
+Message-Id: <158749802063.25518.14503910452719540577.pr-tracker-bot@kernel.org>
+Date:   Tue, 21 Apr 2020 19:40:20 +0000
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        alexander.h.duyck@linux.intel.com, arnd@arndb.de,
+        bjorn.andersson@linaro.org, eli@mellanox.com, eperezma@redhat.com,
+        gustavo@embeddedor.com, hulkci@huawei.com, jasowang@redhat.com,
+        mst@redhat.com, sfr@canb.auug.org.au, yanaijie@huawei.com,
+        yuehaibing@huawei.com
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Apr 21, 2020 at 9:07 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
->   https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
->
-> for you to fetch changes up to 00a6a5ef39e7db3648b35c86361058854db84c83:
+The pull request you sent on Mon, 20 Apr 2020 16:00:01 -0400:
 
-Did you perhaps forget to force-update that tag?
+> https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
 
-That tree still shows the tag from April 7 (that I merged in commit
-0339eb95403f).
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/189522da8b3a796d56d802e067d591d2ffff7f40
 
-                     Linus
+Thank you!
+
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.wiki.kernel.org/userdoc/prtracker
