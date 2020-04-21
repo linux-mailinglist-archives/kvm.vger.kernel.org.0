@@ -2,82 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F29D91B2B41
-	for <lists+kvm@lfdr.de>; Tue, 21 Apr 2020 17:35:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9813C1B2B75
+	for <lists+kvm@lfdr.de>; Tue, 21 Apr 2020 17:43:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726641AbgDUPf5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Apr 2020 11:35:57 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:27651 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725870AbgDUPf5 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 21 Apr 2020 11:35:57 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1587483355;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=PGNerKQ1UQx6WT1P5HU0VQqoOoFnJq56uynZHi+cqPw=;
-        b=PLjncxSMm4aH4eYJPLwK7Ezlco9aAueGQPly5ug06Wj0I7pKVu+KEgp4EGrw1znEuFrZnY
-        0AxhbiaAutKCpOC4swlteQUFR1c/XBipd4a+fx2AR+DF+LzNSREzgGw2joO7NCDgYtqL5h
-        nkLvQsVg4yYwI1AlWmlrCXcCpqj/fL0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-335-XULLsK9UOUaHAmQxCyg8NQ-1; Tue, 21 Apr 2020 11:35:50 -0400
-X-MC-Unique: XULLsK9UOUaHAmQxCyg8NQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C3AED1005510;
-        Tue, 21 Apr 2020 15:35:48 +0000 (UTC)
-Received: from gondolin (ovpn-112-226.ams2.redhat.com [10.36.112.226])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 5290A5C1B2;
-        Tue, 21 Apr 2020 15:35:47 +0000 (UTC)
-Date:   Tue, 21 Apr 2020 17:35:44 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Eric Farman <farman@linux.ibm.com>
-Cc:     linux-s390@vger.kernel.org, kvm@vger.kernel.org,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Jason Herne <jjherne@linux.ibm.com>,
-        Jared Rossi <jrossi@linux.ibm.com>
-Subject: Re: [PATCH v3 0/8] s390x/vfio-ccw: Channel Path Handling [KVM]
-Message-ID: <20200421173544.36b48657.cohuck@redhat.com>
-In-Reply-To: <20200417023001.65006-1-farman@linux.ibm.com>
-References: <20200417023001.65006-1-farman@linux.ibm.com>
-Organization: Red Hat GmbH
+        id S1729003AbgDUPmy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Apr 2020 11:42:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59890 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726043AbgDUPmx (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 21 Apr 2020 11:42:53 -0400
+Received: from mail-wr1-x443.google.com (mail-wr1-x443.google.com [IPv6:2a00:1450:4864:20::443])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 770B9C061A10;
+        Tue, 21 Apr 2020 08:42:51 -0700 (PDT)
+Received: by mail-wr1-x443.google.com with SMTP id u13so16992646wrp.3;
+        Tue, 21 Apr 2020 08:42:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=smCulfeM0i6IfFInFyIPYZ1woXDKmy7XMohFywAgL4M=;
+        b=onCE8a9sWDTMpHJ5MLfvbv+ZBUE9S/7Cs3Xj9v4QkmAOq146uMO5Q88FIh8aXfQI5Y
+         S5YfUqv+qeERvhQWTYVuY3JFHiVAHuW3PkT9/FFhAFrpc0JdmvZS/pM/knaJqY134q8d
+         e9aS1UdmHDsVjdyyXVBIirNFNxefJ+GJ/M4zBG3bBftaJzoMOBcicD44bKlI22xHawvX
+         Jr0rfBxUllcL0/m985SIa/9kUhDjqPhwWxSwSPS809RIT/w6F3avUqO09VZQopgtm7SM
+         NAyszST8DbAVDFgcqYB9jWb2BAi0byTeYKdvhOOtay3WGhEB1OWQLf/9bs8UkV3Z3TKr
+         nZtg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=smCulfeM0i6IfFInFyIPYZ1woXDKmy7XMohFywAgL4M=;
+        b=UXgG1vdHycWVsaA4cIpRepZf4cybBIF2iZF7Cn29yl7wUJghmUkJZN3+oBHpIPyflc
+         wrcbCeVaAcgz4LOpMSbbyeNPeIeloY+hJfwI9PqlCBCUXgkOTIVN/NxGH4B1HIGdF8C/
+         RqBRq+gwFB72h6OMEAoEl8hMZ/jSYwJbLfn8QxxPR0yvYdjeYKF1TmaKGA2ryCOty5R/
+         muhbbOIdKiSnMNUgKjj+LE1OG+l40BwOT+t516fKqgLUapfsHIuV454SRQxM6zFWgcvI
+         KTVMjyjvxq5Hpxd3Vy1CF/BCWHNrGedoF7oH3jeK7fW1K7bR4w4YT4XoiMuijUEQ/reA
+         buyw==
+X-Gm-Message-State: AGi0Pube5k/d55r+PMhXDhqYTC1BzT73o5DR65kdDg3b19FVJvw0ZPgO
+        rDGSrwiFydZabQ+7YjXoz+k=
+X-Google-Smtp-Source: APiQypLxhyUQuMLlC/lZYEOaNY6oE6EnQ7qLe9/IuAI2gTFFfZgl+/1BfhPKJow73lUllSKMMFd6mA==
+X-Received: by 2002:adf:e7ca:: with SMTP id e10mr25267486wrn.18.1587483770237;
+        Tue, 21 Apr 2020 08:42:50 -0700 (PDT)
+Received: from localhost ([51.15.41.238])
+        by smtp.gmail.com with ESMTPSA id a20sm4428579wra.26.2020.04.21.08.42.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 21 Apr 2020 08:42:48 -0700 (PDT)
+Date:   Tue, 21 Apr 2020 16:42:46 +0100
+From:   Stefan Hajnoczi <stefanha@gmail.com>
+To:     Stefano Garzarella <sgarzare@redhat.com>
+Cc:     davem@davemloft.net, Gerard Garcia <ggarcia@abra.uab.cat>,
+        kvm@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Jakub Kicinski <kuba@kernel.org>
+Subject: Re: [PATCH net] vsock/virtio: postpone packet delivery to monitoring
+ devices
+Message-ID: <20200421154246.GA47385@stefanha-x1.localdomain>
+References: <20200421092527.41651-1-sgarzare@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="jRHKVT23PllUwdXP"
+Content-Disposition: inline
+In-Reply-To: <20200421092527.41651-1-sgarzare@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 17 Apr 2020 04:29:53 +0200
-Eric Farman <farman@linux.ibm.com> wrote:
 
-> Here is a new pass at the channel-path handling code for vfio-ccw.
-> Changes from previous versions are recorded in git notes for each patch.
-> 
-> I dropped the "Remove inline get_schid()" patch from this version.
-> When I made the change suggested in v2, it seemed rather frivolous and
-> better to just drop it for the time being.
-> 
-> I suspect that patches 5 and 7 would be better squashed together, but I
-> have not done that here.  For future versions, I guess.
+--jRHKVT23PllUwdXP
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-The result also might get a bit large.
+On Tue, Apr 21, 2020 at 11:25:27AM +0200, Stefano Garzarella wrote:
+> We delivering packets to monitoring devices, before to check if
+> the virtqueue has enough space.
 
-> 
-> With this, and the corresponding QEMU series (to be posted momentarily),
-> applied I am able to configure off/on a CHPID (for example, by issuing
-> "chchp -c 0/1 xx" on the host), and the guest is able to see both the
-> events and reflect the updated path masks in its structures.
+"We [are] delivering packets" and "before to check" -> "before
+checking".  Perhaps it can be rewritten as:
 
-Basically, this looks good to me (modulo my comments).
+  Packets are delivered to monitoring devices before checking if the
+  virtqueue has enough space.
 
-One thing though that keeps coming up: do we need any kind of
-serialization? Can there be any confusion from concurrent reads from
-userspace, or are we sure that we always provide consistent data?
+>=20
+> If the virtqueue is full, the transmitting packet is queued up
+> and it will be sent in the next iteration. This causes the same
+> packet to be delivered multiple times to monitoring devices.
+>=20
+> This patch fixes this issue, postponing the packet delivery
+> to monitoring devices, only when it is properly queued in the
 
+s/,//
+
+> virqueue.
+
+s/virqueue/virtqueue/
+
+> @@ -137,6 +135,11 @@ virtio_transport_send_pkt_work(struct work_struct *w=
+ork)
+>  			break;
+>  		}
+> =20
+> +		/* Deliver to monitoring devices all correctly transmitted
+> +		 * packets.
+> +		 */
+> +		virtio_transport_deliver_tap_pkt(pkt);
+> +
+
+The device may see the tx packet and therefore receive a reply to it
+before we can call virtio_transport_deliver_tap_pkt().  Does this mean
+that replies can now appear in the packet capture before the transmitted
+packet?
+
+--jRHKVT23PllUwdXP
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl6fFHYACgkQnKSrs4Gr
+c8gyawf/T+a2xJRtBkyZjuaj7XH+djH+xU923vloo0YRur+sYDLhisPt7kU7x0E9
+NXQvUSZKmd8iUUUDDBeJPpa86l7OisNvebRkWrpj1pOWKl0aOiRG7h7nsRM7+0O4
+hZZ84Hpaq05u6KYAJvtwMXGBtb+Vn3m3CqLf2fEt+Z1xZ+laJhgQD66f/6/HEeVz
+Y2bBrSwjULMJSzy5rGaqDAeewofwWYdK6XPnNXsOHcfcCN3a3Ioy9/GcRfx/8paa
+vswqRKN0nbWhj/xk0dsWoK64CmBFZ7S2wDOztjQ6gtqZ9oG1LzMCWvv/JZADJAPX
+Z64ss/NhhySeVpAIhPrpkFXBVYFuLA==
+=zD+X
+-----END PGP SIGNATURE-----
+
+--jRHKVT23PllUwdXP--
