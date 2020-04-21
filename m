@@ -2,269 +2,159 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C6C631B1C04
-	for <lists+kvm@lfdr.de>; Tue, 21 Apr 2020 04:39:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DE64F1B1C89
+	for <lists+kvm@lfdr.de>; Tue, 21 Apr 2020 05:23:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726688AbgDUCjd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Apr 2020 22:39:33 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:27528 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726024AbgDUCjd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 Apr 2020 22:39:33 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1587436770;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=kmunxmRPWgsddlc22setU4RrPRi7Q8TgmUrkV++FWQ0=;
-        b=RpyVpNCWna/wX5c9CFJrslMXY0dMABUjCqkIAOk2Xsb2tLE/ja9PhN6i/NEA8Dr9j5Qf0o
-        GinQp2B9pJQ4zAdloDa/po3hlCI0h4uHVx4X+mjGRZpxCU7CxAzjzYKt2aM3aRSo3r/T27
-        TugmqrM2sTh4HFetStGvszxdtoWK06s=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-260-897cG6v6OymdM3U0rEwCQA-1; Mon, 20 Apr 2020 22:39:26 -0400
-X-MC-Unique: 897cG6v6OymdM3U0rEwCQA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3E70C8017F3;
-        Tue, 21 Apr 2020 02:39:25 +0000 (UTC)
-Received: from [10.72.12.74] (ovpn-12-74.pek2.redhat.com [10.72.12.74])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id ACD1C48;
-        Tue, 21 Apr 2020 02:39:20 +0000 (UTC)
-Subject: Re: [PATCH v3] virtio: force spec specified alignment on types
-To:     "Michael S. Tsirkin" <mst@redhat.com>, linux-kernel@vger.kernel.org
-Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org
-References: <20200420204448.377168-1-mst@redhat.com>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <a4939aeb-ed9d-a6af-1c70-c6c2513e86e2@redhat.com>
-Date:   Tue, 21 Apr 2020 10:39:19 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
-MIME-Version: 1.0
-In-Reply-To: <20200420204448.377168-1-mst@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-Content-Transfer-Encoding: quoted-printable
+        id S1727928AbgDUDXY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Apr 2020 23:23:24 -0400
+Received: from foss.arm.com ([217.140.110.172]:57300 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725989AbgDUDXY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 Apr 2020 23:23:24 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 601D331B;
+        Mon, 20 Apr 2020 20:23:23 -0700 (PDT)
+Received: from entos-d05.shanghai.arm.com (entos-d05.shanghai.arm.com [10.169.40.35])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 7ADBD3F6CF;
+        Mon, 20 Apr 2020 20:23:16 -0700 (PDT)
+From:   Jianyong Wu <jianyong.wu@arm.com>
+To:     netdev@vger.kernel.org, yangbo.lu@nxp.com, john.stultz@linaro.org,
+        tglx@linutronix.de, pbonzini@redhat.com,
+        sean.j.christopherson@intel.com, maz@kernel.org,
+        richardcochran@gmail.com, Mark.Rutland@arm.com, will@kernel.org,
+        suzuki.poulose@arm.com, steven.price@arm.com
+Cc:     linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        Steve.Capper@arm.com, Kaly.Xin@arm.com, justin.he@arm.com,
+        jianyong.wu@arm.com, nd@arm.com
+Subject: [RFC PATCH v11 0/9] Enable ptp_kvm for arm64
+Date:   Tue, 21 Apr 2020 11:22:55 +0800
+Message-Id: <20200421032304.26300-1-jianyong.wu@arm.com>
+X-Mailer: git-send-email 2.17.1
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+kvm ptp targets to provide high precision time sync between guest
+and host in virtualization environment. Here, we enable kvm ptp
+for arm64.
 
-On 2020/4/21 =E4=B8=8A=E5=8D=884:46, Michael S. Tsirkin wrote:
-> The ring element addresses are passed between components with different
-> alignments assumptions. Thus, if guest/userspace selects a pointer and
-> host then gets and dereferences it, we might need to decrease the
-> compiler-selected alignment to prevent compiler on the host from
-> assuming pointer is aligned.
->
-> This actually triggers on ARM with -mabi=3Dapcs-gnu - which is a
-> deprecated configuration, but it seems safer to handle this
-> generally.
->
-> Note that userspace that allocates the memory is actually OK and does
-> not need to be fixed, but userspace that gets it from guest or another
-> process does need to be fixed. The later doesn't generally talk to the
-> kernel so while it might be buggy it's not talking to the kernel in the
-> buggy way - it's just using the header in the buggy way - so fixing
-> header and asking userspace to recompile is the best we can do.
->
-> I verified that the produced kernel binary on x86 is exactly identical
-> before and after the change.
->
-> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> ---
->
-> changes from v2:
-> 	add vring_used_elem_t to ensure alignment for substructures
-> changes from v1:
-> 	swicth all __user to the new typedefs
->
->   drivers/vhost/vhost.c            |  8 +++---
->   drivers/vhost/vhost.h            |  6 ++---
->   drivers/vhost/vringh.c           |  6 ++---
->   include/linux/vringh.h           |  6 ++---
->   include/uapi/linux/virtio_ring.h | 43 ++++++++++++++++++++++++-------=
--
->   5 files changed, 45 insertions(+), 24 deletions(-)
->
-> diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
-> index d450e16c5c25..bc77b0f465fd 100644
-> --- a/drivers/vhost/vhost.c
-> +++ b/drivers/vhost/vhost.c
-> @@ -1244,9 +1244,9 @@ static int vhost_iotlb_miss(struct vhost_virtqueu=
-e *vq, u64 iova, int access)
->   }
->  =20
->   static bool vq_access_ok(struct vhost_virtqueue *vq, unsigned int num=
-,
-> -			 struct vring_desc __user *desc,
-> -			 struct vring_avail __user *avail,
-> -			 struct vring_used __user *used)
-> +			 vring_desc_t __user *desc,
-> +			 vring_avail_t __user *avail,
-> +			 vring_used_t __user *used)
->  =20
->   {
->   	return access_ok(desc, vhost_get_desc_size(vq, num)) &&
-> @@ -2301,7 +2301,7 @@ static int __vhost_add_used_n(struct vhost_virtqu=
-eue *vq,
->   			    struct vring_used_elem *heads,
->   			    unsigned count)
->   {
-> -	struct vring_used_elem __user *used;
-> +	vring_used_elem_t __user *used;
->   	u16 old, new;
->   	int start;
->  =20
-> diff --git a/drivers/vhost/vhost.h b/drivers/vhost/vhost.h
-> index f8403bd46b85..60cab4c78229 100644
-> --- a/drivers/vhost/vhost.h
-> +++ b/drivers/vhost/vhost.h
-> @@ -67,9 +67,9 @@ struct vhost_virtqueue {
->   	/* The actual ring of buffers. */
->   	struct mutex mutex;
->   	unsigned int num;
-> -	struct vring_desc __user *desc;
-> -	struct vring_avail __user *avail;
-> -	struct vring_used __user *used;
-> +	vring_desc_t __user *desc;
-> +	vring_avail_t __user *avail;
-> +	vring_used_t __user *used;
->   	const struct vhost_iotlb_map *meta_iotlb[VHOST_NUM_ADDRS];
->   	struct file *kick;
->   	struct eventfd_ctx *call_ctx;
-> diff --git a/drivers/vhost/vringh.c b/drivers/vhost/vringh.c
-> index ba8e0d6cfd97..e059a9a47cdf 100644
-> --- a/drivers/vhost/vringh.c
-> +++ b/drivers/vhost/vringh.c
-> @@ -620,9 +620,9 @@ static inline int xfer_to_user(const struct vringh =
-*vrh,
->    */
->   int vringh_init_user(struct vringh *vrh, u64 features,
->   		     unsigned int num, bool weak_barriers,
-> -		     struct vring_desc __user *desc,
-> -		     struct vring_avail __user *avail,
-> -		     struct vring_used __user *used)
-> +		     vring_desc_t __user *desc,
-> +		     vring_avail_t __user *avail,
-> +		     vring_used_t __user *used)
->   {
->   	/* Sane power of 2 please! */
->   	if (!num || num > 0xffff || (num & (num - 1))) {
-> diff --git a/include/linux/vringh.h b/include/linux/vringh.h
-> index 9e2763d7c159..59bd50f99291 100644
-> --- a/include/linux/vringh.h
-> +++ b/include/linux/vringh.h
-> @@ -105,9 +105,9 @@ struct vringh_kiov {
->   /* Helpers for userspace vrings. */
->   int vringh_init_user(struct vringh *vrh, u64 features,
->   		     unsigned int num, bool weak_barriers,
-> -		     struct vring_desc __user *desc,
-> -		     struct vring_avail __user *avail,
-> -		     struct vring_used __user *used);
-> +		     vring_desc_t __user *desc,
-> +		     vring_avail_t __user *avail,
-> +		     vring_used_t __user *used);
->  =20
->   static inline void vringh_iov_init(struct vringh_iov *iov,
->   				   struct iovec *iovec, unsigned num)
-> diff --git a/include/uapi/linux/virtio_ring.h b/include/uapi/linux/virt=
-io_ring.h
-> index 9223c3a5c46a..b2c20f794472 100644
-> --- a/include/uapi/linux/virtio_ring.h
-> +++ b/include/uapi/linux/virtio_ring.h
-> @@ -86,6 +86,13 @@
->    * at the end of the used ring. Guest should ignore the used->flags f=
-ield. */
->   #define VIRTIO_RING_F_EVENT_IDX		29
->  =20
-> +/* Alignment requirements for vring elements.
-> + * When using pre-virtio 1.0 layout, these fall out naturally.
-> + */
-> +#define VRING_AVAIL_ALIGN_SIZE 2
-> +#define VRING_USED_ALIGN_SIZE 4
-> +#define VRING_DESC_ALIGN_SIZE 16
-> +
->   /* Virtio ring descriptors: 16 bytes.  These can chain together via "=
-next". */
->   struct vring_desc {
->   	/* Address (guest-physical). */
-> @@ -112,29 +119,43 @@ struct vring_used_elem {
->   	__virtio32 len;
->   };
->  =20
-> +typedef struct vring_used_elem __aligned(VRING_USED_ALIGN_SIZE)
-> +	vring_used_elem_t;
-> +
->   struct vring_used {
->   	__virtio16 flags;
->   	__virtio16 idx;
-> -	struct vring_used_elem ring[];
-> +	vring_used_elem_t ring[];
->   };
->  =20
-> +/*
-> + * The ring element addresses are passed between components with diffe=
-rent
-> + * alignments assumptions. Thus, we might need to decrease the compile=
-r-selected
-> + * alignment, and so must use a typedef to make sure the __aligned att=
-ribute
-> + * actually takes hold:
-> + *
-> + * https://gcc.gnu.org/onlinedocs//gcc/Common-Type-Attributes.html#Com=
-mon-Type-Attributes
-> + *
-> + * When used on a struct, or struct member, the aligned attribute can =
-only
-> + * increase the alignment; in order to decrease it, the packed attribu=
-te must
-> + * be specified as well. When used as part of a typedef, the aligned a=
-ttribute
-> + * can both increase and decrease alignment, and specifying the packed
-> + * attribute generates a warning.
-> + */
-> +typedef struct vring_desc __aligned(VRING_DESC_ALIGN_SIZE) vring_desc_=
-t;
-> +typedef struct vring_avail __aligned(VRING_AVAIL_ALIGN_SIZE) vring_ava=
-il_t;
-> +typedef struct vring_used __aligned(VRING_USED_ALIGN_SIZE) vring_used_=
-t;
+change log:
 
+from v11 to v10:
+        (1) rebase code on 5.7_rc2.
+        (2) remove support for arm32, as kvm support for arm32 will be
+removed [1]
+        (3) add error report in ptp_kvm initialization.
 
-I wonder whether we can simply use __attribute__(packed) instead?
+from v10 to v9:
+        (1) change code base to v5.5.
+	(2) enable ptp_kvm both for arm32 and arm64.
+        (3) let user choose which of virtual counter or physical counter
+should return when using crosstimestamp mode of ptp_kvm for arm/arm64.
+        (4) extend input argument for getcrosstimestamp API.
 
-Thanks
+from v8 to v9:
+        (1) move ptp_kvm.h to driver/ptp/
+        (2) replace license declaration of ptp_kvm.h the same with other
+header files in the same directory.
 
+from v7 to v8:
+        (1) separate adding clocksource id for arm_arch_counter as a
+single patch.
+        (2) update commit message for patch 4/8.
+        (3) refine patch 7/8 and patch 8/8 to make them more independent.
 
-> +
->   struct vring {
->   	unsigned int num;
->  =20
-> -	struct vring_desc *desc;
-> +	vring_desc_t *desc;
->  =20
-> -	struct vring_avail *avail;
-> +	vring_avail_t *avail;
->  =20
-> -	struct vring_used *used;
-> +	vring_used_t *used;
->   };
->  =20
-> -/* Alignment requirements for vring elements.
-> - * When using pre-virtio 1.0 layout, these fall out naturally.
-> - */
-> -#define VRING_AVAIL_ALIGN_SIZE 2
-> -#define VRING_USED_ALIGN_SIZE 4
-> -#define VRING_DESC_ALIGN_SIZE 16
-> -
->   #ifndef VIRTIO_RING_NO_LEGACY
->  =20
->   /* The standard layout for the ring is a continuous chunk of memory w=
-hich looks
+from v6 to v7:
+        (1) include the omitted clocksource_id.h in last version.
+        (2) reorder the header file in patch.
+        (3) refine some words in commit message to make it more impersonal.
+
+from v5 to v6:
+        (1) apply Mark's patch[4] to get SMCCC conduit.
+        (2) add mechanism to recognize current clocksource by add
+clocksouce_id value into struct clocksource instead of method in patch-v5.
+        (3) rename kvm_arch_ptp_get_clock_fn into
+kvm_arch_ptp_get_crosststamp.
+
+from v4 to v5:
+        (1) remove hvc delay compensasion as it should leave to userspace.
+        (2) check current clocksource in hvc call service.
+        (3) expose current clocksource by adding it to
+system_time_snapshot.
+        (4) add helper to check if clocksource is arm_arch_counter.
+        (5) rename kvm_ptp.c to ptp_kvm_common.c
+
+from v3 to v4:
+        (1) fix clocksource of ptp_kvm to arch_sys_counter.
+        (2) move kvm_arch_ptp_get_clock_fn into arm_arch_timer.c
+        (3) subtract cntvoff before return cycles from host.
+        (4) use ktime_get_snapshot instead of getnstimeofday and
+get_current_counterval to return time and counter value.
+        (5) split ktime and counter into two 32-bit block respectively
+to avoid Y2038-safe issue.
+        (6) set time compensation to device time as half of the delay of
+hvc call.
+        (7) add ARM_ARCH_TIMER as dependency of ptp_kvm for
+arm64.
+
+from v2 to v3:
+        (1) fix some issues in commit log.
+        (2) add some receivers in send list.
+
+from v1 to v2:
+        (1) move arch-specific code from arch/ to driver/ptp/
+        (2) offer mechanism to inform userspace if ptp_kvm service is
+available.
+        (3) separate ptp_kvm code for arm64 into hypervisor part and
+guest part.
+        (4) add API to expose monotonic clock and counter value.
+        (5) refine code: remove no necessary part and reconsitution.
+
+[1] https://patchwork.kernel.org/cover/11373351/
+
+Jianyong Wu (8):
+  psci: export psci conduit get helper.
+  ptp: Reorganize ptp_kvm modules to make it arch-independent.
+  clocksource: Add clocksource id for arm arch counter
+  psci: Add hypercall service for ptp_kvm.
+  ptp: arm64: Enable ptp_kvm for arm/arm64
+  ptp: extend input argument for getcrosstimestamp API
+  arm64: add mechanism to let user choose which counter to return
+  arm64: Add kvm capability check extension for ptp_kvm
+
+Thomas Gleixner (1):
+  time: Add mechanism to recognize clocksource in time_get_snapshot
+
+ drivers/clocksource/arm_arch_timer.c        | 33 ++++++++
+ drivers/firmware/psci/psci.c                |  1 +
+ drivers/net/ethernet/intel/e1000e/ptp.c     |  3 +-
+ drivers/ptp/Kconfig                         |  2 +-
+ drivers/ptp/Makefile                        |  1 +
+ drivers/ptp/ptp_chardev.c                   |  8 +-
+ drivers/ptp/ptp_kvm.h                       | 11 +++
+ drivers/ptp/ptp_kvm_arm64.c                 | 53 ++++++++++++
+ drivers/ptp/{ptp_kvm.c => ptp_kvm_common.c} | 85 ++++++--------------
+ drivers/ptp/ptp_kvm_x86.c                   | 89 +++++++++++++++++++++
+ include/linux/arm-smccc.h                   | 21 +++++
+ include/linux/clocksource.h                 |  6 ++
+ include/linux/clocksource_ids.h             | 12 +++
+ include/linux/ptp_clock_kernel.h            |  3 +-
+ include/linux/timekeeping.h                 | 12 +--
+ include/uapi/linux/kvm.h                    |  1 +
+ include/uapi/linux/ptp_clock.h              |  4 +-
+ kernel/time/clocksource.c                   |  3 +
+ kernel/time/timekeeping.c                   |  1 +
+ virt/kvm/arm/arm.c                          |  1 +
+ virt/kvm/arm/hypercalls.c                   | 44 +++++++++-
+ 21 files changed, 322 insertions(+), 72 deletions(-)
+ create mode 100644 drivers/ptp/ptp_kvm.h
+ create mode 100644 drivers/ptp/ptp_kvm_arm64.c
+ rename drivers/ptp/{ptp_kvm.c => ptp_kvm_common.c} (60%)
+ create mode 100644 drivers/ptp/ptp_kvm_x86.c
+ create mode 100644 include/linux/clocksource_ids.h
+
+-- 
+2.17.1
 
