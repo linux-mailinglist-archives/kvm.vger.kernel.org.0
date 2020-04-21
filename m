@@ -2,65 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 280051B30CC
-	for <lists+kvm@lfdr.de>; Tue, 21 Apr 2020 21:56:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8E7AB1B3134
+	for <lists+kvm@lfdr.de>; Tue, 21 Apr 2020 22:30:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726384AbgDUT4Y (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Apr 2020 15:56:24 -0400
-Received: from mail.kernel.org ([198.145.29.99]:47878 "EHLO mail.kernel.org"
+        id S1726151AbgDUUaW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Apr 2020 16:30:22 -0400
+Received: from mail.kernel.org ([198.145.29.99]:43836 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726379AbgDUT4W (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Apr 2020 15:56:22 -0400
-Received: from localhost (unknown [137.135.114.1])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id E9E3820774;
-        Tue, 21 Apr 2020 19:56:21 +0000 (UTC)
+        id S1726024AbgDUUaV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Apr 2020 16:30:21 -0400
+Subject: Re: [GIT PULL] KVM changes for Linux 5.7-rc3
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1587498982;
-        bh=Q38SnWOvz4AnBx07LWYwNxGnnvvT7pWqjzliwW5rQB8=;
-        h=Date:From:To:To:To:Cc:Cc:Cc:Subject:In-Reply-To:References:From;
-        b=ruVji9SgCdr/8ZmxfPRHsSVZjVD3JIF+5KINhiTaybm4z3AfwHG9N5JNss7Z+O9+8
-         YzdWM2rSo8HxSW8DEUzfozH+luyTZBCPq1DwbYxaFxclAO51U+FHPIhL7tttT5RYIc
-         chKRyXDRWJnBzBHQuUpEDG+cUVtqKC2JV7oh+29A=
-Date:   Tue, 21 Apr 2020 19:56:21 +0000
-From:   Sasha Levin <sashal@kernel.org>
-To:     Sasha Levin <sashal@kernel.org>
+        s=default; t=1587501020;
+        bh=engZtD2Byr5RNVmx4+QRjiZoeOI+oX+7T22guYnldLw=;
+        h=From:In-Reply-To:References:Date:To:Cc:From;
+        b=SON04QHRx3IFEjqIFis5u/ZUdV+t/flRU32973qWUsnIWwlXQJaolyovWTM1Yhjj8
+         WngXy/ybARAoHH/G4wSES/+cmQPXEPVlrt9UVhVgd5bIA24DLmFZqK/XZ9yjYRNCl7
+         mhHFJ4wj+u0zParG3ZCIJ1W2MJevo6WbeEmkG1Ak=
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <20200421160651.19274-1-pbonzini@redhat.com>
+References: <20200421160651.19274-1-pbonzini@redhat.com>
+X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
+X-PR-Tracked-Message-Id: <20200421160651.19274-1-pbonzini@redhat.com>
+X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/virt/kvm/kvm.git
+ tags/for-linus
+X-PR-Tracked-Commit-Id: 00a6a5ef39e7db3648b35c86361058854db84c83
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 8160a563cfff2a94e4ef20508961f1c9eead3b1f
+Message-Id: <158750102085.18550.2785276584947429254.pr-tracker-bot@kernel.org>
+Date:   Tue, 21 Apr 2020 20:30:20 +0000
 To:     Paolo Bonzini <pbonzini@redhat.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     stable@vger.kernel.org
-Cc:     stable@vger.kernel.org
-Subject: Re: [PATCH 1/2] KVM: SVM: avoid infinite loop on NPF from bad address
-In-Reply-To: <20200417163843.71624-2-pbonzini@redhat.com>
-References: <20200417163843.71624-2-pbonzini@redhat.com>
-Message-Id: <20200421195621.E9E3820774@mail.kernel.org>
+Cc:     torvalds@linux-foundation.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi
+The pull request you sent on Tue, 21 Apr 2020 12:06:51 -0400:
 
-[This is an automated email]
+> https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
 
-This commit has been processed because it contains a "Fixes:" tag
-fixing commit: 05d5a4863525 ("KVM: SVM: Workaround errata#1096 (insn_len maybe zero on SMAP violation)").
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/8160a563cfff2a94e4ef20508961f1c9eead3b1f
 
-The bot has tested the following trees: v5.6.5, v5.5.18, v5.4.33.
-
-v5.6.5: Build OK!
-v5.5.18: Failed to apply! Possible dependencies:
-    Unable to calculate
-
-v5.4.33: Failed to apply! Possible dependencies:
-    Unable to calculate
-
-
-NOTE: The patch will not be queued to stable trees until it is upstream.
-
-How should we proceed with this patch?
+Thank you!
 
 -- 
-Thanks
-Sasha
+Deet-doot-dot, I am a bot.
+https://korg.wiki.kernel.org/userdoc/prtracker
