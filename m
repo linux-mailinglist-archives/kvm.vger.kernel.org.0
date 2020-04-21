@@ -2,243 +2,269 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D08DB1B1C24
-	for <lists+kvm@lfdr.de>; Tue, 21 Apr 2020 04:47:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C6C631B1C04
+	for <lists+kvm@lfdr.de>; Tue, 21 Apr 2020 04:39:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727771AbgDUCrI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Apr 2020 22:47:08 -0400
-Received: from mga18.intel.com ([134.134.136.126]:13060 "EHLO mga18.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725829AbgDUCrH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 Apr 2020 22:47:07 -0400
-IronPort-SDR: qylJSn4JJpyTme1byj+Lb/KCNQdGRMIo5HySCD6a61/JNzxh4G+Qyk0POezus+soQVfSLwIPd0
- F4uuhqApxeOA==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Apr 2020 19:47:05 -0700
-IronPort-SDR: WP5a6nj6xJnEVl6WA5kdYckNG9hO3apk0/HSVypSAXzz/O+qEmu/5Om+1CgXcUIBycQs5Zk8tw
- 1T0Us5MYSZkA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.72,408,1580803200"; 
-   d="scan'208";a="279462298"
-Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040) ([10.239.13.16])
-  by fmsmga004.fm.intel.com with ESMTP; 20 Apr 2020 19:46:58 -0700
-Date:   Mon, 20 Apr 2020 22:37:18 -0400
-From:   Yan Zhao <yan.y.zhao@intel.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     Cornelia Huck <cohuck@redhat.com>,
-        "intel-gvt-dev@lists.freedesktop.org" 
-        <intel-gvt-dev@lists.freedesktop.org>,
-        "libvir-list@redhat.com" <libvir-list@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "aik@ozlabs.ru" <aik@ozlabs.ru>,
-        "Zhengxiao.zx@alibaba-inc.com" <Zhengxiao.zx@alibaba-inc.com>,
-        "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
-        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-        "eauger@redhat.com" <eauger@redhat.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>, "Zeng, Xin" <xin.zeng@intel.com>,
-        "Yang, Ziye" <ziye.yang@intel.com>,
-        "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
-        "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
-        "felipe@nutanix.com" <felipe@nutanix.com>,
-        "Liu, Changpeng" <changpeng.liu@intel.com>,
-        "Ken.Xue@amd.com" <Ken.Xue@amd.com>,
-        "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>,
-        "He, Shaopeng" <shaopeng.he@intel.com>,
-        "eskultet@redhat.com" <eskultet@redhat.com>,
-        "dgilbert@redhat.com" <dgilbert@redhat.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
-        "Wang, Zhi A" <zhi.a.wang@intel.com>,
-        "cjia@nvidia.com" <cjia@nvidia.com>,
-        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-        "berrange@redhat.com" <berrange@redhat.com>,
-        "dinechin@redhat.com" <dinechin@redhat.com>,
-        "corbet@lwn.net" <corbet@lwn.net>
-Subject: Re: [PATCH v5 0/4] introduction of migration_version attribute for
- VFIO live migration
-Message-ID: <20200421023718.GA12111@joy-OptiPlex-7040>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-References: <20200413055201.27053-1-yan.y.zhao@intel.com>
- <20200417104450.2d2f2fa9.cohuck@redhat.com>
- <20200417095202.GD16688@joy-OptiPlex-7040>
- <20200417132457.45d91fe3.cohuck@redhat.com>
- <20200420012457.GE16688@joy-OptiPlex-7040>
- <20200420165600.4951ae82@w520.home>
+        id S1726688AbgDUCjd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Apr 2020 22:39:33 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:27528 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726024AbgDUCjd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 Apr 2020 22:39:33 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1587436770;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=kmunxmRPWgsddlc22setU4RrPRi7Q8TgmUrkV++FWQ0=;
+        b=RpyVpNCWna/wX5c9CFJrslMXY0dMABUjCqkIAOk2Xsb2tLE/ja9PhN6i/NEA8Dr9j5Qf0o
+        GinQp2B9pJQ4zAdloDa/po3hlCI0h4uHVx4X+mjGRZpxCU7CxAzjzYKt2aM3aRSo3r/T27
+        TugmqrM2sTh4HFetStGvszxdtoWK06s=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-260-897cG6v6OymdM3U0rEwCQA-1; Mon, 20 Apr 2020 22:39:26 -0400
+X-MC-Unique: 897cG6v6OymdM3U0rEwCQA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3E70C8017F3;
+        Tue, 21 Apr 2020 02:39:25 +0000 (UTC)
+Received: from [10.72.12.74] (ovpn-12-74.pek2.redhat.com [10.72.12.74])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id ACD1C48;
+        Tue, 21 Apr 2020 02:39:20 +0000 (UTC)
+Subject: Re: [PATCH v3] virtio: force spec specified alignment on types
+To:     "Michael S. Tsirkin" <mst@redhat.com>, linux-kernel@vger.kernel.org
+Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org
+References: <20200420204448.377168-1-mst@redhat.com>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <a4939aeb-ed9d-a6af-1c70-c6c2513e86e2@redhat.com>
+Date:   Tue, 21 Apr 2020 10:39:19 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200420165600.4951ae82@w520.home>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+In-Reply-To: <20200420204448.377168-1-mst@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Apr 21, 2020 at 06:56:00AM +0800, Alex Williamson wrote:
-> On Sun, 19 Apr 2020 21:24:57 -0400
-> Yan Zhao <yan.y.zhao@intel.com> wrote:
-> 
-> > On Fri, Apr 17, 2020 at 07:24:57PM +0800, Cornelia Huck wrote:
-> > > On Fri, 17 Apr 2020 05:52:02 -0400
-> > > Yan Zhao <yan.y.zhao@intel.com> wrote:
-> > >   
-> > > > On Fri, Apr 17, 2020 at 04:44:50PM +0800, Cornelia Huck wrote:  
-> > > > > On Mon, 13 Apr 2020 01:52:01 -0400
-> > > > > Yan Zhao <yan.y.zhao@intel.com> wrote:
-> > > > >     
-> > > > > > This patchset introduces a migration_version attribute under sysfs of VFIO
-> > > > > > Mediated devices.
-> > > > > > 
-> > > > > > This migration_version attribute is used to check migration compatibility
-> > > > > > between two mdev devices.
-> > > > > > 
-> > > > > > Currently, it has two locations:
-> > > > > > (1) under mdev_type node,
-> > > > > >     which can be used even before device creation, but only for mdev
-> > > > > >     devices of the same mdev type.
-> > > > > > (2) under mdev device node,
-> > > > > >     which can only be used after the mdev devices are created, but the src
-> > > > > >     and target mdev devices are not necessarily be of the same mdev type
-> > > > > > (The second location is newly added in v5, in order to keep consistent
-> > > > > > with the migration_version node for migratable pass-though devices)    
-> > > > > 
-> > > > > What is the relationship between those two attributes?
-> > > > >     
-> > > > (1) is for mdev devices specifically, and (2) is provided to keep the same
-> > > > sysfs interface as with non-mdev cases. so (2) is for both mdev devices and
-> > > > non-mdev devices.
-> > > > 
-> > > > in future, if we enable vfio-pci vendor ops, (i.e. a non-mdev device
-> > > > is binding to vfio-pci, but is able to register migration region and do
-> > > > migration transactions from a vendor provided affiliate driver),
-> > > > the vendor driver would export (2) directly, under device node.
-> > > > It is not able to provide (1) as there're no mdev devices involved.  
-> > > 
-> > > Ok, creating an alternate attribute for non-mdev devices makes sense.
-> > > However, wouldn't that rather be a case (3)? The change here only
-> > > refers to mdev devices.
-> > >  
-> > as you pointed below, (3) and (2) serve the same purpose. 
-> > and I think a possible usage is to migrate between a non-mdev device and
-> > an mdev device. so I think it's better for them both to use (2) rather
-> > than creating (3).
-> 
-> An mdev type is meant to define a software compatible interface, so in
-> the case of mdev->mdev migration, doesn't migrating to a different type
-> fail the most basic of compatibility tests that we expect userspace to
-> perform?  IOW, if two mdev types are migration compatible, it seems a
-> prerequisite to that is that they provide the same software interface,
-> which means they should be the same mdev type.
-> 
-> In the hybrid cases of mdev->phys or phys->mdev, how does a management
-> tool begin to even guess what might be compatible?  Are we expecting
-> libvirt to probe ever device with this attribute in the system?  Is
-> there going to be a new class hierarchy created to enumerate all
-> possible migrate-able devices?
+
+On 2020/4/21 =E4=B8=8A=E5=8D=884:46, Michael S. Tsirkin wrote:
+> The ring element addresses are passed between components with different
+> alignments assumptions. Thus, if guest/userspace selects a pointer and
+> host then gets and dereferences it, we might need to decrease the
+> compiler-selected alignment to prevent compiler on the host from
+> assuming pointer is aligned.
 >
-yes, management tool needs to guess and test migration compatible
-between two devices. But I think it's not the problem only for
-mdev->phys or phys->mdev. even for mdev->mdev, management tool needs to
-first assume that the two mdevs have the same type of parent devices
-(e.g.their pciids are equal). otherwise, it's still enumerating
-possibilities.
+> This actually triggers on ARM with -mabi=3Dapcs-gnu - which is a
+> deprecated configuration, but it seems safer to handle this
+> generally.
+>
+> Note that userspace that allocates the memory is actually OK and does
+> not need to be fixed, but userspace that gets it from guest or another
+> process does need to be fixed. The later doesn't generally talk to the
+> kernel so while it might be buggy it's not talking to the kernel in the
+> buggy way - it's just using the header in the buggy way - so fixing
+> header and asking userspace to recompile is the best we can do.
+>
+> I verified that the produced kernel binary on x86 is exactly identical
+> before and after the change.
+>
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> ---
+>
+> changes from v2:
+> 	add vring_used_elem_t to ensure alignment for substructures
+> changes from v1:
+> 	swicth all __user to the new typedefs
+>
+>   drivers/vhost/vhost.c            |  8 +++---
+>   drivers/vhost/vhost.h            |  6 ++---
+>   drivers/vhost/vringh.c           |  6 ++---
+>   include/linux/vringh.h           |  6 ++---
+>   include/uapi/linux/virtio_ring.h | 43 ++++++++++++++++++++++++-------=
+-
+>   5 files changed, 45 insertions(+), 24 deletions(-)
+>
+> diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+> index d450e16c5c25..bc77b0f465fd 100644
+> --- a/drivers/vhost/vhost.c
+> +++ b/drivers/vhost/vhost.c
+> @@ -1244,9 +1244,9 @@ static int vhost_iotlb_miss(struct vhost_virtqueu=
+e *vq, u64 iova, int access)
+>   }
+>  =20
+>   static bool vq_access_ok(struct vhost_virtqueue *vq, unsigned int num=
+,
+> -			 struct vring_desc __user *desc,
+> -			 struct vring_avail __user *avail,
+> -			 struct vring_used __user *used)
+> +			 vring_desc_t __user *desc,
+> +			 vring_avail_t __user *avail,
+> +			 vring_used_t __user *used)
+>  =20
+>   {
+>   	return access_ok(desc, vhost_get_desc_size(vq, num)) &&
+> @@ -2301,7 +2301,7 @@ static int __vhost_add_used_n(struct vhost_virtqu=
+eue *vq,
+>   			    struct vring_used_elem *heads,
+>   			    unsigned count)
+>   {
+> -	struct vring_used_elem __user *used;
+> +	vring_used_elem_t __user *used;
+>   	u16 old, new;
+>   	int start;
+>  =20
+> diff --git a/drivers/vhost/vhost.h b/drivers/vhost/vhost.h
+> index f8403bd46b85..60cab4c78229 100644
+> --- a/drivers/vhost/vhost.h
+> +++ b/drivers/vhost/vhost.h
+> @@ -67,9 +67,9 @@ struct vhost_virtqueue {
+>   	/* The actual ring of buffers. */
+>   	struct mutex mutex;
+>   	unsigned int num;
+> -	struct vring_desc __user *desc;
+> -	struct vring_avail __user *avail;
+> -	struct vring_used __user *used;
+> +	vring_desc_t __user *desc;
+> +	vring_avail_t __user *avail;
+> +	vring_used_t __user *used;
+>   	const struct vhost_iotlb_map *meta_iotlb[VHOST_NUM_ADDRS];
+>   	struct file *kick;
+>   	struct eventfd_ctx *call_ctx;
+> diff --git a/drivers/vhost/vringh.c b/drivers/vhost/vringh.c
+> index ba8e0d6cfd97..e059a9a47cdf 100644
+> --- a/drivers/vhost/vringh.c
+> +++ b/drivers/vhost/vringh.c
+> @@ -620,9 +620,9 @@ static inline int xfer_to_user(const struct vringh =
+*vrh,
+>    */
+>   int vringh_init_user(struct vringh *vrh, u64 features,
+>   		     unsigned int num, bool weak_barriers,
+> -		     struct vring_desc __user *desc,
+> -		     struct vring_avail __user *avail,
+> -		     struct vring_used __user *used)
+> +		     vring_desc_t __user *desc,
+> +		     vring_avail_t __user *avail,
+> +		     vring_used_t __user *used)
+>   {
+>   	/* Sane power of 2 please! */
+>   	if (!num || num > 0xffff || (num & (num - 1))) {
+> diff --git a/include/linux/vringh.h b/include/linux/vringh.h
+> index 9e2763d7c159..59bd50f99291 100644
+> --- a/include/linux/vringh.h
+> +++ b/include/linux/vringh.h
+> @@ -105,9 +105,9 @@ struct vringh_kiov {
+>   /* Helpers for userspace vrings. */
+>   int vringh_init_user(struct vringh *vrh, u64 features,
+>   		     unsigned int num, bool weak_barriers,
+> -		     struct vring_desc __user *desc,
+> -		     struct vring_avail __user *avail,
+> -		     struct vring_used __user *used);
+> +		     vring_desc_t __user *desc,
+> +		     vring_avail_t __user *avail,
+> +		     vring_used_t __user *used);
+>  =20
+>   static inline void vringh_iov_init(struct vringh_iov *iov,
+>   				   struct iovec *iovec, unsigned num)
+> diff --git a/include/uapi/linux/virtio_ring.h b/include/uapi/linux/virt=
+io_ring.h
+> index 9223c3a5c46a..b2c20f794472 100644
+> --- a/include/uapi/linux/virtio_ring.h
+> +++ b/include/uapi/linux/virtio_ring.h
+> @@ -86,6 +86,13 @@
+>    * at the end of the used ring. Guest should ignore the used->flags f=
+ield. */
+>   #define VIRTIO_RING_F_EVENT_IDX		29
+>  =20
+> +/* Alignment requirements for vring elements.
+> + * When using pre-virtio 1.0 layout, these fall out naturally.
+> + */
+> +#define VRING_AVAIL_ALIGN_SIZE 2
+> +#define VRING_USED_ALIGN_SIZE 4
+> +#define VRING_DESC_ALIGN_SIZE 16
+> +
+>   /* Virtio ring descriptors: 16 bytes.  These can chain together via "=
+next". */
+>   struct vring_desc {
+>   	/* Address (guest-physical). */
+> @@ -112,29 +119,43 @@ struct vring_used_elem {
+>   	__virtio32 len;
+>   };
+>  =20
+> +typedef struct vring_used_elem __aligned(VRING_USED_ALIGN_SIZE)
+> +	vring_used_elem_t;
+> +
+>   struct vring_used {
+>   	__virtio16 flags;
+>   	__virtio16 idx;
+> -	struct vring_used_elem ring[];
+> +	vring_used_elem_t ring[];
+>   };
+>  =20
+> +/*
+> + * The ring element addresses are passed between components with diffe=
+rent
+> + * alignments assumptions. Thus, we might need to decrease the compile=
+r-selected
+> + * alignment, and so must use a typedef to make sure the __aligned att=
+ribute
+> + * actually takes hold:
+> + *
+> + * https://gcc.gnu.org/onlinedocs//gcc/Common-Type-Attributes.html#Com=
+mon-Type-Attributes
+> + *
+> + * When used on a struct, or struct member, the aligned attribute can =
+only
+> + * increase the alignment; in order to decrease it, the packed attribu=
+te must
+> + * be specified as well. When used as part of a typedef, the aligned a=
+ttribute
+> + * can both increase and decrease alignment, and specifying the packed
+> + * attribute generates a warning.
+> + */
+> +typedef struct vring_desc __aligned(VRING_DESC_ALIGN_SIZE) vring_desc_=
+t;
+> +typedef struct vring_avail __aligned(VRING_AVAIL_ALIGN_SIZE) vring_ava=
+il_t;
+> +typedef struct vring_used __aligned(VRING_USED_ALIGN_SIZE) vring_used_=
+t;
 
-on the other hand, for two mdevs,
-mdev1 from pdev1, its mdev_type is 1/2 of pdev1;
-mdev2 from pdev2, its mdev_type is 1/4 of pdev2;
-if pdev2 is exactly 2 times of pdev1, why not allow migration between
-mdev1 <-> mdev2.
 
-
-> I agree that there was a gap in the previous proposal for non-mdev
-> devices, but I think this bring a lot of questions that we need to
-> puzzle through and libvirt will need to re-evaluate how they might
-> decide to pick a migration target device.  For example, I'm sure
-> libvirt would reject any policy decisions regarding picking a physical
-> device versus an mdev device.  Had we previously left it that only a
-> layer above libvirt would select a target device and libvirt only tests
-> compatibility to that target device?
-I'm not sure if there's a layer above libvirt would select a target
-device. but if there is such a layer (even it's human), we need to
-provide an interface for them to know whether their decision is suitable
-for migration. The migration_version interface provides a potential to
-allow mdev->phys migration, even libvirt may currently reject it.
-
-
-> We also need to consider that this expands the namespace.  If we no
-> longer require matching types as the first level of comparison, then
-> vendor migration strings can theoretically collide.  How do we
-> coordinate that can't happen?  Thanks,
-yes, it's indeed a problem.
-could only allowing migration beteen devices from the same vendor be a good
-prerequisite?
+I wonder whether we can simply use __attribute__(packed) instead?
 
 Thanks
-Yan
-> 
-> > > > > Is existence (and compatibility) of (1) a pre-req for possible
-> > > > > existence (and compatibility) of (2)?
-> > > > >    
-> > > > no. (2) does not reply on (1).  
-> > > 
-> > > Hm. Non-existence of (1) seems to imply "this type does not support
-> > > migration". If an mdev created for such a type suddenly does support
-> > > migration, it feels a bit odd.
-> > >   
-> > yes. but I think if the condition happens, it should be reported a bug
-> > to vendor driver.
-> > should I add a line in the doc like "vendor driver should ensure that the
-> > migration compatibility from migration_version under mdev_type should be
-> > consistent with that from migration_version under device node" ?
-> > 
-> > > (It obviously cannot be a prereq for what I called (3) above.)
-> > >   
-> > > >   
-> > > > > Does userspace need to check (1) or can it completely rely on (2), if
-> > > > > it so chooses?
-> > > > >    
-> > > > I think it can completely reply on (2) if compatibility check before
-> > > > mdev creation is not required.
-> > > >   
-> > > > > If devices with a different mdev type are indeed compatible, it seems
-> > > > > userspace can only find out after the devices have actually been
-> > > > > created, as (1) does not apply?    
-> > > > yes, I think so.   
-> > > 
-> > > How useful would it be for userspace to even look at (1) in that case?
-> > > It only knows if things have a chance of working if it actually goes
-> > > ahead and creates devices.
-> > >  
-> > hmm, is it useful for userspace to test the migration_version under mdev
-> > type before it knows what mdev device to generate ?
-> > like when the userspace wants to migrate an mdev device in src vm,
-> > but it has not created target vm and the target mdev device.
-> > 
-> > > >   
-> > > > > One of my worries is that the existence of an attribute with the same
-> > > > > name in two similar locations might lead to confusion. But maybe it
-> > > > > isn't a problem.
-> > > > >    
-> > > > Yes, I have the same feeling. but as (2) is for sysfs interface
-> > > > consistency, to make it transparent to userspace tools like libvirt,
-> > > > I guess the same name is necessary?  
-> > > 
-> > > What do we actually need here, I wonder? (1) and (2) seem to serve
-> > > slightly different purposes, while (2) and what I called (3) have the
-> > > same purpose. Is it important to userspace that (1) and (2) have the
-> > > same name?  
-> > so change (1) to migration_type_version and (2) to
-> > migration_instance_version?
-> > But as they are under different locations, could that location imply
-> > enough information?
-> > 
-> > 
-> > Thanks
-> > Yan
-> > 
-> > 
-> 
+
+
+> +
+>   struct vring {
+>   	unsigned int num;
+>  =20
+> -	struct vring_desc *desc;
+> +	vring_desc_t *desc;
+>  =20
+> -	struct vring_avail *avail;
+> +	vring_avail_t *avail;
+>  =20
+> -	struct vring_used *used;
+> +	vring_used_t *used;
+>   };
+>  =20
+> -/* Alignment requirements for vring elements.
+> - * When using pre-virtio 1.0 layout, these fall out naturally.
+> - */
+> -#define VRING_AVAIL_ALIGN_SIZE 2
+> -#define VRING_USED_ALIGN_SIZE 4
+> -#define VRING_DESC_ALIGN_SIZE 16
+> -
+>   #ifndef VIRTIO_RING_NO_LEGACY
+>  =20
+>   /* The standard layout for the ring is a continuous chunk of memory w=
+hich looks
+
