@@ -2,95 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8C79A1B2C76
-	for <lists+kvm@lfdr.de>; Tue, 21 Apr 2020 18:19:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D7BCD1B2D8C
+	for <lists+kvm@lfdr.de>; Tue, 21 Apr 2020 18:57:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726335AbgDUQTX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Apr 2020 12:19:23 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:20639 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1725963AbgDUQTW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Apr 2020 12:19:22 -0400
+        id S1729626AbgDUQ5K (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Apr 2020 12:57:10 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:60567 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728951AbgDUQ4k (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 21 Apr 2020 12:56:40 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1587485960;
+        s=mimecast20190719; t=1587488199;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=OMcMRkM6CTuHPozam45N2SC6f9ykAvtZFSzHRVou/uA=;
-        b=H/cW8PGhf+FTGhGTO5/B0VgW89TkUJeOjc6AgPUWZnyK6Cd1WU2JiLt1eo8HVRBWfyF+rq
-        t+CsbAhQt36JptkTynrEmChxs8JBNKYtw5feBtUk5C1vMhLQvBrEBIHvhEY3wf0mnQO7ub
-        p+B03EaBtL8uFiV6TKVK4BFWZfLNb/g=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-363-QhIG-xWUNZKWdl-MSiDypg-1; Tue, 21 Apr 2020 12:19:18 -0400
-X-MC-Unique: QhIG-xWUNZKWdl-MSiDypg-1
-Received: by mail-wr1-f70.google.com with SMTP id e5so7738324wrs.23
-        for <kvm@vger.kernel.org>; Tue, 21 Apr 2020 09:19:18 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=OMcMRkM6CTuHPozam45N2SC6f9ykAvtZFSzHRVou/uA=;
-        b=Zl+LzSzg+2yHAKcgI3SahzCF5ijbZCj2WhT7yTRN0JAtXbDpTnQ6DPhHMUH9tf/iu9
-         R0BSF4R5+z4z5848gVfyeQvrbDp0kRTnuExPFaYvqzjvE+iRHzWk6gwT0FN3NtbaSZJQ
-         U9K5nc2RgrRn5Mvx4FqmFF8QZL9LdkhJoBZ6lN1B9RYZvWQnwuLFRad7n0kbMvT7WdeC
-         maf70Ba8kL2PIdvInGnsr7dFgGAyR+qLUJ+FCi+hOkxQt1sRMO/icyp78lK8SRd8CHhs
-         riaCqa20If4dYRwj04gLGptAEsZWnweNTyi5YcMqeY6G8b/9XoZ7swzKG8SeWOPzmvnA
-         m/TA==
-X-Gm-Message-State: AGi0PuaFe/sVNL1Qm618aUPOkk8UCHz0xlHpUE4QZZ20PuWJvRfxCGBB
-        CkkfoOO1kVRtBQp9v0CDyMd0oARbObBWL2BN6uNXqrMT9r0z8UPuum/ZK4iIqIpktHEfIL9SI2m
-        FEVsWNIhzEPZo
-X-Received: by 2002:a5d:6504:: with SMTP id x4mr26598664wru.164.1587485957603;
-        Tue, 21 Apr 2020 09:19:17 -0700 (PDT)
-X-Google-Smtp-Source: APiQypLBExtm46kFG/q5uOgEqHEeaUuSrp481aTEfOfkh5uRE39whBLwSFtgA3GXRG/Qo3jvvfG+iQ==
-X-Received: by 2002:a5d:6504:: with SMTP id x4mr26598644wru.164.1587485957403;
-        Tue, 21 Apr 2020 09:19:17 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:f43b:97b2:4c89:7446? ([2001:b07:6468:f312:f43b:97b2:4c89:7446])
-        by smtp.gmail.com with ESMTPSA id s8sm4112831wru.38.2020.04.21.09.19.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 21 Apr 2020 09:19:16 -0700 (PDT)
-Subject: Re: [PATCH v3 0/2] KVM: VMX: Unionize vcpu_vmx.exit_reason
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>
-References: <20200421075328.14458-1-sean.j.christopherson@intel.com>
+         to:to:cc:cc; bh=Rf0y5DMEXDv12IlLkk2NBKoWJYu1ZKBxtnnwzy0NcJ0=;
+        b=RQiKQXkDckNC4+IfRXjOsRZzFSbUXPywSQQ2c5Sdv0qD1WtFzA4KiYikF+6gdRvLXxeTNA
+        K8fFzGmDEqgLNPgXkKLEWdYEvV1G95jdTJ0GCsIUOYAAKzYyiKWeU7d8k6QjDKJcU7Iuod
+        1okoo7J8xzgh/oliLVIQRDxH4LQjfT0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-170-Fn-gG8nQN_qT5Vt52099EQ-1; Tue, 21 Apr 2020 12:56:37 -0400
+X-MC-Unique: Fn-gG8nQN_qT5Vt52099EQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9B204DBA5;
+        Tue, 21 Apr 2020 16:56:36 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 693CC48;
+        Tue, 21 Apr 2020 16:56:33 +0000 (UTC)
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <bcf9cbba-6cce-f10b-da94-232403a3f7f6@redhat.com>
-Date:   Tue, 21 Apr 2020 18:19:15 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
-MIME-Version: 1.0
-In-Reply-To: <20200421075328.14458-1-sean.j.christopherson@intel.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     peterx@redhat.com,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>
+Subject: [PATCH v2 0/3] KVM: x86: move nested-related kvm_x86_ops to a separate struct
+Date:   Tue, 21 Apr 2020 12:56:29 -0400
+Message-Id: <20200421165632.20157-1-pbonzini@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 21/04/20 09:53, Sean Christopherson wrote:
-> Minor fixup patch for a mishandled conflict between the vmcs.INTR_INFO
-> caching series and the union series, plus the actual unionization patch
-> rebased onto kvm/queue, commit 604e8bba0dc5 ("KVM: Remove redundant ...").
-> 
-> Sean Christopherson (2):
->   KVM: nVMX: Drop a redundant call to vmx_get_intr_info()
->   KVM: VMX: Convert vcpu_vmx.exit_reason to a union
-> 
->  arch/x86/kvm/vmx/nested.c | 39 ++++++++++++++---------
->  arch/x86/kvm/vmx/vmx.c    | 65 ++++++++++++++++++++-------------------
->  arch/x86/kvm/vmx/vmx.h    | 25 ++++++++++++++-
->  3 files changed, 83 insertions(+), 46 deletions(-)
-> 
+Patch 3 follows the lead of the kvm_pmu_ops and moves callbacks related
+to nested virtualization to a separate struct.  Patches 1 and 2 are
+preparation (patch 1 mostly makes some lines shorter, while patch 2
+avoids semantic changes in KVM_GET_SUPPORTED_HV_CPUID).
 
-Thanks, I queued patch 1.  I am not too enthusiastic about patch 2, but
-when SGX comes around it may be a better idea.
+While this reintroduces some pointer chasing that was removed in
+afaf0b2f9b80 ("KVM: x86: Copy kvm_x86_ops by value to eliminate layer
+of indirection", 2020-03-31), the cost is small compared to retpolines
+and anyway most of the callbacks are not even remotely on a fastpath.
+In fact, only check_nested_events should be called during normal VM
+runtime.  When static calls are merged into Linux my plan is to use them
+instead of callbacks, and that will finally make things fast again by
+removing the retpolines.
+
+Thanks,
 
 Paolo
+
+v1->v2: shorten names by removing "nested".  I did _not_ introduce copying.
+
+Paolo Bonzini (3):
+  KVM: x86: check_nested_events is never NULL
+  KVM: eVMCS: check if nesting is enabled
+  KVM: x86: move nested-related kvm_x86_ops to a separate struct
+
+ arch/x86/include/asm/kvm_host.h | 29 +++++++++++++++-------------
+ arch/x86/kvm/hyperv.c           |  4 ++--
+ arch/x86/kvm/svm/nested.c       |  6 +++++-
+ arch/x86/kvm/svm/svm.c          | 13 +++++--------
+ arch/x86/kvm/svm/svm.h          |  3 ++-
+ arch/x86/kvm/vmx/evmcs.c        | 24 ++++++++++++-----------
+ arch/x86/kvm/vmx/nested.c       | 16 +++++++++-------
+ arch/x86/kvm/vmx/nested.h       |  2 ++
+ arch/x86/kvm/vmx/vmx.c          |  7 +------
+ arch/x86/kvm/x86.c              | 34 ++++++++++++++++-----------------
+ 10 files changed, 72 insertions(+), 66 deletions(-)
+
+-- 
+2.18.2
 
