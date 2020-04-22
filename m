@@ -2,19 +2,19 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 799C81B35F8
-	for <lists+kvm@lfdr.de>; Wed, 22 Apr 2020 06:11:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5CAAE1B35FC
+	for <lists+kvm@lfdr.de>; Wed, 22 Apr 2020 06:12:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726442AbgDVELr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Apr 2020 00:11:47 -0400
-Received: from mx2.suse.de ([195.135.220.15]:60012 "EHLO mx2.suse.de"
+        id S1726465AbgDVELv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Apr 2020 00:11:51 -0400
+Received: from mx2.suse.de ([195.135.220.15]:60050 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725808AbgDVELr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Apr 2020 00:11:47 -0400
+        id S1726456AbgDVELt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Apr 2020 00:11:49 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx2.suse.de (Postfix) with ESMTP id 5F1ABAD5E;
-        Wed, 22 Apr 2020 04:11:44 +0000 (UTC)
+        by mx2.suse.de (Postfix) with ESMTP id E36AEAD82;
+        Wed, 22 Apr 2020 04:11:46 +0000 (UTC)
 From:   Davidlohr Bueso <dave@stgolabs.net>
 To:     tglx@linutronix.de, pbonzini@redhat.com
 Cc:     bigeasy@linutronix.de, peterz@infradead.org, rostedt@goodmis.org,
@@ -22,9 +22,9 @@ Cc:     bigeasy@linutronix.de, peterz@infradead.org, rostedt@goodmis.org,
         joel@joelfernandes.org, linux-kernel@vger.kernel.org,
         kvm@vger.kernel.org, dave@stgolabs.net,
         Davidlohr Bueso <dbueso@suse.de>
-Subject: [PATCH 1/5] rcuwait: Fix stale wake call name in comment
-Date:   Tue, 21 Apr 2020 21:07:35 -0700
-Message-Id: <20200422040739.18601-2-dave@stgolabs.net>
+Subject: [PATCH 2/5] rcuwait: Let rcuwait_wake_up() return whether or not a task was awoken
+Date:   Tue, 21 Apr 2020 21:07:36 -0700
+Message-Id: <20200422040739.18601-3-dave@stgolabs.net>
 X-Mailer: git-send-email 2.16.4
 In-Reply-To: <20200422040739.18601-1-dave@stgolabs.net>
 References: <20200422040739.18601-1-dave@stgolabs.net>
@@ -33,26 +33,56 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The 'trywake' name was renamed to simply 'wake', update the comment.
+Propagating the return value of wake_up_process() back to the caller
+can come in handy for future users, such as for statistics or
+accounting purposes.
 
 Signed-off-by: Davidlohr Bueso <dbueso@suse.de>
 ---
- kernel/exit.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ include/linux/rcuwait.h | 2 +-
+ kernel/exit.c           | 7 +++++--
+ 2 files changed, 6 insertions(+), 3 deletions(-)
 
+diff --git a/include/linux/rcuwait.h b/include/linux/rcuwait.h
+index 2ffe1ee6d482..6ebb23258a27 100644
+--- a/include/linux/rcuwait.h
++++ b/include/linux/rcuwait.h
+@@ -25,7 +25,7 @@ static inline void rcuwait_init(struct rcuwait *w)
+ 	w->task = NULL;
+ }
+ 
+-extern void rcuwait_wake_up(struct rcuwait *w);
++extern int rcuwait_wake_up(struct rcuwait *w);
+ 
+ /*
+  * The caller is responsible for locking around rcuwait_wait_event(),
 diff --git a/kernel/exit.c b/kernel/exit.c
-index 389a88cb3081..9f9015f3f6b0 100644
+index 9f9015f3f6b0..f3beb637acf7 100644
 --- a/kernel/exit.c
 +++ b/kernel/exit.c
-@@ -236,7 +236,7 @@ void rcuwait_wake_up(struct rcuwait *w)
- 	/*
- 	 * Order condition vs @task, such that everything prior to the load
- 	 * of @task is visible. This is the condition as to why the user called
--	 * rcuwait_trywake() in the first place. Pairs with set_current_state()
-+	 * rcuwait_wake() in the first place. Pairs with set_current_state()
- 	 * barrier (A) in rcuwait_wait_event().
- 	 *
- 	 *    WAIT                WAKE
+@@ -227,8 +227,9 @@ void release_task(struct task_struct *p)
+ 		goto repeat;
+ }
+ 
+-void rcuwait_wake_up(struct rcuwait *w)
++int rcuwait_wake_up(struct rcuwait *w)
+ {
++	int ret = 0;
+ 	struct task_struct *task;
+ 
+ 	rcu_read_lock();
+@@ -248,8 +249,10 @@ void rcuwait_wake_up(struct rcuwait *w)
+ 
+ 	task = rcu_dereference(w->task);
+ 	if (task)
+-		wake_up_process(task);
++		ret = wake_up_process(task);
+ 	rcu_read_unlock();
++
++	return ret;
+ }
+ EXPORT_SYMBOL_GPL(rcuwait_wake_up);
+ 
 -- 
 2.16.4
 
