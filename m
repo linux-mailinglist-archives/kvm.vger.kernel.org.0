@@ -2,245 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F08171B350F
-	for <lists+kvm@lfdr.de>; Wed, 22 Apr 2020 04:36:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E0B231B3573
+	for <lists+kvm@lfdr.de>; Wed, 22 Apr 2020 05:10:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726414AbgDVCgD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Apr 2020 22:36:03 -0400
-Received: from mga09.intel.com ([134.134.136.24]:58101 "EHLO mga09.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725912AbgDVCgD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Apr 2020 22:36:03 -0400
-IronPort-SDR: rcQQ8jISHmYDtZrNLGy9NP3lz87S93xhHHnRPmtqLlUKdGroyfKv+uMcynRq0IN+VehO+hLmJ7
- nOgA7Dr2X+Rw==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Apr 2020 19:36:02 -0700
-IronPort-SDR: KiEH+eCpJ+b1rvDh6nM1edRHIfKO2FwMXabHaZUZCSGpVa3qLtmyMs7AIq0s64hINoMJUjCR5p
- pZkZihwfxm6Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.72,412,1580803200"; 
-   d="scan'208";a="247341092"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
-  by fmsmga008.fm.intel.com with ESMTP; 21 Apr 2020 19:36:02 -0700
-Date:   Tue, 21 Apr 2020 19:36:01 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Makarand Sonare <makarandsonare@google.com>
-Cc:     kvm@vger.kernel.org, pshier@google.com, jmattson@google.com
-Subject: Re: [kvm PATCH 1/2] KVM: nVMX - enable VMX preemption timer migration
-Message-ID: <20200422023601.GG17836@linux.intel.com>
-References: <20200417183452.115762-1-makarandsonare@google.com>
- <20200417183452.115762-2-makarandsonare@google.com>
+        id S1726504AbgDVDKY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Apr 2020 23:10:24 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:58762 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726324AbgDVDKY (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 21 Apr 2020 23:10:24 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 03M32jMr140578;
+        Tue, 21 Apr 2020 23:10:22 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 30ggr36ffm-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 21 Apr 2020 23:10:22 -0400
+Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 03M32nXh140898;
+        Tue, 21 Apr 2020 23:10:22 -0400
+Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com [169.53.41.122])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 30ggr36ffa-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 21 Apr 2020 23:10:22 -0400
+Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
+        by ppma04dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 03M31uFs007729;
+        Wed, 22 Apr 2020 03:10:21 GMT
+Received: from b01cxnp23032.gho.pok.ibm.com (b01cxnp23032.gho.pok.ibm.com [9.57.198.27])
+        by ppma04dal.us.ibm.com with ESMTP id 30fs66nqe3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 22 Apr 2020 03:10:21 +0000
+Received: from b01ledav005.gho.pok.ibm.com (b01ledav005.gho.pok.ibm.com [9.57.199.110])
+        by b01cxnp23032.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 03M3ALk553739994
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 22 Apr 2020 03:10:21 GMT
+Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E5973AE05C;
+        Wed, 22 Apr 2020 03:10:20 +0000 (GMT)
+Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 6F215AE05F;
+        Wed, 22 Apr 2020 03:10:20 +0000 (GMT)
+Received: from [9.65.254.167] (unknown [9.65.254.167])
+        by b01ledav005.gho.pok.ibm.com (Postfix) with ESMTP;
+        Wed, 22 Apr 2020 03:10:20 +0000 (GMT)
+Subject: Re: [PATCH v3 0/8] s390x/vfio-ccw: Channel Path Handling [KVM]
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     linux-s390@vger.kernel.org, kvm@vger.kernel.org,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        Jared Rossi <jrossi@linux.ibm.com>
+References: <20200417023001.65006-1-farman@linux.ibm.com>
+ <20200421173544.36b48657.cohuck@redhat.com>
+From:   Eric Farman <farman@linux.ibm.com>
+Message-ID: <8acd4662-5a8b-ceda-108f-ed2cfac8dcee@linux.ibm.com>
+Date:   Tue, 21 Apr 2020 23:10:20 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200417183452.115762-2-makarandsonare@google.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <20200421173544.36b48657.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.676
+ definitions=2020-04-21_10:2020-04-21,2020-04-21 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 mlxlogscore=999
+ spamscore=0 impostorscore=0 malwarescore=0 suspectscore=0 mlxscore=0
+ clxscore=1015 lowpriorityscore=0 bulkscore=0 phishscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2004220024
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Apr 17, 2020 at 11:34:51AM -0700, Makarand Sonare wrote:
-> From: Peter Shier <pshier@google.com>
+
+
+On 4/21/20 11:35 AM, Cornelia Huck wrote:
+> On Fri, 17 Apr 2020 04:29:53 +0200
+> Eric Farman <farman@linux.ibm.com> wrote:
 > 
-> Add new field to hold preemption timer remaining until expiration
-> appended to struct kvm_vmx_nested_state_data. KVM_SET_NESTED_STATE restarts
-> timer using migrated state regardless of whether L1 sets
-> VM_EXIT_SAVE_VMX_PREEMPTION_TIMER.
-
-The changelog should call out that simply stuffing vmcs12 will cause
-incorrect behavior because the second (and later) VM-Enter after migration
-will restart the timer with the wrong value.  It took me a bit to piece
-together why the extra field was needed.
-
- 
-> -static void vmx_start_preemption_timer(struct kvm_vcpu *vcpu)
-> +static void vmx_start_preemption_timer(struct kvm_vcpu *vcpu,
-> +					u64 preemption_timeout)
->  {
-> -	u64 preemption_timeout = get_vmcs12(vcpu)->vmx_preemption_timer_value;
->  	struct vcpu_vmx *vmx = to_vmx(vcpu);
->  
->  	/*
-> @@ -3293,8 +3294,15 @@ enum nvmx_vmentry_status nested_vmx_enter_non_root_mode(struct kvm_vcpu *vcpu,
->  	 * the timer.
->  	 */
->  	vmx->nested.preemption_timer_expired = false;
-> -	if (nested_cpu_has_preemption_timer(vmcs12))
-> -		vmx_start_preemption_timer(vcpu);
-> +	if (nested_cpu_has_preemption_timer(vmcs12)) {
-> +		u64 preemption_timeout;
-
-timer_value would be shorter, and IMO, a better name as well.  I'd even go
-so far as to say throw on a follow-up patch to rename the variable in
-vmx_start_preemption_timer.
-
-> +		if (from_vmentry)
-> +			preemption_timeout = get_vmcs12(vcpu)->vmx_preemption_timer_value;
-
-vmcs12 is already available.
-
-> +		else
-> +			preemption_timeout = vmx->nested.preemption_timer_remaining;
-> +		vmx_start_preemption_timer(vcpu, preemption_timeout);
-> +	}
->  
->  	/*
->  	 * Note no nested_vmx_succeed or nested_vmx_fail here. At this point
-> @@ -3888,10 +3896,13 @@ static void sync_vmcs02_to_vmcs12(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12)
->  	else
->  		vmcs12->guest_activity_state = GUEST_ACTIVITY_ACTIVE;
->  
-> -	if (nested_cpu_has_preemption_timer(vmcs12) &&
-> -	    vmcs12->vm_exit_controls & VM_EXIT_SAVE_VMX_PREEMPTION_TIMER)
-> +	if (nested_cpu_has_preemption_timer(vmcs12)) {
-> +		vmx->nested.preemption_timer_remaining =
-> +			vmx_get_preemption_timer_value(vcpu);
-> +		if (vmcs12->vm_exit_controls & VM_EXIT_SAVE_VMX_PREEMPTION_TIMER)
->  			vmcs12->vmx_preemption_timer_value =
-> -				vmx_get_preemption_timer_value(vcpu);
-> +				vmx->nested.preemption_timer_remaining;
-> +	}
->  
->  	/*
->  	 * In some cases (usually, nested EPT), L2 is allowed to change its
-> @@ -5759,6 +5770,13 @@ static int vmx_get_nested_state(struct kvm_vcpu *vcpu,
->  
->  			if (vmx->nested.mtf_pending)
->  				kvm_state.flags |= KVM_STATE_NESTED_MTF_PENDING;
-> +
-> +			if (nested_cpu_has_preemption_timer(vmcs12)) {
-> +				kvm_state.flags |=
-> +					KVM_STATE_NESTED_PREEMPTION_TIMER;
-> +				kvm_state.size +=
-> +					sizeof(user_vmx_nested_state->preemption_timer_remaining);
-> +			}
->  		}
->  	}
->  
-> @@ -5790,6 +5808,9 @@ static int vmx_get_nested_state(struct kvm_vcpu *vcpu,
->  
->  	BUILD_BUG_ON(sizeof(user_vmx_nested_state->vmcs12) < VMCS12_SIZE);
->  	BUILD_BUG_ON(sizeof(user_vmx_nested_state->shadow_vmcs12) < VMCS12_SIZE);
-> +	BUILD_BUG_ON(sizeof(user_vmx_nested_state->preemption_timer_remaining)
-> +		    != sizeof(vmx->nested.preemption_timer_remaining));
-> +
->  
->  	/*
->  	 * Copy over the full allocated size of vmcs12 rather than just the size
-> @@ -5805,6 +5826,13 @@ static int vmx_get_nested_state(struct kvm_vcpu *vcpu,
->  			return -EFAULT;
->  	}
->  
-> +	if (kvm_state.flags & KVM_STATE_NESTED_PREEMPTION_TIMER) {
-> +		if (copy_to_user(&user_vmx_nested_state->preemption_timer_remaining,
-> +				 &vmx->nested.preemption_timer_remaining,
-> +				 sizeof(vmx->nested.preemption_timer_remaining)))
-> +			return -EFAULT;
-
-Isn't this suitable for put_user()?  That would allow dropping the
-long-winded BUILD_BUG_ON.
-
-> +	}
-> +
->  out:
->  	return kvm_state.size;
->  }
-> @@ -5876,7 +5904,8 @@ static int vmx_set_nested_state(struct kvm_vcpu *vcpu,
->  	 */
->  	if (is_smm(vcpu) ?
->  		(kvm_state->flags &
-> -		 (KVM_STATE_NESTED_GUEST_MODE | KVM_STATE_NESTED_RUN_PENDING))
-> +		 (KVM_STATE_NESTED_GUEST_MODE | KVM_STATE_NESTED_RUN_PENDING |
-> +		  KVM_STATE_NESTED_PREEMPTION_TIMER))
->  		: kvm_state->hdr.vmx.smm.flags)
->  		return -EINVAL;
->  
-> @@ -5966,6 +5995,23 @@ static int vmx_set_nested_state(struct kvm_vcpu *vcpu,
->  			goto error_guest_mode;
->  	}
->  
-> +	if (kvm_state->flags & KVM_STATE_NESTED_PREEMPTION_TIMER) {
-> +
-> +		if (kvm_state->size <
-> +		    sizeof(*kvm_state) +
-> +		    sizeof(user_vmx_nested_state->vmcs12) +
-> +		    sizeof(user_vmx_nested_state->shadow_vmcs12) +
-> +		    sizeof(user_vmx_nested_state->preemption_timer_remaining))
-
-		if (kvm_state->size <
-		    offsetof(struct kvm_nested_state, vmx) +
-		    offsetofend(struct kvm_nested_state_data,
-				preemption_timer_remaining))
-
-
-> +			goto error_guest_mode;
-> +
-> +		if (copy_from_user(&vmx->nested.preemption_timer_remaining,
-> +				   &user_vmx_nested_state->preemption_timer_remaining,
-> +				   sizeof(user_vmx_nested_state->preemption_timer_remaining))) {
-> +			ret = -EFAULT;
-> +			goto error_guest_mode;
-> +		}
-> +	}
-> +
->  	if (nested_vmx_check_controls(vcpu, vmcs12) ||
->  	    nested_vmx_check_host_state(vcpu, vmcs12) ||
->  	    nested_vmx_check_guest_state(vcpu, vmcs12, &exit_qual))
-> diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-> index aab9df55336ef..0098c7dc2e254 100644
-> --- a/arch/x86/kvm/vmx/vmx.h
-> +++ b/arch/x86/kvm/vmx/vmx.h
-> @@ -167,6 +167,7 @@ struct nested_vmx {
->  	u16 posted_intr_nv;
->  
->  	struct hrtimer preemption_timer;
-> +	u32 preemption_timer_remaining;
->  	bool preemption_timer_expired;
->  
->  	/* to migrate it to L2 if VM_ENTRY_LOAD_DEBUG_CONTROLS is off */
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 027dfd278a973..ddad6305a0d23 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -3374,6 +3374,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->  	case KVM_CAP_GET_MSR_FEATURES:
->  	case KVM_CAP_MSR_PLATFORM_INFO:
->  	case KVM_CAP_EXCEPTION_PAYLOAD:
-> +	case KVM_CAP_NESTED_PREEMPTION_TIMER:
-
-Maybe KVM_CAP_NESTED_STATE_PREEMPTION_TIMER?
-
->  		r = 1;
->  		break;
->  	case KVM_CAP_SYNC_REGS:
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index 428c7dde6b4b3..489c3df0b49c8 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -1017,6 +1017,7 @@ struct kvm_ppc_resize_hpt {
->  #define KVM_CAP_S390_VCPU_RESETS 179
->  #define KVM_CAP_S390_PROTECTED 180
->  #define KVM_CAP_PPC_SECURE_GUEST 181
-> +#define KVM_CAP_NESTED_PREEMPTION_TIMER 182
->  
->  #ifdef KVM_CAP_IRQ_ROUTING
->  
-> diff --git a/tools/arch/x86/include/uapi/asm/kvm.h b/tools/arch/x86/include/uapi/asm/kvm.h
-> index 3f3f780c8c650..ac8e5d391356c 100644
-> --- a/tools/arch/x86/include/uapi/asm/kvm.h
-> +++ b/tools/arch/x86/include/uapi/asm/kvm.h
-> @@ -391,6 +391,8 @@ struct kvm_sync_regs {
->  #define KVM_STATE_NESTED_RUN_PENDING	0x00000002
->  #define KVM_STATE_NESTED_EVMCS		0x00000004
->  #define KVM_STATE_NESTED_MTF_PENDING	0x00000008
-> +/* Available with KVM_CAP_NESTED_PREEMPTION_TIMER */
-> +#define KVM_STATE_NESTED_PREEMPTION_TIMER	0x00000010
->  
->  #define KVM_STATE_NESTED_SMM_GUEST_MODE	0x00000001
->  #define KVM_STATE_NESTED_SMM_VMXON	0x00000002
-> -- 
-> 2.26.1.301.g55bc3eb7cb9-goog
+>> Here is a new pass at the channel-path handling code for vfio-ccw.
+>> Changes from previous versions are recorded in git notes for each patch.
+>>
+>> I dropped the "Remove inline get_schid()" patch from this version.
+>> When I made the change suggested in v2, it seemed rather frivolous and
+>> better to just drop it for the time being.
+>>
+>> I suspect that patches 5 and 7 would be better squashed together, but I
+>> have not done that here.  For future versions, I guess.
 > 
+> The result also might get a bit large.
+
+True.
+
+Not that someone would pick patch 5 and not 7, but vfio-ccw is broken
+between them, because of a mismatch in IRQs.  An example from hotplug:
+
+error: internal error: unable to execute QEMU command 'device_add':
+vfio: unexpected number of irqs 1
+
+Maybe I just pull the CRW_IRQ definition into 5, and leave the wiring of
+the CRW stuff in 7.  That seems to leave a better behavior.
+
+> 
+>>
+>> With this, and the corresponding QEMU series (to be posted momentarily),
+>> applied I am able to configure off/on a CHPID (for example, by issuing
+>> "chchp -c 0/1 xx" on the host), and the guest is able to see both the
+>> events and reflect the updated path masks in its structures.
+> 
+> Basically, this looks good to me (modulo my comments).
+
+Woo!  Thanks for the feedback; I'm going to try to get them all
+addressed in the next couple of days.
+
+> 
+> One thing though that keeps coming up: do we need any kind of
+> serialization? Can there be any confusion from concurrent reads from
+> userspace, or are we sure that we always provide consistent data?
+> 
+
+I'm feeling better with the rearrangement in this version of how we get
+data from the queue of CRWs into the region and off to the guest.  The
+weirdness I described a few months ago seems to have been triggered by
+one of the patches that's now been dropped.  But I'll walk through this
+code again once I get your latest comments applied.
