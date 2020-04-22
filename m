@@ -2,55 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2A3821B4A6B
-	for <lists+kvm@lfdr.de>; Wed, 22 Apr 2020 18:27:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6964A1B4A6D
+	for <lists+kvm@lfdr.de>; Wed, 22 Apr 2020 18:27:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726402AbgDVQ1A (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Apr 2020 12:27:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35812 "EHLO
+        id S1726421AbgDVQ1b (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Apr 2020 12:27:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35890 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725808AbgDVQ1A (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Apr 2020 12:27:00 -0400
-Received: from mail-io1-xd43.google.com (mail-io1-xd43.google.com [IPv6:2607:f8b0:4864:20::d43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE78AC03C1A9
-        for <kvm@vger.kernel.org>; Wed, 22 Apr 2020 09:26:59 -0700 (PDT)
-Received: by mail-io1-xd43.google.com with SMTP id i19so2999257ioh.12
-        for <kvm@vger.kernel.org>; Wed, 22 Apr 2020 09:26:59 -0700 (PDT)
+        with ESMTP id S1726006AbgDVQ1b (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Apr 2020 12:27:31 -0400
+Received: from mail-il1-x144.google.com (mail-il1-x144.google.com [IPv6:2607:f8b0:4864:20::144])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0C6CC03C1A9
+        for <kvm@vger.kernel.org>; Wed, 22 Apr 2020 09:27:30 -0700 (PDT)
+Received: by mail-il1-x144.google.com with SMTP id f82so2497379ilh.8
+        for <kvm@vger.kernel.org>; Wed, 22 Apr 2020 09:27:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=ARQeSk2+NORP6v4NT1HcDlot2QPQtDdHOOTogk7Q3E0=;
-        b=cI85keEiMYi2LL7zilZvX6AhS0AsCUeagqEOWsGnf5I/x3mv073zADCTxxdWgaCCT+
-         xK+T2kBOlzvMeEaUkSaPXnTcX8KKYKnhHHt7IaOwDe3qW6qXD8VC+yUO0/Dmsu3whkoc
-         q7GVekBPn9dm9TX1l3WGdCI914T31blhtI4uHH9G/0PhIb75gxK7+QgDFqJQzprQzKuh
-         P23mLtaJ0l0X/a2xgOBzQ/KsMmTYyfsfSA6NvUwIuv+ezjL04CzZ5nXslB/LAK+FW0gN
-         WRDuSOdZnSGlwopzJE/gV34RQHeV9RWKSUgyDZ0GARbRhHvhHRwZdv/1T5RAXFmsQvsh
-         EUPA==
+        bh=EzGrC2vqQKE/rawUH7ijZjXr0pr1f68SrkRjObtRtqg=;
+        b=tG7wYLsQGs8Z2l1BnwH5IR8n3D4aMmnVP7NqqD+vquciI60pduXyN9JAopBP6sZwWA
+         ymv0DSklsI5JNi9lqSUcGc/nCCmCICfncRhoZREf7Eqfp3IMo1zqV3ZiwTsO/zS0PDfz
+         qF6vtEjV3Bn6oLg3i8JT4ItFFCq1GeTC7C3T+CdeZTFCTZjG6NZfV7SEbCHegrhHfaR/
+         fHq71+dZQ9vriMzp6jvvJ/GC9uXwykTM+lwIebrcAmv+6lNxU8RONOJ6RmSAHA+gDGL2
+         auygphG3s72ABcDcl0EWhemQp3/iDeJqT39qOlqr0P8il0/XybGYMpXCn/f+W6q+q/go
+         vd1Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=ARQeSk2+NORP6v4NT1HcDlot2QPQtDdHOOTogk7Q3E0=;
-        b=II6Fe/f5uIgs5o+n41a/uv7tkOAQjO4SfMSBbYgX38IO+sHxC3ckTZPNuil+TbBnXi
-         kbFYwKwpQCObt2pHAoabyjW4piVRejGDO2R02FZ8No5M3rhtLm3HT4zt5Ka0SAkZ1T4O
-         exGntYQWxEfmhHDHTbxAqBFoXLgmPjohfRC4wrecNVh8ex6C79/dln4EDkogndzCQGRU
-         UQLRVX0XO4hnbVHbYGMki24EKLIecTTxHJzIMqh1T/1h7dhPPiPX2SxCrYI23E6J8aif
-         Lj1bkwgl9NNCpMLbQ+U/b/QW/Sh263Eklo/2ISFy+eQUjtdHgIULQNW3gY2GHE58vSTS
-         tIzg==
-X-Gm-Message-State: AGi0Pub5Rhp0P4G2xXz+WQg0TY6iIMrqwkz2U7QvvnMPGXmJa+yN23nN
-        0rVrBAH94uH0GVpkxPmeCpGux1l//s6K5P1xXH2QPMCR
-X-Google-Smtp-Source: APiQypLF74uHPnyey6wmqKmG62Jt2qNFVeJ87R1PSBrn4kwivL/D0pZuk4k+ObU1M5tuWcS/Xp0XWFA2hcmODlcpo84=
-X-Received: by 2002:a6b:c910:: with SMTP id z16mr26262209iof.164.1587572818530;
- Wed, 22 Apr 2020 09:26:58 -0700 (PDT)
+        bh=EzGrC2vqQKE/rawUH7ijZjXr0pr1f68SrkRjObtRtqg=;
+        b=uXg0xnCV8x+tvJ2VmbQNEIHDQ3nCTQdF8Y77ula4gBX1ajiHMLCjbNcOJ6MA4S8LVu
+         nXkw7f3GUz63CsrpidKN9rZc2KH0DOZeE7GLhIYCOlfHg2O182TGL4GiUQs4j2Pwguzx
+         uGbGq0hnPraRrxojKhuUFcxQLJ3Yz9KUzwa1f0NChIhvmbfUmrM8JdiBAfObDCpFskpA
+         YEp0/RZDxN+b7x49C2YcRAKx0SSylgD6qtoW1b1Vh7pS4JKsyirD5vxC3IJkXS9PSIxW
+         0rE/q3xhAl9GEoovcrtCHpB/vv7grDaEy2K7nd1A3LI1vZLeomeG91Zpv8+aaXoB1lfS
+         T6Lg==
+X-Gm-Message-State: AGi0PuZtvUpM8QGtBs1eWtKAU5g5HZZEkLS5bYmv1KQb5LiIluJxsTId
+        XlcT+O/BNXGIrHx8GFBjSntDuJEY2JdlS2kulRMHBf2h
+X-Google-Smtp-Source: APiQypJom6O7KoVdZVKCaU79S3Fy9koGIMb0Zo6d9r1mMSdgG4bmhmSauBJPfBxKzehhq6P7rptYs8rW62alklrRWuE=
+X-Received: by 2002:a92:da4e:: with SMTP id p14mr26539574ilq.296.1587572849555;
+ Wed, 22 Apr 2020 09:27:29 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200414001026.50051-1-jmattson@google.com>
-In-Reply-To: <20200414001026.50051-1-jmattson@google.com>
+References: <20200414001026.50051-1-jmattson@google.com> <20200414001026.50051-2-jmattson@google.com>
+In-Reply-To: <20200414001026.50051-2-jmattson@google.com>
 From:   Jim Mattson <jmattson@google.com>
-Date:   Wed, 22 Apr 2020 09:26:47 -0700
-Message-ID: <CALMp9eRnLxG=Je3SDcz6HOgB0AJbC-qACySiSVrxP9qT6A54Rw@mail.gmail.com>
-Subject: Re: [kvm-unit-tests PATCH 1/2] x86: nVMX: Add some corner-case
- VMX-preemption timer tests
+Date:   Wed, 22 Apr 2020 09:27:18 -0700
+Message-ID: <CALMp9eQskG_tyCZ6bxxZMB2Rm9_9MRyYdpzdfTiBngjuddcSTQ@mail.gmail.com>
+Subject: Re: [kvm-unit-tests PATCH 2/2] x86: VMX: Add another corner-case
+ VMX-preemption timer test
 To:     kvm list <kvm@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Oliver Upton <oupton@google.com>, Peter Shier <pshier@google.com>
 Content-Type: text/plain; charset="UTF-8"
@@ -61,138 +61,122 @@ X-Mailing-List: kvm@vger.kernel.org
 
 On Mon, Apr 13, 2020 at 5:10 PM Jim Mattson <jmattson@google.com> wrote:
 >
-> Verify that both injected events and debug traps that result from
-> pending debug exceptions take precedence over a "VMX-preemption timer
-> expired" VM-exit resulting from a zero-valued VMX-preemption timer.
+> Ensure that the delivery of a "VMX-preemption timer expired" VM-exit
+> doesn't disrupt single-stepping in the guest. Note that passing this
+> test doesn't ensure correctness.
 >
 > Signed-off-by: Jim Mattson <jmattson@google.com>
 > Reviewed-by: Oliver Upton <oupton@google.com>
 > Reviewed-by: Peter Shier <pshier@google.com>
 > ---
->  x86/vmx_tests.c | 120 ++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 120 insertions(+)
+>  x86/vmx_tests.c | 104 ++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 104 insertions(+)
 >
 > diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
-> index 1f97fe3..fccb27f 100644
+> index fccb27f..86b8880 100644
 > --- a/x86/vmx_tests.c
 > +++ b/x86/vmx_tests.c
-> @@ -8319,6 +8319,125 @@ static void vmx_store_tsc_test(void)
->                msr_entry.value, low, high);
+> @@ -8438,6 +8438,109 @@ static void vmx_preemption_timer_zero_test(void)
+>         handle_exception(DB_VECTOR, old_db);
 >  }
 >
-> +static void vmx_preemption_timer_zero_test_db_handler(struct ex_regs *regs)
-> +{
-> +}
+> +static u64 vmx_preemption_timer_tf_test_prev_rip;
 > +
-> +static void vmx_preemption_timer_zero_test_guest(void)
+> +static void vmx_preemption_timer_tf_test_db_handler(struct ex_regs *regs)
 > +{
-> +       while (vmx_get_test_stage() < 3)
+> +       extern char vmx_preemption_timer_tf_test_endloop;
+> +
+> +       if (vmx_get_test_stage() == 2) {
+> +               /*
+> +                * Stage 2 means that we're done, one way or another.
+> +                * Arrange for the iret to drop us out of the wbinvd
+> +                * loop and stop single-stepping.
+> +                */
+> +               regs->rip = (u64)&vmx_preemption_timer_tf_test_endloop;
+> +               regs->rflags &= ~X86_EFLAGS_TF;
+> +       } else if (regs->rip == vmx_preemption_timer_tf_test_prev_rip) {
+> +               /*
+> +                * The RIP should alternate between the wbinvd and the
+> +                * jmp instruction in the code below. If we ever see
+> +                * the same instruction twice in a row, that means a
+> +                * single-step trap has been dropped. Let the
+> +                * hypervisor know about the failure by executing a
+> +                * VMCALL.
+> +                */
 > +               vmcall();
+> +       }
+> +       vmx_preemption_timer_tf_test_prev_rip = regs->rip;
 > +}
 > +
-> +static void vmx_preemption_timer_zero_activate_preemption_timer(void)
+> +static void vmx_preemption_timer_tf_test_guest(void)
 > +{
-> +       vmcs_set_bits(PIN_CONTROLS, PIN_PREEMPT);
-> +       vmcs_write(PREEMPT_TIMER_VALUE, 0);
-> +}
-> +
-> +static void vmx_preemption_timer_zero_advance_past_vmcall(void)
-> +{
-> +       vmcs_clear_bits(PIN_CONTROLS, PIN_PREEMPT);
-> +       enter_guest();
-> +       skip_exit_vmcall();
-> +}
-> +
-> +static void vmx_preemption_timer_zero_inject_db(bool intercept_db)
-> +{
-> +       vmx_preemption_timer_zero_activate_preemption_timer();
-> +       vmcs_write(ENT_INTR_INFO, INTR_INFO_VALID_MASK |
-> +                  INTR_TYPE_HARD_EXCEPTION | DB_VECTOR);
-> +       vmcs_write(EXC_BITMAP, intercept_db ? 1 << DB_VECTOR : 0);
-> +       enter_guest();
-> +}
-> +
-> +static void vmx_preemption_timer_zero_set_pending_dbg(u32 exception_bitmap)
-> +{
-> +       vmx_preemption_timer_zero_activate_preemption_timer();
-> +       vmcs_write(GUEST_PENDING_DEBUG, BIT(12) | DR_TRAP1);
-> +       vmcs_write(EXC_BITMAP, exception_bitmap);
-> +       enter_guest();
-> +}
-> +
-> +static void vmx_preemption_timer_zero_expect_preempt_at_rip(u64 expected_rip)
-> +{
-> +       u32 reason = (u32)vmcs_read(EXI_REASON);
-> +       u64 guest_rip = vmcs_read(GUEST_RIP);
-> +
-> +       report(reason == VMX_PREEMPT && guest_rip == expected_rip,
-> +              "Exit reason is 0x%x (expected 0x%x) and guest RIP is %lx (0x%lx expected).",
-> +              reason, VMX_PREEMPT, guest_rip, expected_rip);
+> +       /*
+> +        * The hypervisor doesn't intercept WBINVD, so the loop below
+> +        * shouldn't be a problem--it's just two instructions
+> +        * executing in VMX non-root mode. However, when the
+> +        * hypervisor is running in a virtual environment, the parent
+> +        * hypervisor might intercept WBINVD and emulate it. If the
+> +        * parent hypervisor is broken, the single-step trap after the
+> +        * WBINVD might be lost.
+> +        */
+> +       asm volatile("vmcall\n\t"
+> +                    "0: wbinvd\n\t"
+> +                    "1: jmp 0b\n\t"
+> +                    "vmx_preemption_timer_tf_test_endloop:");
 > +}
 > +
 > +/*
-> + * This test ensures that when the VMX preemption timer is zero at
-> + * VM-entry, a VM-exit occurs after any event injection and after any
-> + * pending debug exceptions are raised, but before execution of any
-> + * guest instructions.
+> + * Ensure that the delivery of a "VMX-preemption timer expired"
+> + * VM-exit doesn't disrupt single-stepping in the guest. Note that
+> + * passing this test doesn't ensure correctness, because the test will
+> + * only fail if the VMX-preemtion timer fires at the right time (or
+> + * the wrong time, as it were).
 > + */
-> +static void vmx_preemption_timer_zero_test(void)
+> +static void vmx_preemption_timer_tf_test(void)
 > +{
-> +       u64 db_fault_address = (u64)get_idt_addr(&boot_idt[DB_VECTOR]);
 > +       handler old_db;
 > +       u32 reason;
+> +       int i;
 > +
 > +       if (!(ctrl_pin_rev.clr & PIN_PREEMPT)) {
 > +               report_skip("'Activate VMX-preemption timer' not supported");
 > +               return;
 > +       }
 > +
-> +       /*
-> +        * Install a custom #DB handler that doesn't abort.
-> +        */
 > +       old_db = handle_exception(DB_VECTOR,
-> +                                 vmx_preemption_timer_zero_test_db_handler);
+> +                                 vmx_preemption_timer_tf_test_db_handler);
 > +
-> +       test_set_guest(vmx_preemption_timer_zero_test_guest);
+> +       test_set_guest(vmx_preemption_timer_tf_test_guest);
 > +
-> +       /*
-> +        * VMX-preemption timer should fire after event injection.
-> +        */
-> +       vmx_set_test_stage(0);
-> +       vmx_preemption_timer_zero_inject_db(0);
-> +       vmx_preemption_timer_zero_expect_preempt_at_rip(db_fault_address);
-> +       vmx_preemption_timer_zero_advance_past_vmcall();
+> +       enter_guest();
+> +       skip_exit_vmcall();
 > +
-> +       /*
-> +        * VMX-preemption timer should fire after event injection.
-> +        * Exception bitmap is irrelevant, since you can't intercept
-> +        * an event that you injected.
-> +        */
 > +       vmx_set_test_stage(1);
-> +       vmx_preemption_timer_zero_inject_db(1 << DB_VECTOR);
-> +       vmx_preemption_timer_zero_expect_preempt_at_rip(db_fault_address);
-> +       vmx_preemption_timer_zero_advance_past_vmcall();
+> +       vmcs_set_bits(PIN_CONTROLS, PIN_PREEMPT);
+> +       vmcs_write(PREEMPT_TIMER_VALUE, 50000);
+> +       vmcs_write(GUEST_RFLAGS, X86_EFLAGS_FIXED | X86_EFLAGS_TF);
 > +
 > +       /*
-> +        * VMX-preemption timer should fire after pending debug exceptions
-> +        * have delivered a #DB trap.
+> +        * The only exit we should see is "VMX-preemption timer
+> +        * expired."  If we get a VMCALL exit, that means the #DB
+> +        * handler has detected a missing single-step trap. It doesn't
+> +        * matter where the guest RIP is when the VMX-preemption timer
+> +        * expires (whether it's in the WBINVD loop or in the #DB
+> +        * handler)--a single-step trap should never be discarded.
 > +        */
+> +       for (i = 0; i < 10000; i++) {
+> +               enter_guest();
+> +               reason = (u32)vmcs_read(EXI_REASON);
+> +               if (reason == VMX_PREEMPT)
+> +                       continue;
+> +               TEST_ASSERT(reason == VMX_VMCALL);
+> +               skip_exit_insn();
+> +               break;
+> +       }
+> +
+> +       report(reason == VMX_PREEMPT, "No single-step traps skipped");
+> +
 > +       vmx_set_test_stage(2);
-> +       vmx_preemption_timer_zero_set_pending_dbg(0);
-> +       vmx_preemption_timer_zero_expect_preempt_at_rip(db_fault_address);
-> +       vmx_preemption_timer_zero_advance_past_vmcall();
-> +
-> +       /*
-> +        * VMX-preemption timer would fire after pending debug exceptions
-> +        * have delivered a #DB trap, but in this case, the #DB trap is
-> +        * intercepted.
-> +        */
-> +       vmx_set_test_stage(3);
-> +       vmx_preemption_timer_zero_set_pending_dbg(1 << DB_VECTOR);
-> +       reason = (u32)vmcs_read(EXI_REASON);
-> +       report(reason == VMX_EXC_NMI, "Exit reason is 0x%x (expected 0x%x)",
-> +              reason, VMX_EXC_NMI);
-> +
 > +       vmcs_clear_bits(PIN_CONTROLS, PIN_PREEMPT);
 > +       enter_guest();
 > +
@@ -202,11 +186,11 @@ On Mon, Apr 13, 2020 at 5:10 PM Jim Mattson <jmattson@google.com> wrote:
 >  static void vmx_db_test_guest(void)
 >  {
 >         /*
-> @@ -9623,6 +9742,7 @@ struct vmx_test vmx_tests[] = {
->         TEST(vmx_pending_event_test),
+> @@ -9743,6 +9846,7 @@ struct vmx_test vmx_tests[] = {
 >         TEST(vmx_pending_event_hlt_test),
 >         TEST(vmx_store_tsc_test),
-> +       TEST(vmx_preemption_timer_zero_test),
+>         TEST(vmx_preemption_timer_zero_test),
+> +       TEST(vmx_preemption_timer_tf_test),
 >         /* EPT access tests. */
 >         TEST(ept_access_test_not_present),
 >         TEST(ept_access_test_read_only),
