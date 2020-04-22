@@ -2,73 +2,179 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 97D031B36F8
-	for <lists+kvm@lfdr.de>; Wed, 22 Apr 2020 07:53:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0C14E1B36FC
+	for <lists+kvm@lfdr.de>; Wed, 22 Apr 2020 07:53:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726154AbgDVFvV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Apr 2020 01:51:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49890 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725308AbgDVFvV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Apr 2020 01:51:21 -0400
-Received: from mail-oi1-x232.google.com (mail-oi1-x232.google.com [IPv6:2607:f8b0:4864:20::232])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C98AC03C1A6
-        for <kvm@vger.kernel.org>; Tue, 21 Apr 2020 22:51:21 -0700 (PDT)
-Received: by mail-oi1-x232.google.com with SMTP id t199so908621oif.7
-        for <kvm@vger.kernel.org>; Tue, 21 Apr 2020 22:51:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to
-         :content-transfer-encoding;
-        bh=evSSN9h22SZxdtBUrRFRaCNtkgNZePgvqWQvMgguurE=;
-        b=TRgxXuWWPxVcpbAaq4DXOirYEYxTXypk4VLkNm5imHwNVdEWGSri9/gP7xHOr/37te
-         JK0892lQ32LgKjajbK+K4gvxfJKeXa45Pe2aXW3ZYQfsX+Ij6j4AQZNIlnQiwEYqkt39
-         a2KoIWolcByn+1OdiEHdVYoSHLZAcyeZ9qjMkjdSdJCtuPhH+0bU8bGj8PI96R83t/xx
-         cItyPBLNeUCd4CuzDclK6Oq0OFxy7A8LYIBr8HtpG6gUapAnwRs7hune/cTDgbQ+vvFm
-         ScOZScpPs9w1cRlgkllFZNE1hzsrGYe2ApVL49Kmceze6wO4kH46u0HvymXIxaapxYij
-         nctA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to
-         :content-transfer-encoding;
-        bh=evSSN9h22SZxdtBUrRFRaCNtkgNZePgvqWQvMgguurE=;
-        b=dU8OqbM2zz3vUwLdc8EHDBjAHwvhdA30W9i+ZRRawQd3ozsLLs7yASc9uMIapGeDPS
-         HDygqoWCrIqWFOcVLKivPd9WkLM1XKH1QbrIxhl4rrgn5OSj+9fsAdOyJvStn8Upl93t
-         px+KPaD4DJjV6AEEU9u465USVgOunHUTk6blw6oP7meRm9L1A3sPUqpRAjmbBXS89Q1y
-         +rPiieIcb3aSTD0i7Ie6JxgNnw6kTJYyuX3I9gQ6FDgkUmJk5NpWEHAuWwo2wMW/C5Yz
-         EkUOrjkG5c82I/QDFJ/FudQ4Z52/UBdpoCqOTatgp7Hz5xYaImqEEavNwwCSC37XZWgc
-         ZQoA==
-X-Gm-Message-State: AGi0PuZdapZ1rzfaUkZ95IXZXBAasfGRb5UtaBRfJ1aUwVSDYZQRB08g
-        6+1rMA0mhDp2+1b0gC3TcxEcWZfHaVZlewHCt7Ytb1GF
-X-Google-Smtp-Source: APiQypKGNXuiCsV1r3uXwojWaTAq7Dhfyldlhg+7WFyoO0gFM0qwO0WTXtEA8VewfO8DEEWY+lBsE8QxJ8RtBlrtElU=
-X-Received: by 2002:aca:1709:: with SMTP id j9mr5711063oii.59.1587534680173;
- Tue, 21 Apr 2020 22:51:20 -0700 (PDT)
+        id S1726446AbgDVFxj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Apr 2020 01:53:39 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:55634 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726033AbgDVFxi (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 22 Apr 2020 01:53:38 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 03M5WEgT019620
+        for <kvm@vger.kernel.org>; Wed, 22 Apr 2020 01:53:38 -0400
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 30gj24fewv-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Wed, 22 Apr 2020 01:53:38 -0400
+Received: from localhost
+        by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <pmorel@linux.ibm.com>;
+        Wed, 22 Apr 2020 06:53:00 +0100
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
+        by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Wed, 22 Apr 2020 06:52:56 +0100
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 03M5rVU46750510
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 22 Apr 2020 05:53:31 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 33002A404D;
+        Wed, 22 Apr 2020 05:53:31 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D0F16A4040;
+        Wed, 22 Apr 2020 05:53:30 +0000 (GMT)
+Received: from oc3016276355.ibm.com (unknown [9.145.55.142])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed, 22 Apr 2020 05:53:30 +0000 (GMT)
+Subject: Re: [kvm-unit-tests PATCH v5 02/10] s390x: Use PSW bits definitions
+ in cstart
+To:     David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, frankja@linux.ibm.com,
+        thuth@redhat.com, cohuck@redhat.com
+References: <1582200043-21760-1-git-send-email-pmorel@linux.ibm.com>
+ <1582200043-21760-3-git-send-email-pmorel@linux.ibm.com>
+ <f8cb512c-8146-3777-13a8-5c06017334cf@redhat.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+Date:   Wed, 22 Apr 2020 07:53:30 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-From:   =?UTF-8?Q?Anders_=C3=96stling?= <anders.ostling@gmail.com>
-Date:   Wed, 22 Apr 2020 07:51:09 +0200
-Message-ID: <CAP4+ddND+RrQG7gGoKQ+ydnwXpr0HLrxUyi-pshc-jsigCwjBg@mail.gmail.com>
-Subject: Backup of vm disk images
-To:     kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <f8cb512c-8146-3777-13a8-5c06017334cf@redhat.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 20042205-0008-0000-0000-0000037529EC
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20042205-0009-0000-0000-00004A96F1C0
+Message-Id: <2ca34025-a366-2431-daba-8b08bff84aad@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.676
+ definitions=2020-04-21_10:2020-04-21,2020-04-21 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 clxscore=1015
+ impostorscore=0 mlxscore=0 suspectscore=0 bulkscore=0 malwarescore=0
+ phishscore=0 adultscore=0 spamscore=0 priorityscore=1501
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2004220041
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-I am fighting to understand the difference between backing up a VM by
-using a regular copy vs using the virsh blockcopy command.
-What I want to do is to suspend the vm, copy the XML and .QCOW2 files
-and then resume the vm again. What are your thoughts? What are the
-drawbacks compared to other methods?
-Thanks
 
---=20
----------------------------------------------------------------------------=
---------------------------------------------
-This signature contains 100% recyclable electrons as prescribed by Mother N=
-ature
 
-Anders =C3=96stling
-+46 768 716 165 (Mobil)
-+46 431 45 56 01  (Hem)
+On 2020-04-21 18:16, David Hildenbrand wrote:
+> On 20.02.20 13:00, Pierre Morel wrote:
+>> This patch defines the PSW bits EA/BA used to initialize the PSW masks
+>> for exceptions.
+>>
+>> Since some PSW mask definitions exist already in arch_def.h we add these
+>> definitions there.
+>> We move all PSW definitions together and protect assembler code against
+>> C syntax.
+>>
+>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+>> ---
+>>   lib/s390x/asm/arch_def.h | 15 +++++++++++----
+>>   s390x/cstart64.S         | 15 ++++++++-------
+>>   2 files changed, 19 insertions(+), 11 deletions(-)
+>>
+>> diff --git a/lib/s390x/asm/arch_def.h b/lib/s390x/asm/arch_def.h
+>> index 15a4d49..69a8256 100644
+>> --- a/lib/s390x/asm/arch_def.h
+>> +++ b/lib/s390x/asm/arch_def.h
+>> @@ -10,15 +10,21 @@
+>>   #ifndef _ASM_S390X_ARCH_DEF_H_
+>>   #define _ASM_S390X_ARCH_DEF_H_
+>>   
+>> +#define PSW_MASK_EXT			0x0100000000000000UL
+>> +#define PSW_MASK_DAT			0x0400000000000000UL
+>> +#define PSW_MASK_PSTATE			0x0001000000000000UL
+>> +#define PSW_MASK_BA			0x0000000080000000UL
+>> +#define PSW_MASK_EA			0x0000000100000000UL
+>> +
+>> +#define PSW_EXCEPTION_MASK (PSW_MASK_EA|PSW_MASK_BA)
+>> +
+>> +#ifndef __ASSEMBLER__
+>> +
+>>   struct psw {
+>>   	uint64_t	mask;
+>>   	uint64_t	addr;
+>>   };
+>>   
+>> -#define PSW_MASK_EXT			0x0100000000000000UL
+>> -#define PSW_MASK_DAT			0x0400000000000000UL
+>> -#define PSW_MASK_PSTATE			0x0001000000000000UL
+>> -
+>>   #define CR0_EXTM_SCLP			0X0000000000000200UL
+>>   #define CR0_EXTM_EXTC			0X0000000000002000UL
+>>   #define CR0_EXTM_EMGC			0X0000000000004000UL
+>> @@ -297,4 +303,5 @@ static inline uint32_t get_prefix(void)
+>>   	return current_prefix;
+>>   }
+>>   
+>> +#endif /* not __ASSEMBLER__ */
+>>   #endif
+>> diff --git a/s390x/cstart64.S b/s390x/cstart64.S
+>> index 45da523..2885a36 100644
+>> --- a/s390x/cstart64.S
+>> +++ b/s390x/cstart64.S
+>> @@ -12,6 +12,7 @@
+>>    */
+>>   #include <asm/asm-offsets.h>
+>>   #include <asm/sigp.h>
+>> +#include <asm/arch_def.h>
+>>   
+>>   .section .init
+>>   
+>> @@ -214,19 +215,19 @@ svc_int:
+>>   
+>>   	.align	8
+>>   reset_psw:
+>> -	.quad	0x0008000180000000
+>> +	.quad	PSW_EXCEPTION_MASK
+>>   initial_psw:
+>> -	.quad	0x0000000180000000, clear_bss_start
+>> +	.quad	PSW_EXCEPTION_MASK, clear_bss_start
+>>   pgm_int_psw:
+>> -	.quad	0x0000000180000000, pgm_int
+>> +	.quad	PSW_EXCEPTION_MASK, pgm_int
+>>   ext_int_psw:
+>> -	.quad	0x0000000180000000, ext_int
+>> +	.quad	PSW_EXCEPTION_MASK, ext_int
+>>   mcck_int_psw:
+>> -	.quad	0x0000000180000000, mcck_int
+>> +	.quad	PSW_EXCEPTION_MASK, mcck_int
+>>   io_int_psw:
+>> -	.quad	0x0000000180000000, io_int
+>> +	.quad	PSW_EXCEPTION_MASK, io_int
+>>   svc_int_psw:
+>> -	.quad	0x0000000180000000, svc_int
+>> +	.quad	PSW_EXCEPTION_MASK, svc_int
+>>   initial_cr0:
+>>   	/* enable AFP-register control, so FP regs (+BFP instr) can be used */
+>>   	.quad	0x0000000000040000
+>>
+> 
+> Reviewed-by: David Hildenbrand <david@redhat.com>
+> 
+
+Thanks,
+Pierre
+
+-- 
+Pierre Morel
+IBM Lab Boeblingen
+
