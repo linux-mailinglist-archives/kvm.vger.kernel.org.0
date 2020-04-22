@@ -2,50 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5317D1B3931
-	for <lists+kvm@lfdr.de>; Wed, 22 Apr 2020 09:40:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 22E9C1B393A
+	for <lists+kvm@lfdr.de>; Wed, 22 Apr 2020 09:43:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726632AbgDVHjy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Apr 2020 03:39:54 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:41126 "EHLO
+        id S1725907AbgDVHna (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Apr 2020 03:43:30 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:24436 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726431AbgDVHjL (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 22 Apr 2020 03:39:11 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 03M7ZbkS008821
-        for <kvm@vger.kernel.org>; Wed, 22 Apr 2020 03:39:10 -0400
+        by vger.kernel.org with ESMTP id S1726110AbgDVHna (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 22 Apr 2020 03:43:30 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 03M7W3iK071950
+        for <kvm@vger.kernel.org>; Wed, 22 Apr 2020 03:43:29 -0400
 Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 30ggxqvhev-1
+        by mx0a-001b2d01.pphosted.com with ESMTP id 30gj24jhst-1
         (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Wed, 22 Apr 2020 03:39:10 -0400
+        for <kvm@vger.kernel.org>; Wed, 22 Apr 2020 03:43:29 -0400
 Received: from localhost
         by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
         for <kvm@vger.kernel.org> from <frankja@linux.ibm.com>;
-        Wed, 22 Apr 2020 08:38:22 +0100
+        Wed, 22 Apr 2020 08:42:42 +0100
 Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
         by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
         (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Wed, 22 Apr 2020 08:38:20 +0100
+        Wed, 22 Apr 2020 08:42:39 +0100
 Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 03M7d4os63438882
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 03M7hNg952625426
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 22 Apr 2020 07:39:04 GMT
+        Wed, 22 Apr 2020 07:43:23 GMT
 Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 22F54A404D;
-        Wed, 22 Apr 2020 07:39:04 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 28423A405E;
+        Wed, 22 Apr 2020 07:43:23 +0000 (GMT)
 Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C6937A4040;
-        Wed, 22 Apr 2020 07:39:03 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id D56DBA4040;
+        Wed, 22 Apr 2020 07:43:22 +0000 (GMT)
 Received: from localhost.localdomain (unknown [9.145.53.90])
         by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 22 Apr 2020 07:39:03 +0000 (GMT)
-Subject: Re: [kvm-unit-tests PATCH v5 03/10] s390x: cr0: adding AFP-register
- control bit
-To:     Pierre Morel <pmorel@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, david@redhat.com, thuth@redhat.com,
-        cohuck@redhat.com
+        Wed, 22 Apr 2020 07:43:22 +0000 (GMT)
+Subject: Re: [kvm-unit-tests PATCH v5 00/10] s390x: Testing the Channel
+ Subsystem I/O
+To:     David Hildenbrand <david@redhat.com>,
+        Pierre Morel <pmorel@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, thuth@redhat.com, cohuck@redhat.com
 References: <1582200043-21760-1-git-send-email-pmorel@linux.ibm.com>
- <1582200043-21760-4-git-send-email-pmorel@linux.ibm.com>
+ <028ece05-1429-7761-cf4e-6fabc34e6aa0@linux.ibm.com>
+ <4a5f0636-cd73-164a-8c7a-ca5679f01e56@redhat.com>
 From:   Janosch Frank <frankja@linux.ibm.com>
 Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
  mQINBFubpD4BEADX0uhkRhkj2AVn7kI4IuPY3A8xKat0ihuPDXbynUC77mNox7yvK3X5QBO6
@@ -89,124 +90,97 @@ Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
  DchCqFm5adiSP5+OT4NjkKUeGpBe/aRyQSle/RropTgCi85pje/juYEn2P9UAgkfBJrOHvQ9
  Z+2Sva8FRd61NJLkCJ4LFumRn9wQlX2icFbi8UDV3do0hXJRRYTWCxrHscMhkrFWLhYiPF4i
  phX7UNdOWBQ90qpHyAxHmDazdo27gEjfvsgYMdveKknEOTEb5phwxWgg7BcIDoJf9UMC
-Date:   Wed, 22 Apr 2020 09:39:03 +0200
+Date:   Wed, 22 Apr 2020 09:43:22 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <1582200043-21760-4-git-send-email-pmorel@linux.ibm.com>
+In-Reply-To: <4a5f0636-cd73-164a-8c7a-ca5679f01e56@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="GyifXTZlsyM8ZIgho0Vn086lt06WUgA3h"
+ boundary="OYF0GydMbDu8HxOuTkPPSmnAuccIO8APC"
 X-TM-AS-GCONF: 00
-x-cbid: 20042207-4275-0000-0000-000003C46D08
+x-cbid: 20042207-4275-0000-0000-000003C46D76
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20042207-4276-0000-0000-000038D9F38A
-Message-Id: <a40f5061-e261-a6dd-ea6a-a8bec703175f@linux.ibm.com>
+x-cbparentid: 20042207-4276-0000-0000-000038D9F3FC
+Message-Id: <2c30fd52-876d-91b0-9a69-363efabdb86e@linux.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.676
  definitions=2020-04-22_02:2020-04-21,2020-04-22 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 impostorscore=0
- suspectscore=0 lowpriorityscore=0 mlxlogscore=999 bulkscore=0
- priorityscore=1501 spamscore=0 malwarescore=0 adultscore=0 mlxscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2004220062
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 clxscore=1015
+ impostorscore=0 mlxscore=0 suspectscore=0 bulkscore=0 malwarescore=0
+ phishscore=0 adultscore=0 spamscore=0 priorityscore=1501
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2004220057
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---GyifXTZlsyM8ZIgho0Vn086lt06WUgA3h
-Content-Type: multipart/mixed; boundary="EOWPvNTSl0Qrmj66m9JdSexUHJqGIhPYD"
+--OYF0GydMbDu8HxOuTkPPSmnAuccIO8APC
+Content-Type: multipart/mixed; boundary="M3I2jByNAOz0jeA9h61PC1o4DevKsR8cF"
 
---EOWPvNTSl0Qrmj66m9JdSexUHJqGIhPYD
+--M3I2jByNAOz0jeA9h61PC1o4DevKsR8cF
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 2/20/20 1:00 PM, Pierre Morel wrote:
-> While adding the definition for the AFP-Register control bit, move all
-> existing definitions for CR0 out of the C zone to the assmbler zone to
-> keep the definitions concerning CR0 together.
-
-How about:
-s390x: Move control register bit definitions and add AFP to them
-
-Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
-
+On 4/21/20 6:18 PM, David Hildenbrand wrote:
+> On 21.04.20 18:13, Pierre Morel wrote:
+>>
+>>
+>> On 2020-02-20 13:00, Pierre Morel wrote:
+>>
+>> ...snip...
+>>
+>>>
+>>>
+>>> Pierre Morel (10):
+>>>    s390x: saving regs for interrupts
+>>>    s390x: Use PSW bits definitions in cstart
+>>>    s390x: cr0: adding AFP-register control bit
+>>>    s390x: export the clock get_clock_ms() utility
+>>
+>> Please can you consider applying these 4 patches only.
+>> I will send some changes I made for the patches on css tests.
+>>
 >=20
-> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
-> ---
->  lib/s390x/asm/arch_def.h | 11 ++++++-----
->  s390x/cstart64.S         |  2 +-
->  2 files changed, 7 insertions(+), 6 deletions(-)
->=20
-> diff --git a/lib/s390x/asm/arch_def.h b/lib/s390x/asm/arch_def.h
-> index 69a8256..863c2bf 100644
-> --- a/lib/s390x/asm/arch_def.h
-> +++ b/lib/s390x/asm/arch_def.h
-> @@ -18,6 +18,12 @@
-> =20
->  #define PSW_EXCEPTION_MASK (PSW_MASK_EA|PSW_MASK_BA)
-> =20
-> +#define CR0_EXTM_SCLP			0X0000000000000200UL
-> +#define CR0_EXTM_EXTC			0X0000000000002000UL
-> +#define CR0_EXTM_EMGC			0X0000000000004000UL
-> +#define CR0_EXTM_MASK			0X0000000000006200UL
-> +#define CR0_AFP_REG_CRTL		0x0000000000040000UL
-> +
->  #ifndef __ASSEMBLER__
-> =20
->  struct psw {
-> @@ -25,11 +31,6 @@ struct psw {
->  	uint64_t	addr;
->  };
-> =20
-> -#define CR0_EXTM_SCLP			0X0000000000000200UL
-> -#define CR0_EXTM_EXTC			0X0000000000002000UL
-> -#define CR0_EXTM_EMGC			0X0000000000004000UL
-> -#define CR0_EXTM_MASK			0X0000000000006200UL
-> -
->  struct lowcore {
->  	uint8_t		pad_0x0000[0x0080 - 0x0000];	/* 0x0000 */
->  	uint32_t	ext_int_param;			/* 0x0080 */
-> diff --git a/s390x/cstart64.S b/s390x/cstart64.S
-> index 2885a36..3b59bd1 100644
-> --- a/s390x/cstart64.S
-> +++ b/s390x/cstart64.S
-> @@ -230,4 +230,4 @@ svc_int_psw:
->  	.quad	PSW_EXCEPTION_MASK, svc_int
->  initial_cr0:
->  	/* enable AFP-register control, so FP regs (+BFP instr) can be used *=
-/
-> -	.quad	0x0000000000040000
-> +	.quad	CR0_AFP_REG_CRTL
+> The first one requires a little more brain power - can anybody at IBM
+> help reviewing that?
 >=20
 
+I'll try to understand it :)
+
+But I think we need a new series anyway.
+@Pierre: You told me, that you removed delay() and this series still has
+it. With the changes needed to the second patch and the delay change we
+need all information to make decisions, so a new version of the series
+would make sense.
 
 
---EOWPvNTSl0Qrmj66m9JdSexUHJqGIhPYD--
 
---GyifXTZlsyM8ZIgho0Vn086lt06WUgA3h
+--M3I2jByNAOz0jeA9h61PC1o4DevKsR8cF--
+
+--OYF0GydMbDu8HxOuTkPPSmnAuccIO8APC
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl6f9JcACgkQ41TmuOI4
-ufil/w//dbqGIM2HaV4WaUalhvxm/YfYG2jKvebHmD68d6wGgTEDx2mIkNR1jPlx
-Rzz36pOnADQIXizEqwWNVbdK4gI2r+DlnPY88sJckv6JiiOqsZyPKyYc36asIArV
-HKzHRYWIZBLC52VC2f1EopSXob7z/JlHFa6V4K+MCDdOBlWsMZIH1jgt0jVMLFU+
-aWQMNZBeIZWZ2GsylmRxrZkIVLv3Z3Kx38hgpq/QIECTPn2zmT5spKbjPcZP2RVw
-VNYI5T1gq7a/NTDIAVtr8+05LOGJ7jvhORMT6Z6MRG3XgyWNCBTV/WTppNsDX/ur
-fWd7dn/ZnaOvQxPtfAOBh/sDtCxh9NvXnmip6238EecLcvFjGxKkJblQpYcSGoM4
-aMVG3M6HWeQxAPTaZuRIKK442+kPtfl1u8ZWIe8jLc0BUn3cbFSWn0yzBYTzCaVG
-3c50r7Szmz2RfjzxwEa0X4VcCCuvCXfSwvZX3qTWh8HrC2odS2C3gaGWTOm3Aax3
-CRwQA3RTaGtKaMyoOCWRy7IosyQjXtbEOcUXJCqpESTLLV2/ls2CM8u0D1hhmfwD
-2bPZzU4Z1iCtTdoPWnrsg/iUGmbLbcmR6Okip22WdUPHpm8kxYkWd8f+2eSY1z7Z
-o+s0jTFv9ZbHr7KL/qF3MEOhqgtIy3rQmxHpPgWtuhGL8zAASVk=
-=8jsV
+iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl6f9ZoACgkQ41TmuOI4
+ufi3EhAAp8SxlhgUDsqAMFa9aK3fOyIyY6jE53bUGQnYKbTk7IW1EB0B8+TLAvRf
+QxvgsPqYGpQJVqNW8DsnYvTiseTROUi0R9BUi/otGLuE8nSB1S0jGfLtwjQQGIP/
+NqhOuZuGnEZUDEP8CrTEORKQdPEkFwJ69v8TAw+5HGEl2+K1c15SxlRfAVv1HCp2
+AkD2Yw6YyJD4M8ywhtsuda2DJPzZRNdDkcIggUQjBXTR7Db7VvE9wLhpxQd4WYWm
+wLI7iVV80Qf0KVU7WZzlGfDpKLEwXfzQTVzupvCUAnw/cyDFGf0Yd4UO8dYIL8w0
+z3sd3ElcgHsoBEvTrwbpuqRNnIGDL8a7u9bendmiInDbSgvlfqAFLIB4JXKiToMj
+tsCvpGtKv1PuyUuC7J1mb8K7GrFoIvl+twNhW9fnu58iwIFo1OSMj5T0eBg0yhb2
+BU4rL1SPleJ9dhrTmYxN0o2wqZtR21LoliRAfVLx782jjBp4iwndSIe2EGwEV76P
+q528UweaNJsSRmGEWdF90LC918AkgrqCLWJ7FAFLldYR19dx7l/A4n2vInwFDHeC
+FAlpWLYjcQCMJYEEygLKxe0+x8dEKqqSz2jXNoqCeDgMlO16uVb1wxouZyJ8ZGRZ
+6I0haqwkNexKFQp30zOUBrCM2FcMQi6a3himPl+PQGWuNBgJENA=
+=qs4e
 -----END PGP SIGNATURE-----
 
---GyifXTZlsyM8ZIgho0Vn086lt06WUgA3h--
+--OYF0GydMbDu8HxOuTkPPSmnAuccIO8APC--
 
