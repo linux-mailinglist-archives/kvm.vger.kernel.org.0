@@ -2,92 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6C56D1B4FD8
-	for <lists+kvm@lfdr.de>; Thu, 23 Apr 2020 00:06:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 822B01B50A1
+	for <lists+kvm@lfdr.de>; Thu, 23 Apr 2020 01:04:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726715AbgDVWGi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Apr 2020 18:06:38 -0400
-Received: from mga18.intel.com ([134.134.136.126]:27263 "EHLO mga18.intel.com"
+        id S1726399AbgDVXEY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Apr 2020 19:04:24 -0400
+Received: from mga07.intel.com ([134.134.136.100]:7109 "EHLO mga07.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725839AbgDVWGh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Apr 2020 18:06:37 -0400
-IronPort-SDR: ruk9Jd06KF759dBwMw/DuUHLseBFIK7G8QIbtKYCt975xwV67SJA+tmWMhkJroJUVd2RZES8k/
- x4g2JHtMTVCA==
+        id S1726008AbgDVXEY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Apr 2020 19:04:24 -0400
+IronPort-SDR: 3uHv/mNBS2PuxZxmApi10iGniE4BDbo7a1FVY6YBZxfcuULMNbvrESa4GCrBdBmTmCrSKD8lnI
+ LSbwpX6W44QQ==
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Apr 2020 15:06:37 -0700
-IronPort-SDR: 1fHNQs6YerVTl9db/RG3UYOLHnAFOQ/q/qgrFrrnlDyvUbe1CzzuXb979XtTJ+r70WbBjnGBUe
- EFXMG2eWcyIQ==
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Apr 2020 16:04:23 -0700
+IronPort-SDR: 49PSRAP6HZ2kkUOmviJXbjwvhozsbej9LWy1KbXoOSWlD9Itl37uJJ9lcmtRvzpTqNciu0IzD/
+ O+hF9jv9BXmA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.73,304,1583222400"; 
-   d="scan'208";a="430086473"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
-  by orsmga005.jf.intel.com with ESMTP; 22 Apr 2020 15:06:37 -0700
-Date:   Wed, 22 Apr 2020 15:06:37 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Jim Mattson <jmattson@google.com>
-Cc:     kvm list <kvm@vger.kernel.org>, Oliver Upton <oupton@google.com>,
-        Peter Shier <pshier@google.com>
-Subject: Re: [PATCH 1/2] kvm: nVMX: Pending debug exceptions trump expired
- VMX-preemption timer
-Message-ID: <20200422220637.GC5823@linux.intel.com>
-References: <20200414000946.47396-1-jmattson@google.com>
- <20200422210649.GA5823@linux.intel.com>
- <CALMp9eSHyYvRfNe+X+Hd4i2c2phssakxr_5zV9tMQjtk1Usm9A@mail.gmail.com>
+   d="scan'208";a="247589890"
+Received: from meghadey-mobl1.amr.corp.intel.com (HELO [10.254.185.101]) ([10.254.185.101])
+  by fmsmga008.fm.intel.com with ESMTP; 22 Apr 2020 16:04:20 -0700
+Subject: Re: [PATCH RFC 00/15] Add VFIO mediated device support and IMS
+ support for the idxd driver.
+To:     Jason Gunthorpe <jgg@mellanox.com>,
+        Dave Jiang <dave.jiang@intel.com>
+Cc:     vkoul@kernel.org, maz@kernel.org, bhelgaas@google.com,
+        rafael@kernel.org, gregkh@linuxfoundation.org, tglx@linutronix.de,
+        hpa@zytor.com, alex.williamson@redhat.com, jacob.jun.pan@intel.com,
+        ashok.raj@intel.com, yi.l.liu@intel.com, baolu.lu@intel.com,
+        kevin.tian@intel.com, sanjay.k.kumar@intel.com,
+        tony.luck@intel.com, jing.lin@intel.com, dan.j.williams@intel.com,
+        kwankhede@nvidia.com, eric.auger@redhat.com, parav@mellanox.com,
+        dmaengine@vger.kernel.org, linux-kernel@vger.kernel.org,
+        x86@kernel.org, linux-pci@vger.kernel.org, kvm@vger.kernel.org
+References: <158751095889.36773.6009825070990637468.stgit@djiang5-desk3.ch.intel.com>
+ <20200421235442.GO11945@mellanox.com>
+From:   "Dey, Megha" <megha.dey@linux.intel.com>
+Message-ID: <d6b3c133-ac19-21af-b7a7-b9e7166b8166@linux.intel.com>
+Date:   Wed, 22 Apr 2020 16:04:20 -0700
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CALMp9eSHyYvRfNe+X+Hd4i2c2phssakxr_5zV9tMQjtk1Usm9A@mail.gmail.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <20200421235442.GO11945@mellanox.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Apr 22, 2020 at 02:27:33PM -0700, Jim Mattson wrote:
-> On Wed, Apr 22, 2020 at 2:06 PM Sean Christopherson
-> <sean.j.christopherson@intel.com> wrote:
-> The KVM code that deals with all of these events is really hard to
-> follow. I wish we could take a step back and just implement Table 6-2
-> from the SDM volume 3 (augmented with the scattered information about
-> VMX events and their priorities relative to their nearest neighbors.
-> Lumping priorities 7 - 10 together (faults that we either intercepted
-> or synthesized in emulation), I think these are the various things we
-> need to check, in this order...
+
+
+On 4/21/2020 4:54 PM, Jason Gunthorpe wrote:
+> On Tue, Apr 21, 2020 at 04:33:46PM -0700, Dave Jiang wrote:
+>> The actual code is independent of the stage 2 driver code submission that adds
+>> support for SVM, ENQCMD(S), PASID, and shared workqueues. This code series will
+>> support dedicated workqueue on a guest with no vIOMMU.
+>>    
+>> A new device type "mdev" is introduced for the idxd driver. This allows the wq
+>> to be dedicated to the usage of a VFIO mediated device (mdev). Once the work
+>> queue (wq) is enabled, an uuid generated by the user can be added to the wq
+>> through the uuid sysfs attribute for the wq.  After the association, a mdev can
+>> be created using this UUID. The mdev driver code will associate the uuid and
+>> setup the mdev on the driver side. When the create operation is successful, the
+>> uuid can be passed to qemu. When the guest boots up, it should discover a DSA
+>> device when doing PCI discovery.
 > 
-> 0. Is there a fault to be delivered? (In L2, is it intercepted by L1?)
-> 1. Is there a RESET or machine check event?
-> 2. Is there a trap on task switch?
-> 3. Is there an SMI or an INIT?
-> 3.5 In L2, is there an MTF VM-exit?
-> 4. Is there a #DB trap on the previous instruction? (In L2, is it
-> intercepted by L1?)
-> 4.3 In L2, has the VMX-preemption timer expired?
-> 4.6 In L2, do we need to synthesize an NMI-window VM-exit?
-> 5. Is there an NMI? (In L2, is it intercepted by L1?)
-> 5.3 In L2 do we need to synthesize an interrupt-window VM-exit?
-> 5.6 In L2, do we need to virtualize virtual-interrupt delivery?
-> 6. Is there a maskable interrupt? (In L2, is it intercepted by L1?)
-> 7. Now, we can enter VMX non-root mode.
+> I'm feeling really skeptical that adding all this PCI config space and
+> MMIO BAR emulation to the kernel just to cram this into a VFIO
+> interface is a good idea, that kind of stuff is much safer in
+> userspace.
+> 
+> Particularly since vfio is not really needed once a driver is using
+> the PASID stuff. We already have general code for drivers to use to
+> attach a PASID to a mm_struct - and using vfio while disabling all the
+> DMA/iommu config really seems like an abuse.
+> 
+> A /dev/idxd char dev that mmaps a bar page and links it to a PASID
+> seems a lot simpler and saner kernel wise.
+> 
+>> The mdev utilizes Interrupt Message Store or IMS[3] instead of MSIX for
+>> interrupts for the guest. This preserves MSIX for host usages and also allows a
+>> significantly larger number of interrupt vectors for guest usage.
+> 
+> I never did get a reply to my earlier remarks on the IMS patches.
+> 
+> The concept of a device specific addr/data table format for MSI is not
+> Intel specific. This should be general code. We have a device that can
+> use this kind of kernel capability today.
+> 
 
-100% agreed.  I even tried to go down that path, multiple times, while
-sorting this stuff out.  The big problem that isn't easily resolved is
-kvm_vcpu_running(), which currently calls .check_nested_events()
-even if KVM_REQ_EVENT isn't set.  Its existence makes it annoyingly
-difficult to provide a unified single-pass flow for exiting and
-non-exiting events, e.g. we'd either have to duplicate a big pile of
-logic (eww) or significantly rework the event handling (scary).
+<resending to the mailing list, I had incorrect email options set>
 
-Having the INIT and SIPI handling buried in kvm_apic_accept_events() is
-also a pain, but that's less scary to change.
+Hi Jason,
 
-In the long term, I absolutely think it'd be worth revamping the event
-handling so that it's not scattered all over tarnation, but that's
-something that should probably have a full kernel cycle or two of
-testing and performance analysis.
+I am sorry if I did not address your comments earlier.
 
-If someone does pick up that torch, I think it'd also be worth experimenting
-with removing KVM_REQ_EVENT, i.e. processing events on _every_ run.  IMO
-that would simplify the code, or at least how one reasons about the code, a
-great deal.
+The present IMS code is quite generic, most of the code is in the 
+drivers/ folder. We basically introduce 2 APIS: allocate and free IMS 
+interrupts and a IMS IRQ domain to allocate these interrupts from. These 
+APIs are architecture agnostic.
+
+We also introduce a new IMS IRQ domain which is architecture specific. 
+This is because IMS generates interrupts only in the remappable format, 
+hence interrupt remapping should be enabled for IMS. Currently, the 
+interrupt remapping code is only available for Intel and AMD and I don’t 
+see anything for ARM.
+
+If a new architecture would want to use IMS, they must simply introduce 
+a new IMS IRQ domain. I am not sure if there is any other way around 
+this. If you have any ideas, please let me know.
+
+Also, could you give more details on the device that could use IMS? Do 
+you have some driver code already? We could then see if and how the 
+current IMS code could be made more generic.
+
+> Jason
+> 
