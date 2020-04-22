@@ -2,32 +2,32 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A5EAC1B44BA
-	for <lists+kvm@lfdr.de>; Wed, 22 Apr 2020 14:21:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C16091B44CF
+	for <lists+kvm@lfdr.de>; Wed, 22 Apr 2020 14:21:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727089AbgDVMVQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Apr 2020 08:21:16 -0400
-Received: from mail.kernel.org ([198.145.29.99]:57218 "EHLO mail.kernel.org"
+        id S1728648AbgDVMV0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Apr 2020 08:21:26 -0400
+Received: from mail.kernel.org ([198.145.29.99]:57770 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728478AbgDVMVM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Apr 2020 08:21:12 -0400
+        id S1727892AbgDVMVW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Apr 2020 08:21:22 -0400
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 74E7C217BA;
-        Wed, 22 Apr 2020 12:21:11 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 5003A20784;
+        Wed, 22 Apr 2020 12:21:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1587558071;
-        bh=3DfBWnjoftiMKEV8n/oHnQrUy1AFUy0M8vMHJgyQgDQ=;
+        s=default; t=1587558081;
+        bh=ltfWEr7b6Col4KshTFdZvfSbsWR/3TVT6QbzpRPiUzE=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=yhYsqogUMKn1g1v2Sg8c0LVBe/0g412wtS5WOpM16KFnv/oHZxPEPa4/aVevGTgx7
-         P3vgJn9VM6Uunn+F6jlqCmZFBjfHuJQPJAjOhnMhvLsiYDX0kDsAQIBO1ZyD/AOxsH
-         vXOImoveedTfP49+iiNvTL2nWhQdg8iDzyDjOq2k=
+        b=Yy+sl3UjWx1mHaF+CeFdnisUG7BVXK8nXsghKr1cbpDMFHceG4IVvGoloTtyZ5pPv
+         LYfz+kWvlpV+WsEFBBfmjFqeqSVO/DqsKZ5po6dccmUXZQbRfHmmmFHNc+z+q3VnHE
+         R83zFZL8snwztJnQLoYFP1OlPLbIcJRGRLiQIe8Y=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
         by disco-boy.misterjones.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
         (Exim 4.92)
         (envelope-from <maz@kernel.org>)
-        id 1jRE3t-005UI7-3d; Wed, 22 Apr 2020 13:01:05 +0100
+        id 1jRE3u-005UI7-39; Wed, 22 Apr 2020 13:01:06 +0100
 From:   Marc Zyngier <maz@kernel.org>
 To:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         kvm@vger.kernel.org
@@ -44,9 +44,9 @@ Cc:     Andre Przywara <andre.przywara@arm.com>,
         James Morse <james.morse@arm.com>,
         Julien Thierry <julien.thierry.kdev@gmail.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [PATCH 11/26] KVM: arm64: Add missing reset handlers for PMU emulation
-Date:   Wed, 22 Apr 2020 13:00:35 +0100
-Message-Id: <20200422120050.3693593-12-maz@kernel.org>
+Subject: [PATCH 12/26] KVM: arm64: Move sysreg reset check to boot time
+Date:   Wed, 22 Apr 2020 13:00:36 +0100
+Message-Id: <20200422120050.3693593-13-maz@kernel.org>
 X-Mailer: git-send-email 2.26.1
 In-Reply-To: <20200422120050.3693593-1-maz@kernel.org>
 References: <20200422120050.3693593-1-maz@kernel.org>
@@ -61,40 +61,143 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-As we're about to become a bit more harsh when it comes to the lack of
-reset callbacks, let's add the missing PMU reset handlers. Note that
-these only cover *CLR registers that were always covered by their *SET
-counterpart, so there is no semantic change here.
+Our sysreg reset check has become a bit silly, as it only checks whether
+a reset callback actually exists for a given sysreg entry, and apply the
+method if available. Doing the check at each vcpu reset is pretty dumb,
+as the tables never change. It is thus perfectly possible to do the same
+checks at boot time.
+
+This also allows us to introduce a sparse sys_regs[] array, something
+that will be required with ARMv8.4-NV.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/sys_regs.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ arch/arm64/kvm/sys_regs.c | 72 +++++++++++++++++++--------------------
+ 1 file changed, 35 insertions(+), 37 deletions(-)
 
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 46f218982df8c..c9443960b36e4 100644
+index c9443960b36e4..5bda4af36a0e7 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -1553,7 +1553,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	{ SYS_DESC(SYS_PAR_EL1), NULL, reset_unknown, PAR_EL1 },
+@@ -2094,12 +2094,37 @@ static const struct sys_reg_desc cp15_64_regs[] = {
+ 	{ SYS_DESC(SYS_AARCH32_CNTP_CVAL),    access_arch_timer },
+ };
  
- 	{ SYS_DESC(SYS_PMINTENSET_EL1), access_pminten, reset_unknown, PMINTENSET_EL1 },
--	{ SYS_DESC(SYS_PMINTENCLR_EL1), access_pminten, NULL, PMINTENSET_EL1 },
-+	{ SYS_DESC(SYS_PMINTENCLR_EL1), access_pminten, reset_unknown, PMINTENSET_EL1 },
++static int check_sysreg_table(const struct sys_reg_desc *table, unsigned int n,
++			      bool is_32)
++{
++	unsigned int i;
++
++	for (i = 0; i < n; i++) {
++		if (!is_32 && table[i].reg && !table[i].reset) {
++			kvm_err("sys_reg table %p entry %d has lacks reset\n",
++				table, i);
++			return 1;
++		}
++
++		if (i && cmp_sys_reg(&table[i-1], &table[i]) >= 0) {
++			kvm_err("sys_reg table %p out of order (%d)\n", table, i - 1);
++			return 1;
++		}
++	}
++
++	return 0;
++}
++
+ /* Target specific emulation tables */
+ static struct kvm_sys_reg_target_table *target_tables[KVM_ARM_NUM_TARGETS];
  
- 	{ SYS_DESC(SYS_MAIR_EL1), access_vm_reg, reset_unknown, MAIR_EL1 },
- 	{ SYS_DESC(SYS_AMAIR_EL1), access_vm_reg, reset_amair_el1, AMAIR_EL1 },
-@@ -1592,8 +1592,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ void kvm_register_target_sys_reg_table(unsigned int target,
+ 				       struct kvm_sys_reg_target_table *table)
+ {
++	if (check_sysreg_table(table->table64.table, table->table64.num, false) ||
++	    check_sysreg_table(table->table32.table, table->table32.num, true))
++		return;
++
+ 	target_tables[target] = table;
+ }
  
- 	{ SYS_DESC(SYS_PMCR_EL0), access_pmcr, reset_pmcr, PMCR_EL0 },
- 	{ SYS_DESC(SYS_PMCNTENSET_EL0), access_pmcnten, reset_unknown, PMCNTENSET_EL0 },
--	{ SYS_DESC(SYS_PMCNTENCLR_EL0), access_pmcnten, NULL, PMCNTENSET_EL0 },
--	{ SYS_DESC(SYS_PMOVSCLR_EL0), access_pmovs, NULL, PMOVSSET_EL0 },
-+	{ SYS_DESC(SYS_PMCNTENCLR_EL0), access_pmcnten, reset_unknown, PMCNTENSET_EL0 },
-+	{ SYS_DESC(SYS_PMOVSCLR_EL0), access_pmovs, reset_unknown, PMOVSSET_EL0 },
- 	{ SYS_DESC(SYS_PMSWINC_EL0), access_pmswinc, reset_unknown, PMSWINC_EL0 },
- 	{ SYS_DESC(SYS_PMSELR_EL0), access_pmselr, reset_unknown, PMSELR_EL0 },
- 	{ SYS_DESC(SYS_PMCEID0_EL0), access_pmceid },
+@@ -2385,19 +2410,13 @@ static int emulate_sys_reg(struct kvm_vcpu *vcpu,
+ }
+ 
+ static void reset_sys_reg_descs(struct kvm_vcpu *vcpu,
+-				const struct sys_reg_desc *table, size_t num,
+-				unsigned long *bmap)
++				const struct sys_reg_desc *table, size_t num)
+ {
+ 	unsigned long i;
+ 
+ 	for (i = 0; i < num; i++)
+-		if (table[i].reset) {
+-			int reg = table[i].reg;
+-
++		if (table[i].reset)
+ 			table[i].reset(vcpu, &table[i]);
+-			if (reg > 0 && reg < NR_SYS_REGS)
+-				set_bit(reg, bmap);
+-		}
+ }
+ 
+ /**
+@@ -2853,32 +2872,18 @@ int kvm_arm_copy_sys_reg_indices(struct kvm_vcpu *vcpu, u64 __user *uindices)
+ 	return write_demux_regids(uindices);
+ }
+ 
+-static int check_sysreg_table(const struct sys_reg_desc *table, unsigned int n)
+-{
+-	unsigned int i;
+-
+-	for (i = 1; i < n; i++) {
+-		if (cmp_sys_reg(&table[i-1], &table[i]) >= 0) {
+-			kvm_err("sys_reg table %p out of order (%d)\n", table, i - 1);
+-			return 1;
+-		}
+-	}
+-
+-	return 0;
+-}
+-
+ void kvm_sys_reg_table_init(void)
+ {
+ 	unsigned int i;
+ 	struct sys_reg_desc clidr;
+ 
+ 	/* Make sure tables are unique and in order. */
+-	BUG_ON(check_sysreg_table(sys_reg_descs, ARRAY_SIZE(sys_reg_descs)));
+-	BUG_ON(check_sysreg_table(cp14_regs, ARRAY_SIZE(cp14_regs)));
+-	BUG_ON(check_sysreg_table(cp14_64_regs, ARRAY_SIZE(cp14_64_regs)));
+-	BUG_ON(check_sysreg_table(cp15_regs, ARRAY_SIZE(cp15_regs)));
+-	BUG_ON(check_sysreg_table(cp15_64_regs, ARRAY_SIZE(cp15_64_regs)));
+-	BUG_ON(check_sysreg_table(invariant_sys_regs, ARRAY_SIZE(invariant_sys_regs)));
++	BUG_ON(check_sysreg_table(sys_reg_descs, ARRAY_SIZE(sys_reg_descs), false));
++	BUG_ON(check_sysreg_table(cp14_regs, ARRAY_SIZE(cp14_regs), true));
++	BUG_ON(check_sysreg_table(cp14_64_regs, ARRAY_SIZE(cp14_64_regs), true));
++	BUG_ON(check_sysreg_table(cp15_regs, ARRAY_SIZE(cp15_regs), true));
++	BUG_ON(check_sysreg_table(cp15_64_regs, ARRAY_SIZE(cp15_64_regs), true));
++	BUG_ON(check_sysreg_table(invariant_sys_regs, ARRAY_SIZE(invariant_sys_regs), false));
+ 
+ 	/* We abuse the reset function to overwrite the table itself. */
+ 	for (i = 0; i < ARRAY_SIZE(invariant_sys_regs); i++)
+@@ -2914,17 +2919,10 @@ void kvm_reset_sys_regs(struct kvm_vcpu *vcpu)
+ {
+ 	size_t num;
+ 	const struct sys_reg_desc *table;
+-	DECLARE_BITMAP(bmap, NR_SYS_REGS) = { 0, };
+ 
+ 	/* Generic chip reset first (so target could override). */
+-	reset_sys_reg_descs(vcpu, sys_reg_descs, ARRAY_SIZE(sys_reg_descs), bmap);
++	reset_sys_reg_descs(vcpu, sys_reg_descs, ARRAY_SIZE(sys_reg_descs));
+ 
+ 	table = get_target_table(vcpu->arch.target, true, &num);
+-	reset_sys_reg_descs(vcpu, table, num, bmap);
+-
+-	for (num = 1; num < NR_SYS_REGS; num++) {
+-		if (WARN(!test_bit(num, bmap),
+-			 "Didn't reset __vcpu_sys_reg(%zi)\n", num))
+-			break;
+-	}
++	reset_sys_reg_descs(vcpu, table, num);
+ }
 -- 
 2.26.1
 
