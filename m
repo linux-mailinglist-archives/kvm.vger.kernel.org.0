@@ -2,89 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7EA811B3602
-	for <lists+kvm@lfdr.de>; Wed, 22 Apr 2020 06:12:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D15E81B365E
+	for <lists+kvm@lfdr.de>; Wed, 22 Apr 2020 06:32:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726528AbgDVEL7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Apr 2020 00:11:59 -0400
-Received: from mx2.suse.de ([195.135.220.15]:60174 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726494AbgDVEL6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Apr 2020 00:11:58 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx2.suse.de (Postfix) with ESMTP id 1E94DAE6E;
-        Wed, 22 Apr 2020 04:11:55 +0000 (UTC)
-From:   Davidlohr Bueso <dave@stgolabs.net>
-To:     tglx@linutronix.de, pbonzini@redhat.com
-Cc:     bigeasy@linutronix.de, peterz@infradead.org, rostedt@goodmis.org,
-        torvalds@linux-foundation.org, will@kernel.org,
-        joel@joelfernandes.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, dave@stgolabs.net,
-        Davidlohr Bueso <dbueso@suse.de>
-Subject: [PATCH 5/5] sched/swait: Reword some of the main description
-Date:   Tue, 21 Apr 2020 21:07:39 -0700
-Message-Id: <20200422040739.18601-6-dave@stgolabs.net>
-X-Mailer: git-send-email 2.16.4
-In-Reply-To: <20200422040739.18601-1-dave@stgolabs.net>
-References: <20200422040739.18601-1-dave@stgolabs.net>
+        id S1725835AbgDVEcu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Apr 2020 00:32:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37772 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725355AbgDVEcu (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 22 Apr 2020 00:32:50 -0400
+Received: from mail-lj1-x243.google.com (mail-lj1-x243.google.com [IPv6:2a00:1450:4864:20::243])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B49BC061BD3;
+        Tue, 21 Apr 2020 21:32:50 -0700 (PDT)
+Received: by mail-lj1-x243.google.com with SMTP id f18so764934lja.13;
+        Tue, 21 Apr 2020 21:32:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=A5QcfjCn4RHqxFiUd6PW5P9dUEa7LK3ItDiWItR+ENY=;
+        b=LWv/JZzafay7oRFFZtJqFGtvMDPsNV5bw77dhIFOOeJBjFTu5zh4OpuCyAMv0Y217U
+         51SeLdsd6xu3q4qprVgI2FWMiFXF/kFr1q6JtNDSkpLZAePfLFixYyxELG0RznpYIZWl
+         oX0MlD8JslD6H1f/UHsdRUZJa3f/cLrNbv2vRgUN4tALvynmTdC9i0FN9PzwV8isMUFL
+         xjYza4n00Glv4eRD3aYOE326OhwNLa0hzQOWMxrdfHkEIU1Masj9YSAgBKmCSBdao0fl
+         0Zt99AuMLkH3trLAVBKxLLDBj9VchEUyziShKVeDk8zrLxziV41IVHVyPjDSUk7U6yw8
+         1aVg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=A5QcfjCn4RHqxFiUd6PW5P9dUEa7LK3ItDiWItR+ENY=;
+        b=rG6afltyXvDONh2EyjzGtKKSUX+5LfQhqMqyzTmnmv9vBkzAmi0e1FPVYH6/FKPfsh
+         RpYGKVCc9PKg2ev6rgNeAwcASmC6vkBWIM48VkJPnNZq6K5hImONfsOTmO2zCdgLqFQ8
+         FzkY/qIEwUPFT1HjKYrzwZHs6GL+9fQkjMjHPuDmisp8ERLUKTlTYBprp1blexeTkNJF
+         2CPTwlV/KqhxgUXoP/vM8YWYyUGjz8t7f3bk4VtB6IAylNJfWjFte86eOigfYlwv4hDY
+         pzemmh4xF9jFVvxhxoU3JblOmDu8Pj0u1GtF07g/1iLoGPH3mSZwuIrg2FGF0lj0+toG
+         cxkA==
+X-Gm-Message-State: AGi0PuYWH6uEIL0Tjd+OQ4SLS95eNx92g44y6hWcdE9LxkJfvM4DAAn4
+        jTVAz1j9cGHje9ljyZjoNNZny+LutNFXTLprHu0=
+X-Google-Smtp-Source: APiQypLk+D7TFlox7KCXYhUtX1tRIYss0/OkVkleKJZEfuLyIcHMqz3bBCjV80gtvPEUDaLqY+jwZQ+PgnR7cvHkUuY=
+X-Received: by 2002:a2e:9b0f:: with SMTP id u15mr618934lji.272.1587529968454;
+ Tue, 21 Apr 2020 21:32:48 -0700 (PDT)
+MIME-Version: 1.0
+References: <1586763024-12197-3-git-send-email-chenhc@lemote.com> <20200421195611.49A4A206E9@mail.kernel.org>
+In-Reply-To: <20200421195611.49A4A206E9@mail.kernel.org>
+From:   chen huacai <zltjiangshi@gmail.com>
+Date:   Wed, 22 Apr 2020 12:40:10 +0800
+Message-ID: <CABDp7Vo_rKn2x8zmrNQzdcFHC_1sxXDot1t_ZEt+Y=Q=jo+wOQ@mail.gmail.com>
+Subject: Re: [PATCH 02/15] KVM: MIPS: Define KVM_ENTRYHI_ASID to cpu_asid_mask(&boot_cpu_data)
+To:     Sasha Levin <sashal@kernel.org>
+Cc:     Huacai Chen <chenhc@lemote.com>, Xing Li <lixing@loongson.cn>,
+        Paolo Bonzini <pbonzini@redhat.com>, stable@vger.kernel.org,
+        qemu-level <qemu-devel@nongnu.org>, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-With both the increased use of swait and kvm no longer using
-it, we can reword some of the comments. While removing Linus'
-valid rant, I've also cared to explicitly mention that swait
-is very different than regular wait. In addition it is
-mentioned against using swait in favor of the regular flavor.
+Hi, Sasha,
 
-Signed-off-by: Davidlohr Bueso <dbueso@suse.de>
----
- include/linux/swait.h | 23 +++++------------------
- 1 file changed, 5 insertions(+), 18 deletions(-)
+On Wed, Apr 22, 2020 at 9:40 AM Sasha Levin <sashal@kernel.org> wrote:
+>
+> Hi
+>
+> [This is an automated email]
+>
+> This commit has been processed because it contains a -stable tag.
+> The stable tag indicates that it's relevant for the following trees: all
+>
+> The bot has tested the following trees: v5.6.5, v5.5.18, v5.4.33, v4.19.116, v4.14.176, v4.9.219, v4.4.219.
+>
+> v5.6.5: Build OK!
+> v5.5.18: Build OK!
+> v5.4.33: Build OK!
+> v4.19.116: Build OK!
+> v4.14.176: Build OK!
+> v4.9.219: Build OK!
+> v4.4.219: Failed to apply! Possible dependencies:
+>     029499b47738 ("KVM: x86: MMU: Make mmu_set_spte() return emulate value")
+>     19d194c62b25 ("MIPS: KVM: Simplify TLB_* macros")
+>     403015b323a2 ("MIPS: KVM: Move non-TLB handling code out of tlb.c")
+>     7ee0e5b29d27 ("KVM: x86: MMU: Remove unused parameter of __direct_map()")
+>     9fbfb06a4065 ("MIPS: KVM: Arrayify struct kvm_mips_tlb::tlb_lo*")
+>     ba049e93aef7 ("kvm: rename pfn_t to kvm_pfn_t")
+>     bdb7ed8608f8 ("MIPS: KVM: Convert headers to kernel sized types")
+>     ca64c2beecd4 ("MIPS: KVM: Abstract guest ASID mask")
+>     caa1faa7aba6 ("MIPS: KVM: Trivial whitespace and style fixes")
+>     e6207bbea16c ("MIPS: KVM: Use MIPS_ENTRYLO_* defs from mipsregs.h")
+>
+>
+> NOTE: The patch will not be queued to stable trees until it is upstream.
+>
+> How should we proceed with this patch?
+Please ignore this patch in linux-4.4 branch and even below.
+>
+> --
+> Thanks
+> Sasha
+>
+Thanks,
+Huacai
 
-diff --git a/include/linux/swait.h b/include/linux/swait.h
-index 73e06e9986d4..6a8c22b8c2a5 100644
---- a/include/linux/swait.h
-+++ b/include/linux/swait.h
-@@ -9,23 +9,10 @@
- #include <asm/current.h>
- 
- /*
-- * BROKEN wait-queues.
-- *
-- * These "simple" wait-queues are broken garbage, and should never be
-- * used. The comments below claim that they are "similar" to regular
-- * wait-queues, but the semantics are actually completely different, and
-- * every single user we have ever had has been buggy (or pointless).
-- *
-- * A "swake_up_one()" only wakes up _one_ waiter, which is not at all what
-- * "wake_up()" does, and has led to problems. In other cases, it has
-- * been fine, because there's only ever one waiter (kvm), but in that
-- * case gthe whole "simple" wait-queue is just pointless to begin with,
-- * since there is no "queue". Use "wake_up_process()" with a direct
-- * pointer instead.
-- *
-- * While these are very similar to regular wait queues (wait.h) the most
-- * important difference is that the simple waitqueue allows for deterministic
-- * behaviour -- IOW it has strictly bounded IRQ and lock hold times.
-+ * Simple waitqueues are semantically very different to regular wait queues
-+ * (wait.h). The most important difference is that the simple waitqueue allows
-+ * for deterministic behaviour -- IOW it has strictly bounded IRQ and lock hold
-+ * times.
-  *
-  * Mainly, this is accomplished by two things. Firstly not allowing swake_up_all
-  * from IRQ disabled, and dropping the lock upon every wakeup, giving a higher
-@@ -39,7 +26,7 @@
-  *    sleeper state.
-  *
-  *  - the !exclusive mode; because that leads to O(n) wakeups, everything is
-- *    exclusive.
-+ *    exclusive. As such swake_up_one will only ever awake _one_ waiter.
-  *
-  *  - custom wake callback functions; because you cannot give any guarantees
-  *    about random code. This also allows swait to be used in RT, such that
+
 -- 
-2.16.4
-
+Huacai Chen
