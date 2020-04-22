@@ -2,105 +2,152 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A637C1B33DA
-	for <lists+kvm@lfdr.de>; Wed, 22 Apr 2020 02:16:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 579261B3425
+	for <lists+kvm@lfdr.de>; Wed, 22 Apr 2020 02:49:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726501AbgDVAQI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Apr 2020 20:16:08 -0400
-Received: from mga11.intel.com ([192.55.52.93]:1468 "EHLO mga11.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726359AbgDVAQH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Apr 2020 20:16:07 -0400
-IronPort-SDR: fvPwy0/GJtuK6yD02tIDsYdH0FzXcviKcZuIXpvm32vESBivF8tvOfjZXR0oKTXqaO3uUNC+vA
- qLKVprk2S4fQ==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Apr 2020 17:16:07 -0700
-IronPort-SDR: 4Z7xSpRSKXq2YQuB0qLz81M9c80sF1K1MyvId7f9Ik6WN2lJumK419t4i/BK56oKGkTnP4L9qW
- 8cDFOqIfJmYQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.72,412,1580803200"; 
-   d="scan'208";a="290649427"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
-  by fmsmga002.fm.intel.com with ESMTP; 21 Apr 2020 17:16:07 -0700
-Date:   Tue, 21 Apr 2020 17:16:07 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Jim Mattson <jmattson@google.com>
-Cc:     kvm list <kvm@vger.kernel.org>, Oliver Upton <oupton@google.com>,
-        Peter Shier <pshier@google.com>
-Subject: Re: [PATCH 2/2] kvm: nVMX: Single-step traps trump expired
- VMX-preemption timer
-Message-ID: <20200422001607.GA17836@linux.intel.com>
-References: <20200414000946.47396-1-jmattson@google.com>
- <20200414000946.47396-2-jmattson@google.com>
- <20200414031705.GP21204@linux.intel.com>
- <CALMp9eT23AUTU3m_oADKw3O_NMpuX3crx7eqSB8Rbgh3k0s_Jw@mail.gmail.com>
- <20200415001212.GA12547@linux.intel.com>
- <CALMp9eS-s5doptTzVkE2o9jDYuGU3T=5azMhm3fCqLJPcABAOg@mail.gmail.com>
- <20200418042108.GF15609@linux.intel.com>
- <CALMp9eQpwnhD7H3a9wC=TnL3=OKmvHAmVFj=r9OBaWiBEGhR4Q@mail.gmail.com>
- <20200421044141.GE11134@linux.intel.com>
- <CALMp9eST-Fpbsg_x5exDxdAC-S+ekk+smyx5e0ymDqHLi-y8xQ@mail.gmail.com>
+        id S1726355AbgDVAtF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Apr 2020 20:49:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59932 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726012AbgDVAtF (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 21 Apr 2020 20:49:05 -0400
+Received: from mail-oi1-x242.google.com (mail-oi1-x242.google.com [IPv6:2607:f8b0:4864:20::242])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26640C0610D5;
+        Tue, 21 Apr 2020 17:49:05 -0700 (PDT)
+Received: by mail-oi1-x242.google.com with SMTP id t199so447505oif.7;
+        Tue, 21 Apr 2020 17:49:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=fyWIvNsFDIbDhj5AHIg5Xemvwg92lR3Mt2pRS9IX/eY=;
+        b=ZRepC3bJo7TngfHSxmUTuuwFth5NE423gQHfzhrwqKOW/rG5flMB9dP4weA4JGtEHy
+         UOBQ4Lf1S1PdyWACh3vfJi+ahA2GTwmdqRTMkpI2odZ1aVL0cmeI4P3R+JuMjM6MgytQ
+         BBqEyteRb5uhGwjNUkbcjf0X/8GMIgRTWOgHzd70a+ST/Ejez9ptO9rYQk/v71Xf42Yw
+         5YsUN63ngS+fYMnpRva8OJhT/fudkSJYWu0RBS6xqRLaXVBKgoYt48ip6j8vFF82b0c1
+         kVJaUDUc9DIjdq5gzUf2jw/IG4Fcq1OEV6pL8Zt6C2WhiSUTp0gE5zargeJiJLOLexqp
+         F8ww==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=fyWIvNsFDIbDhj5AHIg5Xemvwg92lR3Mt2pRS9IX/eY=;
+        b=gwQakFJCVVSkmXm8oGpNBnINI2anJVUX5YPDcId0V15c/pmqZ31LOHBCHbFhYfliek
+         wgkezHM8fvUyEZXLfT0YN48D6YZ09iyf6dn5nsSqpWMMrjjUqih2UHV1p6V1XH4lrZDs
+         kUU8HmI60nSHGpvg1CdAh1zbvmf91/sPe2WDtX7g1fh+SZmt3JDeXcua0Rh+6dUocdLr
+         vTDviTJHdBU+JqFcnodDj3nZd2BdnkEwy/nP419ER8hGyG2HnoLabCVmCX+GJUB2AUgQ
+         KdipwNXEcsIlWIrVN96HfQJWHipE/b85dAHIp1hTnO/eiYJ6MDNbaeVJujB4woZj+Em3
+         JENg==
+X-Gm-Message-State: AGi0Pub4UlEXzEZa4xixzgiXi0GShIUZR7K+kROMdt5J+cV9763+HSnd
+        zpEtsFqg13p3PzYZWUlbC86FtmOgJBzSqdxBBWU=
+X-Google-Smtp-Source: APiQypLD9AwSNYzuxvfQfpcQ099bZV8Nz8y3kuAYm1wHcLyTZkfVBsJCzZstjc+PvCkJN1SfCN9lsgMQMrz02HpXq8w=
+X-Received: by 2002:aca:2801:: with SMTP id 1mr4840905oix.141.1587516544513;
+ Tue, 21 Apr 2020 17:49:04 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CALMp9eST-Fpbsg_x5exDxdAC-S+ekk+smyx5e0ymDqHLi-y8xQ@mail.gmail.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+References: <1587468026-15753-1-git-send-email-wanpengli@tencent.com>
+ <1587468026-15753-2-git-send-email-wanpengli@tencent.com> <ed968729-5d2a-a318-1d8f-db39e6ee72cb@redhat.com>
+In-Reply-To: <ed968729-5d2a-a318-1d8f-db39e6ee72cb@redhat.com>
+From:   Wanpeng Li <kernellwp@gmail.com>
+Date:   Wed, 22 Apr 2020 08:48:53 +0800
+Message-ID: <CANRm+CxzROx=eawemmzh==2Mz-DxKSyYFSxHqLxUiGFFnWkAYw@mail.gmail.com>
+Subject: Re: [PATCH 1/2] KVM: X86: TSCDEADLINE MSR emulation fastpath
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Haiwei Li <lihaiwei@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Apr 21, 2020 at 11:28:23AM -0700, Jim Mattson wrote:
-> The more I look at that call to kvm_clear_exception_queue(), the more
-> convinced I am that it's wrong. The comment above it says:
-> 
-> /*
-> * Drop what we picked up for L2 via vmx_complete_interrupts. It is
-> * preserved above and would only end up incorrectly in L1.
-> */
-> 
-> The first sentence is just wrong. Vmx_complete_interrupts may not be
-> where the NMI/exception/interrupt came from. And the second sentence
-> is not entirely true. Only *injected* events are "preserved above" (by
-> the call to vmcs12_save_pending_event). However,
-> kvm_clear_exception_queue zaps both injected events and pending
-> events. Moreover, vmcs12_save_pending_event "preserves" the event by
-> stashing it in the IDT-vectoring info field of vmcs12, even when the
-> current VM-exit (from L2 to L1) did not (and in some cases cannot)
-> occur during event delivery (e.g. VMX-preemption timer expired).
+On Tue, 21 Apr 2020 at 19:37, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 21/04/20 13:20, Wanpeng Li wrote:
+> > +     case MSR_IA32_TSCDEADLINE:
+> > +             if (!kvm_x86_ops.event_needs_reinjection(vcpu)) {
+> > +                     data = kvm_read_edx_eax(vcpu);
+> > +                     if (!handle_fastpath_set_tscdeadline(vcpu, data))
+> > +                             ret = EXIT_FASTPATH_CONT_RUN;
+> > +             }
+> >               break;
+>
+> Can you explain the event_needs_reinjection case?  Also, does this break
 
-The comments are definitely wrong, or perhaps incomplete, but the behavior
-isn't "wrong, assuming the rest of the nested event handling is correct
-(hint, it's not).  Even with imperfect event handling, clearing
-queued/pending exceptions on nested exit isn't terrible behavior as VMX
-doesn't have a notion of queued/pending excpetions (ignoring #DBs for now).
-If the VM-Exit occured while vectoring an event, that event is captured in
-IDT_VECTORING_INFO.  Everything else that might have happened is an
-alternate timeline.
+This is used to catch the case vmexit occurred while another event was
+being delivered to guest software, I move the
+vmx_exit_handlers_fastpath() call after vmx_complete_interrupts()
+which will decode such event and make kvm_event_needs_reinjection
+return true.
 
-The piece that's likely missing is updating GUEST_PENDING_DBG_EXCEPTIONS if
-a single-step #DB was pending after emulation.  KVM currently propagates
-the field as-is from vmcs02, which would miss any emulated #DB.  But, that
-is effectively orthogonal to kvm_clear_exception_queue(), e.g. KVM needs to
-"save" the pending #DB like it "saves" an injected event, but clearing the
-#DB from the queue is correct.
+> AMD which does not implement the callback?
 
-The main issue I have with the nested event code is that the checks are
-effectively grouped by exiting versus non-exiting instead of being grouped
-by priority.  That makes it extremely difficult to correctly prioritize
-events because each half needs to know the other's behavior, even though
-the code is "separated"  E.g. my suggestion to return immediatel if an NMI
-is pending and won't VM-Exit is wrong, as the behavior should also be
-conditioned on NMIs being unmasked in L2.  Actually implementing that check
-is a gigantic mess in the current code base and simply isn't worth the
-marginal benefit.
+Now I add the tscdeadline msr emulation and vmx-preemption timer
+fastpath pair for Intel platform.
 
-Unwinding the mess, i.e. processing each event class exactly once per run
-loop, is extremely difficult because there one-off cases that have been
-piled on top, e.g. calling check_nested_events() from kvm_vcpu_running()
-and processing INIT and SIPI in kvm_apic_accept_events(), whose full impact
-is impossible to ascertain simply by reading the code.  The KVM_REQ_EVENT
-optimization also exacerbates the problem, i.e. the event checking really
-should be done unconditionally on every loop.
+>
+> > +
+> > +     reg = kvm_lapic_get_reg(apic, APIC_LVTT);
+> > +     if (kvm_apic_hw_enabled(apic) && !(reg & APIC_LVT_MASKED)) {
+> > +             vector = reg & APIC_VECTOR_MASK;
+> > +             kvm_lapic_clear_vector(vector, apic->regs + APIC_TMR);
+> > +
+> > +             if (vcpu->arch.apicv_active) {
+> > +                     if (pi_test_and_set_pir(vector, &vmx->pi_desc))
+> > +                             return;
+> > +
+> > +                     if (pi_test_and_set_on(&vmx->pi_desc))
+> > +                             return;
+> > +
+> > +                     vmx_sync_pir_to_irr(vcpu);
+> > +             } else {
+> > +                     kvm_lapic_set_irr(vector, apic);
+> > +                     kvm_queue_interrupt(vcpu, kvm_cpu_get_interrupt(vcpu), false);
+> > +                     vmx_inject_irq(vcpu);
+> > +             }
+> > +     }
+>
+> This is mostly a copy of
+>
+>                if (kvm_x86_ops.deliver_posted_interrupt(vcpu, vector)) {
+>                         kvm_lapic_set_irr(vector, apic);
+>                         kvm_make_request(KVM_REQ_EVENT, vcpu);
+>                         kvm_vcpu_kick(vcpu);
+>                 }
+>                 break;
+>
+> (is it required to do vmx_sync_pir_to_irr?).  So you should not special
+
+I observe send notification vector as in
+kvm_x86_ops.deliver_posted_interrupt() is ~900 cycles worse than
+vmx_sync_pir_to_irr in my case. It needs to wait guest vmentry, then
+the physical cpu ack the notification vector, read posted-interrupt
+desciptor etc. For the non-APICv part, original copy needs to wait
+inject_pending_event to do these stuff.
+
+> case LVTT and move this code to lapic.c instead.  But even before that...
+>
+> >
+> > +
+> > +     if (kvm_start_hv_timer(apic)) {
+> > +             if (kvm_check_request(KVM_REQ_PENDING_TIMER, vcpu)) {
+> > +                     if (kvm_x86_ops.interrupt_allowed(vcpu)) {
+> > +                             kvm_clear_request(KVM_REQ_PENDING_TIMER, vcpu);
+> > +                             kvm_x86_ops.fast_deliver_interrupt(vcpu);
+> > +                             atomic_set(&apic->lapic_timer.pending, 0);
+> > +                             apic->lapic_timer.tscdeadline = 0;
+> > +                             return 0;
+> > +                     }
+> > +                     return 1;
+>
+>
+> Is it actually common that the timer is set back in time and therefore
+> this code is executed?
+
+It is used to handle the already-expired timer.
+
+    Wanpeng
