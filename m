@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C65D31B46BC
-	for <lists+kvm@lfdr.de>; Wed, 22 Apr 2020 15:59:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3EEC91B46CF
+	for <lists+kvm@lfdr.de>; Wed, 22 Apr 2020 16:07:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726983AbgDVN7t (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Apr 2020 09:59:49 -0400
-Received: from mail.kernel.org ([198.145.29.99]:36254 "EHLO mail.kernel.org"
+        id S1726831AbgDVOHK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Apr 2020 10:07:10 -0400
+Received: from mail.kernel.org ([198.145.29.99]:43692 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726967AbgDVN7s (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Apr 2020 09:59:48 -0400
+        id S1725810AbgDVOHK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Apr 2020 10:07:10 -0400
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 280B22077D;
-        Wed, 22 Apr 2020 13:59:48 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 8AC872077D;
+        Wed, 22 Apr 2020 14:07:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1587563988;
-        bh=OKor0O1lAwDsiHEhIHm+ZWkyVKAQBwA4AAHrzX1Q+v4=;
+        s=default; t=1587564429;
+        bh=Ydp+HSH/1XyIOqk56Lxy/+GbC3ZFcSR/6FAxFaOb2nE=;
         h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=Mft597zjrjfiYPCTD7S4lA3sg14fCZ2v2U47Z6Du5U5NKrMl5NA1BpiDTbr2xAimj
-         47DVnc9Fv7lo3ZnBI6UJOPGcZpV//wtWy4jdl3wOzpAv81yu35tKsTyUMnnhnGbfhl
-         h4An5H97MXOwUnn3qKU24hiU2sZED7EywJKFlAAc=
+        b=EWkwFwctcOsyKFAI4n3DUjoRKEcuGfrIPU1mkoPdOKoq2TumxieGGmxsVfD0oyIqx
+         e1r7FYq431lQ0W1VuL/4HzGIyXPrwgvkYs2Z9wzfGIicm/6FDWagx+VP6GyMYxtjUg
+         pdqiZH9Zao4SigAhHAe2MXe0HVND6s3Nbo5s8czI=
 Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
         by disco-boy.misterjones.org with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
         (Exim 4.92)
         (envelope-from <maz@kernel.org>)
-        id 1jRFuk-005WlJ-HE; Wed, 22 Apr 2020 14:59:46 +0100
+        id 1jRG1r-005WqO-UF; Wed, 22 Apr 2020 15:07:08 +0100
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII;
  format=flowed
 Content-Transfer-Encoding: 7bit
-Date:   Wed, 22 Apr 2020 14:59:46 +0100
+Date:   Wed, 22 Apr 2020 15:07:07 +0100
 From:   Marc Zyngier <maz@kernel.org>
 To:     Suzuki K Poulose <suzuki.poulose@arm.com>
 Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
@@ -42,12 +42,13 @@ Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         gcherian@marvell.com, prime.zeng@hisilicon.com, will@kernel.org,
         catalin.marinas@arm.com, mark.rutland@arm.com, james.morse@arm.com,
         julien.thierry.kdev@gmail.com
-Subject: Re: [PATCH 02/26] KVM: arm64: Move __load_guest_stage2 to kvm_mmu.h
-In-Reply-To: <7bfefbb0-a467-3e43-6e22-466ae7184a1f@arm.com>
+Subject: Re: [PATCH 01/26] KVM: arm64: Check advertised Stage-2 page size
+ capability
+In-Reply-To: <32cc9a60-1b47-f3f7-d18d-d39db397ea55@arm.com>
 References: <20200422120050.3693593-1-maz@kernel.org>
- <20200422120050.3693593-3-maz@kernel.org>
- <7bfefbb0-a467-3e43-6e22-466ae7184a1f@arm.com>
-Message-ID: <df8c5f459f449c5e1180dcb2a48d11b0@kernel.org>
+ <20200422120050.3693593-2-maz@kernel.org>
+ <32cc9a60-1b47-f3f7-d18d-d39db397ea55@arm.com>
+Message-ID: <06c3b2c9b23beeeb224d263077299039@kernel.org>
 X-Sender: maz@kernel.org
 User-Agent: Roundcube Webmail/1.3.10
 X-SA-Exim-Connect-IP: 51.254.78.96
@@ -61,94 +62,94 @@ X-Mailing-List: kvm@vger.kernel.org
 
 Hi Suzuki,
 
-On 2020-04-22 14:51, Suzuki K Poulose wrote:
+On 2020-04-22 14:40, Suzuki K Poulose wrote:
 > Hi Marc,
 > 
-> 
 > On 04/22/2020 01:00 PM, Marc Zyngier wrote:
->> Having __load_guest_stage2 in kvm_hyp.h is quickly going to trigger
->> a circular include problem. In order to avoid this, let's move
->> it to kvm_mmu.h, where it will be a better fit anyway.
+>> With ARMv8.5-GTG, the hardware (or more likely a hypervisor) can
+>> advertise the supported Stage-2 page sizes.
 >> 
->> In the process, drop the __hyp_text annotation, which doesn't help
->> as the function is marked as __always_inline.
+>> Let's check this at boot time.
 >> 
 >> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> 
 >> ---
->>   arch/arm64/include/asm/kvm_hyp.h | 18 ------------------
->>   arch/arm64/include/asm/kvm_mmu.h | 17 +++++++++++++++++
->>   2 files changed, 17 insertions(+), 18 deletions(-)
+>>   arch/arm64/include/asm/kvm_host.h |  2 +-
+>>   arch/arm64/include/asm/sysreg.h   |  3 +++
+>>   arch/arm64/kernel/cpufeature.c    |  8 +++++++
+>>   arch/arm64/kvm/reset.c            | 40 
+>> ++++++++++++++++++++++++++++---
+>>   virt/kvm/arm/arm.c                |  4 +---
+>>   5 files changed, 50 insertions(+), 7 deletions(-)
 >> 
->> diff --git a/arch/arm64/include/asm/kvm_hyp.h 
->> b/arch/arm64/include/asm/kvm_hyp.h
->> index fe57f60f06a89..dcb63bf941057 100644
->> --- a/arch/arm64/include/asm/kvm_hyp.h
->> +++ b/arch/arm64/include/asm/kvm_hyp.h
->> @@ -10,7 +10,6 @@
->>   #include <linux/compiler.h>
->>   #include <linux/kvm_host.h>
->>   #include <asm/alternative.h>
->> -#include <asm/kvm_mmu.h>
->>   #include <asm/sysreg.h>
->>     #define __hyp_text __section(.hyp.text) notrace
->> @@ -88,22 +87,5 @@ void deactivate_traps_vhe_put(void);
->>   u64 __guest_enter(struct kvm_vcpu *vcpu, struct kvm_cpu_context 
->> *host_ctxt);
->>   void __noreturn __hyp_do_panic(unsigned long, ...);
->>   -/*
->> - * Must be called from hyp code running at EL2 with an updated VTTBR
->> - * and interrupts disabled.
->> - */
->> -static __always_inline void __hyp_text __load_guest_stage2(struct kvm 
->> *kvm)
->> -{
->> -	write_sysreg(kvm->arch.vtcr, vtcr_el2);
->> -	write_sysreg(kvm_get_vttbr(kvm), vttbr_el2);
->> -
->> -	/*
->> -	 * ARM errata 1165522 and 1530923 require the actual execution of 
->> the
->> -	 * above before we can switch to the EL1/EL0 translation regime used 
->> by
->> -	 * the guest.
->> -	 */
->> -	asm(ALTERNATIVE("nop", "isb", ARM64_WORKAROUND_SPECULATIVE_AT_VHE));
->> -}
->> -
->>   #endif /* __ARM64_KVM_HYP_H__ */
->>   diff --git a/arch/arm64/include/asm/kvm_mmu.h 
->> b/arch/arm64/include/asm/kvm_mmu.h
->> index 30b0e8d6b8953..5ba1310639ec6 100644
->> --- a/arch/arm64/include/asm/kvm_mmu.h
->> +++ b/arch/arm64/include/asm/kvm_mmu.h
->> @@ -604,5 +604,22 @@ static __always_inline u64 kvm_get_vttbr(struct 
->> kvm *kvm)
->>   	return kvm_phys_to_vttbr(baddr) | vmid_field | cnp;
->>   }
->>   +/*
->> + * Must be called from hyp code running at EL2 with an updated VTTBR
->> + * and interrupts disabled.
->> + */
->> +static __always_inline void __load_guest_stage2(struct kvm *kvm)
->> +{
->> +	write_sysreg(kvm->arch.vtcr, vtcr_el2);
->> +	write_sysreg(kvm_get_vttbr(kvm), vttbr_el2);
->> +
+>> diff --git a/arch/arm64/include/asm/kvm_host.h 
+>> b/arch/arm64/include/asm/kvm_host.h
+>> index 32c8a675e5a4a..7dd8fefa6aecd 100644
+>> --- a/arch/arm64/include/asm/kvm_host.h
+>> +++ b/arch/arm64/include/asm/kvm_host.h
+>> @@ -670,7 +670,7 @@ static inline int kvm_arm_have_ssbd(void)
+>>   void kvm_vcpu_load_sysregs(struct kvm_vcpu *vcpu);
+>>   void kvm_vcpu_put_sysregs(struct kvm_vcpu *vcpu);
+>>   -void kvm_set_ipa_limit(void);
+>> +int kvm_set_ipa_limit(void);
+>>     #define __KVM_HAVE_ARCH_VM_ALLOC
+>>   struct kvm *kvm_arch_alloc_vm(void);
+>> diff --git a/arch/arm64/include/asm/sysreg.h 
+>> b/arch/arm64/include/asm/sysreg.h
+>> index ebc6224328318..5d10c9148e844 100644
+>> --- a/arch/arm64/include/asm/sysreg.h
+>> +++ b/arch/arm64/include/asm/sysreg.h
+>> @@ -686,6 +686,9 @@
+>>   #define ID_AA64ZFR0_SVEVER_SVE2		0x1
+>>     /* id_aa64mmfr0 */
+>> +#define ID_AA64MMFR0_TGRAN4_2_SHIFT	40
+>> +#define ID_AA64MMFR0_TGRAN64_2_SHIFT	36
+>> +#define ID_AA64MMFR0_TGRAN16_2_SHIFT	32
+>>   #define ID_AA64MMFR0_TGRAN4_SHIFT	28
+>>   #define ID_AA64MMFR0_TGRAN64_SHIFT	24
+>>   #define ID_AA64MMFR0_TGRAN16_SHIFT	20
+>> diff --git a/arch/arm64/kernel/cpufeature.c 
+>> b/arch/arm64/kernel/cpufeature.c
+>> index 9fac745aa7bb2..9892a845d06c9 100644
+>> --- a/arch/arm64/kernel/cpufeature.c
+>> +++ b/arch/arm64/kernel/cpufeature.c
+>> @@ -208,6 +208,14 @@ static const struct arm64_ftr_bits 
+>> ftr_id_aa64zfr0[] = {
+>>   };
+>>     static const struct arm64_ftr_bits ftr_id_aa64mmfr0[] = {
 >> +	/*
->> +	 * ARM erratum 1165522 requires the actual execution of the above
+>> +	 * Page size not being supported at Stage-2 are not fatal. You
+>> +	 * just give up KVM if PAGE_SIZE isn't supported there. Go fix
+>> +	 * your favourite nesting hypervisor.
+>> +	 */
+>> +	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_EXACT, 
+>> ID_AA64MMFR0_TGRAN4_2_SHIFT, 4, 1),
+>> +	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_EXACT, 
+>> ID_AA64MMFR0_TGRAN64_2_SHIFT, 4, 1),
+>> +	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_EXACT, 
+>> ID_AA64MMFR0_TGRAN16_2_SHIFT, 4, 1),
 > 
-> Is it intentional to drop the reference to errata 1530923 ?
+> One minor issue with this is, if we get a system with cpus having 
+> values
+> 0 and 2 (both of which indicates the stage-2 support), we might reset
+> the value to 1 for the feature indicating, we don't support and block
+> KVM. But, we can blame the nesting hypervisor for not emulating this to
+> (2). Do we need a comment to make this explicit here ?
 
-No, that's obviously the effect of a bad conflict resolution during a 
-rebase.
-I'll fix it now, thanks for spotting it.
+Sure. How about something like:
 
-> Otherwise :
-> 
-> Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+"There is a small corner case where the hypervisor could explicitly 
+advertise
+  a given granule size at Stage-2 (value 2) on some vCPUs, and use the 
+fallback
+  to Stage-1 (value 0) for other vCPUs. Although this is not forbidden by 
+the
+  architecture, it indicates that the hypervisor is being silly (or 
+buggy).
+  We make no effort to cope with this and pretend that if these fields 
+are
+  inconsistent across vCPUs, then it isn't worth trying to bring KVM up."
 
-Cheers,
+Thanks,
 
          M.
 -- 
