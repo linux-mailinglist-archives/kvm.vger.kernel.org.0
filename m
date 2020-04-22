@@ -2,118 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9CDFE1B3448
-	for <lists+kvm@lfdr.de>; Wed, 22 Apr 2020 03:02:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0C94C1B34B5
+	for <lists+kvm@lfdr.de>; Wed, 22 Apr 2020 03:58:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726377AbgDVBCE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Apr 2020 21:02:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33710 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726055AbgDVBCE (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 21 Apr 2020 21:02:04 -0400
-Received: from mail-oi1-x244.google.com (mail-oi1-x244.google.com [IPv6:2607:f8b0:4864:20::244])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B08DC0610D5;
-        Tue, 21 Apr 2020 18:02:04 -0700 (PDT)
-Received: by mail-oi1-x244.google.com with SMTP id a2so447954oia.11;
-        Tue, 21 Apr 2020 18:02:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=JwVDsnKQEhm1jAKmC3TdxNUyFpBPqvMfGNXwJrkzeOk=;
-        b=GPF42GEk0RargHC4CRBaeWdJMXVEj99sHY6Ia+uZjQfmnnnHP1NWRqo2dY6I8g0L2i
-         jk9zOY1Y3LO0iFGZXUbF3rkoGnDQlcN2SK2y7vocOIrn+X9bmAfjPc/fqLPgoWeXiw2/
-         sTWwIJPXPgQclVK19R3XVA1RrnVFHvv6j/XqTYBVpk3GBe2HWdXMN/L9TeRPSh+C+1tn
-         XZtJcnSzFWqTRIlBdGqo0/rPkgdLl2ZCMMgpo+jwQFh7mlvsxpCDkvxjiQ8y7lJ72WDh
-         znpRwf7MftRjr6ml0DtfY69cOhqHHrLQ98a9AbJq3yUKTNx50TIq1PK6HhprIuyAgYKy
-         8r2g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=JwVDsnKQEhm1jAKmC3TdxNUyFpBPqvMfGNXwJrkzeOk=;
-        b=dkHHgBTSMH3B1fqONRKmWdcVhVK2wmcBydGG/d9JsF/ANbrAXcya8M4VyrWLIX1fWV
-         SbSs4Db50jZ/U+cDgSyNEUIGqoin6HjPaxVL1q03yVJNuyrsJKtIxPNZq0j2oah48eE4
-         s3ZpBYnKHhnACrG/bIWTum82D3Gm6O3iPyIWOSHxN+giwgeNXIrtgUWGoNsq2t0rKTMv
-         /Wa9fvxHAAqZ0Xlew0wWFJ7lNEkeXBxWi6OGJiS0n2Q+YfG5e3S5t8meBZFIxlq3X/xD
-         12x8fl2Z8uZX/+nqTwpTpDIn6oiqEHVeLH3nzxom7bVYsyETVLUiuTCGaLxle0TzPZAS
-         Sd7A==
-X-Gm-Message-State: AGi0PuZbUvYasMh0i3Dg9o3/jl5xNmS1fJ4NhWtnSYBgtAXhwMEvAvon
-        XKwi6pVb7eTSn0R+6kTDVN4ws28CTF/JckJXDrM=
-X-Google-Smtp-Source: APiQypLjVzrsl0Anz94XprXcwDt3fBjesJAs6pymEAtm5P7X7L2JfxiWhw73gsMrLIp/3Qq2SpkINTQzTjOfxSPeUgg=
-X-Received: by 2002:aca:2801:: with SMTP id 1mr4869738oix.141.1587517323684;
- Tue, 21 Apr 2020 18:02:03 -0700 (PDT)
+        id S1726173AbgDVB6A (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Apr 2020 21:58:00 -0400
+Received: from mga04.intel.com ([192.55.52.120]:46869 "EHLO mga04.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725912AbgDVB6A (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Apr 2020 21:58:00 -0400
+IronPort-SDR: 6MZFnnKAdLRUl3BSZzjTW+Aa1Fajc8WYf9KgRu62RlmxJaYNL9dT5+LKMk0msH/GPbgvN8u8T2
+ 5/Yx/9XwrvAA==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Apr 2020 18:57:59 -0700
+IronPort-SDR: WD+uJhq4rQL85dMqO8cDV7jeRPbSO1Ui7I17S2/P4h8ZwJdrtyt9s94PHfHoyUPcU6nZSLTkqe
+ CLeu/biOSTew==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.72,412,1580803200"; 
+   d="scan'208";a="290671750"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
+  by fmsmga002.fm.intel.com with ESMTP; 21 Apr 2020 18:57:59 -0700
+Date:   Tue, 21 Apr 2020 18:57:59 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Makarand Sonare <makarandsonare@google.com>
+Cc:     kvm@vger.kernel.org, pshier@google.com, jmattson@google.com
+Subject: Re: [kvm PATCH 2/2] KVM: nVMX: Don't clobber preemption timer in the
+ VMCS12 before L2 ran
+Message-ID: <20200422015759.GE17836@linux.intel.com>
+References: <20200417183452.115762-1-makarandsonare@google.com>
+ <20200417183452.115762-3-makarandsonare@google.com>
 MIME-Version: 1.0
-References: <1587468026-15753-1-git-send-email-wanpengli@tencent.com>
- <1587468026-15753-3-git-send-email-wanpengli@tencent.com> <68eb0e46-4c2a-0292-3dfa-db2ae2b2b13d@redhat.com>
-In-Reply-To: <68eb0e46-4c2a-0292-3dfa-db2ae2b2b13d@redhat.com>
-From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Wed, 22 Apr 2020 09:01:52 +0800
-Message-ID: <CANRm+CwXhe+TdB8JpQ78qR-sO6FB_cMjqHxj5fSyKEMPkMVm8g@mail.gmail.com>
-Subject: Re: [PATCH 2/2] KVM: VMX: Handle preemption timer fastpath
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Haiwei Li <lihaiwei@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200417183452.115762-3-makarandsonare@google.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 21 Apr 2020 at 19:40, Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 21/04/20 13:20, Wanpeng Li wrote:
-> > +
-> > +     if (!vmx->req_immediate_exit &&
-> > +             !unlikely(vmx->loaded_vmcs->hv_timer_soft_disabled)) {
-> > +             if (!vmx_interrupt_allowed(vcpu) ||
+On Fri, Apr 17, 2020 at 11:34:52AM -0700, Makarand Sonare wrote:
+> Don't clobber the VMX-preemption timer value in the VMCS12 during
+> migration on the source while handling an L1 VMLAUNCH/VMRESUME but
+> before L2 ran. In that case the VMCS12 preemption timer value
+> should not be touched as it will be restarted on the target
+> from its original value. This emulates migration occurring while L1
+> awaits completion of its VMLAUNCH/VMRESUME instruction.
+> 
+> Signed-off-by: Makarand Sonare <makarandsonare@google.com>
+> Signed-off-by: Peter Shier <pshier@google.com>
 
-For non-APICv case, we need to request interrupt-window.
+The SOB tags are reversed, i.e. Peter's should be first to show that he
+wrote the patch and then transfered it to you for upstreaming.
 
-> > +                     !apic_lvtt_tscdeadline(apic) ||
+> Change-Id: I376d151585d4f1449319f7512151f11bbf08c5bf
+> ---
+>  arch/x86/kvm/vmx/nested.c | 12 +++++++-----
+>  1 file changed, 7 insertions(+), 5 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> index 5365d7e5921ea..66155e9114114 100644
+> --- a/arch/x86/kvm/vmx/nested.c
+> +++ b/arch/x86/kvm/vmx/nested.c
+> @@ -3897,11 +3897,13 @@ static void sync_vmcs02_to_vmcs12(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12)
+>  		vmcs12->guest_activity_state = GUEST_ACTIVITY_ACTIVE;
+>  
+>  	if (nested_cpu_has_preemption_timer(vmcs12)) {
+> -		vmx->nested.preemption_timer_remaining =
+> -			vmx_get_preemption_timer_value(vcpu);
+> -		if (vmcs12->vm_exit_controls & VM_EXIT_SAVE_VMX_PREEMPTION_TIMER)
+> -			vmcs12->vmx_preemption_timer_value =
+> -				vmx->nested.preemption_timer_remaining;
+> +		if (!vmx->nested.nested_run_pending) {
+> +			vmx->nested.preemption_timer_remaining =
+> +				vmx_get_preemption_timer_value(vcpu);
+> +			if (vmcs12->vm_exit_controls & VM_EXIT_SAVE_VMX_PREEMPTION_TIMER)
+> +				vmcs12->vmx_preemption_timer_value =
+> +					vmx->nested.preemption_timer_remaining;
+> +			}
 
-Now just add fastpath for tscdeadline mode.
+This indentation is messed up, the closing brace is for !nested_run_pending,
+but it's aligned with (vm_exit_controls & ..._PREEMPTION_TIMER).
 
-> > +                     vmx->rmode.vm86_active ||
-> > +                     is_smm(vcpu) ||
-> > +                     !kvm_apic_hw_enabled(apic))
+Even better than fixing the indentation would be to include !nested_run_pending
+in the top-level if statement, which reduces the nesting level and produces
+a much cleaner diff, e.g.
 
-These stuff can be removed, kvm_apic_hw_enable() is check in
-vmx_fast_deliver_interrupt().
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index 409a39af121f..7dd6440425ab 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -3951,7 +3951,8 @@ static void sync_vmcs02_to_vmcs12(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12)
+        else
+                vmcs12->guest_activity_state = GUEST_ACTIVITY_ACTIVE;
 
-> > +                     return EXIT_FASTPATH_NONE;
-> > +
-> > +             if (!apic->lapic_timer.hv_timer_in_use)
-> > +                     return EXIT_FASTPATH_CONT_RUN;
-> > +
-> > +             WARN_ON(swait_active(&vcpu->wq));
-> > +             vmx_cancel_hv_timer(vcpu);
-> > +             apic->lapic_timer.hv_timer_in_use = false;
-> > +
-> > +             if (atomic_read(&apic->lapic_timer.pending))
-> > +                     return EXIT_FASTPATH_CONT_RUN;
+-       if (nested_cpu_has_preemption_timer(vmcs12)) {
++       if (nested_cpu_has_preemption_timer(vmcs12) &&
++           !vmx->nested.nested_run_pending) {
+                vmx->nested.preemption_timer_remaining =
+                        vmx_get_preemption_timer_value(vcpu);
+                if (vmcs12->vm_exit_controls & VM_EXIT_SAVE_VMX_PREEMPTION_TIMER)
 
-Other two checks are the same in kvm_lapic_expired_hv_timer().
-
-    Wanpeng
-
-> > +
-> > +             ktimer->expired_tscdeadline = ktimer->tscdeadline;
-> > +             vmx_fast_deliver_interrupt(vcpu);
-> > +             ktimer->tscdeadline = 0;
-> > +             return EXIT_FASTPATH_CONT_RUN;
-> > +     }
-> > +
->
-> Can you explain all the checks you have here, and why you need something
-> more complex than apic_timer_expired (possibly by adding some
-> optimizations to kvm_apic_local_deliver)?  This code is impossible to
-> maintain.
->
-> Paolo
->
+>  	}
+>  
+>  	/*
+> -- 
+> 2.26.1.301.g55bc3eb7cb9-goog
+> 
