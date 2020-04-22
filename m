@@ -2,32 +2,32 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D0AC81B43BB
-	for <lists+kvm@lfdr.de>; Wed, 22 Apr 2020 14:00:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 862D61B43BE
+	for <lists+kvm@lfdr.de>; Wed, 22 Apr 2020 14:01:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726988AbgDVMA5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Apr 2020 08:00:57 -0400
-Received: from mail.kernel.org ([198.145.29.99]:43752 "EHLO mail.kernel.org"
+        id S1728025AbgDVMA6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Apr 2020 08:00:58 -0400
+Received: from mail.kernel.org ([198.145.29.99]:43792 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726043AbgDVMA5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Apr 2020 08:00:57 -0400
+        id S1726477AbgDVMA6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Apr 2020 08:00:58 -0400
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 45B3D20780;
-        Wed, 22 Apr 2020 12:00:56 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 21EB520781;
+        Wed, 22 Apr 2020 12:00:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1587556856;
-        bh=cjNtiZiSfG8NCNGrLmoyucuhnBDcnLMQHlTpx9c+/rQ=;
-        h=From:To:Cc:Subject:Date:From;
-        b=NCoygnjpF76Otji5EmVvuJDE0QdIRz2Fim66ksOD9SzJprbT6vIp/3C0kUNbb2y0G
-         P9h/3TxTnhcDvtYzGc6pmq++7JXvFqDt+tJaQXnvjuTvkCcJQecQrAZYj8mqCiCZsx
-         laibgAPSq3EHmqsHQ6zH+wY4BjvSqpearnncm5PY=
+        s=default; t=1587556857;
+        bh=I732TSPQc9bSSFWvXROeC4qjohlGzkEaC6Z5VtQBTwo=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=BsU3EsqwyQFOrnctLzeLHMQxEkwKULRbhE6I1p008aroJY9Ynv1NQnl6yQ0pZ1JBV
+         aHpbXsJkoyirFZd46RNf7IiPHH6Pywib299iMU6HmVbU3QwQSE1f8LXMKbGO6+S3Qx
+         o3h/0dnp79hM8InLRUTyzmbCBHm9d3FmJCqOvJaw=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
         by disco-boy.misterjones.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
         (Exim 4.92)
         (envelope-from <maz@kernel.org>)
-        id 1jRE3i-005UI7-JR; Wed, 22 Apr 2020 13:00:54 +0100
+        id 1jRE3j-005UI7-FO; Wed, 22 Apr 2020 13:00:55 +0100
 From:   Marc Zyngier <maz@kernel.org>
 To:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         kvm@vger.kernel.org
@@ -44,10 +44,12 @@ Cc:     Andre Przywara <andre.przywara@arm.com>,
         James Morse <james.morse@arm.com>,
         Julien Thierry <julien.thierry.kdev@gmail.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [PATCH 00/26] KVM: arm64: Preliminary NV patches
-Date:   Wed, 22 Apr 2020 13:00:24 +0100
-Message-Id: <20200422120050.3693593-1-maz@kernel.org>
+Subject: [PATCH 01/26] KVM: arm64: Check advertised Stage-2 page size capability
+Date:   Wed, 22 Apr 2020 13:00:25 +0100
+Message-Id: <20200422120050.3693593-2-maz@kernel.org>
 X-Mailer: git-send-email 2.26.1
+In-Reply-To: <20200422120050.3693593-1-maz@kernel.org>
+References: <20200422120050.3693593-1-maz@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 62.31.163.78
@@ -59,120 +61,148 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi all,
+With ARMv8.5-GTG, the hardware (or more likely a hypervisor) can
+advertise the supported Stage-2 page sizes.
 
-In order not to repeat the 90+ patch series that resulted in a
-deafening silence last time, I've extracted a smaller set of patches
-that form the required dependencies that allow the rest of the 65 NV
-patches to be added on top. Yes, it is that bad.
+Let's check this at boot time.
 
-The one real feature here is support for the ARMv8.4-TTL extension at
-Stage-2 only. The reason to support it is that it helps the hypervisor
-a lot when it comes to finding out how much to invalidate. It is thus
-always "supported" with NV.
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/include/asm/kvm_host.h |  2 +-
+ arch/arm64/include/asm/sysreg.h   |  3 +++
+ arch/arm64/kernel/cpufeature.c    |  8 +++++++
+ arch/arm64/kvm/reset.c            | 40 ++++++++++++++++++++++++++++---
+ virt/kvm/arm/arm.c                |  4 +---
+ 5 files changed, 50 insertions(+), 7 deletions(-)
 
-The rest doesn't contain any functionality change. Most of it reworks
-existing data structures and adds new accessors for the things that
-get moved around. The reason for this is that:
-
-- With NV, we end-up with multiple Stage-2 MMU contexts per VM instead
-  of a single one. This requires we divorce struct kvm from the S2 MMU
-  configuration. Of course, we stick with a single MMU context for now.
-
-- With ARMv8.4-NV, a number of system register accesses are turned
-  into memory accesses into the so-called VNCR page. It is thus
-  convenient to make this VNCR page part of the vcpu context and avoid
-  copying data back and forth. For this to work, we need to make sure
-  that all the VNCR-aware sysregs are moved into our per-vcpu sys_regs
-  array instead of leaving in other data structures (the timers, for
-  example). The VNCR page itself isn't introduced with these patches.
-
-- As some of these data structures change, we need a way to isolate
-  the userspace ABI from such change.
-
-- The exception generation code is also reworked to prepare the
-  addition of EL2 exceptions.
-
-There is also a number of cleanups that were in the full fat series
-that I decided to move early to get them out of the way.
-
-The whole this is a bit of a mix of vaguely unrelated "stuff", but it
-all comes together if you look at the final series[1]. This applies on
-top of v5.7-rc1.
-
-I haven't applied any of the Tested-by: tags, as the series keeps
-changing. Please keep testing though!
-
-[1] https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=kvm-arm64/nv-5.7-rc1-WIP
-
-Christoffer Dall (2):
-  KVM: arm64: Factor out stage 2 page table data from struct kvm
-  KVM: arm64: vgic-v3: Take cpu_if pointer directly instead of vcpu
-
-Marc Zyngier (24):
-  KVM: arm64: Check advertised Stage-2 page size capability
-  KVM: arm64: Move __load_guest_stage2 to kvm_mmu.h
-  arm64: Detect the ARMv8.4 TTL feature
-  arm64: Document SW reserved PTE/PMD bits in Stage-2 descriptors
-  arm64: Add level-hinted TLB invalidation helper
-  KVM: arm64: Add a level hint to __kvm_tlb_flush_vmid_ipa
-  KVM: arm64: Use TTL hint in when invalidating stage-2 translations
-  KVM: arm64: Refactor vcpu_{read,write}_sys_reg
-  KVM: arm64: Add missing reset handlers for PMU emulation
-  KVM: arm64: Move sysreg reset check to boot time
-  KVM: arm64: Introduce accessor for ctxt->sys_reg
-  KVM: arm64: hyp: Use ctxt_sys_reg/__vcpu_sys_reg instead of raw
-    sys_regs access
-  KVM: arm64: sve: Use __vcpu_sys_reg() instead of raw sys_regs access
-  KVM: arm64: pauth: Use ctxt_sys_reg() instead of raw sys_regs access
-  KVM: arm64: debug: Use ctxt_sys_reg() instead of raw sys_regs access
-  KVM: arm64: Don't use empty structures as CPU reset state
-  KVM: arm64: Make struct kvm_regs userspace-only
-  KVM: arm64: Move ELR_EL1 to the system register array
-  KVM: arm64: Move SP_EL1 to the system register array
-  KVM: arm64: Disintegrate SPSR array
-  KVM: arm64: Move SPSR_EL1 to the system register array
-  KVM: arm64: timers: Rename kvm_timer_sync_hwstate to
-    kvm_timer_sync_user
-  KVM: arm64: timers: Move timer registers to the sys_regs file
-  KVM: arm64: Parametrize exception entry with a target EL
-
- arch/arm64/include/asm/cpucaps.h        |   3 +-
- arch/arm64/include/asm/kvm_asm.h        |   6 +-
- arch/arm64/include/asm/kvm_emulate.h    |  37 +---
- arch/arm64/include/asm/kvm_host.h       |  71 +++++--
- arch/arm64/include/asm/kvm_hyp.h        |  30 +--
- arch/arm64/include/asm/kvm_mmu.h        |  27 ++-
- arch/arm64/include/asm/pgtable-hwdef.h  |   2 +
- arch/arm64/include/asm/stage2_pgtable.h |   9 +
- arch/arm64/include/asm/sysreg.h         |   4 +
- arch/arm64/include/asm/tlbflush.h       |  30 +++
- arch/arm64/kernel/asm-offsets.c         |   3 +-
- arch/arm64/kernel/cpufeature.c          |  19 ++
- arch/arm64/kvm/fpsimd.c                 |   6 +-
- arch/arm64/kvm/guest.c                  |  79 ++++++-
- arch/arm64/kvm/handle_exit.c            |  17 +-
- arch/arm64/kvm/hyp/debug-sr.c           |  18 +-
- arch/arm64/kvm/hyp/entry.S              |   3 +-
- arch/arm64/kvm/hyp/switch.c             |  31 ++-
- arch/arm64/kvm/hyp/sysreg-sr.c          | 160 +++++++-------
- arch/arm64/kvm/hyp/tlb.c                |  51 +++--
- arch/arm64/kvm/inject_fault.c           |  75 +++----
- arch/arm64/kvm/regmap.c                 |  37 +++-
- arch/arm64/kvm/reset.c                  |  60 ++++--
- arch/arm64/kvm/sys_regs.c               | 215 ++++++++++---------
- include/kvm/arm_arch_timer.h            |  13 +-
- include/kvm/arm_vgic.h                  |   5 +-
- virt/kvm/arm/arch_timer.c               | 157 +++++++++++---
- virt/kvm/arm/arm.c                      |  40 ++--
- virt/kvm/arm/hyp/vgic-v3-sr.c           |  33 +--
- virt/kvm/arm/mmu.c                      | 267 +++++++++++++-----------
- virt/kvm/arm/trace.h                    |   8 +-
- virt/kvm/arm/vgic/vgic-v2.c             |  10 +-
- virt/kvm/arm/vgic/vgic-v3.c             |  14 +-
- virt/kvm/arm/vgic/vgic.c                |  25 ++-
- 34 files changed, 942 insertions(+), 623 deletions(-)
-
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 32c8a675e5a4a..7dd8fefa6aecd 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -670,7 +670,7 @@ static inline int kvm_arm_have_ssbd(void)
+ void kvm_vcpu_load_sysregs(struct kvm_vcpu *vcpu);
+ void kvm_vcpu_put_sysregs(struct kvm_vcpu *vcpu);
+ 
+-void kvm_set_ipa_limit(void);
++int kvm_set_ipa_limit(void);
+ 
+ #define __KVM_HAVE_ARCH_VM_ALLOC
+ struct kvm *kvm_arch_alloc_vm(void);
+diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+index ebc6224328318..5d10c9148e844 100644
+--- a/arch/arm64/include/asm/sysreg.h
++++ b/arch/arm64/include/asm/sysreg.h
+@@ -686,6 +686,9 @@
+ #define ID_AA64ZFR0_SVEVER_SVE2		0x1
+ 
+ /* id_aa64mmfr0 */
++#define ID_AA64MMFR0_TGRAN4_2_SHIFT	40
++#define ID_AA64MMFR0_TGRAN64_2_SHIFT	36
++#define ID_AA64MMFR0_TGRAN16_2_SHIFT	32
+ #define ID_AA64MMFR0_TGRAN4_SHIFT	28
+ #define ID_AA64MMFR0_TGRAN64_SHIFT	24
+ #define ID_AA64MMFR0_TGRAN16_SHIFT	20
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index 9fac745aa7bb2..9892a845d06c9 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -208,6 +208,14 @@ static const struct arm64_ftr_bits ftr_id_aa64zfr0[] = {
+ };
+ 
+ static const struct arm64_ftr_bits ftr_id_aa64mmfr0[] = {
++	/*
++	 * Page size not being supported at Stage-2 are not fatal. You
++	 * just give up KVM if PAGE_SIZE isn't supported there. Go fix
++	 * your favourite nesting hypervisor.
++	 */
++	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_EXACT, ID_AA64MMFR0_TGRAN4_2_SHIFT, 4, 1),
++	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_EXACT, ID_AA64MMFR0_TGRAN64_2_SHIFT, 4, 1),
++	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_EXACT, ID_AA64MMFR0_TGRAN16_2_SHIFT, 4, 1),
+ 	/*
+ 	 * We already refuse to boot CPUs that don't support our configured
+ 	 * page size, so we can only detect mismatches for a page size other
+diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+index 30b7ea680f66c..241db35a7ef4f 100644
+--- a/arch/arm64/kvm/reset.c
++++ b/arch/arm64/kvm/reset.c
+@@ -9,6 +9,7 @@
+  */
+ 
+ #include <linux/errno.h>
++#include <linux/bitfield.h>
+ #include <linux/kernel.h>
+ #include <linux/kvm_host.h>
+ #include <linux/kvm.h>
+@@ -340,11 +341,42 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+ 	return ret;
+ }
+ 
+-void kvm_set_ipa_limit(void)
++int kvm_set_ipa_limit(void)
+ {
+-	unsigned int ipa_max, pa_max, va_max, parange;
++	unsigned int ipa_max, pa_max, va_max, parange, tgran_2;
++	u64 mmfr0 = read_sanitised_ftr_reg(SYS_ID_AA64MMFR0_EL1);
+ 
+-	parange = read_sanitised_ftr_reg(SYS_ID_AA64MMFR0_EL1) & 0x7;
++	/*
++	 * Check with ARMv8.5-GTG that our PAGE_SIZE is supported at
++	 * Stage-2. If not, things will stop very quickly.
++	 */
++	switch (PAGE_SIZE) {
++	default:
++	case SZ_4K:
++		tgran_2 = ID_AA64MMFR0_TGRAN4_2_SHIFT;
++		break;
++	case SZ_16K:
++		tgran_2 = ID_AA64MMFR0_TGRAN16_2_SHIFT;
++		break;
++	case SZ_64K:
++		tgran_2 = ID_AA64MMFR0_TGRAN64_2_SHIFT;
++		break;
++	}
++
++	switch (FIELD_GET(0xFUL << tgran_2, mmfr0)) {
++	default:
++	case 1:
++		kvm_err("PAGE_SIZE not supported at Stage-2, giving up\n");
++		return -EINVAL;
++	case 0:
++		kvm_debug("PAGE_SIZE supported at Stage-2 (default)\n");
++		break;
++	case 2:
++		kvm_debug("PAGE_SIZE supported at Stage-2 (advertised)\n");
++		break;
++	}
++
++	parange = mmfr0 & 0x7;
+ 	pa_max = id_aa64mmfr0_parange_to_phys_shift(parange);
+ 
+ 	/* Clamp the IPA limit to the PA size supported by the kernel */
+@@ -378,6 +410,8 @@ void kvm_set_ipa_limit(void)
+ 	     "KVM IPA limit (%d bit) is smaller than default size\n", ipa_max);
+ 	kvm_ipa_limit = ipa_max;
+ 	kvm_info("IPA Size Limit: %dbits\n", kvm_ipa_limit);
++
++	return 0;
+ }
+ 
+ /*
+diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+index 48d0ec44ad77e..53b3ba9173ba7 100644
+--- a/virt/kvm/arm/arm.c
++++ b/virt/kvm/arm/arm.c
+@@ -1387,9 +1387,7 @@ static inline void hyp_cpu_pm_exit(void)
+ 
+ static int init_common_resources(void)
+ {
+-	kvm_set_ipa_limit();
+-
+-	return 0;
++	return kvm_set_ipa_limit();
+ }
+ 
+ static int init_subsystems(void)
 -- 
 2.26.1
 
