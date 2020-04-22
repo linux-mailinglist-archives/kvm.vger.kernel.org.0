@@ -2,137 +2,83 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 678511B4CE6
-	for <lists+kvm@lfdr.de>; Wed, 22 Apr 2020 20:52:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 46A281B4DC8
+	for <lists+kvm@lfdr.de>; Wed, 22 Apr 2020 21:56:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726822AbgDVSwG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Apr 2020 14:52:06 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:23999 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726721AbgDVSwF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Apr 2020 14:52:05 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1587581523;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=trPq/Y5FosLGaXOvjfTLOLDEExV7IW7COeIEuuhVB14=;
-        b=XkMce8TUoquSKvS4DOBlcf66Kw81AexoNioLCT6+1dWb2X0WGy8f8ljUIKwxcwojLCnMAw
-        M+eXSYqU38lNcEYG9+hUQXRiLRxLDq6MPOp3NKvKs9q+BkXk2HvsInNwAWkSx0lmVDmmwd
-        ZheWa3yJqY7DnuhY9Rg4BOBPpKt0vag=
-Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
- [209.85.219.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-74-CoEbegW3PI-9MvfbkA0Rqw-1; Wed, 22 Apr 2020 14:51:59 -0400
-X-MC-Unique: CoEbegW3PI-9MvfbkA0Rqw-1
-Received: by mail-qv1-f71.google.com with SMTP id u5so3382050qvt.12
-        for <kvm@vger.kernel.org>; Wed, 22 Apr 2020 11:51:59 -0700 (PDT)
+        id S1726496AbgDVT4j (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Apr 2020 15:56:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40086 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726079AbgDVT4j (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 22 Apr 2020 15:56:39 -0400
+Received: from mail-oi1-x22e.google.com (mail-oi1-x22e.google.com [IPv6:2607:f8b0:4864:20::22e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9163C03C1A9
+        for <kvm@vger.kernel.org>; Wed, 22 Apr 2020 12:56:37 -0700 (PDT)
+Received: by mail-oi1-x22e.google.com with SMTP id j16so2974298oih.10
+        for <kvm@vger.kernel.org>; Wed, 22 Apr 2020 12:56:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:from:date:message-id:subject:to
+         :content-transfer-encoding;
+        bh=o9znY9dsi04w9M+M3bySEL0TwVDUInTJHIzNh81N4Fg=;
+        b=Dg0mlK5rIYbJiP5d+1GNAONriuwLQzsCPBkzn8OUz0n4SHw9CgeQz5cLesg5qs7MwH
+         l6nKcpAZUluqyA4aYxOwcjAXqq7JeWGJKl3ZlL1LIzn4gyVbOauilL7BU+F6szgOVMp4
+         eU7gQbTak4tZnSKRpYleObad+oxBDlT8cEYBw0jv4OTdHyOijMVExXreJizIkzakprsn
+         vavD3XyKVRQBGYqEiEGanXK8snDJ0pqZbWECPYGekkS5ErLAqZQJBF0+djLw4YRaW87X
+         RASJB/TFjDqgpVYazjQ6CHoT4B6F7HQOJ+Wnwhd3XiThsq7RTW+5DeI6lsUcEjCp4An3
+         +/rg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=trPq/Y5FosLGaXOvjfTLOLDEExV7IW7COeIEuuhVB14=;
-        b=mBjajRkeK7+RflYoEI4PY8bOAIv8s/5v+BZ2W0JS81fm4eVB11+068zKrsaWC9fFK9
-         XwAA6JidsqV1D19M6bh+GVH2KO1W07RWNmmrRZDFzqbH3iaNUW2u7Ins13HiHemg9G3m
-         z7CxG53QI2AeZ6kHtUxmqptzKH0FWajoUyUAOBFnuEJvvG8hZWsrwXx9I2/h7qmjh9da
-         8yjoq1by2nM55JvyRzyWUiIXlxuw/rW37UuSqUXhhkuMua4nj0E6q9U1nQY4/nAdpO2x
-         ThTbVh4P5TTvbX1ekG9OIclHL178fiUpwA2Jhu8CLrx7cv8ShHLHzo1dsHy6bXKoQp4+
-         s9gw==
-X-Gm-Message-State: AGi0Pua0rrCo3AYp6l8pMx+B/tuQxp2wC7EXa1lNmQZ4X6Rk6XwsXEn/
-        lsVhEXQk2wouE/WxxFFpi8aOa021cLF2Q7779Q42EU9hs4CFAJ/lmmQxbZEm1otB7KO5TIhs7Eu
-        PQVto6v361aDZ
-X-Received: by 2002:a37:b15:: with SMTP id 21mr28563999qkl.104.1587581518878;
-        Wed, 22 Apr 2020 11:51:58 -0700 (PDT)
-X-Google-Smtp-Source: APiQypLLzkmnDYGbbOkIaC8yISYdS2vxaekStNwPP8eyf0MeRUT+hbOr8YWc7KYSWKcge0VUFezzCA==
-X-Received: by 2002:a37:b15:: with SMTP id 21mr28563901qkl.104.1587581517797;
-        Wed, 22 Apr 2020 11:51:57 -0700 (PDT)
-Received: from xz-x1 ([2607:9880:19c0:32::2])
-        by smtp.gmail.com with ESMTPSA id w10sm14397qka.19.2020.04.22.11.51.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Apr 2020 11:51:56 -0700 (PDT)
-Date:   Wed, 22 Apr 2020 14:51:55 -0400
-From:   Peter Xu <peterx@redhat.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Kevin Tian <kevin.tian@intel.com>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Christophe de Dinechin <dinechin@redhat.com>,
-        Yan Zhao <yan.y.zhao@intel.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>
-Subject: Re: [PATCH v8 00/14] KVM: Dirty ring interface
-Message-ID: <20200422185155.GA3596@xz-x1>
-References: <20200331190000.659614-1-peterx@redhat.com>
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to
+         :content-transfer-encoding;
+        bh=o9znY9dsi04w9M+M3bySEL0TwVDUInTJHIzNh81N4Fg=;
+        b=jxu5qg5F/FwGU0nMSg0LCQB3hrv469/lh3AWbjlIJmLNE22SBXj8nQ2pTTyHPHKW8R
+         4bleOmYVzaekXrbYtyzcUdJjmVSb2G5MAU8hiQGd+htiQBu6g4AyYE9LNjcmYQHiA55w
+         iipi5TGv3P7DoKQ0fYXoG7Ni5G3Z/UXnj2935Xtv5+pjHQhhbH+M2QoTPBwX/suSvWCt
+         lXz7ynUVpeYwYTcI+dXkJF2iy82e+hKB5dOucpkR8N1dbstg2XROX9cfagRpO3DSoEoS
+         Q9UVORuK9ouj023fP9BN3O5mguja3R5apj8eWKFYzLNEmiyHLHP1J7DhYi06FVuEa9AL
+         bmnQ==
+X-Gm-Message-State: AGi0PuafLFpFR6fpVS21lgI/DMTYenR7OgtHVcS8i1nLZlmu70UJz4gU
+        +KttWBwGj0vIhyP3CdQuN/LRnrt+vEYY032ePTZg1qXnHi8=
+X-Google-Smtp-Source: APiQypJ9xRSRoK2MhQd73k8mpRgo0u92aDjBIoDrEUQ8ESiZVQYYAmKdFPOfiRmFy8QjxN43Wm+PZzsQ0lHkdxvFax0=
+X-Received: by 2002:aca:c385:: with SMTP id t127mr483394oif.49.1587585396740;
+ Wed, 22 Apr 2020 12:56:36 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20200331190000.659614-1-peterx@redhat.com>
+From:   =?UTF-8?Q?Anders_=C3=96stling?= <anders.ostling@gmail.com>
+Date:   Wed, 22 Apr 2020 21:56:26 +0200
+Message-ID: <CAP4+ddNe4wFunyH_qKQR5A_a+nwAmvE0COEVirnwUACk9jgpmQ@mail.gmail.com>
+Subject: libvirt snapshot problem
+To:     kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+virsh snapshot-create-as --domain ubuntu-fs guest-state1 --diskspec
+vda,snapshot=3Dexternal,file=3D/home/anders/overlay.qcow2 --disk-only
+--atomic
 
-TL;DR: I'm thinking whether we should record pure GPA/GFN instead of (slot_id,
-slot_offset) tuple for dirty pages in kvm dirty ring to unbind kvm_dirty_gfn
-with memslots.
+returns this
 
-(A slightly longer version starts...)
+error: internal error: unable to execute QEMU command 'transaction':
+Could not create file: Permission denied
 
-The problem is that binding dirty tracking operations to KVM memslots is a
-restriction that needs synchronization to memslot changes, which further needs
-synchronization across all the vcpus because they're the consumers of memslots.
-E.g., when we remove a memory slot, we need to flush all the dirty bits
-correctly before we do the removal of the memslot.  That's actually an known
-defect for QEMU/KVM [1] (I bet it could be a defect for many other
-hypervisors...) right now with current dirty logging.  Meanwhile, even if we
-fix it, that procedure is not scale at all, and error prone to dead locks.
+I found some bugs related to apparmor, and after doing this
 
-Here memory removal is really an (still corner-cased but relatively) important
-scenario to think about for dirty logging comparing to memory additions &
-movings.  Because memory addition will always have no initial dirty page, and
-we don't really move RAM a lot (or do we ever?!) for a general VM use case.
+aa-complain /etc/apparmor.d/libvirt/libvirt-`virsh domuuid ubuntu-fs`
 
-Then I went a step back to think about why we need these dirty bit information
-after all if the memslot is going to be removed?
+I managed to create a snapshot, backup the base file and do a
+blockcommit to merge the snapshot with the base. But on the subsequent
+attempts, the Permission denied problem came back and persists. I am
+running on Ubuntu 18.04, and apparmor is active.
+--=20
+---------------------------------------------------------------------------=
+--------------------------------------------
+This signature contains 100% recyclable electrons as prescribed by Mother N=
+ature
 
-There're two cases:
-
-  - When the memslot is going to be removed forever, then the dirty information
-    is indeed meaningless and can be dropped, and,
-
-  - When the memslot is going to be removed but quickly added back with changed
-    size, then we need to keep those dirty bits because it's just a commmon way
-    to e.g. punch an MMIO hole in an existing RAM region (here I'd confess I
-    feel like using "slot_id" to identify memslot is really unfriendly syscall
-    design for things like "hole punchings" in the RAM address space...
-    However such "punch hold" operation is really needed even for a common
-    guest for either system reboots or device hotplugs, etc.).
-
-The real scenario we want to cover for dirty tracking is the 2nd one.
-
-If we can track dirty using raw GPA, the 2nd scenario is solved itself.
-Because we know we'll add those memslots back (though it might be with a
-different slot ID), then the GPA value will still make sense, which means we
-should be able to avoid any kind of synchronization for things like memory
-removals, as long as the userspace is aware of that.
-
-With that, when we fetch the dirty bits, we lookup the memslot dynamically,
-drop bits if the memslot does not exist on that address (e.g., permanent
-removals), and use whatever memslot is there for that guest physical address.
-Though we for sure still need to handle memory move, that the userspace needs
-to still take care of dirty bit flushing and sync for a memory move, however
-that's merely not happening so nothing to take care about either.
-
-Does this makes sense?  Comments greatly welcomed..
-
-Thanks,
-
-[1] https://lists.gnu.org/archive/html/qemu-devel/2020-03/msg08361.html
-
--- 
-Peter Xu
-
+Anders =C3=96stling
++46 768 716 165 (Mobil)
++46 431 45 56 01  (Hem)
