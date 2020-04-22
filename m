@@ -2,198 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CAC4B1B44D1
-	for <lists+kvm@lfdr.de>; Wed, 22 Apr 2020 14:21:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4FCCE1B45AA
+	for <lists+kvm@lfdr.de>; Wed, 22 Apr 2020 14:59:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728932AbgDVMVf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Apr 2020 08:21:35 -0400
-Received: from mail.kernel.org ([198.145.29.99]:58020 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728480AbgDVMV0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Apr 2020 08:21:26 -0400
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 9531C221EB;
-        Wed, 22 Apr 2020 12:21:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1587558085;
-        bh=w1KXX+6GQ7cFF1e8qmsBxy/daj02ed6N9gs8z88iNaA=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=gvbCvVFoWA8wdN7bYhHfDz+qVy9XmuiwXlaj+4iuz9iRlZTmaExStENHW7BUMfrYZ
-         1uQeAjPpmi6SDLikBGz6QBGkX5BPP2ocl+W5FHHJt+YN3NzuaJpgLcXfLnxRDvbA5j
-         UoUjWtcfVCUNnCiWoDlCBjiZPNy0jW6ElK/6rOpc=
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
-        by disco-boy.misterjones.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <maz@kernel.org>)
-        id 1jRE47-005UI7-VB; Wed, 22 Apr 2020 13:01:20 +0100
-From:   Marc Zyngier <maz@kernel.org>
-To:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org
-Cc:     Andre Przywara <andre.przywara@arm.com>,
-        Christoffer Dall <christoffer.dall@arm.com>,
-        Dave Martin <Dave.Martin@arm.com>,
-        Jintack Lim <jintack@cs.columbia.edu>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        George Cherian <gcherian@marvell.com>,
-        "Zengtao (B)" <prime.zeng@hisilicon.com>,
-        Will Deacon <will@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [PATCH 26/26] KVM: arm64: Parametrize exception entry with a target EL
-Date:   Wed, 22 Apr 2020 13:00:50 +0100
-Message-Id: <20200422120050.3693593-27-maz@kernel.org>
-X-Mailer: git-send-email 2.26.1
-In-Reply-To: <20200422120050.3693593-1-maz@kernel.org>
-References: <20200422120050.3693593-1-maz@kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, andre.przywara@arm.com, christoffer.dall@arm.com, Dave.Martin@arm.com, jintack@cs.columbia.edu, alexandru.elisei@arm.com, gcherian@marvell.com, prime.zeng@hisilicon.com, will@kernel.org, catalin.marinas@arm.com, mark.rutland@arm.com, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+        id S1727125AbgDVM7Q (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Apr 2020 08:59:16 -0400
+Received: from out30-54.freemail.mail.aliyun.com ([115.124.30.54]:50913 "EHLO
+        out30-54.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725924AbgDVM7P (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 22 Apr 2020 08:59:15 -0400
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R641e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e01355;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=37;SR=0;TI=SMTPD_---0TwKABpW_1587560291;
+Received: from localhost(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0TwKABpW_1587560291)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Wed, 22 Apr 2020 20:58:11 +0800
+From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+To:     pbonzini@redhat.com, tsbogend@alpha.franken.de, paulus@ozlabs.org,
+        mpe@ellerman.id.au, benh@kernel.crashing.org,
+        borntraeger@de.ibm.com, frankja@linux.ibm.com, david@redhat.com,
+        cohuck@redhat.com, heiko.carstens@de.ibm.com, gor@linux.ibm.com,
+        sean.j.christopherson@intel.com, vkuznets@redhat.com,
+        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, x86@kernel.org,
+        hpa@zytor.com, maz@kernel.org, james.morse@arm.com,
+        julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
+        christoffer.dall@arm.com, peterx@redhat.com, thuth@redhat.com
+Cc:     kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        tianjia.zhang@linux.alibaba.com
+Subject: [PATCH v2 0/7] clean up redundant 'kvm_run' parameters
+Date:   Wed, 22 Apr 2020 20:58:03 +0800
+Message-Id: <20200422125810.34847-1-tianjia.zhang@linux.alibaba.com>
+X-Mailer: git-send-email 2.17.1
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-We currently assume that an exception is delivered to EL1, always.
-Once we emulate EL2, this no longer will be the case. To prepare
-for this, add a target_mode parameter.
+In the current kvm version, 'kvm_run' has been included in the 'kvm_vcpu'
+structure. Earlier than historical reasons, many kvm-related function
+parameters retain the 'kvm_run' and 'kvm_vcpu' parameters at the same time.
+This patch does a unified cleanup of these remaining redundant parameters.
 
-While we're at it, merge the computing of the target PC and PSTATE in
-a single function that updates both PC and CPSR after saving their
-previous values in the corresponding ELR/SPSR. This ensures that they
-are updated in the correct order (a pretty common source of bugs...).
+This series of patches has completely cleaned the architecture of
+arm64, mips, ppc, and s390 (no such redundant code on x86). Due to
+the large number of modified codes, a separate patch is made for each
+platform. On the ppc platform, there is also a redundant structure
+pointer of 'kvm_run' in 'vcpu_arch', which has also been cleaned
+separately.
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/inject_fault.c | 75 ++++++++++++++++++-----------------
- 1 file changed, 38 insertions(+), 37 deletions(-)
+v2 change:
+  s390 retains the original variable name and minimizes modification.
 
-diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
-index d3ebf8bca4b89..3dbcbc839b9c3 100644
---- a/arch/arm64/kvm/inject_fault.c
-+++ b/arch/arm64/kvm/inject_fault.c
-@@ -26,28 +26,12 @@ enum exception_type {
- 	except_type_serror	= 0x180,
- };
- 
--static u64 get_except_vector(struct kvm_vcpu *vcpu, enum exception_type type)
--{
--	u64 exc_offset;
--
--	switch (*vcpu_cpsr(vcpu) & (PSR_MODE_MASK | PSR_MODE32_BIT)) {
--	case PSR_MODE_EL1t:
--		exc_offset = CURRENT_EL_SP_EL0_VECTOR;
--		break;
--	case PSR_MODE_EL1h:
--		exc_offset = CURRENT_EL_SP_ELx_VECTOR;
--		break;
--	case PSR_MODE_EL0t:
--		exc_offset = LOWER_EL_AArch64_VECTOR;
--		break;
--	default:
--		exc_offset = LOWER_EL_AArch32_VECTOR;
--	}
--
--	return vcpu_read_sys_reg(vcpu, VBAR_EL1) + exc_offset + type;
--}
--
- /*
-+ * This performs the exception entry at a given EL (@target_mode), stashing PC
-+ * and PSTATE into ELR and SPSR respectively, and compute the new PC/PSTATE.
-+ * The EL passed to this function *must* be a non-secure, privileged mode with
-+ * bit 0 being set (PSTATE.SP == 1).
-+ *
-  * When an exception is taken, most PSTATE fields are left unchanged in the
-  * handler. However, some are explicitly overridden (e.g. M[4:0]). Luckily all
-  * of the inherited bits have the same position in the AArch64/AArch32 SPSR_ELx
-@@ -59,10 +43,35 @@ static u64 get_except_vector(struct kvm_vcpu *vcpu, enum exception_type type)
-  * Here we manipulate the fields in order of the AArch64 SPSR_ELx layout, from
-  * MSB to LSB.
-  */
--static unsigned long get_except64_pstate(struct kvm_vcpu *vcpu)
-+static void enter_exception(struct kvm_vcpu *vcpu, unsigned long target_mode,
-+			    enum exception_type type)
- {
--	unsigned long sctlr = vcpu_read_sys_reg(vcpu, SCTLR_EL1);
--	unsigned long old, new;
-+	unsigned long sctlr, vbar, old, new, mode;
-+	u64 exc_offset;
-+
-+	mode = *vcpu_cpsr(vcpu) & (PSR_MODE_MASK | PSR_MODE32_BIT);
-+
-+	if      (mode == target_mode)
-+		exc_offset = CURRENT_EL_SP_ELx_VECTOR;
-+	else if ((mode | 1) == target_mode)
-+		exc_offset = CURRENT_EL_SP_EL0_VECTOR;
-+	else if (!(mode & PSR_MODE32_BIT))
-+		exc_offset = LOWER_EL_AArch64_VECTOR;
-+	else
-+		exc_offset = LOWER_EL_AArch32_VECTOR;
-+
-+	switch (target_mode) {
-+	case PSR_MODE_EL1h:
-+		vbar = vcpu_read_sys_reg(vcpu, VBAR_EL1);
-+		sctlr = vcpu_read_sys_reg(vcpu, SCTLR_EL1);
-+		vcpu_write_sys_reg(vcpu, *vcpu_pc(vcpu), ELR_EL1);
-+		break;
-+	default:
-+		/* Don't do that */
-+		BUG();
-+	}
-+
-+	*vcpu_pc(vcpu) = vbar + exc_offset + type;
- 
- 	old = *vcpu_cpsr(vcpu);
- 	new = 0;
-@@ -105,9 +114,10 @@ static unsigned long get_except64_pstate(struct kvm_vcpu *vcpu)
- 	new |= PSR_I_BIT;
- 	new |= PSR_F_BIT;
- 
--	new |= PSR_MODE_EL1h;
-+	new |= target_mode;
- 
--	return new;
-+	*vcpu_cpsr(vcpu) = new;
-+	vcpu_write_spsr(vcpu, old);
- }
- 
- static void inject_abt64(struct kvm_vcpu *vcpu, bool is_iabt, unsigned long addr)
-@@ -116,11 +126,7 @@ static void inject_abt64(struct kvm_vcpu *vcpu, bool is_iabt, unsigned long addr
- 	bool is_aarch32 = vcpu_mode_is_32bit(vcpu);
- 	u32 esr = 0;
- 
--	vcpu_write_sys_reg(vcpu, *vcpu_pc(vcpu), ELR_EL1);
--	*vcpu_pc(vcpu) = get_except_vector(vcpu, except_type_sync);
--
--	*vcpu_cpsr(vcpu) = get_except64_pstate(vcpu);
--	vcpu_write_spsr(vcpu, cpsr);
-+	enter_exception(vcpu, PSR_MODE_EL1h, except_type_sync);
- 
- 	vcpu_write_sys_reg(vcpu, addr, FAR_EL1);
- 
-@@ -148,14 +154,9 @@ static void inject_abt64(struct kvm_vcpu *vcpu, bool is_iabt, unsigned long addr
- 
- static void inject_undef64(struct kvm_vcpu *vcpu)
- {
--	unsigned long cpsr = *vcpu_cpsr(vcpu);
- 	u32 esr = (ESR_ELx_EC_UNKNOWN << ESR_ELx_EC_SHIFT);
- 
--	vcpu_write_sys_reg(vcpu, *vcpu_pc(vcpu), ELR_EL1);
--	*vcpu_pc(vcpu) = get_except_vector(vcpu, except_type_sync);
--
--	*vcpu_cpsr(vcpu) = get_except64_pstate(vcpu);
--	vcpu_write_spsr(vcpu, cpsr);
-+	enter_exception(vcpu, PSR_MODE_EL1h, except_type_sync);
- 
- 	/*
- 	 * Build an unknown exception, depending on the instruction
+Tianjia Zhang (7):
+  KVM: s390: clean up redundant 'kvm_run' parameters
+  KVM: arm64: clean up redundant 'kvm_run' parameters
+  KVM: PPC: Remove redundant kvm_run from vcpu_arch
+  KVM: PPC: clean up redundant 'kvm_run' parameters
+  KVM: PPC: clean up redundant kvm_run parameters in assembly
+  KVM: MIPS: clean up redundant 'kvm_run' parameters
+  KVM: MIPS: clean up redundant kvm_run parameters in assembly
+
+ arch/arm64/include/asm/kvm_coproc.h      |  12 +--
+ arch/arm64/include/asm/kvm_host.h        |  11 +--
+ arch/arm64/include/asm/kvm_mmu.h         |   2 +-
+ arch/arm64/kvm/handle_exit.c             |  36 +++----
+ arch/arm64/kvm/sys_regs.c                |  13 ++-
+ arch/mips/include/asm/kvm_host.h         |  32 +------
+ arch/mips/kvm/emulate.c                  |  59 ++++--------
+ arch/mips/kvm/entry.c                    |  15 +--
+ arch/mips/kvm/mips.c                     |  14 +--
+ arch/mips/kvm/trap_emul.c                | 114 ++++++++++-------------
+ arch/mips/kvm/vz.c                       |  26 ++----
+ arch/powerpc/include/asm/kvm_book3s.h    |  16 ++--
+ arch/powerpc/include/asm/kvm_host.h      |   1 -
+ arch/powerpc/include/asm/kvm_ppc.h       |  27 +++---
+ arch/powerpc/kvm/book3s.c                |   4 +-
+ arch/powerpc/kvm/book3s.h                |   2 +-
+ arch/powerpc/kvm/book3s_64_mmu_hv.c      |  12 +--
+ arch/powerpc/kvm/book3s_64_mmu_radix.c   |   4 +-
+ arch/powerpc/kvm/book3s_emulate.c        |  10 +-
+ arch/powerpc/kvm/book3s_hv.c             |  64 ++++++-------
+ arch/powerpc/kvm/book3s_hv_nested.c      |  12 +--
+ arch/powerpc/kvm/book3s_interrupts.S     |  17 ++--
+ arch/powerpc/kvm/book3s_paired_singles.c |  72 +++++++-------
+ arch/powerpc/kvm/book3s_pr.c             |  33 ++++---
+ arch/powerpc/kvm/booke.c                 |  39 ++++----
+ arch/powerpc/kvm/booke.h                 |   8 +-
+ arch/powerpc/kvm/booke_emulate.c         |   2 +-
+ arch/powerpc/kvm/booke_interrupts.S      |   9 +-
+ arch/powerpc/kvm/bookehv_interrupts.S    |  10 +-
+ arch/powerpc/kvm/e500_emulate.c          |  15 ++-
+ arch/powerpc/kvm/emulate.c               |  10 +-
+ arch/powerpc/kvm/emulate_loadstore.c     |  32 +++----
+ arch/powerpc/kvm/powerpc.c               |  72 +++++++-------
+ arch/powerpc/kvm/trace_hv.h              |   6 +-
+ arch/s390/kvm/kvm-s390.c                 |  37 +++++---
+ virt/kvm/arm/arm.c                       |   6 +-
+ virt/kvm/arm/mmio.c                      |  11 ++-
+ virt/kvm/arm/mmu.c                       |   5 +-
+ 38 files changed, 396 insertions(+), 474 deletions(-)
+
 -- 
-2.26.1
+2.17.1
 
