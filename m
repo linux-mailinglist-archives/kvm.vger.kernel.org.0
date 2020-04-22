@@ -2,117 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 92C1D1B3AE1
-	for <lists+kvm@lfdr.de>; Wed, 22 Apr 2020 11:12:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 306631B3AE4
+	for <lists+kvm@lfdr.de>; Wed, 22 Apr 2020 11:12:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726458AbgDVJL7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Apr 2020 05:11:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52642 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726077AbgDVJL6 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 22 Apr 2020 05:11:58 -0400
-Received: from mail-il1-x142.google.com (mail-il1-x142.google.com [IPv6:2607:f8b0:4864:20::142])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32A7DC03C1A6;
-        Wed, 22 Apr 2020 02:11:58 -0700 (PDT)
-Received: by mail-il1-x142.google.com with SMTP id r2so1146238ilo.6;
-        Wed, 22 Apr 2020 02:11:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=HLA2X61U+G6ZU9bEd0gaBeZeOPn3A93++NR5CH7fB64=;
-        b=J4giD/YBDck/mUz0NwFQmVGxTe9zC58MQlFLAUBAI8G5MB5vM1Rp3aJ6rpAtVprNOk
-         fjK4+71GRvF2HV3KluQ3oGmf/X5xqtLOJdDGZs7SFWjzhOCE/UJxAO45q73x3htA1uff
-         QFGDAoOK5RvuBFRKG19vPMWNefS/BkV8oQkA0du0Q/k4lgU3RXC68RSoydztfd87xOFw
-         Oft5gwdc7SNDcoOKq4kdGGAvk2trvqzmbU46Xox7RnM/aSe0xUHsbJPR4EePZrbWO8DU
-         HagahOT5NBK4iLVTpgdtYC0jPvdIhqXYRZLvtcSinDR5InMHTuOXWLl+btWsaHjppnji
-         A55g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=HLA2X61U+G6ZU9bEd0gaBeZeOPn3A93++NR5CH7fB64=;
-        b=D+I3xR2vtXgCGWECGmGxto17sH8fxMpnfjApXgFqYbXv8v599EA4az7jS8q8dun5r4
-         Z9XVP/UX9M1i/ZtJ4C3lmuyV/WWfB/L66IxjqagyfurgnDyF0Az1dm8m5BvwqoJzGWni
-         kQKWeVaUyCyuHbD4zsQrajNRYLt7zxpFBscq3liQ2clCMHeYD83pepDDUh9iotSlIgGL
-         xJdDE3Cm6mrTXDNPX12Y6qAEHTLpDUFPOIZV5qpE4JpAaD05n86QNWt9V8sHAD1QPw+k
-         TD/mV7/hFP29Z7AQ7+fqSJWjRMlO2CL7EzgierXCMJZSs/J8NiOObQuzykQuIfZNxepC
-         zTJg==
-X-Gm-Message-State: AGi0PuYB96lqu6KCEHsqDzGnGeSRkjZx59AbdqZ3fhKviiwKPXTrZiwr
-        yfNys+LqvEvnKP9qjK71CDwc2/xJ3YokvukY1BoPCZ1Y
-X-Google-Smtp-Source: APiQypLL1gvBGc4Ay2OA6p4ztYkG00xYbbpahoQ5ydSVzKBkM11/r29cjbEPIXT9B2oV7tkziJyE0MoGrx9YPZIi6TQ=
-X-Received: by 2002:a05:6e02:dc3:: with SMTP id l3mr24249236ilj.149.1587546717465;
- Wed, 22 Apr 2020 02:11:57 -0700 (PDT)
+        id S1726563AbgDVJML (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Apr 2020 05:12:11 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:30102 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726527AbgDVJML (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 22 Apr 2020 05:12:11 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 03M92fT4078232
+        for <kvm@vger.kernel.org>; Wed, 22 Apr 2020 05:12:10 -0400
+Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 30gmvhvak6-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Wed, 22 Apr 2020 05:12:10 -0400
+Received: from localhost
+        by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <pmorel@linux.ibm.com>;
+        Wed, 22 Apr 2020 10:11:21 +0100
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
+        by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Wed, 22 Apr 2020 10:11:19 +0100
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 03M9C5Nl60817514
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 22 Apr 2020 09:12:05 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A0F69A4055;
+        Wed, 22 Apr 2020 09:12:04 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5D1A7A40D0;
+        Wed, 22 Apr 2020 09:12:04 +0000 (GMT)
+Received: from oc3016276355.ibm.com (unknown [9.145.55.142])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed, 22 Apr 2020 09:12:04 +0000 (GMT)
+Subject: Re: [kvm-unit-tests PATCH v5 03/10] s390x: cr0: adding AFP-register
+ control bit
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        frankja@linux.ibm.com, david@redhat.com, thuth@redhat.com
+References: <1582200043-21760-1-git-send-email-pmorel@linux.ibm.com>
+ <1582200043-21760-4-git-send-email-pmorel@linux.ibm.com>
+ <20200422095928.0623886c.cohuck@redhat.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+Date:   Wed, 22 Apr 2020 11:12:04 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-References: <20200323075354.93825-1-aik@ozlabs.ru> <b512ac5e-dca5-4c08-8ea1-a636b887c0d0@ozlabs.ru>
- <d5cac37a-8b32-cabf-e247-10e64f0110ab@ozlabs.ru> <CAOSf1CGfjX9LGQ1GDSmxrzjnaWOM3mUvBu9_xe-L2umin9n66w@mail.gmail.com>
- <CAOSf1CHgUsJ7jGokg6QD6cEDr4-o5hnyyyjRZ=YijsRY3T1sYA@mail.gmail.com>
- <b0b361092d2d7e38f753edee6dcd9222b4e388ce.camel@russell.cc>
- <9893c4db-057d-8e42-52fe-8241d6d90b5f@ozlabs.ru> <76718d0c46f4638a57fd2deeeed031143599d12d.camel@gmail.com>
- <8f317916-06be-ed25-4d9b-a8e2e993b112@ozlabs.ru> <CAOSf1CG_qiR2HvSFVTbgTyqVmDt4+Oy60PNWY23K2ihHib1K7Q@mail.gmail.com>
- <ee3fd87f-f2b6-1439-a310-fedc614e6155@ozlabs.ru>
-In-Reply-To: <ee3fd87f-f2b6-1439-a310-fedc614e6155@ozlabs.ru>
-From:   "Oliver O'Halloran" <oohall@gmail.com>
-Date:   Wed, 22 Apr 2020 19:11:46 +1000
-Message-ID: <CAOSf1CGeDCh-5TQ0mka0GG_gNeTY3EVtYkPvu=0ckrGe1VAqcw@mail.gmail.com>
-Subject: Re: [PATCH kernel v2 0/7] powerpc/powenv/ioda: Allow huge DMA window
- at 4GB
-To:     Alexey Kardashevskiy <aik@ozlabs.ru>
-Cc:     Russell Currey <ruscur@russell.cc>,
-        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        kvm-ppc@vger.kernel.org, KVM list <kvm@vger.kernel.org>,
-        Alistair Popple <alistair@popple.id.au>,
-        Fabiano Rosas <farosas@linux.ibm.com>,
-        Michael Ellerman <mpe@ellerman.id.au>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20200422095928.0623886c.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 20042209-0016-0000-0000-00000309217C
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20042209-0017-0000-0000-0000336D3C8A
+Message-Id: <e7fa91ba-1128-7b89-851c-b5dd0afe6315@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.676
+ definitions=2020-04-22_03:2020-04-21,2020-04-22 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ bulkscore=0 malwarescore=0 impostorscore=0 suspectscore=0 phishscore=0
+ adultscore=0 mlxlogscore=964 clxscore=1015 mlxscore=0 spamscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2004220069
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Apr 22, 2020 at 4:49 PM Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
->
-> 32bit MMIO is what puzzles me in this picture, how does it work?
 
-For devices with no m64 we allocate a PE number as described above. In
-the 32bit MMIO window we have a segment-to-PE remapping table so any
-m32 segment can be assigned to any PE. As a result slave PE concept
-isn't really needed. If the BARs of a device span multiple m32
-segments then we can setup the remapping table so that all the
-segments point to the same PE.
 
-> > I was thinking we should try minimise the number of DMA-only PEs since
-> > it complicates the EEH freeze handling. When MMIO and DMA are mapped
-> > to the same PE an error on either will cause the hardware to stop
-> > both. When seperate PEs are used for DMA and MMIO you lose that
-> > atomicity. It's not a big deal if DMA is stopped and MMIO allowed
-> > since PAPR (sort-of) allows that, but having MMIO frozen with DMA
-> > unfrozen is a bit sketch.
->
-> You suggested using slave PEs for crippled functions - won't we have the
-> same problem then?
+On 2020-04-22 09:59, Cornelia Huck wrote:
+> On Thu, 20 Feb 2020 13:00:36 +0100
+> Pierre Morel <pmorel@linux.ibm.com> wrote:
+> 
+>> While adding the definition for the AFP-Register control bit, move all
+>> existing definitions for CR0 out of the C zone to the assmbler zone to
+>> keep the definitions concerning CR0 together.
+>>
+>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+>> ---
+>>   lib/s390x/asm/arch_def.h | 11 ++++++-----
+>>   s390x/cstart64.S         |  2 +-
+>>   2 files changed, 7 insertions(+), 6 deletions(-)
+>>
+> 
+> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+> 
 
-Yes, but I think it's probably worth doing in that case. You get
-slightly janky EEH in exchange for better DMA performance.
+Thanks for the review,
+Regards,
 
-> And is this "slave PE" something the hardware supports or it is a
-> software concept?
+Pierre
 
-It's all in software. The hardware does have the PELT-V which allows
-you to specify a group of PEs to additionally freeze when a PE is
-frozen, but the PELT-V is only used when handling AER messages.  All
-other error sources (DMAs, MMIOs, etc) will only freeze one PE (or all
-of them in very rare cases).
+-- 
+Pierre Morel
+IBM Lab Boeblingen
 
-> > There's been no official FW releases with a skiboot that supports the
-> > phb get/set option opal calls so the only systems that can actually
-> > take advantage of it are our lab systems. It might still be useful for
-> > future systems, but I'd rather something that doesn't depend on FW
-> > support.
->
-> Pensando folks use it ;)
-
-the what folks
-
-Oliver
