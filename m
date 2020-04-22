@@ -2,173 +2,177 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1F0491B438B
-	for <lists+kvm@lfdr.de>; Wed, 22 Apr 2020 13:50:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D0AC81B43BB
+	for <lists+kvm@lfdr.de>; Wed, 22 Apr 2020 14:00:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727920AbgDVLu1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Apr 2020 07:50:27 -0400
-Received: from mail-vi1eur05on2087.outbound.protection.outlook.com ([40.107.21.87]:30048
-        "EHLO EUR05-VI1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726043AbgDVLu0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Apr 2020 07:50:26 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=DZGYrnXj0/HRw20mrWUORIUyWru3UC6xn7kZkebNbd3MNHAwERHhJs9+WNdV1GplVMlI2gvjbPWM2ru2mfLeykIcLGhG8hHb7bEJeFPHMDKsdC/kU7/IQQpW7NrtIRKPTaRdK4w0EOmZRV3YlWXCJAT0/sMjyhr2cbE89RhXQmR2wcr3Nm8JGyg0i9p404xVD/i/6iDI31PZKOy9NDM1FFNaJgTTmmO2Ai8qGj9JIT2nVGDIeRP6/9nxRKY0NSBjmdpMJ95XRni7sRucveDF5LI+oRKmPeJwHq1Zgdc93emKON3YFqMDgQnXquvr4sfjfugagk9jQZpuPQsdnHAzXQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ZiHdXJZxGaInGlyTvej0EWR4G9fxBg/5DXDTQYIkFAE=;
- b=T3jN40IN1+d6dvizvnCSSyCamGmwQD6znJGY7cQsBBTkTV0qXyqDkKwu7kAqbo1bz9C561nYSXJQpRWGh43gBiXXe30fpmdtEh1HaL2ynkq7wSkyINN5HwYYJRF/do76PRxrKfSpJBYhKEjb7eSEAHSYzpjt6qgsRSiuTVBD0hhD3AQXZ9FddwvUECkEsCGYRVp7VVT0v4m4H1rtzWMdmfmtDUbSDI4EK0rk0NwD9kRa4Gw8p7NEVQc8vEEq/lPGzueYYKY6InJtYbsO8PgBJSHdHcT6PlYhlMZ1KMsQkbdYyeLQhde45IubIc64l794CtfHu3Lh1e/t85jxnVmmUA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=mellanox.com; dmarc=pass action=none header.from=mellanox.com;
- dkim=pass header.d=mellanox.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Mellanox.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ZiHdXJZxGaInGlyTvej0EWR4G9fxBg/5DXDTQYIkFAE=;
- b=ahOUpgrFMc0K8skWLDg/6RFm1AgTW8sBlFCAnm9Vr1h6An53igVeYH60AEFYLooUR/4T1TERAsmLRytVFKfII0rB9a30YyGf325g8tVAJl9wo4et2jAcq8dyF0S6gqJAv+z2qqAGXFRG8MZddB4sF+9EBFTDop4oQCwYvILfaxs=
-Authentication-Results: spf=none (sender IP is )
- smtp.mailfrom=jgg@mellanox.com; 
-Received: from VI1PR05MB4141.eurprd05.prod.outlook.com (2603:10a6:803:44::15)
- by VI1PR05MB6144.eurprd05.prod.outlook.com (2603:10a6:803:e8::33) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2937.13; Wed, 22 Apr
- 2020 11:50:21 +0000
-Received: from VI1PR05MB4141.eurprd05.prod.outlook.com
- ([fe80::a47b:e3cd:7d6d:5d4e]) by VI1PR05MB4141.eurprd05.prod.outlook.com
- ([fe80::a47b:e3cd:7d6d:5d4e%6]) with mapi id 15.20.2921.030; Wed, 22 Apr 2020
- 11:50:21 +0000
-Date:   Wed, 22 Apr 2020 08:50:17 -0300
-From:   Jason Gunthorpe <jgg@mellanox.com>
-To:     "Tian, Kevin" <kevin.tian@intel.com>
-Cc:     "Jiang, Dave" <dave.jiang@intel.com>,
-        "vkoul@kernel.org" <vkoul@kernel.org>,
-        "megha.dey@linux.intel.com" <megha.dey@linux.intel.com>,
-        "maz@kernel.org" <maz@kernel.org>,
-        "bhelgaas@google.com" <bhelgaas@google.com>,
-        "rafael@kernel.org" <rafael@kernel.org>,
-        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "hpa@zytor.com" <hpa@zytor.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "Pan, Jacob jun" <jacob.jun.pan@intel.com>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>, "Lu, Baolu" <baolu.lu@intel.com>,
-        "Kumar, Sanjay K" <sanjay.k.kumar@intel.com>,
-        "Luck, Tony" <tony.luck@intel.com>,
-        "Lin, Jing" <jing.lin@intel.com>,
-        "Williams, Dan J" <dan.j.williams@intel.com>,
-        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "parav@mellanox.com" <parav@mellanox.com>,
-        "dmaengine@vger.kernel.org" <dmaengine@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: Re: [PATCH RFC 00/15] Add VFIO mediated device support and IMS
- support for the idxd driver.
-Message-ID: <20200422115017.GQ11945@mellanox.com>
-References: <158751095889.36773.6009825070990637468.stgit@djiang5-desk3.ch.intel.com>
- <20200421235442.GO11945@mellanox.com>
- <AADFC41AFE54684AB9EE6CBC0274A5D19D86EE26@SHSMSX104.ccr.corp.intel.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <AADFC41AFE54684AB9EE6CBC0274A5D19D86EE26@SHSMSX104.ccr.corp.intel.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-ClientProxiedBy: MN2PR15CA0004.namprd15.prod.outlook.com
- (2603:10b6:208:1b4::17) To VI1PR05MB4141.eurprd05.prod.outlook.com
- (2603:10a6:803:44::15)
+        id S1726988AbgDVMA5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Apr 2020 08:00:57 -0400
+Received: from mail.kernel.org ([198.145.29.99]:43752 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726043AbgDVMA5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Apr 2020 08:00:57 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 45B3D20780;
+        Wed, 22 Apr 2020 12:00:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1587556856;
+        bh=cjNtiZiSfG8NCNGrLmoyucuhnBDcnLMQHlTpx9c+/rQ=;
+        h=From:To:Cc:Subject:Date:From;
+        b=NCoygnjpF76Otji5EmVvuJDE0QdIRz2Fim66ksOD9SzJprbT6vIp/3C0kUNbb2y0G
+         P9h/3TxTnhcDvtYzGc6pmq++7JXvFqDt+tJaQXnvjuTvkCcJQecQrAZYj8mqCiCZsx
+         laibgAPSq3EHmqsHQ6zH+wY4BjvSqpearnncm5PY=
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
+        by disco-boy.misterjones.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <maz@kernel.org>)
+        id 1jRE3i-005UI7-JR; Wed, 22 Apr 2020 13:00:54 +0100
+From:   Marc Zyngier <maz@kernel.org>
+To:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org
+Cc:     Andre Przywara <andre.przywara@arm.com>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Dave Martin <Dave.Martin@arm.com>,
+        Jintack Lim <jintack@cs.columbia.edu>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        George Cherian <gcherian@marvell.com>,
+        "Zengtao (B)" <prime.zeng@hisilicon.com>,
+        Will Deacon <will@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>
+Subject: [PATCH 00/26] KVM: arm64: Preliminary NV patches
+Date:   Wed, 22 Apr 2020 13:00:24 +0100
+Message-Id: <20200422120050.3693593-1-maz@kernel.org>
+X-Mailer: git-send-email 2.26.1
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from mlx.ziepe.ca (142.68.57.212) by MN2PR15CA0004.namprd15.prod.outlook.com (2603:10b6:208:1b4::17) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2937.13 via Frontend Transport; Wed, 22 Apr 2020 11:50:20 +0000
-Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)     (envelope-from <jgg@mellanox.com>)      id 1jRDtR-0005Jl-6J; Wed, 22 Apr 2020 08:50:17 -0300
-X-Originating-IP: [142.68.57.212]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: b8f61273-44a1-436e-ec98-08d7e6b355c4
-X-MS-TrafficTypeDiagnostic: VI1PR05MB6144:|VI1PR05MB6144:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <VI1PR05MB61441FF49D2E8F59F8C8BA25CFD20@VI1PR05MB6144.eurprd05.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:7691;
-X-Forefront-PRVS: 03818C953D
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI1PR05MB4141.eurprd05.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(136003)(346002)(376002)(396003)(39860400002)(366004)(52116002)(9746002)(186003)(9786002)(26005)(8936002)(81156014)(8676002)(478600001)(36756003)(7416002)(2906002)(54906003)(316002)(6916009)(2616005)(66556008)(66476007)(1076003)(66946007)(4326008)(33656002)(86362001)(5660300002)(24400500001);DIR:OUT;SFP:1101;
-Received-SPF: None (protection.outlook.com: mellanox.com does not designate
- permitted sender hosts)
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: g2hhWJZx18CpRfjbS+Oh6BWXZ22hlU53I+inlXjFWSch6Xb/aVxhnw51PvCg5FE7NeKaY4+WFrIaoYx0Qo/rsGStrYHgAVlwtIOV21pbHTud4cse00qnagorPOv/X+NmbQg0wkn2eStUlxBFSr9sbXZLpxJQOF7M8aS3JofDenM2r//jLXo4vJMrJKgqRuJDVdfmWeU9ZWg1la/mJFqk3kTOp6TboglgVprnKhOWz9JhJNVEKQdmLgpt3mCKePLUEoyllVGeiQkJCRs3orMoAkNjBB5AdDl0v8xrGHRdPeu6daodmwuhekyUGuI5btQ1r1SrzW8eZVPr3uPoLYb7qMR4fcnbz04GxfIgoNoXbPrZJuEaGCPEDZVf4Zv7XptqdZOqelew/5pomVIwukW85FamdTckyFnFzJ2JFtfnZzl9rYLvLhZsbaL3Yb3IBIxzVzIg7LM/ZR1lTB1HQuH/MotdkCuEyQhS9cTO07W8RboCZ1YMInBBvqS3+O8SgtM4
-X-MS-Exchange-AntiSpam-MessageData: stkA1MXK4zOck7r69UNwJBGhBKDT+RMVW+XVmhpgnd60BceiJBlscBQY3/fb6i7RR5Z6n+jXEUaUjF0uJfCAojoivYwFI7n67HcSSqIhl9ofEOhj28i8xZjYTYyf9MedmTuoMlbZhvbbD+XO0HbrQw==
-X-OriginatorOrg: Mellanox.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b8f61273-44a1-436e-ec98-08d7e6b355c4
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Apr 2020 11:50:21.4944
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: a652971c-7d2e-4d9b-a6a4-d149256f461b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Xu5DnnwejPSswsnrh77OfwllhVrst09R4Fed5uZfCW4CqvD1NTjk0F4no1lnUzWgfTNqNGrFtJF6uR0+1V5k2w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR05MB6144
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, andre.przywara@arm.com, christoffer.dall@arm.com, Dave.Martin@arm.com, jintack@cs.columbia.edu, alexandru.elisei@arm.com, gcherian@marvell.com, prime.zeng@hisilicon.com, will@kernel.org, catalin.marinas@arm.com, mark.rutland@arm.com, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Apr 22, 2020 at 12:53:25AM +0000, Tian, Kevin wrote:
-> > From: Jason Gunthorpe
-> > Sent: Wednesday, April 22, 2020 7:55 AM
-> > 
-> > On Tue, Apr 21, 2020 at 04:33:46PM -0700, Dave Jiang wrote:
-> > > The actual code is independent of the stage 2 driver code submission that
-> > adds
-> > > support for SVM, ENQCMD(S), PASID, and shared workqueues. This code
-> > series will
-> > > support dedicated workqueue on a guest with no vIOMMU.
-> > >
-> > > A new device type "mdev" is introduced for the idxd driver. This allows the
-> > wq
-> > > to be dedicated to the usage of a VFIO mediated device (mdev). Once the
-> > work
-> > > queue (wq) is enabled, an uuid generated by the user can be added to the
-> > wq
-> > > through the uuid sysfs attribute for the wq.  After the association, a mdev
-> > can
-> > > be created using this UUID. The mdev driver code will associate the uuid
-> > and
-> > > setup the mdev on the driver side. When the create operation is successful,
-> > the
-> > > uuid can be passed to qemu. When the guest boots up, it should discover a
-> > DSA
-> > > device when doing PCI discovery.
-> > 
-> > I'm feeling really skeptical that adding all this PCI config space and
-> > MMIO BAR emulation to the kernel just to cram this into a VFIO
-> > interface is a good idea, that kind of stuff is much safer in
-> > userspace.
-> > 
-> > Particularly since vfio is not really needed once a driver is using
-> > the PASID stuff. We already have general code for drivers to use to
-> > attach a PASID to a mm_struct - and using vfio while disabling all the
-> > DMA/iommu config really seems like an abuse.
-> 
-> Well, this series is for virtualizing idxd device to VMs, instead of
-> supporting SVA for bare metal processes. idxd implements a
-> hardware-assisted mediated device technique called Intel Scalable
-> I/O Virtualization,
+Hi all,
 
-I'm familiar with the intel naming scheme.
+In order not to repeat the 90+ patch series that resulted in a
+deafening silence last time, I've extracted a smaller set of patches
+that form the required dependencies that allow the rest of the 65 NV
+patches to be added on top. Yes, it is that bad.
 
-> which allows each Assignable Device Interface (ADI, e.g. a work
-> queue) tagged with an unique PASID to ensure fine-grained DMA
-> isolation when those ADIs are assigned to different VMs. For this
-> purpose idxd utilizes the VFIO mdev framework and IOMMU aux-domain
-> extension. Bare metal SVA will be enabled for idxd later by using
-> the general SVA code that you mentioned.  Both paths will co-exist
-> in the end so there is no such case of disabling DMA/iommu config.
- 
-Again, if you will have a normal SVA interface, there is no need for a
-VFIO version, just use normal SVA for both.
+The one real feature here is support for the ARMv8.4-TTL extension at
+Stage-2 only. The reason to support it is that it helps the hypervisor
+a lot when it comes to finding out how much to invalidate. It is thus
+always "supported" with NV.
 
-PCI emulation should try to be in userspace, not the kernel, for
-security.
+The rest doesn't contain any functionality change. Most of it reworks
+existing data structures and adds new accessors for the things that
+get moved around. The reason for this is that:
 
-Jason
+- With NV, we end-up with multiple Stage-2 MMU contexts per VM instead
+  of a single one. This requires we divorce struct kvm from the S2 MMU
+  configuration. Of course, we stick with a single MMU context for now.
+
+- With ARMv8.4-NV, a number of system register accesses are turned
+  into memory accesses into the so-called VNCR page. It is thus
+  convenient to make this VNCR page part of the vcpu context and avoid
+  copying data back and forth. For this to work, we need to make sure
+  that all the VNCR-aware sysregs are moved into our per-vcpu sys_regs
+  array instead of leaving in other data structures (the timers, for
+  example). The VNCR page itself isn't introduced with these patches.
+
+- As some of these data structures change, we need a way to isolate
+  the userspace ABI from such change.
+
+- The exception generation code is also reworked to prepare the
+  addition of EL2 exceptions.
+
+There is also a number of cleanups that were in the full fat series
+that I decided to move early to get them out of the way.
+
+The whole this is a bit of a mix of vaguely unrelated "stuff", but it
+all comes together if you look at the final series[1]. This applies on
+top of v5.7-rc1.
+
+I haven't applied any of the Tested-by: tags, as the series keeps
+changing. Please keep testing though!
+
+[1] https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=kvm-arm64/nv-5.7-rc1-WIP
+
+Christoffer Dall (2):
+  KVM: arm64: Factor out stage 2 page table data from struct kvm
+  KVM: arm64: vgic-v3: Take cpu_if pointer directly instead of vcpu
+
+Marc Zyngier (24):
+  KVM: arm64: Check advertised Stage-2 page size capability
+  KVM: arm64: Move __load_guest_stage2 to kvm_mmu.h
+  arm64: Detect the ARMv8.4 TTL feature
+  arm64: Document SW reserved PTE/PMD bits in Stage-2 descriptors
+  arm64: Add level-hinted TLB invalidation helper
+  KVM: arm64: Add a level hint to __kvm_tlb_flush_vmid_ipa
+  KVM: arm64: Use TTL hint in when invalidating stage-2 translations
+  KVM: arm64: Refactor vcpu_{read,write}_sys_reg
+  KVM: arm64: Add missing reset handlers for PMU emulation
+  KVM: arm64: Move sysreg reset check to boot time
+  KVM: arm64: Introduce accessor for ctxt->sys_reg
+  KVM: arm64: hyp: Use ctxt_sys_reg/__vcpu_sys_reg instead of raw
+    sys_regs access
+  KVM: arm64: sve: Use __vcpu_sys_reg() instead of raw sys_regs access
+  KVM: arm64: pauth: Use ctxt_sys_reg() instead of raw sys_regs access
+  KVM: arm64: debug: Use ctxt_sys_reg() instead of raw sys_regs access
+  KVM: arm64: Don't use empty structures as CPU reset state
+  KVM: arm64: Make struct kvm_regs userspace-only
+  KVM: arm64: Move ELR_EL1 to the system register array
+  KVM: arm64: Move SP_EL1 to the system register array
+  KVM: arm64: Disintegrate SPSR array
+  KVM: arm64: Move SPSR_EL1 to the system register array
+  KVM: arm64: timers: Rename kvm_timer_sync_hwstate to
+    kvm_timer_sync_user
+  KVM: arm64: timers: Move timer registers to the sys_regs file
+  KVM: arm64: Parametrize exception entry with a target EL
+
+ arch/arm64/include/asm/cpucaps.h        |   3 +-
+ arch/arm64/include/asm/kvm_asm.h        |   6 +-
+ arch/arm64/include/asm/kvm_emulate.h    |  37 +---
+ arch/arm64/include/asm/kvm_host.h       |  71 +++++--
+ arch/arm64/include/asm/kvm_hyp.h        |  30 +--
+ arch/arm64/include/asm/kvm_mmu.h        |  27 ++-
+ arch/arm64/include/asm/pgtable-hwdef.h  |   2 +
+ arch/arm64/include/asm/stage2_pgtable.h |   9 +
+ arch/arm64/include/asm/sysreg.h         |   4 +
+ arch/arm64/include/asm/tlbflush.h       |  30 +++
+ arch/arm64/kernel/asm-offsets.c         |   3 +-
+ arch/arm64/kernel/cpufeature.c          |  19 ++
+ arch/arm64/kvm/fpsimd.c                 |   6 +-
+ arch/arm64/kvm/guest.c                  |  79 ++++++-
+ arch/arm64/kvm/handle_exit.c            |  17 +-
+ arch/arm64/kvm/hyp/debug-sr.c           |  18 +-
+ arch/arm64/kvm/hyp/entry.S              |   3 +-
+ arch/arm64/kvm/hyp/switch.c             |  31 ++-
+ arch/arm64/kvm/hyp/sysreg-sr.c          | 160 +++++++-------
+ arch/arm64/kvm/hyp/tlb.c                |  51 +++--
+ arch/arm64/kvm/inject_fault.c           |  75 +++----
+ arch/arm64/kvm/regmap.c                 |  37 +++-
+ arch/arm64/kvm/reset.c                  |  60 ++++--
+ arch/arm64/kvm/sys_regs.c               | 215 ++++++++++---------
+ include/kvm/arm_arch_timer.h            |  13 +-
+ include/kvm/arm_vgic.h                  |   5 +-
+ virt/kvm/arm/arch_timer.c               | 157 +++++++++++---
+ virt/kvm/arm/arm.c                      |  40 ++--
+ virt/kvm/arm/hyp/vgic-v3-sr.c           |  33 +--
+ virt/kvm/arm/mmu.c                      | 267 +++++++++++++-----------
+ virt/kvm/arm/trace.h                    |   8 +-
+ virt/kvm/arm/vgic/vgic-v2.c             |  10 +-
+ virt/kvm/arm/vgic/vgic-v3.c             |  14 +-
+ virt/kvm/arm/vgic/vgic.c                |  25 ++-
+ 34 files changed, 942 insertions(+), 623 deletions(-)
+
+-- 
+2.26.1
+
