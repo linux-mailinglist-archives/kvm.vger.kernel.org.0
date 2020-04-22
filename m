@@ -2,32 +2,32 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 52E5B1B4A2C
-	for <lists+kvm@lfdr.de>; Wed, 22 Apr 2020 18:19:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D01811B4A2B
+	for <lists+kvm@lfdr.de>; Wed, 22 Apr 2020 18:19:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726820AbgDVQT2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Apr 2020 12:19:28 -0400
-Received: from mail.kernel.org ([198.145.29.99]:39318 "EHLO mail.kernel.org"
+        id S1726790AbgDVQT1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Apr 2020 12:19:27 -0400
+Received: from mail.kernel.org ([198.145.29.99]:39422 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726761AbgDVQTZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Apr 2020 12:19:25 -0400
+        id S1726778AbgDVQT0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Apr 2020 12:19:26 -0400
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id C016B21569;
-        Wed, 22 Apr 2020 16:19:24 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 64B7F21582;
+        Wed, 22 Apr 2020 16:19:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1587572364;
-        bh=uS/26Iqzcy4uMSgKJBTxZPQLx/5kq9wkCVC7k/Sfbbs=;
+        s=default; t=1587572365;
+        bh=ak8isB0FGlseKt4JiC38muAkANaK86FQSKsLQTeIsUc=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=bZSnyVknBM4Yuvp046bG1qqzSfaPA1QKvXhzgk+MvvoFM2fZod9YjAvRkm80lAJ5G
-         4+aqgnY7cZBnSET4VMi1gVwA69ukyesvGtEKgcrJyvfAocXeXPfHRkPVWXtpM8plvA
-         2Vo1g/bDfArkcoKgw0JvFwk7jJYnm0d9kNhS3usQ=
+        b=TA7uM5hOYoNIVk8PohFOkWL0eczaMaBSGL+pEZx6gzt639Ho/n7mB+5L8avj4yhm3
+         Uk0YbSza2Krf260n4qv6CdW3uyilwyB27Yj2hgFDsoCsATQlFdVveKnXrZBY4d7fhg
+         sx+TXCU2YPf5HE/6QcpiC3eWmXNBCU/h9KdxxiQQ=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
         by disco-boy.misterjones.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
         (Exim 4.92)
         (envelope-from <maz@kernel.org>)
-        id 1jRI5r-005Ynp-5T; Wed, 22 Apr 2020 17:19:23 +0100
+        id 1jRI5r-005Ynp-QO; Wed, 22 Apr 2020 17:19:23 +0100
 From:   Marc Zyngier <maz@kernel.org>
 To:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         kvm@vger.kernel.org
@@ -38,9 +38,9 @@ Cc:     Zenghui Yu <yuzenghui@huawei.com>,
         James Morse <james.morse@arm.com>,
         Julien Thierry <julien.thierry.kdev@gmail.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [PATCH v3 5/6] KVM: arm64: vgic-v3: Retire all pending LPIs on vcpu destroy
-Date:   Wed, 22 Apr 2020 17:18:43 +0100
-Message-Id: <20200422161844.3848063-6-maz@kernel.org>
+Subject: [PATCH v3 6/6] KVM: arm64: vgic-its: Fix memory leak on the error path of vgic_add_lpi()
+Date:   Wed, 22 Apr 2020 17:18:44 +0100
+Message-Id: <20200422161844.3848063-7-maz@kernel.org>
 X-Mailer: git-send-email 2.26.1
 In-Reply-To: <20200422161844.3848063-1-maz@kernel.org>
 References: <20200422161844.3848063-1-maz@kernel.org>
@@ -57,69 +57,45 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Zenghui Yu <yuzenghui@huawei.com>
 
-It's likely that the vcpu fails to handle all virtual interrupts if
-userspace decides to destroy it, leaving the pending ones stay in the
-ap_list. If the un-handled one is a LPI, its vgic_irq structure will
-be eventually leaked because of an extra refcount increment in
-vgic_queue_irq_unlock().
-
-This was detected by kmemleak on almost every guest destroy, the
-backtrace is as follows:
-
-unreferenced object 0xffff80725aed5500 (size 128):
-comm "CPU 5/KVM", pid 40711, jiffies 4298024754 (age 166366.512s)
-hex dump (first 32 bytes):
-00 00 00 00 00 00 00 00 08 01 a9 73 6d 80 ff ff ...........sm...
-c8 61 ee a9 00 20 ff ff 28 1e 55 81 6c 80 ff ff .a... ..(.U.l...
-backtrace:
-[<000000004bcaa122>] kmem_cache_alloc_trace+0x2dc/0x418
-[<0000000069c7dabb>] vgic_add_lpi+0x88/0x418
-[<00000000bfefd5c5>] vgic_its_cmd_handle_mapi+0x4dc/0x588
-[<00000000cf993975>] vgic_its_process_commands.part.5+0x484/0x1198
-[<000000004bd3f8e3>] vgic_its_process_commands+0x50/0x80
-[<00000000b9a65b2b>] vgic_mmio_write_its_cwriter+0xac/0x108
-[<0000000009641ebb>] dispatch_mmio_write+0xd0/0x188
-[<000000008f79d288>] __kvm_io_bus_write+0x134/0x240
-[<00000000882f39ac>] kvm_io_bus_write+0xe0/0x150
-[<0000000078197602>] io_mem_abort+0x484/0x7b8
-[<0000000060954e3c>] kvm_handle_guest_abort+0x4cc/0xa58
-[<00000000e0d0cd65>] handle_exit+0x24c/0x770
-[<00000000b44a7fad>] kvm_arch_vcpu_ioctl_run+0x460/0x1988
-[<0000000025fb897c>] kvm_vcpu_ioctl+0x4f8/0xee0
-[<000000003271e317>] do_vfs_ioctl+0x160/0xcd8
-[<00000000e7f39607>] ksys_ioctl+0x98/0xd8
-
-Fix it by retiring all pending LPIs in the ap_list on the destroy path.
-
-p.s. I can also reproduce it on a normal guest shutdown. It is because
-userspace still send LPIs to vcpu (through KVM_SIGNAL_MSI ioctl) while
-the guest is being shutdown and unable to handle it. A little strange
-though and haven't dig further...
+If we're going to fail out the vgic_add_lpi(), let's make sure the
+allocated vgic_irq memory is also freed. Though it seems that both
+cases are unlikely to fail.
 
 Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
-Link: https://lore.kernel.org/r/20200414030349.625-2-yuzenghui@huawei.com
+Link: https://lore.kernel.org/r/20200414030349.625-3-yuzenghui@huawei.com
 ---
- virt/kvm/arm/vgic/vgic-init.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ virt/kvm/arm/vgic/vgic-its.c | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
 
-diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
-index a963b9d766b73..53ec9b9d9bc43 100644
---- a/virt/kvm/arm/vgic/vgic-init.c
-+++ b/virt/kvm/arm/vgic/vgic-init.c
-@@ -348,6 +348,12 @@ void kvm_vgic_vcpu_destroy(struct kvm_vcpu *vcpu)
- {
- 	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
+diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+index d53d34a33e35d..c012a52b19f57 100644
+--- a/virt/kvm/arm/vgic/vgic-its.c
++++ b/virt/kvm/arm/vgic/vgic-its.c
+@@ -96,14 +96,21 @@ static struct vgic_irq *vgic_add_lpi(struct kvm *kvm, u32 intid,
+ 	 * We "cache" the configuration table entries in our struct vgic_irq's.
+ 	 * However we only have those structs for mapped IRQs, so we read in
+ 	 * the respective config data from memory here upon mapping the LPI.
++	 *
++	 * Should any of these fail, behave as if we couldn't create the LPI
++	 * by dropping the refcount and returning the error.
+ 	 */
+ 	ret = update_lpi_config(kvm, irq, NULL, false);
+-	if (ret)
++	if (ret) {
++		vgic_put_irq(kvm, irq);
+ 		return ERR_PTR(ret);
++	}
  
-+	/*
-+	 * Retire all pending LPIs on this vcpu anyway as we're
-+	 * going to destroy it.
-+	 */
-+	vgic_flush_pending_lpis(vcpu);
-+
- 	INIT_LIST_HEAD(&vgic_cpu->ap_list_head);
+ 	ret = vgic_v3_lpi_sync_pending_status(kvm, irq);
+-	if (ret)
++	if (ret) {
++		vgic_put_irq(kvm, irq);
+ 		return ERR_PTR(ret);
++	}
+ 
+ 	return irq;
  }
- 
 -- 
 2.26.1
 
