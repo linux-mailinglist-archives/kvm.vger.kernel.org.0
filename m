@@ -2,309 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2ECC71B3A9E
-	for <lists+kvm@lfdr.de>; Wed, 22 Apr 2020 10:56:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DF0011B3AA2
+	for <lists+kvm@lfdr.de>; Wed, 22 Apr 2020 10:59:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726399AbgDVI4b (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Apr 2020 04:56:31 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:48577 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1725786AbgDVI4b (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Apr 2020 04:56:31 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1587545788;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=9HgKg6CG3H2vb1nMCNFXUuJLGQOJ24KS/7vP7eM2t8o=;
-        b=cy6xRsDW47+0AMddKCOhJ/m+He+6QWVOYmea3VoG3k9MkTLRqNK/Qe36O4ra/ytJzxjIkI
-        ASSp990qgtZNWIR/b4KP10mLkano5u2zUsmD8xS+DOmN7L2D0gZYrF3bFdXgZEOrpXgLJi
-        aiD2X9W5E8aGqewl0peFDNauiqr3yAA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-287-bVQfQHnPOXSzLpP8Zg6Zdg-1; Wed, 22 Apr 2020 04:56:23 -0400
-X-MC-Unique: bVQfQHnPOXSzLpP8Zg6Zdg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D8206DB64
-        for <kvm@vger.kernel.org>; Wed, 22 Apr 2020 08:56:22 +0000 (UTC)
-Received: from gondolin (ovpn-112-195.ams2.redhat.com [10.36.112.195])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9589B100034E;
-        Wed, 22 Apr 2020 08:56:21 +0000 (UTC)
-Date:   Wed, 22 Apr 2020 10:56:18 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Kashyap Chamarthy <kchamart@redhat.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, dgilbert@redhat.com,
-        vkuznets@redhat.com
-Subject: Re: [PATCH v2] docs/virt/kvm: Document running nested guests
-Message-ID: <20200422105618.22260edb.cohuck@redhat.com>
-In-Reply-To: <20200420111755.2926-1-kchamart@redhat.com>
-References: <20200420111755.2926-1-kchamart@redhat.com>
-Organization: Red Hat GmbH
+        id S1726068AbgDVI7q (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Apr 2020 04:59:46 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:20882 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725934AbgDVI7q (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 22 Apr 2020 04:59:46 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 03M8YVuh092454
+        for <kvm@vger.kernel.org>; Wed, 22 Apr 2020 04:59:45 -0400
+Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 30gmu91q8m-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Wed, 22 Apr 2020 04:59:45 -0400
+Received: from localhost
+        by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <pmorel@linux.ibm.com>;
+        Wed, 22 Apr 2020 09:58:49 +0100
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
+        by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Wed, 22 Apr 2020 09:58:46 +0100
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 03M8xcnQ38207628
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 22 Apr 2020 08:59:38 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 84852A404D;
+        Wed, 22 Apr 2020 08:59:38 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3A64FA405B;
+        Wed, 22 Apr 2020 08:59:38 +0000 (GMT)
+Received: from oc3016276355.ibm.com (unknown [9.145.55.142])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed, 22 Apr 2020 08:59:38 +0000 (GMT)
+Subject: Re: [kvm-unit-tests PATCH v5 02/10] s390x: Use PSW bits definitions
+ in cstart
+To:     David Hildenbrand <david@redhat.com>,
+        Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, thuth@redhat.com, cohuck@redhat.com
+References: <1582200043-21760-1-git-send-email-pmorel@linux.ibm.com>
+ <1582200043-21760-3-git-send-email-pmorel@linux.ibm.com>
+ <aae40a5a-63a6-e802-53bb-9683d03ad57d@linux.ibm.com>
+ <d4e66e9b-ed68-e7ef-4b9d-8af879e44813@redhat.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+Date:   Wed, 22 Apr 2020 10:59:37 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+In-Reply-To: <d4e66e9b-ed68-e7ef-4b9d-8af879e44813@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 20042208-0020-0000-0000-000003CC6973
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20042208-0021-0000-0000-000022256477
+Message-Id: <e1050532-72ee-210c-822a-f1eb91c6d388@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.676
+ definitions=2020-04-22_02:2020-04-21,2020-04-22 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0
+ priorityscore=1501 spamscore=0 lowpriorityscore=0 adultscore=0
+ impostorscore=0 mlxscore=0 malwarescore=0 suspectscore=0 mlxlogscore=999
+ clxscore=1015 phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2004220066
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 20 Apr 2020 13:17:55 +0200
-Kashyap Chamarthy <kchamart@redhat.com> wrote:
 
-> This is a rewrite of this[1] Wiki page with further enhancements.  The
-> doc also includes a section on debugging problems in nested
-> environments.
->=20
-> [1] https://www.linux-kvm.org/page/Nested_Guests
->=20
-> Signed-off-by: Kashyap Chamarthy <kchamart@redhat.com>
-> ---
-> v1 is here: https://marc.info/?l=3Dkvm&m=3D158108941605311&w=3D2
->=20
-> In v2:
->   - Address Cornelia's feedback v1:
->     https://marc.info/?l=3Dkvm&m=3D158109042605606&w=3D2
->   - Address Dave's feedback from v1:
->     https://marc.info/?l=3Dkvm&m=3D158109134905930&w=3D2
-> ---
->  .../virt/kvm/running-nested-guests.rst        | 275 ++++++++++++++++++
->  1 file changed, 275 insertions(+)
->  create mode 100644 Documentation/virt/kvm/running-nested-guests.rst
->=20
-> diff --git a/Documentation/virt/kvm/running-nested-guests.rst b/Documenta=
-tion/virt/kvm/running-nested-guests.rst
-> new file mode 100644
-> index 0000000000000000000000000000000000000000..c6c9ccfa0c00e3cbfd65782ce=
-ae962b7ef52b34b
-> --- /dev/null
-> +++ b/Documentation/virt/kvm/running-nested-guests.rst
-> @@ -0,0 +1,275 @@
-> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D
-> +Running nested guests with KVM
-> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D
-> +
-> +A nested guest is the ability to run a guest inside another guest (it
-> +can be KVM-based or a different hypervisor).  The straightforward
-> +example is a KVM guest that in turn runs on KVM a guest (the rest of
 
-s/on KVM a guest/on a KVM guest/
+On 2020-04-22 09:44, David Hildenbrand wrote:
+> 
+>>> diff --git a/s390x/cstart64.S b/s390x/cstart64.S
+>>> index 45da523..2885a36 100644
+>>> --- a/s390x/cstart64.S
+>>> +++ b/s390x/cstart64.S
+>>> @@ -12,6 +12,7 @@
+>>>    */
+>>>   #include <asm/asm-offsets.h>
+>>>   #include <asm/sigp.h>
+>>> +#include <asm/arch_def.h>
+>>>   
+>>>   .section .init
+>>>   
+>>> @@ -214,19 +215,19 @@ svc_int:
+>>>   
+>>>   	.align	8
+>>>   reset_psw:
+>>> -	.quad	0x0008000180000000
+>>> +	.quad	PSW_EXCEPTION_MASK
+>>
+>> That won't work, this is a short PSW and you're removing the short
+>> indication here. Notice the 0008 at the front.
 
-> +this document is built on this example)::
-> +
-> +              .----------------.  .----------------.
-> +              |                |  |                |
-> +              |      L2        |  |      L2        |
-> +              | (Nested Guest) |  | (Nested Guest) |
-> +              |                |  |                |
-> +              |----------------'--'----------------|
-> +              |                                    |
-> +              |       L1 (Guest Hypervisor)        |
-> +              |          KVM (/dev/kvm)            |
-> +              |                                    |
-> +      .------------------------------------------------------.
-> +      |                 L0 (Host Hypervisor)                 |
-> +      |                    KVM (/dev/kvm)                    |
-> +      |------------------------------------------------------|
-> +      |        Hardware (with virtualization extensions)     |
-> +      '------------------------------------------------------'
-> +
-> +Terminology:
-> +
-> +- L0 =E2=80=93 level-0; the bare metal host, running KVM
-> +
-> +- L1 =E2=80=93 level-1 guest; a VM running on L0; also called the "guest
-> +  hypervisor", as it itself is capable of running KVM.
-> +
-> +- L2 =E2=80=93 level-2 guest; a VM running on L1, this is the "nested gu=
-est"
-> +
-> +.. note:: The above diagram is modelled after x86 architecture; s390x,
+hum... :(
 
-s/x86 architecture/the x86 architecture/
+> 
+> Good catch! Guess it would have bailed out when testing.
+> 
+> 
 
-> +          ppc64 and other architectures are likely to have different
+Yes it does. Sorry.
 
-s/to have/to have a/
 
-> +          design for nesting.
-> +
-> +          For example, s390x has an additional layer, called "LPAR
-> +          hypervisor" (Logical PARtition) on the baremetal, resulting in
-> +          "four levels" in a nested setup =E2=80=94 L0 (bare metal, runn=
-ing the
-> +          LPAR hypervisor), L1 (host hypervisor), L2 (guest hypervisor),
-> +          L3 (nested guest).
-
-What about:
-
-"For example, s390x always has an LPAR (LogicalPARtition) hypervisor
-running on bare metal, adding another layer and resulting in at least
-four levels in a nested setup..."
-
-> +
-> +          This document will stick with the three-level terminology (L0,
-> +          L1, and L2) for all architectures; and will largely focus on
-> +          x86.
-> +
-> +
-
-(...)
-
-> +Enabling "nested" (s390x)
-> +-------------------------
-> +
-> +1. On the host hypervisor (L0), enable the ``nested`` parameter on
-> +   s390x::
-> +
-> +    $ rmmod kvm
-> +    $ modprobe kvm nested=3D1
-> +
-> +.. note:: On s390x, the kernel parameter ``hpage`` parameter is mutually
-
-Drop one of the "parameter"?
-
-> +          exclusive with the ``nested`` paramter; i.e. to have
-> +          ``nested`` enabled you _must_ disable the ``hpage`` parameter.
-
-"i.e., in order to be able to enable ``nested``, the ``hpage``
-parameter _must_ be disabled."
-
-?
-
-> +
-> +2. The guest hypervisor (L1) must be allowed to have ``sie`` CPU
-
-"must be provided with" ?
-
-> +   feature =E2=80=94 with QEMU, this is possible by using "host passthro=
-ugh"
-
-s/this is possible by/this can be done by e.g./ ?
-
-> +   (via the command-line ``-cpu host``).
-> +
-> +3. Now the KVM module can be enabled in the L1 (guest hypervisor)::
-
-s/enabled/loaded/
-
-> +
-> +    $ modprobe kvm
-> +
-> +
-> +Live migration with nested KVM
-> +------------------------------
-> +
-> +The below live migration scenarios should work as of Linux kernel 5.3
-> +and QEMU 4.2.0.  In all the below cases, L1 exposes ``/dev/kvm`` in
-> +it, i.e. the L2 guest is a "KVM-accelerated guest", not a "plain
-> +emulated guest" (as done by QEMU's TCG).
-
-The 5.3/4.2 versions likely apply to x86? Should work for s390x as well
-as of these version, but should have worked earlier already :)
-
-> +
-> +- Migrating a nested guest (L2) to another L1 guest on the *same* bare
-> +  metal host.
-> +
-> +- Migrating a nested guest (L2) to another L1 guest on a *different*
-> +  bare metal host.
-> +
-> +- Migrating an L1 guest, with an *offline* nested guest in it, to
-> +  another bare metal host.
-> +
-> +- Migrating an L1 guest, with a  *live* nested guest in it, to another
-> +  bare metal host.
-> +
-> +Limitations on Linux kernel versions older than 5.3
-> +---------------------------------------------------
-> +
-> +On x86 systems-only (as this does *not* apply for s390x):
-
-Add a "x86" marker? Or better yet, group all the x86 stuff in an x86
-section?
-
-> +
-> +On Linux kernel versions older than 5.3, once an L1 guest has started an
-> +L2 guest, the L1 guest would no longer capable of being migrated, saved,
-> +or loaded (refer to QEMU documentation on "save"/"load") until the L2
-> +guest shuts down.
-> +
-> +Attempting to migrate or save-and-load an L1 guest while an L2 guest is
-> +running will result in undefined behavior.  You might see a ``kernel
-> +BUG!`` entry in ``dmesg``, a kernel 'oops', or an outright kernel panic.
-> +Such a migrated or loaded L1 guest can no longer be considered stable or
-> +secure, and must be restarted.
-> +
-> +Migrating an L1 guest merely configured to support nesting, while not
-> +actually running L2 guests, is expected to function normally.
-> +Live-migrating an L2 guest from one L1 guest to another is also expected
-> +to succeed.
-> +
-> +Reporting bugs from "nested" setups
-> +-----------------------------------
-> +
-> +(This is written with x86 terminology in mind, but similar should apply
-> +for other architectures.)
-
-Better to reorder it a bit (see below).
-
-> +
-> +Debugging "nested" problems can involve sifting through log files across
-> +L0, L1 and L2; this can result in tedious back-n-forth between the bug
-> +reporter and the bug fixer.
-> +
-> +- Mention that you are in a "nested" setup.  If you are running any kind
-> +  of "nesting" at all, say so.  Unfortunately, this needs to be called
-> +  out because when reporting bugs, people tend to forget to even
-> +  *mention* that they're using nested virtualization.
-> +
-> +- Ensure you are actually running KVM on KVM.  Sometimes people do not
-> +  have KVM enabled for their guest hypervisor (L1), which results in
-> +  them running with pure emulation or what QEMU calls it as "TCG", but
-> +  they think they're running nested KVM.  Thus confusing "nested Virt"
-> +  (which could also mean, QEMU on KVM) with "nested KVM" (KVM on KVM).
-> +
-> +- What information to collect?  The following; it's not an exhaustive
-> +  list, but a very good starting point:
-> +
-> +  - Kernel, libvirt, and QEMU version from L0
-> +
-> +  - Kernel, libvirt and QEMU version from L1
-> +
-> +  - QEMU command-line of L1 -- preferably full log from
-> +    ``/var/log/libvirt/qemu/instance.log``
-
-(if you are running libvirt)
-
-> +
-> +  - QEMU command-line of L2 -- preferably full log from
-> +    ``/var/log/libvirt/qemu/instance.log``
-
-(if you are running libvirt)
-
-> +
-> +  - Full ``dmesg`` output from L0
-> +
-> +  - Full ``dmesg`` output from L1
-> +
-> +  - Output of: ``x86info -a`` (& ``lscpu``) from L0
-> +
-> +  - Output of: ``x86info -a`` (& ``lscpu``) from L1
-
-lscpu makes sense for other architectures as well.
-
-> +
-> +  - Output of: ``dmidecode`` from L0
-> +
-> +  - Output of: ``dmidecode`` from L1
-
-This looks x86 specific? Maybe have a list of things that make sense
-everywhere, and list architecture-specific stuff in specific
-subsections?
+-- 
+Pierre Morel
+IBM Lab Boeblingen
 
