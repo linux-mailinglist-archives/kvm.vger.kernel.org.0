@@ -2,131 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F04571B4B62
-	for <lists+kvm@lfdr.de>; Wed, 22 Apr 2020 19:12:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 678511B4CE6
+	for <lists+kvm@lfdr.de>; Wed, 22 Apr 2020 20:52:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726859AbgDVRM5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Apr 2020 13:12:57 -0400
-Received: from sonic313-15.consmr.mail.ne1.yahoo.com ([66.163.185.38]:33174
-        "EHLO sonic313-15.consmr.mail.ne1.yahoo.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726437AbgDVRMz (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 22 Apr 2020 13:12:55 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1587575574; bh=+KYwgqq/AmEfR52qW4/rvXPouS6eAxPS2KKqaT54mFU=; h=Subject:To:Cc:References:From:Date:In-Reply-To:From:Subject; b=RaJerD9V+3WaVEj5DW6is3CQxL3t5vLiaY1PokUhh6ntWe9FHyeog82h5VgGn+Lu/QeCc9yoSPEPZkMNSIO3Xh397GJeU3MFO8Cjs4YtrzF49bk70sYXhLH5v3lxk6fKKJKWxqGyvmOfSCQR1bd4JSJZMGisfImjpRhuh87eWsRKfucji5L8g4stG656VG5ByZFma/h8xrtlw3x8ncWGzOLYiZ01vXKkMxtGXGvB+yhAKDfSI7vv6420PEKmTchcyDfV0i9JLPFMQ7IqWAuQql5FALsd/daddsI9zKpkMD9DI/4JwLZhnE/5OCCkmTDx1lsY7CyIVS4wQ6Eo+wUoIQ==
-X-YMail-OSG: tEYDWw8VM1me8UGcuDB0ueuFndIiHF0J5tbhT7fzdEQKs758k7rfONd6qzR8vbA
- .0z_79vcLhPGw9W5VV5ab9l1kaBUqf4mmkrdT3DgBPbbOvVEbvS838Gd_b_fMmsqge6IFCT_vgaP
- 4nzHWzNhSlI5lP5Kg8foDqCSTBLakHSatTTXGv2sKh1SpxHuf5A7YHcxFW0J2fJcVF8plLmjvFL3
- Q2gWeGYYAdizQK_Ii2ucqa3bKIXOm4qqSeATOvo6tCp7Oj0tYbAscsm9JfmNeF3_J6vujd2MV9C.
- 3lLY0P6VPCfvxpp8viwyP4cU_g..ZyVXHhcKMP7MXSJO8hl6w9hcF2.CHMOWBXMIZklccAj1s5fE
- J.ALFGyVF43Frfp8_6WE1SossBoWDPHdNlZiNfr8XmfJCgs3_MtjyeArkhZ6lmR9ttCz4vI9Fqbu
- LVRAoPSFG48PMjjjoo_CvJ53iHEVhzpd9f9AkB.M.PsjBoUEvUoOYvwwxBnAj76lvcXlNr2nv_Ow
- FagbAC1g7wOpu8tDR_NKgw6J45TTcW49iSJQYvfYIJun68BlLT7C.BqmmDppXjBp4R4RinVxie9n
- B6anJkyoV_WkYMp_ywKV8teXQ0gWihkr6j8sG0OfUnC_.JR_bln2mdPGxi93kvudQuCbbyWWtk5h
- 1Chs7zMS.62JYkmAkq_6vTM7hilZtMbtg1w6rVJlhnLx.FB1hlWmNrLZFKiXfO8i6s4u5AXhDp35
- duYsjUK6EzQ8jE9.ilbfWfF1lLtmZUgSEK5EfQ78XBcipsho0Lj1nAAFGN9GTmZPFeC7m7EG4dLQ
- Xd1ZH_PWTAuu6DnpnzWeQJatd2RRzC0eIu7bR6bsFYeJcGqbSYrnlcu8CONnDOlETygor3ivdqzq
- .OzU7uLIvDWN9zrXm1lULqX1eAlx.hqhB6ek1a.JeKGHX1JZkgNxflM8mr6ejF3dlyYquPXcKIXZ
- tJLscNa0S1jsP_7zMFF7zstoODV0.sGh.OFq0sqbkrQS6miJgl2DZqT5AzgiZnAvQpOTjc7YsJFx
- wYdB.TmQ160L9BBTPFnIrppB.JvMWLn_DrG_1AKoG.aDaN8OteaW9FNHKeKE7BvxnTEzvrdPGxEk
- 47_shXz1FXyNhtNIUbK4Hr_PtWdlA7xkDBsWU7LVRFpbgIs.RzbPFv8ft63BY7bqUTmHajtZ8wZ9
- 07UQC_eq_tvyE7xqvukIqCQU3fUD50KxuAOf.IBQlKd0ulRyRp63Gi0MOuuoAFt7ZP9CV3jYAiqO
- gOvLfEaJPsAFrMRe2b_i.JG9T4JYvHuNa6YZZZ7U.l1nnq1S9ifVKDoi6GOref8gjn_Pml4OVMZC
- JAl8zsc46TPKxg1GybYWCBMIqImmVEbuKc67vxpYJf_JYUfaAx43pKvOVkNRdI4jC9ccRV6mzyfE
- L5ktjp4l9UtrNqcP9cNkdEscptOA9E.7oa_pC3BYQjPU-
-Received: from sonic.gate.mail.ne1.yahoo.com by sonic313.consmr.mail.ne1.yahoo.com with HTTP; Wed, 22 Apr 2020 17:12:54 +0000
-Received: by smtp419.mail.gq1.yahoo.com (VZM Hermes SMTP Server) with ESMTPA ID 7e7f1419592d6ebe33c3473a62489b2a;
-          Wed, 22 Apr 2020 17:12:48 +0000 (UTC)
-Subject: Re: [PATCH v5 0/3] SELinux support for anonymous inodes and UFFD
-To:     James Morris <jmorris@namei.org>,
-        Daniel Colascione <dancol@google.com>
-Cc:     Tim Murray <timmurray@google.com>,
-        SElinux list <selinux@vger.kernel.org>,
-        LSM List <linux-security-module@vger.kernel.org>,
-        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Paul Moore <paul@paul-moore.com>,
-        Nick Kralevich <nnk@google.com>,
-        Stephen Smalley <sds@tycho.nsa.gov>,
-        Lokesh Gidra <lokeshgidra@google.com>,
-        John Johansen <john.johansen@canonical.com>,
-        Casey Schaufler <casey@schaufler-ca.com>
-References: <20200326200634.222009-1-dancol@google.com>
- <20200401213903.182112-1-dancol@google.com>
- <CAKOZueuu=bGt4O0xjiV=9_PC_8Ey8pa3NjtJ7+O-nHCcYbLnEg@mail.gmail.com>
- <alpine.LRH.2.21.2004230253530.12318@namei.org>
-From:   Casey Schaufler <casey@schaufler-ca.com>
-Autocrypt: addr=casey@schaufler-ca.com; keydata=
- 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
- abzjfg==
-Message-ID: <6fcc0093-f154-493e-dc11-359b44ed57ce@schaufler-ca.com>
-Date:   Wed, 22 Apr 2020 10:12:47 -0700
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+        id S1726822AbgDVSwG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Apr 2020 14:52:06 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:23999 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726721AbgDVSwF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Apr 2020 14:52:05 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1587581523;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=trPq/Y5FosLGaXOvjfTLOLDEExV7IW7COeIEuuhVB14=;
+        b=XkMce8TUoquSKvS4DOBlcf66Kw81AexoNioLCT6+1dWb2X0WGy8f8ljUIKwxcwojLCnMAw
+        M+eXSYqU38lNcEYG9+hUQXRiLRxLDq6MPOp3NKvKs9q+BkXk2HvsInNwAWkSx0lmVDmmwd
+        ZheWa3yJqY7DnuhY9Rg4BOBPpKt0vag=
+Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
+ [209.85.219.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-74-CoEbegW3PI-9MvfbkA0Rqw-1; Wed, 22 Apr 2020 14:51:59 -0400
+X-MC-Unique: CoEbegW3PI-9MvfbkA0Rqw-1
+Received: by mail-qv1-f71.google.com with SMTP id u5so3382050qvt.12
+        for <kvm@vger.kernel.org>; Wed, 22 Apr 2020 11:51:59 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=trPq/Y5FosLGaXOvjfTLOLDEExV7IW7COeIEuuhVB14=;
+        b=mBjajRkeK7+RflYoEI4PY8bOAIv8s/5v+BZ2W0JS81fm4eVB11+068zKrsaWC9fFK9
+         XwAA6JidsqV1D19M6bh+GVH2KO1W07RWNmmrRZDFzqbH3iaNUW2u7Ins13HiHemg9G3m
+         z7CxG53QI2AeZ6kHtUxmqptzKH0FWajoUyUAOBFnuEJvvG8hZWsrwXx9I2/h7qmjh9da
+         8yjoq1by2nM55JvyRzyWUiIXlxuw/rW37UuSqUXhhkuMua4nj0E6q9U1nQY4/nAdpO2x
+         ThTbVh4P5TTvbX1ekG9OIclHL178fiUpwA2Jhu8CLrx7cv8ShHLHzo1dsHy6bXKoQp4+
+         s9gw==
+X-Gm-Message-State: AGi0Pua0rrCo3AYp6l8pMx+B/tuQxp2wC7EXa1lNmQZ4X6Rk6XwsXEn/
+        lsVhEXQk2wouE/WxxFFpi8aOa021cLF2Q7779Q42EU9hs4CFAJ/lmmQxbZEm1otB7KO5TIhs7Eu
+        PQVto6v361aDZ
+X-Received: by 2002:a37:b15:: with SMTP id 21mr28563999qkl.104.1587581518878;
+        Wed, 22 Apr 2020 11:51:58 -0700 (PDT)
+X-Google-Smtp-Source: APiQypLLzkmnDYGbbOkIaC8yISYdS2vxaekStNwPP8eyf0MeRUT+hbOr8YWc7KYSWKcge0VUFezzCA==
+X-Received: by 2002:a37:b15:: with SMTP id 21mr28563901qkl.104.1587581517797;
+        Wed, 22 Apr 2020 11:51:57 -0700 (PDT)
+Received: from xz-x1 ([2607:9880:19c0:32::2])
+        by smtp.gmail.com with ESMTPSA id w10sm14397qka.19.2020.04.22.11.51.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 22 Apr 2020 11:51:56 -0700 (PDT)
+Date:   Wed, 22 Apr 2020 14:51:55 -0400
+From:   Peter Xu <peterx@redhat.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     Kevin Tian <kevin.tian@intel.com>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Christophe de Dinechin <dinechin@redhat.com>,
+        Yan Zhao <yan.y.zhao@intel.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+Subject: Re: [PATCH v8 00/14] KVM: Dirty ring interface
+Message-ID: <20200422185155.GA3596@xz-x1>
+References: <20200331190000.659614-1-peterx@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <alpine.LRH.2.21.2004230253530.12318@namei.org>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Mailer: WebService/1.1.15739 hermes Apache-HttpAsyncClient/4.1.4 (Java/11.0.6)
+Content-Disposition: inline
+In-Reply-To: <20200331190000.659614-1-peterx@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 4/22/2020 9:55 AM, James Morris wrote:
-> On Mon, 13 Apr 2020, Daniel Colascione wrote:
->
->> On Wed, Apr 1, 2020 at 2:39 PM Daniel Colascione <dancol@google.com> wrote:
->>> Changes from the fourth version of the patch:
->>
->> Is there anything else that needs to be done before merging this patch series?
-> The vfs changes need review and signoff from the vfs folk, the SELinux 
-> changes by either Paul or Stephen, and we also need signoff on the LSM 
-> hooks from other major LSM authors (Casey and John, at a minimum).
+Hi,
 
-I haven't had the opportunity to test this relative to Smack.
-It's unclear whether the change would impact security modules that
-don't provide hooks for it. I will bump my priority on this, but it's
-still going to be a bit before I can get to it.
+TL;DR: I'm thinking whether we should record pure GPA/GFN instead of (slot_id,
+slot_offset) tuple for dirty pages in kvm dirty ring to unbind kvm_dirty_gfn
+with memslots.
+
+(A slightly longer version starts...)
+
+The problem is that binding dirty tracking operations to KVM memslots is a
+restriction that needs synchronization to memslot changes, which further needs
+synchronization across all the vcpus because they're the consumers of memslots.
+E.g., when we remove a memory slot, we need to flush all the dirty bits
+correctly before we do the removal of the memslot.  That's actually an known
+defect for QEMU/KVM [1] (I bet it could be a defect for many other
+hypervisors...) right now with current dirty logging.  Meanwhile, even if we
+fix it, that procedure is not scale at all, and error prone to dead locks.
+
+Here memory removal is really an (still corner-cased but relatively) important
+scenario to think about for dirty logging comparing to memory additions &
+movings.  Because memory addition will always have no initial dirty page, and
+we don't really move RAM a lot (or do we ever?!) for a general VM use case.
+
+Then I went a step back to think about why we need these dirty bit information
+after all if the memslot is going to be removed?
+
+There're two cases:
+
+  - When the memslot is going to be removed forever, then the dirty information
+    is indeed meaningless and can be dropped, and,
+
+  - When the memslot is going to be removed but quickly added back with changed
+    size, then we need to keep those dirty bits because it's just a commmon way
+    to e.g. punch an MMIO hole in an existing RAM region (here I'd confess I
+    feel like using "slot_id" to identify memslot is really unfriendly syscall
+    design for things like "hole punchings" in the RAM address space...
+    However such "punch hold" operation is really needed even for a common
+    guest for either system reboots or device hotplugs, etc.).
+
+The real scenario we want to cover for dirty tracking is the 2nd one.
+
+If we can track dirty using raw GPA, the 2nd scenario is solved itself.
+Because we know we'll add those memslots back (though it might be with a
+different slot ID), then the GPA value will still make sense, which means we
+should be able to avoid any kind of synchronization for things like memory
+removals, as long as the userspace is aware of that.
+
+With that, when we fetch the dirty bits, we lookup the memslot dynamically,
+drop bits if the memslot does not exist on that address (e.g., permanent
+removals), and use whatever memslot is there for that guest physical address.
+Though we for sure still need to handle memory move, that the userspace needs
+to still take care of dirty bit flushing and sync for a memory move, however
+that's merely not happening so nothing to take care about either.
+
+Does this makes sense?  Comments greatly welcomed..
+
+Thanks,
+
+[1] https://lists.gnu.org/archive/html/qemu-devel/2020-03/msg08361.html
+
+-- 
+Peter Xu
 
