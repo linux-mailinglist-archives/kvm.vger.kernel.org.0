@@ -2,121 +2,218 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 74BFB1B4F63
-	for <lists+kvm@lfdr.de>; Wed, 22 Apr 2020 23:27:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1737C1B4F6E
+	for <lists+kvm@lfdr.de>; Wed, 22 Apr 2020 23:36:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726508AbgDVV1q (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Apr 2020 17:27:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54278 "EHLO
+        id S1726154AbgDVVgr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Apr 2020 17:36:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55662 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726066AbgDVV1p (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Apr 2020 17:27:45 -0400
-Received: from mail-il1-x141.google.com (mail-il1-x141.google.com [IPv6:2607:f8b0:4864:20::141])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D948C03C1A9
-        for <kvm@vger.kernel.org>; Wed, 22 Apr 2020 14:27:45 -0700 (PDT)
-Received: by mail-il1-x141.google.com with SMTP id r2so3505300ilo.6
-        for <kvm@vger.kernel.org>; Wed, 22 Apr 2020 14:27:45 -0700 (PDT)
+        with ESMTP id S1726060AbgDVVgr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Apr 2020 17:36:47 -0400
+Received: from mail-io1-xd41.google.com (mail-io1-xd41.google.com [IPv6:2607:f8b0:4864:20::d41])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E3B43C03C1A9
+        for <kvm@vger.kernel.org>; Wed, 22 Apr 2020 14:36:46 -0700 (PDT)
+Received: by mail-io1-xd41.google.com with SMTP id o127so4179768iof.0
+        for <kvm@vger.kernel.org>; Wed, 22 Apr 2020 14:36:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=xcWDakBTb4wWp+y8qqY98n+VmK8hXyzSR0t8WU80d7U=;
-        b=BJ4khznGG1SZIenbv+R6HnaxLxXk1GfF9O/b2+ByBIdrmz1cI+hy0vI2eNnjSMUVhh
-         UP0Xd+0e8JxdTZBRDU0FEo+v0B+0ioZRViCxCVctYgv1aHYTPoFrOHKymtsTbpmfTEFn
-         tfa1a/wxKpXMRjUvPJtwgmRQv17m063cqNiJOhHgRTT8NT/KUTN5UEgOKXZZ+OCQHtq3
-         qfS/sPWIITvoQK8exO7+pZVBXQyO34ufoh/KBtRpDb5bcCCI+SAQ8FWQhKhaYMVeJ833
-         dKIHpxGZuCiz1Pa0yLUMeioBBVHvyxEgl9lmKCyzQb/G9a9uL+rq989UUnQKJZVQwE5R
-         FFgA==
+        bh=D1Uf2oovzVOLF+H0FK/R7k1uZv64JouEaR0IvZuYAO0=;
+        b=AWNK0e4f4ZtajDEbk2/zgMrdrjvYWreWbrmP+jYQoma+bpFMddRrYwLb1lVgenXMSN
+         4Sg7vvm3HXmFG8vHJQvySKT+OxKKJNrsYx0LYzKhtW4UmKzNudfvBoYdW3pJRKFcLZBJ
+         Oizuhv/uo5pdxctcnFPhmGVKBcMVBD+BryCGXprm2AQV8irqoaq5eyidRv90zd7bPwhS
+         csCupTj9f2Z4PbtONJzny0DsRlds67mFNFa49bPLzVl4K5g4bXL4ZnoSl9dtZzg5rzGt
+         A6OJbofuIsYGb8EBUZqhtGJlo7T9EUBb+15VDoJO/qBHBgWpijoSzAo0mK2OCqyDHL1q
+         /+DQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=xcWDakBTb4wWp+y8qqY98n+VmK8hXyzSR0t8WU80d7U=;
-        b=CVDecZNDkZGtNmYyc9aJp2LJFUUaQbx3Lwmr4o7GhB0jc9130oEquR2+XVe3/Pzo77
-         qQ28EdLiru4qldOI2tdE6YR1hyHACnrugZk4ubyabc0ofIU6ijeq5njYD8QNjJsg+FJ9
-         5EyyGtnpPgG6BeaZ8anIorUKahqYUiRV8p+k6JJyQRzuh2iQTV5MWtiOxJum/GdPXLEN
-         sOV3W4dSKsEnstwXns4ODA2I84VIOTUOkyNCmQioEKGYrOHYLkWzc7/8gjguJN8NFR8b
-         PQyCpAM6sp7Bd2VOT11Jg0x7dmgsVdm7G2WL07ItNKJH/VdpqOC6iE+ZQdHFXty63Uci
-         xKNA==
-X-Gm-Message-State: AGi0PuYsxuZMLIpTHjbQ2WyZlP3hCycoXQiIumJ+WoCMzge2w088TWRT
-        /jEgyU7bvQJLMVLwahUyBGPnVpO/mG4qGRz19V9hEw==
-X-Google-Smtp-Source: APiQypIRIvKqd7J8rzmX3Gsct+9GW4a+VFZkk2bru2zaIPAQ/1txgzzwSLGUJSTSeKX3QFoO9VyvU7cBJ5H/aRMAVO8=
-X-Received: by 2002:a92:d8ca:: with SMTP id l10mr466482ilo.118.1587590864660;
- Wed, 22 Apr 2020 14:27:44 -0700 (PDT)
+        bh=D1Uf2oovzVOLF+H0FK/R7k1uZv64JouEaR0IvZuYAO0=;
+        b=JaDr+jpBHWTtgRHKsKbHVpjrUGsGXAHkslDlKuowRdJBR8vffXLI++x+QwYGDAezb/
+         6oNG88F1khsiI+2Kj96uPjk5NHgCw3yFJPXcdW1AC88yVBrZ5zOZU9bHhut0IKp3kdlf
+         xzKuyJB3zZNyZ4X23B6OgLug9UOtuhkYAqnn6gM8i3vd2enCrRJERH4okIZiDgu/z6/L
+         AYd5lGQqVUZJr8FW/QZrnxF6CYDBT1qpSr4ALkE38hFnjF5f0xlMgsPh998EE6zW0JC4
+         eYC7cfXOvZjybGZ9BRW9kWoax1kThIUGHlvyW8VYNbvg2q/JKRJmCMGVSZremoamBRlJ
+         lBIg==
+X-Gm-Message-State: AGi0Pua9SWWccz9o/Tou5p4ZvOK9NC/u2hiNNMk4UgTIHvUChOqZ98jf
+        na5I271nPHaEtqH9+UCEMimbzsQojxHu3A00PSNOoA==
+X-Google-Smtp-Source: APiQypJEe8pwxASOXnaq0f6ETsUIkVm4W9ywGv6vpECQoSEbZM2EQv87mkdBioXyZc1+2xxm2ivj7QJwlssdDDFXaBE=
+X-Received: by 2002:a6b:91d4:: with SMTP id t203mr845837iod.70.1587591405906;
+ Wed, 22 Apr 2020 14:36:45 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200414000946.47396-1-jmattson@google.com> <20200422210649.GA5823@linux.intel.com>
-In-Reply-To: <20200422210649.GA5823@linux.intel.com>
+References: <20200417221446.108733-1-jcargill@google.com> <87d083td9f.fsf@vitty.brq.redhat.com>
+In-Reply-To: <87d083td9f.fsf@vitty.brq.redhat.com>
 From:   Jim Mattson <jmattson@google.com>
-Date:   Wed, 22 Apr 2020 14:27:33 -0700
-Message-ID: <CALMp9eSHyYvRfNe+X+Hd4i2c2phssakxr_5zV9tMQjtk1Usm9A@mail.gmail.com>
-Subject: Re: [PATCH 1/2] kvm: nVMX: Pending debug exceptions trump expired
- VMX-preemption timer
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     kvm list <kvm@vger.kernel.org>, Oliver Upton <oupton@google.com>,
-        Peter Shier <pshier@google.com>
+Date:   Wed, 22 Apr 2020 14:36:34 -0700
+Message-ID: <CALMp9eREdS=nfdtvfNhW87G20Tfdwy69Phdbdmo=NzAw_tavzw@mail.gmail.com>
+Subject: Re: [PATCH] kvm: add capability for halt polling
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     Jon Cargille <jcargill@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        "the arch/x86 maintainers" <x86@kernel.org>,
+        kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Apr 22, 2020 at 2:06 PM Sean Christopherson
-<sean.j.christopherson@intel.com> wrote:
+On Sun, Apr 19, 2020 at 1:46 PM Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
 >
-> On Mon, Apr 13, 2020 at 05:09:45PM -0700, Jim Mattson wrote:
-> > Fixes: f4124500c2c13 ("KVM: nVMX: Fully emulate preemption timer")
-> > Signed-off-by: Jim Mattson <jmattson@google.com>
-> > Reviewed-by: Oliver Upton <oupton@google.com>
-> > Reviewed-by: Peter Shier <pshier@google.com>
+> Jon Cargille <jcargill@google.com> writes:
 >
-> ...
->
-> > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> > index 83050977490c..aae01253bfba 100644
-> > --- a/arch/x86/kvm/vmx/vmx.c
-> > +++ b/arch/x86/kvm/vmx/vmx.c
-> > @@ -4682,7 +4682,7 @@ static int handle_exception_nmi(struct kvm_vcpu *vcpu)
-> >                       if (is_icebp(intr_info))
-> >                               WARN_ON(!skip_emulated_instruction(vcpu));
+> > From: David Matlack <dmatlack@google.com>
 > >
-> > -                     kvm_queue_exception(vcpu, DB_VECTOR);
-> > +                     kvm_requeue_exception(vcpu, DB_VECTOR);
+> > KVM_CAP_HALT_POLL is a per-VM capability that lets userspace
+> > control the halt-polling time, allowing halt-polling to be tuned or
+> > disabled on particular VMs.
+> >
+> > With dynamic halt-polling, a VM's VCPUs can poll from anywhere from
+> > [0, halt_poll_ns] on each halt. KVM_CAP_HALT_POLL sets the
+> > upper limit on the poll time.
 >
-> This isn't wrong per se, but it's effectively papering over an underlying
-> bug, e.g. the same missed preemption timer bug can manifest if the timer
-> expires while in KVM context (because the hr timer is left running) and KVM
-> queues an exception for _any_ reason.  Most of the scenarios where L0 will
-> queue an exception for L2 are fairly contrived, but they are possible.
+> Out of pure curiosity, why is this a per-VM and not a per-VCPU property?
 
-I'm now thinking that this is actually wrong, since requeued
-exceptions may make their way into the vmcs12 IDT-vectoring info, and
-I believe that ultimately the vmcs12 IDT-vectoring info should be
-populated only from the vmcs02 IDT-vectoring info (by whatever
-circuitous route KVM likes).
+It didn't seem to be worth doing the plumbing for an
+architecture-agnostic per-vCPU property (which doesn't exist today).
 
-> I believe the correct fix is to open a "preemption timer window" like we do
-> for pending SMI, NMI and IRQ.  It's effectively the same handling a pending
-> SMI on VMX, set req_immediate_exit in the !inject_pending_event() path.
+> >
+> > Signed-off-by: David Matlack <dmatlack@google.com>
+> > Signed-off-by: Jon Cargille <jcargill@google.com>
+> > Reviewed-by: Jim Mattson <jmattson@google.com>
+> > ---
+> >  Documentation/virt/kvm/api.rst | 17 +++++++++++++++++
+> >  include/linux/kvm_host.h       |  1 +
+> >  include/uapi/linux/kvm.h       |  1 +
+> >  virt/kvm/kvm_main.c            | 19 +++++++++++++++----
+> >  4 files changed, 34 insertions(+), 4 deletions(-)
+> >
+> > diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> > index efbbe570aa9b7b..d871dacb984e98 100644
+> > --- a/Documentation/virt/kvm/api.rst
+> > +++ b/Documentation/virt/kvm/api.rst
+> > @@ -5802,6 +5802,23 @@ If present, this capability can be enabled for a VM, meaning that KVM
+> >  will allow the transition to secure guest mode.  Otherwise KVM will
+> >  veto the transition.
+> >
+> > +7.20 KVM_CAP_HALT_POLL
+> > +----------------------
+> > +
+> > +:Architectures: all
+> > +:Target: VM
+> > +:Parameters: args[0] is the maximum poll time in nanoseconds
+> > +:Returns: 0 on success; -1 on error
+> > +
+> > +This capability overrides the kvm module parameter halt_poll_ns for the
+> > +target VM.
+> > +
+> > +VCPU polling allows a VCPU to poll for wakeup events instead of immediately
+> > +scheduling during guest halts. The maximum time a VCPU can spend polling is
+> > +controlled by the kvm module parameter halt_poll_ns. This capability allows
+> > +the maximum halt time to specified on a per-VM basis, effectively overriding
+> > +the module parameter for the target VM.
+> > +
+> >  8. Other capabilities.
+> >  ======================
+> >
+> > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> > index 6d58beb65454f7..922b24ce5e7297 100644
+> > --- a/include/linux/kvm_host.h
+> > +++ b/include/linux/kvm_host.h
+> > @@ -503,6 +503,7 @@ struct kvm {
+> >       struct srcu_struct srcu;
+> >       struct srcu_struct irq_srcu;
+> >       pid_t userspace_pid;
+> > +     unsigned int max_halt_poll_ns;
+> >  };
+> >
+> >  #define kvm_err(fmt, ...) \
+> > diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> > index 428c7dde6b4b37..ac9eba0289d1b6 100644
+> > --- a/include/uapi/linux/kvm.h
+> > +++ b/include/uapi/linux/kvm.h
+> > @@ -1017,6 +1017,7 @@ struct kvm_ppc_resize_hpt {
+> >  #define KVM_CAP_S390_VCPU_RESETS 179
+> >  #define KVM_CAP_S390_PROTECTED 180
+> >  #define KVM_CAP_PPC_SECURE_GUEST 181
+> > +#define KVM_CAP_HALT_POLL 182
+> >
+> >  #ifdef KVM_CAP_IRQ_ROUTING
+> >
+> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> > index 74bdb7bf32952e..ec038a9e60a275 100644
+> > --- a/virt/kvm/kvm_main.c
+> > +++ b/virt/kvm/kvm_main.c
+> > @@ -710,6 +710,8 @@ static struct kvm *kvm_create_vm(unsigned long type)
+> >                       goto out_err_no_arch_destroy_vm;
+> >       }
+> >
+> > +     kvm->max_halt_poll_ns = halt_poll_ns;
+> > +
+> >       r = kvm_arch_init_vm(kvm, type);
+> >       if (r)
+> >               goto out_err_no_arch_destroy_vm;
+> > @@ -2716,15 +2718,16 @@ void kvm_vcpu_block(struct kvm_vcpu *vcpu)
+> >       if (!kvm_arch_no_poll(vcpu)) {
+> >               if (!vcpu_valid_wakeup(vcpu)) {
+> >                       shrink_halt_poll_ns(vcpu);
+> > -             } else if (halt_poll_ns) {
+> > +             } else if (vcpu->kvm->max_halt_poll_ns) {
+> >                       if (block_ns <= vcpu->halt_poll_ns)
+> >                               ;
+> >                       /* we had a long block, shrink polling */
+> > -                     else if (vcpu->halt_poll_ns && block_ns > halt_poll_ns)
+> > +                     else if (vcpu->halt_poll_ns &&
+> > +                                     block_ns > vcpu->kvm->max_halt_poll_ns)
+> >                               shrink_halt_poll_ns(vcpu);
+> >                       /* we had a short halt and our poll time is too small */
+> > -                     else if (vcpu->halt_poll_ns < halt_poll_ns &&
+> > -                             block_ns < halt_poll_ns)
+> > +                     else if (vcpu->halt_poll_ns < vcpu->kvm->max_halt_poll_ns &&
+> > +                                     block_ns < vcpu->kvm->max_halt_poll_ns)
+> >                               grow_halt_poll_ns(vcpu);
+> >               } else {
+> >                       vcpu->halt_poll_ns = 0;
+> > @@ -3516,6 +3519,7 @@ static long kvm_vm_ioctl_check_extension_generic(struct kvm *kvm, long arg)
+> >       case KVM_CAP_IOEVENTFD_ANY_LENGTH:
+> >       case KVM_CAP_CHECK_EXTENSION_VM:
+> >       case KVM_CAP_ENABLE_CAP_VM:
+> > +     case KVM_CAP_HALT_POLL:
+> >               return 1;
+> >  #ifdef CONFIG_KVM_MMIO
+> >       case KVM_CAP_COALESCED_MMIO:
+> > @@ -3566,6 +3570,13 @@ static int kvm_vm_ioctl_enable_cap_generic(struct kvm *kvm,
+> >               return 0;
+> >       }
+> >  #endif
+> > +     case KVM_CAP_HALT_POLL: {
+> > +             if (cap->flags || cap->args[0] != (unsigned int)cap->args[0])
+> > +                     return -EINVAL;
+> > +
+> > +             kvm->max_halt_poll_ns = cap->args[0];
+>
+> Is it safe to allow any value from userspace here or would it maybe make
+> sense to only allow [0, global halt_poll_ns]?
 
-The KVM code that deals with all of these events is really hard to
-follow. I wish we could take a step back and just implement Table 6-2
-from the SDM volume 3 (augmented with the scattered information about
-VMX events and their priorities relative to their nearest neighbors.
-Lumping priorities 7 - 10 together (faults that we either intercepted
-or synthesized in emulation), I think these are the various things we
-need to check, in this order...
+Would that restriction help to get this change accepted?
 
-0. Is there a fault to be delivered? (In L2, is it intercepted by L1?)
-1. Is there a RESET or machine check event?
-2. Is there a trap on task switch?
-3. Is there an SMI or an INIT?
-3.5 In L2, is there an MTF VM-exit?
-4. Is there a #DB trap on the previous instruction? (In L2, is it
-intercepted by L1?)
-4.3 In L2, has the VMX-preemption timer expired?
-4.6 In L2, do we need to synthesize an NMI-window VM-exit?
-5. Is there an NMI? (In L2, is it intercepted by L1?)
-5.3 In L2 do we need to synthesize an interrupt-window VM-exit?
-5.6 In L2, do we need to virtualize virtual-interrupt delivery?
-6. Is there a maskable interrupt? (In L2, is it intercepted by L1?)
-7. Now, we can enter VMX non-root mode.
+> > +             return 0;
+> > +     }
+> >       default:
+> >               return kvm_vm_ioctl_enable_cap(kvm, cap);
+> >       }
+>
+> --
+> Vitaly
+>
