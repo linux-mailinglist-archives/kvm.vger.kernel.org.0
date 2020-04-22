@@ -2,158 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A2B401B342F
-	for <lists+kvm@lfdr.de>; Wed, 22 Apr 2020 02:53:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9CDFE1B3448
+	for <lists+kvm@lfdr.de>; Wed, 22 Apr 2020 03:02:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726284AbgDVAxc convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Tue, 21 Apr 2020 20:53:32 -0400
-Received: from mga09.intel.com ([134.134.136.24]:52603 "EHLO mga09.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726012AbgDVAxc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Apr 2020 20:53:32 -0400
-IronPort-SDR: EKI54qKrr30rVClxbdzn2R6r6SktghpvXfjaDFOE9vu9esEhZapSN3QL0xXG8eqRxBldXJhm/N
- OrtgV69SIJiQ==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Apr 2020 17:53:31 -0700
-IronPort-SDR: 6BvZNWKAkfEmtMuPX9NJM/DT2T0OL58dZHnYXUjIma0xZO8x1qj0CkCR3Q2GnadwpmmFhzZvUf
- sQJMrcy45FuQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.72,412,1580803200"; 
-   d="scan'208";a="334451596"
-Received: from fmsmsx105.amr.corp.intel.com ([10.18.124.203])
-  by orsmga001.jf.intel.com with ESMTP; 21 Apr 2020 17:53:30 -0700
-Received: from fmsmsx608.amr.corp.intel.com (10.18.126.88) by
- FMSMSX105.amr.corp.intel.com (10.18.124.203) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Tue, 21 Apr 2020 17:53:30 -0700
-Received: from fmsmsx608.amr.corp.intel.com (10.18.126.88) by
- fmsmsx608.amr.corp.intel.com (10.18.126.88) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1713.5; Tue, 21 Apr 2020 17:53:30 -0700
-Received: from shsmsx105.ccr.corp.intel.com (10.239.4.158) by
- fmsmsx608.amr.corp.intel.com (10.18.126.88) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id 15.1.1713.5
- via Frontend Transport; Tue, 21 Apr 2020 17:53:29 -0700
-Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.225]) by
- SHSMSX105.ccr.corp.intel.com ([169.254.11.213]) with mapi id 14.03.0439.000;
- Wed, 22 Apr 2020 08:53:26 +0800
-From:   "Tian, Kevin" <kevin.tian@intel.com>
-To:     Jason Gunthorpe <jgg@mellanox.com>,
-        "Jiang, Dave" <dave.jiang@intel.com>
-CC:     "vkoul@kernel.org" <vkoul@kernel.org>,
-        "megha.dey@linux.intel.com" <megha.dey@linux.intel.com>,
-        "maz@kernel.org" <maz@kernel.org>,
-        "bhelgaas@google.com" <bhelgaas@google.com>,
-        "rafael@kernel.org" <rafael@kernel.org>,
-        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "hpa@zytor.com" <hpa@zytor.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "Pan, Jacob jun" <jacob.jun.pan@intel.com>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>, "Lu, Baolu" <baolu.lu@intel.com>,
-        "Kumar, Sanjay K" <sanjay.k.kumar@intel.com>,
-        "Luck, Tony" <tony.luck@intel.com>,
-        "Lin, Jing" <jing.lin@intel.com>,
-        "Williams, Dan J" <dan.j.williams@intel.com>,
-        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "parav@mellanox.com" <parav@mellanox.com>,
-        "dmaengine@vger.kernel.org" <dmaengine@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: RE: [PATCH RFC 00/15] Add VFIO mediated device support and IMS
- support for the idxd driver.
-Thread-Topic: [PATCH RFC 00/15] Add VFIO mediated device support and IMS
- support for the idxd driver.
-Thread-Index: AQHWGDVStT24LxQ110qc/YDRWdRX86iDuewAgACI/wA=
-Date:   Wed, 22 Apr 2020 00:53:25 +0000
-Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D19D86EE26@SHSMSX104.ccr.corp.intel.com>
-References: <158751095889.36773.6009825070990637468.stgit@djiang5-desk3.ch.intel.com>
- <20200421235442.GO11945@mellanox.com>
-In-Reply-To: <20200421235442.GO11945@mellanox.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-version: 11.2.0.6
-dlp-reaction: no-action
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+        id S1726377AbgDVBCE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Apr 2020 21:02:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33710 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726055AbgDVBCE (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 21 Apr 2020 21:02:04 -0400
+Received: from mail-oi1-x244.google.com (mail-oi1-x244.google.com [IPv6:2607:f8b0:4864:20::244])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B08DC0610D5;
+        Tue, 21 Apr 2020 18:02:04 -0700 (PDT)
+Received: by mail-oi1-x244.google.com with SMTP id a2so447954oia.11;
+        Tue, 21 Apr 2020 18:02:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=JwVDsnKQEhm1jAKmC3TdxNUyFpBPqvMfGNXwJrkzeOk=;
+        b=GPF42GEk0RargHC4CRBaeWdJMXVEj99sHY6Ia+uZjQfmnnnHP1NWRqo2dY6I8g0L2i
+         jk9zOY1Y3LO0iFGZXUbF3rkoGnDQlcN2SK2y7vocOIrn+X9bmAfjPc/fqLPgoWeXiw2/
+         sTWwIJPXPgQclVK19R3XVA1RrnVFHvv6j/XqTYBVpk3GBe2HWdXMN/L9TeRPSh+C+1tn
+         XZtJcnSzFWqTRIlBdGqo0/rPkgdLl2ZCMMgpo+jwQFh7mlvsxpCDkvxjiQ8y7lJ72WDh
+         znpRwf7MftRjr6ml0DtfY69cOhqHHrLQ98a9AbJq3yUKTNx50TIq1PK6HhprIuyAgYKy
+         8r2g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=JwVDsnKQEhm1jAKmC3TdxNUyFpBPqvMfGNXwJrkzeOk=;
+        b=dkHHgBTSMH3B1fqONRKmWdcVhVK2wmcBydGG/d9JsF/ANbrAXcya8M4VyrWLIX1fWV
+         SbSs4Db50jZ/U+cDgSyNEUIGqoin6HjPaxVL1q03yVJNuyrsJKtIxPNZq0j2oah48eE4
+         s3ZpBYnKHhnACrG/bIWTum82D3Gm6O3iPyIWOSHxN+giwgeNXIrtgUWGoNsq2t0rKTMv
+         /Wa9fvxHAAqZ0Xlew0wWFJ7lNEkeXBxWi6OGJiS0n2Q+YfG5e3S5t8meBZFIxlq3X/xD
+         12x8fl2Z8uZX/+nqTwpTpDIn6oiqEHVeLH3nzxom7bVYsyETVLUiuTCGaLxle0TzPZAS
+         Sd7A==
+X-Gm-Message-State: AGi0PuZbUvYasMh0i3Dg9o3/jl5xNmS1fJ4NhWtnSYBgtAXhwMEvAvon
+        XKwi6pVb7eTSn0R+6kTDVN4ws28CTF/JckJXDrM=
+X-Google-Smtp-Source: APiQypLjVzrsl0Anz94XprXcwDt3fBjesJAs6pymEAtm5P7X7L2JfxiWhw73gsMrLIp/3Qq2SpkINTQzTjOfxSPeUgg=
+X-Received: by 2002:aca:2801:: with SMTP id 1mr4869738oix.141.1587517323684;
+ Tue, 21 Apr 2020 18:02:03 -0700 (PDT)
 MIME-Version: 1.0
+References: <1587468026-15753-1-git-send-email-wanpengli@tencent.com>
+ <1587468026-15753-3-git-send-email-wanpengli@tencent.com> <68eb0e46-4c2a-0292-3dfa-db2ae2b2b13d@redhat.com>
+In-Reply-To: <68eb0e46-4c2a-0292-3dfa-db2ae2b2b13d@redhat.com>
+From:   Wanpeng Li <kernellwp@gmail.com>
+Date:   Wed, 22 Apr 2020 09:01:52 +0800
+Message-ID: <CANRm+CwXhe+TdB8JpQ78qR-sO6FB_cMjqHxj5fSyKEMPkMVm8g@mail.gmail.com>
+Subject: Re: [PATCH 2/2] KVM: VMX: Handle preemption timer fastpath
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Haiwei Li <lihaiwei@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> From: Jason Gunthorpe
-> Sent: Wednesday, April 22, 2020 7:55 AM
-> 
-> On Tue, Apr 21, 2020 at 04:33:46PM -0700, Dave Jiang wrote:
-> > The actual code is independent of the stage 2 driver code submission that
-> adds
-> > support for SVM, ENQCMD(S), PASID, and shared workqueues. This code
-> series will
-> > support dedicated workqueue on a guest with no vIOMMU.
-> >
-> > A new device type "mdev" is introduced for the idxd driver. This allows the
-> wq
-> > to be dedicated to the usage of a VFIO mediated device (mdev). Once the
-> work
-> > queue (wq) is enabled, an uuid generated by the user can be added to the
-> wq
-> > through the uuid sysfs attribute for the wq.  After the association, a mdev
-> can
-> > be created using this UUID. The mdev driver code will associate the uuid
-> and
-> > setup the mdev on the driver side. When the create operation is successful,
-> the
-> > uuid can be passed to qemu. When the guest boots up, it should discover a
-> DSA
-> > device when doing PCI discovery.
-> 
-> I'm feeling really skeptical that adding all this PCI config space and
-> MMIO BAR emulation to the kernel just to cram this into a VFIO
-> interface is a good idea, that kind of stuff is much safer in
-> userspace.
-> 
-> Particularly since vfio is not really needed once a driver is using
-> the PASID stuff. We already have general code for drivers to use to
-> attach a PASID to a mm_struct - and using vfio while disabling all the
-> DMA/iommu config really seems like an abuse.
+On Tue, 21 Apr 2020 at 19:40, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 21/04/20 13:20, Wanpeng Li wrote:
+> > +
+> > +     if (!vmx->req_immediate_exit &&
+> > +             !unlikely(vmx->loaded_vmcs->hv_timer_soft_disabled)) {
+> > +             if (!vmx_interrupt_allowed(vcpu) ||
 
-Well, this series is for virtualizing idxd device to VMs, instead of supporting
-SVA for bare metal processes. idxd implements a hardware-assisted 
-mediated device technique called Intel Scalable I/O Virtualization, which
-allows each Assignable Device Interface (ADI, e.g. a work queue) tagged 
-with an unique PASID to ensure fine-grained DMA isolation when those 
-ADIs are assigned to different VMs. For this purpose idxd utilizes the VFIO 
-mdev framework and IOMMU aux-domain extension. Bare metal SVA will
-be enabled for idxd later by using the general SVA code that you mentioned.
-Both paths will co-exist in the end so there is no such case of disabling
-DMA/iommu config.
+For non-APICv case, we need to request interrupt-window.
 
-Thanks
-Kevin
+> > +                     !apic_lvtt_tscdeadline(apic) ||
 
-> 
-> A /dev/idxd char dev that mmaps a bar page and links it to a PASID
-> seems a lot simpler and saner kernel wise.
-> 
-> > The mdev utilizes Interrupt Message Store or IMS[3] instead of MSIX for
-> > interrupts for the guest. This preserves MSIX for host usages and also
-> allows a
-> > significantly larger number of interrupt vectors for guest usage.
-> 
-> I never did get a reply to my earlier remarks on the IMS patches.
-> 
-> The concept of a device specific addr/data table format for MSI is not
-> Intel specific. This should be general code. We have a device that can
-> use this kind of kernel capability today.
-> 
-> Jason
+Now just add fastpath for tscdeadline mode.
+
+> > +                     vmx->rmode.vm86_active ||
+> > +                     is_smm(vcpu) ||
+> > +                     !kvm_apic_hw_enabled(apic))
+
+These stuff can be removed, kvm_apic_hw_enable() is check in
+vmx_fast_deliver_interrupt().
+
+> > +                     return EXIT_FASTPATH_NONE;
+> > +
+> > +             if (!apic->lapic_timer.hv_timer_in_use)
+> > +                     return EXIT_FASTPATH_CONT_RUN;
+> > +
+> > +             WARN_ON(swait_active(&vcpu->wq));
+> > +             vmx_cancel_hv_timer(vcpu);
+> > +             apic->lapic_timer.hv_timer_in_use = false;
+> > +
+> > +             if (atomic_read(&apic->lapic_timer.pending))
+> > +                     return EXIT_FASTPATH_CONT_RUN;
+
+Other two checks are the same in kvm_lapic_expired_hv_timer().
+
+    Wanpeng
+
+> > +
+> > +             ktimer->expired_tscdeadline = ktimer->tscdeadline;
+> > +             vmx_fast_deliver_interrupt(vcpu);
+> > +             ktimer->tscdeadline = 0;
+> > +             return EXIT_FASTPATH_CONT_RUN;
+> > +     }
+> > +
+>
+> Can you explain all the checks you have here, and why you need something
+> more complex than apic_timer_expired (possibly by adding some
+> optimizations to kvm_apic_local_deliver)?  This code is impossible to
+> maintain.
+>
+> Paolo
+>
