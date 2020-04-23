@@ -2,168 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9A31E1B6205
-	for <lists+kvm@lfdr.de>; Thu, 23 Apr 2020 19:34:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AAD6D1B6218
+	for <lists+kvm@lfdr.de>; Thu, 23 Apr 2020 19:39:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729955AbgDWRew (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Apr 2020 13:34:52 -0400
-Received: from mga07.intel.com ([134.134.136.100]:32507 "EHLO mga07.intel.com"
+        id S1729981AbgDWRjD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Apr 2020 13:39:03 -0400
+Received: from foss.arm.com ([217.140.110.172]:44742 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729879AbgDWRew (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Apr 2020 13:34:52 -0400
-IronPort-SDR: RND1g0Ee7IMRsBKx1Pwp/5ML+umHkz5IwRabNBaukWPyV6I2MGmo63xTQAQQTFaSDqhLYMv3aW
- AqywtyVVvTnQ==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Apr 2020 10:34:51 -0700
-IronPort-SDR: LdsGU0KqTWZLYY2Opbsopap7RtiKwFrI72w+nQN9mdgFoDjia0qw0vyUrgj0vo7PC6M4tU4+Sa
- WHKKq1/ojUrA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,307,1583222400"; 
-   d="scan'208";a="456991546"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
-  by fmsmga005.fm.intel.com with ESMTP; 23 Apr 2020 10:34:50 -0700
-Date:   Thu, 23 Apr 2020 10:34:50 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Yang Weijiang <weijiang.yang@intel.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        pbonzini@redhat.com, jmattson@google.com,
-        yu.c.zhang@linux.intel.com
-Subject: Re: [PATCH v11 5/9] KVM: X86: Refresh CPUID once guest XSS MSR
- changes
-Message-ID: <20200423173450.GJ17824@linux.intel.com>
-References: <20200326081847.5870-1-weijiang.yang@intel.com>
- <20200326081847.5870-6-weijiang.yang@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200326081847.5870-6-weijiang.yang@intel.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+        id S1729802AbgDWRjD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Apr 2020 13:39:03 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2AC7430E;
+        Thu, 23 Apr 2020 10:39:02 -0700 (PDT)
+Received: from localhost.localdomain (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B996C3F68F;
+        Thu, 23 Apr 2020 10:39:00 -0700 (PDT)
+From:   Andre Przywara <andre.przywara@arm.com>
+To:     Will Deacon <will@kernel.org>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>
+Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        Raphael Gault <raphael.gault@arm.com>,
+        Sami Mujawar <sami.mujawar@arm.com>,
+        Alexandru Elisei <Alexandru.Elisei@arm.com>,
+        Ard Biesheuvel <ardb@kernel.org>
+Subject: [PATCH kvmtool v4 0/5] Add CFI flash emulation
+Date:   Thu, 23 Apr 2020 18:38:39 +0100
+Message-Id: <20200423173844.24220-1-andre.przywara@arm.com>
+X-Mailer: git-send-email 2.17.1
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 26, 2020 at 04:18:42PM +0800, Yang Weijiang wrote:
-> CPUID(0xd, 1) reports the current required storage size of
-> XCR0 | XSS, when guest updates the XSS, it's necessary to update
-> the CPUID leaf, otherwise guest will fetch old state size, and
-> results to some WARN traces during guest running.
-> 
-> Co-developed-by: Zhang Yi Z <yi.z.zhang@linux.intel.com>
-> Signed-off-by: Zhang Yi Z <yi.z.zhang@linux.intel.com>
-> Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
-> ---
->  arch/x86/include/asm/kvm_host.h |  1 +
->  arch/x86/kvm/cpuid.c            | 21 ++++++++++++++++++---
->  arch/x86/kvm/x86.c              |  9 +++++++--
->  3 files changed, 26 insertions(+), 5 deletions(-)
-> 
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 24c90ea5ddbd..2c944ad99692 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -650,6 +650,7 @@ struct kvm_vcpu_arch {
->  
->  	u64 xcr0;
->  	u64 guest_supported_xcr0;
-> +	u64 guest_supported_xss;
->  	u32 guest_xstate_size;
->  
->  	struct kvm_pio_request pio;
-> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> index 78d461be2102..25e9a11291b3 100644
-> --- a/arch/x86/kvm/cpuid.c
-> +++ b/arch/x86/kvm/cpuid.c
-> @@ -95,9 +95,24 @@ int kvm_update_cpuid(struct kvm_vcpu *vcpu)
->  	}
->  
->  	best = kvm_find_cpuid_entry(vcpu, 0xD, 1);
-> -	if (best && (cpuid_entry_has(best, X86_FEATURE_XSAVES) ||
-> -		     cpuid_entry_has(best, X86_FEATURE_XSAVEC)))
-> -		best->ebx = xstate_required_size(vcpu->arch.xcr0, true);
-> +	if (best) {
-> +		if (best->eax & (F(XSAVES) | F(XSAVEC))) {
+Hi,
 
-Please use cpuid_entry_has() to preserve the automagic register lookup and
-compile-time assertions that are provided.  E.g. I don't know off the top
-of my whether %eax is the correct register, and I don't want to know :-).
+an update for the CFI flash emulation, addressing Alex' comments and
+adding direct mapping support.
+The actual code changes to the flash emulation are minimal, mostly this
+is about renaming and cleanups.
+This versions now adds some patches. 1/5 is a required fix, the last
+three patches add mapping support as an extension. See below.
 
-> +			u64 xstate = vcpu->arch.xcr0 | vcpu->arch.ia32_xss;
-> +
-> +			best->ebx = xstate_required_size(xstate, true);
-> +		}
-> +
-> +		if (best->eax & F(XSAVES)) {
+In addition to a branch with this series[1], I also put a git branch with
+all the changes compared to v3[2] as separate patches on the server, please
+have a look if you want to verify against a previous review.
 
-Same thing here.
+===============
+The EDK II UEFI firmware implementation requires some storage for the EFI
+variables, which is typically some flash storage.
+Since this is already supported on the EDK II side, and looks like a
+generic standard, this series adds a CFI flash emulation to kvmtool.
 
-> +			vcpu->arch.guest_supported_xss =
-> +			(best->ecx | ((u64)best->edx << 32)) & supported_xss;
+Patch 2/5 is the actual emulation code, patch 1/5 is a bug-fix for
+registering MMIO devices, which is needed for this device.
+Patches 3-5 add support for mapping the flash memory into guest, should
+it be in read-array mode. For this to work, patch 3/5 is cherry-picked
+from Alex' PCIe reassignable BAR series, to support removing a memslot
+mapping. Patch 4/5 adds support for read-only mappings, while patch 5/5
+adds or removes the mapping based on the current state.
+I am happy to squash 5/5 into 2/5, if we agree that patch 3/5 should be
+merged either separately or the PCIe series is actually merged before
+this one.
 
-The indentation is funky, I'm guessing you're trying to squeak in less than
-80 chars.  Maybe this?
+This is one missing piece towards a working UEFI boot with kvmtool on
+ARM guests, the other is to provide writable PCI BARs, which is WIP.
+This series alone already enables UEFI boot, but only with virtio-mmio.
 
-		if (!cpuid_entry_has(best, X86_FEATURE_XSAVES)) {
-			best->ecx = 0;
-			best->edx = 0;
-		}
+Cheers,
+Andre
 
-		 vcpu->arch.guest_supported_xss =
-			(((u64)best->edx << 32) | best->ecx) & supported_xss;
+[1] http://www.linux-arm.org/git?p=kvmtool.git;a=log;h=refs/heads/cfi-flash/v4
+[2] http://www.linux-arm.org/git?p=kvmtool.git;a=log;h=refs/heads/cfi-flash/v3
+git://linux-arm.org/kvmtool.git (branches cfi-flash/v3 and cfi-flash/v4)
 
-Nit: my preference is to have the high half first, x86 is little endian
-(the xcr0 code is "wrong" :-D).  For me, this also makes it more obvious
-that the effective size is a u64.
+Changelog v3 .. v4:
+- Rename file to cfi-flash.c (dash instead of underscore).
+- Unify macro names for states, modes and commands.
+- Enforce one or two chips only.
+- Comment on pow2_size() function.
+- Use more consistent identifier spellings.
+- Assign symbols to status register values.
+- Drop RCR register emulation.
+- Use numerical offsets instead of names for query offsets to match spec.
+- Cleanup error path and reword info message in create_flash_device_file().
+- Add fix to allow non-virtio MMIO device emulations.
+- Support tearing down and adding read-only memslots.
+- Add read-only memslot mapping when in read mode.
 
-> +		} else {
-> +			best->ecx = 0;
-> +			best->edx = 0;
-> +			vcpu->arch.guest_supported_xss = 0;
-> +		}
-> +	} else {
-> +		vcpu->arch.guest_supported_xss = 0;
-> +	}
->  
->  	/*
->  	 * The existing code assumes virtual address is 48-bit or 57-bit in the
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 90acdbbb8a5a..51ecb496d47d 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -2836,9 +2836,12 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->  		 * IA32_XSS[bit 8]. Guests have to use RDMSR/WRMSR rather than
->  		 * XSAVES/XRSTORS to save/restore PT MSRs.
->  		 */
-> -		if (data & ~supported_xss)
-> +		if (data & ~vcpu->arch.guest_supported_xss)
->  			return 1;
-> -		vcpu->arch.ia32_xss = data;
-> +		if (vcpu->arch.ia32_xss != data) {
-> +			vcpu->arch.ia32_xss = data;
-> +			kvm_update_cpuid(vcpu);
-> +		}
->  		break;
->  	case MSR_SMI_COUNT:
->  		if (!msr_info->host_initiated)
-> @@ -9635,6 +9638,8 @@ int kvm_arch_hardware_setup(void)
->  
->  	if (!kvm_cpu_cap_has(X86_FEATURE_XSAVES))
->  		supported_xss = 0;
-> +	else
-> +		supported_xss = host_xss & KVM_SUPPORTED_XSS;
+Changelog v2 .. v3:
+- Breaking MMIO handling into three separate functions.
+- Assing the flash base address in the memory map, but stay at 32 MB for now.
+  The MMIO area has been moved up to 48 MB, to never overlap with the
+  flash.
+- Impose a limit of 16 MB for the flash size, mostly to fit into the
+  (for now) fixed memory map.
+- Trim flash size down to nearest power-of-2, to match hardware.
+- Announce forced flash size trimming.
+- Rework the CFI query table slightly, to add the addresses as array
+  indicies.
+- Fix error handling when creating the flash device.
+- Fix pow2_size implementation for 0 and 1 as input values.
+- Fix write buffer size handling.
+- Improve some comments.
 
-Silly nit: I'd prefer to invert the check, e.g.
-
-	if (kvm_cpu_cap_has(X86_FEATURE_XSAVES))
-		supported_xss = host_xss & KVM_SUPPORTED_XSS;
-	else
-		supported_xss = 0;
-
->  
->  	cr4_reserved_bits = kvm_host_cr4_reserved_bits(&boot_cpu_data);
->  
-> -- 
-> 2.17.2
-> 
+Changelog v1 .. v2:
+- Add locking for MMIO handling.
+- Fold flash read into handler.
+- Move pow2_size() into generic header.
+- Spell out flash base address.
