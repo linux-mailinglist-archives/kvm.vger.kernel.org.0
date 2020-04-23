@@ -2,135 +2,285 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 780CB1B62C8
-	for <lists+kvm@lfdr.de>; Thu, 23 Apr 2020 19:55:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D27841B6318
+	for <lists+kvm@lfdr.de>; Thu, 23 Apr 2020 20:14:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730102AbgDWRzd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Apr 2020 13:55:33 -0400
-Received: from mail.kernel.org ([198.145.29.99]:42514 "EHLO mail.kernel.org"
+        id S1730134AbgDWSOI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Apr 2020 14:14:08 -0400
+Received: from mga05.intel.com ([192.55.52.43]:39222 "EHLO mga05.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729995AbgDWRzd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Apr 2020 13:55:33 -0400
-Received: from mail-il1-f178.google.com (mail-il1-f178.google.com [209.85.166.178])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id D58DF20781
-        for <kvm@vger.kernel.org>; Thu, 23 Apr 2020 17:55:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1587664532;
-        bh=HzfdttVM9BgXQr/ijSQNIg+ZauLcJdE62a/irg9HQUA=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=cu4I9nHQfaAgy0rxfE2IlSOes6GxtHhb1TM6KzJAfSoXk3LQVsGKljDgd4Kf2e0Du
-         cgTDqQF09l20AZz5QEkMAXbyseU5q3jalMsiN/Hvx3mfkYLe/u9uBIWtbfuu8QqiYD
-         SEJ5CeenY+ILfm9KNSCcO8L/iPPsdWYEoz4fb+Bc=
-Received: by mail-il1-f178.google.com with SMTP id u189so6445668ilc.4
-        for <kvm@vger.kernel.org>; Thu, 23 Apr 2020 10:55:32 -0700 (PDT)
-X-Gm-Message-State: AGi0PuYAVsrsxJDdADrzxT2RCID4Snfa2nIHP4IwPEILOVZqZmDxtOur
-        DK3GhVulGihCPvFqH6uBbVxMjeZtbPSZLw+XLkA=
-X-Google-Smtp-Source: APiQypL/Z2RoaxQTfyMU8HG6ck8a1KcKtB0U7jGPtMPkv1hfvGb/DzU/DYKwhO+zoay4gzXDiXn1MefQvMTM2uI93Yw=
-X-Received: by 2002:a92:405:: with SMTP id 5mr4426510ile.279.1587664532201;
- Thu, 23 Apr 2020 10:55:32 -0700 (PDT)
+        id S1730042AbgDWSOI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Apr 2020 14:14:08 -0400
+IronPort-SDR: l/7nngsIIVOzXWyCodYSfKqDTL7iKCxDIr+ZMQozLdpLwrX6bxXloDM2kDe/ePf92Sd8AGE9VC
+ uYb6UL4AnrBg==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Apr 2020 11:14:07 -0700
+IronPort-SDR: n6O+tei/TZKssUMSN1ddj46BDAlluaZsK7sDuMgWxXnWgll3uW2NOCcxZNgJKsyPhgKsOczBbu
+ Wrdg2O7ag1nQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.73,307,1583222400"; 
+   d="scan'208";a="274315244"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
+  by orsmga002.jf.intel.com with ESMTP; 23 Apr 2020 11:14:07 -0700
+Date:   Thu, 23 Apr 2020 11:14:06 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Yang Weijiang <weijiang.yang@intel.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        pbonzini@redhat.com, jmattson@google.com,
+        yu.c.zhang@linux.intel.com
+Subject: Re: [PATCH v11 7/9] KVM: X86: Add userspace access interface for CET
+ MSRs
+Message-ID: <20200423181406.GK17824@linux.intel.com>
+References: <20200326081847.5870-1-weijiang.yang@intel.com>
+ <20200326081847.5870-8-weijiang.yang@intel.com>
 MIME-Version: 1.0
-References: <20200423173844.24220-1-andre.przywara@arm.com>
-In-Reply-To: <20200423173844.24220-1-andre.przywara@arm.com>
-From:   Ard Biesheuvel <ardb@kernel.org>
-Date:   Thu, 23 Apr 2020 19:55:21 +0200
-X-Gmail-Original-Message-ID: <CAMj1kXGDjzLA3sZg33EK2RVrSmYGuCm4cZ0Y9X=ZLxN8R--7=g@mail.gmail.com>
-Message-ID: <CAMj1kXGDjzLA3sZg33EK2RVrSmYGuCm4cZ0Y9X=ZLxN8R--7=g@mail.gmail.com>
-Subject: Re: [PATCH kvmtool v4 0/5] Add CFI flash emulation
-To:     Andre Przywara <andre.przywara@arm.com>
-Cc:     Will Deacon <will@kernel.org>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        kvm@vger.kernel.org, kvmarm <kvmarm@lists.cs.columbia.edu>,
-        Raphael Gault <raphael.gault@arm.com>,
-        Sami Mujawar <sami.mujawar@arm.com>,
-        Alexandru Elisei <Alexandru.Elisei@arm.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200326081847.5870-8-weijiang.yang@intel.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 23 Apr 2020 at 19:39, Andre Przywara <andre.przywara@arm.com> wrote:
->
-> Hi,
->
-> an update for the CFI flash emulation, addressing Alex' comments and
-> adding direct mapping support.
-> The actual code changes to the flash emulation are minimal, mostly this
-> is about renaming and cleanups.
-> This versions now adds some patches. 1/5 is a required fix, the last
-> three patches add mapping support as an extension. See below.
->
-> In addition to a branch with this series[1], I also put a git branch with
-> all the changes compared to v3[2] as separate patches on the server, please
-> have a look if you want to verify against a previous review.
->
-> ===============
-> The EDK II UEFI firmware implementation requires some storage for the EFI
-> variables, which is typically some flash storage.
-> Since this is already supported on the EDK II side, and looks like a
-> generic standard, this series adds a CFI flash emulation to kvmtool.
->
-> Patch 2/5 is the actual emulation code, patch 1/5 is a bug-fix for
-> registering MMIO devices, which is needed for this device.
-> Patches 3-5 add support for mapping the flash memory into guest, should
-> it be in read-array mode. For this to work, patch 3/5 is cherry-picked
-> from Alex' PCIe reassignable BAR series, to support removing a memslot
-> mapping. Patch 4/5 adds support for read-only mappings, while patch 5/5
-> adds or removes the mapping based on the current state.
-> I am happy to squash 5/5 into 2/5, if we agree that patch 3/5 should be
-> merged either separately or the PCIe series is actually merged before
-> this one.
->
-> This is one missing piece towards a working UEFI boot with kvmtool on
-> ARM guests, the other is to provide writable PCI BARs, which is WIP.
-> This series alone already enables UEFI boot, but only with virtio-mmio.
->
+On Thu, Mar 26, 2020 at 04:18:44PM +0800, Yang Weijiang wrote:
+> +#define CET_MSR_RSVD_BITS_1  GENMASK(1, 0)
+> +#define CET_MSR_RSVD_BITS_2  GENMASK(9, 6)
+> +
+> +static bool cet_check_msr_write(struct kvm_vcpu *vcpu,
 
-Excellent! Thanks for taking the time to implement the r/o memslot for
-the flash, it really makes the UEFI firmware much more usable.
+s/cet_check_msr_write/is_cet_msr_valid
 
-I will test this as soon as I get a chance, probably tomorrow.
+Otherwise the polarity of the return value isn't obvious.
 
+> +				struct msr_data *msr,
 
->
-> [1] http://www.linux-arm.org/git?p=kvmtool.git;a=log;h=refs/heads/cfi-flash/v4
-> [2] http://www.linux-arm.org/git?p=kvmtool.git;a=log;h=refs/heads/cfi-flash/v3
-> git://linux-arm.org/kvmtool.git (branches cfi-flash/v3 and cfi-flash/v4)
->
-> Changelog v3 .. v4:
-> - Rename file to cfi-flash.c (dash instead of underscore).
-> - Unify macro names for states, modes and commands.
-> - Enforce one or two chips only.
-> - Comment on pow2_size() function.
-> - Use more consistent identifier spellings.
-> - Assign symbols to status register values.
-> - Drop RCR register emulation.
-> - Use numerical offsets instead of names for query offsets to match spec.
-> - Cleanup error path and reword info message in create_flash_device_file().
-> - Add fix to allow non-virtio MMIO device emulations.
-> - Support tearing down and adding read-only memslots.
-> - Add read-only memslot mapping when in read mode.
->
-> Changelog v2 .. v3:
-> - Breaking MMIO handling into three separate functions.
-> - Assing the flash base address in the memory map, but stay at 32 MB for now.
->   The MMIO area has been moved up to 48 MB, to never overlap with the
->   flash.
-> - Impose a limit of 16 MB for the flash size, mostly to fit into the
->   (for now) fixed memory map.
-> - Trim flash size down to nearest power-of-2, to match hardware.
-> - Announce forced flash size trimming.
-> - Rework the CFI query table slightly, to add the addresses as array
->   indicies.
-> - Fix error handling when creating the flash device.
-> - Fix pow2_size implementation for 0 and 1 as input values.
-> - Fix write buffer size handling.
-> - Improve some comments.
->
-> Changelog v1 .. v2:
-> - Add locking for MMIO handling.
-> - Fold flash read into handler.
-> - Move pow2_size() into generic header.
-> - Spell out flash base address.
+Unnecessary newline.
+
+> +				u64 mask)
+
+s/mask/rsvd_bits
+
+> +{
+> +	u64 data = msr->data;
+> +	u32 high_word = data >> 32;
+> +
+> +	if (data & mask)
+> +		return false;
+> +
+> +	if (!is_64_bit_mode(vcpu) && high_word)
+> +		return false;
+
+As I called out before, this is wrong.  AFAIK, the CPU never depends on
+WRMSR to prevent loading bits 63:32, software can simply do WRMSR and then
+transition back to 32-bit mode.  Yes, the shadow stack itself is 32 bits,
+but the internal value is still 64 bits.  This is backed up by the CALL
+pseudocode:
+
+  IF ShadowStackEnabled(CPL)
+    IF (EFER.LMA and DEST(CodeSegmentSelector).L) = 0
+      (* If target is legacy or compatibility mode then the SSP must be in low 4GB *)
+      IF (SSP & 0xFFFFFFFF00000000 != 0)
+        THEN #GP(0); FI;
+  FI;
+
+as well as RDSSP:
+
+  IF CPL = 3
+    IF CR4.CET & IA32_U_CET.SH_STK_EN
+      IF (operand size is 64 bit)
+        THEN
+          Dest ← SSP;
+        ELSE
+          Dest ← SSP[31:0];
+      FI;
+    FI;
+  ELSE
+
+> +
+> +	return true;
+> +}
+> +
+> +static bool cet_check_ssp_msr_access(struct kvm_vcpu *vcpu,
+> +				     struct msr_data *msr)
+
+Similar to above, the polarity of the return isn't obvious.  Maybe
+is_cet_ssp_msr_accessible()?
+
+I'd prefer to pass in @index, passing the full @msr makes it look like
+this helper might also check msr->data.
+
+> +{
+> +	u32 index = msr->index;
+> +
+> +	if (!boot_cpu_has(X86_FEATURE_SHSTK))
+> +		return false;
+> +
+> +	if (!msr->host_initiated &&
+> +	    !guest_cpuid_has(vcpu, X86_FEATURE_SHSTK))
+> +		return false;
+> +
+> +	if (index == MSR_IA32_INT_SSP_TAB)
+> +		return true;
+> +
+> +	if (index == MSR_IA32_PL3_SSP) {
+> +		if (!(supported_xss & XFEATURE_MASK_CET_USER))
+> +			return false;
+> +	} else if (!(supported_xss & XFEATURE_MASK_CET_KERNEL)) {
+> +		return false;
+> +	}
+
+	if (index == MSR_IA32_PL3_SSP)
+		return supported_xss & XFEATURE_MASK_CET_USER;
+
+	/* MSR_IA32_PL[0-2]_SSP */
+	return supported_xss & XFEATURE_MASK_CET_KERNEL;
+> +
+> +	return true;
+> +}
+> +
+> +static bool cet_check_ctl_msr_access(struct kvm_vcpu *vcpu,
+
+is_cet_ctl_msr_accessible?
+
+> +				     struct msr_data *msr)
+> +{
+> +	u32 index = msr->index;
+> +
+> +	if (!boot_cpu_has(X86_FEATURE_SHSTK) &&
+> +	    !boot_cpu_has(X86_FEATURE_IBT))
+> +		return false;
+> +
+> +	if (!msr->host_initiated &&
+> +	    !guest_cpuid_has(vcpu, X86_FEATURE_SHSTK) &&
+> +	    !guest_cpuid_has(vcpu, X86_FEATURE_IBT))
+> +		return false;
+> +
+> +	if (index == MSR_IA32_U_CET) {
+> +		if (!(supported_xss & XFEATURE_MASK_CET_USER))
+> +			return false;
+> +	} else if (!(supported_xss & XFEATURE_MASK_CET_KERNEL)) {
+> +		return false;
+> +	}
+
+Same as above:
+
+	if (index == MSR_IA32_U_CET)
+		return supported_xss & XFEATURE_MASK_CET_USER;
+
+	return supported_xss & XFEATURE_MASK_CET_KERNEL;
+> +
+> +	return true;
+> +}
+>  /*
+>   * Reads an msr value (of 'msr_index') into 'pdata'.
+>   * Returns 0 on success, non-0 otherwise.
+> @@ -1941,6 +2026,26 @@ static int vmx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>  		else
+>  			msr_info->data = vmx->pt_desc.guest.addr_a[index / 2];
+>  		break;
+> +	case MSR_IA32_S_CET:
+> +		if (!cet_check_ctl_msr_access(vcpu, msr_info))
+> +			return 1;
+> +		msr_info->data = vmcs_readl(GUEST_S_CET);
+> +		break;
+> +	case MSR_IA32_INT_SSP_TAB:
+> +		if (!cet_check_ssp_msr_access(vcpu, msr_info))
+> +			return 1;
+> +		msr_info->data = vmcs_readl(GUEST_INTR_SSP_TABLE);
+> +		break;
+> +	case MSR_IA32_U_CET:
+> +		if (!cet_check_ctl_msr_access(vcpu, msr_info))
+> +			return 1;
+> +		vmx_get_xsave_msr(msr_info);
+> +		break;
+> +	case MSR_IA32_PL0_SSP ... MSR_IA32_PL3_SSP:
+> +		if (!cet_check_ssp_msr_access(vcpu, msr_info))
+> +			return 1;
+> +		vmx_get_xsave_msr(msr_info);
+> +		break;
+>  	case MSR_TSC_AUX:
+>  		if (!msr_info->host_initiated &&
+>  		    !guest_cpuid_has(vcpu, X86_FEATURE_RDTSCP))
+> @@ -2197,6 +2302,34 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>  		else
+>  			vmx->pt_desc.guest.addr_a[index / 2] = data;
+>  		break;
+> +	case MSR_IA32_S_CET:
+> +		if (!cet_check_ctl_msr_access(vcpu, msr_info))
+> +			return 1;
+> +		if (!cet_check_msr_write(vcpu, msr_info, CET_MSR_RSVD_BITS_2))
+> +			return 1;
+> +		vmcs_writel(GUEST_S_CET, data);
+> +		break;
+> +	case MSR_IA32_INT_SSP_TAB:
+> +		if (!cet_check_ctl_msr_access(vcpu, msr_info))
+> +			return 1;
+> +		if (!is_64_bit_mode(vcpu))
+
+This is wrong, the SDM explicitly calls out the !64 case:
+
+  IA32_INTERRUPT_SSP_TABLE_ADDR (64 bits; 32 bits on processors that do not
+  support Intel 64 architecture).
+
+> +			return 1;
+> +		vmcs_writel(GUEST_INTR_SSP_TABLE, data);
+> +		break;
+> +	case MSR_IA32_U_CET:
+> +		if (!cet_check_ctl_msr_access(vcpu, msr_info))
+> +			return 1;
+> +		if (!cet_check_msr_write(vcpu, msr_info, CET_MSR_RSVD_BITS_2))
+> +			return 1;
+> +		vmx_set_xsave_msr(msr_info);
+> +		break;
+> +	case MSR_IA32_PL0_SSP ... MSR_IA32_PL3_SSP:
+> +		if (!cet_check_ssp_msr_access(vcpu, msr_info))
+> +			return 1;
+> +		if (!cet_check_msr_write(vcpu, msr_info, CET_MSR_RSVD_BITS_1))
+> +			return 1;
+> +		vmx_set_xsave_msr(msr_info);
+> +		break;
+>  	case MSR_TSC_AUX:
+>  		if (!msr_info->host_initiated &&
+>  		    !guest_cpuid_has(vcpu, X86_FEATURE_RDTSCP))
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 9654d779bdab..9e89ee6a09e1 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -1229,6 +1229,10 @@ static const u32 msrs_to_save_all[] = {
+>  	MSR_ARCH_PERFMON_EVENTSEL0 + 12, MSR_ARCH_PERFMON_EVENTSEL0 + 13,
+>  	MSR_ARCH_PERFMON_EVENTSEL0 + 14, MSR_ARCH_PERFMON_EVENTSEL0 + 15,
+>  	MSR_ARCH_PERFMON_EVENTSEL0 + 16, MSR_ARCH_PERFMON_EVENTSEL0 + 17,
+> +
+> +	MSR_IA32_XSS, MSR_IA32_U_CET, MSR_IA32_S_CET,
+> +	MSR_IA32_PL0_SSP, MSR_IA32_PL1_SSP, MSR_IA32_PL2_SSP,
+> +	MSR_IA32_PL3_SSP, MSR_IA32_INT_SSP_TAB,
+>  };
+>  
+>  static u32 msrs_to_save[ARRAY_SIZE(msrs_to_save_all)];
+> @@ -1504,6 +1508,13 @@ static int __kvm_set_msr(struct kvm_vcpu *vcpu, u32 index, u64 data,
+>  		 * invokes 64-bit SYSENTER.
+>  		 */
+>  		data = get_canonical(data, vcpu_virt_addr_bits(vcpu));
+> +		break;
+> +	case MSR_IA32_PL0_SSP ... MSR_IA32_PL3_SSP:
+> +	case MSR_IA32_U_CET:
+> +	case MSR_IA32_S_CET:
+> +	case MSR_IA32_INT_SSP_TAB:
+> +		if (is_noncanonical_address(data, vcpu))
+
+IMO the canonical check belongs in cet_check_msr_write().  The above checks
+are for MSRs that are common to VMX and SVM, i.e. the common check saves
+having to duplicate the logic.  If SVM picks up CET support, then they'll
+presumably want to share all of the checks, not just the canonical piece.
+
+> +			return 1;
+>  	}
+>  
+>  	msr.data = data;
+> -- 
+> 2.17.2
+> 
