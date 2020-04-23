@@ -2,92 +2,156 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 791261B5877
-	for <lists+kvm@lfdr.de>; Thu, 23 Apr 2020 11:45:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C90851B587C
+	for <lists+kvm@lfdr.de>; Thu, 23 Apr 2020 11:46:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726904AbgDWJpK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Apr 2020 05:45:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55998 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726343AbgDWJpK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Apr 2020 05:45:10 -0400
-Received: from mail-ot1-x342.google.com (mail-ot1-x342.google.com [IPv6:2607:f8b0:4864:20::342])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F8ABC03C1AF;
-        Thu, 23 Apr 2020 02:45:10 -0700 (PDT)
-Received: by mail-ot1-x342.google.com with SMTP id e26so5001817otr.2;
-        Thu, 23 Apr 2020 02:45:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=n6ZqebWlg204l/WYlcxSJMS+2DS6scyfdiu+AZLw5jQ=;
-        b=UNwRCuC7UVwmFvehs/bjmUtY6RKoA6Z9LE4DFeTTFborUYqlZqOp97DzZu09ZhtcRx
-         wJo0fmw1xJH8xyBN6GeJv/P0HvMX50qUSBYIw4x9VP13ToL69EyNWiCJ4n5pCCLHlbPh
-         koBaWNFSpjPddtzXrsy1tQ20Xls3kEQnRYhUgtsTy3h5HDZMF3Ebq1k8RLSXoGPhFyqb
-         4nKq2mMcQqZMWP387L93ddqJwTnNBoiIyIVgC+UR+fHoH2sxPEVTEnM28I07J64R2h2/
-         hhi7u0wPZBnRFcBYbtMMq+VD89W+wEAdCH1IUjGk+uYrdUPVgIKhfPlobqT5VzKxN2oy
-         jF7A==
+        id S1726947AbgDWJqZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Apr 2020 05:46:25 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:27508 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726375AbgDWJqY (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 23 Apr 2020 05:46:24 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1587635183;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=KaFdX++ChHNsDdrE29TfUYlzOreRcNHe/xIToCcwxcE=;
+        b=Jdokqy/Y+kEC5+J1WaIfFhLpoXXhLWpR4v3YkoBfq7PKVZJWSeGvlk42+A8iaNzDKCXic7
+        S4pbuMEWP0SPHxnRytWJVZE3uu97g0Rk01I68Qh+lJyKyhxsa4C8KqNXaLCbdga+pwB0l9
+        FOqlK8Zojau1sdRx/fDGaVyONgo4aSs=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-31-Op0xtSTmNcmVEjGDtFVjJQ-1; Thu, 23 Apr 2020 05:46:20 -0400
+X-MC-Unique: Op0xtSTmNcmVEjGDtFVjJQ-1
+Received: by mail-wr1-f70.google.com with SMTP id e5so2561324wrs.23
+        for <kvm@vger.kernel.org>; Thu, 23 Apr 2020 02:46:20 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=n6ZqebWlg204l/WYlcxSJMS+2DS6scyfdiu+AZLw5jQ=;
-        b=UNHwrvEvl1bfcoDJIHGTMlMrjhmpDxMkSMBQqS+TfFzY/vuOXpIbpJazKl3so8bM0n
-         ou4lsNUOwqcMRfxNYZocxjEMwHRFB7JOd4RXSulqpVp+qk+cSszDrSgcwPqIj+8RxrEc
-         IByMeXcJ2EoLAZh80MUp970Op3K+eHRSrvoyV6IZVt/6+xodMth49MzhRQLRVRt5VQMM
-         nnZYyhgwwiQdLLEzMqBzSeS+eYe1oUczAkxWKhpi9KldAmcNnpmRnmKBD7FJ0fSHPnaq
-         yXcduTinLK3YoidE8vkuGBHO7kZDwY/Cn+gyOmz2uSvRPWQXQPiZbOmD6V9dEN6CICRI
-         rqPA==
-X-Gm-Message-State: AGi0PuYPVunb+hRpUT8jUAQLs9W9jCehRZvsOsWNl8xMNNVS5AKiE4//
-        OMrBPuN/xn0b19OUDZoUklqIF7t/+rBVY7zpP+BuwzYy
-X-Google-Smtp-Source: APiQypKJniww7CaQVDAQOV36GE447YPzgsjP4zY2TylCeykgsfNXhfFGYf5RTg39rnXtlL30Zmjr+t2bgoyRLJgxG8E=
-X-Received: by 2002:a9d:7f04:: with SMTP id j4mr2815237otq.185.1587635108563;
- Thu, 23 Apr 2020 02:45:08 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=KaFdX++ChHNsDdrE29TfUYlzOreRcNHe/xIToCcwxcE=;
+        b=A2jezacYw/SvHhz9LsvkBdHGOuIv/njrvxjgdHyaOqj/lULmEn/EalKlwjWLOP2bta
+         VXbjYQTcZO7h3PX1k9Nt2lixhOLK2YYJO9trykEdIX664F80CNZ+uhAgqf9c7fSXPclC
+         Jx5ulCDY4HCCpGpAnjXPhrfUYGuxBod3CxXWpNq+2KA8wDxW99ns0jfrC/ar2W6v3pBO
+         81lQi4GTZcvoTJD+DzDb/IbqPY5fHYsvxkbEZpphdVyN0IKgmk1TrmeUiM75Bzsq00Jj
+         TXrx8IHfY+/b8QyMH8vXBj3/EXE4i3aiA3ZEt0muPXEE8+ag5txd9ccMq+Gov7neja4g
+         4mEA==
+X-Gm-Message-State: AGi0PuZS7Bvpp9I0G4xBjxAelUklfrE/0+JVZS0YYH0dQ66Xx/yul+Ja
+        gtB3SyR7qMGFfI4LGq0R05TzGJF1Oe1lX9Oo8/APaKEViTE8vdD203j0M/RNRxXcxF/DD4fGaKb
+        HZfSOwWaxViFL
+X-Received: by 2002:a05:600c:21d6:: with SMTP id x22mr3325469wmj.95.1587635179208;
+        Thu, 23 Apr 2020 02:46:19 -0700 (PDT)
+X-Google-Smtp-Source: APiQypLeQTwZRBWWH7mjBHXRBPiFSgXSmaey5vhzcyNkf/fCfxWQ9eAAj3YDWjuUu3+kujKLWHGwTw==
+X-Received: by 2002:a05:600c:21d6:: with SMTP id x22mr3325445wmj.95.1587635178966;
+        Thu, 23 Apr 2020 02:46:18 -0700 (PDT)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id y63sm2945360wmg.21.2020.04.23.02.46.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 23 Apr 2020 02:46:18 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Michael Kelley <mikelley@microsoft.com>
+Cc:     mikelley@microsoft.com, kys@microsoft.com, haiyangz@microsoft.com,
+        sthemmin@microsoft.com, wei.liu@kernel.org, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, x86@kernel.org, hpa@zytor.com,
+        pbonzini@redhat.com, sean.j.christopherson@intel.com,
+        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-hyperv@vger.kernel.org
+Subject: Re: [PATCH v2 4/4] asm-generic/hyperv: Add definitions for Get/SetVpRegister hypercalls
+In-Reply-To: <20200422195737.10223-5-mikelley@microsoft.com>
+References: <20200422195737.10223-1-mikelley@microsoft.com> <20200422195737.10223-5-mikelley@microsoft.com>
+Date:   Thu, 23 Apr 2020 11:46:16 +0200
+Message-ID: <87r1wepmaf.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-References: <1587632507-18997-1-git-send-email-wanpengli@tencent.com>
- <1587632507-18997-2-git-send-email-wanpengli@tencent.com> <09cba36c-61d8-e660-295d-af54ceb36036@redhat.com>
- <CANRm+Cybksev1jJK7Fuog43G9zBCqmtLTYGvqAdCwpw3f6z0yA@mail.gmail.com> <8a29181c-c6bb-fe36-51ac-49d764819393@redhat.com>
-In-Reply-To: <8a29181c-c6bb-fe36-51ac-49d764819393@redhat.com>
-From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Thu, 23 Apr 2020 17:44:58 +0800
-Message-ID: <CANRm+CzFgbuYY6t8E0OihXMzRV8ePjnoZPUPXxGcexbL8gKfEA@mail.gmail.com>
-Subject: Re: [PATCH v2 1/5] KVM: LAPIC: Introduce interrupt delivery fastpath
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Haiwei Li <lihaiwei@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 23 Apr 2020 at 17:41, Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 23/04/20 11:35, Wanpeng Li wrote:
-> >> Ok, got it now.  The problem is that deliver_posted_interrupt goes through
-> >>
-> >>         if (!kvm_vcpu_trigger_posted_interrupt(vcpu, false))
-> >>                 kvm_vcpu_kick(vcpu);
-> >>
-> >> Would it help to make the above
-> >>
-> >>         if (vcpu != kvm_get_running_vcpu() &&
-> >>             !kvm_vcpu_trigger_posted_interrupt(vcpu, false))
-> >>                 kvm_vcpu_kick(vcpu);
-> >>
-> >> ?  If that is enough for the APICv case, it's good enough.
-> > We will not exit from vmx_vcpu_run to vcpu_enter_guest, so it will not
-> > help, right?
->
-> Oh indeed---the call to sync_pir_to_irr is in vcpu_enter_guest.  You can
-> add it to patch 3 right before "goto cont_run", since AMD does not need it.
+Michael Kelley <mikelley@microsoft.com> writes:
 
-Just move kvm_x86_ops.sync_pir_to_irr(vcpu)? How about the set pir/on
-part for APICv and non-APICv part in fast_deliver_interrupt()?
+> Add definitions for GetVpRegister and SetVpRegister hypercalls, which
+> are implemented for both x86 and ARM64.
+>
+> Signed-off-by: Michael Kelley <mikelley@microsoft.com>
+> ---
+>  include/asm-generic/hyperv-tlfs.h | 51 +++++++++++++++++++++++++++++++
+>  1 file changed, 51 insertions(+)
+>
+> diff --git a/include/asm-generic/hyperv-tlfs.h b/include/asm-generic/hyperv-tlfs.h
+> index 1f92ef92eb56..262fae9526b1 100644
+> --- a/include/asm-generic/hyperv-tlfs.h
+> +++ b/include/asm-generic/hyperv-tlfs.h
+> @@ -141,6 +141,8 @@ struct ms_hyperv_tsc_page {
+>  #define HVCALL_FLUSH_VIRTUAL_ADDRESS_SPACE_EX	0x0013
+>  #define HVCALL_FLUSH_VIRTUAL_ADDRESS_LIST_EX	0x0014
+>  #define HVCALL_SEND_IPI_EX			0x0015
+> +#define HVCALL_GET_VP_REGISTERS			0x0050
+> +#define HVCALL_SET_VP_REGISTERS			0x0051
+>  #define HVCALL_POST_MESSAGE			0x005c
+>  #define HVCALL_SIGNAL_EVENT			0x005d
+>  #define HVCALL_RETARGET_INTERRUPT		0x007e
+> @@ -439,4 +441,53 @@ struct hv_retarget_device_interrupt {
+>  	struct hv_device_interrupt_target int_target;
+>  } __packed __aligned(8);
+>  
+> +
+> +/* HvGetVpRegisters hypercall input with variable size reg name list*/
+> +struct hv_get_vp_registers_input {
+> +	struct {
+> +		u64 partitionid;
+> +		u32 vpindex;
+> +		u8  inputvtl;
+> +		u8  padding[3];
+> +	} header;
+> +	struct input {
+> +		u32 name0;
+> +		u32 name1;
+> +	} element[];
+> +} __packed;
+> +
+> +
+> +/* HvGetVpRegisters returns an array of these output elements */
+> +struct hv_get_vp_registers_output {
+> +	union {
+> +		struct {
+> +			u32 a;
+> +			u32 b;
+> +			u32 c;
+> +			u32 d;
+> +		} as32 __packed;
+> +		struct {
+> +			u64 low;
+> +			u64 high;
+> +		} as64 __packed;
+> +	};
+> +};
+> +
+> +/* HvSetVpRegisters hypercall with variable size reg name/value list*/
+> +struct hv_set_vp_registers_input {
+> +	struct {
+> +		u64 partitionid;
+> +		u32 vpindex;
+> +		u8  inputvtl;
+> +		u8  padding[3];
+> +	} header;
+> +	struct {
+> +		u32 name;
+> +		u32 padding1;
+> +		u64 padding2;
+> +		u64 valuelow;
+> +		u64 valuehigh;
+> +	} element[];
+> +} __packed;
+> +
+>  #endif
 
-    Wanpeng
+Thank you for making these changes,
+
+Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+
+-- 
+Vitaly
+
