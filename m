@@ -2,113 +2,203 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8AA051B5F4B
-	for <lists+kvm@lfdr.de>; Thu, 23 Apr 2020 17:33:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4A3651B5F52
+	for <lists+kvm@lfdr.de>; Thu, 23 Apr 2020 17:34:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729161AbgDWPda (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Apr 2020 11:33:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53812 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728865AbgDWPd3 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 23 Apr 2020 11:33:29 -0400
-Received: from chronos.abteam.si (chronos.abteam.si [IPv6:2a01:4f8:140:90ea::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C47EBC09B040
-        for <kvm@vger.kernel.org>; Thu, 23 Apr 2020 08:33:29 -0700 (PDT)
-Received: from localhost (localhost.localdomain [127.0.0.1])
-        by chronos.abteam.si (Postfix) with ESMTP id 7764C5D00090;
-        Thu, 23 Apr 2020 17:33:27 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=bstnet.org; h=
-        content-transfer-encoding:content-language:content-type
-        :content-type:in-reply-to:mime-version:user-agent:date:date
-        :message-id:from:from:references:subject:subject; s=default; t=
-        1587656006; x=1589470407; bh=1WIvFSXmtMM9Yp5tE2vZWpIna/XHKN/+oYk
-        YGDyAYJY=; b=eMS7Ylg5SXqqHk8z0anyLf+QHoXtxvVViGEWFJilIVvmx+M+YVO
-        6n3s5xpHHvLrozO0CzXthX79fhIzX39OKpvfFPSBCTdEejHFdhhaI43sTXzi8+DG
-        og01epYiufzZ7die7YTeHTPPEYeqr8m9w4edwJs4KBRKrAYaQOhjk3m8=
-Received: from chronos.abteam.si ([127.0.0.1])
-        by localhost (chronos.abteam.si [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id rKebhu9E2b9Z; Thu, 23 Apr 2020 17:33:26 +0200 (CEST)
-Received: from bst-slack.bstnet.org (unknown [IPv6:2a00:ee2:4d00:602:d782:18ef:83c9:31f5])
-        (Authenticated sender: boris@abteam.si)
-        by chronos.abteam.si (Postfix) with ESMTPSA id 9CDDC5D00084;
-        Thu, 23 Apr 2020 17:33:24 +0200 (CEST)
-Subject: Re: KVM Kernel 5.6+, BUG: stack guard page was hit at
-To:     Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        kvm@vger.kernel.org
-References: <fd793edf-a40f-100e-d1ba-a1147659cf17@bstnet.org>
- <d9c000ab-3288-ecc3-7a3f-e7bac963a398@amd.com>
-From:   "Boris V." <borisvk@bstnet.org>
-Message-ID: <ebff3407-b049-4bf0-895d-3996866bcb74@bstnet.org>
-Date:   Thu, 23 Apr 2020 17:33:35 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+        id S1729203AbgDWPeA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Apr 2020 11:34:00 -0400
+Received: from mga09.intel.com ([134.134.136.24]:46415 "EHLO mga09.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729020AbgDWPeA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Apr 2020 11:34:00 -0400
+IronPort-SDR: dKh7CQqMNjMGcfO63Bo8XcLoHT+OW33oBmOsnRIjQANrEoW6aBWT/vax5V0M1C7rqbPmMxZsao
+ S0Jlej4Xi2VQ==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Apr 2020 08:34:00 -0700
+IronPort-SDR: QPa9RMw44FKNdJCF7lLC8+GCW7/D3GO5FLlqP3Etq5GvdM3PTDKoFija4mu6vAi7eJNxHj0bi6
+ vSBXMipjM+Uw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.73,307,1583222400"; 
+   d="scan'208";a="430364213"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
+  by orsmga005.jf.intel.com with ESMTP; 23 Apr 2020 08:33:59 -0700
+Date:   Thu, 23 Apr 2020 08:33:59 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Makarand Sonare <makarandsonare@google.com>
+Cc:     kvm@vger.kernel.org, pshier@google.com, jmattson@google.com
+Subject: Re: [kvm PATCH] KVM: nVMX - enable VMX preemption timer migration
+Message-ID: <20200423153359.GB17824@linux.intel.com>
+References: <20200422205030.84476-1-makarandsonare@google.com>
 MIME-Version: 1.0
-In-Reply-To: <d9c000ab-3288-ecc3-7a3f-e7bac963a398@amd.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200422205030.84476-1-makarandsonare@google.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2020-04-23 13:54, Suravee Suthikulpanit wrote:
-> Boris,
->
-> On 4/22/20 12:43 PM, Boris V. wrote:
->> Hello,
->>
->> when running qemu with GPU passthrough it crashes with 5.6 and also=20
->> 5.7-rc kernels, it works with 5.5 and lower.
->> Without GPU passthrough I don't see this crash.
->> With bisecting, I found commit that causes this BUG.
->> It seems bad commit is f458d039db7e8518041db4169d657407e3217008, if I=20
->> revert this patch it works.
->
-> Could you please try the following patch?
->
-> Thanks,
-> Suravee
->
-> --- BEGIN PATCH ---
-> commit 5a605d65a71583195f64d42f39a29c771e2c763a
-> Author: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
-> Date:=C2=A0=C2=A0 Thu Apr 23 06:40:11 2020 -0500
->
-> =C2=A0=C2=A0=C2=A0 kvm: ioapic: Introduce arch-specific check for lazy =
-update EOI=20
-> mechanism
->
-> =C2=A0=C2=A0=C2=A0 commit f458d039db7e ("kvm: ioapic: Lazy update IOAPI=
-C EOI")=20
-> introduces
-> =C2=A0=C2=A0=C2=A0 a regression on Intel VMX APICv since it always forc=
-e IOAPIC lazy=20
-> update
-> =C2=A0=C2=A0=C2=A0 EOI mechanism when APICv is activated, which is need=
-ed to support AMD
-> =C2=A0=C2=A0=C2=A0 SVM AVIC.
->
-> =C2=A0=C2=A0=C2=A0 Fixes by introducing struct kvm_arch.use_lazy_eoi va=
-riable to specify
-> =C2=A0=C2=A0=C2=A0 whether the architecture needs lazy update EOI suppo=
-rt.
->
-> =C2=A0=C2=A0=C2=A0 Fixes: f458d039db7e ("kvm: ioapic: Lazy update IOAPI=
-C EOI")
-> =C2=A0=C2=A0=C2=A0 Signed-off-by: Suravee Suthikulpanit <suravee.suthik=
-ulpanit@amd.com>
-> ---
-> =C2=A0arch/x86/include/asm/kvm_host.h | 2 ++
-> =C2=A0arch/x86/kvm/ioapic.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0 | 3 +++
-> =C2=A0arch/x86/kvm/svm.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 1 +
-> =C2=A03 files changed, 6 insertions(+)
->
+A few comments on the shortlog:
 
-Yes, this this patch works, there is no longer kernel BUG.
+  - Use [PATCH] instead of [kvm PATCH], the "kvm" part is redundant with
+    the subsystem scope.  I almost skipped over this patch because my eyes
+    have been trained to treat [kvm... PATCH] as patches for kvm-unit-tests.
 
-Thanks,
-Boris
+  - Use a colon instead of a dash after nVMX.
 
+  - The patch should be tagged v2.  Again, I almost glossed over this
+    because I thought it was a resend of v1.
+
+  - I wouldn't phrase this as enabling, e.g. nothing prevented migrating
+    the preemption timer before this patch, it just wasn't migrated
+    correctly.
+
+E.g.
+
+  [PATCH v2] KVM: nVMX: Fix VMX preemption timer migration
+
+
+On Wed, Apr 22, 2020 at 01:50:30PM -0700, Makarand Sonare wrote:
+> From: Peter Shier <pshier@google.com>
+> 
+> Add new field to hold preemption timer remaining until expiration
+> appended to struct kvm_vmx_nested_state_data. This is to prevent
+> the second (and later) VM-Enter after migration from restarting the timer
+
+This isn't correct.  The bug being fixed is that the _first_ VM-Enter after
+migration would use the incorrect value, i.e. full value instead of
+partially decayed timer.  My comment in v1 was that the changelog should
+document why it adds a new field to fix the bug as opposed to simply
+snapshotting the decayed timer.
+
+> with wrong value. KVM_SET_NESTED_STATE restarts timer using migrated
+> state regardless of whether L1 sets VM_EXIT_SAVE_VMX_PREEMPTION_TIMER.
+
+Any plans to enhance the vmx_set_nested_state_test.c to verify this works
+as intended?
+
+> struct kvm_vmx_nested_state_hdr {
+> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> index cbc9ea2de28f9..a5207df73f015 100644
+> --- a/arch/x86/kvm/vmx/nested.c
+> +++ b/arch/x86/kvm/vmx/nested.c
+> @@ -2014,15 +2014,16 @@ static enum hrtimer_restart vmx_preemption_timer_fn(struct hrtimer *timer)
+>  		container_of(timer, struct vcpu_vmx, nested.preemption_timer);
+>  
+>  	vmx->nested.preemption_timer_expired = true;
+> +	vmx->nested.preemption_timer_remaining = 0;
+
+Won't this get overwritten by sync_vmcs02_to_vmcs12()?  Unless there is a
+corner cases I'm missing, I think it'd be better to omit this so that it's
+clear that sync_vmcs02_to_vmcs12() is responsible for snapshotting the
+remaining time.
+
+>  	kvm_make_request(KVM_REQ_EVENT, &vmx->vcpu);
+>  	kvm_vcpu_kick(&vmx->vcpu);
+>  
+>  	return HRTIMER_NORESTART;
+>  }
+
+...
+
+> @@ -5790,6 +5809,9 @@ static int vmx_get_nested_state(struct kvm_vcpu *vcpu,
+>  
+>  	BUILD_BUG_ON(sizeof(user_vmx_nested_state->vmcs12) < VMCS12_SIZE);
+>  	BUILD_BUG_ON(sizeof(user_vmx_nested_state->shadow_vmcs12) < VMCS12_SIZE);
+> +	BUILD_BUG_ON(sizeof(user_vmx_nested_state->preemption_timer_remaining)
+> +		    != sizeof(vmx->nested.preemption_timer_remaining));
+> +
+>  
+>  	/*
+>  	 * Copy over the full allocated size of vmcs12 rather than just the size
+> @@ -5805,6 +5827,13 @@ static int vmx_get_nested_state(struct kvm_vcpu *vcpu,
+>  			return -EFAULT;
+>  	}
+>  
+> +	if (kvm_state.flags & KVM_STATE_NESTED_PREEMPTION_TIMER) {
+> +		if (copy_to_user(&user_vmx_nested_state->preemption_timer_remaining,
+> +				 &vmx->nested.preemption_timer_remaining,
+> +				 sizeof(vmx->nested.preemption_timer_remaining)))a
+
+Build tested only, but {get,put}_user() compiles just fine, as requested.
+
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index a2cd413f2901..b2ec62a24f0c 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -5970,9 +5970,6 @@ static int vmx_get_nested_state(struct kvm_vcpu *vcpu,
+
+        BUILD_BUG_ON(sizeof(user_vmx_nested_state->vmcs12) < VMCS12_SIZE);
+        BUILD_BUG_ON(sizeof(user_vmx_nested_state->shadow_vmcs12) < VMCS12_SIZE);
+-       BUILD_BUG_ON(sizeof(user_vmx_nested_state->preemption_timer_remaining)
+-                   != sizeof(vmx->nested.preemption_timer_remaining));
+-
+
+        /*
+         * Copy over the full allocated size of vmcs12 rather than just the size
+@@ -5989,9 +5986,8 @@ static int vmx_get_nested_state(struct kvm_vcpu *vcpu,
+        }
+
+        if (kvm_state.flags & KVM_STATE_NESTED_PREEMPTION_TIMER) {
+-               if (copy_to_user(&user_vmx_nested_state->preemption_timer_remaining,
+-                                &vmx->nested.preemption_timer_remaining,
+-                                sizeof(vmx->nested.preemption_timer_remaining)))
++               if (put_user(vmx->nested.preemption_timer_remaining,
++                            &user_vmx_nested_state->preemption_timer_remaining))
+                        return -EFAULT;
+        }
+
+@@ -6164,9 +6160,8 @@ static int vmx_set_nested_state(struct kvm_vcpu *vcpu,
+                    offsetofend(struct  kvm_vmx_nested_state_data, preemption_timer_remaining))
+                        goto error_guest_mode;
+
+-               if (copy_from_user(&vmx->nested.preemption_timer_remaining,
+-                                  &user_vmx_nested_state->preemption_timer_remaining,
+-                                  sizeof(user_vmx_nested_state->preemption_timer_remaining))) {
++               if (get_user(vmx->nested.preemption_timer_remaining,
++                            &user_vmx_nested_state->preemption_timer_remaining)) {
+                        ret = -EFAULT;
+                        goto error_guest_mode;
+                }
+
+> +			return -EFAULT;
+> +	}
+> +
+>  out:
+>  	return kvm_state.size;
+>  }
+> @@ -5876,7 +5905,8 @@ static int vmx_set_nested_state(struct kvm_vcpu *vcpu,
+>  	 */
+>  	if (is_smm(vcpu) ?
+>  		(kvm_state->flags &
+> -		 (KVM_STATE_NESTED_GUEST_MODE | KVM_STATE_NESTED_RUN_PENDING))
+> +		 (KVM_STATE_NESTED_GUEST_MODE | KVM_STATE_NESTED_RUN_PENDING |
+> +		  KVM_STATE_NESTED_PREEMPTION_TIMER))
+>  		: kvm_state->hdr.vmx.smm.flags)
+>  		return -EINVAL;
+>  
+> @@ -5966,6 +5996,21 @@ static int vmx_set_nested_state(struct kvm_vcpu *vcpu,
+>  			goto error_guest_mode;
+>  	}
+>  
+> +	if (kvm_state->flags & KVM_STATE_NESTED_PREEMPTION_TIMER) {
+> +
+> +		if (kvm_state->size <
+> +		    offsetof(struct  kvm_nested_state, hdr.vmx) +
+> +		    offsetofend(struct  kvm_vmx_nested_state_data, preemption_timer_remaining))
+
+Too many spaces after 'struct'.
+
+> +			goto error_guest_mode;
+> +
+> +		if (copy_from_user(&vmx->nested.preemption_timer_remaining,
+> +				   &user_vmx_nested_state->preemption_timer_remaining,
+> +				   sizeof(user_vmx_nested_state->preemption_timer_remaining))) {
+> +			ret = -EFAULT;
+> +			goto error_guest_mode;
+> +		}
+> +	}
+> +
