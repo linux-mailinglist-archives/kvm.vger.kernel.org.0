@@ -2,89 +2,176 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B74D21B6576
-	for <lists+kvm@lfdr.de>; Thu, 23 Apr 2020 22:34:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 18F7F1B6594
+	for <lists+kvm@lfdr.de>; Thu, 23 Apr 2020 22:39:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726363AbgDWUe2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Apr 2020 16:34:28 -0400
-Received: from mga07.intel.com ([134.134.136.100]:42895 "EHLO mga07.intel.com"
+        id S1726414AbgDWUjp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Apr 2020 16:39:45 -0400
+Received: from mga05.intel.com ([192.55.52.43]:49524 "EHLO mga05.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725877AbgDWUe2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Apr 2020 16:34:28 -0400
-IronPort-SDR: VAtVVIkPnEVAwufiCRL2eY0S5sFWbPoS0epttwpj4uoP7lmXNztWC4PUONWKQpc9ZVh7iuWueS
- 1qxZIq7VN5hg==
+        id S1725884AbgDWUjp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Apr 2020 16:39:45 -0400
+IronPort-SDR: 2IQp2gPFueeTo17yy5Scm5COEeKY9WhjQyNTYngkw4Re5Oe4v0zhSMk/hXQusQDeUyaCCTXiHD
+ OC/thd7/G4EA==
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Apr 2020 13:34:25 -0700
-IronPort-SDR: EI6Ve9nnUVyb2g3jV9TsSYsL0FC4/+jzmNMl1+ZNvkzCyZ6IqOTd3GUkgjEJuulHr5wLVISCjn
- H2pJtnmhT8QA==
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Apr 2020 13:39:44 -0700
+IronPort-SDR: PAytE2gd3PBGaQ1vc8eGBqEXx4D7ZP6om29YOEArslB7dEk2ZEyvxu6H5jlS9TrOay2cxKyWBa
+ mzhGhdIVBhdQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.73,309,1583222400"; 
-   d="scan'208";a="301316877"
-Received: from iweiny-desk2.sc.intel.com ([10.3.52.147])
-  by FMSMGA003.fm.intel.com with ESMTP; 23 Apr 2020 13:34:24 -0700
-Date:   Thu, 23 Apr 2020 13:34:24 -0700
-From:   Ira Weiny <ira.weiny@intel.com>
-To:     Janakarajan Natarajan <Janakarajan.Natarajan@amd.com>
-Cc:     linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org,
+   d="scan'208";a="292396043"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
+  by orsmga008.jf.intel.com with ESMTP; 23 Apr 2020 13:39:44 -0700
+Date:   Thu, 23 Apr 2020 13:39:44 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Peter Xu <peterx@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Kevin Tian <kevin.tian@intel.com>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Christophe de Dinechin <dinechin@redhat.com>,
+        Yan Zhao <yan.y.zhao@intel.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H . Peter Anvin" <hpa@zytor.com>,
-        Mike Marshall <hubcap@omnibond.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Brijesh Singh <brijesh.singh@amd.com>
-Subject: Re: [PATCH] KVM: SVM: Change flag passed to GUP fast in
- sev_pin_memory()
-Message-ID: <20200423203424.GA3997014@iweiny-DESK2.sc.intel.com>
-References: <20200423152419.87202-1-Janakarajan.Natarajan@amd.com>
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+Subject: Re: [PATCH v8 03/14] KVM: X86: Don't track dirty for
+ KVM_SET_[TSS_ADDR|IDENTITY_MAP_ADDR]
+Message-ID: <20200423203944.GS17824@linux.intel.com>
+References: <20200331190000.659614-1-peterx@redhat.com>
+ <20200331190000.659614-4-peterx@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200423152419.87202-1-Janakarajan.Natarajan@amd.com>
-User-Agent: Mutt/1.11.1 (2018-12-01)
+In-Reply-To: <20200331190000.659614-4-peterx@redhat.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Apr 23, 2020 at 10:24:19AM -0500, Janakarajan Natarajan wrote:
-> When trying to lock read-only pages, sev_pin_memory() fails because FOLL_WRITE
-> is used as the flag for get_user_pages_fast().
-> 
-> Commit 73b0140bf0fe ("mm/gup: change GUP fast to use flags rather than a write
-> 'bool'") updated the get_user_pages_fast() call sites to use flags, but
-> incorrectly updated the call in sev_pin_memory(). As the original coding of this
-> call was correct, revert the change made by that commit.
-> 
-> Fixes: 73b0140bf0fe ("mm/gup: change GUP fast to use flags rather than a write 'bool'")
-> Signed-off-by: Janakarajan Natarajan <Janakarajan.Natarajan@amd.com>
-
-Reviewed-by: Ira Weiny <ira.weiny@intel.com>
-
-> ---
->  arch/x86/kvm/svm/sev.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> index cf912b4aaba8..89f7f3aebd31 100644
-> --- a/arch/x86/kvm/svm/sev.c
-> +++ b/arch/x86/kvm/svm/sev.c
-> @@ -345,7 +345,7 @@ static struct page **sev_pin_memory(struct kvm *kvm, unsigned long uaddr,
->  		return NULL;
+On Tue, Mar 31, 2020 at 02:59:49PM -0400, Peter Xu wrote:
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 1b6d9ac9533c..faa702c4d37b 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -9791,7 +9791,32 @@ void kvm_arch_sync_events(struct kvm *kvm)
+>  	kvm_free_pit(kvm);
+>  }
 >  
->  	/* Pin the user virtual address. */
-> -	npinned = get_user_pages_fast(uaddr, npages, FOLL_WRITE, pages);
-> +	npinned = get_user_pages_fast(uaddr, npages, write ? FOLL_WRITE : 0, pages);
->  	if (npinned != npages) {
->  		pr_err("SEV: Failure locking %lu pages.\n", npages);
->  		goto err;
+> -int __x86_set_memory_region(struct kvm *kvm, int id, gpa_t gpa, u32 size)
+> +#define  ERR_PTR_USR(e)  ((void __user *)ERR_PTR(e))
+
+Heh, my first thought when reading the below code was "cool, I didn't know
+there was ERR_PTR_USR!".  This probably should be in include/linux/err.h,
+or maybe a new arch specific implementation if it's not universally safe.
+
+An alternative, which looks enticing given that proper user variants will
+be a bit of an explosion, would be to do:
+
+  static void *____x86_set_memory_region(...)
+  {
+	<actual function>
+  }
+
+  void __user *__x86_set_memory_region(...)
+  {
+	return (void __user *)____x86_set_memory_region(...);
+  }
+
+A second alternative would be to return an "unsigned long", i.e. force the
+one function that actually accesses the hva to do the cast.  I think I like
+this option the best as it would minimize the churn in
+__x86_set_memory_region().  Callers can use IS_ERR_VALUE() to detect failure.
+
+> +/**
+> + * __x86_set_memory_region: Setup KVM internal memory slot
+> + *
+> + * @kvm: the kvm pointer to the VM.
+> + * @id: the slot ID to setup.
+> + * @gpa: the GPA to install the slot (unused when @size == 0).
+> + * @size: the size of the slot. Set to zero to uninstall a slot.
+> + *
+> + * This function helps to setup a KVM internal memory slot.  Specify
+> + * @size > 0 to install a new slot, while @size == 0 to uninstall a
+> + * slot.  The return code can be one of the following:
+> + *
+> + *   HVA:           on success (uninstall will return a bogus HVA)
+
+I think it's important to call out that it returns '0' on uninstall, e.g.
+otherwise it's not clear how a caller can detect failure.
+
+> + *   -errno:        on error
+> + *
+> + * The caller should always use IS_ERR() to check the return value
+> + * before use.  Note, the KVM internal memory slots are guaranteed to
+> + * remain valid and unchanged until the VM is destroyed, i.e., the
+> + * GPA->HVA translation will not change.  However, the HVA is a user
+> + * address, i.e. its accessibility is not guaranteed, and must be
+> + * accessed via __copy_{to,from}_user().
+> + */
+> +void __user * __x86_set_memory_region(struct kvm *kvm, int id, gpa_t gpa,
+> +				      u32 size)
+>  {
+>  	int i, r;
+>  	unsigned long hva, uninitialized_var(old_npages);
+> @@ -9800,12 +9825,12 @@ int __x86_set_memory_region(struct kvm *kvm, int id, gpa_t gpa, u32 size)
+>  
+>  	/* Called with kvm->slots_lock held.  */
+>  	if (WARN_ON(id >= KVM_MEM_SLOTS_NUM))
+> -		return -EINVAL;
+> +		return ERR_PTR_USR(-EINVAL);
+>  
+>  	slot = id_to_memslot(slots, id);
+>  	if (size) {
+>  		if (slot && slot->npages)
+> -			return -EEXIST;
+> +			return ERR_PTR_USR(-EEXIST);
+>  
+>  		/*
+>  		 * MAP_SHARED to prevent internal slot pages from being moved
+> @@ -9814,10 +9839,10 @@ int __x86_set_memory_region(struct kvm *kvm, int id, gpa_t gpa, u32 size)
+>  		hva = vm_mmap(NULL, 0, size, PROT_READ | PROT_WRITE,
+>  			      MAP_SHARED | MAP_ANONYMOUS, 0);
+>  		if (IS_ERR((void *)hva))
+
+IS_ERR_VALUE() can be used to avoid the double cast.
+
+> -			return PTR_ERR((void *)hva);
+> +			return (void __user *)hva;
+
+If we still want to go down the route of ERR_PTR_USR, then an ERR_CAST_USR
+seems in order.
+
+>  	} else {
+>  		if (!slot || !slot->npages)
+> -			return 0;
+> +			return ERR_PTR_USR(0);
+
+"return ERR_PTR_USR(NULL)" or "return NULL" would be more intuitive.  Moot
+point if the return is changed to "unsigned long".
+
+>  
+>  		/*
+>  		 * Stuff a non-canonical value to catch use-after-delete.  This
+> @@ -9838,13 +9863,13 @@ int __x86_set_memory_region(struct kvm *kvm, int id, gpa_t gpa, u32 size)
+>  		m.memory_size = size;
+>  		r = __kvm_set_memory_region(kvm, &m);
+>  		if (r < 0)
+> -			return r;
+> +			return ERR_PTR_USR(r);
+>  	}
+>  
+>  	if (!size)
+>  		vm_munmap(hva, old_npages * PAGE_SIZE);
+>  
+> -	return 0;
+> +	return (void __user *)hva;
+>  }
+>  EXPORT_SYMBOL_GPL(__x86_set_memory_region);
+>  
 > -- 
-> 2.17.1
+> 2.24.1
 > 
