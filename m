@@ -2,55 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F1E9E1B5898
-	for <lists+kvm@lfdr.de>; Thu, 23 Apr 2020 11:54:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 629191B58AA
+	for <lists+kvm@lfdr.de>; Thu, 23 Apr 2020 11:57:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726490AbgDWJyb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Apr 2020 05:54:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57454 "EHLO
+        id S1726949AbgDWJ5E (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Apr 2020 05:57:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57860 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726145AbgDWJya (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 23 Apr 2020 05:54:30 -0400
-Received: from mail-oo1-xc44.google.com (mail-oo1-xc44.google.com [IPv6:2607:f8b0:4864:20::c44])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97ABCC03C1AF;
-        Thu, 23 Apr 2020 02:54:30 -0700 (PDT)
-Received: by mail-oo1-xc44.google.com with SMTP id t3so1174387oou.8;
-        Thu, 23 Apr 2020 02:54:30 -0700 (PDT)
+        by vger.kernel.org with ESMTP id S1726364AbgDWJ5D (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 23 Apr 2020 05:57:03 -0400
+Received: from mail-ot1-x344.google.com (mail-ot1-x344.google.com [IPv6:2607:f8b0:4864:20::344])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C732AC03C1AF;
+        Thu, 23 Apr 2020 02:57:02 -0700 (PDT)
+Received: by mail-ot1-x344.google.com with SMTP id b13so5037529oti.3;
+        Thu, 23 Apr 2020 02:57:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=2+tCyipaNqVV0N3AqaOsT6FQs4vP2wHKkBmD2urCaQg=;
-        b=BJrEApAs6KnHtxWnrK7DdtZVtIakjCkamAHbflZmeIDx3ODZRfnl2JLAWbIpYpWvEG
-         cNFD63Rol9SC9vpUBaFqdznz8V5NHpyXd9pWCrozEhox7uZUNP6nnPnYDQkSvKVvJD1l
-         ntJOXVLGztXNaVXhY3VlZACxRXBx1UYHSw+nnphdauxz+a/JAmVbbTBXw1Zc6W7FvECQ
-         lTy7oCoRvG4O4WeXqObE5DGgR9oSjqurj+d05eokN8V9aAT6Ws7VPubIM5tnDamul6PI
-         Z/WNbCyVuOdAdGP/iMi/ywsUeTnYvD02QuDCD106e3R0EVUAXmsWBOj9xKo0UWy4lcZ5
-         zF7g==
+        bh=zpVZ9ErILW2s2TLRWRMEyXqH+tdaxrwrClR4yhCM63A=;
+        b=f+tlLNe/7c5lNj49h+TjMXRdhQ6FJTks90I9bWP/RWG3yICYZkFf5leNgGYdDJpHrP
+         et9KkypWu5hmk1DznoYL+UTLXVCeH6bFPyApKyEqvRpcn46PX7qtoLFDCDkUXgsfvO9E
+         WioFpPjShvrB6p/oqBw5KzFpjWBIIoJGbu/S4Kq2TG3avvjgypfRZheaV/BDf/HAREQH
+         JkhrQ7AJEm00NTAkktuoo11RTXqICuWTyLv+wZZgFc2q1MFs5ULW/DZUbxJnp8+utvJK
+         2eabLgfMUM0jsPtzrefE/XbSRz1gFFDE6/VMbdobwOptxQlk2q2WWYOsmnGX7XpjjmRC
+         Q8Qg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=2+tCyipaNqVV0N3AqaOsT6FQs4vP2wHKkBmD2urCaQg=;
-        b=s1D+bxalbSJI3FOBfV7t325n3JX+v6wIsc373CAF4uusggWCWv6UGTwZhxZDHZuBkj
-         E7PoEDrAGxu/UE/UPFmQd/5LVpk4cVzRyQbODqkixF5zB/TYzUOVKo2EISd2NM+sXCwT
-         WDgumTQ6PYSfhN+exMAtT2NTHuYW+9mE8nFwsKd5UDnrm/qPKEyZciZnUYLh6Y7Jr0ol
-         lDkdHs2IdqUgJGdHl8J0EnB0YdyPhCW1z/4u9UZbMzyxtt2OS2KtjotCs1Ni0KYw24xG
-         LAOXJ1LmAxlyncFgq6aNNU/o2tYPHYJ23QmgpWrltyu5sBKjIA+A2ka2j7aQvhVhhZYh
-         JgSw==
-X-Gm-Message-State: AGi0PubgDy+qlbQidP0lI5pFmDKYtnQHVM2iLzkGokJtmqECO05PTVOF
-        W4T3PKSHEndsdjaHcK9htBSpnEWsKkFvtWXD8Rg=
-X-Google-Smtp-Source: APiQypLOEV9PcQMTp0kxuOhw0v6xZ7EDA7GhTwOKfda/G84PzeNSqtYsrgdZg+XZFBibqnwNgG1zxfxGGkSB65YmvWk=
-X-Received: by 2002:a4a:a5d0:: with SMTP id k16mr2580802oom.41.1587635670034;
- Thu, 23 Apr 2020 02:54:30 -0700 (PDT)
+        bh=zpVZ9ErILW2s2TLRWRMEyXqH+tdaxrwrClR4yhCM63A=;
+        b=UohfVu1mTTUTJMSm8ja00PK715L41pv9KwjDc2784C/aCcvw+RcAEJUXFEtIBXJBU7
+         cbQQcwrCSnICKpPZWjn4tZOeNOY8ek5QCTQgoPmFQJU5t/hl4g1ECc+LpIvCqei2fK2b
+         3XA10z+Cy2s+Av9NKmw0myNgSckutmOvHIoaWM/HZkt/3eF3RNQmmNLGszPTUgHJ6yJE
+         Cz+2zXohFDhiNfYt2OOhF8I8LH2kUlYirPoK9MkIXHNkdqvc6GBKvNdCTZaZWdefoQgl
+         tqDiRSS1jj2W+sBhpuiGd7lI1jivQnH9x54WBlhoHHIOIANASpE7G70mfkIJQCZsiPyj
+         YhHA==
+X-Gm-Message-State: AGi0PuYIwuciP8ZMBLaRgWlBPAwfQuQP0woWjjVVFNewvwKJ14pS9K+v
+        wlsztFY6pROJeuoFCjW6tTSBhwu0C1TqloJt0cU=
+X-Google-Smtp-Source: APiQypL4Y08BAWHfAY/2dYCM7ExuzW0M0wfbUZ+BIhhJm+lWHaDHhlM/7TKnj9MZBb+5KburSX2TNh1aizfyolz0rxc=
+X-Received: by 2002:aca:2801:: with SMTP id 1mr2200732oix.141.1587635822199;
+ Thu, 23 Apr 2020 02:57:02 -0700 (PDT)
 MIME-Version: 1.0
 References: <1587632507-18997-1-git-send-email-wanpengli@tencent.com>
- <1587632507-18997-5-git-send-email-wanpengli@tencent.com> <1309372a-0dcf-cba6-9d65-e50139bbe46b@redhat.com>
-In-Reply-To: <1309372a-0dcf-cba6-9d65-e50139bbe46b@redhat.com>
+ <1587632507-18997-6-git-send-email-wanpengli@tencent.com> <99d81fa5-dc37-b22f-be1e-4aa0449e6c26@redhat.com>
+In-Reply-To: <99d81fa5-dc37-b22f-be1e-4aa0449e6c26@redhat.com>
 From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Thu, 23 Apr 2020 17:54:19 +0800
-Message-ID: <CANRm+CwwUO9Snyvuhyg8zbLf9DRhQ8RhRddkrdu+wRjF8v5tdw@mail.gmail.com>
-Subject: Re: [PATCH v2 4/5] KVM: X86: TSCDEADLINE MSR emulation fastpath
+Date:   Thu, 23 Apr 2020 17:56:51 +0800
+Message-ID: <CANRm+CyyKwFoSns31gK=_v0j1VQrOwDhgTqWZOLZS9iGZeC3Gw@mail.gmail.com>
+Subject: Re: [PATCH v2 5/5] KVM: VMX: Handle preemption timer fastpath
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
         Sean Christopherson <sean.j.christopherson@intel.com>,
@@ -65,57 +65,34 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 23 Apr 2020 at 17:39, Paolo Bonzini <pbonzini@redhat.com> wrote:
+On Thu, 23 Apr 2020 at 17:40, Paolo Bonzini <pbonzini@redhat.com> wrote:
 >
 > On 23/04/20 11:01, Wanpeng Li wrote:
-> > +
-> > +void kvm_set_lapic_tscdeadline_msr(struct kvm_vcpu *vcpu, u64 data)
-> > +{
-> > +     if (__kvm_set_lapic_tscdeadline_msr(vcpu, data))
-> > +             start_apic_timer(vcpu->arch.apic);
-> > +}
-> > +
-> > +int kvm_set_lapic_tscdeadline_msr_fast(struct kvm_vcpu *vcpu, u64 data)
+> > +bool kvm_lapic_expired_hv_timer_fast(struct kvm_vcpu *vcpu)
 > > +{
 > > +     struct kvm_lapic *apic = vcpu->arch.apic;
+> > +     struct kvm_timer *ktimer = &apic->lapic_timer;
 > > +
-> > +     if (__kvm_set_lapic_tscdeadline_msr(vcpu, data)) {
-> > +             atomic_set(&apic->lapic_timer.pending, 0);
-> > +             if (start_hv_timer(apic))
-> > +                     return tscdeadline_expired_timer_fast(vcpu);
-> > +     }
+> > +     if (!apic_lvtt_tscdeadline(apic) ||
+> > +             !ktimer->hv_timer_in_use ||
+> > +             atomic_read(&ktimer->pending))
+> > +             return 0;
+> > +
+> > +     WARN_ON(swait_active(&vcpu->wq));
+> > +     cancel_hv_timer(apic);
+> > +
+> > +     ktimer->expired_tscdeadline = ktimer->tscdeadline;
+> > +     kvm_inject_apic_timer_irqs_fast(vcpu);
 > > +
 > > +     return 1;
-> >  }
-> >
-> > +static int tscdeadline_expired_timer_fast(struct kvm_vcpu *vcpu)
-> > +{
-> > +     if (kvm_check_request(KVM_REQ_PENDING_TIMER, vcpu)) {
-> > +             kvm_clear_request(KVM_REQ_PENDING_TIMER, vcpu);
-> > +             kvm_inject_apic_timer_irqs_fast(vcpu);
-> > +             atomic_set(&vcpu->arch.apic->lapic_timer.pending, 0);
-> > +     }
-> > +
-> > +     return 0;
 > > +}
+> > +EXPORT_SYMBOL_GPL(kvm_lapic_expired_hv_timer_fast);
 >
-> This could also be handled in apic_timer_expired.  For example you can
-> add an argument from_timer_fn and do
->
->         if (!from_timer_fn) {
->                 WARN_ON(kvm_get_running_vcpu() != vcpu);
->                 kvm_inject_apic_timer_irqs_fast(vcpu);
->                 return;
->         }
->
->         if (kvm_use_posted_timer_interrupt(apic->vcpu)) {
->                 ...
->         }
->         atomic_inc(&apic->lapic_timer.pending);
->         kvm_set_pending_timer(vcpu);
->
-> and then you don't need kvm_set_lapic_tscdeadline_msr_fast and
+> Please re-evaluate if this is needed (or which parts are needed) after
+> cleaning up patch 4.  Anyway again---this is already better, I don't
+> like the duplicated code but at least I can understand what's going on.
 
-I guess you mean don't need tscdeadline_expired_timer_fast().
+Except the apic_lvtt_tscdeadline(apic) check, others are duplicated,
+what do you think about apic_lvtt_tscdeadline(apic) check?
 
     Wanpeng
