@@ -2,92 +2,87 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 59B481B5CC4
-	for <lists+kvm@lfdr.de>; Thu, 23 Apr 2020 15:43:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B81EB1B5D02
+	for <lists+kvm@lfdr.de>; Thu, 23 Apr 2020 15:58:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728337AbgDWNnS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Apr 2020 09:43:18 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:50841 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726224AbgDWNnS (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 23 Apr 2020 09:43:18 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1587649397;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=KkSCE0JzSlg9odwhbBRC3mYNWh8RC/9N7mx5EiFBY6g=;
-        b=VvRIo+KoptrpGuBV5og84nB87pmA9VW4SFmmN17TDyHMBCjzYhJm7QvnwZqEGUuTSJyllP
-        BO1AiotSUlxX5/WUDxtRe2WjEUw65X75G65kOpsqN7gwO0ScCbmkUf/VdwyeglREVhAy3f
-        kjMc7FbELb3imPS5ZgWd7kHKUA3eOJk=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-330-ZuDyUcPhPRaFocyOIVRkzA-1; Thu, 23 Apr 2020 09:43:14 -0400
-X-MC-Unique: ZuDyUcPhPRaFocyOIVRkzA-1
-Received: by mail-wr1-f71.google.com with SMTP id f15so2892268wrj.2
-        for <kvm@vger.kernel.org>; Thu, 23 Apr 2020 06:43:14 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=KkSCE0JzSlg9odwhbBRC3mYNWh8RC/9N7mx5EiFBY6g=;
-        b=RTrSVyJHCoIrbXSKgzpNOWeFchXjhIGrmOoLLiCk6zMUlMYgQfieLINz/wEJ1aOuS1
-         eltQfxPCKa07vkta6oEZZMDC79ak3M0CUCW5ZVmN+gJQ3FifQ5hMoeN2cw+S48UOzbbU
-         ZYDDuXPm6jV6Mt6oIqc3liGqw4KarTAheZ28HDlkgSuUFdyIEpLXrWDmxU8yi9Piqc+u
-         3L7vR4tp8n8u2OeRZKrU2qhYaMOTdoPuoRYXbScS3lne8h+YrewSRwlt1p+7szjeg32K
-         cL0QfbcaKluTa22lS/alHdkLgNx63pKib1GZJwpwvwTqoLyve1q3YQZErSED/nDCGWb/
-         3zgA==
-X-Gm-Message-State: AGi0Pubt/K7DY2cLIesElrvYl702yniPXp2cuiIZ/Excp+wtgvFKJHJF
-        6VlB+5i8D0BxAkZ4+zE90V5LyPmxcVNx6a+i1sqdGGAyR8bDVaKfr8V9EN+lobFb1VOsvU4USH/
-        nm1Ra/zRziJ1c
-X-Received: by 2002:a5d:6607:: with SMTP id n7mr5326236wru.150.1587649393476;
-        Thu, 23 Apr 2020 06:43:13 -0700 (PDT)
-X-Google-Smtp-Source: APiQypJa1WY71QlS4JoH4ExfIQ/Mcb3+xBPD0CWFeuWO/5cLjqXMXckSK/nstqWU4jJUxZY0ARTRPA==
-X-Received: by 2002:a5d:6607:: with SMTP id n7mr5326219wru.150.1587649393280;
-        Thu, 23 Apr 2020 06:43:13 -0700 (PDT)
-Received: from [192.168.10.150] ([93.56.170.5])
-        by smtp.gmail.com with ESMTPSA id o7sm3582902wmh.46.2020.04.23.06.43.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 23 Apr 2020 06:43:12 -0700 (PDT)
-Subject: Re: [PATCH 0/2] KVM: SVM: Implement check_nested_events for NMI
-To:     Cathy Avery <cavery@redhat.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     vkuznets@redhat.com, wei.huang2@amd.com
-References: <20200414201107.22952-1-cavery@redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <8c3f87de-525a-63d5-0134-606250d8c945@redhat.com>
-Date:   Thu, 23 Apr 2020 15:43:10 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+        id S1728562AbgDWN5p (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Apr 2020 09:57:45 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:36992 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728379AbgDWN5o (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 23 Apr 2020 09:57:44 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 03NDaEGJ084586
+        for <kvm@vger.kernel.org>; Thu, 23 Apr 2020 09:57:43 -0400
+Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 30jrj6tju4-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Thu, 23 Apr 2020 09:57:43 -0400
+Received: from localhost
+        by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <pasic@linux.ibm.com>;
+        Thu, 23 Apr 2020 14:57:17 +0100
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
+        by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Thu, 23 Apr 2020 14:57:13 +0100
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 03NDuMQM7930322
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 23 Apr 2020 13:56:22 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 4FE9952050;
+        Thu, 23 Apr 2020 13:56:22 +0000 (GMT)
+Received: from oc2783563651 (unknown [9.145.58.187])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id EA8FF5204F;
+        Thu, 23 Apr 2020 13:56:21 +0000 (GMT)
+Date:   Thu, 23 Apr 2020 15:56:20 +0200
+From:   Halil Pasic <pasic@linux.ibm.com>
+To:     Jared Rossi <jrossi@linux.ibm.com>
+Cc:     Eric Farman <farman@linux.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/1] vfio-ccw: Enable transparent CCW IPL from DASD
+In-Reply-To: <20200417182939.11460-2-jrossi@linux.ibm.com>
+References: <20200417182939.11460-1-jrossi@linux.ibm.com>
+        <20200417182939.11460-2-jrossi@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <20200414201107.22952-1-cavery@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 20042313-0012-0000-0000-000003A9E399
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20042313-0013-0000-0000-000021E73824
+Message-Id: <20200423155620.493cb7cb.pasic@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.676
+ definitions=2020-04-23_10:2020-04-23,2020-04-23 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 spamscore=0
+ malwarescore=0 mlxscore=0 lowpriorityscore=0 priorityscore=1501
+ adultscore=0 mlxlogscore=832 phishscore=0 suspectscore=0 clxscore=1011
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2004230103
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 14/04/20 22:11, Cathy Avery wrote:
-> Moved nested NMI exit to new check_nested_events.
-> The second patch fixes the NMI pending race condition that now occurs.
-> 
-> Cathy Avery (2):
->   KVM: SVM: Implement check_nested_events for NMI
->   KVM: x86: check_nested_events if there is an injectable NMI
-> 
->  arch/x86/kvm/svm/nested.c | 21 +++++++++++++++++++++
->  arch/x86/kvm/svm/svm.c    |  2 +-
->  arch/x86/kvm/svm/svm.h    | 15 ---------------
->  arch/x86/kvm/x86.c        | 15 +++++++++++----
->  4 files changed, 33 insertions(+), 20 deletions(-)
-> 
+On Fri, 17 Apr 2020 14:29:39 -0400
+Jared Rossi <jrossi@linux.ibm.com> wrote:
 
-Thanks, I've integrated this in Sean's event reinjection series and will
-post soon my own take on both.
+> Remove the explicit prefetch check when using vfio-ccw devices.
+> This check is not needed as all Linux channel programs are intended
+> to use prefetch and will be executed in the same way regardless.
 
-Paolo
+Hm. This is a guest thing or? So you basically say, it is OK to do
+this, because you know that the guest is gonna be Linux and that it
+the channel program is intended to use prefetch -- but the ORB supplied
+by the guest that designates the channel program happens to state the
+opposite.
+
+Or am I missing something?
+
+Regards,
+Halil 
 
