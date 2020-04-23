@@ -2,215 +2,150 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B138E1B63C7
-	for <lists+kvm@lfdr.de>; Thu, 23 Apr 2020 20:29:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 69ADB1B63D6
+	for <lists+kvm@lfdr.de>; Thu, 23 Apr 2020 20:32:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730289AbgDWS3I (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Apr 2020 14:29:08 -0400
-Received: from mga03.intel.com ([134.134.136.65]:2236 "EHLO mga03.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730213AbgDWS3I (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Apr 2020 14:29:08 -0400
-IronPort-SDR: udfmIAMy63LZ0quCQ91DXBkj+6SPUuLS/V9IY5X3yJO69D4gmlcgGI7EslCO0iH+tcfBQXd++k
- UoKqD7oYlRew==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Apr 2020 11:29:06 -0700
-IronPort-SDR: oy4NngsXFL3Vr7Bhhcxj9DhNek5s/i5+X0F1gRwAm5Z+J1E57JhqgDBIk4phhLTegFfLrqpc8j
- 3Ke4T94sgRWQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,307,1583222400"; 
-   d="scan'208";a="430420815"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
-  by orsmga005.jf.intel.com with ESMTP; 23 Apr 2020 11:29:06 -0700
-Date:   Thu, 23 Apr 2020 11:29:06 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Yang Weijiang <weijiang.yang@intel.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        pbonzini@redhat.com, jmattson@google.com,
-        yu.c.zhang@linux.intel.com
-Subject: Re: [PATCH v11 8/9] KVM: VMX: Enable CET support for nested VM
-Message-ID: <20200423182906.GL17824@linux.intel.com>
-References: <20200326081847.5870-1-weijiang.yang@intel.com>
- <20200326081847.5870-9-weijiang.yang@intel.com>
+        id S1730216AbgDWScf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Apr 2020 14:32:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53780 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730169AbgDWSce (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Apr 2020 14:32:34 -0400
+Received: from mail-wr1-x443.google.com (mail-wr1-x443.google.com [IPv6:2a00:1450:4864:20::443])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F3C5C09B042;
+        Thu, 23 Apr 2020 11:32:34 -0700 (PDT)
+Received: by mail-wr1-x443.google.com with SMTP id x18so8025476wrq.2;
+        Thu, 23 Apr 2020 11:32:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:subject:from:to:cc:references:autocrypt:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=bK65IuIqpgyWPmanvZBUBnpNvTI3nXeRzRVeV6SLK9k=;
+        b=LhN9scN2yZ70XNxkiyCHan4WxcFNpCjuCNtQI8QC1Tdg0ZZz5QiLS34elD963AXfXd
+         kDkN4BLM5Aa6J9YdZGmGjDjW02DWH5mQPio67yTTRHDVoGU7xYDBUhPDjNu6LfBZlc5N
+         fDPJVE94kik8yLni7FQH+T4AMwSGwlbeTQ+ZZlEypOlDwuLaLwA9apD4/duWINaanDha
+         MdOKqryt+c5e+EzGJoJFS+nwkuDH7pnZGbXjjldHVl2QyAt4Z1o4XisXDn+YLGGwc0Tp
+         cffRW57QvOMeHwleh/eVLRdcDw0enTYrtdj3eK/QBnaR9IVoqTNIdMLGaM/E6XzMBo1o
+         RJpw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:subject:from:to:cc:references:autocrypt
+         :message-id:date:user-agent:mime-version:in-reply-to
+         :content-language:content-transfer-encoding;
+        bh=bK65IuIqpgyWPmanvZBUBnpNvTI3nXeRzRVeV6SLK9k=;
+        b=RJ8vDk8MJ4htRgb3zq6LTIiM3oKsrAaZGjJ8ZCL8C5qpnJ9kNF+a2bsr9wY31hEbve
+         JfWpTWU/onbuLsQqPnkb7TQYkus4XfVeh6+h91xEMxNP8H4CCpNnp2YaHitPBGPJ4/zV
+         xfVMdDyj+Pwpo0z7kdC9ke33JdAU+mRQulWXJ2pMANtPJLIsxM8fTCVMM0UKMxquAHUJ
+         9SPYU2Ct7EfwuVAz08MZ8b/ZcxL7QFfj57tR7vGX1j+iHUJty/K0b8jwuUWGAwhQ1PuG
+         Qtf/hmAHunXt6cEQaNCSMDVDJ5VlQBcnU+thKQM7sIGDbRYJs865sROeDfJgxNhE7uf+
+         8eaQ==
+X-Gm-Message-State: AGi0PuY3Z+FPGk4YV8wyoE5WAeyDKUaNxJKiTicZKVkR+poT2w6mWebj
+        rmS840v2CXAzK6yQVJakzAI=
+X-Google-Smtp-Source: APiQypKOqR1uikgGXQuPmwtWGUwTKfb5OFejs/sGi4vpUzv5zW707qx7ZcsXTesWrlMqYQZiUoBFtQ==
+X-Received: by 2002:adf:f4cb:: with SMTP id h11mr2060458wrp.191.1587666753306;
+        Thu, 23 Apr 2020 11:32:33 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:f43b:97b2:4c89:7446? ([2001:b07:6468:f312:f43b:97b2:4c89:7446])
+        by smtp.googlemail.com with ESMTPSA id a125sm4730718wme.3.2020.04.23.11.32.32
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 23 Apr 2020 11:32:32 -0700 (PDT)
+Subject: Re: [PATCH 2/2] KVM: x86: check_nested_events if there is an
+ injectable NMI
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Cathy Avery <cavery@redhat.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, vkuznets@redhat.com, wei.huang2@amd.com
+References: <20200414201107.22952-1-cavery@redhat.com>
+ <20200414201107.22952-3-cavery@redhat.com>
+ <20200423144209.GA17824@linux.intel.com>
+ <ae2d4f5d-cb96-f63a-7742-a7f46ad0d1a8@redhat.com>
+ <20200423153531.GC17824@linux.intel.com>
+ <793bf6ba-a21a-02cc-c80a-05a7af37b5b6@redhat.com>
+Autocrypt: addr=pbonzini@redhat.com; keydata=
+ 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
+ uUHgL9dKIfvpm+rNXRn9wAwGjk0X/A==
+Message-ID: <119b9a64-b071-41e3-f690-89f4ac52bd7b@redhat.com>
+Date:   Thu, 23 Apr 2020 20:32:32 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200326081847.5870-9-weijiang.yang@intel.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <793bf6ba-a21a-02cc-c80a-05a7af37b5b6@redhat.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 26, 2020 at 04:18:45PM +0800, Yang Weijiang wrote:
-> CET MSRs pass through guests for performance consideration.
-> Configure the MSRs to match L0/L1 settings so that nested VM
-> is able to run with CET.
+On 23/04/20 17:43, Paolo Bonzini wrote:
+>>
+> Ah no, it's a bug in Cathy's patch and it's a weird one.
 > 
-> Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
-> ---
->  arch/x86/kvm/vmx/nested.c | 41 +++++++++++++++++++++++++++++++++++++--
->  arch/x86/kvm/vmx/vmcs12.c |  6 ++++++
->  arch/x86/kvm/vmx/vmcs12.h | 14 ++++++++++++-
->  arch/x86/kvm/vmx/vmx.c    |  1 +
->  4 files changed, 59 insertions(+), 3 deletions(-)
+> The problem is that on AMD you exit guest mode with the NMI latched and
+> GIF=0.  So check_nested_events should enable the NMI window in addition
+> to causing a vmexit.
 > 
-> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> index e47eb7c0fbae..a71ef33de55f 100644
-> --- a/arch/x86/kvm/vmx/nested.c
-> +++ b/arch/x86/kvm/vmx/nested.c
-> @@ -627,6 +627,41 @@ static inline bool nested_vmx_prepare_msr_bitmap(struct kvm_vcpu *vcpu,
->  	nested_vmx_disable_intercept_for_msr(msr_bitmap_l1, msr_bitmap_l0,
->  					     MSR_KERNEL_GS_BASE, MSR_TYPE_RW);
->  
-> +	/* Pass CET MSRs to nested VM if L0 and L1 are set to pass-through. */
-> +	if (!msr_write_intercepted_l01(vcpu, MSR_IA32_U_CET))
-> +		nested_vmx_disable_intercept_for_msr(
-> +					msr_bitmap_l1, msr_bitmap_l0,
-> +					MSR_IA32_U_CET, MSR_TYPE_RW);
-> +
-> +	if (!msr_write_intercepted_l01(vcpu, MSR_IA32_PL3_SSP))
-> +		nested_vmx_disable_intercept_for_msr(
-> +					msr_bitmap_l1, msr_bitmap_l0,
-> +					MSR_IA32_PL3_SSP, MSR_TYPE_RW);
-> +
-> +	if (!msr_write_intercepted_l01(vcpu, MSR_IA32_S_CET))
-> +		nested_vmx_disable_intercept_for_msr(
-> +					msr_bitmap_l1, msr_bitmap_l0,
-> +					MSR_IA32_S_CET, MSR_TYPE_RW);
-> +
-> +	if (!msr_write_intercepted_l01(vcpu, MSR_IA32_PL0_SSP))
-> +		nested_vmx_disable_intercept_for_msr(
-> +					msr_bitmap_l1, msr_bitmap_l0,
-> +					MSR_IA32_PL0_SSP, MSR_TYPE_RW);
-> +
-> +	if (!msr_write_intercepted_l01(vcpu, MSR_IA32_PL1_SSP))
-> +		nested_vmx_disable_intercept_for_msr(
-> +					msr_bitmap_l1, msr_bitmap_l0,
-> +					MSR_IA32_PL1_SSP, MSR_TYPE_RW);
-> +
-> +	if (!msr_write_intercepted_l01(vcpu, MSR_IA32_PL2_SSP))
-> +		nested_vmx_disable_intercept_for_msr(
-> +					msr_bitmap_l1, msr_bitmap_l0,
-> +					MSR_IA32_PL2_SSP, MSR_TYPE_RW);
-> +
-> +	if (!msr_write_intercepted_l01(vcpu, MSR_IA32_INT_SSP_TAB))
-> +		nested_vmx_disable_intercept_for_msr(
-> +					msr_bitmap_l1, msr_bitmap_l0,
-> +					MSR_IA32_INT_SSP_TAB, MSR_TYPE_RW);
+> So why does it work?  Because on AMD we don't have (yet)
+> nested_run_pending, so we just check if we already have a vmexit
+> scheduled and if so return -EBUSY.  The second call causes
+> inject_pending_event to return -EBUSY and thus go through KVM_REQ_EVENT
+> again, which enables the NMI window.
 
-That's a lot of copy-paste.  Maybe add a helper to do the conditional l01
-check and subsequent call to nested_vmx_disable_intercept_for_msr()?  It's
-still a lot of boilerplate, but it's at least a little better.  Not sure
-what a good name would be.
+... and this means that suddenly your event handling series has become
+twice as large so I'm taking it over.
 
-	nested_vmx_update_intercept_for_msr(vcpu, MSR_IA32_U_CET,
-					    msr_bitmap_l1, msr_bitmap_l0,
-					    MSR_TYPE_RW);
+Paolo
 
-
->  	/*
->  	 * Checking the L0->L1 bitmap is trying to verify two things:
->  	 *
-> @@ -6040,7 +6075,8 @@ void nested_vmx_setup_ctls_msrs(struct nested_vmx_msrs *msrs, u32 ept_caps)
->  	msrs->exit_ctls_high |=
->  		VM_EXIT_ALWAYSON_WITHOUT_TRUE_MSR |
->  		VM_EXIT_LOAD_IA32_EFER | VM_EXIT_SAVE_IA32_EFER |
-> -		VM_EXIT_SAVE_VMX_PREEMPTION_TIMER | VM_EXIT_ACK_INTR_ON_EXIT;
-> +		VM_EXIT_SAVE_VMX_PREEMPTION_TIMER | VM_EXIT_ACK_INTR_ON_EXIT |
-> +		VM_EXIT_LOAD_HOST_CET_STATE;
->  
->  	/* We support free control of debug control saving. */
->  	msrs->exit_ctls_low &= ~VM_EXIT_SAVE_DEBUG_CONTROLS;
-> @@ -6057,7 +6093,8 @@ void nested_vmx_setup_ctls_msrs(struct nested_vmx_msrs *msrs, u32 ept_caps)
->  #endif
->  		VM_ENTRY_LOAD_IA32_PAT;
->  	msrs->entry_ctls_high |=
-> -		(VM_ENTRY_ALWAYSON_WITHOUT_TRUE_MSR | VM_ENTRY_LOAD_IA32_EFER);
-> +		(VM_ENTRY_ALWAYSON_WITHOUT_TRUE_MSR | VM_ENTRY_LOAD_IA32_EFER |
-> +		 VM_ENTRY_LOAD_GUEST_CET_STATE);
-
-This is wrong, the OR path is only for emulated stuff, I'm guessing you're
-not planning on emulating CET :-)
-
-And I think this needs to be conditional based on supported_xss?
- 
->  	/* We support free control of debug control loading. */
->  	msrs->entry_ctls_low &= ~VM_ENTRY_LOAD_DEBUG_CONTROLS;
-> diff --git a/arch/x86/kvm/vmx/vmcs12.c b/arch/x86/kvm/vmx/vmcs12.c
-> index 53dfb401316d..82b82bebeee0 100644
-> --- a/arch/x86/kvm/vmx/vmcs12.c
-> +++ b/arch/x86/kvm/vmx/vmcs12.c
-> @@ -141,6 +141,9 @@ const unsigned short vmcs_field_to_offset_table[] = {
->  	FIELD(GUEST_PENDING_DBG_EXCEPTIONS, guest_pending_dbg_exceptions),
->  	FIELD(GUEST_SYSENTER_ESP, guest_sysenter_esp),
->  	FIELD(GUEST_SYSENTER_EIP, guest_sysenter_eip),
-> +	FIELD(GUEST_S_CET, guest_s_cet),
-> +	FIELD(GUEST_SSP, guest_ssp),
-> +	FIELD(GUEST_INTR_SSP_TABLE, guest_ssp_tbl),
->  	FIELD(HOST_CR0, host_cr0),
->  	FIELD(HOST_CR3, host_cr3),
->  	FIELD(HOST_CR4, host_cr4),
-> @@ -153,5 +156,8 @@ const unsigned short vmcs_field_to_offset_table[] = {
->  	FIELD(HOST_IA32_SYSENTER_EIP, host_ia32_sysenter_eip),
->  	FIELD(HOST_RSP, host_rsp),
->  	FIELD(HOST_RIP, host_rip),
-> +	FIELD(HOST_S_CET, host_s_cet),
-> +	FIELD(HOST_SSP, host_ssp),
-> +	FIELD(HOST_INTR_SSP_TABLE, host_ssp_tbl),
->  };
->  const unsigned int nr_vmcs12_fields = ARRAY_SIZE(vmcs_field_to_offset_table);
-> diff --git a/arch/x86/kvm/vmx/vmcs12.h b/arch/x86/kvm/vmx/vmcs12.h
-> index d0c6df373f67..62b7be68f05c 100644
-> --- a/arch/x86/kvm/vmx/vmcs12.h
-> +++ b/arch/x86/kvm/vmx/vmcs12.h
-> @@ -118,7 +118,13 @@ struct __packed vmcs12 {
->  	natural_width host_ia32_sysenter_eip;
->  	natural_width host_rsp;
->  	natural_width host_rip;
-> -	natural_width paddingl[8]; /* room for future expansion */
-> +	natural_width host_s_cet;
-> +	natural_width host_ssp;
-> +	natural_width host_ssp_tbl;
-> +	natural_width guest_s_cet;
-> +	natural_width guest_ssp;
-> +	natural_width guest_ssp_tbl;
-> +	natural_width paddingl[2]; /* room for future expansion */
-
-Tangetial topic, it'd be helpful if FIELD and FIELD64 had compile-time
-assertions similar to vmcs_read*() to verify the size of the vmcs12 field
-is correct.  In other words, I don't feel like reviewing all of these :-).
-
->  	u32 pin_based_vm_exec_control;
->  	u32 cpu_based_vm_exec_control;
->  	u32 exception_bitmap;
-> @@ -301,6 +307,12 @@ static inline void vmx_check_vmcs12_offsets(void)
->  	CHECK_OFFSET(host_ia32_sysenter_eip, 656);
->  	CHECK_OFFSET(host_rsp, 664);
->  	CHECK_OFFSET(host_rip, 672);
-> +	CHECK_OFFSET(host_s_cet, 680);
-> +	CHECK_OFFSET(host_ssp, 688);
-> +	CHECK_OFFSET(host_ssp_tbl, 696);
-> +	CHECK_OFFSET(guest_s_cet, 704);
-> +	CHECK_OFFSET(guest_ssp, 712);
-> +	CHECK_OFFSET(guest_ssp_tbl, 720);
->  	CHECK_OFFSET(pin_based_vm_exec_control, 744);
->  	CHECK_OFFSET(cpu_based_vm_exec_control, 748);
->  	CHECK_OFFSET(exception_bitmap, 752);
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index a3d01014b9e7..c2e950d378bd 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -7153,6 +7153,7 @@ static void nested_vmx_cr_fixed1_bits_update(struct kvm_vcpu *vcpu)
->  	cr4_fixed1_update(X86_CR4_PKE,        ecx, feature_bit(PKU));
->  	cr4_fixed1_update(X86_CR4_UMIP,       ecx, feature_bit(UMIP));
->  	cr4_fixed1_update(X86_CR4_LA57,       ecx, feature_bit(LA57));
-> +	cr4_fixed1_update(X86_CR4_CET,	      ecx, feature_bit(SHSTK));
->  
->  #undef cr4_fixed1_update
->  }
-> -- 
-> 2.17.2
-> 
