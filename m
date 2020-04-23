@@ -2,214 +2,182 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A0A4A1B5F78
-	for <lists+kvm@lfdr.de>; Thu, 23 Apr 2020 17:37:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9256D1B5F98
+	for <lists+kvm@lfdr.de>; Thu, 23 Apr 2020 17:40:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729161AbgDWPg7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Apr 2020 11:36:59 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:28123 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728865AbgDWPg7 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 23 Apr 2020 11:36:59 -0400
+        id S1729255AbgDWPkE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Apr 2020 11:40:04 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:53568 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1729176AbgDWPkE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Apr 2020 11:40:04 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1587656217;
+        s=mimecast20190719; t=1587656402;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=E23T/oKddWGo20e8Sy98c42LsNfH3cMjAg49nwFeKKI=;
-        b=Dry+sH7tFeLuKlHFFaPz7PpwcbD6hPT+KuoRNn5HRHGC/Uhzl4gPizNHGp9jw4swsWywcu
-        eHZH8lJp8jw9oaoEnx3WzJfgLA4bv0ifpss0dqUMNU+vwwl4WQaYQA00urbBzpMb/Wf9kn
-        p3ZJdBc928Zt9PQhP8vDoELAkgNtC44=
+         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+        bh=JrZU4Cr3Dz83RhiT59lrDgTfPqo4aZWSRt6wxBcIIfQ=;
+        b=H2HX/IoTsTANMvEy1C8uW8vNYVlF9mhpn6PO3c1022itGnu2NKkwKBqaztl1xFBh/D3/ex
+        GEFSnLh0Cjk+DnbQo8dS1m3dTFBEnKr70ppeI56ByMOUFqX9lE2+nTRPUnJHL6hPg8h8Jt
+        X/aKJv/6leZ1KRyKv5j+SKr4atZRhzs=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-415-uhXV4b82MrCICvxSQoHEFw-1; Thu, 23 Apr 2020 11:36:55 -0400
-X-MC-Unique: uhXV4b82MrCICvxSQoHEFw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+ us-mta-394-4EFXvVmXNkWVfCuyXvmA1Q-1; Thu, 23 Apr 2020 11:39:58 -0400
+X-MC-Unique: 4EFXvVmXNkWVfCuyXvmA1Q-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1608D872FE1;
-        Thu, 23 Apr 2020 15:36:53 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-116-29.rdu2.redhat.com [10.10.116.29])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 54DD610016DA;
-        Thu, 23 Apr 2020 15:36:52 +0000 (UTC)
-Subject: Re: [PATCH 2/2] KVM: x86: check_nested_events if there is an
- injectable NMI
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        pbonzini@redhat.com, vkuznets@redhat.com, wei.huang2@amd.com
-References: <20200414201107.22952-1-cavery@redhat.com>
- <20200414201107.22952-3-cavery@redhat.com>
- <20200423144209.GA17824@linux.intel.com>
-From:   Cathy Avery <cavery@redhat.com>
-Message-ID: <467c5c66-8890-02ba-2e9a-c28365d9f2c6@redhat.com>
-Date:   Thu, 23 Apr 2020 11:36:50 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 739A41800D6B;
+        Thu, 23 Apr 2020 15:39:57 +0000 (UTC)
+Received: from [10.36.114.136] (ovpn-114-136.ams2.redhat.com [10.36.114.136])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E84775D70A;
+        Thu, 23 Apr 2020 15:39:53 +0000 (UTC)
+Subject: Re: [PATCH v2 01/10] s390x: smp: Test all CRs on initial reset
+To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     thuth@redhat.com, linux-s390@vger.kernel.org,
+        borntraeger@de.ibm.com, cohuck@redhat.com
+References: <20200423091013.11587-1-frankja@linux.ibm.com>
+ <20200423091013.11587-2-frankja@linux.ibm.com>
+From:   David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat GmbH
+Message-ID: <2ebdf5d6-74ac-d9e5-d329-29611a5f87cd@redhat.com>
+Date:   Thu, 23 Apr 2020 17:39:53 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <20200423144209.GA17824@linux.intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20200423091013.11587-2-frankja@linux.ibm.com>
+Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 4/23/20 10:42 AM, Sean Christopherson wrote:
-> On Tue, Apr 14, 2020 at 04:11:07PM -0400, Cathy Avery wrote:
->> With NMI intercept moved to check_nested_events there is a race
->> condition where vcpu->arch.nmi_pending is set late causing
-> How is nmi_pending set late?  The KVM_{G,S}ET_VCPU_EVENTS paths can't s=
-et
-> it because the current KVM_RUN thread holds the mutex, and the only oth=
-er
-> call to process_nmi() is in the request path of vcpu_enter_guest, which=
- has
-> already executed.
+On 23.04.20 11:10, Janosch Frank wrote:
+> All CRs are set to 0 and CRs 0 and 14 are set to pre-defined values,
+> so we also need to test 1-13 and 15 for 0.
+> 
+> And while we're at it, let's also set some values to cr 1, 7 and 13, so
+> we can actually be sure that they will be zeroed.
+> 
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+> Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> ---
+>  s390x/smp.c | 16 +++++++++++++++-
+>  1 file changed, 15 insertions(+), 1 deletion(-)
+> 
+> diff --git a/s390x/smp.c b/s390x/smp.c
+> index fa40753..8c9b98a 100644
+> --- a/s390x/smp.c
+> +++ b/s390x/smp.c
+> @@ -182,16 +182,28 @@ static void test_emcall(void)
+>  	report_prefix_pop();
+>  }
+>  
+> +/* Used to dirty registers of cpu #1 before it is reset */
+> +static void test_func_initial(void)
+> +{
+> +	lctlg(1, 0x42000UL);
+> +	lctlg(7, 0x43000UL);
+> +	lctlg(13, 0x44000UL);
+> +	set_flag(1);
+> +}
+> +
+>  static void test_reset_initial(void)
+>  {
+>  	struct cpu_status *status = alloc_pages(0);
+> +	uint64_t nullp[12] = {};
 
-You will have to forgive me as I am new to KVM and any help would be=20
-most appreciated.=C2=A0 This is what I noticed when an NMI intercept is=20
-processed when it was implemented in check_nested_events.
+static const uint64_t nullp[12]; ? but see below
 
-When check_nested_events is called from inject_pending_event ...=20
-check_nested_events needs to have already been called (kvm_vcpu_running=20
-with vcpu->arch.nmi_pending =3D 1)=C2=A0 to set up the NMI intercept and =
-set=20
-svm->nested.exit_required. Otherwise we do not exit from the second=20
-checked_nested_events call ( code below ) with a return of -EBUSY which=20
-allows us to immediately vmexit.
+>  	struct psw psw;
+>  
+>  	psw.mask = extract_psw_mask();
+> -	psw.addr = (unsigned long)test_func;
+> +	psw.addr = (unsigned long)test_func_initial;
+>  
+>  	report_prefix_push("reset initial");
+> +	set_flag(0);
+>  	smp_cpu_start(1, psw);
+> +	wait_for_flag();
+>  
+>  	sigp_retry(1, SIGP_INITIAL_CPU_RESET, 0, NULL);
+>  	sigp(1, SIGP_STORE_STATUS_AT_ADDRESS, (uintptr_t)status, NULL);
+> @@ -202,6 +214,8 @@ static void test_reset_initial(void)
+>  	report(!status->fpc, "fpc");
+>  	report(!status->cputm, "cpu timer");
+>  	report(!status->todpr, "todpr");
+> +	report(!memcmp(&status->crs[1], nullp, sizeof(status->crs[1]) * 12), "cr1-13 == 0");
 
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /*
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * Call check_nested_eve=
-nts() even if we reinjected a previous=20
-event
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * in order for caller t=
-o determine if it should require=20
-immediate-exit
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * from L2 to L1 due to =
-pending L1 events which require exit
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * from L2 to L1.
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 */
+sizeof(nullp) ?
 
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (is_guest_mode(vcpu) && kv=
-m_x86_ops.check_nested_events) {
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 r =3D kvm_x86_ops.check_nested_events(vcpu);
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 if (r !=3D 0)
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return=
- r;
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+> +	report(status->crs[15] == 0, "cr15 == 0");
 
-Unfortunately when=C2=A0 kvm_vcpu_running is called vcpu->arch.nmi_pendin=
-g is=20
-not yet set.
+I'd actually prefer a simple loop
 
-Here is the trace snippet ( with some debug ) without the second call to=20
-check_nested_events.
 
+for (i = 1; i <= 13; i++) {
+	report(status->crs[i] == 0, "cr%d == 0", i);
+}
+report(status->crs[15] == 0, "cr15 == 0");
+
+>  	report_prefix_pop();
+>  
+>  	report_prefix_push("initialized");
+> 
+
+Apart from that looks good to me.
+
+
+-- 
 Thanks,
 
-Cathy
-
-qemu-system-x86-2029=C2=A0 [040]=C2=A0=C2=A0 232.168269: kvm_entry: vcpu =
-0
- =C2=A0qemu-system-x86-2029=C2=A0 [040]=C2=A0=C2=A0 232.168271: kvm_exit:=
- reason EXIT_MSR=20
-rip 0x405371 info 1 0
- =C2=A0qemu-system-x86-2029=C2=A0 [040]=C2=A0=C2=A0 232.168272: kvm_neste=
-d_vmexit: rip=20
-405371 reason EXIT_MSR info1 1 info2 0 int_info 0 int_info_err 0
- =C2=A0qemu-system-x86-2029=C2=A0 [040]=C2=A0=C2=A0 232.168273: kvm_apic:=
- apic_write=20
-APIC_ICR2 =3D 0x0
- =C2=A0qemu-system-x86-2029=C2=A0 [040]=C2=A0=C2=A0 232.168274: kvm_apic:=
- apic_write=20
-APIC_ICR =3D 0x44400
- =C2=A0qemu-system-x86-2029=C2=A0 [040]=C2=A0=C2=A0 232.168275: kvm_apic_=
-ipi: dst 0 vec 0=20
-(NMI|physical|assert|edge|self)
- =C2=A0qemu-system-x86-2029=C2=A0 [040]=C2=A0=C2=A0 232.168277: kvm_apic_=
-accept_irq: apicid=20
-0 vec 0 (NMI|edge)
- =C2=A0qemu-system-x86-2029=C2=A0 [040]=C2=A0=C2=A0 232.168278: kvm_msr: =
-msr_write 830 =3D 0x44400
- =C2=A0qemu-system-x86-2029=C2=A0 [040]=C2=A0=C2=A0 232.168279: bprint:=20
-svm_check_nested_events:=C2=A0 svm_check_nested_events reinj =3D 0, exit_=
-req =3D 0
- =C2=A0qemu-system-x86-2029=C2=A0 [040]=C2=A0=C2=A0 232.168279: bprint:=20
-svm_check_nested_events:=C2=A0 svm_check_nested_events nmi pending =3D 0
- =C2=A0qemu-system-x86-2029=C2=A0 [040]=C2=A0=C2=A0 232.168279: bputs: vc=
-pu_enter_guest:=C2=A0=20
-inject_pending_event 1
- =C2=A0qemu-system-x86-2029=C2=A0 [040]=C2=A0=C2=A0 232.168279: bprint:=20
-svm_check_nested_events: svm_check_nested_events reinj =3D 0, exit_req =3D=
- 0
- =C2=A0qemu-system-x86-2029=C2=A0 [040]=C2=A0=C2=A0 232.168279: bprint:=20
-svm_check_nested_events: svm_check_nested_events nmi pending =3D 1
- =C2=A0qemu-system-x86-2029=C2=A0 [040]=C2=A0=C2=A0 232.168280: bprint: s=
-vm_nmi_allowed:=20
-svm_nmi_allowed ret 1
- =C2=A0qemu-system-x86-2029=C2=A0 [040]=C2=A0=C2=A0 232.168280: bputs: sv=
-m_inject_nmi:=20
-svm_inject_nmi
- =C2=A0qemu-system-x86-2029=C2=A0 [040]=C2=A0=C2=A0 232.168280: bprint: v=
-cpu_enter_guest:=C2=A0=20
-nmi_pending 0
- =C2=A0qemu-system-x86-2029=C2=A0 [040]=C2=A0=C2=A0 232.168281: kvm_entry=
-: vcpu 0
- =C2=A0qemu-system-x86-2029=C2=A0 [040]=C2=A0=C2=A0 232.168282: kvm_exit:=
- reason EXIT_NMI=20
-rip 0x405373 info 1 0
- =C2=A0qemu-system-x86-2029=C2=A0 [040]=C2=A0=C2=A0 232.168284: kvm_neste=
-d_vmexit_inject:=20
-reason EXIT_NMI info1 1 info2 0 int_info 0 int_info_err 0
- =C2=A0qemu-system-x86-2029=C2=A0 [040]=C2=A0=C2=A0 232.168285: kvm_entry=
-: vcpu 0
-
-
->> the execution of check_nested_events to not setup correctly
->> for nested.exit_required. A second call to check_nested_events
->> allows the injectable nmi to be detected in time in order to
->> require immediate exit from L2 to L1.
->>
->> Signed-off-by: Cathy Avery <cavery@redhat.com>
->> ---
->>   arch/x86/kvm/x86.c | 15 +++++++++++----
->>   1 file changed, 11 insertions(+), 4 deletions(-)
->>
->> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
->> index 027dfd278a97..ecfafcd93536 100644
->> --- a/arch/x86/kvm/x86.c
->> +++ b/arch/x86/kvm/x86.c
->> @@ -7734,10 +7734,17 @@ static int inject_pending_event(struct kvm_vcp=
-u *vcpu)
->>   		vcpu->arch.smi_pending =3D false;
->>   		++vcpu->arch.smi_count;
->>   		enter_smm(vcpu);
->> -	} else if (vcpu->arch.nmi_pending && kvm_x86_ops.nmi_allowed(vcpu)) =
-{
->> -		--vcpu->arch.nmi_pending;
->> -		vcpu->arch.nmi_injected =3D true;
->> -		kvm_x86_ops.set_nmi(vcpu);
->> +	} else if (vcpu->arch.nmi_pending) {
->> +		if (is_guest_mode(vcpu) && kvm_x86_ops.check_nested_events) {
->> +			r =3D kvm_x86_ops.check_nested_events(vcpu);
->> +			if (r !=3D 0)
->> +				return r;
->> +		}
->> +		if (kvm_x86_ops.nmi_allowed(vcpu)) {
->> +			--vcpu->arch.nmi_pending;
->> +			vcpu->arch.nmi_injected =3D true;
->> +			kvm_x86_ops.set_nmi(vcpu);
->> +		}
->>   	} else if (kvm_cpu_has_injectable_intr(vcpu)) {
->>   		/*
->>   		 * Because interrupts can be injected asynchronously, we are
->> --=20
->> 2.20.1
->>
+David / dhildenb
 
