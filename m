@@ -2,93 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D62651B5E11
-	for <lists+kvm@lfdr.de>; Thu, 23 Apr 2020 16:42:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E0EF31B5E73
+	for <lists+kvm@lfdr.de>; Thu, 23 Apr 2020 16:58:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728403AbgDWOmK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Apr 2020 10:42:10 -0400
-Received: from mga14.intel.com ([192.55.52.115]:40291 "EHLO mga14.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726323AbgDWOmK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Apr 2020 10:42:10 -0400
-IronPort-SDR: Y5r+AXxd6Q4bljWGySnDoehbm4Qk+E05YC0Tnr7TxtArcGnn9oD0ccZBw9ZCLYjMMBzrI2Mj/N
- V9D9BEjssB9g==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Apr 2020 07:42:09 -0700
-IronPort-SDR: heL70kamjV8fP3qeZ86FGQrHpl921Z+ulj0rEDtSvkjoGH+G/3HYAUI3tYQm05YAwuf90SuGC7
- tAtBeguRjE7Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,307,1583222400"; 
-   d="scan'208";a="430344560"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
-  by orsmga005.jf.intel.com with ESMTP; 23 Apr 2020 07:42:09 -0700
-Date:   Thu, 23 Apr 2020 07:42:09 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Cathy Avery <cavery@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        pbonzini@redhat.com, vkuznets@redhat.com, wei.huang2@amd.com
-Subject: Re: [PATCH 2/2] KVM: x86: check_nested_events if there is an
- injectable NMI
-Message-ID: <20200423144209.GA17824@linux.intel.com>
-References: <20200414201107.22952-1-cavery@redhat.com>
- <20200414201107.22952-3-cavery@redhat.com>
+        id S1728934AbgDWO6q (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Apr 2020 10:58:46 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:25370 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726380AbgDWO6q (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 23 Apr 2020 10:58:46 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1587653924;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=LF1mR98ZsspG6hFlwkveu5fxjM1/WWjBF1lX+wIJ3Ro=;
+        b=VszwZczCKuH4Ew12FHv8pVWJPtpKyHKpic787BnkzpP8ldrcCRKPlVHEfMpRS5A7unRdux
+        eqMImYW3FQT3frkbiPB/CffbXFwXgdRFW5NKWodTS7sY/7Elvae10NJB3jpRkOd0cDPqfG
+        T3LvM7NObS+LcUOv59dYhbaH5c+aN4k=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-425-RSQ8W4qCMVu5VUfwuSj89Q-1; Thu, 23 Apr 2020 10:58:43 -0400
+X-MC-Unique: RSQ8W4qCMVu5VUfwuSj89Q-1
+Received: by mail-wr1-f72.google.com with SMTP id f2so2997063wrm.9
+        for <kvm@vger.kernel.org>; Thu, 23 Apr 2020 07:58:43 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=LF1mR98ZsspG6hFlwkveu5fxjM1/WWjBF1lX+wIJ3Ro=;
+        b=EDaIy9R0fsSmKXZDC6pXR8binMZhmxR24guTd+burPy30xMc7SwTWGNbO9l8SHq+XI
+         BNwxZhmjKIBGrZeFBLsH46de7ymj/69aGrun66KQqU2jfUqv6vq8wk8IR4vKXPdVYMlX
+         6B8DoTlU2xIwQ3KEyYawMzwUcS87DmnoHVgBdglvidXPGdM6+ow5KAQEN6UDj7a1zm2U
+         kzobRdC7X0x0rP7V880bOG7vh/iEEwv5iqFTGqH4k3rT2kNQhKXbfwuqAb4FpoNieAxO
+         SU1Jhec7lo6hRGQW+yvAKNmoB8gv0SWbTf1xepghpXTtYa0RdyjwoH2yjvYs273vv9yJ
+         TSwQ==
+X-Gm-Message-State: AGi0PuajX+NHLrrk0aMsmsDWyks6ccTUyJIrRqOSGFW3UKVybrZarYQ2
+        a3sCI67qK6PkCaH80sRgugJlwDL6GYLkZ2GnfmgX/D1vVo1wX0OIPeQdnGZePJJqHKq6jpV1fGU
+        ScwUDhQLkyBAi
+X-Received: by 2002:a1c:2e07:: with SMTP id u7mr4598179wmu.74.1587653922526;
+        Thu, 23 Apr 2020 07:58:42 -0700 (PDT)
+X-Google-Smtp-Source: APiQypI3ZtnwdvQD+OkmsF20U6sOGqkW/h32yM4npR8vKhJowWv1yJktFyWdurcZKl4ZY/nQULGPWA==
+X-Received: by 2002:a1c:2e07:: with SMTP id u7mr4598160wmu.74.1587653922284;
+        Thu, 23 Apr 2020 07:58:42 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:f43b:97b2:4c89:7446? ([2001:b07:6468:f312:f43b:97b2:4c89:7446])
+        by smtp.gmail.com with ESMTPSA id 36sm4117329wrc.35.2020.04.23.07.58.41
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 23 Apr 2020 07:58:41 -0700 (PDT)
+Subject: Re: [kvm PATCH 2/2] KVM: nVMX: Don't clobber preemption timer in the
+ VMCS12 before L2 ran
+To:     Jim Mattson <jmattson@google.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Makarand Sonare <makarandsonare@google.com>,
+        kvm list <kvm@vger.kernel.org>, Peter Shier <pshier@google.com>
+References: <20200417183452.115762-1-makarandsonare@google.com>
+ <20200417183452.115762-3-makarandsonare@google.com>
+ <20200422015759.GE17836@linux.intel.com>
+ <20200422020216.GF17836@linux.intel.com>
+ <CALMp9eRUE7hRNUohhAuz8UoX0Zu1LtoXum7inuqW5ROy=m1hyQ@mail.gmail.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <d1910ba0-13b0-1e82-06d1-b349632149e4@redhat.com>
+Date:   Thu, 23 Apr 2020 16:58:41 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200414201107.22952-3-cavery@redhat.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <CALMp9eRUE7hRNUohhAuz8UoX0Zu1LtoXum7inuqW5ROy=m1hyQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Apr 14, 2020 at 04:11:07PM -0400, Cathy Avery wrote:
-> With NMI intercept moved to check_nested_events there is a race
-> condition where vcpu->arch.nmi_pending is set late causing
+On 22/04/20 19:05, Jim Mattson wrote:
+> I don't have a strong objection to this patch. It just seems to add
+> gratuitous complexity. If the consensus is to take it, the two parts
+> should be squashed together.
 
-How is nmi_pending set late?  The KVM_{G,S}ET_VCPU_EVENTS paths can't set
-it because the current KVM_RUN thread holds the mutex, and the only other
-call to process_nmi() is in the request path of vcpu_enter_guest, which has
-already executed.
+The complexity is not much if you just count lines of code, but I agree
+with you that it's both allowed and more accurate.
 
-> the execution of check_nested_events to not setup correctly
-> for nested.exit_required. A second call to check_nested_events
-> allows the injectable nmi to be detected in time in order to
-> require immediate exit from L2 to L1.
-> 
-> Signed-off-by: Cathy Avery <cavery@redhat.com>
-> ---
->  arch/x86/kvm/x86.c | 15 +++++++++++----
->  1 file changed, 11 insertions(+), 4 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 027dfd278a97..ecfafcd93536 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -7734,10 +7734,17 @@ static int inject_pending_event(struct kvm_vcpu *vcpu)
->  		vcpu->arch.smi_pending = false;
->  		++vcpu->arch.smi_count;
->  		enter_smm(vcpu);
-> -	} else if (vcpu->arch.nmi_pending && kvm_x86_ops.nmi_allowed(vcpu)) {
-> -		--vcpu->arch.nmi_pending;
-> -		vcpu->arch.nmi_injected = true;
-> -		kvm_x86_ops.set_nmi(vcpu);
-> +	} else if (vcpu->arch.nmi_pending) {
-> +		if (is_guest_mode(vcpu) && kvm_x86_ops.check_nested_events) {
-> +			r = kvm_x86_ops.check_nested_events(vcpu);
-> +			if (r != 0)
-> +				return r;
-> +		}
-> +		if (kvm_x86_ops.nmi_allowed(vcpu)) {
-> +			--vcpu->arch.nmi_pending;
-> +			vcpu->arch.nmi_injected = true;
-> +			kvm_x86_ops.set_nmi(vcpu);
-> +		}
->  	} else if (kvm_cpu_has_injectable_intr(vcpu)) {
->  		/*
->  		 * Because interrupts can be injected asynchronously, we are
-> -- 
-> 2.20.1
-> 
+Paolo
+
