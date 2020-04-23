@@ -2,100 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E95591B57D8
-	for <lists+kvm@lfdr.de>; Thu, 23 Apr 2020 11:10:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1FD511B57F4
+	for <lists+kvm@lfdr.de>; Thu, 23 Apr 2020 11:19:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726864AbgDWJKh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Apr 2020 05:10:37 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:25958 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726750AbgDWJKf (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 23 Apr 2020 05:10:35 -0400
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 03N92xMT061717
-        for <kvm@vger.kernel.org>; Thu, 23 Apr 2020 05:10:35 -0400
-Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 30jrxmfsdd-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Thu, 23 Apr 2020 05:10:34 -0400
-Received: from localhost
-        by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <frankja@linux.ibm.com>;
-        Thu, 23 Apr 2020 10:09:46 +0100
-Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
-        by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Thu, 23 Apr 2020 10:09:42 +0100
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 03N9ASEj65470900
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 23 Apr 2020 09:10:28 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 28FD94C052;
-        Thu, 23 Apr 2020 09:10:28 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6FA604C046;
-        Thu, 23 Apr 2020 09:10:27 +0000 (GMT)
-Received: from linux01.pok.stglabs.ibm.com (unknown [9.114.17.81])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 23 Apr 2020 09:10:27 +0000 (GMT)
-From:   Janosch Frank <frankja@linux.ibm.com>
-To:     kvm@vger.kernel.org
-Cc:     thuth@redhat.com, linux-s390@vger.kernel.org, david@redhat.com,
-        borntraeger@de.ibm.com, cohuck@redhat.com
-Subject: [PATCH v2 10/10] s390x: Fix library constant definitions
-Date:   Thu, 23 Apr 2020 05:10:13 -0400
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200423091013.11587-1-frankja@linux.ibm.com>
-References: <20200423091013.11587-1-frankja@linux.ibm.com>
+        id S1726587AbgDWJTk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Apr 2020 05:19:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52000 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725854AbgDWJTk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Apr 2020 05:19:40 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0074CC03C1AF;
+        Thu, 23 Apr 2020 02:19:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=IF166yOm7z3m4Fk7SSrrLKAwHCMS4Qf9u239M1AvMd0=; b=NEv7cR+rgqIf2XOBxiAU9RR9Vs
+        ihCjSWBaJbsum5B6R4ENT5uYOyV4ul60eCJwViQD3oNK2ivAZU/N3oEgK/n9xN8K9f9CW43fHfkgt
+        hgxpQoU30ckQi9kJaAbADimpDHIBwLydqXpm8O3ccaLXNZiGOkA4tZsBPW4MyC+00xsks27Szn1AK
+        pHzaKGgvAQDmJ4WQisG8qDpEdmU00Otf7jMekdWZwrjboExbQQh5ZyYCtxI5ZmGv+2cREn059gQhK
+        amR13oJQKxMRq6inLqNxgqb/K5+1yN631HrSBA9pSYmVXLrrUdQTJHxpq1WaGbtJx5db0XSohzk/Q
+        9aPAUTZQ==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
+        by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1jRY0n-0003XN-Qx; Thu, 23 Apr 2020 09:19:13 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 8CA4330257C;
+        Thu, 23 Apr 2020 11:19:11 +0200 (CEST)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id 469F520C02CD2; Thu, 23 Apr 2020 11:19:11 +0200 (CEST)
+Date:   Thu, 23 Apr 2020 11:19:11 +0200
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Marc Zyngier <maz@kernel.org>, Davidlohr Bueso <dave@stgolabs.net>,
+        tglx@linutronix.de, kvm@vger.kernel.org,
+        Davidlohr Bueso <dbueso@suse.de>,
+        torvalds@linux-foundation.org, bigeasy@linutronix.de,
+        linux-kernel@vger.kernel.org, rostedt@goodmis.org,
+        linux-mips@vger.kernel.org, Paul Mackerras <paulus@ozlabs.org>,
+        joel@joelfernandes.org, will@kernel.org,
+        kvmarm@lists.cs.columbia.edu
+Subject: Re: [PATCH 4/5] kvm: Replace vcpu->swait with rcuwait
+Message-ID: <20200423091911.GP20730@hirez.programming.kicks-ass.net>
+References: <20200422040739.18601-1-dave@stgolabs.net>
+ <20200422040739.18601-5-dave@stgolabs.net>
+ <20200423094140.69909bbb@why>
+ <f07f6f55-9339-04b0-3877-d3240abd6d9c@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-x-cbid: 20042309-4275-0000-0000-000003C51E03
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20042309-4276-0000-0000-000038DAA825
-Message-Id: <20200423091013.11587-11-frankja@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.676
- definitions=2020-04-23_07:2020-04-22,2020-04-23 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 adultscore=0
- spamscore=0 clxscore=1015 suspectscore=1 priorityscore=1501 phishscore=0
- lowpriorityscore=0 mlxlogscore=726 mlxscore=0 malwarescore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2004230070
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f07f6f55-9339-04b0-3877-d3240abd6d9c@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Seems like I uppercased the whole region instead of only the ULs when
-I added those definitions. Let's make the x lowercase again.
+On Thu, Apr 23, 2020 at 10:57:57AM +0200, Paolo Bonzini wrote:
+> On 23/04/20 10:41, Marc Zyngier wrote:
+> >>  
+> >> -	if (swait_active(kvm_arch_vcpu_wq(vcpu)))
+> >> +	if (rcu_dereference(kvm_arch_vpu_get_wait(vcpu)) != NULL)
+> > This doesn't compile (wrong function name, and rcu_dereference takes a
+> > variable). But whatever it would do if we fixed it looks dodgy. it isn't
+> > the rcuwait structure that you want to dereference, but rcuwait->task
+> > (we are checking whether we are called because we are blocking or being
+> > preempted).
+> > 
+> 
+> Yes, I agree.  Replacing swait with rcuwait is all good, but please make
+> the API look the same first.  Just like you added prepare_to_rcuwait and
+> finish_rcuwait, let's add rcuwait_active as well.
+> 
+> Actually let's do it like this:
+> 
+> 1) Davidlohr, please post only patches 1-3 to "equalize" the swait and
+> rcuwait APIs.
+> 
+> 2) Peter, please prepare a topic branch for those, or provide Acked-by
 
-Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
----
- lib/s390x/asm/arch_def.h | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+I don't think I have anything that conflicts with this, so sure, take
+the whole thing through KVM.
 
-diff --git a/lib/s390x/asm/arch_def.h b/lib/s390x/asm/arch_def.h
-index 15a4d49..1b3bb0c 100644
---- a/lib/s390x/asm/arch_def.h
-+++ b/lib/s390x/asm/arch_def.h
-@@ -19,10 +19,10 @@ struct psw {
- #define PSW_MASK_DAT			0x0400000000000000UL
- #define PSW_MASK_PSTATE			0x0001000000000000UL
- 
--#define CR0_EXTM_SCLP			0X0000000000000200UL
--#define CR0_EXTM_EXTC			0X0000000000002000UL
--#define CR0_EXTM_EMGC			0X0000000000004000UL
--#define CR0_EXTM_MASK			0X0000000000006200UL
-+#define CR0_EXTM_SCLP			0x0000000000000200UL
-+#define CR0_EXTM_EXTC			0x0000000000002000UL
-+#define CR0_EXTM_EMGC			0x0000000000004000UL
-+#define CR0_EXTM_MASK			0x0000000000006200UL
- 
- struct lowcore {
- 	uint8_t		pad_0x0000[0x0080 - 0x0000];	/* 0x0000 */
--- 
-2.25.1
+For 1-3 (and I'll send a small niggle for 3 right after this):
 
+Acked-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+
+I'll keep 5 as it is unrelated.
