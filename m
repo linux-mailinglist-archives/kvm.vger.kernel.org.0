@@ -2,163 +2,155 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C15471B5ACF
-	for <lists+kvm@lfdr.de>; Thu, 23 Apr 2020 13:55:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7C47C1B5AE8
+	for <lists+kvm@lfdr.de>; Thu, 23 Apr 2020 13:57:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728197AbgDWLzE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Apr 2020 07:55:04 -0400
-Received: from mail-co1nam11on2052.outbound.protection.outlook.com ([40.107.220.52]:6148
-        "EHLO NAM11-CO1-obe.outbound.protection.outlook.com"
+        id S1728224AbgDWL5c (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Apr 2020 07:57:32 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:47184 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728184AbgDWLzE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Apr 2020 07:55:04 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=N0wqhdlRK6wajcXcZ4pJSck/KFfYrPzFXYmLrBxoC3hqoCsiRMjtS35tAl8LjKRETUnCD1mYAslwBQZFeUAvFXqI+arEQVSsf+uVjcMq0odAgmOBnCjO+bTvk2xDHzve1aX+h25hBAs9miwLjYKM5NQTOfZ2fp1AAGJWlA2WCAVzgtlPRtjkjyD2MNc4dDkO7/GQPIcryZB7s743y7SGuNdJizIJyO6GTzjqRZsCUgPNG7yj2qLBTw6CB8MRwtaXS+KAIXEEc0sipVEAB80yzlj2Iz4RDIwzuOZPcbpE2/QYvmZKj2XVJuvZd6InSDc0kHdDiBmoqtvijtrIhZR2EQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Hd3RMYWdsXRS2su3Vh8lvNSe71o6oYSHooHzyUB2Qzg=;
- b=cJZOg5IFj/KEnUTVOoAzL3Wxcib5W+LtqPbp8tqSXUligz6W1kOFuq/tlWRnslV8KoTrs56mm5LzAayBjve7apCg80T4qCWEldryUOmWTL9f3UGr67aFvW1NIwP34JtB54s9cCcEut7XuXo7ou0h+SVdpugEL8ZiVUGgcIAsRBX5Jxb0EZj2cTJ5BGJjbjUJQBvK2gKd3S2AOX748xc9I31RAuckgLHovq7+aIy5Ba/RDI9uP/HqrDhWSkAzCPnwyK3TWHXioAFAeg7KG5Uk98rKPH0rRyripwIWSOsdCL6VSTgXcKEZ73avi32pdykqejhxsFwu6RkFNgyl6jlfqQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Hd3RMYWdsXRS2su3Vh8lvNSe71o6oYSHooHzyUB2Qzg=;
- b=Gy2ZCptDZ1eOyRE4y1PQaA0BDaA5tBQcKaVXSdINnvkDh8tzQUVQE/JW1nUDuqarCgc7N93u4pmGsH3f281/Sig4OR7XoRoUmC5/8PY6ZuDiSVOk/d2U1uPtTrpQFrphbjfBnKHx7H2EqG+HT0axj0/CxeDvDB8rp+BRANUOILM=
-Authentication-Results: spf=none (sender IP is )
- smtp.mailfrom=Suravee.Suthikulpanit@amd.com; 
-Received: from DM5PR12MB1163.namprd12.prod.outlook.com (2603:10b6:3:7a::18) by
- DM5PR12MB2519.namprd12.prod.outlook.com (2603:10b6:4:b5::22) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2937.13; Thu, 23 Apr 2020 11:55:00 +0000
-Received: from DM5PR12MB1163.namprd12.prod.outlook.com
- ([fe80::d061:4c5:954e:4744]) by DM5PR12MB1163.namprd12.prod.outlook.com
- ([fe80::d061:4c5:954e:4744%4]) with mapi id 15.20.2921.033; Thu, 23 Apr 2020
- 11:55:00 +0000
-Subject: Re: KVM Kernel 5.6+, BUG: stack guard page was hit at
-To:     "Boris V." <borisvk@bstnet.org>, kvm@vger.kernel.org
-References: <fd793edf-a40f-100e-d1ba-a1147659cf17@bstnet.org>
-From:   Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
-Message-ID: <d9c000ab-3288-ecc3-7a3f-e7bac963a398@amd.com>
-Date:   Thu, 23 Apr 2020 18:54:39 +0700
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
- Gecko/20100101 Thunderbird/68.7.0
-In-Reply-To: <fd793edf-a40f-100e-d1ba-a1147659cf17@bstnet.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
+        id S1727014AbgDWL5b (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Apr 2020 07:57:31 -0400
+Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.60])
+        by Forcepoint Email with ESMTP id 31843E061F836E6EF3C0;
+        Thu, 23 Apr 2020 19:57:26 +0800 (CST)
+Received: from [127.0.0.1] (10.173.222.27) by DGGEMS402-HUB.china.huawei.com
+ (10.3.19.202) with Microsoft SMTP Server id 14.3.487.0; Thu, 23 Apr 2020
+ 19:57:17 +0800
+Subject: Re: [PATCH v3 5/6] KVM: arm64: vgic-v3: Retire all pending LPIs on
+ vcpu destroy
+To:     James Morse <james.morse@arm.com>, Marc Zyngier <maz@kernel.org>
+CC:     <linux-arm-kernel@lists.infradead.org>,
+        <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>,
+        Eric Auger <eric.auger@redhat.com>,
+        Andre Przywara <Andre.Przywara@arm.com>,
+        Julien Grall <julien@xen.org>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>
+References: <20200422161844.3848063-1-maz@kernel.org>
+ <20200422161844.3848063-6-maz@kernel.org>
+ <2a0d1542-1964-c818-aae8-76f9227676b8@arm.com>
+From:   Zenghui Yu <yuzenghui@huawei.com>
+Message-ID: <f8c8b60d-f701-28c5-3102-e2ae8804e341@huawei.com>
+Date:   Thu, 23 Apr 2020 19:57:16 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
+MIME-Version: 1.0
+In-Reply-To: <2a0d1542-1964-c818-aae8-76f9227676b8@arm.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: KL1PR0601CA0002.apcprd06.prod.outlook.com
- (2603:1096:802:1::12) To DM5PR12MB1163.namprd12.prod.outlook.com
- (2603:10b6:3:7a::18)
-MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from Suravees-MacBook-Pro.local (2403:6200:8862:1548:45c4:8dc6:180b:453e) by KL1PR0601CA0002.apcprd06.prod.outlook.com (2603:1096:802:1::12) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2937.13 via Frontend Transport; Thu, 23 Apr 2020 11:54:58 +0000
-X-Originating-IP: [2403:6200:8862:1548:45c4:8dc6:180b:453e]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: ea1bbb08-e928-4df5-4c04-08d7e77d266b
-X-MS-TrafficTypeDiagnostic: DM5PR12MB2519:
-X-Microsoft-Antispam-PRVS: <DM5PR12MB2519EE0EDB1913C934BB3700F3D30@DM5PR12MB2519.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:7219;
-X-Forefront-PRVS: 03827AF76E
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM5PR12MB1163.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(136003)(346002)(39860400002)(376002)(396003)(366004)(478600001)(66946007)(6486002)(6666004)(66476007)(66556008)(6512007)(2906002)(8936002)(8676002)(81156014)(316002)(5660300002)(44832011)(52116002)(36756003)(31696002)(86362001)(53546011)(2616005)(6506007)(31686004)(186003)(16526019);DIR:OUT;SFP:1101;
-Received-SPF: None (protection.outlook.com: amd.com does not designate
- permitted sender hosts)
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: dpElQenPVc8gLL0NHxMzbt+L9d0QBhbyypLXGPNS9a2lS10tO+/bT1f7IAozGo2qVxl7CubnatgKcyLFGT8khisBpILYHZ5U6MO2/53pEWFNvoLZaEudMFsdDZV4V0CRwstwA3F8Oyfxk4/7m1rr2WNYjnp+FYQRXS5mrdbYYJ0j+9QEA8HDjZ9MG++tYLBr8WYmehbIMwfovoKkutiFwyyc7QDMTSLDMG5oRHWSya7fJ5uJLsZNQ7IWHFyNYxMnTy/fL4KHJ8hINAFXMjfb36x3DcCSsQmi5Wco+ClVHib0HfCOWjktorIr4reVILig5R4ngleUNzZOXM5AhDrQ92CxJ2CDvd2mgnDyXTfdP+v7GJyLHIvbVVLo3XeYNt9A5Z5fuCrfzoVX4f6O+UkosEo46FNNpV49MmUJao3iL5F6X1GSNRtugRTnCmYXGOKq
-X-MS-Exchange-AntiSpam-MessageData: CwUkSJfZdEUX+Njvj1Oxo9QsqVz9bYG7k1IVldeoOD6cFogKIhSrENDVFpdBTQRCw7SF1lhFEHq9CqTq6lC8YXA5GiZi+JbWJCaH3T8O248ByxTPicT6uvf8wWa7ueF9qx8IRPHkAakGFs7x0mKhUODbnE5TBSFCk1DZMSz5hVvHfPyeFY4SsZKoWNiFmb38e2BnxODzoNXpmgw47IzAhg==
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ea1bbb08-e928-4df5-4c04-08d7e77d266b
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Apr 2020 11:55:00.5515
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 40CR2oYUjxw6vkM74DPlCvIPTVXdJo32d4A/afEoakWF7VHBpgLPipvLnGQVS/QeH+GciP2uWTDahef0dmTrnA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR12MB2519
+X-Originating-IP: [10.173.222.27]
+X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Boris,
+Hi James,
 
-On 4/22/20 12:43 PM, Boris V. wrote:
-> Hello,
+Thanks for having a look and testing it!
+
+On 2020/4/23 19:35, James Morse wrote:
+> Hi Marc, Zenghui,
 > 
-> when running qemu with GPU passthrough it crashes with 5.6 and also 5.7-rc kernels, it works with 5.5 and lower.
-> Without GPU passthrough I don't see this crash.
-> With bisecting, I found commit that causes this BUG.
-> It seems bad commit is f458d039db7e8518041db4169d657407e3217008, if I revert this patch it works.
+> On 22/04/2020 17:18, Marc Zyngier wrote:
+>> From: Zenghui Yu <yuzenghui@huawei.com>
+>>
+>> It's likely that the vcpu fails to handle all virtual interrupts if
+>> userspace decides to destroy it, leaving the pending ones stay in the
+>> ap_list. If the un-handled one is a LPI, its vgic_irq structure will
+>> be eventually leaked because of an extra refcount increment in
+>> vgic_queue_irq_unlock().
+> 
+>> diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
+>> index a963b9d766b73..53ec9b9d9bc43 100644
+>> --- a/virt/kvm/arm/vgic/vgic-init.c
+>> +++ b/virt/kvm/arm/vgic/vgic-init.c
+>> @@ -348,6 +348,12 @@ void kvm_vgic_vcpu_destroy(struct kvm_vcpu *vcpu)
+>>   {
+>>   	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
+>>   
+>> +	/*
+>> +	 * Retire all pending LPIs on this vcpu anyway as we're
+>> +	 * going to destroy it.
+>> +	 */
+> 
+> Looking at the other caller, do we need something like:
+> |	if (vgic_cpu->lpis_enabled)
+> 
+> ?
 
-Could you please try the following patch?
+If LPIs are disabled at redistributor level, yes there should be no
+pending LPIs in the ap_list. But I'm not sure how can the following
+use-after-free BUG be triggered.
 
-Thanks,
-Suravee
+> 
+>> +	vgic_flush_pending_lpis(vcpu);
+>> +
+> 
+> Otherwise, I get this on a gic-v2 machine!:
 
---- BEGIN PATCH ---
-commit 5a605d65a71583195f64d42f39a29c771e2c763a
-Author: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
-Date:   Thu Apr 23 06:40:11 2020 -0500
+I don't have a gic-v2 one and thus can't reproduce it :-(
 
-     kvm: ioapic: Introduce arch-specific check for lazy update EOI mechanism
+> [ 1742.187139] BUG: KASAN: use-after-free in vgic_flush_pending_lpis+0x250/0x2c0
+> [ 1742.194302] Read of size 8 at addr ffff0008e1bf1f28 by task qemu-system-aar/542
+> [ 1742.203140] CPU: 2 PID: 542 Comm: qemu-system-aar Not tainted
+> 5.7.0-rc2-00006-g4fb0f7bb0e27 #2
+> [ 1742.211780] Hardware name: ARM LTD ARM Juno Development Platform/ARM Juno Development
+> Platform, BIOS EDK II Jul 30 2018
+> [ 1742.222596] Call trace:
+> [ 1742.225059]  dump_backtrace+0x0/0x328
+> [ 1742.228738]  show_stack+0x18/0x28
+> [ 1742.232071]  dump_stack+0x134/0x1b0
+> [ 1742.235578]  print_address_description.isra.0+0x6c/0x350
+> [ 1742.240910]  __kasan_report+0x10c/0x180
+> [ 1742.244763]  kasan_report+0x4c/0x68
+> [ 1742.248268]  __asan_report_load8_noabort+0x30/0x48
+> [ 1742.253081]  vgic_flush_pending_lpis+0x250/0x2c0
 
-     commit f458d039db7e ("kvm: ioapic: Lazy update IOAPIC EOI") introduces
-     a regression on Intel VMX APICv since it always force IOAPIC lazy update
-     EOI mechanism when APICv is activated, which is needed to support AMD
-     SVM AVIC.
+Could you please show the result of
 
-     Fixes by introducing struct kvm_arch.use_lazy_eoi variable to specify
-     whether the architecture needs lazy update EOI support.
+./scripts/faddr2line vmlinux vgic_flush_pending_lpis+0x250/0x2c0
 
-     Fixes: f458d039db7e ("kvm: ioapic: Lazy update IOAPIC EOI")
-     Signed-off-by: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
----
-  arch/x86/include/asm/kvm_host.h | 2 ++
-  arch/x86/kvm/ioapic.c           | 3 +++
-  arch/x86/kvm/svm.c              | 1 +
-  3 files changed, 6 insertions(+)
+on your setup?
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index f15e5b3..a760ebd 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -980,6 +980,8 @@ struct kvm_arch {
+> [ 1742.257718]  __kvm_vgic_destroy+0x1cc/0x478
+> [ 1742.261919]  kvm_vgic_destroy+0x30/0x48
+> [ 1742.265773]  kvm_arch_destroy_vm+0x20/0x128
+> [ 1742.269976]  kvm_put_kvm+0x3e0/0x8d0
+> [ 1742.273567]  kvm_vm_release+0x3c/0x60
+> [ 1742.277248]  __fput+0x218/0x630
+> [ 1742.280406]  ____fput+0x10/0x20
+> [ 1742.283565]  task_work_run+0xd8/0x1f0
+> [ 1742.287245]  do_exit+0x87c/0x2640
+> [ 1742.290575]  do_group_exit+0xd0/0x258
+> [ 1742.294254]  __arm64_sys_exit_group+0x3c/0x48
+> [ 1742.298631]  el0_svc_common.constprop.0+0x10c/0x348
+> [ 1742.303529]  do_el0_svc+0x48/0xd0
+> [ 1742.306861]  el0_sync_handler+0x11c/0x1b8
+> [ 1742.310888]  el0_sync+0x158/0x180
+> [ 1742.315716] The buggy address belongs to the page:
+> [ 1742.320529] page:fffffe002366fc40 refcount:0 mapcount:0 mapping:000000007e21d29f index:0x0
+> [ 1742.328821] flags: 0x2ffff00000000000()
+> [ 1742.332678] raw: 2ffff00000000000 0000000000000000 ffffffff23660401 0000000000000000
+> [ 1742.340449] raw: 0000000000000000 0000000000000000 00000000ffffffff 0000000000000000
+> [ 1742.348215] page dumped because: kasan: bad access detected
+> [ 1742.355304] Memory state around the buggy address:
+> [ 1742.360115]  ffff0008e1bf1e00: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+> [ 1742.367360]  ffff0008e1bf1e80: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+> [ 1742.374606] >ffff0008e1bf1f00: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+> [ 1742.381851]                                   ^
+> [ 1742.386399]  ffff0008e1bf1f80: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+> [ 1742.393645]  ffff0008e1bf2000: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+> [ 1742.400889] ==================================================================
+> [ 1742.408132] Disabling lock debugging due to kernel taint
+> 
+> 
+> With that:
+> Reviewed-by: James Morse <james.morse@arm.com>
 
-         struct kvm_pmu_event_filter *pmu_event_filter;
-         struct task_struct *nx_lpage_recovery_thread;
-+
-+       bool use_lazy_eoi;
-  };
+Thanks a lot!
 
-  struct kvm_vm_stat {
-diff --git a/arch/x86/kvm/ioapic.c b/arch/x86/kvm/ioapic.c
-index 750ff0b..baee8793 100644
---- a/arch/x86/kvm/ioapic.c
-+++ b/arch/x86/kvm/ioapic.c
-@@ -188,6 +188,9 @@ static void ioapic_lazy_update_eoi(struct kvm_ioapic *ioapic, int irq)
-         struct kvm_vcpu *vcpu;
-         union kvm_ioapic_redirect_entry *entry = &ioapic->redirtbl[irq];
+Zenghui
 
-+       if (!ioapic->kvm->arch.use_lazy_eoi)
-+               return;
-+
-         kvm_for_each_vcpu(i, vcpu, ioapic->kvm) {
-                 if (!kvm_apic_match_dest(vcpu, NULL, APIC_DEST_NOSHORT,
-                                          entry->fields.dest_id,
-diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
-index 13a5bb4..a3d45ec 100644
---- a/arch/x86/kvm/svm.c
-+++ b/arch/x86/kvm/svm.c
-@@ -2267,6 +2267,7 @@ static int svm_create_vcpu(struct kvm_vcpu *vcpu)
-
-         svm_init_osvw(vcpu);
-         vcpu->arch.microcode_version = 0x01000065;
-+       vcpu->kvm->arch.use_lazy_eoi = true;
-
-         return 0;
-
----- END PATCH ---
