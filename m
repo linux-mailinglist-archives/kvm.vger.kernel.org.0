@@ -2,189 +2,211 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E29531B59D0
-	for <lists+kvm@lfdr.de>; Thu, 23 Apr 2020 13:00:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 23A501B59D4
+	for <lists+kvm@lfdr.de>; Thu, 23 Apr 2020 13:00:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727890AbgDWLAX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Apr 2020 07:00:23 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:43651 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727814AbgDWLAW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Apr 2020 07:00:22 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1587639620;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=20mD5b4K8EOsmpKpysEvWUMgHRYlVlD/chD77TRrBwA=;
-        b=fDk/E5ZCG34p7hXbkQ5Dp6InsLFg3nted2Vmx7nyfb01P+pt5hhj6zLpfFhzxp/whk0NSL
-        CPTNaHxq/LzFzNxGogNyGbLIozjih8/TrSZG2Six9b25kcjnMT3Fj57nM9K+IlSj3Ox7td
-        nCJe0nOvvTzeMSdihXHUbO7rvAnl0+8=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-22-AX58lXq6OJKUhq67lHeDMg-1; Thu, 23 Apr 2020 07:00:13 -0400
-X-MC-Unique: AX58lXq6OJKUhq67lHeDMg-1
-Received: by mail-wr1-f69.google.com with SMTP id m5so2658879wru.15
-        for <kvm@vger.kernel.org>; Thu, 23 Apr 2020 04:00:12 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=20mD5b4K8EOsmpKpysEvWUMgHRYlVlD/chD77TRrBwA=;
-        b=ajgdC5BqDiVMmOJ3+wbynWavOexcG+lAr6rRGu3604Pxosf/Z97uCWZeo1P+8QR4IO
-         5CpTXqhZQ1N25GjLBaKpLkiGV+KLJ6RS6rJGbscBSNQMDXavLMiRfNXrfEQ2mmosdGnp
-         iy54DmWN7MazANC78e5Kpd9IPwYc7jRaxdg+YZogXRcnijMogTPyjLU9Le0zVegHDNg5
-         4+0gd15mpg6dZC7SN2BSCxROw9ikv3BOH8rTFrrq9/z+hiyN3ds2lLWwwJ4EfIyNMXyA
-         aujd1XCWpuUPN06DDuBm1Nong6xJvv4Pq5JUuMOXPDGdbm4x5poARpuopnQiUiW612pD
-         gByA==
-X-Gm-Message-State: AGi0PubE6aLaBVjKVnfnejeZsb0mY8NmDvvVU++fP5sf/woXb7r8Xc75
-        nFdvpI2gO8Dv6g5eUWmGXu2+MPstsQqC43GVnWq+2GvN3fMjo/8K79ydbUvnOjTz6lmoO6veHiR
-        EH5JhFEPxjzH8
-X-Received: by 2002:adf:97d0:: with SMTP id t16mr4055795wrb.138.1587639611836;
-        Thu, 23 Apr 2020 04:00:11 -0700 (PDT)
-X-Google-Smtp-Source: APiQypJ8SqSh9o6yckWbzkNCOCPSjoQm/m/ViZdLrbvlLCIMHDoLGQ8GJlTCvLpolt8yzkBiY2WRuQ==
-X-Received: by 2002:adf:97d0:: with SMTP id t16mr4055767wrb.138.1587639611556;
-        Thu, 23 Apr 2020 04:00:11 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:d0a0:f143:e9e4:2926? ([2001:b07:6468:f312:d0a0:f143:e9e4:2926])
-        by smtp.gmail.com with ESMTPSA id l19sm3348599wmj.14.2020.04.23.04.00.09
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 23 Apr 2020 04:00:11 -0700 (PDT)
-Subject: Re: [PATCH 12/13] KVM: x86: Replace late check_nested_events() hack
- with more precise fix
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Oliver Upton <oupton@google.com>,
-        Peter Shier <pshier@google.com>
-References: <20200423022550.15113-1-sean.j.christopherson@intel.com>
- <20200423022550.15113-13-sean.j.christopherson@intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <f766789e-7444-ab0d-4364-0c14ec7154b1@redhat.com>
-Date:   Thu, 23 Apr 2020 13:00:08 +0200
+        id S1727918AbgDWLAm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Apr 2020 07:00:42 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:43948 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726805AbgDWLAm (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 23 Apr 2020 07:00:42 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 03NAW5gm092813
+        for <kvm@vger.kernel.org>; Thu, 23 Apr 2020 07:00:41 -0400
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 30gmua8sam-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Thu, 23 Apr 2020 07:00:41 -0400
+Received: from localhost
+        by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
+        Thu, 23 Apr 2020 12:00:32 +0100
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
+        by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Thu, 23 Apr 2020 12:00:22 +0100
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 03NB0RJX46792854
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 23 Apr 2020 11:00:27 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2A7EA4C071;
+        Thu, 23 Apr 2020 11:00:27 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 8B7784C04E;
+        Thu, 23 Apr 2020 11:00:25 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.145.69.15])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu, 23 Apr 2020 11:00:25 +0000 (GMT)
+Subject: Re: [PATCH v2 1/7] KVM: s390: clean up redundant 'kvm_run' parameters
+To:     Tianjia Zhang <tianjia.zhang@linux.alibaba.com>,
+        Cornelia Huck <cohuck@redhat.com>
+Cc:     pbonzini@redhat.com, tsbogend@alpha.franken.de, paulus@ozlabs.org,
+        mpe@ellerman.id.au, benh@kernel.crashing.org,
+        frankja@linux.ibm.com, david@redhat.com, heiko.carstens@de.ibm.com,
+        gor@linux.ibm.com, sean.j.christopherson@intel.com,
+        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+        joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, x86@kernel.org, hpa@zytor.com, maz@kernel.org,
+        james.morse@arm.com, julien.thierry.kdev@gmail.com,
+        suzuki.poulose@arm.com, christoffer.dall@arm.com,
+        peterx@redhat.com, thuth@redhat.com, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        linux-mips@vger.kernel.org, kvm-ppc@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20200422125810.34847-1-tianjia.zhang@linux.alibaba.com>
+ <20200422125810.34847-2-tianjia.zhang@linux.alibaba.com>
+ <20200422154543.2efba3dd.cohuck@redhat.com>
+ <dc5e0fa3-558b-d606-bda9-ed281cf9e9ae@de.ibm.com>
+ <20200422180403.03f60b0c.cohuck@redhat.com>
+ <5e1e126d-f1b0-196c-594b-4289d0afb9a8@linux.alibaba.com>
+ <20200423123901.72a4c6a4.cohuck@redhat.com>
+ <71344f73-c34f-a373-49d1-5d839c6be5f6@linux.alibaba.com>
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+ nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
+Date:   Thu, 23 Apr 2020 13:00:25 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20200423022550.15113-13-sean.j.christopherson@intel.com>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <71344f73-c34f-a373-49d1-5d839c6be5f6@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 20042311-0028-0000-0000-000003FD8840
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20042311-0029-0000-0000-000024C352F5
+Message-Id: <1d73b700-4a20-3d7a-66d1-29b5afa03f4d@de.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.676
+ definitions=2020-04-23_07:2020-04-22,2020-04-23 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0
+ priorityscore=1501 spamscore=0 lowpriorityscore=0 adultscore=0
+ impostorscore=0 mlxscore=0 malwarescore=0 suspectscore=0 mlxlogscore=999
+ clxscore=1015 phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2004230078
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 23/04/20 04:25, Sean Christopherson wrote:
-> Add a separate hook for checking if interrupt injection is blocked and
-> use the hook to handle the case where an interrupt arrives between
-> check_nested_events() and the injection logic.  Drop the retry of
-> check_nested_events() that hack-a-fixed the same condition.
-> 
-> Blocking injection is also a bit of a hack, e.g. KVM should do exiting
-> and non-exiting interrupt processing in a single pass, but it's a more
-> precise hack.  The old comment is also misleading, e.g. KVM_REQ_EVENT is
-> purely an optimization, setting it on every run loop (which KVM doesn't
-> do) should not affect functionality, only performance.
-> 
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> ---
->  arch/x86/include/asm/kvm_host.h |  1 +
->  arch/x86/kvm/svm/svm.c          |  1 +
->  arch/x86/kvm/vmx/vmx.c          | 13 +++++++++++++
->  arch/x86/kvm/x86.c              | 22 ++++------------------
->  4 files changed, 19 insertions(+), 18 deletions(-)
-> 
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 787636acd648..16fdeddb4a65 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -1140,6 +1140,7 @@ struct kvm_x86_ops {
->  	void (*queue_exception)(struct kvm_vcpu *vcpu);
->  	void (*cancel_injection)(struct kvm_vcpu *vcpu);
->  	bool (*interrupt_allowed)(struct kvm_vcpu *vcpu);
-> +	bool (*interrupt_injection_allowed)(struct kvm_vcpu *vcpu);
->  	bool (*nmi_allowed)(struct kvm_vcpu *vcpu);
->  	bool (*get_nmi_mask)(struct kvm_vcpu *vcpu);
->  	void (*set_nmi_mask)(struct kvm_vcpu *vcpu, bool masked);
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index f21f734861dd..6d3ccbfc9e6a 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -3993,6 +3993,7 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
->  	.queue_exception = svm_queue_exception,
->  	.cancel_injection = svm_cancel_injection,
->  	.interrupt_allowed = svm_interrupt_allowed,
-> +	.interrupt_injection_allowed = svm_interrupt_allowed,
->  	.nmi_allowed = svm_nmi_allowed,
->  	.get_nmi_mask = svm_get_nmi_mask,
->  	.set_nmi_mask = svm_set_nmi_mask,
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 2f8cacb3aa9b..68b3748b5383 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -4550,6 +4550,18 @@ static bool vmx_interrupt_allowed(struct kvm_vcpu *vcpu)
->  	return !vmx_interrupt_blocked(vcpu);
->  }
->  
-> +static bool vmx_interrupt_injection_allowed(struct kvm_vcpu *vcpu)
-> +{
-> +	/*
-> +	 * An IRQ must not be injected into L2 if it's supposed to VM-Exit,
-> +	 * e.g. if the IRQ arrived asynchronously after checking nested events.
-> +	 */
-> +	if (is_guest_mode(vcpu) && nested_exit_on_intr(vcpu))
-> +		return false;
-> +
-> +	return vmx_interrupt_allowed(vcpu);
-> +}
-> +
->  static int vmx_set_tss_addr(struct kvm *kvm, unsigned int addr)
->  {
->  	int ret;
-> @@ -7823,6 +7835,7 @@ static struct kvm_x86_ops vmx_x86_ops __initdata = {
->  	.queue_exception = vmx_queue_exception,
->  	.cancel_injection = vmx_cancel_injection,
->  	.interrupt_allowed = vmx_interrupt_allowed,
-> +	.interrupt_injection_allowed = vmx_interrupt_injection_allowed,
->  	.nmi_allowed = vmx_nmi_allowed,
->  	.get_nmi_mask = vmx_get_nmi_mask,
->  	.set_nmi_mask = vmx_set_nmi_mask,
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 7c49a7dc601f..d9d6028a77e0 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -7755,24 +7755,10 @@ static int inject_pending_event(struct kvm_vcpu *vcpu)
->  		--vcpu->arch.nmi_pending;
->  		vcpu->arch.nmi_injected = true;
->  		kvm_x86_ops.set_nmi(vcpu);
-> -	} else if (kvm_cpu_has_injectable_intr(vcpu)) {
-> -		/*
-> -		 * Because interrupts can be injected asynchronously, we are
-> -		 * calling check_nested_events again here to avoid a race condition.
-> -		 * See https://lkml.org/lkml/2014/7/2/60 for discussion about this
-> -		 * proposal and current concerns.  Perhaps we should be setting
-> -		 * KVM_REQ_EVENT only on certain events and not unconditionally?
-> -		 */
-> -		if (is_guest_mode(vcpu) && kvm_x86_ops.check_nested_events) {
-> -			r = kvm_x86_ops.check_nested_events(vcpu);
-> -			if (r != 0)
-> -				return r;
-> -		}
-> -		if (kvm_x86_ops.interrupt_allowed(vcpu)) {
-> -			kvm_queue_interrupt(vcpu, kvm_cpu_get_interrupt(vcpu),
-> -					    false);
-> -			kvm_x86_ops.set_irq(vcpu);
-> -		}
-> +	} else if (kvm_cpu_has_injectable_intr(vcpu) &&
-> +		   kvm_x86_ops.interrupt_injection_allowed(vcpu)) {
-> +		kvm_queue_interrupt(vcpu, kvm_cpu_get_interrupt(vcpu), false);
-> +		kvm_x86_ops.set_irq(vcpu);
 
-Hmm I'm interested in how this can help with AMD introducing another
-instance of the late random check_nested_events.  I'll play with it.
 
-Paolo
+On 23.04.20 12:58, Tianjia Zhang wrote:
+> 
+> 
+> On 2020/4/23 18:39, Cornelia Huck wrote:
+>> On Thu, 23 Apr 2020 11:01:43 +0800
+>> Tianjia Zhang <tianjia.zhang@linux.alibaba.com> wrote:
+>>
+>>> On 2020/4/23 0:04, Cornelia Huck wrote:
+>>>> On Wed, 22 Apr 2020 17:58:04 +0200
+>>>> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+>>>>   
+>>>>> On 22.04.20 15:45, Cornelia Huck wrote:
+>>>>>> On Wed, 22 Apr 2020 20:58:04 +0800
+>>>>>> Tianjia Zhang <tianjia.zhang@linux.alibaba.com> wrote:
+>>>>>>      
+>>>>>>> In the current kvm version, 'kvm_run' has been included in the 'kvm_vcpu'
+>>>>>>> structure. Earlier than historical reasons, many kvm-related function
+>>>>>>
+>>>>>> s/Earlier than/For/ ?
+>>>>>>      
+>>>>>>> parameters retain the 'kvm_run' and 'kvm_vcpu' parameters at the same time.
+>>>>>>> This patch does a unified cleanup of these remaining redundant parameters.
+>>>>>>>
+>>>>>>> Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+>>>>>>> ---
+>>>>>>>    arch/s390/kvm/kvm-s390.c | 37 ++++++++++++++++++++++---------------
+>>>>>>>    1 file changed, 22 insertions(+), 15 deletions(-)
+>>>>>>>
+>>>>>>> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+>>>>>>> index e335a7e5ead7..d7bb2e7a07ff 100644
+>>>>>>> --- a/arch/s390/kvm/kvm-s390.c
+>>>>>>> +++ b/arch/s390/kvm/kvm-s390.c
+>>>>>>> @@ -4176,8 +4176,9 @@ static int __vcpu_run(struct kvm_vcpu *vcpu)
+>>>>>>>        return rc;
+>>>>>>>    }
+>>>>>>>    -static void sync_regs_fmt2(struct kvm_vcpu *vcpu, struct kvm_run *kvm_run)
+>>>>>>> +static void sync_regs_fmt2(struct kvm_vcpu *vcpu)
+>>>>>>>    {
+>>>>>>> +    struct kvm_run *kvm_run = vcpu->run;
+>>>>>>>        struct runtime_instr_cb *riccb;
+>>>>>>>        struct gs_cb *gscb;
+>>>>>>>    @@ -4235,7 +4236,7 @@ static void sync_regs_fmt2(struct kvm_vcpu *vcpu, struct kvm_run *kvm_run)
+>>>>>>>            }
+>>>>>>>            if (vcpu->arch.gs_enabled) {
+>>>>>>>                current->thread.gs_cb = (struct gs_cb *)
+>>>>>>> -                        &vcpu->run->s.regs.gscb;
+>>>>>>> +                        &kvm_run->s.regs.gscb;
+>>>>>>
+>>>>>> Not sure if these changes (vcpu->run-> => kvm_run->) are really worth
+>>>>>> it. (It seems they amount to at least as much as the changes advertised
+>>>>>> in the patch description.)
+>>>>>>
+>>>>>> Other opinions?
+>>>>>
+>>>>> Agreed. It feels kind of random. Maybe just do the first line (move kvm_run from the
+>>>>> function parameter list into the variable declaration)? Not sure if this is better.
+>>>>>   
+>>>>
+>>>> There's more in this patch that I cut... but I think just moving
+>>>> kvm_run from the parameter list would be much less disruptive.
+>>>>    
+>>>
+>>> I think there are two kinds of code(`vcpu->run->` and `kvm_run->`), but
+>>> there will be more disruptive, not less.
+>>
+>> I just fail to see the benefit; sure, kvm_run-> is convenient, but the
+>> current code is just fine, and any rework should be balanced against
+>> the cost (e.g. cluttering git annotate).
+>>
+> 
+> cluttering git annotate ? Does it mean Fix xxxx ("comment"). Is it possible to solve this problem by splitting this patch?
+
+No its about breaking git blame (and bugfix backports) for just a cosmetic improvement.
+And I agree with Conny: the cost is higher than the benefit.
 
