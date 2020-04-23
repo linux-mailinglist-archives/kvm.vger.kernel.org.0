@@ -2,77 +2,211 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 087B91B64E0
-	for <lists+kvm@lfdr.de>; Thu, 23 Apr 2020 21:58:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 98E5B1B651F
+	for <lists+kvm@lfdr.de>; Thu, 23 Apr 2020 22:05:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726141AbgDWT6c (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Apr 2020 15:58:32 -0400
-Received: from mga18.intel.com ([134.134.136.126]:35340 "EHLO mga18.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726079AbgDWT6c (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Apr 2020 15:58:32 -0400
-IronPort-SDR: qCbgURd+SVEA0sJQcTxaeoHO83tek0GEO6eC9IHLLqdSZvkeFyi9EROnwVu05dpoHycqlHPW4M
- GxCuOpTStREg==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Apr 2020 12:58:31 -0700
-IronPort-SDR: 61y+Tqkj45fICIepaEaNB/FU7yJ5pDT+LGDxH4t5zv6XlgtPqoka3ikmi1lhSda6U2q2w+ITvk
- zkg2Onc7LRPA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,309,1583222400"; 
-   d="scan'208";a="259539857"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
-  by orsmga006.jf.intel.com with ESMTP; 23 Apr 2020 12:58:31 -0700
-Date:   Thu, 23 Apr 2020 12:58:31 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Makarand Sonare <makarandsonare@google.com>
-Cc:     kvm@vger.kernel.org, Peter Shier <pshier@google.com>,
-        Jim Mattson <jmattson@google.com>
-Subject: Re: [kvm PATCH] KVM: nVMX - enable VMX preemption timer migration
-Message-ID: <20200423195831.GR17824@linux.intel.com>
-References: <20200422205030.84476-1-makarandsonare@google.com>
- <20200423153359.GB17824@linux.intel.com>
- <CA+qz5spBA0HiXbvtZ-7bvfvf20HbfVaV0UrXF=NOGMA1ptuTHg@mail.gmail.com>
+        id S1726200AbgDWUFx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Apr 2020 16:05:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40198 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726181AbgDWUFx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Apr 2020 16:05:53 -0400
+Received: from mail-qt1-x844.google.com (mail-qt1-x844.google.com [IPv6:2607:f8b0:4864:20::844])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C349C09B045
+        for <kvm@vger.kernel.org>; Thu, 23 Apr 2020 13:05:52 -0700 (PDT)
+Received: by mail-qt1-x844.google.com with SMTP id i68so6014678qtb.5
+        for <kvm@vger.kernel.org>; Thu, 23 Apr 2020 13:05:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=OGu+H9Gxb4tDFOp8fw7exxKfo/lmw1deEj+U+KuzxgA=;
+        b=esGb0qsr8S2R0qKpqcjD9DwR12EsySXYgYnUu0i6LoNRLHfDiOcOGOfE1ip57oJT4I
+         9JoZdQywHPq8WwQZyKjBCegka9UlyLCmBj/4PJ2gTi9a1GRLgmw1lBi6/67XfkoxHjtF
+         QIDZSX0x/NjOMGXbmKkpw1qlMTexOynEVkORye9X4iR4JffO3n+BQYmExdQpvKUWvZ5u
+         CQLLPjUzxy3QmpI3ZMjz32ZbvpMtFduWvOuy/c3rIPw+SnUda5vZIqDGmqcKqF9nOQ7n
+         UUzZg3Fom3EvQGVr7dk46QzhEHMVshgJI+0kEysmMee+yWRtbMmfLghZXzmWbJ8uNisB
+         QjMw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=OGu+H9Gxb4tDFOp8fw7exxKfo/lmw1deEj+U+KuzxgA=;
+        b=Ra1S0XW+gVWrjvtPoPIayiHIHW8Qpc1g611yZ6OCreYakf+qPt4hJJDT0icj/PwiKb
+         6kO7uErPqbq41Vx73Vq3KpedJc8iKXr55jQFzR4i7ffmaIPjcZMod679X7FUMjeL/iv+
+         69FuWSVOyYede5QrUxn+ls3IcD2vQI/2UPWddpqNPYo90H1+Qj0EGXOewC/0ChLA8dYe
+         eeV52ZH67uib1t+XG8iZfnpKzfqmUSY+w5pTtKONA4x7J/i8JOZQtZEiuKbWAZ6rGHp9
+         gFq80LWPjwQEbOdISOmsXHmenkjeCgnBqaZw2YyuCNiIQOkgI/zScqIjRQ2OueJJMfIy
+         IFvw==
+X-Gm-Message-State: AGi0PuZiyfVf0TzWNivoL0YdRSZ4YaP75VzM8wn+smqg9Y6xxJvjtZdo
+        mtmm7JQgYzv91cbr4Rwk+2oUKw==
+X-Google-Smtp-Source: APiQypKgTkhoslLa1VaSlI6+/e0Q/twNfuGjIX2/4S0TUHP9uXc8vJs6MhROT+wFJvVo/Suzu/usIg==
+X-Received: by 2002:ac8:2c66:: with SMTP id e35mr5990474qta.188.1587672351308;
+        Thu, 23 Apr 2020 13:05:51 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-142-68-57-212.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.57.212])
+        by smtp.gmail.com with ESMTPSA id 70sm2291707qkh.67.2020.04.23.13.04.46
+        (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
+        Thu, 23 Apr 2020 13:05:17 -0700 (PDT)
+Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1jRi5M-0007gM-Ow; Thu, 23 Apr 2020 17:04:36 -0300
+Date:   Thu, 23 Apr 2020 17:04:36 -0300
+From:   Jason Gunthorpe <jgg@ziepe.ca>
+To:     Dave Jiang <dave.jiang@intel.com>
+Cc:     vkoul@kernel.org, megha.dey@linux.intel.com, maz@kernel.org,
+        bhelgaas@google.com, rafael@kernel.org, gregkh@linuxfoundation.org,
+        tglx@linutronix.de, hpa@zytor.com, alex.williamson@redhat.com,
+        jacob.jun.pan@intel.com, ashok.raj@intel.com, yi.l.liu@intel.com,
+        baolu.lu@intel.com, kevin.tian@intel.com, sanjay.k.kumar@intel.com,
+        tony.luck@intel.com, jing.lin@intel.com, dan.j.williams@intel.com,
+        kwankhede@nvidia.com, eric.auger@redhat.com, parav@mellanox.com,
+        dmaengine@vger.kernel.org, linux-kernel@vger.kernel.org,
+        x86@kernel.org, linux-pci@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH RFC 07/15] Documentation: Interrupt Message store
+Message-ID: <20200423200436.GA29181@ziepe.ca>
+References: <158751095889.36773.6009825070990637468.stgit@djiang5-desk3.ch.intel.com>
+ <158751207000.36773.18208950543781892.stgit@djiang5-desk3.ch.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CA+qz5spBA0HiXbvtZ-7bvfvf20HbfVaV0UrXF=NOGMA1ptuTHg@mail.gmail.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <158751207000.36773.18208950543781892.stgit@djiang5-desk3.ch.intel.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Please read through Thomas' diatribe^W comments on top-posting and HTML
-email[*].  I appreciate that it can be frustrating to configure and get
-used to, especially in a corporate environment, but it really does help
-get your code upstreamed.
+On Tue, Apr 21, 2020 at 04:34:30PM -0700, Dave Jiang wrote:
 
-https://people.kernel.org/tglx/notes-about-netiquette
+> diff --git a/Documentation/ims-howto.rst b/Documentation/ims-howto.rst
+> new file mode 100644
+> index 000000000000..a18de152b393
+> +++ b/Documentation/ims-howto.rst
+> @@ -0,0 +1,210 @@
+> +.. SPDX-License-Identifier: GPL-2.0
+> +.. include:: <isonum.txt>
+> +
+> +==========================
+> +The IMS Driver Guide HOWTO
+> +==========================
+> +
+> +:Authors: Megha Dey
+> +
+> +:Copyright: 2020 Intel Corporation
+> +
+> +About this guide
+> +================
+> +
+> +This guide describes the basics of Interrupt Message Store (IMS), the
+> +need to introduce a new interrupt mechanism, implementation details of
+> +IMS in the kernel, driver changes required to support IMS and the general
+> +misconceptions and FAQs associated with IMS.
 
-On Thu, Apr 23, 2020 at 11:48:34AM -0700, Makarand Sonare wrote:
-> Thanks for the feedback!
-> *>>Any plans to enhance the vmx_set_nested_state_test.c to verify this
-> works as intended?*
-> I am working on writing the test as part of state_test.c as that test
-> already has the nested state save/restore logic.
-> 
-> *>>Build tested only, but {get,put}_user() compiles just fine, as
-> requested.*
-> The impacted functions are using copy_to_user/copy_from_user already so I
-> used the same for consistency.
+I'm not sure why we need to call this IMS in kernel documentat? I know
+Intel is using this term, but this document is really only talking
+about extending the existing platform_msi stuff, which looks pretty
+good actually.
 
-That's because they're copying complex structures that don't fit in a
-single memory access.
+A lot of this is good for the cover letter..
 
-> I will send a v3 PATCH after incorporating rest of the feedback.
+> +Implementation of IMS in the kernel
+> +===================================
+> +
+> +The Linux kernel today already provides a generic mechanism to support
+> +non-PCI compliant MSI interrupts for platform devices (platform-msi.c).
+> +To support IMS interrupts, we create a new IMS IRQ domain and extend the
+> +existing infrastructure. Dynamic allocation of IMS vectors is a requirement
+> +for devices which support Scalable I/O Virtualization. A driver can allocate
+> +and free vectors not just once during probe (as was the case with MSI/MSI-X)
+> +but also in the post probe phase where actual demand is available. Thus, a
+> +new API, platform_msi_domain_alloc_irqs_group is introduced which drivers
+> +using IMS would be able to call multiple times. The vectors allocated each
+> +time this API is called are associated with a group ID. To free the vectors
+> +associated with a particular group, the platform_msi_domain_free_irqs_group
+> +API can be called. The existing drivers using platform-msi infrastructure
+> +will continue to use the existing alloc (platform_msi_domain_alloc_irqs)
+> +and free (platform_msi_domain_free_irqs) APIs and are assigned a default
+> +group ID of 0.
+> +
+> +Thus, platform-msi.c provides the generic methods which can be used by any
+> +non-pci MSI interrupt type while the newly created ims-msi.c provides IMS
+> +specific callbacks that can be used by drivers capable of generating IMS
+> +interrupts. 
 
-In the future, please give folks a chance to digest and respond before
-spinning another version, especially when there is disagreement over which
-direction to take.  E.g. the above {get,put}_user() thing is easy to sort
-out with a few back-and-forth mails.  Sending v3 prematurely (and v2 for
-that matter) means that closing that discussion requires tracking down the
-new version and providing the necessary context.  Which, as an aside, is
-why trimming mails and bottom-posting is helpful as it allows the scope of
-the conversation to be narrowed to the remaining opens.
+How exactly is an IMS interrupt is different from a platform msi?
+
+It looks like it is just some thin wrapper around msi_domain - what is
+it for?
+
+> +FAQs and general misconceptions:
+> +================================
+> +
+> +** There were some concerns raised by Thomas Gleixner and Marc Zyngier
+> +during Linux plumbers conference 2019:
+> +
+> +1. Enumeration of IMS needs to be done by PCI core code and not by
+> +   individual device drivers:
+> +
+> +   Currently, if the kernel needs a generic way to discover IMS capability
+> +   without host driver dependency, the PCIE Designated Vendor specific
+> +
+> +   However, we cannot have a standard way of enumerating the IMS size
+> +   because for context based devices, the interrupt message is part of
+> +   the context itself which is managed entirely by the driver. Since
+> +   context creation is done on demand, there is no way to tell during boot
+> +   time, the maximum number of contexts (and hence the number of interrupt
+> +   messages)that the device can support.
+
+FWIW, I agree with this.
+
+Like platform-msi, IMS should be controlled entirely by the driver.
+
+> +2. Why is Intel designing a new interrupt mechanism rather than extending
+> +   MSI-X to address its limitations? Isn't 2048 device interrupts enough?
+> +
+> +   MSI-X has a rigid definition of one-table and on-device storage and does
+> +   not provide the full flexibility required for future multi-tile
+> +   accelerator designs.
+> +   IMS was envisioned to be used with large number of ADIs in devices where
+> +   each will need unique interrupt resources. For example, a DSA shared
+> +   work queue can support large number of clients where each client can
+> +   have its own interrupt. In future, with user interrupts, we expect the
+> +   demand for messages to increase further.
+
+Generally agree
+
+> +Device Driver Changes:
+> +=====================
+> +
+> +1. platform_msi_domain_alloc_irqs_group (struct device *dev, unsigned int
+> +   nvec, const struct platform_msi_ops *platform_ops, int *group_id)
+> +   to allocate IMS interrupts, where:
+> +
+> +   dev: The device for which to allocate interrupts
+> +   nvec: The number of interrupts to allocate
+> +   platform_ops: Callbacks for platform MSI ops (to be provided by driver)
+> +   group_id: returned by the call, to be used to free IRQs of a certain type
+> +
+> +   eg: static struct platform_msi_ops ims_ops  = {
+> +        .irq_mask               = ims_irq_mask,
+> +        .irq_unmask             = ims_irq_unmask,
+> +        .write_msg              = ims_write_msg,
+> +        };
+> +
+> +        int group;
+> +        platform_msi_domain_alloc_irqs_group (dev, nvec, platform_ops, &group)
+> +
+> +   where, struct platform_msi_ops:
+> +   irq_mask:   mask an interrupt source
+> +   irq_unmask: unmask an interrupt source
+> +   irq_write_msi_msg: write message content
+> +
+> +   This API can be called multiple times. Every time a new group will be
+> +   associated with the allocated vectors. Group ID starts from 0.
+
+Need much more closer look, but this seems conceptually fine to me.
+
+As above the API here is called platform_msi - which seems good to
+me. Again not sure why the word IMS is needed
+
+Jason
