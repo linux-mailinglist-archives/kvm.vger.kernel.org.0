@@ -2,192 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AA22D1B57AA
-	for <lists+kvm@lfdr.de>; Thu, 23 Apr 2020 11:02:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 677281B57CB
+	for <lists+kvm@lfdr.de>; Thu, 23 Apr 2020 11:10:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726955AbgDWJCN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Apr 2020 05:02:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49260 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726947AbgDWJCL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Apr 2020 05:02:11 -0400
-Received: from mail-pf1-x444.google.com (mail-pf1-x444.google.com [IPv6:2607:f8b0:4864:20::444])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7059C03C1AF;
-        Thu, 23 Apr 2020 02:02:11 -0700 (PDT)
-Received: by mail-pf1-x444.google.com with SMTP id w65so2616619pfc.12;
-        Thu, 23 Apr 2020 02:02:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=kNkf65SCsLjjC7xn3ioH056ZuzoCRKgE8pf6nd0QUo4=;
-        b=msclw6SVWQ8CdgFubQUWR2b0aIGCHDpDlfVkEj+rh/BlhSwevdMfNcpOxfdpeixECk
-         2W7+rEKVeRBcpFlQBNqYRMsxtua2eYuVEAWFg5g5YYAt5DwFpWGQ2FJSJy+y49RsgOXH
-         hDJB0XfgWcv7trxfn8pIzBeJlr1HI/IVevtVeXz1OKeXTJAaGzIVrnbatblznfoNlRx6
-         wfiyotX+seQcar5Rswq/Fj/CYZ19Nvi0aJwudkE9GdsmSfzIbGunrAy/ojgDPSpjoRWr
-         VhZNKODSkFu8edrhkAnlwPy6gfqAEOliqvb5zdwU/rrv77QXdkD8UKdmMs/ruCYoNa5j
-         LPPA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references;
-        bh=kNkf65SCsLjjC7xn3ioH056ZuzoCRKgE8pf6nd0QUo4=;
-        b=NGQ3fEFtVAAY32ZUIxCKPRVkPuA2y4tNy/WCIn9aO6OMn+DnsGVBHCixN9PsHiEx0M
-         6ItpAFP7RITvxK+CmQiHEoVG1sOjBXDo8CMVpwnGAPC51R21C8t+X5I7kFDjZnrcrS1V
-         oPfVHUPWtohQct5d52blJ1YaQH28vM2zj+7p2tuKIMzWu3G4niX8D0mVk+gCrmWoBAsC
-         kO1/lpGklYFjJcApLzTGrPA0GT6MXyU6OUBZjINapDmP0zWqNoQYkkVy54t+YxZMtnbU
-         OT0tER2/vBJARv6zXhLb+5ym3xOjndCX2v9wZpImEO4+Ry9auZogWl15Pi6E/Nf6Qko3
-         qshw==
-X-Gm-Message-State: AGi0PuZNU8zqBUNOLb4j7y/bN7oDGNGoKDGemcbDi6RFxU97bO+3jHVN
-        hVzXUUInaUhE922VEZV3ESel7MHG
-X-Google-Smtp-Source: APiQypLuMYVTXL3yfaUKBicdNeJwz2OnR0h/FLV1EDzHT8f4cJ+x7RMj7RE70fFLxrU/XPdgXOEBfg==
-X-Received: by 2002:a62:15c5:: with SMTP id 188mr2650761pfv.66.1587632531069;
-        Thu, 23 Apr 2020 02:02:11 -0700 (PDT)
-Received: from localhost.localdomain ([103.7.29.6])
-        by smtp.googlemail.com with ESMTPSA id w28sm1574204pgc.26.2020.04.23.02.02.08
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 23 Apr 2020 02:02:10 -0700 (PDT)
-From:   Wanpeng Li <kernellwp@gmail.com>
-X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Haiwei Li <lihaiwei@tencent.com>
-Subject: [PATCH v2 5/5] KVM: VMX: Handle preemption timer fastpath
-Date:   Thu, 23 Apr 2020 17:01:47 +0800
-Message-Id: <1587632507-18997-6-git-send-email-wanpengli@tencent.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1587632507-18997-1-git-send-email-wanpengli@tencent.com>
-References: <1587632507-18997-1-git-send-email-wanpengli@tencent.com>
+        id S1726474AbgDWJK1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Apr 2020 05:10:27 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:23356 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725854AbgDWJK1 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 23 Apr 2020 05:10:27 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 03N98pF5066305
+        for <kvm@vger.kernel.org>; Thu, 23 Apr 2020 05:10:25 -0400
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 30k7rkrsew-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Thu, 23 Apr 2020 05:10:25 -0400
+Received: from localhost
+        by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <frankja@linux.ibm.com>;
+        Thu, 23 Apr 2020 10:10:17 +0100
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
+        by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Thu, 23 Apr 2020 10:10:14 +0100
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 03N9AJZ566912396
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 23 Apr 2020 09:10:19 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 960AB4C040;
+        Thu, 23 Apr 2020 09:10:19 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id DC5424C066;
+        Thu, 23 Apr 2020 09:10:18 +0000 (GMT)
+Received: from linux01.pok.stglabs.ibm.com (unknown [9.114.17.81])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu, 23 Apr 2020 09:10:18 +0000 (GMT)
+From:   Janosch Frank <frankja@linux.ibm.com>
+To:     kvm@vger.kernel.org
+Cc:     thuth@redhat.com, linux-s390@vger.kernel.org, david@redhat.com,
+        borntraeger@de.ibm.com, cohuck@redhat.com
+Subject: [PATCH v2 00/10] s390x: smp: Improve smp code part 2
+Date:   Thu, 23 Apr 2020 05:10:03 -0400
+X-Mailer: git-send-email 2.25.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 20042309-0028-0000-0000-000003FD7B07
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20042309-0029-0000-0000-000024C3455C
+Message-Id: <20200423091013.11587-1-frankja@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.676
+ definitions=2020-04-23_07:2020-04-22,2020-04-23 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ priorityscore=1501 clxscore=1015 mlxscore=0 mlxlogscore=518 adultscore=0
+ bulkscore=0 impostorscore=0 malwarescore=0 suspectscore=0 spamscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2004230070
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Wanpeng Li <wanpengli@tencent.com>
+Let's continue cleaning up the smp test and smp related functions.
 
-This patch implements handle preemption timer fastpath, after timer fire 
-due to VMX-preemption timer counts down to zero, handle it as soon as 
-possible and vmentry immediately without checking various kvm stuff when 
-possible.
+We add:
+   * Test for external/emergency calls after reset
+   * Test SIGP restart while running
+   * SIGP stop and store status while running
+   * CR testing on reset
 
-Testing on SKX Server.
+We fix:
+   * Proper check for sigp completion
+   * smp_cpu_setup_state() loop and return address in r14
 
-cyclictest in guest(w/o mwait exposed, adaptive advance lapic timer is default -1):
 
-5632.75ns -> 4559.25ns, 19%
+GIT: https://github.com/frankjaa/kvm-unit-tests/tree/smp_cleanup2
 
-kvm-unit-test/vmexit.flat:
+v2:
+	* Added some rev-bys and acks
+	* Explicitly stop and start cpu before hot restart test
 
-w/o APICv, w/o advance timer:
-tscdeadline_immed: 4780.75 -> 3851    19.4%
-tscdeadline:       7474    -> 6528.5  12.7%
+Janosch Frank (10):
+  s390x: smp: Test all CRs on initial reset
+  s390x: smp: Dirty fpc before initial reset test
+  s390x: smp: Test stop and store status on a running and stopped cpu
+  s390x: smp: Test local interrupts after cpu reset
+  s390x: smp: Loop if secondary cpu returns into cpu setup again
+  s390x: smp: Remove unneeded cpu loops
+  s390x: smp: Use full PSW to bringup new cpu
+  s390x: smp: Wait for sigp completion
+  s390x: smp: Add restart when running test
+  s390x: Fix library constant definitions
 
-w/o APICv, w/ adaptive advance timer default -1:
-tscdeadline_immed: 4845.75 -> 3930.5  18.9%
-tscdeadline:       6048    -> 5871.75    3%
+ lib/s390x/asm/arch_def.h |  8 ++--
+ lib/s390x/smp.c          | 10 +++++
+ lib/s390x/smp.h          |  1 +
+ s390x/cstart64.S         |  5 ++-
+ s390x/smp.c              | 94 ++++++++++++++++++++++++++++++++++++----
+ 5 files changed, 105 insertions(+), 13 deletions(-)
 
-w/ APICv, w/o avanced timer:
-tscdeadline_immed: 2919    -> 2467.75 15.5%
-tscdeadline:       5661.75 -> 5188.25  8.4%
-
-w/ APICv, w/ adaptive advance timer default -1:
-tscdeadline_immed: 3018.5  -> 2561    15.2%
-tscdeadline:       4663.75 -> 4537     2.7%
-
-Tested-by: Haiwei Li <lihaiwei@tencent.com>
-Cc: Haiwei Li <lihaiwei@tencent.com>
-Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
----
- arch/x86/kvm/lapic.c   | 19 +++++++++++++++++++
- arch/x86/kvm/lapic.h   |  1 +
- arch/x86/kvm/vmx/vmx.c | 22 ++++++++++++++++++++++
- 3 files changed, 42 insertions(+)
-
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index d652bd9..2741931 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -1899,6 +1899,25 @@ void kvm_lapic_expired_hv_timer(struct kvm_vcpu *vcpu)
- EXPORT_SYMBOL_GPL(kvm_lapic_expired_hv_timer);
- 
- static void kvm_inject_apic_timer_irqs_fast(struct kvm_vcpu *vcpu);
-+bool kvm_lapic_expired_hv_timer_fast(struct kvm_vcpu *vcpu)
-+{
-+	struct kvm_lapic *apic = vcpu->arch.apic;
-+	struct kvm_timer *ktimer = &apic->lapic_timer;
-+
-+	if (!apic_lvtt_tscdeadline(apic) ||
-+		!ktimer->hv_timer_in_use ||
-+		atomic_read(&ktimer->pending))
-+		return 0;
-+
-+	WARN_ON(swait_active(&vcpu->wq));
-+	cancel_hv_timer(apic);
-+
-+	ktimer->expired_tscdeadline = ktimer->tscdeadline;
-+	kvm_inject_apic_timer_irqs_fast(vcpu);
-+
-+	return 1;
-+}
-+EXPORT_SYMBOL_GPL(kvm_lapic_expired_hv_timer_fast);
- 
- void kvm_lapic_switch_to_hv_timer(struct kvm_vcpu *vcpu)
- {
-diff --git a/arch/x86/kvm/lapic.h b/arch/x86/kvm/lapic.h
-index 5ef1364..1b5abd8 100644
---- a/arch/x86/kvm/lapic.h
-+++ b/arch/x86/kvm/lapic.h
-@@ -252,6 +252,7 @@ bool kvm_lapic_hv_timer_in_use(struct kvm_vcpu *vcpu);
- void kvm_lapic_restart_hv_timer(struct kvm_vcpu *vcpu);
- bool kvm_can_post_timer_interrupt(struct kvm_vcpu *vcpu);
- int kvm_set_lapic_tscdeadline_msr_fast(struct kvm_vcpu *vcpu, u64 data);
-+bool kvm_lapic_expired_hv_timer_fast(struct kvm_vcpu *vcpu);
- 
- static inline enum lapic_mode kvm_apic_mode(u64 apic_base)
- {
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 2613e58..527d1c1 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -6569,12 +6569,34 @@ void vmx_update_host_rsp(struct vcpu_vmx *vmx, unsigned long host_rsp)
- 	}
- }
- 
-+static void vmx_cancel_hv_timer(struct kvm_vcpu *vcpu);
-+
-+static enum exit_fastpath_completion handle_fastpath_preemption_timer(struct kvm_vcpu *vcpu)
-+{
-+	struct vcpu_vmx *vmx = to_vmx(vcpu);
-+
-+	if (kvm_need_cancel_enter_guest(vcpu) ||
-+		kvm_event_needs_reinjection(vcpu))
-+		return EXIT_FASTPATH_NONE;
-+
-+	if (!vmx->req_immediate_exit &&
-+		!unlikely(vmx->loaded_vmcs->hv_timer_soft_disabled) &&
-+		kvm_lapic_expired_hv_timer_fast(vcpu)) {
-+		trace_kvm_exit(EXIT_REASON_PREEMPTION_TIMER, vcpu, KVM_ISA_VMX);
-+		return EXIT_FASTPATH_CONT_RUN;
-+	}
-+
-+	return EXIT_FASTPATH_NONE;
-+}
-+
- static enum exit_fastpath_completion vmx_exit_handlers_fastpath(struct kvm_vcpu *vcpu)
- {
- 	if (!is_guest_mode(vcpu)) {
- 		switch (to_vmx(vcpu)->exit_reason) {
- 		case EXIT_REASON_MSR_WRITE:
- 			return handle_fastpath_set_msr_irqoff(vcpu);
-+		case EXIT_REASON_PREEMPTION_TIMER:
-+			return handle_fastpath_preemption_timer(vcpu);
- 		default:
- 			return EXIT_FASTPATH_NONE;
- 		}
 -- 
-2.7.4
+2.25.1
 
