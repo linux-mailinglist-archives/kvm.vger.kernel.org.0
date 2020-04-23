@@ -2,28 +2,28 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 95BE61B570D
-	for <lists+kvm@lfdr.de>; Thu, 23 Apr 2020 10:18:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6A23C1B5721
+	for <lists+kvm@lfdr.de>; Thu, 23 Apr 2020 10:19:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726596AbgDWIRo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Apr 2020 04:17:44 -0400
+        id S1726579AbgDWIRs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Apr 2020 04:17:48 -0400
 Received: from mga18.intel.com ([134.134.136.126]:57581 "EHLO mga18.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726541AbgDWIRn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Apr 2020 04:17:43 -0400
-IronPort-SDR: Dd2MEjJAUsmqAgPQ4AfuE+L5Z+5yLidNs58bx1KC4JTGUWH1UIExWzJ4AmSm68oxJZKVszH3hj
- msIEzI5dA2TA==
+        id S1726643AbgDWIRq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Apr 2020 04:17:46 -0400
+IronPort-SDR: okghvkxQp8tzRBXSR3ygshbaqGuZoD7KO+tXlcxJOCRL4u4CuCN0SGiWM+sjLAbpKXdJymrb3u
+ StQNEgR+sZlw==
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Apr 2020 01:17:42 -0700
-IronPort-SDR: IsU+N7gEYBPuSPBbRNvRbvbNZQhwQ0rsg5nH9XmwClFFxvjZ1d8FGB3Ra4YhGe7BURCA4bEbsM
- 3BAO4sfXZKRA==
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Apr 2020 01:17:45 -0700
+IronPort-SDR: wDEGoONwrkp1xCBZwvT5CcViKU1v9vE7wKxDoQwPwu02y4lqV2Jabzfh1lLdINTuAU13GT6TZd
+ vgkL+cKcS3Dg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.73,306,1583222400"; 
-   d="scan'208";a="255910046"
+   d="scan'208";a="255910051"
 Received: from sqa-gate.sh.intel.com (HELO clx-ap-likexu.tsp.org) ([10.239.48.212])
-  by orsmga003.jf.intel.com with ESMTP; 23 Apr 2020 01:17:39 -0700
+  by orsmga003.jf.intel.com with ESMTP; 23 Apr 2020 01:17:42 -0700
 From:   Like Xu <like.xu@linux.intel.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
@@ -33,11 +33,10 @@ Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org, wei.w.wang@intel.com,
         ak@linux.intel.com, Like Xu <like.xu@linux.intel.com>,
-        Kan Liang <kan.liang@linux.intel.com>,
         Peter Zijlstra <peterz@infradead.org>
-Subject: [PATCH v10 02/11] perf/x86/core: Refactor hw->idx checks and cleanup
-Date:   Thu, 23 Apr 2020 16:14:03 +0800
-Message-Id: <20200423081412.164863-3-like.xu@linux.intel.com>
+Subject: [PATCH v10 03/11] perf/x86/lbr: Add interface to get basic information about LBR stack
+Date:   Thu, 23 Apr 2020 16:14:04 +0800
+Message-Id: <20200423081412.164863-4-like.xu@linux.intel.com>
 X-Mailer: git-send-email 2.21.1
 In-Reply-To: <20200423081412.164863-1-like.xu@linux.intel.com>
 References: <20200423081412.164863-1-like.xu@linux.intel.com>
@@ -48,217 +47,86 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-For intel_pmu_en/disable_event(), reorder the branches checks for
-hw->idx and make them sorted by probability: gp,fixed,bts,others.
+The LBR stack msrs are model specific. The perf subsystem has already
+obtained the LBR stack base addresses based on the cpu model.
 
-Clean up the x86_assign_hw_event() by converting multiple if-else
-statements to a switch statement.
+Therefore, an interface is added to allow callers outside the perf
+subsystem to obtain the LBR stack base addresses. It's useful for
+hypervisors to emulate the LBR feature for guests with less code.
 
-To skip x86_perf_event_update() and x86_perf_event_set_period(),
-it's generic to replace "idx == INTEL_PMC_IDX_FIXED_BTS" check with
-'!hwc->event_base' because that should be 0 for all non-gp/fixed cases.
-
-Wrap related bit operations into intel_set/clear_masks() and
-make the main path more cleaner and readable.
-
-No functional changes.
-
-Cc: Kan Liang <kan.liang@linux.intel.com>
 Cc: Peter Zijlstra (Intel) <peterz@infradead.org>
-Original-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+Co-developed-by: Wei Wang <wei.w.wang@intel.com>
+Signed-off-by: Wei Wang <wei.w.wang@intel.com>
 Signed-off-by: Like Xu <like.xu@linux.intel.com>
 ---
- arch/x86/events/core.c       | 25 +++++++----
- arch/x86/events/intel/core.c | 85 +++++++++++++++++++-----------------
- 2 files changed, 62 insertions(+), 48 deletions(-)
+ arch/x86/events/intel/lbr.c       | 20 ++++++++++++++++++++
+ arch/x86/include/asm/perf_event.h | 12 ++++++++++++
+ 2 files changed, 32 insertions(+)
 
-diff --git a/arch/x86/events/core.c b/arch/x86/events/core.c
-index a619763e96e1..f7a259dcbb06 100644
---- a/arch/x86/events/core.c
-+++ b/arch/x86/events/core.c
-@@ -71,10 +71,9 @@ u64 x86_perf_event_update(struct perf_event *event)
- 	struct hw_perf_event *hwc = &event->hw;
- 	int shift = 64 - x86_pmu.cntval_bits;
- 	u64 prev_raw_count, new_raw_count;
--	int idx = hwc->idx;
- 	u64 delta;
- 
--	if (idx == INTEL_PMC_IDX_FIXED_BTS)
-+	if (unlikely(!hwc->event_base))
- 		return 0;
- 
- 	/*
-@@ -1097,22 +1096,30 @@ static inline void x86_assign_hw_event(struct perf_event *event,
- 				struct cpu_hw_events *cpuc, int i)
- {
- 	struct hw_perf_event *hwc = &event->hw;
-+	int idx;
- 
--	hwc->idx = cpuc->assign[i];
-+	idx = hwc->idx = cpuc->assign[i];
- 	hwc->last_cpu = smp_processor_id();
- 	hwc->last_tag = ++cpuc->tags[i];
- 
--	if (hwc->idx == INTEL_PMC_IDX_FIXED_BTS) {
-+	switch (hwc->idx) {
-+	case INTEL_PMC_IDX_FIXED_BTS:
- 		hwc->config_base = 0;
- 		hwc->event_base	= 0;
--	} else if (hwc->idx >= INTEL_PMC_IDX_FIXED) {
-+		break;
-+
-+	case INTEL_PMC_IDX_FIXED ... INTEL_PMC_IDX_FIXED_BTS-1:
- 		hwc->config_base = MSR_ARCH_PERFMON_FIXED_CTR_CTRL;
--		hwc->event_base = MSR_ARCH_PERFMON_FIXED_CTR0 + (hwc->idx - INTEL_PMC_IDX_FIXED);
--		hwc->event_base_rdpmc = (hwc->idx - INTEL_PMC_IDX_FIXED) | 1<<30;
--	} else {
-+		hwc->event_base = MSR_ARCH_PERFMON_FIXED_CTR0 +
-+				(idx - INTEL_PMC_IDX_FIXED);
-+		hwc->event_base_rdpmc = (idx - INTEL_PMC_IDX_FIXED) | 1<<30;
-+		break;
-+
-+	default:
- 		hwc->config_base = x86_pmu_config_addr(hwc->idx);
- 		hwc->event_base  = x86_pmu_event_addr(hwc->idx);
- 		hwc->event_base_rdpmc = x86_pmu_rdpmc_index(hwc->idx);
-+		break;
- 	}
+diff --git a/arch/x86/events/intel/lbr.c b/arch/x86/events/intel/lbr.c
+index 65113b16804a..6c60dcaaaf69 100644
+--- a/arch/x86/events/intel/lbr.c
++++ b/arch/x86/events/intel/lbr.c
+@@ -1343,3 +1343,23 @@ void intel_pmu_lbr_init_knl(void)
+ 	if (x86_pmu.intel_cap.lbr_format == LBR_FORMAT_LIP)
+ 		x86_pmu.intel_cap.lbr_format = LBR_FORMAT_EIP_FLAGS;
  }
- 
-@@ -1233,7 +1240,7 @@ int x86_perf_event_set_period(struct perf_event *event)
- 	s64 period = hwc->sample_period;
- 	int ret = 0, idx = hwc->idx;
- 
--	if (idx == INTEL_PMC_IDX_FIXED_BTS)
-+	if (unlikely(!hwc->event_base))
- 		return 0;
- 
- 	/*
-diff --git a/arch/x86/events/intel/core.c b/arch/x86/events/intel/core.c
-index 332954cccece..f1439acbf7e6 100644
---- a/arch/x86/events/intel/core.c
-+++ b/arch/x86/events/intel/core.c
-@@ -2136,8 +2136,35 @@ static inline void intel_pmu_ack_status(u64 ack)
- 	wrmsrl(MSR_CORE_PERF_GLOBAL_OVF_CTRL, ack);
- }
- 
--static void intel_pmu_disable_fixed(struct hw_perf_event *hwc)
-+static inline bool event_is_checkpointed(struct perf_event *event)
++
++/**
++ * x86_perf_get_lbr - get the LBR stack information
++ *
++ * @stack: the caller's memory to store the LBR stack information
++ *
++ * Returns: 0 indicates the LBR stack info has been successfully obtained
++ */
++int x86_perf_get_lbr(struct x86_pmu_lbr *stack)
 +{
-+	return unlikely(event->hw.config & HSW_IN_TX_CHECKPOINTED) != 0;
++	int lbr_fmt = x86_pmu.intel_cap.lbr_format;
++
++	stack->nr = x86_pmu.lbr_nr;
++	stack->from = x86_pmu.lbr_from;
++	stack->to = x86_pmu.lbr_to;
++	stack->info = (lbr_fmt == LBR_FORMAT_INFO) ? MSR_LBR_INFO_0 : 0;
++
++	return 0;
 +}
-+
-+static inline void intel_set_masks(struct perf_event *event, int idx)
-+{
-+	struct cpu_hw_events *cpuc = this_cpu_ptr(&cpu_hw_events);
-+
-+	if (event->attr.exclude_host)
-+		__set_bit(idx, (unsigned long *)&cpuc->intel_ctrl_guest_mask);
-+	if (event->attr.exclude_guest)
-+		__set_bit(idx, (unsigned long *)&cpuc->intel_ctrl_host_mask);
-+	if (event_is_checkpointed(event))
-+		__set_bit(idx, (unsigned long *)&cpuc->intel_cp_status);
-+}
-+
-+static inline void intel_clear_masks(struct perf_event *event, int idx)
- {
-+	struct cpu_hw_events *cpuc = this_cpu_ptr(&cpu_hw_events);
-+
-+	__clear_bit(idx, (unsigned long *)&cpuc->intel_ctrl_guest_mask);
-+	__clear_bit(idx, (unsigned long *)&cpuc->intel_ctrl_host_mask);
-+	__clear_bit(idx, (unsigned long *)&cpuc->intel_cp_status);
-+}
-+
-+static void intel_pmu_disable_fixed(struct perf_event *event)
-+{
-+	struct hw_perf_event *hwc = &event->hw;
- 	int idx = hwc->idx - INTEL_PMC_IDX_FIXED;
- 	u64 ctrl_val, mask;
++EXPORT_SYMBOL_GPL(x86_perf_get_lbr);
+diff --git a/arch/x86/include/asm/perf_event.h b/arch/x86/include/asm/perf_event.h
+index e855e9cf2c37..5071515f6b0f 100644
+--- a/arch/x86/include/asm/perf_event.h
++++ b/arch/x86/include/asm/perf_event.h
+@@ -333,6 +333,13 @@ struct perf_guest_switch_msr {
+ 	u64 host, guest;
+ };
  
-@@ -2148,31 +2175,22 @@ static void intel_pmu_disable_fixed(struct hw_perf_event *hwc)
- 	wrmsrl(hwc->config_base, ctrl_val);
++struct x86_pmu_lbr {
++	unsigned int	nr;
++	unsigned int	from;
++	unsigned int	to;
++	unsigned int	info;
++};
++
+ extern void perf_get_x86_pmu_capability(struct x86_pmu_capability *cap);
+ extern void perf_check_microcode(void);
+ extern int x86_perf_rdpmc_index(struct perf_event *event);
+@@ -348,12 +355,17 @@ static inline void perf_check_microcode(void) { }
+ 
+ #if defined(CONFIG_PERF_EVENTS) && defined(CONFIG_CPU_SUP_INTEL)
+ extern struct perf_guest_switch_msr *perf_guest_get_msrs(int *nr);
++extern int x86_perf_get_lbr(struct x86_pmu_lbr *stack);
+ #else
+ static inline struct perf_guest_switch_msr *perf_guest_get_msrs(int *nr)
+ {
+ 	*nr = 0;
+ 	return NULL;
  }
++static inline int x86_perf_get_lbr(struct x86_pmu_lbr *stack)
++{
++	return -1;
++}
+ #endif
  
--static inline bool event_is_checkpointed(struct perf_event *event)
--{
--	return (event->hw.config & HSW_IN_TX_CHECKPOINTED) != 0;
--}
--
- static void intel_pmu_disable_event(struct perf_event *event)
- {
- 	struct hw_perf_event *hwc = &event->hw;
--	struct cpu_hw_events *cpuc = this_cpu_ptr(&cpu_hw_events);
-+	int idx = hwc->idx;
- 
--	if (unlikely(hwc->idx == INTEL_PMC_IDX_FIXED_BTS)) {
-+	if (idx < INTEL_PMC_IDX_FIXED) {
-+		intel_clear_masks(event, idx);
-+		x86_pmu_disable_event(event);
-+	} else if (idx < INTEL_PMC_IDX_FIXED_BTS) {
-+		intel_clear_masks(event, idx);
-+		intel_pmu_disable_fixed(event);
-+	} else if (idx == INTEL_PMC_IDX_FIXED_BTS) {
- 		intel_pmu_disable_bts();
- 		intel_pmu_drain_bts_buffer();
--		return;
- 	}
- 
--	cpuc->intel_ctrl_guest_mask &= ~(1ull << hwc->idx);
--	cpuc->intel_ctrl_host_mask &= ~(1ull << hwc->idx);
--	cpuc->intel_cp_status &= ~(1ull << hwc->idx);
--
--	if (unlikely(hwc->config_base == MSR_ARCH_PERFMON_FIXED_CTR_CTRL))
--		intel_pmu_disable_fixed(hwc);
--	else
--		x86_pmu_disable_event(event);
--
- 	/*
- 	 * Needs to be called after x86_pmu_disable_event,
- 	 * so we don't trigger the event without PEBS bit set.
-@@ -2238,33 +2256,22 @@ static void intel_pmu_enable_fixed(struct perf_event *event)
- static void intel_pmu_enable_event(struct perf_event *event)
- {
- 	struct hw_perf_event *hwc = &event->hw;
--	struct cpu_hw_events *cpuc = this_cpu_ptr(&cpu_hw_events);
--
--	if (unlikely(hwc->idx == INTEL_PMC_IDX_FIXED_BTS)) {
--		if (!__this_cpu_read(cpu_hw_events.enabled))
--			return;
--
--		intel_pmu_enable_bts(hwc->config);
--		return;
--	}
--
--	if (event->attr.exclude_host)
--		cpuc->intel_ctrl_guest_mask |= (1ull << hwc->idx);
--	if (event->attr.exclude_guest)
--		cpuc->intel_ctrl_host_mask |= (1ull << hwc->idx);
--
--	if (unlikely(event_is_checkpointed(event)))
--		cpuc->intel_cp_status |= (1ull << hwc->idx);
-+	int idx = hwc->idx;
- 
- 	if (unlikely(event->attr.precise_ip))
- 		intel_pmu_pebs_enable(event);
- 
--	if (unlikely(hwc->config_base == MSR_ARCH_PERFMON_FIXED_CTR_CTRL)) {
-+	if (idx < INTEL_PMC_IDX_FIXED) {
-+		intel_set_masks(event, idx);
-+		__x86_pmu_enable_event(hwc, ARCH_PERFMON_EVENTSEL_ENABLE);
-+	} else if (idx < INTEL_PMC_IDX_FIXED_BTS) {
-+		intel_set_masks(event, idx);
- 		intel_pmu_enable_fixed(event);
--		return;
-+	} else if (idx == INTEL_PMC_IDX_FIXED_BTS) {
-+		if (!__this_cpu_read(cpu_hw_events.enabled))
-+			return;
-+		intel_pmu_enable_bts(hwc->config);
- 	}
--
--	__x86_pmu_enable_event(hwc, ARCH_PERFMON_EVENTSEL_ENABLE);
- }
- 
- static void intel_pmu_add_event(struct perf_event *event)
+ #ifdef CONFIG_CPU_SUP_INTEL
 -- 
 2.21.1
 
