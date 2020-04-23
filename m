@@ -2,198 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C11ED1B576B
-	for <lists+kvm@lfdr.de>; Thu, 23 Apr 2020 10:41:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 48F391B5788
+	for <lists+kvm@lfdr.de>; Thu, 23 Apr 2020 10:58:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726875AbgDWIlp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Apr 2020 04:41:45 -0400
-Received: from mail.kernel.org ([198.145.29.99]:56356 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725854AbgDWIlo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Apr 2020 04:41:44 -0400
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id B47CC20781;
-        Thu, 23 Apr 2020 08:41:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1587631303;
-        bh=t8blW7Cv+bprujnr81ng6J5oRSYCzqyxB2PvmFe4IEE=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=HZ5vrG/25ZmFh9rjigGIkPmroBlnVM/6xRqAYqanwgRawoBvTjqELTZ/B4NHmKLYV
-         Djmy82a5+Ikl4ons0llnji98I7Ubcw1KqS1ziz2xVFmDcBhEeG1h0o5ZqOK8Lq9KWz
-         DarluvpF7uoH2HrkkZpZtMY+LwZcap2ApXPSU+nM=
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why)
-        by disco-boy.misterjones.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <maz@kernel.org>)
-        id 1jRXQT-005ikb-Tu; Thu, 23 Apr 2020 09:41:42 +0100
-Date:   Thu, 23 Apr 2020 09:41:40 +0100
-From:   Marc Zyngier <maz@kernel.org>
-To:     Davidlohr Bueso <dave@stgolabs.net>
-Cc:     tglx@linutronix.de, pbonzini@redhat.com, kvm@vger.kernel.org,
+        id S1726643AbgDWI6L (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Apr 2020 04:58:11 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:39603 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726470AbgDWI6K (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Apr 2020 04:58:10 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1587632289;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Kkq0uwjQBfxJhQKuYr+1chwz4XGWFG4HzoEt9DzJrws=;
+        b=iGAOCQ8qlGPHFbP9p+FqEGRRLBMdsIE6UH6o4zEembVbztHHxC/JWhRoWv34o5h0XkQf9s
+        dgj4jftcqXalejir7yAhsFS1HfgyurbDpxr3ZVe0F+AoDhsiUlgKIEvcAr97EuXqM4PKQa
+        Wgk7i3h8Mv5BWJLy7gLrXX+R+3kGtvs=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-39-geR6BdfYMMyr9-WHdlERXA-1; Thu, 23 Apr 2020 04:58:07 -0400
+X-MC-Unique: geR6BdfYMMyr9-WHdlERXA-1
+Received: by mail-wr1-f70.google.com with SMTP id f4so1080166wrp.14
+        for <kvm@vger.kernel.org>; Thu, 23 Apr 2020 01:58:07 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=Kkq0uwjQBfxJhQKuYr+1chwz4XGWFG4HzoEt9DzJrws=;
+        b=NU4++X9lzpop2xsYY87Y7xUyL1bz/tUIYQUaZKbhGc1WFjIEGaUOKnWE1sGO+424N1
+         HVmjhMdnKwPt0pu2ClwViZT9BIkrggO8orQR/Lyl9GJEEE6m1/Mn3c5VfonHWtQWYjQF
+         r0Bv74GdLKgmeXZDshmoqOWEy4SKRynq7DyQlGmh5KhPfyonDKkxEmPK7MVaGy+L9v8Q
+         2Fu0stzbQIiEYUNRg9dtlKcR66IbFrvoCXSSrD3UOvp5uRSOqzWk3GNoIBfOlBQRy/Gm
+         Jpbzbit8mivxQtdNx6/WpvO03gBfSnu+gmNi6nGFeejcChd3bvahYSejVnj0LYGgMWw9
+         P6FA==
+X-Gm-Message-State: AGi0PuaQOXbkoE9Hvo/t+Fq5fViP3W6rC4PwWiIcmkiEXq+eHeOOKolD
+        LBUQm+0Q8jIlxlkddEHVZFIElfmEsGL4VlxLLscAdNmpWhcxDLKUNf+fmQ4SUD640Kv6UIqdrPw
+        /PD6LxiI/Xns5
+X-Received: by 2002:a5d:664f:: with SMTP id f15mr3609436wrw.72.1587632286119;
+        Thu, 23 Apr 2020 01:58:06 -0700 (PDT)
+X-Google-Smtp-Source: APiQypJw0BmW6FuCWHcq3ZxzvKLkyVd4P0Y1C0QqksviQgntreRVEaQvmWwFSAjOCQTYt1Fqs4tEqA==
+X-Received: by 2002:a5d:664f:: with SMTP id f15mr3609406wrw.72.1587632285847;
+        Thu, 23 Apr 2020 01:58:05 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:d0a0:f143:e9e4:2926? ([2001:b07:6468:f312:d0a0:f143:e9e4:2926])
+        by smtp.gmail.com with ESMTPSA id h2sm2810041wmf.34.2020.04.23.01.58.04
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 23 Apr 2020 01:58:05 -0700 (PDT)
+Subject: Re: [PATCH 4/5] kvm: Replace vcpu->swait with rcuwait
+To:     Marc Zyngier <maz@kernel.org>, Davidlohr Bueso <dave@stgolabs.net>
+Cc:     tglx@linutronix.de, kvm@vger.kernel.org,
         Davidlohr Bueso <dbueso@suse.de>, peterz@infradead.org,
         torvalds@linux-foundation.org, bigeasy@linutronix.de,
         linux-kernel@vger.kernel.org, rostedt@goodmis.org,
         linux-mips@vger.kernel.org, Paul Mackerras <paulus@ozlabs.org>,
         joel@joelfernandes.org, will@kernel.org,
         kvmarm@lists.cs.columbia.edu
-Subject: Re: [PATCH 4/5] kvm: Replace vcpu->swait with rcuwait
-Message-ID: <20200423094140.69909bbb@why>
-In-Reply-To: <20200422040739.18601-5-dave@stgolabs.net>
 References: <20200422040739.18601-1-dave@stgolabs.net>
-        <20200422040739.18601-5-dave@stgolabs.net>
-Organization: Approximate
-X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+ <20200422040739.18601-5-dave@stgolabs.net> <20200423094140.69909bbb@why>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <f07f6f55-9339-04b0-3877-d3240abd6d9c@redhat.com>
+Date:   Thu, 23 Apr 2020 10:57:57 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20200423094140.69909bbb@why>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: dave@stgolabs.net, tglx@linutronix.de, pbonzini@redhat.com, kvm@vger.kernel.org, dbueso@suse.de, peterz@infradead.org, torvalds@linux-foundation.org, bigeasy@linutronix.de, linux-kernel@vger.kernel.org, rostedt@goodmis.org, linux-mips@vger.kernel.org, paulus@ozlabs.org, joel@joelfernandes.org, will@kernel.org, kvmarm@lists.cs.columbia.edu
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 21 Apr 2020 21:07:38 -0700
-Davidlohr Bueso <dave@stgolabs.net> wrote:
-
-> The use of any sort of waitqueue (simple or regular) for
-> wait/waking vcpus has always been an overkill and semantically
-> wrong. Because this is per-vcpu (which is blocked) there is
-> only ever a single waiting vcpu, thus no need for any sort of
-> queue.
+On 23/04/20 10:41, Marc Zyngier wrote:
+>>  
+>> -	if (swait_active(kvm_arch_vcpu_wq(vcpu)))
+>> +	if (rcu_dereference(kvm_arch_vpu_get_wait(vcpu)) != NULL)
+> This doesn't compile (wrong function name, and rcu_dereference takes a
+> variable). But whatever it would do if we fixed it looks dodgy. it isn't
+> the rcuwait structure that you want to dereference, but rcuwait->task
+> (we are checking whether we are called because we are blocking or being
+> preempted).
 > 
-> As such, make use of the rcuwait primitive, with the following
-> considerations:
-> 
->   - rcuwait already provides the proper barriers that serialize
->   concurrent waiter and waker.
-> 
->   - Task wakeup is done in rcu read critical region, with a
->   stable task pointer.
-> 
->   - Because there is no concurrency among waiters, we need
->   not worry about rcuwait_wait_event() calls corrupting
->   the wait->task. As a consequence, this saves the locking
->   done in swait when modifying the queue. This also applies
->   to per-vcore wait for powerpc kvm-hv.
-> 
-> The x86 tscdeadline_latency test mentioned in 8577370fb0cb
-> ("KVM: Use simple waitqueue for vcpu->wq") shows that, on avg,
-> latency is reduced by around 15-20% with this change.
-> 
-> Cc: Paul Mackerras <paulus@ozlabs.org>
-> Cc: kvmarm@lists.cs.columbia.edu
-> Cc: linux-mips@vger.kernel.org
-> Signed-off-by: Davidlohr Bueso <dbueso@suse.de>
-> ---
->  arch/mips/kvm/mips.c                  |  6 ++----
->  arch/powerpc/include/asm/kvm_book3s.h |  2 +-
->  arch/powerpc/include/asm/kvm_host.h   |  2 +-
->  arch/powerpc/kvm/book3s_hv.c          | 22 ++++++++--------------
->  arch/powerpc/kvm/powerpc.c            |  2 +-
->  arch/x86/kvm/lapic.c                  |  2 +-
->  include/linux/kvm_host.h              | 10 +++++-----
->  virt/kvm/arm/arch_timer.c             |  2 +-
->  virt/kvm/arm/arm.c                    |  9 +++++----
->  virt/kvm/async_pf.c                   |  3 +--
->  virt/kvm/kvm_main.c                   | 19 +++++++++----------
->  11 files changed, 35 insertions(+), 44 deletions(-)
 
-[...]
+Yes, I agree.  Replacing swait with rcuwait is all good, but please make
+the API look the same first.  Just like you added prepare_to_rcuwait and
+finish_rcuwait, let's add rcuwait_active as well.
 
-I should have tested it *before* acking it, really.
+Actually let's do it like this:
 
-> diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
-> index 93bd59b46848..b2805105bbe5 100644
-> --- a/virt/kvm/arm/arch_timer.c
-> +++ b/virt/kvm/arm/arch_timer.c
-> @@ -593,7 +593,7 @@ void kvm_timer_vcpu_put(struct kvm_vcpu *vcpu)
->  	if (map.emul_ptimer)
->  		soft_timer_cancel(&map.emul_ptimer->hrtimer);
->  
-> -	if (swait_active(kvm_arch_vcpu_wq(vcpu)))
-> +	if (rcu_dereference(kvm_arch_vpu_get_wait(vcpu)) != NULL)
+1) Davidlohr, please post only patches 1-3 to "equalize" the swait and
+rcuwait APIs.
 
-This doesn't compile (wrong function name, and rcu_dereference takes a
-variable). But whatever it would do if we fixed it looks dodgy. it isn't
-the rcuwait structure that you want to dereference, but rcuwait->task
-(we are checking whether we are called because we are blocking or being
-preempted).
+2) Peter, please prepare a topic branch for those, or provide Acked-by
 
->  		kvm_timer_blocking(vcpu);
->  
->  	/*
-> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-> index 48d0ec44ad77..f94a10bb1251 100644
-> --- a/virt/kvm/arm/arm.c
-> +++ b/virt/kvm/arm/arm.c
-> @@ -579,16 +579,17 @@ void kvm_arm_resume_guest(struct kvm *kvm)
->  
->  	kvm_for_each_vcpu(i, vcpu, kvm) {
->  		vcpu->arch.pause = false;
-> -		swake_up_one(kvm_arch_vcpu_wq(vcpu));
-> +		rcuwait_wake_up(kvm_arch_vcpu_get_wait(vcpu));
->  	}
->  }
->  
->  static void vcpu_req_sleep(struct kvm_vcpu *vcpu)
->  {
-> -	struct swait_queue_head *wq = kvm_arch_vcpu_wq(vcpu);
-> +	struct rcuwait *wait = kvm_arch_vcpu_get_wait(vcpu);
->  
-> -	swait_event_interruptible_exclusive(*wq, ((!vcpu->arch.power_off) &&
-> -				       (!vcpu->arch.pause)));
-> +	rcuwait_wait_event(*wait,
-> +			   (!vcpu->arch.power_off) &&(!vcpu->arch.pause),
-> +			   TASK_INTERRUPTIBLE);
-
-As noticed by the kbuild robot, this doesn't compile either.
-
-I fixed it as follow, and it survived a very basic test run in a model
-(more testing later).
+3) let's get everything else through the KVM tree.
 
 Thanks,
 
-	M.
+Paolo
 
-diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
-index b2805105bbe56..2dbd14dcae9fb 100644
---- a/virt/kvm/arm/arch_timer.c
-+++ b/virt/kvm/arm/arch_timer.c
-@@ -569,6 +569,7 @@ bool kvm_timer_should_notify_user(struct kvm_vcpu *vcpu)
- 
- void kvm_timer_vcpu_put(struct kvm_vcpu *vcpu)
- {
-+	struct rcuwait *wait = kvm_arch_vcpu_get_wait(vcpu);
- 	struct arch_timer_cpu *timer = vcpu_timer(vcpu);
- 	struct timer_map map;
- 
-@@ -593,7 +594,7 @@ void kvm_timer_vcpu_put(struct kvm_vcpu *vcpu)
- 	if (map.emul_ptimer)
- 		soft_timer_cancel(&map.emul_ptimer->hrtimer);
- 
--	if (rcu_dereference(kvm_arch_vpu_get_wait(vcpu)) != NULL)
-+	if (rcu_dereference(wait->task))
- 		kvm_timer_blocking(vcpu);
- 
- 	/*
-diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-index f94a10bb1251b..479f36d02418d 100644
---- a/virt/kvm/arm/arm.c
-+++ b/virt/kvm/arm/arm.c
-@@ -587,7 +587,7 @@ static void vcpu_req_sleep(struct kvm_vcpu *vcpu)
- {
- 	struct rcuwait *wait = kvm_arch_vcpu_get_wait(vcpu);
- 
--	rcuwait_wait_event(*wait,
-+	rcuwait_wait_event(wait,
- 			   (!vcpu->arch.power_off) &&(!vcpu->arch.pause),
- 			   TASK_INTERRUPTIBLE);
- 
-
--- 
-Jazz is not dead. It just smells funny...
