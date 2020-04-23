@@ -2,25 +2,26 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F24D41B5DD8
-	for <lists+kvm@lfdr.de>; Thu, 23 Apr 2020 16:34:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4CECA1B5DDE
+	for <lists+kvm@lfdr.de>; Thu, 23 Apr 2020 16:35:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726363AbgDWOeJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Apr 2020 10:34:09 -0400
-Received: from foss.arm.com ([217.140.110.172]:41296 "EHLO foss.arm.com"
+        id S1728003AbgDWOfC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Apr 2020 10:35:02 -0400
+Received: from foss.arm.com ([217.140.110.172]:41354 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726138AbgDWOeJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Apr 2020 10:34:09 -0400
+        id S1726981AbgDWOfB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Apr 2020 10:35:01 -0400
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 46F8B31B;
-        Thu, 23 Apr 2020 07:34:08 -0700 (PDT)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0445B31B;
+        Thu, 23 Apr 2020 07:35:01 -0700 (PDT)
 Received: from [192.168.0.14] (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0C3633F6CF;
-        Thu, 23 Apr 2020 07:34:05 -0700 (PDT)
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 21CBA3F6CF;
+        Thu, 23 Apr 2020 07:34:59 -0700 (PDT)
 Subject: Re: [PATCH v3 5/6] KVM: arm64: vgic-v3: Retire all pending LPIs on
  vcpu destroy
-To:     Zenghui Yu <yuzenghui@huawei.com>, Marc Zyngier <maz@kernel.org>
-Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     Zenghui Yu <yuzenghui@huawei.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         kvm@vger.kernel.org, Eric Auger <eric.auger@redhat.com>,
         Andre Przywara <Andre.Przywara@arm.com>,
         Julien Grall <julien@xen.org>,
@@ -29,14 +30,14 @@ Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
 References: <20200422161844.3848063-1-maz@kernel.org>
  <20200422161844.3848063-6-maz@kernel.org>
  <2a0d1542-1964-c818-aae8-76f9227676b8@arm.com>
- <f8c8b60d-f701-28c5-3102-e2ae8804e341@huawei.com>
+ <c4b89164d79b733bcc38801c9483417d@kernel.org>
 From:   James Morse <james.morse@arm.com>
-Message-ID: <86d04a96-4048-878e-b104-7b4631902558@arm.com>
-Date:   Thu, 23 Apr 2020 15:34:00 +0100
+Message-ID: <b76bf753-caaa-a6ce-9cdc-0fcf05821a56@arm.com>
+Date:   Thu, 23 Apr 2020 15:34:53 +0100
 User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
  Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <f8c8b60d-f701-28c5-3102-e2ae8804e341@huawei.com>
+In-Reply-To: <c4b89164d79b733bcc38801c9483417d@kernel.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-GB
 Content-Transfer-Encoding: 8bit
@@ -45,10 +46,10 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Zenghui,
+Hi guys,
 
-On 23/04/2020 12:57, Zenghui Yu wrote:
-> On 2020/4/23 19:35, James Morse wrote:
+On 23/04/2020 13:03, Marc Zyngier wrote:
+> On 2020-04-23 12:35, James Morse wrote:
 >> On 22/04/2020 17:18, Marc Zyngier wrote:
 >>> From: Zenghui Yu <yuzenghui@huawei.com>
 >>>
@@ -63,9 +64,10 @@ On 23/04/2020 12:57, Zenghui Yu wrote:
 >>> --- a/virt/kvm/arm/vgic/vgic-init.c
 >>> +++ b/virt/kvm/arm/vgic/vgic-init.c
 >>> @@ -348,6 +348,12 @@ void kvm_vgic_vcpu_destroy(struct kvm_vcpu *vcpu)
->>>   {
->>>       struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
->>>   +    /*
+>>>  {
+>>>      struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
+>>>
+>>> +    /*
 >>> +     * Retire all pending LPIs on this vcpu anyway as we're
 >>> +     * going to destroy it.
 >>> +     */
@@ -75,23 +77,21 @@ On 23/04/2020 12:57, Zenghui Yu wrote:
 >>
 >> ?
 > 
-> If LPIs are disabled at redistributor level, yes there should be no
-> pending LPIs in the ap_list. But I'm not sure how can the following
-> use-after-free BUG be triggered.
+> Huh... On its own, this call is absolutely harmless even if you
+> don't have LPIs. But see below.
 > 
 >>
 >>> +    vgic_flush_pending_lpis(vcpu);
 >>> +
 >>
 >> Otherwise, I get this on a gic-v2 machine!:
-> 
-> I don't have a gic-v2 one and thus can't reproduce it :-(
-> 
 >> [ 1742.187139] BUG: KASAN: use-after-free in vgic_flush_pending_lpis+0x250/0x2c0
->> [ 1742.194302] Read of size 8 at addr ffff0008e1bf1f28 by task qemu-system-aar/542
+>> [ 1742.194302] Read of size 8 at addr ffff0008e1bf1f28 by task
+>> qemu-system-aar/542
 >> [ 1742.203140] CPU: 2 PID: 542 Comm: qemu-system-aar Not tainted
 >> 5.7.0-rc2-00006-g4fb0f7bb0e27 #2
->> [ 1742.211780] Hardware name: ARM LTD ARM Juno Development Platform/ARM Juno Development
+>> [ 1742.211780] Hardware name: ARM LTD ARM Juno Development
+>> Platform/ARM Juno Development
 >> Platform, BIOS EDK II Jul 30 2018
 >> [ 1742.222596] Call trace:
 >> [ 1742.225059]  dump_backtrace+0x0/0x328
@@ -102,30 +102,57 @@ On 23/04/2020 12:57, Zenghui Yu wrote:
 >> [ 1742.244763]  kasan_report+0x4c/0x68
 >> [ 1742.248268]  __asan_report_load8_noabort+0x30/0x48
 >> [ 1742.253081]  vgic_flush_pending_lpis+0x250/0x2c0
+>> [ 1742.257718]  __kvm_vgic_destroy+0x1cc/0x478
+>> [ 1742.261919]  kvm_vgic_destroy+0x30/0x48
+>> [ 1742.265773]  kvm_arch_destroy_vm+0x20/0x128
+>> [ 1742.269976]  kvm_put_kvm+0x3e0/0x8d0
+>> [ 1742.273567]  kvm_vm_release+0x3c/0x60
+>> [ 1742.277248]  __fput+0x218/0x630
+>> [ 1742.280406]  ____fput+0x10/0x20
+>> [ 1742.283565]  task_work_run+0xd8/0x1f0
+>> [ 1742.287245]  do_exit+0x87c/0x2640
+>> [ 1742.290575]  do_group_exit+0xd0/0x258
+>> [ 1742.294254]  __arm64_sys_exit_group+0x3c/0x48
+>> [ 1742.298631]  el0_svc_common.constprop.0+0x10c/0x348
+>> [ 1742.303529]  do_el0_svc+0x48/0xd0
+>> [ 1742.306861]  el0_sync_handler+0x11c/0x1b8
+>> [ 1742.310888]  el0_sync+0x158/0x180
+
+>> [ 1742.348215] page dumped because: kasan: bad access detected
+
+> I think this is slightly more concerning. The issue is that we have
+> started freeing parts of the interrupt state already (we free the
+> SPIs early in kvm_vgic_dist_destroy()).
+
+(I took this to be some wild pointer access. Previously for use-after-free I've seen it
+print where it was allocated and where it was freed).
+
+
+> If a SPI was pending or active at this stage (i.e. present in the
+> ap_list), we are going to iterate over memory that has been freed
+> already. This is bad, and this can happen on GICv3 as well.
+
+
+> I think this should solve it, but I need to test it on a GICv2 system:
 > 
-> Could you please show the result of
+> diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
+> index 53ec9b9d9bc43..30dbec9fe0b4a 100644
+> --- a/virt/kvm/arm/vgic/vgic-init.c
+> +++ b/virt/kvm/arm/vgic/vgic-init.c
+> @@ -365,10 +365,10 @@ static void __kvm_vgic_destroy(struct kvm *kvm)
 > 
-> ./scripts/faddr2line vmlinux vgic_flush_pending_lpis+0x250/0x2c0
+>      vgic_debug_destroy(kvm);
 > 
-> on your setup?
+> -    kvm_vgic_dist_destroy(kvm);
+> -
+>      kvm_for_each_vcpu(i, vcpu, kvm)
+>          kvm_vgic_vcpu_destroy(vcpu);
+> +
+> +    kvm_vgic_dist_destroy(kvm);
+>  }
+> >  void kvm_vgic_destroy(struct kvm *kvm)
 
-vgic_flush_pending_lpis+0x250/0x2c0:
-vgic_flush_pending_lpis at arch/arm64/kvm/../../../virt/kvm/arm/vgic/vgic.c:159
-
-Which is:
-|	list_for_each_entry_safe(irq, tmp, &vgic_cpu->ap_list_head, ap_list) {
-
-
-I think this confirms Marc's view of the KASAN splat.
-
-
->> With that:
->> Reviewed-by: James Morse <james.morse@arm.com>
-> 
-> Thanks a lot!
-
-Heh, it looks like I had the wrong end of the stick with this... I wrongly assumed calling
-this on gicv2 would go using structures that held something else.
+This works for me on Juno.
 
 
 Thanks,
