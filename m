@@ -2,134 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 26FE51B655E
-	for <lists+kvm@lfdr.de>; Thu, 23 Apr 2020 22:25:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B74D21B6576
+	for <lists+kvm@lfdr.de>; Thu, 23 Apr 2020 22:34:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726161AbgDWUZp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Apr 2020 16:25:45 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:51594 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726002AbgDWUZo (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 23 Apr 2020 16:25:44 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 03NJWXuU047357;
-        Thu, 23 Apr 2020 16:25:43 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 30jrj76a14-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 23 Apr 2020 16:25:43 -0400
-Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 03NJidh0079219;
-        Thu, 23 Apr 2020 16:25:43 -0400
-Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com [169.55.85.253])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 30jrj76a0y-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 23 Apr 2020 16:25:43 -0400
-Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
-        by ppma01wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 03NKNJSM030716;
-        Thu, 23 Apr 2020 20:25:42 GMT
-Received: from b03cxnp07029.gho.boulder.ibm.com (b03cxnp07029.gho.boulder.ibm.com [9.17.130.16])
-        by ppma01wdc.us.ibm.com with ESMTP id 30fs66m8se-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 23 Apr 2020 20:25:42 +0000
-Received: from b03ledav002.gho.boulder.ibm.com (b03ledav002.gho.boulder.ibm.com [9.17.130.233])
-        by b03cxnp07029.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 03NKPfxF54198716
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 23 Apr 2020 20:25:41 GMT
-Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 480E913604F;
-        Thu, 23 Apr 2020 20:25:41 +0000 (GMT)
-Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3B103136053;
-        Thu, 23 Apr 2020 20:25:40 +0000 (GMT)
-Received: from [9.65.212.228] (unknown [9.65.212.228])
-        by b03ledav002.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Thu, 23 Apr 2020 20:25:40 +0000 (GMT)
-Subject: Re: [PATCH 1/1] vfio-ccw: Enable transparent CCW IPL from DASD
-To:     Cornelia Huck <cohuck@redhat.com>,
-        Halil Pasic <pasic@linux.ibm.com>
-Cc:     Jared Rossi <jrossi@linux.ibm.com>, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20200417182939.11460-1-jrossi@linux.ibm.com>
- <20200417182939.11460-2-jrossi@linux.ibm.com>
- <20200423155620.493cb7cb.pasic@linux.ibm.com>
- <20200423171103.497dcd02.cohuck@redhat.com>
-From:   Eric Farman <farman@linux.ibm.com>
-Message-ID: <b6dc3d32-3e84-4ce1-59a2-d5de99716027@linux.ibm.com>
-Date:   Thu, 23 Apr 2020 16:25:39 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+        id S1726363AbgDWUe2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Apr 2020 16:34:28 -0400
+Received: from mga07.intel.com ([134.134.136.100]:42895 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725877AbgDWUe2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Apr 2020 16:34:28 -0400
+IronPort-SDR: VAtVVIkPnEVAwufiCRL2eY0S5sFWbPoS0epttwpj4uoP7lmXNztWC4PUONWKQpc9ZVh7iuWueS
+ 1qxZIq7VN5hg==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Apr 2020 13:34:25 -0700
+IronPort-SDR: EI6Ve9nnUVyb2g3jV9TsSYsL0FC4/+jzmNMl1+ZNvkzCyZ6IqOTd3GUkgjEJuulHr5wLVISCjn
+ H2pJtnmhT8QA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.73,309,1583222400"; 
+   d="scan'208";a="301316877"
+Received: from iweiny-desk2.sc.intel.com ([10.3.52.147])
+  by FMSMGA003.fm.intel.com with ESMTP; 23 Apr 2020 13:34:24 -0700
+Date:   Thu, 23 Apr 2020 13:34:24 -0700
+From:   Ira Weiny <ira.weiny@intel.com>
+To:     Janakarajan Natarajan <Janakarajan.Natarajan@amd.com>
+Cc:     linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H . Peter Anvin" <hpa@zytor.com>,
+        Mike Marshall <hubcap@omnibond.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Brijesh Singh <brijesh.singh@amd.com>
+Subject: Re: [PATCH] KVM: SVM: Change flag passed to GUP fast in
+ sev_pin_memory()
+Message-ID: <20200423203424.GA3997014@iweiny-DESK2.sc.intel.com>
+References: <20200423152419.87202-1-Janakarajan.Natarajan@amd.com>
 MIME-Version: 1.0
-In-Reply-To: <20200423171103.497dcd02.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.676
- definitions=2020-04-23_13:2020-04-23,2020-04-23 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 spamscore=0
- malwarescore=0 mlxscore=0 lowpriorityscore=0 priorityscore=1501
- adultscore=0 mlxlogscore=999 phishscore=0 suspectscore=0 clxscore=1011
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2004230146
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200423152419.87202-1-Janakarajan.Natarajan@amd.com>
+User-Agent: Mutt/1.11.1 (2018-12-01)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 4/23/20 11:11 AM, Cornelia Huck wrote:
-> On Thu, 23 Apr 2020 15:56:20 +0200
-> Halil Pasic <pasic@linux.ibm.com> wrote:
+On Thu, Apr 23, 2020 at 10:24:19AM -0500, Janakarajan Natarajan wrote:
+> When trying to lock read-only pages, sev_pin_memory() fails because FOLL_WRITE
+> is used as the flag for get_user_pages_fast().
 > 
->> On Fri, 17 Apr 2020 14:29:39 -0400
->> Jared Rossi <jrossi@linux.ibm.com> wrote:
->>
->>> Remove the explicit prefetch check when using vfio-ccw devices.
->>> This check is not needed as all Linux channel programs are intended
->>> to use prefetch and will be executed in the same way regardless.  
->>
->> Hm. This is a guest thing or? So you basically say, it is OK to do
->> this, because you know that the guest is gonna be Linux and that it
->> the channel program is intended to use prefetch -- but the ORB supplied
->> by the guest that designates the channel program happens to state the
->> opposite.
->>
->> Or am I missing something?
+> Commit 73b0140bf0fe ("mm/gup: change GUP fast to use flags rather than a write
+> 'bool'") updated the get_user_pages_fast() call sites to use flags, but
+> incorrectly updated the call in sev_pin_memory(). As the original coding of this
+> call was correct, revert the change made by that commit.
 > 
-> I see this as a kind of architecture compliance/ease of administration
-> tradeoff, as we none of the guests we currently support uses something
-> that breaks with prefetching outside of IPL (which has a different
-> workaround).>
-> One thing that still concerns me a bit is debuggability if a future
-> guest indeed does want to dynamically rewrite a channel program: the
+> Fixes: 73b0140bf0fe ("mm/gup: change GUP fast to use flags rather than a write 'bool'")
+> Signed-off-by: Janakarajan Natarajan <Janakarajan.Natarajan@amd.com>
 
-+1 for some debuggability, just in general
+Reviewed-by: Ira Weiny <ira.weiny@intel.com>
 
-> guest thinks it instructed the device to not prefetch, and then
-> suddenly things do not work as expected. We can log when a guest
-> submits an orb without prefetch set, but we can't find out if the guest
-> actually does something that relies on non-prefetch.
-
-Without going too far down a non-prefetch rabbit-hole, can we use the
-cpa_within_range logic to see if the address of the CCW being fetched
-exists as the CDA of an earlier (non-TIC) CCW in the chain we're
-processing, and tracing/logging/messaging something about a possible
-conflict?
-
-(Jared, you did some level of this tracing with our real/synthetic tests
-some time ago.  Any chance something of it could be polished and made
-useful, without being overly heavy on the mainline path?)
-
+> ---
+>  arch/x86/kvm/svm/sev.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> The only correct way to handle this would be to actually implement
-> non-prefetch processing, where I would not really know where to even
-> start -- and then we'd only have synthetic test cases, for now. None of
-> the options are pleasant :(
+> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> index cf912b4aaba8..89f7f3aebd31 100644
+> --- a/arch/x86/kvm/svm/sev.c
+> +++ b/arch/x86/kvm/svm/sev.c
+> @@ -345,7 +345,7 @@ static struct page **sev_pin_memory(struct kvm *kvm, unsigned long uaddr,
+>  		return NULL;
+>  
+>  	/* Pin the user virtual address. */
+> -	npinned = get_user_pages_fast(uaddr, npages, FOLL_WRITE, pages);
+> +	npinned = get_user_pages_fast(uaddr, npages, write ? FOLL_WRITE : 0, pages);
+>  	if (npinned != npages) {
+>  		pr_err("SEV: Failure locking %lu pages.\n", npages);
+>  		goto err;
+> -- 
+> 2.17.1
 > 
-
-And even if we knew where to start, it's quite a bit of effort for the
-hypothetical.  From conversations I've had with long-time I/O folks,
-non-prefetch seems to be the significant minority these days, dating
-back to older CKD devices (and associated connectivity) in practice.
