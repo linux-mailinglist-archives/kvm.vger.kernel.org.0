@@ -2,101 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 424531B62B3
-	for <lists+kvm@lfdr.de>; Thu, 23 Apr 2020 19:51:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 780CB1B62C8
+	for <lists+kvm@lfdr.de>; Thu, 23 Apr 2020 19:55:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730015AbgDWRvS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Apr 2020 13:51:18 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:60107 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1729889AbgDWRvR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Apr 2020 13:51:17 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1587664275;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=K4I4TQXbu0COs/qS0TdMrpO0BMmwvUdkWqtKkxdiZtg=;
-        b=eeW/zRdAVsH+9nh6dSZrOVKFK4yOAeFBtx8hmJ4dbRg07hlxfTvQ/3/hdegNDEPZtqpEe/
-        1Gz+9wxlRXl8H+BRaTGQZsWJ6JrIFLFK0v3vSQuRcnyE/VpUyggiiiDvXumNAVC6Webclf
-        7KmGFl9mtCnpsqNpLpdD2c1wX6Uze9s=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-9-D2JV04i8O1uSBbQ92VRt2A-1; Thu, 23 Apr 2020 13:51:13 -0400
-X-MC-Unique: D2JV04i8O1uSBbQ92VRt2A-1
-Received: by mail-wm1-f71.google.com with SMTP id n17so2686432wmi.3
-        for <kvm@vger.kernel.org>; Thu, 23 Apr 2020 10:51:13 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=K4I4TQXbu0COs/qS0TdMrpO0BMmwvUdkWqtKkxdiZtg=;
-        b=jCYnIgGyhYmcDmS3Wi4fH/dtWtfQeg8Z2Yxhgt+62JNO0qaCy9OwtFwNfDXQ0W2cDY
-         j7NXLtlLJqto5Mc6U939QRNhKr7VCcbbbPCvGTLAhSaSfxhdBbgYCWrXv6rXcs4OnJXq
-         oINqXmr22398x8KNOaqkDLIghZ1dLFFhZESoU8TJx0a6NNMG2KUbHVtajpC/mXbxqq5Q
-         P3kRONJf2m543Y1bINVnEmtW1e3XqG8oEsPiYBnWMv6O8g2MltOS0UJP4t+ZPZ21dlWh
-         HfpYWh1ZoUx2twtR0ffygEK2DPJKypGdmpfMTvCNdUtk5jRmn+UCK7P2ov2rmC5gzrEy
-         HH2A==
-X-Gm-Message-State: AGi0PuavaNjIip+mvfCfcy8hHx0r9dgp3hscFLl1E3MwBBzZ9rk3vJ/o
-        M5SHvuiXv8sd/itLGcA/Rbik+Qlq5giszFwMXu3a8tXcOAZz3xUVaPlLittPVpKo+J26XIiGfNP
-        S4IkuxrrEW7pz
-X-Received: by 2002:a1c:9e51:: with SMTP id h78mr5726963wme.177.1587664272584;
-        Thu, 23 Apr 2020 10:51:12 -0700 (PDT)
-X-Google-Smtp-Source: APiQypK/wZjFY48hmQMwIAV2fQ6VxIkFz+VgDCtd7gu1Ykeal53v56KplZrYM0/Je0GgoY4i5twzKQ==
-X-Received: by 2002:a1c:9e51:: with SMTP id h78mr5726937wme.177.1587664272275;
-        Thu, 23 Apr 2020 10:51:12 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:f43b:97b2:4c89:7446? ([2001:b07:6468:f312:f43b:97b2:4c89:7446])
-        by smtp.gmail.com with ESMTPSA id h137sm15720031wme.0.2020.04.23.10.51.10
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 23 Apr 2020 10:51:11 -0700 (PDT)
-Subject: Re: [PATCH v1 00/15] Add support for Nitro Enclaves
-To:     "Paraschiv, Andra-Irina" <andraprs@amazon.com>,
-        linux-kernel@vger.kernel.org
-Cc:     Anthony Liguori <aliguori@amazon.com>,
-        Benjamin Herrenschmidt <benh@amazon.com>,
-        Colm MacCarthaigh <colmmacc@amazon.com>,
-        Bjoern Doebel <doebel@amazon.de>,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        Frank van der Linden <fllinden@amazon.com>,
-        Alexander Graf <graf@amazon.de>,
-        Martin Pohlack <mpohlack@amazon.de>,
-        Matt Wilson <msw@amazon.com>, Balbir Singh <sblbir@amazon.com>,
-        Stewart Smith <trawets@amazon.com>,
-        Uwe Dannowski <uwed@amazon.de>, kvm@vger.kernel.org,
-        ne-devel-upstream@amazon.com
-References: <20200421184150.68011-1-andraprs@amazon.com>
- <18406322-dc58-9b59-3f94-88e6b638fe65@redhat.com>
- <ff65b1ed-a980-9ddc-ebae-996869e87308@amazon.com>
- <2a4a15c5-7adb-c574-d558-7540b95e2139@redhat.com>
- <1ee5958d-e13e-5175-faf7-a1074bd9846d@amazon.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <f560aed3-a241-acbd-6d3b-d0c831234235@redhat.com>
-Date:   Thu, 23 Apr 2020 19:51:09 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+        id S1730102AbgDWRzd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Apr 2020 13:55:33 -0400
+Received: from mail.kernel.org ([198.145.29.99]:42514 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729995AbgDWRzd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Apr 2020 13:55:33 -0400
+Received: from mail-il1-f178.google.com (mail-il1-f178.google.com [209.85.166.178])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id D58DF20781
+        for <kvm@vger.kernel.org>; Thu, 23 Apr 2020 17:55:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1587664532;
+        bh=HzfdttVM9BgXQr/ijSQNIg+ZauLcJdE62a/irg9HQUA=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=cu4I9nHQfaAgy0rxfE2IlSOes6GxtHhb1TM6KzJAfSoXk3LQVsGKljDgd4Kf2e0Du
+         cgTDqQF09l20AZz5QEkMAXbyseU5q3jalMsiN/Hvx3mfkYLe/u9uBIWtbfuu8QqiYD
+         SEJ5CeenY+ILfm9KNSCcO8L/iPPsdWYEoz4fb+Bc=
+Received: by mail-il1-f178.google.com with SMTP id u189so6445668ilc.4
+        for <kvm@vger.kernel.org>; Thu, 23 Apr 2020 10:55:32 -0700 (PDT)
+X-Gm-Message-State: AGi0PuYAVsrsxJDdADrzxT2RCID4Snfa2nIHP4IwPEILOVZqZmDxtOur
+        DK3GhVulGihCPvFqH6uBbVxMjeZtbPSZLw+XLkA=
+X-Google-Smtp-Source: APiQypL/Z2RoaxQTfyMU8HG6ck8a1KcKtB0U7jGPtMPkv1hfvGb/DzU/DYKwhO+zoay4gzXDiXn1MefQvMTM2uI93Yw=
+X-Received: by 2002:a92:405:: with SMTP id 5mr4426510ile.279.1587664532201;
+ Thu, 23 Apr 2020 10:55:32 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1ee5958d-e13e-5175-faf7-a1074bd9846d@amazon.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20200423173844.24220-1-andre.przywara@arm.com>
+In-Reply-To: <20200423173844.24220-1-andre.przywara@arm.com>
+From:   Ard Biesheuvel <ardb@kernel.org>
+Date:   Thu, 23 Apr 2020 19:55:21 +0200
+X-Gmail-Original-Message-ID: <CAMj1kXGDjzLA3sZg33EK2RVrSmYGuCm4cZ0Y9X=ZLxN8R--7=g@mail.gmail.com>
+Message-ID: <CAMj1kXGDjzLA3sZg33EK2RVrSmYGuCm4cZ0Y9X=ZLxN8R--7=g@mail.gmail.com>
+Subject: Re: [PATCH kvmtool v4 0/5] Add CFI flash emulation
+To:     Andre Przywara <andre.przywara@arm.com>
+Cc:     Will Deacon <will@kernel.org>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        kvm@vger.kernel.org, kvmarm <kvmarm@lists.cs.columbia.edu>,
+        Raphael Gault <raphael.gault@arm.com>,
+        Sami Mujawar <sami.mujawar@arm.com>,
+        Alexandru Elisei <Alexandru.Elisei@arm.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 23/04/20 19:42, Paraschiv, Andra-Irina wrote:
->>
->>>> - the initial CPU state: CPL0 vs. CPL3, initial program counter, etc.
-> 
-> The enclave VM has its own kernel and follows the well-known Linux boot
-> protocol, in the end getting to the user application after init finishes
-> its work, so that's CPL3.
+On Thu, 23 Apr 2020 at 19:39, Andre Przywara <andre.przywara@arm.com> wrote:
+>
+> Hi,
+>
+> an update for the CFI flash emulation, addressing Alex' comments and
+> adding direct mapping support.
+> The actual code changes to the flash emulation are minimal, mostly this
+> is about renaming and cleanups.
+> This versions now adds some patches. 1/5 is a required fix, the last
+> three patches add mapping support as an extension. See below.
+>
+> In addition to a branch with this series[1], I also put a git branch with
+> all the changes compared to v3[2] as separate patches on the server, please
+> have a look if you want to verify against a previous review.
+>
+> ===============
+> The EDK II UEFI firmware implementation requires some storage for the EFI
+> variables, which is typically some flash storage.
+> Since this is already supported on the EDK II side, and looks like a
+> generic standard, this series adds a CFI flash emulation to kvmtool.
+>
+> Patch 2/5 is the actual emulation code, patch 1/5 is a bug-fix for
+> registering MMIO devices, which is needed for this device.
+> Patches 3-5 add support for mapping the flash memory into guest, should
+> it be in read-array mode. For this to work, patch 3/5 is cherry-picked
+> from Alex' PCIe reassignable BAR series, to support removing a memslot
+> mapping. Patch 4/5 adds support for read-only mappings, while patch 5/5
+> adds or removes the mapping based on the current state.
+> I am happy to squash 5/5 into 2/5, if we agree that patch 3/5 should be
+> merged either separately or the PCIe series is actually merged before
+> this one.
+>
+> This is one missing piece towards a working UEFI boot with kvmtool on
+> ARM guests, the other is to provide writable PCI BARs, which is WIP.
+> This series alone already enables UEFI boot, but only with virtio-mmio.
+>
 
-CPL3 is how the user application run, but does the enclave's Linux boot
-process start in real mode at the reset vector (0xfffffff0), in 16-bit
-protected mode at the Linux bzImage entry point, or at the ELF entry point?
+Excellent! Thanks for taking the time to implement the r/o memslot for
+the flash, it really makes the UEFI firmware much more usable.
 
-Paolo
+I will test this as soon as I get a chance, probably tomorrow.
 
+
+>
+> [1] http://www.linux-arm.org/git?p=kvmtool.git;a=log;h=refs/heads/cfi-flash/v4
+> [2] http://www.linux-arm.org/git?p=kvmtool.git;a=log;h=refs/heads/cfi-flash/v3
+> git://linux-arm.org/kvmtool.git (branches cfi-flash/v3 and cfi-flash/v4)
+>
+> Changelog v3 .. v4:
+> - Rename file to cfi-flash.c (dash instead of underscore).
+> - Unify macro names for states, modes and commands.
+> - Enforce one or two chips only.
+> - Comment on pow2_size() function.
+> - Use more consistent identifier spellings.
+> - Assign symbols to status register values.
+> - Drop RCR register emulation.
+> - Use numerical offsets instead of names for query offsets to match spec.
+> - Cleanup error path and reword info message in create_flash_device_file().
+> - Add fix to allow non-virtio MMIO device emulations.
+> - Support tearing down and adding read-only memslots.
+> - Add read-only memslot mapping when in read mode.
+>
+> Changelog v2 .. v3:
+> - Breaking MMIO handling into three separate functions.
+> - Assing the flash base address in the memory map, but stay at 32 MB for now.
+>   The MMIO area has been moved up to 48 MB, to never overlap with the
+>   flash.
+> - Impose a limit of 16 MB for the flash size, mostly to fit into the
+>   (for now) fixed memory map.
+> - Trim flash size down to nearest power-of-2, to match hardware.
+> - Announce forced flash size trimming.
+> - Rework the CFI query table slightly, to add the addresses as array
+>   indicies.
+> - Fix error handling when creating the flash device.
+> - Fix pow2_size implementation for 0 and 1 as input values.
+> - Fix write buffer size handling.
+> - Improve some comments.
+>
+> Changelog v1 .. v2:
+> - Add locking for MMIO handling.
+> - Fold flash read into handler.
+> - Move pow2_size() into generic header.
+> - Spell out flash base address.
