@@ -2,93 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BEFF11B571A
-	for <lists+kvm@lfdr.de>; Thu, 23 Apr 2020 10:18:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4FA301B574C
+	for <lists+kvm@lfdr.de>; Thu, 23 Apr 2020 10:36:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726985AbgDWISP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Apr 2020 04:18:15 -0400
-Received: from mga18.intel.com ([134.134.136.126]:57619 "EHLO mga18.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726960AbgDWISK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Apr 2020 04:18:10 -0400
-IronPort-SDR: 6nScYEbL5sC1832kois4tnBVeWgnr1VEqXB8AMu7OKKAMH5aZky/2U9IZj9wSYKXPIfMeikjOv
- Urf+vXAIFB3Q==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Apr 2020 01:18:09 -0700
-IronPort-SDR: H2js4KyfqgKPTrSIYNjsglnFfWiHpURD680umEPk7b1S7xoshEnoq1ns8VOdG92uFnD2SZTbI6
- o0EUARnm/8+Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,306,1583222400"; 
-   d="scan'208";a="255910162"
-Received: from sqa-gate.sh.intel.com (HELO clx-ap-likexu.tsp.org) ([10.239.48.212])
-  by orsmga003.jf.intel.com with ESMTP; 23 Apr 2020 01:18:07 -0700
-From:   Like Xu <like.xu@linux.intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, wei.w.wang@intel.com,
-        ak@linux.intel.com
-Subject: [PATCH v10 11/11] KVM: x86: Remove the common trap handler of the MSR_IA32_DEBUGCTLMSR
-Date:   Thu, 23 Apr 2020 16:14:12 +0800
-Message-Id: <20200423081412.164863-12-like.xu@linux.intel.com>
-X-Mailer: git-send-email 2.21.1
-In-Reply-To: <20200423081412.164863-1-like.xu@linux.intel.com>
-References: <20200423081412.164863-1-like.xu@linux.intel.com>
+        id S1726582AbgDWIgh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Apr 2020 04:36:37 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:38458 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725854AbgDWIgg (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 23 Apr 2020 04:36:36 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1587630995;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=bRD8O5iG7EfvWKOKXBFAGi4rL5dnL8/PwE9Z+SSrmik=;
+        b=UNXaARgsAwlkChUkaBg2SwLLczO7hBCPHxSlV6iWsDGGT2IBaNOYpKppcpVR44dQgbZRWR
+        xezg7qOtwOwMX23lRQvS4M1sokOPXRcn1ueVSjNoK86BdMci4AI0Ajqyn6mXE+F8ea0jXZ
+        5lKiXfFEPVE9CUN9dzOmNC4aDNLZggs=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-308-T83WYf6gM-qF5dSeN7hoNw-1; Thu, 23 Apr 2020 04:36:33 -0400
+X-MC-Unique: T83WYf6gM-qF5dSeN7hoNw-1
+Received: by mail-wr1-f71.google.com with SMTP id i10so2500083wrq.8
+        for <kvm@vger.kernel.org>; Thu, 23 Apr 2020 01:36:33 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=bRD8O5iG7EfvWKOKXBFAGi4rL5dnL8/PwE9Z+SSrmik=;
+        b=mLqTDlq8Vc9TqarwufHS5nBjn/zRNpUiY+wtRqBBgzJZxU6XEl7Q7V8Y6tEmivFfas
+         +0O0WP+HOXY9J9FRkcj3c65Qx8/ZdGiz7Tu4cc/ZKQzjr+F7DacQazh+M/VPSsZxwQwK
+         RjPtVy8AtCLqrqcc7aNZD/Qa3aZPcw+dGGZdODVX+z7+2X1sqaZvrtufiHyFWyOv9Adz
+         Q7fmEgQjeICATiYNXNaNT+ySXbV69XRHudI2nLW221q1MjWR/FotJLqo13dGuaPLY7hO
+         2XjW/IkRVhNK+xWR4FYelwJvfuwSb8ff2RLmbtavX4dC5feiL1g8cEDkL/upoVkUzFWE
+         xTyA==
+X-Gm-Message-State: AGi0PuZ+w3Pw6x+Rz1XBWwm5vs5Uj/XDn7ID3Du8PKFJ36K1rkTb9w35
+        kWbgVzg2P2CgOeTVqp7vSXSxBBH7lj3AVvUv03v7cnih3j1wRl52CpWHD1mguT19zsWPNp8T/tn
+        v7tIjcZbUYVrw
+X-Received: by 2002:a7b:c84f:: with SMTP id c15mr2725574wml.166.1587630991696;
+        Thu, 23 Apr 2020 01:36:31 -0700 (PDT)
+X-Google-Smtp-Source: APiQypLsKgGadTcNDt29kt4RwW1MeBi8hDzTQTTl+RYFiTtzryLE6OQChnefkxwejcELjdlw+X5njA==
+X-Received: by 2002:a7b:c84f:: with SMTP id c15mr2725541wml.166.1587630991255;
+        Thu, 23 Apr 2020 01:36:31 -0700 (PDT)
+Received: from [192.168.1.39] (116.red-83-42-57.dynamicip.rima-tde.net. [83.42.57.116])
+        by smtp.gmail.com with ESMTPSA id h188sm2861902wme.8.2020.04.23.01.36.30
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 23 Apr 2020 01:36:30 -0700 (PDT)
+Subject: Re: [PATCH v3 10/19] target/arm: Restrict ARMv4 cpus to TCG accel
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Peter Maydell <peter.maydell@linaro.org>
+Cc:     qemu-devel@nongnu.org,
+        =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+        kvm@vger.kernel.org, Thomas Huth <thuth@redhat.com>,
+        qemu-arm@nongnu.org, Fam Zheng <fam@euphon.net>,
+        Richard Henderson <richard.henderson@linaro.org>
+References: <20200316160634.3386-1-philmd@redhat.com>
+ <20200316160634.3386-11-philmd@redhat.com>
+From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <6849be34-8e45-98f8-7424-0fdb9466e9bd@redhat.com>
+Date:   Thu, 23 Apr 2020 10:36:29 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
+In-Reply-To: <20200316160634.3386-11-philmd@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Wei Wang <wei.w.wang@intel.com>
+On 3/16/20 5:06 PM, Philippe Mathieu-Daudé wrote:
+> KVM requires a cpu based on (at least) the ARMv7 architecture.
+> 
+> Only enable the following ARMv4 CPUs when TCG is available:
+> 
+>    - StrongARM (SA1100/1110)
+>    - OMAP1510 (TI925T)
+> 
 
-The debugctl msr is not completely identical on AMD and Intel CPUs, for
-example, FREEZE_LBRS_ON_PMI is supported by Intel CPUs only. Now, this
-msr is handled separately in svm.c and intel_pmu.c. So remove the
-common debugctl msr handling code in kvm_get/set_msr_common.
+I missed to explain, the point of this Kconfig granularity is on a KVM 
+only build, the TCG-only CPUs can't be default-selected, so most of 
+their devices are not pulled in.
 
-Signed-off-by: Wei Wang <wei.w.wang@intel.com>
----
- arch/x86/kvm/x86.c | 13 -------------
- 1 file changed, 13 deletions(-)
+Instead at the end the KVM-only binary only contains the devices 
+required to run the Cortex-A machines.
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 99f819dfcc90..e6dd8525cc60 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -2791,18 +2791,6 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 			return 1;
- 		}
- 		break;
--	case MSR_IA32_DEBUGCTLMSR:
--		if (!data) {
--			/* We support the non-activated case already */
--			break;
--		} else if (data & ~(DEBUGCTLMSR_LBR | DEBUGCTLMSR_BTF)) {
--			/* Values other than LBR and BTF are vendor-specific,
--			   thus reserved and should throw a #GP */
--			return 1;
--		}
--		vcpu_unimpl(vcpu, "%s: MSR_IA32_DEBUGCTLMSR 0x%llx, nop\n",
--			    __func__, data);
--		break;
- 	case 0x200 ... 0x2ff:
- 		return kvm_mtrr_set_msr(vcpu, msr, data);
- 	case MSR_IA32_APICBASE:
-@@ -3059,7 +3047,6 @@ int kvm_get_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 	switch (msr_info->index) {
- 	case MSR_IA32_PLATFORM_ID:
- 	case MSR_IA32_EBL_CR_POWERON:
--	case MSR_IA32_DEBUGCTLMSR:
- 	case MSR_IA32_LASTBRANCHFROMIP:
- 	case MSR_IA32_LASTBRANCHTOIP:
- 	case MSR_IA32_LASTINTFROMIP:
--- 
-2.21.1
+> diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
+> index 8b89d8c4c0..0652396296 100644
+> --- a/default-configs/arm-softmmu.mak
+> +++ b/default-configs/arm-softmmu.mak
+> @@ -17,8 +17,6 @@ CONFIG_INTEGRATOR=y
+>   CONFIG_FSL_IMX31=y
+>   CONFIG_MUSICPAL=y
+>   CONFIG_MUSCA=y
+> -CONFIG_CHEETAH=y
+> -CONFIG_SX1=y
+>   CONFIG_NSERIES=y
+>   CONFIG_STELLARIS=y
+>   CONFIG_REALVIEW=y
+[...]
+> diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
+> index e3d7e7694a..7fc0cff776 100644
+> --- a/hw/arm/Kconfig
+> +++ b/hw/arm/Kconfig
+> @@ -28,6 +28,7 @@ config ARM_VIRT
+>   
+>   config CHEETAH
+>       bool
+> +    select ARM_V4
+>       select OMAP
+>       select TSC210X
+>   
+> @@ -242,6 +243,7 @@ config COLLIE
+>   
+>   config SX1
+>       bool
+> +    select ARM_V4
+>       select OMAP
+>   
+>   config VERSATILE
+> diff --git a/target/arm/Kconfig b/target/arm/Kconfig
+> index e68c71a6ff..0d496d318a 100644
+> --- a/target/arm/Kconfig
+> +++ b/target/arm/Kconfig
+> @@ -1,2 +1,6 @@
+> +config ARM_V4
+> +    depends on TCG
+> +    bool
+> +
+>   config ARM_V7M
+>       bool
 
