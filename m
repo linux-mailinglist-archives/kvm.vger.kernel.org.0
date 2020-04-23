@@ -2,32 +2,32 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 034471B5F9B
-	for <lists+kvm@lfdr.de>; Thu, 23 Apr 2020 17:40:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6C9EB1B5F9C
+	for <lists+kvm@lfdr.de>; Thu, 23 Apr 2020 17:40:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729282AbgDWPkd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Apr 2020 11:40:33 -0400
-Received: from mail.kernel.org ([198.145.29.99]:51220 "EHLO mail.kernel.org"
+        id S1729310AbgDWPke (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Apr 2020 11:40:34 -0400
+Received: from mail.kernel.org ([198.145.29.99]:51254 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729230AbgDWPkc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Apr 2020 11:40:32 -0400
+        id S1728865AbgDWPkd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Apr 2020 11:40:33 -0400
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 5B07E2076C;
-        Thu, 23 Apr 2020 15:40:32 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 0B34920781;
+        Thu, 23 Apr 2020 15:40:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1587656432;
-        bh=4DuwlILzO9hzvyysFjgJ3379wFv4s1rSPnAK2bFpaTs=;
+        s=default; t=1587656433;
+        bh=E7hIDSjhnPmiIoxSDtBaSnp525oAZljrQLvYSUMnRqI=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=wgO3AfdBxQ5L9TwoxHZk2oTCEXGNO3QjqONrDkRWAfcWa8L76plT1O2ZPWegtrg7+
-         i8C3AzprII/rdO3bjLm1LgCwHm+bLBiI1Dr9+Rq87/xMdk4og41x2UUipxc459DCl0
-         o6gy5G51pXzJL8MvLgDqeB8GlA+FRcCjBpf8IxkE=
+        b=IOr1AEawHtAGqEWt5ye+aq959VTWkVDQD2fChx+WW/oywhsZNDQntOeSVWZB03BBq
+         PvZHChsnt5YsaUMzh01rx5pavN5sWmnoKAcSw7vyFMkJuwwoC8ffuKl4tQZsKOHV18
+         sKg9+DkPSmXh7SCoGNO9rYmO/cy96K8kBbtHjxTg=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
         by disco-boy.misterjones.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
         (Exim 4.92)
         (envelope-from <maz@kernel.org>)
-        id 1jRdxm-005oPM-Mj; Thu, 23 Apr 2020 16:40:30 +0100
+        id 1jRdxn-005oPM-Dr; Thu, 23 Apr 2020 16:40:31 +0100
 From:   Marc Zyngier <maz@kernel.org>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
@@ -39,18 +39,17 @@ Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
         Julien Thierry <julien.thierry.kdev@gmail.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.cs.columbia.edu, stable@vger.kernel.org
-Subject: [PATCH 1/8] KVM: arm: vgic: Fix limit condition when writing to GICD_I[CS]ACTIVER
-Date:   Thu, 23 Apr 2020 16:40:02 +0100
-Message-Id: <20200423154009.4113562-2-maz@kernel.org>
+        kvmarm@lists.cs.columbia.edu
+Subject: [PATCH 2/8] KVM: arm64: PSCI: Narrow input registers when using 32bit functions
+Date:   Thu, 23 Apr 2020 16:40:03 +0100
+Message-Id: <20200423154009.4113562-3-maz@kernel.org>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200423154009.4113562-1-maz@kernel.org>
 References: <20200423154009.4113562-1-maz@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: pbonzini@redhat.com, alexandru.elisei@arm.com, andre.przywara@arm.com, christoffer.dall@arm.com, julien@xen.org, yuzenghui@huawei.com, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, stable@vger.kernel.org
+X-SA-Exim-Rcpt-To: pbonzini@redhat.com, alexandru.elisei@arm.com, andre.przywara@arm.com, christoffer.dall@arm.com, julien@xen.org, yuzenghui@huawei.com, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-owner@vger.kernel.org
@@ -58,43 +57,58 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When deciding whether a guest has to be stopped we check whether this
-is a private interrupt or not. Unfortunately, there's an off-by-one bug
-here, and we fail to recognize a whole range of interrupts as being
-global (GICv2 SPIs 32-63).
+When a guest delibarately uses an SMC32 function number (which is allowed),
+we should make sure we drop the top 32bits from the input arguments, as they
+could legitimately be junk.
 
-Fix the condition from > to be >=.
-
-Cc: stable@vger.kernel.org
-Fixes: abd7229626b93 ("KVM: arm/arm64: Simplify active_change_prepare and plug race")
-Reported-by: André Przywara <andre.przywara@arm.com>
+Reported-by: Christoffer Dall <christoffer.dall@arm.com>
+Reviewed-by: Christoffer Dall <christoffer.dall@arm.com>
+Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- virt/kvm/arm/vgic/vgic-mmio.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ virt/kvm/arm/psci.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
-index 2199302597faf..d085e047953fa 100644
---- a/virt/kvm/arm/vgic/vgic-mmio.c
-+++ b/virt/kvm/arm/vgic/vgic-mmio.c
-@@ -444,7 +444,7 @@ static void vgic_mmio_change_active(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
- static void vgic_change_active_prepare(struct kvm_vcpu *vcpu, u32 intid)
- {
- 	if (vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3 ||
--	    intid > VGIC_NR_PRIVATE_IRQS)
-+	    intid >= VGIC_NR_PRIVATE_IRQS)
- 		kvm_arm_halt_guest(vcpu->kvm);
+diff --git a/virt/kvm/arm/psci.c b/virt/kvm/arm/psci.c
+index 14a162e295a94..3772717efe3e5 100644
+--- a/virt/kvm/arm/psci.c
++++ b/virt/kvm/arm/psci.c
+@@ -186,6 +186,18 @@ static void kvm_psci_system_reset(struct kvm_vcpu *vcpu)
+ 	kvm_prepare_system_event(vcpu, KVM_SYSTEM_EVENT_RESET);
  }
  
-@@ -452,7 +452,7 @@ static void vgic_change_active_prepare(struct kvm_vcpu *vcpu, u32 intid)
- static void vgic_change_active_finish(struct kvm_vcpu *vcpu, u32 intid)
++static void kvm_psci_narrow_to_32bit(struct kvm_vcpu *vcpu)
++{
++	int i;
++
++	/*
++	 * Zero the input registers' upper 32 bits. They will be fully
++	 * zeroed on exit, so we're fine changing them in place.
++	 */
++	for (i = 1; i < 4; i++)
++		vcpu_set_reg(vcpu, i, lower_32_bits(vcpu_get_reg(vcpu, i)));
++}
++
+ static int kvm_psci_0_2_call(struct kvm_vcpu *vcpu)
  {
- 	if (vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3 ||
--	    intid > VGIC_NR_PRIVATE_IRQS)
-+	    intid >= VGIC_NR_PRIVATE_IRQS)
- 		kvm_arm_resume_guest(vcpu->kvm);
- }
- 
+ 	struct kvm *kvm = vcpu->kvm;
+@@ -210,12 +222,16 @@ static int kvm_psci_0_2_call(struct kvm_vcpu *vcpu)
+ 		val = PSCI_RET_SUCCESS;
+ 		break;
+ 	case PSCI_0_2_FN_CPU_ON:
++		kvm_psci_narrow_to_32bit(vcpu);
++		fallthrough;
+ 	case PSCI_0_2_FN64_CPU_ON:
+ 		mutex_lock(&kvm->lock);
+ 		val = kvm_psci_vcpu_on(vcpu);
+ 		mutex_unlock(&kvm->lock);
+ 		break;
+ 	case PSCI_0_2_FN_AFFINITY_INFO:
++		kvm_psci_narrow_to_32bit(vcpu);
++		fallthrough;
+ 	case PSCI_0_2_FN64_AFFINITY_INFO:
+ 		val = kvm_psci_vcpu_affinity_info(vcpu);
+ 		break;
 -- 
 2.26.2
 
