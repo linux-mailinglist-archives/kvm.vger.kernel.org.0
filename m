@@ -2,218 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 905891B7B89
-	for <lists+kvm@lfdr.de>; Fri, 24 Apr 2020 18:26:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4B5001B7B90
+	for <lists+kvm@lfdr.de>; Fri, 24 Apr 2020 18:27:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728106AbgDXQ0I convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Fri, 24 Apr 2020 12:26:08 -0400
-Received: from mga02.intel.com ([134.134.136.20]:59598 "EHLO mga02.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727843AbgDXQ0H (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Apr 2020 12:26:07 -0400
-IronPort-SDR: M45TnLJIdqJfXj3EBAj2yAdJsrso4w+8M34IPjvAZ1w4JOqU41Chv+jzQ34z32guoFL1jY0KXg
- l6WnM54czLFg==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Apr 2020 09:26:05 -0700
-IronPort-SDR: sMPovo0w/QjfFeZ2GraoucfQ+YJQEMvNP/IzuYLavl671sAlZ01nHrwx6Ol1XKOp6SJBEmb/6l
- Y9fcBfjUsMCA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,311,1583222400"; 
-   d="scan'208";a="248104520"
-Received: from fmsmsx103.amr.corp.intel.com ([10.18.124.201])
-  by fmsmga008.fm.intel.com with ESMTP; 24 Apr 2020 09:26:04 -0700
-Received: from fmsmsx602.amr.corp.intel.com (10.18.126.82) by
- FMSMSX103.amr.corp.intel.com (10.18.124.201) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Fri, 24 Apr 2020 09:26:01 -0700
-Received: from fmsmsx602.amr.corp.intel.com (10.18.126.82) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1713.5; Fri, 24 Apr 2020 09:26:01 -0700
-Received: from shsmsx151.ccr.corp.intel.com (10.239.6.50) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id 15.1.1713.5
- via Frontend Transport; Fri, 24 Apr 2020 09:26:00 -0700
-Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.225]) by
- SHSMSX151.ccr.corp.intel.com ([169.254.3.22]) with mapi id 14.03.0439.000;
- Sat, 25 Apr 2020 00:25:56 +0800
-From:   "Tian, Kevin" <kevin.tian@intel.com>
-To:     Jason Gunthorpe <jgg@mellanox.com>
-CC:     "Raj, Ashok" <ashok.raj@intel.com>,
-        "Jiang, Dave" <dave.jiang@intel.com>,
-        "vkoul@kernel.org" <vkoul@kernel.org>,
-        "megha.dey@linux.intel.com" <megha.dey@linux.intel.com>,
-        "maz@kernel.org" <maz@kernel.org>,
-        "bhelgaas@google.com" <bhelgaas@google.com>,
-        "rafael@kernel.org" <rafael@kernel.org>,
-        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "hpa@zytor.com" <hpa@zytor.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "Pan, Jacob jun" <jacob.jun.pan@intel.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>, "Lu, Baolu" <baolu.lu@intel.com>,
-        "Kumar, Sanjay K" <sanjay.k.kumar@intel.com>,
-        "Luck, Tony" <tony.luck@intel.com>,
-        "Lin, Jing" <jing.lin@intel.com>,
-        "Williams, Dan J" <dan.j.williams@intel.com>,
-        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "parav@mellanox.com" <parav@mellanox.com>,
-        "dmaengine@vger.kernel.org" <dmaengine@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: RE: [PATCH RFC 00/15] Add VFIO mediated device support and IMS
- support for the idxd driver.
-Thread-Topic: [PATCH RFC 00/15] Add VFIO mediated device support and IMS
- support for the idxd driver.
-Thread-Index: AQHWGDVStT24LxQ110qc/YDRWdRX86iDuewAgACI/wCAAD7wgIAAnasAgAFwKICAAOPOMIAAQj8AgACkdbA=
-Date:   Fri, 24 Apr 2020 16:25:56 +0000
-Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D19D8A808B@SHSMSX104.ccr.corp.intel.com>
-References: <158751095889.36773.6009825070990637468.stgit@djiang5-desk3.ch.intel.com>
- <20200421235442.GO11945@mellanox.com>
- <AADFC41AFE54684AB9EE6CBC0274A5D19D86EE26@SHSMSX104.ccr.corp.intel.com>
- <20200422115017.GQ11945@mellanox.com> <20200422211436.GA103345@otc-nc-03>
- <20200423191217.GD13640@mellanox.com>
- <AADFC41AFE54684AB9EE6CBC0274A5D19D8960F9@SHSMSX104.ccr.corp.intel.com>
- <20200424124444.GJ13640@mellanox.com>
-In-Reply-To: <20200424124444.GJ13640@mellanox.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-version: 11.2.0.6
-dlp-reaction: no-action
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+        id S1727123AbgDXQ1z (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Apr 2020 12:27:55 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:57742 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726908AbgDXQ1y (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Apr 2020 12:27:54 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1587745673;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Sqa2zwpSHX/aXBjtwrDIW+4Ig2oY54LeCCkYHCPqKQY=;
+        b=HG3KGu6ivtxLwQiNFW8P0B5jjTxX3+h13NXncHKTg+3kuJwnAxOzoVne+ddBxe+yan0TlS
+        xhmT4HsE5DdgLon/EbTIn8HofMwYDl7ZUFz9beT3m+RtuLB6V3avjnw7DErigcMEeYVt48
+        nhmjT8VZJnXAedBlICGtybPI+orZ3Wg=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-477-flM2cS70OheOlr7uCaAt8A-1; Fri, 24 Apr 2020 12:27:51 -0400
+X-MC-Unique: flM2cS70OheOlr7uCaAt8A-1
+Received: by mail-wm1-f72.google.com with SMTP id h22so4052041wml.1
+        for <kvm@vger.kernel.org>; Fri, 24 Apr 2020 09:27:51 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=Sqa2zwpSHX/aXBjtwrDIW+4Ig2oY54LeCCkYHCPqKQY=;
+        b=PCtbBU1AMisz/gTVYQwU3OiVw9YSqTK+CLtfZzD4irbprheRWv6pGXyhaJyHpZtb3G
+         uOJtcYomJXeCo0aK5lxDTzYF3GuB3ENrJldYvb+GW0/+mua1MyjQtiPE0N9hsNX7bHfj
+         ePRfk4eXSyVce67CCOB5PAUUTRcLjjsrR+L6U7btzRPDCeadgjtQyQYHl34vdHVe2dJk
+         mIM3UZSk9tK1P2AMgxf2Yf83x4NXAz5DuhbmABoP59b0JBoz57AfVZeqI0uDwvjempNF
+         Mp3OlR8mDb0G94MYVb6ssHifGpPGhGtva6hw18XdrPiWN1EEP6P1ZuQIEeTi2W6pzcBj
+         GOsA==
+X-Gm-Message-State: AGi0PuaPJMEOg4vc8UzdRwjeW9g269glvyJVHlh1A9x754fx/ekBnozq
+        dGXsD4UIHZMmMdrzxqPz9Cd5nHVOngDrVzel+TPI4EYvBDtDGPCLGon/7PSfIFqNGT5Zc4BKDCZ
+        B2LmweoPJzuP5
+X-Received: by 2002:adf:f1c6:: with SMTP id z6mr4968441wro.361.1587745670672;
+        Fri, 24 Apr 2020 09:27:50 -0700 (PDT)
+X-Google-Smtp-Source: APiQypIHstS4mrgHIDeQ+fTnoYDfe+UHEdeBZBtwXAhvHQPJTVKOCiAjlm0h5Fan95TAEh8l+gYMmg==
+X-Received: by 2002:adf:f1c6:: with SMTP id z6mr4968408wro.361.1587745670416;
+        Fri, 24 Apr 2020 09:27:50 -0700 (PDT)
+Received: from [192.168.10.150] ([93.56.170.5])
+        by smtp.gmail.com with ESMTPSA id y10sm3443488wma.5.2020.04.24.09.27.49
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 24 Apr 2020 09:27:49 -0700 (PDT)
+Subject: Re: [PATCH v1 00/15] Add support for Nitro Enclaves
+To:     Alexander Graf <graf@amazon.com>,
+        "Paraschiv, Andra-Irina" <andraprs@amazon.com>,
+        linux-kernel@vger.kernel.org
+Cc:     Anthony Liguori <aliguori@amazon.com>,
+        Benjamin Herrenschmidt <benh@amazon.com>,
+        Colm MacCarthaigh <colmmacc@amazon.com>,
+        Bjoern Doebel <doebel@amazon.de>,
+        David Woodhouse <dwmw@amazon.co.uk>,
+        Frank van der Linden <fllinden@amazon.com>,
+        Martin Pohlack <mpohlack@amazon.de>,
+        Matt Wilson <msw@amazon.com>, Balbir Singh <sblbir@amazon.com>,
+        Stewart Smith <trawets@amazon.com>,
+        Uwe Dannowski <uwed@amazon.de>, kvm@vger.kernel.org,
+        ne-devel-upstream@amazon.com
+References: <20200421184150.68011-1-andraprs@amazon.com>
+ <18406322-dc58-9b59-3f94-88e6b638fe65@redhat.com>
+ <ff65b1ed-a980-9ddc-ebae-996869e87308@amazon.com>
+ <2a4a15c5-7adb-c574-d558-7540b95e2139@redhat.com>
+ <1ee5958d-e13e-5175-faf7-a1074bd9846d@amazon.com>
+ <f560aed3-a241-acbd-6d3b-d0c831234235@redhat.com>
+ <80489572-72a1-dbe7-5306-60799711dae0@amazon.com>
+ <0467ce02-92f3-8456-2727-c4905c98c307@redhat.com>
+ <5f8de7da-9d5c-0115-04b5-9f08be0b34b0@amazon.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <095e3e9d-c9e5-61d0-cdfc-2bb099f02932@redhat.com>
+Date:   Fri, 24 Apr 2020 18:27:48 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
+In-Reply-To: <5f8de7da-9d5c-0115-04b5-9f08be0b34b0@amazon.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> From: Jason Gunthorpe
-> Sent: Friday, April 24, 2020 8:45 PM
-> 
-> On Fri, Apr 24, 2020 at 03:27:41AM +0000, Tian, Kevin wrote:
-> 
-> > > > That by itself doesn't translate to what a guest typically does
-> > > > with a VDEV. There are other control paths that need to be serviced
-> > > > from the kernel code via VFIO. For speed path operations like
-> > > > ringing doorbells and such they are directly managed from guest.
-> > >
-> > > You don't need vfio to mmap BAR pages to userspace. The unique thing
-> > > that vfio gives is it provides a way to program the classic non-PASID
-> > > iommu, which you are not using here.
-> >
-> > That unique thing is indeed used here. Please note sharing CPU virtual
-> > address space with device (what SVA API is invented for) is not the
-> > purpose of this series. We still rely on classic non-PASID iommu
-> programming,
-> > i.e. mapping/unmapping IOVA->HPA per iommu_domain. Although
-> > we do use PASID to tag ADI, the PASID is contained within iommu_domain
-> > and invisible to VFIO. From userspace p.o.v, this is a device passthrough
-> > usage instead of PASID-based address space binding.
-> 
-> So you have PASID support but don't use it? Why? PASID is much better
-> than classic VFIO iommu, it doesn't require page pinning...
+On 24/04/20 14:56, Alexander Graf wrote:
+> Yes, that part is not documented in the patch set, correct. I would
+> personally just make an example user space binary the documentation for
+> now. Later we will publish a proper device specification outside of the
+> Linux ecosystem which will describe the register layout and image
+> loading semantics in verbatim, so that other OSs can implement the
+> driver too.
 
-PASID and I/O page fault (through ATS/PRI) are orthogonal things. Don't
-draw the equation between them. The host driver can tag PASID to 
-ADI so every DMA request out of that ADI has a PASID prefix, allowing VT-d
-to do PASID-granular DMA isolation. However I/O page fault cannot be
-taken for granted. A scalable IOV device may support PASID while without
-ATS/PRI. Even when ATS/PRI is supported, the tolerance of I/O page fault
-is decided by the work queue mode that is configured by the guest. For 
-example, if the guest put the work queue in non-faultable transaction 
-mode, the device doesn't do PRI and simply report error if no valid IOMMU 
-mapping.
+But this is not part of the device specification, it's part of the child
+enclave view.  And in my opinion, understanding the way the child
+enclave is programmed is very important to understand if Linux should at
+all support this new device.
 
-So in this series we support only the basic form for non-faultable transactions,
-using the classic VFIO iommu interface plus PASID-granular translation. 
-We are working on virtual SVA support in parallel. Once that feature is ready, 
-then I/O page fault could be CONDITIONALLY enabled according to guest 
-vIOMMU setting, e.g. when virtual context entry has page request enabled 
-then we enable nested translation in the physical PASID entry, with 1st 
-level linking to guest page table (GVA->GPA) and 2nd-level carrying 
-(GPA->HPA).
+> To answer the question though, the target file is in a newly invented
+> file format called "EIF" and it needs to be loaded at offset 0x800000 of
+> the address space donated to the enclave.
 
-> 
-> > > > How do you propose to use the existing SVA api's  to also provide
-> > > > full device emulation as opposed to using an existing infrastructure
-> > > > that's already in place?
-> > >
-> > > You'd provide the 'full device emulation' in userspace (eg qemu),
-> > > along side all the other device emulation. Device emulation does not
-> > > belong in the kernel without a very good reason.
-> >
-> > The problem is that we are not doing full device emulation. It's based
-> > on mediated passthrough. Some emulation logic requires close
-> > engagement with kernel device driver, e.g. resource allocation, WQ
-> > configuration, fault report, etc., while the detail interface is very vendor/
-> > device specific (just like between PF and VF).
-> 
-> Which sounds like the fairly classic case of device emulation to me.
-> 
-> > idxd is just the first device that supports Scalable IOV. We have a
-> > lot more coming later, in different types. Then putting such
-> > emulation in user space means that Qemu needs to support all those
-> > vendor specific interfaces for every new device which supports
-> 
-> It would be very sad to see an endless amount of device emulation code
-> crammed into the kernel. Userspace is where device emulation is
-> supposed to live. For security
+What is this EIF?
 
-I think providing an unified abstraction to userspace is also important,
-which is what VFIO provides today. The merit of using one set of VFIO 
-API to manage all kinds of mediated devices and VF devices is a major
-gain. Instead, inventing a new vDPA-like interface for every Scalable-IOV
-or equivalent device is just overkill and doesn't scale. Also the actual
-emulation code in idxd driver is actually small, if putting aside the PCI
-config space part for which I already explained most logic could be shared
-between mdev device drivers.
+* a new Linux kernel format?  If so, are there patches in flight to
+compile Linux in this new format (and I would be surprised if they were
+accepted, since we already have PVH as a standard way to boot
+uncompressed Linux kernels)?
 
-> 
-> qemu is the right place to put this stuff.
-> 
-> > > > Perhaps Alex can ease Jason's concerns?
-> > >
-> > > Last we talked Alex also had doubts on what mdev should be used
-> > > for. It is a feature that seems to lack boundaries, and I'll note that
-> > > when the discussion came up for VDPA, they eventually choose not to
-> > > use VFIO.
-> > >
-> >
-> > Is there a link to Alex's doubt? I'm not sure why vDPA didn't go
-> > for VFIO, but imho it is a different story.
-> 
-> No, not at all. VDPA HW today is using what Intel has been calling
-> ADI. But qemu already had the device emulation part in userspace, (all
-> of the virtio emulation parts are in userspace) so they didn't try to
-> put it in the kernel.
-> 
-> This is the pattern. User space is supposed to do the emulation parts,
-> the kernel provides the raw elements to manage queues/etc - and it is
-> not done through mdev.
-> 
-> > efficient for all vDPA type devices. However Scalable IOV is
-> > similar to SR-IOV, only for resource partitioning. It doesn't change
-> > the device programming interface, which could be in any vendor
-> > specific form. Here VFIO mdev is good for providing an unified
-> > interface for managing resource multiplexing of all such devices.
-> 
-> SIOV doesn't have a HW config space, and for some reason in these
-> patches there is BAR emulation too. So, no, it is not like SR-IOV at
-> all.
-> 
-> This is more like classic device emulation, presumably with some fast
-> path for the data plane. ie just like VDPA :)
-> 
-> Jason
+* a userspace binary (the CPL3 that Andra was referring to)?  In that
+case what is the rationale to prefer it over a statically linked ELF binary?
 
-Thanks
-Kevin
+* something completely different like WebAssembly?
+
+Again, I cannot provide a sensible review without explaining how to use
+all this.  I understand that Amazon needs to do part of the design
+behind closed doors, but this seems to have the resulted in issues that
+reminds me of Intel's SGX misadventures. If Amazon has designed NE in a
+way that is incompatible with open standards, it's up to Amazon to fix
+it for the patches to be accepted.  I'm very saddened to have to say
+this, because I do love the idea.
+
+Thanks,
+
+Paolo
+
