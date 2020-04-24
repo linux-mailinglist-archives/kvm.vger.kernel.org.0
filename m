@@ -2,43 +2,43 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C028F1B7196
-	for <lists+kvm@lfdr.de>; Fri, 24 Apr 2020 12:10:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8524A1B71A2
+	for <lists+kvm@lfdr.de>; Fri, 24 Apr 2020 12:11:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726668AbgDXKKD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Apr 2020 06:10:03 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:22445 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726582AbgDXKKC (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 24 Apr 2020 06:10:02 -0400
+        id S1726849AbgDXKLq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Apr 2020 06:11:46 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:20188 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726842AbgDXKLp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Apr 2020 06:11:45 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1587723000;
+        s=mimecast20190719; t=1587723103;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=Gs8h2QGSX4WsZ/SylCc9cjahXS3AAkX/n9RngR5AjYQ=;
-        b=JQQmWVibdFAJviPBwf1//M5X0kSDYB8BYKZ6SqR4+4eEF7bsu95VKC+pfb2Ov3LvIuIaDk
-        FuRqFq+82PfoRZlQq57ehk15HLmmCOsBmpYeV7VSQC1iB1P6CISB+/6thBE/Z+f0vnQWoj
-        NzCSHyK9stPSaj5nvCzeIkBGlLHvdbs=
+        bh=DU0V+U9WPB3BBfUQT4oXb1eZQQMpM0g5rHKwaAFTB48=;
+        b=B3xbmt+cmraexJ/3PRI+Z2SlxQW9hGMn2LS6lMKq/HivzZlD4RNb5ZUtOiB9HGgEhdTicd
+        pWfk0pfceIVENsot4xvvT/5nn7S3FCu0mfzSd9AzLbOYeGjcJUK/AQ6OrCro7JWaKcUzwZ
+        wFvZ2uPqWOaUvCqNV7Hthg8imyehDTU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-64-5wAabdQVNBGej0HJI6Z3Bw-1; Fri, 24 Apr 2020 06:09:58 -0400
-X-MC-Unique: 5wAabdQVNBGej0HJI6Z3Bw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+ us-mta-107-BLSxr5EmN_2wUiSn4OyUrg-1; Fri, 24 Apr 2020 06:11:40 -0400
+X-MC-Unique: BLSxr5EmN_2wUiSn4OyUrg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 586AA804061;
-        Fri, 24 Apr 2020 10:09:52 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F314F84E042;
+        Fri, 24 Apr 2020 10:11:38 +0000 (UTC)
 Received: from [10.36.113.138] (ovpn-113-138.ams2.redhat.com [10.36.113.138])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E6AB3100164D;
-        Fri, 24 Apr 2020 10:09:50 +0000 (UTC)
-Subject: Re: [PATCH v2 07/10] s390x: smp: Use full PSW to bringup new cpu
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 9455560606;
+        Fri, 24 Apr 2020 10:11:37 +0000 (UTC)
+Subject: Re: [PATCH v2 08/10] s390x: smp: Wait for sigp completion
 To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
 Cc:     thuth@redhat.com, linux-s390@vger.kernel.org,
         borntraeger@de.ibm.com, cohuck@redhat.com
 References: <20200423091013.11587-1-frankja@linux.ibm.com>
- <20200423091013.11587-8-frankja@linux.ibm.com>
+ <20200423091013.11587-9-frankja@linux.ibm.com>
 From:   David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -84,46 +84,90 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
  FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
 Organization: Red Hat GmbH
-Message-ID: <f13b31f6-80ef-9cfc-0cde-fe1c1601cf1f@redhat.com>
-Date:   Fri, 24 Apr 2020 12:09:50 +0200
+Message-ID: <6084d368-86d6-b8fd-d4d3-5e0d72cef590@redhat.com>
+Date:   Fri, 24 Apr 2020 12:11:36 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <20200423091013.11587-8-frankja@linux.ibm.com>
+In-Reply-To: <20200423091013.11587-9-frankja@linux.ibm.com>
 Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 23.04.20 11:10, Janosch Frank wrote:
-> Up to now we ignored the psw mask and only used the psw address when
-> bringing up a new cpu. For DAT we need to also load the mask, so let's
-> do that.
+> Sigp orders are not necessarily finished when the processor finished
+> the sigp instruction. We need to poll if the order has been finished
+> before we continue.
+> 
+> For (re)start and stop we already use sigp sense running and sigp
+> sense loops. But we still lack completion checks for stop and store
+> status, as well as the cpu resets.
+> 
+> Let's add them.
 > 
 > Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
 > Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 > ---
->  lib/s390x/smp.c  | 2 ++
->  s390x/cstart64.S | 3 ++-
->  2 files changed, 4 insertions(+), 1 deletion(-)
+>  lib/s390x/smp.c | 8 ++++++++
+>  lib/s390x/smp.h | 1 +
+>  s390x/smp.c     | 4 ++++
+>  3 files changed, 13 insertions(+)
 > 
 > diff --git a/lib/s390x/smp.c b/lib/s390x/smp.c
-> index 3f86243..6ef0335 100644
+> index 6ef0335..2555bf4 100644
 > --- a/lib/s390x/smp.c
 > +++ b/lib/s390x/smp.c
-> @@ -202,6 +202,8 @@ int smp_cpu_setup(uint16_t addr, struct psw psw)
->  	cpu->stack = (uint64_t *)alloc_pages(2);
+> @@ -154,6 +154,14 @@ int smp_cpu_start(uint16_t addr, struct psw psw)
+>  	return rc;
+>  }
 >  
->  	/* Start without DAT and any other mask bits. */
-> +	cpu->lowcore->sw_int_psw.mask = psw.mask;
-> +	cpu->lowcore->sw_int_psw.addr = psw.addr;
->  	cpu->lowcore->sw_int_grs[14] = psw.addr;
+> +void smp_cpu_wait_for_completion(uint16_t addr)
+> +{
+> +	uint32_t status;
+> +
+> +	/* Loops when cc == 2, i.e. when the cpu is busy with a sigp order */
+> +	sigp_retry(1, SIGP_SENSE, 0, &status);
+> +}
+> +
+>  int smp_cpu_destroy(uint16_t addr)
+>  {
+>  	struct cpu *cpu;
+> diff --git a/lib/s390x/smp.h b/lib/s390x/smp.h
+> index ce63a89..a8b98c0 100644
+> --- a/lib/s390x/smp.h
+> +++ b/lib/s390x/smp.h
+> @@ -45,6 +45,7 @@ int smp_cpu_restart(uint16_t addr);
+>  int smp_cpu_start(uint16_t addr, struct psw psw);
+>  int smp_cpu_stop(uint16_t addr);
+>  int smp_cpu_stop_store_status(uint16_t addr);
+> +void smp_cpu_wait_for_completion(uint16_t addr);
+>  int smp_cpu_destroy(uint16_t addr);
+>  int smp_cpu_setup(uint16_t addr, struct psw psw);
+>  void smp_teardown(void);
+> diff --git a/s390x/smp.c b/s390x/smp.c
+> index 7462211..48321f4 100644
+> --- a/s390x/smp.c
+> +++ b/s390x/smp.c
+> @@ -75,6 +75,7 @@ static void test_stop_store_status(void)
+>  	lc->prefix_sa = 0;
+>  	lc->grs_sa[15] = 0;
+>  	smp_cpu_stop_store_status(1);
+> +	smp_cpu_wait_for_completion(1);
+>  	mb();
+>  	report(lc->prefix_sa == (uint32_t)(uintptr_t)cpu->lowcore, "prefix");
+>  	report(lc->grs_sa[15], "stack");
+> @@ -85,6 +86,7 @@ static void test_stop_store_status(void)
+>  	lc->prefix_sa = 0;
+>  	lc->grs_sa[15] = 0;
+>  	smp_cpu_stop_store_status(1);
 
-Do we still have to set sw_int_grs[14] ?
+Just curious: Would it make sense to add that inside
+smp_cpu_stop_store_status() instead?
 
 -- 
 Thanks,
