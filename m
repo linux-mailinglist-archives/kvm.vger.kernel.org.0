@@ -2,255 +2,173 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 369921B73C1
-	for <lists+kvm@lfdr.de>; Fri, 24 Apr 2020 14:20:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9561D1B744D
+	for <lists+kvm@lfdr.de>; Fri, 24 Apr 2020 14:26:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726941AbgDXMUg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Apr 2020 08:20:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50510 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726289AbgDXMUf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Apr 2020 08:20:35 -0400
-Received: from mail-wr1-x442.google.com (mail-wr1-x442.google.com [IPv6:2a00:1450:4864:20::442])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9582FC09B045;
-        Fri, 24 Apr 2020 05:20:35 -0700 (PDT)
-Received: by mail-wr1-x442.google.com with SMTP id b11so10533455wrs.6;
-        Fri, 24 Apr 2020 05:20:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=P8xGO6FvtwsKZcy/9M7ngHRBNxButYM6Sd7Wr0NzqAM=;
-        b=LODAtqybFfeVD7pi/3KfbPvl/yQHMQ1WeN/BimMkrFKmFwDAleRV4VsbYm8oYi+hAS
-         f7wjEEpqdgeDiQ4ojaCUn+ioNkEX0D/I78/dp2EDSgNwlQoJtG5mlfNaUrBpTFXqUQ8w
-         B06lLAauxAfb3hjainhxP1TALEXhinNMgNVfosPcAKxeGAOpW1a90TQ78wsih35OYOd3
-         KDo9TJbM1s/OT9ZDH8pZLSt+e3KJqz6JaJptV9z60dw3F5/bPSEgEmtUcbaxuik/PdNb
-         aakMZ+kQeoHqDbzRtKbNCFgWhxrN1lcRw85M5cwwi46pitXEK0JUtOx/ldVQjcm1IdY8
-         kSTw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=P8xGO6FvtwsKZcy/9M7ngHRBNxButYM6Sd7Wr0NzqAM=;
-        b=trcYNZ8xWey5x44fYYoMMf/ahwcqvpbdUZnsnckK7owIPCtgs0tbDfb68wLsPMvU2D
-         G2dIcXaAx/EgalVhS4/uTVfcDDHyQxA608NbiX4ei0RDLxLtFQEfE5HGgCKDWLXWEUkD
-         YiyGugj+ihJ9OYFcw7Pu5lxyNgGrYkp3qYylIdnQAmPhNieovPPs6uoY1vKEAqQV4+GX
-         Jcl+tGaKzpiG/4cH6UrskRUEWeJPzJps3rZ/dYhGbC4KgLZvJISDFS2YjaJV+DPubiaj
-         ouRz4V4B6XvW6RrNbwxNliBzfNkLBLxjqqYJv7PqbEZGgsWqk2pAf4c2dwEOQtXLqR1q
-         vOEQ==
-X-Gm-Message-State: AGi0PuYepjJeBlC6siQiMxBiQImpij3N8drVBjdos9dCrVcFnDCzlLg0
-        Rr8IBfaNdG5cQCYcXgeV6do=
-X-Google-Smtp-Source: APiQypIgi/JP7UB+NS4VGbRiov8ReSLjYkP2pYkJfdgNuZVX137+z2nGMGaolZ/0vhgJQXj7kghi7Q==
-X-Received: by 2002:adf:f8c6:: with SMTP id f6mr11796994wrq.276.1587730834226;
-        Fri, 24 Apr 2020 05:20:34 -0700 (PDT)
-Received: from jondnuc (IGLD-84-229-154-20.inter.net.il. [84.229.154.20])
-        by smtp.gmail.com with ESMTPSA id z15sm7815562wrs.47.2020.04.24.05.20.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 24 Apr 2020 05:20:33 -0700 (PDT)
-Date:   Fri, 24 Apr 2020 15:20:32 +0300
-From:   Jon Doron <arilou@gmail.com>
-To:     Roman Kagan <rvkagan@yandex-team.ru>, kvm@vger.kernel.org,
-        linux-hyperv@vger.kernel.org, vkuznets@redhat.com
-Subject: Re: [PATCH v2 0/1] x86/kvm/hyper-v: Add support to SYNIC exit on EOM
-Message-ID: <20200424122032.GE1917435@jondnuc>
-References: <20200416083847.1776387-1-arilou@gmail.com>
- <20200416120040.GA3745197@rvkaganb>
- <20200416125430.GL7606@jondnuc>
- <20200417104251.GA3009@rvkaganb>
- <20200418064127.GB1917435@jondnuc>
+        id S1727804AbgDXMZ2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Apr 2020 08:25:28 -0400
+Received: from mail.kernel.org ([198.145.29.99]:56704 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727782AbgDXMZ1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Apr 2020 08:25:27 -0400
+Received: from mail-io1-f53.google.com (mail-io1-f53.google.com [209.85.166.53])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 708BB21582
+        for <kvm@vger.kernel.org>; Fri, 24 Apr 2020 12:25:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1587731126;
+        bh=At8xmfKBJxQ9CafuQrxhSF7RQSm74iu7lK9/pffz/Kk=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=hSuoz731MrEwMi2PEd3c9/Zupwr84KMTfGVXuHRXhm9aYcqRY78XoDs+Mpcsx3yqj
+         FY7Q37+129/tYtL2RZlzP0k3Pks6aQ6AAO2WWK9PoTkIpeGmMvZcI65R2iR/2l0ieX
+         c0Bqu6hvqyghzrOyJIAUYtUacnE0LgptmtjJcXQg=
+Received: by mail-io1-f53.google.com with SMTP id p10so10113729ioh.7
+        for <kvm@vger.kernel.org>; Fri, 24 Apr 2020 05:25:26 -0700 (PDT)
+X-Gm-Message-State: AGi0PuZHEM6qOFtXjYdGg01KqBLiF5P76qXtPsbazP1amO/canTgH038
+        aiAdRXtJ+u/OWOPeBQITRN3dNjQvMmKnp0l8Weg=
+X-Google-Smtp-Source: APiQypJc/nkscRMyfcPd01oltQYjyEJquNAjGFcmgHSSoISonFfv+XMnS8tZSLIDvipgwz2NbSPAKVS/Gu9zhzUEeD4=
+X-Received: by 2002:a6b:ef03:: with SMTP id k3mr8349793ioh.203.1587731125790;
+ Fri, 24 Apr 2020 05:25:25 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20200418064127.GB1917435@jondnuc>
+References: <20200423173844.24220-1-andre.przywara@arm.com>
+ <CAMj1kXGDjzLA3sZg33EK2RVrSmYGuCm4cZ0Y9X=ZLxN8R--7=g@mail.gmail.com>
+ <CAMj1kXEjckV3HzcX_XXTSn-tDDQ5H8=LgteDcP5USThn=OgTQg@mail.gmail.com>
+ <9e742184-86c1-a4be-c2cb-fe96979e0f1f@arm.com> <CAMj1kXGMHfENDCkAyPCvS0avaYGOVbjDkPi964L3y0DVvz8m8A@mail.gmail.com>
+ <df9a0aeb-39ed-f9bc-c506-71d2f134bc62@arm.com>
+In-Reply-To: <df9a0aeb-39ed-f9bc-c506-71d2f134bc62@arm.com>
+From:   Ard Biesheuvel <ardb@kernel.org>
+Date:   Fri, 24 Apr 2020 14:25:14 +0200
+X-Gmail-Original-Message-ID: <CAMj1kXEr0fVVG1xCxEJtcrrKe3_OYbOmAmbYy0TceSeX+3gfww@mail.gmail.com>
+Message-ID: <CAMj1kXEr0fVVG1xCxEJtcrrKe3_OYbOmAmbYy0TceSeX+3gfww@mail.gmail.com>
+Subject: Re: [PATCH kvmtool v4 0/5] Add CFI flash emulation
+To:     =?UTF-8?Q?Andr=C3=A9_Przywara?= <andre.przywara@arm.com>
+Cc:     Will Deacon <will@kernel.org>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        kvm@vger.kernel.org, kvmarm <kvmarm@lists.cs.columbia.edu>,
+        Raphael Gault <raphael.gault@arm.com>,
+        Sami Mujawar <sami.mujawar@arm.com>,
+        Alexandru Elisei <Alexandru.Elisei@arm.com>,
+        Leif Lindholm <leif@nuviainc.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 18/04/2020, Jon Doron wrote:
->On 17/04/2020, Roman Kagan wrote:
->>On Thu, Apr 16, 2020 at 03:54:30PM +0300, Jon Doron wrote:
->>>On 16/04/2020, Roman Kagan wrote:
->>>> On Thu, Apr 16, 2020 at 11:38:46AM +0300, Jon Doron wrote:
->>>> > According to the TLFS:
->>>> > "A write to the end of message (EOM) register by the guest causes the
->>>> > hypervisor to scan the internal message buffer queue(s) associated with
->>>> > the virtual processor.
->>>> >
->>>> > If a message buffer queue contains a queued message buffer, the hypervisor
->>>> > attempts to deliver the message.
->>>> >
->>>> > Message delivery succeeds if the SIM page is enabled and the message slot
->>>> > corresponding to the SINTx is empty (that is, the message type in the
->>>> > header is set to HvMessageTypeNone).
->>>> > If a message is successfully delivered, its corresponding internal message
->>>> > buffer is dequeued and marked free.
->>>> > If the corresponding SINTx is not masked, an edge-triggered interrupt is
->>>> > delivered (that is, the corresponding bit in the IRR is set).
->>>> >
->>>> > This register can be used by guests to poll for messages. It can also be
->>>> > used as a way to drain the message queue for a SINTx that has
->>>> > been disabled (that is, masked)."
->>>>
->>>> Doesn't this work already?
->>>>
->>>
->>>Well if you dont have SCONTROL and a GSI associated with the SINT then it
->>>does not...
->>
->>Yes you do need both of these.
->>
->>>> > So basically this means that we need to exit on EOM so the hypervisor
->>>> > will have a chance to send all the pending messages regardless of the
->>>> > SCONTROL mechnaisim.
->>>>
->>>> I might be misinterpreting the spec, but my understanding is that
->>>> SCONTROL {en,dis}ables the message queueing completely.  What the quoted
->>>> part means is that a write to EOM should trigger the message source to
->>>> push a new message into the slot, regardless of whether the SINT was
->>>> masked or not.
->>>>
->>>> And this (I think, haven't tested) should already work.  The userspace
->>>> just keeps using the SINT route as it normally does, posting
->>>> notifications to the corresponding irqfd when posting a message, and
->>>> waiting on the resamplerfd for the message slot to become free.  If the
->>>> SINT is masked KVM will skip injecting the interrupt, that's it.
->>>>
->>>> Roman.
->>>
->>>That's what I was thinking originally as well, but then i noticed KDNET as a
->>>VMBus client (and it basically runs before anything else) is working in this
->>>polling mode, where SCONTROL is disabled and it just loops, and if it saw
->>>there is a PENDING message flag it will issue an EOM to indicate it has free
->>>the slot.
->>
->>Who sets up the message page then?  Doesn't it enabe SCONTROL as well?
->>
+On Fri, 24 Apr 2020 at 14:08, Andr=C3=A9 Przywara <andre.przywara@arm.com> =
+wrote:
 >
->KdNet is the one setting the SIMP and it's not setting the SCONTROL, 
->ill paste output of KVM traces for the relevant MSRs
+> On 24/04/2020 07:45, Ard Biesheuvel wrote:
 >
->>Note that, even if you don't see it being enabled by Windows, it can be
->>enabled by the firmware and/or by the bootloader.
->>
->>Can you perhaps try with the SeaBIOS from
->>https://src.openvz.org/projects/UP/repos/seabios branch hv-scsi?  It
->>enables SCONTROL and leaves it that way.
->>
->>I'd also suggest tracing kvm_msr events (both reads and writes) for
->>SCONTROL and SIMP msrs, to better understand the picture.
->>
->>So far the change you propose appears too heavy to work around the
->>problem of disabled SCONTROL.  You seem to be better off just making
->>sure it's enabled (either by the firmware or slighly violating the spec
->>and initializing to enabled from the start), and sticking to the
->>existing infrastructure for posting messages.
->>
+> Hi,
 >
->I guess there is something I'm missing here but let's say the BIOS 
->would have set the SCONTROL but the OS is not setting it, who is in 
->charge of handling the interrupts?
+> (adding Leif for EDK-2 discussion)
 >
->>>(There are a bunch of patches i sent on the QEMU mailing list as well  where
->>>i CCed you, I will probably revise it a bit but was hoping to get  KVM
->>>sorted out first).
->>
->>I'll look through the archive, should be there, thanks.
->>
->>Roman.
+> > On Thu, 23 Apr 2020 at 23:32, Andr=C3=A9 Przywara <andre.przywara@arm.c=
+om> wrote:
+> >>
+> >> On 23/04/2020 21:43, Ard Biesheuvel wrote:
 >
->I tried testing with both the SeaBIOS branch you have suggested and 
->the EDK2, unfortunately I could not get the EDK2 build to identify my 
->VM drive to boot from (not sure why)
+> [ ... kvmtool series to add CFI flash emulation allowing EDK-2 to store
+> variables. Starting with this version (v4) the flash memory region is
+> presented as a read-only memslot to KVM, to allow direct guest accesses
+> as opposed to trap-and-emulate even read accesses to the array.]
 >
->Here is an output of KVM trace for the relevant MSRs (SCONTROL and SIMP)
+> >>
+> >>
+> >> Just curious: the images Sami gave me this morning did not show any
+> >> issues anymore (no no-syndrome fault, no alignment issues), even witho=
+ut
+> >> the mapping [1]. And even though I saw the 800k read traps, I didn't
+> >> notice any real performance difference (on a Juno). The PXE timeout wa=
+s
+> >> definitely much more noticeable.
+> >>
+> >> So did you see any performance impact with this series?
+> >>
+> >
+> > You normally don't PXE boot. There is an issue with the iSCSI driver
+> > as well, which causes a boot delay for some reason, so I disabled that
+> > in my build.
+> >
+> > I definitely *feels* faster :-) But in any case, exposing the array
+> > mode as a r/o memslot is definitely the right way to deal with this.
+> > Even if Sami did find a workaround that masks the error, it is no
+> > guarantee that all accesses go through that library.
 >
->QEMU Default BIOS
->-----------------
-> qemu-system-x86-613   [000] ....  1121.080722: kvm_hv_synic_set_msr: vcpu_id 0 msr 0x40000080 data 0x0 host 1
-> qemu-system-x86-613   [000] ....  1121.080722: kvm_hv_synic_set_msr: vcpu_id 0 msr 0x40000083 data 0x0 host 1
-> qemu-system-x86-613   [000] .N..  1121.095592: kvm_hv_synic_set_msr: vcpu_id 0 msr 0x40000080 data 0x0 host 1
-> qemu-system-x86-613   [000] .N..  1121.095592: kvm_hv_synic_set_msr: vcpu_id 0 msr 0x40000083 data 0x0 host 1
->Choose Windows DebugEntry
-> qemu-system-x86-613   [001] ....  1165.185227: kvm_msr: msr_read 40000083 = 0x0
-> qemu-system-x86-613   [001] ....  1165.185255: kvm_hv_synic_set_msr: vcpu_id 0 msr 0x40000083 data 0xfa1001 host 0
-> qemu-system-x86-613   [001] ....  1165.185255: kvm_msr: msr_write 40000083 = 0xfa1001
-> qemu-system-x86-613   [001] ....  1165.193206: kvm_msr: msr_read 40000083 = 0xfa1001
-> qemu-system-x86-613   [001] ....  1165.193236: kvm_hv_synic_set_msr: vcpu_id 0 msr 0x40000083 data 0xfa1000 host 0
-> qemu-system-x86-613   [001] ....  1165.193237: kvm_msr: msr_write 40000083 = 0xfa1000
+> So I was wondering about this, maybe you can confirm or debunk this:
+> - Any memory given to the compiler (through a pointer) is assumed to be
+> "normal" memory: the compiler can re-arrange accesses, split them up or
+> collate them. Also unaligned accesses should be allowed - although I
+> guess most compilers would avoid them.
+> - This normally forbids to give a pointer to memory mapped as "device
+> memory" to the compiler, since this would violate all of the assumptions
+> above.
+> - If the device mapped as "device memory" is actually memory (SRAM,
+> ROM/flash, framebuffer), then most of the assumptions are met, except
+> the alignment requirement, which is bound to the mapping type, not the
+> actual device (ARMv8 ARM: Unaligned accesses to device memory always
+> trap, regardless of SCTLR.A)
+> - To accommodate the latter, GCC knows the option -malign-strict, to
+> avoid unaligned accesses. TF-A and U-Boot use this option, to run
+> without the MMU enabled.
 >
+> Now if EDK-2 lets the compiler deal with the flash memory region
+> directly, I think this would still be prone to alignment faults. In fact
+> an earlier build I got from Sami faulted on exactly that, when I ran it,
+> even with the r/o memslot mapping in place.
 >
->SeaBIOS hv-scsci
->----------------
-> qemu-system-x86-656   [001] ....  1313.072714: kvm_hv_synic_set_msr: vcpu_id 0 msr 0x40000080 data 0x0 host 1
-> qemu-system-x86-656   [001] ....  1313.072714: kvm_hv_synic_set_msr: vcpu_id 0 msr 0x40000083 data 0x0 host 1
-> qemu-system-x86-656   [001] ....  1313.087752: kvm_hv_synic_set_msr: vcpu_id 0 msr 0x40000080 data 0x0 host 1
-> qemu-system-x86-656   [001] ....  1313.087752: kvm_hv_synic_set_msr: vcpu_id 0 msr 0x40000083 data 0x0 host 1
-> qemu-system-x86-656   [001] ....  1313.156675: kvm_msr: msr_read 40000083 = 0x0
-> qemu-system-x86-656   [001] ....  1313.156680: kvm_hv_synic_set_msr: vcpu_id 0 msr 0x40000083 data 0x7fffe001 host 0
->Choose Windows DebugEntry
-> qemu-system-x86-656   [001] ....  1313.156680: kvm_msr: msr_write 40000083 = 0x7fffe001
-> qemu-system-x86-656   [001] ....  1313.162111: kvm_msr: msr_read 40000080 = 0x0
-> qemu-system-x86-656   [001] ....  1313.162118: kvm_hv_synic_set_msr: vcpu_id 0 msr 0x40000080 data 0x1 host 0
-> qemu-system-x86-656   [001] ....  1313.162119: kvm_msr: msr_write 40000080 = 0x1
-> qemu-system-x86-656   [001] ....  1313.246758: kvm_msr: msr_read 40000083 = 0x7fffe001
-> qemu-system-x86-656   [001] ....  1313.246764: kvm_hv_synic_set_msr: vcpu_id 0 msr 0x40000083 data 0x0 host 0
-> qemu-system-x86-656   [001] ....  1313.246764: kvm_msr: msr_write 40000083 = 0x0
-> qemu-system-x86-656   [001] ....  1348.904727: kvm_msr: msr_read 40000083 = 0x0
-> qemu-system-x86-656   [001] ....  1348.904771: kvm_hv_synic_set_msr: vcpu_id 0 msr 0x40000083 data 0xfa1001 host 0
-> qemu-system-x86-656   [001] ....  1348.904772: kvm_msr: msr_write 40000083 = 0xfa1001
-> qemu-system-x86-656   [001] ....  1348.919170: kvm_msr: msr_read 40000083 = 0xfa1001
-> qemu-system-x86-656   [001] ....  1348.919183: kvm_hv_synic_set_msr: vcpu_id 0 msr 0x40000083 data 0xfa1000 host 0
-> qemu-system-x86-656   [001] ....  1348.919183: kvm_msr: msr_write 40000083 = 0xfa1000
->
->
-> I could not get the EDK2 setup to work though
-> (https://src.openvz.org/projects/UP/repos/edk2 branch hv-scsi)
->
->It does not detect my VM hard drive not sure why (this is how i  
->configured it:
-> -drive file=./win10.qcow2,format=qcow2,if=none,id=drive_disk0 \
-> -device virtio-blk-pci,drive=drive_disk0 \
->
->(Is there something special i need to configure it order for it to  
->work?, I tried building EDK2 with and without SMM_REQUIRE and  
->SECURE_BOOT_ENABLE)
->
->
->But in general it sounds like there is something I dont fully 
->understand when SCONTROL is enabled, then a GSI is associated with 
->this SintRoute.
->
->Then when the guest triggers an EOI via the APIC we will trigger the 
->GSI notification, which will give us another go on trying to copy the 
->message into it's slot.
->
->So is it the OS that is in charge of setting the EOI? If so then it 
->needs to be aware of SCONTROL being enabled and just having it left 
->set by the BIOS might not be enough?
->
->Also in the TLFS (looking at v6) they mention that message queueing 
->has "3 exit conditions", which will cause the hypervisor to try and 
->attempt to deliver the additional messages.
->
->The 3 exit conditions they refer to are:
->* Another message buffer is queued.
->* The guest indicates the “end of interrupt” by writing to the APIC’s   
->EOI register.
->* The guest indicates the “end of message” by writing to the SynIC’s 
->EOM   register.
->
->Also notice this additional exit is only if there is a pending message 
->and not for every EOM.
->
->Thanks,
->-- Jon.
+> So should EDK-2 add -malign-strict to be safe?
 
-Hi Roman
+It already uses this in various places where it matters.
 
-Any other thoughts/suggestions about this?
+>         or
+> Should EDK-2 add an additional or alternate mapping using a non-device
+> memory type (with all the mismatched attributes consequences)?
 
-Thanks,
--- Jon.
+The memory mapped NOR flash in UEFI is really a special case, since we
+need the OS to map it for us at runtime, and we cannot tell it to
+switch between normal-NC and device attributes depending on which mode
+the firmware is using it in.
+
+Note that this is not any different on bare metal.
+
+>         or
+> Should EDK-2 only touch the flash region using MMIO accessors, and
+> forbid the compiler direct access to that region?
+>
+
+It should only touch those regions using abstractions it defines
+itself, and which can be backed in different ways. This is already the
+case in EDK2: it has its own CopyMem, ZeroMem, etc string library, and
+bans the use the standard C ones. On top of that, it bans struct
+assignment, initializers for automatic variables and are things that
+result in such calls to be emitted implicitly.
+
+So in practice, this issue is under control, unless you use a version
+of those abstractions that willingly uses unaligned accesses (we have
+optimized versions based on the cortex-strings library). So my
+suspicion is that this may have caused the crash: on bare metal, we
+have to switch to the non-optimized string library for the variable
+driver for this reason.
+
+The real solution is to fix EDK2, and make the variable stack work
+with NOR flash that is non-memory mapped. This is something that has
+come up before, and the other day, Sami and I were just discussing
+logging this as a wishlist item for the firmware team.
+
+
+> So does EDK-2 get away with this because the compiler typically avoids
+> unaligned accesses?
+>
+
+There are certainly some places in the current code base where it is
+the compiler that is emitting reads from the NOR flash region, but
+there aren't that many. Moving the variable data itself in and out
+will typically use the abstractions, since it is moving anonymous
+chunks of data. However, there are places where, e.g., fields in the
+FS metadata are being read by the code, and there it just casts an
+address pointing into the NOR flash region to the appropriate struct
+type, and dereferences the fields.
