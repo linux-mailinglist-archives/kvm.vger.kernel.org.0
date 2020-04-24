@@ -2,215 +2,225 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7F1A81B796F
-	for <lists+kvm@lfdr.de>; Fri, 24 Apr 2020 17:22:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 367B61B7974
+	for <lists+kvm@lfdr.de>; Fri, 24 Apr 2020 17:23:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728222AbgDXPWA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Apr 2020 11:22:00 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:33093 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727123AbgDXPWA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Apr 2020 11:22:00 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1587741718;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Wx6UqBc+7Fd78ffDznq1MJq+WQRq4yvKOdpl3Ke1Tvs=;
-        b=E0EghZKROQh5KCE6hRSf2LgnMegdOzx9wPDGtzNV47CcY5WhejLYrI8o1RjyG0VYI4y2co
-        B65xX8rGwcgg0GxYp0ONEXn7kcCUKhdS4DHk6g1UXJyEEWNOGMjFyTfEqksr/oJ5vve4Es
-        8JSkmW30Oc9OOaW3GpyqGjNZ/lFTF3w=
-Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
- [209.85.219.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-142-0hLPEJFUNWSQhVT4JClcFg-1; Fri, 24 Apr 2020 11:21:54 -0400
-X-MC-Unique: 0hLPEJFUNWSQhVT4JClcFg-1
-Received: by mail-qv1-f71.google.com with SMTP id et5so10106440qvb.5
-        for <kvm@vger.kernel.org>; Fri, 24 Apr 2020 08:21:54 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=Wx6UqBc+7Fd78ffDznq1MJq+WQRq4yvKOdpl3Ke1Tvs=;
-        b=HGsb8s90baT/PF4WbB1Fr3butsdNoMYiflRSWHC7OjeKcw1AHtiDrfQ+vN5NbwNTRW
-         3Ty6Xqyl3+gG7rx19Ir7YbTnE3VAv3hMEVFVBC+jUjJCNI2MuT5SsTwuuO18O5q63yYp
-         IOm5xEogi9yPC6SFCPKCeDyA0qHa6Ojrq8bFwQZyHPbMmNCQw7p0B0593xDxLXId99kU
-         kxBIPMdwlc6cR4ZQ4IsYPgfOaTRfd16Y0nZXXS0fAqUVFijg4TNoTA/nJASJELBou6x9
-         AZRwkmueBbs6eWY6FSE2VCE8DsVT9p4weiPlFzVNtRBUna/J9nbiFCY2e0vX+pUB7KLF
-         dGNg==
-X-Gm-Message-State: AGi0PuZhkDuSqV6/0j9Yusds4Anok+4FlOlJGo4fGNqH7+K6VmQOP/G0
-        6MeEVJPJzdGQvEYLw8TlfmfZc4jZ9PxdXiQFbSbxu+vrhnZpk6UZ6rAENTu7Bsy5WQrA+bQ7uWd
-        KtKHUuD1tgNlj
-X-Received: by 2002:a05:620a:22d6:: with SMTP id o22mr9336375qki.49.1587741714150;
-        Fri, 24 Apr 2020 08:21:54 -0700 (PDT)
-X-Google-Smtp-Source: APiQypLQIQ4cCKKttCJu6UxYlK8vabyjhMsxG7WZoaBoQk27nV3zGbwoIRKSjA+BIEmG5/Gh77Y+cg==
-X-Received: by 2002:a05:620a:22d6:: with SMTP id o22mr9336338qki.49.1587741713790;
-        Fri, 24 Apr 2020 08:21:53 -0700 (PDT)
-Received: from xz-x1 ([2607:9880:19c0:32::2])
-        by smtp.gmail.com with ESMTPSA id 195sm3758661qkd.6.2020.04.24.08.21.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 24 Apr 2020 08:21:52 -0700 (PDT)
-Date:   Fri, 24 Apr 2020 11:21:51 -0400
-From:   Peter Xu <peterx@redhat.com>
+        id S1728241AbgDXPWU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Apr 2020 11:22:20 -0400
+Received: from mga04.intel.com ([192.55.52.120]:12913 "EHLO mga04.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726920AbgDXPWU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Apr 2020 11:22:20 -0400
+IronPort-SDR: gkmLLEDGFVXVA+Pyahqqvl++4ENjVxKYf7KYBaT+rc4us59sjbWqGQhul84TbuQkDYWuBfjuk0
+ eH3FUQl7UpDw==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Apr 2020 08:22:19 -0700
+IronPort-SDR: lNZQXQ63t+XjMky3bU1cg+5d3JFTtZ1ZILO0XjPgq3c7HU32TVp1zDyK/1Hq4BIMeVbmnv0C20
+ 40vaoszU990w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.73,311,1583222400"; 
+   d="scan'208";a="457375407"
+Received: from local-michael-cet-test.sh.intel.com (HELO localhost) ([10.239.159.128])
+  by fmsmga005.fm.intel.com with ESMTP; 24 Apr 2020 08:22:17 -0700
+Date:   Fri, 24 Apr 2020 23:24:19 +0800
+From:   Yang Weijiang <weijiang.yang@intel.com>
 To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Kevin Tian <kevin.tian@intel.com>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Christophe de Dinechin <dinechin@redhat.com>,
-        Yan Zhao <yan.y.zhao@intel.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>
-Subject: Re: [PATCH v8 03/14] KVM: X86: Don't track dirty for
- KVM_SET_[TSS_ADDR|IDENTITY_MAP_ADDR]
-Message-ID: <20200424152151.GB41816@xz-x1>
-References: <20200331190000.659614-1-peterx@redhat.com>
- <20200331190000.659614-4-peterx@redhat.com>
- <20200423203944.GS17824@linux.intel.com>
+Cc:     Yang Weijiang <weijiang.yang@intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, pbonzini@redhat.com,
+        jmattson@google.com, yu.c.zhang@linux.intel.com
+Subject: Re: [PATCH v11 8/9] KVM: VMX: Enable CET support for nested VM
+Message-ID: <20200424152419.GL24039@local-michael-cet-test>
+References: <20200326081847.5870-1-weijiang.yang@intel.com>
+ <20200326081847.5870-9-weijiang.yang@intel.com>
+ <20200423182906.GL17824@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200423203944.GS17824@linux.intel.com>
+In-Reply-To: <20200423182906.GL17824@linux.intel.com>
+User-Agent: Mutt/1.11.3 (2019-02-01)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Apr 23, 2020 at 01:39:44PM -0700, Sean Christopherson wrote:
-> On Tue, Mar 31, 2020 at 02:59:49PM -0400, Peter Xu wrote:
-> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > index 1b6d9ac9533c..faa702c4d37b 100644
-> > --- a/arch/x86/kvm/x86.c
-> > +++ b/arch/x86/kvm/x86.c
-> > @@ -9791,7 +9791,32 @@ void kvm_arch_sync_events(struct kvm *kvm)
-> >  	kvm_free_pit(kvm);
+On Thu, Apr 23, 2020 at 11:29:06AM -0700, Sean Christopherson wrote:
+> On Thu, Mar 26, 2020 at 04:18:45PM +0800, Yang Weijiang wrote:
+> > CET MSRs pass through guests for performance consideration.
+> > Configure the MSRs to match L0/L1 settings so that nested VM
+> > is able to run with CET.
+> > 
+> > Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
+> > ---
+> >  arch/x86/kvm/vmx/nested.c | 41 +++++++++++++++++++++++++++++++++++++--
+> >  arch/x86/kvm/vmx/vmcs12.c |  6 ++++++
+> >  arch/x86/kvm/vmx/vmcs12.h | 14 ++++++++++++-
+> >  arch/x86/kvm/vmx/vmx.c    |  1 +
+> >  4 files changed, 59 insertions(+), 3 deletions(-)
+> > 
+> > diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> > index e47eb7c0fbae..a71ef33de55f 100644
+> > --- a/arch/x86/kvm/vmx/nested.c
+> > +++ b/arch/x86/kvm/vmx/nested.c
+> > @@ -627,6 +627,41 @@ static inline bool nested_vmx_prepare_msr_bitmap(struct kvm_vcpu *vcpu,
+> >  	nested_vmx_disable_intercept_for_msr(msr_bitmap_l1, msr_bitmap_l0,
+> >  					     MSR_KERNEL_GS_BASE, MSR_TYPE_RW);
+> >  
+> > +	/* Pass CET MSRs to nested VM if L0 and L1 are set to pass-through. */
+> > +	if (!msr_write_intercepted_l01(vcpu, MSR_IA32_U_CET))
+> > +		nested_vmx_disable_intercept_for_msr(
+> > +					msr_bitmap_l1, msr_bitmap_l0,
+> > +					MSR_IA32_U_CET, MSR_TYPE_RW);
+> > +
+> > +	if (!msr_write_intercepted_l01(vcpu, MSR_IA32_PL3_SSP))
+> > +		nested_vmx_disable_intercept_for_msr(
+> > +					msr_bitmap_l1, msr_bitmap_l0,
+> > +					MSR_IA32_PL3_SSP, MSR_TYPE_RW);
+> > +
+> > +	if (!msr_write_intercepted_l01(vcpu, MSR_IA32_S_CET))
+> > +		nested_vmx_disable_intercept_for_msr(
+> > +					msr_bitmap_l1, msr_bitmap_l0,
+> > +					MSR_IA32_S_CET, MSR_TYPE_RW);
+> > +
+> > +	if (!msr_write_intercepted_l01(vcpu, MSR_IA32_PL0_SSP))
+> > +		nested_vmx_disable_intercept_for_msr(
+> > +					msr_bitmap_l1, msr_bitmap_l0,
+> > +					MSR_IA32_PL0_SSP, MSR_TYPE_RW);
+> > +
+> > +	if (!msr_write_intercepted_l01(vcpu, MSR_IA32_PL1_SSP))
+> > +		nested_vmx_disable_intercept_for_msr(
+> > +					msr_bitmap_l1, msr_bitmap_l0,
+> > +					MSR_IA32_PL1_SSP, MSR_TYPE_RW);
+> > +
+> > +	if (!msr_write_intercepted_l01(vcpu, MSR_IA32_PL2_SSP))
+> > +		nested_vmx_disable_intercept_for_msr(
+> > +					msr_bitmap_l1, msr_bitmap_l0,
+> > +					MSR_IA32_PL2_SSP, MSR_TYPE_RW);
+> > +
+> > +	if (!msr_write_intercepted_l01(vcpu, MSR_IA32_INT_SSP_TAB))
+> > +		nested_vmx_disable_intercept_for_msr(
+> > +					msr_bitmap_l1, msr_bitmap_l0,
+> > +					MSR_IA32_INT_SSP_TAB, MSR_TYPE_RW);
+> 
+> That's a lot of copy-paste.  Maybe add a helper to do the conditional l01
+> check and subsequent call to nested_vmx_disable_intercept_for_msr()?  It's
+> still a lot of boilerplate, but it's at least a little better.  Not sure
+> what a good name would be.
+> 
+> 	nested_vmx_update_intercept_for_msr(vcpu, MSR_IA32_U_CET,
+> 					    msr_bitmap_l1, msr_bitmap_l0,
+> 					    MSR_TYPE_RW);
+>
+OK, I'll figure out how to make it nicer :-)
+
+> 
+> >  	/*
+> >  	 * Checking the L0->L1 bitmap is trying to verify two things:
+> >  	 *
+> > @@ -6040,7 +6075,8 @@ void nested_vmx_setup_ctls_msrs(struct nested_vmx_msrs *msrs, u32 ept_caps)
+> >  	msrs->exit_ctls_high |=
+> >  		VM_EXIT_ALWAYSON_WITHOUT_TRUE_MSR |
+> >  		VM_EXIT_LOAD_IA32_EFER | VM_EXIT_SAVE_IA32_EFER |
+> > -		VM_EXIT_SAVE_VMX_PREEMPTION_TIMER | VM_EXIT_ACK_INTR_ON_EXIT;
+> > +		VM_EXIT_SAVE_VMX_PREEMPTION_TIMER | VM_EXIT_ACK_INTR_ON_EXIT |
+> > +		VM_EXIT_LOAD_HOST_CET_STATE;
+> >  
+> >  	/* We support free control of debug control saving. */
+> >  	msrs->exit_ctls_low &= ~VM_EXIT_SAVE_DEBUG_CONTROLS;
+> > @@ -6057,7 +6093,8 @@ void nested_vmx_setup_ctls_msrs(struct nested_vmx_msrs *msrs, u32 ept_caps)
+> >  #endif
+> >  		VM_ENTRY_LOAD_IA32_PAT;
+> >  	msrs->entry_ctls_high |=
+> > -		(VM_ENTRY_ALWAYSON_WITHOUT_TRUE_MSR | VM_ENTRY_LOAD_IA32_EFER);
+> > +		(VM_ENTRY_ALWAYSON_WITHOUT_TRUE_MSR | VM_ENTRY_LOAD_IA32_EFER |
+> > +		 VM_ENTRY_LOAD_GUEST_CET_STATE);
+> 
+> This is wrong, the OR path is only for emulated stuff, I'm guessing you're
+> not planning on emulating CET :-)
+When I tested nested VM, if it's not "ORed" here, nested VM entry will
+fail, so what's your suggestion on this?
+> 
+> And I think this needs to be conditional based on supported_xss?
+Yes, a check is necessary.
+
+>  
+> >  	/* We support free control of debug control loading. */
+> >  	msrs->entry_ctls_low &= ~VM_ENTRY_LOAD_DEBUG_CONTROLS;
+> > diff --git a/arch/x86/kvm/vmx/vmcs12.c b/arch/x86/kvm/vmx/vmcs12.c
+> > index 53dfb401316d..82b82bebeee0 100644
+> > --- a/arch/x86/kvm/vmx/vmcs12.c
+> > +++ b/arch/x86/kvm/vmx/vmcs12.c
+> > @@ -141,6 +141,9 @@ const unsigned short vmcs_field_to_offset_table[] = {
+> >  	FIELD(GUEST_PENDING_DBG_EXCEPTIONS, guest_pending_dbg_exceptions),
+> >  	FIELD(GUEST_SYSENTER_ESP, guest_sysenter_esp),
+> >  	FIELD(GUEST_SYSENTER_EIP, guest_sysenter_eip),
+> > +	FIELD(GUEST_S_CET, guest_s_cet),
+> > +	FIELD(GUEST_SSP, guest_ssp),
+> > +	FIELD(GUEST_INTR_SSP_TABLE, guest_ssp_tbl),
+> >  	FIELD(HOST_CR0, host_cr0),
+> >  	FIELD(HOST_CR3, host_cr3),
+> >  	FIELD(HOST_CR4, host_cr4),
+> > @@ -153,5 +156,8 @@ const unsigned short vmcs_field_to_offset_table[] = {
+> >  	FIELD(HOST_IA32_SYSENTER_EIP, host_ia32_sysenter_eip),
+> >  	FIELD(HOST_RSP, host_rsp),
+> >  	FIELD(HOST_RIP, host_rip),
+> > +	FIELD(HOST_S_CET, host_s_cet),
+> > +	FIELD(HOST_SSP, host_ssp),
+> > +	FIELD(HOST_INTR_SSP_TABLE, host_ssp_tbl),
+> >  };
+> >  const unsigned int nr_vmcs12_fields = ARRAY_SIZE(vmcs_field_to_offset_table);
+> > diff --git a/arch/x86/kvm/vmx/vmcs12.h b/arch/x86/kvm/vmx/vmcs12.h
+> > index d0c6df373f67..62b7be68f05c 100644
+> > --- a/arch/x86/kvm/vmx/vmcs12.h
+> > +++ b/arch/x86/kvm/vmx/vmcs12.h
+> > @@ -118,7 +118,13 @@ struct __packed vmcs12 {
+> >  	natural_width host_ia32_sysenter_eip;
+> >  	natural_width host_rsp;
+> >  	natural_width host_rip;
+> > -	natural_width paddingl[8]; /* room for future expansion */
+> > +	natural_width host_s_cet;
+> > +	natural_width host_ssp;
+> > +	natural_width host_ssp_tbl;
+> > +	natural_width guest_s_cet;
+> > +	natural_width guest_ssp;
+> > +	natural_width guest_ssp_tbl;
+> > +	natural_width paddingl[2]; /* room for future expansion */
+> 
+> Tangetial topic, it'd be helpful if FIELD and FIELD64 had compile-time
+> assertions similar to vmcs_read*() to verify the size of the vmcs12 field
+> is correct.  In other words, I don't feel like reviewing all of these :-).
+>
+OK, let me figure out how to polish them...
+
+> >  	u32 pin_based_vm_exec_control;
+> >  	u32 cpu_based_vm_exec_control;
+> >  	u32 exception_bitmap;
+> > @@ -301,6 +307,12 @@ static inline void vmx_check_vmcs12_offsets(void)
+> >  	CHECK_OFFSET(host_ia32_sysenter_eip, 656);
+> >  	CHECK_OFFSET(host_rsp, 664);
+> >  	CHECK_OFFSET(host_rip, 672);
+> > +	CHECK_OFFSET(host_s_cet, 680);
+> > +	CHECK_OFFSET(host_ssp, 688);
+> > +	CHECK_OFFSET(host_ssp_tbl, 696);
+> > +	CHECK_OFFSET(guest_s_cet, 704);
+> > +	CHECK_OFFSET(guest_ssp, 712);
+> > +	CHECK_OFFSET(guest_ssp_tbl, 720);
+> >  	CHECK_OFFSET(pin_based_vm_exec_control, 744);
+> >  	CHECK_OFFSET(cpu_based_vm_exec_control, 748);
+> >  	CHECK_OFFSET(exception_bitmap, 752);
+> > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> > index a3d01014b9e7..c2e950d378bd 100644
+> > --- a/arch/x86/kvm/vmx/vmx.c
+> > +++ b/arch/x86/kvm/vmx/vmx.c
+> > @@ -7153,6 +7153,7 @@ static void nested_vmx_cr_fixed1_bits_update(struct kvm_vcpu *vcpu)
+> >  	cr4_fixed1_update(X86_CR4_PKE,        ecx, feature_bit(PKU));
+> >  	cr4_fixed1_update(X86_CR4_UMIP,       ecx, feature_bit(UMIP));
+> >  	cr4_fixed1_update(X86_CR4_LA57,       ecx, feature_bit(LA57));
+> > +	cr4_fixed1_update(X86_CR4_CET,	      ecx, feature_bit(SHSTK));
+> >  
+> >  #undef cr4_fixed1_update
 > >  }
-> >  
-> > -int __x86_set_memory_region(struct kvm *kvm, int id, gpa_t gpa, u32 size)
-> > +#define  ERR_PTR_USR(e)  ((void __user *)ERR_PTR(e))
-> 
-> Heh, my first thought when reading the below code was "cool, I didn't know
-> there was ERR_PTR_USR!".  This probably should be in include/linux/err.h,
-> or maybe a new arch specific implementation if it's not universally safe.
-
-Yeah, I just wanted to avoid introducing things in common headers before I'm
-sure it'll be used in the rest of the world..  We can always replace them with
-a global definition when it comes.
-
-> 
-> An alternative, which looks enticing given that proper user variants will
-> be a bit of an explosion, would be to do:
-> 
->   static void *____x86_set_memory_region(...)
->   {
-> 	<actual function>
->   }
-> 
->   void __user *__x86_set_memory_region(...)
->   {
-> 	return (void __user *)____x86_set_memory_region(...);
->   }
-> 
-> A second alternative would be to return an "unsigned long", i.e. force the
-> one function that actually accesses the hva to do the cast.  I think I like
-> this option the best as it would minimize the churn in
-> __x86_set_memory_region().  Callers can use IS_ERR_VALUE() to detect failure.
-
-If you won't mind, I would prefer a 2nd opinion (maybe Paolo?) so we can
-consolidate the idea before I change them... (I would for sure still prefer the
-current approach for simplicity since after all I don't have strong opionion..)
-
-> 
-> > +/**
-> > + * __x86_set_memory_region: Setup KVM internal memory slot
-> > + *
-> > + * @kvm: the kvm pointer to the VM.
-> > + * @id: the slot ID to setup.
-> > + * @gpa: the GPA to install the slot (unused when @size == 0).
-> > + * @size: the size of the slot. Set to zero to uninstall a slot.
-> > + *
-> > + * This function helps to setup a KVM internal memory slot.  Specify
-> > + * @size > 0 to install a new slot, while @size == 0 to uninstall a
-> > + * slot.  The return code can be one of the following:
-> > + *
-> > + *   HVA:           on success (uninstall will return a bogus HVA)
-> 
-> I think it's important to call out that it returns '0' on uninstall, e.g.
-> otherwise it's not clear how a caller can detect failure.
-
-It will "return (0xdeadull << 48)" as you proposed in abbed4fa94f6? :-)
-
-Frankly speaking I always preferred zero but that's just not true any more
-after above change.  This also reminded me that maybe we should also return the
-same thing at [1] below.
-
-> 
-> > + *   -errno:        on error
-> > + *
-> > + * The caller should always use IS_ERR() to check the return value
-> > + * before use.  Note, the KVM internal memory slots are guaranteed to
-> > + * remain valid and unchanged until the VM is destroyed, i.e., the
-> > + * GPA->HVA translation will not change.  However, the HVA is a user
-> > + * address, i.e. its accessibility is not guaranteed, and must be
-> > + * accessed via __copy_{to,from}_user().
-> > + */
-> > +void __user * __x86_set_memory_region(struct kvm *kvm, int id, gpa_t gpa,
-> > +				      u32 size)
-> >  {
-> >  	int i, r;
-> >  	unsigned long hva, uninitialized_var(old_npages);
-> > @@ -9800,12 +9825,12 @@ int __x86_set_memory_region(struct kvm *kvm, int id, gpa_t gpa, u32 size)
-> >  
-> >  	/* Called with kvm->slots_lock held.  */
-> >  	if (WARN_ON(id >= KVM_MEM_SLOTS_NUM))
-> > -		return -EINVAL;
-> > +		return ERR_PTR_USR(-EINVAL);
-> >  
-> >  	slot = id_to_memslot(slots, id);
-> >  	if (size) {
-> >  		if (slot && slot->npages)
-> > -			return -EEXIST;
-> > +			return ERR_PTR_USR(-EEXIST);
-> >  
-> >  		/*
-> >  		 * MAP_SHARED to prevent internal slot pages from being moved
-> > @@ -9814,10 +9839,10 @@ int __x86_set_memory_region(struct kvm *kvm, int id, gpa_t gpa, u32 size)
-> >  		hva = vm_mmap(NULL, 0, size, PROT_READ | PROT_WRITE,
-> >  			      MAP_SHARED | MAP_ANONYMOUS, 0);
-> >  		if (IS_ERR((void *)hva))
-> 
-> IS_ERR_VALUE() can be used to avoid the double cast.
-
-Agreed.  But it's a context cleanup, so I normally will keep it as is (or use a
-standalone patch).
-
-> 
-> > -			return PTR_ERR((void *)hva);
-> > +			return (void __user *)hva;
-> 
-> If we still want to go down the route of ERR_PTR_USR, then an ERR_CAST_USR
-> seems in order.
-
-Sure.  But I'll still keep it kvm-only if you won't mind...
-
-> 
-> >  	} else {
-> >  		if (!slot || !slot->npages)
-> > -			return 0;
-> > +			return ERR_PTR_USR(0);
-
-[1]
-
-> 
-> "return ERR_PTR_USR(NULL)" or "return NULL" would be more intuitive.  Moot
-> point if the return is changed to "unsigned long".
-
-ERR_PTR_USR() takes a "long".  I can use ERR_CAST_USR(NULL) if you prefer me to
-explicitly use NULL.
-
-Thanks,
-
--- 
-Peter Xu
-
+> > -- 
+> > 2.17.2
+> > 
