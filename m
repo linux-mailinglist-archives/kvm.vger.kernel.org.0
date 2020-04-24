@@ -2,127 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1B36F1B6D22
-	for <lists+kvm@lfdr.de>; Fri, 24 Apr 2020 07:19:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C037C1B6D80
+	for <lists+kvm@lfdr.de>; Fri, 24 Apr 2020 07:52:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726642AbgDXFSw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Apr 2020 01:18:52 -0400
-Received: from mx59.baidu.com ([61.135.168.59]:31099 "EHLO
-        tc-sys-mailedm02.tc.baidu.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725919AbgDXFSu (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 24 Apr 2020 01:18:50 -0400
-X-Greylist: delayed 580 seconds by postgrey-1.27 at vger.kernel.org; Fri, 24 Apr 2020 01:18:49 EDT
-Received: from localhost (cp01-cos-dev01.cp01.baidu.com [10.92.119.46])
-        by tc-sys-mailedm02.tc.baidu.com (Postfix) with ESMTP id 4E31611C0049;
-        Fri, 24 Apr 2020 13:08:55 +0800 (CST)
-From:   Li RongQing <lirongqing@baidu.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org,
-        hpa@zytor.com, bp@alien8.de, mingo@redhat.com, tglx@linutronix.de,
-        joro@8bytes.org, jmattson@google.com, wanpengli@tencent.com,
-        vkuznets@redhat.com, sean.j.christopherson@intel.com,
-        pbonzini@redhat.com
-Subject: [PATCH] [RFC] kvm: x86: emulate APERF/MPERF registers
-Date:   Fri, 24 Apr 2020 13:08:55 +0800
-Message-Id: <1587704935-30960-1-git-send-email-lirongqing@baidu.com>
-X-Mailer: git-send-email 1.7.1
+        id S1726338AbgDXFwT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Apr 2020 01:52:19 -0400
+Received: from mx2.suse.de ([195.135.220.15]:36982 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725554AbgDXFwT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Apr 2020 01:52:19 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx2.suse.de (Postfix) with ESMTP id 801EBAD71;
+        Fri, 24 Apr 2020 05:52:16 +0000 (UTC)
+From:   Davidlohr Bueso <dave@stgolabs.net>
+To:     tglx@linutronix.de, pbonzini@redhat.com
+Cc:     peterz@infradead.org, maz@kernel.org, bigeasy@linutronix.de,
+        rostedt@goodmis.org, torvalds@linux-foundation.org,
+        will@kernel.org, joel@joelfernandes.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        dave@stgolabs.net
+Subject: [PATCH v4 0/5] kvm: Use rcuwait for vcpu blocking
+Date:   Thu, 23 Apr 2020 22:48:32 -0700
+Message-Id: <20200424054837.5138-1-dave@stgolabs.net>
+X-Mailer: git-send-email 2.16.4
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Guest kernel reports a fixed cpu frequency in /proc/cpuinfo,
-this is confused to user when turbo is enable, and aperf/mperf
-can be used to show current cpu frequency after 7d5905dc14a
-"(x86 / CPU: Always show current CPU frequency in /proc/cpuinfo)"
-so we should emulate aperf mperf to achieve it
+Hi,
 
-the period of aperf/mperf in guest mode are accumulated
-as emulated value
+The following is an updated (and hopefully final) revision of the kvm
+vcpu to rcuwait conversion[0], following the work on completions using
+simple waitqueues.
 
-Signed-off-by: Li RongQing <lirongqing@baidu.com>
----
- arch/x86/include/asm/kvm_host.h |  5 +++++
- arch/x86/kvm/cpuid.c            |  5 ++++-
- arch/x86/kvm/vmx/vmx.c          | 20 ++++++++++++++++++++
- 3 files changed, 29 insertions(+), 1 deletion(-)
+Patches 1-4 level up the rcuwait api with waitqueues.
+Patch 5 converts kvm to use rcuwait.
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 42a2d0d3984a..526bd13a3d3d 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -820,6 +820,11 @@ struct kvm_vcpu_arch {
- 
- 	/* AMD MSRC001_0015 Hardware Configuration */
- 	u64 msr_hwcr;
-+
-+	u64 host_mperf;
-+	u64 host_aperf;
-+	u64 v_mperf;
-+	u64 v_aperf;
- };
- 
- struct kvm_lpage_info {
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index 901cd1fdecd9..00e4993cb338 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -558,7 +558,10 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
- 	case 6: /* Thermal management */
- 		entry->eax = 0x4; /* allow ARAT */
- 		entry->ebx = 0;
--		entry->ecx = 0;
-+		if (boot_cpu_has(X86_FEATURE_APERFMPERF))
-+			entry->ecx = 0x1;
-+		else
-+			entry->ecx = 0x0;
- 		entry->edx = 0;
- 		break;
- 	/* function 7 has additional index. */
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 91749f1254e8..f20216fc0b57 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -1064,6 +1064,11 @@ static inline void pt_save_msr(struct pt_ctx *ctx, u32 addr_range)
- 
- static void pt_guest_enter(struct vcpu_vmx *vmx)
- {
-+	struct kvm_vcpu *vcpu = &vmx->vcpu;
-+
-+	rdmsrl(MSR_IA32_MPERF, vcpu->arch.host_mperf);
-+	rdmsrl(MSR_IA32_APERF, vcpu->arch.host_aperf);
-+
- 	if (vmx_pt_mode_is_system())
- 		return;
- 
-@@ -1081,6 +1086,15 @@ static void pt_guest_enter(struct vcpu_vmx *vmx)
- 
- static void pt_guest_exit(struct vcpu_vmx *vmx)
- {
-+	struct kvm_vcpu *vcpu = &vmx->vcpu;
-+	u64 perf;
-+
-+	rdmsrl(MSR_IA32_MPERF, perf);
-+	vcpu->arch.v_mperf += perf - vcpu->arch.host_mperf;
-+
-+	rdmsrl(MSR_IA32_APERF, perf);
-+	vcpu->arch.v_aperf += perf - vcpu->arch.host_aperf;
-+
- 	if (vmx_pt_mode_is_system())
- 		return;
- 
-@@ -1914,6 +1928,12 @@ static int vmx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 		    !guest_cpuid_has(vcpu, X86_FEATURE_RDTSCP))
- 			return 1;
- 		goto find_shared_msr;
-+	case MSR_IA32_MPERF:
-+		msr_info->data = vcpu->arch.v_mperf;
-+		break;
-+	case MSR_IA32_APERF:
-+		msr_info->data = vcpu->arch.v_aperf;
-+		break;
- 	default:
- 	find_shared_msr:
- 		msr = find_msr_entry(vmx, msr_info->index);
--- 
-2.16.2
+Changes from v3:
+  - picked up maz and peterz's acks for routing via kvm tree.
+  - added new patch 4/5 which introduces rcuwait_active. This is to avoid
+    directly calling rcu_dereference() to peek at the wait->task.
+  - fixed breakage for arm in patch 4/5.
+  - removed previous patch 5/5 which updates swait doc as peterz will
+    keep it.
+
+Changes from v2:
+  - new patch 3 which adds prepare_to_rcuwait and finish_rcuwait helpers.
+  - fixed broken sleep and tracepoint semantics in patch 4. (Marc and Paolo)
+  
+This has only been run tested on x86 but compile tested on mips, powerpc
+and arm. It passes all tests from kvm-unit-tests[1].
+
+This series applies on top of current kvm and tip trees.
+Please consider for v5.8.
+
+[0] https://lore.kernel.org/lkml/20200320085527.23861-3-dave@stgolabs.net/
+[1] git://git.kernel.org/pub/scm/virt/kvm/kvm-unit-tests.git
+
+Thanks!
+
+Davidlohr Bueso (5):
+  rcuwait: Fix stale wake call name in comment
+  rcuwait: Let rcuwait_wake_up() return whether or not a task was awoken
+  rcuwait: Introduce prepare_to and finish_rcuwait
+  rcuwait: Introduce rcuwait_active()
+  kvm: Replace vcpu->swait with rcuwait
+
+ arch/mips/kvm/mips.c                  |  6 ++----
+ arch/powerpc/include/asm/kvm_book3s.h |  2 +-
+ arch/powerpc/include/asm/kvm_host.h   |  2 +-
+ arch/powerpc/kvm/book3s_hv.c          | 22 ++++++++--------------
+ arch/powerpc/kvm/powerpc.c            |  2 +-
+ arch/x86/kvm/lapic.c                  |  2 +-
+ include/linux/kvm_host.h              | 10 +++++-----
+ include/linux/rcuwait.h               | 32 ++++++++++++++++++++++++++------
+ kernel/exit.c                         |  9 ++++++---
+ virt/kvm/arm/arch_timer.c             |  3 ++-
+ virt/kvm/arm/arm.c                    |  9 +++++----
+ virt/kvm/async_pf.c                   |  3 +--
+ virt/kvm/kvm_main.c                   | 19 +++++++++----------
+ 13 files changed, 68 insertions(+), 53 deletions(-)
+
+--
+2.16.4
 
