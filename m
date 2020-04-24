@@ -2,57 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D5C2E1B7339
-	for <lists+kvm@lfdr.de>; Fri, 24 Apr 2020 13:38:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7F1F01B733C
+	for <lists+kvm@lfdr.de>; Fri, 24 Apr 2020 13:38:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727015AbgDXLiH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Apr 2020 07:38:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43866 "EHLO
+        id S1727025AbgDXLiI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Apr 2020 07:38:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43872 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726667AbgDXLiG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Apr 2020 07:38:06 -0400
-Received: from mail-wr1-x441.google.com (mail-wr1-x441.google.com [IPv6:2a00:1450:4864:20::441])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A460C09B045;
-        Fri, 24 Apr 2020 04:38:06 -0700 (PDT)
-Received: by mail-wr1-x441.google.com with SMTP id j2so10381800wrs.9;
-        Fri, 24 Apr 2020 04:38:05 -0700 (PDT)
+        with ESMTP id S1726888AbgDXLiH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Apr 2020 07:38:07 -0400
+Received: from mail-wm1-x343.google.com (mail-wm1-x343.google.com [IPv6:2a00:1450:4864:20::343])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32D56C09B045;
+        Fri, 24 Apr 2020 04:38:07 -0700 (PDT)
+Received: by mail-wm1-x343.google.com with SMTP id x25so10079808wmc.0;
+        Fri, 24 Apr 2020 04:38:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=mG9eU+aM3EiusgpSEHFIr98SypSKh+boePa08AAVfTc=;
-        b=pBnlHnqWhwtUfuxB+KkmmcbKIFYM3zo+4df6l5pFF1lyemTYVKYtek0RpiVwHydvhN
-         Q0VXcLlEuPDOixhiQMUXop6CEc9pQkHtHqYvRc00thuqow7QdkWKT+elWksyuvDv6tyg
-         WvDDl0FXj+iENxEOo+bkpOiq09vdTDpLi531ZW29rlArBb7GoHo6OQFp7RcunxRo256s
-         U9pUs0UQZ2XLd5m8x4tLdnQb9NvzLBcdfmMfogfzQpYBL7yd6UHV9+uYkrytlrqME/nh
-         VP+85551i0tp8U31KHqvCQmFbWt/74sKRHY/yqc1YdgUVG/fFF/xo6W1jYptPp8Ju/13
-         fzKg==
+        bh=jTDLY8IqM4gzoQ6wo3jww9wemhS46tpJf0MrInuAZDU=;
+        b=XLcV57zKn5sAdfqH55F25tcPxTyj8y2t0iixEbRB92e8EytGVzGv8pjnhuFmgytXtp
+         mEJrEAHkL6g502KFVuDKBinJMGorNk25MHAtit6RxdDUdBeMDFahYyg0DIT0Cq54D/4t
+         M2EFYEhvuecu3jHpZ6p3mgTh1PREfYc5jKQ/QhV1dEjsHDGByUQG3wPVUwiNPO3lZeNB
+         fMV/WPtCCBtacjrsqaQB8mMBVzD6ZBJjxxkIeUJB8igzDQmz5og7SHjMu5vWyQ/AwXGq
+         3rqD1T6oSEdpEoP/UwwShnDZa36huHh2ro/MWZjhzAvuitvGD9P3jQvciMWanvINjAJB
+         Uj8Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=mG9eU+aM3EiusgpSEHFIr98SypSKh+boePa08AAVfTc=;
-        b=TjrLd48JCZ2avz1T9FksV0Zo4nvDxeqi13qHmFL4GISQRMSwMkoGzKer1IW4P9n7c8
-         oPaN8YrbL0AMsL0KEKk9Wzd4GwkmHmt1nD92DaKwYJ/1qgEdiWn90TYIvtdFcmOpjBbg
-         q/KR1Yny4lLB/wYOtAXjglx2IxiuSCOEFN0fEoXRMhq22Sy9E0SV2sIFLQvldZhrlWby
-         KBXb4neBNAuheGWP9bEoBBKzQeoyoamGmcfY8GjAARo+WRRI0G4fZiAA/QGK26Zw9mC3
-         VSvvZg25HoH/zJ2K6RMsh7U4MpU8e5594hJT2RVUVnWwubWw5QOrnDsBjw2cx0+qXimA
-         Jv0w==
-X-Gm-Message-State: AGi0PuY8yA2Uk06/9YxEUVFw+9BfnTSqogMaRFqyAjcyPLlug1u6KC8x
-        UB3HTHrbbyaEH+Ytfx+PPDpP2Qxh/ME=
-X-Google-Smtp-Source: APiQypLtzruqxGMWb9iWkasbikxYsG/0rU/KRfjPLjHKXU3NafnPvqxWVI+Es/oGLYP2IQvWiRUigg==
-X-Received: by 2002:adf:ee4c:: with SMTP id w12mr11643554wro.347.1587728284593;
-        Fri, 24 Apr 2020 04:38:04 -0700 (PDT)
+        bh=jTDLY8IqM4gzoQ6wo3jww9wemhS46tpJf0MrInuAZDU=;
+        b=tMHMGS6djzOhiJM4N4Ov1UAMJqKfVeIbVuaRT7EclTrculb89e+cpxn5aCGSTlSdZt
+         gVg8JBtJlHRv926/bKhYACLNoF7EJoZxUzmukve2KuJNWtCWtfO7JBY+s9Tn9IH+TiEX
+         hBfihKaKQ6712E78FAHxC/hgzdWLZcvy+DQcN+LIB0QSNYqIwXJOh1TQFRYmXIo3Yg3q
+         fNfrLNq5GmHlv/6+dEloN6VT1Sc4qLS6AS5cJ2OO0puculjaX7mZXsQDmExBpACSGi9t
+         32Tl65Uj6id5GLMhI0LHjM24PA2+KSuZZtjjOvRIAii+DnBZITaF6brE4yP2r3hKt0ln
+         9Ugw==
+X-Gm-Message-State: AGi0PuZtNYcdafQjGcwRa13c2buws90SEXUHEE4S0Q7c6OM1QWMu7RvW
+        x8dtMyHY1D+Msvb6aBLpW9rINRp7bkw=
+X-Google-Smtp-Source: APiQypKG4dCfzlxRcjPzxQr1yX2QvpfzJ8EKpO256vJv/7fVjkvHTyfVv1GtgkiWvlhDAAQR3+42IQ==
+X-Received: by 2002:a05:600c:2:: with SMTP id g2mr9939840wmc.85.1587728285630;
+        Fri, 24 Apr 2020 04:38:05 -0700 (PDT)
 Received: from jondnuc.lan (IGLD-84-229-154-20.inter.net.il. [84.229.154.20])
-        by smtp.gmail.com with ESMTPSA id w83sm2451007wmb.37.2020.04.24.04.38.03
+        by smtp.gmail.com with ESMTPSA id w83sm2451007wmb.37.2020.04.24.04.38.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 24 Apr 2020 04:38:03 -0700 (PDT)
+        Fri, 24 Apr 2020 04:38:05 -0700 (PDT)
 From:   Jon Doron <arilou@gmail.com>
 To:     kvm@vger.kernel.org, linux-hyperv@vger.kernel.org
-Cc:     vkuznets@redhat.com, Jon Doron <arilou@gmail.com>
-Subject: [PATCH v11 2/7] x86/kvm/hyper-v: Simplify addition for custom cpuid leafs
-Date:   Fri, 24 Apr 2020 14:37:41 +0300
-Message-Id: <20200424113746.3473563-3-arilou@gmail.com>
+Cc:     vkuznets@redhat.com, Jon Doron <arilou@gmail.com>,
+        Michael Kelley <mikelley@microsoft.com>
+Subject: [PATCH v11 3/7] x86/hyper-v: Add synthetic debugger definitions
+Date:   Fri, 24 Apr 2020 14:37:42 +0300
+Message-Id: <20200424113746.3473563-4-arilou@gmail.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200424113746.3473563-1-arilou@gmail.com>
 References: <20200424113746.3473563-1-arilou@gmail.com>
@@ -63,95 +64,94 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Simlify the code to define a new cpuid leaf group by enabled feature.
+Hyper-V synthetic debugger has two modes, one that uses MSRs and
+the other that use Hypercalls.
 
-This also fixes a bug in which the max cpuid leaf was always set to
-HYPERV_CPUID_NESTED_FEATURES regardless if nesting is supported or not.
+Add all the required definitions to both types of synthetic debugger
+interface.
 
-Any new CPUID group needs to consider the max leaf and be added in the
-correct order, in this method there are two rules:
-1. Each cpuid leaf group must be order in an ascending order
-2. The appending for the cpuid leafs by features also needs to happen by
-   ascending order.
+Some of the required new CPUIDs and MSRs are not documented in the TLFS
+so they are in hyperv.h instead.
 
-Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+The reason they are not documented is because they are subjected to be
+removed in future versions of Windows.
+
+Reviewed-by: Michael Kelley <mikelley@microsoft.com>
 Signed-off-by: Jon Doron <arilou@gmail.com>
 ---
- arch/x86/kvm/hyperv.c | 46 ++++++++++++++++++++++++++++++-------------
- 1 file changed, 32 insertions(+), 14 deletions(-)
+ arch/x86/include/asm/hyperv-tlfs.h |  6 ++++++
+ arch/x86/kvm/hyperv.h              | 27 +++++++++++++++++++++++++++
+ 2 files changed, 33 insertions(+)
 
-diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
-index bcefa9d4e57e..ab3e9dbcabbe 100644
---- a/arch/x86/kvm/hyperv.c
-+++ b/arch/x86/kvm/hyperv.c
-@@ -1785,27 +1785,45 @@ int kvm_vm_ioctl_hv_eventfd(struct kvm *kvm, struct kvm_hyperv_eventfd *args)
- 	return kvm_hv_eventfd_assign(kvm, args->conn_id, args->fd);
- }
+diff --git a/arch/x86/include/asm/hyperv-tlfs.h b/arch/x86/include/asm/hyperv-tlfs.h
+index 29336574d0bc..53ef6b7bd380 100644
+--- a/arch/x86/include/asm/hyperv-tlfs.h
++++ b/arch/x86/include/asm/hyperv-tlfs.h
+@@ -131,6 +131,8 @@
+ #define HV_FEATURE_FREQUENCY_MSRS_AVAILABLE		BIT(8)
+ /* Crash MSR available */
+ #define HV_FEATURE_GUEST_CRASH_MSR_AVAILABLE		BIT(10)
++/* Support for debug MSRs available */
++#define HV_FEATURE_DEBUG_MSRS_AVAILABLE			BIT(11)
+ /* stimer Direct Mode is available */
+ #define HV_STIMER_DIRECT_MODE_AVAILABLE			BIT(19)
  
-+/* Must be sorted in ascending order by function */
-+static struct kvm_cpuid_entry2 core_cpuid_entries[] = {
-+	{ .function = HYPERV_CPUID_VENDOR_AND_MAX_FUNCTIONS },
-+	{ .function = HYPERV_CPUID_INTERFACE },
-+	{ .function = HYPERV_CPUID_VERSION },
-+	{ .function = HYPERV_CPUID_FEATURES },
-+	{ .function = HYPERV_CPUID_ENLIGHTMENT_INFO },
-+	{ .function = HYPERV_CPUID_IMPLEMENT_LIMITS },
-+};
+@@ -376,6 +378,9 @@ struct hv_tsc_emulation_status {
+ #define HVCALL_SEND_IPI_EX			0x0015
+ #define HVCALL_POST_MESSAGE			0x005c
+ #define HVCALL_SIGNAL_EVENT			0x005d
++#define HVCALL_POST_DEBUG_DATA			0x0069
++#define HVCALL_RETRIEVE_DEBUG_DATA		0x006a
++#define HVCALL_RESET_DEBUG_SESSION		0x006b
+ #define HVCALL_RETARGET_INTERRUPT		0x007e
+ #define HVCALL_FLUSH_GUEST_PHYSICAL_ADDRESS_SPACE 0x00af
+ #define HVCALL_FLUSH_GUEST_PHYSICAL_ADDRESS_LIST 0x00b0
+@@ -422,6 +427,7 @@ enum HV_GENERIC_SET_FORMAT {
+ #define HV_STATUS_INVALID_HYPERCALL_INPUT	3
+ #define HV_STATUS_INVALID_ALIGNMENT		4
+ #define HV_STATUS_INVALID_PARAMETER		5
++#define HV_STATUS_OPERATION_DENIED		8
+ #define HV_STATUS_INSUFFICIENT_MEMORY		11
+ #define HV_STATUS_INVALID_PORT_ID		17
+ #define HV_STATUS_INVALID_CONNECTION_ID		18
+diff --git a/arch/x86/kvm/hyperv.h b/arch/x86/kvm/hyperv.h
+index 757cb578101c..7f50ff0bad07 100644
+--- a/arch/x86/kvm/hyperv.h
++++ b/arch/x86/kvm/hyperv.h
+@@ -23,6 +23,33 @@
+ 
+ #include <linux/kvm_host.h>
+ 
++/*
++ * The #defines related to the synthetic debugger are required by KDNet, but
++ * they are not documented in the Hyper-V TLFS because the synthetic debugger
++ * functionality has been deprecated and is subject to removal in future
++ * versions of Windows.
++ */
++#define HYPERV_CPUID_SYNDBG_VENDOR_AND_MAX_FUNCTIONS	0x40000080
++#define HYPERV_CPUID_SYNDBG_INTERFACE			0x40000081
++#define HYPERV_CPUID_SYNDBG_PLATFORM_CAPABILITIES	0x40000082
 +
-+static struct kvm_cpuid_entry2 evmcs_cpuid_entries[] = {
-+	{ .function = HYPERV_CPUID_NESTED_FEATURES },
-+};
++/*
++ * Hyper-V synthetic debugger platform capabilities
++ * These are HYPERV_CPUID_SYNDBG_PLATFORM_CAPABILITIES.EAX bits.
++ */
++#define HV_X64_SYNDBG_CAP_ALLOW_KERNEL_DEBUGGING	BIT(1)
 +
-+#define HV_MAX_CPUID_ENTRIES \
-+	(ARRAY_SIZE(core_cpuid_entries) +\
-+	 ARRAY_SIZE(evmcs_cpuid_entries))
++/* Hyper-V Synthetic debug options MSR */
++#define HV_X64_MSR_SYNDBG_CONTROL		0x400000F1
++#define HV_X64_MSR_SYNDBG_STATUS		0x400000F2
++#define HV_X64_MSR_SYNDBG_SEND_BUFFER		0x400000F3
++#define HV_X64_MSR_SYNDBG_RECV_BUFFER		0x400000F4
++#define HV_X64_MSR_SYNDBG_PENDING_BUFFER	0x400000F5
++#define HV_X64_MSR_SYNDBG_OPTIONS		0x400000FF
 +
- int kvm_vcpu_ioctl_get_hv_cpuid(struct kvm_vcpu *vcpu, struct kvm_cpuid2 *cpuid,
- 				struct kvm_cpuid_entry2 __user *entries)
++/* Hyper-V HV_X64_MSR_SYNDBG_OPTIONS bits */
++#define HV_X64_SYNDBG_OPTION_USE_HCALLS		BIT(2)
++
+ static inline struct kvm_vcpu_hv *vcpu_to_hv_vcpu(struct kvm_vcpu *vcpu)
  {
- 	uint16_t evmcs_ver = 0;
--	struct kvm_cpuid_entry2 cpuid_entries[] = {
--		{ .function = HYPERV_CPUID_VENDOR_AND_MAX_FUNCTIONS },
--		{ .function = HYPERV_CPUID_INTERFACE },
--		{ .function = HYPERV_CPUID_VERSION },
--		{ .function = HYPERV_CPUID_FEATURES },
--		{ .function = HYPERV_CPUID_ENLIGHTMENT_INFO },
--		{ .function = HYPERV_CPUID_IMPLEMENT_LIMITS },
--		{ .function = HYPERV_CPUID_NESTED_FEATURES },
--	};
--	int i, nent = ARRAY_SIZE(cpuid_entries);
-+	struct kvm_cpuid_entry2 cpuid_entries[HV_MAX_CPUID_ENTRIES];
-+	int i, nent = 0;
-+
-+	/* Set the core cpuid entries required for Hyper-V */
-+	memcpy(&cpuid_entries[nent], &core_cpuid_entries,
-+	       sizeof(core_cpuid_entries));
-+	nent = ARRAY_SIZE(core_cpuid_entries);
- 
- 	if (kvm_x86_ops.nested_get_evmcs_version)
- 		evmcs_ver = kvm_x86_ops.nested_get_evmcs_version(vcpu);
- 
--	/* Skip NESTED_FEATURES if eVMCS is not supported */
--	if (!evmcs_ver)
--		--nent;
-+	if (evmcs_ver) {
-+		/* EVMCS is enabled, add the required EVMCS CPUID leafs */
-+		memcpy(&cpuid_entries[nent], &evmcs_cpuid_entries,
-+		       sizeof(evmcs_cpuid_entries));
-+		nent += ARRAY_SIZE(evmcs_cpuid_entries);
-+	}
- 
- 	if (cpuid->nent < nent)
- 		return -E2BIG;
-@@ -1821,7 +1839,7 @@ int kvm_vcpu_ioctl_get_hv_cpuid(struct kvm_vcpu *vcpu, struct kvm_cpuid2 *cpuid,
- 		case HYPERV_CPUID_VENDOR_AND_MAX_FUNCTIONS:
- 			memcpy(signature, "Linux KVM Hv", 12);
- 
--			ent->eax = HYPERV_CPUID_NESTED_FEATURES;
-+			ent->eax = cpuid_entries[nent - 1].function;
- 			ent->ebx = signature[0];
- 			ent->ecx = signature[1];
- 			ent->edx = signature[2];
+ 	return &vcpu->arch.hyperv;
 -- 
 2.24.1
 
