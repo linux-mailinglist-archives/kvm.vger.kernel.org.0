@@ -2,44 +2,43 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 030AD1B7192
-	for <lists+kvm@lfdr.de>; Fri, 24 Apr 2020 12:08:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C028F1B7196
+	for <lists+kvm@lfdr.de>; Fri, 24 Apr 2020 12:10:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726778AbgDXKIG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Apr 2020 06:08:06 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:27206 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726788AbgDXKIG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Apr 2020 06:08:06 -0400
+        id S1726668AbgDXKKD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Apr 2020 06:10:03 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:22445 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726582AbgDXKKC (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 24 Apr 2020 06:10:02 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1587722885;
+        s=mimecast20190719; t=1587723000;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=hbrNhLz3CjweCyJq+f1274eqVCwqHLRzUfAHIIeYvTQ=;
-        b=TwDbI49TGCO2Kfy+RZLJvJSkFal8IfLGYpDWxaLXaXfnptfOzmZO0qHxp07kmJnNSp1dmD
-        louewU+4TfJN7QufAsA9Mzz+aser5hbUPVBNt6WKu0xQ7Fb/GPuvB27KjtsAV8Th5SoaEJ
-        654Ndq1Uf68HWIp/ZDBOwa2GdA508J8=
+        bh=Gs8h2QGSX4WsZ/SylCc9cjahXS3AAkX/n9RngR5AjYQ=;
+        b=JQQmWVibdFAJviPBwf1//M5X0kSDYB8BYKZ6SqR4+4eEF7bsu95VKC+pfb2Ov3LvIuIaDk
+        FuRqFq+82PfoRZlQq57ehk15HLmmCOsBmpYeV7VSQC1iB1P6CISB+/6thBE/Z+f0vnQWoj
+        NzCSHyK9stPSaj5nvCzeIkBGlLHvdbs=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-215-uguoR7LlOXiHQ5ND9F1rUA-1; Fri, 24 Apr 2020 06:08:03 -0400
-X-MC-Unique: uguoR7LlOXiHQ5ND9F1rUA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+ us-mta-64-5wAabdQVNBGej0HJI6Z3Bw-1; Fri, 24 Apr 2020 06:09:58 -0400
+X-MC-Unique: 5wAabdQVNBGej0HJI6Z3Bw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5DA0F1B18BC1;
-        Fri, 24 Apr 2020 10:08:02 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 586AA804061;
+        Fri, 24 Apr 2020 10:09:52 +0000 (UTC)
 Received: from [10.36.113.138] (ovpn-113-138.ams2.redhat.com [10.36.113.138])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id CE40E60CD0;
-        Fri, 24 Apr 2020 10:08:00 +0000 (UTC)
-Subject: Re: [PATCH v2 05/10] s390x: smp: Loop if secondary cpu returns into
- cpu setup again
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E6AB3100164D;
+        Fri, 24 Apr 2020 10:09:50 +0000 (UTC)
+Subject: Re: [PATCH v2 07/10] s390x: smp: Use full PSW to bringup new cpu
 To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
 Cc:     thuth@redhat.com, linux-s390@vger.kernel.org,
         borntraeger@de.ibm.com, cohuck@redhat.com
 References: <20200423091013.11587-1-frankja@linux.ibm.com>
- <20200423091013.11587-6-frankja@linux.ibm.com>
+ <20200423091013.11587-8-frankja@linux.ibm.com>
 From:   David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -85,53 +84,46 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
  FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
 Organization: Red Hat GmbH
-Message-ID: <2d08ea4f-7251-0867-7f48-81642e551c79@redhat.com>
-Date:   Fri, 24 Apr 2020 12:08:00 +0200
+Message-ID: <f13b31f6-80ef-9cfc-0cde-fe1c1601cf1f@redhat.com>
+Date:   Fri, 24 Apr 2020 12:09:50 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <20200423091013.11587-6-frankja@linux.ibm.com>
+In-Reply-To: <20200423091013.11587-8-frankja@linux.ibm.com>
 Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 23.04.20 11:10, Janosch Frank wrote:
-> Up to now a secondary cpu could have returned from the function it was
-> executing and ending up somewhere in cstart64.S. This was mostly
-> circumvented by an endless loop in the function that it executed.
-> 
-> Let's add a loop to the end of the cpu setup, so we don't have to rely
-> on added loops in the tests.
+> Up to now we ignored the psw mask and only used the psw address when
+> bringing up a new cpu. For DAT we need to also load the mask, so let's
+> do that.
 > 
 > Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
 > Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 > ---
->  s390x/cstart64.S | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
+>  lib/s390x/smp.c  | 2 ++
+>  s390x/cstart64.S | 3 ++-
+>  2 files changed, 4 insertions(+), 1 deletion(-)
 > 
-> diff --git a/s390x/cstart64.S b/s390x/cstart64.S
-> index 9af6bb3..ecffbe0 100644
-> --- a/s390x/cstart64.S
-> +++ b/s390x/cstart64.S
-> @@ -161,7 +161,9 @@ smp_cpu_setup_state:
->  	lctlg   %c0, %c0, GEN_LC_SW_INT_CRS
->  	/* We should only go once through cpu setup and not for every restart */
->  	stg	%r14, GEN_LC_RESTART_NEW_PSW + 8
-> -	br	%r14
-> +	brasl	%r14, %r14
-> +	/* If the function returns, just loop here */
-> +0:	j	0
+> diff --git a/lib/s390x/smp.c b/lib/s390x/smp.c
+> index 3f86243..6ef0335 100644
+> --- a/lib/s390x/smp.c
+> +++ b/lib/s390x/smp.c
+> @@ -202,6 +202,8 @@ int smp_cpu_setup(uint16_t addr, struct psw psw)
+>  	cpu->stack = (uint64_t *)alloc_pages(2);
 >  
->  pgm_int:
->  	SAVE_REGS
-> 
+>  	/* Start without DAT and any other mask bits. */
+> +	cpu->lowcore->sw_int_psw.mask = psw.mask;
+> +	cpu->lowcore->sw_int_psw.addr = psw.addr;
+>  	cpu->lowcore->sw_int_grs[14] = psw.addr;
 
-Reviewed-by: David Hildenbrand <david@redhat.com>
+Do we still have to set sw_int_grs[14] ?
 
 -- 
 Thanks,
