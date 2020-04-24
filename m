@@ -2,43 +2,43 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D01CA1B71B2
-	for <lists+kvm@lfdr.de>; Fri, 24 Apr 2020 12:13:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F25E31B71B3
+	for <lists+kvm@lfdr.de>; Fri, 24 Apr 2020 12:13:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726717AbgDXKN1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Apr 2020 06:13:27 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:46192 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726920AbgDXKNZ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 24 Apr 2020 06:13:25 -0400
+        id S1726946AbgDXKNb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Apr 2020 06:13:31 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:42928 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726920AbgDXKNa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Apr 2020 06:13:30 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1587723203;
+        s=mimecast20190719; t=1587723209;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=hN2gTxbfF6w0iLlokXohRJP1AJKgFauepm8HlPRqgLo=;
-        b=Z+lMETedSx09nvY4GVBZw0s83c2k6EzMYBdlUP8lv816OeDKgsR/RBXOcqGfecdeV1QBet
-        czj6YtaX+8GYEl52XhnD3MLf/LkAfyYYhTkJb1SDbTTL+pRmz6liSeu+kYXlnDvq6MQ/iF
-        PqYFUvb1nObBmwf2lLw0C31axFyUObA=
+        bh=XEt1KRq0Qn9oBSjehd1C+o9CaP9vmvEZWjyJnjChYLg=;
+        b=UDQ27aovb97C310f0RTLtokz7YvW2GiNmdWGbAe8bFO5PmDKkg7Bbw/1KDbaCjK+9wDvck
+        5m4F4VeQUEqTDPsktYjHEcEp9WJrXgdRylZPpCxpbquWHTxLiUTZYBAe7nM+FASWUVgMZl
+        q1r8SAO5PW/6TObEzJw4rC/dSaX94qY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-23-1V7ZLy_xNDW2kwtAoOPnwQ-1; Fri, 24 Apr 2020 06:13:21 -0400
-X-MC-Unique: 1V7ZLy_xNDW2kwtAoOPnwQ-1
+ us-mta-288-tPxV-Db2Pca7TUJ0pExnoA-1; Fri, 24 Apr 2020 06:13:27 -0400
+X-MC-Unique: tPxV-Db2Pca7TUJ0pExnoA-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 251D818FF664;
-        Fri, 24 Apr 2020 10:13:20 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 02977835B8D;
+        Fri, 24 Apr 2020 10:13:26 +0000 (UTC)
 Received: from [10.36.113.138] (ovpn-113-138.ams2.redhat.com [10.36.113.138])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id BB1885C1D0;
-        Fri, 24 Apr 2020 10:13:18 +0000 (UTC)
-Subject: Re: [PATCH v2 09/10] s390x: smp: Add restart when running test
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 9C4305C1D2;
+        Fri, 24 Apr 2020 10:13:24 +0000 (UTC)
+Subject: Re: [PATCH v2 10/10] s390x: Fix library constant definitions
 To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
 Cc:     thuth@redhat.com, linux-s390@vger.kernel.org,
         borntraeger@de.ibm.com, cohuck@redhat.com
 References: <20200423091013.11587-1-frankja@linux.ibm.com>
- <20200423091013.11587-10-frankja@linux.ibm.com>
+ <20200423091013.11587-11-frankja@linux.ibm.com>
 From:   David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -84,12 +84,12 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
  FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
 Organization: Red Hat GmbH
-Message-ID: <89fbb3c2-9dfc-818e-3442-4aa102ff0705@redhat.com>
-Date:   Fri, 24 Apr 2020 12:13:17 +0200
+Message-ID: <1ffe6eca-0f17-939e-ecf4-2719c455cb6f@redhat.com>
+Date:   Fri, 24 Apr 2020 12:13:23 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <20200423091013.11587-10-frankja@linux.ibm.com>
+In-Reply-To: <20200423091013.11587-11-frankja@linux.ibm.com>
 Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -100,63 +100,35 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 23.04.20 11:10, Janosch Frank wrote:
-> Let's make sure we can restart a cpu that is already running.
-> Restarting it if it is stopped is implicitely tested by the the other
-> restart calls in the smp test.
+> Seems like I uppercased the whole region instead of only the ULs when
+> I added those definitions. Let's make the x lowercase again.
 > 
 > Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
 > Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 > ---
->  s390x/smp.c | 29 +++++++++++++++++++++++++++++
->  1 file changed, 29 insertions(+)
+>  lib/s390x/asm/arch_def.h | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
 > 
-> diff --git a/s390x/smp.c b/s390x/smp.c
-> index 48321f4..35ca9c7 100644
-> --- a/s390x/smp.c
-> +++ b/s390x/smp.c
-> @@ -52,6 +52,34 @@ static void test_start(void)
->  	report(1, "start");
->  }
+> diff --git a/lib/s390x/asm/arch_def.h b/lib/s390x/asm/arch_def.h
+> index 15a4d49..1b3bb0c 100644
+> --- a/lib/s390x/asm/arch_def.h
+> +++ b/lib/s390x/asm/arch_def.h
+> @@ -19,10 +19,10 @@ struct psw {
+>  #define PSW_MASK_DAT			0x0400000000000000UL
+>  #define PSW_MASK_PSTATE			0x0001000000000000UL
 >  
-> +/*
-> + * Does only test restart when the target is running.
-> + * The other tests do restarts when stopped multiple times already.
-> + */
-> +static void test_restart(void)
-> +{
-> +	struct cpu *cpu = smp_cpu_from_addr(1);
-> +	struct lowcore *lc = cpu->lowcore;
-> +
-> +	lc->restart_new_psw.mask = extract_psw_mask();
-> +	lc->restart_new_psw.addr = (unsigned long)test_func;
-> +
-> +	/* Make sure cpu is running */
-> +	smp_cpu_stop(0);
-> +	set_flag(0);
-> +	smp_cpu_restart(1);
-> +	wait_for_flag();
-> +
-> +	/*
-> +	 * Wait until cpu 1 has set the flag because it executed the
-> +	 * restart function.
-> +	 */
-> +	set_flag(0);
-> +	smp_cpu_restart(1);
-> +	wait_for_flag();
-> +	report(1, "restart while running");
-> +}
-> +
->  static void test_stop(void)
->  {
->  	smp_cpu_stop(1);
-> @@ -295,6 +323,7 @@ int main(void)
->  	smp_cpu_stop(1);
+> -#define CR0_EXTM_SCLP			0X0000000000000200UL
+> -#define CR0_EXTM_EXTC			0X0000000000002000UL
+> -#define CR0_EXTM_EMGC			0X0000000000004000UL
+> -#define CR0_EXTM_MASK			0X0000000000006200UL
+> +#define CR0_EXTM_SCLP			0x0000000000000200UL
+> +#define CR0_EXTM_EXTC			0x0000000000002000UL
+> +#define CR0_EXTM_EMGC			0x0000000000004000UL
+> +#define CR0_EXTM_MASK			0x0000000000006200UL
 >  
->  	test_start();
-> +	test_restart();
->  	test_stop();
->  	test_stop_store_status();
->  	test_store_status();
+>  struct lowcore {
+>  	uint8_t		pad_0x0000[0x0080 - 0x0000];	/* 0x0000 */
 > 
 
 Reviewed-by: David Hildenbrand <david@redhat.com>
