@@ -2,130 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 64FDB1B78E8
-	for <lists+kvm@lfdr.de>; Fri, 24 Apr 2020 17:10:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7ECFF1B78F5
+	for <lists+kvm@lfdr.de>; Fri, 24 Apr 2020 17:11:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727962AbgDXPJB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Apr 2020 11:09:01 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:55267 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727781AbgDXPJA (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 24 Apr 2020 11:09:00 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1587740938;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=ARp1QaZyc6uSRKz56nM+3cPhl3dHwuu6PrNTP1aVNwk=;
-        b=DUDJFIWT+TNUJwty3YeDIDwMtYBZX22wZwIyjFe/pilQo5Yl7udb4K3oopuOCEi88e/JZR
-        tsxwE4AEM/9A/jXWP5xDHU6wzT6te62Btg6SQY3AS4rs462TW+arHEwLgXOibRlCQQ1fIg
-        5IAIq/5NXCSWavdj8P+I9BfHCHAwON4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-179-DmiyAjRKOj64EzmUgW8ULQ-1; Fri, 24 Apr 2020 11:08:57 -0400
-X-MC-Unique: DmiyAjRKOj64EzmUgW8ULQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8F8F3100A8D3;
-        Fri, 24 Apr 2020 15:08:39 +0000 (UTC)
-Received: from steredhat.redhat.com (ovpn-114-43.ams2.redhat.com [10.36.114.43])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 324695D750;
-        Fri, 24 Apr 2020 15:08:37 +0000 (UTC)
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     davem@davemloft.net
-Cc:     Jason Wang <jasowang@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
-        linux-kernel@vger.kernel.org,
-        Stefano Garzarella <sgarzare@redhat.com>, kvm@vger.kernel.org,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
-Subject: [PATCH net v2 2/2] vsock/virtio: fix multiple packet delivery to monitoring devices
-Date:   Fri, 24 Apr 2020 17:08:30 +0200
-Message-Id: <20200424150830.183113-3-sgarzare@redhat.com>
-In-Reply-To: <20200424150830.183113-1-sgarzare@redhat.com>
-References: <20200424150830.183113-1-sgarzare@redhat.com>
+        id S1727109AbgDXPKy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Apr 2020 11:10:54 -0400
+Received: from mga18.intel.com ([134.134.136.126]:34128 "EHLO mga18.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726872AbgDXPKy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Apr 2020 11:10:54 -0400
+IronPort-SDR: GY1yEiyH3xqsNRlRQFNAB+SxvBjMmsGLe2A98xxZigxhesu3jKH7kg9ngca1gPz2AY+zao+uSV
+ 257vEhRHY7Vg==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Apr 2020 08:10:49 -0700
+IronPort-SDR: wmjljIv6HW5GhwZm7s0TvZQaaxz0KBjvEjC9Ruqc7fQyLP2YhAOBL90BWSJ9PLB9JeibauhHWu
+ 4r5VdU5DcYKg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.73,311,1583222400"; 
+   d="scan'208";a="430793969"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
+  by orsmga005.jf.intel.com with ESMTP; 24 Apr 2020 08:10:49 -0700
+Date:   Fri, 24 Apr 2020 08:10:49 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Yang Weijiang <weijiang.yang@intel.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        pbonzini@redhat.com, jmattson@google.com,
+        yu.c.zhang@linux.intel.com
+Subject: Re: [PATCH v11 7/9] KVM: X86: Add userspace access interface for CET
+ MSRs
+Message-ID: <20200424151049.GE30013@linux.intel.com>
+References: <20200326081847.5870-1-weijiang.yang@intel.com>
+ <20200326081847.5870-8-weijiang.yang@intel.com>
+ <20200423181406.GK17824@linux.intel.com>
+ <20200424150246.GK24039@local-michael-cet-test>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200424150246.GK24039@local-michael-cet-test>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-In virtio_transport.c, if the virtqueue is full, the transmitting
-packet is queued up and it will be sent in the next iteration.
-This causes the same packet to be delivered multiple times to
-monitoring devices.
+On Fri, Apr 24, 2020 at 11:02:46PM +0800, Yang Weijiang wrote:
+> On Thu, Apr 23, 2020 at 11:14:06AM -0700, Sean Christopherson wrote:
+> > > +	case MSR_IA32_INT_SSP_TAB:
+> > > +		if (!cet_check_ctl_msr_access(vcpu, msr_info))
+> > > +			return 1;
+> > > +		if (!is_64_bit_mode(vcpu))
+> > 
+> > This is wrong, the SDM explicitly calls out the !64 case:
+> > 
+> >   IA32_INTERRUPT_SSP_TABLE_ADDR (64 bits; 32 bits on processors that do not
+> >   support Intel 64 architecture).
+> So the check is also unnecessary as it's natual size?
 
-We want to continue to deliver packets to monitoring devices before
-it is put in the virtqueue, to avoid that replies can appear in the
-packet capture before the transmitted packet.
+It still needs a canonical check.
 
-This patch fixes the issue, adding a new flag (tap_delivered) in
-struct virtio_vsock_pkt, to check if the packet is already delivered
-to monitoring devices.
-
-In vhost/vsock.c, we are splitting packets, so we must set
-'tap_delivered' to false when we queue up the same virtio_vsock_pkt
-to handle the remaining bytes.
-
-Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
----
- drivers/vhost/vsock.c                   | 6 ++++++
- include/linux/virtio_vsock.h            | 1 +
- net/vmw_vsock/virtio_transport_common.c | 4 ++++
- 3 files changed, 11 insertions(+)
-
-diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
-index 18aff350a405..11f066c76a25 100644
---- a/drivers/vhost/vsock.c
-+++ b/drivers/vhost/vsock.c
-@@ -196,6 +196,12 @@ vhost_transport_do_send_pkt(struct vhost_vsock *vsoc=
-k,
- 		 * to send it with the next available buffer.
- 		 */
- 		if (pkt->off < pkt->len) {
-+			/* We are queueing the same virtio_vsock_pkt to handle
-+			 * the remaining bytes, and we want to deliver it
-+			 * to monitoring devices in the next iteration.
-+			 */
-+			pkt->tap_delivered =3D false;
-+
- 			spin_lock_bh(&vsock->send_pkt_list_lock);
- 			list_add(&pkt->list, &vsock->send_pkt_list);
- 			spin_unlock_bh(&vsock->send_pkt_list_lock);
-diff --git a/include/linux/virtio_vsock.h b/include/linux/virtio_vsock.h
-index 71c81e0dc8f2..dc636b727179 100644
---- a/include/linux/virtio_vsock.h
-+++ b/include/linux/virtio_vsock.h
-@@ -48,6 +48,7 @@ struct virtio_vsock_pkt {
- 	u32 len;
- 	u32 off;
- 	bool reply;
-+	bool tap_delivered;
- };
-=20
- struct virtio_vsock_pkt_info {
-diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virt=
-io_transport_common.c
-index 709038a4783e..69efc891885f 100644
---- a/net/vmw_vsock/virtio_transport_common.c
-+++ b/net/vmw_vsock/virtio_transport_common.c
-@@ -157,7 +157,11 @@ static struct sk_buff *virtio_transport_build_skb(vo=
-id *opaque)
-=20
- void virtio_transport_deliver_tap_pkt(struct virtio_vsock_pkt *pkt)
- {
-+	if (pkt->tap_delivered)
-+		return;
-+
- 	vsock_deliver_tap(virtio_transport_build_skb, pkt);
-+	pkt->tap_delivered =3D true;
- }
- EXPORT_SYMBOL_GPL(virtio_transport_deliver_tap_pkt);
-=20
---=20
-2.25.3
-
+Note, KVM diverges from the SDM for canonical checks in that it performs
+canonical checks even when the virtual CPU doesn't support 64-bit and/or
+the host kernel is a 32-bit kernel.  This is intentional because the
+underlying hardware will still enforce the checks, i.e. KVM needs to make
+the physical CPU happy, and the number of people running KVM on hardware
+without 64-bit support can probably be counted on one hand.
