@@ -2,164 +2,144 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2281F1B6BB2
-	for <lists+kvm@lfdr.de>; Fri, 24 Apr 2020 05:04:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3433D1B6BBE
+	for <lists+kvm@lfdr.de>; Fri, 24 Apr 2020 05:13:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726032AbgDXDE2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Apr 2020 23:04:28 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:2891 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725840AbgDXDE2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Apr 2020 23:04:28 -0400
-Received: from DGGEMS407-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id 1E2A414620237EA865E5;
-        Fri, 24 Apr 2020 11:04:25 +0800 (CST)
-Received: from [10.173.228.124] (10.173.228.124) by smtp.huawei.com
- (10.3.19.207) with Microsoft SMTP Server (TLS) id 14.3.487.0; Fri, 24 Apr
- 2020 11:04:15 +0800
-Subject: Re: [PATCH v1 00/15] Add support for Nitro Enclaves
-To:     "Paraschiv, Andra-Irina" <andraprs@amazon.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        <linux-kernel@vger.kernel.org>
-CC:     Anthony Liguori <aliguori@amazon.com>,
-        Benjamin Herrenschmidt <benh@amazon.com>,
-        Colm MacCarthaigh <colmmacc@amazon.com>,
-        Bjoern Doebel <doebel@amazon.de>,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        Frank van der Linden <fllinden@amazon.com>,
-        Alexander Graf <graf@amazon.de>,
-        Martin Pohlack <mpohlack@amazon.de>,
-        Matt Wilson <msw@amazon.com>, Balbir Singh <sblbir@amazon.com>,
-        Stewart Smith <trawets@amazon.com>,
-        Uwe Dannowski <uwed@amazon.de>, <kvm@vger.kernel.org>,
-        <ne-devel-upstream@amazon.com>,
-        "Gonglei (Arei)" <arei.gonglei@huawei.com>
-References: <20200421184150.68011-1-andraprs@amazon.com>
- <18406322-dc58-9b59-3f94-88e6b638fe65@redhat.com>
- <ff65b1ed-a980-9ddc-ebae-996869e87308@amazon.com>
-From:   "Longpeng (Mike, Cloud Infrastructure Service Product Dept.)" 
-        <longpeng2@huawei.com>
-Message-ID: <2aa9c865-61c1-fc73-c85d-6627738d2d24@huawei.com>
-Date:   Fri, 24 Apr 2020 11:04:14 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+        id S1726124AbgDXDNZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Apr 2020 23:13:25 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:46608 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725790AbgDXDNZ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 23 Apr 2020 23:13:25 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 03O3294Z005558
+        for <kvm@vger.kernel.org>; Thu, 23 Apr 2020 23:13:24 -0400
+Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 30gmub128v-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Thu, 23 Apr 2020 23:13:24 -0400
+Received: from localhost
+        by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <pasic@linux.ibm.com>;
+        Fri, 24 Apr 2020 04:12:56 +0100
+Received: from b06avi18626390.portsmouth.uk.ibm.com (9.149.26.192)
+        by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Fri, 24 Apr 2020 04:12:54 +0100
+Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 03O3CAW765470952
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 24 Apr 2020 03:12:10 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E2B4042042;
+        Fri, 24 Apr 2020 03:13:17 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3FAFF4203F;
+        Fri, 24 Apr 2020 03:13:17 +0000 (GMT)
+Received: from oc2783563651 (unknown [9.145.87.192])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri, 24 Apr 2020 03:13:17 +0000 (GMT)
+Date:   Fri, 24 Apr 2020 05:13:15 +0200
+From:   Halil Pasic <pasic@linux.ibm.com>
+To:     Tony Krowiak <akrowiak@linux.ibm.com>
+Cc:     Cornelia Huck <cohuck@redhat.com>, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        freude@linux.ibm.com, borntraeger@de.ibm.com,
+        mjrosato@linux.ibm.com, pmorel@linux.ibm.com,
+        alex.williamson@redhat.com, kwankhede@nvidia.com,
+        jjherne@linux.ibm.com, fiuczy@linux.ibm.com
+Subject: Re: [PATCH v7 04/15] s390/vfio-ap: implement in-use callback for
+ vfio_ap driver
+In-Reply-To: <5cf7d611-e30c-226d-0d3d-d37170f117f4@linux.ibm.com>
+References: <20200407192015.19887-1-akrowiak@linux.ibm.com>
+        <20200407192015.19887-5-akrowiak@linux.ibm.com>
+        <20200416131845.3ef6b3b5.cohuck@redhat.com>
+        <5cf7d611-e30c-226d-0d3d-d37170f117f4@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <ff65b1ed-a980-9ddc-ebae-996869e87308@amazon.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.173.228.124]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 20042403-0012-0000-0000-000003AA334F
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20042403-0013-0000-0000-000021E789D4
+Message-Id: <20200424051315.20f17133.pasic@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.676
+ definitions=2020-04-23_19:2020-04-23,2020-04-23 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0
+ priorityscore=1501 spamscore=0 lowpriorityscore=0 adultscore=0
+ impostorscore=0 mlxscore=0 malwarescore=0 suspectscore=0 mlxlogscore=999
+ clxscore=1015 phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2004240015
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Thu, 16 Apr 2020 10:45:20 -0400
+Tony Krowiak <akrowiak@linux.ibm.com> wrote:
 
-On 2020/4/23 21:19, Paraschiv, Andra-Irina wrote:
 > 
 > 
-> On 22/04/2020 00:46, Paolo Bonzini wrote:
->> On 21/04/20 20:41, Andra Paraschiv wrote:
->>> An enclave communicates with the primary VM via a local communication channel,
->>> using virtio-vsock [2]. An enclave does not have a disk or a network device
->>> attached.
->> Is it possible to have a sample of this in the samples/ directory?
+> On 4/16/20 7:18 AM, Cornelia Huck wrote:
+> > On Tue,  7 Apr 2020 15:20:04 -0400
+> > Tony Krowiak <akrowiak@linux.ibm.com> wrote:
+> >
+> >> Let's implement the callback to indicate when an APQN
+> >> is in use by the vfio_ap device driver. The callback is
+> >> invoked whenever a change to the apmask or aqmask would
+> >> result in one or more queue devices being removed from the driver. The
+> >> vfio_ap device driver will indicate a resource is in use
+> >> if the APQN of any of the queue devices to be removed are assigned to
+> >> any of the matrix mdevs under the driver's control.
+> >>
+> >> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
+> >> ---
+> >>   drivers/s390/crypto/vfio_ap_drv.c     |  1 +
+> >>   drivers/s390/crypto/vfio_ap_ops.c     | 47 +++++++++++++++++----------
+> >>   drivers/s390/crypto/vfio_ap_private.h |  2 ++
+> >>   3 files changed, 33 insertions(+), 17 deletions(-)
+> >> @@ -1369,3 +1371,14 @@ void vfio_ap_mdev_remove_queue(struct ap_queue *queue)
+> >>   	kfree(q);
+> >>   	mutex_unlock(&matrix_dev->lock);
+> >>   }
+> >> +
+> >> +bool vfio_ap_mdev_resource_in_use(unsigned long *apm, unsigned long *aqm)
+> >> +{
+> >> +	bool in_use;
+> >> +
+> >> +	mutex_lock(&matrix_dev->lock);
+> >> +	in_use = vfio_ap_mdev_verify_no_sharing(NULL, apm, aqm) ? true : false;
+> > Maybe
+> >
+> > in_use = !!vfio_ap_mdev_verify_no_sharing(NULL, apm, aqm);
+> >
+> > ?
 > 
-> I can add in v2 a sample file including the basic flow of how to use the ioctl
-> interface to create / terminate an enclave.
+> To be honest, I find the !! expression very confusing. Every time I see 
+> it, I have
+> to spend time thinking about what the result of !! is going to be. I think
+> the statement should be left as-is because it more clearly expresses
+> the intent.
 > 
-> Then we can update / build on top it based on the ongoing discussions on the
-> patch series and the received feedback.
-> 
->>
->> I am interested especially in:
->>
->> - the initial CPU state: CPL0 vs. CPL3, initial program counter, etc.
->>
->> - the communication channel; does the enclave see the usual local APIC
->> and IOAPIC interfaces in order to get interrupts from virtio-vsock, and
->> where is the virtio-vsock device (virtio-mmio I suppose) placed in memory?
->>
->> - what the enclave is allowed to do: can it change privilege levels,
->> what happens if the enclave performs an access to nonexistent memory, etc.
->>
->> - whether there are special hypercall interfaces for the enclave
-> 
-> An enclave is a VM, running on the same host as the primary VM, that launched
-> the enclave. They are siblings.
-> 
-> Here we need to think of two components:
-> 
-> 1. An enclave abstraction process - a process running in the primary VM guest,
-> that uses the provided ioctl interface of the Nitro Enclaves kernel driver to
-> spawn an enclave VM (that's 2 below).
-> 
-> How does all gets to an enclave VM running on the host?
-> 
-> There is a Nitro Enclaves emulated PCI device exposed to the primary VM. The
-> driver for this new PCI device is included in the current patch series.
-> 
-Hi Paraschiv,
 
-The new PCI device is emulated in QEMU ? If so, is there any plan to send the
-QEMU code ?
+This is discussion is just about cosmetics, I believe. Just a piece of
+advice: try to be sensitive about the community. In this community, and
+I believe in C general !! is the idiomatic way to convert number to
+boolean. Why would one want to do that is a bit longer story. The short
+version is in logic condition context the value 0 is false and any
+other value is true. !! keeps false value (0) false, and forces a true to
+the most true true value. If you keep getting confused every time you
+run across a !! that won't help with reading other peoples C.
 
-> The ioctl logic is mapped to PCI device commands e.g. the NE_ENCLAVE_START ioctl
-> maps to an enclave start PCI command or the KVM_SET_USER_MEMORY_REGION maps to
-> an add memory PCI command. The PCI device commands are then translated into
-> actions taken on the hypervisor side; that's the Nitro hypervisor running on the
-> host where the primary VM is running.
-> 
-> 2. The enclave itself - a VM running on the same host as the primary VM that
-> spawned it.
-> 
-> The enclave VM has no persistent storage or network interface attached, it uses
-> its own memory and CPUs + its virtio-vsock emulated device for communication
-> with the primary VM.
-> 
-> The memory and CPUs are carved out of the primary VM, they are dedicated for the
-> enclave. The Nitro hypervisor running on the host ensures memory and CPU
-> isolation between the primary VM and the enclave VM.
-> 
-> 
-> These two components need to reflect the same state e.g. when the enclave
-> abstraction process (1) is terminated, the enclave VM (2) is terminated as well.
-> 
-> With regard to the communication channel, the primary VM has its own emulated
-> virtio-vsock PCI device. The enclave VM has its own emulated virtio-vsock device
-> as well. This channel is used, for example, to fetch data in the enclave and
-> then process it. An application that sets up the vsock socket and connects or
-> listens, depending on the use case, is then developed to use this channel; this
-> happens on both ends - primary VM and enclave VM.
-> 
-> Let me know if further clarifications are needed.
-> 
->>
->>> The proposed solution is following the KVM model and uses the KVM API to be able
->>> to create and set resources for enclaves. An additional ioctl command, besides
->>> the ones provided by KVM, is used to start an enclave and setup the addressing
->>> for the communication channel and an enclave unique id.
->> Reusing some KVM ioctls is definitely a good idea, but I wouldn't really
->> say it's the KVM API since the VCPU file descriptor is basically non
->> functional (without KVM_RUN and mmap it's not really the KVM API).
-> 
-> It uses part of the KVM API or a set of KVM ioctls to model the way a VM is
-> created / terminated. That's true, KVM_RUN and mmap-ing the vcpu fd are not
-> included.
-> 
-> Thanks for the feedback regarding the reuse of KVM ioctls.
-> 
-> Andra
-> 
-> 
-> 
-> 
-> Amazon Development Center (Romania) S.R.L. registered office: 27A Sf. Lazar
-> Street, UBC5, floor 2, Iasi, Iasi County, 700045, Romania. Registered in
-> Romania. Registration number J22/2621/2005.
-
--- 
----
 Regards,
-Longpeng(Mike)
+Halil 
+
+> >
+> >> +	mutex_unlock(&matrix_dev->lock);
+> >> +
+> >> +	return in_use;
+> >> +}
+> 
+
