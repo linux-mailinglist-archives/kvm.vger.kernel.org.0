@@ -2,162 +2,174 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 914351B7169
-	for <lists+kvm@lfdr.de>; Fri, 24 Apr 2020 12:02:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 501CF1B7170
+	for <lists+kvm@lfdr.de>; Fri, 24 Apr 2020 12:03:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726845AbgDXKCi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Apr 2020 06:02:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57164 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726193AbgDXKCi (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 24 Apr 2020 06:02:38 -0400
-Received: from merlin.infradead.org (unknown [IPv6:2001:8b0:10b:1231::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A678C09B045;
-        Fri, 24 Apr 2020 03:02:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=merlin.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=iPgS037mNuGvOYOpwoSf1H/SfmbqTuuOMcYJNVtGJDI=; b=N4R7qIENToOsIMIszN0piefZdS
-        2/V8uPlGpM1eSpjZV9jU7iBzEBFYlR2nc3k4M9iY5pHLt7x+6LFFEYiNtDpxL1u6NCoZ1SSRoq4MC
-        4V620UaJ1I5+ORn4seM/IPAsDckj5M52yBHsu+67CjjqzxaHBM/EY8wZKpdoEnv7DYJZCL5ewQfgg
-        qTTtkicv5fLDkxYXQECiXioyxjxqHgtBMCBBhaSImsDUEo6wut7MTvd1azRa2mgIPawK7ZgVWX9Te
-        oFvp9LbQggANylejedo3TyR1ZzQD0Qn9w39ZIMJZsaBSFHWab7a0dMwyUa2bqw6P+cFD04Nrc7zex
-        AOreSQ8Q==;
-Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
-        by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jRv9X-0006sU-7O; Fri, 24 Apr 2020 10:01:47 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 88B4E300B38;
-        Fri, 24 Apr 2020 12:01:43 +0200 (CEST)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id 5F4B320325E18; Fri, 24 Apr 2020 12:01:43 +0200 (CEST)
-Date:   Fri, 24 Apr 2020 12:01:43 +0200
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Li RongQing <lirongqing@baidu.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org,
-        hpa@zytor.com, bp@alien8.de, mingo@redhat.com, tglx@linutronix.de,
-        joro@8bytes.org, jmattson@google.com, wanpengli@tencent.com,
-        vkuznets@redhat.com, sean.j.christopherson@intel.com,
-        pbonzini@redhat.com
-Subject: Re: [PATCH] [RFC] kvm: x86: emulate APERF/MPERF registers
-Message-ID: <20200424100143.GZ20730@hirez.programming.kicks-ass.net>
-References: <1587704935-30960-1-git-send-email-lirongqing@baidu.com>
+        id S1726867AbgDXKDl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Apr 2020 06:03:41 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:21561 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726193AbgDXKDk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Apr 2020 06:03:40 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1587722618;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+        bh=5O5xKdH6pZvUIHEm+Z4BpmapSiNxrKkhV+s6z3dC09M=;
+        b=hAWHLLhmYDIyjjmh6DoAfCBZ2SfpKrTHjsbBfG+L6JbN9PlyUVZVkMcepUCQOby8hd5zwL
+        FY9daZ5nsTM9XQn9g8RUBvMBaPwjuOUkNPQ8f+ccfRqut+GSPPJ68smg2VizZVf0iKd3Jw
+        krDnUJ1KAfdhYHW0q3htdkjRWJ5Q5yU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-325-9p5G_NeIOZC_TfLBI9m3GA-1; Fri, 24 Apr 2020 06:03:34 -0400
+X-MC-Unique: 9p5G_NeIOZC_TfLBI9m3GA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 904BF100960F;
+        Fri, 24 Apr 2020 10:03:33 +0000 (UTC)
+Received: from [10.36.113.138] (ovpn-113-138.ams2.redhat.com [10.36.113.138])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 2A7CD5DA27;
+        Fri, 24 Apr 2020 10:03:31 +0000 (UTC)
+Subject: Re: [PATCH v3] s390x: smp: Test all CRs on initial reset
+To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     thuth@redhat.com, linux-s390@vger.kernel.org,
+        borntraeger@de.ibm.com, cohuck@redhat.com
+References: <2ebdf5d6-74ac-d9e5-d329-29611a5f87cd@redhat.com>
+ <20200424093356.11931-1-frankja@linux.ibm.com>
+From:   David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat GmbH
+Message-ID: <a37706b5-9319-0a70-181f-5a6afbb79d64@redhat.com>
+Date:   Fri, 24 Apr 2020 12:03:31 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1587704935-30960-1-git-send-email-lirongqing@baidu.com>
+In-Reply-To: <20200424093356.11931-1-frankja@linux.ibm.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Apr 24, 2020 at 01:08:55PM +0800, Li RongQing wrote:
-> Guest kernel reports a fixed cpu frequency in /proc/cpuinfo,
-> this is confused to user when turbo is enable, and aperf/mperf
-> can be used to show current cpu frequency after 7d5905dc14a
-> "(x86 / CPU: Always show current CPU frequency in /proc/cpuinfo)"
-> so we should emulate aperf mperf to achieve it
-> 
-> the period of aperf/mperf in guest mode are accumulated
-> as emulated value
-> 
-> Signed-off-by: Li RongQing <lirongqing@baidu.com>
+On 24.04.20 11:33, Janosch Frank wrote:
+> All CRs are set to 0 and CRs 0 and 14 are set to pre-defined values,
+> so we also need to test 1-13 and 15 for 0.
+>=20
+> And while we're at it, let's also set some values to cr 1, 7 and 13, so
+> we can actually be sure that they will be zeroed.
+>=20
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+> Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
 > ---
->  arch/x86/include/asm/kvm_host.h |  5 +++++
->  arch/x86/kvm/cpuid.c            |  5 ++++-
->  arch/x86/kvm/vmx/vmx.c          | 20 ++++++++++++++++++++
->  3 files changed, 29 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 42a2d0d3984a..526bd13a3d3d 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -820,6 +820,11 @@ struct kvm_vcpu_arch {
->  
->  	/* AMD MSRC001_0015 Hardware Configuration */
->  	u64 msr_hwcr;
+>  s390x/smp.c | 18 +++++++++++++++++-
+>  1 file changed, 17 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/s390x/smp.c b/s390x/smp.c
+> index fa40753..7144c9b 100644
+> --- a/s390x/smp.c
+> +++ b/s390x/smp.c
+> @@ -182,16 +182,28 @@ static void test_emcall(void)
+>  	report_prefix_pop();
+>  }
+> =20
+> +/* Used to dirty registers of cpu #1 before it is reset */
+> +static void test_func_initial(void)
+> +{
+> +	lctlg(1, 0x42000UL);
+> +	lctlg(7, 0x43000UL);
+> +	lctlg(13, 0x44000UL);
+> +	set_flag(1);
+> +}
 > +
-> +	u64 host_mperf;
-> +	u64 host_aperf;
-> +	u64 v_mperf;
-> +	u64 v_aperf;
->  };
->  
->  struct kvm_lpage_info {
-> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> index 901cd1fdecd9..00e4993cb338 100644
-> --- a/arch/x86/kvm/cpuid.c
-> +++ b/arch/x86/kvm/cpuid.c
-> @@ -558,7 +558,10 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
->  	case 6: /* Thermal management */
->  		entry->eax = 0x4; /* allow ARAT */
->  		entry->ebx = 0;
-> -		entry->ecx = 0;
-> +		if (boot_cpu_has(X86_FEATURE_APERFMPERF))
-> +			entry->ecx = 0x1;
-> +		else
-> +			entry->ecx = 0x0;
->  		entry->edx = 0;
->  		break;
->  	/* function 7 has additional index. */
-
-AFAICT this is generic x86 code, that is, this will tell an AMD SVM
-guest it has APERFMPERF on.
-
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 91749f1254e8..f20216fc0b57 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -1064,6 +1064,11 @@ static inline void pt_save_msr(struct pt_ctx *ctx, u32 addr_range)
->  
->  static void pt_guest_enter(struct vcpu_vmx *vmx)
+>  static void test_reset_initial(void)
 >  {
-> +	struct kvm_vcpu *vcpu = &vmx->vcpu;
-> +
-> +	rdmsrl(MSR_IA32_MPERF, vcpu->arch.host_mperf);
-> +	rdmsrl(MSR_IA32_APERF, vcpu->arch.host_aperf);
-> +
->  	if (vmx_pt_mode_is_system())
->  		return;
->  
-> @@ -1081,6 +1086,15 @@ static void pt_guest_enter(struct vcpu_vmx *vmx)
->  
->  static void pt_guest_exit(struct vcpu_vmx *vmx)
->  {
-> +	struct kvm_vcpu *vcpu = &vmx->vcpu;
-> +	u64 perf;
-> +
-> +	rdmsrl(MSR_IA32_MPERF, perf);
-> +	vcpu->arch.v_mperf += perf - vcpu->arch.host_mperf;
-> +
-> +	rdmsrl(MSR_IA32_APERF, perf);
-> +	vcpu->arch.v_aperf += perf - vcpu->arch.host_aperf;
-> +
->  	if (vmx_pt_mode_is_system())
->  		return;
->  
-> @@ -1914,6 +1928,12 @@ static int vmx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->  		    !guest_cpuid_has(vcpu, X86_FEATURE_RDTSCP))
->  			return 1;
->  		goto find_shared_msr;
-> +	case MSR_IA32_MPERF:
-> +		msr_info->data = vcpu->arch.v_mperf;
-> +		break;
-> +	case MSR_IA32_APERF:
-> +		msr_info->data = vcpu->arch.v_aperf;
-> +		break;
->  	default:
->  	find_shared_msr:
->  		msr = find_msr_entry(vmx, msr_info->index);
+>  	struct cpu_status *status =3D alloc_pages(0);
+>  	struct psw psw;
+> +	int i;
+> =20
+>  	psw.mask =3D extract_psw_mask();
+> -	psw.addr =3D (unsigned long)test_func;
+> +	psw.addr =3D (unsigned long)test_func_initial;
+> =20
+>  	report_prefix_push("reset initial");
+> +	set_flag(0);
+>  	smp_cpu_start(1, psw);
+> +	wait_for_flag();
+> =20
+>  	sigp_retry(1, SIGP_INITIAL_CPU_RESET, 0, NULL);
+>  	sigp(1, SIGP_STORE_STATUS_AT_ADDRESS, (uintptr_t)status, NULL);
+> @@ -202,6 +214,10 @@ static void test_reset_initial(void)
+>  	report(!status->fpc, "fpc");
+>  	report(!status->cputm, "cpu timer");
+>  	report(!status->todpr, "todpr");
+> +	for (i =3D 1; i <=3D 13; i++) {
+> +		report(status->crs[i] =3D=3D 0, "cr%d =3D=3D 0", i);
+> +	}
+> +	report(status->crs[15] =3D=3D 0, "cr15 =3D=3D 0");
+>  	report_prefix_pop();
+> =20
+>  	report_prefix_push("initialized");
+>=20
 
-But then here you only emulate it for VMX, which then results in SVM
-guests going wobbly.
+Reviewed-by: David Hildenbrand <david@redhat.com>
 
-Also, on Intel, the moment you advertise APERFMPERF, we'll try and read
-MSR_PLATFORM_INFO / MSR_TURBO_RATIO_LIMIT*, I don't suppose you're
-passing those through as well?
+Queued to
 
+https://github.com/davidhildenbrand/kvm-unit-tests.git s390x-next
+
+thanks!
+
+--=20
+Thanks,
+
+David / dhildenb
 
