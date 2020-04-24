@@ -2,178 +2,169 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 32ADC1B6E67
-	for <lists+kvm@lfdr.de>; Fri, 24 Apr 2020 08:46:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7DEBB1B6F39
+	for <lists+kvm@lfdr.de>; Fri, 24 Apr 2020 09:45:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726762AbgDXGpt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Apr 2020 02:45:49 -0400
-Received: from mail.kernel.org ([198.145.29.99]:36506 "EHLO mail.kernel.org"
+        id S1726298AbgDXHpK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Apr 2020 03:45:10 -0400
+Received: from mail.kernel.org ([198.145.29.99]:54324 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726072AbgDXGpt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Apr 2020 02:45:49 -0400
-Received: from mail-il1-f172.google.com (mail-il1-f172.google.com [209.85.166.172])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        id S1726028AbgDXHpJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Apr 2020 03:45:09 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 9DCAD2168B
-        for <kvm@vger.kernel.org>; Fri, 24 Apr 2020 06:45:48 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id E6AB220704;
+        Fri, 24 Apr 2020 07:45:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1587710748;
-        bh=p2q55OLx4UPloM+vgfVQMuUale07BQMtfAZ7tOi6RnU=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=JSx+T6PtvoWL6GnpDqhKz/MwjKZxO/9BHdc7hOg/ev4nwZ7P+2eTqw+Bk7V9rSzej
-         z9yI/xhe6ykQgZSG85qtADknL2sRRw5myyRLI1lmU3k3gmRIPFTqpOIua3M2LloCT+
-         YSac4oCFt0ktHk4KQH6htBnfaDhvwfjk7UZTXjhs=
-Received: by mail-il1-f172.google.com with SMTP id f82so8253252ilh.8
-        for <kvm@vger.kernel.org>; Thu, 23 Apr 2020 23:45:48 -0700 (PDT)
-X-Gm-Message-State: AGi0PuZ93vpOMjPq7h6E6xybmpuJtnNW42N2riZuGmg/bYi/AK7AoYIX
-        tW7F+AcqzUAUiUgmjgmMHJ1EeyujIGITpO/fv8U=
-X-Google-Smtp-Source: APiQypLtBOfLTUCgAhYdZRnGLbRyu71+dwoV1T4y4Mmeic6g1JZnuZsFCD3CRzF/Ys/eH3kOjeDK4ksjZqc5dzL+Mos=
-X-Received: by 2002:a92:607:: with SMTP id x7mr6630624ilg.218.1587710747942;
- Thu, 23 Apr 2020 23:45:47 -0700 (PDT)
+        s=default; t=1587714309;
+        bh=bgQUeLtR5/7GCj8flGJ20OIZAJat0izFGHC+rQxM1Nw=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=ZYezxYGsy/G1/2Jk5bMxQlxiWkn+K1nNr7hI7ZppcXRhc8cg98jCrayPkkBrdIisP
+         GQdWFFKlqM2rLs5qeqWiQvTeMhc9jvcpu863z+OFOYVW7Q7JiYRoAF0sFpOyPKHEVd
+         jEfBF2WmiIdN2XcMiyBclLkmiiCrfBC9RLg6c8k8=
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why)
+        by disco-boy.misterjones.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <maz@kernel.org>)
+        id 1jRt1H-005zJu-9N; Fri, 24 Apr 2020 08:45:07 +0100
+Date:   Fri, 24 Apr 2020 08:45:05 +0100
+From:   Marc Zyngier <maz@kernel.org>
+To:     Zenghui Yu <yuzenghui@huawei.com>
+Cc:     <linux-arm-kernel@lists.infradead.org>,
+        <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>,
+        Will Deacon <will@kernel.org>,
+        Andre Przywara <andre.przywara@arm.com>,
+        Dave Martin <Dave.Martin@arm.com>,
+        George Cherian <gcherian@marvell.com>,
+        "Zengtao (B)" <prime.zeng@hisilicon.com>,
+        Catalin Marinas <catalin.marinas@arm.com>
+Subject: Re: [PATCH 18/26] KVM: arm64: Don't use empty structures as CPU
+ reset state
+Message-ID: <20200424084505.6b0afc94@why>
+In-Reply-To: <77963c60-bcc4-0c9e-fd35-d696827ea55c@huawei.com>
+References: <20200422120050.3693593-1-maz@kernel.org>
+        <20200422120050.3693593-19-maz@kernel.org>
+        <77963c60-bcc4-0c9e-fd35-d696827ea55c@huawei.com>
+Organization: Approximate
+X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
-References: <20200423173844.24220-1-andre.przywara@arm.com>
- <CAMj1kXGDjzLA3sZg33EK2RVrSmYGuCm4cZ0Y9X=ZLxN8R--7=g@mail.gmail.com>
- <CAMj1kXEjckV3HzcX_XXTSn-tDDQ5H8=LgteDcP5USThn=OgTQg@mail.gmail.com> <9e742184-86c1-a4be-c2cb-fe96979e0f1f@arm.com>
-In-Reply-To: <9e742184-86c1-a4be-c2cb-fe96979e0f1f@arm.com>
-From:   Ard Biesheuvel <ardb@kernel.org>
-Date:   Fri, 24 Apr 2020 08:45:37 +0200
-X-Gmail-Original-Message-ID: <CAMj1kXGMHfENDCkAyPCvS0avaYGOVbjDkPi964L3y0DVvz8m8A@mail.gmail.com>
-Message-ID: <CAMj1kXGMHfENDCkAyPCvS0avaYGOVbjDkPi964L3y0DVvz8m8A@mail.gmail.com>
-Subject: Re: [PATCH kvmtool v4 0/5] Add CFI flash emulation
-To:     =?UTF-8?Q?Andr=C3=A9_Przywara?= <andre.przywara@arm.com>
-Cc:     Will Deacon <will@kernel.org>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        kvm@vger.kernel.org, kvmarm <kvmarm@lists.cs.columbia.edu>,
-        Raphael Gault <raphael.gault@arm.com>,
-        Sami Mujawar <sami.mujawar@arm.com>,
-        Alexandru Elisei <Alexandru.Elisei@arm.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, will@kernel.org, andre.przywara@arm.com, Dave.Martin@arm.com, gcherian@marvell.com, prime.zeng@hisilicon.com, catalin.marinas@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 23 Apr 2020 at 23:32, Andr=C3=A9 Przywara <andre.przywara@arm.com> =
-wrote:
->
-> On 23/04/2020 21:43, Ard Biesheuvel wrote:
->
-> Hi Ard,
->
-> > On Thu, 23 Apr 2020 at 19:55, Ard Biesheuvel <ardb@kernel.org> wrote:
-> >>
-> >> On Thu, 23 Apr 2020 at 19:39, Andre Przywara <andre.przywara@arm.com> =
-wrote:
-> >>>
-> >>> Hi,
-> >>>
-> >>> an update for the CFI flash emulation, addressing Alex' comments and
-> >>> adding direct mapping support.
-> >>> The actual code changes to the flash emulation are minimal, mostly th=
-is
-> >>> is about renaming and cleanups.
-> >>> This versions now adds some patches. 1/5 is a required fix, the last
-> >>> three patches add mapping support as an extension. See below.
-> >>>
-> >>> In addition to a branch with this series[1], I also put a git branch =
-with
-> >>> all the changes compared to v3[2] as separate patches on the server, =
-please
-> >>> have a look if you want to verify against a previous review.
-> >>>
-> >>> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> >>> The EDK II UEFI firmware implementation requires some storage for the=
- EFI
-> >>> variables, which is typically some flash storage.
-> >>> Since this is already supported on the EDK II side, and looks like a
-> >>> generic standard, this series adds a CFI flash emulation to kvmtool.
-> >>>
-> >>> Patch 2/5 is the actual emulation code, patch 1/5 is a bug-fix for
-> >>> registering MMIO devices, which is needed for this device.
-> >>> Patches 3-5 add support for mapping the flash memory into guest, shou=
-ld
-> >>> it be in read-array mode. For this to work, patch 3/5 is cherry-picke=
-d
-> >>> from Alex' PCIe reassignable BAR series, to support removing a memslo=
-t
-> >>> mapping. Patch 4/5 adds support for read-only mappings, while patch 5=
-/5
-> >>> adds or removes the mapping based on the current state.
-> >>> I am happy to squash 5/5 into 2/5, if we agree that patch 3/5 should =
-be
-> >>> merged either separately or the PCIe series is actually merged before
-> >>> this one.
-> >>>
-> >>> This is one missing piece towards a working UEFI boot with kvmtool on
-> >>> ARM guests, the other is to provide writable PCI BARs, which is WIP.
-> >>> This series alone already enables UEFI boot, but only with virtio-mmi=
-o.
-> >>>
-> >>
-> >> Excellent! Thanks for taking the time to implement the r/o memslot for
-> >> the flash, it really makes the UEFI firmware much more usable.
-> >>
-> >> I will test this as soon as I get a chance, probably tomorrow.
-> >>
-> >
-> > I tested this on a SynQuacer box as a host, using EFI firmware [0]
-> > built from patches provided by Sami.
-> >
-> > I booted the Debian buster installer, completed the installation, and
-> > could boot into the system. The only glitch was the fact that the
-> > reboot didn't work, but I suppose we are not preserving the memory the
-> > contains the firmware image, so there is nothing to reboot into.
->
-> It's even worth, kvmtool does actually not support reset at all:
-> https://git.kernel.org/pub/scm/linux/kernel/git/will/kvmtool.git/tree/kvm=
--cpu.c#n220
->
-> And yeah, the UEFI firmware is loaded at the beginning of RAM, so most
-> of it is long gone by then.
-> kvmtool could reload the image and reset the VCPUs, but every device
-> emulation would need to be reset, for which there is no code yet.
->
+Hi Zenghui,
 
-Fair enough. For my use case, it doesn't really matter anyway.
+On Fri, 24 Apr 2020 12:07:50 +0800
+Zenghui Yu <yuzenghui@huawei.com> wrote:
 
-> > But
-> > just restarting kvmtool with the flash image containing the EFI
-> > variables got me straight into GRUB and the installed OS.
->
-> So, yeah, this is the way to do it ;-)
->
-> > Tested-by: Ard Biesheuvel <ardb@kernel.org>
->
-> Many thanks for that!
->
-> > Thanks again for getting this sorted.
->
-> It was actually easier than I thought (see the last patch).
->
-> Just curious: the images Sami gave me this morning did not show any
-> issues anymore (no no-syndrome fault, no alignment issues), even without
-> the mapping [1]. And even though I saw the 800k read traps, I didn't
-> notice any real performance difference (on a Juno). The PXE timeout was
-> definitely much more noticeable.
->
-> So did you see any performance impact with this series?
->
+> Hi Marc,
+> 
+> On 2020/4/22 20:00, Marc Zyngier wrote:
+> > Keeping empty structure as the vcpu state initializer is slightly
+> > wasteful: we only want to set pstate, and zero everything else.
+> > Just do that.
+> > 
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >   arch/arm64/kvm/reset.c | 20 +++++++++-----------
+> >   1 file changed, 9 insertions(+), 11 deletions(-)
+> > 
+> > diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+> > index 241db35a7ef4f..895d7d9ad1866 100644
+> > --- a/arch/arm64/kvm/reset.c
+> > +++ b/arch/arm64/kvm/reset.c
+> > @@ -37,15 +37,11 @@ static u32 kvm_ipa_limit;
+> >   /*
+> >    * ARMv8 Reset Values
+> >    */
+> > -static const struct kvm_regs default_regs_reset = {
+> > -	.regs.pstate = (PSR_MODE_EL1h | PSR_A_BIT | PSR_I_BIT |
+> > -			PSR_F_BIT | PSR_D_BIT),
+> > -};
+> > +#define VCPU_RESET_PSTATE_EL1	(PSR_MODE_EL1h | PSR_A_BIT | PSR_I_BIT | \
+> > +				 PSR_F_BIT | PSR_D_BIT)  
+> >   > -static const struct kvm_regs default_regs_reset32 = {  
+> > -	.regs.pstate = (PSR_AA32_MODE_SVC | PSR_AA32_A_BIT |
+> > -			PSR_AA32_I_BIT | PSR_AA32_F_BIT),
+> > -};
+> > +#define VCPU_RESET_PSTATE_SVC	(PSR_AA32_MODE_SVC | PSR_AA32_A_BIT | \
+> > +				 PSR_AA32_I_BIT | PSR_AA32_F_BIT)  
+> >   >   static bool cpu_has_32bit_el1(void)  
+> >   {
+> > @@ -261,6 +257,7 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+> >   	const struct kvm_regs *cpu_reset;
+> >   	int ret = -EINVAL;
+> >   	bool loaded;
+> > +	u32 pstate;  
+> >   >   	/* Reset PMU outside of the non-preemptible section */  
+> >   	kvm_pmu_vcpu_reset(vcpu);
+> > @@ -291,16 +288,17 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+> >   		if (test_bit(KVM_ARM_VCPU_EL1_32BIT, vcpu->arch.features)) {
+> >   			if (!cpu_has_32bit_el1())
+> >   				goto out;
+> > -			cpu_reset = &default_regs_reset32;
+> > +			pstate = VCPU_RESET_PSTATE_SVC;
+> >   		} else {
+> > -			cpu_reset = &default_regs_reset;
+> > +			pstate = VCPU_RESET_PSTATE_EL1;
+> >   		}  
+> >   >   		break;  
+> >   	}  
+> >   >   	/* Reset core registers */  
+> > -	memcpy(vcpu_gp_regs(vcpu), cpu_reset, sizeof(*cpu_reset));
+> > +	memset(vcpu_gp_regs(vcpu), 0, sizeof(*cpu_reset));  
+> 
+> Be careful that we can *not* use 'sizeof(*cpu_reset)' here anymore.  As
+> you're going to refactor the layout of the core registers whilst keeping
+> the kvm_regs API unchanged.  Resetting the whole kvm_regs will go
+> corrupting some affected registers and make them temporarily invalid.
+> The bad thing will show up after you start moving ELR_EL1 around,
+> specifically in patch #20...
 
-You normally don't PXE boot. There is an issue with the iSCSI driver
-as well, which causes a boot delay for some reason, so I disabled that
-in my build.
+Ah, awesome find! Yes, it is pretty obvious now that you point it out.
+If I had removed this now useless cpu_reset variable, I'd have spotted
+it!
 
-I definitely *feels* faster :-) But in any case, exposing the array
-mode as a r/o memslot is definitely the right way to deal with this.
-Even if Sami did find a workaround that masks the error, it is no
-guarantee that all accesses go through that library.
+> And the first victim is ... MPIDR_EL1 (the first one in sys_regs array).
+> Now you know how this was spotted ;-)  I think this should be the root
+> cause of what Zengtao had previously reported [*].
 
+It'd be good if Zengtao could confirm that changing this line to
 
-> > [0] https://people.linaro.org/~ard.biesheuvel/KVMTOOL_EFI.fd
->
-> Ah, nice, will this stay there for a while? I can't provide binaries,
-> but wanted others to be able to easily test this.
->
+	memset(vcpu_gp_regs(vcpu), 0, sizeof(*vcpu_gp_regs(vcpu)));
 
-Sure, I will leave it up until Linaro decides to take down my account.
+fixes his problem.
+
+> If these registers are all expected to be reset to architecturally
+> UNKNOWN values, I think we can just drop this memset(), though haven't
+> check with the ARM ARM carefully.
+
+D1.9.1 ("PE state on reset to AArch64 state"):
+
+"All general-purpose, and SIMD and floating-point registers are
+UNKNOWN."
+
+There is a vaguely similar wording for AArch32 (G1.17.1), although it
+is only described by omission:
+
+"Immediately after a reset, much of the PE state is UNKNOWN. However,
+some of the PE state is defined."
+
+and the GPRs are not part of the list of defined states.
+
+Still, I'm worried to change KVM's behaviour after so long... I'll have
+a try with a handful of non-Linux guests and see if anything breaks.
+
+Thanks again,
+
+         M.
+-- 
+Jazz is not dead. It just smells funny...
