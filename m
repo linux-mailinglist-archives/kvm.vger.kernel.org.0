@@ -2,235 +2,171 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 338951B7373
-	for <lists+kvm@lfdr.de>; Fri, 24 Apr 2020 13:51:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DDDAA1B739A
+	for <lists+kvm@lfdr.de>; Fri, 24 Apr 2020 14:08:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726844AbgDXLvx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Apr 2020 07:51:53 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:62114 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726247AbgDXLvw (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 24 Apr 2020 07:51:52 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 03OBXq58059420;
-        Fri, 24 Apr 2020 07:51:51 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 30jrj7wpse-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 24 Apr 2020 07:51:51 -0400
-Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 03OBa59Y067085;
-        Fri, 24 Apr 2020 07:51:50 -0400
-Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 30jrj7wps3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 24 Apr 2020 07:51:50 -0400
-Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
-        by ppma02fra.de.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 03OBnqad026626;
-        Fri, 24 Apr 2020 11:51:48 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma02fra.de.ibm.com with ESMTP id 30fs65gy95-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 24 Apr 2020 11:51:48 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 03OBpkAO27197636
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 24 Apr 2020 11:51:46 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7B146A4055;
-        Fri, 24 Apr 2020 11:51:46 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 35C14A4051;
-        Fri, 24 Apr 2020 11:51:46 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.145.157.9])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri, 24 Apr 2020 11:51:46 +0000 (GMT)
-Subject: Re: [PATCH v2 04/10] s390x: smp: Test local interrupts after cpu
- reset
-To:     David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org
-Cc:     thuth@redhat.com, linux-s390@vger.kernel.org,
-        borntraeger@de.ibm.com, cohuck@redhat.com
-References: <20200423091013.11587-1-frankja@linux.ibm.com>
- <20200423091013.11587-5-frankja@linux.ibm.com>
- <8bdbe934-fff9-cc2a-3043-4851365735f3@redhat.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
-Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
- mQINBFubpD4BEADX0uhkRhkj2AVn7kI4IuPY3A8xKat0ihuPDXbynUC77mNox7yvK3X5QBO6
- qLqYr+qrG3buymJJRD9xkp4mqgasHdB5WR9MhXWKH08EvtvAMkEJLnqxgbqf8td3pCQ2cEpv
- 15mH49iKSmlTcJ+PvJpGZcq/jE42u9/0YFHhozm8GfQdb9SOI/wBSsOqcXcLTUeAvbdqSBZe
- zuMRBivJQQI1esD9HuADmxdE7c4AeMlap9MvxvUtWk4ZJ/1Z3swMVCGzZb2Xg/9jZpLsyQzb
- lDbbTlEeyBACeED7DYLZI3d0SFKeJZ1SUyMmSOcr9zeSh4S4h4w8xgDDGmeDVygBQZa1HaoL
- Esb8Y4avOYIgYDhgkCh0nol7XQ5i/yKLtnNThubAcxNyryw1xSstnKlxPRoxtqTsxMAiSekk
- 0m3WJwvwd1s878HrQNK0orWd8BzzlSswzjNfQYLF466JOjHPWFOok9pzRs+ucrs6MUwDJj0S
- cITWU9Rxb04XyigY4XmZ8dywaxwi2ZVTEg+MD+sPmRrTw+5F+sU83cUstuymF3w1GmyofgsU
- Z+/ldjToHnq21MNa1wx0lCEipCCyE/8K9B9bg9pUwy5lfx7yORP3JuAUfCYb8DVSHWBPHKNj
- HTOLb2g2UT65AjZEQE95U2AY9iYm5usMqaWD39pAHfhC09/7NQARAQABtCVKYW5vc2NoIEZy
- YW5rIDxmcmFua2phQGxpbnV4LmlibS5jb20+iQI3BBMBCAAhBQJbm6Q+AhsjBQsJCAcCBhUI
- CQoLAgQWAgMBAh4BAheAAAoJEONU5rjiOLn4p9gQALjkdj5euJVI2nNT3/IAxAhQSmRhPEt0
- AmnCYnuTcHRWPujNr5kqgtyER9+EMQ0ZkX44JU2q7OWxTdSNSAN/5Z7qmOR9JySvDOf4d3mS
- bMB5zxL9d8SbnSs1uW96H9ZBTlTQnmLfsiM9TetAjSrR8nUmjGhe2YUhJLR1v1LguME+YseT
- eXnLzIzqqpu311/eYiiIGcmaOjPCE+vFjcXL5oLnGUE73qSYiujwhfPCCUK0850o1fUAYq5p
- CNBCoKT4OddZR+0itKc/cT6NwEDwdokeg0+rAhxb4Rv5oFO70lziBplEjOxu3dqgIKbHbjza
- EXTb+mr7VI9O4tTdqrwJo2q9zLqqOfDBi7NDvZFLzaCewhbdEpDYVu6/WxprAY94hY3F4trT
- rQMHJKQENtF6ZTQc9fcT5I3gAmP+OEvDE5hcTALpWm6Z6SzxO7gEYCnF+qGXqp8sJVrweMub
- UscyLqHoqdZC2UG4LQ1OJ97nzDpIRe0g6oJ9ZIYHKmfw5jjwH6rASTld5MFWajWdNsqK15k/
- RZnHAGICKVIBOBsq26m4EsBlfCdt3b/6emuBjUXR1pyjHMz2awWzCq6/6OWs5eANZ0sdosNq
- dq2v0ULYTazJz2rlCXV89qRa7ukkNwdBSZNEwsD4eEMicj1LSrqWDZMAALw50L4jxaMD7lPL
- jJbauQINBFubpD4BEADAcUTRqXF/aY53OSH7IwIK9lFKxIm0IoFkOEh7LMfp7FGzaP7ANrZd
- cIzhZi38xyOkcaFY+npGEWvko7rlIAn0JpBO4x3hfhmhBD/WSY8LQIFQNNjEm3vzrMo7b9Jb
- JAqQxfbURY3Dql3GUzeWTG9uaJ00u+EEPlY8zcVShDltIl5PLih20e8xgTnNzx5c110lQSu0
- iZv2lAE6DM+2bJQTsMSYiwKlwTuv9LI9Chnoo6+tsN55NqyMxYqJgElk3VzlTXSr3+rtSCwf
- tq2cinETbzxc1XuhIX6pu/aCGnNfuEkM34b7G1D6CPzDMqokNFbyoO6DQ1+fW6c5gctXg/lZ
- 602iEl4C4rgcr3+EpfoPUWzKeM8JXv5Kpq4YDxhvbitr8Dm8gr38+UKFZKlWLlwhQ56r/zAU
- v6LIsm11GmFs2/cmgD1bqBTNHHcTWwWtRTLgmnqJbVisMJuYJt4KNPqphTWsPY8SEtbufIlY
- HXOJ2lqUzOReTrie2u0qcSvGAbSfec9apTFl2Xko/ddqPcZMpKhBiXmY8tJzSPk3+G4tqur4
- 6TYAm5ouitJsgAR61Cu7s+PNuq/pTLDhK+6/Njmc94NGBcRA4qTuysEGE79vYWP2oIAU4Fv6
- gqaWHZ4MEI2XTqH8wiwzPdCQPYsSE0fXWiYu7ObeErT6iLSTZGx4rQARAQABiQIfBBgBCAAJ
- BQJbm6Q+AhsMAAoJEONU5rjiOLn4DDEP/RuyckW65SZcPG4cMfNgWxZF8rVjeVl/9PBfy01K
- 8R0hajU40bWtXSMiby7j0/dMjz99jN6L+AJHJvrLz4qYRzn2Ys843W+RfXj62Zde4YNBE5SL
- jJweRCbMWKaJLj6499fctxTyeb9+AMLQS4yRSwHuAZLmAb5AyCW1gBcTWZb8ON5BmWnRqeGm
- IgC1EvCnHy++aBnHTn0m+zV89BhTLTUal35tcjUFwluBY39R2ux/HNlBO1GY3Z+WYXhBvq7q
- katThLjaQSmnOrMhzqYmdShP1leFTVbzXUUIYv/GbynO/YrL2gaQpaP1bEUEi8lUAfXJbEWG
- dnHFkciryi092E8/9j89DJg4mmZqOau7TtUxjRMlBcIliXkzSLUk+QvD4LK1kWievJse4mte
- FBdkWHfP4BH/+8DxapRcG1UAheSnSRQ5LiO50annOB7oXF+vgKIaie2TBfZxQNGAs3RQ+bga
- DchCqFm5adiSP5+OT4NjkKUeGpBe/aRyQSle/RropTgCi85pje/juYEn2P9UAgkfBJrOHvQ9
- Z+2Sva8FRd61NJLkCJ4LFumRn9wQlX2icFbi8UDV3do0hXJRRYTWCxrHscMhkrFWLhYiPF4i
- phX7UNdOWBQ90qpHyAxHmDazdo27gEjfvsgYMdveKknEOTEb5phwxWgg7BcIDoJf9UMC
-Message-ID: <c92a928a-aa94-38b6-f8af-d0bf28e368fd@linux.ibm.com>
-Date:   Fri, 24 Apr 2020 13:51:45 +0200
+        id S1726992AbgDXMIz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Apr 2020 08:08:55 -0400
+Received: from foss.arm.com ([217.140.110.172]:60966 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726798AbgDXMIy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Apr 2020 08:08:54 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C9C9C1FB;
+        Fri, 24 Apr 2020 05:08:53 -0700 (PDT)
+Received: from [192.168.2.22] (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9C10C3F6CF;
+        Fri, 24 Apr 2020 05:08:52 -0700 (PDT)
+Subject: Re: [PATCH kvmtool v4 0/5] Add CFI flash emulation
+To:     Ard Biesheuvel <ardb@kernel.org>
+Cc:     Will Deacon <will@kernel.org>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        kvm@vger.kernel.org, kvmarm <kvmarm@lists.cs.columbia.edu>,
+        Raphael Gault <raphael.gault@arm.com>,
+        Sami Mujawar <sami.mujawar@arm.com>,
+        Alexandru Elisei <Alexandru.Elisei@arm.com>,
+        Leif Lindholm <leif@nuviainc.com>
+References: <20200423173844.24220-1-andre.przywara@arm.com>
+ <CAMj1kXGDjzLA3sZg33EK2RVrSmYGuCm4cZ0Y9X=ZLxN8R--7=g@mail.gmail.com>
+ <CAMj1kXEjckV3HzcX_XXTSn-tDDQ5H8=LgteDcP5USThn=OgTQg@mail.gmail.com>
+ <9e742184-86c1-a4be-c2cb-fe96979e0f1f@arm.com>
+ <CAMj1kXGMHfENDCkAyPCvS0avaYGOVbjDkPi964L3y0DVvz8m8A@mail.gmail.com>
+From:   =?UTF-8?Q?Andr=c3=a9_Przywara?= <andre.przywara@arm.com>
+Autocrypt: addr=andre.przywara@arm.com; prefer-encrypt=mutual; keydata=
+ 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
+ i4aIXCH3Wv6K
+Organization: ARM Ltd.
+Message-ID: <df9a0aeb-39ed-f9bc-c506-71d2f134bc62@arm.com>
+Date:   Fri, 24 Apr 2020 13:08:14 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <8bdbe934-fff9-cc2a-3043-4851365735f3@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="aOrwj5xvk38smJvn6YESLUkGSJZgLIb52"
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.676
- definitions=2020-04-24_04:2020-04-23,2020-04-24 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 spamscore=0
- malwarescore=0 mlxscore=0 lowpriorityscore=0 priorityscore=1501
- adultscore=0 mlxlogscore=999 phishscore=0 suspectscore=0 clxscore=1015
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2004240087
+In-Reply-To: <CAMj1kXGMHfENDCkAyPCvS0avaYGOVbjDkPi964L3y0DVvz8m8A@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---aOrwj5xvk38smJvn6YESLUkGSJZgLIb52
-Content-Type: multipart/mixed; boundary="lZfKXrBz9XIErdMhMDpoUgWKD9h2NyaY3"
+On 24/04/2020 07:45, Ard Biesheuvel wrote:
 
---lZfKXrBz9XIErdMhMDpoUgWKD9h2NyaY3
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Hi,
 
-On 4/24/20 12:07 PM, David Hildenbrand wrote:
-> On 23.04.20 11:10, Janosch Frank wrote:
->> Local interrupts (external and emergency call) should be cleared after=
+(adding Leif for EDK-2 discussion)
 
->> any cpu reset.
+> On Thu, 23 Apr 2020 at 23:32, André Przywara <andre.przywara@arm.com> wrote:
 >>
->> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
->> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
->> ---
->>  s390x/smp.c | 22 ++++++++++++++++++++++
->>  1 file changed, 22 insertions(+)
+>> On 23/04/2020 21:43, Ard Biesheuvel wrote:
+
+[ ... kvmtool series to add CFI flash emulation allowing EDK-2 to store
+variables. Starting with this version (v4) the flash memory region is
+presented as a read-only memslot to KVM, to allow direct guest accesses
+as opposed to trap-and-emulate even read accesses to the array.]
+
 >>
->> diff --git a/s390x/smp.c b/s390x/smp.c
->> index 8a6cd1d..a8e3dd7 100644
->> --- a/s390x/smp.c
->> +++ b/s390x/smp.c
->> @@ -243,6 +243,20 @@ static void test_reset_initial(void)
->>  	report_prefix_pop();
->>  }
->> =20
->> +static void test_local_ints(void)
->> +{
->> +	unsigned long mask;
->> +
->> +	expect_ext_int();
->> +	/* Open masks for ecall and emcall */
->> +	ctl_set_bit(0, 13);
->> +	ctl_set_bit(0, 14);
->> +	mask =3D extract_psw_mask();
->> +	mask |=3D PSW_MASK_EXT;
->> +	load_psw_mask(mask);
->> +	set_flag(1);
->> +}
->=20
-> I think last time I looked at this I got it all wrong. So, we actually
-> don't expect that an interrupt triggers here, correct?
-
-Correct
-
->=20
-> The SIGP_CPU_RESET should have cleared both interrupts on this cpu. So
-> once we enable them, none should trigger.
-
-Yes
-
->=20
-> Why do we have "expect_ext_int()" ?
-
-Excellent question, that should not be there.
-Fortunately removing it doesn't change the test results.
-
->=20
->> +
->>  static void test_reset(void)
->>  {
->>  	struct psw psw;
->> @@ -251,10 +265,18 @@ static void test_reset(void)
->>  	psw.addr =3D (unsigned long)test_func;
->> =20
->>  	report_prefix_push("cpu reset");
->> +	sigp(1, SIGP_EMERGENCY_SIGNAL, 0, NULL);
->> +	sigp(1, SIGP_EXTERNAL_CALL, 0, NULL);
->>  	smp_cpu_start(1, psw);
->> =20
->>  	sigp_retry(1, SIGP_CPU_RESET, 0, NULL);
->>  	report(smp_cpu_stopped(1), "cpu stopped");
->> +
->> +	set_flag(0);
->> +	psw.addr =3D (unsigned long)test_local_ints;
->> +	smp_cpu_start(1, psw);
->> +	wait_for_flag();
->> +	report(true, "local interrupts cleared");
->>  	report_prefix_pop();
->>  }
->> =20
 >>
->=20
->=20
+>> Just curious: the images Sami gave me this morning did not show any
+>> issues anymore (no no-syndrome fault, no alignment issues), even without
+>> the mapping [1]. And even though I saw the 800k read traps, I didn't
+>> notice any real performance difference (on a Juno). The PXE timeout was
+>> definitely much more noticeable.
+>>
+>> So did you see any performance impact with this series?
+>>
+> 
+> You normally don't PXE boot. There is an issue with the iSCSI driver
+> as well, which causes a boot delay for some reason, so I disabled that
+> in my build.
+> 
+> I definitely *feels* faster :-) But in any case, exposing the array
+> mode as a r/o memslot is definitely the right way to deal with this.
+> Even if Sami did find a workaround that masks the error, it is no
+> guarantee that all accesses go through that library.
 
+So I was wondering about this, maybe you can confirm or debunk this:
+- Any memory given to the compiler (through a pointer) is assumed to be
+"normal" memory: the compiler can re-arrange accesses, split them up or
+collate them. Also unaligned accesses should be allowed - although I
+guess most compilers would avoid them.
+- This normally forbids to give a pointer to memory mapped as "device
+memory" to the compiler, since this would violate all of the assumptions
+above.
+- If the device mapped as "device memory" is actually memory (SRAM,
+ROM/flash, framebuffer), then most of the assumptions are met, except
+the alignment requirement, which is bound to the mapping type, not the
+actual device (ARMv8 ARM: Unaligned accesses to device memory always
+trap, regardless of SCTLR.A)
+- To accommodate the latter, GCC knows the option -malign-strict, to
+avoid unaligned accesses. TF-A and U-Boot use this option, to run
+without the MMU enabled.
 
+Now if EDK-2 lets the compiler deal with the flash memory region
+directly, I think this would still be prone to alignment faults. In fact
+an earlier build I got from Sami faulted on exactly that, when I ran it,
+even with the r/o memslot mapping in place.
 
---lZfKXrBz9XIErdMhMDpoUgWKD9h2NyaY3--
+So should EDK-2 add -malign-strict to be safe?
+	or
+Should EDK-2 add an additional or alternate mapping using a non-device
+memory type (with all the mismatched attributes consequences)?
+	or
+Should EDK-2 only touch the flash region using MMIO accessors, and
+forbid the compiler direct access to that region?
 
---aOrwj5xvk38smJvn6YESLUkGSJZgLIb52
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+So does EDK-2 get away with this because the compiler typically avoids
+unaligned accesses?
 
------BEGIN PGP SIGNATURE-----
+Cheers,
+Andre
 
-iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl6i0tEACgkQ41TmuOI4
-ufj4EA//aXAKunI1QR4Ntu+FV3GAd2rgU8RBpTd1kDK/MvbYUykdg7tW4VYjvRAG
-eO7fiYX92s+ARdvlU4hc5LMfdcMi1ftxotKnq83DP450ZqbBZcrzkYL3IcXqLnl0
-rmUs4gihMloe9Yan7qY+F/Etemoaa0aqBCXikK1q3Gnmm/UG2QkfNTr8cWAnn0M7
-UUxxpt9zbMGJ8yyAdSC7Da9t4+95nFfd3avnNokTjh7LIaZY6cTaN+oPwSVvHMqh
-TqsrgLRsylABJoGkwTZNVUtlV9pPk/lBuxZUsDvekCOdxvG2899s85jAvnXn+ylP
-n0TyqA4hsRLV9K0uINXBnibUQnR5hYdOoE3sieBkUGncrJBwoRRavR6N3u+5d2e8
-CGbcr0kYGi4ObPFpbF3v0kXUfnFWpglb0YZ4PIyiMGh9NXBjOEOfxq1l8uBUSwEn
-FtSWmEzU9Vid2le/V3pZL4VVRDzqU7jIX+59hZCriQRU3meObX5APv9JbpItFw0d
-X8v4hKybMV82nBtSYsAp8349ukskupj9p6wS9nHCcpk4wNk6LwG+9TubYj5yURLz
-qq6s/eEMJwqcbrRP484TDyyinUVjz0shh77PIXGT/R6iE+2/2ET7C3uL3babPhEL
-9ylVZ6Bt4uemlFw1iyL3cjKffRz9nF4u66ECc3/1brunw+9qTFk=
-=f38m
------END PGP SIGNATURE-----
-
---aOrwj5xvk38smJvn6YESLUkGSJZgLIb52--
+>>> [0] https://people.linaro.org/~ard.biesheuvel/KVMTOOL_EFI.fd
+>>
+>> Ah, nice, will this stay there for a while? I can't provide binaries,
+>> but wanted others to be able to easily test this.
+>>
+> 
+> Sure, I will leave it up until Linaro decides to take down my account.
+> 
 
