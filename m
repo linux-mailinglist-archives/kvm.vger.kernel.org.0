@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 07C181B7341
-	for <lists+kvm@lfdr.de>; Fri, 24 Apr 2020 13:38:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5BEBF1B7344
+	for <lists+kvm@lfdr.de>; Fri, 24 Apr 2020 13:38:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727055AbgDXLiN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Apr 2020 07:38:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43896 "EHLO
+        id S1727063AbgDXLiP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Apr 2020 07:38:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43904 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727042AbgDXLiM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Apr 2020 07:38:12 -0400
-Received: from mail-wr1-x444.google.com (mail-wr1-x444.google.com [IPv6:2a00:1450:4864:20::444])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 080F6C09B045;
+        with ESMTP id S1727031AbgDXLiN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Apr 2020 07:38:13 -0400
+Received: from mail-wr1-x442.google.com (mail-wr1-x442.google.com [IPv6:2a00:1450:4864:20::442])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02494C09B045;
+        Fri, 24 Apr 2020 04:38:13 -0700 (PDT)
+Received: by mail-wr1-x442.google.com with SMTP id x17so9643017wrt.5;
         Fri, 24 Apr 2020 04:38:12 -0700 (PDT)
-Received: by mail-wr1-x444.google.com with SMTP id i10so10373479wrv.10;
-        Fri, 24 Apr 2020 04:38:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=FKcPWMZCAUe8c6acnbxNFfpNt2+SpTEs6pyxNkpmr/I=;
-        b=Jo5wQIahpC0sx0TEACrJHHEDzufnSEw8oIoz2PtdBLWKmuCaCv/2wMGvfRg3+BX+K6
-         IWhXB4tcBQcnvhBgSrn/aNX0aszmq//i4V3mE2pVom+ml4MpDCCaoF/OoEceuLQSm0b7
-         uihewejh4RknzT8F/RU+OQk5Dms5vA0O0VBvVyJE+dHpJpGBD+1LwBCAu8avxddb3IGM
-         yzazQq8Uf1eRyX4EwH4ZYgwKdtPHNPRBF0bPXY7ItesbiB1/jALbErW36nZC4yENOg/N
-         GyylrRrNw0K7zV/5LE2HmoDRnwXKnA2Mp8hTZaJwR258yBt74R/LnrguTuS9xDmAfCt9
-         MPDQ==
+        bh=81HV7LsCw4SH8jFyAVMERWB026fgTjwPKbEnYETv7cQ=;
+        b=P8RBtkSAXYfrYD3TwzDxyVJmoS3UpVjIAi2gd+eFqBBVMAbUUOsWgePjgkIw84jNY9
+         tF1zd5DgR3FQUOZ1eNNJmW8LwB8KGa+ESbFvD6sXrNBGeLhBRGVN/GH7VVLlU8gDBkRB
+         FlvzJEzUzPp8myURV6IHav/d56Yqbl+pmnUzXrLgFLt7bBbL02DglqXctK9nKle5gY3d
+         NNhxZWBTXWlGn0d1sebXNpw3XaUrljCJuS81HElmgYTkATfbzF7vqMmmay2B78bUvl7q
+         Gdxrf/W2N4guctfO/wSASpgzP7EvnUSNkbGUBPZbxXq7JEZLtSIrVOTqSra+bHW6jeqj
+         dyhA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=FKcPWMZCAUe8c6acnbxNFfpNt2+SpTEs6pyxNkpmr/I=;
-        b=bN53SvVUcIxHyaOonse+sECaJ0bOx+4vaFVHK6KkBAbQjk+ObvuNQNrwr38N0kIX92
-         OYyGsi3LSbvFSAaD0gdF+EP8mFu9ow7U+QrqEIFDE3nIY5CbLsrZGO0RZ6x5J5YfJbLO
-         sUndKgzYhshBDhuQfwfxbiibNxtr8CVuJQxNvY/HX24OOgFiUMO17tF+V+LSFKqx15DJ
-         pWb9cHqaS+e3x3GEoJnzstrZTbf8bvMAyGx7w8wOO+L/r7z/RfXll/L1pkhFxiJv+vnY
-         YN53Ow8lnO9x4Uob0j8Pm5MSdxu3o3qfrKZCTp7QQCfdbIEFjzK6SXsD1CGBEPhreuDe
-         y5Qg==
-X-Gm-Message-State: AGi0Pube/CCYfsmGEd6QgFIufVv9i6zQEq6keefc1iuHFa7FH78qRYnC
-        YAE49mArZzDcVdsKh63kM25HVyu/4jo=
-X-Google-Smtp-Source: APiQypLDls1cujoU03pQHWQGmrbD3lI2RnP6220FbzyUmBJy9i09Uh020YuC7PsE6qqmqJs6uNJHOw==
-X-Received: by 2002:a5d:45cf:: with SMTP id b15mr10400117wrs.78.1587728290553;
-        Fri, 24 Apr 2020 04:38:10 -0700 (PDT)
+        bh=81HV7LsCw4SH8jFyAVMERWB026fgTjwPKbEnYETv7cQ=;
+        b=lhbyuoVyO9Hu4KOWIrzF0YfZfCg+pwsyb4MrI5A+bgSkLVaxPV0z8dMx6piZo4mK+J
+         Li6id35dD/k+G9uKK4LbkaHZfC9c65wG8d64uEvFHwiylbEFYznmueTnRFR4njjmtmRV
+         G8Lu2WIoQjUwN70JzgnwrAXrOBc4byGNvLaktEOpeFmICbTaLELfwsCfYDnhsKi5AOc1
+         1emhXSZVsfDBFH3Fps/mAmRFM+lJaF73/em9KMiZUdxCPdqvA8j2kANPiqLVqSFfPJ1h
+         ExsmH9/DqrKgVfRy/+GojjA3MZWs+pWqyc6t27qdeUseVDbPI0nbdS9w9/0Gwbnhic12
+         DzZw==
+X-Gm-Message-State: AGi0PuYkGtvzXdrxWvqEufoOTvsN9RTYLWPWZcV1sdfwOMQ2fqHbJPG2
+        eqyFUn3/y3QRE/P8DWSMVIFdf8YcuJk=
+X-Google-Smtp-Source: APiQypI1GQD90DofoSOXy81sEGlRcRsnCGuV73CWIJevB8bqFi+FWn1FPaZXgioaDv9CufdNRtEq8g==
+X-Received: by 2002:adf:e711:: with SMTP id c17mr11011226wrm.334.1587728291521;
+        Fri, 24 Apr 2020 04:38:11 -0700 (PDT)
 Received: from jondnuc.lan (IGLD-84-229-154-20.inter.net.il. [84.229.154.20])
-        by smtp.gmail.com with ESMTPSA id w83sm2451007wmb.37.2020.04.24.04.38.09
+        by smtp.gmail.com with ESMTPSA id w83sm2451007wmb.37.2020.04.24.04.38.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 24 Apr 2020 04:38:10 -0700 (PDT)
+        Fri, 24 Apr 2020 04:38:11 -0700 (PDT)
 From:   Jon Doron <arilou@gmail.com>
 To:     kvm@vger.kernel.org, linux-hyperv@vger.kernel.org
-Cc:     vkuznets@redhat.com, Jon Doron <arilou@gmail.com>
-Subject: [PATCH v11 6/7] x86/kvm/hyper-v: Add support for synthetic debugger via hypercalls
-Date:   Fri, 24 Apr 2020 14:37:45 +0300
-Message-Id: <20200424113746.3473563-7-arilou@gmail.com>
+Cc:     vkuznets@redhat.com
+Subject: [PATCH v11 7/7] KVM: selftests: update hyperv_cpuid with SynDBG tests
+Date:   Fri, 24 Apr 2020 14:37:46 +0300
+Message-Id: <20200424113746.3473563-8-arilou@gmail.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200424113746.3473563-1-arilou@gmail.com>
 References: <20200424113746.3473563-1-arilou@gmail.com>
@@ -63,59 +63,225 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-There is another mode for the synthetic debugger which uses hypercalls
-to send/recv network data instead of the MSR interface.
+From: Vitaly Kuznetsov <vkuznets@redhat.com>
 
-This interface is much slower and less recommended since you might get
-a lot of VMExits while KDVM polling for new packets to recv, rather
-than simply checking the pending page to see if there is data avialble
-and then request.
+Test all four combinations with eVMCS and SynDBG capabilities,
+check that we get the right number of entries and that
+0x40000000.EAX always returns the correct max leaf.
 
-Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-Signed-off-by: Jon Doron <arilou@gmail.com>
+Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 ---
- arch/x86/kvm/hyperv.c | 28 ++++++++++++++++++++++++++++
- 1 file changed, 28 insertions(+)
+ .../selftests/kvm/x86_64/hyperv_cpuid.c       | 143 ++++++++++++------
+ 1 file changed, 95 insertions(+), 48 deletions(-)
 
-diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
-index 524b5466a515..744bcef88c70 100644
---- a/arch/x86/kvm/hyperv.c
-+++ b/arch/x86/kvm/hyperv.c
-@@ -1832,6 +1832,34 @@ int kvm_hv_hypercall(struct kvm_vcpu *vcpu)
+diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c b/tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c
+index 83323f3d7ca0..5268abf9ad80 100644
+--- a/tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c
++++ b/tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c
+@@ -26,18 +26,18 @@ static void guest_code(void)
+ {
+ }
+ 
+-static int smt_possible(void)
++static bool smt_possible(void)
+ {
+ 	char buf[16];
+ 	FILE *f;
+-	bool res = 1;
++	bool res = true;
+ 
+ 	f = fopen("/sys/devices/system/cpu/smt/control", "r");
+ 	if (f) {
+ 		if (fread(buf, sizeof(*buf), sizeof(buf), f) > 0) {
+ 			if (!strncmp(buf, "forceoff", 8) ||
+ 			    !strncmp(buf, "notsupported", 12))
+-				res = 0;
++				res = false;
  		}
- 		ret = kvm_hv_send_ipi(vcpu, ingpa, outgpa, true, false);
- 		break;
-+	case HVCALL_POST_DEBUG_DATA:
-+	case HVCALL_RETRIEVE_DEBUG_DATA:
-+		if (unlikely(fast)) {
-+			ret = HV_STATUS_INVALID_PARAMETER;
-+			break;
-+		}
-+		fallthrough;
-+	case HVCALL_RESET_DEBUG_SESSION: {
-+		struct kvm_hv_syndbg *syndbg = vcpu_to_hv_syndbg(vcpu);
+ 		fclose(f);
+ 	}
+@@ -45,30 +45,48 @@ static int smt_possible(void)
+ 	return res;
+ }
+ 
++void vcpu_enable_syndbg(struct kvm_vm *vm, int vcpu_id)
++{
++	struct kvm_enable_cap enable_syndbg_cap = {
++		.cap = KVM_CAP_HYPERV_SYNDBG,
++	};
 +
-+		if (!syndbg->active) {
-+			ret = HV_STATUS_INVALID_HYPERCALL_CODE;
-+			break;
-+		}
++	vcpu_ioctl(vm, vcpu_id, KVM_ENABLE_CAP, &enable_syndbg_cap);
++}
 +
-+		if (!(syndbg->options & HV_X64_SYNDBG_OPTION_USE_HCALLS)) {
-+			ret = HV_STATUS_OPERATION_DENIED;
+ static void test_hv_cpuid(struct kvm_cpuid2 *hv_cpuid_entries,
+-			  int evmcs_enabled)
++			  bool evmcs_enabled, bool syndbg_enabled)
+ {
+ 	int i;
++	int nent = 6;
++	u32 test_val;
++
++	if (evmcs_enabled)
++		nent += 1; /* 0x4000000A */
+ 
+-	if (!evmcs_enabled)
+-		TEST_ASSERT(hv_cpuid_entries->nent == 6,
+-			    "KVM_GET_SUPPORTED_HV_CPUID should return 6 entries"
+-			    " when Enlightened VMCS is disabled (returned %d)",
+-			    hv_cpuid_entries->nent);
+-	else
+-		TEST_ASSERT(hv_cpuid_entries->nent == 7,
+-			    "KVM_GET_SUPPORTED_HV_CPUID should return 7 entries"
+-			    " when Enlightened VMCS is enabled (returned %d)",
+-			    hv_cpuid_entries->nent);
++	if (syndbg_enabled)
++		nent += 3; /* 0x40000080 - 0x40000082 */
++
++	TEST_ASSERT(hv_cpuid_entries->nent == nent,
++		    "KVM_GET_SUPPORTED_HV_CPUID should return %d entries"
++		    " with evmcs=%d syndbg=%d (returned %d)",
++		    nent, evmcs_enabled, syndbg_enabled,
++		    hv_cpuid_entries->nent);
+ 
+ 	for (i = 0; i < hv_cpuid_entries->nent; i++) {
+ 		struct kvm_cpuid_entry2 *entry = &hv_cpuid_entries->entries[i];
+ 
+ 		TEST_ASSERT((entry->function >= 0x40000000) &&
+-			    (entry->function <= 0x4000000A),
++			    (entry->function <= 0x40000082),
+ 			    "function %x is our of supported range",
+ 			    entry->function);
+ 
++		TEST_ASSERT(evmcs_enabled || (entry->function != 0x4000000A),
++			    "0x4000000A leaf should not be reported");
++
++		TEST_ASSERT(syndbg_enabled || (entry->function <= 0x4000000A),
++			    "SYNDBG leaves should not be reported");
++
+ 		TEST_ASSERT(entry->index == 0,
+ 			    ".index field should be zero");
+ 
+@@ -78,12 +96,27 @@ static void test_hv_cpuid(struct kvm_cpuid2 *hv_cpuid_entries,
+ 		TEST_ASSERT(!entry->padding[0] && !entry->padding[1] &&
+ 			    !entry->padding[2], "padding should be zero");
+ 
+-		if (entry->function == 0x40000004) {
+-			int nononarchcs = !!(entry->eax & (1UL << 18));
+-
+-			TEST_ASSERT(nononarchcs == !smt_possible(),
++		switch (entry->function) {
++		case 0x40000000:
++			test_val = 0x40000005;
++			if (evmcs_enabled)
++				test_val = 0x4000000A;
++			if (syndbg_enabled)
++				test_val = 0x40000082;
++
++			TEST_ASSERT(entry->eax == test_val,
++				    "Wrong max leaf report in 0x40000000.EAX: %x"
++				    " (evmcs=%d syndbg=%d)",
++				    entry->eax, evmcs_enabled, syndbg_enabled
++				);
++			break;
++		case 0x40000004:
++			test_val = entry->eax & (1UL << 18);
++
++			TEST_ASSERT(!!test_val == !smt_possible(),
+ 				    "NoNonArchitecturalCoreSharing bit"
+ 				    " doesn't reflect SMT setting");
++			break;
+ 		}
+ 
+ 		/*
+@@ -133,8 +166,9 @@ struct kvm_cpuid2 *kvm_get_supported_hv_cpuid(struct kvm_vm *vm)
+ int main(int argc, char *argv[])
+ {
+ 	struct kvm_vm *vm;
+-	int rv;
++	int rv, stage;
+ 	struct kvm_cpuid2 *hv_cpuid_entries;
++	bool evmcs_enabled, syndbg_enabled;
+ 
+ 	/* Tell stdout not to buffer its content */
+ 	setbuf(stdout, NULL);
+@@ -145,36 +179,49 @@ int main(int argc, char *argv[])
+ 		exit(KSFT_SKIP);
+ 	}
+ 
+-	/* Create VM */
+-	vm = vm_create_default(VCPU_ID, 0, guest_code);
+-
+-	test_hv_cpuid_e2big(vm);
+-
+-	hv_cpuid_entries = kvm_get_supported_hv_cpuid(vm);
+-	if (!hv_cpuid_entries)
+-		return 1;
+-
+-	test_hv_cpuid(hv_cpuid_entries, 0);
+-
+-	free(hv_cpuid_entries);
++	for (stage = 0; stage < 5; stage++) {
++		evmcs_enabled = false;
++		syndbg_enabled = false;
++
++		vm = vm_create_default(VCPU_ID, 0, guest_code);
++		switch (stage) {
++		case 0:
++			test_hv_cpuid_e2big(vm);
++			continue;
++		case 1:
++			break;
++		case 2:
++			if (!kvm_check_cap(KVM_CAP_HYPERV_ENLIGHTENED_VMCS)) {
++				print_skip("Enlightened VMCS is unsupported");
++				continue;
++			}
++			vcpu_enable_evmcs(vm, VCPU_ID);
++			evmcs_enabled = true;
++			break;
++		case 3:
++			if (!kvm_check_cap(KVM_CAP_HYPERV_SYNDBG)) {
++				print_skip("Synthetic debugger is unsupported");
++				continue;
++			}
++			vcpu_enable_syndbg(vm, VCPU_ID);
++			syndbg_enabled = true;
++			break;
++		case 4:
++			if (!kvm_check_cap(KVM_CAP_HYPERV_ENLIGHTENED_VMCS) ||
++			    !kvm_check_cap(KVM_CAP_HYPERV_SYNDBG))
++				continue;
++			vcpu_enable_evmcs(vm, VCPU_ID);
++			vcpu_enable_syndbg(vm, VCPU_ID);
++			evmcs_enabled = true;
++			syndbg_enabled = true;
 +			break;
 +		}
-+		vcpu->run->exit_reason = KVM_EXIT_HYPERV;
-+		vcpu->run->hyperv.type = KVM_EXIT_HYPERV_HCALL;
-+		vcpu->run->hyperv.u.hcall.input = param;
-+		vcpu->run->hyperv.u.hcall.params[0] = ingpa;
-+		vcpu->run->hyperv.u.hcall.params[1] = outgpa;
-+		vcpu->arch.complete_userspace_io =
-+				kvm_hv_hypercall_complete_userspace;
-+		return 0;
-+	}
- 	default:
- 		ret = HV_STATUS_INVALID_HYPERCALL_CODE;
- 		break;
+ 
+-	if (!kvm_check_cap(KVM_CAP_HYPERV_ENLIGHTENED_VMCS)) {
+-		print_skip("Enlightened VMCS is unsupported");
+-		goto vm_free;
++		hv_cpuid_entries = kvm_get_supported_hv_cpuid(vm);
++		test_hv_cpuid(hv_cpuid_entries, evmcs_enabled, syndbg_enabled);
++		free(hv_cpuid_entries);
++		kvm_vm_free(vm);
+ 	}
+ 
+-	vcpu_enable_evmcs(vm, VCPU_ID);
+-
+-	hv_cpuid_entries = kvm_get_supported_hv_cpuid(vm);
+-	if (!hv_cpuid_entries)
+-		return 1;
+-
+-	test_hv_cpuid(hv_cpuid_entries, 1);
+-
+-	free(hv_cpuid_entries);
+-
+-vm_free:
+-	kvm_vm_free(vm);
+-
+ 	return 0;
+ }
 -- 
 2.24.1
 
