@@ -2,139 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A1F691B6C6A
-	for <lists+kvm@lfdr.de>; Fri, 24 Apr 2020 06:08:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DF0551B6CF1
+	for <lists+kvm@lfdr.de>; Fri, 24 Apr 2020 07:00:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726076AbgDXEIH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Apr 2020 00:08:07 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:2850 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725776AbgDXEIG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Apr 2020 00:08:06 -0400
-Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.60])
-        by Forcepoint Email with ESMTP id 7E6B1DEC27DDEED61367;
-        Fri, 24 Apr 2020 12:08:03 +0800 (CST)
-Received: from [127.0.0.1] (10.173.222.27) by DGGEMS412-HUB.china.huawei.com
- (10.3.19.212) with Microsoft SMTP Server id 14.3.487.0; Fri, 24 Apr 2020
- 12:07:52 +0800
-Subject: Re: [PATCH 18/26] KVM: arm64: Don't use empty structures as CPU reset
- state
-To:     Marc Zyngier <maz@kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>
-CC:     Will Deacon <will@kernel.org>,
-        Andre Przywara <andre.przywara@arm.com>,
-        Dave Martin <Dave.Martin@arm.com>,
-        George Cherian <gcherian@marvell.com>,
-        "Zengtao (B)" <prime.zeng@hisilicon.com>,
-        Catalin Marinas <catalin.marinas@arm.com>
-References: <20200422120050.3693593-1-maz@kernel.org>
- <20200422120050.3693593-19-maz@kernel.org>
-From:   Zenghui Yu <yuzenghui@huawei.com>
-Message-ID: <77963c60-bcc4-0c9e-fd35-d696827ea55c@huawei.com>
-Date:   Fri, 24 Apr 2020 12:07:50 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+        id S1726347AbgDXFAO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Apr 2020 01:00:14 -0400
+Received: from esa5.hgst.iphmx.com ([216.71.153.144]:17046 "EHLO
+        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725554AbgDXFAN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Apr 2020 01:00:13 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1587704414; x=1619240414;
+  h=from:to:cc:subject:date:message-id:
+   content-transfer-encoding:mime-version;
+  bh=3RFL5fk8ktjSeopG8h0D42A38ZN6X8PbrTCsrXCK1WU=;
+  b=ocdVOzdXsqEyYbUsFRt9/mve6cf9RWYW/I/9BqEYM+dn9S59+m6Wy+Aj
+   1iKYbm3aq21ln7Ff4KJWsxIMS9cRLz+9LeeO9IwId4+bZ3xWlnmXOVS7P
+   0bsayC2WH/0FYI6BpAf1EdDqY1yO6oJgzr5tEMzBk894BLFwmfzZGcqyj
+   QCrDevTI8UyfwEBMHwtFtraYfmmWexIW/Jwr9P6iwKO2vwGPB7+ESmgit
+   sAoCN83Yt31zzwIXYAlXBqyjFEM5uQ+eGKfRvazwq9Hu4si7zNVzCSBKX
+   QZaAc4Eka7OmKGwTinEg9ucycloe2/+8qEdk9MsgHp5FsRTwgT8C44Ptf
+   g==;
+IronPort-SDR: M89i/vv+1ikN4QeDNUnviHuIGjQz1cU6WJVw8dWEg+I5o6OERXs5te56WgXn72DU2ZmO8hgcbL
+ em3H3LGw5VBNP4UbB+EIXHgCccydP8N4RV4m3khGp3v70VaPBYzz94tiOOTXG3W3h04mSanL8z
+ mOsM/s7Ysj1i13Lzb9rFYkRfjnDFGzxEvt7iZi42y0MTchGSpnGNf0TObJX8gG98Unpk+U0KBK
+ 9DxELnqjGJnUb104qVr2vuiB59DUqE1wxHBY92XvQ0D6ZdjpDJt5PXFPkpZtDEbjNTpRYFQVCH
+ im0=
+X-IronPort-AV: E=Sophos;i="5.73,310,1583164800"; 
+   d="scan'208";a="136354210"
+Received: from mail-co1nam11lp2174.outbound.protection.outlook.com (HELO NAM11-CO1-obe.outbound.protection.outlook.com) ([104.47.56.174])
+  by ob1.hgst.iphmx.com with ESMTP; 24 Apr 2020 13:00:13 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=XnHIBFyxSRdL72GGgY6+gfta/vV9yq/sZV2aawGsgrfUTQ1G850IHWVEyrPoIiiwb+FQf5VyjOA3ZjVvzPT9HU5tFiHDdul3boYSLxtATyXdQyZkEGTy3wAskoiFOKxnjXZFBstxduKSW74girdwxH/0RXqBV/wxrpXGgA+DvfaVXBmeRFW2OnTHJ42GbwJESlx1WBD0HT9uT0XS2Y5YNzq72LMlh26PhccKBDDXf601gHpuNskjWyYBVzG9nBnZm3/y2A/nnmh5j0NezMysVArTTgU/4OfFtLfG/rlC9l3qhuugHuung0FiajfDnJA/0j406+iqFahnYqu/rr/kAw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=MmpUk/iHmXL2NaITJWMDkQWf4xmblBLnoU2PM3OklQ8=;
+ b=GHQiu+k4bLeBTnQyM/8yYkywOMf5EWw/j6QU+a0edcezxvSZRYTElolbmWVW2IpG5jaxbkX1vVdgnoLlXIEmUiUgGTj2zXCL/b1w6jBqr2e16F751SzhOoufMtexq9G3Ye99ryvZu/1gZPbFjYz/zUdwpKuwtN3GiNLnyP49JyNGDFw2FVjIqdsAlPtulY/c9lgzyKuBYpDoW1XTWbAnUgJkWIk+iENCHTZoLiTG57EqHufsQJALMUpKD98/y/G8wg0IMpenR0d/vUOinofRhnPUUX02jFX9SpD88+LhjMwfdShNV5gLLPxIkEMmkuuiy4ilUYxc52DTu+sEUC5hqw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=MmpUk/iHmXL2NaITJWMDkQWf4xmblBLnoU2PM3OklQ8=;
+ b=vyB01TCv2z9PY3qeXhdVaZecrUaUTBoWHU9DV8U0yZlptI0GQ2o4VfYAyttZKF7mV/HtjrPKNGRFYxerHR+dtu6bs5whfvLj4/SaVxKJ1gPQl1T+Hp76Jjkfqc3H8tfPLHlyHh8BqDXOw5U8l0l2+r8qyXdI8RS2R9aIChSxpUs=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=Anup.Patel@wdc.com; 
+Received: from DM6PR04MB6201.namprd04.prod.outlook.com (20.178.225.224) by
+ DM6PR04MB5467.namprd04.prod.outlook.com (20.178.25.10) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2937.13; Fri, 24 Apr 2020 05:00:11 +0000
+Received: from DM6PR04MB6201.namprd04.prod.outlook.com
+ ([fe80::f8b3:c124:482b:52e0]) by DM6PR04MB6201.namprd04.prod.outlook.com
+ ([fe80::f8b3:c124:482b:52e0%5]) with mapi id 15.20.2921.030; Fri, 24 Apr 2020
+ 05:00:10 +0000
+From:   Anup Patel <anup.patel@wdc.com>
+To:     Palmer Dabbelt <palmer@dabbelt.com>,
+        Palmer Dabbelt <palmerdabbelt@google.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Atish Patra <atish.patra@wdc.com>,
+        Alistair Francis <Alistair.Francis@wdc.com>,
+        Anup Patel <anup@brainfault.org>, kvm@vger.kernel.org,
+        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+        linux-kernel@vger.kernel.org, Anup Patel <anup.patel@wdc.com>
+Subject: [PATCH 0/3] RISC-V KVM preparation
+Date:   Fri, 24 Apr 2020 10:29:25 +0530
+Message-Id: <20200424045928.79324-1-anup.patel@wdc.com>
+X-Mailer: git-send-email 2.25.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: MA1PR01CA0130.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:a00:35::24) To DM6PR04MB6201.namprd04.prod.outlook.com
+ (2603:10b6:5:127::32)
 MIME-Version: 1.0
-In-Reply-To: <20200422120050.3693593-19-maz@kernel.org>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.173.222.27]
-X-CFilter-Loop: Reflected
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from wdc.com (49.207.59.136) by MA1PR01CA0130.INDPRD01.PROD.OUTLOOK.COM (2603:1096:a00:35::24) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2937.13 via Frontend Transport; Fri, 24 Apr 2020 05:00:04 +0000
+X-Mailer: git-send-email 2.25.1
+X-Originating-IP: [49.207.59.136]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: f8e8f040-1375-42a8-9ea1-08d7e80c5d51
+X-MS-TrafficTypeDiagnostic: DM6PR04MB5467:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <DM6PR04MB54679EE28AEB5B3C0EB182068DD00@DM6PR04MB5467.namprd04.prod.outlook.com>
+WDCIPOUTBOUND: EOP-TRUE
+X-MS-Oob-TLC-OOBClassifiers: OLM:5516;
+X-Forefront-PRVS: 03838E948C
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR04MB6201.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(396003)(366004)(39860400002)(136003)(346002)(376002)(54906003)(110136005)(55016002)(52116002)(7696005)(16526019)(8936002)(5660300002)(7416002)(4326008)(2906002)(8886007)(6666004)(81156014)(478600001)(1006002)(186003)(316002)(1076003)(55236004)(36756003)(4744005)(44832011)(8676002)(2616005)(26005)(956004)(66556008)(66476007)(86362001)(66946007);DIR:OUT;SFP:1102;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: wMUHww/1zaXgttl+BrdgHbT9VXw249QEYJOL/3cSxCCPKP0xfTvja7OU9xX/Wagiisk2s9lL37cH6PtUhBZw2Exg6e4QIdeEfYX2x6KCA9E+pautszrfxVm3n2MOrpICdVLxBAZapSTJoqh1ca2DcmiMjzsqCXH+JN0rp4Gkhf6I7wcYqn5qODlbtHXHr7nz4c1WEYq4nr3fP46vp4PdfuKf1n0feondeFfYNxZ8SztHM0PReIbXi3dUTEcx6m2afnuwEsuaIuJCWN3bDazn7WY6j6hCJGJwwA12H71zKjVPyRbIgBdre5c+7EPiv0w4YavvNUEbY2oiCPWmK5V678sq8DLqAAYsu+vKKJah4bf1ErLexc/mH83TeuFAaG/A2qWmqRkUk5+RHkLGwj92jHNlYTy2Lt2Kubp8hzK35vpvcQagU2Com4yiFBHwcjO2
+X-MS-Exchange-AntiSpam-MessageData: 50sEN5dpNldzM+Rp9BI6K1XXOz5sxQhlIqeHXgZwKtddCm12BKq1HQA9S67VgW3dhUVBPsHH3JL7cYUqoN+rUPCPoDy0wT2+PLFuJOtKRLfv2TWUv/uCYeTrllkkkUw2Hbf5txGmVnOgE227Y9YAZQ==
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f8e8f040-1375-42a8-9ea1-08d7e80c5d51
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Apr 2020 05:00:10.3063
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: K9YvWzndkEXMPKxApLWUkTIkdnaQJsdarxr/gc+9I9+VOV4wJwPaa0zPgA/a5bvOKw4HGtLe+4a+7YxukhZm0A==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR04MB5467
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
+This patch series is factored-out from the KVM RISC-V v11 series and is
+based upon Linux-5.7-rc2.
 
-On 2020/4/22 20:00, Marc Zyngier wrote:
-> Keeping empty structure as the vcpu state initializer is slightly
-> wasteful: we only want to set pstate, and zero everything else.
-> Just do that.
-> 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->   arch/arm64/kvm/reset.c | 20 +++++++++-----------
->   1 file changed, 9 insertions(+), 11 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-> index 241db35a7ef4f..895d7d9ad1866 100644
-> --- a/arch/arm64/kvm/reset.c
-> +++ b/arch/arm64/kvm/reset.c
-> @@ -37,15 +37,11 @@ static u32 kvm_ipa_limit;
->   /*
->    * ARMv8 Reset Values
->    */
-> -static const struct kvm_regs default_regs_reset = {
-> -	.regs.pstate = (PSR_MODE_EL1h | PSR_A_BIT | PSR_I_BIT |
-> -			PSR_F_BIT | PSR_D_BIT),
-> -};
-> +#define VCPU_RESET_PSTATE_EL1	(PSR_MODE_EL1h | PSR_A_BIT | PSR_I_BIT | \
-> +				 PSR_F_BIT | PSR_D_BIT)
->   
-> -static const struct kvm_regs default_regs_reset32 = {
-> -	.regs.pstate = (PSR_AA32_MODE_SVC | PSR_AA32_A_BIT |
-> -			PSR_AA32_I_BIT | PSR_AA32_F_BIT),
-> -};
-> +#define VCPU_RESET_PSTATE_SVC	(PSR_AA32_MODE_SVC | PSR_AA32_A_BIT | \
-> +				 PSR_AA32_I_BIT | PSR_AA32_F_BIT)
->   
->   static bool cpu_has_32bit_el1(void)
->   {
-> @@ -261,6 +257,7 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
->   	const struct kvm_regs *cpu_reset;
->   	int ret = -EINVAL;
->   	bool loaded;
-> +	u32 pstate;
->   
->   	/* Reset PMU outside of the non-preemptible section */
->   	kvm_pmu_vcpu_reset(vcpu);
-> @@ -291,16 +288,17 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
->   		if (test_bit(KVM_ARM_VCPU_EL1_32BIT, vcpu->arch.features)) {
->   			if (!cpu_has_32bit_el1())
->   				goto out;
-> -			cpu_reset = &default_regs_reset32;
-> +			pstate = VCPU_RESET_PSTATE_SVC;
->   		} else {
-> -			cpu_reset = &default_regs_reset;
-> +			pstate = VCPU_RESET_PSTATE_EL1;
->   		}
->   
->   		break;
->   	}
->   
->   	/* Reset core registers */
-> -	memcpy(vcpu_gp_regs(vcpu), cpu_reset, sizeof(*cpu_reset));
-> +	memset(vcpu_gp_regs(vcpu), 0, sizeof(*cpu_reset));
+These patches are mostly preparatory changes in Linux RISC-V kernel which
+we require for KVM RISC-V implementation. Also, most of these patches are
+already reviewed as part of original KVM RISC-V series.
 
-Be careful that we can *not* use 'sizeof(*cpu_reset)' here anymore.  As
-you're going to refactor the layout of the core registers whilst keeping
-the kvm_regs API unchanged.  Resetting the whole kvm_regs will go
-corrupting some affected registers and make them temporarily invalid.
-The bad thing will show up after you start moving ELR_EL1 around,
-specifically in patch #20...
+Anup Patel (3):
+  RISC-V: Export riscv_cpuid_to_hartid_mask() API
+  RISC-V: Add bitmap reprensenting ISA features common across CPUs
+  RISC-V: Remove N-extension related defines
 
-And the first victim is ... MPIDR_EL1 (the first one in sys_regs array).
-Now you know how this was spotted ;-)  I think this should be the root
-cause of what Zengtao had previously reported [*].
+ arch/riscv/include/asm/csr.h   |  3 --
+ arch/riscv/include/asm/hwcap.h | 22 +++++++++
+ arch/riscv/kernel/cpufeature.c | 83 ++++++++++++++++++++++++++++++++--
+ arch/riscv/kernel/smp.c        |  2 +
+ 4 files changed, 104 insertions(+), 6 deletions(-)
 
-If these registers are all expected to be reset to architecturally
-UNKNOWN values, I think we can just drop this memset(), though haven't
-check with the ARM ARM carefully.
-
-
-Thanks,
-Zenghui
-
-
-[*] 
-https://lore.kernel.org/kvmarm/f55386a9-8eaa-944f-453d-9c3c4abee5fb@arm.com/T/#mc6c7268755f5cdaff7a23c34e6e16ea36bcfbe22
-
-> +	vcpu_gp_regs(vcpu)->regs.pstate = pstate;
->   
->   	/* Reset system registers */
->   	kvm_reset_sys_regs(vcpu);
-> 
+-- 
+2.25.1
 
