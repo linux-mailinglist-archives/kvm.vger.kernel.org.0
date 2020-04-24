@@ -2,259 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1E8FC1B7C8F
-	for <lists+kvm@lfdr.de>; Fri, 24 Apr 2020 19:19:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B4F401B7C9C
+	for <lists+kvm@lfdr.de>; Fri, 24 Apr 2020 19:24:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727091AbgDXRT2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Apr 2020 13:19:28 -0400
-Received: from mga03.intel.com ([134.134.136.65]:14632 "EHLO mga03.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726813AbgDXRT2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Apr 2020 13:19:28 -0400
-IronPort-SDR: 8oDrBcXIfUv4rkGplRme9Xi2fs8fGKbrVaolAZ8Z/gHfiPMC4Z/oOihwMrROPi1lzB3IMhABVj
- +e5aAvNn6J0g==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Apr 2020 10:19:27 -0700
-IronPort-SDR: YquaYbCpzuPcEbkFG18XrwTE0QbEwlzOzr7LCqlIXar3KpDE/jHZ7en8cKwOcvDVdUUCM3J6ee
- pXoftvnPaVZw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,311,1583222400"; 
-   d="scan'208";a="259894358"
-Received: from sjchrist-coffee.jf.intel.com ([10.54.74.202])
-  by orsmga006.jf.intel.com with ESMTP; 24 Apr 2020 10:19:26 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH] KVM: nVMX: Tweak handling of failure code for nested VM-Enter failure
-Date:   Fri, 24 Apr 2020 10:19:25 -0700
-Message-Id: <20200424171925.1178-1-sean.j.christopherson@intel.com>
-X-Mailer: git-send-email 2.26.0
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        id S1727022AbgDXRYg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Apr 2020 13:24:36 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:42060 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726698AbgDXRYf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Apr 2020 13:24:35 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1587749073;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc; bh=GYFwWH6/BVn1OIKUezAa/Z7+8Oz/hFSaieEazSypgrY=;
+        b=By9raioncsbAKwA35r4lnwAszPw9nvcj+m1UAHpQR6kxJGjYmhCOlEgcgBZsMZmPyiD1Rw
+        20n8b9vTA/aDxFSmUquy5Hmifg8HTZ9ROjJG/A4MZGh+5GJ8xTPnjcxmkITXhfmCMikuZi
+        zfQajh8hILTkBYhx2q4Xk2saWWuHNAQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-279-mEkFw_AbPIqqDggtBGfHpw-1; Fri, 24 Apr 2020 13:24:31 -0400
+X-MC-Unique: mEkFw_AbPIqqDggtBGfHpw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9D86EA48DA;
+        Fri, 24 Apr 2020 17:24:18 +0000 (UTC)
+Received: from virtlab511.virt.lab.eng.bos.redhat.com (virtlab511.virt.lab.eng.bos.redhat.com [10.19.152.198])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 77D2D25277;
+        Fri, 24 Apr 2020 17:24:17 +0000 (UTC)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     wei.huang2@amd.com, cavery@redhat.com, vkuznets@redhat.com,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Oliver Upton <oupton@google.com>,
+        Jim Mattson <jmattson@google.com>
+Subject: [PATCH v2 00/22] KVM: Event fixes and cleanup
+Date:   Fri, 24 Apr 2020 13:23:54 -0400
+Message-Id: <20200424172416.243870-1-pbonzini@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Use an enum for passing around the failure code for a failed VM-Enter
-that results in VM-Exit to provide a level of indirection from the final
-resting place of the failure code, vmcs.EXIT_QUALIFICATION.  The exit
-qualification field is an unsigned long, e.g. passing around
-'u32 exit_qual' throws up red flags as it suggests KVM may be dropping
-bits when reporting errors to L1.  This is a red herring because the
-only defined failure codes are 0, 2, 3, and 4, i.e. don't come remotely
-close to overflowing a u32.
+This is v2 of Sean's patch series, where the generic and VMX parts
+are left more or less untouched and SVM gets the same cure.  It also
+incorporates Cathy's patch to move nested NMI to svm_check_nested_events,
+which just works thanks to preliminary changes that switch
+svm_check_nested_events to look more like VMX.  In particular, the vmexit
+is performed immediately instead of being scheduled via exit_required,
+so that GIF is cleared and inject_pending_event automagically requests
+an interrupt/NMI/SMI window.  This in turn requires the addition of a
+nested_run_pending flag similar to VMX's.
 
-Setting vmcs.EXIT_QUALIFICATION on entry failure is further complicated
-by the MSR load list, which returns the (1-based) entry that failed, and
-the number of MSRs to load is a 32-bit VMCS field.  At first blush, it
-would appear that overflowing a u32 is possible, but the number of MSRs
-that can be loaded is hardcapped at 4096 (limited by MSR_IA32_VMX_MISC).
+As in the Intel patch, check_nested_events is now used for SMIs as well,
+so that only exceptions are using the old mechanism.  Likewise,
+exit_required is only used for exceptions (and that should go away next).
+SMIs can cause a vmexit on AMD, unlike on Intel without dual-monitor
+treatment, and are blocked by GIF=0, hence the few SMI-related changes
+in common code (patch 9).
 
-In other words, there are two completely disparate types of data that
-eventually get stuffed into vmcs.EXIT_QUALIFICATION, neither of which is
-an 'unsigned long' in nature.  This was presumably the reasoning for
-switching to 'u32' when the related code was refactored in commit
-ca0bde28f2ed6 ("kvm: nVMX: Split VMCS checks from nested_vmx_run()").
+Sean's changes to common code are more or less left untouched, except
+for the last patch to replace the late check_nested_events() hack.  Even
+though it turned out to be unnecessary for NMIs, I think the new fix
+makes more sense if applied generally to all events---even NMIs and SMIs,
+despite them never being injected asynchronously.  If people prefer to
+have a WARN instead we can do that, too.
 
-Using an enum for the failure code addresses the technically-possible-
-but-will-never-happen scenario where Intel defines a failure code that
-doesn't fit in a 32-bit integer.  The enum variables and values will
-either be automatically sized (gcc 5.4 behavior) or be subjected to some
-combination of truncation.  The former case will simply work, while the
-latter will trigger a compile-time warning unless the compiler is being
-particularly unhelpful.
+Because of this, I added a bool argument to interrupt_allowed, nmi_allowed
+and smi_allowed instead of adding a fourth hook.
 
-Separating the failure code from the failed MSR entry allows for
-disassociating both from vmcs.EXIT_QUALIFICATION, which avoids the
-conundrum where KVM has to choose between 'u32 exit_qual' and tracking
-values as 'unsigned long' that have no business being tracked as such.
+I have some ideas about how to rework the event injection code in the
+way that Sean mentioned in his cover letter.  It's not even that scary,
+with the right set of testcases and starting from code that (despite its
+deficiencies) actually makes some sense and is not a pile of hacks, and
+I am very happy in that respect about the general ideas behind these
+patches.  Even though some hacks remain it's a noticeable improvement,
+and it's very good that Intel and AMD can be brought more or less on
+the same page with respect to nested guest event injection.
 
-Opportunistically rename the variables in load_vmcs12_host_state() and
-vmx_set_nested_state() to call out that they're ignored, and add a
-comment in nested_vmx_load_msr() to call out that returning 'i + 1'
-can't wrap.
+Please review!
 
-No functional change intended.
+Paolo
 
-Reported-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
----
- arch/x86/include/asm/vmx.h | 10 ++++++----
- arch/x86/kvm/vmx/nested.c  | 38 +++++++++++++++++++++-----------------
- 2 files changed, 27 insertions(+), 21 deletions(-)
+Cathy Avery (1):
+  KVM: SVM: Implement check_nested_events for NMI
 
-diff --git a/arch/x86/include/asm/vmx.h b/arch/x86/include/asm/vmx.h
-index 5e090d1f03f8..cd7de4b401fe 100644
---- a/arch/x86/include/asm/vmx.h
-+++ b/arch/x86/include/asm/vmx.h
-@@ -527,10 +527,12 @@ struct vmx_msr_entry {
- /*
-  * Exit Qualifications for entry failure during or after loading guest state
-  */
--#define ENTRY_FAIL_DEFAULT		0
--#define ENTRY_FAIL_PDPTE		2
--#define ENTRY_FAIL_NMI			3
--#define ENTRY_FAIL_VMCS_LINK_PTR	4
-+enum vm_entry_failure_code {
-+	ENTRY_FAIL_DEFAULT		= 0,
-+	ENTRY_FAIL_PDPTE		= 2,
-+	ENTRY_FAIL_NMI			= 3,
-+	ENTRY_FAIL_VMCS_LINK_PTR	= 4,
-+};
- 
- /*
-  * Exit Qualifications for EPT Violations
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index b516c24494e3..e66320997910 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -927,6 +927,7 @@ static u32 nested_vmx_load_msr(struct kvm_vcpu *vcpu, u64 gpa, u32 count)
- 	}
- 	return 0;
- fail:
-+	/* Note, max_msr_list_size is at most 4096, i.e. this can't wrap. */
- 	return i + 1;
- }
- 
-@@ -1122,7 +1123,7 @@ static bool nested_vmx_transition_mmu_sync(struct kvm_vcpu *vcpu)
-  * @entry_failure_code.
-  */
- static int nested_vmx_load_cr3(struct kvm_vcpu *vcpu, unsigned long cr3, bool nested_ept,
--			       u32 *entry_failure_code)
-+			       enum vm_entry_failure_code *entry_failure_code)
- {
- 	if (cr3 != kvm_read_cr3(vcpu) || (!nested_ept && pdptrs_changed(vcpu))) {
- 		if (CC(!nested_cr3_valid(vcpu, cr3))) {
-@@ -2475,7 +2476,7 @@ static void prepare_vmcs02_rare(struct vcpu_vmx *vmx, struct vmcs12 *vmcs12)
-  * is assigned to entry_failure_code on failure.
-  */
- static int prepare_vmcs02(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12,
--			  u32 *entry_failure_code)
-+			  enum vm_entry_failure_code *entry_failure_code)
- {
- 	struct vcpu_vmx *vmx = to_vmx(vcpu);
- 	struct hv_enlightened_vmcs *hv_evmcs = vmx->nested.hv_evmcs;
-@@ -2935,11 +2936,11 @@ static int nested_check_guest_non_reg_state(struct vmcs12 *vmcs12)
- 
- static int nested_vmx_check_guest_state(struct kvm_vcpu *vcpu,
- 					struct vmcs12 *vmcs12,
--					u32 *exit_qual)
-+					enum vm_entry_failure_code *entry_failure_code)
- {
- 	bool ia32e;
- 
--	*exit_qual = ENTRY_FAIL_DEFAULT;
-+	*entry_failure_code = ENTRY_FAIL_DEFAULT;
- 
- 	if (CC(!nested_guest_cr0_valid(vcpu, vmcs12->guest_cr0)) ||
- 	    CC(!nested_guest_cr4_valid(vcpu, vmcs12->guest_cr4)))
-@@ -2954,7 +2955,7 @@ static int nested_vmx_check_guest_state(struct kvm_vcpu *vcpu,
- 		return -EINVAL;
- 
- 	if (nested_vmx_check_vmcs_link_ptr(vcpu, vmcs12)) {
--		*exit_qual = ENTRY_FAIL_VMCS_LINK_PTR;
-+		*entry_failure_code = ENTRY_FAIL_VMCS_LINK_PTR;
- 		return -EINVAL;
- 	}
- 
-@@ -3247,8 +3248,9 @@ enum nvmx_vmentry_status nested_vmx_enter_non_root_mode(struct kvm_vcpu *vcpu,
- 	struct vcpu_vmx *vmx = to_vmx(vcpu);
- 	struct vmcs12 *vmcs12 = get_vmcs12(vcpu);
- 	bool evaluate_pending_interrupts;
-+	enum vm_entry_failure_code entry_failure_code;
- 	u32 exit_reason = EXIT_REASON_INVALID_STATE;
--	u32 exit_qual;
-+	u32 failed_msr;
- 
- 	if (kvm_check_request(KVM_REQ_TLB_FLUSH_CURRENT, vcpu))
- 		kvm_vcpu_flush_tlb_current(vcpu);
-@@ -3296,7 +3298,7 @@ enum nvmx_vmentry_status nested_vmx_enter_non_root_mode(struct kvm_vcpu *vcpu,
- 			return NVMX_VMENTRY_VMFAIL;
- 		}
- 
--		if (nested_vmx_check_guest_state(vcpu, vmcs12, &exit_qual))
-+		if (nested_vmx_check_guest_state(vcpu, vmcs12, &entry_failure_code))
- 			goto vmentry_fail_vmexit;
- 	}
- 
-@@ -3304,16 +3306,18 @@ enum nvmx_vmentry_status nested_vmx_enter_non_root_mode(struct kvm_vcpu *vcpu,
- 	if (vmcs12->cpu_based_vm_exec_control & CPU_BASED_USE_TSC_OFFSETTING)
- 		vcpu->arch.tsc_offset += vmcs12->tsc_offset;
- 
--	if (prepare_vmcs02(vcpu, vmcs12, &exit_qual))
-+	if (prepare_vmcs02(vcpu, vmcs12, &entry_failure_code))
- 		goto vmentry_fail_vmexit_guest_mode;
- 
- 	if (from_vmentry) {
- 		exit_reason = EXIT_REASON_MSR_LOAD_FAIL;
--		exit_qual = nested_vmx_load_msr(vcpu,
--						vmcs12->vm_entry_msr_load_addr,
--						vmcs12->vm_entry_msr_load_count);
--		if (exit_qual)
-+		failed_msr = nested_vmx_load_msr(vcpu,
-+						 vmcs12->vm_entry_msr_load_addr,
-+						 vmcs12->vm_entry_msr_load_count);
-+		if (failed_msr) {
-+			entry_failure_code = failed_msr;
- 			goto vmentry_fail_vmexit_guest_mode;
-+		}
- 	} else {
- 		/*
- 		 * The MMU is not initialized to point at the right entities yet and
-@@ -3377,7 +3381,7 @@ enum nvmx_vmentry_status nested_vmx_enter_non_root_mode(struct kvm_vcpu *vcpu,
- 
- 	load_vmcs12_host_state(vcpu, vmcs12);
- 	vmcs12->vm_exit_reason = exit_reason | VMX_EXIT_REASONS_FAILED_VMENTRY;
--	vmcs12->exit_qualification = exit_qual;
-+	vmcs12->exit_qualification = entry_failure_code;
- 	if (enable_shadow_vmcs || vmx->nested.hv_evmcs)
- 		vmx->nested.need_vmcs12_to_shadow_sync = true;
- 	return NVMX_VMENTRY_VMEXIT;
-@@ -4053,8 +4057,8 @@ static void prepare_vmcs12(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12,
- static void load_vmcs12_host_state(struct kvm_vcpu *vcpu,
- 				   struct vmcs12 *vmcs12)
- {
-+	enum vm_entry_failure_code ignored;
- 	struct kvm_segment seg;
--	u32 entry_failure_code;
- 
- 	if (vmcs12->vm_exit_controls & VM_EXIT_LOAD_IA32_EFER)
- 		vcpu->arch.efer = vmcs12->host_ia32_efer;
-@@ -4089,7 +4093,7 @@ static void load_vmcs12_host_state(struct kvm_vcpu *vcpu,
- 	 * Only PDPTE load can fail as the value of cr3 was checked on entry and
- 	 * couldn't have changed.
- 	 */
--	if (nested_vmx_load_cr3(vcpu, vmcs12->host_cr3, false, &entry_failure_code))
-+	if (nested_vmx_load_cr3(vcpu, vmcs12->host_cr3, false, &ignored))
- 		nested_vmx_abort(vcpu, VMX_ABORT_LOAD_HOST_PDPTE_FAIL);
- 
- 	if (!enable_ept)
-@@ -5989,7 +5993,7 @@ static int vmx_set_nested_state(struct kvm_vcpu *vcpu,
- {
- 	struct vcpu_vmx *vmx = to_vmx(vcpu);
- 	struct vmcs12 *vmcs12;
--	u32 exit_qual;
-+	enum vm_entry_failure_code ignored;
- 	struct kvm_vmx_nested_state_data __user *user_vmx_nested_state =
- 		&user_kvm_nested_state->data.vmx[0];
- 	int ret;
-@@ -6130,7 +6134,7 @@ static int vmx_set_nested_state(struct kvm_vcpu *vcpu,
- 
- 	if (nested_vmx_check_controls(vcpu, vmcs12) ||
- 	    nested_vmx_check_host_state(vcpu, vmcs12) ||
--	    nested_vmx_check_guest_state(vcpu, vmcs12, &exit_qual))
-+	    nested_vmx_check_guest_state(vcpu, vmcs12, &ignored))
- 		goto error_guest_mode;
- 
- 	vmx->nested.dirty_vmcs12 = true;
+Paolo Bonzini (10):
+  KVM: SVM: introduce nested_run_pending
+  KVM: SVM: leave halted state on vmexit
+  KVM: SVM: immediately inject INTR vmexit
+  KVM: x86: replace is_smm checks with kvm_x86_ops.smi_allowed
+  KVM: nSVM: Report NMIs as allowed when in L2 and Exit-on-NMI is set
+  KVM: nSVM: Move SMI vmexit handling to svm_check_nested_events()
+  KVM: SVM: Split out architectural interrupt/NMI/SMI blocking checks
+  KVM: nSVM: Report interrupts as allowed when in L2 and
+    exit-on-interrupt is set
+  KVM: nSVM: Preserve IRQ/NMI/SMI priority irrespective of exiting
+    behavior
+  KVM: x86: Replace late check_nested_events() hack with more precise
+    fix
+
+Sean Christopherson (11):
+  KVM: nVMX: Preserve exception priority irrespective of exiting
+    behavior
+  KVM: nVMX: Open a window for pending nested VMX preemption timer
+  KVM: x86: Set KVM_REQ_EVENT if run is canceled with req_immediate_exit
+    set
+  KVM: x86: Make return for {interrupt_nmi,smi}_allowed() a bool instead
+    of int
+  KVM: nVMX: Report NMIs as allowed when in L2 and Exit-on-NMI is set
+  KVM: VMX: Split out architectural interrupt/NMI blocking checks
+  KVM: nVMX: Preserve IRQ/NMI priority irrespective of exiting behavior
+  KVM: nVMX: Prioritize SMI over nested IRQ/NMI
+  KVM: x86: WARN on injected+pending exception even in nested case
+  KVM: VMX: Use vmx_interrupt_blocked() directly from vmx_handle_exit()
+  KVM: VMX: Use vmx_get_rflags() to query RFLAGS in
+    vmx_interrupt_blocked()
+
+ arch/x86/include/asm/kvm_host.h |   7 ++-
+ arch/x86/kvm/svm/nested.c       |  55 ++++++++++++++---
+ arch/x86/kvm/svm/svm.c          | 101 ++++++++++++++++++++++++--------
+ arch/x86/kvm/svm/svm.h          |  31 ++++++----
+ arch/x86/kvm/vmx/nested.c       |  42 ++++++++-----
+ arch/x86/kvm/vmx/nested.h       |   5 ++
+ arch/x86/kvm/vmx/vmx.c          |  76 ++++++++++++++++--------
+ arch/x86/kvm/vmx/vmx.h          |   2 +
+ arch/x86/kvm/x86.c              |  53 +++++++++--------
+ 9 files changed, 256 insertions(+), 116 deletions(-)
+
 -- 
-2.26.0
+2.18.2
 
