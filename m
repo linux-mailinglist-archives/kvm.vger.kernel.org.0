@@ -2,43 +2,43 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8524A1B71A2
-	for <lists+kvm@lfdr.de>; Fri, 24 Apr 2020 12:11:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D01CA1B71B2
+	for <lists+kvm@lfdr.de>; Fri, 24 Apr 2020 12:13:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726849AbgDXKLq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Apr 2020 06:11:46 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:20188 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726842AbgDXKLp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Apr 2020 06:11:45 -0400
+        id S1726717AbgDXKN1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Apr 2020 06:13:27 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:46192 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726920AbgDXKNZ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 24 Apr 2020 06:13:25 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1587723103;
+        s=mimecast20190719; t=1587723203;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=DU0V+U9WPB3BBfUQT4oXb1eZQQMpM0g5rHKwaAFTB48=;
-        b=B3xbmt+cmraexJ/3PRI+Z2SlxQW9hGMn2LS6lMKq/HivzZlD4RNb5ZUtOiB9HGgEhdTicd
-        pWfk0pfceIVENsot4xvvT/5nn7S3FCu0mfzSd9AzLbOYeGjcJUK/AQ6OrCro7JWaKcUzwZ
-        wFvZ2uPqWOaUvCqNV7Hthg8imyehDTU=
+        bh=hN2gTxbfF6w0iLlokXohRJP1AJKgFauepm8HlPRqgLo=;
+        b=Z+lMETedSx09nvY4GVBZw0s83c2k6EzMYBdlUP8lv816OeDKgsR/RBXOcqGfecdeV1QBet
+        czj6YtaX+8GYEl52XhnD3MLf/LkAfyYYhTkJb1SDbTTL+pRmz6liSeu+kYXlnDvq6MQ/iF
+        PqYFUvb1nObBmwf2lLw0C31axFyUObA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-107-BLSxr5EmN_2wUiSn4OyUrg-1; Fri, 24 Apr 2020 06:11:40 -0400
-X-MC-Unique: BLSxr5EmN_2wUiSn4OyUrg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+ us-mta-23-1V7ZLy_xNDW2kwtAoOPnwQ-1; Fri, 24 Apr 2020 06:13:21 -0400
+X-MC-Unique: 1V7ZLy_xNDW2kwtAoOPnwQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F314F84E042;
-        Fri, 24 Apr 2020 10:11:38 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 251D818FF664;
+        Fri, 24 Apr 2020 10:13:20 +0000 (UTC)
 Received: from [10.36.113.138] (ovpn-113-138.ams2.redhat.com [10.36.113.138])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9455560606;
-        Fri, 24 Apr 2020 10:11:37 +0000 (UTC)
-Subject: Re: [PATCH v2 08/10] s390x: smp: Wait for sigp completion
+        by smtp.corp.redhat.com (Postfix) with ESMTP id BB1885C1D0;
+        Fri, 24 Apr 2020 10:13:18 +0000 (UTC)
+Subject: Re: [PATCH v2 09/10] s390x: smp: Add restart when running test
 To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
 Cc:     thuth@redhat.com, linux-s390@vger.kernel.org,
         borntraeger@de.ibm.com, cohuck@redhat.com
 References: <20200423091013.11587-1-frankja@linux.ibm.com>
- <20200423091013.11587-9-frankja@linux.ibm.com>
+ <20200423091013.11587-10-frankja@linux.ibm.com>
 From:   David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -84,90 +84,82 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
  FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
 Organization: Red Hat GmbH
-Message-ID: <6084d368-86d6-b8fd-d4d3-5e0d72cef590@redhat.com>
-Date:   Fri, 24 Apr 2020 12:11:36 +0200
+Message-ID: <89fbb3c2-9dfc-818e-3442-4aa102ff0705@redhat.com>
+Date:   Fri, 24 Apr 2020 12:13:17 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <20200423091013.11587-9-frankja@linux.ibm.com>
+In-Reply-To: <20200423091013.11587-10-frankja@linux.ibm.com>
 Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 23.04.20 11:10, Janosch Frank wrote:
-> Sigp orders are not necessarily finished when the processor finished
-> the sigp instruction. We need to poll if the order has been finished
-> before we continue.
-> 
-> For (re)start and stop we already use sigp sense running and sigp
-> sense loops. But we still lack completion checks for stop and store
-> status, as well as the cpu resets.
-> 
-> Let's add them.
+> Let's make sure we can restart a cpu that is already running.
+> Restarting it if it is stopped is implicitely tested by the the other
+> restart calls in the smp test.
 > 
 > Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
 > Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 > ---
->  lib/s390x/smp.c | 8 ++++++++
->  lib/s390x/smp.h | 1 +
->  s390x/smp.c     | 4 ++++
->  3 files changed, 13 insertions(+)
+>  s390x/smp.c | 29 +++++++++++++++++++++++++++++
+>  1 file changed, 29 insertions(+)
 > 
-> diff --git a/lib/s390x/smp.c b/lib/s390x/smp.c
-> index 6ef0335..2555bf4 100644
-> --- a/lib/s390x/smp.c
-> +++ b/lib/s390x/smp.c
-> @@ -154,6 +154,14 @@ int smp_cpu_start(uint16_t addr, struct psw psw)
->  	return rc;
->  }
->  
-> +void smp_cpu_wait_for_completion(uint16_t addr)
-> +{
-> +	uint32_t status;
-> +
-> +	/* Loops when cc == 2, i.e. when the cpu is busy with a sigp order */
-> +	sigp_retry(1, SIGP_SENSE, 0, &status);
-> +}
-> +
->  int smp_cpu_destroy(uint16_t addr)
->  {
->  	struct cpu *cpu;
-> diff --git a/lib/s390x/smp.h b/lib/s390x/smp.h
-> index ce63a89..a8b98c0 100644
-> --- a/lib/s390x/smp.h
-> +++ b/lib/s390x/smp.h
-> @@ -45,6 +45,7 @@ int smp_cpu_restart(uint16_t addr);
->  int smp_cpu_start(uint16_t addr, struct psw psw);
->  int smp_cpu_stop(uint16_t addr);
->  int smp_cpu_stop_store_status(uint16_t addr);
-> +void smp_cpu_wait_for_completion(uint16_t addr);
->  int smp_cpu_destroy(uint16_t addr);
->  int smp_cpu_setup(uint16_t addr, struct psw psw);
->  void smp_teardown(void);
 > diff --git a/s390x/smp.c b/s390x/smp.c
-> index 7462211..48321f4 100644
+> index 48321f4..35ca9c7 100644
 > --- a/s390x/smp.c
 > +++ b/s390x/smp.c
-> @@ -75,6 +75,7 @@ static void test_stop_store_status(void)
->  	lc->prefix_sa = 0;
->  	lc->grs_sa[15] = 0;
->  	smp_cpu_stop_store_status(1);
-> +	smp_cpu_wait_for_completion(1);
->  	mb();
->  	report(lc->prefix_sa == (uint32_t)(uintptr_t)cpu->lowcore, "prefix");
->  	report(lc->grs_sa[15], "stack");
-> @@ -85,6 +86,7 @@ static void test_stop_store_status(void)
->  	lc->prefix_sa = 0;
->  	lc->grs_sa[15] = 0;
->  	smp_cpu_stop_store_status(1);
+> @@ -52,6 +52,34 @@ static void test_start(void)
+>  	report(1, "start");
+>  }
+>  
+> +/*
+> + * Does only test restart when the target is running.
+> + * The other tests do restarts when stopped multiple times already.
+> + */
+> +static void test_restart(void)
+> +{
+> +	struct cpu *cpu = smp_cpu_from_addr(1);
+> +	struct lowcore *lc = cpu->lowcore;
+> +
+> +	lc->restart_new_psw.mask = extract_psw_mask();
+> +	lc->restart_new_psw.addr = (unsigned long)test_func;
+> +
+> +	/* Make sure cpu is running */
+> +	smp_cpu_stop(0);
+> +	set_flag(0);
+> +	smp_cpu_restart(1);
+> +	wait_for_flag();
+> +
+> +	/*
+> +	 * Wait until cpu 1 has set the flag because it executed the
+> +	 * restart function.
+> +	 */
+> +	set_flag(0);
+> +	smp_cpu_restart(1);
+> +	wait_for_flag();
+> +	report(1, "restart while running");
+> +}
+> +
+>  static void test_stop(void)
+>  {
+>  	smp_cpu_stop(1);
+> @@ -295,6 +323,7 @@ int main(void)
+>  	smp_cpu_stop(1);
+>  
+>  	test_start();
+> +	test_restart();
+>  	test_stop();
+>  	test_stop_store_status();
+>  	test_store_status();
+> 
 
-Just curious: Would it make sense to add that inside
-smp_cpu_stop_store_status() instead?
+Reviewed-by: David Hildenbrand <david@redhat.com>
 
 -- 
 Thanks,
