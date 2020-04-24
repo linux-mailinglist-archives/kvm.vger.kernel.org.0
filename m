@@ -2,160 +2,152 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 242AB1B7884
-	for <lists+kvm@lfdr.de>; Fri, 24 Apr 2020 16:46:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8A6DD1B787B
+	for <lists+kvm@lfdr.de>; Fri, 24 Apr 2020 16:46:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727868AbgDXOq0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Apr 2020 10:46:26 -0400
-Received: from mga05.intel.com ([192.55.52.43]:50190 "EHLO mga05.intel.com"
+        id S1727781AbgDXOpz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Apr 2020 10:45:55 -0400
+Received: from mga06.intel.com ([134.134.136.31]:23091 "EHLO mga06.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726872AbgDXOq0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Apr 2020 10:46:26 -0400
-IronPort-SDR: mJJ2rrqmJflWUMSKnZursi+zbiU5GL+9B2Oan3LUfc+98ckEUXmphJoNKsS/5XMpqkXzd897kF
- om0D3sJNwDqw==
+        id S1726707AbgDXOpy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Apr 2020 10:45:54 -0400
+IronPort-SDR: Z6E6llFs1p5UHGGq8swL2WPGTblmy9b5KrLLeRg0C1nJB6hxRsXbHuu3EiBs9CZJBM7ZPtMsxh
+ uFA34RMpzsQA==
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Apr 2020 07:46:25 -0700
-IronPort-SDR: dc/ovCJOroXtCeCVuyJiWfqaWNBHsarWs+X7LIcYDJwXCIGcyQcDvhc9il1r3ZaHPZkaeulybn
- TStm3iJ3kRJw==
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Apr 2020 07:45:51 -0700
+IronPort-SDR: bIq/sAdTuo5CqfgSdHbFHEzG5kckZHnXZyykIfjeUd6lJxDPY2iCTu08LBycgVzPIWdNAr/hI2
+ pzvLLweCispQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.73,311,1583222400"; 
-   d="scan'208";a="457925573"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
-  by fmsmga006.fm.intel.com with ESMTP; 24 Apr 2020 07:46:25 -0700
-Date:   Fri, 24 Apr 2020 07:46:25 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Peter Zijlstra <peterz@infradead.org>
-Cc:     Li RongQing <lirongqing@baidu.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, x86@kernel.org, hpa@zytor.com, bp@alien8.de,
-        mingo@redhat.com, tglx@linutronix.de, joro@8bytes.org,
-        jmattson@google.com, wanpengli@tencent.com, vkuznets@redhat.com,
-        pbonzini@redhat.com
-Subject: Re: [PATCH] [RFC] kvm: x86: emulate APERF/MPERF registers
-Message-ID: <20200424144625.GB30013@linux.intel.com>
-References: <1587704935-30960-1-git-send-email-lirongqing@baidu.com>
- <20200424100143.GZ20730@hirez.programming.kicks-ass.net>
+   d="scan'208";a="457364053"
+Received: from unknown (HELO localhost) ([10.239.159.128])
+  by fmsmga005.fm.intel.com with ESMTP; 24 Apr 2020 07:45:49 -0700
+Date:   Fri, 24 Apr 2020 22:47:51 +0800
+From:   Yang Weijiang <weijiang.yang@intel.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Yang Weijiang <weijiang.yang@intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, pbonzini@redhat.com,
+        jmattson@google.com, yu.c.zhang@linux.intel.com
+Subject: Re: [PATCH v11 5/9] KVM: X86: Refresh CPUID once guest XSS MSR
+ changes
+Message-ID: <20200424144751.GJ24039@local-michael-cet-test>
+References: <20200326081847.5870-1-weijiang.yang@intel.com>
+ <20200326081847.5870-6-weijiang.yang@intel.com>
+ <20200423173450.GJ17824@linux.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200424100143.GZ20730@hirez.programming.kicks-ass.net>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <20200423173450.GJ17824@linux.intel.com>
+User-Agent: Mutt/1.11.3 (2019-02-01)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Apr 24, 2020 at 12:01:43PM +0200, Peter Zijlstra wrote:
-> On Fri, Apr 24, 2020 at 01:08:55PM +0800, Li RongQing wrote:
+On Thu, Apr 23, 2020 at 10:34:50AM -0700, Sean Christopherson wrote:
+> On Thu, Mar 26, 2020 at 04:18:42PM +0800, Yang Weijiang wrote:
+> > CPUID(0xd, 1) reports the current required storage size of
+ 
+> >  	struct kvm_pio_request pio;
 > > diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> > index 901cd1fdecd9..00e4993cb338 100644
+> > index 78d461be2102..25e9a11291b3 100644
 > > --- a/arch/x86/kvm/cpuid.c
 > > +++ b/arch/x86/kvm/cpuid.c
-> > @@ -558,7 +558,10 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
-> >  	case 6: /* Thermal management */
-> >  		entry->eax = 0x4; /* allow ARAT */
-> >  		entry->ebx = 0;
-> > -		entry->ecx = 0;
-> > +		if (boot_cpu_has(X86_FEATURE_APERFMPERF))
-> > +			entry->ecx = 0x1;
-> > +		else
-> > +			entry->ecx = 0x0;
-> >  		entry->edx = 0;
-> >  		break;
-> >  	/* function 7 has additional index. */
+> > @@ -95,9 +95,24 @@ int kvm_update_cpuid(struct kvm_vcpu *vcpu)
+> >  	}
+> >  
+> >  	best = kvm_find_cpuid_entry(vcpu, 0xD, 1);
+> > -	if (best && (cpuid_entry_has(best, X86_FEATURE_XSAVES) ||
+> > -		     cpuid_entry_has(best, X86_FEATURE_XSAVEC)))
+> > -		best->ebx = xstate_required_size(vcpu->arch.xcr0, true);
+> > +	if (best) {
+> > +		if (best->eax & (F(XSAVES) | F(XSAVEC))) {
 > 
-> AFAICT this is generic x86 code, that is, this will tell an AMD SVM
-> guest it has APERFMPERF on.
+> Please use cpuid_entry_has() to preserve the automagic register lookup and
+> compile-time assertions that are provided.  E.g. I don't know off the top
+> of my whether %eax is the correct register, and I don't want to know :-).
+>
+Got it, will fix it.
+
+> > +			u64 xstate = vcpu->arch.xcr0 | vcpu->arch.ia32_xss;
+> > +
+> > +			best->ebx = xstate_required_size(xstate, true);
+> > +		}
+> > +
+> > +		if (best->eax & F(XSAVES)) {
 > 
-> > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> > index 91749f1254e8..f20216fc0b57 100644
-> > --- a/arch/x86/kvm/vmx/vmx.c
-> > +++ b/arch/x86/kvm/vmx/vmx.c
-> > @@ -1064,6 +1064,11 @@ static inline void pt_save_msr(struct pt_ctx *ctx, u32 addr_range)
+> Same thing here.
+> 
+> > +			vcpu->arch.guest_supported_xss =
+> > +			(best->ecx | ((u64)best->edx << 32)) & supported_xss;
+> 
+> The indentation is funky, I'm guessing you're trying to squeak in less than
+> 80 chars.  Maybe this?
+> 
+> 		if (!cpuid_entry_has(best, X86_FEATURE_XSAVES)) {
+> 			best->ecx = 0;
+> 			best->edx = 0;
+> 		}
+> 
+> 		 vcpu->arch.guest_supported_xss =
+> 			(((u64)best->edx << 32) | best->ecx) & supported_xss;
+> 
+> Nit: my preference is to have the high half first, x86 is little endian
+> (the xcr0 code is "wrong" :-D).  For me, this also makes it more obvious
+> that the effective size is a u64.
+>
+Good suggestion, will fixed it together the xcr0 part!
+
+> > +		} else {
+> > +			best->ecx = 0;
+> > +			best->edx = 0;
+> > +			vcpu->arch.guest_supported_xss = 0;
+> > +		}
+> > +	} else {
+> > +		vcpu->arch.guest_supported_xss = 0;
+> > +	}
 > >  
-> >  static void pt_guest_enter(struct vcpu_vmx *vmx)
-> >  {
-> > +	struct kvm_vcpu *vcpu = &vmx->vcpu;
-> > +
-> > +	rdmsrl(MSR_IA32_MPERF, vcpu->arch.host_mperf);
-> > +	rdmsrl(MSR_IA32_APERF, vcpu->arch.host_aperf);
-
-Why are these buried in Processor Trace code?  Is APERFMERF in any way
-dependent on PT?
-
-> > +
-> >  	if (vmx_pt_mode_is_system())
-> >  		return;
-> >  
-> > @@ -1081,6 +1086,15 @@ static void pt_guest_enter(struct vcpu_vmx *vmx)
-> >  
-> >  static void pt_guest_exit(struct vcpu_vmx *vmx)
-> >  {
-> > +	struct kvm_vcpu *vcpu = &vmx->vcpu;
-> > +	u64 perf;
-> > +
-> > +	rdmsrl(MSR_IA32_MPERF, perf);
-> > +	vcpu->arch.v_mperf += perf - vcpu->arch.host_mperf;
-> > +
-> > +	rdmsrl(MSR_IA32_APERF, perf);
-> > +	vcpu->arch.v_aperf += perf - vcpu->arch.host_aperf;
-
-This requires four RDMSRs per VMX transition.  Doing that unconditionally
-will drastically impact performance.  Not to mention that reading the MSRs
-without checking for host support will generate #GPs and WARNs on hardware
-without APERFMPERF.
-
-Assuming we're going forward with this, at an absolute minimum the RDMSRs
-need to be wrapped with checks on host _and_ guest support for the emulated
-behavior.  Given the significant overhead, this might even be something
-that should require an extra opt-in from userspace to enable.
-
-> > +
-> >  	if (vmx_pt_mode_is_system())
-> >  		return;
-> >  
-> > @@ -1914,6 +1928,12 @@ static int vmx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
-> >  		    !guest_cpuid_has(vcpu, X86_FEATURE_RDTSCP))
+> >  	/*
+> >  	 * The existing code assumes virtual address is 48-bit or 57-bit in the
+> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> > index 90acdbbb8a5a..51ecb496d47d 100644
+> > --- a/arch/x86/kvm/x86.c
+> > +++ b/arch/x86/kvm/x86.c
+> > @@ -2836,9 +2836,12 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+> >  		 * IA32_XSS[bit 8]. Guests have to use RDMSR/WRMSR rather than
+> >  		 * XSAVES/XRSTORS to save/restore PT MSRs.
+> >  		 */
+> > -		if (data & ~supported_xss)
+> > +		if (data & ~vcpu->arch.guest_supported_xss)
 > >  			return 1;
-> >  		goto find_shared_msr;
-> > +	case MSR_IA32_MPERF:
-> > +		msr_info->data = vcpu->arch.v_mperf;
-> > +		break;
-> > +	case MSR_IA32_APERF:
-> > +		msr_info->data = vcpu->arch.v_aperf;
-> > +		break;
-> >  	default:
-> >  	find_shared_msr:
-> >  		msr = find_msr_entry(vmx, msr_info->index);
+> > -		vcpu->arch.ia32_xss = data;
+> > +		if (vcpu->arch.ia32_xss != data) {
+> > +			vcpu->arch.ia32_xss = data;
+> > +			kvm_update_cpuid(vcpu);
+> > +		}
+> >  		break;
+> >  	case MSR_SMI_COUNT:
+> >  		if (!msr_info->host_initiated)
+> > @@ -9635,6 +9638,8 @@ int kvm_arch_hardware_setup(void)
+> >  
+> >  	if (!kvm_cpu_cap_has(X86_FEATURE_XSAVES))
+> >  		supported_xss = 0;
+> > +	else
+> > +		supported_xss = host_xss & KVM_SUPPORTED_XSS;
 > 
-> But then here you only emulate it for VMX, which then results in SVM
-> guests going wobbly.
-
-Ya.
-
-> Also, on Intel, the moment you advertise APERFMPERF, we'll try and read
-> MSR_PLATFORM_INFO / MSR_TURBO_RATIO_LIMIT*, I don't suppose you're
-> passing those through as well?
-
-AFAICT, the proposed patch isn't fully advertising APERFMPERF, it's
-advertising Turbo Boost / Dynamic Acceleration to the guest when APERFMPERF
-can be used by the host to emulate IDA.  The transliteration of the
-above code to be VMX-only is:
-
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 766303b31949..7e459b66b06e 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -7191,6 +7191,9 @@ static __init void vmx_set_cpu_caps(void)
-        if (nested)
-                kvm_cpu_cap_set(X86_FEATURE_VMX);
-
-+       if (boot_cpu_has(X86_FEATURE_APERFMPERF))
-+               kvm_cpu_cap_set(X86_FEATURE_IDA);
-+
-        /* CPUID 0x7 */
-        if (kvm_mpx_supported())
-                kvm_cpu_cap_check_and_set(X86_FEATURE_MPX);
-
-I have no clue as to whether that's sane/correct.
+> Silly nit: I'd prefer to invert the check, e.g.
+> 
+> 	if (kvm_cpu_cap_has(X86_FEATURE_XSAVES))
+> 		supported_xss = host_xss & KVM_SUPPORTED_XSS;
+> 	else
+> 		supported_xss = 0;
+Fair enough!
+> 
+> >  
+> >  	cr4_reserved_bits = kvm_host_cr4_reserved_bits(&boot_cpu_data);
+> >  
+> > -- 
+> > 2.17.2
+> > 
