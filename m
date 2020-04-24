@@ -2,44 +2,44 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B377F1B7182
-	for <lists+kvm@lfdr.de>; Fri, 24 Apr 2020 12:07:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 030AD1B7192
+	for <lists+kvm@lfdr.de>; Fri, 24 Apr 2020 12:08:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726793AbgDXKHa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Apr 2020 06:07:30 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:37273 "EHLO
+        id S1726778AbgDXKIG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Apr 2020 06:08:06 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:27206 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726289AbgDXKH3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Apr 2020 06:07:29 -0400
+        with ESMTP id S1726788AbgDXKIG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Apr 2020 06:08:06 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1587722847;
+        s=mimecast20190719; t=1587722885;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=xFU7y4GXMfWER4ccvjYuubE8unmSm+kNUI+d0/MgDMk=;
-        b=CcGSpKc3pM56A+p/KfTdOogfVs2HtTOeips2DtDClsLdY4Yg+Ewb158PWb/Zs79cf3aKH2
-        VjiIIpFgodkOn0Dr/GRQ91APnh8Y7ppChe3P0bAPo4nzIUSdhN50avh2Gka6emmnP/sdAx
-        IJ4fholSP27M6dZ6PZOiBYeitJHOF4Y=
+        bh=hbrNhLz3CjweCyJq+f1274eqVCwqHLRzUfAHIIeYvTQ=;
+        b=TwDbI49TGCO2Kfy+RZLJvJSkFal8IfLGYpDWxaLXaXfnptfOzmZO0qHxp07kmJnNSp1dmD
+        louewU+4TfJN7QufAsA9Mzz+aser5hbUPVBNt6WKu0xQ7Fb/GPuvB27KjtsAV8Th5SoaEJ
+        654Ndq1Uf68HWIp/ZDBOwa2GdA508J8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-203-LP4xaB94Nfq33I-VuZ6eYA-1; Fri, 24 Apr 2020 06:07:24 -0400
-X-MC-Unique: LP4xaB94Nfq33I-VuZ6eYA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+ us-mta-215-uguoR7LlOXiHQ5ND9F1rUA-1; Fri, 24 Apr 2020 06:08:03 -0400
+X-MC-Unique: uguoR7LlOXiHQ5ND9F1rUA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F2571102CC3C;
-        Fri, 24 Apr 2020 10:07:22 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5DA0F1B18BC1;
+        Fri, 24 Apr 2020 10:08:02 +0000 (UTC)
 Received: from [10.36.113.138] (ovpn-113-138.ams2.redhat.com [10.36.113.138])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 7C0E45D9CC;
-        Fri, 24 Apr 2020 10:07:21 +0000 (UTC)
-Subject: Re: [PATCH v2 04/10] s390x: smp: Test local interrupts after cpu
- reset
+        by smtp.corp.redhat.com (Postfix) with ESMTP id CE40E60CD0;
+        Fri, 24 Apr 2020 10:08:00 +0000 (UTC)
+Subject: Re: [PATCH v2 05/10] s390x: smp: Loop if secondary cpu returns into
+ cpu setup again
 To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
 Cc:     thuth@redhat.com, linux-s390@vger.kernel.org,
         borntraeger@de.ibm.com, cohuck@redhat.com
 References: <20200423091013.11587-1-frankja@linux.ibm.com>
- <20200423091013.11587-5-frankja@linux.ibm.com>
+ <20200423091013.11587-6-frankja@linux.ibm.com>
 From:   David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -85,86 +85,53 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
  FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
 Organization: Red Hat GmbH
-Message-ID: <8bdbe934-fff9-cc2a-3043-4851365735f3@redhat.com>
-Date:   Fri, 24 Apr 2020 12:07:20 +0200
+Message-ID: <2d08ea4f-7251-0867-7f48-81642e551c79@redhat.com>
+Date:   Fri, 24 Apr 2020 12:08:00 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <20200423091013.11587-5-frankja@linux.ibm.com>
+In-Reply-To: <20200423091013.11587-6-frankja@linux.ibm.com>
 Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 23.04.20 11:10, Janosch Frank wrote:
-> Local interrupts (external and emergency call) should be cleared after
-> any cpu reset.
+> Up to now a secondary cpu could have returned from the function it was
+> executing and ending up somewhere in cstart64.S. This was mostly
+> circumvented by an endless loop in the function that it executed.
+> 
+> Let's add a loop to the end of the cpu setup, so we don't have to rely
+> on added loops in the tests.
 > 
 > Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
 > Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 > ---
->  s390x/smp.c | 22 ++++++++++++++++++++++
->  1 file changed, 22 insertions(+)
+>  s390x/cstart64.S | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
 > 
-> diff --git a/s390x/smp.c b/s390x/smp.c
-> index 8a6cd1d..a8e3dd7 100644
-> --- a/s390x/smp.c
-> +++ b/s390x/smp.c
-> @@ -243,6 +243,20 @@ static void test_reset_initial(void)
->  	report_prefix_pop();
->  }
+> diff --git a/s390x/cstart64.S b/s390x/cstart64.S
+> index 9af6bb3..ecffbe0 100644
+> --- a/s390x/cstart64.S
+> +++ b/s390x/cstart64.S
+> @@ -161,7 +161,9 @@ smp_cpu_setup_state:
+>  	lctlg   %c0, %c0, GEN_LC_SW_INT_CRS
+>  	/* We should only go once through cpu setup and not for every restart */
+>  	stg	%r14, GEN_LC_RESTART_NEW_PSW + 8
+> -	br	%r14
+> +	brasl	%r14, %r14
+> +	/* If the function returns, just loop here */
+> +0:	j	0
 >  
-> +static void test_local_ints(void)
-> +{
-> +	unsigned long mask;
-> +
-> +	expect_ext_int();
-> +	/* Open masks for ecall and emcall */
-> +	ctl_set_bit(0, 13);
-> +	ctl_set_bit(0, 14);
-> +	mask = extract_psw_mask();
-> +	mask |= PSW_MASK_EXT;
-> +	load_psw_mask(mask);
-> +	set_flag(1);
-> +}
-
-I think last time I looked at this I got it all wrong. So, we actually
-don't expect that an interrupt triggers here, correct?
-
-The SIGP_CPU_RESET should have cleared both interrupts on this cpu. So
-once we enable them, none should trigger.
-
-Why do we have "expect_ext_int()" ?
-
-> +
->  static void test_reset(void)
->  {
->  	struct psw psw;
-> @@ -251,10 +265,18 @@ static void test_reset(void)
->  	psw.addr = (unsigned long)test_func;
->  
->  	report_prefix_push("cpu reset");
-> +	sigp(1, SIGP_EMERGENCY_SIGNAL, 0, NULL);
-> +	sigp(1, SIGP_EXTERNAL_CALL, 0, NULL);
->  	smp_cpu_start(1, psw);
->  
->  	sigp_retry(1, SIGP_CPU_RESET, 0, NULL);
->  	report(smp_cpu_stopped(1), "cpu stopped");
-> +
-> +	set_flag(0);
-> +	psw.addr = (unsigned long)test_local_ints;
-> +	smp_cpu_start(1, psw);
-> +	wait_for_flag();
-> +	report(true, "local interrupts cleared");
->  	report_prefix_pop();
->  }
->  
+>  pgm_int:
+>  	SAVE_REGS
 > 
 
+Reviewed-by: David Hildenbrand <david@redhat.com>
 
 -- 
 Thanks,
