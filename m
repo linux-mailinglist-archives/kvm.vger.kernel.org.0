@@ -2,130 +2,172 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 306921B718E
-	for <lists+kvm@lfdr.de>; Fri, 24 Apr 2020 12:07:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B377F1B7182
+	for <lists+kvm@lfdr.de>; Fri, 24 Apr 2020 12:07:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726915AbgDXKHo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Apr 2020 06:07:44 -0400
-Received: from mga03.intel.com ([134.134.136.65]:53054 "EHLO mga03.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726903AbgDXKHm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Apr 2020 06:07:42 -0400
-IronPort-SDR: 4uhbedfg+U2neNMnYENrxlZv18CX/BKsV23oVtz1tYX9cIErIQVgIwnJvpmXbWtiG3U/B5xykT
- MDyX+E8LboaA==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Apr 2020 03:07:41 -0700
-IronPort-SDR: L1erLUzZn/MG0HE3WaragkHVLTIfJgph1L8fxLPfHNgp3Msi3lXFBQE7CaTopxDb2I+qweoUl5
- vLGSBakCd1CA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,311,1583222400"; 
-   d="scan'208";a="280755940"
-Received: from unknown (HELO localhost.localdomain.bj.intel.com) ([10.240.193.79])
-  by fmsmga004.fm.intel.com with ESMTP; 24 Apr 2020 03:07:38 -0700
-From:   Zhu Lingshan <lingshan.zhu@intel.com>
-To:     mst@redhat.com, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-        jasowang@redhat.com
-Cc:     lulu@redhat.com, dan.daly@intel.com, cunming.liang@intel.com,
-        Zhu Lingshan <lingshan.zhu@intel.com>
-Subject: [PATCH 2/2] vdpa: implement config interrupt in IFCVF
-Date:   Fri, 24 Apr 2020 18:04:19 +0800
-Message-Id: <1587722659-1300-3-git-send-email-lingshan.zhu@intel.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1587722659-1300-1-git-send-email-lingshan.zhu@intel.com>
-References: <1587722659-1300-1-git-send-email-lingshan.zhu@intel.com>
+        id S1726793AbgDXKHa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Apr 2020 06:07:30 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:37273 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726289AbgDXKH3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Apr 2020 06:07:29 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1587722847;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+        bh=xFU7y4GXMfWER4ccvjYuubE8unmSm+kNUI+d0/MgDMk=;
+        b=CcGSpKc3pM56A+p/KfTdOogfVs2HtTOeips2DtDClsLdY4Yg+Ewb158PWb/Zs79cf3aKH2
+        VjiIIpFgodkOn0Dr/GRQ91APnh8Y7ppChe3P0bAPo4nzIUSdhN50avh2Gka6emmnP/sdAx
+        IJ4fholSP27M6dZ6PZOiBYeitJHOF4Y=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-203-LP4xaB94Nfq33I-VuZ6eYA-1; Fri, 24 Apr 2020 06:07:24 -0400
+X-MC-Unique: LP4xaB94Nfq33I-VuZ6eYA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F2571102CC3C;
+        Fri, 24 Apr 2020 10:07:22 +0000 (UTC)
+Received: from [10.36.113.138] (ovpn-113-138.ams2.redhat.com [10.36.113.138])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 7C0E45D9CC;
+        Fri, 24 Apr 2020 10:07:21 +0000 (UTC)
+Subject: Re: [PATCH v2 04/10] s390x: smp: Test local interrupts after cpu
+ reset
+To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     thuth@redhat.com, linux-s390@vger.kernel.org,
+        borntraeger@de.ibm.com, cohuck@redhat.com
+References: <20200423091013.11587-1-frankja@linux.ibm.com>
+ <20200423091013.11587-5-frankja@linux.ibm.com>
+From:   David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat GmbH
+Message-ID: <8bdbe934-fff9-cc2a-3043-4851365735f3@redhat.com>
+Date:   Fri, 24 Apr 2020 12:07:20 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
+MIME-Version: 1.0
+In-Reply-To: <20200423091013.11587-5-frankja@linux.ibm.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This commit implements config interrupt support
-in IFC VF
+On 23.04.20 11:10, Janosch Frank wrote:
+> Local interrupts (external and emergency call) should be cleared after
+> any cpu reset.
+> 
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+> ---
+>  s390x/smp.c | 22 ++++++++++++++++++++++
+>  1 file changed, 22 insertions(+)
+> 
+> diff --git a/s390x/smp.c b/s390x/smp.c
+> index 8a6cd1d..a8e3dd7 100644
+> --- a/s390x/smp.c
+> +++ b/s390x/smp.c
+> @@ -243,6 +243,20 @@ static void test_reset_initial(void)
+>  	report_prefix_pop();
+>  }
+>  
+> +static void test_local_ints(void)
+> +{
+> +	unsigned long mask;
+> +
+> +	expect_ext_int();
+> +	/* Open masks for ecall and emcall */
+> +	ctl_set_bit(0, 13);
+> +	ctl_set_bit(0, 14);
+> +	mask = extract_psw_mask();
+> +	mask |= PSW_MASK_EXT;
+> +	load_psw_mask(mask);
+> +	set_flag(1);
+> +}
 
-Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
----
- drivers/vdpa/ifcvf/ifcvf_base.c |  3 +++
- drivers/vdpa/ifcvf/ifcvf_base.h |  2 ++
- drivers/vdpa/ifcvf/ifcvf_main.c | 22 +++++++++++++++++++++-
- 3 files changed, 26 insertions(+), 1 deletion(-)
+I think last time I looked at this I got it all wrong. So, we actually
+don't expect that an interrupt triggers here, correct?
 
-diff --git a/drivers/vdpa/ifcvf/ifcvf_base.c b/drivers/vdpa/ifcvf/ifcvf_base.c
-index b61b06e..c825d99 100644
---- a/drivers/vdpa/ifcvf/ifcvf_base.c
-+++ b/drivers/vdpa/ifcvf/ifcvf_base.c
-@@ -185,6 +185,9 @@ void ifcvf_set_status(struct ifcvf_hw *hw, u8 status)
- 
- void ifcvf_reset(struct ifcvf_hw *hw)
- {
-+	hw->config_cb.callback = NULL;
-+	hw->config_cb.private = NULL;
-+
- 	ifcvf_set_status(hw, 0);
- 	/* flush set_status, make sure VF is stopped, reset */
- 	ifcvf_get_status(hw);
-diff --git a/drivers/vdpa/ifcvf/ifcvf_base.h b/drivers/vdpa/ifcvf/ifcvf_base.h
-index e803070..76928b0 100644
---- a/drivers/vdpa/ifcvf/ifcvf_base.h
-+++ b/drivers/vdpa/ifcvf/ifcvf_base.h
-@@ -81,6 +81,8 @@ struct ifcvf_hw {
- 	void __iomem *net_cfg;
- 	struct vring_info vring[IFCVF_MAX_QUEUE_PAIRS * 2];
- 	void __iomem * const *base;
-+	char config_msix_name[256];
-+	struct vdpa_callback config_cb;
- };
- 
- struct ifcvf_adapter {
-diff --git a/drivers/vdpa/ifcvf/ifcvf_main.c b/drivers/vdpa/ifcvf/ifcvf_main.c
-index 8d54dc5..f7baeca 100644
---- a/drivers/vdpa/ifcvf/ifcvf_main.c
-+++ b/drivers/vdpa/ifcvf/ifcvf_main.c
-@@ -18,6 +18,16 @@
- #define DRIVER_AUTHOR   "Intel Corporation"
- #define IFCVF_DRIVER_NAME       "ifcvf"
- 
-+static irqreturn_t ifcvf_config_changed(int irq, void *arg)
-+{
-+	struct ifcvf_hw *vf = arg;
-+
-+	if (vf->config_cb.callback)
-+		return vf->config_cb.callback(vf->config_cb.private);
-+
-+	return IRQ_HANDLED;
-+}
-+
- static irqreturn_t ifcvf_intr_handler(int irq, void *arg)
- {
- 	struct vring_info *vring = arg;
-@@ -256,7 +266,10 @@ static void ifcvf_vdpa_set_config(struct vdpa_device *vdpa_dev,
- static void ifcvf_vdpa_set_config_cb(struct vdpa_device *vdpa_dev,
- 				     struct vdpa_callback *cb)
- {
--	/* We don't support config interrupt */
-+	struct ifcvf_hw *vf = vdpa_to_vf(vdpa_dev);
-+
-+	vf->config_cb.callback = cb->callback;
-+	vf->config_cb.private = cb->private;
- }
- 
- /*
-@@ -292,6 +305,13 @@ static int ifcvf_request_irq(struct ifcvf_adapter *adapter)
- 	struct ifcvf_hw *vf = &adapter->vf;
- 	int vector, i, ret, irq;
- 
-+	snprintf(vf->config_msix_name, 256, "ifcvf[%s]-config\n",
-+		pci_name(pdev));
-+	vector = 0;
-+	irq = pci_irq_vector(pdev, vector);
-+	ret = devm_request_irq(&pdev->dev, irq,
-+			       ifcvf_config_changed, 0,
-+			       vf->config_msix_name, vf);
- 
- 	for (i = 0; i < IFCVF_MAX_QUEUE_PAIRS * 2; i++) {
- 		snprintf(vf->vring[i].msix_name, 256, "ifcvf[%s]-%d\n",
+The SIGP_CPU_RESET should have cleared both interrupts on this cpu. So
+once we enable them, none should trigger.
+
+Why do we have "expect_ext_int()" ?
+
+> +
+>  static void test_reset(void)
+>  {
+>  	struct psw psw;
+> @@ -251,10 +265,18 @@ static void test_reset(void)
+>  	psw.addr = (unsigned long)test_func;
+>  
+>  	report_prefix_push("cpu reset");
+> +	sigp(1, SIGP_EMERGENCY_SIGNAL, 0, NULL);
+> +	sigp(1, SIGP_EXTERNAL_CALL, 0, NULL);
+>  	smp_cpu_start(1, psw);
+>  
+>  	sigp_retry(1, SIGP_CPU_RESET, 0, NULL);
+>  	report(smp_cpu_stopped(1), "cpu stopped");
+> +
+> +	set_flag(0);
+> +	psw.addr = (unsigned long)test_local_ints;
+> +	smp_cpu_start(1, psw);
+> +	wait_for_flag();
+> +	report(true, "local interrupts cleared");
+>  	report_prefix_pop();
+>  }
+>  
+> 
+
+
 -- 
-1.8.3.1
+Thanks,
+
+David / dhildenb
 
