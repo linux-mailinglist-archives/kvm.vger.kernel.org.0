@@ -2,74 +2,154 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E2F6F1B8172
-	for <lists+kvm@lfdr.de>; Fri, 24 Apr 2020 23:02:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D7BE81B8191
+	for <lists+kvm@lfdr.de>; Fri, 24 Apr 2020 23:19:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726046AbgDXVCt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Apr 2020 17:02:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48878 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726032AbgDXVCt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Apr 2020 17:02:49 -0400
-Received: from mail-vk1-xa42.google.com (mail-vk1-xa42.google.com [IPv6:2607:f8b0:4864:20::a42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2D35C09B049
-        for <kvm@vger.kernel.org>; Fri, 24 Apr 2020 14:02:48 -0700 (PDT)
-Received: by mail-vk1-xa42.google.com with SMTP id d6so1576815vko.4
-        for <kvm@vger.kernel.org>; Fri, 24 Apr 2020 14:02:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=N+lekRCvAeIq1HnnVu1dMr0TEj8QJMC4PyRn69xzXA8=;
-        b=Qg4TL8IyERbxZ4ldVherT7+8Xp22wDPat2HaRwguiuYRWkHmJToETRessf3QYBm1Ft
-         wY1Jb6qdGOziULEpvY3RofC6ZToMQ7N8Nv5/ovg+dXabXbVgwsl690rEWl8vrgseQB8r
-         o8iYO6aXpywZAV6M1ErBHT81hacRpcIkf6vBVbc1Bk/bslDfeJIYkrAcuhawRhxgy6sn
-         dgNBoYanlSF7pjWMgIscOqeTapc0cBHQqrZ8yty7T2W0a+o4Zzps6JNC20hoV7RvFfE+
-         yPYke/KYEbnIXqd0/8HhSZ+QW0e5GgLSl4rcyKyhyk21cEL531r5ANHAGM8yOCIIraGz
-         FX+g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=N+lekRCvAeIq1HnnVu1dMr0TEj8QJMC4PyRn69xzXA8=;
-        b=K3D1sSQEYIWiXdwPhs/XQdR1Xvt9YVErp1lzIcELscNk6MHgZNYblC580q8igXk416
-         jZtFrd9aDXVXDv4GabtLVr0hN87NICotAYsn/ei0ANuBlEIkZl8YGNhL4cJcOgPuNot+
-         QSWnC+K7nfE+W95Cc7+zO01NM90i3NZhnNV4TKXGyYEpdKZG9K4iYfioXzwlos7Dk9Cj
-         w9p41+QD2mqbuKHdyjonXjM0uk59KCu4dc3QlYyya3bfskorWGXBUnxJCdZVfBWhRY/P
-         qXMaYDMxBhn845nrkjFY8V3wquHCPInYOM3Ma+F9UM1xsZJ+phyAxNw9lw7wKZFMbUcD
-         E61w==
-X-Gm-Message-State: AGi0PubgRctypJXN5mmU396b9/GP6xbyYOyuWuM8b8dNwLYcZh6qf5/L
-        15x03wlOLU1vfhrbJ90Zr2kXpg==
-X-Google-Smtp-Source: APiQypLW193+p+mWHTSAc87JCKYuoXneFfjRmShR5mwMzAfKp2W4ARyBRe8ZbJtLj/vq9CxiP/q1Zw==
-X-Received: by 2002:a1f:1f52:: with SMTP id f79mr9655456vkf.19.1587762167144;
-        Fri, 24 Apr 2020 14:02:47 -0700 (PDT)
-Received: from google.com (25.173.196.35.bc.googleusercontent.com. [35.196.173.25])
-        by smtp.gmail.com with ESMTPSA id t194sm1887798vkt.56.2020.04.24.14.02.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 24 Apr 2020 14:02:46 -0700 (PDT)
-Date:   Fri, 24 Apr 2020 21:02:42 +0000
-From:   Oliver Upton <oupton@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        wei.huang2@amd.com, cavery@redhat.com, vkuznets@redhat.com,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Jim Mattson <jmattson@google.com>
-Subject: Re: [PATCH v2 00/22] KVM: Event fixes and cleanup
-Message-ID: <20200424210242.GA80882@google.com>
-References: <20200424172416.243870-1-pbonzini@redhat.com>
+        id S1726053AbgDXVSk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Apr 2020 17:18:40 -0400
+Received: from ex13-edg-ou-002.vmware.com ([208.91.0.190]:9377 "EHLO
+        EX13-EDG-OU-002.vmware.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726027AbgDXVSk (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 24 Apr 2020 17:18:40 -0400
+X-Greylist: delayed 904 seconds by postgrey-1.27 at vger.kernel.org; Fri, 24 Apr 2020 17:18:40 EDT
+Received: from sc9-mailhost3.vmware.com (10.113.161.73) by
+ EX13-EDG-OU-002.vmware.com (10.113.208.156) with Microsoft SMTP Server id
+ 15.0.1156.6; Fri, 24 Apr 2020 14:03:32 -0700
+Received: from mstunes-sid.eng.vmware.com (mstunes-sid.eng.vmware.com [10.118.100.24])
+        by sc9-mailhost3.vmware.com (Postfix) with ESMTP id CBB63405C8;
+        Fri, 24 Apr 2020 14:03:35 -0700 (PDT)
+From:   Mike Stunes <mstunes@vmware.com>
+To:     <joro@8bytes.org>
+CC:     <dan.j.williams@intel.com>, <dave.hansen@linux.intel.com>,
+        <hpa@zytor.com>, <jgross@suse.com>, <jroedel@suse.de>,
+        <jslaby@suse.cz>, <keescook@chromium.org>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <luto@kernel.org>,
+        <peterz@infradead.org>, <thellstrom@vmware.com>,
+        <thomas.lendacky@amd.com>,
+        <virtualization@lists.linux-foundation.org>, <x86@kernel.org>,
+        Mike Stunes <mstunes@vmware.com>
+Subject: [PATCH] Allow RDTSC and RDTSCP from userspace
+Date:   Fri, 24 Apr 2020 14:03:16 -0700
+Message-ID: <20200424210316.848878-1-mstunes@vmware.com>
+X-Mailer: git-send-email 2.26.1
+In-Reply-To: <20200319091407.1481-56-joro@8bytes.org>
+References: <20200319091407.1481-56-joro@8bytes.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200424172416.243870-1-pbonzini@redhat.com>
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+Received-SPF: None (EX13-EDG-OU-002.vmware.com: mstunes@vmware.com does not
+ designate permitted sender hosts)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Paolo,
+Hi Joerg,
 
-I've only received patches 1-9 for this series, could you resend? :)
+I needed to allow RDTSC(P) from userspace and in early boot in order to
+get userspace started properly. Patch below.
 
---
-Thanks,
-Oliver
+---
+SEV-ES guests will need to execute rdtsc and rdtscp from userspace and
+during early boot. Move the rdtsc(p) #VC handler into common code and
+extend the #VC handlers.
+
+Signed-off-by: Mike Stunes <mstunes@vmware.com>
+---
+ arch/x86/boot/compressed/sev-es.c |  4 ++++
+ arch/x86/kernel/sev-es-shared.c   | 23 +++++++++++++++++++++++
+ arch/x86/kernel/sev-es.c          | 25 ++-----------------------
+ 3 files changed, 29 insertions(+), 23 deletions(-)
+
+diff --git a/arch/x86/boot/compressed/sev-es.c b/arch/x86/boot/compressed/sev-es.c
+index 53c65fc09341..1d0290cc46c1 100644
+--- a/arch/x86/boot/compressed/sev-es.c
++++ b/arch/x86/boot/compressed/sev-es.c
+@@ -158,6 +158,10 @@ void boot_vc_handler(struct pt_regs *regs, unsigned long exit_code)
+ 	case SVM_EXIT_CPUID:
+ 		result = vc_handle_cpuid(boot_ghcb, &ctxt);
+ 		break;
++	case SVM_EXIT_RDTSC:
++	case SVM_EXIT_RDTSCP:
++		result = vc_handle_rdtsc(boot_ghcb, &ctxt, exit_code);
++		break;
+ 	default:
+ 		result = ES_UNSUPPORTED;
+ 		break;
+diff --git a/arch/x86/kernel/sev-es-shared.c b/arch/x86/kernel/sev-es-shared.c
+index a632b8f041ec..373ced468659 100644
+--- a/arch/x86/kernel/sev-es-shared.c
++++ b/arch/x86/kernel/sev-es-shared.c
+@@ -442,3 +442,26 @@ static enum es_result vc_handle_cpuid(struct ghcb *ghcb,
+ 
+ 	return ES_OK;
+ }
++
++static enum es_result vc_handle_rdtsc(struct ghcb *ghcb,
++				      struct es_em_ctxt *ctxt,
++				      unsigned long exit_code)
++{
++	bool rdtscp = (exit_code == SVM_EXIT_RDTSCP);
++	enum es_result ret;
++
++	ret = sev_es_ghcb_hv_call(ghcb, ctxt, exit_code, 0, 0);
++	if (ret != ES_OK)
++		return ret;
++
++	if (!(ghcb_is_valid_rax(ghcb) && ghcb_is_valid_rdx(ghcb) &&
++	     (!rdtscp || ghcb_is_valid_rcx(ghcb))))
++		return ES_VMM_ERROR;
++
++	ctxt->regs->ax = ghcb->save.rax;
++	ctxt->regs->dx = ghcb->save.rdx;
++	if (rdtscp)
++		ctxt->regs->cx = ghcb->save.rcx;
++
++	return ES_OK;
++}
+diff --git a/arch/x86/kernel/sev-es.c b/arch/x86/kernel/sev-es.c
+index 409a7a2aa630..82199527d012 100644
+--- a/arch/x86/kernel/sev-es.c
++++ b/arch/x86/kernel/sev-es.c
+@@ -815,29 +815,6 @@ static enum es_result vc_handle_wbinvd(struct ghcb *ghcb,
+ 	return sev_es_ghcb_hv_call(ghcb, ctxt, SVM_EXIT_WBINVD, 0, 0);
+ }
+ 
+-static enum es_result vc_handle_rdtsc(struct ghcb *ghcb,
+-				      struct es_em_ctxt *ctxt,
+-				      unsigned long exit_code)
+-{
+-	bool rdtscp = (exit_code == SVM_EXIT_RDTSCP);
+-	enum es_result ret;
+-
+-	ret = sev_es_ghcb_hv_call(ghcb, ctxt, exit_code, 0, 0);
+-	if (ret != ES_OK)
+-		return ret;
+-
+-	if (!(ghcb_is_valid_rax(ghcb) && ghcb_is_valid_rdx(ghcb) &&
+-	     (!rdtscp || ghcb_is_valid_rcx(ghcb))))
+-		return ES_VMM_ERROR;
+-
+-	ctxt->regs->ax = ghcb->save.rax;
+-	ctxt->regs->dx = ghcb->save.rdx;
+-	if (rdtscp)
+-		ctxt->regs->cx = ghcb->save.rcx;
+-
+-	return ES_OK;
+-}
+-
+ static enum es_result vc_handle_rdpmc(struct ghcb *ghcb, struct es_em_ctxt *ctxt)
+ {
+ 	enum es_result ret;
+@@ -1001,6 +978,8 @@ static enum es_result vc_context_filter(struct pt_regs *regs, long exit_code)
+ 		/* List of #VC exit-codes we support in user-space */
+ 		case SVM_EXIT_EXCP_BASE ... SVM_EXIT_LAST_EXCP:
+ 		case SVM_EXIT_CPUID:
++		case SVM_EXIT_RDTSC:
++		case SVM_EXIT_RDTSCP:
+ 			r = ES_OK;
+ 			break;
+ 		default:
+-- 
+2.26.1
+
