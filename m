@@ -2,403 +2,183 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4A6321B6D8B
-	for <lists+kvm@lfdr.de>; Fri, 24 Apr 2020 07:52:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6A19C1B6DC0
+	for <lists+kvm@lfdr.de>; Fri, 24 Apr 2020 08:02:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726651AbgDXFwf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Apr 2020 01:52:35 -0400
-Received: from mx2.suse.de ([195.135.220.15]:37108 "EHLO mx2.suse.de"
+        id S1726536AbgDXGCM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Apr 2020 02:02:12 -0400
+Received: from mga04.intel.com ([192.55.52.120]:42766 "EHLO mga04.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726646AbgDXFwd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Apr 2020 01:52:33 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx2.suse.de (Postfix) with ESMTP id E23BBAEB9;
-        Fri, 24 Apr 2020 05:52:29 +0000 (UTC)
-From:   Davidlohr Bueso <dave@stgolabs.net>
-To:     tglx@linutronix.de, pbonzini@redhat.com
-Cc:     peterz@infradead.org, maz@kernel.org, bigeasy@linutronix.de,
-        rostedt@goodmis.org, torvalds@linux-foundation.org,
-        will@kernel.org, joel@joelfernandes.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        dave@stgolabs.net, Paul Mackerras <paulus@ozlabs.org>,
-        kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org,
-        Davidlohr Bueso <dbueso@suse.de>
-Subject: [PATCH 5/5] kvm: Replace vcpu->swait with rcuwait
-Date:   Thu, 23 Apr 2020 22:48:37 -0700
-Message-Id: <20200424054837.5138-6-dave@stgolabs.net>
-X-Mailer: git-send-email 2.16.4
-In-Reply-To: <20200424054837.5138-1-dave@stgolabs.net>
-References: <20200424054837.5138-1-dave@stgolabs.net>
+        id S1725823AbgDXGCL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Apr 2020 02:02:11 -0400
+IronPort-SDR: s+WiYxF3NGmW7c+rUmwvUGlCIT4cRMHWnZoFU6HJ4BjoWPJFVn0T6fyA5k5hIx8sxKE2WILeWL
+ PM1TKMHxoACQ==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Apr 2020 23:02:09 -0700
+IronPort-SDR: C7M2/SnilvttMrj9jsA+S1N6fYgtIksfMU9Yuzg/EZtwuQLPqloNc6EfzjjFgYHDyqmibeBlel
+ pGb7/x5kfyiQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.73,310,1583222400"; 
+   d="scan'208";a="274494676"
+Received: from fmsmsx105.amr.corp.intel.com ([10.18.124.203])
+  by orsmga002.jf.intel.com with ESMTP; 23 Apr 2020 23:02:08 -0700
+Received: from fmsmsx116.amr.corp.intel.com (10.18.116.20) by
+ FMSMSX105.amr.corp.intel.com (10.18.124.203) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Thu, 23 Apr 2020 23:01:49 -0700
+Received: from shsmsx102.ccr.corp.intel.com (10.239.4.154) by
+ fmsmsx116.amr.corp.intel.com (10.18.116.20) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Thu, 23 Apr 2020 23:01:49 -0700
+Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.225]) by
+ shsmsx102.ccr.corp.intel.com ([169.254.2.138]) with mapi id 14.03.0439.000;
+ Fri, 24 Apr 2020 14:01:46 +0800
+From:   "Tian, Kevin" <kevin.tian@intel.com>
+To:     Peter Xu <peterx@redhat.com>
+CC:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        "Christopherson, Sean J" <sean.j.christopherson@intel.com>,
+        Christophe de Dinechin <dinechin@redhat.com>,
+        "Zhao, Yan Y" <yan.y.zhao@intel.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "Vitaly Kuznetsov" <vkuznets@redhat.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+Subject: RE: [PATCH v8 00/14] KVM: Dirty ring interface
+Thread-Topic: [PATCH v8 00/14] KVM: Dirty ring interface
+Thread-Index: AQHWB46fdukYwiMLhk2Q+RCi75MUMqiFGPaAgAFC4vCAABULgIABdJmw
+Date:   Fri, 24 Apr 2020 06:01:46 +0000
+Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D19D899D8D@SHSMSX104.ccr.corp.intel.com>
+References: <20200331190000.659614-1-peterx@redhat.com>
+ <20200422185155.GA3596@xz-x1>
+ <AADFC41AFE54684AB9EE6CBC0274A5D19D877A3B@SHSMSX104.ccr.corp.intel.com>
+ <20200423152253.GB3596@xz-x1>
+In-Reply-To: <20200423152253.GB3596@xz-x1>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The use of any sort of waitqueue (simple or regular) for
-wait/waking vcpus has always been an overkill and semantically
-wrong. Because this is per-vcpu (which is blocked) there is
-only ever a single waiting vcpu, thus no need for any sort of
-queue.
-
-As such, make use of the rcuwait primitive, with the following
-considerations:
-
-  - rcuwait already provides the proper barriers that serialize
-  concurrent waiter and waker.
-
-  - Task wakeup is done in rcu read critical region, with a
-  stable task pointer.
-
-  - Because there is no concurrency among waiters, we need
-  not worry about rcuwait_wait_event() calls corrupting
-  the wait->task. As a consequence, this saves the locking
-  done in swait when modifying the queue. This also applies
-  to per-vcore wait for powerpc kvm-hv.
-
-The x86 tscdeadline_latency test mentioned in 8577370fb0cb
-("KVM: Use simple waitqueue for vcpu->wq") shows that, on avg,
-latency is reduced by around 15-20% with this change.
-
-Cc: Paul Mackerras <paulus@ozlabs.org>
-Cc: kvmarm@lists.cs.columbia.edu
-Cc: linux-mips@vger.kernel.org
-Reviewed-by: Marc Zyngier <maz@kernel.org>
-Signed-off-by: Davidlohr Bueso <dbueso@suse.de>
----
- arch/mips/kvm/mips.c                  |  6 ++----
- arch/powerpc/include/asm/kvm_book3s.h |  2 +-
- arch/powerpc/include/asm/kvm_host.h   |  2 +-
- arch/powerpc/kvm/book3s_hv.c          | 22 ++++++++--------------
- arch/powerpc/kvm/powerpc.c            |  2 +-
- arch/x86/kvm/lapic.c                  |  2 +-
- include/linux/kvm_host.h              | 10 +++++-----
- virt/kvm/arm/arch_timer.c             |  3 ++-
- virt/kvm/arm/arm.c                    |  9 +++++----
- virt/kvm/async_pf.c                   |  3 +--
- virt/kvm/kvm_main.c                   | 19 +++++++++----------
- 11 files changed, 36 insertions(+), 44 deletions(-)
-
-diff --git a/arch/mips/kvm/mips.c b/arch/mips/kvm/mips.c
-index 8f05dd0a0f4e..fad6acce46e4 100644
---- a/arch/mips/kvm/mips.c
-+++ b/arch/mips/kvm/mips.c
-@@ -284,8 +284,7 @@ static enum hrtimer_restart kvm_mips_comparecount_wakeup(struct hrtimer *timer)
- 	kvm_mips_callbacks->queue_timer_int(vcpu);
- 
- 	vcpu->arch.wait = 0;
--	if (swq_has_sleeper(&vcpu->wq))
--		swake_up_one(&vcpu->wq);
-+	rcuwait_wake_up(&vcpu->wait);
- 
- 	return kvm_mips_count_timeout(vcpu);
- }
-@@ -511,8 +510,7 @@ int kvm_vcpu_ioctl_interrupt(struct kvm_vcpu *vcpu,
- 
- 	dvcpu->arch.wait = 0;
- 
--	if (swq_has_sleeper(&dvcpu->wq))
--		swake_up_one(&dvcpu->wq);
-+	rcuwait_wake_up(&dvcpu->wait);
- 
- 	return 0;
- }
-diff --git a/arch/powerpc/include/asm/kvm_book3s.h b/arch/powerpc/include/asm/kvm_book3s.h
-index 506e4df2d730..6e5d85ba588d 100644
---- a/arch/powerpc/include/asm/kvm_book3s.h
-+++ b/arch/powerpc/include/asm/kvm_book3s.h
-@@ -78,7 +78,7 @@ struct kvmppc_vcore {
- 	struct kvm_vcpu *runnable_threads[MAX_SMT_THREADS];
- 	struct list_head preempt_list;
- 	spinlock_t lock;
--	struct swait_queue_head wq;
-+	struct rcuwait wait;
- 	spinlock_t stoltb_lock;	/* protects stolen_tb and preempt_tb */
- 	u64 stolen_tb;
- 	u64 preempt_tb;
-diff --git a/arch/powerpc/include/asm/kvm_host.h b/arch/powerpc/include/asm/kvm_host.h
-index 1dc63101ffe1..337047ba4a56 100644
---- a/arch/powerpc/include/asm/kvm_host.h
-+++ b/arch/powerpc/include/asm/kvm_host.h
-@@ -751,7 +751,7 @@ struct kvm_vcpu_arch {
- 	u8 irq_pending; /* Used by XIVE to signal pending guest irqs */
- 	u32 last_inst;
- 
--	struct swait_queue_head *wqp;
-+	struct rcuwait *waitp;
- 	struct kvmppc_vcore *vcore;
- 	int ret;
- 	int trap;
-diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-index 93493f0cbfe8..b8d42f523ca7 100644
---- a/arch/powerpc/kvm/book3s_hv.c
-+++ b/arch/powerpc/kvm/book3s_hv.c
-@@ -230,13 +230,11 @@ static bool kvmppc_ipi_thread(int cpu)
- static void kvmppc_fast_vcpu_kick_hv(struct kvm_vcpu *vcpu)
- {
- 	int cpu;
--	struct swait_queue_head *wqp;
-+	struct rcuwait *wait;
- 
--	wqp = kvm_arch_vcpu_wq(vcpu);
--	if (swq_has_sleeper(wqp)) {
--		swake_up_one(wqp);
-+	wait = kvm_arch_vcpu_get_wait(vcpu);
-+	if (rcuwait_wake_up(wait))
- 		++vcpu->stat.halt_wakeup;
--	}
- 
- 	cpu = READ_ONCE(vcpu->arch.thread_cpu);
- 	if (cpu >= 0 && kvmppc_ipi_thread(cpu))
-@@ -2125,7 +2123,7 @@ static struct kvmppc_vcore *kvmppc_vcore_create(struct kvm *kvm, int id)
- 
- 	spin_lock_init(&vcore->lock);
- 	spin_lock_init(&vcore->stoltb_lock);
--	init_swait_queue_head(&vcore->wq);
-+	rcuwait_init(&vcore->wait);
- 	vcore->preempt_tb = TB_NIL;
- 	vcore->lpcr = kvm->arch.lpcr;
- 	vcore->first_vcpuid = id;
-@@ -3784,7 +3782,6 @@ static void kvmppc_vcore_blocked(struct kvmppc_vcore *vc)
- 	ktime_t cur, start_poll, start_wait;
- 	int do_sleep = 1;
- 	u64 block_ns;
--	DECLARE_SWAITQUEUE(wait);
- 
- 	/* Poll for pending exceptions and ceded state */
- 	cur = start_poll = ktime_get();
-@@ -3812,10 +3809,7 @@ static void kvmppc_vcore_blocked(struct kvmppc_vcore *vc)
- 		}
- 	}
- 
--	prepare_to_swait_exclusive(&vc->wq, &wait, TASK_INTERRUPTIBLE);
--
- 	if (kvmppc_vcore_check_block(vc)) {
--		finish_swait(&vc->wq, &wait);
- 		do_sleep = 0;
- 		/* If we polled, count this as a successful poll */
- 		if (vc->halt_poll_ns)
-@@ -3828,8 +3822,8 @@ static void kvmppc_vcore_blocked(struct kvmppc_vcore *vc)
- 	vc->vcore_state = VCORE_SLEEPING;
- 	trace_kvmppc_vcore_blocked(vc, 0);
- 	spin_unlock(&vc->lock);
--	schedule();
--	finish_swait(&vc->wq, &wait);
-+	rcuwait_wait_event(&vc->wait,
-+			   kvmppc_vcore_check_block(vc), TASK_INTERRUPTIBLE);
- 	spin_lock(&vc->lock);
- 	vc->vcore_state = VCORE_INACTIVE;
- 	trace_kvmppc_vcore_blocked(vc, 1);
-@@ -3940,7 +3934,7 @@ static int kvmppc_run_vcpu(struct kvm_run *kvm_run, struct kvm_vcpu *vcpu)
- 			kvmppc_start_thread(vcpu, vc);
- 			trace_kvm_guest_enter(vcpu);
- 		} else if (vc->vcore_state == VCORE_SLEEPING) {
--			swake_up_one(&vc->wq);
-+		        rcuwait_wake_up(&vc->wait);
- 		}
- 
- 	}
-@@ -4279,7 +4273,7 @@ static int kvmppc_vcpu_run_hv(struct kvm_run *run, struct kvm_vcpu *vcpu)
- 	}
- 	user_vrsave = mfspr(SPRN_VRSAVE);
- 
--	vcpu->arch.wqp = &vcpu->arch.vcore->wq;
-+	vcpu->arch.waitp = &vcpu->arch.vcore->wait;
- 	vcpu->arch.pgdir = kvm->mm->pgd;
- 	vcpu->arch.state = KVMPPC_VCPU_BUSY_IN_HOST;
- 
-diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
-index e15166b0a16d..4a074b587520 100644
---- a/arch/powerpc/kvm/powerpc.c
-+++ b/arch/powerpc/kvm/powerpc.c
-@@ -751,7 +751,7 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
- 	if (err)
- 		goto out_vcpu_uninit;
- 
--	vcpu->arch.wqp = &vcpu->wq;
-+	vcpu->arch.waitp = &vcpu->wait;
- 	kvmppc_create_vcpu_debugfs(vcpu, vcpu->vcpu_id);
- 	return 0;
- 
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index 9af25c97612a..54345dc645ba 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -1833,7 +1833,7 @@ void kvm_lapic_expired_hv_timer(struct kvm_vcpu *vcpu)
- 	/* If the preempt notifier has already run, it also called apic_timer_expired */
- 	if (!apic->lapic_timer.hv_timer_in_use)
- 		goto out;
--	WARN_ON(swait_active(&vcpu->wq));
-+	WARN_ON(rcuwait_active(&vcpu->wait));
- 	cancel_hv_timer(apic);
- 	apic_timer_expired(apic);
- 
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 6d58beb65454..fc34021546bd 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -23,7 +23,7 @@
- #include <linux/irqflags.h>
- #include <linux/context_tracking.h>
- #include <linux/irqbypass.h>
--#include <linux/swait.h>
-+#include <linux/rcuwait.h>
- #include <linux/refcount.h>
- #include <linux/nospec.h>
- #include <asm/signal.h>
-@@ -277,7 +277,7 @@ struct kvm_vcpu {
- 	struct mutex mutex;
- 	struct kvm_run *run;
- 
--	struct swait_queue_head wq;
-+	struct rcuwait wait;
- 	struct pid __rcu *pid;
- 	int sigset_active;
- 	sigset_t sigset;
-@@ -956,12 +956,12 @@ static inline bool kvm_arch_has_assigned_device(struct kvm *kvm)
- }
- #endif
- 
--static inline struct swait_queue_head *kvm_arch_vcpu_wq(struct kvm_vcpu *vcpu)
-+static inline struct rcuwait *kvm_arch_vcpu_get_wait(struct kvm_vcpu *vcpu)
- {
- #ifdef __KVM_HAVE_ARCH_WQP
--	return vcpu->arch.wqp;
-+	return vcpu->arch.waitp;
- #else
--	return &vcpu->wq;
-+	return &vcpu->wait;
- #endif
- }
- 
-diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
-index 93bd59b46848..d5024416e722 100644
---- a/virt/kvm/arm/arch_timer.c
-+++ b/virt/kvm/arm/arch_timer.c
-@@ -571,6 +571,7 @@ void kvm_timer_vcpu_put(struct kvm_vcpu *vcpu)
- {
- 	struct arch_timer_cpu *timer = vcpu_timer(vcpu);
- 	struct timer_map map;
-+	struct rcuwait *wait = kvm_arch_vcpu_get_wait(vcpu);
- 
- 	if (unlikely(!timer->enabled))
- 		return;
-@@ -593,7 +594,7 @@ void kvm_timer_vcpu_put(struct kvm_vcpu *vcpu)
- 	if (map.emul_ptimer)
- 		soft_timer_cancel(&map.emul_ptimer->hrtimer);
- 
--	if (swait_active(kvm_arch_vcpu_wq(vcpu)))
-+	if (rcuwait_active(wait))
- 		kvm_timer_blocking(vcpu);
- 
- 	/*
-diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-index 48d0ec44ad77..479f36d02418 100644
---- a/virt/kvm/arm/arm.c
-+++ b/virt/kvm/arm/arm.c
-@@ -579,16 +579,17 @@ void kvm_arm_resume_guest(struct kvm *kvm)
- 
- 	kvm_for_each_vcpu(i, vcpu, kvm) {
- 		vcpu->arch.pause = false;
--		swake_up_one(kvm_arch_vcpu_wq(vcpu));
-+		rcuwait_wake_up(kvm_arch_vcpu_get_wait(vcpu));
- 	}
- }
- 
- static void vcpu_req_sleep(struct kvm_vcpu *vcpu)
- {
--	struct swait_queue_head *wq = kvm_arch_vcpu_wq(vcpu);
-+	struct rcuwait *wait = kvm_arch_vcpu_get_wait(vcpu);
- 
--	swait_event_interruptible_exclusive(*wq, ((!vcpu->arch.power_off) &&
--				       (!vcpu->arch.pause)));
-+	rcuwait_wait_event(wait,
-+			   (!vcpu->arch.power_off) &&(!vcpu->arch.pause),
-+			   TASK_INTERRUPTIBLE);
- 
- 	if (vcpu->arch.power_off || vcpu->arch.pause) {
- 		/* Awaken to handle a signal, request we sleep again later. */
-diff --git a/virt/kvm/async_pf.c b/virt/kvm/async_pf.c
-index 15e5b037f92d..10b533f641a6 100644
---- a/virt/kvm/async_pf.c
-+++ b/virt/kvm/async_pf.c
-@@ -80,8 +80,7 @@ static void async_pf_execute(struct work_struct *work)
- 
- 	trace_kvm_async_pf_completed(addr, cr2_or_gpa);
- 
--	if (swq_has_sleeper(&vcpu->wq))
--		swake_up_one(&vcpu->wq);
-+	rcuwait_wake_up(&vcpu->wait);
- 
- 	mmput(mm);
- 	kvm_put_kvm(vcpu->kvm);
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 74bdb7bf3295..f027ae3598e8 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -341,7 +341,7 @@ static void kvm_vcpu_init(struct kvm_vcpu *vcpu, struct kvm *kvm, unsigned id)
- 	vcpu->kvm = kvm;
- 	vcpu->vcpu_id = id;
- 	vcpu->pid = NULL;
--	init_swait_queue_head(&vcpu->wq);
-+	rcuwait_init(&vcpu->wait);
- 	kvm_async_pf_vcpu_init(vcpu);
- 
- 	vcpu->pre_pcpu = -1;
-@@ -2671,7 +2671,6 @@ static int kvm_vcpu_check_block(struct kvm_vcpu *vcpu)
- void kvm_vcpu_block(struct kvm_vcpu *vcpu)
- {
- 	ktime_t start, cur;
--	DECLARE_SWAITQUEUE(wait);
- 	bool waited = false;
- 	u64 block_ns;
- 
-@@ -2697,8 +2696,9 @@ void kvm_vcpu_block(struct kvm_vcpu *vcpu)
- 		} while (single_task_running() && ktime_before(cur, stop));
- 	}
- 
-+	prepare_to_rcuwait(&vcpu->wait);
- 	for (;;) {
--		prepare_to_swait_exclusive(&vcpu->wq, &wait, TASK_INTERRUPTIBLE);
-+		set_current_state(TASK_INTERRUPTIBLE);
- 
- 		if (kvm_vcpu_check_block(vcpu) < 0)
- 			break;
-@@ -2706,8 +2706,7 @@ void kvm_vcpu_block(struct kvm_vcpu *vcpu)
- 		waited = true;
- 		schedule();
- 	}
--
--	finish_swait(&vcpu->wq, &wait);
-+	finish_rcuwait(&vcpu->wait);
- 	cur = ktime_get();
- out:
- 	kvm_arch_vcpu_unblocking(vcpu);
-@@ -2738,11 +2737,10 @@ EXPORT_SYMBOL_GPL(kvm_vcpu_block);
- 
- bool kvm_vcpu_wake_up(struct kvm_vcpu *vcpu)
- {
--	struct swait_queue_head *wqp;
-+	struct rcuwait *wait;
- 
--	wqp = kvm_arch_vcpu_wq(vcpu);
--	if (swq_has_sleeper(wqp)) {
--		swake_up_one(wqp);
-+	wait = kvm_arch_vcpu_get_wait(vcpu);
-+	if (rcuwait_wake_up(wait)) {
- 		WRITE_ONCE(vcpu->ready, true);
- 		++vcpu->stat.halt_wakeup;
- 		return true;
-@@ -2884,7 +2882,8 @@ void kvm_vcpu_on_spin(struct kvm_vcpu *me, bool yield_to_kernel_mode)
- 				continue;
- 			if (vcpu == me)
- 				continue;
--			if (swait_active(&vcpu->wq) && !vcpu_dy_runnable(vcpu))
-+			if (rcuwait_active(&vcpu->wait) &&
-+			    !vcpu_dy_runnable(vcpu))
- 				continue;
- 			if (READ_ONCE(vcpu->preempted) && yield_to_kernel_mode &&
- 				!kvm_arch_vcpu_in_kernel(vcpu))
--- 
-2.16.4
-
+PiBGcm9tOiBQZXRlciBYdSA8cGV0ZXJ4QHJlZGhhdC5jb20+DQo+IFNlbnQ6IFRodXJzZGF5LCBB
+cHJpbCAyMywgMjAyMCAxMToyMyBQTQ0KPiANCj4gT24gVGh1LCBBcHIgMjMsIDIwMjAgYXQgMDY6
+Mjg6NDNBTSArMDAwMCwgVGlhbiwgS2V2aW4gd3JvdGU6DQo+ID4gPiBGcm9tOiBQZXRlciBYdSA8
+cGV0ZXJ4QHJlZGhhdC5jb20+DQo+ID4gPiBTZW50OiBUaHVyc2RheSwgQXByaWwgMjMsIDIwMjAg
+Mjo1MiBBTQ0KPiA+ID4NCj4gPiA+IEhpLA0KPiA+ID4NCj4gPiA+IFRMO0RSOiBJJ20gdGhpbmtp
+bmcgd2hldGhlciB3ZSBzaG91bGQgcmVjb3JkIHB1cmUgR1BBL0dGTiBpbnN0ZWFkIG9mDQo+ID4g
+PiAoc2xvdF9pZCwNCj4gPiA+IHNsb3Rfb2Zmc2V0KSB0dXBsZSBmb3IgZGlydHkgcGFnZXMgaW4g
+a3ZtIGRpcnR5IHJpbmcgdG8gdW5iaW5kDQo+IGt2bV9kaXJ0eV9nZm4NCj4gPiA+IHdpdGggbWVt
+c2xvdHMuDQo+ID4gPg0KPiA+ID4gKEEgc2xpZ2h0bHkgbG9uZ2VyIHZlcnNpb24gc3RhcnRzLi4u
+KQ0KPiA+ID4NCj4gPiA+IFRoZSBwcm9ibGVtIGlzIHRoYXQgYmluZGluZyBkaXJ0eSB0cmFja2lu
+ZyBvcGVyYXRpb25zIHRvIEtWTSBtZW1zbG90cyBpcw0KPiBhDQo+ID4gPiByZXN0cmljdGlvbiB0
+aGF0IG5lZWRzIHN5bmNocm9uaXphdGlvbiB0byBtZW1zbG90IGNoYW5nZXMsIHdoaWNoIGZ1cnRo
+ZXINCj4gPiA+IG5lZWRzDQo+ID4gPiBzeW5jaHJvbml6YXRpb24gYWNyb3NzIGFsbCB0aGUgdmNw
+dXMgYmVjYXVzZSB0aGV5J3JlIHRoZSBjb25zdW1lcnMgb2YNCj4gPiA+IG1lbXNsb3RzLg0KPiA+
+ID4gRS5nLiwgd2hlbiB3ZSByZW1vdmUgYSBtZW1vcnkgc2xvdCwgd2UgbmVlZCB0byBmbHVzaCBh
+bGwgdGhlIGRpcnR5IGJpdHMNCj4gPiA+IGNvcnJlY3RseSBiZWZvcmUgd2UgZG8gdGhlIHJlbW92
+YWwgb2YgdGhlIG1lbXNsb3QuICBUaGF0J3MgYWN0dWFsbHkgYW4NCj4gPiA+IGtub3duDQo+ID4g
+PiBkZWZlY3QgZm9yIFFFTVUvS1ZNIFsxXSAoSSBiZXQgaXQgY291bGQgYmUgYSBkZWZlY3QgZm9y
+IG1hbnkgb3RoZXINCj4gPiA+IGh5cGVydmlzb3JzLi4uKSByaWdodCBub3cgd2l0aCBjdXJyZW50
+IGRpcnR5IGxvZ2dpbmcuICBNZWFud2hpbGUsIGV2ZW4gaWYNCj4gd2UNCj4gPiA+IGZpeCBpdCwg
+dGhhdCBwcm9jZWR1cmUgaXMgbm90IHNjYWxlIGF0IGFsbCwgYW5kIGVycm9yIHByb25lIHRvIGRl
+YWQgbG9ja3MuDQo+ID4gPg0KPiA+ID4gSGVyZSBtZW1vcnkgcmVtb3ZhbCBpcyByZWFsbHkgYW4g
+KHN0aWxsIGNvcm5lci1jYXNlZCBidXQgcmVsYXRpdmVseSkNCj4gaW1wb3J0YW50DQo+ID4gPiBz
+Y2VuYXJpbyB0byB0aGluayBhYm91dCBmb3IgZGlydHkgbG9nZ2luZyBjb21wYXJpbmcgdG8gbWVt
+b3J5IGFkZGl0aW9ucw0KPiAmDQo+ID4gPiBtb3ZpbmdzLiAgQmVjYXVzZSBtZW1vcnkgYWRkaXRp
+b24gd2lsbCBhbHdheXMgaGF2ZSBubyBpbml0aWFsIGRpcnR5IHBhZ2UsDQo+ID4gPiBhbmQNCj4g
+PiA+IHdlIGRvbid0IHJlYWxseSBtb3ZlIFJBTSBhIGxvdCAob3IgZG8gd2UgZXZlcj8hKSBmb3Ig
+YSBnZW5lcmFsIFZNIHVzZQ0KPiBjYXNlLg0KPiA+ID4NCj4gPiA+IFRoZW4gSSB3ZW50IGEgc3Rl
+cCBiYWNrIHRvIHRoaW5rIGFib3V0IHdoeSB3ZSBuZWVkIHRoZXNlIGRpcnR5IGJpdA0KPiA+ID4g
+aW5mb3JtYXRpb24NCj4gPiA+IGFmdGVyIGFsbCBpZiB0aGUgbWVtc2xvdCBpcyBnb2luZyB0byBi
+ZSByZW1vdmVkPw0KPiA+ID4NCj4gPiA+IFRoZXJlJ3JlIHR3byBjYXNlczoNCj4gPiA+DQo+ID4g
+PiAgIC0gV2hlbiB0aGUgbWVtc2xvdCBpcyBnb2luZyB0byBiZSByZW1vdmVkIGZvcmV2ZXIsIHRo
+ZW4gdGhlIGRpcnR5DQo+ID4gPiBpbmZvcm1hdGlvbg0KPiA+ID4gICAgIGlzIGluZGVlZCBtZWFu
+aW5nbGVzcyBhbmQgY2FuIGJlIGRyb3BwZWQsIGFuZCwNCj4gPiA+DQo+ID4gPiAgIC0gV2hlbiB0
+aGUgbWVtc2xvdCBpcyBnb2luZyB0byBiZSByZW1vdmVkIGJ1dCBxdWlja2x5IGFkZGVkIGJhY2sg
+d2l0aA0KPiA+ID4gY2hhbmdlZA0KPiA+ID4gICAgIHNpemUsIHRoZW4gd2UgbmVlZCB0byBrZWVw
+IHRob3NlIGRpcnR5IGJpdHMgYmVjYXVzZSBpdCdzIGp1c3QgYSBjb21tbW9uDQo+ID4gPiB3YXkN
+Cj4gPiA+ICAgICB0byBlLmcuIHB1bmNoIGFuIE1NSU8gaG9sZSBpbiBhbiBleGlzdGluZyBSQU0g
+cmVnaW9uIChoZXJlIEknZCBjb25mZXNzDQo+IEkNCj4gPiA+ICAgICBmZWVsIGxpa2UgdXNpbmcg
+InNsb3RfaWQiIHRvIGlkZW50aWZ5IG1lbXNsb3QgaXMgcmVhbGx5IHVuZnJpZW5kbHkgc3lzY2Fs
+bA0KPiA+ID4gICAgIGRlc2lnbiBmb3IgdGhpbmdzIGxpa2UgImhvbGUgcHVuY2hpbmdzIiBpbiB0
+aGUgUkFNIGFkZHJlc3Mgc3BhY2UuLi4NCj4gPiA+ICAgICBIb3dldmVyIHN1Y2ggInB1bmNoIGhv
+bGQiIG9wZXJhdGlvbiBpcyByZWFsbHkgbmVlZGVkIGV2ZW4gZm9yIGENCj4gY29tbW9uDQo+ID4g
+PiAgICAgZ3Vlc3QgZm9yIGVpdGhlciBzeXN0ZW0gcmVib290cyBvciBkZXZpY2UgaG90cGx1Z3Ms
+IGV0Yy4pLg0KPiA+DQo+ID4gd2h5IHdvdWxkIGRldmljZSBob3RwbHVnIHB1bmNoIGEgaG9sZSBp
+biBhbiBleGlzdGluZyBSQU0gcmVnaW9uPw0KPiANCj4gSSB0aG91Z2h0IGl0IGNvdWxkIGhhcHBl
+biBiZWNhdXNlIEkgdXNlZCB0byB0cmFjZSB0aGUgS1ZNIGlvY3RscyBhbmQgc2VlIHRoZQ0KPiBt
+ZW1zbG90IGNoYW5nZXMgZHVyaW5nIGRyaXZlciBsb2FkaW5nLiAgQnV0IGxhdGVyIHdoZW4gSSB0
+cmllZCB0byBob3RwbHVnIGENCg0KSXMgdGhlcmUgbW9yZSBkZXRhaWwgd2h5IGRyaXZlciBsb2Fk
+aW5nIG1heSBsZWFkIHRvIG1lbXNsb3QgY2hhbmdlcz8NCg0KPiBkZXZpY2UgSSBkbyBzZWUgdGhh
+dCBpdCB3b24ndC4uLiAgVGhlIG5ldyBNTUlPIHJlZ2lvbnMgYXJlIGFkZGVkIG9ubHkgaW50bw0K
+PiAweGZlMDAwMDAwIGZvciBhIHZpcnRpby1uZXQ6DQo+IA0KPiAgIDAwMDAwMDAwZmUwMDAwMDAt
+MDAwMDAwMDBmZTAwMGZmZiAocHJpbyAwLCBpL28pOiB2aXJ0aW8tcGNpLWNvbW1vbg0KPiAgIDAw
+MDAwMDAwZmUwMDEwMDAtMDAwMDAwMDBmZTAwMWZmZiAocHJpbyAwLCBpL28pOiB2aXJ0aW8tcGNp
+LWlzcg0KPiAgIDAwMDAwMDAwZmUwMDIwMDAtMDAwMDAwMDBmZTAwMmZmZiAocHJpbyAwLCBpL28p
+OiB2aXJ0aW8tcGNpLWRldmljZQ0KPiAgIDAwMDAwMDAwZmUwMDMwMDAtMDAwMDAwMDBmZTAwM2Zm
+ZiAocHJpbyAwLCBpL28pOiB2aXJ0aW8tcGNpLW5vdGlmeQ0KPiAgIDAwMDAwMDAwZmU4NDAwMDAt
+MDAwMDAwMDBmZTg0MDAyZiAocHJpbyAwLCBpL28pOiBtc2l4LXRhYmxlDQo+ICAgMDAwMDAwMDBm
+ZTg0MDgwMC0wMDAwMDAwMGZlODQwODA3IChwcmlvIDAsIGkvbyk6IG1zaXgtcGJhDQo+IA0KPiBE
+b2VzIGl0IG1lYW4gdGhhdCBkZXZpY2UgcGx1Z2dpbmcgaXMgZ3VhcmFudGVlZCB0byBub3QgdHJp
+Z2dlciBSQU0gY2hhbmdlcz8NCg0KSSdkIHRoaW5rIHNvLiBPdGhlcndpc2UgZnJvbSBndWVzdCBw
+Lm8udiBhbnkgZGV2aWNlIGhvdHBsdWcgaW1wbGllcyBkb2luZw0KYSBtZW1vcnkgaG90LXVucGx1
+ZyBmaXJzdCB0aGVuIGl0J3MgYSBiYWQgZGVzaWduLg0KDQo+IEkNCj4gYW0gcmVhbGx5IGN1cmlv
+dXMgYWJvdXQgd2hhdCBjYXNlcyB3ZSBuZWVkIHRvIGNvbnNpZGVyIGluIHdoaWNoIHdlIG5lZWQg
+dG8NCj4ga2VlcA0KPiB0aGUgZGlydHkgYml0cyBmb3IgYSBtZW1vcnkgcmVtb3ZhbCwgYW5kIGlm
+IHN5c3RlbSByZXNldCBpcyB0aGUgb25seSBjYXNlLCB0aGVuDQo+IGl0IGNvdWxkIGJlIGV2ZW4g
+ZWFzaWVyIChiZWNhdXNlIHdlIG1pZ2h0IGJlIGFibGUgdG8gYXZvaWQgdGhlIHN5bmMgaW4NCj4g
+bWVtb3J5DQo+IHJlbW92YWwgYnV0IGRvIHRoYXQgb25jZSBpbiBhIHN5cyByZXNldCBob29rKS4u
+Lg0KDQpQb3NzaWJseSBtZW1vcnkgaG90LXVucGx1ZywgYXMgYWxsb3dlZCBieSByZWNlbnQgdmly
+dGlvLW1lbT8gDQoNCmJ0dyBWRklPIGZhY2VzIGEgc2ltaWxhciBwcm9ibGVtIHdoZW4gdW5tYXBw
+aW5nIGEgRE1BIHJhbmdlIChlLmcuIHdoZW4NCnZJT01NVSBpcyBlbmFibGVkKSBpbiBkaXJ0eSBs
+b2cgcGhhc2UuIFRoZXJlIGNvdWxkIGJlIHNvbWUgZGlydHkgYml0cyB3aGljaCBhcmUNCm5vdCBy
+ZXRyaWV2ZWQgd2hlbiB1bm1hcHBpbmcgaGFwcGVucy4gVkZJTyBjaG9vc2VzIHRvIHJldHVybiB0
+aGUgZGlydHkNCmJpdHMgaW4gYSBidWZmZXIgcGFzc2VkIGluIHRoZSB1bm1hcHBpbmcgcGFyYW1l
+dGVycy4gQ2FuIG1lbXNsb3QgaW50ZXJmYWNlDQpkbyBzaW1pbGFyIHRoaW5nIGJ5IGFsbG93aW5n
+IHRoZSB1c2Vyc3BhY2UgdG8gc3BlY2lmeSBhIGJ1ZmZlciBwb2ludGVyIHRvIGhvbGQNCndoYXRl
+dmVyIGRpcnR5IHBhZ2VzIHJlY29yZGVkIGZvciB0aGUgc2xvdCB0aGF0IGlzIGJlaW5nIHJlbW92
+ZWQ/DQoNCj4gDQo+ID4NCj4gPiA+DQo+ID4gPiBUaGUgcmVhbCBzY2VuYXJpbyB3ZSB3YW50IHRv
+IGNvdmVyIGZvciBkaXJ0eSB0cmFja2luZyBpcyB0aGUgMm5kIG9uZS4NCj4gPiA+DQo+ID4gPiBJ
+ZiB3ZSBjYW4gdHJhY2sgZGlydHkgdXNpbmcgcmF3IEdQQSwgdGhlIDJuZCBzY2VuYXJpbyBpcyBz
+b2x2ZWQgaXRzZWxmLg0KPiA+ID4gQmVjYXVzZSB3ZSBrbm93IHdlJ2xsIGFkZCB0aG9zZSBtZW1z
+bG90cyBiYWNrICh0aG91Z2ggaXQgbWlnaHQgYmUgd2l0aA0KPiBhDQo+ID4gPiBkaWZmZXJlbnQg
+c2xvdCBJRCksIHRoZW4gdGhlIEdQQSB2YWx1ZSB3aWxsIHN0aWxsIG1ha2Ugc2Vuc2UsIHdoaWNo
+IG1lYW5zDQo+IHdlDQo+ID4gPiBzaG91bGQgYmUgYWJsZSB0byBhdm9pZCBhbnkga2luZCBvZiBz
+eW5jaHJvbml6YXRpb24gZm9yIHRoaW5ncyBsaWtlDQo+IG1lbW9yeQ0KPiA+ID4gcmVtb3ZhbHMs
+IGFzIGxvbmcgYXMgdGhlIHVzZXJzcGFjZSBpcyBhd2FyZSBvZiB0aGF0Lg0KPiA+DQo+ID4gQSBj
+dXJpb3VzIHF1ZXN0aW9uLiBXaGF0IGFib3V0IHRoZSBiYWNraW5nIHN0b3JhZ2Ugb2YgdGhlIGFm
+ZmVjdGVkIEdQQQ0KPiA+IGlzIGNoYW5nZWQgYWZ0ZXIgYWRkaW5nIGJhY2s/IElzIHJlY29yZGVk
+IGRpcnR5IGluZm8gZm9yIHByZXZpb3VzIGJhY2tpbmcNCj4gPiBzdG9yYWdlIHN0aWxsIG1ha2lu
+ZyBzZW5zZSBmb3IgdGhlIG5ld2VyIG9uZT8NCj4gDQo+IEl0J3MgdGhlIGNhc2Ugb2YgYSBwZXJt
+YW5lbnQgcmVtb3ZhbCwgcGx1cyBhbm90aGVyIGFkZGl0aW9uIGlpdWMuICBUaGVuIHRoZQ0KPiB3
+b3JzdCBjYXNlIGlzIHdlIGdldCBzb21lIGV4dHJhIGRpcnR5IGJpdHMgc2V0IG9uIHRoYXQgbmV3
+IG1lbW9yeSByZWdpb24sDQo+IGJ1dA0KPiBJTUhPIHRoYXQncyBiZW5pZ2ggKHdlJ2xsIG1pZ3Jh
+dGUgc29tZSBleHRyYSBwYWdlcyBldmVuIHRoZXkgY291bGQgYmUgemVybw0KPiBwYWdlcykuDQoN
+CnllcywgcmVwb3J0aW5nIG1vcmUgdGhhbiBuZWNlc3NhcnkgZGlydHkgYml0cyBkb2Vzbid0IGh1
+cnQuIA0KDQo+IA0KPiBUaGFua3MsDQo+IA0KPiA+DQo+ID4gVGhhbmtzDQo+ID4gS2V2aW4NCj4g
+Pg0KPiA+ID4NCj4gPiA+IFdpdGggdGhhdCwgd2hlbiB3ZSBmZXRjaCB0aGUgZGlydHkgYml0cywg
+d2UgbG9va3VwIHRoZSBtZW1zbG90DQo+IGR5bmFtaWNhbGx5LA0KPiA+ID4gZHJvcCBiaXRzIGlm
+IHRoZSBtZW1zbG90IGRvZXMgbm90IGV4aXN0IG9uIHRoYXQgYWRkcmVzcyAoZS5nLiwgcGVybWFu
+ZW50DQo+ID4gPiByZW1vdmFscyksIGFuZCB1c2Ugd2hhdGV2ZXIgbWVtc2xvdCBpcyB0aGVyZSBm
+b3IgdGhhdCBndWVzdCBwaHlzaWNhbA0KPiA+ID4gYWRkcmVzcy4NCj4gPiA+IFRob3VnaCB3ZSBm
+b3Igc3VyZSBzdGlsbCBuZWVkIHRvIGhhbmRsZSBtZW1vcnkgbW92ZSwgdGhhdCB0aGUNCj4gdXNl
+cnNwYWNlDQo+ID4gPiBuZWVkcw0KPiA+ID4gdG8gc3RpbGwgdGFrZSBjYXJlIG9mIGRpcnR5IGJp
+dCBmbHVzaGluZyBhbmQgc3luYyBmb3IgYSBtZW1vcnkgbW92ZSwNCj4gaG93ZXZlcg0KPiA+ID4g
+dGhhdCdzIG1lcmVseSBub3QgaGFwcGVuaW5nIHNvIG5vdGhpbmcgdG8gdGFrZSBjYXJlIGFib3V0
+IGVpdGhlci4NCj4gPiA+DQo+ID4gPiBEb2VzIHRoaXMgbWFrZXMgc2Vuc2U/ICBDb21tZW50cyBn
+cmVhdGx5IHdlbGNvbWVkLi4NCj4gPiA+DQo+ID4gPiBUaGFua3MsDQo+ID4gPg0KPiA+ID4gWzFd
+IGh0dHBzOi8vbGlzdHMuZ251Lm9yZy9hcmNoaXZlL2h0bWwvcWVtdS1kZXZlbC8yMDIwLQ0KPiAw
+My9tc2cwODM2MS5odG1sDQo+ID4gPg0KPiA+ID4gLS0NCj4gPiA+IFBldGVyIFh1DQo+ID4NCj4g
+DQo+IC0tDQo+IFBldGVyIFh1DQoNCg==
