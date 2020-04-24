@@ -2,19 +2,19 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 924A31B6D85
-	for <lists+kvm@lfdr.de>; Fri, 24 Apr 2020 07:52:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 74C141B6D87
+	for <lists+kvm@lfdr.de>; Fri, 24 Apr 2020 07:52:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726525AbgDXFwY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Apr 2020 01:52:24 -0400
-Received: from mx2.suse.de ([195.135.220.15]:37030 "EHLO mx2.suse.de"
+        id S1726601AbgDXFw2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Apr 2020 01:52:28 -0400
+Received: from mx2.suse.de ([195.135.220.15]:37056 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725554AbgDXFwX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Apr 2020 01:52:23 -0400
+        id S1726586AbgDXFw0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Apr 2020 01:52:26 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx2.suse.de (Postfix) with ESMTP id B2B15ADEB;
-        Fri, 24 Apr 2020 05:52:20 +0000 (UTC)
+        by mx2.suse.de (Postfix) with ESMTP id 69B48AEA8;
+        Fri, 24 Apr 2020 05:52:23 +0000 (UTC)
 From:   Davidlohr Bueso <dave@stgolabs.net>
 To:     tglx@linutronix.de, pbonzini@redhat.com
 Cc:     peterz@infradead.org, maz@kernel.org, bigeasy@linutronix.de,
@@ -22,9 +22,9 @@ Cc:     peterz@infradead.org, maz@kernel.org, bigeasy@linutronix.de,
         will@kernel.org, joel@joelfernandes.org,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         dave@stgolabs.net, Davidlohr Bueso <dbueso@suse.de>
-Subject: [PATCH 2/5] rcuwait: Let rcuwait_wake_up() return whether or not a task was awoken
-Date:   Thu, 23 Apr 2020 22:48:34 -0700
-Message-Id: <20200424054837.5138-3-dave@stgolabs.net>
+Subject: [PATCH 3/5] rcuwait: Introduce prepare_to and finish_rcuwait
+Date:   Thu, 23 Apr 2020 22:48:35 -0700
+Message-Id: <20200424054837.5138-4-dave@stgolabs.net>
 X-Mailer: git-send-email 2.16.4
 In-Reply-To: <20200424054837.5138-1-dave@stgolabs.net>
 References: <20200424054837.5138-1-dave@stgolabs.net>
@@ -33,56 +33,63 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Propagating the return value of wake_up_process() back to the caller
-can come in handy for future users, such as for statistics or
-accounting purposes.
+This allows further flexibility for some callers to implement
+ad-hoc versions of the generic rcuwait_wait_event(). For example,
+kvm will need this to maintain tracing semantics. The naming
+is of course similar to what waitqueue apis offer.
+
+Also go ahead and make use of rcu_assign_pointer() for both task
+writes as it will make the __rcu sparse people happy - this will
+be the special nil case, thus no added serialization.
 
 Acked-by: Peter Zijlstra (Intel) <peterz@infradead.org>
 Signed-off-by: Davidlohr Bueso <dbueso@suse.de>
 ---
- include/linux/rcuwait.h | 2 +-
- kernel/exit.c           | 7 +++++--
- 2 files changed, 6 insertions(+), 3 deletions(-)
+ include/linux/rcuwait.h | 21 ++++++++++++++++-----
+ 1 file changed, 16 insertions(+), 5 deletions(-)
 
 diff --git a/include/linux/rcuwait.h b/include/linux/rcuwait.h
-index 2ffe1ee6d482..6ebb23258a27 100644
+index 6ebb23258a27..45bc6604e9b1 100644
 --- a/include/linux/rcuwait.h
 +++ b/include/linux/rcuwait.h
-@@ -25,7 +25,7 @@ static inline void rcuwait_init(struct rcuwait *w)
- 	w->task = NULL;
- }
- 
--extern void rcuwait_wake_up(struct rcuwait *w);
-+extern int rcuwait_wake_up(struct rcuwait *w);
+@@ -29,12 +29,25 @@ extern int rcuwait_wake_up(struct rcuwait *w);
  
  /*
   * The caller is responsible for locking around rcuwait_wait_event(),
-diff --git a/kernel/exit.c b/kernel/exit.c
-index 9f9015f3f6b0..f3beb637acf7 100644
---- a/kernel/exit.c
-+++ b/kernel/exit.c
-@@ -227,8 +227,9 @@ void release_task(struct task_struct *p)
- 		goto repeat;
- }
- 
--void rcuwait_wake_up(struct rcuwait *w)
-+int rcuwait_wake_up(struct rcuwait *w)
- {
-+	int ret = 0;
- 	struct task_struct *task;
- 
- 	rcu_read_lock();
-@@ -248,8 +249,10 @@ void rcuwait_wake_up(struct rcuwait *w)
- 
- 	task = rcu_dereference(w->task);
- 	if (task)
--		wake_up_process(task);
-+		ret = wake_up_process(task);
- 	rcu_read_unlock();
+- * such that writes to @task are properly serialized.
++ * and [prepare_to/finish]_rcuwait() such that writes to @task are
++ * properly serialized.
+  */
 +
-+	return ret;
- }
- EXPORT_SYMBOL_GPL(rcuwait_wake_up);
++static inline void prepare_to_rcuwait(struct rcuwait *w)
++{
++	rcu_assign_pointer(w->task, current);
++}
++
++static inline void finish_rcuwait(struct rcuwait *w)
++{
++        rcu_assign_pointer(w->task, NULL);
++	__set_current_state(TASK_RUNNING);
++}
++
+ #define rcuwait_wait_event(w, condition, state)				\
+ ({									\
+ 	int __ret = 0;							\
+-	rcu_assign_pointer((w)->task, current);				\
++	prepare_to_rcuwait(w);						\
+ 	for (;;) {							\
+ 		/*							\
+ 		 * Implicit barrier (A) pairs with (B) in		\
+@@ -51,9 +64,7 @@ extern int rcuwait_wake_up(struct rcuwait *w);
+ 									\
+ 		schedule();						\
+ 	}								\
+-									\
+-	WRITE_ONCE((w)->task, NULL);					\
+-	__set_current_state(TASK_RUNNING);				\
++	finish_rcuwait(w);						\
+ 	__ret;								\
+ })
  
 -- 
 2.16.4
