@@ -2,144 +2,232 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3EA681B859E
-	for <lists+kvm@lfdr.de>; Sat, 25 Apr 2020 12:24:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8DB3C1B85AD
+	for <lists+kvm@lfdr.de>; Sat, 25 Apr 2020 12:29:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726088AbgDYKYf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 25 Apr 2020 06:24:35 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:41567 "EHLO
+        id S1726139AbgDYK3e (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 25 Apr 2020 06:29:34 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:44630 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726050AbgDYKYe (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sat, 25 Apr 2020 06:24:34 -0400
+        by vger.kernel.org with ESMTP id S1726050AbgDYK3d (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sat, 25 Apr 2020 06:29:33 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1587810273;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=AiiGjxMSfR/3HcuLZdv0rh/BGKXUkSP2JfWB96AlEV4=;
-        b=a2tIUsThwWFw0rZMldVXpgsPzgXDGunM1+dHF4kkccaABijYovhkOccigkMS/Z/w7bdB3L
-        GCakqIQMbXtnlGGuHkxUFTo8agdIukJbP2wcwX88C8Pgt+R38SM/57ewXFmziin5rLkOr1
-        suHoIomyeQzstcmUh+0yKcbKnM16rAc=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-29-C4DGlTI-MAasUuKSFw9AOQ-1; Sat, 25 Apr 2020 06:24:29 -0400
-X-MC-Unique: C4DGlTI-MAasUuKSFw9AOQ-1
-Received: by mail-wr1-f69.google.com with SMTP id d17so6457281wrr.17
-        for <kvm@vger.kernel.org>; Sat, 25 Apr 2020 03:24:29 -0700 (PDT)
+        s=mimecast20190719; t=1587810571;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:mime-version:mime-version:
+         content-type:content-type:  content-transfer-encoding:content-transfer-encoding;
+        bh=Wtc798SaiZRKd4xvI15KW6Lm5IMWQxOD5VKCV+R0GjA=;
+        b=cgChzG6wuAdhYTEG3uYGF0LwOCYRHmTths8rGoZjcyowg+pGAhGEeqMqxGJW2b3LbWrXN1
+        7PGZ9eCXio4VFXB64cpx+qEu0U8mdvXOg06zW7il8Za+gFCPXzrSbJeaSo/mEj5ebhphf5
+        LW2JrLLQypL58Dk6IJZAjYxLx0b0/R4=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-471-j4oRagRgP_-enPD-w-ciSQ-1; Sat, 25 Apr 2020 06:29:26 -0400
+X-MC-Unique: j4oRagRgP_-enPD-w-ciSQ-1
+Received: by mail-wr1-f72.google.com with SMTP id m5so6493131wru.15
+        for <kvm@vger.kernel.org>; Sat, 25 Apr 2020 03:29:26 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=AiiGjxMSfR/3HcuLZdv0rh/BGKXUkSP2JfWB96AlEV4=;
-        b=nGTqGn034W9/qfEHQ61XJ6NKh3CEpx9k0IvamJ1UHCgcYfdXC/LhTsVytNg7U0dvlc
-         rZr+nZYRCeBmkhGLR5CvwHLvZknrYRfLgeNc9R8Rkbh9OOle+6R/zy6XnIwhVPyWrt8L
-         5RuaGIC97aa57KBZVlvrQS56mq4q1Tlum/qcO/3lVFib/8Lk/0fCWK8ZeCLrCEWJwzja
-         akc4bZfrx6ed3Ewi+OQ0INa2fBpGNpE6EBLK/k47/o+RX4gGIEy/hCm1wvufkEazokZm
-         8/NgXdvg2oOwPnTdfSyl4gp8DbfIAE+yzWuX2e8AnvKxIJcGGoVJJ3MV6bmQPTwFlo8L
-         G0Tg==
-X-Gm-Message-State: AGi0PubJmzfvGsnAcLm72ury3Iu0hWCqFlApw+rDHjHMANvY3HdvPaVb
-        HmB0qXNR4XyNHitTJlMYj6aCNAX6QzPSA0TG4dxnDKy4cSxPIKYNcL5l+0uPo9WJYNLc1Pp8Cup
-        cdsPRIyOJaFIs
-X-Received: by 2002:a5d:5745:: with SMTP id q5mr17541300wrw.351.1587810268502;
-        Sat, 25 Apr 2020 03:24:28 -0700 (PDT)
-X-Google-Smtp-Source: APiQypJCsnbfHqFriQbI24TXuIAXrqXN8iqz6uh+Ag2xVYIfCBS/H8oNA4RK58IzO9hfko5vLHJ96Q==
-X-Received: by 2002:a5d:5745:: with SMTP id q5mr17541287wrw.351.1587810268284;
-        Sat, 25 Apr 2020 03:24:28 -0700 (PDT)
+        h=x-gm-message-state:to:from:reply-to:subject:message-id:date
+         :user-agent:mime-version:content-language:content-transfer-encoding;
+        bh=Wtc798SaiZRKd4xvI15KW6Lm5IMWQxOD5VKCV+R0GjA=;
+        b=Lxke5rJokHZ8KIEVoKnTx/0ABJXVP1c5P9LD0ywUgGNq4/XaOiBHJUq+BNMFNHSWGn
+         j0KhdwBYuDpO+pEAbZZJmrPRPj0K974Rmwc3UjIpE7hHBKonwTc4rAytKYoZe4Zp/8Nx
+         uEhLRtPsvTttx5EfsUnc2WX4v+pvmpHvzb/MU5YV/xD1R28tkne0RwLQ3deAjP/7PXFM
+         FJtIGJXkGccnMkzgM7pfsO3TnrCUkGYL/hzkvwlEcjTRv+fOec183fRurBa/H2yQGYOb
+         F5zjq1h+ii55K6S9eT5Vm3HRbYaWyNUi3uKnr0+1kw6hq7sCCuyBngU5hvmqk/T5EypE
+         bIsQ==
+X-Gm-Message-State: AGi0PuZYkhrXFHCWhHXLEueHlY1fZl6knJ6al7rozwooOVnvU/bpKSLv
+        oWntnpTEJdzvAHAXRII+fiRi+NXK4cjH6TMt5mBLdPNdRJivecZp8yxFOqS5hpGT6SxetSCszYT
+        j4C1dOE4vUYTX
+X-Received: by 2002:a5d:6b8a:: with SMTP id n10mr16036965wrx.36.1587810565330;
+        Sat, 25 Apr 2020 03:29:25 -0700 (PDT)
+X-Google-Smtp-Source: APiQypKrXXpKyRrBQw9KkMlM/i2jcGT9lAiH2FwZ8dFH+eCYZgK0PBopf1xo9ue/6znHXT3G3NYTtA==
+X-Received: by 2002:a5d:6b8a:: with SMTP id n10mr16036938wrx.36.1587810564943;
+        Sat, 25 Apr 2020 03:29:24 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:d0a0:f143:e9e4:2926? ([2001:b07:6468:f312:d0a0:f143:e9e4:2926])
-        by smtp.gmail.com with ESMTPSA id t17sm11580360wro.2.2020.04.25.03.24.26
+        by smtp.gmail.com with ESMTPSA id v1sm12516300wrv.19.2020.04.25.03.29.23
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 25 Apr 2020 03:24:27 -0700 (PDT)
-Subject: Re: [PATCH 5/5] kvm: Replace vcpu->swait with rcuwait
-To:     Davidlohr Bueso <dave@stgolabs.net>, tglx@linutronix.de
-Cc:     peterz@infradead.org, maz@kernel.org, bigeasy@linutronix.de,
-        rostedt@goodmis.org, torvalds@linux-foundation.org,
-        will@kernel.org, joel@joelfernandes.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Paul Mackerras <paulus@ozlabs.org>,
-        kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org,
-        Davidlohr Bueso <dbueso@suse.de>
-References: <20200424054837.5138-1-dave@stgolabs.net>
- <20200424054837.5138-6-dave@stgolabs.net>
+        Sat, 25 Apr 2020 03:29:24 -0700 (PDT)
+To:     qemu-devel <qemu-devel@nongnu.org>,
+        "libvir-list@redhat.com" <libvir-list@redhat.com>,
+        KVM list <kvm@vger.kernel.org>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <69af54bb-8632-fbf7-d774-da9a954ff1b7@redhat.com>
-Date:   Sat, 25 Apr 2020 12:24:25 +0200
+Reply-To: kvm-forum-2020-pc@redhat.com
+Subject: CFP: KVM Forum 2020
+Message-ID: <a1d960aa-c1a0-ff95-68a8-6e471028fe1e@redhat.com>
+Date:   Sat, 25 Apr 2020 12:29:22 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20200424054837.5138-6-dave@stgolabs.net>
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-I'm squashing this in to keep the changes compared to the current code minimal,
-and queuing the series.
+================================================================
+KVM Forum 2020: Call For Participation
+October 28-30, 2020 - Convention Centre Dublin - Dublin, Ireland
 
-Thanks,
+(All submissions must be received before June 15, 2020 at 23:59 PST)
+=================================================================
 
-Paolo
+KVM Forum is an annual event that presents a rare opportunity for
+developers and users to meet, discuss the state of Linux virtualization
+technology, and plan for the challenges ahead. This highly technical
+conference unites the developers who drive KVM development and the users
+who depend on KVM as part of their offerings, or to power their data
+centers and clouds.
 
-diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-index bbefa2a7f950..feca3118b17f 100644
---- a/arch/powerpc/kvm/book3s_hv.c
-+++ b/arch/powerpc/kvm/book3s_hv.c
-@@ -230,10 +230,10 @@ static bool kvmppc_ipi_thread(int cpu)
- static void kvmppc_fast_vcpu_kick_hv(struct kvm_vcpu *vcpu)
- {
- 	int cpu;
--	struct rcuwait *wait;
-+	struct rcuwait *waitp;
- 
--	wait = kvm_arch_vcpu_get_wait(vcpu);
--	if (rcuwait_wake_up(wait))
-+	waitp = kvm_arch_vcpu_get_wait(vcpu);
-+	if (rcuwait_wake_up(waitp))
- 		++vcpu->stat.halt_wakeup;
- 
- 	cpu = READ_ONCE(vcpu->arch.thread_cpu);
-@@ -3814,7 +3814,10 @@ static void kvmppc_vcore_blocked(struct kvmppc_vcore *vc)
- 		}
- 	}
- 
-+	prepare_to_rcuwait(&vc->wait);
-+	set_current_state(TASK_INTERRUPTIBLE);
- 	if (kvmppc_vcore_check_block(vc)) {
-+		finish_rcuwait(&vc->wait);
- 		do_sleep = 0;
- 		/* If we polled, count this as a successful poll */
- 		if (vc->halt_poll_ns)
-@@ -3827,8 +3830,8 @@ static void kvmppc_vcore_blocked(struct kvmppc_vcore *vc)
- 	vc->vcore_state = VCORE_SLEEPING;
- 	trace_kvmppc_vcore_blocked(vc, 0);
- 	spin_unlock(&vc->lock);
--	rcuwait_wait_event(&vc->wait,
--			   kvmppc_vcore_check_block(vc), TASK_INTERRUPTIBLE);
-+	schedule();
-+	finish_rcuwait(&vc->wait);
- 	spin_lock(&vc->lock);
- 	vc->vcore_state = VCORE_INACTIVE;
- 	trace_kvmppc_vcore_blocked(vc, 1);
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 7c2d18c12d87..c671de51a753 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -2737,10 +2737,10 @@ EXPORT_SYMBOL_GPL(kvm_vcpu_block);
- 
- bool kvm_vcpu_wake_up(struct kvm_vcpu *vcpu)
- {
--	struct rcuwait *wait;
-+	struct rcuwait *waitp;
- 
--	wait = kvm_arch_vcpu_get_wait(vcpu);
--	if (rcuwait_wake_up(wait)) {
-+	waitp = kvm_arch_vcpu_get_wait(vcpu);
-+	if (rcuwait_wake_up(waitp)) {
- 		WRITE_ONCE(vcpu->ready, true);
- 		++vcpu->stat.halt_wakeup;
- 		return true;
+Sessions include updates on the state of the KVM virtualization stack,
+planning for the future, and many opportunities for attendees to
+collaborate. After more than ten years in the mainline kernel, KVM
+continues to be a critical part of the FOSS cloud infrastructure. Come
+join us in continuing to improve the KVM ecosystem.
+
+We understand that these are uncertain times and we are continuously
+monitoring the COVID-19/Novel Coronavirus situation. Our attendees'
+safety is of the utmost importance. If we feel it is not safe to meet in
+person, we will turn the event into a virtual experience. We hope to
+announce this at the same time as the speaker notification. Speakers
+will still be expected to attend if a physical event goes ahead, but we
+understand that exceptional circumstances might arise after speakers are
+accepted and we will do our best to accommodate such circumstances.
+
+Based on these factors, we encourage you to submit and reach out to us
+should you have any questions. The program committee may be contacted as
+a group via email: kvm-forum-2020-pc@redhat.com.
+
+
+SUGGESTED TOPICS
+----------------
+
+* Scaling, latency optimizations, performance tuning
+* Hardening and security
+* New features
+* Testing
+
+KVM and the Linux Kernel:
+* Nested virtualization
+* Resource management (CPU, I/O, memory) and scheduling
+* VFIO: IOMMU, SR-IOV, virtual GPU, etc.
+* Networking: Open vSwitch, XDP, etc.
+* virtio and vhost
+* Architecture ports and new processor features
+
+QEMU:
+* Management interfaces: QOM and QMP
+* New devices, new boards, new architectures
+* New storage features
+* High availability, live migration and fault tolerance
+* Emulation and TCG
+* Firmware: ACPI, UEFI, coreboot, U-Boot, etc.
+
+Management & Infrastructure
+* Managing KVM: Libvirt, OpenStack, oVirt, KubeVirt, etc.
+* Storage: Ceph, Gluster, SPDK, etc.
+* Network Function Virtualization: DPDK, OPNFV, OVN, etc.
+* Provisioning
+
+
+SUBMITTING YOUR PROPOSAL
+------------------------
+
+Abstracts due: June 15, 2020
+
+Please submit a short abstract (~150 words) describing your presentation
+proposal. Slots vary in length up to 45 minutes.
+
+Submit your proposal here:
+https://events.linuxfoundation.org/kvm-forum/program/cfp/
+
+Please only use the categories "presentation" and "panel discussion"
+
+You will receive a notification whether or not your presentation
+proposal was accepted by August 17, 2020.
+
+Speakers will receive a complimentary pass for the event. In case your
+submission has multiple presenters, only the primary speaker for a
+proposal will receive a complimentary event pass. For panel discussions,
+all panelists will receive a complimentary event pass.
+
+
+TECHNICAL TALKS
+
+A good technical talk should not just report on what has happened over
+the last year; it should present a concrete problem and how it impacts
+the user and/or developer community. Whenever applicable, focus on work
+that needs to be done, difficulties that haven't yet been solved, and on
+decisions that other developers should be aware of. Summarizing recent
+developments is okay but it should not be more than a small portion of
+the overall talk.
+
+
+END-USER TALKS
+
+One of the big challenges as developers is to know what, where and how
+people actually use our software. We will reserve a few slots for end
+users talking about their deployment challenges and achievements.
+
+If you are using KVM in production you are encouraged submit a speaking
+proposal. Simply mark it as an end-user talk. As an end user, this is a
+unique opportunity to get your input to developers.
+
+
+PANEL DISCUSSIONS
+
+If you are proposing a panel discussion, please make sure that you list
+all of your potential panelists in your the abstract. We will request
+full biographies if a panel is accepted.
+
+
+HANDS-ON / BOF SESSIONS
+
+We will reserve some time for people to get together and discuss
+strategic decisions as well as other topics that are best solved within
+smaller groups.
+
+These sessions will be announced during the event. If you are interested
+in organizing such a session, please add it to the list at
+
+  http://www.linux-kvm.org/page/KVM_Forum_2020_BOF
+
+Let people you think who might be interested know about your BOF, and
+encourage them to add their names to the wiki page as well. Please add
+your ideas to the list before KVM Forum starts.
+
+
+HOTEL / TRAVEL
+--------------
+
+This year's event will take place at the Conference Center Dublin. For
+information on hotels close to the conference, please visit
+https://events.linuxfoundation.org/kvm-forum/attend/venue-travel/.
+Information on conference hotel blocks will be available later in
+Spring 2020.
+
+
+DATES TO REMEMBER
+-----------------
+
+* CFP Opens: Monday, April 27, 2020
+* CFP Closes: Monday, June 15 at 11:59 PM PST
+* CFP Notifications: Monday, August 17
+* Schedule Announcement: Thursday, August 20
+* Slide Due Date: Monday, October 26
+* Event Dates: Wednesday, October 28 – Friday, October 30
+
+
+
+Thank you for your interest in KVM. We're looking forward to your
+submissions and, if the conditions will permit it, to seeing you at the
+KVM Forum 2020 in October!
+
+-your KVM Forum 2020 Program Committee
+
+Please contact us with any questions or comments at
+kvm-forum-2020-pc@redhat.com
 
