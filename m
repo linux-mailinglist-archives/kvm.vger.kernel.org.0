@@ -2,108 +2,161 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 990601B8764
-	for <lists+kvm@lfdr.de>; Sat, 25 Apr 2020 17:32:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 337B41B879E
+	for <lists+kvm@lfdr.de>; Sat, 25 Apr 2020 18:05:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726135AbgDYPcI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 25 Apr 2020 11:32:08 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:38166 "EHLO
+        id S1726145AbgDYQFg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 25 Apr 2020 12:05:36 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:55150 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726062AbgDYPcI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 25 Apr 2020 11:32:08 -0400
+        with ESMTP id S1726076AbgDYQFg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 25 Apr 2020 12:05:36 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1587828727;
+        s=mimecast20190719; t=1587830733;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=BzRp1k5dc8WKlXfsFPGhR2nlnYOxZPdvqIx1ngvuQb8=;
-        b=h0Z2jXz9bWRc3Y40V+5WILpEPRXo2oooGg+MdZHviPGd5077e7yAvqEfzaWPDll+J1KYJ5
-        1l6qMw7ccCSe0b04MKuSns5bRUJIwXIPfNEdTOIC30dylskmXqYmSrwTR8eLu5YMNwxEq3
-        aXM23YXQB6eKgFHoU5DdGPuhd+QxNwk=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-499-yqLa5A5tOwWadgUdo_pzyw-1; Sat, 25 Apr 2020 11:32:03 -0400
-X-MC-Unique: yqLa5A5tOwWadgUdo_pzyw-1
-Received: by mail-wr1-f69.google.com with SMTP id f4so5435864wrp.14
-        for <kvm@vger.kernel.org>; Sat, 25 Apr 2020 08:32:02 -0700 (PDT)
+        bh=xrOeXcOZqBMJ5lhnZJFD0uuCM8TXUygNv7A1BN4CiBk=;
+        b=DKJoCL5vlVmJIfmBnEIShQ6mLc9XvTzR6SKKa22smTuXDgSQnV2cBaCL93Zsw4y7xs1/DS
+        e2ySnBRRRXKsP39Folxk7KPpm90tGkvYWGEmMSsazmbztmzYoQfRHCwhLO4G1z2EVfU8qW
+        9kXMLrOIbDTsHHGi0RkUd47U4Tn5WQU=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-322-gAB3E2Y4Pp2pEfdCWVJPSA-1; Sat, 25 Apr 2020 12:05:32 -0400
+X-MC-Unique: gAB3E2Y4Pp2pEfdCWVJPSA-1
+Received: by mail-wr1-f72.google.com with SMTP id a3so6937142wro.1
+        for <kvm@vger.kernel.org>; Sat, 25 Apr 2020 09:05:31 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=BzRp1k5dc8WKlXfsFPGhR2nlnYOxZPdvqIx1ngvuQb8=;
-        b=mvKhwxOsjI5j32x+Hm2CiUDmlMPefPzNZdJC4pBnBSct3q7akQuGB4ZohTLpMvJVqd
-         hAUuKeeWzgS3RhEDVlux6Xxqe46eKrb78HletllN8bTGwomSt6MT952o8yPc1YOvs7O9
-         97oIJs9n16FImB1WJb1/bdf4+jjYIL5d++5+xUMzZZI+JQMjXqG9gAkra/xX18AQqX2N
-         xGI6OoWJyCk3a5GL6uriUqgeSfvs6wC6ewbjwV90oZXZd0hb1LYo6H5hLhlA3CDbPBtJ
-         AxgMFcWQ8skNXtjfik1XUhBQ+BB0vvt/Ne7dCT93s3VHOkn+aiL/iwRXaT1tty/UMT1e
-         l5Og==
-X-Gm-Message-State: AGi0PuZ5BLotKz2fh3aKxgjeL75qhUQAUqr9d+ZeX7DyAn91K2LThtE2
-        XqbAG9pGxaGjvXC1ZOfy6TZBjTjpFR2+vR2gQM8UH59wzAzCLkjbqsnuBr0M7TMW1PZmTxBh9lv
-        xsjefwOWh9/vr
-X-Received: by 2002:a5d:4301:: with SMTP id h1mr18013779wrq.144.1587828721999;
-        Sat, 25 Apr 2020 08:32:01 -0700 (PDT)
-X-Google-Smtp-Source: APiQypKxxnDSm/VF3uk0PKMA3ZoLYy6mbz4JxZCdemvQx51TsVlUG0uJlpkeUpyPFw2DqwsfIQNYcQ==
-X-Received: by 2002:a5d:4301:: with SMTP id h1mr18013766wrq.144.1587828721754;
-        Sat, 25 Apr 2020 08:32:01 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:d0a0:f143:e9e4:2926? ([2001:b07:6468:f312:d0a0:f143:e9e4:2926])
-        by smtp.gmail.com with ESMTPSA id y40sm14033685wrd.20.2020.04.25.08.32.00
+        bh=xrOeXcOZqBMJ5lhnZJFD0uuCM8TXUygNv7A1BN4CiBk=;
+        b=sJxvvDTOzl4iPo0WXKS6ulGIimGiFID3Ow2ZuLX04gpFGm6N/y3QdWYfCiMgvbDMKl
+         bxULWhv+sy58hR6DeluxJtcG5YzT5LGUVe0pR+CJGkcRzA0yTADfvrgXt0UaLhp68Hla
+         OyEt43HVd9nIyzsnFC+jwgce32szrBqzdvNY4d5MtVJBfWcST53aIbbRCI/Xb+p8RJhi
+         Af7PSGdpHMoal3K5z50rOKjHZfqGVRBytN8z7KgseaLY/BNmRvJpxcpPF0UzhW7u6yUA
+         yYJU51vDTphvvql2ZzWJDaeA5IGacpzypGvM0HhyQAqYpRwHh5pinpc6G6CRBRG6RDRh
+         HArg==
+X-Gm-Message-State: AGi0PuaQEpeWB02qTC98nJF4sXbCXX+Btws/JBafd9/fPXdtfPfzGI/Y
+        kbyRgtINWS1XEQ8EeO/T2uws5j9zLdG3+y6Ymx+NE/F9iKR4w/YHjCWNqpfBQqkBs/Czdt+BARJ
+        SJ+Ulu7uy4Von
+X-Received: by 2002:a5d:6b8a:: with SMTP id n10mr17218843wrx.36.1587830729827;
+        Sat, 25 Apr 2020 09:05:29 -0700 (PDT)
+X-Google-Smtp-Source: APiQypLfb7IDIlJ1JC8QHKTgwWwjqVDic7ZRsRsH21HBmi+SnjB+9o/XXBreOEhEP/5q3L1PKRPDeg==
+X-Received: by 2002:a5d:6b8a:: with SMTP id n10mr17218823wrx.36.1587830729566;
+        Sat, 25 Apr 2020 09:05:29 -0700 (PDT)
+Received: from [192.168.10.150] ([93.56.170.5])
+        by smtp.gmail.com with ESMTPSA id v131sm7961138wmb.19.2020.04.25.09.05.28
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 25 Apr 2020 08:32:01 -0700 (PDT)
-Subject: Re: [PATCH v11 7/9] KVM: X86: Add userspace access interface for CET
- MSRs
-To:     Yang Weijiang <weijiang.yang@intel.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, sean.j.christopherson@intel.com,
-        jmattson@google.com
-Cc:     yu.c.zhang@linux.intel.com
-References: <20200326081847.5870-1-weijiang.yang@intel.com>
- <20200326081847.5870-8-weijiang.yang@intel.com>
+        Sat, 25 Apr 2020 09:05:28 -0700 (PDT)
+Subject: Re: [PATCH v1 00/15] Add support for Nitro Enclaves
+To:     Alexander Graf <graf@amazon.com>,
+        "Paraschiv, Andra-Irina" <andraprs@amazon.com>,
+        linux-kernel@vger.kernel.org
+Cc:     Anthony Liguori <aliguori@amazon.com>,
+        Benjamin Herrenschmidt <benh@amazon.com>,
+        Colm MacCarthaigh <colmmacc@amazon.com>,
+        Bjoern Doebel <doebel@amazon.de>,
+        David Woodhouse <dwmw@amazon.co.uk>,
+        Frank van der Linden <fllinden@amazon.com>,
+        Martin Pohlack <mpohlack@amazon.de>,
+        Matt Wilson <msw@amazon.com>, Balbir Singh <sblbir@amazon.com>,
+        Stewart Smith <trawets@amazon.com>,
+        Uwe Dannowski <uwed@amazon.de>, kvm@vger.kernel.org,
+        ne-devel-upstream@amazon.com
+References: <20200421184150.68011-1-andraprs@amazon.com>
+ <18406322-dc58-9b59-3f94-88e6b638fe65@redhat.com>
+ <ff65b1ed-a980-9ddc-ebae-996869e87308@amazon.com>
+ <2a4a15c5-7adb-c574-d558-7540b95e2139@redhat.com>
+ <1ee5958d-e13e-5175-faf7-a1074bd9846d@amazon.com>
+ <f560aed3-a241-acbd-6d3b-d0c831234235@redhat.com>
+ <80489572-72a1-dbe7-5306-60799711dae0@amazon.com>
+ <0467ce02-92f3-8456-2727-c4905c98c307@redhat.com>
+ <5f8de7da-9d5c-0115-04b5-9f08be0b34b0@amazon.com>
+ <095e3e9d-c9e5-61d0-cdfc-2bb099f02932@redhat.com>
+ <602565db-d9a6-149a-0e1a-fe9c14a90ce7@amazon.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <08457f11-f0ac-ff4b-80b7-e5380624eca0@redhat.com>
-Date:   Sat, 25 Apr 2020 17:31:59 +0200
+Message-ID: <fb0bfd95-4732-f3c6-4a59-7227cf50356c@redhat.com>
+Date:   Sat, 25 Apr 2020 18:05:27 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20200326081847.5870-8-weijiang.yang@intel.com>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <602565db-d9a6-149a-0e1a-fe9c14a90ce7@amazon.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 26/03/20 09:18, Yang Weijiang wrote:
-> There're two different places storing Guest CET states, states
-> managed with XSAVES/XRSTORS, as restored/saved
-> in previous patch, can be read/write directly from/to the MSRs.
-> For those stored in VMCS fields, they're access via vmcs_read/
-> vmcs_write.
+On 24/04/20 21:11, Alexander Graf wrote:
+> What I was saying above is that maybe code is easier to transfer that
+> than a .txt file that gets lost somewhere in the Documentation directory
+> :).
+
+whynotboth.jpg :D
+
+>>> To answer the question though, the target file is in a newly invented
+>>> file format called "EIF" and it needs to be loaded at offset 0x800000 of
+>>> the address space donated to the enclave.
+>>
+>> What is this EIF?
 > 
-> To correctly read/write the CET MSRs, it's necessary to check
-> whether the kernel FPU context switch happened and reload guest
-> FPU context if needed.
+> It's just a very dumb container format that has a trivial header, a
+> section with the bzImage and one to many sections of initramfs.
+> 
+> As mentioned earlier in this thread, it really is just "-kernel" and
+> "-initrd", packed into a single binary for transmission to the host.
 
-I have one question here, it may be just a misunderstanding.
+Okay, got it.  So, correct me if this is wrong, the information that is
+needed to boot the enclave is:
 
-As I understand it, the PLx_SSP MSRs are only used when the current
-privilege level changes; the processor has a hidden SSP register for the
-current privilege level, and the SSP can be accessed via VMCS only.
+* the kernel, in bzImage format
 
-These patches do not allow saving/restoring this hidden register.
-However, this should be necessary in order to migrate the virtual
-machine.  The simplest way to plumb this is through a KVM-specific MSR
-in arch/x86/include/uapi/asm/kvm_para.h.  This MSR should only be
-accessible to userspace, i.e. only if msr_info->host_initiated.
+* the initrd
 
-Testing CET in the state-test selftest is a bit hard because you have to
-set up S_CET and the shadow stack, but it would be great to have a
-separate test similar to tools/testing/selftests/x86_64/smm_test.  It's
-not an absolute requirement for merging, but if you can put it on your
-todo list it would be better.
+* a consecutive amount of memory, to be mapped with
+KVM_SET_USER_MEMORY_REGION
 
-Thanks,
+Off list, Alex and I discussed having a struct that points to kernel and
+initrd off enclave memory, and have the driver build EIF at the
+appropriate point in enclave memory (the 8 MiB ofset that you mentioned).
+
+This however has two disadvantages:
+
+1) having the kernel and initrd loaded by the parent VM in enclave
+memory has the advantage that you save memory outside the enclave memory
+for something that is only needed inside the enclave
+
+2) it is less extensible (what if you want to use PVH in the future for
+example) and puts in the driver policy that should be in userspace.
+
+
+So why not just start running the enclave at 0xfffffff0 in real mode?
+Yes everybody hates it, but that's what OSes are written against.  In
+the simplest example, the parent enclave can load bzImage and initrd at
+0x10000 and place firmware tables (MPTable and DMI) somewhere at
+0xf0000; the firmware would just be a few movs to segment registers
+followed by a long jmp.
+
+If you want to keep EIF, we measured in QEMU that there is no measurable
+difference between loading the kernel in the host and doing it in the
+guest, so Amazon could provide an EIF loader stub at 0xfffffff0 for
+backwards compatibility.
+
+>> Again, I cannot provide a sensible review without explaining how to use
+>> all this.  I understand that Amazon needs to do part of the design
+>> behind closed doors, but this seems to have the resulted in issues that
+>> reminds me of Intel's SGX misadventures. If Amazon has designed NE in a
+>> way that is incompatible with open standards, it's up to Amazon to fix
+> 
+> Oh, if there's anything that conflicts with open standards here, I would
+> love to hear it immediately. I do not believe in security by obscurity  :).
+
+That's great to hear!
 
 Paolo
 
