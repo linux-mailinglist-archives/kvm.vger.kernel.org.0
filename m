@@ -2,44 +2,44 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6B9AA1B8418
-	for <lists+kvm@lfdr.de>; Sat, 25 Apr 2020 09:03:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1372D1B8410
+	for <lists+kvm@lfdr.de>; Sat, 25 Apr 2020 09:02:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726147AbgDYHCD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 25 Apr 2020 03:02:03 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:21948 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726113AbgDYHCC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 25 Apr 2020 03:02:02 -0400
+        id S1726295AbgDYHCG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 25 Apr 2020 03:02:06 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:51009 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726188AbgDYHCF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 25 Apr 2020 03:02:05 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1587798121;
+        s=mimecast20190719; t=1587798124;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:in-reply-to:in-reply-to:references:references;
-        bh=tQ0DnedDERp8UnEgcFBdDKx3t9qOBvJdAkWOzvyaHK4=;
-        b=VneD+MYM0wsf45lLP43OBSdGaOStcQEKsYzl9VYIXjGSzVJjsuC0uMWv6IOmB+dUebdJ7B
-        fQjYekjQfk1oKx8jNrtIDEdrupkKMYBGHPiHV2uO380a0P1+ww8dTWSB+w7Hotqy8v4VpW
-        wvOuhVgMXdBty6cN8voXtMXP9ZAXIWM=
+        bh=Zhop02cboELmmyjJa4pTw5otGh2YRyzNp42T5e+hcbY=;
+        b=F32QWdSaIa4u31G8zsCSSHpy68Jn311I0mSQQFW7NGMzndASnRXk4f62syDZd+rqq832Yy
+        X6JsBXyK6qQHPb3gR5V0Mkk/nmR3s2ur2oHxMoKDLHmGv3caWRK43FvshQV9LMtojlyVKA
+        Q1oTI6i1eh7Ogc8Z7KX8Uizp5bw5bpk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-14-w35gB8JFPNqmo2pm04YuIw-1; Sat, 25 Apr 2020 03:01:59 -0400
-X-MC-Unique: w35gB8JFPNqmo2pm04YuIw-1
+ us-mta-249-L3qCV47DNH-5TfaqJEYYqA-1; Sat, 25 Apr 2020 03:01:59 -0400
+X-MC-Unique: L3qCV47DNH-5TfaqJEYYqA-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B882845F;
-        Sat, 25 Apr 2020 07:01:57 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8CED11005510;
+        Sat, 25 Apr 2020 07:01:58 +0000 (UTC)
 Received: from virtlab511.virt.lab.eng.bos.redhat.com (virtlab511.virt.lab.eng.bos.redhat.com [10.19.152.198])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 0CF125D9C5;
-        Sat, 25 Apr 2020 07:01:56 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D32835D9C5;
+        Sat, 25 Apr 2020 07:01:57 +0000 (UTC)
 From:   Paolo Bonzini <pbonzini@redhat.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     wei.huang2@amd.com, cavery@redhat.com, vkuznets@redhat.com,
         Sean Christopherson <sean.j.christopherson@intel.com>,
         Oliver Upton <oupton@google.com>,
         Jim Mattson <jmattson@google.com>
-Subject: [PATCH v2 12/22] KVM: nSVM: Move SMI vmexit handling to svm_check_nested_events()
-Date:   Sat, 25 Apr 2020 03:01:44 -0400
-Message-Id: <20200425070154.251290-3-pbonzini@redhat.com>
+Subject: [PATCH v2 13/22] KVM: VMX: Split out architectural interrupt/NMI blocking checks
+Date:   Sat, 25 Apr 2020 03:01:45 -0400
+Message-Id: <20200425070154.251290-4-pbonzini@redhat.com>
 In-Reply-To: <20200424172416.243870-1-pbonzini@redhat.com>
 References: <20200424172416.243870-1-pbonzini@redhat.com>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
@@ -48,92 +48,96 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Unlike VMX, SVM allows a hypervisor to take a SMI vmexit without having
-any special SMM-monitor enablement sequence.  Therefore, it has to be
-handled like interrupts and NMIs.  Check for an unblocked SMI in
-svm_check_nested_events() so that pending SMIs are correctly prioritized
-over IRQs and NMIs when the latter events will trigger VM-Exit.
+From: Sean Christopherson <sean.j.christopherson@intel.com>
 
-Note that there is no need to test explicitly for SMI vmexits, because
-guests always runs outside SMM and therefore can never get an SMI while
-they are blocked.
+Move the architectural (non-KVM specific) interrupt/NMI blocking checks
+to a separate helper so that they can be used in a future patch by
+vmx_check_nested_events().
 
+No functional change intended.
+
+Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+Message-Id: <20200423022550.15113-8-sean.j.christopherson@intel.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- arch/x86/kvm/svm/nested.c | 16 ++++++++++++++++
- arch/x86/kvm/svm/svm.c    |  8 --------
- arch/x86/kvm/svm/svm.h    |  5 +++++
- 3 files changed, 21 insertions(+), 8 deletions(-)
+ arch/x86/kvm/vmx/vmx.c | 35 ++++++++++++++++++++++-------------
+ arch/x86/kvm/vmx/vmx.h |  2 ++
+ 2 files changed, 24 insertions(+), 13 deletions(-)
 
-diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-index 748b01220aac..226d5a0d677b 100644
---- a/arch/x86/kvm/svm/nested.c
-+++ b/arch/x86/kvm/svm/nested.c
-@@ -776,6 +776,15 @@ int nested_svm_check_exception(struct vcpu_svm *svm, unsigned nr,
- 	return vmexit;
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 37b1986a4e8f..7fb7dcb3d94d 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -4511,21 +4511,35 @@ void vmx_set_nmi_mask(struct kvm_vcpu *vcpu, bool masked)
+ 	}
  }
  
-+static void nested_svm_smi(struct vcpu_svm *svm)
++bool vmx_nmi_blocked(struct kvm_vcpu *vcpu)
 +{
-+	svm->vmcb->control.exit_code = SVM_EXIT_SMI;
-+	svm->vmcb->control.exit_info_1 = 0;
-+	svm->vmcb->control.exit_info_2 = 0;
++	if (is_guest_mode(vcpu) && nested_exit_on_nmi(vcpu))
++		return false;
 +
-+	nested_svm_vmexit(svm);
++	if (!enable_vnmi && to_vmx(vcpu)->loaded_vmcs->soft_vnmi_blocked)
++		return true;
++
++	return (vmcs_read32(GUEST_INTERRUPTIBILITY_INFO) &
++		(GUEST_INTR_STATE_MOV_SS | GUEST_INTR_STATE_STI |
++		 GUEST_INTR_STATE_NMI));
 +}
 +
- static void nested_svm_nmi(struct vcpu_svm *svm)
+ static bool vmx_nmi_allowed(struct kvm_vcpu *vcpu)
  {
- 	svm->vmcb->control.exit_code = SVM_EXIT_NMI;
-@@ -807,6 +816,13 @@ static int svm_check_nested_events(struct kvm_vcpu *vcpu)
- 		kvm_event_needs_reinjection(vcpu) || svm->nested.exit_required ||
- 		svm->nested.nested_run_pending;
- 
-+	if (vcpu->arch.smi_pending && nested_exit_on_smi(svm)) {
-+		if (block_nested_events)
-+			return -EBUSY;
-+		nested_svm_smi(svm);
-+		return 0;
-+	}
-+
- 	if (vcpu->arch.nmi_pending && nested_exit_on_nmi(svm)) {
- 		if (block_nested_events)
- 			return -EBUSY;
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 3f1f80737f9e..1f9577b281e6 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -3766,14 +3766,6 @@ static bool svm_smi_allowed(struct kvm_vcpu *vcpu)
- 	if (!gif_set(svm))
+ 	if (to_vmx(vcpu)->nested.nested_run_pending)
  		return false;
  
--	if (is_guest_mode(&svm->vcpu) &&
--	    svm->nested.intercept & (1ULL << INTERCEPT_SMI)) {
--		/* TODO: Might need to set exit_info_1 and exit_info_2 here */
--		svm->vmcb->control.exit_code = SVM_EXIT_SMI;
--		svm->nested.exit_required = true;
--		return false;
--	}
--
- 	return !is_smm(vcpu);
- }
- 
-diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index d8ae654340d4..4dc6d2b4b721 100644
---- a/arch/x86/kvm/svm/svm.h
-+++ b/arch/x86/kvm/svm/svm.h
-@@ -378,6 +378,11 @@ static inline bool svm_nested_virtualize_tpr(struct kvm_vcpu *vcpu)
- 	return is_guest_mode(vcpu) && (vcpu->arch.hflags & HF_VINTR_MASK);
- }
- 
-+static inline bool nested_exit_on_smi(struct vcpu_svm *svm)
-+{
-+	return (svm->nested.intercept & (1ULL << INTERCEPT_SMI));
+-	if (is_guest_mode(vcpu) && nested_exit_on_nmi(vcpu))
+-		return true;
++	return !vmx_nmi_blocked(vcpu);
 +}
-+
- static inline bool nested_exit_on_nmi(struct vcpu_svm *svm)
- {
- 	return (svm->nested.intercept & (1ULL << INTERCEPT_NMI));
+ 
+-	if (!enable_vnmi &&
+-	    to_vmx(vcpu)->loaded_vmcs->soft_vnmi_blocked)
++bool vmx_interrupt_blocked(struct kvm_vcpu *vcpu)
++{
++	if (is_guest_mode(vcpu) && nested_exit_on_intr(vcpu))
+ 		return false;
+ 
+-	return	!(vmcs_read32(GUEST_INTERRUPTIBILITY_INFO) &
+-		  (GUEST_INTR_STATE_MOV_SS | GUEST_INTR_STATE_STI
+-		   | GUEST_INTR_STATE_NMI));
++	return !(vmcs_readl(GUEST_RFLAGS) & X86_EFLAGS_IF) ||
++	       (vmcs_read32(GUEST_INTERRUPTIBILITY_INFO) &
++		(GUEST_INTR_STATE_STI | GUEST_INTR_STATE_MOV_SS));
+ }
+ 
+ static bool vmx_interrupt_allowed(struct kvm_vcpu *vcpu)
+@@ -4533,12 +4547,7 @@ static bool vmx_interrupt_allowed(struct kvm_vcpu *vcpu)
+ 	if (to_vmx(vcpu)->nested.nested_run_pending)
+ 		return false;
+ 
+-	if (is_guest_mode(vcpu) && nested_exit_on_intr(vcpu))
+-		return true;
+-
+-	return (vmcs_readl(GUEST_RFLAGS) & X86_EFLAGS_IF) &&
+-		!(vmcs_read32(GUEST_INTERRUPTIBILITY_INFO) &
+-			(GUEST_INTR_STATE_STI | GUEST_INTR_STATE_MOV_SS));
++	return !vmx_interrupt_blocked(vcpu);
+ }
+ 
+ static int vmx_set_tss_addr(struct kvm *kvm, unsigned int addr)
+diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
+index edfb739e5907..b5e773267abe 100644
+--- a/arch/x86/kvm/vmx/vmx.h
++++ b/arch/x86/kvm/vmx/vmx.h
+@@ -344,6 +344,8 @@ void vmx_set_segment(struct kvm_vcpu *vcpu, struct kvm_segment *var, int seg);
+ u64 construct_eptp(struct kvm_vcpu *vcpu, unsigned long root_hpa);
+ void update_exception_bitmap(struct kvm_vcpu *vcpu);
+ void vmx_update_msr_bitmap(struct kvm_vcpu *vcpu);
++bool vmx_nmi_blocked(struct kvm_vcpu *vcpu);
++bool vmx_interrupt_blocked(struct kvm_vcpu *vcpu);
+ bool vmx_get_nmi_mask(struct kvm_vcpu *vcpu);
+ void vmx_set_nmi_mask(struct kvm_vcpu *vcpu, bool masked);
+ void vmx_set_virtual_apic_mode(struct kvm_vcpu *vcpu);
 -- 
 2.18.2
 
