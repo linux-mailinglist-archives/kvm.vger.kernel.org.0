@@ -2,45 +2,46 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 31EB41B86FF
-	for <lists+kvm@lfdr.de>; Sat, 25 Apr 2020 16:26:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D5DA21B872C
+	for <lists+kvm@lfdr.de>; Sat, 25 Apr 2020 16:52:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726125AbgDYO0B (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 25 Apr 2020 10:26:01 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:46050 "EHLO
+        id S1726128AbgDYOwe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 25 Apr 2020 10:52:34 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:36620 "EHLO
         aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726101AbgDYO0B (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 25 Apr 2020 10:26:01 -0400
+        with ESMTP id S1726087AbgDYOwe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 25 Apr 2020 10:52:34 -0400
 Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 03PEMuq9031187;
-        Sat, 25 Apr 2020 14:25:56 GMT
+        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 03PEmiQo075187;
+        Sat, 25 Apr 2020 14:52:24 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
  references : from : message-id : date : mime-version : in-reply-to :
  content-type : content-transfer-encoding; s=corp-2020-01-29;
- bh=09cauQ6AhJt/4gZtKxWRkuLDgm5fQOx5AAooS2mPOjc=;
- b=wBMDwiONRiqAlXUJoytvHLtBQcWR46hcAusk2ygp7AeP8iOEPvlvofIa7/fiyolZlC0l
- /XQRUMgIlSvX4otTtZxv2AM/vytVqC36s252mIcgzbtv+UfqD7/6RdIvHFwsEg54/VqB
- PkgTWLr/2BRwXOGfNUHoKtXkVcXFBy9vGHOkMM+d7Rvnz8IZLSCXF9hfvEjhtJZVBotp
- ibNci+hyWc6hPpvCULOeirAxGt4p+IcdiQ36vsmVbTlUFVDwDP48sYQzlEQxm4X7lceA
- UrE17ekBzX49/VrvcBCqFf5MbRYkUKOX0uvgzN+UQuHwOYetGjbSlH8hoy4EACfoyVg1 WQ== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by aserp2120.oracle.com with ESMTP id 30md5ks1ae-1
+ bh=l2/an7nrpK2tcK4d90skvgCAMPPfiLAfC4j1zf4Vw3Q=;
+ b=nlMJCr+eULTFBOsOTxYX37wCpd/EQA4SjfcNnMr9atF27x7FKVqvytMebqQhmmHvb73d
+ Ca5j/GsCmlVhAXnOYaVR1Fgk81Ie18nUPvE8k64GlyN9jCLvghmv1Ugxou888RNKh4zd
+ bDq7ZpctoA6r2fxtERAkUkadDOnUiYyyx6jnIGFQtgjf3hChencE6KXPdWMOdNJgVlOF
+ RjdJnjDNTZW9Drx+ZEOvo1eBvQP5ewqIKWaSIfg+1wkHHknKdm8T0n9NEjKE9l7KNe8J
+ wkTFq1Vb0HB6kqJ7s0qQR2Q2PVh/35NYLpniQHq7JP9YBD9Cn5A4UcQBM2FHwYsblRwl Rw== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by aserp2120.oracle.com with ESMTP id 30md5ks2mb-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Sat, 25 Apr 2020 14:25:56 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 03PEMkfi071389;
-        Sat, 25 Apr 2020 14:25:56 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
-        by aserp3020.oracle.com with ESMTP id 30md12p6mf-1
+        Sat, 25 Apr 2020 14:52:24 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 03PElpVC034677;
+        Sat, 25 Apr 2020 14:52:24 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by aserp3030.oracle.com with ESMTP id 30mb89ujts-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Sat, 25 Apr 2020 14:25:56 +0000
-Received: from abhmp0015.oracle.com (abhmp0015.oracle.com [141.146.116.21])
-        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 03PEPrfo003272;
-        Sat, 25 Apr 2020 14:25:53 GMT
+        Sat, 25 Apr 2020 14:52:24 +0000
+Received: from abhmp0012.oracle.com (abhmp0012.oracle.com [141.146.116.18])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 03PEqNij014660;
+        Sat, 25 Apr 2020 14:52:23 GMT
 Received: from [192.168.14.112] (/109.67.198.165)
         by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Sat, 25 Apr 2020 07:25:53 -0700
-Subject: Re: [PATCH v1 04/15] nitro_enclaves: Init PCI device driver
+        with ESMTP ; Sat, 25 Apr 2020 07:52:22 -0700
+Subject: Re: [PATCH v1 05/15] nitro_enclaves: Handle PCI device command
+ requests
 To:     Andra Paraschiv <andraprs@amazon.com>, linux-kernel@vger.kernel.org
 Cc:     Anthony Liguori <aliguori@amazon.com>,
         Benjamin Herrenschmidt <benh@amazon.com>,
@@ -57,28 +58,28 @@ Cc:     Anthony Liguori <aliguori@amazon.com>,
         Uwe Dannowski <uwed@amazon.de>, kvm@vger.kernel.org,
         ne-devel-upstream@amazon.com
 References: <20200421184150.68011-1-andraprs@amazon.com>
- <20200421184150.68011-5-andraprs@amazon.com>
+ <20200421184150.68011-6-andraprs@amazon.com>
 From:   Liran Alon <liran.alon@oracle.com>
-Message-ID: <dbb58c31-f388-cd03-ff66-e77b027a7ba3@oracle.com>
-Date:   Sat, 25 Apr 2020 17:25:48 +0300
+Message-ID: <39060271-279b-546b-05a6-c5b2fd7ff5d0@oracle.com>
+Date:   Sat, 25 Apr 2020 17:52:17 +0300
 User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.13; rv:68.0)
  Gecko/20100101 Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <20200421184150.68011-5-andraprs@amazon.com>
+In-Reply-To: <20200421184150.68011-6-andraprs@amazon.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Content-Language: en-US
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9602 signatures=668686
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 phishscore=0 suspectscore=2
- mlxscore=0 bulkscore=0 malwarescore=0 mlxlogscore=999 adultscore=0
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=2 mlxscore=0 spamscore=0
+ phishscore=0 bulkscore=0 mlxlogscore=999 malwarescore=0 adultscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
- definitions=main-2004250129
+ definitions=main-2004250133
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9602 signatures=668686
 X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 mlxscore=0 bulkscore=0
- adultscore=0 clxscore=1011 impostorscore=0 priorityscore=1501 phishscore=0
+ adultscore=0 clxscore=1015 impostorscore=0 priorityscore=1501 phishscore=0
  lowpriorityscore=0 mlxlogscore=999 suspectscore=2 malwarescore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
- definitions=main-2004250129
+ definitions=main-2004250133
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
@@ -86,276 +87,351 @@ X-Mailing-List: kvm@vger.kernel.org
 
 
 On 21/04/2020 21:41, Andra Paraschiv wrote:
-> +
+> The Nitro Enclaves PCI device exposes a MMIO space that this driver
+> uses to submit command requests and to receive command replies e.g. for
+> enclave creation / termination or setting enclave resources.
+>
+> Add logic for handling PCI device command requests based on the given
+> command type.
+>
+> Register an MSI-X interrupt vector for command reply notifications to
+> handle this type of communication events.
+>
+> Signed-off-by: Alexandru-Catalin Vasile <lexnv@amazon.com>
+> Signed-off-by: Andra Paraschiv <andraprs@amazon.com>
+> ---
+>   .../virt/amazon/nitro_enclaves/ne_pci_dev.c   | 264 ++++++++++++++++++
+>   1 file changed, 264 insertions(+)
+>
+> diff --git a/drivers/virt/amazon/nitro_enclaves/ne_pci_dev.c b/drivers/virt/amazon/nitro_enclaves/ne_pci_dev.c
+> index 8fbee95ea291..7453d129689a 100644
+> --- a/drivers/virt/amazon/nitro_enclaves/ne_pci_dev.c
+> +++ b/drivers/virt/amazon/nitro_enclaves/ne_pci_dev.c
+> @@ -40,6 +40,251 @@ static const struct pci_device_id ne_pci_ids[] = {
+>   
+>   MODULE_DEVICE_TABLE(pci, ne_pci_ids);
+>   
 > +/**
-> + * ne_setup_msix - Setup MSI-X vectors for the PCI device.
+> + * ne_submit_request - Submit command request to the PCI device based on the
+> + * command type.
 > + *
-> + * @pdev: PCI device to setup the MSI-X for.
-> + * @ne_pci_dev: PCI device private data structure.
+> + * This function gets called with the ne_pci_dev mutex held.
+> + *
+> + * @pdev: PCI device to send the command to.
+> + * @cmd_type: command type of the request sent to the PCI device.
+> + * @cmd_request: command request payload.
+> + * @cmd_request_size: size of the command request payload.
 > + *
 > + * @returns: 0 on success, negative return value on failure.
 > + */
-> +static int ne_setup_msix(struct pci_dev *pdev, struct ne_pci_dev *ne_pci_dev)
+> +static int ne_submit_request(struct pci_dev *pdev,
+> +			     enum ne_pci_dev_cmd_type cmd_type,
+> +			     void *cmd_request, size_t cmd_request_size)
 > +{
-> +	int nr_vecs = 0;
-> +	int rc = -EINVAL;
+> +	struct ne_pci_dev *ne_pci_dev = NULL;
+These local vars are unnecessarily initialized.
 > +
+> +	BUG_ON(!pdev);
+> +
+> +	ne_pci_dev = pci_get_drvdata(pdev);
 > +	BUG_ON(!ne_pci_dev);
-This kind of defensive programming does not align with Linux coding 
-convention.
-I think these BUG_ON() conditions should be removed.
+> +	BUG_ON(!ne_pci_dev->iomem_base);
+You should remove these defensive BUG_ON() calls.
 > +
-> +	nr_vecs = pci_msix_vec_count(pdev);
-> +	if (nr_vecs < 0) {
-> +		rc = nr_vecs;
+> +	if (WARN_ON(cmd_type <= INVALID_CMD || cmd_type >= MAX_CMD)) {
+> +		dev_err_ratelimited(&pdev->dev, "Invalid cmd type=%d\n",
+> +				    cmd_type);
 > +
+> +		return -EINVAL;
+> +	}
+> +
+> +	if (WARN_ON(!cmd_request))
+> +		return -EINVAL;
+> +
+> +	if (WARN_ON(cmd_request_size > NE_SEND_DATA_SIZE)) {
 > +		dev_err_ratelimited(&pdev->dev,
-> +				    "Failure in getting vec count [rc=%d]\n",
+> +				    "Invalid req size=%ld for cmd type=%d\n",
+> +				    cmd_request_size, cmd_type);
+> +
+> +		return -EINVAL;
+> +	}
+It doesn't make sense to have WARN_ON() print error to dmesg on every 
+evaluation to true,
+together with using dev_err_ratelimited() which attempts to rate-limit 
+prints.
+
+Anyway, these conditions were already checked by ne_do_request(). Why 
+also check them here?
+
+> +
+> +	memcpy_toio(ne_pci_dev->iomem_base + NE_SEND_DATA, cmd_request,
+> +		    cmd_request_size);
+> +
+> +	iowrite32(cmd_type, ne_pci_dev->iomem_base + NE_COMMAND);
+> +
+> +	return 0;
+> +}
+> +
+> +/**
+> + * ne_retrieve_reply - Retrieve reply from the PCI device.
+> + *
+> + * This function gets called with the ne_pci_dev mutex held.
+> + *
+> + * @pdev: PCI device to receive the reply from.
+> + * @cmd_reply: command reply payload.
+> + * @cmd_reply_size: size of the command reply payload.
+> + *
+> + * @returns: 0 on success, negative return value on failure.
+> + */
+> +static int ne_retrieve_reply(struct pci_dev *pdev,
+> +			     struct ne_pci_dev_cmd_reply *cmd_reply,
+> +			     size_t cmd_reply_size)
+> +{
+> +	struct ne_pci_dev *ne_pci_dev = NULL;
+These local vars are unnecessarily initialized.
+> +
+> +	BUG_ON(!pdev);
+> +
+> +	ne_pci_dev = pci_get_drvdata(pdev);
+> +	BUG_ON(!ne_pci_dev);
+> +	BUG_ON(!ne_pci_dev->iomem_base);
+You should remove these defensive BUG_ON() calls.
+> +
+> +	if (WARN_ON(!cmd_reply))
+> +		return -EINVAL;
+> +
+> +	if (WARN_ON(cmd_reply_size > NE_RECV_DATA_SIZE)) {
+> +		dev_err_ratelimited(&pdev->dev, "Invalid reply size=%ld\n",
+> +				    cmd_reply_size);
+> +
+> +		return -EINVAL;
+> +	}
+It doesn't make sense to have WARN_ON() print error to dmesg on every 
+evaluation to true,
+together with using dev_err_ratelimited() which attempts to rate-limit 
+prints.
+
+Anyway, these conditions were already checked by ne_do_request(). Why 
+also check them here?
+
+> +
+> +	memcpy_fromio(cmd_reply, ne_pci_dev->iomem_base + NE_RECV_DATA,
+> +		      cmd_reply_size);
+> +
+> +	return 0;
+> +}
+> +
+> +/**
+> + * ne_wait_for_reply - Wait for a reply of a PCI command.
+> + *
+> + * This function gets called with the ne_pci_dev mutex held.
+> + *
+> + * @pdev: PCI device for which a reply is waited.
+> + *
+> + * @returns: 0 on success, negative return value on failure.
+> + */
+> +static int ne_wait_for_reply(struct pci_dev *pdev)
+> +{
+> +	struct ne_pci_dev *ne_pci_dev = NULL;
+> +	int rc = -EINVAL;
+These local vars are unnecessarily initialized.
+> +
+> +	BUG_ON(!pdev);
+> +
+> +	ne_pci_dev = pci_get_drvdata(pdev);
+> +	BUG_ON(!ne_pci_dev);
+You should remove these defensive BUG_ON() calls.
+> +
+> +	/*
+> +	 * TODO: Update to _interruptible and handle interrupted wait event
+> +	 * e.g. -ERESTARTSYS, incoming signals + add / update timeout.
+> +	 */
+> +	rc = wait_event_timeout(ne_pci_dev->cmd_reply_wait_q,
+> +				atomic_read(&ne_pci_dev->cmd_reply_avail) != 0,
+> +				msecs_to_jiffies(DEFAULT_TIMEOUT_MSECS));
+> +	if (!rc) {
+> +		pr_err("Wait event timed out when waiting for PCI cmd reply\n");
+> +
+> +		return -ETIMEDOUT;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +int ne_do_request(struct pci_dev *pdev, enum ne_pci_dev_cmd_type cmd_type,
+> +		  void *cmd_request, size_t cmd_request_size,
+> +		  struct ne_pci_dev_cmd_reply *cmd_reply, size_t cmd_reply_size)
+This function is introduced in this patch but it is not used.
+It will cause compiling the kernel on this commit to raise 
+warnings/errors on unused functions.
+You should introduce functions on the patch that they are used.
+> +{
+> +	struct ne_pci_dev *ne_pci_dev = NULL;
+> +	int rc = -EINVAL;
+These local vars are unnecessarily initialized.
+> +
+> +	BUG_ON(!pdev);
+> +
+> +	ne_pci_dev = pci_get_drvdata(pdev);
+> +	BUG_ON(!ne_pci_dev);
+> +	BUG_ON(!ne_pci_dev->iomem_base);
+You should remove these defensive BUG_ON() calls.
+> +
+> +	if (WARN_ON(cmd_type <= INVALID_CMD || cmd_type >= MAX_CMD)) {
+> +		dev_err_ratelimited(&pdev->dev, "Invalid cmd type=%d\n",
+> +				    cmd_type);
+> +
+> +		return -EINVAL;
+> +	}
+> +
+> +	if (WARN_ON(!cmd_request))
+> +		return -EINVAL;
+> +
+> +	if (WARN_ON(cmd_request_size > NE_SEND_DATA_SIZE)) {
+> +		dev_err_ratelimited(&pdev->dev,
+> +				    "Invalid req size=%ld for cmd type=%d\n",
+> +				    cmd_request_size, cmd_type);
+> +
+> +		return -EINVAL;
+> +	}
+> +
+> +	if (WARN_ON(!cmd_reply))
+> +		return -EINVAL;
+> +
+> +	if (WARN_ON(cmd_reply_size > NE_RECV_DATA_SIZE)) {
+> +		dev_err_ratelimited(&pdev->dev, "Invalid reply size=%ld\n",
+> +				    cmd_reply_size);
+> +
+> +		return -EINVAL;
+> +	}
+I would consider specifying all these conditions in function 
+documentation instead of enforcing them at runtime on every function call.
+> +
+> +	/*
+> +	 * Use this mutex so that the PCI device handles one command request at
+> +	 * a time.
+> +	 */
+> +	mutex_lock(&ne_pci_dev->pci_dev_mutex);
+> +
+> +	atomic_set(&ne_pci_dev->cmd_reply_avail, 0);
+> +
+> +	rc = ne_submit_request(pdev, cmd_type, cmd_request, cmd_request_size);
+> +	if (rc < 0) {
+> +		dev_err_ratelimited(&pdev->dev,
+> +				    "Failure in submit cmd request [rc=%d]\n",
 > +				    rc);
+> +
+> +		mutex_unlock(&ne_pci_dev->pci_dev_mutex);
+> +
+> +		return rc;
+Consider leaving function with a goto to a label that unlocks mutex and 
+then return.
+> +	}
+> +
+> +	rc = ne_wait_for_reply(pdev);
+> +	if (rc < 0) {
+> +		dev_err_ratelimited(&pdev->dev,
+> +				    "Failure in wait cmd reply [rc=%d]\n",
+> +				    rc);
+> +
+> +		mutex_unlock(&ne_pci_dev->pci_dev_mutex);
 > +
 > +		return rc;
 > +	}
 > +
-> +	rc = pci_alloc_irq_vectors(pdev, nr_vecs, nr_vecs, PCI_IRQ_MSIX);
+> +	rc = ne_retrieve_reply(pdev, cmd_reply, cmd_reply_size);
 > +	if (rc < 0) {
 > +		dev_err_ratelimited(&pdev->dev,
-> +				    "Failure in alloc MSI-X vecs [rc=%d]\n",
+> +				    "Failure in retrieve cmd reply [rc=%d]\n",
 > +				    rc);
 > +
-> +		goto err_alloc_irq_vecs;
-You should just replace this with "return rc;" as no cleanup is required 
-here.
-> +	}
+> +		mutex_unlock(&ne_pci_dev->pci_dev_mutex);
 > +
-> +	return 0;
-> +
-> +err_alloc_irq_vecs:
-> +	return rc;
-> +}
-> +
-> +/**
-> + * ne_pci_dev_enable - Select PCI device version and enable it.
-> + *
-> + * @pdev: PCI device to select version for and then enable.
-> + * @ne_pci_dev: PCI device private data structure.
-> + *
-> + * @returns: 0 on success, negative return value on failure.
-> + */
-> +static int ne_pci_dev_enable(struct pci_dev *pdev,
-> +			     struct ne_pci_dev *ne_pci_dev)
-> +{
-> +	u8 dev_enable_reply = 0;
-> +	u16 dev_version_reply = 0;
-> +
-> +	BUG_ON(!pdev);
-> +	BUG_ON(!ne_pci_dev);
-> +	BUG_ON(!ne_pci_dev->iomem_base);
-Same.
-> +
-> +	iowrite16(NE_VERSION_MAX, ne_pci_dev->iomem_base + NE_VERSION);
-> +
-> +	dev_version_reply = ioread16(ne_pci_dev->iomem_base + NE_VERSION);
-> +	if (dev_version_reply != NE_VERSION_MAX) {
-> +		dev_err_ratelimited(&pdev->dev,
-> +				    "Failure in pci dev version cmd\n");
-> +
-> +		return -EIO;
-> +	}
-> +
-> +	iowrite8(NE_ENABLE_ON, ne_pci_dev->iomem_base + NE_ENABLE);
-> +
-> +	dev_enable_reply = ioread8(ne_pci_dev->iomem_base + NE_ENABLE);
-> +	if (dev_enable_reply != NE_ENABLE_ON) {
-> +		dev_err_ratelimited(&pdev->dev,
-> +				    "Failure in pci dev enable cmd\n");
-> +
-> +		return -EIO;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +/**
-> + * ne_pci_dev_disable - Disable PCI device.
-> + *
-> + * @pdev: PCI device to disable.
-> + * @ne_pci_dev: PCI device private data structure.
-> + *
-> + * @returns: 0 on success, negative return value on failure.
-> + */
-> +static int ne_pci_dev_disable(struct pci_dev *pdev,
-> +			      struct ne_pci_dev *ne_pci_dev)
-> +{
-> +	u8 dev_disable_reply = 0;
-> +
-> +	BUG_ON(!pdev);
-> +	BUG_ON(!ne_pci_dev);
-> +	BUG_ON(!ne_pci_dev->iomem_base);
-Same.
-> +
-> +	iowrite8(NE_ENABLE_OFF, ne_pci_dev->iomem_base + NE_ENABLE);
-> +
-> +	/*
-> +	 * TODO: Check for NE_ENABLE_OFF in a loop, to handle cases when the
-> +	 * device state is not immediately set to disabled and going through a
-> +	 * transitory state of disabling.
-> +	 */
-> +	dev_disable_reply = ioread8(ne_pci_dev->iomem_base + NE_ENABLE);
-> +	if (dev_disable_reply != NE_ENABLE_OFF) {
-> +		dev_err_ratelimited(&pdev->dev,
-> +				    "Failure in pci dev disable cmd\n");
-> +
-> +		return -EIO;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +static int ne_probe(struct pci_dev *pdev, const struct pci_device_id *id)
-> +{
-> +	struct ne_pci_dev *ne_pci_dev = NULL;
-> +	int rc = -EINVAL;
-Unnecessary variable initialization.
-ne_pci_dev and rc are initialized below always before they are used.
-> +
-> +	ne_pci_dev = kzalloc(sizeof(*ne_pci_dev), GFP_KERNEL);
-> +	if (!ne_pci_dev)
-> +		return -ENOMEM;
-> +
-> +	rc = pci_enable_device(pdev);
-> +	if (rc < 0) {
-> +		dev_err_ratelimited(&pdev->dev,
-> +				    "Failure in pci dev enable [rc=%d]\n", rc);
-> +
-Why is this dev_err_ratelimited() instead of dev_err()?
-Same for the rest of error printing in this probe() method and other 
-places in this patch.
-> +		goto err_pci_enable_dev;
-I find it confusing that the error labels are named based on the 
-failure-case they are used,
-instead of the action they do (i.e. Unwind previous successful operation 
-that requires unwinding).
-This doesn't seem to match Linux kernel coding convention.
-It also created an unnecessary 2 labels pointing to the same place in 
-cleanup code.
-> +	}
-> +
-> +	rc = pci_request_regions_exclusive(pdev, "ne_pci_dev");
-> +	if (rc < 0) {
-> +		dev_err_ratelimited(&pdev->dev,
-> +				    "Failure in pci request regions [rc=%d]\n",
-> +				    rc);
-> +
-> +		goto err_req_regions;
-> +	}
-> +
-> +	ne_pci_dev->iomem_base = pci_iomap(pdev, PCI_BAR_NE, 0);
-> +	if (!ne_pci_dev->iomem_base) {
-> +		rc = -ENOMEM;
-> +
-> +		dev_err_ratelimited(&pdev->dev,
-> +				    "Failure in pci bar mapping [rc=%d]\n", rc);
-> +
-> +		goto err_iomap;
-> +	}
-> +
-> +	rc = ne_setup_msix(pdev, ne_pci_dev);
-> +	if (rc < 0) {
-> +		dev_err_ratelimited(&pdev->dev,
-> +				    "Failure in pci dev msix setup [rc=%d]\n",
-> +				    rc);
-> +
-> +		goto err_setup_msix;
-> +	}
-> +
-> +	rc = ne_pci_dev_disable(pdev, ne_pci_dev);
-> +	if (rc < 0) {
-> +		dev_err_ratelimited(&pdev->dev,
-> +				    "Failure in ne_pci_dev disable [rc=%d]\n",
-> +				    rc);
-> +
-> +		goto err_ne_pci_dev_disable;
-> +	}
-It seems weird that we need to disable the device before enabling it on 
-the probe() method.
-Why can't we just enable the device without disabling it?
-> +
-> +	rc = ne_pci_dev_enable(pdev, ne_pci_dev);
-> +	if (rc < 0) {
-> +		dev_err_ratelimited(&pdev->dev,
-> +				    "Failure in ne_pci_dev enable [rc=%d]\n",
-> +				    rc);
-> +
-> +		goto err_ne_pci_dev_enable;
+> +		return rc;
 > +	}
 > +
 > +	atomic_set(&ne_pci_dev->cmd_reply_avail, 0);
-> +	init_waitqueue_head(&ne_pci_dev->cmd_reply_wait_q);
-> +	INIT_LIST_HEAD(&ne_pci_dev->enclaves_list);
-> +	mutex_init(&ne_pci_dev->enclaves_list_mutex);
-> +	mutex_init(&ne_pci_dev->pci_dev_mutex);
 > +
-> +	pci_set_drvdata(pdev, ne_pci_dev);
-If you would have pci_set_drvdata() as one of the first operations in 
-ne_probe(), then you could have avoided
-passing both struct pci_dev  and struct ne_pci_dev parameters to 
-ne_setup_msix(), ne_pci_dev_enable() and ne_pci_dev_disable().
-Which would have been a bit more elegant.
+> +	if (cmd_reply->rc < 0) {
+> +		dev_err_ratelimited(&pdev->dev,
+> +				    "Failure in cmd process logic [rc=%d]\n",
+> +				    cmd_reply->rc);
+> +
+> +		mutex_unlock(&ne_pci_dev->pci_dev_mutex);
+> +
+> +		return cmd_reply->rc;
+> +	}
+> +
+> +	mutex_unlock(&ne_pci_dev->pci_dev_mutex);
 > +
 > +	return 0;
-> +
-> +err_ne_pci_dev_enable:
-> +err_ne_pci_dev_disable:
-> +	pci_free_irq_vectors(pdev);
-> +err_setup_msix:
-> +	pci_iounmap(pdev, ne_pci_dev->iomem_base);
-> +err_iomap:
-> +	pci_release_regions(pdev);
-> +err_req_regions:
-> +	pci_disable_device(pdev);
-> +err_pci_enable_dev:
-> +	kzfree(ne_pci_dev);
-An empty new-line is appropriate here.
-To separate the return statement from the cleanup logic.
-> +	return rc;
 > +}
 > +
-> +static void ne_remove(struct pci_dev *pdev)
+> +/**
+> + * ne_reply_handler - Interrupt handler for retrieving a reply matching
+> + * a request sent to the PCI device for enclave lifetime management.
+> + *
+> + * @irq: received interrupt for a reply sent by the PCI device.
+> + * @args: PCI device private data structure.
+> + *
+> + * @returns: IRQ_HANDLED on handled interrupt, IRQ_NONE otherwise.
+> + */
+> +static irqreturn_t ne_reply_handler(int irq, void *args)
 > +{
-> +	struct ne_pci_dev *ne_pci_dev = pci_get_drvdata(pdev);
+> +	struct ne_pci_dev *ne_pci_dev = (struct ne_pci_dev *)args;
 > +
-> +	if (!ne_pci_dev || !ne_pci_dev->iomem_base)
-> +		return;
-Why is this condition necessary?
-The ne_remove() function should be called only in case ne_probe() succeeded.
-In that case, both ne_pci_dev and ne_pci_dev->iomem_base should be non-NULL.
+> +	atomic_set(&ne_pci_dev->cmd_reply_avail, 1);
 > +
-> +	ne_pci_dev_disable(pdev, ne_pci_dev);
+> +	/* TODO: Update to _interruptible. */
+> +	wake_up(&ne_pci_dev->cmd_reply_wait_q);
 > +
-> +	pci_set_drvdata(pdev, NULL);
+> +	return IRQ_HANDLED;
+> +}
 > +
+>   /**
+>    * ne_setup_msix - Setup MSI-X vectors for the PCI device.
+>    *
+> @@ -75,8 +320,25 @@ static int ne_setup_msix(struct pci_dev *pdev, struct ne_pci_dev *ne_pci_dev)
+>   		goto err_alloc_irq_vecs;
+>   	}
+>   
+> +	/*
+> +	 * This IRQ gets triggered every time the PCI device responds to a
+> +	 * command request. The reply is then retrieved, reading from the MMIO
+> +	 * space of the PCI device.
+> +	 */
+> +	rc = request_irq(pci_irq_vector(pdev, NE_VEC_REPLY),
+> +			 ne_reply_handler, 0, "enclave_cmd", ne_pci_dev);
+> +	if (rc < 0) {
+> +		dev_err_ratelimited(&pdev->dev,
+> +				    "Failure in allocating irq reply [rc=%d]\n",
+> +				    rc);
+> +
+> +		goto err_req_irq_reply;
+> +	}
+> +
+>   	return 0;
+>   
+> +err_req_irq_reply:
 > +	pci_free_irq_vectors(pdev);
-> +
-> +	pci_iounmap(pdev, ne_pci_dev->iomem_base);
-> +
-> +	kzfree(ne_pci_dev);
-> +
-> +	pci_release_regions(pdev);
-> +
-> +	pci_disable_device(pdev);
-You should aspire to keep ne_remove() order of operations to be the 
-reverse order of operations done in ne_probe().
-Which would also nicely match the order of operations done in ne_probe() 
-cleanup.
-i.e. The following order:
-
-pci_set_drvdata();
-ne_pci_dev_disable();
-pci_free_irq_vectors();
-pci_iounmap();
-pci_release_regions();
-pci_disable_device()
-kzfree();
-
--Liran
-
+>   err_alloc_irq_vecs:
+>   	return rc;
+>   }
+> @@ -232,6 +494,7 @@ static int ne_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+>   
+>   err_ne_pci_dev_enable:
+>   err_ne_pci_dev_disable:
+> +	free_irq(pci_irq_vector(pdev, NE_VEC_REPLY), ne_pci_dev);
+>   	pci_free_irq_vectors(pdev);
+I suggest to introduce a ne_teardown_msix() utility. That is aimed to 
+cleanup after ne_setup_msix().
+>   err_setup_msix:
+>   	pci_iounmap(pdev, ne_pci_dev->iomem_base);
+> @@ -255,6 +518,7 @@ static void ne_remove(struct pci_dev *pdev)
+>   
+>   	pci_set_drvdata(pdev, NULL);
+>   
+> +	free_irq(pci_irq_vector(pdev, NE_VEC_REPLY), ne_pci_dev);
+>   	pci_free_irq_vectors(pdev);
+>   
+>   	pci_iounmap(pdev, ne_pci_dev->iomem_base);
