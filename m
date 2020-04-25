@@ -2,105 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1BF911B8559
-	for <lists+kvm@lfdr.de>; Sat, 25 Apr 2020 11:44:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5D8741B8566
+	for <lists+kvm@lfdr.de>; Sat, 25 Apr 2020 11:52:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726133AbgDYJoz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 25 Apr 2020 05:44:55 -0400
-Received: from mail.kernel.org ([198.145.29.99]:46056 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726060AbgDYJoy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 25 Apr 2020 05:44:54 -0400
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id EFF832064C;
-        Sat, 25 Apr 2020 09:44:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1587807894;
-        bh=hbcviEx626chZm3MDI73tTRFC1Bak0yE4bT+LlrKlz8=;
-        h=From:To:Cc:Subject:Date:From;
-        b=f1zbBBC9R3jLlcrk8D+MtVDc/EpaeLHY61g/LIf0YQmldc02dH17V87ccKJQhqXZ4
-         SJF/NsTajZ+xmjI8CHw9bHInwhuObC6SDfV+JpT2aBEoJpxQ8YMK2UkwHxNRtJaZnR
-         FDyi2WUg89eS13Wlf4YniGNCqfk45wpDlHtrQh84=
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
-        by disco-boy.misterjones.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <maz@kernel.org>)
-        id 1jSHMi-006HBD-Ce; Sat, 25 Apr 2020 10:44:52 +0100
-From:   Marc Zyngier <maz@kernel.org>
-To:     linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu
-Cc:     James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Eric Auger <eric.auger@redhat.com>
-Subject: [PATCH] KVM: arm64: vgic-v4: Initialize GICv4.1 even in the absence of a virtual ITS
-Date:   Sat, 25 Apr 2020 10:44:26 +0100
-Message-Id: <20200425094426.162962-1-maz@kernel.org>
-X-Mailer: git-send-email 2.26.2
+        id S1726070AbgDYJw5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 25 Apr 2020 05:52:57 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:60931 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726022AbgDYJw4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 25 Apr 2020 05:52:56 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1587808375;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=iy6NQDz2bvlcDJdi3t6wYpiP8TNlTDnJAJ85f9gUoPw=;
+        b=DEnsjTeNKEVrWmoOzJb5W5qr1aunE/vlP2f0aycvTQu6+F2mm4w7ig6lh+wW7cbiNqWRN4
+        9HBTSTP0vs+6n5oRUDnDGoqIPBGldyA3vR1hzGu11sEwMZsqMpD0W5lmeyJW521vHojTwo
+        5QWgV8IFfkv+bryEsHvKz2thIT2z30o=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-236-MyZbcvyaPHCg3IIylppmfQ-1; Sat, 25 Apr 2020 05:52:49 -0400
+X-MC-Unique: MyZbcvyaPHCg3IIylppmfQ-1
+Received: by mail-wr1-f70.google.com with SMTP id e5so6426334wrs.23
+        for <kvm@vger.kernel.org>; Sat, 25 Apr 2020 02:52:49 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=iy6NQDz2bvlcDJdi3t6wYpiP8TNlTDnJAJ85f9gUoPw=;
+        b=Lgp/cVG9138JskQ8rT4Hin4Xe4CydoWhJ7BmPIohscnC43mOD/nvKEgKQlDHlUqK91
+         I45M7avNRTPk3QSK6tNSR6CoSZyC2hMGhcKr7zdO+duNjmJwEiXw0KvM0xYo0iKdaK+R
+         qM1FVghtMOCC0fBRK5TiVhNTTAHb1thXjejzoA6cOs/NUT3ixn1dKc5E3i+PwBK4SVoP
+         5NsB5HGXaVuYbLOTuE+BcnMmKTOfkvWyjoiCCdi2RLOgRD8o+FgyNd+jUQMKwRv3dUns
+         yPEEp4LLqLCzi6Ho/2JVBvLI8XqfImx39HUGFCRYGOzLL4S5QRu3nvQpntT2ojHTstHH
+         Ij4w==
+X-Gm-Message-State: AGi0PuZnj0P0HnJ0Ke+TcgpxTM7pKP5PBIUf76KLToreKNGrPg7yZrJf
+        mD949hgx3Rt6OM7ruF2T1TyvqdQUJED9js2o0waxjQStZQz3NzvcWrah0poWiUbOIBkhTnwTjPo
+        jTMtmj5uTQDjH
+X-Received: by 2002:a1c:40c4:: with SMTP id n187mr14678363wma.28.1587808368108;
+        Sat, 25 Apr 2020 02:52:48 -0700 (PDT)
+X-Google-Smtp-Source: APiQypJ1i6l3HYPsUNNYMgP5vLaP3Jp+6CJeidd7e8baenIOl0PDzANWn6IazIqsDn4jLvfEqaKLTg==
+X-Received: by 2002:a1c:40c4:: with SMTP id n187mr14678349wma.28.1587808367849;
+        Sat, 25 Apr 2020 02:52:47 -0700 (PDT)
+Received: from [192.168.10.150] ([93.56.170.5])
+        by smtp.gmail.com with ESMTPSA id y63sm6808373wmg.21.2020.04.25.02.52.46
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 25 Apr 2020 02:52:47 -0700 (PDT)
+Subject: Re: [PATCH] kvm: ioapic: Introduce arch-specific check for lazy
+ update EOI mechanism
+To:     Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     rkrcmar@redhat.com, joro@8bytes.org, jon.grimm@amd.com,
+        borisvk@bstnet.org
+References: <1587704910-78437-1-git-send-email-suravee.suthikulpanit@amd.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <b051913a-10f4-81d4-6ef8-19d586db61da@redhat.com>
+Date:   Sat, 25 Apr 2020 11:52:45 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, eric.auger@redhat.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+In-Reply-To: <1587704910-78437-1-git-send-email-suravee.suthikulpanit@amd.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-KVM now expects to be able to use HW-accelerated delivery of vSGIs
-as soon as the guest has enabled thm. Unfortunately, we only
-initialize the GICv4 context if we have a virtual ITS exposed to
-the guest.
+On 24/04/20 07:08, Suravee Suthikulpanit wrote:
+> commit f458d039db7e ("kvm: ioapic: Lazy update IOAPIC EOI") introduces
+> the following regression on Intel VMX APICv.
+> 
+> BUG: stack guard page was hit at 000000008f595917 \
+> (stack is 00000000bdefe5a4..00000000ae2b06f5)
+> kernel stack overflow (double-fault): 0000 [#1] SMP NOPTI
+> RIP: 0010:kvm_set_irq+0x51/0x160 [kvm]
+> Call Trace:
+>  irqfd_resampler_ack+0x32/0x90 [kvm]
+>  kvm_notify_acked_irq+0x62/0xd0 [kvm]
+>  kvm_ioapic_update_eoi_one.isra.0+0x30/0x120 [kvm]
+>  ioapic_set_irq+0x20e/0x240 [kvm]
+>  kvm_ioapic_set_irq+0x5c/0x80 [kvm]
+>  kvm_set_irq+0xbb/0x160 [kvm]
+>  ? kvm_hv_set_sint+0x20/0x20 [kvm]
+>  irqfd_resampler_ack+0x32/0x90 [kvm]
+>  kvm_notify_acked_irq+0x62/0xd0 [kvm]
+>  kvm_ioapic_update_eoi_one.isra.0+0x30/0x120 [kvm]
+>  ioapic_set_irq+0x20e/0x240 [kvm]
+>  kvm_ioapic_set_irq+0x5c/0x80 [kvm]
+>  kvm_set_irq+0xbb/0x160 [kvm]
+>  ? kvm_hv_set_sint+0x20/0x20 [kvm]
+> ....
+> 
+> This is due to the logic always force IOAPIC lazy update EOI mechanism
+> when APICv is activated, which is only needed by AMD SVM AVIC.
+> 
+> Fixes by introducing struct kvm_arch.use_lazy_eoi variable to specify
+> whether the architecture needs lazy update EOI support.
 
-Fix it by always initializing the GICv4.1 context if it is
-available on the host.
+You are not explaining why the same infinite loop cannot happen on AMD.
+ It seems to me that it is also fixed by adding a check for re-entrancy
+in ioapic_lazy_update_eoi.  It's easy to add one since
+ioapic_lazy_update_eoi is called with the ioapic->lock taken.
 
-Fixes: 2291ff2f2a56 ("KVM: arm64: GICv4.1: Plumb SGI implementation selection in the distributor")
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- virt/kvm/arm/vgic/vgic-init.c    | 9 ++++++++-
- virt/kvm/arm/vgic/vgic-mmio-v3.c | 3 ++-
- 2 files changed, 10 insertions(+), 2 deletions(-)
-
-diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
-index a963b9d766b73..8e6f350c3bcd1 100644
---- a/virt/kvm/arm/vgic/vgic-init.c
-+++ b/virt/kvm/arm/vgic/vgic-init.c
-@@ -294,8 +294,15 @@ int vgic_init(struct kvm *kvm)
- 		}
- 	}
- 
--	if (vgic_has_its(kvm)) {
-+	if (vgic_has_its(kvm))
- 		vgic_lpi_translation_cache_init(kvm);
-+
-+	/*
-+	 * If we have GICv4.1 enabled, unconditionnaly request enable the
-+	 * v4 support so that we get HW-accelerated vSGIs. Otherwise, only
-+	 * enable it if we present a virtual ITS to the guest.
-+	 */
-+	if (vgic_supports_direct_msis(kvm)) {
- 		ret = vgic_v4_init(kvm);
- 		if (ret)
- 			goto out;
-diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-index e72dcc4542475..26b11dcd45524 100644
---- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
-+++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-@@ -50,7 +50,8 @@ bool vgic_has_its(struct kvm *kvm)
- 
- bool vgic_supports_direct_msis(struct kvm *kvm)
- {
--	return kvm_vgic_global_state.has_gicv4 && vgic_has_its(kvm);
-+	return (kvm_vgic_global_state.has_gicv4_1 ||
-+		(kvm_vgic_global_state.has_gicv4 && vgic_has_its(kvm)));
- }
- 
- /*
--- 
-2.26.2
+Paolo
 
