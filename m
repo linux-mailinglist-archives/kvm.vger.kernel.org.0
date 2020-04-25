@@ -2,101 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AB66E1B88D1
-	for <lists+kvm@lfdr.de>; Sat, 25 Apr 2020 21:16:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 272271B8921
+	for <lists+kvm@lfdr.de>; Sat, 25 Apr 2020 21:47:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726355AbgDYTQW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 25 Apr 2020 15:16:22 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:23677 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726216AbgDYTQW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 25 Apr 2020 15:16:22 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1587842180;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=ajW83cPmwSdOeR1VWQQEGhPP3tbajGWXOutPh+OWcCo=;
-        b=i+kFM2j3jroUZG966cGab2G+Af9Lbb1eRiGwqdV423AqZr6u7dbXC5HuZW+Vvdq7dre9wv
-        l3Z3ptdnmcotu5j3skPfbXc+sK0Q+3Fm0XWrflzTPnwRU5xuWDe6e/Zzivcy3iqYARem1e
-        ZEY/OpmyhWWuqiRavFSu2lc/NwzTYls=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-205-zuPcIaM3OUyCSZoTr_BCDw-1; Sat, 25 Apr 2020 15:16:18 -0400
-X-MC-Unique: zuPcIaM3OUyCSZoTr_BCDw-1
-Received: by mail-wr1-f70.google.com with SMTP id j22so7237489wrb.4
-        for <kvm@vger.kernel.org>; Sat, 25 Apr 2020 12:16:18 -0700 (PDT)
+        id S1726327AbgDYTrh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 25 Apr 2020 15:47:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33468 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726190AbgDYTrg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 25 Apr 2020 15:47:36 -0400
+Received: from mail-pl1-x642.google.com (mail-pl1-x642.google.com [IPv6:2607:f8b0:4864:20::642])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0044FC09B04D
+        for <kvm@vger.kernel.org>; Sat, 25 Apr 2020 12:47:35 -0700 (PDT)
+Received: by mail-pl1-x642.google.com with SMTP id k18so5135768pll.6
+        for <kvm@vger.kernel.org>; Sat, 25 Apr 2020 12:47:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=amacapital-net.20150623.gappssmtp.com; s=20150623;
+        h=content-transfer-encoding:from:mime-version:subject:date:message-id
+         :references:cc:in-reply-to:to;
+        bh=su/TZCdqsGvDX9O/dILShocQiIYHImvs41WopVEj3dw=;
+        b=HSXwK1S0RYPgtPSMNgcEjmafSf61If+0xsLS+GSFa2PueznsCEQ0seads/QyC49eam
+         ChF2VREKs79Xr2/x1ZXz/hxctXZzXzSm+dKeuSZ95p5d0d9wlWufoRlNviyr31NcTuPi
+         ds/VTJnblzlXan6xNWu5FVl05hOJTzbCmH7FnIrRgzN9MwKqO7iu7VFWv8xkBoY6GpDl
+         Jznip7aJE891SixfzCyH9GiFuwWvLoOukW3NU363SZ3X+hewceNu0/cauA9MStDr+tgz
+         ndotP6Bq4jE6rI35SQCmWMndOsi1yWHYH0/LiDg6y8dKccC3HNc4Yb/re7xLVArFp9Cf
+         9afg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=ajW83cPmwSdOeR1VWQQEGhPP3tbajGWXOutPh+OWcCo=;
-        b=HgiQZsFhzO73ACRg0AnZ+srYBLMztyNyauvofwMxvTam0PHGMASm9dgbDPHsAo8kH5
-         Dy/9KGixy9BpJe06IG72ME5aXZfvWbCCoqQvZGj8zVZiI7ieRAWraK2JWMMInsghznlp
-         w/8lCIUcR2VI4rCyjq1mYp2PRkZpIvscIN84jEfz9TIUETN3z7jSkRuhwUdcPR3KZTxy
-         DwhavuL3/outyKC66EtcRUCR1PQcpS9oNhw11Gc/6ymMtR3DW/JJpIdx/ax0YVYZYlnX
-         x6E6Hbzf5Am5A6QaMe/1P5ELJOsBDZng95wW2hpoWq5RvxihfhhVvfmRnPxAtA33HN5c
-         dIEQ==
-X-Gm-Message-State: AGi0PuYSFY1be1VaW++nN99aDc4x/RE4AG1aq3ClBCloOFG2+CUV/auv
-        u5GoGI1I74WztGrI1G6PSNbgoOMKHswFRtBZSvIioUQX03s8gLxnPmYucTm2i7BZlFnNK+FNwmz
-        rRzM5h1WqM71q
-X-Received: by 2002:a5d:5001:: with SMTP id e1mr18996371wrt.27.1587842177345;
-        Sat, 25 Apr 2020 12:16:17 -0700 (PDT)
-X-Google-Smtp-Source: APiQypIslrnrTCUpVt5mn/A0rA0ebcrzDNEHzKVQ09XyEpYeCTU1+Fo5jDEho79nKUV/iuLclvvUMA==
-X-Received: by 2002:a5d:5001:: with SMTP id e1mr18996358wrt.27.1587842177133;
-        Sat, 25 Apr 2020 12:16:17 -0700 (PDT)
-Received: from [192.168.10.150] ([93.56.170.5])
-        by smtp.gmail.com with ESMTPSA id p6sm13751690wrt.3.2020.04.25.12.16.15
+        h=x-gm-message-state:content-transfer-encoding:from:mime-version
+         :subject:date:message-id:references:cc:in-reply-to:to;
+        bh=su/TZCdqsGvDX9O/dILShocQiIYHImvs41WopVEj3dw=;
+        b=HgmgXTCXuYYtEsXJT9M+xnHfYfRxapYt97Dk5+xJk+895Ce2MzDimCL0+zMd4Q/PP5
+         AC2AdH0apUc91Ig0x1gJp/A6Lb2GAJQWC+/88yXOPKHgTDn5Nrte2kTFcUeT3VoRLhHK
+         HOqmLpSUYUq3qjgt4o7RiekgKoPzMBBgBWP6K+AZWqfrJmLqevd+XOHpVE/WPaNU8fIw
+         8EzZwSdXJMVvJuW5sZArCHqfsoamLKsCGOVwxdMsAsMmsDEzwr+udfb+Q8LYQteyksam
+         4aBPC8e+h1LGu77ICbGnH3HPAAQGhG8uuCu5VeU6OJIW9q3fud+IPktRXprzf1GrSP2J
+         bq9Q==
+X-Gm-Message-State: AGi0Pubytu0hRk0nHfDpZbfqLlxnEq0sxMuegfVA8NGdxkQpf8xXu7ta
+        BlQvxT4ZJhid8qZXjpxlnSt5mA==
+X-Google-Smtp-Source: APiQypKEMhdWCQosOVFNGGvelzt3tcfdxzwTQ4wUUFKoxDVH8RdkAuEGYoNGN00zKueIqusTJ5+Cmg==
+X-Received: by 2002:a17:90a:d984:: with SMTP id d4mr14044440pjv.59.1587844054298;
+        Sat, 25 Apr 2020 12:47:34 -0700 (PDT)
+Received: from ?IPv6:2601:646:c200:1ef2:d16f:990f:8780:729d? ([2601:646:c200:1ef2:d16f:990f:8780:729d])
+        by smtp.gmail.com with ESMTPSA id b2sm7567961pgg.77.2020.04.25.12.47.33
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 25 Apr 2020 12:16:16 -0700 (PDT)
-Subject: Re: [RFC PATCH 1/3] kvm: x86: Rename KVM_DEBUGREG_RELOAD to
- KVM_DEBUGREG_NEED_RELOAD
-To:     Nadav Amit <nadav.amit@gmail.com>
-Cc:     Xiaoyao Li <xiaoyao.li@intel.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        kvm <kvm@vger.kernel.org>, Nadav Amit <namit@cs.technion.ac.il>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        linux-kernel@vger.kernel.org
-References: <20200416101509.73526-1-xiaoyao.li@intel.com>
- <20200416101509.73526-2-xiaoyao.li@intel.com>
- <85cb5946-2109-28a0-578d-bed31d1b8298@redhat.com>
- <08C6D1FB-A4F7-49FA-AC46-5323C104840A@gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <8223a7e2-5d4a-b427-c44f-d76450f16748@redhat.com>
-Date:   Sat, 25 Apr 2020 21:16:14 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
-MIME-Version: 1.0
-In-Reply-To: <08C6D1FB-A4F7-49FA-AC46-5323C104840A@gmail.com>
+        Sat, 25 Apr 2020 12:47:33 -0700 (PDT)
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: quoted-printable
+From:   Andy Lutomirski <luto@amacapital.net>
+Mime-Version: 1.0 (1.0)
+Subject: Re: [PATCH] Allow RDTSC and RDTSCP from userspace
+Date:   Sat, 25 Apr 2020 12:47:31 -0700
+Message-Id: <910AE5B4-4522-4133-99F7-64850181FBF9@amacapital.net>
+References: <20200425191032.GK21900@8bytes.org>
+Cc:     Andy Lutomirski <luto@kernel.org>, Joerg Roedel <jroedel@suse.de>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Tom Lendacky <Thomas.Lendacky@amd.com>,
+        Mike Stunes <mstunes@vmware.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Juergen Gross <JGross@suse.com>,
+        Jiri Slaby <jslaby@suse.cz>, Kees Cook <keescook@chromium.org>,
+        kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Thomas Hellstrom <thellstrom@vmware.com>,
+        Linux Virtualization <virtualization@lists.linux-foundation.org>,
+        X86 ML <x86@kernel.org>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+In-Reply-To: <20200425191032.GK21900@8bytes.org>
+To:     Joerg Roedel <joro@8bytes.org>
+X-Mailer: iPhone Mail (17E262)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 25/04/20 18:54, Nadav Amit wrote:
->> I wonder if KVM_DEBUGREG_RELOAD is needed at all.  It should be easy to
->> write selftests for it, using the testcase in commit message
->> 172b2386ed16 and the information in commit ae561edeb421.
-> I must be missing something, since I did not follow this thread and other
-> KVM changes very closely.
-> 
-> Yet, for the record, I added KVM_DEBUGREG_RELOAD due to real experienced
-> issues that I had while running Intel’s fuzzing tests on KVM: IIRC, the DRs
-> were not reloaded after an INIT event that clears them.
 
-Indeed, but the code has changed since then and I'm not sure it is still
-needed.
 
-> Personally, I would prefer that a test for that, if added, would be added
-> to KVM-unit-tests, based on Liran’s INIT test. This would allow to confirm
-> bare-metal behaves as the VM.
+> On Apr 25, 2020, at 12:10 PM, Joerg Roedel <joro@8bytes.org> wrote:
+>=20
+> =EF=BB=BFOn Sat, Apr 25, 2020 at 11:15:35AM -0700, Andy Lutomirski wrote:
+>> shift_ist is gross.  What's it for?  If it's not needed, I'd rather
+>> not use it, and I eventually want to get rid of it for #DB as well.
+>=20
+> The #VC handler needs to be able to nest, there is no way around that
+> for various reasons, the two most important ones are:
+>=20
+>    1. The #VC -> NMI -> #VC case. #VCs can happen in the NMI
+>       handler, for example (but not exclusivly) for RDPMC.
+>=20
+>    2. In case of an error the #VC handler needs to print out error
+>       information by calling one of the printk wrappers. Those will
+>       end up doing IO to some console/serial port/whatever which
+>       will also cause #VC exceptions to emulate the access to the
+>       output devices.
+>=20
+> Using shift_ist is perfect for that, the only problem is the race
+> condition with the NMI handler, as shift_ist does not work well with
+> exceptions that can also trigger within the NMI handler. But I have
+> taken care of that for #VC.
+>=20
 
-Yes, that would be good as well of course.
+I assume the race you mean is:
 
-Paolo
+#VC
+Immediate NMI before IST gets shifted
+#VC
 
+Kaboom.
+
+How are you dealing with this?  Ultimately, I think that NMI will need to tu=
+rn off IST before engaging in any funny business. Let me ponder this a bit.
+
+>=20
+> Regards,
+>=20
+>    Joerg
+>=20
