@@ -2,102 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 844901B87CD
-	for <lists+kvm@lfdr.de>; Sat, 25 Apr 2020 18:54:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B7D4F1B8874
+	for <lists+kvm@lfdr.de>; Sat, 25 Apr 2020 20:15:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726174AbgDYQyL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 25 Apr 2020 12:54:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34934 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726152AbgDYQyL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 25 Apr 2020 12:54:11 -0400
-Received: from mail-pj1-x1041.google.com (mail-pj1-x1041.google.com [IPv6:2607:f8b0:4864:20::1041])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0FFDAC09B04D;
-        Sat, 25 Apr 2020 09:54:11 -0700 (PDT)
-Received: by mail-pj1-x1041.google.com with SMTP id fu13so4626738pjb.5;
-        Sat, 25 Apr 2020 09:54:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=Ni7dX1B7pi70mNP8/hgrlsRSdpbg/0CNNTaHtJC2aBI=;
-        b=ZB7oVq7fsOIznxNS7UZhzn6Makn3MVh/Kbd5M1MhKtQ7IVzXRT8b0T4OR+HsFLeDf0
-         16s/BRqJ0tII4C67qPq3tbfd4TaxpWmqVNhsJk6kdtBGJs3+9/VfQX54W+zowmirKHOW
-         Y7Z8uS4tho7igDx/US3ImS4KKFPXagoW7E4uf7LBZ9XAp1dkVAJpZn5beBXkT9ZsXWRd
-         inkzCrJnV5djMsXdzOMzVJ2czjDS28tW0tmxjhUqStCZfKIla7I3Isar0lJpXG9jjHqS
-         cgrSaMTd7T5VodoQzTM8VqAUwz/DzbOgrKECm4z/RJYhcRfiGYcwmbKFuhHa2yevxBon
-         KDVw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=Ni7dX1B7pi70mNP8/hgrlsRSdpbg/0CNNTaHtJC2aBI=;
-        b=TniSzqkuAIikBqVmFkZ0EWsSgEIlptNHDRribHWKYbV58m2NsXThliq5tE9AZZainV
-         gkZ/URaNBu0eRbvSVBZFst87ey36k2A9UnxBlqEGHAqCzdJe9cf6FAuqmKVrk/baOUtV
-         gdirXzrbAfQ/ecSrWjZttn2qhuyPyW15bk6WltuiHd50Ibq5X2mNl7uG99qkwyitZZY2
-         ZImx5JtcogBMtrRR3EOXQtbCCPQiyC5flevYZxuOfpthfv1X+7ObPF/kU3aGyTvpBdoL
-         tA6uTeoGIagipXDSsXyHy+5/iy+H89piLfhTvQGZG+YmK4x5BebME9+VNNd7hnA7ci7e
-         R1+g==
-X-Gm-Message-State: AGi0PuYXzw55qXXDNuipZCcC1U4szsjgpTVBveezQM7g0YI+xQaPSezT
-        V0fd8KtR4zfCNunZ/1OZXxA=
-X-Google-Smtp-Source: APiQypJhvMOXcEqGt6tXZHSLN+DNe9cAdJX+NSPOYfKzDd5EYKyzLqQq0zW6vraDp2ui3eyKU00toQ==
-X-Received: by 2002:a17:902:a5ca:: with SMTP id t10mr7463608plq.300.1587833649881;
-        Sat, 25 Apr 2020 09:54:09 -0700 (PDT)
-Received: from ?IPv6:2601:647:4700:9b2:6553:6836:584f:1008? ([2601:647:4700:9b2:6553:6836:584f:1008])
-        by smtp.gmail.com with ESMTPSA id v1sm7424946pjs.36.2020.04.25.09.54.08
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Sat, 25 Apr 2020 09:54:09 -0700 (PDT)
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
-Subject: Re: [RFC PATCH 1/3] kvm: x86: Rename KVM_DEBUGREG_RELOAD to
- KVM_DEBUGREG_NEED_RELOAD
-From:   Nadav Amit <nadav.amit@gmail.com>
-In-Reply-To: <85cb5946-2109-28a0-578d-bed31d1b8298@redhat.com>
-Date:   Sat, 25 Apr 2020 09:54:07 -0700
-Cc:     Xiaoyao Li <xiaoyao.li@intel.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        kvm <kvm@vger.kernel.org>, Nadav Amit <namit@cs.technion.ac.il>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        linux-kernel@vger.kernel.org
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <08C6D1FB-A4F7-49FA-AC46-5323C104840A@gmail.com>
-References: <20200416101509.73526-1-xiaoyao.li@intel.com>
- <20200416101509.73526-2-xiaoyao.li@intel.com>
- <85cb5946-2109-28a0-578d-bed31d1b8298@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-X-Mailer: Apple Mail (2.3608.80.23.2.2)
+        id S1726261AbgDYSPu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 25 Apr 2020 14:15:50 -0400
+Received: from mail.kernel.org ([198.145.29.99]:50452 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726157AbgDYSPu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 25 Apr 2020 14:15:50 -0400
+Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 58690217BA
+        for <kvm@vger.kernel.org>; Sat, 25 Apr 2020 18:15:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1587838549;
+        bh=cVK0toJnn9vOB9E2SmO9CBJWGgOYMugNbByNAh8ilkI=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=Td1w4w4h9ChWYz5sxGi7UkXFmK/KIcZI+NzSE/qXy5EHXewGWv3PHpGP8/taXuTC8
+         uWk+vEI7eTXTaXz696KMMjIcufWpDhgIKKqdFCb7AYkGEgWEYvLqqKw19we/BmxCNY
+         FwvAGN5IfcSyhd4VsaVVYwDtAW54CWFlJnBsZaMo=
+Received: by mail-wr1-f53.google.com with SMTP id j2so15528045wrs.9
+        for <kvm@vger.kernel.org>; Sat, 25 Apr 2020 11:15:49 -0700 (PDT)
+X-Gm-Message-State: AGi0PuYaao0Bl0Q8wt4Iiel3AMJ45kmbY/aRjyaZ0j3WPIkK8wzwFWTa
+        NE15rJtPPMQ27TzybbHGduktsxy7vYPks33GH/zMQg==
+X-Google-Smtp-Source: APiQypJ7rU7AYr+libqeVqePFVrceb06kci8UbSVnmOb7FS/p9cPbc3OPMNaylAH0ECs1JdRARhF0f+awt47YIcfzuo=
+X-Received: by 2002:adf:f648:: with SMTP id x8mr17727377wrp.257.1587838547579;
+ Sat, 25 Apr 2020 11:15:47 -0700 (PDT)
+MIME-Version: 1.0
+References: <20200319091407.1481-56-joro@8bytes.org> <20200424210316.848878-1-mstunes@vmware.com>
+ <2c49061d-eb84-032e-8dcb-dd36a891ce90@intel.com> <ead88d04-1756-1190-2b37-b24f86422595@amd.com>
+ <4d2ac222-a896-a60e-9b3c-b35aa7e81a97@intel.com> <20200425124909.GO30814@suse.de>
+In-Reply-To: <20200425124909.GO30814@suse.de>
+From:   Andy Lutomirski <luto@kernel.org>
+Date:   Sat, 25 Apr 2020 11:15:35 -0700
+X-Gmail-Original-Message-ID: <CALCETrWCiMkA37yf972h+fqsz1_dbfye8AbrkJxDPJzC+1PBEw@mail.gmail.com>
+Message-ID: <CALCETrWCiMkA37yf972h+fqsz1_dbfye8AbrkJxDPJzC+1PBEw@mail.gmail.com>
+Subject: Re: [PATCH] Allow RDTSC and RDTSCP from userspace
+To:     Joerg Roedel <jroedel@suse.de>
+Cc:     Dave Hansen <dave.hansen@intel.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Mike Stunes <mstunes@vmware.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Juergen Gross <jgross@suse.com>,
+        Jiri Slaby <jslaby@suse.cz>, Kees Cook <keescook@chromium.org>,
+        kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Andrew Lutomirski <luto@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Thomas Hellstrom <thellstrom@vmware.com>,
+        Linux Virtualization <virtualization@lists.linux-foundation.org>,
+        X86 ML <x86@kernel.org>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> On Apr 25, 2020, at 1:07 AM, Paolo Bonzini <pbonzini@redhat.com> =
-wrote:
->=20
-> On 16/04/20 12:15, Xiaoyao Li wrote:
->> To make it more clear that the flag means DRn (except DR7) need to be
->> reloaded before vm entry.
->>=20
->> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
->=20
-> I wonder if KVM_DEBUGREG_RELOAD is needed at all.  It should be easy =
-to
-> write selftests for it, using the testcase in commit message
-> 172b2386ed16 and the information in commit ae561edeb421.
+On Sat, Apr 25, 2020 at 5:49 AM Joerg Roedel <jroedel@suse.de> wrote:
+>
+> Hi Dave,
+>
+> On Fri, Apr 24, 2020 at 03:53:09PM -0700, Dave Hansen wrote:
+> > Ahh, so any instruction that can have an instruction intercept set
+> > potentially needs to be able to tolerate a #VC?  Those instruction
+> > intercepts are under the control of the (untrusted relative to the
+> > guest) hypervisor, right?
+> >
+> > >From the main sev-es series:
+> >
+> > +#ifdef CONFIG_AMD_MEM_ENCRYPT
+> > +idtentry vmm_communication     do_vmm_communication    has_error_code=1
+> > +#endif
+>
+> The next version of the patch-set (which I will hopefully have ready
+> next week) will have this changed. The #VC exception handler uses an IST
+> stack and is set to paranoid=1 and shift_ist. The IST stacks for the #VC
+> handler are only allocated when SEV-ES is active.
 
-I must be missing something, since I did not follow this thread and =
-other
-KVM changes very closely.
+shift_ist is gross.  What's it for?  If it's not needed, I'd rather
+not use it, and I eventually want to get rid of it for #DB as well.
 
-Yet, for the record, I added KVM_DEBUGREG_RELOAD due to real experienced
-issues that I had while running Intel=E2=80=99s fuzzing tests on KVM: =
-IIRC, the DRs
-were not reloaded after an INIT event that clears them.
-
-Personally, I would prefer that a test for that, if added, would be =
-added
-to KVM-unit-tests, based on Liran=E2=80=99s INIT test. This would allow =
-to confirm
-bare-metal behaves as the VM.
-
+--Andy
