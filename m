@@ -2,160 +2,158 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3B8321B8BA3
-	for <lists+kvm@lfdr.de>; Sun, 26 Apr 2020 05:26:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 84EE01B8C86
+	for <lists+kvm@lfdr.de>; Sun, 26 Apr 2020 07:19:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726142AbgDZDZs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 25 Apr 2020 23:25:48 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:57339 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1725943AbgDZDZs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 25 Apr 2020 23:25:48 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1587871546;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=xeVCSVVAGo0Z4+nT2s2gLtAX66uKIDuBw9cn9Gzx2mE=;
-        b=Ks7qKABL7+eZd5yuCyv64OjG5A4WxTUbZVVQUwEL13SYjCaB49SiyFkuyThg7NRelp5sH8
-        hElcj4udkuYUwrNddaCdrwNANVOg0qKaimibzeXdL5bzafacRIgUVyd6pi/BI5TXNldXSe
-        jP56qAJMtTkNtkyf3ptyixOZ3Zax2po=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-338-hFEJfXROPcGf0r9lcBgsYA-1; Sat, 25 Apr 2020 23:25:42 -0400
-X-MC-Unique: hFEJfXROPcGf0r9lcBgsYA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 71F6E1800D4A;
-        Sun, 26 Apr 2020 03:25:41 +0000 (UTC)
-Received: from [10.72.13.103] (ovpn-13-103.pek2.redhat.com [10.72.13.103])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id DBEA25C1C3;
-        Sun, 26 Apr 2020 03:25:35 +0000 (UTC)
-Subject: Re: [PATCH 2/2] vdpa: implement config interrupt in IFCVF
-To:     Zhu Lingshan <lingshan.zhu@intel.com>, mst@redhat.com,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Cc:     lulu@redhat.com, dan.daly@intel.com, cunming.liang@intel.com
-References: <1587722659-1300-1-git-send-email-lingshan.zhu@intel.com>
- <1587722659-1300-3-git-send-email-lingshan.zhu@intel.com>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <bb909a20-3f14-427d-ee40-129a1844486b@redhat.com>
-Date:   Sun, 26 Apr 2020 11:25:34 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
-MIME-Version: 1.0
-In-Reply-To: <1587722659-1300-3-git-send-email-lingshan.zhu@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+        id S1726144AbgDZFTF convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Sun, 26 Apr 2020 01:19:05 -0400
+Received: from mga01.intel.com ([192.55.52.88]:51368 "EHLO mga01.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725765AbgDZFTE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 26 Apr 2020 01:19:04 -0400
+IronPort-SDR: hStMhTZAkqFLa55C01+YYoGLp99FdLDXZ8kddbY0rv/j5Xk+ZJx62WhereHrmJgXp7WCdWB0so
+ /sQYssz8qgPQ==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Apr 2020 22:19:04 -0700
+IronPort-SDR: 7oUFACyYMaI58TCLvNzIfWtr9icVHR6F93W0fNWs0ro27ExULtxG2c/75WZ1yLrb25XmRP1XIf
+ nGedbiD9SlZw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.73,318,1583222400"; 
+   d="scan'208";a="256851019"
+Received: from fmsmsx107.amr.corp.intel.com ([10.18.124.205])
+  by orsmga003.jf.intel.com with ESMTP; 25 Apr 2020 22:19:03 -0700
+Received: from fmsmsx119.amr.corp.intel.com (10.18.124.207) by
+ fmsmsx107.amr.corp.intel.com (10.18.124.205) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Sat, 25 Apr 2020 22:19:03 -0700
+Received: from shsmsx151.ccr.corp.intel.com (10.239.6.50) by
+ FMSMSX119.amr.corp.intel.com (10.18.124.207) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Sat, 25 Apr 2020 22:19:03 -0700
+Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.225]) by
+ SHSMSX151.ccr.corp.intel.com ([169.254.3.22]) with mapi id 14.03.0439.000;
+ Sun, 26 Apr 2020 13:18:58 +0800
+From:   "Tian, Kevin" <kevin.tian@intel.com>
+To:     Jason Gunthorpe <jgg@mellanox.com>
+CC:     "Raj, Ashok" <ashok.raj@intel.com>,
+        "Jiang, Dave" <dave.jiang@intel.com>,
+        "vkoul@kernel.org" <vkoul@kernel.org>,
+        "megha.dey@linux.intel.com" <megha.dey@linux.intel.com>,
+        "maz@kernel.org" <maz@kernel.org>,
+        "bhelgaas@google.com" <bhelgaas@google.com>,
+        "rafael@kernel.org" <rafael@kernel.org>,
+        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "hpa@zytor.com" <hpa@zytor.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "Pan, Jacob jun" <jacob.jun.pan@intel.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>, "Lu, Baolu" <baolu.lu@intel.com>,
+        "Kumar, Sanjay K" <sanjay.k.kumar@intel.com>,
+        "Luck, Tony" <tony.luck@intel.com>,
+        "Lin, Jing" <jing.lin@intel.com>,
+        "Williams, Dan J" <dan.j.williams@intel.com>,
+        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "parav@mellanox.com" <parav@mellanox.com>,
+        "dmaengine@vger.kernel.org" <dmaengine@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: RE: [PATCH RFC 00/15] Add VFIO mediated device support and IMS
+ support for the idxd driver.
+Thread-Topic: [PATCH RFC 00/15] Add VFIO mediated device support and IMS
+ support for the idxd driver.
+Thread-Index: AQHWGDVStT24LxQ110qc/YDRWdRX86iDuewAgACI/wCAAD7wgIAAnasAgAFwKICAAOPOMIAAQj8AgACkdbD//7b+gIACl9WQ
+Date:   Sun, 26 Apr 2020 05:18:59 +0000
+Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D19D8C5486@SHSMSX104.ccr.corp.intel.com>
+References: <158751095889.36773.6009825070990637468.stgit@djiang5-desk3.ch.intel.com>
+ <20200421235442.GO11945@mellanox.com>
+ <AADFC41AFE54684AB9EE6CBC0274A5D19D86EE26@SHSMSX104.ccr.corp.intel.com>
+ <20200422115017.GQ11945@mellanox.com> <20200422211436.GA103345@otc-nc-03>
+ <20200423191217.GD13640@mellanox.com>
+ <AADFC41AFE54684AB9EE6CBC0274A5D19D8960F9@SHSMSX104.ccr.corp.intel.com>
+ <20200424124444.GJ13640@mellanox.com>
+ <AADFC41AFE54684AB9EE6CBC0274A5D19D8A808B@SHSMSX104.ccr.corp.intel.com>
+ <20200424181203.GU13640@mellanox.com>
+In-Reply-To: <20200424181203.GU13640@mellanox.com>
+Accept-Language: en-US
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Content-Transfer-Encoding: quoted-printable
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
+MIME-Version: 1.0
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+> From: Jason Gunthorpe <jgg@mellanox.com>
+> Sent: Saturday, April 25, 2020 2:12 AM
+> 
+> > > > idxd is just the first device that supports Scalable IOV. We have a
+> > > > lot more coming later, in different types. Then putting such
+> > > > emulation in user space means that Qemu needs to support all those
+> > > > vendor specific interfaces for every new device which supports
+> > >
+> > > It would be very sad to see an endless amount of device emulation code
+> > > crammed into the kernel. Userspace is where device emulation is
+> > > supposed to live. For security
+> >
+> > I think providing an unified abstraction to userspace is also important,
+> > which is what VFIO provides today. The merit of using one set of VFIO
+> > API to manage all kinds of mediated devices and VF devices is a major
+> > gain. Instead, inventing a new vDPA-like interface for every Scalable-IOV
+> > or equivalent device is just overkill and doesn't scale. Also the actual
+> > emulation code in idxd driver is actually small, if putting aside the PCI
+> > config space part for which I already explained most logic could be shared
+> > between mdev device drivers.
+> 
+> If it was just config space you might have an argument, VFIO already
+> does some config space mangling, but emulating BAR space is out of
+> scope of VFIO, IMHO.
 
-On 2020/4/24 =E4=B8=8B=E5=8D=886:04, Zhu Lingshan wrote:
-> This commit implements config interrupt support
-> in IFC VF
->
-> Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
-> ---
->   drivers/vdpa/ifcvf/ifcvf_base.c |  3 +++
->   drivers/vdpa/ifcvf/ifcvf_base.h |  2 ++
->   drivers/vdpa/ifcvf/ifcvf_main.c | 22 +++++++++++++++++++++-
->   3 files changed, 26 insertions(+), 1 deletion(-)
->
-> diff --git a/drivers/vdpa/ifcvf/ifcvf_base.c b/drivers/vdpa/ifcvf/ifcvf=
-_base.c
-> index b61b06e..c825d99 100644
-> --- a/drivers/vdpa/ifcvf/ifcvf_base.c
-> +++ b/drivers/vdpa/ifcvf/ifcvf_base.c
-> @@ -185,6 +185,9 @@ void ifcvf_set_status(struct ifcvf_hw *hw, u8 statu=
-s)
->  =20
->   void ifcvf_reset(struct ifcvf_hw *hw)
->   {
-> +	hw->config_cb.callback =3D NULL;
-> +	hw->config_cb.private =3D NULL;
-> +
->   	ifcvf_set_status(hw, 0);
->   	/* flush set_status, make sure VF is stopped, reset */
->   	ifcvf_get_status(hw);
-> diff --git a/drivers/vdpa/ifcvf/ifcvf_base.h b/drivers/vdpa/ifcvf/ifcvf=
-_base.h
-> index e803070..76928b0 100644
-> --- a/drivers/vdpa/ifcvf/ifcvf_base.h
-> +++ b/drivers/vdpa/ifcvf/ifcvf_base.h
-> @@ -81,6 +81,8 @@ struct ifcvf_hw {
->   	void __iomem *net_cfg;
->   	struct vring_info vring[IFCVF_MAX_QUEUE_PAIRS * 2];
->   	void __iomem * const *base;
-> +	char config_msix_name[256];
-> +	struct vdpa_callback config_cb;
->   };
->  =20
->   struct ifcvf_adapter {
-> diff --git a/drivers/vdpa/ifcvf/ifcvf_main.c b/drivers/vdpa/ifcvf/ifcvf=
-_main.c
-> index 8d54dc5..f7baeca 100644
-> --- a/drivers/vdpa/ifcvf/ifcvf_main.c
-> +++ b/drivers/vdpa/ifcvf/ifcvf_main.c
-> @@ -18,6 +18,16 @@
->   #define DRIVER_AUTHOR   "Intel Corporation"
->   #define IFCVF_DRIVER_NAME       "ifcvf"
->  =20
-> +static irqreturn_t ifcvf_config_changed(int irq, void *arg)
-> +{
-> +	struct ifcvf_hw *vf =3D arg;
-> +
-> +	if (vf->config_cb.callback)
-> +		return vf->config_cb.callback(vf->config_cb.private);
-> +
-> +	return IRQ_HANDLED;
+out of scope of vfio-pci, but in scope of vfio-mdev. btw I feel that most
+of your objections are actually related to the general idea of vfio-mdev.
+Scalable IOV just uses PASID to harden DMA isolation in mediated
+pass-through usage which vfio-mdev enables. Then are you just opposing
+the whole vfio-mdev? If not, I'm curious about the criteria in your mind 
+about when using vfio-mdev is good...
 
+> 
+> I also think it is disingenuous to pretend this is similar to
+> SR-IOV. SR-IOV is self contained and the BAR does not require
+> emulation. What you have here sounds like it is just an ordinary
 
-So it looks to me the current support of VIRTIO_NET_F_STATUS is broken=20
-without this patch.
+technically Scalable IOV is definitely different from SR-IOV. It's 
+simpler in hardware. And we're not emulating SR-IOV. The point
+is just in usage-wise we want to present a consistent user 
+experience just like passing through a PCI endpoint (PF or VF) device
+through vfio eco-system, including various userspace VMMs (Qemu,
+firecracker, rust-vmm, etc.), middleware (Libvirt), and higher level 
+management stacks. 
 
-We probably need to patch to disable it.
+> multi-queue device with the ability to PASID tag queues for IOMMU
+> handling. This is absolutely not SRIOV - it is much closer to VDPA,
+> which isn't using mdev.
+> 
+> Further, I disagree with your assessment that this doesn't scale. You
+> already said you plan a normal user interface for idxd, so instead of
+> having a single sane user interface (ala VDPA) idxd now needs *two*. If
+> this is the general pattern of things to come, it is a bad path.
+> 
+> The only thing we get out of this is someone doesn't have to write a
+> idxd emulation driver in qemu, instead they have to write it in the
+> kernel. I don't see how that is a win for the ecosystem.
+> 
+
+No. The clear win is on leveraging classic VFIO iommu and its eco-system
+as explained above.
 
 Thanks
-
-
-> +}
-> +
->   static irqreturn_t ifcvf_intr_handler(int irq, void *arg)
->   {
->   	struct vring_info *vring =3D arg;
-> @@ -256,7 +266,10 @@ static void ifcvf_vdpa_set_config(struct vdpa_devi=
-ce *vdpa_dev,
->   static void ifcvf_vdpa_set_config_cb(struct vdpa_device *vdpa_dev,
->   				     struct vdpa_callback *cb)
->   {
-> -	/* We don't support config interrupt */
-> +	struct ifcvf_hw *vf =3D vdpa_to_vf(vdpa_dev);
-> +
-> +	vf->config_cb.callback =3D cb->callback;
-> +	vf->config_cb.private =3D cb->private;
->   }
->  =20
->   /*
-> @@ -292,6 +305,13 @@ static int ifcvf_request_irq(struct ifcvf_adapter =
-*adapter)
->   	struct ifcvf_hw *vf =3D &adapter->vf;
->   	int vector, i, ret, irq;
->  =20
-> +	snprintf(vf->config_msix_name, 256, "ifcvf[%s]-config\n",
-> +		pci_name(pdev));
-> +	vector =3D 0;
-> +	irq =3D pci_irq_vector(pdev, vector);
-> +	ret =3D devm_request_irq(&pdev->dev, irq,
-> +			       ifcvf_config_changed, 0,
-> +			       vf->config_msix_name, vf);
->  =20
->   	for (i =3D 0; i < IFCVF_MAX_QUEUE_PAIRS * 2; i++) {
->   		snprintf(vf->vring[i].msix_name, 256, "ifcvf[%s]-%d\n",
-
+Kevin
