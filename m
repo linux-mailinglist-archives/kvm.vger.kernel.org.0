@@ -2,138 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C573D1B8F7F
-	for <lists+kvm@lfdr.de>; Sun, 26 Apr 2020 13:47:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EF8A61B8F93
+	for <lists+kvm@lfdr.de>; Sun, 26 Apr 2020 13:53:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726249AbgDZLq5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 26 Apr 2020 07:46:57 -0400
-Received: from mga05.intel.com ([192.55.52.43]:11883 "EHLO mga05.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726228AbgDZLqx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 26 Apr 2020 07:46:53 -0400
-IronPort-SDR: GM65Awuqw23W0eRExFNLQ8hrxwKNhDlJdTUtXt8ZjVlHo2ZNkV4a9TAoQ8MnH9ZI/k2kPFTDuf
- 6YS6JuF08Qyw==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Apr 2020 04:46:52 -0700
-IronPort-SDR: uoXCr6IRVu738d0l769dyIzvyOpqL6kQ0HeQUcVfrtfwXEkgqQrQHldYHd1uTyUM4lFDfg227i
- Nrd3vaxICfHQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,320,1583222400"; 
-   d="scan'208";a="275155067"
-Received: from unknown (HELO localhost.localdomain.bj.intel.com) ([10.240.193.79])
-  by orsmga002.jf.intel.com with ESMTP; 26 Apr 2020 04:46:49 -0700
-From:   Zhu Lingshan <lingshan.zhu@intel.com>
-To:     mst@redhat.com, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-        jasowang@redhat.com
-Cc:     lulu@redhat.com, dan.daly@intel.com, cunming.liang@intel.com,
-        Zhu Lingshan <lingshan.zhu@intel.com>
-Subject: [PATCH V4 3/3] vdpa: implement config interrupt in IFCVF
-Date:   Sun, 26 Apr 2020 19:43:26 +0800
-Message-Id: <1587901406-27400-4-git-send-email-lingshan.zhu@intel.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1587901406-27400-1-git-send-email-lingshan.zhu@intel.com>
-References: <1587901406-27400-1-git-send-email-lingshan.zhu@intel.com>
+        id S1726137AbgDZLxF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 26 Apr 2020 07:53:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41020 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726125AbgDZLxF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 26 Apr 2020 07:53:05 -0400
+Received: from mail-wr1-x441.google.com (mail-wr1-x441.google.com [IPv6:2a00:1450:4864:20::441])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CED53C061A0E
+        for <kvm@vger.kernel.org>; Sun, 26 Apr 2020 04:53:04 -0700 (PDT)
+Received: by mail-wr1-x441.google.com with SMTP id k1so17128056wrx.4
+        for <kvm@vger.kernel.org>; Sun, 26 Apr 2020 04:53:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=XHG/8raY/sNsCvqJxNKRfA970Dv5Wyt5EYrzke/beHI=;
+        b=b4XCUq7PlQRs0ksWZgSlunAMQSnV1kPIMQyqkc6EbU7JgSk1MLfLZ/Ggie2G35aPHK
+         GRMdF8ts0WKc+gY4/T8wS63LX/W+04fSQYABLIOE9e+S0QhS0Vrxtqlau03Vjhm5GMPp
+         tFg/GONDORkbh74dUg/hsW0UNP0/zyavovzIfujGGmxCPG9dt9Q49m+i3LugZJU6sCtL
+         tKXYuz4Jjo1ocKlPoS3V21XzzKxsh/S/MwA48T34tg4TNqFtLTMLfqurzgXwwdZIK3bp
+         tOfh0J1x6HemeW5UE4cKaucFxCo6gOlZ3aBYcEn/KxVDfZyWa87b//ftH9AZwEZi29gA
+         hjew==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=XHG/8raY/sNsCvqJxNKRfA970Dv5Wyt5EYrzke/beHI=;
+        b=YvAv7y2Tcqs4oshjky4nVV4eqzZ3cZiUCPAIaNpRyDWP6Vq36axoikCPnPPgR/lH2/
+         7/GgeEsZjoyXSe8C7JYmHvASi9Fj3HGyv/BWAENRqsJ0P5a8gnCXa55lmNX0p4M7Hq4s
+         1lgvSG5l6KpR2Km6b1mPhrI+hFNGfM65l2tUJrcLprorztWe2MC/azMlgnZ6lQ3DGT3h
+         /i2QdOp8F8q+67pn0tAoo4ngMkgnEGdt1t+DL214lDQMBvqENwG0Sc5CEtyRpPObUqWN
+         O50NBnl/yLOGZaK0P9ioDCYaCSYfvt0fcvutncqiV1sM0n7tHHfZVnY+Vf5Gj6DR4dbh
+         Sk6Q==
+X-Gm-Message-State: AGi0Pubc5EFCKZS5hErijGln7AgoMRajrywqXaV7zMFIBS4BP23+H8NG
+        MPxSMvnRiOrUdLc7UlrCTBv4wjJ92vw=
+X-Google-Smtp-Source: APiQypKT6U5iFWVWGfBb8r2IYcT670b2zDQ6YjkSiDSmQiKGrbBpFpAeMuVc2nS2y+e0N0qtu45rvQ==
+X-Received: by 2002:adf:9d85:: with SMTP id p5mr22726396wre.101.1587901983275;
+        Sun, 26 Apr 2020 04:53:03 -0700 (PDT)
+Received: from localhost.localdomain (93-103-18-160.static.t-2.net. [93.103.18.160])
+        by smtp.gmail.com with ESMTPSA id g6sm16387565wrw.34.2020.04.26.04.53.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 26 Apr 2020 04:53:02 -0700 (PDT)
+From:   Uros Bizjak <ubizjak@gmail.com>
+To:     kvm@vger.kernel.org
+Cc:     Uros Bizjak <ubizjak@gmail.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Subject: [PATCH v2] KVM: VMX: Improve handle_external_interrupt_irqoff inline assembly
+Date:   Sun, 26 Apr 2020 13:52:55 +0200
+Message-Id: <20200426115255.305060-1-ubizjak@gmail.com>
+X-Mailer: git-send-email 2.25.3
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This commit implements config interrupt support
-in IFC VF
+Improve handle_external_interrupt_irqoff inline assembly in several ways:
+- use "n" operand constraint instead of "i" and remove
+  unneeded %c operand modifiers and "$" prefixes
+- use %rsp instead of _ASM_SP, since we are in CONFIG_X86_64 part
+- use $-16 immediate to align %rsp
+- remove unneeded use of __ASM_SIZE macro
+- define "ss" named operand only for X86_64
 
-Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
+The patch introduces no functional changes.
+
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Sean Christopherson <sean.j.christopherson@intel.com>
+Signed-off-by: Uros Bizjak <ubizjak@gmail.com>
 ---
- drivers/vdpa/ifcvf/ifcvf_base.c |  3 +++
- drivers/vdpa/ifcvf/ifcvf_base.h |  3 +++
- drivers/vdpa/ifcvf/ifcvf_main.c | 22 +++++++++++++++++++++-
- 3 files changed, 27 insertions(+), 1 deletion(-)
+ arch/x86/kvm/vmx/vmx.c | 14 ++++++++------
+ 1 file changed, 8 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/vdpa/ifcvf/ifcvf_base.c b/drivers/vdpa/ifcvf/ifcvf_base.c
-index b61b06e..c825d99 100644
---- a/drivers/vdpa/ifcvf/ifcvf_base.c
-+++ b/drivers/vdpa/ifcvf/ifcvf_base.c
-@@ -185,6 +185,9 @@ void ifcvf_set_status(struct ifcvf_hw *hw, u8 status)
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index c2c6335a998c..7471f1b948b3 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -6283,13 +6283,13 @@ static void handle_external_interrupt_irqoff(struct kvm_vcpu *vcpu)
  
- void ifcvf_reset(struct ifcvf_hw *hw)
- {
-+	hw->config_cb.callback = NULL;
-+	hw->config_cb.private = NULL;
-+
- 	ifcvf_set_status(hw, 0);
- 	/* flush set_status, make sure VF is stopped, reset */
- 	ifcvf_get_status(hw);
-diff --git a/drivers/vdpa/ifcvf/ifcvf_base.h b/drivers/vdpa/ifcvf/ifcvf_base.h
-index e803070..23ac47d 100644
---- a/drivers/vdpa/ifcvf/ifcvf_base.h
-+++ b/drivers/vdpa/ifcvf/ifcvf_base.h
-@@ -27,6 +27,7 @@
- 		((1ULL << VIRTIO_NET_F_MAC)			| \
- 		 (1ULL << VIRTIO_F_ANY_LAYOUT)			| \
- 		 (1ULL << VIRTIO_F_VERSION_1)			| \
-+		 (1ULL << VIRTIO_NET_F_STATUS)			| \
- 		 (1ULL << VIRTIO_F_ORDER_PLATFORM)		| \
- 		 (1ULL << VIRTIO_F_IOMMU_PLATFORM)		| \
- 		 (1ULL << VIRTIO_NET_F_MRG_RXBUF))
-@@ -81,6 +82,8 @@ struct ifcvf_hw {
- 	void __iomem *net_cfg;
- 	struct vring_info vring[IFCVF_MAX_QUEUE_PAIRS * 2];
- 	void __iomem * const *base;
-+	char config_msix_name[256];
-+	struct vdpa_callback config_cb;
- };
+ 	asm volatile(
+ #ifdef CONFIG_X86_64
+-		"mov %%" _ASM_SP ", %[sp]\n\t"
+-		"and $0xfffffffffffffff0, %%" _ASM_SP "\n\t"
+-		"push $%c[ss]\n\t"
++		"mov %%rsp, %[sp]\n\t"
++		"and $-16, %%rsp\n\t"
++		"push %[ss]\n\t"
+ 		"push %[sp]\n\t"
+ #endif
+ 		"pushf\n\t"
+-		__ASM_SIZE(push) " $%c[cs]\n\t"
++		"push %[cs]\n\t"
+ 		CALL_NOSPEC
+ 		:
+ #ifdef CONFIG_X86_64
+@@ -6298,8 +6298,10 @@ static void handle_external_interrupt_irqoff(struct kvm_vcpu *vcpu)
+ 		ASM_CALL_CONSTRAINT
+ 		:
+ 		[thunk_target]"r"(entry),
+-		[ss]"i"(__KERNEL_DS),
+-		[cs]"i"(__KERNEL_CS)
++#ifdef CONFIG_X86_64
++		[ss]"n"(__KERNEL_DS),
++#endif
++		[cs]"n"(__KERNEL_CS)
+ 	);
  
- struct ifcvf_adapter {
-diff --git a/drivers/vdpa/ifcvf/ifcvf_main.c b/drivers/vdpa/ifcvf/ifcvf_main.c
-index 8d54dc5..f7baeca 100644
---- a/drivers/vdpa/ifcvf/ifcvf_main.c
-+++ b/drivers/vdpa/ifcvf/ifcvf_main.c
-@@ -18,6 +18,16 @@
- #define DRIVER_AUTHOR   "Intel Corporation"
- #define IFCVF_DRIVER_NAME       "ifcvf"
- 
-+static irqreturn_t ifcvf_config_changed(int irq, void *arg)
-+{
-+	struct ifcvf_hw *vf = arg;
-+
-+	if (vf->config_cb.callback)
-+		return vf->config_cb.callback(vf->config_cb.private);
-+
-+	return IRQ_HANDLED;
-+}
-+
- static irqreturn_t ifcvf_intr_handler(int irq, void *arg)
- {
- 	struct vring_info *vring = arg;
-@@ -256,7 +266,10 @@ static void ifcvf_vdpa_set_config(struct vdpa_device *vdpa_dev,
- static void ifcvf_vdpa_set_config_cb(struct vdpa_device *vdpa_dev,
- 				     struct vdpa_callback *cb)
- {
--	/* We don't support config interrupt */
-+	struct ifcvf_hw *vf = vdpa_to_vf(vdpa_dev);
-+
-+	vf->config_cb.callback = cb->callback;
-+	vf->config_cb.private = cb->private;
- }
- 
- /*
-@@ -292,6 +305,13 @@ static int ifcvf_request_irq(struct ifcvf_adapter *adapter)
- 	struct ifcvf_hw *vf = &adapter->vf;
- 	int vector, i, ret, irq;
- 
-+	snprintf(vf->config_msix_name, 256, "ifcvf[%s]-config\n",
-+		pci_name(pdev));
-+	vector = 0;
-+	irq = pci_irq_vector(pdev, vector);
-+	ret = devm_request_irq(&pdev->dev, irq,
-+			       ifcvf_config_changed, 0,
-+			       vf->config_msix_name, vf);
- 
- 	for (i = 0; i < IFCVF_MAX_QUEUE_PAIRS * 2; i++) {
- 		snprintf(vf->vring[i].msix_name, 256, "ifcvf[%s]-%d\n",
+ 	kvm_after_interrupt(vcpu);
 -- 
-1.8.3.1
+2.25.3
 
