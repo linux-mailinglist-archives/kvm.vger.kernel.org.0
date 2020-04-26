@@ -2,98 +2,220 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 677191B8CF2
-	for <lists+kvm@lfdr.de>; Sun, 26 Apr 2020 08:40:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 467F91B8D1A
+	for <lists+kvm@lfdr.de>; Sun, 26 Apr 2020 08:59:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726188AbgDZGkE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 26 Apr 2020 02:40:04 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:3299 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726108AbgDZGkE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 26 Apr 2020 02:40:04 -0400
-Received: from DGGEMS410-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id 912E0C13748A6CD909A3;
-        Sun, 26 Apr 2020 14:40:02 +0800 (CST)
-Received: from DESKTOP-FJ48AOJ.china.huawei.com (10.173.221.6) by
- DGGEMS410-HUB.china.huawei.com (10.3.19.210) with Microsoft SMTP Server id
- 14.3.487.0; Sun, 26 Apr 2020 14:39:52 +0800
-From:   Yingtai Xie <xieyingtai@huawei.com>
-To:     <kwankhede@nvidia.com>
-CC:     <alex.williamson@redhat.com>, <kvm@vger.kernel.org>,
-        <xieyingtai@huawei.com>, <wu.wubin@huawei.com>
-Subject: [PATCH] vfio/mdev: Add vfio-mdev device request interface
-Date:   Sun, 26 Apr 2020 14:35:42 +0800
-Message-ID: <20200426063542.16548-1-xieyingtai@huawei.com>
-X-Mailer: git-send-email 2.8.3.windows.1
+        id S1726141AbgDZG7C (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 26 Apr 2020 02:59:02 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:45720 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726108AbgDZG7C (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sun, 26 Apr 2020 02:59:02 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1587884340;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=nzpyfv1Z6VEBidKjguuGbAmxFY96l0LyJXnhGt0vsLM=;
+        b=IPf5nC//xW/YUDkf3cSN5GYGMqO4rCFUz8LqthGaYzwAkCNMWAiBhg2mZRiT7opDVSd1hU
+        ZUco65lwoP+Tz38RtCbAwSsui/eqqEltOcrEG7MVjdizU3oVlepmtjAQBxQR0IiJfPZIYY
+        Iu1pVIlC42OnJY8ei99N4ZwHyfZ1wZM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-496-aJ0xuxzYOcqNo5y_I5t1WQ-1; Sun, 26 Apr 2020 02:58:53 -0400
+X-MC-Unique: aJ0xuxzYOcqNo5y_I5t1WQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 89CE91005510;
+        Sun, 26 Apr 2020 06:58:51 +0000 (UTC)
+Received: from [10.72.13.103] (ovpn-13-103.pek2.redhat.com [10.72.13.103])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 506925D9CD;
+        Sun, 26 Apr 2020 06:58:44 +0000 (UTC)
+Subject: Re: [PATCH V2 1/2] vdpa: Support config interrupt in vhost_vdpa
+To:     Zhu Lingshan <lingshan.zhu@intel.com>, mst@redhat.com,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Cc:     lulu@redhat.com, dan.daly@intel.com, cunming.liang@intel.com
+References: <1587881384-2133-1-git-send-email-lingshan.zhu@intel.com>
+ <1587881384-2133-2-git-send-email-lingshan.zhu@intel.com>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <055fb826-895d-881b-719c-228d0cc9a7bf@redhat.com>
+Date:   Sun, 26 Apr 2020 14:58:43 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.173.221.6]
-X-CFilter-Loop: Reflected
+In-Reply-To: <1587881384-2133-2-git-send-email-lingshan.zhu@intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This is setup the same way as vfio-pci to indicate
-userspace that the device should be released.
 
-Signed-off-by: Yingtai Xie <xieyingtai@huawei.com>
----
- drivers/vfio/mdev/vfio_mdev.c | 10 ++++++++++
- include/linux/mdev.h          |  4 ++++
- 2 files changed, 14 insertions(+)
+On 2020/4/26 =E4=B8=8B=E5=8D=882:09, Zhu Lingshan wrote:
+> This commit implements config interrupt support in
+> vhost_vdpa layer.
+>
+> Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
+> ---
+>   drivers/vhost/vdpa.c       | 47 +++++++++++++++++++++++++++++++++++++=
++++++++++
+>   drivers/vhost/vhost.c      |  2 +-
+>   drivers/vhost/vhost.h      |  2 ++
+>   include/uapi/linux/vhost.h |  2 ++
+>   4 files changed, 52 insertions(+), 1 deletion(-)
+>
+> diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+> index 421f02a..b94e349 100644
+> --- a/drivers/vhost/vdpa.c
+> +++ b/drivers/vhost/vdpa.c
+> @@ -21,6 +21,7 @@
+>   #include <linux/nospec.h>
+>   #include <linux/vhost.h>
+>   #include <linux/virtio_net.h>
+> +#include <linux/kernel.h>
+>  =20
+>   #include "vhost.h"
+>  =20
+> @@ -70,6 +71,7 @@ struct vhost_vdpa {
+>   	int nvqs;
+>   	int virtio_id;
+>   	int minor;
+> +	struct eventfd_ctx *config_ctx;
+>   };
+>  =20
+>   static DEFINE_IDA(vhost_vdpa_ida);
+> @@ -101,6 +103,17 @@ static irqreturn_t vhost_vdpa_virtqueue_cb(void *p=
+rivate)
+>   	return IRQ_HANDLED;
+>   }
+>  =20
+> +static irqreturn_t vhost_vdpa_config_cb(void *private)
+> +{
+> +	struct vhost_vdpa *v =3D private;
+> +	struct eventfd_ctx *config_ctx =3D v->config_ctx;
+> +
+> +	if (config_ctx)
+> +		eventfd_signal(config_ctx, 1);
+> +
+> +	return IRQ_HANDLED;
+> +}
+> +
+>   static void vhost_vdpa_reset(struct vhost_vdpa *v)
+>   {
+>   	struct vdpa_device *vdpa =3D v->vdpa;
+> @@ -288,6 +301,36 @@ static long vhost_vdpa_get_vring_num(struct vhost_=
+vdpa *v, u16 __user *argp)
+>   	return 0;
+>   }
+>  =20
+> +static void vhost_vdpa_config_put(struct vhost_vdpa *v)
+> +{
+> +	if (v->config_ctx)
+> +		eventfd_ctx_put(v->config_ctx);
+> +}
+> +
+> +static long vhost_vdpa_set_config_call(struct vhost_vdpa *v, u32 __use=
+r *argp)
+> +{
+> +	struct vdpa_callback cb;
+> +	u32 fd;
+> +	struct eventfd_ctx *ctx;
+> +
+> +	cb.callback =3D vhost_vdpa_config_cb;
+> +	cb.private =3D v->vdpa;
+> +	if (copy_from_user(&fd, argp, sizeof(fd)))
+> +		return  -EFAULT;
+> +
+> +	ctx =3D fd =3D=3D VHOST_FILE_UNBIND ? NULL : eventfd_ctx_fdget(fd);
+> +	swap(ctx, v->config_ctx);
+> +
+> +	if (!IS_ERR_OR_NULL(ctx))
+> +		eventfd_ctx_put(ctx);
+> +
+> +	if (IS_ERR(v->config_ctx))
+> +		return PTR_ERR(v->config_ctx);
+> +
+> +	v->vdpa->config->set_config_cb(v->vdpa, &cb);
+> +
+> +	return 0;
+> +}
+>   static long vhost_vdpa_vring_ioctl(struct vhost_vdpa *v, unsigned int=
+ cmd,
+>   				   void __user *argp)
+>   {
+> @@ -398,6 +441,9 @@ static long vhost_vdpa_unlocked_ioctl(struct file *=
+filep,
+>   	case VHOST_SET_LOG_FD:
+>   		r =3D -ENOIOCTLCMD;
+>   		break;
+> +	case VHOST_VDPA_SET_CONFIG_CALL:
+> +		r =3D vhost_vdpa_set_config_call(v, argp);
+> +		break;
+>   	default:
+>   		r =3D vhost_dev_ioctl(&v->vdev, cmd, argp);
+>   		if (r =3D=3D -ENOIOCTLCMD)
+> @@ -734,6 +780,7 @@ static int vhost_vdpa_release(struct inode *inode, =
+struct file *filep)
+>   	vhost_dev_stop(&v->vdev);
+>   	vhost_vdpa_iotlb_free(v);
+>   	vhost_vdpa_free_domain(v);
+> +	vhost_vdpa_config_put(v);
+>   	vhost_dev_cleanup(&v->vdev);
+>   	kfree(v->vdev.vqs);
+>   	mutex_unlock(&d->mutex);
+> diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+> index d450e16..e8f5b20 100644
+> --- a/drivers/vhost/vhost.c
+> +++ b/drivers/vhost/vhost.c
+> @@ -1590,7 +1590,7 @@ long vhost_vring_ioctl(struct vhost_dev *d, unsig=
+ned int ioctl, void __user *arg
+>   			r =3D -EFAULT;
+>   			break;
+>   		}
+> -		ctx =3D f.fd =3D=3D -1 ? NULL : eventfd_ctx_fdget(f.fd);
+> +		ctx =3D f.fd =3D=3D VHOST_FILE_UNBIND ? NULL : eventfd_ctx_fdget(f.f=
+d);
+>   		if (IS_ERR(ctx)) {
+>   			r =3D PTR_ERR(ctx);
+>   			break;
+> diff --git a/drivers/vhost/vhost.h b/drivers/vhost/vhost.h
+> index 1813821..8663139 100644
+> --- a/drivers/vhost/vhost.h
+> +++ b/drivers/vhost/vhost.h
+> @@ -18,6 +18,8 @@
+>   typedef void (*vhost_work_fn_t)(struct vhost_work *work);
+>  =20
+>   #define VHOST_WORK_QUEUED 1
+> +#define VHOST_FILE_UNBIND -1
 
-diff --git a/drivers/vfio/mdev/vfio_mdev.c b/drivers/vfio/mdev/vfio_mdev.c
-index 30964a4e0..74695c116 100644
---- a/drivers/vfio/mdev/vfio_mdev.c
-+++ b/drivers/vfio/mdev/vfio_mdev.c
-@@ -98,6 +98,15 @@ static int vfio_mdev_mmap(void *device_data, struct vm_area_struct *vma)
- 	return parent->ops->mmap(mdev, vma);
- }
- 
-+static void vfio_mdev_request(void *device_data, unsigned int count)
-+{
-+	struct mdev_device *mdev = device_data;
-+	struct mdev_parent *parent = mdev->parent;
-+
-+	if (likely(!parent->ops->request))
-+		parent->ops->request(mdev, count);
-+}
-+
- static const struct vfio_device_ops vfio_mdev_dev_ops = {
- 	.name		= "vfio-mdev",
- 	.open		= vfio_mdev_open,
-@@ -106,6 +115,7 @@ static const struct vfio_device_ops vfio_mdev_dev_ops = {
- 	.read		= vfio_mdev_read,
- 	.write		= vfio_mdev_write,
- 	.mmap		= vfio_mdev_mmap,
-+	.request	= vfio_mdev_request,
- };
- 
- static int vfio_mdev_probe(struct device *dev)
-diff --git a/include/linux/mdev.h b/include/linux/mdev.h
-index 0ce30ca78..1ab0b0b9b 100644
---- a/include/linux/mdev.h
-+++ b/include/linux/mdev.h
-@@ -72,6 +72,9 @@ struct device *mdev_get_iommu_device(struct device *dev);
-  * @mmap:		mmap callback
-  *			@mdev: mediated device structure
-  *			@vma: vma structure
-+ * @request	request callback
-+ *			@mdev: mediated device structure
-+ *			@count: counter to allow driver to release the device
-  * Parent device that support mediated device should be registered with mdev
-  * module with mdev_parent_ops structure.
-  **/
-@@ -92,6 +95,7 @@ struct mdev_parent_ops {
- 	long	(*ioctl)(struct mdev_device *mdev, unsigned int cmd,
- 			 unsigned long arg);
- 	int	(*mmap)(struct mdev_device *mdev, struct vm_area_struct *vma);
-+	int	(*request)(struct mdev_device *mdev, unsigned int count);
- };
- 
- /* interface for exporting mdev supported type attributes */
--- 
-2.19.1
 
+I think it's better to document this in uapi.
+
+
+> +
+>   struct vhost_work {
+>   	struct llist_node	  node;
+>   	vhost_work_fn_t		  fn;
+> diff --git a/include/uapi/linux/vhost.h b/include/uapi/linux/vhost.h
+> index 9fe72e4..345acb3 100644
+> --- a/include/uapi/linux/vhost.h
+> +++ b/include/uapi/linux/vhost.h
+> @@ -140,4 +140,6 @@
+>   /* Get the max ring size. */
+>   #define VHOST_VDPA_GET_VRING_NUM	_IOR(VHOST_VIRTIO, 0x76, __u16)
+>  =20
+> +/* Set event fd for config interrupt*/
+> +#define VHOST_VDPA_SET_CONFIG_CALL	_IOW(VHOST_VIRTIO, 0x77, u32)
+>   #endif
+
+
+Should be "int" instead of "u32".
+
+Thanks
 
