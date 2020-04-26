@@ -2,206 +2,172 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 80C051B8AEA
-	for <lists+kvm@lfdr.de>; Sun, 26 Apr 2020 03:55:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 72A8D1B8AEE
+	for <lists+kvm@lfdr.de>; Sun, 26 Apr 2020 04:05:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726102AbgDZBzj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 25 Apr 2020 21:55:39 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:3292 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726087AbgDZBzj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 25 Apr 2020 21:55:39 -0400
-Received: from DGGEMS407-HUB.china.huawei.com (unknown [172.30.72.58])
-        by Forcepoint Email with ESMTP id A8599EA61FAA5363363F;
-        Sun, 26 Apr 2020 09:55:36 +0800 (CST)
-Received: from [10.173.228.124] (10.173.228.124) by smtp.huawei.com
- (10.3.19.207) with Microsoft SMTP Server (TLS) id 14.3.487.0; Sun, 26 Apr
- 2020 09:55:29 +0800
-Subject: Re: [PATCH v1 00/15] Add support for Nitro Enclaves
-To:     "Paraschiv, Andra-Irina" <andraprs@amazon.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        <linux-kernel@vger.kernel.org>
-CC:     Anthony Liguori <aliguori@amazon.com>,
-        Benjamin Herrenschmidt <benh@amazon.com>,
-        Colm MacCarthaigh <colmmacc@amazon.com>,
-        Bjoern Doebel <doebel@amazon.de>,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        Frank van der Linden <fllinden@amazon.com>,
-        Alexander Graf <graf@amazon.de>,
-        Martin Pohlack <mpohlack@amazon.de>,
-        Matt Wilson <msw@amazon.com>, Balbir Singh <sblbir@amazon.com>,
-        Stewart Smith <trawets@amazon.com>,
-        Uwe Dannowski <uwed@amazon.de>, <kvm@vger.kernel.org>,
-        <ne-devel-upstream@amazon.com>,
-        "Gonglei (Arei)" <arei.gonglei@huawei.com>
-References: <20200421184150.68011-1-andraprs@amazon.com>
- <18406322-dc58-9b59-3f94-88e6b638fe65@redhat.com>
- <ff65b1ed-a980-9ddc-ebae-996869e87308@amazon.com>
- <2aa9c865-61c1-fc73-c85d-6627738d2d24@huawei.com>
- <7ac3f702-9c5f-5021-ebe3-42f1c93afbdf@amazon.com>
- <f701e084-7d2d-35dd-31ec-adc7d2a9e893@amazon.com>
-From:   "Longpeng (Mike, Cloud Infrastructure Service Product Dept.)" 
-        <longpeng2@huawei.com>
-Message-ID: <77af0b1c-9884-5a75-02bd-1cc63c57971c@huawei.com>
-Date:   Sun, 26 Apr 2020 09:55:28 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+        id S1726107AbgDZCFN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 25 Apr 2020 22:05:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35106 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726087AbgDZCFM (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sat, 25 Apr 2020 22:05:12 -0400
+Received: from mail-ot1-x344.google.com (mail-ot1-x344.google.com [IPv6:2607:f8b0:4864:20::344])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9CA42C061A0C;
+        Sat, 25 Apr 2020 19:05:12 -0700 (PDT)
+Received: by mail-ot1-x344.google.com with SMTP id e26so19983154otr.2;
+        Sat, 25 Apr 2020 19:05:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=XV/ycCCkbNOtiapuFi8QAjboaHhRP6AP7U91LebFK/8=;
+        b=m5h31eSaY8gD6hMEnGw1xNe7BGd9oox5GSVSkSSieNI3JeKRkfex0iT/T1xsDQRXCe
+         VXL+zL8lhQ6OwZZgPZLuSyHauCFn82WrlcupV5jh4bBkpqHqZvOTJtj8jhhGd8eZ1hPL
+         S6kB3dKzbZoOToILfjdGZWowgeiVsYxWgotBsWmBGZylZUnX3+9upjfeiIHLPu7cY3n+
+         YcedJjmG2Y0A28wdx32M178ZUOj7kxx3OwIotIflTeIm/T6U69dXqXQ4G/RC/iP+mmCL
+         l2Gn4UpaSgQfuJfKYRRMONB1kMr/XPOBGG398Td0ElXPOgEX/GpnTBx6kMqiM7xe5ATO
+         +Rcw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=XV/ycCCkbNOtiapuFi8QAjboaHhRP6AP7U91LebFK/8=;
+        b=FHZcAUKn82iyojfI260BHUBAru4UqUDmWSivUgBP9XG3GHx95/Z24sO4ND69kbdwNI
+         zA5JyIcTNvmm2bo2GuSmp9L7+agvimK1Oye9WHiEBeN8lHENRiULyGLyleXB0N44PDNL
+         Y71pir3WzsLRpQ274ELVe7GzrM/5eg8WDEQECjFMgdl1rujpfnu6fUPO//1bHEe5/ocW
+         YW7tZs6elQRKkTISNN0z+hqdyLfrJZ+RWmia791i2lUR9veFwBaBF+O7+lMaM3eJPXCo
+         wmHPd3GcvxiMjpPZZJBa+YWcxWdn3WgaYjLzjJkchINl8JQ8dl7wA9uxVVlp1mk1NIve
+         9xYw==
+X-Gm-Message-State: AGi0PuZXhTZufr9hDEOs3BX4PF+dxpUrP51vHr1FVJE3hO6t+4B8WYdy
+        B1XLIXpC6I4qWYLj0rMtDVKgyXHp2o/42JFBtLjsuQjg
+X-Google-Smtp-Source: APiQypJIyDV4LLYHpnEtCktMxekOVKPDUdGjh36BZXibZGgTZQNSbjuWNyQ481rAkx1gqvxwCIBL6Nv+IZqS/k8nx98=
+X-Received: by 2002:a05:6830:20d9:: with SMTP id z25mr6500868otq.254.1587866711857;
+ Sat, 25 Apr 2020 19:05:11 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <f701e084-7d2d-35dd-31ec-adc7d2a9e893@amazon.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.173.228.124]
-X-CFilter-Loop: Reflected
+References: <1587709364-19090-1-git-send-email-wanpengli@tencent.com> <1587709364-19090-3-git-send-email-wanpengli@tencent.com>
+In-Reply-To: <1587709364-19090-3-git-send-email-wanpengli@tencent.com>
+From:   Wanpeng Li <kernellwp@gmail.com>
+Date:   Sun, 26 Apr 2020 10:05:00 +0800
+Message-ID: <CANRm+CwvTrwmJnFWR8UgEkqyE_fyoc6KmrNuHQj=DuJDkR-UGA@mail.gmail.com>
+Subject: Re: [PATCH v3 2/5] KVM: X86: Introduce need_cancel_enter_guest helper
+To:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Haiwei Li <lihaiwei@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Fri, 24 Apr 2020 at 14:23, Wanpeng Li <kernellwp@gmail.com> wrote:
+>
+> From: Wanpeng Li <wanpengli@tencent.com>
+>
+> Introduce need_cancel_enter_guest() helper, we need to check some
+> conditions before doing CONT_RUN, in addition, it can also catch
+> the case vmexit occurred while another event was being delivered
+> to guest software since vmx_complete_interrupts() adds the request
+> bit.
+>
+> Tested-by: Haiwei Li <lihaiwei@tencent.com>
+> Cc: Haiwei Li <lihaiwei@tencent.com>
+> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+> ---
+>  arch/x86/kvm/vmx/vmx.c | 12 +++++++-----
+>  arch/x86/kvm/x86.c     | 10 ++++++++--
+>  arch/x86/kvm/x86.h     |  1 +
+>  3 files changed, 16 insertions(+), 7 deletions(-)
+>
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index f1f6638..5c21027 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -6577,7 +6577,7 @@ bool __vmx_vcpu_run(struct vcpu_vmx *vmx, unsigned long *regs, bool launched);
+>
+>  static enum exit_fastpath_completion vmx_vcpu_run(struct kvm_vcpu *vcpu)
+>  {
+> -       enum exit_fastpath_completion exit_fastpath;
+> +       enum exit_fastpath_completion exit_fastpath = EXIT_FASTPATH_NONE;
+>         struct vcpu_vmx *vmx = to_vmx(vcpu);
+>         unsigned long cr3, cr4;
+>
+> @@ -6754,10 +6754,12 @@ static enum exit_fastpath_completion vmx_vcpu_run(struct kvm_vcpu *vcpu)
+>         vmx_recover_nmi_blocking(vmx);
+>         vmx_complete_interrupts(vmx);
+>
+> -       exit_fastpath = vmx_exit_handlers_fastpath(vcpu);
+> -       /* static call is better with retpolines */
+> -       if (exit_fastpath == EXIT_FASTPATH_CONT_RUN)
+> -               goto cont_run;
+> +       if (!kvm_need_cancel_enter_guest(vcpu)) {
+> +               exit_fastpath = vmx_exit_handlers_fastpath(vcpu);
+> +               /* static call is better with retpolines */
+> +               if (exit_fastpath == EXIT_FASTPATH_CONT_RUN)
+> +                       goto cont_run;
+> +       }
 
+The kvm_need_cancel_enter_guest() should not before
+vmx_exit_handlers_fastpath() which will break IPI fastpath. How about
+applying something like below, otherwise, maybe introduce another
+EXIT_FASTPATH_CONT_FAIL to indicate fails due to
+kvm_need_cancel_enter_guest() if checking it after
+vmx_exit_handlers_fastpath(), then we return 1 in vmx_handle_exit()
+directly instead of kvm_skip_emulated_instruction(). VMX-preemption
+timer exit doesn't need to skip emulated instruction but wrmsr
+TSCDEADLINE MSR exit does which results in a little complex here.
 
-On 2020/4/24 17:54, Paraschiv, Andra-Irina wrote:
-> 
-> 
-> On 24/04/2020 11:19, Paraschiv, Andra-Irina wrote:
->>
->>
->> On 24/04/2020 06:04, Longpeng (Mike, Cloud Infrastructure Service Product
->> Dept.) wrote:
->>> On 2020/4/23 21:19, Paraschiv, Andra-Irina wrote:
->>>>
->>>> On 22/04/2020 00:46, Paolo Bonzini wrote:
->>>>> On 21/04/20 20:41, Andra Paraschiv wrote:
->>>>>> An enclave communicates with the primary VM via a local communication
->>>>>> channel,
->>>>>> using virtio-vsock [2]. An enclave does not have a disk or a network device
->>>>>> attached.
->>>>> Is it possible to have a sample of this in the samples/ directory?
->>>> I can add in v2 a sample file including the basic flow of how to use the ioctl
->>>> interface to create / terminate an enclave.
->>>>
->>>> Then we can update / build on top it based on the ongoing discussions on the
->>>> patch series and the received feedback.
->>>>
->>>>> I am interested especially in:
->>>>>
->>>>> - the initial CPU state: CPL0 vs. CPL3, initial program counter, etc.
->>>>>
->>>>> - the communication channel; does the enclave see the usual local APIC
->>>>> and IOAPIC interfaces in order to get interrupts from virtio-vsock, and
->>>>> where is the virtio-vsock device (virtio-mmio I suppose) placed in memory?
->>>>>
->>>>> - what the enclave is allowed to do: can it change privilege levels,
->>>>> what happens if the enclave performs an access to nonexistent memory, etc.
->>>>>
->>>>> - whether there are special hypercall interfaces for the enclave
->>>> An enclave is a VM, running on the same host as the primary VM, that launched
->>>> the enclave. They are siblings.
->>>>
->>>> Here we need to think of two components:
->>>>
->>>> 1. An enclave abstraction process - a process running in the primary VM guest,
->>>> that uses the provided ioctl interface of the Nitro Enclaves kernel driver to
->>>> spawn an enclave VM (that's 2 below).
->>>>
->>>> How does all gets to an enclave VM running on the host?
->>>>
->>>> There is a Nitro Enclaves emulated PCI device exposed to the primary VM. The
->>>> driver for this new PCI device is included in the current patch series.
->>>>
->>> Hi Paraschiv,
->>>
->>> The new PCI device is emulated in QEMU ? If so, is there any plan to send the
->>> QEMU code ?
->>
->> Hi,
->>
->> Nope, not that I know of so far.
-> 
-> And just to be a bit more clear, the reply above takes into consideration that
-> it's not emulated in QEMU.
-> 
+Paolo, what do you think?
 
-Thanks.
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 853d3af..9317924 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -6564,6 +6564,9 @@ static enum exit_fastpath_completion
+handle_fastpath_preemption_timer(struct kvm
+ {
+     struct vcpu_vmx *vmx = to_vmx(vcpu);
 
-Guys in this thread are much more interested in the design of enclave VM and the
-new device, but there's no any document about this device yet, so I think the
-emulate code is a good alternative. However, Alex said the device specific will
-be published later, so I'll wait for it.
++    if (kvm_need_cancel_enter_guest(vcpu))
++        return EXIT_FASTPATH_NONE;
++
+     if (!vmx->req_immediate_exit &&
+         !unlikely(vmx->loaded_vmcs->hv_timer_soft_disabled)) {
+             kvm_lapic_expired_hv_timer(vcpu);
+@@ -6771,12 +6774,10 @@ static enum exit_fastpath_completion
+vmx_vcpu_run(struct kvm_vcpu *vcpu)
+     vmx_recover_nmi_blocking(vmx);
+     vmx_complete_interrupts(vmx);
 
-> 
-> Thanks,
-> Andra
-> 
->>
->>>
->>>> The ioctl logic is mapped to PCI device commands e.g. the NE_ENCLAVE_START
->>>> ioctl
->>>> maps to an enclave start PCI command or the KVM_SET_USER_MEMORY_REGION maps to
->>>> an add memory PCI command. The PCI device commands are then translated into
->>>> actions taken on the hypervisor side; that's the Nitro hypervisor running on
->>>> the
->>>> host where the primary VM is running.
->>>>
->>>> 2. The enclave itself - a VM running on the same host as the primary VM that
->>>> spawned it.
->>>>
->>>> The enclave VM has no persistent storage or network interface attached, it uses
->>>> its own memory and CPUs + its virtio-vsock emulated device for communication
->>>> with the primary VM.
->>>>
->>>> The memory and CPUs are carved out of the primary VM, they are dedicated for
->>>> the
->>>> enclave. The Nitro hypervisor running on the host ensures memory and CPU
->>>> isolation between the primary VM and the enclave VM.
->>>>
->>>>
->>>> These two components need to reflect the same state e.g. when the enclave
->>>> abstraction process (1) is terminated, the enclave VM (2) is terminated as
->>>> well.
->>>>
->>>> With regard to the communication channel, the primary VM has its own emulated
->>>> virtio-vsock PCI device. The enclave VM has its own emulated virtio-vsock
->>>> device
->>>> as well. This channel is used, for example, to fetch data in the enclave and
->>>> then process it. An application that sets up the vsock socket and connects or
->>>> listens, depending on the use case, is then developed to use this channel; this
->>>> happens on both ends - primary VM and enclave VM.
->>>>
->>>> Let me know if further clarifications are needed.
->>>>
->>>>>> The proposed solution is following the KVM model and uses the KVM API to
->>>>>> be able
->>>>>> to create and set resources for enclaves. An additional ioctl command,
->>>>>> besides
->>>>>> the ones provided by KVM, is used to start an enclave and setup the
->>>>>> addressing
->>>>>> for the communication channel and an enclave unique id.
->>>>> Reusing some KVM ioctls is definitely a good idea, but I wouldn't really
->>>>> say it's the KVM API since the VCPU file descriptor is basically non
->>>>> functional (without KVM_RUN and mmap it's not really the KVM API).
->>>> It uses part of the KVM API or a set of KVM ioctls to model the way a VM is
->>>> created / terminated. That's true, KVM_RUN and mmap-ing the vcpu fd are not
->>>> included.
->>>>
->>>> Thanks for the feedback regarding the reuse of KVM ioctls.
->>>>
->>>> Andra
->>>>
->>>>
->>>>
->>>>
->>>> Amazon Development Center (Romania) S.R.L. registered office: 27A Sf. Lazar
->>>> Street, UBC5, floor 2, Iasi, Iasi County, 700045, Romania. Registered in
->>>> Romania. Registration number J22/2621/2005.
->>
-> 
-> 
-> 
-> 
-> Amazon Development Center (Romania) S.R.L. registered office: 27A Sf. Lazar
-> Street, UBC5, floor 2, Iasi, Iasi County, 700045, Romania. Registered in
-> Romania. Registration number J22/2621/2005.
----
-Regards,
-Longpeng(Mike)
+-    if (!(kvm_need_cancel_enter_guest(vcpu))) {
+-        exit_fastpath = vmx_exit_handlers_fastpath(vcpu);
+-        if (exit_fastpath == EXIT_FASTPATH_CONT_RUN) {
+-            vmx_sync_pir_to_irr(vcpu);
+-            goto cont_run;
+-        }
++    exit_fastpath = vmx_exit_handlers_fastpath(vcpu);
++    if (exit_fastpath == EXIT_FASTPATH_CONT_RUN) {
++        vmx_sync_pir_to_irr(vcpu);
++        goto cont_run;
+     }
+
+     return exit_fastpath;
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 99061ba..11b309c 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -1618,6 +1618,9 @@ static int
+handle_fastpath_set_x2apic_icr_irqoff(struct kvm_vcpu *vcpu, u64 data
+
+ static int handle_fastpath_set_tscdeadline(struct kvm_vcpu *vcpu, u64 data)
+ {
++    if (kvm_need_cancel_enter_guest(vcpu))
++        return 1;
++
+     if (!kvm_x86_ops.set_hv_timer ||
+         kvm_mwait_in_guest(vcpu->kvm) ||
+         kvm_can_post_timer_interrupt(vcpu))
