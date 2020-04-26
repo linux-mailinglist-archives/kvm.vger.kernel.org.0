@@ -2,77 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8FA991B9111
-	for <lists+kvm@lfdr.de>; Sun, 26 Apr 2020 17:03:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7FCC91B9124
+	for <lists+kvm@lfdr.de>; Sun, 26 Apr 2020 17:22:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726189AbgDZPDp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 26 Apr 2020 11:03:45 -0400
-Received: from mail.kernel.org ([198.145.29.99]:55098 "EHLO mail.kernel.org"
+        id S1726191AbgDZPV7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 26 Apr 2020 11:21:59 -0400
+Received: from mga05.intel.com ([192.55.52.43]:21919 "EHLO mga05.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726194AbgDZPDn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 26 Apr 2020 11:03:43 -0400
-Received: from localhost (unknown [137.135.114.1])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 62F0120A8B;
-        Sun, 26 Apr 2020 15:03:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1587913423;
-        bh=jphvnaDJ59LJam6j47S/T9guNFEE39WqYXNatYSM1BA=;
-        h=Date:From:To:To:To:To:Cc:Cc:Cc:Subject:In-Reply-To:References:
-         From;
-        b=B5ejUTCBwDJwAwbSNXAZ9698RhtsSFBhf1kM7PMJIWCJ7NFWPFqU9IplaaK0HxVCf
-         eml65acONoZduWkrfuTzPbz2lYa8G82Lz/AfqC5QCvaoy5Bd2yzstc3T+f5C3nPRGd
-         2N+LMWvmim4JoFNRCNz0zm+UZ74EoxT99gp+J6rI=
-Date:   Sun, 26 Apr 2020 15:03:42 +0000
-From:   Sasha Levin <sashal@kernel.org>
-To:     Sasha Levin <sashal@kernel.org>
-To:     Huacai Chen <chenhc@lemote.com>
-To:     Xing Li <lixing@loongson.cn>
+        id S1725975AbgDZPV7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 26 Apr 2020 11:21:59 -0400
+IronPort-SDR: RmKVuRa1uw4cDWtWO87frShgmoj5CBkUMIv6TH0WDrxYFUTh17Z3p47NuzJez113sW/jcw2Ft2
+ 5wJeBu1UUpVg==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Apr 2020 08:21:59 -0700
+IronPort-SDR: qMXhH6Y5Ppw8jvrNSDZgkysrFGrNKvsu1BDnfineDYgmgqgkeGPoppM5NhhbJ6iDYO0ORtkQXQ
+ Uf3vE0MNh/Zg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.73,320,1583222400"; 
+   d="scan'208";a="248616221"
+Received: from unknown (HELO localhost) ([10.239.159.128])
+  by fmsmga008.fm.intel.com with ESMTP; 26 Apr 2020 08:21:57 -0700
+Date:   Sun, 26 Apr 2020 23:23:55 +0800
+From:   Yang Weijiang <weijiang.yang@intel.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-mips@vger.kernel.org
-Cc:     stable@vger.kernel.org
-Cc:     stable@vger.kernel.org
-Subject: Re: [PATCH V2 01/14] KVM: MIPS: Define KVM_ENTRYHI_ASID to cpu_asid_mask(&boot_cpu_data)
-In-Reply-To: <1587726933-31757-2-git-send-email-chenhc@lemote.com>
-References: <1587726933-31757-2-git-send-email-chenhc@lemote.com>
-Message-Id: <20200426150343.62F0120A8B@mail.kernel.org>
+Cc:     Yang Weijiang <weijiang.yang@intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, sean.j.christopherson@intel.com,
+        jmattson@google.com, yu.c.zhang@linux.intel.com
+Subject: Re: [PATCH v11 7/9] KVM: X86: Add userspace access interface for CET
+ MSRs
+Message-ID: <20200426152355.GB29493@local-michael-cet-test.sh.intel.com>
+References: <20200326081847.5870-1-weijiang.yang@intel.com>
+ <20200326081847.5870-8-weijiang.yang@intel.com>
+ <08457f11-f0ac-ff4b-80b7-e5380624eca0@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <08457f11-f0ac-ff4b-80b7-e5380624eca0@redhat.com>
+User-Agent: Mutt/1.11.3 (2019-02-01)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi
+On Sat, Apr 25, 2020 at 05:31:59PM +0200, Paolo Bonzini wrote:
+> On 26/03/20 09:18, Yang Weijiang wrote:
+> > There're two different places storing Guest CET states, states
+> > managed with XSAVES/XRSTORS, as restored/saved
+> > in previous patch, can be read/write directly from/to the MSRs.
+> > For those stored in VMCS fields, they're access via vmcs_read/
+> > vmcs_write.
+> > 
+> > To correctly read/write the CET MSRs, it's necessary to check
+> > whether the kernel FPU context switch happened and reload guest
+> > FPU context if needed.
+> 
+> I have one question here, it may be just a misunderstanding.
+> 
+> As I understand it, the PLx_SSP MSRs are only used when the current
+> privilege level changes; the processor has a hidden SSP register for the
+> current privilege level, and the SSP can be accessed via VMCS only.
+>
+> These patches do not allow saving/restoring this hidden register.
+> However, this should be necessary in order to migrate the virtual
+> machine.  The simplest way to plumb this is through a KVM-specific MSR
+> in arch/x86/include/uapi/asm/kvm_para.h.  This MSR should only be
+> accessible to userspace, i.e. only if msr_info->host_initiated.
+Thanks for raising the issue!
+I checked SDM again, yes, it's neccessary to save the current SSP for
+migration case, I'll follow your advice to add it as custom MSR.
+ 
+> Testing CET in the state-test selftest is a bit hard because you have to
+> set up S_CET and the shadow stack, but it would be great to have a
+> separate test similar to tools/testing/selftests/x86_64/smm_test.  It's
+> not an absolute requirement for merging, but if you can put it on your
+> todo list it would be better.
+> 
+What's the purpose of the selftest? Is it just for Shadow Stack SSP
+state transitions in various cases? e.g., L0 SSP<--->L3 SSP,
+L0 SSP1<--->L0 SSP2? We now have the KVM unit-test for CET functionalities,
+i.e., Shadow Stack and Indirect Branch Tracking for user-mode, I can put the
+state test app into the todo list as current patchset is mainly for user-mode
+protection, the supervisor-mode CET protection is the next step.
 
-[This is an automated email]
-
-This commit has been processed because it contains a -stable tag.
-The stable tag indicates that it's relevant for the following trees: all
-
-The bot has tested the following trees: v5.6.7, v5.4.35, v4.19.118, v4.14.177, v4.9.220, v4.4.220.
-
-v5.6.7: Build OK!
-v5.4.35: Build OK!
-v4.19.118: Build OK!
-v4.14.177: Build OK!
-v4.9.220: Build OK!
-v4.4.220: Failed to apply! Possible dependencies:
-    029499b47738 ("KVM: x86: MMU: Make mmu_set_spte() return emulate value")
-    19d194c62b25 ("MIPS: KVM: Simplify TLB_* macros")
-    403015b323a2 ("MIPS: KVM: Move non-TLB handling code out of tlb.c")
-    7ee0e5b29d27 ("KVM: x86: MMU: Remove unused parameter of __direct_map()")
-    9fbfb06a4065 ("MIPS: KVM: Arrayify struct kvm_mips_tlb::tlb_lo*")
-    ba049e93aef7 ("kvm: rename pfn_t to kvm_pfn_t")
-    bdb7ed8608f8 ("MIPS: KVM: Convert headers to kernel sized types")
-    ca64c2beecd4 ("MIPS: KVM: Abstract guest ASID mask")
-    caa1faa7aba6 ("MIPS: KVM: Trivial whitespace and style fixes")
-    e6207bbea16c ("MIPS: KVM: Use MIPS_ENTRYLO_* defs from mipsregs.h")
-
-
-NOTE: The patch will not be queued to stable trees until it is upstream.
-
-How should we proceed with this patch?
-
--- 
-Thanks
-Sasha
+> Thanks,
+> 
+> Paolo
