@@ -2,138 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0409F1B8CDB
-	for <lists+kvm@lfdr.de>; Sun, 26 Apr 2020 08:13:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 677191B8CF2
+	for <lists+kvm@lfdr.de>; Sun, 26 Apr 2020 08:40:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726250AbgDZGNO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 26 Apr 2020 02:13:14 -0400
-Received: from mga12.intel.com ([192.55.52.136]:62050 "EHLO mga12.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726230AbgDZGNN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 26 Apr 2020 02:13:13 -0400
-IronPort-SDR: HnPf5zFxfKOruBI/+nDehse2eVh7IZCvZ4IZhDN0SVEdFbsWWvaN3vEoNdD75MMczFEYbk0Szp
- VbN9k752WlBw==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Apr 2020 23:13:13 -0700
-IronPort-SDR: TXqH2o88GR3QOtZBefej95gttWbl3MPxq1zuRI/ZUhAcNTpJ4x4y3kcjcBqwctwFnRW1fWTSIg
- qtMflFXk5MBw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,319,1583222400"; 
-   d="scan'208";a="256865214"
-Received: from unknown (HELO localhost.localdomain.bj.intel.com) ([10.240.193.79])
-  by orsmga003.jf.intel.com with ESMTP; 25 Apr 2020 23:13:10 -0700
-From:   Zhu Lingshan <lingshan.zhu@intel.com>
-To:     mst@redhat.com, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-        jasowang@redhat.com
-Cc:     lulu@redhat.com, dan.daly@intel.com, cunming.liang@intel.com,
-        Zhu Lingshan <lingshan.zhu@intel.com>
-Subject: [PATCH V2 2/2] vdpa: implement config interrupt in IFCVF
-Date:   Sun, 26 Apr 2020 14:09:44 +0800
-Message-Id: <1587881384-2133-3-git-send-email-lingshan.zhu@intel.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1587881384-2133-1-git-send-email-lingshan.zhu@intel.com>
-References: <1587881384-2133-1-git-send-email-lingshan.zhu@intel.com>
+        id S1726188AbgDZGkE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 26 Apr 2020 02:40:04 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:3299 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726108AbgDZGkE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 26 Apr 2020 02:40:04 -0400
+Received: from DGGEMS410-HUB.china.huawei.com (unknown [172.30.72.59])
+        by Forcepoint Email with ESMTP id 912E0C13748A6CD909A3;
+        Sun, 26 Apr 2020 14:40:02 +0800 (CST)
+Received: from DESKTOP-FJ48AOJ.china.huawei.com (10.173.221.6) by
+ DGGEMS410-HUB.china.huawei.com (10.3.19.210) with Microsoft SMTP Server id
+ 14.3.487.0; Sun, 26 Apr 2020 14:39:52 +0800
+From:   Yingtai Xie <xieyingtai@huawei.com>
+To:     <kwankhede@nvidia.com>
+CC:     <alex.williamson@redhat.com>, <kvm@vger.kernel.org>,
+        <xieyingtai@huawei.com>, <wu.wubin@huawei.com>
+Subject: [PATCH] vfio/mdev: Add vfio-mdev device request interface
+Date:   Sun, 26 Apr 2020 14:35:42 +0800
+Message-ID: <20200426063542.16548-1-xieyingtai@huawei.com>
+X-Mailer: git-send-email 2.8.3.windows.1
+MIME-Version: 1.0
+Content-Type: text/plain
+X-Originating-IP: [10.173.221.6]
+X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This commit implements config interrupt support
-in IFC VF
+This is setup the same way as vfio-pci to indicate
+userspace that the device should be released.
 
-Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
+Signed-off-by: Yingtai Xie <xieyingtai@huawei.com>
 ---
- drivers/vdpa/ifcvf/ifcvf_base.c |  3 +++
- drivers/vdpa/ifcvf/ifcvf_base.h |  3 +++
- drivers/vdpa/ifcvf/ifcvf_main.c | 22 +++++++++++++++++++++-
- 3 files changed, 27 insertions(+), 1 deletion(-)
+ drivers/vfio/mdev/vfio_mdev.c | 10 ++++++++++
+ include/linux/mdev.h          |  4 ++++
+ 2 files changed, 14 insertions(+)
 
-diff --git a/drivers/vdpa/ifcvf/ifcvf_base.c b/drivers/vdpa/ifcvf/ifcvf_base.c
-index b61b06e..c825d99 100644
---- a/drivers/vdpa/ifcvf/ifcvf_base.c
-+++ b/drivers/vdpa/ifcvf/ifcvf_base.c
-@@ -185,6 +185,9 @@ void ifcvf_set_status(struct ifcvf_hw *hw, u8 status)
- 
- void ifcvf_reset(struct ifcvf_hw *hw)
- {
-+	hw->config_cb.callback = NULL;
-+	hw->config_cb.private = NULL;
-+
- 	ifcvf_set_status(hw, 0);
- 	/* flush set_status, make sure VF is stopped, reset */
- 	ifcvf_get_status(hw);
-diff --git a/drivers/vdpa/ifcvf/ifcvf_base.h b/drivers/vdpa/ifcvf/ifcvf_base.h
-index e803070..23ac47d 100644
---- a/drivers/vdpa/ifcvf/ifcvf_base.h
-+++ b/drivers/vdpa/ifcvf/ifcvf_base.h
-@@ -27,6 +27,7 @@
- 		((1ULL << VIRTIO_NET_F_MAC)			| \
- 		 (1ULL << VIRTIO_F_ANY_LAYOUT)			| \
- 		 (1ULL << VIRTIO_F_VERSION_1)			| \
-+		 (1ULL << VIRTIO_NET_F_STATUS)			| \
- 		 (1ULL << VIRTIO_F_ORDER_PLATFORM)		| \
- 		 (1ULL << VIRTIO_F_IOMMU_PLATFORM)		| \
- 		 (1ULL << VIRTIO_NET_F_MRG_RXBUF))
-@@ -81,6 +82,8 @@ struct ifcvf_hw {
- 	void __iomem *net_cfg;
- 	struct vring_info vring[IFCVF_MAX_QUEUE_PAIRS * 2];
- 	void __iomem * const *base;
-+	char config_msix_name[256];
-+	struct vdpa_callback config_cb;
- };
- 
- struct ifcvf_adapter {
-diff --git a/drivers/vdpa/ifcvf/ifcvf_main.c b/drivers/vdpa/ifcvf/ifcvf_main.c
-index 8d54dc5..f7baeca 100644
---- a/drivers/vdpa/ifcvf/ifcvf_main.c
-+++ b/drivers/vdpa/ifcvf/ifcvf_main.c
-@@ -18,6 +18,16 @@
- #define DRIVER_AUTHOR   "Intel Corporation"
- #define IFCVF_DRIVER_NAME       "ifcvf"
- 
-+static irqreturn_t ifcvf_config_changed(int irq, void *arg)
-+{
-+	struct ifcvf_hw *vf = arg;
-+
-+	if (vf->config_cb.callback)
-+		return vf->config_cb.callback(vf->config_cb.private);
-+
-+	return IRQ_HANDLED;
-+}
-+
- static irqreturn_t ifcvf_intr_handler(int irq, void *arg)
- {
- 	struct vring_info *vring = arg;
-@@ -256,7 +266,10 @@ static void ifcvf_vdpa_set_config(struct vdpa_device *vdpa_dev,
- static void ifcvf_vdpa_set_config_cb(struct vdpa_device *vdpa_dev,
- 				     struct vdpa_callback *cb)
- {
--	/* We don't support config interrupt */
-+	struct ifcvf_hw *vf = vdpa_to_vf(vdpa_dev);
-+
-+	vf->config_cb.callback = cb->callback;
-+	vf->config_cb.private = cb->private;
+diff --git a/drivers/vfio/mdev/vfio_mdev.c b/drivers/vfio/mdev/vfio_mdev.c
+index 30964a4e0..74695c116 100644
+--- a/drivers/vfio/mdev/vfio_mdev.c
++++ b/drivers/vfio/mdev/vfio_mdev.c
+@@ -98,6 +98,15 @@ static int vfio_mdev_mmap(void *device_data, struct vm_area_struct *vma)
+ 	return parent->ops->mmap(mdev, vma);
  }
  
- /*
-@@ -292,6 +305,13 @@ static int ifcvf_request_irq(struct ifcvf_adapter *adapter)
- 	struct ifcvf_hw *vf = &adapter->vf;
- 	int vector, i, ret, irq;
++static void vfio_mdev_request(void *device_data, unsigned int count)
++{
++	struct mdev_device *mdev = device_data;
++	struct mdev_parent *parent = mdev->parent;
++
++	if (likely(!parent->ops->request))
++		parent->ops->request(mdev, count);
++}
++
+ static const struct vfio_device_ops vfio_mdev_dev_ops = {
+ 	.name		= "vfio-mdev",
+ 	.open		= vfio_mdev_open,
+@@ -106,6 +115,7 @@ static const struct vfio_device_ops vfio_mdev_dev_ops = {
+ 	.read		= vfio_mdev_read,
+ 	.write		= vfio_mdev_write,
+ 	.mmap		= vfio_mdev_mmap,
++	.request	= vfio_mdev_request,
+ };
  
-+	snprintf(vf->config_msix_name, 256, "ifcvf[%s]-config\n",
-+		pci_name(pdev));
-+	vector = 0;
-+	irq = pci_irq_vector(pdev, vector);
-+	ret = devm_request_irq(&pdev->dev, irq,
-+			       ifcvf_config_changed, 0,
-+			       vf->config_msix_name, vf);
+ static int vfio_mdev_probe(struct device *dev)
+diff --git a/include/linux/mdev.h b/include/linux/mdev.h
+index 0ce30ca78..1ab0b0b9b 100644
+--- a/include/linux/mdev.h
++++ b/include/linux/mdev.h
+@@ -72,6 +72,9 @@ struct device *mdev_get_iommu_device(struct device *dev);
+  * @mmap:		mmap callback
+  *			@mdev: mediated device structure
+  *			@vma: vma structure
++ * @request	request callback
++ *			@mdev: mediated device structure
++ *			@count: counter to allow driver to release the device
+  * Parent device that support mediated device should be registered with mdev
+  * module with mdev_parent_ops structure.
+  **/
+@@ -92,6 +95,7 @@ struct mdev_parent_ops {
+ 	long	(*ioctl)(struct mdev_device *mdev, unsigned int cmd,
+ 			 unsigned long arg);
+ 	int	(*mmap)(struct mdev_device *mdev, struct vm_area_struct *vma);
++	int	(*request)(struct mdev_device *mdev, unsigned int count);
+ };
  
- 	for (i = 0; i < IFCVF_MAX_QUEUE_PAIRS * 2; i++) {
- 		snprintf(vf->vring[i].msix_name, 256, "ifcvf[%s]-%d\n",
+ /* interface for exporting mdev supported type attributes */
 -- 
-1.8.3.1
+2.19.1
+
 
