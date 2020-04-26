@@ -2,92 +2,160 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F0C271B8BB1
-	for <lists+kvm@lfdr.de>; Sun, 26 Apr 2020 05:39:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3B8321B8BA3
+	for <lists+kvm@lfdr.de>; Sun, 26 Apr 2020 05:26:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726131AbgDZDjr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 25 Apr 2020 23:39:47 -0400
-Received: from mx22.baidu.com ([220.181.50.185]:57196 "EHLO baidu.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725945AbgDZDjr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 25 Apr 2020 23:39:47 -0400
-X-Greylist: delayed 1025 seconds by postgrey-1.27 at vger.kernel.org; Sat, 25 Apr 2020 23:39:46 EDT
-Received: from BJHW-Mail-Ex15.internal.baidu.com (unknown [10.127.64.38])
-        by Forcepoint Email with ESMTPS id B363084C3B2F5DB7D264;
-        Sun, 26 Apr 2020 11:24:13 +0800 (CST)
-Received: from BJHW-Mail-Ex13.internal.baidu.com (10.127.64.36) by
- BJHW-Mail-Ex15.internal.baidu.com (10.127.64.38) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.1713.5; Sun, 26 Apr 2020 11:24:13 +0800
-Received: from BJHW-Mail-Ex13.internal.baidu.com ([100.100.100.36]) by
- BJHW-Mail-Ex13.internal.baidu.com ([100.100.100.36]) with mapi id
- 15.01.1713.004; Sun, 26 Apr 2020 11:24:13 +0800
-From:   "Li,Rongqing" <lirongqing@baidu.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-CC:     Peter Zijlstra <peterz@infradead.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        kvm list <kvm@vger.kernel.org>,
-        "the arch/x86 maintainers" <x86@kernel.org>,
-        "H . Peter Anvin" <hpa@zytor.com>,
-        "Borislav Petkov" <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Joerg Roedel <joro@8bytes.org>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>
-Subject: =?utf-8?B?562U5aSNOiBbUEFUQ0hdIFtSRkNdIGt2bTogeDg2OiBlbXVsYXRlIEFQRVJG?=
- =?utf-8?Q?/MPERF_registers?=
-Thread-Topic: [PATCH] [RFC] kvm: x86: emulate APERF/MPERF registers
-Thread-Index: AQHWGh9bZdasuQhOo023NQfHi2P1S6iH0+aAgAAbkwCAAAF0AIACzsUw
-Date:   Sun, 26 Apr 2020 03:24:13 +0000
-Message-ID: <fd2a8092edf54a85979e5781dc354690@baidu.com>
-References: <1587704935-30960-1-git-send-email-lirongqing@baidu.com>
- <20200424100143.GZ20730@hirez.programming.kicks-ass.net>
- <20200424144625.GB30013@linux.intel.com>
- <CALMp9eQtSrZMRQtxa_Z5WmjayWzJYhSrpNkQbqK5b7Ufxg-cMA@mail.gmail.com>
- <ce51d5f9-aa7b-233b-883d-802d9b00e090@redhat.com>
-In-Reply-To: <ce51d5f9-aa7b-233b-883d-802d9b00e090@redhat.com>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [172.22.198.27]
-x-baidu-bdmsfe-datecheck: 1_BJHW-Mail-Ex15_2020-04-26 11:24:13:665
-x-baidu-bdmsfe-viruscheck: BJHW-Mail-Ex15_GRAY_Inside_WithoutAtta_2020-04-26
- 11:24:13:634
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        id S1726142AbgDZDZs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 25 Apr 2020 23:25:48 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:57339 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1725943AbgDZDZs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 25 Apr 2020 23:25:48 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1587871546;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=xeVCSVVAGo0Z4+nT2s2gLtAX66uKIDuBw9cn9Gzx2mE=;
+        b=Ks7qKABL7+eZd5yuCyv64OjG5A4WxTUbZVVQUwEL13SYjCaB49SiyFkuyThg7NRelp5sH8
+        hElcj4udkuYUwrNddaCdrwNANVOg0qKaimibzeXdL5bzafacRIgUVyd6pi/BI5TXNldXSe
+        jP56qAJMtTkNtkyf3ptyixOZ3Zax2po=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-338-hFEJfXROPcGf0r9lcBgsYA-1; Sat, 25 Apr 2020 23:25:42 -0400
+X-MC-Unique: hFEJfXROPcGf0r9lcBgsYA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 71F6E1800D4A;
+        Sun, 26 Apr 2020 03:25:41 +0000 (UTC)
+Received: from [10.72.13.103] (ovpn-13-103.pek2.redhat.com [10.72.13.103])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id DBEA25C1C3;
+        Sun, 26 Apr 2020 03:25:35 +0000 (UTC)
+Subject: Re: [PATCH 2/2] vdpa: implement config interrupt in IFCVF
+To:     Zhu Lingshan <lingshan.zhu@intel.com>, mst@redhat.com,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Cc:     lulu@redhat.com, dan.daly@intel.com, cunming.liang@intel.com
+References: <1587722659-1300-1-git-send-email-lingshan.zhu@intel.com>
+ <1587722659-1300-3-git-send-email-lingshan.zhu@intel.com>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <bb909a20-3f14-427d-ee40-129a1844486b@redhat.com>
+Date:   Sun, 26 Apr 2020 11:25:34 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
+In-Reply-To: <1587722659-1300-3-git-send-email-lingshan.zhu@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-DQoNCj4gLS0tLS3pgq7ku7bljp/ku7YtLS0tLQ0KPiDlj5Hku7bkuro6IFBhb2xvIEJvbnppbmkg
-W21haWx0bzpwYm9uemluaUByZWRoYXQuY29tXQ0KPiDlj5HpgIHml7bpl7Q6IDIwMjDlubQ05pyI
-MjXml6UgMDozMA0KPiDmlLbku7bkuro6IEppbSBNYXR0c29uIDxqbWF0dHNvbkBnb29nbGUuY29t
-PjsgU2VhbiBDaHJpc3RvcGhlcnNvbg0KPiA8c2Vhbi5qLmNocmlzdG9waGVyc29uQGludGVsLmNv
-bT4NCj4g5oqE6YCBOiBQZXRlciBaaWpsc3RyYSA8cGV0ZXJ6QGluZnJhZGVhZC5vcmc+OyBMaSxS
-b25ncWluZw0KPiA8bGlyb25ncWluZ0BiYWlkdS5jb20+OyBMS01MIDxsaW51eC1rZXJuZWxAdmdl
-ci5rZXJuZWwub3JnPjsga3ZtIGxpc3QNCj4gPGt2bUB2Z2VyLmtlcm5lbC5vcmc+OyB0aGUgYXJj
-aC94ODYgbWFpbnRhaW5lcnMgPHg4NkBrZXJuZWwub3JnPjsgSCAuDQo+IFBldGVyIEFudmluIDxo
-cGFAenl0b3IuY29tPjsgQm9yaXNsYXYgUGV0a292IDxicEBhbGllbjguZGU+OyBJbmdvIE1vbG5h
-cg0KPiA8bWluZ29AcmVkaGF0LmNvbT47IFRob21hcyBHbGVpeG5lciA8dGdseEBsaW51dHJvbml4
-LmRlPjsgSm9lcmcgUm9lZGVsDQo+IDxqb3JvQDhieXRlcy5vcmc+OyBXYW5wZW5nIExpIDx3YW5w
-ZW5nbGlAdGVuY2VudC5jb20+OyBWaXRhbHkgS3V6bmV0c292DQo+IDx2a3V6bmV0c0ByZWRoYXQu
-Y29tPg0KPiDkuLvpopg6IFJlOiBbUEFUQ0hdIFtSRkNdIGt2bTogeDg2OiBlbXVsYXRlIEFQRVJG
-L01QRVJGIHJlZ2lzdGVycw0KPiANCj4gT24gMjQvMDQvMjAgMTg6MjUsIEppbSBNYXR0c29uIHdy
-b3RlOg0KPiA+PiBBc3N1bWluZyB3ZSdyZSBnb2luZyBmb3J3YXJkIHdpdGggdGhpcywgYXQgYW4g
-YWJzb2x1dGUgbWluaW11bSB0aGUNCj4gPj4gUkRNU1JzIG5lZWQgdG8gYmUgd3JhcHBlZCB3aXRo
-IGNoZWNrcyBvbiBob3N0IF9hbmRfIGd1ZXN0IHN1cHBvcnQgZm9yDQo+ID4+IHRoZSBlbXVsYXRl
-ZCBiZWhhdmlvci4gIEdpdmVuIHRoZSBzaWduaWZpY2FudCBvdmVyaGVhZCwgdGhpcyBtaWdodA0K
-PiA+PiBldmVuIGJlIHNvbWV0aGluZyB0aGF0IHNob3VsZCByZXF1aXJlIGFuIGV4dHJhIG9wdC1p
-biBmcm9tIHVzZXJzcGFjZSB0bw0KPiBlbmFibGUuDQo+ID4NCj4gPiBJIHdvdWxkIGxpa2UgdG8g
-c2VlIHBlcmZvcm1hbmNlIGRhdGEgYmVmb3JlIGVuYWJsaW5nIHRoaXMgdW5jb25kaXRpb25hbGx5
-Lg0KPiANCj4gSSB3b3VsZG4ndCB3YW50IHRoaXMgdG8gYmUgZW5hYmxlZCB1bmNvbmRpdGlvbmFs
-bHkgYW55d2F5LCBiZWNhdXNlIHlvdSBuZWVkIHRvDQo+IHRha2UgaW50byBhY2NvdW50IGxpdmUg
-bWlncmF0aW9uIHRvIGFuZCBmcm9tIHByb2Nlc3NvcnMgdGhhdCBkbyBub3QgaGF2ZQ0KPiBBUEVS
-Ri9NUEVSRiBzdXBwb3J0Lg0KPiANCj4gUGFvbG8NCg0KSSB3aWxsIGFkZCBhIGt2bSBwYXJhbWV0
-ZXIgdG8gY29uc2lkZXIgd2hldGhlciBlbmFibGUgTVBFUkYvQVBFUkYgZW11bGF0aW9ucywgYW5k
-IG1ha2UgZGVmYXVsdCB2YWx1ZSB0byBmYWxzZQ0KDQpUaGFua3MNCg0KLUxpDQoNCg==
+
+On 2020/4/24 =E4=B8=8B=E5=8D=886:04, Zhu Lingshan wrote:
+> This commit implements config interrupt support
+> in IFC VF
+>
+> Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
+> ---
+>   drivers/vdpa/ifcvf/ifcvf_base.c |  3 +++
+>   drivers/vdpa/ifcvf/ifcvf_base.h |  2 ++
+>   drivers/vdpa/ifcvf/ifcvf_main.c | 22 +++++++++++++++++++++-
+>   3 files changed, 26 insertions(+), 1 deletion(-)
+>
+> diff --git a/drivers/vdpa/ifcvf/ifcvf_base.c b/drivers/vdpa/ifcvf/ifcvf=
+_base.c
+> index b61b06e..c825d99 100644
+> --- a/drivers/vdpa/ifcvf/ifcvf_base.c
+> +++ b/drivers/vdpa/ifcvf/ifcvf_base.c
+> @@ -185,6 +185,9 @@ void ifcvf_set_status(struct ifcvf_hw *hw, u8 statu=
+s)
+>  =20
+>   void ifcvf_reset(struct ifcvf_hw *hw)
+>   {
+> +	hw->config_cb.callback =3D NULL;
+> +	hw->config_cb.private =3D NULL;
+> +
+>   	ifcvf_set_status(hw, 0);
+>   	/* flush set_status, make sure VF is stopped, reset */
+>   	ifcvf_get_status(hw);
+> diff --git a/drivers/vdpa/ifcvf/ifcvf_base.h b/drivers/vdpa/ifcvf/ifcvf=
+_base.h
+> index e803070..76928b0 100644
+> --- a/drivers/vdpa/ifcvf/ifcvf_base.h
+> +++ b/drivers/vdpa/ifcvf/ifcvf_base.h
+> @@ -81,6 +81,8 @@ struct ifcvf_hw {
+>   	void __iomem *net_cfg;
+>   	struct vring_info vring[IFCVF_MAX_QUEUE_PAIRS * 2];
+>   	void __iomem * const *base;
+> +	char config_msix_name[256];
+> +	struct vdpa_callback config_cb;
+>   };
+>  =20
+>   struct ifcvf_adapter {
+> diff --git a/drivers/vdpa/ifcvf/ifcvf_main.c b/drivers/vdpa/ifcvf/ifcvf=
+_main.c
+> index 8d54dc5..f7baeca 100644
+> --- a/drivers/vdpa/ifcvf/ifcvf_main.c
+> +++ b/drivers/vdpa/ifcvf/ifcvf_main.c
+> @@ -18,6 +18,16 @@
+>   #define DRIVER_AUTHOR   "Intel Corporation"
+>   #define IFCVF_DRIVER_NAME       "ifcvf"
+>  =20
+> +static irqreturn_t ifcvf_config_changed(int irq, void *arg)
+> +{
+> +	struct ifcvf_hw *vf =3D arg;
+> +
+> +	if (vf->config_cb.callback)
+> +		return vf->config_cb.callback(vf->config_cb.private);
+> +
+> +	return IRQ_HANDLED;
+
+
+So it looks to me the current support of VIRTIO_NET_F_STATUS is broken=20
+without this patch.
+
+We probably need to patch to disable it.
+
+Thanks
+
+
+> +}
+> +
+>   static irqreturn_t ifcvf_intr_handler(int irq, void *arg)
+>   {
+>   	struct vring_info *vring =3D arg;
+> @@ -256,7 +266,10 @@ static void ifcvf_vdpa_set_config(struct vdpa_devi=
+ce *vdpa_dev,
+>   static void ifcvf_vdpa_set_config_cb(struct vdpa_device *vdpa_dev,
+>   				     struct vdpa_callback *cb)
+>   {
+> -	/* We don't support config interrupt */
+> +	struct ifcvf_hw *vf =3D vdpa_to_vf(vdpa_dev);
+> +
+> +	vf->config_cb.callback =3D cb->callback;
+> +	vf->config_cb.private =3D cb->private;
+>   }
+>  =20
+>   /*
+> @@ -292,6 +305,13 @@ static int ifcvf_request_irq(struct ifcvf_adapter =
+*adapter)
+>   	struct ifcvf_hw *vf =3D &adapter->vf;
+>   	int vector, i, ret, irq;
+>  =20
+> +	snprintf(vf->config_msix_name, 256, "ifcvf[%s]-config\n",
+> +		pci_name(pdev));
+> +	vector =3D 0;
+> +	irq =3D pci_irq_vector(pdev, vector);
+> +	ret =3D devm_request_irq(&pdev->dev, irq,
+> +			       ifcvf_config_changed, 0,
+> +			       vf->config_msix_name, vf);
+>  =20
+>   	for (i =3D 0; i < IFCVF_MAX_QUEUE_PAIRS * 2; i++) {
+>   		snprintf(vf->vring[i].msix_name, 256, "ifcvf[%s]-%d\n",
+
