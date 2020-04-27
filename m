@@ -2,170 +2,361 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B235D1BA651
-	for <lists+kvm@lfdr.de>; Mon, 27 Apr 2020 16:26:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8FBE31BA657
+	for <lists+kvm@lfdr.de>; Mon, 27 Apr 2020 16:27:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727966AbgD0O0F (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Apr 2020 10:26:05 -0400
-Received: from mail-eopbgr70071.outbound.protection.outlook.com ([40.107.7.71]:29699
-        "EHLO EUR04-HE1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727077AbgD0O0E (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Apr 2020 10:26:04 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=jyzGEwIYnkHquW8HRRU74yDUaR+aiKdRCbIK4vpoRBewvdWjPUnBb8YEYq1Sx2JA7hZphyWTB3KmULgIpDfWfd/zxsjwyE7h3pBquZYRid6XF8CsHEGLfXmqOMXS2NZZ8MQx8MS4SGJ5rGSZKie48WI+ODK1/G1yQOrXXD8R52kvx2B4G10k/okUxIM3wJ/78xzHDc7t/GwUnruaixKm31k9TWfbhernQ3DO5It/6lWXzUqB/+Eza7WMVCtk1wv4bHPLOaxwZ3xzSv36p8Wxgdbb5xnYCci5oIVUvuWDHq8qAxP+AmR28gN4WK6lyWqhSyUtm7msYal7GOry3Kh7cg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=73pxRLEAccaMA1EYoTl6Dgo3FZtgkSsRnyNyaKa83pM=;
- b=R9MuJv/hUlTZ37OYh3htsM2DDE6Ll0JOZ81ljbtunfsOVt9j2P2/2akCt9c58671I6KH0A1Cidh2RPWCr3f2/wedpbeJy6iK3HacuTMBUvc3lgsLXpz3cxIQ0ALajAj8OEiuqKHbox1kHypv524PTtLmrw/m1NuMy/CLqt4PH1xbzGxZulWCSWz6wrmy9NeKZ94vD0X+qjVWSoimrOdKD5bARXJceVCNnXx/R2Gf9I36M7Of3UkkJzxOqQlkPBJwMDfD0Kv4kLCFgTaM1taF6pn5mPmg1R1xTfKEvDo6HuSyIBQmMUn0+feLMVYg71ZLLRnlzHIZUdsIefqQ09pSCQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=mellanox.com; dmarc=pass action=none header.from=mellanox.com;
- dkim=pass header.d=mellanox.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Mellanox.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=73pxRLEAccaMA1EYoTl6Dgo3FZtgkSsRnyNyaKa83pM=;
- b=C2I3T7Cjax3NJfJF/B95zrYYv+/XiAlIoU1JrkVYicHKdx26s7CjP8JOzhgJJIQbXWk2Of2ETFGD8LyXVrlcQIPwIfl7zRi8ZReFIQHDiDjdyXhTTdWmC0ar6bY+MnGr7JRHxiq+2ovXWJCACkMWHHlP8C/pCjpcmw4ItpQ9AE0=
-Authentication-Results: spf=none (sender IP is )
- smtp.mailfrom=jgg@mellanox.com; 
-Received: from VI1PR05MB4141.eurprd05.prod.outlook.com (2603:10a6:803:44::15)
- by VI1PR05MB5183.eurprd05.prod.outlook.com (2603:10a6:803:a9::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2937.22; Mon, 27 Apr
- 2020 14:25:58 +0000
-Received: from VI1PR05MB4141.eurprd05.prod.outlook.com
- ([fe80::a47b:e3cd:7d6d:5d4e]) by VI1PR05MB4141.eurprd05.prod.outlook.com
- ([fe80::a47b:e3cd:7d6d:5d4e%6]) with mapi id 15.20.2937.020; Mon, 27 Apr 2020
- 14:25:58 +0000
-Date:   Mon, 27 Apr 2020 11:25:53 -0300
-From:   Jason Gunthorpe <jgg@mellanox.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "Jiang, Dave" <dave.jiang@intel.com>,
-        "vkoul@kernel.org" <vkoul@kernel.org>,
-        "megha.dey@linux.intel.com" <megha.dey@linux.intel.com>,
-        "maz@kernel.org" <maz@kernel.org>,
-        "bhelgaas@google.com" <bhelgaas@google.com>,
-        "rafael@kernel.org" <rafael@kernel.org>,
-        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "hpa@zytor.com" <hpa@zytor.com>,
-        "Pan, Jacob jun" <jacob.jun.pan@intel.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>, "Lu, Baolu" <baolu.lu@intel.com>,
-        "Kumar, Sanjay K" <sanjay.k.kumar@intel.com>,
-        "Luck, Tony" <tony.luck@intel.com>,
-        "Lin, Jing" <jing.lin@intel.com>,
-        "Williams, Dan J" <dan.j.williams@intel.com>,
-        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "parav@mellanox.com" <parav@mellanox.com>,
-        "dmaengine@vger.kernel.org" <dmaengine@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: Re: [PATCH RFC 00/15] Add VFIO mediated device support and IMS
- support for the idxd driver.
-Message-ID: <20200427142553.GH13640@mellanox.com>
-References: <20200424124444.GJ13640@mellanox.com>
- <AADFC41AFE54684AB9EE6CBC0274A5D19D8A808B@SHSMSX104.ccr.corp.intel.com>
- <20200424181203.GU13640@mellanox.com>
- <AADFC41AFE54684AB9EE6CBC0274A5D19D8C5486@SHSMSX104.ccr.corp.intel.com>
- <20200426191357.GB13640@mellanox.com>
- <20200426214355.29e19d33@x1.home>
- <20200427115818.GE13640@mellanox.com>
- <20200427071939.06aa300e@x1.home>
- <20200427132218.GG13640@mellanox.com>
- <20200427081841.18c4a994@x1.home>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200427081841.18c4a994@x1.home>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-ClientProxiedBy: BL0PR02CA0007.namprd02.prod.outlook.com
- (2603:10b6:207:3c::20) To VI1PR05MB4141.eurprd05.prod.outlook.com
- (2603:10a6:803:44::15)
+        id S1727996AbgD0O1s (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Apr 2020 10:27:48 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:60844 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726539AbgD0O1q (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 27 Apr 2020 10:27:46 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1587997662;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=KH3F3rn5H3P6F15O38bSCG/8kvqeQ9K+5rygkYqN0eY=;
+        b=ev9VUtoNNRCyFKxqf89RLa0+vdUTzVneV6nXoqAAx0TK3jMBH4m+p0ulIavQb1BjW3clra
+        HFpGcR8mM+8euVf5qZlONU2+c2aI/akIcDhBr3ERE1g0gwxyScXUHNpPH0vKyj3LPGe3js
+        Pi7gDql3ZBQPFAG/1YyIj4ij46D05pQ=
+Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
+ [209.85.219.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-92-D_cUFizVPAGdRJgxuWrI9Q-1; Mon, 27 Apr 2020 10:27:41 -0400
+X-MC-Unique: D_cUFizVPAGdRJgxuWrI9Q-1
+Received: by mail-qv1-f70.google.com with SMTP id ev8so18870170qvb.7
+        for <kvm@vger.kernel.org>; Mon, 27 Apr 2020 07:27:41 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=KH3F3rn5H3P6F15O38bSCG/8kvqeQ9K+5rygkYqN0eY=;
+        b=d3F6jc5+Wy/6d5UkElOtbwyJOe6tDZ/rmzGZCT2MJIgwQywJMX+Uy8TrZJANG5wCXJ
+         1Q2BSRkoC2m0fM68Mkw6n1Yihi9NTA6zyxh14+Plv02M2YUh1fjAlORRKy/QpHPIB/hW
+         AyvJJgTD+CAtoTHDqUIokNlg0N4nSIIDwCBcs1jBGX2F+0UKJCtHXEj9g33owmP6ywHr
+         g9uLh0kQXC/RKeIAUQtMwSjbS71bpFezEIXKVJcYXSBw6iz3v33EJ2tOoQFxxDcRkfZT
+         LvvVBI9rJ3WgL4OmaOXhxqdMwiL/VrznlJewVM5VFsJCP6Ofrx1Icrkhetey6QRk4X/l
+         7uEA==
+X-Gm-Message-State: AGi0PuZwi6iWNQplKJOJPrRMpZ2ldV9ginL5QFW0ViZE5qcKeILi0Uj2
+        9ksMdwe501ShGCD0J3GuPXv3vCCCbF8T5l0lt7MkZHFzI0E+l+kAN/rA8H1nR9MIVmU+o5p2i6c
+        WlHiXJNBNnFUQ
+X-Received: by 2002:a37:614a:: with SMTP id v71mr23179851qkb.326.1587997660697;
+        Mon, 27 Apr 2020 07:27:40 -0700 (PDT)
+X-Google-Smtp-Source: APiQypJBahc2Fd13kBJ84o2T7mk9CjdMOq9EJyYJJL+14UprAQQVaTptKsIU4hnS0GBjnWy+NDpS2w==
+X-Received: by 2002:a37:614a:: with SMTP id v71mr23179778qkb.326.1587997659805;
+        Mon, 27 Apr 2020 07:27:39 -0700 (PDT)
+Received: from xz-x1 ([2607:9880:19c0:32::2])
+        by smtp.gmail.com with ESMTPSA id w27sm10967427qtc.18.2020.04.27.07.27.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 27 Apr 2020 07:27:38 -0700 (PDT)
+Date:   Mon, 27 Apr 2020 10:27:37 -0400
+From:   Peter Xu <peterx@redhat.com>
+To:     "Tian, Kevin" <kevin.tian@intel.com>
+Cc:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        "Christopherson, Sean J" <sean.j.christopherson@intel.com>,
+        Christophe de Dinechin <dinechin@redhat.com>,
+        "Zhao, Yan Y" <yan.y.zhao@intel.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+Subject: Re: [PATCH v8 00/14] KVM: Dirty ring interface
+Message-ID: <20200427142737.GC48376@xz-x1>
+References: <20200331190000.659614-1-peterx@redhat.com>
+ <20200422185155.GA3596@xz-x1>
+ <AADFC41AFE54684AB9EE6CBC0274A5D19D877A3B@SHSMSX104.ccr.corp.intel.com>
+ <20200423152253.GB3596@xz-x1>
+ <AADFC41AFE54684AB9EE6CBC0274A5D19D899D8D@SHSMSX104.ccr.corp.intel.com>
+ <20200424141944.GA41816@xz-x1>
+ <AADFC41AFE54684AB9EE6CBC0274A5D19D8CD4C8@SHSMSX104.ccr.corp.intel.com>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from mlx.ziepe.ca (142.68.57.212) by BL0PR02CA0007.namprd02.prod.outlook.com (2603:10b6:207:3c::20) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2937.13 via Frontend Transport; Mon, 27 Apr 2020 14:25:58 +0000
-Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)     (envelope-from <jgg@mellanox.com>)      id 1jT4hl-00083h-TE; Mon, 27 Apr 2020 11:25:53 -0300
-X-Originating-IP: [142.68.57.212]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: bca20ff2-8517-4dc4-56fb-08d7eab6e754
-X-MS-TrafficTypeDiagnostic: VI1PR05MB5183:|VI1PR05MB5183:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <VI1PR05MB5183A2BD8069F6322A4EC67ECFAF0@VI1PR05MB5183.eurprd05.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
-X-Forefront-PRVS: 0386B406AA
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI1PR05MB4141.eurprd05.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(136003)(366004)(376002)(396003)(39860400002)(346002)(52116002)(26005)(6916009)(186003)(5660300002)(66946007)(2616005)(66556008)(54906003)(316002)(66476007)(4326008)(478600001)(9786002)(9746002)(1076003)(86362001)(33656002)(36756003)(2906002)(8936002)(8676002)(81156014)(7416002)(24400500001);DIR:OUT;SFP:1101;
-Received-SPF: None (protection.outlook.com: mellanox.com does not designate
- permitted sender hosts)
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 05X4l1p6VZ+cBXhuIafJ0TZRnctsj5iI57eQJuYRJ0vltuBD+ZzYJ50ZZGSNykqyJ5iSwpGaZIHh+8cNJQHUKwmu6Ac6HQfQ147VdrO4GluBgifcmLF2q0t575J4BqmGZ6GeeNSVYfYhtG67py0/CFv3v2HNyCftS1tzCATaVawdXBroaFSS4HOCepZ+aHP2i3+EkOLBS7Oi4KQ1NUPF0KpwczrDkGYJRLq2vPf7/rUC6L0oOBxwWk5+th0Sy6gvw+evreoAVhN5Rwj7Z8MQzUkQkEaYBR+4m/OjWVFFauSKpWWaEFxBplTC5qdHYF+G/XxjdkSSWFQ5i9JfyN7x2IItXK+6YyRemxNpHnqt9/PAs+f5k+zVm1auLuRv0UWR4du36XddODxfxISpqwHxycN5ses36S5BKiRT/O0hhc0gX1wfgWeCrxS/7XqgqkfBiLppAJCR4aANAUFAZLLCyIAqpeTTBUnO0xV6rkN0wy0UFwuclC/1khmcedwfa7ng
-X-MS-Exchange-AntiSpam-MessageData: oJghRb+9wZU/4jL4TQYgagw1z6XiBgdb7+t/00wGxOYFgx5pURmaHIGKnh0/uOCmN3Pgq7/DOhe0DLfsT2VF378+4KQoCKhKZPBUeA8LHN8f7qpsb1oDt5P8N5zP/Um4dwhp5GNitrqqYEzLhP+TYE6qbO4rLy3miBsT7qCRzC9hsIfXn2dIxyeV4hHFReAII/Q/m36YR2T5NuKsk/1Zfk5JBNqwJKX5wcVfueYtLZxeDuaeKsvjIVz/BbwqxmcApI0IHKzpbUD1uazTJSammLZLgJUFtPutlVIlDUbru8a2pkIl40El/KNOKB3hE6bZo0UhfSi26Ym/UuuXaBtAVXLObL01iVhQSExzlTmckpDnLeiqylsQiodtY0+KQ8hMWxOo29q6NIcu1TWALN+7rxL/DwCVsSz5EUItTwJYwi4HKvF3EuduZD/K1VNq8afx5q8vGZBdBzsC03lz1BybqfrYUTy+zKAvoxBgiQX1n4tE7wI44X6nwkvoYK9ck9Y4IHZpKi7BqmqOkNnigATactJbsauCApluBSzaG1bsY5yb8dLPzKgJRmmsUV/e9fufRE1JtmNJchqqNzKSO8cGgeV5reHybZCqgwA2nF7ptkO9vWkiQffcoGFZ3rHzIMHas0cONkhgUdkXMThkBXl5qUAcu89fo3U/v6jduU4kHMCzdKfHI9obhkLEjlBLDBKR54tb33Y17txerK9sW6cbYUI7YeeW5gLeITIG2Fo15ff1sNffQsmkneuCB7EKisJ51zNHbrkh5iAYR3/2GrIXVFiKI219TMhb8xhIFmGjaOA=
-X-OriginatorOrg: Mellanox.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: bca20ff2-8517-4dc4-56fb-08d7eab6e754
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Apr 2020 14:25:58.5844
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: a652971c-7d2e-4d9b-a6a4-d149256f461b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: qlRu1EcECVW2HvZPh4axAmcAxysrYphwx8KsJsJkjShDbj1BEgrvAITYYAv9+9gkAER0MjVJhkmdTB+LWYdS/g==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR05MB5183
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <AADFC41AFE54684AB9EE6CBC0274A5D19D8CD4C8@SHSMSX104.ccr.corp.intel.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Apr 27, 2020 at 08:18:41AM -0600, Alex Williamson wrote:
-> On Mon, 27 Apr 2020 10:22:18 -0300
-> Jason Gunthorpe <jgg@mellanox.com> wrote:
+On Sun, Apr 26, 2020 at 10:29:51AM +0000, Tian, Kevin wrote:
+> > From: Peter Xu
+> > Sent: Friday, April 24, 2020 10:20 PM
+> > 
+> > On Fri, Apr 24, 2020 at 06:01:46AM +0000, Tian, Kevin wrote:
+> > > > From: Peter Xu <peterx@redhat.com>
+> > > > Sent: Thursday, April 23, 2020 11:23 PM
+> > > >
+> > > > On Thu, Apr 23, 2020 at 06:28:43AM +0000, Tian, Kevin wrote:
+> > > > > > From: Peter Xu <peterx@redhat.com>
+> > > > > > Sent: Thursday, April 23, 2020 2:52 AM
+> > > > > >
+> > > > > > Hi,
+> > > > > >
+> > > > > > TL;DR: I'm thinking whether we should record pure GPA/GFN instead
+> > of
+> > > > > > (slot_id,
+> > > > > > slot_offset) tuple for dirty pages in kvm dirty ring to unbind
+> > > > kvm_dirty_gfn
+> > > > > > with memslots.
+> > > > > >
+> > > > > > (A slightly longer version starts...)
+> > > > > >
+> > > > > > The problem is that binding dirty tracking operations to KVM
+> > memslots is
+> > > > a
+> > > > > > restriction that needs synchronization to memslot changes, which
+> > further
+> > > > > > needs
+> > > > > > synchronization across all the vcpus because they're the consumers of
+> > > > > > memslots.
+> > > > > > E.g., when we remove a memory slot, we need to flush all the dirty
+> > bits
+> > > > > > correctly before we do the removal of the memslot.  That's actually an
+> > > > > > known
+> > > > > > defect for QEMU/KVM [1] (I bet it could be a defect for many other
+> > > > > > hypervisors...) right now with current dirty logging.  Meanwhile, even
+> > if
+> > > > we
+> > > > > > fix it, that procedure is not scale at all, and error prone to dead locks.
+> > > > > >
+> > > > > > Here memory removal is really an (still corner-cased but relatively)
+> > > > important
+> > > > > > scenario to think about for dirty logging comparing to memory
+> > additions
+> > > > &
+> > > > > > movings.  Because memory addition will always have no initial dirty
+> > page,
+> > > > > > and
+> > > > > > we don't really move RAM a lot (or do we ever?!) for a general VM
+> > use
+> > > > case.
+> > > > > >
+> > > > > > Then I went a step back to think about why we need these dirty bit
+> > > > > > information
+> > > > > > after all if the memslot is going to be removed?
+> > > > > >
+> > > > > > There're two cases:
+> > > > > >
+> > > > > >   - When the memslot is going to be removed forever, then the dirty
+> > > > > > information
+> > > > > >     is indeed meaningless and can be dropped, and,
+> > > > > >
+> > > > > >   - When the memslot is going to be removed but quickly added back
+> > with
+> > > > > > changed
+> > > > > >     size, then we need to keep those dirty bits because it's just a
+> > commmon
+> > > > > > way
+> > > > > >     to e.g. punch an MMIO hole in an existing RAM region (here I'd
+> > confess
+> > > > I
+> > > > > >     feel like using "slot_id" to identify memslot is really unfriendly
+> > syscall
+> > > > > >     design for things like "hole punchings" in the RAM address space...
+> > > > > >     However such "punch hold" operation is really needed even for a
+> > > > common
+> > > > > >     guest for either system reboots or device hotplugs, etc.).
+> > > > >
+> > > > > why would device hotplug punch a hole in an existing RAM region?
+> > > >
+> > > > I thought it could happen because I used to trace the KVM ioctls and see
+> > the
+> > > > memslot changes during driver loading.  But later when I tried to hotplug
+> > a
+> > >
+> > > Is there more detail why driver loading may lead to memslot changes?
+> > 
+> > E.g., I can observe these after Linux loads and before the prompt, which is a
+> > simplest VM with default devices on:
+> > 
+> > 41874@1587736345.192636:kvm_set_user_memory Slot#3 flags=0x0
+> > gpa=0xfd000000 size=0x0 ua=0x7fadf6800000 ret=0
+> > 41874@1587736345.192760:kvm_set_user_memory Slot#65539 flags=0x0
+> > gpa=0xfd000000 size=0x0 ua=0x7fadf6800000 ret=0
+> > 41874@1587736345.193884:kvm_set_user_memory Slot#3 flags=0x1
+> > gpa=0xfd000000 size=0x1000000 ua=0x7fadf6800000 ret=0
+> > 41874@1587736345.193956:kvm_set_user_memory Slot#65539 flags=0x1
+> > gpa=0xfd000000 size=0x1000000 ua=0x7fadf6800000 ret=0
+> > 41874@1587736345.195788:kvm_set_user_memory Slot#3 flags=0x0
+> > gpa=0xfd000000 size=0x0 ua=0x7fadf6800000 ret=0
+> > 41874@1587736345.195838:kvm_set_user_memory Slot#65539 flags=0x0
+> > gpa=0xfd000000 size=0x0 ua=0x7fadf6800000 ret=0
+> > 41874@1587736345.196769:kvm_set_user_memory Slot#3 flags=0x1
+> > gpa=0xfd000000 size=0x1000000 ua=0x7fadf6800000 ret=0
+> > 41874@1587736345.196827:kvm_set_user_memory Slot#65539 flags=0x1
+> > gpa=0xfd000000 size=0x1000000 ua=0x7fadf6800000 ret=0
+> > 41874@1587736345.197787:kvm_set_user_memory Slot#3 flags=0x0
+> > gpa=0xfd000000 size=0x0 ua=0x7fadf6800000 ret=0
+> > 41874@1587736345.197832:kvm_set_user_memory Slot#65539 flags=0x0
+> > gpa=0xfd000000 size=0x0 ua=0x7fadf6800000 ret=0
+> > 41874@1587736345.198777:kvm_set_user_memory Slot#3 flags=0x1
+> > gpa=0xfd000000 size=0x1000000 ua=0x7fadf6800000 ret=0
+> > 41874@1587736345.198836:kvm_set_user_memory Slot#65539 flags=0x1
+> > gpa=0xfd000000 size=0x1000000 ua=0x7fadf6800000 ret=0
+> > 41874@1587736345.200491:kvm_set_user_memory Slot#3 flags=0x0
+> > gpa=0xfd000000 size=0x0 ua=0x7fadf6800000 ret=0
+> > 41874@1587736345.200537:kvm_set_user_memory Slot#65539 flags=0x0
+> > gpa=0xfd000000 size=0x0 ua=0x7fadf6800000 ret=0
+> > 41874@1587736345.201592:kvm_set_user_memory Slot#3 flags=0x1
+> > gpa=0xfd000000 size=0x1000000 ua=0x7fadf6800000 ret=0
+> > 41874@1587736345.201649:kvm_set_user_memory Slot#65539 flags=0x1
+> > gpa=0xfd000000 size=0x1000000 ua=0x7fadf6800000 ret=0
+> > 41874@1587736345.202415:kvm_set_user_memory Slot#3 flags=0x0
+> > gpa=0xfd000000 size=0x0 ua=0x7fadf6800000 ret=0
+> > 41874@1587736345.202461:kvm_set_user_memory Slot#65539 flags=0x0
+> > gpa=0xfd000000 size=0x0 ua=0x7fadf6800000 ret=0
+> > 41874@1587736345.203169:kvm_set_user_memory Slot#3 flags=0x1
+> > gpa=0xfd000000 size=0x1000000 ua=0x7fadf6800000 ret=0
+> > 41874@1587736345.203225:kvm_set_user_memory Slot#65539 flags=0x1
+> > gpa=0xfd000000 size=0x1000000 ua=0x7fadf6800000 ret=0
+> > 41874@1587736345.204037:kvm_set_user_memory Slot#3 flags=0x0
+> > gpa=0xfd000000 size=0x0 ua=0x7fadf6800000 ret=0
+> > 41874@1587736345.204083:kvm_set_user_memory Slot#65539 flags=0x0
+> > gpa=0xfd000000 size=0x0 ua=0x7fadf6800000 ret=0
+> > 41874@1587736345.204983:kvm_set_user_memory Slot#3 flags=0x1
+> > gpa=0xfd000000 size=0x1000000 ua=0x7fadf6800000 ret=0
+> > 41874@1587736345.205041:kvm_set_user_memory Slot#65539 flags=0x1
+> > gpa=0xfd000000 size=0x1000000 ua=0x7fadf6800000 ret=0
+> > 41874@1587736345.205940:kvm_set_user_memory Slot#3 flags=0x0
+> > gpa=0xfd000000 size=0x0 ua=0x7fadf6800000 ret=0
+> > 41874@1587736345.206022:kvm_set_user_memory Slot#65539 flags=0x0
+> > gpa=0xfd000000 size=0x0 ua=0x7fadf6800000 ret=0
+> > 41874@1587736345.206981:kvm_set_user_memory Slot#3 flags=0x1
+> > gpa=0xfd000000 size=0x1000000 ua=0x7fadf6800000 ret=0
+> > 41874@1587736345.207038:kvm_set_user_memory Slot#65539 flags=0x1
+> > gpa=0xfd000000 size=0x1000000 ua=0x7fadf6800000 ret=0
+> > 41875@1587736351.141052:kvm_set_user_memory Slot#9 flags=0x1
+> > gpa=0xa0000 size=0x10000 ua=0x7fadf6800000 ret=0
+> > 
+> > After a careful look, I noticed it's only the VGA device mostly turning slot 3
+> > off & on.  Frankly speaking I don't know why it happens to do so.
+> > 
+> > >
+> > > > device I do see that it won't...  The new MMIO regions are added only
+> > into
+> > > > 0xfe000000 for a virtio-net:
+> > > >
+> > > >   00000000fe000000-00000000fe000fff (prio 0, i/o): virtio-pci-common
+> > > >   00000000fe001000-00000000fe001fff (prio 0, i/o): virtio-pci-isr
+> > > >   00000000fe002000-00000000fe002fff (prio 0, i/o): virtio-pci-device
+> > > >   00000000fe003000-00000000fe003fff (prio 0, i/o): virtio-pci-notify
+> > > >   00000000fe840000-00000000fe84002f (prio 0, i/o): msix-table
+> > > >   00000000fe840800-00000000fe840807 (prio 0, i/o): msix-pba
+> > > >
+> > > > Does it mean that device plugging is guaranteed to not trigger RAM
+> > changes?
+> > >
+> > > I'd think so. Otherwise from guest p.o.v any device hotplug implies doing
+> > > a memory hot-unplug first then it's a bad design.
+> > 
+> > Right that's what I was confused about.  Then maybe you're right. :)
+> > 
+> > >
+> > > > I
+> > > > am really curious about what cases we need to consider in which we
+> > need to
+> > > > keep
+> > > > the dirty bits for a memory removal, and if system reset is the only case,
+> > then
+> > > > it could be even easier (because we might be able to avoid the sync in
+> > > > memory
+> > > > removal but do that once in a sys reset hook)...
+> > >
+> > > Possibly memory hot-unplug, as allowed by recent virtio-mem?
+> > 
+> > That should belong to the case where dirty bits do not matter at all after the
+> > removal, right?  I would be mostly curious about when we (1) remove a
+> > memory
+> > slot, and at the meantime (2) we still care about the dirty bits of that slot.
 > 
-> > On Mon, Apr 27, 2020 at 07:19:39AM -0600, Alex Williamson wrote:
-> > 
-> > > > It is not trivial masking. It is a 2000 line patch doing comprehensive
-> > > > emulation.  
-> > > 
-> > > Not sure what you're referring to, I see about 30 lines of code in
-> > > vdcm_vidxd_cfg_write() that specifically handle writes to the 4 BARs in
-> > > config space and maybe a couple hundred lines of code in total handling
-> > > config space emulation.  Thanks,  
-> > 
-> > Look around vidxd_do_command()
-> > 
-> > If I understand this flow properly..
+> I remember one case. PCIe spec defines a resizable BAR capability, allowing
+> hardware to communicate supported resource sizes and software to set
+> an optimal size back to hardware. If such a capability is presented to guest
+> and the BAR is backed by memory, it's possible to observe a removal-and-
+> add-back scenario. However in such case, the spec requires the software 
+> to clear memory space enable bit in command register before changing 
+> the BAR size. I suppose such thing should happen at boot phase where
+> dirty bits related to old BAR size don't matter. 
+
+Good to know. Yes it makes sense to have no valid data if the driver is trying
+to decide the bar size at boot time.
+
 > 
-> I've only glanced at it, but that's called in response to a write to
-> MMIO space on the device, so it's implementing a device specific
-> register.
+> > 
+> > I'll see whether I can remove the dirty bit sync in kvm_set_phys_mem(),
+> > which I
+> > think is really nasty.
+> > 
+> > >
+> > > btw VFIO faces a similar problem when unmapping a DMA range (e.g.
+> > when
+> > > vIOMMU is enabled) in dirty log phase. There could be some dirty bits
+> > which are
+> > > not retrieved when unmapping happens. VFIO chooses to return the dirty
+> > > bits in a buffer passed in the unmapping parameters. Can memslot
+> > interface
+> > > do similar thing by allowing the userspace to specify a buffer pointer to
+> > hold
+> > > whatever dirty pages recorded for the slot that is being removed?
+> > 
+> > Yes I think we can, but may not be necessary.  Actually IMHO CPU access to
+> > pages are slightly different to device DMAs in that we can do these sequence
+> > to
+> > collect the dirty bits of a slot safely:
+> > 
+> >   - mark slot as READONLY
+> >   - KVM_GET_DIRTY_LOG on the slot
+> >   - finally remove the slot
+> > 
+> > I guess VFIO cannot do that because there's no way to really "mark the
+> > region
+> > as read-only" for a device because DMA could happen and DMA would fail
+> > then
+> > when writting to a readonly slot.
+> > 
+> > On the KVM/CPU side, after we mark the slot as READONLY then the CPU
+> > writes
+> > will page fault and fallback to the QEMU userspace, then QEMU will take care
+> > of
+> > the writes (so those writes could be slow but still working) then even if we
+> > mark it READONLY it won't fail the writes but just fallback to QEMU.
+> 
+> Yes, you are right.
+> 
+> > 
+> > Btw, since we're discussing the VFIO dirty logging across memory removal...
+> > the
+> > unmapping DMA range you're talking about needs to be added back later,
+> > right?
+> 
+> pure memory removal doesn't need add-back. Or are you specifically
+> referring to removal-and-add-back case?
 
-It is doing emulation of the secure BAR. The entire 1000 lines of
-vidxd_* functions appear to be focused on this task.
+Oh right I get the point now - VFIO unmap is different that it does not mean
+the RAM is going away, but the RAM is only not accessable any more from the
+device, so it's actually a different scenario here comparing to real memory
+removals.  Sorry I obviously missed that... :)
 
-> Are you asking that PCI config space be done in userspace
-> or any sort of device emulation?  
+Thanks,
 
-I'm concerned about doing full emulation of registers on a MMIO BAR
-that trigger complex actions in response to MMIO read/write.
+> 
+> > Then what if the device does DMA after the removal but before it's added
+> > back?
+> 
+> then just got IOMMU page fault, but I guess that I didn't get your real 
+> question...
+> 
+> > I think this is a more general question not for dirty logging but also for when
+> > dirty logging is not enabled - I never understand how this could be fixed with
+> > existing facilities.
+> > 
+> 
+> Thanks,
+> Kevin
 
-Simple masking and simple config space stuff doesn't seem so
-problematic.
+-- 
+Peter Xu
 
-> The assumption with mdev is that we need emulation in the host
-> kernel because we need a trusted entity to mediate device access and
-> interact with privileged portion of the device control.  Thanks,
-
-Sure, but there are all kinds of different levels to this - mdev
-should not be some open ended device emulation framework, IMHO.
-
-ie other devices need only a small amount of kernel side help and
-don't need complex MMIO BAR emulation.
-
-Would you be happy if someone proposed an e1000 NIC emulator using
-mdev? Why not move every part of qemu's PCI device emulation into the
-kernel?
-
-Jason
