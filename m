@@ -2,95 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 096501B957C
-	for <lists+kvm@lfdr.de>; Mon, 27 Apr 2020 05:31:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6AD971B9581
+	for <lists+kvm@lfdr.de>; Mon, 27 Apr 2020 05:35:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726534AbgD0DbR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 26 Apr 2020 23:31:17 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:30258 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726434AbgD0DbR (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sun, 26 Apr 2020 23:31:17 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1587958275;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=0WoA+56dUoJ/42TBfEa8gnCTKtqRiC7Gj8GgqmhVbnk=;
-        b=Dz8JzZTVTOo9q8Ox1Vo90CQ5LtyLYbTaQKLE78KvPL0/5pTAFP+4KpEEyxB24HDTFCtA6e
-        Wkixeo0/rPqg5eiXFsMW6dM5E9FIn0JgfDAkXy9JEoXIO/XWauaYtNHzWWP/5c26/Dwlqj
-        XFI/FrgPIe9kUCz8nyF4Nj5bjvi60uo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-228-mbCEEtQlNV2GbyXyosO0mw-1; Sun, 26 Apr 2020 23:31:14 -0400
-X-MC-Unique: mbCEEtQlNV2GbyXyosO0mw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 072B918FE863;
-        Mon, 27 Apr 2020 03:31:13 +0000 (UTC)
-Received: from [10.72.12.205] (ovpn-12-205.pek2.redhat.com [10.72.12.205])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 57E371001281;
-        Mon, 27 Apr 2020 03:31:07 +0000 (UTC)
-Subject: Re: [PATCH V4 0/3] vdpa: Support config interrupt in vhost_vdpa
-To:     Zhu Lingshan <lingshan.zhu@intel.com>, mst@redhat.com,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Cc:     lulu@redhat.com, dan.daly@intel.com, cunming.liang@intel.com
-References: <1587901406-27400-1-git-send-email-lingshan.zhu@intel.com>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <ff2471ae-254e-7697-72b7-6601a561c3d9@redhat.com>
-Date:   Mon, 27 Apr 2020 11:31:05 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+        id S1726398AbgD0De7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 26 Apr 2020 23:34:59 -0400
+Received: from mail-io1-f67.google.com ([209.85.166.67]:33102 "EHLO
+        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726341AbgD0De6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 26 Apr 2020 23:34:58 -0400
+Received: by mail-io1-f67.google.com with SMTP id o127so17344361iof.0;
+        Sun, 26 Apr 2020 20:34:58 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=bQd3lXTqblCEkvmd58RFuaaBCMl9c3wU/f2GfDs7JmE=;
+        b=PfExsySdpr5AqNHORy1X1prIeUVQRL967+1rUqcvhe4tQ4lSma2Va+t0AEDP3YYVzM
+         Hg07fO3TPHAWlaMV254l/ZzknyFnKpC4cYtHpL5cTeZLAPgq/9eXmojmskTYp3oOH4Yd
+         g5YUv1QBioubDEmvACgohn4irB3qKPXJ0sdoA+ZRseH+gXDbqA4cI8B85gcH0ImKF1qj
+         Yihv5mYmamzFWI2kyeGCQreFRSSQpmhFkwiY3Kr5bhL9xmtqE1ophRIebZfaT5ZHHfU3
+         osb2wfyFovXbKqS269byvmfF3Tfcowb1ONKBe1UqA+/HqAhqsZQ2rqGgy3hAKAAcGdQ7
+         s5Tw==
+X-Gm-Message-State: AGi0PuYUkfPJMUYCjrTtION/HLN27hoCZ+jcIPDlNnEL9sNubzuLFO/N
+        wWBCwLry5ztYLrbk1g11ZFltvBfHS49wmwEKS6PvMZzU
+X-Google-Smtp-Source: APiQypIqE+Y64fdtg5YbsWIbJ47vBWy9vxBZ64Sf5ebWBPKWB2Imr5Vekd1+Swivs+6HTxFREUiyxblizAZYQPDXEbM=
+X-Received: by 2002:a5e:8613:: with SMTP id z19mr18642912ioj.84.1587958498049;
+ Sun, 26 Apr 2020 20:34:58 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1587901406-27400-1-git-send-email-lingshan.zhu@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Content-Transfer-Encoding: quoted-printable
+References: <1587726933-31757-2-git-send-email-chenhc@lemote.com> <20200426150343.62F0120A8B@mail.kernel.org>
+In-Reply-To: <20200426150343.62F0120A8B@mail.kernel.org>
+From:   Huacai Chen <chenhc@lemote.com>
+Date:   Mon, 27 Apr 2020 11:42:25 +0800
+Message-ID: <CAAhV-H6EcD8b-NB_toH3yiiNthMfPLCJu8aXbX=+4t3Se8mqaw@mail.gmail.com>
+Subject: Re: [PATCH V2 01/14] KVM: MIPS: Define KVM_ENTRYHI_ASID to cpu_asid_mask(&boot_cpu_data)
+To:     Sasha Levin <sashal@kernel.org>
+Cc:     Xing Li <lixing@loongson.cn>, Paolo Bonzini <pbonzini@redhat.com>,
+        kvm@vger.kernel.org, "open list:MIPS" <linux-mips@vger.kernel.org>,
+        stable <stable@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi, Sasha,
 
-On 2020/4/26 =E4=B8=8B=E5=8D=887:43, Zhu Lingshan wrote:
-> This series includes two patches, one introduced
-> config interrupt support in VDPA core, the other
-> one implemented config interrupt in IFCVF.
+On Sun, Apr 26, 2020 at 11:04 PM Sasha Levin <sashal@kernel.org> wrote:
 >
-> changes from V3:
-> move changes in driver/vhost/vhost.c to a
-> separated patch.
+> Hi
 >
-> changes from V2:
-> move VHOST_FILE_UNBIND to the uapi header.
+> [This is an automated email]
 >
-> changes from V1:
-> vdpa: more efficient code to handle eventfd unbind.
-> ifcvf: add VIRTIO_NET_F_STATUS feature bit.
-
-
-5.8 material I think.
-
-Acked-by: Jason Wang <jasowang@redhat.com>
-
-
+> This commit has been processed because it contains a -stable tag.
+> The stable tag indicates that it's relevant for the following trees: all
 >
-> Zhu Lingshan (3):
->    vdpa: Support config interrupt in vhost_vdpa
->    vhost: replace -1 with  VHOST_FILE_UNBIND in iotcls
->    vdpa: implement config interrupt in IFCVF
+> The bot has tested the following trees: v5.6.7, v5.4.35, v4.19.118, v4.14.177, v4.9.220, v4.4.220.
 >
->   drivers/vdpa/ifcvf/ifcvf_base.c |  3 +++
->   drivers/vdpa/ifcvf/ifcvf_base.h |  3 +++
->   drivers/vdpa/ifcvf/ifcvf_main.c | 22 ++++++++++++++++++-
->   drivers/vhost/vdpa.c            | 47 ++++++++++++++++++++++++++++++++=
-+++++++++
->   drivers/vhost/vhost.c           |  8 +++----
->   include/uapi/linux/vhost.h      |  4 ++++
->   6 files changed, 82 insertions(+), 5 deletions(-)
+> v5.6.7: Build OK!
+> v5.4.35: Build OK!
+> v4.19.118: Build OK!
+> v4.14.177: Build OK!
+> v4.9.220: Build OK!
+> v4.4.220: Failed to apply! Possible dependencies:
+>     029499b47738 ("KVM: x86: MMU: Make mmu_set_spte() return emulate value")
+>     19d194c62b25 ("MIPS: KVM: Simplify TLB_* macros")
+>     403015b323a2 ("MIPS: KVM: Move non-TLB handling code out of tlb.c")
+>     7ee0e5b29d27 ("KVM: x86: MMU: Remove unused parameter of __direct_map()")
+>     9fbfb06a4065 ("MIPS: KVM: Arrayify struct kvm_mips_tlb::tlb_lo*")
+>     ba049e93aef7 ("kvm: rename pfn_t to kvm_pfn_t")
+>     bdb7ed8608f8 ("MIPS: KVM: Convert headers to kernel sized types")
+>     ca64c2beecd4 ("MIPS: KVM: Abstract guest ASID mask")
+>     caa1faa7aba6 ("MIPS: KVM: Trivial whitespace and style fixes")
+>     e6207bbea16c ("MIPS: KVM: Use MIPS_ENTRYLO_* defs from mipsregs.h")
 >
+>
+> NOTE: The patch will not be queued to stable trees until it is upstream.
+>
+> How should we proceed with this patch?
+Please ignore this patch in linux-4.4 branch, thanks.
 
+Huacai
+>
+> --
+> Thanks
+> Sasha
