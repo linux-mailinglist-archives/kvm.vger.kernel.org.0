@@ -2,130 +2,145 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 519CB1BA7C8
-	for <lists+kvm@lfdr.de>; Mon, 27 Apr 2020 17:19:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 55C0C1BA7D2
+	for <lists+kvm@lfdr.de>; Mon, 27 Apr 2020 17:21:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728228AbgD0PTR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Apr 2020 11:19:17 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:40256 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726539AbgD0PTQ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 27 Apr 2020 11:19:16 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 03REYsO2070456;
-        Mon, 27 Apr 2020 11:19:15 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 30mfhd35ee-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 27 Apr 2020 11:19:15 -0400
-Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 03REZsou075191;
-        Mon, 27 Apr 2020 11:19:15 -0400
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 30mfhd35db-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 27 Apr 2020 11:19:14 -0400
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 03RFAKWU001097;
-        Mon, 27 Apr 2020 15:19:12 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma04ams.nl.ibm.com with ESMTP id 30mcu6v3ty-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 27 Apr 2020 15:19:12 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 03RFI1KG65798558
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 27 Apr 2020 15:18:01 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C520CA405B;
-        Mon, 27 Apr 2020 15:19:09 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1CF5BA405C;
-        Mon, 27 Apr 2020 15:19:09 +0000 (GMT)
-Received: from oc2783563651 (unknown [9.145.84.115])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon, 27 Apr 2020 15:19:09 +0000 (GMT)
-Date:   Mon, 27 Apr 2020 17:17:39 +0200
-From:   Halil Pasic <pasic@linux.ibm.com>
-To:     Harald Freudenberger <freude@linux.ibm.com>
-Cc:     Tony Krowiak <akrowiak@linux.ibm.com>, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        borntraeger@de.ibm.com, cohuck@redhat.com, mjrosato@linux.ibm.com,
-        pmorel@linux.ibm.com, alex.williamson@redhat.com,
-        kwankhede@nvidia.com, jjherne@linux.ibm.com, fiuczy@linux.ibm.com
-Subject: Re: [PATCH v7 01/15] s390/vfio-ap: store queue struct in hash table
- for quick access
-Message-ID: <20200427171739.76291a74.pasic@linux.ibm.com>
-In-Reply-To: <d15b4a8e-66eb-e4ce-c8ac-6885519940aa@linux.ibm.com>
-References: <20200407192015.19887-1-akrowiak@linux.ibm.com>
-        <20200407192015.19887-2-akrowiak@linux.ibm.com>
-        <20200424055732.7663896d.pasic@linux.ibm.com>
-        <d15b4a8e-66eb-e4ce-c8ac-6885519940aa@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
+        id S1727771AbgD0PVN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Apr 2020 11:21:13 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:22003 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727807AbgD0PVM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Apr 2020 11:21:12 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1588000870;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=t0zUuDSHC2LYYJLNAsloYEAAqSEOkEn10YRd/wXdi+k=;
+        b=SfZ0IZheyMg6ghHTswOQGdrY+Rpys1Mi/KkEVLlbxCDRtBaItNqwp/1tLm81F1R0dUNVwE
+        vZ7R8h9VNwMlVmM/DrOIszdygHdadb3hcjGsOpvO71bnsyupfDTxgC8IYYkElvOa5CiaO/
+        +RFALVW2+XmKzEB6dGNJY7orxCdqWy4=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-328-04QLiYJMPCuP2dVVQqceYA-1; Mon, 27 Apr 2020 11:21:08 -0400
+X-MC-Unique: 04QLiYJMPCuP2dVVQqceYA-1
+Received: by mail-wr1-f70.google.com with SMTP id a3so10672955wro.1
+        for <kvm@vger.kernel.org>; Mon, 27 Apr 2020 08:21:08 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=t0zUuDSHC2LYYJLNAsloYEAAqSEOkEn10YRd/wXdi+k=;
+        b=KdXkX91UXlLmoq5ElGxRIvqAAhj/srHKtIjovAfEw8gyngZwL9/2ji6oQPbLC4Vtt5
+         OBUn4qP1T8qj33rcovkIlalJaWEbNwKsM1slh4k0AcD2KLoAsMnb4lKxBNAbkE6gsbSV
+         Ud+G7FwrLM7VJ5votcJ59wgro2eVjMNy/qX1NVgsgyzGpzNAP2EABfcZrSZUsmORaTCE
+         zttLFORhTTzSFWG0GSZXGtnSYzvVOtzSzcYyGhOMjrV9jMHvuIHW67GXfSMHUl5jNR/I
+         2be0ABCK9IZDLJmym0mGAjUByReUSYlusigcvApXGx48m/3I6lhVqq+/IytH/cWR8lj+
+         NyNQ==
+X-Gm-Message-State: AGi0PuaH/szBzEPVJMkpCMDhIki0v+tGTiT3Wat0YugNTmomCAPFqTe0
+        DfH2qxo8nmbUOwhL5bd3B1/UZHTB6x9QSso2TDBgjd7HNwQzdmdQGJK71a5ybFJcz+OZRgJEkH5
+        EfbDIcLG5Hc7f
+X-Received: by 2002:a1c:b445:: with SMTP id d66mr38650wmf.187.1588000867454;
+        Mon, 27 Apr 2020 08:21:07 -0700 (PDT)
+X-Google-Smtp-Source: APiQypIZ5/J/wN/0wkBkOIE/TjfFJ5VeKIYdPSnC6DlZr/llDxsorbTrSb9AdWnEjmL3w4GukHw2OQ==
+X-Received: by 2002:a1c:b445:: with SMTP id d66mr38611wmf.187.1588000867197;
+        Mon, 27 Apr 2020 08:21:07 -0700 (PDT)
+Received: from steredhat (host108-207-dynamic.49-79-r.retail.telecomitalia.it. [79.49.207.108])
+        by smtp.gmail.com with ESMTPSA id r3sm22637536wrx.72.2020.04.27.08.21.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 27 Apr 2020 08:21:06 -0700 (PDT)
+Date:   Mon, 27 Apr 2020 17:21:03 +0200
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     davem@davemloft.net, Stefan Hajnoczi <stefanha@redhat.com>,
+        linux-kernel@vger.kernel.org, Jorgen Hansen <jhansen@vmware.com>,
+        Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        linux-hyperv@vger.kernel.org, Dexuan Cui <decui@microsoft.com>,
+        netdev@vger.kernel.org
+Subject: Re: [PATCH net-next 0/3] vsock: support network namespace
+Message-ID: <20200427152103.r65new4r342crfs6@steredhat>
+References: <20200116172428.311437-1-sgarzare@redhat.com>
+ <20200427142518.uwssa6dtasrp3bfc@steredhat>
+ <20200427102828-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.676
- definitions=2020-04-27_10:2020-04-27,2020-04-27 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 suspectscore=0
- phishscore=0 lowpriorityscore=0 bulkscore=0 adultscore=0 mlxlogscore=999
- malwarescore=0 impostorscore=0 clxscore=1015 priorityscore=1501
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2004270123
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200427102828-mutt-send-email-mst@kernel.org>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 27 Apr 2020 15:05:23 +0200
-Harald Freudenberger <freude@linux.ibm.com> wrote:
-
-> On 24.04.20 05:57, Halil Pasic wrote:
-> > On Tue,  7 Apr 2020 15:20:01 -0400
-> > Tony Krowiak <akrowiak@linux.ibm.com> wrote:
-> >  
-> >> Rather than looping over potentially 65535 objects, let's store the
-> >> structures for caching information about queue devices bound to the
-> >> vfio_ap device driver in a hash table keyed by APQN.  
-> > @Harald:
-> > Would it make sense to make the efficient lookup of an apqueue base
-> > on its APQN core AP functionality instead of each driver figuring it out
-> > on it's own?
-> >
-> > If I'm not wrong the zcrypt device/driver(s) must the problem of
-> > looking up a queue based on its APQN as well.
-> >
-> > For instance struct ep11_cprb has a target_id filed
-> > (arch/s390/include/uapi/asm/zcrypt.h).
-> >
-> > Regards,
-> > Halil  
+On Mon, Apr 27, 2020 at 10:31:57AM -0400, Michael S. Tsirkin wrote:
+> On Mon, Apr 27, 2020 at 04:25:18PM +0200, Stefano Garzarella wrote:
+> > Hi David, Michael, Stefan,
+> > I'm restarting to work on this topic since Kata guys are interested to
+> > have that, especially on the guest side.
+> > 
+> > While working on the v2 I had few doubts, and I'd like to have your
+> > suggestions:
+> > 
+> >  1. netns assigned to the device inside the guest
+> > 
+> >    Currently I assigned this device to 'init_net'. Maybe it is better
+> >    if we allow the user to decide which netns assign to the device
+> >    or to disable this new feature to have the same behavior as before
+> >    (host reachable from any netns).
+> >    I think we can handle this in the vsock core and not in the single
+> >    transports.
+> > 
+> >    The simplest way that I found, is to add a new
+> >    IOCTL_VM_SOCKETS_ASSIGN_G2H_NETNS to /dev/vsock to enable the feature
+> >    and assign the device to the same netns of the process that do the
+> >    ioctl(), but I'm not sure it is clean enough.
+> > 
+> >    Maybe it is better to add new rtnetlink messages, but I'm not sure if
+> >    it is feasible since we don't have a netdev device.
+> > 
+> >    What do you suggest?
 > 
-> Hi Halil
+> Maybe /dev/vsock-netns here too, like in the host?
 > 
-> no, the zcrypt drivers don't have this problem. They build up their own device object which
-> includes a pointer to the base ap device.
 
-I'm a bit confused. Doesn't your code loop first trough the ap_card
-objects to find the APID portion of the APQN, and then loop the queue
-list of the matching card to find the right ap_queue object? Or did I
-miss something? Isn't that what _zcrypt_send_ep11_cprb() does? Can you
-point me to the code that avoids the lookup (by apqn) for zcrypt?
+I'm not sure I get it.
 
+In the guest, /dev/vsock is only used to get the CID assigned to the
+guest through an ioctl().
 
-If you look at the new function of vfio_ap_get_queue(unsigned long apqn)
-it basically about finding the queue based on the apqn, with the
-difference that it is vfio specific.
-
-Regards,
-Halil
+In the virtio-vsock case, the guest transport is loaded when it is discovered
+on the PCI bus, so we need a way to "move" it to a netns or to specify
+which netns should be used when it is probed.
 
 > 
-> However, this is not a big issue, as the ap_bus holds a list of ap_card objects and within each
-> ap_card object there exists a list of ap_queues.
+> > 
+> >  2. netns assigned in the host
+> > 
+> >     As Michael suggested, I added a new /dev/vhost-vsock-netns to allow
+> >     userspace application to use this new feature, leaving to
+> >     /dev/vhost-vsock the previous behavior (guest reachable from any
+> >     netns).
+> > 
+> >     I like this approach, but I had these doubts:
+> > 
+> >     - I need to allocate a new minor for that device (e.g.
+> >       VHOST_VSOCK_NETNS_MINOR) or is there an alternative way that I can
+> >       use?
+> 
+> Not that I see. I agree it's a bit annoying. I'll think about it a bit.
+> 
 
+Thanks for that!
+An idea that I had, was to add a new ioctl to /dev/vhost-vsock to enable
+the netns support, but I'm not sure it is a clean approach.
 
+> >     - It is vhost-vsock specific, should we provide something handled in
+> >       the vsock core, maybe centralizing the CID allocation and adding a
+> >       new IOCTL or rtnetlink message like for the guest side?
+> >       (maybe it could be a second step, and for now we can continue with
+> >       the new device)
+> > 
 
+Thanks,
+Stefano
 
