@@ -2,106 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D59F51BA721
-	for <lists+kvm@lfdr.de>; Mon, 27 Apr 2020 17:00:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 519CB1BA7C8
+	for <lists+kvm@lfdr.de>; Mon, 27 Apr 2020 17:19:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727807AbgD0PA2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Apr 2020 11:00:28 -0400
-Received: from foss.arm.com ([217.140.110.172]:36658 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727006AbgD0PA2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Apr 2020 11:00:28 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6746331B;
-        Mon, 27 Apr 2020 08:00:27 -0700 (PDT)
-Received: from [10.37.8.240] (unknown [10.37.8.240])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D5FCE3F68F;
-        Mon, 27 Apr 2020 08:00:25 -0700 (PDT)
-Subject: Re: [PATCH][kvmtool] kvm: Request VM specific limits instead of
- system-wide ones
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-To:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org
-Cc:     James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Andre Przywara <Andre.Przywara@arm.com>,
-        Ard Biesheuvel <ardb@kernel.org>
-References: <20200427141738.285217-1-maz@kernel.org>
- <d27e4a14-34b8-7f3d-1e58-ef2ae13e443b@arm.com>
-Message-ID: <7ac17890-72d1-1c81-e513-5d4f7841ca9d@arm.com>
-Date:   Mon, 27 Apr 2020 16:00:58 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+        id S1728228AbgD0PTR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Apr 2020 11:19:17 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:40256 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726539AbgD0PTQ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 27 Apr 2020 11:19:16 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 03REYsO2070456;
+        Mon, 27 Apr 2020 11:19:15 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 30mfhd35ee-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 27 Apr 2020 11:19:15 -0400
+Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 03REZsou075191;
+        Mon, 27 Apr 2020 11:19:15 -0400
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 30mfhd35db-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 27 Apr 2020 11:19:14 -0400
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 03RFAKWU001097;
+        Mon, 27 Apr 2020 15:19:12 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma04ams.nl.ibm.com with ESMTP id 30mcu6v3ty-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 27 Apr 2020 15:19:12 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 03RFI1KG65798558
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 27 Apr 2020 15:18:01 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C520CA405B;
+        Mon, 27 Apr 2020 15:19:09 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 1CF5BA405C;
+        Mon, 27 Apr 2020 15:19:09 +0000 (GMT)
+Received: from oc2783563651 (unknown [9.145.84.115])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon, 27 Apr 2020 15:19:09 +0000 (GMT)
+Date:   Mon, 27 Apr 2020 17:17:39 +0200
+From:   Halil Pasic <pasic@linux.ibm.com>
+To:     Harald Freudenberger <freude@linux.ibm.com>
+Cc:     Tony Krowiak <akrowiak@linux.ibm.com>, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        borntraeger@de.ibm.com, cohuck@redhat.com, mjrosato@linux.ibm.com,
+        pmorel@linux.ibm.com, alex.williamson@redhat.com,
+        kwankhede@nvidia.com, jjherne@linux.ibm.com, fiuczy@linux.ibm.com
+Subject: Re: [PATCH v7 01/15] s390/vfio-ap: store queue struct in hash table
+ for quick access
+Message-ID: <20200427171739.76291a74.pasic@linux.ibm.com>
+In-Reply-To: <d15b4a8e-66eb-e4ce-c8ac-6885519940aa@linux.ibm.com>
+References: <20200407192015.19887-1-akrowiak@linux.ibm.com>
+        <20200407192015.19887-2-akrowiak@linux.ibm.com>
+        <20200424055732.7663896d.pasic@linux.ibm.com>
+        <d15b4a8e-66eb-e4ce-c8ac-6885519940aa@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <d27e4a14-34b8-7f3d-1e58-ef2ae13e443b@arm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.676
+ definitions=2020-04-27_10:2020-04-27,2020-04-27 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 suspectscore=0
+ phishscore=0 lowpriorityscore=0 bulkscore=0 adultscore=0 mlxlogscore=999
+ malwarescore=0 impostorscore=0 clxscore=1015 priorityscore=1501
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2004270123
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+On Mon, 27 Apr 2020 15:05:23 +0200
+Harald Freudenberger <freude@linux.ibm.com> wrote:
 
-On 4/27/20 3:44 PM, Alexandru Elisei wrote:
-> Hi,
->
-> On 4/27/20 3:17 PM, Marc Zyngier wrote:
->> On arm64, the maximum number of vcpus is constrained by the type
->> of interrupt controller that has been selected (GICv2 imposes a
->> limit of 8 vcpus, while GICv3 currently has a limit of 512).
->>
->> It is thus important to request this limit on the VM file descriptor
->> rather than on the one that corresponds to /dev/kvm, as the latter
->> is likely to return something that doesn't take the constraints into
->> account.
->>
->> Reported-by: Ard Biesheuvel <ardb@kernel.org>
->> Signed-off-by: Marc Zyngier <maz@kernel.org>
->> ---
->>  kvm.c | 4 ++--
->>  1 file changed, 2 insertions(+), 2 deletions(-)
->>
->> diff --git a/kvm.c b/kvm.c
->> index e327541..3d5173d 100644
->> --- a/kvm.c
->> +++ b/kvm.c
->> @@ -406,7 +406,7 @@ int kvm__recommended_cpus(struct kvm *kvm)
->>  {
->>  	int ret;
->>  
->> -	ret = ioctl(kvm->sys_fd, KVM_CHECK_EXTENSION, KVM_CAP_NR_VCPUS);
->> +	ret = ioctl(kvm->vm_fd, KVM_CHECK_EXTENSION, KVM_CAP_NR_VCPUS);
->>  	if (ret <= 0)
->>  		/*
->>  		 * api.txt states that if KVM_CAP_NR_VCPUS does not exist,
->> @@ -421,7 +421,7 @@ int kvm__max_cpus(struct kvm *kvm)
->>  {
->>  	int ret;
->>  
->> -	ret = ioctl(kvm->sys_fd, KVM_CHECK_EXTENSION, KVM_CAP_MAX_VCPUS);
->> +	ret = ioctl(kvm->vm_fd, KVM_CHECK_EXTENSION, KVM_CAP_MAX_VCPUS);
->>  	if (ret <= 0)
->>  		ret = kvm__recommended_cpus(kvm);
->>  
-> I've checked that gic__create comes before the call kvm__recommended_capus:
-> gic__create is in core_init (called via kvm__init->kvm_arch_init), and
-> kvm__recommended_cpus is in base_init (called via kvm__cpu_init ->
-> kvm__{recommended,max}_cpus).
->
-> The KVM api documentation states that KVM_CHECK_EXTENSION is available for the vm
-> fd only if the system capability KVM_CAP_CHECK_EXTENSION_VM is present. kvmtool
-> already has a function for checking extensions on the vm fd, it's called
-> kvm__supports_vm_extension. Can we use that instead of doing the ioctl directly on
-> the vm fd?
+> On 24.04.20 05:57, Halil Pasic wrote:
+> > On Tue,  7 Apr 2020 15:20:01 -0400
+> > Tony Krowiak <akrowiak@linux.ibm.com> wrote:
+> >  
+> >> Rather than looping over potentially 65535 objects, let's store the
+> >> structures for caching information about queue devices bound to the
+> >> vfio_ap device driver in a hash table keyed by APQN.  
+> > @Harald:
+> > Would it make sense to make the efficient lookup of an apqueue base
+> > on its APQN core AP functionality instead of each driver figuring it out
+> > on it's own?
+> >
+> > If I'm not wrong the zcrypt device/driver(s) must the problem of
+> > looking up a queue based on its APQN as well.
+> >
+> > For instance struct ep11_cprb has a target_id filed
+> > (arch/s390/include/uapi/asm/zcrypt.h).
+> >
+> > Regards,
+> > Halil  
+> 
+> Hi Halil
+> 
+> no, the zcrypt drivers don't have this problem. They build up their own device object which
+> includes a pointer to the base ap device.
 
-Scratch that, kvm__supports_vm_extension returns a bool, not an int. How about we
-write kvm__check_vm_extension that returns an int, and kvm__supports_vm_extension
-calls it?
+I'm a bit confused. Doesn't your code loop first trough the ap_card
+objects to find the APID portion of the APQN, and then loop the queue
+list of the matching card to find the right ap_queue object? Or did I
+miss something? Isn't that what _zcrypt_send_ep11_cprb() does? Can you
+point me to the code that avoids the lookup (by apqn) for zcrypt?
 
->
-> Thanks,
-> Alex
+
+If you look at the new function of vfio_ap_get_queue(unsigned long apqn)
+it basically about finding the queue based on the apqn, with the
+difference that it is vfio specific.
+
+Regards,
+Halil
+
+> 
+> However, this is not a big issue, as the ap_bus holds a list of ap_card objects and within each
+> ap_card object there exists a list of ap_queues.
+
+
+
+
