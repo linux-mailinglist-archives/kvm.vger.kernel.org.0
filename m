@@ -2,265 +2,145 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8B6B11BA7DB
-	for <lists+kvm@lfdr.de>; Mon, 27 Apr 2020 17:22:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9E1531BA817
+	for <lists+kvm@lfdr.de>; Mon, 27 Apr 2020 17:37:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727843AbgD0PW6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Apr 2020 11:22:58 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:35800 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727840AbgD0PW5 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 27 Apr 2020 11:22:57 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1588000976;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=j1P8r/1uiuCesfWRL2P1eB9YuwB+npl31XfwyVv6S0w=;
-        b=KJfKFZU9z53vEAd6cr1p885Ma4iNkhIAFovv6bd6KXf68DTHR6WQ/vc6mh+H2gnnBIhFAB
-        wkMh10KDZv+FnlQIvi8mAIgzA3qPFl2Y0ydY4J5ecGMBzPpUNc7n5aTzjnuweBLR83zmq9
-        fmdF64q1tkJWE+JOfpA/1kGMGZKRgS4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-52-oA5Rk_UpNlS7pKV9ScEOnA-1; Mon, 27 Apr 2020 11:22:52 -0400
-X-MC-Unique: oA5Rk_UpNlS7pKV9ScEOnA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EA77118A076B
-        for <kvm@vger.kernel.org>; Mon, 27 Apr 2020 15:22:51 +0000 (UTC)
-Received: from paraplu.localdomain (unknown [10.36.110.49])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 81D665D716;
-        Mon, 27 Apr 2020 15:22:51 +0000 (UTC)
-Received: by paraplu.localdomain (Postfix, from userid 1001)
-        id A592D3E048A; Mon, 27 Apr 2020 17:22:49 +0200 (CEST)
-Date:   Mon, 27 Apr 2020 17:22:49 +0200
-From:   Kashyap Chamarthy <kchamart@redhat.com>
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, dgilbert@redhat.com,
-        vkuznets@redhat.com
-Subject: Re: [PATCH v2] docs/virt/kvm: Document running nested guests
-Message-ID: <20200427152249.GB25403@paraplu>
-References: <20200420111755.2926-1-kchamart@redhat.com>
- <20200422105618.22260edb.cohuck@redhat.com>
+        id S1727833AbgD0Pht (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Apr 2020 11:37:49 -0400
+Received: from foss.arm.com ([217.140.110.172]:37178 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726539AbgD0Phs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Apr 2020 11:37:48 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2BF8C31B;
+        Mon, 27 Apr 2020 08:37:48 -0700 (PDT)
+Received: from [192.168.2.22] (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 42EC13F68F;
+        Mon, 27 Apr 2020 08:37:46 -0700 (PDT)
+Subject: Re: [PATCH][kvmtool] kvm: Request VM specific limits instead of
+ system-wide ones
+To:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org
+Cc:     James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Alexandru Elisei <Alexandru.Elisei@arm.com>
+References: <20200427141738.285217-1-maz@kernel.org>
+From:   =?UTF-8?Q?Andr=c3=a9_Przywara?= <andre.przywara@arm.com>
+Autocrypt: addr=andre.przywara@arm.com; prefer-encrypt=mutual; keydata=
+ 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
+ i4aIXCH3Wv6K
+Organization: ARM Ltd.
+Message-ID: <c36c30b1-6017-9c75-e0e9-e643eb348641@arm.com>
+Date:   Mon, 27 Apr 2020 16:37:07 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
+In-Reply-To: <20200427141738.285217-1-maz@kernel.org>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20200422105618.22260edb.cohuck@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Content-Transfer-Encoding: quoted-printable
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Apr 22, 2020 at 10:56:18AM +0200, Cornelia Huck wrote:
-> On Mon, 20 Apr 2020 13:17:55 +0200
-> Kashyap Chamarthy <kchamart@redhat.com> wrote:
+On 27/04/2020 15:17, Marc Zyngier wrote:
+Hi,
 
-[Just noticed this today ... thanks for the review.]
+> On arm64, the maximum number of vcpus is constrained by the type
+> of interrupt controller that has been selected (GICv2 imposes a
+> limit of 8 vcpus, while GICv3 currently has a limit of 512).
+> 
+> It is thus important to request this limit on the VM file descriptor
+> rather than on the one that corresponds to /dev/kvm, as the latter
+> is likely to return something that doesn't take the constraints into
+> account.
 
-[...]
+That sounds reasonable, but I fail to find any distinction in the kernel
+code. We don't make any difference between the VM or the system FD in
+the ioctl handler for those two extensions. For arm64 we always return
+max. 512 (max VCPUs on GICv3), and number of online host cores for the
+recommended value. For arm there was a distinction between GICv3 support
+compiled in or not, but otherwise the same constant values returned.
+Quickly tested on Juno and N1SDP, the ioctls return the same expected
+values, regardless of sys_fd vs vm_fd.
 
-> > +A nested guest is the ability to run a guest inside another guest (i=
-t
-> > +can be KVM-based or a different hypervisor).  The straightforward
-> > +example is a KVM guest that in turn runs on KVM a guest (the rest of
->=20
-> s/on KVM a guest/on a KVM guest/
+So what am I missing here? Is this for some older or even newer kernels?
 
-Will fix in v3.
+Cheers,
+Andre.
 
-[...]
-
-> > +Terminology:
-> > +
-> > +- L0 =E2=80=93 level-0; the bare metal host, running KVM
-> > +
-> > +- L1 =E2=80=93 level-1 guest; a VM running on L0; also called the "g=
-uest
-> > +  hypervisor", as it itself is capable of running KVM.
-> > +
-> > +- L2 =E2=80=93 level-2 guest; a VM running on L1, this is the "neste=
-d guest"
-> > +
-> > +.. note:: The above diagram is modelled after x86 architecture; s390=
-x,
->=20
-> s/x86 architecture/the x86 architecture/
->=20
-> > +          ppc64 and other architectures are likely to have different
->=20
-> s/to have/to have a/
-
-Noted (both the above)
-
-> > +          design for nesting.
-> > +
-> > +          For example, s390x has an additional layer, called "LPAR
-> > +          hypervisor" (Logical PARtition) on the baremetal, resultin=
-g in
-> > +          "four levels" in a nested setup =E2=80=94 L0 (bare metal, =
-running the
-> > +          LPAR hypervisor), L1 (host hypervisor), L2 (guest hypervis=
-or),
-> > +          L3 (nested guest).
->=20
-> What about:
->=20
-> "For example, s390x always has an LPAR (LogicalPARtition) hypervisor
-> running on bare metal, adding another layer and resulting in at least
-> four levels in a nested setup..."
-
-Yep, reads nicer; thanks.
-
-[...]
-
-> > +1. On the host hypervisor (L0), enable the ``nested`` parameter on
-> > +   s390x::
-> > +
-> > +    $ rmmod kvm
-> > +    $ modprobe kvm nested=3D1
-> > +
-> > +.. note:: On s390x, the kernel parameter ``hpage`` parameter is mutu=
-ally
->=20
-> Drop one of the "parameter"?
-
-Will do.
-
-> > +          exclusive with the ``nested`` paramter; i.e. to have
-> > +          ``nested`` enabled you _must_ disable the ``hpage`` parame=
-ter.
->=20
-> "i.e., in order to be able to enable ``nested``, the ``hpage``
-> parameter _must_ be disabled."
->=20
-> ?
-
-Yes :)
-
->=20
-> > +
-> > +2. The guest hypervisor (L1) must be allowed to have ``sie`` CPU
->=20
-> "must be provided with" ?
->=20
-> > +   feature =E2=80=94 with QEMU, this is possible by using "host pass=
-through"
->=20
-> s/this is possible by/this can be done by e.g./ ?
->=20
-> > +   (via the command-line ``-cpu host``).
-> > +
-> > +3. Now the KVM module can be enabled in the L1 (guest hypervisor)::
->=20
-> s/enabled/loaded/
-
-Will adjust the above three; thanks.
-
-> > +
-> > +    $ modprobe kvm
-> > +
-> > +
-> > +Live migration with nested KVM
-> > +------------------------------
-> > +
-> > +The below live migration scenarios should work as of Linux kernel 5.=
-3
-> > +and QEMU 4.2.0.  In all the below cases, L1 exposes ``/dev/kvm`` in
-> > +it, i.e. the L2 guest is a "KVM-accelerated guest", not a "plain
-> > +emulated guest" (as done by QEMU's TCG).
->=20
-> The 5.3/4.2 versions likely apply to x86? Should work for s390x as well
-> as of these version, but should have worked earlier already :)
-
-Heh, I'll specify the x86-ness of those versions :-)
-
-> > +
-> > +- Migrating a nested guest (L2) to another L1 guest on the *same* ba=
-re
-> > +  metal host.
-> > +
-> > +- Migrating a nested guest (L2) to another L1 guest on a *different*
-> > +  bare metal host.
-> > +
-> > +- Migrating an L1 guest, with an *offline* nested guest in it, to
-> > +  another bare metal host.
-> > +
-> > +- Migrating an L1 guest, with a  *live* nested guest in it, to anoth=
-er
-> > +  bare metal host.
-> > +
-> > +Limitations on Linux kernel versions older than 5.3
-> > +---------------------------------------------------
-> > +
-> > +On x86 systems-only (as this does *not* apply for s390x):
->=20
-> Add a "x86" marker? Or better yet, group all the x86 stuff in an x86
-> section?
-
-Right, forgot here, will do.
-
-[...]
-
-> > +Reporting bugs from "nested" setups
-> > +-----------------------------------
-> > +
-> > +(This is written with x86 terminology in mind, but similar should ap=
-ply
-> > +for other architectures.)
->=20
-> Better to reorder it a bit (see below).
-
-[...]
-
-> > +  - Kernel, libvirt, and QEMU version from L0
-> > +
-> > +  - Kernel, libvirt and QEMU version from L1
-> > +
-> > +  - QEMU command-line of L1 -- preferably full log from
-> > +    ``/var/log/libvirt/qemu/instance.log``
->=20
-> (if you are running libvirt)
->=20
-> > +
-> > +  - QEMU command-line of L2 -- preferably full log from
-> > +    ``/var/log/libvirt/qemu/instance.log``
->=20
-> (if you are running libvirt)
-
-Yes, I'll mention that bit.  (I'm just to used to reports coming from
-libvirt users :-))
-
-> > +
-> > +  - Full ``dmesg`` output from L0
-> > +
-> > +  - Full ``dmesg`` output from L1
-> > +
-> > +  - Output of: ``x86info -a`` (& ``lscpu``) from L0
-> > +
-> > +  - Output of: ``x86info -a`` (& ``lscpu``) from L1
->=20
-> lscpu makes sense for other architectures as well.
-
-Noted.
-
-> > +
-> > +  - Output of: ``dmidecode`` from L0
-> > +
-> > +  - Output of: ``dmidecode`` from L1
->=20
-> This looks x86 specific? Maybe have a list of things that make sense
-> everywhere, and list architecture-specific stuff in specific
-> subsections?
-
-Can do.  Do you have any other specific debugging bits to look out for
-s390x or any other arch?
-
-Thanks for the careful review.  Much appreciate it :-)
-
---=20
-/kashyap
+> 
+> Reported-by: Ard Biesheuvel <ardb@kernel.org>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  kvm.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/kvm.c b/kvm.c
+> index e327541..3d5173d 100644
+> --- a/kvm.c
+> +++ b/kvm.c
+> @@ -406,7 +406,7 @@ int kvm__recommended_cpus(struct kvm *kvm)
+>  {
+>  	int ret;
+>  
+> -	ret = ioctl(kvm->sys_fd, KVM_CHECK_EXTENSION, KVM_CAP_NR_VCPUS);
+> +	ret = ioctl(kvm->vm_fd, KVM_CHECK_EXTENSION, KVM_CAP_NR_VCPUS);
+>  	if (ret <= 0)
+>  		/*
+>  		 * api.txt states that if KVM_CAP_NR_VCPUS does not exist,
+> @@ -421,7 +421,7 @@ int kvm__max_cpus(struct kvm *kvm)
+>  {
+>  	int ret;
+>  
+> -	ret = ioctl(kvm->sys_fd, KVM_CHECK_EXTENSION, KVM_CAP_MAX_VCPUS);
+> +	ret = ioctl(kvm->vm_fd, KVM_CHECK_EXTENSION, KVM_CAP_MAX_VCPUS);
+>  	if (ret <= 0)
+>  		ret = kvm__recommended_cpus(kvm);
+>  
+> 
 
