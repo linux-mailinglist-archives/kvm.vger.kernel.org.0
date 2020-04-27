@@ -2,120 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 438431BAB8C
-	for <lists+kvm@lfdr.de>; Mon, 27 Apr 2020 19:44:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 88F4A1BABC4
+	for <lists+kvm@lfdr.de>; Mon, 27 Apr 2020 19:56:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726244AbgD0RoO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Apr 2020 13:44:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36528 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725963AbgD0RoO (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 27 Apr 2020 13:44:14 -0400
-Received: from chronos.abteam.si (chronos.abteam.si [IPv6:2a01:4f8:140:90ea::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6981CC0610D5
-        for <kvm@vger.kernel.org>; Mon, 27 Apr 2020 10:44:14 -0700 (PDT)
-Received: from localhost (localhost.localdomain [127.0.0.1])
-        by chronos.abteam.si (Postfix) with ESMTP id 2784C5D0009E;
-        Mon, 27 Apr 2020 19:44:12 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=bstnet.org; h=
-        content-language:content-transfer-encoding:content-type
-        :content-type:in-reply-to:mime-version:user-agent:date:date
-        :message-id:from:from:references:subject:subject; s=default; t=
-        1588009452; x=1589823853; bh=oOSrTHcbAV1YUo+MmhX4JcsOTkfQ25kfNGZ
-        2k+zrVZs=; b=yJsXNDYkCvJt5PANq6X1ObzNdpv1dccsXCQVWTZNzWzR0l8DqWD
-        3E3CSrPjEemv0YrQXmwV3QDckraIzn6Vb3xqd9A/yZtY2azYHyt/DYdwNQpJ8nMf
-        ek933EKLybySRnQBVA7D721/ySEyvHfearCmKlWpg2KorLFRvXZVLcms=
-Received: from chronos.abteam.si ([127.0.0.1])
-        by localhost (chronos.abteam.si [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id pgXIEBduJpzl; Mon, 27 Apr 2020 19:44:12 +0200 (CEST)
-Received: from bst-slack.bstnet.org (unknown [IPv6:2a00:ee2:4d00:602:d782:18ef:83c9:31f5])
-        (Authenticated sender: boris@abteam.si)
-        by chronos.abteam.si (Postfix) with ESMTPSA id 95EB05D0009D;
-        Mon, 27 Apr 2020 19:44:10 +0200 (CEST)
-Subject: Re: KVM Kernel 5.6+, BUG: stack guard page was hit at
-To:     Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        kvm@vger.kernel.org
-References: <fd793edf-a40f-100e-d1ba-a1147659cf17@bstnet.org>
- <d9c000ab-3288-ecc3-7a3f-e7bac963a398@amd.com>
- <ebff3407-b049-4bf0-895d-3996866bcb74@bstnet.org>
- <f283181d-b8ff-0020-eddf-7c939809008b@amd.com>
- <2cc1df19-e954-7b69-6175-b674bf12b2c0@amd.com>
-From:   "Boris V." <borisvk@bstnet.org>
-Message-ID: <51d65e72-16de-3a31-1a62-5698775c026f@bstnet.org>
-Date:   Mon, 27 Apr 2020 19:44:23 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+        id S1726283AbgD0R4s (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Apr 2020 13:56:48 -0400
+Received: from mga04.intel.com ([192.55.52.120]:18653 "EHLO mga04.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726229AbgD0R4s (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Apr 2020 13:56:48 -0400
+IronPort-SDR: 3dXglAy1oN7zYNVmuX34tO7qIovq1LqlmDunV/9d5KkpqZOqrVn2jIGpULvbkzQeJn+W0+gGMU
+ mwnKCMi2wKbw==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Apr 2020 10:56:48 -0700
+IronPort-SDR: VMqz5JP/v6+Xipo7yk79MoKh7DT+hIdwj2pgAYG7iyo+P5HvnpbpRlhEEdEg6YoQGkuTrlnCvh
+ VX6WGnLDvddw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.73,325,1583222400"; 
+   d="scan'208";a="248940043"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
+  by fmsmga008.fm.intel.com with ESMTP; 27 Apr 2020 10:56:47 -0700
+Date:   Mon, 27 Apr 2020 10:56:47 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Yang Weijiang <weijiang.yang@intel.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        pbonzini@redhat.com, jmattson@google.com,
+        yu.c.zhang@linux.intel.com
+Subject: Re: [PATCH v11 3/9] KVM: VMX: Set host/guest CET states for
+ vmexit/vmentry
+Message-ID: <20200427175647.GK14870@linux.intel.com>
+References: <20200326081847.5870-1-weijiang.yang@intel.com>
+ <20200326081847.5870-4-weijiang.yang@intel.com>
+ <20200423171741.GH17824@linux.intel.com>
+ <20200424143510.GH24039@local-michael-cet-test>
+ <20200424144941.GC30013@linux.intel.com>
+ <20200425092021.GB26221@local-michael-cet-test>
+ <20200427170426.GH14870@linux.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <2cc1df19-e954-7b69-6175-b674bf12b2c0@amd.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200427170426.GH14870@linux.intel.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2020-04-27 07:12, Suravee Suthikulpanit wrote:
-> Boris,
->
-> Would you mind sharing your QEMU command line and how to set up the VM?
-> I would like to double check to confirm that this is not specific to
-> running on Intel system.
->
-> Thanks,
-> Suravee
+On Mon, Apr 27, 2020 at 10:04:26AM -0700, Sean Christopherson wrote:
+> On Sat, Apr 25, 2020 at 05:20:21PM +0800, Yang Weijiang wrote:
+> > On Fri, Apr 24, 2020 at 07:49:41AM -0700, Sean Christopherson wrote:
+> > > On Fri, Apr 24, 2020 at 10:35:10PM +0800, Yang Weijiang wrote:
+> > > > On Thu, Apr 23, 2020 at 10:17:41AM -0700, Sean Christopherson wrote:
+> > > > > On Thu, Mar 26, 2020 at 04:18:40PM +0800, Yang Weijiang wrote:
+> > > > > > @@ -7140,8 +7175,23 @@ static void vmx_cpuid_update(struct kvm_vcpu *vcpu)
+> > > > > >  	}
+> > > > > >  
+> > > > > >  	if (guest_cpuid_has(vcpu, X86_FEATURE_SHSTK) ||
+> > > > > > -	    guest_cpuid_has(vcpu, X86_FEATURE_IBT))
+> > > > > > +	    guest_cpuid_has(vcpu, X86_FEATURE_IBT)) {
+> > > > > >  		vmx_update_intercept_for_cet_msr(vcpu);
+> > > > > > +
+> > > > > > +		if (cpu_has_cet_guest_load_ctrl() && is_cet_supported(vcpu))
+> > > > > > +			vm_entry_controls_setbit(to_vmx(vcpu),
+> > > > > > +						 VM_ENTRY_LOAD_GUEST_CET_STATE);
+> > > > > > +		else
+> > > > > > +			vm_entry_controls_clearbit(to_vmx(vcpu),
+> > > > > > +						   VM_ENTRY_LOAD_GUEST_CET_STATE);
+> > > > > > +
+> > > > > > +		if (cpu_has_cet_host_load_ctrl() && is_cet_supported(vcpu))
+> > > > > > +			vm_exit_controls_setbit(to_vmx(vcpu),
+> > > > > > +						VM_EXIT_LOAD_HOST_CET_STATE);
+> > > > > > +		else
+> > > > > > +			vm_exit_controls_clearbit(to_vmx(vcpu),
+> > > > > > +						  VM_EXIT_LOAD_HOST_CET_STATE);
+> > > > > 
+> > > > > As above, I think this can be done in vmx_set_cr4().
+> > > > >
+> > > > Hmm, it's in vmx_set_cr4() in early versions, OK, will move them back.
+> > > 
+> > > Did I advise you to move them out of vmx_set_cr4()?  It's entirely possible
+> > > I forgot some detail since the last time I reviewed this series.
+> > Things are always changing, I'm willing to change any part of the patch
+> > before it's landed :-).
+> 
+> I'm worried that there was a reason for requesting the logic to be moved
+> out vmx_set_cr4() that I've since forgotten.  I'll see if I can dredge up
+> the old mail.
 
-This is minimal example.
-When windows starts loading after cca 3 seconds crash happens 100% of 
-the time.
-This also happens with Linux guests and also sometimes in TianoCore 
-Settings/BIOS or whatever it is.
-Also if I'm in TianoCore settings and I write "quit" in qemu monitor 
-there is always crash.
+Aha.  v1-v7 had this in cr4.  In v7, you stated that you would move the
+toggling to VM-Enter, and in v8 you did just that[2].  In v9 I questioned
+why the bits were being toggled in vmx_vcpu_run() and advised moving the
+code to vmx_cpuid_update()[3], obviously forgetting that earlier versions
+did the toggling in vmx_set_cr4().
 
---
-#!/bin/bash
+AFAICT, I was only reacting to the immediate patch when I advised moving
+the code to vmx_cpuid_update(), i.e. the recommendation to move the code
+to vmx_set_cr4() doesn't contradict any previous feedback and thus doesn't
+reintroduce a known bug.
 
-export QEMU_AUDIO_DRV=pa
-
-NETDEV=""
-NETDEV+=" -netdev 
-tap,id=net0,ifname=tap0,script=no,downscript=no,vhost=on -device 
-virtio-net-pci,netdev=net0,mac=00:16:3e:79:dc:ed"
-
-OTHEROPT=""
-
-# GPU + HDMI
-OTHEROPT+=" -device vfio-pci,host=03:00.0"
-OTHEROPT+=" -device vfio-pci,host=03:00.1"
-
-# ASMedia SATA
-OTHEROPT+=" -device vfio-pci,host=0c:00.0"
-
-VGADEV="-vga none"
-
-# Keyboard
-OTHEROPT+=" -object 
-input-linux,id=kbd01,evdev=/dev/input/by-id/usb-046a_0023-event-kbd,grab_all=on,repeat=on"
-# Mouse
-OTHEROPT+=" -object 
-input-linux,id=mouse01,evdev=/dev/input/by-id/usb-Logitech_USB_Laser_Mouse-event-mouse"
-
-qemu-system-x86_64 -name "Windows 8.1" -uuid 
-14bb2c04-110b-444e-85b7-1ad5d1744df4 \
--cpu host,kvm=off,hv_vendor_id=asustek --enable-kvm \
--m 32G -mem-path /dev/hugepages -mem-prealloc \
--smp 8,sockets=1,cores=8,threads=1 \
--machine pc-q35-4.1,kernel_irqchip=on \
--monitor stdio -rtc clock=host,base=localtime \
-$NETDEV \
--drive if=pflash,format=raw,readonly,file=OVMF_CODE-pure-efi.fd \
--drive if=pflash,format=raw,file=OVMF_VARS-pure-efi.fd \
--serial none \
--parallel none \
-$OTHEROPT \
--audiodev id=pa,driver=pa \
--soundhw hda \
-$VGADEV
-
---
+[1] https://patchwork.kernel.org/patch/11163639/#22931561
+[2] https://patchwork.kernel.org/patch/11222763/
+[3] https://patchwork.kernel.org/patch/11310823/
