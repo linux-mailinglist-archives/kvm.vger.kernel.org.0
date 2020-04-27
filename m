@@ -2,145 +2,265 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 55C0C1BA7D2
-	for <lists+kvm@lfdr.de>; Mon, 27 Apr 2020 17:21:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8B6B11BA7DB
+	for <lists+kvm@lfdr.de>; Mon, 27 Apr 2020 17:22:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727771AbgD0PVN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Apr 2020 11:21:13 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:22003 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727807AbgD0PVM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Apr 2020 11:21:12 -0400
+        id S1727843AbgD0PW6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Apr 2020 11:22:58 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:35800 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727840AbgD0PW5 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 27 Apr 2020 11:22:57 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1588000870;
+        s=mimecast20190719; t=1588000976;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=t0zUuDSHC2LYYJLNAsloYEAAqSEOkEn10YRd/wXdi+k=;
-        b=SfZ0IZheyMg6ghHTswOQGdrY+Rpys1Mi/KkEVLlbxCDRtBaItNqwp/1tLm81F1R0dUNVwE
-        vZ7R8h9VNwMlVmM/DrOIszdygHdadb3hcjGsOpvO71bnsyupfDTxgC8IYYkElvOa5CiaO/
-        +RFALVW2+XmKzEB6dGNJY7orxCdqWy4=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-328-04QLiYJMPCuP2dVVQqceYA-1; Mon, 27 Apr 2020 11:21:08 -0400
-X-MC-Unique: 04QLiYJMPCuP2dVVQqceYA-1
-Received: by mail-wr1-f70.google.com with SMTP id a3so10672955wro.1
-        for <kvm@vger.kernel.org>; Mon, 27 Apr 2020 08:21:08 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=t0zUuDSHC2LYYJLNAsloYEAAqSEOkEn10YRd/wXdi+k=;
-        b=KdXkX91UXlLmoq5ElGxRIvqAAhj/srHKtIjovAfEw8gyngZwL9/2ji6oQPbLC4Vtt5
-         OBUn4qP1T8qj33rcovkIlalJaWEbNwKsM1slh4k0AcD2KLoAsMnb4lKxBNAbkE6gsbSV
-         Ud+G7FwrLM7VJ5votcJ59wgro2eVjMNy/qX1NVgsgyzGpzNAP2EABfcZrSZUsmORaTCE
-         zttLFORhTTzSFWG0GSZXGtnSYzvVOtzSzcYyGhOMjrV9jMHvuIHW67GXfSMHUl5jNR/I
-         2be0ABCK9IZDLJmym0mGAjUByReUSYlusigcvApXGx48m/3I6lhVqq+/IytH/cWR8lj+
-         NyNQ==
-X-Gm-Message-State: AGi0PuaH/szBzEPVJMkpCMDhIki0v+tGTiT3Wat0YugNTmomCAPFqTe0
-        DfH2qxo8nmbUOwhL5bd3B1/UZHTB6x9QSso2TDBgjd7HNwQzdmdQGJK71a5ybFJcz+OZRgJEkH5
-        EfbDIcLG5Hc7f
-X-Received: by 2002:a1c:b445:: with SMTP id d66mr38650wmf.187.1588000867454;
-        Mon, 27 Apr 2020 08:21:07 -0700 (PDT)
-X-Google-Smtp-Source: APiQypIZ5/J/wN/0wkBkOIE/TjfFJ5VeKIYdPSnC6DlZr/llDxsorbTrSb9AdWnEjmL3w4GukHw2OQ==
-X-Received: by 2002:a1c:b445:: with SMTP id d66mr38611wmf.187.1588000867197;
-        Mon, 27 Apr 2020 08:21:07 -0700 (PDT)
-Received: from steredhat (host108-207-dynamic.49-79-r.retail.telecomitalia.it. [79.49.207.108])
-        by smtp.gmail.com with ESMTPSA id r3sm22637536wrx.72.2020.04.27.08.21.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Apr 2020 08:21:06 -0700 (PDT)
-Date:   Mon, 27 Apr 2020 17:21:03 +0200
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     davem@davemloft.net, Stefan Hajnoczi <stefanha@redhat.com>,
-        linux-kernel@vger.kernel.org, Jorgen Hansen <jhansen@vmware.com>,
-        Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        linux-hyperv@vger.kernel.org, Dexuan Cui <decui@microsoft.com>,
-        netdev@vger.kernel.org
-Subject: Re: [PATCH net-next 0/3] vsock: support network namespace
-Message-ID: <20200427152103.r65new4r342crfs6@steredhat>
-References: <20200116172428.311437-1-sgarzare@redhat.com>
- <20200427142518.uwssa6dtasrp3bfc@steredhat>
- <20200427102828-mutt-send-email-mst@kernel.org>
+        bh=j1P8r/1uiuCesfWRL2P1eB9YuwB+npl31XfwyVv6S0w=;
+        b=KJfKFZU9z53vEAd6cr1p885Ma4iNkhIAFovv6bd6KXf68DTHR6WQ/vc6mh+H2gnnBIhFAB
+        wkMh10KDZv+FnlQIvi8mAIgzA3qPFl2Y0ydY4J5ecGMBzPpUNc7n5aTzjnuweBLR83zmq9
+        fmdF64q1tkJWE+JOfpA/1kGMGZKRgS4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-52-oA5Rk_UpNlS7pKV9ScEOnA-1; Mon, 27 Apr 2020 11:22:52 -0400
+X-MC-Unique: oA5Rk_UpNlS7pKV9ScEOnA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EA77118A076B
+        for <kvm@vger.kernel.org>; Mon, 27 Apr 2020 15:22:51 +0000 (UTC)
+Received: from paraplu.localdomain (unknown [10.36.110.49])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 81D665D716;
+        Mon, 27 Apr 2020 15:22:51 +0000 (UTC)
+Received: by paraplu.localdomain (Postfix, from userid 1001)
+        id A592D3E048A; Mon, 27 Apr 2020 17:22:49 +0200 (CEST)
+Date:   Mon, 27 Apr 2020 17:22:49 +0200
+From:   Kashyap Chamarthy <kchamart@redhat.com>
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, dgilbert@redhat.com,
+        vkuznets@redhat.com
+Subject: Re: [PATCH v2] docs/virt/kvm: Document running nested guests
+Message-ID: <20200427152249.GB25403@paraplu>
+References: <20200420111755.2926-1-kchamart@redhat.com>
+ <20200422105618.22260edb.cohuck@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20200427102828-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20200422105618.22260edb.cohuck@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Apr 27, 2020 at 10:31:57AM -0400, Michael S. Tsirkin wrote:
-> On Mon, Apr 27, 2020 at 04:25:18PM +0200, Stefano Garzarella wrote:
-> > Hi David, Michael, Stefan,
-> > I'm restarting to work on this topic since Kata guys are interested to
-> > have that, especially on the guest side.
-> > 
-> > While working on the v2 I had few doubts, and I'd like to have your
-> > suggestions:
-> > 
-> >  1. netns assigned to the device inside the guest
-> > 
-> >    Currently I assigned this device to 'init_net'. Maybe it is better
-> >    if we allow the user to decide which netns assign to the device
-> >    or to disable this new feature to have the same behavior as before
-> >    (host reachable from any netns).
-> >    I think we can handle this in the vsock core and not in the single
-> >    transports.
-> > 
-> >    The simplest way that I found, is to add a new
-> >    IOCTL_VM_SOCKETS_ASSIGN_G2H_NETNS to /dev/vsock to enable the feature
-> >    and assign the device to the same netns of the process that do the
-> >    ioctl(), but I'm not sure it is clean enough.
-> > 
-> >    Maybe it is better to add new rtnetlink messages, but I'm not sure if
-> >    it is feasible since we don't have a netdev device.
-> > 
-> >    What do you suggest?
-> 
-> Maybe /dev/vsock-netns here too, like in the host?
-> 
+On Wed, Apr 22, 2020 at 10:56:18AM +0200, Cornelia Huck wrote:
+> On Mon, 20 Apr 2020 13:17:55 +0200
+> Kashyap Chamarthy <kchamart@redhat.com> wrote:
 
-I'm not sure I get it.
+[Just noticed this today ... thanks for the review.]
 
-In the guest, /dev/vsock is only used to get the CID assigned to the
-guest through an ioctl().
+[...]
 
-In the virtio-vsock case, the guest transport is loaded when it is discovered
-on the PCI bus, so we need a way to "move" it to a netns or to specify
-which netns should be used when it is probed.
+> > +A nested guest is the ability to run a guest inside another guest (i=
+t
+> > +can be KVM-based or a different hypervisor).  The straightforward
+> > +example is a KVM guest that in turn runs on KVM a guest (the rest of
+>=20
+> s/on KVM a guest/on a KVM guest/
 
-> 
-> > 
-> >  2. netns assigned in the host
-> > 
-> >     As Michael suggested, I added a new /dev/vhost-vsock-netns to allow
-> >     userspace application to use this new feature, leaving to
-> >     /dev/vhost-vsock the previous behavior (guest reachable from any
-> >     netns).
-> > 
-> >     I like this approach, but I had these doubts:
-> > 
-> >     - I need to allocate a new minor for that device (e.g.
-> >       VHOST_VSOCK_NETNS_MINOR) or is there an alternative way that I can
-> >       use?
-> 
-> Not that I see. I agree it's a bit annoying. I'll think about it a bit.
-> 
+Will fix in v3.
 
-Thanks for that!
-An idea that I had, was to add a new ioctl to /dev/vhost-vsock to enable
-the netns support, but I'm not sure it is a clean approach.
+[...]
 
-> >     - It is vhost-vsock specific, should we provide something handled in
-> >       the vsock core, maybe centralizing the CID allocation and adding a
-> >       new IOCTL or rtnetlink message like for the guest side?
-> >       (maybe it could be a second step, and for now we can continue with
-> >       the new device)
-> > 
+> > +Terminology:
+> > +
+> > +- L0 =E2=80=93 level-0; the bare metal host, running KVM
+> > +
+> > +- L1 =E2=80=93 level-1 guest; a VM running on L0; also called the "g=
+uest
+> > +  hypervisor", as it itself is capable of running KVM.
+> > +
+> > +- L2 =E2=80=93 level-2 guest; a VM running on L1, this is the "neste=
+d guest"
+> > +
+> > +.. note:: The above diagram is modelled after x86 architecture; s390=
+x,
+>=20
+> s/x86 architecture/the x86 architecture/
+>=20
+> > +          ppc64 and other architectures are likely to have different
+>=20
+> s/to have/to have a/
 
-Thanks,
-Stefano
+Noted (both the above)
+
+> > +          design for nesting.
+> > +
+> > +          For example, s390x has an additional layer, called "LPAR
+> > +          hypervisor" (Logical PARtition) on the baremetal, resultin=
+g in
+> > +          "four levels" in a nested setup =E2=80=94 L0 (bare metal, =
+running the
+> > +          LPAR hypervisor), L1 (host hypervisor), L2 (guest hypervis=
+or),
+> > +          L3 (nested guest).
+>=20
+> What about:
+>=20
+> "For example, s390x always has an LPAR (LogicalPARtition) hypervisor
+> running on bare metal, adding another layer and resulting in at least
+> four levels in a nested setup..."
+
+Yep, reads nicer; thanks.
+
+[...]
+
+> > +1. On the host hypervisor (L0), enable the ``nested`` parameter on
+> > +   s390x::
+> > +
+> > +    $ rmmod kvm
+> > +    $ modprobe kvm nested=3D1
+> > +
+> > +.. note:: On s390x, the kernel parameter ``hpage`` parameter is mutu=
+ally
+>=20
+> Drop one of the "parameter"?
+
+Will do.
+
+> > +          exclusive with the ``nested`` paramter; i.e. to have
+> > +          ``nested`` enabled you _must_ disable the ``hpage`` parame=
+ter.
+>=20
+> "i.e., in order to be able to enable ``nested``, the ``hpage``
+> parameter _must_ be disabled."
+>=20
+> ?
+
+Yes :)
+
+>=20
+> > +
+> > +2. The guest hypervisor (L1) must be allowed to have ``sie`` CPU
+>=20
+> "must be provided with" ?
+>=20
+> > +   feature =E2=80=94 with QEMU, this is possible by using "host pass=
+through"
+>=20
+> s/this is possible by/this can be done by e.g./ ?
+>=20
+> > +   (via the command-line ``-cpu host``).
+> > +
+> > +3. Now the KVM module can be enabled in the L1 (guest hypervisor)::
+>=20
+> s/enabled/loaded/
+
+Will adjust the above three; thanks.
+
+> > +
+> > +    $ modprobe kvm
+> > +
+> > +
+> > +Live migration with nested KVM
+> > +------------------------------
+> > +
+> > +The below live migration scenarios should work as of Linux kernel 5.=
+3
+> > +and QEMU 4.2.0.  In all the below cases, L1 exposes ``/dev/kvm`` in
+> > +it, i.e. the L2 guest is a "KVM-accelerated guest", not a "plain
+> > +emulated guest" (as done by QEMU's TCG).
+>=20
+> The 5.3/4.2 versions likely apply to x86? Should work for s390x as well
+> as of these version, but should have worked earlier already :)
+
+Heh, I'll specify the x86-ness of those versions :-)
+
+> > +
+> > +- Migrating a nested guest (L2) to another L1 guest on the *same* ba=
+re
+> > +  metal host.
+> > +
+> > +- Migrating a nested guest (L2) to another L1 guest on a *different*
+> > +  bare metal host.
+> > +
+> > +- Migrating an L1 guest, with an *offline* nested guest in it, to
+> > +  another bare metal host.
+> > +
+> > +- Migrating an L1 guest, with a  *live* nested guest in it, to anoth=
+er
+> > +  bare metal host.
+> > +
+> > +Limitations on Linux kernel versions older than 5.3
+> > +---------------------------------------------------
+> > +
+> > +On x86 systems-only (as this does *not* apply for s390x):
+>=20
+> Add a "x86" marker? Or better yet, group all the x86 stuff in an x86
+> section?
+
+Right, forgot here, will do.
+
+[...]
+
+> > +Reporting bugs from "nested" setups
+> > +-----------------------------------
+> > +
+> > +(This is written with x86 terminology in mind, but similar should ap=
+ply
+> > +for other architectures.)
+>=20
+> Better to reorder it a bit (see below).
+
+[...]
+
+> > +  - Kernel, libvirt, and QEMU version from L0
+> > +
+> > +  - Kernel, libvirt and QEMU version from L1
+> > +
+> > +  - QEMU command-line of L1 -- preferably full log from
+> > +    ``/var/log/libvirt/qemu/instance.log``
+>=20
+> (if you are running libvirt)
+>=20
+> > +
+> > +  - QEMU command-line of L2 -- preferably full log from
+> > +    ``/var/log/libvirt/qemu/instance.log``
+>=20
+> (if you are running libvirt)
+
+Yes, I'll mention that bit.  (I'm just to used to reports coming from
+libvirt users :-))
+
+> > +
+> > +  - Full ``dmesg`` output from L0
+> > +
+> > +  - Full ``dmesg`` output from L1
+> > +
+> > +  - Output of: ``x86info -a`` (& ``lscpu``) from L0
+> > +
+> > +  - Output of: ``x86info -a`` (& ``lscpu``) from L1
+>=20
+> lscpu makes sense for other architectures as well.
+
+Noted.
+
+> > +
+> > +  - Output of: ``dmidecode`` from L0
+> > +
+> > +  - Output of: ``dmidecode`` from L1
+>=20
+> This looks x86 specific? Maybe have a list of things that make sense
+> everywhere, and list architecture-specific stuff in specific
+> subsections?
+
+Can do.  Do you have any other specific debugging bits to look out for
+s390x or any other arch?
+
+Thanks for the careful review.  Much appreciate it :-)
+
+--=20
+/kashyap
 
