@@ -2,205 +2,170 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3D4D81BA64D
-	for <lists+kvm@lfdr.de>; Mon, 27 Apr 2020 16:25:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B235D1BA651
+	for <lists+kvm@lfdr.de>; Mon, 27 Apr 2020 16:26:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727905AbgD0OZi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Apr 2020 10:25:38 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:57863 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727104AbgD0OZf (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 27 Apr 2020 10:25:35 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1587997532;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=G2OKqHupmsX6p6eOVsvAeEE5c4vTAldIJ9QKI6xeIiI=;
-        b=XEbYlLxhVEJbyb/H5a89UsZmZ715k/yneNwCCZHVPl1COF+Ubb9xzBk2OkkV9jdukiCJuX
-        ly9O2ZbFtaYI5IAWU7f13RJDfPUdNv/0vkqpJrH7ZzC0eJXl785NIFS7TiW5oHvzgo1bPl
-        wrmHpZ9J54ci3gvjD0AbE7EE8PB1tE8=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-426-uCzr8ur1OmuyWvVe41fcfw-1; Mon, 27 Apr 2020 10:25:23 -0400
-X-MC-Unique: uCzr8ur1OmuyWvVe41fcfw-1
-Received: by mail-wr1-f72.google.com with SMTP id f2so10609937wrm.9
-        for <kvm@vger.kernel.org>; Mon, 27 Apr 2020 07:25:23 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=G2OKqHupmsX6p6eOVsvAeEE5c4vTAldIJ9QKI6xeIiI=;
-        b=YPf/zad1k6mi9XbpgnRXeE8V2QAx/gfEsw6jVKqosx9/hAES6kubskydWHqXDskHDO
-         km0/xaq+UAhwm15/NaAPDUI1g+PSYlRBhKBIlsQ7IIN0BV1fS+cFtNzT1+nqP6o5bvFm
-         wRxjdU1PG760JYSk/awgKPhxWEjBPr8OrcOWcPVzRSjsqAb+Yn8XeQQQ+NCFr7lgnWNV
-         qCEtU2j2PI0JYZyY9aCuE11BJZfcKc7OkNcCLoQd5zOhZbBYFlYwatoafRnx7cFUC4Yz
-         RQloeWWZvPIZH8ImYKUfIkfll9ucWFGrtsWPfToN3Nhiy7N9SKHFPPcz6V7JyckFojva
-         eACg==
-X-Gm-Message-State: AGi0PuZtqA9IqeK0XpCXghGYogxTKQztlF/HsvU7b2X73FTzCfYq0qlJ
-        hQbaJzSUekZpgnWeQCZd1gLpGqDOieFBu04dePuhIUx4tCwhDPOnUVc/wvJ4gTg7nkJj+3IKGH6
-        Q6Jp4RSxn4IQN
-X-Received: by 2002:a1c:ed04:: with SMTP id l4mr26738558wmh.93.1587997522578;
-        Mon, 27 Apr 2020 07:25:22 -0700 (PDT)
-X-Google-Smtp-Source: APiQypIxTLUJV76JfSV7akvjZLc8gxRNuDLQT/3botMuSslAXyKAEmVDR+5C/do/K4W5YD7K308fCA==
-X-Received: by 2002:a1c:ed04:: with SMTP id l4mr26738539wmh.93.1587997522273;
-        Mon, 27 Apr 2020 07:25:22 -0700 (PDT)
-Received: from steredhat (host108-207-dynamic.49-79-r.retail.telecomitalia.it. [79.49.207.108])
-        by smtp.gmail.com with ESMTPSA id m1sm20657589wro.64.2020.04.27.07.25.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Apr 2020 07:25:21 -0700 (PDT)
-Date:   Mon, 27 Apr 2020 16:25:18 +0200
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     davem@davemloft.net, Stefan Hajnoczi <stefanha@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, Jorgen Hansen <jhansen@vmware.com>,
-        Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        linux-hyperv@vger.kernel.org, Dexuan Cui <decui@microsoft.com>,
-        netdev@vger.kernel.org
-Subject: Re: [PATCH net-next 0/3] vsock: support network namespace
-Message-ID: <20200427142518.uwssa6dtasrp3bfc@steredhat>
-References: <20200116172428.311437-1-sgarzare@redhat.com>
-MIME-Version: 1.0
+        id S1727966AbgD0O0F (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Apr 2020 10:26:05 -0400
+Received: from mail-eopbgr70071.outbound.protection.outlook.com ([40.107.7.71]:29699
+        "EHLO EUR04-HE1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727077AbgD0O0E (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Apr 2020 10:26:04 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=jyzGEwIYnkHquW8HRRU74yDUaR+aiKdRCbIK4vpoRBewvdWjPUnBb8YEYq1Sx2JA7hZphyWTB3KmULgIpDfWfd/zxsjwyE7h3pBquZYRid6XF8CsHEGLfXmqOMXS2NZZ8MQx8MS4SGJ5rGSZKie48WI+ODK1/G1yQOrXXD8R52kvx2B4G10k/okUxIM3wJ/78xzHDc7t/GwUnruaixKm31k9TWfbhernQ3DO5It/6lWXzUqB/+Eza7WMVCtk1wv4bHPLOaxwZ3xzSv36p8Wxgdbb5xnYCci5oIVUvuWDHq8qAxP+AmR28gN4WK6lyWqhSyUtm7msYal7GOry3Kh7cg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=73pxRLEAccaMA1EYoTl6Dgo3FZtgkSsRnyNyaKa83pM=;
+ b=R9MuJv/hUlTZ37OYh3htsM2DDE6Ll0JOZ81ljbtunfsOVt9j2P2/2akCt9c58671I6KH0A1Cidh2RPWCr3f2/wedpbeJy6iK3HacuTMBUvc3lgsLXpz3cxIQ0ALajAj8OEiuqKHbox1kHypv524PTtLmrw/m1NuMy/CLqt4PH1xbzGxZulWCSWz6wrmy9NeKZ94vD0X+qjVWSoimrOdKD5bARXJceVCNnXx/R2Gf9I36M7Of3UkkJzxOqQlkPBJwMDfD0Kv4kLCFgTaM1taF6pn5mPmg1R1xTfKEvDo6HuSyIBQmMUn0+feLMVYg71ZLLRnlzHIZUdsIefqQ09pSCQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=mellanox.com; dmarc=pass action=none header.from=mellanox.com;
+ dkim=pass header.d=mellanox.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Mellanox.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=73pxRLEAccaMA1EYoTl6Dgo3FZtgkSsRnyNyaKa83pM=;
+ b=C2I3T7Cjax3NJfJF/B95zrYYv+/XiAlIoU1JrkVYicHKdx26s7CjP8JOzhgJJIQbXWk2Of2ETFGD8LyXVrlcQIPwIfl7zRi8ZReFIQHDiDjdyXhTTdWmC0ar6bY+MnGr7JRHxiq+2ovXWJCACkMWHHlP8C/pCjpcmw4ItpQ9AE0=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=jgg@mellanox.com; 
+Received: from VI1PR05MB4141.eurprd05.prod.outlook.com (2603:10a6:803:44::15)
+ by VI1PR05MB5183.eurprd05.prod.outlook.com (2603:10a6:803:a9::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2937.22; Mon, 27 Apr
+ 2020 14:25:58 +0000
+Received: from VI1PR05MB4141.eurprd05.prod.outlook.com
+ ([fe80::a47b:e3cd:7d6d:5d4e]) by VI1PR05MB4141.eurprd05.prod.outlook.com
+ ([fe80::a47b:e3cd:7d6d:5d4e%6]) with mapi id 15.20.2937.020; Mon, 27 Apr 2020
+ 14:25:58 +0000
+Date:   Mon, 27 Apr 2020 11:25:53 -0300
+From:   Jason Gunthorpe <jgg@mellanox.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "Jiang, Dave" <dave.jiang@intel.com>,
+        "vkoul@kernel.org" <vkoul@kernel.org>,
+        "megha.dey@linux.intel.com" <megha.dey@linux.intel.com>,
+        "maz@kernel.org" <maz@kernel.org>,
+        "bhelgaas@google.com" <bhelgaas@google.com>,
+        "rafael@kernel.org" <rafael@kernel.org>,
+        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "hpa@zytor.com" <hpa@zytor.com>,
+        "Pan, Jacob jun" <jacob.jun.pan@intel.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>, "Lu, Baolu" <baolu.lu@intel.com>,
+        "Kumar, Sanjay K" <sanjay.k.kumar@intel.com>,
+        "Luck, Tony" <tony.luck@intel.com>,
+        "Lin, Jing" <jing.lin@intel.com>,
+        "Williams, Dan J" <dan.j.williams@intel.com>,
+        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "parav@mellanox.com" <parav@mellanox.com>,
+        "dmaengine@vger.kernel.org" <dmaengine@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: Re: [PATCH RFC 00/15] Add VFIO mediated device support and IMS
+ support for the idxd driver.
+Message-ID: <20200427142553.GH13640@mellanox.com>
+References: <20200424124444.GJ13640@mellanox.com>
+ <AADFC41AFE54684AB9EE6CBC0274A5D19D8A808B@SHSMSX104.ccr.corp.intel.com>
+ <20200424181203.GU13640@mellanox.com>
+ <AADFC41AFE54684AB9EE6CBC0274A5D19D8C5486@SHSMSX104.ccr.corp.intel.com>
+ <20200426191357.GB13640@mellanox.com>
+ <20200426214355.29e19d33@x1.home>
+ <20200427115818.GE13640@mellanox.com>
+ <20200427071939.06aa300e@x1.home>
+ <20200427132218.GG13640@mellanox.com>
+ <20200427081841.18c4a994@x1.home>
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200116172428.311437-1-sgarzare@redhat.com>
+In-Reply-To: <20200427081841.18c4a994@x1.home>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-ClientProxiedBy: BL0PR02CA0007.namprd02.prod.outlook.com
+ (2603:10b6:207:3c::20) To VI1PR05MB4141.eurprd05.prod.outlook.com
+ (2603:10a6:803:44::15)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from mlx.ziepe.ca (142.68.57.212) by BL0PR02CA0007.namprd02.prod.outlook.com (2603:10b6:207:3c::20) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2937.13 via Frontend Transport; Mon, 27 Apr 2020 14:25:58 +0000
+Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)     (envelope-from <jgg@mellanox.com>)      id 1jT4hl-00083h-TE; Mon, 27 Apr 2020 11:25:53 -0300
+X-Originating-IP: [142.68.57.212]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: bca20ff2-8517-4dc4-56fb-08d7eab6e754
+X-MS-TrafficTypeDiagnostic: VI1PR05MB5183:|VI1PR05MB5183:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <VI1PR05MB5183A2BD8069F6322A4EC67ECFAF0@VI1PR05MB5183.eurprd05.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
+X-Forefront-PRVS: 0386B406AA
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI1PR05MB4141.eurprd05.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(136003)(366004)(376002)(396003)(39860400002)(346002)(52116002)(26005)(6916009)(186003)(5660300002)(66946007)(2616005)(66556008)(54906003)(316002)(66476007)(4326008)(478600001)(9786002)(9746002)(1076003)(86362001)(33656002)(36756003)(2906002)(8936002)(8676002)(81156014)(7416002)(24400500001);DIR:OUT;SFP:1101;
+Received-SPF: None (protection.outlook.com: mellanox.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 05X4l1p6VZ+cBXhuIafJ0TZRnctsj5iI57eQJuYRJ0vltuBD+ZzYJ50ZZGSNykqyJ5iSwpGaZIHh+8cNJQHUKwmu6Ac6HQfQ147VdrO4GluBgifcmLF2q0t575J4BqmGZ6GeeNSVYfYhtG67py0/CFv3v2HNyCftS1tzCATaVawdXBroaFSS4HOCepZ+aHP2i3+EkOLBS7Oi4KQ1NUPF0KpwczrDkGYJRLq2vPf7/rUC6L0oOBxwWk5+th0Sy6gvw+evreoAVhN5Rwj7Z8MQzUkQkEaYBR+4m/OjWVFFauSKpWWaEFxBplTC5qdHYF+G/XxjdkSSWFQ5i9JfyN7x2IItXK+6YyRemxNpHnqt9/PAs+f5k+zVm1auLuRv0UWR4du36XddODxfxISpqwHxycN5ses36S5BKiRT/O0hhc0gX1wfgWeCrxS/7XqgqkfBiLppAJCR4aANAUFAZLLCyIAqpeTTBUnO0xV6rkN0wy0UFwuclC/1khmcedwfa7ng
+X-MS-Exchange-AntiSpam-MessageData: oJghRb+9wZU/4jL4TQYgagw1z6XiBgdb7+t/00wGxOYFgx5pURmaHIGKnh0/uOCmN3Pgq7/DOhe0DLfsT2VF378+4KQoCKhKZPBUeA8LHN8f7qpsb1oDt5P8N5zP/Um4dwhp5GNitrqqYEzLhP+TYE6qbO4rLy3miBsT7qCRzC9hsIfXn2dIxyeV4hHFReAII/Q/m36YR2T5NuKsk/1Zfk5JBNqwJKX5wcVfueYtLZxeDuaeKsvjIVz/BbwqxmcApI0IHKzpbUD1uazTJSammLZLgJUFtPutlVIlDUbru8a2pkIl40El/KNOKB3hE6bZo0UhfSi26Ym/UuuXaBtAVXLObL01iVhQSExzlTmckpDnLeiqylsQiodtY0+KQ8hMWxOo29q6NIcu1TWALN+7rxL/DwCVsSz5EUItTwJYwi4HKvF3EuduZD/K1VNq8afx5q8vGZBdBzsC03lz1BybqfrYUTy+zKAvoxBgiQX1n4tE7wI44X6nwkvoYK9ck9Y4IHZpKi7BqmqOkNnigATactJbsauCApluBSzaG1bsY5yb8dLPzKgJRmmsUV/e9fufRE1JtmNJchqqNzKSO8cGgeV5reHybZCqgwA2nF7ptkO9vWkiQffcoGFZ3rHzIMHas0cONkhgUdkXMThkBXl5qUAcu89fo3U/v6jduU4kHMCzdKfHI9obhkLEjlBLDBKR54tb33Y17txerK9sW6cbYUI7YeeW5gLeITIG2Fo15ff1sNffQsmkneuCB7EKisJ51zNHbrkh5iAYR3/2GrIXVFiKI219TMhb8xhIFmGjaOA=
+X-OriginatorOrg: Mellanox.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: bca20ff2-8517-4dc4-56fb-08d7eab6e754
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Apr 2020 14:25:58.5844
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: a652971c-7d2e-4d9b-a6a4-d149256f461b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: qlRu1EcECVW2HvZPh4axAmcAxysrYphwx8KsJsJkjShDbj1BEgrvAITYYAv9+9gkAER0MjVJhkmdTB+LWYdS/g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR05MB5183
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi David, Michael, Stefan,
-I'm restarting to work on this topic since Kata guys are interested to
-have that, especially on the guest side.
-
-While working on the v2 I had few doubts, and I'd like to have your
-suggestions:
-
- 1. netns assigned to the device inside the guest
-
-   Currently I assigned this device to 'init_net'. Maybe it is better
-   if we allow the user to decide which netns assign to the device
-   or to disable this new feature to have the same behavior as before
-   (host reachable from any netns).
-   I think we can handle this in the vsock core and not in the single
-   transports.
-
-   The simplest way that I found, is to add a new
-   IOCTL_VM_SOCKETS_ASSIGN_G2H_NETNS to /dev/vsock to enable the feature
-   and assign the device to the same netns of the process that do the
-   ioctl(), but I'm not sure it is clean enough.
-
-   Maybe it is better to add new rtnetlink messages, but I'm not sure if
-   it is feasible since we don't have a netdev device.
-
-   What do you suggest?
-
-
- 2. netns assigned in the host
-
-    As Michael suggested, I added a new /dev/vhost-vsock-netns to allow
-    userspace application to use this new feature, leaving to
-    /dev/vhost-vsock the previous behavior (guest reachable from any
-    netns).
-
-    I like this approach, but I had these doubts:
-
-    - I need to allocate a new minor for that device (e.g.
-      VHOST_VSOCK_NETNS_MINOR) or is there an alternative way that I can
-      use?
-
-    - It is vhost-vsock specific, should we provide something handled in
-      the vsock core, maybe centralizing the CID allocation and adding a
-      new IOCTL or rtnetlink message like for the guest side?
-      (maybe it could be a second step, and for now we can continue with
-      the new device)
-
-
-Thanks for the help,
-Stefano
-
-
-On Thu, Jan 16, 2020 at 06:24:25PM +0100, Stefano Garzarella wrote:
-> RFC -> v1:
->  * added 'netns' module param to vsock.ko to enable the
->    network namespace support (disabled by default)
->  * added 'vsock_net_eq()' to check the "net" assigned to a socket
->    only when 'netns' support is enabled
+On Mon, Apr 27, 2020 at 08:18:41AM -0600, Alex Williamson wrote:
+> On Mon, 27 Apr 2020 10:22:18 -0300
+> Jason Gunthorpe <jgg@mellanox.com> wrote:
 > 
-> RFC: https://patchwork.ozlabs.org/cover/1202235/
+> > On Mon, Apr 27, 2020 at 07:19:39AM -0600, Alex Williamson wrote:
+> > 
+> > > > It is not trivial masking. It is a 2000 line patch doing comprehensive
+> > > > emulation.  
+> > > 
+> > > Not sure what you're referring to, I see about 30 lines of code in
+> > > vdcm_vidxd_cfg_write() that specifically handle writes to the 4 BARs in
+> > > config space and maybe a couple hundred lines of code in total handling
+> > > config space emulation.  Thanks,  
+> > 
+> > Look around vidxd_do_command()
+> > 
+> > If I understand this flow properly..
 > 
-> Now that we have multi-transport upstream, I started to take a look to
-> support network namespace in vsock.
-> 
-> As we partially discussed in the multi-transport proposal [1], it could
-> be nice to support network namespace in vsock to reach the following
-> goals:
-> - isolate host applications from guest applications using the same ports
->   with CID_ANY
-> - assign the same CID of VMs running in different network namespaces
-> - partition VMs between VMMs or at finer granularity
-> 
-> This new feature is disabled by default, because it changes vsock's
-> behavior with network namespaces and could break existing applications.
-> It can be enabled with the new 'netns' module parameter of vsock.ko.
-> 
-> This implementation provides the following behavior:
-> - packets received from the host (received by G2H transports) are
->   assigned to the default netns (init_net)
-> - packets received from the guest (received by H2G - vhost-vsock) are
->   assigned to the netns of the process that opens /dev/vhost-vsock
->   (usually the VMM, qemu in my tests, opens the /dev/vhost-vsock)
->     - for vmci I need some suggestions, because I don't know how to do
->       and test the same in the vmci driver, for now vmci uses the
->       init_net
-> - loopback packets are exchanged only in the same netns
-> 
-> I tested the series in this way:
-> l0_host$ qemu-system-x86_64 -m 4G -M accel=kvm -smp 4 \
->             -drive file=/tmp/vsockvm0.img,if=virtio --nographic \
->             -device vhost-vsock-pci,guest-cid=3
-> 
-> l1_vm$ echo 1 > /sys/module/vsock/parameters/netns
-> 
-> l1_vm$ ip netns add ns1
-> l1_vm$ ip netns add ns2
->  # same CID on different netns
-> l1_vm$ ip netns exec ns1 qemu-system-x86_64 -m 1G -M accel=kvm -smp 2 \
->             -drive file=/tmp/vsockvm1.img,if=virtio --nographic \
->             -device vhost-vsock-pci,guest-cid=4
-> l1_vm$ ip netns exec ns2 qemu-system-x86_64 -m 1G -M accel=kvm -smp 2 \
->             -drive file=/tmp/vsockvm2.img,if=virtio --nographic \
->             -device vhost-vsock-pci,guest-cid=4
-> 
->  # all iperf3 listen on CID_ANY and port 5201, but in different netns
-> l1_vm$ ./iperf3 --vsock -s # connection from l0 or guests started
->                            # on default netns (init_net)
-> l1_vm$ ip netns exec ns1 ./iperf3 --vsock -s
-> l1_vm$ ip netns exec ns1 ./iperf3 --vsock -s
-> 
-> l0_host$ ./iperf3 --vsock -c 3
-> l2_vm1$ ./iperf3 --vsock -c 2
-> l2_vm2$ ./iperf3 --vsock -c 2
-> 
-> [1] https://www.spinics.net/lists/netdev/msg575792.html
-> 
-> Stefano Garzarella (3):
->   vsock: add network namespace support
->   vsock/virtio_transport_common: handle netns of received packets
->   vhost/vsock: use netns of process that opens the vhost-vsock device
-> 
->  drivers/vhost/vsock.c                   | 29 ++++++++++++-----
->  include/linux/virtio_vsock.h            |  2 ++
->  include/net/af_vsock.h                  |  7 +++--
->  net/vmw_vsock/af_vsock.c                | 41 +++++++++++++++++++------
->  net/vmw_vsock/hyperv_transport.c        |  5 +--
->  net/vmw_vsock/virtio_transport.c        |  2 ++
->  net/vmw_vsock/virtio_transport_common.c | 12 ++++++--
->  net/vmw_vsock/vmci_transport.c          |  5 +--
->  8 files changed, 78 insertions(+), 25 deletions(-)
-> 
-> -- 
-> 2.24.1
-> 
+> I've only glanced at it, but that's called in response to a write to
+> MMIO space on the device, so it's implementing a device specific
+> register.
 
+It is doing emulation of the secure BAR. The entire 1000 lines of
+vidxd_* functions appear to be focused on this task.
+
+> Are you asking that PCI config space be done in userspace
+> or any sort of device emulation?  
+
+I'm concerned about doing full emulation of registers on a MMIO BAR
+that trigger complex actions in response to MMIO read/write.
+
+Simple masking and simple config space stuff doesn't seem so
+problematic.
+
+> The assumption with mdev is that we need emulation in the host
+> kernel because we need a trusted entity to mediate device access and
+> interact with privileged portion of the device control.  Thanks,
+
+Sure, but there are all kinds of different levels to this - mdev
+should not be some open ended device emulation framework, IMHO.
+
+ie other devices need only a small amount of kernel side help and
+don't need complex MMIO BAR emulation.
+
+Would you be happy if someone proposed an e1000 NIC emulator using
+mdev? Why not move every part of qemu's PCI device emulation into the
+kernel?
+
+Jason
