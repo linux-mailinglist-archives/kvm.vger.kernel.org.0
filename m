@@ -2,177 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 35D221BAECC
-	for <lists+kvm@lfdr.de>; Mon, 27 Apr 2020 22:08:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 24DEA1BAFC1
+	for <lists+kvm@lfdr.de>; Mon, 27 Apr 2020 22:50:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726654AbgD0UIP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Apr 2020 16:08:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59420 "EHLO
+        id S1726820AbgD0Uut (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Apr 2020 16:50:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37892 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725919AbgD0UIO (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 27 Apr 2020 16:08:14 -0400
-Received: from mail-il1-x143.google.com (mail-il1-x143.google.com [IPv6:2607:f8b0:4864:20::143])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7631BC0610D5
-        for <kvm@vger.kernel.org>; Mon, 27 Apr 2020 13:08:14 -0700 (PDT)
-Received: by mail-il1-x143.google.com with SMTP id q10so18019044ile.0
-        for <kvm@vger.kernel.org>; Mon, 27 Apr 2020 13:08:14 -0700 (PDT)
+        by vger.kernel.org with ESMTP id S1726233AbgD0Uut (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 27 Apr 2020 16:50:49 -0400
+Received: from mail-wm1-x341.google.com (mail-wm1-x341.google.com [IPv6:2a00:1450:4864:20::341])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF0CBC0610D5
+        for <kvm@vger.kernel.org>; Mon, 27 Apr 2020 13:50:47 -0700 (PDT)
+Received: by mail-wm1-x341.google.com with SMTP id x4so418252wmj.1
+        for <kvm@vger.kernel.org>; Mon, 27 Apr 2020 13:50:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=uE7r1bxZarqXZYdCTFoacrsaCwJFjjRY47IcHW3Ejr0=;
-        b=Rj6Nz3TrIAG71jOyfWtHE1mX74mHswvj/GOgyily7Wlf61y4QTu2tV2ZfJ30nchDa7
-         X4Ie2ztGPLOdImkbnGj6dFQgjTOxD1ErdrzFvCPp3HCQxsAPW4pKOIAFgQ/8j5fcC4Rw
-         gQ7swod7CujaRy+E5baGevmVmY0uYrg0WDLXqDAg/73L0r8z/fB8mYpOQz1UqsmcowJA
-         IxaEqMQaowR30hRJlgy3AeYpJtV2k7pgYdTd8zKZJ1yyrBKNtPKH3Dmd75497A5Jrq0c
-         VywtIKdHYhamPVcXxeHKQS6CBnTAfa0TpnWvXJqbZzIPz5tZDck/qcQDNWR72I90BtJn
-         wMpg==
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=d5HJp8ytw+WF6w8CWQAXWegbZHxFLiJtIvJYhuwFUs4=;
+        b=QpSYbnupClteTVnHLdPep8uPFZJf8YplaUEZETktCDnwp2S38FqYI6/Vy3eWtc7mnU
+         pXxHCxTAGYX3SEuqj863Ga8+BYvUYqYOmrPOypKxy6VWhYckl3LHYRaEpaovBkfaT97G
+         JcWyJ9PrU1v4RdK0OvkWeqjftmFRfwqny+t7KwBst2WSE+5PlNDAyqtzXibYITPs/YEm
+         6KioDDUTbSynDTSeTF4TBhFqR0HvGRqLdSxFlKEw7jH7s2Ekwj1hjm2uEY/rsPSA4gO1
+         2tLkfjyI32MCC6VlMDwE7j2udDwXEt8ZoJj6EqVaWjaSmT41+MYFNngvqFo9DHc8Lug0
+         bSOQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=uE7r1bxZarqXZYdCTFoacrsaCwJFjjRY47IcHW3Ejr0=;
-        b=psUmSAb9LPY4ry6z95NTXq9422bsqzybX2mZ6kE0Hi6jmcLLG98ssiWoTCPR3cY3yW
-         mqojKFKaApsytZRcyYsI8TgjoV9NmJmPAfgu7MOzlpAQzLhdZB8HkFh3DtH7wWgF0L7R
-         1u0d6TxBW8P/yncq315LDs8vDke/FLrZWAusiqyrmgKcMd+NeB67TKW+5e4HMX0YYkzu
-         tLun/NIdQLC8ENLMADoQQ46iOxlHZ6bF+sMevmDDEbEcCs87XbtMyF507zRAR5BBS8U1
-         f5ir3vNQvDlztkK5sEppeBfZiHHSmWipVPCKVlUVbRX8UBAtAV/bWCXCaQ+beLpLt9t4
-         jCUQ==
-X-Gm-Message-State: AGi0PublAiUKd6m3+eYJUYR97tv+uYetIkX53ccyNYQDizkrmT4WvxYl
-        84l78l5gyCTwN4qdfu6AmBISJ8XOaLkkVwvoUcv323vmjMQ=
-X-Google-Smtp-Source: APiQypLxfAc2gzjAMf/c1qVFSr7ki3LjwUwo+h6l3xKw9nzhJKauClJIXx9bgho/zXKCwOB5Q5gChg2h1Iey0AzrpRM=
-X-Received: by 2002:a92:d186:: with SMTP id z6mr22090929ilz.119.1588018093718;
- Mon, 27 Apr 2020 13:08:13 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200426115255.305060-1-ubizjak@gmail.com> <20200427192512.GT14870@linux.intel.com>
-In-Reply-To: <20200427192512.GT14870@linux.intel.com>
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=d5HJp8ytw+WF6w8CWQAXWegbZHxFLiJtIvJYhuwFUs4=;
+        b=gGv/t7fL+zCgGb95+yYi28WTMYzYNCVxn70DBHddo8hphW3n9djIa0bCxB41Rvpad7
+         XuaqghLX8Aa5Vvv+QSql6ublx3JqyL/LVMJPlMJxqtJcjum4NRGYT4I7d+xapq3JPbjP
+         DwazOvnSRKnrfRx1vQGlO64s5jRFSDIVjk0pCYQaJOsk/9NcXiCOYmpfAM3uzAFk98Lu
+         qf//oKqujulULzvwuBn6Ys0HpM5UqMooyPoFq7KVtsmnQq1zYU+x4k6zOsBe8p2TAAhE
+         RSK926heE5SAALYo8xAKagTJWsk+IS89q0k5f67UJ4mSJJsUP8rWlxWh31FDKTwHCNXP
+         Ut6Q==
+X-Gm-Message-State: AGi0PuYjy4m6v8n5KUK+E08flMQzYvXbaTuQGEERkbZoOCF4HPJmc+CX
+        Jjw1Hi4MvmbxDEt6zZQd0kBuyiSdFsM=
+X-Google-Smtp-Source: APiQypJItIIHmzqXkzdy9UxZyBMZJHkiZTsHxHw3rxbbj0GVqY/LeH41O0snXpDDJqCQRA02VT8dFA==
+X-Received: by 2002:a7b:c5d4:: with SMTP id n20mr628912wmk.92.1588020646214;
+        Mon, 27 Apr 2020 13:50:46 -0700 (PDT)
+Received: from localhost.localdomain (93-103-18-160.static.t-2.net. [93.103.18.160])
+        by smtp.gmail.com with ESMTPSA id w10sm23515491wrg.52.2020.04.27.13.50.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 27 Apr 2020 13:50:45 -0700 (PDT)
 From:   Uros Bizjak <ubizjak@gmail.com>
-Date:   Mon, 27 Apr 2020 22:08:01 +0200
-Message-ID: <CAFULd4bJR0bHCkbHdioBtKCs6=cRyrj8v6XYCezrNLUTf8OwgA@mail.gmail.com>
-Subject: Re: [PATCH v2] KVM: VMX: Improve handle_external_interrupt_irqoff
- inline assembly
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+To:     kvm@vger.kernel.org
+Cc:     Uros Bizjak <ubizjak@gmail.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Subject: [PATCH v2] KVM: VMX: Remove unneeded __ASM_SIZE usage with POP instruction
+Date:   Mon, 27 Apr 2020 22:50:35 +0200
+Message-Id: <20200427205035.1594232-1-ubizjak@gmail.com>
+X-Mailer: git-send-email 2.25.4
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Apr 27, 2020 at 9:25 PM Sean Christopherson
-<sean.j.christopherson@intel.com> wrote:
->
-> On Sun, Apr 26, 2020 at 01:52:55PM +0200, Uros Bizjak wrote:
-> > Improve handle_external_interrupt_irqoff inline assembly in several ways:
-> > - use "n" operand constraint instead of "i" and remove
->
-> What's the motivation for using 'n'?  The 'i' variant is much more common,
-> i.e. less likely to trip up readers.
->
->   $ git grep -E "\"i\"\s*\(" | wc -l
->   768
->   $ git grep -E "\"n\"\s*\(" | wc -l
->   11
+POP [mem] defaults to the word size, and the only legal non-default
+size is 16 bits, e.g. a 32-bit POP will #UD in 64-bit mode and vice
+versa, no need to use __ASM_SIZE macro to force operating mode.
 
-When only numerical constants are allowed, "n" should be used, as
-demonstrated by the following artificial example:
+Changes since v1:
+- Fix commit message.
 
---cut here--
-#define IMM 123
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Sean Christopherson <sean.j.christopherson@intel.com>
+Reviewed-by: Sean Christopherson <sean.j.christopherson@intel.com>
+Signed-off-by: Uros Bizjak <ubizjak@gmail.com>
+---
+ arch/x86/kvm/vmx/vmenter.S | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
-int z;
+diff --git a/arch/x86/kvm/vmx/vmenter.S b/arch/x86/kvm/vmx/vmenter.S
+index 87f3f24fef37..94b8794bdd2a 100644
+--- a/arch/x86/kvm/vmx/vmenter.S
++++ b/arch/x86/kvm/vmx/vmenter.S
+@@ -163,13 +163,13 @@ SYM_FUNC_START(__vmx_vcpu_run)
+ 	mov WORD_SIZE(%_ASM_SP), %_ASM_AX
+ 
+ 	/* Save all guest registers, including RAX from the stack */
+-	__ASM_SIZE(pop) VCPU_RAX(%_ASM_AX)
+-	mov %_ASM_CX,   VCPU_RCX(%_ASM_AX)
+-	mov %_ASM_DX,   VCPU_RDX(%_ASM_AX)
+-	mov %_ASM_BX,   VCPU_RBX(%_ASM_AX)
+-	mov %_ASM_BP,   VCPU_RBP(%_ASM_AX)
+-	mov %_ASM_SI,   VCPU_RSI(%_ASM_AX)
+-	mov %_ASM_DI,   VCPU_RDI(%_ASM_AX)
++	pop           VCPU_RAX(%_ASM_AX)
++	mov %_ASM_CX, VCPU_RCX(%_ASM_AX)
++	mov %_ASM_DX, VCPU_RDX(%_ASM_AX)
++	mov %_ASM_BX, VCPU_RBX(%_ASM_AX)
++	mov %_ASM_BP, VCPU_RBP(%_ASM_AX)
++	mov %_ASM_SI, VCPU_RSI(%_ASM_AX)
++	mov %_ASM_DI, VCPU_RDI(%_ASM_AX)
+ #ifdef CONFIG_X86_64
+ 	mov %r8,  VCPU_R8 (%_ASM_AX)
+ 	mov %r9,  VCPU_R9 (%_ASM_AX)
+-- 
+2.25.4
 
-int
-test (void)
-{
-  __label__ lab;
-  __asm__ __volatile__ ("push %0" :: "n"(IMM));
-  __asm__ __volatile__ ("push %0" :: "i"(&z));
-  __asm__ __volatile__ ("push %0" :: "i"(&&lab));
-  return 1;
- lab:
-  return 0;
-}
---cut here--
-
-changing "i" to "n" will trigger a compiler error in the second and
-the third case.
-
-The compiler documentation is a bit unclear here:
-
-'i'
-     An immediate integer operand (one with constant value) is allowed.
-     This includes symbolic constants whose values will be known only at
-     assembly time or later.
-
-'n'
-     An immediate integer operand with a known numeric value is allowed.
-     Many systems cannot support assembly-time constants for operands
-     less than a word wide.  Constraints for these operands should use
-     'n' rather than 'i'.
-
-PUSH is able to use "i" here, since the operand is word wide. But, do
-we really want to allow symbol references and labels here?
-
-> >   unneeded %c operand modifiers and "$" prefixes
-> > - use %rsp instead of _ASM_SP, since we are in CONFIG_X86_64 part
-> > - use $-16 immediate to align %rsp
->
-> Heh, this one depends on the reader, I find 0xfffffffffffffff0 to be much
-> more intuitive, though admittedly also far easier to screw up.
-
-I was beaten by this in the past ... but don't want to bikeshed here.
-
-BR,
-Uros.
-
-> > - remove unneeded use of __ASM_SIZE macro
-> > - define "ss" named operand only for X86_64
-> >
-> > The patch introduces no functional changes.
-> >
-> > Cc: Paolo Bonzini <pbonzini@redhat.com>
-> > Cc: Sean Christopherson <sean.j.christopherson@intel.com>
-> > Signed-off-by: Uros Bizjak <ubizjak@gmail.com>
-> > ---
-> >  arch/x86/kvm/vmx/vmx.c | 14 ++++++++------
-> >  1 file changed, 8 insertions(+), 6 deletions(-)
-> >
-> > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> > index c2c6335a998c..7471f1b948b3 100644
-> > --- a/arch/x86/kvm/vmx/vmx.c
-> > +++ b/arch/x86/kvm/vmx/vmx.c
-> > @@ -6283,13 +6283,13 @@ static void handle_external_interrupt_irqoff(struct kvm_vcpu *vcpu)
-> >
-> >       asm volatile(
-> >  #ifdef CONFIG_X86_64
-> > -             "mov %%" _ASM_SP ", %[sp]\n\t"
-> > -             "and $0xfffffffffffffff0, %%" _ASM_SP "\n\t"
-> > -             "push $%c[ss]\n\t"
-> > +             "mov %%rsp, %[sp]\n\t"
-> > +             "and $-16, %%rsp\n\t"
-> > +             "push %[ss]\n\t"
-> >               "push %[sp]\n\t"
-> >  #endif
-> >               "pushf\n\t"
-> > -             __ASM_SIZE(push) " $%c[cs]\n\t"
-> > +             "push %[cs]\n\t"
-> >               CALL_NOSPEC
-> >               :
-> >  #ifdef CONFIG_X86_64
-> > @@ -6298,8 +6298,10 @@ static void handle_external_interrupt_irqoff(struct kvm_vcpu *vcpu)
-> >               ASM_CALL_CONSTRAINT
-> >               :
-> >               [thunk_target]"r"(entry),
-> > -             [ss]"i"(__KERNEL_DS),
-> > -             [cs]"i"(__KERNEL_CS)
-> > +#ifdef CONFIG_X86_64
-> > +             [ss]"n"(__KERNEL_DS),
-> > +#endif
-> > +             [cs]"n"(__KERNEL_CS)
-> >       );
-> >
-> >       kvm_after_interrupt(vcpu);
-> > --
-> > 2.25.3
-> >
