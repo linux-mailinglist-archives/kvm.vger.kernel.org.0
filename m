@@ -2,132 +2,210 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 32DEF1BA41B
-	for <lists+kvm@lfdr.de>; Mon, 27 Apr 2020 14:55:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 464D21BA424
+	for <lists+kvm@lfdr.de>; Mon, 27 Apr 2020 14:59:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727869AbgD0Mz0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Apr 2020 08:55:26 -0400
-Received: from mail-eopbgr80054.outbound.protection.outlook.com ([40.107.8.54]:16686
-        "EHLO EUR04-VI1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727006AbgD0MzZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Apr 2020 08:55:25 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=BO2ZUI4Fe+ccSkfhzJ3pMqQaOaSgXytrhohJ6Npg8e6UIf+4PhZZCzUDm9ee/xS8qC5gU5G9yKaukvrPwoRmLT3otS4QqEfV25pUaAKpx0g2wVQxEypK/lR/yNrEeMUmX1Mn6kpZjutxj7hoxN+mMh20yk5RCEPu/dhu21sSb3YLxlLcTo3ZuoQg4LJsIw13T7Ga8/SKbEmf1j6Jd/3VOXIPi1xJKcGm1NYR+Xqdy4vk/pWAeUsBYC7iYHUNsQx1CE61yTGBGMJckD2Lki75tSknGSjU/F8VhfSSpKbffNz9d6SUkzxL82RSwrXCunU8mGvC2lb/ZbXTZvp1Q7YCOw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=gFImOFr9UyGnIhMldRpFm5XJ3mAWuSQNKYvtiyt4u84=;
- b=SwET2paZyfHBnFzzoDl37949PCvnDCfdCzjrWOmB9R6E7rRBXtnSIuY7vBSYtoGUfpKjuE5RwxcoY82CRI+FxQ8MvuaAjlsinCAuSD3qfrcZiIQmFAjv2X63d97wSdW6IjMuVDzNR7KnrtkkRM4N3xGxDvJo2qbWmnIt+6oMWDERqcJXOLHVoNusGf+cgj4QtMlbb+SS+f4UCFLFTfsv3B1gCHxpM/THplqQjiPFsiHRPkcqd7bZgqUeF4GHKfuiAsR5GrZWLTDH+wJyK0t6oEztgnxmvt8ThFu5r++hQx0XA50EUJCvS/7PvAOWBHcKcRYrzHpvK8elFtKxdrQk5w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=mellanox.com; dmarc=pass action=none header.from=mellanox.com;
- dkim=pass header.d=mellanox.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Mellanox.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=gFImOFr9UyGnIhMldRpFm5XJ3mAWuSQNKYvtiyt4u84=;
- b=aj8gmQmGjoCBJJEPMFR7GxW3xYYXQwYhITTcZASY/b+yp3UUjmDznZ3HK7I/LJfZl5TkuFzF/KmnC4Wt2DmetldgNL6x1gUdZ6UuwWOakADl40PHXzwpzmbM8y4PXIU/vfT29rGvF7yNzW5t0wqDyCxuVipQRJbl1BUc5eHuvfs=
-Authentication-Results: spf=none (sender IP is )
- smtp.mailfrom=jgg@mellanox.com; 
-Received: from VI1PR05MB4141.eurprd05.prod.outlook.com (2603:10a6:803:44::15)
- by VI1PR05MB4975.eurprd05.prod.outlook.com (2603:10a6:803:5c::33) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2937.22; Mon, 27 Apr
- 2020 12:55:21 +0000
-Received: from VI1PR05MB4141.eurprd05.prod.outlook.com
- ([fe80::a47b:e3cd:7d6d:5d4e]) by VI1PR05MB4141.eurprd05.prod.outlook.com
- ([fe80::a47b:e3cd:7d6d:5d4e%6]) with mapi id 15.20.2937.020; Mon, 27 Apr 2020
- 12:55:21 +0000
-Date:   Mon, 27 Apr 2020 09:55:17 -0300
-From:   Jason Gunthorpe <jgg@mellanox.com>
-To:     "Tian, Kevin" <kevin.tian@intel.com>
-Cc:     "Raj, Ashok" <ashok.raj@intel.com>,
-        "Jiang, Dave" <dave.jiang@intel.com>,
-        "vkoul@kernel.org" <vkoul@kernel.org>,
-        "megha.dey@linux.intel.com" <megha.dey@linux.intel.com>,
-        "maz@kernel.org" <maz@kernel.org>,
-        "bhelgaas@google.com" <bhelgaas@google.com>,
-        "rafael@kernel.org" <rafael@kernel.org>,
-        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "hpa@zytor.com" <hpa@zytor.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "Pan, Jacob jun" <jacob.jun.pan@intel.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>, "Lu, Baolu" <baolu.lu@intel.com>,
-        "Kumar, Sanjay K" <sanjay.k.kumar@intel.com>,
-        "Luck, Tony" <tony.luck@intel.com>,
-        "Lin, Jing" <jing.lin@intel.com>,
-        "Williams, Dan J" <dan.j.williams@intel.com>,
-        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "parav@mellanox.com" <parav@mellanox.com>,
-        "dmaengine@vger.kernel.org" <dmaengine@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: Re: [PATCH RFC 00/15] Add VFIO mediated device support and IMS
- support for the idxd driver.
-Message-ID: <20200427125517.GF13640@mellanox.com>
-References: <20200422115017.GQ11945@mellanox.com>
- <20200422211436.GA103345@otc-nc-03>
- <20200423191217.GD13640@mellanox.com>
- <AADFC41AFE54684AB9EE6CBC0274A5D19D8960F9@SHSMSX104.ccr.corp.intel.com>
- <20200424124444.GJ13640@mellanox.com>
- <AADFC41AFE54684AB9EE6CBC0274A5D19D8A808B@SHSMSX104.ccr.corp.intel.com>
- <20200424181203.GU13640@mellanox.com>
- <AADFC41AFE54684AB9EE6CBC0274A5D19D8C5486@SHSMSX104.ccr.corp.intel.com>
- <20200426191357.GB13640@mellanox.com>
- <AADFC41AFE54684AB9EE6CBC0274A5D19D8D906E@SHSMSX104.ccr.corp.intel.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <AADFC41AFE54684AB9EE6CBC0274A5D19D8D906E@SHSMSX104.ccr.corp.intel.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-ClientProxiedBy: BL0PR02CA0062.namprd02.prod.outlook.com
- (2603:10b6:207:3d::39) To VI1PR05MB4141.eurprd05.prod.outlook.com
- (2603:10a6:803:44::15)
+        id S1727098AbgD0M7Z (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Apr 2020 08:59:25 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:18940 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726539AbgD0M7Z (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 27 Apr 2020 08:59:25 -0400
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 03RCXkIO133812
+        for <kvm@vger.kernel.org>; Mon, 27 Apr 2020 08:59:23 -0400
+Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 30mhbhck9v-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Mon, 27 Apr 2020 08:59:23 -0400
+Received: from localhost
+        by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <frankja@linux.ibm.com>;
+        Mon, 27 Apr 2020 13:58:54 +0100
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
+        by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Mon, 27 Apr 2020 13:58:50 +0100
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 03RCxHZ7852412
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 27 Apr 2020 12:59:17 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E375752054;
+        Mon, 27 Apr 2020 12:59:16 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.145.33.119])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 9101A52057;
+        Mon, 27 Apr 2020 12:59:16 +0000 (GMT)
+Subject: Re: [kvm-unit-tests PATCH v6 08/10] s390x: define wfi: wait for
+ interrupt
+To:     Pierre Morel <pmorel@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, david@redhat.com, thuth@redhat.com,
+        cohuck@redhat.com
+References: <1587725152-25569-1-git-send-email-pmorel@linux.ibm.com>
+ <1587725152-25569-9-git-send-email-pmorel@linux.ibm.com>
+From:   Janosch Frank <frankja@linux.ibm.com>
+Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+Date:   Mon, 27 Apr 2020 14:59:15 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from mlx.ziepe.ca (142.68.57.212) by BL0PR02CA0062.namprd02.prod.outlook.com (2603:10b6:207:3d::39) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2937.13 via Frontend Transport; Mon, 27 Apr 2020 12:55:20 +0000
-Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)     (envelope-from <jgg@mellanox.com>)      id 1jT3I5-0005Hr-6z; Mon, 27 Apr 2020 09:55:17 -0300
-X-Originating-IP: [142.68.57.212]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 146a56ea-992e-4367-2ae7-08d7eaaa3e6b
-X-MS-TrafficTypeDiagnostic: VI1PR05MB4975:|VI1PR05MB4975:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <VI1PR05MB497552C365A1148018C06054CFAF0@VI1PR05MB4975.eurprd05.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:7691;
-X-Forefront-PRVS: 0386B406AA
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI1PR05MB4141.eurprd05.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(39860400002)(376002)(346002)(366004)(136003)(396003)(2906002)(54906003)(4326008)(1076003)(8676002)(316002)(5660300002)(86362001)(478600001)(2616005)(7416002)(81156014)(36756003)(66556008)(6916009)(66476007)(52116002)(4744005)(33656002)(9786002)(8936002)(186003)(26005)(9746002)(66946007)(24400500001);DIR:OUT;SFP:1101;
-Received-SPF: None (protection.outlook.com: mellanox.com does not designate
- permitted sender hosts)
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: XejVNY712vCIk0Ev/gWh7uVnPvcethfJNvPGT9gHK/lhfguKsUqB5hpfvUni5OwuYDcbj0yYx32tQuZCgIkXJ4HopJhFFzD5FyPweRj94l9QempF5LFkd7y/FYdCMpkw4nuDZCb+HXNtDN5AfwWBSgOtfTvAw2PgjbWhnDfNxHuX3uG3+5ITN7aLRZjMEqSjlklJvAN/3xYHPVLCChWCf+xkg5fFP1R05Q6SfamqIl9bGvOv2OxGWfxgkNGrFM3bWpvjnVM3pNxFgNztZgyoaJXtm92H/D9aej024LKlkIwn7DExyQDOne+PwuryIxbxmo13Jbys5ALyP0jcnXImC9gGWlIaf7lEYmc5IvOb2LLEOXstN1iHfSX4QhFuWtMlUBichQ1TuQMLYzfhPrhDA7fWvOfFJv66/a9XWM6TCD1+bGEOncqWHU706AlXF3RWxgXZIKui6DmwmvKp9ApGTREeu/VGTNAywfERHv4OJiWILwj1SutN9X2yXNKqfw02
-X-MS-Exchange-AntiSpam-MessageData: Wb+LnKAz2b/UCXm8Ze2RZ8mszentTEoihPj55MozOO4y4oaxatx1ATw8PBXqHt2wJg6wOJBbxTT1rx7KD65e3Sk+n/vx7FA3sw9EbRDA0I2BrC6B5rjfWykQj2xm4Bwg4esVT18N0+jFHmCslHC4jom+/EtrsIwUuwqqpVs5uJs8WqDU07PIk+5xRBmuiw2y4cHPeHylj+EkDD7LZHw+gSUtRxslqZYkyO+hUvtxEW4MKBUFsSbMrHE38z4h5EjmXD2Qt3aG5z0AbX/rszT++AsJST7tRaYhOdsqtO8Z9Ed0GB4l+wIUJxsZo1yVIuo3lyvt4jG9dyu0cUfH8Yg9M8JK+cw91wJltRf7HoVzA/DKKxW6gVPhM9BA/wXpUdzcjgzek+TMC/G2+Dw+Bf9DLvXxN/ZstlJNpKnVwrc5bOQDLHG0E7LaRV3C/S+uz8lDpOxWDALXyRJkzRzg75IgIvehgMZugZKa+hsTsuCh4FVvXsFxESQFqPlXnGGBeaMux1UJbuvZKRp/dku59AIM3q8naCbJ/xMku7CVQiSn4D1bR6bZIL2n5schLNsruGFcmBKhO1haSWZDL+zbiofl4/I05XdiEDyyLGw/2VcZ3Wj6bO6tQJTPdNZs02YGVLGtNI09WHXnTpsORDQpgKy1rCNFZcqwMg1UiwX36qMBL/4LIhfT18v4ONnFPYos2SCkymWmx0xkjSSFFyWk8GqgCIjaPJmLcxx4+KvszQkIZqESATU6na8AKiN1ccLrIljreJXaP6A9KE5MH7qUYCOGwE7XOvcUBAT4WcFnQlKCTc0=
-X-OriginatorOrg: Mellanox.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 146a56ea-992e-4367-2ae7-08d7eaaa3e6b
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Apr 2020 12:55:21.1793
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: a652971c-7d2e-4d9b-a6a4-d149256f461b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: y6oapRO1F5UAj+SPqquU9rblq03ImkK4vf2aaWsBp5dAsSWzR9kdYsTWrHCy1dY2JMnQ8C/JFMldHm0aOZ5aZA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR05MB4975
+In-Reply-To: <1587725152-25569-9-git-send-email-pmorel@linux.ibm.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="mycbVbn5uu8M1vWxaCunLpYhu3ubA0Y3w"
+X-TM-AS-GCONF: 00
+x-cbid: 20042712-0012-0000-0000-000003AB817C
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20042712-0013-0000-0000-000021E8DF87
+Message-Id: <4cc33b1c-7fa2-0775-f176-08bb31b7e68e@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.676
+ definitions=2020-04-27_09:2020-04-24,2020-04-27 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 bulkscore=0
+ phishscore=0 adultscore=0 spamscore=0 clxscore=1015 priorityscore=1501
+ impostorscore=0 lowpriorityscore=0 mlxlogscore=772 suspectscore=0
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2004270112
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Apr 27, 2020 at 12:13:33PM +0000, Tian, Kevin wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--mycbVbn5uu8M1vWxaCunLpYhu3ubA0Y3w
+Content-Type: multipart/mixed; boundary="lbduyF0MwG5HewJENdIo9eOj9Xs9ORyDe"
 
-> Then back to this context. Almost every newly-born Linux VMM
-> (firecracker, crosvm, cloud hypervisor, and some proprietary 
-> implementations) support only two types of devices: virtio and 
-> vfio, because they want to be simple and slim.
+--lbduyF0MwG5HewJENdIo9eOj9Xs9ORyDe
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-For security. Moving all the sketchy emulation code into the kernel
-seems like a worse security posture over all :(
+On 4/24/20 12:45 PM, Pierre Morel wrote:
+> wfi(irq_mask) allows the programm to wait for an interrupt.
 
-Jason
+s/programm/program/
+
+> The interrupt handler is in charge to remove the WAIT bit
+> when it finished handling interrupt.
+
+=2E..finished handling the interrupt.
+
+>=20
+> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+> ---
+>  lib/s390x/asm/arch_def.h | 11 +++++++++++
+>  1 file changed, 11 insertions(+)
+>=20
+> diff --git a/lib/s390x/asm/arch_def.h b/lib/s390x/asm/arch_def.h
+> index a0d2362..e04866c 100644
+> --- a/lib/s390x/asm/arch_def.h
+> +++ b/lib/s390x/asm/arch_def.h
+> @@ -13,6 +13,7 @@
+>  #define PSW_MASK_EXT			0x0100000000000000UL
+>  #define PSW_MASK_DAT			0x0400000000000000UL
+>  #define PSW_MASK_SHORT_PSW		0x0008000000000000UL
+> +#define PSW_MASK_WAIT			0x0002000000000000UL
+>  #define PSW_MASK_PSTATE			0x0001000000000000UL
+>  #define PSW_MASK_BA			0x0000000080000000UL
+>  #define PSW_MASK_EA			0x0000000100000000UL
+> @@ -254,6 +255,16 @@ static inline void load_psw_mask(uint64_t mask)
+>  		: "+r" (tmp) :  "a" (&psw) : "memory", "cc" );
+>  }
+> =20
+> +static inline void wfi(uint64_t irq_mask)
+
+enabled_wait()
+
+> +{
+> +	uint64_t psw_mask;
+
+You can directly initialize this variable.
+
+> +
+> +	psw_mask =3D extract_psw_mask();
+> +	load_psw_mask(psw_mask | irq_mask | PSW_MASK_WAIT);
+
+Maybe add a comment here:
+
+/*
+ * After being woken and having processed the interrupt, let's restore
+the PSW mask.
+*/
+
+> +	load_psw_mask(psw_mask);
+> +}
+> +
+> +
+>  static inline void enter_pstate(void)
+>  {
+>  	uint64_t mask;
+>=20
+
+
+
+--lbduyF0MwG5HewJENdIo9eOj9Xs9ORyDe--
+
+--mycbVbn5uu8M1vWxaCunLpYhu3ubA0Y3w
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl6m1yQACgkQ41TmuOI4
+ufigsw/5Ac+eGbJ2JtbVvHuSKnEB1eYHOzaRiMaK5ysc/ipzYUOY2aNBxn4hhneU
+18Q97gbzPTZbIx8/RlXBXPIj6vZbyeJhbdqCUF3LbDQ/NoEToXyukrww7bM7PDsT
+j5OpJgPbHzuw+7hJdCjk88wCw4yiMVIRGlvfjrW6QsM2YaC740ZfsjDUELfltWZC
+XeqtOgq2YzmNZO6uwKbQ7ceXRBd7D9yskqwodkrHi2lkcvitkRv6mFvFOGY3UaA6
+UK8LoETczOaGW+eeWLFskzM5K74l+SGuyY5YZgdgJcdko4KJk85NtSs9NINK4hyu
+wZPjN7LnJDghfyOD5oFlQ4w59gqXo21k0ZkxPwjVZHyVnV5w7x+nd9xPtK4Fijeu
+3a9PwHMfwlL8meo5Rj8Ng+a8Msh3+2ukgpEg384+NFZdE9kyof7sQQ688CC9D6w2
+a4h0PkE8Rqw/GkTMG47Fxs/TuFWXFk2IQ4YxybtQ4XOaUeeEolr5rjUUPJIBnrmw
+3E2nKRXR8jtboHwZJRTESWNvcBu8JHnmf6EyCAUgFCmKOck+VaFl/jOlFLWKxa34
+hjCtwp3mSv5ZRwvvHvWpKejDm+D4i1u9WxSjiLUZ1g6yxrH6AD2/jVrRBFTVyWzC
+xhFeB+0N+B007jRj+AcaMvJPfh6dMwajgD1KB0a3FAsPZbDCexs=
+=l8OX
+-----END PGP SIGNATURE-----
+
+--mycbVbn5uu8M1vWxaCunLpYhu3ubA0Y3w--
+
