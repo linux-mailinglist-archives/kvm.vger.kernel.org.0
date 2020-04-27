@@ -2,134 +2,156 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F1F0A1B9920
-	for <lists+kvm@lfdr.de>; Mon, 27 Apr 2020 09:57:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CE4951B99E8
+	for <lists+kvm@lfdr.de>; Mon, 27 Apr 2020 10:21:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726636AbgD0H5L (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Apr 2020 03:57:11 -0400
-Received: from smtp-fw-4101.amazon.com ([72.21.198.25]:37736 "EHLO
-        smtp-fw-4101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725785AbgD0H5K (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Apr 2020 03:57:10 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1587974229; x=1619510229;
-  h=subject:to:cc:references:from:message-id:date:
-   mime-version:in-reply-to:content-transfer-encoding;
-  bh=r6kxjfVdGRB2Y5Se4e/fZ3NmsmVLSqy1TQ/xjnJh7n4=;
-  b=nNXHUYXTkqM19KUVRTzK49HEvSYsncDqST5Lj3eEgqACR3gEiwsBoSvV
-   vXVxSqVVoAboCfeZSLb3PMFN56uB3PX4rhzMlPE7weXE65Tuc0/90M3ne
-   QBAPWeU5jP8Dpzf+x4yDzr1uke3ig4IA0tEY5rOwUyg5IZ8DErl0wKs88
-   c=;
-IronPort-SDR: qsmjE1jGly+zLYPOVIE5xUO/EK6EtncPOjLGM6oE73vskBirxK/cOXF+8nWn33ePwUgKEnFCF2
- M3D6RsPifr4Q==
-X-IronPort-AV: E=Sophos;i="5.73,323,1583193600"; 
-   d="scan'208";a="27496939"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-2c-168cbb73.us-west-2.amazon.com) ([10.43.8.6])
-  by smtp-border-fw-out-4101.iad4.amazon.com with ESMTP; 27 Apr 2020 07:56:51 +0000
-Received: from EX13MTAUEA002.ant.amazon.com (pdx4-ws-svc-p6-lb7-vlan2.pdx.amazon.com [10.170.41.162])
-        by email-inbound-relay-2c-168cbb73.us-west-2.amazon.com (Postfix) with ESMTPS id 4E821A1898;
-        Mon, 27 Apr 2020 07:56:50 +0000 (UTC)
-Received: from EX13D16EUB001.ant.amazon.com (10.43.166.28) by
- EX13MTAUEA002.ant.amazon.com (10.43.61.77) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Mon, 27 Apr 2020 07:56:49 +0000
-Received: from 38f9d34ed3b1.ant.amazon.com (10.43.162.70) by
- EX13D16EUB001.ant.amazon.com (10.43.166.28) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Mon, 27 Apr 2020 07:56:41 +0000
-Subject: Re: [PATCH v1 00/15] Add support for Nitro Enclaves
-To:     Liran Alon <liran.alon@oracle.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        <linux-kernel@vger.kernel.org>
-CC:     Anthony Liguori <aliguori@amazon.com>,
-        Benjamin Herrenschmidt <benh@amazon.com>,
-        Colm MacCarthaigh <colmmacc@amazon.com>,
-        Bjoern Doebel <doebel@amazon.de>,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        Frank van der Linden <fllinden@amazon.com>,
-        Alexander Graf <graf@amazon.de>,
-        Martin Pohlack <mpohlack@amazon.de>,
-        Matt Wilson <msw@amazon.com>, Balbir Singh <sblbir@amazon.com>,
-        Stewart Smith <trawets@amazon.com>,
-        Uwe Dannowski <uwed@amazon.de>, <kvm@vger.kernel.org>,
-        <ne-devel-upstream@amazon.com>
-References: <20200421184150.68011-1-andraprs@amazon.com>
- <18406322-dc58-9b59-3f94-88e6b638fe65@redhat.com>
- <ff65b1ed-a980-9ddc-ebae-996869e87308@amazon.com>
- <5c514de6-52a8-8532-23d9-e6b0cc9ac7eb@oracle.com>
-From:   "Paraschiv, Andra-Irina" <andraprs@amazon.com>
-Message-ID: <eb92ba4e-113e-d7ec-4633-f6b5ac54796b@amazon.com>
-Date:   Mon, 27 Apr 2020 10:56:31 +0300
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:68.0)
- Gecko/20100101 Thunderbird/68.7.0
+        id S1726718AbgD0IUt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Apr 2020 04:20:49 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:22294 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726434AbgD0IUt (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 27 Apr 2020 04:20:49 -0400
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 03R7XldU011092;
+        Mon, 27 Apr 2020 04:20:47 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 30mhbh482f-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 27 Apr 2020 04:20:46 -0400
+Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 03R7XwQs011724;
+        Mon, 27 Apr 2020 04:20:46 -0400
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 30mhbh481m-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 27 Apr 2020 04:20:46 -0400
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 03R8Je6s023801;
+        Mon, 27 Apr 2020 08:20:44 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma04ams.nl.ibm.com with ESMTP id 30mcu6ueuy-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 27 Apr 2020 08:20:44 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 03R8Kf9b721342
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 27 Apr 2020 08:20:41 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D3DF9AE051;
+        Mon, 27 Apr 2020 08:20:41 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 45D0AAE05A;
+        Mon, 27 Apr 2020 08:20:41 +0000 (GMT)
+Received: from oc3016276355.ibm.com (unknown [9.145.191.241])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon, 27 Apr 2020 08:20:41 +0000 (GMT)
+Subject: Re: [PATCH v7 03/15] s390/zcrypt: driver callback to indicate
+ resource in use
+To:     Tony Krowiak <akrowiak@linux.ibm.com>, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     freude@linux.ibm.com, borntraeger@de.ibm.com, cohuck@redhat.com,
+        mjrosato@linux.ibm.com, pasic@linux.ibm.com,
+        alex.williamson@redhat.com, kwankhede@nvidia.com,
+        jjherne@linux.ibm.com, fiuczy@linux.ibm.com
+References: <20200407192015.19887-1-akrowiak@linux.ibm.com>
+ <20200407192015.19887-4-akrowiak@linux.ibm.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+Message-ID: <75bcbc06-f38f-1aff-138f-5d2a2dd3f7b6@linux.ibm.com>
+Date:   Mon, 27 Apr 2020 10:20:40 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <5c514de6-52a8-8532-23d9-e6b0cc9ac7eb@oracle.com>
+In-Reply-To: <20200407192015.19887-4-akrowiak@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-X-Originating-IP: [10.43.162.70]
-X-ClientProxiedBy: EX13D31UWA004.ant.amazon.com (10.43.160.217) To
- EX13D16EUB001.ant.amazon.com (10.43.166.28)
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Transfer-Encoding: base64
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.676
+ definitions=2020-04-27_03:2020-04-24,2020-04-27 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 bulkscore=0
+ phishscore=0 adultscore=0 spamscore=0 clxscore=1011 priorityscore=1501
+ impostorscore=0 lowpriorityscore=0 mlxlogscore=999 suspectscore=0
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2004270067
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-CgpPbiAyNS8wNC8yMDIwIDE4OjI1LCBMaXJhbiBBbG9uIHdyb3RlOgo+Cj4gT24gMjMvMDQvMjAy
-MCAxNjoxOSwgUGFyYXNjaGl2LCBBbmRyYS1JcmluYSB3cm90ZToKPj4KPj4gVGhlIG1lbW9yeSBh
-bmQgQ1BVcyBhcmUgY2FydmVkIG91dCBvZiB0aGUgcHJpbWFyeSBWTSwgdGhleSBhcmUgCj4+IGRl
-ZGljYXRlZCBmb3IgdGhlIGVuY2xhdmUuIFRoZSBOaXRybyBoeXBlcnZpc29yIHJ1bm5pbmcgb24g
-dGhlIGhvc3QgCj4+IGVuc3VyZXMgbWVtb3J5IGFuZCBDUFUgaXNvbGF0aW9uIGJldHdlZW4gdGhl
-IHByaW1hcnkgVk0gYW5kIHRoZSAKPj4gZW5jbGF2ZSBWTS4KPiBJIGhvcGUgeW91IHByb3Blcmx5
-IHRha2UgaW50byBjb25zaWRlcmF0aW9uIEh5cGVyLVRocmVhZGluZyAKPiBzcGVjdWxhdGl2ZSBz
-aWRlLWNoYW5uZWwgdnVsbmVyYWJpbGl0aWVzIGhlcmUuCj4gaS5lLiBVc3VhbGx5IGNsb3VkIHBy
-b3ZpZGVycyBkZXNpZ25hdGUgZWFjaCBDUFUgY29yZSB0byBiZSBhc3NpZ25lZCB0byAKPiBydW4g
-b25seSB2Q1BVcyBvZiBzcGVjaWZpYyBndWVzdC4gVG8gYXZvaWQgc2hhcmluZyBhIHNpbmdsZSBD
-UFUgY29yZSAKPiBiZXR3ZWVuIG11bHRpcGxlIGd1ZXN0cy4KPiBUbyBoYW5kbGUgdGhpcyBwcm9w
-ZXJseSwgeW91IG5lZWQgdG8gdXNlIHNvbWUga2luZCBvZiBjb3JlLXNjaGVkdWxpbmcgCj4gbWVj
-aGFuaXNtIChTdWNoIHRoYXQgZWFjaCBDUFUgY29yZSBlaXRoZXIgcnVucyBvbmx5IHZDUFVzIG9m
-IGVuY2xhdmUgCj4gb3Igb25seSB2Q1BVcyBvZiBwcmltYXJ5IFZNIGF0IGFueSBnaXZlbiBwb2lu
-dCBpbiB0aW1lKS4KPgo+IEluIGFkZGl0aW9uLCBjYW4geW91IGVsYWJvcmF0ZSBtb3JlIG9uIGhv
-dyB0aGUgZW5jbGF2ZSBtZW1vcnkgaXMgCj4gY2FydmVkIG91dCBvZiB0aGUgcHJpbWFyeSBWTT8K
-PiBEb2VzIHRoaXMgaW52b2x2ZSBwZXJmb3JtaW5nIGEgbWVtb3J5IGhvdC11bnBsdWcgb3BlcmF0
-aW9uIGZyb20gCj4gcHJpbWFyeSBWTSBvciBqdXN0IHVubWFwIGVuY2xhdmUtYXNzaWduZWQgZ3Vl
-c3QgcGh5c2ljYWwgcGFnZXMgZnJvbSAKPiBwcmltYXJ5IFZNJ3MgU0xBVCAoRVBUL05QVCkgYW5k
-IG1hcCB0aGVtIG5vdyBvbmx5IGluIGVuY2xhdmUncyBTTEFUPwoKCkNvcnJlY3QsIHdlIHRha2Ug
-aW50byBjb25zaWRlcmF0aW9uIHRoZSBIVCBzZXR1cC4gVGhlIGVuY2xhdmUgZ2V0cyAKZGVkaWNh
-dGVkIHBoeXNpY2FsIGNvcmVzLiBUaGUgcHJpbWFyeSBWTSBhbmQgdGhlIGVuY2xhdmUgVk0gZG9u
-J3QgcnVuIG9uIApDUFUgc2libGluZ3Mgb2YgYSBwaHlzaWNhbCBjb3JlLgoKUmVnYXJkaW5nIHRo
-ZSBtZW1vcnkgY2FydmUgb3V0LCB0aGUgbG9naWMgaW5jbHVkZXMgcGFnZSB0YWJsZSBlbnRyaWVz
-IApoYW5kbGluZy4KCklJUkMsIG1lbW9yeSBob3QtdW5wbHVnIGNhbiBiZSB1c2VkIGZvciB0aGUg
-bWVtb3J5IGJsb2NrcyB0aGF0IHdlcmUgCnByZXZpb3VzbHkgaG90LXBsdWdnZWQuCgpodHRwczov
-L3d3dy5rZXJuZWwub3JnL2RvYy9odG1sL2xhdGVzdC9hZG1pbi1ndWlkZS9tbS9tZW1vcnktaG90
-cGx1Zy5odG1sCgo+Cj4+Cj4+IExldCBtZSBrbm93IGlmIGZ1cnRoZXIgY2xhcmlmaWNhdGlvbnMg
-YXJlIG5lZWRlZC4KPj4KPiBJIGRvbid0IHF1aXRlIHVuZGVyc3RhbmQgd2h5IEVuY2xhdmUgVk0g
-bmVlZHMgdG8gYmUgCj4gcHJvdmlzaW9uZWQvdGVhcmRvd24gZHVyaW5nIHByaW1hcnkgVk0ncyBy
-dW50aW1lLgo+Cj4gRm9yIGV4YW1wbGUsIGFuIGFsdGVybmF0aXZlIGNvdWxkIGhhdmUgYmVlbiB0
-byBqdXN0IHByb3Zpc2lvbiBib3RoIAo+IHByaW1hcnkgVk0gYW5kIEVuY2xhdmUgVk0gb24gcHJp
-bWFyeSBWTSBzdGFydHVwLgo+IFRoZW4sIHdhaXQgZm9yIHByaW1hcnkgVk0gdG8gc2V0dXAgYSBj
-b21tdW5pY2F0aW9uIGNoYW5uZWwgd2l0aCAKPiBFbmNsYXZlIFZNIChFLmcuIHZpYSB2aXJ0aW8t
-dnNvY2spLgo+IFRoZW4sIHByaW1hcnkgVk0gaXMgZnJlZSB0byByZXF1ZXN0IEVuY2xhdmUgVk0g
-dG8gcGVyZm9ybSB2YXJpb3VzIAo+IHRhc2tzIHdoZW4gcmVxdWlyZWQgb24gdGhlIGlzb2xhdGVk
-IGVudmlyb25tZW50Lgo+Cj4gU3VjaCBzZXR1cCB3aWxsIG1pbWljIGEgY29tbW9uIEVuY2xhdmUg
-c2V0dXAuIFN1Y2ggYXMgTWljcm9zb2Z0IAo+IFdpbmRvd3MgVkJTIEVQVC1iYXNlZCBFbmNsYXZl
-cyAoVGhhdCBhbGwgcnVucyBvbiBWVEwxKS4gSXQgaXMgYWxzbyAKPiBzaW1pbGFyIHRvIFRFRXMg
-cnVubmluZyBvbiBBUk0gVHJ1c3Rab25lLgo+IGkuZS4gSW4gbXkgYWx0ZXJuYXRpdmUgcHJvcG9z
-ZWQgc29sdXRpb24sIHRoZSBFbmNsYXZlIFZNIGlzIHNpbWlsYXIgdG8gCj4gVlRMMS9UcnVzdFpv
-bmUuCj4gSXQgd2lsbCBhbHNvIGF2b2lkIHJlcXVpcmluZyBpbnRyb2R1Y2luZyBhIG5ldyBQQ0kg
-ZGV2aWNlIGFuZCBkcml2ZXIuCgpUcnVlLCB0aGlzIGNhbiBiZSBhbm90aGVyIG9wdGlvbiwgdG8g
-cHJvdmlzaW9uIHRoZSBwcmltYXJ5IFZNIGFuZCB0aGUgCmVuY2xhdmUgVk0gYXQgbGF1bmNoIHRp
-bWUuCgpJbiB0aGUgcHJvcG9zZWQgc2V0dXAsIHRoZSBwcmltYXJ5IFZNIHN0YXJ0cyB3aXRoIHRo
-ZSBpbml0aWFsIGFsbG9jYXRlZCAKcmVzb3VyY2VzIChtZW1vcnksIENQVXMpLiBUaGUgbGF1bmNo
-IHBhdGggb2YgdGhlIGVuY2xhdmUgVk0sIGFzIGl0J3MgCnNwYXduZWQgb24gdGhlIHNhbWUgaG9z
-dCwgaXMgZG9uZSB2aWEgdGhlIGlvY3RsIGludGVyZmFjZSAtIFBDSSBkZXZpY2UgLSAKaG9zdCBo
-eXBlcnZpc29yIHBhdGguIFNob3J0LXJ1bm5pbmcgb3IgbG9uZy1ydW5uaW5nIGVuY2xhdmUgY2Fu
-IGJlIApib290c3RyYXBwZWQgZHVyaW5nIHByaW1hcnkgVk0gbGlmZXRpbWUuIERlcGVuZGluZyBv
-biB0aGUgdXNlIGNhc2UsIGEgCmN1c3RvbSBzZXQgb2YgcmVzb3VyY2VzIChtZW1vcnkgYW5kIENQ
-VXMpIGlzIHNldCBmb3IgYW4gZW5jbGF2ZSBhbmQgdGhlbiAKZ2l2ZW4gYmFjayB3aGVuIHRoZSBl
-bmNsYXZlIGlzIHRlcm1pbmF0ZWQ7IHRoZXNlIHJlc291cmNlcyBjYW4gYmUgdXNlZCAKZm9yIGFu
-b3RoZXIgZW5jbGF2ZSBzcGF3bmVkIGxhdGVyIG9uIG9yIHRoZSBwcmltYXJ5IFZNIHRhc2tzLgoK
-VGhhbmtzLApBbmRyYQoKCgoKQW1hem9uIERldmVsb3BtZW50IENlbnRlciAoUm9tYW5pYSkgUy5S
-LkwuIHJlZ2lzdGVyZWQgb2ZmaWNlOiAyN0EgU2YuIExhemFyIFN0cmVldCwgVUJDNSwgZmxvb3Ig
-MiwgSWFzaSwgSWFzaSBDb3VudHksIDcwMDA0NSwgUm9tYW5pYS4gUmVnaXN0ZXJlZCBpbiBSb21h
-bmlhLiBSZWdpc3RyYXRpb24gbnVtYmVyIEoyMi8yNjIxLzIwMDUuCg==
 
+
+On 2020-04-07 21:20, Tony Krowiak wrote:
+> Introduces a new driver callback to prevent a root user from unbinding
+> an AP queue from its device driver if the queue is in use. The intent of
+> this callback is to provide a driver with the means to prevent a root user
+> from inadvertently taking a queue away from a guest and giving it to the
+> host while the guest is still using it.
+
+How can we know, at this point if the guest uses or not the queue?
+Do you want to say that this prevents to take away a queue when it is 
+currently assigned to a VFIO device?
+and with a guest currently using this VFIO device?
+
+> The callback will
+> be invoked whenever a change to the AP bus's sysfs apmask or aqmask
+> attributes would result in one or more AP queues being removed from its
+> driver. If the callback responds in the affirmative for any driver
+> queried, the change to the apmask or aqmask will be rejected with a device
+> in use error.
+
+AFAIU you mean that Linux's driver's binding and unbinding mechanism is 
+not sufficient to avoid this issue because unbind can not be refused by 
+the driver.
+
+The reason why we do not want a single queue to be removed from the VFIO 
+driver is because the VFIO drivers works on a matrix, not on queues, and 
+for the matrix to be consistent it needs to acquire all queues defined 
+by the cross product of all APID and AQID assigned to the matrix.
+
+This functionality is valid for the host as for the guests and is 
+handled automatically by the firmware with the CRYCB.
+The AP bus uses QCI to retrieve the host CRYCB and build the hosts AP 
+queues.
+
+If instead to mix VFIO CRYCB matrix handling and queues at the same 
+level inside the AP bus we separate these different firmware entities in 
+two different software entities.
+
+If we make the AP bus sit above a CRYCB/Matrix bus, and in the way 
+virtualize the QCI and test AP queue instructions:
+- we can directly pass a matrix device to the guest though a VFIO matrix 
+device
+- the consistence will be automatic
+- the VFIO device and parent device will be of the same kind which would 
+make the design much more clearer.
+- there will be no need for these callback because the consistence of 
+the matrix will be guaranteed by firmware
+
+
+> 
+> For this patch, only non-default drivers will be queried. Currently,
+> there is only one non-default driver, the vfio_ap device driver.
+
+You mean that the admin may take queues away from the "default driver", 
+while the queue is in use, to give it to an other driver?
+Why is it to avoid in one way and not in the other way?
+
+> The
+> vfio_ap device driver manages AP queues passed through to one or more
+> guests
+
+I read this as if a queue may be passed to several guest...
+please, rephrase or explain.
+
+> and we don't want to unexpectedly take AP resources away from
+> guests which are most likely independently administered.
+
+When you say "independently administered", you mean as a second admin 
+inside the host, don't you?
+
+Regards,
+Pierre
+
+-- 
+Pierre Morel
+IBM Lab Boeblingen
