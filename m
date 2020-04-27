@@ -2,62 +2,250 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 854B61BA293
-	for <lists+kvm@lfdr.de>; Mon, 27 Apr 2020 13:41:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4011A1BA2E1
+	for <lists+kvm@lfdr.de>; Mon, 27 Apr 2020 13:44:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726728AbgD0LlF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Apr 2020 07:41:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35976 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726504AbgD0LlE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Apr 2020 07:41:04 -0400
-Received: from mail-il1-x141.google.com (mail-il1-x141.google.com [IPv6:2607:f8b0:4864:20::141])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4B2EC0610D5
-        for <kvm@vger.kernel.org>; Mon, 27 Apr 2020 04:41:04 -0700 (PDT)
-Received: by mail-il1-x141.google.com with SMTP id b18so16331278ilf.2
-        for <kvm@vger.kernel.org>; Mon, 27 Apr 2020 04:41:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:reply-to:from:date:message-id:subject:to;
-        bh=F+HbPvxQnRBlqBFKy/zn6110uxUPAWY6eSsMY6+ckPY=;
-        b=gyhur46zBd2J4ErWZN2Wr1DzSL5A/f491REyzMI+qUJS1AkX1EF6ZUwRsIb8lTPpnP
-         85H8T2+WRlSh9z1sJO++XnnANVDJvFxgZVEVXx/eBA4jP3qQppM1Jb/6b5xP/F+muDWA
-         HWXV+6PKTYqKOAlQgRrivuezDVfPTqsBdd+DjP9TqaHGrEgeg8dykE021P72kJXF2ZtM
-         GCizy19KrTP9/KKgjtQbfrDGLVo2xHVOQXsH5zBKemN2bQw4OsUzNGWijakKNIorJFPi
-         2BIRgbeIOLNd3XH1MAGR4z6gPurQOOqjl28dhdRpGgmYo1NgbEuKisKf8MfoVRLAFWp2
-         b/VQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
-         :subject:to;
-        bh=F+HbPvxQnRBlqBFKy/zn6110uxUPAWY6eSsMY6+ckPY=;
-        b=KDPTCWnbKX8gnvLGcD1UN7DmDwrU5t3rmw7VCVBCpzv8o+rJ/0kZRvG21Tm2ijFjgg
-         z9QLCdsLbKi6iFiW25dqNmtA1EjvhrY5X43QYKNMviGOo3jAe3z8yXKB+iQAXzxfjNp0
-         ADllFOZhQwhVYg1t/ta9/qm8gh4nupRV/Ax4J0uuBFDxBQN/j2hbRzp5Rf9SAfIL+ub4
-         yjSQ+IzN4kjmPlX7T6rXvrUvX8hUw71j9Jb64WOxdWsYgJ2tvGGtHyFutgEyPK935wxi
-         X/PhXB/W4H939LfhmYl5dNCGJGMXuwzk0RR2HESzW4f2H6tbdD58+mDyciyQM2VrzfM0
-         ytag==
-X-Gm-Message-State: AGi0PuZSLME2HNwTUBimxt6CVx6TRrcs66niMRX++bits/2C/9Ng/CoX
-        9wc7jclRvbKV6vhJN+czGoGp0fKOgF+vwUc+TAY=
-X-Google-Smtp-Source: APiQypIxXj+BykxkQlHPhrWRmh8cErkfIla/aWFxp/Z0rnfOAF+a0Opg2L3mFDxFmQOUGS1UxiN+VBD+iB4pdWuVWQg=
-X-Received: by 2002:a92:50f:: with SMTP id q15mr21210781ile.4.1587987664162;
- Mon, 27 Apr 2020 04:41:04 -0700 (PDT)
+        id S1726795AbgD0LoY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Apr 2020 07:44:24 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:36534 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726390AbgD0LoY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Apr 2020 07:44:24 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 03RBh7V7047158;
+        Mon, 27 Apr 2020 11:44:17 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2020-01-29;
+ bh=RQOOACECUuHyr8LTU3wWvlpFUzbC/3nRAE5jmtUSnC4=;
+ b=kfgiLjzkTrhEwhLLnmZm//R5aXeV8xnknDcHu2VRWybGA2zNaFEODtLP6mhItkVab3O+
+ Ol8tY4lNOCfcu9AE/JRrjbYZ8WVbBHJjLL+slmnQczlAq7X6orIZTeh49BfjOlA2pCn5
+ fPZ4wBlhp6bMScBMz+F573R6M8jxJEfjLihNdmsGvWEeAJfqjNiJpvBRs3mR9k725tl5
+ sXbNxvPZsmOoL0vaj0n015e+SVSD4Lm6HcDfPZnuA1nkH/97tbpZg27BzYCfHVd8nz4k
+ pXmFKrRAHe0dgtCgxBJByNwmNZKOAENmpU8o5t67Oxez0f3yg2C088bbfYIFXGthaLxc dQ== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by userp2130.oracle.com with ESMTP id 30mcmqx32j-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 27 Apr 2020 11:44:17 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 03RBfpW0026622;
+        Mon, 27 Apr 2020 11:44:17 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by userp3020.oracle.com with ESMTP id 30mxww174s-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 27 Apr 2020 11:44:17 +0000
+Received: from abhmp0013.oracle.com (abhmp0013.oracle.com [141.146.116.19])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 03RBiFYn014619;
+        Mon, 27 Apr 2020 11:44:15 GMT
+Received: from [192.168.14.112] (/109.67.198.165)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Mon, 27 Apr 2020 04:44:14 -0700
+Subject: Re: [PATCH v1 00/15] Add support for Nitro Enclaves
+To:     "Paraschiv, Andra-Irina" <andraprs@amazon.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        linux-kernel@vger.kernel.org
+Cc:     Anthony Liguori <aliguori@amazon.com>,
+        Benjamin Herrenschmidt <benh@amazon.com>,
+        Colm MacCarthaigh <colmmacc@amazon.com>,
+        Bjoern Doebel <doebel@amazon.de>,
+        David Woodhouse <dwmw@amazon.co.uk>,
+        Frank van der Linden <fllinden@amazon.com>,
+        Alexander Graf <graf@amazon.de>,
+        Martin Pohlack <mpohlack@amazon.de>,
+        Matt Wilson <msw@amazon.com>, Balbir Singh <sblbir@amazon.com>,
+        Stewart Smith <trawets@amazon.com>,
+        Uwe Dannowski <uwed@amazon.de>, kvm@vger.kernel.org,
+        ne-devel-upstream@amazon.com
+References: <20200421184150.68011-1-andraprs@amazon.com>
+ <18406322-dc58-9b59-3f94-88e6b638fe65@redhat.com>
+ <ff65b1ed-a980-9ddc-ebae-996869e87308@amazon.com>
+ <5c514de6-52a8-8532-23d9-e6b0cc9ac7eb@oracle.com>
+ <eb92ba4e-113e-d7ec-4633-f6b5ac54796b@amazon.com>
+From:   Liran Alon <liran.alon@oracle.com>
+Message-ID: <26111e31-8ff5-8358-1e05-6d7df0441ab1@oracle.com>
+Date:   Mon, 27 Apr 2020 14:44:09 +0300
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.13; rv:68.0)
+ Gecko/20100101 Thunderbird/68.7.0
 MIME-Version: 1.0
-Received: by 2002:a5d:8f89:0:0:0:0:0 with HTTP; Mon, 27 Apr 2020 04:41:03
- -0700 (PDT)
-Reply-To: convy0090@gmail.com
-From:   Ruben CONVY <andrewboccc@gmail.com>
-Date:   Mon, 27 Apr 2020 12:41:03 +0100
-Message-ID: <CAHVC0+BUDofvorH_OcPXRx-=OZEwfpP7KdZHNg2LzUpRQHM+tg@mail.gmail.com>
-Subject: Why continued silence 2
-To:     undisclosed-recipients:;
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <eb92ba4e-113e-d7ec-4633-f6b5ac54796b@amazon.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9603 signatures=668686
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 spamscore=0 bulkscore=0
+ suspectscore=0 mlxlogscore=999 phishscore=0 malwarescore=0 mlxscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
+ definitions=main-2004270106
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9603 signatures=668686
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 spamscore=0 clxscore=1015
+ priorityscore=1501 suspectscore=0 impostorscore=0 adultscore=0
+ malwarescore=0 bulkscore=0 lowpriorityscore=0 mlxlogscore=999 mlxscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
+ definitions=main-2004270106
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Did you receive my previous email regarding your family inheritance?
-Reply strictly through: convy0090@gmail.com
-Best Regards,
-Ruben CONVY
+
+On 27/04/2020 10:56, Paraschiv, Andra-Irina wrote:
+>
+> On 25/04/2020 18:25, Liran Alon wrote:
+>>
+>> On 23/04/2020 16:19, Paraschiv, Andra-Irina wrote:
+>>>
+>>> The memory and CPUs are carved out of the primary VM, they are 
+>>> dedicated for the enclave. The Nitro hypervisor running on the host 
+>>> ensures memory and CPU isolation between the primary VM and the 
+>>> enclave VM.
+>> I hope you properly take into consideration Hyper-Threading 
+>> speculative side-channel vulnerabilities here.
+>> i.e. Usually cloud providers designate each CPU core to be assigned 
+>> to run only vCPUs of specific guest. To avoid sharing a single CPU 
+>> core between multiple guests.
+>> To handle this properly, you need to use some kind of core-scheduling 
+>> mechanism (Such that each CPU core either runs only vCPUs of enclave 
+>> or only vCPUs of primary VM at any given point in time).
+>>
+>> In addition, can you elaborate more on how the enclave memory is 
+>> carved out of the primary VM?
+>> Does this involve performing a memory hot-unplug operation from 
+>> primary VM or just unmap enclave-assigned guest physical pages from 
+>> primary VM's SLAT (EPT/NPT) and map them now only in enclave's SLAT?
+>
+> Correct, we take into consideration the HT setup. The enclave gets 
+> dedicated physical cores. The primary VM and the enclave VM don't run 
+> on CPU siblings of a physical core.
+The way I would imagine this to work is that Primary-VM just specifies 
+how many vCPUs will the Enclave-VM have and those vCPUs will be set with 
+affinity to run on same physical CPU cores as Primary-VM.
+But with the exception that scheduler is modified to not run vCPUs of 
+Primary-VM and Enclave-VM as sibling on the same physical CPU core 
+(core-scheduling). i.e. This is different than primary-VM losing
+physical CPU cores permanently as long as the Enclave-VM is running.
+Or maybe this should even be controlled by a knob in virtual PCI device 
+interface to allow flexibility to customer to decide if Enclave-VM needs 
+dedicated CPU cores or is it ok to share them with Primary-VM
+as long as core-scheduling is used to guarantee proper isolation.
+>
+> Regarding the memory carve out, the logic includes page table entries 
+> handling.
+As I thought. Thanks for conformation.
+>
+> IIRC, memory hot-unplug can be used for the memory blocks that were 
+> previously hot-plugged.
+>
+> https://urldefense.com/v3/__https://www.kernel.org/doc/html/latest/admin-guide/mm/memory-hotplug.html__;!!GqivPVa7Brio!MubgaBjJabDtNzNpdOxxbSKtLbqXHbsEpTtZ1mj-rnfLvMIbLW1nZ8cK10GhYJQ$ 
+>
+>>
+>> I don't quite understand why Enclave VM needs to be 
+>> provisioned/teardown during primary VM's runtime.
+>>
+>> For example, an alternative could have been to just provision both 
+>> primary VM and Enclave VM on primary VM startup.
+>> Then, wait for primary VM to setup a communication channel with 
+>> Enclave VM (E.g. via virtio-vsock).
+>> Then, primary VM is free to request Enclave VM to perform various 
+>> tasks when required on the isolated environment.
+>>
+>> Such setup will mimic a common Enclave setup. Such as Microsoft 
+>> Windows VBS EPT-based Enclaves (That all runs on VTL1). It is also 
+>> similar to TEEs running on ARM TrustZone.
+>> i.e. In my alternative proposed solution, the Enclave VM is similar 
+>> to VTL1/TrustZone.
+>> It will also avoid requiring introducing a new PCI device and driver.
+>
+> True, this can be another option, to provision the primary VM and the 
+> enclave VM at launch time.
+>
+> In the proposed setup, the primary VM starts with the initial 
+> allocated resources (memory, CPUs). The launch path of the enclave VM, 
+> as it's spawned on the same host, is done via the ioctl interface - 
+> PCI device - host hypervisor path. Short-running or long-running 
+> enclave can be bootstrapped during primary VM lifetime. Depending on 
+> the use case, a custom set of resources (memory and CPUs) is set for 
+> an enclave and then given back when the enclave is terminated; these 
+> resources can be used for another enclave spawned later on or the 
+> primary VM tasks.
+>
+Yes, I already understood this is how the mechanism work. I'm 
+questioning whether this is indeed a good approach that should also be 
+taken by upstream.
+
+The use-case of using Nitro Enclaves is for a Confidential-Computing 
+service. i.e. The ability to provision a compute instance that can be 
+trusted to perform a bunch of computation on sensitive
+information with high confidence that it cannot be compromised as it's 
+highly isolated. Some technologies such as Intel SGX and AMD SEV 
+attempted to achieve this even with guarantees that
+the computation is isolated from the hardware and hypervisor itself.
+
+I would have expected that for the vast majority of real customer 
+use-cases, the customer will provision a compute instance that runs some 
+confidential-computing task in an enclave which it
+keeps running for the entire life-time of the compute instance. As the 
+sole purpose of the compute instance is to just expose a service that 
+performs some confidential-computing task.
+For those cases, it should have been sufficient to just pre-provision a 
+single Enclave-VM that performs this task, together with the compute 
+instance and connect them via virtio-vsock.
+Without introducing any new virtual PCI device, guest PCI driver and 
+unique semantics of stealing resources (CPUs and Memory) from primary-VM 
+at runtime.
+
+In this Nitro Enclave architecture, we de-facto put Compute 
+control-plane abilities in the hands of the guest VM. Instead of 
+introducing new control-plane primitives that allows building
+the data-plane architecture desired by the customer in a flexible manner.
+* What if the customer prefers to have it's Enclave VM polling S3 bucket 
+for new tasks and produce results to S3 as-well? Without having any 
+"Primary-VM" or virtio-vsock connection of any kind?
+* What if for some use-cases customer wants Enclave-VM to have dedicated 
+compute power (i.e. Not share physical CPU cores with primary-VM. Not 
+even with core-scheduling) but for other
+use-cases, customer prefers to share physical CPU cores with Primary-VM 
+(Together with core-scheduling guarantees)? (Although this could be 
+addressed by extending the virtual PCI device
+interface with a knob to control this)
+
+An alternative would have been to have the following new control-plane 
+primitives:
+* Ability to provision a VM without boot-volume, but instead from an 
+Image that is used to boot from memory. Allowing to provision disk-less VMs.
+   (E.g. Can be useful for other use-cases such as VMs not requiring EBS 
+at all which could allow cheaper compute instance)
+* Ability to provision a group of VMs together as a group such that they 
+are guaranteed to launch as sibling VMs on the same host.
+* Ability to create a fast-path connection between sibling VMs on the 
+same host with virtio-vsock. Or even also other shared-memory mechanism.
+* Extend AWS Fargate with ability to run multiple microVMs as a group 
+(Similar to above) connected with virtio-vsock. To allow on-demand scale 
+of confidential-computing task.
+
+Having said that, I do see a similar architecture to Nitro Enclaves 
+virtual PCI device used for a different purpose: For hypervisor-based 
+security isolation (Such as Windows VBS).
+E.g. Linux boot-loader can detect the presence of this virtual PCI 
+device and use it to provision multiple VM security domains. Such that 
+when a security domain is created,
+it is specified what is the hardware resources it have access to (Guest 
+memory pages, IOPorts, MSRs and etc.) and the blob it should run to 
+bootstrap. Similar, but superior than,
+Hyper-V VSM. In addition, some security domains will be given special 
+abilities to control other security domains (For example, to control the 
++XS,+XU EPT bits of other security
+domains to enforce code-integrity. Similar to Windows VBS HVCI). Just an 
+idea... :)
+
+-Liran
+
+
+
+
+
+
+
+
+
+
+
