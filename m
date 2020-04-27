@@ -2,81 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 73B091BAB56
-	for <lists+kvm@lfdr.de>; Mon, 27 Apr 2020 19:32:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5BF471BAB5E
+	for <lists+kvm@lfdr.de>; Mon, 27 Apr 2020 19:33:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726450AbgD0Rcm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Apr 2020 13:32:42 -0400
-Received: from mga11.intel.com ([192.55.52.93]:60294 "EHLO mga11.intel.com"
+        id S1726420AbgD0Rdi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Apr 2020 13:33:38 -0400
+Received: from mail.kernel.org ([198.145.29.99]:46388 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726249AbgD0Rcm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Apr 2020 13:32:42 -0400
-IronPort-SDR: 0l1W9mYfL7ySDTyATFd6DWVXjRM9f+xNa06xaPsGpVk4TU4nmmK4rnB8I2v2zbtFajEYiMPQDs
- xW+s6NV+t8KQ==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Apr 2020 10:32:42 -0700
-IronPort-SDR: 1xMMgJom7B473tblxJSdTr8wBNBbcUi2UQDDSlm0UV6m+UX04XA8NI7Fnc9MCTwGZbr7r1KY9Q
- SdwfDna1VJKg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,324,1583222400"; 
-   d="scan'208";a="404381107"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
-  by orsmga004.jf.intel.com with ESMTP; 27 Apr 2020 10:32:42 -0700
-Date:   Mon, 27 Apr 2020 10:32:41 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: VMX: Use accessor to read vmcs.INTR_INFO when
- handling exception
-Message-ID: <20200427173241.GJ14870@linux.intel.com>
-References: <20200427171837.22613-1-sean.j.christopherson@intel.com>
- <8123dc4b-a449-a92c-85a1-c255fa2bbbca@redhat.com>
+        id S1726252AbgD0Rdi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Apr 2020 13:33:38 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id D451F206D9;
+        Mon, 27 Apr 2020 17:33:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1588008818;
+        bh=En6PMPermi7/qXogYL4qV4kDVxomi2kZ/siwiOXKS1E=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=FXKAonvdo0qpOkOILva/raUkYBFNRi5fSKy/mA3pCRpZsxvhAUHtwTAdO9X7dKEeC
+         2beGGpYruB3VdYBKTmLGYPRNuVre4U5QNYbQZudz9wksSesyOHzLUUTfJNT75eG6Y3
+         W5Vf41J+8GMrpCbbsq0HApS7YkJ7ibl9yGoFhHLk=
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why)
+        by disco-boy.misterjones.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <maz@kernel.org>)
+        id 1jT7dQ-006ng9-79; Mon, 27 Apr 2020 18:33:36 +0100
+Date:   Mon, 27 Apr 2020 18:33:31 +0100
+From:   Marc Zyngier <maz@kernel.org>
+To:     Alexandru Elisei <alexandru.elisei@arm.com>
+Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Andre Przywara <Andre.Przywara@arm.com>,
+        Ard Biesheuvel <ardb@kernel.org>
+Subject: Re: [PATCH][kvmtool] kvm: Request VM specific limits instead of
+ system-wide ones
+Message-ID: <20200427183331.48f411f5@why>
+In-Reply-To: <7ac17890-72d1-1c81-e513-5d4f7841ca9d@arm.com>
+References: <20200427141738.285217-1-maz@kernel.org>
+        <d27e4a14-34b8-7f3d-1e58-ef2ae13e443b@arm.com>
+        <7ac17890-72d1-1c81-e513-5d4f7841ca9d@arm.com>
+Organization: Approximate
+X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8123dc4b-a449-a92c-85a1-c255fa2bbbca@redhat.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, will@kernel.org, Andre.Przywara@arm.com, ardb@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Apr 27, 2020 at 07:28:02PM +0200, Paolo Bonzini wrote:
-> On 27/04/20 19:18, Sean Christopherson wrote:
-> > Use vmx_get_intr_info() when grabbing the cached vmcs.INTR_INFO in
-> > handle_exception_nmi() to ensure the cache isn't stale.  Bypassing the
-> > caching accessor doesn't cause any known issues as the cache is always
-> > refreshed by handle_exception_nmi_irqoff(), but the whole point of
-> > adding the proper caching mechanism was to avoid such dependencies.
-> > 
-> > Fixes: 8791585837f6 ("KVM: VMX: Cache vmcs.EXIT_INTR_INFO using arch avail_reg flags")
-> > Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> > ---
-> >  arch/x86/kvm/vmx/vmx.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > 
-> > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> > index 3ab6ca6062ce..7bddcb24f6f3 100644
-> > --- a/arch/x86/kvm/vmx/vmx.c
-> > +++ b/arch/x86/kvm/vmx/vmx.c
-> > @@ -4677,7 +4677,7 @@ static int handle_exception_nmi(struct kvm_vcpu *vcpu)
-> >  	u32 vect_info;
-> >  
-> >  	vect_info = vmx->idt_vectoring_info;
-> > -	intr_info = vmx->exit_intr_info;
-> > +	intr_info = vmx_get_intr_info(vcpu);
-> >  
-> >  	if (is_machine_check(intr_info) || is_nmi(intr_info))
-> >  		return 1; /* handled by handle_exception_nmi_irqoff() */
-> > 
-> 
-> Hasn't this been applied already?
+On Mon, 27 Apr 2020 16:00:58 +0100
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
 
-No, I missed this case in the original patch, and the other fix was for
-incorrect sizing of an exit_qual variable.
+> Hi,
+> 
+> On 4/27/20 3:44 PM, Alexandru Elisei wrote:
+> > Hi,
+> >
+> > On 4/27/20 3:17 PM, Marc Zyngier wrote:  
+> >> On arm64, the maximum number of vcpus is constrained by the type
+> >> of interrupt controller that has been selected (GICv2 imposes a
+> >> limit of 8 vcpus, while GICv3 currently has a limit of 512).
+> >>
+> >> It is thus important to request this limit on the VM file descriptor
+> >> rather than on the one that corresponds to /dev/kvm, as the latter
+> >> is likely to return something that doesn't take the constraints into
+> >> account.
+> >>
+> >> Reported-by: Ard Biesheuvel <ardb@kernel.org>
+> >> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> >> ---
+> >>  kvm.c | 4 ++--
+> >>  1 file changed, 2 insertions(+), 2 deletions(-)
+> >>
+> >> diff --git a/kvm.c b/kvm.c
+> >> index e327541..3d5173d 100644
+> >> --- a/kvm.c
+> >> +++ b/kvm.c
+> >> @@ -406,7 +406,7 @@ int kvm__recommended_cpus(struct kvm *kvm)
+> >>  {
+> >>  	int ret;
+> >>  
+> >> -	ret = ioctl(kvm->sys_fd, KVM_CHECK_EXTENSION, KVM_CAP_NR_VCPUS);
+> >> +	ret = ioctl(kvm->vm_fd, KVM_CHECK_EXTENSION, KVM_CAP_NR_VCPUS);
+> >>  	if (ret <= 0)
+> >>  		/*
+> >>  		 * api.txt states that if KVM_CAP_NR_VCPUS does not exist,
+> >> @@ -421,7 +421,7 @@ int kvm__max_cpus(struct kvm *kvm)
+> >>  {
+> >>  	int ret;
+> >>  
+> >> -	ret = ioctl(kvm->sys_fd, KVM_CHECK_EXTENSION, KVM_CAP_MAX_VCPUS);
+> >> +	ret = ioctl(kvm->vm_fd, KVM_CHECK_EXTENSION, KVM_CAP_MAX_VCPUS);
+> >>  	if (ret <= 0)
+> >>  		ret = kvm__recommended_cpus(kvm);
+> >>    
+> > I've checked that gic__create comes before the call kvm__recommended_capus:
+> > gic__create is in core_init (called via kvm__init->kvm_arch_init), and
+> > kvm__recommended_cpus is in base_init (called via kvm__cpu_init ->
+> > kvm__{recommended,max}_cpus).
+> >
+> > The KVM api documentation states that KVM_CHECK_EXTENSION is available for the vm
+> > fd only if the system capability KVM_CAP_CHECK_EXTENSION_VM is present. kvmtool
+> > already has a function for checking extensions on the vm fd, it's called
+> > kvm__supports_vm_extension. Can we use that instead of doing the ioctl directly on
+> > the vm fd?  
+> 
+> Scratch that, kvm__supports_vm_extension returns a bool, not an int.
+> How about we write kvm__check_vm_extension that returns an int, and
+> kvm__supports_vm_extension calls it?
+
+That, or we just change the return type for kvm__supports_vm_extension,
+and hack the only places that uses it so far (the GIC code) to detect
+the error.
+
+Thanks,
+
+	M.
+-- 
+Jazz is not dead. It just smells funny...
