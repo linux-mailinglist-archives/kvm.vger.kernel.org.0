@@ -2,112 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 189DE1BADD8
-	for <lists+kvm@lfdr.de>; Mon, 27 Apr 2020 21:25:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 14AB81BAE21
+	for <lists+kvm@lfdr.de>; Mon, 27 Apr 2020 21:41:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726420AbgD0TZM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Apr 2020 15:25:12 -0400
-Received: from mga01.intel.com ([192.55.52.88]:11840 "EHLO mga01.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726023AbgD0TZM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Apr 2020 15:25:12 -0400
-IronPort-SDR: 5cRvX6ZSLWAmqohrgDgIlxx+tluWeUiHSSJSPLK/BfXKbNweb8XQU/zDozoAvEV7/lFGvNsKp8
- Q38JgY5f2yNw==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Apr 2020 12:25:12 -0700
-IronPort-SDR: Cx7K0NL+wJX8a1A2fM3ex6v+A5Yqfvx6X7jhEGbZm09FHH0X22r15RLoyoC5kPHC4TDQlkHHa+
- QkLdoO1SCduQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,325,1583222400"; 
-   d="scan'208";a="293631514"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
-  by orsmga008.jf.intel.com with ESMTP; 27 Apr 2020 12:25:12 -0700
-Date:   Mon, 27 Apr 2020 12:25:12 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Uros Bizjak <ubizjak@gmail.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v2] KVM: VMX: Improve handle_external_interrupt_irqoff
- inline assembly
-Message-ID: <20200427192512.GT14870@linux.intel.com>
-References: <20200426115255.305060-1-ubizjak@gmail.com>
+        id S1726548AbgD0TlE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Apr 2020 15:41:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55162 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725919AbgD0TlE (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 27 Apr 2020 15:41:04 -0400
+Received: from mail-ot1-x341.google.com (mail-ot1-x341.google.com [IPv6:2607:f8b0:4864:20::341])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DCE79C0610D5;
+        Mon, 27 Apr 2020 12:41:03 -0700 (PDT)
+Received: by mail-ot1-x341.google.com with SMTP id c3so28359739otp.8;
+        Mon, 27 Apr 2020 12:41:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=KJgjJqfYxYx1DamhB8SHVDVYVYMTaoNULn4soSfif8o=;
+        b=Awr/3rYcBw7IUNxOE2pHd9iUsxf+b+0F5oivdZ0gMq4uA1hkZgEw1VVHuOGZWBnp5Z
+         TIp3PNk6UW5NbnIkEyua/1uxF661Lz1zCOl9fCPsE3eF7ib9CcqRstWRMzX2YN0RApif
+         J7mPUujaPVFsvPRM81KcDC9mr8hcliXZUi+4Ba1c9w6Gcf4P569SoJofFY4DJ2b78UPs
+         djVyHuPPLi2KmetXOMEjR4ccGdlKV5P7Y/xwSjYA5ais585oWyKjE53PS0pf1SuiJsdC
+         J/1ZckW+XEo9p1xknc3mqgDPAeU1CrRqUmjkHFzbCfawVx3NTMkqZ72cJl2Gw189Ywum
+         2XYw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=KJgjJqfYxYx1DamhB8SHVDVYVYMTaoNULn4soSfif8o=;
+        b=IrsKeFfhexGH9Ed/VZXB7fbFz1HwnAuCiaSbLXnYlzZXNGEgX2JI/XzJoJPDEl/K4z
+         hREdBFCyw5mKaUbvHFvLYbrTdisAfakT110O555rnf9UZsOzNnV7qGKHqDxU/BNT0pPX
+         tKqrCy4NXk5izIIuBaJcDtTDDz8R8YKYGXOWS26KicFdEZUFxAt/KChflE0PV9l67oqS
+         M5eKsJk/Qai3d/+2NNr2pa4wMRklK0JKrp30AjezMuD+NrXzjq1aONF3PFWdCY4tNpyS
+         c+9PY8n6sLTfnHzBjs2BHdvGlDgcmUiPBuUUoMk/XET+IwhSPimwDWdMCAILrF7KSXB/
+         XjgA==
+X-Gm-Message-State: AGi0PuZZNrjO+G+xK/OHDChNgC4Jx5sZWlhdXAmVnnf+phRnkrcGnVGo
+        q5fvr+Fq/Ud7bTSASeqEpXuZ0FBmQSCRYQOdrsE=
+X-Google-Smtp-Source: APiQypJ1FMuh3neyv5Ove0+Oveml6rJ7zmUzQYEa8VLdUSSnKo/+3+qY5TyFQK4Y9SO0B4S0U5QMWyP+fowj5p+NOTE=
+X-Received: by 2002:aca:5e0b:: with SMTP id s11mr213497oib.160.1588016463282;
+ Mon, 27 Apr 2020 12:41:03 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200426115255.305060-1-ubizjak@gmail.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+References: <20200326200634.222009-1-dancol@google.com> <20200401213903.182112-1-dancol@google.com>
+ <CAKOZueuu=bGt4O0xjiV=9_PC_8Ey8pa3NjtJ7+O-nHCcYbLnEg@mail.gmail.com>
+ <alpine.LRH.2.21.2004230253530.12318@namei.org> <02468636-c981-2502-d4f4-58afbf8506b1@schaufler-ca.com>
+In-Reply-To: <02468636-c981-2502-d4f4-58afbf8506b1@schaufler-ca.com>
+From:   Stephen Smalley <stephen.smalley.work@gmail.com>
+Date:   Mon, 27 Apr 2020 15:40:51 -0400
+Message-ID: <CAEjxPJ4WKu9L4Bey1YVo3-tb0Td7Lz5WYw=d1jJ-TN5j5QMcAg@mail.gmail.com>
+Subject: Re: [PATCH v5 0/3] SELinux support for anonymous inodes and UFFD
+To:     Casey Schaufler <casey@schaufler-ca.com>
+Cc:     James Morris <jmorris@namei.org>,
+        Daniel Colascione <dancol@google.com>,
+        Tim Murray <timmurray@google.com>,
+        SElinux list <selinux@vger.kernel.org>,
+        LSM List <linux-security-module@vger.kernel.org>,
+        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Paul Moore <paul@paul-moore.com>,
+        Nick Kralevich <nnk@google.com>,
+        Stephen Smalley <sds@tycho.nsa.gov>,
+        Lokesh Gidra <lokeshgidra@google.com>,
+        John Johansen <john.johansen@canonical.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Apr 26, 2020 at 01:52:55PM +0200, Uros Bizjak wrote:
-> Improve handle_external_interrupt_irqoff inline assembly in several ways:
-> - use "n" operand constraint instead of "i" and remove
+On Mon, Apr 27, 2020 at 1:17 PM Casey Schaufler <casey@schaufler-ca.com> wrote:
+>
+> On 4/22/2020 9:55 AM, James Morris wrote:
+> > On Mon, 13 Apr 2020, Daniel Colascione wrote:
+> >
+> >> On Wed, Apr 1, 2020 at 2:39 PM Daniel Colascione <dancol@google.com> wrote:
+> >>> Changes from the fourth version of the patch:
+> >>
+> >> Is there anything else that needs to be done before merging this patch series?
+> > The vfs changes need review and signoff from the vfs folk, the SELinux
+> > changes by either Paul or Stephen, and we also need signoff on the LSM
+> > hooks from other major LSM authors (Casey and John, at a minimum).
+>
+> You can add my
+>
+>         Acked-by: Casey Schaufler <casey@schaufler-ca.com>
+>
+> for this patchset.
 
-What's the motivation for using 'n'?  The 'i' variant is much more common,
-i.e. less likely to trip up readers.
+This version of the series addresses all of my comments, so you can add my
+Acked-by: Stephen Smalley <stephen.smalley.work@gmail.com>
 
-  $ git grep -E "\"i\"\s*\(" | wc -l
-  768
-  $ git grep -E "\"n\"\s*\(" | wc -l
-  11
-
->   unneeded %c operand modifiers and "$" prefixes
-> - use %rsp instead of _ASM_SP, since we are in CONFIG_X86_64 part
-> - use $-16 immediate to align %rsp
-
-Heh, this one depends on the reader, I find 0xfffffffffffffff0 to be much
-more intuitive, though admittedly also far easier to screw up.
-
-> - remove unneeded use of __ASM_SIZE macro
-> - define "ss" named operand only for X86_64
-> 
-> The patch introduces no functional changes.
-> 
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Sean Christopherson <sean.j.christopherson@intel.com>
-> Signed-off-by: Uros Bizjak <ubizjak@gmail.com>
-> ---
->  arch/x86/kvm/vmx/vmx.c | 14 ++++++++------
->  1 file changed, 8 insertions(+), 6 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index c2c6335a998c..7471f1b948b3 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -6283,13 +6283,13 @@ static void handle_external_interrupt_irqoff(struct kvm_vcpu *vcpu)
->  
->  	asm volatile(
->  #ifdef CONFIG_X86_64
-> -		"mov %%" _ASM_SP ", %[sp]\n\t"
-> -		"and $0xfffffffffffffff0, %%" _ASM_SP "\n\t"
-> -		"push $%c[ss]\n\t"
-> +		"mov %%rsp, %[sp]\n\t"
-> +		"and $-16, %%rsp\n\t"
-> +		"push %[ss]\n\t"
->  		"push %[sp]\n\t"
->  #endif
->  		"pushf\n\t"
-> -		__ASM_SIZE(push) " $%c[cs]\n\t"
-> +		"push %[cs]\n\t"
->  		CALL_NOSPEC
->  		:
->  #ifdef CONFIG_X86_64
-> @@ -6298,8 +6298,10 @@ static void handle_external_interrupt_irqoff(struct kvm_vcpu *vcpu)
->  		ASM_CALL_CONSTRAINT
->  		:
->  		[thunk_target]"r"(entry),
-> -		[ss]"i"(__KERNEL_DS),
-> -		[cs]"i"(__KERNEL_CS)
-> +#ifdef CONFIG_X86_64
-> +		[ss]"n"(__KERNEL_DS),
-> +#endif
-> +		[cs]"n"(__KERNEL_CS)
->  	);
->  
->  	kvm_after_interrupt(vcpu);
-> -- 
-> 2.25.3
-> 
+I don't know though how to get a response from the vfs folks; the
+series has been posted repeatedly without any
+response by them.
