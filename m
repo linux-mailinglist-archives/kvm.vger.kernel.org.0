@@ -2,43 +2,44 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7CED61B9F37
-	for <lists+kvm@lfdr.de>; Mon, 27 Apr 2020 11:00:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 12A6A1B9F3F
+	for <lists+kvm@lfdr.de>; Mon, 27 Apr 2020 11:01:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726805AbgD0JAA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Apr 2020 05:00:00 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:49033 "EHLO
+        id S1726507AbgD0JB4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Apr 2020 05:01:56 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:40312 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726692AbgD0JAA (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 27 Apr 2020 05:00:00 -0400
+        by vger.kernel.org with ESMTP id S1726003AbgD0JBz (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 27 Apr 2020 05:01:55 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1587977998;
+        s=mimecast20190719; t=1587978113;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=xmh2zCgcUeTcpiprHgma1oXEFJKFV97rvC5bCFqQ7SA=;
-        b=E99gt9ZkohYnStjiYbafqwr0O/GypepUQI4aH98nsyp8G5RlYVMfa6xY4j7CCrWeZCZB9t
-        +sv8L1LxrTZVnZDqSjKuPJeIa0v/mTy3iswFgmzRx46r4He+u6gyKAUegL+W+PDGrYNZ14
-        HtMLD3SUIBpy0VYB4ZoGdi4uMKpvk20=
+        bh=fPRyAWSt+cMOeJ08eeHDfjQPpCs9b2/mC+ejEUKG9ik=;
+        b=EiwEYiLZfgqMuj50Ng26t8wyYhPx6gh64qkCZmQmfgNkCvfhJnLv/L0UJxiRciWUTRqXkX
+        sM/eDjM2YQBAnmi+RELGCo0fJZO4FyBsFFmC6H56fOEBaOgEwBYjaJFMh6YjX2NZh0+AsY
+        gu/PLye0o3KWjCO93Qs6TTGdI8c3dc4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-99--3wxIos2OBmeE46wHv72Wg-1; Mon, 27 Apr 2020 04:59:54 -0400
-X-MC-Unique: -3wxIos2OBmeE46wHv72Wg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+ us-mta-32-x5qGC7BrMkalyoEG0S9DiQ-1; Mon, 27 Apr 2020 05:01:50 -0400
+X-MC-Unique: x5qGC7BrMkalyoEG0S9DiQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AE28D1895A2B;
-        Mon, 27 Apr 2020 08:59:53 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A8527107ACCA;
+        Mon, 27 Apr 2020 09:01:49 +0000 (UTC)
 Received: from [10.36.114.127] (ovpn-114-127.ams2.redhat.com [10.36.114.127])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 32E4627CD2;
-        Mon, 27 Apr 2020 08:59:48 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH v6 01/10] s390x: saving regs for interrupts
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 4393B5D70C;
+        Mon, 27 Apr 2020 09:01:48 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH v6 02/10] s390x: Use PSW bits definitions
+ in cstart
 To:     Pierre Morel <pmorel@linux.ibm.com>, kvm@vger.kernel.org
 Cc:     linux-s390@vger.kernel.org, frankja@linux.ibm.com,
         thuth@redhat.com, cohuck@redhat.com
 References: <1587725152-25569-1-git-send-email-pmorel@linux.ibm.com>
- <1587725152-25569-2-git-send-email-pmorel@linux.ibm.com>
+ <1587725152-25569-3-git-send-email-pmorel@linux.ibm.com>
 From:   David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -84,122 +85,103 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
  FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
 Organization: Red Hat GmbH
-Message-ID: <6b8e4ce5-0c9c-6111-98e8-1c9e392d0a73@redhat.com>
-Date:   Mon, 27 Apr 2020 10:59:47 +0200
+Message-ID: <231839f0-41f9-844c-efc4-34893e7b720f@redhat.com>
+Date:   Mon, 27 Apr 2020 11:01:47 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <1587725152-25569-2-git-send-email-pmorel@linux.ibm.com>
+In-Reply-To: <1587725152-25569-3-git-send-email-pmorel@linux.ibm.com>
 Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 24.04.20 12:45, Pierre Morel wrote:
-> If we use multiple source of interrupts, for example, using SCLP
-> console to print information while using I/O interrupts, we need
-> to have a re-entrant register saving interruption handling.
-
-So the primary reason is to print during I/O interrupts (which we
-already do, but usually never trigger - handle_io_int())
-
->=20
-> Instead of saving at a static memory address, let's save the base
-> registers and the floating point registers on the stack.
-
-".. in case of I/O interrupts".
-
->=20
-> Note that we keep the static register saving to recover from the
-> RESET tests.
-
-and for all other types of interrupts.
-
->=20
+> This patch defines the PSW bits EA/BA used to initialize the PSW masks
+> for exceptions.
+> 
+> Since some PSW mask definitions exist already in arch_def.h we add these
+> definitions there.
+> We move all PSW definitions together and protect assembler code against
+> C syntax.
+> 
 > Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
 > ---
->  s390x/cstart64.S | 34 ++++++++++++++++++++++++++++++++--
->  1 file changed, 32 insertions(+), 2 deletions(-)
->=20
+>  lib/s390x/asm/arch_def.h | 16 ++++++++++++----
+>  s390x/cstart64.S         | 15 ++++++++-------
+>  2 files changed, 20 insertions(+), 11 deletions(-)
+> 
+> diff --git a/lib/s390x/asm/arch_def.h b/lib/s390x/asm/arch_def.h
+> index 15a4d49..c54409a 100644
+> --- a/lib/s390x/asm/arch_def.h
+> +++ b/lib/s390x/asm/arch_def.h
+> @@ -10,15 +10,22 @@
+>  #ifndef _ASM_S390X_ARCH_DEF_H_
+>  #define _ASM_S390X_ARCH_DEF_H_
+>  
+> +#define PSW_MASK_EXT			0x0100000000000000UL
+> +#define PSW_MASK_DAT			0x0400000000000000UL
+> +#define PSW_MASK_SHORT_PSW		0x0008000000000000UL
+> +#define PSW_MASK_PSTATE			0x0001000000000000UL
+> +#define PSW_MASK_BA			0x0000000080000000UL
+> +#define PSW_MASK_EA			0x0000000100000000UL
+> +
+> +#define PSW_EXCEPTION_MASK	(PSW_MASK_EA | PSW_MASK_BA)
+> +#define PSW_RESET_MASK		(PSW_EXCEPTION_MASK | PSW_MASK_SHORT_PSW)
+> +
+> +#ifndef __ASSEMBLER__
+>  struct psw {
+>  	uint64_t	mask;
+>  	uint64_t	addr;
+>  };
+>  
+> -#define PSW_MASK_EXT			0x0100000000000000UL
+> -#define PSW_MASK_DAT			0x0400000000000000UL
+> -#define PSW_MASK_PSTATE			0x0001000000000000UL
+> -
+>  #define CR0_EXTM_SCLP			0X0000000000000200UL
+>  #define CR0_EXTM_EXTC			0X0000000000002000UL
+>  #define CR0_EXTM_EMGC			0X0000000000004000UL
+> @@ -297,4 +304,5 @@ static inline uint32_t get_prefix(void)
+>  	return current_prefix;
+>  }
+>  
+> +#endif /* __ASSEMBLER */
+>  #endif
 > diff --git a/s390x/cstart64.S b/s390x/cstart64.S
-> index 9af6bb3..ba2e67c 100644
+> index ba2e67c..e394b3a 100644
 > --- a/s390x/cstart64.S
 > +++ b/s390x/cstart64.S
-> @@ -118,6 +118,36 @@ memsetxc:
->  	lmg	%r0, %r15, GEN_LC_SW_INT_GRS
->  	.endm
-> =20
-> +/* Save registers on the stack (r15), so we can have stacked interrupt=
-s. */
-> +	.macro SAVE_IRQ_REGS
+> @@ -12,6 +12,7 @@
+>   */
+>  #include <asm/asm-offsets.h>
+>  #include <asm/sigp.h>
+> +#include <asm/arch_def.h>
+>  
+>  .section .init
+>  
+> @@ -225,19 +226,19 @@ svc_int:
+>  
+>  	.align	8
+>  reset_psw:
+> -	.quad	0x0008000180000000
+> +	.quad	PSW_RESET_MASK
 
-s/SAVE_IRQ_REGS/SAVE_REGS_STACK/ ?
+I'd really prefer
 
-Same for the other macro.
+.quad	PSW_EXCEPTION_MASK | PSW_MASK_SHORT_PSW
 
-> +	/* Allocate a stack frame for 15 integer registers */
+here instead and drop PSW_RESET_MASK. Makes it clearer that we are
+talking about a special short psw here.
 
-not integers. sizeof(int) =3D=3D 4.
-
-"doublewords" should be the right s390x speak.
-
-> +	slgfi   %r15, 15 * 8
-> +	/* Store all registers from r0 to r14 on the stack */
-> +	stmg    %r0, %r14, 0(%r15)
-> +	/* Allocate a stack frame for 16 floating point registers */
-> +	/* The size of a FP register is the size of an integer */
-> +	slgfi   %r15, 16 * 8
-> +	/* Save fp register on stack: offset to SP is multiple of reg number =
-*/
-> +	.irp i, 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
-> +	std	\i, \i * 8(%r15)
-> +	.endr
-> +	.endm
-
-What about the FPC?
-
-> +
-> +/* Restore the register in reverse order */
-> +	.macro RESTORE_IRQ_REGS
-> +	/* Restore fp register from stack: SP still where it was left */
-> +	/* and offset to SP is a multile of reg number */
-> +	.irp i, 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
-> +	ld	\i, \i * 8(%r15)
-> +	.endr
-> +	/* Now it is done, rewind the stack pointer by 16 integers */
-> +	algfi   %r15, 16 * 8
-> +	/* Load the registers from stack */
-> +	lmg     %r0, %r14, 0(%r15)
-> +	/* Rewind the stack by 15 integers */
-> +	algfi   %r15, 15 * 8
-> +	.endm
-
-Dito, FPC?
-
-> +
->  .section .text
->  /*
->   * load_reset calling convention:
-> @@ -182,9 +212,9 @@ mcck_int:
->  	lpswe	GEN_LC_MCCK_OLD_PSW
-> =20
->  io_int:
-> -	SAVE_REGS
-> +	SAVE_IRQ_REGS
->  	brasl	%r14, handle_io_int
-> -	RESTORE_REGS
-> +	RESTORE_IRQ_REGS
->  	lpswe	GEN_LC_IO_OLD_PSW
-> =20
->  svc_int:
->=20
+Apart from that, looks good to me.
 
 
---=20
+-- 
 Thanks,
 
 David / dhildenb
