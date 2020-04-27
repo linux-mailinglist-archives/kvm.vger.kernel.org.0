@@ -2,29 +2,29 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 494241BAC91
-	for <lists+kvm@lfdr.de>; Mon, 27 Apr 2020 20:26:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EF55E1BACAF
+	for <lists+kvm@lfdr.de>; Mon, 27 Apr 2020 20:30:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726497AbgD0S0d (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Apr 2020 14:26:33 -0400
-Received: from mga09.intel.com ([134.134.136.24]:21071 "EHLO mga09.intel.com"
+        id S1726523AbgD0SaP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Apr 2020 14:30:15 -0400
+Received: from mga03.intel.com ([134.134.136.65]:34512 "EHLO mga03.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726162AbgD0S0c (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Apr 2020 14:26:32 -0400
-IronPort-SDR: /agMUFcVb6+Ww6AMlBXvTgJ5A3borKSNLVU2nFb6WZyKAM+7B6DaMUDRJqb9ZaLq6AMRfKREzT
- //sElO4CTE7w==
+        id S1726189AbgD0SaP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Apr 2020 14:30:15 -0400
+IronPort-SDR: FH5ieVHTDZl2NcHKKYf3Qs7DeErajLnY5EAM0OEBjnqhXdmMpwSrJk3Wab0NNYh1W3Q0BZorGQ
+ 6oo8xKHAu1mw==
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Apr 2020 11:26:32 -0700
-IronPort-SDR: QbGgClW/+TE0gVxSFMjZWJg2qAiGhLr3Y9SG+yY6TZycF7vOAUC4Ky3zS+qzehEKuxIGaQA+Cl
- E4K0c4+GnLuQ==
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Apr 2020 11:30:14 -0700
+IronPort-SDR: dzNpUWnLy+BqQgkoHYn8J7WnmojkK9OYjkNk7tmyxglsZJEl8zaAD+fCzVBM4QOOGsJNp/sxSe
+ LJqMy4MasX9w==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.73,325,1583222400"; 
-   d="scan'208";a="247482032"
+   d="scan'208";a="281861522"
 Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
-  by fmsmga007.fm.intel.com with ESMTP; 27 Apr 2020 11:26:31 -0700
-Date:   Mon, 27 Apr 2020 11:26:31 -0700
+  by fmsmga004.fm.intel.com with ESMTP; 27 Apr 2020 11:30:13 -0700
+Date:   Mon, 27 Apr 2020 11:30:13 -0700
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
 To:     Wanpeng Li <kernellwp@gmail.com>
 Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
@@ -34,117 +34,116 @@ Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>,
         Haiwei Li <lihaiwei@tencent.com>
-Subject: Re: [PATCH v3 1/5] KVM: VMX: Introduce generic fastpath handler
-Message-ID: <20200427182631.GM14870@linux.intel.com>
+Subject: Re: [PATCH v3 2/5] KVM: X86: Introduce need_cancel_enter_guest helper
+Message-ID: <20200427183013.GN14870@linux.intel.com>
 References: <1587709364-19090-1-git-send-email-wanpengli@tencent.com>
- <1587709364-19090-2-git-send-email-wanpengli@tencent.com>
+ <1587709364-19090-3-git-send-email-wanpengli@tencent.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1587709364-19090-2-git-send-email-wanpengli@tencent.com>
+In-Reply-To: <1587709364-19090-3-git-send-email-wanpengli@tencent.com>
 User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Apr 24, 2020 at 02:22:40PM +0800, Wanpeng Li wrote:
+On Fri, Apr 24, 2020 at 02:22:41PM +0800, Wanpeng Li wrote:
 > From: Wanpeng Li <wanpengli@tencent.com>
 > 
-> Introduce generic fastpath handler to handle MSR fastpath, VMX-preemption 
-> timer fastpath etc. In addition, we can't observe benefit from single 
-> target IPI fastpath when APICv is disabled, let's just enable IPI and 
-> Timer fastpath when APICv is enabled for now.
-
-There are three different changes being squished into a single patch:
-
-  - Refactor code to add helper
-  - Change !APICv behavior for WRMSR fastpath
-  - Introduce EXIT_FASTPATH_CONT_RUN
-
-I don't think you necessarily need to break this into three separate
-patches, but's the !APICv change needs to be a standalone patch, especially
-given the shortlog.  E.g. the refactoring could be introduced along with
-the second fastpath case, and CONT_RUN could be introduced with its first
-usage.
-
+> Introduce need_cancel_enter_guest() helper, we need to check some 
+> conditions before doing CONT_RUN, in addition, it can also catch 
+> the case vmexit occurred while another event was being delivered 
+> to guest software since vmx_complete_interrupts() adds the request 
+> bit.
 > 
 > Tested-by: Haiwei Li <lihaiwei@tencent.com>
 > Cc: Haiwei Li <lihaiwei@tencent.com>
 > Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
 > ---
->  arch/x86/include/asm/kvm_host.h |  1 +
->  arch/x86/kvm/vmx/vmx.c          | 25 ++++++++++++++++++++-----
->  2 files changed, 21 insertions(+), 5 deletions(-)
+>  arch/x86/kvm/vmx/vmx.c | 12 +++++++-----
+>  arch/x86/kvm/x86.c     | 10 ++++++++--
+>  arch/x86/kvm/x86.h     |  1 +
+>  3 files changed, 16 insertions(+), 7 deletions(-)
 > 
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index f26df2c..6397723 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -188,6 +188,7 @@ enum {
->  enum exit_fastpath_completion {
->  	EXIT_FASTPATH_NONE,
->  	EXIT_FASTPATH_SKIP_EMUL_INS,
-> +	EXIT_FASTPATH_CONT_RUN,
->  };
->  
->  struct x86_emulate_ctxt;
 > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 766303b..f1f6638 100644
+> index f1f6638..5c21027 100644
 > --- a/arch/x86/kvm/vmx/vmx.c
 > +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -6559,6 +6559,20 @@ void vmx_update_host_rsp(struct vcpu_vmx *vmx, unsigned long host_rsp)
->  	}
->  }
->  
-> +static enum exit_fastpath_completion vmx_exit_handlers_fastpath(struct kvm_vcpu *vcpu)
-> +{
-> +	if (!is_guest_mode(vcpu) && vcpu->arch.apicv_active) {
-> +		switch (to_vmx(vcpu)->exit_reason) {
-> +		case EXIT_REASON_MSR_WRITE:
-> +			return handle_fastpath_set_msr_irqoff(vcpu);
-> +		default:
-> +			return EXIT_FASTPATH_NONE;
-> +		}
-> +	}
-> +
-> +	return EXIT_FASTPATH_NONE;
-> +}
-> +
->  bool __vmx_vcpu_run(struct vcpu_vmx *vmx, unsigned long *regs, bool launched);
+> @@ -6577,7 +6577,7 @@ bool __vmx_vcpu_run(struct vcpu_vmx *vmx, unsigned long *regs, bool launched);
 >  
 >  static enum exit_fastpath_completion vmx_vcpu_run(struct kvm_vcpu *vcpu)
-> @@ -6567,6 +6581,7 @@ static enum exit_fastpath_completion vmx_vcpu_run(struct kvm_vcpu *vcpu)
+>  {
+> -	enum exit_fastpath_completion exit_fastpath;
+> +	enum exit_fastpath_completion exit_fastpath = EXIT_FASTPATH_NONE;
 >  	struct vcpu_vmx *vmx = to_vmx(vcpu);
 >  	unsigned long cr3, cr4;
 >  
-> +cont_run:
->  	/* Record the guest's net vcpu time for enforced NMI injections. */
->  	if (unlikely(!enable_vnmi &&
->  		     vmx->loaded_vmcs->soft_vnmi_blocked))
-> @@ -6733,17 +6748,17 @@ static enum exit_fastpath_completion vmx_vcpu_run(struct kvm_vcpu *vcpu)
->  	if (unlikely(vmx->exit_reason & VMX_EXIT_REASONS_FAILED_VMENTRY))
->  		return EXIT_FASTPATH_NONE;
->  
-> -	if (!is_guest_mode(vcpu) && vmx->exit_reason == EXIT_REASON_MSR_WRITE)
-> -		exit_fastpath = handle_fastpath_set_msr_irqoff(vcpu);
-> -	else
-> -		exit_fastpath = EXIT_FASTPATH_NONE;
-> -
->  	vmx->loaded_vmcs->launched = 1;
->  	vmx->idt_vectoring_info = vmcs_read32(IDT_VECTORING_INFO_FIELD);
->  
+> @@ -6754,10 +6754,12 @@ static enum exit_fastpath_completion vmx_vcpu_run(struct kvm_vcpu *vcpu)
 >  	vmx_recover_nmi_blocking(vmx);
 >  	vmx_complete_interrupts(vmx);
 >  
-> +	exit_fastpath = vmx_exit_handlers_fastpath(vcpu);
-> +	/* static call is better with retpolines */
-> +	if (exit_fastpath == EXIT_FASTPATH_CONT_RUN)
-> +		goto cont_run;
-> +
+> -	exit_fastpath = vmx_exit_handlers_fastpath(vcpu);
+> -	/* static call is better with retpolines */
+> -	if (exit_fastpath == EXIT_FASTPATH_CONT_RUN)
+> -		goto cont_run;
+> +	if (!kvm_need_cancel_enter_guest(vcpu)) {
+> +		exit_fastpath = vmx_exit_handlers_fastpath(vcpu);
+> +		/* static call is better with retpolines */
+> +		if (exit_fastpath == EXIT_FASTPATH_CONT_RUN)
+> +			goto cont_run;
+> +	}
+>  
 >  	return exit_fastpath;
 >  }
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 59958ce..4561104 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -1581,6 +1581,13 @@ int kvm_emulate_wrmsr(struct kvm_vcpu *vcpu)
+>  }
+>  EXPORT_SYMBOL_GPL(kvm_emulate_wrmsr);
 >  
+> +bool kvm_need_cancel_enter_guest(struct kvm_vcpu *vcpu)
+
+What about kvm_vcpu_<???>_pending()?  Not sure what a good ??? would be.
+The "cancel_enter_guest" wording is a bit confusing when this is called
+from the VM-Exit path.
+
+> +{
+> +	return (vcpu->mode == EXITING_GUEST_MODE || kvm_request_pending(vcpu)
+> +	    || need_resched() || signal_pending(current));
+
+Parantheses around the whole statement are unnecessary.  Personal preference
+is to put the || before the newline.
+
+> +}
+> +EXPORT_SYMBOL_GPL(kvm_need_cancel_enter_guest);
+> +
+>  /*
+>   * The fast path for frequent and performance sensitive wrmsr emulation,
+>   * i.e. the sending of IPI, sending IPI early in the VM-Exit flow reduces
+> @@ -8373,8 +8380,7 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+>  	if (kvm_lapic_enabled(vcpu) && vcpu->arch.apicv_active)
+>  		kvm_x86_ops.sync_pir_to_irr(vcpu);
+>  
+> -	if (vcpu->mode == EXITING_GUEST_MODE || kvm_request_pending(vcpu)
+> -	    || need_resched() || signal_pending(current)) {
+> +	if (kvm_need_cancel_enter_guest(vcpu)) {
+>  		vcpu->mode = OUTSIDE_GUEST_MODE;
+>  		smp_wmb();
+>  		local_irq_enable();
+> diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
+> index 7b5ed8e..1906e7e 100644
+> --- a/arch/x86/kvm/x86.h
+> +++ b/arch/x86/kvm/x86.h
+> @@ -364,5 +364,6 @@ static inline bool kvm_dr7_valid(u64 data)
+>  void kvm_load_guest_xsave_state(struct kvm_vcpu *vcpu);
+>  void kvm_load_host_xsave_state(struct kvm_vcpu *vcpu);
+>  u64 kvm_spec_ctrl_valid_bits(struct kvm_vcpu *vcpu);
+> +bool kvm_need_cancel_enter_guest(struct kvm_vcpu *vcpu);
+>  
+>  #endif
 > -- 
 > 2.7.4
 > 
