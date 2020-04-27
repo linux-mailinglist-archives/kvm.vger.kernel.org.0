@@ -2,349 +2,339 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B37A11BA434
-	for <lists+kvm@lfdr.de>; Mon, 27 Apr 2020 15:05:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 753291BA438
+	for <lists+kvm@lfdr.de>; Mon, 27 Apr 2020 15:06:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727055AbgD0NFc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Apr 2020 09:05:32 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:22376 "EHLO
+        id S1727098AbgD0NG4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Apr 2020 09:06:56 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:17390 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727022AbgD0NFc (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 27 Apr 2020 09:05:32 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 03RD2K8u062746
-        for <kvm@vger.kernel.org>; Mon, 27 Apr 2020 09:05:32 -0400
-Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 30mggt5da4-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Mon, 27 Apr 2020 09:05:31 -0400
-Received: from localhost
-        by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <freude@linux.ibm.com>;
-        Mon, 27 Apr 2020 14:05:01 +0100
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
-        by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Mon, 27 Apr 2020 14:04:58 +0100
-Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 03RD5OJe65798298
+        by vger.kernel.org with ESMTP id S1727001AbgD0NG4 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 27 Apr 2020 09:06:56 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 03RD257V046103;
+        Mon, 27 Apr 2020 09:06:54 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 30mfhcxh7p-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 27 Apr 2020 09:06:54 -0400
+Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 03RD4ISS055914;
+        Mon, 27 Apr 2020 09:06:54 -0400
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 30mfhcxh6f-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 27 Apr 2020 09:06:53 -0400
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+        by ppma02fra.de.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 03RCoXBL019535;
+        Mon, 27 Apr 2020 13:06:51 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma02fra.de.ibm.com with ESMTP id 30mcu7uvwq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 27 Apr 2020 13:06:51 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 03RD6nZ357540698
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 27 Apr 2020 13:05:24 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 71B5442047;
-        Mon, 27 Apr 2020 13:05:24 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 8714942045;
-        Mon, 27 Apr 2020 13:05:23 +0000 (GMT)
-Received: from funtu.home (unknown [9.171.70.169])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon, 27 Apr 2020 13:05:23 +0000 (GMT)
-Subject: Re: [PATCH v7 01/15] s390/vfio-ap: store queue struct in hash table
- for quick access
-To:     Halil Pasic <pasic@linux.ibm.com>,
-        Tony Krowiak <akrowiak@linux.ibm.com>
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, borntraeger@de.ibm.com, cohuck@redhat.com,
-        mjrosato@linux.ibm.com, pmorel@linux.ibm.com,
-        alex.williamson@redhat.com, kwankhede@nvidia.com,
-        jjherne@linux.ibm.com, fiuczy@linux.ibm.com
-References: <20200407192015.19887-1-akrowiak@linux.ibm.com>
- <20200407192015.19887-2-akrowiak@linux.ibm.com>
- <20200424055732.7663896d.pasic@linux.ibm.com>
-From:   Harald Freudenberger <freude@linux.ibm.com>
-Date:   Mon, 27 Apr 2020 15:05:23 +0200
+        Mon, 27 Apr 2020 13:06:49 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 4ADD95204F;
+        Mon, 27 Apr 2020 13:06:49 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.145.33.119])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id E314A52050;
+        Mon, 27 Apr 2020 13:06:48 +0000 (GMT)
+Subject: Re: [kvm-unit-tests PATCH v6 06/10] s390x: css: stsch, enumeration
+ test
+To:     Pierre Morel <pmorel@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, david@redhat.com, thuth@redhat.com,
+        cohuck@redhat.com
+References: <1587725152-25569-1-git-send-email-pmorel@linux.ibm.com>
+ <1587725152-25569-7-git-send-email-pmorel@linux.ibm.com>
+From:   Janosch Frank <frankja@linux.ibm.com>
+Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <2f1e27a9-1cb2-79b2-b655-6f170431a14f@linux.ibm.com>
+Date:   Mon, 27 Apr 2020 15:06:48 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <20200424055732.7663896d.pasic@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
+In-Reply-To: <1587725152-25569-7-git-send-email-pmorel@linux.ibm.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="Aq0bUnkXJUTuQNnQsgaJGCELpHbwGkafP"
 X-TM-AS-GCONF: 00
-x-cbid: 20042713-0012-0000-0000-000003AB8211
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20042713-0013-0000-0000-000021E8E023
-Message-Id: <d15b4a8e-66eb-e4ce-c8ac-6885519940aa@linux.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.676
  definitions=2020-04-27_09:2020-04-24,2020-04-27 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 spamscore=0
- suspectscore=0 mlxscore=0 lowpriorityscore=0 adultscore=0 phishscore=0
- bulkscore=0 priorityscore=1501 malwarescore=0 clxscore=1015
- mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 suspectscore=0
+ phishscore=0 lowpriorityscore=0 bulkscore=0 adultscore=0 mlxlogscore=999
+ malwarescore=0 impostorscore=0 clxscore=1015 priorityscore=1501
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2003020000 definitions=main-2004270113
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 24.04.20 05:57, Halil Pasic wrote:
-> On Tue,  7 Apr 2020 15:20:01 -0400
-> Tony Krowiak <akrowiak@linux.ibm.com> wrote:
->
->> Rather than looping over potentially 65535 objects, let's store the
->> structures for caching information about queue devices bound to the
->> vfio_ap device driver in a hash table keyed by APQN.
-> @Harald:
-> Would it make sense to make the efficient lookup of an apqueue base
-> on its APQN core AP functionality instead of each driver figuring it out
-> on it's own?
->
-> If I'm not wrong the zcrypt device/driver(s) must the problem of
-> looking up a queue based on its APQN as well.
->
-> For instance struct ep11_cprb has a target_id filed
-> (arch/s390/include/uapi/asm/zcrypt.h).
->
-> Regards,
-> Halil
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--Aq0bUnkXJUTuQNnQsgaJGCELpHbwGkafP
+Content-Type: multipart/mixed; boundary="Y95dPwLfgyXzPR3Grej7fTOORbhD9gPwz"
 
-Hi Halil
+--Y95dPwLfgyXzPR3Grej7fTOORbhD9gPwz
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-no, the zcrypt drivers don't have this problem. They build up their own device object which
-includes a pointer to the base ap device.
+On 4/24/20 12:45 PM, Pierre Morel wrote:
+> First step for testing the channel subsystem is to enumerate the css an=
+d
+> retrieve the css devices.
+>=20
+> This tests the success of STSCH I/O instruction, we do not test the
+> reaction of the VM for an instruction with wrong parameters.
+>=20
+> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+> ---
+>  lib/s390x/css.h     |  1 +
+>  s390x/Makefile      |  2 +
+>  s390x/css.c         | 92 +++++++++++++++++++++++++++++++++++++++++++++=
 
-However, this is not a big issue, as the ap_bus holds a list of ap_card objects and within each
-ap_card object there exists a list of ap_queues. So if Tony want's I could provide a function like
+>  s390x/unittests.cfg |  4 ++
+>  4 files changed, 99 insertions(+)
+>  create mode 100644 s390x/css.c
+>=20
+> diff --git a/lib/s390x/css.h b/lib/s390x/css.h
+> index bab0dd5..9417541 100644
+> --- a/lib/s390x/css.h
+> +++ b/lib/s390x/css.h
+> @@ -82,6 +82,7 @@ struct pmcw {
+>  	uint8_t  chpid[8];
+>  	uint32_t flags2;
+>  };
+> +#define PMCW_CHANNEL_TYPE(pmcw) (pmcw->flags2 >> 21)
 
-struct ap_queue *ap_get_ap_queue_dev(ap_qid_t qid);
+Why isn't this in the library patch?
 
-Which returns a ptr to an ap_queue device or an error ptr. It would also do a get_device() on the
-device within the ap_queue struct (and would need to run a put_device() after the caller has
-finished using the ap_queue).
+> =20
+>  struct schib {
+>  	struct pmcw pmcw;
+> diff --git a/s390x/Makefile b/s390x/Makefile
+> index ddb4b48..baebf18 100644
+> --- a/s390x/Makefile
+> +++ b/s390x/Makefile
+> @@ -17,6 +17,7 @@ tests +=3D $(TEST_DIR)/stsi.elf
+>  tests +=3D $(TEST_DIR)/skrf.elf
+>  tests +=3D $(TEST_DIR)/smp.elf
+>  tests +=3D $(TEST_DIR)/sclp.elf
+> +tests +=3D $(TEST_DIR)/css.elf
+>  tests_binary =3D $(patsubst %.elf,%.bin,$(tests))
+> =20
+>  all: directories test_cases test_cases_binary
+> @@ -51,6 +52,7 @@ cflatobjs +=3D lib/s390x/sclp-console.o
+>  cflatobjs +=3D lib/s390x/interrupt.o
+>  cflatobjs +=3D lib/s390x/mmu.o
+>  cflatobjs +=3D lib/s390x/smp.o
+> +cflatobjs +=3D lib/s390x/css_dump.o
 
-Tony just tell me, if I should go forward and provide this to you.
+Why isn't this in the library patch?
 
-regards
-Harald 
+> =20
+>  OBJDIRS +=3D lib/s390x
+> =20
+> diff --git a/s390x/css.c b/s390x/css.c
+> new file mode 100644
+> index 0000000..cc97e79
+> --- /dev/null
+> +++ b/s390x/css.c
+> @@ -0,0 +1,92 @@
+> +/*
+> + * Channel Subsystem tests
+> + *
+> + * Copyright (c) 2020 IBM Corp
+> + *
+> + * Authors:
+> + *  Pierre Morel <pmorel@linux.ibm.com>
+> + *
+> + * This code is free software; you can redistribute it and/or modify i=
+t
+> + * under the terms of the GNU General Public License version 2.
+> + */
+> +
+> +#include <libcflat.h>
+> +#include <alloc_phys.h>
+> +#include <asm/page.h>
+> +#include <string.h>
+> +#include <interrupt.h>
+> +#include <asm/arch_def.h>
+> +
+> +#include <css.h>
+> +
+> +#define SID_ONE		0x00010000
 
->
->> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
->> ---
->>  drivers/s390/crypto/vfio_ap_drv.c     | 28 +++------
->>  drivers/s390/crypto/vfio_ap_ops.c     | 90 ++++++++++++++-------------
->>  drivers/s390/crypto/vfio_ap_private.h | 10 ++-
->>  3 files changed, 60 insertions(+), 68 deletions(-)
->>
->> diff --git a/drivers/s390/crypto/vfio_ap_drv.c b/drivers/s390/crypto/vfio_ap_drv.c
->> index be2520cc010b..e9c226c0730e 100644
->> --- a/drivers/s390/crypto/vfio_ap_drv.c
->> +++ b/drivers/s390/crypto/vfio_ap_drv.c
->> @@ -51,15 +51,9 @@ MODULE_DEVICE_TABLE(vfio_ap, ap_queue_ids);
->>   */
->>  static int vfio_ap_queue_dev_probe(struct ap_device *apdev)
->>  {
->> -	struct vfio_ap_queue *q;
->> -
->> -	q = kzalloc(sizeof(*q), GFP_KERNEL);
->> -	if (!q)
->> -		return -ENOMEM;
->> -	dev_set_drvdata(&apdev->device, q);
->> -	q->apqn = to_ap_queue(&apdev->device)->qid;
->> -	q->saved_isc = VFIO_AP_ISC_INVALID;
->> -	return 0;
->> +	struct ap_queue *queue = to_ap_queue(&apdev->device);
->> +
->> +	return vfio_ap_mdev_probe_queue(queue);
->>  }
->>  
->>  /**
->> @@ -70,18 +64,9 @@ static int vfio_ap_queue_dev_probe(struct ap_device *apdev)
->>   */
->>  static void vfio_ap_queue_dev_remove(struct ap_device *apdev)
->>  {
->> -	struct vfio_ap_queue *q;
->> -	int apid, apqi;
->> -
->> -	mutex_lock(&matrix_dev->lock);
->> -	q = dev_get_drvdata(&apdev->device);
->> -	dev_set_drvdata(&apdev->device, NULL);
->> -	apid = AP_QID_CARD(q->apqn);
->> -	apqi = AP_QID_QUEUE(q->apqn);
->> -	vfio_ap_mdev_reset_queue(apid, apqi, 1);
->> -	vfio_ap_irq_disable(q);
->> -	kfree(q);
->> -	mutex_unlock(&matrix_dev->lock);
->> +	struct ap_queue *queue = to_ap_queue(&apdev->device);
->> +
->> +	vfio_ap_mdev_remove_queue(queue);
->>  }
->>  
->>  static void vfio_ap_matrix_dev_release(struct device *dev)
->> @@ -135,6 +120,7 @@ static int vfio_ap_matrix_dev_create(void)
->>  
->>  	mutex_init(&matrix_dev->lock);
->>  	INIT_LIST_HEAD(&matrix_dev->mdev_list);
->> +	hash_init(matrix_dev->qtable);
->>  
->>  	dev_set_name(&matrix_dev->device, "%s", VFIO_AP_DEV_NAME);
->>  	matrix_dev->device.parent = root_device;
->> diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
->> index 5c0f53c6dde7..134860934fe7 100644
->> --- a/drivers/s390/crypto/vfio_ap_ops.c
->> +++ b/drivers/s390/crypto/vfio_ap_ops.c
->> @@ -26,45 +26,16 @@
->>  
->>  static int vfio_ap_mdev_reset_queues(struct mdev_device *mdev);
->>  
->> -static int match_apqn(struct device *dev, const void *data)
->> -{
->> -	struct vfio_ap_queue *q = dev_get_drvdata(dev);
->> -
->> -	return (q->apqn == *(int *)(data)) ? 1 : 0;
->> -}
->> -
->> -/**
->> - * vfio_ap_get_queue: Retrieve a queue with a specific APQN from a list
->> - * @matrix_mdev: the associated mediated matrix
->> - * @apqn: The queue APQN
->> - *
->> - * Retrieve a queue with a specific APQN from the list of the
->> - * devices of the vfio_ap_drv.
->> - * Verify that the APID and the APQI are set in the matrix.
->> - *
->> - * Returns the pointer to the associated vfio_ap_queue
->> - */
->> -static struct vfio_ap_queue *vfio_ap_get_queue(
->> -					struct ap_matrix_mdev *matrix_mdev,
->> -					int apqn)
->> +struct vfio_ap_queue *vfio_ap_get_queue(unsigned long apqn)
->>  {
->>  	struct vfio_ap_queue *q;
->> -	struct device *dev;
->> -
->> -	if (!test_bit_inv(AP_QID_CARD(apqn), matrix_mdev->matrix.apm))
->> -		return NULL;
->> -	if (!test_bit_inv(AP_QID_QUEUE(apqn), matrix_mdev->matrix.aqm))
->> -		return NULL;
->> -
->> -	dev = driver_find_device(&matrix_dev->vfio_ap_drv->driver, NULL,
->> -				 &apqn, match_apqn);
->> -	if (!dev)
->> -		return NULL;
->> -	q = dev_get_drvdata(dev);
->> -	q->matrix_mdev = matrix_mdev;
->> -	put_device(dev);
->>  
->> -	return q;
->> +	hash_for_each_possible(matrix_dev->qtable, q, qnode, apqn) {
->> +		if (q && (apqn == q->apqn))
->> +			return q;
->> +	}
->> +
->> +	return NULL;
->>  }
->>  
->>  /**
->> @@ -293,10 +264,11 @@ static int handle_pqap(struct kvm_vcpu *vcpu)
->>  	matrix_mdev = container_of(vcpu->kvm->arch.crypto.pqap_hook,
->>  				   struct ap_matrix_mdev, pqap_hook);
->>  
->> -	q = vfio_ap_get_queue(matrix_mdev, apqn);
->> +	q = vfio_ap_get_queue(apqn);
->>  	if (!q)
->>  		goto out_unlock;
->>  
->> +	q->matrix_mdev = matrix_mdev;
->>  	status = vcpu->run->s.regs.gprs[1];
->>  
->>  	/* If IR bit(16) is set we enable the interrupt */
->> @@ -1116,16 +1088,11 @@ static int vfio_ap_mdev_group_notifier(struct notifier_block *nb,
->>  
->>  static void vfio_ap_irq_disable_apqn(int apqn)
->>  {
->> -	struct device *dev;
->>  	struct vfio_ap_queue *q;
->>  
->> -	dev = driver_find_device(&matrix_dev->vfio_ap_drv->driver, NULL,
->> -				 &apqn, match_apqn);
->> -	if (dev) {
->> -		q = dev_get_drvdata(dev);
->> +	q = vfio_ap_get_queue(apqn);
->> +	if (q)
->>  		vfio_ap_irq_disable(q);
->> -		put_device(dev);
->> -	}
->>  }
->>  
->>  int vfio_ap_mdev_reset_queue(unsigned int apid, unsigned int apqi,
->> @@ -1302,3 +1269,38 @@ void vfio_ap_mdev_unregister(void)
->>  {
->>  	mdev_unregister_device(&matrix_dev->device);
->>  }
->> +
->> +int vfio_ap_mdev_probe_queue(struct ap_queue *queue)
->> +{
->> +	struct vfio_ap_queue *q;
->> +
->> +	q = kzalloc(sizeof(*q), GFP_KERNEL);
->> +	if (!q)
->> +		return -ENOMEM;
->> +
->> +	mutex_lock(&matrix_dev->lock);
->> +	dev_set_drvdata(&queue->ap_dev.device, q);
->> +	q->apqn = queue->qid;
->> +	q->saved_isc = VFIO_AP_ISC_INVALID;
->> +	hash_add(matrix_dev->qtable, &q->qnode, q->apqn);
->> +	mutex_unlock(&matrix_dev->lock);
->> +
->> +	return 0;
->> +}
->> +
->> +void vfio_ap_mdev_remove_queue(struct ap_queue *queue)
->> +{
->> +	struct vfio_ap_queue *q;
->> +	int apid, apqi;
->> +
->> +	mutex_lock(&matrix_dev->lock);
->> +	q = dev_get_drvdata(&queue->ap_dev.device);
->> +	dev_set_drvdata(&queue->ap_dev.device, NULL);
->> +	apid = AP_QID_CARD(q->apqn);
->> +	apqi = AP_QID_QUEUE(q->apqn);
->> +	vfio_ap_mdev_reset_queue(apid, apqi, 1);
->> +	vfio_ap_irq_disable(q);
->> +	hash_del(&q->qnode);
->> +	kfree(q);
->> +	mutex_unlock(&matrix_dev->lock);
->> +}
->> diff --git a/drivers/s390/crypto/vfio_ap_private.h b/drivers/s390/crypto/vfio_ap_private.h
->> index f46dde56b464..e1f8c82cc55d 100644
->> --- a/drivers/s390/crypto/vfio_ap_private.h
->> +++ b/drivers/s390/crypto/vfio_ap_private.h
->> @@ -18,6 +18,7 @@
->>  #include <linux/delay.h>
->>  #include <linux/mutex.h>
->>  #include <linux/kvm_host.h>
->> +#include <linux/hashtable.h>
->>  
->>  #include "ap_bus.h"
->>  
->> @@ -43,6 +44,7 @@ struct ap_matrix_dev {
->>  	struct list_head mdev_list;
->>  	struct mutex lock;
->>  	struct ap_driver  *vfio_ap_drv;
->> +	DECLARE_HASHTABLE(qtable, 8);
->>  };
->>  
->>  extern struct ap_matrix_dev *matrix_dev;
->> @@ -90,8 +92,6 @@ struct ap_matrix_mdev {
->>  
->>  extern int vfio_ap_mdev_register(void);
->>  extern void vfio_ap_mdev_unregister(void);
->> -int vfio_ap_mdev_reset_queue(unsigned int apid, unsigned int apqi,
->> -			     unsigned int retry);
->>  
->>  struct vfio_ap_queue {
->>  	struct ap_matrix_mdev *matrix_mdev;
->> @@ -99,6 +99,10 @@ struct vfio_ap_queue {
->>  	int	apqn;
->>  #define VFIO_AP_ISC_INVALID 0xff
->>  	unsigned char saved_isc;
->> +	struct hlist_node qnode;
->>  };
->> -struct ap_queue_status vfio_ap_irq_disable(struct vfio_ap_queue *q);
->> +
->> +int vfio_ap_mdev_probe_queue(struct ap_queue *queue);
->> +void vfio_ap_mdev_remove_queue(struct ap_queue *queue);
->> +
->>  #endif /* _VFIO_AP_PRIVATE_H_ */
+Why isn't this in the library patch?
+
+> +
+> +static struct schib schib;
+> +static int test_device_sid;
+> +
+> +static void test_enumerate(void)
+> +{
+> +	struct pmcw *pmcw =3D &schib.pmcw;
+> +	int cc;
+> +	int scn;
+> +	int scn_found =3D 0;
+> +	int dev_found =3D 0;
+> +
+> +	for (scn =3D 0; scn < 0xffff; scn++) {
+> +		cc =3D stsch(scn|SID_ONE, &schib);
+> +		switch (cc) {
+> +		case 0:		/* 0 means SCHIB stored */
+> +			break;
+> +		case 3:		/* 3 means no more channels */
+> +			goto out;
+> +		default:	/* 1 or 2 should never happened for STSCH */
+> +			report(0, "Unexpected cc=3D%d on subchannel number 0x%x",
+> +			       cc, scn);
+> +			return;
+> +		}
+> +		/* We currently only support type 0, a.k.a. I/O channels */
+> +		if (PMCW_CHANNEL_TYPE(pmcw) !=3D 0)
+> +			continue;
+> +		/* We ignore I/O channels without valid devices */
+> +		scn_found++;
+> +		if (!(pmcw->flags & PMCW_DNV))
+> +			continue;
+> +		/* We keep track of the first device as our test device */
+> +		if (!test_device_sid)
+> +			test_device_sid =3D scn|SID_ONE;
+
+Give the pipe some space :)
+
+> +		dev_found++;
+
+Newlines would make this more readable.
+
+> +	}
+> +out:
+
+We can report dev_found instead of 0/1 and a if/else
+
+report(dev_found,
+	"Tested subchannels: %d, I/O subchannels: %d, I/O devices: %d",
+                    scn, scn_found, dev_found);=09
+
+> +	if (!dev_found) {
+> +		report(0,
+> +		       "Tested subchannels: %d, I/O subchannels: %d, I/O devices: %d=
+",
+> +		       scn, scn_found, dev_found);
+> +		return;
+> +	}
+> +	report(1,
+> +	       "Tested subchannels: %d, I/O subchannels: %d, I/O devices: %d"=
+,
+> +	       scn, scn_found, dev_found);
+> +}
+> +
+> +static struct {
+> +	const char *name;
+> +	void (*func)(void);
+> +} tests[] =3D {
+> +	{ "enumerate (stsch)", test_enumerate },
+> +	{ NULL, NULL }
+> +};
+> +
+> +int main(int argc, char *argv[])
+> +{
+> +	int i;
+> +
+> +	report_prefix_push("Channel Subsystem");
+> +	for (i =3D 0; tests[i].name; i++) {
+> +		report_prefix_push(tests[i].name);
+> +		tests[i].func();
+> +		report_prefix_pop();
+> +	}
+> +	report_prefix_pop();
+> +
+> +	return report_summary();
+> +}
+> diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
+> index 07013b2..a436ec0 100644
+> --- a/s390x/unittests.cfg
+> +++ b/s390x/unittests.cfg
+> @@ -83,3 +83,7 @@ extra_params =3D -m 1G
+>  [sclp-3g]
+>  file =3D sclp.elf
+>  extra_params =3D -m 3G
+> +
+> +[css]
+> +file =3D css.elf
+> +extra_params =3D-device ccw-pong
+>=20
+
+
+
+--Y95dPwLfgyXzPR3Grej7fTOORbhD9gPwz--
+
+--Aq0bUnkXJUTuQNnQsgaJGCELpHbwGkafP
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl6m2OgACgkQ41TmuOI4
+ufimLg/+Kt1j5l3VyTURlS5kWRzPhJf4kcLS79Xdj/b/Wdmny6e62anAuEptD+5A
+aRinGtalQ5UC1EebK7U+k8bsmeuwoU4J/h2ZSqDmcvKEj8xAp/SkMKWggOvJNveI
+ojjLnt0313WCFn7i6oYZqkCdqOYraNg8rBQHfuoejOoNHJqITiV33m94U7P/71ZW
+HIzKtAE1WpTe5dt/8mxzpbJT2GNiDb1AlqmBwSh84qrgWEtmpw7f0dx3TlL5mqzi
+DGo8+r51mpaWHndSu0TIHbwF6HBYT/T5jmCabAE0NtGAhOCe23xQdiX2H92/8LYI
+xY35YGVwjfDcSGX0v2RUq6uUKl4tJlG3+TG5O0rEJmJ6FYmVYstCIVfN6FJI5CSP
+YBqqHZO7z8+3wRMCL6HloiS4O3VADLL/YbwmSKVGDBhoxtEvhZk7PmlBf69NqKDn
+Zxsy8ocILtuExcOlRAhtGyEcbksK4Gsk3q4t00r2OocsgGG+1bFEd0o6NrAmasCV
+x4ADyumzf1ymWmZiHKePbN30mx2F6YdOPmj5CYib/ALBkaoy7V0R6+959v/jmEvw
+i88JnT7zMr9GKlW0HSdkxhCE/Xnt2BxVHZ45fdMs6fk/8gddifKewwPNsy8D/bqk
+N19IQlc+UrY0+q36CEFhPd1U1qPJPl5LODWZ8svHtRJ3HDpeGy4=
+=tLCB
+-----END PGP SIGNATURE-----
+
+--Aq0bUnkXJUTuQNnQsgaJGCELpHbwGkafP--
 
