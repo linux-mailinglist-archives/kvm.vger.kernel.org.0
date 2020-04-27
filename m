@@ -2,108 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 444E81BAB34
-	for <lists+kvm@lfdr.de>; Mon, 27 Apr 2020 19:28:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 11DAF1BAB4E
+	for <lists+kvm@lfdr.de>; Mon, 27 Apr 2020 19:30:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726372AbgD0R2K (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Apr 2020 13:28:10 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:44962 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726030AbgD0R2K (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Apr 2020 13:28:10 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1588008488;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=AIdh8aRRTeVMDlIVe128qbh6x+vMtm/fPvnZdxCsjFc=;
-        b=OUYBdPcBz41whDEAW3YRly0U+ea4oFKl2SXHUGsadCFtZ3WFkoCMwbBCelbSB8AGAoEcuu
-        OJ62nniLq2bh7gYVNFEqnuSd099PCFLZzCtrysmAq57SGm1pS0mrhGRjuahmTXN817xOfd
-        WJxaczEMMjJM7m09EextrrkE6H3bbtg=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-243-20Ic7UlqPWqdsT5ENwH9tQ-1; Mon, 27 Apr 2020 13:28:07 -0400
-X-MC-Unique: 20Ic7UlqPWqdsT5ENwH9tQ-1
-Received: by mail-wm1-f72.google.com with SMTP id l21so156441wmh.2
-        for <kvm@vger.kernel.org>; Mon, 27 Apr 2020 10:28:06 -0700 (PDT)
+        id S1726384AbgD0Raf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Apr 2020 13:30:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34408 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725980AbgD0Rae (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Apr 2020 13:30:34 -0400
+Received: from mail-il1-x130.google.com (mail-il1-x130.google.com [IPv6:2607:f8b0:4864:20::130])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB687C0610D5
+        for <kvm@vger.kernel.org>; Mon, 27 Apr 2020 10:30:34 -0700 (PDT)
+Received: by mail-il1-x130.google.com with SMTP id s10so17463917iln.11
+        for <kvm@vger.kernel.org>; Mon, 27 Apr 2020 10:30:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=WAmnZAQqsfdyDzhsu6wAOJW6mDvNQHToHiDwv+tvXL0=;
+        b=rM6jBlbJF1p0rjqRj7enKn0xq7UtAq83W7/SMdsqwx7j8hmwJeU36VtGxm8+GhlYgi
+         Ve6dpPf9g/k7UAXG5Kz3hp4z6YzgMyETLRyzSpcdDp9PkOJjRsWZGuyxr1Guxa1Qgx5h
+         9HsDiljnE8iqsOYg9kr3Nl0Y+4k6JN3ZLOUNhj4aKH1LQtSMaK9Zmf8fLI2E78lgUGHz
+         Rd/Gk7s4nR2oYB/JsvK/t2tZ4Pk9T0UC45bJ22686Gnmk1YPYfR5ss4L+L95lXOsU5ev
+         WlZvRr3Z3PaNGYEQoz8EazMzdRqDlGQ/y/xmK9Z8BLvfiiLjQv1f3l6cJNPklESdAKt9
+         c2WA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=AIdh8aRRTeVMDlIVe128qbh6x+vMtm/fPvnZdxCsjFc=;
-        b=a3eu7JvBzdmrGPj4U95j2gSBAJbSNwvG00lr5CXKvzfLnTq9HiE+6UuIafOV3esZUC
-         NznwnD8fNJv6aDVIOlgxJHlfE+C/I/teSxs4nL2AbuFS3v9Xx/YwE/KRdPcVMA/4ywdZ
-         7zXmizHAu9cOhVM9/l2cdZPxcbabM2VHTmueUAsnZlBfvB5n36yvCt7PgXm78MleHvC8
-         q6X35C3QTDamYX08cGJfHB8rVXFQiojR27U16SW3tYvwY8Cs860FB5Sa8ZGTGvZKXtGv
-         g2zbjWMw+JYBIiiCZWwTcZWF+YmE6QFAmSA7fwWtS0Ke18uDcPU4RAWEQStje0O/K8iz
-         K6LQ==
-X-Gm-Message-State: AGi0PuZ+icXqoMq+wYcwXOjF5eEQ7GYsI8SzazD12sX/suXOgYZnMbQu
-        o1tIf98ddohpRgCUX8CaGTmYg/18Xua6oY0TzvTO8P5AWmi1cs2YUBKWS4O16r6ldOH/WqFTmhC
-        ScSDnOsD+mdfN
-X-Received: by 2002:adf:fe51:: with SMTP id m17mr28105888wrs.414.1588008485623;
-        Mon, 27 Apr 2020 10:28:05 -0700 (PDT)
-X-Google-Smtp-Source: APiQypK7mAxrF469/q2T6gwPBIgiv6em6qBY0yYH5Pgcqs55CxifERpdCZbEIn1L7QLLUTzS2XWc8w==
-X-Received: by 2002:adf:fe51:: with SMTP id m17mr28105867wrs.414.1588008485367;
-        Mon, 27 Apr 2020 10:28:05 -0700 (PDT)
-Received: from [192.168.10.150] ([93.56.170.5])
-        by smtp.gmail.com with ESMTPSA id s14sm15422654wmh.18.2020.04.27.10.28.03
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 27 Apr 2020 10:28:04 -0700 (PDT)
-Subject: Re: [PATCH] KVM: VMX: Use accessor to read vmcs.INTR_INFO when
- handling exception
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20200427171837.22613-1-sean.j.christopherson@intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <8123dc4b-a449-a92c-85a1-c255fa2bbbca@redhat.com>
-Date:   Mon, 27 Apr 2020 19:28:02 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=WAmnZAQqsfdyDzhsu6wAOJW6mDvNQHToHiDwv+tvXL0=;
+        b=gpHVKnXIDYAohorGYCVvc7H3LzYv0sKf61k7J9swWMN3Gs7fTkzxlWGxmgzMiVCIlj
+         vDnrG5gbYYZexMFkB0cKTQaXgT4kTRCNtqh/gXmD4ymgGNerk4bEgPEX6pcQNdjQ0Scl
+         xZ3GXfklI/5BrQxk5BbF0ZF5jZX/IIOUaStjPoQKBlsDwM02MLJOI26IB4lo/PRCkn3l
+         9YqFtO1MolhR8qYFxeQMZKTpWhMGijY8x7aznZNWtwXNF+ZumD7dlE6q1oTnOCx+U+Ni
+         Mfc2dNC0n0h4AypUiJkUi6M+qwQA3ZBuTv9pmt08BZ8Yavtm77Iz7NZaYvlJMQxiTcBm
+         kQSw==
+X-Gm-Message-State: AGi0PubAO7QAETSMa+tsNBNNC4uPYDuk7d5egy9HrUCbRuidhHw2IU2o
+        wCKbqrAFhYClXokIkwmJM8WeNt7qg/xECXHoFhD99A==
+X-Google-Smtp-Source: APiQypLYGcoWKQQgcyvEo8F50ZL+lo84Kee1KKs7UcdGmTDiIyOyUYlVajqWTGznlrcpj+c81fTJlOxSHfqZrkYwiqE=
+X-Received: by 2002:a92:da4e:: with SMTP id p14mr22191527ilq.296.1588008633445;
+ Mon, 27 Apr 2020 10:30:33 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200427171837.22613-1-sean.j.christopherson@intel.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <1587704935-30960-1-git-send-email-lirongqing@baidu.com>
+ <20200424100143.GZ20730@hirez.programming.kicks-ass.net> <20200424144625.GB30013@linux.intel.com>
+ <CALMp9eQtSrZMRQtxa_Z5WmjayWzJYhSrpNkQbqK5b7Ufxg-cMA@mail.gmail.com>
+ <ce51d5f9-aa7b-233b-883d-802d9b00e090@redhat.com> <fd2a8092edf54a85979e5781dc354690@baidu.com>
+In-Reply-To: <fd2a8092edf54a85979e5781dc354690@baidu.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Mon, 27 Apr 2020 10:30:22 -0700
+Message-ID: <CALMp9eQrGuqzy_ZRu+qU3A7PRkoi8JHWFRpm---cMhp9+J4j8A@mail.gmail.com>
+Subject: Re: [PATCH] [RFC] kvm: x86: emulate APERF/MPERF registers
+To:     "Li,Rongqing" <lirongqing@baidu.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        kvm list <kvm@vger.kernel.org>,
+        "the arch/x86 maintainers" <x86@kernel.org>,
+        "H . Peter Anvin" <hpa@zytor.com>, Borislav Petkov <bp@alien8.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Joerg Roedel <joro@8bytes.org>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 27/04/20 19:18, Sean Christopherson wrote:
-> Use vmx_get_intr_info() when grabbing the cached vmcs.INTR_INFO in
-> handle_exception_nmi() to ensure the cache isn't stale.  Bypassing the
-> caching accessor doesn't cause any known issues as the cache is always
-> refreshed by handle_exception_nmi_irqoff(), but the whole point of
-> adding the proper caching mechanism was to avoid such dependencies.
-> 
-> Fixes: 8791585837f6 ("KVM: VMX: Cache vmcs.EXIT_INTR_INFO using arch avail_reg flags")
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> ---
->  arch/x86/kvm/vmx/vmx.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 3ab6ca6062ce..7bddcb24f6f3 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -4677,7 +4677,7 @@ static int handle_exception_nmi(struct kvm_vcpu *vcpu)
->  	u32 vect_info;
->  
->  	vect_info = vmx->idt_vectoring_info;
-> -	intr_info = vmx->exit_intr_info;
-> +	intr_info = vmx_get_intr_info(vcpu);
->  
->  	if (is_machine_check(intr_info) || is_nmi(intr_info))
->  		return 1; /* handled by handle_exception_nmi_irqoff() */
-> 
+On Sat, Apr 25, 2020 at 8:24 PM Li,Rongqing <lirongqing@baidu.com> wrote:
+>
+>
+>
+> > -----=E9=82=AE=E4=BB=B6=E5=8E=9F=E4=BB=B6-----
+> > =E5=8F=91=E4=BB=B6=E4=BA=BA: Paolo Bonzini [mailto:pbonzini@redhat.com]
+> > =E5=8F=91=E9=80=81=E6=97=B6=E9=97=B4: 2020=E5=B9=B44=E6=9C=8825=E6=97=
+=A5 0:30
+> > =E6=94=B6=E4=BB=B6=E4=BA=BA: Jim Mattson <jmattson@google.com>; Sean Ch=
+ristopherson
+> > <sean.j.christopherson@intel.com>
+> > =E6=8A=84=E9=80=81: Peter Zijlstra <peterz@infradead.org>; Li,Rongqing
+> > <lirongqing@baidu.com>; LKML <linux-kernel@vger.kernel.org>; kvm list
+> > <kvm@vger.kernel.org>; the arch/x86 maintainers <x86@kernel.org>; H .
+> > Peter Anvin <hpa@zytor.com>; Borislav Petkov <bp@alien8.de>; Ingo Molna=
+r
+> > <mingo@redhat.com>; Thomas Gleixner <tglx@linutronix.de>; Joerg Roedel
+> > <joro@8bytes.org>; Wanpeng Li <wanpengli@tencent.com>; Vitaly Kuznetsov
+> > <vkuznets@redhat.com>
+> > =E4=B8=BB=E9=A2=98: Re: [PATCH] [RFC] kvm: x86: emulate APERF/MPERF reg=
+isters
+> >
+> > On 24/04/20 18:25, Jim Mattson wrote:
+> > >> Assuming we're going forward with this, at an absolute minimum the
+> > >> RDMSRs need to be wrapped with checks on host _and_ guest support fo=
+r
+> > >> the emulated behavior.  Given the significant overhead, this might
+> > >> even be something that should require an extra opt-in from userspace=
+ to
+> > enable.
+> > >
+> > > I would like to see performance data before enabling this uncondition=
+ally.
+> >
+> > I wouldn't want this to be enabled unconditionally anyway, because you =
+need to
+> > take into account live migration to and from processors that do not hav=
+e
+> > APERF/MPERF support.
+> >
+> > Paolo
+>
+> I will add a kvm parameter to consider whether enable MPERF/APERF emulati=
+ons, and make default value to false
 
-Hasn't this been applied already?
-
-Paolo
-
+Wouldn't it be better to add a per-VM capability to enable this feature?
