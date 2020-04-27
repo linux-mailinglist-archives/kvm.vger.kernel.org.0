@@ -2,183 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BB7DF1BA9E8
-	for <lists+kvm@lfdr.de>; Mon, 27 Apr 2020 18:16:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 437731BA9F2
+	for <lists+kvm@lfdr.de>; Mon, 27 Apr 2020 18:18:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728214AbgD0QQd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Apr 2020 12:16:33 -0400
-Received: from mail-am6eur05on2089.outbound.protection.outlook.com ([40.107.22.89]:6249
-        "EHLO EUR05-AM6-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728156AbgD0QQd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Apr 2020 12:16:33 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=jmor5XyvV1BNTTnDMLdtUdRhwAp8raDcIqvy2uXVlvUzVd9DCnJtg62Lx6qbotIU8pXXIPTOvHntWDfHT8gxSfZvGjtNYjB6XVBUTP+Z5kYEtdcj5eknUDbvCiM2cOgH0yOo/aPpopuGsUuFi60oDvIvUO++VkVrMGO/G2r+ulO/Mn59et+/9Jp/8nPeQ1zmXhvsYTtP73V5xQDc4qbY387J1Z2cbc7R82qg5nTeSo/LYBlWNvQsmsAja6mRy/AvtU8+pXJmhmKz3uXeV2Ngd+5zOOHxyP5gwldzI1me0qCHUESKVfawGRkJNbJ+ANT2CWiCgG3+rMXBXSQQOTy2MA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=qPTuHTP2cFZHj/SNKkk7C4sV1EuhSp/KyyjXa7AC8nY=;
- b=ibZKba9BpnoMM5jYzvcyqICN6xkj33QVJTAoRQMd8yaS9xXu9HtrVWaHXjgh6hsBF305Pglso07WJ4u+CE0qCVDIdhSPV8umQ/B0OK4EHtcoe8677trQCriQzbWBBkkLP+3B4HwsO/bHjAsMLTOnzFPmsYw4GwjGSGzWeAvUPcw4deNJ/Lw9yxcVdhJcOKAduDMLkJinJy3OegwY3U5uCk5gARA1uJefPyiizqqprZOSYv5zms5vihLc//GxjskagYGB0LmkTm3Pn/EYnoMiAR9qTtF1GnBCrpLQIdrits5ons/60lLM3kQn+CgqvyAe71UMpL9M3D0MeMBsFSsuJA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=mellanox.com; dmarc=pass action=none header.from=mellanox.com;
- dkim=pass header.d=mellanox.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Mellanox.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=qPTuHTP2cFZHj/SNKkk7C4sV1EuhSp/KyyjXa7AC8nY=;
- b=HjD8yBvBo+38M899vPqrL8ko6JLTV1WkQP2WhHIGyQoL5MAJaSOx7pvu2S/ttbW0zs4ENyXvkARCksCRTPW/JX53AMWPII9IA3BghpMG8jmakkCVaBd7YGENl2cVCKv5gVqv/EnnHtjCsPR3u8r150OFx9ffZC0mzEKVw2KkrmY=
-Authentication-Results: spf=none (sender IP is )
- smtp.mailfrom=jgg@mellanox.com; 
-Received: from VI1PR05MB4141.eurprd05.prod.outlook.com (2603:10a6:803:44::15)
- by VI1PR05MB4416.eurprd05.prod.outlook.com (2603:10a6:803:4b::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2937.13; Mon, 27 Apr
- 2020 16:16:29 +0000
-Received: from VI1PR05MB4141.eurprd05.prod.outlook.com
- ([fe80::a47b:e3cd:7d6d:5d4e]) by VI1PR05MB4141.eurprd05.prod.outlook.com
- ([fe80::a47b:e3cd:7d6d:5d4e%6]) with mapi id 15.20.2937.020; Mon, 27 Apr 2020
- 16:16:29 +0000
-Date:   Mon, 27 Apr 2020 13:16:25 -0300
-From:   Jason Gunthorpe <jgg@mellanox.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "Jiang, Dave" <dave.jiang@intel.com>,
-        "vkoul@kernel.org" <vkoul@kernel.org>,
-        "megha.dey@linux.intel.com" <megha.dey@linux.intel.com>,
-        "maz@kernel.org" <maz@kernel.org>,
-        "bhelgaas@google.com" <bhelgaas@google.com>,
-        "rafael@kernel.org" <rafael@kernel.org>,
-        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "hpa@zytor.com" <hpa@zytor.com>,
-        "Pan, Jacob jun" <jacob.jun.pan@intel.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>, "Lu, Baolu" <baolu.lu@intel.com>,
-        "Kumar, Sanjay K" <sanjay.k.kumar@intel.com>,
-        "Luck, Tony" <tony.luck@intel.com>,
-        "Lin, Jing" <jing.lin@intel.com>,
-        "Williams, Dan J" <dan.j.williams@intel.com>,
-        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "parav@mellanox.com" <parav@mellanox.com>,
-        "dmaengine@vger.kernel.org" <dmaengine@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: Re: [PATCH RFC 00/15] Add VFIO mediated device support and IMS
- support for the idxd driver.
-Message-ID: <20200427161625.GI13640@mellanox.com>
-References: <20200424181203.GU13640@mellanox.com>
- <AADFC41AFE54684AB9EE6CBC0274A5D19D8C5486@SHSMSX104.ccr.corp.intel.com>
- <20200426191357.GB13640@mellanox.com>
- <20200426214355.29e19d33@x1.home>
- <20200427115818.GE13640@mellanox.com>
- <20200427071939.06aa300e@x1.home>
- <20200427132218.GG13640@mellanox.com>
- <20200427081841.18c4a994@x1.home>
- <20200427142553.GH13640@mellanox.com>
- <20200427094137.4801bfb6@w520.home>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200427094137.4801bfb6@w520.home>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-ClientProxiedBy: MN2PR22CA0011.namprd22.prod.outlook.com
- (2603:10b6:208:238::16) To VI1PR05MB4141.eurprd05.prod.outlook.com
- (2603:10a6:803:44::15)
+        id S1726030AbgD0QSt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Apr 2020 12:18:49 -0400
+Received: from sonic301-38.consmr.mail.ne1.yahoo.com ([66.163.184.207]:39372
+        "EHLO sonic301-38.consmr.mail.ne1.yahoo.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728148AbgD0QSs (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 27 Apr 2020 12:18:48 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1588004327; bh=63tDCXQ4d3+61/OGW3S7mVOWRy3GargmMKYOqYpaPWo=; h=Subject:To:Cc:References:From:Date:In-Reply-To:From:Subject; b=RzNX4KUf6BZIfe4sMw7mm/PaJvF1QUtBAGzCUyDPL+YOD1oI0AZRsJ9RwuejZBtOeeZVRcBumKaACT6UU2L22udsX4DQIlZgED34UO5Fg3GBf9pWdKkFXvs3GkI2ncteaDnwADThOE5H7DpnAQu2uLsEcQEeoq9SFz/cqODerVqCsQ+nifoVY0aJ+NieBfc+P3quyr/JD5H7lPDDNHd+creOE6IUirTEGsrNrh6TGt5FYjMo+dn8BqHWCPPMRdq5Sy/BdFI0muiF6X2Q6yAYrtErUCWM2E05YUIA8gmvMMPZpykog2b1n1LhXeAFCpHJHryRXdTYamH/7RKh8FStvA==
+X-YMail-OSG: GZ1qFv8VM1lloMwOeiuwS_DLZMlZS596z_T5Ezam5JVYK16xQKQqGgbpCWLb2nw
+ dJEvdcljCn0NiQ6ginYhlcMXj5NvyGh1fiJBTE0_ILqLT5lkHR_lLmj9fs_T5xGazvv7dad.dBKH
+ 629bTpGIgztRfTBAONGXm9sWvrBH6IGWenZF4jT4hI9AwmBqZii70US34pgShjXO9fmAMkwh5qAX
+ kFbLNnLB_PywIzJygwsu2ts59DVgAU5BTxXdh4nS6B7nDOj84phyL3Jietqqe5SIyA_nd.PO8p42
+ sOfsmUZRg1c.kS4lqMXGGFId1g5t30fyhj816egHJn0NnYxQdHZ56PxwUrY50E16Cnel50aETquU
+ WF1KRaWFFmeU2gh5oIZzoV421i2bpe5DmLBG7ilCQyZCHn5Q3uoVPrAu1Us8.hRQZ6ZlNA2m7ai3
+ Bk6tPkCDzrSthL8iH9F8h.CKnYSMNgZrzJePQDKz5sv0nmVAEEHsYMqtsC7_CcLPBk4zcpeS1Wca
+ DplINAdBgrydIVgCuHT3uk0IN0ItvEthNy3mt83cPM2l6X6XhnYm.mrjIiykR5ZNqgFeoTAr0HC7
+ 3R_nve23tPOh7bLsISYqNxi1PyRrvSRDmbpebY9_oLgeLe235P_iBUCn.zmmxx8nJJTJAvJ_mYgN
+ q4pDzc3opQFpZmNWtYA1c3OFDbEB6qhCLzu4AyY6C2Kl.QOSkQatVdTwSn3LMOU6DbLzUIa_W.Ie
+ tzt2IOZIKFF.HdCz1efogWd9GQWJwfTeKs_IlMo5Bn0sxmATPTq.0zTMzWqvnn2cZnLX0fQi077k
+ TJbItAkMMuwDRUEOoegATu5cRz4m2c7WwKYVky10R6inprsdCzeLO4.rvp3B8HrrLR3QSc.c6n2j
+ gO.3wEwFNn.zLB1LNY1ocEd_XPO3DVvsX_0xsunAiLb8MMeDDfaeVfVK.MZmjKxr0KHRelOJId5e
+ OVfFn4yVt9EDY5H2.88VVkc8p2ial9NJv6VUPdAESIbuIdglKY91PZ4Da9kMlrXubptTPSbv7Qg1
+ OUe7aIWREJ4_F597pMzKGplgaXdgE91RfZ1Mm2m0QTgwfjNIG0KU2NPIIBAitrWHRqEdDudvIzDH
+ orNscbu.BIIJRLwn2c19VAp6VS7Nr9XUas4Hfe8ask8TZ3yFC05oVdSzmnVSd.sCFOIabuzqztjk
+ Wz00Xj377CdA6eyi2YWp3Mz1LEScGoR_O.enIIAyjCLQglN.iixKo.hN.TFrjlb9UyEOhLQBUiiE
+ BFQiZwg48QzGhEtvPwCiqqwZ6wCgaRz25LTyDHPJDJ0ktyMGXVbfUQr2LrpjPrOZL9t4tFL8DnZ2
+ YIIJUmHu.TWdXohpmQe6Pdlgxd9SSi0Nk4QkThj2aAQssPBnwiYvJ3SB._hPpGxCfqtj7Zv728EE
+ xzVPL01cyTSytuTx2zLMhhQ--
+Received: from sonic.gate.mail.ne1.yahoo.com by sonic301.consmr.mail.ne1.yahoo.com with HTTP; Mon, 27 Apr 2020 16:18:47 +0000
+Received: by smtp431.mail.ne1.yahoo.com (VZM Hermes SMTP Server) with ESMTPA ID 990e53893286a3d1e8f5702abe246841;
+          Mon, 27 Apr 2020 16:18:43 +0000 (UTC)
+Subject: Re: [PATCH v5 0/3] SELinux support for anonymous inodes and UFFD
+To:     Daniel Colascione <dancol@google.com>
+Cc:     James Morris <jmorris@namei.org>,
+        Tim Murray <timmurray@google.com>,
+        SElinux list <selinux@vger.kernel.org>,
+        LSM List <linux-security-module@vger.kernel.org>,
+        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Paul Moore <paul@paul-moore.com>,
+        Nick Kralevich <nnk@google.com>,
+        Stephen Smalley <sds@tycho.nsa.gov>,
+        Lokesh Gidra <lokeshgidra@google.com>,
+        John Johansen <john.johansen@canonical.com>,
+        Casey Schaufler <casey@schaufler-ca.com>
+References: <20200326200634.222009-1-dancol@google.com>
+ <20200401213903.182112-1-dancol@google.com>
+ <CAKOZueuu=bGt4O0xjiV=9_PC_8Ey8pa3NjtJ7+O-nHCcYbLnEg@mail.gmail.com>
+ <alpine.LRH.2.21.2004230253530.12318@namei.org>
+ <6fcc0093-f154-493e-dc11-359b44ed57ce@schaufler-ca.com>
+ <3ffd699d-c2e7-2bc3-eecc-b28457929da9@schaufler-ca.com>
+From:   Casey Schaufler <casey@schaufler-ca.com>
+Autocrypt: addr=casey@schaufler-ca.com; keydata=
+ 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
+ abzjfg==
+Message-ID: <8bef5acd-471e-0288-ad85-72601c3a2234@schaufler-ca.com>
+Date:   Mon, 27 Apr 2020 09:18:42 -0700
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from mlx.ziepe.ca (142.68.57.212) by MN2PR22CA0011.namprd22.prod.outlook.com (2603:10b6:208:238::16) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2937.13 via Frontend Transport; Mon, 27 Apr 2020 16:16:28 +0000
-Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)     (envelope-from <jgg@mellanox.com>)      id 1jT6Qj-000299-9p; Mon, 27 Apr 2020 13:16:25 -0300
-X-Originating-IP: [142.68.57.212]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: e75cbe4b-103e-4ca5-10a8-08d7eac65765
-X-MS-TrafficTypeDiagnostic: VI1PR05MB4416:|VI1PR05MB4416:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <VI1PR05MB4416A6821392EC4B4E969446CFAF0@VI1PR05MB4416.eurprd05.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:5516;
-X-Forefront-PRVS: 0386B406AA
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI1PR05MB4141.eurprd05.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(136003)(346002)(376002)(366004)(396003)(39860400002)(36756003)(9746002)(7416002)(66476007)(9786002)(8936002)(1076003)(8676002)(81156014)(66556008)(66946007)(2906002)(2616005)(86362001)(186003)(52116002)(4326008)(6916009)(26005)(316002)(54906003)(478600001)(33656002)(5660300002)(24400500001);DIR:OUT;SFP:1101;
-Received-SPF: None (protection.outlook.com: mellanox.com does not designate
- permitted sender hosts)
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 7RyT5eR3Eg74TqpMtItKMOfrRA8WA/t7rpxqgMAAnw4040qJQQpoLpOMZjhTyRh1gOe5A+gLyqxMTIzPJEs3LlFGlItZBYIFbZkxRioLqKW7ImQ5J707bjXcPLRetnMnQ1V0fTaXyn9+AMkLwjv11A6XHvvIk9/ndLZZWluKvYzgK0IO2QiNHyWG13BrY52QnDupW0XEcVjGmQ11Ij6vovPTuReNTaGeyiJnZX3cCo+UyqJ6iq0QO91CnrM5NjQeYLfYAayEEMyTaU2nI5VVtNHgrLz8UQ4rPoY/tGwMBrF51G19OlaFhCitdDxclZgnXQIeeyN+TYBX7KkiKxbK8YcjUk0ny2wCXoLdagTajae5tVsArbuDeRubHdnd0hntWS0hRRDSLVRZQx9QWmQ4DeahiRTdYVRc2+T3seS28ldzo6U41c9SzdgUH9pw7glwdK8DOXZki5pwUd+9xlhKiwvvGFAaSgoEaOzLPW7rO2nGnlc9mmJfnZPw+28s9Rdu
-X-MS-Exchange-AntiSpam-MessageData: iKAp5Yo3sll1ZmOLEe8NCwaLbwLlR9ndiA0wRjwGMlkxdkkY2YmmFhjHtaOeZmq5UxBDmQmY+eyQr9/XR/AXFmrjgmuF3bJ9Xw268zNDGnoh4HFL7HsDSxcosRDgaRMkDEoeGXvG335oQM65stDGI0cXwiZ0lReZoTgW8tuW0uj9dydHDYv29XrD0HKtDfdfXR+thdzORDHfhkl+Qjk39s7VMultW0NcoeW41w40YzMsQeKcVg8T0LOKwmxWCUAiJZzZZEeMQXkRa9rdxW5XzCQjp9RYWjlE56Og/WC0DnH5pJqWz0qrDChBnQzKvPAEiA3h1s72dhSeTzUwdoMQRaFzSahKq7GP2v4olV0xUyG9XkFIE/ZUY/aPqdIsU64LQ8JVjZ6/rT8RX1un3mEvTNk3rTjq6RRqBhXjRnO6aVj1pf50y2yFgyM0BTF3lN3SnaDFjEqTUv3RhUs/yAErlCk8T6DDmf9ywnJbGdhcqbB5Jci99uG+o4mw2p3ByW0pVRuT433c6n3QcukeWnrIJG9u7UbPNhhMth0uYSChKcIdBp3bw49nzLAHb4TSACQzYBNYIAUij9MItQ/RyzLhAA14A3W0ObdEK41ul7W8GxB29iItg4NMicYTJf8mkHoPEKuSo+R8o+Y+JtB+CbYK2RWA+/h9o14g494D0IOo5/fIJZ8odt7CuePxJBvF3FugP3jYs1sGMHMeQPqyoUxqqDRDYko8li6uWnTq+T9DG7oa2/kwYxFFShqgby0P+0Bjvzt6Si94A4fa79RaGDzhEK5h29oRECMTPPo7CeOD5CI=
-X-OriginatorOrg: Mellanox.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e75cbe4b-103e-4ca5-10a8-08d7eac65765
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Apr 2020 16:16:28.9448
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: a652971c-7d2e-4d9b-a6a4-d149256f461b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: y0ppz3mVEedUo8lUZy8jLrlx8OXTvjnenLD5m2Ys065IFGcK4zkoP3kdkX1MUJ4xPSFbmKqm/LoOdAFIaJNQHA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR05MB4416
+In-Reply-To: <3ffd699d-c2e7-2bc3-eecc-b28457929da9@schaufler-ca.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Mailer: WebService/1.1.15756 hermes Apache-HttpAsyncClient/4.1.4 (Java/11.0.6)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Apr 27, 2020 at 09:41:37AM -0600, Alex Williamson wrote:
-> On Mon, 27 Apr 2020 11:25:53 -0300
-> Jason Gunthorpe <jgg@mellanox.com> wrote:
-> 
-> > On Mon, Apr 27, 2020 at 08:18:41AM -0600, Alex Williamson wrote:
-> > > On Mon, 27 Apr 2020 10:22:18 -0300
-> > > Jason Gunthorpe <jgg@mellanox.com> wrote:
-> > >   
-> > > > On Mon, Apr 27, 2020 at 07:19:39AM -0600, Alex Williamson wrote:
-> > > >   
-> > > > > > It is not trivial masking. It is a 2000 line patch doing comprehensive
-> > > > > > emulation.    
-> > > > > 
-> > > > > Not sure what you're referring to, I see about 30 lines of code in
-> > > > > vdcm_vidxd_cfg_write() that specifically handle writes to the 4 BARs in
-> > > > > config space and maybe a couple hundred lines of code in total handling
-> > > > > config space emulation.  Thanks,    
-> > > > 
-> > > > Look around vidxd_do_command()
-> > > > 
-> > > > If I understand this flow properly..  
-> > > 
-> > > I've only glanced at it, but that's called in response to a write to
-> > > MMIO space on the device, so it's implementing a device specific
-> > > register.  
-> > 
-> > It is doing emulation of the secure BAR. The entire 1000 lines of
-> > vidxd_* functions appear to be focused on this task.
-> 
-> Ok, we/I need a terminology clarification, a BAR is a register in
-> config space for determining the size, type, and setting the location
-> of a I/O or memory region of a device.  I've been asserting that the
-> emulation of the BAR itself is trivial, but are you actually focused on
-> emulation of the region described by the BAR?
+On 4/23/2020 3:24 PM, Casey Schaufler wrote:
+> On 4/22/2020 10:12 AM, Casey Schaufler wrote:
+>> On 4/22/2020 9:55 AM, James Morris wrote:
+>>> On Mon, 13 Apr 2020, Daniel Colascione wrote:
+>>>
+>>>> On Wed, Apr 1, 2020 at 2:39 PM Daniel Colascione <dancol@google.com> wrote:
+>>>>> Changes from the fourth version of the patch:
+>>>> Is there anything else that needs to be done before merging this patch series?
+> Do you have a test case that exercises this feature?
 
-Yes, BAR here means the actually MMIO memory window - not the config
-space part. Config space emulation is largely trivial.
+I haven't heard anything back. What would cause this code to be executed?
 
-> > > Are you asking that PCI config space be done in userspace
-> > > or any sort of device emulation?    
-> > 
-> > I'm concerned about doing full emulation of registers on a MMIO BAR
-> > that trigger complex actions in response to MMIO read/write.
-> 
-> Maybe what you're recalling me say about mdev is that its Achilles
-> heel is that we rely on mediation provider (ie. vendor driver) for
-> security, we don't necessarily have an piece of known, common hardware
-> like an IOMMU to protect us when things go wrong.  That's true, but
-> don't we also trust drivers in the host kernel to correctly manage and
-> validate their own interactions with hardware, including the APIs
-> provided through other user interfaces.  Is the assertion then that
-> device specific, register level API is too difficult to emulate?
 
-No, it is a reflection on the standard Linux philosophy that if it can
-be done in user space it should be done in userspace. Ie keep minimal
-work in the monolithic kernel.
-
-Also to avoid duplication, ie idxd proposes to have a char dev with a
-normal kernel driver interface and then an in-kernel emulated MMIO BAR
-version of that same capability for VFIO consumption.
-
-Jason
