@@ -2,250 +2,181 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4011A1BA2E1
-	for <lists+kvm@lfdr.de>; Mon, 27 Apr 2020 13:44:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C085E1BA308
+	for <lists+kvm@lfdr.de>; Mon, 27 Apr 2020 13:58:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726795AbgD0LoY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Apr 2020 07:44:24 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:36534 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726390AbgD0LoY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Apr 2020 07:44:24 -0400
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 03RBh7V7047158;
-        Mon, 27 Apr 2020 11:44:17 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2020-01-29;
- bh=RQOOACECUuHyr8LTU3wWvlpFUzbC/3nRAE5jmtUSnC4=;
- b=kfgiLjzkTrhEwhLLnmZm//R5aXeV8xnknDcHu2VRWybGA2zNaFEODtLP6mhItkVab3O+
- Ol8tY4lNOCfcu9AE/JRrjbYZ8WVbBHJjLL+slmnQczlAq7X6orIZTeh49BfjOlA2pCn5
- fPZ4wBlhp6bMScBMz+F573R6M8jxJEfjLihNdmsGvWEeAJfqjNiJpvBRs3mR9k725tl5
- sXbNxvPZsmOoL0vaj0n015e+SVSD4Lm6HcDfPZnuA1nkH/97tbpZg27BzYCfHVd8nz4k
- pXmFKrRAHe0dgtCgxBJByNwmNZKOAENmpU8o5t67Oxez0f3yg2C088bbfYIFXGthaLxc dQ== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
-        by userp2130.oracle.com with ESMTP id 30mcmqx32j-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 27 Apr 2020 11:44:17 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
-        by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 03RBfpW0026622;
-        Mon, 27 Apr 2020 11:44:17 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
-        by userp3020.oracle.com with ESMTP id 30mxww174s-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 27 Apr 2020 11:44:17 +0000
-Received: from abhmp0013.oracle.com (abhmp0013.oracle.com [141.146.116.19])
-        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 03RBiFYn014619;
-        Mon, 27 Apr 2020 11:44:15 GMT
-Received: from [192.168.14.112] (/109.67.198.165)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Mon, 27 Apr 2020 04:44:14 -0700
-Subject: Re: [PATCH v1 00/15] Add support for Nitro Enclaves
-To:     "Paraschiv, Andra-Irina" <andraprs@amazon.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        linux-kernel@vger.kernel.org
-Cc:     Anthony Liguori <aliguori@amazon.com>,
-        Benjamin Herrenschmidt <benh@amazon.com>,
-        Colm MacCarthaigh <colmmacc@amazon.com>,
-        Bjoern Doebel <doebel@amazon.de>,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        Frank van der Linden <fllinden@amazon.com>,
-        Alexander Graf <graf@amazon.de>,
-        Martin Pohlack <mpohlack@amazon.de>,
-        Matt Wilson <msw@amazon.com>, Balbir Singh <sblbir@amazon.com>,
-        Stewart Smith <trawets@amazon.com>,
-        Uwe Dannowski <uwed@amazon.de>, kvm@vger.kernel.org,
-        ne-devel-upstream@amazon.com
-References: <20200421184150.68011-1-andraprs@amazon.com>
- <18406322-dc58-9b59-3f94-88e6b638fe65@redhat.com>
- <ff65b1ed-a980-9ddc-ebae-996869e87308@amazon.com>
- <5c514de6-52a8-8532-23d9-e6b0cc9ac7eb@oracle.com>
- <eb92ba4e-113e-d7ec-4633-f6b5ac54796b@amazon.com>
-From:   Liran Alon <liran.alon@oracle.com>
-Message-ID: <26111e31-8ff5-8358-1e05-6d7df0441ab1@oracle.com>
-Date:   Mon, 27 Apr 2020 14:44:09 +0300
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.13; rv:68.0)
- Gecko/20100101 Thunderbird/68.7.0
+        id S1726981AbgD0L62 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Apr 2020 07:58:28 -0400
+Received: from mail-db8eur05on2081.outbound.protection.outlook.com ([40.107.20.81]:63058
+        "EHLO EUR05-DB8-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726260AbgD0L62 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Apr 2020 07:58:28 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Dp9TaPUA8GrUXoToSedBImmvsL/wax2liMz6kq6PgFQrfDn1eImnM9ucx7EYbGu4cikeKAC0oR14thAOHW26J5eQI+uSEK8Eb0mMq86n+NHWhwUHTgYT8okdJ8PWn9Gu7rAd+8BwulHc3CkoVQkz1q3oOVilbG/Y/k5c13IZLnuqvZ4Ogkr9mjNss5D709/hZtUUky8Tgb3JXMqX+HrA26Xqt8VbNHDEnzM5sWuZ57c/lvn1+hrckdWZ+G09ZAjxde00hmCASHTlcWJjeeqjFV7ILHwFJoQ3NJc62s5CP25vobek5x1Qhp0ttNXCnOTwIAfl8ZfTaWJQ7r+xmroa2w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=kiXxLaXL+jb45eK3DQwWfDBXKdHvPmQe0PcqPs8E2sk=;
+ b=JtoENfCf+yfV3AUTB0IgFfTHEWFBYgDaKx16VUraFc58TA8MW6hSv5jar+rS+cycDxMxFW8C4lCG3+UW9aAOPOGm/p6UHokpJNPY/Tzp8BWhpBW6qpebksA5A7wDqWRvglQa13ucSI0pB+Is9GY6z07yrivxkty6Er7iU+Ux4PTjnhnEdWmB78OFFoeh/jO591N2yPo6RVFog2dulnhgaQ+QFpptzQZwZu9DQxICmdEdUGyS4Tx8ulAmZMrHUyYv7YQ8LqE2RuttSsNwMlPKTsh4wH55Rfq3RJaK1F17bAop6NaQdLczKYYVxSnTgidwYNoVxOydyhOXR26qWVl9Cw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=mellanox.com; dmarc=pass action=none header.from=mellanox.com;
+ dkim=pass header.d=mellanox.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Mellanox.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=kiXxLaXL+jb45eK3DQwWfDBXKdHvPmQe0PcqPs8E2sk=;
+ b=CASQ7H+ktYlgF68HTzEDUfBoejvLbNmk+ZKMoswH2QEXrsGCL/p0qBNygKJUOyl0XqWBmA6ap+ULw65YlysyXXwADur6Jp2HhXNFcmWQivZZgKqeenhxqmAFV/iA3oD+Wy4V9qC6xxxIjCV6WERa3Zp/58ubcmYvbfjvrkrkQdI=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=jgg@mellanox.com; 
+Received: from VI1PR05MB4141.eurprd05.prod.outlook.com (2603:10a6:803:44::15)
+ by VI1PR05MB4767.eurprd05.prod.outlook.com (2603:10a6:802:68::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2937.22; Mon, 27 Apr
+ 2020 11:58:23 +0000
+Received: from VI1PR05MB4141.eurprd05.prod.outlook.com
+ ([fe80::a47b:e3cd:7d6d:5d4e]) by VI1PR05MB4141.eurprd05.prod.outlook.com
+ ([fe80::a47b:e3cd:7d6d:5d4e%6]) with mapi id 15.20.2937.020; Mon, 27 Apr 2020
+ 11:58:23 +0000
+Date:   Mon, 27 Apr 2020 08:58:18 -0300
+From:   Jason Gunthorpe <jgg@mellanox.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "Jiang, Dave" <dave.jiang@intel.com>,
+        "vkoul@kernel.org" <vkoul@kernel.org>,
+        "megha.dey@linux.intel.com" <megha.dey@linux.intel.com>,
+        "maz@kernel.org" <maz@kernel.org>,
+        "bhelgaas@google.com" <bhelgaas@google.com>,
+        "rafael@kernel.org" <rafael@kernel.org>,
+        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "hpa@zytor.com" <hpa@zytor.com>,
+        "Pan, Jacob jun" <jacob.jun.pan@intel.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>, "Lu, Baolu" <baolu.lu@intel.com>,
+        "Kumar, Sanjay K" <sanjay.k.kumar@intel.com>,
+        "Luck, Tony" <tony.luck@intel.com>,
+        "Lin, Jing" <jing.lin@intel.com>,
+        "Williams, Dan J" <dan.j.williams@intel.com>,
+        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "parav@mellanox.com" <parav@mellanox.com>,
+        "dmaengine@vger.kernel.org" <dmaengine@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: Re: [PATCH RFC 00/15] Add VFIO mediated device support and IMS
+ support for the idxd driver.
+Message-ID: <20200427115818.GE13640@mellanox.com>
+References: <20200422115017.GQ11945@mellanox.com>
+ <20200422211436.GA103345@otc-nc-03>
+ <20200423191217.GD13640@mellanox.com>
+ <AADFC41AFE54684AB9EE6CBC0274A5D19D8960F9@SHSMSX104.ccr.corp.intel.com>
+ <20200424124444.GJ13640@mellanox.com>
+ <AADFC41AFE54684AB9EE6CBC0274A5D19D8A808B@SHSMSX104.ccr.corp.intel.com>
+ <20200424181203.GU13640@mellanox.com>
+ <AADFC41AFE54684AB9EE6CBC0274A5D19D8C5486@SHSMSX104.ccr.corp.intel.com>
+ <20200426191357.GB13640@mellanox.com>
+ <20200426214355.29e19d33@x1.home>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200426214355.29e19d33@x1.home>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-ClientProxiedBy: MN2PR11CA0007.namprd11.prod.outlook.com
+ (2603:10b6:208:23b::12) To VI1PR05MB4141.eurprd05.prod.outlook.com
+ (2603:10a6:803:44::15)
 MIME-Version: 1.0
-In-Reply-To: <eb92ba4e-113e-d7ec-4633-f6b5ac54796b@amazon.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9603 signatures=668686
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 spamscore=0 bulkscore=0
- suspectscore=0 mlxlogscore=999 phishscore=0 malwarescore=0 mlxscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
- definitions=main-2004270106
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9603 signatures=668686
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 spamscore=0 clxscore=1015
- priorityscore=1501 suspectscore=0 impostorscore=0 adultscore=0
- malwarescore=0 bulkscore=0 lowpriorityscore=0 mlxlogscore=999 mlxscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
- definitions=main-2004270106
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from mlx.ziepe.ca (142.68.57.212) by MN2PR11CA0007.namprd11.prod.outlook.com (2603:10b6:208:23b::12) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2937.13 via Frontend Transport; Mon, 27 Apr 2020 11:58:22 +0000
+Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)     (envelope-from <jgg@mellanox.com>)      id 1jT2Ow-0002tk-P8; Mon, 27 Apr 2020 08:58:18 -0300
+X-Originating-IP: [142.68.57.212]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: 1c132dfe-547f-4f82-eed9-08d7eaa248c2
+X-MS-TrafficTypeDiagnostic: VI1PR05MB4767:|VI1PR05MB4767:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <VI1PR05MB4767489B576EDA22CBF992E0CFAF0@VI1PR05MB4767.eurprd05.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
+X-Forefront-PRVS: 0386B406AA
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI1PR05MB4141.eurprd05.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(346002)(376002)(366004)(136003)(396003)(39860400002)(52116002)(81156014)(66556008)(66476007)(33656002)(8936002)(6916009)(8676002)(1076003)(316002)(86362001)(66946007)(36756003)(186003)(9746002)(9786002)(26005)(2616005)(7416002)(2906002)(4326008)(54906003)(478600001)(5660300002)(24400500001);DIR:OUT;SFP:1101;
+Received-SPF: None (protection.outlook.com: mellanox.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 2ojPqI2igDFJy4KAHVZWahYAxkpbelRUIBPRpCyabDhWgY+5JhJS2n4prKqhBCHrLwDlljRbn/+190yQmbsp+hv145otb6bLdi0lxQJCNyldYuPvBkqxxUZlWGI6N6Be+eMhvvZ9e4BKzs/w94ymB7bT7v/EL53zzb/cyrKNDGIYfxrdAlOOzMAjdt/4HI/19y/SVmYKYNhob1KjEAEjZ926IYG9H0L/LjyGCr+CjMG+cXvTas2dO4Wm5nE+LTAFJvUrTPJwpb4yNytPu6HT7Tzm/9G6PqxTt4PkULginCeDlUyXPThlLbiwfbwLfrvuHq8rpmc0ud7gn0LDjobuPWbhLn4ww1ailO3RPUlV0gvgKqvH9apIfH8RF/zMSpKaWFyPFp4LTkf3cZkYr/oTvZfePEOmI0Ov8tBXYMZCgRgADdMUL0v4rfRYWZIfCWzNvrG9G5HX+ZOeRsf3m13vkyacAMDqfR66WUt9WKrPfRScUneUWn0KBT5YY+jFGNgA
+X-MS-Exchange-AntiSpam-MessageData: uOp4EP9LzO1mHhHvfKE0KYe4xuERzWb3yBwD8pfrlgjWVRnBDl5fZr5OrciUdU1eBGpYYPfABUtG6g00kV2negSGKtl6znGpRomtThJONq3mNy+FZY/Zimg8i/ExBjwE2KGcg1Jhmrru6t3x7MZZUsZXNxaIxwI46XWZTHGV/V3AtVMJr+VRsePgeMoe9HI49mkfPqqXTvWyCf8KNrgb3ahCPlbysO4nhcx8zgKV5DpW+CnPDYq7+lnxDTE2eyOP/0RW913qWQQ1MJjoTWFjZP0yffs61mq4hP2HdK2GKq5M+fDArDolIQVrHsbmxB6fLlKYAgbDeUsNjlUxw+2nGREpWwMQOEtKx46igkZ8rDFFxvQLZFG/KqFABt4amPSUJYu6863rWL2DoyIeGba/VoECi0S2D7DKl4v4U5WY6AdWQ+XGHXpztLqiWEMHSQAxaVFnmCBvBwmV6ug4KN56J+hKHQjozsngKFsLXCFOoyjr5RQaYORIQ5ojR9d76j820NKzuATM+2zYMW/L4TbbPHfpps2y6DH3cBF/0PAHf/GXV3nZQCALWZ3U8TYJY48LD/GJP2Jt2JPE4u0yog5XaVwMIyBCEM2QhNSOvF0Ky603F24IJ005a2MkqsqiCGcB1t/iEIXYy607zqS43EPvmV30JU2epmDaxCcffuj66tnICxIA/HMoowFk7h0tRGzKuZn1RkF8KXRouLNC0QpOLyfid723XMbot2s9QmBu74FECuxrs34VyLKH6wa0ggXk0kI5r11BD7tHcquCr9Ko4VqwlYlZHrG1A5Bs5LksHVo=
+X-OriginatorOrg: Mellanox.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1c132dfe-547f-4f82-eed9-08d7eaa248c2
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Apr 2020 11:58:23.1745
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: a652971c-7d2e-4d9b-a6a4-d149256f461b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: K+w0sCC/zqeFU//oOh+/4VIU/iUCfdBZldHojEqu2lkVZoea8OSleloZXOnofDS2177BW98gYsNbhcDBvO0a4Q==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR05MB4767
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Sun, Apr 26, 2020 at 09:43:55PM -0600, Alex Williamson wrote:
+> On Sun, 26 Apr 2020 16:13:57 -0300
+> Jason Gunthorpe <jgg@mellanox.com> wrote:
+> 
+> > On Sun, Apr 26, 2020 at 05:18:59AM +0000, Tian, Kevin wrote:
+> > 
+> > > > > I think providing an unified abstraction to userspace is also important,
+> > > > > which is what VFIO provides today. The merit of using one set of VFIO
+> > > > > API to manage all kinds of mediated devices and VF devices is a major
+> > > > > gain. Instead, inventing a new vDPA-like interface for every Scalable-IOV
+> > > > > or equivalent device is just overkill and doesn't scale. Also the actual
+> > > > > emulation code in idxd driver is actually small, if putting aside the PCI
+> > > > > config space part for which I already explained most logic could be shared
+> > > > > between mdev device drivers.  
+> > > > 
+> > > > If it was just config space you might have an argument, VFIO already
+> > > > does some config space mangling, but emulating BAR space is out of
+> > > > scope of VFIO, IMHO.  
+> > > 
+> > > out of scope of vfio-pci, but in scope of vfio-mdev. btw I feel that most
+> > > of your objections are actually related to the general idea of
+> > > vfio-mdev.  
+> > 
+> > There have been several abusive proposals of vfio-mdev, everything
+> > from a way to create device drivers to this kind of generic emulation
+> > framework.
+> > 
+> > > Scalable IOV just uses PASID to harden DMA isolation in mediated
+> > > pass-through usage which vfio-mdev enables. Then are you just opposing
+> > > the whole vfio-mdev? If not, I'm curious about the criteria in your mind 
+> > > about when using vfio-mdev is good...  
+> > 
+> > It is appropriate when non-PCI standard techniques are needed to do
+> > raw device assignment, just like VFIO.
+> > 
+> > Basically if vfio-pci is already doing it then it seems reasonable
+> > that vfio-mdev should do the same. This mission creep where vfio-mdev
+> > gains functionality far beyond VFIO is the problem.
+> 
+> Ehm, vfio-pci emulates BARs too.  We also emulate FLR, power
+> management, DisINTx, and VPD.  FLR, PM, and VPD all have device
+> specific quirks in the host kernel, and I've generally taken the stance
+> that would should take advantage of those quirks, not duplicate them in
+> userspace and not invent new access mechanisms/ioctls for each of them.
+> Emulating DisINTx is convenient since we must have a mechanism to mask
+> INTx, whether it's at the device or the APIC, so we can pretend the
+> hardware supports it.  BAR emulation is really too trivial to argue
+> about, the BARs mean nothing to the physical device mapping, they're
+> simply scratch registers that we mask out the alignment bits on read.
+> vfio-pci is a mix of things that we decide are too complicated or
+> irrelevant to emulate in the kernel and things that take advantage of
+> shared quirks or are just too darn easy to worry about.  BARs fall into
+> that latter category, any sort of mapping into VM address spaces is
+> necessarily done in userspace, but scratch registers that are masked on
+> read, *shrug*, vfio-pci does that.  Thanks,
 
-On 27/04/2020 10:56, Paraschiv, Andra-Irina wrote:
->
-> On 25/04/2020 18:25, Liran Alon wrote:
->>
->> On 23/04/2020 16:19, Paraschiv, Andra-Irina wrote:
->>>
->>> The memory and CPUs are carved out of the primary VM, they are 
->>> dedicated for the enclave. The Nitro hypervisor running on the host 
->>> ensures memory and CPU isolation between the primary VM and the 
->>> enclave VM.
->> I hope you properly take into consideration Hyper-Threading 
->> speculative side-channel vulnerabilities here.
->> i.e. Usually cloud providers designate each CPU core to be assigned 
->> to run only vCPUs of specific guest. To avoid sharing a single CPU 
->> core between multiple guests.
->> To handle this properly, you need to use some kind of core-scheduling 
->> mechanism (Such that each CPU core either runs only vCPUs of enclave 
->> or only vCPUs of primary VM at any given point in time).
->>
->> In addition, can you elaborate more on how the enclave memory is 
->> carved out of the primary VM?
->> Does this involve performing a memory hot-unplug operation from 
->> primary VM or just unmap enclave-assigned guest physical pages from 
->> primary VM's SLAT (EPT/NPT) and map them now only in enclave's SLAT?
->
-> Correct, we take into consideration the HT setup. The enclave gets 
-> dedicated physical cores. The primary VM and the enclave VM don't run 
-> on CPU siblings of a physical core.
-The way I would imagine this to work is that Primary-VM just specifies 
-how many vCPUs will the Enclave-VM have and those vCPUs will be set with 
-affinity to run on same physical CPU cores as Primary-VM.
-But with the exception that scheduler is modified to not run vCPUs of 
-Primary-VM and Enclave-VM as sibling on the same physical CPU core 
-(core-scheduling). i.e. This is different than primary-VM losing
-physical CPU cores permanently as long as the Enclave-VM is running.
-Or maybe this should even be controlled by a knob in virtual PCI device 
-interface to allow flexibility to customer to decide if Enclave-VM needs 
-dedicated CPU cores or is it ok to share them with Primary-VM
-as long as core-scheduling is used to guarantee proper isolation.
->
-> Regarding the memory carve out, the logic includes page table entries 
-> handling.
-As I thought. Thanks for conformation.
->
-> IIRC, memory hot-unplug can be used for the memory blocks that were 
-> previously hot-plugged.
->
-> https://urldefense.com/v3/__https://www.kernel.org/doc/html/latest/admin-guide/mm/memory-hotplug.html__;!!GqivPVa7Brio!MubgaBjJabDtNzNpdOxxbSKtLbqXHbsEpTtZ1mj-rnfLvMIbLW1nZ8cK10GhYJQ$ 
->
->>
->> I don't quite understand why Enclave VM needs to be 
->> provisioned/teardown during primary VM's runtime.
->>
->> For example, an alternative could have been to just provision both 
->> primary VM and Enclave VM on primary VM startup.
->> Then, wait for primary VM to setup a communication channel with 
->> Enclave VM (E.g. via virtio-vsock).
->> Then, primary VM is free to request Enclave VM to perform various 
->> tasks when required on the isolated environment.
->>
->> Such setup will mimic a common Enclave setup. Such as Microsoft 
->> Windows VBS EPT-based Enclaves (That all runs on VTL1). It is also 
->> similar to TEEs running on ARM TrustZone.
->> i.e. In my alternative proposed solution, the Enclave VM is similar 
->> to VTL1/TrustZone.
->> It will also avoid requiring introducing a new PCI device and driver.
->
-> True, this can be another option, to provision the primary VM and the 
-> enclave VM at launch time.
->
-> In the proposed setup, the primary VM starts with the initial 
-> allocated resources (memory, CPUs). The launch path of the enclave VM, 
-> as it's spawned on the same host, is done via the ioctl interface - 
-> PCI device - host hypervisor path. Short-running or long-running 
-> enclave can be bootstrapped during primary VM lifetime. Depending on 
-> the use case, a custom set of resources (memory and CPUs) is set for 
-> an enclave and then given back when the enclave is terminated; these 
-> resources can be used for another enclave spawned later on or the 
-> primary VM tasks.
->
-Yes, I already understood this is how the mechanism work. I'm 
-questioning whether this is indeed a good approach that should also be 
-taken by upstream.
+It is not trivial masking. It is a 2000 line patch doing comprehensive
+emulation.
 
-The use-case of using Nitro Enclaves is for a Confidential-Computing 
-service. i.e. The ability to provision a compute instance that can be 
-trusted to perform a bunch of computation on sensitive
-information with high confidence that it cannot be compromised as it's 
-highly isolated. Some technologies such as Intel SGX and AMD SEV 
-attempted to achieve this even with guarantees that
-the computation is isolated from the hardware and hypervisor itself.
-
-I would have expected that for the vast majority of real customer 
-use-cases, the customer will provision a compute instance that runs some 
-confidential-computing task in an enclave which it
-keeps running for the entire life-time of the compute instance. As the 
-sole purpose of the compute instance is to just expose a service that 
-performs some confidential-computing task.
-For those cases, it should have been sufficient to just pre-provision a 
-single Enclave-VM that performs this task, together with the compute 
-instance and connect them via virtio-vsock.
-Without introducing any new virtual PCI device, guest PCI driver and 
-unique semantics of stealing resources (CPUs and Memory) from primary-VM 
-at runtime.
-
-In this Nitro Enclave architecture, we de-facto put Compute 
-control-plane abilities in the hands of the guest VM. Instead of 
-introducing new control-plane primitives that allows building
-the data-plane architecture desired by the customer in a flexible manner.
-* What if the customer prefers to have it's Enclave VM polling S3 bucket 
-for new tasks and produce results to S3 as-well? Without having any 
-"Primary-VM" or virtio-vsock connection of any kind?
-* What if for some use-cases customer wants Enclave-VM to have dedicated 
-compute power (i.e. Not share physical CPU cores with primary-VM. Not 
-even with core-scheduling) but for other
-use-cases, customer prefers to share physical CPU cores with Primary-VM 
-(Together with core-scheduling guarantees)? (Although this could be 
-addressed by extending the virtual PCI device
-interface with a knob to control this)
-
-An alternative would have been to have the following new control-plane 
-primitives:
-* Ability to provision a VM without boot-volume, but instead from an 
-Image that is used to boot from memory. Allowing to provision disk-less VMs.
-   (E.g. Can be useful for other use-cases such as VMs not requiring EBS 
-at all which could allow cheaper compute instance)
-* Ability to provision a group of VMs together as a group such that they 
-are guaranteed to launch as sibling VMs on the same host.
-* Ability to create a fast-path connection between sibling VMs on the 
-same host with virtio-vsock. Or even also other shared-memory mechanism.
-* Extend AWS Fargate with ability to run multiple microVMs as a group 
-(Similar to above) connected with virtio-vsock. To allow on-demand scale 
-of confidential-computing task.
-
-Having said that, I do see a similar architecture to Nitro Enclaves 
-virtual PCI device used for a different purpose: For hypervisor-based 
-security isolation (Such as Windows VBS).
-E.g. Linux boot-loader can detect the presence of this virtual PCI 
-device and use it to provision multiple VM security domains. Such that 
-when a security domain is created,
-it is specified what is the hardware resources it have access to (Guest 
-memory pages, IOPorts, MSRs and etc.) and the blob it should run to 
-bootstrap. Similar, but superior than,
-Hyper-V VSM. In addition, some security domains will be given special 
-abilities to control other security domains (For example, to control the 
-+XS,+XU EPT bits of other security
-domains to enforce code-integrity. Similar to Windows VBS HVCI). Just an 
-idea... :)
-
--Liran
-
-
-
-
-
-
-
-
-
-
-
+Jason
