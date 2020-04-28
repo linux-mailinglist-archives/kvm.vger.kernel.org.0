@@ -2,63 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D773C1BB793
-	for <lists+kvm@lfdr.de>; Tue, 28 Apr 2020 09:34:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5077B1BB794
+	for <lists+kvm@lfdr.de>; Tue, 28 Apr 2020 09:34:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726508AbgD1Hdr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Apr 2020 03:33:47 -0400
-Received: from esa2.hgst.iphmx.com ([68.232.143.124]:57139 "EHLO
+        id S1726423AbgD1Hdx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Apr 2020 03:33:53 -0400
+Received: from esa2.hgst.iphmx.com ([68.232.143.124]:57156 "EHLO
         esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726253AbgD1Hdq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Apr 2020 03:33:46 -0400
+        with ESMTP id S1726256AbgD1Hdw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Apr 2020 03:33:52 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1588059265; x=1619595265;
-  h=from:to:cc:subject:date:message-id:
-   content-transfer-encoding:mime-version;
-  bh=K2ObMqTtR+ub5JWRiFnyxSpi8EEPvM1ecrOMfRGOYT4=;
-  b=ZS+ifRL3yvaNWOpyf+KboBQnwbWUOuGBfdnTAXaeqFlfuL5NY1DlTfiK
-   fbvuWbgt+PQ3289I8s3Usj2NrJTd2UKhcvQsqgHKkhAhy3rHA/6CVnMJY
-   K6K9icqAWNnfBrcpojIQHcvsxORuwPwXiKu3Ve8auEe+dZuLmy7mq6HSM
-   pqC7E34hJaT4xTbvyipbjGcgIQfB39I5ZnwFybKbLmfhovlhR1wC+sE3R
-   rO7Jk2O9o6Jiz9yXab81jrrewE8QCUQGmrkFox8tUsgCkX4Xb+ZgGWf8g
-   gDVg0QIhem4zl37N+3xqfWKSceHJyNUoRTfrszG9Ddalyp/1rP/5eSW3n
-   g==;
-IronPort-SDR: 6UOk4dP4EPmb/mS4lgz3/GEtQlRG4uo6dAv7Ev2F9EthIgu3bfzGOEcJ1WOHMcPLr1YjIy9wMr
- hVWbgEfH4YQOmnQeoC+zhNSmjlxYpFTmiNHxklZr7/ZUOEWbiEkIMRlCfTTEguy7IrETIbOaW6
- eH76IPBub5DKTRi5s47LjJWu1uOfDX9XlEvAAQBvGpLmiJXxDlZdhDoPgkGnzciP+YuineivMB
- +JSXwV8SlUphzbiCEwEPvmpFpKX7jDptZQfhlWiy+zgRn3Z3XHgMjK8ZIR9kut+WrLV+VJdDZk
- AKM=
+  t=1588059274; x=1619595274;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:content-transfer-encoding:mime-version;
+  bh=fS1pOZ9tSgfBg3vFDRjMcFP/v25WbM3UcpHa2814axo=;
+  b=Vda9aIQrTkmB4STDcykj6fXOiPAJBhOzFSFU+S6QahCYqQZ8fthbbBj/
+   N/ZJEPk9/gW//V1Po4ghzhcSqkREuqN+r0LmoZn14Kcgo2d3vFcIW4Ky4
+   72D8yOPzmq/vu11RHudhgqUzfkyGhAfOFw2z0b5aY9wKGR7t8ZfRT2c/r
+   e3tJb7u4DLNSoROV7KBvq4Ubzdaqwg8TCwKSt/BqOoaOenU7BOvs/2M6Z
+   IWsBxbtN90zQzdH5JwrCQZS7PWS3kQI7GQkknDcwNLwFOjb65HOOgC9Qn
+   J637g+fFj84ZIKMTfHqQUFbt6uyRiDE4sdIJ2eFpMgA1hrJGP/AubEtCQ
+   A==;
+IronPort-SDR: 9pT1nIlVYvyayynuD/4J4rwjUnig2Uhf4RaPA6D6uBWvfjo25+lCh22FcWGiLXGZEKK4t8KObL
+ dJPyHSBkrNB9cSicK8Hx46SDVpYNI1vo/Bj5Y7k6Fu7su6oZHqCEBxq1UdkF8EESTnkQci3wxg
+ xqclhHKjVccMneoNp0txwMlXS12rEQXEwXyGXGlip+52faZTP1OpL30asz7INYK4MqlrDynY1b
+ iozY9zzBwmD5ghPPjxuS1o1zATXrR5+ACTjva3vsJxnkg5vVjoR3sTlkozl9vpGgUoNDRKO6Qt
+ OuE=
 X-IronPort-AV: E=Sophos;i="5.73,327,1583164800"; 
-   d="scan'208";a="238865785"
-Received: from mail-co1nam04lp2052.outbound.protection.outlook.com (HELO NAM04-CO1-obe.outbound.protection.outlook.com) ([104.47.45.52])
-  by ob1.hgst.iphmx.com with ESMTP; 28 Apr 2020 15:34:22 +0800
+   d="scan'208";a="238865794"
+Received: from mail-co1nam04lp2056.outbound.protection.outlook.com (HELO NAM04-CO1-obe.outbound.protection.outlook.com) ([104.47.45.56])
+  by ob1.hgst.iphmx.com with ESMTP; 28 Apr 2020 15:34:32 +0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=jzQGpuTYgtoXhT+sEz1q9o+dJd28lSU/s8nbddhTyItKcCoosjvVmXPaDXlOKGn3C91MFROPWvvXo2IzSw4LUVfIaTMYJvSWxQomM1m3hZA5c88J96/Hmq56DT4ebO+FzSFJxhPQehz/nxHVvKw04hVN0Vsc8H3oqXaElvuKtvHrc+7sqA0qHB51dPRO3hFMnCtCIQSHZcZYysStYd2mvGYtvpY1XQKaBqWXWDNrSYLZzysvxq5xBlG7eCmRqWNd9yvziMIz5/2m4dfwRSSaCk/wAfY7JI06xTuvFuQzbPbuaKfeNHvo2UUve6hbri1zI7ktsPZJEX3tB6fqTT/92Q==
+ b=MumHdT1JKCiCbNM1lragTrW6S1AJxgwgsN7HDBZzAkqG/5iEAQWtD1UldFvHH+j2jz2fWGFz/P3pC0urMQyhA28AS/dnOTXd6JDXMAGFEN/PWggHWX6LEnzaS7jWDDuiOz7zm9n3FGhR/j52T5YG8c1z3fBQRfzLkVx5QQmuW4+yt6pbQESmOjJnbwJ9HM0nVX2ZPeobCcf7l6mSJOSZxI0BpfbHdqcpCQSbp8G6OpuXy4481LS7uf60QOd0S318Z3CeCdQQ5SnDVEnSF2tMcZMJprY+zfCNXpGDVLT38+up4qhcUXADrOJyFPs29OShdsmBNax/3SUqrUxwHVgvaA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=piwHsz7eOuE/EHPtZVN3i3H74CFot424Bo5imRr8R34=;
- b=dfHqWji5vZXEwUvkLmPs3O+qvAehfEEeJqPTvwm7j12l9+24CvAlE3gW/A8lzvn/HT7VbeLE/Dm56Fw0BUvtn3X1UyORK9+ISqGG78j1C3vcmnHBPbkfrajcDA6QwkzTqQzD9dGYInB4CQhngUn/YcEKZJ289VSykUvGlwpGrGbaWgArXrmf/5FNYi16K6psu7aXCD4/+9sPevfcKQXSkGPOKCvNIoW5YedppVU19HpPkTDz+fpKuwJCoL3SpQNyFJrsWnNKUQzVATb0iZNFmMzXZfwZcOPBs2x2A1oOGczxQSiIJt5ReJKfj/TlvTx5W/KaQwvhkXezZB+aukI23A==
+ bh=7cM5zvagwwwCQPQYhTln098aGMAhEwWyhhwu44uXGfs=;
+ b=PAFEd1ulqr2sH8UIuz97oU/g2A4sVlKe6usFF1V6ngPnMLhyXLG9aJOCpbvwrvgMOqfmgWQdhjz1LG+RwNH/1GeDBPwidANZhZJP87AGOzbGLAbIudpEek4gD62Z7KFXIXjg57oiphoIx0wyvc9YDWPY6pEWTouNeeJqJg+L/ZhgNEYTwpePBCAsE/lkG30BwIYKdLE3Q7WwmuqEcCfZUROlH2M0L4NzTjeNOkm6f5CzV6bhIbCwD1qommUz9VQPx3qwWFmWPmUFZbFfB7Hnih3woPVMcefoKwoylTKJ4wK5VtjwoVdL/a+yEpIqmPxm2VkvaMHoOIgvquq3bKDNWA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
  header.d=wdc.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=piwHsz7eOuE/EHPtZVN3i3H74CFot424Bo5imRr8R34=;
- b=aUAy1nUQteb95ksZNPVjCskhd9Xo7fn5LgiQS8GPMzwbkQaPKzPnxIDWXdI0R4nqdgmBKviTuNpaLUsKFdbqFw5ruWENbYYkbmWigojf5TxFbrj8jyFsESy7C6LGJw3E/lrOzBnIJ3SGO71SrY6p51CVI/a6dYjgCia+9BldNuk=
+ bh=7cM5zvagwwwCQPQYhTln098aGMAhEwWyhhwu44uXGfs=;
+ b=XISfYNaoR2VW4JvllJEkWtLyB9ECGW21CnBE6ysrk+FqlSxxWKNnjCtoF6eyYNUubFabONNzngUxBClOS26o+cZXzhx1pgjWdEKU/6e2lARhbDSi+qKDdwXtW7OEG4NhewrHVINyIR3tRXt7BEuClyQ+3IQ9E/4GUhfitUQhnaU=
 Authentication-Results: dabbelt.com; dkim=none (message not signed)
  header.d=none;dabbelt.com; dmarc=none action=none header.from=wdc.com;
 Received: from DM6PR04MB6201.namprd04.prod.outlook.com (2603:10b6:5:127::32)
  by DM6PR04MB4538.namprd04.prod.outlook.com (2603:10b6:5:21::16) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2937.22; Tue, 28 Apr
- 2020 07:33:43 +0000
+ 2020 07:33:50 +0000
 Received: from DM6PR04MB6201.namprd04.prod.outlook.com
  ([fe80::f8b3:c124:482b:52e0]) by DM6PR04MB6201.namprd04.prod.outlook.com
  ([fe80::f8b3:c124:482b:52e0%5]) with mapi id 15.20.2937.023; Tue, 28 Apr 2020
- 07:33:43 +0000
+ 07:33:50 +0000
 From:   Anup Patel <anup.patel@wdc.com>
 To:     Palmer Dabbelt <palmer@dabbelt.com>,
         Palmer Dabbelt <palmerdabbelt@google.com>,
@@ -72,10 +72,12 @@ Cc:     Alexander Graf <graf@amazon.com>,
         Anup Patel <anup@brainfault.org>, kvm@vger.kernel.org,
         kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
         linux-kernel@vger.kernel.org, Anup Patel <anup.patel@wdc.com>
-Subject: [PATCH v12 00/17] KVM RISC-V Support
-Date:   Tue, 28 Apr 2020 13:02:55 +0530
-Message-Id: <20200428073312.324684-1-anup.patel@wdc.com>
+Subject: [PATCH v12 01/17] RISC-V: Add hypervisor extension related CSR defines
+Date:   Tue, 28 Apr 2020 13:02:56 +0530
+Message-Id: <20200428073312.324684-2-anup.patel@wdc.com>
 X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20200428073312.324684-1-anup.patel@wdc.com>
+References: <20200428073312.324684-1-anup.patel@wdc.com>
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-ClientProxiedBy: MAXPR01CA0073.INDPRD01.PROD.OUTLOOK.COM
@@ -83,250 +85,181 @@ X-ClientProxiedBy: MAXPR01CA0073.INDPRD01.PROD.OUTLOOK.COM
  (2603:10b6:5:127::32)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from wdc.com (106.51.31.156) by MAXPR01CA0073.INDPRD01.PROD.OUTLOOK.COM (2603:1096:a00:49::15) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2958.19 via Frontend Transport; Tue, 28 Apr 2020 07:33:38 +0000
+Received: from wdc.com (106.51.31.156) by MAXPR01CA0073.INDPRD01.PROD.OUTLOOK.COM (2603:1096:a00:49::15) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2958.19 via Frontend Transport; Tue, 28 Apr 2020 07:33:44 +0000
 X-Mailer: git-send-email 2.25.1
 X-Originating-IP: [106.51.31.156]
 X-MS-PublicTrafficType: Email
 X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: c1bd5aaf-8719-41e6-490f-08d7eb467a79
+X-MS-Office365-Filtering-Correlation-Id: 4e47d305-d850-4021-01e2-08d7eb467e77
 X-MS-TrafficTypeDiagnostic: DM6PR04MB4538:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <DM6PR04MB45385629BC6BBE3638437D7B8DAC0@DM6PR04MB4538.namprd04.prod.outlook.com>
+X-Microsoft-Antispam-PRVS: <DM6PR04MB453898547E856B50ED7AAAF58DAC0@DM6PR04MB4538.namprd04.prod.outlook.com>
 WDCIPOUTBOUND: EOP-TRUE
-X-MS-Oob-TLC-OOBClassifiers: OLM:133;
+X-MS-Oob-TLC-OOBClassifiers: OLM:11;
 X-Forefront-PRVS: 0387D64A71
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR04MB6201.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(366004)(39860400002)(136003)(396003)(346002)(376002)(55016002)(6666004)(1006002)(8886007)(55236004)(956004)(2906002)(966005)(1076003)(2616005)(44832011)(86362001)(8676002)(5660300002)(16526019)(7416002)(478600001)(36756003)(66476007)(54906003)(26005)(186003)(4326008)(43170500005)(110136005)(66946007)(66556008)(8936002)(7696005)(316002)(52116002)(81156014)(42580500001);DIR:OUT;SFP:1102;
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR04MB6201.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(366004)(39860400002)(136003)(396003)(346002)(376002)(55016002)(6666004)(1006002)(8886007)(55236004)(956004)(2906002)(1076003)(2616005)(44832011)(86362001)(8676002)(5660300002)(16526019)(7416002)(478600001)(36756003)(66476007)(54906003)(26005)(186003)(4326008)(110136005)(66946007)(66556008)(8936002)(7696005)(316002)(52116002)(81156014);DIR:OUT;SFP:1102;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: B9Nagv9jPhduMZSJsV/NMV4NavqqS5AX3iebDyKPJ96tDA7x6cACdBkEvCblrJH7vLIcgTF2itvUEER0G9bFFrFsBTgFyF6aCqZrBPtiENDF0vsbDTn29K31V2oLj8ig0nykscw6mvXqWx4dKs0Nu1HiqKY9joDvIXD09zSe2DLAxGWabIlBsDabp/CN18KG6MHZCITGzSt+smvNs/82xAsmLKJj2suOLGPoXRt/kogGnYAaJyq/qtllOYPV2AM85UAb7ZDRS8KiPiepxqzLVNIF2SCubH6wDKI8+OnrZmZxa59bqkyIZ7duTX+9aicsrbVhJx7fqfga3PWTN79iwKZr340CtAbo30QBwQ6DuzU71nejZZqMWH2NVj97yBMxdKph0vCCaMxKrRDa8ai8B5t0SRza2YCn4q/6X0RSmkO/5fuP0jkF4Zw0AGWnu6i1XRG+D8m7bZsK+90Ih4nUhhmx3SRxGM7AsRZnqOFjWKZEJB3xI+MraggZpEVOVWn+SUBAIpopsPszwskf85T9WskuZwmI+WIzyt8dBhA3LCBJ6BTfB/AqJIRXw36mGaB9jbsV3edcic63eVPkf/mXWsv+vuV8cd3fTWAoITOEwY0=
-X-MS-Exchange-AntiSpam-MessageData: /TfhKQ+Q40xZztxOzCP0sekXDWKRZTkrO16iBwNjllxXaXHOPXoFX3vFBgS6/J51fDHx9uAaL8m7KFGBfMjABH7nTMP9AWh4BgDnY3eR3jDwNGOa+EcwGjTg2jVH/OMI+ivTGKmUH3btWGYivaAZTC2bL0d8bjLr4pg+gCes5SnUzgSoSd3TzoaUQHWVFwGEZXXjZx8UOjfpf+KNlbciofNeurKgfLC3TD7H3OabTbrXW07OJHQodP3ciJ1neTwQba9La8MD+Ph79bKQJy2/EFiZB9GQ/IBrFIlG89gCpL7JokkvQTGUrybX4KnhDGDHQI8CLjC1tvFnMtqwOUMv7br28bPROB+3DFgrrEE4jUvtOg4f8RHa4m2ke8/1ZHMMaYcuoCGzKxrxnGmqmShQJP/fRoj4Z2Lb2aqJmnw/tGUrI6WWi1SCmyWizdYHyzKNXZUiWr3X+v2u18p0Yg9sFqgdwcCXWRIVadxvJAnDZRjfz1T2RHOnw5ZVnApVc/oY3/CRXPGhWdP+x/GBI2uUk5PWONDAv19EG7TpPEDTTahHxalERL21L3DOqB/E2AJue4ldsPptK1t4a9KrTdfYG5D4oLubAcClZ6rINMOcgPaU0ZWnL6FXBzXnK41z6E3Lfrm8aKo2AmvCFudki99b5D4W4JUOtd1zMfG5YJgwFn5oBRP/4esYVbRuAjRKXcv/A3UX45+GBZ4c6I/QA8jmjbSCd3fj34anWYbpnXXD5Y9EKvh4Zr38ndfEh7viOjM7ST9iJ4Q7GImnOvT2S/zfy+nEIC2raB80pQI9+CCaX6I=
+X-Microsoft-Antispam-Message-Info: Mk6dp0pv9o4jRAhISKvJ5viqXAS+aPV5lCJUg70kX7lXruQMqYl8ne6U+V6x/Wq0Sx7j9He5OM6wkznM4OEcnnuijTxxMxqAI/SJHiqqdXYVn8vxV3yBTvyNDcqtY9Ss5yrHp0xabSbwvZMaYWesiIvAZIDnIfTS9EP4MnZqYLnXdJhDHoFYd6RsPXbyNuQGDWR4JQhIICGteOQde6YmF/P1KoemIfq5wOcEJ1qZ6oHRJqtlRUYlBo2+NhtaDZ67aBW4+MtKfvAJtg6pPPVXV04tWfIdX16JrDh0QcNGQvdJaer7UIbylsdpPq/3LsI4S1Xl6qLRXx+r0Kii9hs9dcJNQQb2TA9GcnMYXy6QLTbaMXji0K65d4Xk01k/AnJe848CL8/BHFvEkzZ8c0OUCbpheZiUL/Wv1M41eDlmOF/cyKuh+UncEttPKbyLH30x
+X-MS-Exchange-AntiSpam-MessageData: bq1nsOzZivLxG8FaPBgm26aHhLD+wy+4f6ihl9TWBQ6n2W8ORL9xLPDaPnaFDEyO/Eiuj0jjgjfnkoB/WhkLNJU+Mqknpjr5yo/m/Vs15vKXDRDu9zNbSbclJGlI/OFHUD71nnbAYrJ7hP7OY9dFqaHX2qFbE/zFQ+lvTY545P/aTcaPr3UCYyxrgjZ7cq6rY67qPzCuu1KPe+lfkz8kvLLc5VaHhN6Zt6Ycatu0iDR4/rlmlZbE+rDkY9YxpXwS8FqZrX9/OAVzXzr52Yjzef7DK6QK2eYHoFafoqTG+0r8X1GCFAEAWO8RcCt87k1FiawtlIxWWwa6P7puX3zJtPi6vJwckzpkyFjDAnyHjUJtuK13oWA1tnVKG7VSaICbiDQuBzNEvOs5sC1ZaeWHqIB7NCUC+QHCgfmHGYmNKitjBsLe6wYV5XTJuSmjhx8r04dKLc6Cx4xH+mYmcZWZPct/JweuppIKkSYqr+08fbwtxynhd/ybii3pE36xlRfN2PXRhiEmDidlwacVCVjCZm+2/K2uMmaBXcvWvnlc0UqEE/BlnGs9oMJ7O3TZ6n+1r3s5PPIt09nHWsIFZLuBLlPesBEEIKRXC5GnXXeuSNSiwYbZTrOvE6PnAxhBUJjNF5kyrZf1X+WwszHCkyKUfRLR4Q2kWbbAFcy3GxoErhJ2ED2J5uZVu7aMB+OaV4Tg6vhqtjk4tAr2aawlCblbVUBTJRNBRN0zBuHEp9hQnx8ou8orP//7XiWSYlozkHjFS30Wbn8xt8OADxNwUmD5cbE/pjHDTePWWdlt5SDR9YQ=
 X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c1bd5aaf-8719-41e6-490f-08d7eb467a79
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Apr 2020 07:33:43.2890
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4e47d305-d850-4021-01e2-08d7eb467e77
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Apr 2020 07:33:49.9909
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: b61c8803-16f3-4c35-9b17-6f65f441df86
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: F1Tk+cWX6rw6H8ylr8oEp3PBlPYEOGpDnzv1KdOLRRYqDyA5W36rUzcgjEAkBQI1oALb8/u9N2rjWpi0v7vb8g==
+X-MS-Exchange-CrossTenant-UserPrincipalName: TcHj9s54Huykl7XaZQ01YjKOhXgAV/nzbUP4QdmYrfij9iO2UehOt8/4ILExVmWXXDcciLeD3kj9k0fMQR342g==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR04MB4538
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This series adds initial KVM RISC-V support. Currently, we are able to boot
-RISC-V 64bit Linux Guests with multiple VCPUs.
+This patch extends asm/csr.h by adding RISC-V hypervisor extension
+related defines.
 
-Few key aspects of KVM RISC-V added by this series are:
-1. Minimal possible KVM world-switch which touches only GPRs and few CSRs.
-2. Full Guest/VM switch is done via vcpu_get/vcpu_put infrastructure.
-3. KVM ONE_REG interface for VCPU register access from user-space.
-4. PLIC emulation is done in user-space.
-5. Timer and IPI emuation is done in-kernel.
-6. MMU notifiers supported.
-7. FP lazy save/restore supported.
-8. SBI v0.1 emulation for KVM Guest available.
-9. Forward unhandled SBI calls to KVM userspace.
-10. Hugepage support for Guest/VM
+Signed-off-by: Anup Patel <anup.patel@wdc.com>
+Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+Reviewed-by: Alexander Graf <graf@amazon.com>
+---
+ arch/riscv/include/asm/csr.h | 85 ++++++++++++++++++++++++++++++++++++
+ 1 file changed, 85 insertions(+)
 
-Here's a brief TODO list which we will work upon after this series:
-1. SBI v0.2 emulation in-kernel
-2. SBI v0.2 hart state management emulation in-kernel
-3. In-kernel PLIC emulation
-4. ..... and more .....
-
-This series can be found in riscv_kvm_v12 branch at:
-https//github.com/avpatel/linux.git
-
-Our work-in-progress KVMTOOL RISC-V port can be found in riscv_v3 branch
-at: https//github.com/avpatel/kvmtool.git
-
-The QEMU RISC-V hypervisor emulation is done by Alistair and is available
-in mainline/anup/riscv-hyp-ext-v0.6 branch at:
-https://github.com/kvm-riscv/qemu.git
-
-To play around with KVM RISC-V, refer KVM RISC-V wiki at:
-https://github.com/kvm-riscv/howto/wiki
-https://github.com/kvm-riscv/howto/wiki/KVM-RISCV64-on-QEMU
-
-Changes since v11:
- - Rebased patches on Linux-5.7-rc3
- - Fixed typo in typecast of stage2_map_size define
- - Introduced struct kvm_cpu_trap to represent trap details and
-   use it as function parameter wherever applicable
- - Pass memslot to kvm_riscv_stage2_map() for supporing dirty page
-   logging in future
- - RISC-V H-Extension v0.6 spec support
- - Send-out first three patches as separate series so that it can
-   be taken by Palmer for Linux RISC-V
-
-Changes since v10:
- - Rebased patches on Linux-5.6-rc5
- - Reduce RISCV_ISA_EXT_MAX from 256 to 64
- - Separate PATCH for removing N-extension related defines
- - Added comments as requested by Palmer
- - Fixed HIDELEG CSR programming
-
-Changes since v9:
- - Rebased patches on Linux-5.5-rc3
- - Squash PATCH19 and PATCH20 into PATCH5
- - Squash PATCH18 into PATCH11
- - Squash PATCH17 into PATCH16
- - Added ONE_REG interface for VCPU timer in PATCH13
- - Use HTIMEDELTA for VCPU timer in PATCH13
- - Updated KVM RISC-V mailing list in MAINTAINERS entry
- - Update KVM kconfig option to depend on RISCV_SBI and MMU
- - Check for SBI v0.2 and SBI v0.2 RFENCE extension at boot-time
- - Use SBI v0.2 RFENCE extension in VMID implementation
- - Use SBI v0.2 RFENCE extension in Stage2 MMU implementation
- - Use SBI v0.2 RFENCE extension in SBI implementation
- - Moved to RISC-V Hypervisor v0.5 draft spec
- - Updated Documentation/virt/kvm/api.txt for timer ONE_REG interface
-
-Changes since v8:
- - Rebased series on Linux-5.4-rc3 and Atish's SBI v0.2 patches
- - Use HRTIMER_MODE_REL instead of HRTIMER_MODE_ABS in timer emulation
- - Fixed kvm_riscv_stage2_map() to handle hugepages
- - Added patch to forward unhandled SBI calls to user-space
- - Added patch for iterative/recursive stage2 page table programming
- - Added patch to remove per-CPU vsip_shadow variable
- - Added patch to fix race-condition in kvm_riscv_vcpu_sync_interrupts()
-
-Changes since v7:
-- Rebased series on Linux-5.4-rc1 and Atish's SBI v0.2 patches
-- Removed PATCH1, PATCH3, and PATCH20 because these already merged
-- Use kernel doc style comments for ISA bitmap functions
-- Don't parse X, Y, and Z extension in riscv_fill_hwcap() because it will
-  be added in-future
-- Mark KVM RISC-V kconfig option as EXPERIMENTAL
-- Typo fix in commit description of PATCH6 of v7 series
-- Use separate structs for CORE and CSR registers of ONE_REG interface
-- Explicitly include asm/sbi.h in kvm/vcpu_sbi.c
-- Removed implicit switch-case fall-through in kvm_riscv_vcpu_exit()
-- No need to set VSSTATUS.MXR bit in kvm_riscv_vcpu_unpriv_read()
-- Removed register for instruction length in kvm_riscv_vcpu_unpriv_read()
-- Added defines for checking/decoding instruction length
-- Added separate patch to forward unhandled SBI calls to userspace tool
-
-Changes since v6:
-- Rebased patches on Linux-5.3-rc7
-- Added "return_handled" in struct kvm_mmio_decode to ensure that
-  kvm_riscv_vcpu_mmio_return() updates SEPC only once
-- Removed trap_stval parameter from kvm_riscv_vcpu_unpriv_read()
-- Updated git repo URL in MAINTAINERS entry
-
-Changes since v5:
-- Renamed KVM_REG_RISCV_CONFIG_TIMEBASE register to
-  KVM_REG_RISCV_CONFIG_TBFREQ register in ONE_REG interface
-- Update SPEC in kvm_riscv_vcpu_mmio_return() for MMIO exits
-- Use switch case instead of illegal instruction opcode table for simplicity
-- Improve comments in stage2_remote_tlb_flush() for a potential remote TLB
-  flush optimization
-- Handle all unsupported SBI calls in default case of
-  kvm_riscv_vcpu_sbi_ecall() function
-- Fixed kvm_riscv_vcpu_sync_interrupts() for software interrupts
-- Improved unprivilege reads to handle traps due to Guest stage1 page table
-- Added separate patch to document RISC-V specific things in
-  Documentation/virt/kvm/api.txt
-
-Changes since v4:
-- Rebased patches on Linux-5.3-rc5
-- Added Paolo's Acked-by and Reviewed-by
-- Updated mailing list in MAINTAINERS entry
-
-Changes since v3:
-- Moved patch for ISA bitmap from KVM prep series to this series
-- Make vsip_shadow as run-time percpu variable instead of compile-time
-- Flush Guest TLBs on all Host CPUs whenever we run-out of VMIDs
-
-Changes since v2:
-- Removed references of KVM_REQ_IRQ_PENDING from all patches
-- Use kvm->srcu within in-kernel KVM run loop
-- Added percpu vsip_shadow to track last value programmed in VSIP CSR
-- Added comments about irqs_pending and irqs_pending_mask
-- Used kvm_arch_vcpu_runnable() in-place-of kvm_riscv_vcpu_has_interrupt()
-  in system_opcode_insn()
-- Removed unwanted smp_wmb() in kvm_riscv_stage2_vmid_update()
-- Use kvm_flush_remote_tlbs() in kvm_riscv_stage2_vmid_update()
-- Use READ_ONCE() in kvm_riscv_stage2_update_hgatp() for vmid
-
-Changes since v1:
-- Fixed compile errors in building KVM RISC-V as module
-- Removed unused kvm_riscv_halt_guest() and kvm_riscv_resume_guest()
-- Set KVM_CAP_SYNC_MMU capability only after MMU notifiers are implemented
-- Made vmid_version as unsigned long instead of atomic
-- Renamed KVM_REQ_UPDATE_PGTBL to KVM_REQ_UPDATE_HGATP
-- Renamed kvm_riscv_stage2_update_pgtbl() to kvm_riscv_stage2_update_hgatp()
-- Configure HIDELEG and HEDELEG in kvm_arch_hardware_enable()
-- Updated ONE_REG interface for CSR access to user-space
-- Removed irqs_pending_lock and use atomic bitops instead
-- Added separate patch for FP ONE_REG interface
-- Added separate patch for updating MAINTAINERS file
-
-Anup Patel (13):
-  RISC-V: Add hypervisor extension related CSR defines
-  RISC-V: Add initial skeletal KVM support
-  RISC-V: KVM: Implement VCPU create, init and destroy functions
-  RISC-V: KVM: Implement VCPU interrupts and requests handling
-  RISC-V: KVM: Implement KVM_GET_ONE_REG/KVM_SET_ONE_REG ioctls
-  RISC-V: KVM: Implement VCPU world-switch
-  RISC-V: KVM: Handle MMIO exits for VCPU
-  RISC-V: KVM: Handle WFI exits for VCPU
-  RISC-V: KVM: Implement VMID allocator
-  RISC-V: KVM: Implement stage2 page table programming
-  RISC-V: KVM: Implement MMU notifiers
-  RISC-V: KVM: Document RISC-V specific parts of KVM API
-  RISC-V: KVM: Add MAINTAINERS entry
-
-Atish Patra (4):
-  RISC-V: KVM: Add timer functionality
-  RISC-V: KVM: FP lazy save/restore
-  RISC-V: KVM: Implement ONE REG interface for FP registers
-  RISC-V: KVM: Add SBI v0.1 support
-
- Documentation/virt/kvm/api.rst          | 193 ++++-
- MAINTAINERS                             |  11 +
- arch/riscv/Kconfig                      |   2 +
- arch/riscv/Makefile                     |   2 +
- arch/riscv/include/asm/csr.h            |  85 ++
- arch/riscv/include/asm/kvm_host.h       | 272 +++++++
- arch/riscv/include/asm/kvm_vcpu_timer.h |  44 ++
- arch/riscv/include/asm/pgtable-bits.h   |   1 +
- arch/riscv/include/uapi/asm/kvm.h       | 127 +++
- arch/riscv/kernel/asm-offsets.c         | 154 ++++
- arch/riscv/kvm/Kconfig                  |  34 +
- arch/riscv/kvm/Makefile                 |  14 +
- arch/riscv/kvm/main.c                   |  97 +++
- arch/riscv/kvm/mmu.c                    | 775 ++++++++++++++++++
- arch/riscv/kvm/tlb.S                    |  43 +
- arch/riscv/kvm/vcpu.c                   | 996 ++++++++++++++++++++++++
- arch/riscv/kvm/vcpu_exit.c              | 654 ++++++++++++++++
- arch/riscv/kvm/vcpu_sbi.c               | 172 ++++
- arch/riscv/kvm/vcpu_switch.S            | 391 ++++++++++
- arch/riscv/kvm/vcpu_timer.c             | 225 ++++++
- arch/riscv/kvm/vm.c                     |  86 ++
- arch/riscv/kvm/vmid.c                   | 120 +++
- drivers/clocksource/timer-riscv.c       |   8 +
- include/clocksource/timer-riscv.h       |  16 +
- include/uapi/linux/kvm.h                |   8 +
- 25 files changed, 4521 insertions(+), 9 deletions(-)
- create mode 100644 arch/riscv/include/asm/kvm_host.h
- create mode 100644 arch/riscv/include/asm/kvm_vcpu_timer.h
- create mode 100644 arch/riscv/include/uapi/asm/kvm.h
- create mode 100644 arch/riscv/kvm/Kconfig
- create mode 100644 arch/riscv/kvm/Makefile
- create mode 100644 arch/riscv/kvm/main.c
- create mode 100644 arch/riscv/kvm/mmu.c
- create mode 100644 arch/riscv/kvm/tlb.S
- create mode 100644 arch/riscv/kvm/vcpu.c
- create mode 100644 arch/riscv/kvm/vcpu_exit.c
- create mode 100644 arch/riscv/kvm/vcpu_sbi.c
- create mode 100644 arch/riscv/kvm/vcpu_switch.S
- create mode 100644 arch/riscv/kvm/vcpu_timer.c
- create mode 100644 arch/riscv/kvm/vm.c
- create mode 100644 arch/riscv/kvm/vmid.c
- create mode 100644 include/clocksource/timer-riscv.h
-
+diff --git a/arch/riscv/include/asm/csr.h b/arch/riscv/include/asm/csr.h
+index cec462e198ce..ec6a1917bb0d 100644
+--- a/arch/riscv/include/asm/csr.h
++++ b/arch/riscv/include/asm/csr.h
+@@ -30,6 +30,8 @@
+ #define SR_XS_CLEAN	_AC(0x00010000, UL)
+ #define SR_XS_DIRTY	_AC(0x00018000, UL)
+ 
++#define SR_MXR		_AC(0x00080000, UL)
++
+ #ifndef CONFIG_64BIT
+ #define SR_SD		_AC(0x80000000, UL) /* FS/XS dirty */
+ #else
+@@ -52,22 +54,31 @@
+ 
+ /* Interrupt causes (minus the high bit) */
+ #define IRQ_S_SOFT		1
++#define IRQ_VS_SOFT		2
+ #define IRQ_M_SOFT		3
+ #define IRQ_S_TIMER		5
++#define IRQ_VS_TIMER		6
+ #define IRQ_M_TIMER		7
+ #define IRQ_S_EXT		9
++#define IRQ_VS_EXT		10
+ #define IRQ_M_EXT		11
+ 
+ /* Exception causes */
+ #define EXC_INST_MISALIGNED	0
+ #define EXC_INST_ACCESS		1
++#define EXC_INST_ILLEGAL	2
+ #define EXC_BREAKPOINT		3
+ #define EXC_LOAD_ACCESS		5
+ #define EXC_STORE_ACCESS	7
+ #define EXC_SYSCALL		8
++#define EXC_HYPERVISOR_SYSCALL	9
++#define EXC_SUPERVISOR_SYSCALL	10
+ #define EXC_INST_PAGE_FAULT	12
+ #define EXC_LOAD_PAGE_FAULT	13
+ #define EXC_STORE_PAGE_FAULT	15
++#define EXC_INST_GUEST_PAGE_FAULT	20
++#define EXC_LOAD_GUEST_PAGE_FAULT	21
++#define EXC_STORE_GUEST_PAGE_FAULT	23
+ 
+ /* PMP configuration */
+ #define PMP_R			0x01
+@@ -79,6 +90,55 @@
+ #define PMP_A_NAPOT		0x18
+ #define PMP_L			0x80
+ 
++/* HSTATUS flags */
++#ifdef CONFIG_64BIT
++#define HSTATUS_VSXL		_AC(0x300000000, UL)
++#define HSTATUS_VSXL_SHIFT	32
++#endif
++#define HSTATUS_VTSR		_AC(0x00400000, UL)
++#define HSTATUS_VTVM		_AC(0x00100000, UL)
++#define HSTATUS_VGEIN		_AC(0x0003f000, UL)
++#define HSTATUS_VGEIN_SHIFT	12
++#define HSTATUS_HU		_AC(0x00000200, UL)
++#define HSTATUS_SPVP		_AC(0x00000100, UL)
++#define HSTATUS_SPV		_AC(0x00000080, UL)
++#define HSTATUS_GVA		_AC(0x00000040, UL)
++#define HSTATUS_VSBE		_AC(0x00000020, UL)
++
++/* HGATP flags */
++#define HGATP_MODE_OFF		_AC(0, UL)
++#define HGATP_MODE_SV32X4	_AC(1, UL)
++#define HGATP_MODE_SV39X4	_AC(8, UL)
++#define HGATP_MODE_SV48X4	_AC(9, UL)
++
++#define HGATP32_MODE_SHIFT	31
++#define HGATP32_VMID_SHIFT	22
++#define HGATP32_VMID_MASK	_AC(0x1FC00000, UL)
++#define HGATP32_PPN		_AC(0x003FFFFF, UL)
++
++#define HGATP64_MODE_SHIFT	60
++#define HGATP64_VMID_SHIFT	44
++#define HGATP64_VMID_MASK	_AC(0x03FFF00000000000, UL)
++#define HGATP64_PPN		_AC(0x00000FFFFFFFFFFF, UL)
++
++#ifdef CONFIG_64BIT
++#define HGATP_PPN		HGATP64_PPN
++#define HGATP_VMID_SHIFT	HGATP64_VMID_SHIFT
++#define HGATP_VMID_MASK		HGATP64_VMID_MASK
++#define HGATP_MODE		(HGATP_MODE_SV39X4 << HGATP64_MODE_SHIFT)
++#else
++#define HGATP_PPN		HGATP32_PPN
++#define HGATP_VMID_SHIFT	HGATP32_VMID_SHIFT
++#define HGATP_VMID_MASK		HGATP32_VMID_MASK
++#define HGATP_MODE		(HGATP_MODE_SV32X4 << HGATP32_MODE_SHIFT)
++#endif
++
++/* VSIP & HVIP relation */
++#define VSIP_TO_HVIP_SHIFT	(IRQ_VS_SOFT - IRQ_S_SOFT)
++#define VSIP_VALID_MASK		((_AC(1, UL) << IRQ_S_SOFT) | \
++				 (_AC(1, UL) << IRQ_S_TIMER) | \
++				 (_AC(1, UL) << IRQ_S_EXT))
++
+ /* symbolic CSR names: */
+ #define CSR_CYCLE		0xc00
+ #define CSR_TIME		0xc01
+@@ -98,6 +158,31 @@
+ #define CSR_SIP			0x144
+ #define CSR_SATP		0x180
+ 
++#define CSR_VSSTATUS		0x200
++#define CSR_VSIE		0x204
++#define CSR_VSTVEC		0x205
++#define CSR_VSSCRATCH		0x240
++#define CSR_VSEPC		0x241
++#define CSR_VSCAUSE		0x242
++#define CSR_VSTVAL		0x243
++#define CSR_VSIP		0x244
++#define CSR_VSATP		0x280
++
++#define CSR_HSTATUS		0x600
++#define CSR_HEDELEG		0x602
++#define CSR_HIDELEG		0x603
++#define CSR_HIE			0x604
++#define CSR_HTIMEDELTA		0x605
++#define CSR_HCOUNTERNEN		0x606
++#define CSR_HGEIE		0x607
++#define CSR_HTIMEDELTAH		0x615
++#define CSR_HTVAL		0x643
++#define CSR_HIP			0x644
++#define CSR_HVIP		0x645
++#define CSR_HTINST		0x64a
++#define CSR_HGATP		0x680
++#define CSR_HGEIP		0xe12
++
+ #define CSR_MSTATUS		0x300
+ #define CSR_MISA		0x301
+ #define CSR_MIE			0x304
 -- 
 2.25.1
 
