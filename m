@@ -2,66 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7E0A51BB874
-	for <lists+kvm@lfdr.de>; Tue, 28 Apr 2020 10:09:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 12A8E1BB882
+	for <lists+kvm@lfdr.de>; Tue, 28 Apr 2020 10:11:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726761AbgD1IJR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Apr 2020 04:09:17 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:25636 "EHLO
+        id S1726853AbgD1IKa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Apr 2020 04:10:30 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:18250 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726180AbgD1IJR (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 28 Apr 2020 04:09:17 -0400
+        by vger.kernel.org with ESMTP id S1726377AbgD1IK3 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 28 Apr 2020 04:10:29 -0400
 Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 03S831ds118075;
-        Tue, 28 Apr 2020 04:09:16 -0400
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 03S833Ep118370;
+        Tue, 28 Apr 2020 04:10:29 -0400
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 30mh9nahes-1
+        by mx0a-001b2d01.pphosted.com with ESMTP id 30mh9najhk-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 28 Apr 2020 04:09:15 -0400
+        Tue, 28 Apr 2020 04:10:28 -0400
 Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 03S83DMp119777;
-        Tue, 28 Apr 2020 04:09:15 -0400
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 30mh9nahdy-1
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 03S83EdA120000;
+        Tue, 28 Apr 2020 04:10:28 -0400
+Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 30mh9najge-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 28 Apr 2020 04:09:15 -0400
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 03S853dY000878;
-        Tue, 28 Apr 2020 08:09:12 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma03ams.nl.ibm.com with ESMTP id 30mcu5nmtk-1
+        Tue, 28 Apr 2020 04:10:28 -0400
+Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
+        by ppma04fra.de.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 03S855TK011472;
+        Tue, 28 Apr 2020 08:10:26 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma04fra.de.ibm.com with ESMTP id 30mcu58nqj-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 28 Apr 2020 08:09:12 +0000
+        Tue, 28 Apr 2020 08:10:25 +0000
 Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 03S89Aqr53018636
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 03S8ANMu35586342
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 28 Apr 2020 08:09:10 GMT
+        Tue, 28 Apr 2020 08:10:23 GMT
 Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 07F2F52051;
-        Tue, 28 Apr 2020 08:09:10 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id AEA5C52059;
+        Tue, 28 Apr 2020 08:10:23 +0000 (GMT)
 Received: from oc3016276355.ibm.com (unknown [9.145.156.174])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 707715204F;
-        Tue, 28 Apr 2020 08:09:09 +0000 (GMT)
-Subject: Re: [PATCH v7 03/15] s390/zcrypt: driver callback to indicate
- resource in use
-To:     Tony Krowiak <akrowiak@linux.ibm.com>, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     freude@linux.ibm.com, borntraeger@de.ibm.com, cohuck@redhat.com,
-        mjrosato@linux.ibm.com, pasic@linux.ibm.com,
-        alex.williamson@redhat.com, kwankhede@nvidia.com,
-        jjherne@linux.ibm.com, fiuczy@linux.ibm.com
-References: <20200407192015.19887-1-akrowiak@linux.ibm.com>
- <20200407192015.19887-4-akrowiak@linux.ibm.com>
- <75bcbc06-f38f-1aff-138f-5d2a2dd3f7b6@linux.ibm.com>
- <162f7dbc-9dd0-0a42-0d1a-8412a9a848e7@linux.ibm.com>
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 636B65204F;
+        Tue, 28 Apr 2020 08:10:23 +0000 (GMT)
+Subject: Re: [kvm-unit-tests PATCH v6 02/10] s390x: Use PSW bits definitions
+ in cstart
+To:     David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, frankja@linux.ibm.com,
+        thuth@redhat.com, cohuck@redhat.com
+References: <1587725152-25569-1-git-send-email-pmorel@linux.ibm.com>
+ <1587725152-25569-3-git-send-email-pmorel@linux.ibm.com>
+ <231839f0-41f9-844c-efc4-34893e7b720f@redhat.com>
 From:   Pierre Morel <pmorel@linux.ibm.com>
-Message-ID: <3f7f57fb-c137-4854-3cb0-b234196a9f1e@linux.ibm.com>
-Date:   Tue, 28 Apr 2020 10:09:09 +0200
+Message-ID: <6bc4a268-e4c4-d9f0-1e4a-94c48a081c10@linux.ibm.com>
+Date:   Tue, 28 Apr 2020 10:10:23 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <162f7dbc-9dd0-0a42-0d1a-8412a9a848e7@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <231839f0-41f9-844c-efc4-34893e7b720f@redhat.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
@@ -79,67 +75,93 @@ X-Mailing-List: kvm@vger.kernel.org
 
 
 
-On 2020-04-28 00:24, Tony Krowiak wrote:
+On 2020-04-27 11:01, David Hildenbrand wrote:
+> On 24.04.20 12:45, Pierre Morel wrote:
+>> This patch defines the PSW bits EA/BA used to initialize the PSW masks
+>> for exceptions.
+>>
+>> Since some PSW mask definitions exist already in arch_def.h we add these
+>> definitions there.
+>> We move all PSW definitions together and protect assembler code against
+>> C syntax.
+>>
+>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+>> ---
+>>   lib/s390x/asm/arch_def.h | 16 ++++++++++++----
+>>   s390x/cstart64.S         | 15 ++++++++-------
+>>   2 files changed, 20 insertions(+), 11 deletions(-)
+>>
+>> diff --git a/lib/s390x/asm/arch_def.h b/lib/s390x/asm/arch_def.h
+>> index 15a4d49..c54409a 100644
+>> --- a/lib/s390x/asm/arch_def.h
+>> +++ b/lib/s390x/asm/arch_def.h
+>> @@ -10,15 +10,22 @@
+>>   #ifndef _ASM_S390X_ARCH_DEF_H_
+>>   #define _ASM_S390X_ARCH_DEF_H_
+>>   
+>> +#define PSW_MASK_EXT			0x0100000000000000UL
+>> +#define PSW_MASK_DAT			0x0400000000000000UL
+>> +#define PSW_MASK_SHORT_PSW		0x0008000000000000UL
+>> +#define PSW_MASK_PSTATE			0x0001000000000000UL
+>> +#define PSW_MASK_BA			0x0000000080000000UL
+>> +#define PSW_MASK_EA			0x0000000100000000UL
+>> +
+>> +#define PSW_EXCEPTION_MASK	(PSW_MASK_EA | PSW_MASK_BA)
+>> +#define PSW_RESET_MASK		(PSW_EXCEPTION_MASK | PSW_MASK_SHORT_PSW)
+>> +
+>> +#ifndef __ASSEMBLER__
+>>   struct psw {
+>>   	uint64_t	mask;
+>>   	uint64_t	addr;
+>>   };
+>>   
+>> -#define PSW_MASK_EXT			0x0100000000000000UL
+>> -#define PSW_MASK_DAT			0x0400000000000000UL
+>> -#define PSW_MASK_PSTATE			0x0001000000000000UL
+>> -
+>>   #define CR0_EXTM_SCLP			0X0000000000000200UL
+>>   #define CR0_EXTM_EXTC			0X0000000000002000UL
+>>   #define CR0_EXTM_EMGC			0X0000000000004000UL
+>> @@ -297,4 +304,5 @@ static inline uint32_t get_prefix(void)
+>>   	return current_prefix;
+>>   }
+>>   
+>> +#endif /* __ASSEMBLER */
+>>   #endif
+>> diff --git a/s390x/cstart64.S b/s390x/cstart64.S
+>> index ba2e67c..e394b3a 100644
+>> --- a/s390x/cstart64.S
+>> +++ b/s390x/cstart64.S
+>> @@ -12,6 +12,7 @@
+>>    */
+>>   #include <asm/asm-offsets.h>
+>>   #include <asm/sigp.h>
+>> +#include <asm/arch_def.h>
+>>   
+>>   .section .init
+>>   
+>> @@ -225,19 +226,19 @@ svc_int:
+>>   
+>>   	.align	8
+>>   reset_psw:
+>> -	.quad	0x0008000180000000
+>> +	.quad	PSW_RESET_MASK
+> 
+> I'd really prefer
+> 
+> .quad	PSW_EXCEPTION_MASK | PSW_MASK_SHORT_PSW
+> 
+> here instead and drop PSW_RESET_MASK. Makes it clearer that we are
+> talking about a special short psw here.
+> 
+> Apart from that, looks good to me.
 > 
 > 
-> On 4/27/20 4:20 AM, Pierre Morel wrote:
->>
->>
->> On 2020-04-07 21:20, Tony Krowiak wrote:
->>> Introduces a new driver callback to prevent a root user from unbinding
->>> an AP queue from its device driver if the queue is in use. The intent of
->>> this callback is to provide a driver with the means to prevent a root 
->>> user
->>> from inadvertently taking a queue away from a guest and giving it to the
->>> host while the guest is still using it.
 
-...snip...
-
->>
->> This functionality is valid for the host as for the guests and is 
->> handled automatically by the firmware with the CRYCB.
->> The AP bus uses QCI to retrieve the host CRYCB and build the hosts AP 
->> queues.
->>
->> If instead to mix VFIO CRYCB matrix handling and queues at the same 
->> level inside the AP bus we separate these different firmware entities 
->> in two different software entities.
->>
->> If we make the AP bus sit above a CRYCB/Matrix bus, and in the way 
->> virtualize the QCI and test AP queue instructions:
->> - we can directly pass a matrix device to the guest though a VFIO 
->> matrix device
->> - the consistence will be automatic
->> - the VFIO device and parent device will be of the same kind which 
->> would make the design much more clearer.
->> - there will be no need for these callback because the consistence of 
->> the matrix will be guaranteed by firmware
-> 
-> As stated in my response above, the issue here is not consistency. While 
-> the design you describe
-> may be reasonable, it is a major departure from what is out in the 
-> field. In other words, that ship
-> has sailed.
-
-
-The current VFIO-AP driver works as before, without any change, above 
-the Matrix device I suggest.
-
-Aside the old scheme which can continue, the Matrix device can be used 
-directly to build a VFIO Matrix device, usable by QEMU without any 
-modification.
-
-Once the dynamic extensions proposed in this series and the associated 
-tools are out on the field, then yes the ship is really far.
-For now, the existing user's API do not change, the existing tools do 
-not need modifications and we can repair the ship for its long journey.
-
-The inconsistency between device and VFIO device and the resulting 
-complexity is not going to ease future enhancement.
+Thanks, I will do as you propose,
 
 Regards,
 Pierre
-
 
 
 -- 
