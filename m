@@ -2,17 +2,17 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6AC681BC334
-	for <lists+kvm@lfdr.de>; Tue, 28 Apr 2020 17:23:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A98DC1BC32E
+	for <lists+kvm@lfdr.de>; Tue, 28 Apr 2020 17:23:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728263AbgD1PXG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Apr 2020 11:23:06 -0400
-Received: from 8bytes.org ([81.169.241.247]:37428 "EHLO theia.8bytes.org"
+        id S1728793AbgD1PWu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Apr 2020 11:22:50 -0400
+Received: from 8bytes.org ([81.169.241.247]:37386 "EHLO theia.8bytes.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728253AbgD1PSC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Apr 2020 11:18:02 -0400
+        id S1728263AbgD1PSD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Apr 2020 11:18:03 -0400
 Received: by theia.8bytes.org (Postfix, from userid 1000)
-        id BE12BF08; Tue, 28 Apr 2020 17:17:47 +0200 (CEST)
+        id E526AF0E; Tue, 28 Apr 2020 17:17:47 +0200 (CEST)
 From:   Joerg Roedel <joro@8bytes.org>
 To:     x86@kernel.org
 Cc:     hpa@zytor.com, Andy Lutomirski <luto@kernel.org>,
@@ -32,9 +32,9 @@ Cc:     hpa@zytor.com, Andy Lutomirski <luto@kernel.org>,
         Joerg Roedel <joro@8bytes.org>, Joerg Roedel <jroedel@suse.de>,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         virtualization@lists.linux-foundation.org
-Subject: [PATCH v3 30/75] x86/idt: Move two function from k/idt.c to i/a/desc.h
-Date:   Tue, 28 Apr 2020 17:16:40 +0200
-Message-Id: <20200428151725.31091-31-joro@8bytes.org>
+Subject: [PATCH v3 31/75] x86/head/64: Install boot GDT
+Date:   Tue, 28 Apr 2020 17:16:41 +0200
+Message-Id: <20200428151725.31091-32-joro@8bytes.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200428151725.31091-1-joro@8bytes.org>
 References: <20200428151725.31091-1-joro@8bytes.org>
@@ -45,139 +45,68 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Joerg Roedel <jroedel@suse.de>
 
-Move these two functions from kernel/idt.c to include/asm/desc.h:
-
-	* init_idt_data()
-	* idt_init_desc()
-
-These functions are needed to setup IDT entries very early and need to
-be called from head64.c. To be usable this early these functions need to
-be compiled without instrumentation and the stack-protector feature.
-These features need to be kept enabled for kernel/idt.c, so head64.c
-must use its own versions.
+Handling exceptions during boot requires a working GDT. The kernel GDT
+is not yet ready for use, so install a temporary boot GDT.
 
 Signed-off-by: Joerg Roedel <jroedel@suse.de>
 ---
- arch/x86/include/asm/desc.h      | 27 +++++++++++++++++++++++++
- arch/x86/include/asm/desc_defs.h |  7 +++++++
- arch/x86/kernel/idt.c            | 34 --------------------------------
- 3 files changed, 34 insertions(+), 34 deletions(-)
+ arch/x86/kernel/head_64.S | 36 ++++++++++++++++++++++++++++++++++++
+ 1 file changed, 36 insertions(+)
 
-diff --git a/arch/x86/include/asm/desc.h b/arch/x86/include/asm/desc.h
-index 68a99d2a5f33..80bf63c08007 100644
---- a/arch/x86/include/asm/desc.h
-+++ b/arch/x86/include/asm/desc.h
-@@ -389,6 +389,33 @@ static inline void set_desc_limit(struct desc_struct *desc, unsigned long limit)
- void update_intr_gate(unsigned int n, const void *addr);
- void alloc_intr_gate(unsigned int n, const void *addr);
+diff --git a/arch/x86/kernel/head_64.S b/arch/x86/kernel/head_64.S
+index 4bbc770af632..11a28c1fb51f 100644
+--- a/arch/x86/kernel/head_64.S
++++ b/arch/x86/kernel/head_64.S
+@@ -72,6 +72,26 @@ SYM_CODE_START_NOALIGN(startup_64)
+ 	/* Set up the stack for verify_cpu(), similar to initial_stack below */
+ 	leaq	(__end_init_task - SIZEOF_PTREGS)(%rip), %rsp
  
-+static inline void init_idt_data(struct idt_data *data, unsigned int n,
-+				 const void *addr)
-+{
-+	BUG_ON(n > 0xFF);
++	/* Setup boot GDT descriptor and load boot GDT */
++	leaq	boot_gdt(%rip), %rax
++	movq	%rax, boot_gdt_base(%rip)
++	lgdt	boot_gdt_descr(%rip)
 +
-+	memset(data, 0, sizeof(*data));
-+	data->vector	= n;
-+	data->addr	= addr;
-+	data->segment	= __KERNEL_CS;
-+	data->bits.type	= GATE_INTERRUPT;
-+	data->bits.p	= 1;
-+}
++	/* New GDT is live - reload data segment registers */
++	movl	$__KERNEL_DS, %eax
++	movl	%eax, %ds
++	movl	%eax, %ss
++	movl	%eax, %es
 +
-+static inline void idt_init_desc(gate_desc *gate, const struct idt_data *d)
-+{
-+	unsigned long addr = (unsigned long) d->addr;
++	/* Now switch to __KERNEL_CS so IRET works reliably */
++	pushq	$__KERNEL_CS
++	leaq	.Lon_kernel_cs(%rip), %rax
++	pushq	%rax
++	lretq
 +
-+	gate->offset_low	= (u16) addr;
-+	gate->segment		= (u16) d->segment;
-+	gate->bits		= d->bits;
-+	gate->offset_middle	= (u16) (addr >> 16);
-+#ifdef CONFIG_X86_64
-+	gate->offset_high	= (u32) (addr >> 32);
-+	gate->reserved		= 0;
-+#endif
-+}
++.Lon_kernel_cs:
++	UNWIND_HINT_EMPTY
 +
- extern unsigned long system_vectors[];
+ 	/* Sanitize CPU configuration */
+ 	call verify_cpu
  
- #ifdef CONFIG_X86_64
-diff --git a/arch/x86/include/asm/desc_defs.h b/arch/x86/include/asm/desc_defs.h
-index 5621fb3f2d1a..f7e7099af595 100644
---- a/arch/x86/include/asm/desc_defs.h
-+++ b/arch/x86/include/asm/desc_defs.h
-@@ -74,6 +74,13 @@ struct idt_bits {
- 			p	: 1;
- } __attribute__((packed));
+@@ -480,6 +500,22 @@ SYM_DATA_LOCAL(early_gdt_descr_base,	.quad INIT_PER_CPU_VAR(gdt_page))
+ SYM_DATA(phys_base, .quad 0x0)
+ EXPORT_SYMBOL(phys_base)
  
-+struct idt_data {
-+	unsigned int	vector;
-+	unsigned int	segment;
-+	struct idt_bits	bits;
-+	const void	*addr;
-+};
++/* Boot GDT used when kernel addresses are not mapped yet */
++SYM_DATA_LOCAL(boot_gdt_descr,		.word boot_gdt_end - boot_gdt)
++SYM_DATA_LOCAL(boot_gdt_base,		.quad 0)
++SYM_DATA_START(boot_gdt)
++	.quad	0
++	.quad   0x00cf9a000000ffff	/* __KERNEL32_CS */
++	.quad   0x00af9a000000ffff	/* __KERNEL_CS */
++	.quad   0x00cf92000000ffff	/* __KERNEL_DS */
++	.quad	0			/* __USER32_CS - unused */
++	.quad	0			/* __USER_DS   - unused */
++	.quad	0			/* __USER_CS   - unused */
++	.quad	0			/* unused */
++	.quad   0x0080890000000000	/* TSS descriptor */
++	.quad   0x0000000000000000	/* TSS continued */
++SYM_DATA_END_LABEL(boot_gdt, SYM_L_LOCAL, boot_gdt_end)
 +
- struct gate_struct {
- 	u16		offset_low;
- 	u16		segment;
-diff --git a/arch/x86/kernel/idt.c b/arch/x86/kernel/idt.c
-index c752027abc9e..4a2c7791c697 100644
---- a/arch/x86/kernel/idt.c
-+++ b/arch/x86/kernel/idt.c
-@@ -9,13 +9,6 @@
- #include <asm/desc.h>
- #include <asm/hw_irq.h>
+ #include "../../x86/xen/xen-head.S"
  
--struct idt_data {
--	unsigned int	vector;
--	unsigned int	segment;
--	struct idt_bits	bits;
--	const void	*addr;
--};
--
- #define DPL0		0x0
- #define DPL3		0x3
- 
-@@ -204,20 +197,6 @@ const struct desc_ptr debug_idt_descr = {
- };
- #endif
- 
--static inline void idt_init_desc(gate_desc *gate, const struct idt_data *d)
--{
--	unsigned long addr = (unsigned long) d->addr;
--
--	gate->offset_low	= (u16) addr;
--	gate->segment		= (u16) d->segment;
--	gate->bits		= d->bits;
--	gate->offset_middle	= (u16) (addr >> 16);
--#ifdef CONFIG_X86_64
--	gate->offset_high	= (u32) (addr >> 32);
--	gate->reserved		= 0;
--#endif
--}
--
- static void
- idt_setup_from_table(gate_desc *idt, const struct idt_data *t, int size, bool sys)
- {
-@@ -231,19 +210,6 @@ idt_setup_from_table(gate_desc *idt, const struct idt_data *t, int size, bool sy
- 	}
- }
- 
--static void init_idt_data(struct idt_data *data, unsigned int n,
--			  const void *addr)
--{
--	BUG_ON(n > 0xFF);
--
--	memset(data, 0, sizeof(*data));
--	data->vector	= n;
--	data->addr	= addr;
--	data->segment	= __KERNEL_CS;
--	data->bits.type	= GATE_INTERRUPT;
--	data->bits.p	= 1;
--}
--
- static void set_intr_gate(unsigned int n, const void *addr)
- {
- 	struct idt_data data;
+ 	__PAGE_ALIGNED_BSS
 -- 
 2.17.1
 
