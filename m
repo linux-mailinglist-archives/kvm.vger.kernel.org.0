@@ -2,55 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A39C21BCF04
-	for <lists+kvm@lfdr.de>; Tue, 28 Apr 2020 23:42:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 91C2F1BCF0B
+	for <lists+kvm@lfdr.de>; Tue, 28 Apr 2020 23:44:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726520AbgD1Vmr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Apr 2020 17:42:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45586 "EHLO
+        id S1726805AbgD1VoR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Apr 2020 17:44:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45846 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726272AbgD1Vmp (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 28 Apr 2020 17:42:45 -0400
-Received: from mail-io1-xd42.google.com (mail-io1-xd42.google.com [IPv6:2607:f8b0:4864:20::d42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54514C03C1AD
-        for <kvm@vger.kernel.org>; Tue, 28 Apr 2020 14:42:44 -0700 (PDT)
-Received: by mail-io1-xd42.google.com with SMTP id f3so25065193ioj.1
-        for <kvm@vger.kernel.org>; Tue, 28 Apr 2020 14:42:44 -0700 (PDT)
+        by vger.kernel.org with ESMTP id S1726291AbgD1VoR (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 28 Apr 2020 17:44:17 -0400
+Received: from mail-il1-x141.google.com (mail-il1-x141.google.com [IPv6:2607:f8b0:4864:20::141])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48BD4C03C1AD
+        for <kvm@vger.kernel.org>; Tue, 28 Apr 2020 14:44:17 -0700 (PDT)
+Received: by mail-il1-x141.google.com with SMTP id w6so468866ilg.1
+        for <kvm@vger.kernel.org>; Tue, 28 Apr 2020 14:44:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=rfmlo41ts2i7Zcv0kqVybUxAnbR3sTlhoiDkLxdhqcM=;
-        b=jzYQ2rTc5iGSeW867YpgJb0e0aw2v+lG7u1PpshHvK+b6XV/dUh6YTFnf/tFVjoHSL
-         BU4n4+hcpwwPAURGSbzgxuxkjBKwGmDDH8fhJ6Noim6yF2Ko55IlWL3GaMHWQIEE85z8
-         stYWqfldjztBG7VdjBUxgxmYYt7ch8ZcywOPIpqIy8JW+yYySgvhJYT/a2dBQLTPNYo6
-         TtGt6ctYXhojzWnBpNIFQzBu/3qfIkUvqHKv/BAXbgbmwYbakHDJ4C2IA1PvjgV2JQK5
-         3zqvrwVubOUgBRTJ59l1iaxH/JjFjMKorIeIuTq3Oo0trW8vjEUnPKDt2enyUWMjCT9R
-         lGRg==
+        bh=qwL+4WZ+0ScRQq3VXJ2lINm0eOX2xPWaP7a0ucBzFCA=;
+        b=d7VojKRrrM2EbO15GOh1OhChn7gSyFoTXBrRcOc33vyUBYppKZsM5J90YUoUIGIm6D
+         kJl+gdgZdxLSvXBoBJL8gWJtDQdUDSLmr5Lx088oqp+gCg0xyM1hqhXzkH2hs0DkdFJL
+         IEs6ffv+z09tOT6TZ/kUbg1buaBZgAmOPP605bXMrH+zkfy4eU/fijkjz1DEOM07JoWr
+         lymrrJaD2xwwvFXttNIX3YuSZsXZM+EE9wZsNEl6MuszpQTWxcXgTs83YLdPEg0JP/DK
+         9rcKunzihHcggaPr2OalahIwvaFR5CvA+wOOGGpphObaMV0oFzqYtJSs/ewkHKGshQ84
+         tHeg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=rfmlo41ts2i7Zcv0kqVybUxAnbR3sTlhoiDkLxdhqcM=;
-        b=O/0l7u/vTDSrdbcGIXnUT49VtCThJE1LeJu+5dJMlrGz/ct20zIoJhrGgqAbSXr6IL
-         vUsQioVltPxc4VRk4rKLPjl/h7P8jf6tMCvo0a73t+feLaZXdSmsecYlJLfRffzKw/UH
-         LKraaFct14EWY92UHFtpDK6FyQUoaf67j0o51BYugk5nn3ipEbLXfClrJcReQkLisrwH
-         pkY0j+Pn/l4gFBpSppsz+dLQdXW881Ytv4oNsjwU7JgxmOqNeR/9eWkYv3RPRr3NwRGc
-         amNtExt9Kyndr+cNg/HK53FAcb+BbSYddSwmm+NVGIcjMj8n58N7zFtqlKEn4tud/VYh
-         M+mA==
-X-Gm-Message-State: AGi0PuaOlZevpTDjHjVSo+764L4cbGvcJzbJBeDzND2vWKfBrh+WbqFn
-        td7JSENCQ6fD2AD9IJM21VLCC+SgilHVLSMJs+JEOw==
-X-Google-Smtp-Source: APiQypK7/mohAHqrxGWpCG7N79ayXvDCuEmqwdOh2T1wVp1srOrMpFaJDheHtIywUbwKQ4GJrCnqek9FIrXvz7vYYDc=
-X-Received: by 2002:a05:6638:bd0:: with SMTP id g16mr27759289jad.48.1588110163502;
- Tue, 28 Apr 2020 14:42:43 -0700 (PDT)
+        bh=qwL+4WZ+0ScRQq3VXJ2lINm0eOX2xPWaP7a0ucBzFCA=;
+        b=rLGgIHXmUvBbn0crW919VLT6j/bbwePaQ5nl7JgKs7ob3jJTIF8ARyf7wPAXRgBbuN
+         AdLCJMQBKKWbRNldL3Y4+kVSHI4Ll1VPYmvptp1DpAuBeAaEoKUcg/0WoQgqK2Qb3C/y
+         CQoTCfkf3prFKmgAe6oocmoZhTsCE4lq8EnfYfl6qQgYkg5QuLQeYfqKxKDf/Y/X8CB2
+         tdNNZYuUBtbh1iyJChvFyaOVeb5szfQgoYgAW3A1qmUw6fJCQ6OXMBSXYsNkleaNo1Cu
+         v4NiYrDblLjp++rERyRZTRwo2zF12ZRa8Gta3M4HPNTVD5RbogiB1AvkLhHYq5Y+T3CS
+         fTXQ==
+X-Gm-Message-State: AGi0PuY/8stspcCrqjZMzVpjyFg8e2xPHB9DQ/snjlXtWUmpIOOlCi92
+        En9718d80190nKrQiFmxQSZ3Yn1XrqdcWSsMVYruJw==
+X-Google-Smtp-Source: APiQypKaShkz7WAR98Qp49F/fWDSJZqW2ISiUOp3Ex60HLT/a92+dt8VDos6q83aPip6tyDKdLHAZncMUbfE9aGu6gw=
+X-Received: by 2002:a92:d8ca:: with SMTP id l10mr28461593ilo.118.1588110256438;
+ Tue, 28 Apr 2020 14:44:16 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200423022550.15113-1-sean.j.christopherson@intel.com> <20200423022550.15113-5-sean.j.christopherson@intel.com>
-In-Reply-To: <20200423022550.15113-5-sean.j.christopherson@intel.com>
+References: <20200423022550.15113-1-sean.j.christopherson@intel.com> <20200423022550.15113-6-sean.j.christopherson@intel.com>
+In-Reply-To: <20200423022550.15113-6-sean.j.christopherson@intel.com>
 From:   Jim Mattson <jmattson@google.com>
-Date:   Tue, 28 Apr 2020 14:42:32 -0700
-Message-ID: <CALMp9eRPfvsx+uu4RFbDiLrL4pY9_NiZkivWqUi8gUSAMHv-ZA@mail.gmail.com>
-Subject: Re: [PATCH 04/13] KVM: x86: Make return for {interrupt_nmi}_allowed()
- a bool instead of int
+Date:   Tue, 28 Apr 2020 14:44:05 -0700
+Message-ID: <CALMp9eRZFZhEQOjLGy7LdYGdp23NJOewr49X+XJ3my05v+OZtw@mail.gmail.com>
+Subject: Re: [PATCH 05/13] KVM: nVMX: Move nested_exit_on_nmi() to nested.h
 To:     Sean Christopherson <sean.j.christopherson@intel.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
@@ -68,9 +67,10 @@ X-Mailing-List: kvm@vger.kernel.org
 On Wed, Apr 22, 2020 at 7:26 PM Sean Christopherson
 <sean.j.christopherson@intel.com> wrote:
 >
-> Return an actual bool for kvm_x86_ops' {interrupt_nmi}_allowed() hook to
-> better reflect the return semantics, and to avoid creating an even
-> bigger mess when the related VMX code is refactored in upcoming patches.
+> Expose nested_exit_on_nmi() for use by vmx_nmi_allowed() in a future
+> patch.
+>
+> No functional change intended.
 >
 > Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 Reviewed-by: Jim Mattson <jmattson@google.com>
