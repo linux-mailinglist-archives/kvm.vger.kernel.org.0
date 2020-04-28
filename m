@@ -2,55 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8123D1BCF43
-	for <lists+kvm@lfdr.de>; Tue, 28 Apr 2020 23:59:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6D81D1BCF60
+	for <lists+kvm@lfdr.de>; Wed, 29 Apr 2020 00:04:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726820AbgD1V65 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Apr 2020 17:58:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48144 "EHLO
+        id S1726793AbgD1WEO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Apr 2020 18:04:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49036 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726778AbgD1V65 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 28 Apr 2020 17:58:57 -0400
-Received: from mail-io1-xd41.google.com (mail-io1-xd41.google.com [IPv6:2607:f8b0:4864:20::d41])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C89B0C03C1AD
-        for <kvm@vger.kernel.org>; Tue, 28 Apr 2020 14:58:56 -0700 (PDT)
-Received: by mail-io1-xd41.google.com with SMTP id e9so25037619iok.9
-        for <kvm@vger.kernel.org>; Tue, 28 Apr 2020 14:58:56 -0700 (PDT)
+        by vger.kernel.org with ESMTP id S1726737AbgD1WEO (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 28 Apr 2020 18:04:14 -0400
+Received: from mail-io1-xd42.google.com (mail-io1-xd42.google.com [IPv6:2607:f8b0:4864:20::d42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36A7CC03C1AD
+        for <kvm@vger.kernel.org>; Tue, 28 Apr 2020 15:04:14 -0700 (PDT)
+Received: by mail-io1-xd42.google.com with SMTP id k6so50544iob.3
+        for <kvm@vger.kernel.org>; Tue, 28 Apr 2020 15:04:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Lnb/AuomAQNJo8vC00yUB5kS4MsOuZB4Ct4ocKwuxdk=;
-        b=mkX4NZaNgVNkDyA54xwp26Mz+IRfpG1ztLCsGFY2+Q8scP70EZBen1e/opZFQUaqlu
-         VJ5Rp3psn0rcwas6GrwhtKAnlAsUMCJwnICnwwnEFuTuYssLk0gb3UiqYMLHl5xTHTzi
-         gLhIEZwFQq1pLhwwjwjrCp6Vx9Yt4PsflleMy1hgrW1LffY+tBffmmXWGBUqvxlJ+2Kh
-         S15d2MNup5bdK3efqdbfh+lDsG3Tj3O6M4oehDOMG8bH+cLrtwHmg3DVQfN/vJgExQTy
-         Sn89OHYrhTvStmTNGHpU5K0R86SV6xMjDV6poX65cA+KQPjNmK97WyfbQHpqPcjQVa6Z
-         xG3g==
+         :cc:content-transfer-encoding;
+        bh=hdye9Y+HN3Ay3k4lAQbTQjGJKjGjfhnRJ5ClLYqLI5Q=;
+        b=EYfcSwBKoyf1yvsIqjslcUpr811ti1beomA8wAYjwTPxou14WZi54Y1DRkaCZUFbzS
+         fod/drVFx08FoL743YYDcZt006b5fMlrKOhEBMc4mWuSCmaYYwZkmU3OnVT2w56YAGPt
+         dwetTgWPn05l/H7Uw5Q2HAA94rrAsF8o3ibPAdUZJPCtvTuONOnkW2Iou8UMTPASDrh4
+         VWBxlx9oC3tOZvW+Q7G3fRsF3AmnRSLqL0QMA0x+k9MI6P1D4E51Gs5ZhZqI+EKccIrZ
+         0JtZZdKuZU3XbuJSvldJMMICbIXaSn86M3joweoUyWG+rjeODIhzGiQL4bfNphcwoJs2
+         X47w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Lnb/AuomAQNJo8vC00yUB5kS4MsOuZB4Ct4ocKwuxdk=;
-        b=YmQJ2KCTq1apXJGuIK9h+wRJ95qNzZE392n0cwzKu31FIAXIsmqSOxhZ7GO83XeIqS
-         wZMm5USqVxVpbpvEqxUxE/9+THh77nKBqlelc9svPN5K38r7025wqHfac4mTZsH3xsYO
-         9G0cZuA+cBlQbsnXHni5EaB0VMmnqkXpiZWRom0fU9xTml3groehr6d7yF3XBCNr/Eit
-         Au38Wypo1X/wlPtiiXDjjOzkmvy+nGrOYbcNHg5cXIxShjDf4TSK2HZhKUd9HF0ohT50
-         Yr6riEFWcmCgCbPByb1vzsM/tvM2pPE7nXEEnKSM40BEa2b1ITdh76Z4G5KfwLz2m2GI
-         piQQ==
-X-Gm-Message-State: AGi0PuaW5srV74YEZU7INWgwRuftXsgSvXIHOGWM/GNmu996hnKdgUb3
-        zAIsGKimyCgh6E6USs34444mJGUkWqG+Bwx7ENMBiQ==
-X-Google-Smtp-Source: APiQypJIb0ErMY4mtUsYmzA6Yv167R2fgOgPSoZqyTb9YnVxaEYquhArv+3g934sjJXNag31V/j4bT9VoIQAlxJU3/g=
-X-Received: by 2002:a5e:a610:: with SMTP id q16mr28126485ioi.75.1588111136020;
- Tue, 28 Apr 2020 14:58:56 -0700 (PDT)
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=hdye9Y+HN3Ay3k4lAQbTQjGJKjGjfhnRJ5ClLYqLI5Q=;
+        b=QmYI5fN1DNW8QDrDGZHcts7I3kv3ojhVMziSpkjp7Z6ebaJH3kGscOXfgsMsGIyQox
+         +8+mw9UWQnU7/MTNgsIAsKp/s1pECsfyE46n8TAlxtb3OvxiIOnaAvMgW8aXJoqHTF//
+         CCTcOCigwT0afAtKpcTTM8CO3Ylsys6QEUZOX17VE6eIhpZtzc0rB5Iv2o0FeI/QWLio
+         WH+Zq+3vtP8cLweU36QI9AbDaR2kcVP4BE4essQDED6DfCwG0tENBp+WGBKiv9HHmEix
+         sqkPct8nIt4/pDnF22SD5fko6ENujSNmmwbRJpCiGtnZP7+/4EQyiylKp8Wy0VZ10wKX
+         4xcw==
+X-Gm-Message-State: AGi0Pub1khv41HGhxVyUvR7/u2XRljfbe5nfBwaXcfRct48HQ9TFCcT5
+        v0pm9shyeEoYtY3JDNlqkuvBlvXr0j4xZivOFQXkug==
+X-Google-Smtp-Source: APiQypI9Nf6EOOBA5QVkfYCA6/jwvMsAYAzR0B14+Ay30XrCyHLqc0Nyb66cxDFd7jShKchKfrhAeQtEqRe90mQA/zU=
+X-Received: by 2002:a6b:6318:: with SMTP id p24mr4129450iog.12.1588111453327;
+ Tue, 28 Apr 2020 15:04:13 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200423022550.15113-1-sean.j.christopherson@intel.com> <20200423022550.15113-9-sean.j.christopherson@intel.com>
-In-Reply-To: <20200423022550.15113-9-sean.j.christopherson@intel.com>
+References: <20200423022550.15113-1-sean.j.christopherson@intel.com> <20200423022550.15113-10-sean.j.christopherson@intel.com>
+In-Reply-To: <20200423022550.15113-10-sean.j.christopherson@intel.com>
 From:   Jim Mattson <jmattson@google.com>
-Date:   Tue, 28 Apr 2020 14:58:44 -0700
-Message-ID: <CALMp9eQav5s4SceVD=3zYb-RYkNHs+8F3hMUASBYrcJcyUterQ@mail.gmail.com>
-Subject: Re: [PATCH 08/13] KVM: nVMX: Preserve IRQ/NMI priority irrespective
- of exiting behavior
+Date:   Tue, 28 Apr 2020 15:04:02 -0700
+Message-ID: <CALMp9eSuYqeVmWhb6q7T5DAW_Npbuin_N1+sbWjvcu0zTqiwsQ@mail.gmail.com>
+Subject: Re: [PATCH 09/13] KVM: nVMX: Prioritize SMI over nested IRQ/NMI
 To:     Sean Christopherson <sean.j.christopherson@intel.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
@@ -60,6 +59,7 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Oliver Upton <oupton@google.com>,
         Peter Shier <pshier@google.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
@@ -68,10 +68,38 @@ X-Mailing-List: kvm@vger.kernel.org
 On Wed, Apr 22, 2020 at 7:26 PM Sean Christopherson
 <sean.j.christopherson@intel.com> wrote:
 >
-> Short circuit vmx_check_nested_events() if an unblocked IRQ/NMI is
-> pending and needs to be injected into L2, priority between coincident
-> events is not dependent on exiting behavior.
+> Check for an unblocked SMI in vmx_check_nested_events() so that pending
+> SMIs are correctly prioritized over IRQs and NMIs when the latter events
+> will trigger VM-Exit.  This also fixes an issue where an SMI that was
+> marked pending while processing a nested VM-Enter wouldn't trigger an
+> immediate exit, i.e. would be incorrectly delayed until L2 happened to
+> take a VM-Exit.
 >
-> Fixes: b6b8a1451fc4 ("KVM: nVMX: Rework interception of IRQs and NMIs")
+> Fixes: 64d6067057d96 ("KVM: x86: stubs for SMM support")
 > Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-Reviewed-by: Jim Mattson <jmattson@google.com>
+> ---
+>  arch/x86/kvm/vmx/nested.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
+>
+> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> index 1fdaca5fd93d..8c16b190816b 100644
+> --- a/arch/x86/kvm/vmx/nested.c
+> +++ b/arch/x86/kvm/vmx/nested.c
+> @@ -3750,6 +3750,12 @@ static int vmx_check_nested_events(struct kvm_vcpu=
+ *vcpu)
+>                 return 0;
+>         }
+>
+> +       if (vcpu->arch.smi_pending && !is_smm(vcpu)) {
+> +               if (block_nested_events)
+> +                       return -EBUSY;
+> +               goto no_vmexit;
+> +       }
+> +
+
+From the SDM, volume 3:
+
+=E2=80=A2 System-management interrupts (SMIs), INIT signals, and higher
+priority events take priority over MTF VM exits.
+
+I think this block needs to be moved up.
