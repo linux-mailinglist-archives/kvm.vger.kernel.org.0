@@ -2,700 +2,376 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D000E1BB313
-	for <lists+kvm@lfdr.de>; Tue, 28 Apr 2020 02:54:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B9F1B1BB333
+	for <lists+kvm@lfdr.de>; Tue, 28 Apr 2020 03:04:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726426AbgD1Ayd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Apr 2020 20:54:33 -0400
-Received: from mga05.intel.com ([192.55.52.43]:42479 "EHLO mga05.intel.com"
+        id S1726536AbgD1BEX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Apr 2020 21:04:23 -0400
+Received: from mga11.intel.com ([192.55.52.93]:23033 "EHLO mga11.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726360AbgD1Ayc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Apr 2020 20:54:32 -0400
-IronPort-SDR: rqiHTyS5lUOYSKGMVhCNtfJ+TKOjbJ7m8Mi1+d+rD3L5+5EH6SUW09eGp0uumB568FWpauarxB
- ovZ5IkQKW96w==
+        id S1726526AbgD1BEV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Apr 2020 21:04:21 -0400
+IronPort-SDR: PJEKi80KgElesi5dRPfieqJ4JbzR27D2PayM+9G7UZEsE6XsvHH5sLp3Dwt4GkV+GzxKvx+E9p
+ kSgccc2KWvow==
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Apr 2020 17:54:23 -0700
-IronPort-SDR: vXwpQVgPJQT5uqZ45hn3ZVOR6WDCaNaIxqb9z5WCwzOAJBFuaKlxUhUO2i38JMym0AY66WIzeT
- o9Z5LJ/as1vQ==
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Apr 2020 18:04:21 -0700
+IronPort-SDR: /OgPjKQLqGW0dazR7C5+g5qKwUQ9gEtbYMc94xEtbrMextw6H04uF6g4BJIQtESaIAoBC9Pz0h
+ ospD7fj3JFAg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.73,325,1583222400"; 
-   d="scan'208";a="260920810"
-Received: from sjchrist-coffee.jf.intel.com ([10.54.74.202])
-  by orsmga006.jf.intel.com with ESMTP; 27 Apr 2020 17:54:23 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Barret Rhoden <brho@google.com>
-Subject: [PATCH 3/3] KVM: x86/mmu: Drop KVM's hugepage enums in favor of the kernel's enums
-Date:   Mon, 27 Apr 2020 17:54:22 -0700
-Message-Id: <20200428005422.4235-4-sean.j.christopherson@intel.com>
-X-Mailer: git-send-email 2.26.0
-In-Reply-To: <20200428005422.4235-1-sean.j.christopherson@intel.com>
-References: <20200428005422.4235-1-sean.j.christopherson@intel.com>
+   d="scan'208";a="246339926"
+Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040) ([10.239.13.16])
+  by orsmga007.jf.intel.com with ESMTP; 27 Apr 2020 18:04:12 -0700
+Date:   Mon, 27 Apr 2020 20:54:29 -0400
+From:   Yan Zhao <yan.y.zhao@intel.com>
+To:     "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        "cjia@nvidia.com" <cjia@nvidia.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+        "libvir-list@redhat.com" <libvir-list@redhat.com>,
+        "Zhengxiao.zx@alibaba-inc.com" <Zhengxiao.zx@alibaba-inc.com>,
+        "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
+        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
+        "eauger@redhat.com" <eauger@redhat.com>,
+        "corbet@lwn.net" <corbet@lwn.net>,
+        "Liu, Yi L" <yi.l.liu@intel.com>,
+        "eskultet@redhat.com" <eskultet@redhat.com>,
+        "Yang, Ziye" <ziye.yang@intel.com>,
+        "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
+        "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
+        "aik@ozlabs.ru" <aik@ozlabs.ru>,
+        "felipe@nutanix.com" <felipe@nutanix.com>,
+        "Ken.Xue@amd.com" <Ken.Xue@amd.com>,
+        "Zeng, Xin" <xin.zeng@intel.com>,
+        "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
+        "dinechin@redhat.com" <dinechin@redhat.com>,
+        "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        "Liu, Changpeng" <changpeng.liu@intel.com>,
+        "berrange@redhat.com" <berrange@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Wang, Zhi A" <zhi.a.wang@intel.com>,
+        "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>,
+        "He, Shaopeng" <shaopeng.he@intel.com>
+Subject: Re: [PATCH v5 0/4] introduction of migration_version attribute for
+ VFIO live migration
+Message-ID: <20200428005429.GJ12879@joy-OptiPlex-7040>
+Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+References: <20200417095202.GD16688@joy-OptiPlex-7040>
+ <20200417132457.45d91fe3.cohuck@redhat.com>
+ <20200420012457.GE16688@joy-OptiPlex-7040>
+ <20200420165600.4951ae82@w520.home>
+ <20200421023718.GA12111@joy-OptiPlex-7040>
+ <AADFC41AFE54684AB9EE6CBC0274A5D19D86DF06@SHSMSX104.ccr.corp.intel.com>
+ <20200422073628.GA12879@joy-OptiPlex-7040>
+ <20200424191049.GU3106@work-vm>
+ <20200426013628.GC12879@joy-OptiPlex-7040>
+ <20200427153743.GK2923@work-vm>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200427153743.GK2923@work-vm>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Replace KVM's PT_PAGE_TABLE_LEVEL, PT_DIRECTORY_LEVEL and PT_PDPE_LEVEL
-with the kernel's PG_LEVEL_4K, PG_LEVEL_2M and PG_LEVEL_1G.  KVM's
-enums are borderline impossible to remember and result in code that is
-visually difficult to audit, e.g.
+On Mon, Apr 27, 2020 at 11:37:43PM +0800, Dr. David Alan Gilbert wrote:
+> * Yan Zhao (yan.y.zhao@intel.com) wrote:
+> > On Sat, Apr 25, 2020 at 03:10:49AM +0800, Dr. David Alan Gilbert wrote:
+> > > * Yan Zhao (yan.y.zhao@intel.com) wrote:
+> > > > On Tue, Apr 21, 2020 at 08:08:49PM +0800, Tian, Kevin wrote:
+> > > > > > From: Yan Zhao
+> > > > > > Sent: Tuesday, April 21, 2020 10:37 AM
+> > > > > > 
+> > > > > > On Tue, Apr 21, 2020 at 06:56:00AM +0800, Alex Williamson wrote:
+> > > > > > > On Sun, 19 Apr 2020 21:24:57 -0400
+> > > > > > > Yan Zhao <yan.y.zhao@intel.com> wrote:
+> > > > > > >
+> > > > > > > > On Fri, Apr 17, 2020 at 07:24:57PM +0800, Cornelia Huck wrote:
+> > > > > > > > > On Fri, 17 Apr 2020 05:52:02 -0400
+> > > > > > > > > Yan Zhao <yan.y.zhao@intel.com> wrote:
+> > > > > > > > >
+> > > > > > > > > > On Fri, Apr 17, 2020 at 04:44:50PM +0800, Cornelia Huck wrote:
+> > > > > > > > > > > On Mon, 13 Apr 2020 01:52:01 -0400
+> > > > > > > > > > > Yan Zhao <yan.y.zhao@intel.com> wrote:
+> > > > > > > > > > >
+> > > > > > > > > > > > This patchset introduces a migration_version attribute under sysfs
+> > > > > > of VFIO
+> > > > > > > > > > > > Mediated devices.
+> > > > > > > > > > > >
+> > > > > > > > > > > > This migration_version attribute is used to check migration
+> > > > > > compatibility
+> > > > > > > > > > > > between two mdev devices.
+> > > > > > > > > > > >
+> > > > > > > > > > > > Currently, it has two locations:
+> > > > > > > > > > > > (1) under mdev_type node,
+> > > > > > > > > > > >     which can be used even before device creation, but only for
+> > > > > > mdev
+> > > > > > > > > > > >     devices of the same mdev type.
+> > > > > > > > > > > > (2) under mdev device node,
+> > > > > > > > > > > >     which can only be used after the mdev devices are created, but
+> > > > > > the src
+> > > > > > > > > > > >     and target mdev devices are not necessarily be of the same
+> > > > > > mdev type
+> > > > > > > > > > > > (The second location is newly added in v5, in order to keep
+> > > > > > consistent
+> > > > > > > > > > > > with the migration_version node for migratable pass-though
+> > > > > > devices)
+> > > > > > > > > > >
+> > > > > > > > > > > What is the relationship between those two attributes?
+> > > > > > > > > > >
+> > > > > > > > > > (1) is for mdev devices specifically, and (2) is provided to keep the
+> > > > > > same
+> > > > > > > > > > sysfs interface as with non-mdev cases. so (2) is for both mdev
+> > > > > > devices and
+> > > > > > > > > > non-mdev devices.
+> > > > > > > > > >
+> > > > > > > > > > in future, if we enable vfio-pci vendor ops, (i.e. a non-mdev device
+> > > > > > > > > > is binding to vfio-pci, but is able to register migration region and do
+> > > > > > > > > > migration transactions from a vendor provided affiliate driver),
+> > > > > > > > > > the vendor driver would export (2) directly, under device node.
+> > > > > > > > > > It is not able to provide (1) as there're no mdev devices involved.
+> > > > > > > > >
+> > > > > > > > > Ok, creating an alternate attribute for non-mdev devices makes sense.
+> > > > > > > > > However, wouldn't that rather be a case (3)? The change here only
+> > > > > > > > > refers to mdev devices.
+> > > > > > > > >
+> > > > > > > > as you pointed below, (3) and (2) serve the same purpose.
+> > > > > > > > and I think a possible usage is to migrate between a non-mdev device and
+> > > > > > > > an mdev device. so I think it's better for them both to use (2) rather
+> > > > > > > > than creating (3).
+> > > > > > >
+> > > > > > > An mdev type is meant to define a software compatible interface, so in
+> > > > > > > the case of mdev->mdev migration, doesn't migrating to a different type
+> > > > > > > fail the most basic of compatibility tests that we expect userspace to
+> > > > > > > perform?  IOW, if two mdev types are migration compatible, it seems a
+> > > > > > > prerequisite to that is that they provide the same software interface,
+> > > > > > > which means they should be the same mdev type.
+> > > > > > >
+> > > > > > > In the hybrid cases of mdev->phys or phys->mdev, how does a
+> > > > > > management
+> > > > > > > tool begin to even guess what might be compatible?  Are we expecting
+> > > > > > > libvirt to probe ever device with this attribute in the system?  Is
+> > > > > > > there going to be a new class hierarchy created to enumerate all
+> > > > > > > possible migrate-able devices?
+> > > > > > >
+> > > > > > yes, management tool needs to guess and test migration compatible
+> > > > > > between two devices. But I think it's not the problem only for
+> > > > > > mdev->phys or phys->mdev. even for mdev->mdev, management tool needs
+> > > > > > to
+> > > > > > first assume that the two mdevs have the same type of parent devices
+> > > > > > (e.g.their pciids are equal). otherwise, it's still enumerating
+> > > > > > possibilities.
+> > > > > > 
+> > > > > > on the other hand, for two mdevs,
+> > > > > > mdev1 from pdev1, its mdev_type is 1/2 of pdev1;
+> > > > > > mdev2 from pdev2, its mdev_type is 1/4 of pdev2;
+> > > > > > if pdev2 is exactly 2 times of pdev1, why not allow migration between
+> > > > > > mdev1 <-> mdev2.
+> > > > > 
+> > > > > How could the manage tool figure out that 1/2 of pdev1 is equivalent 
+> > > > > to 1/4 of pdev2? If we really want to allow such thing happen, the best
+> > > > > choice is to report the same mdev type on both pdev1 and pdev2.
+> > > > I think that's exactly the value of this migration_version interface.
+> > > > the management tool can take advantage of this interface to know if two
+> > > > devices are migration compatible, no matter they are mdevs, non-mdevs,
+> > > > or mix.
+> > > > 
+> > > > as I know, (please correct me if not right), current libvirt still
+> > > > requires manually generating mdev devices, and it just duplicates src vm
+> > > > configuration to the target vm.
+> > > > for libvirt, currently it's always phys->phys and mdev->mdev (and of the
+> > > > same mdev type).
+> > > > But it does not justify that hybrid cases should not be allowed. otherwise,
+> > > > why do we need to introduce this migration_version interface and leave
+> > > > the judgement of migration compatibility to vendor driver? why not simply
+> > > > set the criteria to something like "pciids of parent devices are equal,
+> > > > and mdev types are equal" ?
+> > > > 
+> > > > 
+> > > > > btw mdev<->phys just brings trouble to upper stack as Alex pointed out. 
+> > > > could you help me understand why it will bring trouble to upper stack?
+> > > > 
+> > > > I think it just needs to read src migration_version under src dev node,
+> > > > and test it in target migration version under target dev node. 
+> > > > 
+> > > > after all, through this interface we just help the upper layer
+> > > > knowing available options through reading and testing, and they decide
+> > > > to use it or not.
+> > > > 
+> > > > > Can we simplify the requirement by allowing only mdev<->mdev and 
+> > > > > phys<->phys migration? If an customer does want to migrate between a 
+> > > > > mdev and phys, he could wrap physical device into a wrapped mdev 
+> > > > > instance (with the same type as the source mdev) instead of using vendor 
+> > > > > ops. Doing so does add some burden but if mdev<->phys is not dominant 
+> > > > > usage then such tradeoff might be worthywhile...
+> > > > >
+> > > > If the interfaces for phys<->phys and mdev<->mdev are consistent, it makes no
+> > > > difference to phys<->mdev, right?
+> > > > I think the vendor string for a mdev device is something like:
+> > > > "Parent PCIID + mdev type + software version", and
+> > > > that for a phys device is something like:
+> > > > "PCIID + software version".
+> > > > as long as we don't migrate between devices from different vendors, it's
+> > > > easy for vendor driver to tell if a phys device is migration compatible
+> > > > to a mdev device according it supports it or not.
+> > > 
+> > > It surprises me that the PCIID matching is a requirement; I'd assumed
+> > > with this clever mdev name setup that you could migrate between two
+> > > different models in a series, or to a newer model, as long as they
+> > > both supported the same mdev view.
+> > > 
+> > hi Dave
+> > the migration_version string is transparent to userspace, and is
+> > completely defined by vendor driver.
+> > I put it there just as an example of how vendor driver may implement it.
+> > e.g.
+> > the src migration_version string is "src PCIID + src software version", 
+> > then when this string is write to target migration_version node,
+> > the vendor driver in the target device will compare it with its own
+> > device info and software version.
+> > If different models are allowed, the write just succeeds even
+> > PCIIDs in src and target are different.
+> > 
+> > so, it is the vendor driver to define whether two devices are able to
+> > migrate, no matter their PCIIDs, mdev types, software versions..., which
+> > provides vendor driver full flexibility.
+> > 
+> > do you think it's good?
+> 
+> Yeh that's OK; I guess it's going to need to have a big table in their
+> with all the PCIIDs in.
+> The alternative would be to abstract it a little; e.g. to say it's
+> an Intel-gpu-core-v4  and then it would be less worried about the exact
+> clock speed etc - but yes you might be right htat PCIIDs might be best
+> for checking for quirks.
+>
+glad that you are agreed with it:)
+I think the vendor driver still can choose a way to abstract a little
+(e.g. Intel-gpu-core-v4...) if they think it's better. In that case, the
+migration_string would be something like "Intel-gpu-core-v4 + instance
+number + software version".
+IOW, they can choose anything they think appropriate to identify migration
+compatibility of a device.
+But Alex is right, we have to prevent namespace overlapping. So I think
+we need to ensure src and target devices are from the same vendors.
+or, any other ideas?
 
-        if (!enable_ept)
-                ept_lpage_level = 0;
-        else if (cpu_has_vmx_ept_1g_page())
-                ept_lpage_level = PT_PDPE_LEVEL;
-        else if (cpu_has_vmx_ept_2m_page())
-                ept_lpage_level = PT_DIRECTORY_LEVEL;
-        else
-                ept_lpage_level = PT_PAGE_TABLE_LEVEL;
+Thanks
+Yan
 
-versus
 
-        if (!enable_ept)
-                ept_lpage_level = 0;
-        else if (cpu_has_vmx_ept_1g_page())
-                ept_lpage_level = PG_LEVEL_1G;
-        else if (cpu_has_vmx_ept_2m_page())
-                ept_lpage_level = PG_LEVEL_2M;
-        else
-                ept_lpage_level = PG_LEVEL_4K;
-
-No functional change intended.
-
-Suggested-by: Barret Rhoden <brho@google.com>
-Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
----
- arch/x86/include/asm/kvm_host.h |  12 +---
- arch/x86/kvm/mmu/mmu.c          | 107 +++++++++++++++-----------------
- arch/x86/kvm/mmu/page_track.c   |   4 +-
- arch/x86/kvm/mmu/paging_tmpl.h  |  18 +++---
- arch/x86/kvm/mmu_audit.c        |   6 +-
- arch/x86/kvm/svm/svm.c          |   2 +-
- arch/x86/kvm/vmx/vmx.c          |   6 +-
- arch/x86/kvm/x86.c              |   4 +-
- 8 files changed, 73 insertions(+), 86 deletions(-)
-
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 204f742bf096..5b83e3dc673a 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -110,14 +110,8 @@
- #define UNMAPPED_GVA (~(gpa_t)0)
- 
- /* KVM Hugepage definitions for x86 */
--enum {
--	PT_PAGE_TABLE_LEVEL   = 1,
--	PT_DIRECTORY_LEVEL    = 2,
--	PT_PDPE_LEVEL         = 3,
--};
--#define KVM_MAX_HUGEPAGE_LEVEL	PT_PDPE_LEVEL
--#define KVM_NR_PAGE_SIZES	(KVM_MAX_HUGEPAGE_LEVEL - \
--				 PT_PAGE_TABLE_LEVEL + 1)
-+#define KVM_MAX_HUGEPAGE_LEVEL	PG_LEVEL_1G
-+#define KVM_NR_PAGE_SIZES	(KVM_MAX_HUGEPAGE_LEVEL - PG_LEVEL_4K + 1)
- #define KVM_HPAGE_GFN_SHIFT(x)	(((x) - 1) * 9)
- #define KVM_HPAGE_SHIFT(x)	(PAGE_SHIFT + KVM_HPAGE_GFN_SHIFT(x))
- #define KVM_HPAGE_SIZE(x)	(1UL << KVM_HPAGE_SHIFT(x))
-@@ -126,7 +120,7 @@ enum {
- 
- static inline gfn_t gfn_to_index(gfn_t gfn, gfn_t base_gfn, int level)
- {
--	/* KVM_HPAGE_GFN_SHIFT(PT_PAGE_TABLE_LEVEL) must be 0. */
-+	/* KVM_HPAGE_GFN_SHIFT(PG_LEVEL_4K) must be 0. */
- 	return (gfn >> KVM_HPAGE_GFN_SHIFT(level)) -
- 		(base_gfn >> KVM_HPAGE_GFN_SHIFT(level));
- }
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 324734db25ce..5c3e8d65f20f 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -623,7 +623,7 @@ static int is_large_pte(u64 pte)
- 
- static int is_last_spte(u64 pte, int level)
- {
--	if (level == PT_PAGE_TABLE_LEVEL)
-+	if (level == PG_LEVEL_4K)
- 		return 1;
- 	if (is_large_pte(pte))
- 		return 1;
-@@ -1199,7 +1199,7 @@ static void update_gfn_disallow_lpage_count(struct kvm_memory_slot *slot,
- 	struct kvm_lpage_info *linfo;
- 	int i;
- 
--	for (i = PT_DIRECTORY_LEVEL; i <= KVM_MAX_HUGEPAGE_LEVEL; ++i) {
-+	for (i = PG_LEVEL_2M; i <= KVM_MAX_HUGEPAGE_LEVEL; ++i) {
- 		linfo = lpage_info_slot(gfn, slot, i);
- 		linfo->disallow_lpage += count;
- 		WARN_ON(linfo->disallow_lpage < 0);
-@@ -1228,7 +1228,7 @@ static void account_shadowed(struct kvm *kvm, struct kvm_mmu_page *sp)
- 	slot = __gfn_to_memslot(slots, gfn);
- 
- 	/* the non-leaf shadow pages are keeping readonly. */
--	if (sp->role.level > PT_PAGE_TABLE_LEVEL)
-+	if (sp->role.level > PG_LEVEL_4K)
- 		return kvm_slot_page_track_add_page(kvm, slot, gfn,
- 						    KVM_PAGE_TRACK_WRITE);
- 
-@@ -1256,7 +1256,7 @@ static void unaccount_shadowed(struct kvm *kvm, struct kvm_mmu_page *sp)
- 	gfn = sp->gfn;
- 	slots = kvm_memslots_for_spte_role(kvm, sp->role);
- 	slot = __gfn_to_memslot(slots, gfn);
--	if (sp->role.level > PT_PAGE_TABLE_LEVEL)
-+	if (sp->role.level > PG_LEVEL_4K)
- 		return kvm_slot_page_track_remove_page(kvm, slot, gfn,
- 						       KVM_PAGE_TRACK_WRITE);
- 
-@@ -1401,7 +1401,7 @@ static struct kvm_rmap_head *__gfn_to_rmap(gfn_t gfn, int level,
- 	unsigned long idx;
- 
- 	idx = gfn_to_index(gfn, slot->base_gfn, level);
--	return &slot->arch.rmap[level - PT_PAGE_TABLE_LEVEL][idx];
-+	return &slot->arch.rmap[level - PG_LEVEL_4K][idx];
- }
- 
- static struct kvm_rmap_head *gfn_to_rmap(struct kvm *kvm, gfn_t gfn,
-@@ -1532,8 +1532,7 @@ static void drop_spte(struct kvm *kvm, u64 *sptep)
- static bool __drop_large_spte(struct kvm *kvm, u64 *sptep)
- {
- 	if (is_large_pte(*sptep)) {
--		WARN_ON(page_header(__pa(sptep))->role.level ==
--			PT_PAGE_TABLE_LEVEL);
-+		WARN_ON(page_header(__pa(sptep))->role.level == PG_LEVEL_4K);
- 		drop_spte(kvm, sptep);
- 		--kvm->stat.lpages;
- 		return true;
-@@ -1685,7 +1684,7 @@ static void kvm_mmu_write_protect_pt_masked(struct kvm *kvm,
- 
- 	while (mask) {
- 		rmap_head = __gfn_to_rmap(slot->base_gfn + gfn_offset + __ffs(mask),
--					  PT_PAGE_TABLE_LEVEL, slot);
-+					  PG_LEVEL_4K, slot);
- 		__rmap_write_protect(kvm, rmap_head, false);
- 
- 		/* clear the first set bit */
-@@ -1711,7 +1710,7 @@ void kvm_mmu_clear_dirty_pt_masked(struct kvm *kvm,
- 
- 	while (mask) {
- 		rmap_head = __gfn_to_rmap(slot->base_gfn + gfn_offset + __ffs(mask),
--					  PT_PAGE_TABLE_LEVEL, slot);
-+					  PG_LEVEL_4K, slot);
- 		__rmap_clear_dirty(kvm, rmap_head);
- 
- 		/* clear the first set bit */
-@@ -1763,7 +1762,7 @@ bool kvm_mmu_slot_gfn_write_protect(struct kvm *kvm,
- 	int i;
- 	bool write_protected = false;
- 
--	for (i = PT_PAGE_TABLE_LEVEL; i <= KVM_MAX_HUGEPAGE_LEVEL; ++i) {
-+	for (i = PG_LEVEL_4K; i <= KVM_MAX_HUGEPAGE_LEVEL; ++i) {
- 		rmap_head = __gfn_to_rmap(gfn, i, slot);
- 		write_protected |= __rmap_write_protect(kvm, rmap_head, true);
- 	}
-@@ -1951,7 +1950,7 @@ static int kvm_handle_hva_range(struct kvm *kvm,
- 			gfn_start = hva_to_gfn_memslot(hva_start, memslot);
- 			gfn_end = hva_to_gfn_memslot(hva_end + PAGE_SIZE - 1, memslot);
- 
--			for_each_slot_rmap_range(memslot, PT_PAGE_TABLE_LEVEL,
-+			for_each_slot_rmap_range(memslot, PG_LEVEL_4K,
- 						 KVM_MAX_HUGEPAGE_LEVEL,
- 						 gfn_start, gfn_end - 1,
- 						 &iterator)
-@@ -2346,7 +2345,7 @@ static bool kvm_sync_pages(struct kvm_vcpu *vcpu, gfn_t gfn,
- 		if (!s->unsync)
- 			continue;
- 
--		WARN_ON(s->role.level != PT_PAGE_TABLE_LEVEL);
-+		WARN_ON(s->role.level != PG_LEVEL_4K);
- 		ret |= kvm_sync_page(vcpu, s, invalid_list);
- 	}
- 
-@@ -2375,7 +2374,7 @@ static int mmu_pages_next(struct kvm_mmu_pages *pvec,
- 		int level = sp->role.level;
- 
- 		parents->idx[level-1] = idx;
--		if (level == PT_PAGE_TABLE_LEVEL)
-+		if (level == PG_LEVEL_4K)
- 			break;
- 
- 		parents->parent[level-2] = sp;
-@@ -2397,7 +2396,7 @@ static int mmu_pages_first(struct kvm_mmu_pages *pvec,
- 
- 	sp = pvec->page[0].sp;
- 	level = sp->role.level;
--	WARN_ON(level == PT_PAGE_TABLE_LEVEL);
-+	WARN_ON(level == PG_LEVEL_4K);
- 
- 	parents->parent[level-2] = sp;
- 
-@@ -2545,11 +2544,10 @@ static struct kvm_mmu_page *kvm_mmu_get_page(struct kvm_vcpu *vcpu,
- 		 * be inconsistent with guest page table.
- 		 */
- 		account_shadowed(vcpu->kvm, sp);
--		if (level == PT_PAGE_TABLE_LEVEL &&
--		      rmap_write_protect(vcpu, gfn))
-+		if (level == PG_LEVEL_4K && rmap_write_protect(vcpu, gfn))
- 			kvm_flush_remote_tlbs_with_address(vcpu->kvm, gfn, 1);
- 
--		if (level > PT_PAGE_TABLE_LEVEL && need_sync)
-+		if (level > PG_LEVEL_4K && need_sync)
- 			flush |= kvm_sync_pages(vcpu, gfn, &invalid_list);
- 	}
- 	clear_page(sp->spt);
-@@ -2600,7 +2598,7 @@ static void shadow_walk_init(struct kvm_shadow_walk_iterator *iterator,
- 
- static bool shadow_walk_okay(struct kvm_shadow_walk_iterator *iterator)
- {
--	if (iterator->level < PT_PAGE_TABLE_LEVEL)
-+	if (iterator->level < PG_LEVEL_4K)
- 		return false;
- 
- 	iterator->index = SHADOW_PT_INDEX(iterator->addr, iterator->level);
-@@ -2721,7 +2719,7 @@ static int mmu_zap_unsync_children(struct kvm *kvm,
- 	struct mmu_page_path parents;
- 	struct kvm_mmu_pages pages;
- 
--	if (parent->role.level == PT_PAGE_TABLE_LEVEL)
-+	if (parent->role.level == PG_LEVEL_4K)
- 		return 0;
- 
- 	while (mmu_unsync_walk(parent, &pages)) {
-@@ -2920,7 +2918,7 @@ static bool mmu_need_write_protect(struct kvm_vcpu *vcpu, gfn_t gfn,
- 		if (sp->unsync)
- 			continue;
- 
--		WARN_ON(sp->role.level != PT_PAGE_TABLE_LEVEL);
-+		WARN_ON(sp->role.level != PG_LEVEL_4K);
- 		kvm_unsync_page(vcpu, sp);
- 	}
- 
-@@ -3019,7 +3017,7 @@ static int set_spte(struct kvm_vcpu *vcpu, u64 *sptep,
- 	if (!speculative)
- 		spte |= spte_shadow_accessed_mask(spte);
- 
--	if (level > PT_PAGE_TABLE_LEVEL && (pte_access & ACC_EXEC_MASK) &&
-+	if (level > PG_LEVEL_4K && (pte_access & ACC_EXEC_MASK) &&
- 	    is_nx_huge_page_enabled()) {
- 		pte_access &= ~ACC_EXEC_MASK;
- 	}
-@@ -3032,7 +3030,7 @@ static int set_spte(struct kvm_vcpu *vcpu, u64 *sptep,
- 	if (pte_access & ACC_USER_MASK)
- 		spte |= shadow_user_mask;
- 
--	if (level > PT_PAGE_TABLE_LEVEL)
-+	if (level > PG_LEVEL_4K)
- 		spte |= PT_PAGE_SIZE_MASK;
- 	if (tdp_enabled)
- 		spte |= kvm_x86_ops.get_mt_mask(vcpu, gfn,
-@@ -3102,8 +3100,7 @@ static int mmu_set_spte(struct kvm_vcpu *vcpu, u64 *sptep,
- 		 * If we overwrite a PTE page pointer with a 2MB PMD, unlink
- 		 * the parent of the now unreachable PTE.
- 		 */
--		if (level > PT_PAGE_TABLE_LEVEL &&
--		    !is_large_pte(*sptep)) {
-+		if (level > PG_LEVEL_4K && !is_large_pte(*sptep)) {
- 			struct kvm_mmu_page *child;
- 			u64 pte = *sptep;
- 
-@@ -3227,7 +3224,7 @@ static void direct_pte_prefetch(struct kvm_vcpu *vcpu, u64 *sptep)
- 	if (sp_ad_disabled(sp))
- 		return;
- 
--	if (sp->role.level > PT_PAGE_TABLE_LEVEL)
-+	if (sp->role.level > PG_LEVEL_4K)
- 		return;
- 
- 	__direct_pte_prefetch(vcpu, sp, sptep);
-@@ -3240,12 +3237,8 @@ static int host_pfn_mapping_level(struct kvm_vcpu *vcpu, gfn_t gfn,
- 	pte_t *pte;
- 	int level;
- 
--	BUILD_BUG_ON(PT_PAGE_TABLE_LEVEL != (int)PG_LEVEL_4K ||
--		     PT_DIRECTORY_LEVEL != (int)PG_LEVEL_2M ||
--		     PT_PDPE_LEVEL != (int)PG_LEVEL_1G);
--
- 	if (!PageCompound(pfn_to_page(pfn)) && !kvm_is_zone_device_pfn(pfn))
--		return PT_PAGE_TABLE_LEVEL;
-+		return PG_LEVEL_4K;
- 
- 	/*
- 	 * Note, using the already-retrieved memslot and __gfn_to_hva_memslot()
-@@ -3259,7 +3252,7 @@ static int host_pfn_mapping_level(struct kvm_vcpu *vcpu, gfn_t gfn,
- 
- 	pte = lookup_address_in_mm(vcpu->kvm->mm, hva, &level);
- 	if (unlikely(!pte))
--		return PT_PAGE_TABLE_LEVEL;
-+		return PG_LEVEL_4K;
- 
- 	return level;
- }
-@@ -3273,28 +3266,28 @@ static int kvm_mmu_hugepage_adjust(struct kvm_vcpu *vcpu, gfn_t gfn,
- 	kvm_pfn_t mask;
- 	int level;
- 
--	if (unlikely(max_level == PT_PAGE_TABLE_LEVEL))
--		return PT_PAGE_TABLE_LEVEL;
-+	if (unlikely(max_level == PG_LEVEL_4K))
-+		return PG_LEVEL_4K;
- 
- 	if (is_error_noslot_pfn(pfn) || kvm_is_reserved_pfn(pfn))
--		return PT_PAGE_TABLE_LEVEL;
-+		return PG_LEVEL_4K;
- 
- 	slot = gfn_to_memslot_dirty_bitmap(vcpu, gfn, true);
- 	if (!slot)
--		return PT_PAGE_TABLE_LEVEL;
-+		return PG_LEVEL_4K;
- 
- 	max_level = min(max_level, max_page_level);
--	for ( ; max_level > PT_PAGE_TABLE_LEVEL; max_level--) {
-+	for ( ; max_level > PG_LEVEL_4K; max_level--) {
- 		linfo = lpage_info_slot(gfn, slot, max_level);
- 		if (!linfo->disallow_lpage)
- 			break;
- 	}
- 
--	if (max_level == PT_PAGE_TABLE_LEVEL)
--		return PT_PAGE_TABLE_LEVEL;
-+	if (max_level == PG_LEVEL_4K)
-+		return PG_LEVEL_4K;
- 
- 	level = host_pfn_mapping_level(vcpu, gfn, pfn, slot);
--	if (level == PT_PAGE_TABLE_LEVEL)
-+	if (level == PG_LEVEL_4K)
- 		return level;
- 
- 	level = min(level, max_level);
-@@ -3316,7 +3309,7 @@ static void disallowed_hugepage_adjust(struct kvm_shadow_walk_iterator it,
- 	int level = *levelp;
- 	u64 spte = *it.sptep;
- 
--	if (it.level == level && level > PT_PAGE_TABLE_LEVEL &&
-+	if (it.level == level && level > PG_LEVEL_4K &&
- 	    is_nx_huge_page_enabled() &&
- 	    is_shadow_present_pte(spte) &&
- 	    !is_large_pte(spte)) {
-@@ -3573,7 +3566,7 @@ static bool fast_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
- 			 *
- 			 * See the comments in kvm_arch_commit_memory_region().
- 			 */
--			if (sp->role.level > PT_PAGE_TABLE_LEVEL)
-+			if (sp->role.level > PG_LEVEL_4K)
- 				break;
- 		}
- 
-@@ -4132,7 +4125,7 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
- 		return r;
- 
- 	if (lpage_disallowed)
--		max_level = PT_PAGE_TABLE_LEVEL;
-+		max_level = PG_LEVEL_4K;
- 
- 	if (fast_page_fault(vcpu, gpa, error_code))
- 		return RET_PF_RETRY;
-@@ -4168,7 +4161,7 @@ static int nonpaging_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa,
- 
- 	/* This path builds a PAE pagetable, we can map 2mb pages at maximum. */
- 	return direct_page_fault(vcpu, gpa & PAGE_MASK, error_code, prefault,
--				 PT_DIRECTORY_LEVEL, false);
-+				 PG_LEVEL_2M, false);
- }
- 
- int kvm_handle_page_fault(struct kvm_vcpu *vcpu, u64 error_code,
-@@ -4215,7 +4208,7 @@ int kvm_tdp_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
- 	int max_level;
- 
- 	for (max_level = KVM_MAX_HUGEPAGE_LEVEL;
--	     max_level > PT_PAGE_TABLE_LEVEL;
-+	     max_level > PG_LEVEL_4K;
- 	     max_level--) {
- 		int page_num = KVM_PAGES_PER_HPAGE(max_level);
- 		gfn_t base = (gpa >> PAGE_SHIFT) & ~(page_num - 1);
-@@ -4376,11 +4369,11 @@ static inline bool is_last_gpte(struct kvm_mmu *mmu,
- 	gpte &= level - mmu->last_nonleaf_level;
- 
- 	/*
--	 * PT_PAGE_TABLE_LEVEL always terminates.  The RHS has bit 7 set
--	 * iff level <= PT_PAGE_TABLE_LEVEL, which for our purpose means
--	 * level == PT_PAGE_TABLE_LEVEL; set PT_PAGE_SIZE_MASK in gpte then.
-+	 * PG_LEVEL_4K always terminates.  The RHS has bit 7 set
-+	 * iff level <= PG_LEVEL_4K, which for our purpose means
-+	 * level == PG_LEVEL_4K; set PT_PAGE_SIZE_MASK in gpte then.
- 	 */
--	gpte |= level - PT_PAGE_TABLE_LEVEL - 1;
-+	gpte |= level - PG_LEVEL_4K - 1;
- 
- 	return gpte & PT_PAGE_SIZE_MASK;
- }
-@@ -5193,7 +5186,7 @@ static void mmu_pte_write_new_pte(struct kvm_vcpu *vcpu,
- 				  struct kvm_mmu_page *sp, u64 *spte,
- 				  const void *new)
- {
--	if (sp->role.level != PT_PAGE_TABLE_LEVEL) {
-+	if (sp->role.level != PG_LEVEL_4K) {
- 		++vcpu->kvm->stat.mmu_pde_zapped;
- 		return;
-         }
-@@ -5251,7 +5244,7 @@ static bool detect_write_flooding(struct kvm_mmu_page *sp)
- 	 * Skip write-flooding detected for the sp whose level is 1, because
- 	 * it can become unsync, then the guest page is not write-protected.
- 	 */
--	if (sp->role.level == PT_PAGE_TABLE_LEVEL)
-+	if (sp->role.level == PG_LEVEL_4K)
- 		return false;
- 
- 	atomic_inc(&sp->write_flooding_count);
-@@ -5582,9 +5575,9 @@ void kvm_configure_mmu(bool enable_tdp, int tdp_page_level)
- 	if (tdp_enabled)
- 		max_page_level = tdp_page_level;
- 	else if (boot_cpu_has(X86_FEATURE_GBPAGES))
--		max_page_level = PT_PDPE_LEVEL;
-+		max_page_level = PG_LEVEL_1G;
- 	else
--		max_page_level = PT_DIRECTORY_LEVEL;
-+		max_page_level = PG_LEVEL_2M;
- }
- EXPORT_SYMBOL_GPL(kvm_configure_mmu);
- 
-@@ -5640,7 +5633,7 @@ static __always_inline bool
- slot_handle_all_level(struct kvm *kvm, struct kvm_memory_slot *memslot,
- 		      slot_level_handler fn, bool lock_flush_tlb)
- {
--	return slot_handle_level(kvm, memslot, fn, PT_PAGE_TABLE_LEVEL,
-+	return slot_handle_level(kvm, memslot, fn, PG_LEVEL_4K,
- 				 KVM_MAX_HUGEPAGE_LEVEL, lock_flush_tlb);
- }
- 
-@@ -5648,7 +5641,7 @@ static __always_inline bool
- slot_handle_large_level(struct kvm *kvm, struct kvm_memory_slot *memslot,
- 			slot_level_handler fn, bool lock_flush_tlb)
- {
--	return slot_handle_level(kvm, memslot, fn, PT_PAGE_TABLE_LEVEL + 1,
-+	return slot_handle_level(kvm, memslot, fn, PG_LEVEL_4K + 1,
- 				 KVM_MAX_HUGEPAGE_LEVEL, lock_flush_tlb);
- }
- 
-@@ -5656,8 +5649,8 @@ static __always_inline bool
- slot_handle_leaf(struct kvm *kvm, struct kvm_memory_slot *memslot,
- 		 slot_level_handler fn, bool lock_flush_tlb)
- {
--	return slot_handle_level(kvm, memslot, fn, PT_PAGE_TABLE_LEVEL,
--				 PT_PAGE_TABLE_LEVEL, lock_flush_tlb);
-+	return slot_handle_level(kvm, memslot, fn, PG_LEVEL_4K,
-+				 PG_LEVEL_4K, lock_flush_tlb);
- }
- 
- static void free_mmu_pages(struct kvm_mmu *mmu)
-@@ -5867,7 +5860,7 @@ void kvm_zap_gfn_range(struct kvm *kvm, gfn_t gfn_start, gfn_t gfn_end)
- 				continue;
- 
- 			slot_handle_level_range(kvm, memslot, kvm_zap_rmapp,
--						PT_PAGE_TABLE_LEVEL,
-+						PG_LEVEL_4K,
- 						KVM_MAX_HUGEPAGE_LEVEL,
- 						start, end - 1, true);
- 		}
-diff --git a/arch/x86/kvm/mmu/page_track.c b/arch/x86/kvm/mmu/page_track.c
-index ddc1ec3bdacd..a7bcde34d1f2 100644
---- a/arch/x86/kvm/mmu/page_track.c
-+++ b/arch/x86/kvm/mmu/page_track.c
-@@ -61,7 +61,7 @@ static void update_gfn_track(struct kvm_memory_slot *slot, gfn_t gfn,
- {
- 	int index, val;
- 
--	index = gfn_to_index(gfn, slot->base_gfn, PT_PAGE_TABLE_LEVEL);
-+	index = gfn_to_index(gfn, slot->base_gfn, PG_LEVEL_4K);
- 
- 	val = slot->arch.gfn_track[mode][index];
- 
-@@ -151,7 +151,7 @@ bool kvm_page_track_is_active(struct kvm_vcpu *vcpu, gfn_t gfn,
- 	if (!slot)
- 		return false;
- 
--	index = gfn_to_index(gfn, slot->base_gfn, PT_PAGE_TABLE_LEVEL);
-+	index = gfn_to_index(gfn, slot->base_gfn, PG_LEVEL_4K);
- 	return !!READ_ONCE(slot->arch.gfn_track[mode][index]);
- }
- 
-diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
-index ca39bd315f70..38c576495048 100644
---- a/arch/x86/kvm/mmu/paging_tmpl.h
-+++ b/arch/x86/kvm/mmu/paging_tmpl.h
-@@ -75,7 +75,7 @@
- #define PT_GUEST_ACCESSED_MASK (1 << PT_GUEST_ACCESSED_SHIFT)
- 
- #define gpte_to_gfn_lvl FNAME(gpte_to_gfn_lvl)
--#define gpte_to_gfn(pte) gpte_to_gfn_lvl((pte), PT_PAGE_TABLE_LEVEL)
-+#define gpte_to_gfn(pte) gpte_to_gfn_lvl((pte), PG_LEVEL_4K)
- 
- /*
-  * The guest_walker structure emulates the behavior of the hardware page
-@@ -198,7 +198,7 @@ static bool FNAME(prefetch_invalid_gpte)(struct kvm_vcpu *vcpu,
- 	    !(gpte & PT_GUEST_ACCESSED_MASK))
- 		goto no_present;
- 
--	if (FNAME(is_rsvd_bits_set)(vcpu->arch.mmu, gpte, PT_PAGE_TABLE_LEVEL))
-+	if (FNAME(is_rsvd_bits_set)(vcpu->arch.mmu, gpte, PG_LEVEL_4K))
- 		goto no_present;
- 
- 	return false;
-@@ -436,7 +436,7 @@ static int FNAME(walk_addr_generic)(struct guest_walker *walker,
- 	gfn = gpte_to_gfn_lvl(pte, walker->level);
- 	gfn += (addr & PT_LVL_OFFSET_MASK(walker->level)) >> PAGE_SHIFT;
- 
--	if (PTTYPE == 32 && walker->level > PT_PAGE_TABLE_LEVEL && is_cpuid_PSE36())
-+	if (PTTYPE == 32 && walker->level > PG_LEVEL_4K && is_cpuid_PSE36())
- 		gfn += pse36_gfn_delta(pte);
- 
- 	real_gpa = mmu->translate_gpa(vcpu, gfn_to_gpa(gfn), access, &walker->fault);
-@@ -552,7 +552,7 @@ FNAME(prefetch_gpte)(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
- 	 * we call mmu_set_spte() with host_writable = true because
- 	 * pte_prefetch_gfn_to_pfn always gets a writable pfn.
- 	 */
--	mmu_set_spte(vcpu, spte, pte_access, 0, PT_PAGE_TABLE_LEVEL, gfn, pfn,
-+	mmu_set_spte(vcpu, spte, pte_access, 0, PG_LEVEL_4K, gfn, pfn,
- 		     true, true);
- 
- 	kvm_release_pfn_clean(pfn);
-@@ -575,7 +575,7 @@ static bool FNAME(gpte_changed)(struct kvm_vcpu *vcpu,
- 	u64 mask;
- 	int r, index;
- 
--	if (level == PT_PAGE_TABLE_LEVEL) {
-+	if (level == PG_LEVEL_4K) {
- 		mask = PTE_PREFETCH_NUM * sizeof(pt_element_t) - 1;
- 		base_gpa = pte_gpa & ~mask;
- 		index = (pte_gpa - base_gpa) / sizeof(pt_element_t);
-@@ -600,7 +600,7 @@ static void FNAME(pte_prefetch)(struct kvm_vcpu *vcpu, struct guest_walker *gw,
- 
- 	sp = page_header(__pa(sptep));
- 
--	if (sp->role.level > PT_PAGE_TABLE_LEVEL)
-+	if (sp->role.level > PG_LEVEL_4K)
- 		return;
- 
- 	if (sp->role.direct)
-@@ -828,7 +828,7 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, gpa_t addr, u32 error_code,
- 	      &walker, user_fault, &vcpu->arch.write_fault_to_shadow_pgtable);
- 
- 	if (lpage_disallowed || is_self_change_mapping)
--		max_level = PT_PAGE_TABLE_LEVEL;
-+		max_level = PG_LEVEL_4K;
- 	else
- 		max_level = walker.level;
- 
-@@ -884,7 +884,7 @@ static gpa_t FNAME(get_level1_sp_gpa)(struct kvm_mmu_page *sp)
- {
- 	int offset = 0;
- 
--	WARN_ON(sp->role.level != PT_PAGE_TABLE_LEVEL);
-+	WARN_ON(sp->role.level != PG_LEVEL_4K);
- 
- 	if (PTTYPE == 32)
- 		offset = sp->role.quadrant << PT64_LEVEL_BITS;
-@@ -1070,7 +1070,7 @@ static int FNAME(sync_page)(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp)
- 		host_writable = sp->spt[i] & SPTE_HOST_WRITEABLE;
- 
- 		set_spte_ret |= set_spte(vcpu, &sp->spt[i],
--					 pte_access, PT_PAGE_TABLE_LEVEL,
-+					 pte_access, PG_LEVEL_4K,
- 					 gfn, spte_to_pfn(sp->spt[i]),
- 					 true, false, host_writable);
- 	}
-diff --git a/arch/x86/kvm/mmu_audit.c b/arch/x86/kvm/mmu_audit.c
-index ca39f62aabc6..9d2844f87f6d 100644
---- a/arch/x86/kvm/mmu_audit.c
-+++ b/arch/x86/kvm/mmu_audit.c
-@@ -100,7 +100,7 @@ static void audit_mappings(struct kvm_vcpu *vcpu, u64 *sptep, int level)
- 	sp = page_header(__pa(sptep));
- 
- 	if (sp->unsync) {
--		if (level != PT_PAGE_TABLE_LEVEL) {
-+		if (level != PG_LEVEL_4K) {
- 			audit_printk(vcpu->kvm, "unsync sp: %p "
- 				     "level = %d\n", sp, level);
- 			return;
-@@ -176,7 +176,7 @@ static void check_mappings_rmap(struct kvm *kvm, struct kvm_mmu_page *sp)
- {
- 	int i;
- 
--	if (sp->role.level != PT_PAGE_TABLE_LEVEL)
-+	if (sp->role.level != PG_LEVEL_4K)
- 		return;
- 
- 	for (i = 0; i < PT64_ENT_PER_PAGE; ++i) {
-@@ -200,7 +200,7 @@ static void audit_write_protection(struct kvm *kvm, struct kvm_mmu_page *sp)
- 
- 	slots = kvm_memslots_for_spte_role(kvm, sp->role);
- 	slot = __gfn_to_memslot(slots, sp->gfn);
--	rmap_head = __gfn_to_rmap(sp->gfn, PT_PAGE_TABLE_LEVEL, slot);
-+	rmap_head = __gfn_to_rmap(sp->gfn, PG_LEVEL_4K, slot);
- 
- 	for_each_rmap_spte(rmap_head, &iter, sptep) {
- 		if (is_writable_pte(*sptep))
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 8f8fc65bfa3e..ee8756ef8543 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -891,7 +891,7 @@ static __init int svm_hardware_setup(void)
- 	if (npt_enabled && !npt)
- 		npt_enabled = false;
- 
--	kvm_configure_mmu(npt_enabled, PT_PDPE_LEVEL);
-+	kvm_configure_mmu(npt_enabled, PG_LEVEL_1G);
- 	pr_info("kvm: Nested Paging %sabled\n", npt_enabled ? "en" : "dis");
- 
- 	if (nrips) {
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 3ab6ca6062ce..c84de7b6eda5 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -8002,11 +8002,11 @@ static __init int hardware_setup(void)
- 	if (!enable_ept)
- 		ept_lpage_level = 0;
- 	else if (cpu_has_vmx_ept_1g_page())
--		ept_lpage_level = PT_PDPE_LEVEL;
-+		ept_lpage_level = PG_LEVEL_1G;
- 	else if (cpu_has_vmx_ept_2m_page())
--		ept_lpage_level = PT_DIRECTORY_LEVEL;
-+		ept_lpage_level = PG_LEVEL_2M;
- 	else
--		ept_lpage_level = PT_PAGE_TABLE_LEVEL;
-+		ept_lpage_level = PG_LEVEL_4K;
- 	kvm_configure_mmu(enable_ept, ept_lpage_level);
- 
- 	/*
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 856b6fc2c2ba..0df27e578705 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -10017,7 +10017,7 @@ static void kvm_mmu_slot_apply_flags(struct kvm *kvm,
- {
- 	/* Still write protect RO slot */
- 	if (new->flags & KVM_MEM_READONLY) {
--		kvm_mmu_slot_remove_write_access(kvm, new, PT_PAGE_TABLE_LEVEL);
-+		kvm_mmu_slot_remove_write_access(kvm, new, PG_LEVEL_4K);
- 		return;
- 	}
- 
-@@ -10057,7 +10057,7 @@ static void kvm_mmu_slot_apply_flags(struct kvm *kvm,
- 		} else {
- 			int level =
- 				kvm_dirty_log_manual_protect_and_init_set(kvm) ?
--				PT_DIRECTORY_LEVEL : PT_PAGE_TABLE_LEVEL;
-+				PG_LEVEL_2M : PG_LEVEL_4K;
- 
- 			/*
- 			 * If we're with initial-all-set, we don't need
--- 
-2.26.0
-
+> > > > > > 
+> > > > > > 
+> > > > > > > I agree that there was a gap in the previous proposal for non-mdev
+> > > > > > > devices, but I think this bring a lot of questions that we need to
+> > > > > > > puzzle through and libvirt will need to re-evaluate how they might
+> > > > > > > decide to pick a migration target device.  For example, I'm sure
+> > > > > > > libvirt would reject any policy decisions regarding picking a physical
+> > > > > > > device versus an mdev device.  Had we previously left it that only a
+> > > > > > > layer above libvirt would select a target device and libvirt only tests
+> > > > > > > compatibility to that target device?
+> > > > > > I'm not sure if there's a layer above libvirt would select a target
+> > > > > > device. but if there is such a layer (even it's human), we need to
+> > > > > > provide an interface for them to know whether their decision is suitable
+> > > > > > for migration. The migration_version interface provides a potential to
+> > > > > > allow mdev->phys migration, even libvirt may currently reject it.
+> > > > > > 
+> > > > > > 
+> > > > > > > We also need to consider that this expands the namespace.  If we no
+> > > > > > > longer require matching types as the first level of comparison, then
+> > > > > > > vendor migration strings can theoretically collide.  How do we
+> > > > > > > coordinate that can't happen?  Thanks,
+> > > > > > yes, it's indeed a problem.
+> > > > > > could only allowing migration beteen devices from the same vendor be a
+> > > > > > good
+> > > > > > prerequisite?
+> > > > > > 
+> > > > > > Thanks
+> > > > > > Yan
+> > > > > > >
+> > > > > > > > > > > Is existence (and compatibility) of (1) a pre-req for possible
+> > > > > > > > > > > existence (and compatibility) of (2)?
+> > > > > > > > > > >
+> > > > > > > > > > no. (2) does not reply on (1).
+> > > > > > > > >
+> > > > > > > > > Hm. Non-existence of (1) seems to imply "this type does not support
+> > > > > > > > > migration". If an mdev created for such a type suddenly does support
+> > > > > > > > > migration, it feels a bit odd.
+> > > > > > > > >
+> > > > > > > > yes. but I think if the condition happens, it should be reported a bug
+> > > > > > > > to vendor driver.
+> > > > > > > > should I add a line in the doc like "vendor driver should ensure that the
+> > > > > > > > migration compatibility from migration_version under mdev_type should
+> > > > > > be
+> > > > > > > > consistent with that from migration_version under device node" ?
+> > > > > > > >
+> > > > > > > > > (It obviously cannot be a prereq for what I called (3) above.)
+> > > > > > > > >
+> > > > > > > > > >
+> > > > > > > > > > > Does userspace need to check (1) or can it completely rely on (2), if
+> > > > > > > > > > > it so chooses?
+> > > > > > > > > > >
+> > > > > > > > > > I think it can completely reply on (2) if compatibility check before
+> > > > > > > > > > mdev creation is not required.
+> > > > > > > > > >
+> > > > > > > > > > > If devices with a different mdev type are indeed compatible, it
+> > > > > > seems
+> > > > > > > > > > > userspace can only find out after the devices have actually been
+> > > > > > > > > > > created, as (1) does not apply?
+> > > > > > > > > > yes, I think so.
+> > > > > > > > >
+> > > > > > > > > How useful would it be for userspace to even look at (1) in that case?
+> > > > > > > > > It only knows if things have a chance of working if it actually goes
+> > > > > > > > > ahead and creates devices.
+> > > > > > > > >
+> > > > > > > > hmm, is it useful for userspace to test the migration_version under mdev
+> > > > > > > > type before it knows what mdev device to generate ?
+> > > > > > > > like when the userspace wants to migrate an mdev device in src vm,
+> > > > > > > > but it has not created target vm and the target mdev device.
+> > > > > > > >
+> > > > > > > > > >
+> > > > > > > > > > > One of my worries is that the existence of an attribute with the
+> > > > > > same
+> > > > > > > > > > > name in two similar locations might lead to confusion. But maybe it
+> > > > > > > > > > > isn't a problem.
+> > > > > > > > > > >
+> > > > > > > > > > Yes, I have the same feeling. but as (2) is for sysfs interface
+> > > > > > > > > > consistency, to make it transparent to userspace tools like libvirt,
+> > > > > > > > > > I guess the same name is necessary?
+> > > > > > > > >
+> > > > > > > > > What do we actually need here, I wonder? (1) and (2) seem to serve
+> > > > > > > > > slightly different purposes, while (2) and what I called (3) have the
+> > > > > > > > > same purpose. Is it important to userspace that (1) and (2) have the
+> > > > > > > > > same name?
+> > > > > > > > so change (1) to migration_type_version and (2) to
+> > > > > > > > migration_instance_version?
+> > > > > > > > But as they are under different locations, could that location imply
+> > > > > > > > enough information?
+> > > > > > > >
+> > > > > > > >
+> > > > > > > > Thanks
+> > > > > > > > Yan
+> > > > > > > >
+> > > > > > > >
+> > > > > > >
+> > > > > > _______________________________________________
+> > > > > > intel-gvt-dev mailing list
+> > > > > > intel-gvt-dev@lists.freedesktop.org
+> > > > > > https://lists.freedesktop.org/mailman/listinfo/intel-gvt-dev
+> > > > 
+> > > --
+> > > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> > > 
+> > 
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> 
