@@ -2,188 +2,186 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 91F2B1BBAB0
-	for <lists+kvm@lfdr.de>; Tue, 28 Apr 2020 12:06:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D4DEB1BBAC4
+	for <lists+kvm@lfdr.de>; Tue, 28 Apr 2020 12:08:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727909AbgD1KFs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Apr 2020 06:05:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49144 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727820AbgD1KFs (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 28 Apr 2020 06:05:48 -0400
-Received: from mail-ot1-x344.google.com (mail-ot1-x344.google.com [IPv6:2607:f8b0:4864:20::344])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 511E5C03C1AC;
-        Tue, 28 Apr 2020 03:05:48 -0700 (PDT)
-Received: by mail-ot1-x344.google.com with SMTP id 72so31654171otu.1;
-        Tue, 28 Apr 2020 03:05:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=c+huRrl4EMmwLtCydWHPHBwimIQQrSdcPSmlbyOi6ak=;
-        b=ZXQcasNbkucSaQmXTrTSqX7pZUJO2euHRVM05NZzm5TApUC2RLi8uiPoeIXyaeakg8
-         L6s31m697YGtYuo/2tuzhQkt/Hsy+AUjb3rLu2rA2YL9iaQdgRGY1ARTmpQzgheJxVnE
-         HQNWIkhgPajVwvSY9z8CelokxtaWqOuE1qSh8YZJPRyZpIMxiZBOATTvk3UAbwlSuS5W
-         ZlyX+NpB4hN6Y/BZE5qqAAFDLA4OdVFtwAC+PUqFzLBItCIEvDcdfjXhJI/iNXjDuNXE
-         qdnmr8vMnZbJWcm17PQsuhSwhQK9dGIFV696cp8pZJhMh/ImQAJlIebRToOXiZaAa84c
-         DbIA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=c+huRrl4EMmwLtCydWHPHBwimIQQrSdcPSmlbyOi6ak=;
-        b=Cr2xU40lhFKrmfJD0zLp60qiCoJsq2ZquVSVnmOdvf8BA2ZIYQB9YqUcjm473D5KYP
-         5IiUjz58cJnqXc56OlRuANwX7SuR6SBPwMyongl/9gTCEGlKVCyK8Vbfkxbld6uD06No
-         5sMy8Y6CMhZwMoypdASyWzSfzR/5/V6KA0RohSEIZCuExBP1dyeLCEeBo5xEk3LBSsRz
-         KvgjaASVK/pDShfdQnhpHTk8EqJqL11si95STgwHd3vXjr9LX0UF0xMQMEDUVEJsTIyV
-         FD4kjyKvZ/MgtDStosAs5AjVIBPqBbvn3uSdhNMxqTUFpDW6iCsm66+24U8k4keJ1S4p
-         yacA==
-X-Gm-Message-State: AGi0PuaN3pDhZZbHChzbKbbkFiTKUgJmdoN8QvaIIRVXX4uI0NpKff1D
-        QGdU2hEkPvKJBQ2KAj4cK0B/iRf2SHvCSc9fGzg=
-X-Google-Smtp-Source: APiQypKYwyvKoAhMChnqsyAy72r1GF1221YvLClrEKSSr7ORzSXuco0AdOhukG42X8AkRT3b27d0+Yk1YWS/WZFqPdw=
-X-Received: by 2002:a9d:810:: with SMTP id 16mr21332951oty.56.1588068347645;
- Tue, 28 Apr 2020 03:05:47 -0700 (PDT)
+        id S1727831AbgD1KIa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Apr 2020 06:08:30 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:20610 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726932AbgD1KI3 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 28 Apr 2020 06:08:29 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 03SA1fVx113549;
+        Tue, 28 Apr 2020 06:08:26 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 30pgnxujvf-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 28 Apr 2020 06:08:26 -0400
+Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 03SA1kTZ114104;
+        Tue, 28 Apr 2020 06:08:26 -0400
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 30pgnxuju1-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 28 Apr 2020 06:08:26 -0400
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 03SA5hsK003543;
+        Tue, 28 Apr 2020 10:08:24 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma04ams.nl.ibm.com with ESMTP id 30mcu6wvxt-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 28 Apr 2020 10:08:24 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 03SA8Lii65208416
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 28 Apr 2020 10:08:21 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 6A6D0A4040;
+        Tue, 28 Apr 2020 10:08:21 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id BA56BA404D;
+        Tue, 28 Apr 2020 10:08:20 +0000 (GMT)
+Received: from oc2783563651 (unknown [9.145.145.25])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 28 Apr 2020 10:08:20 +0000 (GMT)
+Date:   Tue, 28 Apr 2020 12:07:26 +0200
+From:   Halil Pasic <pasic@linux.ibm.com>
+To:     Tony Krowiak <akrowiak@linux.ibm.com>
+Cc:     Harald Freudenberger <freude@linux.ibm.com>,
+        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, borntraeger@de.ibm.com, cohuck@redhat.com,
+        mjrosato@linux.ibm.com, pmorel@linux.ibm.com,
+        alex.williamson@redhat.com, kwankhede@nvidia.com,
+        jjherne@linux.ibm.com, fiuczy@linux.ibm.com
+Subject: Re: [PATCH v7 01/15] s390/vfio-ap: store queue struct in hash table
+ for quick access
+Message-ID: <20200428120726.3f769ce3.pasic@linux.ibm.com>
+In-Reply-To: <6ea12752-d23f-abe4-8d5f-3e7738984576@linux.ibm.com>
+References: <20200407192015.19887-1-akrowiak@linux.ibm.com>
+        <20200407192015.19887-2-akrowiak@linux.ibm.com>
+        <20200424055732.7663896d.pasic@linux.ibm.com>
+        <d15b4a8e-66eb-e4ce-c8ac-6885519940aa@linux.ibm.com>
+        <20200427171739.76291a74.pasic@linux.ibm.com>
+        <6ea12752-d23f-abe4-8d5f-3e7738984576@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-References: <1588055009-12677-1-git-send-email-wanpengli@tencent.com>
- <1588055009-12677-7-git-send-email-wanpengli@tencent.com> <15150824.2a36.171c0394538.Coremail.linxl3@wangsu.com>
-In-Reply-To: <15150824.2a36.171c0394538.Coremail.linxl3@wangsu.com>
-From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Tue, 28 Apr 2020 18:05:37 +0800
-Message-ID: <CANRm+Cw0=JU5eJayQ0XM7n2e+q8a8dzHusqtsfNjmWTNai9phg@mail.gmail.com>
-Subject: Re: [PATCH v4 6/7] KVM: X86: TSCDEADLINE MSR emulation fastpath
-To:     =?UTF-8?B?5p6X6ZGr6b6Z?= <linxl3@wangsu.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Haiwei Li <lihaiwei@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.676
+ definitions=2020-04-28_05:2020-04-27,2020-04-28 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 clxscore=1015
+ mlxscore=0 priorityscore=1501 lowpriorityscore=0 bulkscore=0
+ suspectscore=0 malwarescore=0 phishscore=0 mlxlogscore=999 spamscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2004280082
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 28 Apr 2020 at 17:59, =E6=9E=97=E9=91=AB=E9=BE=99 <linxl3@wangsu.co=
-m> wrote:
->
-> On Tuesday, 28 Apr 2020 at 14:23, Wanpeng Li <kernellwp@gmail.com> wrote:
-> &gt;
-> &gt; From: Wanpeng Li <wanpengli@tencent.com>
-> &gt;
-> &gt; This patch implements tscdealine msr emulation fastpath, after wrmsr
-> &gt; tscdeadline vmexit, handle it as soon as possible and vmentry immedi=
-ately
-> &gt; without checking various kvm stuff when possible.
-> &gt;
-> &gt; Tested-by: Haiwei Li <lihaiwei@tencent.com>
-> &gt; Cc: Haiwei Li <lihaiwei@tencent.com>
-> &gt; Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
-> &gt; ---
-> &gt;  arch/x86/kvm/lapic.c   | 18 ++++++++++++------
-> &gt;  arch/x86/kvm/vmx/vmx.c | 12 ++++++++----
-> &gt;  arch/x86/kvm/x86.c     | 30 ++++++++++++++++++++++++------
-> &gt;  3 files changed, 44 insertions(+), 16 deletions(-)
-> &gt;
-> &gt; diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> &gt; index 38f7dc9..3589237 100644
-> &gt; --- a/arch/x86/kvm/lapic.c
-> &gt; +++ b/arch/x86/kvm/lapic.c
-> &gt; @@ -1593,7 +1593,7 @@ static void kvm_apic_inject_pending_timer_irqs=
-(struct kvm_lapic *apic)
-> &gt;    }
-> &gt;  }
-> &gt;
-> &gt; -static void apic_timer_expired(struct kvm_lapic *apic)
-> &gt; +static void apic_timer_expired(struct kvm_lapic *apic, bool from_ti=
-mer_fn)
-> &gt;  {
-> &gt;    struct kvm_vcpu *vcpu =3D apic-&gt;vcpu;
-> &gt;    struct kvm_timer *ktimer =3D &amp;apic-&gt;lapic_timer;
-> &gt; @@ -1604,6 +1604,12 @@ static void apic_timer_expired(struct kvm_lap=
-ic *apic)
-> &gt;    if (apic_lvtt_tscdeadline(apic) || ktimer-&gt;hv_timer_in_use)
-> &gt;            ktimer-&gt;expired_tscdeadline =3D ktimer-&gt;tscdeadline=
-;
-> &gt;
-> &gt; +  if (!from_timer_fn &amp;&amp; vcpu-&gt;arch.apicv_active) {
-> &gt; +          WARN_ON(kvm_get_running_vcpu() !=3D vcpu);
-> &gt; +          kvm_apic_inject_pending_timer_irqs(apic);
-> &gt; +          return;
-> &gt; +  }
-> &gt; +
-> &gt;    if (kvm_use_posted_timer_interrupt(apic-&gt;vcpu)) {
-> &gt;            if (apic-&gt;lapic_timer.timer_advance_ns)
-> &gt;                    __kvm_wait_lapic_expire(vcpu);
-> &gt; @@ -1643,7 +1649,7 @@ static void start_sw_tscdeadline(struct kvm_la=
-pic *apic)
-> &gt;            expire =3D ktime_sub_ns(expire, ktimer-&gt;timer_advance_=
-ns);
-> &gt;            hrtimer_start(&amp;ktimer-&gt;timer, expire, HRTIMER_MODE=
-_ABS_HARD);
-> &gt;    } else
-> &gt; -          apic_timer_expired(apic);
-> &gt; +          apic_timer_expired(apic, false);
-> &gt;
-> &gt;    local_irq_restore(flags);
-> &gt;  }
-> &gt; @@ -1751,7 +1757,7 @@ static void start_sw_period(struct kvm_lapic *=
-apic)
-> &gt;
-> &gt;    if (ktime_after(ktime_get(),
-> &gt;                    apic-&gt;lapic_timer.target_expiration)) {
-> &gt; -          apic_timer_expired(apic);
-> &gt; +          apic_timer_expired(apic, false);
-> &gt;
-> &gt;            if (apic_lvtt_oneshot(apic))
-> &gt;                    return;
-> &gt; @@ -1813,7 +1819,7 @@ static bool start_hv_timer(struct kvm_lapic *a=
-pic)
-> &gt;            if (atomic_read(&amp;ktimer-&gt;pending)) {
-> &gt;                    cancel_hv_timer(apic);
-> &gt;            } else if (expired) {
-> &gt; -                  apic_timer_expired(apic);
-> &gt; +                  apic_timer_expired(apic, false);
-> &gt;                    cancel_hv_timer(apic);
-> &gt;            }
-> &gt;    }
-> &gt; @@ -1863,7 +1869,7 @@ void kvm_lapic_expired_hv_timer(struct kvm_vcp=
-u *vcpu)
-> &gt;            goto out;
-> &gt;    WARN_ON(swait_active(&amp;vcpu-&gt;wq));
-> &gt;    cancel_hv_timer(apic);
-> &gt; -  apic_timer_expired(apic);
-> &gt; +  apic_timer_expired(apic, false);
-> &gt;
-> &gt;    if (apic_lvtt_period(apic) &amp;&amp; apic-&gt;lapic_timer.period=
-) {
-> &gt;            advance_periodic_target_expiration(apic);
-> &gt; @@ -2369,7 +2375,7 @@ static enum hrtimer_restart apic_timer_fn(stru=
-ct hrtimer *data)
-> &gt;    struct kvm_timer *ktimer =3D container_of(data, struct kvm_timer,=
- timer);
-> &gt;    struct kvm_lapic *apic =3D container_of(ktimer, struct kvm_lapic,=
- lapic_timer);
-> &gt;
-> &gt; -  apic_timer_expired(apic);
-> &gt; +  apic_timer_expired(apic, true);
-> &gt;
-> &gt;    if (lapic_is_periodic(apic)) {
-> &gt;            advance_periodic_target_expiration(apic);
-> &gt; diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> &gt; index ce19b0e..bb5c4f1 100644
-> &gt; --- a/arch/x86/kvm/vmx/vmx.c
-> &gt; +++ b/arch/x86/kvm/vmx/vmx.c
-> &gt; @@ -5994,7 +5994,8 @@ static int vmx_handle_exit(struct kvm_vcpu *vc=
-pu, fastpath_t exit_fastpath)
-> &gt;    if (exit_fastpath =3D=3D EXIT_FASTPATH_SKIP_EMUL_INS) {
-> &gt;            kvm_skip_emulated_instruction(vcpu);
-> Can we move this kvm_skip_emulated_instruction to handle_fastpath_set_msr=
-_irqoff? This will keep the style consistent.
+On Mon, 27 Apr 2020 17:48:58 -0400
+Tony Krowiak <akrowiak@linux.ibm.com> wrote:
 
-It can have other users sooner or later.
+> 
+> 
+> On 4/27/20 11:17 AM, Halil Pasic wrote:
+> > On Mon, 27 Apr 2020 15:05:23 +0200
+> > Harald Freudenberger <freude@linux.ibm.com> wrote:
+> >
+> >> On 24.04.20 05:57, Halil Pasic wrote:
+> >>> On Tue,  7 Apr 2020 15:20:01 -0400
+> >>> Tony Krowiak <akrowiak@linux.ibm.com> wrote:
+> >>>   
+> >>>> Rather than looping over potentially 65535 objects, let's store the
+> >>>> structures for caching information about queue devices bound to the
+> >>>> vfio_ap device driver in a hash table keyed by APQN.
+> >>> @Harald:
+> >>> Would it make sense to make the efficient lookup of an apqueue base
+> >>> on its APQN core AP functionality instead of each driver figuring it out
+> >>> on it's own?
+> >>>
+> >>> If I'm not wrong the zcrypt device/driver(s) must the problem of
+> >>> looking up a queue based on its APQN as well.
+> >>>
+> >>> For instance struct ep11_cprb has a target_id filed
+> >>> (arch/s390/include/uapi/asm/zcrypt.h).
+> >>>
+> >>> Regards,
+> >>> Halil
+> >> Hi Halil
+> >>
+> >> no, the zcrypt drivers don't have this problem. They build up their own device object which
+> >> includes a pointer to the base ap device.
+> > I'm a bit confused. Doesn't your code loop first trough the ap_card
+> > objects to find the APID portion of the APQN, and then loop the queue
+> > list of the matching card to find the right ap_queue object? Or did I
+> > miss something? Isn't that what _zcrypt_send_ep11_cprb() does? Can you
+> > point me to the code that avoids the lookup (by apqn) for zcrypt?
+> 
+> The code you reference, _zcrypt_send_ep11_cprb(), does loop through
+> each queue associated with each card, but it doesn't appear to be 
+> looking for
+> a queue with a particular APQN. It appears to be looking for a queue
+> meeting a specific set of conditions. At least that's my take after 
+> taking a very
+> brief look at the code, so I'm not sure that applies here.
+> 
 
-    Wanpeng
+One of the possible conditions is that the APQN is in the targets array.
+Please have another look at the code below, is_desired_ep11_queue()
+and is_desired_ep11_card() do APQI and APID part of the check
+respectively:
+
+        for_each_zcrypt_card(zc) {
+                /* Check for online EP11 cards */
+                if (!zc->online || !(zc->card->functions & 0x04000000))
+                        continue;
+                /* Check for user selected EP11 card */
+                if (targets &&
+                    !is_desired_ep11_card(zc->card->id, target_num, targets))
+                        continue;
+                /* check if device node has admission for this card */
+                if (!zcrypt_check_card(perms, zc->card->id))
+                        continue;
+                /* get weight index of the card device  */
+                weight = speed_idx_ep11(func_code) * zc->speed_rating[SECKEY];
+                if (zcrypt_card_compare(zc, pref_zc, weight, pref_weight))
+                        continue;
+                for_each_zcrypt_queue(zq, zc) {
+                        /* check if device is online and eligible */
+                        if (!zq->online ||
+                            !zq->ops->send_ep11_cprb ||
+                            (targets &&
+                             !is_desired_ep11_queue(zq->queue->qid,
+                                                    target_num, targets)))
+
+
+Yes the size of targets may or may not be 1 (example for size == 1 is
+the invocation form ep11_cryptsingle()) and the respective costs
+depend on the usual size of the array. Since the goal of the whole
+exercise seems to be to pick a single queue, and we settle with the first
+suitable (first not in the input array, but in our lists) that is
+suitable, I assumed we wouldn't need many hashtable lookups.
+
+Regards,
+Halil
+
+> >
+> >
+> > If you look at the new function of vfio_ap_get_queue(unsigned long apqn)
+> > it basically about finding the queue based on the apqn, with the
+> > difference that it is vfio specific.
+> >
+> > Regards,
+> > Halil
+> >
+> >> However, this is not a big issue, as the ap_bus holds a list of ap_card objects and within each
+> >> ap_card object there exists a list of ap_queues.
+> >
+> >
+> >
+> 
+
