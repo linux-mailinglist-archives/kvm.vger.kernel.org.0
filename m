@@ -2,55 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D6EE21BD086
-	for <lists+kvm@lfdr.de>; Wed, 29 Apr 2020 01:16:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5D7EE1BD090
+	for <lists+kvm@lfdr.de>; Wed, 29 Apr 2020 01:24:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726412AbgD1XQ3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Apr 2020 19:16:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60292 "EHLO
+        id S1726435AbgD1XYF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Apr 2020 19:24:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33250 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726312AbgD1XQ3 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 28 Apr 2020 19:16:29 -0400
-Received: from mail-il1-x143.google.com (mail-il1-x143.google.com [IPv6:2607:f8b0:4864:20::143])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E886AC03C1AD
-        for <kvm@vger.kernel.org>; Tue, 28 Apr 2020 16:16:28 -0700 (PDT)
-Received: by mail-il1-x143.google.com with SMTP id m5so606320ilj.10
-        for <kvm@vger.kernel.org>; Tue, 28 Apr 2020 16:16:28 -0700 (PDT)
+        by vger.kernel.org with ESMTP id S1726044AbgD1XYF (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 28 Apr 2020 19:24:05 -0400
+Received: from mail-io1-xd44.google.com (mail-io1-xd44.google.com [IPv6:2607:f8b0:4864:20::d44])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26B72C03C1AD
+        for <kvm@vger.kernel.org>; Tue, 28 Apr 2020 16:24:05 -0700 (PDT)
+Received: by mail-io1-xd44.google.com with SMTP id y26so241660ioj.2
+        for <kvm@vger.kernel.org>; Tue, 28 Apr 2020 16:24:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc:content-transfer-encoding;
-        bh=r4RxKLheQFWjLght4V80HIUjV5cwhunpMukZ0Rx77a0=;
-        b=a3/ZV658yISvrO9+1UU27T1GAwKxt14HXqvoXKFBaCbW3Lp5mY7UffdoYOa95wNEf3
-         U+grmPC6Pf8E1N9kq2HAsoeLDAt+iMAyNDZKvehqIc6NcWOBIhIjh5XB0ZJoGK023wA4
-         mar6i3VfAxK6wgli1oe4eJa4AK2wnngnNaHmCDFzAKTG+jNUNK1djtgDXV34yiEIxk8D
-         z/TwGO99pgXFch32y5rw9GZ87Fbonh62nDyONUFchBOMD4ps/qBzc4TmyHKcOZ3anD8j
-         VHtd+tp8KEE1sF1675bCwZfrpPrs/HV+dDRUMpGbdy2vTWxhynJ8yOA5zbcjBRlm+Ijb
-         fwGg==
+        bh=tYTe3rXjQCNrBkKTXCmJf8lKprp2RWUAlHsRaWNxGTc=;
+        b=TXuANhi0BR/JvyNjZ8nFnQsNZ4GupoZB2lYXOs15aNSTXp8rXR8eORnV/dPHv5qVQO
+         wtgyDJ2jD8GYUaTGPEjvTkkvFhLb8Sj1iszbfT4W0QH/hWFvecz9SLWlyz6qJpFr/u/e
+         xVfR3geOpR/9ejNcEqBvcj4oXzS743JT5vt2JSc7V88h1ShcNVcBgF4vJh1HOkK21TaS
+         0bGkVsqcf8wWQ016Azt0Ro1bKOedsJuhvo67WQwQcfsntwjg10hsHHRwWspyMmE/lC5m
+         KE8nAWQ7H7+ELIVDnsmiZu1Y9ttYzJybd/6JoEFXeaqjPzn2QE9uI7DEkcn8Dxus7gvx
+         wnWw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc:content-transfer-encoding;
-        bh=r4RxKLheQFWjLght4V80HIUjV5cwhunpMukZ0Rx77a0=;
-        b=o+FIlNWNL0qMHOye5phXmBgqEqKLdiYFtWjPJpU2IRxIU5H7f3W4lrYwMomhLGyjjF
-         2OIpLH9tjJOD2QEz7OQfhoBI0/Hoc1fBv6kylh9wJN1p329+nOEXl4Pf8WOGoL8SN0JT
-         yRO8UON+ws4H5a16FXc1V8JwvFiv/sETOZoD2Z08cGxV70l5+6/oNjdF2VscPifKoc77
-         Pu5gqdZUTiUfr3+HXobU+PodJcMxYSJVk+TxCMp9wkUjYx9JKFsga0SV5XPwgDf9olGY
-         OZIGzaZyDV/FnyTD7ZBZ3UTUr0OCZI0jDZMFR1lavcYt19onR/TEbMTsVAiBk2g0HwLY
-         pHXg==
-X-Gm-Message-State: AGi0PuaileM3rNautaPoanBNl6YH+eisyQJsGvRXTnCEL9Sw/W4c8bdD
-        3zTEfGHLERODTjYzO8nhob5JQns3AEWQnG7IN4pctQ==
-X-Google-Smtp-Source: APiQypIfCxto0N8rPspMKdAExAKXIzoJjLZtwgxTLaVVXOic/XF6uX4ejcBrMul0Kw5QIrfPRlN2jEuMxt7uLL1VpWc=
-X-Received: by 2002:a92:3d85:: with SMTP id k5mr29689400ilf.26.1588115787754;
- Tue, 28 Apr 2020 16:16:27 -0700 (PDT)
+        bh=tYTe3rXjQCNrBkKTXCmJf8lKprp2RWUAlHsRaWNxGTc=;
+        b=f2BrNF+v7iACRw+kw5q4NT+N60K8Gn7Hor0w1+K+T27BcEAB2NL5EuYHomPMlH5V/J
+         D54yuwN19cC0sNV18sGj5V0KsbQTlR1/5ubKrL1GPJ1pwcl0a0I6Q7UiZwSPHIgswcyF
+         YeyydlVE/R7kYYZFYrav4/2CJi/ZoQD9awEeunYo0qsZrP3sAiqnzXgV9fghUDczHYrr
+         PNWy6wxI2TLFQab0kAg8Ppn/wHvtrJgE+5h+QpdiLhRy2aD8vgU6UTolNIBm/GK2YrzG
+         EXjJJ+tEryazHvzXyIysN6BFSkDjNH2n65QkpkKekihaYL7S087S7rVDOZLCVlhPd91u
+         vf6A==
+X-Gm-Message-State: AGi0PuadwyFCk/7sEAwxd5wK6Xk1SotXApd1MK+SYRNhD5v6ri7H78Td
+        /GaWfdBEH6GY6XOOMglNVd5tjxDICiImVy1c90VhZsAyr1w=
+X-Google-Smtp-Source: APiQypJARVyM9++FPpENPWT9FRn8ts9pOcs46/T52gRBupV/SBqZ6MaFNM0VJKXMuJDTTIEqosCza1ykao3hdWRhF5Q=
+X-Received: by 2002:a5e:a610:: with SMTP id q16mr28422670ioi.75.1588116244121;
+ Tue, 28 Apr 2020 16:24:04 -0700 (PDT)
 MIME-Version: 1.0
 References: <20200423022550.15113-1-sean.j.christopherson@intel.com>
  <20200423022550.15113-10-sean.j.christopherson@intel.com> <CALMp9eSuYqeVmWhb6q7T5DAW_Npbuin_N1+sbWjvcu0zTqiwsQ@mail.gmail.com>
  <20200428225949.GP12735@linux.intel.com>
 In-Reply-To: <20200428225949.GP12735@linux.intel.com>
 From:   Jim Mattson <jmattson@google.com>
-Date:   Tue, 28 Apr 2020 16:16:16 -0700
-Message-ID: <CALMp9eRFfEB1avbQv0O0V=EGrJdSNTxg8Z-BONmQ--dV66CuAg@mail.gmail.com>
+Date:   Tue, 28 Apr 2020 16:23:52 -0700
+Message-ID: <CALMp9eR8VsGAPrKLM2ZCG_DBTJa5Cn+raaUtzG=4V-bp_jxqWw@mail.gmail.com>
 Subject: Re: [PATCH 09/13] KVM: nVMX: Prioritize SMI over nested IRQ/NMI
 To:     Sean Christopherson <sean.j.christopherson@intel.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -117,37 +117,11 @@ vcpu *vcpu)
 I
 > can't find any public documentation about the preemption timer's priority=
 .
-> Preemption timer is lower priority than MTF, ergo it's not in the same
-> class as SMI.
->
-> Regarding SMI vs. MTF and #DB trap, to actually prioritize SMIs above MTF
-> and #DBs, we'd need to save/restore MTF and pending #DBs via SMRAM.  I
-> think it makes sense to take the easy road and keep SMI after the traps,
-> with a comment to say it's technically wrong but not worth fixing.
 
-Pending debug exceptions should just go in the pending debug
-exceptions field. End of story and end of complications. I don't
-understand why kvm is so averse to using this field the way it was
-intended.
+Section 25.2 of the SDM, volume 3:
 
-As for the MTF, section 34.14.1 of the SDM, volume 3, clearly states:
-
-The pseudocode above makes reference to the saving of VMX-critical
-state. This state consists of the following:
-(1) SS.DPL (the current privilege level); (2) RFLAGS.VM; (3) the state
-of blocking by STI and by MOV SS (see
-Table 24-3 in Section 24.4.2); (4) the state of virtual-NMI blocking
-(only if the processor is in VMX non-root oper-
-ation and the =E2=80=9Cvirtual NMIs=E2=80=9D VM-execution control is 1); an=
-d (5) an
-indication of whether an MTF VM exit is pending
-(see Section 25.5.2). These data may be saved internal to the
-processor or in the VMCS region of the current
-VMCS. Processors that do not support SMI recognition while there is
-blocking by STI or by MOV SS need not save
-the state of such blocking.
-
-I haven't really looked at kvm's implementation of SMM (because Google
-doesn't support it), but it seems that the "MTF VM exit is pending"
-bit should be trivial to deal with. I assume we save the other
-VMX-critical state somewhere!
+Debug-trap exceptions and higher priority events take priority over VM
+exits caused by the VMX-preemption
+timer. VM exits caused by the VMX-preemption timer take priority over
+VM exits caused by the =E2=80=9CNMI-window
+exiting=E2=80=9D VM-execution control and lower priority events.
