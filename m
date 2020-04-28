@@ -2,97 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F2FED1BCD06
-	for <lists+kvm@lfdr.de>; Tue, 28 Apr 2020 22:08:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C5EEB1BCD4E
+	for <lists+kvm@lfdr.de>; Tue, 28 Apr 2020 22:22:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726453AbgD1UHe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Apr 2020 16:07:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58894 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726440AbgD1UH3 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 28 Apr 2020 16:07:29 -0400
-Received: from mail-lf1-x144.google.com (mail-lf1-x144.google.com [IPv6:2a00:1450:4864:20::144])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 521ADC03C1AB
-        for <kvm@vger.kernel.org>; Tue, 28 Apr 2020 13:07:29 -0700 (PDT)
-Received: by mail-lf1-x144.google.com with SMTP id f8so18001864lfe.12
-        for <kvm@vger.kernel.org>; Tue, 28 Apr 2020 13:07:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=M1YtACLEe9IuTvLnjysZBZz/m54iNfZsObywrWlf7oE=;
-        b=KjUGDWC9klYlMPXx4Q6IAmywWSeQcbXkwwzOYikFtW+g+kq2qFglZTMOdtK+hTolHm
-         +95eYRT4IQPC9wQ25xEQ/SCOUpJdsiTcw+861799DwWHDH8vvPUt5+I8zdP/ZwSSeH/5
-         0XK2fGAcqUzAOkqu5KGDML5Img3Muwp0A++uH/Ag53yiJmrlnrdZXJ6hy+swQVY/hK5b
-         lX5Z2b32uNS/Kl8jNnNsH0ruVgDtGu05DBwQSZP/ZRdkBy79mMNYWR9dcS7CIocvNPLE
-         70LzUAEHuv/zYF4Ta6uOT4gMGcsGp+FSRfsflhMFCSq0p3nPi0xpZkkNMdM23coeEnCB
-         OXjA==
+        id S1726463AbgD1UWj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Apr 2020 16:22:39 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:24456 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726284AbgD1UWj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Apr 2020 16:22:39 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1588105357;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=voGLyeD1WxfVMgEf4Mai58JZB/u+WPmTGh+LxkJS5LU=;
+        b=KBkiM90Nb9LnuAeDGFQ4WG7bJFTjEdqdpw+gX1iYMohcLwMT5paGFN5I9BxtA6Kfhfmzuc
+        uAoti+sPuCVZAbid7bQuDk8p/v6iLs5DhlBgUXLnjo04WOC7POMqpXt+sY7dgeM96plfE7
+        9GSt6qpruf7Gym4CpFKducJ/WAAb9e8=
+Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
+ [209.85.222.200]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-62-nv2qFTWwNHKauWqhuzwJ5g-1; Tue, 28 Apr 2020 16:22:31 -0400
+X-MC-Unique: nv2qFTWwNHKauWqhuzwJ5g-1
+Received: by mail-qk1-f200.google.com with SMTP id z8so24683667qki.13
+        for <kvm@vger.kernel.org>; Tue, 28 Apr 2020 13:22:31 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=M1YtACLEe9IuTvLnjysZBZz/m54iNfZsObywrWlf7oE=;
-        b=WBNtLoFXNpHPRe7cOMbwoMAoFGQXOyLs94xNN/apq3llyYTCH5ApznQTMCCkrOgsP/
-         UvcyXnurgeDW/akJYqAF8tH8AJ+76z2EC6BUGe1NO1A+zRp5PQARtR+BUJ6yWX8WeQ3c
-         dTY/tQvwYjC+2YJVzwxkiAysNLpxqzHXOOtWJnq7JyFYd57kUKYcsA868nq2Sn7r+VYV
-         KaJ4i/VRem1uHoofJ2lprd/U7YxmNhlES1WcJ38X3NAEfyTEgHayHJj0V4ARWCl42POe
-         vzx/x+DCedW44f849zK8uOaMnwPIioX+HpHEgl+Kdc4TM9HQLHcYU0y2wdZRG0GUg1hl
-         1g7g==
-X-Gm-Message-State: AGi0PuaFGWqZLK4kiB6/kLblhxG7A0Ba/jiriNM34v63rKxzUO4HfG5P
-        5NB3qCAfYLoqJBF292aM+bn9cgHx4irehQ7OfFvHqg==
-X-Google-Smtp-Source: APiQypI3iiSpP+vuFbfcMhuWh/HEF2kch9czpa3KxmqEEmwzMCc2dSPgMvj85MvOgPehFcfih9BZiBMwVu+AeS8e8lc=
-X-Received: by 2002:ac2:4832:: with SMTP id 18mr20437133lft.162.1588104446347;
- Tue, 28 Apr 2020 13:07:26 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200423022550.15113-1-sean.j.christopherson@intel.com>
- <20200423022550.15113-2-sean.j.christopherson@intel.com> <CALMp9eRD9py=N9hDSon5GPzuiZw1Z+3xHv9umu1_qKzWczz0PA@mail.gmail.com>
-In-Reply-To: <CALMp9eRD9py=N9hDSon5GPzuiZw1Z+3xHv9umu1_qKzWczz0PA@mail.gmail.com>
-From:   Oliver Upton <oupton@google.com>
-Date:   Tue, 28 Apr 2020 13:07:15 -0700
-Message-ID: <CAOQ_Qsi62EL3WZWEnKVNT=9YFsZ3Gmsu3V-JeehGmxbvotiShg@mail.gmail.com>
-Subject: Re: [PATCH 01/13] KVM: nVMX: Preserve exception priority irrespective
- of exiting behavior
-To:     Jim Mattson <jmattson@google.com>
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=voGLyeD1WxfVMgEf4Mai58JZB/u+WPmTGh+LxkJS5LU=;
+        b=Ydkcnzz2EpekAkIhi5d0+5UOH66RWGpzjDiU7nT9Ob+DnKgcOksJI02jNSmjnl3XbT
+         ajdsuIe1n+GsOnJ5iZ07BYcI3zsfHX9ktkqkrVFSfHs0pfRPvsP7eh7CnIKIr27OtZj1
+         0pTvupIP8J5KzJAFJpktnnbvbUxUvmWrEGw46Q5Z67l8ONW6f5/6jJqaF3FmNRm83Vkv
+         Voq3CKcIhLRuLW/asD/egzKaqA/V9KIyT54TrppcWwVufx1gP1VGwWU0PkZXInnCLSGY
+         Pf8nQ2Ux75RLF9bh2nEvtOBZV9xdNOK0n3MywCz9s9Xdm3/+8gV97Hrq5ok/RjUiUnJ8
+         maLA==
+X-Gm-Message-State: AGi0PuYM1g25ZPs+kNuG1ebcwmvCD1mheLi4+UnYRyskH9S9ANUkfsDZ
+        oBga8RcH+BY39/DZy9DVcxBuCTBheayC5jIcaAiXXu7JpaJ+Y/ExDz/+6Qg/iBHsUS8doNolKIJ
+        XnqMySHherXn6
+X-Received: by 2002:a37:66d8:: with SMTP id a207mr28461420qkc.127.1588105351221;
+        Tue, 28 Apr 2020 13:22:31 -0700 (PDT)
+X-Google-Smtp-Source: APiQypK+LsYsK4GPD3bREyTNhokuLO2gi/E05ejK2hXFbJea8Bo086oicUgNv17RFKAAPIkQ+byHkg==
+X-Received: by 2002:a37:66d8:: with SMTP id a207mr28461388qkc.127.1588105350974;
+        Tue, 28 Apr 2020 13:22:30 -0700 (PDT)
+Received: from xz-x1 ([2607:9880:19c0:32::2])
+        by smtp.gmail.com with ESMTPSA id x24sm14925754qth.80.2020.04.28.13.22.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 28 Apr 2020 13:22:30 -0700 (PDT)
+Date:   Tue, 28 Apr 2020 16:22:28 -0400
+From:   Peter Xu <peterx@redhat.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Kevin Tian <kevin.tian@intel.com>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Christophe de Dinechin <dinechin@redhat.com>,
+        Yan Zhao <yan.y.zhao@intel.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Peter Shier <pshier@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+Subject: Re: [PATCH v8 03/14] KVM: X86: Don't track dirty for
+ KVM_SET_[TSS_ADDR|IDENTITY_MAP_ADDR]
+Message-ID: <20200428202228.GB4280@xz-x1>
+References: <20200331190000.659614-1-peterx@redhat.com>
+ <20200331190000.659614-4-peterx@redhat.com>
+ <20200423203944.GS17824@linux.intel.com>
+ <20200424152151.GB41816@xz-x1>
+ <20200427181054.GL14870@linux.intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20200427181054.GL14870@linux.intel.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Apr 28, 2020 at 11:54 AM Jim Mattson <jmattson@google.com> wrote:
->
-> On Wed, Apr 22, 2020 at 7:26 PM Sean Christopherson
-> <sean.j.christopherson@intel.com> wrote:
-> >
-> > Short circuit vmx_check_nested_events() if an exception is pending and
-> > needs to be injected into L2, priority between coincident events is not
-> > dependent on exiting behavior.  This fixes a bug where a single-step #DB
-> > that is not intercepted by L1 is incorrectly dropped due to servicing a
-> > VMX Preemption Timer VM-Exit.
-> >
-> > Injected exceptions also need to be blocked if nested VM-Enter is
-> > pending or an exception was already injected, otherwise injecting the
-> > exception could overwrite an existing event injection from L1.
-> > Technically, this scenario should be impossible, i.e. KVM shouldn't
-> > inject its own exception during nested VM-Enter.  This will be addressed
-> > in a future patch.
-> >
-> > Note, event priority between SMI, NMI and INTR is incorrect for L2, e.g.
-> > SMI should take priority over VM-Exit on NMI/INTR, and NMI that is
-> > injected into L2 should take priority over VM-Exit INTR.  This will also
-> > be addressed in a future patch.
-> >
-> > Fixes: b6b8a1451fc4 ("KVM: nVMX: Rework interception of IRQs and NMIs")
-> > Reported-by: Jim Mattson <jmattson@google.com>
-> > Cc: Oliver Upton <oupton@google.com>
-> > Cc: Peter Shier <pshier@google.com>
-> > Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> Reviewed-by: Jim Mattson <jmattson@google.com>
-Reviewed-by: Oliver Upton <oupton@google.com>
+On Mon, Apr 27, 2020 at 11:10:54AM -0700, Sean Christopherson wrote:
+
+[...]
+
+> > It will "return (0xdeadull << 48)" as you proposed in abbed4fa94f6? :-)
+> > 
+> > Frankly speaking I always preferred zero but that's just not true any more
+> > after above change.  This also reminded me that maybe we should also return the
+> > same thing at [1] below.
+> 
+> Ah, I was looking at this code:
+> 
+> 	if (!slot || !slot->npages)
+> 		return 0;
+> 
+> That means deletion returns different success values for "deletion was a
+> nop" and "deletion was successful".  The nop path should probably return
+> (or fill in) "(unsigned long)(0xdeadull << 48)" as well.
+
+Yep.  Since I touched the line here after all, I'll directly squash this small
+fix into this patch too when I repost.  Thanks,
+
+[...]
+
+> > > 
+> > > >  	} else {
+> > > >  		if (!slot || !slot->npages)
+> > > > -			return 0;
+> > > > +			return ERR_PTR_USR(0);
+> > 
+> > [1]
+
+-- 
+Peter Xu
+
