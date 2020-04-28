@@ -2,17 +2,17 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 523DA1BC336
-	for <lists+kvm@lfdr.de>; Tue, 28 Apr 2020 17:23:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6AC681BC334
+	for <lists+kvm@lfdr.de>; Tue, 28 Apr 2020 17:23:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728565AbgD1PXM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Apr 2020 11:23:12 -0400
-Received: from 8bytes.org ([81.169.241.247]:37790 "EHLO theia.8bytes.org"
+        id S1728263AbgD1PXG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Apr 2020 11:23:06 -0400
+Received: from 8bytes.org ([81.169.241.247]:37428 "EHLO theia.8bytes.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728250AbgD1PSC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S1728253AbgD1PSC (ORCPT <rfc822;kvm@vger.kernel.org>);
         Tue, 28 Apr 2020 11:18:02 -0400
 Received: by theia.8bytes.org (Postfix, from userid 1000)
-        id 9BCF8F0C; Tue, 28 Apr 2020 17:17:47 +0200 (CEST)
+        id BE12BF08; Tue, 28 Apr 2020 17:17:47 +0200 (CEST)
 From:   Joerg Roedel <joro@8bytes.org>
 To:     x86@kernel.org
 Cc:     hpa@zytor.com, Andy Lutomirski <luto@kernel.org>,
@@ -32,9 +32,9 @@ Cc:     hpa@zytor.com, Andy Lutomirski <luto@kernel.org>,
         Joerg Roedel <joro@8bytes.org>, Joerg Roedel <jroedel@suse.de>,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         virtualization@lists.linux-foundation.org
-Subject: [PATCH v3 29/75] x86/idt: Split idt_data setup out of set_intr_gate()
-Date:   Tue, 28 Apr 2020 17:16:39 +0200
-Message-Id: <20200428151725.31091-30-joro@8bytes.org>
+Subject: [PATCH v3 30/75] x86/idt: Move two function from k/idt.c to i/a/desc.h
+Date:   Tue, 28 Apr 2020 17:16:40 +0200
+Message-Id: <20200428151725.31091-31-joro@8bytes.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200428151725.31091-1-joro@8bytes.org>
 References: <20200428151725.31091-1-joro@8bytes.org>
@@ -45,28 +45,34 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Joerg Roedel <jroedel@suse.de>
 
-The code to setup idt_data is needed for early exception handling, but
-set_intr_gate() can't be used that early because it has pv-ops in its
-code path, which don't work that early.
+Move these two functions from kernel/idt.c to include/asm/desc.h:
 
-Split out the idt_data initialization part from set_intr_gate() so
-that it can be used separatly.
+	* init_idt_data()
+	* idt_init_desc()
+
+These functions are needed to setup IDT entries very early and need to
+be called from head64.c. To be usable this early these functions need to
+be compiled without instrumentation and the stack-protector feature.
+These features need to be kept enabled for kernel/idt.c, so head64.c
+must use its own versions.
 
 Signed-off-by: Joerg Roedel <jroedel@suse.de>
 ---
- arch/x86/kernel/idt.c | 22 ++++++++++++++--------
- 1 file changed, 14 insertions(+), 8 deletions(-)
+ arch/x86/include/asm/desc.h      | 27 +++++++++++++++++++++++++
+ arch/x86/include/asm/desc_defs.h |  7 +++++++
+ arch/x86/kernel/idt.c            | 34 --------------------------------
+ 3 files changed, 34 insertions(+), 34 deletions(-)
 
-diff --git a/arch/x86/kernel/idt.c b/arch/x86/kernel/idt.c
-index a8fc01ea602a..c752027abc9e 100644
---- a/arch/x86/kernel/idt.c
-+++ b/arch/x86/kernel/idt.c
-@@ -231,18 +231,24 @@ idt_setup_from_table(gate_desc *idt, const struct idt_data *t, int size, bool sy
- 	}
- }
+diff --git a/arch/x86/include/asm/desc.h b/arch/x86/include/asm/desc.h
+index 68a99d2a5f33..80bf63c08007 100644
+--- a/arch/x86/include/asm/desc.h
++++ b/arch/x86/include/asm/desc.h
+@@ -389,6 +389,33 @@ static inline void set_desc_limit(struct desc_struct *desc, unsigned long limit)
+ void update_intr_gate(unsigned int n, const void *addr);
+ void alloc_intr_gate(unsigned int n, const void *addr);
  
-+static void init_idt_data(struct idt_data *data, unsigned int n,
-+			  const void *addr)
++static inline void init_idt_data(struct idt_data *data, unsigned int n,
++				 const void *addr)
 +{
 +	BUG_ON(n > 0xFF);
 +
@@ -78,22 +84,100 @@ index a8fc01ea602a..c752027abc9e 100644
 +	data->bits.p	= 1;
 +}
 +
++static inline void idt_init_desc(gate_desc *gate, const struct idt_data *d)
++{
++	unsigned long addr = (unsigned long) d->addr;
++
++	gate->offset_low	= (u16) addr;
++	gate->segment		= (u16) d->segment;
++	gate->bits		= d->bits;
++	gate->offset_middle	= (u16) (addr >> 16);
++#ifdef CONFIG_X86_64
++	gate->offset_high	= (u32) (addr >> 32);
++	gate->reserved		= 0;
++#endif
++}
++
+ extern unsigned long system_vectors[];
+ 
+ #ifdef CONFIG_X86_64
+diff --git a/arch/x86/include/asm/desc_defs.h b/arch/x86/include/asm/desc_defs.h
+index 5621fb3f2d1a..f7e7099af595 100644
+--- a/arch/x86/include/asm/desc_defs.h
++++ b/arch/x86/include/asm/desc_defs.h
+@@ -74,6 +74,13 @@ struct idt_bits {
+ 			p	: 1;
+ } __attribute__((packed));
+ 
++struct idt_data {
++	unsigned int	vector;
++	unsigned int	segment;
++	struct idt_bits	bits;
++	const void	*addr;
++};
++
+ struct gate_struct {
+ 	u16		offset_low;
+ 	u16		segment;
+diff --git a/arch/x86/kernel/idt.c b/arch/x86/kernel/idt.c
+index c752027abc9e..4a2c7791c697 100644
+--- a/arch/x86/kernel/idt.c
++++ b/arch/x86/kernel/idt.c
+@@ -9,13 +9,6 @@
+ #include <asm/desc.h>
+ #include <asm/hw_irq.h>
+ 
+-struct idt_data {
+-	unsigned int	vector;
+-	unsigned int	segment;
+-	struct idt_bits	bits;
+-	const void	*addr;
+-};
+-
+ #define DPL0		0x0
+ #define DPL3		0x3
+ 
+@@ -204,20 +197,6 @@ const struct desc_ptr debug_idt_descr = {
+ };
+ #endif
+ 
+-static inline void idt_init_desc(gate_desc *gate, const struct idt_data *d)
+-{
+-	unsigned long addr = (unsigned long) d->addr;
+-
+-	gate->offset_low	= (u16) addr;
+-	gate->segment		= (u16) d->segment;
+-	gate->bits		= d->bits;
+-	gate->offset_middle	= (u16) (addr >> 16);
+-#ifdef CONFIG_X86_64
+-	gate->offset_high	= (u32) (addr >> 32);
+-	gate->reserved		= 0;
+-#endif
+-}
+-
+ static void
+ idt_setup_from_table(gate_desc *idt, const struct idt_data *t, int size, bool sys)
+ {
+@@ -231,19 +210,6 @@ idt_setup_from_table(gate_desc *idt, const struct idt_data *t, int size, bool sy
+ 	}
+ }
+ 
+-static void init_idt_data(struct idt_data *data, unsigned int n,
+-			  const void *addr)
+-{
+-	BUG_ON(n > 0xFF);
+-
+-	memset(data, 0, sizeof(*data));
+-	data->vector	= n;
+-	data->addr	= addr;
+-	data->segment	= __KERNEL_CS;
+-	data->bits.type	= GATE_INTERRUPT;
+-	data->bits.p	= 1;
+-}
+-
  static void set_intr_gate(unsigned int n, const void *addr)
  {
  	struct idt_data data;
- 
--	BUG_ON(n > 0xFF);
--
--	memset(&data, 0, sizeof(data));
--	data.vector	= n;
--	data.addr	= addr;
--	data.segment	= __KERNEL_CS;
--	data.bits.type	= GATE_INTERRUPT;
--	data.bits.p	= 1;
-+	init_idt_data(&data, n, addr);
- 
- 	idt_setup_from_table(idt_table, &data, 1, false);
- }
 -- 
 2.17.1
 
