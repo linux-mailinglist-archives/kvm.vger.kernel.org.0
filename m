@@ -2,50 +2,50 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8A6FC1BB678
-	for <lists+kvm@lfdr.de>; Tue, 28 Apr 2020 08:24:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 512E01BB67E
+	for <lists+kvm@lfdr.de>; Tue, 28 Apr 2020 08:24:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726511AbgD1GXz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Apr 2020 02:23:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42708 "EHLO
+        id S1726540AbgD1GYI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Apr 2020 02:24:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42706 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726355AbgD1GXz (ORCPT
+        by vger.kernel.org with ESMTP id S1726474AbgD1GXz (ORCPT
         <rfc822;kvm@vger.kernel.org>); Tue, 28 Apr 2020 02:23:55 -0400
-Received: from mail-pl1-x644.google.com (mail-pl1-x644.google.com [IPv6:2607:f8b0:4864:20::644])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E713DC03C1AA;
+Received: from mail-pg1-x544.google.com (mail-pg1-x544.google.com [IPv6:2607:f8b0:4864:20::544])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80887C03C1A9;
         Mon, 27 Apr 2020 23:23:54 -0700 (PDT)
-Received: by mail-pl1-x644.google.com with SMTP id d24so7940090pll.8;
+Received: by mail-pg1-x544.google.com with SMTP id d17so9841238pgo.0;
         Mon, 27 Apr 2020 23:23:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=dASjRXsAg6WzAae5CXACCO5RVvFv8dsS43RJHmTgzTs=;
-        b=V4vrhTp+G2YuztWgbTcOG0kzgrR8Rjq27TRZj4WM+JH7ENf17cEXehRD3QYP8/7Io9
-         TRzTzUTcGwsFd8wED53Al5Lf1e9d6fEci2seRTv/bsTzredAB3ZKNrNTPkD1jkw6TRwg
-         Pj9e5lD/VwwVjGqPTWTa+6FvuJ8NZC2vT/DQW8Sp6NPERTXP8XtybizKH9Jh5sIxGy7I
-         mj0Gak2SH8YCpk3XP2AeT6W606c8NNb5UgBZpLOj+uCk7r2eTebi8COcq2ybxhTvX5GR
-         nMvZdgTkhKo64RckR88JvNc6mkMCmOywxBrDdTARontdbMxvHjbNWblRrPkMYdOTgq0U
-         GH0A==
+        bh=c4J23pfnjE51eiU8sg/gmUkqucxcbnJvyvaM93YyDy8=;
+        b=sFxQQzq7Mg0a9LVrigkvsGpOutFd3UmHoo7YxqEc2e/CIwse9vEG3VCe7dlSVMd1L4
+         Nx6zQZnhL6FYfDXT/LCne37szpqNofdNRrF4qmXnkj5chX5NTOffEyRfGNOOXVHXZevb
+         ORWL45so9Q2uygWze4TlTfFtszIpZdZvshtJ2KfNTBif1kUgfo++tH58p4v0GANSsxzQ
+         zY2CvFKWMse6vlPklFz/Im0M6bQtEih/bf/3rLadg6+MjlecQ34l4bS2EZMiBQgxgBn1
+         CGgCupke1j5ye0TR7e6x+Toq+OyzFAPeSnlltPImbAPfPqNN2LqGlUnpIfdSMcOvzCuO
+         R2Qg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=dASjRXsAg6WzAae5CXACCO5RVvFv8dsS43RJHmTgzTs=;
-        b=ZqMtS/8E8KHXDwr9xGPiD+kpmCWK2riqIhbhOWrBsPPkCZlMDvZW+g1SllLRhM/vLz
-         XoMTDEg9opTYcPwIUzdVevDtYGVJhI6kfzsQz+vg3qNjCzTiFsyZmz9vxRHH+tZ/y/Rt
-         4KumQUOkLZq3lfP/MXjj9wRx3GxdAy4j4/STWZk8sbapr9XB6XV09IQ/sQkvGLoFFPOC
-         a3safBPn7TsyG35CiC+AezmbriiwHnOB3ccdBs6R6B2XrihFd9qqDHXXNO7M/soXfp34
-         4D2c4Kxd1A+CR41IKZJ/tVdfZ35eVSBUyNz/E5sRfKx91X93Sla1Dpx578TrP2wghq4a
-         e9Jw==
-X-Gm-Message-State: AGi0PuYFTAU36ZegTlSLiVkgjKz3WqkfGjrv/TAcl06uqLbuFpL57R8F
-        bVf4/tBnyh4Fo1xbE9G06hz3DVFp
-X-Google-Smtp-Source: APiQypJ2dyHcYY2mJa3PGa2d76ad4Tri/9ZR7Ip0tE6jflFVGWTKZMBwmKayZxw5sbVUvfCPgkM9ng==
-X-Received: by 2002:a17:90a:b293:: with SMTP id c19mr3093890pjr.22.1588055030740;
-        Mon, 27 Apr 2020 23:23:50 -0700 (PDT)
+        bh=c4J23pfnjE51eiU8sg/gmUkqucxcbnJvyvaM93YyDy8=;
+        b=VhnrXwqa+nduBNewuI71cg6Bi81E33uWdGxvgja1i8SxgFmzQu56cA5JeLO9lcW+GM
+         FjJooivYrdjJIE6J495LCL4cb/mwKoCS3c5xXNwV/iprfgEphHKAL6FCkNlq+sY7z+Gt
+         YqvRCX1UIeY5pfy1X4EZ7rBopty7EYMl4Virv5WzeH1ptnUrvRvdl3zpliQKYnXug+UT
+         BnF9/pN60riVNoJYnOl2tv3Nj65H8mbjpfd3yIAoz2hiLvaUIgtZM2imX/S+6sw6mBqh
+         Skz024W+fsFoRZMqihNrwMff/GGYU2XMPhTdoZ222qUHTvkABSaqUnXJPgm0v1f8EUgE
+         kyuA==
+X-Gm-Message-State: AGi0PuZuBhkKGC71fQL4y0bOphoYh+IB9JJFnIdbZmJqRpxaAtLQ5I4G
+        GZ/kVqA4PlAuP0B1TyySID3KrhIl
+X-Google-Smtp-Source: APiQypLQMmro+DQJ5c5SblXXuHsVr5QFrpUVoA0Jh34UQ6ckiRrL94Euwh7qSKyy+M/FsCUJccvn9g==
+X-Received: by 2002:a62:4d43:: with SMTP id a64mr30288672pfb.156.1588055033511;
+        Mon, 27 Apr 2020 23:23:53 -0700 (PDT)
 Received: from localhost.localdomain ([103.7.29.6])
-        by smtp.googlemail.com with ESMTPSA id u188sm14183071pfu.33.2020.04.27.23.23.48
+        by smtp.googlemail.com with ESMTPSA id u188sm14183071pfu.33.2020.04.27.23.23.51
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 27 Apr 2020 23:23:50 -0700 (PDT)
+        Mon, 27 Apr 2020 23:23:53 -0700 (PDT)
 From:   Wanpeng Li <kernellwp@gmail.com>
 X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
@@ -56,9 +56,9 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>,
         Haiwei Li <lihaiwei@tencent.com>
-Subject: [PATCH v4 4/7] KVM: X86: Introduce kvm_vcpu_exit_request() helper
-Date:   Tue, 28 Apr 2020 14:23:26 +0800
-Message-Id: <1588055009-12677-5-git-send-email-wanpengli@tencent.com>
+Subject: [PATCH v4 5/7] KVM: VMX: Optimize posted-interrupt delivery for timer fastpath
+Date:   Tue, 28 Apr 2020 14:23:27 +0800
+Message-Id: <1588055009-12677-6-git-send-email-wanpengli@tencent.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1588055009-12677-1-git-send-email-wanpengli@tencent.com>
 References: <1588055009-12677-1-git-send-email-wanpengli@tencent.com>
@@ -69,73 +69,65 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Wanpeng Li <wanpengli@tencent.com>
 
-Introduce kvm_vcpu_exit_request() helper, we need to check some conditions
-before enter guest again immediately, we skip invoking the exit handler and
-go through full run loop if complete fastpath but there is stuff preventing
-we enter guest again immediately.
+Optimizing posted-interrupt delivery especially for the timer fastpath
+scenario, I observe kvm_x86_ops.deliver_posted_interrupt() has more latency
+then vmx_sync_pir_to_irr() in the case of timer fastpath scenario, since
+it needs to wait vmentry, after that it can handle external interrupt, ack
+the notification vector, read posted-interrupt descriptor etc, it is slower
+than evaluate and delivery during vmentry immediately approach. Let's skip
+sending interrupt to notify target pCPU and replace by vmx_sync_pir_to_irr()
+before each reenter guest.
 
 Tested-by: Haiwei Li <lihaiwei@tencent.com>
 Cc: Haiwei Li <lihaiwei@tencent.com>
 Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
 ---
- arch/x86/kvm/vmx/vmx.c |  3 +++
- arch/x86/kvm/x86.c     | 10 ++++++++--
- arch/x86/kvm/x86.h     |  1 +
- 3 files changed, 12 insertions(+), 2 deletions(-)
+ arch/x86/kvm/vmx/vmx.c | 12 ++++++++----
+ virt/kvm/kvm_main.c    |  1 +
+ 2 files changed, 9 insertions(+), 4 deletions(-)
 
 diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index e12a42e..24cadf4 100644
+index 24cadf4..ce19b0e 100644
 --- a/arch/x86/kvm/vmx/vmx.c
 +++ b/arch/x86/kvm/vmx/vmx.c
-@@ -6777,6 +6777,9 @@ static fastpath_t vmx_vcpu_run(struct kvm_vcpu *vcpu)
+@@ -3909,7 +3909,8 @@ static int vmx_deliver_posted_interrupt(struct kvm_vcpu *vcpu, int vector)
+ 	if (pi_test_and_set_on(&vmx->pi_desc))
+ 		return 0;
+ 
+-	if (!kvm_vcpu_trigger_posted_interrupt(vcpu, false))
++	if (vcpu != kvm_get_running_vcpu() &&
++	    !kvm_vcpu_trigger_posted_interrupt(vcpu, false))
+ 		kvm_vcpu_kick(vcpu);
+ 
+ 	return 0;
+@@ -6777,9 +6778,12 @@ static fastpath_t vmx_vcpu_run(struct kvm_vcpu *vcpu)
  	vmx_complete_interrupts(vmx);
  
  	exit_fastpath = vmx_exit_handlers_fastpath(vcpu);
-+	if (exit_fastpath == EXIT_FASTPATH_REENTER_GUEST &&
-+	    kvm_vcpu_exit_request(vcpu))
-+		exit_fastpath = EXIT_FASTPATH_NOP;
+-	if (exit_fastpath == EXIT_FASTPATH_REENTER_GUEST &&
+-	    kvm_vcpu_exit_request(vcpu))
+-		exit_fastpath = EXIT_FASTPATH_NOP;
++	if (exit_fastpath == EXIT_FASTPATH_REENTER_GUEST) {
++		if (!kvm_vcpu_exit_request(vcpu))
++			vmx_sync_pir_to_irr(vcpu);
++		else
++			exit_fastpath = EXIT_FASTPATH_NOP;
++	}
  
  	return exit_fastpath;
  }
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index df38b40..afe052c 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -1581,6 +1581,13 @@ int kvm_emulate_wrmsr(struct kvm_vcpu *vcpu)
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 33e1eee..2482f3c 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -4644,6 +4644,7 @@ struct kvm_vcpu *kvm_get_running_vcpu(void)
+ 
+ 	return vcpu;
  }
- EXPORT_SYMBOL_GPL(kvm_emulate_wrmsr);
++EXPORT_SYMBOL_GPL(kvm_get_running_vcpu);
  
-+bool kvm_vcpu_exit_request(struct kvm_vcpu *vcpu)
-+{
-+	return vcpu->mode == EXITING_GUEST_MODE || kvm_request_pending(vcpu) ||
-+		need_resched() || signal_pending(current);
-+}
-+EXPORT_SYMBOL_GPL(kvm_vcpu_exit_request);
-+
- /*
-  * The fast path for frequent and performance sensitive wrmsr emulation,
-  * i.e. the sending of IPI, sending IPI early in the VM-Exit flow reduces
-@@ -8366,8 +8373,7 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
- 	if (kvm_lapic_enabled(vcpu) && vcpu->arch.apicv_active)
- 		kvm_x86_ops.sync_pir_to_irr(vcpu);
- 
--	if (vcpu->mode == EXITING_GUEST_MODE || kvm_request_pending(vcpu)
--	    || need_resched() || signal_pending(current)) {
-+	if (kvm_vcpu_exit_request(vcpu)) {
- 		vcpu->mode = OUTSIDE_GUEST_MODE;
- 		smp_wmb();
- 		local_irq_enable();
-diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
-index 2f02dc0..6eb62e9 100644
---- a/arch/x86/kvm/x86.h
-+++ b/arch/x86/kvm/x86.h
-@@ -364,5 +364,6 @@ static inline bool kvm_dr7_valid(u64 data)
- void kvm_load_guest_xsave_state(struct kvm_vcpu *vcpu);
- void kvm_load_host_xsave_state(struct kvm_vcpu *vcpu);
- u64 kvm_spec_ctrl_valid_bits(struct kvm_vcpu *vcpu);
-+bool kvm_vcpu_exit_request(struct kvm_vcpu *vcpu);
- 
- #endif
+ /**
+  * kvm_get_running_vcpus - get the per-CPU array of currently running vcpus.
 -- 
 2.7.4
 
