@@ -2,133 +2,186 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C887D1BC573
-	for <lists+kvm@lfdr.de>; Tue, 28 Apr 2020 18:41:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7DBE81BC567
+	for <lists+kvm@lfdr.de>; Tue, 28 Apr 2020 18:39:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728232AbgD1Qlt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Apr 2020 12:41:49 -0400
-Received: from esa1.hc3370-68.iphmx.com ([216.71.145.142]:41896 "EHLO
-        esa1.hc3370-68.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728022AbgD1Qlt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Apr 2020 12:41:49 -0400
-X-Greylist: delayed 427 seconds by postgrey-1.27 at vger.kernel.org; Tue, 28 Apr 2020 12:41:48 EDT
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=citrix.com; s=securemail; t=1588092108;
-  h=subject:to:cc:references:from:message-id:date:
-   mime-version:in-reply-to:content-transfer-encoding;
-  bh=0w6FX0efDJGzaehxYFThqDcH+QYQY0rUFheCeGs7Cu8=;
-  b=YhBFFxiGRIw+sJcxA0K3Xy3AoZzcgqu/Rgty6fE0TH7GVISc1Xc+Vnqc
-   uzTvZfxgfweUGMsL8U/QRVySvItNRqOFvB6ynEKOarIUc05xqdK4+BP0p
-   SUShCtjE/P3i07nS0IGA3ViLhWl1EcQshfOlFR6VlbBJu4roCN3um8YJ9
-   E=;
-Authentication-Results: esa1.hc3370-68.iphmx.com; dkim=none (message not signed) header.i=none; spf=None smtp.pra=andrew.cooper3@citrix.com; spf=Pass smtp.mailfrom=Andrew.Cooper3@citrix.com; spf=None smtp.helo=postmaster@mail.citrix.com
-Received-SPF: None (esa1.hc3370-68.iphmx.com: no sender
-  authenticity information available from domain of
-  andrew.cooper3@citrix.com) identity=pra;
-  client-ip=162.221.158.21; receiver=esa1.hc3370-68.iphmx.com;
-  envelope-from="Andrew.Cooper3@citrix.com";
-  x-sender="andrew.cooper3@citrix.com";
-  x-conformance=sidf_compatible
-Received-SPF: Pass (esa1.hc3370-68.iphmx.com: domain of
-  Andrew.Cooper3@citrix.com designates 162.221.158.21 as
-  permitted sender) identity=mailfrom;
-  client-ip=162.221.158.21; receiver=esa1.hc3370-68.iphmx.com;
-  envelope-from="Andrew.Cooper3@citrix.com";
-  x-sender="Andrew.Cooper3@citrix.com";
-  x-conformance=sidf_compatible; x-record-type="v=spf1";
-  x-record-text="v=spf1 ip4:209.167.231.154 ip4:178.63.86.133
-  ip4:195.66.111.40/30 ip4:85.115.9.32/28 ip4:199.102.83.4
-  ip4:192.28.146.160 ip4:192.28.146.107 ip4:216.52.6.88
-  ip4:216.52.6.188 ip4:162.221.158.21 ip4:162.221.156.83
-  ip4:168.245.78.127 ~all"
-Received-SPF: None (esa1.hc3370-68.iphmx.com: no sender
-  authenticity information available from domain of
-  postmaster@mail.citrix.com) identity=helo;
-  client-ip=162.221.158.21; receiver=esa1.hc3370-68.iphmx.com;
-  envelope-from="Andrew.Cooper3@citrix.com";
-  x-sender="postmaster@mail.citrix.com";
-  x-conformance=sidf_compatible
-IronPort-SDR: GfTE0zwlZX/DF1ctKDqrxqeVbE8WVcfOvsjN98osQHnlIj+bOA/2LFcYVb0aH7461lKjAVAfLx
- 7j15tUKm7Q9jukDiXGBXe4JArojeffWncpdbJdc8J++Ucn0eFvbBbxBJWeB9VAlVhEsRfeADRX
- IWdKBPAe2bZuNVhHpQqKaPx3D4feKv58+vQM9FlmpNzLI+AL1Z6D6MtcVx42gwF/6YidSiYLvI
- o3l7R+GG2CLL3cZaUut58uQQSlPrgZH5ynhcWk//W7GtWbcIlSDiJOv63nzSwdEOcFOfFhx9DW
- 9eM=
-X-SBRS: 2.7
-X-MesageID: 16638438
-X-Ironport-Server: esa1.hc3370-68.iphmx.com
-X-Remote-IP: 162.221.158.21
-X-Policy: $RELAYED
-X-IronPort-AV: E=Sophos;i="5.73,328,1583211600"; 
-   d="scan'208";a="16638438"
-Subject: Re: Should SEV-ES #VC use IST? (Re: [PATCH] Allow RDTSC and RDTSCP
- from userspace)
-To:     Joerg Roedel <jroedel@suse.de>, Andy Lutomirski <luto@kernel.org>
-CC:     Joerg Roedel <joro@8bytes.org>,
-        Dave Hansen <dave.hansen@intel.com>,
-        "Tom Lendacky" <Thomas.Lendacky@amd.com>,
-        Mike Stunes <mstunes@vmware.com>,
-        "Dan Williams" <dan.j.williams@intel.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        "Juergen Gross" <JGross@suse.com>, Jiri Slaby <jslaby@suse.cz>,
-        Kees Cook <keescook@chromium.org>,
-        kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        "Thomas Hellstrom" <thellstrom@vmware.com>,
-        Linux Virtualization <virtualization@lists.linux-foundation.org>,
-        X86 ML <x86@kernel.org>,
-        "Sean Christopherson" <sean.j.christopherson@intel.com>
-References: <20200425191032.GK21900@8bytes.org>
- <910AE5B4-4522-4133-99F7-64850181FBF9@amacapital.net>
- <20200425202316.GL21900@8bytes.org>
- <CALCETrW2Y6UFC=zvGbXEYqpsDyBh0DSEM4NQ+L=_pp4aOd6Fuw@mail.gmail.com>
- <CALCETrXGr+o1_bKbnre8cVY14c_76m8pEf3iB_i7h+zfgE5_jA@mail.gmail.com>
- <20200428075512.GP30814@suse.de>
-From:   Andrew Cooper <andrew.cooper3@citrix.com>
-Message-ID: <1b232a8e-af99-4f7b-05c5-584b82853ac5@citrix.com>
-Date:   Tue, 28 Apr 2020 17:34:36 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+        id S1728319AbgD1Qj1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Apr 2020 12:39:27 -0400
+Received: from mail.kernel.org ([198.145.29.99]:49412 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728106AbgD1Qj0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Apr 2020 12:39:26 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id F2E12206D6;
+        Tue, 28 Apr 2020 16:39:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1588091966;
+        bh=8RpWHwtl4RZqT1ZbuFdwUYbYF9iOnIhy5wLRan7Ele0=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=C3O5HAnG/zI1EGbjpMSLFe4PPxjQXabbbGgb9/ZXUha0QkwEz2h9CJvqtGWWD//7q
+         UqNTUwFQ9bNLrNTP5PiiThvSwqZxl2lJG1893SB4WE+ax/9unkmYml66+Suxe/7MgL
+         n0o8XYwfyFRJMUv5hbxlnekwyonUpKdOGUuo1o2c=
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+        by disco-boy.misterjones.org with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        (Exim 4.92)
+        (envelope-from <maz@kernel.org>)
+        id 1jTTGW-007QwJ-AY; Tue, 28 Apr 2020 17:39:24 +0100
 MIME-Version: 1.0
-In-Reply-To: <20200428075512.GP30814@suse.de>
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=UTF-8;
+ format=flowed
 Content-Transfer-Encoding: 8bit
-Content-Language: en-GB
-X-ClientProxiedBy: AMSPEX02CAS02.citrite.net (10.69.22.113) To
- AMSPEX02CL02.citrite.net (10.69.22.126)
+Date:   Tue, 28 Apr 2020 17:39:24 +0100
+From:   Marc Zyngier <maz@kernel.org>
+To:     Michael Mrozek <EvilDragon@openpandora.org>
+Cc:     Lukas Straub <lukasstraub2@web.de>, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, kernel@pyra-handheld.com
+Subject: Re: Against removing aarch32 kvm host support
+In-Reply-To: <9c67a3722611d1ec9fe1e8a1fbe65956b32147c3.camel@openpandora.org>
+References: <20200428143850.4c8cbd2a@luklap>
+ <916b6072a4a2688745a5e3f75c1c8c01@misterjones.org>
+ <9c67a3722611d1ec9fe1e8a1fbe65956b32147c3.camel@openpandora.org>
+User-Agent: Roundcube Webmail/1.4.3
+Message-ID: <f5c18fe4ca1d0cc3de5723b82ca4dafc@kernel.org>
+X-Sender: maz@kernel.org
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: EvilDragon@openpandora.org, lukasstraub2@web.de, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, kernel@pyra-handheld.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 28/04/2020 08:55, Joerg Roedel wrote:
-> On Mon, Apr 27, 2020 at 10:37:41AM -0700, Andy Lutomirski wrote:
->> I have a somewhat serious question: should we use IST for #VC at all?
->> As I understand it, Rome and Naples make it mandatory for hypervisors
->> to intercept #DB, which means that, due to the MOV SS mess, it's sort
->> of mandatory to use IST for #VC.  But Milan fixes the #DB issue, so,
->> if we're running under a sufficiently sensible hypervisor, we don't
->> need IST for #VC.
-> The reason for #VC being IST is not only #DB, but also SEV-SNP. SNP adds
-> page ownership tracking between guest and host, so that the hypervisor
-> can't remap guest pages without the guest noticing.
->
-> If there is a violation of ownership, which can happen at any memory
-> access, there will be a #VC exception to notify the guest. And as this
-> can happen anywhere, for example on a carefully crafted stack page set
-> by userspace before doing SYSCALL, the only robust choice for #VC is to
-> use IST.
+Michael,
 
-The kernel won't ever touch the guest stack before restoring %rsp in the
-syscall path, but the (minimum 2) memory accesses required to save the
-user %rsp and load the kernel stack may be subject to #VC exceptions, as
-are instruction fetches at the head of the SYSCALL path.
+On 2020-04-28 15:26, Michael Mrozek wrote:
+> Am Dienstag, den 28.04.2020, 14:30 +0100 schrieb Marc Zyngier:
+> 
+> Hi,
+> 
+> well, the PCBs are currently in production, the cases are already here 
+> (coating
+> is currently being delayed as the company has closed down due to Corona 
+> right
+> now), so the first 500 units would be ready to be shipped in around 2 - 
+> 3 months
+> at latest.
+> 
+> The non-existance problem would therefore be solved then.
 
-So yes - #VC needs IST.
+And then? Are these 500 machines going to be instantly turned into 
+production KVM
+hosts? Over 7 years, we have identified at most *four* users. Four users 
+over a
+few billion 32bit ARM devices running Linux. What are the odds that you 
+will
+actually use KVM in any significant way? None whatsoever.
 
-Sorry for the noise.  (That said, it is unfortunate that the hypervisor
-messing with the memory backing the guest #VC handler results in an
-infinite loop, rather than an ability to cleanly terminate.)
+> So far, AFAIK, the Letux team has tried their best to get as close to 
+> possible
+> to mainline kernel and support as many classic devices (OMAP3 and OMAP4 
+> devices
+> as well), so removing 32bit support from mainline would surely be a 
+> step back
+> for a lot of older devices as well.
 
-~Andrew
+Read the above. No users. Which means that KVM/arm is untested and is 
+just
+bit-rotting. It is also incomplete and nobody is interested in putting 
+the
+required effort to help it moving forward. Hell, the whole ARM port is 
+now
+on life support, and you worry about KVM?
+
+> I know we have to accept the decision, but so far, I've known Linux to 
+> support
+> as many older devices as possible as well - removing KVM Host 32bit 
+> support
+> would be a step back here.
+
+Linux is known to support as many *useful* devices and features as 
+possible.
+KVM isn't one of them.
+
+> Is there a specific reason for that?
+
+Please read the threads on the subject.
+
+> Is it too complex to maintain alongside the aarch64 KVM Host?
+
+It certainly gets in the way of making significant changes to the arm64 
+port.
+
+And as I said, feel free to revive the port anytime. The code is still 
+there,
+the documentation available, and you're lucky enough to have one of the 
+few
+machines capable of virtualization. If all of a sudden you end-up 
+finding
+the killer use case for KVM/arm, I'll applaud its return. In the 
+meantime,
+the arm64 will be able to move at a much faster pace. As it turns out,
+it has actual users.
+
+Thanks,
+
+       M.
+
+> 
+>> Hi Lukas,
+>> 
+>> Thanks for your email.
+>> 
+>> On 2020-04-28 13:38, Lukas Straub wrote:
+>> > Hello Everyone,
+>> > As a preorder of the Pyra handheld, (OMAP5 SoC with 2x cortex-a15 arm
+>> > cores)
+>> > I'm against removing KVM host support for aarch32. I'm probably going
+>> > to use
+>> > this device for more than 5 years and thus the latest lts-kernel is no
+>> > option
+>> > for me.
+>> 
+>> So let me spell it out. You are against the removal of a feature that
+>> you don't
+>> use yet, that you may of may not use on a device that doesn't exist 
+>> yet,
+>> which
+>> you may or may not still be using by the time 5.4/5.6 aren't supported
+>> anymore.
+>> You don't seem to have the strongest case, I'm afraid.
+>> 
+>> But nothing is lost! The code is still in the git tree, ou can always
+>> revert
+>> the removal patches and revive the port if you are so inclined. It 
+>> will
+>> just need
+>> to be stand-alone, and not depend on the arm64 code, which is now
+>> evolving its own
+>> separate way.
+>> 
+>> Cheers,
+>> 
+>>          M.
+> --
+> Mit freundlichen Grüßen,
+> 
+> Michael Mrozek
+> 
+> -----------------------
+> OpenPandora GmbH
+> Geschäftsführer: Michael Mrozek
+> 
+> Schäffbräustr. 11
+> 85049 Ingolstadt
+> Deutschland
+> Tel.: 0841 / 990 5548
+> http://www.openpandora.de/
+> HRB 4879, Amtsgericht Ingolstadt
+> -----------------------
+> eMail: mrozek@openpandora.org
+
+-- 
+Jazz is not dead. It just smells funny...
