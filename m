@@ -2,88 +2,152 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DA48A1BD07B
-	for <lists+kvm@lfdr.de>; Wed, 29 Apr 2020 01:11:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D6EE21BD086
+	for <lists+kvm@lfdr.de>; Wed, 29 Apr 2020 01:16:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726291AbgD1XLh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Apr 2020 19:11:37 -0400
-Received: from mga04.intel.com ([192.55.52.120]:60595 "EHLO mga04.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726042AbgD1XLh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Apr 2020 19:11:37 -0400
-IronPort-SDR: Hd3PdiTVBm+X3UQ/cJF4c/rUf2ulRJCpcLpVKNeJ/NpSvKLNWpChg7enalnzH0Rls+hkif21bj
- GgH/Shzkh3Aw==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Apr 2020 16:11:36 -0700
-IronPort-SDR: Lumyx9Z75N97somQ64mE5rxQtSYZcjdtECX5M/FMACPmubNrqJl0g6KgB/HVZEc2AaIu2lj+IH
- ri67blsxjk5Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,328,1583222400"; 
-   d="scan'208";a="294005594"
-Received: from sjchrist-coffee.jf.intel.com ([10.54.74.202])
-  by orsmga008.jf.intel.com with ESMTP; 28 Apr 2020 16:11:35 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-Subject: [kvm-unit-tests PATCH] x86: msr: Don't test bits 63:32 of SYSENTER MSRs on 32-bit builds
-Date:   Tue, 28 Apr 2020 16:11:35 -0700
-Message-Id: <20200428231135.12903-1-sean.j.christopherson@intel.com>
-X-Mailer: git-send-email 2.26.0
+        id S1726412AbgD1XQ3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Apr 2020 19:16:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60292 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726312AbgD1XQ3 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 28 Apr 2020 19:16:29 -0400
+Received: from mail-il1-x143.google.com (mail-il1-x143.google.com [IPv6:2607:f8b0:4864:20::143])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E886AC03C1AD
+        for <kvm@vger.kernel.org>; Tue, 28 Apr 2020 16:16:28 -0700 (PDT)
+Received: by mail-il1-x143.google.com with SMTP id m5so606320ilj.10
+        for <kvm@vger.kernel.org>; Tue, 28 Apr 2020 16:16:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=r4RxKLheQFWjLght4V80HIUjV5cwhunpMukZ0Rx77a0=;
+        b=a3/ZV658yISvrO9+1UU27T1GAwKxt14HXqvoXKFBaCbW3Lp5mY7UffdoYOa95wNEf3
+         U+grmPC6Pf8E1N9kq2HAsoeLDAt+iMAyNDZKvehqIc6NcWOBIhIjh5XB0ZJoGK023wA4
+         mar6i3VfAxK6wgli1oe4eJa4AK2wnngnNaHmCDFzAKTG+jNUNK1djtgDXV34yiEIxk8D
+         z/TwGO99pgXFch32y5rw9GZ87Fbonh62nDyONUFchBOMD4ps/qBzc4TmyHKcOZ3anD8j
+         VHtd+tp8KEE1sF1675bCwZfrpPrs/HV+dDRUMpGbdy2vTWxhynJ8yOA5zbcjBRlm+Ijb
+         fwGg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=r4RxKLheQFWjLght4V80HIUjV5cwhunpMukZ0Rx77a0=;
+        b=o+FIlNWNL0qMHOye5phXmBgqEqKLdiYFtWjPJpU2IRxIU5H7f3W4lrYwMomhLGyjjF
+         2OIpLH9tjJOD2QEz7OQfhoBI0/Hoc1fBv6kylh9wJN1p329+nOEXl4Pf8WOGoL8SN0JT
+         yRO8UON+ws4H5a16FXc1V8JwvFiv/sETOZoD2Z08cGxV70l5+6/oNjdF2VscPifKoc77
+         Pu5gqdZUTiUfr3+HXobU+PodJcMxYSJVk+TxCMp9wkUjYx9JKFsga0SV5XPwgDf9olGY
+         OZIGzaZyDV/FnyTD7ZBZ3UTUr0OCZI0jDZMFR1lavcYt19onR/TEbMTsVAiBk2g0HwLY
+         pHXg==
+X-Gm-Message-State: AGi0PuaileM3rNautaPoanBNl6YH+eisyQJsGvRXTnCEL9Sw/W4c8bdD
+        3zTEfGHLERODTjYzO8nhob5JQns3AEWQnG7IN4pctQ==
+X-Google-Smtp-Source: APiQypIfCxto0N8rPspMKdAExAKXIzoJjLZtwgxTLaVVXOic/XF6uX4ejcBrMul0Kw5QIrfPRlN2jEuMxt7uLL1VpWc=
+X-Received: by 2002:a92:3d85:: with SMTP id k5mr29689400ilf.26.1588115787754;
+ Tue, 28 Apr 2020 16:16:27 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20200423022550.15113-1-sean.j.christopherson@intel.com>
+ <20200423022550.15113-10-sean.j.christopherson@intel.com> <CALMp9eSuYqeVmWhb6q7T5DAW_Npbuin_N1+sbWjvcu0zTqiwsQ@mail.gmail.com>
+ <20200428225949.GP12735@linux.intel.com>
+In-Reply-To: <20200428225949.GP12735@linux.intel.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Tue, 28 Apr 2020 16:16:16 -0700
+Message-ID: <CALMp9eRFfEB1avbQv0O0V=EGrJdSNTxg8Z-BONmQ--dV66CuAg@mail.gmail.com>
+Subject: Re: [PATCH 09/13] KVM: nVMX: Prioritize SMI over nested IRQ/NMI
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Oliver Upton <oupton@google.com>,
+        Peter Shier <pshier@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Squish the "address" stuffed into SYSENTER_EIP/ESP into an unsigned long
-so as to drop bits 63:32 on 32-bit builds.  VMX diverges from bare metal
-in the sense that the associated VMCS fields are natural width fields,
-whereas the actual MSRs hold 64-bit values, even on CPUs that don't
-support 64-bit mode.  This causes the tests to fail if bits 63:32 are
-non-zero and a VM-Exit/VM-Enter occurs on and/or between WRMSR/RDMSR,
-e.g. when running the tests in L1 or deeper.
+On Tue, Apr 28, 2020 at 3:59 PM Sean Christopherson
+<sean.j.christopherson@intel.com> wrote:
+>
+> On Tue, Apr 28, 2020 at 03:04:02PM -0700, Jim Mattson wrote:
+> > On Wed, Apr 22, 2020 at 7:26 PM Sean Christopherson
+> > <sean.j.christopherson@intel.com> wrote:
+> > >
+> > > Check for an unblocked SMI in vmx_check_nested_events() so that pendi=
+ng
+> > > SMIs are correctly prioritized over IRQs and NMIs when the latter eve=
+nts
+> > > will trigger VM-Exit.  This also fixes an issue where an SMI that was
+> > > marked pending while processing a nested VM-Enter wouldn't trigger an
+> > > immediate exit, i.e. would be incorrectly delayed until L2 happened t=
+o
+> > > take a VM-Exit.
+> > >
+> > > Fixes: 64d6067057d96 ("KVM: x86: stubs for SMM support")
+> > > Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> > > ---
+> > >  arch/x86/kvm/vmx/nested.c | 6 ++++++
+> > >  1 file changed, 6 insertions(+)
+> > >
+> > > diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> > > index 1fdaca5fd93d..8c16b190816b 100644
+> > > --- a/arch/x86/kvm/vmx/nested.c
+> > > +++ b/arch/x86/kvm/vmx/nested.c
+> > > @@ -3750,6 +3750,12 @@ static int vmx_check_nested_events(struct kvm_=
+vcpu *vcpu)
+> > >                 return 0;
+> > >         }
+> > >
+> > > +       if (vcpu->arch.smi_pending && !is_smm(vcpu)) {
+> > > +               if (block_nested_events)
+> > > +                       return -EBUSY;
+> > > +               goto no_vmexit;
+> > > +       }
+> > > +
+> >
+> > From the SDM, volume 3:
+> >
+> > =E2=80=A2 System-management interrupts (SMIs), INIT signals, and higher
+> > priority events take priority over MTF VM exits.
+> >
+> > I think this block needs to be moved up.
+>
+> Hrm.  It definitely needs to be moved above the preemption timer, though =
+I
+> can't find any public documentation about the preemption timer's priority=
+.
+> Preemption timer is lower priority than MTF, ergo it's not in the same
+> class as SMI.
+>
+> Regarding SMI vs. MTF and #DB trap, to actually prioritize SMIs above MTF
+> and #DBs, we'd need to save/restore MTF and pending #DBs via SMRAM.  I
+> think it makes sense to take the easy road and keep SMI after the traps,
+> with a comment to say it's technically wrong but not worth fixing.
 
-Don't bother trying to actually test that bits 63:32 are dropped, the
-behavior depends on the (virtual) CPU capabilities, not the build, and
-the behavior is specific to VMX as both SVM and bare metal preserve the
-full 64-bit values.  And because practically no one cares about 32-bit
-KVM, let alone an obscure architectural quirk that doesn't affect real
-world kernels.
+Pending debug exceptions should just go in the pending debug
+exceptions field. End of story and end of complications. I don't
+understand why kvm is so averse to using this field the way it was
+intended.
 
-Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
----
- x86/msr.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+As for the MTF, section 34.14.1 of the SDM, volume 3, clearly states:
 
-diff --git a/x86/msr.c b/x86/msr.c
-index de2cb6d..f7539c3 100644
---- a/x86/msr.c
-+++ b/x86/msr.c
-@@ -16,6 +16,7 @@ struct msr_info {
- 
- 
- #define addr_64 0x0000123456789abcULL
-+#define addr_ul (unsigned long)addr_64
- 
- struct msr_info msr_info[] =
- {
-@@ -23,10 +24,10 @@ struct msr_info msr_info[] =
-       .val_pairs = {{ .valid = 1, .value = 0x1234, .expected = 0x1234}}
-     },
-     { .index = 0x00000175, .name = "MSR_IA32_SYSENTER_ESP",
--      .val_pairs = {{ .valid = 1, .value = addr_64, .expected = addr_64}}
-+      .val_pairs = {{ .valid = 1, .value = addr_ul, .expected = addr_ul}}
-     },
-     { .index = 0x00000176, .name = "IA32_SYSENTER_EIP",
--      .val_pairs = {{ .valid = 1, .value = addr_64, .expected = addr_64}}
-+      .val_pairs = {{ .valid = 1, .value = addr_ul, .expected = addr_ul}}
-     },
-     { .index = 0x000001a0, .name = "MSR_IA32_MISC_ENABLE",
-       // reserved: 1:2, 4:6, 8:10, 13:15, 17, 19:21, 24:33, 35:63
--- 
-2.26.0
+The pseudocode above makes reference to the saving of VMX-critical
+state. This state consists of the following:
+(1) SS.DPL (the current privilege level); (2) RFLAGS.VM; (3) the state
+of blocking by STI and by MOV SS (see
+Table 24-3 in Section 24.4.2); (4) the state of virtual-NMI blocking
+(only if the processor is in VMX non-root oper-
+ation and the =E2=80=9Cvirtual NMIs=E2=80=9D VM-execution control is 1); an=
+d (5) an
+indication of whether an MTF VM exit is pending
+(see Section 25.5.2). These data may be saved internal to the
+processor or in the VMCS region of the current
+VMCS. Processors that do not support SMI recognition while there is
+blocking by STI or by MOV SS need not save
+the state of such blocking.
 
+I haven't really looked at kvm's implementation of SMM (because Google
+doesn't support it), but it seems that the "MTF VM exit is pending"
+bit should be trivial to deal with. I assume we save the other
+VMX-critical state somewhere!
