@@ -2,168 +2,219 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 12A8E1BB882
-	for <lists+kvm@lfdr.de>; Tue, 28 Apr 2020 10:11:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C72DC1BB897
+	for <lists+kvm@lfdr.de>; Tue, 28 Apr 2020 10:14:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726853AbgD1IKa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Apr 2020 04:10:30 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:18250 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726377AbgD1IK3 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 28 Apr 2020 04:10:29 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 03S833Ep118370;
-        Tue, 28 Apr 2020 04:10:29 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 30mh9najhk-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 28 Apr 2020 04:10:28 -0400
-Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 03S83EdA120000;
-        Tue, 28 Apr 2020 04:10:28 -0400
-Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 30mh9najge-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 28 Apr 2020 04:10:28 -0400
-Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
-        by ppma04fra.de.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 03S855TK011472;
-        Tue, 28 Apr 2020 08:10:26 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma04fra.de.ibm.com with ESMTP id 30mcu58nqj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 28 Apr 2020 08:10:25 +0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 03S8ANMu35586342
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 28 Apr 2020 08:10:23 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id AEA5C52059;
-        Tue, 28 Apr 2020 08:10:23 +0000 (GMT)
-Received: from oc3016276355.ibm.com (unknown [9.145.156.174])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 636B65204F;
-        Tue, 28 Apr 2020 08:10:23 +0000 (GMT)
-Subject: Re: [kvm-unit-tests PATCH v6 02/10] s390x: Use PSW bits definitions
- in cstart
-To:     David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, frankja@linux.ibm.com,
-        thuth@redhat.com, cohuck@redhat.com
-References: <1587725152-25569-1-git-send-email-pmorel@linux.ibm.com>
- <1587725152-25569-3-git-send-email-pmorel@linux.ibm.com>
- <231839f0-41f9-844c-efc4-34893e7b720f@redhat.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-Message-ID: <6bc4a268-e4c4-d9f0-1e4a-94c48a081c10@linux.ibm.com>
-Date:   Tue, 28 Apr 2020 10:10:23 +0200
+        id S1726851AbgD1INt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Apr 2020 04:13:49 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:42364 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726759AbgD1INq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Apr 2020 04:13:46 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1588061624;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=YyRKuzpWR77tocYAqun+YTjfRtHpPA8xvoTqR86LZ0M=;
+        b=NTEZFyhlHemPrIR9QkcZhAQkpW+dkONboek+55ynMQ5kmRehZu8CiKIaC/k5TUtCgjezxV
+        jGsS4+0IHPLL4aQ6aPvtSpQFcGBKB0g9Ndibpj6Ga0ac1FdkRGmnZ6veC+LfljkGWOfTT0
+        0CdnbX2yTB3d+0xLhQ8r3BAq1TAVv4Q=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-412-zbElCxm3MAqo-lGPyHfa2Q-1; Tue, 28 Apr 2020 04:13:35 -0400
+X-MC-Unique: zbElCxm3MAqo-lGPyHfa2Q-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A758A107B7C5;
+        Tue, 28 Apr 2020 08:13:33 +0000 (UTC)
+Received: from [10.72.13.181] (ovpn-13-181.pek2.redhat.com [10.72.13.181])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 3C9F860D53;
+        Tue, 28 Apr 2020 08:13:23 +0000 (UTC)
+Subject: Re: [PATCH net-next 0/3] vsock: support network namespace
+To:     Stefano Garzarella <sgarzare@redhat.com>, davem@davemloft.net,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, Jorgen Hansen <jhansen@vmware.com>,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        linux-hyperv@vger.kernel.org, Dexuan Cui <decui@microsoft.com>,
+        netdev@vger.kernel.org
+References: <20200116172428.311437-1-sgarzare@redhat.com>
+ <20200427142518.uwssa6dtasrp3bfc@steredhat>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <224cdc10-1532-7ddc-f113-676d43d8f322@redhat.com>
+Date:   Tue, 28 Apr 2020 16:13:22 +0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <231839f0-41f9-844c-efc4-34893e7b720f@redhat.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+In-Reply-To: <20200427142518.uwssa6dtasrp3bfc@steredhat>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.676
- definitions=2020-04-28_03:2020-04-27,2020-04-28 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 bulkscore=0
- spamscore=0 malwarescore=0 adultscore=0 suspectscore=0 mlxlogscore=999
- impostorscore=0 lowpriorityscore=0 mlxscore=0 phishscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2004280065
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
+On 2020/4/27 =E4=B8=8B=E5=8D=8810:25, Stefano Garzarella wrote:
+> Hi David, Michael, Stefan,
+> I'm restarting to work on this topic since Kata guys are interested to
+> have that, especially on the guest side.
+>
+> While working on the v2 I had few doubts, and I'd like to have your
+> suggestions:
+>
+>   1. netns assigned to the device inside the guest
+>
+>     Currently I assigned this device to 'init_net'. Maybe it is better
+>     if we allow the user to decide which netns assign to the device
+>     or to disable this new feature to have the same behavior as before
+>     (host reachable from any netns).
+>     I think we can handle this in the vsock core and not in the single
+>     transports.
+>
+>     The simplest way that I found, is to add a new
+>     IOCTL_VM_SOCKETS_ASSIGN_G2H_NETNS to /dev/vsock to enable the featu=
+re
+>     and assign the device to the same netns of the process that do the
+>     ioctl(), but I'm not sure it is clean enough.
+>
+>     Maybe it is better to add new rtnetlink messages, but I'm not sure =
+if
+>     it is feasible since we don't have a netdev device.
+>
+>     What do you suggest?
 
-On 2020-04-27 11:01, David Hildenbrand wrote:
-> On 24.04.20 12:45, Pierre Morel wrote:
->> This patch defines the PSW bits EA/BA used to initialize the PSW masks
->> for exceptions.
+
+As we've discussed, it should be a netdev probably in either guest or=20
+host side. And it would be much simpler if we want do implement=20
+namespace then. No new API is needed.
+
+Thanks
+
+
+>
+>
+>   2. netns assigned in the host
+>
+>      As Michael suggested, I added a new /dev/vhost-vsock-netns to allo=
+w
+>      userspace application to use this new feature, leaving to
+>      /dev/vhost-vsock the previous behavior (guest reachable from any
+>      netns).
+>
+>      I like this approach, but I had these doubts:
+>
+>      - I need to allocate a new minor for that device (e.g.
+>        VHOST_VSOCK_NETNS_MINOR) or is there an alternative way that I c=
+an
+>        use?
+>
+>      - It is vhost-vsock specific, should we provide something handled =
+in
+>        the vsock core, maybe centralizing the CID allocation and adding=
+ a
+>        new IOCTL or rtnetlink message like for the guest side?
+>        (maybe it could be a second step, and for now we can continue wi=
+th
+>        the new device)
+>
+>
+> Thanks for the help,
+> Stefano
+>
+>
+> On Thu, Jan 16, 2020 at 06:24:25PM +0100, Stefano Garzarella wrote:
+>> RFC -> v1:
+>>   * added 'netns' module param to vsock.ko to enable the
+>>     network namespace support (disabled by default)
+>>   * added 'vsock_net_eq()' to check the "net" assigned to a socket
+>>     only when 'netns' support is enabled
 >>
->> Since some PSW mask definitions exist already in arch_def.h we add these
->> definitions there.
->> We move all PSW definitions together and protect assembler code against
->> C syntax.
+>> RFC: https://patchwork.ozlabs.org/cover/1202235/
 >>
->> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
->> ---
->>   lib/s390x/asm/arch_def.h | 16 ++++++++++++----
->>   s390x/cstart64.S         | 15 ++++++++-------
->>   2 files changed, 20 insertions(+), 11 deletions(-)
+>> Now that we have multi-transport upstream, I started to take a look to
+>> support network namespace in vsock.
 >>
->> diff --git a/lib/s390x/asm/arch_def.h b/lib/s390x/asm/arch_def.h
->> index 15a4d49..c54409a 100644
->> --- a/lib/s390x/asm/arch_def.h
->> +++ b/lib/s390x/asm/arch_def.h
->> @@ -10,15 +10,22 @@
->>   #ifndef _ASM_S390X_ARCH_DEF_H_
->>   #define _ASM_S390X_ARCH_DEF_H_
->>   
->> +#define PSW_MASK_EXT			0x0100000000000000UL
->> +#define PSW_MASK_DAT			0x0400000000000000UL
->> +#define PSW_MASK_SHORT_PSW		0x0008000000000000UL
->> +#define PSW_MASK_PSTATE			0x0001000000000000UL
->> +#define PSW_MASK_BA			0x0000000080000000UL
->> +#define PSW_MASK_EA			0x0000000100000000UL
->> +
->> +#define PSW_EXCEPTION_MASK	(PSW_MASK_EA | PSW_MASK_BA)
->> +#define PSW_RESET_MASK		(PSW_EXCEPTION_MASK | PSW_MASK_SHORT_PSW)
->> +
->> +#ifndef __ASSEMBLER__
->>   struct psw {
->>   	uint64_t	mask;
->>   	uint64_t	addr;
->>   };
->>   
->> -#define PSW_MASK_EXT			0x0100000000000000UL
->> -#define PSW_MASK_DAT			0x0400000000000000UL
->> -#define PSW_MASK_PSTATE			0x0001000000000000UL
->> -
->>   #define CR0_EXTM_SCLP			0X0000000000000200UL
->>   #define CR0_EXTM_EXTC			0X0000000000002000UL
->>   #define CR0_EXTM_EMGC			0X0000000000004000UL
->> @@ -297,4 +304,5 @@ static inline uint32_t get_prefix(void)
->>   	return current_prefix;
->>   }
->>   
->> +#endif /* __ASSEMBLER */
->>   #endif
->> diff --git a/s390x/cstart64.S b/s390x/cstart64.S
->> index ba2e67c..e394b3a 100644
->> --- a/s390x/cstart64.S
->> +++ b/s390x/cstart64.S
->> @@ -12,6 +12,7 @@
->>    */
->>   #include <asm/asm-offsets.h>
->>   #include <asm/sigp.h>
->> +#include <asm/arch_def.h>
->>   
->>   .section .init
->>   
->> @@ -225,19 +226,19 @@ svc_int:
->>   
->>   	.align	8
->>   reset_psw:
->> -	.quad	0x0008000180000000
->> +	.quad	PSW_RESET_MASK
-> 
-> I'd really prefer
-> 
-> .quad	PSW_EXCEPTION_MASK | PSW_MASK_SHORT_PSW
-> 
-> here instead and drop PSW_RESET_MASK. Makes it clearer that we are
-> talking about a special short psw here.
-> 
-> Apart from that, looks good to me.
-> 
-> 
+>> As we partially discussed in the multi-transport proposal [1], it coul=
+d
+>> be nice to support network namespace in vsock to reach the following
+>> goals:
+>> - isolate host applications from guest applications using the same por=
+ts
+>>    with CID_ANY
+>> - assign the same CID of VMs running in different network namespaces
+>> - partition VMs between VMMs or at finer granularity
+>>
+>> This new feature is disabled by default, because it changes vsock's
+>> behavior with network namespaces and could break existing applications=
+.
+>> It can be enabled with the new 'netns' module parameter of vsock.ko.
+>>
+>> This implementation provides the following behavior:
+>> - packets received from the host (received by G2H transports) are
+>>    assigned to the default netns (init_net)
+>> - packets received from the guest (received by H2G - vhost-vsock) are
+>>    assigned to the netns of the process that opens /dev/vhost-vsock
+>>    (usually the VMM, qemu in my tests, opens the /dev/vhost-vsock)
+>>      - for vmci I need some suggestions, because I don't know how to d=
+o
+>>        and test the same in the vmci driver, for now vmci uses the
+>>        init_net
+>> - loopback packets are exchanged only in the same netns
+>>
+>> I tested the series in this way:
+>> l0_host$ qemu-system-x86_64 -m 4G -M accel=3Dkvm -smp 4 \
+>>              -drive file=3D/tmp/vsockvm0.img,if=3Dvirtio --nographic \
+>>              -device vhost-vsock-pci,guest-cid=3D3
+>>
+>> l1_vm$ echo 1 > /sys/module/vsock/parameters/netns
+>>
+>> l1_vm$ ip netns add ns1
+>> l1_vm$ ip netns add ns2
+>>   # same CID on different netns
+>> l1_vm$ ip netns exec ns1 qemu-system-x86_64 -m 1G -M accel=3Dkvm -smp =
+2 \
+>>              -drive file=3D/tmp/vsockvm1.img,if=3Dvirtio --nographic \
+>>              -device vhost-vsock-pci,guest-cid=3D4
+>> l1_vm$ ip netns exec ns2 qemu-system-x86_64 -m 1G -M accel=3Dkvm -smp =
+2 \
+>>              -drive file=3D/tmp/vsockvm2.img,if=3Dvirtio --nographic \
+>>              -device vhost-vsock-pci,guest-cid=3D4
+>>
+>>   # all iperf3 listen on CID_ANY and port 5201, but in different netns
+>> l1_vm$ ./iperf3 --vsock -s # connection from l0 or guests started
+>>                             # on default netns (init_net)
+>> l1_vm$ ip netns exec ns1 ./iperf3 --vsock -s
+>> l1_vm$ ip netns exec ns1 ./iperf3 --vsock -s
+>>
+>> l0_host$ ./iperf3 --vsock -c 3
+>> l2_vm1$ ./iperf3 --vsock -c 2
+>> l2_vm2$ ./iperf3 --vsock -c 2
+>>
+>> [1] https://www.spinics.net/lists/netdev/msg575792.html
+>>
+>> Stefano Garzarella (3):
+>>    vsock: add network namespace support
+>>    vsock/virtio_transport_common: handle netns of received packets
+>>    vhost/vsock: use netns of process that opens the vhost-vsock device
+>>
+>>   drivers/vhost/vsock.c                   | 29 ++++++++++++-----
+>>   include/linux/virtio_vsock.h            |  2 ++
+>>   include/net/af_vsock.h                  |  7 +++--
+>>   net/vmw_vsock/af_vsock.c                | 41 +++++++++++++++++++----=
+--
+>>   net/vmw_vsock/hyperv_transport.c        |  5 +--
+>>   net/vmw_vsock/virtio_transport.c        |  2 ++
+>>   net/vmw_vsock/virtio_transport_common.c | 12 ++++++--
+>>   net/vmw_vsock/vmci_transport.c          |  5 +--
+>>   8 files changed, 78 insertions(+), 25 deletions(-)
+>>
+>> --=20
+>> 2.24.1
+>>
 
-Thanks, I will do as you propose,
-
-Regards,
-Pierre
-
-
--- 
-Pierre Morel
-IBM Lab Boeblingen
