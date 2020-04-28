@@ -2,54 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5FB831BC0A8
-	for <lists+kvm@lfdr.de>; Tue, 28 Apr 2020 16:07:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7F32E1BC0E8
+	for <lists+kvm@lfdr.de>; Tue, 28 Apr 2020 16:14:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727891AbgD1OHc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Apr 2020 10:07:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58894 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726939AbgD1OHc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Apr 2020 10:07:32 -0400
-Received: from mail-qt1-x842.google.com (mail-qt1-x842.google.com [IPv6:2607:f8b0:4864:20::842])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9FD4C03C1A9
-        for <kvm@vger.kernel.org>; Tue, 28 Apr 2020 07:07:31 -0700 (PDT)
-Received: by mail-qt1-x842.google.com with SMTP id v26so11742722qto.0
-        for <kvm@vger.kernel.org>; Tue, 28 Apr 2020 07:07:31 -0700 (PDT)
+        id S1727837AbgD1OOe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Apr 2020 10:14:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60002 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726949AbgD1OOe (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 28 Apr 2020 10:14:34 -0400
+Received: from mail-qk1-x741.google.com (mail-qk1-x741.google.com [IPv6:2607:f8b0:4864:20::741])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F63BC03C1A9
+        for <kvm@vger.kernel.org>; Tue, 28 Apr 2020 07:14:34 -0700 (PDT)
+Received: by mail-qk1-x741.google.com with SMTP id 23so17018697qkf.0
+        for <kvm@vger.kernel.org>; Tue, 28 Apr 2020 07:14:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=Fy9ivS8QPPwiuCK+doJtcNxxWhUNoFRKbiicEk8ESXs=;
-        b=m03V7Bqnrzc7u1hOHNegLX/D6uRA6iSn20RxNU8QvJ1QFKsSaD70QJ6n/s/UyarsFJ
-         rS4XcjYTl/K8wPVQmsqZcwGaYD4DEF96z+keAqbELkFqDS54ADd792WseZXN6fmhZjdK
-         D2hC44IoUKWdnBAHvC5M60WEYESwUu1VZofGFOKhASI+hQkhe9zsHZWNSdgUyJHHj9IU
-         jBU0JJsSzE8KiMpymNT5HJRvRE8knYzVWS+0PdOCFmaciO0iQSVK5de5Rbf3CztawIBI
-         CdsaCr46/lqDnOLgGy9KBM4Sz16Nusr1wxAiubc5Qq7sqPrR7bFG3qVDFZzxPdIE6WuI
-         tBmw==
+        bh=YmG6e8PfiNmVhhdbXMVIOaZWVWR6olJeBRQ69y4M/14=;
+        b=nh6Qpqd9QRGYZOrXjf/W936AyFxS8AyRj0FgCELzs85TWec2cVRazwamkciK/XdRYE
+         Hu6lvZ+FwDwd9ZT4wmZy2rsp/XGbAhuFID9OqLfRBTBkd9pNNbCTx9osw9r9w4sD6S4h
+         GpmVmsALHtzvIfsoXvX3cEn5PwWwFvJl1QEVQudPV3wDETh6ruXFPQzbO3uIKdVAq26j
+         xpiDaafvdhD8n8ZuR4KlhW0kdGfUTpx6PTd/5tSwwicoEdwDd0j/qKRH0rOLrXOxeS9U
+         efQu9EYCozGtTZCEAeOie7UAqO23Qryyz43rAAQXq38x+Wn3PgDE/wYQSDBD5N1C8WjK
+         6pQQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=Fy9ivS8QPPwiuCK+doJtcNxxWhUNoFRKbiicEk8ESXs=;
-        b=nAd5V4gnOefyTvchimkJgZc9pCfluWFfOCKyd00VTqp6YnaXqF0J9vg/YxFh6iqnvo
-         1QzMsMjbW3KtFEYHnn3ITDx9yDdEqqRtYmrYwfAZDOtZHTQ+VjSU2lc0bkbEdZe+8BR3
-         oxrzizHdKs7T/pILh/nC074qS/0prNdoVB9ezMooRprJhwb3eyPMdGAY+J9g36HJoqDp
-         8/6+xuCCEVPjUr+7G9jEnUYKfObQuDai46httClC8Yd+bj9H9z/c+vxQOfBDHmYWgvWV
-         WCH6Dq+wI+UGgW7DdrpP/7hfNyI9KEt/aOHo090bxzIrDgpGAFYCtB3dnkw1/JK52ZyN
-         inRQ==
-X-Gm-Message-State: AGi0PuadCyllvtrWsC3E4FfIvl/g8e2jlkIHfq/7qsNLT+c6pCQQDPu8
-        W+vm8m4DC4OJGHwZ2VhSQO9mLg==
-X-Google-Smtp-Source: APiQypL8JVVgXn1Z0K37nLLf+jtFxuaUMdsGklwooOQS8IA68vzDHPI0GpgPkHQUdRDPsQEeiTjwEQ==
-X-Received: by 2002:ac8:65cc:: with SMTP id t12mr28186660qto.310.1588082850656;
-        Tue, 28 Apr 2020 07:07:30 -0700 (PDT)
+        bh=YmG6e8PfiNmVhhdbXMVIOaZWVWR6olJeBRQ69y4M/14=;
+        b=aukeJhTNSxNM75EZ43v2Z9GBgzLR8mOLVKqerHxMklMEkbkOVT/4jOFsnR68qrsNuB
+         wmwu1jAq/b7HMh83V7x5RfHXBPtMATivZx8mkQkTYd0EZVRHLDLX7HGzB3ZP+yhkSLuo
+         kNi/Uok6IJmJATCLdidnaDdKOEN0uo0AiJZK99B28CGoZOOCaA/2t7xln6B2il8GufDv
+         wWBreXpEm4/sLscNtk3mR9jyxYnJo4f2QGeQUU68/ac8ilGEVsYCpIwq05Y1L0T2CUdD
+         xoEGzQRnepjiN5k0Kw2P4x5f6Xg7gHunJe28GU6NJVmGE8/5/ftScx93kG1zDSLGv7kv
+         Ll4Q==
+X-Gm-Message-State: AGi0PuYdxc913JaIMdXLBVvOt5pNCDDRG+3RvQsE7QkmVn7Q5cE2nrwW
+        MmBU5Kc6tbT0zUdTY3A4cnDvyA==
+X-Google-Smtp-Source: APiQypIOpiFNANzTvPctzvvDY2gG6uXAjSuNrdv5GAYwajOlR96Gh1jix1heX9RukZ5ogaHaqmOC7Q==
+X-Received: by 2002:a37:6cc7:: with SMTP id h190mr27716937qkc.115.1588083271951;
+        Tue, 28 Apr 2020 07:14:31 -0700 (PDT)
 Received: from [192.168.1.10] (c-66-30-119-151.hsd1.ma.comcast.net. [66.30.119.151])
-        by smtp.gmail.com with ESMTPSA id 29sm13492497qkr.109.2020.04.28.07.07.29
+        by smtp.gmail.com with ESMTPSA id p4sm13509507qkg.48.2020.04.28.07.14.31
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 28 Apr 2020 07:07:29 -0700 (PDT)
-Subject: Re: [PATCH 1/3] KVM: x86/mmu: Tweak PSE hugepage handling to avoid 2M
- vs 4M conundrum
+        Tue, 28 Apr 2020 07:14:31 -0700 (PDT)
+Subject: Re: [PATCH 0/3] KVM: x86/mmu: Use kernel's PG_LEVEL_* enums
 To:     Sean Christopherson <sean.j.christopherson@intel.com>,
         Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
@@ -58,14 +57,13 @@ Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
 References: <20200428005422.4235-1-sean.j.christopherson@intel.com>
- <20200428005422.4235-2-sean.j.christopherson@intel.com>
 From:   Barret Rhoden <brho@google.com>
-Message-ID: <3e60b34b-e160-2052-3066-c29867ccef64@google.com>
-Date:   Tue, 28 Apr 2020 10:07:27 -0400
+Message-ID: <a8dbc4c2-2594-2cff-8dfb-aabe6812b0f5@google.com>
+Date:   Tue, 28 Apr 2020 10:14:30 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200428005422.4235-2-sean.j.christopherson@intel.com>
+In-Reply-To: <20200428005422.4235-1-sean.j.christopherson@intel.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -75,39 +73,39 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 4/27/20 8:54 PM, Sean Christopherson wrote:
-> Change the PSE hugepage handling in walk_addr_generic() to fire on any
-> page level greater than PT_PAGE_TABLE_LEVEL, a.k.a. PG_LEVEL_4K.  PSE
-> paging only has two levels, so "== 2" and "> 1" are functionally the
-> seam, i.e. this is a nop.
-   ^ s/seam/same/
+> Drop KVM's PT_{PAGE_TABLE,DIRECTORY,PDPE}_LEVEL KVM enums in favor of the
+> kernel's PG_LEVEL_{4K,2M,1G} enums, which have far more user friendly
+> names.
 
-Barret
+thanks for doing this - it fell off my radar.
+
+all 3:
+
+Reviewed-by: Barret Rhoden <brho@google.com>
 
 > 
-> A future patch will drop KVM's PT_*_LEVEL enums in favor of the kernel's
-> PG_LEVEL_* enums, at which point "walker->level == PG_LEVEL_2M" is
-> semantically incorrect (though still functionally ok).
+> The KVM names were presumably intended to abstract away the page size.  In
+> practice, the abstraction is only useful for a single line of code, a PSE
+> paging related large page check.  For everything else, the abstract names
+> do nothing but obfuscate the code.
 > 
-> No functional change intended.
+> Boot tested a PSE kernel under 32-bit KVM and 64-bit KVM, with and without
+> EPT enabled.  Patches 2 and 3 generate no binary difference relative to
+> patch 1 when compared via "objdump -d".
 > 
-> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> ---
->   arch/x86/kvm/mmu/paging_tmpl.h | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
+> Sean Christopherson (3):
+>    KVM: x86/mmu: Tweak PSE hugepage handling to avoid 2M vs 4M conundrum
+>    KVM: x86/mmu: Move max hugepage level to a separate #define
+>    KVM: x86/mmu: Drop KVM's hugepage enums in favor of the kernel's enums
 > 
-> diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
-> index efec7d27b8c5..ca39bd315f70 100644
-> --- a/arch/x86/kvm/mmu/paging_tmpl.h
-> +++ b/arch/x86/kvm/mmu/paging_tmpl.h
-> @@ -436,7 +436,7 @@ static int FNAME(walk_addr_generic)(struct guest_walker *walker,
->   	gfn = gpte_to_gfn_lvl(pte, walker->level);
->   	gfn += (addr & PT_LVL_OFFSET_MASK(walker->level)) >> PAGE_SHIFT;
->   
-> -	if (PTTYPE == 32 && walker->level == PT_DIRECTORY_LEVEL && is_cpuid_PSE36())
-> +	if (PTTYPE == 32 && walker->level > PT_PAGE_TABLE_LEVEL && is_cpuid_PSE36())
->   		gfn += pse36_gfn_delta(pte);
->   
->   	real_gpa = mmu->translate_gpa(vcpu, gfn_to_gpa(gfn), access, &walker->fault);
+>   arch/x86/include/asm/kvm_host.h |  13 +---
+>   arch/x86/kvm/mmu/mmu.c          | 118 +++++++++++++++-----------------
+>   arch/x86/kvm/mmu/page_track.c   |   4 +-
+>   arch/x86/kvm/mmu/paging_tmpl.h  |  18 ++---
+>   arch/x86/kvm/mmu_audit.c        |   6 +-
+>   arch/x86/kvm/svm/svm.c          |   2 +-
+>   arch/x86/kvm/vmx/vmx.c          |   6 +-
+>   arch/x86/kvm/x86.c              |   4 +-
+>   8 files changed, 79 insertions(+), 92 deletions(-)
 > 
 
