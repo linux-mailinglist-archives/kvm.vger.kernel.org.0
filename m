@@ -2,26 +2,26 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5996B1BD079
-	for <lists+kvm@lfdr.de>; Wed, 29 Apr 2020 01:10:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6D14C1BD077
+	for <lists+kvm@lfdr.de>; Wed, 29 Apr 2020 01:10:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726799AbgD1XKg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Apr 2020 19:10:36 -0400
+        id S1726757AbgD1XKb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Apr 2020 19:10:31 -0400
 Received: from mga04.intel.com ([192.55.52.120]:60554 "EHLO mga04.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726474AbgD1XKa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Apr 2020 19:10:30 -0400
-IronPort-SDR: yPQrueutqA7+ZzVCkeo6dpzVxsAKJ3M8rzadjLlra1EMRE3YKCphSfNuUsZhLTeLGU36F0vOOS
- jT65xECDLTow==
+        id S1726044AbgD1XK3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Apr 2020 19:10:29 -0400
+IronPort-SDR: 8pRgyfKvzctGSh9OCOWdCjZD2edCwwS6YIp1KIqGEoCXClsRnXaJv0NzkjFePQji5tBZGMd+jW
+ 1r5IQ6DZ6RDw==
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga003.jf.intel.com ([10.7.209.27])
   by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Apr 2020 16:10:28 -0700
-IronPort-SDR: HBNXtjzUTGy9RAIvMbWj7UjVEywi0T3ruJwfW6/gbOr7TCtwpoBMi6TcjOmDKS/wBs8gbDZ23Q
- UybHlICfsxpw==
+IronPort-SDR: ymAtfv6Y9u3LU8hUXMd6TBtt2Sy65OH4v6MpsYmBzPPbjIstHFdqkAIYtGI5REHGV1uk52OS1F
+ 1GcQQINvHTrQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.73,328,1583222400"; 
-   d="scan'208";a="257774906"
+   d="scan'208";a="257774905"
 Received: from sjchrist-coffee.jf.intel.com ([10.54.74.202])
   by orsmga003.jf.intel.com with ESMTP; 28 Apr 2020 16:10:26 -0700
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
@@ -32,9 +32,9 @@ Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH 1/2] KVM: nVMX: Truncate writes to vmcs.SYSENTER_EIP/ESP for 32-bit vCPU
-Date:   Tue, 28 Apr 2020 16:10:24 -0700
-Message-Id: <20200428231025.12766-2-sean.j.christopherson@intel.com>
+Subject: [PATCH 2/2] KVM: nVMX: Drop superfluous VMREAD of vmcs02.GUEST_SYSENTER_*
+Date:   Tue, 28 Apr 2020 16:10:25 -0700
+Message-Id: <20200428231025.12766-3-sean.j.christopherson@intel.com>
 X-Mailer: git-send-email 2.26.0
 In-Reply-To: <20200428231025.12766-1-sean.j.christopherson@intel.com>
 References: <20200428231025.12766-1-sean.j.christopherson@intel.com>
@@ -45,59 +45,38 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Explicitly truncate the data written to vmcs.SYSENTER_EIP/ESP on WRMSR
-if the virtual CPU doesn't support 64-bit mode.  The SYSENTER address
-fields in the VMCS are natural width, i.e. bits 63:32 are dropped if the
-CPU doesn't support Intel 64 architectures.  This behavior is visible to
-the guest after a VM-Exit/VM-Exit roundtrip, e.g. if the guest sets bits
-63:32 in the actual MSR.
+Don't propagate GUEST_SYSENTER_* from vmcs02 to vmcs12 on nested VM-Exit
+as the vmcs12 fields are updated in vmx_set_msr(), and writes to the
+corresponding MSRs are always intercepted by KVM when running L2.
+
+Dropping the propagation was intended to be done in the same commit that
+added vmcs12 writes in vmx_set_msr()[1], but for reasons unknown was
+only shuffled around[2][3].
+
+[1] https://patchwork.kernel.org/patch/10933215
+[2] https://patchwork.kernel.org/patch/10933215/#22682289
+[3] https://lore.kernel.org/patchwork/patch/1088643
 
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 ---
- arch/x86/kvm/vmx/vmx.c | 18 ++++++++++++++++--
- 1 file changed, 16 insertions(+), 2 deletions(-)
+ arch/x86/kvm/vmx/nested.c | 4 ----
+ 1 file changed, 4 deletions(-)
 
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 3ab6ca6062ce..bc91ce499a7a 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -1936,6 +1936,16 @@ static int vmx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 	return 0;
- }
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index 2c36f3f53108..a54231bac047 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -3944,10 +3944,6 @@ static void sync_vmcs02_to_vmcs12(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12)
+ 	vmcs12->guest_cs_ar_bytes = vmcs_read32(GUEST_CS_AR_BYTES);
+ 	vmcs12->guest_ss_ar_bytes = vmcs_read32(GUEST_SS_AR_BYTES);
  
-+static u64 nested_vmx_truncate_sysenter_addr(struct kvm_vcpu *vcpu,
-+						    u64 data)
-+{
-+#ifdef CONFIG_X86_64
-+	if (!guest_cpuid_has(vcpu, X86_FEATURE_LM))
-+		return (u32)data;
-+#endif
-+	return (unsigned long)data;
-+}
-+
- /*
-  * Writes msr value into the appropriate "register".
-  * Returns 0 on success, non-0 otherwise.
-@@ -1973,13 +1983,17 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 		vmcs_write32(GUEST_SYSENTER_CS, data);
- 		break;
- 	case MSR_IA32_SYSENTER_EIP:
--		if (is_guest_mode(vcpu))
-+		if (is_guest_mode(vcpu)) {
-+			data = nested_vmx_truncate_sysenter_addr(vcpu, data);
- 			get_vmcs12(vcpu)->guest_sysenter_eip = data;
-+		}
- 		vmcs_writel(GUEST_SYSENTER_EIP, data);
- 		break;
- 	case MSR_IA32_SYSENTER_ESP:
--		if (is_guest_mode(vcpu))
-+		if (is_guest_mode(vcpu)) {
-+			data = nested_vmx_truncate_sysenter_addr(vcpu, data);
- 			get_vmcs12(vcpu)->guest_sysenter_esp = data;
-+		}
- 		vmcs_writel(GUEST_SYSENTER_ESP, data);
- 		break;
- 	case MSR_IA32_DEBUGCTLMSR:
+-	vmcs12->guest_sysenter_cs = vmcs_read32(GUEST_SYSENTER_CS);
+-	vmcs12->guest_sysenter_esp = vmcs_readl(GUEST_SYSENTER_ESP);
+-	vmcs12->guest_sysenter_eip = vmcs_readl(GUEST_SYSENTER_EIP);
+-
+ 	vmcs12->guest_interruptibility_info =
+ 		vmcs_read32(GUEST_INTERRUPTIBILITY_INFO);
+ 
 -- 
 2.26.0
 
