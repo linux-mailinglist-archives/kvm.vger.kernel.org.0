@@ -2,55 +2,31 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CBC6D1BCF8A
-	for <lists+kvm@lfdr.de>; Wed, 29 Apr 2020 00:13:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 44BE01BCFCF
+	for <lists+kvm@lfdr.de>; Wed, 29 Apr 2020 00:20:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726307AbgD1WNt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Apr 2020 18:13:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50536 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725934AbgD1WNt (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 28 Apr 2020 18:13:49 -0400
-Received: from mail-io1-xd42.google.com (mail-io1-xd42.google.com [IPv6:2607:f8b0:4864:20::d42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C2CCC03C1AC
-        for <kvm@vger.kernel.org>; Tue, 28 Apr 2020 15:13:49 -0700 (PDT)
-Received: by mail-io1-xd42.google.com with SMTP id u11so66831iow.4
-        for <kvm@vger.kernel.org>; Tue, 28 Apr 2020 15:13:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=nt1cm16K5Y36Xh/ags5IlFDGPPNWI9tqZabQEk0lerk=;
-        b=Pnjpc69a03aDBq/qhh2OAOK7R1vgOqgfEJpswJa4LrY0v9Mh4scs+TIZeMJ0a6XMen
-         LhdW4Q9sQnXEozRdiuE07iBai0lTC9DGkjZ/rl5ODoasbAjHr7+Fo18rj5zn7s+40gNz
-         iAvuQe2iImsfmV+sc1Ksjpa0s9JUBBMGSVGq0564FHWLONLCkA+bl7Hjy0c89Dvw9pSY
-         LVU2xYmjBErDnRx3hFdMNDEX1aSi7sffi2hbUCTOAHzDMdm1pKnLo86JPq3gPdZfZAqY
-         CP7PHW4+A/cda9B40s2k9nWBNneJLIKMn+i7aY7Q4zJGS8399VEZVJjtKcNxd9cc6MX1
-         kzqQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=nt1cm16K5Y36Xh/ags5IlFDGPPNWI9tqZabQEk0lerk=;
-        b=CnM25tdZzpVpxH7GpsGV85FoVNJDmiKAcb62ftA5tM16VsCtsBYqdJP2Pf+SmYJi5o
-         R7lhn4o/h6e25OdMk3Wcq0SQauoFpHhW7PO37aJVBfDjVsqwp0vZlLtFRoKCMCOwtcIR
-         E3VgIjZlFr233CpH6dKeillbT77CouJpLqAMcbwbFXpAqEAdLdSV1/A9jo4ZHK4ujCh5
-         10JV3gHlSkLzwAtn07SRz5Ygb5FXT3oJdvOOn5eu/URwxdCTyBp2e1RN3QnnA0aD2yto
-         4+c9eEwXlmlNC53MY/4ci8P6ZZ3aLYIWM1OPG8J1CTmXOS+WrCeGBHOivbSTNCYBv3P5
-         VM0w==
-X-Gm-Message-State: AGi0PuYNdqTCahCiMw+GlS/NUu4Q8qHt9nj25Xa6OlR7cq0jcg1xVkz6
-        FWUYenYKBptLMq5sxbt9XRvn9xt86p4DHIghNqMrBQ==
-X-Google-Smtp-Source: APiQypKr1XjkmQooE/lzZ/u45HwY4nKIHKWQktaVIhq1vSY/3xMLN9btT4nz5s5h8EBpad7gV6FTGcaNJpohL6Cfzxg=
-X-Received: by 2002:a05:6638:bd0:: with SMTP id g16mr27868146jad.48.1588112028205;
- Tue, 28 Apr 2020 15:13:48 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200423022550.15113-1-sean.j.christopherson@intel.com> <20200423022550.15113-14-sean.j.christopherson@intel.com>
-In-Reply-To: <20200423022550.15113-14-sean.j.christopherson@intel.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Tue, 28 Apr 2020 15:13:37 -0700
-Message-ID: <CALMp9eQ0hpZ8MBmCCEXQHKFxyeFzRbJ3+OmaTe2cMwtkp2AKGA@mail.gmail.com>
-Subject: Re: [PATCH 13/13] KVM: VMX: Use vmx_get_rflags() to query RFLAGS in vmx_interrupt_blocked()
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
+        id S1726849AbgD1WUM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Apr 2020 18:20:12 -0400
+Received: from mga18.intel.com ([134.134.136.126]:26741 "EHLO mga18.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726312AbgD1WUL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Apr 2020 18:20:11 -0400
+IronPort-SDR: 9eTYK0Ki80pHPzGB9aS+XFf+aN7x33TQ61gd+MtoBe6TQhSl6x6ulvCgjqBP9syLBYc3pPkRzI
+ riZukShdDsWQ==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Apr 2020 15:20:11 -0700
+IronPort-SDR: pTtCLvWjqtF4QvauuVuS6xbdBEQ8G5baHf6iF3cul0p0dYsj9BFlAPk+IeX1OIcF0eoQ3bi+nh
+ s+Evr0h4QT0A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.73,328,1583222400"; 
+   d="scan'208";a="367632604"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
+  by fmsmga001.fm.intel.com with ESMTP; 28 Apr 2020 15:20:10 -0700
+Date:   Tue, 28 Apr 2020 15:20:10 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Jim Mattson <jmattson@google.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
@@ -58,18 +34,61 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         LKML <linux-kernel@vger.kernel.org>,
         Oliver Upton <oupton@google.com>,
         Peter Shier <pshier@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [PATCH 12/13] KVM: x86: Replace late check_nested_events() hack
+ with more precise fix
+Message-ID: <20200428222010.GN12735@linux.intel.com>
+References: <20200423022550.15113-1-sean.j.christopherson@intel.com>
+ <20200423022550.15113-13-sean.j.christopherson@intel.com>
+ <CALMp9eTiGdYPpejAOLNz7zzqP1wPXb_zSL02F27VMHeHGzANJg@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CALMp9eTiGdYPpejAOLNz7zzqP1wPXb_zSL02F27VMHeHGzANJg@mail.gmail.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Apr 22, 2020 at 7:26 PM Sean Christopherson
-<sean.j.christopherson@intel.com> wrote:
->
-> Use vmx_get_rflags() instead of manually reading vmcs.GUEST_RFLAGS when
-> querying RFLAGS.IF so that multiple checks against interrupt blocking in
-> a single run loop only require a single VMREAD.
->
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-Reviewed-by: Jim Mattson <jmattson@google.com>
+On Tue, Apr 28, 2020 at 03:12:51PM -0700, Jim Mattson wrote:
+> On Wed, Apr 22, 2020 at 7:26 PM Sean Christopherson
+> <sean.j.christopherson@intel.com> wrote:
+> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> > index 7c49a7dc601f..d9d6028a77e0 100644
+> > --- a/arch/x86/kvm/x86.c
+> > +++ b/arch/x86/kvm/x86.c
+> > @@ -7755,24 +7755,10 @@ static int inject_pending_event(struct kvm_vcpu *vcpu)
+> >                 --vcpu->arch.nmi_pending;
+> >                 vcpu->arch.nmi_injected = true;
+> >                 kvm_x86_ops.set_nmi(vcpu);
+> > -       } else if (kvm_cpu_has_injectable_intr(vcpu)) {
+> > -               /*
+> > -                * Because interrupts can be injected asynchronously, we are
+> > -                * calling check_nested_events again here to avoid a race condition.
+> > -                * See https://lkml.org/lkml/2014/7/2/60 for discussion about this
+> > -                * proposal and current concerns.  Perhaps we should be setting
+> > -                * KVM_REQ_EVENT only on certain events and not unconditionally?
+> > -                */
+> > -               if (is_guest_mode(vcpu) && kvm_x86_ops.check_nested_events) {
+> > -                       r = kvm_x86_ops.check_nested_events(vcpu);
+> > -                       if (r != 0)
+> > -                               return r;
+> > -               }
+> > -               if (kvm_x86_ops.interrupt_allowed(vcpu)) {
+> > -                       kvm_queue_interrupt(vcpu, kvm_cpu_get_interrupt(vcpu),
+> > -                                           false);
+> > -                       kvm_x86_ops.set_irq(vcpu);
+> > -               }
+> > +       } else if (kvm_cpu_has_injectable_intr(vcpu) &&
+> > +                  kvm_x86_ops.interrupt_injection_allowed(vcpu)) {
+> > +               kvm_queue_interrupt(vcpu, kvm_cpu_get_interrupt(vcpu), false);
+> > +               kvm_x86_ops.set_irq(vcpu);
+> >         }
+> So, that's what this mess was all about! Well, this certainly looks better.
+
+Right?  I can't count the number of times I've looked at this code and
+wondered what the hell it was doing.
+
+Side topic, I just realized you're reviewing my original series.  Paolo
+commandeered it to extend it to SVM. https://patchwork.kernel.org/cover/11508679/
+
