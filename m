@@ -2,17 +2,17 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A98DC1BC32E
-	for <lists+kvm@lfdr.de>; Tue, 28 Apr 2020 17:23:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 09E741BC328
+	for <lists+kvm@lfdr.de>; Tue, 28 Apr 2020 17:22:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728793AbgD1PWu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Apr 2020 11:22:50 -0400
-Received: from 8bytes.org ([81.169.241.247]:37386 "EHLO theia.8bytes.org"
+        id S1728818AbgD1PWe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Apr 2020 11:22:34 -0400
+Received: from 8bytes.org ([81.169.241.247]:37630 "EHLO theia.8bytes.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728263AbgD1PSD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Apr 2020 11:18:03 -0400
+        id S1728257AbgD1PSE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Apr 2020 11:18:04 -0400
 Received: by theia.8bytes.org (Postfix, from userid 1000)
-        id E526AF0E; Tue, 28 Apr 2020 17:17:47 +0200 (CEST)
+        id 1DEA3F10; Tue, 28 Apr 2020 17:17:48 +0200 (CEST)
 From:   Joerg Roedel <joro@8bytes.org>
 To:     x86@kernel.org
 Cc:     hpa@zytor.com, Andy Lutomirski <luto@kernel.org>,
@@ -32,9 +32,9 @@ Cc:     hpa@zytor.com, Andy Lutomirski <luto@kernel.org>,
         Joerg Roedel <joro@8bytes.org>, Joerg Roedel <jroedel@suse.de>,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         virtualization@lists.linux-foundation.org
-Subject: [PATCH v3 31/75] x86/head/64: Install boot GDT
-Date:   Tue, 28 Apr 2020 17:16:41 +0200
-Message-Id: <20200428151725.31091-32-joro@8bytes.org>
+Subject: [PATCH v3 32/75] x86/head/64: Reload GDT after switch to virtual addresses
+Date:   Tue, 28 Apr 2020 17:16:42 +0200
+Message-Id: <20200428151725.31091-33-joro@8bytes.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200428151725.31091-1-joro@8bytes.org>
 References: <20200428151725.31091-1-joro@8bytes.org>
@@ -45,68 +45,32 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Joerg Roedel <jroedel@suse.de>
 
-Handling exceptions during boot requires a working GDT. The kernel GDT
-is not yet ready for use, so install a temporary boot GDT.
+Reload the GDT after switching to virtual addresses to make sure it will
+not go away when the lower mappings are removed. This will also reload
+the GDT for booting APs, which will need a working GDT too to handle #VC
+exceptions.
 
 Signed-off-by: Joerg Roedel <jroedel@suse.de>
 ---
- arch/x86/kernel/head_64.S | 36 ++++++++++++++++++++++++++++++++++++
- 1 file changed, 36 insertions(+)
+ arch/x86/kernel/head_64.S | 5 +++++
+ 1 file changed, 5 insertions(+)
 
 diff --git a/arch/x86/kernel/head_64.S b/arch/x86/kernel/head_64.S
-index 4bbc770af632..11a28c1fb51f 100644
+index 11a28c1fb51f..20a9df062088 100644
 --- a/arch/x86/kernel/head_64.S
 +++ b/arch/x86/kernel/head_64.S
-@@ -72,6 +72,26 @@ SYM_CODE_START_NOALIGN(startup_64)
- 	/* Set up the stack for verify_cpu(), similar to initial_stack below */
- 	leaq	(__end_init_task - SIZEOF_PTREGS)(%rip), %rsp
+@@ -163,6 +163,11 @@ SYM_CODE_START(secondary_startup_64)
+ 1:
+ 	UNWIND_HINT_EMPTY
  
 +	/* Setup boot GDT descriptor and load boot GDT */
 +	leaq	boot_gdt(%rip), %rax
 +	movq	%rax, boot_gdt_base(%rip)
 +	lgdt	boot_gdt_descr(%rip)
 +
-+	/* New GDT is live - reload data segment registers */
-+	movl	$__KERNEL_DS, %eax
-+	movl	%eax, %ds
-+	movl	%eax, %ss
-+	movl	%eax, %es
-+
-+	/* Now switch to __KERNEL_CS so IRET works reliably */
-+	pushq	$__KERNEL_CS
-+	leaq	.Lon_kernel_cs(%rip), %rax
-+	pushq	%rax
-+	lretq
-+
-+.Lon_kernel_cs:
-+	UNWIND_HINT_EMPTY
-+
- 	/* Sanitize CPU configuration */
- 	call verify_cpu
- 
-@@ -480,6 +500,22 @@ SYM_DATA_LOCAL(early_gdt_descr_base,	.quad INIT_PER_CPU_VAR(gdt_page))
- SYM_DATA(phys_base, .quad 0x0)
- EXPORT_SYMBOL(phys_base)
- 
-+/* Boot GDT used when kernel addresses are not mapped yet */
-+SYM_DATA_LOCAL(boot_gdt_descr,		.word boot_gdt_end - boot_gdt)
-+SYM_DATA_LOCAL(boot_gdt_base,		.quad 0)
-+SYM_DATA_START(boot_gdt)
-+	.quad	0
-+	.quad   0x00cf9a000000ffff	/* __KERNEL32_CS */
-+	.quad   0x00af9a000000ffff	/* __KERNEL_CS */
-+	.quad   0x00cf92000000ffff	/* __KERNEL_DS */
-+	.quad	0			/* __USER32_CS - unused */
-+	.quad	0			/* __USER_DS   - unused */
-+	.quad	0			/* __USER_CS   - unused */
-+	.quad	0			/* unused */
-+	.quad   0x0080890000000000	/* TSS descriptor */
-+	.quad   0x0000000000000000	/* TSS continued */
-+SYM_DATA_END_LABEL(boot_gdt, SYM_L_LOCAL, boot_gdt_end)
-+
- #include "../../x86/xen/xen-head.S"
- 
- 	__PAGE_ALIGNED_BSS
+ 	/* Check if nx is implemented */
+ 	movl	$0x80000001, %eax
+ 	cpuid
 -- 
 2.17.1
 
