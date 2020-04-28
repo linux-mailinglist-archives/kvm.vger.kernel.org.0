@@ -2,80 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BBBB91BC4EB
-	for <lists+kvm@lfdr.de>; Tue, 28 Apr 2020 18:17:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 46F391BC521
+	for <lists+kvm@lfdr.de>; Tue, 28 Apr 2020 18:26:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728436AbgD1QRm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Apr 2020 12:17:42 -0400
-Received: from mga12.intel.com ([192.55.52.136]:37679 "EHLO mga12.intel.com"
+        id S1728350AbgD1Q0O (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Apr 2020 12:26:14 -0400
+Received: from muru.com ([72.249.23.125]:51636 "EHLO muru.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728156AbgD1QRl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Apr 2020 12:17:41 -0400
-IronPort-SDR: zf7GrIhMBjxFAYhNqoINlsjBiaU5VnMSFSAWszRXvRISkAKbfsUDW+WH0OAkXb1IuoK0LQl2mz
- 0daagmj8pVwQ==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Apr 2020 09:17:41 -0700
-IronPort-SDR: habY9dDlpjQSbFwhsKrvFROBzve+61bPVytg/y6AG7KN3g3EJj0oWnK86Qswq51t94UxTKiLT8
- zElpX3RgXOQQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,328,1583222400"; 
-   d="scan'208";a="367543361"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
-  by fmsmga001.fm.intel.com with ESMTP; 28 Apr 2020 09:17:40 -0700
-Date:   Tue, 28 Apr 2020 09:17:40 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Jim Mattson <jmattson@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] KVM: nVMX: Tweak handling of failure code for nested
- VM-Enter failure
-Message-ID: <20200428161740.GE12735@linux.intel.com>
-References: <20200424171925.1178-1-sean.j.christopherson@intel.com>
- <CALMp9eRG=L_dQfS_qpYhJ_86B-yyfYYg+pwcixQOfWT4hwCa1Q@mail.gmail.com>
+        id S1727920AbgD1Q0O (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Apr 2020 12:26:14 -0400
+Received: from atomide.com (localhost [127.0.0.1])
+        by muru.com (Postfix) with ESMTPS id 8684180F3;
+        Tue, 28 Apr 2020 16:27:02 +0000 (UTC)
+Date:   Tue, 28 Apr 2020 09:26:11 -0700
+From:   Tony Lindgren <tony@atomide.com>
+To:     Michael Mrozek <EvilDragon@openpandora.org>
+Cc:     Marc Zyngier <maz@kernel.org>, Lukas Straub <lukasstraub2@web.de>,
+        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        kernel@pyra-handheld.com
+Subject: Re: Against removing aarch32 kvm host support
+Message-ID: <20200428162611.GW43721@atomide.com>
+References: <20200428143850.4c8cbd2a@luklap>
+ <916b6072a4a2688745a5e3f75c1c8c01@misterjones.org>
+ <9c67a3722611d1ec9fe1e8a1fbe65956b32147c3.camel@openpandora.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CALMp9eRG=L_dQfS_qpYhJ_86B-yyfYYg+pwcixQOfWT4hwCa1Q@mail.gmail.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <9c67a3722611d1ec9fe1e8a1fbe65956b32147c3.camel@openpandora.org>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Apr 24, 2020 at 10:47:04AM -0700, Jim Mattson wrote:
-> On Fri, Apr 24, 2020 at 10:19 AM Sean Christopherson
-> <sean.j.christopherson@intel.com> wrote:
-> >         if (from_vmentry) {
-> >                 exit_reason = EXIT_REASON_MSR_LOAD_FAIL;
-> > -               exit_qual = nested_vmx_load_msr(vcpu,
-> > -                                               vmcs12->vm_entry_msr_load_addr,
-> > -                                               vmcs12->vm_entry_msr_load_count);
-> > -               if (exit_qual)
-> > +               failed_msr = nested_vmx_load_msr(vcpu,
-> > +                                                vmcs12->vm_entry_msr_load_addr,
-> > +                                                vmcs12->vm_entry_msr_load_count);
-> > +               if (failed_msr) {
-> > +                       entry_failure_code = failed_msr;
+* Michael Mrozek <EvilDragon@openpandora.org> [200428 14:27]:
+> Am Dienstag, den 28.04.2020, 14:30 +0100 schrieb Marc Zyngier:
+> I know we have to accept the decision, but so far, I've known Linux to support
+> as many older devices as possible as well - removing KVM Host 32bit support
+> would be a step back here.
 > 
-> This assignment is a bit dodgy from a type perspective, and suggests
-> that perhaps a better type for the local variable is an
-> undiscriminated union of the enumerated type and a sufficiently large
-> unsigned integer type. But I won't be a stickler if you add a comment.
-> :-)
+> Is there a specific reason for that?
+> Is it too complex to maintain alongside the aarch64 KVM Host?
 
-This is a bit ugly.  A union doesn't work well because writing the enum
-field isn't guaranteed to write the full width of the union, i.e. could
-lead to uninitialized variable usage without additional initialization
-of the union.  The reverse is true as well, e.g. if the compiler sizes the
-enum to be larger than an unisigned int.
+I don't know the details, but ideally things would be set up
+in a way where folks interested in patching 32-bit arm kvm support
+can do so without causing issues for 64-bit kvm development.
 
-Rather than use a common local variable, I think it's best to set vmcs12
-directly.  That also provides an opportunity to set exit_reason on demand
-instead of speculatively setting it, which has always bugged me.
+That being said, I don't know who might be interested in doing
+all the work for that. It's unrealistic to expect Marc to do this
+work if he's not using it.
 
-v2 incoming.
+Features that are used get more resources, and features that are
+less used end up just bitrotting into a broken state in about
+six weeks in the Linux kernel :)
+
+Regards,
+
+Tony
