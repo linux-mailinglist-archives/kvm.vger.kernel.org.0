@@ -2,115 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 028491BE2D0
-	for <lists+kvm@lfdr.de>; Wed, 29 Apr 2020 17:34:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ABB9B1BD642
+	for <lists+kvm@lfdr.de>; Wed, 29 Apr 2020 09:41:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726854AbgD2PeD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 Apr 2020 11:34:03 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:25518 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726519AbgD2PeC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 29 Apr 2020 11:34:02 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1588174440;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=KKID24VeS04+SIozIuc8RuLZZFKJ5rduUKOoVcekO0A=;
-        b=gWcyjvVjyuR4Xtsk+ejTzP+sRLkpt/IiKcNoOY7QacHpEUURVkvB/z7jE6zdN/ScV3JN4Q
-        qRUqlanUmeQg1qoSbY65RJuCvAESzyTEIw0ErgdLKQxA8lAUqQ1JpXvsRBHGIRhzyugb9Q
-        sddQ8H0JQGG756h7rwKheISrb8ZOY2c=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-513-yd7fgLG-P4a5pSftzZazaQ-1; Wed, 29 Apr 2020 11:33:57 -0400
-X-MC-Unique: yd7fgLG-P4a5pSftzZazaQ-1
-Received: by mail-wm1-f69.google.com with SMTP id h6so1372747wmi.7
-        for <kvm@vger.kernel.org>; Wed, 29 Apr 2020 08:33:57 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=KKID24VeS04+SIozIuc8RuLZZFKJ5rduUKOoVcekO0A=;
-        b=aWg86BHcnuO670txfQtdMJayJqtD+pKF9qC49Il+sQKsY7fHul+dQOfpuLBO5Q4iIB
-         H+L0tz38Upuhtcu6w1rj+qUEWdXhiWfPd/GuqrKwxHSs75ja8IJFHE2ZYbjNVK7Tg1EJ
-         oD9D20LIswJEzjG5z5mjQBw9WYoJhFH/eu2ExTq1uI4DzuBNEF/wQyZZqirzLM+fU1Fm
-         D6uSxLHuI1fghLjmjuFnShBzcHWE+7wQ19l5gJs2vlZg8Bo01NT4BFsVHrGeREk7oqBU
-         tJi7Dqp+kOwWRn4CKWESFCYXllVolSpJT5POTSs6yJNtycDZI/oU/EqKUf3mytmXeEPV
-         NT1g==
-X-Gm-Message-State: AGi0PuZSW1LA3Us8KqKT9RtmNFqMVWn8kVM3nH6QpzG2O1GXw+ELv0k2
-        D4D/e7biw0PibZeDyv4mNWKSWULAgFumEapGbrR4iEUgbws+Rfank0Xe8JXYP/i3zS03jlX4/fj
-        9tXOmnrlrDqSK
-X-Received: by 2002:adf:fecd:: with SMTP id q13mr42286155wrs.12.1588174435308;
-        Wed, 29 Apr 2020 08:33:55 -0700 (PDT)
-X-Google-Smtp-Source: APiQypJv7rM5XZdPpYa0XbuMbltzbpsnlCYEladdinC4riKF/z7q+xHJZ0Lq2AB1h1HtNI76PDhJ5w==
-X-Received: by 2002:adf:fecd:: with SMTP id q13mr42286134wrs.12.1588174435068;
-        Wed, 29 Apr 2020 08:33:55 -0700 (PDT)
-Received: from redhat.com (bzq-109-66-7-121.red.bezeqint.net. [109.66.7.121])
-        by smtp.gmail.com with ESMTPSA id u7sm8832675wmg.41.2020.04.29.08.33.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 Apr 2020 08:33:54 -0700 (PDT)
-Date:   Wed, 29 Apr 2020 11:33:51 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Arnd Bergmann <arnd@arndb.de>
-Cc:     Jason Wang <jasowang@redhat.com>, Tiwei Bie <tiwei.bie@intel.com>,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] vhost: fix default for vhost_iotlb
-Message-ID: <20200429113232-mutt-send-email-mst@kernel.org>
-References: <20200429142317.1847441-1-arnd@arndb.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200429142317.1847441-1-arnd@arndb.de>
+        id S1726611AbgD2HlY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 Apr 2020 03:41:24 -0400
+Received: from mga02.intel.com ([134.134.136.20]:43114 "EHLO mga02.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726355AbgD2HlY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 29 Apr 2020 03:41:24 -0400
+IronPort-SDR: 3PqwIIFQKMmXCLuypnL7o3Tfliz+Knx1gIw6ZRqe0LNsU2t3MGY13m02hqqejTzN1/2Zk1NM3I
+ tQEdmded6nOw==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Apr 2020 00:41:23 -0700
+IronPort-SDR: phi0KJ//BVVxyKik5SX4LXIfbNkAfgUfknW+m75A2qkdVTQLjC1+fOjB60anFyH3w/m175ypCW
+ NKGwCtOaEyMg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.73,330,1583222400"; 
+   d="scan'208";a="302931421"
+Received: from lxy-dell.sh.intel.com ([10.239.159.21])
+  by FMSMGA003.fm.intel.com with ESMTP; 29 Apr 2020 00:41:21 -0700
+From:   Xiaoyao Li <xiaoyao.li@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH] kvm: x86: Cleanup vcpu->arch.guest_xstate_size
+Date:   Wed, 29 Apr 2020 23:43:12 +0800
+Message-Id: <20200429154312.1411-1-xiaoyao.li@intel.com>
+X-Mailer: git-send-email 2.18.2
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Apr 29, 2020 at 04:23:04PM +0200, Arnd Bergmann wrote:
-> During randconfig build testing, I ran into a configuration that has
-> CONFIG_VHOST=m, CONFIG_VHOST_IOTLB=m and CONFIG_VHOST_RING=y, which
-> makes the iotlb implementation left out from vhost_ring, and in turn
-> leads to a link failure of the vdpa_sim module:
-> 
-> ERROR: modpost: "vringh_set_iotlb" [drivers/vdpa/vdpa_sim/vdpa_sim.ko] undefined!
-> ERROR: modpost: "vringh_init_iotlb" [drivers/vdpa/vdpa_sim/vdpa_sim.ko] undefined!
-> ERROR: modpost: "vringh_iov_push_iotlb" [drivers/vdpa/vdpa_sim/vdpa_sim.ko] undefined!
-> ERROR: modpost: "vringh_iov_pull_iotlb" [drivers/vdpa/vdpa_sim/vdpa_sim.ko] undefined!
-> ERROR: modpost: "vringh_complete_iotlb" [drivers/vdpa/vdpa_sim/vdpa_sim.ko] undefined!
-> ERROR: modpost: "vringh_getdesc_iotlb" [drivers/vdpa/vdpa_sim/vdpa_sim.ko] undefined!
-> 
-> Work around it by setting the default for VHOST_IOTLB to avoid this
-> configuration.
-> 
-> Fixes: e6faeaa12841 ("vhost: drop vring dependency on iotlb")
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-> ---
-> I fixed this a while ago locally but never got around to sending the
-> fix. If the problem has been addressed differently in the meantime,
-> please ignore this one.
+vcpu->arch.guest_xstate_size lost its only user since commit df1daba7d1cb
+("KVM: x86: support XSAVES usage in the host"), so clean it up.
 
+Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+---
+ arch/x86/include/asm/kvm_host.h | 1 -
+ arch/x86/kvm/cpuid.c            | 8 ++------
+ arch/x86/kvm/x86.c              | 2 --
+ 3 files changed, 2 insertions(+), 9 deletions(-)
 
-So I ended up not sending e6faeaa12841 upstream because of this problem.
-But hey, that's a nice idea!
-I'll queue something like this for the next release.
-
-> ---
->  drivers/vhost/Kconfig | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/drivers/vhost/Kconfig b/drivers/vhost/Kconfig
-> index 2c75d164b827..ee5f85761024 100644
-> --- a/drivers/vhost/Kconfig
-> +++ b/drivers/vhost/Kconfig
-> @@ -1,6 +1,7 @@
->  # SPDX-License-Identifier: GPL-2.0-only
->  config VHOST_IOTLB
->  	tristate
-> +	default y if VHOST=m && VHOST_RING=y
->  	help
->  	  Generic IOTLB implementation for vhost and vringh.
->  	  This option is selected by any driver which needs to support
-> -- 
-> 2.26.0
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 7cd68d1d0627..34a05ca3c904 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -654,7 +654,6 @@ struct kvm_vcpu_arch {
+ 
+ 	u64 xcr0;
+ 	u64 guest_supported_xcr0;
+-	u32 guest_xstate_size;
+ 
+ 	struct kvm_pio_request pio;
+ 	void *pio_data;
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index 6828be99b908..f3eb4f171d3d 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -84,15 +84,11 @@ int kvm_update_cpuid(struct kvm_vcpu *vcpu)
+ 				   kvm_read_cr4_bits(vcpu, X86_CR4_PKE));
+ 
+ 	best = kvm_find_cpuid_entry(vcpu, 0xD, 0);
+-	if (!best) {
++	if (!best)
+ 		vcpu->arch.guest_supported_xcr0 = 0;
+-		vcpu->arch.guest_xstate_size = XSAVE_HDR_SIZE + XSAVE_HDR_OFFSET;
+-	} else {
++	else
+ 		vcpu->arch.guest_supported_xcr0 =
+ 			(best->eax | ((u64)best->edx << 32)) & supported_xcr0;
+-		vcpu->arch.guest_xstate_size = best->ebx =
+-			xstate_required_size(vcpu->arch.xcr0, false);
+-	}
+ 
+ 	best = kvm_find_cpuid_entry(vcpu, 0xD, 1);
+ 	if (best && (cpuid_entry_has(best, X86_FEATURE_XSAVES) ||
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 856b6fc2c2ba..7cd51a3acc43 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -9358,8 +9358,6 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+ 	}
+ 	fx_init(vcpu);
+ 
+-	vcpu->arch.guest_xstate_size = XSAVE_HDR_SIZE + XSAVE_HDR_OFFSET;
+-
+ 	vcpu->arch.maxphyaddr = cpuid_query_maxphyaddr(vcpu);
+ 
+ 	vcpu->arch.pat = MSR_IA32_CR_PAT_DEFAULT;
+-- 
+2.18.2
 
