@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 714831BD864
-	for <lists+kvm@lfdr.de>; Wed, 29 Apr 2020 11:37:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6BE691BD866
+	for <lists+kvm@lfdr.de>; Wed, 29 Apr 2020 11:37:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726809AbgD2JhB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        id S1726816AbgD2JhC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 Apr 2020 05:37:02 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:40893 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726790AbgD2JhB (ORCPT <rfc822;kvm@vger.kernel.org>);
         Wed, 29 Apr 2020 05:37:01 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:55155 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726744AbgD2JhA (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 29 Apr 2020 05:37:00 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1588153018;
+        s=mimecast20190719; t=1588153020;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=zk4COgdMLxZOUPDMABW5oK8rzzY1FgBfPJgdCdDp2KQ=;
-        b=UylngXXD3pRgYza9deOQtViYkuZ2hpYVUw5sMk7xuRhzjKIMPKmkSpq68sRkQwbZ+mh27I
-        jmigFCsok+a8I7/rbLW4Xp+oSajsgDdwc5t79iOn2JX7C3IU5+cGDbfNS1sFq2cIK9KYLn
-        HM1AZ7qOO8rJjTWAsDkcFL4kCW3KQ70=
+        bh=62PaSZcXI2KQgVFHOqv6n3wyyzQ9POA7+NN5mWgacs8=;
+        b=UZ1SECicnPHh9qU6HJM5+UKxh+j0guzxFmW3ojW2ni1py2clyFUeYlJFgBtOsA3Pe60YST
+        SdpbJ2nlT0kFN3QShYqQtS0T2UTD4vdl3uI4tbCl3cvYxRllYkbOvZIfaHpgG6tI9wJIOq
+        O2cIji9t0d6oq5v3DyLvtQWeW64aXZM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-143-lHZmN1oBMcCi2YVDRiM7jw-1; Wed, 29 Apr 2020 05:36:55 -0400
-X-MC-Unique: lHZmN1oBMcCi2YVDRiM7jw-1
+ us-mta-324-cmJqbOcjPOCvCOOEaFvaCA-1; Wed, 29 Apr 2020 05:36:58 -0400
+X-MC-Unique: cmJqbOcjPOCvCOOEaFvaCA-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5C74A1800D4A;
-        Wed, 29 Apr 2020 09:36:53 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B6477800C78;
+        Wed, 29 Apr 2020 09:36:56 +0000 (UTC)
 Received: from vitty.brq.redhat.com (unknown [10.40.193.242])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id BA2F65D9C9;
-        Wed, 29 Apr 2020 09:36:50 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id ABDE45D9C9;
+        Wed, 29 Apr 2020 09:36:53 +0000 (UTC)
 From:   Vitaly Kuznetsov <vkuznets@redhat.com>
 To:     x86@kernel.org, kvm@vger.kernel.org
 Cc:     linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
@@ -43,9 +43,9 @@ Cc:     linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <sean.j.christopherson@intel.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>
-Subject: [PATCH RFC 4/6] KVM: x86: acknowledgment mechanism for async pf page ready notifications
-Date:   Wed, 29 Apr 2020 11:36:32 +0200
-Message-Id: <20200429093634.1514902-5-vkuznets@redhat.com>
+Subject: [PATCH RFC 5/6] KVM: x86: announce KVM_FEATURE_ASYNC_PF_INT
+Date:   Wed, 29 Apr 2020 11:36:33 +0200
+Message-Id: <20200429093634.1514902-6-vkuznets@redhat.com>
 In-Reply-To: <20200429093634.1514902-1-vkuznets@redhat.com>
 References: <20200429093634.1514902-1-vkuznets@redhat.com>
 MIME-Version: 1.0
@@ -56,107 +56,98 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-If two page ready notifications happen back to back the second one is not
-delivered and the only mechanism we currently have is
-kvm_check_async_pf_completion() check in vcpu_run() loop. The check will
-only be performed with the next vmexit when it happens and in some cases
-it may take a while. With interrupt based page ready notification deliver=
-y
-the situation is even worse: unlike exceptions, interrupts are not handle=
-d
-immediately so we must check if the slot is empty. This is slow and
-unnecessary. Introduce dedicated MSR_KVM_ASYNC_PF_ACK MSR to communicate
-the fact that the slot is free and host should check its notification
-queue. Mandate using it for interrupt based type 2 APF event delivery.
+Introduce new capability to indicate that KVM supports interrupt based
+delivery of type 2 APF events (page ready notifications). This includes
+support for both MSR_KVM_ASYNC_PF2 and MSR_KVM_ASYNC_PF_ACK.
 
 Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 ---
- Documentation/virt/kvm/msr.rst       | 16 +++++++++++++++-
- arch/x86/include/uapi/asm/kvm_para.h |  1 +
- arch/x86/kvm/x86.c                   |  9 ++++++++-
- 3 files changed, 24 insertions(+), 2 deletions(-)
+ Documentation/virt/kvm/cpuid.rst     | 6 ++++++
+ arch/x86/include/uapi/asm/kvm_para.h | 1 +
+ arch/x86/kvm/cpuid.c                 | 3 ++-
+ arch/x86/kvm/x86.c                   | 1 +
+ include/uapi/linux/kvm.h             | 1 +
+ 5 files changed, 11 insertions(+), 1 deletion(-)
 
-diff --git a/Documentation/virt/kvm/msr.rst b/Documentation/virt/kvm/msr.=
-rst
-index 7433e55f7184..18db3448db06 100644
---- a/Documentation/virt/kvm/msr.rst
-+++ b/Documentation/virt/kvm/msr.rst
-@@ -219,6 +219,11 @@ data:
- 	If during pagefault APF reason is 0 it means that this is regular
- 	page fault.
+diff --git a/Documentation/virt/kvm/cpuid.rst b/Documentation/virt/kvm/cp=
+uid.rst
+index 01b081f6e7ea..5383d68e3217 100644
+--- a/Documentation/virt/kvm/cpuid.rst
++++ b/Documentation/virt/kvm/cpuid.rst
+@@ -86,6 +86,12 @@ KVM_FEATURE_PV_SCHED_YIELD        13          guest ch=
+ecks this feature bit
+                                               before using paravirtualiz=
+ed
+                                               sched yield.
 =20
-+	For interrupt based delivery, guest has to write '1' to
-+	MSR_KVM_ASYNC_PF_ACK every time it clears reason in the shared
-+	'struct kvm_vcpu_pv_apf_data', this forces KVM to re-scan its
-+	queue and deliver next pending notification.
++KVM_FEATURE_PV_SCHED_YIELD        14          guest checks this feature =
+bit
++                                              before using the second as=
+ync
++                                              pf control msr 0x4b564d06 =
+and
++                                              async pf acknowledgment ms=
+r
++                                              0x4b564d07.
 +
- 	During delivery of type 1 APF cr2 contains a token that will
- 	be used to notify a guest when missing page becomes
- 	available. When page becomes available type 2 APF is sent with
-@@ -340,4 +345,13 @@ data:
-=20
- 	To switch to interrupt based delivery of type 2 APF events guests
- 	are supposed to enable asynchronous page faults and set bit 3 in
--	MSR_KVM_ASYNC_PF_EN first.
-+
-+MSR_KVM_ASYNC_PF_ACK:
-+	0x4b564d07
-+
-+data:
-+	Asynchronous page fault acknowledgment. When the guest is done
-+	processing type 2 APF event and 'reason' field in 'struct
-+	kvm_vcpu_pv_apf_data' is cleared it is supposed to write '1' to
-+	Bit 0 of the MSR, this caused the host to re-scan its queue and
-+	check if there are more notifications pending.
+ KVM_FEATURE_CLOCSOURCE_STABLE_BIT 24          host will warn if no guest=
+-side
+                                               per-cpu warps are expeced =
+in
+                                               kvmclock
 diff --git a/arch/x86/include/uapi/asm/kvm_para.h b/arch/x86/include/uapi=
 /asm/kvm_para.h
-index 1bbb0b7e062f..5c7449980619 100644
+index 5c7449980619..b4560f60fb05 100644
 --- a/arch/x86/include/uapi/asm/kvm_para.h
 +++ b/arch/x86/include/uapi/asm/kvm_para.h
-@@ -51,6 +51,7 @@
- #define MSR_KVM_PV_EOI_EN      0x4b564d04
- #define MSR_KVM_POLL_CONTROL	0x4b564d05
- #define MSR_KVM_ASYNC_PF2	0x4b564d06
-+#define MSR_KVM_ASYNC_PF_ACK	0x4b564d07
+@@ -31,6 +31,7 @@
+ #define KVM_FEATURE_PV_SEND_IPI	11
+ #define KVM_FEATURE_POLL_CONTROL	12
+ #define KVM_FEATURE_PV_SCHED_YIELD	13
++#define KVM_FEATURE_ASYNC_PF_INT	14
 =20
- struct kvm_steal_time {
- 	__u64 steal;
+ #define KVM_HINTS_REALTIME      0
+=20
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index 901cd1fdecd9..790fe4988001 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -712,7 +712,8 @@ static inline int __do_cpuid_func(struct kvm_cpuid_ar=
+ray *array, u32 function)
+ 			     (1 << KVM_FEATURE_ASYNC_PF_VMEXIT) |
+ 			     (1 << KVM_FEATURE_PV_SEND_IPI) |
+ 			     (1 << KVM_FEATURE_POLL_CONTROL) |
+-			     (1 << KVM_FEATURE_PV_SCHED_YIELD);
++			     (1 << KVM_FEATURE_PV_SCHED_YIELD) |
++			     (1 << KVM_FEATURE_ASYNC_PF_INT);
+=20
+ 		if (sched_info_on())
+ 			entry->eax |=3D (1 << KVM_FEATURE_STEAL_TIME);
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 861dce1e7cf5..e3b91ac33bfd 100644
+index e3b91ac33bfd..b1ee01fdf671 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -1243,7 +1243,7 @@ static const u32 emulated_msrs_all[] =3D {
- 	HV_X64_MSR_TSC_EMULATION_STATUS,
+@@ -3413,6 +3413,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, l=
+ong ext)
+ 	case KVM_CAP_X86_ROBUST_SINGLESTEP:
+ 	case KVM_CAP_XSAVE:
+ 	case KVM_CAP_ASYNC_PF:
++	case KVM_CAP_ASYNC_PF_INT:
+ 	case KVM_CAP_GET_TSC_KHZ:
+ 	case KVM_CAP_KVMCLOCK_CTRL:
+ 	case KVM_CAP_READONLY_MEM:
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index 428c7dde6b4b..15012f78a691 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -1017,6 +1017,7 @@ struct kvm_ppc_resize_hpt {
+ #define KVM_CAP_S390_VCPU_RESETS 179
+ #define KVM_CAP_S390_PROTECTED 180
+ #define KVM_CAP_PPC_SECURE_GUEST 181
++#define KVM_CAP_ASYNC_PF_INT 182
 =20
- 	MSR_KVM_ASYNC_PF_EN, MSR_KVM_STEAL_TIME,
--	MSR_KVM_PV_EOI_EN, MSR_KVM_ASYNC_PF2,
-+	MSR_KVM_PV_EOI_EN, MSR_KVM_ASYNC_PF2, MSR_KVM_ASYNC_PF_ACK,
+ #ifdef KVM_CAP_IRQ_ROUTING
 =20
- 	MSR_IA32_TSC_ADJUST,
- 	MSR_IA32_TSCDEADLINE,
-@@ -2915,6 +2915,10 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, stru=
-ct msr_data *msr_info)
- 		if (kvm_pv_enable_async_pf2(vcpu, data))
- 			return 1;
- 		break;
-+	case MSR_KVM_ASYNC_PF_ACK:
-+		if (data & 0x1)
-+			kvm_check_async_pf_completion(vcpu);
-+		break;
- 	case MSR_KVM_STEAL_TIME:
-=20
- 		if (unlikely(!sched_info_on()))
-@@ -3194,6 +3198,9 @@ int kvm_get_msr_common(struct kvm_vcpu *vcpu, struc=
-t msr_data *msr_info)
- 	case MSR_KVM_ASYNC_PF2:
- 		msr_info->data =3D vcpu->arch.apf.msr2_val;
- 		break;
-+	case MSR_KVM_ASYNC_PF_ACK:
-+		msr_info->data =3D 0;
-+		break;
- 	case MSR_KVM_STEAL_TIME:
- 		msr_info->data =3D vcpu->arch.st.msr_val;
- 		break;
 --=20
 2.25.3
 
