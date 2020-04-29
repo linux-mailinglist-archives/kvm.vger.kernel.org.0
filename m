@@ -2,246 +2,186 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A68EB1BDAF8
-	for <lists+kvm@lfdr.de>; Wed, 29 Apr 2020 13:47:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7EFC11BDB53
+	for <lists+kvm@lfdr.de>; Wed, 29 Apr 2020 14:04:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726345AbgD2LrW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 Apr 2020 07:47:22 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:60463 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726426AbgD2LrW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 29 Apr 2020 07:47:22 -0400
+        id S1726903AbgD2MD5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 Apr 2020 08:03:57 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:27791 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726893AbgD2MD4 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 29 Apr 2020 08:03:56 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1588160839;
+        s=mimecast20190719; t=1588161834;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=tWXvPiEROAswH8R05PYoNUB+uY3zOONL7QpJ/glzGJE=;
-        b=WzLvlMSD4zZ0mDEWReJ1fiSWuuOdCzFUY5pRqq4u4+h8VYT0LYPTMbmzZGLPR9RZgvj42p
-        eAFlm9sZReSFiXdD246eaztheKlEXvgOzOoXeEDMdFAUNZJPoCP8OD0dPPi24cTckPQP1U
-        0NC6LY8I+JCnovfi8pPhyRNly7covbM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-174-6gY05wMwOP6Ng98qk5Edog-1; Wed, 29 Apr 2020 07:47:17 -0400
-X-MC-Unique: 6gY05wMwOP6Ng98qk5Edog-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 88D23BFC1;
-        Wed, 29 Apr 2020 11:47:16 +0000 (UTC)
-Received: from [10.36.114.55] (ovpn-114-55.ams2.redhat.com [10.36.114.55])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 251D91001281;
-        Wed, 29 Apr 2020 11:47:14 +0000 (UTC)
-Subject: Re: [PATCH v2 08/10] s390x: smp: Wait for sigp completion
-To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     thuth@redhat.com, linux-s390@vger.kernel.org,
-        borntraeger@de.ibm.com, cohuck@redhat.com
-References: <20200423091013.11587-1-frankja@linux.ibm.com>
- <20200423091013.11587-9-frankja@linux.ibm.com>
- <6084d368-86d6-b8fd-d4d3-5e0d72cef590@redhat.com>
- <18b6f022-81b7-6e0d-996d-3abcffceca41@linux.ibm.com>
- <be5ed01e-f4f6-6e3a-deb0-8f983e658e0f@linux.ibm.com>
- <8182df06-8190-001d-ad02-ae13fb99ec72@redhat.com>
- <802601e1-0bc0-faba-b802-2b0e24e3d96b@linux.ibm.com>
- <5ef08433-10fd-ccca-eb13-5a93bd462c4c@redhat.com>
- <cca03b19-4008-78c8-0528-e928b013b715@linux.ibm.com>
-From:   David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
- dBrn+lhhOYjjNefFQou6478faXE6o2AhmebqT4KiQoUQFV4R7y1KMEKoSyy8hQaK1umALTdL
- QZLQMzNE74ap+GDK0wnacPQFpcG1AE9RMq3aeErY5tujekBS32jfC/7AnH7I0v1v1TbbK3Gp
- XNeiN4QroO+5qaSr0ID2sz5jtBLRb15RMre27E1ImpaIv2Jw8NJgW0k/D1RyKCwaTsgRdwuK
- Kx/Y91XuSBdz0uOyU/S8kM1+ag0wvsGlpBVxRR/xw/E8M7TEwuCZQArqqTCmkG6HGcXFT0V9
- PXFNNgV5jXMQRwU0O/ztJIQqsE5LsUomE//bLwzj9IVsaQpKDqW6TAPjcdBDPLHvriq7kGjt
- WhVhdl0qEYB8lkBEU7V2Yb+SYhmhpDrti9Fq1EsmhiHSkxJcGREoMK/63r9WLZYI3+4W2rAc
- UucZa4OT27U5ZISjNg3Ev0rxU5UH2/pT4wJCfxwocmqaRr6UYmrtZmND89X0KigoFD/XSeVv
- jwBRNjPAubK9/k5NoRrYqztM9W6sJqrH8+UWZ1Idd/DdmogJh0gNC0+N42Za9yBRURfIdKSb
- B3JfpUqcWwE7vUaYrHG1nw54pLUoPG6sAA7Mehl3nd4pZUALHwARAQABtCREYXZpZCBIaWxk
- ZW5icmFuZCA8ZGF2aWRAcmVkaGF0LmNvbT6JAlgEEwEIAEICGwMFCQlmAYAGCwkIBwMCBhUI
- AgkKCwQWAgMBAh4BAheAFiEEG9nKrXNcTDpGDfzKTd4Q9wD/g1oFAl3pImkCGQEACgkQTd4Q
- 9wD/g1o+VA//SFvIHUAvul05u6wKv/pIR6aICPdpF9EIgEU448g+7FfDgQwcEny1pbEzAmiw
- zAXIQ9H0NZh96lcq+yDLtONnXk/bEYWHHUA014A1wqcYNRY8RvY1+eVHb0uu0KYQoXkzvu+s
- Dncuguk470XPnscL27hs8PgOP6QjG4jt75K2LfZ0eAqTOUCZTJxA8A7E9+XTYuU0hs7QVrWJ
- jQdFxQbRMrYz7uP8KmTK9/Cnvqehgl4EzyRaZppshruKMeyheBgvgJd5On1wWq4ZUV5PFM4x
- II3QbD3EJfWbaJMR55jI9dMFa+vK7MFz3rhWOkEx/QR959lfdRSTXdxs8V3zDvChcmRVGN8U
- Vo93d1YNtWnA9w6oCW1dnDZ4kgQZZSBIjp6iHcA08apzh7DPi08jL7M9UQByeYGr8KuR4i6e
- RZI6xhlZerUScVzn35ONwOC91VdYiQgjemiVLq1WDDZ3B7DIzUZ4RQTOaIWdtXBWb8zWakt/
- ztGhsx0e39Gvt3391O1PgcA7ilhvqrBPemJrlb9xSPPRbaNAW39P8ws/UJnzSJqnHMVxbRZC
- Am4add/SM+OCP0w3xYss1jy9T+XdZa0lhUvJfLy7tNcjVG/sxkBXOaSC24MFPuwnoC9WvCVQ
- ZBxouph3kqc4Dt5X1EeXVLeba+466P1fe1rC8MbcwDkoUo65Ag0EVcufkQEQAOfX3n0g0fZz
- Bgm/S2zF/kxQKCEKP8ID+Vz8sy2GpDvveBq4H2Y34XWsT1zLJdvqPI4af4ZSMxuerWjXbVWb
- T6d4odQIG0fKx4F8NccDqbgHeZRNajXeeJ3R7gAzvWvQNLz4piHrO/B4tf8svmRBL0ZB5P5A
- 2uhdwLU3NZuK22zpNn4is87BPWF8HhY0L5fafgDMOqnf4guJVJPYNPhUFzXUbPqOKOkL8ojk
- CXxkOFHAbjstSK5Ca3fKquY3rdX3DNo+EL7FvAiw1mUtS+5GeYE+RMnDCsVFm/C7kY8c2d0G
- NWkB9pJM5+mnIoFNxy7YBcldYATVeOHoY4LyaUWNnAvFYWp08dHWfZo9WCiJMuTfgtH9tc75
- 7QanMVdPt6fDK8UUXIBLQ2TWr/sQKE9xtFuEmoQGlE1l6bGaDnnMLcYu+Asp3kDT0w4zYGsx
- 5r6XQVRH4+5N6eHZiaeYtFOujp5n+pjBaQK7wUUjDilPQ5QMzIuCL4YjVoylWiBNknvQWBXS
- lQCWmavOT9sttGQXdPCC5ynI+1ymZC1ORZKANLnRAb0NH/UCzcsstw2TAkFnMEbo9Zu9w7Kv
- AxBQXWeXhJI9XQssfrf4Gusdqx8nPEpfOqCtbbwJMATbHyqLt7/oz/5deGuwxgb65pWIzufa
- N7eop7uh+6bezi+rugUI+w6DABEBAAGJAiUEGAECAA8FAlXLn5ECGwwFCQlmAYAACgkQTd4Q
- 9wD/g1qA6w/+M+ggFv+JdVsz5+ZIc6MSyGUozASX+bmIuPeIecc9UsFRatc91LuJCKMkD9Uv
- GOcWSeFpLrSGRQ1Z7EMzFVU//qVs6uzhsNk0RYMyS0B6oloW3FpyQ+zOVylFWQCzoyyf227y
- GW8HnXunJSC+4PtlL2AY4yZjAVAPLK2l6mhgClVXTQ/S7cBoTQKP+jvVJOoYkpnFxWE9pn4t
- H5QIFk7Ip8TKr5k3fXVWk4lnUi9MTF/5L/mWqdyIO1s7cjharQCstfWCzWrVeVctpVoDfJWp
- 4LwTuQ5yEM2KcPeElLg5fR7WB2zH97oI6/Ko2DlovmfQqXh9xWozQt0iGy5tWzh6I0JrlcxJ
- ileZWLccC4XKD1037Hy2FLAjzfoWgwBLA6ULu0exOOdIa58H4PsXtkFPrUF980EEibUp0zFz
- GotRVekFAceUaRvAj7dh76cToeZkfsjAvBVb4COXuhgX6N4pofgNkW2AtgYu1nUsPAo+NftU
- CxrhjHtLn4QEBpkbErnXQyMjHpIatlYGutVMS91XTQXYydCh5crMPs7hYVsvnmGHIaB9ZMfB
- njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
- FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
-Organization: Red Hat GmbH
-Message-ID: <b1372d9f-ad21-af27-3c7f-1b60ab2e0597@redhat.com>
-Date:   Wed, 29 Apr 2020 13:47:14 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+         in-reply-to:in-reply-to:references:references;
+        bh=PqLyCXunZj5hIFRUBscgO/EQSOL9w9OMkdGXwDOCk6M=;
+        b=VNU9le3J0Fnzu7NyUHsMVo9C80npV4kOpJOAsjsilFZGH5lvXe4f8O6g2FdmJS4+8d9mbp
+        CJFsy8b41E7GP+bsq0RHW6rYECUhtrWx2T1MXVyoJSW2Ho+O3Y7JVomBK4stbe11rayxRY
+        LOIu95UNgm1RzaJGJ7MzZa0FhQst2Fg=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-32-FB6ifFf0NDehJ9zMyeDU9g-1; Wed, 29 Apr 2020 08:03:53 -0400
+X-MC-Unique: FB6ifFf0NDehJ9zMyeDU9g-1
+Received: by mail-wr1-f70.google.com with SMTP id p16so1596252wro.16
+        for <kvm@vger.kernel.org>; Wed, 29 Apr 2020 05:03:52 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=PqLyCXunZj5hIFRUBscgO/EQSOL9w9OMkdGXwDOCk6M=;
+        b=q52JyaRgPRMgerm3EXOJArPJb/lgw4wg2r1dUhO5nAvfkBGjeT8UxF/lbNfKANegUw
+         RQMRjDK4RGKKADCAGbLVm6++jSNgbuZBw8Fuld9RPQgGfypcAW9Ja/MeeRwmoEdF16TO
+         R1C5Rcv5W6YX5vJGXQe76yElvn+BFixJM1NpDfV9aLqtYFNXvVZRnZefsvkgh88MDEyl
+         jUpHNgbHbsGpGB9StrRCfCLQMvSPyQrqA4BhOaIdk1GsuPq3VoCgB1aNhmUagB3bbnfd
+         5Twv98YFhLxYyM94Klmm8nePuyXuFWQomtcmihSrgPnpnHS9SYrzK5Ztl5Es7/eaF34/
+         0Vug==
+X-Gm-Message-State: AGi0PuZ9/pWim7LGYTmQnGrIm+5PupkxWOhflB6ekbL6IdNrUkDNEvjp
+        NTDg3DSe6vty5MY+wPhH2tXeTkVNrlKGBnxGaaOXUVjXmZXMQi89JVKpQToV3G6kxOgxVDhzE5i
+        zVIUApYUneJ3T
+X-Received: by 2002:a5d:470a:: with SMTP id y10mr38056962wrq.63.1588161831813;
+        Wed, 29 Apr 2020 05:03:51 -0700 (PDT)
+X-Google-Smtp-Source: APiQypLf4KZ8Rngx22ZnSSPEeNNoZEwjNixMH7nATd8iA4vBWIWJ++JJzRvFnPP9z8By88bEDzPwkg==
+X-Received: by 2002:a5d:470a:: with SMTP id y10mr38056907wrq.63.1588161831501;
+        Wed, 29 Apr 2020 05:03:51 -0700 (PDT)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id h16sm33279920wrw.36.2020.04.29.05.03.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 29 Apr 2020 05:03:46 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+Cc:     kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        tianjia.zhang@linux.alibaba.com, pbonzini@redhat.com,
+        tsbogend@alpha.franken.de, paulus@ozlabs.org, mpe@ellerman.id.au,
+        benh@kernel.crashing.org, borntraeger@de.ibm.com,
+        frankja@linux.ibm.com, david@redhat.com, cohuck@redhat.com,
+        heiko.carstens@de.ibm.com, gor@linux.ibm.com,
+        sean.j.christopherson@intel.com, wanpengli@tencent.com,
+        jmattson@google.com, joro@8bytes.org, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, x86@kernel.org, hpa@zytor.com,
+        maz@kernel.org, james.morse@arm.com, julien.thierry.kdev@gmail.com,
+        suzuki.poulose@arm.com, christoffer.dall@arm.com,
+        peterx@redhat.com, thuth@redhat.com, chenhuacai@gmail.com
+Subject: Re: [PATCH v4 1/7] KVM: s390: clean up redundant 'kvm_run' parameters
+In-Reply-To: <20200427043514.16144-2-tianjia.zhang@linux.alibaba.com>
+References: <20200427043514.16144-1-tianjia.zhang@linux.alibaba.com> <20200427043514.16144-2-tianjia.zhang@linux.alibaba.com>
+Date:   Wed, 29 Apr 2020 14:03:41 +0200
+Message-ID: <87r1w6h52a.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <cca03b19-4008-78c8-0528-e928b013b715@linux.ibm.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 29.04.20 13:21, Janosch Frank wrote:
-> On 4/29/20 11:55 AM, David Hildenbrand wrote:
->> On 29.04.20 11:37, Janosch Frank wrote:
->>> On 4/29/20 11:06 AM, David Hildenbrand wrote:
->>>> On 29.04.20 10:57, Janosch Frank wrote:
->>>>> On 4/24/20 1:40 PM, Janosch Frank wrote:
->>>>>> On 4/24/20 12:11 PM, David Hildenbrand wrote:
->>>>>>> On 23.04.20 11:10, Janosch Frank wrote:
->>>>>>>> Sigp orders are not necessarily finished when the processor finished
->>>>>>>> the sigp instruction. We need to poll if the order has been finished
->>>>>>>> before we continue.
->>>>>>>>
->>>>>>>> For (re)start and stop we already use sigp sense running and sigp
->>>>>>>> sense loops. But we still lack completion checks for stop and store
->>>>>>>> status, as well as the cpu resets.
->>>>>>>>
->>>>>>>> Let's add them.
->>>>>>>>
->>>>>>>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
->>>>>>>> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
->>>>>>>> ---
->>>>>>>>  lib/s390x/smp.c | 8 ++++++++
->>>>>>>>  lib/s390x/smp.h | 1 +
->>>>>>>>  s390x/smp.c     | 4 ++++
->>>>>>>>  3 files changed, 13 insertions(+)
->>>>>>>>
->>>>>>>> diff --git a/lib/s390x/smp.c b/lib/s390x/smp.c
->>>>>>>> index 6ef0335..2555bf4 100644
->>>>>>>> --- a/lib/s390x/smp.c
->>>>>>>> +++ b/lib/s390x/smp.c
->>>>>>>> @@ -154,6 +154,14 @@ int smp_cpu_start(uint16_t addr, struct psw psw)
->>>>>>>>  	return rc;
->>>>>>>>  }
->>>>>>>>  
->>>>>>>> +void smp_cpu_wait_for_completion(uint16_t addr)
->>>>>>>> +{
->>>>>>>> +	uint32_t status;
->>>>>>>> +
->>>>>>>> +	/* Loops when cc == 2, i.e. when the cpu is busy with a sigp order */
->>>>>>>> +	sigp_retry(1, SIGP_SENSE, 0, &status);
->>>>>>>> +}
->>>>>>>> +
->>>>>>>>  int smp_cpu_destroy(uint16_t addr)
->>>>>>>>  {
->>>>>>>>  	struct cpu *cpu;
->>>>>>>> diff --git a/lib/s390x/smp.h b/lib/s390x/smp.h
->>>>>>>> index ce63a89..a8b98c0 100644
->>>>>>>> --- a/lib/s390x/smp.h
->>>>>>>> +++ b/lib/s390x/smp.h
->>>>>>>> @@ -45,6 +45,7 @@ int smp_cpu_restart(uint16_t addr);
->>>>>>>>  int smp_cpu_start(uint16_t addr, struct psw psw);
->>>>>>>>  int smp_cpu_stop(uint16_t addr);
->>>>>>>>  int smp_cpu_stop_store_status(uint16_t addr);
->>>>>>>> +void smp_cpu_wait_for_completion(uint16_t addr);
->>>>>>>>  int smp_cpu_destroy(uint16_t addr);
->>>>>>>>  int smp_cpu_setup(uint16_t addr, struct psw psw);
->>>>>>>>  void smp_teardown(void);
->>>>>>>> diff --git a/s390x/smp.c b/s390x/smp.c
->>>>>>>> index 7462211..48321f4 100644
->>>>>>>> --- a/s390x/smp.c
->>>>>>>> +++ b/s390x/smp.c
->>>>>>>> @@ -75,6 +75,7 @@ static void test_stop_store_status(void)
->>>>>>>>  	lc->prefix_sa = 0;
->>>>>>>>  	lc->grs_sa[15] = 0;
->>>>>>>>  	smp_cpu_stop_store_status(1);
->>>>>>>> +	smp_cpu_wait_for_completion(1);
->>>>>>>>  	mb();
->>>>>>>>  	report(lc->prefix_sa == (uint32_t)(uintptr_t)cpu->lowcore, "prefix");
->>>>>>>>  	report(lc->grs_sa[15], "stack");
->>>>>>>> @@ -85,6 +86,7 @@ static void test_stop_store_status(void)
->>>>>>>>  	lc->prefix_sa = 0;
->>>>>>>>  	lc->grs_sa[15] = 0;
->>>>>>>>  	smp_cpu_stop_store_status(1);
->>>>>>>
->>>>>>> Just curious: Would it make sense to add that inside
->>>>>>> smp_cpu_stop_store_status() instead?
->>>>>>>
->>>>>>
->>>>>> I think so, we also wait for stop and start to finish, so why not for
->>>>>> this order code.
->>>>>>
->>>>>
->>>>> I've moved the waiting into the smp library and now the prefix check for
->>>>> stop and store status fails every so often if executed repeatedly.
->>>>>
->>>>> I've tried making the lc ptr volatile, a print of the prefix before the
->>>>> report seems to fix the issue, a print after the report still shows the
->>>>> issue but according to the print both values are the same.
->>>>>
->>>>> I'm currently at a loss...
->>>>
->>>> Are you missing a barrier() somewhere?
->>>>
->>>
->>> Maybe, but the question is where?
->>>
->>> There's already one before the report:
->>> smp_cpu_stop_store_status(1);
->>> mb();
->>> report(lc->prefix_sa == (uint32_t)(uintptr_t)cpu->lowcore, "prefix");
->>
->> The issue here is:
->>
->> SIGP_SENSE is always handled in the kernel for KVM. Meaning, it will
->> complete even before the target CPU executed the stop and store (in QEMU).
->>
->> Reading the PoP:
->>
->> "One of the following conditions exists at the
->> addressed CPU: ... A previously issued stop-
->> and-store-status ... has been accepted by the
->> addressed CPU, and execution of the func-
->> tion requested by the order has not yet been
->> completed.
->>
->> "If the currently specified order is sense ... then the order
->> is rejected, and condition code 2 is set."
->>
->> So, in case of KVM, SENSE does not wait for completion of the previous
->> order. I remember that was a performance improvements, because we wanted
->> to avoid going to user space just to sense if another CPU is running.
->> (and I remember that the documentation was inconsistent)
-> 
-> So, KVM is not architectural compliant when it comes to SIGP SENSE?
-> I guess I need to go back to looping until the prefix is > 0
+Tianjia Zhang <tianjia.zhang@linux.alibaba.com> writes:
 
-Yeah, or fix SIGP_SENSE in KVM. Would need QEMU and KVM changes. I
-remember that a tricky part was checking if external calls are pending
-for a CPU from user space.
+> In the current kvm version, 'kvm_run' has been included in the 'kvm_vcpu'
+> structure. For historical reasons, many kvm-related function parameters
+> retain the 'kvm_run' and 'kvm_vcpu' parameters at the same time. This
+> patch does a unified cleanup of these remaining redundant parameters.
+>
+> Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+> ---
+>  arch/s390/kvm/kvm-s390.c | 23 +++++++++++++++--------
+>  1 file changed, 15 insertions(+), 8 deletions(-)
+>
+> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> index e335a7e5ead7..c0d94eaa00d7 100644
+> --- a/arch/s390/kvm/kvm-s390.c
+> +++ b/arch/s390/kvm/kvm-s390.c
+> @@ -4176,8 +4176,9 @@ static int __vcpu_run(struct kvm_vcpu *vcpu)
+>  	return rc;
+>  }
+>  
+> -static void sync_regs_fmt2(struct kvm_vcpu *vcpu, struct kvm_run *kvm_run)
+> +static void sync_regs_fmt2(struct kvm_vcpu *vcpu)
+>  {
+> +	struct kvm_run *kvm_run = vcpu->run;
+>  	struct runtime_instr_cb *riccb;
+>  	struct gs_cb *gscb;
+>  
+> @@ -4243,8 +4244,10 @@ static void sync_regs_fmt2(struct kvm_vcpu *vcpu, struct kvm_run *kvm_run)
+>  	/* SIE will load etoken directly from SDNX and therefore kvm_run */
+>  }
+>  
+> -static void sync_regs(struct kvm_vcpu *vcpu, struct kvm_run *kvm_run)
+> +static void sync_regs(struct kvm_vcpu *vcpu)
+>  {
+> +	struct kvm_run *kvm_run = vcpu->run;
+> +
+>  	if (kvm_run->kvm_dirty_regs & KVM_SYNC_PREFIX)
+>  		kvm_s390_set_prefix(vcpu, kvm_run->s.regs.prefix);
+>  	if (kvm_run->kvm_dirty_regs & KVM_SYNC_CRS) {
+> @@ -4273,7 +4276,7 @@ static void sync_regs(struct kvm_vcpu *vcpu, struct kvm_run *kvm_run)
+>  
+>  	/* Sync fmt2 only data */
+>  	if (likely(!kvm_s390_pv_cpu_is_protected(vcpu))) {
+> -		sync_regs_fmt2(vcpu, kvm_run);
+> +		sync_regs_fmt2(vcpu);
+>  	} else {
+>  		/*
+>  		 * In several places we have to modify our internal view to
+> @@ -4292,8 +4295,10 @@ static void sync_regs(struct kvm_vcpu *vcpu, struct kvm_run *kvm_run)
+>  	kvm_run->kvm_dirty_regs = 0;
+>  }
+>  
+> -static void store_regs_fmt2(struct kvm_vcpu *vcpu, struct kvm_run *kvm_run)
+> +static void store_regs_fmt2(struct kvm_vcpu *vcpu)
+>  {
+> +	struct kvm_run *kvm_run = vcpu->run;
+> +
+>  	kvm_run->s.regs.todpr = vcpu->arch.sie_block->todpr;
+>  	kvm_run->s.regs.pp = vcpu->arch.sie_block->pp;
+>  	kvm_run->s.regs.gbea = vcpu->arch.sie_block->gbea;
+> @@ -4313,8 +4318,10 @@ static void store_regs_fmt2(struct kvm_vcpu *vcpu, struct kvm_run *kvm_run)
+>  	/* SIE will save etoken directly into SDNX and therefore kvm_run */
+>  }
+>  
+> -static void store_regs(struct kvm_vcpu *vcpu, struct kvm_run *kvm_run)
+> +static void store_regs(struct kvm_vcpu *vcpu)
+>  {
+> +	struct kvm_run *kvm_run = vcpu->run;
+> +
+>  	kvm_run->psw_mask = vcpu->arch.sie_block->gpsw.mask;
+>  	kvm_run->psw_addr = vcpu->arch.sie_block->gpsw.addr;
+>  	kvm_run->s.regs.prefix = kvm_s390_get_prefix(vcpu);
+> @@ -4333,7 +4340,7 @@ static void store_regs(struct kvm_vcpu *vcpu, struct kvm_run *kvm_run)
+>  	current->thread.fpu.fpc = vcpu->arch.host_fpregs.fpc;
+>  	current->thread.fpu.regs = vcpu->arch.host_fpregs.regs;
+>  	if (likely(!kvm_s390_pv_cpu_is_protected(vcpu)))
+> -		store_regs_fmt2(vcpu, kvm_run);
+> +		store_regs_fmt2(vcpu);
+>  }
+>  
+>  int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+> @@ -4371,7 +4378,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+>  		goto out;
+>  	}
+>  
+> -	sync_regs(vcpu, kvm_run);
+> +	sync_regs(vcpu);
+>  	enable_cpu_timer_accounting(vcpu);
+>  
+>  	might_fault();
+> @@ -4393,7 +4400,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+>  	}
+>  
+>  	disable_cpu_timer_accounting(vcpu);
+> -	store_regs(vcpu, kvm_run);
+> +	store_regs(vcpu);
+>  
+>  	kvm_sigset_deactivate(vcpu);
 
-We could pass that information along with the intercept to QEMU.
+Haven't tried to compile this but the change itself looks obviously
+correct, so
 
-AFAIKs, SIGP SENSE is not used on a hot path in Linux.
+Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 
 -- 
-Thanks,
-
-David / dhildenb
+Vitaly
 
