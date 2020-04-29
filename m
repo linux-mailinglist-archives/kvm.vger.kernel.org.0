@@ -2,132 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 250F51BDD5F
-	for <lists+kvm@lfdr.de>; Wed, 29 Apr 2020 15:20:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1DB881BDD64
+	for <lists+kvm@lfdr.de>; Wed, 29 Apr 2020 15:21:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726832AbgD2NUJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 Apr 2020 09:20:09 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:39172 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726776AbgD2NUI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 29 Apr 2020 09:20:08 -0400
+        id S1726760AbgD2NVw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 Apr 2020 09:21:52 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:55844 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726599AbgD2NVw (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 29 Apr 2020 09:21:52 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1588166407;
+        s=mimecast20190719; t=1588166510;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=n1dpe2R+BaXjYKU81tW2AJJKUbU2yVflRAds1OeIUQA=;
-        b=QwobHKi2HvETYpH8Er0vgqNDGXauJ25NdUiT0fNcpM9Wahn8hB28VamL57CU9rtjG+aWcg
-        ANvE4mCEMH9MkqqqcQB/qwxD9vg3cZuJ49QUBorf2p56HZf5buVG0aBsIU94kbwwxp7uEp
-        a2P4vxoiZJfaQcjq1Y6Ulr4RcpzAXcA=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-167-9Xu4WHEZOvWDy8yo_abDSw-1; Wed, 29 Apr 2020 09:20:03 -0400
-X-MC-Unique: 9Xu4WHEZOvWDy8yo_abDSw-1
-Received: by mail-wm1-f69.google.com with SMTP id t62so1204136wma.0
-        for <kvm@vger.kernel.org>; Wed, 29 Apr 2020 06:20:03 -0700 (PDT)
+        bh=Kh2zEXuRrHJ7OoyUsto1r+1dFw1T/nGXYT4VtCcPwG4=;
+        b=aigJc8JR81mnRUxaWqNlL4tr/sYvl2THPdb1NQJhOVx/r8Sl5G9zQCF5KRjQmU5h1C97oV
+        7DPSHieJMWvFEjitXFmA4WthbCA5STi0i6jRXE9ZsWFSc7g1nHk8rL9YkgYHuExewUikXl
+        A+OW1lFI0RJgkyG/aiHSQ4//8cP8a3k=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-127-pXIgCupwOnKTnob2EpDzJg-1; Wed, 29 Apr 2020 09:21:49 -0400
+X-MC-Unique: pXIgCupwOnKTnob2EpDzJg-1
+Received: by mail-wr1-f72.google.com with SMTP id r17so1706013wrg.19
+        for <kvm@vger.kernel.org>; Wed, 29 Apr 2020 06:21:48 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=n1dpe2R+BaXjYKU81tW2AJJKUbU2yVflRAds1OeIUQA=;
-        b=Etel25L8RaFI5sS/ZKeqJ3hqDZmbZZZWTG+EWXu4LNiy6pgjNDrq+zFS+R/jzMPlRH
-         Sf/tV1Gla2yAdMgXhbPhc+oKLuyMWQyJ/UjPGJSVR2cZ8p2s2Op1f2Bdq8ZNawTxXxFX
-         CJyH+tjS944h+A8dPXJ/v6NXW1/xT/ScnupUa86XWNfomCr0Oj8hO2cLvY/LjID8Wa+e
-         YV3djZvn4tw9OtRA3fBLDyaMUuxmg7002sk8UPPysxs8QGHa7+wSWcfwUkOTFWpnPf9U
-         wgVygxwAiGxNjinFuXNg9zhTBAjtRE4BAa3T9i0yHpQgHCp06AXNA/vmR4Ciei8qFns5
-         rZsA==
-X-Gm-Message-State: AGi0PuakHCHBD0pTJnXERRV+3tlaQAvPyRybdUymWQNbcU+cnbxdDnyX
-        vrRo8kUNh8KolO4sYap3NijFbwwwbzEqHQ9yUjnrQUeO/wLh/Wc8L8kB4EKNprLsIiYymROrSvF
-        Jk/Vm4ZUFLdck
-X-Received: by 2002:a5d:650b:: with SMTP id x11mr38608016wru.405.1588166402530;
-        Wed, 29 Apr 2020 06:20:02 -0700 (PDT)
-X-Google-Smtp-Source: APiQypLLm8qn1Tw91phFnLxp2Md4CBWIVFhkVC0MYgra0vAWcDzU06OmfmNuwnFvZRprLFRjLESqcA==
-X-Received: by 2002:a5d:650b:: with SMTP id x11mr38607988wru.405.1588166402233;
-        Wed, 29 Apr 2020 06:20:02 -0700 (PDT)
+        bh=Kh2zEXuRrHJ7OoyUsto1r+1dFw1T/nGXYT4VtCcPwG4=;
+        b=h5gggXGmRc9XqNwv9oNNbc61HywIjxF0dsadb+FmQdugV3fCa/K7G9Vr9yHI4QGXu3
+         nn8mX3NSlAW9VjzaE9MdEykwxO1d9YUK+OQqqnZMnBUQdQsJHEaiW65V+9HRKDMQZbyt
+         eRKs6EcIGzTObFXj5clyqKcjQFp5FR+0JywOjk1bcKl+DCgbGk7lDT89vcUPZfhj6bJr
+         8ppgMH/aSl26IAEw/ynfI+UNc8MjEseoXNqkDQDepFnKNe+cerGWtOhPzyud5s+uNwrK
+         6ow/VYzTx2H0BR/Bu2gGz19jedNtgY2p+/YN3uH2nIJU/4OqLL3PrLymseGr4JezqtfQ
+         6F+A==
+X-Gm-Message-State: AGi0PuahG3lHVqpaJfNhpZblA6wZy67XQaKvm3VSoET/7ipH6RZGuyNs
+        MucvdsOGibZq9xcSi8fOg/5+W621E987TXVBB2oBIFqeDELnldnaHkrumLnF2sGIBuvaWf9E0um
+        5yPV4n/Ol9Yfv
+X-Received: by 2002:a5d:574b:: with SMTP id q11mr33967169wrw.324.1588166507575;
+        Wed, 29 Apr 2020 06:21:47 -0700 (PDT)
+X-Google-Smtp-Source: APiQypIHNXwnwSe2sR6WV2t9YCV9HVySfV4QKReiL6szz5wDHMQxpkv0Y/6/6o/vsY5sereoKPmpnw==
+X-Received: by 2002:a5d:574b:: with SMTP id q11mr33967138wrw.324.1588166507283;
+        Wed, 29 Apr 2020 06:21:47 -0700 (PDT)
 Received: from [192.168.10.150] ([93.56.170.5])
-        by smtp.gmail.com with ESMTPSA id s14sm8221183wme.33.2020.04.29.06.20.00
+        by smtp.gmail.com with ESMTPSA id x18sm7647996wmi.29.2020.04.29.06.21.45
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 29 Apr 2020 06:20:01 -0700 (PDT)
-Subject: Re: [PATCH v1 00/15] Add support for Nitro Enclaves
-To:     Alexander Graf <graf@amazon.com>,
-        "Paraschiv, Andra-Irina" <andraprs@amazon.com>,
-        linux-kernel@vger.kernel.org
-Cc:     Anthony Liguori <aliguori@amazon.com>,
-        Benjamin Herrenschmidt <benh@amazon.com>,
-        Colm MacCarthaigh <colmmacc@amazon.com>,
-        Bjoern Doebel <doebel@amazon.de>,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        Frank van der Linden <fllinden@amazon.com>,
-        Martin Pohlack <mpohlack@amazon.de>,
-        Matt Wilson <msw@amazon.com>, Balbir Singh <sblbir@amazon.com>,
-        Stewart Smith <trawets@amazon.com>,
-        Uwe Dannowski <uwed@amazon.de>, kvm@vger.kernel.org,
-        ne-devel-upstream@amazon.com
-References: <20200421184150.68011-1-andraprs@amazon.com>
- <18406322-dc58-9b59-3f94-88e6b638fe65@redhat.com>
- <ff65b1ed-a980-9ddc-ebae-996869e87308@amazon.com>
- <2a4a15c5-7adb-c574-d558-7540b95e2139@redhat.com>
- <1ee5958d-e13e-5175-faf7-a1074bd9846d@amazon.com>
- <f560aed3-a241-acbd-6d3b-d0c831234235@redhat.com>
- <80489572-72a1-dbe7-5306-60799711dae0@amazon.com>
- <0467ce02-92f3-8456-2727-c4905c98c307@redhat.com>
- <5f8de7da-9d5c-0115-04b5-9f08be0b34b0@amazon.com>
- <095e3e9d-c9e5-61d0-cdfc-2bb099f02932@redhat.com>
- <602565db-d9a6-149a-0e1a-fe9c14a90ce7@amazon.com>
- <fb0bfd95-4732-f3c6-4a59-7227cf50356c@redhat.com>
- <0a4c7a95-af86-270f-6770-0a283cec30df@amazon.com>
+        Wed, 29 Apr 2020 06:21:46 -0700 (PDT)
+Subject: Re: [PATCH RFC 3/6] KVM: x86: interrupt based APF page-ready event
+ delivery
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, Andy Lutomirski <luto@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>, x86@kernel.org,
+        kvm@vger.kernel.org
+References: <20200429093634.1514902-1-vkuznets@redhat.com>
+ <20200429093634.1514902-4-vkuznets@redhat.com>
+ <546bb75a-ec00-f748-1f44-2b5299a3d3d7@redhat.com>
+ <87ees6h3cm.fsf@vitty.brq.redhat.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <ad01ef35-9ee5-cf94-640c-4c26184946fa@redhat.com>
-Date:   Wed, 29 Apr 2020 15:20:01 +0200
+Message-ID: <15c625c5-d551-85fd-8412-f88503e6a86b@redhat.com>
+Date:   Wed, 29 Apr 2020 15:21:45 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <0a4c7a95-af86-270f-6770-0a283cec30df@amazon.com>
+In-Reply-To: <87ees6h3cm.fsf@vitty.brq.redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 28/04/20 17:07, Alexander Graf wrote:
->> So why not just start running the enclave at 0xfffffff0 in real mode?
->> Yes everybody hates it, but that's what OSes are written against.  In
->> the simplest example, the parent enclave can load bzImage and initrd at
->> 0x10000 and place firmware tables (MPTable and DMI) somewhere at
->> 0xf0000; the firmware would just be a few movs to segment registers
->> followed by a long jmp.
+On 29/04/20 14:40, Vitaly Kuznetsov wrote:
+> Paolo Bonzini <pbonzini@redhat.com> writes:
 > 
-> There is a bit of initial attestation flow in the enclave, so that
-> you can be sure that the code that is running is actually what you wanted to
-> run.
-
-Can you explain this, since it's not documented?
-
->   vm = ne_create(vcpus = 4)
->   ne_set_memory(vm, hva, len)
->   ne_load_image(vm, addr, len)
->   ne_start(vm)
+>> On 29/04/20 11:36, Vitaly Kuznetsov wrote:
+>>> +
+>>> +	Type 1 page (page missing) events are currently always delivered as
+>>> +	synthetic #PF exception. Type 2 (page ready) are either delivered
+>>> +	by #PF exception (when bit 3 of MSR_KVM_ASYNC_PF_EN is clear) or
+>>> +	via an APIC interrupt (when bit 3 set). APIC interrupt delivery is
+>>> +	controlled by MSR_KVM_ASYNC_PF2.
+>>
+>> I think we should (in the non-RFC version) block async page faults
+>> completely and only keep APF_HALT unless the guest is using page ready
+>> interrupt delivery.
 > 
-> That way we would get the EIF loading into kernel space. "LOAD_IMAGE"
-> would only be available in the time window between set_memory and start.
-> It basically implements a memcpy(), but it would completely hide the
-> hidden semantics of where an EIF has to go, so future device versions
-> (or even other enclave implementers) could change the logic.
-> 
-> I think it also makes sense to just allocate those 4 ioctls from
-> scratch. Paolo, would you still want to "donate" KVM ioctl space in that
-> case?
+> Sure, we can do that. This is, however, a significant behavioral change:
+> APF_HALT frees the host, not the guest, so even if the combined
+> performance of all guests on the same pCPU remain the same guests with
+> e.g. a lot of simultaneously running processes may suffer more.
 
-Sure, that's not a problem.
+Yes, it is a significant change.  However the resulting clean up in the
+spec is significant, because we don't have type 2 notifications at all
+anymore.
+
+(APF_HALT does free the guest a little bit by allowing interrupt
+delivery during a host page fault; in particular it lets the scheduler
+tick run, which does improve responsiveness somewhat significantly).
+
+Likewise, I think we should clean up the guest side without prejudice.
+Patch 6 should disable async page fault unless page-ready interrupts are
+available, and drop the page ready case from the #PF handler.
+
+Thanks,
 
 Paolo
 
-> Overall, the above should address most of the concerns you raised in
-> this mail, right? It still requires copying, but at least we don't have
-> to keep the copy in kernel space.
+> In theory, we can keep two mechanisms side by side for as long as we
+> want but if the end goal is to have '#PF abuse eliminated' than we'll
+> have to get rid of the legacy one some day. The day when the new
+> mechanism lands is also a good choice :-)
+
 
